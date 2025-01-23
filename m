@@ -1,151 +1,107 @@
-Return-Path: <netdev+bounces-160504-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-160505-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 05CA1A19FDE
-	for <lists+netdev@lfdr.de>; Thu, 23 Jan 2025 09:25:38 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 3D85BA19FF6
+	for <lists+netdev@lfdr.de>; Thu, 23 Jan 2025 09:35:52 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 4FFF816DFFD
-	for <lists+netdev@lfdr.de>; Thu, 23 Jan 2025 08:25:36 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 867C316797F
+	for <lists+netdev@lfdr.de>; Thu, 23 Jan 2025 08:35:50 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4F7E320C02E;
-	Thu, 23 Jan 2025 08:25:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 019B120C010;
+	Thu, 23 Jan 2025 08:35:39 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="TSayIkE+"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="eQFDZQKR"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f66.google.com (mail-wm1-f66.google.com [209.85.128.66])
+Received: from mail-ed1-f45.google.com (mail-ed1-f45.google.com [209.85.208.45])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7FAC3320B;
-	Thu, 23 Jan 2025 08:25:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.66
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3B97020B800
+	for <netdev@vger.kernel.org>; Thu, 23 Jan 2025 08:35:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.45
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1737620730; cv=none; b=o4WCHC2U68oFIuBpPIz6mNxFIyPf4SXlFxo62XQ1a4nrYglfL9Zpz+Qiv70VAUoxVcDX0aDGbxkcHKnttlhLLVSa3vV2LJZUkuXCAz1hv1py80hupFktCkvbPH+SL+rUJD3nLjPJ6mdHzw8Q88r7GuKP7iyUZ/HeoHXrvX2ODxM=
+	t=1737621338; cv=none; b=WjKSCRm1AvaF8DvsexfETJOz78MwcGkZtAiD4FC+5i53XvU8cwjeV/LlIHtR4oP4B1DAivAohI9/FtOU4ErmNOKXMw6fChkQitubPYqIyUOFdWrvWJhUVQWj/UtGCgYEZD11SjJ7TOrQaAdfQ8A3eWA1Txzy20NbHLuJwSFc3NE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1737620730; c=relaxed/simple;
-	bh=0RqbJsmBYD4psvJjsPR1/k8+RZSZVR7ryEwaJzId76g=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=Kyh2c7hV2ImG1G6/Nz8a8LZlYSLWnlGJU+AeYM1zGY5d/Lue3KXrGh/hXFslLAy13QQzthkoxZKsi/gJ1RqotRBxM2NULJPDZyib++1lWs039yM23K0DUn9ItgV1QqBtf+GCeR9n3ADVUQXV8NaYVC5aC4cGC3c2rux1e3VWmiw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=TSayIkE+; arc=none smtp.client-ip=209.85.128.66
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wm1-f66.google.com with SMTP id 5b1f17b1804b1-436ce2ab251so3707585e9.1;
-        Thu, 23 Jan 2025 00:25:28 -0800 (PST)
+	s=arc-20240116; t=1737621338; c=relaxed/simple;
+	bh=ZimtWzmtoRn0zBBmr3fNGH8DWBXEuJMF4xxVwaG4Du4=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=t6vBSvrU4UV/HNCKh2Laxnn3quEbyO460MFdHHabk3r2Zf17sP7WDQjAGwtkR9Zj41y9Yor64LoTRlx9IZaIamSw7o61K0sA/fi5t5X70UF3cxUj2nNsHyCuJvWdOQ/eSY1vMSeb1Q1DaDfuvSqLaPJn8TGqg8P6yp/lSRMHReg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=eQFDZQKR; arc=none smtp.client-ip=209.85.208.45
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-ed1-f45.google.com with SMTP id 4fb4d7f45d1cf-5d647d5df90so1167978a12.2
+        for <netdev@vger.kernel.org>; Thu, 23 Jan 2025 00:35:36 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1737620727; x=1738225527; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=7x78WrC+cTNtBpfnkOUA5kq6ry12btJ1fKxNdWFZpHE=;
-        b=TSayIkE+0U+pOvEuJnRxcZgVtCapfSagrwq/toiKmQ8w4Wb4hJCpPg6r0QO8VTxCpi
-         O5iirqYdfrYwF9HYoyZ3B1qoirJZcahDRj4VoIbT2s6qS6dETU/FOVdCTgaMxXCMVgU3
-         kawda30JBuXD/72WCKpQTS/3EEWJk47Jl3FhpbyrWtImmjS6+DDN1u1e0l/IjJLj1R9o
-         O3EUq3Rk3mPZAYVtLPJPNykU5koESxoUd0rtIW4qiv+8VfM/fCYEBTy4Qk6UYLDtzk1W
-         oLV6EDoHkmSKiktgJ+9LMmSPec9Ocj7ZyF/O8Pr1qjHOONap3CbJhKCkKGbWczR3nT2C
-         2d0g==
+        d=google.com; s=20230601; t=1737621335; x=1738226135; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=ZimtWzmtoRn0zBBmr3fNGH8DWBXEuJMF4xxVwaG4Du4=;
+        b=eQFDZQKRWjXx3mhkKrBZkY+6p/BXrdKUJhEVhX/KbK0p40b2t+vWPZP405pzZ/kH5r
+         w3n4ThP9jPXxUbmBQ7YXUP0/3ygjN333GAFixv5ObzfeK4wR2ZNtsmXsIuh74n5aG9tk
+         42ppH+fog0KMisB+VHn76nV3IuKr4r2lOmhaEiecueqfYRAdBdCoySlhqUdUtgAfL/df
+         UOE1iBR0pCLBjTXEhKUqNqDr4zqVtHJZDaAX25SbrmDxQZjs7XPioSzz+MP6LPPR4CaZ
+         pA6fICMgfIniCVhDuGbJEuJHTep4Uq+cCJ3vpXC13itaueIZCT+x9GsX33J7bPX51K/9
+         Krlg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1737620727; x=1738225527;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=7x78WrC+cTNtBpfnkOUA5kq6ry12btJ1fKxNdWFZpHE=;
-        b=mxmo3pGNz6zxiC9pokMJ2tYJt0MomVCfOiYxUvJM24fAvr7EcWzbO5dcn2zGPpWont
-         67ccdR57rSp50TizY18+gdYKy6f/FIdGx/R5vm/hZncWL6NJj7cU+WzljqbKpc7P+w8S
-         gRxB63T/yod/bLcGNpo+XOUpWYizO09tWHJv4bBklEGPSC3QqzEiBp9OLYwb19WbqMCz
-         dITgnso3Nql5nHV1qMKqwvBUFhLRTpItMNbYNlNvO0EvlllIpL+TITwJt42bR9rGti5m
-         Bs7gedb8lwKr12HVIYReezZ6PsA7rYLS651zIvrHNhL618KzWw+AfCvUoZgQ04a4aFsX
-         HhJw==
-X-Forwarded-Encrypted: i=1; AJvYcCUbuOP5EvEk5GKTki3+/OehmCHq17Wqu1OAiQQZrb3PJLaIGzDS81+vPXQyLbBjzSzq1HcnvXp6@vger.kernel.org, AJvYcCVDW/khwxbsYEhBa1w9XGZL68gQtGvSV/gFyUwJdEZzM62sfLVoas3mF4bayYAY6fDf+L+QK5I1eGa60Js+@vger.kernel.org, AJvYcCVrjRI0wRHLSoVb1ZDyLwl+TwWKU3dlb0ERQKOYJ8xfpGPs+VbZa66y8+RXbhLZmyDh3BbVz5N1FgIO@vger.kernel.org, AJvYcCXNNMSU5KlhDD4rJAWdGpvu/yDfW1AxfOynrqLQ9jX2TnxzV37c8yJ3xzlptrfp9UCkq4mbGivcEwQ=@vger.kernel.org, AJvYcCXzDM37I4hjPWQ9EUCI3nS5mv9P/zzW09OOAMogCk3bjIogdCQgBlKf1kmGayYEF+RoUYEd+YfgKhD39dpjbIfqzzTOIy0=@vger.kernel.org
-X-Gm-Message-State: AOJu0Ywl19QpVZVAoF3ZhSSwTw9u28bdknKZC4IIIHH7gkzxMAXRWsC9
-	vbCow9pcw4yeMB+i94ibcQKrNLsBjeSdWFy5Pbemyw4KAIhLlELe
-X-Gm-Gg: ASbGncuooC5rub8bL3fLdEg3+L4NnNFKWsODHwXDNsbGmC/VqWB5/dViDG9OMEsLkrQ
-	LD17jshJYW5hEnPYfiYTldAMmTsYMLti4NZswHGje3w2Scpr0rpSyJnMEP9DGYy9X2ozeFIYPOc
-	3xqPu/Ec8yPGqqf1QNA+j4stAqNCFq/Hq6pt44M1TnPiEsAnCkhR+mLjtdJwcpZYsxzxYbz9c/K
-	pqa5xGHlrhBdBvETlG1cn5cl9iS6jEn49i8LxKZvBCj/+2xtnLynGB7esnAIFxFVbJ+aiBBG0X4
-	NzPgxPbCZoYfh0YQ5EeVBdKvJqch7bg=
-X-Google-Smtp-Source: AGHT+IGC68+iWj/tGHITjYEzoOGz/ssjpVakkTiozXCptHX+mLeBDtIXnpipmOJtFYfncB14B/hKTA==
-X-Received: by 2002:a05:600c:3b94:b0:434:e2ea:fc94 with SMTP id 5b1f17b1804b1-438913cb620mr264534565e9.11.1737620726503;
-        Thu, 23 Jan 2025 00:25:26 -0800 (PST)
-Received: from localhost.localdomain ([197.63.236.210])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-38bf3215bf2sm18829969f8f.18.2025.01.23.00.25.24
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 23 Jan 2025 00:25:25 -0800 (PST)
-From: Khaled Elnaggar <khaledelnaggarlinux@gmail.com>
-To: socketcan@hartkopp.net,
-	mkl@pengutronix.de,
-	davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	horms@kernel.org,
-	corbet@lwn.net
-Cc: Khaled Elnaggar <khaledelnaggarlinux@gmail.com>,
-	shuah@kernel.org,
-	linux-can@vger.kernel.org,
-	netdev@vger.kernel.org,
-	linux-doc@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	linux-kernel-mentees@vger.kernel.org
-Subject: [PATCH] documentation: networking: fix spelling mistakes
-Date: Thu, 23 Jan 2025 10:25:20 +0200
-Message-ID: <20250123082521.59997-1-khaledelnaggarlinux@gmail.com>
-X-Mailer: git-send-email 2.45.2
+        d=1e100.net; s=20230601; t=1737621335; x=1738226135;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=ZimtWzmtoRn0zBBmr3fNGH8DWBXEuJMF4xxVwaG4Du4=;
+        b=oXTvNerzmgnnVAlYj8avYciy0RjusNwV3J+CSxdmwfViqsmAylK8Z/NrDHWaVdn+lP
+         L8ctIUDuPdofzhCO8sQ3ldipTHW5LTlpkvG6kYpdZhaLoyBgp0FpnbYZZFQ8Gtc1oOI8
+         WjIrbW5I6PwIkH0YvzA/MWo4GhT23C6brfF/EnH1Pa0CoeCzNjtIcNGeb7/mxERvJN9C
+         5V7EYwdzb1MaPwycAWfPK11UUf0JGRLaYrP9TP2tlObMhj5KhzjqSp/P62vdfD8iuhvB
+         wyueLemK+Fz58/28Zd3TlMUskthri1mPvpY1EWz65ZZUP0uW1hrhTJP7aQylHO+9gpNN
+         +LnA==
+X-Forwarded-Encrypted: i=1; AJvYcCWZKYreOw7SfNZNgHkAoNFxywi1G6UJZTp6M49AqmBAOB2rGYe2J3RJG1pDhhIgttkdVtAej+Q=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzpcS9yeJOYtk6gQCYEXERrNTqwkbesorqxHlMK6qu0FicRS+pe
+	D9i9KX05AXT6fV/Yo0N64IS1Ep4gEszP9U9LbshCOfqSo+Ab65yMMzBdKuqGMCP5Hy1lrB4ZGja
+	9nnp5KLpYuboeV0n5z202r3ocFGZKxBQe4SZ9mnR0ba6FJOuXfg==
+X-Gm-Gg: ASbGncs0Q3UBpLL5xoGhh8Q2QV1wrS3rkHra/OdVfis3L7O/ICyJrUgWEoXjLq3KmS8
+	CISUH9CMGelYFRIhbChq7DTQ+TwBWkFs0hxATgtyj0Nqtbb6tQqxKakaLYRxQ
+X-Google-Smtp-Source: AGHT+IFtxqHGcNwvgxixlmy6o4ew/qdNykOEAqnleRnPUq4Ps2wzf24D53UtjIbG41bsJtZ26ww1MyyHBK0syc3BnbE=
+X-Received: by 2002:a05:6402:3550:b0:5d3:ce7f:abee with SMTP id
+ 4fb4d7f45d1cf-5db7db08623mr22895163a12.25.1737621335315; Thu, 23 Jan 2025
+ 00:35:35 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+References: <20250123004520.806855-1-kuba@kernel.org> <20250123004520.806855-7-kuba@kernel.org>
+In-Reply-To: <20250123004520.806855-7-kuba@kernel.org>
+From: Eric Dumazet <edumazet@google.com>
+Date: Thu, 23 Jan 2025 09:35:24 +0100
+X-Gm-Features: AWEUYZkWOcjVIxf35MkfasYofnVKj4UG_H6rnEdLpG0RxgNyviKVDUkt8zWkI8U
+Message-ID: <CANn89iJM8Rb=zYDbvUjwV+MKqA4m3nBzau+OkPHKtquc=yF1kQ@mail.gmail.com>
+Subject: Re: [PATCH net v2 6/7] eth: via-rhine: fix calling napi_enable() in
+ atomic context
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: davem@davemloft.net, netdev@vger.kernel.org, pabeni@redhat.com, 
+	andrew+netdev@lunn.ch, horms@kernel.org, dan.carpenter@linaro.org, 
+	kevinbrace@bracecomputerlab.com, romieu@fr.zoreil.com, kuniyu@amazon.com
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Fix a couple of typos/spelling mistakes in the documentation.
+On Thu, Jan 23, 2025 at 1:45=E2=80=AFAM Jakub Kicinski <kuba@kernel.org> wr=
+ote:
+>
+> napi_enable() may sleep now, take netdev_lock() before rp->lock.
+> napi_enable() is hidden inside init_registers().
+>
+> Note that this patch orders netdev_lock after rp->task_lock,
+> to avoid having to take the netdev_lock() around disable path.
+>
+> Fixes: 413f0271f396 ("net: protect NAPI enablement with netdev_lock()")
+> Reported-by: Dan Carpenter <dan.carpenter@linaro.org>
+> Link: https://lore.kernel.org/dcfd56bc-de32-4b11-9e19-d8bd1543745d@stanle=
+y.mountain
+> Signed-off-by: Jakub Kicinski <kuba@kernel.org>
 
-Signed-off-by: Khaled Elnaggar <khaledelnaggarlinux@gmail.com>
----
-Hello, I hope the patch is self-explanatory. Please let me know if you
-have any comments.
-
-Aside: CCing Shuah and linux-kernel-mentees as I am working on the mentorship
-application tasks.
-
-Thanks
-Khaled
----
- Documentation/networking/can.rst  | 4 ++--
- Documentation/networking/napi.rst | 2 +-
- 2 files changed, 3 insertions(+), 3 deletions(-)
-
-diff --git a/Documentation/networking/can.rst b/Documentation/networking/can.rst
-index 62519d38c58b..b018ce346392 100644
---- a/Documentation/networking/can.rst
-+++ b/Documentation/networking/can.rst
-@@ -699,10 +699,10 @@ RAW socket option CAN_RAW_JOIN_FILTERS
-
- The CAN_RAW socket can set multiple CAN identifier specific filters that
- lead to multiple filters in the af_can.c filter processing. These filters
--are indenpendent from each other which leads to logical OR'ed filters when
-+are independent from each other which leads to logical OR'ed filters when
- applied (see :ref:`socketcan-rawfilter`).
-
--This socket option joines the given CAN filters in the way that only CAN
-+This socket option joins the given CAN filters in the way that only CAN
- frames are passed to user space that matched *all* given CAN filters. The
- semantic for the applied filters is therefore changed to a logical AND.
-
-diff --git a/Documentation/networking/napi.rst b/Documentation/networking/napi.rst
-index 6083210ab2a4..f970a2be271a 100644
---- a/Documentation/networking/napi.rst
-+++ b/Documentation/networking/napi.rst
-@@ -362,7 +362,7 @@ It is expected that ``irq-suspend-timeout`` will be set to a value much larger
- than ``gro_flush_timeout`` as ``irq-suspend-timeout`` should suspend IRQs for
- the duration of one userland processing cycle.
-
--While it is not stricly necessary to use ``napi_defer_hard_irqs`` and
-+While it is not strictly necessary to use ``napi_defer_hard_irqs`` and
- ``gro_flush_timeout`` to use IRQ suspension, their use is strongly
- recommended.
-
---
-2.45.2
-
+Reviewed-by: Eric Dumazet <edumazet@google.com>
 
