@@ -1,82 +1,92 @@
-Return-Path: <netdev+bounces-160584-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-160585-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id E792CA1A674
-	for <lists+netdev@lfdr.de>; Thu, 23 Jan 2025 16:02:11 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2CCECA1A6B7
+	for <lists+netdev@lfdr.de>; Thu, 23 Jan 2025 16:10:10 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 3798E3A8E2D
-	for <lists+netdev@lfdr.de>; Thu, 23 Jan 2025 15:01:47 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id E923C188878A
+	for <lists+netdev@lfdr.de>; Thu, 23 Jan 2025 15:10:13 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8B22020F994;
-	Thu, 23 Jan 2025 15:01:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 832A8211A03;
+	Thu, 23 Jan 2025 15:10:05 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="OO+TcBxr"
+	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="eMchakSr"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.16])
+Received: from NAM11-BN8-obe.outbound.protection.outlook.com (mail-bn8nam11on2089.outbound.protection.outlook.com [40.107.236.89])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AC0DE211715
-	for <netdev@vger.kernel.org>; Thu, 23 Jan 2025 15:01:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.16
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1737644506; cv=none; b=rIDGeC7agytH7D+XW4tcE/hzXXXFPLUucp9AEkrtdqHFMSmnNIDU7J8uPZxibbsUqLX/asQoJNhLwRWMZEwO/a+r9ZaiiLOdcRlD/RsDkrsyX4G33NB8+2ViNNXhwvSPyERHP3Tj483Yt+4n4K2LaxrHLTIOiNMV6wZztsKoR+0=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1737644506; c=relaxed/simple;
-	bh=p7fa+WFNqJza0sxHWYgodldmhz/kPKET0jzp3FaE6vY=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=uNwIeVyzh64aNjAcb0R5JvZLIC1WwVIa0dfWNgsiAxnRMCExknfdfQ6syM4wwZjYtm0de5a9kLMqBOPC1NIbZbJzvagcFDvczEwEkOYkKylOVT2HpCNKbICq+XAB/UiMWbjcrcCkrbb3linL/dn6C3jRPFbST7ifT9kjYb8H5gU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=OO+TcBxr; arc=none smtp.client-ip=198.175.65.16
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1737644505; x=1769180505;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=p7fa+WFNqJza0sxHWYgodldmhz/kPKET0jzp3FaE6vY=;
-  b=OO+TcBxrXoBBc3tC0jDBixLXtsDOWIN5PqLMBR0iDB8Vax2gbjD7yzsj
-   1ZMsWV3h4IKNQxHzTfLo4KGKMi8uExaWKplemsT1v/gnIHKZN3QTEw+oP
-   d4UwgZJtD8+qt4LgHyk8IaedfnnVMqbCg9InkPwuxJ8npNGRuBSh5x7C1
-   Xo4IB7rUOl3+SUUiFJZYuYjoMVvG8YurW9UZOIOuZnTDIRW3NFcsfulxx
-   IXm1EIcmJagrbi70Xi4HauYm4/mW94xGianEwTm9f77HGbBoN0QoyD6jM
-   nM4bsZZGCqKzvuY7o8Gcd9i5MBujBrHN2ceimW5JFq6bEJ3+6F2j3oG/R
-   g==;
-X-CSE-ConnectionGUID: 7tI1pxSQSmK1LgTx/JwThg==
-X-CSE-MsgGUID: tiuMcYA4RcuP+vPqWCHWDg==
-X-IronPort-AV: E=McAfee;i="6700,10204,11324"; a="38293553"
-X-IronPort-AV: E=Sophos;i="6.13,228,1732608000"; 
-   d="scan'208";a="38293553"
-Received: from fmviesa003.fm.intel.com ([10.60.135.143])
-  by orvoesa108.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 23 Jan 2025 07:01:45 -0800
-X-CSE-ConnectionGUID: InM3erYjQkOQ7maZUy6Lng==
-X-CSE-MsgGUID: Sw+H/qlUQM+bAEwdgYO47Q==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.12,224,1728975600"; 
-   d="scan'208";a="111509018"
-Received: from boxer.igk.intel.com ([10.102.20.173])
-  by fmviesa003.fm.intel.com with ESMTP; 23 Jan 2025 07:01:41 -0800
-From: Maciej Fijalkowski <maciej.fijalkowski@intel.com>
-To: intel-wired-lan@lists.osuosl.org
-Cc: netdev@vger.kernel.org,
-	anthony.l.nguyen@intel.com,
-	magnus.karlsson@intel.com,
-	jacob.e.keller@intel.com,
-	xudu@redhat.com,
-	mschmidt@redhat.com,
-	jmaxwell@redhat.com,
-	poros@redhat.com,
-	przemyslaw.kitszel@intel.com,
-	Maciej Fijalkowski <maciej.fijalkowski@intel.com>,
-	Simon Horman <horms@kernel.org>
-Subject: [PATCH v5 iwl-net 3/3] ice: stop storing XDP verdict within ice_rx_buf
-Date: Thu, 23 Jan 2025 16:01:18 +0100
-Message-Id: <20250123150118.583039-4-maciej.fijalkowski@intel.com>
-X-Mailer: git-send-email 2.38.1
-In-Reply-To: <20250123150118.583039-1-maciej.fijalkowski@intel.com>
-References: <20250123150118.583039-1-maciej.fijalkowski@intel.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BD42920E711;
+	Thu, 23 Jan 2025 15:10:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.236.89
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1737645005; cv=fail; b=GNzueOJpmaQ2f+pYoD4afeBHYl0Zinnv8qiGKWyYXlG3gqv0pbZLxmRaG7+09KIQQaIr0jLjnTY/UXLyUGDkuo/q3gkh283YAQKRwK1/mVRLig8CP5yJFzlYvWOzL/8WOpncV35vbqaP7XRmpK2aQaYQRRnOsCqXZf98YkjOnDU=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1737645005; c=relaxed/simple;
+	bh=O92uHUIh1Q3x4j2A4VL/K9nptztlHAHfXOP6Ad3N9uw=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=KMK26Q/OUlF1jnSpT+Ka0b8UCT6NUIKGStoC+geEL0ZHxpAi9JuR8fp6IND+oGffE5VMXP4Da4m9Fl5AzzlL6kEa3k9AzaziZiGnwiy+berTEVxyOlALBiVPCpatRtrFSV6mP4ftUmeqyF/W9vTUHCmbKry+R+yotoTlGlW5/lI=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=eMchakSr; arc=fail smtp.client-ip=40.107.236.89
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=vI5V7YKWiBT3xtFV3+ETEEKoBBixtEkythbVbf0x1RndclJpFXHjfbTNCjDLc/1zmEvYMmoCe+Y71nrgroL2D0C2Y2/kFEmYCpBX3TbOxN0I2fx3Fyo1cNB/zebF9qHAbNEQFMZcstn4mTuqjaivjceF0p+adun7sfg4AtasuoEH9pAzbUeD3y3PMEaK4QHsfCjyx11DMfxTc0qnfGH0m0knZGOxwGrzDWeGTvuIt2Z2J+L5Dk+ym1V1dOcWG5daCOBIgM09AXhjF22LPP8Dvj/9WC6D+w9QU0Y2YFF26/IErWu8mo7hU9dQCKK83Uj1eeqyAsVK8UcbMzJcbRoUiQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=10mCTQWPnjT4UaE5DswreRKFKzwbMSaB85ao6y8nAfk=;
+ b=hXLDcALIRybqWWDVJGygJjNTrnaKWNwymlBBC5OrRi/0kD58SKuzHJi38jcaSPWFVUAO+8HBMZ7411p1+UC5C36quiuBI2SWvhpsE43qEfhpetqHGMubuxsbacbYr3NbsacBunbTkLqcrzxtVe5J4ca7KGik3SzTJz3RZZ9oIfvDw8MTn1ydQqj11Ugx0kJgjQJHKBCgR2PCyxhJ7NqdyQsayXcBz2MRn7lMVv6b27EofCp43+aAokPdZtX44B3f5CEitBa1TEjmnjoCAXBcqLAjuOXpO1h+j5AaJBcZjnfrShCIfK2+H8V5lVqJe0J2NsIZ7YMtiyurTOrnar9Usg==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
+ 216.228.117.161) smtp.rcpttodomain=vger.kernel.org smtp.mailfrom=nvidia.com;
+ dmarc=pass (p=reject sp=reject pct=100) action=none header.from=nvidia.com;
+ dkim=none (message not signed); arc=none (0)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=10mCTQWPnjT4UaE5DswreRKFKzwbMSaB85ao6y8nAfk=;
+ b=eMchakSrPK6rpTedMhwyV6zCKN+Vwg7x6CMTwOsUuhouDZn2WD5VK2XJNxnn7CZFlt5WsRg6MD/pl1865pjM/A2zNvYZBnO3las27ghXw2v3moZwqoaFX0lPUDH4w5qZ8eBuPiyimW54ua2k1SfVbrRJhxQXoxYmkS0PmVxkJTv520tB6qAvLROO2V6XdAvDpGUo6HROl1c+Aq4OYKyC7CaPXwyb6VMve517MmewfjnL+h6p3AKoEcAed2l5GcSzmo7mwa1RW7H5H0XUc7nqAB/pJdn35MYxfny7j/vHNSUEPFPinzRAStO9jTMeeE0+G1BHD7vJxfLM+EAkMAL80Q==
+Received: from CYXPR03CA0096.namprd03.prod.outlook.com (2603:10b6:930:d3::17)
+ by CY5PR12MB6084.namprd12.prod.outlook.com (2603:10b6:930:28::7) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8377.17; Thu, 23 Jan
+ 2025 15:09:57 +0000
+Received: from CY4PEPF0000EE3B.namprd03.prod.outlook.com
+ (2603:10b6:930:d3:cafe::b0) by CYXPR03CA0096.outlook.office365.com
+ (2603:10b6:930:d3::17) with Microsoft SMTP Server (version=TLS1_3,
+ cipher=TLS_AES_256_GCM_SHA384) id 15.20.8356.22 via Frontend Transport; Thu,
+ 23 Jan 2025 15:09:57 +0000
+X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 216.228.117.161)
+ smtp.mailfrom=nvidia.com; dkim=none (message not signed)
+ header.d=none;dmarc=pass action=none header.from=nvidia.com;
+Received-SPF: Pass (protection.outlook.com: domain of nvidia.com designates
+ 216.228.117.161 as permitted sender) receiver=protection.outlook.com;
+ client-ip=216.228.117.161; helo=mail.nvidia.com; pr=C
+Received: from mail.nvidia.com (216.228.117.161) by
+ CY4PEPF0000EE3B.mail.protection.outlook.com (10.167.242.14) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.8377.8 via Frontend Transport; Thu, 23 Jan 2025 15:09:56 +0000
+Received: from rnnvmail201.nvidia.com (10.129.68.8) by mail.nvidia.com
+ (10.129.200.67) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.4; Thu, 23 Jan
+ 2025 07:09:33 -0800
+Received: from hive.mtl.labs.mlnx (10.126.230.35) by rnnvmail201.nvidia.com
+ (10.129.68.8) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.4; Thu, 23 Jan
+ 2025 07:09:30 -0800
+From: Cosmin Ratiu <cratiu@nvidia.com>
+To: <netdev@vger.kernel.org>
+CC: "David S . Miller" <davem@davemloft.net>, Eric Dumazet
+	<edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
+	<pabeni@redhat.com>, Simon Horman <horms@kernel.org>, Jianbo Liu
+	<jianbol@nvidia.com>, Boris Pismenny <borisp@nvidia.com>, Tariq Toukan
+	<tariqt@nvidia.com>, <linux-kselftest@vger.kernel.org>, Hangbin Liu
+	<liuhangbin@gmail.com>, Liang Li <liali@redhat.com>, Cosmin Ratiu
+	<cratiu@nvidia.com>
+Subject: [PATCH net] bonding: Correctly support GSO ESP offload
+Date: Thu, 23 Jan 2025 17:09:09 +0200
+Message-ID: <20250123150909.387415-1-cratiu@nvidia.com>
+X-Mailer: git-send-email 2.45.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -84,266 +94,145 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-ClientProxiedBy: rnnvmail201.nvidia.com (10.129.68.8) To
+ rnnvmail201.nvidia.com (10.129.68.8)
+X-EOPAttributedMessage: 0
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: CY4PEPF0000EE3B:EE_|CY5PR12MB6084:EE_
+X-MS-Office365-Filtering-Correlation-Id: ac6266ae-e698-4bdf-d973-08dd3bbfffa6
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam:
+	BCL:0;ARA:13230040|82310400026|36860700013|1800799024|376014;
+X-Microsoft-Antispam-Message-Info:
+	=?us-ascii?Q?L6nSZ1/P/CiJ3l2Hw2Y2ns6QxPLbVDuC9Zxr9pypE7+3WACasJKkfoazmvSa?=
+ =?us-ascii?Q?rIkLcDaChbDHNaU17YzeH2A7cmSU78+hUywS/5nHpdwkRoSRrt+YH2jY/DAU?=
+ =?us-ascii?Q?3Esfbv1ttmlSSh+2A3pYKFTg9t1/91Ug5Eg3GGgRqk22zMtkeeJakBmoonSL?=
+ =?us-ascii?Q?h0h73kzPW19mWgENR9NVeJw15lcOk4wC8BgvtiPqbnPyx+2QPaDl/+zXLCDO?=
+ =?us-ascii?Q?4XxevcolbLajjL+xFY0A7w3Pwr7H+Peqs7fRlouf+ANRtuzjpOY3YoGTnsAD?=
+ =?us-ascii?Q?e+JDwZ12r2tSP177507dkkMUIywgjoc0aY4pxD9FOfGysYcAB+7WAHGnbubz?=
+ =?us-ascii?Q?ZNiyiXJRhuJ4ufZG3bg0rC7LsypV5Rus/rndbk0vOVwOVi9A4bvmbLLk1lIs?=
+ =?us-ascii?Q?XXBlELBq+Frk439Vg+7WR9ogdkM1Qrbw2LCa5bog2uZQyAgXVn3QX2B0u5eJ?=
+ =?us-ascii?Q?J/YzJc6JLm+0X8ePAIcYyAyUhV7+RSPoMx0+Pn4TCj13fCoDt9h/LwXd2oDD?=
+ =?us-ascii?Q?JA5TfqsanQq3viuTwTc3Rd/NoT8QI/oYAxZHsu8knAnTFQT8X7ifYRsFShkS?=
+ =?us-ascii?Q?oVvNIuSAWuo8KIq3Q4U+ZdNRAepsRMqXexM5bFQ+J/AsNbJm+kGK5mYOdz+G?=
+ =?us-ascii?Q?tCKLKxOTMSqwm/lC2PB2kgrVAFMTN77ukEdkmx4DhByaxSzjCIzjG0Bif3bL?=
+ =?us-ascii?Q?apUnFA+W2yJnR4qkncOtMJzf5xFss5ZmVstdpk+rCxVl3m+VCS38p9zJPxo8?=
+ =?us-ascii?Q?7tb9LgL5jX5d8t6r3n9IoxS2zOv/FyQf8QtwXpD5rd0lhrE78qSqlxF5H5a/?=
+ =?us-ascii?Q?LzrG+mJ6j0OX+PsnQwGxg1V/RYBf/WUYNbx2QXVBjurcZqk2kvSttjyWShnW?=
+ =?us-ascii?Q?anFsXI3Z1DUP/Bqo9Qx/hUV8Koq83L5JGUShHU+mhcLWZxQm1dyE3kRHKA+Q?=
+ =?us-ascii?Q?ck/Ag4Rtec6N3DHjEAm5lnDArfXzHvpToy8lMjZlNQ1yKxkGjxYZ9ARUlUVU?=
+ =?us-ascii?Q?h5reGhrfD2ON8kpEocrC3ADK7C/eazk6CE5og+qTWAZFiYXCUIHIK616PLPG?=
+ =?us-ascii?Q?npivx5BpoRCK0vvzY24+5DU0S7P7MLHNoENItkV5Hk0trLvHMGCwxYK26nRl?=
+ =?us-ascii?Q?2swN6itO/0pgaaQOE/A+1T0bjcGbFczAH39qzTnQAVLw3FTx4qCvtJeUodr4?=
+ =?us-ascii?Q?B1FqBn+xSHYQ6vCT2764HYpGVC7zjYlckKC1p/6XfxkPIA0A2/QuFz+Hbn/Q?=
+ =?us-ascii?Q?CjmmKx+FCMbGKnIJka4ajR/JXrLLxLvBhyTJxlCo4iM8YcBl/usMGBQwWDvq?=
+ =?us-ascii?Q?qjZZOMH8AkZEfm9vtx/DbnHplQr4fAXKEVcQvDFfa48wDK6c5XJAq29rcpYh?=
+ =?us-ascii?Q?0OBKyO9e790nKcWtRN5CL+1YbagannNuDcVDY9ICLALUzP7G1kWrGUbpVjQV?=
+ =?us-ascii?Q?bAj23bxflZvmtpRuULaT6iQfqEmidB9w2wNrISuATXyiP5a9XezNpw=3D=3D?=
+X-Forefront-Antispam-Report:
+	CIP:216.228.117.161;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:dc6edge2.nvidia.com;CAT:NONE;SFS:(13230040)(82310400026)(36860700013)(1800799024)(376014);DIR:OUT;SFP:1101;
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 23 Jan 2025 15:09:56.8833
+ (UTC)
+X-MS-Exchange-CrossTenant-Network-Message-Id: ac6266ae-e698-4bdf-d973-08dd3bbfffa6
+X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[216.228.117.161];Helo=[mail.nvidia.com]
+X-MS-Exchange-CrossTenant-AuthSource:
+	CY4PEPF0000EE3B.namprd03.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Anonymous
+X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: CY5PR12MB6084
 
-Idea behind having ice_rx_buf::act was to simplify and speed up the Rx
-data path by walking through buffers that were representing cleaned HW
-Rx descriptors. Since it caused us a major headache recently and we
-rolled back to old approach that 'puts' Rx buffers right after running
-XDP prog/creating skb, this is useless now and should be removed.
+The referenced fix is incomplete. It correctly computes
+bond_dev->gso_partial_features across slaves, but unfortunately
+netdev_fix_features discards gso_partial_features from the feature set
+if NETIF_F_GSO_PARTIAL isn't set in bond->features.
 
-Get rid of ice_rx_buf::act and related logic. We still need to take care
-of a corner case where XDP program releases a particular fragment.
+This is visible with ethtool -k bond0 | grep esp:
+tx-esp-segmentation: off [requested on]
+esp-hw-offload: on
+esp-tx-csum-hw-offload: on
 
-Make ice_run_xdp() to return its result and use it within
-ice_put_rx_mbuf().
+This patch reworks the bonding GSO offload support by:
+- making aggregating gso_partial_features across slaves similar to the
+  other feature sets (this part is a no-op).
+- adding NETIF_F_GSO_PARTIAL to hw_enc_features filtered across slaves.
+- adding NETIF_F_GSO_PARTIAL to features in bond_setup()
 
-Fixes: 2fba7dc5157b ("ice: Add support for XDP multi-buffer on Rx side")
-Reviewed-by: Przemek Kitszel <przemyslaw.kitszel@intel.com>
-Reviewed-by: Simon Horman <horms@kernel.org>
-Signed-off-by: Maciej Fijalkowski <maciej.fijalkowski@intel.com>
+With all of these, 'ethtool -k bond0 | grep esp' now reports:
+tx-esp-segmentation: on
+esp-hw-offload: on
+esp-tx-csum-hw-offload: on
+
+Fixes: 4861333b4217 ("bonding: add ESP offload features when slaves support")
+Signed-off-by: Cosmin Ratiu <cratiu@nvidia.com>
+Change-Id: Iebd2a9d903d3e056e7717e8ca2527a9adf21b2e1
 ---
- drivers/net/ethernet/intel/ice/ice_txrx.c     | 62 +++++++++++--------
- drivers/net/ethernet/intel/ice/ice_txrx.h     |  1 -
- drivers/net/ethernet/intel/ice/ice_txrx_lib.h | 43 -------------
- 3 files changed, 36 insertions(+), 70 deletions(-)
+ drivers/net/bonding/bond_main.c | 18 ++++++++++--------
+ 1 file changed, 10 insertions(+), 8 deletions(-)
 
-diff --git a/drivers/net/ethernet/intel/ice/ice_txrx.c b/drivers/net/ethernet/intel/ice/ice_txrx.c
-index cf46bcf143b4..9c9ea4c1b93b 100644
---- a/drivers/net/ethernet/intel/ice/ice_txrx.c
-+++ b/drivers/net/ethernet/intel/ice/ice_txrx.c
-@@ -527,15 +527,14 @@ int ice_setup_rx_ring(struct ice_rx_ring *rx_ring)
-  * @xdp: xdp_buff used as input to the XDP program
-  * @xdp_prog: XDP program to run
-  * @xdp_ring: ring to be used for XDP_TX action
-- * @rx_buf: Rx buffer to store the XDP action
-  * @eop_desc: Last descriptor in packet to read metadata from
-  *
-  * Returns any of ICE_XDP_{PASS, CONSUMED, TX, REDIR}
-  */
--static void
-+static u32
- ice_run_xdp(struct ice_rx_ring *rx_ring, struct xdp_buff *xdp,
- 	    struct bpf_prog *xdp_prog, struct ice_tx_ring *xdp_ring,
--	    struct ice_rx_buf *rx_buf, union ice_32b_rx_flex_desc *eop_desc)
-+	    union ice_32b_rx_flex_desc *eop_desc)
- {
- 	unsigned int ret = ICE_XDP_PASS;
- 	u32 act;
-@@ -574,7 +573,7 @@ ice_run_xdp(struct ice_rx_ring *rx_ring, struct xdp_buff *xdp,
- 		ret = ICE_XDP_CONSUMED;
- 	}
- exit:
--	ice_set_rx_bufs_act(xdp, rx_ring, ret);
-+	return ret;
- }
+diff --git a/drivers/net/bonding/bond_main.c b/drivers/net/bonding/bond_main.c
+index 7b78c2bada81..de105868c009 100644
+--- a/drivers/net/bonding/bond_main.c
++++ b/drivers/net/bonding/bond_main.c
+@@ -1538,17 +1538,20 @@ static netdev_features_t bond_fix_features(struct net_device *dev,
+ 				 NETIF_F_HIGHDMA | NETIF_F_LRO)
  
- /**
-@@ -860,10 +859,8 @@ ice_add_xdp_frag(struct ice_rx_ring *rx_ring, struct xdp_buff *xdp,
- 		xdp_buff_set_frags_flag(xdp);
- 	}
+ #define BOND_ENC_FEATURES	(NETIF_F_HW_CSUM | NETIF_F_SG | \
+-				 NETIF_F_RXCSUM | NETIF_F_GSO_SOFTWARE)
++				 NETIF_F_RXCSUM | NETIF_F_GSO_SOFTWARE | \
++				 NETIF_F_GSO_PARTIAL)
  
--	if (unlikely(sinfo->nr_frags == MAX_SKB_FRAGS)) {
--		ice_set_rx_bufs_act(xdp, rx_ring, ICE_XDP_CONSUMED);
-+	if (unlikely(sinfo->nr_frags == MAX_SKB_FRAGS))
- 		return -ENOMEM;
--	}
+ #define BOND_MPLS_FEATURES	(NETIF_F_HW_CSUM | NETIF_F_SG | \
+ 				 NETIF_F_GSO_SOFTWARE)
  
- 	__skb_fill_page_desc_noacc(sinfo, sinfo->nr_frags++, rx_buf->page,
- 				   rx_buf->page_offset, size);
-@@ -1075,12 +1072,12 @@ ice_construct_skb(struct ice_rx_ring *rx_ring, struct xdp_buff *xdp)
- 				rx_buf->page_offset + headlen, size,
- 				xdp->frame_sz);
- 	} else {
--		/* buffer is unused, change the act that should be taken later
--		 * on; data was copied onto skb's linear part so there's no
-+		/* buffer is unused, restore biased page count in Rx buffer;
-+		 * data was copied onto skb's linear part so there's no
- 		 * need for adjusting page offset and we can reuse this buffer
- 		 * as-is
- 		 */
--		rx_buf->act = ICE_SKB_CONSUMED;
-+		rx_buf->pagecnt_bias++;
- 	}
- 
- 	if (unlikely(xdp_buff_has_frags(xdp))) {
-@@ -1133,29 +1130,34 @@ ice_put_rx_buf(struct ice_rx_ring *rx_ring, struct ice_rx_buf *rx_buf)
-  * @xdp: XDP buffer carrying linear + frags part
-  * @xdp_xmit: XDP_TX/XDP_REDIRECT verdict storage
-  * @ntc: a current next_to_clean value to be stored at rx_ring
-+ * @verdict: return code from XDP program execution
-  *
-  * Walk through gathered fragments and satisfy internal page
-  * recycle mechanism; we take here an action related to verdict
-  * returned by XDP program;
-  */
- static void ice_put_rx_mbuf(struct ice_rx_ring *rx_ring, struct xdp_buff *xdp,
--			    u32 *xdp_xmit, u32 ntc)
-+			    u32 *xdp_xmit, u32 ntc, u32 verdict)
- {
- 	u32 nr_frags = rx_ring->nr_frags + 1;
- 	u32 idx = rx_ring->first_desc;
- 	u32 cnt = rx_ring->count;
-+	u32 post_xdp_frags = 1;
- 	struct ice_rx_buf *buf;
- 	int i;
- 
--	for (i = 0; i < nr_frags; i++) {
-+	if (unlikely(xdp_buff_has_frags(xdp)))
-+		post_xdp_frags += xdp_get_shared_info_from_buff(xdp)->nr_frags;
++#define BOND_GSO_PARTIAL_FEATURES (NETIF_F_GSO_ESP)
 +
-+	for (i = 0; i < post_xdp_frags; i++) {
- 		buf = &rx_ring->rx_buf[idx];
  
--		if (buf->act & (ICE_XDP_TX | ICE_XDP_REDIR)) {
-+		if (verdict & (ICE_XDP_TX | ICE_XDP_REDIR)) {
- 			ice_rx_buf_adjust_pg_offset(buf, xdp->frame_sz);
--			*xdp_xmit |= buf->act;
--		} else if (buf->act & ICE_XDP_CONSUMED) {
-+			*xdp_xmit |= verdict;
-+		} else if (verdict & ICE_XDP_CONSUMED) {
- 			buf->pagecnt_bias++;
--		} else if (buf->act == ICE_XDP_PASS) {
-+		} else if (verdict == ICE_XDP_PASS) {
- 			ice_rx_buf_adjust_pg_offset(buf, xdp->frame_sz);
- 		}
+ static void bond_compute_features(struct bonding *bond)
+ {
++	netdev_features_t gso_partial_features = BOND_GSO_PARTIAL_FEATURES;
+ 	unsigned int dst_release_flag = IFF_XMIT_DST_RELEASE |
+ 					IFF_XMIT_DST_RELEASE_PERM;
+-	netdev_features_t gso_partial_features = NETIF_F_GSO_ESP;
+ 	netdev_features_t vlan_features = BOND_VLAN_FEATURES;
+ 	netdev_features_t enc_features  = BOND_ENC_FEATURES;
+ #ifdef CONFIG_XFRM_OFFLOAD
+@@ -1582,8 +1585,9 @@ static void bond_compute_features(struct bonding *bond)
+ 							  BOND_XFRM_FEATURES);
+ #endif /* CONFIG_XFRM_OFFLOAD */
  
-@@ -1164,6 +1166,17 @@ static void ice_put_rx_mbuf(struct ice_rx_ring *rx_ring, struct xdp_buff *xdp,
- 		if (++idx == cnt)
- 			idx = 0;
+-		if (slave->dev->hw_enc_features & NETIF_F_GSO_PARTIAL)
+-			gso_partial_features &= slave->dev->gso_partial_features;
++		gso_partial_features = netdev_increment_features(gso_partial_features,
++								 slave->dev->gso_partial_features,
++								 BOND_GSO_PARTIAL_FEATURES);
+ 
+ 		mpls_features = netdev_increment_features(mpls_features,
+ 							  slave->dev->mpls_features,
+@@ -1598,10 +1602,7 @@ static void bond_compute_features(struct bonding *bond)
  	}
-+	/* handle buffers that represented frags released by XDP prog;
-+	 * for these we keep pagecnt_bias as-is; refcount from struct page
-+	 * has been decremented within XDP prog and we do not have to increase
-+	 * the biased refcnt
-+	 */
-+	for (; i < nr_frags; i++) {
-+		buf = &rx_ring->rx_buf[idx];
-+		ice_put_rx_buf(rx_ring, buf);
-+		if (++idx == cnt)
-+			idx = 0;
-+	}
+ 	bond_dev->hard_header_len = max_hard_header_len;
  
- 	xdp->data = NULL;
- 	rx_ring->first_desc = ntc;
-@@ -1190,9 +1203,9 @@ int ice_clean_rx_irq(struct ice_rx_ring *rx_ring, int budget)
- 	struct ice_tx_ring *xdp_ring = NULL;
- 	struct bpf_prog *xdp_prog = NULL;
- 	u32 ntc = rx_ring->next_to_clean;
-+	u32 cached_ntu, xdp_verdict;
- 	u32 cnt = rx_ring->count;
- 	u32 xdp_xmit = 0;
--	u32 cached_ntu;
- 	bool failure;
+-	if (gso_partial_features & NETIF_F_GSO_ESP)
+-		bond_dev->gso_partial_features |= NETIF_F_GSO_ESP;
+-	else
+-		bond_dev->gso_partial_features &= ~NETIF_F_GSO_ESP;
++	bond_dev->gso_partial_features = gso_partial_features;
  
- 	xdp_prog = READ_ONCE(rx_ring->xdp_prog);
-@@ -1255,7 +1268,7 @@ int ice_clean_rx_irq(struct ice_rx_ring *rx_ring, int budget)
- 			xdp_prepare_buff(xdp, hard_start, offset, size, !!offset);
- 			xdp_buff_clear_frags_flag(xdp);
- 		} else if (ice_add_xdp_frag(rx_ring, xdp, rx_buf, size)) {
--			ice_put_rx_mbuf(rx_ring, xdp, NULL, ntc);
-+			ice_put_rx_mbuf(rx_ring, xdp, NULL, ntc, ICE_XDP_CONSUMED);
- 			break;
- 		}
- 		if (++ntc == cnt)
-@@ -1266,13 +1279,13 @@ int ice_clean_rx_irq(struct ice_rx_ring *rx_ring, int budget)
- 			continue;
- 
- 		ice_get_pgcnts(rx_ring);
--		ice_run_xdp(rx_ring, xdp, xdp_prog, xdp_ring, rx_buf, rx_desc);
--		if (rx_buf->act == ICE_XDP_PASS)
-+		xdp_verdict = ice_run_xdp(rx_ring, xdp, xdp_prog, xdp_ring, rx_desc);
-+		if (xdp_verdict == ICE_XDP_PASS)
- 			goto construct_skb;
- 		total_rx_bytes += xdp_get_buff_len(xdp);
- 		total_rx_pkts++;
- 
--		ice_put_rx_mbuf(rx_ring, xdp, &xdp_xmit, ntc);
-+		ice_put_rx_mbuf(rx_ring, xdp, &xdp_xmit, ntc, xdp_verdict);
- 
- 		continue;
- construct_skb:
-@@ -1283,12 +1296,9 @@ int ice_clean_rx_irq(struct ice_rx_ring *rx_ring, int budget)
- 		/* exit if we failed to retrieve a buffer */
- 		if (!skb) {
- 			rx_ring->ring_stats->rx_stats.alloc_page_failed++;
--			rx_buf->act = ICE_XDP_CONSUMED;
--			if (unlikely(xdp_buff_has_frags(xdp)))
--				ice_set_rx_bufs_act(xdp, rx_ring,
--						    ICE_XDP_CONSUMED);
-+			xdp_verdict = ICE_XDP_CONSUMED;
- 		}
--		ice_put_rx_mbuf(rx_ring, xdp, &xdp_xmit, ntc);
-+		ice_put_rx_mbuf(rx_ring, xdp, &xdp_xmit, ntc, xdp_verdict);
- 
- 		if (!skb)
- 			break;
-diff --git a/drivers/net/ethernet/intel/ice/ice_txrx.h b/drivers/net/ethernet/intel/ice/ice_txrx.h
-index cb347c852ba9..806bce701df3 100644
---- a/drivers/net/ethernet/intel/ice/ice_txrx.h
-+++ b/drivers/net/ethernet/intel/ice/ice_txrx.h
-@@ -201,7 +201,6 @@ struct ice_rx_buf {
- 	struct page *page;
- 	unsigned int page_offset;
- 	unsigned int pgcnt;
--	unsigned int act;
- 	unsigned int pagecnt_bias;
- };
- 
-diff --git a/drivers/net/ethernet/intel/ice/ice_txrx_lib.h b/drivers/net/ethernet/intel/ice/ice_txrx_lib.h
-index 79f960c6680d..6cf32b404127 100644
---- a/drivers/net/ethernet/intel/ice/ice_txrx_lib.h
-+++ b/drivers/net/ethernet/intel/ice/ice_txrx_lib.h
-@@ -5,49 +5,6 @@
- #define _ICE_TXRX_LIB_H_
- #include "ice.h"
- 
--/**
-- * ice_set_rx_bufs_act - propagate Rx buffer action to frags
-- * @xdp: XDP buffer representing frame (linear and frags part)
-- * @rx_ring: Rx ring struct
-- * act: action to store onto Rx buffers related to XDP buffer parts
-- *
-- * Set action that should be taken before putting Rx buffer from first frag
-- * to the last.
-- */
--static inline void
--ice_set_rx_bufs_act(struct xdp_buff *xdp, const struct ice_rx_ring *rx_ring,
--		    const unsigned int act)
--{
--	u32 sinfo_frags = xdp_get_shared_info_from_buff(xdp)->nr_frags;
--	u32 nr_frags = rx_ring->nr_frags + 1;
--	u32 idx = rx_ring->first_desc;
--	u32 cnt = rx_ring->count;
--	struct ice_rx_buf *buf;
--
--	for (int i = 0; i < nr_frags; i++) {
--		buf = &rx_ring->rx_buf[idx];
--		buf->act = act;
--
--		if (++idx == cnt)
--			idx = 0;
--	}
--
--	/* adjust pagecnt_bias on frags freed by XDP prog */
--	if (sinfo_frags < rx_ring->nr_frags && act == ICE_XDP_CONSUMED) {
--		u32 delta = rx_ring->nr_frags - sinfo_frags;
--
--		while (delta) {
--			if (idx == 0)
--				idx = cnt - 1;
--			else
--				idx--;
--			buf = &rx_ring->rx_buf[idx];
--			buf->pagecnt_bias--;
--			delta--;
--		}
--	}
--}
--
- /**
-  * ice_test_staterr - tests bits in Rx descriptor status and error fields
-  * @status_err_n: Rx descriptor status_error0 or status_error1 bits
+ done:
+ 	bond_dev->vlan_features = vlan_features;
+@@ -6046,6 +6047,7 @@ void bond_setup(struct net_device *bond_dev)
+ 	bond_dev->hw_features |= NETIF_F_GSO_ENCAP_ALL;
+ 	bond_dev->features |= bond_dev->hw_features;
+ 	bond_dev->features |= NETIF_F_HW_VLAN_CTAG_TX | NETIF_F_HW_VLAN_STAG_TX;
++	bond_dev->features |= NETIF_F_GSO_PARTIAL;
+ #ifdef CONFIG_XFRM_OFFLOAD
+ 	bond_dev->hw_features |= BOND_XFRM_FEATURES;
+ 	/* Only enable XFRM features if this is an active-backup config */
 -- 
-2.43.0
+2.45.0
 
 
