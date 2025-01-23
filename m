@@ -1,151 +1,142 @@
-Return-Path: <netdev+bounces-160608-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-160609-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9D016A1A7EC
-	for <lists+netdev@lfdr.de>; Thu, 23 Jan 2025 17:35:23 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0AA93A1A7F0
+	for <lists+netdev@lfdr.de>; Thu, 23 Jan 2025 17:35:43 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D23051664FA
-	for <lists+netdev@lfdr.de>; Thu, 23 Jan 2025 16:35:21 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D312C3AA8C6
+	for <lists+netdev@lfdr.de>; Thu, 23 Jan 2025 16:35:31 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D0AC6212F86;
-	Thu, 23 Jan 2025 16:35:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="YGJC4Zmz"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A0FA5213236;
+	Thu, 23 Jan 2025 16:35:30 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f179.google.com (mail-pl1-f179.google.com [209.85.214.179])
+Received: from mail-il1-f207.google.com (mail-il1-f207.google.com [209.85.166.207])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 578FE211464;
-	Thu, 23 Jan 2025 16:35:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.179
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 08B90212B0E
+	for <netdev@vger.kernel.org>; Thu, 23 Jan 2025 16:35:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.207
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1737650119; cv=none; b=bvZJ22gH7gGs/Jdaz9+61du5fFh/e8ItPGX+hUPdvQwYny7+0n8W1X7L+H8biIimJiukmnhCM0ZJZ5poP8lFE9B6Fi3cOAa09IrgJkNIPuQ69RvkoXQYH1waABx12DLvjHg1leeJz76TiEMgpqoQMBf3txUTvYSIDFLXTNpFYy0=
+	t=1737650130; cv=none; b=oWo9uZ9m+n5R0+traXVqu0kUedg4VcxsEd1nrbuwjsGfjBuRsB6CLJlf68WOoFUxFLSWUA+v04YYyNpYsqQ4wFvgMeNunuaw9JeHabQTZ4xF+61eyGRsv8aVjQwshdjZVFrV6MZ2tpMBGj4mg//qCI0/97m4zhQS9ec3OUhk/C8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1737650119; c=relaxed/simple;
-	bh=vF4G7cHCJjveZ2c96Umb8UF1SOgG7D16IAO8eiP//IY=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=lK0xh/EEQoO7QQPq2f90JVJwn0L92J3T8AfuDyUAcMS801sd/yrpj1M5KLaeneDeAlHebJ++CTj47prrMH4r2w0tEDdcco4PDAJncTcO/vkN1PHnmgX5UMBxQkmxrUEc0LzNP6NYMAkPetRWN+imsHpNNVg4NgJT0uWc9YZwNWo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=YGJC4Zmz; arc=none smtp.client-ip=209.85.214.179
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pl1-f179.google.com with SMTP id d9443c01a7336-21644aca3a0so24999915ad.3;
-        Thu, 23 Jan 2025 08:35:18 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1737650117; x=1738254917; darn=vger.kernel.org;
-        h=mime-version:references:in-reply-to:message-id:subject:cc:to:from
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=37PCcaFsphtONjU1WuGj3LJHxxawzOceGVtfL5iTpqc=;
-        b=YGJC4ZmzkHr/s6CNGXpjutA1BrPqEoEGQUxOlbM95Uu+OwgSaWMy3Jwgj2OCrI2XRU
-         uN17UgJ0Dw+eDWbMz4Ei7gJ6i6/gdHRghtpvFAa32JYobp5klBnRVIfpKYbcBaodUH3B
-         l1rDH6BzJ3dzyAAMipJeoZHsjE4q4kz7u8G3T1E5uf6TQK2pN46NTMXIL+q5avkXMlD6
-         UUSRao0SxhUMx2NkMK0N4hUVQsYKrsw19CojYbhpCC4w3bx0a16xMxckDhnmp4t9rV1B
-         FT/4z6cXgAGlfazcPSvxuwzjZi7AxawzXAr9KE2S89bsLGoYqxUn94M3JSbOMKJ+Bpbb
-         vCTw==
+	s=arc-20240116; t=1737650130; c=relaxed/simple;
+	bh=rQrvzIco6ucpXeDPwRKQB1b/pEwTdilUvVHY5dhA/e8=;
+	h=MIME-Version:Date:Message-ID:Subject:From:To:Content-Type; b=U6HM2GXwS41SZuUN3e4ouKBDA/+hK5ftq5h3N2rPgunZu9XdGD9MZPuoyB88XnGxItFBxE89pa0ir+MKPonq92DPq7JeKoXm/kx8qZaBiNH89TWDHaG1jMAz2GJQxY6elPYIKU3R+ktGwIN3NgfMBMS6V93twCLhSxPkTEhg24Y=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.207
+Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
+Received: by mail-il1-f207.google.com with SMTP id e9e14a558f8ab-3cf6ceaccdbso7398245ab.1
+        for <netdev@vger.kernel.org>; Thu, 23 Jan 2025 08:35:28 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1737650117; x=1738254917;
-        h=mime-version:references:in-reply-to:message-id:subject:cc:to:from
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=37PCcaFsphtONjU1WuGj3LJHxxawzOceGVtfL5iTpqc=;
-        b=FnNgfwiH8hHbUsYCH/DTJDLsXbfhtaD/e0DY5rPtZR/HvtSV5mIF7FFClovgJI38VZ
-         1/jqt14WcI7cJEgj1dNZ3tcexdXRLeDW2/VOoDiNDsAtSR0cQ9ie3i8b46sUJ+pAe7Iz
-         7EFtwOumxihld2PfYqiWAGHO7PB5E7mcCNyopjmTEJT4GSlzNbyzu/Sa3/gChNuLraI+
-         MyfvdrpDH0i0e6eQzfGUp3Uai4vy84kpQVYQJk5D7L0UduGq79fNm92aCavhqQa+sYjr
-         5v5sMaGdSdvtr62Ef0FhErQ6U55x1nT1F2LkcW+Op25mX7z6M/9V5bN0KUURE0wK9vGn
-         Ow2Q==
-X-Forwarded-Encrypted: i=1; AJvYcCUgR/SktY9Itk4MpSufk9Yu31f8N7My3gHkzh4H4sQ3KoR6Azg7iGfG9jnimqwHN3BzaSUOLgjlQgzQSuE=@vger.kernel.org, AJvYcCX4l1N5QQNlfimwKgmxq0zYzQEyjqOcBKUjMZTYEEqhg/C6l8FZrc/rpVo4eizg5wEwKV7pG9O4danAawE=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzoEl663hsjgG85+nnTdWDS/tlafEuQc5WYiJn2uhqL4m3pSyAv
-	XXI0wePgJWTT19EnYmJGU8mncaXbC/e0mvNCRgWbSdve4ga/m0x3
-X-Gm-Gg: ASbGnctQtpALuCE0uKTuuvW9CtzYLMFyYEm51O97kUXIQeplUg/sJ6J3omMYYlUtWW5
-	WUHsroM1G3KKbtAjVnwI9p7tIhDEDWSGdS6QduYmu50Zzm9ypNbSF/gkBGyUb2c0Un/1r5YgMFC
-	dOdMHXhNYGS11HbseBi/9D4fppFc/rAxHEBE6phMcFko1e/UpbjmdU+g6rnptmEA8at0jkoIXw+
-	cR8LKdToXjYJJSwl9T6spDA2PQphY+3ixnZ72FQhSiPnD//pWGJz01+qCsAAalSqd9aX3Kqixkl
-	cZ95ECyC
-X-Google-Smtp-Source: AGHT+IFs4lUJjgFulZgoKt9vLCAMNVT+ssvpUR3RYJq7IZyHJnj6PWguIOa0Hbt9lV14uqVBhXgqSw==
-X-Received: by 2002:a05:6a20:394b:b0:1e1:d22d:cf38 with SMTP id adf61e73a8af0-1eb214f0f61mr39291398637.21.1737650117287;
-        Thu, 23 Jan 2025 08:35:17 -0800 (PST)
-Received: from orangepi5-plus ([129.146.253.192])
-        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-72f8a76115bsm117705b3a.108.2025.01.23.08.35.12
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 23 Jan 2025 08:35:16 -0800 (PST)
-Date: Fri, 24 Jan 2025 00:35:01 +0800
-From: Furong Xu <0x1207@gmail.com>
-To: Jon Hunter <jonathanh@nvidia.com>
-Cc: netdev@vger.kernel.org, linux-stm32@st-md-mailman.stormreply.com,
- linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
- Alexander Lobakin <aleksander.lobakin@intel.com>, Joe Damato
- <jdamato@fastly.com>, Andrew Lunn <andrew+netdev@lunn.ch>, "David S.
- Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Jakub
- Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Maxime
- Coquelin <mcoquelin.stm32@gmail.com>, xfr@outlook.com, Brad Griffis
- <bgriffis@nvidia.com>, "linux-tegra@vger.kernel.org"
- <linux-tegra@vger.kernel.org>
-Subject: Re: [PATCH net-next v3 1/4] net: stmmac: Switch to zero-copy in
- non-XDP RX path
-Message-ID: <20250124003501.5fff00bc@orangepi5-plus>
-In-Reply-To: <d465f277-bac7-439f-be1d-9a47dfe2d951@nvidia.com>
-References: <cover.1736910454.git.0x1207@gmail.com>
-	<bd7aabf4d9b6696885922ed4bef8fc95142d3004.1736910454.git.0x1207@gmail.com>
-	<d465f277-bac7-439f-be1d-9a47dfe2d951@nvidia.com>
-X-Mailer: Claws Mail 4.2.0 (GTK 3.24.41; aarch64-unknown-linux-gnu)
+        d=1e100.net; s=20230601; t=1737650128; x=1738254928;
+        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=bN7Cps97LuNIjFLkDCHAZkPg/aaPybeHLcKwHv41VvM=;
+        b=Db1pB0Oa1dnvMZPtwwMSbQt64DuPGKaj6qjGrgPRKmDvlx9TXzvO40DW7XyTemgn1z
+         6Y3EdzSpiXKHsDncQ+r9BwFc2Z2EKQknFDmgNzg4Hq+jLDEPj9r+K3XrSkdJFpQHgoMh
+         gyZeGwfYMFSPwvHstyWoMVzY4MoDrr7C7fFGLuaf6aP6CXqmbxE897ETWAjmELXsq67Q
+         hfHzQ3DgkkcdVVlziG7ujyxt5jIKO+uIjoHQlJTtzNEW8HOcqUN/zyL2sE/+iGJiIoYW
+         BdWpWscZZ73wNYS422JTXQ3+uy2+/cp+dq5CSIz+MZA11nOzi67/K4VDW+Jnd8gtV2h6
+         I2IA==
+X-Forwarded-Encrypted: i=1; AJvYcCXj1kjQwJXMQS4yv7TO/fRxMLLZNVHrJBoDVHNToAm49rpwFhZFugx1oNPeyEa2xiZGFdX6a50=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzBn3henglV0O1OAREMu1f07BmEPd+vTT0c6aiIcjWCpc8P0IV1
+	vikl8O9ujl7cGiiigGaRb3fwe1cZIM4ObQJrDqqPcxRSHKWeXS7z7kb0915oMQHQwtQmn3hrCPo
+	MKysESFE+EnK2cO8nEbLtP8vv/j/ZEcPqWyFASScLaPR2wkEx1o0CEdk=
+X-Google-Smtp-Source: AGHT+IHQTVUuYTiPnz6bKzhsiaTz0p05lbwf74wSRcZ4HPj3Zf2jkd7pS5Y9o0XVymoCJ/KWmtnojkCr2HXaxToEgKDffMKPmNYw
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/mixed; boundary="MP_/uWm=6.JKohvenzJ_Cv9eW2I"
+X-Received: by 2002:a05:6e02:1521:b0:3cf:bb11:a3a7 with SMTP id
+ e9e14a558f8ab-3cfbb11a5dcmr41765325ab.17.1737650128144; Thu, 23 Jan 2025
+ 08:35:28 -0800 (PST)
+Date: Thu, 23 Jan 2025 08:35:28 -0800
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <67926fd0.050a0220.2eae65.000e.GAE@google.com>
+Subject: [syzbot] [net?] KMSAN: uninit-value in nsim_get_ringparam
+From: syzbot <syzbot+b3bcd80232d00091e061@syzkaller.appspotmail.com>
+To: andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com, 
+	kuba@kernel.org, linux-kernel@vger.kernel.org, netdev@vger.kernel.org, 
+	pabeni@redhat.com, syzkaller-bugs@googlegroups.com
+Content-Type: text/plain; charset="UTF-8"
 
---MP_/uWm=6.JKohvenzJ_Cv9eW2I
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-Content-Disposition: inline
+Hello,
 
-Hi Jon,
+syzbot found the following issue on:
 
-On Thu, 23 Jan 2025 14:06:42 +0000, Jon Hunter wrote: 
-> We have noticed a boot regression on -next when booting with NFS.
-> Bisect is pointing to this commit and reverting this on top of -next
-> does fix the problem.
-> 
-> I only see this on Tegra234 which uses the 
-> drivers/net/ethernet/stmicro/stmmac/dwmac-tegra.c driver. Tegra194
-> which uses the
-> drivers/net/ethernet/stmicro/stmmac/dwmac-dwc-qos-eth.c driver
-> appears to be fine.
+HEAD commit:    7004a2e46d16 Merge tag 'linux_kselftest-nolibc-6.14-rc1' o..
+git tree:       upstream
+console+strace: https://syzkaller.appspot.com/x/log.txt?x=171a1c24580000
+kernel config:  https://syzkaller.appspot.com/x/.config?x=d6a5cefe7199b4e8
+dashboard link: https://syzkaller.appspot.com/bug?extid=b3bcd80232d00091e061
+compiler:       Debian clang version 15.0.6, GNU ld (GNU Binutils for Debian) 2.40
+syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=16a2a9f8580000
+C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=12baf618580000
 
-What is the MTU of Tegra234 and NFS server? Are they both 1500?
+Downloadable assets:
+disk image: https://storage.googleapis.com/syzbot-assets/d5b55fed9d79/disk-7004a2e4.raw.xz
+vmlinux: https://storage.googleapis.com/syzbot-assets/70382af6f618/vmlinux-7004a2e4.xz
+kernel image: https://storage.googleapis.com/syzbot-assets/a7609fc3059d/bzImage-7004a2e4.xz
 
-Could you please try attached patch to confirm if this regression is
-fixed?
+IMPORTANT: if you fix the issue, please add the following tag to the commit:
+Reported-by: syzbot+b3bcd80232d00091e061@syzkaller.appspotmail.com
 
-If the attached patch fixes this regression, and so it seems to be a
-cache coherence issue specific to Tegra234, since this patch avoid
-memcpy and the page buffers may be modified by upper network stack of
-course, then cache lines of page buffers may become dirty. But by
-reverting this patch, cache lines of page buffers never become dirty,
-this is the core difference.
+=====================================================
+BUG: KMSAN: uninit-value in nsim_get_ringparam+0xa8/0xe0 drivers/net/netdevsim/ethtool.c:77
+ nsim_get_ringparam+0xa8/0xe0 drivers/net/netdevsim/ethtool.c:77
+ ethtool_set_ringparam+0x268/0x570 net/ethtool/ioctl.c:2072
+ __dev_ethtool net/ethtool/ioctl.c:3209 [inline]
+ dev_ethtool+0x126d/0x2a40 net/ethtool/ioctl.c:3398
+ dev_ioctl+0xb0e/0x1280 net/core/dev_ioctl.c:759
+ sock_do_ioctl+0x28c/0x540 net/socket.c:1208
+ sock_ioctl+0x721/0xd70 net/socket.c:1313
+ vfs_ioctl fs/ioctl.c:51 [inline]
+ __do_sys_ioctl fs/ioctl.c:906 [inline]
+ __se_sys_ioctl+0x246/0x440 fs/ioctl.c:892
+ __x64_sys_ioctl+0x96/0xe0 fs/ioctl.c:892
+ x64_sys_call+0x19f0/0x3c30 arch/x86/include/generated/asm/syscalls_64.h:17
+ do_syscall_x64 arch/x86/entry/common.c:52 [inline]
+ do_syscall_64+0xcd/0x1e0 arch/x86/entry/common.c:83
+ entry_SYSCALL_64_after_hwframe+0x77/0x7f
 
---MP_/uWm=6.JKohvenzJ_Cv9eW2I
-Content-Type: text/x-patch
-Content-Transfer-Encoding: 7bit
-Content-Disposition: attachment; filename=force-disable-rx-checksum.diff
+Local variable kernel_ringparam created at:
+ ethtool_set_ringparam+0x96/0x570 net/ethtool/ioctl.c:2063
+ __dev_ethtool net/ethtool/ioctl.c:3209 [inline]
+ dev_ethtool+0x126d/0x2a40 net/ethtool/ioctl.c:3398
 
-diff --git a/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c b/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
-index edbf8994455d..f00bcfc65dd0 100644
---- a/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
-+++ b/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
-@@ -5442,7 +5442,7 @@ static int stmmac_rx(struct stmmac_priv *priv, int limit, u32 queue)
-        struct stmmac_rx_queue *rx_q = &priv->dma_conf.rx_queue[queue];
-        struct stmmac_channel *ch = &priv->channel[queue];
-        unsigned int count = 0, error = 0, len = 0;
--       int status = 0, coe = priv->hw->rx_csum;
-+       int status = 0, coe = 0;
-        unsigned int next_entry = rx_q->cur_rx;
-        enum dma_data_direction dma_dir;
-        unsigned int desc_size;
+CPU: 0 UID: 0 PID: 5807 Comm: syz-executor164 Not tainted 6.13.0-syzkaller-04788-g7004a2e46d16 #0
+Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 12/27/2024
+=====================================================
 
---MP_/uWm=6.JKohvenzJ_Cv9eW2I--
+
+---
+This report is generated by a bot. It may contain errors.
+See https://goo.gl/tpsmEJ for more information about syzbot.
+syzbot engineers can be reached at syzkaller@googlegroups.com.
+
+syzbot will keep track of this issue. See:
+https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
+
+If the report is already addressed, let syzbot know by replying with:
+#syz fix: exact-commit-title
+
+If you want syzbot to run the reproducer, reply with:
+#syz test: git://repo/address.git branch-or-commit-hash
+If you attach or paste a git patch, syzbot will apply it before testing.
+
+If you want to overwrite report's subsystems, reply with:
+#syz set subsystems: new-subsystem
+(See the list of subsystem names on the web dashboard)
+
+If the report is a duplicate of another one, reply with:
+#syz dup: exact-subject-of-another-report
+
+If you want to undo deduplication, reply with:
+#syz undup
 
