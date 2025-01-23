@@ -1,165 +1,130 @@
-Return-Path: <netdev+bounces-160435-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-160436-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 67A11A19BA6
-	for <lists+netdev@lfdr.de>; Thu, 23 Jan 2025 01:04:14 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 025BBA19BAD
+	for <lists+netdev@lfdr.de>; Thu, 23 Jan 2025 01:12:37 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 8E6E616B603
-	for <lists+netdev@lfdr.de>; Thu, 23 Jan 2025 00:04:12 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id BA9923A3710
+	for <lists+netdev@lfdr.de>; Thu, 23 Jan 2025 00:12:30 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 50F8817FE;
-	Thu, 23 Jan 2025 00:04:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 431682576;
+	Thu, 23 Jan 2025 00:12:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="N9YrP5XU"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f172.google.com (mail-pl1-f172.google.com [209.85.214.172])
+Received: from mail-pl1-f169.google.com (mail-pl1-f169.google.com [209.85.214.169])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 64BCC629;
-	Thu, 23 Jan 2025 00:04:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.172
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C635F1C01;
+	Thu, 23 Jan 2025 00:12:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.169
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1737590651; cv=none; b=p2AW0ndzf4weZLUk66pA4ZxQbljXkAL4QrRVFCvQuz2QSPF/Y29jY8D53s6diOHGsRbzKwYFNFeR37JyR1i18B+w/sQ7kH0JqUXrVg9l1zHG/e1qoGKZQ8hulqaGI8gOVJwf7Sj9A/+2PgvZkQ7g1ohLepw+uztyeqy3o+SgVCE=
+	t=1737591153; cv=none; b=bsKkPrxXwpvAMN5ZZ52WYJvSzeqeuFNuwNd4O1kRRt1Qi13LgELZPGXLEOlknQS0+1txrvizzLIbpw7Ikn7kPOuZNQmduXVZ17qGK5zIqba5K6b89IED1FKMdkth3POwFMQhcCQtSgY9x3mmV0JNdVek1fqyeMp7swHr25lCuBI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1737590651; c=relaxed/simple;
-	bh=PH8LxbIrb2Kq9AS8sl24KAaDNIbUwoOmj7D4FMfbdgE=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=MeUbaR69rBItmrn02lsdgksKlgqSDf5NOLyHRvSs9T84d8ZlREsDPzuV5kzVtrTslnDZkhnA0ng2Y6b4HC/1dRcDH9gnuN3WFZfaIxjEqAjAv1XaiVHgFESS91majjli8KM9m2cqRs07/H+QMbEoHqyg1RiE5FO0nWBtR9TEgmw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=fomichev.me; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.214.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=fomichev.me
+	s=arc-20240116; t=1737591153; c=relaxed/simple;
+	bh=X1XECz49qWcxWeG/GB6BNF2gmFTz+ylWBz8BE0QNiJA=;
+	h=Date:Message-Id:To:Cc:Subject:From:In-Reply-To:References:
+	 Mime-Version:Content-Type; b=rhehvGBbWg5Tiz8BCh7OLpJqO0mWTlUOpv0/ymico8yDDPbLUDKnOPKNErUZ794SEcAuAu6vhyZ8dRQ8c6qQh7fNZduJ9z1XbP+s3/SNH7tzTOiHj3OM76aSzYdf/vH0wqLJmBEOVxUQy51vB0AWs2CaJkWp0mi1bsxQkzpPHxw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=N9YrP5XU; arc=none smtp.client-ip=209.85.214.169
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pl1-f172.google.com with SMTP id d9443c01a7336-21670dce0a7so5119845ad.1;
-        Wed, 22 Jan 2025 16:04:09 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1737590648; x=1738195448;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+Received: by mail-pl1-f169.google.com with SMTP id d9443c01a7336-21a7ed0155cso5004205ad.3;
+        Wed, 22 Jan 2025 16:12:31 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1737591151; x=1738195951; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to:from
+         :subject:cc:to:message-id:date:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=bY8ZVk2Uf7HppO8+gzzWHK3AIfhiQMvTEXF+Lh4vqR4=;
-        b=Hs++o+zTWe10BDFbnKU8eWLiu/WIYViWNtIAfdTnJfK7jc0TgCe4n2a8GQMCNdZisx
-         J//cIq7l6Jc/VkZapLZ2vS8rxGGw77SGMlXIGtSRQtq9IVhNgwiH4iWnHAlaGW+iquqa
-         3IvUUMKq/WfgVJLgS4jthVly/XHHO7l8wN3OCg1tg6B+dh+XzdOku40I3Xos9RymnpFd
-         Kl/dUJaJUZL7UOQ3I1lG/fCkqvQJ/vsLWsoVdCM/POsUqKZUnwVKplh/dK70Y0WvdVjF
-         hoh61JblSQYojS1wuve9xGAN/Bwd5XYW4THxr9unGSHdBRr91AGOk8/Hriik2UzwjVeA
-         TClQ==
-X-Forwarded-Encrypted: i=1; AJvYcCVdbDp3WORmtsT9WVOY9Zbs8+WuqMZxkqr3F0g2PsqhAt6dZMz9qagGqIXgLZCR+QuvJ6wsRn/Ymz9i/OQ=@vger.kernel.org, AJvYcCWZjGW3+oTspOpp8LpVXNEmgvWM7W/3pDJ/nkZ8W1K5Tqcg0OK5g9YhSib967+fX6BrJdP9QzSrjzBU4g==@vger.kernel.org
-X-Gm-Message-State: AOJu0YykV0OI1AYQiTRiVLCqJ7v9ji6M4y2RnNhT6esXaaiRO1EK4jwH
-	5DKGMINoPXch042Pc1TCFrQEkpbMYKfXsxSfG4pgikgEGp0TIi3pDDkg
-X-Gm-Gg: ASbGncuPtrPkMG2mTmH7jBgRikBSpilMknZUnalV/gOD4RTJLAzefXxDRq6uVbNRmoy
-	jA6/a7TuWBZ6qk14EAzFl0Ue/h+XZCYhnL2lGpBiRhlNuCq9Gxkx1VkdEu8xXp6m1pAYhwzAf7c
-	ra9v8qnzwl8WfsKxejEoNFQTEPWamw74pVpBo5Cj6f8MjVR0t7gDXiL0KvVzCmm7GtPtxHJvvTW
-	3I9KrgKD3bkocjhEpTjJs4+e1MmhreZTo3DnAwFkp4hT0QO88RSXBnk0VTjU1KWbd65Yg==
-X-Google-Smtp-Source: AGHT+IE7dxxpYn3JHZUsJEN8kIdACZ5n8A0bzXRZzD93uctIb4hINpZXVpaiSir5eGOs1NpJU+HmYg==
-X-Received: by 2002:a05:6a20:9144:b0:1e1:a9dd:5a58 with SMTP id adf61e73a8af0-1eb215ec11cmr43812181637.30.1737590648353;
-        Wed, 22 Jan 2025 16:04:08 -0800 (PST)
-Received: from localhost ([2601:646:9e00:f56e:123b:cea3:439a:b3e3])
-        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-72f510a2e24sm5293718b3a.47.2025.01.22.16.04.07
+        bh=Piw58QD9uf+j8b2ua/HAZ6tweWQTcyMdimhsEJ9IrPo=;
+        b=N9YrP5XUgxBNZhfBm3iMhwivi23ul1HGApK7C197VOyXH3JZXHm2znSRoRk0z/geQI
+         hx7ZT/pLn+SO4D2mqgw7hmqXOltuYWw4vnONij5bZrkccgWmd29AW839HQKxLWSOc02A
+         q19+8wBgHdmbS+PkH6RQkpfnw/0duutoDgJ+SCXD/I+HYpH2P6++7E+Hl2FWBBmaQW94
+         Il14U/dkXY73FBQd4Eme93yRWCoPjgJ6uhhERcpB67P1Nb0DF8nAk1u4ARWDpr1oFVMP
+         3xceirbu2h/Q16I/hkDYFqSN9NtjnMfQ2UPhmZCpM3T8rfHCiSWQAbQ02/sJC6ZhI33T
+         vCVw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1737591151; x=1738195951;
+        h=content-transfer-encoding:mime-version:references:in-reply-to:from
+         :subject:cc:to:message-id:date:x-gm-message-state:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=Piw58QD9uf+j8b2ua/HAZ6tweWQTcyMdimhsEJ9IrPo=;
+        b=O0jBu83J3fQfujDoqEsLj6BKsFHcDTRFLLidSiZhUpDXjOE31LdyF4B28yiWxS0Z9F
+         AQZjCQULHeShPye486EDumdx5DBpWpVtixEbUpPMaKqmf+s2AUhoNjGkfs72FGsBa4Xw
+         W52R4pBwKpDHNKGGesjC0HAPy94MALmueNB7JMORuV6j83kaQQ6IKR2WfQqBMsR6VpKE
+         s0MjQ8m+HmAPEFCA25r28f0uyjKGR0NAGU3q/kXyn7x4xEFcdLqXZgenG9mO1UJiH4o7
+         6LmY6ufqbEDtq+6Zvmt2VgWeiG09tdJ1S9PDcQtTFHyYGcMSGPXxekZJB0LTw3JrDalk
+         QEyw==
+X-Forwarded-Encrypted: i=1; AJvYcCUxxXYAJ0gEgcWSqvm2cAXJ6Fu47dAxYFwNwsR5kIoRgAukKoy9Pn3bAE8F0qvLW/eepyXW4LhriJlNv8/38DA=@vger.kernel.org, AJvYcCV1ShBMSZBAaekhzZgF3xl6XwwQemFJkVOT1lnalDkI/NbTQrRCfkVoDW5NZGZFN7h4ss3vbWsIj/WsaDw=@vger.kernel.org, AJvYcCV6hWo87QlTyHTae8PivHzYtZGihgvm8Iw64cNX1XlhxCDMCF0LFBQbT2YJqnaGdguDsJiL3pns@vger.kernel.org
+X-Gm-Message-State: AOJu0YzLg9eTlWQKjhhdOLRoCUYwIkii9jdCMLrBEnHBa/guN7L1J8F6
+	c4FpBQH1NhfFzKwtC8VVRzv7mTWkmQy5Fl6E5iUe2b+QEicAW7CM
+X-Gm-Gg: ASbGncuJGyqXSRk8Tfjuuqb2rNr7iKbonX4DrrtXvd/pF7VJWAVJjU+n1jaBCvjB9C7
+	BMK5GhUS5r10Yeovg/s+uaO3aWFk637YIhx+/s4g9voEWP2cfuEIa7sPvvyVDVGuX5nO9HowAxa
+	q03yCX/E8J8TG8zmOmUeIzvhZbeI5UPjJIl9SwGgfXcz/emqnwPh2rBtOopo6Zl9HOEzXiOMHjl
+	PcYDoT3ZzN8eeqfm3vb4l2nRK9bv6pyz9VHOTh8ef8ifi+Z1PKbMnJd1EiuO6ZR2KzuMuVE0n8X
+	RA4I1Jj9g5VcjSrgA4/rUAcZ9Zpe7ieBMof0o/9TP1vaciLyp6c=
+X-Google-Smtp-Source: AGHT+IFbzEzDepffLCJBduNjJCrXd9MQqm9y1MzMSu+HJp+DT1OxEewkjFhjOhEzH9VOMpb0jb0NKQ==
+X-Received: by 2002:a17:902:c94a:b0:216:2abc:195c with SMTP id d9443c01a7336-21c352dd6ffmr323373965ad.7.1737591150970;
+        Wed, 22 Jan 2025 16:12:30 -0800 (PST)
+Received: from localhost (p3882177-ipxg22501hodogaya.kanagawa.ocn.ne.jp. [180.15.148.177])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-21c2cea07e1sm100915785ad.19.2025.01.22.16.12.23
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 22 Jan 2025 16:04:07 -0800 (PST)
-From: Stanislav Fomichev <sdf@fomichev.me>
-To: netdev@vger.kernel.org
-Cc: davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	linux-rdma@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	llvm@lists.linux.dev,
-	saeedm@nvidia.com,
-	tariqt@nvidia.com,
-	leon@kernel.org,
-	andrew+netdev@lunn.ch,
-	nathan@kernel.org,
-	ndesaulniers@google.com,
-	morbo@google.com,
-	justinstitt@google.com,
-	witu@nvidia.com,
-	parav@nvidia.com
-Subject: [PATCH net] net/mlx5e: add missing cpu_to_node to kvzalloc_node in mlx5e_open_xdpredirect_sq
-Date: Wed, 22 Jan 2025 16:04:07 -0800
-Message-ID: <20250123000407.3464715-1-sdf@fomichev.me>
-X-Mailer: git-send-email 2.48.0
+        Wed, 22 Jan 2025 16:12:30 -0800 (PST)
+Date: Thu, 23 Jan 2025 09:12:20 +0900 (JST)
+Message-Id: <20250123.091220.883080907537783935.fujita.tomonori@gmail.com>
+To: aliceryhl@google.com, gary@garyguo.net
+Cc: fujita.tomonori@gmail.com, miguel.ojeda.sandonis@gmail.com,
+ linux-kernel@vger.kernel.org, rust-for-linux@vger.kernel.org,
+ netdev@vger.kernel.org, andrew@lunn.ch, hkallweit1@gmail.com,
+ tmgross@umich.edu, ojeda@kernel.org, alex.gaynor@gmail.com,
+ bjorn3_gh@protonmail.com, benno.lossin@proton.me, a.hindborg@samsung.com,
+ anna-maria@linutronix.de, frederic@kernel.org, tglx@linutronix.de,
+ arnd@arndb.de, jstultz@google.com, sboyd@kernel.org, mingo@redhat.com,
+ peterz@infradead.org, juri.lelli@redhat.com, vincent.guittot@linaro.org,
+ dietmar.eggemann@arm.com, rostedt@goodmis.org, bsegall@google.com,
+ mgorman@suse.de, vschneid@redhat.com
+Subject: Re: [PATCH v8 4/7] rust: time: Add wrapper for fsleep function
+From: FUJITA Tomonori <fujita.tomonori@gmail.com>
+In-Reply-To: <CAH5fLgiEn27VMUfrXcidu0rUpM7MPZVCOjywa-vQBO7dOdQrRQ@mail.gmail.com>
+References: <20250118.170224.1577745251770787347.fujita.tomonori@gmail.com>
+	<20250122170537.1a92051c.gary@garyguo.net>
+	<CAH5fLgiEn27VMUfrXcidu0rUpM7MPZVCOjywa-vQBO7dOdQrRQ@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Mime-Version: 1.0
+Content-Type: Text/Plain; charset=us-ascii
+Content-Transfer-Encoding: 7bit
 
-kvzalloc_node is not doing a runtime check on the node argument
-(__alloc_pages_node_noprof does have a VM_BUG_ON, but it expands to
-nothing on !CONFIG_DEBUG_VM builds), so doing any ethtool/netlink
-operation that calls mlx5e_open on a CPU that's larger that MAX_NUMNODES
-triggers OOB access and panic (see the trace below).
+On Wed, 22 Jan 2025 18:06:58 +0100
+Alice Ryhl <aliceryhl@google.com> wrote:
 
-Add missing cpu_to_node call to convert cpu id to node id.
+>> > >> +    let duration = if delta > MAX_DURATION || delta.is_negative() {
+>> > >> +        // TODO: add WARN_ONCE() when it's supported.
+>> > >
+>> > > Ditto (also "Add").
+>> >
+>> > Oops, I'll fix.
+>> >
+>> > > By the way, can this be written differently maybe? e.g. using a range
+>> > > since it is `const`?
+>> >
+>> > A range can be used for a custom type?
+>>
+>> Yes, you can say `!(Delta::ZERO..MAX_DURATION).contains(&delta)`.
+>> (You'll need to add `Delta::ZERO`).
+> 
+> It would need to use ..= instead of .. to match the current check.
 
-[  165.427394] mlx5_core 0000:5c:00.0 beth1: Link up
-[  166.479327] BUG: unable to handle page fault for address: 0000000800000010
-[  166.494592] #PF: supervisor read access in kernel mode
-[  166.505995] #PF: error_code(0x0000) - not-present page
-...
-[  166.816958] Call Trace:
-[  166.822380]  <TASK>
-[  166.827034]  ? __die_body+0x64/0xb0
-[  166.834774]  ? page_fault_oops+0x2cd/0x3f0
-[  166.843862]  ? exc_page_fault+0x63/0x130
-[  166.852564]  ? asm_exc_page_fault+0x22/0x30
-[  166.861843]  ? __kvmalloc_node_noprof+0x43/0xd0
-[  166.871897]  ? get_partial_node+0x1c/0x320
-[  166.880983]  ? deactivate_slab+0x269/0x2b0
-[  166.890069]  ___slab_alloc+0x521/0xa90
-[  166.898389]  ? __kvmalloc_node_noprof+0x43/0xd0
-[  166.908442]  __kmalloc_node_noprof+0x216/0x3f0
-[  166.918302]  ? __kvmalloc_node_noprof+0x43/0xd0
-[  166.928354]  __kvmalloc_node_noprof+0x43/0xd0
-[  166.938021]  mlx5e_open_channels+0x5e2/0xc00
-[  166.947496]  mlx5e_open_locked+0x3e/0xf0
-[  166.956201]  mlx5e_open+0x23/0x50
-[  166.963551]  __dev_open+0x114/0x1c0
-[  166.971292]  __dev_change_flags+0xa2/0x1b0
-[  166.980378]  dev_change_flags+0x21/0x60
-[  166.988887]  do_setlink+0x38d/0xf20
-[  166.996628]  ? ep_poll_callback+0x1b9/0x240
-[  167.005910]  ? __nla_validate_parse.llvm.10713395753544950386+0x80/0xd70
-[  167.020782]  ? __wake_up_sync_key+0x52/0x80
-[  167.030066]  ? __mutex_lock+0xff/0x550
-[  167.038382]  ? security_capable+0x50/0x90
-[  167.047279]  rtnl_setlink+0x1c9/0x210
-[  167.055403]  ? ep_poll_callback+0x1b9/0x240
-[  167.064684]  ? security_capable+0x50/0x90
-[  167.073579]  rtnetlink_rcv_msg+0x2f9/0x310
-[  167.082667]  ? rtnetlink_bind+0x30/0x30
-[  167.091173]  netlink_rcv_skb+0xb1/0xe0
-[  167.099492]  netlink_unicast+0x20f/0x2e0
-[  167.108191]  netlink_sendmsg+0x389/0x420
-[  167.116896]  __sys_sendto+0x158/0x1c0
-[  167.125024]  __x64_sys_sendto+0x22/0x30
-[  167.133534]  do_syscall_64+0x63/0x130
-[  167.141657]  ? __irq_exit_rcu.llvm.17843942359718260576+0x52/0xd0
-[  167.155181]  entry_SYSCALL_64_after_hwframe+0x4b/0x53
+Neat, it works as follows.
 
-Fixes: bb135e40129d ("net/mlx5e: move XDP_REDIRECT sq to dynamic allocation")
-Signed-off-by: Stanislav Fomichev <sdf@fomichev.me>
----
- drivers/net/ethernet/mellanox/mlx5/core/en_main.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
-
-diff --git a/drivers/net/ethernet/mellanox/mlx5/core/en_main.c b/drivers/net/ethernet/mellanox/mlx5/core/en_main.c
-index bd41b75d246e..a814b63ed97e 100644
---- a/drivers/net/ethernet/mellanox/mlx5/core/en_main.c
-+++ b/drivers/net/ethernet/mellanox/mlx5/core/en_main.c
-@@ -2087,7 +2087,7 @@ static struct mlx5e_xdpsq *mlx5e_open_xdpredirect_sq(struct mlx5e_channel *c,
- 	struct mlx5e_xdpsq *xdpsq;
- 	int err;
- 
--	xdpsq = kvzalloc_node(sizeof(*xdpsq), GFP_KERNEL, c->cpu);
-+	xdpsq = kvzalloc_node(sizeof(*xdpsq), GFP_KERNEL, cpu_to_node(c->cpu));
- 	if (!xdpsq)
- 		return ERR_PTR(-ENOMEM);
- 
--- 
-2.48.0
-
+let delta = if (Delta::ZERO..=MAX_DELTA).contains(&delta) {
+    delta
+} else {
+    MAX_DELTA
+};
 
