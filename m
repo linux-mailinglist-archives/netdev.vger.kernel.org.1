@@ -1,144 +1,200 @@
-Return-Path: <netdev+bounces-160531-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-160532-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1811BA1A14A
-	for <lists+netdev@lfdr.de>; Thu, 23 Jan 2025 10:57:20 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 07C85A1A14E
+	for <lists+netdev@lfdr.de>; Thu, 23 Jan 2025 10:57:34 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id D59F27A1C05
-	for <lists+netdev@lfdr.de>; Thu, 23 Jan 2025 09:57:10 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id B6E657A164B
+	for <lists+netdev@lfdr.de>; Thu, 23 Jan 2025 09:57:24 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 70DDC20D4E8;
-	Thu, 23 Jan 2025 09:57:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id ABAE720DD4B;
+	Thu, 23 Jan 2025 09:57:16 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="QSPk1U78"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="lCwNQ9jj"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f181.google.com (mail-pl1-f181.google.com [209.85.214.181])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5D9B320D519
-	for <netdev@vger.kernel.org>; Thu, 23 Jan 2025 09:56:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0D2F520CCFB;
+	Thu, 23 Jan 2025 09:57:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.181
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1737626220; cv=none; b=J5HVpwMwu1f3zA4PYYxe2tP7uLkQ4Vss/vWvi9U1ZJuxkOmride8y95wCoUPvM5atO3lsHgQMBZJ6FkTnEOP0TNWY1sTFvEPT3Sk/iFZ2bMKpyPRjTfDiTZCStKq6j2vasKmTfNtsTCV0PTZqZuVlqKQg/+G82QWjAkbhEPqWK0=
+	t=1737626236; cv=none; b=nB6eMrnvF3HpLCu22n2gdP5WjqM+HLcxHq4xukg3jEqxtssTnXMaQ0yBjNVIKrGfYGME4cYR+DYQzvVFb/1+tsC8zXfipFcvpBnWxYN76eP9JfM8gkIA5++5lsUX/o/YcOYz8xjG7QbgSCcG5R0hjQesB7A8rLJhDOzGR1LiOhY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1737626220; c=relaxed/simple;
-	bh=ERAIMIKIu9APFSuO9Cn/T3m12u7EZAmVoz09ki9CqGg=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=LNU2In7/vEPqvEeo0E80jypqlxZNKXO2Xd3eaq4D29Iq3sgsITfiiudkL9NAArMDYASp60QyE6lgD63XNoOEnGqrKdmUO5sdlgYf9nOBwJEjv1cVEROt7d3axMgVu2Z/2zYrURJLgOsBW4y+b1G04W8859JDvTYLw4JTnVyCbp0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=QSPk1U78; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1737626214;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=YN5ISUI76bMnss/OXDHrGsjku/c5kM4P7iAQCZfcmpU=;
-	b=QSPk1U78lMQQGdGvoA6kUzDcBYMQz0vAMp3il5jTbRRHYwU9AiOW0Yre5KSDfykCDB6J6o
-	uXt6oamIu9PsKUqBTAl6OrtUwbfYkV2sDKo0aKviOOtLEJweorNdH35a6wh/01U8G5sTBm
-	5fODlKtpMtPM/29s7Gx2D//ncCTUeTU=
-Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com
- [209.85.128.72]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-45-KgqapWGlPi-MhaxkVJxzYw-1; Thu, 23 Jan 2025 04:56:49 -0500
-X-MC-Unique: KgqapWGlPi-MhaxkVJxzYw-1
-X-Mimecast-MFC-AGG-ID: KgqapWGlPi-MhaxkVJxzYw
-Received: by mail-wm1-f72.google.com with SMTP id 5b1f17b1804b1-4361efc9d1fso5817525e9.2
-        for <netdev@vger.kernel.org>; Thu, 23 Jan 2025 01:56:48 -0800 (PST)
+	s=arc-20240116; t=1737626236; c=relaxed/simple;
+	bh=x7MrWrh9s4+2xOk6514eGbTBSVS0ZR49Q4i+dlUkIDU=;
+	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
+	 Content-Type:MIME-Version; b=GvW9Qbkvuf3beD2gosiQ8rCVby67W3K2b0Y9yOkMV6OmSKmkGaND0MHRmSmHbvYWWV+mcxVTtssf9//OxMkTFFnxvsQgSiNR6mo5EA7szzz+Y0K9eVU8uyU2Yw9AUZdsOUW5vIdKfVuAaKqDwJrSIe169dFaCYZPwUEQQyz5eEs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=lCwNQ9jj; arc=none smtp.client-ip=209.85.214.181
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pl1-f181.google.com with SMTP id d9443c01a7336-21649a7bcdcso10971465ad.1;
+        Thu, 23 Jan 2025 01:57:14 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1737626234; x=1738231034; darn=vger.kernel.org;
+        h=mime-version:user-agent:content-transfer-encoding:references
+         :in-reply-to:date:cc:to:from:subject:message-id:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=ucSoUf9zPoPz/2MmjdKOJuDYg9iHG9qEzkVprvIblnk=;
+        b=lCwNQ9jjVSB98J4XuoJAiTx+vEhoyYg32DK5ChK4V8eZGi3vEk+ag0RZAzBfnpFbie
+         EZAcMmwJ1vwx5lIcB01mLNqQ3/Uni3k9iTqm6d0JHFEr3wZeKgYwCbqsC+1Is7Qz6Ma8
+         fdLO0qYwkVfWRMTE3yTWkt6Eg3+Kjvca/3cj/AcXFR1NeYD/51BAFNgnWSeByPJIOKik
+         Uf826o9DE1pV8Xy8ZNHmWufKjgpouZee8HOea9ov/1w1595V+6c/HzlrolpsUSi5dK4a
+         EE94jV0kzNbLTs/6mA+WhZS47xo5We6wMgSSKywhYuH+wg/D+G6kU1qssvdgwj6LgrC2
+         OMKQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1737626207; x=1738231007;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=YN5ISUI76bMnss/OXDHrGsjku/c5kM4P7iAQCZfcmpU=;
-        b=uOLfVv0ChW7qIZIwAXyJJbziqn8iIZ5R0QFxPPrfonXdkJ4PoepqcjVjLRqjC5fMYI
-         3vBy+lO5IhGN9hBxc/SHHgNww9dSMU5aMvb3Tk7FZGAWDDRLedDDUInEY1gI9THzGoID
-         4V5zmIuE+gO3Kh/FqMuoN0lvI5DgH0/JRQriInzlvukr4t/Q5+mFNzfFBpdsUEZy8tvp
-         2krZXfRUx9f5reqOBdQTpDrlHAjHg1yZJoJ9CrRvL7jLIH+Y7BrmqdxZuaKSI00EzRLI
-         xyZkmtwxziiHMvzIeaSjwBtBqjhY0DUnobVkEXVH2qrnPhT9JDtR7Y8gL/2/a2kNUN8e
-         jhkQ==
-X-Forwarded-Encrypted: i=1; AJvYcCXL6F1TcACky8KJjs481N+EAjHfKaBf652oUgYC2cV7nQjLocXeqWtnn0tmbFUqahxX6fqdVuQ=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyQhUnwSW8FOPRslXGEyUF8PSfp6dhT17+HBhgTkPonjzrz3Sdn
-	P+NMHPq2ClzMelMctx5/PEPislDvZaVw+2YB/PH7YrelriptrpAhSOaGADUXeLpm53B5QAsVAN4
-	GjHOidKqj3HWOrB2h8iFeRRrCI8E57P2YGe8lmWQiKNG4beW3lKUmtlDfopcmOw==
-X-Gm-Gg: ASbGncu/9uLQaz/D6W/7POo55guehSmUwXnCNSMUkm7CGFMbkK75qAdDWaWi6hl0V59
-	1PUSSlhmcKHj28wI9Lh4xYUiU/JLDVgxJmQmlc+P8xLWbN/gq0xoH6EvUCB05uhxXqh+2xuI/8c
-	FQGwlF7AJJkhrwYUnDxjUKUx+G4N7J3vPkisA/ALo3EJyR/wR6DMsHSrJRLtd49f55iIGXzETKk
-	wMXytUVrpcP7yathyb/cSbmp+QKpsZWURd7B3WGQfBncslSH2ag1TpATG65ZPqAl+/Jl+R7XS9P
-	ZQ6OGs86RfU7HPDLySRsd0z8
-X-Received: by 2002:a05:600c:34c9:b0:436:f975:29d with SMTP id 5b1f17b1804b1-438913bffd9mr231650205e9.6.1737626206988;
-        Thu, 23 Jan 2025 01:56:46 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IEJHnewSJlPxFP9qi7fJLgC8bjjyroK4Qc6r15kcanAlYURNuOkB1/AfBOP9ckT3pjhn9NCug==
-X-Received: by 2002:a05:600c:34c9:b0:436:f975:29d with SMTP id 5b1f17b1804b1-438913bffd9mr231649985e9.6.1737626206652;
-        Thu, 23 Jan 2025 01:56:46 -0800 (PST)
-Received: from [192.168.88.253] (146-241-27-215.dyn.eolo.it. [146.241.27.215])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-438b31c7c6asm55250225e9.35.2025.01.23.01.56.45
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 23 Jan 2025 01:56:46 -0800 (PST)
-Message-ID: <84c82380-4210-4efe-a269-6a40c3e39e61@redhat.com>
-Date: Thu, 23 Jan 2025 10:56:45 +0100
+        d=1e100.net; s=20230601; t=1737626234; x=1738231034;
+        h=mime-version:user-agent:content-transfer-encoding:references
+         :in-reply-to:date:cc:to:from:subject:message-id:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=ucSoUf9zPoPz/2MmjdKOJuDYg9iHG9qEzkVprvIblnk=;
+        b=nraFTv2pnHtjMvjmIPyauCTBu9Hka02zzRfO2lNPQ3r777xa0h32kSR915vNdyVzUR
+         G9pX9yQpE56HIXpuhmc+8Fc0gXwXw2EFwFESilRlUUAD3CyfHWqIyIGmoAxTnMhqz7FU
+         SB62EAlQfEqGPgFwq+aVYJvN8q3Dy/26ZFaENE0gKEQ6KF7/NyHSl8Xz4XnCRP64p4r6
+         dSxczoMgOp4jjsTst9GWBICdwJcAveXY6LliI+tzhA1tkwGs8Udh1zrpwtGkFvZuydm+
+         ZvvwiTnVylMlNHCzCvE1BSTE2lyqX1n7lQMK+YsoutgsunKZ5PWR4z/IYYsWnxBLyr2t
+         zpoQ==
+X-Forwarded-Encrypted: i=1; AJvYcCWGofxhbv+b/1wV9kSj8Ou24RlIBfb/yLcJyERLz6co4utF4sUAfzH6DFiU+KncvOUpW5pEBsU=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yy/MyebiEI3XrQEFoTxYamsaaIXVM4MvWw3sXucXjY9jOAPJXlU
+	dmUauuvbd8A4cwMy6vcQavzKb97AHhkjWBTsslyCsGpszH5xBXKn
+X-Gm-Gg: ASbGncv4jvxfsswSUW0WkoHpTdh8H/hrj+E2J8p5FpLDFjNPgPPBXNFEGpd2jlac+uX
+	p44KOL91BacgXYIDdKRIZkv0ToOlPPq+e3SJAd/oceQlOMqhZdzyg7dBt35LuP+OquwxdO8rFGm
+	AX9fFsG3sGn83pZXc2dcdw/hvhbR1Jd2Cgdr1/5L3qJeD7H51j5e8bPjfDMPUoiiAZSrxqs2829
+	APCD22oKlr17rpg5E4qipLltCGwQrjWCgUuaCCzax9+gDo7rHd/4zEpNZhIYQeH36IdE/sf8LXa
+	UQ==
+X-Google-Smtp-Source: AGHT+IFO7qmxrrtvSmdmUK7vk8xIIt4eT66KKBZvZdmEy9g8EqyAjovKPL8+E/kxvoRkZcWODKRkCg==
+X-Received: by 2002:a05:6a00:23c3:b0:725:b201:2353 with SMTP id d2e1a72fcca58-72daf997326mr34263065b3a.13.1737626234114;
+        Thu, 23 Jan 2025 01:57:14 -0800 (PST)
+Received: from [192.168.0.235] ([38.34.87.7])
+        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-72dab7f06e6sm12762936b3a.34.2025.01.23.01.57.12
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 23 Jan 2025 01:57:13 -0800 (PST)
+Message-ID: <ce15f61de21a4415d00d2e52c2eedc63564093c8.camel@gmail.com>
+Subject: Re: [PATCH bpf-next v2 01/14] bpf: Support getting referenced kptr
+ from struct_ops argument
+From: Eduard Zingerman <eddyz87@gmail.com>
+To: Amery Hung <ameryhung@gmail.com>, netdev@vger.kernel.org
+Cc: bpf@vger.kernel.org, daniel@iogearbox.net, andrii@kernel.org, 
+	alexei.starovoitov@gmail.com, martin.lau@kernel.org, sinquersw@gmail.com, 
+	toke@redhat.com, jhs@mojatatu.com, jiri@resnulli.us, stfomichev@gmail.com, 
+	ekarani.silvestre@ccc.ufcg.edu.br, yangpeihao@sjtu.edu.cn, 
+	xiyou.wangcong@gmail.com, yepeilin.cs@gmail.com, amery.hung@bytedance.com
+Date: Thu, 23 Jan 2025 01:57:08 -0800
+In-Reply-To: <20241220195619.2022866-2-amery.hung@gmail.com>
+References: <20241220195619.2022866-1-amery.hung@gmail.com>
+		 <20241220195619.2022866-2-amery.hung@gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+User-Agent: Evolution 3.54.2 (3.54.2-1.fc41) 
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH] net: davicom: fix UAF in dm9000_drv_remove
-To: Chenyuan Yang <chenyuan0y@gmail.com>,
- =?UTF-8?Q?Uwe_Kleine-K=C3=B6nig?= <u.kleine-koenig@baylibre.com>
-Cc: andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com,
- kuba@kernel.org, paul@crapouillou.net, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org, zijie98@gmail.com
-References: <20250120222557.833100-1-chenyuan0y@gmail.com>
- <xttnvcmu3dep2genvce3r7spreliecx3dc3rynups25q6xilk6@tf4wxe6bdxia>
- <CALGdzuqsjddPKgpCdOtDyAAJcJcfd1UUyK7o4YzL8a1E5EsNKw@mail.gmail.com>
-Content-Language: en-US
-From: Paolo Abeni <pabeni@redhat.com>
-In-Reply-To: <CALGdzuqsjddPKgpCdOtDyAAJcJcfd1UUyK7o4YzL8a1E5EsNKw@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
 
-On 1/21/25 9:04 PM, Chenyuan Yang wrote:
-> On Mon, Jan 20, 2025 at 11:33 PM Uwe Kleine-König
-> <u.kleine-koenig@baylibre.com> wrote:
->> On Mon, Jan 20, 2025 at 04:25:57PM -0600, Chenyuan Yang wrote:
->>> dm is netdev private data and it cannot be
->>> used after free_netdev() call. Using adpt after free_netdev()
->>
->> What is adpt?
-> 
-> This should be "dm".
-> 
->>> can cause UAF bug. Fix it by moving free_netdev() at the end of the
->>> function.
->>
->> "can cause"? Doesn't that trigger reliable?
->>
->> How did you find that issue? Did this actually trigger for you, or is it
->> a static checker that found it? Please mention that in the commit log.
-> 
-> This is detected by our static checker. Thus, we don't have a
-> test-case to trigger it stably.
-> Basically, it has the buggy pattern as the commit mentioned below.
-> 
->>> This is similar to the issue fixed in commit
->>> ad297cd2db8953e2202970e9504cab247b6c7cb4 ("net: qcom/emac: fix UAF in emac_remove").
->>
->> Please shorten the commit id, typically to 12 chars as you did in the
->> Fixes line below.
-> 
-> Sure! Should I send a Patch v2 for this commit?
+On Fri, 2024-12-20 at 11:55 -0800, Amery Hung wrote:
+> From: Amery Hung <amery.hung@bytedance.com>
+>=20
+> Allows struct_ops programs to acqurie referenced kptrs from arguments
+> by directly reading the argument.
+>=20
+> The verifier will acquire a reference for struct_ops a argument tagged
+> with "__ref" in the stub function in the beginning of the main program.
+> The user will be able to access the referenced kptr directly by reading
+> the context as long as it has not been released by the program.
+>=20
+> This new mechanism to acquire referenced kptr (compared to the existing
+> "kfunc with KF_ACQUIRE") is introduced for ergonomic and semantic reasons=
+.
+> In the first use case, Qdisc_ops, an skb is passed to .enqueue in the
+> first argument. This mechanism provides a natural way for users to get a
+> referenced kptr in the .enqueue struct_ops programs and makes sure that a
+> qdisc will always enqueue or drop the skb.
+>=20
+> Signed-off-by: Amery Hung <amery.hung@bytedance.com>
+> ---
 
-Please do! while at it, please also include the target tree ('net') in
-the subj prefix.
+Hi Amery,
 
-Thanks,
+Sorry, for joining so late in the review process.
+Decided to take a look at verifier related changes.
+Overall the patch looks good to me,
+but I dislike the part allocating parameter ids.
 
-Paolo
+[...]
+
+> diff --git a/kernel/bpf/btf.c b/kernel/bpf/btf.c
+> index 28246c59e12e..c2f4f84e539d 100644
+> --- a/kernel/bpf/btf.c
+> +++ b/kernel/bpf/btf.c
+> @@ -6682,6 +6682,7 @@ bool btf_ctx_access(int off, int size, enum bpf_acc=
+ess_type type,
+>  			info->reg_type =3D ctx_arg_info->reg_type;
+>  			info->btf =3D ctx_arg_info->btf ? : btf_vmlinux;
+>  			info->btf_id =3D ctx_arg_info->btf_id;
+> +			info->ref_obj_id =3D ctx_arg_info->refcounted ? ++nr_ref_args : 0;
+>  			return true;
+>  		}
+>  	}
+> diff --git a/kernel/bpf/verifier.c b/kernel/bpf/verifier.c
+> index f27274e933e5..26305571e377 100644
+> --- a/kernel/bpf/verifier.c
+> +++ b/kernel/bpf/verifier.c
+
+[...]
+
+> @@ -22161,6 +22182,16 @@ static int do_check_common(struct bpf_verifier_e=
+nv *env, int subprog)
+>  		mark_reg_known_zero(env, regs, BPF_REG_1);
+>  	}
+> =20
+> +	/* Acquire references for struct_ops program arguments tagged with "__r=
+ef".
+> +	 * These should be the earliest references acquired. btf_ctx_access() w=
+ill
+> +	 * assume the ref_obj_id of the n-th __ref-tagged argument to be n.
+> +	 */
+> +	if (!subprog && env->prog->type =3D=3D BPF_PROG_TYPE_STRUCT_OPS) {
+> +		for (i =3D 0; i < env->prog->aux->ctx_arg_info_size; i++)
+> +			if (env->prog->aux->ctx_arg_info[i].refcounted)
+> +				acquire_reference(env, 0);
+> +	}
+> +
+>  	ret =3D do_check(env);
+>  out:
+>  	/* check for NULL is necessary, since cur_state can be freed inside
+
+I think it would be cleaner if:
+- each program would own it's instance of 'env->prog->aux->ctx_arg_info';
+- ref_obj_id field would be added to 'struct bpf_ctx_arg_aux';
+- parameter ids would be allocated in do_check_common(), but without
+  reliance on being first to allocate.
+
+Or add some rigour to this thing and e.g. make env->id_gen signed
+and declare an enum of special ids like:
+
+  enum special_ids {
+  	STRUCT_OPS_CTX_PARAM_0 =3D -1,
+  	STRUCT_OPS_CTX_PARAM_1 =3D -2,
+  	STRUCT_OPS_CTX_PARAM_2 =3D -3,
+  	...
+  }
+
+and update the loop above as:
+
+	if (!subprog && env->prog->type =3D=3D BPF_PROG_TYPE_STRUCT_OPS) {
+		for (i =3D 0; i < env->prog->aux->ctx_arg_info_size; i++)
+			if (env->prog->aux->ctx_arg_info[i].refcounted)
+            	/* imagined function that acquires an id with specific value *=
+/
+				acquire_special_reference(env, 0, STRUCT_OPS_CTX_PARAM_0 - i /* desired=
+ id */);
+	}
+
+wdyt?
 
 
