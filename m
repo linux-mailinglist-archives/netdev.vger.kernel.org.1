@@ -1,126 +1,141 @@
-Return-Path: <netdev+bounces-160587-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-160588-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id B416FA1A6BE
-	for <lists+netdev@lfdr.de>; Thu, 23 Jan 2025 16:11:19 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3818EA1A6C6
+	for <lists+netdev@lfdr.de>; Thu, 23 Jan 2025 16:12:23 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 77CF31888A3B
-	for <lists+netdev@lfdr.de>; Thu, 23 Jan 2025 15:11:22 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 427583ABA12
+	for <lists+netdev@lfdr.de>; Thu, 23 Jan 2025 15:11:52 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0E08620E03C;
-	Thu, 23 Jan 2025 15:11:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AB953212B13;
+	Thu, 23 Jan 2025 15:11:54 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="cEvf8YtW"
+	dkim=pass (2048-bit key) header.d=rowland.harvard.edu header.i=@rowland.harvard.edu header.b="sf3lvnqI"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f173.google.com (mail-pl1-f173.google.com [209.85.214.173])
+Received: from mail-qv1-f48.google.com (mail-qv1-f48.google.com [209.85.219.48])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8B2A31CA8D;
-	Thu, 23 Jan 2025 15:11:10 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.173
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 108E4211A3A
+	for <netdev@vger.kernel.org>; Thu, 23 Jan 2025 15:11:52 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.48
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1737645072; cv=none; b=dhCJwieHrgjbohAQUm2xF9ZFRJs8CiLvtPJiqc3v6wVZkKjkdlpK4c8fh7mpr9561gHONoCR43eIpCfaykmxDLu811cA9wI10q8z/XekEdZ0et0whx3cyfuLs/RQpnHfFrOOC/JAiwTxzytIeDyEg2+3Hexixoxbr7J4kWz6xlU=
+	t=1737645114; cv=none; b=rDX7TlHQKxBqWImTvSKRkydQ9123lhaCWpjN+UEM7ypAIFrKEp4uR1GGebhcL+BaOdf2NtiMZQNkT5E8V8rgLoa0fcB9ToRE9j5YmJr+1oVAzoO4xkLebmqGEm1VH4c3W3y7HeL7YlUdanLMcwv0v1/zAJc0lIwaVdVnP5Da87Q=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1737645072; c=relaxed/simple;
-	bh=Tif76zDRrIJX6lJuKWq8bNtyoEWXtS07G9SKxrHHHfg=;
+	s=arc-20240116; t=1737645114; c=relaxed/simple;
+	bh=9F/OaSn8fuweFCH3ladTWTaTydc93sP5hBxUQpgO0Ps=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=bMj5Drgm/6d5ipNVFxdEk4MlgfiqjE3Y0efeowXbu5X9nSYdHSgZMgLm+JfgFuVGG3RUG59FITQ5t55sRzlMnuIn2fO9sDlkTAPpqdFytajC72ZQi5buCpr0EA9bPyN+tH5veOCaHIG1WbzhDfQMJw+s+0Wy5jqq5EZlxyY+AVo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=cEvf8YtW; arc=none smtp.client-ip=209.85.214.173
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pl1-f173.google.com with SMTP id d9443c01a7336-2164b662090so20022715ad.1;
-        Thu, 23 Jan 2025 07:11:10 -0800 (PST)
+	 Content-Type:Content-Disposition:In-Reply-To; b=l9pkKLsWRSxC6YtsChXtj4CchJCAoos5qcATL8Ai+HSRR7uc5O6gixwUH4CcjO+OdUBdPwBJ5qwDKoroiykqQX/au58c7x1z8z/k7DYlF7weXmtV8MsqXwazpmA3TKNhEc5ey438/PQJDyWzG5lipF7Ac+4dwqmAU4we0Su+b38=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=rowland.harvard.edu; spf=fail smtp.mailfrom=g.harvard.edu; dkim=pass (2048-bit key) header.d=rowland.harvard.edu header.i=@rowland.harvard.edu header.b=sf3lvnqI; arc=none smtp.client-ip=209.85.219.48
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=rowland.harvard.edu
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=g.harvard.edu
+Received: by mail-qv1-f48.google.com with SMTP id 6a1803df08f44-6d8ece4937fso8673716d6.2
+        for <netdev@vger.kernel.org>; Thu, 23 Jan 2025 07:11:52 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1737645070; x=1738249870; darn=vger.kernel.org;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=CPVOhXs2R7AvyExLoxGLf0L/phBUtvvTj+5Z0v1peEA=;
-        b=cEvf8YtW1HURnpfXrewojfO+Ufq3/AfwAWlajd+dCxpznPC5fZ/lIR3KgJYtEMLK2r
-         2k2H0InYnZNJBmmGKLXo6YcpFszd66aQ3LhkHZL+XiAL2wQGduV8uz6YjmfYZs3LFZ6x
-         WTr2OAgCGXnDof0lx3hMeeOhahUt4iDUkDB/ma6tZMiiWW3uWGkD7rWJNV2BPGADo6Oc
-         RnlOdcSwLb+oRkeXbfqipqnjhPO22NNRiAA2cPVMOz7NPsKNzaXte19oTT53ETF49CLJ
-         vT1T9q05tZtDiQkyseIe80kyC/os0QenfBmUktHrjFAUgxSHS3x0T5nin6XTx0S7AgNN
-         OfDA==
+        d=rowland.harvard.edu; s=google; t=1737645112; x=1738249912; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=631aiENuZfGBJPCs1cywEgmvIT9kJQOpty8zcOly6Oo=;
+        b=sf3lvnqIGGs1t/3jOZ0Z3bpfQclWIlKEhG43WZVATd29yl2KmcvUhPx9nA9JXMUwkX
+         de6aGhYOqwcu0NhUpVHce0ujhhycYjExtsIZ5ZDz37M3B27GzFn7VnF0YxaMRCqg6hRF
+         6mWclZKX9AN8XGBLwmmaCI4T6lpINTgxNlu0ZIF28Wf2MtDsjLbZsK08dpzgpKM1P2tC
+         OghueD/w1FG+BR5TlvE53US6NqEEowug+L2jtBmhe510kZg39pBcd9DYDO22MMRXKv5s
+         G8FlXlypu0l1qlvaWR96BCNV2NGHYRf3PPRoWVGuMC673zVJMo0L/avKsFf0y+VvLaU7
+         XwHA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1737645070; x=1738249870;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=CPVOhXs2R7AvyExLoxGLf0L/phBUtvvTj+5Z0v1peEA=;
-        b=boxp+srXdwirLA3L7moRcHezL3p/S16nIMhP4MDlwNbxS9RPl7GwT2G9kxy3o355Ye
-         MwQTOTYT9hMeERgqXdse9fnAuKu8oKCdEsPK3fVudAufxKBwBEgAT2n5wzLEUNSoP4nJ
-         aXjdQ2828BYmY1sYTHmNX3UwRkFjaP5qxfhZlZdH4uErS5BCaRAQsUEzfi5XFCISiROb
-         iFOpmY8T6QxtxM1bCBD4+oqnHhADx6SGoAablv6VOpgcYsccsrFaY7GrwC3SL+25l8bN
-         i/6c4xjzDPM0woM7No74gA4gEBovgAMbwAgfmPTJmcaljd2vQT/ZDjiNkiVrXhVEZQo+
-         PfKQ==
-X-Forwarded-Encrypted: i=1; AJvYcCUcpvuVuarTuzelvfumzZnwlXZaCLb4Y+3NgfnnNcVUENNdVfHu4P8Drms4DKP/KNi/kTT0IYBKsbFjVlw=@vger.kernel.org, AJvYcCVao+HBBQCa08YoEfU4telACStd8EOA/qjYNjIJ1h2aDCZ8lFYiSVFd/hyCYFmnALUKAhMAfyoB@vger.kernel.org, AJvYcCWDqlFYpV8fAfn/5hxAR9HfmO2x9L19U0J9ccd4po7O1kBcAV2ReEGviZnh+dSe0R+hgsXH5RhW@vger.kernel.org
-X-Gm-Message-State: AOJu0Yz4aiC8YkC5xaLMP+8QoPBZK6kTeZhwRWCp080WrjmleJI+63By
-	XmPNQZMy0LrH1KtipxT9RfzQAIEQ5M6gBpS1YyOjtDJAadhjPY/B
-X-Gm-Gg: ASbGncuO3dpcJyrG7fAWXcelG361kWkyoY3xuSkADPnXowLKQVZoimJsedMhMh1+hyI
-	XfdXv8kvgQ5+To7QPpYlGSmaifiqMCswm2rKsZ9uz7VTfqgz4NMhYWo9sAu4pGUsnAse7q/5Rv2
-	2jKr4C1BlGCnmii9ycNV1THoXZS8Fev4qLKN8lokIqh+Fi6qC9+RC0kStztjuu/sz9JvB+pGfd7
-	hpBSnKWgbIhdFweY6VWK3U+fgfnVn5LRj/kj4KfPKSmvBW4r1KDSFbqPBPLS7+gxDl3Mvn2FQ7o
-	OMjNtmDX/V7ON2eAkAgLwiCs
-X-Google-Smtp-Source: AGHT+IHGhnh5sedgClGN15IhDMrSkupxb1oxY9VDNKt+MW2FCfzIppVwZ5pXtLHL0q/K/w9+EUv/+w==
-X-Received: by 2002:a17:902:da88:b0:216:69ca:773b with SMTP id d9443c01a7336-21c352c7b99mr402128005ad.5.1737645069936;
-        Thu, 23 Jan 2025 07:11:09 -0800 (PST)
-Received: from hoboy.vegasvil.org ([2600:1700:2430:6f6f:e2d5:5eff:fea5:802f])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-21da3d9c552sm180675ad.18.2025.01.23.07.11.08
+        d=1e100.net; s=20230601; t=1737645112; x=1738249912;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=631aiENuZfGBJPCs1cywEgmvIT9kJQOpty8zcOly6Oo=;
+        b=Za68+XcqW3gFmurl+AbNdujPxqB0Bz595M2HwfFyPsNJGFBn7tTjkBv7V5A5FSvf4g
+         BIJelpnQbqufb1wbQ7ADLCiumMIMS4tH+pNd3at/HcEtk86dbMqqWHB5rCHvaymP7Xn+
+         Bm4LBMRSXWqTi5G9NauQITn9t6hcbPamDAUaiOLshhgeM2xVRL03/CYGEcNVMH91GdoV
+         CrZN+V4utDvx2HIX+J+viQfPEweTKq44PMEfamhjMlgWhlYnNuTeNu835keXm/ijg7T5
+         9ECcG7EpQTedUKMNK1LdKEL8O5FrR52CKMmTbcGJh8XmYd/wiZmAXi6HxOJ3sQQFq+vT
+         qlHQ==
+X-Forwarded-Encrypted: i=1; AJvYcCXZmyknN3sO7eDh7XyHkWFC50SjoKG5YrjsX3whehj4BZzJfRUp+sFtazpXaZQf1TSPC0oFAHo=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyKUiqqB4ac3PmDpwkakuU7R50BY/vuPc/YBP6V+LFilN7JzxUk
+	5avLhG2sZUuR2lmusjRkAttXkrql8qjBiyz4ElfumddMZOSfaGjErSizTBULfg==
+X-Gm-Gg: ASbGncunvZLZbDZFssgmtfNVTVOWG58XRtkxqR3RrN7XLePcjZmThoJlO4MFCzuZ87p
+	7Qolde9vVzq7HxXSRkZRRwaVIsKCUGK8Fxy2YMIOx7+LG1as5pCD6EGcuOshNZ+mmua+1N31SPr
+	d5nGFYPcCoLl84W3U6rrgb/VOcxNADnueCwVzlg2z2HcWPwZz9aA6RE6bHRJpdnh9HqAL/+PgYC
+	4oBlYyhl5ybyldwjQ7eE4n+5QUr3uc3SvgJFVfxbLK0rxhKmdkd04IsAolN6i2HhQzWf3Q5wrrh
+	B9yFZzvM2ucxiGlPNUcUcSk=
+X-Google-Smtp-Source: AGHT+IFUzFZYic8b37Oq8op4miNTXO7cwki07AlbPa1AyzBG78+xrz5qJpCoIBrPSuDV9oVi5Ns4PA==
+X-Received: by 2002:a05:6214:570b:b0:6d4:25c4:e772 with SMTP id 6a1803df08f44-6e1b2251083mr497962286d6.36.1737645111911;
+        Thu, 23 Jan 2025 07:11:51 -0800 (PST)
+Received: from rowland.harvard.edu ([140.247.181.15])
+        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-6e1afcd3859sm71567576d6.74.2025.01.23.07.11.51
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 23 Jan 2025 07:11:09 -0800 (PST)
-Date: Thu, 23 Jan 2025 07:11:07 -0800
-From: Richard Cochran <richardcochran@gmail.com>
-To: Thomas =?iso-8859-1?Q?Wei=DFschuh?= <linux@weissschuh.net>
-Cc: Michal Swiatkowski <michal.swiatkowski@linux.intel.com>,
+        Thu, 23 Jan 2025 07:11:51 -0800 (PST)
+Date: Thu, 23 Jan 2025 10:11:49 -0500
+From: Alan Stern <stern@rowland.harvard.edu>
+To: Petko Manolov <petkan@nucleusys.com>
+Cc: Nikita Zhandarovich <n.zhandarovich@fintech.ru>,
 	Andrew Lunn <andrew+netdev@lunn.ch>,
 	"David S. Miller" <davem@davemloft.net>,
 	Eric Dumazet <edumazet@google.com>,
 	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	John Stultz <john.stultz@linaro.org>, Arnd Bergmann <arnd@arndb.de>,
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
-	stable@vger.kernel.org
-Subject: Re: [PATCH RESEND net] ptp: Ensure info->enable callback is always
- set
-Message-ID: <Z5JcCxGuQNH9bZYH@hoboy.vegasvil.org>
-References: <20250123-ptp-enable-v1-1-b015834d3a47@weissschuh.net>
- <Z5IOHVu9L+QpyK4Y@mev-dev.igk.intel.com>
- <779708b6-d61c-4688-92cc-6afb987334d6@t-8ch.de>
+	linux-usb@vger.kernel.org, netdev@vger.kernel.org,
+	syzbot+d7e968426f644b567e31@syzkaller.appspotmail.com,
+	syzkaller-bugs@googlegroups.com, linux-kernel@vger.kernel.org,
+	lvc-project@linuxtesting.org
+Subject: Re: [PATCH net] net: usb: rtl8150: enable basic endpoint checking
+Message-ID: <0a063f6a-cce7-4a78-99e4-7069e37ab3d9@rowland.harvard.edu>
+References: <20250122104246.29172-1-n.zhandarovich@fintech.ru>
+ <20250122124359.GA9183@bender.k.g>
+ <f199387d-393b-4cb4-a215-7fd073ac32b8@fintech.ru>
+ <f099be8f-0ae0-49c7-b0bc-02770d9c1210@rowland.harvard.edu>
+ <20250123094930.GG4145@bender.k.g>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <779708b6-d61c-4688-92cc-6afb987334d6@t-8ch.de>
+In-Reply-To: <20250123094930.GG4145@bender.k.g>
 
-On Thu, Jan 23, 2025 at 02:19:46PM +0100, Thomas Weißschuh wrote:
-> On 2025-01-23 10:38:37+0100, Michal Swiatkowski wrote:
-> > What about other ops, did you check it too? Looks like it isn't needed,
-> > but it sometimes hard to follow.
+On Thu, Jan 23, 2025 at 11:49:30AM +0200, Petko Manolov wrote:
+> On 25-01-22 10:59:33, Alan Stern wrote:
+> > On Wed, Jan 22, 2025 at 05:20:12AM -0800, Nikita Zhandarovich wrote:
+> > > Hi,
+> > > 
+> > > On 1/22/25 04:43, Petko Manolov wrote:
+> > > > On 25-01-22 02:42:46, Nikita Zhandarovich wrote:
+> > > >> Syzkaller reports [1] encountering a common issue of utilizing a wrong usb
+> > > >> endpoint type during URB submitting stage. This, in turn, triggers a warning
+> > > >> shown below.
+> > > > 
+> > > > If these endpoints were of the wrong type the driver simply wouldn't work.
+> > 
+> > Better not to bind at all than to bind in a non-working way.  Especially when
+> > we can tell by a simple check that the device isn't what the driver expects.
+> > 
+> > > > The proposed change in the patch doesn't do much in terms of fixing the
+> > > > issue (pipe 3 != type 1) and if usb_check_bulk_endpoints() fails, the
+> > > > driver will just not probe successfully.  I don't see how this is an
+> > > > improvement to the current situation.
+> > 
+> > It fixes the issue by preventing the driver from submitting an interrupt URB
+> > to a bulk endpoint or vice versa.
 > 
-> I couldn't find any missing, but I'm not familiar with the subsystem and
-> didn't check too hard.
+> I always thought that once DID/VID is verified, there's no much room for that to
+> happen.
 
-Initially all of the callbacks were required, but that requirement
-became relaxed over time with getcycles64().
+Unfortunately that's not so, for two reasons.  First, the vendor may 
+change the device's design without updating the Product or Device ID, 
+and second, a malicious device may spoof the VID, PID, and DID values.  
+(Or, as in this case, a fuzzer may try to fool the driver.)
 
-Now that we have more and more drivers, it wouldn't hurt to let
-ptp_clock_register() check that the needed callbacks are valid.
+> Alright then.  I'd recommend following Fedor Pchelkin's advise about moving
+> those declarations to the beginning of probe(), though.
 
-> Note:
-> 
-> A follow-up fix would be to actually guard the users of ->enable and
-> error out.
+Agreed.
 
-Yes, I would place checks at the call sites, within ptp_ioctl().
-
-Thanks,
-Richard
+Alan Stern
 
