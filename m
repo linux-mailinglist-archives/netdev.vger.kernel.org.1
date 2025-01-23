@@ -1,163 +1,144 @@
-Return-Path: <netdev+bounces-160555-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-160556-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 95489A1A263
-	for <lists+netdev@lfdr.de>; Thu, 23 Jan 2025 12:01:20 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id A3296A1A27D
+	for <lists+netdev@lfdr.de>; Thu, 23 Jan 2025 12:03:57 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 617933A7659
-	for <lists+netdev@lfdr.de>; Thu, 23 Jan 2025 11:01:13 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 752DB16B235
+	for <lists+netdev@lfdr.de>; Thu, 23 Jan 2025 11:03:43 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 659F020CCE3;
-	Thu, 23 Jan 2025 11:01:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 637FF20DD7F;
+	Thu, 23 Jan 2025 11:02:45 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="CRhRSpFl"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="EBysC/vv"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 32BEE1C5F14
-	for <netdev@vger.kernel.org>; Thu, 23 Jan 2025 11:01:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ADE531C5F14
+	for <netdev@vger.kernel.org>; Thu, 23 Jan 2025 11:02:43 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1737630076; cv=none; b=Cnyz9H+WsGpsldRkITvr3v/bgZs+Nd8h4QtC1OztdXRtqo5nlvNcam7Tl5g5EOBOiJWon4ruUw3Gde+UDsiRLEJWT5LntlJzKSzQEKSp2cNNhCvAF1dxz+Ytv/0Ip+lgDohg7TeeU/LmtVRYZS5QzjAPSq5uhJRcpKHXSl1kTtM=
+	t=1737630165; cv=none; b=etwT3+wAZFj0Cn5Jh0UHddbsCD0uMCgKrxOCQowXAuXNoT2taQdGzy6R/iitlxWczMN/jG/irkhFVELnbmIyTjon9lE+NIRgm1ooNzCxbnk3bCzgM3JUUpn0MLNPGRw80HjQSotsaYIh3vf7gX2wi0TPeOjuf5mNy9KIPLgKg9c=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1737630076; c=relaxed/simple;
-	bh=KtDANyD9/osuMC7CVYxJnZRboxoCPbMAFvGu++rDke0=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=KE7zDYU0+2zLMXznitryzfpdfZp19UI2KYUjGC6pUr2UNFHZQoDB7hYk+lAYS4yHtp8hsh+LSkjTURKo94cI+tFM9nSP877LAcASedHS1CZLonK7rGGjN27AVf/f/vLqCNaoT8ty7U50aRbhhgPCpJ0bz1eBfKyxWzuGoLvzv1I=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=CRhRSpFl; arc=none smtp.client-ip=170.10.133.124
+	s=arc-20240116; t=1737630165; c=relaxed/simple;
+	bh=/CrwkM6sz8EQ7DFhmCxDvR35R1xgL/CrolRfxoB8HSA=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=JgP8W3oVP53ENfJ384vQzsb5qLK+0HtfxHj+oYlBDmV39by49ZwryYmB0D6o/TnswcIfoSB3N3U9ZDxsmNFNvJhslCfGK49ThaVuy+WESAo+VkEnUYI84Whf6B7JJgqe+12pvIjSrJkZwbIo5Gdbn0RIqsT0ui3cT7B1UwfknZM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=EBysC/vv; arc=none smtp.client-ip=170.10.129.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1737630073;
+	s=mimecast20190719; t=1737630162;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=HVFvlsMfxq0V5HAtv3hPGyTsmZRqbThPam/nCN6/K4w=;
-	b=CRhRSpFlxKUMcmJVEF4vsqz27Nu891fY0p7hgEP1hDzuIsBpekmfmMYLI4ygRFCcjA7ZpI
-	mUMUjipGn0+JLEcscHWRsMwm8+INz1wAmFTqLKmZO0ymBTj9DPqe/Xi600inh7Rx6JZ/b8
-	uWmHb/4xf1chT8+T/PLKlEviFNJ9RMM=
-Received: from mail-wm1-f69.google.com (mail-wm1-f69.google.com
- [209.85.128.69]) by relay.mimecast.com with ESMTP with STARTTLS
+	bh=v+HvkadESYr+6YZ6rJIaWxe2n6B1oB6eTw6RXzewGEk=;
+	b=EBysC/vvlL0ACxe+XlmBdVVqvlKdbyiAzBJ6dIvXbyTdfMKiRoQIq3z7g+ULUu/aivSGli
+	58ORL354TdNltvFOPIIkK6ZpT9wts100PjXb4YCQdda4IrXRzUo8qMhkT2xdAlNb+FvuRV
+	/kUKaFGZny4lkGSOL0Xd4bjZT8fLz5Q=
+Received: from mail-qt1-f199.google.com (mail-qt1-f199.google.com
+ [209.85.160.199]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-332-jtQCi_cWPP-s8mOjSCQiiQ-1; Thu, 23 Jan 2025 06:01:11 -0500
-X-MC-Unique: jtQCi_cWPP-s8mOjSCQiiQ-1
-X-Mimecast-MFC-AGG-ID: jtQCi_cWPP-s8mOjSCQiiQ
-Received: by mail-wm1-f69.google.com with SMTP id 5b1f17b1804b1-4362b9c1641so3554815e9.3
-        for <netdev@vger.kernel.org>; Thu, 23 Jan 2025 03:01:11 -0800 (PST)
+ us-mta-623-rkQVxV61OCyEyITzm7YS2Q-1; Thu, 23 Jan 2025 06:02:41 -0500
+X-MC-Unique: rkQVxV61OCyEyITzm7YS2Q-1
+X-Mimecast-MFC-AGG-ID: rkQVxV61OCyEyITzm7YS2Q
+Received: by mail-qt1-f199.google.com with SMTP id d75a77b69052e-4678b42cbfeso16248091cf.3
+        for <netdev@vger.kernel.org>; Thu, 23 Jan 2025 03:02:41 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1737630070; x=1738234870;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=HVFvlsMfxq0V5HAtv3hPGyTsmZRqbThPam/nCN6/K4w=;
-        b=Mbm6DXRrNctEI8zgVO+BZ0Wt38wlrhSzsT/2s+vyEY9eIv8oOIaJpLsYkQBpkOJTuP
-         pzX8uBggbPxO5tNYQsJl3Ok070qZBGhdxVCkXJzIaOsVxZUp1zQsGN+yxloWrRQJi7Ys
-         EOkBcW+C1VqsWkSe2DpbMCxCoJML0QNRF75rYVX0NMLLTQBHUH2jFNaHzfjbphhvBjJK
-         LW5e8lKgwtJj0T/NZ2Hf5SbKFr1iZRFrKgMKszVhyy9YpbV8IgOY0DWbYuBwj6fkwNkI
-         6lm4gXZZeADl900sGUoWn7qpI8mZ5PXzj1ukbn+zkke28ZWi+jRG9ykNNd+D038y+87R
-         2erA==
-X-Forwarded-Encrypted: i=1; AJvYcCU6IYye4PVoA41DgmXrw1x24wCEirYUqjc1JejAt4vU80+9F0EbFMqUyUgZL0PGd9twtqPWhrk=@vger.kernel.org
-X-Gm-Message-State: AOJu0YznsIDWblec6jlmuhyy45+6TT776MfSZV5IgKU8f3hOy93HSq3X
-	l6IXMhZMbuiYUFAVAOcQOIs3xDx8/G9NAjRNJKDuxAcEJwKJez9vCjI2BxTrsbI0PTQUEY1rBHS
-	hrIXR0kS9sQratja7DrpPo4Xer4VA4YzC1/GAOfDaNKB+AZUc1Q05mw==
-X-Gm-Gg: ASbGncvVFpcKNmW1+oUDh9BaAkRgFfzYwYFZpldFu6yUJkyT1oJrHoF2iKUnXzH3aNo
-	D7r8afKzroa710YXY3HgvswWUWZSGLtueTvzh7OZ4JlhiyUv+/v5OO3TuM8/hc4WlSMnaH4JKTu
-	k6tt0xCl8IWnqZkYKley3mkUWhjZ1wFmUKg+5drhciUGM0H8mV8nqUg2g6POHN+jTr4PAg5l0x6
-	1uaLTNVwJvc9QN5FvyaOK/qMxwztZuEjV026UQbwA68+NNwTsWWAkQ0PT5DXHqwtp9hJXEcUaWK
-	5r1ZNmN3j5HZFq/fVXHYjKdc
-X-Received: by 2002:a05:600c:46cb:b0:434:f1e9:afb3 with SMTP id 5b1f17b1804b1-438913bea88mr231678055e9.3.1737630070271;
-        Thu, 23 Jan 2025 03:01:10 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IGH7kkjdPMy6i3wvH9FFcJt7PHEbVtyHIqQJmuEhTRAVmLZLikJtA2o50DHcchuyXLUbTM//A==
-X-Received: by 2002:a05:600c:46cb:b0:434:f1e9:afb3 with SMTP id 5b1f17b1804b1-438913bea88mr231677635e9.3.1737630069837;
-        Thu, 23 Jan 2025 03:01:09 -0800 (PST)
-Received: from [192.168.88.253] (146-241-27-215.dyn.eolo.it. [146.241.27.215])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-438b31afaf8sm58730635e9.21.2025.01.23.03.01.08
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 23 Jan 2025 03:01:09 -0800 (PST)
-Message-ID: <08c42b4a-6eed-4814-8bf8-fad40de6f2ed@redhat.com>
-Date: Thu, 23 Jan 2025 12:01:08 +0100
+        d=1e100.net; s=20230601; t=1737630161; x=1738234961;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=v+HvkadESYr+6YZ6rJIaWxe2n6B1oB6eTw6RXzewGEk=;
+        b=iH/7Atam7qB6xR9thnlWWMuvKF4NgFc6Eu3aP2i54RT+vJzkHZLfGVYM/Zjt54Zw5i
+         4neIQmm6e0BXMDMuqixPNk69BcQ5hL8vMcOflIMUX3wwOlKLjPU2Vn8zZ32+NvAwVsM2
+         iQWznpVaJCBZCOyWC46ilbpXbijblUPZ4wWZl3VpTkkmWZaNs5Z46cXrG6ZBmKNHBMIb
+         ZCHWfl+fW5dLHotRYbxkktzipPmgf8JAilRqyL8MUvDtTKAGRqUJPEB/9hkJVUiUPFHi
+         uViCCLCauIXTsjMeDICUed9VR4s06cvHLBn/E7yxDMCunScTkzxPPNqYmURa8Rir6bUB
+         2oCg==
+X-Forwarded-Encrypted: i=1; AJvYcCWDlbjxOj3b2TydB+4DEYnaiYlMt8CfmeyaPuKWYKh2p92hp9d52T38dWnUUWn6RnG3BO5Pm2Y=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxFyWqqi7QBmO1JR2ALY3FNMJOltCi0ezdGK/MDDW9IlSWi32ca
+	9K3t7ywu6toX0hpvLGkR/KwoVFHL2JJyyTt7OJwOEuPhpyFq5fwuXECKijparxe/gv6TLc0W710
+	cTaNayZR8516xokVcs+deed95ZuL+dRh3P8/7BDdzD5lxhCRtspYm+w==
+X-Gm-Gg: ASbGnct+1vdmMkJ7dy1HvqiTHqgGpT7v9PV6440PCVb2tWlNWj8L6CXT0jviu92aRVJ
+	Xl+4nMPIdAK6h8lK2S9/oFr9cEkaf2dHnXjcHpDVylYcOv6v33bFS/xWq+/b/fdWUj6eIWLynVP
+	5Q4uPxy6O7A5ElUrR9YbwQQms6kiGcpkJFQMYYUfCWKQlQqXxcmI1oXjyRBNwrAV6c845gp9eUW
+	ih6/CU+590hJ3jPCEBw6GUtlfMQVO6jUXR0cNyRpr326nz3zrcN2ArW+WGHzuMNoDoOzuEb5w==
+X-Received: by 2002:a05:622a:4c:b0:467:83f1:71d9 with SMTP id d75a77b69052e-46e1286bcc9mr358386761cf.0.1737630160793;
+        Thu, 23 Jan 2025 03:02:40 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IEEUGOo95N96L61xTsUy34Z9+f6t8bmMxBiZJynEMpKPrd7zIV5A5PAboah2tdpaVZIp0UhLw==
+X-Received: by 2002:a05:622a:4c:b0:467:83f1:71d9 with SMTP id d75a77b69052e-46e1286bcc9mr358386551cf.0.1737630160493;
+        Thu, 23 Jan 2025 03:02:40 -0800 (PST)
+Received: from leonardi-redhat ([176.206.32.19])
+        by smtp.gmail.com with ESMTPSA id d75a77b69052e-46e102ec2d9sm73508861cf.12.2025.01.23.03.02.38
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 23 Jan 2025 03:02:40 -0800 (PST)
+Date: Thu, 23 Jan 2025 12:02:36 +0100
+From: Luigi Leonardi <leonardi@redhat.com>
+To: Michal Luczaj <mhal@rbox.co>
+Cc: Stefano Garzarella <sgarzare@redhat.com>, 
+	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, 
+	George Zhang <georgezhang@vmware.com>, Dmitry Torokhov <dtor@vmware.com>, Andy King <acking@vmware.com>, 
+	netdev@vger.kernel.org
+Subject: Re: [PATCH net v2 3/6] vsock/test: Introduce vsock_bind()
+Message-ID: <gkgrd5zpqow4jn2dzr4svh2xu2tfhzucqjv5wavnqrq3qa34uj@x3lv7qy27t2m>
+References: <20250121-vsock-transport-vs-autobind-v2-0-aad6069a4e8c@rbox.co>
+ <20250121-vsock-transport-vs-autobind-v2-3-aad6069a4e8c@rbox.co>
+ <xzvqojpgicztj3waxetzemx5kzmjy57yl5hv5t7y2sh4bda27l@wwvuhac6zkgg>
+ <64fcd0af-a03b-47d5-960d-4326289023a5@rbox.co>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next v6 03/12] net: homa: create shared Homa header
- files
-To: John Ousterhout <ouster@cs.stanford.edu>, netdev@vger.kernel.org
-Cc: edumazet@google.com, horms@kernel.org, kuba@kernel.org
-References: <20250115185937.1324-1-ouster@cs.stanford.edu>
- <20250115185937.1324-4-ouster@cs.stanford.edu>
-Content-Language: en-US
-From: Paolo Abeni <pabeni@redhat.com>
-In-Reply-To: <20250115185937.1324-4-ouster@cs.stanford.edu>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii; format=flowed
+Content-Disposition: inline
+In-Reply-To: <64fcd0af-a03b-47d5-960d-4326289023a5@rbox.co>
 
-On 1/15/25 7:59 PM, John Ousterhout wrote:
-[...]
-> +/**
-> + * union sockaddr_in_union - Holds either an IPv4 or IPv6 address (smaller
-> + * and easier to use than sockaddr_storage).
-> + */
-> +union sockaddr_in_union {
-> +	/** @sa: Used to access as a generic sockaddr. */
-> +	struct sockaddr sa;
-> +
-> +	/** @in4: Used to access as IPv4 socket. */
-> +	struct sockaddr_in in4;
-> +
-> +	/** @in6: Used to access as IPv6 socket.  */
-> +	struct sockaddr_in6 in6;
-> +};
+On Wed, Jan 22, 2025 at 09:11:30PM +0100, Michal Luczaj wrote:
+>On 1/22/25 17:01, Luigi Leonardi wrote:
+>> On Tue, Jan 21, 2025 at 03:44:04PM +0100, Michal Luczaj wrote:
+>>> Add a helper for socket()+bind(). Adapt callers.
+>>>
+>>> Reviewed-by: Stefano Garzarella <sgarzare@redhat.com>
+>>> Signed-off-by: Michal Luczaj <mhal@rbox.co>
+>>> ---
+>>> tools/testing/vsock/util.c       | 56 +++++++++++++++++-----------------------
+>>> tools/testing/vsock/util.h       |  1 +
+>>> tools/testing/vsock/vsock_test.c | 17 +-----------
+>>> 3 files changed, 25 insertions(+), 49 deletions(-)
+>>>
+>>> diff --git a/tools/testing/vsock/util.c b/tools/testing/vsock/util.c
+>>> index 34e9dac0a105f8aeb8c9af379b080d5ce8cb2782..31ee1767c8b73c05cfd219c3d520a677df6e66a6 100644
+>>> --- a/tools/testing/vsock/util.c
+>>> +++ b/tools/testing/vsock/util.c
+>>> @@ -96,33 +96,42 @@ void vsock_wait_remote_close(int fd)
+>>> 	close(epollfd);
+>>> }
+>>>
+>>> -/* Bind to <bind_port>, connect to <cid, port> and return the file descriptor. */
+>>> -int vsock_bind_connect(unsigned int cid, unsigned int port, unsigned int bind_port, int type)
+>>
+>> If you need to send a v3, it would be nice to have a comment for
+>> vsock_bind, as there used to be one.
+>
+>Comment for vsock_bind_connect() remains, see below. As for vsock_bind(),
+>perhaps it's time to start using kernel-doc comments? 
+This is a good idea! @Stefano WDYT?
+Sticking to tests, IIRC someone mentioned (maybe Stefano?) about moving 
+to selftests for vsock, but I don't think it's going to happen anytime 
+soon.
 
-There are other protocol using the same struct with a different name
-(sctp) or  a very similar struct (mptcp). It would be nice to move this
-in a shared header and allow re-use.
+>v3 isn't coming, it seems, but I'll comment the function later.
+Thank you :)
 
-[...]
-> +	/**
-> +	 * @core: Core on which @thread was executing when it registered
-> +	 * its interest.  Used for load balancing (see balance.txt).
-> +	 */
-> +	int core;
-
-I don't see a 'balance.txt' file in this submission, possibly stray
-reference?
-
-[...]
-> +	/**
-> +	 * @pacer_wake_time: time (in sched_clock units) when the pacer last
-> +	 * woke up (if the pacer is running) or 0 if the pacer is sleeping.
-> +	 */
-> +	__u64 pacer_wake_time;
-
-why do you use the '__' variant here? this is not uapi, you should use
-the plain u64/u32 (more occurrences below).
-
-[...]
-> +	/**
-> +	 * @prev_default_port: The most recent port number assigned from
-> +	 * the range of default ports.
-> +	 */
-> +	__u16 prev_default_port __aligned(L1_CACHE_BYTES);
-
-I think the idiomatic way to express the above is to use:
-
-	u16 prev_default_port ____cacheline_aligned;
-
-or
-
-	u16 prev_default_port ____cacheline_aligned_in_smp;
-
-more similar occourrences below.
-
-/P
+Cheers,
+Luigi
 
 
