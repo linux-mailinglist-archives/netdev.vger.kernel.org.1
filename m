@@ -1,118 +1,83 @@
-Return-Path: <netdev+bounces-160669-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-160670-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id EA7E6A1AC75
-	for <lists+netdev@lfdr.de>; Thu, 23 Jan 2025 23:09:38 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5CFA7A1AC86
+	for <lists+netdev@lfdr.de>; Thu, 23 Jan 2025 23:12:26 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id BFBA53A5F90
-	for <lists+netdev@lfdr.de>; Thu, 23 Jan 2025 22:09:29 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A098E162109
+	for <lists+netdev@lfdr.de>; Thu, 23 Jan 2025 22:12:24 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DE5461CBE95;
-	Thu, 23 Jan 2025 22:09:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 996FD1CF7A1;
+	Thu, 23 Jan 2025 22:12:11 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="vRXkir+J"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="pS0PydAP"
 X-Original-To: netdev@vger.kernel.org
-Received: from out-174.mta0.migadu.com (out-174.mta0.migadu.com [91.218.175.174])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 03AB01C5F26
-	for <netdev@vger.kernel.org>; Thu, 23 Jan 2025 22:09:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.174
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5D0381CEE8C;
+	Thu, 23 Jan 2025 22:12:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1737670167; cv=none; b=meld69h8bx6OewPFtk3vyUzBN/c7TP/jhhizKULh9DIfJU05Sa54QJ/qUeMyAwqxRLqNqooolP9FKsAX0DsDrmEAIJkFbkkoAg3Sc7SGwyx4f7708EyZaexf2DAld1unYjaRYSrF8cDOJxrEcQbTXeixQkWOFFXuzPNAPF+hNN0=
+	t=1737670331; cv=none; b=T+esq8UTYEYAwioFPR8nqeOIK0h+Qj/uD85gKCME53OkjoSbhOa8GP5sSYoEgGu1xtCjX4hljFxkjtnBHy5zquQXTD8u/2KagQUnKEDY7r5vG+0zWrw8YMVW8KMVNd9fNxh31lrQ215e7ZGigzK6pB47qeQyxeoKlrbaQDd+/tk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1737670167; c=relaxed/simple;
-	bh=2JmqOhboPRPDZz8CXMfItF1J+nsmfLoDcpmyWJDutdI=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=e/YsxaBhkBofpO0qGMhvWMUUxpTvfIWPEQmmO6GY+pfyaXsX/vWQYVw0T+apqmFrtE0RdgfTbvOUK7xyvqmlI3ZmgPUz6fMgY9vR+NOeztmfTfkxgwgJfqG0zuLSAEsS0T+X/ra99f7xPYAyixOeZWlGXBhitzmuGsUAihUDZj0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=vRXkir+J; arc=none smtp.client-ip=91.218.175.174
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
-Message-ID: <5e342fea-764b-48a0-afda-4adfb504bd46@linux.dev>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1737670157;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=rxuszYqUcy92pyE+ca7H2NSup9nD9q/odGEB7qlqknw=;
-	b=vRXkir+JQPNyMCu8k53IOq2yLa+Qcydt9EevYYPxmoWVS7MI5lmT5nYf9S9/4+mQF+wf0+
-	Ij1m0yi/0gApsoRssOUIs4t3eEN6zgtDpwiEETFnmrSUJHzkAfkJllVVl8dQr0MpkIt2sJ
-	nZ0UCYkI8jiSbQXTf8AeHGM4uqF2e7w=
-Date: Thu, 23 Jan 2025 14:09:09 -0800
+	s=arc-20240116; t=1737670331; c=relaxed/simple;
+	bh=h5zYZEeh2fayA+qgYt1ROno/TFyCfT21k9zimU507Dk=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=U2nn39r9oMPdlpNaOmpPpl88BqjXaWw9hk358K4oBqv9BG9LkLqmdaSuUoHkhAPkchQrjY4hAxVDVgm4xI0EUoffU+7rUOKflTaXBlH+c/VDQlpx2fymPZ/uFAaEtlYhm/OyQR4Ev4LCfn/+Afo6FU5xd/8l7fFFv+DRYqmyQLA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=pS0PydAP; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9D677C4CED3;
+	Thu, 23 Jan 2025 22:12:10 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1737670330;
+	bh=h5zYZEeh2fayA+qgYt1ROno/TFyCfT21k9zimU507Dk=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=pS0PydAP+A2YJMSiI8R5iPpvEnHyM7oUr40s3uHQxbFxq6iXZ498P+qYTBYL5FiG9
+	 98ffwKSrAFQvn9NDtjAD0K87PpxCpCsK6QXof+baFrDGreCApwkNQ2vmEuqNXQu+Kv
+	 t6pyoV7HiNuLnpxeSUQPHwzR9n4Af9dU6mCCXwY7HXLAbXf+0xDZZfq8IFEW797fuL
+	 Wvc5n0H8yOZaKN4VElcrUqH4XdlT2AfYnkHZYFINZC+3L3iS8PP6SfaN/r5TJWuik1
+	 wjpwY2Kn/I7M3bLekd2YYYhV8/+KYrxRXUJXBzyBldxEU0xqvYvokHfM/QoJLFgqRS
+	 VUARXO7KPHoWA==
+Date: Thu, 23 Jan 2025 16:12:09 -0600
+From: "Rob Herring (Arm)" <robh@kernel.org>
+To: Ninad Palsule <ninad@linux.ibm.com>
+Cc: pabeni@redhat.com, davem@davemloft.net, edumazet@google.com,
+	conor+dt@kernel.org, kuba@kernel.org, andrew+netdev@lunn.ch,
+	joel@jms.id.au, linux-arm-kernel@lists.infradead.org,
+	linux-aspeed@lists.ozlabs.org, linux-kernel@vger.kernel.org,
+	krzk+dt@kernel.org, eajames@linux.ibm.com,
+	andrew@codeconstruct.com.au, minyard@acm.org,
+	openipmi-developer@lists.sourceforge.net,
+	devicetree@vger.kernel.org, netdev@vger.kernel.org
+Subject: Re: [PATCH v6 02/10] bindings: ipmi: Add binding for IPMB device intf
+Message-ID: <173767032899.448455.5833909744401276024.robh@kernel.org>
+References: <20250116203527.2102742-1-ninad@linux.ibm.com>
+ <20250116203527.2102742-3-ninad@linux.ibm.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Subject: Re: [PATCH bpf v2 2/2] selftests/bpf: Adjust data size to have
- ETH_HLEN
-To: Stanislav Fomichev <stfomichev@gmail.com>,
- Shigeru Yoshida <syoshida@redhat.com>
-Cc: ast@kernel.org, daniel@iogearbox.net, andrii@kernel.org,
- eddyz87@gmail.com, song@kernel.org, yonghong.song@linux.dev,
- john.fastabend@gmail.com, kpsingh@kernel.org, sdf@fomichev.me,
- haoluo@google.com, jolsa@kernel.org, davem@davemloft.net,
- edumazet@google.com, kuba@kernel.org, pabeni@redhat.com, horms@kernel.org,
- hawk@kernel.org, lorenzo@kernel.org, toke@redhat.com, bpf@vger.kernel.org,
- netdev@vger.kernel.org
-References: <20250121150643.671650-1-syoshida@redhat.com>
- <20250121150643.671650-2-syoshida@redhat.com> <Z5KWE6J8OtRVCFDR@mini-arch>
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Martin KaFai Lau <martin.lau@linux.dev>
-Content-Language: en-US
-In-Reply-To: <Z5KWE6J8OtRVCFDR@mini-arch>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Migadu-Flow: FLOW_OUT
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250116203527.2102742-3-ninad@linux.ibm.com>
 
-On 1/23/25 11:18 AM, Stanislav Fomichev wrote:
-> On 01/22, Shigeru Yoshida wrote:
->> The function bpf_test_init() now returns an error if user_size
->> (.data_size_in) is less than ETH_HLEN, causing the tests to
->> fail. Adjust the data size to ensure it meets the requirement of
->> ETH_HLEN.
->>
->> Signed-off-by: Shigeru Yoshida <syoshida@redhat.com>
->> ---
->>   .../testing/selftests/bpf/prog_tests/xdp_cpumap_attach.c  | 4 ++--
->>   .../testing/selftests/bpf/prog_tests/xdp_devmap_attach.c  | 8 ++++----
->>   2 files changed, 6 insertions(+), 6 deletions(-)
->>
->> diff --git a/tools/testing/selftests/bpf/prog_tests/xdp_cpumap_attach.c b/tools/testing/selftests/bpf/prog_tests/xdp_cpumap_attach.c
->> index c7f74f068e78..df27535995af 100644
->> --- a/tools/testing/selftests/bpf/prog_tests/xdp_cpumap_attach.c
->> +++ b/tools/testing/selftests/bpf/prog_tests/xdp_cpumap_attach.c
->> @@ -52,10 +52,10 @@ static void test_xdp_with_cpumap_helpers(void)
->>   	ASSERT_EQ(info.id, val.bpf_prog.id, "Match program id to cpumap entry prog_id");
->>   
->>   	/* send a packet to trigger any potential bugs in there */
->> -	char data[10] = {};
->> +	char data[ETH_HLEN] = {};
->>   	DECLARE_LIBBPF_OPTS(bpf_test_run_opts, opts,
->>   			    .data_in = &data,
->> -			    .data_size_in = 10,
->> +			    .data_size_in = sizeof(data),
->>   			    .flags = BPF_F_TEST_XDP_LIVE_FRAMES,
->>   			    .repeat = 1,
->>   		);
+
+On Thu, 16 Jan 2025 14:35:17 -0600, Ninad Palsule wrote:
+> Add device tree binding document for the IPMB device interface.
+> This device is already in use in both driver and .dts files.
 > 
-> We should still keep 10, but change the ASSERT_OK below to expect the
-> error instead. Looking at the comment above, the purpose of the test
-> is to exercise that error case.
+> Signed-off-by: Ninad Palsule <ninad@linux.ibm.com>
+> ---
+>  .../devicetree/bindings/ipmi/ipmb-dev.yaml    | 56 +++++++++++++++++++
+>  1 file changed, 56 insertions(+)
+>  create mode 100644 Documentation/devicetree/bindings/ipmi/ipmb-dev.yaml
 > 
 
-I think the bpf_prog_test_run_opts in this dev/cpumap test is to check the 
-bpf_redirect_map() helper, so it expects the bpf_prog_test_run_opts to succeed.
+Reviewed-by: Rob Herring (Arm) <robh@kernel.org>
 
-It just happens the current data[10] cannot trigger the fixed bug because the 
-bpf prog returns a XDP_REDIRECT instead of XDP_PASS, so xdp_recv_frames is not 
-called.
-
-To test patch 1, a separate test is probably needed to trigger the bug in 
-xdp_recv_frames() with a bpf prog returning XDP_PASS.
 
