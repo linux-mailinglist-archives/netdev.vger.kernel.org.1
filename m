@@ -1,168 +1,263 @@
-Return-Path: <netdev+bounces-160495-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-160497-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id C8991A19EE0
-	for <lists+netdev@lfdr.de>; Thu, 23 Jan 2025 08:25:36 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id F13B4A19EE6
+	for <lists+netdev@lfdr.de>; Thu, 23 Jan 2025 08:26:13 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 875BC1881548
-	for <lists+netdev@lfdr.de>; Thu, 23 Jan 2025 07:25:40 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id BD4273A3487
+	for <lists+netdev@lfdr.de>; Thu, 23 Jan 2025 07:26:06 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 35CBB20B21B;
-	Thu, 23 Jan 2025 07:25:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6F89F20B7E4;
+	Thu, 23 Jan 2025 07:26:03 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Nx/z1QSc"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=couthit.com header.i=@couthit.com header.b="sClbXXEv"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f169.google.com (mail-pl1-f169.google.com [209.85.214.169])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from server.wki.vra.mybluehostin.me (server.wki.vra.mybluehostin.me [162.240.238.73])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ACFDD20B1FD;
-	Thu, 23 Jan 2025 07:25:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.169
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 980B220B21B;
+	Thu, 23 Jan 2025 07:26:01 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=162.240.238.73
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1737617132; cv=none; b=CLaenUIxIcaCUls63kF6p/cY53FJGMbO8YSf/BhrARVBHNMMJH9KTVPFwEb5Z/AwrVq4A/lvQqUS0kmdMo4V4vVZKYAb+bNnPw8gnnROdJiqE8oI7OZ0M6O1ZRXYP7mvMpdlPHG+NZFoqJuN6289qfYilzGo/cSrZKLgcnHE5qs=
+	t=1737617163; cv=none; b=Sa1SXKZuBr19moHJ/KqghYU5LukWZQWvSYi6dzDwGAO9ImKWan0vN+41mRqErzj0fDLN3OlKCa1+mEZ6fVstdp7Xf3C2akpGGeEg+Hau4IiUfGt+pBIg9RhgZNSK9fjyvdrb5rguo6BL//n5gO9WExx+WkVTPxwKjmHtWjJO7Bw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1737617132; c=relaxed/simple;
-	bh=zMv/TiG+ah/03Csaypc7gUgqfNDfS6VRfIl8Xy9TzZA=;
-	h=Date:Message-Id:To:Cc:Subject:From:In-Reply-To:References:
-	 Mime-Version:Content-Type; b=FO/sD5w3KzhN157ceMcYdq1rraJfNNRFxuZJttSvjEEtiJgIpvxNVNAHxA39kfPyXYUQUjRqExufb0AZFdIp+8ymWAQR5mjfY4KY0d16QqVaIKV9Kwf9+VcH7WvyFWl7F0fpXMUHxiRwis1yFHzu95qIUcAFhYSKUt2nNGgz1oQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Nx/z1QSc; arc=none smtp.client-ip=209.85.214.169
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pl1-f169.google.com with SMTP id d9443c01a7336-2156e078563so7256965ad.2;
-        Wed, 22 Jan 2025 23:25:30 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1737617130; x=1738221930; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to:from
-         :subject:cc:to:message-id:date:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=mglLasBQ6UAhjc7fwRWJg6n/lLTMQwudiiJlW3FCDz8=;
-        b=Nx/z1QScXKIyqYq9DXhb91qGg2ArOK7ZGRDLxkL26+qQ3wNisJeRbQQ4JN6lXNxWgZ
-         i8tJpltseOCa4n6K5WKJHwRl7Flrd01MkUuJts6xaNW9ZNpvdhMByFE8bMNIlcYwA8+2
-         2VWXAi0Br+oUjSqJvppWdyHqhLgTaPrkJPqy/Nbqdm0T7ZWsJGSLX02MaG6C6F+vwgJM
-         Z869/DhZnVfayo6foux2wHl5QZ3xrDEsBXiE1Vg+zyjY2uh514WkCtycgKeW6H43+NTF
-         nLdkGOl7NkcrrsSmhdh0hDb/EktV6kXsi9bXu7kpR9i3Lxb1D+NHAmLgSKHUeeZP8ZOV
-         42TA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1737617130; x=1738221930;
-        h=content-transfer-encoding:mime-version:references:in-reply-to:from
-         :subject:cc:to:message-id:date:x-gm-message-state:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=mglLasBQ6UAhjc7fwRWJg6n/lLTMQwudiiJlW3FCDz8=;
-        b=N23164FT2o1yAlSP4zqShFNnquU65yiZSE+g8hOmnc/pNJVow503pu8pvK93v0LHGX
-         te6nQ7OcnIPnTyu6nTBmDbHlIVf0Q+5bmjvDDDTwVZm/HLSa4uO+KEmXOLa6kk6PJWKo
-         1hVixPswjblxk/d3oT7zL96r2hQEZjqZUnYSGvAoC/6Oh0AAg6un0tmyf4Zk+/2ZgyYK
-         FQGD3KWLsjTm+MaadZAd1jLmEwgpzBH2213Ml1/CN2jdTJfp+hqoBsXhgKJNqLojKiR/
-         eGiL4JcFKuvQ8J7ly+uMpFR+kE7/0kUJwIiGgmq/OR6USY96BLGnW+APZcyYalcGasMv
-         Dqkg==
-X-Forwarded-Encrypted: i=1; AJvYcCWxOKF4VuTqHYPGhoHGa4xJAVobrjprESK/oQDgiU6sP100LudG4ZmiTgYc1MZJqH+QzSxrCkQVLBK2+Xc=@vger.kernel.org, AJvYcCWySmm6W3iHPMpvkOt7YHZMksl7FMA21iMZzVV1BKLq2tAFJJZ6fS/sJmIKR4N8EsGu96gq1ANo@vger.kernel.org, AJvYcCXEKqVLenDBISJZ8ZyoWoJMZBQWoGb40v3jh7pR6B2jB3QW/WV+szyHBpT+RUuOXHjnbLSuSl99FTDe2dQ5cq0=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yx1R24lRgC1fcVEntrN9EUlX2jVAd82yhFy+aau9yHHQiLGR0ig
-	1w8GtoLUJHtuQ/9daqOgSRK9PDX6geER1vfjhckFuK9lSAWbLtvA
-X-Gm-Gg: ASbGncuO8sbh8bs6r6x4NX8dDPJZGOBMzPCEs7IAoQw6nA6srS2RoR0oVQriUul4C8w
-	s2J8bX8zZG3YC8iKX/DjQGGuZnF4tL4mBb22QoqgAUDY5FA8PfeXi+MUB376yvk8rD2F1bZMiYF
-	GTMRY+vWYewHuo6J/p0fkgZczZuQzl7WRPhxa6dpXXauxvovZ4kEafgMiQxbj8Z7Bl8F+XqjnVa
-	rGiVqeDLVXm2omk5MU7zwPQrZzcx2VunYHRczHp5CaHItyFxKIDsy+jHDec1nfXcv/657uHUmJw
-	s+RWJ2hq2we2W/pVEkQT8Gr4A9EFT1T/sBA+E9NChW3bt8CUpndrMPs2+BW+aQ==
-X-Google-Smtp-Source: AGHT+IEH/Wi3WdaSKzSPl0LEqkocaSd8XuIkzat23e7beAx1OP2VoOnLU1WfnqycivkxABnI19OnRQ==
-X-Received: by 2002:a05:6a00:448a:b0:728:eb32:356c with SMTP id d2e1a72fcca58-72daf97a62emr35484219b3a.11.1737617129851;
-        Wed, 22 Jan 2025 23:25:29 -0800 (PST)
-Received: from localhost (p3882177-ipxg22501hodogaya.kanagawa.ocn.ne.jp. [180.15.148.177])
-        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-72daba4895csm12693767b3a.130.2025.01.22.23.25.22
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 22 Jan 2025 23:25:29 -0800 (PST)
-Date: Thu, 23 Jan 2025 16:25:20 +0900 (JST)
-Message-Id: <20250123.162520.1427672620079645345.fujita.tomonori@gmail.com>
-To: gary@garyguo.net
-Cc: fujita.tomonori@gmail.com, linux-kernel@vger.kernel.org,
- boqun.feng@gmail.com, rust-for-linux@vger.kernel.org,
- netdev@vger.kernel.org, andrew@lunn.ch, hkallweit1@gmail.com,
- tmgross@umich.edu, ojeda@kernel.org, alex.gaynor@gmail.com,
- bjorn3_gh@protonmail.com, benno.lossin@proton.me, a.hindborg@samsung.com,
- aliceryhl@google.com, anna-maria@linutronix.de, frederic@kernel.org,
- tglx@linutronix.de, arnd@arndb.de, jstultz@google.com, sboyd@kernel.org,
- mingo@redhat.com, peterz@infradead.org, juri.lelli@redhat.com,
- vincent.guittot@linaro.org, dietmar.eggemann@arm.com, rostedt@goodmis.org,
- bsegall@google.com, mgorman@suse.de, vschneid@redhat.com
-Subject: Re: [PATCH v8 6/7] rust: Add read_poll_timeout functions
-From: FUJITA Tomonori <fujita.tomonori@gmail.com>
-In-Reply-To: <20250122183612.60f3c62d.gary@garyguo.net>
-References: <20250116044100.80679-1-fujita.tomonori@gmail.com>
-	<20250116044100.80679-7-fujita.tomonori@gmail.com>
-	<20250122183612.60f3c62d.gary@garyguo.net>
+	s=arc-20240116; t=1737617163; c=relaxed/simple;
+	bh=+oTU2f7QVgMPnI5TDOFIx60vS3POz6R+KAMidl+5BuU=;
+	h=Date:From:To:Cc:Message-ID:In-Reply-To:References:Subject:
+	 MIME-Version:Content-Type; b=qqL4aHeBL7b/9b1XOm1HD1+/G3IMPe2FzuKbhHjb8d8s1Y3hFGJENgYcEvw0SZtvc87rrfwEAjS6o6f/26JvbwByUXa6lhhCK90eh5wLm6FZfGWwH4qAbXYULOrH8Js5iFup9zW6qW1+ZN+hkKeSebPW62dLbZHOkYU1w9dTR98=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=couthit.com; spf=pass smtp.mailfrom=couthit.com; dkim=pass (2048-bit key) header.d=couthit.com header.i=@couthit.com header.b=sClbXXEv; arc=none smtp.client-ip=162.240.238.73
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=couthit.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=couthit.com
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=couthit.com
+	; s=default; h=Content-Transfer-Encoding:Content-Type:MIME-Version:Subject:
+	References:In-Reply-To:Message-ID:Cc:To:From:Date:Sender:Reply-To:Content-ID:
+	Content-Description:Resent-Date:Resent-From:Resent-Sender:Resent-To:Resent-Cc
+	:Resent-Message-ID:List-Id:List-Help:List-Unsubscribe:List-Subscribe:
+	List-Post:List-Owner:List-Archive;
+	bh=veVVuKJ87/rWDfKKk1AslmxtqJaSaNITyAxbJjSZqBs=; b=sClbXXEvBxiDWOPpHjgna2Gr/r
+	y7v1+u6od2V3kWR5Nd3lCCR2kHu5jhH6cUl4U9+h//cIsVEFI3Gyiba6S9Q82ZyoN4iwE2FIsqS3W
+	DsxNnFTErn3b2PRzsPP0aO1xORwztmfTzvrZan4K5x7E1Y0CAPiBY4UJljzuJNZUzVxXW7Rbb6pdR
+	zFlvVbaokqMzbs96DSwagskLz3Km6HfJXaGxuzfEcM2jKKTtiijosYTR6xjXZ6hlBV8jb4jL3W9SA
+	r7PzG6sPpqv/jKYGPQ3jXs3ARB9GfbCtT8gfF15l/jQ2WFZPzE5ki1LeF45zlZ870NkaxDng6OGoV
+	+UMB5CsA==;
+Received: from [122.175.9.182] (port=20914 helo=zimbra.couthit.local)
+	by server.wki.vra.mybluehostin.me with esmtpsa  (TLS1.2) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.96.2)
+	(envelope-from <basharath@couthit.com>)
+	id 1tarb9-0008NK-2D;
+	Thu, 23 Jan 2025 12:55:56 +0530
+Received: from zimbra.couthit.local (localhost [127.0.0.1])
+	by zimbra.couthit.local (Postfix) with ESMTPS id 81E7F1781A7D;
+	Thu, 23 Jan 2025 12:55:49 +0530 (IST)
+Received: from localhost (localhost [127.0.0.1])
+	by zimbra.couthit.local (Postfix) with ESMTP id 623C21782495;
+	Thu, 23 Jan 2025 12:55:49 +0530 (IST)
+Received: from zimbra.couthit.local ([127.0.0.1])
+	by localhost (zimbra.couthit.local [127.0.0.1]) (amavisd-new, port 10026)
+	with ESMTP id CgdwGL9ompX1; Thu, 23 Jan 2025 12:55:49 +0530 (IST)
+Received: from zimbra.couthit.local (zimbra.couthit.local [10.10.10.103])
+	by zimbra.couthit.local (Postfix) with ESMTP id 1E2E41781A7D;
+	Thu, 23 Jan 2025 12:55:49 +0530 (IST)
+Date: Thu, 23 Jan 2025 12:55:48 +0530 (IST)
+From: Basharath Hussain Khaja <basharath@couthit.com>
+To: Jason Xing <kerneljasonxing@gmail.com>
+Cc: basharath <basharath@couthit.com>, danishanwar <danishanwar@ti.com>, 
+	rogerq <rogerq@kernel.org>, andrew+netdev <andrew+netdev@lunn.ch>, 
+	davem <davem@davemloft.net>, edumazet <edumazet@google.com>, 
+	kuba <kuba@kernel.org>, pabeni <pabeni@redhat.com>, 
+	Rob Herring <robh@kernel.org>, krzk+dt <krzk+dt@kernel.org>, 
+	conor+dt <conor+dt@kernel.org>, nm <nm@ti.com>, 
+	ssantosh <ssantosh@kernel.org>, tony <tony@atomide.com>, 
+	richardcochran <richardcochran@gmail.com>, 
+	parvathi <parvathi@couthit.com>, schnelle <schnelle@linux.ibm.com>, 
+	rdunlap <rdunlap@infradead.org>, diogo ivo <diogo.ivo@siemens.com>, 
+	m-karicheri2 <m-karicheri2@ti.com>, horms <horms@kernel.org>, 
+	jacob e keller <jacob.e.keller@intel.com>, 
+	m-malladi <m-malladi@ti.com>, 
+	javier carrasco cruz <javier.carrasco.cruz@gmail.com>, 
+	afd <afd@ti.com>, s-anna <s-anna@ti.com>, 
+	linux-arm-kernel <linux-arm-kernel@lists.infradead.org>, 
+	netdev <netdev@vger.kernel.org>, 
+	devicetree <devicetree@vger.kernel.org>, 
+	linux-kernel <linux-kernel@vger.kernel.org>, 
+	linux-omap <linux-omap@vger.kernel.org>, 
+	pratheesh <pratheesh@ti.com>, prajith <prajith@ti.com>, 
+	vigneshr <vigneshr@ti.com>, praneeth <praneeth@ti.com>, 
+	srk <srk@ti.com>, rogerq <rogerq@ti.com>, 
+	krishna <krishna@couthit.com>, pmohan <pmohan@couthit.com>, 
+	mohan <mohan@couthit.com>
+Message-ID: <507763040.391350.1737617148913.JavaMail.zimbra@couthit.local>
+In-Reply-To: <CAL+tcoD6WuJH6yXaEGvuz_s3sROPXtEMeZw1hBNQvb6wnKKr-w@mail.gmail.com>
+References: <20250109105600.41297-1-basharath@couthit.com> <20250110055906.65086-7-basharath@couthit.com> <CAL+tcoD6WuJH6yXaEGvuz_s3sROPXtEMeZw1hBNQvb6wnKKr-w@mail.gmail.com>
+Subject: Re: [RFC PATCH 06/10] net: ti: prueth: Adds HW timestamping support
+ for PTP using PRU-ICSS IEP module
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Content-Type: Text/Plain; charset=us-ascii
-Content-Transfer-Encoding: 7bit
+MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+X-Mailer: Zimbra 8.8.15_GA_3968 (ZimbraWebClient - FF113 (Linux)/8.8.15_GA_3968)
+Thread-Topic: prueth: Adds HW timestamping support for PTP using PRU-ICSS IEP module
+Thread-Index: wTJ8No/eSvZZY8f30NQgDnaEMvdq2w==
+X-AntiAbuse: This header was added to track abuse, please include it with any abuse report
+X-AntiAbuse: Primary Hostname - server.wki.vra.mybluehostin.me
+X-AntiAbuse: Original Domain - vger.kernel.org
+X-AntiAbuse: Originator/Caller UID/GID - [47 12] / [47 12]
+X-AntiAbuse: Sender Address Domain - couthit.com
+X-Get-Message-Sender-Via: server.wki.vra.mybluehostin.me: authenticated_id: smtp@couthit.com
+X-Authenticated-Sender: server.wki.vra.mybluehostin.me: smtp@couthit.com
+X-Source: 
+X-Source-Args: 
+X-Source-Dir: 
 
-On Wed, 22 Jan 2025 18:36:12 +0000
-Gary Guo <gary@garyguo.net> wrote:
-
->> +#[track_caller]
->> +pub fn read_poll_timeout<Op, Cond, T: Copy>(
-> 
-> I wonder if we can lift the `T: Copy` restriction and have `Cond` take
-> `&T` instead. I can see this being useful in many cases.
-> 
-> I know that quite often `T` is just an integer so you'd want to pass by
-> value, but I think almost always `Cond` is a very simple closure so
-> inlining would take place and they won't make a performance difference.
-
-Yeah, we can. More handy for the users of this function. I'll do.
-
->> +    mut op: Op,
->> +    cond: Cond,
->> +    sleep_delta: Delta,
->> +    timeout_delta: Delta,
->> +) -> Result<T>
->> +where
->> +    Op: FnMut() -> Result<T>,
->> +    Cond: Fn(T) -> bool,
->> +{
->> +    let start = Instant::now();
->> +    let sleep = !sleep_delta.is_zero();
->> +    let timeout = !timeout_delta.is_zero();
+> On Fri, Jan 10, 2025 at 2:01=E2=80=AFPM Basharath Hussain Khaja
+> <basharath@couthit.com> wrote:
+>>
+>> From: Roger Quadros <rogerq@ti.com>
+>>
+>> PRU-ICSS IEP module, which is capable of timestamping RX and
+>> TX packets at HW level, is used for time synchronization by PTP4L.
+>>
+>> This change includes interaction between firmware and user space
+>> application (ptp4l) with required packet timestamps. The driver
+>> initializes the PRU firmware with appropriate mode and configuration
+>> flags. Firmware updates local registers with the flags set by driver
+>> and uses for further operation. RX SOF timestamp comes along with
+>> packet and firmware will rise interrupt with TX SOF timestamp after
+>> pushing the packet on to the wire.
+>>
+>> IEP driver is available in upstream and we are reusing for hardware
+>> configuration for ICSSM as well. On top of that we have extended it
+>> with the changes for AM57xx SoC.
+>>
+>> Extended ethtool for reading HW timestamping capability of the PRU
+>> interfaces.
+>>
+>> Currently ordinary clock (OC) configuration has been validated with
+>> Linux ptp4l.
+>>
+>> Signed-off-by: Roger Quadros <rogerq@ti.com>
+>> Signed-off-by: Andrew F. Davis <afd@ti.com>
+>> Signed-off-by: Parvathi Pudi <parvathi@couthit.com>
+>> Signed-off-by: Basharath Hussain Khaja <basharath@couthit.com>
+>> ---
+>>  drivers/net/ethernet/ti/icssg/icss_iep.c      |  42 ++
+>>  drivers/net/ethernet/ti/icssm/icssm_ethtool.c |  26 +
+>>  drivers/net/ethernet/ti/icssm/icssm_prueth.c  | 443 +++++++++++++++++-
+>>  drivers/net/ethernet/ti/icssm/icssm_prueth.h  |  11 +
+>>  .../net/ethernet/ti/icssm/icssm_prueth_ptp.h  |  85 ++++
+>>  5 files changed, 605 insertions(+), 2 deletions(-)
+>>  create mode 100644 drivers/net/ethernet/ti/icssm/icssm_prueth_ptp.h
+>>
+>> diff --git a/drivers/net/ethernet/ti/icssg/icss_iep.c
+>> b/drivers/net/ethernet/ti/icssg/icss_iep.c
+>> index 768578c0d958..9a2ea13703d8 100644
+>> --- a/drivers/net/ethernet/ti/icssg/icss_iep.c
+>> +++ b/drivers/net/ethernet/ti/icssg/icss_iep.c
+>> @@ -937,11 +937,53 @@ static const struct icss_iep_plat_data
+>> am654_icss_iep_plat_data =3D {
+>>         .config =3D &am654_icss_iep_regmap_config,
+>>  };
+>>
+>> +static const struct icss_iep_plat_data am57xx_icss_iep_plat_data =3D {
+>> +       .flags =3D ICSS_IEP_64BIT_COUNTER_SUPPORT |
+>> +                ICSS_IEP_SLOW_COMPEN_REG_SUPPORT,
+>> +       .reg_offs =3D {
+>> +               [ICSS_IEP_GLOBAL_CFG_REG] =3D 0x00,
+>> +               [ICSS_IEP_COMPEN_REG] =3D 0x08,
+>> +               [ICSS_IEP_SLOW_COMPEN_REG] =3D 0x0C,
+>> +               [ICSS_IEP_COUNT_REG0] =3D 0x10,
+>> +               [ICSS_IEP_COUNT_REG1] =3D 0x14,
+>> +               [ICSS_IEP_CAPTURE_CFG_REG] =3D 0x18,
+>> +               [ICSS_IEP_CAPTURE_STAT_REG] =3D 0x1c,
 >> +
->> +    might_sleep(Location::caller());
-> 
-> This should only be called if `timeout` is true?
+>> +               [ICSS_IEP_CAP6_RISE_REG0] =3D 0x50,
+>> +               [ICSS_IEP_CAP6_RISE_REG1] =3D 0x54,
+>> +
+>> +               [ICSS_IEP_CAP7_RISE_REG0] =3D 0x60,
+>> +               [ICSS_IEP_CAP7_RISE_REG1] =3D 0x64,
+>> +
+>> +               [ICSS_IEP_CMP_CFG_REG] =3D 0x70,
+>> +               [ICSS_IEP_CMP_STAT_REG] =3D 0x74,
+>> +               [ICSS_IEP_CMP0_REG0] =3D 0x78,
+>> +               [ICSS_IEP_CMP0_REG1] =3D 0x7c,
+>> +               [ICSS_IEP_CMP1_REG0] =3D 0x80,
+>> +               [ICSS_IEP_CMP1_REG1] =3D 0x84,
+>> +
+>> +               [ICSS_IEP_CMP8_REG0] =3D 0xc0,
+>> +               [ICSS_IEP_CMP8_REG1] =3D 0xc4,
+>> +               [ICSS_IEP_SYNC_CTRL_REG] =3D 0x180,
+>> +               [ICSS_IEP_SYNC0_STAT_REG] =3D 0x188,
+>> +               [ICSS_IEP_SYNC1_STAT_REG] =3D 0x18c,
+>> +               [ICSS_IEP_SYNC_PWIDTH_REG] =3D 0x190,
+>> +               [ICSS_IEP_SYNC0_PERIOD_REG] =3D 0x194,
+>> +               [ICSS_IEP_SYNC1_DELAY_REG] =3D 0x198,
+>> +               [ICSS_IEP_SYNC_START_REG] =3D 0x19c,
+>> +       },
+>> +       .config =3D &am654_icss_iep_regmap_config,
+>> +};
+>> +
+>>  static const struct of_device_id icss_iep_of_match[] =3D {
+>>         {
+>>                 .compatible =3D "ti,am654-icss-iep",
+>>                 .data =3D &am654_icss_iep_plat_data,
+>>         },
+>> +       {
+>> +               .compatible =3D "ti,am5728-icss-iep",
+>> +               .data =3D &am57xx_icss_iep_plat_data,
+>> +       },
+>>         {},
+>>  };
+>>  MODULE_DEVICE_TABLE(of, icss_iep_of_match);
+>> diff --git a/drivers/net/ethernet/ti/icssm/icssm_ethtool.c
+>> b/drivers/net/ethernet/ti/icssm/icssm_ethtool.c
+>> index cce3276d5565..86d62d64dc4d 100644
+>> --- a/drivers/net/ethernet/ti/icssm/icssm_ethtool.c
+>> +++ b/drivers/net/ethernet/ti/icssm/icssm_ethtool.c
+>> @@ -7,6 +7,7 @@
+>>
+>>  #include <linux/if_bridge.h>
+>>  #include "icssm_prueth.h"
+>> +#include "../icssg/icss_iep.h"
+>>
+>>  #define PRUETH_MODULE_VERSION "0.2"
+>>  #define PRUETH_MODULE_DESCRIPTION "PRUSS Ethernet driver"
+>> @@ -189,12 +190,37 @@ static void icssm_emac_get_regs(struct net_device =
+*ndev,
+>>         regs->version =3D PRUETH_REG_DUMP_GET_VER(prueth);
+>>  }
+>>
+>> +static int icssm_emac_get_ts_info(struct net_device *ndev,
+>> +                                 struct kernel_ethtool_ts_info *info)
+>> +{
+>> +       struct prueth_emac *emac =3D netdev_priv(ndev);
+>> +
+>> +       if ((PRUETH_IS_EMAC(emac->prueth) && !emac->emac_ptp_tx_irq))
+>> +               return ethtool_op_get_ts_info(ndev, info);
+>> +
+>> +       info->so_timestamping =3D
+>> +               SOF_TIMESTAMPING_TX_HARDWARE |
+>> +               SOF_TIMESTAMPING_TX_SOFTWARE |
+>> +               SOF_TIMESTAMPING_RX_HARDWARE |
+>> +               SOF_TIMESTAMPING_RX_SOFTWARE |
+>> +               SOF_TIMESTAMPING_SOFTWARE |
+>> +               SOF_TIMESTAMPING_RAW_HARDWARE;
+>=20
+> In addtion to what Richard suggested, there is no need to re-mark the
+> following flags "SOF_TIMESTAMPING_RX_SOFTWARE" and
+> "SOF_TIMESTAMPING_SOFTWARE", please see __ethtool_get_ts_info().
+>=20
 
-Oops, I messed up this in v6 somehow. I'll fix.
+Yes. This module always uses IEP HW timestamping both on RX side and TX sid=
+e=20
+for better precision. We will clean this in the next version.
 
->> +    let val = loop {
->> +        let val = op()?;
->> +        if cond(val) {
->> +            // Unlike the C version, we immediately return.
->> +            // We know a condition is met so we don't need to check again.
->> +            return Ok(val);
->> +        }
->> +        if timeout && start.elapsed() > timeout_delta {
->> +            // Should we return Err(ETIMEDOUT) here instead of call op() again
->> +            // without a sleep between? But we follow the C version. op() could
->> +            // take some time so might be worth checking again.
->> +            break op()?;
-> 
-> Maybe the reason is `ktime_get` can take some time (due to its use of
-> seqlock and thus may require retrying?) Although this logic breaks down
-> when `read_poll_timeout_atomic` also has this extra `op(args)` despite
-> the condition being trivial.
-
-ktime_get() might do retrying (read_seqcount) but compared to the op
-function, I think that ktime_get() is fast (usually an op function
-waits for hardware).
-
-> So I really can't convince myself that this additional `op()` call is
-> needed. I can't think of any case where this behaviour would be
-> depended on by a driver, so I'd be tempted just to return ETIMEOUT
-> straight.
-
-As I commented in the code, I just mimic the logic of the C version,
-which has been used for a long time. But as you said, looks like we
-can return Err(ETIMEOUT) immediately here. I'll do that in the next
-version.
+Thanks & Best Regards,
+Basharath
 
