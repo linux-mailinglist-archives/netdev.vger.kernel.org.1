@@ -1,50 +1,67 @@
-Return-Path: <netdev+bounces-160473-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-160474-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 55E09A19D82
-	for <lists+netdev@lfdr.de>; Thu, 23 Jan 2025 05:11:20 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 03654A19DC9
+	for <lists+netdev@lfdr.de>; Thu, 23 Jan 2025 05:50:56 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id EDB9616C3D9
-	for <lists+netdev@lfdr.de>; Thu, 23 Jan 2025 04:11:13 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id A2CD67A4E26
+	for <lists+netdev@lfdr.de>; Thu, 23 Jan 2025 04:50:46 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D634A155359;
-	Thu, 23 Jan 2025 04:10:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 191BF198E9B;
+	Thu, 23 Jan 2025 04:50:48 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="gS807DZG"
+	dkim=pass (1024-bit key) header.d=uniontech.com header.i=@uniontech.com header.b="IxjnxTNL"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from smtpbguseast2.qq.com (smtpbguseast2.qq.com [54.204.34.130])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A8BE83F9C5;
-	Thu, 23 Jan 2025 04:10:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1BCDD191F77;
+	Thu, 23 Jan 2025 04:50:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=54.204.34.130
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1737605411; cv=none; b=u2H72vezh1jpBWL7QKjmxo5bl8fysx2QeVLrwpNrURiZpgMEmZRDlXfDFfBQfX2+i8HfzxbtPelTiNIWkq3MaN4XRMI5K6nuFTNBnrHfqql+iTWAWqynNHOeN6aT33kcHAzk7LglRxURQ6vDrZil6HAXQi4H473HnypU2O++BDw=
+	t=1737607848; cv=none; b=ApyTTYvD2vJc0tJCamP1PuRYsn1fISNqZZACSrohN6fTELukyPwSarpcbxR+dpIiEPna/8Ikcap8fdsFvVZFCE/Kh3ObFoWXDx+/1mPzGQ1ICFKb4ch0u9d60NpklkwzSfeDn53YKpDRDAw4CJN6jhhnFM+bdDOVOdWz/BMls9s=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1737605411; c=relaxed/simple;
-	bh=pxRLwulr+o4G1w5QMFLlft/rLgF2P9dNP1ofylPDWgk=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=qVU3UTh3SwE6EMIEEBdPwBXWO4AXgmXakbyyTSaH/kz+2DVP5zB9IG4JTajct2Wzqr2/x6lVzJoN9hQBENXRaGUMWbI2HHyLatxRy+WY7+Oy7Yg2j2SRAAdtm1eFYpUoIoYNEJNgcSoinUbYECxHxzcI3Oi83WxspA99MgmoVFQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=gS807DZG; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2884EC4CEDD;
-	Thu, 23 Jan 2025 04:10:11 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1737605411;
-	bh=pxRLwulr+o4G1w5QMFLlft/rLgF2P9dNP1ofylPDWgk=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=gS807DZGpAdKeUDEcI7PKv76ETH0tVTHOPFwZco9uWZ6X3VuPy/9qpL7pCWRaQCWG
-	 JjMMg75JuCHUvvpghuuzpY+gJpFal1E4YdozvsjHWM+SX/xt1w5v1ZO+UMvCA2dmMH
-	 lAWdEIFAuaISY6MuAmD3uC5QdlW+jbnWxzL1ewZkpoZzz6GRg0qD8ZWdEEibtz6xbQ
-	 8CQZq2PQ8b0RI0593ULBoFXunTuYd5ffE7tKwomoSSjX6YZaMjrxwI/gDIt5Nsh+Ol
-	 Gy6Z8XtQpJIFZy4ZyuRFkWo86fnF3mCG92kag38GjyoGnY/aaTxtKxszMnFXHWrmZL
-	 OCfYlDCIVEalA==
-Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id EB090380AA70;
-	Thu, 23 Jan 2025 04:10:36 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=arc-20240116; t=1737607848; c=relaxed/simple;
+	bh=im++eR/INdPSpUr45TlAR+IsbPrHVkY67fuTdQe07YM=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=Qc9jREQzZ4X79VQWDNr6sz+TvV0HPak7CY23+vMh2NvynDPMm37B3yPzaEdy22jUCQrOki0/agL3PTRNkwS0rSSXmetxr3q57WbneQLfrpMwwn347mtFdvIMYy66rs3tFw4WVYaOFSh3zdo80dbHf536aMditSW7di/kHAmftYw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=uniontech.com; spf=pass smtp.mailfrom=uniontech.com; dkim=pass (1024-bit key) header.d=uniontech.com header.i=@uniontech.com header.b=IxjnxTNL; arc=none smtp.client-ip=54.204.34.130
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=uniontech.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=uniontech.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=uniontech.com;
+	s=onoh2408; t=1737607783;
+	bh=+AGkopHYTgZidv+7oyOdM0KJWm1PxaW2N+T5XJvNq6s=;
+	h=From:To:Subject:Date:Message-ID:MIME-Version;
+	b=IxjnxTNLce4SbtMwh3+4qafArbLCwQkMItXkaKvMLxdXD2FhqcCZF8vCw472snN/z
+	 nHn8zY0GeVhx0g4Diox3lnQlH9PHGF61z2PHkYXNSTzhKXChJgHgkX9zFt98ZMdzfh
+	 LX4SRhzrQRfs0/1rDELC7hNG54bpq8ANk9jTUbA8=
+X-QQ-mid: bizesmtpip4t1737607771txzqs1l
+X-QQ-Originating-IP: vAxGYuBn/XVVB1GPf9+8yeHPQp7yVrrcFMOsPqyvF/8=
+Received: from avenger-OMEN-by-HP-Gaming-Lapto ( [localhost])
+	by bizesmtp.qq.com (ESMTP) with 
+	id ; Thu, 23 Jan 2025 12:49:29 +0800 (CST)
+X-QQ-SSF: 0000000000000000000000000000000
+X-QQ-GoodBg: 1
+X-BIZMAIL-ID: 14309089569765569099
+From: WangYuli <wangyuli@uniontech.com>
+To: Jason@zx2c4.com,
+	shuah@kernel.org
+Cc: wireguard@lists.zx2c4.com,
+	netdev@vger.kernel.org,
+	linux-kselftest@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	wangyuli@uniontech.com,
+	tglx@linutronix.de,
+	jstultz@google.com,
+	zhanjun@uniontech.com,
+	guanwentao@uniontech.com,
+	chenlinxuan@uniontech.com
+Subject: [PATCH] wireguard: selftests: Cleanup CONFIG_UBSAN_SANITIZE_ALL
+Date: Thu, 23 Jan 2025 12:49:23 +0800
+Message-ID: <F0F29BE7BB89FAAF+20250123044923.161871-1-wangyuli@uniontech.com>
+X-Mailer: git-send-email 2.45.2
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -52,44 +69,49 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH] net/ncsi: wait for the last response to Deselect Package
- before configuring channel
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <173760543574.917319.5168244429411410501.git-patchwork-notify@kernel.org>
-Date: Thu, 23 Jan 2025 04:10:35 +0000
-References: <20250116152900.8656-1-fercerpav@gmail.com>
-In-Reply-To: <20250116152900.8656-1-fercerpav@gmail.com>
-To: Paul Fertser <fercerpav@gmail.com>
-Cc: potin.lai.pt@gmail.com, chou.cosmo@gmail.com, eajames@linux.ibm.com,
- sam@mendozajonas.com, davem@davemloft.net, edumazet@google.com,
- kuba@kernel.org, pabeni@redhat.com, horms@kernel.org, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org, fr0st61te@gmail.com, stable@vger.kernel.org
+X-QQ-SENDSIZE: 520
+Feedback-ID: bizesmtpip:uniontech.com:qybglogicsvrgz:qybglogicsvrgz8a-1
+X-QQ-XMAILINFO: OSjTqsWSa+11nw528X1QVyRbDuq0BN/aLIyWtoNFvEyI7B3nZ8ER6KAO
+	W0L5hbBXPbv4hlRfpU0he7NmhCO3eHKWkK+Bmeq+up/Xs8e/4wvt1C0C0mdKD2F7RjUTG87
+	8vz0Bujr1TwsKxClNjijdtL9opARa6KxpXGNcoZeFl9RYIqL96EDc0AV994gBlzh8Wd7yw5
+	OK4MrjEgqZ6kFmTm1xeCYAB/4Wsfl/bvSj1ws9KpPiWQ2YcgggKvHbuhWLLrwLw6/DwVM0K
+	M9KpVdsT/LmxFxaYfA8mPGSQhAkPP17CEhYX+CWTMEkh71stKmfmxsmqpPECOGrpQxqZ73/
+	vSipW8nnGiZsd45heqYXyyMMg6dmns4H6nObqapwsbHWsj1plqvIZCPrrvio6RGJH//vOM8
+	BDyZCRnCkzKAzry5CCm+9gQM3oMjm26FH7f3eyNpwxtQXzfXlG2RDIJmNQn1vjERhKfjrrf
+	ggjSrimU+4oOTD3VWpXw3xRtx7QIG/pzZhbmnWm56N5YO841ObemgNVbnyfz5n4e4yMBz1w
+	6GoslWhpjUOl7mxLsU7bOubs3IDENwt6voyRN7LbMuwUhhT0rpzvqhSC5mw6UeJiEz+mY8q
+	e1SxYTKhksEo6q5D8/Gh+hx4aZTuCu2V1cYcQrCEtn4CyuvLumNMKScbFG/U2XkUgLKd5kp
+	XhM9/Uz4q9hk80+pbJjIn4TQTF2DbaExVVF7In53QdBqimmwLb2eOrZJhkUh/eHexT2+eXC
+	bLquowAeWzD4plKaV59BfOqsfCkBkzbThj/QWnhNCPz3uxKMKkBwaeuB8fZqjLiRurYNmZG
+	yUrmhiyxUWiTHe3UTCjJQ1RSL4xbcUiNyHxpVsUctK2r0i/H2Loy98MVzgUwiSa/AvZMLxx
+	9G0nZTTVmgMwsAHG+eZ3UYbqOukz7ifLsmkLoQs6GpULQzoQGBZdQrrqK4L8MtybVeRIBbH
+	cfBfrvWbovuQ2rVyU0PKzCjztblb8urhSoBcS3oiaWWXswwlqwT1p4idW8aHuMotaxus1J7
+	7laQJXZ8JVaYWe5C6PYWnriaOl7ng/Kul3F5VHzQ==
+X-QQ-XMRINFO: MSVp+SPm3vtS1Vd6Y4Mggwc=
+X-QQ-RECHKSPAM: 0
 
-Hello:
+Commit 918327e9b7ff ("ubsan: Remove CONFIG_UBSAN_SANITIZE_ALL")
+removed the CONFIG_UBSAN_SANITIZE_ALL configuration option.
+Eliminate invalid configurations to improve code readability.
 
-This patch was applied to netdev/net.git (main)
-by Jakub Kicinski <kuba@kernel.org>:
+Signed-off-by: WangYuli <wangyuli@uniontech.com>
+---
+ tools/testing/selftests/wireguard/qemu/debug.config | 1 -
+ 1 file changed, 1 deletion(-)
 
-On Thu, 16 Jan 2025 18:29:00 +0300 you wrote:
-> The NCSI state machine as it's currently implemented assumes that
-> transition to the next logical state is performed either explicitly by
-> calling `schedule_work(&ndp->work)` to re-queue itself or implicitly
-> after processing the predefined (ndp->pending_req_num) number of
-> replies. Thus to avoid the configuration FSM from advancing prematurely
-> and getting out of sync with the process it's essential to not skip
-> waiting for a reply.
-> 
-> [...]
-
-Here is the summary with links:
-  - net/ncsi: wait for the last response to Deselect Package before configuring channel
-    https://git.kernel.org/netdev/net/c/6bb194d036c6
-
-You are awesome, thank you!
+diff --git a/tools/testing/selftests/wireguard/qemu/debug.config b/tools/testing/selftests/wireguard/qemu/debug.config
+index 139fd9aa8b12..828f14300d0a 100644
+--- a/tools/testing/selftests/wireguard/qemu/debug.config
++++ b/tools/testing/selftests/wireguard/qemu/debug.config
+@@ -22,7 +22,6 @@ CONFIG_HAVE_ARCH_KASAN=y
+ CONFIG_KASAN=y
+ CONFIG_KASAN_INLINE=y
+ CONFIG_UBSAN=y
+-CONFIG_UBSAN_SANITIZE_ALL=y
+ CONFIG_DEBUG_KMEMLEAK=y
+ CONFIG_DEBUG_STACK_USAGE=y
+ CONFIG_DEBUG_SHIRQ=y
 -- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
-
+2.45.2
 
 
