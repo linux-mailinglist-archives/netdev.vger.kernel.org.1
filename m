@@ -1,290 +1,225 @@
-Return-Path: <netdev+bounces-160475-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-160476-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0D27EA19DD0
-	for <lists+netdev@lfdr.de>; Thu, 23 Jan 2025 05:57:56 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id AF944A19DE6
+	for <lists+netdev@lfdr.de>; Thu, 23 Jan 2025 06:17:11 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id BCEB71885567
-	for <lists+netdev@lfdr.de>; Thu, 23 Jan 2025 04:57:59 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 8223E3A5F34
+	for <lists+netdev@lfdr.de>; Thu, 23 Jan 2025 05:17:04 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A180A1ADC85;
-	Thu, 23 Jan 2025 04:57:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A62D01494A7;
+	Thu, 23 Jan 2025 05:17:07 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="XzMUweKU"
+	dkim=pass (1024-bit key) header.d=microsoft.com header.i=@microsoft.com header.b="ZL1gHOuZ"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-yb1-f172.google.com (mail-yb1-f172.google.com [209.85.219.172])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from NAM11-BN8-obe.outbound.protection.outlook.com (mail-bn8nam11on2109.outbound.protection.outlook.com [40.107.236.109])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 486921ADC75
-	for <netdev@vger.kernel.org>; Thu, 23 Jan 2025 04:57:45 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.172
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1737608267; cv=none; b=abuQb2gp4k/61RXN1n6nJtsq7Ux31+wXyiA7EIwJFG+81xgB7bWTaSkfvx1X0b3qNcZZtrg/dUT6KHaNVp7FSKvcthiGPH1LFxDJAOq9yZHIy1CZhAmKGa1UL1WA/tJoCWlrUJIzmU3vbw3wTIZmPvzE9wDf/NweHZf56XKjgmg=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1737608267; c=relaxed/simple;
-	bh=gXGST6/fJwV5Do5lFRM2gwK3r63i8h21UsR/WokvCsc=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=gLubSghLd5js+mI7e76sSs2C5clZ2AbSGu+ZdA4G1nAPupBMOgCb4IqyVgkX2KtAJPZVasF1mm+La+mxnHXCulmbmJ23fjfWvHO5xwIOg4BeTMpJTZ7uI/GHHaw1GfVS7XhLW288As38akK00XwsRcd19/eehv7lZMX4r0qomZM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=XzMUweKU; arc=none smtp.client-ip=209.85.219.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-yb1-f172.google.com with SMTP id 3f1490d57ef6-e53c9035003so783754276.2
-        for <netdev@vger.kernel.org>; Wed, 22 Jan 2025 20:57:44 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1737608264; x=1738213064; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=2iLrSrrpPpe4BqQ40aqwnxmgvffYQ/EZQy8IbB10yas=;
-        b=XzMUweKUuSR4HSPIw4abx+rgXGFdYW/J996lweTQTK591xZkMXZme5cXiPg3mh5kU6
-         FlJfUoGYBicTXxcnmLxQ3Gig2XyFGyjcGR8UULbIdUhk1hYr5vGAcVIlQOlG9Uuc051X
-         gIF5zVT0om/1Uc44Ms4CKQaOUkX0ZvCRGWODawv1TUWbgN3HIM7gDXnDF5aupTBm5MPq
-         KAg2b8sPPlvHP+iiv8SvNQBFMewLUMbin5ARU/sP+bIWKMC8Fp3nLnDyK9WDRMLSiBgn
-         DdnQUqgjVCfHDq/HsdtzgVA55n6PE0zRegWRHq7E4mxTlFacqX+JjSgpgyyFLP5QzDA2
-         iFWQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1737608264; x=1738213064;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=2iLrSrrpPpe4BqQ40aqwnxmgvffYQ/EZQy8IbB10yas=;
-        b=xTgPG8Y83a3Y2L41RMwcYDCbu1KyuOV0DbhhHhROd0HPUJx2YCSF0J6EoYgHX7KlA7
-         I7TtZOY1I8yeFL8S07yvU1demYubDw0eIhv+gX/uaFabho+6LmHlZ9XFCxl0E4WmYOBe
-         KPjigVGjqd+JtVuOZJ7VqBTAtI1EV7gMeiVD2tqyjUnOMtoEyIN1bCVvevQOle2IFjHP
-         7fQdPkIY4FNAc+WP1kAWvgvsuzEnZkPI3RBlyeCw2UPiXGxbvj6pZ2bfCgfRr3RBj7Fk
-         sag+2Il+qtn5x8JiR54wdMwRClzvnLCRMKEboucIjnheoqKOIYySyCprK+WduaxsWygd
-         X9YQ==
-X-Forwarded-Encrypted: i=1; AJvYcCU3/ZS8NIseqIF8rzb1IzrNnKeakJCJ5GRPBUy6VfMbpvAR+QDZ4TlbFiKdVcknlQZPHi3qY48=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwLPJ8HhlH/KNplnujpE4KdXRmB1jdCqKIcJYeYytBs3yxh0cqh
-	xZcXdOp8aW20cyq8z+0+0vKn4Du5wNgjvM85qYQsMzywOvG+voiyVAB1YzjyV8XmPHs9tCXSigp
-	1fNMykMyi8535TOt72MMF67f/+y7IvIbPSXWA
-X-Gm-Gg: ASbGnctmrJuDrbhZKLciXUSZkTLkDgIzvHECnYdy4W89xP/5P02zHNEOcOIkASTqvLg
-	gnwN1Jbo3kVUNpKD1g339BcRQlQUYvXnUCX9Z98wBWTh+yMtj5SJhrwsEod+bbh15DKNjQw==
-X-Google-Smtp-Source: AGHT+IHw30UHsHJMDbPUuK8hZBKTwSVtpKrIowAAcEbatGnNkbAkvD1p/2ygh9YC8YFN9vpyDnwchG1tI5ye+jHjemA=
-X-Received: by 2002:a05:6902:2089:b0:e57:8bbb:b911 with SMTP id
- 3f1490d57ef6-e57b106410emr16615739276.19.1737608264015; Wed, 22 Jan 2025
- 20:57:44 -0800 (PST)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F0C713596B;
+	Thu, 23 Jan 2025 05:17:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.236.109
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1737609427; cv=fail; b=fKqGWVXZ0ihAIbxkw6qNYLiuu8dc5e+3saQzdQ58OXKkFO0qpwWsIVw0XKguT/gH7M3Cm0JFTiXqwv3UTySAyyckVu/ifmNNxAxQgnclDKC6RatT48aCvlFItjdV5fpUJKBpNLSjDGrgqQUAdojQfR7Z9KHDDiN51yWp8PuasOE=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1737609427; c=relaxed/simple;
+	bh=t1CBnBPnY1GhM6/WUXzHUa/DVrai9mHfRjCbGYm63n0=;
+	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
+	 Content-Type:MIME-Version; b=m/P8F4PfVLxVHHIvWvD3s+f2uC5GxHFmhNsGT1dj0N2wEnJW3XP0P5qsmRSgvc8efqOtaCoFC+qUHll0V920/YH+eVhQ7326tQBfYNKgY4tVpRB9/M573rLsraEzDlA1rjYuREeHx6H8CHPxBiNuu8EkoeDbuvM98PK8cG64YOc=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microsoft.com; spf=pass smtp.mailfrom=microsoft.com; dkim=pass (1024-bit key) header.d=microsoft.com header.i=@microsoft.com header.b=ZL1gHOuZ; arc=fail smtp.client-ip=40.107.236.109
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microsoft.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=microsoft.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=RFn7LJ/slHtK1AqUgYBYNCCh37MZWMsda+mNCpV6ZEWt+HTrgpIOQVrW+bd0ueEmb833sjpCqPJJUus7YC7aCmPhcebO3sA63WoFrO5tAymX3B81XtDUNPQbn0IEnZKgkitzjCzIiNzt8pP+eIvr2ddMus+hPIqya8EkJEvleR0If+/cIIjVgYYUfA7qGzhGinZKD+BmxRqVGzbUm721jC6gDegkGJfSskAgB9KCZ3YaWYhlEhjCg/besz2ix+9+FOqTmp7xSqt6QOvXtA7Vc6X3+LZ2k/fpWr6Q0Sg2X6PKsOhg6XekNhf0QPCBy0PBbrXh3XJXwCa0BKl8kd2y6w==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=RHBQTUhQEYX6uADhDEbpkAJc0d33lYyfXz5x7WTOOaA=;
+ b=Obk3j9Edy0zko5lfF6PfB/TFxZ6m/OcWt3+vkuax0JyU+7nBDjCQb4NFo0qU32XBymxsR9gBdihukA45JpMvCIWxxzidWY1lcqn8XThWCUc0wF/0fdhN4LECug8doFSmAwh2D8f9EHa9oxxmpIb6qNNmpTAvyqY1b7qqh8kBIvkvv7SEQawfwOHOYeGuTgnD2KFFTI83A+BoIICQQHyNSk+oC94bo3ytmJXBhtfjcVgAdgS9jDNPSg9JKWirrOOg0oYHo/tSGbgWjSq3Prbdj9cB0v44JtY/xgDvN0Ke5vHgszR99GNNWUzg76jMTfC0HdqUuwXYROaHFreGsfPO3g==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=microsoft.com; dmarc=pass action=none
+ header.from=microsoft.com; dkim=pass header.d=microsoft.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=RHBQTUhQEYX6uADhDEbpkAJc0d33lYyfXz5x7WTOOaA=;
+ b=ZL1gHOuZP0mATww7HHAufibSZBBmAkbHkBvI0TwDclP7upXjPqAmY+zDHaLtYRHX8kimUuJV54GIYtGeEIhvCVzg6g3Xq2IpEuXPAbT+uDnD9CZlRqQoRbQfWpk41C1F7ZuwPkjye+Q7CdzixNmAZQfcj7Yvkw9Q3sfZw+hWLmY=
+Received: from SA6PR21MB4231.namprd21.prod.outlook.com (2603:10b6:806:412::20)
+ by SA6PR21MB4302.namprd21.prod.outlook.com (2603:10b6:806:418::15) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8398.7; Thu, 23 Jan
+ 2025 05:17:02 +0000
+Received: from SA6PR21MB4231.namprd21.prod.outlook.com
+ ([fe80::5c62:d7c6:4531:3aff]) by SA6PR21MB4231.namprd21.prod.outlook.com
+ ([fe80::5c62:d7c6:4531:3aff%5]) with mapi id 15.20.8398.005; Thu, 23 Jan 2025
+ 05:17:02 +0000
+From: Long Li <longli@microsoft.com>
+To: Konstantin Taranov <kotaranov@linux.microsoft.com>, Konstantin Taranov
+	<kotaranov@microsoft.com>, Shiraz Saleem <shirazsaleem@microsoft.com>,
+	"pabeni@redhat.com" <pabeni@redhat.com>, Haiyang Zhang
+	<haiyangz@microsoft.com>, KY Srinivasan <kys@microsoft.com>,
+	"edumazet@google.com" <edumazet@google.com>, "kuba@kernel.org"
+	<kuba@kernel.org>, "davem@davemloft.net" <davem@davemloft.net>, Dexuan Cui
+	<decui@microsoft.com>, "wei.liu@kernel.org" <wei.liu@kernel.org>,
+	"sharmaajay@microsoft.com" <sharmaajay@microsoft.com>, "jgg@ziepe.ca"
+	<jgg@ziepe.ca>, "leon@kernel.org" <leon@kernel.org>
+CC: "linux-rdma@vger.kernel.org" <linux-rdma@vger.kernel.org>,
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+	"netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+	"linux-hyperv@vger.kernel.org" <linux-hyperv@vger.kernel.org>
+Subject: RE: [PATCH rdma-next 01/13] RDMA/mana_ib: Allow registration of
+ DMA-mapped memory in PDs
+Thread-Topic: [PATCH rdma-next 01/13] RDMA/mana_ib: Allow registration of
+ DMA-mapped memory in PDs
+Thread-Index: AQHba2CVaMl2TmeRG0O5ev1nFYViF7Mj1TfA
+Date: Thu, 23 Jan 2025 05:17:01 +0000
+Message-ID:
+ <SA6PR21MB4231B2C714A7944F39BD464ECEE02@SA6PR21MB4231.namprd21.prod.outlook.com>
+References: <1737394039-28772-1-git-send-email-kotaranov@linux.microsoft.com>
+ <1737394039-28772-2-git-send-email-kotaranov@linux.microsoft.com>
+In-Reply-To: <1737394039-28772-2-git-send-email-kotaranov@linux.microsoft.com>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach:
+X-MS-TNEF-Correlator:
+msip_labels:
+ MSIP_Label_f42aa342-8706-4288-bd11-ebb85995028c_ActionId=1d60f2d3-cc08-4f5d-9ee5-c33eaccff85b;MSIP_Label_f42aa342-8706-4288-bd11-ebb85995028c_ContentBits=0;MSIP_Label_f42aa342-8706-4288-bd11-ebb85995028c_Enabled=true;MSIP_Label_f42aa342-8706-4288-bd11-ebb85995028c_Method=Standard;MSIP_Label_f42aa342-8706-4288-bd11-ebb85995028c_Name=Internal;MSIP_Label_f42aa342-8706-4288-bd11-ebb85995028c_SetDate=2025-01-23T05:16:41Z;MSIP_Label_f42aa342-8706-4288-bd11-ebb85995028c_SiteId=72f988bf-86f1-41af-91ab-2d7cd011db47;MSIP_Label_f42aa342-8706-4288-bd11-ebb85995028c_Tag=10,
+ 3, 0, 1;
+authentication-results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=microsoft.com;
+x-ms-publictraffictype: Email
+x-ms-traffictypediagnostic: SA6PR21MB4231:EE_|SA6PR21MB4302:EE_
+x-ms-office365-filtering-correlation-id: 9e5cf17e-9100-482b-f836-08dd3b6d2b40
+x-ms-exchange-senderadcheck: 1
+x-ms-exchange-antispam-relay: 0
+x-microsoft-antispam:
+ BCL:0;ARA:13230040|376014|7416014|1800799024|366016|921020|38070700018;
+x-microsoft-antispam-message-info:
+ =?us-ascii?Q?1pmVHKwGTMl1ez3hYHwUmBNat56PWMC/Q4sCsL7mCtx4w3CtTPGyMCymaAwL?=
+ =?us-ascii?Q?rx/5eHESbZWnClUQ50bzA4a/4IvDvpHTlky5wkXIzNcfOnWqZJzYuKgLesKe?=
+ =?us-ascii?Q?i7dNPYQ/wzQI8A47JxfGKnGzsJJo5NN8GN9kgoqxKbNu1AISNl/N7dHYuumr?=
+ =?us-ascii?Q?wT1m/x79XSJXoItdapiuFfdWo3a45AdT+9Ftph+salbAAdCA+46zNhZCJVSS?=
+ =?us-ascii?Q?ruiTzUzRw/biZHUNkTjZ5GAJjezgbvaVv/wWeAqDVwOLlMRSy9la0LH4YDkx?=
+ =?us-ascii?Q?tSssGWdT5KDl76Gkeh2ffgnO0aaNDjN6RowBpI4tQK6GHm2nJm1TcCrAdIIh?=
+ =?us-ascii?Q?mvEdPz3YVmbdzCpqeZNQo9dnon7NQDV1nma643khyjsGrnvhhUdx5hpLVWHz?=
+ =?us-ascii?Q?tlvH0bqjuRLnDO5SSwJXHVRsuRU/B3VFuqAILrIF+sxQIBX6xZBzqoJL8hkB?=
+ =?us-ascii?Q?E30/udPdFr0tUVcgwjDothTHlfPT920lcLNYG6SlCBRUGIDupAd8nNn5QCo7?=
+ =?us-ascii?Q?XP89+Rv0X4blPqvjGxAb5euAwkgs8zhtHgPUuyj0YJYKdcnPc+nMjuMpfxrL?=
+ =?us-ascii?Q?+JlZgECq+0IqxglyQZ1VsRZEQfBqUim1OfPU1jmP5dkFQOJdrvmAOvOCiQT6?=
+ =?us-ascii?Q?pnXJd90wsex93CZ+Ail0WMCgIyrSJuqNI/C+wAJX2olyLCs669svB9z/5zla?=
+ =?us-ascii?Q?a73q27Jy5hzxqSsv7S8NHP34ctSwv0K8felaDWgYOcsSMDTu3H4bFxGRv/pK?=
+ =?us-ascii?Q?YlywSpDSsQkqgPjkw2W7ZB+YHdNCKqYwPubjTsWa79IQkiV1njoXEIngarX9?=
+ =?us-ascii?Q?fh07GMpsDy/PpYr4RQPwAHKxUmWRFPSiwGTeLzpwa+2iIQE22Q+CJXW/gii9?=
+ =?us-ascii?Q?il5gNUOih4UM1XVftS8GW1Qmg9vh1zQDn/8ktws5Vprusp0mAIgi4wCAlZc5?=
+ =?us-ascii?Q?rGTcCM+BfH2xk+Nrd7/4ntoBRtTe9oPoDdMKKliMSgBY6K1pC/DLQnVmnLeK?=
+ =?us-ascii?Q?4phXLo5h4bI1UVQIzIHu8e5IJvIkZWoEc6oE7fdRda1j/yOmTU/huw2+jBTO?=
+ =?us-ascii?Q?igctoEOxB94GXS5GnKvK6n8a1qA/SlGAmvytu/7p4XAjghYLVJWZEGpfioci?=
+ =?us-ascii?Q?iMN/+G0Gc2BR7g8r26LUmm/6EFOpG4krtfNA+CxD3VrejXGck9+dEMyeG4ki?=
+ =?us-ascii?Q?/BHv+nQoRfJ2VOhHTL4GlXThw9QZYoHCCfIFCn5/K0wz5miCcJTb+vIme/QV?=
+ =?us-ascii?Q?y0vyJP3beWAsCCObSq3Nevd7+h39G2P+JuIqOE8aA7GtVgbaJjdH/OaSAYFP?=
+ =?us-ascii?Q?nxY4bjtuwtufj2ErbFlHnjkdeTzhYKGfNsQj/6BtVkKmMS94riXiU/4SyNYz?=
+ =?us-ascii?Q?yYYQRmDNYD+eXP8s40GK9UbEj1r0+SMD9v0rDDVFo4deWcOnBG40LsBltx9x?=
+ =?us-ascii?Q?C1sR3zSD7jAv9Xt1wq5FZj97GBK3CwGzJrxBucIxuxRJ9AOWO0agFw=3D=3D?=
+x-forefront-antispam-report:
+ CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SA6PR21MB4231.namprd21.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(376014)(7416014)(1800799024)(366016)(921020)(38070700018);DIR:OUT;SFP:1102;
+x-ms-exchange-antispam-messagedata-chunkcount: 1
+x-ms-exchange-antispam-messagedata-0:
+ =?us-ascii?Q?sNVjVtkQ2g/lXNvdA+F6JxEhj9BBTxXAgWDPH71qbFJ0cxUr1hJ2vNnXesEQ?=
+ =?us-ascii?Q?GpETm098Hn/BqpFS8YNbynBvPdNrCft3RwidqjerOjm0DuPvrwbhm9WktSPO?=
+ =?us-ascii?Q?kwUUPj/ZVTvajTXYPk0QLOHJ2dq/saT6QrtXqrkjTdcOrkZiAU3wqvHHITLr?=
+ =?us-ascii?Q?AjAd0FY1sXZYBAMX+sOgQ4x36uRSjB14JlrveAXPY84kInRolDtifqwaWwTM?=
+ =?us-ascii?Q?duvPc+oJ7y0cgqHcBSEm+uvWzdpY/9cwXbj7FBs6f62W6xXqTgcy9+kTiBrb?=
+ =?us-ascii?Q?mhKkRRzpYP90GtT+yOAurN1VN3arW8DmZ43OfEX7kCWrOx3ugPX9n01VG6mQ?=
+ =?us-ascii?Q?gmf9TTm1cU1GFTdUtQrD4lgYdkOCosq/ffB3xA25Al7UVpvDWViT1IVXsld5?=
+ =?us-ascii?Q?OHN1JdKhNLGJAaqGqyDN8yw/i/Ivwq4VLZazOPGMO6e+78HSPeVrb2/8bSgX?=
+ =?us-ascii?Q?ZofCVSMjOdxN0nZgEHXpMq5CLQjXzHvuMRZVGk5i7+vyXpFBkwm3VtbrKOzO?=
+ =?us-ascii?Q?N3l1nxEysOqyeIKoXh7vwQKXUpjzhsX5uqmdEzJA9Y0Ex0+eG85gbhP27Iki?=
+ =?us-ascii?Q?28C9OcanW0QTMUpl7NweYQq7bBskAfBbhRm4ycl6151qe+REkCSLiB23+Ep6?=
+ =?us-ascii?Q?hiVxG/htqrFg0qCbeMBb+yZf9pgKgAsjU0vKErsNEnBCNAVAPNV1I3xZ1mNv?=
+ =?us-ascii?Q?6IreLfDUEOmZ1DyE3ofBPmwpRweCXvw33bO8fOXgjEpgweHXGaxTkmenZfzV?=
+ =?us-ascii?Q?to+4t00YPRjCslT9+ouNdPulmffB+mY4D+czhyeKEb9t/2NXbBvTF6qSdb59?=
+ =?us-ascii?Q?RG8BLauAKBrGyro4IPfMUUaPKFH+626tL0m3bhQX/mae0nW0E1pkshwvkmX7?=
+ =?us-ascii?Q?cDaCPcKT8KdRO/pPlr9VfcNMhTl6XbGyfvzCASZ1W+I6AMA8vhrw2nG8IGc4?=
+ =?us-ascii?Q?015BdlY3qSaKj/+NCDv3r84YBif8Uwywj52X46B10X/J+F36KQKjv5TOgaWL?=
+ =?us-ascii?Q?eP7qQqBdS5PtcnMATDS2Xl6Y8qvCwAb1gsmrSw6hDh5/iZSkIJ//LZhn6kSH?=
+ =?us-ascii?Q?SHj5qAQmoCuyDJ2+ONNYPSV2BRyqzb9isjS/Q1eVg9lElaFCOUME1wCEFQ3s?=
+ =?us-ascii?Q?I4j99AKqT6MogI5m38kTtNtP6mPLrYYiR6bT30yGSl5sFXysvvQzCWv5j2kz?=
+ =?us-ascii?Q?wl7oOk1UJGHZzsfrgrQGmYgVL+Hre3Oq394XH2mEV4c1PdxMMpaaryzP3OPV?=
+ =?us-ascii?Q?mJC/UhsOZn3gDPI6/24Dxk2wSJhcMbChX4fX1CLHMtfrT07jgG5/ij54Zpaf?=
+ =?us-ascii?Q?R/61jOekckGEowSoDTUk7N1iZ0QiZ0tK0DbQE0jSMmnZZIKW9cFjf2Ucx999?=
+ =?us-ascii?Q?EOb4XOJADAMNGPAZ8CXhlDs3G/i9iUWnzo2/FsOFY4aO0CTfSg7PyNTPD+td?=
+ =?us-ascii?Q?1E6D2wTZzlotpkl5EuYW3ExK1E9VzvsQbp33ZJ9UDfDyhCnuDvXTQEaYQ4UF?=
+ =?us-ascii?Q?FmMqj4M5bJjbLD8cZOFMyHeMuep34H1qAGKjWmZrpPTnorMV34co6FQHYwDt?=
+ =?us-ascii?Q?XN2Ub7cR5sQalOXeO1A/lJNvsMwAoUCTAZXwUV2p?=
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250122131925.v2.1.If6f14aa2512336173a53fc3552756cd8a332b0a3@changeid>
- <CABBYNZKoXT4u4=KJZUvG4g1OEi+xQ-LchiH8gvEZURNTzJoQDw@mail.gmail.com>
-In-Reply-To: <CABBYNZKoXT4u4=KJZUvG4g1OEi+xQ-LchiH8gvEZURNTzJoQDw@mail.gmail.com>
-From: Hsin-chen Chuang <chharry@google.com>
-Date: Thu, 23 Jan 2025 12:57:17 +0800
-X-Gm-Features: AbW1kvbTxTtlZSbyA9ivfrSgLdev-buUmaUqiyJmWXFScjR17gRUJCehKfNPqW8
-Message-ID: <CADg1FFdt2mQsN4YjLTn=zp_+MahopN371EDiXQEbp+GTSaNtBg@mail.gmail.com>
-Subject: Re: [PATCH v2 1/3] Bluetooth: Fix possible race with userspace of
- sysfs isoc_alt
-To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Cc: linux-bluetooth@vger.kernel.org, 
-	chromeos-bluetooth-upstreaming@chromium.org, 
-	Hsin-chen Chuang <chharry@chromium.org>, "David S. Miller" <davem@davemloft.net>, 
-	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
-	Johan Hedberg <johan.hedberg@gmail.com>, Marcel Holtmann <marcel@holtmann.org>, 
-	Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, Ying Hsu <yinghsu@chromium.org>, 
-	linux-kernel@vger.kernel.org, netdev@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+X-OriginatorOrg: microsoft.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: SA6PR21MB4231.namprd21.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 9e5cf17e-9100-482b-f836-08dd3b6d2b40
+X-MS-Exchange-CrossTenant-originalarrivaltime: 23 Jan 2025 05:17:01.9572
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 72f988bf-86f1-41af-91ab-2d7cd011db47
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: cGP2C1g8Uau214sqlPh09XYoWsBdkc3wMNzyYafeff0wQaQWDM9WcAbfwhT5KhEIb749H/EP2JOnGUu5uZcmuw==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SA6PR21MB4302
 
-Hi Luiz,
+> Subject: [PATCH rdma-next 01/13] RDMA/mana_ib: Allow registration of DMA-
+> mapped memory in PDs
+>=20
+> From: Konstantin Taranov <kotaranov@microsoft.com>
+>=20
+> Allow the HW to register DMA-mapped memory for kernel-level PDs.
+>=20
+> Signed-off-by: Konstantin Taranov <kotaranov@microsoft.com>
+> Reviewed-by: Shiraz Saleem <shirazsaleem@microsoft.com>
 
-On Thu, Jan 23, 2025 at 3:35=E2=80=AFAM Luiz Augusto von Dentz
-<luiz.dentz@gmail.com> wrote:
->
-> Hi Hsin-chen,
->
-> On Wed, Jan 22, 2025 at 12:20=E2=80=AFAM Hsin-chen Chuang <chharry@google=
-.com> wrote:
-> >
-> > From: Hsin-chen Chuang <chharry@chromium.org>
-> >
-> > Use device group to avoid the racing. To reuse the group defined in
-> > hci_sysfs.c, defined 2 callbacks switch_usb_alt_setting and
-> > read_usb_alt_setting which are only registered in btusb.
-> >
-> > Fixes: b16b327edb4d ("Bluetooth: btusb: add sysfs attribute to control =
-USB alt setting")
-> > Signed-off-by: Hsin-chen Chuang <chharry@chromium.org>
-> > ---
-> >
-> > (no changes since v1)
-> >
-> >  drivers/bluetooth/btusb.c        | 42 ++++++++------------------------
-> >  include/net/bluetooth/hci_core.h |  2 ++
-> >  net/bluetooth/hci_sysfs.c        | 33 +++++++++++++++++++++++++
-> >  3 files changed, 45 insertions(+), 32 deletions(-)
-> >
-> > diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
-> > index 75a0f15819c4..bf210275e5b7 100644
-> > --- a/drivers/bluetooth/btusb.c
-> > +++ b/drivers/bluetooth/btusb.c
-> > @@ -2221,6 +2221,13 @@ static int btusb_switch_alt_setting(struct hci_d=
-ev *hdev, int new_alts)
-> >         return 0;
-> >  }
-> >
-> > +static int btusb_read_alt_setting(struct hci_dev *hdev)
-> > +{
-> > +       struct btusb_data *data =3D hci_get_drvdata(hdev);
-> > +
-> > +       return data->isoc_altsetting;
-> > +}
-> > +
-> >  static struct usb_host_interface *btusb_find_altsetting(struct btusb_d=
-ata *data,
-> >                                                         int alt)
-> >  {
-> > @@ -3650,32 +3657,6 @@ static const struct file_operations force_poll_s=
-ync_fops =3D {
-> >         .llseek         =3D default_llseek,
-> >  };
-> >
-> > -static ssize_t isoc_alt_show(struct device *dev,
-> > -                            struct device_attribute *attr,
-> > -                            char *buf)
-> > -{
-> > -       struct btusb_data *data =3D dev_get_drvdata(dev);
-> > -
-> > -       return sysfs_emit(buf, "%d\n", data->isoc_altsetting);
-> > -}
-> > -
-> > -static ssize_t isoc_alt_store(struct device *dev,
-> > -                             struct device_attribute *attr,
-> > -                             const char *buf, size_t count)
-> > -{
-> > -       struct btusb_data *data =3D dev_get_drvdata(dev);
-> > -       int alt;
-> > -       int ret;
-> > -
-> > -       if (kstrtoint(buf, 10, &alt))
-> > -               return -EINVAL;
-> > -
-> > -       ret =3D btusb_switch_alt_setting(data->hdev, alt);
-> > -       return ret < 0 ? ret : count;
-> > -}
-> > -
-> > -static DEVICE_ATTR_RW(isoc_alt);
-> > -
-> >  static int btusb_probe(struct usb_interface *intf,
-> >                        const struct usb_device_id *id)
-> >  {
-> > @@ -4040,9 +4021,8 @@ static int btusb_probe(struct usb_interface *intf=
-,
-> >                 if (err < 0)
-> >                         goto out_free_dev;
-> >
-> > -               err =3D device_create_file(&intf->dev, &dev_attr_isoc_a=
-lt);
-> > -               if (err)
-> > -                       goto out_free_dev;
-> > +               hdev->switch_usb_alt_setting =3D btusb_switch_alt_setti=
-ng;
-> > +               hdev->read_usb_alt_setting =3D btusb_read_alt_setting;
-> >         }
-> >
-> >         if (IS_ENABLED(CONFIG_BT_HCIBTUSB_BCM) && data->diag) {
-> > @@ -4089,10 +4069,8 @@ static void btusb_disconnect(struct usb_interfac=
-e *intf)
-> >         hdev =3D data->hdev;
-> >         usb_set_intfdata(data->intf, NULL);
-> >
-> > -       if (data->isoc) {
-> > -               device_remove_file(&intf->dev, &dev_attr_isoc_alt);
-> > +       if (data->isoc)
-> >                 usb_set_intfdata(data->isoc, NULL);
-> > -       }
-> >
-> >         if (data->diag)
-> >                 usb_set_intfdata(data->diag, NULL);
-> > diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/h=
-ci_core.h
-> > index f756fac95488..5d3ec5ff5adb 100644
-> > --- a/include/net/bluetooth/hci_core.h
-> > +++ b/include/net/bluetooth/hci_core.h
-> > @@ -641,6 +641,8 @@ struct hci_dev {
-> >                                      struct bt_codec *codec, __u8 *vnd_=
-len,
-> >                                      __u8 **vnd_data);
-> >         u8 (*classify_pkt_type)(struct hci_dev *hdev, struct sk_buff *s=
-kb);
-> > +       int (*switch_usb_alt_setting)(struct hci_dev *hdev, int new_alt=
-s);
-> > +       int (*read_usb_alt_setting)(struct hci_dev *hdev);
-> >  };
-> >
-> >  #define HCI_PHY_HANDLE(handle) (handle & 0xff)
-> > diff --git a/net/bluetooth/hci_sysfs.c b/net/bluetooth/hci_sysfs.c
-> > index 041ce9adc378..887aa1935b1e 100644
-> > --- a/net/bluetooth/hci_sysfs.c
-> > +++ b/net/bluetooth/hci_sysfs.c
-> > @@ -102,8 +102,41 @@ static ssize_t reset_store(struct device *dev, str=
-uct device_attribute *attr,
-> >  }
-> >  static DEVICE_ATTR_WO(reset);
-> >
-> > +static ssize_t isoc_alt_show(struct device *dev,
-> > +                            struct device_attribute *attr,
-> > +                            char *buf)
-> > +{
-> > +       struct hci_dev *hdev =3D to_hci_dev(dev);
-> > +
-> > +       if (hdev->read_usb_alt_setting)
-> > +               return sysfs_emit(buf, "%d\n", hdev->read_usb_alt_setti=
-ng(hdev));
-> > +
-> > +       return -ENODEV;
-> > +}
-> > +
-> > +static ssize_t isoc_alt_store(struct device *dev,
-> > +                             struct device_attribute *attr,
-> > +                             const char *buf, size_t count)
-> > +{
-> > +       struct hci_dev *hdev =3D to_hci_dev(dev);
-> > +       int alt;
-> > +       int ret;
-> > +
-> > +       if (kstrtoint(buf, 10, &alt))
-> > +               return -EINVAL;
-> > +
-> > +       if (hdev->switch_usb_alt_setting) {
-> > +               ret =3D hdev->switch_usb_alt_setting(hdev, alt);
-> > +               return ret < 0 ? ret : count;
-> > +       }
-> > +
-> > +       return -ENODEV;
-> > +}
-> > +static DEVICE_ATTR_RW(isoc_alt);
-> > +
-> >  static struct attribute *bt_host_attrs[] =3D {
-> >         &dev_attr_reset.attr,
-> > +       &dev_attr_isoc_alt.attr,
-> >         NULL,
-> >  };
-> >  ATTRIBUTE_GROUPS(bt_host);
->
-> While this fixes the race it also forces the inclusion of an attribute
-> that is driver specific, so I wonder if we should introduce some
-> internal interface to register driver specific entries like this.
+Reviewed-by: Long Li <longli@microsoft.com>
 
-Do you mean you prefer the original interface that only exports the
-attribute when isoc_altsetting is supported?
-Agree it makes more sense but I hit the obstacle: hci_init_sysfs is
-called earlier than data->isoc is determined. I need some time to
-verify whether changing the order won't break anything.
-
->
-> > --
-> > 2.48.1.262.g85cc9f2d1e-goog
-> >
->
->
+> ---
+>  drivers/infiniband/hw/mana/main.c | 3 +++
+>  include/net/mana/gdma.h           | 1 +
+>  2 files changed, 4 insertions(+)
+>=20
+> diff --git a/drivers/infiniband/hw/mana/main.c
+> b/drivers/infiniband/hw/mana/main.c
+> index 67c2d43..45b251b 100644
+> --- a/drivers/infiniband/hw/mana/main.c
+> +++ b/drivers/infiniband/hw/mana/main.c
+> @@ -82,6 +82,9 @@ int mana_ib_alloc_pd(struct ib_pd *ibpd, struct ib_udat=
+a
+> *udata)
+>  	mana_gd_init_req_hdr(&req.hdr, GDMA_CREATE_PD, sizeof(req),
+>  			     sizeof(resp));
+>=20
+> +	if (!udata)
+> +		flags |=3D GDMA_PD_FLAG_ALLOW_GPA_MR;
+> +
+>  	req.flags =3D flags;
+>  	err =3D mana_gd_send_request(gc, sizeof(req), &req,
+>  				   sizeof(resp), &resp);
+> diff --git a/include/net/mana/gdma.h b/include/net/mana/gdma.h index
+> 90f5665..03e1b25 100644
+> --- a/include/net/mana/gdma.h
+> +++ b/include/net/mana/gdma.h
+> @@ -775,6 +775,7 @@ struct gdma_destroy_dma_region_req {
+>=20
+>  enum gdma_pd_flags {
+>  	GDMA_PD_FLAG_INVALID =3D 0,
+> +	GDMA_PD_FLAG_ALLOW_GPA_MR =3D 1,
+>  };
+>=20
+>  struct gdma_create_pd_req {
 > --
-> Luiz Augusto von Dentz
+> 2.43.0
+
 
