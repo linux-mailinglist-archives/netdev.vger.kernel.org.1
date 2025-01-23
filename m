@@ -1,75 +1,81 @@
-Return-Path: <netdev+bounces-160603-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-160604-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7FB2CA1A7C5
-	for <lists+netdev@lfdr.de>; Thu, 23 Jan 2025 17:22:42 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 29FB3A1A7C6
+	for <lists+netdev@lfdr.de>; Thu, 23 Jan 2025 17:23:02 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id CB9461637B6
-	for <lists+netdev@lfdr.de>; Thu, 23 Jan 2025 16:22:40 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E5C973A4C94
+	for <lists+netdev@lfdr.de>; Thu, 23 Jan 2025 16:22:54 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C515020F973;
-	Thu, 23 Jan 2025 16:22:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6D7132116ED;
+	Thu, 23 Jan 2025 16:22:57 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="VMldHYof"
+	dkim=pass (1024-bit key) header.d=weissschuh.net header.i=@weissschuh.net header.b="OVdQG0EY"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from todd.t-8ch.de (todd.t-8ch.de [159.69.126.157])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9F6C91C5D4D
-	for <netdev@vger.kernel.org>; Thu, 23 Jan 2025 16:22:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CDE521C5D4D;
+	Thu, 23 Jan 2025 16:22:52 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=159.69.126.157
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1737649358; cv=none; b=aJBjeNiGpBHa06EzW8VVZ0wqNKnJ/RBnSWaKGg/B39Jy03s4+uapMDbKQ5C65UzDCr40qFG8868d/hcH7BXiaGd93DrWaOOQQ2AxRCMLf1cnHeTw4vxeJ2ImMO91yvpglnfZZhQtRcGdSqxCglZ983Hnngy2RzkvsNtTo6sP2bI=
+	t=1737649377; cv=none; b=sdtZqZRd4dwvIec6ZjS5yB/rBc0c9nR8TlMD5YTwBkXoM4dRoybxGQrDthIsxKzutVrLFZMfzE4oJsHzvTw1c/7NiIp+e7AkPSZHIpXITH6sKSJt+s+KBsBEneNIQTXUN8qIdhffU799uJa9dI/N/qI0QrLZ9xXja7QBIEH0D0w=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1737649358; c=relaxed/simple;
-	bh=/glhc3ybED5ZMc803T1L/QTRYPesfVx533/bDfzoC0w=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=GTJwjfxYFjLbKtyqHvsdZaUEvrOv3UtWgl4gDJb53dYt4qa+nTxHZ1LaSt/FayJvSyRoe8A826jradECrC8h8PwgsQYWaYmPqrJLyJtpDo52rIwWNXAAABazbc3bVjaVEdMBet/x/4pjeLgSkynbTfmSVuYilpU0fT1+eV2k9U0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=VMldHYof; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 09B66C4CED3;
-	Thu, 23 Jan 2025 16:22:38 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1737649358;
-	bh=/glhc3ybED5ZMc803T1L/QTRYPesfVx533/bDfzoC0w=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=VMldHYofCbW38BNX1YUfvecOicVyPgFiXJg2jcNkdpayBvmo8WRtNJpZqmru/6uzh
-	 iTiMpvefQNCcqO8DzrD3OhXLSSBp5iOCpt1deU9QqaKIgia7wB1Emu4u5UGL8BDKjd
-	 ROiUgfd3yg1z5Z+YOtnJYTua02Gz6xehSEa56xl6v0Mj7NY7gYdzjoYEuM9Dkz7JeG
-	 fMIsstXqs7nKjMvM+sgiKAPnSO6Ec08MrMNVvioXJElM/xdQBh8IoAwv8fMLIqPgXL
-	 e4lJ6fHvIMffdJfeH/7hkwnzqvedsPMFTZ69CNyKFtYns6HtYBC354n0g2Z8DmLYly
-	 rrWvT5lzwkxlg==
-Date: Thu, 23 Jan 2025 08:22:37 -0800
-From: Jakub Kicinski <kuba@kernel.org>
-To: Eric Dumazet <edumazet@google.com>
-Cc: davem@davemloft.net, netdev@vger.kernel.org, pabeni@redhat.com,
- andrew+netdev@lunn.ch, horms@kernel.org, michael.chan@broadcom.com,
- pavan.chebbi@broadcom.com, ap420073@gmail.com
-Subject: Re: [PATCH net-next v2 5/7] net: ethtool: populate the default HDS
- params in the core
-Message-ID: <20250123082237.27c5fc40@kernel.org>
-In-Reply-To: <CANn89i+a_DfERsqHbi6Uu9uzCsN+wKh7WXr6Xh957Cs86ThS9A@mail.gmail.com>
-References: <20250119020518.1962249-1-kuba@kernel.org>
-	<20250119020518.1962249-6-kuba@kernel.org>
-	<CANn89i+a_DfERsqHbi6Uu9uzCsN+wKh7WXr6Xh957Cs86ThS9A@mail.gmail.com>
+	s=arc-20240116; t=1737649377; c=relaxed/simple;
+	bh=N6HZrAsYICGN9MzebeZPm2VLnTBchujah17HfU33zjc=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=EOF3s8XdpnqS8Xc4QsJyPDA4yIH0UEcuXNVigtEV9VMh/1YMjXqNt2gCgv3irPqcNIim818CW9tNayNomkUV3ExQmzx0EaKulWYjxUnbJ1HCSqbGJ5NWPolOdv1q1Nzw+FaWsaK0Js7ZJUM3OgNTtGK6+8SIoTIGmwAAyARx3NM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=weissschuh.net; spf=pass smtp.mailfrom=weissschuh.net; dkim=pass (1024-bit key) header.d=weissschuh.net header.i=@weissschuh.net header.b=OVdQG0EY; arc=none smtp.client-ip=159.69.126.157
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=weissschuh.net
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=weissschuh.net
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=weissschuh.net;
+	s=mail; t=1737649370;
+	bh=N6HZrAsYICGN9MzebeZPm2VLnTBchujah17HfU33zjc=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=OVdQG0EYhyJoVMggmIPGVJN5Kz1UNA8Vd9HJ4dFpeKJ1liSRMc0efxIpxSLpkR8p+
+	 0P7x3WDUSNboHWlpUe7Nr6taiXVz98XIqgkUHuClYOuxZAd8z+Yh7vMW5DovyY+IK6
+	 qfV8x8MND8+WBwTpTeV74XB9E59zgCFBMfSz7slg=
+Date: Thu, 23 Jan 2025 17:22:49 +0100
+From: Thomas =?utf-8?Q?Wei=C3=9Fschuh?= <linux@weissschuh.net>
+To: Arnd Bergmann <arnd@arndb.de>, 
+	Richard Cochran <richardcochran@gmail.com>
+Cc: Andrew Lunn <andrew+netdev@lunn.ch>, 
+	"David S . Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+	Anna-Maria Gleixner <anna-maria@linutronix.de>, Frederic Weisbecker <frederic@kernel.org>, 
+	Thomas Gleixner <tglx@linutronix.de>, John Stultz <johnstul@us.ibm.com>, 
+	Netdev <netdev@vger.kernel.org>, linux-kernel@vger.kernel.org, 
+	Cyrill Gorcunov <gorcunov@gmail.com>, stable@vger.kernel.org
+Subject: Re: [PATCH] posix-clock: Explicitly handle compat ioctls
+Message-ID: <82861179-dfd5-4330-86cb-048d124487b0@t-8ch.de>
+References: <20250121-posix-clock-compat_ioctl-v1-1-c70d5433a825@weissschuh.net>
+ <603100b4-3895-4b7c-a70e-f207dd961550@app.fastmail.com>
+ <Z5Ebh4pbOUGh64BS@hoboy.vegasvil.org>
+ <0ecf1a72-d6ae-46ab-ad20-c088c6888747@app.fastmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <0ecf1a72-d6ae-46ab-ad20-c088c6888747@app.fastmail.com>
 
-On Thu, 23 Jan 2025 17:15:55 +0100 Eric Dumazet wrote:
-> I am unsure how to fix this, should all callers to
-> dev->ethtool_ops->get_ringparam()
-> have to populate  tcp_data_split and hds_thresh from dev->cfg,
-> or would the following fix be enough ?
+On 2025-01-22 18:15:13+0100, Arnd Bergmann wrote:
+> A simpler variant of the patch would move the switch/case logic
+> into posix_clock_compat_ioctl() and avoid the extra function
+> pointer, simply calling posix_clock_ioctl() with the modified
+> argument.
 
-I think the comparison in nsim_get_ringparam() should look at dev->cfg.
-If the used configuration (dev->cfg) is not set (UNKNOWN), our default
-is ENABLED.
+That would work, but be a layering violation.
+Or a "compat_mode" argument to ptp_ioctl()
+
+I'm fine with either approach.
+
+
+Thomas
 
