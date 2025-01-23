@@ -1,211 +1,205 @@
-Return-Path: <netdev+bounces-160675-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-160677-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 15AA8A1ACD1
-	for <lists+netdev@lfdr.de>; Thu, 23 Jan 2025 23:48:57 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3ED6CA1AD1E
+	for <lists+netdev@lfdr.de>; Fri, 24 Jan 2025 00:12:44 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id CB2A03AC4F5
-	for <lists+netdev@lfdr.de>; Thu, 23 Jan 2025 22:48:49 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id E5B6A188A264
+	for <lists+netdev@lfdr.de>; Thu, 23 Jan 2025 23:12:47 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7B9BC1CD219;
-	Thu, 23 Jan 2025 22:48:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C8D551D222B;
+	Thu, 23 Jan 2025 23:12:39 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=microsoft.com header.i=@microsoft.com header.b="FL4vlv2Z"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="VIyVEHuI"
 X-Original-To: netdev@vger.kernel.org
-Received: from CY3PR05CU001.outbound.protection.outlook.com (mail-westcentralusazon11023112.outbound.protection.outlook.com [40.93.201.112])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pj1-f73.google.com (mail-pj1-f73.google.com [209.85.216.73])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CEA9F3232;
-	Thu, 23 Jan 2025 22:48:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.93.201.112
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1737672530; cv=fail; b=kTLGezRCipbaM8t6nDNiOlU+zVwyVWBTfWRijWV+QY1Kaa4aHuTnF7qAS/8F2bUY/ZIPdeOP3tsdv68OOlXHdviSojeBCUmbazUpIuacqmyjzNb/K5faOoJK8jthPCTha1MLw+tUVhbY8IYnwkfMOkdXiwgXMMdR732EMGqzU8I=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1737672530; c=relaxed/simple;
-	bh=YKWrjNxFVoPka0gbmy9T7mrdifV7xpKzOi9jhvSo/FY=;
-	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
-	 Content-Type:MIME-Version; b=hSDtQyIf5eZWbSBUWjRewO4JuFFrcVp7SrGu7zRdkv2HG0clfoOguumaP+z/peUiNJHkVCccpqJuix/zYTd19R+kKrm8i7j9wcjGZntytdLaXAAapPizBzOeOvbCyLgoHXyXNLlpKmJ5lA3WGtFB8N13V30wo/xl+TLDYb4vd48=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microsoft.com; spf=pass smtp.mailfrom=microsoft.com; dkim=pass (1024-bit key) header.d=microsoft.com header.i=@microsoft.com header.b=FL4vlv2Z; arc=fail smtp.client-ip=40.93.201.112
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microsoft.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=microsoft.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=rNelyhkBJx87s2yh//nw0+IfVgACK/uu2kCD+V7gDLMkaLVMZZQ6TkpVytrvqJH/gZeSseGvqDVvWswzsU1ZoEHEW3Q3dlt9Fmithor7eHXBxonQhcvJeSH+PIwaGnIMO5iASG5uc8xaF2Jky8HljjwalC4t3ImufTVCIKaj4asdK9xbQpXlhmQtHpvtM4nCvwcJgoLpIiF8UaG/upOvp+bSfroGXf2xR9tgNEeFtJCzW8/8M5HuAFiKe01rQD3msEYgNrRDS8R6XXW6RSJsiygnMnqEDr2mIt562PGCe5IAvb7/5BcvRdR/cJFKReo4Tzzm0VpkAo+hBB/+0dVwFQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=3NY2DamcTsXbPRtJQlgqY07b+2TpjnewaT5xCfMnG+I=;
- b=QyS2RzYRTJuETTcnOkgMqKMdEd5rrtBchYGww7INKbU4AryrWV3ZEYbScvbP6bVqErsktfiQFK55EGmmlvWEgYGdac2ZRP9Gf5H8ClxKK50zgroKDuroI6RvX+xPKTO9LOsBDbs/hfrp2fVZ3joCk4FYERuvJirVCqB/7BmoJLnHCDZmWzUsiEgmOsNr7cxxkWvXszxIk0npvk8QVrsrCmwQUKD7yDxx4/85+2G2XbEgtMkuyByUPcZCNs2YMK2tqKsnBoURRvWy8cjf8YZC/PeKSTDv/8z2KAeUBDVCXHClleTwyu0qHiWsLbZIMt64O4pjpjplgjg9nI4LpyNY4g==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=microsoft.com; dmarc=pass action=none
- header.from=microsoft.com; dkim=pass header.d=microsoft.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=3NY2DamcTsXbPRtJQlgqY07b+2TpjnewaT5xCfMnG+I=;
- b=FL4vlv2ZgtUeZw4fqn1oBEUEXT+OD0GJfDVJXtPok91fR0Mb21PeBLhdX5RgBDKPp95tDP9HnBExSOd7BRMwOZicFZdDKxZI4CDHhNUdoajzIE2OGHFj84Lq9SVM63/14IaZt+qN5WlAwBNs0HewHFiLm5+hnlOGTWYvZwftPT0=
-Received: from SA6PR21MB4231.namprd21.prod.outlook.com (2603:10b6:806:412::20)
- by MN0PR21MB3556.namprd21.prod.outlook.com (2603:10b6:208:3d3::12) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8398.9; Thu, 23 Jan
- 2025 22:48:46 +0000
-Received: from SA6PR21MB4231.namprd21.prod.outlook.com
- ([fe80::5c62:d7c6:4531:3aff]) by SA6PR21MB4231.namprd21.prod.outlook.com
- ([fe80::5c62:d7c6:4531:3aff%5]) with mapi id 15.20.8398.005; Thu, 23 Jan 2025
- 22:48:46 +0000
-From: Long Li <longli@microsoft.com>
-To: Konstantin Taranov <kotaranov@linux.microsoft.com>, Konstantin Taranov
-	<kotaranov@microsoft.com>, Shiraz Saleem <shirazsaleem@microsoft.com>,
-	"pabeni@redhat.com" <pabeni@redhat.com>, Haiyang Zhang
-	<haiyangz@microsoft.com>, KY Srinivasan <kys@microsoft.com>,
-	"edumazet@google.com" <edumazet@google.com>, "kuba@kernel.org"
-	<kuba@kernel.org>, "davem@davemloft.net" <davem@davemloft.net>, Dexuan Cui
-	<decui@microsoft.com>, "wei.liu@kernel.org" <wei.liu@kernel.org>,
-	"sharmaajay@microsoft.com" <sharmaajay@microsoft.com>, "jgg@ziepe.ca"
-	<jgg@ziepe.ca>, "leon@kernel.org" <leon@kernel.org>
-CC: "linux-rdma@vger.kernel.org" <linux-rdma@vger.kernel.org>,
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-	"netdev@vger.kernel.org" <netdev@vger.kernel.org>,
-	"linux-hyperv@vger.kernel.org" <linux-hyperv@vger.kernel.org>
-Subject: RE: [PATCH rdma-next 08/13] net/mana: fix warning in the writer of
- client oob
-Thread-Topic: [PATCH rdma-next 08/13] net/mana: fix warning in the writer of
- client oob
-Thread-Index: AQHba2CVL6AquS7CykeBekAIiBLkYbMk+xfQ
-Date: Thu, 23 Jan 2025 22:48:45 +0000
-Message-ID:
- <SA6PR21MB4231E9223002447E72150F78CEE02@SA6PR21MB4231.namprd21.prod.outlook.com>
-References: <1737394039-28772-1-git-send-email-kotaranov@linux.microsoft.com>
- <1737394039-28772-9-git-send-email-kotaranov@linux.microsoft.com>
-In-Reply-To: <1737394039-28772-9-git-send-email-kotaranov@linux.microsoft.com>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach:
-X-MS-TNEF-Correlator:
-msip_labels:
- MSIP_Label_f42aa342-8706-4288-bd11-ebb85995028c_ActionId=186d0aae-59fe-4506-bafa-1df3d468cca6;MSIP_Label_f42aa342-8706-4288-bd11-ebb85995028c_ContentBits=0;MSIP_Label_f42aa342-8706-4288-bd11-ebb85995028c_Enabled=true;MSIP_Label_f42aa342-8706-4288-bd11-ebb85995028c_Method=Standard;MSIP_Label_f42aa342-8706-4288-bd11-ebb85995028c_Name=Internal;MSIP_Label_f42aa342-8706-4288-bd11-ebb85995028c_SetDate=2025-01-23T22:48:30Z;MSIP_Label_f42aa342-8706-4288-bd11-ebb85995028c_SiteId=72f988bf-86f1-41af-91ab-2d7cd011db47;MSIP_Label_f42aa342-8706-4288-bd11-ebb85995028c_Tag=10,
- 3, 0, 1;
-authentication-results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=microsoft.com;
-x-ms-publictraffictype: Email
-x-ms-traffictypediagnostic: SA6PR21MB4231:EE_|MN0PR21MB3556:EE_
-x-ms-office365-filtering-correlation-id: e67352da-21b1-4d74-14ff-08dd3c00181b
-x-ms-exchange-senderadcheck: 1
-x-ms-exchange-antispam-relay: 0
-x-microsoft-antispam:
- BCL:0;ARA:13230040|1800799024|376014|7416014|366016|921020|38070700018;
-x-microsoft-antispam-message-info:
- =?us-ascii?Q?RU7LHG5hYnMbeFIoGOLO9SZFH0DlQNwd35YIyYBgp/+wpnzfQ4ch+lqI9tWb?=
- =?us-ascii?Q?wKkNiVSMxKCnxZWWoXVjL+RLNFChSGKtYV2XtnQvJkWZDKzxZ0EaKbtih706?=
- =?us-ascii?Q?peeQ/lAPbfbROl24py6LleOWSJ94lyXTociyq+5CIdBj1TKgy4DRXpjNmITv?=
- =?us-ascii?Q?r7SiZW3JmrobqxUYvoyGE1ycR+Fhjo9jXDnPvhXkS2PV5MNgmYfe7xKv1VB6?=
- =?us-ascii?Q?V6olT+wnKMsTmJ9qxGgCPCp73e1paNhKYN3EHvAZ5pU+x/WvvOFCrEdEUL2X?=
- =?us-ascii?Q?g61qD/apf4+OWkB8jJ9RMSTFZZeP44MGSC7FABxWWksPI6FeITAFEzKJMCGU?=
- =?us-ascii?Q?OVeN4ullHYNGtT62VGKxxMRCfZVIK6voQ5Y+7RqTHnRtcPg+rTvmhUVFXF2W?=
- =?us-ascii?Q?ZxUORvErUBQgYEKDgaD4fTQx5b1N+HMgKGYAx5qbeCsm2+0ZorVRUsXb7B6u?=
- =?us-ascii?Q?02rl7PJLUVrJzHn+utuGaDGNo3kU3MwjSrRDl6jCmpKnn35yjybMpwYWV4nG?=
- =?us-ascii?Q?lqc86PAwkhfkjBnvSgiQ02Wat+UsHcizKA1XAuE9le4XDG1DjSkzGOkNjHPU?=
- =?us-ascii?Q?xcRBIqKYKFkawj7Jlj47oBxB4LKFVep6h+LJTD7wuo/MI+LRA+wCI8W8bUxx?=
- =?us-ascii?Q?PMPteGDOXJswhBf+1x5BxUNWSkbrNJWiVIaAvEy3xiErbVhBzLLlTdDqsyP5?=
- =?us-ascii?Q?MUfhkSl4dk0STycvi9OBo+kouDc2R3BjASTNXl4mTCQZnQ/QOhnHoHvMRe/f?=
- =?us-ascii?Q?yjKIbFBzL3sVYIS7VXwrnFnqZx1IdDiaKOsm8xC8XUGxQXwjBApWvN0ZUBDD?=
- =?us-ascii?Q?p7hWLsAJ5QIVuudsljcXZ6Hupxs2jgMac+Tfm/Yqz6Az7LbOn1GaAL0VlLMq?=
- =?us-ascii?Q?JrrvuYAfwuaaF3xNEpRl6mbdkPrwo2m8Bm6pZsahqElp4hiqj20yf9GBDNAo?=
- =?us-ascii?Q?Oq9HZlcAyo3ijhcTy+/tQlUakla3gYOuiCik6iLvRhtWmGmxKnbrAgvs7HYT?=
- =?us-ascii?Q?dNi/hvzD6jahAmbbN3kHAy0EJABQ5g0Er5cR9pDxZGI8vByreZF9AdWp5eJ/?=
- =?us-ascii?Q?zI88K4/xl5pwbWShtj3U2pOc5IXz/A03tnLR/LSO8GxsLSmWj/NVzwKbvOD6?=
- =?us-ascii?Q?Dlstf/fQC9Yguin945bCLSGtInwteID2t17CREyYbHJE3+aPZt+aMPJjii68?=
- =?us-ascii?Q?TgGA8FKUQcXcbGyirXsnNeYPqGvgFl4rf2nzdjfhc9lqcjSh8vESnXVzdJD0?=
- =?us-ascii?Q?gNU682fwHdEyA8NaygBsxni+VUUsYHAp8kenzp8OkvXdEhIMhDpcjsqF6bvu?=
- =?us-ascii?Q?XB7CTiujDkwsoy/4hWtIeLqVS3WPcg/ykvJIBUDcUGy8ap4M0LWvPybdMhsw?=
- =?us-ascii?Q?bNnr3N19KavUwIodMN+UUQDPKZU0ABOqSU3VCQ8UGFQ7hFNGaS5XY7ZzU0nu?=
- =?us-ascii?Q?14+iMprF0HoE2DS1U5iF6kRccbhSPt8F?=
-x-forefront-antispam-report:
- CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SA6PR21MB4231.namprd21.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(1800799024)(376014)(7416014)(366016)(921020)(38070700018);DIR:OUT;SFP:1102;
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0:
- =?us-ascii?Q?+JXt9MOAxadXQgQLknuZ4naYlRa9cuW8WyITb1jDuz7Dx97Lt+Xab10UpPCL?=
- =?us-ascii?Q?9SFUcmmkushsBn37BOieilWKPxqYZ4Z4T0gAZ1qgs7sToy2Hi6LeC66GRhtH?=
- =?us-ascii?Q?u1L73iCdHreb4NakfY7YcjYL1jpfnkaa2MdJOvxemN2Ok5jjDo4ThiCYNtQ7?=
- =?us-ascii?Q?AnQfzkeBvM0GcNVFGLtUDBJL+pOT3bQIs/iRN/HUkddo9pWnzI54aQOXU0Zm?=
- =?us-ascii?Q?Iy0VT1EWQJ18X0E85xYf79xROVfTMaqX2SCNvlXNDjQ4mbZBdNC8xoQskrgN?=
- =?us-ascii?Q?hmbqpZy+0kHIn+RSVfRttkn2HLfw0wBeGiVle/KqpITFkdBp/pegXf13h4Wo?=
- =?us-ascii?Q?1RKfnUnwzfKW0kps7ZLFuWOu/ckBjEsACPaqLFUmLhgnT6rg0hvw50XoL0Pz?=
- =?us-ascii?Q?T6Abzo4W7nwLU2s478Slra1gh7u/4XhBttAjWgIPBe+sKSzvVyK4w/iIYe7q?=
- =?us-ascii?Q?JU6CRWInT4V54s1VwUbvuKYIgNzv/2QHGnUWDFLXzIu/jM+r1t/HK3sv53IT?=
- =?us-ascii?Q?VHQgEu4gZOzACGNG8aQDP+O+YjV/EXFVDnfS8hJe1iisHSmsuufypw77HPDs?=
- =?us-ascii?Q?ZWmoEcLn9rgNj4VcRP6kWcdJKzLos88eaDIuqKPmrydsHqo0/xgxafKilXSi?=
- =?us-ascii?Q?5QI/jhYfy7+5ahaiU4Xe3y2t1072jjT9hcz1HoTkEmx4NyU+qN18iWEXoM79?=
- =?us-ascii?Q?t8vbvaBPxVPxlCeqJibiZfbp579+U7muGYuoHFiA4WsMkdiUO16ifn7mJgPk?=
- =?us-ascii?Q?m1Kt6+sYN9uPZw0J80FWXye52NDSTcK1N3g9/Duc9QARJtfjRbyn14SV8c0F?=
- =?us-ascii?Q?RMZuE1IXzzNReZVlrfjK/x5zs/15Z6w2XWQAwaWh+164hldNmrjTpXZ5b++g?=
- =?us-ascii?Q?WMmuQYEnKefD4o3djW81vzTzVGv2cggA4gjadPAtTl5Fj0K0wOp8Dj9V9jI+?=
- =?us-ascii?Q?NsLivtjjRUCJZhSymY186wCqzNhKfEl2X+9BCocb9RpplWykwOkQ7trirP4n?=
- =?us-ascii?Q?ZqzNomin9RJ9OpP0CU5Ol6y4etbI3w8FcAp6ICrK2cYjAmwbiUFBzJJAZSn3?=
- =?us-ascii?Q?dphE69/xcXhHxSQOnkj3s0XHAIdxaqFC7fiw7HJJvkApsbotssra2futS4hU?=
- =?us-ascii?Q?oJe7jqh8XzVh8uOAzZpovp3iHFiV5fumkLOWwCTw9TQXGTXisBC87SDHmyVm?=
- =?us-ascii?Q?4Y7Im8/hnmxzH7h+z/4/fnc3VJwR0WBo2/R7gjtl5Q0zGSkdgU10noE3+sSs?=
- =?us-ascii?Q?rtE03bSBooNVOFHvZ+OLv+pu4A2izVKR3jje+txbii5o7JNes7otqC91xrwY?=
- =?us-ascii?Q?5sEe3PUEYH/Cd47M49AlOLwjz0d9hfUFYxcIMZ3u8W+ZrTKrKlKl8tY8RCBb?=
- =?us-ascii?Q?bYimYKSRN0TBneWg5slDQC1sQjxzSzcxTSW/zd0ETuHNMVl7rPPFCsMzdFn3?=
- =?us-ascii?Q?tFn83ASUIVg5Kbtn8ZRqfKmk2N6RIdZHCmmhA00/FX3gscjbtEhtrVbCjTdx?=
- =?us-ascii?Q?XbnWK0ld1d5TPVJ7J3EyF4qM8PBMp25EAgtfCeHmVuYXrcA5C+25aTrm2BQW?=
- =?us-ascii?Q?jAuw2CBXiY6CGYPxqsrM4hRDDFuV1wjVpuv1sFva?=
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 38441139CEF
+	for <netdev@vger.kernel.org>; Thu, 23 Jan 2025 23:12:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.73
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1737673959; cv=none; b=ozyXYdbHCG63peOk3XDGEv5ZMcx8ChiAIu+CPHqlJN43qWYxFWjYmmQfj5kM+7XjOKVawdyjMuevOjc4dh/g/eZx2JCFPWBhlffSt+/mwT0I1sLGTK+KT8GLPy45ZN/Z28/7G8TKgxOlX9EOpu6vb9OfzATXi7st24JxNRlUmqk=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1737673959; c=relaxed/simple;
+	bh=JQHRcENH+j6qiC6qeChHNpAzTsg0urhF7CpKb9v+rss=;
+	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=M0D6nS5cMIAAFDrzQh9NxHfGs5XNPJuF0PqPojOy3a3sWGqAMsimCVSaUjxLgKfvCwe7d/a0C0a/rl+qRMP2N1Ttx7sKKGlWtUiRkLMMxliRNNWuTZwkqCeDTNwk5Z3B0rW62tIPfovCccj/b9xD80r1ATp6Zm0rfnBn0oq+OTU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--skhawaja.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=VIyVEHuI; arc=none smtp.client-ip=209.85.216.73
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--skhawaja.bounces.google.com
+Received: by mail-pj1-f73.google.com with SMTP id 98e67ed59e1d1-2ef91d5c863so3053461a91.2
+        for <netdev@vger.kernel.org>; Thu, 23 Jan 2025 15:12:37 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1737673957; x=1738278757; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=HF4G1xyVJrDcJpcFoHM4c0Y75qeijYE/HkmrsCL2B8o=;
+        b=VIyVEHuIdqOsb64X3TEmRvgAAIewfN9EChTJ5IWuQvYgtRk0mG3fnmEp+HKZ07YSpb
+         UBI53FGZdxt7qwiWbZ2ylqTZBKMChTY4nYr/PmLI/J1Hutq1nHDVv6riEdC2arY6tjs1
+         oqzcyF+rOSsZsaLaFFhVqYl172EIHdvPDSq4WH4q4ccrIICzf5YdwN9j6dA1qQdig9Ok
+         BKBVYgSZme9rvwuSdFWbGbZttmM2HaZytLEBq9IHrxlb3lV9G71+M9c2PHHmxkCek72u
+         qtO5Xf9MnFi6wYV2N+t5TA1PjFKr1H8wkuixDzTZqakZxFz3ElmeJjBPHY9Z6lw+x7oF
+         Nsfg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1737673957; x=1738278757;
+        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=HF4G1xyVJrDcJpcFoHM4c0Y75qeijYE/HkmrsCL2B8o=;
+        b=kwt4xT6xEWqcV3u854v9Tg8aPugYMYnfdBbf8dM3hkBQvdEdpIo1xqkJKcUAlwZ3gs
+         wlwYjVzauVMLqj3fzySoG9UKWOjZImnHGufhOGWo7J800kH07PjpuyssgFN4+KI0kknX
+         xpY3DdkLLydyF6GmS4CrCBuytV99b/Qi3L0Y8/Qcl4DuRAYgzZUc0dxm/51rAVBFc43O
+         nMuN1g0jcjWRVNoAlTFChGQjO6almUIi7ar43DtGPlrgY0stKrrGjztvgw1dgiBLQtTL
+         XIE5uBngDxP79SqaNGJqhmlYgDZ8UMuRuz8usS1EiA0TH9rAomL2bFgNrjUp6MRqG2MV
+         Wsbg==
+X-Gm-Message-State: AOJu0YzjS5oCUCwwCRF4ZusaohcAA2pB5ERWcWINzBr0+6CpTSg1xOwN
+	AxAN3i1wzJivevajeDINe73ggiFdEA2cxnK1Z1xLiUULsP3vMTc9i7hgtmaUZ4ZDKrEwsVssQEE
+	uKDqnz6tAtg==
+X-Google-Smtp-Source: AGHT+IFyx+vpmFG7adIVWGvCGFeo+Yj/ZyWwb0ZYs0VF1yzGrWuDgvJ3dNchuJBFa0CFzOM6TleblCrdm8LwQw==
+X-Received: from pjbdy8.prod.google.com ([2002:a17:90b:6c8:b0:2ef:9239:aab1])
+ (user=skhawaja job=prod-delivery.src-stubby-dispatcher) by
+ 2002:a17:90b:56c7:b0:2ee:9b09:7d3d with SMTP id 98e67ed59e1d1-2f782c9a73emr37805987a91.19.1737673957421;
+ Thu, 23 Jan 2025 15:12:37 -0800 (PST)
+Date: Thu, 23 Jan 2025 23:12:32 +0000
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-X-OriginatorOrg: microsoft.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: SA6PR21MB4231.namprd21.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: e67352da-21b1-4d74-14ff-08dd3c00181b
-X-MS-Exchange-CrossTenant-originalarrivaltime: 23 Jan 2025 22:48:45.8518
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 72f988bf-86f1-41af-91ab-2d7cd011db47
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: VuEnmVsN253Rto5idNEkchZQ+nqW2mXXfoSEbVufzVIzWDOAVtGmf8eBLiOaxd/sY6sEDzmMV0bM4Me3p3L2tA==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: MN0PR21MB3556
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.48.1.262.g85cc9f2d1e-goog
+Message-ID: <20250123231236.2657321-1-skhawaja@google.com>
+Subject: [PATCH net-next v2 0/4] Add support to do threaded napi busy poll
+From: Samiullah Khawaja <skhawaja@google.com>
+To: Jakub Kicinski <kuba@kernel.org>, "David S . Miller " <davem@davemloft.net>, 
+	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, almasrymina@google.com
+Cc: netdev@vger.kernel.org, skhawaja@google.com
+Content-Type: text/plain; charset="UTF-8"
 
-> Subject: [PATCH rdma-next 08/13] net/mana: fix warning in the writer of c=
-lient
-> oob
->=20
-> From: Konstantin Taranov <kotaranov@microsoft.com>
->=20
-> Do not warn on missing pad_data when oob is in sgl.
->=20
-> Signed-off-by: Konstantin Taranov <kotaranov@microsoft.com>
-> Reviewed-by: Shiraz Saleem <shirazsaleem@microsoft.com>
+Extend the already existing support of threaded napi poll to do continuous
+busy polling.
 
-Reviewed-by: Long Li <longli@microsoft.com>
+This is used for doing continuous polling of napi to fetch descriptors from
+backing RX/TX queues for low latency applications. Allow enabling of threaded
+busypoll using netlink so this can be enabled on a set of dedicated napis for
+low latency applications.
 
-> ---
->  drivers/net/ethernet/microsoft/mana/gdma_main.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
->=20
-> diff --git a/drivers/net/ethernet/microsoft/mana/gdma_main.c
-> b/drivers/net/ethernet/microsoft/mana/gdma_main.c
-> index 3cb0543..a8a9cd7 100644
-> --- a/drivers/net/ethernet/microsoft/mana/gdma_main.c
-> +++ b/drivers/net/ethernet/microsoft/mana/gdma_main.c
-> @@ -1042,7 +1042,7 @@ static u32 mana_gd_write_client_oob(const struct
-> gdma_wqe_request *wqe_req,
->  	header->inline_oob_size_div4 =3D client_oob_size / sizeof(u32);
->=20
->  	if (oob_in_sgl) {
-> -		WARN_ON_ONCE(!pad_data || wqe_req->num_sge < 2);
-> +		WARN_ON_ONCE(wqe_req->num_sge < 2);
->=20
->  		header->client_oob_in_sgl =3D 1;
->=20
-> --
-> 2.43.0
+It allows enabling NAPI busy poll for any userspace application
+indepdendent of userspace API being used for packet and event processing
+(epoll, io_uring, raw socket APIs). Once enabled user can fetch the PID
+of the kthread doing NAPI polling and set affinity, priority and
+scheduler for it depending on the low-latency requirements.
+
+Currently threaded napi is only enabled at device level using sysfs. Add
+support to enable/disable threaded mode for a napi individually. This can be
+done using the netlink interface. Extend `napi-set` op in netlink spec that
+allows setting the `threaded` attribute of a napi.
+
+Extend the threaded attribute in napi struct to add an option to enable
+continuous busy polling. Extend the netlink and sysfs interface to allow
+enabled/disabling threaded busypolling at device or individual napi level.
+
+We use this for our AF_XDP based hard low-latency usecase using onload
+stack (https://github.com/Xilinx-CNS/onload) that runs in userspace. Our
+usecase is a fixed frequency RPC style traffic with fixed
+request/response size. We simulated this using neper by only starting
+next transaction when last one has completed. The experiment results are
+listed below,
+
+Setup:
+
+- Running on Google C3 VMs with idpf driver with following configurations.
+- IRQ affinity and coalascing is common for both experiments.
+- There is only 1 RX/TX queue configured.
+- First experiment enables busy poll using sysctl for both epoll and
+  socket APIs.
+- Second experiment enables NAPI threaded busy poll for the full device
+  using sysctl.
+
+Non threaded NAPI busy poll enabled using sysctl.
+```
+echo 400 | sudo tee /proc/sys/net/core/busy_poll
+echo 400 | sudo tee /proc/sys/net/core/busy_read
+echo 2 | sudo tee /sys/class/net/eth0/napi_defer_hard_irqs
+echo 15000  | sudo tee /sys/class/net/eth0/gro_flush_timeout
+```
+
+Results using following command,
+```
+sudo EF_NO_FAIL=0 EF_POLL_USEC=100000 taskset -c 3-10 onload -v \
+		--profile=latency ./neper/tcp_rr -Q 200 -R 400 -T 1 -F 50 \
+		-p 50,90,99,999 -H <IP> -l 10
+
+...
+...
+
+num_transactions=2835
+latency_min=0.000018976
+latency_max=0.049642100
+latency_mean=0.003243618
+latency_stddev=0.010636847
+latency_p50=0.000025270
+latency_p90=0.005406710
+latency_p99=0.049807350
+latency_p99.9=0.049807350
+```
+
+Results with napi threaded busy poll using following command,
+```
+sudo EF_NO_FAIL=0 EF_POLL_USEC=100000 taskset -c 3-10 onload -v \
+                --profile=latency ./neper/tcp_rr -Q 200 -R 400 -T 1 -F 50 \
+                -p 50,90,99,999 -H <IP> -l 10
+
+...
+...
+
+num_transactions=460163
+latency_min=0.000015707
+latency_max=0.200182942
+latency_mean=0.000019453
+latency_stddev=0.000720727
+latency_p50=0.000016950
+latency_p90=0.000017270
+latency_p99=0.000018710
+latency_p99.9=0.000020150
+```
+
+Here with NAPI threaded busy poll in a separate core, we are able to
+consistently poll the NAPI to keep latency to absolute minimum. And also
+we are able to do this without any major changes to the onload stack and
+threading model.
+
+v2:
+ - Add documentation in napi.rst.
+ - Provide experiment data and usecase details.
+ - Update busy_poller selftest to include napi threaded poll testcase.
+ - Define threaded mode enum in netlink interface.
+ - Included NAPI threaded state in napi config to save/restore.
+
+Samiullah Khawaja (4):
+  Add support to set napi threaded for individual napi
+  net: Create separate gro_flush helper function
+  Extend napi threaded polling to allow kthread based busy polling
+  selftests: Add napi threaded busy poll test in `busy_poller`
+
+ Documentation/ABI/testing/sysfs-class-net     |   3 +-
+ Documentation/netlink/specs/netdev.yaml       |  14 ++
+ Documentation/networking/napi.rst             |  80 ++++++++++-
+ .../net/ethernet/atheros/atl1c/atl1c_main.c   |   2 +-
+ include/linux/netdevice.h                     |  24 +++-
+ include/uapi/linux/netdev.h                   |   7 +
+ net/core/dev.c                                | 127 ++++++++++++++----
+ net/core/net-sysfs.c                          |   2 +-
+ net/core/netdev-genl-gen.c                    |   5 +-
+ net/core/netdev-genl.c                        |   9 ++
+ tools/include/uapi/linux/netdev.h             |   7 +
+ tools/testing/selftests/net/busy_poll_test.sh |  25 +++-
+ tools/testing/selftests/net/busy_poller.c     |  14 +-
+ 13 files changed, 282 insertions(+), 37 deletions(-)
+
+-- 
+2.48.1.262.g85cc9f2d1e-goog
 
 
