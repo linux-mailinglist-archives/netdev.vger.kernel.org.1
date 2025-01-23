@@ -1,144 +1,126 @@
-Return-Path: <netdev+bounces-160556-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-160557-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id A3296A1A27D
-	for <lists+netdev@lfdr.de>; Thu, 23 Jan 2025 12:03:57 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 12AF6A1A27F
+	for <lists+netdev@lfdr.de>; Thu, 23 Jan 2025 12:04:17 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 752DB16B235
-	for <lists+netdev@lfdr.de>; Thu, 23 Jan 2025 11:03:43 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 5CA1B160A53
+	for <lists+netdev@lfdr.de>; Thu, 23 Jan 2025 11:04:15 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 637FF20DD7F;
-	Thu, 23 Jan 2025 11:02:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4335B20CCE6;
+	Thu, 23 Jan 2025 11:04:12 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="EBysC/vv"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="HK5iadzA"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pj1-f42.google.com (mail-pj1-f42.google.com [209.85.216.42])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ADE531C5F14
-	for <netdev@vger.kernel.org>; Thu, 23 Jan 2025 11:02:43 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C81E820E009;
+	Thu, 23 Jan 2025 11:04:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.42
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1737630165; cv=none; b=etwT3+wAZFj0Cn5Jh0UHddbsCD0uMCgKrxOCQowXAuXNoT2taQdGzy6R/iitlxWczMN/jG/irkhFVELnbmIyTjon9lE+NIRgm1ooNzCxbnk3bCzgM3JUUpn0MLNPGRw80HjQSotsaYIh3vf7gX2wi0TPeOjuf5mNy9KIPLgKg9c=
+	t=1737630252; cv=none; b=ugEOmoDQiINQWV+myGFipHaXVLW5Pm5uNaTjg09PP8clnnp3qSeF9G1npGvdiAQpfgrE3P8Bki5XepPBFS0weLNmasGrXdwQz7C+XfBIzCcLADrZyhqwt9unzAN+GBgA74bh+cbm+yJIXbjsxbo2s+YQNmGNUv2rl6LKZrev81w=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1737630165; c=relaxed/simple;
-	bh=/CrwkM6sz8EQ7DFhmCxDvR35R1xgL/CrolRfxoB8HSA=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=JgP8W3oVP53ENfJ384vQzsb5qLK+0HtfxHj+oYlBDmV39by49ZwryYmB0D6o/TnswcIfoSB3N3U9ZDxsmNFNvJhslCfGK49ThaVuy+WESAo+VkEnUYI84Whf6B7JJgqe+12pvIjSrJkZwbIo5Gdbn0RIqsT0ui3cT7B1UwfknZM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=EBysC/vv; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1737630162;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=v+HvkadESYr+6YZ6rJIaWxe2n6B1oB6eTw6RXzewGEk=;
-	b=EBysC/vvlL0ACxe+XlmBdVVqvlKdbyiAzBJ6dIvXbyTdfMKiRoQIq3z7g+ULUu/aivSGli
-	58ORL354TdNltvFOPIIkK6ZpT9wts100PjXb4YCQdda4IrXRzUo8qMhkT2xdAlNb+FvuRV
-	/kUKaFGZny4lkGSOL0Xd4bjZT8fLz5Q=
-Received: from mail-qt1-f199.google.com (mail-qt1-f199.google.com
- [209.85.160.199]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-623-rkQVxV61OCyEyITzm7YS2Q-1; Thu, 23 Jan 2025 06:02:41 -0500
-X-MC-Unique: rkQVxV61OCyEyITzm7YS2Q-1
-X-Mimecast-MFC-AGG-ID: rkQVxV61OCyEyITzm7YS2Q
-Received: by mail-qt1-f199.google.com with SMTP id d75a77b69052e-4678b42cbfeso16248091cf.3
-        for <netdev@vger.kernel.org>; Thu, 23 Jan 2025 03:02:41 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1737630161; x=1738234961;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+	s=arc-20240116; t=1737630252; c=relaxed/simple;
+	bh=Fzo06p7LbGOK4VfFKjg4NmV51POOKOUCBXzkkK9h//o=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=D3MQR2LvXi5Cf3iFPjgNV5ituLMyYfFoFxZDQen3o++OSV9sKx6gF8mhwN1PrexZVjejojXHD9XgaLvG1733RIwOpE7oV2fIYONvCyXFA+nTuKbaAGPLuGF8qH3MwVWbmtpj1MpwH6VeVT7aqLXu24ghvSYmrbGOH1D/VnXJj1g=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=HK5iadzA; arc=none smtp.client-ip=209.85.216.42
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pj1-f42.google.com with SMTP id 98e67ed59e1d1-2f45526dea0so180202a91.1;
+        Thu, 23 Jan 2025 03:04:10 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1737630250; x=1738235050; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=v+HvkadESYr+6YZ6rJIaWxe2n6B1oB6eTw6RXzewGEk=;
-        b=iH/7Atam7qB6xR9thnlWWMuvKF4NgFc6Eu3aP2i54RT+vJzkHZLfGVYM/Zjt54Zw5i
-         4neIQmm6e0BXMDMuqixPNk69BcQ5hL8vMcOflIMUX3wwOlKLjPU2Vn8zZ32+NvAwVsM2
-         iQWznpVaJCBZCOyWC46ilbpXbijblUPZ4wWZl3VpTkkmWZaNs5Z46cXrG6ZBmKNHBMIb
-         ZCHWfl+fW5dLHotRYbxkktzipPmgf8JAilRqyL8MUvDtTKAGRqUJPEB/9hkJVUiUPFHi
-         uViCCLCauIXTsjMeDICUed9VR4s06cvHLBn/E7yxDMCunScTkzxPPNqYmURa8Rir6bUB
-         2oCg==
-X-Forwarded-Encrypted: i=1; AJvYcCWDlbjxOj3b2TydB+4DEYnaiYlMt8CfmeyaPuKWYKh2p92hp9d52T38dWnUUWn6RnG3BO5Pm2Y=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxFyWqqi7QBmO1JR2ALY3FNMJOltCi0ezdGK/MDDW9IlSWi32ca
-	9K3t7ywu6toX0hpvLGkR/KwoVFHL2JJyyTt7OJwOEuPhpyFq5fwuXECKijparxe/gv6TLc0W710
-	cTaNayZR8516xokVcs+deed95ZuL+dRh3P8/7BDdzD5lxhCRtspYm+w==
-X-Gm-Gg: ASbGnct+1vdmMkJ7dy1HvqiTHqgGpT7v9PV6440PCVb2tWlNWj8L6CXT0jviu92aRVJ
-	Xl+4nMPIdAK6h8lK2S9/oFr9cEkaf2dHnXjcHpDVylYcOv6v33bFS/xWq+/b/fdWUj6eIWLynVP
-	5Q4uPxy6O7A5ElUrR9YbwQQms6kiGcpkJFQMYYUfCWKQlQqXxcmI1oXjyRBNwrAV6c845gp9eUW
-	ih6/CU+590hJ3jPCEBw6GUtlfMQVO6jUXR0cNyRpr326nz3zrcN2ArW+WGHzuMNoDoOzuEb5w==
-X-Received: by 2002:a05:622a:4c:b0:467:83f1:71d9 with SMTP id d75a77b69052e-46e1286bcc9mr358386761cf.0.1737630160793;
-        Thu, 23 Jan 2025 03:02:40 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IEEUGOo95N96L61xTsUy34Z9+f6t8bmMxBiZJynEMpKPrd7zIV5A5PAboah2tdpaVZIp0UhLw==
-X-Received: by 2002:a05:622a:4c:b0:467:83f1:71d9 with SMTP id d75a77b69052e-46e1286bcc9mr358386551cf.0.1737630160493;
-        Thu, 23 Jan 2025 03:02:40 -0800 (PST)
-Received: from leonardi-redhat ([176.206.32.19])
-        by smtp.gmail.com with ESMTPSA id d75a77b69052e-46e102ec2d9sm73508861cf.12.2025.01.23.03.02.38
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 23 Jan 2025 03:02:40 -0800 (PST)
-Date: Thu, 23 Jan 2025 12:02:36 +0100
-From: Luigi Leonardi <leonardi@redhat.com>
-To: Michal Luczaj <mhal@rbox.co>
-Cc: Stefano Garzarella <sgarzare@redhat.com>, 
-	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, 
-	George Zhang <georgezhang@vmware.com>, Dmitry Torokhov <dtor@vmware.com>, Andy King <acking@vmware.com>, 
-	netdev@vger.kernel.org
-Subject: Re: [PATCH net v2 3/6] vsock/test: Introduce vsock_bind()
-Message-ID: <gkgrd5zpqow4jn2dzr4svh2xu2tfhzucqjv5wavnqrq3qa34uj@x3lv7qy27t2m>
-References: <20250121-vsock-transport-vs-autobind-v2-0-aad6069a4e8c@rbox.co>
- <20250121-vsock-transport-vs-autobind-v2-3-aad6069a4e8c@rbox.co>
- <xzvqojpgicztj3waxetzemx5kzmjy57yl5hv5t7y2sh4bda27l@wwvuhac6zkgg>
- <64fcd0af-a03b-47d5-960d-4326289023a5@rbox.co>
+        bh=Fzo06p7LbGOK4VfFKjg4NmV51POOKOUCBXzkkK9h//o=;
+        b=HK5iadzAbSEOl+9/YoFLR0A5r8Q9nEsH6QtVrhX6ttBmiPtPeCcJGj0rstV9QKFUFe
+         Twwmt10WhnoHHp+wtRWEVemKtpJwWTI3YuWjw+q7Tay7+XVU1GnZguZvZvOiFDzEHMCf
+         gFDlihhd8hkL16xZJbxVOuTmY0DgVcNvw685CxU7Wyc47k9eNIF2pBtJHlKcwwPiDkqE
+         YowNouP4+0+4e/YsixVi4Wfq3jtCGE4V+PwBKYGo8KqFZvyyzTVi9TYJi5CvYVBVNb6P
+         /Yw2BW2Vy709YZ+TSKArYw8z08emoHrvN6piZ3bfOuHPvYie+SMUzGoIud1Ei05pobiq
+         Ovcw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1737630250; x=1738235050;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=Fzo06p7LbGOK4VfFKjg4NmV51POOKOUCBXzkkK9h//o=;
+        b=lum1Z2sBhKrJ27sPB3gak3OYz7B6TlBn3mj4TpmMo4HZ7kTc9/kp2xUjfsdUuuNrba
+         k8/enSVQKJ+5LO9XFu1I2ahJGoXaTE7cRs07dIUajoPKp2KJucEvqQgvZFkQaJOG98BR
+         s9nSYZ39JF5698isXIRr9oDB1f6+5Hv9hSTA895GhMhf+Xe771Z7x6EBpBW+3iBe7xzm
+         EtR3i/bddgMn3ImfmXImTFb0haI9cl1jkl9V3Dg6HPmZsXOSbTCTf3hoin+BHkrXMU31
+         SOZ+DTy3ujmDIQFPA/Qu+oMj4acjG5JZYkAVlXU6ZqGJTP+knuW643/Q5SZQbI59fcxV
+         a0XQ==
+X-Forwarded-Encrypted: i=1; AJvYcCULsxgU4D+ZasEVs1n3UJjP/ggN9N6CYIgBeLDF3kyTI3hePoDLyFSh0QDC4lDoiWY7zqcTKLqB5C7bPsw=@vger.kernel.org, AJvYcCVWqufx/avNYgnuO9KN5ewWf1AiYlv8OlULzaW1mKGh2Q8ElJdWU7k9IrwVPpblEHjBqMEHd+GU@vger.kernel.org, AJvYcCX95miUE0r6PllEhD4CR+TNdhpQKTXghJ19Ka1IleMhF8Uded7miZExLgo2V9ChO4dVeetw4e+WqubDMgmlY4E=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yzd4HZSxYAXlWymzzyKb9z7swd8ORs2LFIFNTEXUINcGL7T/0w+
+	IXdqWqnI6YvLuxVjUQmSI/aOO2mI5KDEeGpAW53tmxv9t1yDZXtOkwXfqXC9V6+/Ouey8Dqwch0
+	yLjINSTaabvXtHaMnWMlgyTwF5IN5pgZ2
+X-Gm-Gg: ASbGncsCZfefv/GYqELXs60Je7JT6l7oTERZJUVJ6IL7Vlr4CjBTxYNRWUFzg6puPOL
+	F7zhcxdSWND3qHD6rfKgOYZQrYfg76uk07YO0863ouanvwWfp/mqw2Zfr+kdZ6A==
+X-Google-Smtp-Source: AGHT+IErE7Mk/Hv4lR4bn+1BCQ6wuArrQjSwSOVt/rGhgOGYV9tJ4eUVFee3uzk+5C0oyr/HJR2OHgdGbydMLnxUp/A=
+X-Received: by 2002:a17:90b:534c:b0:2ea:5e0c:2851 with SMTP id
+ 98e67ed59e1d1-2f782b06d93mr13769040a91.0.1737630249985; Thu, 23 Jan 2025
+ 03:04:09 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii; format=flowed
-Content-Disposition: inline
-In-Reply-To: <64fcd0af-a03b-47d5-960d-4326289023a5@rbox.co>
+References: <CAH5fLghgcJV6gLvPxJVvn8mq4ZN0jGF16L5w-7nDo9TGNAA86w@mail.gmail.com>
+ <20250122.194405.1742941306708932313.fujita.tomonori@gmail.com>
+ <Z5HpvAMd6mr-6d9k@boqun-archlinux> <20250123.174011.1712033125728284549.fujita.tomonori@gmail.com>
+In-Reply-To: <20250123.174011.1712033125728284549.fujita.tomonori@gmail.com>
+From: Miguel Ojeda <miguel.ojeda.sandonis@gmail.com>
+Date: Thu, 23 Jan 2025 12:03:56 +0100
+X-Gm-Features: AWEUYZnSN-u14_3F504620wE10KcsGXv_0aa4VFT7rZTZHgaKbu-nyKZWm7z3bw
+Message-ID: <CANiq72kbv2BvQHKWeLV89hmjqL479MpzkE6PKDj8SLm9ehZE_Q@mail.gmail.com>
+Subject: Re: [PATCH v8 4/7] rust: time: Add wrapper for fsleep function
+To: FUJITA Tomonori <fujita.tomonori@gmail.com>
+Cc: boqun.feng@gmail.com, aliceryhl@google.com, linux-kernel@vger.kernel.org, 
+	rust-for-linux@vger.kernel.org, netdev@vger.kernel.org, andrew@lunn.ch, 
+	hkallweit1@gmail.com, tmgross@umich.edu, ojeda@kernel.org, 
+	alex.gaynor@gmail.com, gary@garyguo.net, bjorn3_gh@protonmail.com, 
+	benno.lossin@proton.me, a.hindborg@samsung.com, anna-maria@linutronix.de, 
+	frederic@kernel.org, tglx@linutronix.de, arnd@arndb.de, jstultz@google.com, 
+	sboyd@kernel.org, mingo@redhat.com, peterz@infradead.org, 
+	juri.lelli@redhat.com, vincent.guittot@linaro.org, dietmar.eggemann@arm.com, 
+	rostedt@goodmis.org, bsegall@google.com, mgorman@suse.de, vschneid@redhat.com
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Wed, Jan 22, 2025 at 09:11:30PM +0100, Michal Luczaj wrote:
->On 1/22/25 17:01, Luigi Leonardi wrote:
->> On Tue, Jan 21, 2025 at 03:44:04PM +0100, Michal Luczaj wrote:
->>> Add a helper for socket()+bind(). Adapt callers.
->>>
->>> Reviewed-by: Stefano Garzarella <sgarzare@redhat.com>
->>> Signed-off-by: Michal Luczaj <mhal@rbox.co>
->>> ---
->>> tools/testing/vsock/util.c       | 56 +++++++++++++++++-----------------------
->>> tools/testing/vsock/util.h       |  1 +
->>> tools/testing/vsock/vsock_test.c | 17 +-----------
->>> 3 files changed, 25 insertions(+), 49 deletions(-)
->>>
->>> diff --git a/tools/testing/vsock/util.c b/tools/testing/vsock/util.c
->>> index 34e9dac0a105f8aeb8c9af379b080d5ce8cb2782..31ee1767c8b73c05cfd219c3d520a677df6e66a6 100644
->>> --- a/tools/testing/vsock/util.c
->>> +++ b/tools/testing/vsock/util.c
->>> @@ -96,33 +96,42 @@ void vsock_wait_remote_close(int fd)
->>> 	close(epollfd);
->>> }
->>>
->>> -/* Bind to <bind_port>, connect to <cid, port> and return the file descriptor. */
->>> -int vsock_bind_connect(unsigned int cid, unsigned int port, unsigned int bind_port, int type)
->>
->> If you need to send a v3, it would be nice to have a comment for
->> vsock_bind, as there used to be one.
+On Thu, Jan 23, 2025 at 9:40=E2=80=AFAM FUJITA Tomonori
+<fujita.tomonori@gmail.com> wrote:
 >
->Comment for vsock_bind_connect() remains, see below. As for vsock_bind(),
->perhaps it's time to start using kernel-doc comments? 
-This is a good idea! @Stefano WDYT?
-Sticking to tests, IIRC someone mentioned (maybe Stefano?) about moving 
-to selftests for vsock, but I don't think it's going to happen anytime 
-soon.
+> Thanks, I overlooked this. I had better to go with [`fsleep()`] then.
+>
+> I think that using two styles under rust/kernel isn't ideal. Should we
+> make the [`function_name()`] style the preference under rust/kernel?
 
->v3 isn't coming, it seems, but I'll comment the function later.
-Thank you :)
+Sounds good to me. I have a guidelines series on the backlog, so I can
+add it there.
+
+Though there is a question about whether we should do the same for
+Rust ones or not. For Rust, it is a bit clearer already since it uses
+e.g. CamelCase for types.
+
+> Unless there's a subsystem that prefers the [`function_name`] style,
+> that would be a different story.
+
+I think we have a good chance to try to make things consistent across
+the kernel (for Rust) wherever possible, like for formatting, since
+all the code is new, i.e. to try to avoid variations between
+subsystems, even if in the C side had them originally.
+
+Exceptions as usual may be needed, but unless there is a good reason,
+I think we should try to stay consistent.
 
 Cheers,
-Luigi
-
+Miguel
 
