@@ -1,130 +1,136 @@
-Return-Path: <netdev+bounces-160436-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-160437-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 025BBA19BAD
-	for <lists+netdev@lfdr.de>; Thu, 23 Jan 2025 01:12:37 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5BE02A19BC7
+	for <lists+netdev@lfdr.de>; Thu, 23 Jan 2025 01:29:54 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id BA9923A3710
-	for <lists+netdev@lfdr.de>; Thu, 23 Jan 2025 00:12:30 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 3C306188CFBE
+	for <lists+netdev@lfdr.de>; Thu, 23 Jan 2025 00:29:58 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 431682576;
-	Thu, 23 Jan 2025 00:12:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4DFCB8C07;
+	Thu, 23 Jan 2025 00:29:50 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="N9YrP5XU"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="aagVpeE9"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f169.google.com (mail-pl1-f169.google.com [209.85.214.169])
+Received: from mail-wm1-f41.google.com (mail-wm1-f41.google.com [209.85.128.41])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C635F1C01;
-	Thu, 23 Jan 2025 00:12:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.169
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8D12B8BF8;
+	Thu, 23 Jan 2025 00:29:48 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.41
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1737591153; cv=none; b=bsKkPrxXwpvAMN5ZZ52WYJvSzeqeuFNuwNd4O1kRRt1Qi13LgELZPGXLEOlknQS0+1txrvizzLIbpw7Ikn7kPOuZNQmduXVZ17qGK5zIqba5K6b89IED1FKMdkth3POwFMQhcCQtSgY9x3mmV0JNdVek1fqyeMp7swHr25lCuBI=
+	t=1737592190; cv=none; b=V/fgnXiW0r+rMK6ImbPI7YLNHFgT0bo7OVRgNBWQ8FyNdc3C/JiJCYjb5YxP+YKoYwM06WWt62f0qKm862JyC9y4jfzF5IuZ+6ryULE7CBuYZPRlzmY1+3cxjN8tWxRlZ0xpF8OcrGol7ZjuWpphmpr6CvESC1XteEjA540V3WA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1737591153; c=relaxed/simple;
-	bh=X1XECz49qWcxWeG/GB6BNF2gmFTz+ylWBz8BE0QNiJA=;
-	h=Date:Message-Id:To:Cc:Subject:From:In-Reply-To:References:
-	 Mime-Version:Content-Type; b=rhehvGBbWg5Tiz8BCh7OLpJqO0mWTlUOpv0/ymico8yDDPbLUDKnOPKNErUZ794SEcAuAu6vhyZ8dRQ8c6qQh7fNZduJ9z1XbP+s3/SNH7tzTOiHj3OM76aSzYdf/vH0wqLJmBEOVxUQy51vB0AWs2CaJkWp0mi1bsxQkzpPHxw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=N9YrP5XU; arc=none smtp.client-ip=209.85.214.169
+	s=arc-20240116; t=1737592190; c=relaxed/simple;
+	bh=b8zm+y8kEriQePfvD56B0nHNYKUjbIeQf5ZwlufSFMg=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=esSPZxoJZ0gK0+p40dar/JDX/bf8ErXflo5ERySTNQCtGBezEWYfDH8hmepHzI2lOwL/llEz6GpJeFti1U894kWAIn2nR6EDJWQxP+HDD/BzXd4e4CEFiaL20D2VfzseSJ8IExyG5AYViEI46Sd7A308q9vF2Sm8VT1bqpz/mh8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=aagVpeE9; arc=none smtp.client-ip=209.85.128.41
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pl1-f169.google.com with SMTP id d9443c01a7336-21a7ed0155cso5004205ad.3;
-        Wed, 22 Jan 2025 16:12:31 -0800 (PST)
+Received: by mail-wm1-f41.google.com with SMTP id 5b1f17b1804b1-43622267b2eso3338785e9.0;
+        Wed, 22 Jan 2025 16:29:48 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1737591151; x=1738195951; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to:from
-         :subject:cc:to:message-id:date:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=Piw58QD9uf+j8b2ua/HAZ6tweWQTcyMdimhsEJ9IrPo=;
-        b=N9YrP5XUgxBNZhfBm3iMhwivi23ul1HGApK7C197VOyXH3JZXHm2znSRoRk0z/geQI
-         hx7ZT/pLn+SO4D2mqgw7hmqXOltuYWw4vnONij5bZrkccgWmd29AW839HQKxLWSOc02A
-         q19+8wBgHdmbS+PkH6RQkpfnw/0duutoDgJ+SCXD/I+HYpH2P6++7E+Hl2FWBBmaQW94
-         Il14U/dkXY73FBQd4Eme93yRWCoPjgJ6uhhERcpB67P1Nb0DF8nAk1u4ARWDpr1oFVMP
-         3xceirbu2h/Q16I/hkDYFqSN9NtjnMfQ2UPhmZCpM3T8rfHCiSWQAbQ02/sJC6ZhI33T
-         vCVw==
+        d=gmail.com; s=20230601; t=1737592187; x=1738196987; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=EqMq3rk8LAv4NWlF/rIgW8PmsqPjzvs+YfG3tHjJzJs=;
+        b=aagVpeE9qCwuNAnfPf6+sTennYvuJe4gebx6akxIZiHuKthsPqqOQb6L1bN/9YcPI8
+         k32OUF7mqzcy74ACs2CzJRrEWreXSVR9M/xS6X1WXO0cM6XDXm2QyJQ7EsjIQISbbz+l
+         r5JUF0jXIontspB9ZIjveRY9Ws0QKScPE6c0GRW5cQYJjqafsLLnSZwSlaFuDEFr7B7W
+         u1OzJ0DhO+nKNXBQGEr9NbVXv2cjx6vaHcrWW9GjR2Etq4ZVz2Yxlw+qtkRzXM4boFz8
+         aGAyFr806nKqkF86UM4sbbu5+W89wK6PrrnSs8ECY8AYL3qXbq8t44nVwQ24xt9Elj/W
+         plyg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1737591151; x=1738195951;
-        h=content-transfer-encoding:mime-version:references:in-reply-to:from
-         :subject:cc:to:message-id:date:x-gm-message-state:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=Piw58QD9uf+j8b2ua/HAZ6tweWQTcyMdimhsEJ9IrPo=;
-        b=O0jBu83J3fQfujDoqEsLj6BKsFHcDTRFLLidSiZhUpDXjOE31LdyF4B28yiWxS0Z9F
-         AQZjCQULHeShPye486EDumdx5DBpWpVtixEbUpPMaKqmf+s2AUhoNjGkfs72FGsBa4Xw
-         W52R4pBwKpDHNKGGesjC0HAPy94MALmueNB7JMORuV6j83kaQQ6IKR2WfQqBMsR6VpKE
-         s0MjQ8m+HmAPEFCA25r28f0uyjKGR0NAGU3q/kXyn7x4xEFcdLqXZgenG9mO1UJiH4o7
-         6LmY6ufqbEDtq+6Zvmt2VgWeiG09tdJ1S9PDcQtTFHyYGcMSGPXxekZJB0LTw3JrDalk
-         QEyw==
-X-Forwarded-Encrypted: i=1; AJvYcCUxxXYAJ0gEgcWSqvm2cAXJ6Fu47dAxYFwNwsR5kIoRgAukKoy9Pn3bAE8F0qvLW/eepyXW4LhriJlNv8/38DA=@vger.kernel.org, AJvYcCV1ShBMSZBAaekhzZgF3xl6XwwQemFJkVOT1lnalDkI/NbTQrRCfkVoDW5NZGZFN7h4ss3vbWsIj/WsaDw=@vger.kernel.org, AJvYcCV6hWo87QlTyHTae8PivHzYtZGihgvm8Iw64cNX1XlhxCDMCF0LFBQbT2YJqnaGdguDsJiL3pns@vger.kernel.org
-X-Gm-Message-State: AOJu0YzLg9eTlWQKjhhdOLRoCUYwIkii9jdCMLrBEnHBa/guN7L1J8F6
-	c4FpBQH1NhfFzKwtC8VVRzv7mTWkmQy5Fl6E5iUe2b+QEicAW7CM
-X-Gm-Gg: ASbGncuJGyqXSRk8Tfjuuqb2rNr7iKbonX4DrrtXvd/pF7VJWAVJjU+n1jaBCvjB9C7
-	BMK5GhUS5r10Yeovg/s+uaO3aWFk637YIhx+/s4g9voEWP2cfuEIa7sPvvyVDVGuX5nO9HowAxa
-	q03yCX/E8J8TG8zmOmUeIzvhZbeI5UPjJIl9SwGgfXcz/emqnwPh2rBtOopo6Zl9HOEzXiOMHjl
-	PcYDoT3ZzN8eeqfm3vb4l2nRK9bv6pyz9VHOTh8ef8ifi+Z1PKbMnJd1EiuO6ZR2KzuMuVE0n8X
-	RA4I1Jj9g5VcjSrgA4/rUAcZ9Zpe7ieBMof0o/9TP1vaciLyp6c=
-X-Google-Smtp-Source: AGHT+IFbzEzDepffLCJBduNjJCrXd9MQqm9y1MzMSu+HJp+DT1OxEewkjFhjOhEzH9VOMpb0jb0NKQ==
-X-Received: by 2002:a17:902:c94a:b0:216:2abc:195c with SMTP id d9443c01a7336-21c352dd6ffmr323373965ad.7.1737591150970;
-        Wed, 22 Jan 2025 16:12:30 -0800 (PST)
-Received: from localhost (p3882177-ipxg22501hodogaya.kanagawa.ocn.ne.jp. [180.15.148.177])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-21c2cea07e1sm100915785ad.19.2025.01.22.16.12.23
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 22 Jan 2025 16:12:30 -0800 (PST)
-Date: Thu, 23 Jan 2025 09:12:20 +0900 (JST)
-Message-Id: <20250123.091220.883080907537783935.fujita.tomonori@gmail.com>
-To: aliceryhl@google.com, gary@garyguo.net
-Cc: fujita.tomonori@gmail.com, miguel.ojeda.sandonis@gmail.com,
- linux-kernel@vger.kernel.org, rust-for-linux@vger.kernel.org,
- netdev@vger.kernel.org, andrew@lunn.ch, hkallweit1@gmail.com,
- tmgross@umich.edu, ojeda@kernel.org, alex.gaynor@gmail.com,
- bjorn3_gh@protonmail.com, benno.lossin@proton.me, a.hindborg@samsung.com,
- anna-maria@linutronix.de, frederic@kernel.org, tglx@linutronix.de,
- arnd@arndb.de, jstultz@google.com, sboyd@kernel.org, mingo@redhat.com,
- peterz@infradead.org, juri.lelli@redhat.com, vincent.guittot@linaro.org,
- dietmar.eggemann@arm.com, rostedt@goodmis.org, bsegall@google.com,
- mgorman@suse.de, vschneid@redhat.com
-Subject: Re: [PATCH v8 4/7] rust: time: Add wrapper for fsleep function
-From: FUJITA Tomonori <fujita.tomonori@gmail.com>
-In-Reply-To: <CAH5fLgiEn27VMUfrXcidu0rUpM7MPZVCOjywa-vQBO7dOdQrRQ@mail.gmail.com>
-References: <20250118.170224.1577745251770787347.fujita.tomonori@gmail.com>
-	<20250122170537.1a92051c.gary@garyguo.net>
-	<CAH5fLgiEn27VMUfrXcidu0rUpM7MPZVCOjywa-vQBO7dOdQrRQ@mail.gmail.com>
+        d=1e100.net; s=20230601; t=1737592187; x=1738196987;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=EqMq3rk8LAv4NWlF/rIgW8PmsqPjzvs+YfG3tHjJzJs=;
+        b=HHlL5MV7Pks23LsQVqlhgOrd+WIJKQIuWzkQNfUC9yRGutBUcNulrXoaTs7R6HZmVt
+         02ZTfD2Wib2Jl1WN9Bw8BZ8dyKscEIk5NmwMGiHUroPSLXlasPnSYAr4OUre7zmzh4C5
+         6KRK1LgjhONQY8rb3SChHgjqb3j9FlJd9r3iCEUuNFUY7na0hMJepLPRkUCVzSW2K9Vw
+         m7xWzFDxAs9C1P7GOtqNVVq/lolB0s7+pmhpFi+t+HUJuKlmq/o9nCoFU5uLTziq1Mkt
+         7Khjp29ZnMfphJYMSYpKBOHZlTJy0WQzuNVEYd38FSufaw/911ELxrWtydpCGPnC+7IG
+         pZnA==
+X-Forwarded-Encrypted: i=1; AJvYcCVnKUrELV/Zy6hYQSxWgKc/XGO+bZ+feXUkzP4RzWRZOyiSWwUDT7j+qh5je5lB8zlagh/aiUkM@vger.kernel.org, AJvYcCWTqC75BheNiFojWqt4ZzHilaTnF79jw2k/UvlJ1oQE4EOfGNdFgAXIC8h17nd+RvYgZEkLXpqcSbQWBjzj@vger.kernel.org, AJvYcCXmnovLytBpeBQowRjMacibXJANVirda9fGO4aEIDMCoMwkglSIJ6ZhpGKrxlTeqvTjmGk=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yx5mX4xubBlnYaZVscYOmk9vSFKjwo6k+arvWWXQ+xHyb7VmZjv
+	TaX6Fx2xBtjwWjFfssH57akfftpOjQXIzPU4beD9VOqHDueh9gxdbFAXLEgPgswIaljd2atzmWE
+	XPsXc5WZt30p5XR/Hp03dkRDIB3I=
+X-Gm-Gg: ASbGncs7ZzWb0eQ3JSskWxxTycLejEhk4CRA58NEsjl8ZlfogfBMsVLLG7Kd+gYoO/U
+	Dtuf6FRblYKcBoje3UD63eZHubX4VaWai/KHRNlnj+qJwaxo6H2OHZIab7Kx727rJubu3r2fFMU
+	8Kbi3ZPls=
+X-Google-Smtp-Source: AGHT+IHYNodHiGpmK3Vs244K1buAYV1GG2229vuGCmhgyK/AWasRZCkcsisNbbVT1Inqobj9CnwDXeWUUNPnXX7pNlM=
+X-Received: by 2002:a05:6000:1ace:b0:386:1cd3:8a07 with SMTP id
+ ffacd0b85a97d-38bf5678239mr19993264f8f.7.1737592186688; Wed, 22 Jan 2025
+ 16:29:46 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Content-Type: Text/Plain; charset=us-ascii
-Content-Transfer-Encoding: 7bit
+MIME-Version: 1.0
+References: <cover.1737433945.git.dxu@dxuuu.xyz> <2050196010b1bf1efa357cfddebd15a152582bb4.1737433945.git.dxu@dxuuu.xyz>
+In-Reply-To: <2050196010b1bf1efa357cfddebd15a152582bb4.1737433945.git.dxu@dxuuu.xyz>
+From: Alexei Starovoitov <alexei.starovoitov@gmail.com>
+Date: Wed, 22 Jan 2025 16:29:35 -0800
+X-Gm-Features: AWEUYZmMcOAe0ZW4uSlBfaznTC1C-BAguyt6dp3FH8nHUI1jGRRe4CBZ8Jr4LV4
+Message-ID: <CAADnVQJcJz9stNyjck4AukQ_T=DJcFszp_cH0r_spju_Oxd5ZQ@mail.gmail.com>
+Subject: Re: [PATCH bpf-next 2/3] bpf: map: Thread null elision metadata to map_gen_lookup
+To: Daniel Xu <dxu@dxuuu.xyz>
+Cc: Paolo Abeni <pabeni@redhat.com>, Jakub Kicinski <kuba@kernel.org>, 
+	Jesper Dangaard Brouer <hawk@kernel.org>, "Fijalkowski, Maciej" <maciej.fijalkowski@intel.com>, 
+	Alexei Starovoitov <ast@kernel.org>, Eric Dumazet <edumazet@google.com>, 
+	Daniel Borkmann <daniel@iogearbox.net>, "David S. Miller" <davem@davemloft.net>, 
+	=?UTF-8?B?QmrDtnJuIFTDtnBlbA==?= <bjorn@kernel.org>, 
+	John Fastabend <john.fastabend@gmail.com>, "Karlsson, Magnus" <magnus.karlsson@intel.com>, 
+	Andrii Nakryiko <andrii@kernel.org>, Martin KaFai Lau <martin.lau@linux.dev>, Eddy Z <eddyz87@gmail.com>, 
+	Song Liu <song@kernel.org>, Yonghong Song <yonghong.song@linux.dev>, KP Singh <kpsingh@kernel.org>, 
+	Stanislav Fomichev <sdf@fomichev.me>, Hao Luo <haoluo@google.com>, Jiri Olsa <jolsa@kernel.org>, 
+	Jonathan Lemon <jonathan.lemon@gmail.com>, Simon Horman <horms@kernel.org>, bpf <bpf@vger.kernel.org>, 
+	LKML <linux-kernel@vger.kernel.org>, Network Development <netdev@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Wed, 22 Jan 2025 18:06:58 +0100
-Alice Ryhl <aliceryhl@google.com> wrote:
+On Mon, Jan 20, 2025 at 8:35=E2=80=AFPM Daniel Xu <dxu@dxuuu.xyz> wrote:
+>
+> Add an extra parameter to map_gen_lookup callback so that if the lookup
+> is known to be inbounds, the bounds check can be omitted.
+>
+> The next commit will take advantage of this new information.
+>
+> Signed-off-by: Daniel Xu <dxu@dxuuu.xyz>
+> ---
+>  include/linux/bpf.h   |  2 +-
+>  kernel/bpf/arraymap.c | 11 ++++++++---
+>  kernel/bpf/hashtab.c  | 14 ++++++++++----
+>  kernel/bpf/verifier.c |  2 +-
+>  net/xdp/xskmap.c      |  4 +++-
+>  5 files changed, 23 insertions(+), 10 deletions(-)
+>
+> diff --git a/include/linux/bpf.h b/include/linux/bpf.h
+> index feda0ce90f5a..da8b420095c9 100644
+> --- a/include/linux/bpf.h
+> +++ b/include/linux/bpf.h
+> @@ -117,7 +117,7 @@ struct bpf_map_ops {
+>          * may manipulate it, exists.
+>          */
+>         void (*map_fd_put_ptr)(struct bpf_map *map, void *ptr, bool need_=
+defer);
+> -       int (*map_gen_lookup)(struct bpf_map *map, struct bpf_insn *insn_=
+buf);
+> +       int (*map_gen_lookup)(struct bpf_map *map, struct bpf_insn *insn_=
+buf, bool inbounds);
 
->> > >> +    let duration = if delta > MAX_DURATION || delta.is_negative() {
->> > >> +        // TODO: add WARN_ONCE() when it's supported.
->> > >
->> > > Ditto (also "Add").
->> >
->> > Oops, I'll fix.
->> >
->> > > By the way, can this be written differently maybe? e.g. using a range
->> > > since it is `const`?
->> >
->> > A range can be used for a custom type?
->>
->> Yes, you can say `!(Delta::ZERO..MAX_DURATION).contains(&delta)`.
->> (You'll need to add `Delta::ZERO`).
-> 
-> It would need to use ..= instead of .. to match the current check.
+The next time around we'd need another bool and more churn.
+Let's use 'enum map_gen_flags flags' right away.
 
-Neat, it works as follows.
-
-let delta = if (Delta::ZERO..=MAX_DELTA).contains(&delta) {
-    delta
-} else {
-    MAX_DELTA
-};
+Also don't you want to pass an actual const_map_key
+since its already known?
+And the whole array_map_gen_lookup will become
+single ld_imm64 insn.
 
