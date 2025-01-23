@@ -1,250 +1,122 @@
-Return-Path: <netdev+bounces-160650-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-160651-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2EE05A1AB1A
-	for <lists+netdev@lfdr.de>; Thu, 23 Jan 2025 21:20:48 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0E067A1AB3D
+	for <lists+netdev@lfdr.de>; Thu, 23 Jan 2025 21:28:24 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id A20237A28E4
-	for <lists+netdev@lfdr.de>; Thu, 23 Jan 2025 20:20:38 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 6C35C16C26C
+	for <lists+netdev@lfdr.de>; Thu, 23 Jan 2025 20:28:13 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B5EA41B424B;
-	Thu, 23 Jan 2025 20:20:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C694F1C5F22;
+	Thu, 23 Jan 2025 20:25:35 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=fastly.com header.i=@fastly.com header.b="j7rXEkjl"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="B1l8/HJv"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pj1-f41.google.com (mail-pj1-f41.google.com [209.85.216.41])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 08884156F21
-	for <netdev@vger.kernel.org>; Thu, 23 Jan 2025 20:20:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.41
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 95C6C1C5D62;
+	Thu, 23 Jan 2025 20:25:35 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1737663640; cv=none; b=XBonkAnSaV/xnzCJEQQ8dNI7WkbOXZ8st5adt0BE2zJZyS/umGhO5WplVPEgn4E7icnBK03T7iFSbAdIT9R4CF7gIMUV/025zF6EpPpx9GVJ6S0e2fUx1n6Qxw6ATSAO7WEP3Z6b3TkQyhYmo0pUfb14zpsbWTTntkC97IZ9sOg=
+	t=1737663935; cv=none; b=q9lcFpTlAtuZAI8Ws62Cs1xRlApG6rLOGSgENAdafLOGgZx4F8eWhkwk3mRO0OqeidRxWtoAorfa2JqxEKV+Rnk6/yTIWOJLm1TONx+a8CWNWEXAJT1weyl5oxGYtDbQGby8pdPS6YL9sipzhB7sN23lw9qfT/g1KI+4rTGmCoQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1737663640; c=relaxed/simple;
-	bh=JpZk763GRNCKNUJRjotRPzNiO/3ojqiNhAdrKYLa/3Q=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=o559XHgjOXx5/u/rpVD6t2GHJYWTF6Cf9u3ysyrXRV0Ny9HmcpOmYhZ/nZmg63fOzMFa90H2hk5kTHrzAFp/kfpGDpXBGZQFaPivjsupoApQgj5omD1g+sbhrdWFCrCPrrvr8wuZa45+VnD1h4BrbciUNvgAfVA4RwJ7WUFQ4FA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fastly.com; spf=pass smtp.mailfrom=fastly.com; dkim=pass (1024-bit key) header.d=fastly.com header.i=@fastly.com header.b=j7rXEkjl; arc=none smtp.client-ip=209.85.216.41
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fastly.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=fastly.com
-Received: by mail-pj1-f41.google.com with SMTP id 98e67ed59e1d1-2ef87d24c2dso2044615a91.1
-        for <netdev@vger.kernel.org>; Thu, 23 Jan 2025 12:20:38 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=fastly.com; s=google; t=1737663638; x=1738268438; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references
-         :mail-followup-to:message-id:subject:cc:to:from:date:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=KB1t1DSHYe/kIJpeHgsnuq5QN3rT3/xSpDRas/TVl9Q=;
-        b=j7rXEkjl0scfXd5w42Ko8vISOU2GEkACDW75PCES7vmfE1i9uSIoGWkV4kL5ns8HRT
-         zkRDhO0QJyxgm7XfOGl5i2RZdvG2xBLg/7W6PXyBgmTzWqXrD4tJ5gkOsnBIspH1yPhj
-         kKhaSrlFyoglzf1mHgas2aIn4nAxvWVTbf/bo=
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1737663638; x=1738268438;
-        h=in-reply-to:content-disposition:mime-version:references
-         :mail-followup-to:message-id:subject:cc:to:from:date
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=KB1t1DSHYe/kIJpeHgsnuq5QN3rT3/xSpDRas/TVl9Q=;
-        b=w3AmAO86VUT44CYkeOfO11pfbZSnT3Ms2f1ckJ8xdzkxdtdLFRKQBR3IwuPc/Mii6l
-         vtR059hSi2uiq5QUkQVCR3IK5ZEw4VpDwXe3rKMV9XVpB/bRAzI0YjI3mSZGU+sNMkOw
-         9+b4Z2RP6zN40museQrxJl4C4DGfOsnWD2c/0XCspWsHfoh/rIga92tW1FBCs8fZ/2KO
-         HdjPT9McSdSMpWyjCy2wIuaFtY25jP47bHj8xfb6NmfikyqdJCKSaegiRi2JBE5NqxVj
-         HQZHSiSj5+9vBcu/qCwe4RPCpLWlK48zadF25DUZ5yOqI0mjAipGLmLXcdJFdHQ0jELG
-         BaNQ==
-X-Gm-Message-State: AOJu0YyyWDjRbXzr+nm4u5bM7eww2wIc0Bd6mq6Z1rpDHIiZsSgZ9fQc
-	EafjhIf7ZAyp/3w0LjoOYq4MLtFaTcDFvEC7phpihwTxvV78z32VGRnsxelH6p0=
-X-Gm-Gg: ASbGncuiauml6yDGlhoTyUyyyhdWzgH6q+QPouhSh2bj4q0aGP7lzuXVm+oN5GYP2iW
-	DJy9XY5+k7LIYpL/cueIX4fRGOjDWFO6UtSl5Z3dX8qNv7lw+FSEx4nzf65x3VH0dlE5p3mE1e4
-	aXnISatk2w4mnnEKqOTBOMF4ue0eJQzmewkwi1r0UVzafUHGrfgFdDwGtdz6TlU39maQb+3XGUX
-	P+8vk7XwPRXWkVbyH7me20sLx1Lc+kqPVxnYHCU1/Y/WPn4UTafo8ZjiGrMiacj2mXHTBL5IzL7
-	BnlG2QcjDEU/84rHq2wMmq5SWQDjh8ti6XzAYWN6+FxUQzM=
-X-Google-Smtp-Source: AGHT+IGWiW4fruTXQaig8VlUH68P+LvfxTOjfstapyawpwKg0R4SlaMZKhcLWLkqA4bHRKxUrinKdg==
-X-Received: by 2002:a17:90b:540b:b0:2ee:ba0c:1726 with SMTP id 98e67ed59e1d1-2f782d9a1c9mr34516067a91.34.1737663638298;
-        Thu, 23 Jan 2025 12:20:38 -0800 (PST)
-Received: from LQ3V64L9R2 (c-24-6-151-244.hsd1.ca.comcast.net. [24.6.151.244])
-        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-2f7ffa6b315sm127868a91.26.2025.01.23.12.20.36
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 23 Jan 2025 12:20:37 -0800 (PST)
-Date: Thu, 23 Jan 2025 12:20:34 -0800
-From: Joe Damato <jdamato@fastly.com>
-To: Ahmed Zaki <ahmed.zaki@intel.com>
-Cc: netdev@vger.kernel.org, intel-wired-lan@lists.osuosl.org,
-	andrew+netdev@lunn.ch, edumazet@google.com, kuba@kernel.org,
-	horms@kernel.org, pabeni@redhat.com, davem@davemloft.net,
-	michael.chan@broadcom.com, tariqt@nvidia.com,
-	anthony.l.nguyen@intel.com, przemyslaw.kitszel@intel.com,
-	shayd@nvidia.com, akpm@linux-foundation.org, shayagr@amazon.com,
-	kalesh-anakkur.purayil@broadcom.com,
-	David Arinzon <darinzon@amazon.com>
-Subject: Re: [PATCH net-next v6 1/5] net: move ARFS rmap management to core
-Message-ID: <Z5KkkldrWpw8wayS@LQ3V64L9R2>
-Mail-Followup-To: Joe Damato <jdamato@fastly.com>,
-	Ahmed Zaki <ahmed.zaki@intel.com>, netdev@vger.kernel.org,
-	intel-wired-lan@lists.osuosl.org, andrew+netdev@lunn.ch,
-	edumazet@google.com, kuba@kernel.org, horms@kernel.org,
-	pabeni@redhat.com, davem@davemloft.net, michael.chan@broadcom.com,
-	tariqt@nvidia.com, anthony.l.nguyen@intel.com,
-	przemyslaw.kitszel@intel.com, shayd@nvidia.com,
-	akpm@linux-foundation.org, shayagr@amazon.com,
-	kalesh-anakkur.purayil@broadcom.com,
-	David Arinzon <darinzon@amazon.com>
-References: <20250118003335.155379-1-ahmed.zaki@intel.com>
- <20250118003335.155379-2-ahmed.zaki@intel.com>
- <Z5KYWAshgRL2GbX2@LQ3V64L9R2>
- <414c773d-5b7b-44b8-82a7-da49168ee791@intel.com>
+	s=arc-20240116; t=1737663935; c=relaxed/simple;
+	bh=InyBiJX/ZrPVjzxsBNdprnqCrCMGTNTHttu2kN3J+3A=;
+	h=From:Subject:Date:Message-Id:MIME-Version:Content-Type:To:Cc; b=ikp59aOM7lo5t/Mu1fYqQYs4Bhs5LKvLAvDjDdy+YW8uVfArsDMUbMPFJlitvOZ+lHwtQc/fB4TSTczM8ZND4/5KR7NIdY5ytfxm1IZa/1A8OPmoYawqf5Xr9ZJo6cfj+/MvHIN7u8dY+utrKIBM6hc9owgQGL1Pa2lo8V7+4Zg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=B1l8/HJv; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8A761C4CED3;
+	Thu, 23 Jan 2025 20:25:33 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1737663935;
+	bh=InyBiJX/ZrPVjzxsBNdprnqCrCMGTNTHttu2kN3J+3A=;
+	h=From:Subject:Date:To:Cc:From;
+	b=B1l8/HJvYp9w4oLdxgo+rfXkz/Zioh3JQkn6IDo5THV2cTKOxhhr+OIxBH7Quc1X4
+	 JgGQ21jabilC3K/GVCzJIFDF/McctbkqYcf4Dx5M8PkuL6PORsPfnL7pDV+DnPoZHW
+	 FItMdaUT5ayLp1dwoDZlpYSDbDG1byfjCplFK8I55HeyKOstLeqMMtZBLYS/omjIyj
+	 uHoEPJapT6Qe9HseNqlWbcQDJjBp3eBwgfi1ZWIHfafpZc1NC1MKnLEjkllujDR3JX
+	 sKvm0nVh8TpKpuuOrp5EUctGCliG4Kkl7ZW4sDGo62mzbs/huHB776IEg5XJcFKrLW
+	 VzFCuDMIy/+hA==
+From: Jeff Layton <jlayton@kernel.org>
+Subject: [PATCH 0/8] nfsd: CB_SEQUENCE error handling fixes and cleanups
+Date: Thu, 23 Jan 2025 15:25:17 -0500
+Message-Id: <20250123-nfsd-6-14-v1-0-c1137a4fa2ae@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <414c773d-5b7b-44b8-82a7-da49168ee791@intel.com>
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+X-B4-Tracking: v=1; b=H4sIAK2lkmcC/6tWKk4tykwtVrJSqFYqSi3LLM7MzwNyDHUUlJIzE
+ vPSU3UzU4B8JSMDI1MDQyNj3by04hRdM11DE90kA3NL81RjC9OUZAMloPqCotS0zAqwWdGxtbU
+ AdfVgblsAAAA=
+X-Change-ID: 20250123-nfsd-6-14-b0797e385dc0
+To: Chuck Lever <chuck.lever@oracle.com>, Neil Brown <neilb@suse.de>, 
+ Olga Kornievskaia <okorniev@redhat.com>, Dai Ngo <Dai.Ngo@oracle.com>, 
+ Tom Talpey <tom@talpey.com>, "J. Bruce Fields" <bfields@fieldses.org>, 
+ Kinglong Mee <kinglongmee@gmail.com>, Trond Myklebust <trondmy@kernel.org>, 
+ Anna Schumaker <anna@kernel.org>, "David S. Miller" <davem@davemloft.net>, 
+ Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
+ Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>
+Cc: linux-nfs@vger.kernel.org, linux-kernel@vger.kernel.org, 
+ netdev@vger.kernel.org, Jeff Layton <jlayton@kernel.org>
+X-Mailer: b4 0.14.2
+X-Developer-Signature: v=1; a=openpgp-sha256; l=1550; i=jlayton@kernel.org;
+ h=from:subject:message-id; bh=InyBiJX/ZrPVjzxsBNdprnqCrCMGTNTHttu2kN3J+3A=;
+ b=owEBbQKS/ZANAwAIAQAOaEEZVoIVAcsmYgBnkqW7DC5ulbQLNbJnWLLi0FuKmMGANycWQr5Gb
+ LIS97fL8kCJAjMEAAEIAB0WIQRLwNeyRHGyoYTq9dMADmhBGVaCFQUCZ5KluwAKCRAADmhBGVaC
+ FfGBD/96BcnS1gx7z1ubD5AbyZcZOJ/QAu/MfqBIB+AXp6XzgRjjlAVkA690Z4LEQA+mliKQAEo
+ Pzq11f8MYGyfumQqIn+i2EL3sH+lGVHkeTDCU0AyIYkkYiyOGh1sUAOGoX63oHibB78+KT7DXVG
+ JfIT1/lWbbNBcL5wXpgReVP65iH4XvgE8tSfuoTswPvn31eZEKdq+d9BDycNO7RBq46k610FAzz
+ 8kZ0egcYoM65qz+hCngg6eZtmRMiCcZ8A1l2S3X2o2Ok/pJapwANNN1ThF37KuzudYfxyGoo9V8
+ Iu+2a7t5KVFHs7eRqhecqO5eHtJG4ZWDhLFerNvPqxDsPfAzlpQV1LdGk+Ay3PWvjYI9oSNGvH2
+ y7auyU6YphWMlcaOmWhqD2GLc5TaJci05qJdmff8jOElY/abStpaKYF7Ql9gEqKJprSSpk8iXsD
+ T8vGogOD/HAlxtnrNsNNlLYHH/NtkPgypCoXbW6BjU4l9rBpvC7DlWJBpXHEAfk6LMWQ4f78gn0
+ A14I1cHUxJpeK4Y7zRU1VN5+BrL9CaHNozyKjixlJlU/5vx6odPOQXEojgeg2mm2gQoTCohLx79
+ iaJG4vkL32y5xzlZC4j1wygYpXzYdtMVUURMBz90n5fH45gPBmOI5MzDPEiy3X1kekwGeNiuuSp
+ JLiGOKSes7EHtPg==
+X-Developer-Key: i=jlayton@kernel.org; a=openpgp;
+ fpr=4BC0D7B24471B2A184EAF5D3000E684119568215
 
-On Thu, Jan 23, 2025 at 01:13:10PM -0700, Ahmed Zaki wrote:
-> 
-> 
-> On 2025-01-23 12:28 p.m., Joe Damato wrote:
-> > On Fri, Jan 17, 2025 at 05:33:31PM -0700, Ahmed Zaki wrote:
-> > > Add a new netdev flag "rx_cpu_rmap_auto". Drivers supporting ARFS should
-> > > set the flag via netif_enable_cpu_rmap() and core will allocate and manage
-> > > the ARFS rmap. Freeing the rmap is also done by core when the netdev is
-> > > freed.
-> > > 
-> > > For better IRQ affinity management, move the IRQ rmap notifier inside the
-> > > napi_struct. Consequently, add new notify.notify and notify.release
-> > > functions: netif_irq_cpu_rmap_notify() and netif_napi_affinity_release().
-> > > 
-> > > Acked-by: David Arinzon <darinzon@amazon.com>
-> > > Signed-off-by: Ahmed Zaki <ahmed.zaki@intel.com>
-> > 
-> > [...]
-> > 
-> > > diff --git a/net/core/dev.c b/net/core/dev.c
-> > > index fe5f5855593d..dbb63005bc2b 100644
-> > > --- a/net/core/dev.c
-> > > +++ b/net/core/dev.c
-> > > @@ -6862,6 +6862,141 @@ void netif_queue_set_napi(struct net_device *dev, unsigned int queue_index,
-> > >   }
-> > >   EXPORT_SYMBOL(netif_queue_set_napi);
-> > > +#ifdef CONFIG_RFS_ACCEL
-> > > +static void
-> > > +netif_irq_cpu_rmap_notify(struct irq_affinity_notify *notify,
-> > > +			  const cpumask_t *mask)
-> > > +{
-> > > +	struct napi_struct *napi =
-> > > +		container_of(notify, struct napi_struct, notify);
-> > > +	struct cpu_rmap *rmap = napi->dev->rx_cpu_rmap;
-> > > +	int err;
-> > 
-> > I wonder if this generates a warning with some compilers? err is
-> > defined not used if !napi->dev->rx_cpu_rmap_auto ? Not sure.
-> > 
-> > > +	if (napi->dev->rx_cpu_rmap_auto) {
-> > > +		err = cpu_rmap_update(rmap, napi->napi_rmap_idx, mask);
-> > > +		if (err)
-> > > +			pr_warn("%s: RMAP update failed (%d)\n",
-> > > +				__func__, err);
-> > > +	}
-> > > +}
-> > > +
-> > > +static void netif_napi_affinity_release(struct kref *ref)
-> > > +{
-> > > +	struct napi_struct *napi =
-> > > +		container_of(ref, struct napi_struct, notify.kref);
-> > > +	struct cpu_rmap *rmap = napi->dev->rx_cpu_rmap;
-> > > +
-> > > +	if (!napi->dev->rx_cpu_rmap_auto)
-> > > +		return;
-> > > +	rmap->obj[napi->napi_rmap_idx] = NULL;
-> > > +	napi->napi_rmap_idx = -1;
-> > > +	cpu_rmap_put(rmap);
-> > > +}
-> > > +
-> > > +static int napi_irq_cpu_rmap_add(struct napi_struct *napi, int irq)
-> > > +{
-> > > +	struct cpu_rmap *rmap = napi->dev->rx_cpu_rmap;
-> > > +	int rc;
-> > > +
-> > > +	if (!rmap)
-> > > +		return -EINVAL;
-> > > +
-> > > +	napi->notify.notify = netif_irq_cpu_rmap_notify;
-> > > +	napi->notify.release = netif_napi_affinity_release;
-> > 
-> > Maybe the callbacks should only be set at the end after everything
-> > else is successful, just before the return 0 ?
-> > 
-> 
-> I believe this is needed before irq_set_affinity_notifier(), OW we could
-> have some racing. I can move it there if you like.
-> 
-> > > +	cpu_rmap_get(rmap);
-> > > +	rc = cpu_rmap_add(rmap, napi);
-> > > +	if (rc < 0)
-> > > +		goto err_add;
-> > > +
-> > > +	napi->napi_rmap_idx = rc;
-> > > +	rc = irq_set_affinity_notifier(irq, &napi->notify);
-> > > +	if (rc)
-> > > +		goto err_set;
-> > > +
-> > > +	return 0;
-> > > +
-> > > +err_set:
-> > > +	rmap->obj[napi->napi_rmap_idx] = NULL;
-> > > +	napi->napi_rmap_idx = -1;
-> > > +err_add:
-> > > +	cpu_rmap_put(rmap);
-> > > +	return rc;
-> > > +}
-> > 
-> > [...]
-> > 
-> > > +void netif_napi_set_irq_locked(struct napi_struct *napi, int irq)
-> > > +{
-> > > +	int rc;
-> > > +
-> > > +	if (!napi->dev->rx_cpu_rmap_auto)
-> > > +		goto out;
-> > 
-> > Maybe the above if statement could be extended to be something like:
-> > 
-> > if (!napi->dev->rx_cpu_rmap_auto || napi->irq < 0)
-> >    goto out;
-> > 
-> > then you can omit the irq > 0 checks in the code below, potentially?
-> 
-> I am afraid I don't get this, the checks below one is for the new irq (could
-> be valid or -1) and one for the existing (nap->irq).
+The first four patches fix bugs in the CB_SEQUENCE error handling. The
+last patches are cleanups.
 
-Ah yes, my mistake; I misread the other half of the if statement
-below. My apologies.
+These are only lightly tested, mostly because we don't have a great way
+to test backchannel error handling. I tried to keep these very small so
+that we could bisect if there are problems.
 
-> > 
-> > > +	/* Remove existing rmap entries */
-> > > +	if (napi->irq != irq && napi->irq > 0)
-> > > +		irq_set_affinity_notifier(napi->irq, NULL);
-> > > +
-> > > +	if (irq > 0) {
-> > > +		rc = napi_irq_cpu_rmap_add(napi, irq);
-> > > +		if (rc) {
-> > > +			netdev_warn(napi->dev, "Unable to update ARFS map (%d)\n",
-> > > +				    rc);
-> > > +			netif_disable_cpu_rmap(napi->dev);
-> > > +		}
-> > > +	}
-> > > +
-> > > +out:
-> > > +	napi->irq = irq;
-> > > +}
-> > > +EXPORT_SYMBOL(netif_napi_set_irq_locked);
-> > > +
-> 
-> Thanks.
-> 
+These should probably go in via Chuck's tree, but the last patch touches
+some NFS client code, so it'd be good to have R-b's or A-b's from Trond
+and/or Anna on that one.
+
+Signed-off-by: Jeff Layton <jlayton@kernel.org>
+---
+Jeff Layton (8):
+      nfsd: don't restart v4.1+ callback when RPC_SIGNALLED is set
+      nfsd: fix CB_SEQUENCE error handling of NFS4ERR_{BADSLOT,BADSESSION,SEQ_MISORDERED}
+      nfsd: when CB_SEQUENCE gets NFS4ERR_DELAY, release the slot
+      nfsd: fix default case in nfsd4_cb_sequence_done()
+      nfsd: reverse default of "ret" variable in nfsd4_cb_sequence_done()
+      nfsd: remove unneeded forward declaration of nfsd4_mark_cb_fault()
+      nfsd: clean up and amend comments around nfsd4_cb_sequence_done()
+      sunrpc: make rpc_restart_call() and rpc_restart_call_prepare() void return
+
+ fs/nfs/nfs4proc.c           | 12 ++++----
+ fs/nfsd/nfs4callback.c      | 69 +++++++++++++++++++++++----------------------
+ include/linux/sunrpc/clnt.h |  4 +--
+ net/sunrpc/clnt.c           |  7 ++---
+ 4 files changed, 45 insertions(+), 47 deletions(-)
+---
+base-commit: 0ab8e05a5a694a1e4c6854a98f08a477d16b6aeb
+change-id: 20250123-nfsd-6-14-b0797e385dc0
+
+Best regards,
+-- 
+Jeff Layton <jlayton@kernel.org>
+
 
