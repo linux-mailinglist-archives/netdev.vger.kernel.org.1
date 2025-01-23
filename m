@@ -1,138 +1,142 @@
-Return-Path: <netdev+bounces-160528-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-160529-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id B0CDDA1A0EC
-	for <lists+netdev@lfdr.de>; Thu, 23 Jan 2025 10:36:35 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id C128FA1A0FE
+	for <lists+netdev@lfdr.de>; Thu, 23 Jan 2025 10:42:22 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E8F3B3AAB66
-	for <lists+netdev@lfdr.de>; Thu, 23 Jan 2025 09:36:20 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 129AA16DE4F
+	for <lists+netdev@lfdr.de>; Thu, 23 Jan 2025 09:42:21 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 30A2D20D4EE;
-	Thu, 23 Jan 2025 09:36:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1892B20CCCD;
+	Thu, 23 Jan 2025 09:42:10 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="dlmG5YL4"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="NW+aVDJr"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.8])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3D54E20C48D
-	for <netdev@vger.kernel.org>; Thu, 23 Jan 2025 09:36:03 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 650D420C492;
+	Thu, 23 Jan 2025 09:42:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.8
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1737624967; cv=none; b=ZSg7CBcUwftp6vlP/lp8R5P4+o+y3Rtl50s2kB3e3Ska9AAIBSAuIIZINgF2Wl4xYDYZMUTcA0WWjdcwVbqUYZIpEU+ysA/e4/r4ZnhJWWC9K0eRZC+fqQ8fkbbiVzr/pB8HV41g+M1OLvkdEte2uV+zo+yI9TZxyCBDPXXGTjk=
+	t=1737625330; cv=none; b=nN728u4wrz3iyDhof4mE38OD+5yHHelE7dICiRcUr8IS7LOSyb19JgPBZ9YfnQ0YJzfwRXYL8EmCUdB2RmXscw1nKevvrlT/ycSINcUR0AO3xb3trvIFZWQmFt0GExwxU6G/BcQmKlJLFpNZHrYfYVWYshk5/r5FzcS22hsbUe8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1737624967; c=relaxed/simple;
-	bh=dqawR7XNzIGe0xKiLtAeHwJKbpEBmKW8gR9cV5OZiSA=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=AJAnnx4H+9lJJW5deM5KPX7MN64zzbsFjdhI97e/eaql1xin7Irpqj1nEdqNF/PJxNdfYmu2iIHNSy+XZ5hdwzYJls5Wm2qO9bnHFytLAbhSl8K+EDi6i1DtkfLQIXE8xYFLlSbK1rt2K2qtPDiTm1E7zBN2o3nxqXDEOCDddcE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=dlmG5YL4; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1737624963;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=UnYFcRPw5BnzfejUEGROZP2MFra+jRL2jq0Ys6OTnCE=;
-	b=dlmG5YL4tR6xLGi9A0mBVD7aDKfjkh32hWjQrPXE6VxLyazRH/OHa266KZ/QsRsJM7eFEH
-	pKxFfEgu3FFL5E0UzuyAy1jdztlYF/MTS6FldHswzr4OSgHSiFSeN0kfCzf72XHbFJObOF
-	Z0mMcpCS2T/jmV6ZM6F8NeghbB7/5K4=
-Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
- [209.85.128.70]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-168-yOyJ1mQqPNiwzp7fKn4vfA-1; Thu, 23 Jan 2025 04:36:01 -0500
-X-MC-Unique: yOyJ1mQqPNiwzp7fKn4vfA-1
-X-Mimecast-MFC-AGG-ID: yOyJ1mQqPNiwzp7fKn4vfA
-Received: by mail-wm1-f70.google.com with SMTP id 5b1f17b1804b1-43624b08181so3620585e9.0
-        for <netdev@vger.kernel.org>; Thu, 23 Jan 2025 01:36:01 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1737624960; x=1738229760;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=UnYFcRPw5BnzfejUEGROZP2MFra+jRL2jq0Ys6OTnCE=;
-        b=Z/w0N3A6aRXJ1VA7F4OMeaA7/RCBZJ6f7tKg1ODG5UdVREDPJnUwlIiMDb2RkQmNRJ
-         MDPlNKswJ1ou3gC2aRSr9Y/WdQ+2V1qeV2J3yKHmATVlTb7HAVtrZBVuMcwsmpGgvfsj
-         YHS+JcLid3jvIsRkba5sGgn/iqmnidJ3JCD8GLJPyduOkMc/8Cucju4mMmNuLep04GtL
-         9/XGf7nRJm4QWhH1p6t4QmwGBmQmLrR8A5nEfqUDiPqCetD6T4dg/yyMdVxKYmC+0UhQ
-         C1bH1nC5hHylKhUzZtQS0du9XIJcVOTtchX03P6Z9LPmEiXRSF8+iy0Gqk+knxXdS+0L
-         s/Ag==
-X-Gm-Message-State: AOJu0Yy+FQgIcO7+wfnftdNeT1zySlIZXoy8uM+BAI8mpiBzCJbFqemF
-	a/fkIvgdSOT8vmeCvOdP4wdNFW2qdqIwYHNBLXmD7gEyydvHRvJDNbheUiroW6wwsTmL7RnLARI
-	x68pSiJewunOMGUFZ8Jf6aKvyafr71Z10e/CUfJDV9yvci4rU6k5hJA==
-X-Gm-Gg: ASbGncuuGxEcjg0Nq7sKKld3KpR1/1X3vNA18q4VRMGjDrwsPN1oxOKjdiI/D8gnujh
-	sxwmZpoH8B3g6o1F5l6D2cYPOmDLjK6rGldUwx94HzoOfe3blmq6tGH3FRDGlrAS7pPh29v0jkI
-	qBHOsON/XgBoqdj2QQJMhnWlG/qHFwbgbzwUyn/g3eF2r8i9qiRfmDJlQT8aTr5Ge+7NqARbfjh
-	vs9zFf8yGWlQY6k5RskkLu6xtZQWyOuhjLbETDH36lJhyMTK7IrIATHGA/r+YvEYauNUXIcRa61
-	n/i425wklrRfOzcV1N21lWYH
-X-Received: by 2002:a05:600c:1d0c:b0:434:f9ad:7222 with SMTP id 5b1f17b1804b1-438b885652fmr22198705e9.7.1737624960113;
-        Thu, 23 Jan 2025 01:36:00 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IEioYh+fOt8E8oEIKF32FkxJEk+epzAyprXFxCf2o/rfVP//pqtUxaTni9qOyL9m9HdyOe9YA==
-X-Received: by 2002:a05:600c:1d0c:b0:434:f9ad:7222 with SMTP id 5b1f17b1804b1-438b885652fmr22198425e9.7.1737624959693;
-        Thu, 23 Jan 2025 01:35:59 -0800 (PST)
-Received: from [192.168.88.253] (146-241-15-169.dyn.eolo.it. [146.241.15.169])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-438b31a0f47sm54375985e9.15.2025.01.23.01.35.58
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 23 Jan 2025 01:35:59 -0800 (PST)
-Message-ID: <a194d683-d97d-469d-b016-f11bfad5aba1@redhat.com>
-Date: Thu, 23 Jan 2025 10:35:58 +0100
+	s=arc-20240116; t=1737625330; c=relaxed/simple;
+	bh=YrG2Ji3mQLbKulNePHgsKU4kGwK8BTcBIgjmwTWQVaA=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=Lzr29t/Rb4ZCbC6yPgPNXJbFJUum5ldggY03ANNOSFQfYCti6mSBGjujFl6f66zizJGViVpw1Pkeayz9AfZTwAY1ebzCSN9UAPLg32yFF5CQzYwQB0AcC7vJPTWVsYCblf55SZXVU2n21nYkZ3LH8T+9llm9p1NbjoHIR2Dzr48=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=NW+aVDJr; arc=none smtp.client-ip=192.198.163.8
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1737625329; x=1769161329;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:content-transfer-encoding:in-reply-to;
+  bh=YrG2Ji3mQLbKulNePHgsKU4kGwK8BTcBIgjmwTWQVaA=;
+  b=NW+aVDJrglSF4O/MmS1jBftL4f4PPcPpVsBNcTj52u8IkSxSGnOMoOXT
+   e1jPHaFMpMxmpsFOAj4e5Y7o5UF/HXkQVj5z4fyE3hpmlYq8foakLg1eG
+   45JABLEqLtJEONw0kHZxs8ebgBH5jdYBAVT+lcW6D+5uHn5O8uebpSmXz
+   viqVw+1/2AK/NfirAE/RNmv6WOEbW/o9s2LkhVdEAexVn60S8HTApzZYa
+   FQWguyJHETK1q6buv/d5YO9vHEW6tnIS3x6af10dm/1O1D3uqtVbMIS3O
+   kXT5cFsTB7sYJ+zU5S8OzoYNPyZy3gWEOjqxqThGvF5TnwxRBRCiOpcqU
+   w==;
+X-CSE-ConnectionGUID: IDtow5M8RBmuzNV1COjfCQ==
+X-CSE-MsgGUID: KDVrn5ViTLaKsPZNnngSfQ==
+X-IronPort-AV: E=McAfee;i="6700,10204,11323"; a="55662645"
+X-IronPort-AV: E=Sophos;i="6.13,228,1732608000"; 
+   d="scan'208";a="55662645"
+Received: from orviesa008.jf.intel.com ([10.64.159.148])
+  by fmvoesa102.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 23 Jan 2025 01:42:08 -0800
+X-CSE-ConnectionGUID: 9oxn64ksRdubNtzQclsuOQ==
+X-CSE-MsgGUID: 9H5eZPi1SmWTleYC98/QGg==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.12,224,1728975600"; 
+   d="scan'208";a="108281813"
+Received: from mev-dev.igk.intel.com ([10.237.112.144])
+  by orviesa008-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 23 Jan 2025 01:42:05 -0800
+Date: Thu, 23 Jan 2025 10:38:37 +0100
+From: Michal Swiatkowski <michal.swiatkowski@linux.intel.com>
+To: Thomas =?iso-8859-1?Q?Wei=DFschuh?= <linux@weissschuh.net>
+Cc: Richard Cochran <richardcochran@gmail.com>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	John Stultz <john.stultz@linaro.org>, Arnd Bergmann <arnd@arndb.de>,
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+	stable@vger.kernel.org
+Subject: Re: [PATCH RESEND net] ptp: Ensure info->enable callback is always
+ set
+Message-ID: <Z5IOHVu9L+QpyK4Y@mev-dev.igk.intel.com>
+References: <20250123-ptp-enable-v1-1-b015834d3a47@weissschuh.net>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next v2] ipv4: ip_gre: Fix set but not used warning in
- ipgre_err() if IPv4-only
-To: Geert Uytterhoeven <geert@linux-m68k.org>,
- "David S . Miller" <davem@davemloft.net>, David Ahern <dsahern@kernel.org>,
- Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
- Simon Horman <horms@kernel.org>, Kuniyuki Iwashima <kuniyu@amazon.com>
-Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
- kernel test robot <lkp@intel.com>
-References: <67956320a8ee663f2582cc75f0e8047d69da5f6a.1737371364.git.geert@linux-m68k.org>
-Content-Language: en-US
-From: Paolo Abeni <pabeni@redhat.com>
-In-Reply-To: <67956320a8ee663f2582cc75f0e8047d69da5f6a.1737371364.git.geert@linux-m68k.org>
-Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
+In-Reply-To: <20250123-ptp-enable-v1-1-b015834d3a47@weissschuh.net>
 
-On 1/20/25 2:12 PM, Geert Uytterhoeven wrote:
-> if CONFIG_NET_IPGRE is enabled, but CONFIG_IPV6 is disabled:
+On Thu, Jan 23, 2025 at 08:22:40AM +0100, Thomas Weiﬂschuh wrote:
+> The ioctl and sysfs handlers unconditionally call the ->enable callback.
+> Not all drivers implement that callback, leading to NULL dereferences.
+> Example of affected drivers: ptp_s390.c, ptp_vclock.c and ptp_mock.c.
 > 
->     net/ipv4/ip_gre.c: In function ‚Äòipgre_err‚Äô:
->     net/ipv4/ip_gre.c:144:22: error: variable ‚Äòdata_len‚Äô set but not used [-Werror=unused-but-set-variable]
->       144 |         unsigned int data_len = 0;
-> 	  |                      ^~~~~~~~
+> Instead use a dummy callback if no better was specified by the driver.
 > 
-> Fix this by moving all data_len processing inside the IPV6-only section
-> that uses its result.
+> Fixes: d94ba80ebbea ("ptp: Added a brand new class driver for ptp clocks.")
+> Cc: stable@vger.kernel.org
+> Signed-off-by: Thomas Weiﬂschuh <linux@weissschuh.net>
+> ---
+>  drivers/ptp/ptp_clock.c | 8 ++++++++
+>  1 file changed, 8 insertions(+)
 > 
-> Reported-by: kernel test robot <lkp@intel.com>
-> Closes: https://lore.kernel.org/oe-kbuild-all/202501121007.2GofXmh5-lkp@intel.com/
-> Signed-off-by: Geert Uytterhoeven <geert@linux-m68k.org>
+> diff --git a/drivers/ptp/ptp_clock.c b/drivers/ptp/ptp_clock.c
+> index b932425ddc6a3789504164a69d1b8eba47da462c..35a5994bf64f6373c08269d63aaeac3f4ab31ff0 100644
+> --- a/drivers/ptp/ptp_clock.c
+> +++ b/drivers/ptp/ptp_clock.c
+> @@ -217,6 +217,11 @@ static int ptp_getcycles64(struct ptp_clock_info *info, struct timespec64 *ts)
+>  		return info->gettime64(info, ts);
+>  }
+>  
+> +static int ptp_enable(struct ptp_clock_info *ptp, struct ptp_clock_request *request, int on)
+> +{
+> +	return -EOPNOTSUPP;
+> +}
+> +
+>  static void ptp_aux_kworker(struct kthread_work *work)
+>  {
+>  	struct ptp_clock *ptp = container_of(work, struct ptp_clock,
+> @@ -294,6 +299,9 @@ struct ptp_clock *ptp_clock_register(struct ptp_clock_info *info,
+>  			ptp->info->getcrosscycles = ptp->info->getcrosststamp;
+>  	}
+>  
+> +	if (!ptp->info->enable)
+> +		ptp->info->enable = ptp_enable;
+> +
+>  	if (ptp->info->do_aux_work) {
+>  		kthread_init_delayed_work(&ptp->aux_work, ptp_aux_kworker);
+>  		ptp->kworker = kthread_run_worker(0, "ptp%d", ptp->index);
+> 
+> ---
+> base-commit: c4b9570cfb63501638db720f3bee9f6dfd044b82
+> change-id: 20250122-ptp-enable-831339c62428
+> 
+> Best regards,
+> -- 
+> Thomas Weiﬂschuh <linux@weissschuh.net>
 
-## Form letter - net-next-closed
+Reviewed-by: Michal Swiatkowski <michal.swiatkowski@linux.intel.com>
 
-The merge window for v6.14 has begun. Therefore net-next is closed
-for new drivers, features, code refactoring and optimizations.
-We are currently accepting bug fixes only.
+What about other ops, did you check it too? Looks like it isn't needed,
+but it sometimes hard to follow.
 
-Please repost when net-next reopens after Feb 3rd.
-
-RFC patches sent for review only are obviously welcome at any time.
-
-See:
-https://www.kernel.org/doc/html/next/process/maintainer-netdev.html#development-cycle
----
-Note: this is possibly somewhat borderline, but I prefer to avoid
-exceptions unless there is something really ... exceptional ;)
-
-/P
-
+Thanks
 
