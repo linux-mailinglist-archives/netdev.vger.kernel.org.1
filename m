@@ -1,125 +1,99 @@
-Return-Path: <netdev+bounces-160613-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-160620-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 71477A1A847
-	for <lists+netdev@lfdr.de>; Thu, 23 Jan 2025 18:00:30 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6D1E8A1A8D8
+	for <lists+netdev@lfdr.de>; Thu, 23 Jan 2025 18:22:24 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 9537B7A201D
-	for <lists+netdev@lfdr.de>; Thu, 23 Jan 2025 17:00:18 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 024DC3A93F9
+	for <lists+netdev@lfdr.de>; Thu, 23 Jan 2025 17:20:29 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4382514AD38;
-	Thu, 23 Jan 2025 17:00:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5786112C7FD;
+	Thu, 23 Jan 2025 17:20:32 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="JQBcCEe+"
+	dkim=pass (2048-bit key) header.d=netfilter.org header.i=@netfilter.org header.b="evapiPAK";
+	dkim=pass (2048-bit key) header.d=netfilter.org header.i=@netfilter.org header.b="IAaHXFW5"
 X-Original-To: netdev@vger.kernel.org
-Received: from relay8-d.mail.gandi.net (relay8-d.mail.gandi.net [217.70.183.201])
+Received: from mail.netfilter.org (mail.netfilter.org [217.70.190.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EE58C3C463;
-	Thu, 23 Jan 2025 17:00:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3F62213D891
+	for <netdev@vger.kernel.org>; Thu, 23 Jan 2025 17:20:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.190.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1737651612; cv=none; b=MwYW5zpB3ehjv9sgLuHHQaVEMZx1uNo+UUCcCo9dLlXQb+6z9yDETEMHdtKOaeIQMXoPufeJBpgv5yAwRwu25q5DzLGueJqzNCkvbe0ifXMnX81UpakSRIgiXeUtdFt99ntn5irt5ELBwVoqFsR6vqeSN76z7I7xyAh8UXdUZ0s=
+	t=1737652832; cv=none; b=MciNeZR8DseAoiajdDRdTWeBaugOt5ol1++nbTTVR6QBxxZtgzGNd9kKMvrrmSt/s0LtgCxs2zmv5OcoeuXPLbZXjy6DAiXKfSPCjPaUFycX6XBDkDsXPQk9GNGdD+s3I04KTaueNkP+nUQeMGmnYpcMMNKa4Ho476HZWO1bbMI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1737651612; c=relaxed/simple;
-	bh=a1xqH+ot/n+WwUJKmGMch9Gmph5UCrgJHrIJlfxGmgw=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=OgtxePObVBn4G4dkGO/Xak8Oem4YI142+ssOkgqfrINFnPLpONt5JW/fqnYhYnlrB5XXrRpcOHDUS5mt+iR83OjNc5kBIpiEmvvl+TnRQ29ae7qh2wjzyHI6mfA4xqf3VW8oXDLy5QQljkej08RoqnJb3jkjOC7dDFz5SxetuPI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=JQBcCEe+; arc=none smtp.client-ip=217.70.183.201
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
-Received: by mail.gandi.net (Postfix) with ESMTPSA id 77C601BF207;
-	Thu, 23 Jan 2025 17:00:07 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
-	t=1737651608;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=APFOFofNAriLkQoN+2DBivXiQlJ9mH2058hLi8ae2J4=;
-	b=JQBcCEe+osfxTy7gxiIHiXIO7CrcCIBLWIozlv/uOiqgUyKwAKBxvAq5d+tGHgAmEfW+04
-	p3zhX0IPRzlJIctV5wcPyvFJvwLPMeUHV08/drWwcGDBgLMiXrQjPwqSJZ8S4A2HH+mzXv
-	WpLFlOJZHUA/uW2HOs2iCd82tVQOlDkIgJaRqkKFRxFBSiFpDQ//wDdHlmNmr3fP0goqhv
-	bbiu2p2p7lxHUUofZ4bKCQN1hDeaTFbs/GZvX5RJ2A0WbhQWPQ/Z5frf7SHL4n9FH9uBXO
-	qWHENrCehHlCepDfLaZcJNSrxp4IFsQxNgXdgI4ZvDKSztQsokJvgobjwi9pcQ==
-From: Kory Maincent <kory.maincent@bootlin.com>
-Date: Thu, 23 Jan 2025 17:58:01 +0100
-Subject: [PATCH net v2 2/2] net: sh_eth: Fix missing rtnl lock in suspend
- path
+	s=arc-20240116; t=1737652832; c=relaxed/simple;
+	bh=WhTsnlpcnQq4WidHbXE5ciYxnPBAP916V3sS7V7tWVg=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=ij6wV9VfHTKLbYOcbTJUnH+RzhRYaKmK8VIeHYVRc1whipq0hPpM/CeEm7VkLDsKZw5qHmPNUY80ldRlFLVIhFMxlC9QegzSFSN7rXsqNrGu+2dGBgMu/OhpTrps7YP/3VYzd5Y4kyuvHQsDMEF+UieSTKHx2Qwo6AxyzB1o5A8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=netfilter.org; spf=pass smtp.mailfrom=netfilter.org; dkim=pass (2048-bit key) header.d=netfilter.org header.i=@netfilter.org header.b=evapiPAK; dkim=pass (2048-bit key) header.d=netfilter.org header.i=@netfilter.org header.b=IAaHXFW5; arc=none smtp.client-ip=217.70.190.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=netfilter.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=netfilter.org
+Received: by mail.netfilter.org (Postfix, from userid 109)
+	id DF6E460281; Thu, 23 Jan 2025 18:10:22 +0100 (CET)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=netfilter.org;
+	s=2025; t=1737652222;
+	bh=CBXShc47+4kX7A6JXFFPx3Pz+0aI99upTCBf/QitxbU=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=evapiPAKGKNbCGPBlcwOwhr+32vOueQLuAzPZtI3SW7FT04LvRNEWyHltPF0G93YT
+	 yLajO7Otcwl2v+qi2kOWsXu2IPMeyT0q78hmiYuNtIxV+C8GHHTVzFojddHH5bgqvJ
+	 fJVpKfCLTmyZ0OZilFdK9lZxi9JBr358tGlDNCB4okC65X8gmvqoDP2lprD/HrYOWY
+	 QzZs1iNB2xi3Dfje6jyvR78BE83CtvJ2byMfRMx4L4VTOG4+mKzTHaMei8RXmnx63E
+	 0nNrvVkcGHRCkY/3FVmvfrPkKopYNXevGbDqkW7QVAX09djZRUtLWQa1JivVEpgPee
+	 MUi7TQ0eojApQ==
+X-Spam-Level: 
+Received: from netfilter.org (mail-agni [217.70.190.124])
+	by mail.netfilter.org (Postfix) with ESMTPSA id B5A5D60281;
+	Thu, 23 Jan 2025 18:10:21 +0100 (CET)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=netfilter.org;
+	s=2025; t=1737652221;
+	bh=CBXShc47+4kX7A6JXFFPx3Pz+0aI99upTCBf/QitxbU=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=IAaHXFW5rT/GPD8xMR8e53JoSe4odOYOCkoBnl4wr86Kpd5sv5pRBIEjtRRHTa0Zu
+	 +Mi1u0RgLpCTcRf4M8z1a91ERIR6a6vHaTysH9PCOu6Gi/Lo6xaZZDOSjbgzEXAkI+
+	 BYWebfk69uebUOLmkzukh5RI5I/KwsPLIh1yPCC9F510IqdqCfaetgFAkKgYHX5kgq
+	 nHKeM8ovF/zFw2V812lOt+b2PD5QS0nEfFMOs6Te8kg6fX6Ao/u12Ujj1WjPLICV7i
+	 llUTGXA3ym/KrD0qwwPLhdSqAuZREG/5J1vZVoRoHUdoHN3wH71j7SLLQCbttD9FsD
+	 sT4gFb4uC9pkg==
+Date: Thu, 23 Jan 2025 18:10:18 +0100
+From: Pablo Neira Ayuso <pablo@netfilter.org>
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: netdev@vger.kernel.org, fw@strlen.de
+Subject: Re: [TEST] nft-flowtable-sh flaking after pulling first chunk of the
+ merge window
+Message-ID: <Z5J3-ppgAuRL5P9U@calendula>
+References: <20250123080444.4d92030c@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 8bit
-Message-Id: <20250123-fix_missing_rtnl_lock_phy_disconnect-v2-2-e6206f5508ba@bootlin.com>
-References: <20250123-fix_missing_rtnl_lock_phy_disconnect-v2-0-e6206f5508ba@bootlin.com>
-In-Reply-To: <20250123-fix_missing_rtnl_lock_phy_disconnect-v2-0-e6206f5508ba@bootlin.com>
-To: Paul Barker <paul.barker.ct@bp.renesas.com>, 
- =?utf-8?q?Niklas_S=C3=B6derlund?= <niklas.soderlund@ragnatech.se>, 
- Andrew Lunn <andrew+netdev@lunn.ch>, 
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
- Mikhail Ulyanov <mikhail.ulyanov@cogentembedded.com>, 
- Sergei Shtylyov <sergei.shtylyov@cogentembedded.com>
-Cc: Thomas Petazzoni <thomas.petazzoni@bootlin.com>, 
- =?utf-8?q?Niklas_S=C3=B6derlund?= <niklas.soderlund+renesas@ragnatech.se>, 
- Claudiu Beznea <claudiu.beznea.uj@bp.renesas.com>, netdev@vger.kernel.org, 
- linux-renesas-soc@vger.kernel.org, linux-kernel@vger.kernel.org, 
- Kory Maincent <kory.maincent@bootlin.com>, 
- Sergey Shtylyov <s.shtylyov@omp.ru>
-X-Mailer: b4 0.14.1
-X-GND-Sasl: kory.maincent@bootlin.com
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20250123080444.4d92030c@kernel.org>
 
-Fix the suspend path by ensuring the rtnl lock is held where required.
-Calls to sh_eth_close, sh_eth_open and wol operations must be performed
-under the rtnl lock to prevent conflicts with ongoing ndo operations.
+Hi Jakub,
 
-Fixes: b71af04676e9 ("sh_eth: add more PM methods")
-Tested-by: Niklas Söderlund <niklas.soderlund+renesas@ragnatech.se>
-Reviewed-by: Sergey Shtylyov <s.shtylyov@omp.ru>
-Signed-off-by: Kory Maincent <kory.maincent@bootlin.com>
----
- drivers/net/ethernet/renesas/sh_eth.c | 4 ++++
- 1 file changed, 4 insertions(+)
+On Thu, Jan 23, 2025 at 08:04:44AM -0800, Jakub Kicinski wrote:
+> Hi!
+> 
+> Could be very bad luck but after we fast forwarded net-next yesterday
+> we have 3 failures in less than 24h in nft_flowtabl.sh:
+> 
+> https://netdev.bots.linux.dev/contest.html?test=nft-flowtable-sh
+> 
+> # FAIL: flow offload for ns1/ns2 with masquerade and pmtu discovery : original counter  2113852 exceeds expected value 2097152, reply counter  60
+> https://netdev-3.bots.linux.dev/vmksft-nf/results/960740/11-nft-flowtable-sh/stdout
+> 
+> # FAIL: flow offload for ns1/ns2 with masquerade and pmtu discovery : original counter  3530493 exceeds expected value 3478585, reply counter  60
+> https://netdev-3.bots.linux.dev/vmksft-nf/results/960022/10-nft-flowtable-sh/stdout
+> 
+> # FAIL: dscp counters do not match, expected dscp3 and dscp0 > 0 but got  1431 , 0 
+> https://netdev-3.bots.linux.dev/vmksft-nf/results/960740/11-nft-flowtable-sh-retry/stdout
 
-diff --git a/drivers/net/ethernet/renesas/sh_eth.c b/drivers/net/ethernet/renesas/sh_eth.c
-index 8887b8921009..5fc8027c92c7 100644
---- a/drivers/net/ethernet/renesas/sh_eth.c
-+++ b/drivers/net/ethernet/renesas/sh_eth.c
-@@ -3494,10 +3494,12 @@ static int sh_eth_suspend(struct device *dev)
- 
- 	netif_device_detach(ndev);
- 
-+	rtnl_lock();
- 	if (mdp->wol_enabled)
- 		ret = sh_eth_wol_setup(ndev);
- 	else
- 		ret = sh_eth_close(ndev);
-+	rtnl_unlock();
- 
- 	return ret;
- }
-@@ -3511,10 +3513,12 @@ static int sh_eth_resume(struct device *dev)
- 	if (!netif_running(ndev))
- 		return 0;
- 
-+	rtnl_lock();
- 	if (mdp->wol_enabled)
- 		ret = sh_eth_wol_restore(ndev);
- 	else
- 		ret = sh_eth_open(ndev);
-+	rtnl_unlock();
- 
- 	if (ret < 0)
- 		return ret;
-
--- 
-2.34.1
-
+Thanks for your report, let me take a look.
 
