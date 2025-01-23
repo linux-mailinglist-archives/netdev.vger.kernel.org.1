@@ -1,96 +1,134 @@
-Return-Path: <netdev+bounces-160500-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-160502-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2CFEAA19F00
-	for <lists+netdev@lfdr.de>; Thu, 23 Jan 2025 08:33:20 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 44865A19FB2
+	for <lists+netdev@lfdr.de>; Thu, 23 Jan 2025 09:19:11 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id CD1D77A286A
-	for <lists+netdev@lfdr.de>; Thu, 23 Jan 2025 07:33:10 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 7E83016DE91
+	for <lists+netdev@lfdr.de>; Thu, 23 Jan 2025 08:19:09 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0A8F52010E1;
-	Thu, 23 Jan 2025 07:33:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D1B5B20C006;
+	Thu, 23 Jan 2025 08:19:03 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b="EFkqSsMM"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="GNd3WSUE"
 X-Original-To: netdev@vger.kernel.org
-Received: from out30-118.freemail.mail.aliyun.com (out30-118.freemail.mail.aliyun.com [115.124.30.118])
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6B4B9179A7;
-	Thu, 23 Jan 2025 07:33:07 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=115.124.30.118
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 28A1020B80A
+	for <netdev@vger.kernel.org>; Thu, 23 Jan 2025 08:19:01 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1737617591; cv=none; b=iKDAnX/oMc8NwoD9jp7Yik+qTMGpwCoPKkECqYH6DlUPTqXTlH6LKNwNt536MWjDNLD1B3q4VbuSXqgMVFVpYVJEoTzvTZYe2q0BAXrZMLWgSHXl0TdMDYw92n82JU2qOMF4U7qHA4HafzCbeba9ZMiz7B4hbYuQFCRp1M7V/Lo=
+	t=1737620343; cv=none; b=AVC/x5RMZHGqHgWSPLiTxcTJiBmNnlkAnQVo0xgsm0OWFJq1lPRSzEnzyL1imKX/h7wkd5hXwmvBawlHGmwOQ2eZcTFjuT9h2IBMWhW8/fnpKcg6ZwjzbVbuWGQufwFur2ECuInZ4edXvv0r1IFqmRzXmxiwZi+YpjHDK/vlrfY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1737617591; c=relaxed/simple;
-	bh=VgZ6NpiJIBnOImn9hg7EpJtXzuG0hqCcxpeAx/83DGU=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=iPw1qIGLgj7eJHN2ubCFly561K0z/DIh2aelKvLCmktEqAwPU5UiY9Rd/tXfRw4hlD61Kuq8jVWbRAL9EeELhgMEo3DnsikxpgzKQ+xLfhYW7Sghv2ca0IjlhagwlMNgZQYeWYWwES7htXYHfUvXm1LpFlEFpG6h7TYs09oqu+A=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com; spf=pass smtp.mailfrom=linux.alibaba.com; dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b=EFkqSsMM; arc=none smtp.client-ip=115.124.30.118
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.alibaba.com
-DKIM-Signature:v=1; a=rsa-sha256; c=relaxed/relaxed;
-	d=linux.alibaba.com; s=default;
-	t=1737617586; h=Date:From:To:Subject:Message-ID:MIME-Version:Content-Type;
-	bh=VgZ6NpiJIBnOImn9hg7EpJtXzuG0hqCcxpeAx/83DGU=;
-	b=EFkqSsMMESJ61Y+71C2oLESm0t9h+WHbiNghTaD/0OU2G3PN7ifrYpYCUB/tTCsuBhccmTKyyHc1cq6SDmmaRkybSrZ08Zao1MHCa8tqIO31ueBumgmv5HpjzEXsJoYQNo6/4gIxHjR0YQfW98Xump2Ff+1BISChQKM1kGgYZSA=
-Received: from localhost(mailfrom:dust.li@linux.alibaba.com fp:SMTPD_---0WOAr9.D_1737617584 cluster:ay36)
-          by smtp.aliyun-inc.com;
-          Thu, 23 Jan 2025 15:33:04 +0800
-Date: Thu, 23 Jan 2025 15:33:03 +0800
-From: Dust Li <dust.li@linux.alibaba.com>
-To: "D. Wythe" <alibuda@linux.alibaba.com>, kgraul@linux.ibm.com,
-	wenjia@linux.ibm.com, jaka@linux.ibm.com, ast@kernel.org,
-	daniel@iogearbox.net, andrii@kernel.org, martin.lau@linux.dev,
-	pabeni@redhat.com, song@kernel.org, sdf@google.com,
-	haoluo@google.com, yhs@fb.com, edumazet@google.com,
-	john.fastabend@gmail.com, kpsingh@kernel.org, jolsa@kernel.org,
-	guwen@linux.alibaba.com
-Cc: kuba@kernel.org, davem@davemloft.net, netdev@vger.kernel.org,
-	linux-s390@vger.kernel.org, linux-rdma@vger.kernel.org,
-	bpf@vger.kernel.org
-Subject: Re: [PATCH bpf-next v7 0/6] net/smc: Introduce smc_ops
-Message-ID: <20250123073303.GR89233@linux.alibaba.com>
-Reply-To: dust.li@linux.alibaba.com
-References: <20250123015942.94810-1-alibuda@linux.alibaba.com>
+	s=arc-20240116; t=1737620343; c=relaxed/simple;
+	bh=e1qw4y4PLJCQfmeGcA03ZD+XvKSBFChpfjWZUn2EDtQ=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=T5e2ccAF/HbSMokHOyLU/Cdgy3eb//s2vZ9ZmNuoMomIiSyEGfx5S4fXtn+SixpWIuqNJySftS/xjrZCeTNbr3jJDnN3raNasirqpPP4C8QP09IY7gwbMNiNTl+ezEsVW1J/hztDNYRXlxG89X0B1v7a3X58UAY0otrkMTKPziA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=GNd3WSUE; arc=none smtp.client-ip=192.198.163.18
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1737620342; x=1769156342;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=e1qw4y4PLJCQfmeGcA03ZD+XvKSBFChpfjWZUn2EDtQ=;
+  b=GNd3WSUEi/KqWucFtI5gAv3ALa0fRgtEmb5/Li5ePAMci0I78fc7WEWw
+   6mF7CWQ5OyXvcnB+byOxyeoDJvxxDCr9KB9vMwVt2Oq+s2G04s9y41Lru
+   qtYKGJr8QSqiTzGFTO4tL1lNlVq1Ek2J91aOZXcw1vrrgXiG/QQ9AxEZZ
+   5w9xEL/rJcTc1wl2F5VsRSp0q1EUgdAArXmH5ptgYih7gn2ox1+w5G/Eh
+   hJuaNPd1GquxHKNLMKHR/J4sTEXd8O8VsC5CrzaK0J/Z8fvyfR9tac1AN
+   +OZPn6Tlf6LsAqGCLVdGpNQmieRFfSU67me2HSgzvbMOAYm7KhMxVojGZ
+   g==;
+X-CSE-ConnectionGUID: 4B9gfZwrTvi5P79/MPsZ4g==
+X-CSE-MsgGUID: TajNjvshQyy1aajfsKev8w==
+X-IronPort-AV: E=McAfee;i="6700,10204,11323"; a="37367431"
+X-IronPort-AV: E=Sophos;i="6.13,227,1732608000"; 
+   d="scan'208";a="37367431"
+Received: from orviesa001.jf.intel.com ([10.64.159.141])
+  by fmvoesa112.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 23 Jan 2025 00:19:01 -0800
+X-CSE-ConnectionGUID: 3BCBMiajSwWA8L2gLrBW1A==
+X-CSE-MsgGUID: t4F6L9C8RSG1qdHzUJ8/kA==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.12,224,1728975600"; 
+   d="scan'208";a="144631774"
+Received: from gklab-003-001.igk.intel.com ([10.211.3.1])
+  by orviesa001.jf.intel.com with ESMTP; 23 Jan 2025 00:19:00 -0800
+From: Grzegorz Nitka <grzegorz.nitka@intel.com>
+To: intel-wired-lan@lists.osuosl.org
+Cc: netdev@vger.kernel.org,
+	Grzegorz Nitka <grzegorz.nitka@intel.com>,
+	Michal Swiatkowski <michal.swiatkowski@linux.intel.com>
+Subject: [PATCH iwl-net v1] ice: fix memory leak in aRFS after reset
+Date: Thu, 23 Jan 2025 09:15:39 +0100
+Message-Id: <20250123081539.1814685-1-grzegorz.nitka@intel.com>
+X-Mailer: git-send-email 2.39.3
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250123015942.94810-1-alibuda@linux.alibaba.com>
+Content-Transfer-Encoding: 8bit
 
-On 2025-01-23 09:59:36, D. Wythe wrote:
->This patch aims to introduce BPF injection capabilities for SMC and
->includes a self-test to ensure code stability.
->
->Since the SMC protocol isn't ideal for every situation, especially
->short-lived ones, most applications can't guarantee the absence of
->such scenarios. Consequently, applications may need specific strategies
->to decide whether to use SMC. For example, an application might limit SMC
->usage to certain IP addresses or ports.
->
->To maintain the principle of transparent replacement, we want applications
->to remain unaffected even if they need specific SMC strategies. In other
->words, they should not require recompilation of their code.
->
->Additionally, we need to ensure the scalability of strategy implementation.
->While using socket options or sysctl might be straightforward, it could
->complicate future expansions.
->
->Fortunately, BPF addresses these concerns effectively. Users can write
->their own strategies in eBPF to determine whether to use SMC, and they can
->easily modify those strategies in the future.
+Fix aRFS (accelerated Receive Flow Steering) structures memory leak by
+adding a checker to verify if aRFS memory is already allocated while
+configuring VSI. aRFS objects are allocated in two cases:
+- as part of VSI initialization (at probe), and
+- as part of reset handling
 
-The series looks good to me, except the name of smc_ops, we should come
-up with a better name.
+However, VSI reconfiguration executed during reset involves memory
+allocation one more time, without prior releasing already allocated
+resources. This led to the memory leak with the following signature:
 
-Best regards,
-Dust
+[root@os-delivery ~]# cat /sys/kernel/debug/kmemleak
+unreferenced object 0xff3c1ca7252e6000 (size 8192):
+  comm "kworker/0:0", pid 8, jiffies 4296833052
+  hex dump (first 32 bytes):
+    00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00  ................
+    00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00  ................
+  backtrace (crc 0):
+    [<ffffffff991ec485>] __kmalloc_cache_noprof+0x275/0x340
+    [<ffffffffc0a6e06a>] ice_init_arfs+0x3a/0xe0 [ice]
+    [<ffffffffc09f1027>] ice_vsi_cfg_def+0x607/0x850 [ice]
+    [<ffffffffc09f244b>] ice_vsi_setup+0x5b/0x130 [ice]
+    [<ffffffffc09c2131>] ice_init+0x1c1/0x460 [ice]
+    [<ffffffffc09c64af>] ice_probe+0x2af/0x520 [ice]
+    [<ffffffff994fbcd3>] local_pci_probe+0x43/0xa0
+    [<ffffffff98f07103>] work_for_cpu_fn+0x13/0x20
+    [<ffffffff98f0b6d9>] process_one_work+0x179/0x390
+    [<ffffffff98f0c1e9>] worker_thread+0x239/0x340
+    [<ffffffff98f14abc>] kthread+0xcc/0x100
+    [<ffffffff98e45a6d>] ret_from_fork+0x2d/0x50
+    [<ffffffff98e083ba>] ret_from_fork_asm+0x1a/0x30
+    ...
+
+Fixes: 28bf26724fdb ("ice: Implement aRFS")
+Reviewed-by: Michal Swiatkowski <michal.swiatkowski@linux.intel.com>
+Signed-off-by: Grzegorz Nitka <grzegorz.nitka@intel.com>
+---
+ drivers/net/ethernet/intel/ice/ice_arfs.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/drivers/net/ethernet/intel/ice/ice_arfs.c b/drivers/net/ethernet/intel/ice/ice_arfs.c
+index 7cee365cc7d1..405ddd17de1b 100644
+--- a/drivers/net/ethernet/intel/ice/ice_arfs.c
++++ b/drivers/net/ethernet/intel/ice/ice_arfs.c
+@@ -511,7 +511,7 @@ void ice_init_arfs(struct ice_vsi *vsi)
+ 	struct hlist_head *arfs_fltr_list;
+ 	unsigned int i;
+ 
+-	if (!vsi || vsi->type != ICE_VSI_PF)
++	if (!vsi || vsi->type != ICE_VSI_PF || ice_is_arfs_active(vsi))
+ 		return;
+ 
+ 	arfs_fltr_list = kcalloc(ICE_MAX_ARFS_LIST, sizeof(*arfs_fltr_list),
+
+base-commit: 3ef16bb459c1a3af2c071cb5651877a47cd03295
+-- 
+2.39.3
 
 
