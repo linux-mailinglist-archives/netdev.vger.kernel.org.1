@@ -1,142 +1,141 @@
-Return-Path: <netdev+bounces-160529-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-160530-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id C128FA1A0FE
-	for <lists+netdev@lfdr.de>; Thu, 23 Jan 2025 10:42:22 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 22488A1A12B
+	for <lists+netdev@lfdr.de>; Thu, 23 Jan 2025 10:50:12 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 129AA16DE4F
-	for <lists+netdev@lfdr.de>; Thu, 23 Jan 2025 09:42:21 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 6347B3AC2C2
+	for <lists+netdev@lfdr.de>; Thu, 23 Jan 2025 09:50:02 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1892B20CCCD;
-	Thu, 23 Jan 2025 09:42:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 397FB20D4EF;
+	Thu, 23 Jan 2025 09:50:04 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="NW+aVDJr"
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=nucleusys.com header.i=@nucleusys.com header.b="IkG0eniu"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.8])
+Received: from lan.nucleusys.com (lan.nucleusys.com [92.247.61.126])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 650D420C492;
-	Thu, 23 Jan 2025 09:42:08 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.8
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 46CDA20D4F6;
+	Thu, 23 Jan 2025 09:49:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=92.247.61.126
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1737625330; cv=none; b=nN728u4wrz3iyDhof4mE38OD+5yHHelE7dICiRcUr8IS7LOSyb19JgPBZ9YfnQ0YJzfwRXYL8EmCUdB2RmXscw1nKevvrlT/ycSINcUR0AO3xb3trvIFZWQmFt0GExwxU6G/BcQmKlJLFpNZHrYfYVWYshk5/r5FzcS22hsbUe8=
+	t=1737625804; cv=none; b=jfaXnZ0nkfAvUGf5VSwP/CcLSzTYCHGHxNHRM9ElhiaKSwyWvbC+n9HxDsNfHQ+gT5nS2r98upmrH/XzcHQYnf2qRtb/CmQer76bYOJMi76JdY9ORXLeOueYx0WG6wixZNpRRDy/oGqtcAPlJ/NMVGWf/SmlXsSJcda1iCEih68=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1737625330; c=relaxed/simple;
-	bh=YrG2Ji3mQLbKulNePHgsKU4kGwK8BTcBIgjmwTWQVaA=;
+	s=arc-20240116; t=1737625804; c=relaxed/simple;
+	bh=Bbz0HQLEUv0H65DYzIZMwaLns+nw+QgTm9WO+iTQm5c=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Lzr29t/Rb4ZCbC6yPgPNXJbFJUum5ldggY03ANNOSFQfYCti6mSBGjujFl6f66zizJGViVpw1Pkeayz9AfZTwAY1ebzCSN9UAPLg32yFF5CQzYwQB0AcC7vJPTWVsYCblf55SZXVU2n21nYkZ3LH8T+9llm9p1NbjoHIR2Dzr48=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=NW+aVDJr; arc=none smtp.client-ip=192.198.163.8
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1737625329; x=1769161329;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:content-transfer-encoding:in-reply-to;
-  bh=YrG2Ji3mQLbKulNePHgsKU4kGwK8BTcBIgjmwTWQVaA=;
-  b=NW+aVDJrglSF4O/MmS1jBftL4f4PPcPpVsBNcTj52u8IkSxSGnOMoOXT
-   e1jPHaFMpMxmpsFOAj4e5Y7o5UF/HXkQVj5z4fyE3hpmlYq8foakLg1eG
-   45JABLEqLtJEONw0kHZxs8ebgBH5jdYBAVT+lcW6D+5uHn5O8uebpSmXz
-   viqVw+1/2AK/NfirAE/RNmv6WOEbW/o9s2LkhVdEAexVn60S8HTApzZYa
-   FQWguyJHETK1q6buv/d5YO9vHEW6tnIS3x6af10dm/1O1D3uqtVbMIS3O
-   kXT5cFsTB7sYJ+zU5S8OzoYNPyZy3gWEOjqxqThGvF5TnwxRBRCiOpcqU
-   w==;
-X-CSE-ConnectionGUID: IDtow5M8RBmuzNV1COjfCQ==
-X-CSE-MsgGUID: KDVrn5ViTLaKsPZNnngSfQ==
-X-IronPort-AV: E=McAfee;i="6700,10204,11323"; a="55662645"
-X-IronPort-AV: E=Sophos;i="6.13,228,1732608000"; 
-   d="scan'208";a="55662645"
-Received: from orviesa008.jf.intel.com ([10.64.159.148])
-  by fmvoesa102.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 23 Jan 2025 01:42:08 -0800
-X-CSE-ConnectionGUID: 9oxn64ksRdubNtzQclsuOQ==
-X-CSE-MsgGUID: 9H5eZPi1SmWTleYC98/QGg==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.12,224,1728975600"; 
-   d="scan'208";a="108281813"
-Received: from mev-dev.igk.intel.com ([10.237.112.144])
-  by orviesa008-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 23 Jan 2025 01:42:05 -0800
-Date: Thu, 23 Jan 2025 10:38:37 +0100
-From: Michal Swiatkowski <michal.swiatkowski@linux.intel.com>
-To: Thomas =?iso-8859-1?Q?Wei=DFschuh?= <linux@weissschuh.net>
-Cc: Richard Cochran <richardcochran@gmail.com>,
+	 Content-Type:Content-Disposition:In-Reply-To; b=j26nwRuUyhXEEyHeX+2VvsLFll+8096mVOXwaI+wR1E9QJ/k2gG+Od/gPqUGxbZ56wbMtljqyKJuDIXYeiHo0nmkP9zJMeSpGMSZ48wD3ClR9FqrKZPc6jnaCUbIyoTWIfpbfXbsMuJIJJAHUdKTElMTF4TQF/49HuE4Xqfurdw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=nucleusys.com; spf=pass smtp.mailfrom=nucleusys.com; dkim=pass (1024-bit key) header.d=nucleusys.com header.i=@nucleusys.com header.b=IkG0eniu; arc=none smtp.client-ip=92.247.61.126
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=nucleusys.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=nucleusys.com
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=nucleusys.com; s=xyz; h=In-Reply-To:Content-Type:MIME-Version:References:
+	Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Resent-Date:Resent-From:Resent-Sender:
+	Resent-To:Resent-Cc:Resent-Message-ID:List-Id:List-Help:List-Unsubscribe:
+	List-Subscribe:List-Post:List-Owner:List-Archive;
+	bh=+2lqGpaf1hkITIxyqiO+GCWkT51go5Y5OtXzi3ZW6UM=; b=IkG0eniuKRNGFi/c98lwnTHnW0
+	qkWLnknHtFnw0L9bsO0g2Obt8xrKSUis5qrjJzM79AAxxDGw/hQ9LlzP1jF0zytMk3ccyAZEaozTQ
+	FNoGNy3wcOaaj/PlnFCM3/t9QU4rey2A+Te7oCsbpyci8nKG8FkMsK94/qcaSvzISw18=;
+Received: from [192.168.234.1] (helo=bender.k.g)
+	by lan.nucleusys.com with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.96)
+	(envelope-from <petkan@nucleusys.com>)
+	id 1tatq7-000Gmm-0D;
+	Thu, 23 Jan 2025 11:49:31 +0200
+Date: Thu, 23 Jan 2025 11:49:30 +0200
+From: Petko Manolov <petkan@nucleusys.com>
+To: Alan Stern <stern@rowland.harvard.edu>
+Cc: Nikita Zhandarovich <n.zhandarovich@fintech.ru>,
 	Andrew Lunn <andrew+netdev@lunn.ch>,
 	"David S. Miller" <davem@davemloft.net>,
 	Eric Dumazet <edumazet@google.com>,
 	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	John Stultz <john.stultz@linaro.org>, Arnd Bergmann <arnd@arndb.de>,
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
-	stable@vger.kernel.org
-Subject: Re: [PATCH RESEND net] ptp: Ensure info->enable callback is always
- set
-Message-ID: <Z5IOHVu9L+QpyK4Y@mev-dev.igk.intel.com>
-References: <20250123-ptp-enable-v1-1-b015834d3a47@weissschuh.net>
+	linux-usb@vger.kernel.org, netdev@vger.kernel.org,
+	syzbot+d7e968426f644b567e31@syzkaller.appspotmail.com,
+	syzkaller-bugs@googlegroups.com, linux-kernel@vger.kernel.org,
+	lvc-project@linuxtesting.org
+Subject: Re: [PATCH net] net: usb: rtl8150: enable basic endpoint checking
+Message-ID: <20250123094930.GG4145@bender.k.g>
+References: <20250122104246.29172-1-n.zhandarovich@fintech.ru>
+ <20250122124359.GA9183@bender.k.g>
+ <f199387d-393b-4cb4-a215-7fd073ac32b8@fintech.ru>
+ <f099be8f-0ae0-49c7-b0bc-02770d9c1210@rowland.harvard.edu>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <20250123-ptp-enable-v1-1-b015834d3a47@weissschuh.net>
+In-Reply-To: <f099be8f-0ae0-49c7-b0bc-02770d9c1210@rowland.harvard.edu>
+X-Spam_score: -1.0
+X-Spam_bar: -
 
-On Thu, Jan 23, 2025 at 08:22:40AM +0100, Thomas Weiﬂschuh wrote:
-> The ioctl and sysfs handlers unconditionally call the ->enable callback.
-> Not all drivers implement that callback, leading to NULL dereferences.
-> Example of affected drivers: ptp_s390.c, ptp_vclock.c and ptp_mock.c.
+On 25-01-22 10:59:33, Alan Stern wrote:
+> On Wed, Jan 22, 2025 at 05:20:12AM -0800, Nikita Zhandarovich wrote:
+> > Hi,
+> > 
+> > On 1/22/25 04:43, Petko Manolov wrote:
+> > > On 25-01-22 02:42:46, Nikita Zhandarovich wrote:
+> > >> Syzkaller reports [1] encountering a common issue of utilizing a wrong usb
+> > >> endpoint type during URB submitting stage. This, in turn, triggers a warning
+> > >> shown below.
+> > > 
+> > > If these endpoints were of the wrong type the driver simply wouldn't work.
 > 
-> Instead use a dummy callback if no better was specified by the driver.
+> Better not to bind at all than to bind in a non-working way.  Especially when
+> we can tell by a simple check that the device isn't what the driver expects.
 > 
-> Fixes: d94ba80ebbea ("ptp: Added a brand new class driver for ptp clocks.")
-> Cc: stable@vger.kernel.org
-> Signed-off-by: Thomas Weiﬂschuh <linux@weissschuh.net>
-> ---
->  drivers/ptp/ptp_clock.c | 8 ++++++++
->  1 file changed, 8 insertions(+)
+> > > The proposed change in the patch doesn't do much in terms of fixing the
+> > > issue (pipe 3 != type 1) and if usb_check_bulk_endpoints() fails, the
+> > > driver will just not probe successfully.  I don't see how this is an
+> > > improvement to the current situation.
 > 
-> diff --git a/drivers/ptp/ptp_clock.c b/drivers/ptp/ptp_clock.c
-> index b932425ddc6a3789504164a69d1b8eba47da462c..35a5994bf64f6373c08269d63aaeac3f4ab31ff0 100644
-> --- a/drivers/ptp/ptp_clock.c
-> +++ b/drivers/ptp/ptp_clock.c
-> @@ -217,6 +217,11 @@ static int ptp_getcycles64(struct ptp_clock_info *info, struct timespec64 *ts)
->  		return info->gettime64(info, ts);
->  }
->  
-> +static int ptp_enable(struct ptp_clock_info *ptp, struct ptp_clock_request *request, int on)
-> +{
-> +	return -EOPNOTSUPP;
-> +}
-> +
->  static void ptp_aux_kworker(struct kthread_work *work)
->  {
->  	struct ptp_clock *ptp = container_of(work, struct ptp_clock,
-> @@ -294,6 +299,9 @@ struct ptp_clock *ptp_clock_register(struct ptp_clock_info *info,
->  			ptp->info->getcrosscycles = ptp->info->getcrosststamp;
->  	}
->  
-> +	if (!ptp->info->enable)
-> +		ptp->info->enable = ptp_enable;
-> +
->  	if (ptp->info->do_aux_work) {
->  		kthread_init_delayed_work(&ptp->aux_work, ptp_aux_kworker);
->  		ptp->kworker = kthread_run_worker(0, "ptp%d", ptp->index);
-> 
-> ---
-> base-commit: c4b9570cfb63501638db720f3bee9f6dfd044b82
-> change-id: 20250122-ptp-enable-831339c62428
-> 
-> Best regards,
-> -- 
-> Thomas Weiﬂschuh <linux@weissschuh.net>
+> It fixes the issue by preventing the driver from submitting an interrupt URB
+> to a bulk endpoint or vice versa.
 
-Reviewed-by: Michal Swiatkowski <michal.swiatkowski@linux.intel.com>
+I always thought that once DID/VID is verified, there's no much room for that to
+happen.
 
-What about other ops, did you check it too? Looks like it isn't needed,
-but it sometimes hard to follow.
+> > > We should either spend some time fixing the "BOGUS urb xfer, pipe 3 !=
+> > > type 1" for real or not touch anything.
+> > > 
+> > > 
+> > > 		Petko
+> > > 
+> > > 
+> > 
+> > Thank you for your answer, I had a couple thoughts though.
+> > 
+> > If I understand correctly (which may not be the case, of course), since the
+> > driver currently does not have any sanity checks for endpoints and URBs'
+> > pipes are initialized essentially by fixed constants (as is often the case),
+> > once again without any testing, then a virtual, weirdly constructed device,
+> > like the one made up by Syzkaller, could provide endpoints with contents
+> > that may cause that exact warning.
+> > 
+> > Real-life devices (with appropriate eps) would still work well and are in no
+> > danger, with or without the patch. And even if that warning is triggered, I
+> > am not certain the consequences are that severe, maybe on kernels with
+> > 'panic_on_warn' set, and that's another conversation. However, it seems that
+> > the change won't hurt either. Failing probe() in such situations looks to be
+> > the standard.
+> > 
+> > If my approach is flawed, I'd really appreciate some hints on how you would
+> > address that issue and I'd like to tackle it. I'd also ask if other
+> > recipients could provide some of their views on the issue, even if just to
+> > prove me wrong.
+> 
+> I agree with this approach; it seems like the best way to address this issue.
 
-Thanks
+Alright then.  I'd recommend following Fedor Pchelkin's advise about moving
+those declarations to the beginning of probe(), though.
+
+
+		Petko
 
