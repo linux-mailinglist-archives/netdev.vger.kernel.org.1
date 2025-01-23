@@ -1,136 +1,112 @@
-Return-Path: <netdev+bounces-160437-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-160438-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5BE02A19BC7
-	for <lists+netdev@lfdr.de>; Thu, 23 Jan 2025 01:29:54 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4D87FA19BE1
+	for <lists+netdev@lfdr.de>; Thu, 23 Jan 2025 01:45:28 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 3C306188CFBE
-	for <lists+netdev@lfdr.de>; Thu, 23 Jan 2025 00:29:58 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 285A7188B74F
+	for <lists+netdev@lfdr.de>; Thu, 23 Jan 2025 00:45:32 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4DFCB8C07;
-	Thu, 23 Jan 2025 00:29:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AEEE24C6D;
+	Thu, 23 Jan 2025 00:45:24 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="aagVpeE9"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="V7dIVqKz"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f41.google.com (mail-wm1-f41.google.com [209.85.128.41])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8D12B8BF8;
-	Thu, 23 Jan 2025 00:29:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.41
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8928746B8
+	for <netdev@vger.kernel.org>; Thu, 23 Jan 2025 00:45:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1737592190; cv=none; b=V/fgnXiW0r+rMK6ImbPI7YLNHFgT0bo7OVRgNBWQ8FyNdc3C/JiJCYjb5YxP+YKoYwM06WWt62f0qKm862JyC9y4jfzF5IuZ+6ryULE7CBuYZPRlzmY1+3cxjN8tWxRlZ0xpF8OcrGol7ZjuWpphmpr6CvESC1XteEjA540V3WA=
+	t=1737593124; cv=none; b=lkqTTDRKqZ152Fpu7aIcIyMxuZJZnBUn/RaGoGR+C7zk8myMqySWQ9jRtRM0C1QxdW+lTVFd5odMDMHJXS0lnyDRX8zRyQEyLWStP0b4mlJ+qluGygn67W+buyq0QR0PMKhyuVd3QHDW0iS+muUiGOYDjQNwz9QXGqxX+Exv+hQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1737592190; c=relaxed/simple;
-	bh=b8zm+y8kEriQePfvD56B0nHNYKUjbIeQf5ZwlufSFMg=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=esSPZxoJZ0gK0+p40dar/JDX/bf8ErXflo5ERySTNQCtGBezEWYfDH8hmepHzI2lOwL/llEz6GpJeFti1U894kWAIn2nR6EDJWQxP+HDD/BzXd4e4CEFiaL20D2VfzseSJ8IExyG5AYViEI46Sd7A308q9vF2Sm8VT1bqpz/mh8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=aagVpeE9; arc=none smtp.client-ip=209.85.128.41
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wm1-f41.google.com with SMTP id 5b1f17b1804b1-43622267b2eso3338785e9.0;
-        Wed, 22 Jan 2025 16:29:48 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1737592187; x=1738196987; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=EqMq3rk8LAv4NWlF/rIgW8PmsqPjzvs+YfG3tHjJzJs=;
-        b=aagVpeE9qCwuNAnfPf6+sTennYvuJe4gebx6akxIZiHuKthsPqqOQb6L1bN/9YcPI8
-         k32OUF7mqzcy74ACs2CzJRrEWreXSVR9M/xS6X1WXO0cM6XDXm2QyJQ7EsjIQISbbz+l
-         r5JUF0jXIontspB9ZIjveRY9Ws0QKScPE6c0GRW5cQYJjqafsLLnSZwSlaFuDEFr7B7W
-         u1OzJ0DhO+nKNXBQGEr9NbVXv2cjx6vaHcrWW9GjR2Etq4ZVz2Yxlw+qtkRzXM4boFz8
-         aGAyFr806nKqkF86UM4sbbu5+W89wK6PrrnSs8ECY8AYL3qXbq8t44nVwQ24xt9Elj/W
-         plyg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1737592187; x=1738196987;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=EqMq3rk8LAv4NWlF/rIgW8PmsqPjzvs+YfG3tHjJzJs=;
-        b=HHlL5MV7Pks23LsQVqlhgOrd+WIJKQIuWzkQNfUC9yRGutBUcNulrXoaTs7R6HZmVt
-         02ZTfD2Wib2Jl1WN9Bw8BZ8dyKscEIk5NmwMGiHUroPSLXlasPnSYAr4OUre7zmzh4C5
-         6KRK1LgjhONQY8rb3SChHgjqb3j9FlJd9r3iCEUuNFUY7na0hMJepLPRkUCVzSW2K9Vw
-         m7xWzFDxAs9C1P7GOtqNVVq/lolB0s7+pmhpFi+t+HUJuKlmq/o9nCoFU5uLTziq1Mkt
-         7Khjp29ZnMfphJYMSYpKBOHZlTJy0WQzuNVEYd38FSufaw/911ELxrWtydpCGPnC+7IG
-         pZnA==
-X-Forwarded-Encrypted: i=1; AJvYcCVnKUrELV/Zy6hYQSxWgKc/XGO+bZ+feXUkzP4RzWRZOyiSWwUDT7j+qh5je5lB8zlagh/aiUkM@vger.kernel.org, AJvYcCWTqC75BheNiFojWqt4ZzHilaTnF79jw2k/UvlJ1oQE4EOfGNdFgAXIC8h17nd+RvYgZEkLXpqcSbQWBjzj@vger.kernel.org, AJvYcCXmnovLytBpeBQowRjMacibXJANVirda9fGO4aEIDMCoMwkglSIJ6ZhpGKrxlTeqvTjmGk=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yx5mX4xubBlnYaZVscYOmk9vSFKjwo6k+arvWWXQ+xHyb7VmZjv
-	TaX6Fx2xBtjwWjFfssH57akfftpOjQXIzPU4beD9VOqHDueh9gxdbFAXLEgPgswIaljd2atzmWE
-	XPsXc5WZt30p5XR/Hp03dkRDIB3I=
-X-Gm-Gg: ASbGncs7ZzWb0eQ3JSskWxxTycLejEhk4CRA58NEsjl8ZlfogfBMsVLLG7Kd+gYoO/U
-	Dtuf6FRblYKcBoje3UD63eZHubX4VaWai/KHRNlnj+qJwaxo6H2OHZIab7Kx727rJubu3r2fFMU
-	8Kbi3ZPls=
-X-Google-Smtp-Source: AGHT+IHYNodHiGpmK3Vs244K1buAYV1GG2229vuGCmhgyK/AWasRZCkcsisNbbVT1Inqobj9CnwDXeWUUNPnXX7pNlM=
-X-Received: by 2002:a05:6000:1ace:b0:386:1cd3:8a07 with SMTP id
- ffacd0b85a97d-38bf5678239mr19993264f8f.7.1737592186688; Wed, 22 Jan 2025
- 16:29:46 -0800 (PST)
+	s=arc-20240116; t=1737593124; c=relaxed/simple;
+	bh=VEuzaTQf6fczz5nMhzIxRdr9jlJDslcTvJgwsLqbS+o=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=f5CzDaljFTFDjtGFDFM8aPyoQ3zeEBLNjEJBmp+tnaJP6NsRAPDIPTEkIDi/6cIUgW8lZGxuEW+nsdFmCbCuQUK2Vc2yOnBiVkZNQ2Kpq2CL1sP/mMivFoBx8PcZ14cuT0CSvW2hYXWEAmXF46v4Z/1n7Spgvq7UCZZbaiqCvrc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=V7dIVqKz; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id AFC21C4CED2;
+	Thu, 23 Jan 2025 00:45:23 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1737593124;
+	bh=VEuzaTQf6fczz5nMhzIxRdr9jlJDslcTvJgwsLqbS+o=;
+	h=From:To:Cc:Subject:Date:From;
+	b=V7dIVqKzQLX+p8h7eBrGwV+rcBDjwB9Y7td8h4OID1l/ncodFRN0pj8yARI9Jvo+L
+	 I73KPw2nFs3jZNLqUD/mSZdRsiWhksiTCdED/F0Z3QqoNWs9o6sdD4g5b1XIemVL4L
+	 lKZ7PBw8iY0/TqGUF2cTndaCejkcxgfnswEAZPgY8lDM2IsndtiPqPl/oqhOv038D2
+	 Rn4BuzLPPl6eq0FBIAoGJMIBvYu3K/8sqGxmO8bzbeE4pmi1Byg8mq/A39emPNPdDd
+	 QbPBlCBOz3x1bnR8Y0zn8eH/W1jtL6YktOx3jAs/w3iK+0afQTC95RXj3JjeSwy4F7
+	 gXLWeAOrSSBoA==
+From: Jakub Kicinski <kuba@kernel.org>
+To: davem@davemloft.net
+Cc: netdev@vger.kernel.org,
+	edumazet@google.com,
+	pabeni@redhat.com,
+	andrew+netdev@lunn.ch,
+	horms@kernel.org,
+	dan.carpenter@linaro.org,
+	Jakub Kicinski <kuba@kernel.org>
+Subject: [PATCH net v2 0/7] eth: fix calling napi_enable() in atomic context
+Date: Wed, 22 Jan 2025 16:45:13 -0800
+Message-ID: <20250123004520.806855-1-kuba@kernel.org>
+X-Mailer: git-send-email 2.48.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <cover.1737433945.git.dxu@dxuuu.xyz> <2050196010b1bf1efa357cfddebd15a152582bb4.1737433945.git.dxu@dxuuu.xyz>
-In-Reply-To: <2050196010b1bf1efa357cfddebd15a152582bb4.1737433945.git.dxu@dxuuu.xyz>
-From: Alexei Starovoitov <alexei.starovoitov@gmail.com>
-Date: Wed, 22 Jan 2025 16:29:35 -0800
-X-Gm-Features: AWEUYZmMcOAe0ZW4uSlBfaznTC1C-BAguyt6dp3FH8nHUI1jGRRe4CBZ8Jr4LV4
-Message-ID: <CAADnVQJcJz9stNyjck4AukQ_T=DJcFszp_cH0r_spju_Oxd5ZQ@mail.gmail.com>
-Subject: Re: [PATCH bpf-next 2/3] bpf: map: Thread null elision metadata to map_gen_lookup
-To: Daniel Xu <dxu@dxuuu.xyz>
-Cc: Paolo Abeni <pabeni@redhat.com>, Jakub Kicinski <kuba@kernel.org>, 
-	Jesper Dangaard Brouer <hawk@kernel.org>, "Fijalkowski, Maciej" <maciej.fijalkowski@intel.com>, 
-	Alexei Starovoitov <ast@kernel.org>, Eric Dumazet <edumazet@google.com>, 
-	Daniel Borkmann <daniel@iogearbox.net>, "David S. Miller" <davem@davemloft.net>, 
-	=?UTF-8?B?QmrDtnJuIFTDtnBlbA==?= <bjorn@kernel.org>, 
-	John Fastabend <john.fastabend@gmail.com>, "Karlsson, Magnus" <magnus.karlsson@intel.com>, 
-	Andrii Nakryiko <andrii@kernel.org>, Martin KaFai Lau <martin.lau@linux.dev>, Eddy Z <eddyz87@gmail.com>, 
-	Song Liu <song@kernel.org>, Yonghong Song <yonghong.song@linux.dev>, KP Singh <kpsingh@kernel.org>, 
-	Stanislav Fomichev <sdf@fomichev.me>, Hao Luo <haoluo@google.com>, Jiri Olsa <jolsa@kernel.org>, 
-	Jonathan Lemon <jonathan.lemon@gmail.com>, Simon Horman <horms@kernel.org>, bpf <bpf@vger.kernel.org>, 
-	LKML <linux-kernel@vger.kernel.org>, Network Development <netdev@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
 
-On Mon, Jan 20, 2025 at 8:35=E2=80=AFPM Daniel Xu <dxu@dxuuu.xyz> wrote:
->
-> Add an extra parameter to map_gen_lookup callback so that if the lookup
-> is known to be inbounds, the bounds check can be omitted.
->
-> The next commit will take advantage of this new information.
->
-> Signed-off-by: Daniel Xu <dxu@dxuuu.xyz>
-> ---
->  include/linux/bpf.h   |  2 +-
->  kernel/bpf/arraymap.c | 11 ++++++++---
->  kernel/bpf/hashtab.c  | 14 ++++++++++----
->  kernel/bpf/verifier.c |  2 +-
->  net/xdp/xskmap.c      |  4 +++-
->  5 files changed, 23 insertions(+), 10 deletions(-)
->
-> diff --git a/include/linux/bpf.h b/include/linux/bpf.h
-> index feda0ce90f5a..da8b420095c9 100644
-> --- a/include/linux/bpf.h
-> +++ b/include/linux/bpf.h
-> @@ -117,7 +117,7 @@ struct bpf_map_ops {
->          * may manipulate it, exists.
->          */
->         void (*map_fd_put_ptr)(struct bpf_map *map, void *ptr, bool need_=
-defer);
-> -       int (*map_gen_lookup)(struct bpf_map *map, struct bpf_insn *insn_=
-buf);
-> +       int (*map_gen_lookup)(struct bpf_map *map, struct bpf_insn *insn_=
-buf, bool inbounds);
+Dan has reported that I missed a lot of drivers which call napi_enable()
+in atomic with the naive coccinelle search for spin locks:
+https://lore.kernel.org/dcfd56bc-de32-4b11-9e19-d8bd1543745d@stanley.mountain
 
-The next time around we'd need another bool and more churn.
-Let's use 'enum map_gen_flags flags' right away.
+Fix them. Most of the fixes involve taking the netdev_lock()
+before the spin lock. mt76 is special because we can just
+move napi_enable() from the BH section.
 
-Also don't you want to pass an actual const_map_key
-since its already known?
-And the whole array_map_gen_lookup will become
-single ld_imm64 insn.
+All patches compile tested only.
+
+v2:
+ - [patch 1] correct commit msg (can't sleep -> needs to sleep)
+ - [patch 1] add re-locking annotation to tg3_irq_quiesce()
+ - [patch 6] actually switch to napi_enable_locked()
+ - [patch 7] reword the commit msg slightly
+v1: https://lore.kernel.org/20250121221519.392014-1-kuba@kernel.org 
+
+Jakub Kicinski (7):
+  eth: tg3: fix calling napi_enable() in atomic context
+  eth: forcedeth: remove local wrappers for napi enable/disable
+  eth: forcedeth: fix calling napi_enable() in atomic context
+  eth: 8139too: fix calling napi_enable() in atomic context
+  eth: niu: fix calling napi_enable() in atomic context
+  eth: via-rhine: fix calling napi_enable() in atomic context
+  wifi: mt76: move napi_enable() from under BH
+
+ drivers/net/ethernet/broadcom/tg3.c           | 35 ++++++++++++++++---
+ drivers/net/ethernet/nvidia/forcedeth.c       | 32 ++++++-----------
+ drivers/net/ethernet/realtek/8139too.c        |  4 ++-
+ drivers/net/ethernet/sun/niu.c                | 10 +++++-
+ drivers/net/ethernet/via/via-rhine.c          | 11 +++++-
+ .../net/wireless/mediatek/mt76/mt7603/mac.c   |  9 +++--
+ .../net/wireless/mediatek/mt76/mt7615/pci.c   |  8 +++--
+ .../wireless/mediatek/mt76/mt7615/pci_mac.c   |  8 +++--
+ .../net/wireless/mediatek/mt76/mt76x0/pci.c   |  8 +++--
+ .../net/wireless/mediatek/mt76/mt76x02_mmio.c |  8 +++--
+ .../net/wireless/mediatek/mt76/mt76x2/pci.c   |  7 ++--
+ .../net/wireless/mediatek/mt76/mt7915/mac.c   | 17 ++++++---
+ .../net/wireless/mediatek/mt76/mt7921/pci.c   |  7 ++--
+ .../wireless/mediatek/mt76/mt7921/pci_mac.c   |  7 ++--
+ .../net/wireless/mediatek/mt76/mt7925/pci.c   |  7 ++--
+ .../wireless/mediatek/mt76/mt7925/pci_mac.c   |  7 ++--
+ .../net/wireless/mediatek/mt76/mt7996/mac.c   | 12 +++----
+ 17 files changed, 132 insertions(+), 65 deletions(-)
+
+-- 
+2.48.1
+
 
