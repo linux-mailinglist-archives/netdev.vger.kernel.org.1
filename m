@@ -1,133 +1,116 @@
-Return-Path: <netdev+bounces-160572-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-160573-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id D655DA1A4C4
-	for <lists+netdev@lfdr.de>; Thu, 23 Jan 2025 14:19:56 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 101D0A1A569
+	for <lists+netdev@lfdr.de>; Thu, 23 Jan 2025 15:05:58 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id C53A6188C341
-	for <lists+netdev@lfdr.de>; Thu, 23 Jan 2025 13:20:00 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 05D0B188A08A
+	for <lists+netdev@lfdr.de>; Thu, 23 Jan 2025 14:06:02 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A573020F07B;
-	Thu, 23 Jan 2025 13:19:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D10FA20F062;
+	Thu, 23 Jan 2025 14:05:52 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=weissschuh.net header.i=@weissschuh.net header.b="S0R3F1GM"
+	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="DFL7F7/9"
 X-Original-To: netdev@vger.kernel.org
-Received: from todd.t-8ch.de (todd.t-8ch.de [159.69.126.157])
+Received: from relay8-d.mail.gandi.net (relay8-d.mail.gandi.net [217.70.183.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7F31938F83;
-	Thu, 23 Jan 2025 13:19:49 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=159.69.126.157
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EC2828C07;
+	Thu, 23 Jan 2025 14:05:49 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1737638391; cv=none; b=kCvjPceoqE16cw+WlG3Nf39Qfq6Jm3vPuSVqmBS6FLvl97MnNr5P9DLnm/dkSFjleXLHU5a0RynFMzbdeIm+Du25JBrMvpCyQDV5oO+lYikFYTKM4Djyc/n6MLPltMvCdlk0PkiO0yMr0jGnX/cobrxvG/Pyg3oRCVSEkytvpIU=
+	t=1737641152; cv=none; b=hYcb4mcYVo2Rv/dkBtDm+QE/4zsOFmZvmIuTKNrsNkvwoczcYcMojPNuxJHhXf/APpmiQws7f4WTZ6R12Pe+i1EtKcckeakPtWRw/qXe+d902uigTGwfI66ToxDwAe6Zo6AKuspqhJW6HEwOHrRHyH0sv432JFdxgO9XLKO2KB0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1737638391; c=relaxed/simple;
-	bh=/kihfaFGO49thI+Od/KeUYGlC98j80PRn0PUwUiPuTk=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=TBEzbiPuAn9W1tXo0CQBLnRvL0Fe4UVT+GyS7ED6uPIA1aSy5B52kuUlda6moh2A0gmVXrGHPsUpBsVDAMt3zsPlHJrA2ruxmjl+8xjivb40LWuzU22NfiGCZhe6PH5M7jtJzNI7Lhxq+1i/Q0gr/NA0PgIqjDYhXHN/8h+Cklc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=weissschuh.net; spf=pass smtp.mailfrom=weissschuh.net; dkim=pass (1024-bit key) header.d=weissschuh.net header.i=@weissschuh.net header.b=S0R3F1GM; arc=none smtp.client-ip=159.69.126.157
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=weissschuh.net
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=weissschuh.net
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=weissschuh.net;
-	s=mail; t=1737638386;
-	bh=/kihfaFGO49thI+Od/KeUYGlC98j80PRn0PUwUiPuTk=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=S0R3F1GMfZfkBmtT3YlsZb/OFPRVhImdlvD7qen0g9S1oCwbLEW839vszuxKJOwT2
-	 lRt6YD2bD6lq9YfErgiYlf4eEgj5h9XRw9l9hhAzBbWetAchgxE4sj/ORcB0i9jD8J
-	 A2rJgCONx/enmCRAfZYdzLMBStrT/6sa7/76/S0U=
-Date: Thu, 23 Jan 2025 14:19:46 +0100
-From: Thomas =?utf-8?Q?Wei=C3=9Fschuh?= <linux@weissschuh.net>
-To: Michal Swiatkowski <michal.swiatkowski@linux.intel.com>
-Cc: Richard Cochran <richardcochran@gmail.com>, 
-	Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller" <davem@davemloft.net>, 
-	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
-	Paolo Abeni <pabeni@redhat.com>, John Stultz <john.stultz@linaro.org>, 
-	Arnd Bergmann <arnd@arndb.de>, netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	stable@vger.kernel.org
-Subject: Re: [PATCH RESEND net] ptp: Ensure info->enable callback is always
- set
-Message-ID: <779708b6-d61c-4688-92cc-6afb987334d6@t-8ch.de>
-References: <20250123-ptp-enable-v1-1-b015834d3a47@weissschuh.net>
- <Z5IOHVu9L+QpyK4Y@mev-dev.igk.intel.com>
+	s=arc-20240116; t=1737641152; c=relaxed/simple;
+	bh=60hukXhQPinTRn0DpPyfDNfHKxCUrLEWoJLDVwIwAaA=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=B0aCzYK4gSrmTfBa6TncZHB3Tqy0hYZ7kr2Ur0RCfYxjftxY/F73dhuKJH73MhR7mMu67fcVRaGKDk8xXl+TjFuqZ1NyzFxIXEd7X962gJAbCeUMCg8G7i3nZZJLjl5T7Jlpio29BVVxxLXmFgchKyXh5CQa2jShv75rrIYnUDg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=DFL7F7/9; arc=none smtp.client-ip=217.70.183.201
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
+Received: by mail.gandi.net (Postfix) with ESMTPSA id ED25F1BF205;
+	Thu, 23 Jan 2025 14:05:38 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
+	t=1737641141;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=60hukXhQPinTRn0DpPyfDNfHKxCUrLEWoJLDVwIwAaA=;
+	b=DFL7F7/9nz48TWUV0Ira9WtcMhAIRlLM493wPx1K6QX0jqDdMSrz5q5E4dtp/qOLNO6ycN
+	epdkaWF3wTHYPulqCHiHkavMwxW6YgiK+FncOf+rs7PAi3aatmY0pPGccOiC7L3NE2RERG
+	JaqbOy9VaFf/7jZEqfEfcEaqnt06u640IpUvB1HV74UMQXGpwjqp7hS/BU13bhg1wcfiI9
+	/+eyt9j6VaCLTstINL7YMIEAbovQw9k3s3A2zyHo9NTCeeGiNTEAmsWmW+8utH/23t5GPv
+	sNScmdiTLXS0+rMgU3D5dGlSDIzWOiOhRVW2KSAx6ouwuPDqR2jvrx+kJM+3tQ==
+Date: Thu, 23 Jan 2025 15:05:37 +0100
+From: Kory Maincent <kory.maincent@bootlin.com>
+To: Claudiu Beznea <claudiu.beznea@tuxon.dev>
+Cc: Paul Barker <paul.barker.ct@bp.renesas.com>, Jakub Kicinski
+ <kuba@kernel.org>, "David S. Miller" <davem@davemloft.net>,
+ netdev@vger.kernel.org, linux-kernel@vger.kernel.org, Claudiu Beznea
+ <claudiu.beznea.uj@bp.renesas.com>, thomas.petazzoni@bootlin.com, Andrew
+ Lunn <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>, Russell King
+ <linux@armlinux.org.uk>, Eric Dumazet <edumazet@google.com>, Paolo Abeni
+ <pabeni@redhat.com>, Niklas =?UTF-8?B?U8O2ZGVybHVuZA==?=
+ <niklas.soderlund@ragnatech.se>, Sergey Shtylyov <s.shtylyov@omp.ru>
+Subject: Re: [PATCH net-next v3] net: phy: Fix suspicious rcu_dereference
+ usage
+Message-ID: <20250123150537.5288d894@kmaincent-XPS-13-7390>
+In-Reply-To: <49d39ae2-fbe1-4054-bb78-7e0c54626a23@tuxon.dev>
+References: <20250120141926.1290763-1-kory.maincent@bootlin.com>
+	<20250120111228.6bd61673@kernel.org>
+	<20250121103845.6e135477@kmaincent-XPS-13-7390>
+	<134f69de-64f9-4d36-94ff-22b93cb32f2e@bp.renesas.com>
+	<20250121140124.259e36e0@kmaincent-XPS-13-7390>
+	<d512e107-68ac-4594-a7cb-8c26be4b3280@bp.renesas.com>
+	<20250121171156.790df4ba@kmaincent-XPS-13-7390>
+	<49d39ae2-fbe1-4054-bb78-7e0c54626a23@tuxon.dev>
+Organization: bootlin
+X-Mailer: Claws Mail 4.0.0 (GTK+ 3.24.33; x86_64-pc-linux-gnu)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <Z5IOHVu9L+QpyK4Y@mev-dev.igk.intel.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+X-GND-Sasl: kory.maincent@bootlin.com
 
-On 2025-01-23 10:38:37+0100, Michal Swiatkowski wrote:
-> On Thu, Jan 23, 2025 at 08:22:40AM +0100, Thomas Weißschuh wrote:
-> > The ioctl and sysfs handlers unconditionally call the ->enable callback.
-> > Not all drivers implement that callback, leading to NULL dereferences.
-> > Example of affected drivers: ptp_s390.c, ptp_vclock.c and ptp_mock.c.
-> > 
-> > Instead use a dummy callback if no better was specified by the driver.
-> > 
-> > Fixes: d94ba80ebbea ("ptp: Added a brand new class driver for ptp clocks.")
-> > Cc: stable@vger.kernel.org
-> > Signed-off-by: Thomas Weißschuh <linux@weissschuh.net>
-> > ---
-> >  drivers/ptp/ptp_clock.c | 8 ++++++++
-> >  1 file changed, 8 insertions(+)
-> > 
-> > diff --git a/drivers/ptp/ptp_clock.c b/drivers/ptp/ptp_clock.c
-> > index b932425ddc6a3789504164a69d1b8eba47da462c..35a5994bf64f6373c08269d63aaeac3f4ab31ff0 100644
-> > --- a/drivers/ptp/ptp_clock.c
-> > +++ b/drivers/ptp/ptp_clock.c
-> > @@ -217,6 +217,11 @@ static int ptp_getcycles64(struct ptp_clock_info *info, struct timespec64 *ts)
-> >  		return info->gettime64(info, ts);
-> >  }
-> >  
-> > +static int ptp_enable(struct ptp_clock_info *ptp, struct ptp_clock_request *request, int on)
-> > +{
-> > +	return -EOPNOTSUPP;
-> > +}
-> > +
-> >  static void ptp_aux_kworker(struct kthread_work *work)
-> >  {
-> >  	struct ptp_clock *ptp = container_of(work, struct ptp_clock,
-> > @@ -294,6 +299,9 @@ struct ptp_clock *ptp_clock_register(struct ptp_clock_info *info,
-> >  			ptp->info->getcrosscycles = ptp->info->getcrosststamp;
-> >  	}
-> >  
-> > +	if (!ptp->info->enable)
-> > +		ptp->info->enable = ptp_enable;
-> > +
-> >  	if (ptp->info->do_aux_work) {
-> >  		kthread_init_delayed_work(&ptp->aux_work, ptp_aux_kworker);
-> >  		ptp->kworker = kthread_run_worker(0, "ptp%d", ptp->index);
-> > 
-> > ---
-> > base-commit: c4b9570cfb63501638db720f3bee9f6dfd044b82
-> > change-id: 20250122-ptp-enable-831339c62428
-> > 
-> > Best regards,
-> > -- 
-> > Thomas Weißschuh <linux@weissschuh.net>
-> 
-> Reviewed-by: Michal Swiatkowski <michal.swiatkowski@linux.intel.com>
-> 
-> What about other ops, did you check it too? Looks like it isn't needed,
-> but it sometimes hard to follow.
+On Thu, 23 Jan 2025 13:25:57 +0200
+Claudiu Beznea <claudiu.beznea@tuxon.dev> wrote:
 
-I couldn't find any missing, but I'm not familiar with the subsystem and
-didn't check too hard.
+> >> ravb_ptp_stop() modifies a couple of device registers and calls
+> >> ptp_clock_unregister(). I don't see anything to suggest that this
+> >> requires the rtnl lock to be held, unless I am missing something. =20
+> >=20
+> > What happens if two ptp_clock_unregister() with the same ptp_clock poin=
+ter
+> > are called simultaneously? From ravb_suspend and ravb_set_ringparam for
+> > example. It may cause some errors. =20
+>=20
+> Can this happen? I see ethtool_ops::set_ringparam() references only in
+> ethtool or ioctl files:
+>=20
+> net/ethtool/ioctl.c:2066
+> net/ethtool/ioctl.c:2081
+> net/ethtool/rings.c:212
+> net/ethtool/rings.c:304
+>=20
+> At the time the suspend/resume APIs are called the user space threads are
+> frozen.
 
-Note:
+Maybe, I don't know the suspend path, and what the state of user space thre=
+ads
+at that time. This was an example but Wake on Lan setup could also have some
+issue. IMHO I think it is more precautions to have it under rtnl lock.
 
-A follow-up fix would be to actually guard the users of ->enable and
-error out. For sysfs the attributes could be hidden completely.
-That would be a nicer user interface but more code change which are not
-so easily backportable.
-
-
-Thomas
+Regards,
+--=20
+K=C3=B6ry Maincent, Bootlin
+Embedded Linux and kernel engineering
+https://bootlin.com
 
