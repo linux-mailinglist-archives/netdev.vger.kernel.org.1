@@ -1,168 +1,144 @@
-Return-Path: <netdev+bounces-160510-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-160511-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id C4FC6A1A019
-	for <lists+netdev@lfdr.de>; Thu, 23 Jan 2025 09:43:07 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id ADB4AA1A01C
+	for <lists+netdev@lfdr.de>; Thu, 23 Jan 2025 09:43:55 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 0AFA216D55E
-	for <lists+netdev@lfdr.de>; Thu, 23 Jan 2025 08:43:06 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 0391016D510
+	for <lists+netdev@lfdr.de>; Thu, 23 Jan 2025 08:43:54 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 99A0320C47B;
-	Thu, 23 Jan 2025 08:43:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7C62C20C47B;
+	Thu, 23 Jan 2025 08:43:52 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="XKQ4AAYh"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="jFC9VKgg"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C318820C03A
-	for <netdev@vger.kernel.org>; Thu, 23 Jan 2025 08:42:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4B08D20C03A
+	for <netdev@vger.kernel.org>; Thu, 23 Jan 2025 08:43:49 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1737621781; cv=none; b=uuZY0dgfX8zlB9D4pNGzlYlRxqaLl/3Bt3sELUpqRguvxsj4vbVLB57xfNjmSul2RmTKhY5gqUvE/HFLXhwPmw0gTycW6FBdSAWRlWVa39wcb7IC76OfuDe7XsfatHOjnEJE4Xq/iSnp/scpElbcPpK9q0JY7XCW6CAeYeT4dno=
+	t=1737621832; cv=none; b=OaFEAi3gipz+gXH1MkOGpuUk5ZteKe6wBYI/YToqYL3yM4TpISMasYDgFBHdrsHJASFClty4cFBe7F974vLhmTbqIWSMFdKaFii/Id4yKw1PQMj4s3rDrRzOJrcRblghqvij0b293pf9pDwJVB2EH8BVUfGh6++tv+ghy9JOUkY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1737621781; c=relaxed/simple;
-	bh=W5EOVpddbQRRllFhbSwuM+hw+G/Vrs8x/dSe5NV+jUI=;
-	h=Message-ID:Date:MIME-Version:Subject:To:References:From:
-	 In-Reply-To:Content-Type; b=TXV16s76/mNXy+CNvm1GxlcaSMNtWVEfef9PPjDK4jlWBuYZGVfW53A7A2srXKnvC9NFHll/mfugtddsf5EpRxgLjfWsTGhi+MtDLHJHqVXm8w5VCcmYWRG0pwHsdN3bdcygbjLAOGVd939eOIXiXMB4XZTF5ODmDnhO0p4+oWc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=XKQ4AAYh; arc=none smtp.client-ip=170.10.129.124
+	s=arc-20240116; t=1737621832; c=relaxed/simple;
+	bh=ha6b9ok5quAYeRP2tfX+AMmeuXgHarjxTmNfEbxLHVU=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=ns9XENCHebfb8CPA2gSVaGvVknQXrLFaIh2zXTuWwa3t1GOvKhicECRy0EHL9X+O7e2n/mR9paH0L5E/MwNNoRPlF+2KvssvUfyXNLvOU7BWnehvI+vZJeB3nra7BvvFU8LkCLjQcIUcmVfHZK02WSh1peujXZHzSlZJh7tnLFM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=jFC9VKgg; arc=none smtp.client-ip=170.10.133.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1737621778;
+	s=mimecast20190719; t=1737621829;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 in-reply-to:in-reply-to:references:references;
-	bh=n7VpKnoXpxqrufmF6Uq4djpTFVl/srMFbe01PZDMXHg=;
-	b=XKQ4AAYhHYszoxuefe+zZ4NSr8ib3aYIx/qJ4t6ZdL6GJ6xi4aFyXJQ7tyWFYrpxjJifZq
-	DPHv04ynW2hKn1jBwndqPNj2LGi8SQYCComeDCvoZ5TodQ+7Od8qHUYUoTmtQgLv1XzcPx
-	il4PmuwREzmWK6kRcEN4QmwyspVQVWE=
-Received: from mail-wm1-f69.google.com (mail-wm1-f69.google.com
- [209.85.128.69]) by relay.mimecast.com with ESMTP with STARTTLS
+	bh=IpWDV/ai6Ur+w1Blpv0i6Vc7rkxchZcIx8yap87Tpz8=;
+	b=jFC9VKggGxMXJZ/XO5bxgLU5g6tb7xLQ4tAl4oF5qU4ARlEz54lWKdURMTJfUrO+sB/XWu
+	+h15Rr0zxR/5rMsnEVN76TSYQp5B3Oa0WjDzxm4VKBO5nZln86PMB3ONcm+TUmGV21fgk0
+	a2EZOCN+5Ekcptg01B4KPQ3jbwnIBaE=
+Received: from mail-pl1-f199.google.com (mail-pl1-f199.google.com
+ [209.85.214.199]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-495-wYLA7cYsMyOWsDSYMelq3Q-1; Thu, 23 Jan 2025 03:42:57 -0500
-X-MC-Unique: wYLA7cYsMyOWsDSYMelq3Q-1
-X-Mimecast-MFC-AGG-ID: wYLA7cYsMyOWsDSYMelq3Q
-Received: by mail-wm1-f69.google.com with SMTP id 5b1f17b1804b1-43619b135bcso2885785e9.1
-        for <netdev@vger.kernel.org>; Thu, 23 Jan 2025 00:42:56 -0800 (PST)
+ us-mta-654-8C35_tsSNlaYLoDfh47WFw-1; Thu, 23 Jan 2025 03:43:47 -0500
+X-MC-Unique: 8C35_tsSNlaYLoDfh47WFw-1
+X-Mimecast-MFC-AGG-ID: 8C35_tsSNlaYLoDfh47WFw
+Received: by mail-pl1-f199.google.com with SMTP id d9443c01a7336-216728b170cso13971865ad.2
+        for <netdev@vger.kernel.org>; Thu, 23 Jan 2025 00:43:47 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1737621775; x=1738226575;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=n7VpKnoXpxqrufmF6Uq4djpTFVl/srMFbe01PZDMXHg=;
-        b=lU7beywfa5acwoaESDLFWMM518A3p9qV6bz1V1ckCcvRovM8TSk9nko7edHpIza2BB
-         AqC4CtbgKhWJ2xCbAZ+owA7AeeKxjBbPkLAFI7j16QJVYTJ8XefolfonjCeXGVrWZqfB
-         k8ErK4JyHEwUS82V/fHHryslXB5wzFnSNWB4FCJAT/rwMw8mWdrF+c2ZLpjfSW0r4H+9
-         No80A2A+KehA+XxKoMRL/zNunALuj/sMbdruqGw/fC+DK49vtOm0RxSCSWZ/ZaZtyx3B
-         frDuxsQ4fpvv9zGUswEjqCAsO3rD9zZ6vSjcMS/+1HVyrZiCkjFPKAXWvBfv2yj1FTnx
-         /u6g==
-X-Forwarded-Encrypted: i=1; AJvYcCXEJGXAD1KZDsfK+mHjKoZw+Q5AcSWcv9sD5b/zVP76CVvCiXQImjFrH/jO6RK6mx03RFg7h7U=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yw5ENckMVAXtZ0E6gNku+AHlvdaifsjznhI8GJZGZrvRYTsW0+d
-	7nsMJV5gqqptk8ywm9ARYIc7o6QnNBUrZ1UGEYb2XRLV2F/Zi2u9hMm5Y2+rj0YIcHalzE6+jo/
-	ZjbdZ+SQWUzd9xeWu3F0xTl9/ogHwEFbozb21ld49UIAn37xU7NMK/N4/g0Kw5Q==
-X-Gm-Gg: ASbGncsObuU8bFeFI3ivEOCleeMB5Kfvk+qZf6Mv9cAzM1u7FuL+nZRgSF9bg4Ai59t
-	4evs4Hun5iHiSlM/YNRiI5B27nthd+gEsOEcgPZbE+PL7CJHgbEgktgUgDAH/LOtwac5V/XJizG
-	e4NGNne5tysQfa1+OCxQdcmi7nl8hkeTKd/6bwtXLMJQ9hrgqJqyqjEMTrTZjbL4tyksQRDwVfN
-	Cl+aMs7WiqGgzjfmJapuvaHjzQxrgAP3bodGeZt9etyVO8hxepJt/I3hUxzBPmt6RhB++8oHcVZ
-	wgsGrVoCAfr8tuJxExi6zR6s
-X-Received: by 2002:a05:600c:3d05:b0:434:f767:68ea with SMTP id 5b1f17b1804b1-438b0dc9532mr88513525e9.5.1737621775459;
-        Thu, 23 Jan 2025 00:42:55 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IH+6X3e7kB0DtfO/qbwwTzYJk66XVeL1g86ixoWl/N8/0lpKCBF8Ed1lo5mhchkHseZsdmgcw==
-X-Received: by 2002:a05:600c:3d05:b0:434:f767:68ea with SMTP id 5b1f17b1804b1-438b0dc9532mr88513315e9.5.1737621775153;
-        Thu, 23 Jan 2025 00:42:55 -0800 (PST)
-Received: from [192.168.88.253] (146-241-15-169.dyn.eolo.it. [146.241.15.169])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-438b1ce51a6sm43477185e9.1.2025.01.23.00.42.54
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 23 Jan 2025 00:42:54 -0800 (PST)
-Message-ID: <3fe1299c-9aea-4d6a-b65b-6ac050769d6e@redhat.com>
-Date: Thu, 23 Jan 2025 09:42:53 +0100
+        d=1e100.net; s=20230601; t=1737621826; x=1738226626;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=IpWDV/ai6Ur+w1Blpv0i6Vc7rkxchZcIx8yap87Tpz8=;
+        b=vsD60oMYWCoSsnlTFeQ4T8ItZLKBAm9j/Jr+WdOIl16z3S4dETahK7Hnu8g2YUnIlT
+         /R+SDmWPUCP5R2ieooHgKOKyqagTfIC9VqrZaxJXycDrJ9s8JM2WjIjELtm0Jz5gX8Df
+         J1BCHgEWFfK3wQ8Bvq6HPzTEvfJHBK+o3IYD7DwIWMTR5c6fEFhckzdRan5vpsUj1Rb7
+         gl/nFRz4kwhsgKEMXcscjl7uilqGTEHQDMtMuIadeijD/LYcxVV5TIE1LIOug3KQDG+3
+         njLs1liliGyP/th8OQqFg+pDe/yQ7JXQbXSmj4goVnvZGTLd3ksMSExU5HvIWfCuCggp
+         KNKw==
+X-Forwarded-Encrypted: i=1; AJvYcCXt9i0r+hfGkHkRX7Vh/paInvTI7FSr7C8SpDNY9CEg/ccL/J1Gyi2wH9Mtl9zxoscwDrEjgGk=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwDUhkATAotyQLNR3h6ZQ/IZWKJUjI4usd/u+Nk1ilXGFpWoCiH
+	HcLhmasyyrMZjLPD4Cbp4vtTkLgID0i6Wsw9vureeIoXYntjO0CLlqm/7G/YAjUkbRCmJJHPFlr
+	KP6CjLLPLzcR7tV2gi5f+dvf1kh2bqq1tW9WsAFOWxLfJ6HmZeOQ6
+X-Gm-Gg: ASbGncsKyYCwVJc/3anZqsFFYVNb+Yz6TcIGEKGpPIsRZdBt8+tBB57zGr5Pkda4jBm
+	RwfGQCE4vIFqeML+HkYl3XgZgrNwe4n31g5yshTEAoVuSuQAI1ls4UsN9yOxtyZ7jV4fgS8aTrH
+	9HgjCCTlL6H39XyIawn7seo8hJWDvDOxdDJqdnD9S+JTzcfZ6HuKlGubBWX9dTP9OzoKhsyhrPG
+	/XFMl7qV4zPo78d8zM/TQWYK3Duzhyu9zwdRaNWeyzG2EKG8M6fN/YhZW9wMyJoALh6
+X-Received: by 2002:a17:902:f68e:b0:211:fcad:d6ea with SMTP id d9443c01a7336-21c355f040emr334907775ad.45.1737621826288;
+        Thu, 23 Jan 2025 00:43:46 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IFoFyp8mUveTmi4te0YtMoaGtmQKXDYru3r0i2y43Wp7szaIptDNAzb2cDV4fRUJni9KmOC+Q==
+X-Received: by 2002:a17:902:f68e:b0:211:fcad:d6ea with SMTP id d9443c01a7336-21c355f040emr334907475ad.45.1737621825978;
+        Thu, 23 Jan 2025 00:43:45 -0800 (PST)
+Received: from fedora ([43.228.180.230])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-21c2ceba9a4sm107223715ad.69.2025.01.23.00.43.43
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 23 Jan 2025 00:43:45 -0800 (PST)
+Date: Thu, 23 Jan 2025 08:43:40 +0000
+From: Hangbin Liu <haliu@redhat.com>
+To: Jan Stancek <jstancek@redhat.com>
+Cc: matttbe@kernel.org, martineau@kernel.org, eliang@kernel.org,
+	netdev@vger.kernel.org, mptcp@lists.linux.dev,
+	linux-kselftest@vger.kernel.org
+Subject: Re: [PATCH] selftests: mptcp: extend CFLAGS to keep options from
+ environment
+Message-ID: <Z5IBPOGvfPozjrl5@fedora>
+References: <7abc701da9df39c2d6cd15bc3cf9e6cee445cb96.1737621162.git.jstancek@redhat.com>
+ <Z5IAU4X1084EFrEd@fedora>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v2 net] gro_cells: Avoid packet re-ordering for cloned
- skbs
-To: Thomas Bogendoerfer <tbogendoerfer@suse.de>,
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Simon Horman <horms@kernel.org>,
- netdev@vger.kernel.org, linux-kernel@vger.kernel.org
-References: <20250121115010.110053-1-tbogendoerfer@suse.de>
-Content-Language: en-US
-From: Paolo Abeni <pabeni@redhat.com>
-In-Reply-To: <20250121115010.110053-1-tbogendoerfer@suse.de>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <Z5IAU4X1084EFrEd@fedora>
 
-On 1/21/25 12:50 PM, Thomas Bogendoerfer wrote:
-> gro_cells_receive() passes a cloned skb directly up the stack and
-> could cause re-ordering against segments still in GRO. To avoid
-> this queue cloned skbs and use gro_normal_one() to pass it during
-> normal NAPI work.
+On Thu, Jan 23, 2025 at 08:39:53AM +0000, Hangbin Liu wrote:
+> On Thu, Jan 23, 2025 at 09:35:42AM +0100, Jan Stancek wrote:
+> > Package build environments like Fedora rpmbuild introduced hardening
+> > options (e.g. -pie -Wl,-z,now) by passing a -spec option to CFLAGS
+> > and LDFLAGS.
+> > 
+> > mptcp Makefile currently overrides CFLAGS but not LDFLAGS, which leads
+> > to a mismatch and build failure, for example:
+> >   make[1]: *** [../../lib.mk:222: tools/testing/selftests/net/mptcp/mptcp_sockopt] Error 1
+> >   /usr/bin/ld: /tmp/ccqyMVdb.o: relocation R_X86_64_32 against `.rodata.str1.8' can not be used when making a PIE object; recompile with -fPIE
+> >   /usr/bin/ld: failed to set dynamic section sizes: bad value
+> >   collect2: error: ld returned 1 exit status
+> > 
+> > Signed-off-by: Jan Stancek <jstancek@redhat.com>
+> > ---
+> >  tools/testing/selftests/net/mptcp/Makefile | 2 +-
+> >  1 file changed, 1 insertion(+), 1 deletion(-)
+> > 
+> > diff --git a/tools/testing/selftests/net/mptcp/Makefile b/tools/testing/selftests/net/mptcp/Makefile
+> > index 8e3fc05a5397..9706bc73809f 100644
+> > --- a/tools/testing/selftests/net/mptcp/Makefile
+> > +++ b/tools/testing/selftests/net/mptcp/Makefile
+> > @@ -2,7 +2,7 @@
+> >  
+> >  top_srcdir = ../../../../..
+> >  
+> > -CFLAGS =  -Wall -Wl,--no-as-needed -O2 -g -I$(top_srcdir)/usr/include $(KHDR_INCLUDES)
+> > +CFLAGS +=  -Wall -Wl,--no-as-needed -O2 -g -I$(top_srcdir)/usr/include $(KHDR_INCLUDES)
+> >  
+> >  TEST_PROGS := mptcp_connect.sh pm_netlink.sh mptcp_join.sh diag.sh \
+> >  	      simult_flows.sh mptcp_sockopt.sh userspace_pm.sh
+> > -- 
+> > 2.43.0
+> > 
 > 
-> Fixes: c9e6bc644e55 ("net: add gro_cells infrastructure")
-> Suggested-by: Eric Dumazet <edumazet@google.com>
-> Signed-off-by: Thomas Bogendoerfer <tbogendoerfer@suse.de>
-> --
-> v2: don't use skb_copy(), but make decision how to pass cloned skbs in
->     napi poll function (suggested by Eric)
-> v1: https://lore.kernel.org/lkml/20250109142724.29228-1-tbogendoerfer@suse.de/
->   
->  net/core/gro_cells.c | 9 +++++++--
->  1 file changed, 7 insertions(+), 2 deletions(-)
-> 
-> diff --git a/net/core/gro_cells.c b/net/core/gro_cells.c
-> index ff8e5b64bf6b..762746d18486 100644
-> --- a/net/core/gro_cells.c
-> +++ b/net/core/gro_cells.c
-> @@ -2,6 +2,7 @@
->  #include <linux/skbuff.h>
->  #include <linux/slab.h>
->  #include <linux/netdevice.h>
-> +#include <net/gro.h>
->  #include <net/gro_cells.h>
->  #include <net/hotdata.h>
->  
-> @@ -20,7 +21,7 @@ int gro_cells_receive(struct gro_cells *gcells, struct sk_buff *skb)
->  	if (unlikely(!(dev->flags & IFF_UP)))
->  		goto drop;
->  
-> -	if (!gcells->cells || skb_cloned(skb) || netif_elide_gro(dev)) {
-> +	if (!gcells->cells || netif_elide_gro(dev)) {
->  		res = netif_rx(skb);
->  		goto unlock;
->  	}
-> @@ -58,7 +59,11 @@ static int gro_cell_poll(struct napi_struct *napi, int budget)
->  		skb = __skb_dequeue(&cell->napi_skbs);
->  		if (!skb)
->  			break;
-> -		napi_gro_receive(napi, skb);
-> +		/* Core GRO stack does not play well with clones. */
-> +		if (skb_cloned(skb))
-> +			gro_normal_one(napi, skb, 1);
-> +		else
-> +			napi_gro_receive(napi, skb);
+> Reviewed-by: Hangbin Liu <liuhangbin@gmail.com>
 
-I must admit it's not clear to me how/why the above will avoid OoO. I
-assume OoO happens when we observe both cloned and uncloned packets
-belonging to the same connection/flow.
+Hmm, net-next is closed. Not sure if we can target this to net since it fixes
+the build errors.
 
-What if we have a (uncloned) packet for the relevant flow in the GRO,
-'rx_count - 1' packets already sitting in 'rx_list' and a cloned packet
-for the critical flow reaches gro_cells_receive()?
-
-Don't we need to unconditionally flush any packets belonging to the same
-flow?
-
-Thanks!
-
-Paolo
+Thanks
+Hangbin
 
 
