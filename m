@@ -1,195 +1,271 @@
-Return-Path: <netdev+bounces-160842-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-160843-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 96C9EA1BC83
-	for <lists+netdev@lfdr.de>; Fri, 24 Jan 2025 19:55:33 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 3A4AFA1BC95
+	for <lists+netdev@lfdr.de>; Fri, 24 Jan 2025 20:07:52 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 95AA81883820
-	for <lists+netdev@lfdr.de>; Fri, 24 Jan 2025 18:55:37 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 9150B188EFFE
+	for <lists+netdev@lfdr.de>; Fri, 24 Jan 2025 19:07:52 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C8F222248AC;
-	Fri, 24 Jan 2025 18:55:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 47F402248B7;
+	Fri, 24 Jan 2025 19:07:42 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b="hKUKSRjq"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="FAWGp/1a"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-oi1-f171.google.com (mail-oi1-f171.google.com [209.85.167.171])
+Received: from mail-ej1-f54.google.com (mail-ej1-f54.google.com [209.85.218.54])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F2DF31D54D8
-	for <netdev@vger.kernel.org>; Fri, 24 Jan 2025 18:55:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.171
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3BC551CCEEC;
+	Fri, 24 Jan 2025 19:07:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.54
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1737744928; cv=none; b=n++M8JQdNCTdI6JfLjpvFgsh7FM/cHcbsyOmpHuGpYnTer72I6nGN/Lw/r4VI3+tYOLFAAxiwwH+9jEaGJ7u8/QGY5L9de9F6nJOeNhnwB2SStQoJ3Y0DrX/DcRxD4nvPL2xf4Q5z979ndiL4TSNQtpfixXxJvFS/FMvfphgKbs=
+	t=1737745662; cv=none; b=p3ErCv6UlpRenLW8aIK/GrWZfzsM2akFqptaaXcDhuSaLzXkD8Lm6/jmrab+mRUbQrsK2MvCCWMSvhhTnIC/oRUkzK2jZ0B1hj/uYLd8SNB3xSY+yL1AFwcuGafdRRzPXLUFsLxS0OosuOjo3xltG/t+BAvoWM0lYaD/aAp+36Q=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1737744928; c=relaxed/simple;
-	bh=2qe6Qb0Z9UOJ4lSuhRpQUQvF0J1wYewJ2oQiAd3ZUqU=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=fbd7CnAMxg7YSNlCCLZH1vK8Z+nhGoX53FFxUYCQN/PH+gWJeMf+6OXgY8/shiRtiOzyC1QSzG/bzdmqEsLwXTif/8lRtKz2OPyuouGiRMwkWrfrELXUIFf7GDgwNUgWxpGsQehRFXx/34N5tz5YvuhzvfvVBEDetusoK808mOY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com; spf=fail smtp.mailfrom=broadcom.com; dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b=hKUKSRjq; arc=none smtp.client-ip=209.85.167.171
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=broadcom.com
-Received: by mail-oi1-f171.google.com with SMTP id 5614622812f47-3eb9101419cso1480383b6e.0
-        for <netdev@vger.kernel.org>; Fri, 24 Jan 2025 10:55:26 -0800 (PST)
+	s=arc-20240116; t=1737745662; c=relaxed/simple;
+	bh=PXrJs9ZPNIEquEYhRhDNDhbsr5oSKmZUVYbDQcYYsTI=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=DG69UiqvGJ/zTYvfsxCMEKbB6EbA7g1jNK6VHJjz5szk1fpw745xU5DSHRCkj+wC5sUv6hv5WTjCDkbWixwHD9/dp6iKpVHdsnp6BqU737H9AgfmWZfg644+aUh/pVGPhqssc5DE1qNLc5W3aWxNky70dT4aSxbT862ac3GhFt8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=FAWGp/1a; arc=none smtp.client-ip=209.85.218.54
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-ej1-f54.google.com with SMTP id a640c23a62f3a-aab925654d9so448722066b.2;
+        Fri, 24 Jan 2025 11:07:39 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=broadcom.com; s=google; t=1737744926; x=1738349726; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:autocrypt:from
-         :content-language:references:cc:to:subject:user-agent:mime-version
-         :date:message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=p/AsADTBfGWUpUUArfkz8RqP+OWTJhAps4ZyikpDhAs=;
-        b=hKUKSRjqYc+3Lcz3aE68sEP8JMBgZxN+pvrP9kvwwmrGQi7TqRPtZj4QmTS1mx0LRL
-         oZyzD/i2CDZNlNGVOFiBk6B5EOdky/7TYbQZ6YMwacfeqtA/bbUncn50zwrl1YNzfi9n
-         AcgRrL9EQ2ExIj/qtvpjeAXxLSin3MgeNYjec=
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1737744926; x=1738349726;
-        h=content-transfer-encoding:in-reply-to:autocrypt:from
-         :content-language:references:cc:to:subject:user-agent:mime-version
-         :date:message-id:x-gm-message-state:from:to:cc:subject:date
+        d=gmail.com; s=20230601; t=1737745658; x=1738350458; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=p/AsADTBfGWUpUUArfkz8RqP+OWTJhAps4ZyikpDhAs=;
-        b=mwUN8Pb3mh96Q5NuhGmkwBcp3uTCAL5fv8ggcO9hCNJXjA8qwGPKQl2yG2EyaGkuZG
-         JmT6q/yL734hYRi2kNgHAMB53Etag9MNjGqlYrRhUWuaERCUuH/sIlxT3uJRmulqLw+b
-         SipcbNbmAzxCaxN3+D63XuH0G2L8vtF8JDGYNcrXy7uuheC3HdUfe6Y/+RYOEZ6F4JRy
-         3JACKcaEsGFdfPmxf8gOkOzfumHebShBS+XO9SGLNooV7PUimar08kj3WUONww9EnkOE
-         6B8lyRs7eNQXvJTakFcgDJ/MGaF0vM7/rD5UOnhu/SjEG7gZEfzlt8DXx6yFckNeWLnV
-         2QdA==
-X-Gm-Message-State: AOJu0Yx0aM+wAty/7BPUO11BsYYXxlU1NTmsRwzwUYWBq3i5zTkkdVwS
-	NoNM3VLNEXGxo9/jYLNbibML3dMGjYHLjyPzdPM2trM90JkoSTWOMTo0MP2vSg==
-X-Gm-Gg: ASbGncsOvq/WOH7zT1Ar6wEeNndSmIVDbGMlRg0afyWCdTZxq+/bZBJO2FqFxPba1Oc
-	dg7DeYekZ4lh7134AdHkwlc5sncR5e82dWJNnPUsLW6soSPlLUmyDWAqruIa4c/Upz5615kUmEJ
-	6O9JqR37qOxh0loxL82kslk2rN/KzpUTw5YE51eWShtwOLRORcrHuDTW3OQ/LaW56oo+BqGXaEA
-	vIXEvAR59YOCh/vK26vOa3PnLCFOuLse5vR5IxILorgktb4ZgeQwy1noB9fs7Xd5IJC4LtkDAOL
-	dcEORWQFixPWchW+l3b3RUo/csUvXuBssfSyCuU58y+L
-X-Google-Smtp-Source: AGHT+IFNofcV4cIdaVI+zk5heo0JWzhvbLoBns5GzokoyEGNl6Aao5MsDKKZo+urWMsRTfyl8JW9Qg==
-X-Received: by 2002:a05:6808:11d1:b0:3e7:a15c:467b with SMTP id 5614622812f47-3f19fcda5e6mr21223232b6e.34.1737744926010;
-        Fri, 24 Jan 2025 10:55:26 -0800 (PST)
-Received: from [10.67.48.245] ([192.19.223.252])
-        by smtp.gmail.com with ESMTPSA id 5614622812f47-3f1f085eab5sm552257b6e.1.2025.01.24.10.55.23
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 24 Jan 2025 10:55:24 -0800 (PST)
-Message-ID: <371240e0-5f95-4d5b-9eea-9029e5dcb4b1@broadcom.com>
-Date: Fri, 24 Jan 2025 10:55:22 -0800
+        bh=M64ccCiSMLIZYqvDwKn2KQG8TzxywkOKAzy05Y8MZaw=;
+        b=FAWGp/1aLDCHa5FxSvDu+g350bbKTX5P62ur4VwZrrTBgGHaPybmvEuKJa2QJNBFC+
+         8yODhlNgOB6Moc1NY4iNybalQSMCMaPqZ9LLojg7Kewgth2Wa0XUk0XB8WxWNJL5nqrg
+         gVuOK63TqFE5I/aagdfpVvyDYN/3cTsU+mm3e0olw7S1F1HzDv7quNP59km+Ug900iBg
+         2MxDj+EofGfUir5nHhtbp4SU33Mqtxatsy7sOPn6G0Li3Ft2EzAnMg4N8xUJSz+sA0r8
+         BuGVmOdDCca+RiSzoGADL69qzR+Z1EyXeyepMeUsdJK5djKou/OUiDm7PDugwsrpRUs7
+         IOXw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1737745658; x=1738350458;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=M64ccCiSMLIZYqvDwKn2KQG8TzxywkOKAzy05Y8MZaw=;
+        b=L/HrfKUrwELWE7e17Ma3BdE90Trxl+FfAGdEQoA4D9fZvT2eFUMKw29as3iVJlHbZx
+         t8bl16/ofl2IkXe5uc7Sqi0FmZyu9X6ogE7KhuPjSj12cPLaDVGgh8RWKkR1ew4Bj8ba
+         aosmj2oWWgTl1yxUWPXjmcLzv1g02ousqBVRUIosRtXDtEPC+kszSV4y0CUrFoe3QilJ
+         eltkAhiHPeoYCcPRzs1yo7XYwpBWQCEdOkU8ZmxgMs1gr5pJD0IcEMfX1bfkaHK0M3O9
+         NRuJAZ+XYB91K6Sr/njfMzcGyqdmXKMhvc2j6O8cFTPmfvfwOYRDKINq31bclSAUFtJQ
+         HVIg==
+X-Forwarded-Encrypted: i=1; AJvYcCVHv4VKwjPLWWFaHaUD4UAnBmRsgRiJ5/Td2V/Wa6X0/xd6ePHH8NCc5vpfhHKvpM2+mxG1Yaw+Fo8G@vger.kernel.org, AJvYcCVewf/VBJvTgQttiOWldqEUZvQ8WT9sXN6QEnhn7QgSj7/PZLi9u6rfDJk3Fk7PkarK4Cw=@vger.kernel.org, AJvYcCWCfz8TNeK+g4jE6od0B+mHEJBl25lxx6KPdFESTh4BN6Ow6hHqNMoq4iufe6g6NeY03dd5AGmT@vger.kernel.org, AJvYcCWWI/Do2T1GpXskzhdceuM+iQyAhLktaTLIG8kFzlYFE/HIbz9U+74eEknvvy6hjIIBvTvOMSACAYpHTA==@vger.kernel.org, AJvYcCWZlumolwD6PFq+rfdEypE+5txegmNGNgQDffv41DIrUwUsTYs5p4DlXGeQgg2M5OqXiGkWTLwf8dLcaA==@vger.kernel.org, AJvYcCWgE1X4gdgdXCVFV3MFLK8MwDLxdmEwRtmrIb2zGEb6mG2v+IAHxfDE53VtAnN8CdFomq4BK31qWIsghr3e@vger.kernel.org, AJvYcCWgqmYYHudlT1g79u7sFvOs2rsmOEoUdiPQJntRS72qy9sfd+Hv6+/DwWrrcRf3RMl1fryX4GfCuwXhU+HZGg==@vger.kernel.org
+X-Gm-Message-State: AOJu0YzyYi/k9HRum2nPQJ/qoW8coy7aTBUYU7zvT5oHYvkJEWbZ/e2P
+	TiCKAXvZqsjHylnNp71oD+YaEO5HjC4aMgDNopzNWIv7+MlEyZyJl1rwAHZQh47CWb2owHwoqYp
+	TNUM8O5Cj9GyEBoIknVWtYBOqdSw=
+X-Gm-Gg: ASbGncvYXuj9V2iaRpV59I/eOwEqJnAJSmzq6RYFIAT3pYWI+nP+xRkiUNTn9oKT1Db
+	+gWiaRtq3oVTtJZ1iqbtQ5J86zI5dhNupu68LPbEk46jbVSU1IfbiqHvstoA=
+X-Google-Smtp-Source: AGHT+IHVokvHgS4VPbH29H+qihMfYRv5DXmUYISCN+1KE4QC6a2L3CH+v4Rg2tloe5yQ1DMWw4vIjjDbAzeSubHjNHs=
+X-Received: by 2002:a17:907:1c2a:b0:aac:832:9bf7 with SMTP id
+ a640c23a62f3a-ab38b27be47mr2790084466b.24.1737745658104; Fri, 24 Jan 2025
+ 11:07:38 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next v23 3/7] mm: page_frag: use initial zero offset
- for page_frag_alloc_align()
-To: Yunsheng Lin <linyunsheng@huawei.com>, davem@davemloft.net,
- kuba@kernel.org, pabeni@redhat.com, Eric Dumazet <edumazet@google.com>
-Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
- Alexander Duyck <alexander.duyck@gmail.com>,
- Andrew Morton <akpm@linux-foundation.org>, Linux-MM <linux-mm@kvack.org>,
- Alexander Duyck <alexanderduyck@fb.com>
-References: <20241028115343.3405838-1-linyunsheng@huawei.com>
- <20241028115343.3405838-4-linyunsheng@huawei.com>
- <2ef8b7d4-7fae-4a08-9db1-4a33cd56ec9c@broadcom.com>
- <ead00fb7-8538-45b3-8322-8a41386e7381@huawei.com>
-Content-Language: en-US
-From: Florian Fainelli <florian.fainelli@broadcom.com>
-Autocrypt: addr=florian.fainelli@broadcom.com; keydata=
- xsBNBFPAG8ABCAC3EO02urEwipgbUNJ1r6oI2Vr/+uE389lSEShN2PmL3MVnzhViSAtrYxeT
- M0Txqn1tOWoIc4QUl6Ggqf5KP6FoRkCrgMMTnUAINsINYXK+3OLe7HjP10h2jDRX4Ajs4Ghs
- JrZOBru6rH0YrgAhr6O5gG7NE1jhly+EsOa2MpwOiXO4DE/YKZGuVe6Bh87WqmILs9KvnNrQ
- PcycQnYKTVpqE95d4M824M5cuRB6D1GrYovCsjA9uxo22kPdOoQRAu5gBBn3AdtALFyQj9DQ
- KQuc39/i/Kt6XLZ/RsBc6qLs+p+JnEuPJngTSfWvzGjpx0nkwCMi4yBb+xk7Hki4kEslABEB
- AAHNMEZsb3JpYW4gRmFpbmVsbGkgPGZsb3JpYW4uZmFpbmVsbGlAYnJvYWRjb20uY29tPsLB
- IQQQAQgAywUCZWl41AUJI+Jo+hcKAAG/SMv+fS3xUQWa0NryPuoRGjsA3SAUAAAAAAAWAAFr
- ZXktdXNhZ2UtbWFza0BwZ3AuY29tjDAUgAAAAAAgAAdwcmVmZXJyZWQtZW1haWwtZW5jb2Rp
- bmdAcGdwLmNvbXBncG1pbWUICwkIBwMCAQoFF4AAAAAZGGxkYXA6Ly9rZXlzLmJyb2FkY29t
- Lm5ldAUbAwAAAAMWAgEFHgEAAAAEFQgJChYhBNXZKpfnkVze1+R8aIExtcQpvGagAAoJEIEx
- tcQpvGagWPEH/2l0DNr9QkTwJUxOoP9wgHfmVhqc0ZlDsBFv91I3BbhGKI5UATbipKNqG13Z
- TsBrJHcrnCqnTRS+8n9/myOF0ng2A4YT0EJnayzHugXm+hrkO5O9UEPJ8a+0553VqyoFhHqA
- zjxj8fUu1px5cbb4R9G4UAySqyeLLeqnYLCKb4+GklGSBGsLMYvLmIDNYlkhMdnnzsSUAS61
- WJYW6jjnzMwuKJ0ZHv7xZvSHyhIsFRiYiEs44kiYjbUUMcXor/uLEuTIazGrE3MahuGdjpT2
- IOjoMiTsbMc0yfhHp6G/2E769oDXMVxCCbMVpA+LUtVIQEA+8Zr6mX0Yk4nDS7OiBlvOwE0E
- U8AbwQEIAKxr71oqe+0+MYCc7WafWEcpQHFUwvYLcdBoOnmJPxDwDRpvU5LhqSPvk/yJdh9k
- 4xUDQu3rm1qIW2I9Puk5n/Jz/lZsqGw8T13DKyu8eMcvaA/irm9lX9El27DPHy/0qsxmxVmU
- pu9y9S+BmaMb2CM9IuyxMWEl9ruWFS2jAWh/R8CrdnL6+zLk60R7XGzmSJqF09vYNlJ6Bdbs
- MWDXkYWWP5Ub1ZJGNJQ4qT7g8IN0qXxzLQsmz6tbgLMEHYBGx80bBF8AkdThd6SLhreCN7Uh
- IR/5NXGqotAZao2xlDpJLuOMQtoH9WVNuuxQQZHVd8if+yp6yRJ5DAmIUt5CCPcAEQEAAcLB
- gQQYAQIBKwUCU8AbwgUbDAAAAMBdIAQZAQgABgUCU8AbwQAKCRCTYAaomC8PVQ0VCACWk3n+
- obFABEp5Rg6Qvspi9kWXcwCcfZV41OIYWhXMoc57ssjCand5noZi8bKg0bxw4qsg+9cNgZ3P
- N/DFWcNKcAT3Z2/4fTnJqdJS//YcEhlr8uGs+ZWFcqAPbteFCM4dGDRruo69IrHfyyQGx16s
- CcFlrN8vD066RKevFepb/ml7eYEdN5SRALyEdQMKeCSf3mectdoECEqdF/MWpfWIYQ1hEfdm
- C2Kztm+h3Nkt9ZQLqc3wsPJZmbD9T0c9Rphfypgw/SfTf2/CHoYVkKqwUIzI59itl5Lze+R5
- wDByhWHx2Ud2R7SudmT9XK1e0x7W7a5z11Q6vrzuED5nQvkhAAoJEIExtcQpvGagugcIAJd5
- EYe6KM6Y6RvI6TvHp+QgbU5dxvjqSiSvam0Ms3QrLidCtantcGT2Wz/2PlbZqkoJxMQc40rb
- fXa4xQSvJYj0GWpadrDJUvUu3LEsunDCxdWrmbmwGRKqZraV2oG7YEddmDqOe0Xm/NxeSobc
- MIlnaE6V0U8f5zNHB7Y46yJjjYT/Ds1TJo3pvwevDWPvv6rdBeV07D9s43frUS6xYd1uFxHC
- 7dZYWJjZmyUf5evr1W1gCgwLXG0PEi9n3qmz1lelQ8lSocmvxBKtMbX/OKhAfuP/iIwnTsww
- 95A2SaPiQZA51NywV8OFgsN0ITl2PlZ4Tp9hHERDe6nQCsNI/Us=
-In-Reply-To: <ead00fb7-8538-45b3-8322-8a41386e7381@huawei.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
+References: <20241216204124.3752367-1-dhowells@redhat.com> <20241216204124.3752367-28-dhowells@redhat.com>
+ <a7x33d4dnMdGTtRivptq6S1i8btK70SNBP2XyX_xwDAhLvgQoPox6FVBOkifq4eBinfFfbZlIkMZBe3QarlWTxoEtHZwJCZbNKtaqrR7PvI=@pm.me>
+ <CAB9dFdtVFgG7OWZRytL9Vpr=knNPnMe6b_Esg7rgfFfwLa8j0A@mail.gmail.com> <GHG6tQSGPRj9L93-skG-HGz4vGtXUxy6ibsUTKloUKncNmy8A7xgte0MEiI0iZJ7jD-SSrZiK2oswgvJCRan_0ZMi6xDlP11SHDi1Utf7mI=@pm.me>
+In-Reply-To: <GHG6tQSGPRj9L93-skG-HGz4vGtXUxy6ibsUTKloUKncNmy8A7xgte0MEiI0iZJ7jD-SSrZiK2oswgvJCRan_0ZMi6xDlP11SHDi1Utf7mI=@pm.me>
+From: Marc Dionne <marc.c.dionne@gmail.com>
+Date: Fri, 24 Jan 2025 15:07:26 -0400
+X-Gm-Features: AWEUYZm1VpljAqRhQQ6dX7tl5sygVWqfg2AdWCAk6rSkUpuGiA6tuCJB2vasH_k
+Message-ID: <CAB9dFds_bPG1vThvOxhKcoFbUPGURYRHrY_zubPrAqpQrgHA7A@mail.gmail.com>
+Subject: Re: [PATCH v5 27/32] netfs: Change the read result collector to only
+ use one work item
+To: Ihor Solodrai <ihor.solodrai@pm.me>
+Cc: David Howells <dhowells@redhat.com>, Christian Brauner <christian@brauner.io>, 
+	Steve French <smfrench@gmail.com>, Matthew Wilcox <willy@infradead.org>, 
+	Jeff Layton <jlayton@kernel.org>, Gao Xiang <hsiangkao@linux.alibaba.com>, 
+	Dominique Martinet <asmadeus@codewreck.org>, Paulo Alcantara <pc@manguebit.com>, 
+	Shyam Prasad N <sprasad@microsoft.com>, Tom Talpey <tom@talpey.com>, 
+	Eric Van Hensbergen <ericvh@kernel.org>, Ilya Dryomov <idryomov@gmail.com>, netfs@lists.linux.dev, 
+	linux-afs@lists.infradead.org, linux-cifs@vger.kernel.org, 
+	linux-nfs@vger.kernel.org, ceph-devel@vger.kernel.org, v9fs@lists.linux.dev, 
+	linux-erofs@lists.ozlabs.org, linux-fsdevel@vger.kernel.org, 
+	linux-mm@kvack.org, netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	bpf <bpf@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On 1/24/25 01:52, Yunsheng Lin wrote:
-> On 2025/1/24 3:15, Florian Fainelli wrote:
->>
->> Sorry for the late feedback, this patch causes the bgmac driver in is .ndo_open() function to return -ENOMEM, the call trace looks like this:
-> 
-> Hi, Florian
-> Thanks for the report.
-> 
->>
->>   bgmac_open
->>    -> bgmac_dma_init
->>      -> bgmac_dma_rx_skb_for_slot
->>        -> netdev_alloc_frag
->>
->> BGMAC_RX_ALLOC_SIZE = 10048 and PAGE_FRAG_CACHE_MAX_SIZE = 32768.
-> 
-> I guess BGMAC_RX_ALLOC_SIZE being bigger than PAGE_SIZE is the
-> problem here, as the frag API is not really supporting allocating
-> fragment that is bigger than PAGE_SIZE, as it will fall back to
-> allocate the base page when order-3 compound page allocation fails,
-> see __page_frag_cache_refill().
-> 
-> Also, it seems strange that bgmac driver seems to always use jumbo
-> frame size to allocate fragment, isn't more  appropriate to allocate
-> the fragment according to MTU?
+On Fri, Jan 24, 2025 at 2:46=E2=80=AFPM Ihor Solodrai <ihor.solodrai@pm.me>=
+ wrote:
+>
+> On Friday, January 24th, 2025 at 10:21 AM, Marc Dionne <marc.dionne@auris=
+tor.com> wrote:
+>
+> >
+> > [...]
+> >
+> > > A log snippet:
+> > >
+> > > 2025-01-24T02:15:03.9009694Z [ 246.932163] INFO: task ip:1055 blocked=
+ for more than 122 seconds.
+> > > 2025-01-24T02:15:03.9013633Z [ 246.932709] Tainted: G OE 6.13.0-g2bcb=
+9cf535b8-dirty #149
+> > > 2025-01-24T02:15:03.9018791Z [ 246.933249] "echo 0 > /proc/sys/kernel=
+/hung_task_timeout_secs" disables this message.
+> > > 2025-01-24T02:15:03.9025896Z [ 246.933802] task:ip state:D stack:0 pi=
+d:1055 tgid:1055 ppid:1054 flags:0x00004002
+> > > 2025-01-24T02:15:03.9028228Z [ 246.934564] Call Trace:
+> > > 2025-01-24T02:15:03.9029758Z [ 246.934764] <TASK>
+> > > 2025-01-24T02:15:03.9032572Z [ 246.934937] __schedule+0xa91/0xe80
+> > > 2025-01-24T02:15:03.9035126Z [ 246.935224] schedule+0x41/0xb0
+> > > 2025-01-24T02:15:03.9037992Z [ 246.935459] v9fs_evict_inode+0xfe/0x17=
+0
+> > > 2025-01-24T02:15:03.9041469Z [ 246.935748] ? __pfx_var_wake_function+=
+0x10/0x10
+> > > 2025-01-24T02:15:03.9043837Z [ 246.936101] evict+0x1ef/0x360
+> > > 2025-01-24T02:15:03.9046624Z [ 246.936340] __dentry_kill+0xb0/0x220
+> > > 2025-01-24T02:15:03.9048855Z [ 246.936610] ? dput+0x3a/0x1d0
+> > > 2025-01-24T02:15:03.9051128Z [ 246.936838] dput+0x114/0x1d0
+> > > 2025-01-24T02:15:03.9053548Z [ 246.937069] __fput+0x136/0x2b0
+> > > 2025-01-24T02:15:03.9056154Z [ 246.937305] task_work_run+0x89/0xc0
+> > > 2025-01-24T02:15:03.9058593Z [ 246.937571] do_exit+0x2c6/0x9c0
+> > > 2025-01-24T02:15:03.9061349Z [ 246.937816] do_group_exit+0xa4/0xb0
+> > > 2025-01-24T02:15:03.9064401Z [ 246.938090] __x64_sys_exit_group+0x17/=
+0x20
+> > > 2025-01-24T02:15:03.9067235Z [ 246.938390] x64_sys_call+0x21a0/0x21a0
+> > > 2025-01-24T02:15:03.9069924Z [ 246.938672] do_syscall_64+0x79/0x120
+> > > 2025-01-24T02:15:03.9072746Z [ 246.938941] ? clear_bhb_loop+0x25/0x80
+> > > 2025-01-24T02:15:03.9075581Z [ 246.939230] ? clear_bhb_loop+0x25/0x80
+> > > 2025-01-24T02:15:03.9079275Z [ 246.939510] entry_SYSCALL_64_after_hwf=
+rame+0x76/0x7e
+> > > 2025-01-24T02:15:03.9081976Z [ 246.939875] RIP: 0033:0x7fb86f66f21d
+> > > 2025-01-24T02:15:03.9087533Z [ 246.940153] RSP: 002b:00007ffdb3cf93f8=
+ EFLAGS: 00000202 ORIG_RAX: 00000000000000e7
+> > > 2025-01-24T02:15:03.9092590Z [ 246.940689] RAX: ffffffffffffffda RBX:=
+ 00007fb86f785fa8 RCX: 00007fb86f66f21d
+> > > 2025-01-24T02:15:03.9097722Z [ 246.941201] RDX: 00000000000000e7 RSI:=
+ ffffffffffffff80 RDI: 0000000000000000
+> > > 2025-01-24T02:15:03.9102762Z [ 246.941705] RBP: 00007ffdb3cf9450 R08:=
+ 00007ffdb3cf93a0 R09: 0000000000000000
+> > > 2025-01-24T02:15:03.9107940Z [ 246.942215] R10: 00007ffdb3cf92ff R11:=
+ 0000000000000202 R12: 0000000000000001
+> > > 2025-01-24T02:15:03.9113002Z [ 246.942723] R13: 0000000000000000 R14:=
+ 0000000000000000 R15: 00007fb86f785fc0
+> > > 2025-01-24T02:15:03.9114614Z [ 246.943244] </TASK>
+> >
+> >
+> > That looks very similar to something I saw in afs testing, with a
+> > similar stack but in afs_evict_inode where it hung waiting in
+> > netfs_wait_for_outstanding_io.
+> >
+> > David pointed to this bit where there's a double get in
+> > netfs_retry_read_subrequests, since netfs_reissue_read already takes
+> > care of getting a ref on the subrequest:
+> >
+> > diff --git a/fs/netfs/read_retry.c b/fs/netfs/read_retry.c
+> > index 2290af0d51ac..53d62e31a4cc 100644
+> > --- a/fs/netfs/read_retry.c
+> > +++ b/fs/netfs/read_retry.c
+> > @@ -152,7 +152,6 @@ static void netfs_retry_read_subrequests(struct
+> > netfs_io_request *rreq)
+> > __clear_bit(NETFS_SREQ_BOUNDARY,
+> > &subreq->flags);
+> >
+> > }
+> >
+> > - netfs_get_subrequest(subreq,
+> > netfs_sreq_trace_get_resubmit);
+> > netfs_reissue_read(rreq, subreq);
+> > if (subreq =3D=3D to)
+> > break;
+> >
+> > That seems to help for my afs test case, I suspect it might help in
+> > your case as well.
+>
+> Hi Marc. Thank you for the suggestion.
+>
+> I've just tried this diff on top of bpf-next (d0d106a2bd21):
+>
+> diff --git a/fs/netfs/read_retry.c b/fs/netfs/read_retry.c
+> index 2290af0d51ac..53d62e31a4cc 100644
+> --- a/fs/netfs/read_retry.c
+> +++ b/fs/netfs/read_retry.c
+> @@ -152,7 +152,6 @@ static void netfs_retry_read_subrequests(struct netfs=
+_io_request *rreq)
+>                                 __clear_bit(NETFS_SREQ_BOUNDARY, &subreq-=
+>flags);
+>                         }
+>
+> -                       netfs_get_subrequest(subreq, netfs_sreq_trace_get=
+_resubmit);
+>                         netfs_reissue_read(rreq, subreq);
+>                         if (subreq =3D=3D to)
+>                                 break;
+>
+>
+> and I'm getting a hung task with the same stack
+>
+> [  184.362292] INFO: task modprobe:2527 blocked for more than 20 seconds.
+> [  184.363173]       Tainted: G           OE      6.13.0-gd0d106a2bd21-di=
+rty #1
+> [  184.363651] "echo 0 > /proc/sys/kernel/hung_task_timeout_secs" disable=
+s this message.
+> [  184.364142] task:modprobe        state:D stack:0     pid:2527  tgid:25=
+27  ppid:2134   flags:0x00000002
+> [  184.364743] Call Trace:
+> [  184.364907]  <TASK>
+> [  184.365057]  __schedule+0xa91/0xe80
+> [  184.365311]  schedule+0x41/0xb0
+> [  184.365525]  v9fs_evict_inode+0xfe/0x170
+> [  184.365782]  ? __pfx_var_wake_function+0x10/0x10
+> [  184.366082]  evict+0x1ef/0x360
+> [  184.366312]  __dentry_kill+0xb0/0x220
+> [  184.366561]  ? dput+0x3a/0x1d0
+> [  184.366765]  dput+0x114/0x1d0
+> [  184.366962]  __fput+0x136/0x2b0
+> [  184.367172]  __x64_sys_close+0x9e/0xd0
+> [  184.367443]  do_syscall_64+0x79/0x120
+> [  184.367685]  entry_SYSCALL_64_after_hwframe+0x76/0x7e
+> [  184.368005] RIP: 0033:0x7f4c6fc7f60b
+> [  184.368249] RSP: 002b:00007ffc7582beb8 EFLAGS: 00000297 ORIG_RAX: 0000=
+000000000003
+> [  184.368733] RAX: ffffffffffffffda RBX: 0000555e18cff7a0 RCX: 00007f4c6=
+fc7f60b
+> [  184.369176] RDX: 00007f4c6fd64ee0 RSI: 0000000000000001 RDI: 000000000=
+0000000
+> [  184.369634] RBP: 00007ffc7582bee0 R08: 0000000000000000 R09: 000000000=
+0000007
+> [  184.370078] R10: 0000555e18cff980 R11: 0000000000000297 R12: 000000000=
+0000000
+> [  184.370544] R13: 00007f4c6fd65030 R14: 0000555e18cff980 R15: 0000555e1=
+8d7b750
+> [  184.371004]  </TASK>
+> [  184.371151]
+> [  184.371151] Showing all locks held in the system:
+> [  184.371560] 1 lock held by khungtaskd/32:
+> [  184.371816]  #0: ffffffff83195d90 (rcu_read_lock){....}-{1:3}, at: deb=
+ug_show_all_locks+0x2e/0x180
+> [  184.372397] 2 locks held by kworker/u8:21/2134:
+> [  184.372695]  #0: ffff9a5300104d48 ((wq_completion)events_unbound){+.+.=
+}-{0:0}, at: process_scheduled_works+0x23a/0x600
+> [  184.373376]  #1: ffff9e9882187e20 ((work_completion)(&sub_info->work))=
+{+.+.}-{0:0}, at: process_scheduled_works+0x25a/0x600
+> [  184.374075]
+> [  184.374182] =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D
+>
+> So this appears to be something different.
+>
+> >
+> > Marc
 
-Totally, even though my email domain would suggest otherwise, I am just 
-an user of that driver here, not its maintainer, though I do have some 
-familiarity with it, I don't know why that choice was made.
+Looks like there may be a similar issue with the
+netfs_get_subrequest() at line 196, which also precedes a call to
+netfs_reissue_read.  Might be worth trying with that removed as well.
 
-> 
->>
->> Eventually we land into __page_frag_alloc_align() with the following parameters across multiple successive calls:
->>
->> __page_frag_alloc_align: fragsz=10048, align_mask=-1, size=32768, offset=0
->> __page_frag_alloc_align: fragsz=10048, align_mask=-1, size=32768, offset=10048
->> __page_frag_alloc_align: fragsz=10048, align_mask=-1, size=32768, offset=20096
->> __page_frag_alloc_align: fragsz=10048, align_mask=-1, size=32768, offset=30144
->>
->> So in that case we do indeed have offset + fragsz (40192) > size (32768) and so we would eventually return NULL.
-> 
-> It seems the changing of '(unlikely(offset < 0))' checking to
-> "fragsz > PAGE_SIZE" causes bgmac driver to break more easily
-> here. But bgmac driver might likely break too if the system
-> memory is severely fragmented when falling back to alllocate
-> base page before this patch.
-> 
->>
->> Any idea on how to best fix that within the bgmac driver?
-> 
-> Maybe use the page allocator API directly when allocating fragment
-> with BGMAC_RX_ALLOC_SIZE > PAGE_SIZE for a quick fix.
-> 
-> In the long term, maybe it makes sense to use the page_pool API
-> as more drivers are converting to use page_pool API already.
-
-Short term, I think I am going to submit a quick fix that is inspired by 
-the out of tree patches carried in OpenWrt:
-
-https://git.openwrt.org/?p=openwrt/openwrt.git;a=blob;f=target/linux/bcm53xx/patches-6.6/700-bgmac-reduce-max-frame-size-to-support-just-MTU-1500.patch;h=3a2f4b06ed6d8cda1f3f0be23e1066267234766b;hb=HEAD
-
-Thanks!
--- 
-Florian
+Marc
 
