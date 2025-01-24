@@ -1,46 +1,46 @@
-Return-Path: <netdev+bounces-160720-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-160721-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id E6617A1AEF8
-	for <lists+netdev@lfdr.de>; Fri, 24 Jan 2025 04:19:31 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7C2BEA1AEFA
+	for <lists+netdev@lfdr.de>; Fri, 24 Jan 2025 04:19:39 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id CFE7916C13B
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 5CFA43A9269
 	for <lists+netdev@lfdr.de>; Fri, 24 Jan 2025 03:19:24 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CB0B61D89EC;
-	Fri, 24 Jan 2025 03:18:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4D0081D8E06;
+	Fri, 24 Jan 2025 03:18:55 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="r/V8DA3N"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Umy/4F2B"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A78791D88D1
-	for <netdev@vger.kernel.org>; Fri, 24 Jan 2025 03:18:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2A5EE1D8DEA
+	for <netdev@vger.kernel.org>; Fri, 24 Jan 2025 03:18:55 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1737688734; cv=none; b=kijsmyIikdERCEE/8aM900ShQZ0++9Hj0fX6QGbjXObGQEnpCz7CYRoJ/6258qudurTV5kgxf+BQevwQiLQrNeTiBm7rRylCpjt47+kvhtQlQw5GLvbe8+IfsDJuYlCgfRmSYCQCGyBgakoXRnRDswQ5BZGxuvot+1wbs0IobwE=
+	t=1737688735; cv=none; b=jJREcILveZKi88lTRkTm2eBn/aPEsSBXD7wD+V0STLZ9L9xtKMg92GURbNTvaISEr3Jlx1HDNcG7LbE6LHHNyzGheohStBtJ6LgRCDW/OGqM+lJPyNzN1YxzybLM0kqZBbPyQqA0arofVMYObHwl3AOtyxDj0bHJvP86+cszbdk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1737688734; c=relaxed/simple;
-	bh=hQf1J3ItQ4oRcRphtOkACcoJOJ4gLAc4gVVhH4Yo11o=;
+	s=arc-20240116; t=1737688735; c=relaxed/simple;
+	bh=X0/mxlb/Jfxgz6R8FzdBgypuJHZPfih9S1I0n8lgdkk=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=r/e9P2ADGWQJIos0muuQ2jAZoZ1ELPazVbSBFdAKmkSqfRfel24pjXA/tQQcr35mGpzkBd7sa0EsmxCFRR7wl4RoNIhkHYAfaPOr9RrnAc/mBI9yy4OE1AyTD99cQ59V+z4Iy9AkoYghMgun8fN+nyf7IGdYUCMGmU1R7FnxxWA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=r/V8DA3N; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 325B8C4CEE2;
+	 MIME-Version; b=LyL5lNt885qdiQKd1zTME66r37whwj2V8N8HeclAbdPzHxrTOTe/CB12wpXthwjtOPWtJyWgXxYdTp+KSLk0xpDNVCDWjE9QrEWDuIplGtE+KWgSx9v+4VuOvvfXk3p4MYHHNHq8pkG2K7o93scD7XC9PPHPRzL2x44IwOTvhBY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Umy/4F2B; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id A952EC4CEE4;
 	Fri, 24 Jan 2025 03:18:54 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1737688734;
-	bh=hQf1J3ItQ4oRcRphtOkACcoJOJ4gLAc4gVVhH4Yo11o=;
+	s=k20201202; t=1737688735;
+	bh=X0/mxlb/Jfxgz6R8FzdBgypuJHZPfih9S1I0n8lgdkk=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=r/V8DA3NTrdqcIMD2LIBEyS46fjhXEVKedN5SBo6tLsMBiLI32gm8EDRDo6lmG++w
-	 uaxcJqznGpbgvwJQsRbtcqMu1x4NCJzaciln9GJN0nB647acFtH3riZOiqT2i9qoJT
-	 mCiTO+KcMqiAHz4Ozrm3Ihi2U/gQBqkyhhmK4R9AoHq//3YEQ+QFzDEqVuoAxsfL23
-	 4dZbEWhPH5S8jCOfcN+vJpYi6flwN0tjPakcTQafbJ72wqpWW1/gv/t6MYgGgs3OZ9
-	 da0s8MvSd+bevfrTnApH+HUoMy3lPaexMKV+OgQ2wK5tw8Lc3la5JZlHaAjYcn17HD
-	 mlqXsLS+A4+UA==
+	b=Umy/4F2BQ1nUCWPXrmOzFXlWR7kiWBaVQ5L+gs8GqSKxF2AyClIC9iLo2EO1CQjW+
+	 x4mVz5JxRrVnByM0SfKt9I49F7kvjguhQHCpJq2cW+1QLA2Vue6iOjKXrcqcdP/kVu
+	 WKOYU3jAXRfK68DYuWannEceh7Wpatakg0WBb/T7tfnB7Q7QtdWmnMh8XwppoAeIEk
+	 gNCYdu3CH25/x9WLtHH07aK3LLSoAcnWzqGKe10Ky8XNqWfC6FMAt+U7OB5+p6DAAn
+	 wrz7jvLzD28Q8mwHejAFNZbF/7M9j5VM2xEQa+EgfSXwxCeYi8e3QsEpwtzwu4drOf
+	 e8e1HNVJoZDqw==
 From: Jakub Kicinski <kuba@kernel.org>
 To: davem@davemloft.net
 Cc: netdev@vger.kernel.org,
@@ -50,12 +50,12 @@ Cc: netdev@vger.kernel.org,
 	horms@kernel.org,
 	dan.carpenter@linaro.org,
 	Jakub Kicinski <kuba@kernel.org>,
-	willy@infradead.org,
+	kevinbrace@bracecomputerlab.com,
 	romieu@fr.zoreil.com,
 	kuniyu@amazon.com
-Subject: [PATCH net v3 5/7] eth: niu: fix calling napi_enable() in atomic context
-Date: Thu, 23 Jan 2025 19:18:39 -0800
-Message-ID: <20250124031841.1179756-6-kuba@kernel.org>
+Subject: [PATCH net v3 6/7] eth: via-rhine: fix calling napi_enable() in atomic context
+Date: Thu, 23 Jan 2025 19:18:40 -0800
+Message-ID: <20250124031841.1179756-7-kuba@kernel.org>
 X-Mailer: git-send-email 2.48.1
 In-Reply-To: <20250124031841.1179756-1-kuba@kernel.org>
 References: <20250124031841.1179756-1-kuba@kernel.org>
@@ -67,7 +67,11 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-napi_enable() may sleep now, take netdev_lock() before np->lock.
+napi_enable() may sleep now, take netdev_lock() before rp->lock.
+napi_enable() is hidden inside init_registers().
+
+Note that this patch orders netdev_lock after rp->task_lock,
+to avoid having to take the netdev_lock() around disable path.
 
 Fixes: 413f0271f396 ("net: protect NAPI enablement with netdev_lock()")
 Reported-by: Dan Carpenter <dan.carpenter@linaro.org>
@@ -75,78 +79,71 @@ Link: https://lore.kernel.org/dcfd56bc-de32-4b11-9e19-d8bd1543745d@stanley.mount
 Reviewed-by: Eric Dumazet <edumazet@google.com>
 Signed-off-by: Jakub Kicinski <kuba@kernel.org>
 ---
-CC: willy@infradead.org
+v2:
+ - actually switch to napi_enable_locked()
+v1: https://lore.kernel.org/20250121221519.392014-7-kuba@kernel.org
+
+CC: kevinbrace@bracecomputerlab.com
 CC: romieu@fr.zoreil.com
 CC: kuniyu@amazon.com
 ---
- drivers/net/ethernet/sun/niu.c | 10 +++++++++-
- 1 file changed, 9 insertions(+), 1 deletion(-)
+ drivers/net/ethernet/via/via-rhine.c | 11 ++++++++++-
+ 1 file changed, 10 insertions(+), 1 deletion(-)
 
-diff --git a/drivers/net/ethernet/sun/niu.c b/drivers/net/ethernet/sun/niu.c
-index d7459866d24c..72177fea1cfb 100644
---- a/drivers/net/ethernet/sun/niu.c
-+++ b/drivers/net/ethernet/sun/niu.c
-@@ -6086,7 +6086,7 @@ static void niu_enable_napi(struct niu *np)
- 	int i;
+diff --git a/drivers/net/ethernet/via/via-rhine.c b/drivers/net/ethernet/via/via-rhine.c
+index 894911f3d560..e56ebbdd428d 100644
+--- a/drivers/net/ethernet/via/via-rhine.c
++++ b/drivers/net/ethernet/via/via-rhine.c
+@@ -1568,7 +1568,7 @@ static void init_registers(struct net_device *dev)
+ 	if (rp->quirks & rqMgmt)
+ 		rhine_init_cam_filter(dev);
  
- 	for (i = 0; i < np->num_ldg; i++)
--		napi_enable(&np->ldg[i].napi);
-+		napi_enable_locked(&np->ldg[i].napi);
- }
+-	napi_enable(&rp->napi);
++	napi_enable_locked(&rp->napi);
  
- static void niu_disable_napi(struct niu *np)
-@@ -6116,7 +6116,9 @@ static int niu_open(struct net_device *dev)
- 	if (err)
- 		goto out_free_channels;
+ 	iowrite16(RHINE_EVENT & 0xffff, ioaddr + IntrEnable);
  
+@@ -1696,7 +1696,10 @@ static int rhine_open(struct net_device *dev)
+ 	rhine_power_init(dev);
+ 	rhine_chip_reset(dev);
+ 	rhine_task_enable(rp);
++
 +	netdev_lock(dev);
- 	niu_enable_napi(np);
+ 	init_registers(dev);
 +	netdev_unlock(dev);
  
- 	spin_lock_irq(&np->lock);
+ 	netif_dbg(rp, ifup, dev, "%s() Done - status %04x MII status: %04x\n",
+ 		  __func__, ioread16(ioaddr + ChipCmd),
+@@ -1727,6 +1730,8 @@ static void rhine_reset_task(struct work_struct *work)
  
-@@ -6521,6 +6523,7 @@ static void niu_reset_task(struct work_struct *work)
- 
- 	niu_reset_buffers(np);
- 
-+	netdev_lock(np->dev);
- 	spin_lock_irqsave(&np->lock, flags);
- 
- 	err = niu_init_hw(np);
-@@ -6531,6 +6534,7 @@ static void niu_reset_task(struct work_struct *work)
- 	}
- 
- 	spin_unlock_irqrestore(&np->lock, flags);
-+	netdev_unlock(np->dev);
- }
- 
- static void niu_tx_timeout(struct net_device *dev, unsigned int txqueue)
-@@ -6761,7 +6765,9 @@ static int niu_change_mtu(struct net_device *dev, int new_mtu)
- 
- 	niu_free_channels(np);
- 
+ 	napi_disable(&rp->napi);
+ 	netif_tx_disable(dev);
++
 +	netdev_lock(dev);
- 	niu_enable_napi(np);
+ 	spin_lock_bh(&rp->lock);
+ 
+ 	/* clear all descriptors */
+@@ -1740,6 +1745,7 @@ static void rhine_reset_task(struct work_struct *work)
+ 	init_registers(dev);
+ 
+ 	spin_unlock_bh(&rp->lock);
 +	netdev_unlock(dev);
  
- 	err = niu_alloc_channels(np);
- 	if (err)
-@@ -9937,6 +9943,7 @@ static int __maybe_unused niu_resume(struct device *dev_d)
- 
- 	spin_lock_irqsave(&np->lock, flags);
- 
+ 	netif_trans_update(dev); /* prevent tx timeout */
+ 	dev->stats.tx_errors++;
+@@ -2541,9 +2547,12 @@ static int rhine_resume(struct device *device)
+ 	alloc_tbufs(dev);
+ 	rhine_reset_rbufs(rp);
+ 	rhine_task_enable(rp);
++
 +	netdev_lock(dev);
- 	err = niu_init_hw(np);
- 	if (!err) {
- 		np->timer.expires = jiffies + HZ;
-@@ -9945,6 +9952,7 @@ static int __maybe_unused niu_resume(struct device *dev_d)
- 	}
- 
- 	spin_unlock_irqrestore(&np->lock, flags);
+ 	spin_lock_bh(&rp->lock);
+ 	init_registers(dev);
+ 	spin_unlock_bh(&rp->lock);
 +	netdev_unlock(dev);
  
- 	return err;
- }
+ 	netif_device_attach(dev);
+ 
 -- 
 2.48.1
 
