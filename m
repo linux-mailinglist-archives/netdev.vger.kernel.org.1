@@ -1,200 +1,85 @@
-Return-Path: <netdev+bounces-160768-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-160770-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 85498A1B473
-	for <lists+netdev@lfdr.de>; Fri, 24 Jan 2025 12:10:45 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id BBF17A1B4CF
+	for <lists+netdev@lfdr.de>; Fri, 24 Jan 2025 12:37:50 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 5793E188CD4C
-	for <lists+netdev@lfdr.de>; Fri, 24 Jan 2025 11:10:49 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id C2D13188D536
+	for <lists+netdev@lfdr.de>; Fri, 24 Jan 2025 11:37:54 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7CD6621A433;
-	Fri, 24 Jan 2025 11:10:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6C98F21A449;
+	Fri, 24 Jan 2025 11:37:47 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="SY/ud89X"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ish6hNS2"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f179.google.com (mail-pl1-f179.google.com [209.85.214.179])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E57DE23B0;
-	Fri, 24 Jan 2025 11:10:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.179
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3DB3A207A03
+	for <netdev@vger.kernel.org>; Fri, 24 Jan 2025 11:37:46 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1737717040; cv=none; b=P9+FCMV3+9si63Do46G4J7QYqytvUQy6eRkbRyWz6RB5gSR0VG4Sl40W2+01s0SbnJjYasxDJRetGliIhJdovvDRg1fsg8KJ3zugsmddcTo6Ar9pjPQZssqfrbBa4jWHfPyyHYWdcfAmRJOgSD59Ww69ncpGqpyHlRMz3Vb9DrM=
+	t=1737718667; cv=none; b=Ca/fcy5G1ulH6f6sRDYwer5kAaNeR2boEFqb67zHBDUbYMfeM2CxUkg4sHCC4nKdHXETBWk0sjej7sCmIo/jFDN3qpQu1C10DaccO8I1vlRebOXUOprelAaIf0G/n8cmFaniXPk8A4x1zbAMqLBYoso33Bd50wD724OMlCr/6XM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1737717040; c=relaxed/simple;
-	bh=D3nxBSAmFJS1ZYIFtB7ERBcKeGplwhffAUcJb4JAutU=;
+	s=arc-20240116; t=1737718667; c=relaxed/simple;
+	bh=DOgxYuNJGR/6wh6nuju19thFYosNZhn+4J/myN/Jx1o=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=k2qWGn70gnlTrASPY70nWq+11q/Du2JGBCVPBKE6gKjYXVuBQ+qSgL+bMSyFtW/HTHK8iAi5FXIlmOgx3KoJYsFD0vDmbE7ISnt/wy6X4VYjnwknNjaNWkZGgu3qBvBsRjYI8VN8pxFbA6s2UmsysUf+kzh7O0qqUK7tnhdCYas=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=SY/ud89X; arc=none smtp.client-ip=209.85.214.179
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pl1-f179.google.com with SMTP id d9443c01a7336-21636268e43so42059755ad.2;
-        Fri, 24 Jan 2025 03:10:38 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1737717038; x=1738321838; darn=vger.kernel.org;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=kuiDC4Ce5yx1PUIsFy9n/ZgbqFYaXydoqCv8HLU67i0=;
-        b=SY/ud89XNjmq1CDN2AaSMPEjBzvXFZsNgof6Ll/+KzpQ1vi8RTH3DR4CZxtpr2MRpy
-         QvzL6r42KkeL60YQGLN3jLVQwC3WnLGekS/QvrNTU6DchOy6IxLOSM7XMKsSrMwMIqSH
-         DUDsq0pmJ7p5Dj693sRwniKIt0vugqE1eou4OgsmYznEa7aQaw0RoLS9Vuq1PDeZs576
-         UT7B1AYaSF+0+MBf51QjXX1I4hQxaJO/A4kX4y5FhJHha0ykHGm9KUAVDj8jTKnTCjk7
-         0rk3U4JQWqR5JCDKzezLya+UkufjL/B61UYmLai9arwuOPQp0USNUmWHBXHXq0X7fHyR
-         ya1w==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1737717038; x=1738321838;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=kuiDC4Ce5yx1PUIsFy9n/ZgbqFYaXydoqCv8HLU67i0=;
-        b=C5Qcrb3aG8oETI2GZNVcaIgqeVU1hWlZmG2E2TVTPWH5a0e+D5KuOsN7zQx/KTaNuv
-         I0dpIhicGWzd65t7BDkrCs9OfXKoUojzxYf5Z55xIkv6dstoOCJ0CA8rpS2fD6GcQWDQ
-         8xO4DDWo7d89fV8JEzlhQevF5UXS03Eg7wVnZcKcz7q2jaGGVdRM/TnzSXSdrICowJFb
-         5hUmYmldFQdIdgQ810O/jGicrEAWPfybE314l2rxkdewYTnoJyKZU6p12qQIduwWCdUq
-         HKQMM0apNysdhM39lJx5gQHbI/XFbEkXcMlaK4Ufwnj+LMWq6QD9UGgpvhnIrZVASUH8
-         WW9w==
-X-Forwarded-Encrypted: i=1; AJvYcCWBMaAtzDs1MCiFN8TKECCy/9wnr27yUmHrlPAsTOkavnuame+DqCdBL/ZTP8pOQ/3sPJJX7h84@vger.kernel.org, AJvYcCXQOPlSW5+c6icpzPb0eNrzZW+lP8jFEimoL+/IpDtIZ7YwxlGoJieCODiIYDZNV3+BaE20wlcUd7uiDSzW6cI=@vger.kernel.org
-X-Gm-Message-State: AOJu0YykNfsQw5nZgl0lRpTKpotsPBwmQcoyUXoeKQ15phRvMc6Zg2T0
-	f3bAbvW80rq8i1JUjbED0pRFYFtNc8V2M8pmrtBzgfp9uxiYFNo0
-X-Gm-Gg: ASbGncsaVgTwQa5YamBVqLE+RqCz4MuWgfpYBX/JMeDSJlA0qURx9oV3vi1lKcX6D/S
-	HJK0+QRvUQ1OJ9euQn11uLdONJ7Zl5BP6Rri70lgLCHmhJ7YK0kcqH/6A1R/qZlaa7ztZmoyneR
-	0WvqS4+A3GAPSmV9AuTqnfb/a226OaI6uT4QhR8eO7oMrn30Ej+XOCYxWtQtlvjSihOrE/Ven4n
-	XUtoYHv4zgdWVzX8VqzM7YqYz2DDRRX1MLYEi/e+xGt3I5A6/OtFT00rXFjyO1GqPJmuanLPI4G
-	P4koUveazw==
-X-Google-Smtp-Source: AGHT+IFjQeGKuP8MS2+YRigvEM4CIUUOSSqsMWYg6pA8Bym0Eunfbv0JIczCZFegBy5/QMuWlWerGQ==
-X-Received: by 2002:a05:6a20:840b:b0:1e1:c748:13c1 with SMTP id adf61e73a8af0-1eb215ec017mr42296405637.27.1737717038062;
-        Fri, 24 Jan 2025 03:10:38 -0800 (PST)
-Received: from fedora ([43.228.180.230])
-        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-72f8a78f18asm1597886b3a.177.2025.01.24.03.10.33
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 24 Jan 2025 03:10:37 -0800 (PST)
-Date: Fri, 24 Jan 2025 11:10:30 +0000
-From: Hangbin Liu <liuhangbin@gmail.com>
-To: Cosmin Ratiu <cratiu@nvidia.com>
-Cc: "razor@blackwall.org" <razor@blackwall.org>,
-	"davem@davemloft.net" <davem@davemloft.net>,
-	Tariq Toukan <tariqt@nvidia.com>,
-	"linux-kselftest@vger.kernel.org" <linux-kselftest@vger.kernel.org>,
-	"liali@redhat.com" <liali@redhat.com>,
-	"jv@jvosburgh.net" <jv@jvosburgh.net>,
-	"kuba@kernel.org" <kuba@kernel.org>,
-	"horms@kernel.org" <horms@kernel.org>,
-	"edumazet@google.com" <edumazet@google.com>,
-	"netdev@vger.kernel.org" <netdev@vger.kernel.org>,
-	Boris Pismenny <borisp@nvidia.com>, Jianbo Liu <jianbol@nvidia.com>,
-	"pabeni@redhat.com" <pabeni@redhat.com>
-Subject: Re: [PATCH net v2] bonding: Correctly support GSO ESP offload
-Message-ID: <Z5N1JiVml-YE6L-5@fedora>
-References: <20250124085744.434869-1-cratiu@nvidia.com>
- <Z5Njbd8-ieEcbAEV@fedora>
- <2c92e0c58e7d0ab4b06c16f9f1f67f6f9e48d35b.camel@nvidia.com>
+	 Content-Type:Content-Disposition:In-Reply-To; b=iGhY/PtAhte8k/NjqTCgAUogdiD4Qz6klrZ5wIvif2vMbQO7KK6lBgmvwcYQ98wUM+83S+dmuCHGBJnUk1UhEIW/n+HOQMeqKyYHeTVAnFtKCCvuLfSGpG27BxmIUV/s9G2OsPUfj6Xpcerf6GjsK88aJmkgPnLd/wnfRLVMPE4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ish6hNS2; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 471B5C4CED2;
+	Fri, 24 Jan 2025 11:37:45 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1737718666;
+	bh=DOgxYuNJGR/6wh6nuju19thFYosNZhn+4J/myN/Jx1o=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=ish6hNS2rGMV45xVSjhRFpucP6YMoGERJEfGGTOWv7qTCTgWW655QSdxWDnv4oQ5Y
+	 iXt1lLsGmnWmQuayxwOoE75GKb72VxhtU5CTvBHp3ym+he14njZ0+1bYLoVZ2/ItjZ
+	 AcXzFIgo+oaPLie2CjFMw7Zfs0qmpV/N8aFWep71mVFCyx//UztERXSXQpBPE9l4f2
+	 34yVG3+DRX5uUsUn3AG87EJ3MDE0HDISQCc3glr406Tq0yNDIlje/tWhbZqGm99gHu
+	 Lj/K1YqOnQdFAespmV/+M4EGsUf/Wr7HOEUrK0pn6wefsSM4qiTWYjboVKSzEQ18ms
+	 aLvPgPxDR/0/g==
+Date: Fri, 24 Jan 2025 11:37:43 +0000
+From: Simon Horman <horms@kernel.org>
+To: Cong Wang <xiyou.wangcong@gmail.com>
+Cc: netdev@vger.kernel.org, jhs@mojatatu.com, jiri@resnulli.us,
+	quanglex97@gmail.com, mincho@theori.io,
+	Cong Wang <cong.wang@bytedance.com>
+Subject: Re: [Patch net 2/4] Add test case to check for pfifo_tail_enqueue()
+ behaviour when limit == 0
+Message-ID: <20250124113743.GA34605@kernel.org>
+References: <20250124060740.356527-1-xiyou.wangcong@gmail.com>
+ <20250124060740.356527-3-xiyou.wangcong@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <2c92e0c58e7d0ab4b06c16f9f1f67f6f9e48d35b.camel@nvidia.com>
+In-Reply-To: <20250124060740.356527-3-xiyou.wangcong@gmail.com>
 
-On Fri, Jan 24, 2025 at 10:35:40AM +0000, Cosmin Ratiu wrote:
-> On Fri, 2025-01-24 at 09:54 +0000, Hangbin Liu wrote:
-> > On Fri, Jan 24, 2025 at 10:57:44AM +0200, Cosmin Ratiu wrote:
-> > > ---
-> > >  drivers/net/bonding/bond_main.c | 19 ++++++++++---------
-> > >  1 file changed, 10 insertions(+), 9 deletions(-)
-> > > 
-> > > diff --git a/drivers/net/bonding/bond_main.c
-> > > b/drivers/net/bonding/bond_main.c
-> > > index 7b78c2bada81..e45bba240cbc 100644
-> > > --- a/drivers/net/bonding/bond_main.c
-> > > +++ b/drivers/net/bonding/bond_main.c
-> > > @@ -1538,17 +1538,20 @@ static netdev_features_t
-> > > bond_fix_features(struct net_device *dev,
-> > >  				 NETIF_F_HIGHDMA | NETIF_F_LRO)
-> > >  
-> > >  #define BOND_ENC_FEATURES	(NETIF_F_HW_CSUM | NETIF_F_SG | \
-> > > -				 NETIF_F_RXCSUM |
-> > > NETIF_F_GSO_SOFTWARE)
-> > > +				 NETIF_F_RXCSUM |
-> > > NETIF_F_GSO_SOFTWARE | \
-> > > +				 NETIF_F_GSO_PARTIAL)
-> > >  
-> > >  #define BOND_MPLS_FEATURES	(NETIF_F_HW_CSUM | NETIF_F_SG | \
-> > >  				 NETIF_F_GSO_SOFTWARE)
-> > >  
-> > > +#define BOND_GSO_PARTIAL_FEATURES (NETIF_F_GSO_ESP)
-> > > +
-> > >  
-> > >  static void bond_compute_features(struct bonding *bond)
-> > >  {
-> > > +	netdev_features_t gso_partial_features =
-> > > BOND_GSO_PARTIAL_FEATURES;
-> > >  	unsigned int dst_release_flag = IFF_XMIT_DST_RELEASE |
-> > >  					IFF_XMIT_DST_RELEASE_PERM;
-> > > -	netdev_features_t gso_partial_features = NETIF_F_GSO_ESP;
-> > >  	netdev_features_t vlan_features = BOND_VLAN_FEATURES;
-> > >  	netdev_features_t enc_features  = BOND_ENC_FEATURES;
-> > >  #ifdef CONFIG_XFRM_OFFLOAD
-> > > @@ -1582,8 +1585,9 @@ static void bond_compute_features(struct
-> > > bonding *bond)
-> > >  							 
-> > > BOND_XFRM_FEATURES);
-> > >  #endif /* CONFIG_XFRM_OFFLOAD */
-> > >  
-> > > -		if (slave->dev->hw_enc_features &
-> > > NETIF_F_GSO_PARTIAL)
-> > > -			gso_partial_features &= slave->dev-
-> > > >gso_partial_features;
-> > > +		gso_partial_features =
-> > > netdev_increment_features(gso_partial_features,
-> > > +								
-> > > slave->dev->gso_partial_features,
-> > > +								
-> > > BOND_GSO_PARTIAL_FEATURES);
-> > >  
-> > >  		mpls_features =
-> > > netdev_increment_features(mpls_features,
-> > >  							  slave-
-> > > >dev->mpls_features,
-> > > @@ -1598,12 +1602,8 @@ static void bond_compute_features(struct
-> > > bonding *bond)
-> > >  	}
-> > >  	bond_dev->hard_header_len = max_hard_header_len;
-> > >  
-> > > -	if (gso_partial_features & NETIF_F_GSO_ESP)
-> > > -		bond_dev->gso_partial_features |= NETIF_F_GSO_ESP;
-> > > -	else
-> > > -		bond_dev->gso_partial_features &=
-> > > ~NETIF_F_GSO_ESP;
-> > > -
-> > >  done:
-> > > +	bond_dev->gso_partial_features = gso_partial_features;
-> > >  	bond_dev->vlan_features = vlan_features;
-> > >  	bond_dev->hw_enc_features = enc_features |
-> > > NETIF_F_GSO_ENCAP_ALL |
-> > >  				    NETIF_F_HW_VLAN_CTAG_TX |
-> > 
-> >         if (!bond_has_slaves(bond))
-> >                 goto done;
-> > 
-> > If there is no slaves, should we add the gso_partial_features?
+On Thu, Jan 23, 2025 at 10:07:38PM -0800, Cong Wang wrote:
+> From: Quang Le <quanglex97@gmail.com>
 > 
-> The other partial feature sets are added after 'done:', why not do the
-> same for gso_partial_features for consistency? 'gso_partial_features'
-> is otherwise not set anywhere else and relies on it being set to zero
-> when allocated in alloc_netdev_mqs. I think it's better for it to be
-> explicitly initialized in all cases here, like the other feature sets.
+> When limit == 0, pfifo_tail_enqueue() must drop new packet and
+> increase dropped packets count of scheduler.
 > 
-> Cosmin.
+> Signed-off-by: Quang Le <quanglex97@gmail.com>
+> Signed-off-by: Cong Wang <cong.wang@bytedance.com>
 
-OK.
+Hi Cong, all,
 
-Reviewed-by: Hangbin Liu <liuhangbin@gmail.com>
+This test is reporting "not ok" in the Netdev CI.
+
+# not ok 577 d774 - Check pfifo_head_drop qdisc enqueue behaviour when limit == 0
+# Could not match regex pattern. Verify command output:
+# qdisc pfifo_head_drop 1: root refcnt 2 limit 0p
+#  Sent 0 bytes 0 pkt (dropped 0, overlimits 0 requeues 0)
+#  backlog 0b 0p requeues 0
+
+...
 
