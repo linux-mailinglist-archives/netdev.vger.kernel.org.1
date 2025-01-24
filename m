@@ -1,166 +1,140 @@
-Return-Path: <netdev+bounces-160861-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-160852-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id A5CFCA1BDF5
-	for <lists+netdev@lfdr.de>; Fri, 24 Jan 2025 22:38:47 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id E08F5A1BDE0
+	for <lists+netdev@lfdr.de>; Fri, 24 Jan 2025 22:32:23 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 03DA81612D6
-	for <lists+netdev@lfdr.de>; Fri, 24 Jan 2025 21:38:46 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id EBD3E188E782
+	for <lists+netdev@lfdr.de>; Fri, 24 Jan 2025 21:32:27 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A69161E9917;
-	Fri, 24 Jan 2025 21:38:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 965971DC991;
+	Fri, 24 Jan 2025 21:32:20 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=cs.stanford.edu header.i=@cs.stanford.edu header.b="gzH/9a/W"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="lzY8eI5A"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp1.cs.Stanford.EDU (smtp1.cs.stanford.edu [171.64.64.25])
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.13])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 071291E98ED
-	for <netdev@vger.kernel.org>; Fri, 24 Jan 2025 21:38:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=171.64.64.25
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D54321D8E18
+	for <netdev@vger.kernel.org>; Fri, 24 Jan 2025 21:32:17 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.13
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1737754703; cv=none; b=nU62zVcHdMveky0d4Qo3C18A5eiNE8BBr+k+92mi+CVSel2BQl7xx49Q3E18A4QtXndb51pISMsNLHU1IF3/lZgL86uAdPKHzxx7/pBPc3sOdvVBTgA6IPIBvNVLnFQ7DjDUia/YRK0Xvh80EEdvDBHEocruIjZaIquS5BiX/C0=
+	t=1737754340; cv=none; b=e0KHfz+gya4pGAV0YM4sMly0s51NdPSdxbkW+lBLGQLZMqxRbHMmdNcE88NLpcdA+MQy6dyoXQbWNmUlCSw71525iS9sZPbLpe2TPT0DOxZO10ofxtT8rUAaC4zJa0jKou2TRzWvd6OUu74ZLg9xuFKTcnYvrRYTtHID5P1RMNY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1737754703; c=relaxed/simple;
-	bh=dSUEcI2CszeXa/YUSv7xQrrYhrK0pI0Cvk4UmxjCXSc=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=cYbch5aCwv7UIDJTGDT4c0wUk4yZRHGFq7f6uIT90jYVh8folg9j8szVXOj+ETL3/SE/ujB4nSP30Pv7/wqig8Qdf3VBsGk22d7rr/Scqi8iQ0jlOAsZbuUZmSQAew+ahwlU9O18e2utYESa41wNpk8Vyy11crmtMkGxKW0muEE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=cs.stanford.edu; spf=pass smtp.mailfrom=cs.stanford.edu; dkim=pass (2048-bit key) header.d=cs.stanford.edu header.i=@cs.stanford.edu header.b=gzH/9a/W; arc=none smtp.client-ip=171.64.64.25
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=cs.stanford.edu
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=cs.stanford.edu
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=cs.stanford.edu; s=cs2308; h=Content-Transfer-Encoding:Content-Type:Cc:To:
-	Subject:Message-ID:Date:From:In-Reply-To:References:MIME-Version:Sender:
-	Reply-To:Content-ID:Content-Description:Resent-Date:Resent-From:Resent-Sender
-	:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:List-Help:List-Unsubscribe:
-	List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=pdBEaRCSvyWvsIRlqORJ7WlPyopfS1jbm96449rlIh4=; t=1737754702; x=1738618702; 
-	b=gzH/9a/WiO8OkMRTqNGaQ5kvkzN1v4bf7aAKc3i0bS3rWB9LFPr3nCDBJaO/ky1cXBjGnT/jYYe
-	sXArrLcuHQflM3uUviqhvPfDT6zJs1aID0QACJT2MEnjvaCfPZr08CydpVsql+bQPTL3dPnRTZlnR
-	Lkra9Toku7GLxR64GipFrmTk1Kx8XlWi5U5QaGHlGkE+QxtR1+JhHHn5C868bydSnGVvPpwB1ISlq
-	ZueWgxKvqFRq5KY5ycp5sac7FU32ETM6cxZWkL5dvcfnYyACAp0kOoT8ZrZzpe5rEBzjbAlAKtesn
-	FhoSvA44abCDl8hwJyjUT2RD5/eVQxRgjaOg==;
-Received: from mail-oa1-f47.google.com ([209.85.160.47]:45222)
-	by smtp1.cs.Stanford.EDU with esmtpsa  (TLS1.2) tls TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256
-	(Exim 4.94.2)
-	(envelope-from <ouster@cs.stanford.edu>)
-	id 1tbR88-0004OQ-Oq
-	for netdev@vger.kernel.org; Fri, 24 Jan 2025 13:22:21 -0800
-Received: by mail-oa1-f47.google.com with SMTP id 586e51a60fabf-2a3c075ddb6so1357525fac.2
-        for <netdev@vger.kernel.org>; Fri, 24 Jan 2025 13:22:20 -0800 (PST)
-X-Gm-Message-State: AOJu0Yz40x+q2wr5h/GJ1KKjQERQxkW49ecLHt/ZZ8GI53J7b3geQWll
-	f53EOs6dVHyB3FB3jt1X/KLslbf6pJBdfFn1y3f8d1697ssIyb6OrMjcw3pCwUD9m+LXnVuVNt5
-	aSoHrj9iFJfbm9aYIKwbjPPbLox8=
-X-Google-Smtp-Source: AGHT+IEMKGH2Ikj8XAt+E1qDsuhAm/QbG9QKISQbxfbNEAzix4lDaoB8WuGDVHrYleMsBRTXaV+H8NWflyPdurYo+Tc=
-X-Received: by 2002:a05:6870:2f0d:b0:29e:5522:8eea with SMTP id
- 586e51a60fabf-2b1c0b6cdc0mr19516054fac.38.1737753740167; Fri, 24 Jan 2025
- 13:22:20 -0800 (PST)
+	s=arc-20240116; t=1737754340; c=relaxed/simple;
+	bh=q2WLPddkIW8mplX8Y6BMNf9ZSFOEagNutqDg07mYe0Q=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=Dd0q6IhlLaaMy36A3XRfae5bww6o3rR39qRbI7c6miyzrkMD+XzhvSW7dLO0+wloJcuMrCyIjU62fdoSUETfco5x8UjfUi9CBrjbcCkc6OFzbwvY+1h9kDWSlD4jgXigwWtJ3R+TeBio/4y8+3A46qrTHcqEp7LUD+ozcFld1JY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=lzY8eI5A; arc=none smtp.client-ip=192.198.163.13
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1737754339; x=1769290339;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=q2WLPddkIW8mplX8Y6BMNf9ZSFOEagNutqDg07mYe0Q=;
+  b=lzY8eI5A80rN600hioRErjsqzczoteR936yl87zWBD87uLjlWI60tXr+
+   ZHjwRAW1lC5+mcj5D4QVguiNwE7emLnrDOgA1I1FtyJUUZt59Cyjt2O5H
+   s8kWtu9Edda0XeDpTPzlx4FFMB0Y9QGPPCgcBfSpaFSFrdQl1DIMxovJu
+   dbqr8RnfN+FmsaGytCzO6TTvI+dD3eZlOKdsprnPj/dN1SG2JlE4HdkvC
+   +kWbHgtfcIKbXHu+BTo8B4QAnpjjsrYPKCAG28BfZiTVorgidpUym0uQD
+   9ISsX0m2yZYdFJMWyUfK5/BbstJntPmZQv7hk1IM+f0szy70M6YYbW0zU
+   w==;
+X-CSE-ConnectionGUID: o1Ln+o3RQTyJbI8ztH8NQg==
+X-CSE-MsgGUID: U2ZN8tsnShGSIjIvXkcSRA==
+X-IronPort-AV: E=McAfee;i="6700,10204,11325"; a="41140376"
+X-IronPort-AV: E=Sophos;i="6.13,232,1732608000"; 
+   d="scan'208";a="41140376"
+Received: from orviesa006.jf.intel.com ([10.64.159.146])
+  by fmvoesa107.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 24 Jan 2025 13:32:17 -0800
+X-CSE-ConnectionGUID: 8si73MqZRlyeeCBlOz/ErQ==
+X-CSE-MsgGUID: Qw604W7rTdCt34TjsTUn+g==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.13,232,1732608000"; 
+   d="scan'208";a="107861072"
+Received: from anguy11-upstream.jf.intel.com ([10.166.9.133])
+  by orviesa006.jf.intel.com with ESMTP; 24 Jan 2025 13:32:16 -0800
+From: Tony Nguyen <anthony.l.nguyen@intel.com>
+To: davem@davemloft.net,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	edumazet@google.com,
+	andrew+netdev@lunn.ch,
+	netdev@vger.kernel.org
+Cc: Tony Nguyen <anthony.l.nguyen@intel.com>
+Subject: [PATCH net 0/8][pull request] Intel Wired LAN Driver Updates 2025-01-24 (idpf, ice, iavf)
+Date: Fri, 24 Jan 2025 13:32:02 -0800
+Message-ID: <20250124213213.1328775-1-anthony.l.nguyen@intel.com>
+X-Mailer: git-send-email 2.47.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250115185937.1324-1-ouster@cs.stanford.edu> <20250115185937.1324-4-ouster@cs.stanford.edu>
- <08c42b4a-6eed-4814-8bf8-fad40de6f2ed@redhat.com>
-In-Reply-To: <08c42b4a-6eed-4814-8bf8-fad40de6f2ed@redhat.com>
-From: John Ousterhout <ouster@cs.stanford.edu>
-Date: Fri, 24 Jan 2025 13:21:44 -0800
-X-Gmail-Original-Message-ID: <CAGXJAmzcifEeNthmE2J0epFYUhJYH=XxoJUSxQEqPCjkbhHdBw@mail.gmail.com>
-X-Gm-Features: AWEUYZk3clALfpaUMRAlTCLktkAdFUtMo6S8ZsS46I0zTEx3NbvkwXiHF7IXWqk
-Message-ID: <CAGXJAmzcifEeNthmE2J0epFYUhJYH=XxoJUSxQEqPCjkbhHdBw@mail.gmail.com>
-Subject: Re: [PATCH net-next v6 03/12] net: homa: create shared Homa header files
-To: Paolo Abeni <pabeni@redhat.com>
-Cc: netdev@vger.kernel.org, edumazet@google.com, horms@kernel.org, 
-	kuba@kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Spam-Score: -1.0
-X-Spam-Level: 
-X-Scan-Signature: daeb03f1a6494d8fe08e106a714ef916
+Content-Transfer-Encoding: 8bit
 
-On Thu, Jan 23, 2025 at 3:01=E2=80=AFAM Paolo Abeni <pabeni@redhat.com> wro=
-te:
->
-> On 1/15/25 7:59 PM, John Ousterhout wrote:
-> [...]
-> > +/**
-> > + * union sockaddr_in_union - Holds either an IPv4 or IPv6 address (sma=
-ller
-> > + * and easier to use than sockaddr_storage).
-> > + */
-> > +union sockaddr_in_union {
-> > +     /** @sa: Used to access as a generic sockaddr. */
-> > +     struct sockaddr sa;
-> > +
-> > +     /** @in4: Used to access as IPv4 socket. */
-> > +     struct sockaddr_in in4;
-> > +
-> > +     /** @in6: Used to access as IPv6 socket.  */
-> > +     struct sockaddr_in6 in6;
-> > +};
->
-> There are other protocol using the same struct with a different name
-> (sctp) or  a very similar struct (mptcp). It would be nice to move this
-> in a shared header and allow re-use.
+For idpf:
 
-I would be happy to do this, but I suspect it should be done
-separately from this patch series. It's not obvious to me where such a
-definition should go; can you suggest an appropriate place for it?
+Emil adds memory barrier when accessing control queue descriptors and
+restores call to idpf_vc_xn_shutdown() when resetting.
 
-> [...]
-> > +     /**
-> > +      * @core: Core on which @thread was executing when it registered
-> > +      * its interest.  Used for load balancing (see balance.txt).
-> > +      */
-> > +     int core;
->
-> I don't see a 'balance.txt' file in this submission, possibly stray
-> reference?
+Manoj Vishwanathan expands transaction lock to properly protect xn->salt
+value and adds additional debugging information.
 
-This is a file in the GitHub repo that I hadn't (yet) been including
-with the code being upstreamed. I've now added this file (and a couple
-of other explanatory .txt files) to the manifest for upstreaming.
+Marco Leogrande converts workqueues to be unbound.
 
-> [...]
-> > +     /**
-> > +      * @pacer_wake_time: time (in sched_clock units) when the pacer l=
-ast
-> > +      * woke up (if the pacer is running) or 0 if the pacer is sleepin=
-g.
-> > +      */
-> > +     __u64 pacer_wake_time;
->
-> why do you use the '__' variant here? this is not uapi, you should use
-> the plain u64/u32 (more occurrences below).
+For ice:
 
-Sorry, newbie mistake (I wasn't aware of the difference). I will fix everyw=
-here.
+Przemek fixes incorrect size use for array.
 
-> [...]
-> > +     /**
-> > +      * @prev_default_port: The most recent port number assigned from
-> > +      * the range of default ports.
-> > +      */
-> > +     __u16 prev_default_port __aligned(L1_CACHE_BYTES);
->
-> I think the idiomatic way to express the above is to use:
->
->         u16 prev_default_port ____cacheline_aligned;
->
-> or
->
->         u16 prev_default_port ____cacheline_aligned_in_smp;
->
-> more similar occourrences below.
+Mateusz removes reporting of invalid parameter and value.
 
-I will fix everywhere.
+For iavf:
 
-Thanks for the comments.
+Michal adjusts some VLAN changes to occur without a PF call to avoid
+timing issues with the calls.
 
+The following are changes since commit 15a901361ec3fb1c393f91880e1cbf24ec0a88bd:
+  ipmr: do not call mr_mfc_uses_dev() for unres entries
+and are available in the git repository at:
+  git://git.kernel.org/pub/scm/linux/kernel/git/tnguy/net-queue 200GbE
 
--John-
+Emil Tantilov (2):
+  idpf: add read memory barrier when checking descriptor done bit
+  idpf: fix transaction timeouts on reset
+
+Manoj Vishwanathan (2):
+  idpf: Acquire the lock before accessing the xn->salt
+  idpf: add more info during virtchnl transaction timeout/salt mismatch
+
+Marco Leogrande (1):
+  idpf: convert workqueues to unbound
+
+Mateusz Polchlopek (1):
+  ice: remove invalid parameter of equalizer
+
+Michal Swiatkowski (1):
+  iavf: allow changing VLAN state without calling PF
+
+Przemek Kitszel (1):
+  ice: fix ice_parser_rt::bst_key array size
+
+ drivers/net/ethernet/intel/iavf/iavf_main.c   | 19 ++++++++++++--
+ .../net/ethernet/intel/ice/ice_adminq_cmd.h   |  1 -
+ drivers/net/ethernet/intel/ice/ice_ethtool.c  |  1 -
+ drivers/net/ethernet/intel/ice/ice_ethtool.h  |  1 -
+ drivers/net/ethernet/intel/ice/ice_parser.h   |  6 ++---
+ .../net/ethernet/intel/ice/ice_parser_rt.c    | 12 ++++-----
+ .../net/ethernet/intel/idpf/idpf_controlq.c   |  6 +++++
+ drivers/net/ethernet/intel/idpf/idpf_main.c   | 15 +++++++----
+ .../net/ethernet/intel/idpf/idpf_virtchnl.c   | 25 ++++++++++++++-----
+ 9 files changed, 59 insertions(+), 27 deletions(-)
+
+-- 
+2.47.1
+
 
