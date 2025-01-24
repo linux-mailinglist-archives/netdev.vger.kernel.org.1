@@ -1,118 +1,176 @@
-Return-Path: <netdev+bounces-160751-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-160752-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id CEE00A1B318
-	for <lists+netdev@lfdr.de>; Fri, 24 Jan 2025 10:52:51 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id C52B1A1B31D
+	for <lists+netdev@lfdr.de>; Fri, 24 Jan 2025 10:55:07 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 29E56162034
-	for <lists+netdev@lfdr.de>; Fri, 24 Jan 2025 09:52:50 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 1344C162ADE
+	for <lists+netdev@lfdr.de>; Fri, 24 Jan 2025 09:55:06 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 85C2D219A8F;
-	Fri, 24 Jan 2025 09:52:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7554D21A435;
+	Fri, 24 Jan 2025 09:55:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="irtemr4q"
 X-Original-To: netdev@vger.kernel.org
-Received: from szxga02-in.huawei.com (szxga02-in.huawei.com [45.249.212.188])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f171.google.com (mail-pl1-f171.google.com [209.85.214.171])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 698B923A0;
-	Fri, 24 Jan 2025 09:52:45 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.188
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E517923A0;
+	Fri, 24 Jan 2025 09:55:01 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.171
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1737712367; cv=none; b=czZZzAjdcFkMwXVpBXn1VuvpBLwhuJ+OA/JTceTpaclI54crKq29VVZ7V4uVx3jkrBo4l8+CI6e/CZ4R2fDbeEDTRrXC9t6BDFC4cxwCP3koR4by1qJ9ZJpj79TwgCbI9tCB7pvwq0WS210/D/MuxOvT9DY7fMOrIyGfaTTzspg=
+	t=1737712503; cv=none; b=CGUw/3stGc6vXKf9Fk9+WnGus23doxdc4oQH2W3ZQ2sWPtwsD1ht5d+FHmssYg51jg+5KlsadY9yMGLM9UB2Ga3qSpDtdAbJfYG6xempe+59U9t7N01OO4rmtaCP7reouUGxSLjCEh/myoPZdthHVvPVenKQmG7YUneWKoEFlhQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1737712367; c=relaxed/simple;
-	bh=OxnKsPySuSh7Ons4C5nnqMMTtF+f9pa+WVc7g72LwNc=;
-	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
-	 In-Reply-To:Content-Type; b=B41CmwaYqckzilhZxbsNIeYr/t0kxs2CsTocrWoeibI19/hp/NA/G3UdDucEvPHb7NYcdJVwwzcqeR2CpaXrE/LfHMGIm64ETD+cvReHsN7eCFgcOZ107GGfKMPTVumM++4cfzGLHyEeJrdfD/MWacx+jHIitBo0PEedpTivqog=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.188
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
-Received: from mail.maildlp.com (unknown [172.19.88.105])
-	by szxga02-in.huawei.com (SkyGuard) with ESMTP id 4YfY3V0x6qzrSkW;
-	Fri, 24 Jan 2025 17:51:02 +0800 (CST)
-Received: from dggpemf200006.china.huawei.com (unknown [7.185.36.61])
-	by mail.maildlp.com (Postfix) with ESMTPS id 9A472140159;
-	Fri, 24 Jan 2025 17:52:40 +0800 (CST)
-Received: from [10.67.120.129] (10.67.120.129) by
- dggpemf200006.china.huawei.com (7.185.36.61) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.11; Fri, 24 Jan 2025 17:52:40 +0800
-Message-ID: <ead00fb7-8538-45b3-8322-8a41386e7381@huawei.com>
-Date: Fri, 24 Jan 2025 17:52:33 +0800
+	s=arc-20240116; t=1737712503; c=relaxed/simple;
+	bh=ekBEzqmHVXsoFkfZ4bhPvyOWlylLl9N7yx+UMLISzYk=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=f//v1/RkKIC3wTiGG3dOK6a8VcnHpKSWYsMlYW2VPRZmYkFIWL4SN5p0OiBjfRpRQJh3v2sAHGeXthdZTWfaBau48n3O+qygV6Ur/t50DWP8/KRdkIZkgV8kdyibrFe9KKDn9k8gBCshs1dwKcp3Txvr6N+VJT9HZpwbANs5bJo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=irtemr4q; arc=none smtp.client-ip=209.85.214.171
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pl1-f171.google.com with SMTP id d9443c01a7336-21644aca3a0so42346925ad.3;
+        Fri, 24 Jan 2025 01:55:01 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1737712501; x=1738317301; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=BIZkkKYWnNXZKqM/WO2iIxrtrYS3Hgl4WpBTQkCIUpA=;
+        b=irtemr4qdzUq57ROA3onXKjcQdbRqY+BOEolJB5sRXscyXCa1FCrj3r/v6jB07FS22
+         3OgsREGHS/vjlQV/vNzukGFjbGiDxBXyzAG52BGLqFJm1lgf/UL5m/u4/EsCp6JjTWO7
+         LrCyp1vuEedkmrtuGy3F1AdLFzK5caBPElcMenFO7AkvdPtaYbA1I/X9KKYuzYQ9cxa1
+         OQO8M3LzwqvpK6ygBDQyx9joCczASDUOGI3AoYRGmsmIMWEb7v8BdswmjRzR+mXhpxON
+         EzKTraCN30NVCrsXyv5iuWr30N8mCy2tzXrMX3n04/nkIrPZOCQRxUQCxKWuwjYFgLJX
+         7u8g==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1737712501; x=1738317301;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=BIZkkKYWnNXZKqM/WO2iIxrtrYS3Hgl4WpBTQkCIUpA=;
+        b=KEoqwRdZQ2/y/f2bEJLcQWgT/+ZCDs0bCvt16lPg0gAbM8qlnVy0yvr5dnK2mufZYS
+         yoPSGtpLtStdjGIfzHbvUyebsivkCEvZe2OljYrEm3EJUndGG26R6yv3wd1kgti804mQ
+         pMRurekhPfBr0MRzO93lZupVKOPxZic/6kqYWSZJ/aLB2vJWoFebE3dL9QjSKLPBUGVa
+         cf/GorWO81LO/ZVJjD3c0CSEnyvamyBHoQw+0Krb3seEkGokeUNIxw/auormt8P+C2OI
+         euYQPUSpj1Di0WY6O11u/fVdlSKOBAoj7nDaaYjq88hjV1aOOz2znmhq+dmqlz+7QB9F
+         q3+g==
+X-Forwarded-Encrypted: i=1; AJvYcCXE1FOgffrtwbTEqu9iqwN/lSvsEtu9UB5SQtAx8X4KrKniPeXPvZBZaQPPQMFIyEtRhpAyuL0kYPPz+c5nxMQ=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzRQOMuyNYQF9OXYf68pZiq4N6lTgbtglLF3cB6qOO9n2sbm1qU
+	8IgKC5A79A3w29I9f6b4kXJTurZiJT55m1VNwTSlF0vou+iz9K5+
+X-Gm-Gg: ASbGncsTlrmFp7viK11o+8veJgRPCvwAc3APPjO1pC8+itJp0O/OJCo1j8e490LdfRM
+	kCE6fxaszZFP4RnvR/gqwjxxc2vDenkK2ftyRTXlWsmX1lAUiGtA9Ni05baA2s8QcL1BqSs4HBP
+	TYNQ/VsRu9G5Z7ysgNLBoVbgaMgZI2HN1Ijk0tq0t7N9qDS1or13Sa9T6CKAZVsRaxhQsC9ov6J
+	MFtUvrymfzORzYtnTSH+S830bMBKz3N28e95LYvaLg1rrybFsKecGvPA5OVuqtEiNhfSmkpHP3K
+	g/pzuEfjOA==
+X-Google-Smtp-Source: AGHT+IH/OqXcULIPeM7OIDOkr2Io3BTjD+TdF2pZ2fi0Hg5/ik4B72Pnjn7Jlv6nouU6xkrXuFyo/g==
+X-Received: by 2002:a17:902:d2d2:b0:215:b01a:627f with SMTP id d9443c01a7336-21c352de4c0mr463179785ad.4.1737712501118;
+        Fri, 24 Jan 2025 01:55:01 -0800 (PST)
+Received: from fedora ([43.228.180.230])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-21da414dd18sm12567805ad.184.2025.01.24.01.54.56
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 24 Jan 2025 01:55:00 -0800 (PST)
+Date: Fri, 24 Jan 2025 09:54:53 +0000
+From: Hangbin Liu <liuhangbin@gmail.com>
+To: Cosmin Ratiu <cratiu@nvidia.com>
+Cc: netdev@vger.kernel.org, Jay Vosburgh <jv@jvosburgh.net>,
+	Nikolay Aleksandrov <razor@blackwall.org>,
+	"David S . Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Simon Horman <horms@kernel.org>, Jianbo Liu <jianbol@nvidia.com>,
+	Boris Pismenny <borisp@nvidia.com>,
+	Tariq Toukan <tariqt@nvidia.com>, linux-kselftest@vger.kernel.org,
+	Liang Li <liali@redhat.com>
+Subject: Re: [PATCH net v2] bonding: Correctly support GSO ESP offload
+Message-ID: <Z5Njbd8-ieEcbAEV@fedora>
+References: <20250124085744.434869-1-cratiu@nvidia.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next v23 3/7] mm: page_frag: use initial zero offset
- for page_frag_alloc_align()
-To: Florian Fainelli <florian.fainelli@broadcom.com>, <davem@davemloft.net>,
-	<kuba@kernel.org>, <pabeni@redhat.com>, Eric Dumazet <edumazet@google.com>
-CC: <netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>, Alexander Duyck
-	<alexander.duyck@gmail.com>, Andrew Morton <akpm@linux-foundation.org>,
-	Linux-MM <linux-mm@kvack.org>, Alexander Duyck <alexanderduyck@fb.com>
-References: <20241028115343.3405838-1-linyunsheng@huawei.com>
- <20241028115343.3405838-4-linyunsheng@huawei.com>
- <2ef8b7d4-7fae-4a08-9db1-4a33cd56ec9c@broadcom.com>
-Content-Language: en-US
-From: Yunsheng Lin <linyunsheng@huawei.com>
-In-Reply-To: <2ef8b7d4-7fae-4a08-9db1-4a33cd56ec9c@broadcom.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 8bit
-X-ClientProxiedBy: dggems706-chm.china.huawei.com (10.3.19.183) To
- dggpemf200006.china.huawei.com (7.185.36.61)
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250124085744.434869-1-cratiu@nvidia.com>
 
-On 2025/1/24 3:15, Florian Fainelli wrote:
+On Fri, Jan 24, 2025 at 10:57:44AM +0200, Cosmin Ratiu wrote:
+> ---
+>  drivers/net/bonding/bond_main.c | 19 ++++++++++---------
+>  1 file changed, 10 insertions(+), 9 deletions(-)
 > 
-> Sorry for the late feedback, this patch causes the bgmac driver in is .ndo_open() function to return -ENOMEM, the call trace looks like this:
+> diff --git a/drivers/net/bonding/bond_main.c b/drivers/net/bonding/bond_main.c
+> index 7b78c2bada81..e45bba240cbc 100644
+> --- a/drivers/net/bonding/bond_main.c
+> +++ b/drivers/net/bonding/bond_main.c
+> @@ -1538,17 +1538,20 @@ static netdev_features_t bond_fix_features(struct net_device *dev,
+>  				 NETIF_F_HIGHDMA | NETIF_F_LRO)
+>  
+>  #define BOND_ENC_FEATURES	(NETIF_F_HW_CSUM | NETIF_F_SG | \
+> -				 NETIF_F_RXCSUM | NETIF_F_GSO_SOFTWARE)
+> +				 NETIF_F_RXCSUM | NETIF_F_GSO_SOFTWARE | \
+> +				 NETIF_F_GSO_PARTIAL)
+>  
+>  #define BOND_MPLS_FEATURES	(NETIF_F_HW_CSUM | NETIF_F_SG | \
+>  				 NETIF_F_GSO_SOFTWARE)
+>  
+> +#define BOND_GSO_PARTIAL_FEATURES (NETIF_F_GSO_ESP)
+> +
+>  
+>  static void bond_compute_features(struct bonding *bond)
+>  {
+> +	netdev_features_t gso_partial_features = BOND_GSO_PARTIAL_FEATURES;
+>  	unsigned int dst_release_flag = IFF_XMIT_DST_RELEASE |
+>  					IFF_XMIT_DST_RELEASE_PERM;
+> -	netdev_features_t gso_partial_features = NETIF_F_GSO_ESP;
+>  	netdev_features_t vlan_features = BOND_VLAN_FEATURES;
+>  	netdev_features_t enc_features  = BOND_ENC_FEATURES;
+>  #ifdef CONFIG_XFRM_OFFLOAD
+> @@ -1582,8 +1585,9 @@ static void bond_compute_features(struct bonding *bond)
+>  							  BOND_XFRM_FEATURES);
+>  #endif /* CONFIG_XFRM_OFFLOAD */
+>  
+> -		if (slave->dev->hw_enc_features & NETIF_F_GSO_PARTIAL)
+> -			gso_partial_features &= slave->dev->gso_partial_features;
+> +		gso_partial_features = netdev_increment_features(gso_partial_features,
+> +								 slave->dev->gso_partial_features,
+> +								 BOND_GSO_PARTIAL_FEATURES);
+>  
+>  		mpls_features = netdev_increment_features(mpls_features,
+>  							  slave->dev->mpls_features,
+> @@ -1598,12 +1602,8 @@ static void bond_compute_features(struct bonding *bond)
+>  	}
+>  	bond_dev->hard_header_len = max_hard_header_len;
+>  
+> -	if (gso_partial_features & NETIF_F_GSO_ESP)
+> -		bond_dev->gso_partial_features |= NETIF_F_GSO_ESP;
+> -	else
+> -		bond_dev->gso_partial_features &= ~NETIF_F_GSO_ESP;
+> -
+>  done:
+> +	bond_dev->gso_partial_features = gso_partial_features;
+>  	bond_dev->vlan_features = vlan_features;
+>  	bond_dev->hw_enc_features = enc_features | NETIF_F_GSO_ENCAP_ALL |
+>  				    NETIF_F_HW_VLAN_CTAG_TX |
 
-Hi, Florian
-Thanks for the report.
+        if (!bond_has_slaves(bond))
+                goto done;
 
+If there is no slaves, should we add the gso_partial_features?
+
+Thanks
+Hangbin
+> @@ -6046,6 +6046,7 @@ void bond_setup(struct net_device *bond_dev)
+>  	bond_dev->hw_features |= NETIF_F_GSO_ENCAP_ALL;
+>  	bond_dev->features |= bond_dev->hw_features;
+>  	bond_dev->features |= NETIF_F_HW_VLAN_CTAG_TX | NETIF_F_HW_VLAN_STAG_TX;
+> +	bond_dev->features |= NETIF_F_GSO_PARTIAL;
+>  #ifdef CONFIG_XFRM_OFFLOAD
+>  	bond_dev->hw_features |= BOND_XFRM_FEATURES;
+>  	/* Only enable XFRM features if this is an active-backup config */
+> -- 
+> 2.45.0
 > 
->  bgmac_open
->   -> bgmac_dma_init
->     -> bgmac_dma_rx_skb_for_slot
->       -> netdev_alloc_frag
-> 
-> BGMAC_RX_ALLOC_SIZE = 10048 and PAGE_FRAG_CACHE_MAX_SIZE = 32768.
-
-I guess BGMAC_RX_ALLOC_SIZE being bigger than PAGE_SIZE is the
-problem here, as the frag API is not really supporting allocating
-fragment that is bigger than PAGE_SIZE, as it will fall back to
-allocate the base page when order-3 compound page allocation fails,
-see __page_frag_cache_refill().
-
-Also, it seems strange that bgmac driver seems to always use jumbo
-frame size to allocate fragment, isn't more  appropriate to allocate
-the fragment according to MTU?
-
-> 
-> Eventually we land into __page_frag_alloc_align() with the following parameters across multiple successive calls:
-> 
-> __page_frag_alloc_align: fragsz=10048, align_mask=-1, size=32768, offset=0
-> __page_frag_alloc_align: fragsz=10048, align_mask=-1, size=32768, offset=10048
-> __page_frag_alloc_align: fragsz=10048, align_mask=-1, size=32768, offset=20096
-> __page_frag_alloc_align: fragsz=10048, align_mask=-1, size=32768, offset=30144
-> 
-> So in that case we do indeed have offset + fragsz (40192) > size (32768) and so we would eventually return NULL.
-
-It seems the changing of '(unlikely(offset < 0))' checking to
-"fragsz > PAGE_SIZE" causes bgmac driver to break more easily
-here. But bgmac driver might likely break too if the system
-memory is severely fragmented when falling back to alllocate
-base page before this patch.
-
-> 
-> Any idea on how to best fix that within the bgmac driver?
-
-Maybe use the page allocator API directly when allocating fragment
-with BGMAC_RX_ALLOC_SIZE > PAGE_SIZE for a quick fix.
-
-In the long term, maybe it makes sense to use the page_pool API
-as more drivers are converting to use page_pool API already.
 
