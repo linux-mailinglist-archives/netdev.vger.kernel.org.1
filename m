@@ -1,151 +1,113 @@
-Return-Path: <netdev+bounces-160713-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-160714-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id ECB53A1AED5
-	for <lists+netdev@lfdr.de>; Fri, 24 Jan 2025 03:45:21 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id F0A0FA1AEE9
+	for <lists+netdev@lfdr.de>; Fri, 24 Jan 2025 04:11:29 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 2D43616792A
-	for <lists+netdev@lfdr.de>; Fri, 24 Jan 2025 02:45:20 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 355001695F4
+	for <lists+netdev@lfdr.de>; Fri, 24 Jan 2025 03:11:28 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F18141D5142;
-	Fri, 24 Jan 2025 02:45:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0EE181EA65;
+	Fri, 24 Jan 2025 03:11:26 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="V48qY1s5"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="dYUjmqBd"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f170.google.com (mail-pl1-f170.google.com [209.85.214.170])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 759931C5F33;
-	Fri, 24 Jan 2025 02:45:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.170
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DC58C184F
+	for <netdev@vger.kernel.org>; Fri, 24 Jan 2025 03:11:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1737686717; cv=none; b=vFPVJ1vptDQlZEoiEMClyRED2irmnfFJCEMQL/y/gH/LM13Z8/gG3q+4veRKxrsCmgu+v/ua5q63bPA2P4PrdWN6Ak27guYALmG+bLFjwnWvoWekVkhAm+Ve6Gkoi0NJk0Dwj0KEUHfOFSlI5CCj4sR/TU3G2bJZf6KhsykSSBQ=
+	t=1737688285; cv=none; b=CPx6cEjxvYMiaAafiOvE28bvfUHSKHuwX2aJODOby5rPWTza4MuXe8s7oqAfoTa+EuNkJa+4mWUlc+0tFPhGcraDvgGMFobalJoqrqoqXIP238ELe9E/BQUei4HQJqLDI/3RmQvbwd/r7VMrD7Xhqg52St5rujT/nO8+mKWgdB0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1737686717; c=relaxed/simple;
-	bh=AGK4PFDghSQSTeGrgxUFnwcXS/yxeQImh4MkmJxrK2I=;
+	s=arc-20240116; t=1737688285; c=relaxed/simple;
+	bh=L9kS1pajGgwQJeFG44q1mXJPnOjPjkd500B9kqgQ7M4=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Innb+yvdnegLbPh57wqSN/Zdi+eHkdhbxKW9n8h/i3C/lzvwchFMO/Rph4qoR1YJ3a58jxEWqesXBbNTjJrFcZSEX4WDvLaVALYAEC9xLxKVAXOIaAnbIoRDsJIApO5mcMXl0mXZY9JhnaROF88M4vYJ4YdpSIDccRKm0C7aAFc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=V48qY1s5; arc=none smtp.client-ip=209.85.214.170
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pl1-f170.google.com with SMTP id d9443c01a7336-21631789fcdso37279665ad.1;
-        Thu, 23 Jan 2025 18:45:15 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1737686715; x=1738291515; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=GePSqs03Aexh6HgXJIw+ZOzcN1MnAJHA3c0/jz1hhjE=;
-        b=V48qY1s5fxdq4/0alixLYN0O5PkFVtzWp0mlGHFAZZFH8egOWSdC3idTjdKL+b7efS
-         iuqPdCeybWUlAQbeUiRUTZKAUxxPoT7GxJCv/4Y1768MdfKTdJ5xwBQ2IvTKlNPZLoZq
-         VbrZRYPNz+IWCm0PtSXy3IIPc80mrBVy9MZYfVBTbvtjViMquRvWwrd1P5GILZbSH0AU
-         fFHFsFvoNOpiFtmjdRruYoqYpSlzBmAPDoDYN7kE2klqiCcElxBldwN+jKJ8KTK8OYGb
-         YuhcKPT8dtSQN7EK/Iiz7hXGesw+6dZW0b+ysKbDDasy7/78vOlz59OiBcWt8hhyyAw5
-         ajbg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1737686715; x=1738291515;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=GePSqs03Aexh6HgXJIw+ZOzcN1MnAJHA3c0/jz1hhjE=;
-        b=Q+kQRlm6cFCaC74kpCe+yrhnKAvrVXMMvMtiBmOJU9LT2iWTCEqmNU9ewSHnfnhD6b
-         AkANlUlJ4fiewxFGIsZJrd/XrKZgVSBNrKZDT6ds5uC4VdYmKB0HAD5VcGno5KQuTgtS
-         X2HjLBQE8azowvK+CTdzuhdfzSmtImwQjCwHz5nOju4n5x9gkR6yUAi0utZ4sk3dVaV5
-         ljZf+fRtbOyzC9zQxT+AlzpWuFiugEyUa6qaWORUZUSxIlP6n1eJBO7Cz8v5pMCTHzrw
-         rRlRG4mz8mc8sR7MhQBe3uqfrI1AyfkDtTXF5sNWqLUz2OaXpO7nIlYyBi1IZZQdO9yD
-         VWnw==
-X-Forwarded-Encrypted: i=1; AJvYcCV6kufRDE4vKf6JCf7bBc/Oyf7CbEr4N7C/zGxBHR5jOuOSXUTrfdAdqw9wUapsdV24vMI=@vger.kernel.org, AJvYcCVT3rqdvpPANA5xCIE4FalF4GwZSpjTWOPsk+avUFljKJeX4RDYJ3UHOpatVduffuBXIKaa4u5A@vger.kernel.org
-X-Gm-Message-State: AOJu0YyuNsTxtBhPoJ7vrIsXdz+Q/KJq076gJQWRj0U1rZuwP4kxrRUt
-	ogRY0vIdkABUtWM7Co+FjnDYgTFIXuEy205YZdg1O8euvKpktcQ=
-X-Gm-Gg: ASbGncuJNmRDl31ho1ZPwcPGDM4NJb3ZoNBokBXERu1Xgovwqi3AgdI5n4aeuvI61Jn
-	LS81c8cmd2Hc2lHQ0CA+30N1m35rKxu4vApJINjZeMcLGIdvAFiOBYe7+/ePGYLxknCWzxoT0UN
-	WgAD5RxxXnT7D+R5OcE0m6cAm6BPHzgO8b6+28DWQ4XgWY98AroSv+ONF6yhb5SVqg8vusoLRGM
-	r1ufBqYBzXEEav7Alg6szvrE4DayR2f+AKr7j8//3L7n4jMTVaVyKHonVGpH732ga6RW249V/1v
-	+BLCx6eXte7IH24=
-X-Google-Smtp-Source: AGHT+IHz4SfDUQRu78nxEFlQ7GNd/xQ1tPysAoM3RuyWNKfaGxCmvpmgxaxqlLI9+RwKo3dxLcCSVw==
-X-Received: by 2002:a05:6a21:600f:b0:1e1:adcd:eadb with SMTP id adf61e73a8af0-1eb696e2d17mr8901431637.11.1737686714585;
-        Thu, 23 Jan 2025 18:45:14 -0800 (PST)
-Received: from localhost ([2601:646:9e00:f56e:123b:cea3:439a:b3e3])
-        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-72f8a69f401sm705410b3a.29.2025.01.23.18.45.13
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 23 Jan 2025 18:45:14 -0800 (PST)
-Date: Thu, 23 Jan 2025 18:45:13 -0800
-From: Stanislav Fomichev <stfomichev@gmail.com>
-To: Martin KaFai Lau <martin.lau@linux.dev>
-Cc: Shigeru Yoshida <syoshida@redhat.com>, ast@kernel.org,
-	daniel@iogearbox.net, andrii@kernel.org, eddyz87@gmail.com,
-	song@kernel.org, yonghong.song@linux.dev, john.fastabend@gmail.com,
-	kpsingh@kernel.org, sdf@fomichev.me, haoluo@google.com,
-	jolsa@kernel.org, davem@davemloft.net, edumazet@google.com,
-	kuba@kernel.org, pabeni@redhat.com, horms@kernel.org,
-	hawk@kernel.org, lorenzo@kernel.org, toke@redhat.com,
-	bpf@vger.kernel.org, netdev@vger.kernel.org
-Subject: Re: [PATCH bpf v2 2/2] selftests/bpf: Adjust data size to have
- ETH_HLEN
-Message-ID: <Z5L-ubBI7z1J6IDi@mini-arch>
-References: <20250121150643.671650-1-syoshida@redhat.com>
- <20250121150643.671650-2-syoshida@redhat.com>
- <Z5KWE6J8OtRVCFDR@mini-arch>
- <5e342fea-764b-48a0-afda-4adfb504bd46@linux.dev>
+	 Content-Type:Content-Disposition:In-Reply-To; b=rKQwLOXKllb24yIGGANaNHPA1wx38m5+zd3c2v1kmQKDP33uLpiPUtZSIg63DhaSOswvF9GyB5EZ9rLHM280CMRaVLUut+cKSGQUEkrnDEdxsnMWtnbYBIgqGqfag4ngzb2+Dq9PuTqMBFh0FzozvQj7n79hracBahMKhK9314Y=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=dYUjmqBd; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3C5D2C4CED3;
+	Fri, 24 Jan 2025 03:11:25 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1737688285;
+	bh=L9kS1pajGgwQJeFG44q1mXJPnOjPjkd500B9kqgQ7M4=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=dYUjmqBdRt233+2bTK9varupHqIR+Yaq2NtiiOahAbqPKU65QDg1lTcZ9r5kAsozl
+	 E4ouBoLvz8zPwndvPkzNAC+WE96pIZZF653BKBm1EXXiFh+QmRwNwHiYuo4xgR3rzR
+	 NMwqWZtBLbbOUWCLOIOiGCVCeoK0tIR5wZzPyqgxzb01QPW3B9Dg1WXv/1qt7AJixO
+	 gnwJDCUR7+JUVpCwAT3kFC5p+nt+oRpmeRfGnRjkNHpuXZQL48+oYudLjhCKv8Lu2b
+	 OFcpUgNhVOJcW7nkq17pw/53WeYVRH6+colX63XDAxlsG6lMzzkm7mgYp+kJnYX1Z8
+	 H6wEdjmcUibEg==
+Date: Thu, 23 Jan 2025 19:11:23 -0800
+From: Saeed Mahameed <saeed@kernel.org>
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: Stanislav Fomichev <stfomichev@gmail.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Paolo Abeni <pabeni@redhat.com>, Eric Dumazet <edumazet@google.com>,
+	Saeed Mahameed <saeedm@nvidia.com>, netdev@vger.kernel.org,
+	Tariq Toukan <tariqt@nvidia.com>, Gal Pressman <gal@nvidia.com>,
+	Leon Romanovsky <leonro@nvidia.com>,
+	Dragos Tatulea <dtatulea@nvidia.com>
+Subject: Re: [net-next 10/11] net/mlx5e: Implement queue mgmt ops and single
+ channel swap
+Message-ID: <Z5ME2-zHJq6arJC8@x130>
+References: <20250116215530.158886-1-saeed@kernel.org>
+ <20250116215530.158886-11-saeed@kernel.org>
+ <20250116152136.53f16ecb@kernel.org>
+ <Z4maY9r3tuHVoqAM@x130>
+ <20250116155450.46ba772a@kernel.org>
+ <Z5LhKdNMO5CvAvZf@mini-arch>
+ <20250123165553.66f9f839@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii; format=flowed
 Content-Disposition: inline
-In-Reply-To: <5e342fea-764b-48a0-afda-4adfb504bd46@linux.dev>
+In-Reply-To: <20250123165553.66f9f839@kernel.org>
 
-On 01/23, Martin KaFai Lau wrote:
-> On 1/23/25 11:18 AM, Stanislav Fomichev wrote:
-> > On 01/22, Shigeru Yoshida wrote:
-> > > The function bpf_test_init() now returns an error if user_size
-> > > (.data_size_in) is less than ETH_HLEN, causing the tests to
-> > > fail. Adjust the data size to ensure it meets the requirement of
-> > > ETH_HLEN.
-> > > 
-> > > Signed-off-by: Shigeru Yoshida <syoshida@redhat.com>
-> > > ---
-> > >   .../testing/selftests/bpf/prog_tests/xdp_cpumap_attach.c  | 4 ++--
-> > >   .../testing/selftests/bpf/prog_tests/xdp_devmap_attach.c  | 8 ++++----
-> > >   2 files changed, 6 insertions(+), 6 deletions(-)
-> > > 
-> > > diff --git a/tools/testing/selftests/bpf/prog_tests/xdp_cpumap_attach.c b/tools/testing/selftests/bpf/prog_tests/xdp_cpumap_attach.c
-> > > index c7f74f068e78..df27535995af 100644
-> > > --- a/tools/testing/selftests/bpf/prog_tests/xdp_cpumap_attach.c
-> > > +++ b/tools/testing/selftests/bpf/prog_tests/xdp_cpumap_attach.c
-> > > @@ -52,10 +52,10 @@ static void test_xdp_with_cpumap_helpers(void)
-> > >   	ASSERT_EQ(info.id, val.bpf_prog.id, "Match program id to cpumap entry prog_id");
-> > >   	/* send a packet to trigger any potential bugs in there */
-> > > -	char data[10] = {};
-> > > +	char data[ETH_HLEN] = {};
-> > >   	DECLARE_LIBBPF_OPTS(bpf_test_run_opts, opts,
-> > >   			    .data_in = &data,
-> > > -			    .data_size_in = 10,
-> > > +			    .data_size_in = sizeof(data),
-> > >   			    .flags = BPF_F_TEST_XDP_LIVE_FRAMES,
-> > >   			    .repeat = 1,
-> > >   		);
-> > 
-> > We should still keep 10, but change the ASSERT_OK below to expect the
-> > error instead. Looking at the comment above, the purpose of the test
-> > is to exercise that error case.
-> > 
-> 
-> I think the bpf_prog_test_run_opts in this dev/cpumap test is to check the
-> bpf_redirect_map() helper, so it expects the bpf_prog_test_run_opts to
-> succeed.
-> 
-> It just happens the current data[10] cannot trigger the fixed bug because
-> the bpf prog returns a XDP_REDIRECT instead of XDP_PASS, so xdp_recv_frames
-> is not called.
-> 
-> To test patch 1, a separate test is probably needed to trigger the bug in
-> xdp_recv_frames() with a bpf prog returning XDP_PASS.
+On 23 Jan 16:55, Jakub Kicinski wrote:
+>On Thu, 23 Jan 2025 16:39:05 -0800 Stanislav Fomichev wrote:
+>> > > What technical debt accrued ? I haven't seen any changes in queue API since
+>> > > bnxt and gve got merged, what changed since then ?
+>> > >
+>> > > mlx5 doesn't require rtnl if this is because of the assert, I can remove
+>> > > it. I don't understand what this series is being deferred for, please
+>> > > elaborate, what do I need to do to get it accepted ?
+>> >
+>> > Remove the dependency on rtnl_lock _in the core kernel_.
+>>
+>> IIUC, we want queue API to move away from rtnl and use only (new) netdev
+>> lock. Otherwise, removing this dependency in the future might be
+>> complicated.
+>
+>Correct. We only have one driver now which reportedly works (gve).
+>Let's pull queues under optional netdev_lock protection.
+>Then we can use queue mgmt op support as a carrot for drivers
+>to convert / test the netdev_lock protection... "compliance".
+>
+>I added netdev_lock protection for NAPI before the merge window.
+>Queues are configured in much more ad-hoc fashion, so I think
+>the best way to make queue changes netdev_lock safe would be to
+>wrap all driver ops which are currently under rtnl_lock with
+>netdev_lock.
 
-Ah, yes, you're right, I missed the remaining parts that make sure
-the redirect happens :-(
+Are you expecting drivers to hold netdev_lock internally? 
+I was thinking something more scalable, queue_mgmt API to take
+netdev_lock,  and any other place in the stack that can access 
+"netdev queue config" e.g ethtool/netlink/netdev_ops should grab 
+netdev_lock as well, this is better for the future when we want to 
+reduce rtnl usage in the stack to protect single netdev ops where
+netdev_lock will be sufficient, otherwise you will have to wait for ALL
+drivers to properly use netdev_lock internally to even start thinking of
+getting rid of rtnl from some parts of the core stack.
+
+  
+
+
 
