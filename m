@@ -1,127 +1,153 @@
-Return-Path: <netdev+bounces-160831-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-160832-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id AA6D2A1BB16
-	for <lists+netdev@lfdr.de>; Fri, 24 Jan 2025 17:58:29 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 95502A1BB3D
+	for <lists+netdev@lfdr.de>; Fri, 24 Jan 2025 18:13:52 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 593EE3A3332
-	for <lists+netdev@lfdr.de>; Fri, 24 Jan 2025 16:58:22 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 68299188CB9C
+	for <lists+netdev@lfdr.de>; Fri, 24 Jan 2025 17:13:56 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AC6F51ACE12;
-	Fri, 24 Jan 2025 16:58:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4E1581BD9E5;
+	Fri, 24 Jan 2025 17:13:48 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Pu+ES174"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="L5yngais"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6EA6CFBF6;
-	Fri, 24 Jan 2025 16:58:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 88EF323B0
+	for <netdev@vger.kernel.org>; Fri, 24 Jan 2025 17:13:46 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1737737903; cv=none; b=cPyKijQIdC2lrttDOTXpyjdr3yjhO/Qo+hHODx5orNi9p64r62PyWAloNhB4iffi6F15CsYJKkLETzljSCUeSxWrnp0j+X+ECF1w4hsRNp0JVH7ajwGhdeXJ6hWaIZzoGnAAj3ou/5SE1gZnuDi7PG/ALUduL80Zl6H3frf3WXk=
+	t=1737738828; cv=none; b=I9F6fpWQmVUJTt0d1WvpAGzp061GZrldinBxE0xFZaLr/7VWyjEghdV0TIoP7KNE0Ch5ndGTSu4l87PXODsd/TQgPrRxRrkhzukTjAiUY/Z55h0OwyRRy4dDUD2C4D6DDGtdUSa+3PoAWdJBD9u5e+ywXaZb0BLiWzVhObQ+sf4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1737737903; c=relaxed/simple;
-	bh=ymJW+rtAPVx/7REXk9y2aKHMTY3RTmJlmCBWfsMGnHo=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=SKfNohn8PqBVsW3tFYkuhc/QYXGEdQAraz2pY3EjwZ2JNEXofsAOpkoD/ThLb93PNjpbdP99kRl4k8j0bHJBHf8A0+Gi6KDklvqj3DaKoNRdDAs5Oh3rnGA5P4bMxU8Q4RVEHSf1bnDje2HrsLSwjLQA8ySRmXb2bhavq7cyTqk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Pu+ES174; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6D426C4CED2;
-	Fri, 24 Jan 2025 16:58:15 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1737737902;
-	bh=ymJW+rtAPVx/7REXk9y2aKHMTY3RTmJlmCBWfsMGnHo=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=Pu+ES174yrFgZLIhkQCdNMBAiPpOPgNkKP2A4gg/hKG9eU4+7cb1+MFlPnPk+PT8H
-	 mppaiOLnq2FKb4s3PyvLAyC+R/5hlc3rJmgKeTVyR7WJNdskWqkmuregUNKfvWumyV
-	 Qw7jmeypgNYnsXE6/5rMrid7jzxf5IK6Eydcud/MHbjCARUGJZvyyx5wRhFcUDuftp
-	 n1+F4+1+mgj3Vs4U/+9FIgIvrPCW0VDzW2vj3IJVq8J8p2QESUgQUOJK0KxYS+G1Pv
-	 wgtkilSEiYPfHnpaBZ50bWVlefjrJlC48OtqMwzygZUvXzU/e0ZQlHj+IhcKWFlOJs
-	 7VyXPmf294zOA==
-Message-ID: <1848ad5e-87cb-4f6b-a16d-c1b644add34f@kernel.org>
-Date: Fri, 24 Jan 2025 17:58:12 +0100
+	s=arc-20240116; t=1737738828; c=relaxed/simple;
+	bh=iiMJlnjqVu9fqhSNV3EMXqwrwqj3JQEHc8FTUyKDyRs=;
+	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
+	 MIME-Version:Content-Type; b=HwznVA3e74mSc720MBasj82cICYsX3USGYjeGwQUPoPIBliF2b1dklYcseNl457ecaiuGAVTnP8uFXvHCT3Is+AAI01bbOIlMCGSRY5u5lUl7TJUYpZV1+v7GpqEOyoAcszFVxlPX4PhRkJxHFFSp5N0NTDmPjm36Y4XliriKCo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=L5yngais; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1737738825;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=Bgl21DlUR8J6PmKG92PJjxElpV90g1dFpTjC8FMtbiQ=;
+	b=L5yngaisRHRnmP72uBrWlsXVxa0pBW5qe/I9ouH63oo1cZzWLHx7nd8EN3FGALPfWIr/HA
+	YzNWDMNI0BlqyF4tc4N9I6XvFCCUFGt6Asy4/TpaLx+XsVKsK5SFodwwC8LChaTp46BVyG
+	6ThTGvOfIA3msBUnETWKw8wiLuS6BfE=
+Received: from mail-ej1-f69.google.com (mail-ej1-f69.google.com
+ [209.85.218.69]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-602-kKGlgA1fNXObrOEZsNzwCw-1; Fri, 24 Jan 2025 12:13:44 -0500
+X-MC-Unique: kKGlgA1fNXObrOEZsNzwCw-1
+X-Mimecast-MFC-AGG-ID: kKGlgA1fNXObrOEZsNzwCw
+Received: by mail-ej1-f69.google.com with SMTP id a640c23a62f3a-aa683e90dd3so230520866b.3
+        for <netdev@vger.kernel.org>; Fri, 24 Jan 2025 09:13:43 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1737738823; x=1738343623;
+        h=mime-version:message-id:date:references:in-reply-to:subject:cc:to
+         :from:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=Bgl21DlUR8J6PmKG92PJjxElpV90g1dFpTjC8FMtbiQ=;
+        b=SahMQUeiPDwMFKHOiAJGNxfIfA1I0i9xYLNqKzx4Q2iyz+HHXoZqbfZUXzjFzzuxnA
+         qEx6WkNgJV69swWYnTj1YDe0nBXAwj/XSBjXoVcK8YxOJHdUW8+G5wJE4IFMfH3gc8dt
+         C23VVlJvZooSx3YZd9yV1fS0Ub3CibOMfngpW3+oe4VN3zC0uUCdsqyiqozyJvEZ2Cmz
+         UlUAa/b/786puIo19AZXq3yhniKP8q21+1thNONyer1BdQDUvi5L8Q5bSJqVg6ieHZTu
+         hwzsY08gZbQ/g3bb4Mea/bEFBKlW2ypIXfnBkhy5jF+Nq9G9tmg+SX4OqyAmAa25Ncei
+         N7XA==
+X-Forwarded-Encrypted: i=1; AJvYcCWFbCWBHxtb47k0N1YzlrrmlF5F7+UAtKeZjSrSfBeigh2GIwEiHvRHJJJxDbKA0WEwIEWNKOQ=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yw5RKb2PEPoVYQJrmMvzFzdLLXeyC9IDzESYsmZcYoTzMsP47XJ
+	a4zTFwlgzCOHHgRiv+JCCVRSKfajSAMLa/SvjUDn3VxVxcPdWyAmGJdgsg1zZlXV/id4Up5SiLR
+	1jvLVxMebwdmb/F6TWDWqFMBhQ4JomYlpCE8RU9nxEecXSA9VY2nbnA==
+X-Gm-Gg: ASbGncuVCux68H3snUMCOUyol1Jl5s57cuNZ6hcKAp3Ltj4X8zR7LyudPMP73Ix0tE4
+	5ZOMjiZULrMlnScHRMlN6h/DSe5vTUObOpGj7tsBsm8TPKgDuhVESCaBfN9NKLEbN4Ejqz74QEL
+	7kcd/3FxOtn1/dLwaPPK7lgs4qzXJaZIrYwGXXCyN6ndOzNqJPjBcBQtr3j0glc5C898cbU4xhw
+	UFq4ItK+Ya6XZC2vL7cSm1B8XYMlLV26At//5v/UFr4w7p+DxMdbtED3E02ryhEymACYlL/vP2t
+	bPZx+8CQBraoHQEx4TI=
+X-Received: by 2002:a17:906:4fcb:b0:aa6:90a8:f5ff with SMTP id a640c23a62f3a-ab38b3fbfe3mr3118160866b.50.1737738822870;
+        Fri, 24 Jan 2025 09:13:42 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IFtqQo5YS3ajg4ppdOQhXWzuRmOA3oSoT7thyIDa4HsUOMGk7g+OCNkFH72qXuMXVWqyygG9w==
+X-Received: by 2002:a17:906:4fcb:b0:aa6:90a8:f5ff with SMTP id a640c23a62f3a-ab38b3fbfe3mr3118158166b.50.1737738822476;
+        Fri, 24 Jan 2025 09:13:42 -0800 (PST)
+Received: from alrua-x1.borgediget.toke.dk ([45.145.92.2])
+        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-ab675e64d68sm159418166b.53.2025.01.24.09.13.41
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 24 Jan 2025 09:13:41 -0800 (PST)
+Received: by alrua-x1.borgediget.toke.dk (Postfix, from userid 1000)
+	id DC576180AAB3; Fri, 24 Jan 2025 18:13:40 +0100 (CET)
+From: Toke =?utf-8?Q?H=C3=B8iland-J=C3=B8rgensen?= <toke@redhat.com>
+To: Yunsheng Lin <linyunsheng@huawei.com>, Yunsheng Lin
+ <yunshenglin0825@gmail.com>, davem@davemloft.net, kuba@kernel.org,
+ pabeni@redhat.com
+Cc: zhangkun09@huawei.com, liuyonglong@huawei.com, fanghaiqing@huawei.com,
+ Alexander Lobakin <aleksander.lobakin@intel.com>, Xuan Zhuo
+ <xuanzhuo@linux.alibaba.com>, Jesper Dangaard Brouer <hawk@kernel.org>,
+ Ilias Apalodimas <ilias.apalodimas@linaro.org>, Eric Dumazet
+ <edumazet@google.com>, Simon Horman <horms@kernel.org>,
+ netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH net-next v7 2/8] page_pool: fix timing for checking and
+ disabling napi_local
+In-Reply-To: <2aa84c61-6531-4f17-89e5-101f46ef00d0@huawei.com>
+References: <20250110130703.3814407-1-linyunsheng@huawei.com>
+ <20250110130703.3814407-3-linyunsheng@huawei.com> <87sepqhe3n.fsf@toke.dk>
+ <5059df11-a85b-4404-8c24-a9ccd76924f3@gmail.com> <87plkhn2x7.fsf@toke.dk>
+ <2aa84c61-6531-4f17-89e5-101f46ef00d0@huawei.com>
+X-Clacks-Overhead: GNU Terry Pratchett
+Date: Fri, 24 Jan 2025 18:13:40 +0100
+Message-ID: <8734h8qgmz.fsf@toke.dk>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v1 0/9] Use HWMON_CHANNEL_INFO macro to simplify code
-To: Huisong Li <lihuisong@huawei.com>, linux-hwmon@vger.kernel.org,
- linux-kernel@vger.kernel.org, linux-media@vger.kernel.org,
- netdev@vger.kernel.org, linux-rtc@vger.kernel.org
-Cc: oss-drivers@corigine.com, matt@ranostay.sg, mchehab@kernel.org,
- irusskikh@marvell.com, andrew+netdev@lunn.ch, davem@davemloft.net,
- edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
- louis.peens@corigine.com, hkallweit1@gmail.com, linux@armlinux.org.uk,
- kabel@kernel.org, alexandre.belloni@bootlin.com, zhanjie9@hisilicon.com,
- zhenglifeng1@huawei.com, liuyonglong@huawei.com
-References: <20250124022635.16647-1-lihuisong@huawei.com>
-From: Krzysztof Kozlowski <krzk@kernel.org>
-Content-Language: en-US
-Autocrypt: addr=krzk@kernel.org; keydata=
- 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 fv0=
-In-Reply-To: <20250124022635.16647-1-lihuisong@huawei.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain
 
-On 24/01/2025 03:26, Huisong Li wrote:
-> The HWMON_CHANNEL_INFO macro is provided by hwmon.h and used widely by many
-> other drivers. This series use HWMON_CHANNEL_INFO macro to simplify code.
-> 
+Yunsheng Lin <linyunsheng@huawei.com> writes:
 
-Read the feedback given to you last time. I do not see how you addressed
-this:
+>> So I really don't see a way for this race to happen with correct usage
+>> of the page_pool and NAPI APIs, which means there's no reason to make
+>> the change you are proposing here.
+>
+> I looked at one driver setting pp->napi, it seems the bnxt driver doesn't
+> seems to call page_pool_disable_direct_recycling() when unloading, see
+> bnxt_half_close_nic(), page_pool_disable_direct_recycling() seems to be
+> only called for the new queue_mgmt API:
+>
+> /* rtnl_lock held, this call can only be made after a previous successful
+>  * call to bnxt_half_open_nic().
+>  */
+> void bnxt_half_close_nic(struct bnxt *bp)
+> {
+> 	bnxt_hwrm_resource_free(bp, false, true);
+> 	bnxt_del_napi(bp);       *----call napi del and rcu sync----*
+> 	bnxt_free_skbs(bp);
+> 	bnxt_free_mem(bp, true); *------call page_pool_destroy()----*
+> 	clear_bit(BNXT_STATE_HALF_OPEN, &bp->state);
+> }
+>
+> Even if there is a page_pool_disable_direct_recycling() called between
+> bnxt_del_napi() and bnxt_free_mem(), the timing window still exist as
+> rcu sync need to be called after page_pool_disable_direct_recycling(),
+> it seems some refactor is needed for bnxt driver to reuse the rcu sync
+> from the NAPI API, in order to avoid calling the rcu sync for
+> page_pool_destroy().
 
-"Avoid combining independent patches into one patch bomb. Or explain the
-dependencies and how is it supposed to be merged - that's why you have
-cover letter here."
+Well, I would consider that usage buggy. A page pool object is created
+with a reference to the napi struct; so the page pool should also be
+destroyed (clearing its reference) before the napi memory is freed. I
+guess this is not really documented anywhere, but it's pretty standard
+practice to free objects in the opposite order of their creation.
 
-Best regards,
-Krzysztof
+So no, I don't think this is something that should be fixed on the page
+pool side (and certainly not by adding another synchronize_rcu() call
+per queue!); rather, we should fix the drivers that get this wrong (and
+probably document the requirement a bit better).
+
+-Toke
+
 
