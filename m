@@ -1,147 +1,183 @@
-Return-Path: <netdev+bounces-160739-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-160740-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7C801A1B071
-	for <lists+netdev@lfdr.de>; Fri, 24 Jan 2025 07:37:02 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6D703A1B0C3
+	for <lists+netdev@lfdr.de>; Fri, 24 Jan 2025 08:20:59 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 045073ACD84
-	for <lists+netdev@lfdr.de>; Fri, 24 Jan 2025 06:36:55 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B760C168D08
+	for <lists+netdev@lfdr.de>; Fri, 24 Jan 2025 07:20:57 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0A6281D90A7;
-	Fri, 24 Jan 2025 06:36:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 971B91D9A51;
+	Fri, 24 Jan 2025 07:20:55 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="aA2A4xWk"
+	dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b="ZdtWuQAi"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wr1-f45.google.com (mail-wr1-f45.google.com [209.85.221.45])
+Received: from mail-oo1-f53.google.com (mail-oo1-f53.google.com [209.85.161.53])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3CA5D1D6DC8;
-	Fri, 24 Jan 2025 06:36:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.45
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D8CBD10FD
+	for <netdev@vger.kernel.org>; Fri, 24 Jan 2025 07:20:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.161.53
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1737700617; cv=none; b=G6KijQuYmwVOGXQf8ded6pUd62TpszdldnVLh9AlfrOQPUgntl0pue8+jxxlNBjgsXkZVwr/VoBAYokoblTGOR40YUm3bph1myJQveVXxjHIczle2h+NIIUNbJExlCXhufVI1Jbh8X2AmYp8MlRQNWzkllYNCgbQWgN+n/IlGqA=
+	t=1737703255; cv=none; b=mQcO2N921vKcqhnCPESi3DFbFrTVXp8laaEKIt5LHoKxKbsNuAGc9Kl7mAwBqBdPOnr4cepGcHVzB0ay3vezyO8EGzi0hfpMEeVDTNHBt9Z9Zjzxstk15kp5x9/DgOwL5sBUcizkhGCH7xUZN2Q7iVRDSBcLIKlHSXdzQ1WCXvg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1737700617; c=relaxed/simple;
-	bh=L/cxqniFp/YvovrC3aJ7w5qlG0gQyGBbm59E/eveoSA=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=DI7c++3rNC1JkUQeu88ewAjzSMs2yl6w60JhAAhTxmc6Z8ylyIaVjdE+N5Gx5zDWIUzCEeWQVmU1vG82Z47M5XClC/cq0NOqhGYZayOvwPcNmqeqO04WQQWc19tn+3m/RWmU5hejy1E1g6vFLZyKdPZoSPVs947/o2U5cuHvM2E=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=aA2A4xWk; arc=none smtp.client-ip=209.85.221.45
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wr1-f45.google.com with SMTP id ffacd0b85a97d-3862b40a6e0so1243935f8f.0;
-        Thu, 23 Jan 2025 22:36:55 -0800 (PST)
+	s=arc-20240116; t=1737703255; c=relaxed/simple;
+	bh=sPH5XD4Ql4nTiFx2aUIrFzEBL8VQs0STJlcMk0WQEC8=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=PjZn3lju8Mle8DgOgXhRDJqojr/w0dkCoecroWtH9IcvWPCwlDYkFDuHBc/QbO8QPU3OZ1kTR/mMCEn0AN4Jt0GB9q6qgjLw0N5AQeQFWy54NnZ1liPxmHiDIBZQxw2sCrjnqEtOoPKl4DCxvMi3AxHZypxjPX5zGWFxr+YLAaI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com; spf=fail smtp.mailfrom=broadcom.com; dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b=ZdtWuQAi; arc=none smtp.client-ip=209.85.161.53
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=broadcom.com
+Received: by mail-oo1-f53.google.com with SMTP id 006d021491bc7-5f2d8e590e2so211024eaf.3
+        for <netdev@vger.kernel.org>; Thu, 23 Jan 2025 23:20:53 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1737700614; x=1738305414; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=qD42bGDiKgUU3jqwhIoJJ3N7RjHnLjnUN9aCwhVaCNA=;
-        b=aA2A4xWknNeNloQCs5LWoMZK6AI9SYusRSQvIkWeE+j4rOxn17KwEZU/3cTNFeXrGj
-         HAPGlDeZx+pfRdb3pNcRbW6Gu1OQMlQhbOjHcTyDkETJZ1+xBUi4gIxi8uDdl4TtUzG7
-         UfIj9Na06jbXSQDxYBOz0UaaSIiaw0Yh5/zcbvlaYKIBLore1PY4Oah8TeWLHop8QOqU
-         cJNC9OD+MN0C1NX3eJbYQFf5lruqm0b/feekG5LzzgZ3Jtl+Olk3tMtqIrbrGBhO0lD/
-         vbMv6Ko8ZF1sDRCvIRtomQ9Aa3maQ0irV9NIaz/qv4pWkUmUfi/UeFum61UpY0g89irS
-         GWpQ==
+        d=broadcom.com; s=google; t=1737703253; x=1738308053; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=1o1K/JB2XR1f5n0h8797pNwCCNLrErJQ179f5P2ssZ0=;
+        b=ZdtWuQAiZCzy6a6m6j8Lj+7Jq5umG3qO9klBBS5qwmZhvC/McSeTQ0HGcmHpOeIUa7
+         m/ebaR+Tm4gAdOWGBWDBNA94/1abuhYw1cMc1AdEPJwkCZo/Ezhb26CzkTB2ptSQyUYk
+         uoGzb8i4osrwaFVIQt/h/ZaeWG+HipdpkOm4U=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1737700614; x=1738305414;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=qD42bGDiKgUU3jqwhIoJJ3N7RjHnLjnUN9aCwhVaCNA=;
-        b=kd+kI/3GPW1Et/CQ6WU9d3j7ZO/pOn4MiJF79qQ9BTaUIrNvZhaoXE2RUKOVfPcA1d
-         bwk5P4nKfJO75jPDvgX+rKAJ2FR8Pb5GuYtsTKEIyeVJuqkffScasOxlHA9BAWQt3U95
-         sLidE7jOdF1yRaz/75YEpDT5vxA/DvoCLQLgmvMySub2m1vqCPfbDA6OzOJ4YuSTTNDZ
-         E+7bUdcYvJCldm9t1coDfZ1D9qK8RH4kttYMniyAtRJtcUFk7Ly5GJdIhPBDLNdkGKoK
-         zv7PNUynH9/KNWs2R/O9nor+fmiJMuGCvF9ryjUT8MHlvVihXjQDBKG0CPLRajGffKXA
-         h6HA==
-X-Forwarded-Encrypted: i=1; AJvYcCU2XnME7bVJyHUYpf1Tritdy9TUNAvVotlV6QrNT/0jTiDd8QIOHhsCAwJf97zmc2DaEQIifEu7W/tO@vger.kernel.org, AJvYcCVbRLFOCAk0p8Do84o0KsC3Id4JzwkVb86Ei20DYcA0gRY4FMbS8MgRvv9xCDmA7ruVOdkt/ERN@vger.kernel.org, AJvYcCXkc8Jl3hPfve93KKjQitWjIR0sXMvqPYMcAtkQ4jBAfjU3hDvZDBzctzxK1Rf9q6CYokR8y+kchRevKZxb@vger.kernel.org
-X-Gm-Message-State: AOJu0Ywjo8NIP8RJbietZa9ogtJHRIVDtxammdobsprfUN4xPyrf9UUV
-	fIU5fzKxnmNIU2s88upjASmPZS8/4c/hvQ6Y/b3HLdZiCq802G10
-X-Gm-Gg: ASbGncv4sxrGUFDCatQl8+jQU3YlGO8Gax3wHaFvXo2iC24CxQgfyXBtqOuQchZ6wL1
-	MiIegHXXq4r29pRfdeIicRDF6LQbJpvdgEz1p3i+ZDuum5Z0hhZdQra4ioTqX9OQTot1z1gV+s3
-	eJy8o6TTgIuz+GCSirPfAuwpdpAc82wWZFfqCzxXghQ+IRLz8CU9ZPp1aYQNXl9LbdovzuFEu8x
-	E16EahblRwhutKnnd+7lqBno6CiU/rw8dj8AP6VDM2SxGmn9661tEMwGM6SJ0Np/PP0IIDwVpc4
-X-Google-Smtp-Source: AGHT+IF/tPKOK5uKHtTT55cjsVYoXp0pX/8CStvn6oo+Uu7E0hNcuca78Ym4KT0IHBa4IA7aO4lbsQ==
-X-Received: by 2002:a05:6000:108d:b0:385:f677:8594 with SMTP id ffacd0b85a97d-38bf57a238bmr21881677f8f.43.1737700614224;
-        Thu, 23 Jan 2025 22:36:54 -0800 (PST)
-Received: from debian ([2a00:79c0:60b:6500:303:6c5b:4b07:6715])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-38c2a1c3fedsm1682552f8f.85.2025.01.23.22.36.51
+        d=1e100.net; s=20230601; t=1737703253; x=1738308053;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=1o1K/JB2XR1f5n0h8797pNwCCNLrErJQ179f5P2ssZ0=;
+        b=OrnYY5eWFfdeqwTylL666TZEh8yXUVBjmlxR61EK1kR/iA7dH3n6PrEs/HQAjpELGF
+         eemjsuM6b0eh5Siz3DRAZdwQkWkhl69mWe6Lf1O/0wpPdf8gKHH3wFkWeiYY22PtDIal
+         7VzIglIL4GYASy3J4OZEVhb0yARZRxtiRs2xLmQAqKQms52JZlTYL0nmnUZzkGH9N3mA
+         Qbbt8P9Ta7zJ9nPIFEpT8rKbSFgr7eGgapXfMtk4D7sl4fgcflVXrbiZJrLDsWdix+B1
+         LgQop3IMpcgDgEX13J4RGYlrg2+KCUfCjtIjY/HNsD2LjOK+qOJTmug2mkCkd6j92pfP
+         KKaw==
+X-Forwarded-Encrypted: i=1; AJvYcCW1OzX25MF0do+AjXBuoI5bLkhAWLL2GRF9iC9D4pGejkcpbtm9vN8cSK1XXuT2dVdPQhe/VBE=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yx5tfBeW7vjqr+iJepp/7FW8NFJD+kFG1jpT70pZvyeU04rAzTO
+	AjWo+Ob6Wt2N0sgcSBMAMqTQxcu/5KzhFHrN1dyOkjTkjlmOXDNHtzZT3t1Elw==
+X-Gm-Gg: ASbGncvoFQyCyvSv4ncXZR19OvWPGVzt5d5X1AoMV/0nKHTTCA/XRAZoDQLPVIo7pw2
+	VFOP/Yn/BibKAIwSnQvMaIIsFtiWOuzQKvaSm5fM2qAy2XbmDYWjpzxrtlf1VBWdfTmycxaCqLW
+	ir+4ShD7JELRH9LkXenMi7RDE6vVJ568D79jGuzsycryq+mA7y1nOF+Nv9Cy0mgZtgt+JjGzygh
+	T66DG09455vm7MDISQfm6Ic5XdMTfurM0MsBdqpIMgMVOXrJtzyTqSmgD3PCv0/B1I9ptVC5BWn
+	isaJP+sLdVfbbH+WD0DttcCw/XArmVtppoKo5mARbaazLAC6
+X-Google-Smtp-Source: AGHT+IHZldH01kYElNZnAI13F6z/szWcYyFhNGzqChJnu6ui+DTeuDlFA51IAVpPEsPU+wsGO26fsA==
+X-Received: by 2002:a05:6871:339c:b0:29e:51ca:68ae with SMTP id 586e51a60fabf-2b1c0616e24mr5207177fac.0.1737703252872;
+        Thu, 23 Jan 2025 23:20:52 -0800 (PST)
+Received: from kk-ph5.. ([192.19.161.250])
+        by smtp.gmail.com with ESMTPSA id 586e51a60fabf-2b28f0fad54sm432960fac.3.2025.01.23.23.20.49
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 23 Jan 2025 22:36:52 -0800 (PST)
-Date: Fri, 24 Jan 2025 07:36:50 +0100
-From: Dimitri Fedrau <dima.fedrau@gmail.com>
-To: Krzysztof Kozlowski <krzk@kernel.org>
-Cc: Dimitri Fedrau <dimitri.fedrau@liebherr.com>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
+        Thu, 23 Jan 2025 23:20:51 -0800 (PST)
+From: Keerthana K <keerthana.kalyanasundaram@broadcom.com>
+To: stable@vger.kernel.org,
+	gregkh@linuxfoundation.org
+Cc: marcel@holtmann.org,
+	johan.hedberg@gmail.com,
+	luiz.dentz@gmail.com,
+	davem@davemloft.net,
+	kuba@kernel.org,
+	linux-bluetooth@vger.kernel.org,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	ajay.kaher@broadcom.com,
+	alexey.makhalov@broadcom.com,
+	vasavi.sirnapalli@broadcom.com,
+	Luiz Augusto von Dentz <luiz.von.dentz@intel.com>,
+	syzbot <syzkaller@googlegroups.com>,
 	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Rob Herring <robh@kernel.org>,
-	Krzysztof Kozlowski <krzk+dt@kernel.org>,
-	Conor Dooley <conor+dt@kernel.org>, Andrew Davis <afd@ti.com>,
-	Andrew Lunn <andrew@lunn.ch>,
-	Heiner Kallweit <hkallweit1@gmail.com>,
-	Russell King <linux@armlinux.org.uk>,
-	Florian Fainelli <f.fainelli@gmail.com>, netdev@vger.kernel.org,
-	devicetree@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH net-next v2 1/3] dt-bindings: net: ethernet-phy: add
- property tx-amplitude-100base-tx-gain-milli
-Message-ID: <20250124063650.GA4002@debian>
-References: <20250120-dp83822-tx-swing-v2-0-07c99dc42627@liebherr.com>
- <20250120-dp83822-tx-swing-v2-1-07c99dc42627@liebherr.com>
- <20250121-augmented-coati-of-correction-1f30db@krzk-bin>
+	Sasha Levin <sashal@kernel.org>,
+	Keerthana K <keerthana.kalyanasundaram@broadcom.com>
+Subject: [PATCH v2 v5.10.y] Bluetooth: RFCOMM: Fix not validating setsockopt user input
+Date: Fri, 24 Jan 2025 07:20:47 +0000
+Message-Id: <20250124072047.5320-1-keerthana.kalyanasundaram@broadcom.com>
+X-Mailer: git-send-email 2.39.4
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250121-augmented-coati-of-correction-1f30db@krzk-bin>
+Content-Transfer-Encoding: 8bit
 
-Hi Krzysztof,
+From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
 
-Am Tue, Jan 21, 2025 at 11:17:34AM +0100 schrieb Krzysztof Kozlowski:
-> On Mon, Jan 20, 2025 at 02:50:21PM +0100, Dimitri Fedrau wrote:
-> > Add property tx-amplitude-100base-tx-gain-milli in the device tree bindings
-> > for configuring the tx amplitude of 100BASE-TX PHYs. Modifying it can be
-> > necessary to compensate losses on the PCB and connector, so the voltages
-> > measured on the RJ45 pins are conforming.
-> > 
-> > Signed-off-by: Dimitri Fedrau <dimitri.fedrau@liebherr.com>
-> > ---
-> >  Documentation/devicetree/bindings/net/ethernet-phy.yaml | 8 ++++++++
-> >  1 file changed, 8 insertions(+)
-> > 
-> > diff --git a/Documentation/devicetree/bindings/net/ethernet-phy.yaml b/Documentation/devicetree/bindings/net/ethernet-phy.yaml
-> > index 2c71454ae8e362e7032e44712949e12da6826070..ce65413410c2343a3525e746e72b6c6c8bb120d0 100644
-> > --- a/Documentation/devicetree/bindings/net/ethernet-phy.yaml
-> > +++ b/Documentation/devicetree/bindings/net/ethernet-phy.yaml
-> > @@ -232,6 +232,14 @@ properties:
-> >        PHY's that have configurable TX internal delays. If this property is
-> >        present then the PHY applies the TX delay.
-> >  
-> > +  tx-amplitude-100base-tx-gain-milli:
-> > +    description: |
-> > +      Transmit amplitude gain applied (in milli units) for 100BASE-TX. When
-> 
-> milli is unit prefix, not the unit. What is the unit? percentage? basis
-> point?
-> 
-I think it would be better to switch to percentage. Resolution should be
-fine. I would switch to:
-tx-amplitude-100base-tx-percent
+[ Upstream commit a97de7bff13b1cc825c1b1344eaed8d6c2d3e695 ]
 
-> > +      omitted, the PHYs default will be left as is. If not present, default to
-> > +      1000 (no actual gain applied).
-> 
-> Don't repeat constraints in free form text.
-> 
-Will fix this.
+syzbot reported rfcomm_sock_setsockopt_old() is copying data without
+checking user input length.
 
-Best regards,
-Dimitri
+BUG: KASAN: slab-out-of-bounds in copy_from_sockptr_offset
+include/linux/sockptr.h:49 [inline]
+BUG: KASAN: slab-out-of-bounds in copy_from_sockptr
+include/linux/sockptr.h:55 [inline]
+BUG: KASAN: slab-out-of-bounds in rfcomm_sock_setsockopt_old
+net/bluetooth/rfcomm/sock.c:632 [inline]
+BUG: KASAN: slab-out-of-bounds in rfcomm_sock_setsockopt+0x893/0xa70
+net/bluetooth/rfcomm/sock.c:673
+Read of size 4 at addr ffff8880209a8bc3 by task syz-executor632/5064
+
+Fixes: 9f2c8a03fbb3 ("Bluetooth: Replace RFCOMM link mode with security level")
+Fixes: bb23c0ab8246 ("Bluetooth: Add support for deferring RFCOMM connection setup")
+Reported-by: syzbot <syzkaller@googlegroups.com>
+Signed-off-by: Eric Dumazet <edumazet@google.com>
+Signed-off-by: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+Signed-off-by: Sasha Levin <sashal@kernel.org>
+[Keerthana: No changes from v1
+            link to v1:
+            https://lore.kernel.org/stable/2025012010-manager-dreamlike-b5c1@gregkh/]
+Signed-off-by: Keerthana K <keerthana.kalyanasundaram@broadcom.com>
+---
+ net/bluetooth/rfcomm/sock.c | 14 +++++---------
+ 1 file changed, 5 insertions(+), 9 deletions(-)
+
+diff --git a/net/bluetooth/rfcomm/sock.c b/net/bluetooth/rfcomm/sock.c
+index ae6f80730561..56360da0827c 100644
+--- a/net/bluetooth/rfcomm/sock.c
++++ b/net/bluetooth/rfcomm/sock.c
+@@ -657,7 +657,7 @@ static int rfcomm_sock_setsockopt_old(struct socket *sock, int optname,
+ 
+ 	switch (optname) {
+ 	case RFCOMM_LM:
+-		if (copy_from_sockptr(&opt, optval, sizeof(u32))) {
++		if (bt_copy_from_sockptr(&opt, sizeof(opt), optval, optlen)) {
+ 			err = -EFAULT;
+ 			break;
+ 		}
+@@ -692,7 +692,6 @@ static int rfcomm_sock_setsockopt(struct socket *sock, int level, int optname,
+ 	struct sock *sk = sock->sk;
+ 	struct bt_security sec;
+ 	int err = 0;
+-	size_t len;
+ 	u32 opt;
+ 
+ 	BT_DBG("sk %p", sk);
+@@ -714,11 +713,9 @@ static int rfcomm_sock_setsockopt(struct socket *sock, int level, int optname,
+ 
+ 		sec.level = BT_SECURITY_LOW;
+ 
+-		len = min_t(unsigned int, sizeof(sec), optlen);
+-		if (copy_from_sockptr(&sec, optval, len)) {
+-			err = -EFAULT;
++		err = bt_copy_from_sockptr(&sec, sizeof(sec), optval, optlen);
++		if (err)
+ 			break;
+-		}
+ 
+ 		if (sec.level > BT_SECURITY_HIGH) {
+ 			err = -EINVAL;
+@@ -734,10 +731,9 @@ static int rfcomm_sock_setsockopt(struct socket *sock, int level, int optname,
+ 			break;
+ 		}
+ 
+-		if (copy_from_sockptr(&opt, optval, sizeof(u32))) {
+-			err = -EFAULT;
++		err = bt_copy_from_sockptr(&opt, sizeof(opt), optval, optlen);
++		if (err)
+ 			break;
+-		}
+ 
+ 		if (opt)
+ 			set_bit(BT_SK_DEFER_SETUP, &bt_sk(sk)->flags);
+-- 
+2.39.4
+
 
