@@ -1,200 +1,161 @@
-Return-Path: <netdev+bounces-160753-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-160754-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id C751FA1B329
-	for <lists+netdev@lfdr.de>; Fri, 24 Jan 2025 10:59:19 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 8FAF8A1B339
+	for <lists+netdev@lfdr.de>; Fri, 24 Jan 2025 11:02:20 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 76E7E3A4071
-	for <lists+netdev@lfdr.de>; Fri, 24 Jan 2025 09:59:12 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 261BF3A96D1
+	for <lists+netdev@lfdr.de>; Fri, 24 Jan 2025 10:02:13 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 52B8821A44F;
-	Fri, 24 Jan 2025 09:59:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BFA47207A04;
+	Fri, 24 Jan 2025 10:02:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="TKeyW3Bu"
 X-Original-To: netdev@vger.kernel.org
-Received: from frasgout.his.huawei.com (frasgout.his.huawei.com [185.176.79.56])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f174.google.com (mail-pl1-f174.google.com [209.85.214.174])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BC4D323A0;
-	Fri, 24 Jan 2025 09:59:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.176.79.56
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3A9061B87C3;
+	Fri, 24 Jan 2025 10:02:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.174
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1737712754; cv=none; b=dEBfeMeoNtMvQDtCn6mrHcQ8pIN5FbK/TSguO2ot5zMXZEbPcFYynUEz5/v9nHriinuznE5QXntWfSZGUv1+p4jExEVS1uglz0KSj4Kb8/o/X7rquTPWD5jOtCqXBVx00JD7P4FbS42SI7leqd7P9rycNK6Pknj33OsziNimnbA=
+	t=1737712934; cv=none; b=uQUrpWvKtbFPD1JTSVH8ovAtZAd0FG14B86ZMMDWFuN3LjS5O1ZsKgy2LYcy44o9TJo5dgPH32/31LXuo8BVNt7YF1gUExRC00/8ea/G8Oah8dUmHcbnJUNO9Yw0ctWTX7YOfK4bPs7Toae3ErsEVDzLx+QyFwA4df2j6i/T1DU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1737712754; c=relaxed/simple;
-	bh=IOJbrv4HLpkCrnpS1TfQMsAY9A5wfjrrUImFdpHuccM=;
-	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
-	 In-Reply-To:Content-Type; b=FD/7YbbMT0vbD829qf8U3PHO3UhHEb43b1HGFMl7v5umQG0pP+Y1h2HqLpFTVd2DtOjmFNtH+pvAmVl2uRTIxfB5btVFjiWYEIpU8l1Ab6ea5wsZULBFqqFIgwDbV2TN9/0wwuEr+SZVkizvLwQ1QiMeNYQJZAQfvc4WQ21z8/I=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei-partners.com; spf=pass smtp.mailfrom=huawei-partners.com; arc=none smtp.client-ip=185.176.79.56
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei-partners.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei-partners.com
-Received: from mail.maildlp.com (unknown [172.18.186.31])
-	by frasgout.his.huawei.com (SkyGuard) with ESMTP id 4YfYBX6527z6L53p;
-	Fri, 24 Jan 2025 17:57:08 +0800 (CST)
-Received: from mscpeml500004.china.huawei.com (unknown [7.188.26.250])
-	by mail.maildlp.com (Postfix) with ESMTPS id 757FC1402DB;
-	Fri, 24 Jan 2025 17:59:07 +0800 (CST)
-Received: from [10.123.123.159] (10.123.123.159) by
- mscpeml500004.china.huawei.com (7.188.26.250) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1258.34; Fri, 24 Jan 2025 12:59:05 +0300
-Message-ID: <4b24e1d8-8249-ef0e-5069-90fb7b315503@huawei-partners.com>
-Date: Fri, 24 Jan 2025 12:59:03 +0300
+	s=arc-20240116; t=1737712934; c=relaxed/simple;
+	bh=PG23KZ1AsMgT8M/17mcYN8E0tAr2zJOi9ro3SOQzCO0=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=fxU/1qbgKUYVqt5tnkAYAhQdRP2JBpluOJLF6zVn9rUcxyG3IgSpiX2/vBJfoQFk4CoyEcQ+gOM4Dd9+ViZK+3/saj4n9AB/HXSW1BdnyfKhFdFhRpzdm7GcW7brOEiKR/HAMB3bSjERL/NLqSaWIS5UHFd/cE6rAMJ85POWQxY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=TKeyW3Bu; arc=none smtp.client-ip=209.85.214.174
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pl1-f174.google.com with SMTP id d9443c01a7336-216728b1836so31000885ad.0;
+        Fri, 24 Jan 2025 02:02:12 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1737712932; x=1738317732; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=kV9nRSQ8mieKAHPZA8dj6zBQSRCNZwPWiGP+2xORqJM=;
+        b=TKeyW3BuaPtJedRv+usdgSiBA+rYALKtvqu0e3ZF8Cv8LygXx7yfJfXtF+rVfZoYaU
+         BrhBUqmcT/4imvBDSKKTVJIPA0njpQXZfdkKNBsEn7hQJgLaEzwW2oNqJ8oSw8uA/ep7
+         t5pbjErLJBZeaDYg1WgnyDZ89z/CS6PcvDdu9GZkKwcCmiTV0Z6bBX6brbkXZHxC72Sy
+         URdYCEruhPpOlNuL/pTKgr1Ic63USxuV5XRAMPC6edIukbmfZk4oT+HB1JUD3F5bhs5z
+         Ewltz1jP4v614VkSkeL6n2H8rCuIdBlkUknfhvirN+3mvBxLPRB05/LeUvSR5+lBquTD
+         ZCqw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1737712932; x=1738317732;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=kV9nRSQ8mieKAHPZA8dj6zBQSRCNZwPWiGP+2xORqJM=;
+        b=UgG5w8L62Ogb6GmDaSXIUMlGJq4QYPaKoQom/3s38CJd4pLenMGOaD898Tut6DKdqh
+         uPD8Dok0BdzSZ1Pn7FyOdyeqV+S2PXw1b3NF+duNxrDmcmWLTtIqj/uzyKMIe90dB/R4
+         uOTLyD1yXRvUrRM5iGEB2XV5MtzO+FOWBpIxOYaoXWS3/95GIsNGvFyWuwYQjsn5lsxb
+         /zNI0foYb9i9v7Q3xlSV5fdAULPpeyhhKU1yVHCyYypaBNWspefiFyVGA84NZEnZ0e1D
+         NOov7jrULNvvktLhjLAzQlk4FdGWPQMAvlw9rka6e4ZfbttoLCBJr/SHmMIDldkr2MSW
+         1upw==
+X-Forwarded-Encrypted: i=1; AJvYcCUzwlM880hw8pBsLldS5jx25inEv1iigxr4gqid0ie7c3N5h9xExrJvvsK0ox/OOsdBDS0TFj7Pkwc=@vger.kernel.org, AJvYcCV9QoTv7lRlWP5C7YCwAg/Sa4ASCvJuT5e7w2ebS77RuEkGATsQDfWlW+6ifwymLfQ+ohKLcyetVlEVAsCg7+Mtkl9uSw4=@vger.kernel.org, AJvYcCVgNKD/OocfBbjXh+b8/qPQiqaWlTTmiZTkf2pIQikv1nrpYoLvziVQT+56+/dQDL7KH6Z9akTBRBcN@vger.kernel.org, AJvYcCWedpV/1M4RqWjRC3jfJID98xpXl6S1FoOdRQ6oiTmc4s8hEwTKM8BVyGkdoOjwU2VfVDq6PRNt@vger.kernel.org, AJvYcCXzd4q5l/+iw4IKBJajS59cKkB2Vd8cAi58plbp7PaNxbhgyx7fNayzLHa/4xOwlzqngTSAHv44N5htok3J@vger.kernel.org
+X-Gm-Message-State: AOJu0Yx2OliOfMhra/zepv8Dlib8AGBDBO/oxA1tFo40t6sDMUiO6gol
+	os8zGstZvd45QlGxHXgoUit9hVinwiNmDPV0nQ7ZodlYz5x4bcED
+X-Gm-Gg: ASbGncu9sf4PbUnREUpqJwHHFIllvT6dD9yovAgfRg9cjcRIRQyAzjJ6EC6UUNMjarP
+	tI4LdG9bcABO7uNmbRgg7LYYdyYFJLIpD0YX8HUMVykTLIz/trmQ3OHE/kWkdL8wt+Y7gVl1UEv
+	mYKjZAVYfPSY+K/gdIciFObFA3qFLQeSHywLylKfxp0ASqLtGfBzPPuqpYqxrYOLFDFiuO4IEEV
+	0sxtUF9udllLm2tHOQGHBSZVyIBICS4WFDuUB0lxVinUYzE7qGB5lIaRMPaj4onP0aMxhUQzAeS
+	mf/g
+X-Google-Smtp-Source: AGHT+IFpze+Oipqpvmu3woguMJEQZi5aiMU334eCqZkGSKbDvO1CQlvlX3d34GhPBDzAyRbhLOtiaw==
+X-Received: by 2002:a17:902:cf01:b0:215:94e0:17 with SMTP id d9443c01a7336-21c35530228mr460939765ad.23.1737712932200;
+        Fri, 24 Jan 2025 02:02:12 -0800 (PST)
+Received: from archie.me ([103.124.138.155])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-21da3d9e6ffsm12750515ad.35.2025.01.24.02.02.10
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 24 Jan 2025 02:02:11 -0800 (PST)
+Received: by archie.me (Postfix, from userid 1000)
+	id B8E514208FB7; Fri, 24 Jan 2025 17:02:02 +0700 (WIB)
+Date: Fri, 24 Jan 2025 17:02:02 +0700
+From: Bagas Sanjaya <bagasdotme@gmail.com>
+To: Khaled Elnaggar <khaledelnaggarlinux@gmail.com>, socketcan@hartkopp.net,
+	mkl@pengutronix.de, davem@davemloft.net, edumazet@google.com,
+	kuba@kernel.org, pabeni@redhat.com, horms@kernel.org,
+	corbet@lwn.net
+Cc: shuah@kernel.org, linux-can@vger.kernel.org, netdev@vger.kernel.org,
+	linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org,
+	linux-kernel-mentees@vger.kernel.org
+Subject: Re: [PATCH] documentation: networking: fix spelling mistakes
+Message-ID: <Z5NlGsZlsoqSBzX9@archie.me>
+References: <20250123082521.59997-1-khaledelnaggarlinux@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v2 3/6] landlock: Add UDP sendmsg access control
-Content-Language: ru
-To: Matthieu Buffet <matthieu@buffet.re>, Mickael Salaun <mic@digikod.net>
-CC: Gunther Noack <gnoack@google.com>, <konstantin.meskhidze@huawei.com>, Paul
- Moore <paul@paul-moore.com>, <linux-security-module@vger.kernel.org>,
-	<netdev@vger.kernel.org>, <netfilter-devel@vger.kernel.org>, Pablo Neira
- Ayuso <pablo@netfilter.org>, Jozsef Kadlecsik <kadlec@netfilter.org>
-References: <20241214184540.3835222-1-matthieu@buffet.re>
- <20241214184540.3835222-4-matthieu@buffet.re>
- <d77d347c-de99-42b4-a6f5-6982ed2d413f@buffet.re>
-From: Mikhail Ivanov <ivanov.mikhail1@huawei-partners.com>
-In-Reply-To: <d77d347c-de99-42b4-a6f5-6982ed2d413f@buffet.re>
-Content-Type: text/plain; charset="UTF-8"; format=flowed
-Content-Transfer-Encoding: 8bit
-X-ClientProxiedBy: lhrpeml100002.china.huawei.com (7.191.160.241) To
- mscpeml500004.china.huawei.com (7.188.26.250)
+Content-Type: multipart/signed; micalg=pgp-sha512;
+	protocol="application/pgp-signature"; boundary="RD0+TQNC+QTzLiQX"
+Content-Disposition: inline
+In-Reply-To: <20250123082521.59997-1-khaledelnaggarlinux@gmail.com>
 
-On 1/21/2025 1:30 AM, Matthieu Buffet wrote:
-> Hi,
-> 
-> (for netfilter folks added a bit late: this should be self-contained but 
-> original patch is here[1], it now raises a question about netfilter hook 
-> execution context at the end of this email - you can just skip to it if 
-> not interested in the LSM part)
-> 
-> On 12/14/2024 7:45 PM, Matthieu Buffet wrote:
->> Add support for a LANDLOCK_ACCESS_NET_SENDTO_UDP access right,
->> complementing the two previous LANDLOCK_ACCESS_NET_CONNECT_UDP and
->> LANDLOCK_ACCESS_NET_BIND_UDP.
->> It allows denying and delegating the right to sendto() datagrams with an
->> explicit destination address and port, without requiring to connect() the
->> socket first.
->> [...]
->> +static int hook_socket_sendmsg(struct socket *const sock,
->> +                   struct msghdr *const msg, const int size)
->> +{
->> +    const struct landlock_ruleset *const dom =
->> +        landlock_get_applicable_domain(landlock_get_current_domain(),
->> +                           any_net);
->> +    const struct sockaddr *address = (const struct sockaddr 
->> *)msg->msg_name;
->> +    const int addrlen = msg->msg_namelen;
->> +    __be16 port;
->> +     [...]
->> +    if (!sk_is_udp(sock->sk))
->> +        return 0;
->> +
->> +    /* Checks for minimal header length to safely read sa_family. */
->> +    if (addrlen < offsetofend(typeof(*address), sa_family))
->> +        return -EINVAL;
->> +
->> +    switch (address->sa_family) {
->> +    case AF_UNSPEC:
->> +        /*
->> +         * Parsed as "no address" in udpv6_sendmsg(), which means
->> +         * we fall back into the case checked earlier: policy was
->> +         * enforced at connect() time, nothing to enforce here.
->> +         */
->> +        if (sock->sk->sk_prot == &udpv6_prot)
->> +            return 0;
->> +        /* Parsed as "AF_INET" in udp_sendmsg() */
->> +        fallthrough;
->> +    case AF_INET:
->> +        if (addrlen < sizeof(struct sockaddr_in))
->> +            return -EINVAL;
->> +        port = ((struct sockaddr_in *)address)->sin_port;
->> +        break;
->> +
->> +#if IS_ENABLED(CONFIG_IPV6)
->> +    case AF_INET6:
->> +        if (addrlen < SIN6_LEN_RFC2133)
->> +            return -EINVAL;
->> +        port = ((struct sockaddr_in6 *)address)->sin6_port;
->> +        break;
->> +#endif /* IS_ENABLED(CONFIG_IPV6) */
->> +
->> +    default:
->> +        return -EAFNOSUPPORT;
->> +    }
->> +
->> +    return check_access_port(dom, LANDLOCK_ACCESS_NET_SENDTO_UDP, port);
->> +}
->> +
->>   static struct security_hook_list landlock_hooks[] __ro_after_init = {
->>       LSM_HOOK_INIT(socket_bind, hook_socket_bind),
->>       LSM_HOOK_INIT(socket_connect, hook_socket_connect),
->> +    LSM_HOOK_INIT(socket_sendmsg, hook_socket_sendmsg),
->>   };
-> 
-> Looking back at this part of the patch to fix the stupid #ifdef, I 
-> noticed sk->sk_prot can change under our feet, just like sk->sk_family 
-> as highlighted by Mikhail in [2] due to setsockopt(IPV6_ADDRFORM).
-> Replacing the check with READ_ONCE(sock->sk->sk_family) == AF_INET6 or 
-> even taking the socket's lock would not change anything:
-> setsockopt(IPV6_ADDRFORM) runs concurrently and locklessly.
-> 
-> So with this patch, any Landlock domain with rights to connect(port A) 
-> and no port allowed to be set explicitly in sendto() could actually 
-> sendto(arbitrary port B) :
-> 1. create an IPv6 UDP socket
-> 2. connect it to (any IPv4-mapped-IPv6 like ::ffff:127.0.0.1, port A)
-> 3a. sendmsg(AF_UNSPEC + actual IPv4 target, port B)
-> 3b. race setsockopt(IPV6_ADDRFORM) on another thread
-> 4. retry from 1. until sendmsg() succeeds
-> 
-> I've put together a quick PoC, the race works. SELinux does not have 
-> this problem because it uses a netfilter hook, later down the packet 
-> path. I see three "fixes", I probably missed some others:
-> 
-> A: block IPV6_ADDRFORM support in a setsockopt() hook, if UDP_SENDMSG is 
-> handled. AFAIU, not an option since this breaks a userland API
-> 
-> B: remove sendmsg(AF_UNSPEC) support on IPv6 sockets. Same problem as A
-> 
-> C: use a netfilter NF_INET_LOCAL_OUT hook like selinux_ip_output() 
-> instead of an LSM hook
 
-We can naively follow the semantics of this flag: "This access right is
-checked [...] when the destination address passed is not NULL", and
-check address even for IPV6+AF_UNSPEC. Calling sendto() on IPV6 socket
-with specified AF_UNSPEC address does not look like common or useful
-practice and can be restricted.
+--RD0+TQNC+QTzLiQX
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-> 
-> For C, problem is to get the sender process' credentials, and ideally to 
-> avoid tagging sockets (what SELinux uses to fetch its security context, 
-> also why it does not have this problem). Otherwise, we would add another 
-> case of varying semantics (like rights to truncate/ioctl) to keep in 
-> mind for Landlock users, this time with sockets kept after enforcing a 
-> new ruleset, or passed to/from another domain - not a fan.
-> 
-> I don't know if it is safe to assume for UDP that NF_INET_LOCAL_OUT 
-> executes in process context: [3] doesn't specify, and [4] mentions the 
-> possibility to execute in interrupt context due to e.g. retransmits, but 
-> that does not apply to UDP. Looking at the code, it looks like it has to 
-> run in process context to be able to make the syscall return EPERM if 
-> the verdict is NF_DROP, but I don't know if that's something that can be 
-> relied upon to be always true, including in future revisions. Could use 
-> some input from someone knowledgeable in netfilter.
-> 
-> What do you think?
-> 
-> [1] 
-> https://lore.kernel.org/all/20241214184540.3835222-1-matthieu@buffet.re/
-> [2] https://lore.kernel.org/netdev/20241212.zoh7Eezee9ka@digikod.net/T/
-> [3] 
-> https://www.netfilter.org/documentation/HOWTO/netfilter-hacking-HOWTO-4.html#ss4.6
-> [4] 
-> https://netfilter-devel.vger.kernel.narkive.com/yZHiFEVh/execution-context-in-netfilter-hooks#post5
+On Thu, Jan 23, 2025 at 10:25:20AM +0200, Khaled Elnaggar wrote:
+> diff --git a/Documentation/networking/can.rst b/Documentation/networking/=
+can.rst
+> index 62519d38c58b..b018ce346392 100644
+> --- a/Documentation/networking/can.rst
+> +++ b/Documentation/networking/can.rst
+> @@ -699,10 +699,10 @@ RAW socket option CAN_RAW_JOIN_FILTERS
+>=20
+>  The CAN_RAW socket can set multiple CAN identifier specific filters that
+>  lead to multiple filters in the af_can.c filter processing. These filters
+> -are indenpendent from each other which leads to logical OR'ed filters wh=
+en
+> +are independent from each other which leads to logical OR'ed filters when
+>  applied (see :ref:`socketcan-rawfilter`).
+>=20
+> -This socket option joines the given CAN filters in the way that only CAN
+> +This socket option joins the given CAN filters in the way that only CAN
+>  frames are passed to user space that matched *all* given CAN filters. The
+>  semantic for the applied filters is therefore changed to a logical AND.
+>=20
+> diff --git a/Documentation/networking/napi.rst b/Documentation/networking=
+/napi.rst
+> index 6083210ab2a4..f970a2be271a 100644
+> --- a/Documentation/networking/napi.rst
+> +++ b/Documentation/networking/napi.rst
+> @@ -362,7 +362,7 @@ It is expected that ``irq-suspend-timeout`` will be s=
+et to a value much larger
+>  than ``gro_flush_timeout`` as ``irq-suspend-timeout`` should suspend IRQ=
+s for
+>  the duration of one userland processing cycle.
+>=20
+> -While it is not stricly necessary to use ``napi_defer_hard_irqs`` and
+> +While it is not strictly necessary to use ``napi_defer_hard_irqs`` and
+>  ``gro_flush_timeout`` to use IRQ suspension, their use is strongly
+>  recommended.
+>=20
+
+Looks OK, thanks!
+
+Reviewed-by: Bagas Sanjaya <bagasdotme@gmail.com>
+
+--=20
+An old man doll... just what I always wanted! - Clara
+
+--RD0+TQNC+QTzLiQX
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iHUEABYKAB0WIQSSYQ6Cy7oyFNCHrUH2uYlJVVFOowUCZ5NlEgAKCRD2uYlJVVFO
+ozOLAQCl8xjCksO/2hOyEX/nGCgfpFYnbhfVD89Xy4RfQ3zL2wD/bEYRoZX0basl
+rcYvHQtEYowEqXnopSLl7qJ7DEDkCw0=
+=t2bA
+-----END PGP SIGNATURE-----
+
+--RD0+TQNC+QTzLiQX--
 
