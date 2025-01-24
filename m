@@ -1,94 +1,165 @@
-Return-Path: <netdev+bounces-160786-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-160787-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 099F5A1B750
-	for <lists+netdev@lfdr.de>; Fri, 24 Jan 2025 14:44:02 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 631F4A1B794
+	for <lists+netdev@lfdr.de>; Fri, 24 Jan 2025 15:07:59 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id C522818882E9
-	for <lists+netdev@lfdr.de>; Fri, 24 Jan 2025 13:44:01 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 6158F188E5BA
+	for <lists+netdev@lfdr.de>; Fri, 24 Jan 2025 14:08:03 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A96538633D;
-	Fri, 24 Jan 2025 13:43:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 93E5178C6C;
+	Fri, 24 Jan 2025 14:07:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=fieldses.org header.i=@fieldses.org header.b="fr/xLQGV"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-io1-f72.google.com (mail-io1-f72.google.com [209.85.166.72])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from poldevia.fieldses.org (poldevia.fieldses.org [172.234.196.227])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E0AEC8614E
-	for <netdev@vger.kernel.org>; Fri, 24 Jan 2025 13:43:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.72
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DCE828614E;
+	Fri, 24 Jan 2025 14:07:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=172.234.196.227
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1737726186; cv=none; b=thjywDZBU5cZx03GCU4f77NDnupoYHzPKKrA6FpqPbkbUgW8oX1gFwmMNm9FGcVmVNtWaI6Dh7YIF2rsvx5OpaZ0GeBy6M9nULWt+E0a0TSYKYW6OFO/gPagTIgB2G7oJSSwhLdBiUMAyStGK1ekA+OFvatKmlk7W47zxz0nYCo=
+	t=1737727675; cv=none; b=n/KSQ/nMQzZ0mfIVFSlpYdrN8NQ8naFGVnnzGWLWA2JdZp253MrpIRHn+JipTNEYivvLQ0jUPqVSqpMsV+oxfnVzzihpqypGniApIUzf9w83iSal80MXx8CBWmIOskp5nxur1gJ7yt5oBAcIAJMZsnRno9H0dYAW19Rr6gM6jO8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1737726186; c=relaxed/simple;
-	bh=n8OZ3b/yHRWJF9A8gcfHJ7tGWiWPREHXqrj4JQyfRFs=;
-	h=MIME-Version:Date:In-Reply-To:Message-ID:Subject:From:To:
-	 Content-Type; b=R2TVRaEEMZQUmGXj5XisSGtoAoKKCpuC5GCmwENuoJ0i56P3jvxoqzZKo6KYHwqnziaQWTGWhNvtg2ZGQsfH7U02W8kdhAYRfWr2t58389vdb+JVS5ujXFtoN9axOmXoQI9MTVKz1NHZCWpPU7suw6U8m5/Q78cZ8ep6dqp/Tuk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.72
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
-Received: by mail-io1-f72.google.com with SMTP id ca18e2360f4ac-844d54c3e62so268760739f.2
-        for <netdev@vger.kernel.org>; Fri, 24 Jan 2025 05:43:04 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1737726184; x=1738330984;
-        h=to:from:subject:message-id:in-reply-to:date:mime-version
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=2pZe/q9uQMTJ1h6+AXXu51oqWvY3EGvpD1rhxTUhiCw=;
-        b=u3TL9OlT8WGzQJiaeMGnTUS1JtUcXufK2wcDrivEDjJ+ElcpVUV1Il0Eb6O8WvblUa
-         Mg/Mrf34B+I9TV+CiFjOCkxCeI3zE3DvD54YC+HByM6ZWbRrzTMu+pyvlvXTSIX6LSvJ
-         GXFFb4xYrPceKWy7YmRYY0W07aBgYbE1zD1NMbbdJuXAxFl3DDjcXBIXPxOh56x7FerQ
-         fdJe2Oi+kJeUR4ahpXhr639Sb9+SlITqIqE3ZNTsVYzfoQ6eig3docaXqz8TN1ktJQ5X
-         z5+l3JW9e13pKs+X21eazAS+OaQmJ21WUZqIL5zvQckW3jzuYo4ysU3DWSnVwp6pdfpF
-         /Xmg==
-X-Forwarded-Encrypted: i=1; AJvYcCXV723CbKjD6fj3QlVFr+MSPTCvLYHHr2wzGMichwG6a6PzQf0z+QnUtNtjQwCquAoFR+Nca1c=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yw/+GU7QEzumfiiSAU+4oea2fDydeewZ7TC2b192MQ0O/7c6ZO1
-	KNE9ecpONaJ/rFBnketSnnyalHVQ1j6olFMMbko616EUdeSxLu0eUmrVLhJRVKOPpMIHc6yOa4p
-	XZr05YpNbDIAw3U5GwwCvcwGUry/CGcbzi+y1Q1Vtg+lyITy13O5B21o=
-X-Google-Smtp-Source: AGHT+IHK9J8OswljrqskgVtLCWuKfDYf9V/LMLUGMG1IR6LhNN3Im86vudLsPDVLvtHBMCmDTGo+FZJvCui01vqHBrHYGxG8x3MI
+	s=arc-20240116; t=1737727675; c=relaxed/simple;
+	bh=c5TQs5wxsgX6dCmGKRNNGIwr8UK+qKgeQVNNMkuJal0=;
+	h=Date:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To:From; b=bnqYKosnn0kORXA3eHMyMkBQNJBKymkOkJGLANJ5QQNFtdut+nFGqeP2pu6eUU9t0y3Xbek2gk4UwnP1IxcpFq/6TKxrPdpoO7M3m6WxCZ47vxq0hHkuyV6YcbhqCBTFik2ls4awG/Mb26eHRe8B8XHeGsbNuBkOVv+DrZ4oqoo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fieldses.org; spf=pass smtp.mailfrom=fieldses.org; dkim=pass (1024-bit key) header.d=fieldses.org header.i=@fieldses.org header.b=fr/xLQGV; arc=none smtp.client-ip=172.234.196.227
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fieldses.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=fieldses.org
+Received: by poldevia.fieldses.org (Postfix, from userid 2815)
+	id 89F34FA111; Fri, 24 Jan 2025 09:00:48 -0500 (EST)
+DKIM-Filter: OpenDKIM Filter v2.11.0 poldevia.fieldses.org 89F34FA111
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=fieldses.org;
+	s=default; t=1737727248;
+	bh=cnY+PjJPxBJIsVwGmcrb7Sff2z+2xdN/d7twRRHEDaQ=;
+	h=Date:To:Cc:Subject:References:In-Reply-To:From:From;
+	b=fr/xLQGV1Yzr0W+GdhAsaHfLBdpKuAE9FA75UlPg5dinMwu3DSEsFrn7JiUC3zd0z
+	 0wi+1wQUZqE3bpyBFM4yGbgR2iGGvVkC+qx2npgiwzxJTESzQL1vACKrRIaEd2YNTX
+	 /rGePE3gJ6PD65FIPaFafO3gkhDBifx9HUvlSlhA=
+Date: Fri, 24 Jan 2025 09:00:48 -0500
+To: Jeff Layton <jlayton@kernel.org>
+Cc: Chuck Lever <chuck.lever@oracle.com>, Neil Brown <neilb@suse.de>,
+	Olga Kornievskaia <okorniev@redhat.com>,
+	Dai Ngo <Dai.Ngo@oracle.com>, Tom Talpey <tom@talpey.com>,
+	Kinglong Mee <kinglongmee@gmail.com>,
+	Trond Myklebust <trondmy@kernel.org>,
+	Anna Schumaker <anna@kernel.org>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Simon Horman <horms@kernel.org>, linux-nfs@vger.kernel.org,
+	linux-kernel@vger.kernel.org, netdev@vger.kernel.org
+Subject: Re: [PATCH 3/8] nfsd: when CB_SEQUENCE gets NFS4ERR_DELAY, release
+ the slot
+Message-ID: <Z5OdECjsie-MCFel@poldevia.fieldses.org>
+References: <20250123-nfsd-6-14-v1-0-c1137a4fa2ae@kernel.org>
+ <20250123-nfsd-6-14-v1-3-c1137a4fa2ae@kernel.org>
+ <a95521d2-18a2-48d2-b770-6db25bca5cab@oracle.com>
+ <4f89125253d82233b5b14c6e0c4fd7565b1824e0.camel@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Received: by 2002:a05:6e02:4918:b0:3cf:b2b0:5d35 with SMTP id
- e9e14a558f8ab-3cfb2b05ec7mr102563925ab.7.1737726184066; Fri, 24 Jan 2025
- 05:43:04 -0800 (PST)
-Date: Fri, 24 Jan 2025 05:43:04 -0800
-In-Reply-To: <6786ac51.050a0220.216c54.00a6.GAE@google.com>
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <679398e8.050a0220.2eae65.001d.GAE@google.com>
-Subject: Re: [syzbot] [mptcp?] WARNING in mptcp_pm_nl_set_flags (2)
-From: syzbot <syzbot+cd16e79c1e45f3fe0377@syzkaller.appspotmail.com>
-To: davem@davemloft.net, edumazet@google.com, geliang@kernel.org, 
-	horms@kernel.org, kuba@kernel.org, linux-kernel@vger.kernel.org, 
-	martineau@kernel.org, matttbe@kernel.org, mptcp@lists.linux.dev, 
-	netdev@vger.kernel.org, pabeni@redhat.com, stable@vger.kernel.org, 
-	syzkaller-bugs@googlegroups.com
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <4f89125253d82233b5b14c6e0c4fd7565b1824e0.camel@kernel.org>
+From: "J. Bruce Fields" <bfields@fieldses.org>
 
-syzbot has bisected this issue to:
+On Thu, Jan 23, 2025 at 06:20:08PM -0500, Jeff Layton wrote:
+> On Thu, 2025-01-23 at 17:18 -0500, Chuck Lever wrote:
+> > On 1/23/25 3:25 PM, Jeff Layton wrote:
+> > > RFC8881, 15.1.1.3 says this about NFS4ERR_DELAY:
+> > > 
+> > > "For any of a number of reasons, the replier could not process this
+> > >   operation in what was deemed a reasonable time. The client should wait
+> > >   and then try the request with a new slot and sequence value."
+> > 
+> > A little farther down, Section 15.1.1.3 says this:
+> > 
+> > "If NFS4ERR_DELAY is returned on a SEQUENCE operation, the request is
+> >   retried in full with the SEQUENCE operation containing the same slot
+> >   and sequence values."
+> > 
+> > And:
+> > 
+> > "If NFS4ERR_DELAY is returned on an operation other than the first in
+> >   the request, the request when retried MUST contain a SEQUENCE operation
+> >   that is different than the original one, with either the slot ID or the
+> >   sequence value different from that in the original request."
+> > 
+> > My impression is that the slot needs to be held and used again only if
+> > the server responded with NFS4ERR_DELAY on the SEQUENCE operation. If
+> > the NFS4ERR_DELAY was the status of the 2nd or later operation in the
+> > COMPOUND, then yes, a different slot, or the same slot with a bumped
+> > sequence number, must be used.
+> > 
+> > The current code in nfsd4_cb_sequence_done() appears to be correct in
+> > this regard.
+> > 
+> 
+> Ok! I stand corrected. We should be able to just drop this patch, but
+> some of the later patches may need some trivial merge conflicts fixed
+> up.
+> 
+> Any idea why SEQUENCE is different in this regard?
 
-commit 322ea3778965da72862cca2a0c50253aacf65fe6
-Author: Matthieu Baerts (NGI0) <matttbe@kernel.org>
-Date:   Mon Aug 19 19:45:26 2024 +0000
+Isn't DELAY on SEQUENCE an indication that the operation is still in
+progress?  The difference between retrying the same slot or not is
+whether you're asking the server again for the result of the previous
+operation, or whether you're asking it to perform a new one.
 
-    mptcp: pm: only mark 'subflow' endp as available
+If you get DELAY on a later op and then keep retrying with the same
+seqid/slot then I'd expect you to get stuck in an infinite loop getting
+a DELAY response out of the reply cache.
 
-bisection log:  https://syzkaller.appspot.com/x/bisect.txt?x=14f0bab0580000
-start commit:   d1bf27c4e176 dt-bindings: net: pse-pd: Fix unusual charact..
-git tree:       net
-final oops:     https://syzkaller.appspot.com/x/report.txt?x=16f0bab0580000
-console output: https://syzkaller.appspot.com/x/log.txt?x=12f0bab0580000
-kernel config:  https://syzkaller.appspot.com/x/.config?x=1c541fa8af5c9cc7
-dashboard link: https://syzkaller.appspot.com/bug?extid=cd16e79c1e45f3fe0377
-syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=11262218580000
+--b.
 
-Reported-by: syzbot+cd16e79c1e45f3fe0377@syzkaller.appspotmail.com
-Fixes: 322ea3778965 ("mptcp: pm: only mark 'subflow' endp as available")
 
-For information about bisection process see: https://goo.gl/tpsmEJ#bisection
+> This rule seems a
+> bit arbitrary. If the response is NFS4ERR_DELAY, then why would it
+> matter which slot you use when retransmitting? The responder is just
+> saying "go away and come back later".
+> 
+> What if the responder repeatedly returns NFS4ERR_DELAY (maybe because
+> it's under resource pressure), and also shrinks the slot table in the
+> meantime? It seems like that might put the requestor in an untenable
+> position.
+> 
+> Maybe we should lobby to get this changed in the spec?
+> 
+> > 
+> > > This is CB_SEQUENCE, but I believe the same rule applies. Release the
+> > > slot before submitting the delayed RPC.
+> > > 
+> > > Fixes: 7ba6cad6c88f ("nfsd: New helper nfsd4_cb_sequence_done() for processing more cb errors")
+> > > Signed-off-by: Jeff Layton <jlayton@kernel.org>
+> > > ---
+> > >   fs/nfsd/nfs4callback.c | 1 +
+> > >   1 file changed, 1 insertion(+)
+> > > 
+> > > diff --git a/fs/nfsd/nfs4callback.c b/fs/nfsd/nfs4callback.c
+> > > index bfc9de1fcb67b4f05ed2f7a28038cd8290809c17..c26ccb9485b95499fc908833a384d741e966a8db 100644
+> > > --- a/fs/nfsd/nfs4callback.c
+> > > +++ b/fs/nfsd/nfs4callback.c
+> > > @@ -1392,6 +1392,7 @@ static bool nfsd4_cb_sequence_done(struct rpc_task *task, struct nfsd4_callback
+> > >   		goto need_restart;
+> > >   	case -NFS4ERR_DELAY:
+> > >   		cb->cb_seq_status = 1;
+> > > +		nfsd41_cb_release_slot(cb);
+> > >   		if (!rpc_restart_call(task))
+> > >   			goto out;
+> > >   
+> > > 
+> > 
+> > 
+> 
+> -- 
+> Jeff Layton <jlayton@kernel.org>
 
