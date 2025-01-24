@@ -1,228 +1,185 @@
-Return-Path: <netdev+bounces-160761-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-160762-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4463BA1B39D
-	for <lists+netdev@lfdr.de>; Fri, 24 Jan 2025 11:39:28 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7AB84A1B3A4
+	for <lists+netdev@lfdr.de>; Fri, 24 Jan 2025 11:41:19 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E83B73ABE5C
-	for <lists+netdev@lfdr.de>; Fri, 24 Jan 2025 10:39:20 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 812311889E99
+	for <lists+netdev@lfdr.de>; Fri, 24 Jan 2025 10:41:23 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D849B207A06;
-	Fri, 24 Jan 2025 10:39:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0CFFC1D47A6;
+	Fri, 24 Jan 2025 10:41:15 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=outlook.com header.i=@outlook.com header.b="gwWoYzXE"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-il1-f206.google.com (mail-il1-f206.google.com [209.85.166.206])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from EUR05-AM6-obe.outbound.protection.outlook.com (mail-am6eur05olkn2042.outbound.protection.outlook.com [40.92.91.42])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 09B0A1D47A6
-	for <netdev@vger.kernel.org>; Fri, 24 Jan 2025 10:39:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.206
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1737715164; cv=none; b=iqRdaCaxDJ4BffjR9V3iUEjRx9EO+1pz84XpArL1kk9+IMKhU8cB0BteJ9NAsCdiHIyzOUbNcldo8gLa9aHxblGis5xzHvLPZq7wbKWoqR1pBw4nC7rGffOFtbldBH9HLVsPyJ+uiz8hiYGbLgQBLe3A9PdbRXWfJZXF0FQ9wZ4=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1737715164; c=relaxed/simple;
-	bh=/B0rsYfsHp+rUuckiWQ2hG8MNexA1mWGMgJcxB0HMtY=;
-	h=MIME-Version:Date:Message-ID:Subject:From:To:Content-Type; b=uITn1l9n5uADp/RAb6KMYb+GKPxg6zYES99HHoeydqU8QQscICk4bNBS3VNLbhQoajLZlT/T2UYZAcT6602UJctOs+op5JidKISBntAhKbyh2h5+Uni2x9VpwDAG1FLd9iRTRWFFxNUclJHz4/wa2koEUiAEXHa/elwO+spTy58=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.206
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
-Received: by mail-il1-f206.google.com with SMTP id e9e14a558f8ab-3cf6ceaccdbso13339595ab.1
-        for <netdev@vger.kernel.org>; Fri, 24 Jan 2025 02:39:22 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1737715162; x=1738319962;
-        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=MxNno5zxws6mVLutsOZuLJl70rmf4QucjPZ72NaJpVU=;
-        b=qCVOetrVKoer33wOs09mTiwVSv6cIKjd8fMRsUsXiv5+oYDjoB466miuU6eyNHVxx9
-         2TdOql8MKcVV9P65OSvZV6YxzimNcarlUN2b5Kp8Rt+blUajTDgBPK/6Xt8fXWA6Uahy
-         vpCP+cDjyaoRIJUMmNXjL/BMhO6KyVhx6pKsZF8Er+csaPPJ77hvsbA9um+WgkjzxcwF
-         hQyjlVVXwMlbxOSb2Ewd8N7WQj8Utip4juIkxDvWAqxsGqCpYJTxzjLSXDGrTai7evSy
-         4Lv3WrYr2kmraDJLCVm4i/FvwuZd7psAwmWe7yacl25EaVGTXP3sVfdfLKq00igtFSE3
-         WZxQ==
-X-Forwarded-Encrypted: i=1; AJvYcCXfniVdNWBccX0jgzaDfrz4RHxdwjtZNnzwtU08qCLFVsy8srKV+BA3EmI3mpCkZbmrC1ejFCw=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yz/wz8VR+B3KfBQjMNLRSOnmvffIqyU1dU5gREJ/mfpAVGGLAsn
-	TCgLj/PYVg+ku4KmPdynOYzFkSHDU1Ji15a9yW4FhjpcimWUxQMX7CVs81oRXK44WumzizBFRLG
-	rmtz9oRbxQN3+Xv4vAPKy35Kp2MiQ0o7rbHgHtPGqiICf/VIp4ZlXwFI=
-X-Google-Smtp-Source: AGHT+IF9RIbfEBZs5LOB/BqjJeDz7F91pWHnGrAWyvjrhd2NHlelTAfHKOryXlD5pyBmGpDJO6h+KDSNammzjNzCAJxS9/EFDwfd
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 269871CDA01;
+	Fri, 24 Jan 2025 10:41:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.92.91.42
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1737715274; cv=fail; b=c5pLIAVxqFT6j+IEsfqaZdBsYSEcWJN2RHZHPd0c5c1tUow5WXdMbKomWvkiwPHJ0GhdshkYggNLLMUpFGbOBQmU2SRbq+fkehXbUawlFQCZP2K8B4J5sK268SpFVGqN0b9JlU6Azath1ZRV2iGhRXgI8ddVxpL1bamPfFtR+2Q=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1737715274; c=relaxed/simple;
+	bh=2kQpHvk0QrauXZYU42VS8oUbHDomEW/8gcisH/qb17E=;
+	h=Date:From:To:Cc:Subject:Message-ID:Content-Type:
+	 Content-Disposition:MIME-Version; b=PRsrJ9AgMNHmTKctQu7tcqWX5Fk20hvBH3iWR+huecllha0RMj3G/EjMij7qSaOTYJCQNU6n2Q6IRkvM5D88jL1BKVYrELGKcKYibOJNcCwASb9YFbLF5PxMuvxGQiiD3/pWBbsCBNsPp0kYe6BRk7ZeXuWXzrH9BMdQ4wjo3ko=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=outlook.com; spf=pass smtp.mailfrom=outlook.com; dkim=pass (2048-bit key) header.d=outlook.com header.i=@outlook.com header.b=gwWoYzXE; arc=fail smtp.client-ip=40.92.91.42
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=outlook.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=outlook.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=ZLjDftY/GDUhOB/LV2nNqvGai7xoLMtLag1CdWliqcKm4uD+4pagcYp57UPtM+yPldigc+jpX1CTS5lSAMTLMlnfFuxhfhMPFZqtdfctRS3RFdxNIAChrD9sosqhr1ecKKUCoNvcLbF2BMqD06Kz/519SG1jnBau6o7rVsm5axvRvNjb6oskUlZwe8DT6J+ryPMtQDYF+MT9otcvhMrihvPi9IyFdZTwygLd/uk9pCCN6rDDTIBqmq7NzxAd5UJdgbaNJ2w5934eFATk9+ImhoBMbIHj+Lp+29yBmz5huu33UmZNd5Jm39cUiTYTB+A60lxnOHoNBcil6bZ5WZoCUQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=/BN/88GvPhYSUjoJaer0aByGNz9ftWswAjgooKyhdC0=;
+ b=f3JB+GIVfDNJyAtbGwgs7DPolmtqD4qd/o7gygdoRBIoVZXMfUh5RNE4u04I0ATDkxCZ2FLU/4CPQAdMj/8YDjBmy7iCbnhyXGJVrQ6MFTD/nZdWOcSn7KsulxUyGxF5SAqPu/vn1xE6EXYtMO/qCVZ3suuYBYRquY0GurqXKGyW5AkWKbt6R12+J9FWau5Gx/l+tCTLtnHeLLggsTXaozP+UBCeuFuqod1l9C4pA43n61HcNhy1gFIKCTIPfl7ObRnXbS3asWA4vgRdonIwin9Mnt8d04sa17YceKEZFVmo5jZxdlLa7t2YF6USOyE3QwpS6u5u2C21ktOzVMj/yg==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=none; dmarc=none;
+ dkim=none; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=outlook.com;
+ s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=/BN/88GvPhYSUjoJaer0aByGNz9ftWswAjgooKyhdC0=;
+ b=gwWoYzXERQXdAei787h6f7hyjPFzmvtLAggxp0hgxChkJfRXiLnmX1tPYwPhOHRXmrlFTvbrcYVHO9teJAGc4OA9TDyRVOnSdLDXAKTSwAjLo73Ih7j5lH4XmhlDoEBkPP2j2sx/7hgvWX3twRmsNXEqurc29Klx+R631HCciqGrB3weHBFkuianWAOOxuUs7AudXbt5FQBiq0JqWmDkiPYX30cEn+igGKuE+bDPyqQA2qgeUAbXMGdqGI/0KSzT0Q9Vw/eM2jYgOqvWUTaClgvf/YC/gTzTzQDiyCtw+X7WD1gKgKMfsP7WJJr88qjYij9RFN6lHAgQUdw9oHkOLw==
+Received: from AM8P250MB0124.EURP250.PROD.OUTLOOK.COM (2603:10a6:20b:36f::20)
+ by GV2P250MB0730.EURP250.PROD.OUTLOOK.COM (2603:10a6:150:ab::13) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8377.16; Fri, 24 Jan
+ 2025 10:41:10 +0000
+Received: from AM8P250MB0124.EURP250.PROD.OUTLOOK.COM
+ ([fe80::7f66:337:66ca:6046]) by AM8P250MB0124.EURP250.PROD.OUTLOOK.COM
+ ([fe80::7f66:337:66ca:6046%5]) with mapi id 15.20.8377.009; Fri, 24 Jan 2025
+ 10:41:10 +0000
+Date: Fri, 24 Jan 2025 10:41:02 +0000
+From: Milos Reljin <milos_reljin@outlook.com>
+To: andrei.botila@oss.nxp.com, andrew@lunn.ch, hkallweit1@gmail.com,
+	linux@armlinux.org.uk, davem@davemloft.net, edumazet@google.com,
+	kuba@kernel.org, pabeni@redhat.com, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Cc: milos.reljin@rt-rk.com
+Subject: [PATCH net v3] net: phy: c45-tjaxx: add delay between MDIO write and
+ read in soft_reset
+Message-ID:
+ <AM8P250MB0124D258E5A71041AF2CC322E1E32@AM8P250MB0124.EURP250.PROD.OUTLOOK.COM>
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+X-ClientProxiedBy: VI1PR06CA0148.eurprd06.prod.outlook.com
+ (2603:10a6:803:a0::41) To AM8P250MB0124.EURP250.PROD.OUTLOOK.COM
+ (2603:10a6:20b:36f::20)
+X-Microsoft-Original-Message-ID: <Z5NuPnBatVSbXIdP@e9415978754d>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Received: by 2002:a05:6e02:1aa3:b0:3cf:cc8d:48a1 with SMTP id
- e9e14a558f8ab-3cfcc8d4d81mr4893475ab.18.1737715161695; Fri, 24 Jan 2025
- 02:39:21 -0800 (PST)
-Date: Fri, 24 Jan 2025 02:39:21 -0800
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <67936dd9.050a0220.2eae65.001a.GAE@google.com>
-Subject: [syzbot] [wireless?] upstream test error: possible deadlock in ieee80211_remove_interfaces
-From: syzbot <syzbot+f64ec90806724c999178@syzkaller.appspotmail.com>
-To: johannes@sipsolutions.net, linux-kernel@vger.kernel.org, 
-	linux-wireless@vger.kernel.org, netdev@vger.kernel.org, 
-	syzkaller-bugs@googlegroups.com
-Content-Type: text/plain; charset="UTF-8"
+X-MS-Exchange-MessageSentRepresentingType: 1
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: AM8P250MB0124:EE_|GV2P250MB0730:EE_
+X-MS-Office365-Filtering-Correlation-Id: 006dc9e2-b748-4fce-4705-08dd3c639d95
+X-Microsoft-Antispam:
+	BCL:0;ARA:14566002|461199028|19110799003|6090799003|37102599003|15080799006|5072599009|5062599005|8060799006|3412199025|440099028|21061999003|41001999003|12071999003;
+X-Microsoft-Antispam-Message-Info:
+	=?us-ascii?Q?GAoYb6PoqkldxR33duGsNyFuw0ph+jGDPei0V/X9O9uuKU9tRNXw909SOKgq?=
+ =?us-ascii?Q?pZV2y3O6eI1qNUIK3lLcKk5gdevlOYfjppSFJ2oJDIJvF62FFnRLMbdfK09G?=
+ =?us-ascii?Q?q/TMFMXfbC/ZL+XhRds5E5e9JGXlQY9nxO51X535wXOtaO6GywlZHhrDg7j6?=
+ =?us-ascii?Q?xd7HqmtH/SKWXg7j4CInSnxzTQYddqgZUGGnM79+FhuRQOBePRZbPmrCbR9m?=
+ =?us-ascii?Q?yyXoQ9XAgQOq2g7uZGJGS3Zts/cvpmbV4OerJXCP1NWQwX/dO2K8ykQqDhC5?=
+ =?us-ascii?Q?iEY1F30vG05gb3DAY0wgPd8sLEKJBwKCn+OUzykMjl//I3MBjdnAkWqvhnUD?=
+ =?us-ascii?Q?53o6oroY0iFfYFdLeK3/9xB+N9+RHXwx13bYH0If9px/EviZdRAzYdf4/6YC?=
+ =?us-ascii?Q?WPKoquWOXUGdEAYsdbpdD4mSc1ce5HXi7oyThW013gizuRLSroJlJr6PRK+M?=
+ =?us-ascii?Q?kH8gMrc3VLjWv2sUoeM3VWekTE8JHS/FOJAuZvZhl351Y3wpH8uP1dAZBZUu?=
+ =?us-ascii?Q?Vh0xgUzor3IYeDZYe70wXSe0or5mdIN4o2cgGUlEsLLiEmWVze0AC9E3yha3?=
+ =?us-ascii?Q?YsxzHF1Yq4txxSx1TumGHIwyQSg/odZS/aZZr9pLpzbAVNCoAjBP9qew6nsc?=
+ =?us-ascii?Q?NeCgznSeb9WhP2WAaiRQyD2r9GsvxO8/Tndu2Y1sM3A3JCvmaMwmijHKK/5D?=
+ =?us-ascii?Q?IKeuWxn9OaGZ4oryk7DMgKcmaRjIWd0T9VcmJDcOQ5FWdcpBTHdMMtdIvXiL?=
+ =?us-ascii?Q?bVgp+O9h8iVEJm5o2U9q773w/5OQrnt3VbxuKk1vnkbAr/HrZ7neMN6Lklcz?=
+ =?us-ascii?Q?bz7GtSwz/Cg431vm5kgXnYAaJrhszAEAzEpp4mCmwarZLBF0tfWW1y7d2gcc?=
+ =?us-ascii?Q?FD5K9oqCxJ1SW1EoglleYeYaFhhdgO4vaaWaTsfnNQ64iWW4w/MM+hs191EA?=
+ =?us-ascii?Q?DNlxEd4O/J02KnIaOGyxc3E9eLti0iEwcwmpYM1G7Mcpc7VXm24k7aem3rUx?=
+ =?us-ascii?Q?USsLu5IoLdfXfWYYGSbUmTRZgmKDcxCSEOQyPASOQOaBL9AHYpYGzHbxtyUh?=
+ =?us-ascii?Q?SI5hKOswTOLxDnNRFtvm1SBakoH3q1RWFS13iilqn3tM/sqhy67cCnAzcQG0?=
+ =?us-ascii?Q?NxpvZ65pLm6EmE5fIhPkPncARlD5WSznauhH3LJSqBYnZlPECo9gR9FJS8Ty?=
+ =?us-ascii?Q?FOdQtyuDBRhaoPmKrL7shf8TbmeqgUNo5+8yVFZLUxaw5naXWNV/Pye1WB4?=
+ =?us-ascii?Q?=3D?=
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?us-ascii?Q?EJXy9h5GLn/t6swP2T8NyAa4dLoaWUoYF6WXuK3o3kKA6Ci1K7uMqX4K89Y7?=
+ =?us-ascii?Q?5bfnr1L5u3BSosfFOHVkNSdI7e3vpXv5+FzTKEKOk7oVudBx0HYiNv0o1NaA?=
+ =?us-ascii?Q?rO6sWRtN3OyzztHlhbjxEg7koESC/0G74lyNPreCcA9SRbGUe+0PTM0zzi4V?=
+ =?us-ascii?Q?q2b8VT4usQZ4EQiURtZWRRRKLZEjhgqjIBaKwaBbxkSXxmInu8cv0WUQIuoN?=
+ =?us-ascii?Q?MObnhPWhgWnXdzdeQdyu3BbrkHJ2Wzz49zJzO2idOJDCI0fpzD38pnhcjAhm?=
+ =?us-ascii?Q?zYGgrSyt0Wqpu8UT6VABh1n8C64iax3L2GCDEPH+hYFztJJQCosAUGPHMeDD?=
+ =?us-ascii?Q?D3SVGDz+CWYFxTcbNzZnf5YwaJeijhPkSAjK50ZC9ITYPJajhJv3p4ebGkyc?=
+ =?us-ascii?Q?f77evQtkmzSMPltThQt+GT3iTM4n9hhVqmL7ElQ31k+bzmEhjqoNu93/hobW?=
+ =?us-ascii?Q?7FmooYtXu1OoTQLmQidgyRQihB+NIhi77kVkviFcwQ7H8/Nomkpv4QNj8ixN?=
+ =?us-ascii?Q?sZnXuMoVn7vG2IXzQmITBHbuSvcOg34M6OG44vjmZvh2+md1aW9PIjEU4Uvz?=
+ =?us-ascii?Q?X4aB9KACZsw7suf5Tm9K6LcphVGEJQjW/wmCcxMkzircw6HVjo8kk+z1GZcP?=
+ =?us-ascii?Q?4wP5Qr5h9SaKT2/i1r5Qxfi0yRqabrR7Fdcb/5wWTmXwfs4KDCQzDjW5u4vh?=
+ =?us-ascii?Q?PqPx5FpsotJdR8FUqG7t/MsYywJrX8mmUtf0bq/R9Yvh1FtMUvsFgiSbepIr?=
+ =?us-ascii?Q?epmPVCIapmzmM1YevZ3O6FmCG1noJ4MGgk6AhYPx4Gap0jVd97/izt+huuDF?=
+ =?us-ascii?Q?c4PKOhaUfjfO4cY4zV88+cuj+0t9B1b7uNQo1Qq9zgMOlpuLYO1mzdOtq35i?=
+ =?us-ascii?Q?lI+QLpvCYjMN/eo1tSVAsj8y5qmx12huDLCpivAu1Kx7dtN40Bg9US5zI9Pg?=
+ =?us-ascii?Q?wAlGkfrSlRQEN8wtCuhol1mDvDIkQZ/syEsnOYTBDaS33yR3oSGY+AYGMsuW?=
+ =?us-ascii?Q?Q2tBYBfpUxgeXkkjH60FKXzkZcbtcSzzOXy/aAxD5n4HK+IFjsQfPJE5VF/4?=
+ =?us-ascii?Q?lB0rW5fbUUqnxnmN2UoTAWFqcobIpHHe8sLIfy0GbjXFjm0youUCkhzOUD6z?=
+ =?us-ascii?Q?cWe1w3JRB36FWTRxNd2flyZeh6eziD25+6qw5rsSlTpmI6Q2unt3Pv6brMk3?=
+ =?us-ascii?Q?x0K334Iykun+hOuCdzNdTjJ2uyTqb+tr1a3ZTK8xG348Rap4LLbgfUAw4q/p?=
+ =?us-ascii?Q?SkPSawOiNApOx92J3kdI?=
+X-OriginatorOrg: outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 006dc9e2-b748-4fce-4705-08dd3c639d95
+X-MS-Exchange-CrossTenant-AuthSource: AM8P250MB0124.EURP250.PROD.OUTLOOK.COM
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 24 Jan 2025 10:41:10.1628
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 84df9e7f-e9f6-40af-b435-aaaaaaaaaaaa
+X-MS-Exchange-CrossTenant-RMS-PersistedConsumerOrg:
+	00000000-0000-0000-0000-000000000000
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: GV2P250MB0730
 
-Hello,
+In application note (AN13663) for TJA1120, on page 30, there's a figure
+with average PHY startup timing values following software reset.
+The time it takes for SMI to become operational after software reset
+ranges roughly from 500 us to 1500 us.
 
-syzbot found the following issue on:
+This commit adds 2000 us delay after MDIO write which triggers software
+reset. Without this delay, soft_reset function returns an error and
+prevents successful PHY init.
 
-HEAD commit:    bc8198dc7ebc Merge tag 'sched_ext-for-6.14' of git://git.k..
-git tree:       upstream
-console output: https://syzkaller.appspot.com/x/log.txt?x=10763ab0580000
-kernel config:  https://syzkaller.appspot.com/x/.config?x=faaefa8d73d72fff
-dashboard link: https://syzkaller.appspot.com/bug?extid=f64ec90806724c999178
-compiler:       gcc (Debian 12.2.0-14) 12.2.0, GNU ld (GNU Binutils for Debian) 2.40
-
-Downloadable assets:
-disk image: https://storage.googleapis.com/syzbot-assets/3af0795be8e4/disk-bc8198dc.raw.xz
-vmlinux: https://storage.googleapis.com/syzbot-assets/630156792aa7/vmlinux-bc8198dc.xz
-kernel image: https://storage.googleapis.com/syzbot-assets/f2c5067dd705/bzImage-bc8198dc.xz
-
-IMPORTANT: if you fix the issue, please add the following tag to the commit:
-Reported-by: syzbot+f64ec90806724c999178@syzkaller.appspotmail.com
-
-======================================================
-WARNING: possible circular locking dependency detected
-6.13.0-syzkaller-05252-gbc8198dc7ebc #0 Not tainted
-------------------------------------------------------
-kworker/u8:5/318 is trying to acquire lock:
-ffffffff8fef6fa8 (rtnl_mutex){+.+.}-{4:4}, at: rtnl_acquire_if_cleanup_net net/core/dev.c:10272 [inline]
-ffffffff8fef6fa8 (rtnl_mutex){+.+.}-{4:4}, at: unregister_netdevice_many_notify+0x1a51/0x21a0 net/core/dev.c:11792
-
-but task is already holding lock:
-ffff888073480768 (&rdev->wiphy.mtx){+.+.}-{4:4}, at: class_wiphy_constructor include/net/cfg80211.h:6061 [inline]
-ffff888073480768 (&rdev->wiphy.mtx){+.+.}-{4:4}, at: ieee80211_remove_interfaces+0xf1/0x720 net/mac80211/iface.c:2280
-
-which lock already depends on the new lock.
-
-
-the existing dependency chain (in reverse order) is:
-
--> #1 (&rdev->wiphy.mtx){+.+.}-{4:4}:
-       __mutex_lock_common kernel/locking/mutex.c:585 [inline]
-       __mutex_lock+0x19b/0xb10 kernel/locking/mutex.c:730
-       wiphy_lock include/net/cfg80211.h:6046 [inline]
-       wiphy_register+0x1c9c/0x2860 net/wireless/core.c:1006
-       ieee80211_register_hw+0x2455/0x4060 net/mac80211/main.c:1587
-       mac80211_hwsim_new_radio+0x304e/0x54d0 drivers/net/wireless/virtual/mac80211_hwsim.c:5558
-       init_mac80211_hwsim+0x432/0x8c0 drivers/net/wireless/virtual/mac80211_hwsim.c:6910
-       do_one_initcall+0x128/0x700 init/main.c:1267
-       do_initcall_level init/main.c:1329 [inline]
-       do_initcalls init/main.c:1345 [inline]
-       do_basic_setup init/main.c:1364 [inline]
-       kernel_init_freeable+0x5c7/0x900 init/main.c:1578
-       kernel_init+0x1c/0x2b0 init/main.c:1467
-       ret_from_fork+0x45/0x80 arch/x86/kernel/process.c:148
-       ret_from_fork_asm+0x1a/0x30 arch/x86/entry/entry_64.S:244
-
--> #0 (rtnl_mutex){+.+.}-{4:4}:
-       check_prev_add kernel/locking/lockdep.c:3163 [inline]
-       check_prevs_add kernel/locking/lockdep.c:3282 [inline]
-       validate_chain kernel/locking/lockdep.c:3906 [inline]
-       __lock_acquire+0x249e/0x3c40 kernel/locking/lockdep.c:5228
-       lock_acquire.part.0+0x11b/0x380 kernel/locking/lockdep.c:5851
-       __mutex_lock_common kernel/locking/mutex.c:585 [inline]
-       __mutex_lock+0x19b/0xb10 kernel/locking/mutex.c:730
-       rtnl_acquire_if_cleanup_net net/core/dev.c:10272 [inline]
-       unregister_netdevice_many_notify+0x1a51/0x21a0 net/core/dev.c:11792
-       unregister_netdevice_many net/core/dev.c:11875 [inline]
-       unregister_netdevice_queue+0x307/0x3f0 net/core/dev.c:11741
-       unregister_netdevice include/linux/netdevice.h:3329 [inline]
-       _cfg80211_unregister_wdev+0x64b/0x830 net/wireless/core.c:1251
-       ieee80211_remove_interfaces+0x34f/0x720 net/mac80211/iface.c:2305
-       ieee80211_unregister_hw+0x55/0x3a0 net/mac80211/main.c:1681
-       mac80211_hwsim_del_radio drivers/net/wireless/virtual/mac80211_hwsim.c:5664 [inline]
-       hwsim_exit_net+0x3ad/0x7d0 drivers/net/wireless/virtual/mac80211_hwsim.c:6544
-       ops_exit_list+0xb0/0x180 net/core/net_namespace.c:172
-       cleanup_net+0x5c6/0xbf0 net/core/net_namespace.c:652
-       process_one_work+0x9c5/0x1ba0 kernel/workqueue.c:3236
-       process_scheduled_works kernel/workqueue.c:3317 [inline]
-       worker_thread+0x6c8/0xf00 kernel/workqueue.c:3398
-       kthread+0x3af/0x750 kernel/kthread.c:464
-       ret_from_fork+0x45/0x80 arch/x86/kernel/process.c:148
-       ret_from_fork_asm+0x1a/0x30 arch/x86/entry/entry_64.S:244
-
-other info that might help us debug this:
-
- Possible unsafe locking scenario:
-
-       CPU0                    CPU1
-       ----                    ----
-  lock(&rdev->wiphy.mtx);
-                               lock(rtnl_mutex);
-                               lock(&rdev->wiphy.mtx);
-  lock(rtnl_mutex);
-
- *** DEADLOCK ***
-
-4 locks held by kworker/u8:5/318:
- #0: ffff88801beeb148 ((wq_completion)netns){+.+.}-{0:0}, at: process_one_work+0x1293/0x1ba0 kernel/workqueue.c:3211
- #1: ffffc90003017d18 (net_cleanup_work){+.+.}-{0:0}, at: process_one_work+0x921/0x1ba0 kernel/workqueue.c:3212
- #2: ffffffff8fee1390 (pernet_ops_rwsem){++++}-{4:4}, at: cleanup_net+0xca/0xbf0 net/core/net_namespace.c:606
- #3: ffff888073480768 (&rdev->wiphy.mtx){+.+.}-{4:4}, at: class_wiphy_constructor include/net/cfg80211.h:6061 [inline]
- #3: ffff888073480768 (&rdev->wiphy.mtx){+.+.}-{4:4}, at: ieee80211_remove_interfaces+0xf1/0x720 net/mac80211/iface.c:2280
-
-stack backtrace:
-CPU: 0 UID: 0 PID: 318 Comm: kworker/u8:5 Not tainted 6.13.0-syzkaller-05252-gbc8198dc7ebc #0
-Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 12/27/2024
-Workqueue: netns cleanup_net
-Call Trace:
- <TASK>
- __dump_stack lib/dump_stack.c:94 [inline]
- dump_stack_lvl+0x116/0x1f0 lib/dump_stack.c:120
- print_circular_bug+0x490/0x760 kernel/locking/lockdep.c:2076
- check_noncircular+0x31a/0x400 kernel/locking/lockdep.c:2208
- check_prev_add kernel/locking/lockdep.c:3163 [inline]
- check_prevs_add kernel/locking/lockdep.c:3282 [inline]
- validate_chain kernel/locking/lockdep.c:3906 [inline]
- __lock_acquire+0x249e/0x3c40 kernel/locking/lockdep.c:5228
- lock_acquire.part.0+0x11b/0x380 kernel/locking/lockdep.c:5851
- __mutex_lock_common kernel/locking/mutex.c:585 [inline]
- __mutex_lock+0x19b/0xb10 kernel/locking/mutex.c:730
- rtnl_acquire_if_cleanup_net net/core/dev.c:10272 [inline]
- unregister_netdevice_many_notify+0x1a51/0x21a0 net/core/dev.c:11792
- unregister_netdevice_many net/core/dev.c:11875 [inline]
- unregister_netdevice_queue+0x307/0x3f0 net/core/dev.c:11741
- unregister_netdevice include/linux/netdevice.h:3329 [inline]
- _cfg80211_unregister_wdev+0x64b/0x830 net/wireless/core.c:1251
- ieee80211_remove_interfaces+0x34f/0x720 net/mac80211/iface.c:2305
- ieee80211_unregister_hw+0x55/0x3a0 net/mac80211/main.c:1681
- mac80211_hwsim_del_radio drivers/net/wireless/virtual/mac80211_hwsim.c:5664 [inline]
- hwsim_exit_net+0x3ad/0x7d0 drivers/net/wireless/virtual/mac80211_hwsim.c:6544
- ops_exit_list+0xb0/0x180 net/core/net_namespace.c:172
- cleanup_net+0x5c6/0xbf0 net/core/net_namespace.c:652
- process_one_work+0x9c5/0x1ba0 kernel/workqueue.c:3236
- process_scheduled_works kernel/workqueue.c:3317 [inline]
- worker_thread+0x6c8/0xf00 kernel/workqueue.c:3398
- kthread+0x3af/0x750 kernel/kthread.c:464
- ret_from_fork+0x45/0x80 arch/x86/kernel/process.c:148
- ret_from_fork_asm+0x1a/0x30 arch/x86/entry/entry_64.S:244
- </TASK>
-bond0 (unregistering): Released all slaves
-
-
+Cc: stable@vger.kernel.org
+Fixes: b050f2f15e04 ("phy: nxp-c45: add driver for tja1103")
+Signed-off-by: Milos Reljin <milos_reljin@outlook.com>
 ---
-This report is generated by a bot. It may contain errors.
-See https://goo.gl/tpsmEJ for more information about syzbot.
-syzbot engineers can be reached at syzkaller@googlegroups.com.
+Changes in v3:
+ - Added Fixes and Cc tags, net tree indicator in Subject.
 
-syzbot will keep track of this issue. See:
-https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
+Changes in v2:
+ - Updated commit message to clear up where the delay value comes from.
+ - Delay added with usleep_range instead of changing sleep_before_read
+   parameter of phy_read_mmd_poll_timeout to avoid excessive delay.
+---
+ drivers/net/phy/nxp-c45-tja11xx.c | 2 ++
+ 1 file changed, 2 insertions(+)
 
-If the report is already addressed, let syzbot know by replying with:
-#syz fix: exact-commit-title
+diff --git a/drivers/net/phy/nxp-c45-tja11xx.c b/drivers/net/phy/nxp-c45-tja11xx.c
+index ade544bc007d..872e582b7e83 100644
+--- a/drivers/net/phy/nxp-c45-tja11xx.c
++++ b/drivers/net/phy/nxp-c45-tja11xx.c
+@@ -1297,6 +1297,8 @@ static int nxp_c45_soft_reset(struct phy_device *phydev)
+ 	if (ret)
+ 		return ret;
+ 
++	usleep_range(2000, 2050);
++
+ 	return phy_read_mmd_poll_timeout(phydev, MDIO_MMD_VEND1,
+ 					 VEND1_DEVICE_CONTROL, ret,
+ 					 !(ret & DEVICE_CONTROL_RESET), 20000,
+-- 
+2.34.1
 
-If you want to overwrite report's subsystems, reply with:
-#syz set subsystems: new-subsystem
-(See the list of subsystem names on the web dashboard)
-
-If the report is a duplicate of another one, reply with:
-#syz dup: exact-subject-of-another-report
-
-If you want to undo deduplication, reply with:
-#syz undup
 
