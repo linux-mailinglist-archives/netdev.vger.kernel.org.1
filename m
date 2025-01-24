@@ -1,153 +1,162 @@
-Return-Path: <netdev+bounces-160745-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-160746-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 54FB1A1B1C5
-	for <lists+netdev@lfdr.de>; Fri, 24 Jan 2025 09:35:39 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 59986A1B1FA
+	for <lists+netdev@lfdr.de>; Fri, 24 Jan 2025 09:55:47 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 959C816D327
-	for <lists+netdev@lfdr.de>; Fri, 24 Jan 2025 08:35:37 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 37BE418894AC
+	for <lists+netdev@lfdr.de>; Fri, 24 Jan 2025 08:55:51 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 866CF1DAC8A;
-	Fri, 24 Jan 2025 08:35:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A352E1F5404;
+	Fri, 24 Jan 2025 08:55:43 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="LLJ4PaFw"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Bj7ac1UE"
 X-Original-To: netdev@vger.kernel.org
-Received: from NAM12-DM6-obe.outbound.protection.outlook.com (mail-dm6nam12on2086.outbound.protection.outlook.com [40.107.243.86])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D7A7B166F32;
-	Fri, 24 Jan 2025 08:35:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.243.86
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1737707735; cv=fail; b=VLQML8l196QwrFh/zrrKlwqnEmKLZEJYOzV8csKvD1pTv7SQcM+jeo4aIH76R6cn2PbbW6SXn4ikE9IIzRp7sRGoke9zfwmrDW7OwB+KDsQb4/jIDEESlp/h4X8WDkTkJYH8s3w57f/uDVHEJx4sjk154hTHeKHza66xmr80/wo=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1737707735; c=relaxed/simple;
-	bh=ZOkkM9k/6QE3ChdgYNkpSCENTtous2nkvSkDMthDYy0=;
-	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=YEZCtaM6EdNb1Tg1SwgPBkItENSH1z/zjXYIondlhAerSiijf9sf0HSWLl08iRB3OTcPBWK3uDXpx+0IUL2qzHMiff9l3fa5EyYP87bUrbQ7TzfLQYKbrNqNEsSyIC0fYOwwMFqZn9y2inVgpTI7s5mwrn99U044L4fEbu5oaug=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=LLJ4PaFw; arc=fail smtp.client-ip=40.107.243.86
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=lCd9DDi+kRndNdqO2C/qTr1jlqxW78uaqvuqo3fUSzEgYMlQ3Off6/EhN6tjhgTMMi6mVIk6WeevXC6bPwYNmVG1jnQP008WmdizIjyzwD3825uEHydbxIWJ2GZjYuXRKMPjJ2tvuRpyG/0l0Lr1nbkMfGXEDzwE6QZ5aqcw9r8ywBDbVqFQr68rewM4GIGZlO/cJAU7wU7ERmOfcpMoQUBONzQImtohTjmtd+L5hJzRMWUeyG3/dRsUjqkdBlv8M9QD07fkoKi42ujISULTHtvhnbjYcxNe4rOlVyJznU7A/nI/C7lV4dF/DpZMQfbHLSCIdHHPQAAZpgoBUp/d9w==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=ZOkkM9k/6QE3ChdgYNkpSCENTtous2nkvSkDMthDYy0=;
- b=KtMSYug7pvhK6C8PgJbWD8++Ad8Tr/WAD90wMTgbJLIU3Gd2Wo7YxKetoV+YuFRuohXdAbPlbyGisDhYuJv5tCIcmSV7tXGpHqLXxSOwP+GHu9QkjD846jSGH8SY+28ioWxcA7hlX/XmFh+g8v9cfvjSOI+hZJGNz0lARIi0TsijqlUDbX1t/PdkZYD1UsOmQLTSO0V5P/+q8hqxeX2cLitKCwkOsZHSQvg2OPRrWB4EFV2t2e0dzASM4hU1qZ2NmBwEDhsOzcJFoyK/E4hLqhYjm3hagrYH/86PsCnygtoCu0qQUxritg109chr77LcXuF6uND5rMAh/vceozmyAw==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
- 216.228.117.160) smtp.rcpttodomain=vger.kernel.org smtp.mailfrom=nvidia.com;
- dmarc=pass (p=reject sp=reject pct=100) action=none header.from=nvidia.com;
- dkim=none (message not signed); arc=none (0)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=ZOkkM9k/6QE3ChdgYNkpSCENTtous2nkvSkDMthDYy0=;
- b=LLJ4PaFwBGyuWS8F8ICwzS+WLE12vd9uMygiEkp5jGJYNrifj5cRcjAUzqnpUAALq2/seSeYmWNBzRUZsUcC0aTvX9W+rdc0VJi0hOJL+EOmURQwZE18UVwUTNYrcn8CbPP2tNBkbb/SI/+4ert2CpSyYhlnLm8s73E0CYFEiSD46uyBXCksAju7B4lggITW/xGhfaouuXQwsKBr4ZfpYTve1YTN7VpfQ2waWkgGWIEcmgbROZLVx19F0ATPgLZ+Lt9jvIcgsNC+C5KiQB5JUpDx1oqqYc7KaRjXUnXHhtJ/+Zc1HVkWIuI7Yd6m8P28cN9LewAg0JI2KFK0Gmlyfw==
-Received: from SJ0PR03CA0290.namprd03.prod.outlook.com (2603:10b6:a03:39e::25)
- by SJ1PR12MB6170.namprd12.prod.outlook.com (2603:10b6:a03:45b::22) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8356.22; Fri, 24 Jan
- 2025 08:35:30 +0000
-Received: from SJ1PEPF00001CEB.namprd03.prod.outlook.com
- (2603:10b6:a03:39e:cafe::96) by SJ0PR03CA0290.outlook.office365.com
- (2603:10b6:a03:39e::25) with Microsoft SMTP Server (version=TLS1_3,
- cipher=TLS_AES_256_GCM_SHA384) id 15.20.8377.14 via Frontend Transport; Fri,
- 24 Jan 2025 08:35:30 +0000
-X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 216.228.117.160)
- smtp.mailfrom=nvidia.com; dkim=none (message not signed)
- header.d=none;dmarc=pass action=none header.from=nvidia.com;
-Received-SPF: Pass (protection.outlook.com: domain of nvidia.com designates
- 216.228.117.160 as permitted sender) receiver=protection.outlook.com;
- client-ip=216.228.117.160; helo=mail.nvidia.com; pr=C
-Received: from mail.nvidia.com (216.228.117.160) by
- SJ1PEPF00001CEB.mail.protection.outlook.com (10.167.242.27) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.8377.8 via Frontend Transport; Fri, 24 Jan 2025 08:35:30 +0000
-Received: from rnnvmail201.nvidia.com (10.129.68.8) by mail.nvidia.com
- (10.129.200.66) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.4; Fri, 24 Jan
- 2025 00:35:18 -0800
-Received: from hive.mtl.labs.mlnx (10.126.231.35) by rnnvmail201.nvidia.com
- (10.129.68.8) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.4; Fri, 24 Jan
- 2025 00:35:14 -0800
-From: Cosmin Ratiu <cratiu@nvidia.com>
-To: <netdev@vger.kernel.org>
-CC: Jay Vosburgh <jv@jvosburgh.net>, Nikolay Aleksandrov
-	<razor@blackwall.org>, "David S . Miller" <davem@davemloft.net>, Eric Dumazet
-	<edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
-	<pabeni@redhat.com>, Simon Horman <horms@kernel.org>, Jianbo Liu
-	<jianbol@nvidia.com>, Boris Pismenny <borisp@nvidia.com>, Tariq Toukan
-	<tariqt@nvidia.com>, <linux-kselftest@vger.kernel.org>, Hangbin Liu
-	<liuhangbin@gmail.com>, Liang Li <liali@redhat.com>
-Subject: [PATCH net v2] bonding: Correctly support GSO ESP offload
-Date: Fri, 24 Jan 2025 10:33:12 +0200
-Message-ID: <20250124083426.434648-2-cratiu@nvidia.com>
-X-Mailer: git-send-email 2.45.0
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C97791DB134
+	for <netdev@vger.kernel.org>; Fri, 24 Jan 2025 08:55:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1737708943; cv=none; b=pKTWXn431CMWk8YZEm9dGYf4wKP+Y5M//RnFuwazkXB4ocvHddvPdyuQdZqtUzfzQ3zMpauqOoaMB5uYnsfXV8OJRPk+1KUFl0zBJq8009p18EP1Mh8Li7E+qkFI+sOpZr9o78rbsTQR4KRYcOg7kCrNAFHOICRWGhv9bXsxg1A=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1737708943; c=relaxed/simple;
+	bh=I4zc+GDlkJq0kjn0QGdEfFjOTkfwCf4rjCvQ3LksqbI=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=SIL1m10TPWH9wONYbOdbrIHbUtUQU/A40awhahip5uutz/n95ntS2OgPCkLllwPEQj/BNBo1PJ9npggi6f6vu3nee4y71Enj4wcFzKQT4QlutsaQBpGLZjJUkQoMgkBCmD7ILCnYDhqvBwjsGCgxsiN7SBh3NsfOiU2dPe3m7XU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=Bj7ac1UE; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1737708940;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=qJ5vnur6ivKypl5OvBylT/kaODd1J6Q0gXEjA6f2g9E=;
+	b=Bj7ac1UEtDm4NaQzxJ9Yh9LsAwOgHaHINJCoHOlgOp0YKr+ibz/C3Q0kP47OIktfPhp1Y0
+	qoSLxIcgyzcHO4kUy3JU0i4RdhGBVSflsDBbH5qXQLh+0XnNJ5COzzvuKm40ue+in0wWB7
+	W063Gdb6NUbWiScwouO3oc0o+Mbyny8=
+Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com
+ [209.85.128.72]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-596-dn8YTT8MOzeb5cwPQCJ_zg-1; Fri, 24 Jan 2025 03:55:38 -0500
+X-MC-Unique: dn8YTT8MOzeb5cwPQCJ_zg-1
+X-Mimecast-MFC-AGG-ID: dn8YTT8MOzeb5cwPQCJ_zg
+Received: by mail-wm1-f72.google.com with SMTP id 5b1f17b1804b1-4362f893bfaso9907835e9.1
+        for <netdev@vger.kernel.org>; Fri, 24 Jan 2025 00:55:38 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1737708937; x=1738313737;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=qJ5vnur6ivKypl5OvBylT/kaODd1J6Q0gXEjA6f2g9E=;
+        b=vqg+CKgfFa1aAMB/e/J90il19e0KMiMLzOkCGnR3zE0WD5RMYKYf10LhH26uxe6ffu
+         X31BLjmXaqvxaeBAw9HMfdl58OaZyGtrvLtNseyNLEAcJke7mXYrxZWRlB0d3mn/uquG
+         VWFdhdTM79U9uqH9CUhCNmSDnlzYPJaH53IpIQHdSw7mIZxXR216oqd+syAeEGfHJ5dT
+         mOyrNwguWvw36yJrbU6Y3ik2OLiFgi5jbrclIv+JtPjrWdNR0LxhiGolZf0Zoo23XHIp
+         CtgUDFqDSKK8qPtmyXndhM88YSdoOAEdqqyvJJR6PtrDHq8RKFw6DIMdHz2wAgrvrevG
+         Rjdw==
+X-Forwarded-Encrypted: i=1; AJvYcCVzF9YPQZeKxkC+xNjF+5qHcWrGgkRqa+NMG8e5+rgHkVoe01y+NWyYWGyfYSYUykgNyP7aFqU=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yyr3mPpG1L1nhiqXd//ydu5wI8sK/12JZcV4V6ayrRNdWOWa9c0
+	LA1nSyhqhD/LkRmQ8aXtaW9T3EnO/3WaVlIf4bHQ8EmEhrSzW4N35GMS7EocgoUeIGnlhD3kqIu
+	aail5jBXjTacW2Kzn1nXyu0PimPQ0pynW/s0/K8DjimYDMi8uLIAYiw==
+X-Gm-Gg: ASbGncsSd2JUnBYyaF9V2yV46Cxch0/QHzmPuDUacysAAsY7sd1gGodeyUgKzmmg8WO
+	K2qdfVxexxACASGO/lQpEYX6E//SecrWo8GEL2K+r2wBt6DZlF3Eq5O4286iuox5/Ae3Jd1ekps
+	SLre3QWap/lMiVu8uS0yEDexCqlPrs5Ey4MBQZ88yQnsXl6XZABxusdb41kFVgMXrZrzt3qIQDl
+	py437Rlsr+alnQymG3xLI/eVrtm++g5UFVbjnw8r8FQQ/5yhPmp95LWmfptS5oUtSWCXSzF7BCl
+	tlkWHlFir0Vk1RsnaGsEdv/N
+X-Received: by 2002:a05:600c:5112:b0:434:a5bc:70fc with SMTP id 5b1f17b1804b1-438913cfa0emr264459695e9.8.1737708937653;
+        Fri, 24 Jan 2025 00:55:37 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IFfmM6GfCiAFk4pevsjFhOC0ZvAd5ss3nZoYfZj1WBbjYY5sNrz2rPYAP0gbrN+34XDRTj5vA==
+X-Received: by 2002:a05:600c:5112:b0:434:a5bc:70fc with SMTP id 5b1f17b1804b1-438913cfa0emr264459545e9.8.1737708937322;
+        Fri, 24 Jan 2025 00:55:37 -0800 (PST)
+Received: from [192.168.88.253] (146-241-89-186.dyn.eolo.it. [146.241.89.186])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-438bd5730a6sm18388535e9.35.2025.01.24.00.55.35
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Fri, 24 Jan 2025 00:55:36 -0800 (PST)
+Message-ID: <637049f6-f490-445b-8493-218b68d438a3@redhat.com>
+Date: Fri, 24 Jan 2025 09:55:35 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: rnnvmail203.nvidia.com (10.129.68.9) To
- rnnvmail201.nvidia.com (10.129.68.8)
-X-EOPAttributedMessage: 0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: SJ1PEPF00001CEB:EE_|SJ1PR12MB6170:EE_
-X-MS-Office365-Filtering-Correlation-Id: c42c147f-e3cb-40f3-3e56-08dd3c520fa1
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|376014|82310400026|7416014|36860700013|1800799024;
-X-Microsoft-Antispam-Message-Info:
-	=?us-ascii?Q?BQGKrjfuZ37ivb3tPZ0M/V1ZEQVFZsdJWSNLymFtgbJ5GV8curJZVFXD6YBH?=
- =?us-ascii?Q?/h/0h/F+iM+J96IeYrYMfIQJwXcsIGOxsIos2f+5zAU6TLcYB0MtRqF6xyBM?=
- =?us-ascii?Q?U6bMD6/IAZXkISUwynGiJI10tgNegmSk5yTliA2mXQL4kiwQaZTvA5ruMn9E?=
- =?us-ascii?Q?2oA9UYKiKUmpazG34jwkRy8o7/6kUMDbC/el5YwFA1U1uvrW4gv25fr1fS3d?=
- =?us-ascii?Q?Sl9tfGVKAvhv6fci/rPd6VxB9evyP/jXsk0ez4SbVaW5F8mEm0WsBjCCIy76?=
- =?us-ascii?Q?8JL3K6TpAKrxVbGmCqfX27s32HY4/WdIf4eDJWLo4FsFXwRxHhLhSpPcaddW?=
- =?us-ascii?Q?dchBFp58OV5R+NhATd9hrp3bNpvxiC0GIWqozQ+J3r81ap1XhGRc9E4dcXtx?=
- =?us-ascii?Q?rnSph07wSaF1FPWVf3CxQ6HEClrBT+hYGuHQkYhGKwEpZtRPKMl96GioMifx?=
- =?us-ascii?Q?hnToNDxsXo+NGC7YowdwFsjh+pOXCgYiISyVX+zTAr3bmnMIpvdxe92PkDYT?=
- =?us-ascii?Q?UPWM2owFgA/XU0NYpGF2lsW/pAQEq2Pv+ceBAQuqyhmm9BTW7PKpIJvcMtAP?=
- =?us-ascii?Q?7QvHSWSZfMn34nJHnhyLM6OdDbvcjEEbaE6Mj4jDVLTfInrgrx2VA+WGk1WR?=
- =?us-ascii?Q?yChjLcAE7bfMOSKXVfOWis5gjq1EF9pzEjitbHC7G78Jz9Ijg8vMFerliZHU?=
- =?us-ascii?Q?Yk7NpYdw/oRcn88Qx/ThJ2mzzPXbrtyP46Nmymik7dhzWCXkccnnSyaLotEb?=
- =?us-ascii?Q?5YMKGhljGdCiUFidtokegsIRGbbGEQW+H4ypuKw9U8MdcIbBzSPhpKdHXx9t?=
- =?us-ascii?Q?HJVLDvKYjqE95ngdZnjJ8EYBMiZ3BVoSRFoCC7F/2mIVm9GG7dQlvFCYjYNS?=
- =?us-ascii?Q?Mo+Dkt3vNkIbuBRHEjd9YTJMtMmWhNk1zBbw5Hj9Kj34gFBXN/lRdCkWrVZs?=
- =?us-ascii?Q?rL55w1+EuXsCkjCIFcfcWFZsEQ7W+8GdqWSfuDklJ6003sZrIO31es/FNMYd?=
- =?us-ascii?Q?v+j9NBSctAuu0l0+3TSrZv98SlKtpAZ+dE8kGgLUqPASaihd7tQrRALQ8MOO?=
- =?us-ascii?Q?//+eHDp+oaAcch4vMtdEtO73NZvkYLFXypIggaMh91nZ6uPPGkYhMAdl1+my?=
- =?us-ascii?Q?y9zrSnAINlUm+D+CeWb+nyQbRoYAxbDqNspC+eQ2VIUpDNcSAcORCZaUoGHb?=
- =?us-ascii?Q?8fptDiRZzqbixj+b6tj90HSPyBmUnTmUE1g4iNdr0zy/mox5wcgPpoNTUEsa?=
- =?us-ascii?Q?KdfkFSe5Sqt/FPPI5Xo9y0HsLhxxErYdO6WMlJqsqfwrP/FgQED7JESu2Sg1?=
- =?us-ascii?Q?UQGDgSMzK+f1HTqXGhoWwlgl3zn5XXz3FbPNt3X1/3ZC7wstYNgLs8gnWyGh?=
- =?us-ascii?Q?n4pYANquv9ZPGSaZrltI/Dsvas8xWVq/pGac62781DKsOV+3YDBTZ4DpsjcU?=
- =?us-ascii?Q?oU/MwUznXHtjMbKEtqvokgQc3uRFe7Y8E8bahAdKLel6jsyZ3O1bDcOc4Vi1?=
- =?us-ascii?Q?wjLmvam6rdgyTug=3D?=
-X-Forefront-Antispam-Report:
-	CIP:216.228.117.160;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:dc6edge1.nvidia.com;CAT:NONE;SFS:(13230040)(376014)(82310400026)(7416014)(36860700013)(1800799024);DIR:OUT;SFP:1101;
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 24 Jan 2025 08:35:30.3376
- (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: c42c147f-e3cb-40f3-3e56-08dd3c520fa1
-X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[216.228.117.160];Helo=[mail.nvidia.com]
-X-MS-Exchange-CrossTenant-AuthSource:
-	SJ1PEPF00001CEB.namprd03.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Anonymous
-X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: SJ1PR12MB6170
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next v6 00/12] Begin upstreaming Homa transport
+ protocol
+To: John Ousterhout <ouster@cs.stanford.edu>, netdev@vger.kernel.org
+Cc: edumazet@google.com, horms@kernel.org, kuba@kernel.org
+References: <20250115185937.1324-1-ouster@cs.stanford.edu>
+Content-Language: en-US
+From: Paolo Abeni <pabeni@redhat.com>
+In-Reply-To: <20250115185937.1324-1-ouster@cs.stanford.edu>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-V2:
-Removed unnecessary Change-Id
-Changed "bond->features" to "bond_dev->features" in commit message.
+On 1/15/25 7:59 PM, John Ousterhout wrote:
+> This patch series begins the process of upstreaming the Homa transport
+> protocol. Homa is an alternative to TCP for use in datacenter
+> environments. It provides 10-100x reductions in tail latency for short
+> messages relative to TCP. Its benefits are greatest for mixed workloads
+> containing both short and long messages running under high network loads.
+> Homa is not API-compatible with TCP: it is connectionless and message-
+> oriented (but still reliable and flow-controlled). Homa's new API not
+> only contributes to its performance gains, but it also eliminates the
+> massive amount of connection state required by TCP for highly connected
+> datacenter workloads.
+> 
+> For more details on Homa, please consult the Homa Wiki:
+> https://homa-transport.atlassian.net/wiki/spaces/HOMA/overview
+> The Wiki has pointers to two papers on Homa (one of which describes
+> this implementation) as well as man pages describing the application
+> API and other information.
+> 
+> There is also a GitHub repo for Homa:
+> https://github.com/PlatformLab/HomaModule
+> The GitHub repo contains a superset of this patch set, including:
+> * Additional source code that will eventually be upstreamed
+> * Extensive unit tests (which will also be upstreamed eventually)
+> * Application-level library functions (which need to go in glibc?)
+> * Man pages (which need to be upstreamed as well)
+> * Benchmarking and instrumentation code
+> 
+> For this patch series, Homa has been stripped down to the bare minimum
+> functionality capable of actually executing remote procedure calls. (about
+> 8000 lines of source code, compared to 15000 in the complete Homa). The
+> remaining code will be upstreamed in smaller batches once this patch
+> series has been accepted. Note: the code in this patch series is
+> functional but its performance is not very interesting (about the same
+> as TCP).
+> 
+> The patch series is arranged to introduce the major functional components
+> of Homa. Until the last patch has been applied, the code is inert (it
+> will not be compiled).
+> 
+> Note: this implementation of Homa supports both IPv4 and IPv6.
+
+I haven't completed reviewing the current iteration yet, but with the
+amount of code inspected at this point, the series looks quite far from
+a mergeable status.
+
+Before the next iteration, I strongly advice to review (and possibly
+rethink) completely the locking schema, especially the RCU usage, to
+implement rcvbuf and sendbuf accounting (and possibly even memory
+accounting), to reorganize the code for better reviewability (the code
+in each patch should refer/use only the code current and previous
+patches), to use more the existing kernel API and constructs and to test
+the code with all the kernel/configs/debug.config knobs enabled.
+
+Unless a patch is new or completely rewritten from scratch, it would be
+helpful to add per patch changelog, after the SoB tag and a '---' separator.
+
+Thanks,
+
+Paolo
 
 
