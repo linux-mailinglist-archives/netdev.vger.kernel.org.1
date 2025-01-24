@@ -1,305 +1,332 @@
-Return-Path: <netdev+bounces-160825-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-160826-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0070EA1B9F0
-	for <lists+netdev@lfdr.de>; Fri, 24 Jan 2025 17:05:33 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id C80C9A1B9F7
+	for <lists+netdev@lfdr.de>; Fri, 24 Jan 2025 17:07:06 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 5867B1891C39
-	for <lists+netdev@lfdr.de>; Fri, 24 Jan 2025 16:05:13 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 1702E162E97
+	for <lists+netdev@lfdr.de>; Fri, 24 Jan 2025 16:07:05 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3EEB01632FB;
-	Fri, 24 Jan 2025 16:04:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9FDA915688C;
+	Fri, 24 Jan 2025 16:07:02 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="KCevB+Ns"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="iGFKrLz3"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-lj1-f182.google.com (mail-lj1-f182.google.com [209.85.208.182])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 14A82153BF7;
-	Fri, 24 Jan 2025 16:04:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8EAB415C120;
+	Fri, 24 Jan 2025 16:07:00 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.182
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1737734695; cv=none; b=pkgpPuuRUc26GdqB4bI9Rcdjsxmdn9COJnG7J4BVpPVkh1Z5Ow3LAF+wuqnau671UaIUsaqK0eMg3kBEQkRVXGjsEbcouW94+8m2CKBsGC4f84Ps9o1AncGTZqbnQvksHNKO7awNwDGikGxPauDdCeaQRQu1C+tk8g3XYs4QykY=
+	t=1737734822; cv=none; b=Rlrf4W9LvasTJRicZG4r2r44ddBhAksUuXvm7asH14bkJJDUxUtknCxGVKe0fThHUQtFnf9tWAofAotz3U0PtRGi6iBkI0r/RzVizO71xnBPOmrOfyFpgeas/8IeBoDLwpafQkD/WB+SgRrEb/QZxIkYQbQ3G30VnbGYu3H3yf0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1737734695; c=relaxed/simple;
-	bh=TPA434fY7lux6XnYf1clstY4nCFfIk5DH1SOpMjVHVI=;
-	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=WfFQSGGAbpRuPMgNBcsXN8rFVLw60gMvve+0ukFDO2HKCMSeNMv8id7nRdb611T6gb/K4zKwR54L0lZ5L/klIvIi4ENmNQ7vOocN5DFdQTvu6oyrsNhP7C+JUIf+BNI5WJSUcDKBOlyavK0w6yPhEVfVv49A28d2Wl8cUsFRr4w=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=KCevB+Ns; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 69460C4CED2;
-	Fri, 24 Jan 2025 16:04:53 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1737734694;
-	bh=TPA434fY7lux6XnYf1clstY4nCFfIk5DH1SOpMjVHVI=;
-	h=Subject:From:To:Cc:Date:In-Reply-To:References:From;
-	b=KCevB+Ns2FRk7n1PoeY9NsTiTg90kWA+kmsmeOvo7mnD3CfaSF5twxpQAKIXJhNMc
-	 b3rn6nNuoIbJe3saF8Jn2WRm82ufKmBnmCqg5oeD/xixd7t1RcLfQHDVAKat9YAvOT
-	 9+b/EPvSVHFaBrhCOD7JMddzNtEYNJCaqw3ebGyUeIR5p9zpe4EP8u1wLcusaAAPs1
-	 bNAzgCMCT5vHssZ4lTA/1j2uJKidce2ur/YKZM/8WPF9cfi+4Ve0G6xYLhIKE+/NpX
-	 Ox2TSDJLjaaLomDPZJP9DkVnhe0zAlClfyE/bh9tDN17OpuxTEgE/YdTyGPUBxzRKk
-	 13PZJBxH63rqA==
-Message-ID: <9237d52f30f63cbe6450fcbbbeaf259250554814.camel@kernel.org>
-Subject: Re: [PATCH 2/8] nfsd: fix CB_SEQUENCE error handling of
- NFS4ERR_{BADSLOT,BADSESSION,SEQ_MISORDERED}
-From: Jeff Layton <jlayton@kernel.org>
-To: Chuck Lever <chuck.lever@oracle.com>, Neil Brown <neilb@suse.de>, Olga
- Kornievskaia <okorniev@redhat.com>, Dai Ngo <Dai.Ngo@oracle.com>, Tom
- Talpey <tom@talpey.com>, "J. Bruce Fields" <bfields@fieldses.org>, Kinglong
- Mee <kinglongmee@gmail.com>, Trond Myklebust	 <trondmy@kernel.org>, Anna
- Schumaker <anna@kernel.org>, "David S. Miller"	 <davem@davemloft.net>, Eric
- Dumazet <edumazet@google.com>, Jakub Kicinski	 <kuba@kernel.org>, Paolo
- Abeni <pabeni@redhat.com>, Simon Horman	 <horms@kernel.org>
-Cc: linux-nfs@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	netdev@vger.kernel.org
-Date: Fri, 24 Jan 2025 11:04:52 -0500
-In-Reply-To: <e8b4f46a-2c4b-43b3-bf82-dc5d8f6af171@oracle.com>
-References: <20250123-nfsd-6-14-v1-0-c1137a4fa2ae@kernel.org>
-	 <20250123-nfsd-6-14-v1-2-c1137a4fa2ae@kernel.org>
-	 <c87e5353-d933-47fa-a4e2-9153d243d61c@oracle.com>
-	 <66e5e5e74487a274a069539dc14fb10d7832044f.camel@kernel.org>
-	 <e8b4f46a-2c4b-43b3-bf82-dc5d8f6af171@oracle.com>
-Autocrypt: addr=jlayton@kernel.org; prefer-encrypt=mutual;
- keydata=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
- QZIQXVeAA+smfTT0tDrisj1U5x6ZB9b3nBg65kc=
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-User-Agent: Evolution 3.54.3 (3.54.3-1.fc41) 
+	s=arc-20240116; t=1737734822; c=relaxed/simple;
+	bh=Xg/zFkhNFdxzzxD1FJUR3gV5+xFOECyixQLzK3uV3nU=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=XZnHID49zcaDKWgilr9EuEwGlY4UhlXuNPbkLw+MNW4PTGJYDx+9TI5UrR/PQDXqyal3UHB834xCdDfXytucZxOSsGvuSN47ZGRm3MSmo1mt8RfmpeU1Dw4L0xrdHwjojatPQRstaYsNQz5VrMY/rcRrpMKXnpq4qNGC/es0rQY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=iGFKrLz3; arc=none smtp.client-ip=209.85.208.182
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-lj1-f182.google.com with SMTP id 38308e7fff4ca-30761be8fa7so23040641fa.2;
+        Fri, 24 Jan 2025 08:07:00 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1737734818; x=1738339618; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=hBgJVnTlF1zTLD/T+wwFneTc6TjdTb9VUTzxEiiL4Vg=;
+        b=iGFKrLz3WrRIMfLNp+c0B3vybG5MEJmAjFVd6lbEBf63AkkLKu/J6tXJ/N0e952Lfr
+         DKfoANlXWPHUjMZRJg4v7eK+HxU/Wqwu44yJdYAnkOhUSNkgdtKIy+QCpW2gP147jd5F
+         gtpFDMRrFMvAcIGc7WuZ/F8DhhuuqDspSOwmvpFX49WeSTpxGh5NvzF7PPxnPhI7fWUb
+         zsK5dQTG9WkNgIqO+3D+Mjf+2OjvN4tPeB+z3n9VzAncAYV3t5tpbyCXUyvlaJJyMK5O
+         Ci/3dQhxPq5YIWdvyRarIKdihffFziGWTVL6OAvZjY49MIO27No5qleDuRqjJZtBQra+
+         RkBg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1737734818; x=1738339618;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=hBgJVnTlF1zTLD/T+wwFneTc6TjdTb9VUTzxEiiL4Vg=;
+        b=SHSgtyK4RpmTJe6u0dvCq0ixpMKfabKeY+kRKNi6y82y8dqhNCTj75cRjhmI4/22vn
+         Xy3q74jeTnRT+xcCA83b3K1r3YLXaXAmqkutdZwZejXesMuYoffjkAQsxkoo5E98gCLF
+         C4BYWFgjCqCkQbRtGRokxflEmsRTSCPpTsfuxjVwmvsDed46WgY6a3gA9/2yCURWj0Zl
+         jMnijRPfAva0cD70Pce70AjkTtv52oMZ+GSXcUO/5xmT1qg0pLuSQlA3ytdBH/lbhrvw
+         p1Cl/b6WMhZwLbV1UyU3bEaLdMSivEuTtMEoDYPqpfRbHCDJJuLKv/NaUQo6hL3opkBB
+         hrnQ==
+X-Forwarded-Encrypted: i=1; AJvYcCUPNmn2KBYbi3LCLpS4QOQEGVRx87d8f+CP463wl8UHPt9V/tjwx2baq76IG8CF6O0Wn1THxuseGzOcsTQ=@vger.kernel.org, AJvYcCWGBVuX1nWTkNhJBvg45zDG8b3Dc1J8sgeqD3ILnAvXxFDGsMbn6Syx46gQ+EmC18oWu0GetFRM@vger.kernel.org
+X-Gm-Message-State: AOJu0YxuQxN//QmLw6/STr8gl0qTVkSbGEJO3sjoQNTRoG8Mdil7O8PQ
+	Ndb5Km6gUAX5AEpFNJSLWSnd6322RM7yPLGkpE3/HT5405zmu4KSaKsLT9HheQTtQXkturDBKKw
+	oOgJg4fd7kt/BNfHR5aKE+atUstw=
+X-Gm-Gg: ASbGncsIz5FMkPh7e5sHta/AEUsP40hlv2bLLV0eTpB5eao3a1ehGqSEwzl4+TOMJdc
+	uhbp/dilr5dGrGQS8le2n65b3zOLgfDaV9R4zHeqSikL/z+4TCsLgaxo9pIfnkl8=
+X-Google-Smtp-Source: AGHT+IFzEcfJwJbmSGmxxJuOHDdTToHqdDgSmLqq3NDRAC9IeNTwW37Z/VvDDmE5lXdVKM9Ysce5REuNrHaRDFhKerY=
+X-Received: by 2002:a2e:be06:0:b0:302:1d8e:f4fd with SMTP id
+ 38308e7fff4ca-3072cb3f528mr115560681fa.35.1737734817939; Fri, 24 Jan 2025
+ 08:06:57 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+References: <20250122131925.v2.1.If6f14aa2512336173a53fc3552756cd8a332b0a3@changeid>
+ <CABBYNZKoXT4u4=KJZUvG4g1OEi+xQ-LchiH8gvEZURNTzJoQDw@mail.gmail.com>
+ <CADg1FFdt2mQsN4YjLTn=zp_+MahopN371EDiXQEbp+GTSaNtBg@mail.gmail.com> <CABBYNZJ__OMJZtEE0BFpaUdKPQv+Ym-OnsJj-kN=i_gZCeVN5w@mail.gmail.com>
+In-Reply-To: <CABBYNZJ__OMJZtEE0BFpaUdKPQv+Ym-OnsJj-kN=i_gZCeVN5w@mail.gmail.com>
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Date: Fri, 24 Jan 2025 11:06:45 -0500
+X-Gm-Features: AWEUYZlKNKW8jZkP7zAqAhu9WL1EgeEReJVF89WWI_jRmA658Xl4Bp-mbELYrxM
+Message-ID: <CABBYNZ+aEpJNnz1OSAeqOxFf4s2AbvoRC+FJcRS6y5+g0Mmu+g@mail.gmail.com>
+Subject: Re: [PATCH v2 1/3] Bluetooth: Fix possible race with userspace of
+ sysfs isoc_alt
+To: Hsin-chen Chuang <chharry@google.com>
+Cc: linux-bluetooth@vger.kernel.org, 
+	chromeos-bluetooth-upstreaming@chromium.org, 
+	Hsin-chen Chuang <chharry@chromium.org>, "David S. Miller" <davem@davemloft.net>, 
+	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
+	Johan Hedberg <johan.hedberg@gmail.com>, Marcel Holtmann <marcel@holtmann.org>, 
+	Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, Ying Hsu <yinghsu@chromium.org>, 
+	linux-kernel@vger.kernel.org, netdev@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Fri, 2025-01-24 at 10:31 -0500, Chuck Lever wrote:
-> On 1/24/25 9:46 AM, Jeff Layton wrote:
-> > On Fri, 2025-01-24 at 09:32 -0500, Chuck Lever wrote:
-> > > On 1/23/25 3:25 PM, Jeff Layton wrote:
-> > > > The current error handling has some problems:
-> > > >=20
-> > > > BADSLOT and BADSESSION: don't release the slot before retrying the =
-call
-> > > >=20
-> > > > SEQ_MISORDERED: does some sketchy resetting of the seqid? I can't f=
-ind any
-> > > > recommendation about doing that in the spec, and it seems wrong.
-> > >=20
-> > > Random thought: You might use the Linux NFS client's forechannel sess=
-ion
-> > > implementation as a code reference.
-> > >=20
-> > >=20
-> > > > Handle all three errors the same way: release the slot, but then ha=
-ndle
-> > > > it just like we would as if we hadn't gotten a reply; mark the sess=
-ion
-> > > > as faulty, and retry the call.
-> > >=20
-> > > Some questions:
-> > >=20
-> > > Why does it matter whether NFSD keeps the slot if both sides plan to
-> > > destroy the session?
-> > >=20
-> >=20
-> > It may not be required, but there is no reason to hold onto the slot in
-> > these cases.
->=20
-> In the BADSLOT case, if the slot is released, then another session
-> consumer on the NFS server can use it and will encounter the same error.
-> Best to keep it in the penalty box, IMO.
->=20
-> If there are other slots, they are likely still usable. An
-> implementation can choose to continue using the session rather than
-> scuttling it immediately. In the past, with a single backchannel slot,
-> NFSD had no choice but to replace the session. But now it can be more
-> conservative.
->=20
+Hi Hsin-chen,
 
-It may still be usable, but if we got BADSLOT, then it's still
-indicative of a faulty session. Best to mark it as such, IMO.
-
-It's worth noting that these things should really _never_ happen, so
-being somewhat heavy-handed in this situation seems reasonable.
-
->=20
-> > Also, at this point, only nfsd has declared that it needs
-> > a new session (see below).
->=20
-> If the client's backchannel service has returned BADSESSION, then the
-> client already knows this session is unusable.
->=20
-
-Fair point. I still think it's reasonable to mark it CB_FAULT in that
-case. That status is also displayed via the client_info file, so that's
-helpful info.
-
->=20
-> > > Also, AFAICT marking CB_FAULT does not destroy the session, it simply
-> > > tries to recreate backchannel's rpc_clnt. Perhaps NFSD's callback cod=
-e
-> > > should actively destroy the session and let the client drive a fresh
-> > > CREATE_SESSION to recover?
-> > >=20
-> >=20
-> > Marking it with a fault just sets the cl_cb_state to NFSD4_CB_FAULT.
-> > Then, on the next SEQUENCE call, that makes nfsd set
-> > SEQ4_STATUS_BACKCHANNEL_FAULT, which should make the client recreate
-> > the session. Obviously, there is some delay involved there since we
-> > might have to wait for the client to do a lease renewal before this
-> > happens.
-> >=20
-> > >=20
-> > > > Fixes: 7ba6cad6c88f ("nfsd: New helper nfsd4_cb_sequence_done() for=
- processing more cb errors")
-> > > > Signed-off-by: Jeff Layton <jlayton@kernel.org>
+On Fri, Jan 24, 2025 at 10:54=E2=80=AFAM Luiz Augusto von Dentz
+<luiz.dentz@gmail.com> wrote:
+>
+> Hi Hsin-chen,
+>
+> On Wed, Jan 22, 2025 at 11:57=E2=80=AFPM Hsin-chen Chuang <chharry@google=
+.com> wrote:
+> >
+> > Hi Luiz,
+> >
+> > On Thu, Jan 23, 2025 at 3:35=E2=80=AFAM Luiz Augusto von Dentz
+> > <luiz.dentz@gmail.com> wrote:
+> > >
+> > > Hi Hsin-chen,
+> > >
+> > > On Wed, Jan 22, 2025 at 12:20=E2=80=AFAM Hsin-chen Chuang <chharry@go=
+ogle.com> wrote:
+> > > >
+> > > > From: Hsin-chen Chuang <chharry@chromium.org>
+> > > >
+> > > > Use device group to avoid the racing. To reuse the group defined in
+> > > > hci_sysfs.c, defined 2 callbacks switch_usb_alt_setting and
+> > > > read_usb_alt_setting which are only registered in btusb.
+> > > >
+> > > > Fixes: b16b327edb4d ("Bluetooth: btusb: add sysfs attribute to cont=
+rol USB alt setting")
+> > > > Signed-off-by: Hsin-chen Chuang <chharry@chromium.org>
 > > > > ---
-> > > >    fs/nfsd/nfs4callback.c | 27 +++++++++++----------------
-> > > >    1 file changed, 11 insertions(+), 16 deletions(-)
-> > > >=20
-> > > > diff --git a/fs/nfsd/nfs4callback.c b/fs/nfsd/nfs4callback.c
-> > > > index e12205ef16ca932ffbcc86d67b0817aec2436c89..bfc9de1fcb67b4f05ed=
-2f7a28038cd8290809c17 100644
-> > > > --- a/fs/nfsd/nfs4callback.c
-> > > > +++ b/fs/nfsd/nfs4callback.c
-> > > > @@ -1371,17 +1371,24 @@ static bool nfsd4_cb_sequence_done(struct r=
-pc_task *task, struct nfsd4_callback
-> > > >    		nfsd4_mark_cb_fault(cb->cb_clp);
-> > > >    		ret =3D false;
-> > > >    		break;
-> > > > +	case -NFS4ERR_BADSESSION:
-> > > > +	case -NFS4ERR_BADSLOT:
-> > > > +	case -NFS4ERR_SEQ_MISORDERED:
-> > > > +		/*
-> > > > +		 * These errors indicate that something has gone wrong
-> > > > +		 * with the server and client's synchronization. Release
-> > > > +		 * the slot, but handle it as if we hadn't gotten a reply.
-> > > > +		 */
-> > > > +		nfsd41_cb_release_slot(cb);
-> > > > +		fallthrough;
-> > > >    	case 1:
-> > > >    		/*
-> > > >    		 * cb_seq_status remains 1 if an RPC Reply was never
-> > > >    		 * received. NFSD can't know if the client processed
-> > > >    		 * the CB_SEQUENCE operation. Ask the client to send a
-> > > > -		 * DESTROY_SESSION to recover.
-> > > > +		 * DESTROY_SESSION to recover, but keep the slot.
-> > > >    		 */
-> > > > -		fallthrough;
-> > > > -	case -NFS4ERR_BADSESSION:
-> > > >    		nfsd4_mark_cb_fault(cb->cb_clp);
-> > > > -		ret =3D false;
-> > > >    		goto need_restart;
-> > > >    	case -NFS4ERR_DELAY:
-> > > >    		cb->cb_seq_status =3D 1;
-> > > > @@ -1390,14 +1397,6 @@ static bool nfsd4_cb_sequence_done(struct rp=
-c_task *task, struct nfsd4_callback
-> > > >   =20
-> > > >    		rpc_delay(task, 2 * HZ);
-> > > >    		return false;
-> > > > -	case -NFS4ERR_BADSLOT:
-> > > > -		goto retry_nowait;
-> > > > -	case -NFS4ERR_SEQ_MISORDERED:
-> > > > -		if (session->se_cb_seq_nr[cb->cb_held_slot] !=3D 1) {
-> > > > -			session->se_cb_seq_nr[cb->cb_held_slot] =3D 1;
-> > > > -			goto retry_nowait;
-> > > > -		}
-> > > > -		break;
-> > > >    	default:
-> > > >    		nfsd4_mark_cb_fault(cb->cb_clp);
-> > > >    	}
-> > > > @@ -1405,10 +1404,6 @@ static bool nfsd4_cb_sequence_done(struct rp=
-c_task *task, struct nfsd4_callback
-> > > >    	nfsd41_cb_release_slot(cb);
-> > > >    out:
-> > > >    	return ret;
-> > > > -retry_nowait:
-> > > > -	if (rpc_restart_call_prepare(task))
-> > > > -		ret =3D false;
-> > > > -	goto out;
-> > > >    need_restart:
-> > > >    	if (!test_bit(NFSD4_CLIENT_CB_KILL, &clp->cl_flags)) {
-> > > >    		trace_nfsd_cb_restart(clp, cb);
-> > > >=20
-> > >=20
-> > >=20
-> >=20
->=20
->=20
+> > > >
+> > > > (no changes since v1)
+> > > >
+> > > >  drivers/bluetooth/btusb.c        | 42 ++++++++--------------------=
+----
+> > > >  include/net/bluetooth/hci_core.h |  2 ++
+> > > >  net/bluetooth/hci_sysfs.c        | 33 +++++++++++++++++++++++++
+> > > >  3 files changed, 45 insertions(+), 32 deletions(-)
+> > > >
+> > > > diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
+> > > > index 75a0f15819c4..bf210275e5b7 100644
+> > > > --- a/drivers/bluetooth/btusb.c
+> > > > +++ b/drivers/bluetooth/btusb.c
+> > > > @@ -2221,6 +2221,13 @@ static int btusb_switch_alt_setting(struct h=
+ci_dev *hdev, int new_alts)
+> > > >         return 0;
+> > > >  }
+> > > >
+> > > > +static int btusb_read_alt_setting(struct hci_dev *hdev)
+> > > > +{
+> > > > +       struct btusb_data *data =3D hci_get_drvdata(hdev);
+> > > > +
+> > > > +       return data->isoc_altsetting;
+> > > > +}
+> > > > +
+> > > >  static struct usb_host_interface *btusb_find_altsetting(struct btu=
+sb_data *data,
+> > > >                                                         int alt)
+> > > >  {
+> > > > @@ -3650,32 +3657,6 @@ static const struct file_operations force_po=
+ll_sync_fops =3D {
+> > > >         .llseek         =3D default_llseek,
+> > > >  };
+> > > >
+> > > > -static ssize_t isoc_alt_show(struct device *dev,
+> > > > -                            struct device_attribute *attr,
+> > > > -                            char *buf)
+> > > > -{
+> > > > -       struct btusb_data *data =3D dev_get_drvdata(dev);
+> > > > -
+> > > > -       return sysfs_emit(buf, "%d\n", data->isoc_altsetting);
+> > > > -}
+> > > > -
+> > > > -static ssize_t isoc_alt_store(struct device *dev,
+> > > > -                             struct device_attribute *attr,
+> > > > -                             const char *buf, size_t count)
+> > > > -{
+> > > > -       struct btusb_data *data =3D dev_get_drvdata(dev);
+> > > > -       int alt;
+> > > > -       int ret;
+> > > > -
+> > > > -       if (kstrtoint(buf, 10, &alt))
+> > > > -               return -EINVAL;
+> > > > -
+> > > > -       ret =3D btusb_switch_alt_setting(data->hdev, alt);
+> > > > -       return ret < 0 ? ret : count;
+> > > > -}
+> > > > -
+> > > > -static DEVICE_ATTR_RW(isoc_alt);
+> > > > -
+> > > >  static int btusb_probe(struct usb_interface *intf,
+> > > >                        const struct usb_device_id *id)
+> > > >  {
+> > > > @@ -4040,9 +4021,8 @@ static int btusb_probe(struct usb_interface *=
+intf,
+> > > >                 if (err < 0)
+> > > >                         goto out_free_dev;
+> > > >
+> > > > -               err =3D device_create_file(&intf->dev, &dev_attr_is=
+oc_alt);
+> > > > -               if (err)
+> > > > -                       goto out_free_dev;
+> > > > +               hdev->switch_usb_alt_setting =3D btusb_switch_alt_s=
+etting;
+> > > > +               hdev->read_usb_alt_setting =3D btusb_read_alt_setti=
+ng;
+> > > >         }
+> > > >
+> > > >         if (IS_ENABLED(CONFIG_BT_HCIBTUSB_BCM) && data->diag) {
+> > > > @@ -4089,10 +4069,8 @@ static void btusb_disconnect(struct usb_inte=
+rface *intf)
+> > > >         hdev =3D data->hdev;
+> > > >         usb_set_intfdata(data->intf, NULL);
+> > > >
+> > > > -       if (data->isoc) {
+> > > > -               device_remove_file(&intf->dev, &dev_attr_isoc_alt);
+> > > > +       if (data->isoc)
+> > > >                 usb_set_intfdata(data->isoc, NULL);
+> > > > -       }
+> > > >
+> > > >         if (data->diag)
+> > > >                 usb_set_intfdata(data->diag, NULL);
+> > > > diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetoo=
+th/hci_core.h
+> > > > index f756fac95488..5d3ec5ff5adb 100644
+> > > > --- a/include/net/bluetooth/hci_core.h
+> > > > +++ b/include/net/bluetooth/hci_core.h
+> > > > @@ -641,6 +641,8 @@ struct hci_dev {
+> > > >                                      struct bt_codec *codec, __u8 *=
+vnd_len,
+> > > >                                      __u8 **vnd_data);
+> > > >         u8 (*classify_pkt_type)(struct hci_dev *hdev, struct sk_buf=
+f *skb);
+> > > > +       int (*switch_usb_alt_setting)(struct hci_dev *hdev, int new=
+_alts);
+> > > > +       int (*read_usb_alt_setting)(struct hci_dev *hdev);
+> > > >  };
+> > > >
+> > > >  #define HCI_PHY_HANDLE(handle) (handle & 0xff)
+> > > > diff --git a/net/bluetooth/hci_sysfs.c b/net/bluetooth/hci_sysfs.c
+> > > > index 041ce9adc378..887aa1935b1e 100644
+> > > > --- a/net/bluetooth/hci_sysfs.c
+> > > > +++ b/net/bluetooth/hci_sysfs.c
+> > > > @@ -102,8 +102,41 @@ static ssize_t reset_store(struct device *dev,=
+ struct device_attribute *attr,
+> > > >  }
+> > > >  static DEVICE_ATTR_WO(reset);
+> > > >
+> > > > +static ssize_t isoc_alt_show(struct device *dev,
+> > > > +                            struct device_attribute *attr,
+> > > > +                            char *buf)
+> > > > +{
+> > > > +       struct hci_dev *hdev =3D to_hci_dev(dev);
+> > > > +
+> > > > +       if (hdev->read_usb_alt_setting)
+> > > > +               return sysfs_emit(buf, "%d\n", hdev->read_usb_alt_s=
+etting(hdev));
+> > > > +
+> > > > +       return -ENODEV;
+> > > > +}
+> > > > +
+> > > > +static ssize_t isoc_alt_store(struct device *dev,
+> > > > +                             struct device_attribute *attr,
+> > > > +                             const char *buf, size_t count)
+> > > > +{
+> > > > +       struct hci_dev *hdev =3D to_hci_dev(dev);
+> > > > +       int alt;
+> > > > +       int ret;
+> > > > +
+> > > > +       if (kstrtoint(buf, 10, &alt))
+> > > > +               return -EINVAL;
+> > > > +
+> > > > +       if (hdev->switch_usb_alt_setting) {
+> > > > +               ret =3D hdev->switch_usb_alt_setting(hdev, alt);
+> > > > +               return ret < 0 ? ret : count;
+> > > > +       }
+> > > > +
+> > > > +       return -ENODEV;
+> > > > +}
+> > > > +static DEVICE_ATTR_RW(isoc_alt);
+> > > > +
+> > > >  static struct attribute *bt_host_attrs[] =3D {
+> > > >         &dev_attr_reset.attr,
+> > > > +       &dev_attr_isoc_alt.attr,
+> > > >         NULL,
+> > > >  };
+> > > >  ATTRIBUTE_GROUPS(bt_host);
+> > >
+> > > While this fixes the race it also forces the inclusion of an attribut=
+e
+> > > that is driver specific, so I wonder if we should introduce some
+> > > internal interface to register driver specific entries like this.
+> >
+> > Do you mean you prefer the original interface that only exports the
+> > attribute when isoc_altsetting is supported?
+> > Agree it makes more sense but I hit the obstacle: hci_init_sysfs is
+> > called earlier than data->isoc is determined. I need some time to
+> > verify whether changing the order won't break anything.
+>
+> We might have to do something like the following within hci_init_sysfs:
+>
+> if (hdev->isoc_alt)
+>     dev->type =3D bt_host_isoc_alt
+> else
+>     dev->type =3D bt_host
+>
+> Now perhaps instead of adding the callbacks to hdev we add the
+> attribute itself, btw did you check if there isn't a sysfs entry to
+> interact with USB alternate settings? Because contrary to reset this
+> actually operates directly on the driver bus so it sort of made more
+> sense to me that this would be handled by USB rather than Bluetooth.
+
+A quick git grep shows that this exists:
+
+Documentation/ABI/testing/sysfs-bus-usb:What:
+/sys/bus/usb/devices/usbX/bAlternateSetting
+
+> > >
+> > > > --
+> > > > 2.48.1.262.g85cc9f2d1e-goog
+> > > >
+> > >
+> > >
+> > > --
+> > > Luiz Augusto von Dentz
+>
+>
+>
+> --
+> Luiz Augusto von Dentz
+
+
 
 --=20
-Jeff Layton <jlayton@kernel.org>
+Luiz Augusto von Dentz
 
