@@ -1,394 +1,191 @@
-Return-Path: <netdev+bounces-160833-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-160834-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 35584A1BB87
-	for <lists+netdev@lfdr.de>; Fri, 24 Jan 2025 18:35:34 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id AC9F9A1BB97
+	for <lists+netdev@lfdr.de>; Fri, 24 Jan 2025 18:40:26 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id EDCD1188C94E
-	for <lists+netdev@lfdr.de>; Fri, 24 Jan 2025 17:35:37 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 9A1623AD4BF
+	for <lists+netdev@lfdr.de>; Fri, 24 Jan 2025 17:40:18 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 98CA41CEEA4;
-	Fri, 24 Jan 2025 17:35:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id ECD981D5147;
+	Fri, 24 Jan 2025 17:40:22 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="unFS/zxg"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="I/JMHkc1"
 X-Original-To: netdev@vger.kernel.org
-Received: from out-178.mta1.migadu.com (out-178.mta1.migadu.com [95.215.58.178])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B576B1C5F2B;
-	Fri, 24 Jan 2025 17:35:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.178
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 39C2E19E975
+	for <netdev@vger.kernel.org>; Fri, 24 Jan 2025 17:40:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1737740130; cv=none; b=poro/f4sdnZHaAvw1YQp/M7Yr+/yPC8bEO487Ls0P28DhbR0zHcx2KPbwqVwRPTUVbrAH5Wvxe65GkXtyxPG5zlBujxfXW3NHwWT2n+Rct9JuUHeP9fw2LPvaJ4TUI+FnhSf7/RrHUr6zhztdjiaV44GAT5oAFjJE+CW1YSpqbY=
+	t=1737740422; cv=none; b=RUeazY2HM0UIxR3P8Ak05S3dt614dDb9H8QNFqopVXetAiU6TL70e38Bpi0Ds2lNfA+OPwKpQiaJHq07rU8G3n+rE/n6GnE2kk72Krt6Isy1ApTr2cvp0xuU2yTmbnEP6WgjDGAmkNkqHuVjydKumqZ7V6dzmimdz3MeySO6rX0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1737740130; c=relaxed/simple;
-	bh=YxHdzO8LMBxvXBXKz38pAaN1kH89l4af8hdoM58dBus=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=hTSYB8GBpuE8PbIi4TiqfYh0i7Kdte8iij3LJlNc95O200lc6hM2TTzeE5HH2fW5A9QhEUpr61TxkdyholGgA4u/QR1j1tQ+MF9vFl6S5lYMp9DfLE9HI3v8Y5yn4SvgdfpyvuR6da987wUnPf74KjgzXPvlbLLFy5nVS4Gh3NI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=unFS/zxg; arc=none smtp.client-ip=95.215.58.178
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
-Message-ID: <8186a9c5-8a78-4c0b-a0a3-256231ef8f86@linux.dev>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1737740115;
+	s=arc-20240116; t=1737740422; c=relaxed/simple;
+	bh=c7BfuM+aNXzOUVz+X9FBiS6MH1xtBeoLBoLWszcrx/A=;
+	h=Message-ID:Date:MIME-Version:From:Subject:To:Cc:References:
+	 In-Reply-To:Content-Type; b=OP7yaOcwOAk0hPKcXC0BrYJjqwqlAsRxVgwBn3pmpRzsaGNIfuwplTrKLwGHgnhqmI0CBRzhTEDrzBQDCvDqGCnvQbCFCJDs+Q2wmDHXaEtxaWwRX5atngKciuFSafpqXTa+Kv0rAlGzU1nWOZhjg6tHTIMjmp0MYxLPqJZPrQQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=I/JMHkc1; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1737740420;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=AVDk4Qmge+d9+zv9jHy0P0dAeBXk61CtVVJCRllCkIA=;
-	b=unFS/zxgDEPSFMvJFEcSqIJbrtib+C0YIjREj056krR2nwJI4BQEcOXismH2v/LWd7ItoQ
-	d0FDUDw6vK+Ki/UEaGM9oUEP3ZxfTrsJAYZHIe1pG9MEOW8BG4OjSLYNxQNpL1kRqbaKoQ
-	4cl1fqgxOzUQ+DTLS0YaU71fsHlON7M=
-Date: Fri, 24 Jan 2025 09:35:08 -0800
+	bh=qiYtl14QZ7zAxHwkUe2JLFCtGQr8FTCdbM8LxS988CI=;
+	b=I/JMHkc1SvGyBqOK+VdhWypF7qj3X24vWexpsR1sVOD3PNXIyLl6wkQIjHvIImG4Y0svTV
+	61KstUm1bsIrBNvmvm8IHMPvCMYZoazSDx2YFDUR6XvYCCxyp0+F3NIMxCem6X1Eo0aLmJ
+	3HP6Adh8EFQzwiGCz3mwnCQGKChrJYs=
+Received: from mail-qk1-f198.google.com (mail-qk1-f198.google.com
+ [209.85.222.198]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-373-9x1bexOtPyOzbO4DW6rwgw-1; Fri, 24 Jan 2025 12:40:19 -0500
+X-MC-Unique: 9x1bexOtPyOzbO4DW6rwgw-1
+X-Mimecast-MFC-AGG-ID: 9x1bexOtPyOzbO4DW6rwgw
+Received: by mail-qk1-f198.google.com with SMTP id af79cd13be357-7bb849aa5fbso532473485a.0
+        for <netdev@vger.kernel.org>; Fri, 24 Jan 2025 09:40:18 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1737740418; x=1738345218;
+        h=content-transfer-encoding:in-reply-to:content-language:references
+         :cc:to:subject:from:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=qiYtl14QZ7zAxHwkUe2JLFCtGQr8FTCdbM8LxS988CI=;
+        b=mRIU1Kk12CBDS8Z+7P4jnv8VaY4VuyDdcwbV02Ighnm2Eiaf9CNlIzdfJlKlhCd7WA
+         t5iiX8Tp5/kKrCowxnJNzeKFun+REUGgB1xu3GO7X6+LPE6w6c66W6ym8+465sydKYB0
+         7FWndYbz2mwijjB4o8bUaiqFf4S9ERtJ3IgzkFyWJ+s3lXUPdRpo58AZAUCxfPhLJktG
+         L1Rhbp2COtu5TiPNP3YZgVSO5H2QV543oOXjrkQ7nxsDCio+01jx3R8mGIHUsNPRzszK
+         mdAlraU3XKwAAFYptC3SDgCtWnRFbincOdTLFDrmu4p1eB6toCbPWILEGNmGvBWfXZm9
+         AFGQ==
+X-Forwarded-Encrypted: i=1; AJvYcCV0QsQMw9JvR0ipR0MZfGPZjnx0hupfBf/Hjvq1uLhYxBcvIQJni6lr1dlXJkVU0tewCvobDTQ=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwF+dPN2tiIjEGHAlRQB+03IZWtzulD/8Baf5kQeV9Kr09Dga7C
+	y2BKasGFIJGddZsY85dkh1wGcwQHUUVJvJKJ7dTaP6Opg80Zt+J6zcGnSlj11Pd5aYLvg3GKiXF
+	5DCPXogrJVElXuiiaIXyk7q79jWd6KFk38UdfWCVf7s3mRBeQIh1XIw==
+X-Gm-Gg: ASbGncvlkJ2eI8IiDDhfNtLXi1F++ZEUhwGwvOTlZolkFcMdqR+XL1aCDL77MdYskiP
+	oZYXLjd+iN3zArM8U2zBPTgyhG9yDzWjAzBYY202Od0EpLsirw8Km8mSbVvzju5RZPnMAFaBQd2
+	efQ4pXTzvFcDy3/VKp1gPI6bj3xRlaJQkRQwGXqzRpj0zWhz53obJWZosZPkqzDfkT0Cl98Z33e
+	dG3UA1zH+Z4tAZvoiRDCdqyNWJ0eNWbsQ0JURoxLH2a7xdm9lhZR73pW00sx6JYFSyZ
+X-Received: by 2002:a05:620a:408e:b0:7b6:eef3:aeaf with SMTP id af79cd13be357-7be6314c992mr4581223985a.0.1737740418532;
+        Fri, 24 Jan 2025 09:40:18 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IHxmVhPWR7fVNGigt+spyE8WWD83ve2cHRaJVuBSHFxWI070EZJPVN31nh9mZWqAudHBkvXzQ==
+X-Received: by 2002:a05:620a:408e:b0:7b6:eef3:aeaf with SMTP id af79cd13be357-7be6314c992mr4581220685a.0.1737740418235;
+        Fri, 24 Jan 2025 09:40:18 -0800 (PST)
+Received: from [10.0.0.215] ([24.225.235.209])
+        by smtp.gmail.com with ESMTPSA id af79cd13be357-7be9af0d181sm113605385a.105.2025.01.24.09.40.17
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Fri, 24 Jan 2025 09:40:17 -0800 (PST)
+Message-ID: <e15ff7f6-00b7-4071-866a-666a296d0b15@redhat.com>
+Date: Fri, 24 Jan 2025 12:40:16 -0500
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Subject: Re: [PATCH RFC net-next] trace: tcp: Add tracepoint for
- tcp_cwnd_reduction()
-Content-Language: en-GB
-To: Steven Rostedt <rostedt@goodmis.org>
-Cc: Breno Leitao <leitao@debian.org>, Jason Xing <kerneljasonxing@gmail.com>,
- Eric Dumazet <edumazet@google.com>, Masami Hiramatsu <mhiramat@kernel.org>,
- Mathieu Desnoyers <mathieu.desnoyers@efficios.com>,
- "David S. Miller" <davem@davemloft.net>, David Ahern <dsahern@kernel.org>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- Simon Horman <horms@kernel.org>, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org, linux-trace-kernel@vger.kernel.org,
- kernel-team@meta.com, Song Liu <song@kernel.org>,
- Martin KaFai Lau <martin.lau@kernel.org>
-References: <20250120-cwnd_tracepoint-v1-1-36b0e0d643fa@debian.org>
- <CAL+tcoC+A94uzaSZ+SKhV04=iDWrvUGEfxYJKYCF0ovqvyhfOg@mail.gmail.com>
- <20250120-panda-of-impressive-aptitude-2b714e@leitao>
- <CAL+tcoCzStjkEMdNw5ORYbQy3VnVE9A6aj6HcmQvGj3VG1VypA@mail.gmail.com>
- <20250120-daring-outstanding-jaguarundi-c8aaed@leitao>
- <20250120100340.4129eff7@batman.local.home>
- <20250122-vengeful-myna-of-tranquility-f0f8cf@leitao>
- <20250122095604.3c93bc93@gandalf.local.home>
- <4f3dfc10-7959-4ec7-9ce7-7a555f4865c2@linux.dev>
- <20250124105022.7baeeb33@gandalf.local.home>
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Yonghong Song <yonghong.song@linux.dev>
-In-Reply-To: <20250124105022.7baeeb33@gandalf.local.home>
+User-Agent: Mozilla Thunderbird
+From: Jon Maloy <jmaloy@redhat.com>
+Subject: Re: [net,v2] tcp: correct handling of extreme memory squeeze
+To: Eric Dumazet <edumazet@google.com>
+Cc: Neal Cardwell <ncardwell@google.com>, netdev@vger.kernel.org,
+ davem@davemloft.net, kuba@kernel.org, passt-dev@passt.top,
+ sbrivio@redhat.com, lvivier@redhat.com, dgibson@redhat.com,
+ eric.dumazet@gmail.com, Menglong Dong <menglong8.dong@gmail.com>
+References: <20250117214035.2414668-1-jmaloy@redhat.com>
+ <CADVnQymiwUG3uYBGMc1ZEV9vAUQzEOD4ymdN7Rcqi7yAK9ZB5A@mail.gmail.com>
+ <afb9ff14-a2f1-4c5a-a920-bce0105a7d41@redhat.com>
+ <c41deefb-9bc8-47b8-bff0-226bb03265fe@redhat.com>
+ <CANn89i+RRxyROe3wx6f4y1nk92Y-0eaahjh-OGb326d8NZnK9A@mail.gmail.com>
+Content-Language: en-US
+In-Reply-To: <CANn89i+RRxyROe3wx6f4y1nk92Y-0eaahjh-OGb326d8NZnK9A@mail.gmail.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Migadu-Flow: FLOW_OUT
+Content-Transfer-Encoding: 8bit
 
 
 
-
-On 1/24/25 7:50 AM, Steven Rostedt wrote:
-> On Thu, 23 Jan 2025 20:40:20 -0800
-> Yonghong Song <yonghong.song@linux.dev> wrote:
->
->> Hi, Steve,
->>
->> I did some prototype to support bpf dynamic_events tracepoint. I fixed a couple of issues
-> Before I go further, I want to make sure that we have our terminology's
-> inline. A dynamic event is one that is created at run time. For example, a
-> kprobe event is a dynamic event. Other dynamic events are synthetic events,
-> event probes, and uprobes.
->
->> but still not working. See the hacked patch:
->>
->> diff --git a/include/trace/events/sched.h b/include/trace/events/sched.h
->> index 9ea4c404bd4e..729ea1c21c94 100644
->> --- a/include/trace/events/sched.h
->> +++ b/include/trace/events/sched.h
->> @@ -824,6 +824,15 @@ DECLARE_TRACE(sched_compute_energy_tp,
->>                    unsigned long max_util, unsigned long busy_time),
->>           TP_ARGS(p, dst_cpu, energy, max_util, busy_time));
->>                                                                                                                                             
->> +/* At /sys/kernel/debug/tracing directory, do
->> + *   echo 't sched_switch_dynamic' >> dynamic_events
->> + * before actually use this tracepoint. The tracepoint will be at
->> + *   /sys/kernel/debug/tracing/events/tracepoints/sched_switch_dynamic/
->> + */
->> +DECLARE_TRACE(sched_switch_dynamic,
->> +       TP_PROTO(bool preempt),
->> +       TP_ARGS(preempt));
-> The above is just creating a tracepoint and no "event" is attached to it.
->
-> tracepoints (defined in include/linux/tracepoints.h) are what creates the
-> hooks within the kernel. The trace_##call() functions, like trace_sched_switch().
-> A trace event is something that can be attached to tracepoints, and show up
-> in the tracefs file system. The TRACE_EVENT() macro will create both a
-> tracepoint and a trace event that attaches to the tracepoint it created.
->
->> +
->>    #endif /* _TRACE_SCHED_H */
->>                                                                                                                                             
->>    /* This part must be outside protection */
->> diff --git a/kernel/events/core.c b/kernel/events/core.c
->> index 065f9188b44a..37391eb5089f 100644
->> --- a/kernel/events/core.c
->> +++ b/kernel/events/core.c
->> @@ -10749,6 +10749,7 @@ static inline bool perf_event_is_tracing(struct perf_event *event)
->>    int perf_event_set_bpf_prog(struct perf_event *event, struct bpf_prog *prog,
->>                               u64 bpf_cookie)
->>    {
->> +       u32 dyn_tp_flags = TRACE_EVENT_FL_DYNAMIC | TRACE_EVENT_FL_FPROBE;
->>           bool is_kprobe, is_uprobe, is_tracepoint, is_syscall_tp;
->>     
->>           if (!perf_event_is_tracing(event))
->> @@ -10756,7 +10757,9 @@ int perf_event_set_bpf_prog(struct perf_event *event, struct bpf_prog *prog,
->>     
->>           is_kprobe = event->tp_event->flags & TRACE_EVENT_FL_KPROBE;
->>           is_uprobe = event->tp_event->flags & TRACE_EVENT_FL_UPROBE;
->> -       is_tracepoint = event->tp_event->flags & TRACE_EVENT_FL_TRACEPOINT;
->> +       is_tracepoint = (event->tp_event->flags & TRACE_EVENT_FL_TRACEPOINT) ||
->> +                       ((event->tp_event->flags & dyn_tp_flags) == dyn_tp_flags);
->> +
->>           is_syscall_tp = is_syscall_trace_event(event->tp_event);
->>           if (!is_kprobe && !is_uprobe && !is_tracepoint && !is_syscall_tp)
->>                   /* bpf programs can only be attached to u/kprobe or tracepoint */
->> diff --git a/kernel/sched/core.c b/kernel/sched/core.c
->> index 3e5a6bf587f9..53b3d9e20d00 100644
->> --- a/kernel/sched/core.c
->> +++ b/kernel/sched/core.c
->> @@ -6750,6 +6750,7 @@ static void __sched notrace __schedule(int sched_mode)
->>                   psi_account_irqtime(rq, prev, next);
->>                   psi_sched_switch(prev, next, block);
->>     
->> +               trace_sched_switch_dynamic(preempt);
->>                   trace_sched_switch(preempt, prev, next, prev_state);
->>     
->>                   /* Also unlocks the rq: */
->> diff --git a/kernel/trace/bpf_trace.c b/kernel/trace/bpf_trace.c
->> index 71c1c02ca7a3..8f9fd2f347ef 100644
->> --- a/kernel/trace/bpf_trace.c
->> +++ b/kernel/trace/bpf_trace.c
->> @@ -2448,7 +2448,8 @@ int bpf_get_perf_event_info(const struct perf_event *event, u32 *prog_id,
->>                               u64 *probe_offset, u64 *probe_addr,
->>                               unsigned long *missed)
->>    {
->> -       bool is_tracepoint, is_syscall_tp;
->> +       u32 dyn_tp_flags = TRACE_EVENT_FL_DYNAMIC | TRACE_EVENT_FL_FPROBE;
->> +       bool is_tracepoint, is_dyn_tracepoint, is_syscall_tp;
->>           struct bpf_prog *prog;
->>           int flags, err = 0;
->>     
->> @@ -2463,9 +2464,10 @@ int bpf_get_perf_event_info(const struct perf_event *event, u32 *prog_id,
->>           *prog_id = prog->aux->id;
->>           flags = event->tp_event->flags;
->>           is_tracepoint = flags & TRACE_EVENT_FL_TRACEPOINT;
->> +       is_dyn_tracepoint = (event->tp_event->flags & dyn_tp_flags) == dyn_tp_flags;
->>           is_syscall_tp = is_syscall_trace_event(event->tp_event);
->>     
->> -       if (is_tracepoint || is_syscall_tp) {
->> +       if (is_tracepoint || is_dyn_tracepoint || is_syscall_tp) {
->>                   *buf = is_tracepoint ? event->tp_event->tp->name
->>                                        : event->tp_event->name;
->>                   /* We allow NULL pointer for tracepoint */
->> diff --git a/kernel/trace/trace_fprobe.c b/kernel/trace/trace_fprobe.c
->> index c62d1629cffe..bacc4a1f5f20 100644
->> --- a/kernel/trace/trace_fprobe.c
->> +++ b/kernel/trace/trace_fprobe.c
->> @@ -436,8 +436,10 @@ static struct trace_fprobe *find_trace_fprobe(const char *event,
->>     
->>    static inline int __enable_trace_fprobe(struct trace_fprobe *tf)
->>    {
->> -       if (trace_fprobe_is_registered(tf))
->> +       if (trace_fprobe_is_registered(tf)) {
->> +               pr_warn("fprobe is enabled\n");
->>                   enable_fprobe(&tf->fp);
->> +       }
->>     
->>           return 0;
->>    }
->> diff --git a/tools/testing/selftests/bpf/prog_tests/send_signal.c b/tools/testing/selftests/bpf/prog_tests/send_signal.c
->> index 1702aa592c2c..423770aa581e 100644
->> --- a/tools/testing/selftests/bpf/prog_tests/send_signal.c
->> +++ b/tools/testing/selftests/bpf/prog_tests/send_signal.c
->> @@ -196,6 +196,8 @@ static void test_send_signal_common(struct perf_event_attr *attr,
->>           /* notify child safe to exit */
->>           ASSERT_EQ(write(pipe_p2c[1], buf, 1), 1, "pipe_write");
->>     
->> +       ASSERT_EQ(skel->bss->dyn_tp_visited, 1, "dyn_tp_visited");
->> +
->>    disable_pmu:
->>           close(pmu_fd);
->>    destroy_skel:
->> @@ -260,6 +262,8 @@ void test_send_signal(void)
->>    {
->>           if (test__start_subtest("send_signal_tracepoint"))
->>                   test_send_signal_tracepoint(false, false);
->> +/* Disable all other subtests except above send_signal_tracepoint. */
->> +if (0) {
->>           if (test__start_subtest("send_signal_perf"))
->>                   test_send_signal_perf(false, false);
->>           if (test__start_subtest("send_signal_nmi"))
->> @@ -285,3 +289,4 @@ void test_send_signal(void)
->>           if (test__start_subtest("send_signal_nmi_thread_remote"))
->>                   test_send_signal_nmi(true, true);
->>    }
-> The above looks like you are trying to create your own dynamic event on top
-> of the tracepoint you made.
->
->> +}
->> diff --git a/tools/testing/selftests/bpf/progs/test_send_signal_kern.c b/tools/testing/selftests/bpf/progs/test_send_signal_kern.c
->> index 176a355e3062..9b580d437046 100644
->> --- a/tools/testing/selftests/bpf/progs/test_send_signal_kern.c
->> +++ b/tools/testing/selftests/bpf/progs/test_send_signal_kern.c
->> @@ -60,6 +60,20 @@ int send_signal_tp_sched(void *ctx)
->>           return bpf_send_signal_test(ctx);
->>    }
->>     
->> +int dyn_tp_visited = 0;
->> +#if 1
->> +/* This will fail */
->> +SEC("tracepoint/tracepoints/sched_switch_dynamic")
->> +#else
->> +/* This will succeed */
->> +SEC("tracepoint/sched/sched_switch")
->> +#endif
-> I don't know bpf code at all, so I don't know what this is trying to do. Is
-> it looking at the tracefs file system?
-
-Thanks for the above clarification for terminologies.
-For the above code, yet, I try to look at tracefs file system since
-at runtime once we add 'sched_switch_dynamic' to dynamic_events,
-the above tracepoint tracepoints/sched_switch_dynamic will show up
-in /sys/kernel/debug/tracing/events/ directory.
-
->
-> What I was suggesting, was not to use trace events at all (nothing should
-> be added to the tracefs files system). You would need some code inside the
-> kernel to search for tracepoints that are not exported to tracefs and then
-> BPF could provide its own hooks to them. Isn't this what BPF raw tracepoints do?
-
-Thanks for suggestion! I tried and raw tracepoint indeed work. The following
-is a hack:
-
-diff --git a/include/trace/events/sched.h b/include/trace/events/sched.h
-index 9ea4c404bd4e..db28c5c37a10 100644
---- a/include/trace/events/sched.h
-+++ b/include/trace/events/sched.h
-@@ -824,6 +824,10 @@ DECLARE_TRACE(sched_compute_energy_tp,
-                  unsigned long max_util, unsigned long busy_time),
-         TP_ARGS(p, dst_cpu, energy, max_util, busy_time));
-                                                                                                                                           
-+DECLARE_TRACE(sched_switch_hack,
-+       TP_PROTO(bool preempt),
-+       TP_ARGS(preempt));
-+
-  #endif /* _TRACE_SCHED_H */
-                                                                                                                                           
-  /* This part must be outside protection */
-diff --git a/kernel/sched/core.c b/kernel/sched/core.c
-index 88a9a515b2ba..df3e52d89c94 100644
---- a/kernel/sched/core.c
-+++ b/kernel/sched/core.c
-@@ -6754,6 +6754,7 @@ static void __sched notrace __schedule(int sched_mode)
-                 psi_sched_switch(prev, next, !task_on_rq_queued(prev) ||
-                                              prev->se.sched_delayed);
-                                                                                                                                           
-+               trace_sched_switch_hack(preempt);
-                 trace_sched_switch(preempt, prev, next, prev_state);
-   
-                 /* Also unlocks the rq: */
-diff --git a/tools/testing/selftests/bpf/prog_tests/send_signal.c b/tools/testing/selftests/bpf/prog_tests/send_signal.c
-index 1702aa592c2c..937d5e05fe08 100644
---- a/tools/testing/selftests/bpf/prog_tests/send_signal.c
-+++ b/tools/testing/selftests/bpf/prog_tests/send_signal.c
-@@ -195,6 +195,8 @@ static void test_send_signal_common(struct perf_event_attr *attr,
-   
-         /* notify child safe to exit */
-         ASSERT_EQ(write(pipe_p2c[1], buf, 1), 1, "pipe_write");
-+       if (!attr)
-+               ASSERT_EQ(skel->bss->dyn_tp_visited, 1, "dyn_tp_visited");
-   
-  disable_pmu:
-         close(pmu_fd);
-diff --git a/tools/testing/selftests/bpf/progs/test_send_signal_kern.c b/tools/testing/selftests/bpf/progs/test_send_signal_kern.c
-index 176a355e3062..abed1a55ae3b 100644
---- a/tools/testing/selftests/bpf/progs/test_send_signal_kern.c
-+++ b/tools/testing/selftests/bpf/progs/test_send_signal_kern.c
-@@ -60,6 +60,15 @@ int send_signal_tp_sched(void *ctx)
-         return bpf_send_signal_test(ctx);
-  }
-   
-+int dyn_tp_visited = 0;
-+
-+SEC("raw_tp/sched_switch_hack")
-+int send_signal_dyn_tp_sched(void *ctx)
-+{
-+       dyn_tp_visited = 1;
-+       return 0;
-+}
-+
-  SEC("perf_event")
-  int send_signal_perf(void *ctx)
-  {
-
-The raw_tp/sched_switch_hack works great!
-
->
->> +int send_signal_dyn_tp_sched(void *ctx)
->> +{
->> +       dyn_tp_visited = 1;
->> +       return 0;
->> +}
->> +
->>    SEC("perf_event")
->>    int send_signal_perf(void *ctx)
->>    {
->>
->> To test the above, build the latest bpf-next and then apply the above change.
->> Boot the updated kernel and boot into a qemu VM and run bpf selftest
->>     ./test_progs -t send_signal
->>
->> With tracepoint tracepoint/sched/sched_switch, the test result is correct.
->> With tracepoint tracepoint/tracepoints/sched_switch_dynamic, the test failed.
->> The test failure means the sched_switch_dynamic tracepoint is not
->> triggered with the bpf program.
->>
->> As expected, do
->>     echo 1 > /sys/kernel/debug/tracing/events/tracepoints/sched_switch_dynamic/enable
->> and the sched_switch_dynamic tracepoint works as expected (trace_pipe can dump
->> the expected result).
->>
->> For both 'echo 1 > .../sched_switch_dynamic/enable' approach and
->> bpf tracepoint tracepoint/tracepoints/sched_switch_dynamic, the message
->>     fprobe is enabled
->> is printed out in dmesg. The following is enable_fprobe() code.
->>
->> /**
->>    * enable_fprobe() - Enable fprobe
->>    * @fp: The fprobe to be enabled.
->>    *
->>    * This will soft-enable @fp.
->>    */
->> static inline void enable_fprobe(struct fprobe *fp)
->> {
->>           if (fp)
->>                   fp->flags &= ~FPROBE_FL_DISABLED;
->> }
->>
->> Note that in the above the fprobe/dynamic_events is soft-enable.
->> Maybe the bpf tracepoint/tracepoints/sched_switch_dynamic only has
->> soft-enable and 'echo 1 > ...' approach has both soft-enable and
->> actual hard-enable (at pmu level)? If this is the case, what is
->> missing for hard-enable for bpf dynamic_events case? Do you have
->> any suggestions?
+On 2025-01-20 11:22, Eric Dumazet wrote:
+> On Mon, Jan 20, 2025 at 5:10 PM Jon Maloy <jmaloy@redhat.com> wrote:
 >>
 >>
->> The above prototype tries to reuse the existing infra/API.
->> If you have better way to support dynamic_events, please let me know.
-> Either create a full trace event (one that is exposed in tracefs), or add a
-> direct hook to the tracepoint you want. What the above looks like is some
-> kind of mixture of the two. No "dynamic events" should be involed.
+>>
+>> On 2025-01-20 00:03, Jon Maloy wrote:
+>>>
+>>>
 
-Indeed, as you suggested in the above, raw_tracepoint works fine for bpf
-for those DECLARE_TRACE tracepoints. We can just use it.
+[...]
 
->
-> -- Steve
->
+>>>> I agree with Eric that probably tp->pred_flags should be cleared, and
+>>>> a packetdrill test for this would be super-helpful.
+>>>
+>>> I must admit I have never used packetdrill, but I can make an effort.
+>>
+>> I hear from other sources that you cannot force a memory exhaustion with
+>> packetdrill anyway, so this sounds like a pointless exercise.
+> 
+> We certainly can and should add a feature like that to packetdrill.
+> 
+> Documentation/fault-injection/ has some relevant information.
+> 
+> Even without this, tcp_try_rmem_schedule() is reading sk->sk_rcvbuf
+> that could be lowered by a packetdrill script I think.
+> 
+Neal, Eric,
+How do you suggest we proceed with this?
+I downloaded packetdrill and tried it a bit, but to understand it well 
+enough to introduce a new feature would require more time than I am
+able to spend on this. Maybe Neal, who I see is one of the contributors 
+to packetdrill could help out?
+
+I can certainly clear tp->pred_flags and post it again, maybe with
+an improved and shortened log. Would that be acceptable?
+
+I also made a run where I looked into why __tcp_select_window()
+ignores all the space that has been freed up:
+
+
+  tcp_recvmsg_locked(->)
+    __tcp_cleanup_rbuf(->) (copied 131072)
+      tp->rcv_wup: 1788299855, tp->rcv_wnd: 5812224,
+      tp->rcv_nxt 1793800175
+      __tcp_select_window(->)
+        tcp_space(->)
+        tcp_space(<-) returning 458163
+        free_space = round_down(458163, 1 << 4096) = 454656
+        (free_space > tp->rcv_ssthresh) -->
+          free_space = tp->rcv_ssthresh = 261920
+        window = ALIGN(261920, 4096) = 26144
+      __tcp_select_window(<-) returning 262144
+      [rcv_win_now 311904, 2 * rcv_win_now 623808, new_window 262144]
+      (new_window >= (2 * rcv_win_now)) ? --> time_to_ack 0
+      NOT calling tcp_send_ack()
+    __tcp_cleanup_rbuf(<-)
+    [tp->rcv_wup 1788299855, tp->rcv_wnd 5812224,
+     tp->rcv_nxt 1793800175]
+  tcp_recvmsg_locked(<-) returning 131072 bytes.
+  [tp->rcv_nxt 1793800175, tp->rcv_wnd 5812224,
+   tp->rcv_wup 1788299855, sk->last_ack 0, tcp_receive_win() 311904,
+   copied_seq 1788299855->1788395953 (96098), unread 5404222,
+   sk_rcv_qlen 83, ofo_qlen 0]
+
+
+As we see tp->rcv_ssthresh is the limiting factor, causing
+a consistent situation where (new_window < (rcv_win_now * 2)),
+and even (new_window < rcv_win_now).
+
+To me, it looks like tp->ssthresh should have a higher value
+in this situation, or maybe we should alter this test.
+
+The combination of these two issues, -not updating tp->wnd and
+_tcp_select_window() returning a wrong value, is what is causing
+this whole problem.
+
+///jon
+
+
+
+
 
 
