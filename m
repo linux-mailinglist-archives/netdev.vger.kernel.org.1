@@ -1,314 +1,264 @@
-Return-Path: <netdev+bounces-160789-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-160788-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id BF365A1B7A4
-	for <lists+netdev@lfdr.de>; Fri, 24 Jan 2025 15:12:41 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id C801BA1B79B
+	for <lists+netdev@lfdr.de>; Fri, 24 Jan 2025 15:11:28 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 44AA93AB076
-	for <lists+netdev@lfdr.de>; Fri, 24 Jan 2025 14:12:34 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 1706E16D9A2
+	for <lists+netdev@lfdr.de>; Fri, 24 Jan 2025 14:11:27 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 37D2A82D98;
-	Fri, 24 Jan 2025 14:12:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0E40684A5B;
+	Fri, 24 Jan 2025 14:11:27 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=digikod.net header.i=@digikod.net header.b="XoMXH/JB"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Ny4d+A4b"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp-1908.mail.infomaniak.ch (smtp-1908.mail.infomaniak.ch [185.125.25.8])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C01964C62E
-	for <netdev@vger.kernel.org>; Fri, 24 Jan 2025 14:12:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.125.25.8
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D0CBA7C6E6;
+	Fri, 24 Jan 2025 14:11:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1737727958; cv=none; b=OKxng0U1NN/bcxidB26SP32g2e4hta/wInyU8CIsPk81Hg5qpth/h2h9/9QK4lpSm/PJIuKPDFiIpLhpqnvtGewvkwQHz6hb4NJbYDpX9w53sV3qBLuRr2ZZw+iHBOSExBGz7tdq9T470tGCfl/AHu1qKVekbkD8cBDx97+LUPA=
+	t=1737727886; cv=none; b=WTfPebfASYu/OVP/mtMyGchldwNr+eZd/5fV0ZEp421RFG15+W0M5PCgjOuzDo8nyhZQASYjb/OAmTc7NqfjMc+vRq3CFmmzm3uDdtN7TTsaRwjIEBzU/HHZWUvnhs1TmNGV83LyB5sTdWJb/iKBnI37OQZ44wgKcnJtHO0KRB8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1737727958; c=relaxed/simple;
-	bh=ayLzI3PcVNoJJ/9/YTWL43yXwbohQ8ndnuvu17sCUQM=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=txWoOTFAECn0PyZfopj/yYd9MzUv8i2EVYQCQA3UwmH5InXMWcJ71bBFe/Y0GaqrGy2NPt1xr8P6+t1VK9NW7xLL0PM8QJ9nPc+BxWKsfnKVvzld7xWKOpu7ink/PxvLkWviMbxIp/13TEXY5Sgc8MJ+3Vv9S+8gnjkIhp6DQnk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=digikod.net; spf=pass smtp.mailfrom=digikod.net; dkim=pass (1024-bit key) header.d=digikod.net header.i=@digikod.net header.b=XoMXH/JB; arc=none smtp.client-ip=185.125.25.8
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=digikod.net
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=digikod.net
-Received: from smtp-3-0000.mail.infomaniak.ch (unknown [IPv6:2001:1600:4:17::246b])
-	by smtp-3-3000.mail.infomaniak.ch (Postfix) with ESMTPS id 4Yfff11psFzZvL;
-	Fri, 24 Jan 2025 15:02:49 +0100 (CET)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=digikod.net;
-	s=20191114; t=1737727369;
-	bh=IXUNr4Gyj8z5bhejqLZS4+EX5Ut/oNejaYpglm863h4=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=XoMXH/JBxb0ZJED1oWRFm3J/b6zc9fiUdgzmKa2IlTwfcu+6TwT/93KHOiCJBjMW3
-	 wBqJ30Zq5NDfPjqGruz/ZALsa1sCrvzOr42j4EW/+Oy+pLDn6n2JaBIWgvtpDyYghN
-	 +2WVgf3UkcOevsAZ/oKWAn0EXHGxw9ScOuiha3xo=
-Received: from unknown by smtp-3-0000.mail.infomaniak.ch (Postfix) with ESMTPA id 4Yffdz6mPTzckd;
-	Fri, 24 Jan 2025 15:02:47 +0100 (CET)
-Date: Fri, 24 Jan 2025 15:02:47 +0100
-From: =?utf-8?Q?Micka=C3=ABl_Sala=C3=BCn?= <mic@digikod.net>
-To: Mikhail Ivanov <ivanov.mikhail1@huawei-partners.com>
-Cc: =?utf-8?Q?G=C3=BCnther?= Noack <gnoack3000@gmail.com>, 
-	=?utf-8?Q?G=C3=BCnther?= Noack <gnoack@google.com>, willemdebruijn.kernel@gmail.com, 
-	linux-security-module@vger.kernel.org, netdev@vger.kernel.org, netfilter-devel@vger.kernel.org, 
-	yusongping@huawei.com, artem.kuzin@huawei.com, konstantin.meskhidze@huawei.com, 
-	Matthieu Buffet <matthieu@buffet.re>
-Subject: Re: [RFC PATCH v3 01/19] landlock: Support socket access-control
-Message-ID: <20250124.sei0Aur6aegu@digikod.net>
-References: <eafd855d-2681-8dfd-a2be-9c02fc07050d@huawei-partners.com>
- <20241128.um9voo5Woo3I@digikod.net>
- <af72be74-50c7-d251-5df3-a2c63c73296a@huawei-partners.com>
- <f6b255c9-5a88-fedd-5d25-dd7d09ddc989@huawei-partners.com>
- <20250110.2893966a7649@gnoack.org>
- <3cdf6001-4ad4-6edc-e436-41a1eaf773f3@huawei-partners.com>
- <20250110.8ae6c145948f@gnoack.org>
- <cd78c2c8-feb3-b7f1-90be-3f6ab3becc09@huawei-partners.com>
- <20250114.maiR6ueChieD@digikod.net>
- <aac17a25-eb9e-342e-953a-094ae0e86b54@huawei-partners.com>
+	s=arc-20240116; t=1737727886; c=relaxed/simple;
+	bh=jAvqWJ7yhUiFZNafZTKzScdFt8IoxWPnx39/7EcBfJQ=;
+	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
+	 Content-Type:MIME-Version; b=Wt5fwNwDZ5c8sCT+wrYrarYAaWGb8chS3/2Bkc7JzzIS5I9VWJ88BEtnb036OtkblJSY2NhoWnpWT8ZDRjH+JVs7pBUwY5EflxE0Rz508TlrEOgynUyAAizy7U9yGjsIr9HIrrcqBZeyFkG68uDGQbYYRwzA4WsrWT/CDYB+eEY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Ny4d+A4b; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 37961C4CED2;
+	Fri, 24 Jan 2025 14:11:25 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1737727886;
+	bh=jAvqWJ7yhUiFZNafZTKzScdFt8IoxWPnx39/7EcBfJQ=;
+	h=Subject:From:To:Cc:Date:In-Reply-To:References:From;
+	b=Ny4d+A4bnA1U5HWq7uK6iXLlTBG+O8YQNhb3oisEJTA3mIXTc6Tq2rVHpA3YLxkFG
+	 YM2tObwQcZjAoxnfJdvXygqdaW7HoRfVcjgSQ4GLCS3hJOBOFphi07zeP4PaMLH3f/
+	 qohcYEm01SdxFMUHPzZ61Y0Gbub3876qiBtRgepYokBeJzPBlRgXFMzp4ISYeiQAAB
+	 lSBVCN5hyM3wpOHOxl5PxWBhzAx7dN//4OTUIt3Sv/5ed52XUj6d1Iu7LAcFcda6d5
+	 5QvMTZL7Z0BlNARAEV6gpU0GKBdKi1w/IwG6kQ98Vl6cDt1xUCCDT8kkBIZZRFn8Ib
+	 Mo/G5tk5n5XZw==
+Message-ID: <8314a4b3823ead3dc08411dd48da70e5dcf6b2ae.camel@kernel.org>
+Subject: Re: [PATCH 3/8] nfsd: when CB_SEQUENCE gets NFS4ERR_DELAY, release
+ the slot
+From: Jeff Layton <jlayton@kernel.org>
+To: "J. Bruce Fields" <bfields@fieldses.org>
+Cc: Chuck Lever <chuck.lever@oracle.com>, Neil Brown <neilb@suse.de>, Olga
+ Kornievskaia <okorniev@redhat.com>, Dai Ngo <Dai.Ngo@oracle.com>, Tom
+ Talpey <tom@talpey.com>, Kinglong Mee	 <kinglongmee@gmail.com>, Trond
+ Myklebust <trondmy@kernel.org>, Anna Schumaker	 <anna@kernel.org>, "David
+ S. Miller" <davem@davemloft.net>, Eric Dumazet	 <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni	 <pabeni@redhat.com>, Simon
+ Horman <horms@kernel.org>, linux-nfs@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, netdev@vger.kernel.org
+Date: Fri, 24 Jan 2025 09:11:24 -0500
+In-Reply-To: <Z5OdECjsie-MCFel@poldevia.fieldses.org>
+References: <20250123-nfsd-6-14-v1-0-c1137a4fa2ae@kernel.org>
+	 <20250123-nfsd-6-14-v1-3-c1137a4fa2ae@kernel.org>
+	 <a95521d2-18a2-48d2-b770-6db25bca5cab@oracle.com>
+	 <4f89125253d82233b5b14c6e0c4fd7565b1824e0.camel@kernel.org>
+	 <Z5OdECjsie-MCFel@poldevia.fieldses.org>
+Autocrypt: addr=jlayton@kernel.org; prefer-encrypt=mutual;
+ keydata=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
+ QZIQXVeAA+smfTT0tDrisj1U5x6ZB9b3nBg65kc=
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+User-Agent: Evolution 3.54.3 (3.54.3-1.fc41) 
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <aac17a25-eb9e-342e-953a-094ae0e86b54@huawei-partners.com>
-X-Infomaniak-Routing: alpha
 
-On Fri, Jan 24, 2025 at 03:28:02PM +0300, Mikhail Ivanov wrote:
-> On 1/14/2025 9:31 PM, Mickaël Salaün wrote:
-> > Happy new year!
-> > 
-> > On Fri, Jan 10, 2025 at 07:55:10PM +0300, Mikhail Ivanov wrote:
-> > > On 1/10/2025 7:27 PM, Günther Noack wrote:
-> > > > On Fri, Jan 10, 2025 at 04:02:42PM +0300, Mikhail Ivanov wrote:
-> > > > > Correct, but we also agreed to use bitmasks for "family" field as well:
-> > > > > 
-> > > > > https://lore.kernel.org/all/af72be74-50c7-d251-5df3-a2c63c73296a@huawei-partners.com/
-> > > > 
-> > > > OK
-> > > > 
-> > > > 
-> > > > > On 1/10/2025 2:12 PM, Günther Noack wrote:
-> > > > > > I do not understand why this convenience feature in the UAPI layer
-> > > > > > requires a change to the data structures that Landlock uses
-> > > > > > internally?  As far as I can tell, struct landlock_socket_attr is only
-> > > > > > used in syscalls.c and converted to other data structures already.  I
-> > > > > > would have imagined that we'd "unroll" the specified bitmasks into the
-> > > > > > possible combinations in the add_rule_socket() function and then call
-> > > > > > landlock_append_socket_rule() multiple times with each of these?
-> > 
-> > I agree that UAPI should not necessarily dictate the kernel
-> > implementation.
-> > 
-> > > > > 
-> > > > > I thought about unrolling bitmask into multiple entries in rbtree, and
-> > > > > came up with following possible issue:
-> > > > > 
-> > > > > Imagine that a user creates a rule that allows to create sockets of all
-> > > > > possible families and types (with protocol=0 for example):
-> > > > > {
-> > > > > 	.allowed_access = LANDLOCK_ACCESS_SOCKET_CREATE,
-> > > > > 	.families = INT64_MAX, /* 64 set bits */
-> > > > > 	.types = INT16_MAX, /* 16 set bits */
-> > > > > 	.protocol = 0,
-> > > > > },
-> > > > > 
-> > > > > This will add 64 x 16 = 1024 entries to the rbtree. Currently, the
-> > > > > struct landlock_rule, which is used to store rules, weighs 40B. So, it
-> > > > > will be 40kB by a single rule. Even if we allow rules with only
-> > > > > "existing" families and types, it will be 46 x 7 = 322 entries and ~12kB
-> > > > > by a single rule.
-> > > > > 
-> > > > > I understand that this may be degenerate case and most common rule will
-> > > > > result in less then 8 (or 4) entries in rbtree, but I think API should
-> > > > > be as intuitive as possible. User can expect to see the same
-> > > > > memory usage regardless of the content of the rule.
-> > > > > 
-> > > > > I'm not really sure if this case is really an issue, so I'd be glad
-> > > > > to hear your opinion on it.
-> > > > 
-> > > > I think there are two separate questions here:
-> > > > 
-> > > > (a) I think it is OK that it is *possible* to allocate 40kB of kernel
-> > > >       memory.  At least, this is already possible today by calling
-> > > >       landlock_add_rule() repeatedly.
-> > > > 
-> > > >       I assume that the GFP_KERNEL_ACCOUNT flag is limiting the
-> > > >       potential damage to the caller here?  That flag was added in the
-> > > >       Landlock v19 patch set [1] ("Account objects to kmemcg.").
-> > > > 
-> > > > (b) I agree it might be counterintuitive when a single
-> > > >       landlock_add_rule() call allocates more space than expected.
-> > > > 
-> > > > Mickaël, since it is already possible today (but harder), I assume
-> > > > that you have thought about this problem before -- is it a problem
-> > > > when users allocate more kernel memory through Landlock than they
-> > > > expected?
-> > 
-> > The imbalance between the user request and the required kernel memory is
-> > interesting.  It would not be a security issue thanks to the
-> > GFP_KERNEL_ACCOUNT, but it can be surprising for users that for some
-> > requests they can receive -ENOMEM but not for quite-similar ones (e.g.
-> > with only some bits different).  We should keep the principle of least
-> > astonishment in mind, but also the fact that the kernel implementation
-> > and the related required memory may change between two kernel versions
-> > for the exact same user request (because of Landlock implementation
-> > differences or other parts of the kernel).  In summary, we should be
-> > careful to prevent users from being able to use a large amount of memory
-> > with only one syscall.  This which would be an usability issue.
-> > 
-> > > > 
-> > > > 
-> > > > Naive proposal:
-> > > > 
-> > > > If this is an issue, how about we set a low limit to the number of
-> > > > families and the number of types that can be used in a single
-> > > > landlock_add_rule() invocation?  (It tends to be easier to start with
-> > > > a restrictive API and open it up later than the other way around.)
-> > > 
-> > > Looks like a good approach! Better to return with an error (which almost
-> > > always won't happen) and let the user to refactor the code than to
-> > > allow ruleset to eat an unexpected amount of memory.
-> > > 
-> > > > 
-> > > > For instance,
-> > > > 
-> > > > * In the families field, at most 2 bits may be set.
-> > > > * In the types field, at most 2 bits may be set.
-> > > 
-> > > Or we can say that rule can contain not more than 4 combinations of
-> > > family and type.
-> > > 
-> > > BTW, 4 seems to be sufficient, at least for IP protocols.
-> > > 
-> > > > 
-> > > > In my understanding, the main use case of the bit vectors is that
-> > > > there is a short way to say "all IPv4+v6 stream+dgram sockets", but we
-> > > > do not know scenarios where much more than that is needed?  With that,
-> > > > we would still keep people from accidentally allocating larger amounts
-> > > > of memory, while permitting the main use case.
-> > > 
-> > > Agreed
-> > > 
-> > > > 
-> > > > Having independent limits for the family and type fields is a bit
-> > > > easier to understand and document than imposing a limit on the
-> > > > multiplication result.
-> > 
-> > This is a safer approach that can indeed be documented, but it looks
-> > unintuitive and an arbitrary limitation.  Here is another proposal:
-> > 
-> > Let's ignore my previous suggestion to use bitfields for families and
-> > protocols.  To keep it simple, we can get back to the initial struct but
-> > specifically handle the (i64)-1 value (which cannot be a family,
-> > protocol, nor a type):
-> > {
-> > 	.allowed_access = LANDLOCK_ACCESS_SOCKET_CREATE,
-> > 	.family = AF_INET,
-> > 	.type = SOCK_STREAM,
-> > 	.protocol = -1,
-> > },
-> > 
-> > This would read: deny socket creation except for AF_INET with
-> > SOCK_STREAM (and any protocol).
-> > 
-> > Users might need to add several rules (e.g. one for AF_INET and another
-> > for AF_INET6) but that's OK.  Unfortunately we cannot identify a TCP
-> > socket with only protocol = IPPROTO_TCP because protocol definitions
-> > are relative to network families.  Specifying the protocol without the
-> > family should then return an error.
-> > 
-> > Before rule could be loaded, users define how much they want to match a
-> > socket: at least the family, optionally the type, and if the type is
-> > also set then the protocol can also be set.  These dependencies are
-> > required to transform this triplet to a key number, see below.
-> > 
-> > A landlock_ruleset_attr.handled_socket_layers field would define how
-> > much we want to match a socket:
-> > - 1: family only
-> > - 2: family and type
-> > - 3: family, type, and protocol
-> > 
-> > According to this ruleset's property, users will be allowed to fill the
-> > family, type, or protocol fields in landlock_socket_attr rules.  If a
-> > socket layer is not handled, it should contain (i64)-1 for the kernel to
-> > detect misuse of the API.
-> > 
-> > This enables us to get a key from this triplet:
-> > 
-> > family_bits = 6; // 45 values for now
-> > type_bits = 3; // 7 values for now
-> > protocol_bits = 5; // 28 values for now
-> > 
-> > // attr.* are the sanitized UAPI values, including -1 replaced with 0.
-> > // In this example, landlock_ruleset_attr.handled_socket_layers is 3, so
-> > // the key is composed of all the 3 properties.
-> > landlock_key.data = attr.family << (type_bits + protocol_bits) |
-> >                      attr.type << protocol_bits | attr.protocol;
-> > 
-> > For each layer of restriction in a domain, we know how precise they
-> > define a socket (i.e. with how many "socket layers").  We can then look
-> > for at most 3 entries in the red-black tree: one with only the family,
-> > another with the family and the type, and potentially a third also
-> > including the protocol.  Each key would have the same significant bits
-> > but with the lower bits masked according to each
-> > landlock_ruleset_attr.handled_socket_layers .  Composing the related
-> > access masks according to the defined socket layers, we can create an
-> > array of struct access_masks for the request and then check if such
-> > request is allowed by the current domain.  As for the currently stored
-> > data, we can also identify the domain layer that blocked the request
-> > (required for audit).
-> 
-> I do not quite understand why we need socket_layers. Without it,
-> user can set (i64)(-1) to type or protocol whenever he wants. While
-> transforming triplet to a key we can replace (i64)(-1) with some
-> constant (e.g. (1 << type_bits - 1) for the type if type_bits = 8 and
-> (1 << protocol_bits - 1) for the protocol if protocol_bits = 16).
+On Fri, 2025-01-24 at 09:00 -0500, J. Bruce Fields wrote:
+> On Thu, Jan 23, 2025 at 06:20:08PM -0500, Jeff Layton wrote:
+> > On Thu, 2025-01-23 at 17:18 -0500, Chuck Lever wrote:
+> > > On 1/23/25 3:25 PM, Jeff Layton wrote:
+> > > > RFC8881, 15.1.1.3 says this about NFS4ERR_DELAY:
+> > > >=20
+> > > > "For any of a number of reasons, the replier could not process this
+> > > >   operation in what was deemed a reasonable time. The client should=
+ wait
+> > > >   and then try the request with a new slot and sequence value."
+> > >=20
+> > > A little farther down, Section 15.1.1.3 says this:
+> > >=20
+> > > "If NFS4ERR_DELAY is returned on a SEQUENCE operation, the request is
+> > >   retried in full with the SEQUENCE operation containing the same slo=
+t
+> > >   and sequence values."
+> > >=20
+> > > And:
+> > >=20
+> > > "If NFS4ERR_DELAY is returned on an operation other than the first in
+> > >   the request, the request when retried MUST contain a SEQUENCE opera=
+tion
+> > >   that is different than the original one, with either the slot ID or=
+ the
+> > >   sequence value different from that in the original request."
+> > >=20
+> > > My impression is that the slot needs to be held and used again only i=
+f
+> > > the server responded with NFS4ERR_DELAY on the SEQUENCE operation. If
+> > > the NFS4ERR_DELAY was the status of the 2nd or later operation in the
+> > > COMPOUND, then yes, a different slot, or the same slot with a bumped
+> > > sequence number, must be used.
+> > >=20
+> > > The current code in nfsd4_cb_sequence_done() appears to be correct in
+> > > this regard.
+> > >=20
+> >=20
+> > Ok! I stand corrected. We should be able to just drop this patch, but
+> > some of the later patches may need some trivial merge conflicts fixed
+> > up.
+> >=20
+> > Any idea why SEQUENCE is different in this regard?
+>=20
+> Isn't DELAY on SEQUENCE an indication that the operation is still in
+> progress?  The difference between retrying the same slot or not is
+> whether you're asking the server again for the result of the previous
+> operation, or whether you're asking it to perform a new one.
+>=20
+> If you get DELAY on a later op and then keep retrying with the same
+> seqid/slot then I'd expect you to get stuck in an infinite loop getting
+> a DELAY response out of the reply cache.
+>=20
 
-We can indead add a virtual any/wildcard type and protocol, translated
-from user space's (i64)-1 .  The downside is that for the same domain
-layer we would need to check 4 different keys for the same triplet (i.e.
-famility is always set, but type and protocol are optionals).  With the
-socket_layers number, we only have to check for one key per domain
-layer.  However, in the worse case with at least 3 domain layers having
-different socket_layers value, we would still need to check for 3
-different keys.  So, I think it's reasonable to get rid of the
-socket_layers as you suggested (while requiring the family to always be
-set).
+Hi Bruce!
 
-> 
-> > 
-> > With this design, each sandbox can define a socket as much as it wants.
-> > 
-> > The downside is that we lost the bitfields and we need several calls to
-> > filter more complex sockets (e.g. 4 for UDP and TCP with IPv4 and IPv6),
-> > which looks OK compared to the required calls for filesystem access
-> > control.
-> > 
-> > > > 
-> > > > > > That being said, I am not a big fan of red-black trees for such simple
-> > > > > > integer lookups either, and I also think there should be something
-> > > > > > better if we make more use of the properties of the input ranges. The
-> > > > > > question is though whether you want to couple that to this socket type
-> > > > > > patch set, or rather do it in a follow up?  (So far we have been doing
-> > > > > > fine with the red black trees, and we are already contemplating the
-> > > > > > possibility of changing these internal structures in [2].  We have
-> > > > > > also used RB trees for the "port" rules with a similar reasoning,
-> > > > > > IIRC.)
-> > > > > 
-> > > > > I think it'll be better to have a separate series for [2] if the socket
-> > > > > restriction can be implemented without rbtree refactoring.
-> > > > 
-> > > > Sounds good to me. 👍
-> > > > 
-> > > > [1] https://lore.kernel.org/all/20200707180955.53024-2-mic@digikod.net/
-> > 
-> > red-black trees are a good generic data structure for the current main
-> > use case (for dynamic rulesets and static domains), but we'll need to
-> > use more appropriate data structures.  I think this should not be a
-> > blocker for this patch series.  It will be required to match (port)
-> > ranges though (even if the use case seems limited), and in general for
-> > better performances.
-> 
+That may be the case. From RFC8881, section 2.10.6.2:
+
+"A retry might be sent while the original request is still in progress
+on the replier. The replier SHOULD deal with the issue by returning
+NFS4ERR_DELAY as the reply to SEQUENCE or CB_SEQUENCE operation, but
+implementations MAY return NFS4ERR_MISORDERED. Since errors from
+SEQUENCE and CB_SEQUENCE are never recorded in the reply cache, this
+approach allows the results of the execution of the original request to
+be properly recorded in the reply cache (assuming that the requester
+specified the reply to be cached)."
+
+>=20
+>=20
+> > This rule seems a
+> > bit arbitrary. If the response is NFS4ERR_DELAY, then why would it
+> > matter which slot you use when retransmitting? The responder is just
+> > saying "go away and come back later".
+> >=20
+> > What if the responder repeatedly returns NFS4ERR_DELAY (maybe because
+> > it's under resource pressure), and also shrinks the slot table in the
+> > meantime? It seems like that might put the requestor in an untenable
+> > position.
+> >=20
+> > Maybe we should lobby to get this changed in the spec?
+> >=20
+> > >=20
+> > > > This is CB_SEQUENCE, but I believe the same rule applies. Release t=
+he
+> > > > slot before submitting the delayed RPC.
+> > > >=20
+> > > > Fixes: 7ba6cad6c88f ("nfsd: New helper nfsd4_cb_sequence_done() for=
+ processing more cb errors")
+> > > > Signed-off-by: Jeff Layton <jlayton@kernel.org>
+> > > > ---
+> > > >   fs/nfsd/nfs4callback.c | 1 +
+> > > >   1 file changed, 1 insertion(+)
+> > > >=20
+> > > > diff --git a/fs/nfsd/nfs4callback.c b/fs/nfsd/nfs4callback.c
+> > > > index bfc9de1fcb67b4f05ed2f7a28038cd8290809c17..c26ccb9485b95499fc9=
+08833a384d741e966a8db 100644
+> > > > --- a/fs/nfsd/nfs4callback.c
+> > > > +++ b/fs/nfsd/nfs4callback.c
+> > > > @@ -1392,6 +1392,7 @@ static bool nfsd4_cb_sequence_done(struct rpc=
+_task *task, struct nfsd4_callback
+> > > >   		goto need_restart;
+> > > >   	case -NFS4ERR_DELAY:
+> > > >   		cb->cb_seq_status =3D 1;
+> > > > +		nfsd41_cb_release_slot(cb);
+> > > >   		if (!rpc_restart_call(task))
+> > > >   			goto out;
+> > > >  =20
+> > > >=20
+> > >=20
+> > >=20
+> >=20
+> > --=20
+> > Jeff Layton <jlayton@kernel.org>
+
+--=20
+Jeff Layton <jlayton@kernel.org>
 
