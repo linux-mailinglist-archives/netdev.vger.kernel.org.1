@@ -1,163 +1,139 @@
-Return-Path: <netdev+bounces-160724-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-160725-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9D8BBA1AF50
-	for <lists+netdev@lfdr.de>; Fri, 24 Jan 2025 05:10:52 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4A34BA1AF5F
+	for <lists+netdev@lfdr.de>; Fri, 24 Jan 2025 05:20:05 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 4D3FF3A2A22
-	for <lists+netdev@lfdr.de>; Fri, 24 Jan 2025 04:10:45 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 98BDC16D436
+	for <lists+netdev@lfdr.de>; Fri, 24 Jan 2025 04:20:03 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8CEA21D7E37;
-	Fri, 24 Jan 2025 04:10:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="M881ePrX"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1D1CE1D86C3;
+	Fri, 24 Jan 2025 04:19:58 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.8])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 55FF723B0;
-	Fri, 24 Jan 2025 04:10:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.8
+Received: from mx.socionext.com (mx.socionext.com [202.248.49.38])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 961EA1D63DF;
+	Fri, 24 Jan 2025 04:19:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=202.248.49.38
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1737691848; cv=none; b=aJ9i071lPCRnsMwPpCgtA6DHAECtJAg7J8/mmE48JQU/PODE6OermyJ++Y9PZViazJ+PFPpt+Dwt1XvGcBTm08QAcaiq1SevPIlq9ui6H1sBwgfEk8geDaC6F1wbA/zgNuq7WfxLKn0N8O2JJtv6LAoMkRaB1T0JSKq6+jp0VSU=
+	t=1737692398; cv=none; b=p+nKxa/CrXggxAIiQenTxJxKbyH4mqbh2pCrLqFqzSf0oyofsEPsel70YEzqTNPXQiWKR9pXSF3b5HCeAx+UiBR5Mr7zdipXWREmiMe2zE9WfucKDPtRbTkGsi3GsMZYnY4FdfTAVlbKrtalauIc2xc+WoczqzkzwI6DpihT5KY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1737691848; c=relaxed/simple;
-	bh=MIJ1jgZDwALjGwqZaVentcWeZw4dsL9WAxAAZDG/1Uo=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=ov9ciUA6S0t9w7ivl3ag9MpoO9oOTgXuLHr7zJz4tCLBjJtUZD615ARb/I6s612ObN/Fpg8vkp8v1rshPWoJhMnxB/MJOx838V4iRvEsdOIfXutOiOjfc7qe90zmsKyND/3QpSzM2CExQrAWJwY0IZHLwIse1rrp8uqhHa3t8VY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=M881ePrX; arc=none smtp.client-ip=192.198.163.8
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1737691846; x=1769227846;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=MIJ1jgZDwALjGwqZaVentcWeZw4dsL9WAxAAZDG/1Uo=;
-  b=M881ePrXFXOhtarPbrt78dCJw3SkhnSf4VpyHv8cgtBamSQimTyu579W
-   mIB5EqwD9GPhE0INC2461FXA+FIimvDokuEclWkpLkaJRWq5DFf9amake
-   UpHtKNG5B2t7pktiJ45Byd8DciCZ4gaxlg5ZWXYDTHoK/2jgt+MWEInIy
-   gI7oohUMDHw0UfQGOy+VitAI3tBNmGkmDGHL05TpJwIFcobrq+fjd5X3c
-   D9qcU8eRMtpYUfrQ0FmN13QjyFOU5c2ZNev9Um3v03KUWrGuiVXndTtyz
-   nN0J8nxwEf496Syr9jlfXQyTxn+uLlxOuZR3ygw8bIf1DIkw3r38qaA87
-   A==;
-X-CSE-ConnectionGUID: RmxlPdaESyWJns9U4GrhXA==
-X-CSE-MsgGUID: hF7TGNpPRnGZnWz0lZtRaA==
-X-IronPort-AV: E=McAfee;i="6700,10204,11324"; a="55764030"
-X-IronPort-AV: E=Sophos;i="6.13,230,1732608000"; 
-   d="scan'208";a="55764030"
-Received: from fmviesa004.fm.intel.com ([10.60.135.144])
-  by fmvoesa102.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 23 Jan 2025 20:10:45 -0800
-X-CSE-ConnectionGUID: KBf9L3xqRj2dTmcFB3GFfA==
-X-CSE-MsgGUID: 6iz2VM1SRCWJIdgpFZtQ5w==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.13,230,1732608000"; 
-   d="scan'208";a="112671059"
-Received: from lkp-server01.sh.intel.com (HELO d63d4d77d921) ([10.239.97.150])
-  by fmviesa004.fm.intel.com with ESMTP; 23 Jan 2025 20:10:40 -0800
-Received: from kbuild by d63d4d77d921 with local (Exim 4.96)
-	(envelope-from <lkp@intel.com>)
-	id 1tbB1i-000c7v-10;
-	Fri, 24 Jan 2025 04:10:38 +0000
-Date: Fri, 24 Jan 2025 12:10:17 +0800
-From: kernel test robot <lkp@intel.com>
-To: Suman Ghosh <sumang@marvell.com>, horms@kernel.org,
-	sgoutham@marvell.com, gakula@marvell.com, sbhatta@marvell.com,
-	hkelam@marvell.com, davem@davemloft.net, edumazet@google.com,
-	kuba@kernel.org, pabeni@redhat.com, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org, lcherian@marvell.com,
-	jerinj@marvell.com, john.fastabend@gmail.com, bbhushan2@marvell.com,
-	hawk@kernel.org, andrew+netdev@lunn.ch, ast@kernel.org,
-	daniel@iogearbox.net, bpf@vger.kernel.org
-Cc: oe-kbuild-all@lists.linux.dev, Suman Ghosh <sumang@marvell.com>
-Subject: Re: [net-next PATCH v4 3/6] octeontx2-pf: AF_XDP zero copy receive
- support
-Message-ID: <202501241139.g1v0lH4V-lkp@intel.com>
-References: <20250116191116.3357181-4-sumang@marvell.com>
+	s=arc-20240116; t=1737692398; c=relaxed/simple;
+	bh=tpq5jTfoYJOX3ibbIX4ypawNPCdAI1pRymruM7jn1IY=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=R54dGLoneTkI3mnjiLf8iLAzxbU83LYrFCwprXabKO/oOQ/oTKFePr0hEJI6rydfojHpvbxuDUb1yCosgxwMyjMs3yZ6E6deCxW1ruIRSntworY+UCg0LubPqbQWsY4piTvs7TYl4Yg/9osV3WCnSM4Ea8C5L0wGzd63yno4Rc8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=socionext.com; spf=pass smtp.mailfrom=socionext.com; arc=none smtp.client-ip=202.248.49.38
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=socionext.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=socionext.com
+Received: from unknown (HELO kinkan2-ex.css.socionext.com) ([172.31.9.52])
+  by mx.socionext.com with ESMTP; 24 Jan 2025 13:19:53 +0900
+Received: from mail.mfilter.local (mail-arc02.css.socionext.com [10.213.46.40])
+	by kinkan2-ex.css.socionext.com (Postfix) with ESMTP id D7721208E511;
+	Fri, 24 Jan 2025 13:19:53 +0900 (JST)
+Received: from iyokan2.css.socionext.com ([172.31.9.53]) by m-FILTER with ESMTP; Fri, 24 Jan 2025 13:19:53 +0900
+Received: from [10.212.246.222] (unknown [10.212.246.222])
+	by iyokan2.css.socionext.com (Postfix) with ESMTP id 7A0E0E1E;
+	Fri, 24 Jan 2025 13:19:53 +0900 (JST)
+Message-ID: <c634eb72-6714-47e8-9270-b4ae99df9edf@socionext.com>
+Date: Fri, 24 Jan 2025 13:19:53 +0900
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250116191116.3357181-4-sumang@marvell.com>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net v2 0/3] Limit devicetree parameters to hardware
+ capability
+To: "Russell King (Oracle)" <linux@armlinux.org.uk>
+Cc: Alexandre Torgue <alexandre.torgue@foss.st.com>,
+ Jose Abreu <joabreu@synopsys.com>, Andrew Lunn <andrew+netdev@lunn.ch>,
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ Maxime Coquelin <mcoquelin.stm32@gmail.com>, Furong Xu <0x1207@gmail.com>,
+ Joao Pinto <Joao.Pinto@synopsys.com>, netdev@vger.kernel.org,
+ linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org
+References: <20250121044138.2883912-1-hayashi.kunihiko@socionext.com>
+ <Z492Mvw-BxLBR1eZ@shell.armlinux.org.uk>
+ <ea845c58-ee2a-4660-bc13-7e05003de5d0@socionext.com>
+ <Z5Ju0DtNDwj_hO0F@shell.armlinux.org.uk>
+Content-Language: en-US
+From: Kunihiko Hayashi <hayashi.kunihiko@socionext.com>
+In-Reply-To: <Z5Ju0DtNDwj_hO0F@shell.armlinux.org.uk>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-Hi Suman,
+Hi Russell,
 
-kernel test robot noticed the following build warnings:
+On 2025/01/24 1:31, Russell King (Oracle) wrote:
+> On Thu, Jan 23, 2025 at 02:25:15PM +0900, Kunihiko Hayashi wrote:
+>> Hi Russell,
+>>
+>> Thank you for your comment.
+>>
+>> On 2025/01/21 19:25, Russell King (Oracle) wrote:
+>>> On Tue, Jan 21, 2025 at 01:41:35PM +0900, Kunihiko Hayashi wrote:
+>>>> This series includes patches that checks the devicetree properties,
+>>>> the number of MTL queues and FIFO size values, and if these
+> specified
+>>>> values exceed the value contained in the hardware capabilities,
+> limit to
+>>>> the values from the capabilities.
+>>>>
+>>>> And this sets hardware capability values if FIFO sizes are not
+> specified
+>>>> and removes redundant lines.
+>>>
+>>> I think you also indeed to explain why (and possibly understand) - if
+>>> there are hardware capabilities that describe these parameters - it
+> has
+>>> been necessary to have them in firmware as well.
+>>>
+>>> There are two scenarios I can think of why these would be duplicated:
+>>>
+>>> 1. firmware/platform capabilities are there to correct wrong values
+>>>      provided by the hardware.
+>>> 2. firmware/platform capabilities are there to reduce the parameters
+>>>      below hardware maximums.
+>>>
+>>> Which it is affects whether your patch is correct or not, and thus
+> needs
+>>> to be mentioned.
+>>
+>> I think scenario 2 applies in this case.
+> 
+> In light of my other reply
+> (https://lore.kernel.org/r/Z4_ZilVFKacuAUE8@shell.armlinux.org.uk) I
+> don't think either of my two above applies, and the driver is designed
+> to allow platform code to override the hardware value, or to provide
+> the value if there is no hardware value.
 
-[auto build test WARNING on net-next/main]
+I understand. Especially I realized that I had to care about some hardwares
+not having these values.
 
-url:    https://github.com/intel-lab-lkp/linux/commits/Suman-Ghosh/octeontx2-pf-Don-t-unmap-page-pool-buffer/20250117-031510
-base:   net-next/main
-patch link:    https://lore.kernel.org/r/20250116191116.3357181-4-sumang%40marvell.com
-patch subject: [net-next PATCH v4 3/6] octeontx2-pf: AF_XDP zero copy receive support
-config: loongarch-randconfig-001-20250124 (https://download.01.org/0day-ci/archive/20250124/202501241139.g1v0lH4V-lkp@intel.com/config)
-compiler: loongarch64-linux-gcc (GCC) 14.2.0
-reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20250124/202501241139.g1v0lH4V-lkp@intel.com/reproduce)
+> My suggestion, therefore, would be (e.g.):
+> 
+> 	if (priv->dma_cap.rx_fifo_size &&
+> 	    priv->plat->rx_fifo_size > priv->dma_cap.rx_fifo_size) {
+> 		dev_warn(priv->device,
+> 			 "Rx FIFO size exceeds dma capability (%d)\n",
+> 			 priv->plat->rx_fifo_size);
+> 		priv->plat->rx_fifo_size = priv->dma_cap.rx_fifo_size;
+> 	}
+> 
+> if we still want to limit it to the hardware provided capability, where
+> that is provided.
 
-If you fix the issue in a separate patch/commit (i.e. not just a new version of
-the same patch/commit), kindly add following tags
-| Reported-by: kernel test robot <lkp@intel.com>
-| Closes: https://lore.kernel.org/oe-kbuild-all/202501241139.g1v0lH4V-lkp@intel.com/
+Thank you for your suggestion. I also came up with the same code in:
+https://lore.kernel.org/all/c2aa354d-1bd5-4fb0-aa8b8-48fcce3c1628@socionext.com/#t
 
-All warnings (new ones prefixed by >>):
+I'll reflect this code to the next.
 
-   drivers/net/ethernet/marvell/octeontx2/nic/otx2_pf.c: In function 'otx2_probe':
->> drivers/net/ethernet/marvell/octeontx2/nic/otx2_pf.c:3222:1: warning: label 'err_dcbnl_set_ops' defined but not used [-Wunused-label]
-    3222 | err_dcbnl_set_ops:
-         | ^~~~~~~~~~~~~~~~~
+Thank you,
 
-
-vim +/err_dcbnl_set_ops +3222 drivers/net/ethernet/marvell/octeontx2/nic/otx2_pf.c
-
-  3217	
-  3218		otx2_qos_init(pf, qos_txqs);
-  3219	
-  3220		return 0;
-  3221	
-> 3222	err_dcbnl_set_ops:
-  3223		bitmap_free(pf->af_xdp_zc_qidx);
-  3224	err_af_xdp_zc:
-  3225		otx2_sriov_vfcfg_cleanup(pf);
-  3226	err_pf_sriov_init:
-  3227		otx2_shutdown_tc(pf);
-  3228	err_mcam_flow_del:
-  3229		otx2_mcam_flow_del(pf);
-  3230	err_unreg_netdev:
-  3231		unregister_netdev(netdev);
-  3232	err_ipsec_clean:
-  3233		cn10k_ipsec_clean(pf);
-  3234	err_mcs_free:
-  3235		cn10k_mcs_free(pf);
-  3236	err_del_mcam_entries:
-  3237		otx2_mcam_flow_del(pf);
-  3238	err_ptp_destroy:
-  3239		otx2_ptp_destroy(pf);
-  3240	err_detach_rsrc:
-  3241		if (pf->hw.lmt_info)
-  3242			free_percpu(pf->hw.lmt_info);
-  3243		if (test_bit(CN10K_LMTST, &pf->hw.cap_flag))
-  3244			qmem_free(pf->dev, pf->dync_lmt);
-  3245		otx2_detach_resources(&pf->mbox);
-  3246		otx2_disable_mbox_intr(pf);
-  3247		otx2_pfaf_mbox_destroy(pf);
-  3248		pci_free_irq_vectors(hw->pdev);
-  3249	err_free_netdev:
-  3250		pci_set_drvdata(pdev, NULL);
-  3251		free_netdev(netdev);
-  3252	err_release_regions:
-  3253		pci_release_regions(pdev);
-  3254		return err;
-  3255	}
-  3256	
-
--- 
-0-DAY CI Kernel Test Service
-https://github.com/intel/lkp-tests/wiki
+---
+Best Regards
+Kunihiko Hayashi
 
