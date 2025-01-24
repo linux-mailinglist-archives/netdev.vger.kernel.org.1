@@ -1,58 +1,109 @@
-Return-Path: <netdev+bounces-160848-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-160849-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id E51C1A1BD06
-	for <lists+netdev@lfdr.de>; Fri, 24 Jan 2025 20:55:09 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 06C2DA1BD48
+	for <lists+netdev@lfdr.de>; Fri, 24 Jan 2025 21:20:23 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id CDAEF188BB3E
-	for <lists+netdev@lfdr.de>; Fri, 24 Jan 2025 19:55:13 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 88CB33A34B9
+	for <lists+netdev@lfdr.de>; Fri, 24 Jan 2025 20:20:15 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CDD34224B0A;
-	Fri, 24 Jan 2025 19:54:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C8F8C2253E1;
+	Fri, 24 Jan 2025 20:19:35 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=pm.me header.i=@pm.me header.b="UYR56BC5"
+	dkim=pass (1024-bit key) header.d=fastly.com header.i=@fastly.com header.b="fJ77H04s"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-40134.protonmail.ch (mail-40134.protonmail.ch [185.70.40.134])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f177.google.com (mail-pl1-f177.google.com [209.85.214.177])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4E4D42236F1;
-	Fri, 24 Jan 2025 19:54:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.70.40.134
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1F63A224B18
+	for <netdev@vger.kernel.org>; Fri, 24 Jan 2025 20:19:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.177
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1737748497; cv=none; b=jMdttVjyWr1Jb6Nl+UPB8gHkhIMT24cH4Uc0SiR3YrIo9k/MPrwRTq8Yiip1WRQEYy7MB+L97S71hNZIelMWWKKADna91YCv8j03ugIvmRst2aYQV16uHF4yUf0Mg/ZrAd8jTGTeK1H+PVtfyh6xN4qIbtuxDiugqXC2Db3u3vs=
+	t=1737749975; cv=none; b=qoDWEnglRfzcGjFFig+2YVYGdSCgtzTUT5xeNAtJRLk88eFVZmAWS/8gPq6CE3WqIdaoa2ufwA0BCnZ7VFjt7CG6EZjjiamHzeXNAzNP+UOAZoKN8xRBpCU4GmSYPvRCeG0bSsLNtD0OLxaaxKZMeeSnGfoizYFFeGV/bJ+5QAQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1737748497; c=relaxed/simple;
-	bh=Oo+yYJvHx0J+MvWMPe6O1BeI4kU2b5HNdxVD2LwXshA=;
-	h=Date:To:From:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=fbw/HBkJ+Iyvjo1ov5YvFZCMroqBUh6TV4SIor7zps6wdR3IlDcQx9IgBWzdizAUtbkcdiJSfn8KV925MEz4s4LVKwBW3jwg+kbTTGoRTv9QX/h5jTvgiBI0rtKPcuvChNrcGVMYvJdmrxWlhhwUCh8deKNQz/lwSR7hM+mTelc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=pm.me; spf=pass smtp.mailfrom=pm.me; dkim=pass (2048-bit key) header.d=pm.me header.i=@pm.me header.b=UYR56BC5; arc=none smtp.client-ip=185.70.40.134
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=pm.me
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=pm.me
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=pm.me;
-	s=protonmail3; t=1737748491; x=1738007691;
-	bh=WPCmK7URrEy7NOqMZEP/caP4Gj0g1hUC7OKlgx+c3dY=;
-	h=Date:To:From:Cc:Subject:Message-ID:In-Reply-To:References:
-	 Feedback-ID:From:To:Cc:Date:Subject:Reply-To:Feedback-ID:
-	 Message-ID:BIMI-Selector:List-Unsubscribe:List-Unsubscribe-Post;
-	b=UYR56BC5UZLNsKXH/ITJM6m10LcrV9IMfcxYmVw7ezph9ldDjZxvHpLCf22NzsZXr
-	 OrtdrGTe0IEg/2uXeHRqE+5QFrrGiI2O/3gOK3ahONeosAcRBmfMNVTgYI3czCtp6P
-	 lHl5LYy7Jsr9Xv/6gVxQUo0MB89dVLszkRF5f1hFeaZiGXh9aqV7mjtL2bFljmbu7a
-	 3msIkFFaWc0liztBJiH3nHT5tFsDxDRDjPShqVvhx96DZHE32OTL/1JmyNXzl6O68F
-	 dloKSQtVQfYlyyCI178bmd1mUkfMqVTpBUkRzcp1MQMW3dOhvyM5pJFzqO7AQvZyIV
-	 jGDp4MsJ6jk2g==
-Date: Fri, 24 Jan 2025 19:54:43 +0000
-To: Marc Dionne <marc.c.dionne@gmail.com>
-From: Ihor Solodrai <ihor.solodrai@pm.me>
-Cc: David Howells <dhowells@redhat.com>, Christian Brauner <christian@brauner.io>, Steve French <smfrench@gmail.com>, Matthew Wilcox <willy@infradead.org>, Jeff Layton <jlayton@kernel.org>, Gao Xiang <hsiangkao@linux.alibaba.com>, Dominique Martinet <asmadeus@codewreck.org>, Paulo Alcantara <pc@manguebit.com>, Shyam Prasad N <sprasad@microsoft.com>, Tom Talpey <tom@talpey.com>, Eric Van Hensbergen <ericvh@kernel.org>, Ilya Dryomov <idryomov@gmail.com>, netfs@lists.linux.dev, linux-afs@lists.infradead.org, linux-cifs@vger.kernel.org, linux-nfs@vger.kernel.org, ceph-devel@vger.kernel.org, v9fs@lists.linux.dev, linux-erofs@lists.ozlabs.org, linux-fsdevel@vger.kernel.org, linux-mm@kvack.org, netdev@vger.kernel.org, linux-kernel@vger.kernel.org, bpf <bpf@vger.kernel.org>
-Subject: Re: [PATCH v5 27/32] netfs: Change the read result collector to only use one work item
-Message-ID: <ZWHFHDukzfc7hoFZ8s7ebITzzuXLdL3jtI1Gm7XASpFGprxofyelizx8oA4JZthmee_YlnO7okLF4aUNLXaiZ2Ib_JtUTWzbCcsrnl4LX5w=@pm.me>
-In-Reply-To: <CAB9dFds_bPG1vThvOxhKcoFbUPGURYRHrY_zubPrAqpQrgHA7A@mail.gmail.com>
-References: <20241216204124.3752367-1-dhowells@redhat.com> <20241216204124.3752367-28-dhowells@redhat.com> <a7x33d4dnMdGTtRivptq6S1i8btK70SNBP2XyX_xwDAhLvgQoPox6FVBOkifq4eBinfFfbZlIkMZBe3QarlWTxoEtHZwJCZbNKtaqrR7PvI=@pm.me> <CAB9dFdtVFgG7OWZRytL9Vpr=knNPnMe6b_Esg7rgfFfwLa8j0A@mail.gmail.com> <GHG6tQSGPRj9L93-skG-HGz4vGtXUxy6ibsUTKloUKncNmy8A7xgte0MEiI0iZJ7jD-SSrZiK2oswgvJCRan_0ZMi6xDlP11SHDi1Utf7mI=@pm.me> <CAB9dFds_bPG1vThvOxhKcoFbUPGURYRHrY_zubPrAqpQrgHA7A@mail.gmail.com>
-Feedback-ID: 27520582:user:proton
-X-Pm-Message-ID: 4f0aec3e0f4ce82aa482624e5964b7d886d7a0e5
+	s=arc-20240116; t=1737749975; c=relaxed/simple;
+	bh=Mct/s8icCxgISw7/YyvdW0tKtb93dWIuER94Ecuz9fE=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=PD6+6+gmI1j6NdiDu1VZZ7wXln/mPhBzi8txDC4Xuowy33G7AuHkyEWrTjgoiyilyI54INuwM7Ajjh55HSJOg6jqIOgv/9mHkdJ7217PQOMsDDDL9aj6Fj9owupg8Z+Xh1rX/8wMx/qL32xOWjwpPux3cJDpx2RRV79n+hxTKx4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fastly.com; spf=pass smtp.mailfrom=fastly.com; dkim=pass (1024-bit key) header.d=fastly.com header.i=@fastly.com header.b=fJ77H04s; arc=none smtp.client-ip=209.85.214.177
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fastly.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=fastly.com
+Received: by mail-pl1-f177.google.com with SMTP id d9443c01a7336-2167141dfa1so46961115ad.1
+        for <netdev@vger.kernel.org>; Fri, 24 Jan 2025 12:19:33 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=fastly.com; s=google; t=1737749973; x=1738354773; darn=vger.kernel.org;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:mail-followup-to:message-id:subject:cc:to
+         :from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=ixB98NmCHGnppTZhm0g8E8pIn7GO1Kr2T45neZxhNN4=;
+        b=fJ77H04s4NXigN7rJvooQI4i9A6U4pBsiImLukbQtXIAfk+d6g7+GzviSrgUS0Lshd
+         gEzTa/vCSLQwKxmy4cooKNVRgknR4k/96te91aZ9FJGox+BXsNv0Y+Cycfg8e9niiG5W
+         VEqd1Fzg+c1SjsdzkHsDi8InVX3mqmBhaNlCQ=
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1737749973; x=1738354773;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:mail-followup-to:message-id:subject:cc:to
+         :from:date:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=ixB98NmCHGnppTZhm0g8E8pIn7GO1Kr2T45neZxhNN4=;
+        b=PHbnND/X0AN9hKRKJxmVCn0lS8v0wUsdAvr/6TC1csqWOxVnJ6eKAPmOu0QGNGY4c0
+         zBBsid4cNS5Odwmrockm7LJZwfXTaNEIaE57TOkc1hBNQ45gRBFKyUwngmAPKyH85lC8
+         DuDptqilXyuB6/U++wkHu8XsgG3FgPH5g5FdPLflf+sMHDYoGBEpDLQy7UMdruJ38ykc
+         eywSeY3g9X69DaLieu9c4HMOUwiomSpcbz/L+nwuVFTTWM8fRXP47pf336i6KYyHrM+q
+         74KJVVS9OIH/3cRJvjDLhBVoDXkfZ9IsuJkZoyMGsxgSx+HbqFIYGf+GDhBfsdnrIZ1S
+         QU3A==
+X-Gm-Message-State: AOJu0YzGhKJSXN6VPFcV2yXdnvzfHg828RPwtyj6KJHkJqUrE1e8EEmy
+	j/stujJ51nhXvzyWJ02AraZ9ns2OWf1eDgJ2KUjEJrz0s3q2+6qSmgfYqWVVMXs=
+X-Gm-Gg: ASbGncvXDTbgEL0FZ4sam3ibJJ0n3N9dyjEUwoFGJj6fGz5WG9QwYIKw6JiT3YCIKXE
+	kOfOXGQZJGbGv61OY7A9WiM+USpSO2EcBZ4S9gqzumgahqW5QYF+D1tXOk1o11Bn3M0Xf0u/ZpV
+	q5KPzXUdH+bxBp+tNtyblflYqldwzl69lmsDVz49igicbFBLKxQgZtPCSjCTr0G+O7X1NItkJ/b
+	ixinrTfaTtuhzTQxky1bxGDF1YFGz4h1Pud39juuZi0U+3yc91/14zcWBte8Ko3Pt/2qErwBpTw
+	0l9TxapnxhfESIwNrOg=
+X-Google-Smtp-Source: AGHT+IEBBQUc9yHPlJE7U8Le9EEy/Ys7qdfN3dt6zEwH5EOWHAFcdEMVQEDbDI0xb6cM5LEEwx21fg==
+X-Received: by 2002:a17:902:f541:b0:216:5db1:5dc1 with SMTP id d9443c01a7336-21d993172e2mr138168385ad.1.1737749973160;
+        Fri, 24 Jan 2025 12:19:33 -0800 (PST)
+Received: from LQ3V64L9R2 ([165.225.242.171])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-21da4141175sm20477535ad.117.2025.01.24.12.19.31
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 24 Jan 2025 12:19:32 -0800 (PST)
+Date: Fri, 24 Jan 2025 12:19:29 -0800
+From: Joe Damato <jdamato@fastly.com>
+To: Jason Wang <jasowang@redhat.com>
+Cc: netdev@vger.kernel.org, gerhard@engleder-embedded.com,
+	leiyang@redhat.com, xuanzhuo@linux.alibaba.com,
+	mkarsten@uwaterloo.ca, "Michael S. Tsirkin" <mst@redhat.com>,
+	Eugenio =?iso-8859-1?Q?P=E9rez?= <eperezma@redhat.com>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	"open list:VIRTIO CORE AND NET DRIVERS" <virtualization@lists.linux.dev>,
+	open list <linux-kernel@vger.kernel.org>
+Subject: Re: [RFC net-next v3 2/4] virtio_net: Prepare for NAPI to queue
+ mapping
+Message-ID: <Z5P10c-gbVmXZne2@LQ3V64L9R2>
+Mail-Followup-To: Joe Damato <jdamato@fastly.com>,
+	Jason Wang <jasowang@redhat.com>, netdev@vger.kernel.org,
+	gerhard@engleder-embedded.com, leiyang@redhat.com,
+	xuanzhuo@linux.alibaba.com, mkarsten@uwaterloo.ca,
+	"Michael S. Tsirkin" <mst@redhat.com>,
+	Eugenio =?iso-8859-1?Q?P=E9rez?= <eperezma@redhat.com>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	"open list:VIRTIO CORE AND NET DRIVERS" <virtualization@lists.linux.dev>,
+	open list <linux-kernel@vger.kernel.org>
+References: <20250121191047.269844-1-jdamato@fastly.com>
+ <20250121191047.269844-3-jdamato@fastly.com>
+ <CACGkMEvT=J4XrkGtPeiE+8fwLsMP_B-xebnocJV8c5_qQtCOTA@mail.gmail.com>
+ <Z5EtqRrc_FAHbODM@LQ3V64L9R2>
+ <CACGkMEu6XHx-1ST9GNYs8UnAZpSJhvkSYqa+AE8FKiwKO1=zXQ@mail.gmail.com>
+ <Z5Gtve0NoZwPNP4A@LQ3V64L9R2>
+ <CACGkMEvHVxZcp2efz5EEW96szHBeU0yAfkLy7qSQnVZmxm4GLQ@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -60,216 +111,137 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <CACGkMEvHVxZcp2efz5EEW96szHBeU0yAfkLy7qSQnVZmxm4GLQ@mail.gmail.com>
 
-On Friday, January 24th, 2025 at 11:07 AM, Marc Dionne <marc.c.dionne@gmail=
-.com> wrote:
+On Fri, Jan 24, 2025 at 09:14:54AM +0800, Jason Wang wrote:
+> On Thu, Jan 23, 2025 at 10:47 AM Joe Damato <jdamato@fastly.com> wrote:
+> >
+> > On Thu, Jan 23, 2025 at 10:40:43AM +0800, Jason Wang wrote:
+> > > On Thu, Jan 23, 2025 at 1:41 AM Joe Damato <jdamato@fastly.com> wrote:
+> > > >
+> > > > On Wed, Jan 22, 2025 at 02:12:46PM +0800, Jason Wang wrote:
+> > > > > On Wed, Jan 22, 2025 at 3:11 AM Joe Damato <jdamato@fastly.com> wrote:
+> > > > > >
+> > > > > > Slight refactor to prepare the code for NAPI to queue mapping. No
+> > > > > > functional changes.
+> > > > > >
+> > > > > > Signed-off-by: Joe Damato <jdamato@fastly.com>
+> > > > > > Reviewed-by: Gerhard Engleder <gerhard@engleder-embedded.com>
+> > > > > > Tested-by: Lei Yang <leiyang@redhat.com>
+> > > > > > ---
+> > > > > >  v2:
+> > > > > >    - Previously patch 1 in the v1.
+> > > > > >    - Added Reviewed-by and Tested-by tags to commit message. No
+> > > > > >      functional changes.
+> > > > > >
+> > > > > >  drivers/net/virtio_net.c | 10 ++++++++--
+> > > > > >  1 file changed, 8 insertions(+), 2 deletions(-)
+> > > > > >
+> > > > > > diff --git a/drivers/net/virtio_net.c b/drivers/net/virtio_net.c
+> > > > > > index 7646ddd9bef7..cff18c66b54a 100644
+> > > > > > --- a/drivers/net/virtio_net.c
+> > > > > > +++ b/drivers/net/virtio_net.c
+> > > > > > @@ -2789,7 +2789,8 @@ static void skb_recv_done(struct virtqueue *rvq)
+> > > > > >         virtqueue_napi_schedule(&rq->napi, rvq);
+> > > > > >  }
+> > > > > >
+> > > > > > -static void virtnet_napi_enable(struct virtqueue *vq, struct napi_struct *napi)
+> > > > > > +static void virtnet_napi_do_enable(struct virtqueue *vq,
+> > > > > > +                                  struct napi_struct *napi)
+> > > > > >  {
+> > > > > >         napi_enable(napi);
+> > > > >
+> > > > > Nit: it might be better to not have this helper to avoid a misuse of
+> > > > > this function directly.
+> > > >
+> > > > Sorry, I'm probably missing something here.
+> > > >
+> > > > Both virtnet_napi_enable and virtnet_napi_tx_enable need the logic
+> > > > in virtnet_napi_do_enable.
+> > > >
+> > > > Are you suggesting that I remove virtnet_napi_do_enable and repeat
+> > > > the block of code in there twice (in virtnet_napi_enable and
+> > > > virtnet_napi_tx_enable)?
+> > >
+> > > I think I miss something here, it looks like virtnet_napi_tx_enable()
+> > > calls virtnet_napi_do_enable() directly.
+> > >
+> > > I would like to know why we don't call netif_queue_set_napi() for TX NAPI here?
+> >
+> > Please see both the cover letter and the commit message of the next
+> > commit which addresses this question.
+> >
+> > TX-only NAPIs do not have NAPI IDs so there is nothing to map.
+> 
+> Interesting, but I have more questions
+> 
+> 1) why need a driver to know the NAPI implementation like this?
 
->=20
->=20
-> On Fri, Jan 24, 2025 at 2:46=E2=80=AFPM Ihor Solodrai ihor.solodrai@pm.me=
- wrote:
->=20
-> > On Friday, January 24th, 2025 at 10:21 AM, Marc Dionne marc.dionne@auri=
-stor.com wrote:
-> >=20
-> > > [...]
-> > >=20
-> > > > A log snippet:
-> > > >=20
-> > > > 2025-01-24T02:15:03.9009694Z [ 246.932163] INFO: task ip:1055 block=
-ed for more than 122 seconds.
-> > > > 2025-01-24T02:15:03.9013633Z [ 246.932709] Tainted: G OE 6.13.0-g2b=
-cb9cf535b8-dirty #149
-> > > > 2025-01-24T02:15:03.9018791Z [ 246.933249] "echo 0 > /proc/sys/kern=
-el/hung_task_timeout_secs" disables this message.
-> > > > 2025-01-24T02:15:03.9025896Z [ 246.933802] task:ip state:D stack:0 =
-pid:1055 tgid:1055 ppid:1054 flags:0x00004002
-> > > > 2025-01-24T02:15:03.9028228Z [ 246.934564] Call Trace:
-> > > > 2025-01-24T02:15:03.9029758Z [ 246.934764] <TASK>
-> > > > 2025-01-24T02:15:03.9032572Z [ 246.934937] __schedule+0xa91/0xe80
-> > > > 2025-01-24T02:15:03.9035126Z [ 246.935224] schedule+0x41/0xb0
-> > > > 2025-01-24T02:15:03.9037992Z [ 246.935459] v9fs_evict_inode+0xfe/0x=
-170
-> > > > 2025-01-24T02:15:03.9041469Z [ 246.935748] ? __pfx_var_wake_functio=
-n+0x10/0x10
-> > > > 2025-01-24T02:15:03.9043837Z [ 246.936101] evict+0x1ef/0x360
-> > > > 2025-01-24T02:15:03.9046624Z [ 246.936340] __dentry_kill+0xb0/0x220
-> > > > 2025-01-24T02:15:03.9048855Z [ 246.936610] ? dput+0x3a/0x1d0
-> > > > 2025-01-24T02:15:03.9051128Z [ 246.936838] dput+0x114/0x1d0
-> > > > 2025-01-24T02:15:03.9053548Z [ 246.937069] __fput+0x136/0x2b0
-> > > > 2025-01-24T02:15:03.9056154Z [ 246.937305] task_work_run+0x89/0xc0
-> > > > 2025-01-24T02:15:03.9058593Z [ 246.937571] do_exit+0x2c6/0x9c0
-> > > > 2025-01-24T02:15:03.9061349Z [ 246.937816] do_group_exit+0xa4/0xb0
-> > > > 2025-01-24T02:15:03.9064401Z [ 246.938090] __x64_sys_exit_group+0x1=
-7/0x20
-> > > > 2025-01-24T02:15:03.9067235Z [ 246.938390] x64_sys_call+0x21a0/0x21=
-a0
-> > > > 2025-01-24T02:15:03.9069924Z [ 246.938672] do_syscall_64+0x79/0x120
-> > > > 2025-01-24T02:15:03.9072746Z [ 246.938941] ? clear_bhb_loop+0x25/0x=
-80
-> > > > 2025-01-24T02:15:03.9075581Z [ 246.939230] ? clear_bhb_loop+0x25/0x=
-80
-> > > > 2025-01-24T02:15:03.9079275Z [ 246.939510] entry_SYSCALL_64_after_h=
-wframe+0x76/0x7e
-> > > > 2025-01-24T02:15:03.9081976Z [ 246.939875] RIP: 0033:0x7fb86f66f21d
-> > > > 2025-01-24T02:15:03.9087533Z [ 246.940153] RSP: 002b:00007ffdb3cf93=
-f8 EFLAGS: 00000202 ORIG_RAX: 00000000000000e7
-> > > > 2025-01-24T02:15:03.9092590Z [ 246.940689] RAX: ffffffffffffffda RB=
-X: 00007fb86f785fa8 RCX: 00007fb86f66f21d
-> > > > 2025-01-24T02:15:03.9097722Z [ 246.941201] RDX: 00000000000000e7 RS=
-I: ffffffffffffff80 RDI: 0000000000000000
-> > > > 2025-01-24T02:15:03.9102762Z [ 246.941705] RBP: 00007ffdb3cf9450 R0=
-8: 00007ffdb3cf93a0 R09: 0000000000000000
-> > > > 2025-01-24T02:15:03.9107940Z [ 246.942215] R10: 00007ffdb3cf92ff R1=
-1: 0000000000000202 R12: 0000000000000001
-> > > > 2025-01-24T02:15:03.9113002Z [ 246.942723] R13: 0000000000000000 R1=
-4: 0000000000000000 R15: 00007fb86f785fc0
-> > > > 2025-01-24T02:15:03.9114614Z [ 246.943244] </TASK>
-> > >=20
-> > > That looks very similar to something I saw in afs testing, with a
-> > > similar stack but in afs_evict_inode where it hung waiting in
-> > > netfs_wait_for_outstanding_io.
-> > >=20
-> > > David pointed to this bit where there's a double get in
-> > > netfs_retry_read_subrequests, since netfs_reissue_read already takes
-> > > care of getting a ref on the subrequest:
-> > >=20
-> > > diff --git a/fs/netfs/read_retry.c b/fs/netfs/read_retry.c
-> > > index 2290af0d51ac..53d62e31a4cc 100644
-> > > --- a/fs/netfs/read_retry.c
-> > > +++ b/fs/netfs/read_retry.c
-> > > @@ -152,7 +152,6 @@ static void netfs_retry_read_subrequests(struct
-> > > netfs_io_request *rreq)
-> > > __clear_bit(NETFS_SREQ_BOUNDARY,
-> > > &subreq->flags);
-> > >=20
-> > > }
-> > >=20
-> > > - netfs_get_subrequest(subreq,
-> > > netfs_sreq_trace_get_resubmit);
-> > > netfs_reissue_read(rreq, subreq);
-> > > if (subreq =3D=3D to)
-> > > break;
-> > >=20
-> > > That seems to help for my afs test case, I suspect it might help in
-> > > your case as well.
-> >=20
-> > Hi Marc. Thank you for the suggestion.
-> >=20
-> > I've just tried this diff on top of bpf-next (d0d106a2bd21):
-> >=20
-> > diff --git a/fs/netfs/read_retry.c b/fs/netfs/read_retry.c
-> > index 2290af0d51ac..53d62e31a4cc 100644
-> > --- a/fs/netfs/read_retry.c
-> > +++ b/fs/netfs/read_retry.c
-> > @@ -152,7 +152,6 @@ static void netfs_retry_read_subrequests(struct net=
-fs_io_request *rreq)
-> > __clear_bit(NETFS_SREQ_BOUNDARY, &subreq->flags);
-> > }
-> >=20
-> > - netfs_get_subrequest(subreq, netfs_sreq_trace_get_resubmit);
-> > netfs_reissue_read(rreq, subreq);
-> > if (subreq =3D=3D to)
-> > break;
-> >=20
-> > and I'm getting a hung task with the same stack
-> >=20
-> > [ 184.362292] INFO: task modprobe:2527 blocked for more than 20 seconds=
-.
-> > [ 184.363173] Tainted: G OE 6.13.0-gd0d106a2bd21-dirty #1
-> > [ 184.363651] "echo 0 > /proc/sys/kernel/hung_task_timeout_secs" disabl=
-es this message.
-> > [ 184.364142] task:modprobe state:D stack:0 pid:2527 tgid:2527 ppid:213=
-4 flags:0x00000002
-> > [ 184.364743] Call Trace:
-> > [ 184.364907] <TASK>
-> > [ 184.365057] __schedule+0xa91/0xe80
-> > [ 184.365311] schedule+0x41/0xb0
-> > [ 184.365525] v9fs_evict_inode+0xfe/0x170
-> > [ 184.365782] ? __pfx_var_wake_function+0x10/0x10
-> > [ 184.366082] evict+0x1ef/0x360
-> > [ 184.366312] __dentry_kill+0xb0/0x220
-> > [ 184.366561] ? dput+0x3a/0x1d0
-> > [ 184.366765] dput+0x114/0x1d0
-> > [ 184.366962] __fput+0x136/0x2b0
-> > [ 184.367172] __x64_sys_close+0x9e/0xd0
-> > [ 184.367443] do_syscall_64+0x79/0x120
-> > [ 184.367685] entry_SYSCALL_64_after_hwframe+0x76/0x7e
-> > [ 184.368005] RIP: 0033:0x7f4c6fc7f60b
-> > [ 184.368249] RSP: 002b:00007ffc7582beb8 EFLAGS: 00000297 ORIG_RAX: 000=
-0000000000003
-> > [ 184.368733] RAX: ffffffffffffffda RBX: 0000555e18cff7a0 RCX: 00007f4c=
-6fc7f60b
-> > [ 184.369176] RDX: 00007f4c6fd64ee0 RSI: 0000000000000001 RDI: 00000000=
-00000000
-> > [ 184.369634] RBP: 00007ffc7582bee0 R08: 0000000000000000 R09: 00000000=
-00000007
-> > [ 184.370078] R10: 0000555e18cff980 R11: 0000000000000297 R12: 00000000=
-00000000
-> > [ 184.370544] R13: 00007f4c6fd65030 R14: 0000555e18cff980 R15: 0000555e=
-18d7b750
-> > [ 184.371004] </TASK>
-> > [ 184.371151]
-> > [ 184.371151] Showing all locks held in the system:
-> > [ 184.371560] 1 lock held by khungtaskd/32:
-> > [ 184.371816] #0: ffffffff83195d90 (rcu_read_lock){....}-{1:3}, at: deb=
-ug_show_all_locks+0x2e/0x180
-> > [ 184.372397] 2 locks held by kworker/u8:21/2134:
-> > [ 184.372695] #0: ffff9a5300104d48 ((wq_completion)events_unbound){+.+.=
-}-{0:0}, at: process_scheduled_works+0x23a/0x600
-> > [ 184.373376] #1: ffff9e9882187e20 ((work_completion)(&sub_info->work))=
-{+.+.}-{0:0}, at: process_scheduled_works+0x25a/0x600
-> > [ 184.374075]
-> > [ 184.374182] =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D
-> >=20
-> > So this appears to be something different.
-> >=20
-> > > Marc
->=20
->=20
-> Looks like there may be a similar issue with the
-> netfs_get_subrequest() at line 196, which also precedes a call to
-> netfs_reissue_read. Might be worth trying with that removed as well.
+I'm not sure I understand the question, but I'll try to give an
+answer and please let me know if you have another question.
 
-Just did that. Got lucky locally, but no changes on CI:
-https://github.com/kernel-patches/vmtest/actions/runs/12956261831/job/36142=
-811371
+Mapping the NAPI IDs to queue IDs is useful for applications that
+use epoll based busy polling (which relies on the NAPI ID, see also
+SO_INCOMING_NAPI_ID and [1]), IRQ suspension [2], and generally
+per-NAPI configuration [3].
 
-Do you know of any pending patches addressing the double-get issue?
-Does this diff reliably fix the hang in afs_evict_inode?
+Without this code added to the driver, the user application can get
+the NAPI ID of an incoming connection, but has no way to know which
+queue (or NIC) that NAPI ID is associated with or to set per-NAPI
+configuration settings.
 
-Thanks.
+[1]: https://lore.kernel.org/all/20240213061652.6342-1-jdamato@fastly.com/
+[2]: https://lore.kernel.org/netdev/20241109050245.191288-5-jdamato@fastly.com/T/
+[3]: https://lore.kernel.org/lkml/20241011184527.16393-1-jdamato@fastly.com/
 
-diff --git a/fs/netfs/read_retry.c b/fs/netfs/read_retry.c
-index 2290af0d51ac..6c8327f4227c 100644
---- a/fs/netfs/read_retry.c
-+++ b/fs/netfs/read_retry.c
-@@ -152,7 +152,6 @@ static void netfs_retry_read_subrequests(struct netfs_i=
-o_request *rreq)
-                                __clear_bit(NETFS_SREQ_BOUNDARY, &subreq->f=
-lags);
-                        }
-=20
--                       netfs_get_subrequest(subreq, netfs_sreq_trace_get_r=
-esubmit);
-                        netfs_reissue_read(rreq, subreq);
-                        if (subreq =3D=3D to)
-                                break;
-@@ -194,7 +193,6 @@ static void netfs_retry_read_subrequests(struct netfs_i=
-o_request *rreq)
-                        trace_netfs_sreq_ref(rreq->debug_id, subreq->debug_=
-index,
-                                             refcount_read(&subreq->ref),
-                                             netfs_sreq_trace_new);
--                       netfs_get_subrequest(subreq, netfs_sreq_trace_get_r=
-esubmit);
-=20
-                        list_add(&subreq->rreq_link, &to->rreq_link);
-                        to =3D list_next_entry(to, rreq_link);
+> 2) does NAPI know (or why it needs to know) whether or not it's a TX
+> or not? I only see the following code in napi_hash_add():
 
->=20
-> Marc
+Note that I did not write the original implementation of NAPI IDs or
+epoll-based busy poll, so I can only comment on what I know :)
+
+I don't know why TX-only NAPIs do not have NAPI IDs. My guess is
+that in the original implementation, the code was designed only for
+RX busy polling, so TX-only NAPIs were not assigned NAPI IDs.
+
+Perhaps in the future, TX-only NAPIs will be assigned NAPI IDs, but
+currently they do not have NAPI IDs.
+
+> static void napi_hash_add(struct napi_struct *napi)
+> {
+>         unsigned long flags;
+> 
+>         if (test_bit(NAPI_STATE_NO_BUSY_POLL, &napi->state))
+>                 return;
+> 
+> ...
+> 
+>         __napi_hash_add_with_id(napi, napi_gen_id);
+> 
+>         spin_unlock_irqrestore(&napi_hash_lock, flags);
+> }
+> 
+> It seems it only matters with NAPI_STATE_NO_BUSY_POLL.
+> 
+> And if NAPI knows everything, should it be better to just do the
+> linking in napi_enable/disable() instead of letting each driver do it
+> by itself?
+
+It would be nice if this were possible, I agree. Perhaps in the
+future some work could be done to make this possible.
+
+I believe that this is not currently possible because the NAPI does
+not know which queue ID it is associated with. That mapping of which
+queue is associated with which NAPI is established in patch 3
+(please see the commit message of patch 3 to see an example of the
+output).
+
+The driver knows both the queue ID and the NAPI for that queue, so
+the mapping can be established only by the driver.
+
+Let me know if that helps.
+
+- Joe
 
