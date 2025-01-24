@@ -1,118 +1,127 @@
-Return-Path: <netdev+bounces-160830-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-160831-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 42447A1BAD8
-	for <lists+netdev@lfdr.de>; Fri, 24 Jan 2025 17:46:39 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id AA6D2A1BB16
+	for <lists+netdev@lfdr.de>; Fri, 24 Jan 2025 17:58:29 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 57A6016E7F1
-	for <lists+netdev@lfdr.de>; Fri, 24 Jan 2025 16:46:37 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 593EE3A3332
+	for <lists+netdev@lfdr.de>; Fri, 24 Jan 2025 16:58:22 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EB67A19B5BE;
-	Fri, 24 Jan 2025 16:46:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AC6F51ACE12;
+	Fri, 24 Jan 2025 16:58:23 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ZseZAzfM"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Pu+ES174"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ej1-f46.google.com (mail-ej1-f46.google.com [209.85.218.46])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 33D2F1459E0;
-	Fri, 24 Jan 2025 16:46:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.46
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6EA6CFBF6;
+	Fri, 24 Jan 2025 16:58:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1737737196; cv=none; b=QifmcxEugr3Or8n6A4qoucq7uP3bvXduEobxiyh8UL5kzyoencoyTQDnhBClqrtKsXHrdT77XkYofJ6y8dQZDTIm8C80u63b4DGK0rsreLhe8kox/yWilGNHZemDgQtIgOZrG8cXj1D2wxMfX+WnlcZ3n0nICuWtMiQJr/p7hKo=
+	t=1737737903; cv=none; b=cPyKijQIdC2lrttDOTXpyjdr3yjhO/Qo+hHODx5orNi9p64r62PyWAloNhB4iffi6F15CsYJKkLETzljSCUeSxWrnp0j+X+ECF1w4hsRNp0JVH7ajwGhdeXJ6hWaIZzoGnAAj3ou/5SE1gZnuDi7PG/ALUduL80Zl6H3frf3WXk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1737737196; c=relaxed/simple;
-	bh=3P+9aTiLaHox8mL2ZK+WSxeM0kY5helZLnTFCzt45dc=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=iVwkWXHrCCatpzdNEnE0m8knOQizxfLclvAPr5KDviUHDmGGoRdGvyGCd/8RULJvWt9T0i62KAwhyCx96859OnP5cCduWTC82Ldw9z3XtfyMz/93e9JhcW3XHjrVkJ0zJt+1Asoo4lKxf3peOWx063Md1JRz/spFlIjYhibCwjQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=ZseZAzfM; arc=none smtp.client-ip=209.85.218.46
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ej1-f46.google.com with SMTP id a640c23a62f3a-aaf60d85238so403607266b.0;
-        Fri, 24 Jan 2025 08:46:34 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1737737193; x=1738341993; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=3P+9aTiLaHox8mL2ZK+WSxeM0kY5helZLnTFCzt45dc=;
-        b=ZseZAzfMABao2yI1/Df7T+OQgrhqV0FBYt4HPa04UO4vBgaQqM3q16korfrKUs/fke
-         6vzw8rS3dHd3mCpMPQ5MJ/6S9mb29JMY9XcEz3FmYuSUYD18vNRJNEK3si1ODtkhXtwg
-         xn6Pui7uEypaEFHYmPFOgsaWDtIGHh6JaJ3Ir3qBK4MTfZ4w2+NxTKRzvw8DgT5owbo6
-         ixtLN2s29Lidt98u9Rw0ZN+oiC30Kq9Yr5KUh1w9ACrKzC7qyoAh73z+EEjdjH8eSu+H
-         fCEpFNzUVQI70EyR24oyhpkJZCNHz5pn7v6RJoLn/KFUTxtbb6SwDVA1yeJ4S3AJvCrl
-         UGaQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1737737193; x=1738341993;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=3P+9aTiLaHox8mL2ZK+WSxeM0kY5helZLnTFCzt45dc=;
-        b=BmLYerkVUg1Z4UUmCbplxmrpPq0xR7Qy9rOMa1BD7MSHOd994pmCrcbx9qOJcsei0K
-         dvKdyDXHa5CuRiJ8CvB/cOo2aIP2BaxgUkpyue6XpiJVRPb47oZwdXBzSp8TIg/8oyw6
-         506DIUB4BDVQNgxT6ee/7y0BuPcxnL60yw9ft+19YJGafFGl2b6AJGQj3CqtVpZ208Kk
-         P6kXdujJ0O/s7CaKedb1cQylh1C9GQCmTxibO4z720tj+1f1/cl1uuSET6+j4y5QdOih
-         HDBRolaHPryVlaHHWsmbZh0efXLbuYJva3EyL0rbTiOMZFYqQEKqOLPK0wnI0EcTAs4z
-         JwEw==
-X-Forwarded-Encrypted: i=1; AJvYcCUmqn6XIhsJrQUAjd3ORg1x7VXyfTVM2TkaHrGyZkXxbrBjtm2Phh1QuQFwF3WfyowWtnA=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzbLKhm2g+9/+ZaHdP1T9oh/MTZ6aGVjRNy3L+rVVhiAvQVUk7V
-	1HH8J69JnWAxJTi1drt0zYMvPzvQXtgY+ylPmTPpAYZYL7fu4qlUuSbZXI8PYjSmSsSZwloWT6+
-	iTFb6sI2LClWVEFp2bkK9YlQswNs=
-X-Gm-Gg: ASbGncvVL4VE1uLMHD4y9LXTfS1+KXI4J2Lz4vfe/ns8B2Ryzt5VbovJ4LsI1B0vkNn
-	S3ViQWzBBZJUosPawA5nWrPRtUC1D+ajagjwMDWToIfuWdP4frjTL1ImugQOt9oe6WBAYWgs6Mx
-	U=
-X-Google-Smtp-Source: AGHT+IGMNi7U+c3YgeTKPqKmkN12vA7tjq7ur6vHq+zBUJB5GBN9ofCptg5c4QoAbKBPKmEwrFGHUESzlJTCsnJlf3Y=
-X-Received: by 2002:a17:907:2ce5:b0:aab:cce0:f8b4 with SMTP id
- a640c23a62f3a-ab38b4c6b05mr3017971166b.52.1737737193217; Fri, 24 Jan 2025
- 08:46:33 -0800 (PST)
+	s=arc-20240116; t=1737737903; c=relaxed/simple;
+	bh=ymJW+rtAPVx/7REXk9y2aKHMTY3RTmJlmCBWfsMGnHo=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=SKfNohn8PqBVsW3tFYkuhc/QYXGEdQAraz2pY3EjwZ2JNEXofsAOpkoD/ThLb93PNjpbdP99kRl4k8j0bHJBHf8A0+Gi6KDklvqj3DaKoNRdDAs5Oh3rnGA5P4bMxU8Q4RVEHSf1bnDje2HrsLSwjLQA8ySRmXb2bhavq7cyTqk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Pu+ES174; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6D426C4CED2;
+	Fri, 24 Jan 2025 16:58:15 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1737737902;
+	bh=ymJW+rtAPVx/7REXk9y2aKHMTY3RTmJlmCBWfsMGnHo=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=Pu+ES174yrFgZLIhkQCdNMBAiPpOPgNkKP2A4gg/hKG9eU4+7cb1+MFlPnPk+PT8H
+	 mppaiOLnq2FKb4s3PyvLAyC+R/5hlc3rJmgKeTVyR7WJNdskWqkmuregUNKfvWumyV
+	 Qw7jmeypgNYnsXE6/5rMrid7jzxf5IK6Eydcud/MHbjCARUGJZvyyx5wRhFcUDuftp
+	 n1+F4+1+mgj3Vs4U/+9FIgIvrPCW0VDzW2vj3IJVq8J8p2QESUgQUOJK0KxYS+G1Pv
+	 wgtkilSEiYPfHnpaBZ50bWVlefjrJlC48OtqMwzygZUvXzU/e0ZQlHj+IhcKWFlOJs
+	 7VyXPmf294zOA==
+Message-ID: <1848ad5e-87cb-4f6b-a16d-c1b644add34f@kernel.org>
+Date: Fri, 24 Jan 2025 17:58:12 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250124090211.110328-1-sankararaman.jayaraman@broadcom.com>
-In-Reply-To: <20250124090211.110328-1-sankararaman.jayaraman@broadcom.com>
-From: William Tu <u9012063@gmail.com>
-Date: Fri, 24 Jan 2025 08:45:56 -0800
-X-Gm-Features: AWEUYZkH6xFaPaEOJR0ohihd2I5L7RV1uXP71LkRO-Lq8_VRerVgOElw7fHJ1H4
-Message-ID: <CALDO+SbGYqG6jskUhp-dzxTPa2Mf5ge794Z_L0AC8MLxoKXMnA@mail.gmail.com>
-Subject: Re: [PATCH net] vmxnet3: Fix tx queue race condition with XDP
-To: Sankararaman Jayaraman <sankararaman.jayaraman@broadcom.com>
-Cc: netdev@vger.kernel.org, ronak.doshi@broadcom.com, 
-	bcm-kernel-feedback-list@broadcom.com, andrew+netdev@lunn.ch, 
-	davem@davemloft.net, kuba@kernel.org, edumazet@google.com, pabeni@redhat.com, 
-	ast@kernel.org, alexandr.lobakin@intel.com, alexanderduyck@fb.com, 
-	bpf@vger.kernel.org, daniel@iogearbox.net, hawk@kernel.org, 
-	john.fastabend@gmail.com
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v1 0/9] Use HWMON_CHANNEL_INFO macro to simplify code
+To: Huisong Li <lihuisong@huawei.com>, linux-hwmon@vger.kernel.org,
+ linux-kernel@vger.kernel.org, linux-media@vger.kernel.org,
+ netdev@vger.kernel.org, linux-rtc@vger.kernel.org
+Cc: oss-drivers@corigine.com, matt@ranostay.sg, mchehab@kernel.org,
+ irusskikh@marvell.com, andrew+netdev@lunn.ch, davem@davemloft.net,
+ edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
+ louis.peens@corigine.com, hkallweit1@gmail.com, linux@armlinux.org.uk,
+ kabel@kernel.org, alexandre.belloni@bootlin.com, zhanjie9@hisilicon.com,
+ zhenglifeng1@huawei.com, liuyonglong@huawei.com
+References: <20250124022635.16647-1-lihuisong@huawei.com>
+From: Krzysztof Kozlowski <krzk@kernel.org>
+Content-Language: en-US
+Autocrypt: addr=krzk@kernel.org; keydata=
+ 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 fv0=
+In-Reply-To: <20250124022635.16647-1-lihuisong@huawei.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-On Fri, Jan 24, 2025 at 1:00=E2=80=AFAM Sankararaman Jayaraman
-<sankararaman.jayaraman@broadcom.com> wrote:
->
-> If XDP traffic runs on a CPU which is greater than or equal to
-> the number of the Tx queues of the NIC, then vmxnet3_xdp_get_tq()
-> always picks up queue 0 for transmission as it uses reciprocal scale
-> instead of simple modulo operation.
->
-> vmxnet3_xdp_xmit() and vmxnet3_xdp_xmit_frame() use the above
-> returned queue without any locking which can lead to race conditions
-> when multiple XDP xmits run in parallel on different CPU's.
->
-> This patch uses a simple module scheme when the current CPU equals or
-> exceeds the number of Tx queues on the NIC. It also adds locking in
-> vmxnet3_xdp_xmit() and vmxnet3_xdp_xmit_frame() functions.
->
-> Fixes: 54f00cce1178 ("vmxnet3: Add XDP support.")
-> Signed-off-by: Sankararaman Jayaraman <sankararaman.jayaraman@broadcom.co=
-m>
-> Signed-off-by: Ronak Doshi <ronak.doshi@broadcom.com>
-> ---
+On 24/01/2025 03:26, Huisong Li wrote:
+> The HWMON_CHANNEL_INFO macro is provided by hwmon.h and used widely by many
+> other drivers. This series use HWMON_CHANNEL_INFO macro to simplify code.
+> 
 
-LGTM
-Acked-by: William Tu <u9012063@gmail.com>
+Read the feedback given to you last time. I do not see how you addressed
+this:
+
+"Avoid combining independent patches into one patch bomb. Or explain the
+dependencies and how is it supposed to be merged - that's why you have
+cover letter here."
+
+Best regards,
+Krzysztof
 
