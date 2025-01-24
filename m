@@ -1,152 +1,172 @@
-Return-Path: <netdev+bounces-160749-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-160750-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 080C4A1B25C
-	for <lists+netdev@lfdr.de>; Fri, 24 Jan 2025 10:09:53 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8636BA1B29F
+	for <lists+netdev@lfdr.de>; Fri, 24 Jan 2025 10:30:41 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id E3483188F58F
-	for <lists+netdev@lfdr.de>; Fri, 24 Jan 2025 09:09:57 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id CCBD1166846
+	for <lists+netdev@lfdr.de>; Fri, 24 Jan 2025 09:30:39 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 383381D8E06;
-	Fri, 24 Jan 2025 09:09:50 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="D/CNhJT1"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AC06A218E91;
+	Fri, 24 Jan 2025 09:30:36 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from exchange.fintech.ru (exchange.fintech.ru [195.54.195.159])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0B4821D6DC8;
-	Fri, 24 Jan 2025 09:09:49 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B11D323A0;
+	Fri, 24 Jan 2025 09:30:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.54.195.159
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1737709790; cv=none; b=XBhZzR/6x4kfQzAyGz+XBFwjqvSuRnF+CVp69GLQMo3j8AVoIJwJwPaRTblRWDWzVHH9HRfAaEa8+z1Ag5SUt5XvH+vbqq6Ple/7S+tCKcffhVyT3N7y4WOjW2OJU2cYoDHgfh+RZ7SCvTEKE+WqClnAjuZpAhW7Nhkszm0r7+8=
+	t=1737711036; cv=none; b=Jd4sCUkBbPdoqannNBzGjJfVR/mHg1WLnO4mKhooD6C69BuxW/jUcXgSCclXyT3TqZtl9KFCn0CcZ+N1cE54YnINGwAk5lpmEABjMQrAzmm5TRGSIw/8YHLWj6O5N/fDJ8Glu877rc0lXRsiFNiBB+NsM1En3J+mGL1WiJNIVUU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1737709790; c=relaxed/simple;
-	bh=6ODapJhhQGi6PIhN0lVMoDCWGSUnfR1hVh+dZ2hFuZU=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=hC1xDd71QhNH7gJEX436otrjLusFx7hfna+IBAM4+jFYJ4CWwYbtSWWHOoYZ79JeysX0/AZGZ38EzcxCEyYhnvOwhym59c+tAa7gUZBWDFuYW0brqwB1s/NkhC50Re97SNeTdLEoqmMrqn+o7UR+rcVulkPUMqlrNo/YlXe/puU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=D/CNhJT1; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6D93AC4CEE7;
-	Fri, 24 Jan 2025 09:09:49 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1737709789;
-	bh=6ODapJhhQGi6PIhN0lVMoDCWGSUnfR1hVh+dZ2hFuZU=;
-	h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
-	b=D/CNhJT1iq1VYsG5Y2ZI8HFz67jLp/v0T6K+8uGnhtITcpn7w55gY+nNXFi1PUGHY
-	 l2drx1RXWkDsIIi1BCW3GplM8xyKT6x9jvnK/utNeFTjjCzM8jdxSmHSOdczFlrx2b
-	 6E+gGqSBwvPb1Qwz+cKoOI1oyv5M0mGn54CK/AUArIOyU/n4NRxMIMqx5Ji1aLJ8bM
-	 02XRZ6Nx2xU1yMlsOWCamUbqdTR8xROse9WOfTKyrKty0xBpRg9bRTXYGjVnumg80n
-	 YYZNm+PB9WGgPQbnBYrRQX7VNzDaVgjflgFpXSsBMs5BZ/buTxOJJkUABZpy4HUGJ8
-	 8o/D3FdiyZsMw==
-Received: by mail-ej1-f51.google.com with SMTP id a640c23a62f3a-ab2c9b8aecaso332440666b.0;
-        Fri, 24 Jan 2025 01:09:49 -0800 (PST)
-X-Forwarded-Encrypted: i=1; AJvYcCU/NGjLfwS4iqCUa0gMCorbWcLlv7cd/10uEuN4bujb22vh8Q1gUnBgDLArNM+8PUX5sWUaQFfMn/SYSF0=@vger.kernel.org, AJvYcCXUy2Zg9AVq5f8hUKKCFX9H8IppLCbGbFkBU5LAuBwkqzQg8zgrcjYEyDB0xY6+8SUpkqCaeNur@vger.kernel.org, AJvYcCXY8U6uMD1SfQLUilR+u05ZJ7raDcIpuRXwFYx0Iyn/IeVDm6+Zj2eIalFGkcuWU3EY4i5hz9V1@vger.kernel.org
-X-Gm-Message-State: AOJu0YytdVesI8eFU92vzT27o2H9/QhNwpkDHbqEdPmnD9XDOI3vsTqm
-	OEVbgjyX94BiohXILqqEplAjSkuvQoXOKZyecXpc0RxgZhXQoXlNvsmw0dcwPoZoyiSVY1gyXKc
-	I3fL6xPOTIKpWJ1reDOxpam9pcS4=
-X-Google-Smtp-Source: AGHT+IGTuAf8HhxS55jC5emGy1X+8qNgDIgPU/o1SgJWkl820wvVBBoCo7jL58E2K6QC878sjf/FnZgeOx4+ewldUuc=
-X-Received: by 2002:a17:907:7fa4:b0:ab6:511d:8908 with SMTP id
- a640c23a62f3a-ab6511d8af9mr1112359566b.40.1737709787937; Fri, 24 Jan 2025
- 01:09:47 -0800 (PST)
+	s=arc-20240116; t=1737711036; c=relaxed/simple;
+	bh=T+A/U+lN7rbSAiOboTaT7muuaZCzDU3jykkZJxXpyyA=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=rxuFVPgAy03tCDah6lK1wqpZDAz81yXP9O56XuHMz36WDeBmk5oJOFucMrt6BrHgKdkNXJkFKl3T04YxMAHawX9VkWpOT7jRCD9Vf9XNfK4kc+OEyjP+j2gouMedb6/HbSpI+cqA5l8uxIHwuwrrCXQCMXkCNwZejLmt5EM/iKQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=fintech.ru; spf=pass smtp.mailfrom=fintech.ru; arc=none smtp.client-ip=195.54.195.159
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=fintech.ru
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=fintech.ru
+Received: from Ex16-01.fintech.ru (10.0.10.18) by exchange.fintech.ru
+ (195.54.195.159) with Microsoft SMTP Server (TLS) id 14.3.498.0; Fri, 24 Jan
+ 2025 12:30:23 +0300
+Received: from localhost (10.0.253.138) by Ex16-01.fintech.ru (10.0.10.18)
+ with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2242.4; Fri, 24 Jan
+ 2025 12:30:23 +0300
+From: Nikita Zhandarovich <n.zhandarovich@fintech.ru>
+To: Petko Manolov <petkan@nucleusys.com>
+CC: Nikita Zhandarovich <n.zhandarovich@fintech.ru>, Andrew Lunn
+	<andrew+netdev@lunn.ch>, "David S. Miller" <davem@davemloft.net>, "Eric
+ Dumazet" <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
+	<pabeni@redhat.com>, <linux-usb@vger.kernel.org>, <netdev@vger.kernel.org>,
+	<syzbot+d7e968426f644b567e31@syzkaller.appspotmail.com>,
+	<syzkaller-bugs@googlegroups.com>, <linux-kernel@vger.kernel.org>,
+	<lvc-project@linuxtesting.org>
+Subject: [PATCH net v2] net: usb: rtl8150: enable basic endpoint checking
+Date: Fri, 24 Jan 2025 01:30:20 -0800
+Message-ID: <20250124093020.234642-1-n.zhandarovich@fintech.ru>
+X-Mailer: git-send-email 2.25.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250121093703.2660482-1-chenhuacai@loongson.cn> <20250122133450.GI390877@kernel.org>
-In-Reply-To: <20250122133450.GI390877@kernel.org>
-From: Huacai Chen <chenhuacai@kernel.org>
-Date: Fri, 24 Jan 2025 17:09:39 +0800
-X-Gmail-Original-Message-ID: <CAAhV-H4=FQbZakx_=V-qcoWuBzbVyL31qmStNS9OFt-49w20bw@mail.gmail.com>
-X-Gm-Features: AWEUYZlq08fDdXgdubKEAY1DJZk-M0VOQOeQI5in40fIJ5XHXxgmvkwOvdPO5R4
-Message-ID: <CAAhV-H4=FQbZakx_=V-qcoWuBzbVyL31qmStNS9OFt-49w20bw@mail.gmail.com>
-Subject: Re: [PATCH] net: stmmac: dwmac-loongson: Set correct {tx,rx}_fifo_size
-To: Simon Horman <horms@kernel.org>
-Cc: Huacai Chen <chenhuacai@loongson.cn>, Andrew Lunn <andrew+netdev@lunn.ch>, 
-	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, loongarch@lists.linux.dev, 
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org, stable@vger.kernel.org, 
-	Chong Qiao <qiaochong@loongson.cn>, Feiyang Chen <chenfeiyang@loongson.cn>, 
-	Yanteng Si <si.yanteng@linux.dev>, Alexandre Torgue <alexandre.torgue@foss.st.com>, 
-	Maxime Coquelin <mcoquelin.stm32@gmail.com>, Serge Semin <fancer.lancer@gmail.com>, 
-	linux-stm32@st-md-mailman.stormreply.com, 
-	linux-arm-kernel@lists.infradead.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-ClientProxiedBy: Ex16-02.fintech.ru (10.0.10.19) To Ex16-01.fintech.ru
+ (10.0.10.18)
 
-On Wed, Jan 22, 2025 at 9:34=E2=80=AFPM Simon Horman <horms@kernel.org> wro=
-te:
->
-> + Feiyang Chen, Yanteng Si, Alexandre Torgue, Maxime Coquelin, Serge Semi=
-n,
->   linux-arm-kernel
->
-> On Tue, Jan 21, 2025 at 05:37:03PM +0800, Huacai Chen wrote:
-> > Now for dwmac-loongson {tx,rx}_fifo_size are uninitialised, which means
-> > zero. This means dwmac-loongson doesn't support changing MTU, so set th=
-e
-> > correct tx_fifo_size and rx_fifo_size for it (16KB multiplied by channe=
-l
-> > counts).
-> >
-> > Note: the Fixes tag is not exactly right, but it is a key commit of the
-> > dwmac-loongson series.
-> >
-> > Cc: stable@vger.kernel.org
-> > Fixes: ad72f783de06827a1f ("net: stmmac: Add multi-channel support")
-> > Signed-off-by: Chong Qiao <qiaochong@loongson.cn>
-> > Signed-off-by: Huacai Chen <chenhuacai@loongson.cn>
->
-> Thanks, this change looks good to me.
-> And I agree that MTU setting cannot succeed without it.
->
-> Reviewed-by: Simon Horman <horms@kernel.org>
->
-> Some process notes regarding Networking patches to keep
-> in mind for next time.
->
-> 1. Please set the target tree. In this case, as this is a fix
->    for code present in net. In general, otherwise it would be net-next.
->
->    Subject: [PATCH net] ...
->
-> 2. Please generate a CC list using
->
->    ./scripts/get_maintainer.pl this.patch
->
->    The b4 tool can help with this.
->
-> Link: https://docs.kernel.org/process/maintainer-netdev.html
-OK, thanks.
+Syzkaller reports [1] encountering a common issue of utilizing a wrong
+usb endpoint type during URB submitting stage. This, in turn, triggers
+a warning shown below.
 
-Huacai
->
-> > ---
-> >  drivers/net/ethernet/stmicro/stmmac/dwmac-loongson.c | 3 +++
-> >  1 file changed, 3 insertions(+)
-> >
-> > diff --git a/drivers/net/ethernet/stmicro/stmmac/dwmac-loongson.c b/dri=
-vers/net/ethernet/stmicro/stmmac/dwmac-loongson.c
-> > index bfe6e2d631bd..79acdf38c525 100644
-> > --- a/drivers/net/ethernet/stmicro/stmmac/dwmac-loongson.c
-> > +++ b/drivers/net/ethernet/stmicro/stmmac/dwmac-loongson.c
-> > @@ -574,6 +574,9 @@ static int loongson_dwmac_probe(struct pci_dev *pde=
-v, const struct pci_device_id
-> >       if (ret)
-> >               goto err_disable_device;
-> >
-> > +     plat->tx_fifo_size =3D SZ_16K * plat->tx_queues_to_use;
-> > +     plat->rx_fifo_size =3D SZ_16K * plat->rx_queues_to_use;
-> > +
-> >       if (dev_of_node(&pdev->dev))
-> >               ret =3D loongson_dwmac_dt_config(pdev, plat, &res);
-> >       else
-> > --
-> > 2.47.1
-> >
-> >
+For now, enable simple endpoint checking (specifically, bulk and
+interrupt eps, testing control one is not essential) to mitigate
+the issue with a view to do other related cosmetic changes later,
+if they are necessary.
+
+[1] Syzkaller report:
+usb 1-1: BOGUS urb xfer, pipe 3 != type 1
+WARNING: CPU: 1 PID: 2586 at drivers/usb/core/urb.c:503 usb_submit_urb+0xe4b/0x1730 driv>
+Modules linked in:
+CPU: 1 UID: 0 PID: 2586 Comm: dhcpcd Not tainted 6.11.0-rc4-syzkaller-00069-gfc88bb11617>
+Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 08/06/2024
+RIP: 0010:usb_submit_urb+0xe4b/0x1730 drivers/usb/core/urb.c:503
+Code: 84 3c 02 00 00 e8 05 e4 fc fc 4c 89 ef e8 fd 25 d7 fe 45 89 e0 89 e9 4c 89 f2 48 8>
+RSP: 0018:ffffc9000441f740 EFLAGS: 00010282
+RAX: 0000000000000000 RBX: ffff888112487a00 RCX: ffffffff811a99a9
+RDX: ffff88810df6ba80 RSI: ffffffff811a99b6 RDI: 0000000000000001
+RBP: 0000000000000003 R08: 0000000000000001 R09: 0000000000000000
+R10: 0000000000000000 R11: 0000000000000001 R12: 0000000000000001
+R13: ffff8881023bf0a8 R14: ffff888112452a20 R15: ffff888112487a7c
+FS:  00007fc04eea5740(0000) GS:ffff8881f6300000(0000) knlGS:0000000000000000
+CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+CR2: 00007f0a1de9f870 CR3: 000000010dbd0000 CR4: 00000000003506f0
+DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
+DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
+Call Trace:
+ <TASK>
+ rtl8150_open+0x300/0xe30 drivers/net/usb/rtl8150.c:733
+ __dev_open+0x2d4/0x4e0 net/core/dev.c:1474
+ __dev_change_flags+0x561/0x720 net/core/dev.c:8838
+ dev_change_flags+0x8f/0x160 net/core/dev.c:8910
+ devinet_ioctl+0x127a/0x1f10 net/ipv4/devinet.c:1177
+ inet_ioctl+0x3aa/0x3f0 net/ipv4/af_inet.c:1003
+ sock_do_ioctl+0x116/0x280 net/socket.c:1222
+ sock_ioctl+0x22e/0x6c0 net/socket.c:1341
+ vfs_ioctl fs/ioctl.c:51 [inline]
+ __do_sys_ioctl fs/ioctl.c:907 [inline]
+ __se_sys_ioctl fs/ioctl.c:893 [inline]
+ __x64_sys_ioctl+0x193/0x220 fs/ioctl.c:893
+ do_syscall_x64 arch/x86/entry/common.c:52 [inline]
+ do_syscall_64+0xcd/0x250 arch/x86/entry/common.c:83
+ entry_SYSCALL_64_after_hwframe+0x77/0x7f
+RIP: 0033:0x7fc04ef73d49
+...
+
+This change has not been tested on real hardware.
+
+Reported-and-tested-by: syzbot+d7e968426f644b567e31@syzkaller.appspotmail.com
+Closes: https://syzkaller.appspot.com/bug?extid=d7e968426f644b567e31
+Fixes: 1da177e4c3f4 ("Linux-2.6.12-rc2")
+Cc: stable@vger.kernel.org
+Signed-off-by: Nikita Zhandarovich <n.zhandarovich@fintech.ru>
+---
+v1 -> v2: move declarations of ep addresses to the beginning of
+rtl8150_probe() to remove a build warning in older branches
+(courtesy of -Wdeclaration-after-statement).
+
+ drivers/net/usb/rtl8150.c | 22 ++++++++++++++++++++++
+ 1 file changed, 22 insertions(+)
+
+diff --git a/drivers/net/usb/rtl8150.c b/drivers/net/usb/rtl8150.c
+index 01a3b2417a54..ddff6f19ff98 100644
+--- a/drivers/net/usb/rtl8150.c
++++ b/drivers/net/usb/rtl8150.c
+@@ -71,6 +71,14 @@
+ #define MSR_SPEED		(1<<3)
+ #define MSR_LINK		(1<<2)
+ 
++/* USB endpoints */
++enum rtl8150_usb_ep {
++	RTL8150_USB_EP_CONTROL = 0,
++	RTL8150_USB_EP_BULK_IN = 1,
++	RTL8150_USB_EP_BULK_OUT = 2,
++	RTL8150_USB_EP_INT_IN = 3,
++};
++
+ /* Interrupt pipe data */
+ #define INT_TSR			0x00
+ #define INT_RSR			0x01
+@@ -867,6 +875,13 @@ static int rtl8150_probe(struct usb_interface *intf,
+ 	struct usb_device *udev = interface_to_usbdev(intf);
+ 	rtl8150_t *dev;
+ 	struct net_device *netdev;
++	static const u8 bulk_ep_addr[] = {
++		RTL8150_USB_EP_BULK_IN | USB_DIR_IN,
++		RTL8150_USB_EP_BULK_OUT | USB_DIR_OUT,
++		0};
++	static const u8 int_ep_addr[] = {
++		RTL8150_USB_EP_INT_IN | USB_DIR_IN,
++		0};
+ 
+ 	netdev = alloc_etherdev(sizeof(rtl8150_t));
+ 	if (!netdev)
+@@ -880,6 +895,13 @@ static int rtl8150_probe(struct usb_interface *intf,
+ 		return -ENOMEM;
+ 	}
+ 
++	/* Verify that all required endpoints are present */
++	if (!usb_check_bulk_endpoints(intf, bulk_ep_addr) ||
++	    !usb_check_int_endpoints(intf, int_ep_addr)) {
++		dev_err(&intf->dev, "couldn't find required endpoints\n");
++		goto out;
++	}
++
+ 	tasklet_setup(&dev->tl, rx_fixup);
+ 	spin_lock_init(&dev->rx_pool_lock);
+ 
 
