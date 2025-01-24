@@ -1,133 +1,115 @@
-Return-Path: <netdev+bounces-160846-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-160847-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9124EA1BCD6
-	for <lists+netdev@lfdr.de>; Fri, 24 Jan 2025 20:22:48 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id B78C4A1BCE2
+	for <lists+netdev@lfdr.de>; Fri, 24 Jan 2025 20:34:57 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 9E6C2188A51E
-	for <lists+netdev@lfdr.de>; Fri, 24 Jan 2025 19:22:52 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 14B1B16DD50
+	for <lists+netdev@lfdr.de>; Fri, 24 Jan 2025 19:34:56 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C0D912236FD;
-	Fri, 24 Jan 2025 19:22:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9448F188714;
+	Fri, 24 Jan 2025 19:34:55 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="Jqtl3xJu"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="DYcmC1lZ"
 X-Original-To: netdev@vger.kernel.org
-Received: from out-180.mta0.migadu.com (out-180.mta0.migadu.com [91.218.175.180])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AFFE614D456
-	for <netdev@vger.kernel.org>; Fri, 24 Jan 2025 19:22:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.180
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 702D835976
+	for <netdev@vger.kernel.org>; Fri, 24 Jan 2025 19:34:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1737746564; cv=none; b=TS3/8IqW9r+D1pqfGyWgCwcAQM7Ht7M7o62o7oOgLoX6i3n+cYLPkfitYFvKj/h1e+3G13Ud5gUGyFW7sgpmAe8EYuelcU0Je0D31EzxLIr+r5idiVO7NR0IcWBPFTRAdi2EqbpiTL41kvB08NKszXx1WzjVWG7zt8WdaqE0mXg=
+	t=1737747295; cv=none; b=Lb8QWIrJBJCpDzkn3UEK/dAWPRPBFwl9+nFARpjufQwURbSfmavbN4byTXK/lLjQ5qNDf8qyrou3nSZyuZ+sQtzwQxblOnH9DRUX8EH3/aCGPXFY8pwSXquE/d0gh6IGCnd9DqZl9RyiDohGun/THhHY1D5xtaHE9M5Jw7KYtMU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1737746564; c=relaxed/simple;
-	bh=i/TDGybsH4dySGKqlZyMKcvvI/ahjOvK5u6lr+fsny8=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=cS1+RM/7LtRRja9W64J6hcvsiojbQxaaKQFuSWwzsVuurzhIwnE4GCR/UzlfJ3dtNI3ATPWAMdzrvzktI8hme0GxmWQOA+E0Qv61QLNZRN5jV4ZXQRg3V9ZzpfO9NRd+uR40ZML7hQypNOryCHil+gHplizf45twG0XQj1r4LtA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=Jqtl3xJu; arc=none smtp.client-ip=91.218.175.180
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
-Message-ID: <35e5479b-420c-4fd9-80d9-c04530ef1dc2@linux.dev>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1737746545;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=nJFY4cd+T8Vq2jb64D2lTIqAXeuV2PtwHcbgnffDQjA=;
-	b=Jqtl3xJumbkujZTJ1WVBRW+GgTXP4A0VPQ4EHI4sx+SKdw8VWaV+Isv2r6ZenltbMUXVER
-	I/2nECM4cQ8sgn/4K4yvrsWO28z/JHkOJZW/hRg7DEE/Y1Zv0Zozc217lPE0DTKgY+k+j4
-	Fl1h70O2b9eAmrnoRVTE3w9ymtOi5vM=
-Date: Fri, 24 Jan 2025 11:22:16 -0800
+	s=arc-20240116; t=1737747295; c=relaxed/simple;
+	bh=afaTpytvszIRc3Ff1yvTxfqmbXKTKzeJ7LSxwr4lKS4=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=XvJa7YU2taskxthw11OHAkTHboZM9+TW5q3W2FWgr3VYOwpaQ3Ft8Oo3MR8CU5R0Va1N0eC/1BgM8CXD7zBH7mmOlIOef8ucbuQsaVqyEDRD4lPInfmvauAUxjWdizOP/tCqwShXbAuFFAk7iQEPvy1JyAhnOfd/+6c0IpJ9dUA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=DYcmC1lZ; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4796BC4CED2;
+	Fri, 24 Jan 2025 19:34:55 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1737747295;
+	bh=afaTpytvszIRc3Ff1yvTxfqmbXKTKzeJ7LSxwr4lKS4=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=DYcmC1lZkJMV9DunJ7XC0oGhToYcOB4s3tBaD7J7K2HTD30qsMzcluL0ul2UisIa0
+	 U0ZlUmgxGIg3CMD4CDOiA34GhvVgCEavXwCs6QcAn3xttyKA/pwXM7CN2fiXqHpGnF
+	 MZeXZR1b4Opab0KyP2TN9H4SFTNqH1lBUwLar2y6rOdJ9SdRaQ5D3f4dpUphyOHoQq
+	 SrQr0NN9PoyvBUWOP5IZoUTJSbWG2FiRf6AsdSHkM4mZ9F1up+HBD9jreMDTqdLo82
+	 x6RBtRSFbTe9RCOo2ENh//5oC602nBnkxe7BanALqW3rlOr5K9fm7qszKTyJhVFm6P
+	 KxQEGqFvHm0jw==
+Date: Fri, 24 Jan 2025 11:34:54 -0800
+From: Saeed Mahameed <saeed@kernel.org>
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: Stanislav Fomichev <stfomichev@gmail.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Paolo Abeni <pabeni@redhat.com>, Eric Dumazet <edumazet@google.com>,
+	Saeed Mahameed <saeedm@nvidia.com>, netdev@vger.kernel.org,
+	Tariq Toukan <tariqt@nvidia.com>, Gal Pressman <gal@nvidia.com>,
+	Leon Romanovsky <leonro@nvidia.com>,
+	Dragos Tatulea <dtatulea@nvidia.com>
+Subject: Re: [net-next 10/11] net/mlx5e: Implement queue mgmt ops and single
+ channel swap
+Message-ID: <Z5PrXkL7taguM57W@x130>
+References: <20250116215530.158886-1-saeed@kernel.org>
+ <20250116215530.158886-11-saeed@kernel.org>
+ <20250116152136.53f16ecb@kernel.org>
+ <Z4maY9r3tuHVoqAM@x130>
+ <20250116155450.46ba772a@kernel.org>
+ <Z5LhKdNMO5CvAvZf@mini-arch>
+ <20250123165553.66f9f839@kernel.org>
+ <Z5ME2-zHJq6arJC8@x130>
+ <20250124072621.4ef8c763@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Subject: Re: [PATCH bpf v2 2/2] selftests/bpf: Adjust data size to have
- ETH_HLEN
-To: Shigeru Yoshida <syoshida@redhat.com>,
- Stanislav Fomichev <stfomichev@gmail.com>
-Cc: ast@kernel.org, daniel@iogearbox.net, andrii@kernel.org,
- eddyz87@gmail.com, song@kernel.org, yonghong.song@linux.dev,
- john.fastabend@gmail.com, kpsingh@kernel.org, sdf@fomichev.me,
- haoluo@google.com, jolsa@kernel.org, davem@davemloft.net,
- edumazet@google.com, kuba@kernel.org, pabeni@redhat.com, horms@kernel.org,
- hawk@kernel.org, lorenzo@kernel.org, toke@redhat.com, bpf@vger.kernel.org,
- netdev@vger.kernel.org
-References: <20250121150643.671650-1-syoshida@redhat.com>
- <20250121150643.671650-2-syoshida@redhat.com> <Z5KWE6J8OtRVCFDR@mini-arch>
- <5e342fea-764b-48a0-afda-4adfb504bd46@linux.dev> <Z5L-ubBI7z1J6IDi@mini-arch>
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Martin KaFai Lau <martin.lau@linux.dev>
-Content-Language: en-US
-In-Reply-To: <Z5L-ubBI7z1J6IDi@mini-arch>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Migadu-Flow: FLOW_OUT
+Content-Type: text/plain; charset=us-ascii; format=flowed
+Content-Disposition: inline
+In-Reply-To: <20250124072621.4ef8c763@kernel.org>
 
-On 1/23/25 6:45 PM, Stanislav Fomichev wrote:
-> On 01/23, Martin KaFai Lau wrote:
->> On 1/23/25 11:18 AM, Stanislav Fomichev wrote:
->>> On 01/22, Shigeru Yoshida wrote:
->>>> The function bpf_test_init() now returns an error if user_size
->>>> (.data_size_in) is less than ETH_HLEN, causing the tests to
->>>> fail. Adjust the data size to ensure it meets the requirement of
->>>> ETH_HLEN.
->>>>
->>>> Signed-off-by: Shigeru Yoshida <syoshida@redhat.com>
->>>> ---
->>>>    .../testing/selftests/bpf/prog_tests/xdp_cpumap_attach.c  | 4 ++--
->>>>    .../testing/selftests/bpf/prog_tests/xdp_devmap_attach.c  | 8 ++++----
->>>>    2 files changed, 6 insertions(+), 6 deletions(-)
->>>>
->>>> diff --git a/tools/testing/selftests/bpf/prog_tests/xdp_cpumap_attach.c b/tools/testing/selftests/bpf/prog_tests/xdp_cpumap_attach.c
->>>> index c7f74f068e78..df27535995af 100644
->>>> --- a/tools/testing/selftests/bpf/prog_tests/xdp_cpumap_attach.c
->>>> +++ b/tools/testing/selftests/bpf/prog_tests/xdp_cpumap_attach.c
->>>> @@ -52,10 +52,10 @@ static void test_xdp_with_cpumap_helpers(void)
->>>>    	ASSERT_EQ(info.id, val.bpf_prog.id, "Match program id to cpumap entry prog_id");
->>>>    	/* send a packet to trigger any potential bugs in there */
->>>> -	char data[10] = {};
->>>> +	char data[ETH_HLEN] = {};
->>>>    	DECLARE_LIBBPF_OPTS(bpf_test_run_opts, opts,
->>>>    			    .data_in = &data,
->>>> -			    .data_size_in = 10,
->>>> +			    .data_size_in = sizeof(data),
->>>>    			    .flags = BPF_F_TEST_XDP_LIVE_FRAMES,
->>>>    			    .repeat = 1,
->>>>    		);
->>>
->>> We should still keep 10, but change the ASSERT_OK below to expect the
->>> error instead. Looking at the comment above, the purpose of the test
->>> is to exercise that error case.
->>>
+On 24 Jan 07:26, Jakub Kicinski wrote:
+>On Thu, 23 Jan 2025 19:11:23 -0800 Saeed Mahameed wrote:
+>> On 23 Jan 16:55, Jakub Kicinski wrote:
+>> >> IIUC, we want queue API to move away from rtnl and use only (new) netdev
+>> >> lock. Otherwise, removing this dependency in the future might be
+>> >> complicated.
+>> >
+>> >Correct. We only have one driver now which reportedly works (gve).
+>> >Let's pull queues under optional netdev_lock protection.
+>> >Then we can use queue mgmt op support as a carrot for drivers
+>> >to convert / test the netdev_lock protection... "compliance".
+>> >
+>> >I added netdev_lock protection for NAPI before the merge window.
+>> >Queues are configured in much more ad-hoc fashion, so I think
+>> >the best way to make queue changes netdev_lock safe would be to
+>> >wrap all driver ops which are currently under rtnl_lock with
+>> >netdev_lock.
 >>
->> I think the bpf_prog_test_run_opts in this dev/cpumap test is to check the
->> bpf_redirect_map() helper, so it expects the bpf_prog_test_run_opts to
->> succeed.
->>
->> It just happens the current data[10] cannot trigger the fixed bug because
->> the bpf prog returns a XDP_REDIRECT instead of XDP_PASS, so xdp_recv_frames
->> is not called.
->>
->> To test patch 1, a separate test is probably needed to trigger the bug in
->> xdp_recv_frames() with a bpf prog returning XDP_PASS.
-> 
-> Ah, yes, you're right, I missed the remaining parts that make sure
-> the redirect happens
+>> Are you expecting drivers to hold netdev_lock internally?
+>> I was thinking something more scalable, queue_mgmt API to take
+>> netdev_lock,  and any other place in the stack that can access
+>> "netdev queue config" e.g ethtool/netlink/netdev_ops should grab
+>> netdev_lock as well, this is better for the future when we want to
+>> reduce rtnl usage in the stack to protect single netdev ops where
+>> netdev_lock will be sufficient, otherwise you will have to wait for ALL
+>> drivers to properly use netdev_lock internally to even start thinking of
+>> getting rid of rtnl from some parts of the core stack.
+>
+>Agreed, expecting drivers to get the locking right internally is easier
+>short term but messy long term. I'm thinking opt-in for drivers to have
+>netdev_lock taken by the core. Probably around all ops which today hold
+>rtnl_lock, to keep the expectations simple.
+>
 
-Thanks for confirming and the review.
+Why opt-in? I don't see any overhead of taking netdev_lock by default in
+rtnl_lock flows.
 
-Applied the fix.
-
-Shigeru, please followup with a selftest to test the "less than ETH_HLEN" bug 
-addressed in Patch 1. You can reuse some of the boilerplate codes from the 
-xdp_cpumap_attach.c. The bpf prog can simply be "return XDP_PASS;" and ensure 
-that BPF_F_TEST_XDP_LIVE_FRAMES is included in the bpf_test_run_opts. Thanks.
+>net_shaper and queue_mgmt ops can require that drivers that support
+>them opt-in and these ops can hold just the netdev_lock, no rtnl_lock.
 
