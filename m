@@ -1,172 +1,118 @@
-Return-Path: <netdev+bounces-160750-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-160751-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8636BA1B29F
-	for <lists+netdev@lfdr.de>; Fri, 24 Jan 2025 10:30:41 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id CEE00A1B318
+	for <lists+netdev@lfdr.de>; Fri, 24 Jan 2025 10:52:51 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id CCBD1166846
-	for <lists+netdev@lfdr.de>; Fri, 24 Jan 2025 09:30:39 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 29E56162034
+	for <lists+netdev@lfdr.de>; Fri, 24 Jan 2025 09:52:50 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AC06A218E91;
-	Fri, 24 Jan 2025 09:30:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 85C2D219A8F;
+	Fri, 24 Jan 2025 09:52:47 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from exchange.fintech.ru (exchange.fintech.ru [195.54.195.159])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-SHA384 (256/256 bits))
+Received: from szxga02-in.huawei.com (szxga02-in.huawei.com [45.249.212.188])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B11D323A0;
-	Fri, 24 Jan 2025 09:30:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.54.195.159
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 698B923A0;
+	Fri, 24 Jan 2025 09:52:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.188
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1737711036; cv=none; b=Jd4sCUkBbPdoqannNBzGjJfVR/mHg1WLnO4mKhooD6C69BuxW/jUcXgSCclXyT3TqZtl9KFCn0CcZ+N1cE54YnINGwAk5lpmEABjMQrAzmm5TRGSIw/8YHLWj6O5N/fDJ8Glu877rc0lXRsiFNiBB+NsM1En3J+mGL1WiJNIVUU=
+	t=1737712367; cv=none; b=czZZzAjdcFkMwXVpBXn1VuvpBLwhuJ+OA/JTceTpaclI54crKq29VVZ7V4uVx3jkrBo4l8+CI6e/CZ4R2fDbeEDTRrXC9t6BDFC4cxwCP3koR4by1qJ9ZJpj79TwgCbI9tCB7pvwq0WS210/D/MuxOvT9DY7fMOrIyGfaTTzspg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1737711036; c=relaxed/simple;
-	bh=T+A/U+lN7rbSAiOboTaT7muuaZCzDU3jykkZJxXpyyA=;
-	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=rxuFVPgAy03tCDah6lK1wqpZDAz81yXP9O56XuHMz36WDeBmk5oJOFucMrt6BrHgKdkNXJkFKl3T04YxMAHawX9VkWpOT7jRCD9Vf9XNfK4kc+OEyjP+j2gouMedb6/HbSpI+cqA5l8uxIHwuwrrCXQCMXkCNwZejLmt5EM/iKQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=fintech.ru; spf=pass smtp.mailfrom=fintech.ru; arc=none smtp.client-ip=195.54.195.159
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=fintech.ru
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=fintech.ru
-Received: from Ex16-01.fintech.ru (10.0.10.18) by exchange.fintech.ru
- (195.54.195.159) with Microsoft SMTP Server (TLS) id 14.3.498.0; Fri, 24 Jan
- 2025 12:30:23 +0300
-Received: from localhost (10.0.253.138) by Ex16-01.fintech.ru (10.0.10.18)
- with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2242.4; Fri, 24 Jan
- 2025 12:30:23 +0300
-From: Nikita Zhandarovich <n.zhandarovich@fintech.ru>
-To: Petko Manolov <petkan@nucleusys.com>
-CC: Nikita Zhandarovich <n.zhandarovich@fintech.ru>, Andrew Lunn
-	<andrew+netdev@lunn.ch>, "David S. Miller" <davem@davemloft.net>, "Eric
- Dumazet" <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
-	<pabeni@redhat.com>, <linux-usb@vger.kernel.org>, <netdev@vger.kernel.org>,
-	<syzbot+d7e968426f644b567e31@syzkaller.appspotmail.com>,
-	<syzkaller-bugs@googlegroups.com>, <linux-kernel@vger.kernel.org>,
-	<lvc-project@linuxtesting.org>
-Subject: [PATCH net v2] net: usb: rtl8150: enable basic endpoint checking
-Date: Fri, 24 Jan 2025 01:30:20 -0800
-Message-ID: <20250124093020.234642-1-n.zhandarovich@fintech.ru>
-X-Mailer: git-send-email 2.25.1
+	s=arc-20240116; t=1737712367; c=relaxed/simple;
+	bh=OxnKsPySuSh7Ons4C5nnqMMTtF+f9pa+WVc7g72LwNc=;
+	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
+	 In-Reply-To:Content-Type; b=B41CmwaYqckzilhZxbsNIeYr/t0kxs2CsTocrWoeibI19/hp/NA/G3UdDucEvPHb7NYcdJVwwzcqeR2CpaXrE/LfHMGIm64ETD+cvReHsN7eCFgcOZ107GGfKMPTVumM++4cfzGLHyEeJrdfD/MWacx+jHIitBo0PEedpTivqog=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.188
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
+Received: from mail.maildlp.com (unknown [172.19.88.105])
+	by szxga02-in.huawei.com (SkyGuard) with ESMTP id 4YfY3V0x6qzrSkW;
+	Fri, 24 Jan 2025 17:51:02 +0800 (CST)
+Received: from dggpemf200006.china.huawei.com (unknown [7.185.36.61])
+	by mail.maildlp.com (Postfix) with ESMTPS id 9A472140159;
+	Fri, 24 Jan 2025 17:52:40 +0800 (CST)
+Received: from [10.67.120.129] (10.67.120.129) by
+ dggpemf200006.china.huawei.com (7.185.36.61) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1544.11; Fri, 24 Jan 2025 17:52:40 +0800
+Message-ID: <ead00fb7-8538-45b3-8322-8a41386e7381@huawei.com>
+Date: Fri, 24 Jan 2025 17:52:33 +0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next v23 3/7] mm: page_frag: use initial zero offset
+ for page_frag_alloc_align()
+To: Florian Fainelli <florian.fainelli@broadcom.com>, <davem@davemloft.net>,
+	<kuba@kernel.org>, <pabeni@redhat.com>, Eric Dumazet <edumazet@google.com>
+CC: <netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>, Alexander Duyck
+	<alexander.duyck@gmail.com>, Andrew Morton <akpm@linux-foundation.org>,
+	Linux-MM <linux-mm@kvack.org>, Alexander Duyck <alexanderduyck@fb.com>
+References: <20241028115343.3405838-1-linyunsheng@huawei.com>
+ <20241028115343.3405838-4-linyunsheng@huawei.com>
+ <2ef8b7d4-7fae-4a08-9db1-4a33cd56ec9c@broadcom.com>
+Content-Language: en-US
+From: Yunsheng Lin <linyunsheng@huawei.com>
+In-Reply-To: <2ef8b7d4-7fae-4a08-9db1-4a33cd56ec9c@broadcom.com>
+Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: Ex16-02.fintech.ru (10.0.10.19) To Ex16-01.fintech.ru
- (10.0.10.18)
+X-ClientProxiedBy: dggems706-chm.china.huawei.com (10.3.19.183) To
+ dggpemf200006.china.huawei.com (7.185.36.61)
 
-Syzkaller reports [1] encountering a common issue of utilizing a wrong
-usb endpoint type during URB submitting stage. This, in turn, triggers
-a warning shown below.
+On 2025/1/24 3:15, Florian Fainelli wrote:
+> 
+> Sorry for the late feedback, this patch causes the bgmac driver in is .ndo_open() function to return -ENOMEM, the call trace looks like this:
 
-For now, enable simple endpoint checking (specifically, bulk and
-interrupt eps, testing control one is not essential) to mitigate
-the issue with a view to do other related cosmetic changes later,
-if they are necessary.
+Hi, Florian
+Thanks for the report.
 
-[1] Syzkaller report:
-usb 1-1: BOGUS urb xfer, pipe 3 != type 1
-WARNING: CPU: 1 PID: 2586 at drivers/usb/core/urb.c:503 usb_submit_urb+0xe4b/0x1730 driv>
-Modules linked in:
-CPU: 1 UID: 0 PID: 2586 Comm: dhcpcd Not tainted 6.11.0-rc4-syzkaller-00069-gfc88bb11617>
-Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 08/06/2024
-RIP: 0010:usb_submit_urb+0xe4b/0x1730 drivers/usb/core/urb.c:503
-Code: 84 3c 02 00 00 e8 05 e4 fc fc 4c 89 ef e8 fd 25 d7 fe 45 89 e0 89 e9 4c 89 f2 48 8>
-RSP: 0018:ffffc9000441f740 EFLAGS: 00010282
-RAX: 0000000000000000 RBX: ffff888112487a00 RCX: ffffffff811a99a9
-RDX: ffff88810df6ba80 RSI: ffffffff811a99b6 RDI: 0000000000000001
-RBP: 0000000000000003 R08: 0000000000000001 R09: 0000000000000000
-R10: 0000000000000000 R11: 0000000000000001 R12: 0000000000000001
-R13: ffff8881023bf0a8 R14: ffff888112452a20 R15: ffff888112487a7c
-FS:  00007fc04eea5740(0000) GS:ffff8881f6300000(0000) knlGS:0000000000000000
-CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-CR2: 00007f0a1de9f870 CR3: 000000010dbd0000 CR4: 00000000003506f0
-DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
-DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
-Call Trace:
- <TASK>
- rtl8150_open+0x300/0xe30 drivers/net/usb/rtl8150.c:733
- __dev_open+0x2d4/0x4e0 net/core/dev.c:1474
- __dev_change_flags+0x561/0x720 net/core/dev.c:8838
- dev_change_flags+0x8f/0x160 net/core/dev.c:8910
- devinet_ioctl+0x127a/0x1f10 net/ipv4/devinet.c:1177
- inet_ioctl+0x3aa/0x3f0 net/ipv4/af_inet.c:1003
- sock_do_ioctl+0x116/0x280 net/socket.c:1222
- sock_ioctl+0x22e/0x6c0 net/socket.c:1341
- vfs_ioctl fs/ioctl.c:51 [inline]
- __do_sys_ioctl fs/ioctl.c:907 [inline]
- __se_sys_ioctl fs/ioctl.c:893 [inline]
- __x64_sys_ioctl+0x193/0x220 fs/ioctl.c:893
- do_syscall_x64 arch/x86/entry/common.c:52 [inline]
- do_syscall_64+0xcd/0x250 arch/x86/entry/common.c:83
- entry_SYSCALL_64_after_hwframe+0x77/0x7f
-RIP: 0033:0x7fc04ef73d49
-...
+> 
+>  bgmac_open
+>   -> bgmac_dma_init
+>     -> bgmac_dma_rx_skb_for_slot
+>       -> netdev_alloc_frag
+> 
+> BGMAC_RX_ALLOC_SIZE = 10048 and PAGE_FRAG_CACHE_MAX_SIZE = 32768.
 
-This change has not been tested on real hardware.
+I guess BGMAC_RX_ALLOC_SIZE being bigger than PAGE_SIZE is the
+problem here, as the frag API is not really supporting allocating
+fragment that is bigger than PAGE_SIZE, as it will fall back to
+allocate the base page when order-3 compound page allocation fails,
+see __page_frag_cache_refill().
 
-Reported-and-tested-by: syzbot+d7e968426f644b567e31@syzkaller.appspotmail.com
-Closes: https://syzkaller.appspot.com/bug?extid=d7e968426f644b567e31
-Fixes: 1da177e4c3f4 ("Linux-2.6.12-rc2")
-Cc: stable@vger.kernel.org
-Signed-off-by: Nikita Zhandarovich <n.zhandarovich@fintech.ru>
----
-v1 -> v2: move declarations of ep addresses to the beginning of
-rtl8150_probe() to remove a build warning in older branches
-(courtesy of -Wdeclaration-after-statement).
+Also, it seems strange that bgmac driver seems to always use jumbo
+frame size to allocate fragment, isn't more  appropriate to allocate
+the fragment according to MTU?
 
- drivers/net/usb/rtl8150.c | 22 ++++++++++++++++++++++
- 1 file changed, 22 insertions(+)
+> 
+> Eventually we land into __page_frag_alloc_align() with the following parameters across multiple successive calls:
+> 
+> __page_frag_alloc_align: fragsz=10048, align_mask=-1, size=32768, offset=0
+> __page_frag_alloc_align: fragsz=10048, align_mask=-1, size=32768, offset=10048
+> __page_frag_alloc_align: fragsz=10048, align_mask=-1, size=32768, offset=20096
+> __page_frag_alloc_align: fragsz=10048, align_mask=-1, size=32768, offset=30144
+> 
+> So in that case we do indeed have offset + fragsz (40192) > size (32768) and so we would eventually return NULL.
 
-diff --git a/drivers/net/usb/rtl8150.c b/drivers/net/usb/rtl8150.c
-index 01a3b2417a54..ddff6f19ff98 100644
---- a/drivers/net/usb/rtl8150.c
-+++ b/drivers/net/usb/rtl8150.c
-@@ -71,6 +71,14 @@
- #define MSR_SPEED		(1<<3)
- #define MSR_LINK		(1<<2)
- 
-+/* USB endpoints */
-+enum rtl8150_usb_ep {
-+	RTL8150_USB_EP_CONTROL = 0,
-+	RTL8150_USB_EP_BULK_IN = 1,
-+	RTL8150_USB_EP_BULK_OUT = 2,
-+	RTL8150_USB_EP_INT_IN = 3,
-+};
-+
- /* Interrupt pipe data */
- #define INT_TSR			0x00
- #define INT_RSR			0x01
-@@ -867,6 +875,13 @@ static int rtl8150_probe(struct usb_interface *intf,
- 	struct usb_device *udev = interface_to_usbdev(intf);
- 	rtl8150_t *dev;
- 	struct net_device *netdev;
-+	static const u8 bulk_ep_addr[] = {
-+		RTL8150_USB_EP_BULK_IN | USB_DIR_IN,
-+		RTL8150_USB_EP_BULK_OUT | USB_DIR_OUT,
-+		0};
-+	static const u8 int_ep_addr[] = {
-+		RTL8150_USB_EP_INT_IN | USB_DIR_IN,
-+		0};
- 
- 	netdev = alloc_etherdev(sizeof(rtl8150_t));
- 	if (!netdev)
-@@ -880,6 +895,13 @@ static int rtl8150_probe(struct usb_interface *intf,
- 		return -ENOMEM;
- 	}
- 
-+	/* Verify that all required endpoints are present */
-+	if (!usb_check_bulk_endpoints(intf, bulk_ep_addr) ||
-+	    !usb_check_int_endpoints(intf, int_ep_addr)) {
-+		dev_err(&intf->dev, "couldn't find required endpoints\n");
-+		goto out;
-+	}
-+
- 	tasklet_setup(&dev->tl, rx_fixup);
- 	spin_lock_init(&dev->rx_pool_lock);
- 
+It seems the changing of '(unlikely(offset < 0))' checking to
+"fragsz > PAGE_SIZE" causes bgmac driver to break more easily
+here. But bgmac driver might likely break too if the system
+memory is severely fragmented when falling back to alllocate
+base page before this patch.
+
+> 
+> Any idea on how to best fix that within the bgmac driver?
+
+Maybe use the page allocator API directly when allocating fragment
+with BGMAC_RX_ALLOC_SIZE > PAGE_SIZE for a quick fix.
+
+In the long term, maybe it makes sense to use the page_pool API
+as more drivers are converting to use page_pool API already.
 
