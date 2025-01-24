@@ -1,230 +1,189 @@
-Return-Path: <netdev+bounces-160837-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-160838-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id A33F6A1BBCD
-	for <lists+netdev@lfdr.de>; Fri, 24 Jan 2025 19:00:16 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id C4E97A1BBE2
+	for <lists+netdev@lfdr.de>; Fri, 24 Jan 2025 19:07:21 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 64E9C16E498
-	for <lists+netdev@lfdr.de>; Fri, 24 Jan 2025 18:00:13 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 9FA6E188EDFB
+	for <lists+netdev@lfdr.de>; Fri, 24 Jan 2025 18:07:25 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D2930218EB9;
-	Fri, 24 Jan 2025 17:59:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E20E71DA2F1;
+	Fri, 24 Jan 2025 18:07:17 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=pm.me header.i=@pm.me header.b="JIbIB9RK"
+	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="iTUmVx2f"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-4322.protonmail.ch (mail-4322.protonmail.ch [185.70.43.22])
+Received: from NAM12-MW2-obe.outbound.protection.outlook.com (mail-mw2nam12on2062.outbound.protection.outlook.com [40.107.244.62])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5EF5D1FDE1B;
-	Fri, 24 Jan 2025 17:59:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.70.43.22
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1737741598; cv=none; b=YaIab6WBVVXTJxzgyog9onaBmRUS1VURC9UQDYjInfFnNS+hGkc8zjbarQEehqAjWHIrM3pZDCNqdVWybDHwstfzpV44giHOOnO+ksX6HRpsf62qOz/7K32l+gyxRTsxzqC8Ze/SA9xkG3aJmolx1v2QeVmEesLpwOwtxyax/jY=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1737741598; c=relaxed/simple;
-	bh=BXEp/Ifx1dkFW+s6C1bLT7iPr5FF0eKvtB+OTekdsY0=;
-	h=Date:To:From:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=ENXO8vJB+N+TWZYcbv7YCyxZNPfvUVyha7ej4TU/97LYW7S3utIvs2MF/La1POGjayyLVMTnt5xz4GBMqWKWkpvK5r1vDD8cH5jrm0+gE6DYTAoqBm6G5X7bGAG3F1L6zhmLLtY89PhxTHFSOzsZqNmbLGBimSeKXwnjIn/JqSM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=pm.me; spf=pass smtp.mailfrom=pm.me; dkim=pass (2048-bit key) header.d=pm.me header.i=@pm.me header.b=JIbIB9RK; arc=none smtp.client-ip=185.70.43.22
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=pm.me
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=pm.me
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=pm.me;
-	s=protonmail3; t=1737741587; x=1738000787;
-	bh=4rrjsE+MvicrrQ6Y6gD9cIT/HyQUToaWe+K01zQPoq8=;
-	h=Date:To:From:Cc:Subject:Message-ID:In-Reply-To:References:
-	 Feedback-ID:From:To:Cc:Date:Subject:Reply-To:Feedback-ID:
-	 Message-ID:BIMI-Selector:List-Unsubscribe:List-Unsubscribe-Post;
-	b=JIbIB9RK1AoMS0k9EJR6pJxIvCsuc8wWj0+M0dglHO9q1JpdzdAmkHasYCrL6Xtg3
-	 yZLr3M62KQpW6QElSB9M+pcd4aMm0HT2wqw0UCCvPmLAHp0lzj3Ee1K42YrTJnD1ZJ
-	 iMniNpaAOj+ZqKs0nfS4IhVd194HyBZ9cNCQm9XctxK4WpskYdAABH7CX2J5lBkY13
-	 e0IfEJyknM5ANHMu9Kt8dKBp9jMsb84bURnBlrw52rQdtq+69a5McLcAQtpO65sGdt
-	 41iS4elHgn1exDbKEeUD8x2Poaxtujd+Vr2jIZyVsNGCPiSgDJOwnEXYL+xEoaLsuF
-	 mLAK+CeNGGy/w==
-Date: Fri, 24 Jan 2025 17:59:39 +0000
-To: David Howells <dhowells@redhat.com>
-From: Ihor Solodrai <ihor.solodrai@pm.me>
-Cc: Christian Brauner <christian@brauner.io>, Steve French <smfrench@gmail.com>, Matthew Wilcox <willy@infradead.org>, Jeff Layton <jlayton@kernel.org>, Gao Xiang <hsiangkao@linux.alibaba.com>, Dominique Martinet <asmadeus@codewreck.org>, Marc Dionne <marc.dionne@auristor.com>, Paulo Alcantara <pc@manguebit.com>, Shyam Prasad N <sprasad@microsoft.com>, Tom Talpey <tom@talpey.com>, Eric Van Hensbergen <ericvh@kernel.org>, Ilya Dryomov <idryomov@gmail.com>, netfs@lists.linux.dev, linux-afs@lists.infradead.org, linux-cifs@vger.kernel.org, linux-nfs@vger.kernel.org, ceph-devel@vger.kernel.org, v9fs@lists.linux.dev, linux-erofs@lists.ozlabs.org, linux-fsdevel@vger.kernel.org, linux-mm@kvack.org, netdev@vger.kernel.org, linux-kernel@vger.kernel.org, bpf <bpf@vger.kernel.org>
-Subject: Re: [PATCH v5 27/32] netfs: Change the read result collector to only use one work item
-Message-ID: <a7x33d4dnMdGTtRivptq6S1i8btK70SNBP2XyX_xwDAhLvgQoPox6FVBOkifq4eBinfFfbZlIkMZBe3QarlWTxoEtHZwJCZbNKtaqrR7PvI=@pm.me>
-In-Reply-To: <20241216204124.3752367-28-dhowells@redhat.com>
-References: <20241216204124.3752367-1-dhowells@redhat.com> <20241216204124.3752367-28-dhowells@redhat.com>
-Feedback-ID: 27520582:user:proton
-X-Pm-Message-ID: 2d63f4f4ff77fa7cfd9219388b78b772c9c2eebe
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5003182D98;
+	Fri, 24 Jan 2025 18:07:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.244.62
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1737742037; cv=fail; b=ifMs4aX7Bj6IfKC5Uh/s+jOhi7KXjR1wN4o5enG8Jtj4eLqzkH+fwAbLKAopLVgMqJoAzEIuM/7iRuy255hMVV9QpYm4j9ZEPNUn6cOoDxZWP80pq9Mg1k4uz00YjW7PYSvt5aAdTW/8JvDAQzIsr1njGPTuz6QcjEO1W1tTyxk=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1737742037; c=relaxed/simple;
+	bh=U3gZ/pp5qzL0zpwAimKbs+kdcHs15jeh0OPxr20NVW8=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:Content-Type:
+	 Content-Disposition:In-Reply-To:MIME-Version; b=vDqKDsw8yfbZMvFIEvzFPWF3DcZul4clzxK8GL1Iqg9YrNDDA4Ealh/ykygwLKDucjmkle6UNLdRqP4JiNzgS10or4TCdCVrKvlnPH0aU3CIZ6q/4Qo3tZoX4H2MXGZ3bIGfLGpLKgngNU9lp0JSfMXVJni1QSMOV97N4gPr0ho=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=iTUmVx2f; arc=fail smtp.client-ip=40.107.244.62
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=h5oakpD0YKROC4X6Mevflt95NzBx3ILuI8+WT6zRZVX1Nil7jo8UIGgQRRlSPJ6XOGuaZG1ojPHXG/GwLwksdI+KZ/3e+6m2bh+vryHs0a3sU8i6owQult6IEonlE6IKHgPjkAw3SghvvqFoXK7iiVIDIbHKaCdrPqLZCOtsxEtYCslul/MRobKxwBLvW6BqvNkjkkJwGxb2qMW1DRFBZDKnDiWIHJzIl/+Y/E++BdJ30SN4vv6fzaJvfqJqShVicGMPEv1d/6tn3H6LY+rO83YrgJHWVPhtokBAeAsZg6eWKBQs2Fw2dv9/2AOSA8BTkkHGFsMgj7YKQ/PvJLRF4Q==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=eZIKadRgRCZ8j2KEemOJkhucOKJrobqQ3XrKgQyDlVU=;
+ b=ICZybgWkbb1nDf/yb8YNANQ5l/djL0JKqvDVw3WdFKF+iNbB1UFmQigsh7WrECoFFsKp9Doj91k6f4/fYWWlGy7hn22ClVEXtUiWT7FyUoy834CzXwF86lnfuGjgyqUseRhZqsgzLL7o84DLjLygrvRrfVbOpmYtK/V4lkQmZ+BsPuIF/Dc49VGjE98ImDC1yxX4jNKfA9G6ezc4clRyaJ5NjfLBZcieU9KR4086Pi9g8pPlplxsMwQPI0b3udXpjf6tbGxXkA69/lo1e6zwagiyA4jG1kpuQ5owL1SGjniItPXFx0WMdt6D77RkKXXchdJYFuYIBBtnnziOBusz4Q==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
+ dkim=pass header.d=nvidia.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=eZIKadRgRCZ8j2KEemOJkhucOKJrobqQ3XrKgQyDlVU=;
+ b=iTUmVx2f4GKnYd2YznAv4aRz1nbaQnfj6LUlVWcim23UV6ps8ktubzdkMg+zApjhFawf35dhGYuHF3GGLYlHWftH/9ygIcqU38BUx7IToA//yrBZVDEmL08886Ay+E6Xb2jTuOi73wi3idRgFLe+KsQI8eUDI0ucax0FM++/QQwrGJOpDvbzOOxIpjrCt4zLldaBXyJVMDFgTqyHPZ8/lKVQ74YgbtCOy6GQlB9R5t5iGduAC1i3QwhnFLauULGjZk46vV1Z3ejTAnN2+fAvzpgG06IlFJsZXyPzWe16oDHEaVh9I9DSK1zCSCRF/WpVUVKwI+aW+MiU+sIXvWO6ww==
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=nvidia.com;
+Received: from CY5PR12MB6405.namprd12.prod.outlook.com (2603:10b6:930:3e::17)
+ by DM4PR12MB7672.namprd12.prod.outlook.com (2603:10b6:8:103::18) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8377.18; Fri, 24 Jan
+ 2025 18:07:13 +0000
+Received: from CY5PR12MB6405.namprd12.prod.outlook.com
+ ([fe80::2119:c96c:b455:53b5]) by CY5PR12MB6405.namprd12.prod.outlook.com
+ ([fe80::2119:c96c:b455:53b5%3]) with mapi id 15.20.8356.020; Fri, 24 Jan 2025
+ 18:07:13 +0000
+Date: Fri, 24 Jan 2025 19:07:08 +0100
+From: Andrea Righi <arighi@nvidia.com>
+To: Matthieu Baerts <matttbe@kernel.org>,
+	Catalin Marinas <catalin.marinas@arm.com>
+Cc: torvalds@linux-foundation.org, davem@davemloft.net,
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+	pabeni@redhat.com, Guo Weikang <guoweikang.kernel@gmail.com>,
+	Andrew Morton <akpm@linux-foundation.org>,
+	Jakub Kicinski <kuba@kernel.org>
+Subject: Re: [GIT PULL] Networking for v6.13-rc7
+Message-ID: <Z5PWzNYxJAYjbJkv@gpd3>
+References: <20250109182953.2752717-1-kuba@kernel.org>
+ <173646486752.1541533.15419405499323104668.pr-tracker-bot@kernel.org>
+ <20250116193821.2e12e728@kernel.org>
+ <Z4uwbqAwKvR4_24t@arm.com>
+ <Z45i4YT1YRccf4dH@arm.com>
+ <20250120094547.202f4718@kernel.org>
+ <Z4-AYDvWNaUo-ZQ7@arm.com>
+ <20250121074218.52ce108b@kernel.org>
+ <Z5AHlDLU6I8zh71D@arm.com>
+ <426d4476-e3b4-4a95-84a1-850015651ee6@kernel.org>
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <426d4476-e3b4-4a95-84a1-850015651ee6@kernel.org>
+X-ClientProxiedBy: FR4P281CA0253.DEUP281.PROD.OUTLOOK.COM
+ (2603:10a6:d10:f5::7) To CY5PR12MB6405.namprd12.prod.outlook.com
+ (2603:10b6:930:3e::17)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: CY5PR12MB6405:EE_|DM4PR12MB7672:EE_
+X-MS-Office365-Filtering-Correlation-Id: 1013f45d-d9ae-44c5-3b83-08dd3ca1ed9f
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;ARA:13230040|366016|1800799024|376014|7416014;
+X-Microsoft-Antispam-Message-Info:
+	=?us-ascii?Q?uxVy73Dam5c+Nmjs3HvARI1y3IAfo3vKXVQ0m5fK4HCrRYfouJZz2wgFaemH?=
+ =?us-ascii?Q?D42wnTnZNtHfgtOPgzMvlCiYu5Pql1tYBvl45DrbwxrL8qnoRJtD5nKw0XqF?=
+ =?us-ascii?Q?P0gDCFnZVWROKQkx8I8I/UbDOzP6kt4RXQNbT+WEUrzj1VkRJGrehpSL3EKq?=
+ =?us-ascii?Q?J1760oFuUpIdcilMJzrDUKRPaDI8OquBEsXXO07AstuX9JcwaDfpF8qsuRAC?=
+ =?us-ascii?Q?BOxxJOLzoHOBeWuy49NwUgufcyJe7XLtDiAtmrHN80msL46jatIHlF2hDse0?=
+ =?us-ascii?Q?vdkd7eGZ/hgYogZLsu569t3wtjToXsaiXmRLbivjrUDciUncnCOc8K64k6+y?=
+ =?us-ascii?Q?E9FIEhm+6psaZbqVNrmgCLp/ERGpDkIWtOkKUAZ6Jl8Z69iopUfuKmIZk4x5?=
+ =?us-ascii?Q?7yLPkKeq6NjDAxh0q/mbJ8p5hm+siWiFyeW83nhw9nMpmyenjfu0pT6oQZCV?=
+ =?us-ascii?Q?Spwa1g8rqGOnAcahkCxjzoHgl8zxjwN1M/HwOMgG+fgaTUWxRLpY9lbMpAQa?=
+ =?us-ascii?Q?Fo9E37erF2U6L7fqsiRFKhaTCKsXdW55ymDtkc3gUe4C49Tm9P5xkb64sFlq?=
+ =?us-ascii?Q?a/vnmhB7LQplf6mesDY6aom2k5I+VbYUywgCdHeqv1jS/rebouJBQ3XUls5X?=
+ =?us-ascii?Q?U4fLgKGFKZqqHnR5EljOFEseOO3mX57OMIXvr2G0Fqu8X7LuFNn+TSYsb8pC?=
+ =?us-ascii?Q?dIDQ94KqGc8Qg9fUyScV/DFNkTdFzVpuPcGILC+RIHWHrcwgkKEWAM1rKW9N?=
+ =?us-ascii?Q?1qK7+aZOD6Qv6OX9aKGrfjywpiW/9yVlX46tDkC0FhHiO3XOVd29qaPgi9Li?=
+ =?us-ascii?Q?s4ZgwK/xfp87U2GdlPrVg9VQvzeccv0EVx4MwWwNDJhOpzGuInpgdUfBAOEC?=
+ =?us-ascii?Q?w8Xw1dG7/ZTi8nb+xGPws+oDEtmif9ZP0XC1W3aeNFaYpIctFErQaqL51kwa?=
+ =?us-ascii?Q?00p+A3tCybOh+TJtMz4YZleZeTtBpQHiflfA8iGae/F8upXK9Y4jDhnj0AMt?=
+ =?us-ascii?Q?fwaKQGI8HBovcRbhray1jKGnQFsxVnxadMYjYPHlFEPUCtlFmli1pASP0bGn?=
+ =?us-ascii?Q?uLhqhxpQoXdJaxnXPqDY2S8BBTnCiAjb+rhsGxa7MLUC4VFd72n71qaLHSM7?=
+ =?us-ascii?Q?ZqX/mWDRqXfqShOeSZs/r8fMh3UsnuiwI5BcXraBnfi0H4vNS7hdoNJLm/Vb?=
+ =?us-ascii?Q?ZBWfwMntXSerEMRN5q/BsepoolqSjZx8GGhIDgjo23p4QM1gQwByGfjMhMlh?=
+ =?us-ascii?Q?Jk6fU1Rx8h7G3GKzHwwt2r55dleG0vs/w3cFa5Elte0LOVnU66FD+U6HfCrk?=
+ =?us-ascii?Q?82aJ26cn2bbo1pZWrFNXHBbS6DzRVWRH+XiSD2vWCIuM8XRjpgynx+bc3F55?=
+ =?us-ascii?Q?EglDAKhpM3vMgXIDLCusbQ7IEhH8?=
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:CY5PR12MB6405.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(366016)(1800799024)(376014)(7416014);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?us-ascii?Q?TH3+cghagZKpDRKZMRyDknk1DLMaFMlE+rmX5NXpCum8s55oWP7k8aBRIRO3?=
+ =?us-ascii?Q?PYyvNnkTrc43DuQKGJJzNRE9BVIzcu5I/Xj9TlrP+qawemxhLUZI3NYlQo8U?=
+ =?us-ascii?Q?r9TJdo5ofPXC4w5imbJKG26qxxiZEtBqp4LNc0ZOqbZdZTP/lBZBenb0Ss/J?=
+ =?us-ascii?Q?LkRl1ztGX8rjkK0nIkl/meqMorQOO/352iW/Wxv250xAk1+D5LIgcW6OgBWF?=
+ =?us-ascii?Q?nTeQwiqXMt/7DcQsvBu5/WiWtOPI4IV0QJVKOybiFFKmbGeRttBGuaKzD/en?=
+ =?us-ascii?Q?QE+2e1V816cOroDKPaF0Nni9AAwxJXbRg9G2dVHTnqlo4TJGTMukC56Yvf8K?=
+ =?us-ascii?Q?CPF2S8xMgMR18EZ37BVr0gIl46ZFVUMZsSeHyrAdiJQV08eyflBZmG0HGQ58?=
+ =?us-ascii?Q?cq3/NrENOhgW47RZknHsWk6/wTSWEB6ospMFLmy1z/y8u4xZ0o3G/Cwrrdxb?=
+ =?us-ascii?Q?C2VYdxRETOCQQlp2UJJqwk6UATBHHbiuuJLgVXe8G7PN8+XaasdqJ3yb0Vfi?=
+ =?us-ascii?Q?al4IIEAh4VBS4hgxNK9uXchSPzTHPvf289MoK337v5Of5CV14qExKJJsehGI?=
+ =?us-ascii?Q?bQaVc+tIUp4+fem+5p67MKnDPUV5AviU+e+slZEZKwEsRtJYpE/ykvimJAoc?=
+ =?us-ascii?Q?+5rR7ehULIaOgg8b5QjYTcIBoPZmyYKMWrT8nXwCSpE+dcOMCcNqGjM0Kz55?=
+ =?us-ascii?Q?sgAGHQmMLeouR8NQ5T1Wi8+okxpTns/Ia0ktaYtxCUoRU2LLdDBi+8RI9SLA?=
+ =?us-ascii?Q?AcA3sblgwv9mHuoDINOfNxsz/eaS/AoalG37UNavLyH3Vx/B+JoPdNfPUW/l?=
+ =?us-ascii?Q?IqgtujPYhp5fLVAoy6Oen/3sMm42bTpqJG//mJoRrtNqY4D+x8rD1OEMhhuS?=
+ =?us-ascii?Q?n5GgTYxZYMbvbJFhv1XlLPUFxfdOV0ymQLSMeB0fUViIFWmD0cOe5WcWRwml?=
+ =?us-ascii?Q?gZut+eQWFZ4JwoJZMkOmTu2KVQuqMeHB8I3fIue9pWZAffp2WT+3FT2zkHlC?=
+ =?us-ascii?Q?GdqvQc79fCLgcG1J/IZznLTuRTY/4CN2SD295LciN9ASkGIV8T8Hpm86Tu8E?=
+ =?us-ascii?Q?NemMdVG8cXT5LfYIKlBh5IieF+FkcSrG0tZfMsrtYErwSZPYfQPOr56QGWH1?=
+ =?us-ascii?Q?fCRzGNdLf8utPq7RoJNg3EsvLr5z5GuK1rGF4bAcEW/FU+puzmc7iRzVHQbp?=
+ =?us-ascii?Q?iG2EHTUkS1elqYOduVrxwCWJ6Xu4r4MzS9hy8V1ZiS8mt2K3TwQcb5msk7fb?=
+ =?us-ascii?Q?f5JgxODbBmCuI4aYE4eeEoEtahBCnXF1v3xTn+x/joLtKXeFlhBSsMQajH6p?=
+ =?us-ascii?Q?RSBsZzA01bN8D17hXr75Rm60V3urMvOao3ma5nIOpDgmPiVUwQpMMYF99Y3r?=
+ =?us-ascii?Q?Y0nVbEq5raQR1F2kWEnj/bYURYF3oHmCvT2fstRsZZCathHcGxg+V7wXa0b5?=
+ =?us-ascii?Q?ulv4df0N5ZUCtuT1Ls8o5oz29yebHCwFwKMWMWWXMi5rem6anPej3AP7+FgP?=
+ =?us-ascii?Q?0hc6/mMqwFHqN8t9qLoG/c12pW6QlLK25jWN0V35hsw8thSz+828V7hxZhGa?=
+ =?us-ascii?Q?2RFmv+PJujnGacr4AG3N+qNsHrm5p30abPB4AqqN?=
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 1013f45d-d9ae-44c5-3b83-08dd3ca1ed9f
+X-MS-Exchange-CrossTenant-AuthSource: CY5PR12MB6405.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 24 Jan 2025 18:07:13.1652
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: 5XMZSVPw+DGBoKvL98uOcL09I/2pWHr+a4YgMG7QQ+2LkGH2T2HtC5C9preKS1PgexEI9pqXUbS2vEIBjcihBA==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM4PR12MB7672
 
-On Monday, December 16th, 2024 at 12:41 PM, David Howells <dhowells@redhat.=
-com> wrote:
+On Thu, Jan 23, 2025 at 06:11:16PM +0100, Matthieu Baerts wrote:
+...
+> Please note that on our side with MPTCP, I can only reproduce this issue
+> locally, but not from our CI on GitHub Actions. The main difference is
+> the kernel (6.8 on the CI, 6.12 here) and the fact our CI is launching
+> virtme-ng from a VM. The rest should be the same.
+> 
+> > (after hacking vng to allow x86_64 as non-host architecture).
 
-> Change the way netfslib collects read results to do all the collection fo=
-r
-> a particular read request using a single work item that walks along the
-> subrequest queue as subrequests make progress or complete, unlocking foli=
-os
-> progressively rather than doing the unlock in parallel as parallel reques=
-ts
-> come in.
->=20
-> The code is remodelled to be more like the write-side code, though only
-> using a single stream. This makes it more directly comparable and thus
-> easier to duplicate fixes between the two sides.
->=20
-> This has a number of advantages:
->=20
-> (1) It's simpler. There doesn't need to be a complex donation mechanism
-> to handle mismatches between the size and alignment of subrequests and
-> folios. The collector unlocks folios as the subrequests covering each
-> complete.
->=20
-> (2) It should cause less scheduler overhead as there's a single work item
-> in play unlocking pages in parallel when a read gets split up into a
-> lot of subrequests instead of one per subrequest.
->=20
-> Whilst the parallellism is nice in theory, in practice, the vast
-> majority of loads are sequential reads of the whole file, so
-> committing a bunch of threads to unlocking folios out of order doesn't
-> help in those cases.
->=20
-> (3) It should make it easier to implement content decryption. A folio
-> cannot be decrypted until all the requests that contribute to it have
-> completed - and, again, most loads are sequential and so, most of the
-> time, we want to begin decryption sequentially (though it's great if
-> the decryption can happen in parallel).
->=20
-> There is a disadvantage in that we're losing the ability to decrypt and
-> unlock things on an as-things-arrive basis which may affect some
-> applications.
->=20
-> Signed-off-by: David Howells dhowells@redhat.com
->=20
-> cc: Jeff Layton jlayton@kernel.org
->=20
-> cc: netfs@lists.linux.dev
-> cc: linux-fsdevel@vger.kernel.org
-> ---
-> fs/9p/vfs_addr.c | 3 +-
-> fs/afs/dir.c | 8 +-
-> fs/ceph/addr.c | 9 +-
-> fs/netfs/buffered_read.c | 160 ++++----
-> fs/netfs/direct_read.c | 60 +--
-> fs/netfs/internal.h | 21 +-
-> fs/netfs/main.c | 2 +-
-> fs/netfs/objects.c | 34 +-
-> fs/netfs/read_collect.c | 716 ++++++++++++++++++++---------------
-> fs/netfs/read_pgpriv2.c | 203 ++++------
-> fs/netfs/read_retry.c | 207 +++++-----
-> fs/netfs/read_single.c | 37 +-
-> fs/netfs/write_collect.c | 4 +-
-> fs/netfs/write_issue.c | 2 +-
-> fs/netfs/write_retry.c | 14 +-
-> fs/smb/client/cifssmb.c | 2 +
-> fs/smb/client/smb2pdu.c | 5 +-
-> include/linux/netfs.h | 16 +-
-> include/trace/events/netfs.h | 79 +---
-> 19 files changed, 819 insertions(+), 763 deletions(-)
+Ah right, we still don't support `--arch x86_64|amd64`, it's definitely
+something we should add.
 
-Hello David.
+> 
+> Do not hesitate to report this issue + hack on vng's bug tracker :)
+> 
+>   https://github.com/arighi/virtme-ng/issues/new
 
-After recent merge from upstream BPF CI started consistently failing
-with a task hanging in v9fs_evict_inode. I bisected the failure to
-commit e2d46f2ec332, pointing to this patch.
+Yep, as pointed by Matt, feel free to post your hack there, otherwise I'll
+take a look at this.
 
-Reverting the patch seems to have helped:
-https://github.com/kernel-patches/vmtest/actions/runs/12952856569
-
-Could you please investigate?
-
-Examples of failed jobs:
-  * https://github.com/kernel-patches/bpf/actions/runs/12941732247
-  * https://github.com/kernel-patches/bpf/actions/runs/12933849075
-
-A log snippet:
-
-    2025-01-24T02:15:03.9009694Z [  246.932163] INFO: task ip:1055 blocked =
-for more than 122 seconds.
-    2025-01-24T02:15:03.9013633Z [  246.932709]       Tainted: G           =
-OE      6.13.0-g2bcb9cf535b8-dirty #149
-    2025-01-24T02:15:03.9018791Z [  246.933249] "echo 0 > /proc/sys/kernel/=
-hung_task_timeout_secs" disables this message.
-    2025-01-24T02:15:03.9025896Z [  246.933802] task:ip              state:=
-D stack:0     pid:1055  tgid:1055  ppid:1054   flags:0x00004002
-    2025-01-24T02:15:03.9028228Z [  246.934564] Call Trace:
-    2025-01-24T02:15:03.9029758Z [  246.934764]  <TASK>
-    2025-01-24T02:15:03.9032572Z [  246.934937]  __schedule+0xa91/0xe80
-    2025-01-24T02:15:03.9035126Z [  246.935224]  schedule+0x41/0xb0
-    2025-01-24T02:15:03.9037992Z [  246.935459]  v9fs_evict_inode+0xfe/0x17=
-0
-    2025-01-24T02:15:03.9041469Z [  246.935748]  ? __pfx_var_wake_function+=
-0x10/0x10
-    2025-01-24T02:15:03.9043837Z [  246.936101]  evict+0x1ef/0x360
-    2025-01-24T02:15:03.9046624Z [  246.936340]  __dentry_kill+0xb0/0x220
-    2025-01-24T02:15:03.9048855Z [  246.936610]  ? dput+0x3a/0x1d0
-    2025-01-24T02:15:03.9051128Z [  246.936838]  dput+0x114/0x1d0
-    2025-01-24T02:15:03.9053548Z [  246.937069]  __fput+0x136/0x2b0
-    2025-01-24T02:15:03.9056154Z [  246.937305]  task_work_run+0x89/0xc0
-    2025-01-24T02:15:03.9058593Z [  246.937571]  do_exit+0x2c6/0x9c0
-    2025-01-24T02:15:03.9061349Z [  246.937816]  do_group_exit+0xa4/0xb0
-    2025-01-24T02:15:03.9064401Z [  246.938090]  __x64_sys_exit_group+0x17/=
-0x20
-    2025-01-24T02:15:03.9067235Z [  246.938390]  x64_sys_call+0x21a0/0x21a0
-    2025-01-24T02:15:03.9069924Z [  246.938672]  do_syscall_64+0x79/0x120
-    2025-01-24T02:15:03.9072746Z [  246.938941]  ? clear_bhb_loop+0x25/0x80
-    2025-01-24T02:15:03.9075581Z [  246.939230]  ? clear_bhb_loop+0x25/0x80
-    2025-01-24T02:15:03.9079275Z [  246.939510]  entry_SYSCALL_64_after_hwf=
-rame+0x76/0x7e
-    2025-01-24T02:15:03.9081976Z [  246.939875] RIP: 0033:0x7fb86f66f21d
-    2025-01-24T02:15:03.9087533Z [  246.940153] RSP: 002b:00007ffdb3cf93f8 =
-EFLAGS: 00000202 ORIG_RAX: 00000000000000e7
-    2025-01-24T02:15:03.9092590Z [  246.940689] RAX: ffffffffffffffda RBX: =
-00007fb86f785fa8 RCX: 00007fb86f66f21d
-    2025-01-24T02:15:03.9097722Z [  246.941201] RDX: 00000000000000e7 RSI: =
-ffffffffffffff80 RDI: 0000000000000000
-    2025-01-24T02:15:03.9102762Z [  246.941705] RBP: 00007ffdb3cf9450 R08: =
-00007ffdb3cf93a0 R09: 0000000000000000
-    2025-01-24T02:15:03.9107940Z [  246.942215] R10: 00007ffdb3cf92ff R11: =
-0000000000000202 R12: 0000000000000001
-    2025-01-24T02:15:03.9113002Z [  246.942723] R13: 0000000000000000 R14: =
-0000000000000000 R15: 00007fb86f785fc0
-    2025-01-24T02:15:03.9114614Z [  246.943244]  </TASK>
-    2025-01-24T02:15:03.9115895Z [  246.943415]
-    2025-01-24T02:15:03.9119326Z [  246.943415] Showing all locks held in t=
-he system:
-    2025-01-24T02:15:03.9122278Z [  246.943865] 1 lock held by khungtaskd/3=
-2:
-    2025-01-24T02:15:03.9128640Z [  246.944162]  #0: ffffffffa9195d90 (rcu_=
-read_lock){....}-{1:3}, at: debug_show_all_locks+0x2e/0x180
-    2025-01-24T02:15:03.9131426Z [  246.944792] 2 locks held by kworker/0:2=
-/86:
-    2025-01-24T02:15:03.9132752Z [  246.945102]
-    2025-01-24T02:15:03.9136561Z [  246.945222] =3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
-
-It's worth noting that that the hanging does not happen on *every*
-test run, but often enough to fail the CI pipeline.
-
-You may try reproducing with a container I used for bisection:
-
-    docker pull ghcr.io/theihor/bpf:v9fs_evict_inode-repro
-    docker run -d --privileged --device=3D/dev/kvm --cap-add ALL -v /path/t=
-o/your/kernel/source:/ci/workspace ghcr.io/theihor/bpf:v9fs_evict_inode-rep=
-ro
-    docker exec -it <container_id_or_name> /bin/bash
-    /ci/run.sh # in the container shell
-
-Note that inside the container it's an "ubuntu" user, and you might
-have to run `chown -R ubuntu:ubuntu /ci/workspace` first, or switch to
-root.
-
-> [...]
-
+Thanks,
+-Andrea
 
