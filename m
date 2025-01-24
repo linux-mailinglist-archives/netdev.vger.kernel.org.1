@@ -1,142 +1,283 @@
-Return-Path: <netdev+bounces-160769-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-160766-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id A1975A1B4BA
-	for <lists+netdev@lfdr.de>; Fri, 24 Jan 2025 12:24:43 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id D01BEA1B463
+	for <lists+netdev@lfdr.de>; Fri, 24 Jan 2025 12:05:53 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 4BCD43ADBC5
-	for <lists+netdev@lfdr.de>; Fri, 24 Jan 2025 11:24:36 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 7DDC13A797F
+	for <lists+netdev@lfdr.de>; Fri, 24 Jan 2025 11:05:46 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E68111CDA13;
-	Fri, 24 Jan 2025 11:24:39 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="FbAxYdI3"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5374B1CDA19;
+	Fri, 24 Jan 2025 11:05:49 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wr1-f50.google.com (mail-wr1-f50.google.com [209.85.221.50])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from frasgout.his.huawei.com (frasgout.his.huawei.com [185.176.79.56])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2A918218EBF
-	for <netdev@vger.kernel.org>; Fri, 24 Jan 2025 11:24:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.50
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CEC4E23B0;
+	Fri, 24 Jan 2025 11:05:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.176.79.56
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1737717879; cv=none; b=W5IPovp/l1N8bqUSE0OvNz0PkuqX57D6QuCyD1x8ch0qbzAev0Cz8fyA4yQegkTezcI+JbyA3XijmEqjSc+fEs0BjxfAQXSSsrMWHVS1FFyfdJsVHSF7nj+MUWZ54oqSM+/Y5XHcLlhtaqmyyXLplasDd3mNFa0IUY51cjh70lM=
+	t=1737716749; cv=none; b=PBVCxpOBah6A8998WTPU3sTl4tDmmlYVNhJ1Z2dxrriszZoht0FtjQFfNNIs9hAlIFz8J8hiP4IeVO6Y3gJS2kgQ8fTrhq4roFaAvPS2fxRaeotXiUJptZNXQFYiBdkQ9NShXpOIoWHRZs5/gBXNyjQTPNRaoCliEuAKkcHsK9k=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1737717879; c=relaxed/simple;
-	bh=kDuUZXJmeXA51UBrn63uNfG2QS/pXJjHl08qT6Zu4uQ=;
-	h=From:To:Cc:Subject:In-Reply-To:Date:Message-ID:References:
-	 MIME-Version:Content-Type; b=HN6ToXHDom8Gem+TNJXlxOQzOD1tdbLOP4ge3qKzgPPypzFCqOX/W0nA0aZvrjTgQUMh8W8R/TDUFg4XGhKs3xIZCZtpQRbxW2CJ/d0N/1YnoNA2hT0UWoPLxlaVJ68yXjnTFAu2rBw6qsRlfSYI1s85V1btLy3veFllqOT/U40=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=FbAxYdI3; arc=none smtp.client-ip=209.85.221.50
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wr1-f50.google.com with SMTP id ffacd0b85a97d-385d7f19f20so1012095f8f.1
-        for <netdev@vger.kernel.org>; Fri, 24 Jan 2025 03:24:37 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1737717876; x=1738322676; darn=vger.kernel.org;
-        h=mime-version:user-agent:references:message-id:date:in-reply-to
-         :subject:cc:to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=MPy9qyDJpaJ6jdQ6zGTl4Fsuqnzlt6Gz6CZ3k3QS4WI=;
-        b=FbAxYdI3OU/SPx2OY6qNr1GXDqoblodnbsXCVegADDOMlxPxp6DCrO63rmsKPVVKFL
-         p4ncy3a3v6dEdQasAmjH49H0rFiDuYLH8ehiOYWL9Qa2+mf9WJhhfKH2uspL/d+Tcmsd
-         Qnse0nCNoIyS9HC+3eqyrcoCD5s6LfMCaGRN80mJ2RXE+oiagVXbHQgAyIMFvqKDTVHC
-         7tzQ12txejaEJ9+Ul1U1Qx+5ZGZpXjXlLEd0Ch7OannJYOAMGGRaGfuv8hTHpnYFtYUt
-         HF0V/SRcxuen6GZ33FdagfsxES3bJJntTJ8RNktjBsDtL3czvjCbH37zCBE1Q8LMx00s
-         dv/g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1737717876; x=1738322676;
-        h=mime-version:user-agent:references:message-id:date:in-reply-to
-         :subject:cc:to:from:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=MPy9qyDJpaJ6jdQ6zGTl4Fsuqnzlt6Gz6CZ3k3QS4WI=;
-        b=Y/n/Sy219HoSz6wWcVCDSrk/CePPbOOs972KfaL1QsLubYAThND9F+VnCa6a+XDApZ
-         v1vUXWAeR+0EVamXwv2/URzBjmNvu1x7rMTq1/0HPRtHoakfWjrULZr5cCF6L2GvQWfx
-         3rlC9XWKZE4yUuHO8NFYap4HY9WVKOJjaBZXSJfZ/uub7CoMwCQDAt9KU2FpZiEbqD0e
-         VzaDw/ClAcyEGJtgytamRKhTHM24phoJKQfX3bE8aVboMvboZqfMxss5xslWuwK6sr0n
-         JHB0l1W+i71UZI/hXm4qigAEzM3H9FCkETNVej+sVZNrHUcPIWPVPJwban1p42wqSoRe
-         b01g==
-X-Forwarded-Encrypted: i=1; AJvYcCXNrrcPbkm2GAhnqIdKopKZJIwPLZYBjdLa9kZSD8RPRf3EsXkgxd1muP/zgNsqEA/Y1QgGG9M=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yw2Aho47Ov5XWSBFxGVk9oS617mgoxnNCeuy6VO1qo8JExg0ZnP
-	UeIFbsvpVQqSd7nuJoHB3jxPEDWLxFG+iXWXqXjWvngp7GV29IFJ
-X-Gm-Gg: ASbGncsm8yX3PyNc+xp+37fTXDlY+erF7xgvvMDBys8TBD2v1Nz5f/UgR/gr50nhAAA
-	Yp5Ie7EqMS3a64jRlnsXPE3y5uVCeF2QvonLYC/Fe657u5Ny4c/ZgaWZ5qJCh0hme0f7tnSINne
-	bWHgg0LKZfsjQhbu28HcjS/cqBhDfuwp9k+1VxYFPui1lSH9k0jFKb/hDdLQc5+p5G76U3XaQ6S
-	5SmiRXkY+mXicjAjE64jL0fqOiVCvSQPO8aGGauvfuHE3th1DXp8/GEjdv+189xv+0ATr0FZJ6s
-	8VSYMgOhiEdTvTfS
-X-Google-Smtp-Source: AGHT+IHJFjlZxwPoOjzdYBBlyGxsNGawdKoWCmEDm5p/1jD7n2o5qQBtEuBAht2hHb/sB0bOQPeDAw==
-X-Received: by 2002:adf:ef8d:0:b0:385:f060:b7fc with SMTP id ffacd0b85a97d-38bf5674b55mr26339936f8f.25.1737717876221;
-        Fri, 24 Jan 2025 03:24:36 -0800 (PST)
-Received: from imac ([2a02:8010:60a0:0:df9:ce59:11c1:2a2f])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-38c2a1bbb39sm2406293f8f.65.2025.01.24.03.24.35
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 24 Jan 2025 03:24:35 -0800 (PST)
-From: Donald Hunter <donald.hunter@gmail.com>
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: davem@davemloft.net,  netdev@vger.kernel.org,  edumazet@google.com,
-  pabeni@redhat.com,  andrew+netdev@lunn.ch,  horms@kernel.org,
-  nicolas.dichtel@6wind.com,  willemb@google.com
-Subject: Re: [PATCH net] tools: ynl: c: correct reverse decode of empty attrs
-In-Reply-To: <20250124012130.1121227-1-kuba@kernel.org> (Jakub Kicinski's
-	message of "Thu, 23 Jan 2025 17:21:30 -0800")
-Date: Fri, 24 Jan 2025 10:17:34 +0000
-Message-ID: <m2tt9oldmp.fsf@gmail.com>
-References: <20250124012130.1121227-1-kuba@kernel.org>
-User-Agent: Gnus/5.13 (Gnus v5.13)
+	s=arc-20240116; t=1737716749; c=relaxed/simple;
+	bh=5nY2o5sU7aLXqQ9kn/LZK1GlINByl8IHmNr1xj3mPY8=;
+	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
+	 In-Reply-To:Content-Type; b=ggS5QIayxhdv0xePZYv2sv7Uo1kHXallJJaQ0uBw18k3uUuXDz9+n5qVcBLzTK3nDngI3SfPmYk11Z+ordVRndYU8K1ewgryJRfvdjKUtVQ0qjoEk2Md4JJ4q8Vw5o/hcUwbIvZSwhIL/25Ll7eVYXxvRYf5lSNR2dFn2W5YNd4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei-partners.com; spf=pass smtp.mailfrom=huawei-partners.com; arc=none smtp.client-ip=185.176.79.56
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei-partners.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei-partners.com
+Received: from mail.maildlp.com (unknown [172.18.186.216])
+	by frasgout.his.huawei.com (SkyGuard) with ESMTP id 4YfZgP1X08z6M4HB;
+	Fri, 24 Jan 2025 19:03:45 +0800 (CST)
+Received: from mscpeml500004.china.huawei.com (unknown [7.188.26.250])
+	by mail.maildlp.com (Postfix) with ESMTPS id 9F17D140119;
+	Fri, 24 Jan 2025 19:05:43 +0800 (CST)
+Received: from [10.123.123.159] (10.123.123.159) by
+ mscpeml500004.china.huawei.com (7.188.26.250) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1258.34; Fri, 24 Jan 2025 14:05:41 +0300
+Message-ID: <277b6e70-7749-c75d-3ac0-f55c886f9d57@huawei-partners.com>
+Date: Fri, 24 Jan 2025 14:05:39 +0300
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v2 3/6] landlock: Add UDP sendmsg access control
+Content-Language: ru
+To: Matthieu Buffet <matthieu@buffet.re>, Mickael Salaun <mic@digikod.net>
+CC: Gunther Noack <gnoack@google.com>, <konstantin.meskhidze@huawei.com>, Paul
+ Moore <paul@paul-moore.com>, James Morris <jmorris@namei.org>, "Serge E .
+ Hallyn" <serge@hallyn.com>, <linux-security-module@vger.kernel.org>,
+	<netdev@vger.kernel.org>
+References: <20241214184540.3835222-1-matthieu@buffet.re>
+ <20241214184540.3835222-4-matthieu@buffet.re>
+From: Mikhail Ivanov <ivanov.mikhail1@huawei-partners.com>
+In-Reply-To: <20241214184540.3835222-4-matthieu@buffet.re>
+Content-Type: text/plain; charset="UTF-8"; format=flowed
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: lhrpeml500012.china.huawei.com (7.191.174.4) To
+ mscpeml500004.china.huawei.com (7.188.26.250)
 
-Jakub Kicinski <kuba@kernel.org> writes:
+On 12/14/2024 9:45 PM, Matthieu Buffet wrote:
+> Add support for a LANDLOCK_ACCESS_NET_SENDTO_UDP access right,
+> complementing the two previous LANDLOCK_ACCESS_NET_CONNECT_UDP and
+> LANDLOCK_ACCESS_NET_BIND_UDP.
+> It allows denying and delegating the right to sendto() datagrams with an
+> explicit destination address and port, without requiring to connect() the
+> socket first.
 
-> netlink reports which attribute was incorrect by sending back
-> an attribute offset. Offset points to the address of struct nlattr,
-> but to interpret the type we also need the nesting path.
-> Attribute IDs have different meaning in different nests
-> of the same message.
->
-> Correct the condition for "is the offset within current attribute".
-> ynl_attr_data_len() does not include the attribute header,
-> so the end offset was off by 4 bytes.
->
-> This means that we'd always skip over flags and empty nests.
->
-> The devmem tests, for example, issues an invalid request with
-> empty queue nests, resulting in the following error:
->
->   YNL failed: Kernel error: missing attribute: .queues.ifindex
->
-> The message is incorrect, "queues" nest does not have an "ifindex"
-> attribute defined. With this fix we decend correctly into the nest:
->
->   YNL failed: Kernel error: missing attribute: .queues.id
->
-> Fixes: 86878f14d71a ("tools: ynl: user space helpers")
-> Signed-off-by: Jakub Kicinski <kuba@kernel.org>
+What do you mean by "delegating" here? I suggest changing last sentence
+to something like
+
+"This provides control over setting of the UDP socket destination
+address in sendto(), sendmsg(), send(), sendmmsg(), complementing
+the control of connect(2)".
+
+> 
+> Performance is of course worse if you send many datagrams this way,
+> compared to just connect() then sending without an address (except if you
+> use sendmmsg() which caches LSM results). This may still be desired by
+> applications which send few enough datagrams to different clients that
+> opening and connecting a socket for each one of them is not worth it.
+
+I'm not sure if overhead is gonna be sensible for the average case, we
+need to get some testing results first.
+
+> 
+> Signed-off-by: Matthieu Buffet <matthieu@buffet.re>
 > ---
-> CC: donald.hunter@gmail.com
-> CC: nicolas.dichtel@6wind.com
-> CC: willemb@google.com
-> ---
->  tools/net/ynl/lib/ynl.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
->
-> diff --git a/tools/net/ynl/lib/ynl.c b/tools/net/ynl/lib/ynl.c
-> index e16cef160bc2..ce32cb35007d 100644
-> --- a/tools/net/ynl/lib/ynl.c
-> +++ b/tools/net/ynl/lib/ynl.c
-> @@ -95,7 +95,7 @@ ynl_err_walk(struct ynl_sock *ys, void *start, void *end, unsigned int off,
->  
->  	ynl_attr_for_each_payload(start, data_len, attr) {
->  		astart_off = (char *)attr - (char *)start;
-> -		aend_off = astart_off + ynl_attr_data_len(attr);
-> +		aend_off = (char *)ynl_attr_data_end(attr) - (char *)start;
->  		if (aend_off <= off)
->  			continue;
+>   include/uapi/linux/landlock.h | 14 ++++++
+>   security/landlock/limits.h    |  2 +-
+>   security/landlock/net.c       | 88 +++++++++++++++++++++++++++++++++++
+>   3 files changed, 103 insertions(+), 1 deletion(-)
+> 
+> diff --git a/include/uapi/linux/landlock.h b/include/uapi/linux/landlock.h
+> index 3f7b8e85822d..8b355891e986 100644
+> --- a/include/uapi/linux/landlock.h
+> +++ b/include/uapi/linux/landlock.h
+> @@ -295,6 +295,19 @@ struct landlock_net_port_attr {
+>    *   every time), or for servers that want to filter which client address
+>    *   they want to receive datagrams from (e.g. creating a client-specific
+>    *   socket)
+> + * - %LANDLOCK_ACCESS_NET_SENDTO_UDP: send datagrams with an explicit
+> + *   destination address set to the given remote port. This access right
+> + *   is checked in sendto(), sendmsg() and sendmmsg() when the destination
+> + *   address passed is not NULL. This access right is not required when
+> + *   sending datagrams without an explicit destination (via a connected
+> + *   socket, e.g. with send()). Sending datagrams with explicit addresses
+> + *   induces a non-negligible overhead, so calling connect() once and for
+> + *   all should be preferred. When not possible and sending many datagrams,
+> + *   using sendmmsg() may reduce the access control overhead.
 
-Reviewed-by: Donald Hunter <donald.hunter@gmail.com>
+I suggest changing:
+* "send datagrams" to "Send datagrams",
+* "send datagrams" to "send UDP datagrams" for clarity,
+* "This access right is not required when sending [...]" to "This access
+   right do not control sending [...]".
+
+Again, I don't think that overhead should be noted here: we do not have
+any data yet.
+
+> + *
+> + * Blocking an application from sending UDP traffic requires adding both
+> + * %LANDLOCK_ACCESS_NET_SENDTO_UDP and %LANDLOCK_ACCESS_NET_CONNECT_UDP
+> + * to the handled access rights list.
+>    *
+>    * Note that binding on port 0 means binding to an ephemeral
+>    * kernel-assigned port, in the range configured in
+> @@ -306,6 +319,7 @@ struct landlock_net_port_attr {
+>   #define LANDLOCK_ACCESS_NET_CONNECT_TCP			(1ULL << 1)
+>   #define LANDLOCK_ACCESS_NET_BIND_UDP			(1ULL << 2)
+>   #define LANDLOCK_ACCESS_NET_CONNECT_UDP			(1ULL << 3)
+> +#define LANDLOCK_ACCESS_NET_SENDTO_UDP			(1ULL << 4)
+>   /* clang-format on */
+>   
+>   /**
+> diff --git a/security/landlock/limits.h b/security/landlock/limits.h
+> index ca90c1c56458..8d12ca39cf2e 100644
+> --- a/security/landlock/limits.h
+> +++ b/security/landlock/limits.h
+> @@ -22,7 +22,7 @@
+>   #define LANDLOCK_MASK_ACCESS_FS		((LANDLOCK_LAST_ACCESS_FS << 1) - 1)
+>   #define LANDLOCK_NUM_ACCESS_FS		__const_hweight64(LANDLOCK_MASK_ACCESS_FS)
+>   
+> -#define LANDLOCK_LAST_ACCESS_NET	LANDLOCK_ACCESS_NET_CONNECT_UDP
+> +#define LANDLOCK_LAST_ACCESS_NET	LANDLOCK_ACCESS_NET_SENDTO_UDP
+>   #define LANDLOCK_MASK_ACCESS_NET	((LANDLOCK_LAST_ACCESS_NET << 1) - 1)
+>   #define LANDLOCK_NUM_ACCESS_NET		__const_hweight64(LANDLOCK_MASK_ACCESS_NET)
+>   
+> diff --git a/security/landlock/net.c b/security/landlock/net.c
+> index 1c5cf2ddb7c1..0556d8a21d0b 100644
+> --- a/security/landlock/net.c
+> +++ b/security/landlock/net.c
+> @@ -10,6 +10,8 @@
+>   #include <linux/net.h>
+>   #include <linux/socket.h>
+>   #include <net/ipv6.h>
+> +#include <net/transp_v6.h>
+> +#include <net/ip.h>
+>   
+>   #include "common.h"
+>   #include "cred.h"
+> @@ -155,6 +157,27 @@ static int current_check_access_socket(struct socket *const sock,
+>   	return -EACCES;
+>   }
+>   
+> +static int check_access_port(const struct landlock_ruleset *const dom,
+> +			     access_mask_t access_request, __be16 port)
+> +{
+> +	layer_mask_t layer_masks[LANDLOCK_NUM_ACCESS_NET] = {};
+> +	const struct landlock_rule *rule;
+> +	const struct landlock_id id = {
+> +		.key.data = (__force uintptr_t)port,
+> +		.type = LANDLOCK_KEY_NET_PORT,
+> +	};
+> +	BUILD_BUG_ON(sizeof(port) > sizeof(id.key.data));
+> +
+> +	rule = landlock_find_rule(dom, id);
+> +	access_request = landlock_init_layer_masks(
+> +		dom, access_request, &layer_masks, LANDLOCK_KEY_NET_PORT);
+> +	if (landlock_unmask_layers(rule, access_request, &layer_masks,
+> +				   ARRAY_SIZE(layer_masks)))
+> +		return 0;
+> +
+> +	return -EACCES;
+> +}
+> +
+>   static int hook_socket_bind(struct socket *const sock,
+>   			    struct sockaddr *const address, const int addrlen)
+>   {
+> @@ -190,9 +213,74 @@ static int hook_socket_connect(struct socket *const sock,
+>   					   access_request);
+>   }
+>   
+> +static int hook_socket_sendmsg(struct socket *const sock,
+> +			       struct msghdr *const msg, const int size)
+> +{
+> +	const struct landlock_ruleset *const dom =
+> +		landlock_get_applicable_domain(landlock_get_current_domain(),
+> +					       any_net);
+> +	const struct sockaddr *address = (const struct sockaddr *)msg->msg_name;
+> +	const int addrlen = msg->msg_namelen;
+> +	__be16 port;
+> +
+> +	if (!dom)
+> +		return 0;
+> +	if (WARN_ON_ONCE(dom->num_layers < 1))
+> +		return -EACCES;
+> +	/*
+> +	 * If there is no explicit address in the message, we have no
+> +	 * policy to enforce here because either:
+> +	 * - the socket was previously connect()ed, so the appropriate
+> +	 *   access check has already been done back then;
+
+I suggest changing "connect()ed" to "assigned with destination address":
+connected socket usually implies connection-oriented protocol and
+"connect()ed" implies connect(2) operation, but socket may be connected
+by previous sendto() call.
+
+> +	 * - the socket is unconnected, so we can let the networking stack
+> +	 *   reply -EDESTADDRREQ
+
+nit: missing dot
+
+> +	 */
+> +	if (!address)
+> +		return 0;
+> +
+> +	if (!sk_is_udp(sock->sk))
+> +		return 0;
+> +
+> +	/* Checks for minimal header length to safely read sa_family. */
+> +	if (addrlen < offsetofend(typeof(*address), sa_family))
+> +		return -EINVAL;
+> +
+> +	switch (address->sa_family) {
+> +	case AF_UNSPEC:
+> +		/*
+> +		 * Parsed as "no address" in udpv6_sendmsg(), which means
+> +		 * we fall back into the case checked earlier: policy was
+> +		 * enforced at connect() time, nothing to enforce here.
+> +		 */
+> +		if (sock->sk->sk_prot == &udpv6_prot)
+> +			return 0;
+> +		/* Parsed as "AF_INET" in udp_sendmsg() */
+> +		fallthrough;
+> +	case AF_INET:
+> +		if (addrlen < sizeof(struct sockaddr_in))
+> +			return -EINVAL;
+> +		port = ((struct sockaddr_in *)address)->sin_port;
+> +		break;
+> +
+> +#if IS_ENABLED(CONFIG_IPV6)
+> +	case AF_INET6:
+> +		if (addrlen < SIN6_LEN_RFC2133)
+> +			return -EINVAL;
+> +		port = ((struct sockaddr_in6 *)address)->sin6_port;
+> +		break;
+> +#endif /* IS_ENABLED(CONFIG_IPV6) */
+> +
+> +	default:
+> +		return -EAFNOSUPPORT;
+
+IPv6 socket should return -EINVAL here (Cf. udpv6_sendmsg()).
+
+> +	}
+> +
+> +	return check_access_port(dom, LANDLOCK_ACCESS_NET_SENDTO_UDP, port);
+> +}
+> +
+>   static struct security_hook_list landlock_hooks[] __ro_after_init = {
+>   	LSM_HOOK_INIT(socket_bind, hook_socket_bind),
+>   	LSM_HOOK_INIT(socket_connect, hook_socket_connect),
+> +	LSM_HOOK_INIT(socket_sendmsg, hook_socket_sendmsg),
+>   };
+>   
+>   __init void landlock_add_net_hooks(void)
 
