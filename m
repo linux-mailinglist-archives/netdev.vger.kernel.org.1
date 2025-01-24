@@ -1,315 +1,140 @@
-Return-Path: <netdev+bounces-160821-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-160822-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id CFEB1A1B9B7
-	for <lists+netdev@lfdr.de>; Fri, 24 Jan 2025 16:55:13 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 82FB4A1B9DC
+	for <lists+netdev@lfdr.de>; Fri, 24 Jan 2025 17:02:17 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 775FC3A572F
-	for <lists+netdev@lfdr.de>; Fri, 24 Jan 2025 15:55:06 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C9D423ABE02
+	for <lists+netdev@lfdr.de>; Fri, 24 Jan 2025 16:02:06 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E2CDA157485;
-	Fri, 24 Jan 2025 15:55:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5BAB515C120;
+	Fri, 24 Jan 2025 16:02:12 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Dx2ECspQ"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="qHPu2we1"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-lf1-f50.google.com (mail-lf1-f50.google.com [209.85.167.50])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DCAD915623A;
-	Fri, 24 Jan 2025 15:55:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.50
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 337F3182D2;
+	Fri, 24 Jan 2025 16:02:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1737734108; cv=none; b=LXrX9ixuJe9GJ6bQUrKIRTt5wy+Q833zkZkCb8z1MxkpGkBbiVgvGKeoDbmc7Wkna+/VKGQa9yovyc5sKPBfuw2s3rMHJeWvUCju2N3LYkqu31kSeyYvsGzMA3qZymPnX9NZedhZ01Sa5Shc0URhU0CnYF176LOKAsWUmyYJ4aI=
+	t=1737734532; cv=none; b=FLg0b4+MkG1Usk7SzsYTXFvYnro3Dq21M69hC6X8n3wO46ic5GSPBM2yzbuq84Bj2Vr5rwN8uS50tJ0akq7BDSMFF5xLhBkYl+pqulf8IRqw/nmLGLHj9iLK481U/Pm86MYXeFWS5TsmdpuOwH0Kvxl7esMup4+X0SJ/zfAM1Hc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1737734108; c=relaxed/simple;
-	bh=3FhEfHod4hMTW/jyRqf8DZwzVbpPsYxnVpjspkvh2S8=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=coGTT/Xs1yPGomhj1aTFXPT6MzhSFvoha4zgkUWX5lpXvtMTqOfZU1KoVSEcb2kVhOW81fo1C3i9sdRokkMW9Gvar1kIemut8GoUX+Rgkg+YPwQmkoAltr5zJMsNKpi4Qpixu4jXX/o5zd1BR1w7vdXC9OXBgjPYgVxYPWo6b8E=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Dx2ECspQ; arc=none smtp.client-ip=209.85.167.50
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-lf1-f50.google.com with SMTP id 2adb3069b0e04-5439e331cceso2656129e87.1;
-        Fri, 24 Jan 2025 07:55:06 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1737734105; x=1738338905; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=guIeUf9YGzMkSFqOQtrBhVl1ehI54j4VIgCWcFPEf3c=;
-        b=Dx2ECspQM75DmUo25IehfO5isI51oXEw9NOzlaL8tqPQTonzfvtHtYsu4owypQgAwk
-         R/z7LLN777a4H+OpLRQ+u5AKBYMFt+OBBPu31vRbCRNK9gSXuhw8QVdczxsOtZv5/N4q
-         EpdSGTgr67J4BMqjOwSIlndVfYKnL6NKf+9vkl5KxE//467ULDEGd05uAMhYskGLprKy
-         7ybtuNQYHnFIp0YaX9wDTMxmV+ELlQD+1RmdHhueZpfXUoVBkmHo84NbRESXAquzWNq0
-         /oioe1b36JNidJV1YK8gFPcwlXJlHopbPARmyeZeOviHQif3Bs8srlBIx8lTx5qCwyDn
-         6gvQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1737734105; x=1738338905;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=guIeUf9YGzMkSFqOQtrBhVl1ehI54j4VIgCWcFPEf3c=;
-        b=GnpyRxqaSmOrMPxtSmi4Ec2Be6H2bZDwfFng4Ylq1UmJjOWwKvLuxTOe+MOIw1sm/J
-         FpKxYxxSqszo7kZ1HTNzFN+wrFKjrfMYO4VvlDGtiRXLjq525XcrNzBDaonEp7pJR/Rb
-         AUMhMp0+V4yGYpcVw9Q62xd/2V6pU4CpOplbMwGs23L38yFnX7VbTE3/87NoTua1itK7
-         Z+xp2Z7urehZtwd/zM6uHXlG2J7W3hqMq99HQ89/gd2oVnCei1o3Z3x8HcTBcKd7XHKy
-         ZHWV6wqPsJP0ZawyZ3i8lk0pvOu40HvgMsrSMasIAq6QlOU42dTDLZB9G5P6ObaIrb7/
-         10+A==
-X-Forwarded-Encrypted: i=1; AJvYcCUr5OcWJ4MfOpvypxUbY8mM0+8gifSbWWNV4irMklMuaOot78pkuvRV7Mt9t6ao/KpmPIXoMaliQy1aryY=@vger.kernel.org, AJvYcCUsVUmoF0WaXq1lergPQQ1PR49SZ1UwHBKEMovxSRJ9NjyJ61Afpi2ZtPSbPmxYV5jkn7wpRRDq@vger.kernel.org
-X-Gm-Message-State: AOJu0YwcsaoEtOlc8sxeXC34pekuvcf0X1VP3j4NvVISkj4XXL9QSBQ3
-	q96gp1vwlkUoOddOJh7bdYiHV9ZXHJ0hedgvCqEI81Bs3DRbrrEzSXnd0eXuCR3Fli1JzlLgD1K
-	z743QUsD3NbBu9k/S8FpGACPQODQ=
-X-Gm-Gg: ASbGnctTzKOBvUyr6box6iy+iCf31RIUIFl6Ad9Zb3nMd90RKIivrtaQwAC335W+ycS
-	4QpKL/0M00milh8Iesl6NTWfVw9/q7wfsPrSz9BuHkcVpbteqH+nyHEuOmPcTQLw=
-X-Google-Smtp-Source: AGHT+IG5C0qrGiUnxqMhxIwtJtkQ9upCSRvl3YoxiqroNIUXUx6lSn71xEGH5nDb+pMTx4RRSLdAG9n/WHcAHH6ZPW8=
-X-Received: by 2002:a05:6512:1247:b0:542:98e0:7c67 with SMTP id
- 2adb3069b0e04-5439c27d401mr11464703e87.51.1737734104669; Fri, 24 Jan 2025
- 07:55:04 -0800 (PST)
+	s=arc-20240116; t=1737734532; c=relaxed/simple;
+	bh=mc7C+xWF1Inf26mfK2Z5ENKooEXC/JlUijWAy2yAlBg=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=q7CF5YNqqh/fMk+WMbxlE1sCH8EvzWQ2+Zu5LFCBJNv6WKoTNNYWVMjQ4jaIG40ep9xtYFpFkhwxyXWX0MexZ/k9D48DTBHqdLax/LFxa+DNb6PQwIpDl20upfau8/pnqT8TEhNWrjQ1DE8jG6ncpKN/t8YRvzJ7UTtgGMHZYJs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=qHPu2we1; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id B3CBCC4CEDD;
+	Fri, 24 Jan 2025 16:02:11 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1737734532;
+	bh=mc7C+xWF1Inf26mfK2Z5ENKooEXC/JlUijWAy2yAlBg=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=qHPu2we1GYDq4abcoJt1sMXdp89JBCs25XvXrHdH7aa5B2kAYK2CB4KLyMGSEsShC
+	 dJaC6Z1nwJXA0NhC0e2AJ/iFevLwB++k5AzbdzRiK+P55iqSWrY/vmuCbgh/v9VIeM
+	 71CsuGFP8U6xynMeKGmltiGKhcT1SBz0g7NTq4XJU96nTfDJGApxTxMG4oisClQ7tu
+	 s8I6i5kOsxFCCa7wqEBTAlpQ+wnh7nqH1JrHjQRI1xn/yLLwARfzKPPPwNlEsXibcO
+	 77fiJvoOFsG4RbPquL1/ANSGfzzbDDYdy4dprS+XFhFqEO1AzmD7jR8/ue+XOgVgc/
+	 HFaCcsYaEoEYg==
+Date: Fri, 24 Jan 2025 08:02:10 -0800
+From: Jakub Kicinski <kuba@kernel.org>
+To: Dan Carpenter <dan.carpenter@linaro.org>
+Cc: Thomas Graf <tgraf@suug.ch>, "David S. Miller" <davem@davemloft.net>,
+ Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, Simon
+ Horman <horms@kernel.org>, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org, kernel-janitors@vger.kernel.org
+Subject: Re: [PATCH net] net: netlink: prevent potential integer overflow in
+ nlmsg_new()
+Message-ID: <20250124080210.23208829@kernel.org>
+In-Reply-To: <04dbe1d5-51e8-42d5-a77d-59db4bc13957@stanley.mountain>
+References: <58023f9e-555e-48db-9822-283c2c1f6d0e@stanley.mountain>
+	<20250122062427.2776d926@kernel.org>
+	<04dbe1d5-51e8-42d5-a77d-59db4bc13957@stanley.mountain>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250122131925.v2.1.If6f14aa2512336173a53fc3552756cd8a332b0a3@changeid>
- <CABBYNZKoXT4u4=KJZUvG4g1OEi+xQ-LchiH8gvEZURNTzJoQDw@mail.gmail.com> <CADg1FFdt2mQsN4YjLTn=zp_+MahopN371EDiXQEbp+GTSaNtBg@mail.gmail.com>
-In-Reply-To: <CADg1FFdt2mQsN4YjLTn=zp_+MahopN371EDiXQEbp+GTSaNtBg@mail.gmail.com>
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date: Fri, 24 Jan 2025 10:54:52 -0500
-X-Gm-Features: AWEUYZkWwQ9j64FeGr_QC9cJXdLOlxGXKVanrqf7QNMj6671n9VWp6ZxqJE-8T8
-Message-ID: <CABBYNZJ__OMJZtEE0BFpaUdKPQv+Ym-OnsJj-kN=i_gZCeVN5w@mail.gmail.com>
-Subject: Re: [PATCH v2 1/3] Bluetooth: Fix possible race with userspace of
- sysfs isoc_alt
-To: Hsin-chen Chuang <chharry@google.com>
-Cc: linux-bluetooth@vger.kernel.org, 
-	chromeos-bluetooth-upstreaming@chromium.org, 
-	Hsin-chen Chuang <chharry@chromium.org>, "David S. Miller" <davem@davemloft.net>, 
-	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
-	Johan Hedberg <johan.hedberg@gmail.com>, Marcel Holtmann <marcel@holtmann.org>, 
-	Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, Ying Hsu <yinghsu@chromium.org>, 
-	linux-kernel@vger.kernel.org, netdev@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-Hi Hsin-chen,
+On Fri, 24 Jan 2025 17:35:24 +0300 Dan Carpenter wrote:
+> On Wed, Jan 22, 2025 at 06:24:27AM -0800, Jakub Kicinski wrote:
+> > On Wed, 22 Jan 2025 16:49:17 +0300 Dan Carpenter wrote:  
+> > > The "payload" variable is type size_t, however the nlmsg_total_size()
+> > > function will a few bytes to it and then truncate the result to type
+> > > int.  That means that if "payload" is more than UINT_MAX the alloc_skb()
+> > > function might allocate a buffer which is smaller than intended.  
+> > 
+> > Is there a bug, or is this theoretical?  
+> 
+> The rule here is that if we pass something very close to UINT_MAX to
+> nlmsg_new() the it leads to an integer overflow.  I'm not a networking
+> expert.  The caller that concerned me was:
+> 
+> *** 1 ***
+> 
+> net/netfilter/ipset/ip_set_core.c
+>   1762                  /* Error in restore/batch mode: send back lineno */
+>   1763                  struct nlmsghdr *rep, *nlh = nlmsg_hdr(skb);
+>   1764                  struct sk_buff *skb2;
+>   1765                  struct nlmsgerr *errmsg;
+>   1766                  size_t payload = min(SIZE_MAX,
+>   1767                                       sizeof(*errmsg) + nlmsg_len(nlh));
+> 
+> I don't know the limits of limits of nlmsg_len() here.
 
-On Wed, Jan 22, 2025 at 11:57=E2=80=AFPM Hsin-chen Chuang <chharry@google.c=
-om> wrote:
->
-> Hi Luiz,
->
-> On Thu, Jan 23, 2025 at 3:35=E2=80=AFAM Luiz Augusto von Dentz
-> <luiz.dentz@gmail.com> wrote:
-> >
-> > Hi Hsin-chen,
-> >
-> > On Wed, Jan 22, 2025 at 12:20=E2=80=AFAM Hsin-chen Chuang <chharry@goog=
-le.com> wrote:
-> > >
-> > > From: Hsin-chen Chuang <chharry@chromium.org>
-> > >
-> > > Use device group to avoid the racing. To reuse the group defined in
-> > > hci_sysfs.c, defined 2 callbacks switch_usb_alt_setting and
-> > > read_usb_alt_setting which are only registered in btusb.
-> > >
-> > > Fixes: b16b327edb4d ("Bluetooth: btusb: add sysfs attribute to contro=
-l USB alt setting")
-> > > Signed-off-by: Hsin-chen Chuang <chharry@chromium.org>
-> > > ---
-> > >
-> > > (no changes since v1)
-> > >
-> > >  drivers/bluetooth/btusb.c        | 42 ++++++++----------------------=
---
-> > >  include/net/bluetooth/hci_core.h |  2 ++
-> > >  net/bluetooth/hci_sysfs.c        | 33 +++++++++++++++++++++++++
-> > >  3 files changed, 45 insertions(+), 32 deletions(-)
-> > >
-> > > diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
-> > > index 75a0f15819c4..bf210275e5b7 100644
-> > > --- a/drivers/bluetooth/btusb.c
-> > > +++ b/drivers/bluetooth/btusb.c
-> > > @@ -2221,6 +2221,13 @@ static int btusb_switch_alt_setting(struct hci=
-_dev *hdev, int new_alts)
-> > >         return 0;
-> > >  }
-> > >
-> > > +static int btusb_read_alt_setting(struct hci_dev *hdev)
-> > > +{
-> > > +       struct btusb_data *data =3D hci_get_drvdata(hdev);
-> > > +
-> > > +       return data->isoc_altsetting;
-> > > +}
-> > > +
-> > >  static struct usb_host_interface *btusb_find_altsetting(struct btusb=
-_data *data,
-> > >                                                         int alt)
-> > >  {
-> > > @@ -3650,32 +3657,6 @@ static const struct file_operations force_poll=
-_sync_fops =3D {
-> > >         .llseek         =3D default_llseek,
-> > >  };
-> > >
-> > > -static ssize_t isoc_alt_show(struct device *dev,
-> > > -                            struct device_attribute *attr,
-> > > -                            char *buf)
-> > > -{
-> > > -       struct btusb_data *data =3D dev_get_drvdata(dev);
-> > > -
-> > > -       return sysfs_emit(buf, "%d\n", data->isoc_altsetting);
-> > > -}
-> > > -
-> > > -static ssize_t isoc_alt_store(struct device *dev,
-> > > -                             struct device_attribute *attr,
-> > > -                             const char *buf, size_t count)
-> > > -{
-> > > -       struct btusb_data *data =3D dev_get_drvdata(dev);
-> > > -       int alt;
-> > > -       int ret;
-> > > -
-> > > -       if (kstrtoint(buf, 10, &alt))
-> > > -               return -EINVAL;
-> > > -
-> > > -       ret =3D btusb_switch_alt_setting(data->hdev, alt);
-> > > -       return ret < 0 ? ret : count;
-> > > -}
-> > > -
-> > > -static DEVICE_ATTR_RW(isoc_alt);
-> > > -
-> > >  static int btusb_probe(struct usb_interface *intf,
-> > >                        const struct usb_device_id *id)
-> > >  {
-> > > @@ -4040,9 +4021,8 @@ static int btusb_probe(struct usb_interface *in=
-tf,
-> > >                 if (err < 0)
-> > >                         goto out_free_dev;
-> > >
-> > > -               err =3D device_create_file(&intf->dev, &dev_attr_isoc=
-_alt);
-> > > -               if (err)
-> > > -                       goto out_free_dev;
-> > > +               hdev->switch_usb_alt_setting =3D btusb_switch_alt_set=
-ting;
-> > > +               hdev->read_usb_alt_setting =3D btusb_read_alt_setting=
-;
-> > >         }
-> > >
-> > >         if (IS_ENABLED(CONFIG_BT_HCIBTUSB_BCM) && data->diag) {
-> > > @@ -4089,10 +4069,8 @@ static void btusb_disconnect(struct usb_interf=
-ace *intf)
-> > >         hdev =3D data->hdev;
-> > >         usb_set_intfdata(data->intf, NULL);
-> > >
-> > > -       if (data->isoc) {
-> > > -               device_remove_file(&intf->dev, &dev_attr_isoc_alt);
-> > > +       if (data->isoc)
-> > >                 usb_set_intfdata(data->isoc, NULL);
-> > > -       }
-> > >
-> > >         if (data->diag)
-> > >                 usb_set_intfdata(data->diag, NULL);
-> > > diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth=
-/hci_core.h
-> > > index f756fac95488..5d3ec5ff5adb 100644
-> > > --- a/include/net/bluetooth/hci_core.h
-> > > +++ b/include/net/bluetooth/hci_core.h
-> > > @@ -641,6 +641,8 @@ struct hci_dev {
-> > >                                      struct bt_codec *codec, __u8 *vn=
-d_len,
-> > >                                      __u8 **vnd_data);
-> > >         u8 (*classify_pkt_type)(struct hci_dev *hdev, struct sk_buff =
-*skb);
-> > > +       int (*switch_usb_alt_setting)(struct hci_dev *hdev, int new_a=
-lts);
-> > > +       int (*read_usb_alt_setting)(struct hci_dev *hdev);
-> > >  };
-> > >
-> > >  #define HCI_PHY_HANDLE(handle) (handle & 0xff)
-> > > diff --git a/net/bluetooth/hci_sysfs.c b/net/bluetooth/hci_sysfs.c
-> > > index 041ce9adc378..887aa1935b1e 100644
-> > > --- a/net/bluetooth/hci_sysfs.c
-> > > +++ b/net/bluetooth/hci_sysfs.c
-> > > @@ -102,8 +102,41 @@ static ssize_t reset_store(struct device *dev, s=
-truct device_attribute *attr,
-> > >  }
-> > >  static DEVICE_ATTR_WO(reset);
-> > >
-> > > +static ssize_t isoc_alt_show(struct device *dev,
-> > > +                            struct device_attribute *attr,
-> > > +                            char *buf)
-> > > +{
-> > > +       struct hci_dev *hdev =3D to_hci_dev(dev);
-> > > +
-> > > +       if (hdev->read_usb_alt_setting)
-> > > +               return sysfs_emit(buf, "%d\n", hdev->read_usb_alt_set=
-ting(hdev));
-> > > +
-> > > +       return -ENODEV;
-> > > +}
-> > > +
-> > > +static ssize_t isoc_alt_store(struct device *dev,
-> > > +                             struct device_attribute *attr,
-> > > +                             const char *buf, size_t count)
-> > > +{
-> > > +       struct hci_dev *hdev =3D to_hci_dev(dev);
-> > > +       int alt;
-> > > +       int ret;
-> > > +
-> > > +       if (kstrtoint(buf, 10, &alt))
-> > > +               return -EINVAL;
-> > > +
-> > > +       if (hdev->switch_usb_alt_setting) {
-> > > +               ret =3D hdev->switch_usb_alt_setting(hdev, alt);
-> > > +               return ret < 0 ? ret : count;
-> > > +       }
-> > > +
-> > > +       return -ENODEV;
-> > > +}
-> > > +static DEVICE_ATTR_RW(isoc_alt);
-> > > +
-> > >  static struct attribute *bt_host_attrs[] =3D {
-> > >         &dev_attr_reset.attr,
-> > > +       &dev_attr_isoc_alt.attr,
-> > >         NULL,
-> > >  };
-> > >  ATTRIBUTE_GROUPS(bt_host);
-> >
-> > While this fixes the race it also forces the inclusion of an attribute
-> > that is driver specific, so I wonder if we should introduce some
-> > internal interface to register driver specific entries like this.
->
-> Do you mean you prefer the original interface that only exports the
-> attribute when isoc_altsetting is supported?
-> Agree it makes more sense but I hit the obstacle: hci_init_sysfs is
-> called earlier than data->isoc is determined. I need some time to
-> verify whether changing the order won't break anything.
+Practically speaking the limits are fairly small. The nlh comes from
+user's request / sendmsg() call. So the user must have prepared 
+a message of at least that len, and kernel must had been able to
+kvmalloc() a linear buffer large enough to copy that message in.
 
-We might have to do something like the following within hci_init_sysfs:
+> The min(SIZE_MAX is what scared me.  That was added to silence a Smatch
+> warning.  :P  It should be fixed or removed.
 
-if (hdev->isoc_alt)
-    dev->type =3D bt_host_isoc_alt
-else
-    dev->type =3D bt_host
+Yeah, that ip_set code looks buggy. Mostly because we use @payload
+for the nlmsg_put() call, but then raw nlh->nlmsg_len for memcpy() :S
 
-Now perhaps instead of adding the callbacks to hdev we add the
-attribute itself, btw did you check if there isn't a sysfs entry to
-interact with USB alternate settings? Because contrary to reset this
-actually operates directly on the driver bus so it sort of made more
-sense to me that this would be handled by USB rather than Bluetooth.
+>   1768                  int min_len = nlmsg_total_size(sizeof(struct nfgenmsg));
+>   1769                  struct nlattr *cda[IPSET_ATTR_CMD_MAX + 1];
+>   1770                  struct nlattr *cmdattr;
+>   1771                  u32 *errline;
+>   1772  
+>   1773                  skb2 = nlmsg_new(payload, GFP_KERNEL);
+>   1774                  if (!skb2)
+>   1775                          return -ENOMEM;
+> 
+> *** 2 ***
+> There is similar code in netlink_ack() where the payload comes from
+> nlmsg_len(nlh).
 
-> >
-> > > --
-> > > 2.48.1.262.g85cc9f2d1e-goog
-> > >
-> >
-> >
-> > --
-> > Luiz Augusto von Dentz
+This one is correct. Each piece of the message is nlmsg_put()
+individually, which does bounds checking. So if the allocation 
+of the skb was faulty and the skb is shorter than we expected 
+we'll just error out on the put.
 
+> *** 3 ***
+> 
+> There is a potential issue in queue_userspace_packet() when we call:
+> 
+> 	len = upcall_msg_size(upcall_info, hlen - cutlen, ...
+>                                            ^^^^^^^^^^^^^
+> 	user_skb = genlmsg_new(len, GFP_ATOMIC);
+> 
+> It's possible that hlen is less than cutlen.  (That's a separate bug,
+> I'll send a fix for it).
 
+Ack.
 
---=20
-Luiz Augusto von Dentz
+In general IMVHO the check in nlmsg_new() won't be too effective.
+The callers can overflow their local message size calculation.
+Not to mention that the size calculation is often inexact.
+So using nla_put() and checking error codes is the best way
+to prevent security issues..
 
