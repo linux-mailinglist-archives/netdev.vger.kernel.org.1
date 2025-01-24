@@ -1,185 +1,259 @@
-Return-Path: <netdev+bounces-160762-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-160763-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7AB84A1B3A4
-	for <lists+netdev@lfdr.de>; Fri, 24 Jan 2025 11:41:19 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5E546A1B3B7
+	for <lists+netdev@lfdr.de>; Fri, 24 Jan 2025 11:46:02 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 812311889E99
-	for <lists+netdev@lfdr.de>; Fri, 24 Jan 2025 10:41:23 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 2A68E1887E6A
+	for <lists+netdev@lfdr.de>; Fri, 24 Jan 2025 10:46:06 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0CFFC1D47A6;
-	Fri, 24 Jan 2025 10:41:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=outlook.com header.i=@outlook.com header.b="gwWoYzXE"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 918281CEEAA;
+	Fri, 24 Jan 2025 10:45:55 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from EUR05-AM6-obe.outbound.protection.outlook.com (mail-am6eur05olkn2042.outbound.protection.outlook.com [40.92.91.42])
+Received: from mail78-59.sinamail.sina.com.cn (mail78-59.sinamail.sina.com.cn [219.142.78.59])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 269871CDA01;
-	Fri, 24 Jan 2025 10:41:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.92.91.42
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1737715274; cv=fail; b=c5pLIAVxqFT6j+IEsfqaZdBsYSEcWJN2RHZHPd0c5c1tUow5WXdMbKomWvkiwPHJ0GhdshkYggNLLMUpFGbOBQmU2SRbq+fkehXbUawlFQCZP2K8B4J5sK268SpFVGqN0b9JlU6Azath1ZRV2iGhRXgI8ddVxpL1bamPfFtR+2Q=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1737715274; c=relaxed/simple;
-	bh=2kQpHvk0QrauXZYU42VS8oUbHDomEW/8gcisH/qb17E=;
-	h=Date:From:To:Cc:Subject:Message-ID:Content-Type:
-	 Content-Disposition:MIME-Version; b=PRsrJ9AgMNHmTKctQu7tcqWX5Fk20hvBH3iWR+huecllha0RMj3G/EjMij7qSaOTYJCQNU6n2Q6IRkvM5D88jL1BKVYrELGKcKYibOJNcCwASb9YFbLF5PxMuvxGQiiD3/pWBbsCBNsPp0kYe6BRk7ZeXuWXzrH9BMdQ4wjo3ko=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=outlook.com; spf=pass smtp.mailfrom=outlook.com; dkim=pass (2048-bit key) header.d=outlook.com header.i=@outlook.com header.b=gwWoYzXE; arc=fail smtp.client-ip=40.92.91.42
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=outlook.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=outlook.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=ZLjDftY/GDUhOB/LV2nNqvGai7xoLMtLag1CdWliqcKm4uD+4pagcYp57UPtM+yPldigc+jpX1CTS5lSAMTLMlnfFuxhfhMPFZqtdfctRS3RFdxNIAChrD9sosqhr1ecKKUCoNvcLbF2BMqD06Kz/519SG1jnBau6o7rVsm5axvRvNjb6oskUlZwe8DT6J+ryPMtQDYF+MT9otcvhMrihvPi9IyFdZTwygLd/uk9pCCN6rDDTIBqmq7NzxAd5UJdgbaNJ2w5934eFATk9+ImhoBMbIHj+Lp+29yBmz5huu33UmZNd5Jm39cUiTYTB+A60lxnOHoNBcil6bZ5WZoCUQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=/BN/88GvPhYSUjoJaer0aByGNz9ftWswAjgooKyhdC0=;
- b=f3JB+GIVfDNJyAtbGwgs7DPolmtqD4qd/o7gygdoRBIoVZXMfUh5RNE4u04I0ATDkxCZ2FLU/4CPQAdMj/8YDjBmy7iCbnhyXGJVrQ6MFTD/nZdWOcSn7KsulxUyGxF5SAqPu/vn1xE6EXYtMO/qCVZ3suuYBYRquY0GurqXKGyW5AkWKbt6R12+J9FWau5Gx/l+tCTLtnHeLLggsTXaozP+UBCeuFuqod1l9C4pA43n61HcNhy1gFIKCTIPfl7ObRnXbS3asWA4vgRdonIwin9Mnt8d04sa17YceKEZFVmo5jZxdlLa7t2YF6USOyE3QwpS6u5u2C21ktOzVMj/yg==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=none; dmarc=none;
- dkim=none; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=outlook.com;
- s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=/BN/88GvPhYSUjoJaer0aByGNz9ftWswAjgooKyhdC0=;
- b=gwWoYzXERQXdAei787h6f7hyjPFzmvtLAggxp0hgxChkJfRXiLnmX1tPYwPhOHRXmrlFTvbrcYVHO9teJAGc4OA9TDyRVOnSdLDXAKTSwAjLo73Ih7j5lH4XmhlDoEBkPP2j2sx/7hgvWX3twRmsNXEqurc29Klx+R631HCciqGrB3weHBFkuianWAOOxuUs7AudXbt5FQBiq0JqWmDkiPYX30cEn+igGKuE+bDPyqQA2qgeUAbXMGdqGI/0KSzT0Q9Vw/eM2jYgOqvWUTaClgvf/YC/gTzTzQDiyCtw+X7WD1gKgKMfsP7WJJr88qjYij9RFN6lHAgQUdw9oHkOLw==
-Received: from AM8P250MB0124.EURP250.PROD.OUTLOOK.COM (2603:10a6:20b:36f::20)
- by GV2P250MB0730.EURP250.PROD.OUTLOOK.COM (2603:10a6:150:ab::13) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8377.16; Fri, 24 Jan
- 2025 10:41:10 +0000
-Received: from AM8P250MB0124.EURP250.PROD.OUTLOOK.COM
- ([fe80::7f66:337:66ca:6046]) by AM8P250MB0124.EURP250.PROD.OUTLOOK.COM
- ([fe80::7f66:337:66ca:6046%5]) with mapi id 15.20.8377.009; Fri, 24 Jan 2025
- 10:41:10 +0000
-Date: Fri, 24 Jan 2025 10:41:02 +0000
-From: Milos Reljin <milos_reljin@outlook.com>
-To: andrei.botila@oss.nxp.com, andrew@lunn.ch, hkallweit1@gmail.com,
-	linux@armlinux.org.uk, davem@davemloft.net, edumazet@google.com,
-	kuba@kernel.org, pabeni@redhat.com, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Cc: milos.reljin@rt-rk.com
-Subject: [PATCH net v3] net: phy: c45-tjaxx: add delay between MDIO write and
- read in soft_reset
-Message-ID:
- <AM8P250MB0124D258E5A71041AF2CC322E1E32@AM8P250MB0124.EURP250.PROD.OUTLOOK.COM>
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-X-ClientProxiedBy: VI1PR06CA0148.eurprd06.prod.outlook.com
- (2603:10a6:803:a0::41) To AM8P250MB0124.EURP250.PROD.OUTLOOK.COM
- (2603:10a6:20b:36f::20)
-X-Microsoft-Original-Message-ID: <Z5NuPnBatVSbXIdP@e9415978754d>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 73E3417FE
+	for <netdev@vger.kernel.org>; Fri, 24 Jan 2025 10:45:50 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=219.142.78.59
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1737715555; cv=none; b=CIaIpKp4lgNw+qzNXeMc1ZvTuSli5EwyAGbwIyOcdpwPPbGafI7jy5twwP5MQhCtvUscaJ/+KDExjytAm7RQwQnrJTpo5ccfDTHNgDQWNnng2ekXJoYxke54A7Px4v28TaiH77R0er0S3q6bL7SU95qUtb7STojV2bLFxcbBwro=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1737715555; c=relaxed/simple;
+	bh=6NeoBC31Qgfp04p3fUf7gZUMfysk1+VUBzrkDq5kKi0=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=QZWgSaD5/iG411Hqoi0oVPNPUgF73VwvfhXYDMLLBCjsuX+ev08hACqW9KNsLhg/7dalIbO1SfCETo8Nfw/vx5mNi7+KVuJp3ylZGKmLVz/p21+N++ML2KxKeSMzppvxKi58ruSqaNYiQs0fRvmF0MKtqBASV3UGpZr3hPfww+s=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=sina.com; spf=pass smtp.mailfrom=sina.com; arc=none smtp.client-ip=219.142.78.59
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=sina.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=sina.com
+X-SMAIL-HELO: localhost.localdomain
+Received: from unknown (HELO localhost.localdomain)([113.88.49.166])
+	by sina.com (10.185.250.24) with ESMTP
+	id 67936F4E000013C6; Fri, 24 Jan 2025 18:45:40 +0800 (CST)
+X-Sender: hdanton@sina.com
+X-Auth-ID: hdanton@sina.com
+Authentication-Results: sina.com;
+	 spf=none smtp.mailfrom=hdanton@sina.com;
+	 dkim=none header.i=none;
+	 dmarc=none action=none header.from=hdanton@sina.com
+X-SMAIL-MID: 66828610748379
+X-SMAIL-UIID: 65C8C76C5D6E48DEAC8C78F8B41265AA-20250124-184540-1
+From: Hillf Danton <hdanton@sina.com>
+To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Cc: linux-bluetooth@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	netdev@vger.kernel.org
+Subject: Re: [PATCH v6] Bluetooth: L2CAP: Fix slab-use-after-free Read in l2cap_send_cmd
+Date: Fri, 24 Jan 2025 18:45:27 +0800
+Message-ID: <20250124104528.1777-1-hdanton@sina.com>
+In-Reply-To: <20250122212514.164262-1-luiz.dentz@gmail.com>
+References: 
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-Exchange-MessageSentRepresentingType: 1
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: AM8P250MB0124:EE_|GV2P250MB0730:EE_
-X-MS-Office365-Filtering-Correlation-Id: 006dc9e2-b748-4fce-4705-08dd3c639d95
-X-Microsoft-Antispam:
-	BCL:0;ARA:14566002|461199028|19110799003|6090799003|37102599003|15080799006|5072599009|5062599005|8060799006|3412199025|440099028|21061999003|41001999003|12071999003;
-X-Microsoft-Antispam-Message-Info:
-	=?us-ascii?Q?GAoYb6PoqkldxR33duGsNyFuw0ph+jGDPei0V/X9O9uuKU9tRNXw909SOKgq?=
- =?us-ascii?Q?pZV2y3O6eI1qNUIK3lLcKk5gdevlOYfjppSFJ2oJDIJvF62FFnRLMbdfK09G?=
- =?us-ascii?Q?q/TMFMXfbC/ZL+XhRds5E5e9JGXlQY9nxO51X535wXOtaO6GywlZHhrDg7j6?=
- =?us-ascii?Q?xd7HqmtH/SKWXg7j4CInSnxzTQYddqgZUGGnM79+FhuRQOBePRZbPmrCbR9m?=
- =?us-ascii?Q?yyXoQ9XAgQOq2g7uZGJGS3Zts/cvpmbV4OerJXCP1NWQwX/dO2K8ykQqDhC5?=
- =?us-ascii?Q?iEY1F30vG05gb3DAY0wgPd8sLEKJBwKCn+OUzykMjl//I3MBjdnAkWqvhnUD?=
- =?us-ascii?Q?53o6oroY0iFfYFdLeK3/9xB+N9+RHXwx13bYH0If9px/EviZdRAzYdf4/6YC?=
- =?us-ascii?Q?WPKoquWOXUGdEAYsdbpdD4mSc1ce5HXi7oyThW013gizuRLSroJlJr6PRK+M?=
- =?us-ascii?Q?kH8gMrc3VLjWv2sUoeM3VWekTE8JHS/FOJAuZvZhl351Y3wpH8uP1dAZBZUu?=
- =?us-ascii?Q?Vh0xgUzor3IYeDZYe70wXSe0or5mdIN4o2cgGUlEsLLiEmWVze0AC9E3yha3?=
- =?us-ascii?Q?YsxzHF1Yq4txxSx1TumGHIwyQSg/odZS/aZZr9pLpzbAVNCoAjBP9qew6nsc?=
- =?us-ascii?Q?NeCgznSeb9WhP2WAaiRQyD2r9GsvxO8/Tndu2Y1sM3A3JCvmaMwmijHKK/5D?=
- =?us-ascii?Q?IKeuWxn9OaGZ4oryk7DMgKcmaRjIWd0T9VcmJDcOQ5FWdcpBTHdMMtdIvXiL?=
- =?us-ascii?Q?bVgp+O9h8iVEJm5o2U9q773w/5OQrnt3VbxuKk1vnkbAr/HrZ7neMN6Lklcz?=
- =?us-ascii?Q?bz7GtSwz/Cg431vm5kgXnYAaJrhszAEAzEpp4mCmwarZLBF0tfWW1y7d2gcc?=
- =?us-ascii?Q?FD5K9oqCxJ1SW1EoglleYeYaFhhdgO4vaaWaTsfnNQ64iWW4w/MM+hs191EA?=
- =?us-ascii?Q?DNlxEd4O/J02KnIaOGyxc3E9eLti0iEwcwmpYM1G7Mcpc7VXm24k7aem3rUx?=
- =?us-ascii?Q?USsLu5IoLdfXfWYYGSbUmTRZgmKDcxCSEOQyPASOQOaBL9AHYpYGzHbxtyUh?=
- =?us-ascii?Q?SI5hKOswTOLxDnNRFtvm1SBakoH3q1RWFS13iilqn3tM/sqhy67cCnAzcQG0?=
- =?us-ascii?Q?NxpvZ65pLm6EmE5fIhPkPncARlD5WSznauhH3LJSqBYnZlPECo9gR9FJS8Ty?=
- =?us-ascii?Q?FOdQtyuDBRhaoPmKrL7shf8TbmeqgUNo5+8yVFZLUxaw5naXWNV/Pye1WB4?=
- =?us-ascii?Q?=3D?=
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?us-ascii?Q?EJXy9h5GLn/t6swP2T8NyAa4dLoaWUoYF6WXuK3o3kKA6Ci1K7uMqX4K89Y7?=
- =?us-ascii?Q?5bfnr1L5u3BSosfFOHVkNSdI7e3vpXv5+FzTKEKOk7oVudBx0HYiNv0o1NaA?=
- =?us-ascii?Q?rO6sWRtN3OyzztHlhbjxEg7koESC/0G74lyNPreCcA9SRbGUe+0PTM0zzi4V?=
- =?us-ascii?Q?q2b8VT4usQZ4EQiURtZWRRRKLZEjhgqjIBaKwaBbxkSXxmInu8cv0WUQIuoN?=
- =?us-ascii?Q?MObnhPWhgWnXdzdeQdyu3BbrkHJ2Wzz49zJzO2idOJDCI0fpzD38pnhcjAhm?=
- =?us-ascii?Q?zYGgrSyt0Wqpu8UT6VABh1n8C64iax3L2GCDEPH+hYFztJJQCosAUGPHMeDD?=
- =?us-ascii?Q?D3SVGDz+CWYFxTcbNzZnf5YwaJeijhPkSAjK50ZC9ITYPJajhJv3p4ebGkyc?=
- =?us-ascii?Q?f77evQtkmzSMPltThQt+GT3iTM4n9hhVqmL7ElQ31k+bzmEhjqoNu93/hobW?=
- =?us-ascii?Q?7FmooYtXu1OoTQLmQidgyRQihB+NIhi77kVkviFcwQ7H8/Nomkpv4QNj8ixN?=
- =?us-ascii?Q?sZnXuMoVn7vG2IXzQmITBHbuSvcOg34M6OG44vjmZvh2+md1aW9PIjEU4Uvz?=
- =?us-ascii?Q?X4aB9KACZsw7suf5Tm9K6LcphVGEJQjW/wmCcxMkzircw6HVjo8kk+z1GZcP?=
- =?us-ascii?Q?4wP5Qr5h9SaKT2/i1r5Qxfi0yRqabrR7Fdcb/5wWTmXwfs4KDCQzDjW5u4vh?=
- =?us-ascii?Q?PqPx5FpsotJdR8FUqG7t/MsYywJrX8mmUtf0bq/R9Yvh1FtMUvsFgiSbepIr?=
- =?us-ascii?Q?epmPVCIapmzmM1YevZ3O6FmCG1noJ4MGgk6AhYPx4Gap0jVd97/izt+huuDF?=
- =?us-ascii?Q?c4PKOhaUfjfO4cY4zV88+cuj+0t9B1b7uNQo1Qq9zgMOlpuLYO1mzdOtq35i?=
- =?us-ascii?Q?lI+QLpvCYjMN/eo1tSVAsj8y5qmx12huDLCpivAu1Kx7dtN40Bg9US5zI9Pg?=
- =?us-ascii?Q?wAlGkfrSlRQEN8wtCuhol1mDvDIkQZ/syEsnOYTBDaS33yR3oSGY+AYGMsuW?=
- =?us-ascii?Q?Q2tBYBfpUxgeXkkjH60FKXzkZcbtcSzzOXy/aAxD5n4HK+IFjsQfPJE5VF/4?=
- =?us-ascii?Q?lB0rW5fbUUqnxnmN2UoTAWFqcobIpHHe8sLIfy0GbjXFjm0youUCkhzOUD6z?=
- =?us-ascii?Q?cWe1w3JRB36FWTRxNd2flyZeh6eziD25+6qw5rsSlTpmI6Q2unt3Pv6brMk3?=
- =?us-ascii?Q?x0K334Iykun+hOuCdzNdTjJ2uyTqb+tr1a3ZTK8xG348Rap4LLbgfUAw4q/p?=
- =?us-ascii?Q?SkPSawOiNApOx92J3kdI?=
-X-OriginatorOrg: outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 006dc9e2-b748-4fce-4705-08dd3c639d95
-X-MS-Exchange-CrossTenant-AuthSource: AM8P250MB0124.EURP250.PROD.OUTLOOK.COM
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 24 Jan 2025 10:41:10.1628
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 84df9e7f-e9f6-40af-b435-aaaaaaaaaaaa
-X-MS-Exchange-CrossTenant-RMS-PersistedConsumerOrg:
-	00000000-0000-0000-0000-000000000000
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: GV2P250MB0730
+Content-Transfer-Encoding: 8bit
 
-In application note (AN13663) for TJA1120, on page 30, there's a figure
-with average PHY startup timing values following software reset.
-The time it takes for SMI to become operational after software reset
-ranges roughly from 500 us to 1500 us.
+On Wed, 22 Jan 2025 16:25:14 -0500
+> From: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+> 
+> After the hci sync command releases l2cap_conn, the hci receive data work
+> queue references the released l2cap_conn when sending to the upper layer.
+> Add hci dev lock to the hci receive data work queue to synchronize the two.
+> 
+> [1]
+> BUG: KASAN: slab-use-after-free in l2cap_send_cmd+0x187/0x8d0 net/bluetooth/l2cap_core.c:954
+> Read of size 8 at addr ffff8880271a4000 by task kworker/u9:2/5837
+> 
+> CPU: 0 UID: 0 PID: 5837 Comm: kworker/u9:2 Not tainted 6.13.0-rc5-syzkaller-00163-gab75170520d4 #0
+> Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 09/13/2024
+> Workqueue: hci1 hci_rx_work
+> Call Trace:
+>  <TASK>
+>  __dump_stack lib/dump_stack.c:94 [inline]
+>  dump_stack_lvl+0x241/0x360 lib/dump_stack.c:120
+>  print_address_description mm/kasan/report.c:378 [inline]
+>  print_report+0x169/0x550 mm/kasan/report.c:489
+>  kasan_report+0x143/0x180 mm/kasan/report.c:602
+>  l2cap_build_cmd net/bluetooth/l2cap_core.c:2964 [inline]
+>  l2cap_send_cmd+0x187/0x8d0 net/bluetooth/l2cap_core.c:954
+>  l2cap_sig_send_rej net/bluetooth/l2cap_core.c:5502 [inline]
+>  l2cap_sig_channel net/bluetooth/l2cap_core.c:5538 [inline]
+>  l2cap_recv_frame+0x221f/0x10db0 net/bluetooth/l2cap_core.c:6817
+>  hci_acldata_packet net/bluetooth/hci_core.c:3797 [inline]
+>  hci_rx_work+0x508/0xdb0 net/bluetooth/hci_core.c:4040
+>  process_one_work kernel/workqueue.c:3229 [inline]
+>  process_scheduled_works+0xa66/0x1840 kernel/workqueue.c:3310
+>  worker_thread+0x870/0xd30 kernel/workqueue.c:3391
+>  kthread+0x2f0/0x390 kernel/kthread.c:389
+>  ret_from_fork+0x4b/0x80 arch/x86/kernel/process.c:147
+>  ret_from_fork_asm+0x1a/0x30 arch/x86/entry/entry_64.S:244
+>  </TASK>
+> 
+> Allocated by task 5837:
+>  kasan_save_stack mm/kasan/common.c:47 [inline]
+>  kasan_save_track+0x3f/0x80 mm/kasan/common.c:68
+>  poison_kmalloc_redzone mm/kasan/common.c:377 [inline]
+>  __kasan_kmalloc+0x98/0xb0 mm/kasan/common.c:394
+>  kasan_kmalloc include/linux/kasan.h:260 [inline]
+>  __kmalloc_cache_noprof+0x243/0x390 mm/slub.c:4329
+>  kmalloc_noprof include/linux/slab.h:901 [inline]
+>  kzalloc_noprof include/linux/slab.h:1037 [inline]
+>  l2cap_conn_add+0xa9/0x8e0 net/bluetooth/l2cap_core.c:6860
+>  l2cap_connect_cfm+0x115/0x1090 net/bluetooth/l2cap_core.c:7239
+>  hci_connect_cfm include/net/bluetooth/hci_core.h:2057 [inline]
+>  hci_remote_features_evt+0x68e/0xac0 net/bluetooth/hci_event.c:3726
+>  hci_event_func net/bluetooth/hci_event.c:7473 [inline]
+>  hci_event_packet+0xac2/0x1540 net/bluetooth/hci_event.c:7525
+>  hci_rx_work+0x3f3/0xdb0 net/bluetooth/hci_core.c:4035
+>  process_one_work kernel/workqueue.c:3229 [inline]
+>  process_scheduled_works+0xa66/0x1840 kernel/workqueue.c:3310
+>  worker_thread+0x870/0xd30 kernel/workqueue.c:3391
+>  kthread+0x2f0/0x390 kernel/kthread.c:389
+>  ret_from_fork+0x4b/0x80 arch/x86/kernel/process.c:147
+>  ret_from_fork_asm+0x1a/0x30 arch/x86/entry/entry_64.S:244
+> 
+> Freed by task 54:
+>  kasan_save_stack mm/kasan/common.c:47 [inline]
+>  kasan_save_track+0x3f/0x80 mm/kasan/common.c:68
+>  kasan_save_free_info+0x40/0x50 mm/kasan/generic.c:582
+>  poison_slab_object mm/kasan/common.c:247 [inline]
+>  __kasan_slab_free+0x59/0x70 mm/kasan/common.c:264
+>  kasan_slab_free include/linux/kasan.h:233 [inline]
+>  slab_free_hook mm/slub.c:2353 [inline]
+>  slab_free mm/slub.c:4613 [inline]
+>  kfree+0x196/0x430 mm/slub.c:4761
+>  l2cap_connect_cfm+0xcc/0x1090 net/bluetooth/l2cap_core.c:7235
+>  hci_connect_cfm include/net/bluetooth/hci_core.h:2057 [inline]
+>  hci_conn_failed+0x287/0x400 net/bluetooth/hci_conn.c:1266
+>  hci_abort_conn_sync+0x56c/0x11f0 net/bluetooth/hci_sync.c:5603
+>  hci_cmd_sync_work+0x22b/0x400 net/bluetooth/hci_sync.c:332
+>  process_one_work kernel/workqueue.c:3229 [inline]
+>  process_scheduled_works+0xa66/0x1840 kernel/workqueue.c:3310
+>  worker_thread+0x870/0xd30 kernel/workqueue.c:3391
+>  kthread+0x2f0/0x390 kernel/kthread.c:389
+>  ret_from_fork+0x4b/0x80 arch/x86/kernel/process.c:147
+>  ret_from_fork_asm+0x1a/0x30 arch/x86/entry/entry_64.S:244
+> 
+> Reported-by: syzbot+31c2f641b850a348a734@syzkaller.appspotmail.com
+> Closes: https://syzkaller.appspot.com/bug?extid=31c2f641b850a348a734
+> Tested-by: syzbot+31c2f641b850a348a734@syzkaller.appspotmail.com
+> Signed-off-by: Edward Adam Davis <eadavis@qq.com>
+> Signed-off-by: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+> ---
 
-This commit adds 2000 us delay after MDIO write which triggers software
-reset. Without this delay, soft_reset function returns an error and
-prevents successful PHY init.
+Given V6, feel free to add change log as a maintainer Luiz.
 
-Cc: stable@vger.kernel.org
-Fixes: b050f2f15e04 ("phy: nxp-c45: add driver for tja1103")
-Signed-off-by: Milos Reljin <milos_reljin@outlook.com>
----
-Changes in v3:
- - Added Fixes and Cc tags, net tree indicator in Subject.
+>  net/bluetooth/l2cap_core.c | 39 +++++++++++++++++++++++++++++++++-----
+>  1 file changed, 34 insertions(+), 5 deletions(-)
+> 
+> diff --git a/net/bluetooth/l2cap_core.c b/net/bluetooth/l2cap_core.c
+> index 27b4c4a2ba1f..adb8c33ac595 100644
+> --- a/net/bluetooth/l2cap_core.c
+> +++ b/net/bluetooth/l2cap_core.c
+> @@ -948,6 +948,16 @@ static u8 l2cap_get_ident(struct l2cap_conn *conn)
+>  	return id;
+>  }
+>  
+> +static void l2cap_send_acl(struct l2cap_conn *conn, struct sk_buff *skb,
+> +			   u8 flags)
+> +{
+> +	/* Check if the hcon still valid before attempting to send */
+> +	if (hci_conn_valid(conn->hcon->hdev, conn->hcon))
 
-Changes in v2:
- - Updated commit message to clear up where the delay value comes from.
- - Delay added with usleep_range instead of changing sleep_before_read
-   parameter of phy_read_mmd_poll_timeout to avoid excessive delay.
----
- drivers/net/phy/nxp-c45-tja11xx.c | 2 ++
- 1 file changed, 2 insertions(+)
+Checking validity makes no sense because nothing prevents hcon from
+becoming invalid after check.
 
-diff --git a/drivers/net/phy/nxp-c45-tja11xx.c b/drivers/net/phy/nxp-c45-tja11xx.c
-index ade544bc007d..872e582b7e83 100644
---- a/drivers/net/phy/nxp-c45-tja11xx.c
-+++ b/drivers/net/phy/nxp-c45-tja11xx.c
-@@ -1297,6 +1297,8 @@ static int nxp_c45_soft_reset(struct phy_device *phydev)
- 	if (ret)
- 		return ret;
- 
-+	usleep_range(2000, 2050);
-+
- 	return phy_read_mmd_poll_timeout(phydev, MDIO_MMD_VEND1,
- 					 VEND1_DEVICE_CONTROL, ret,
- 					 !(ret & DEVICE_CONTROL_RESET), 20000,
--- 
-2.34.1
+PS spin with linux-kernel@vger.kernel.org, netdev@vger.kernel.org cced.
 
+> +		hci_send_acl(conn->hchan, skb, flags);
+> +	else
+> +		kfree_skb(skb);
+> +}
+> +
+>  static void l2cap_send_cmd(struct l2cap_conn *conn, u8 ident, u8 code, u16 len,
+>  			   void *data)
+>  {
+> @@ -970,7 +980,7 @@ static void l2cap_send_cmd(struct l2cap_conn *conn, u8 ident, u8 code, u16 len,
+>  	bt_cb(skb)->force_active = BT_POWER_FORCE_ACTIVE_ON;
+>  	skb->priority = HCI_PRIO_MAX;
+>  
+> -	hci_send_acl(conn->hchan, skb, flags);
+> +	l2cap_send_acl(conn, skb, flags);
+>  }
+>  
+>  static void l2cap_do_send(struct l2cap_chan *chan, struct sk_buff *skb)
+> @@ -1792,13 +1802,10 @@ static void l2cap_conn_del(struct hci_conn *hcon, int err)
+>  
+>  	mutex_unlock(&conn->chan_lock);
+>  
+> -	hci_chan_del(conn->hchan);
+> -
+>  	if (conn->info_state & L2CAP_INFO_FEAT_MASK_REQ_SENT)
+>  		cancel_delayed_work_sync(&conn->info_timer);
+>  
+>  	hcon->l2cap_data = NULL;
+> -	conn->hchan = NULL;
+>  	l2cap_conn_put(conn);
+>  }
+>  
+> @@ -1806,6 +1813,7 @@ static void l2cap_conn_free(struct kref *ref)
+>  {
+>  	struct l2cap_conn *conn = container_of(ref, struct l2cap_conn, ref);
+>  
+> +	hci_chan_del(conn->hchan);
+>  	hci_conn_put(conn->hcon);
+>  	kfree(conn);
+>  }
+> @@ -7466,14 +7474,33 @@ static void l2cap_recv_reset(struct l2cap_conn *conn)
+>  	conn->rx_len = 0;
+>  }
+>  
+> +static struct l2cap_conn *l2cap_conn_hold_unless_zero(struct l2cap_conn *c)
+> +{
+> +	BT_DBG("conn %p orig refcnt %u", c, kref_read(&c->ref));
+> +
+> +	if (!kref_get_unless_zero(&c->ref))
+> +		return NULL;
+> +
+> +	return c;
+> +}
+> +
+>  void l2cap_recv_acldata(struct hci_conn *hcon, struct sk_buff *skb, u16 flags)
+>  {
+> -	struct l2cap_conn *conn = hcon->l2cap_data;
+> +	struct l2cap_conn *conn;
+>  	int len;
+>  
+> +	/* Lock hdev to access l2cap_data to avoid race with l2cap_conn_del */
+> +	hci_dev_lock(hcon->hdev);
+> +
+> +	conn = hcon->l2cap_data;
+> +
+>  	if (!conn)
+>  		conn = l2cap_conn_add(hcon);
+>  
+> +	conn = l2cap_conn_hold_unless_zero(conn);
+> +
+> +	hci_dev_unlock(hcon->hdev);
+> +
+>  	if (!conn)
+>  		goto drop;
+>  
+> @@ -7565,6 +7592,8 @@ void l2cap_recv_acldata(struct hci_conn *hcon, struct sk_buff *skb, u16 flags)
+>  		break;
+>  	}
+>  
+> +	l2cap_conn_put(conn);
+> +
+>  drop:
+>  	kfree_skb(skb);
+>  }
+> -- 
+> 2.48.1
 
