@@ -1,352 +1,247 @@
-Return-Path: <netdev+bounces-160780-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-160781-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id C995BA1B6BF
-	for <lists+netdev@lfdr.de>; Fri, 24 Jan 2025 14:20:39 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 95E13A1B6FE
+	for <lists+netdev@lfdr.de>; Fri, 24 Jan 2025 14:38:49 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 36A31188F740
-	for <lists+netdev@lfdr.de>; Fri, 24 Jan 2025 13:20:23 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 703F016D69A
+	for <lists+netdev@lfdr.de>; Fri, 24 Jan 2025 13:38:45 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EF44939AD6;
-	Fri, 24 Jan 2025 13:19:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id F397E5D8F0;
+	Fri, 24 Jan 2025 13:38:16 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="AuU2fzOb"
+	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="slaN8QCF"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.9])
+Received: from NAM11-DM6-obe.outbound.protection.outlook.com (mail-dm6nam11on2050.outbound.protection.outlook.com [40.107.223.50])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5EDC76F305
-	for <netdev@vger.kernel.org>; Fri, 24 Jan 2025 13:19:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.9
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1737724788; cv=none; b=EUvs75827lT5cXC1VAi93LAMdiJ84OEdQagYrRapWZIFmLAFjz02NalmDJpXIHrpp91zUMlZtjWcrx7FXr9OTkULD6xtvRUCGZHDse6JXPLb0kHXqVleETxYpAZyhkrQqiduaLouaz9yCFNIXnlMiBL0EK7QSgHZ2f3a/LjxglE=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1737724788; c=relaxed/simple;
-	bh=XiDNncfJXCpmO1bVzSjTzo876biRjptiWYhvhFLU/9Q=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=LxHEd0eD9Qxyert6GY0bMPmXPlT4EtcFiQ9E/A5KZbg8Jlg+euiEJ6HzTyfWpb1p81rVg3X9j0U2+5Sd/NGI6B20Bhpx8uvOxGwpTPzVnh+lYPvOaTbi8rS8CpfnDFIOvwAZSoHQBISMSNiTsafCLtGMtzRoglVc6vhTCfzjqgY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=AuU2fzOb; arc=none smtp.client-ip=198.175.65.9
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1737724787; x=1769260787;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:content-transfer-encoding:in-reply-to;
-  bh=XiDNncfJXCpmO1bVzSjTzo876biRjptiWYhvhFLU/9Q=;
-  b=AuU2fzOb773WS9PNzkpsRckpxwR99YdmojKgBor0q32qThY5Zn6iY/ig
-   6zGmfIW2/IJXGK9Vfqo7jKxKxM4FeVRo2bKW+Ux6cyWUjrbqCb75b60BX
-   UaGpYSNwsbkeuJh1867S30wuQcclWAnAZ5nOT6Vg0UfBS8DM/q2U8KfdO
-   mNcmaP2WWwPXn/rA/4Fabkb887KGDBuubT5UUtJRdStxFxqi25brrwJAb
-   fzdOvJf/u2etmMI9vEh+AVNuBj45p1uouap5wp+Y8TcaV0kDwUvle50Td
-   594K0uFZyZKKW7q+XrdmcgzNBheJ4W7uGWQhyoByrwrXbaDimCL5Ox1E6
-   A==;
-X-CSE-ConnectionGUID: R7FUpkOQS466QUPLF0zkAQ==
-X-CSE-MsgGUID: JG5sMKNTTbO+/upXLrDDNg==
-X-IronPort-AV: E=McAfee;i="6700,10204,11325"; a="60723374"
-X-IronPort-AV: E=Sophos;i="6.13,231,1732608000"; 
-   d="scan'208";a="60723374"
-Received: from orviesa010.jf.intel.com ([10.64.159.150])
-  by orvoesa101.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 24 Jan 2025 05:19:46 -0800
-X-CSE-ConnectionGUID: iAoI0VKkQSSdkvcOYgqT3w==
-X-CSE-MsgGUID: 35JcTyp9QyusNXRqgTs5Jw==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.12,224,1728975600"; 
-   d="scan'208";a="107617094"
-Received: from lkp-server01.sh.intel.com (HELO d63d4d77d921) ([10.239.97.150])
-  by orviesa010.jf.intel.com with ESMTP; 24 Jan 2025 05:19:43 -0800
-Received: from kbuild by d63d4d77d921 with local (Exim 4.96)
-	(envelope-from <lkp@intel.com>)
-	id 1tbJb3-000chr-00;
-	Fri, 24 Jan 2025 13:19:41 +0000
-Date: Fri, 24 Jan 2025 21:18:55 +0800
-From: kernel test robot <lkp@intel.com>
-To: Samiullah Khawaja <skhawaja@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	"David S . Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
-	almasrymina@google.com
-Cc: oe-kbuild-all@lists.linux.dev, netdev@vger.kernel.org,
-	skhawaja@google.com
-Subject: Re: [PATCH net-next v2 3/4] Extend napi threaded polling to allow
- kthread based busy polling
-Message-ID: <202501242114.hSuOcqsi-lkp@intel.com>
-References: <20250123231236.2657321-4-skhawaja@google.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 135C270808;
+	Fri, 24 Jan 2025 13:38:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.223.50
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1737725896; cv=fail; b=MCdtKK+FMgWYWfdwPCRe6cdcRrf9XkFPQJot9dJ//JFxzOkBuNYH2H7uTe9MIbx3d8OrVHug0itcCE+5CYKr+gIGo9OOAgnUevk+ZG+IDmn2BjYH1RNUKUe2I15lFFIA2eT0wlsOrWVP8sIPMd9Mn5LSwvyEsz4QoDeJrNu0tak=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1737725896; c=relaxed/simple;
+	bh=uMZxnAXRmJRslSV0yLpjve067EU3amSvVtSvj81Cfv8=;
+	h=Message-ID:Date:Subject:To:References:From:In-Reply-To:
+	 Content-Type:MIME-Version; b=cAlcVAyhsYSDJEmjcWAlubWNruaklBM3PzckPqiS705HEGC+IUA7f2/ZVflyMYERQWjSRm9gvgaQfI7Tx2XppwtXh8h1SM42gr7n3P+u21wHjvuYeXUNOvpzz03Z61uzLKljGw0DyuZuTSpj1y3xIWNcVgDxAd4qyl0RqcQLnNI=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=slaN8QCF; arc=fail smtp.client-ip=40.107.223.50
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=amd.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=mgy443Lm1ewZCZxM50YGmhWpWBuGvwfApBo6A95k90hsHd4YmtG9pnJMHhKx5Nv62ylUQRbXbwonSX6euD3a0/cn86QOPeZqFOnWd3RG0GwnZMV1poI7jOx5LxIm3GhnWS3XF7YsTp+h4IpD6pFY9KWzVVy1ymoYVjIn6S07aDNVNji6AH9aKn/7I8rYIQpnwwwAGkVaZ+tix10eTCJ4hCQzG08m/wwvgpT65PL4hsrRsloHv004z7UUp5vWel20dH4Zh60Z6nGRy3xNp41NFH0I2krwxWuArijOZBP7cfZXwDuMSdhO4BiaZl+njsIJQ4I6QVDrFV2zvnkMs/LkzQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=tA6/w+JgpxiSzDRYr/rcY2n+AqyA/9bI4BQr1Xkxwj8=;
+ b=uNZeBo+qA1+6rCvXc3vlcd8waAx7+n4pfGvMGBgcO+xch6jwoklCyKQpMpA0NGA1HteU1fWQeXbQpbwRjWrP2kmgbqAPDuLbf85zwgwah5YFSkeYoT5JOvYSKiK+0G+RvpJRHAoBzKoMvwZ4AxcsAyVkYJYp7o58DEd/lxeR6R67RlvZ6Km+KMS+zeK9/HiJkUcpdmtYckrhI9CPJTX/RhnOOPmddzqdfJHDEAIlNiWrmyEOKxhJUkMNUIEw8jgDupE0iPP31K5CXbtcqIf38XXFBilmDTuKg2xMGUyt26FBA8LjGivKNhxcpPKtBnVCIvVLcoT1rAFR4YGGzWRASQ==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
+ header.d=amd.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=tA6/w+JgpxiSzDRYr/rcY2n+AqyA/9bI4BQr1Xkxwj8=;
+ b=slaN8QCFHUIG98Pvx2Yc2ZkpbffOIXh/35b1C9PDdqHc7xbqaK18DZMO6eN4a2UGjqGC9LDaRDls4xr29Kz1jJsz2DXM1J93zqRMQ+24yRcKEONJDjsNM6X/yS5dKrTrsiFkRl8Bio6+278byXYpofMz7O0Ra8ucHeRlSZkA6bI=
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=amd.com;
+Received: from DM6PR12MB4202.namprd12.prod.outlook.com (2603:10b6:5:219::22)
+ by SA1PR12MB6822.namprd12.prod.outlook.com (2603:10b6:806:25d::17) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8377.16; Fri, 24 Jan
+ 2025 13:38:12 +0000
+Received: from DM6PR12MB4202.namprd12.prod.outlook.com
+ ([fe80::f943:600c:2558:af79]) by DM6PR12MB4202.namprd12.prod.outlook.com
+ ([fe80::f943:600c:2558:af79%7]) with mapi id 15.20.8377.009; Fri, 24 Jan 2025
+ 13:38:12 +0000
+Message-ID: <0074a468-b324-a015-b346-2c49332d161b@amd.com>
+Date: Fri, 24 Jan 2025 13:38:07 +0000
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.11.0
+Subject: Re: [PATCH v8 01/27] cxl: add type2 device basic support
+Content-Language: en-US
+To: Dan Williams <dan.j.williams@intel.com>, alejandro.lucero-palau@amd.com,
+ linux-cxl@vger.kernel.org, netdev@vger.kernel.org, martin.habets@xilinx.com,
+ edward.cree@amd.com, davem@davemloft.net, kuba@kernel.org,
+ pabeni@redhat.com, edumazet@google.com, dave.jiang@intel.com
+References: <20241216161042.42108-1-alejandro.lucero-palau@amd.com>
+ <20241216161042.42108-2-alejandro.lucero-palau@amd.com>
+ <677dbbd46e630_2aff42944@dwillia2-xfh.jf.intel.com.notmuch>
+ <677dd5ea832e6_f58f29444@dwillia2-xfh.jf.intel.com.notmuch>
+From: Alejandro Lucero Palau <alucerop@amd.com>
+In-Reply-To: <677dd5ea832e6_f58f29444@dwillia2-xfh.jf.intel.com.notmuch>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: DUZPR01CA0306.eurprd01.prod.exchangelabs.com
+ (2603:10a6:10:4b7::16) To DM6PR12MB4202.namprd12.prod.outlook.com
+ (2603:10b6:5:219::22)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <20250123231236.2657321-4-skhawaja@google.com>
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: DM6PR12MB4202:EE_|SA1PR12MB6822:EE_
+X-MS-Office365-Filtering-Correlation-Id: dedf0e94-50f4-4206-9331-08dd3c7c58d5
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam:
+	BCL:0;ARA:13230040|366016|376014|1800799024|7053199007|921020;
+X-Microsoft-Antispam-Message-Info:
+	=?utf-8?B?QjhTdFZZSEFybWdoVDlrS3dkU0hFMnVUeThzRWRvNkRaTUUrUEE1NGY0T0ty?=
+ =?utf-8?B?TndnMTNMODRRR2ZLNS9qd0JRYk5mTnFSZ3p3V1VZNmQrckNwSEJrR0RYNk5F?=
+ =?utf-8?B?KzBqSlZLRUszRm9VYmF5WXk3U0JIdlgvWmpFSjRPVTMxYzZMbXljcW0yZ2dr?=
+ =?utf-8?B?TnpPNTNpS0JOeE92YUZqVjZZd2hpZXpnV0tFOGZkcndlcjFIbTZDZmM1MGQ1?=
+ =?utf-8?B?bkFuQnlRZHBnSFlQWnY1SHlrMTVqZ2N1VnN1bnNzNnFXZFVFc1d2aGtGaG9P?=
+ =?utf-8?B?T2M3WkVYekxkcUhIYk1xN0V1YjFLZHN0eVczWktMQU1mWEs2MFliWmVaWVBH?=
+ =?utf-8?B?TGs4bFBCK2xFYTZzOW1Tak9vd3BYVC9YVE82dEI2NzBTcHF2c3RqNlVvYjdq?=
+ =?utf-8?B?THNqbnd0ZWhDT0dTcHM2Vy80OFh0a1ppODFQY2Vta3p0cjZrYnhVRzl5dkdT?=
+ =?utf-8?B?MWxtQjIrci9FZGp6aHZ6RWN4aTltYzM4UlhoWkZMTkhDaGRuamFCVVpzYlNO?=
+ =?utf-8?B?ZU4yYTNyMEJ1U25kZGNmMXZrRExNVnRyK2RXUGJzVDVXYXA1T2F3TnVwS29V?=
+ =?utf-8?B?MWg3c3h4VFZnZGY5WmNxZFdvbGxwTm5PYVk2UTl3QTlTT0EyVGFqOW53cVl2?=
+ =?utf-8?B?bUNnby9sVHB5ZkZrSkhlL3ZYdjY4NUswYVdLUlVjbmN0VitIeit5N1NJMERF?=
+ =?utf-8?B?QUFLQm5rU3pNakFvWThyRU5jTUVJY1dkSE0vaEpLZExURC8xcEdHMDdvNXV0?=
+ =?utf-8?B?bFo5QThBUXk3Rm9vWjJlRzVDemlJWXpVdGROVklhNUsxSjhtL3N4S2g3Z1Qz?=
+ =?utf-8?B?Y0RZNmhuc3F4cDF5MGh6VjRuZytPQ2tIdnFZZUdvclNXSE42cjJBTHUvdGpJ?=
+ =?utf-8?B?bis3RExGN0xXZzlndnBpOEliZUNocVJDM1ROYk1rRHQ1aEE3YmtNdUpUSjds?=
+ =?utf-8?B?a3hGYlV1b0UwRy9jL1dOSDA5UVZGVHlJUmtwRVFqSTV1amZ5bndXcnIzaHpL?=
+ =?utf-8?B?S2o4YnpxdEtWcHpJdFJCL1dDd05RR0puNnp1WU5TSEFFOVEyY2hsdjJ2aFlz?=
+ =?utf-8?B?MlBZeFNIWjlaSis3aVNmVFhBK3M5REVkeDEycmVQUzQxdWxyNi8wdXlxRXZr?=
+ =?utf-8?B?aHhHMUg3aWwwM1JmZVBQNVVueHQ4aU1IL1Z5TUpXWndFWWM0TlY0QlROY1cv?=
+ =?utf-8?B?MlFUanhWN3J5WFBMODVHenpYbnZDa0JRa1BadFFPSS9iQnc0Q3dYRFpwL2RV?=
+ =?utf-8?B?dCt2UE5PdmFiWW1pSEpLOFlSVHorRE1odG9iNC9zdHk5Z2d1aWFybW1YZG9v?=
+ =?utf-8?B?VDExSGdWb0k2dmRpTXFmd1hSU2NBMWdwS250TEtOREhWZ2lhUTVkNkh0czlV?=
+ =?utf-8?B?S1kyQWpmL3lwQUpaeVpRVDJNRlhiMTYzYU9lRVpKVFdpdkR1aUJ4ZDBXeHAw?=
+ =?utf-8?B?YkUrUHM1L05ac3lYQ0ZHNGl4TWNPdDJ6bmJGejZ6cmg3MUExTGhLd3hSYk03?=
+ =?utf-8?B?T3FBOGtRQ3dVcWtuVkNmOUwxSkVvOXFUYTJYcFgyT2dBelVyS3FiNEN5UEtK?=
+ =?utf-8?B?VFV2Q2Flc2hITUd3elJnL1QvZUZ5RlBwSjNqcHd5VEZlVmN1K3VTRkFHQytB?=
+ =?utf-8?B?VUZRSkw2Qi9GMnR2aGhIMHUvTWpXaHBNaUxaMS9TWG9nRUN6aGtJRHowbkp0?=
+ =?utf-8?B?bEtQYnFiY3ZXT0RmUTFpeWEvclhZdkZ1Ly9zdG9QNTFGQmxPM2lxRzB0U1Vi?=
+ =?utf-8?B?bTQ5bWpidXNDR05Dbk5Bc1c3WXNXdXIrNFdWNEpvTWxQMGpySC9yNDVlVmFO?=
+ =?utf-8?B?OU0zbU1xcFNieVJwLzRxOHNVMndjcnRLQzV3RVNXS2NFS3pweFJ1S2JUdGJ5?=
+ =?utf-8?B?eS9HcWtZcTNsSzYrdnJCMm10YzhQcFhySGNXcHY1WEIvcXRGVEVCWjFBM0pV?=
+ =?utf-8?Q?wdUAXnK43UiDBm4RQ7R0NE9bVmORcWWq?=
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DM6PR12MB4202.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(366016)(376014)(1800799024)(7053199007)(921020);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?utf-8?B?TTVSSWRnQlVyNkNZdnZXMURzOEJweUlJQVF4TW1jRHAxU3ZPUzR2cVRVVVRR?=
+ =?utf-8?B?MzkvR0tId1Nzb3FvcXZIY1JocmZ4RmRyblpIakowS1BTNTRsdjJ5eHdJS1VO?=
+ =?utf-8?B?NGFaY3hhNnhvbDRPbkk0THBySFUyQTNBQkh1N1MrNFl2SlZ4QmRhc1lyUVhN?=
+ =?utf-8?B?dXJpS1VQYTRZZ1lPb1BYdHdGdldyLzRJcnFvLzR3aGZ2SDk4RjdoeVNyOEU1?=
+ =?utf-8?B?cmFvOUF4eE5SQVM2S2ZHUGN4Vlg4emN4cS96ZGxBUUJrRHMrYk5YMUt5akVG?=
+ =?utf-8?B?RWlYS25MSmZSNDZtdlRXK2t6MEF0NmlGRG9qY0dleG9ZeDREcjJoVC9XR1lP?=
+ =?utf-8?B?dTZ5WmhQeVRMeXlxWnFnYW84WW5IYXo2UDd4UTdjMGVtaFdET0ZwSXdMNVJ6?=
+ =?utf-8?B?SjI0c0h3WVpEa1hWakYxMU1JcUFCZWYwM3hDN0VsWkVmQXBXTmlsU1gybm5x?=
+ =?utf-8?B?ay85NnpUd3pxc3FIRGZucmRvM3dXbjlRZk1ORitwRzc2YWNCNkJQdVgwYzFu?=
+ =?utf-8?B?cEZtcWwwRENyeTVPQXRDUExqbG4xdUc4K0k4amxGcEdNN29NUndMYVUrNnRV?=
+ =?utf-8?B?ZTE1M0ZjNlQ3UGFpZGdIQ0xwdHZLZzJaaVBvZUx1OG0weUVvZ0tiR0kwUFBZ?=
+ =?utf-8?B?OHVxL2hnVWxLRHFlMklKeG5uYldWU1c3c0wwU0txOE9ZNm1oTlVXZ1huYnVT?=
+ =?utf-8?B?Q3lZaHhubldZbzEyUzZGZkpqbVNuRCs2M0VsVnVhYUt2YnRFbFFic0ZSNDF5?=
+ =?utf-8?B?elErMTBHSEo4cndQNGpBY1Z1ZTRNN254dVNXajdlbVc0RWNFWVhrUEVwSzlp?=
+ =?utf-8?B?b3owUFRhQmh4NDVHSVpWSnFOVGxUcmc3R0pCVGJLTGlPOUNWK2RJcUwxaGFi?=
+ =?utf-8?B?Sjg4Zi9XY0Nad3VOaUxyb1VUL3VYczA3LzRqa05xYVpnaDcrdzcwZTR1Zkhl?=
+ =?utf-8?B?aXcwMjh0VTA2L0xrSkFFYi9QWFM4dTA4MXlaR28vYzVIUWFqSE04OUw4eUxp?=
+ =?utf-8?B?Q1ZZRTFhTTRscDRSQ3RDSFhPaER4ai80Mk1zUUorWGxjMkJGZHIrbGtobDRE?=
+ =?utf-8?B?QzJZcUNtSU1COGFWRzBab2RoOGJTKzJKd0p3bC9YVHVkeVRXSTRIM0d0V3lK?=
+ =?utf-8?B?eHlMT1hZUVluUENrczliYzhXdUkzT2xsS05XdkNyM2FSNDFmclVqWkFCamhL?=
+ =?utf-8?B?QU9uUkJlaEYyTHNmYWM2WWl5U1Z0Mkp4a3RWNE4wWUZmWlRFd1NwVkRrN1RW?=
+ =?utf-8?B?c1VDNGQ0bXowSEN1MmtCQjNiNjJPdTFiYko2YkN5elZ2NGJrdXVvUlV1K20y?=
+ =?utf-8?B?b2NmWjZHZDdkUGtkQlJiZE5ERFBUcDV2M1VjUWt5bm1OV1kwbWVRdFJ1amdj?=
+ =?utf-8?B?NEt6d2lGemFURHNlY0oxUzFoU3R6cHFtcXR0RVRmbzBSWmlsbDZLTVR6QWxM?=
+ =?utf-8?B?U3BJRVFPUVlicThBbWpUeGVLRFR5R1VORTQ1VWprc3JkNGZ1U2VDN0NlWUNR?=
+ =?utf-8?B?djBLYnd5bnhrUGxiL1VaYUxGb2Q2Mk9RNjlCR0llOVNnKzhIV3BxM1dFY2x3?=
+ =?utf-8?B?WmdESmpTUnhoekR0OG56Rnh2MzdOV1g5WW5SeUt6YXJnZWxwWDhkL1JHQW0v?=
+ =?utf-8?B?NnR1TUFRU0VTRGhubGZ6U05zcHdKWG92U0Y0NnJIQ2NpRXp2YW9WV1lWYVlF?=
+ =?utf-8?B?YnNNZ2kxTTFIdllwTHVrQ1V3Y0ZvVUFWanhKZkNsR2MxcVFzRmdpeTFGOWJ1?=
+ =?utf-8?B?TStwWno2dWZjRW8zU2t2SDl5bUxPWDdPaEErdHc1RWtRZVcwb2EvVSsyWnpM?=
+ =?utf-8?B?Vm1UdmpkVmh0cUE3bFF1RVRRY3pMRndPbFFKTUFPeTY1NGdIbnJyU2ZxUGhQ?=
+ =?utf-8?B?c3dvUGtmekptOUhYKzlwa2JmU0FjcFJpUUJmQ3dZNkVEVGRNcWlKVEJGY21w?=
+ =?utf-8?B?OUM5WXVhM1JGd0cxVGh5K2FuUVlHZmp6MURWV25EQ0dVVGNlYm5ZNkRtL1lr?=
+ =?utf-8?B?SmhnalJNNmdXMWYvZnVmL0tSNG9GUDBvdGlPa1RLOFRrZnR5WGRoR09ZMGJE?=
+ =?utf-8?B?bDBqMDAyNkRsNnJra1hoeW54Yk1OOVU3TUJZNU03YjZlck54VjBFcHlBd2Nu?=
+ =?utf-8?Q?VsSHpeY5GFim8OfXWerzzvSvo?=
+X-OriginatorOrg: amd.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: dedf0e94-50f4-4206-9331-08dd3c7c58d5
+X-MS-Exchange-CrossTenant-AuthSource: DM6PR12MB4202.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 24 Jan 2025 13:38:12.3225
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: enJ7rqS2VzgeD7+zgGjTZsfmL11uPvYC4OupiA7TwRxA2PnR3ZFP80Sz35BKqRM/qO7WQL74fRNKsOHx/HDpYQ==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SA1PR12MB6822
 
-Hi Samiullah,
 
-kernel test robot noticed the following build warnings:
-
-[auto build test WARNING on net-next/main]
-
-url:    https://github.com/intel-lab-lkp/linux/commits/Samiullah-Khawaja/Add-support-to-set-napi-threaded-for-individual-napi/20250124-071412
-base:   net-next/main
-patch link:    https://lore.kernel.org/r/20250123231236.2657321-4-skhawaja%40google.com
-patch subject: [PATCH net-next v2 3/4] Extend napi threaded polling to allow kthread based busy polling
-config: loongarch-allyesconfig (https://download.01.org/0day-ci/archive/20250124/202501242114.hSuOcqsi-lkp@intel.com/config)
-compiler: loongarch64-linux-gcc (GCC) 14.2.0
-reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20250124/202501242114.hSuOcqsi-lkp@intel.com/reproduce)
-
-If you fix the issue in a separate patch/commit (i.e. not just a new version of
-the same patch/commit), kindly add following tags
-| Reported-by: kernel test robot <lkp@intel.com>
-| Closes: https://lore.kernel.org/oe-kbuild-all/202501242114.hSuOcqsi-lkp@intel.com/
-
-All warnings (new ones prefixed by >>):
-
-   drivers/net/ethernet/renesas/ravb_main.c: In function 'ravb_probe':
->> drivers/net/ethernet/renesas/ravb_main.c:3078:48: warning: implicit conversion from 'enum <anonymous>' to 'enum netdev_napi_threaded' [-Wenum-conversion]
-    3078 |                         dev_set_threaded(ndev, true);
-         |                                                ^~~~
---
-   drivers/net/ethernet/mellanox/mlxsw/pci.c: In function 'mlxsw_pci_napi_devs_init':
->> drivers/net/ethernet/mellanox/mlxsw/pci.c:159:50: warning: implicit conversion from 'enum <anonymous>' to 'enum netdev_napi_threaded' [-Wenum-conversion]
-     159 |         dev_set_threaded(mlxsw_pci->napi_dev_rx, true);
-         |                                                  ^~~~
---
-   drivers/net/wireless/ath/ath10k/snoc.c: In function 'ath10k_snoc_hif_start':
->> drivers/net/wireless/ath/ath10k/snoc.c:938:40: warning: implicit conversion from 'enum <anonymous>' to 'enum netdev_napi_threaded' [-Wenum-conversion]
-     938 |         dev_set_threaded(ar->napi_dev, true);
-         |                                        ^~~~
+On 1/8/25 01:33, Dan Williams wrote:
+> Dan Williams wrote:
+>> alejandro.lucero-palau@ wrote:
+>>> From: Alejandro Lucero <alucerop@amd.com>
+>>>
+>>> Differentiate CXL memory expanders (type 3) from CXL device accelerators
+>>> (type 2) with a new function for initializing cxl_dev_state.
+>>>
+>>> Create accessors to cxl_dev_state to be used by accel drivers.
+>>>
+>>> Based on previous work by Dan Williams [1]
+>>>
+>>> Link: [1] https://lore.kernel.org/linux-cxl/168592160379.1948938.12863272903570476312.stgit@dwillia2-xfh.jf.intel.com/
+>>> Signed-off-by: Alejandro Lucero <alucerop@amd.com>
+>>> Co-developed-by: Dan Williams <dan.j.williams@intel.com>
+>>> Reviewed-by: Dave Jiang <dave.jiang@intel.com>
+>>> Reviewed-by: Fan Ni <fan.ni@samsung.com>
+>> This patch causes
+> Whoops, forgot to complete this thought. Someting in this series causes:
+>
+> depmod: ERROR: Cycle detected: ecdh_generic
+> depmod: ERROR: Cycle detected: tpm
+> depmod: ERROR: Cycle detected: cxl_mock -> cxl_core -> cxl_mock
+> depmod: ERROR: Cycle detected: encrypted_keys
+> depmod: ERROR: Found 2 modules in dependency cycles!
+>
+> I think the non CXL ones are false likely triggered by the CXL causing
+> depmod to exit early.
+>
+> Given cxl-test is unfamiliar territory to many submitters I always offer
+> to fix up the breakage. I came up with the below incremental patch to
+> fold in that also addresses my other feedback.
 
 
-vim +3078 drivers/net/ethernet/renesas/ravb_main.c
+snip
 
-32f012b8c01ca9 drivers/net/ethernet/renesas/ravb_main.c Claudiu Beznea     2024-02-02  2901  
-c156633f135326 drivers/net/ethernet/renesas/ravb.c      Sergei Shtylyov    2015-06-11  2902  static int ravb_probe(struct platform_device *pdev)
-c156633f135326 drivers/net/ethernet/renesas/ravb.c      Sergei Shtylyov    2015-06-11  2903  {
-c156633f135326 drivers/net/ethernet/renesas/ravb.c      Sergei Shtylyov    2015-06-11  2904  	struct device_node *np = pdev->dev.of_node;
-ebb091461a9e14 drivers/net/ethernet/renesas/ravb_main.c Biju Das           2021-08-18  2905  	const struct ravb_hw_info *info;
-0d13a1a464a023 drivers/net/ethernet/renesas/ravb_main.c Biju Das           2021-08-25  2906  	struct reset_control *rstc;
-c156633f135326 drivers/net/ethernet/renesas/ravb.c      Sergei Shtylyov    2015-06-11  2907  	struct ravb_private *priv;
-c156633f135326 drivers/net/ethernet/renesas/ravb.c      Sergei Shtylyov    2015-06-11  2908  	struct net_device *ndev;
-c156633f135326 drivers/net/ethernet/renesas/ravb.c      Sergei Shtylyov    2015-06-11  2909  	struct resource *res;
-32f012b8c01ca9 drivers/net/ethernet/renesas/ravb_main.c Claudiu Beznea     2024-02-02  2910  	int error, q;
-c156633f135326 drivers/net/ethernet/renesas/ravb.c      Sergei Shtylyov    2015-06-11  2911  
-c156633f135326 drivers/net/ethernet/renesas/ravb.c      Sergei Shtylyov    2015-06-11  2912  	if (!np) {
-c156633f135326 drivers/net/ethernet/renesas/ravb.c      Sergei Shtylyov    2015-06-11  2913  		dev_err(&pdev->dev,
-c156633f135326 drivers/net/ethernet/renesas/ravb.c      Sergei Shtylyov    2015-06-11  2914  			"this driver is required to be instantiated from device tree\n");
-c156633f135326 drivers/net/ethernet/renesas/ravb.c      Sergei Shtylyov    2015-06-11  2915  		return -EINVAL;
-c156633f135326 drivers/net/ethernet/renesas/ravb.c      Sergei Shtylyov    2015-06-11  2916  	}
-c156633f135326 drivers/net/ethernet/renesas/ravb.c      Sergei Shtylyov    2015-06-11  2917  
-b1768e3dc47792 drivers/net/ethernet/renesas/ravb_main.c Claudiu Beznea     2024-02-02  2918  	rstc = devm_reset_control_get_exclusive(&pdev->dev, NULL);
-0d13a1a464a023 drivers/net/ethernet/renesas/ravb_main.c Biju Das           2021-08-25  2919  	if (IS_ERR(rstc))
-0d13a1a464a023 drivers/net/ethernet/renesas/ravb_main.c Biju Das           2021-08-25  2920  		return dev_err_probe(&pdev->dev, PTR_ERR(rstc),
-0d13a1a464a023 drivers/net/ethernet/renesas/ravb_main.c Biju Das           2021-08-25  2921  				     "failed to get cpg reset\n");
-0d13a1a464a023 drivers/net/ethernet/renesas/ravb_main.c Biju Das           2021-08-25  2922  
-c156633f135326 drivers/net/ethernet/renesas/ravb.c      Sergei Shtylyov    2015-06-11  2923  	ndev = alloc_etherdev_mqs(sizeof(struct ravb_private),
-c156633f135326 drivers/net/ethernet/renesas/ravb.c      Sergei Shtylyov    2015-06-11  2924  				  NUM_TX_QUEUE, NUM_RX_QUEUE);
-c156633f135326 drivers/net/ethernet/renesas/ravb.c      Sergei Shtylyov    2015-06-11  2925  	if (!ndev)
-c156633f135326 drivers/net/ethernet/renesas/ravb.c      Sergei Shtylyov    2015-06-11  2926  		return -ENOMEM;
-c156633f135326 drivers/net/ethernet/renesas/ravb.c      Sergei Shtylyov    2015-06-11  2927  
-8912ed25daf6fc drivers/net/ethernet/renesas/ravb_main.c Biju Das           2021-08-18  2928  	info = of_device_get_match_data(&pdev->dev);
-8912ed25daf6fc drivers/net/ethernet/renesas/ravb_main.c Biju Das           2021-08-18  2929  
-8912ed25daf6fc drivers/net/ethernet/renesas/ravb_main.c Biju Das           2021-08-18  2930  	ndev->features = info->net_features;
-8912ed25daf6fc drivers/net/ethernet/renesas/ravb_main.c Biju Das           2021-08-18  2931  	ndev->hw_features = info->net_hw_features;
-546875ccba938b drivers/net/ethernet/renesas/ravb_main.c Paul Barker        2024-10-15  2932  	ndev->vlan_features = info->vlan_features;
-4d86d381862714 drivers/net/ethernet/renesas/ravb_main.c Simon Horman       2017-10-04  2933  
-d8eb6ea4b302e7 drivers/net/ethernet/renesas/ravb_main.c Claudiu Beznea     2023-11-28  2934  	error = reset_control_deassert(rstc);
-d8eb6ea4b302e7 drivers/net/ethernet/renesas/ravb_main.c Claudiu Beznea     2023-11-28  2935  	if (error)
-d8eb6ea4b302e7 drivers/net/ethernet/renesas/ravb_main.c Claudiu Beznea     2023-11-28  2936  		goto out_free_netdev;
-d8eb6ea4b302e7 drivers/net/ethernet/renesas/ravb_main.c Claudiu Beznea     2023-11-28  2937  
-c156633f135326 drivers/net/ethernet/renesas/ravb.c      Sergei Shtylyov    2015-06-11  2938  	SET_NETDEV_DEV(ndev, &pdev->dev);
-c156633f135326 drivers/net/ethernet/renesas/ravb.c      Sergei Shtylyov    2015-06-11  2939  
-c156633f135326 drivers/net/ethernet/renesas/ravb.c      Sergei Shtylyov    2015-06-11  2940  	priv = netdev_priv(ndev);
-ebb091461a9e14 drivers/net/ethernet/renesas/ravb_main.c Biju Das           2021-08-18  2941  	priv->info = info;
-0d13a1a464a023 drivers/net/ethernet/renesas/ravb_main.c Biju Das           2021-08-25  2942  	priv->rstc = rstc;
-c156633f135326 drivers/net/ethernet/renesas/ravb.c      Sergei Shtylyov    2015-06-11  2943  	priv->ndev = ndev;
-c156633f135326 drivers/net/ethernet/renesas/ravb.c      Sergei Shtylyov    2015-06-11  2944  	priv->pdev = pdev;
-c156633f135326 drivers/net/ethernet/renesas/ravb.c      Sergei Shtylyov    2015-06-11  2945  	priv->num_tx_ring[RAVB_BE] = BE_TX_RING_SIZE;
-c156633f135326 drivers/net/ethernet/renesas/ravb.c      Sergei Shtylyov    2015-06-11  2946  	priv->num_rx_ring[RAVB_BE] = BE_RX_RING_SIZE;
-1091da579d7ccd drivers/net/ethernet/renesas/ravb_main.c Biju Das           2021-10-12  2947  	if (info->nc_queues) {
-c156633f135326 drivers/net/ethernet/renesas/ravb.c      Sergei Shtylyov    2015-06-11  2948  		priv->num_tx_ring[RAVB_NC] = NC_TX_RING_SIZE;
-c156633f135326 drivers/net/ethernet/renesas/ravb.c      Sergei Shtylyov    2015-06-11  2949  		priv->num_rx_ring[RAVB_NC] = NC_RX_RING_SIZE;
-a92f4f0662bf2c drivers/net/ethernet/renesas/ravb_main.c Biju Das           2021-10-01  2950  	}
-a92f4f0662bf2c drivers/net/ethernet/renesas/ravb_main.c Biju Das           2021-10-01  2951  
-32f012b8c01ca9 drivers/net/ethernet/renesas/ravb_main.c Claudiu Beznea     2024-02-02  2952  	error = ravb_setup_irqs(priv);
-32f012b8c01ca9 drivers/net/ethernet/renesas/ravb_main.c Claudiu Beznea     2024-02-02  2953  	if (error)
-32f012b8c01ca9 drivers/net/ethernet/renesas/ravb_main.c Claudiu Beznea     2024-02-02  2954  		goto out_reset_assert;
-32f012b8c01ca9 drivers/net/ethernet/renesas/ravb_main.c Claudiu Beznea     2024-02-02  2955  
-a654f6e875b753 drivers/net/ethernet/renesas/ravb_main.c Claudiu Beznea     2024-02-02  2956  	priv->clk = devm_clk_get(&pdev->dev, NULL);
-a654f6e875b753 drivers/net/ethernet/renesas/ravb_main.c Claudiu Beznea     2024-02-02  2957  	if (IS_ERR(priv->clk)) {
-a654f6e875b753 drivers/net/ethernet/renesas/ravb_main.c Claudiu Beznea     2024-02-02  2958  		error = PTR_ERR(priv->clk);
-a654f6e875b753 drivers/net/ethernet/renesas/ravb_main.c Claudiu Beznea     2024-02-02  2959  		goto out_reset_assert;
-a654f6e875b753 drivers/net/ethernet/renesas/ravb_main.c Claudiu Beznea     2024-02-02  2960  	}
-a654f6e875b753 drivers/net/ethernet/renesas/ravb_main.c Claudiu Beznea     2024-02-02  2961  
-a654f6e875b753 drivers/net/ethernet/renesas/ravb_main.c Claudiu Beznea     2024-02-02  2962  	if (info->gptp_ref_clk) {
-a654f6e875b753 drivers/net/ethernet/renesas/ravb_main.c Claudiu Beznea     2024-02-02  2963  		priv->gptp_clk = devm_clk_get(&pdev->dev, "gptp");
-a654f6e875b753 drivers/net/ethernet/renesas/ravb_main.c Claudiu Beznea     2024-02-02  2964  		if (IS_ERR(priv->gptp_clk)) {
-a654f6e875b753 drivers/net/ethernet/renesas/ravb_main.c Claudiu Beznea     2024-02-02  2965  			error = PTR_ERR(priv->gptp_clk);
-a654f6e875b753 drivers/net/ethernet/renesas/ravb_main.c Claudiu Beznea     2024-02-02  2966  			goto out_reset_assert;
-a654f6e875b753 drivers/net/ethernet/renesas/ravb_main.c Claudiu Beznea     2024-02-02  2967  		}
-a654f6e875b753 drivers/net/ethernet/renesas/ravb_main.c Claudiu Beznea     2024-02-02  2968  	}
-a654f6e875b753 drivers/net/ethernet/renesas/ravb_main.c Claudiu Beznea     2024-02-02  2969  
-a654f6e875b753 drivers/net/ethernet/renesas/ravb_main.c Claudiu Beznea     2024-02-02  2970  	priv->refclk = devm_clk_get_optional(&pdev->dev, "refclk");
-a654f6e875b753 drivers/net/ethernet/renesas/ravb_main.c Claudiu Beznea     2024-02-02  2971  	if (IS_ERR(priv->refclk)) {
-a654f6e875b753 drivers/net/ethernet/renesas/ravb_main.c Claudiu Beznea     2024-02-02  2972  		error = PTR_ERR(priv->refclk);
-a654f6e875b753 drivers/net/ethernet/renesas/ravb_main.c Claudiu Beznea     2024-02-02  2973  		goto out_reset_assert;
-a654f6e875b753 drivers/net/ethernet/renesas/ravb_main.c Claudiu Beznea     2024-02-02  2974  	}
-a654f6e875b753 drivers/net/ethernet/renesas/ravb_main.c Claudiu Beznea     2024-02-02  2975  	clk_prepare(priv->refclk);
-a654f6e875b753 drivers/net/ethernet/renesas/ravb_main.c Claudiu Beznea     2024-02-02  2976  
-a654f6e875b753 drivers/net/ethernet/renesas/ravb_main.c Claudiu Beznea     2024-02-02  2977  	platform_set_drvdata(pdev, ndev);
-48f894ab07c444 drivers/net/ethernet/renesas/ravb_main.c Claudiu Beznea     2024-02-14  2978  	pm_runtime_set_autosuspend_delay(&pdev->dev, 100);
-48f894ab07c444 drivers/net/ethernet/renesas/ravb_main.c Claudiu Beznea     2024-02-14  2979  	pm_runtime_use_autosuspend(&pdev->dev);
-a654f6e875b753 drivers/net/ethernet/renesas/ravb_main.c Claudiu Beznea     2024-02-02  2980  	pm_runtime_enable(&pdev->dev);
-a654f6e875b753 drivers/net/ethernet/renesas/ravb_main.c Claudiu Beznea     2024-02-02  2981  	error = pm_runtime_resume_and_get(&pdev->dev);
-a654f6e875b753 drivers/net/ethernet/renesas/ravb_main.c Claudiu Beznea     2024-02-02  2982  	if (error < 0)
-a654f6e875b753 drivers/net/ethernet/renesas/ravb_main.c Claudiu Beznea     2024-02-02  2983  		goto out_rpm_disable;
-a654f6e875b753 drivers/net/ethernet/renesas/ravb_main.c Claudiu Beznea     2024-02-02  2984  
-e89a2cdb1cca51 drivers/net/ethernet/renesas/ravb_main.c Yang Yingliang     2021-06-09  2985  	priv->addr = devm_platform_get_and_ioremap_resource(pdev, 0, &res);
-c156633f135326 drivers/net/ethernet/renesas/ravb.c      Sergei Shtylyov    2015-06-11  2986  	if (IS_ERR(priv->addr)) {
-c156633f135326 drivers/net/ethernet/renesas/ravb.c      Sergei Shtylyov    2015-06-11  2987  		error = PTR_ERR(priv->addr);
-a654f6e875b753 drivers/net/ethernet/renesas/ravb_main.c Claudiu Beznea     2024-02-02  2988  		goto out_rpm_put;
-c156633f135326 drivers/net/ethernet/renesas/ravb.c      Sergei Shtylyov    2015-06-11  2989  	}
-c156633f135326 drivers/net/ethernet/renesas/ravb.c      Sergei Shtylyov    2015-06-11  2990  
-e89a2cdb1cca51 drivers/net/ethernet/renesas/ravb_main.c Yang Yingliang     2021-06-09  2991  	/* The Ether-specific entries in the device structure. */
-e89a2cdb1cca51 drivers/net/ethernet/renesas/ravb_main.c Yang Yingliang     2021-06-09  2992  	ndev->base_addr = res->start;
-e89a2cdb1cca51 drivers/net/ethernet/renesas/ravb_main.c Yang Yingliang     2021-06-09  2993  
-c156633f135326 drivers/net/ethernet/renesas/ravb.c      Sergei Shtylyov    2015-06-11  2994  	spin_lock_init(&priv->lock);
-c156633f135326 drivers/net/ethernet/renesas/ravb.c      Sergei Shtylyov    2015-06-11  2995  	INIT_WORK(&priv->work, ravb_tx_timeout_work);
-c156633f135326 drivers/net/ethernet/renesas/ravb.c      Sergei Shtylyov    2015-06-11  2996  
-0c65b2b90d13c1 drivers/net/ethernet/renesas/ravb_main.c Andrew Lunn        2019-11-04  2997  	error = of_get_phy_mode(np, &priv->phy_interface);
-0c65b2b90d13c1 drivers/net/ethernet/renesas/ravb_main.c Andrew Lunn        2019-11-04  2998  	if (error && error != -ENODEV)
-a654f6e875b753 drivers/net/ethernet/renesas/ravb_main.c Claudiu Beznea     2024-02-02  2999  		goto out_rpm_put;
-c156633f135326 drivers/net/ethernet/renesas/ravb.c      Sergei Shtylyov    2015-06-11  3000  
-c156633f135326 drivers/net/ethernet/renesas/ravb.c      Sergei Shtylyov    2015-06-11  3001  	priv->no_avb_link = of_property_read_bool(np, "renesas,no-ether-link");
-c156633f135326 drivers/net/ethernet/renesas/ravb.c      Sergei Shtylyov    2015-06-11  3002  	priv->avb_link_active_low =
-c156633f135326 drivers/net/ethernet/renesas/ravb.c      Sergei Shtylyov    2015-06-11  3003  		of_property_read_bool(np, "renesas,ether-link-active-low");
-c156633f135326 drivers/net/ethernet/renesas/ravb.c      Sergei Shtylyov    2015-06-11  3004  
-1d63864299cafa drivers/net/ethernet/renesas/ravb_main.c Paul Barker        2024-09-18  3005  	ndev->max_mtu = info->tx_max_frame_size -
-e82700b8662ce5 drivers/net/ethernet/renesas/ravb_main.c Niklas Söderlund   2024-03-04  3006  		(ETH_HLEN + VLAN_HLEN + ETH_FCS_LEN);
-75efa06f457bbe drivers/net/ethernet/renesas/ravb_main.c Niklas Söderlund   2018-02-16  3007  	ndev->min_mtu = ETH_MIN_MTU;
-75efa06f457bbe drivers/net/ethernet/renesas/ravb_main.c Niklas Söderlund   2018-02-16  3008  
-c81d894226b944 drivers/net/ethernet/renesas/ravb_main.c Biju Das           2021-08-25  3009  	/* FIXME: R-Car Gen2 has 4byte alignment restriction for tx buffer
-c81d894226b944 drivers/net/ethernet/renesas/ravb_main.c Biju Das           2021-08-25  3010  	 * Use two descriptor to handle such situation. First descriptor to
-c81d894226b944 drivers/net/ethernet/renesas/ravb_main.c Biju Das           2021-08-25  3011  	 * handle aligned data buffer and second descriptor to handle the
-c81d894226b944 drivers/net/ethernet/renesas/ravb_main.c Biju Das           2021-08-25  3012  	 * overflow data because of alignment.
-c81d894226b944 drivers/net/ethernet/renesas/ravb_main.c Biju Das           2021-08-25  3013  	 */
-c81d894226b944 drivers/net/ethernet/renesas/ravb_main.c Biju Das           2021-08-25  3014  	priv->num_tx_desc = info->aligned_tx ? 2 : 1;
-f543305da9b5a5 drivers/net/ethernet/renesas/ravb_main.c Kazuya Mizuguchi   2018-09-19  3015  
-c156633f135326 drivers/net/ethernet/renesas/ravb.c      Sergei Shtylyov    2015-06-11  3016  	/* Set function */
-c156633f135326 drivers/net/ethernet/renesas/ravb.c      Sergei Shtylyov    2015-06-11  3017  	ndev->netdev_ops = &ravb_netdev_ops;
-c156633f135326 drivers/net/ethernet/renesas/ravb.c      Sergei Shtylyov    2015-06-11  3018  	ndev->ethtool_ops = &ravb_ethtool_ops;
-c156633f135326 drivers/net/ethernet/renesas/ravb.c      Sergei Shtylyov    2015-06-11  3019  
-f384ab481cab6a drivers/net/ethernet/renesas/ravb_main.c Claudiu Beznea     2024-02-02  3020  	error = ravb_compute_gti(ndev);
-b3d39a8805c510 drivers/net/ethernet/renesas/ravb_main.c Simon Horman       2015-11-20  3021  	if (error)
-a654f6e875b753 drivers/net/ethernet/renesas/ravb_main.c Claudiu Beznea     2024-02-02  3022  		goto out_rpm_put;
-c156633f135326 drivers/net/ethernet/renesas/ravb.c      Sergei Shtylyov    2015-06-11  3023  
-a6f51f2efa742d drivers/net/ethernet/renesas/ravb_main.c Geert Uytterhoeven 2020-10-01  3024  	ravb_parse_delay_mode(np, ndev);
-61fccb2d6274f7 drivers/net/ethernet/renesas/ravb_main.c Kazuya Mizuguchi   2017-01-27  3025  
-c156633f135326 drivers/net/ethernet/renesas/ravb.c      Sergei Shtylyov    2015-06-11  3026  	/* Allocate descriptor base address table */
-c156633f135326 drivers/net/ethernet/renesas/ravb.c      Sergei Shtylyov    2015-06-11  3027  	priv->desc_bat_size = sizeof(struct ravb_desc) * DBAT_ENTRY_NUM;
-e2dbb33ad9545d drivers/net/ethernet/renesas/ravb_main.c Kazuya Mizuguchi   2015-09-30  3028  	priv->desc_bat = dma_alloc_coherent(ndev->dev.parent, priv->desc_bat_size,
-c156633f135326 drivers/net/ethernet/renesas/ravb.c      Sergei Shtylyov    2015-06-11  3029  					    &priv->desc_bat_dma, GFP_KERNEL);
-c156633f135326 drivers/net/ethernet/renesas/ravb.c      Sergei Shtylyov    2015-06-11  3030  	if (!priv->desc_bat) {
-c451113291c193 drivers/net/ethernet/renesas/ravb_main.c Simon Horman       2015-11-02  3031  		dev_err(&pdev->dev,
-c156633f135326 drivers/net/ethernet/renesas/ravb.c      Sergei Shtylyov    2015-06-11  3032  			"Cannot allocate desc base address table (size %d bytes)\n",
-c156633f135326 drivers/net/ethernet/renesas/ravb.c      Sergei Shtylyov    2015-06-11  3033  			priv->desc_bat_size);
-c156633f135326 drivers/net/ethernet/renesas/ravb.c      Sergei Shtylyov    2015-06-11  3034  		error = -ENOMEM;
-a654f6e875b753 drivers/net/ethernet/renesas/ravb_main.c Claudiu Beznea     2024-02-02  3035  		goto out_rpm_put;
-c156633f135326 drivers/net/ethernet/renesas/ravb.c      Sergei Shtylyov    2015-06-11  3036  	}
-c156633f135326 drivers/net/ethernet/renesas/ravb.c      Sergei Shtylyov    2015-06-11  3037  	for (q = RAVB_BE; q < DBAT_ENTRY_NUM; q++)
-c156633f135326 drivers/net/ethernet/renesas/ravb.c      Sergei Shtylyov    2015-06-11  3038  		priv->desc_bat[q].die_dt = DT_EOS;
-c156633f135326 drivers/net/ethernet/renesas/ravb.c      Sergei Shtylyov    2015-06-11  3039  
-c156633f135326 drivers/net/ethernet/renesas/ravb.c      Sergei Shtylyov    2015-06-11  3040  	/* Initialise HW timestamp list */
-c156633f135326 drivers/net/ethernet/renesas/ravb.c      Sergei Shtylyov    2015-06-11  3041  	INIT_LIST_HEAD(&priv->ts_skb_list);
-c156633f135326 drivers/net/ethernet/renesas/ravb.c      Sergei Shtylyov    2015-06-11  3042  
-c156633f135326 drivers/net/ethernet/renesas/ravb.c      Sergei Shtylyov    2015-06-11  3043  	/* Debug message level */
-c156633f135326 drivers/net/ethernet/renesas/ravb.c      Sergei Shtylyov    2015-06-11  3044  	priv->msg_enable = RAVB_DEF_MSG_ENABLE;
-c156633f135326 drivers/net/ethernet/renesas/ravb.c      Sergei Shtylyov    2015-06-11  3045  
-76fd52c1007785 drivers/net/ethernet/renesas/ravb_main.c Claudiu Beznea     2024-02-02  3046  	/* Set config mode as this is needed for PHY initialization. */
-76fd52c1007785 drivers/net/ethernet/renesas/ravb_main.c Claudiu Beznea     2024-02-02  3047  	error = ravb_set_opmode(ndev, CCC_OPC_CONFIG);
-76fd52c1007785 drivers/net/ethernet/renesas/ravb_main.c Claudiu Beznea     2024-02-02  3048  	if (error)
-76fd52c1007785 drivers/net/ethernet/renesas/ravb_main.c Claudiu Beznea     2024-02-02  3049  		goto out_rpm_put;
-76fd52c1007785 drivers/net/ethernet/renesas/ravb_main.c Claudiu Beznea     2024-02-02  3050  
-c156633f135326 drivers/net/ethernet/renesas/ravb.c      Sergei Shtylyov    2015-06-11  3051  	/* Read and set MAC address */
-83216e3988cd19 drivers/net/ethernet/renesas/ravb_main.c Michael Walle      2021-04-12  3052  	ravb_read_mac_address(np, ndev);
-c156633f135326 drivers/net/ethernet/renesas/ravb.c      Sergei Shtylyov    2015-06-11  3053  	if (!is_valid_ether_addr(ndev->dev_addr)) {
-c156633f135326 drivers/net/ethernet/renesas/ravb.c      Sergei Shtylyov    2015-06-11  3054  		dev_warn(&pdev->dev,
-c156633f135326 drivers/net/ethernet/renesas/ravb.c      Sergei Shtylyov    2015-06-11  3055  			 "no valid MAC address supplied, using a random one\n");
-c156633f135326 drivers/net/ethernet/renesas/ravb.c      Sergei Shtylyov    2015-06-11  3056  		eth_hw_addr_random(ndev);
-c156633f135326 drivers/net/ethernet/renesas/ravb.c      Sergei Shtylyov    2015-06-11  3057  	}
-c156633f135326 drivers/net/ethernet/renesas/ravb.c      Sergei Shtylyov    2015-06-11  3058  
-77972b55fb9d35 drivers/net/ethernet/renesas/ravb_main.c Geert Uytterhoeven 2020-09-22  3059  	/* MDIO bus init */
-77972b55fb9d35 drivers/net/ethernet/renesas/ravb_main.c Geert Uytterhoeven 2020-09-22  3060  	error = ravb_mdio_init(priv);
-77972b55fb9d35 drivers/net/ethernet/renesas/ravb_main.c Geert Uytterhoeven 2020-09-22  3061  	if (error) {
-77972b55fb9d35 drivers/net/ethernet/renesas/ravb_main.c Geert Uytterhoeven 2020-09-22  3062  		dev_err(&pdev->dev, "failed to initialize MDIO\n");
-76fd52c1007785 drivers/net/ethernet/renesas/ravb_main.c Claudiu Beznea     2024-02-02  3063  		goto out_reset_mode;
-77972b55fb9d35 drivers/net/ethernet/renesas/ravb_main.c Geert Uytterhoeven 2020-09-22  3064  	}
-77972b55fb9d35 drivers/net/ethernet/renesas/ravb_main.c Geert Uytterhoeven 2020-09-22  3065  
-76fd52c1007785 drivers/net/ethernet/renesas/ravb_main.c Claudiu Beznea     2024-02-02  3066  	/* Undo previous switch to config opmode. */
-76fd52c1007785 drivers/net/ethernet/renesas/ravb_main.c Claudiu Beznea     2024-02-02  3067  	error = ravb_set_opmode(ndev, CCC_OPC_RESET);
-76fd52c1007785 drivers/net/ethernet/renesas/ravb_main.c Claudiu Beznea     2024-02-02  3068  	if (error)
-76fd52c1007785 drivers/net/ethernet/renesas/ravb_main.c Claudiu Beznea     2024-02-02  3069  		goto out_mdio_release;
-76fd52c1007785 drivers/net/ethernet/renesas/ravb_main.c Claudiu Beznea     2024-02-02  3070  
-b48b89f9c189d2 drivers/net/ethernet/renesas/ravb_main.c Jakub Kicinski     2022-09-27  3071  	netif_napi_add(ndev, &priv->napi[RAVB_BE], ravb_poll);
-1091da579d7ccd drivers/net/ethernet/renesas/ravb_main.c Biju Das           2021-10-12  3072  	if (info->nc_queues)
-b48b89f9c189d2 drivers/net/ethernet/renesas/ravb_main.c Jakub Kicinski     2022-09-27  3073  		netif_napi_add(ndev, &priv->napi[RAVB_NC], ravb_poll);
-c156633f135326 drivers/net/ethernet/renesas/ravb.c      Sergei Shtylyov    2015-06-11  3074  
-65c482bc226ab2 drivers/net/ethernet/renesas/ravb_main.c Paul Barker        2024-06-04  3075  	if (info->coalesce_irqs) {
-7b39c1814ce3bc drivers/net/ethernet/renesas/ravb_main.c Paul Barker        2024-06-04  3076  		netdev_sw_irq_coalesce_default_on(ndev);
-65c482bc226ab2 drivers/net/ethernet/renesas/ravb_main.c Paul Barker        2024-06-04  3077  		if (num_present_cpus() == 1)
-65c482bc226ab2 drivers/net/ethernet/renesas/ravb_main.c Paul Barker        2024-06-04 @3078  			dev_set_threaded(ndev, true);
-65c482bc226ab2 drivers/net/ethernet/renesas/ravb_main.c Paul Barker        2024-06-04  3079  	}
-7b39c1814ce3bc drivers/net/ethernet/renesas/ravb_main.c Paul Barker        2024-06-04  3080  
-c156633f135326 drivers/net/ethernet/renesas/ravb.c      Sergei Shtylyov    2015-06-11  3081  	/* Network device register */
-c156633f135326 drivers/net/ethernet/renesas/ravb.c      Sergei Shtylyov    2015-06-11  3082  	error = register_netdev(ndev);
-c156633f135326 drivers/net/ethernet/renesas/ravb.c      Sergei Shtylyov    2015-06-11  3083  	if (error)
-c156633f135326 drivers/net/ethernet/renesas/ravb.c      Sergei Shtylyov    2015-06-11  3084  		goto out_napi_del;
-c156633f135326 drivers/net/ethernet/renesas/ravb.c      Sergei Shtylyov    2015-06-11  3085  
-3e3d647715d401 drivers/net/ethernet/renesas/ravb_main.c Niklas Söderlund   2017-08-01  3086  	device_set_wakeup_capable(&pdev->dev, 1);
-3e3d647715d401 drivers/net/ethernet/renesas/ravb_main.c Niklas Söderlund   2017-08-01  3087  
-c156633f135326 drivers/net/ethernet/renesas/ravb.c      Sergei Shtylyov    2015-06-11  3088  	/* Print device information */
-c156633f135326 drivers/net/ethernet/renesas/ravb.c      Sergei Shtylyov    2015-06-11  3089  	netdev_info(ndev, "Base address at %#x, %pM, IRQ %d.\n",
-c156633f135326 drivers/net/ethernet/renesas/ravb.c      Sergei Shtylyov    2015-06-11  3090  		    (u32)ndev->base_addr, ndev->dev_addr, ndev->irq);
-c156633f135326 drivers/net/ethernet/renesas/ravb.c      Sergei Shtylyov    2015-06-11  3091  
-48f894ab07c444 drivers/net/ethernet/renesas/ravb_main.c Claudiu Beznea     2024-02-14  3092  	pm_runtime_mark_last_busy(&pdev->dev);
-48f894ab07c444 drivers/net/ethernet/renesas/ravb_main.c Claudiu Beznea     2024-02-14  3093  	pm_runtime_put_autosuspend(&pdev->dev);
-48f894ab07c444 drivers/net/ethernet/renesas/ravb_main.c Claudiu Beznea     2024-02-14  3094  
-c156633f135326 drivers/net/ethernet/renesas/ravb.c      Sergei Shtylyov    2015-06-11  3095  	return 0;
-c156633f135326 drivers/net/ethernet/renesas/ravb.c      Sergei Shtylyov    2015-06-11  3096  
-c156633f135326 drivers/net/ethernet/renesas/ravb.c      Sergei Shtylyov    2015-06-11  3097  out_napi_del:
-1091da579d7ccd drivers/net/ethernet/renesas/ravb_main.c Biju Das           2021-10-12  3098  	if (info->nc_queues)
-c156633f135326 drivers/net/ethernet/renesas/ravb.c      Sergei Shtylyov    2015-06-11  3099  		netif_napi_del(&priv->napi[RAVB_NC]);
-a92f4f0662bf2c drivers/net/ethernet/renesas/ravb_main.c Biju Das           2021-10-01  3100  
-c156633f135326 drivers/net/ethernet/renesas/ravb.c      Sergei Shtylyov    2015-06-11  3101  	netif_napi_del(&priv->napi[RAVB_BE]);
-76fd52c1007785 drivers/net/ethernet/renesas/ravb_main.c Claudiu Beznea     2024-02-02  3102  out_mdio_release:
-77972b55fb9d35 drivers/net/ethernet/renesas/ravb_main.c Geert Uytterhoeven 2020-09-22  3103  	ravb_mdio_release(priv);
-76fd52c1007785 drivers/net/ethernet/renesas/ravb_main.c Claudiu Beznea     2024-02-02  3104  out_reset_mode:
-76fd52c1007785 drivers/net/ethernet/renesas/ravb_main.c Claudiu Beznea     2024-02-02  3105  	ravb_set_opmode(ndev, CCC_OPC_RESET);
-e2dbb33ad9545d drivers/net/ethernet/renesas/ravb_main.c Kazuya Mizuguchi   2015-09-30  3106  	dma_free_coherent(ndev->dev.parent, priv->desc_bat_size, priv->desc_bat,
-c156633f135326 drivers/net/ethernet/renesas/ravb.c      Sergei Shtylyov    2015-06-11  3107  			  priv->desc_bat_dma);
-a654f6e875b753 drivers/net/ethernet/renesas/ravb_main.c Claudiu Beznea     2024-02-02  3108  out_rpm_put:
-c156633f135326 drivers/net/ethernet/renesas/ravb.c      Sergei Shtylyov    2015-06-11  3109  	pm_runtime_put(&pdev->dev);
-88b74831faaee4 drivers/net/ethernet/renesas/ravb_main.c Claudiu Beznea     2023-11-28  3110  out_rpm_disable:
-c156633f135326 drivers/net/ethernet/renesas/ravb.c      Sergei Shtylyov    2015-06-11  3111  	pm_runtime_disable(&pdev->dev);
-48f894ab07c444 drivers/net/ethernet/renesas/ravb_main.c Claudiu Beznea     2024-02-14  3112  	pm_runtime_dont_use_autosuspend(&pdev->dev);
-a654f6e875b753 drivers/net/ethernet/renesas/ravb_main.c Claudiu Beznea     2024-02-02  3113  	clk_unprepare(priv->refclk);
-a654f6e875b753 drivers/net/ethernet/renesas/ravb_main.c Claudiu Beznea     2024-02-02  3114  out_reset_assert:
-0d13a1a464a023 drivers/net/ethernet/renesas/ravb_main.c Biju Das           2021-08-25  3115  	reset_control_assert(rstc);
-d8eb6ea4b302e7 drivers/net/ethernet/renesas/ravb_main.c Claudiu Beznea     2023-11-28  3116  out_free_netdev:
-d8eb6ea4b302e7 drivers/net/ethernet/renesas/ravb_main.c Claudiu Beznea     2023-11-28  3117  	free_netdev(ndev);
-c156633f135326 drivers/net/ethernet/renesas/ravb.c      Sergei Shtylyov    2015-06-11  3118  	return error;
-c156633f135326 drivers/net/ethernet/renesas/ravb.c      Sergei Shtylyov    2015-06-11  3119  }
-c156633f135326 drivers/net/ethernet/renesas/ravb.c      Sergei Shtylyov    2015-06-11  3120  
+>   
+> -struct cxl_memdev_state *cxl_memdev_state_create(struct device *dev)
+> +struct cxl_memdev_state *cxl_memdev_state_create(struct device *dev, u64 serial, u16 dvsec)
+>   {
+>   	struct cxl_memdev_state *mds;
 
--- 
-0-DAY CI Kernel Test Service
-https://github.com/intel/lkp-tests/wiki
+
+I wonder if we need to differentiate this initialization from ...
+
+
+>   
+> -struct cxl_dev_state *cxl_accel_state_create(struct device *dev)
+> +void cxl_dev_state_init(struct cxl_dev_state *cxlds, struct device *dev,
+> +			enum cxl_devtype type, u64 serial, u16 dvsec)
+>   {
+
+
+... this one for a Type2 device. It is for sure needed for Type1, but I 
+think it can be shared with Type2 since there is a mem, a pmem or both 
+for Type2. The only thing to be different is the memory type.
+
+
+This helps with cxl_mem_dpa_fetch being called by accel drivers with a 
+mailbox supporting the CXL_MBOX_OP_GET_PARTITION_INFO command, and for 
+those with no mailbox the same information can already be there 
+hardcoded by the accel driver, same for those values obtained from the 
+CXL_MBOX_OP_IDENTIFY command. That function would need an extra param 
+for not requiring the CXL_MBOX_OP_GET_PARTITION_INFO command implying 
+all needed cxl_memdev_state fields already initialized.
+
+
 
