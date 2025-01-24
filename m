@@ -1,149 +1,511 @@
-Return-Path: <netdev+bounces-160866-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-160871-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 890B6A1BE5A
-	for <lists+netdev@lfdr.de>; Fri, 24 Jan 2025 23:18:22 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id D13D4A1BEEE
+	for <lists+netdev@lfdr.de>; Sat, 25 Jan 2025 00:13:55 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D1C6A169B14
-	for <lists+netdev@lfdr.de>; Fri, 24 Jan 2025 22:18:20 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 5586A7A154E
+	for <lists+netdev@lfdr.de>; Fri, 24 Jan 2025 23:13:46 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 71BEB1CFEB2;
-	Fri, 24 Jan 2025 22:18:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BF07C1E98F2;
+	Fri, 24 Jan 2025 23:13:49 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="DUftYcVj"
+	dkim=pass (1024-bit key) header.d=fastly.com header.i=@fastly.com header.b="SFEhTafe"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-io1-f48.google.com (mail-io1-f48.google.com [209.85.166.48])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C99D7224CC
-	for <netdev@vger.kernel.org>; Fri, 24 Jan 2025 22:18:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 971411DD526
+	for <netdev@vger.kernel.org>; Fri, 24 Jan 2025 23:13:47 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.48
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1737757099; cv=none; b=QTsH4UE/JV9+jiqIGDA7ljy27aj4eXVraMdYUIBz5x4Vr8xr/OU+ZVFjxm8ZDg827aMWCND9OCHQg+iM5zbaNekmMI9XupS98Qmt5Mb0jaoIKMnYMc2kcNAZdYeKU1LiQBxcub7HxNZxkOFB2G9JXZVEAIjna+WojWJ+ze/+DIY=
+	t=1737760429; cv=none; b=quTdnDoDPu8/mvmJGPtO8my3y46w2k9kWDEa+cxvYiSnvx3K9YpeYAMsUse3CT4QIzcn0NpZnFIy6m13+9IIsRRKqaqVG2zqk/RdgCDAa4ImAi9IIWT/DDWSrTZpZ9rXNMpEE73hYzamyFSX0twv2Bke0Dgk39R3aAMcisOQyhE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1737757099; c=relaxed/simple;
-	bh=xdKI04wq4+0byfaeIDs7tw03nc50FyekufaP1kXdG+E=;
-	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
-	 MIME-Version:Content-Type; b=rA0jafzD8LLin+fwHN5m77xIB0XD8XmssGdzpH8BZsTVnd1nm1IJuSTMHqiFwRE4UXKJwB0iKW5FGuimewMj41aKzsSebO2bxRUvl10zyPA5Zy5f8NqrTxfXjH5avocDJiL25EF7Xkzh3N1RxOOuYJmaWfwZXKIzPEpmsQflBBg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=DUftYcVj; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1737757095;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=xdKI04wq4+0byfaeIDs7tw03nc50FyekufaP1kXdG+E=;
-	b=DUftYcVjFm54B9ZkpLlFG5k14Oh7C4B3JIU7kOyvtB64qyiM3nglTgt6OJd5zttccZRx8i
-	nHGd4tt5S+COxHc3PIfUehnT4osjj4ArSAT97W9T63DY3EZ1XAGwbXeHB2BXfZ18PtgUGC
-	kSyB9pUXtyx9gVgwR6sfO5PCSVMHCDs=
-Received: from mail-ej1-f71.google.com (mail-ej1-f71.google.com
- [209.85.218.71]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-583-QijWSJokPy-iPzSHsi7Dag-1; Fri, 24 Jan 2025 17:18:12 -0500
-X-MC-Unique: QijWSJokPy-iPzSHsi7Dag-1
-X-Mimecast-MFC-AGG-ID: QijWSJokPy-iPzSHsi7Dag
-Received: by mail-ej1-f71.google.com with SMTP id a640c23a62f3a-aa6732a1af5so308925766b.3
-        for <netdev@vger.kernel.org>; Fri, 24 Jan 2025 14:18:12 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1737757091; x=1738361891;
-        h=content-transfer-encoding:mime-version:message-id:date:references
-         :in-reply-to:subject:cc:to:from:x-gm-message-state:from:to:cc
+	s=arc-20240116; t=1737760429; c=relaxed/simple;
+	bh=Obld9qTIYm3KJefEoogJrCRjwtgalbvJDpPbleMuOYE=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=sSVP/5AGRUwsDjGcef3TzuJ0eBu0tGwZUaL9HXoGU6h4pkUttV3veVk71aDU5mjGH3SPA7M6P0Lf85+gqH79fJh50OGCJYWeOZJpLEkNthx7Y1O199D6e059zBk0QAFWNCf7UflbHEdysaxLCZfd3wq9bMe4Jg/UP/iO9R6oqjY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fastly.com; spf=pass smtp.mailfrom=fastly.com; dkim=pass (1024-bit key) header.d=fastly.com header.i=@fastly.com header.b=SFEhTafe; arc=none smtp.client-ip=209.85.166.48
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fastly.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=fastly.com
+Received: by mail-io1-f48.google.com with SMTP id ca18e2360f4ac-844df397754so71059239f.2
+        for <netdev@vger.kernel.org>; Fri, 24 Jan 2025 15:13:47 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=fastly.com; s=google; t=1737760427; x=1738365227; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references
+         :mail-followup-to:message-id:subject:cc:to:from:date:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=xdKI04wq4+0byfaeIDs7tw03nc50FyekufaP1kXdG+E=;
-        b=lASUjVErhOa5abLMXmo9V0r8c9anxnm9VvqjDrc8j7i5ahTZnw8tv26p+OAR6GW+19
-         JdckdBOOiTT3J+wJQFalTM8buctElNKJvYb/VaBNpd7ix/dr998+uFo3wDrnvKCnC+xf
-         9IMZ1FPy9MIiHm2mtGQiiR/16o31t3JwDfal4uoRQEaAByn4xAoQ+8A8INxLPYD2pNSW
-         m7+YWe8qGA01q505DN9V9wSZR2kAcTmVpvcnyPQlXhLN21rDHHSfGiXMsrpuvZN4hAtb
-         IxFjOHdMzZ+U2p+q3GhYXJmeTBmog/XAkuLofr3uHIetWDxSTBLorfREa+jCXVnNhdXa
-         CR4Q==
-X-Forwarded-Encrypted: i=1; AJvYcCWocc/MgWe5rdUBGjQkYdFHKZfDGhK5wQjS4C8alftNy8OXZJJp41OC8XQqzFsthkGY5qF1urk=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwCrXdlsUvAEQ+odDjlDUchcCbjknaNuA72DdEvssTXE16P0try
-	gaqQGlqXD5RGk/czAVViYzx6MGQu+LHS4PaB8GqgAREc8J3HJY6NNFCe+jZOzE9zgBu7QYdQjDM
-	rXhPMk4niZUZg3qYOf2YqLJknL2hlUN9f2wx68zi8SpeRtnPxFiBdNQ==
-X-Gm-Gg: ASbGnctenYXEsxM8LsODLkjerXzsqJVTT4kICSo6QYBqD3ar6GA4W+2oVzHsyVZQuUI
-	JFgKB/obwQuO3+nQV0DdK/t9nXtt19Ouz+U1z0glSm3iKrJfP3bZZtnWgnyVEaogRwhOkz/w3OW
-	p49WBOEromsr/za5rWMjd46o/51zOE3HEQgn3JA+dnDIzfwaPjsCALLsjiWAX2mi0SbvANzsC9y
-	ia5XrgBVxifGaBY96nXRyOXUx0EtrnWt+6TYnLln3sr70tsSMpkUpHaGYIhYYt+QgZBBCuJ1fIE
-	xQ==
-X-Received: by 2002:a17:907:7f12:b0:ab2:b6e2:fcc8 with SMTP id a640c23a62f3a-ab38b1e1e08mr2919699066b.10.1737757091311;
-        Fri, 24 Jan 2025 14:18:11 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IGyJMTAHFRSD+RMPQs+IDIemdovmgEK9+a+hDiBLsFb6ybvN5Ztf/esB+3ZNSg5b9nGdB4zgQ==
-X-Received: by 2002:a17:907:7f12:b0:ab2:b6e2:fcc8 with SMTP id a640c23a62f3a-ab38b1e1e08mr2919693966b.10.1737757090357;
-        Fri, 24 Jan 2025 14:18:10 -0800 (PST)
-Received: from alrua-x1.borgediget.toke.dk ([2a0c:4d80:42:443::2])
-        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-ab6760ab0bcsm189769966b.95.2025.01.24.14.18.09
+        bh=h0XaHocYpjBMm1kr/4P6FLGq+gbasSGEMI2ExACwoaU=;
+        b=SFEhTafe0bnBNt1Lnf2g25JCJ7pnRoVbO3BY9rIUCS+ZgMhP0v2QxxykEA63CJrdgk
+         +bJh4/B7Vzzm0LJqT4Oj/vt/huwSMtE7d2PQxctJ9mTBAY8vSJwygtIhIg64tLy99M8t
+         snMaxS/JAUzJPLmnGmiNgHUnJ7ZdpykzIbMUA=
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1737760427; x=1738365227;
+        h=in-reply-to:content-disposition:mime-version:references
+         :mail-followup-to:message-id:subject:cc:to:from:date
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=h0XaHocYpjBMm1kr/4P6FLGq+gbasSGEMI2ExACwoaU=;
+        b=AQCR2+QLCy6S6ctqKeJsinrOkWwX4yhx6WWwn3NyRYGRy8oljwYG4tJaNmd3zRDnGu
+         SGgAr3Q7f3NgMMpDaJKbrTGKDPyr1f3kd7ht7GgpyE1yx5rCm9RqbnEOfPSiUB5/3UIk
+         Thi3Z8TlLr6gQZLMj/QEMcp/WddMN2qSMArMjaNfW2OlhyN1GkACQ3iIz4h3jKORlUEP
+         pehCaolE2bgN/ir/7QGDcvvtFys0b/sgaJREGQOkKnOQdgItQ2zveOJmwYz3EurlJwb9
+         G+q9FZXJv1S+XGMizdOsewBC3YKGEFSRovwSW/zs77U71kg3fw6uqBFsVhpa0lVEFvjT
+         /ItA==
+X-Forwarded-Encrypted: i=1; AJvYcCVuO6wBrtqd9lrtnlHXwwvGAq8gKEbXvqWmnDaKSSM+iHEL9XsZaqrZDtyhuUAYVStNTs8FMG8=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyNldiT95Kea7rD/Y/WPzLHYLllzWXQZvLfyia++YfEVajmaw6F
+	e+b9jUuorxPLcVGCBTQ7xJq05drWRIpGc46hqneQiwpKyPs6IERaj03AUgQPOkE=
+X-Gm-Gg: ASbGncvPGzRZ6M2Cjq66mbGDuRh8DpdSl6iJYdlJBJ0dG5sevDKtPJfnNq+k7pk5WkY
+	fy3psmArS31uiyJATESSn5qZPbVXds92MzgqM0PzVoK2mkAfz/OGtqbfvCcfvAvYDmqb+aEF3SX
+	yIF6wTzaA3aOqKYhVOHffmQlF7sDGzRk9bNzHTF8DPIFCpgYsSrPWgQRHH9D6izfNBcfHfI3wnL
+	Ff5Kuz2MxeJMsQdf2eaRMo68OGH9JcB7bo+Xt3CKJyo3y8=
+X-Google-Smtp-Source: AGHT+IGVVBGfEdi2ND44dQvzJycmDmT9wC964cNHWq8xu4fhYbtR7D+cmmqExueT+DEvZOFAxLuYGA==
+X-Received: by 2002:a05:6602:3e88:b0:84f:41cb:1895 with SMTP id ca18e2360f4ac-851b616dc39mr2821802739f.1.1737760426589;
+        Fri, 24 Jan 2025 15:13:46 -0800 (PST)
+Received: from LQ3V64L9R2 ([75.104.111.203])
+        by smtp.gmail.com with ESMTPSA id 8926c6da1cb9f-4ec1da4461dsm917901173.56.2025.01.24.15.13.11
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 24 Jan 2025 14:18:09 -0800 (PST)
-Received: by alrua-x1.borgediget.toke.dk (Postfix, from userid 1000)
-	id D082C180AB10; Fri, 24 Jan 2025 23:18:08 +0100 (CET)
-From: Toke =?utf-8?Q?H=C3=B8iland-J=C3=B8rgensen?= <toke@redhat.com>
-To: Mina Almasry <almasrymina@google.com>, Jakub Kicinski <kuba@kernel.org>
-Cc: davem@davemloft.net, netdev@vger.kernel.org, edumazet@google.com,
- pabeni@redhat.com, andrew+netdev@lunn.ch, horms@kernel.org,
- hawk@kernel.org, ilias.apalodimas@linaro.org, asml.silence@gmail.com,
- kaiyuanz@google.com, willemb@google.com, mkarsten@uwaterloo.ca,
- jdamato@fastly.com
-Subject: Re: [PATCH net] net: page_pool: don't try to stash the napi id
-In-Reply-To: <CAHS8izNdpe7rDm7K4zn4QU-6VqwMwf-LeOJrvXOXhpaikY+tLg@mail.gmail.com>
-References: <20250123231620.1086401-1-kuba@kernel.org>
- <CAHS8izNdpe7rDm7K4zn4QU-6VqwMwf-LeOJrvXOXhpaikY+tLg@mail.gmail.com>
-X-Clacks-Overhead: GNU Terry Pratchett
-Date: Fri, 24 Jan 2025 23:18:08 +0100
-Message-ID: <87r04rq2jj.fsf@toke.dk>
+        Fri, 24 Jan 2025 15:13:45 -0800 (PST)
+Date: Fri, 24 Jan 2025 15:13:04 -0800
+From: Joe Damato <jdamato@fastly.com>
+To: Basharath Hussain Khaja <basharath@couthit.com>
+Cc: danishanwar@ti.com, rogerq@kernel.org, andrew+netdev@lunn.ch,
+	davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+	pabeni@redhat.com, robh@kernel.org, krzk+dt@kernel.org,
+	conor+dt@kernel.org, nm@ti.com, ssantosh@kernel.org,
+	tony@atomide.com, richardcochran@gmail.com, parvathi@couthit.com,
+	schnelle@linux.ibm.com, rdunlap@infradead.org,
+	diogo.ivo@siemens.com, m-karicheri2@ti.com, horms@kernel.org,
+	jacob.e.keller@intel.com, m-malladi@ti.com,
+	javier.carrasco.cruz@gmail.com, afd@ti.com, s-anna@ti.com,
+	linux-arm-kernel@lists.infradead.org, netdev@vger.kernel.org,
+	devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
+	linux-omap@vger.kernel.org, pratheesh@ti.com, prajith@ti.com,
+	vigneshr@ti.com, praneeth@ti.com, srk@ti.com, rogerq@ti.com,
+	krishna@couthit.com, pmohan@couthit.com, mohan@couthit.com
+Subject: Re: [RFC v2 PATCH 04/10] net: ti: prueth: Adds link detection, RX
+ and TX support.
+Message-ID: <Z5QegAP71PkbppOO@LQ3V64L9R2>
+Mail-Followup-To: Joe Damato <jdamato@fastly.com>,
+	Basharath Hussain Khaja <basharath@couthit.com>, danishanwar@ti.com,
+	rogerq@kernel.org, andrew+netdev@lunn.ch, davem@davemloft.net,
+	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
+	robh@kernel.org, krzk+dt@kernel.org, conor+dt@kernel.org, nm@ti.com,
+	ssantosh@kernel.org, tony@atomide.com, richardcochran@gmail.com,
+	parvathi@couthit.com, schnelle@linux.ibm.com, rdunlap@infradead.org,
+	diogo.ivo@siemens.com, m-karicheri2@ti.com, horms@kernel.org,
+	jacob.e.keller@intel.com, m-malladi@ti.com,
+	javier.carrasco.cruz@gmail.com, afd@ti.com, s-anna@ti.com,
+	linux-arm-kernel@lists.infradead.org, netdev@vger.kernel.org,
+	devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
+	linux-omap@vger.kernel.org, pratheesh@ti.com, prajith@ti.com,
+	vigneshr@ti.com, praneeth@ti.com, srk@ti.com, rogerq@ti.com,
+	krishna@couthit.com, pmohan@couthit.com, mohan@couthit.com
+References: <20250124122353.1457174-1-basharath@couthit.com>
+ <20250124123707.1457639-5-basharath@couthit.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250124123707.1457639-5-basharath@couthit.com>
 
-Mina Almasry <almasrymina@google.com> writes:
+On Fri, Jan 24, 2025 at 06:07:01PM +0530, Basharath Hussain Khaja wrote:
+> From: Roger Quadros <rogerq@ti.com>
+> 
+> Changes corresponding to link configuration such as speed and duplexity.
+> IRQ and handler initializations are performed for packet reception.Firmware
+> receives the packet from the wire and stores it into OCMC queue. Next, it
+> notifies the CPU via interrupt. Upon receiving the interrupt CPU will
+> service the IRQ and packet will be processed by pushing the newly allocated
+> SKB to upper layers.
+> 
+> When the user application want to transmit a packet, it will invoke
+> sys_send() which will inturn invoke the PRUETH driver, then it will write
+> the packet into OCMC queues. PRU firmware will pick up the packet and
+> transmit it on to the wire.
+> 
+> Signed-off-by: Roger Quadros <rogerq@ti.com>
+> Signed-off-by: Andrew F. Davis <afd@ti.com>
+> Signed-off-by: Parvathi Pudi <parvathi@couthit.com>
+> Signed-off-by: Basharath Hussain Khaja <basharath@couthit.com>
+> ---
+>  drivers/net/ethernet/ti/icssm/icssm_prueth.c | 599 ++++++++++++++++++-
+>  drivers/net/ethernet/ti/icssm/icssm_prueth.h |  46 ++
+>  2 files changed, 640 insertions(+), 5 deletions(-)
+> 
+> diff --git a/drivers/net/ethernet/ti/icssm/icssm_prueth.c b/drivers/net/ethernet/ti/icssm/icssm_prueth.c
+> index 82ed0e3a0d88..0ba1d16a7a15 100644
+> --- a/drivers/net/ethernet/ti/icssm/icssm_prueth.c
+> +++ b/drivers/net/ethernet/ti/icssm/icssm_prueth.c
 
-> On Thu, Jan 23, 2025 at 3:16=E2=80=AFPM Jakub Kicinski <kuba@kernel.org> =
-wrote:
->>
->> Page ppol tried to cache the NAPI ID in page pool info to avoid
->
-> Page pool
->
->> having a dependency on the life cycle of the NAPI instance.
->> Since commit under Fixes the NAPI ID is not populated until
->> napi_enable() and there's a good chance that page pool is
->> created before NAPI gets enabled.
->>
->> Protect the NAPI pointer with the existing page pool mutex,
->> the reading path already holds it. napi_id itself we need
->
-> The reading paths in page_pool.c don't hold the lock, no? Only the
-> reading paths in page_pool_user.c seem to do.
->
-> I could not immediately wrap my head around why pool->p.napi can be
-> accessed in page_pool_napi_local with no lock, but needs to be
-> protected in the code in page_pool_user.c. It seems
-> READ_ONCE/WRITE_ONCE protection is good enough to make sure
-> page_pool_napi_local doesn't race with
-> page_pool_disable_direct_recycling in a way that can crash (the
-> reading code either sees a valid pointer or NULL). Why is that not
-> good enough to also synchronize the accesses between
-> page_pool_disable_direct_recycling and page_pool_nl_fill? I.e., drop
-> the locking?
+[...]
 
-It actually seems that this is *not* currently the case. See the
-discussion here:
+> +/**
+> + * icssm_prueth_tx_enqueue - queue a packet to firmware for transmission
+> + *
+> + * @emac: EMAC data structure
+> + * @skb: packet data buffer
+> + * @queue_id: priority queue id
+> + *
+> + * Return: 0 (Success)
+> + */
+> +static int icssm_prueth_tx_enqueue(struct prueth_emac *emac,
+> +				   struct sk_buff *skb,
+> +				   enum prueth_queue_id queue_id)
+> +{
 
-https://lore.kernel.org/all/8734h8qgmz.fsf@toke.dk/
+[...]
 
-IMO (as indicated in the message linked above), we should require users
-to destroy the page pool before freeing the NAPI memory, rather than add
-additional synchronisation.
+> +
+> +	/* which port to tx: MII0 or MII1 */
+> +	txport = emac->tx_port_queue;
+> +	src_addr = skb->data;
+> +	pktlen = skb->len;
+> +	/* Get the tx queue */
+> +	queue_desc = emac->tx_queue_descs + queue_id;
+> +	txqueue = &queue_infos[txport][queue_id];
+> +
+> +	buffer_desc_count = txqueue->buffer_desc_end -
+> +			    txqueue->buffer_desc_offset;
+> +	buffer_desc_count /= BD_SIZE;
+> +	buffer_desc_count++;
+> +
+> +	bd_rd_ptr = readw(&queue_desc->rd_ptr);
+> +	bd_wr_ptr = readw(&queue_desc->wr_ptr);
+> +
+> +	/* the PRU firmware deals mostly in pointers already
+> +	 * offset into ram, we would like to deal in indexes
+> +	 * within the queue we are working with for code
+> +	 * simplicity, calculate this here
+> +	 */
+> +	write_block = (bd_wr_ptr - txqueue->buffer_desc_offset) / BD_SIZE;
+> +	read_block = (bd_rd_ptr - txqueue->buffer_desc_offset) / BD_SIZE;
 
--Toke
+Seems like there's a lot of similar code repeated in the rx code
+path.
 
+Maybe there's a way to simplify it all with a helper of some sort?
+
+> +	if (write_block > read_block) {
+> +		free_blocks = buffer_desc_count - write_block;
+> +		free_blocks += read_block;
+> +	} else if (write_block < read_block) {
+> +		free_blocks = read_block - write_block;
+> +	} else { /* they are all free */
+> +		free_blocks = buffer_desc_count;
+> +	}
+> +
+> +	pkt_block_size = DIV_ROUND_UP(pktlen, ICSS_BLOCK_SIZE);
+> +	if (pkt_block_size > free_blocks) /* out of queue space */
+> +		return -ENOBUFS;
+> +
+> +	/* calculate end BD address post write */
+> +	update_block = write_block + pkt_block_size;
+> +
+> +	/* Check for wrap around */
+> +	if (update_block >= buffer_desc_count) {
+> +		update_block %= buffer_desc_count;
+> +		buffer_wrapped = true;
+> +	}
+> +
+> +	/* OCMC RAM is not cached and write order is not important */
+> +	ocmc_ram = (__force void *)emac->prueth->mem[PRUETH_MEM_OCMC].va;
+> +	dst_addr = ocmc_ram + txqueue->buffer_offset +
+> +		   (write_block * ICSS_BLOCK_SIZE);
+> +
+> +	/* Copy the data from socket buffer(DRAM) to PRU buffers(OCMC) */
+> +	if (buffer_wrapped) { /* wrapped around buffer */
+> +		int bytes = (buffer_desc_count - write_block) * ICSS_BLOCK_SIZE;
+> +		int remaining;
+> +
+> +		/* bytes is integral multiple of ICSS_BLOCK_SIZE but
+> +		 * entire packet may have fit within the last BD
+> +		 * if pkt_info.length is not integral multiple of
+> +		 * ICSS_BLOCK_SIZE
+> +		 */
+> +		if (pktlen < bytes)
+> +			bytes = pktlen;
+> +
+> +		/* copy non-wrapped part */
+> +		memcpy(dst_addr, src_addr, bytes);
+> +
+> +		/* copy wrapped part */
+> +		src_addr += bytes;
+> +		remaining = pktlen - bytes;
+> +		dst_addr = ocmc_ram + txqueue->buffer_offset;
+> +		memcpy(dst_addr, src_addr, remaining);
+> +	} else {
+> +		memcpy(dst_addr, src_addr, pktlen);
+> +	}
+> +
+> +       /* update first buffer descriptor */
+> +	wr_buf_desc = (pktlen << PRUETH_BD_LENGTH_SHIFT) &
+> +		       PRUETH_BD_LENGTH_MASK;
+> +	writel(wr_buf_desc, dram + bd_wr_ptr);
+> +
+> +	/* update the write pointer in this queue descriptor, the firmware
+> +	 * polls for this change so this will signal the start of transmission
+> +	 */
+> +	update_wr_ptr = txqueue->buffer_desc_offset + (update_block * BD_SIZE);
+> +	writew(update_wr_ptr, &queue_desc->wr_ptr);
+> +
+> +	return 0;
+> +}
+
+[...]
+
+> +
+> +/* get packet from queue
+> + * negative for error
+> + */
+
+The comment above seems superfluous and does not seem to follow the
+format of the tx comment which appears to use kdoc style
+
+> +int icssm_emac_rx_packet(struct prueth_emac *emac, u16 *bd_rd_ptr,
+> +			 struct prueth_packet_info *pkt_info,
+> +			 const struct prueth_queue_info *rxqueue)
+> +{
+
+[...]
+
+> +
+> +	/* the PRU firmware deals mostly in pointers already
+> +	 * offset into ram, we would like to deal in indexes
+> +	 * within the queue we are working with for code
+> +	 * simplicity, calculate this here
+> +	 */
+> +	buffer_desc_count = rxqueue->buffer_desc_end -
+> +			    rxqueue->buffer_desc_offset;
+> +	buffer_desc_count /= BD_SIZE;
+> +	buffer_desc_count++;
+> +	read_block = (*bd_rd_ptr - rxqueue->buffer_desc_offset) / BD_SIZE;
+> +	pkt_block_size = DIV_ROUND_UP(pkt_info->length, ICSS_BLOCK_SIZE);
+> +
+> +	/* calculate end BD address post read */
+> +	update_block = read_block + pkt_block_size;
+> +
+> +	/* Check for wrap around */
+> +	if (update_block >= buffer_desc_count) {
+> +		update_block %= buffer_desc_count;
+> +		if (update_block)
+> +			buffer_wrapped = true;
+> +	}
+> +
+> +	/* calculate new pointer in ram */
+> +	*bd_rd_ptr = rxqueue->buffer_desc_offset + (update_block * BD_SIZE);
+
+Seems like there's a lot of repeated math here and in the above
+function. Maybe this can be simplified with a helper function to
+avoid repeating the math in multiple places?
+
+> +
+> +	/* Pkt len w/ HSR tag removed, If applicable */
+> +	actual_pkt_len = pkt_info->length - start_offset;
+> +
+> +	/* Allocate a socket buffer for this packet */
+> +	skb = netdev_alloc_skb_ip_align(ndev, actual_pkt_len);
+> +	if (!skb) {
+> +		if (netif_msg_rx_err(emac) && net_ratelimit())
+> +			netdev_err(ndev, "failed rx buffer alloc\n");
+> +		return -ENOMEM;
+> +	}
+> +
+> +	dst_addr = skb->data;
+> +
+> +	/* OCMC RAM is not cached and read order is not important */
+> +	ocmc_ram = (__force void *)emac->prueth->mem[PRUETH_MEM_OCMC].va;
+> +
+> +	/* Get the start address of the first buffer from
+> +	 * the read buffer description
+> +	 */
+> +	src_addr = ocmc_ram + rxqueue->buffer_offset +
+> +		   (read_block * ICSS_BLOCK_SIZE);
+> +	src_addr += start_offset;
+> +
+> +	/* Copy the data from PRU buffers(OCMC) to socket buffer(DRAM) */
+> +	if (buffer_wrapped) { /* wrapped around buffer */
+> +		int bytes = (buffer_desc_count - read_block) * ICSS_BLOCK_SIZE;
+> +		int remaining;
+> +		/* bytes is integral multiple of ICSS_BLOCK_SIZE but
+> +		 * entire packet may have fit within the last BD
+> +		 * if pkt_info.length is not integral multiple of
+> +		 * ICSS_BLOCK_SIZE
+> +		 */
+> +		if (pkt_info->length < bytes)
+> +			bytes = pkt_info->length;
+> +
+> +		/* If applicable, account for the HSR tag removed */
+> +		bytes -= start_offset;
+> +
+> +		/* copy non-wrapped part */
+> +		memcpy(dst_addr, src_addr, bytes);
+> +
+> +		/* copy wrapped part */
+> +		dst_addr += bytes;
+> +		remaining = actual_pkt_len - bytes;
+> +
+> +		src_addr = ocmc_ram + rxqueue->buffer_offset;
+> +		memcpy(dst_addr, src_addr, remaining);
+> +		src_addr += remaining;
+> +	} else {
+> +		memcpy(dst_addr, src_addr, actual_pkt_len);
+> +		src_addr += actual_pkt_len;
+> +	}
+> +
+> +	if (!pkt_info->sv_frame) {
+> +		skb_put(skb, actual_pkt_len);
+> +
+> +		/* send packet up the stack */
+> +		skb->protocol = eth_type_trans(skb, ndev);
+> +		local_bh_disable();
+> +		netif_receive_skb(skb);
+> +		local_bh_enable();
+> +	} else {
+> +		dev_kfree_skb_any(skb);
+> +	}
+> +
+> +	/* update stats */
+> +	ndev->stats.rx_bytes += actual_pkt_len;
+> +	ndev->stats.rx_packets++;
+
+See comment below about atomicity.
+
+> +	return 0;
+> +}
+> +
+> +/**
+> + * icssm_emac_rx_thread - EMAC Rx interrupt thread handler
+> + * @irq: interrupt number
+> + * @dev_id: pointer to net_device
+> + *
+> + * EMAC Rx Interrupt thread handler - function to process the rx frames in a
+> + * irq thread function. There is only limited buffer at the ingress to
+> + * queue the frames. As the frames are to be emptied as quickly as
+> + * possible to avoid overflow, irq thread is necessary. Current implementation
+> + * based on NAPI poll results in packet loss due to overflow at
+> + * the ingress queues. Industrial use case requires loss free packet
+> + * processing. Tests shows that with threaded irq based processing,
+> + * no overflow happens when receiving at ~92Mbps for MTU sized frames and thus
+> + * meet the requirement for industrial use case.
+
+That's interesting. Any idea why this is the case? Is there not
+enough CPU for softirq/NAPI processing to run or something? I
+suppose I'd imagine that NAPI would run and if data is arriving fast
+enough, the NAPI would be added to the repoll list and processed
+later.
+
+So I guess either there isn't enough CPU or the ingress queues don't
+have many descriptors or something like that ?
+
+> + *
+> + * Return: interrupt handled condition
+> + */
+> +static irqreturn_t icssm_emac_rx_thread(int irq, void *dev_id)
+> +{
+> +	struct net_device *ndev = (struct net_device *)dev_id;
+> +	struct prueth_emac *emac = netdev_priv(ndev);
+> +	struct prueth_queue_desc __iomem *queue_desc;
+> +	const struct prueth_queue_info *rxqueue;
+> +	struct prueth *prueth = emac->prueth;
+> +	struct net_device_stats *ndevstats;
+> +	struct prueth_packet_info pkt_info;
+> +	int start_queue, end_queue;
+> +	void __iomem *shared_ram;
+> +	u16 bd_rd_ptr, bd_wr_ptr;
+> +	u16 update_rd_ptr;
+> +	u8 overflow_cnt;
+> +	u32 rd_buf_desc;
+> +	int used = 0;
+> +	int i, ret;
+> +
+> +	ndevstats = &emac->ndev->stats;
+
+FWIW the docs in include/linux/netdevice.h say:
+
+/**
+ ...
+ *      @stats:         Statistics struct, which was left as a legacy, use
+ *                      rtnl_link_stats64 instead
+ ...
+ */
+struct net_device {
+  ...
+  struct net_device_stats stats; /* not used by modern drivers */
+  ...
+};
+
+perhaps consider using rtnl_link_stats64 as suggested instead?
+
+> +	shared_ram = emac->prueth->mem[PRUETH_MEM_SHARED_RAM].va;
+> +
+> +	start_queue = emac->rx_queue_start;
+> +	end_queue = emac->rx_queue_end;
+> +retry:
+> +	/* search host queues for packets */
+> +	for (i = start_queue; i <= end_queue; i++) {
+> +		queue_desc = emac->rx_queue_descs + i;
+> +		rxqueue = &queue_infos[PRUETH_PORT_HOST][i];
+> +
+> +		overflow_cnt = readb(&queue_desc->overflow_cnt);
+> +		if (overflow_cnt > 0) {
+> +			emac->ndev->stats.rx_over_errors += overflow_cnt;
+> +			/* reset to zero */
+> +			writeb(0, &queue_desc->overflow_cnt);
+> +		}
+> +
+> +		bd_rd_ptr = readw(&queue_desc->rd_ptr);
+> +		bd_wr_ptr = readw(&queue_desc->wr_ptr);
+> +
+> +		/* while packets are available in this queue */
+> +		while (bd_rd_ptr != bd_wr_ptr) {
+> +			/* get packet info from the read buffer descriptor */
+> +			rd_buf_desc = readl(shared_ram + bd_rd_ptr);
+> +			icssm_parse_packet_info(prueth, rd_buf_desc, &pkt_info);
+> +
+> +			if (pkt_info.length <= 0) {
+> +				/* a packet length of zero will cause us to
+> +				 * never move the read pointer ahead, locking
+> +				 * the driver, so we manually have to move it
+> +				 * to the write pointer, discarding all
+> +				 * remaining packets in this queue. This should
+> +				 * never happen.
+> +				 */
+> +				update_rd_ptr = bd_wr_ptr;
+> +				ndevstats->rx_length_errors++;
+
+See question below.
+
+> +			} else if (pkt_info.length > EMAC_MAX_FRM_SUPPORT) {
+> +				/* if the packet is too large we skip it but we
+> +				 * still need to move the read pointer ahead
+> +				 * and assume something is wrong with the read
+> +				 * pointer as the firmware should be filtering
+> +				 * these packets
+> +				 */
+> +				update_rd_ptr = bd_wr_ptr;
+> +				ndevstats->rx_length_errors++;
+
+in netdevice.h it says:
+
+* struct net_device_stats* (*ndo_get_stats)(struct net_device *dev);
+*      Called when a user wants to get the network device usage
+*      statistics. Drivers must do one of the following:
+*      1. Define @ndo_get_stats64 to fill in a zero-initialised
+*         rtnl_link_stats64 structure passed by the caller.
+*      2. Define @ndo_get_stats to update a net_device_stats structure
+*         (which should normally be dev->stats) and return a pointer to
+*         it. The structure may be changed asynchronously only if each
+*         field is written atomically.
+*      3. Update dev->stats asynchronously and atomically, and define
+*         neither operation.
+
+I didn't look in the other patches to see if ndo_get_stats is
+defined or not, but are these increments atomic?
 
