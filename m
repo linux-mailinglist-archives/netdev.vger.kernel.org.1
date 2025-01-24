@@ -1,247 +1,932 @@
-Return-Path: <netdev+bounces-160781-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-160782-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 95E13A1B6FE
-	for <lists+netdev@lfdr.de>; Fri, 24 Jan 2025 14:38:49 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9ED5CA1B740
+	for <lists+netdev@lfdr.de>; Fri, 24 Jan 2025 14:43:14 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 703F016D69A
-	for <lists+netdev@lfdr.de>; Fri, 24 Jan 2025 13:38:45 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A3E843ADC5D
+	for <lists+netdev@lfdr.de>; Fri, 24 Jan 2025 13:42:33 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F397E5D8F0;
-	Fri, 24 Jan 2025 13:38:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 624604C62E;
+	Fri, 24 Jan 2025 13:41:41 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="slaN8QCF"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=couthit.com header.i=@couthit.com header.b="OgKNeU3I"
 X-Original-To: netdev@vger.kernel.org
-Received: from NAM11-DM6-obe.outbound.protection.outlook.com (mail-dm6nam11on2050.outbound.protection.outlook.com [40.107.223.50])
+Received: from server.wki.vra.mybluehostin.me (server.wki.vra.mybluehostin.me [162.240.238.73])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 135C270808;
-	Fri, 24 Jan 2025 13:38:14 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.223.50
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1737725896; cv=fail; b=MCdtKK+FMgWYWfdwPCRe6cdcRrf9XkFPQJot9dJ//JFxzOkBuNYH2H7uTe9MIbx3d8OrVHug0itcCE+5CYKr+gIGo9OOAgnUevk+ZG+IDmn2BjYH1RNUKUe2I15lFFIA2eT0wlsOrWVP8sIPMd9Mn5LSwvyEsz4QoDeJrNu0tak=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1737725896; c=relaxed/simple;
-	bh=uMZxnAXRmJRslSV0yLpjve067EU3amSvVtSvj81Cfv8=;
-	h=Message-ID:Date:Subject:To:References:From:In-Reply-To:
-	 Content-Type:MIME-Version; b=cAlcVAyhsYSDJEmjcWAlubWNruaklBM3PzckPqiS705HEGC+IUA7f2/ZVflyMYERQWjSRm9gvgaQfI7Tx2XppwtXh8h1SM42gr7n3P+u21wHjvuYeXUNOvpzz03Z61uzLKljGw0DyuZuTSpj1y3xIWNcVgDxAd4qyl0RqcQLnNI=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=slaN8QCF; arc=fail smtp.client-ip=40.107.223.50
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=amd.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=mgy443Lm1ewZCZxM50YGmhWpWBuGvwfApBo6A95k90hsHd4YmtG9pnJMHhKx5Nv62ylUQRbXbwonSX6euD3a0/cn86QOPeZqFOnWd3RG0GwnZMV1poI7jOx5LxIm3GhnWS3XF7YsTp+h4IpD6pFY9KWzVVy1ymoYVjIn6S07aDNVNji6AH9aKn/7I8rYIQpnwwwAGkVaZ+tix10eTCJ4hCQzG08m/wwvgpT65PL4hsrRsloHv004z7UUp5vWel20dH4Zh60Z6nGRy3xNp41NFH0I2krwxWuArijOZBP7cfZXwDuMSdhO4BiaZl+njsIJQ4I6QVDrFV2zvnkMs/LkzQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=tA6/w+JgpxiSzDRYr/rcY2n+AqyA/9bI4BQr1Xkxwj8=;
- b=uNZeBo+qA1+6rCvXc3vlcd8waAx7+n4pfGvMGBgcO+xch6jwoklCyKQpMpA0NGA1HteU1fWQeXbQpbwRjWrP2kmgbqAPDuLbf85zwgwah5YFSkeYoT5JOvYSKiK+0G+RvpJRHAoBzKoMvwZ4AxcsAyVkYJYp7o58DEd/lxeR6R67RlvZ6Km+KMS+zeK9/HiJkUcpdmtYckrhI9CPJTX/RhnOOPmddzqdfJHDEAIlNiWrmyEOKxhJUkMNUIEw8jgDupE0iPP31K5CXbtcqIf38XXFBilmDTuKg2xMGUyt26FBA8LjGivKNhxcpPKtBnVCIvVLcoT1rAFR4YGGzWRASQ==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
- header.d=amd.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=tA6/w+JgpxiSzDRYr/rcY2n+AqyA/9bI4BQr1Xkxwj8=;
- b=slaN8QCFHUIG98Pvx2Yc2ZkpbffOIXh/35b1C9PDdqHc7xbqaK18DZMO6eN4a2UGjqGC9LDaRDls4xr29Kz1jJsz2DXM1J93zqRMQ+24yRcKEONJDjsNM6X/yS5dKrTrsiFkRl8Bio6+278byXYpofMz7O0Ra8ucHeRlSZkA6bI=
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=amd.com;
-Received: from DM6PR12MB4202.namprd12.prod.outlook.com (2603:10b6:5:219::22)
- by SA1PR12MB6822.namprd12.prod.outlook.com (2603:10b6:806:25d::17) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8377.16; Fri, 24 Jan
- 2025 13:38:12 +0000
-Received: from DM6PR12MB4202.namprd12.prod.outlook.com
- ([fe80::f943:600c:2558:af79]) by DM6PR12MB4202.namprd12.prod.outlook.com
- ([fe80::f943:600c:2558:af79%7]) with mapi id 15.20.8377.009; Fri, 24 Jan 2025
- 13:38:12 +0000
-Message-ID: <0074a468-b324-a015-b346-2c49332d161b@amd.com>
-Date: Fri, 24 Jan 2025 13:38:07 +0000
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.11.0
-Subject: Re: [PATCH v8 01/27] cxl: add type2 device basic support
-Content-Language: en-US
-To: Dan Williams <dan.j.williams@intel.com>, alejandro.lucero-palau@amd.com,
- linux-cxl@vger.kernel.org, netdev@vger.kernel.org, martin.habets@xilinx.com,
- edward.cree@amd.com, davem@davemloft.net, kuba@kernel.org,
- pabeni@redhat.com, edumazet@google.com, dave.jiang@intel.com
-References: <20241216161042.42108-1-alejandro.lucero-palau@amd.com>
- <20241216161042.42108-2-alejandro.lucero-palau@amd.com>
- <677dbbd46e630_2aff42944@dwillia2-xfh.jf.intel.com.notmuch>
- <677dd5ea832e6_f58f29444@dwillia2-xfh.jf.intel.com.notmuch>
-From: Alejandro Lucero Palau <alucerop@amd.com>
-In-Reply-To: <677dd5ea832e6_f58f29444@dwillia2-xfh.jf.intel.com.notmuch>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: DUZPR01CA0306.eurprd01.prod.exchangelabs.com
- (2603:10a6:10:4b7::16) To DM6PR12MB4202.namprd12.prod.outlook.com
- (2603:10b6:5:219::22)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CFE3B83CD2;
+	Fri, 24 Jan 2025 13:41:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=162.240.238.73
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1737726101; cv=none; b=JsVY6ouJh3CVS1M7Lo2RkFU3mZk/ihusCvP0IQg5tykJ3v7M9A2VooZ5Zq9yoWxPVO2Hp911ALtPpfsyWJGaf+MmpZ3Rx3oGQfdy1KtOfEovz4BfdKDuH8UERnqdgT0kIO8fUP5W/SufZxQ6J2rg5wsPSLAcwMqzX4AlPKzhV+E=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1737726101; c=relaxed/simple;
+	bh=IEdqGpWBlO7BcdWmpHM6s/ypUwbyRvrlgR5CxA2anIY=;
+	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
+	 MIME-Version; b=Ksj6OCX/i6t31ewihVk3JTOgflC4r4d5CE/QqHfan19yjgq12YNFoNNONgf6VNAx9yZQ9h2NRjpv5OK9WKnBeT7wIrBwKVWiCOIqUAMjIWvWDB1NcRmOUpImxk0xhpEyVtDrl/7+LR2fBUYP2q08RNak9ePECn7QmxzBMkpmhho=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=couthit.com; spf=pass smtp.mailfrom=couthit.com; dkim=pass (2048-bit key) header.d=couthit.com header.i=@couthit.com header.b=OgKNeU3I; arc=none smtp.client-ip=162.240.238.73
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=couthit.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=couthit.com
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=couthit.com
+	; s=default; h=Content-Transfer-Encoding:MIME-Version:References:In-Reply-To:
+	Message-Id:Date:Subject:Cc:To:From:Sender:Reply-To:Content-Type:Content-ID:
+	Content-Description:Resent-Date:Resent-From:Resent-Sender:Resent-To:Resent-Cc
+	:Resent-Message-ID:List-Id:List-Help:List-Unsubscribe:List-Subscribe:
+	List-Post:List-Owner:List-Archive;
+	bh=BKd69uRZUc8HDskr4h8ath83MaEEYQm7FQWqxS7CABk=; b=OgKNeU3IUOeLRbzf2BzU9rU0SD
+	+h0HJuxVBkwhm1EItd+AHXB0g1wtXFrju+uY7ysKm2dG/RZO9YGRLJF0NXT32hskJApCLuyJh691O
+	xp54f7LuHYprPhCEImije9sjLAeXyVeP4WvFZdHNrrdXzSMVT+oCe/g95nL7s+sYCpx1TrFqE3VVy
+	xh+9D7oR/nsSXGn6B2/dwqXhzoMvkeqAl3rUqpiDhftU4yf/cGpJTf9BkVVLAKJ1dynyRSBuT7abg
+	PfRMxagVzxwymbpReD9LJXKNbUoOWssxDzr1eZxFjs48JVb+sOdZn3djnhXbeHhM3hIXluYvlTe1H
+	KQ73GRrQ==;
+Received: from [122.175.9.182] (port=2665 helo=cypher.couthit.local)
+	by server.wki.vra.mybluehostin.me with esmtpa (Exim 4.96.2)
+	(envelope-from <basharath@couthit.com>)
+	id 1tbJwB-0005Y4-2K;
+	Fri, 24 Jan 2025 19:11:32 +0530
+From: Basharath Hussain Khaja <basharath@couthit.com>
+To: danishanwar@ti.com,
+	rogerq@kernel.org,
+	andrew+netdev@lunn.ch,
+	davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	robh@kernel.org,
+	krzk+dt@kernel.org,
+	conor+dt@kernel.org,
+	nm@ti.com,
+	ssantosh@kernel.org,
+	tony@atomide.com,
+	richardcochran@gmail.com,
+	parvathi@couthit.com,
+	basharath@couthit.com,
+	schnelle@linux.ibm.com,
+	rdunlap@infradead.org,
+	diogo.ivo@siemens.com,
+	m-karicheri2@ti.com,
+	horms@kernel.org,
+	jacob.e.keller@intel.com,
+	m-malladi@ti.com,
+	javier.carrasco.cruz@gmail.com,
+	afd@ti.com,
+	s-anna@ti.com
+Cc: linux-arm-kernel@lists.infradead.org,
+	netdev@vger.kernel.org,
+	devicetree@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	linux-omap@vger.kernel.org,
+	pratheesh@ti.com,
+	prajith@ti.com,
+	vigneshr@ti.com,
+	praneeth@ti.com,
+	srk@ti.com,
+	rogerq@ti.com,
+	krishna@couthit.com,
+	pmohan@couthit.com,
+	mohan@couthit.com
+Subject: [RFC v2 PATCH 04/10] net: ti: prueth: Adds link detection, RX and TX support.
+Date: Fri, 24 Jan 2025 19:10:50 +0530
+Message-Id: <20250124134056.1459060-5-basharath@couthit.com>
+X-Mailer: git-send-email 2.34.1
+In-Reply-To: <20250124122353.1457174-1-basharath@couthit.com>
+References: <20250124122353.1457174-1-basharath@couthit.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: DM6PR12MB4202:EE_|SA1PR12MB6822:EE_
-X-MS-Office365-Filtering-Correlation-Id: dedf0e94-50f4-4206-9331-08dd3c7c58d5
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|366016|376014|1800799024|7053199007|921020;
-X-Microsoft-Antispam-Message-Info:
-	=?utf-8?B?QjhTdFZZSEFybWdoVDlrS3dkU0hFMnVUeThzRWRvNkRaTUUrUEE1NGY0T0ty?=
- =?utf-8?B?TndnMTNMODRRR2ZLNS9qd0JRYk5mTnFSZ3p3V1VZNmQrckNwSEJrR0RYNk5F?=
- =?utf-8?B?KzBqSlZLRUszRm9VYmF5WXk3U0JIdlgvWmpFSjRPVTMxYzZMbXljcW0yZ2dr?=
- =?utf-8?B?TnpPNTNpS0JOeE92YUZqVjZZd2hpZXpnV0tFOGZkcndlcjFIbTZDZmM1MGQ1?=
- =?utf-8?B?bkFuQnlRZHBnSFlQWnY1SHlrMTVqZ2N1VnN1bnNzNnFXZFVFc1d2aGtGaG9P?=
- =?utf-8?B?T2M3WkVYekxkcUhIYk1xN0V1YjFLZHN0eVczWktMQU1mWEs2MFliWmVaWVBH?=
- =?utf-8?B?TGs4bFBCK2xFYTZzOW1Tak9vd3BYVC9YVE82dEI2NzBTcHF2c3RqNlVvYjdq?=
- =?utf-8?B?THNqbnd0ZWhDT0dTcHM2Vy80OFh0a1ppODFQY2Vta3p0cjZrYnhVRzl5dkdT?=
- =?utf-8?B?MWxtQjIrci9FZGp6aHZ6RWN4aTltYzM4UlhoWkZMTkhDaGRuamFCVVpzYlNO?=
- =?utf-8?B?ZU4yYTNyMEJ1U25kZGNmMXZrRExNVnRyK2RXUGJzVDVXYXA1T2F3TnVwS29V?=
- =?utf-8?B?MWg3c3h4VFZnZGY5WmNxZFdvbGxwTm5PYVk2UTl3QTlTT0EyVGFqOW53cVl2?=
- =?utf-8?B?bUNnby9sVHB5ZkZrSkhlL3ZYdjY4NUswYVdLUlVjbmN0VitIeit5N1NJMERF?=
- =?utf-8?B?QUFLQm5rU3pNakFvWThyRU5jTUVJY1dkSE0vaEpLZExURC8xcEdHMDdvNXV0?=
- =?utf-8?B?bFo5QThBUXk3Rm9vWjJlRzVDemlJWXpVdGROVklhNUsxSjhtL3N4S2g3Z1Qz?=
- =?utf-8?B?Y0RZNmhuc3F4cDF5MGh6VjRuZytPQ2tIdnFZZUdvclNXSE42cjJBTHUvdGpJ?=
- =?utf-8?B?bis3RExGN0xXZzlndnBpOEliZUNocVJDM1ROYk1rRHQ1aEE3YmtNdUpUSjds?=
- =?utf-8?B?a3hGYlV1b0UwRy9jL1dOSDA5UVZGVHlJUmtwRVFqSTV1amZ5bndXcnIzaHpL?=
- =?utf-8?B?S2o4YnpxdEtWcHpJdFJCL1dDd05RR0puNnp1WU5TSEFFOVEyY2hsdjJ2aFlz?=
- =?utf-8?B?MlBZeFNIWjlaSis3aVNmVFhBK3M5REVkeDEycmVQUzQxdWxyNi8wdXlxRXZr?=
- =?utf-8?B?aHhHMUg3aWwwM1JmZVBQNVVueHQ4aU1IL1Z5TUpXWndFWWM0TlY0QlROY1cv?=
- =?utf-8?B?MlFUanhWN3J5WFBMODVHenpYbnZDa0JRa1BadFFPSS9iQnc0Q3dYRFpwL2RV?=
- =?utf-8?B?dCt2UE5PdmFiWW1pSEpLOFlSVHorRE1odG9iNC9zdHk5Z2d1aWFybW1YZG9v?=
- =?utf-8?B?VDExSGdWb0k2dmRpTXFmd1hSU2NBMWdwS250TEtOREhWZ2lhUTVkNkh0czlV?=
- =?utf-8?B?S1kyQWpmL3lwQUpaeVpRVDJNRlhiMTYzYU9lRVpKVFdpdkR1aUJ4ZDBXeHAw?=
- =?utf-8?B?YkUrUHM1L05ac3lYQ0ZHNGl4TWNPdDJ6bmJGejZ6cmg3MUExTGhLd3hSYk03?=
- =?utf-8?B?T3FBOGtRQ3dVcWtuVkNmOUwxSkVvOXFUYTJYcFgyT2dBelVyS3FiNEN5UEtK?=
- =?utf-8?B?VFV2Q2Flc2hITUd3elJnL1QvZUZ5RlBwSjNqcHd5VEZlVmN1K3VTRkFHQytB?=
- =?utf-8?B?VUZRSkw2Qi9GMnR2aGhIMHUvTWpXaHBNaUxaMS9TWG9nRUN6aGtJRHowbkp0?=
- =?utf-8?B?bEtQYnFiY3ZXT0RmUTFpeWEvclhZdkZ1Ly9zdG9QNTFGQmxPM2lxRzB0U1Vi?=
- =?utf-8?B?bTQ5bWpidXNDR05Dbk5Bc1c3WXNXdXIrNFdWNEpvTWxQMGpySC9yNDVlVmFO?=
- =?utf-8?B?OU0zbU1xcFNieVJwLzRxOHNVMndjcnRLQzV3RVNXS2NFS3pweFJ1S2JUdGJ5?=
- =?utf-8?B?eS9HcWtZcTNsSzYrdnJCMm10YzhQcFhySGNXcHY1WEIvcXRGVEVCWjFBM0pV?=
- =?utf-8?Q?wdUAXnK43UiDBm4RQ7R0NE9bVmORcWWq?=
-X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DM6PR12MB4202.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(366016)(376014)(1800799024)(7053199007)(921020);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?utf-8?B?TTVSSWRnQlVyNkNZdnZXMURzOEJweUlJQVF4TW1jRHAxU3ZPUzR2cVRVVVRR?=
- =?utf-8?B?MzkvR0tId1Nzb3FvcXZIY1JocmZ4RmRyblpIakowS1BTNTRsdjJ5eHdJS1VO?=
- =?utf-8?B?NGFaY3hhNnhvbDRPbkk0THBySFUyQTNBQkh1N1MrNFl2SlZ4QmRhc1lyUVhN?=
- =?utf-8?B?dXJpS1VQYTRZZ1lPb1BYdHdGdldyLzRJcnFvLzR3aGZ2SDk4RjdoeVNyOEU1?=
- =?utf-8?B?cmFvOUF4eE5SQVM2S2ZHUGN4Vlg4emN4cS96ZGxBUUJrRHMrYk5YMUt5akVG?=
- =?utf-8?B?RWlYS25MSmZSNDZtdlRXK2t6MEF0NmlGRG9qY0dleG9ZeDREcjJoVC9XR1lP?=
- =?utf-8?B?dTZ5WmhQeVRMeXlxWnFnYW84WW5IYXo2UDd4UTdjMGVtaFdET0ZwSXdMNVJ6?=
- =?utf-8?B?SjI0c0h3WVpEa1hWakYxMU1JcUFCZWYwM3hDN0VsWkVmQXBXTmlsU1gybm5x?=
- =?utf-8?B?ay85NnpUd3pxc3FIRGZucmRvM3dXbjlRZk1ORitwRzc2YWNCNkJQdVgwYzFu?=
- =?utf-8?B?cEZtcWwwRENyeTVPQXRDUExqbG4xdUc4K0k4amxGcEdNN29NUndMYVUrNnRV?=
- =?utf-8?B?ZTE1M0ZjNlQ3UGFpZGdIQ0xwdHZLZzJaaVBvZUx1OG0weUVvZ0tiR0kwUFBZ?=
- =?utf-8?B?OHVxL2hnVWxLRHFlMklKeG5uYldWU1c3c0wwU0txOE9ZNm1oTlVXZ1huYnVT?=
- =?utf-8?B?Q3lZaHhubldZbzEyUzZGZkpqbVNuRCs2M0VsVnVhYUt2YnRFbFFic0ZSNDF5?=
- =?utf-8?B?elErMTBHSEo4cndQNGpBY1Z1ZTRNN254dVNXajdlbVc0RWNFWVhrUEVwSzlp?=
- =?utf-8?B?b3owUFRhQmh4NDVHSVpWSnFOVGxUcmc3R0pCVGJLTGlPOUNWK2RJcUwxaGFi?=
- =?utf-8?B?Sjg4Zi9XY0Nad3VOaUxyb1VUL3VYczA3LzRqa05xYVpnaDcrdzcwZTR1Zkhl?=
- =?utf-8?B?aXcwMjh0VTA2L0xrSkFFYi9QWFM4dTA4MXlaR28vYzVIUWFqSE04OUw4eUxp?=
- =?utf-8?B?Q1ZZRTFhTTRscDRSQ3RDSFhPaER4ai80Mk1zUUorWGxjMkJGZHIrbGtobDRE?=
- =?utf-8?B?QzJZcUNtSU1COGFWRzBab2RoOGJTKzJKd0p3bC9YVHVkeVRXSTRIM0d0V3lK?=
- =?utf-8?B?eHlMT1hZUVluUENrczliYzhXdUkzT2xsS05XdkNyM2FSNDFmclVqWkFCamhL?=
- =?utf-8?B?QU9uUkJlaEYyTHNmYWM2WWl5U1Z0Mkp4a3RWNE4wWUZmWlRFd1NwVkRrN1RW?=
- =?utf-8?B?c1VDNGQ0bXowSEN1MmtCQjNiNjJPdTFiYko2YkN5elZ2NGJrdXVvUlV1K20y?=
- =?utf-8?B?b2NmWjZHZDdkUGtkQlJiZE5ERFBUcDV2M1VjUWt5bm1OV1kwbWVRdFJ1amdj?=
- =?utf-8?B?NEt6d2lGemFURHNlY0oxUzFoU3R6cHFtcXR0RVRmbzBSWmlsbDZLTVR6QWxM?=
- =?utf-8?B?U3BJRVFPUVlicThBbWpUeGVLRFR5R1VORTQ1VWprc3JkNGZ1U2VDN0NlWUNR?=
- =?utf-8?B?djBLYnd5bnhrUGxiL1VaYUxGb2Q2Mk9RNjlCR0llOVNnKzhIV3BxM1dFY2x3?=
- =?utf-8?B?WmdESmpTUnhoekR0OG56Rnh2MzdOV1g5WW5SeUt6YXJnZWxwWDhkL1JHQW0v?=
- =?utf-8?B?NnR1TUFRU0VTRGhubGZ6U05zcHdKWG92U0Y0NnJIQ2NpRXp2YW9WV1lWYVlF?=
- =?utf-8?B?YnNNZ2kxTTFIdllwTHVrQ1V3Y0ZvVUFWanhKZkNsR2MxcVFzRmdpeTFGOWJ1?=
- =?utf-8?B?TStwWno2dWZjRW8zU2t2SDl5bUxPWDdPaEErdHc1RWtRZVcwb2EvVSsyWnpM?=
- =?utf-8?B?Vm1UdmpkVmh0cUE3bFF1RVRRY3pMRndPbFFKTUFPeTY1NGdIbnJyU2ZxUGhQ?=
- =?utf-8?B?c3dvUGtmekptOUhYKzlwa2JmU0FjcFJpUUJmQ3dZNkVEVGRNcWlKVEJGY21w?=
- =?utf-8?B?OUM5WXVhM1JGd0cxVGh5K2FuUVlHZmp6MURWV25EQ0dVVGNlYm5ZNkRtL1lr?=
- =?utf-8?B?SmhnalJNNmdXMWYvZnVmL0tSNG9GUDBvdGlPa1RLOFRrZnR5WGRoR09ZMGJE?=
- =?utf-8?B?bDBqMDAyNkRsNnJra1hoeW54Yk1OOVU3TUJZNU03YjZlck54VjBFcHlBd2Nu?=
- =?utf-8?Q?VsSHpeY5GFim8OfXWerzzvSvo?=
-X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: dedf0e94-50f4-4206-9331-08dd3c7c58d5
-X-MS-Exchange-CrossTenant-AuthSource: DM6PR12MB4202.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 24 Jan 2025 13:38:12.3225
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: enJ7rqS2VzgeD7+zgGjTZsfmL11uPvYC4OupiA7TwRxA2PnR3ZFP80Sz35BKqRM/qO7WQL74fRNKsOHx/HDpYQ==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: SA1PR12MB6822
+Content-Transfer-Encoding: 8bit
+X-AntiAbuse: This header was added to track abuse, please include it with any abuse report
+X-AntiAbuse: Primary Hostname - server.wki.vra.mybluehostin.me
+X-AntiAbuse: Original Domain - vger.kernel.org
+X-AntiAbuse: Originator/Caller UID/GID - [47 12] / [47 12]
+X-AntiAbuse: Sender Address Domain - couthit.com
+X-Get-Message-Sender-Via: server.wki.vra.mybluehostin.me: authenticated_id: basharath@couthit.com
+X-Authenticated-Sender: server.wki.vra.mybluehostin.me: basharath@couthit.com
+X-Source: 
+X-Source-Args: 
+X-Source-Dir: 
 
+From: Roger Quadros <rogerq@ti.com>
 
-On 1/8/25 01:33, Dan Williams wrote:
-> Dan Williams wrote:
->> alejandro.lucero-palau@ wrote:
->>> From: Alejandro Lucero <alucerop@amd.com>
->>>
->>> Differentiate CXL memory expanders (type 3) from CXL device accelerators
->>> (type 2) with a new function for initializing cxl_dev_state.
->>>
->>> Create accessors to cxl_dev_state to be used by accel drivers.
->>>
->>> Based on previous work by Dan Williams [1]
->>>
->>> Link: [1] https://lore.kernel.org/linux-cxl/168592160379.1948938.12863272903570476312.stgit@dwillia2-xfh.jf.intel.com/
->>> Signed-off-by: Alejandro Lucero <alucerop@amd.com>
->>> Co-developed-by: Dan Williams <dan.j.williams@intel.com>
->>> Reviewed-by: Dave Jiang <dave.jiang@intel.com>
->>> Reviewed-by: Fan Ni <fan.ni@samsung.com>
->> This patch causes
-> Whoops, forgot to complete this thought. Someting in this series causes:
->
-> depmod: ERROR: Cycle detected: ecdh_generic
-> depmod: ERROR: Cycle detected: tpm
-> depmod: ERROR: Cycle detected: cxl_mock -> cxl_core -> cxl_mock
-> depmod: ERROR: Cycle detected: encrypted_keys
-> depmod: ERROR: Found 2 modules in dependency cycles!
->
-> I think the non CXL ones are false likely triggered by the CXL causing
-> depmod to exit early.
->
-> Given cxl-test is unfamiliar territory to many submitters I always offer
-> to fix up the breakage. I came up with the below incremental patch to
-> fold in that also addresses my other feedback.
+Changes corresponding to link configuration such as speed and duplexity.
+IRQ and handler initializations are performed for packet reception.Firmware
+receives the packet from the wire and stores it into OCMC queue. Next, it
+notifies the CPU via interrupt. Upon receiving the interrupt CPU will
+service the IRQ and packet will be processed by pushing the newly allocated
+SKB to upper layers.
 
+When the user application want to transmit a packet, it will invoke
+sys_send() which will inturn invoke the PRUETH driver, then it will write
+the packet into OCMC queues. PRU firmware will pick up the packet and
+transmit it on to the wire.
 
-snip
+Signed-off-by: Roger Quadros <rogerq@ti.com>
+Signed-off-by: Andrew F. Davis <afd@ti.com>
+Signed-off-by: Parvathi Pudi <parvathi@couthit.com>
+Signed-off-by: Basharath Hussain Khaja <basharath@couthit.com>
+---
+ drivers/net/ethernet/ti/icssm/icssm_prueth.c | 599 ++++++++++++++++++-
+ drivers/net/ethernet/ti/icssm/icssm_prueth.h |  46 ++
+ 2 files changed, 640 insertions(+), 5 deletions(-)
 
->   
-> -struct cxl_memdev_state *cxl_memdev_state_create(struct device *dev)
-> +struct cxl_memdev_state *cxl_memdev_state_create(struct device *dev, u64 serial, u16 dvsec)
->   {
->   	struct cxl_memdev_state *mds;
-
-
-I wonder if we need to differentiate this initialization from ...
-
-
->   
-> -struct cxl_dev_state *cxl_accel_state_create(struct device *dev)
-> +void cxl_dev_state_init(struct cxl_dev_state *cxlds, struct device *dev,
-> +			enum cxl_devtype type, u64 serial, u16 dvsec)
->   {
-
-
-... this one for a Type2 device. It is for sure needed for Type1, but I 
-think it can be shared with Type2 since there is a mem, a pmem or both 
-for Type2. The only thing to be different is the memory type.
-
-
-This helps with cxl_mem_dpa_fetch being called by accel drivers with a 
-mailbox supporting the CXL_MBOX_OP_GET_PARTITION_INFO command, and for 
-those with no mailbox the same information can already be there 
-hardcoded by the accel driver, same for those values obtained from the 
-CXL_MBOX_OP_IDENTIFY command. That function would need an extra param 
-for not requiring the CXL_MBOX_OP_GET_PARTITION_INFO command implying 
-all needed cxl_memdev_state fields already initialized.
-
+diff --git a/drivers/net/ethernet/ti/icssm/icssm_prueth.c b/drivers/net/ethernet/ti/icssm/icssm_prueth.c
+index 82ed0e3a0d88..0ba1d16a7a15 100644
+--- a/drivers/net/ethernet/ti/icssm/icssm_prueth.c
++++ b/drivers/net/ethernet/ti/icssm/icssm_prueth.c
+@@ -36,6 +36,13 @@
+ #define TX_START_DELAY		0x40
+ #define TX_CLK_DELAY_100M	0x6
+ 
++static inline void icssm_prueth_write_reg(struct prueth *prueth,
++					  enum prueth_mem region,
++					  unsigned int reg, u32 val)
++{
++	writel_relaxed(val, prueth->mem[region].va + reg);
++}
++
+ /* Below macro is for 1528 Byte Frame support, to Allow even with
+  * Redundancy tag
+  */
+@@ -299,18 +306,31 @@ static void icssm_prueth_init_ethernet_mode(struct prueth *prueth)
+ 	icssm_prueth_hostinit(prueth);
+ }
+ 
+-static int icssm_prueth_emac_config(struct prueth_emac *emac)
++static void icssm_prueth_port_enable(struct prueth_emac *emac, bool enable)
+ {
+ 	struct prueth *prueth = emac->prueth;
++	void __iomem *port_ctrl;
++	void __iomem *ram;
+ 
+-	/* PRU needs local shared RAM address for C28 */
+-	u32 sharedramaddr = ICSS_LOCAL_SHARED_RAM;
++	ram = prueth->mem[emac->dram].va;
++	port_ctrl = ram + PORT_CONTROL_ADDR;
++	writeb(!!enable, port_ctrl);
++}
+ 
+-	/* PRU needs real global OCMC address for C30*/
+-	u32 ocmcaddr = (u32)prueth->mem[PRUETH_MEM_OCMC].pa;
++static int icssm_prueth_emac_config(struct prueth_emac *emac)
++{
++	struct prueth *prueth = emac->prueth;
++	u32 sharedramaddr, ocmcaddr;
+ 	void __iomem *dram_base;
+ 	void __iomem *mac_addr;
+ 	void __iomem *dram;
++	void __iomem *sram;
++
++	/* PRU needs local shared RAM address for C28 */
++	sharedramaddr = ICSS_LOCAL_SHARED_RAM;
++	/* PRU needs real global OCMC address for C30*/
++	ocmcaddr = (u32)prueth->mem[PRUETH_MEM_OCMC].pa;
++	sram = prueth->mem[PRUETH_MEM_SHARED_RAM].va;
+ 
+ 	/* Clear data RAM */
+ 	icssm_prueth_clearmem(prueth, emac->dram);
+@@ -331,6 +351,9 @@ static int icssm_prueth_emac_config(struct prueth_emac *emac)
+ 	memcpy_toio(dram, queue_descs[emac->port_id],
+ 		    sizeof(queue_descs[emac->port_id]));
+ 
++	emac->rx_queue_descs = sram + HOST_QUEUE_DESC_OFFSET;
++	emac->tx_queue_descs = dram;
++
+ 	/* Set in constant table C28 of PRU0 to ICSS Shared memory */
+ 	pru_rproc_set_ctable(emac->pru, PRU_C28, sharedramaddr);
+ 
+@@ -340,6 +363,40 @@ static int icssm_prueth_emac_config(struct prueth_emac *emac)
+ 	return 0;
+ }
+ 
++/* update phy/port status information for firmware */
++static void icssm_emac_update_phystatus(struct prueth_emac *emac)
++{
++	struct prueth *prueth = emac->prueth;
++	u32 phy_speed, port_status = 0;
++	enum prueth_mem region;
++	u32 delay;
++
++	region = emac->dram;
++	phy_speed = emac->speed;
++	icssm_prueth_write_reg(prueth, region, PHY_SPEED_OFFSET, phy_speed);
++
++	delay = TX_CLK_DELAY_100M;
++
++	delay = delay << PRUSS_MII_RT_TXCFG_TX_CLK_DELAY_SHIFT;
++
++	if (emac->port_id) {
++		regmap_update_bits(prueth->mii_rt,
++				   PRUSS_MII_RT_TXCFG1,
++				   PRUSS_MII_RT_TXCFG_TX_CLK_DELAY_MASK,
++				   delay);
++	} else {
++		regmap_update_bits(prueth->mii_rt,
++				   PRUSS_MII_RT_TXCFG0,
++				   PRUSS_MII_RT_TXCFG_TX_CLK_DELAY_MASK,
++				   delay);
++	}
++
++	if (emac->link)
++		port_status |= PORT_LINK_MASK;
++
++	writeb(port_status, prueth->mem[region].va + PORT_STATUS_OFFSET);
++}
++
+ /* called back by PHY layer if there is change in link state of hw port*/
+ static void icssm_emac_adjust_link(struct net_device *ndev)
+ {
+@@ -369,6 +426,8 @@ static void icssm_emac_adjust_link(struct net_device *ndev)
+ 		emac->link = 0;
+ 	}
+ 
++	icssm_emac_update_phystatus(emac);
++
+ 	if (new_state)
+ 		phy_print_status(phydev);
+ 
+@@ -384,6 +443,374 @@ static void icssm_emac_adjust_link(struct net_device *ndev)
+ 	spin_unlock_irqrestore(&emac->lock, flags);
+ }
+ 
++/**
++ * icssm_prueth_tx_enqueue - queue a packet to firmware for transmission
++ *
++ * @emac: EMAC data structure
++ * @skb: packet data buffer
++ * @queue_id: priority queue id
++ *
++ * Return: 0 (Success)
++ */
++static int icssm_prueth_tx_enqueue(struct prueth_emac *emac,
++				   struct sk_buff *skb,
++				   enum prueth_queue_id queue_id)
++{
++	struct prueth_queue_desc __iomem *queue_desc;
++	const struct prueth_queue_info *txqueue;
++	u16 bd_rd_ptr, bd_wr_ptr, update_wr_ptr;
++	struct net_device *ndev = emac->ndev;
++	unsigned int buffer_desc_count;
++	int free_blocks, update_block;
++	bool buffer_wrapped = false;
++	int write_block, read_block;
++	void *src_addr, *dst_addr;
++	int pkt_block_size;
++	void __iomem *dram;
++	int txport, pktlen;
++	u32 wr_buf_desc;
++	void *ocmc_ram;
++
++	dram = emac->prueth->mem[emac->dram].va;
++	if (eth_skb_pad(skb)) {
++		if (netif_msg_tx_err(emac) && net_ratelimit())
++			netdev_err(ndev, "packet pad failed\n");
++		return -ENOMEM;
++	}
++
++	/* which port to tx: MII0 or MII1 */
++	txport = emac->tx_port_queue;
++	src_addr = skb->data;
++	pktlen = skb->len;
++	/* Get the tx queue */
++	queue_desc = emac->tx_queue_descs + queue_id;
++	txqueue = &queue_infos[txport][queue_id];
++
++	buffer_desc_count = txqueue->buffer_desc_end -
++			    txqueue->buffer_desc_offset;
++	buffer_desc_count /= BD_SIZE;
++	buffer_desc_count++;
++
++	bd_rd_ptr = readw(&queue_desc->rd_ptr);
++	bd_wr_ptr = readw(&queue_desc->wr_ptr);
++
++	/* the PRU firmware deals mostly in pointers already
++	 * offset into ram, we would like to deal in indexes
++	 * within the queue we are working with for code
++	 * simplicity, calculate this here
++	 */
++	write_block = (bd_wr_ptr - txqueue->buffer_desc_offset) / BD_SIZE;
++	read_block = (bd_rd_ptr - txqueue->buffer_desc_offset) / BD_SIZE;
++	if (write_block > read_block) {
++		free_blocks = buffer_desc_count - write_block;
++		free_blocks += read_block;
++	} else if (write_block < read_block) {
++		free_blocks = read_block - write_block;
++	} else { /* they are all free */
++		free_blocks = buffer_desc_count;
++	}
++
++	pkt_block_size = DIV_ROUND_UP(pktlen, ICSS_BLOCK_SIZE);
++	if (pkt_block_size > free_blocks) /* out of queue space */
++		return -ENOBUFS;
++
++	/* calculate end BD address post write */
++	update_block = write_block + pkt_block_size;
++
++	/* Check for wrap around */
++	if (update_block >= buffer_desc_count) {
++		update_block %= buffer_desc_count;
++		buffer_wrapped = true;
++	}
++
++	/* OCMC RAM is not cached and write order is not important */
++	ocmc_ram = (__force void *)emac->prueth->mem[PRUETH_MEM_OCMC].va;
++	dst_addr = ocmc_ram + txqueue->buffer_offset +
++		   (write_block * ICSS_BLOCK_SIZE);
++
++	/* Copy the data from socket buffer(DRAM) to PRU buffers(OCMC) */
++	if (buffer_wrapped) { /* wrapped around buffer */
++		int bytes = (buffer_desc_count - write_block) * ICSS_BLOCK_SIZE;
++		int remaining;
++
++		/* bytes is integral multiple of ICSS_BLOCK_SIZE but
++		 * entire packet may have fit within the last BD
++		 * if pkt_info.length is not integral multiple of
++		 * ICSS_BLOCK_SIZE
++		 */
++		if (pktlen < bytes)
++			bytes = pktlen;
++
++		/* copy non-wrapped part */
++		memcpy(dst_addr, src_addr, bytes);
++
++		/* copy wrapped part */
++		src_addr += bytes;
++		remaining = pktlen - bytes;
++		dst_addr = ocmc_ram + txqueue->buffer_offset;
++		memcpy(dst_addr, src_addr, remaining);
++	} else {
++		memcpy(dst_addr, src_addr, pktlen);
++	}
++
++       /* update first buffer descriptor */
++	wr_buf_desc = (pktlen << PRUETH_BD_LENGTH_SHIFT) &
++		       PRUETH_BD_LENGTH_MASK;
++	writel(wr_buf_desc, dram + bd_wr_ptr);
++
++	/* update the write pointer in this queue descriptor, the firmware
++	 * polls for this change so this will signal the start of transmission
++	 */
++	update_wr_ptr = txqueue->buffer_desc_offset + (update_block * BD_SIZE);
++	writew(update_wr_ptr, &queue_desc->wr_ptr);
++
++	return 0;
++}
++
++void icssm_parse_packet_info(struct prueth *prueth, u32 buffer_descriptor,
++			     struct prueth_packet_info *pkt_info)
++{
++	pkt_info->start_offset = false;
++
++	pkt_info->shadow = !!(buffer_descriptor & PRUETH_BD_SHADOW_MASK);
++	pkt_info->port = (buffer_descriptor & PRUETH_BD_PORT_MASK) >>
++			 PRUETH_BD_PORT_SHIFT;
++	pkt_info->length = (buffer_descriptor & PRUETH_BD_LENGTH_MASK) >>
++			   PRUETH_BD_LENGTH_SHIFT;
++	pkt_info->broadcast = !!(buffer_descriptor & PRUETH_BD_BROADCAST_MASK);
++	pkt_info->error = !!(buffer_descriptor & PRUETH_BD_ERROR_MASK);
++	pkt_info->sv_frame = false;
++	pkt_info->lookup_success = !!(buffer_descriptor &
++				      PRUETH_BD_LOOKUP_SUCCESS_MASK);
++	pkt_info->flood = !!(buffer_descriptor & PRUETH_BD_SW_FLOOD_MASK);
++	pkt_info->timestamp = !!(buffer_descriptor & PRUETH_BD_TIMESTAMP_MASK);
++}
++
++/* get packet from queue
++ * negative for error
++ */
++int icssm_emac_rx_packet(struct prueth_emac *emac, u16 *bd_rd_ptr,
++			 struct prueth_packet_info *pkt_info,
++			 const struct prueth_queue_info *rxqueue)
++{
++	struct net_device *ndev = emac->ndev;
++	unsigned int buffer_desc_count;
++	int read_block, update_block;
++	unsigned int actual_pkt_len;
++	bool buffer_wrapped = false;
++	void *src_addr, *dst_addr;
++	u16 start_offset = 0;
++	struct sk_buff *skb;
++	int pkt_block_size;
++	void *ocmc_ram;
++
++	/* the PRU firmware deals mostly in pointers already
++	 * offset into ram, we would like to deal in indexes
++	 * within the queue we are working with for code
++	 * simplicity, calculate this here
++	 */
++	buffer_desc_count = rxqueue->buffer_desc_end -
++			    rxqueue->buffer_desc_offset;
++	buffer_desc_count /= BD_SIZE;
++	buffer_desc_count++;
++	read_block = (*bd_rd_ptr - rxqueue->buffer_desc_offset) / BD_SIZE;
++	pkt_block_size = DIV_ROUND_UP(pkt_info->length, ICSS_BLOCK_SIZE);
++
++	/* calculate end BD address post read */
++	update_block = read_block + pkt_block_size;
++
++	/* Check for wrap around */
++	if (update_block >= buffer_desc_count) {
++		update_block %= buffer_desc_count;
++		if (update_block)
++			buffer_wrapped = true;
++	}
++
++	/* calculate new pointer in ram */
++	*bd_rd_ptr = rxqueue->buffer_desc_offset + (update_block * BD_SIZE);
++
++	/* Pkt len w/ HSR tag removed, If applicable */
++	actual_pkt_len = pkt_info->length - start_offset;
++
++	/* Allocate a socket buffer for this packet */
++	skb = netdev_alloc_skb_ip_align(ndev, actual_pkt_len);
++	if (!skb) {
++		if (netif_msg_rx_err(emac) && net_ratelimit())
++			netdev_err(ndev, "failed rx buffer alloc\n");
++		return -ENOMEM;
++	}
++
++	dst_addr = skb->data;
++
++	/* OCMC RAM is not cached and read order is not important */
++	ocmc_ram = (__force void *)emac->prueth->mem[PRUETH_MEM_OCMC].va;
++
++	/* Get the start address of the first buffer from
++	 * the read buffer description
++	 */
++	src_addr = ocmc_ram + rxqueue->buffer_offset +
++		   (read_block * ICSS_BLOCK_SIZE);
++	src_addr += start_offset;
++
++	/* Copy the data from PRU buffers(OCMC) to socket buffer(DRAM) */
++	if (buffer_wrapped) { /* wrapped around buffer */
++		int bytes = (buffer_desc_count - read_block) * ICSS_BLOCK_SIZE;
++		int remaining;
++		/* bytes is integral multiple of ICSS_BLOCK_SIZE but
++		 * entire packet may have fit within the last BD
++		 * if pkt_info.length is not integral multiple of
++		 * ICSS_BLOCK_SIZE
++		 */
++		if (pkt_info->length < bytes)
++			bytes = pkt_info->length;
++
++		/* If applicable, account for the HSR tag removed */
++		bytes -= start_offset;
++
++		/* copy non-wrapped part */
++		memcpy(dst_addr, src_addr, bytes);
++
++		/* copy wrapped part */
++		dst_addr += bytes;
++		remaining = actual_pkt_len - bytes;
++
++		src_addr = ocmc_ram + rxqueue->buffer_offset;
++		memcpy(dst_addr, src_addr, remaining);
++		src_addr += remaining;
++	} else {
++		memcpy(dst_addr, src_addr, actual_pkt_len);
++		src_addr += actual_pkt_len;
++	}
++
++	if (!pkt_info->sv_frame) {
++		skb_put(skb, actual_pkt_len);
++
++		/* send packet up the stack */
++		skb->protocol = eth_type_trans(skb, ndev);
++		local_bh_disable();
++		netif_receive_skb(skb);
++		local_bh_enable();
++	} else {
++		dev_kfree_skb_any(skb);
++	}
++
++	/* update stats */
++	ndev->stats.rx_bytes += actual_pkt_len;
++	ndev->stats.rx_packets++;
++
++	return 0;
++}
++
++/**
++ * icssm_emac_rx_thread - EMAC Rx interrupt thread handler
++ * @irq: interrupt number
++ * @dev_id: pointer to net_device
++ *
++ * EMAC Rx Interrupt thread handler - function to process the rx frames in a
++ * irq thread function. There is only limited buffer at the ingress to
++ * queue the frames. As the frames are to be emptied as quickly as
++ * possible to avoid overflow, irq thread is necessary. Current implementation
++ * based on NAPI poll results in packet loss due to overflow at
++ * the ingress queues. Industrial use case requires loss free packet
++ * processing. Tests shows that with threaded irq based processing,
++ * no overflow happens when receiving at ~92Mbps for MTU sized frames and thus
++ * meet the requirement for industrial use case.
++ *
++ * Return: interrupt handled condition
++ */
++static irqreturn_t icssm_emac_rx_thread(int irq, void *dev_id)
++{
++	struct net_device *ndev = (struct net_device *)dev_id;
++	struct prueth_emac *emac = netdev_priv(ndev);
++	struct prueth_queue_desc __iomem *queue_desc;
++	const struct prueth_queue_info *rxqueue;
++	struct prueth *prueth = emac->prueth;
++	struct net_device_stats *ndevstats;
++	struct prueth_packet_info pkt_info;
++	int start_queue, end_queue;
++	void __iomem *shared_ram;
++	u16 bd_rd_ptr, bd_wr_ptr;
++	u16 update_rd_ptr;
++	u8 overflow_cnt;
++	u32 rd_buf_desc;
++	int used = 0;
++	int i, ret;
++
++	ndevstats = &emac->ndev->stats;
++	shared_ram = emac->prueth->mem[PRUETH_MEM_SHARED_RAM].va;
++
++	start_queue = emac->rx_queue_start;
++	end_queue = emac->rx_queue_end;
++retry:
++	/* search host queues for packets */
++	for (i = start_queue; i <= end_queue; i++) {
++		queue_desc = emac->rx_queue_descs + i;
++		rxqueue = &queue_infos[PRUETH_PORT_HOST][i];
++
++		overflow_cnt = readb(&queue_desc->overflow_cnt);
++		if (overflow_cnt > 0) {
++			emac->ndev->stats.rx_over_errors += overflow_cnt;
++			/* reset to zero */
++			writeb(0, &queue_desc->overflow_cnt);
++		}
++
++		bd_rd_ptr = readw(&queue_desc->rd_ptr);
++		bd_wr_ptr = readw(&queue_desc->wr_ptr);
++
++		/* while packets are available in this queue */
++		while (bd_rd_ptr != bd_wr_ptr) {
++			/* get packet info from the read buffer descriptor */
++			rd_buf_desc = readl(shared_ram + bd_rd_ptr);
++			icssm_parse_packet_info(prueth, rd_buf_desc, &pkt_info);
++
++			if (pkt_info.length <= 0) {
++				/* a packet length of zero will cause us to
++				 * never move the read pointer ahead, locking
++				 * the driver, so we manually have to move it
++				 * to the write pointer, discarding all
++				 * remaining packets in this queue. This should
++				 * never happen.
++				 */
++				update_rd_ptr = bd_wr_ptr;
++				ndevstats->rx_length_errors++;
++			} else if (pkt_info.length > EMAC_MAX_FRM_SUPPORT) {
++				/* if the packet is too large we skip it but we
++				 * still need to move the read pointer ahead
++				 * and assume something is wrong with the read
++				 * pointer as the firmware should be filtering
++				 * these packets
++				 */
++				update_rd_ptr = bd_wr_ptr;
++				ndevstats->rx_length_errors++;
++			} else {
++				update_rd_ptr = bd_rd_ptr;
++				ret = icssm_emac_rx_packet(emac, &update_rd_ptr,
++							   &pkt_info, rxqueue);
++				if (ret)
++					return IRQ_HANDLED;
++				used++;
++			}
++
++			/* after reading the buffer descriptor we clear it
++			 * to prevent improperly moved read pointer errors
++			 * from simply looking like old packets.
++			 */
++			writel(0, shared_ram + bd_rd_ptr);
++
++			/* update read pointer in queue descriptor */
++			writew(update_rd_ptr, &queue_desc->rd_ptr);
++			bd_rd_ptr = update_rd_ptr;
++		}
++	}
++
++	if (used) {
++		used = 0;
++		goto retry;
++	}
++
++	return IRQ_HANDLED;
++}
++
+ static int icssm_emac_set_boot_pru(struct prueth_emac *emac,
+ 				   struct net_device *ndev)
+ {
+@@ -412,6 +839,21 @@ static int icssm_emac_set_boot_pru(struct prueth_emac *emac,
+ 		netdev_err(ndev, "failed to boot PRU0: %d\n", ret);
+ 		return ret;
+ 	}
++	return ret;
++}
++
++static int icssm_emac_request_irqs(struct prueth_emac *emac)
++{
++	struct net_device *ndev = emac->ndev;
++	int ret;
++
++	ret = request_threaded_irq(emac->rx_irq, NULL, icssm_emac_rx_thread,
++				   IRQF_TRIGGER_HIGH | IRQF_ONESHOT,
++				   ndev->name, ndev);
++	if (ret) {
++		netdev_err(ndev, "unable to request RX IRQ\n");
++		return ret;
++	}
+ 
+ 	return ret;
+ }
+@@ -442,10 +884,27 @@ static int icssm_emac_ndo_open(struct net_device *ndev)
+ 	if (ret)
+ 		netdev_err(ndev, "failed to boot PRU: %d\n", ret);
+ 
++	ret = icssm_emac_request_irqs(emac);
++	if (ret)
++		goto rproc_shutdown;
++
+ 	/* start PHY */
+ 	phy_start(emac->phydev);
++
++	/* enable the port and vlan */
++	icssm_prueth_port_enable(emac, true);
++
+ 	prueth->emac_configured |= BIT(emac->port_id);
++
++	if (netif_msg_drv(emac))
++		dev_notice(&ndev->dev, "started\n");
++
+ 	return 0;
++
++rproc_shutdown:
++	rproc_shutdown(emac->pru);
++
++	return ret;
+ }
+ 
+ /**
+@@ -459,18 +918,122 @@ static int icssm_emac_ndo_open(struct net_device *ndev)
+ static int icssm_emac_ndo_stop(struct net_device *ndev)
+ {
+ 	struct prueth_emac *emac = netdev_priv(ndev);
++	struct prueth *prueth = emac->prueth;
++
++	prueth->emac_configured &= ~BIT(emac->port_id);
++
++	/* disable the mac port */
++	icssm_prueth_port_enable(emac, false);
+ 
+ 	/* stop PHY */
+ 	phy_stop(emac->phydev);
+ 
++	/* stop the PRU */
+ 	rproc_shutdown(emac->pru);
+ 
++	/* free rx and tx interrupts */
++	if (emac->tx_irq > 0)
++		free_irq(emac->tx_irq, ndev);
++
++	free_irq(emac->rx_irq, ndev);
++
++	if (netif_msg_drv(emac))
++		dev_notice(&ndev->dev, "stopped\n");
++
+ 	return 0;
+ }
+ 
++/* VLAN-tag PCP to priority queue map for EMAC/Switch/HSR/PRP used by driver
++ * Index is PCP val / 2.
++ *   low  - pcp 0..3 maps to Q4 for Host
++ *   high - pcp 4..7 maps to Q3 for Host
++ *   low  - pcp 0..3 maps to Q2 (FWD Queue) for PRU-x
++ *   where x = 1 for PRUETH_PORT_MII0
++ *             0 for PRUETH_PORT_MII1
++ *   high - pcp 4..7 maps to Q1 (FWD Queue) for PRU-x
++ */
++static const unsigned short emac_pcp_tx_priority_queue_map[] = {
++	PRUETH_QUEUE4, PRUETH_QUEUE4,
++	PRUETH_QUEUE3, PRUETH_QUEUE3,
++	PRUETH_QUEUE2, PRUETH_QUEUE2,
++	PRUETH_QUEUE1, PRUETH_QUEUE1,
++};
++
++static u16 icssm_prueth_get_tx_queue_id(struct prueth *prueth,
++					struct sk_buff *skb)
++{
++	u16 vlan_tci, pcp;
++	int err;
++
++	err = vlan_get_tag(skb, &vlan_tci);
++	if (likely(err))
++		pcp = 0;
++	else
++		pcp = (vlan_tci & VLAN_PRIO_MASK) >> VLAN_PRIO_SHIFT;
++
++	/* Below code (pcp >>= 1) is made common for all
++	 * protocols (i.e., EMAC, RSTP, HSR and PRP)*
++	 * pcp value 0,1 will be updated to 0 mapped to QUEUE4
++	 * pcp value 2,3 will be updated to 1 mapped to QUEUE4
++	 * pcp value 4,5 will be updated to 2 mapped to QUEUE3
++	 * pcp value 6,7 will be updated to 3 mapped to QUEUE3
++	 */
++	pcp >>= 1;
++
++	return emac_pcp_tx_priority_queue_map[pcp];
++}
++
++/**
++ * icssm_emac_ndo_start_xmit - EMAC Transmit function
++ * @skb: SKB pointer
++ * @ndev: EMAC network adapter
++ *
++ * Called by the system to transmit a packet  - we queue the packet in
++ * EMAC hardware transmit queue
++ *
++ * Return: success(NETDEV_TX_OK) or error code (typically out of desc's)
++ */
++static int icssm_emac_ndo_start_xmit(struct sk_buff *skb,
++				     struct net_device *ndev)
++{
++	struct prueth_emac *emac = netdev_priv(ndev);
++	int ret;
++	u16 qid;
++
++	qid = icssm_prueth_get_tx_queue_id(emac->prueth, skb);
++	ret = icssm_prueth_tx_enqueue(emac, skb, qid);
++	if (ret) {
++		if (ret != -ENOBUFS && netif_msg_tx_err(emac) &&
++		    net_ratelimit())
++			netdev_err(ndev, "packet queue failed: %d\n", ret);
++		goto fail_tx;
++	}
++
++	ndev->stats.tx_packets++;
++	ndev->stats.tx_bytes += skb->len;
++	dev_kfree_skb_any(skb);
++
++	return NETDEV_TX_OK;
++
++fail_tx:
++	if (ret == -ENOBUFS) {
++		/* no free TX queue */
++		if (emac->tx_irq > 0)
++			netif_stop_queue(ndev);
++		ret = NETDEV_TX_BUSY;
++	} else {
++		/* error */
++		ndev->stats.tx_dropped++;
++		ret = NET_XMIT_DROP;
++	}
++
++	return ret;
++}
++
+ static const struct net_device_ops emac_netdev_ops = {
+ 	.ndo_open = icssm_emac_ndo_open,
+ 	.ndo_stop = icssm_emac_ndo_stop,
++	.ndo_start_xmit = icssm_emac_ndo_start_xmit,
+ };
+ 
+ /* get emac_port corresponding to eth_node name */
+@@ -540,16 +1103,42 @@ static int icssm_prueth_netdev_init(struct prueth *prueth,
+ 	/* by default eth_type is EMAC */
+ 	switch (port) {
+ 	case PRUETH_PORT_MII0:
++		emac->tx_port_queue = PRUETH_PORT_QUEUE_MII0;
++
++		/* packets from MII0 are on queues 1 through 2 */
++		emac->rx_queue_start = PRUETH_QUEUE1;
++		emac->rx_queue_end = PRUETH_QUEUE2;
++
+ 		emac->dram = PRUETH_MEM_DRAM0;
+ 		emac->pru = prueth->pru0;
+ 		break;
+ 	case PRUETH_PORT_MII1:
++		emac->tx_port_queue = PRUETH_PORT_QUEUE_MII1;
++
++		/* packets from MII1 are on queues 3 through 4 */
++		emac->rx_queue_start = PRUETH_QUEUE3;
++		emac->rx_queue_end = PRUETH_QUEUE4;
++
+ 		emac->dram = PRUETH_MEM_DRAM1;
+ 		emac->pru = prueth->pru1;
+ 		break;
+ 	default:
+ 		return -EINVAL;
+ 	}
++
++	emac->rx_irq = of_irq_get_byname(eth_node, "rx");
++	if (emac->rx_irq < 0) {
++		ret = emac->rx_irq;
++		if (ret != -EPROBE_DEFER)
++			dev_err(prueth->dev, "could not get rx irq\n");
++		goto free;
++	}
++	emac->tx_irq = of_irq_get_byname(eth_node, "tx");
++	if (emac->tx_irq < 0) {
++		if (emac->tx_irq != -EPROBE_DEFER)
++			dev_dbg(prueth->dev, "tx irq not configured\n");
++	}
++
+ 	/* get mac address from DT and set private and netdev addr */
+ 	ret = of_get_ethdev_address(eth_node, ndev);
+ 	if (!is_valid_ether_addr(ndev->dev_addr)) {
+diff --git a/drivers/net/ethernet/ti/icssm/icssm_prueth.h b/drivers/net/ethernet/ti/icssm/icssm_prueth.h
+index 6aaceb418f12..427dc8971d0f 100644
+--- a/drivers/net/ethernet/ti/icssm/icssm_prueth.h
++++ b/drivers/net/ethernet/ti/icssm/icssm_prueth.h
+@@ -20,6 +20,12 @@
+ 
+ /* PRUSS local memory map */
+ #define ICSS_LOCAL_SHARED_RAM	0x00010000
++#define EMAC_MAX_PKTLEN		(ETH_HLEN + VLAN_HLEN + ETH_DATA_LEN)
++/* Below macro is for 1528 Byte Frame support, to Allow even with
++ * Redundancy tag
++ */
++#define EMAC_MAX_FRM_SUPPORT (ETH_HLEN + VLAN_HLEN + ETH_DATA_LEN + \
++			      ICSSM_LRE_TAG_SIZE)
+ 
+ /* PRU Ethernet Type - Ethernet functionality (protocol
+  * implemented) provided by the PRU firmware being loaded.
+@@ -76,6 +82,32 @@ struct prueth_queue_info {
+ 	u16 buffer_desc_end;
+ } __packed;
+ 
++/**
++ * struct prueth_packet_info - Info about a packet in buffer
++ * @start_offset: start offset of the frame in the buffer for HSR/PRP
++ * @shadow: this packet is stored in the collision queue
++ * @port: port packet is on
++ * @length: length of packet
++ * @broadcast: this packet is a broadcast packet
++ * @error: this packet has an error
++ * @sv_frame: indicate if the frame is a SV frame for HSR/PRP
++ * @lookup_success: src mac found in FDB
++ * @flood: packet is to be flooded
++ * @timstamp: Specifies if timestamp is appended to the packet
++ */
++struct prueth_packet_info {
++	bool start_offset;
++	bool shadow;
++	unsigned int port;
++	unsigned int length;
++	bool broadcast;
++	bool error;
++	bool sv_frame;
++	bool lookup_success;
++	bool flood;
++	bool timestamp;
++};
++
+ /* In switch mode there are 3 real ports i.e. 3 mac addrs.
+  * however Linux sees only the host side port. The other 2 ports
+  * are the switch ports.
+@@ -160,14 +192,22 @@ struct prueth_emac {
+ 
+ 	struct rproc *pru;
+ 	struct phy_device *phydev;
++	struct prueth_queue_desc __iomem *rx_queue_descs;
++	struct prueth_queue_desc __iomem *tx_queue_descs;
+ 
+ 	int link;
+ 	int speed;
+ 	int duplex;
++	int rx_irq;
++	int tx_irq;
+ 
++	enum prueth_port_queue_id tx_port_queue;
++	enum prueth_queue_id rx_queue_start;
++	enum prueth_queue_id rx_queue_end;
+ 	enum prueth_port port_id;
+ 	enum prueth_mem dram;
+ 	const char *phy_id;
++	u32 msg_enable;
+ 	u8 mac_addr[6];
+ 	phy_interface_t phy_if;
+ 	spinlock_t lock;	/* serialize access */
+@@ -191,4 +231,10 @@ struct prueth {
+ 	unsigned int eth_type;
+ 	u8 emac_configured;
+ };
++
++void icssm_parse_packet_info(struct prueth *prueth, u32 buffer_descriptor,
++			     struct prueth_packet_info *pkt_info);
++int icssm_emac_rx_packet(struct prueth_emac *emac, u16 *bd_rd_ptr,
++			 struct prueth_packet_info *pkt_info,
++			 const struct prueth_queue_info *rxqueue);
+ #endif /* __NET_TI_PRUETH_H */
+-- 
+2.34.1
 
 
