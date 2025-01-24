@@ -1,311 +1,264 @@
-Return-Path: <netdev+bounces-160797-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-160794-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3263FA1B827
-	for <lists+netdev@lfdr.de>; Fri, 24 Jan 2025 15:48:19 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 36851A1B818
+	for <lists+netdev@lfdr.de>; Fri, 24 Jan 2025 15:46:33 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A22D1163F50
-	for <lists+netdev@lfdr.de>; Fri, 24 Jan 2025 14:47:52 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 79BF316C935
+	for <lists+netdev@lfdr.de>; Fri, 24 Jan 2025 14:46:31 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E2A2D1531E2;
-	Fri, 24 Jan 2025 14:47:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AFF0612B169;
+	Fri, 24 Jan 2025 14:46:28 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=couthit.com header.i=@couthit.com header.b="yrgNEFGE"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="oO6el5oT"
 X-Original-To: netdev@vger.kernel.org
-Received: from server.wki.vra.mybluehostin.me (server.wki.vra.mybluehostin.me [162.240.238.73])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2F5A214C59B;
-	Fri, 24 Jan 2025 14:47:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=162.240.238.73
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8232970816;
+	Fri, 24 Jan 2025 14:46:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1737730046; cv=none; b=rbkE9iht1T6qiwK8D2El63hfyqb3v/0MGh72by+CouKHOHUQFzVLCgjdyGp2eElaU6M7ejRhatwVHuCGbvyALJ4dJAD5DWpVMW4NZaU0z6GGrkVCTia4P/yBeZzqw4FAk+Na9mJnV4lOOD4+6DL/06HcA0fqbpsYOij5ZEEWRwE=
+	t=1737729988; cv=none; b=UhQBEluCuz1aO3Xop0D6o7zI3V2Sm9Oq+Q1H3g4ts4ePR0VT+49YRPmVkusyHU83qSN9ScAGc46VHQGU0ueKXAFRVITaYasEy29QeMhmwebYSUSTtONJIZSc74c4A06w9NEDQsLWgmWUXTCGnqdFHlZgJVT4Ej+SYRfMlUfeMD4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1737730046; c=relaxed/simple;
-	bh=wu2GQcsOUddOTFtvDnQ95BD4CSom32zfXUWay83ow6s=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=joGPNZDkbqc3h/gQzNGAAVSfRanppNen/zDvCZL8QZmr+aC1mQrb5kFjVTPWRIvInDmTupaTdtcfLjkzuD9GIm51TVzrdv86ovp+lBUPlYKlUM3rPDZ/3Ois/JQhyQ2pqeeqirUqdQREKqso9IIN2xWUdoM0i/U3nFGXg98ZQHI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=couthit.com; spf=pass smtp.mailfrom=couthit.com; dkim=pass (2048-bit key) header.d=couthit.com header.i=@couthit.com header.b=yrgNEFGE; arc=none smtp.client-ip=162.240.238.73
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=couthit.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=couthit.com
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=couthit.com
-	; s=default; h=Content-Transfer-Encoding:MIME-Version:References:In-Reply-To:
-	Message-Id:Date:Subject:Cc:To:From:Sender:Reply-To:Content-Type:Content-ID:
-	Content-Description:Resent-Date:Resent-From:Resent-Sender:Resent-To:Resent-Cc
-	:Resent-Message-ID:List-Id:List-Help:List-Unsubscribe:List-Subscribe:
-	List-Post:List-Owner:List-Archive;
-	bh=dTwVv8Q9VsLbA3MBy8CxgGJuPV4S+1OozgFAK6N4E8c=; b=yrgNEFGEsZD37kqZUYUJGYx9+r
-	7vUEpi2dLwSvI2RSjuL8smY0+dniLHr81+5nxFmLtnx7/nGxsYGBTMWKPcJVOcFJeOulxwcDN+x50
-	TUGCMTqbFuQlvGFxEVg3QoGUfVWCkqoZyajskOQAu+lrL8waj02Lhgl6r/8JnVIxc3pEepeY65ep8
-	iFtVXhgTWZbOuh9K7xnMGnoyrVGUzP8pleVSjij9buZWiR3IXlsb3uvYsYK7IeWJMRSNwY4007aOi
-	M3kAi6M//fisyZGYL/HL1Two/eFCr8axjDbxdz5YXlEyCuMeabdswguE+KV1SxzpTzYV9CoE/cUem
-	JUz62tyg==;
-Received: from [122.175.9.182] (port=38494 helo=cypher.couthit.local)
-	by server.wki.vra.mybluehostin.me with esmtpa (Exim 4.96.2)
-	(envelope-from <basharath@couthit.com>)
-	id 1tbKxr-0006Wf-1n;
-	Fri, 24 Jan 2025 20:17:20 +0530
-From: Basharath Hussain Khaja <basharath@couthit.com>
-To: danishanwar@ti.com,
-	rogerq@kernel.org,
-	andrew+netdev@lunn.ch,
-	davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	robh@kernel.org,
-	krzk+dt@kernel.org,
-	conor+dt@kernel.org,
-	nm@ti.com,
-	ssantosh@kernel.org,
-	tony@atomide.com,
-	richardcochran@gmail.com,
-	parvathi@couthit.com,
-	basharath@couthit.com,
-	schnelle@linux.ibm.com,
-	rdunlap@infradead.org,
-	diogo.ivo@siemens.com,
-	m-karicheri2@ti.com,
-	horms@kernel.org,
-	jacob.e.keller@intel.com,
-	m-malladi@ti.com,
-	javier.carrasco.cruz@gmail.com,
-	afd@ti.com,
-	s-anna@ti.com
-Cc: linux-arm-kernel@lists.infradead.org,
-	netdev@vger.kernel.org,
-	devicetree@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	linux-omap@vger.kernel.org,
-	pratheesh@ti.com,
-	prajith@ti.com,
-	vigneshr@ti.com,
-	praneeth@ti.com,
-	srk@ti.com,
-	rogerq@ti.com,
-	krishna@couthit.com,
-	pmohan@couthit.com,
-	mohan@couthit.com
-Subject: [RFC v2 PATCH 10/10] arm: dts: ti: Adds device tree nodes for PRU Cores, IEP and eCAP modules of PRU-ICSS2 Instance.
-Date: Fri, 24 Jan 2025 20:15:55 +0530
-Message-Id: <20250124144555.1462044-11-basharath@couthit.com>
-X-Mailer: git-send-email 2.34.1
-In-Reply-To: <20250124122353.1457174-1-basharath@couthit.com>
-References: <20250124122353.1457174-1-basharath@couthit.com>
+	s=arc-20240116; t=1737729988; c=relaxed/simple;
+	bh=eDREnnbQ/L3Qu//yraZ9cTXNgbpZQhd+7d3z/h8OVPg=;
+	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
+	 Content-Type:MIME-Version; b=hMuv4bNak37qgEPKmxxM91pRZA4sudhvbRffZtA/nC0D4pvbnnZpFCDqUv5SYFNmQg62NXrmg2uLwQLvqj3SzvK1lyU/Al1hQJCA6P7FJpDhn4BNeOlyH+MiLH95ycnWxJx0thYP4VuPEupNpEvlxnURT34WrOB/7Fuu03M3zIA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=oO6el5oT; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id CFEE0C4CED2;
+	Fri, 24 Jan 2025 14:46:26 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1737729988;
+	bh=eDREnnbQ/L3Qu//yraZ9cTXNgbpZQhd+7d3z/h8OVPg=;
+	h=Subject:From:To:Cc:Date:In-Reply-To:References:From;
+	b=oO6el5oTbJBJAL0H1etshe5dk8NT0ePh3PBAw/yibYfVzeNcaiPnPrsMFzYPeB6xN
+	 ENJ3DP0GINYObErkUuB0gNzairyGuVHWtbt0Eog6QUmSermUGKaqIKk8VtTu3VQr8h
+	 gG7NsqSuFpsNmDOhqAuyhugCBHR8k8M1Qu+vbvBnSl9W+ihPaVcoibQ1cL7SkU+YbS
+	 6tk9g2xlP1mux6Ij4h25PhGSdyJ+alxry1R6csrcsfkSZS/X/uKwvFsN2XZSyQLcyP
+	 6m83ugQL6JatnmQ1Fq//l62vFUiMXk0TKPwl82TUGYxMnvbV86p8ZWN7t4s/QfNan3
+	 Sre1yKP+sMg9A==
+Message-ID: <66e5e5e74487a274a069539dc14fb10d7832044f.camel@kernel.org>
+Subject: Re: [PATCH 2/8] nfsd: fix CB_SEQUENCE error handling of
+ NFS4ERR_{BADSLOT,BADSESSION,SEQ_MISORDERED}
+From: Jeff Layton <jlayton@kernel.org>
+To: Chuck Lever <chuck.lever@oracle.com>, Neil Brown <neilb@suse.de>, Olga
+ Kornievskaia <okorniev@redhat.com>, Dai Ngo <Dai.Ngo@oracle.com>, Tom
+ Talpey <tom@talpey.com>, "J. Bruce Fields" <bfields@fieldses.org>, Kinglong
+ Mee <kinglongmee@gmail.com>, Trond Myklebust	 <trondmy@kernel.org>, Anna
+ Schumaker <anna@kernel.org>, "David S. Miller"	 <davem@davemloft.net>, Eric
+ Dumazet <edumazet@google.com>, Jakub Kicinski	 <kuba@kernel.org>, Paolo
+ Abeni <pabeni@redhat.com>, Simon Horman	 <horms@kernel.org>
+Cc: linux-nfs@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	netdev@vger.kernel.org
+Date: Fri, 24 Jan 2025 09:46:24 -0500
+In-Reply-To: <c87e5353-d933-47fa-a4e2-9153d243d61c@oracle.com>
+References: <20250123-nfsd-6-14-v1-0-c1137a4fa2ae@kernel.org>
+	 <20250123-nfsd-6-14-v1-2-c1137a4fa2ae@kernel.org>
+	 <c87e5353-d933-47fa-a4e2-9153d243d61c@oracle.com>
+Autocrypt: addr=jlayton@kernel.org; prefer-encrypt=mutual;
+ keydata=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
+ QZIQXVeAA+smfTT0tDrisj1U5x6ZB9b3nBg65kc=
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+User-Agent: Evolution 3.54.3 (3.54.3-1.fc41) 
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-AntiAbuse: This header was added to track abuse, please include it with any abuse report
-X-AntiAbuse: Primary Hostname - server.wki.vra.mybluehostin.me
-X-AntiAbuse: Original Domain - vger.kernel.org
-X-AntiAbuse: Originator/Caller UID/GID - [47 12] / [47 12]
-X-AntiAbuse: Sender Address Domain - couthit.com
-X-Get-Message-Sender-Via: server.wki.vra.mybluehostin.me: authenticated_id: basharath@couthit.com
-X-Authenticated-Sender: server.wki.vra.mybluehostin.me: basharath@couthit.com
-X-Source: 
-X-Source-Args: 
-X-Source-Dir: 
 
-From: Roger Quadros <rogerq@ti.com>
+On Fri, 2025-01-24 at 09:32 -0500, Chuck Lever wrote:
+> On 1/23/25 3:25 PM, Jeff Layton wrote:
+> > The current error handling has some problems:
+> >=20
+> > BADSLOT and BADSESSION: don't release the slot before retrying the call
+> >=20
+> > SEQ_MISORDERED: does some sketchy resetting of the seqid? I can't find =
+any
+> > recommendation about doing that in the spec, and it seems wrong.
+>=20
+> Random thought: You might use the Linux NFS client's forechannel session
+> implementation as a code reference.
+>=20
+>=20
+> > Handle all three errors the same way: release the slot, but then handle
+> > it just like we would as if we hadn't gotten a reply; mark the session
+> > as faulty, and retry the call.
+>=20
+> Some questions:
+>=20
+> Why does it matter whether NFSD keeps the slot if both sides plan to
+> destroy the session?
+>=20
 
-The TI Sitara AM57xx series of devices consists of 2 PRU-ICSS instances
-(PRU-ICSS1 and PRU-ICSS2). This patch adds the device tree nodes for the
-PRU-ICSS2 instance to support DUAL-MAC mode of operation.
+It may not be required, but there is no reason to hold onto the slot in
+these cases. Also, at this point, only nfsd has declared that it needs
+a new session (see below).
 
-Each PRU-ICSS instance consists of two PRU cores along with various
-peripherals such as the Interrupt Controller (PRU_INTC), the Industrial
-Ethernet Peripheral(IEP), the Real Time Media Independent Interface
-controller (MII_RT), and the Enhanced Capture (eCAP) event module.
+> Also, AFAICT marking CB_FAULT does not destroy the session, it simply
+> tries to recreate backchannel's rpc_clnt. Perhaps NFSD's callback code
+> should actively destroy the session and let the client drive a fresh
+> CREATE_SESSION to recover?
+>=20
 
-am57-pruss.dtsi - Adds IEP and eCAP peripheral as child nodes of
-the PRUSS subsystem node.
+Marking it with a fault just sets the cl_cb_state to NFSD4_CB_FAULT.
+Then, on the next SEQUENCE call, that makes nfsd set
+SEQ4_STATUS_BACKCHANNEL_FAULT, which should make the client recreate
+the session. Obviously, there is some delay involved there since we
+might have to wait for the client to do a lease renewal before this
+happens.
 
-am57xx-idk-common.dtsi - Adds PRU-ICSS2 instance node along with
-PRU eth port information and corresponding port configuration. It includes
-interrupt mapping for packet reception, HW timestamp collection, and
-PRU Ethernet ports in MII mode.
+>=20
+> > Fixes: 7ba6cad6c88f ("nfsd: New helper nfsd4_cb_sequence_done() for pro=
+cessing more cb errors")
+> > Signed-off-by: Jeff Layton <jlayton@kernel.org>
+> > ---
+> >   fs/nfsd/nfs4callback.c | 27 +++++++++++----------------
+> >   1 file changed, 11 insertions(+), 16 deletions(-)
+> >=20
+> > diff --git a/fs/nfsd/nfs4callback.c b/fs/nfsd/nfs4callback.c
+> > index e12205ef16ca932ffbcc86d67b0817aec2436c89..bfc9de1fcb67b4f05ed2f7a=
+28038cd8290809c17 100644
+> > --- a/fs/nfsd/nfs4callback.c
+> > +++ b/fs/nfsd/nfs4callback.c
+> > @@ -1371,17 +1371,24 @@ static bool nfsd4_cb_sequence_done(struct rpc_t=
+ask *task, struct nfsd4_callback
+> >   		nfsd4_mark_cb_fault(cb->cb_clp);
+> >   		ret =3D false;
+> >   		break;
+> > +	case -NFS4ERR_BADSESSION:
+> > +	case -NFS4ERR_BADSLOT:
+> > +	case -NFS4ERR_SEQ_MISORDERED:
+> > +		/*
+> > +		 * These errors indicate that something has gone wrong
+> > +		 * with the server and client's synchronization. Release
+> > +		 * the slot, but handle it as if we hadn't gotten a reply.
+> > +		 */
+> > +		nfsd41_cb_release_slot(cb);
+> > +		fallthrough;
+> >   	case 1:
+> >   		/*
+> >   		 * cb_seq_status remains 1 if an RPC Reply was never
+> >   		 * received. NFSD can't know if the client processed
+> >   		 * the CB_SEQUENCE operation. Ask the client to send a
+> > -		 * DESTROY_SESSION to recover.
+> > +		 * DESTROY_SESSION to recover, but keep the slot.
+> >   		 */
+> > -		fallthrough;
+> > -	case -NFS4ERR_BADSESSION:
+> >   		nfsd4_mark_cb_fault(cb->cb_clp);
+> > -		ret =3D false;
+> >   		goto need_restart;
+> >   	case -NFS4ERR_DELAY:
+> >   		cb->cb_seq_status =3D 1;
+> > @@ -1390,14 +1397,6 @@ static bool nfsd4_cb_sequence_done(struct rpc_ta=
+sk *task, struct nfsd4_callback
+> >  =20
+> >   		rpc_delay(task, 2 * HZ);
+> >   		return false;
+> > -	case -NFS4ERR_BADSLOT:
+> > -		goto retry_nowait;
+> > -	case -NFS4ERR_SEQ_MISORDERED:
+> > -		if (session->se_cb_seq_nr[cb->cb_held_slot] !=3D 1) {
+> > -			session->se_cb_seq_nr[cb->cb_held_slot] =3D 1;
+> > -			goto retry_nowait;
+> > -		}
+> > -		break;
+> >   	default:
+> >   		nfsd4_mark_cb_fault(cb->cb_clp);
+> >   	}
+> > @@ -1405,10 +1404,6 @@ static bool nfsd4_cb_sequence_done(struct rpc_ta=
+sk *task, struct nfsd4_callback
+> >   	nfsd41_cb_release_slot(cb);
+> >   out:
+> >   	return ret;
+> > -retry_nowait:
+> > -	if (rpc_restart_call_prepare(task))
+> > -		ret =3D false;
+> > -	goto out;
+> >   need_restart:
+> >   	if (!test_bit(NFSD4_CLIENT_CB_KILL, &clp->cl_flags)) {
+> >   		trace_nfsd_cb_restart(clp, cb);
+> >=20
+>=20
+>=20
 
-am571x-idk.dts, am572x-idk.dts and am574x-idk.dts - GPIO configuration
-along with delay configuration for individual PRU Ethernet port.
-
-Signed-off-by: Roger Quadros <rogerq@ti.com>
-Signed-off-by: Andrew F. Davis <afd@ti.com>
-Signed-off-by: Murali Karicheri <m-karicheri2@ti.com>
-Signed-off-by: Parvathi Pudi <parvathi@couthit.com>
-Signed-off-by: Basharath Hussain Khaja <basharath@couthit.com>
----
- arch/arm/boot/dts/ti/omap/am57-pruss.dtsi     | 11 ++++
- arch/arm/boot/dts/ti/omap/am571x-idk.dts      |  8 ++-
- arch/arm/boot/dts/ti/omap/am572x-idk.dts      | 10 +--
- arch/arm/boot/dts/ti/omap/am574x-idk.dts      | 10 +--
- .../boot/dts/ti/omap/am57xx-idk-common.dtsi   | 61 +++++++++++++++++++
- 5 files changed, 91 insertions(+), 9 deletions(-)
-
-diff --git a/arch/arm/boot/dts/ti/omap/am57-pruss.dtsi b/arch/arm/boot/dts/ti/omap/am57-pruss.dtsi
-index 46c5383f0eee..f73316625608 100644
---- a/arch/arm/boot/dts/ti/omap/am57-pruss.dtsi
-+++ b/arch/arm/boot/dts/ti/omap/am57-pruss.dtsi
-@@ -170,6 +170,17 @@ pruss2_iepclk_mux: iepclk-mux@30 {
- 				};
- 			};
- 
-+			pruss2_iep: iep@2e000 {
-+				compatible = "ti,am5728-icss-iep";
-+				reg = <0x2e000 0x31c>;
-+				clocks = <&pruss2_iepclk_mux>;
-+			};
-+
-+			pruss2_ecap: ecap@30000 {
-+				compatible = "ti,pruss-ecap";
-+				reg = <0x30000 0x60>;
-+			};
-+
- 			pruss2_mii_rt: mii-rt@32000 {
- 				compatible = "ti,pruss-mii", "syscon";
- 				reg = <0x32000 0x58>;
-diff --git a/arch/arm/boot/dts/ti/omap/am571x-idk.dts b/arch/arm/boot/dts/ti/omap/am571x-idk.dts
-index 322cf79d22e9..02653b440585 100644
---- a/arch/arm/boot/dts/ti/omap/am571x-idk.dts
-+++ b/arch/arm/boot/dts/ti/omap/am571x-idk.dts
-@@ -214,5 +214,11 @@ &pruss1_mdio {
- };
- 
- &pruss2_mdio {
--	status = "disabled";
-+	reset-gpios = <&gpio5 9 GPIO_ACTIVE_LOW>;
-+	reset-delay-us = <2>;   /* PHY datasheet states 1uS min */
-+};
-+
-+&pruss2_eth {
-+	ti,pruss-gp-mux-sel = <4>,      /* MII2, needed for PRUSS1_MII0 */
-+			      <4>;      /* MII2, needed for PRUSS1_MII1 */
- };
-diff --git a/arch/arm/boot/dts/ti/omap/am572x-idk.dts b/arch/arm/boot/dts/ti/omap/am572x-idk.dts
-index 94a738cb0a4d..54a8ccb9ca14 100644
---- a/arch/arm/boot/dts/ti/omap/am572x-idk.dts
-+++ b/arch/arm/boot/dts/ti/omap/am572x-idk.dts
-@@ -28,10 +28,12 @@ &mmc2 {
- 	pinctrl-2 = <&mmc2_pins_ddr_rev20>;
- };
- 
--&pruss1_mdio {
--	status = "disabled";
-+&pruss2_eth0_phy {
-+	reset-gpios = <&gpio5 8 GPIO_ACTIVE_LOW>;
-+	reset-assert-us = <2>;   /* PHY datasheet states 1uS min */
- };
- 
--&pruss2_mdio {
--	status = "disabled";
-+&pruss2_eth1_phy {
-+	reset-gpios = <&gpio5 9 GPIO_ACTIVE_LOW>;
-+	reset-assert-us = <2>;   /* PHY datasheet states 1uS min */
- };
-diff --git a/arch/arm/boot/dts/ti/omap/am574x-idk.dts b/arch/arm/boot/dts/ti/omap/am574x-idk.dts
-index 47b9174d2353..47b6c6cb210c 100644
---- a/arch/arm/boot/dts/ti/omap/am574x-idk.dts
-+++ b/arch/arm/boot/dts/ti/omap/am574x-idk.dts
-@@ -40,10 +40,12 @@ &emif1 {
- 	status = "okay";
- };
- 
--&pruss1_mdio {
--	status = "disabled";
-+&pruss2_eth0_phy {
-+	reset-gpios = <&gpio5 8 GPIO_ACTIVE_LOW>;
-+	reset-assert-us = <2>;   /* PHY datasheet states 1uS min */
- };
- 
--&pruss2_mdio {
--	status = "disabled";
-+&pruss2_eth1_phy {
-+	reset-gpios = <&gpio5 9 GPIO_ACTIVE_LOW>;
-+	reset-assert-us = <2>;   /* PHY datasheet states 1uS min */
- };
-diff --git a/arch/arm/boot/dts/ti/omap/am57xx-idk-common.dtsi b/arch/arm/boot/dts/ti/omap/am57xx-idk-common.dtsi
-index 43e3623f079c..0a7db6e8eef1 100644
---- a/arch/arm/boot/dts/ti/omap/am57xx-idk-common.dtsi
-+++ b/arch/arm/boot/dts/ti/omap/am57xx-idk-common.dtsi
-@@ -155,6 +155,52 @@ src_clk_x1: src_clk_x1 {
- 		compatible = "fixed-clock";
- 		clock-frequency = <20000000>;
- 	};
-+
-+	/* Dual-MAC Ethernet application node on PRU-ICSS2 */
-+	pruss2_eth: pruss2-eth {
-+		compatible = "ti,am57-prueth";
-+		ti,prus = <&pru2_0>, <&pru2_1>;
-+		sram = <&ocmcram1>;
-+		ti,mii-rt = <&pruss2_mii_rt>;
-+		ti,iep = <&pruss2_iep>;
-+		ecap = <&pruss2_ecap>;
-+		interrupts = <20 2 2>, <21 3 3>;
-+		interrupt-names = "rx_hp", "rx_lp";
-+		interrupt-parent = <&pruss2_intc>;
-+
-+		ethernet-ports {
-+			#address-cells = <1>;
-+			#size-cells = <0>;
-+			pruss2_emac0: ethernet-port@0 {
-+				reg = <0>;
-+				phy-handle = <&pruss2_eth0_phy>;
-+				phy-mode = "mii";
-+				interrupts = <20 2 2>, <26 6 6>, <23 6 6>;
-+				interrupt-names = "rx", "emac_ptp_tx",
-+								"hsr_ptp_tx";
-+				/* Filled in by bootloader */
-+				local-mac-address = [00 00 00 00 00 00];
-+			};
-+
-+			pruss2_emac1: ethernet-port@1 {
-+				reg = <1>;
-+				phy-handle = <&pruss2_eth1_phy>;
-+				phy-mode = "mii";
-+				interrupts = <21 3 3>, <27 9 7>, <24 9 7>;
-+				interrupt-names = "rx", "emac_ptp_tx",
-+								"hsr_ptp_tx";
-+				/* Filled in by bootloader */
-+				local-mac-address = [00 00 00 00 00 00];
-+			};
-+		};
-+	};
-+
-+};
-+
-+&pruss2_iep {
-+	interrupt-parent = <&pruss2_intc>;
-+	interrupts = <7 7 8>;
-+	interrupt-names = "iep_cap_cmp";
- };
- 
- &dra7_pmx_core {
-@@ -606,3 +652,18 @@ dpi_out: endpoint {
- 		};
- 	};
- };
-+
-+&pruss2_mdio {
-+	status = "okay";
-+	pruss2_eth0_phy: ethernet-phy@0 {
-+		reg = <0>;
-+		interrupt-parent = <&gpio3>;
-+		interrupts = <30 IRQ_TYPE_EDGE_FALLING>;
-+	};
-+
-+	pruss2_eth1_phy: ethernet-phy@1 {
-+		reg = <1>;
-+		interrupt-parent = <&gpio3>;
-+		interrupts = <31 IRQ_TYPE_EDGE_FALLING>;
-+	};
-+};
--- 
-2.34.1
-
+--=20
+Jeff Layton <jlayton@kernel.org>
 
