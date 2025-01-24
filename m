@@ -1,493 +1,126 @@
-Return-Path: <netdev+bounces-160722-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-160723-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id E2054A1AEFC
-	for <lists+netdev@lfdr.de>; Fri, 24 Jan 2025 04:19:56 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id C0B7FA1AF10
+	for <lists+netdev@lfdr.de>; Fri, 24 Jan 2025 04:29:34 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 87F151883E4B
-	for <lists+netdev@lfdr.de>; Fri, 24 Jan 2025 03:19:44 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 7827C3A7638
+	for <lists+netdev@lfdr.de>; Fri, 24 Jan 2025 03:29:27 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A6AA91D8DEA;
-	Fri, 24 Jan 2025 03:18:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2BEE81D63C5;
+	Fri, 24 Jan 2025 03:29:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="nGO0VaxU"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="MZhvDzX5"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pj1-f44.google.com (mail-pj1-f44.google.com [209.85.216.44])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7E9CB1D9337;
-	Fri, 24 Jan 2025 03:18:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B17271EA65;
+	Fri, 24 Jan 2025 03:29:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.44
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1737688736; cv=none; b=swzD+X90shE29PMISUWPX5sUXKDh4yMka+77ZqamMPE4uPNsPz8KMPjeXmtyqX4QIq5lv06Q2J1P5F36er+ufW2NJmKJB0E4DC5nsKCGDGkA/ud4qLAuk7LIdrJYwT6u/xKHKwvB6LCwPp52eu9KQQtxX1FWkmrmI30LyvY7iHk=
+	t=1737689370; cv=none; b=XXnKMTwfU+gKnGPZBq5LQrP1zhUI0N/seDSzmm9nNRyzpzTmye8WJ8g4LolLte26AJZMBY3iVi5BmzCEpmBZL1LXRZz7kZTZHZKC756u2OX5e4HDwWetSgfdh+jliqQuFHSky/XEYqrcZTHSawExMDp+chD4JBvPDnwH8jMRs18=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1737688736; c=relaxed/simple;
-	bh=mtHl+eiTIUYaHdG7xSOt9tfDm1HS0Z8cvpdxG4XToQU=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=mFJNI+XeRivNMGG2jZz2kegCBMXJGLeHYeol0GwfJEn7WiNorZjzS+vzPloD9uUt991Ilw9n++5g6zEZa+dbSmg0k/pgEjUDfUtnwMnOge+Cp75+gvrEH7aeDJnMuZmH6orKKnYDWF1rxa4fTiNScKsOddaOPoonMJiwoz9R1yE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=nGO0VaxU; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 26374C4CEE2;
-	Fri, 24 Jan 2025 03:18:55 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1737688735;
-	bh=mtHl+eiTIUYaHdG7xSOt9tfDm1HS0Z8cvpdxG4XToQU=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=nGO0VaxUD3L/rT8D4N6OCA4ago0ElaYLZ1r127lXOEsfiqCbTj+NiJJJr0rq58Zb4
-	 wacvXN+Ezc3O4nzytvax++QhQzEUkwPNsk1hwEom0xQ3oUrf4tv5EF9ZvFGf0YPcaR
-	 3gT/Dax9CZcD3fJOqVaIwuUx+kV3C6BjX826QcTUxib9DAx1m7mxBSaekM7mIBGSYQ
-	 svNKKayI7mz14wFpO1AwKCgfQxx5wC4S3s9qzX/HJOSyEQjJQnkCd7GpxnJX1sP73J
-	 fNu7RAg5iFS4lbhMrBrsN5ICoKDct5MwRoaEOSsQGJj9cfdXtIEK7KhcNoEGD3ADcg
-	 MVG/9QLKoEsgw==
-From: Jakub Kicinski <kuba@kernel.org>
-To: davem@davemloft.net
-Cc: netdev@vger.kernel.org,
-	edumazet@google.com,
-	pabeni@redhat.com,
-	andrew+netdev@lunn.ch,
-	horms@kernel.org,
-	dan.carpenter@linaro.org,
-	Jakub Kicinski <kuba@kernel.org>,
-	nbd@nbd.name,
-	lorenzo@kernel.org,
-	ryder.lee@mediatek.com,
-	shayne.chen@mediatek.com,
-	sean.wang@mediatek.com,
-	kvalo@kernel.org,
-	matthias.bgg@gmail.com,
-	angelogioacchino.delregno@collabora.com,
-	quan.zhou@mediatek.com,
-	johannes.berg@intel.com,
-	emmanuel.grumbach@intel.com,
-	leitao@debian.org,
-	mingyen.hsieh@mediatek.com,
-	leon.yen@mediatek.com,
-	deren.wu@mediatek.com,
-	chui-hao.chiu@mediatek.com,
-	kuniyu@amazon.com,
-	romieu@fr.zoreil.com,
-	linux-wireless@vger.kernel.org
-Subject: [PATCH net v3 7/7] wifi: mt76: move napi_enable() from under BH
-Date: Thu, 23 Jan 2025 19:18:41 -0800
-Message-ID: <20250124031841.1179756-8-kuba@kernel.org>
-X-Mailer: git-send-email 2.48.1
-In-Reply-To: <20250124031841.1179756-1-kuba@kernel.org>
-References: <20250124031841.1179756-1-kuba@kernel.org>
+	s=arc-20240116; t=1737689370; c=relaxed/simple;
+	bh=+4Wxuy5BCPj8fh7yuefG8SsoZEgoF+IRZmzQsBgphAs=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=Ay58jqEPO36uwR5j7QOXdgkUhN6zb5NvVVR+ZVpJW6ZiRS4YWSDAeWjyhCtEJ9E155m96et5q/GQIoU6a/RZnKma1dNef1I7xX7GTBidUXMUUU1hCiIh4cZ15cNcdmLor5Ectv5G6UDTTl42M6ygrpe15i2f2u0rcz4IyOqQT4A=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=MZhvDzX5; arc=none smtp.client-ip=209.85.216.44
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pj1-f44.google.com with SMTP id 98e67ed59e1d1-2ee786b3277so2323043a91.1;
+        Thu, 23 Jan 2025 19:29:28 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1737689368; x=1738294168; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=gj1RoLoVlwQzdB1wfoIjHWpsMAIiM79D2dMStBxbBwU=;
+        b=MZhvDzX59L65BiDbFIkDo/UvmBRYaCKK7Ars2xEBFygfNl6l6hSCAkoYtoNRyeEyTC
+         0z4vqYaicwNl+RNx9IPBi4CkiNg0z2mpirA2031GFzhZ7xXaxtgtzGmcSd8C//mW+zM8
+         Weo3brHN37Ar/cn4QZX8v/Lo1K/77dCOj5KMwCP/+Qum+hwHVl6Z+M5jrw9Gm95gHZ0x
+         TTQ/FwjmkPTECHYJOou/PSGHVx7Fo0Or45A15VCd/roU4cM2Wa8ZP4v8Sf7qRQNyHtCB
+         on+8BSlfSO1kyxEp7caUsyHCHZtbJTWrheFpzyReRN7g996ZiNpxZzruehQuemfo833/
+         SCqg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1737689368; x=1738294168;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=gj1RoLoVlwQzdB1wfoIjHWpsMAIiM79D2dMStBxbBwU=;
+        b=iYA1dZqTPlcKpuILTPRxbYncNedT8v3MhtiGA/htz0W/o1aSUViBhZP0c1NNrAwiS9
+         xAqPyGX9eq2mzBt057KuMv2vK1d6eoIe082D0sLW1VRX3ZBQhkAHlMGaxXcjip9r2+NW
+         vWm8NXd123CnLnXItxE3BLkqy4/yG8gC3frQgArjOD6pTDK33nay4ancpBgRqyiQze0O
+         A4MtfdSB0CiXtrs8lHEUO3Bxa08AMGIIFlLXRC3j1VRZQO737hj20xEB83Oi3nV36I7U
+         wYk1yT/utgI32UEtvXhuUORwQJgMMbH7HcUPpi6Om4Q3ifXpuhjFMb5++Bc+GxmV9iHq
+         jwRg==
+X-Forwarded-Encrypted: i=1; AJvYcCXT5LqZ6gMi+M1qAStpz/JqsLdHtpn9MruHmKW1q3JBsH68um33pOaiqiFWV32MVGFQr4rAeffFbiiq6CSZDgo=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwOfx8UsBFCwEukTxbYqBFtNqxP53QkAP1X3xn2xVdBddPA9Y4J
+	LeqhrsLlBxtXd5CV3qsn2lEuzIk1AnlDzC+RN6nWiBricOYsZdj2tZYSJjt4y6U=
+X-Gm-Gg: ASbGncsQ3DzQZYmdBTmztbe6eCYrwN0edmahF5l+Fq0YNrhKgnkVoSEtLlWzFZoj2f/
+	b/wb4skUAVm++WNtUk46SMgrHpJ9a0Dg6jBzXM0Sh3L2DrebCukexzMOytJnkVzuQZXIIkVRiZ2
+	DwyOpxkK0KcZMqnujDU1mY9/Ev9U3BYJyz4PRHVta3SC6LHg/6+qK+mgsgXLkCCOcA/lLRI+7AN
+	zVe5FhK6yxcqy7tqo4qMy3iR1AoH3nG+WtvWF4RkQsJ9jjiG7XnQkwyQ0HX4CS7Dx/olrLrDvpN
+	gNF+iT9HLA==
+X-Google-Smtp-Source: AGHT+IH3IwxVBc5iCFfZ/tTdPpbMOu2GN6Xu826DtVOjZAcpvHqXcaecnnKv+c/BIi/cXVPjHrhrJQ==
+X-Received: by 2002:a17:90b:2cc5:b0:2ee:bbe0:98c6 with SMTP id 98e67ed59e1d1-2f782c73b74mr41192728a91.8.1737689367772;
+        Thu, 23 Jan 2025 19:29:27 -0800 (PST)
+Received: from fedora ([43.228.180.230])
+        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-2f7ffa82f9esm511960a91.43.2025.01.23.19.29.23
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 23 Jan 2025 19:29:27 -0800 (PST)
+Date: Fri, 24 Jan 2025 03:29:21 +0000
+From: Hangbin Liu <liuhangbin@gmail.com>
+To: Cosmin Ratiu <cratiu@nvidia.com>
+Cc: netdev@vger.kernel.org, "David S . Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Simon Horman <horms@kernel.org>, Jianbo Liu <jianbol@nvidia.com>,
+	Boris Pismenny <borisp@nvidia.com>,
+	Tariq Toukan <tariqt@nvidia.com>, linux-kselftest@vger.kernel.org,
+	Liang Li <liali@redhat.com>
+Subject: Re: [PATCH net] bonding: Correctly support GSO ESP offload
+Message-ID: <Z5MJEShoqJqiNWP6@fedora>
+References: <20250123150909.387415-1-cratiu@nvidia.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250123150909.387415-1-cratiu@nvidia.com>
 
-mt76 does a lot of:
+On Thu, Jan 23, 2025 at 05:09:09PM +0200, Cosmin Ratiu wrote:
+> The referenced fix is incomplete. It correctly computes
+> bond_dev->gso_partial_features across slaves, but unfortunately
+> netdev_fix_features discards gso_partial_features from the feature set
+> if NETIF_F_GSO_PARTIAL isn't set in bond->features.
+> 
+> This is visible with ethtool -k bond0 | grep esp:
+> tx-esp-segmentation: off [requested on]
+> esp-hw-offload: on
+> esp-tx-csum-hw-offload: on
+> 
+> This patch reworks the bonding GSO offload support by:
+> - making aggregating gso_partial_features across slaves similar to the
+>   other feature sets (this part is a no-op).
+> - adding NETIF_F_GSO_PARTIAL to hw_enc_features filtered across slaves.
+> - adding NETIF_F_GSO_PARTIAL to features in bond_setup()
+> 
+> With all of these, 'ethtool -k bond0 | grep esp' now reports:
+> tx-esp-segmentation: on
+> esp-hw-offload: on
+> esp-tx-csum-hw-offload: on
+> 
+> Fixes: 4861333b4217 ("bonding: add ESP offload features when slaves support")
+> Signed-off-by: Cosmin Ratiu <cratiu@nvidia.com>
+> Change-Id: Iebd2a9d903d3e056e7717e8ca2527a9adf21b2e1
 
-  local_bh_disable();
-  napi_enable(...napi);
-  napi_schedule(...napi);
-  local_bh_enable();
+What's Change-Id here? Others looks good to me.
 
-local_bh_disable() is not a real lock, its most likely taken
-because napi_schedule() requires that we invoke softirqs at
-some point. napi_enable() needs to take a mutex, so move it
-from under the BH protection.
-
-Fixes: 413f0271f396 ("net: protect NAPI enablement with netdev_lock()")
-Reported-by: Dan Carpenter <dan.carpenter@linaro.org>
-Link: https://lore.kernel.org/dcfd56bc-de32-4b11-9e19-d8bd1543745d@stanley.mountain
-Reviewed-by: Eric Dumazet <edumazet@google.com>
-Signed-off-by: Jakub Kicinski <kuba@kernel.org>
----
-v2:
- - reword the commit msg slightly
-v1: https://lore.kernel.org/20250121221519.392014-8-kuba@kernel.org
-
-CC: nbd@nbd.name
-CC: lorenzo@kernel.org
-CC: ryder.lee@mediatek.com
-CC: shayne.chen@mediatek.com
-CC: sean.wang@mediatek.com
-CC: kvalo@kernel.org
-CC: matthias.bgg@gmail.com
-CC: angelogioacchino.delregno@collabora.com
-CC: quan.zhou@mediatek.com
-CC: johannes.berg@intel.com
-CC: emmanuel.grumbach@intel.com
-CC: leitao@debian.org
-CC: mingyen.hsieh@mediatek.com
-CC: leon.yen@mediatek.com
-CC: deren.wu@mediatek.com
-CC: chui-hao.chiu@mediatek.com
-CC: kuniyu@amazon.com
-CC: romieu@fr.zoreil.com
-CC: linux-wireless@vger.kernel.org
----
- drivers/net/wireless/mediatek/mt76/mt7603/mac.c |  9 ++++-----
- drivers/net/wireless/mediatek/mt76/mt7615/pci.c |  8 ++++++--
- .../net/wireless/mediatek/mt76/mt7615/pci_mac.c |  8 +++++---
- drivers/net/wireless/mediatek/mt76/mt76x0/pci.c |  8 +++++---
- .../net/wireless/mediatek/mt76/mt76x02_mmio.c   |  8 +++++---
- drivers/net/wireless/mediatek/mt76/mt76x2/pci.c |  7 +++++--
- drivers/net/wireless/mediatek/mt76/mt7915/mac.c | 17 +++++++++++++----
- drivers/net/wireless/mediatek/mt76/mt7921/pci.c |  7 +++++--
- .../net/wireless/mediatek/mt76/mt7921/pci_mac.c |  7 +++++--
- drivers/net/wireless/mediatek/mt76/mt7925/pci.c |  7 +++++--
- .../net/wireless/mediatek/mt76/mt7925/pci_mac.c |  7 +++++--
- drivers/net/wireless/mediatek/mt76/mt7996/mac.c | 12 ++++++------
- 12 files changed, 69 insertions(+), 36 deletions(-)
-
-diff --git a/drivers/net/wireless/mediatek/mt76/mt7603/mac.c b/drivers/net/wireless/mediatek/mt76/mt7603/mac.c
-index a259f4dd9540..413973d05b43 100644
---- a/drivers/net/wireless/mediatek/mt76/mt7603/mac.c
-+++ b/drivers/net/wireless/mediatek/mt76/mt7603/mac.c
-@@ -1479,14 +1479,13 @@ static void mt7603_mac_watchdog_reset(struct mt7603_dev *dev)
- 	tasklet_enable(&dev->mt76.pre_tbtt_tasklet);
- 	mt7603_beacon_set_timer(dev, -1, beacon_int);
- 
--	local_bh_disable();
- 	napi_enable(&dev->mt76.tx_napi);
--	napi_schedule(&dev->mt76.tx_napi);
--
- 	napi_enable(&dev->mt76.napi[0]);
--	napi_schedule(&dev->mt76.napi[0]);
--
- 	napi_enable(&dev->mt76.napi[1]);
-+
-+	local_bh_disable();
-+	napi_schedule(&dev->mt76.tx_napi);
-+	napi_schedule(&dev->mt76.napi[0]);
- 	napi_schedule(&dev->mt76.napi[1]);
- 	local_bh_enable();
- 
-diff --git a/drivers/net/wireless/mediatek/mt76/mt7615/pci.c b/drivers/net/wireless/mediatek/mt76/mt7615/pci.c
-index 9a278589df4e..68010e27f065 100644
---- a/drivers/net/wireless/mediatek/mt76/mt7615/pci.c
-+++ b/drivers/net/wireless/mediatek/mt76/mt7615/pci.c
-@@ -164,12 +164,16 @@ static int mt7615_pci_resume(struct pci_dev *pdev)
- 		dev_err(mdev->dev, "PDMA engine must be reinitialized\n");
- 
- 	mt76_worker_enable(&mdev->tx_worker);
--	local_bh_disable();
-+
- 	mt76_for_each_q_rx(mdev, i) {
- 		napi_enable(&mdev->napi[i]);
--		napi_schedule(&mdev->napi[i]);
- 	}
- 	napi_enable(&mdev->tx_napi);
-+
-+	local_bh_disable();
-+	mt76_for_each_q_rx(mdev, i) {
-+		napi_schedule(&mdev->napi[i]);
-+	}
- 	napi_schedule(&mdev->tx_napi);
- 	local_bh_enable();
- 
-diff --git a/drivers/net/wireless/mediatek/mt76/mt7615/pci_mac.c b/drivers/net/wireless/mediatek/mt76/mt7615/pci_mac.c
-index a0ca3bbdfcaf..c2e4e6aabd9f 100644
---- a/drivers/net/wireless/mediatek/mt76/mt7615/pci_mac.c
-+++ b/drivers/net/wireless/mediatek/mt76/mt7615/pci_mac.c
-@@ -262,12 +262,14 @@ void mt7615_mac_reset_work(struct work_struct *work)
- 
- 	mt76_worker_enable(&dev->mt76.tx_worker);
- 
--	local_bh_disable();
- 	napi_enable(&dev->mt76.tx_napi);
--	napi_schedule(&dev->mt76.tx_napi);
--
- 	mt76_for_each_q_rx(&dev->mt76, i) {
- 		napi_enable(&dev->mt76.napi[i]);
-+	}
-+
-+	local_bh_disable();
-+	napi_schedule(&dev->mt76.tx_napi);
-+	mt76_for_each_q_rx(&dev->mt76, i) {
- 		napi_schedule(&dev->mt76.napi[i]);
- 	}
- 	local_bh_enable();
-diff --git a/drivers/net/wireless/mediatek/mt76/mt76x0/pci.c b/drivers/net/wireless/mediatek/mt76/mt76x0/pci.c
-index 1eb955f3ca13..b456ccd00d58 100644
---- a/drivers/net/wireless/mediatek/mt76/mt76x0/pci.c
-+++ b/drivers/net/wireless/mediatek/mt76/mt76x0/pci.c
-@@ -282,14 +282,16 @@ static int mt76x0e_resume(struct pci_dev *pdev)
- 
- 	mt76_worker_enable(&mdev->tx_worker);
- 
--	local_bh_disable();
- 	mt76_for_each_q_rx(mdev, i) {
- 		mt76_queue_rx_reset(dev, i);
- 		napi_enable(&mdev->napi[i]);
-+	}
-+	napi_enable(&mdev->tx_napi);
-+
-+	local_bh_disable();
-+	mt76_for_each_q_rx(mdev, i) {
- 		napi_schedule(&mdev->napi[i]);
- 	}
--
--	napi_enable(&mdev->tx_napi);
- 	napi_schedule(&mdev->tx_napi);
- 	local_bh_enable();
- 
-diff --git a/drivers/net/wireless/mediatek/mt76/mt76x02_mmio.c b/drivers/net/wireless/mediatek/mt76/mt76x02_mmio.c
-index 7d840ad4ae65..a82c75ba26e6 100644
---- a/drivers/net/wireless/mediatek/mt76/mt76x02_mmio.c
-+++ b/drivers/net/wireless/mediatek/mt76/mt76x02_mmio.c
-@@ -504,12 +504,14 @@ static void mt76x02_watchdog_reset(struct mt76x02_dev *dev)
- 	mt76_worker_enable(&dev->mt76.tx_worker);
- 	tasklet_enable(&dev->mt76.pre_tbtt_tasklet);
- 
--	local_bh_disable();
- 	napi_enable(&dev->mt76.tx_napi);
--	napi_schedule(&dev->mt76.tx_napi);
--
- 	mt76_for_each_q_rx(&dev->mt76, i) {
- 		napi_enable(&dev->mt76.napi[i]);
-+	}
-+
-+	local_bh_disable();
-+	napi_schedule(&dev->mt76.tx_napi);
-+	mt76_for_each_q_rx(&dev->mt76, i) {
- 		napi_schedule(&dev->mt76.napi[i]);
- 	}
- 	local_bh_enable();
-diff --git a/drivers/net/wireless/mediatek/mt76/mt76x2/pci.c b/drivers/net/wireless/mediatek/mt76/mt76x2/pci.c
-index 67c9d1caa0bd..727bfdd00b40 100644
---- a/drivers/net/wireless/mediatek/mt76/mt76x2/pci.c
-+++ b/drivers/net/wireless/mediatek/mt76/mt76x2/pci.c
-@@ -151,12 +151,15 @@ mt76x2e_resume(struct pci_dev *pdev)
- 
- 	mt76_worker_enable(&mdev->tx_worker);
- 
--	local_bh_disable();
- 	mt76_for_each_q_rx(mdev, i) {
- 		napi_enable(&mdev->napi[i]);
--		napi_schedule(&mdev->napi[i]);
- 	}
- 	napi_enable(&mdev->tx_napi);
-+
-+	local_bh_disable();
-+	mt76_for_each_q_rx(mdev, i) {
-+		napi_schedule(&mdev->napi[i]);
-+	}
- 	napi_schedule(&mdev->tx_napi);
- 	local_bh_enable();
- 
-diff --git a/drivers/net/wireless/mediatek/mt76/mt7915/mac.c b/drivers/net/wireless/mediatek/mt76/mt7915/mac.c
-index 13bdc0a7174c..2ba6eb3038ce 100644
---- a/drivers/net/wireless/mediatek/mt76/mt7915/mac.c
-+++ b/drivers/net/wireless/mediatek/mt76/mt7915/mac.c
-@@ -1356,10 +1356,15 @@ mt7915_mac_restart(struct mt7915_dev *dev)
- 
- 	mt7915_dma_reset(dev, true);
- 
--	local_bh_disable();
- 	mt76_for_each_q_rx(mdev, i) {
- 		if (mdev->q_rx[i].ndesc) {
- 			napi_enable(&dev->mt76.napi[i]);
-+		}
-+	}
-+
-+	local_bh_disable();
-+	mt76_for_each_q_rx(mdev, i) {
-+		if (mdev->q_rx[i].ndesc) {
- 			napi_schedule(&dev->mt76.napi[i]);
- 		}
- 	}
-@@ -1419,8 +1424,9 @@ mt7915_mac_restart(struct mt7915_dev *dev)
- 	if (phy2)
- 		clear_bit(MT76_RESET, &phy2->mt76->state);
- 
--	local_bh_disable();
- 	napi_enable(&dev->mt76.tx_napi);
-+
-+	local_bh_disable();
- 	napi_schedule(&dev->mt76.tx_napi);
- 	local_bh_enable();
- 
-@@ -1570,9 +1576,12 @@ void mt7915_mac_reset_work(struct work_struct *work)
- 	if (phy2)
- 		clear_bit(MT76_RESET, &phy2->mt76->state);
- 
--	local_bh_disable();
- 	mt76_for_each_q_rx(&dev->mt76, i) {
- 		napi_enable(&dev->mt76.napi[i]);
-+	}
-+
-+	local_bh_disable();
-+	mt76_for_each_q_rx(&dev->mt76, i) {
- 		napi_schedule(&dev->mt76.napi[i]);
- 	}
- 	local_bh_enable();
-@@ -1581,8 +1590,8 @@ void mt7915_mac_reset_work(struct work_struct *work)
- 
- 	mt76_worker_enable(&dev->mt76.tx_worker);
- 
--	local_bh_disable();
- 	napi_enable(&dev->mt76.tx_napi);
-+	local_bh_disable();
- 	napi_schedule(&dev->mt76.tx_napi);
- 	local_bh_enable();
- 
-diff --git a/drivers/net/wireless/mediatek/mt76/mt7921/pci.c b/drivers/net/wireless/mediatek/mt76/mt7921/pci.c
-index ba870e1b05fb..a0c9df3c2cc7 100644
---- a/drivers/net/wireless/mediatek/mt76/mt7921/pci.c
-+++ b/drivers/net/wireless/mediatek/mt76/mt7921/pci.c
-@@ -523,12 +523,15 @@ static int mt7921_pci_resume(struct device *device)
- 
- 	mt76_worker_enable(&mdev->tx_worker);
- 
--	local_bh_disable();
- 	mt76_for_each_q_rx(mdev, i) {
- 		napi_enable(&mdev->napi[i]);
--		napi_schedule(&mdev->napi[i]);
- 	}
- 	napi_enable(&mdev->tx_napi);
-+
-+	local_bh_disable();
-+	mt76_for_each_q_rx(mdev, i) {
-+		napi_schedule(&mdev->napi[i]);
-+	}
- 	napi_schedule(&mdev->tx_napi);
- 	local_bh_enable();
- 
-diff --git a/drivers/net/wireless/mediatek/mt76/mt7921/pci_mac.c b/drivers/net/wireless/mediatek/mt76/mt7921/pci_mac.c
-index 2452b1a2d118..881812ba03ff 100644
---- a/drivers/net/wireless/mediatek/mt76/mt7921/pci_mac.c
-+++ b/drivers/net/wireless/mediatek/mt76/mt7921/pci_mac.c
-@@ -81,9 +81,12 @@ int mt7921e_mac_reset(struct mt792x_dev *dev)
- 
- 	mt792x_wpdma_reset(dev, true);
- 
--	local_bh_disable();
- 	mt76_for_each_q_rx(&dev->mt76, i) {
- 		napi_enable(&dev->mt76.napi[i]);
-+	}
-+
-+	local_bh_disable();
-+	mt76_for_each_q_rx(&dev->mt76, i) {
- 		napi_schedule(&dev->mt76.napi[i]);
- 	}
- 	local_bh_enable();
-@@ -115,8 +118,8 @@ int mt7921e_mac_reset(struct mt792x_dev *dev)
- 	err = __mt7921_start(&dev->phy);
- out:
- 
--	local_bh_disable();
- 	napi_enable(&dev->mt76.tx_napi);
-+	local_bh_disable();
- 	napi_schedule(&dev->mt76.tx_napi);
- 	local_bh_enable();
- 
-diff --git a/drivers/net/wireless/mediatek/mt76/mt7925/pci.c b/drivers/net/wireless/mediatek/mt76/mt7925/pci.c
-index f36893e20c61..c7b5dc1dbb34 100644
---- a/drivers/net/wireless/mediatek/mt76/mt7925/pci.c
-+++ b/drivers/net/wireless/mediatek/mt76/mt7925/pci.c
-@@ -556,12 +556,15 @@ static int mt7925_pci_resume(struct device *device)
- 
- 	mt76_worker_enable(&mdev->tx_worker);
- 
--	local_bh_disable();
- 	mt76_for_each_q_rx(mdev, i) {
- 		napi_enable(&mdev->napi[i]);
--		napi_schedule(&mdev->napi[i]);
- 	}
- 	napi_enable(&mdev->tx_napi);
-+
-+	local_bh_disable();
-+	mt76_for_each_q_rx(mdev, i) {
-+		napi_schedule(&mdev->napi[i]);
-+	}
- 	napi_schedule(&mdev->tx_napi);
- 	local_bh_enable();
- 
-diff --git a/drivers/net/wireless/mediatek/mt76/mt7925/pci_mac.c b/drivers/net/wireless/mediatek/mt76/mt7925/pci_mac.c
-index faedbf766d1a..4578d16bf456 100644
---- a/drivers/net/wireless/mediatek/mt76/mt7925/pci_mac.c
-+++ b/drivers/net/wireless/mediatek/mt76/mt7925/pci_mac.c
-@@ -101,12 +101,15 @@ int mt7925e_mac_reset(struct mt792x_dev *dev)
- 
- 	mt792x_wpdma_reset(dev, true);
- 
--	local_bh_disable();
- 	mt76_for_each_q_rx(&dev->mt76, i) {
- 		napi_enable(&dev->mt76.napi[i]);
--		napi_schedule(&dev->mt76.napi[i]);
- 	}
- 	napi_enable(&dev->mt76.tx_napi);
-+
-+	local_bh_disable();
-+	mt76_for_each_q_rx(&dev->mt76, i) {
-+		napi_schedule(&dev->mt76.napi[i]);
-+	}
- 	napi_schedule(&dev->mt76.tx_napi);
- 	local_bh_enable();
- 
-diff --git a/drivers/net/wireless/mediatek/mt76/mt7996/mac.c b/drivers/net/wireless/mediatek/mt76/mt7996/mac.c
-index bc8cba4dca47..019c925ae600 100644
---- a/drivers/net/wireless/mediatek/mt76/mt7996/mac.c
-+++ b/drivers/net/wireless/mediatek/mt76/mt7996/mac.c
-@@ -1695,7 +1695,6 @@ mt7996_mac_restart(struct mt7996_dev *dev)
- 
- 	mt7996_dma_reset(dev, true);
- 
--	local_bh_disable();
- 	mt76_for_each_q_rx(mdev, i) {
- 		if (mtk_wed_device_active(&dev->mt76.mmio.wed) &&
- 		    mt76_queue_is_wed_rro(&mdev->q_rx[i]))
-@@ -1703,10 +1702,11 @@ mt7996_mac_restart(struct mt7996_dev *dev)
- 
- 		if (mdev->q_rx[i].ndesc) {
- 			napi_enable(&dev->mt76.napi[i]);
-+			local_bh_disable();
- 			napi_schedule(&dev->mt76.napi[i]);
-+			local_bh_enable();
- 		}
- 	}
--	local_bh_enable();
- 	clear_bit(MT76_MCU_RESET, &dev->mphy.state);
- 	clear_bit(MT76_STATE_MCU_RUNNING, &dev->mphy.state);
- 
-@@ -1764,8 +1764,8 @@ mt7996_mac_restart(struct mt7996_dev *dev)
- 	if (phy3)
- 		clear_bit(MT76_RESET, &phy3->mt76->state);
- 
--	local_bh_disable();
- 	napi_enable(&dev->mt76.tx_napi);
-+	local_bh_disable();
- 	napi_schedule(&dev->mt76.tx_napi);
- 	local_bh_enable();
- 
-@@ -1958,23 +1958,23 @@ void mt7996_mac_reset_work(struct work_struct *work)
- 	if (phy3)
- 		clear_bit(MT76_RESET, &phy3->mt76->state);
- 
--	local_bh_disable();
- 	mt76_for_each_q_rx(&dev->mt76, i) {
- 		if (mtk_wed_device_active(&dev->mt76.mmio.wed) &&
- 		    mt76_queue_is_wed_rro(&dev->mt76.q_rx[i]))
- 			continue;
- 
- 		napi_enable(&dev->mt76.napi[i]);
-+		local_bh_disable();
- 		napi_schedule(&dev->mt76.napi[i]);
-+		local_bh_enable();
- 	}
--	local_bh_enable();
- 
- 	tasklet_schedule(&dev->mt76.irq_tasklet);
- 
- 	mt76_worker_enable(&dev->mt76.tx_worker);
- 
--	local_bh_disable();
- 	napi_enable(&dev->mt76.tx_napi);
-+	local_bh_disable();
- 	napi_schedule(&dev->mt76.tx_napi);
- 	local_bh_enable();
- 
--- 
-2.48.1
-
+Reviewed-by: Hangbin Liu <liuhangbin@gmail.com>
 
