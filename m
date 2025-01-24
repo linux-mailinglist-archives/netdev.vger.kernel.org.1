@@ -1,219 +1,154 @@
-Return-Path: <netdev+bounces-160687-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-160688-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id CB8B7A1ADFC
-	for <lists+netdev@lfdr.de>; Fri, 24 Jan 2025 01:48:00 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 17E8AA1AE00
+	for <lists+netdev@lfdr.de>; Fri, 24 Jan 2025 01:51:37 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 9C4A7188D2DD
-	for <lists+netdev@lfdr.de>; Fri, 24 Jan 2025 00:48:04 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id BA17D3A5B91
+	for <lists+netdev@lfdr.de>; Fri, 24 Jan 2025 00:51:29 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B64D12FC52;
-	Fri, 24 Jan 2025 00:47:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BDEB21581F2;
+	Fri, 24 Jan 2025 00:51:32 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="QkDY2lFO"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="gYJV0qMi"
 X-Original-To: netdev@vger.kernel.org
-Received: from out-180.mta1.migadu.com (out-180.mta1.migadu.com [95.215.58.180])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ed1-f48.google.com (mail-ed1-f48.google.com [209.85.208.48])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 821CA224CC
-	for <netdev@vger.kernel.org>; Fri, 24 Jan 2025 00:47:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.180
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F333F2CA8;
+	Fri, 24 Jan 2025 00:51:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.48
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1737679676; cv=none; b=bX63iNP5FaNx2D6OvsQhHWBjF2O/HkpZpG1cXW+NcRtlcfdQPfuNfQQHAlziOwKsZ1H/U+BooeCDVmVt01Lbm/qQvymVPIm/FBBkQoYejNGsqy20V88iXf11g9mOnoKeTltuMZXD+r0fb0PCSIHk0fUK3EApVMJw8KH7aArPjd4=
+	t=1737679892; cv=none; b=cPCR1aSIyYjiQ5RW4VJ8ys/wNlJ4bkXSGH05S0hMrmKRxKRDSlbx3SghccYcijBOv+n2q3NckrscLMY7i9VIJBSQewPE8rMU+HynVARztr0XR6JmFZxM8jhpPWvSX1F4tRV5csQ3P+LiiDxTOZFFxMiRvX0b9U6VWDWoSW1LJP4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1737679676; c=relaxed/simple;
-	bh=Vz6y+8dB7hx3JeW+p/kladDwPjHK/Q8zuaZZvkC10uY=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=L6FVRiT0+KFgQTz4UJdeWHdpm5qOLpg/XlKb6LSBSWnpZ/TaWoc/K+pGuVll2o02AOVIehTzIfvrQcmWzkFGgNVua1VrmPlBSW8Uio9I/eEu06h35S1kQJlaw5So0pg1INisLxBlm5UrVGCP2xdgjsFdx7yPagc4Uy4Cmm6rKTQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=QkDY2lFO; arc=none smtp.client-ip=95.215.58.180
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
-Message-ID: <fdf0ddbe-e007-4a5f-bbdf-9a144e8fbe35@linux.dev>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1737679672;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=UUuaKy1sM92Co0RwIGKFEWtlJHw8JW5XxlTLishTd28=;
-	b=QkDY2lFOjcmVdNQELpQS6+vB1VWXHDxWrPrK+FDAsJcNvSKNFBF/vBdEavxZkGrBnIdzQc
-	Q7s2voLmkPf9Rj0MuzAoCTPOK5Mz9dx8JScgxstr+9YBl+z5AEyv6MVQbFQmt8Qh3H7tzD
-	VLSnR9P6lbJAyyJkuD8VcO/s/kCOfVc=
-Date: Thu, 23 Jan 2025 16:47:41 -0800
+	s=arc-20240116; t=1737679892; c=relaxed/simple;
+	bh=zSdHFMEh5R3vcklc5JAWEGNlmIa1A7ADM8hUVCupfww=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=tgn9UWpNoOHjLEbpD3kRySaJNZrBSwjZLN5LXHr1X95paL+2y8Rl/CaQ1tjqdbio8Pzg2yx/rJNdkGwHHtUjgixULljtEzdSmSH/uAFsPhOWlUESTaJaUJ3gzY23daSA8jK7oZRJnkWHUo9U3TbB0x+fz1LYrHsn9XcHMV85unU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=gYJV0qMi; arc=none smtp.client-ip=209.85.208.48
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-ed1-f48.google.com with SMTP id 4fb4d7f45d1cf-5dc10fe4e62so2232921a12.1;
+        Thu, 23 Jan 2025 16:51:30 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1737679889; x=1738284689; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=xvSBc19ja4PhXLkU+eKAiQdkfhdLW998VM8F+55O/Pk=;
+        b=gYJV0qMiy1E9yeMmed9O4LZE+yjyQgfFaZU9Wwn8pQh0VOzFPBJhXKBYUTk0GZtNfK
+         tBk67quOSH/dAzmcjYzTUltxX/5a98z40KtWubw7thJKAQhPcFaRSDsR80r0JhSenPXO
+         k9kcj12JSex5/OBCanRBy8t7PS2F6GqXBye5h4iBLa20S3Z2TtjDSHwRnSr5DsiqvVRm
+         ZZbAS4ee/l7e8ezbs7CFSoJAw9u+lQJAEp1Jwta9rz1hLacE5QdhN748Ln3+VPyQ9/ap
+         x2Jv+pbtAiu8mBO5SpoqfC/pRQwmBLx/iP/SPA7ubdts8XP/pHK0kitoLtPlzODvIIlA
+         i/xA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1737679889; x=1738284689;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=xvSBc19ja4PhXLkU+eKAiQdkfhdLW998VM8F+55O/Pk=;
+        b=iMS4JQBqtwlALfgpmYNPG/GSyqQqoikyN6JgF5f4RVwUbeG2e2ITOwb0md52xvWo8a
+         ojn1dsmuRnKF9LSJAmF/Fkta+kAhnWMyrdiBgKSiQ+XKbG/+UOo6/rfEWs7Pxxo9SbwC
+         W9HUT14Ho3d/cR6pfQzKdc/6pwN6uzLFaj3Q3Xt5b4qqBxDr0BotMKBPpErFMAqPWqDa
+         9rD1t4oG4Mo3+RpREJh7hq+hyhAw27LVUuAkRHpIAABnXdb50vnkyJ1Ay6fmDI5CTyH/
+         XFRIZOprKvsFDr+Kvjbbb86GUgi6zJtcPnYezBRKT2ubFTB1XJ7bp9yGGropqCyUi/k4
+         aqLA==
+X-Forwarded-Encrypted: i=1; AJvYcCUT6csyL1amSwxBAMpZftvb+eszvzjaiRzaXiKUBDgafSwx+1VCVserrKgye/+aa0BskY9ojvG5@vger.kernel.org, AJvYcCUpYR0Ee5oyPEiKIG2POJ4WUXT2KJ89qHDggwNybSN7zZ7YR994Gv9EfBmIQLcnZLF1/OxK6IO2@vger.kernel.org, AJvYcCX1ovOGiaoEtKclVuf2brWPWiexsHAW9E/7cR7DA7Jcw+HGNT8S9sTsXWoQ9RuLUEdp/sum4mPl/I+0DBs=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yzuq/ztasD4HrY9KRztrkaAv6eiedVQzHVPh6KGRAB9EE0Yjdjo
+	aOr7v2UcnVXHmK3bmwn6TBvlEBTMMIXOPQ9D3CBtUDwv8HYj0nE2W64I6MsBfq7BqASMQiUdCdd
+	pSmBZGav4k6MV9Wcx7pGQ2sB1zUw=
+X-Gm-Gg: ASbGncsYDIurPAsR+vDqEACC8z/esYRrUvYCTtPvMGXPxXPPwhB44NenvbW7m5E8Oa5
+	FNgqNHv0M8uzJldEd1IIJe/kN7mxhH6PybicYE5bPVzFSC2O0sgSa9q7VOXhWgOw=
+X-Google-Smtp-Source: AGHT+IF1tqPGeWCO56Ui3/IF5YtLZ4HffGAy69gdkDNqHgnKMo4KAe5zXHUVSHRRevF0akyAOQ+jxWNHKxrP9D0F6UA=
+X-Received: by 2002:a05:6402:5203:b0:5d3:e766:6143 with SMTP id
+ 4fb4d7f45d1cf-5db7db078a1mr28496955a12.30.1737679889079; Thu, 23 Jan 2025
+ 16:51:29 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Subject: Re: [PATCH bpf-next/net v2 4/7] bpf: Add mptcp_subflow bpf_iter
-To: "Matthieu Baerts (NGI0)" <matttbe@kernel.org>,
- Geliang Tang <geliang@kernel.org>
-Cc: mptcp@lists.linux.dev, Mat Martineau <martineau@kernel.org>,
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- Simon Horman <horms@kernel.org>, Alexei Starovoitov <ast@kernel.org>,
- Daniel Borkmann <daniel@iogearbox.net>, Andrii Nakryiko <andrii@kernel.org>,
- Eduard Zingerman <eddyz87@gmail.com>, Song Liu <song@kernel.org>,
- Yonghong Song <yonghong.song@linux.dev>,
- John Fastabend <john.fastabend@gmail.com>, KP Singh <kpsingh@kernel.org>,
- Stanislav Fomichev <sdf@fomichev.me>, Hao Luo <haoluo@google.com>,
- Jiri Olsa <jolsa@kernel.org>, Mykola Lysenko <mykolal@fb.com>,
- Shuah Khan <shuah@kernel.org>, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org, bpf@vger.kernel.org,
- linux-kselftest@vger.kernel.org, Martin KaFai Lau <martin.lau@kernel.org>
-References: <20241219-bpf-next-net-mptcp-bpf_iter-subflows-v2-0-ae244d3cdbbc@kernel.org>
- <20241219-bpf-next-net-mptcp-bpf_iter-subflows-v2-4-ae244d3cdbbc@kernel.org>
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Martin KaFai Lau <martin.lau@linux.dev>
-Content-Language: en-US
-In-Reply-To: <20241219-bpf-next-net-mptcp-bpf_iter-subflows-v2-4-ae244d3cdbbc@kernel.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Migadu-Flow: FLOW_OUT
+References: <20250122023745.584995-1-2045gemini@gmail.com> <20250123071201.3d38d8f6@kernel.org>
+In-Reply-To: <20250123071201.3d38d8f6@kernel.org>
+From: Gui-Dong Han <2045gemini@gmail.com>
+Date: Fri, 24 Jan 2025 08:50:50 +0800
+X-Gm-Features: AWEUYZme8_EJ9mqW8EvRGKPAM6vQW9SNxA7jizwJTxsupziLlDboLeknK7dO-_0
+Message-ID: <CAOPYjvbqkDwMt-PdUOhQXQtZEBvryCjyQ3O1=TNtwrYWdhzb2g@mail.gmail.com>
+Subject: Re: [PATCH v2] atm/fore200e: Fix possible data race in fore200e_open()
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: 3chas3@gmail.com, linux-atm-general@lists.sourceforge.net, 
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org, baijiaju1990@gmail.com, 
+	horms@kernel.org, stable@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On 12/19/24 7:46 AM, Matthieu Baerts (NGI0) wrote:
-> From: Geliang Tang <tanggeliang@kylinos.cn>
-> 
-> It's necessary to traverse all subflows on the conn_list of an MPTCP
-> socket and then call kfunc to modify the fields of each subflow. In
-> kernel space, mptcp_for_each_subflow() helper is used for this:
-> 
-> 	mptcp_for_each_subflow(msk, subflow)
-> 		kfunc(subflow);
-> 
-> But in the MPTCP BPF program, this has not yet been implemented. As
-> Martin suggested recently, this conn_list walking + modify-by-kfunc
-> usage fits the bpf_iter use case.
-> 
-> So this patch adds a new bpf_iter type named "mptcp_subflow" to do
-> this and implements its helpers bpf_iter_mptcp_subflow_new()/_next()/
-> _destroy(). And register these bpf_iter mptcp_subflow into mptcp
-> common kfunc set. Then bpf_for_each() for mptcp_subflow can be used
-> in BPF program like this:
-> 
-> 	bpf_for_each(mptcp_subflow, subflow, msk)
-> 		kfunc(subflow);
-> 
-> Suggested-by: Martin KaFai Lau <martin.lau@kernel.org>
-> Signed-off-by: Geliang Tang <tanggeliang@kylinos.cn>
-> Reviewed-by: Mat Martineau <martineau@kernel.org>
-> Signed-off-by: Matthieu Baerts (NGI0) <matttbe@kernel.org>
-> ---
-> Notes:
->   - v2:
->     - Add BUILD_BUG_ON() checks, similar to the ones done with other
->       bpf_iter_(...) helpers.
->     - Replace msk_owned_by_me() by sock_owned_by_user_nocheck() and
->       !spin_is_locked() (Martin).
-> 
-> A few versions of this single patch have been previously posted to the
-> BPF mailing list by Geliang, before continuing to the MPTCP mailing list
-> only, with other patches of this series. The version of the whole series
-> has been reset to 1, but here is the ChangeLog for the previous ones:
->   - v2: remove msk->pm.lock in _new() and _destroy() (Martin)
->         drop DEFINE_BPF_ITER_FUNC, change opaque[3] to opaque[2] (Andrii)
->   - v3: drop bpf_iter__mptcp_subflow
->   - v4: if msk is NULL, initialize kit->msk to NULL in _new() and check
->         it in _next() (Andrii)
->   - v5: use list_is_last() instead of list_entry_is_head() add
->         KF_ITER_NEW/NEXT/DESTROY flags add msk_owned_by_me in _new()
->   - v6: add KF_TRUSTED_ARGS flag (Andrii, Martin)
-> ---
->   net/mptcp/bpf.c | 53 +++++++++++++++++++++++++++++++++++++++++++++++++++++
->   1 file changed, 53 insertions(+)
-> 
-> diff --git a/net/mptcp/bpf.c b/net/mptcp/bpf.c
-> index c5bfd84c16c43230d9d8e1fd8ff781a767e647b5..e39f0e4fb683c1aa31ee075281daee218dac5878 100644
-> --- a/net/mptcp/bpf.c
-> +++ b/net/mptcp/bpf.c
-> @@ -35,6 +35,15 @@ static const struct btf_kfunc_id_set bpf_mptcp_fmodret_set = {
->   	.set   = &bpf_mptcp_fmodret_ids,
->   };
->   
-> +struct bpf_iter_mptcp_subflow {
-> +	__u64 __opaque[2];
-> +} __aligned(8);
-> +
-> +struct bpf_iter_mptcp_subflow_kern {
-> +	struct mptcp_sock *msk;
-> +	struct list_head *pos;
-> +} __aligned(8);
-> +
->   __bpf_kfunc_start_defs();
->   
->   __bpf_kfunc static struct mptcp_subflow_context *
-> @@ -47,10 +56,54 @@ bpf_mptcp_subflow_ctx(const struct sock *sk)
->   	return NULL;
->   }
->   
-> +__bpf_kfunc static int
-> +bpf_iter_mptcp_subflow_new(struct bpf_iter_mptcp_subflow *it,
-> +			   struct mptcp_sock *msk)
-> +{
-> +	struct bpf_iter_mptcp_subflow_kern *kit = (void *)it;
-> +	struct sock *sk = (struct sock *)msk;
-> +
-> +	BUILD_BUG_ON(sizeof(struct bpf_iter_mptcp_subflow_kern) >
-> +		     sizeof(struct bpf_iter_mptcp_subflow));
-> +	BUILD_BUG_ON(__alignof__(struct bpf_iter_mptcp_subflow_kern) !=
-> +		     __alignof__(struct bpf_iter_mptcp_subflow));
-> +
-> +	kit->msk = msk;
-> +	if (!msk)
+On Thu, Jan 23, 2025 at 11:12=E2=80=AFPM Jakub Kicinski <kuba@kernel.org> w=
+rote:
+>
+> On Wed, 22 Jan 2025 02:37:45 +0000 Gui-Dong Han wrote:
+> > Protect access to fore200e->available_cell_rate with rate_mtx lock to
+> > prevent potential data race.
+> >
+> > In this case, since the update depends on a prior read, a data race
+> > could lead to a wrong fore200e.available_cell_rate value.
+> >
+> > The field fore200e.available_cell_rate is generally protected by the lo=
+ck
+> > fore200e.rate_mtx when accessed. In all other read and write cases, thi=
+s
+> > field is consistently protected by the lock, except for this case and
+> > during initialization.
+>
+> Please describe the call paths which interact to cause the race.
 
-NULL check is not needed. verifier should have rejected it for KF_TRUSTED_ARGS.
+The fore200e.available_cell_rate is a shared resource used to track
+the available bandwidth for allocation.
 
-> +		return -EINVAL;
-> +
-> +	if (!sock_owned_by_user_nocheck(sk) &&
-> +	    !spin_is_locked(&sk->sk_lock.slock))
+The functions fore200e_open(), fore200e_close(), and
+fore200e_change_qos(), which modify fore200e.available_cell_rate to
+reflect bandwidth availability, may interact and cause a race
+condition.
 
-I could have missed something. If it is to catch bug, should it be 
-sock_owned_by_me() that has the lockdep splat? For the cg get/setsockopt hook 
-here, the lock should have already been held earlier in the kernel.
+fore200e_open(struct atm_vcc *vcc)
+{
+    ...
+    /* Pseudo-CBR bandwidth requested? */
+    if ((vcc->qos.txtp.traffic_class =3D=3D ATM_CBR) &&
+(vcc->qos.txtp.max_pcr > 0)) {
 
-This set is only showing the cg sockopt bpf prog but missing the major 
-struct_ops piece. It is hard to comment. I assumed the lock situation is the 
-same for the struct_ops where the lock will be held before calling the 
-struct_ops prog?
+        mutex_lock(&fore200e->rate_mtx);
+        if (fore200e->available_cell_rate < vcc->qos.txtp.max_pcr) {
+            mutex_unlock(&fore200e->rate_mtx);
+            ... // Error handling code
+            return -EAGAIN;
+        }
 
-> +		return -EINVAL;
-> +
-> +	kit->pos = &msk->conn_list;
-> +	return 0;
-> +}
-> +
-> +__bpf_kfunc static struct mptcp_subflow_context *
-> +bpf_iter_mptcp_subflow_next(struct bpf_iter_mptcp_subflow *it)
-> +{
-> +	struct bpf_iter_mptcp_subflow_kern *kit = (void *)it;
-> +
-> +	if (!kit->msk || list_is_last(kit->pos, &kit->msk->conn_list))
-> +		return NULL;
-> +
-> +	kit->pos = kit->pos->next;
-> +	return list_entry(kit->pos, struct mptcp_subflow_context, node);
-> +}
-> +
-> +__bpf_kfunc static void
-> +bpf_iter_mptcp_subflow_destroy(struct bpf_iter_mptcp_subflow *it)
-> +{
-> +}
-> +
->   __bpf_kfunc_end_defs();
->   
->   BTF_KFUNCS_START(bpf_mptcp_common_kfunc_ids)
->   BTF_ID_FLAGS(func, bpf_mptcp_subflow_ctx, KF_RET_NULL)
-> +BTF_ID_FLAGS(func, bpf_iter_mptcp_subflow_new, KF_ITER_NEW | KF_TRUSTED_ARGS)
-> +BTF_ID_FLAGS(func, bpf_iter_mptcp_subflow_next, KF_ITER_NEXT | KF_RET_NULL)
-> +BTF_ID_FLAGS(func, bpf_iter_mptcp_subflow_destroy, KF_ITER_DESTROY)
->   BTF_KFUNCS_END(bpf_mptcp_common_kfunc_ids)
->   
->   static const struct btf_kfunc_id_set bpf_mptcp_common_kfunc_set = {
-> 
+        /* Reserve bandwidth */
+        fore200e->available_cell_rate -=3D vcc->qos.txtp.max_pcr;
+        mutex_unlock(&fore200e->rate_mtx);
+    }
+    ...
+    if (fore200e_activate_vcin(fore200e, 1, vcc, vcc->qos.rxtp.max_sdu) < 0=
+) {
+        ... // Error handling code
+        fore200e->available_cell_rate +=3D vcc->qos.txtp.max_pcr;
+        ... // Error handling code
+        return -EINVAL;
+    }
+}
 
+There is further evidence within fore200e_open() itself. The function
+correctly takes the lock when subtracting vcc->qos.txtp.max_pcr from
+fore200e.available_cell_rate to reserve bandwidth, but later, in the
+error handling path, it adds vcc->qos.txtp.max_pcr back without
+holding the lock. There is no justification for modifying a shared
+resource without the corresponding lock in this case.
+
+Regards,
+Han
 
