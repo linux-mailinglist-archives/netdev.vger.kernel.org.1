@@ -1,81 +1,80 @@
-Return-Path: <netdev+bounces-160917-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-160918-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 179B8A1C2B6
-	for <lists+netdev@lfdr.de>; Sat, 25 Jan 2025 11:21:24 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8EF80A1C2B8
+	for <lists+netdev@lfdr.de>; Sat, 25 Jan 2025 11:21:51 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 4210416A734
-	for <lists+netdev@lfdr.de>; Sat, 25 Jan 2025 10:21:12 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id CC8BC188A9BD
+	for <lists+netdev@lfdr.de>; Sat, 25 Jan 2025 10:21:35 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9F9B9207E18;
-	Sat, 25 Jan 2025 10:20:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D18752080CB;
+	Sat, 25 Jan 2025 10:20:38 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Okeb/j+v"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="VR19NQsc"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f170.google.com (mail-pl1-f170.google.com [209.85.214.170])
+Received: from mail-pl1-f180.google.com (mail-pl1-f180.google.com [209.85.214.180])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 072ED207E10;
-	Sat, 25 Jan 2025 10:20:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.170
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2752B20767A;
+	Sat, 25 Jan 2025 10:20:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.180
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1737800431; cv=none; b=F8QXECDBiiahiXPBQFoZ18vA+trScf7tN5hRnINrgegWTwpALJwRfupJnQktOrHHwMPyHWl8yTJITgj8REIvmXUI0tIylewaCG835Rpwjzi5LDCG0HmuYCqN1SY9MRFeuTFy9vK+kC74iRBvyLxU+A90cDbA6Zeme/z23akuaeM=
+	t=1737800438; cv=none; b=kbX0VjPCrv+3D0Dt1+urA+zvDb1mEkUelwkNO2W+B5rm6ChU4SY1twLHNlJj5/TA1HNWtr5Zz3DIvd6FGnJ+Joxnd+yO/NIBkT4yDi/QGmNJh1WUTenQ/GmGRSrzvrWHpfii9SvzdHkGKnEhzQipsOabw/x6ZwZG6ubY28PKKQY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1737800431; c=relaxed/simple;
-	bh=HeEtOL3k54zb89/FWTsjNFuw4q/j8Gt5GdjLU3lTzP0=;
+	s=arc-20240116; t=1737800438; c=relaxed/simple;
+	bh=ReVL26aH6p26mZ26kw6xQ9IoO9iV2Bv4A9ApO1HmIo4=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=D+4sMEhUS5985TELYAVDhijNIw1SzkBwiW+dLLMU202PP7j289OjF949VLYxKN6Qh+JtcYYdN4cber1JXwLGjPWAaBJo1SO8HPHyZR9opODK4VT61AOL5gojsZw2pD8JAAdGfIcVPITgAHOPMTpGEzIqmGwtpyVq+rjXy1VVwbA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Okeb/j+v; arc=none smtp.client-ip=209.85.214.170
+	 MIME-Version; b=FMQMbkYqk7CsqTVurOUncsyr7V4Z+UK7BgwZFvckwEYbP3o/iBpbaN64wMFT9gblwzIYPLECTJY0V6IAdM5phExombDANqWaGlIpvXYQn+2c72pG2MtEGiypoBmyy4SX8BpCkTmLMWh/WQAUx3m2gFJDStJMKqez60zbIGFy5E4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=VR19NQsc; arc=none smtp.client-ip=209.85.214.180
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pl1-f170.google.com with SMTP id d9443c01a7336-2165cb60719so51509375ad.0;
-        Sat, 25 Jan 2025 02:20:29 -0800 (PST)
+Received: by mail-pl1-f180.google.com with SMTP id d9443c01a7336-21c2f1b610dso66426005ad.0;
+        Sat, 25 Jan 2025 02:20:36 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1737800429; x=1738405229; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1737800436; x=1738405236; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=HYF/+WEcHUxYz6LUGWyjprMe9I73XNctlPRWKUzX670=;
-        b=Okeb/j+vHe+Pnb13jex9hSqHlxbU0yrEo+RVGU98ikqhRMVY7t5jFaHWcVCb+YfbS0
-         ENyt/I5O4lHreqrgwNlQklBglF0DX4PJxSD/5z5uuTpEH3um4BvJ/tCSXjFeMjO0D1cx
-         2uNHC6u3zrz6XGaNbaqiutS0W6Pi59HH/UlbBOlGn0ZazZINOaQ8hUDZ61m3zsuCHHAd
-         W/bPtA5VkVmZRB9tz8FUG6w+Qd2Y0YdBIxlBSSKgW3ws4kN/vBKm0gdVuDiLjJloMcm2
-         mNFLvOXgPysfeoN05A7/RPmOI8+oYyjac2qC8kFqM1uCuKIMeHV0+Jtd3giId6FXo8Q+
-         MKSg==
+        bh=zkbKHzExAW0fQ/U6FarCKCDLHrJfi9LS3u9zqTKNql4=;
+        b=VR19NQscUgDSySJLDcxXhxKZ+ud4uHhd1efcQCOY4lBCpD6ZgZXFBcpVWyibPeCKn+
+         zPBYbJZYXZrv4jrIHLq+UbSIfSeevRgPyIMChKLUbxpQdm//cjhgjqn6HMM9SITYm7ga
+         P1AMpt5W95HndaLH9uYsVPblCW1Tfj5f2YLkYgG4iPHIjdO67jJpXua6WQIJd3HAf5zT
+         Y/5zj1FdSnaDr/+9b+t7L0P3Na58hWBHZNogpt1n46BDkn8Sx/tbp3oPECMtv4I5xtTI
+         TtCtVq+sDhxDSKhUnzbZnSI2bBptuUHaAI0TI4AKtQDLsP4w/zA/Xp3uUew7tjs5EBki
+         PA0A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1737800429; x=1738405229;
+        d=1e100.net; s=20230601; t=1737800436; x=1738405236;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=HYF/+WEcHUxYz6LUGWyjprMe9I73XNctlPRWKUzX670=;
-        b=VQxncmdtBLX1ueu5C5WZWLtxfCS4CUP0/xZCvIGTIQgefeLaBojiGo9ie2S1teAx5c
-         +67ktGvqJAaUpjB3UJUGyQ+AcA0EI37BjIALVQQ929+y9FXmBFTT58CCHpHrZrPwMClI
-         KNBe8MMVqGWTXxOg9wC2VjE+J2s1bYcVU090jysXy3/oor9uCLobdK+4to3qaCB8h4+P
-         ndd04y+IASX4OyAuNo72p7VbxQcz8+9AAOi4hoIoOlY3VyWUCrsVsFTYbmMJWwcJDGqY
-         Dks12AlIfG5gDmWU/sm8kkLk4DhaoS/kXkZTkhsaBthVFuN9TbjudLC3qj1E53Xzx/m8
-         wZsA==
-X-Forwarded-Encrypted: i=1; AJvYcCW/cEC0j5gIRnozSvyxzavrukdE8GzQxKnC+VPIVd+SQg5v19vShjTqLbOGc79sE/ZoaCkeyDQ=@vger.kernel.org, AJvYcCXfDQMbNxqgnkDFqPCTXAMc88+A6MsxbJ+m+WjU+7OBHtmVjoSHUMAlfTG5HrHTAFCG9iXGdbcabbxzwgoVNDo=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwB/jDC1LGnKPcyRziSy9GLRsSi2Fw6EudHZcRpFpFSYoe+ayjE
-	KN0TDn1FF68WQSsKzThNEk/nMmtzgQJKypgbYGMs1vH+KwJQymVBZxbBK02b
-X-Gm-Gg: ASbGncuZc5l4VNpSivUCAMBWgnC/pkh3SDL926OqztxjLrKgqc/kZ7OcuAjZvkAT29w
-	MnXQ55BFsny7FahDwzsRKJr/MldojPrGz+GnkGI69/Kj7DK9s6Z/B352o7iTErfkuL0cAyKiFxs
-	a2/MzYhv/zi/ymzHl2GlbiT6DdELzkwTbZsiXUYoTVPTxT0gKXwSHTyNR3iTCldZFXedU2vo5e5
-	EOFXIGFmF9kf1LV797m7ypEt0wlqzC7+fP/38qJ4HLjjZHV1bQxJj1TuenLJwS2yiS0e/2f1IKP
-	C38iBvYxWYOPj+tutOq0D9Uyza2y2QEsbwbPNsJHXSCkDExXXi6N+Afz
-X-Google-Smtp-Source: AGHT+IGzBwoEOlcBY+G0bOmX/uS2sidJTNzJK39POICAA2N1Fqhiu3ASMl2yF0YdgtDQ2XrN91MAmg==
-X-Received: by 2002:a17:902:db0e:b0:215:522d:72d6 with SMTP id d9443c01a7336-21c355bae02mr538611245ad.38.1737800428799;
-        Sat, 25 Jan 2025 02:20:28 -0800 (PST)
+        bh=zkbKHzExAW0fQ/U6FarCKCDLHrJfi9LS3u9zqTKNql4=;
+        b=W+N2+tzsJeuY3j0J8DgmkYLpSgB6OCzV8RhBlvZ45j0+fPU0QoYU68V9sdLM7GssJC
+         v0M87kjh/kKeL7frwBdvNpxOkxO2eqsFrW+U9YxG61nrFXmO5xc2d72T62DOTwzluRpa
+         VtCbUK3x7h2GCRkQtXvc5Mc2IyC8WRjAn7tT239yQXL3VAP1oyAeK8Wj9JkVwiZSoSad
+         0kThvcFAPXYAkCmY9mQiy/EY7Pe68YVZRRB5OrRCIfl9vzn8UMI/p3wO56CZtSgA1rEF
+         qAR3UAaX5QfEs8VtwcBxRS3sPo8DO1GKLDDHI3Qd2vpssJBRghujZH1Zn600hqUcFcQT
+         vgHw==
+X-Forwarded-Encrypted: i=1; AJvYcCX5Ltfxho6wUwHVZPJdtuJRn9E43bMCWP9BABa6fXguIblfG/liVJ+mbS4wmZrX26B7LmQycwQ=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yy9rOa/32VdxqhfBHzThLc650JrXCaFjotPdkoP+G2DNjpFIQI+
+	BqSYeHklgC3E6/9d/b7M1oqJOY/57hR09CGWikW6UxVPzTW0UN8qVSp8ChUg
+X-Gm-Gg: ASbGncvGL8V1uGUVCx2cAqyre6daH+/KWIVcIwf8ZwFB8FBbO/AvO1wdh3a3IUh8Ult
+	JbnBvfOD5CBdT59R437aISArV29ACCdocRjnsXYmSkdpnMm99UJa/YqMsJU02wUDOkLuPPge3/0
+	eMJ6l25h8vg2tOWtmzv/K2o5oNyhDmVVbmLC54IG9mSeCQYBy6W3rhP4JvLu6GWc1rKPESK8MXH
+	5wwhLzsQTjqHkiQTgx0Q7LZUJpT8jMjP5ycAadwRd7lXJrrtHntZ+sc5bZx5Pc2DIOYddjmEBSZ
+	MQVntprOxWRwxd9nByynccXnAwaHnG4XbEcgHIlgoa3F0IP7jrvDphmw5bS6GVew9MQ=
+X-Google-Smtp-Source: AGHT+IEL+mIPaebwamtGa27uOdF/FkrLTiTyKWZitH97Ao290Y78qu2TxCJGyzVQKtvEHrrkvpoxmg==
+X-Received: by 2002:a17:902:ea10:b0:216:4e9f:4ec9 with SMTP id d9443c01a7336-21c355c2906mr536597425ad.38.1737800436067;
+        Sat, 25 Jan 2025 02:20:36 -0800 (PST)
 Received: from mew.. (p3882177-ipxg22501hodogaya.kanagawa.ocn.ne.jp. [180.15.148.177])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-21da424f344sm29461155ad.232.2025.01.25.02.20.21
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-21da424f344sm29461155ad.232.2025.01.25.02.20.29
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sat, 25 Jan 2025 02:20:28 -0800 (PST)
+        Sat, 25 Jan 2025 02:20:35 -0800 (PST)
 From: FUJITA Tomonori <fujita.tomonori@gmail.com>
 To: linux-kernel@vger.kernel.org
-Cc: Boqun Feng <boqun.feng@gmail.com>,
-	rust-for-linux@vger.kernel.org,
+Cc: rust-for-linux@vger.kernel.org,
 	netdev@vger.kernel.org,
 	andrew@lunn.ch,
 	hkallweit1@gmail.com,
@@ -103,9 +102,9 @@ Cc: Boqun Feng <boqun.feng@gmail.com>,
 	mgorman@suse.de,
 	vschneid@redhat.com,
 	tgunders@redhat.com
-Subject: [PATCH v9 4/8] rust: time: Introduce Instant type
-Date: Sat, 25 Jan 2025 19:18:49 +0900
-Message-ID: <20250125101854.112261-5-fujita.tomonori@gmail.com>
+Subject: [PATCH v9 5/8] rust: time: Add wrapper for fsleep() function
+Date: Sat, 25 Jan 2025 19:18:50 +0900
+Message-ID: <20250125101854.112261-6-fujita.tomonori@gmail.com>
 X-Mailer: git-send-email 2.43.0
 In-Reply-To: <20250125101854.112261-1-fujita.tomonori@gmail.com>
 References: <20250125101854.112261-1-fujita.tomonori@gmail.com>
@@ -117,133 +116,127 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Introduce a type representing a specific point in time. We could use
-the Ktime type but C's ktime_t is used for both timestamp and
-timedelta. To avoid confusion, introduce a new Instant type for
-timestamp.
+Add a wrapper for fsleep(), flexible sleep functions in
+include/linux/delay.h which typically deals with hardware delays.
 
-Rename Ktime to Instant and modify their methods for timestamp.
+The kernel supports several sleep functions to handle various lengths
+of delay. This adds fsleep(), automatically chooses the best sleep
+method based on a duration.
 
-Implement the subtraction operator for Instant:
+sleep functions including fsleep() belongs to TIMERS, not
+TIMEKEEPING. They are maintained separately. rust/kernel/time.rs is an
+abstraction for TIMEKEEPING. To make Rust abstractions match the C
+side, add rust/kernel/time/delay.rs for this wrapper.
 
-Delta = Instant A - Instant B
+fsleep() can only be used in a nonatomic context. This requirement is
+not checked by these abstractions, but it is intended that klint [1]
+or a similar tool will be used to check it in the future.
 
-Reviewed-by: Boqun Feng <boqun.feng@gmail.com>
+Link: https://rust-for-linux.com/klint [1]
 Signed-off-by: FUJITA Tomonori <fujita.tomonori@gmail.com>
 ---
- rust/kernel/time.rs | 77 +++++++++++++++++++++++----------------------
- 1 file changed, 39 insertions(+), 38 deletions(-)
+ rust/helpers/helpers.c    |  1 +
+ rust/helpers/time.c       |  8 +++++++
+ rust/kernel/time.rs       |  2 ++
+ rust/kernel/time/delay.rs | 49 +++++++++++++++++++++++++++++++++++++++
+ 4 files changed, 60 insertions(+)
+ create mode 100644 rust/helpers/time.c
+ create mode 100644 rust/kernel/time/delay.rs
 
+diff --git a/rust/helpers/helpers.c b/rust/helpers/helpers.c
+index dcf827a61b52..d16aeda7a558 100644
+--- a/rust/helpers/helpers.c
++++ b/rust/helpers/helpers.c
+@@ -26,6 +26,7 @@
+ #include "slab.c"
+ #include "spinlock.c"
+ #include "task.c"
++#include "time.c"
+ #include "uaccess.c"
+ #include "vmalloc.c"
+ #include "wait.c"
+diff --git a/rust/helpers/time.c b/rust/helpers/time.c
+new file mode 100644
+index 000000000000..7ae64ad8141d
+--- /dev/null
++++ b/rust/helpers/time.c
+@@ -0,0 +1,8 @@
++// SPDX-License-Identifier: GPL-2.0
++
++#include <linux/delay.h>
++
++void rust_helper_fsleep(unsigned long usecs)
++{
++	fsleep(usecs);
++}
 diff --git a/rust/kernel/time.rs b/rust/kernel/time.rs
-index 622cd01e24d7..d64a05a4f4d1 100644
+index d64a05a4f4d1..eeb0f6a7e5d4 100644
 --- a/rust/kernel/time.rs
 +++ b/rust/kernel/time.rs
-@@ -5,6 +5,22 @@
- //! This module contains the kernel APIs related to time and timers that
- //! have been ported or wrapped for usage by Rust code in the kernel.
- //!
-+//! There are two types in this module:
-+//!
-+//! - The [`Instant`] type represents a specific point in time.
-+//! - The [`Delta`] type represents a span of time.
-+//!
-+//! Note that the C side uses `ktime_t` type to represent both. However, timestamp
-+//! and timedelta are different. To avoid confusion, we use two different types.
-+//!
-+//! A [`Instant`] object can be created by calling the [`Instant::now()`] function.
-+//! It represents a point in time at which the object was created.
-+//! By calling the [`Instant::elapsed()`] method, a [`Delta`] object representing
-+//! the elapsed time can be created. The [`Delta`] object can also be created
-+//! by subtracting two [`Instant`] objects.
-+//!
-+//! A [`Delta`] type supports methods to retrieve the duration in various units.
-+//!
+@@ -24,6 +24,8 @@
  //! C header: [`include/linux/jiffies.h`](srctree/include/linux/jiffies.h).
  //! C header: [`include/linux/ktime.h`](srctree/include/linux/ktime.h).
  
-@@ -31,59 +47,44 @@ pub fn msecs_to_jiffies(msecs: Msecs) -> Jiffies {
-     unsafe { bindings::__msecs_to_jiffies(msecs) }
- }
++pub mod delay;
++
+ /// The number of nanoseconds per microsecond.
+ pub const NSEC_PER_USEC: i64 = bindings::NSEC_PER_USEC as i64;
  
--/// A Rust wrapper around a `ktime_t`.
-+/// A specific point in time.
+diff --git a/rust/kernel/time/delay.rs b/rust/kernel/time/delay.rs
+new file mode 100644
+index 000000000000..02b8731433c7
+--- /dev/null
++++ b/rust/kernel/time/delay.rs
+@@ -0,0 +1,49 @@
++// SPDX-License-Identifier: GPL-2.0
++
++//! Delay and sleep primitives.
++//!
++//! This module contains the kernel APIs related to delay and sleep that
++//! have been ported or wrapped for usage by Rust code in the kernel.
++//!
++//! C header: [`include/linux/delay.h`](srctree/include/linux/delay.h).
++
++use super::Delta;
++use crate::ffi::c_ulong;
++
++/// Sleeps for a given duration at least.
 +///
-+/// # Invariants
++/// Equivalent to the C side [`fsleep()`], flexible sleep function,
++/// which automatically chooses the best sleep method based on a duration.
 +///
-+/// The `inner` value is in the range from 0 to `KTIME_MAX`.
- #[repr(transparent)]
- #[derive(Copy, Clone, PartialEq, PartialOrd, Eq, Ord)]
--pub struct Ktime {
-+pub struct Instant {
-     inner: bindings::ktime_t,
- }
- 
--impl Ktime {
--    /// Create a `Ktime` from a raw `ktime_t`.
--    #[inline]
--    pub fn from_raw(inner: bindings::ktime_t) -> Self {
--        Self { inner }
--    }
--
-+impl Instant {
-     /// Get the current time using `CLOCK_MONOTONIC`.
-     #[inline]
--    pub fn ktime_get() -> Self {
--        // SAFETY: It is always safe to call `ktime_get` outside of NMI context.
--        Self::from_raw(unsafe { bindings::ktime_get() })
--    }
--
--    /// Divide the number of nanoseconds by a compile-time constant.
--    #[inline]
--    fn divns_constant<const DIV: i64>(self) -> i64 {
--        self.to_ns() / DIV
--    }
--
--    /// Returns the number of nanoseconds.
--    #[inline]
--    pub fn to_ns(self) -> i64 {
--        self.inner
-+    pub fn now() -> Self {
-+        // INVARIANT: The `ktime_get()` function returns a value in the range
-+        // from 0 to `KTIME_MAX`.
-+        Self {
-+            // SAFETY: It is always safe to call `ktime_get()` outside of NMI context.
-+            inner: unsafe { bindings::ktime_get() },
-+        }
-     }
- 
--    /// Returns the number of milliseconds.
-+    /// Return the amount of time elapsed since the [`Instant`].
-     #[inline]
--    pub fn to_ms(self) -> i64 {
--        self.divns_constant::<NSEC_PER_MSEC>()
-+    pub fn elapsed(&self) -> Delta {
-+        Self::now() - *self
-     }
- }
- 
--/// Returns the number of milliseconds between two ktimes.
--#[inline]
--pub fn ktime_ms_delta(later: Ktime, earlier: Ktime) -> i64 {
--    (later - earlier).to_ms()
--}
--
--impl core::ops::Sub for Ktime {
--    type Output = Ktime;
-+impl core::ops::Sub for Instant {
-+    type Output = Delta;
- 
-+    // By the type invariant, it never overflows.
-     #[inline]
--    fn sub(self, other: Ktime) -> Ktime {
--        Self {
--            inner: self.inner - other.inner,
-+    fn sub(self, other: Instant) -> Delta {
-+        Delta {
-+            nanos: self.inner - other.inner,
-         }
-     }
- }
++/// `delta` must be within `[0, i32::MAX]` microseconds;
++/// otherwise, it is erroneous behavior. That is, it is considered a bug
++/// to call this function with an out-of-range value, in which case the function
++/// will sleep for at least the maximum value in the range and may warn
++/// in the future.
++///
++/// The behavior above differs from the C side [`fsleep()`] for which out-of-range
++/// values mean "infinite timeout" instead.
++///
++/// This function can only be used in a nonatomic context.
++///
++/// [`fsleep`]: https://docs.kernel.org/timers/delay_sleep_functions.html#c.fsleep
++pub fn fsleep(delta: Delta) {
++    // The maximum value is set to `i32::MAX` microseconds to prevent integer
++    // overflow inside fsleep, which could lead to unintentional infinite sleep.
++    const MAX_DELTA: Delta = Delta::from_micros(i32::MAX as i64);
++
++    let delta = if (Delta::ZERO..=MAX_DELTA).contains(&delta) {
++        delta
++    } else {
++        // TODO: Add WARN_ONCE() when it's supported.
++        MAX_DELTA
++    };
++
++    // SAFETY: It is always safe to call `fsleep()` with any duration.
++    unsafe {
++        // Convert the duration to microseconds and round up to preserve
++        // the guarantee; `fsleep()` sleeps for at least the provided duration,
++        // but that it may sleep for longer under some circumstances.
++        bindings::fsleep(delta.as_micros_ceil() as c_ulong)
++    }
++}
 -- 
 2.43.0
 
