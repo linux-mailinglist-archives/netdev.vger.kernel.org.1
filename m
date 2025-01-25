@@ -1,189 +1,179 @@
-Return-Path: <netdev+bounces-160924-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-160925-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id C1249A1C3BB
-	for <lists+netdev@lfdr.de>; Sat, 25 Jan 2025 15:21:48 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id C7C86A1C3CD
+	for <lists+netdev@lfdr.de>; Sat, 25 Jan 2025 15:44:13 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 1A90A7A3BB7
-	for <lists+netdev@lfdr.de>; Sat, 25 Jan 2025 14:21:39 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id B8AAA7A1821
+	for <lists+netdev@lfdr.de>; Sat, 25 Jan 2025 14:44:03 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 75BED1CF96;
-	Sat, 25 Jan 2025 14:21:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5571626ACC;
+	Sat, 25 Jan 2025 14:44:05 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="GNa1AYsF"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="lASgsfJV"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pj1-f68.google.com (mail-pj1-f68.google.com [209.85.216.68])
+Received: from mail-pl1-f171.google.com (mail-pl1-f171.google.com [209.85.214.171])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D98F31862A;
-	Sat, 25 Jan 2025 14:21:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.68
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B47BB182B4;
+	Sat, 25 Jan 2025 14:44:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.171
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1737814902; cv=none; b=dTp2mgUIGTD43JWwWMPxR0c1lB2U0JYkqCl4+RfPvFRdePmBP518Boze0noWnMSQFiGaduLEakRFs4GfQE7qpZBwJXvjW57AtKbTVi+pUT2y65BYQnzfO9pt+sptHWkjndzcG9PlWPIk+HWPdnnMIcRQruobIKJCUOb2RsqRrxY=
+	t=1737816245; cv=none; b=Si7CT0C/c13KuMc3Io7192U++H4LJcudPN7qxUzJ0tmmpyJnILDpuMrZZBh/UYeaWUsQG2xU9WS9SPrUEW2zP9HsW0E3p0bJ2g+7oXpK3HTc9OrVjUiRdIWbZUdGGVOz4keXEjMcpz4TFKsaIWumPwQf1ZA0SwwOZzWAIPMGR+s=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1737814902; c=relaxed/simple;
-	bh=jqMoW1dcKRbOtwX8OSYhUYh1HDTdWtu3Ce3nwohvLSs=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=o846+n1ei03sM0MHQ5qBRysGySUH5fJmLCQo13J03Ckxtg2k1qZxDdNC6KQ0F+VubftBfmk2D+MUh9QIiwytycU2QC65949CFhdvUKlLkgZQPh5L3ucf//JKIWorZL2kDNH0RyEBUvA4nbG6tZHD1njrDEPyYs6Rr9gzWg7DfJQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=GNa1AYsF; arc=none smtp.client-ip=209.85.216.68
+	s=arc-20240116; t=1737816245; c=relaxed/simple;
+	bh=+58+5hxKBn4yoH5m5yJqyQM4CwShpiBHnutilbAW9tw=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=Z8oPPkZBrPfhhZpQOFI/v56wDJPn/Ov4k8XTUBC6wydOI23jNxKWkPeHwgnclbsXTdhrmNLcEv8RTQkBEDCzloCkmI/yglNJB9IbJHA+70iKCpIWNu5LAXK/OasiZa8Zcsv9Vl+l2As0FKEkUyVvJhXWd7Zx8IPChKBVxdedz/I=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=lASgsfJV; arc=none smtp.client-ip=209.85.214.171
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pj1-f68.google.com with SMTP id 98e67ed59e1d1-2f4448bf96fso4201911a91.0;
-        Sat, 25 Jan 2025 06:21:40 -0800 (PST)
+Received: by mail-pl1-f171.google.com with SMTP id d9443c01a7336-2156e078563so43273615ad.2;
+        Sat, 25 Jan 2025 06:44:03 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1737814900; x=1738419700; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=HP4/uyX6B1UOaDGmtJ3ZSiRctz2FrhSZe9i0JS/eJns=;
-        b=GNa1AYsFNeYh6xe5BMh1LA31mjbcL230YlNJqWbnbI/vo8t8PpBlJmBWyYWGVdQ/1a
-         x/OpMx8gkOhRfxysLxePp+jEsHQe6rKvehpIKhXJig949xwL0YFPOU0KwVm9YIQF+ksD
-         xzjf0p9xY217ZZer7YfQSMtx0iduQFWYXGiTs8uk9/fFqzlDvJshcTP/pGOzv+ViCG/b
-         FrZbO9ZkAP5857csuURxi3Xz8ua2pmyfzYOfprudNSVoF/zxMwGZuAFWyMt3jzC6McYy
-         9tL5wZDLOpG4IoP0WfhBvE6srFVCXA9p+jpUigmIJ5b10PHarRVT23vosomP1B6rTomj
-         yp+w==
+        d=gmail.com; s=20230601; t=1737816243; x=1738421043; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:subject:cc:to:from:date:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=MgdWUzewQLGutGWm0yU3b4mLrNsMLQvksBxEqgoq+88=;
+        b=lASgsfJVAHJEsBHVdP0te1x55n4mvOqA4XaUZzSSSXuwxxz4T2FZPSo90JAEVuIYlA
+         fqjhssA0Ak2NqVNQXR6ep5J5LJbKlpyzAGOIJASGCRRQEjmUtJ7sa0DgR8RIlkTmuHg7
+         3rzMmEVZvRYoQj91UXkaGR6XxYwJX+vr6mZLJJDwP+6HpgpzyCOHOSEXy1t5IaLvD3rk
+         K9dvxlBb15apvzXYgH9MJNnvyUq8TAP7ZZtFnRqCQdIvoAHuEBLGFkZcpJY8omBVwGDw
+         OSmbCcUoNV/UBwbQ8nNhITDk/cC32UUpXn+b1gXodKMhv9HP+GPJNmEF8xuCFAzEVjc9
+         7tMg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1737814900; x=1738419700;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=HP4/uyX6B1UOaDGmtJ3ZSiRctz2FrhSZe9i0JS/eJns=;
-        b=NW2tDkE0Aj0T9vt8nUM7gr3B+vi+lpQ+Eo1Nl1L7o0twp0o6Wnsjlj/62x1WpkCKkx
-         qr/O/T8WBu4lKTOO+NRq1GbVSpRfz9tOu9GIl/DsHo6jKxP+uw4Inlo7w8DspI3ZGtay
-         i9PxxSWykrcio7OocfUyaH5fas41aAkb4fCw6pI+pQnjfI/nhhsTcGubKfUCuShdXNGf
-         qO+gTh+Bd0699tEMzkhJSz0eL0VRwamrB5rwiFSK4ys/kzznNb3BAFHNwKdGe31FGNs0
-         A1bpd3j/MKzvc9h0NqTIYRWh0gRhJYT0WtWH5ZAtLCxSX6SuE7GGg1HbUp37QA5Nz+pE
-         c6aQ==
-X-Forwarded-Encrypted: i=1; AJvYcCWooJ6moJ90NkIGBw7Q0gNSxq9FrIPxgkoozQ6QXS4+BeedPUJso9NwN+ykx+bqn8ETVdtE4DlRDGUZtac=@vger.kernel.org, AJvYcCXIq17ZzLjhToVpSd5rm7sGeTmy7xW16Zu5L9RZF9H9QCGmXDeRo0PsxJUqtN/LrOByLu5Oia/R@vger.kernel.org
-X-Gm-Message-State: AOJu0YwkKVobgohGCOlf7gfqtsn/ytnwFuy1imR69SHkvhxOa5WAzeA3
-	SrVpk7VqM8fPGVl/6Z9eHvleyl6IhthmWdb95qDkICKiSLdOmeij
-X-Gm-Gg: ASbGncsdWjPFTLUZJa0cbcC3BJtwuyIeTomePIW5FV4sOG1BKr/Qz885Es3kOt8+DIk
-	S7Duc/8ctMvBGZEHf25+O7/YlAsapt2iAjYTQ2TP0UstfAdssR3GayWd+l8qwH8OSYnPz6LBFck
-	MMdFsqHkc4wb07mg1uvxyz50CbkJiDSNEL2Q/zpZe7R399t0Qle65ZmaezW65p4b57Jaluk9dHW
-	A/XN3Jt7OJII3O0wIxQsb4MQe9eniryr/X02CKx87QNl6QG6d8TxneRhehEEA08utROATgIMMrV
-	VxQPgqvNvZFSfhTGd4YdyIrUe067+4fFBbwCISyOnFj382NBQSANDIhZrTY+ps4uKVBN
-X-Google-Smtp-Source: AGHT+IE8nfjiqBOhoMdvuASP8+zn5x2vl+lg0jnTEhc0X/DITLhwiZmoWU0m4M3vj/eiiMq66nh6Pg==
-X-Received: by 2002:a17:90b:5448:b0:2ea:5dea:eb0a with SMTP id 98e67ed59e1d1-2f782c4d75cmr47522370a91.4.1737814899977;
-        Sat, 25 Jan 2025 06:21:39 -0800 (PST)
-Received: from ?IPV6:2409:8a55:301b:e120:d418:2fb5:a140:54b6? ([2409:8a55:301b:e120:d418:2fb5:a140:54b6])
-        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-2f7ffa56661sm3622206a91.12.2025.01.25.06.21.35
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Sat, 25 Jan 2025 06:21:39 -0800 (PST)
-Message-ID: <84282526-6229-41c7-8f6b-5f2c500dcd8e@gmail.com>
-Date: Sat, 25 Jan 2025 22:21:31 +0800
+        d=1e100.net; s=20230601; t=1737816243; x=1738421043;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:subject:cc:to:from:date:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=MgdWUzewQLGutGWm0yU3b4mLrNsMLQvksBxEqgoq+88=;
+        b=sRFauiiO7tRAmoXUyA5w6SpGAZgQeL817V8GzPQaSgMppFUOVT3Q6uYhwAWh/zVO+O
+         exls54jhJq0IFykowR2sqWE5XBr1mMUqYAmKGXRS8iupjakyg2kaJW6D0U5b9qeoOuXu
+         3JVNZOO3KyIHvu0f8Ha2hSFeqfaj4qitrwtpF3iN37cB+ugp2XZf+dE1HaHsS0R5DTj2
+         wLtfqYAw/chvcI8Odz+nYF6sykrO+1qw6KHDBqDaTDMkBKtPV0Kym1L30E94vrPrW+lO
+         pPJExkUwenHJCQavCpcaWPBMQZi5fqxmRL0UzM31lL4v3uaTYAiJhS6q1KsXnlezb0J3
+         XW7A==
+X-Forwarded-Encrypted: i=1; AJvYcCUn+GUqkT+xiv4XNvkw9/jqIsjpjmFsvHLsspKrsXB6Wq/M5dgiCPzyktZXTR37bgCq3ocQJWB5@vger.kernel.org, AJvYcCV0cKjlh86qMZ/GFxbZKcaYrx2kjJfp+mecblIZWgXH1ymgQeLyn7X7xiabvDSMRivqqkwetaH6HiTESE8=@vger.kernel.org, AJvYcCWrEqhrSK8lJPwqtz7cJQbBFGLlsdj9a82gyLCLopvwsYniWL3FvwwRYKEReHwRTJP0CyCWNHZR/ClXL2w=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxQs1+QuUnmabqaejw2tI7GgXCzaqGn1KEuyrGwQ4JeBUcJdrKA
+	EQJBk4ozsOB/95cJHbpdl7k4ZDIIhb73HrVUhNoNKZ/ch20bEwRD
+X-Gm-Gg: ASbGncv3SSYkvgvVxMoktDKLTxyM2LJjqA0Q2NMlTivyhYBTTEuwhmF/b+qrCo6af3Z
+	4TTEM3uxeYklyPtYJ1QbfH8BL6wV8wU1Kmej/e3jHM1HQWot9akgf06XDog3rUB5AAiUbBa6+J2
+	LgaURa9+ekaIpxJmnGaD6Rse4bkR8293HU90e6JnKVWyOXnsgyh5pd5qgt1RTLfI2Thef650T3P
+	lUNiW2LYxeFio/pbj9wpvy5GrvEPyAxTg0LiAYQyWJHiSY0RC+sp1OMiZGdn/3rA7pbxhoVm/Nn
+	VQ==
+X-Google-Smtp-Source: AGHT+IHA+4rV48inAhpZB8n1PkLhWTEJWQ25mbCFZqNsfRh6vVjT5iQKXj9RhiGTNIQSvXLlnOGvHQ==
+X-Received: by 2002:a17:902:c943:b0:215:5bd8:9f92 with SMTP id d9443c01a7336-21c351d328amr566604515ad.5.1737816242783;
+        Sat, 25 Jan 2025 06:44:02 -0800 (PST)
+Received: from localhost ([129.146.253.192])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-21da3ea332esm33441735ad.87.2025.01.25.06.43.56
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sat, 25 Jan 2025 06:44:02 -0800 (PST)
+Date: Sat, 25 Jan 2025 22:43:42 +0800
+From: Furong Xu <0x1207@gmail.com>
+To: Ido Schimmel <idosch@idosch.org>
+Cc: Andrew Lunn <andrew@lunn.ch>, Brad Griffis <bgriffis@nvidia.com>, Jon
+ Hunter <jonathanh@nvidia.com>, netdev@vger.kernel.org,
+ linux-stm32@st-md-mailman.stormreply.com,
+ linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
+ Alexander Lobakin <aleksander.lobakin@intel.com>, Joe Damato
+ <jdamato@fastly.com>, Andrew Lunn <andrew+netdev@lunn.ch>, "David S.
+ Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Jakub
+ Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Maxime
+ Coquelin <mcoquelin.stm32@gmail.com>, xfr@outlook.com,
+ "linux-tegra@vger.kernel.org" <linux-tegra@vger.kernel.org>
+Subject: Re: [PATCH net-next v3 1/4] net: stmmac: Switch to zero-copy in
+ non-XDP RX path
+Message-ID: <20250125224342.00006ced@gmail.com>
+In-Reply-To: <Z5S69kb7Qz_QZqOh@shredder>
+References: <cover.1736910454.git.0x1207@gmail.com>
+	<bd7aabf4d9b6696885922ed4bef8fc95142d3004.1736910454.git.0x1207@gmail.com>
+	<d465f277-bac7-439f-be1d-9a47dfe2d951@nvidia.com>
+	<20250124003501.5fff00bc@orangepi5-plus>
+	<e6305e71-5633-48bf-988d-fa2886e16aae@nvidia.com>
+	<ccbecd2a-7889-4389-977e-10da6a00391c@lunn.ch>
+	<20250124104256.00007d23@gmail.com>
+	<Z5S69kb7Qz_QZqOh@shredder>
+X-Mailer: Claws Mail 4.3.0 (GTK 3.24.42; x86_64-w64-mingw32)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next v7 2/8] page_pool: fix timing for checking and
- disabling napi_local
-To: =?UTF-8?Q?Toke_H=C3=B8iland-J=C3=B8rgensen?= <toke@redhat.com>,
- Yunsheng Lin <linyunsheng@huawei.com>, davem@davemloft.net, kuba@kernel.org,
- pabeni@redhat.com
-Cc: zhangkun09@huawei.com, liuyonglong@huawei.com, fanghaiqing@huawei.com,
- Alexander Lobakin <aleksander.lobakin@intel.com>,
- Xuan Zhuo <xuanzhuo@linux.alibaba.com>,
- Jesper Dangaard Brouer <hawk@kernel.org>,
- Ilias Apalodimas <ilias.apalodimas@linaro.org>,
- Eric Dumazet <edumazet@google.com>, Simon Horman <horms@kernel.org>,
- netdev@vger.kernel.org, linux-kernel@vger.kernel.org
-References: <20250110130703.3814407-1-linyunsheng@huawei.com>
- <20250110130703.3814407-3-linyunsheng@huawei.com> <87sepqhe3n.fsf@toke.dk>
- <5059df11-a85b-4404-8c24-a9ccd76924f3@gmail.com> <87plkhn2x7.fsf@toke.dk>
- <2aa84c61-6531-4f17-89e5-101f46ef00d0@huawei.com> <8734h8qgmz.fsf@toke.dk>
-Content-Language: en-US
-From: Yunsheng Lin <yunshenglin0825@gmail.com>
-In-Reply-To: <8734h8qgmz.fsf@toke.dk>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-On 1/25/2025 1:13 AM, Toke Høiland-Jørgensen wrote:
-> Yunsheng Lin <linyunsheng@huawei.com> writes:
+Hi Ido
+
+On Sat, 25 Jan 2025 12:20:38 +0200, Ido Schimmel wrote:
+
+> On Fri, Jan 24, 2025 at 10:42:56AM +0800, Furong Xu wrote:
+> > On Thu, 23 Jan 2025 22:48:42 +0100, Andrew Lunn <andrew@lunn.ch>
+> > wrote: 
+> > > > Just to clarify, the patch that you had us try was not intended
+> > > > as an actual fix, correct? It was only for diagnostic purposes,
+> > > > i.e. to see if there is some kind of cache coherence issue,
+> > > > which seems to be the case?  So perhaps the only fix needed is
+> > > > to add dma-coherent to our device tree?    
+> > > 
+> > > That sounds quite error prone. How many other DT blobs are
+> > > missing the property? If the memory should be coherent, i would
+> > > expect the driver to allocate coherent memory. Or the driver
+> > > needs to handle non-coherent memory and add the necessary
+> > > flush/invalidates etc.  
+> > 
+> > stmmac driver does the necessary cache flush/invalidates to
+> > maintain cache lines explicitly.  
 > 
->>> So I really don't see a way for this race to happen with correct usage
->>> of the page_pool and NAPI APIs, which means there's no reason to make
->>> the change you are proposing here.
->>
->> I looked at one driver setting pp->napi, it seems the bnxt driver doesn't
->> seems to call page_pool_disable_direct_recycling() when unloading, see
->> bnxt_half_close_nic(), page_pool_disable_direct_recycling() seems to be
->> only called for the new queue_mgmt API:
->>
->> /* rtnl_lock held, this call can only be made after a previous successful
->>   * call to bnxt_half_open_nic().
->>   */
->> void bnxt_half_close_nic(struct bnxt *bp)
->> {
->> 	bnxt_hwrm_resource_free(bp, false, true);
->> 	bnxt_del_napi(bp);       *----call napi del and rcu sync----*
->> 	bnxt_free_skbs(bp);
->> 	bnxt_free_mem(bp, true); *------call page_pool_destroy()----*
->> 	clear_bit(BNXT_STATE_HALF_OPEN, &bp->state);
->> }
->>
->> Even if there is a page_pool_disable_direct_recycling() called between
->> bnxt_del_napi() and bnxt_free_mem(), the timing window still exist as
->> rcu sync need to be called after page_pool_disable_direct_recycling(),
->> it seems some refactor is needed for bnxt driver to reuse the rcu sync
->> from the NAPI API, in order to avoid calling the rcu sync for
->> page_pool_destroy().
+> Given the problem happens when the kernel performs syncing, is it
+> possible that there is a problem with how the syncing is performed?
 > 
-> Well, I would consider that usage buggy. A page pool object is created
-> with a reference to the napi struct; so the page pool should also be
-> destroyed (clearing its reference) before the napi memory is freed. I
-> guess this is not really documented anywhere, but it's pretty standard
-> practice to free objects in the opposite order of their creation.
-
-I am not so familiar with rule about the creation API of NAPI, but the
-implementation of bnxt driver can have reference of 'struct napi' before
-calling netif_napi_add(), see below:
-
-static int __bnxt_open_nic(struct bnxt *bp, bool irq_re_init, bool 
-link_re_init)
-{
-	.......
-	rc = bnxt_alloc_mem(bp, irq_re_init);     *create page_pool*
-	if (rc) {
-		netdev_err(bp->dev, "bnxt_alloc_mem err: %x\n", rc);
-		goto open_err_free_mem;
-	}
-
-	if (irq_re_init) {
-		bnxt_init_napi(bp);                *netif_napi_add*
-		rc = bnxt_request_irq(bp);
-		if (rc) {
-			netdev_err(bp->dev, "bnxt_request_irq err: %x\n", rc);
-			goto open_err_irq;
-		}
-	}
-
-	.....
-}
-
+> I am not familiar with this driver, but it seems to allocate multiple
+> buffers per packet when split header is enabled and these buffers are
+> allocated from the same page pool (see stmmac_init_rx_buffers()).
+> Despite that, the driver is creating the page pool with a non-zero
+> offset (see __alloc_dma_rx_desc_resources()) to avoid syncing the
+> headroom, which is only present in the head buffer.
 > 
-> So no, I don't think this is something that should be fixed on the page
-> pool side (and certainly not by adding another synchronize_rcu() call
-> per queue!); rather, we should fix the drivers that get this wrong (and
-> probably document the requirement a bit better).
+> I asked Thierry to test the following patch [1] and initial testing
+> seems OK. He also confirmed that "SPH feature enabled" shows up in the
+> kernel log.
+> BTW, the commit that added split header support (67afd6d1cfdf0) says
+> that it "reduces CPU usage because without the feature all the entire
+> packet is memcpy'ed, while that with the feature only the header is".
+> This is no longer correct after your patch, so is there still value in
+> the split header feature? With two large buffers being allocated from
 
-Even if timing problem of checking and disabling napi_local should not
-be fixed on the page_pool side, do we have some common understanding
-about fixing the DMA API misuse problem on the page_pool side?
-If yes, do we have some common understanding about some mechanism
-like synchronize_rcu() might be still needed on the page_pool side?
+Thanks for these great insights!
 
-If no, I am not sure if there is still any better about how to fix
-the DMA API misuse problem after all the previous discussion?
+Yes, when "SPH feature enabled", it is not correct after my patch,
+pp_params.offset should be updated to match the offset of split payload.
 
-If yes, it may be better to focus on discussing how to avoid calling rcu
-sync for each queue mentioned in [1].
+But I would like to let pp_params.max_len remains to
+dma_conf->dma_buf_sz since the sizes of both header and payload are
+limited to dma_conf->dma_buf_sz by DMA engine, no more than
+dma_conf->dma_buf_sz bytes will be written into a page buffer.
+So my patch would be like [2]:
 
-1. 
-https://lore.kernel.org/all/22de6033-744e-486e-bbd9-8950249cd018@huawei.com/
+BTW, the split header feature will be very useful on some certain
+cases, stmmac driver should support this feature always.
+
+[2]
+diff --git a/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c b/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
+index edbf8994455d..def0d893efbb 100644
+--- a/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
++++ b/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
+@@ -2091,7 +2091,7 @@ static int __alloc_dma_rx_desc_resources(struct stmmac_priv *priv,
+        pp_params.nid = dev_to_node(priv->device);
+        pp_params.dev = priv->device;
+        pp_params.dma_dir = xdp_prog ? DMA_BIDIRECTIONAL : DMA_FROM_DEVICE;
+-       pp_params.offset = stmmac_rx_offset(priv);
++       pp_params.offset = priv->sph ? 0 : stmmac_rx_offset(priv);
+        pp_params.max_len = dma_conf->dma_buf_sz;
+
+        rx_q->page_pool = page_pool_create(&pp_params);
 
