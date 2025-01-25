@@ -1,211 +1,166 @@
-Return-Path: <netdev+bounces-160932-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-160933-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1FAA0A1C5B1
-	for <lists+netdev@lfdr.de>; Sun, 26 Jan 2025 00:02:01 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 56CF5A1C5DE
+	for <lists+netdev@lfdr.de>; Sun, 26 Jan 2025 00:54:48 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 84BC87A2DDD
-	for <lists+netdev@lfdr.de>; Sat, 25 Jan 2025 23:01:51 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id ABAFA164A56
+	for <lists+netdev@lfdr.de>; Sat, 25 Jan 2025 23:54:46 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3445B2045B5;
-	Sat, 25 Jan 2025 23:01:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 31FC220A5DA;
+	Sat, 25 Jan 2025 23:54:41 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="KWIy09TW";
-	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="RS53Zs/2";
-	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="KWIy09TW";
-	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="RS53Zs/2"
+	dkim=pass (2048-bit key) header.d=pen.gy header.i=@pen.gy header.b="PMMxP+TY"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp-out1.suse.de (smtp-out1.suse.de [195.135.223.130])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from ci74p00im-qukt09081901.me.com (ci74p00im-qukt09081901.me.com [17.57.156.8])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F3E1B18D643;
-	Sat, 25 Jan 2025 23:01:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.130
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E2BD620A5CD
+	for <netdev@vger.kernel.org>; Sat, 25 Jan 2025 23:54:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=17.57.156.8
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1737846114; cv=none; b=aDRIO1dspz4rBr9GINsKCt6ViqzRLsCgwXzHOu47O4wtcDNCBsNTrbd5XSibBKGmyb66DL5rniC8oMux06cm/COhI2liRmlBGRL56xlmOnpHyqcHiu3dIMKnJx8fTvLflSDNfXM+k9QzMU00hbeQHR1GoVqFyaALIEPC8ayBj0w=
+	t=1737849281; cv=none; b=FcvlrFVGBu3GtBlbU9uYXehSY6hxZUAITUWcsMl7Sa/Xa4LgF+vp7zxF/pKjgYdfjgyMMzMjmfRP7fgZe7hM4/j53teWOik2RmZfM985kVdwuu5ptQPCUq3HFEkhqHvpvI75fUdeqI3DW31waUUF2Pr4DopfTmzqRtnFHWcGe8I=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1737846114; c=relaxed/simple;
-	bh=1Ed4B/0IaUVW+vGVVb9kM095TAYMhoP1gKTPmjAwSyQ=;
-	h=Content-Type:MIME-Version:From:To:Cc:Subject:In-reply-to:
-	 References:Date:Message-id; b=r1R0+zF+GPlaxAkD2CGsZ0q2Y8B68kfUdfBe7FXWXoae/iozvrYpbSpJ/e2pXhKZU6Op5zvCH5YxwfzwdkqwQ/uQbxpedNZUn/8ZUdk20tTlYJPFKRxgF0dbBbAD+WQWjlq/NqgBxZuXRbY2/ytSIdz5tKB+pF8TUn1Dd/dAsVM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de; spf=pass smtp.mailfrom=suse.de; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=KWIy09TW; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=RS53Zs/2; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=KWIy09TW; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=RS53Zs/2; arc=none smtp.client-ip=195.135.223.130
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.de
-Received: from imap1.dmz-prg2.suse.org (imap1.dmz-prg2.suse.org [IPv6:2a07:de40:b281:104:10:150:64:97])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by smtp-out1.suse.de (Postfix) with ESMTPS id 013CD2115C;
-	Sat, 25 Jan 2025 23:01:50 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-	t=1737846110; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=PAr8bpULekmkXIG5sU7L2o2wvjxophxmJVAoc9r35UY=;
-	b=KWIy09TWyLlaG3Q2DrzqYhuSjkjdQSPPGZ17jRAo9wZ3kgAonrACaadbhImS30ZQVmvGPA
-	v7y+fFt0W+dVwwOy5drTuT23spUw2WnL09Rnn7k8Y0CpGyvyMB0Opmbss7OXs2q9obXGDm
-	oUrm0X2Jky36hihkD+tC/4oRKzbr1v4=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-	s=susede2_ed25519; t=1737846110;
-	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=PAr8bpULekmkXIG5sU7L2o2wvjxophxmJVAoc9r35UY=;
-	b=RS53Zs/2zP1rUDyO+IZzgy+ClrkXJxMkZ5wYKA0yhGajOkhGO4jO7fGu/wSG3kj3WW4Hy+
-	px7smP033dk8moDQ==
-Authentication-Results: smtp-out1.suse.de;
-	dkim=pass header.d=suse.de header.s=susede2_rsa header.b=KWIy09TW;
-	dkim=pass header.d=suse.de header.s=susede2_ed25519 header.b="RS53Zs/2"
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-	t=1737846110; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=PAr8bpULekmkXIG5sU7L2o2wvjxophxmJVAoc9r35UY=;
-	b=KWIy09TWyLlaG3Q2DrzqYhuSjkjdQSPPGZ17jRAo9wZ3kgAonrACaadbhImS30ZQVmvGPA
-	v7y+fFt0W+dVwwOy5drTuT23spUw2WnL09Rnn7k8Y0CpGyvyMB0Opmbss7OXs2q9obXGDm
-	oUrm0X2Jky36hihkD+tC/4oRKzbr1v4=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-	s=susede2_ed25519; t=1737846110;
-	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=PAr8bpULekmkXIG5sU7L2o2wvjxophxmJVAoc9r35UY=;
-	b=RS53Zs/2zP1rUDyO+IZzgy+ClrkXJxMkZ5wYKA0yhGajOkhGO4jO7fGu/wSG3kj3WW4Hy+
-	px7smP033dk8moDQ==
-Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id 77F48137DB;
-	Sat, 25 Jan 2025 23:01:44 +0000 (UTC)
-Received: from dovecot-director2.suse.de ([2a07:de40:b281:106:10:150:64:167])
-	by imap1.dmz-prg2.suse.org with ESMTPSA
-	id wywdC1htlWcoVQAAD6G6ig
-	(envelope-from <neilb@suse.de>); Sat, 25 Jan 2025 23:01:44 +0000
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
+	s=arc-20240116; t=1737849281; c=relaxed/simple;
+	bh=/3P5sFdl42PCXPdLvV175/UlyddKR4OVl50EoTcyQpI=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=eIQHG96MJsktBkxTn9La+S3BmBcwt1zVEvlJB5JRpkeMsS3PxnqnPbFtrhC3dWzAF0csr6pLsv3c4YU9/gb7J053SbbaRn8jiW0rzDXX38lxpbyMcE6DY/JEZfUodHAjCsB73j7PqBDg2HVbrjV4mEW64WohypNrrX86HkIfdCk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=pen.gy; spf=pass smtp.mailfrom=pen.gy; dkim=pass (2048-bit key) header.d=pen.gy header.i=@pen.gy header.b=PMMxP+TY; arc=none smtp.client-ip=17.57.156.8
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=pen.gy
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=pen.gy
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=pen.gy; s=sig1;
+	bh=3mvVsp53JPTfjcVGQNQTBmtX58ErjoxBE3VQAwyiHz8=;
+	h=From:To:Subject:Date:Message-ID:MIME-Version:x-icloud-hme;
+	b=PMMxP+TYEiG7i9HvAYC9scJpCL5zZaIh2CvBR3rzQMzKQ5EDXhsYFcYaOOEz+iPIb
+	 0GMZzB9cyDzv7L+3EYG8DQBhxftW90/zvTcB6QNznWAdM1slZ2VBUpXs5Cl6IPJQJk
+	 LjXJJCU7SP5FOZGlGneQH8mGdJZgaVfvakEuhL7ojmLNLSN5KIhy+nfd5S3utAGDfM
+	 nCJQBZGWnAOmVMhSX79eNJVML8+Y2C3np4BGrdlID5k/drlNUQSwQ93cvUWBAIla3A
+	 H0+e4wK7UzCzbe4H3RRQCD7sIix/pVsklGWjVgwh+XXY/8vbVDuGDQdvBChr1s+2mi
+	 3dYTzVISW4i+A==
+Received: from fossa.se1.pen.gy (ci77p00im-dlb-asmtp-mailmevip.me.com [17.57.156.26])
+	by ci74p00im-qukt09081901.me.com (Postfix) with ESMTPSA id B93A25AC00A8;
+	Sat, 25 Jan 2025 23:54:33 +0000 (UTC)
+From: Foster Snowhill <forst@pen.gy>
+To: "David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>
+Cc: Georgi Valkov <gvalkov@gmail.com>,
+	Simon Horman <horms@kernel.org>,
+	Oliver Neukum <oneukum@suse.com>,
+	netdev@vger.kernel.org,
+	linux-usb@vger.kernel.org
+Subject: [PATCH net v5 0/7] usbnet: ipheth: prevent OoB reads of NDP16
+Date: Sun, 26 Jan 2025 00:54:02 +0100
+Message-ID: <20250125235409.3106594-1-forst@pen.gy>
+X-Mailer: git-send-email 2.45.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-From: "NeilBrown" <neilb@suse.de>
-To: "Jeff Layton" <jlayton@kernel.org>
-Cc: "Chuck Lever" <chuck.lever@oracle.com>,
- "Olga Kornievskaia" <okorniev@redhat.com>, "Dai Ngo" <Dai.Ngo@oracle.com>,
- "Tom Talpey" <tom@talpey.com>, "J. Bruce Fields" <bfields@fieldses.org>,
- "Kinglong Mee" <kinglongmee@gmail.com>,
- "Trond Myklebust" <trondmy@kernel.org>, "Anna Schumaker" <anna@kernel.org>,
- "David S. Miller" <davem@davemloft.net>, "Eric Dumazet" <edumazet@google.com>,
- "Jakub Kicinski" <kuba@kernel.org>, "Paolo Abeni" <pabeni@redhat.com>,
- "Simon Horman" <horms@kernel.org>, linux-nfs@vger.kernel.org,
- linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
- "Jeff Layton" <jlayton@kernel.org>
-Subject:
- Re: [PATCH 1/8] nfsd: don't restart v4.1+ callback when RPC_SIGNALLED is set
-In-reply-to: <20250123-nfsd-6-14-v1-1-c1137a4fa2ae@kernel.org>
-References: <20250123-nfsd-6-14-v1-0-c1137a4fa2ae@kernel.org>,
- <20250123-nfsd-6-14-v1-1-c1137a4fa2ae@kernel.org>
-Date: Sun, 26 Jan 2025 10:01:40 +1100
-Message-id: <173784610046.22054.813567864998956753@noble.neil.brown.name>
-X-Rspamd-Queue-Id: 013CD2115C
-X-Spam-Level: 
-X-Spamd-Result: default: False [-4.51 / 50.00];
-	BAYES_HAM(-3.00)[100.00%];
-	NEURAL_HAM_LONG(-1.00)[-1.000];
-	R_DKIM_ALLOW(-0.20)[suse.de:s=susede2_rsa,suse.de:s=susede2_ed25519];
-	NEURAL_HAM_SHORT(-0.20)[-1.000];
-	MIME_GOOD(-0.10)[text/plain];
-	MX_GOOD(-0.01)[];
-	RCVD_TLS_ALL(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	ARC_NA(0.00)[];
-	MIME_TRACE(0.00)[0:+];
-	MISSING_XM_UA(0.00)[];
-	TO_DN_SOME(0.00)[];
-	RCPT_COUNT_TWELVE(0.00)[18];
-	FREEMAIL_ENVRCPT(0.00)[gmail.com];
-	FUZZY_BLOCKED(0.00)[rspamd.com];
-	DKIM_SIGNED(0.00)[suse.de:s=susede2_rsa,suse.de:s=susede2_ed25519];
-	FROM_HAS_DN(0.00)[];
-	FREEMAIL_CC(0.00)[oracle.com,redhat.com,talpey.com,fieldses.org,gmail.com,kernel.org,davemloft.net,google.com,vger.kernel.org];
-	R_RATELIMIT(0.00)[from(RLewrxuus8mos16izbn)];
-	FROM_EQ_ENVFROM(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[suse.de:dkim];
-	RCVD_COUNT_TWO(0.00)[2];
-	TO_MATCH_ENVRCPT_ALL(0.00)[];
-	DKIM_TRACE(0.00)[suse.de:+]
-X-Rspamd-Server: rspamd2.dmz-prg2.suse.org
-X-Rspamd-Action: no action
-X-Spam-Score: -4.51
-X-Spam-Flag: NO
+Content-Transfer-Encoding: 8bit
+X-Proofpoint-ORIG-GUID: GwpecXrgp-rUIGzOP4tci3K9jVYieNmd
+X-Proofpoint-GUID: GwpecXrgp-rUIGzOP4tci3K9jVYieNmd
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.272,Aquarius:18.0.1057,Hydra:6.0.680,FMLib:17.12.68.34
+ definitions=2025-01-25_11,2025-01-23_01,2024-11-22_01
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 mlxlogscore=811 spamscore=0
+ suspectscore=0 malwarescore=0 phishscore=0 mlxscore=0 clxscore=1030
+ adultscore=0 bulkscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.19.0-2308100000 definitions=main-2501250183
 
-On Fri, 24 Jan 2025, Jeff Layton wrote:
-> This is problematic, since the RPC might have been entirely successful.
-> There is no point in restarting a v4.1+ callback just because
-> RPC_SIGNALLED is true. The v4.1+ error handling has other mechanisms for
-> detecting when it should retransmit the RPC.
+iOS devices support two types of tethering over USB: regular, where the
+internet connection is shared from the phone to the attached computer,
+and reverse, where the internet connection is shared from the attached
+computer to the phone.
 
-But why might RPC_SIGNALLED() ever be true?
-The flag RPC_TASK_SIGNALLED is only ever set by rpc_signal_task() which
-is only called from rpc_killall_tasks() and __rpc_execute() for
-non-async tasks which doesn't apply to nfsd callbacks as they are
-started with rpc_call_async().
+The `ipheth` driver is responsible for regular tethering only. With this
+tethering type, iOS devices support two encapsulation modes on RX:
+legacy and NCM.
 
-rpc_killall_tasks() is called by fs/nfs/ which isn't relevant for us,
-and from rpc_shutdown_client().  In those cases we certainly don't want
-the request to be retried, though the nfsd4_process_cb_update() case is
-a little interesting as we do want it to be retried, but in a different
-client.
+In "NCM mode", the iOS device encapsulates RX (phone->computer) traffic
+in NCM Transfer Blocks (similarly to CDC NCM). However, unlike reverse
+tethering, regular tethering is not compliant with the CDC NCM spec:
 
-So the code you are removing is either dead code because something else
-will prevent the restart when a client is being shut down, or it is bad
-code because it would delay rpc_shutdown_client() while the request is
-retried.=20
+* Does not have the required CDC NCM descriptors
+* TX (computer->phone) is not NCM-encapsulated at all
 
-I haven't dug the extra step to figure out which, but either way I think
-the code should go.
+Thus `ipheth` implements a very limited subset of the spec with the sole
+purpose of parsing RX URBs. This driver does not aim to be
+a CDC NCM-compliant implementation and, in fact, can't be one because of
+the points above.
 
-NeilBrown
+For a complete spec-compliant CDC NCM implementation, there is already
+the `cdc_ncm` driver. This driver is used for reverse tethering on iOS
+devices. This patch series does not in any way change `cdc_ncm`.
+
+In the first iteration of the NCM mode implementation in `ipheth`,
+there were a few potential out of bounds reads when processing malformed
+URBs received from a connected device:
+
+* Only the start of NDP16 (wNdpIndex) was checked to fit in the URB
+  buffer.
+* Datagram length check as part of DPEs could overflow.
+* DPEs could be read past the end of NDP16 and even end of URB buffer
+  if a trailer DPE wasn't encountered.
+
+The above is not expected to happen in normal device operation.
+
+To address the above issues for iOS devices in NCM mode, rely on
+and check for a specific fixed format of incoming URBs expected from
+an iOS device:
+
+* 12-byte NTH16
+* 96-byte NDP16, allowing up to 22 DPEs (up to 21 datagrams + trailer)
+
+On iOS, NDP16 directly follows NTH16, and its length is constant
+regardless of the DPE count.
+
+As the regular tethering implementation of iOS devices isn't compliant
+with CDC NCM, it's not possible to use the `cdc_ncm` driver to handle
+this functionality. Furthermore, while the logic required to properly
+parse URBs with NCM-encapsulated frames is already part of said driver,
+I haven't found a nice way to reuse the existing code without messing
+with the `cdc_ncm` driver itself.
+
+I didn't want to reimplement more of the spec than I absolutely had to,
+because that work had already been done in `cdc_ncm`. Instead, to limit
+the scope, I chose to rely on the specific URB format of iOS devices
+that hasn't changed since the NCM mode was introduced there.
+
+I tested each individual patch in the v5 series with iPhone 15 Pro Max,
+iOS 18.2.1: compiled cleanly, ran iperf3 between phone and computer,
+observed no errors in either kernel log or interface statistics.
+
+v4 was Reviewed-by Jakub Kicinski <kuba@kernel.org>. Compared to v4,
+v5 has no code changes. The two differences are:
+
+* Patch "usbnet: ipheth: break up NCM header size computation"
+  moved later in the series, closer to a subsequent commit that makes
+  use of the change.
+* In patch "usbnet: ipheth: refactor NCM datagram loop", removed
+  a stray paragraph in commit msg.
+
+Above items are also noted in the changelogs of respective patches.
 
 
+Foster Snowhill (7):
+  usbnet: ipheth: fix possible overflow in DPE length check
+  usbnet: ipheth: check that DPE points past NCM header
+  usbnet: ipheth: use static NDP16 location in URB
+  usbnet: ipheth: refactor NCM datagram loop
+  usbnet: ipheth: break up NCM header size computation
+  usbnet: ipheth: fix DPE OoB read
+  usbnet: ipheth: document scope of NCM implementation
 
->=20
-> Fixes: 7ba6cad6c88f ("nfsd: New helper nfsd4_cb_sequence_done() for process=
-ing more cb errors")
-> Signed-off-by: Jeff Layton <jlayton@kernel.org>
-> ---
->  fs/nfsd/nfs4callback.c | 3 ---
->  1 file changed, 3 deletions(-)
->=20
-> diff --git a/fs/nfsd/nfs4callback.c b/fs/nfsd/nfs4callback.c
-> index 50e468bdb8d4838b5217346dcc2bd0fec1765c1a..e12205ef16ca932ffbcc86d67b0=
-817aec2436c89 100644
-> --- a/fs/nfsd/nfs4callback.c
-> +++ b/fs/nfsd/nfs4callback.c
-> @@ -1403,9 +1403,6 @@ static bool nfsd4_cb_sequence_done(struct rpc_task *t=
-ask, struct nfsd4_callback
->  	}
->  	trace_nfsd_cb_free_slot(task, cb);
->  	nfsd41_cb_release_slot(cb);
-> -
-> -	if (RPC_SIGNALLED(task))
-> -		goto need_restart;
->  out:
->  	return ret;
->  retry_nowait:
->=20
-> --=20
-> 2.48.1
->=20
->=20
+ drivers/net/usb/ipheth.c | 69 ++++++++++++++++++++++++++--------------
+ 1 file changed, 45 insertions(+), 24 deletions(-)
+
+-- 
+2.45.1
 
 
