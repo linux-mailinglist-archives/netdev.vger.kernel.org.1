@@ -1,132 +1,96 @@
-Return-Path: <netdev+bounces-160895-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-160896-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id D5491A1C051
-	for <lists+netdev@lfdr.de>; Sat, 25 Jan 2025 02:36:31 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id EDCC2A1C057
+	for <lists+netdev@lfdr.de>; Sat, 25 Jan 2025 02:47:09 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id DFAE318838B7
-	for <lists+netdev@lfdr.de>; Sat, 25 Jan 2025 01:36:35 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 301C3165B4B
+	for <lists+netdev@lfdr.de>; Sat, 25 Jan 2025 01:47:08 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C4E8D1F37D1;
-	Sat, 25 Jan 2025 01:36:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 89C732045B2;
+	Sat, 25 Jan 2025 01:47:04 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="LNl7rHW2"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ZOrRYdoo"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-io1-f44.google.com (mail-io1-f44.google.com [209.85.166.44])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 448571F2C35;
-	Sat, 25 Jan 2025 01:36:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.44
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5DEEF157A72;
+	Sat, 25 Jan 2025 01:47:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1737768988; cv=none; b=GnKlQtaVCD0M45xzEkwEFrobXnhWvaiGBHHFqBg8OoYGGUKTJ0LqOsBT7nwPMLvGHlVqOqSCLJpIsNCO5FoMpg3FGotVb0F9b5z6sGiONM3qQXOrIvIRBPVCYQ3cpfh7J+NlAFfw+Nf/fcFSbRTEP8sMgDYnzTlWIq7HOGjplB0=
+	t=1737769624; cv=none; b=q+tmvcqxrqqZb3YWJ4DNBURBIdSYlCMcs7yxfeQtuDbI2ddcgRRH2Ku8oNKXOWaqV1mmtOTQr3NsEif5+fyBLYOrbVB+mkpJvl51aFI6pZybSR0rtWLH4hmRMId5JlZqaImZceTQQVnj2s27Or3OD1nzuIWth/VuVrYm5q1hTpA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1737768988; c=relaxed/simple;
-	bh=LlXW+3i46sk7hmRqmbpX8fq1YMbBPbwnBQPHqvkl2/o=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=jDjwAfPxX2OQVLQyogASMZOdhl6jVKoh04HV+U15RfXgmzf8r0FL9jsgsjeALeYQkr8uZZV/cYOUcLBT/p4XUr2HIQ7vUlc3oTUNgtaAN/+cildf8aaT+KdumbFBXNDRC9w4FSt9AbMNTMNxD3a9GFhc0CFfwn+syWDar6Kqi/E=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=LNl7rHW2; arc=none smtp.client-ip=209.85.166.44
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-io1-f44.google.com with SMTP id ca18e2360f4ac-8521df70be6so125064339f.1;
-        Fri, 24 Jan 2025 17:36:26 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1737768986; x=1738373786; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=S5Q+YlzN963ayxhnyM9IkYILIEOhwcea4ckyMgDoNhY=;
-        b=LNl7rHW2po0if+Fs0THHT1Qi35BSF2+tefBOFX0NFZV050+IzRU6ksZlX569Akdp3A
-         vf9cnJ0UQVSC6d0LIV+VH8KWWQiZOpcrJ0yhjqJHe7DS5T/uJwCqSAnaH9ikpLh7rJDJ
-         JRAMLStgZcMbIRfDLZtW2fDgx95qbSVjjgIGPkZEl+iM/B9oR+hn5PsqRY+a6BX7rw7X
-         zGkLFXROwP5jAKe0IGH/n9KcXs2ivlvtXpDxQR1QbZ8E0pwTTBbpL3CN/EOMvtsq8+Du
-         xgwosvQ71RAFSiHdUCfs1VNEjYHhTkiqBBWLl171r0IZ4FpVPQ50MqKaSlNqmcuhSvuK
-         Wbfw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1737768986; x=1738373786;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=S5Q+YlzN963ayxhnyM9IkYILIEOhwcea4ckyMgDoNhY=;
-        b=ZaXl8pTYNP65twx3m/Uu2l65G6Oy0hGNYxelM5koHWzhn1YljeI+J8h71ulDCx2X/L
-         yN5miWKRtOlPgvWtDmzzvFV2XT+G9dC7E8SBEtQ1Jh5DD/kfOzgUgY8out1NSSEcSx8W
-         8xwHCTVD/ROJDcV/A84+5za4cRNtPOnjxkzlAc5Wb5e78foXvInkmVUh0WoV4mpdynxw
-         ZKr1QTk20w/Ekll738Qo7/j/+fpSlFrkjFAFQbCk6tERaxc9P9FoNHAxj9uZOyIbBRwE
-         1m7ia91cvSWdXXZUiTXdQSkBQfSNO7sLkKLqFxCFalY+uB0P8CyNlScTsKe0HKiwP8kj
-         8U0w==
-X-Forwarded-Encrypted: i=1; AJvYcCU725w01KlI+K/qdGAWbS0gLx1Uwx9uA4XvsjB4bC9JbAcBAiNx1ztp5jCoefeWDHB70Ek=@vger.kernel.org, AJvYcCW/8+rZe8/oH7eYZ5QvNzLiFG2pekb0e1YZGuhyq3MyafyyWpcTaqvc5qF8VZcb+6YMPbZfA4qk@vger.kernel.org
-X-Gm-Message-State: AOJu0YxoY9i6AAu9ab4mQ/MFlbIiP8Ell4kP3tdJTaAxzhwFkF3RKxKy
-	Ug+ug/knnhrXePpKQdeZHaHXDjdklo/won5F30EETNn3tdyUL9bv4nWD8eGCiRLCL4O3zV/FBRR
-	5UHyKqkEHMnGfPFnTQmfhz8rNJlg=
-X-Gm-Gg: ASbGnct21sAjkYU8bGK2BFGUZyANDXSdSqCbCSECG05OPB2dCGnxvGrMwb/0Lq001ux
-	J2dQ92Ov78WGWZW13YflKIQMrTSEBOzMuLxxPdyAhfWeZAm/pkoW6TTRHHqPXYw==
-X-Google-Smtp-Source: AGHT+IHbF3BGJC0JUJQK5Hp+ZndTeKesim/ojM0+K8C2OBJDVwUrtR9kC5XEyOB4szwODe+8khPO9K+ay4OCh2ALLmE=
-X-Received: by 2002:a05:6e02:743:b0:3cf:cb65:8c74 with SMTP id
- e9e14a558f8ab-3cfcb658d19mr45667355ab.7.1737768986220; Fri, 24 Jan 2025
- 17:36:26 -0800 (PST)
+	s=arc-20240116; t=1737769624; c=relaxed/simple;
+	bh=ZT6UxDBvwU2uW6R/61Z6wjqJ83bFy9oW/BsavLj4Nuc=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=GCqZMKQc8YNuTdAXdQlCPe75At4jmvMrrcCP6mb3MdKmnycbqrGPErRccx1lJqGBkQj4Ex901Xb1NWnWnBvysLDjeozr+eUBdA6mbaL+hpkquG7aBP7jvbXMj5FlTZJOvoel12+DcI/7AspqV7TDanxVpvMeaA3HAIaWBjVzHtI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ZOrRYdoo; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3AC2FC4CED2;
+	Sat, 25 Jan 2025 01:47:03 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1737769623;
+	bh=ZT6UxDBvwU2uW6R/61Z6wjqJ83bFy9oW/BsavLj4Nuc=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=ZOrRYdooZv2tWag03dg1wQLXNbDs5iC9WK9JFoL7ARofBk2TdMPmM/cVCnQ80UFrZ
+	 TkEJ9GOddoX4hjaj4TuO49phHNzN8SxBAM885h+FbCscOD1wtfzQjlZhtGS6ud59Yz
+	 18VJBaO3LA6p3ArqJ/KTs3gL1vBym3M6kEPqkUDWdH6irq7x2bqLlBM5ixwUfnS0/t
+	 0++bLwEeW01P5uH1JXWSkQ3B2pn+27M2uIbTcpgUwF2Iv2BG2rNBE+/kBONFPU4ejb
+	 xukta35nZ7rWBF72xWOuX5YNn0NkroitWne2UaqmuL7kPfWDQsmOD+4Ip7XrbxauQX
+	 m7uRYh87Hz3mA==
+Date: Fri, 24 Jan 2025 17:47:02 -0800
+From: Jakub Kicinski <kuba@kernel.org>
+To: Cosmin Ratiu <cratiu@nvidia.com>
+Cc: "andrew+netdev@lunn.ch" <andrew+netdev@lunn.ch>, "liuhangbin@gmail.com"
+ <liuhangbin@gmail.com>, "davem@davemloft.net" <davem@davemloft.net>, Tariq
+ Toukan <tariqt@nvidia.com>, "linux-kselftest@vger.kernel.org"
+ <linux-kselftest@vger.kernel.org>, "razor@blackwall.org"
+ <razor@blackwall.org>, "linux-kernel@vger.kernel.org"
+ <linux-kernel@vger.kernel.org>, "liali@redhat.com" <liali@redhat.com>,
+ "netdev@vger.kernel.org" <netdev@vger.kernel.org>, "pabeni@redhat.com"
+ <pabeni@redhat.com>, "jv@jvosburgh.net" <jv@jvosburgh.net>,
+ "edumazet@google.com" <edumazet@google.com>, "horms@kernel.org"
+ <horms@kernel.org>, Jianbo Liu <jianbol@nvidia.com>, Boris Pismenny
+ <borisp@nvidia.com>
+Subject: Re: [PATCHv2 net] Bonding: Fix support for gso_partial_features
+Message-ID: <20250124174702.59c4b16b@kernel.org>
+In-Reply-To: <b702b3c1caaa913905009296fa82e36fae264691.camel@nvidia.com>
+References: <20250122135218.183578-1-liuhangbin@gmail.com>
+	<40707a0ed22fa87dbe6b5e28d22fad586158675e.camel@nvidia.com>
+	<fc63c005a8f2fd6a34a055c1ac484bc36869f8a8.camel@nvidia.com>
+	<20250124073833.2b2e2f4c@kernel.org>
+	<b702b3c1caaa913905009296fa82e36fae264691.camel@nvidia.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250121012901.87763-1-kerneljasonxing@gmail.com>
- <20250121012901.87763-9-kerneljasonxing@gmail.com> <40e2a7d8-dcba-4dfe-8c4d-14d8cf4954cf@linux.dev>
- <CAL+tcoCzH2t0Zcn++j_w7s2C1AncczR1oe9RwqzTqBMd4zMNmg@mail.gmail.com> <3a91d654-0e61-4da0-9d09-66a82a24012a@linux.dev>
-In-Reply-To: <3a91d654-0e61-4da0-9d09-66a82a24012a@linux.dev>
-From: Jason Xing <kerneljasonxing@gmail.com>
-Date: Sat, 25 Jan 2025 09:35:50 +0800
-X-Gm-Features: AWEUYZnvyVnV-lfMlI4hB7T56ypxNuGvhbYES1XBHzjPQHRE_wKwmbJ9u0ApDQo
-Message-ID: <CAL+tcoBVtqNA_7dN3vpG9VqagjM=VaRKKxDBUiUK-DHPA5Mg=A@mail.gmail.com>
-Subject: Re: [RFC PATCH net-next v6 08/13] net-timestamp: support hw
- SCM_TSTAMP_SND for bpf extension
-To: Martin KaFai Lau <martin.lau@linux.dev>
-Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org, 
-	pabeni@redhat.com, dsahern@kernel.org, willemdebruijn.kernel@gmail.com, 
-	willemb@google.com, ast@kernel.org, daniel@iogearbox.net, andrii@kernel.org, 
-	eddyz87@gmail.com, song@kernel.org, yonghong.song@linux.dev, 
-	john.fastabend@gmail.com, kpsingh@kernel.org, sdf@fomichev.me, 
-	haoluo@google.com, jolsa@kernel.org, horms@kernel.org, bpf@vger.kernel.org, 
-	netdev@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-On Sat, Jan 25, 2025 at 9:30=E2=80=AFAM Martin KaFai Lau <martin.lau@linux.=
-dev> wrote:
->
-> On 1/24/25 5:18 PM, Jason Xing wrote:
-> >>> @@ -5577,9 +5578,9 @@ static void skb_tstamp_tx_bpf(struct sk_buff *s=
-kb, struct sock *sk,
-> >>>                op =3D BPF_SOCK_OPS_TS_SCHED_OPT_CB;
-> >>>                break;
-> >>>        case SCM_TSTAMP_SND:
-> >>> +             op =3D sw ? BPF_SOCK_OPS_TS_SW_OPT_CB : BPF_SOCK_OPS_TS=
-_HW_OPT_CB;
-> >>>                if (!sw)
-> >>> -                     return;
-> >>> -             op =3D BPF_SOCK_OPS_TS_SW_OPT_CB;
-> >>> +                     *skb_hwtstamps(skb) =3D *hwtstamps;
-> >> hwtstamps may still be NULL, no?
-> > Right, it can be zero if something wrong happens.
->
-> Then it needs a NULL check, no?
+On Fri, 24 Jan 2025 16:03:32 +0000 Cosmin Ratiu wrote:
+> On Fri, 2025-01-24 at 07:38 -0800, Jakub Kicinski wrote:
+> > On Thu, 23 Jan 2025 15:24:37 +0000 Cosmin Ratiu wrote:  
+> > > I've sent another patch to suggest these changes.  
+> > 
+> > FTR this is not the normal way to proceed in code review,
+> > please try to share your feedback rather than taking over
+> > the submission (unless the original author explicitly asks
+> > you to).  
+> 
+> Apologies, I didn't want to take over the submission, both me and
+> Hangbin were simultaneously looking to fix this issue. I was about to
+> send my fix when I saw his proposed one (this thread) and in the
+> interest of expediting the solution, I decided to send mine in addition
+> to commenting here.
+> 
+> Given that we were both fixing the same thing, would adding Signed-off-
+> by with both of us be ok?
 
-My original intention is passing whatever to the userspace, so the bpf
-program will be aware of what is happening in the kernel. Passing NULL
-to hwstamps is right which will not cause any problem, I think.
-
-Do you mean the default value of hwstamps itself is NULL so in this
-case we don't need to re-init it to NULL again?
-
-Like this:
-If (*hwtstamps)
-     *skb_hwtstamps(skb) =3D *hwtstamps;
-
-But it looks no different actually.
-
-Thanks,
-Jason
+That's up to you, but keep in mind for the future that the discussion
+on how to proceed has to happen before you post your own version.
 
