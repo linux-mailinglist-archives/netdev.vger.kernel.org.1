@@ -1,56 +1,56 @@
-Return-Path: <netdev+bounces-160897-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-160898-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 85E28A1C07A
-	for <lists+netdev@lfdr.de>; Sat, 25 Jan 2025 03:26:13 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id DBDA8A1C07E
+	for <lists+netdev@lfdr.de>; Sat, 25 Jan 2025 03:37:29 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D851616AFB6
-	for <lists+netdev@lfdr.de>; Sat, 25 Jan 2025 02:26:11 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 3BC627A508F
+	for <lists+netdev@lfdr.de>; Sat, 25 Jan 2025 02:37:20 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B1C1620469B;
-	Sat, 25 Jan 2025 02:26:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3E2D641A8F;
+	Sat, 25 Jan 2025 02:37:23 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="RYPFXTmu"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="PgzxJoXf"
 X-Original-To: netdev@vger.kernel.org
-Received: from out-188.mta1.migadu.com (out-188.mta1.migadu.com [95.215.58.188])
+Received: from out-184.mta0.migadu.com (out-184.mta0.migadu.com [91.218.175.184])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BCFF91FBCB5
-	for <netdev@vger.kernel.org>; Sat, 25 Jan 2025 02:26:07 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.188
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 54D284A0C
+	for <netdev@vger.kernel.org>; Sat, 25 Jan 2025 02:37:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.184
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1737771969; cv=none; b=JBn8+HjSFWIgB7IZSloh2RyHqGbigoie00f0APCBsU4r8nyo2xRhVSBmscH6pzmH+DWbNXBy7C7IdEMfoFfaU5uAIRcp6ntJMMFclCrh1euampclv59gcVvu0PJ41MjfZ89YD39JDuMLDW+/gGHAKYVkb336wGjKKRF5mcvR4XY=
+	t=1737772643; cv=none; b=YZpWwRMGRyMKq77PqWgqjCnMKLkTNQaDm9FPVVvy7BSqnMj5yR9E8cA/mPhOuwp918n7nlraZ3EMtSUJ9RNIKZkKvAhGVYKYEnFEab2rrqZY7e776e7lWcHOEi4LjGj1hTFtmteRF4t9rt8/8iMQnoUnKMJTussYkeEOttMKjig=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1737771969; c=relaxed/simple;
-	bh=sfbyUGNl3BV6cxE3z3Mz62fIxi69c1t5lU8wWDuMWyc=;
+	s=arc-20240116; t=1737772643; c=relaxed/simple;
+	bh=/EwTh95JkZoqDpEO1YKgOkQmeAFxmldgcbsp4VFIv9c=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=rzoCmaOsUulyLCrY/y/B2xx6h4XmDSE3gvFX/BI87W1Xg9WEmm8DZWAj/Uan86ohsZlVs+Ry8+lGKpvo6LwZ/JuPuYiZT82GVbstVqZc28DXI3fjuoNnccqEiSKSrx2BMWrv8YcInvWz/wsDviLld2q6zPMvAPomBEFKU5GXQJw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=RYPFXTmu; arc=none smtp.client-ip=95.215.58.188
+	 In-Reply-To:Content-Type; b=NhIyuBr8FerQ6SlbMKZ2ViONvJmC57vhuL+N7tcSZR6kuSs+pDwdDOG4AdN4UyIOilrqQu405FhhY1+FOx76/6VHJmq8/zBNUdCC7PMCcy+z2VoRap84+99DjWS85Kd8GSwpSh1JRIxK18etjMy0UY4selUP6xbXCPQ8AmNILzM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=PgzxJoXf; arc=none smtp.client-ip=91.218.175.184
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
-Message-ID: <331cec22-3931-4723-aa5a-03d8a9dc6040@linux.dev>
+Message-ID: <7bf7110c-b978-45b8-9f74-4a37d6e98d5d@linux.dev>
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1737771954;
+	t=1737772627;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=ay1VXtsc9zMEJ5Y8hUSrlKQ//fWdWs0EUEFxmqfAedw=;
-	b=RYPFXTmu3EYsLiXDo1MMCiV8pB7kaJ4yRpT2IzJTKhkivijjAxoNlXJcF5DKhAUtxkfAt9
-	/oELO3CWB5dJQ21o/Mh0jxQGZjm6Mv+r9rm3Zn44D6PM2VXqR4y2/BHJ0qOjweTSrP3lHk
-	vQou6jX2ofmVamHK0rqCknz6vdatGGA=
-Date: Fri, 24 Jan 2025 18:25:40 -0800
+	bh=i6iLXzzDkmBVt4OLxXu7H0CDJXdKde9nVZhravGadgs=;
+	b=PgzxJoXfOymHj0LUJvgEiriKiMxP/LQhEMAwLFjTFnHy68tvcH489/B5TKs9cDg6ee21uV
+	xKPS5uskwq/rxbrF8QMX8zOIfhKYzq0jVAFgMnazh9aUrq2KnTFhnWWHBdZZExrmyPvNzg
+	zhIjEwUCPMc+SdA40hsV3KkM/zXvRkE=
+Date: Fri, 24 Jan 2025 18:36:54 -0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Subject: Re: [RFC PATCH net-next v6 04/13] bpf: stop UDP sock accessing TCP
- fields in sock_op BPF CALLs
+Subject: Re: [RFC PATCH net-next v6 08/13] net-timestamp: support hw
+ SCM_TSTAMP_SND for bpf extension
 To: Jason Xing <kerneljasonxing@gmail.com>
 Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
  pabeni@redhat.com, dsahern@kernel.org, willemdebruijn.kernel@gmail.com,
@@ -60,120 +60,59 @@ Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
  haoluo@google.com, jolsa@kernel.org, horms@kernel.org, bpf@vger.kernel.org,
  netdev@vger.kernel.org
 References: <20250121012901.87763-1-kerneljasonxing@gmail.com>
- <20250121012901.87763-5-kerneljasonxing@gmail.com>
- <1c2f4735-bddb-4ce7-bd0a-5dbb31cb0c45@linux.dev>
- <CAL+tcoAXgeSNb3PNdqLxd1amryQ7FNT=8OQampZFL9LzdPmBrA@mail.gmail.com>
+ <20250121012901.87763-9-kerneljasonxing@gmail.com>
+ <40e2a7d8-dcba-4dfe-8c4d-14d8cf4954cf@linux.dev>
+ <CAL+tcoCzH2t0Zcn++j_w7s2C1AncczR1oe9RwqzTqBMd4zMNmg@mail.gmail.com>
+ <3a91d654-0e61-4da0-9d09-66a82a24012a@linux.dev>
+ <CAL+tcoBVtqNA_7dN3vpG9VqagjM=VaRKKxDBUiUK-DHPA5Mg=A@mail.gmail.com>
 X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
 From: Martin KaFai Lau <martin.lau@linux.dev>
 Content-Language: en-US
-In-Reply-To: <CAL+tcoAXgeSNb3PNdqLxd1amryQ7FNT=8OQampZFL9LzdPmBrA@mail.gmail.com>
+In-Reply-To: <CAL+tcoBVtqNA_7dN3vpG9VqagjM=VaRKKxDBUiUK-DHPA5Mg=A@mail.gmail.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 X-Migadu-Flow: FLOW_OUT
 
-On 1/24/25 5:15 PM, Jason Xing wrote:
->>> +static bool is_locked_tcp_sock_ops(struct bpf_sock_ops_kern *bpf_sock)
->>> +{
->>> +     return bpf_sock->op <= BPF_SOCK_OPS_WRITE_HDR_OPT_CB;
+On 1/24/25 5:35 PM, Jason Xing wrote:
+> On Sat, Jan 25, 2025 at 9:30 AM Martin KaFai Lau <martin.lau@linux.dev> wrote:
 >>
->> More bike shedding...
+>> On 1/24/25 5:18 PM, Jason Xing wrote:
+>>>>> @@ -5577,9 +5578,9 @@ static void skb_tstamp_tx_bpf(struct sk_buff *skb, struct sock *sk,
+>>>>>                 op = BPF_SOCK_OPS_TS_SCHED_OPT_CB;
+>>>>>                 break;
+>>>>>         case SCM_TSTAMP_SND:
+>>>>> +             op = sw ? BPF_SOCK_OPS_TS_SW_OPT_CB : BPF_SOCK_OPS_TS_HW_OPT_CB;
+>>>>>                 if (!sw)
+>>>>> -                     return;
+>>>>> -             op = BPF_SOCK_OPS_TS_SW_OPT_CB;
+>>>>> +                     *skb_hwtstamps(skb) = *hwtstamps;
+>>>> hwtstamps may still be NULL, no?
+>>> Right, it can be zero if something wrong happens.
 >>
->> After sleeping on it again, I think it can just test the
->> bpf_sock->allow_tcp_access instead.
+>> Then it needs a NULL check, no?
 > 
-> Sorry, I don't think it can work for all the cases because:
-> 1) please see BPF_SOCK_OPS_WRITE_HDR_OPT_CB/BPF_SOCK_OPS_HDR_OPT_LEN_CB,
-> if req exists, there is no allow_tcp_access initialization. Then
-> calling some function like bpf_sock_ops_setsockopt will be rejected
-> because allow_tcp_access is zero.
-> 2) tcp_call_bpf() only set allow_tcp_access only when the socket is
-> fullsock. As far as I know, all the callers have the full stock for
-> now, but in the future it might not.
+> My original intention is passing whatever to the userspace, so the bpf
+> program will be aware of what is happening in the kernel.
 
-Note that the existing helper bpf_sock_ops_cb_flags_set and 
-bpf_sock_ops_{set,get}sockopt itself have done the sk_fullsock() test and then 
-return -EINVAL. bpf_sock->sk is fullsock or not does not matter to these helpers.
+This is fine.
 
-You are right on the BPF_SOCK_OPS_WRITE_HDR_OPT_CB/BPF_SOCK_OPS_HDR_OPT_LEN_CB 
-but the only helper left that testing allow_tcp_access is not enough is 
-bpf_sock_ops_load_hdr_opt(). Potentially, it can test "if 
-(!bpf_sock->allow_tcp_access && !bpf_sock->syn_skb) { return -EOPNOTSUPP; }".
-
-Agree to stay with the current "bpf_sock->op <= BPF_SOCK_OPS_WRITE_HDR_OPT_CB" 
-as in this patch. It is cleaner.
-
->>> @@ -5673,7 +5678,12 @@ static const struct bpf_func_proto bpf_sock_addr_getsockopt_proto = {
->>>    BPF_CALL_5(bpf_sock_ops_setsockopt, struct bpf_sock_ops_kern *, bpf_sock,
->>>           int, level, int, optname, char *, optval, int, optlen)
->>>    {
->>> -     return _bpf_setsockopt(bpf_sock->sk, level, optname, optval, optlen);
->>> +     struct sock *sk = bpf_sock->sk;
->>> +
->>> +     if (is_locked_tcp_sock_ops(bpf_sock) && sk_fullsock(sk))
->>
->> afaict, the new timestamping callbacks still can do setsockopt and it is
->> incorrect. It should be:
->>
->>          if (!bpf_sock->allow_tcp_access)
->>                  return -EOPNOTSUPP;
->>
->> I recalled I have asked in v5 but it may be buried in the long thread, so asking
->> here again. Please add test(s) to check that the new timestamping callbacks
->> cannot call setsockopt and read/write to some of the tcp_sock fields through the
->> bpf_sock_ops.
->>
->>> +             sock_owned_by_me(sk);
->>
->> Not needed and instead...
+> Passing NULL to hwstamps is right which will not cause any problem, I think.
 > 
-> Sorry I don't get you here. What I was doing was letting non
-> timestamping callbacks be checked by the sock_owned_by_me() function.
+> Do you mean the default value of hwstamps itself is NULL so in this
+> case we don't need to re-init it to NULL again?
 > 
-> If the callback belongs to timestamping, we will skip the check.
+> Like this:
+> If (*hwtstamps)
+   if (hwtstamps) instead ?
 
-It will skip the sock_owned_by_me() test and
-continue to do the following __bpf_setsockopt() which the new timetamping 
-callback should not do, no?
+I don't know. If hwtstamps is NULL, doing *hwtstamps will be bad and oops....
+May be my brain doesn't work well at the end of Friday. Please check.
 
-It should be just this at the very beginning of bpf_sock_ops_setsockopt:
-
-	if (!is_locked_tcp_sock_ops(bpf_sock))
-		return -EOPNOTSUPP;
+>       *skb_hwtstamps(skb) = *hwtstamps;
 > 
->>
->>> +
->>> +     return __bpf_setsockopt(sk, level, optname, optval, optlen);
->>
->> keep the original _bpf_setsockopt().
+> But it looks no different actually.
 > 
-> Oh, I remembered we've already assumed/agreed the timestamping socket
-> must be full sock. I will use it.
-> 
->>
->>>    }
->>>
->>>    static const struct bpf_func_proto bpf_sock_ops_setsockopt_proto = {
->>> @@ -5759,6 +5769,7 @@ BPF_CALL_5(bpf_sock_ops_getsockopt, struct bpf_sock_ops_kern *, bpf_sock,
->>>           int, level, int, optname, char *, optval, int, optlen)
->>>    {
->>>        if (IS_ENABLED(CONFIG_INET) && level == SOL_TCP &&
->>> +         bpf_sock->sk->sk_protocol == IPPROTO_TCP &&
->>>            optname >= TCP_BPF_SYN && optname <= TCP_BPF_SYN_MAC) {
->>
->> No need to allow getsockopt regardless what SOL_* it is asking. To keep it
->> simple, I would just disable both getsockopt and setsockopt for all SOL_* for
-> 
-> Really? I'm shocked because the selftests in this series call
-> bpf_sock_ops_getsockopt() and bpf_sock_ops_setsockopt() in patch
-> [13/13]:
-
-Yes, really. It may be late Friday for me here. Please double check your test if 
-the bpf_set/getsockopt is called from the new timestamp callback or it is only 
-called from the existing BPF_SOCK_OPS_ACTIVE_ESTABLISHED_CB callback.
-
-Note that I am only asking to disable the set/getsockopt, 
-bpf_sock_ops_cb_flags_set, and the bpf_sock_ops_load_hdr_opt for the new 
-timestamping callbacks.
-
+> Thanks,
+> Jason
 
 
