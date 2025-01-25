@@ -1,114 +1,222 @@
-Return-Path: <netdev+bounces-160930-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-160931-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2635AA1C52B
-	for <lists+netdev@lfdr.de>; Sat, 25 Jan 2025 21:21:57 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 857AAA1C557
+	for <lists+netdev@lfdr.de>; Sat, 25 Jan 2025 23:04:33 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 75D9D1675DB
-	for <lists+netdev@lfdr.de>; Sat, 25 Jan 2025 20:21:55 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id C3B727A2F39
+	for <lists+netdev@lfdr.de>; Sat, 25 Jan 2025 22:04:23 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 39F3D18B47D;
-	Sat, 25 Jan 2025 20:21:52 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4DC192054FF;
+	Sat, 25 Jan 2025 22:04:27 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="cnxmSLcs"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="QnXny65P"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f173.google.com (mail-pl1-f173.google.com [209.85.214.173])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C19DA134AC;
-	Sat, 25 Jan 2025 20:21:50 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.173
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 123AA1E4AE;
+	Sat, 25 Jan 2025 22:04:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1737836512; cv=none; b=eB/aK9Wvfpd2QLIw83LB8UWlHErkYDhoR6e+cIzCFP+U52aQ0dpW3kxPtolKpE+xmOTbzqNFDLS6xzxF0zq7F9KLImnXUK7VcL2R/m2JdeYnkQsru9xoVP5hekBUQd0oWmyjSbsor9F+/JgmGFzSQTtD/nVDfU3cuIY8Rw/0r0Y=
+	t=1737842667; cv=none; b=jvGn2gcYnOm/BxYARtusqVVYMnAm9AxCRiWlQcFEd/3BlvlXb5JmGJq/HOelCZmM3ThDvqTRu49NCuNcDEsorW1hkKal6Kn3eHzzEcQKAoHpkFaGk3f/VkR38AAo1H5WIoL33gpuKd/jcqvX8TrYtZ9UAYnbIwP7t344Ch7fEBA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1737836512; c=relaxed/simple;
-	bh=xQtEtXHDwj+CtoO0cytWM+JNXD+v6nYs7hAuXzOZgLg=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Ck13QBGuN31pHaCq5KbnuKTdwe0bvQKXv/l8ETtMB8cq76lsRYoEgof6OClsH+/sOV1waUDBUYqHCYy2YISqXvQlj3tzvGHLQM5DaeazjOk1w2kWReLTZNdzY009RX83gAKpCDKsXcabiEUyEt2V0v9iU8JwjQfvUMXfQQRU0ag=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=cnxmSLcs; arc=none smtp.client-ip=209.85.214.173
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pl1-f173.google.com with SMTP id d9443c01a7336-2167141dfa1so57332035ad.1;
-        Sat, 25 Jan 2025 12:21:50 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1737836510; x=1738441310; darn=vger.kernel.org;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=yEuxof+C2lk26TkQV71ogV9KtBG5KsWWZmkpoOptf3s=;
-        b=cnxmSLcs0wZRum6sbk6J1+blCs+BA+3sNmSViG0APvVLLDP5JBpXJJA5PP2/JEuHOr
-         fGWXchbdXp7cz9eK9HfzsFmnnqt09PtY38pJJWHCZw0mPz5WGHmg+i2lQAAmrNskWpXe
-         bTnvRTaMqHMtUQMdFomMf2/J7wWHfy/uy1BW5GxFc3LwZ3100hK7axhKV6kGUd8mRk8i
-         sx+VMS7JFhFfDiF9bgd4TWrgHVLy3oQA+pQdSVaoYl0FSSzkrC9Cc6lrAxPGXvjTwtqO
-         AUlpf5OA5mwm8n4po0BHUAdgw2NQe41magnlrohwxhg3P5zqp4NwVUSgXz0PzndDbnXN
-         k3yw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1737836510; x=1738441310;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=yEuxof+C2lk26TkQV71ogV9KtBG5KsWWZmkpoOptf3s=;
-        b=SYW0CIx+QspJCf5SWaduOmcjrUCWCDMTr3LCAckn7+TS7pZW3iMAgXJPoELL9/1Toj
-         bZe44CbPaqoy3y8c9SNDKWwCBX6fkepwGClXhhpYF/0XefMZOL1cB4zp7wQwlZ1WAHjQ
-         JX2qvguWjURHx4dbdRR1h/c+FkeyJ7kPFcuZLwUF1LN0hqj/w/xGcen4kWdaGKDOkdCB
-         GUr+J2AEPqHuL5xMhpp9uhXkRtOJ/GarbFzEx1DH7UbRT2+9Ka3ZriRcFPO1KRJmmoCu
-         0WH5Lr1BXvRRVxZk3i0MZ66UhNHrhqWfnD41XyUZnhubXm0C2Do9gf5gBGy0o1M1xOzl
-         sd7A==
-X-Forwarded-Encrypted: i=1; AJvYcCUGudEAqOkTKjidTSYtSi8nM2aF+wj7UMDdl0LquqMHH3WrBVewsclWW6tALF0PbYe5Xns3XZwytBWRUcc=@vger.kernel.org, AJvYcCUeGAcHbzoUxDpUQFyfch9H76KWea1n8tiuEx8JqTvUO3IRqltdkcWNNvnt8TD0s9nla/7Qp8QS@vger.kernel.org
-X-Gm-Message-State: AOJu0YzpG0lo1STEK+/SpZLXZhhqxLFg2stm2RmedU/RzWyOxj7RNW3T
-	wGSthRQ3onKRY+AOwBJOaU5WcdrFbte3gDcv6aEm7fZMi72MNjb7aPxjvQ==
-X-Gm-Gg: ASbGncu+tsBZUAaO1EWMe8N3uPMC1t5gzxBcgzBE8PvPmqAKmpe0kNDrQ+6oyKzr2ts
-	Kwf4fH9+MBxNzQXuqBlW42jQZewmLB8vUIU1wEZeWGF/wYM334S9T0jlZw7Ed0jYoMtNBSPbwdc
-	SfbMlY9GhkJTueurVXJNPvFR4n38Q4GP6+9w7u3bUwwIaU3Gn4hYwxbvjh4pJmri32BJwna7sVQ
-	JA25fztrQltx71i32oEIAEmUhgw1vzL6fiX7SuY+Co7OSKCBf4U5Y9mjvlVmQk0fmto9QsBrYEK
-	PyUlKblI4Vtb+q0at+PL00ns
-X-Google-Smtp-Source: AGHT+IFZo4hK+5HjLM9c7v/0ePuJ5+JkTYFIQMb9Idxed66xGPtck0tOABqdXHdI6e9OApJTlnX7sA==
-X-Received: by 2002:a17:903:990:b0:216:6ef9:60d with SMTP id d9443c01a7336-21da4ab4f3amr136710925ad.23.1737836509935;
-        Sat, 25 Jan 2025 12:21:49 -0800 (PST)
-Received: from hoboy.vegasvil.org ([2600:1700:2430:6f6f:e2d5:5eff:fea5:802f])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-21da3ea3076sm36275585ad.68.2025.01.25.12.21.48
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sat, 25 Jan 2025 12:21:49 -0800 (PST)
-Date: Sat, 25 Jan 2025 12:21:47 -0800
-From: Richard Cochran <richardcochran@gmail.com>
-To: Thomas =?iso-8859-1?Q?Wei=DFschuh?= <linux@weissschuh.net>
-Cc: Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Anna-Maria Behnsen <anna-maria@linutronix.de>,
-	Frederic Weisbecker <frederic@kernel.org>,
-	Thomas Gleixner <tglx@linutronix.de>,
-	John Stultz <jstultz@google.com>, Arnd Bergmann <arnd@arndb.de>,
-	John Stultz <john.stultz@linaro.org>, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org, Cyrill Gorcunov <gorcunov@gmail.com>
-Subject: Re: [PATCH net v2] ptp: Properly handle compat ioctls
-Message-ID: <Z5VH2zW0t_elr9J8@hoboy.vegasvil.org>
-References: <20250125-posix-clock-compat_ioctl-v2-1-11c865c500eb@weissschuh.net>
+	s=arc-20240116; t=1737842667; c=relaxed/simple;
+	bh=J8CwoHDew2ch8hbII+qFLFuRR6imAQksihwTwo9lBe8=;
+	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
+	 Content-Type:MIME-Version; b=cFIAqhTzLQy8d69Qdjzjtws3J1EBn4q1UkQGTfO6kwx+Th0PyIWp97xUmTWxCyqsPiY+ZD9at5Vr33xLnXGBppsDyRRWnrK53khHZNp2FDwDXOTmPlAc28MOLPSqpF8CKA6cleWWo6GJTt424Os79/JanVlMvuRfrmwoRlmeBrs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=QnXny65P; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 68362C4CED6;
+	Sat, 25 Jan 2025 22:04:24 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1737842666;
+	bh=J8CwoHDew2ch8hbII+qFLFuRR6imAQksihwTwo9lBe8=;
+	h=Subject:From:To:Cc:Date:In-Reply-To:References:From;
+	b=QnXny65P2n7gsECmITir410K9YdwC3vHcvJ2v2hKYMta2MwoD9A/hKhVXCJtVVCNK
+	 OVrryhnq4PTJAZuPeerqc9MZdwW/H8k6gV9MzndkcJhP+Ey+cm9N2iVOu561RdxLkl
+	 oZxX4NcuA4Dj2LxEFp/SxYaqFerSh1IwwpOtU0LEH8QiA1XeYk0yWZWGWTxROx+AAj
+	 J9LV2hmaM+YTgy8jUCsAW7ZSB35ZKfOlEGzLsa0jphyMkxBZklegLaAz4bhlv5OZ41
+	 CXbrn5TVgZ4o+5U2Ha/6WXFasg5v4Iq2pp/hk4wP5av1FYvdMaEu7e+LigiDJKTWQ4
+	 Ijf/W+8mk/1+A==
+Message-ID: <bfc058e01c81c45c22e384adec876c59e7b5279e.camel@kernel.org>
+Subject: Re: [PATCH 1/8] nfsd: don't restart v4.1+ callback when
+ RPC_SIGNALLED is set
+From: Jeff Layton <jlayton@kernel.org>
+To: Chuck Lever <chuck.lever@oracle.com>, Neil Brown <neilb@suse.de>, Olga
+ Kornievskaia <okorniev@redhat.com>, Dai Ngo <Dai.Ngo@oracle.com>, Tom
+ Talpey <tom@talpey.com>, "J. Bruce Fields" <bfields@fieldses.org>, Kinglong
+ Mee <kinglongmee@gmail.com>, Trond Myklebust	 <trondmy@kernel.org>, Anna
+ Schumaker <anna@kernel.org>, "David S. Miller"	 <davem@davemloft.net>, Eric
+ Dumazet <edumazet@google.com>, Jakub Kicinski	 <kuba@kernel.org>, Paolo
+ Abeni <pabeni@redhat.com>, Simon Horman	 <horms@kernel.org>
+Cc: linux-nfs@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	netdev@vger.kernel.org
+Date: Sat, 25 Jan 2025 17:04:23 -0500
+In-Reply-To: <421c33ce-d43b-4444-a83a-a25f4fabfce2@oracle.com>
+References: <20250123-nfsd-6-14-v1-0-c1137a4fa2ae@kernel.org>
+	 <20250123-nfsd-6-14-v1-1-c1137a4fa2ae@kernel.org>
+	 <421c33ce-d43b-4444-a83a-a25f4fabfce2@oracle.com>
+Autocrypt: addr=jlayton@kernel.org; prefer-encrypt=mutual;
+ keydata=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
+ QZIQXVeAA+smfTT0tDrisj1U5x6ZB9b3nBg65kc=
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+User-Agent: Evolution 3.54.3 (3.54.3-1.fc41) 
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <20250125-posix-clock-compat_ioctl-v2-1-11c865c500eb@weissschuh.net>
 
-On Sat, Jan 25, 2025 at 10:28:38AM +0100, Thomas Weiﬂschuh wrote:
-> Pointer arguments passed to ioctls need to pass through compat_ptr() to
-> work correctly on s390; as explained in Documentation/driver-api/ioctl.rst.
-> Detect compat mode at runtime and call compat_ptr() for those commands
-> which do take pointer arguments.
-> 
-> Suggested-by: Arnd Bergmann <arnd@arndb.de>
-> Link: https://lore.kernel.org/lkml/1ba5d3a4-7931-455b-a3ce-85a968a7cb10@app.fastmail.com/
-> Fixes: d94ba80ebbea ("ptp: Added a brand new class driver for ptp clocks.")
-> Signed-off-by: Thomas Weiﬂschuh <linux@weissschuh.net>
+On Sat, 2025-01-25 at 11:24 -0500, Chuck Lever wrote:
+> On 1/23/25 3:25 PM, Jeff Layton wrote:
+> > This is problematic, since the RPC might have been entirely successful.
+> > There is no point in restarting a v4.1+ callback just because
+> > RPC_SIGNALLED is true. The v4.1+ error handling has other mechanisms fo=
+r
+> > detecting when it should retransmit the RPC.
+> >=20
+> > Fixes: 7ba6cad6c88f ("nfsd: New helper nfsd4_cb_sequence_done() for pro=
+cessing more cb errors")
+> > Signed-off-by: Jeff Layton <jlayton@kernel.org>
+> > ---
+> >   fs/nfsd/nfs4callback.c | 3 ---
+> >   1 file changed, 3 deletions(-)
+> >=20
+> > diff --git a/fs/nfsd/nfs4callback.c b/fs/nfsd/nfs4callback.c
+> > index 50e468bdb8d4838b5217346dcc2bd0fec1765c1a..e12205ef16ca932ffbcc86d=
+67b0817aec2436c89 100644
+> > --- a/fs/nfsd/nfs4callback.c
+> > +++ b/fs/nfsd/nfs4callback.c
+> > @@ -1403,9 +1403,6 @@ static bool nfsd4_cb_sequence_done(struct rpc_tas=
+k *task, struct nfsd4_callback
+> >   	}
+> >   	trace_nfsd_cb_free_slot(task, cb);
+> >   	nfsd41_cb_release_slot(cb);
+> > -
+> > -	if (RPC_SIGNALLED(task))
+> > -		goto need_restart;
+> >   out:
+> >   	return ret;
+> >   retry_nowait:
+> >=20
+>=20
+> I too am skeptical about this logic, but I don't entirely understand it
+> yet. More importantly, though, I don't recall seeing (mis)behavior that
+> I can directly attribute to it, so I can't yet confirm or deny your=20
+> assertion that "This is problematic".
+>=20
 
-Acked-by: Richard Cochran <richardcochran@gmail.com>
+I haven't seen behavior that I can directly attribute to this either,
+but we have seen a number of strange panics and weird behaviors in the
+callback code over the years that may be related.
+
+At this point, I think you're correct that we will probably need to do
+more than just small, incremental changes here.
+=20
+> Before making a code change here, let's gather a little evidence of a
+> real problem. For instance, we might want to replace this logic with
+> something better rather than wholesale removing it.
+>=20
+> You might start by enabling aggressive disconnect injection to see how
+> backchannel recovery works (or that it doesn't work!). I'm trying this
+> on my kdevops NFSD while running fstests:
+>=20
+> cd /sys/kernel/debug/fail_sunrpc/
+> echo Y > ignore-cache-wait
+> echo Y > ignore-client-disconnect
+> echo 24847 > interval
+> echo 97 > times
+> echo 100 > probability
+>=20
+>=20
+
+Unfortunately, I've found an even bigger problem in the callback code.
+
+It accesses the clp->cl_cb_session pointer when processing the call and
+reply, but that pointer doesn't imply a reference and nothing else
+ensures that the nfsd4_session object will stick around while this
+happens. I think a callback can race with a DESTROY_SESSION and cause a
+UAF. I started working on patches to fix this up, but it's a bit
+complex and will take some time.
+
+Please don't apply any of these until I get a better picture of what
+will need to be changed. Stay tuned!
+--=20
+Jeff Layton <jlayton@kernel.org>
 
