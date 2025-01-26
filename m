@@ -1,275 +1,203 @@
-Return-Path: <netdev+bounces-160954-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-160955-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id CEA36A1C6EE
-	for <lists+netdev@lfdr.de>; Sun, 26 Jan 2025 09:04:27 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 5994CA1C70E
+	for <lists+netdev@lfdr.de>; Sun, 26 Jan 2025 09:41:36 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 1954F166033
-	for <lists+netdev@lfdr.de>; Sun, 26 Jan 2025 08:04:26 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A37AA16701D
+	for <lists+netdev@lfdr.de>; Sun, 26 Jan 2025 08:41:34 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 655AC13AA38;
-	Sun, 26 Jan 2025 08:04:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B25E48635E;
+	Sun, 26 Jan 2025 08:41:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Qj9ldWPu"
+	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="ghCz0DMH"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from fhigh-b7-smtp.messagingengine.com (fhigh-b7-smtp.messagingengine.com [202.12.124.158])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4DA6B82D98
-	for <netdev@vger.kernel.org>; Sun, 26 Jan 2025 08:04:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A6B4955887;
+	Sun, 26 Jan 2025 08:41:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=202.12.124.158
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1737878662; cv=none; b=QYwKg5MqJgC27szIYzzRCD2fmJaZKRRsAN5FiCR6Gb7EAQoW4YU07nXoLAGU2uJ5POU4uNZB9wNZwwjH22Ph1M8M7CCXijRYl2t5tPGh8yT8HrpslrvMd0fBKiqXd3yFpHOZaUjcOAe7zg5svbuLbEdiHLJwo/KJhlnKcuUaXYA=
+	t=1737880890; cv=none; b=D7GkJzKPnDCBBS5E3C1w38nqtLv/fQ/XyacCTGWp+TEd7Z1rSU+TOiXQ6gwYdLtfmHaECjnxsE1GBwzD2k+SyncgyZHmMk/DvgwOYZkrJtV3CgpWZFp13X3qgLypCbiv0+xEDB9zDjh7M8nFtoOeYIZAdpR6Akeivwfgs+gsrZ4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1737878662; c=relaxed/simple;
-	bh=EmEHD1zhsfN64NPKSyz1CabABu7WvztQmGJ1hsT/hEY=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Content-Type; b=iJlYx5qZ+LlZHtvGovmcDpttv70IiX88n6lB5uFMsXLQIg5PO0V6XcC7hqKvtvJjkuj9vTmNCDtDwOAZ7B2QTOFILwd74QnmDzhbYLnuues6J6NlCmT1fkJroyxyU2yDf96FoKQIAd3KENfLsZNggB0haR9NP0tltBqWYyvcwvs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=Qj9ldWPu; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1737878659;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=P/eC54RqFvM1K0GxY2qQosRFNAZx56Iy0IiA8zFllf4=;
-	b=Qj9ldWPuQ4PfzPKmExkfR3FtNUSo+CxdUQI6wvM0xvppcnKdTKDok76wPIR4W+wVRML6rb
-	5RMWtkRxYZtx9I9aqAi4GnJb744UHgkk5wsR/zjuY8tGsvCD0hjkfQhzKZUH4kjYgUlV4T
-	vx2yJAqrbVey76ZZTYWsdaN9VlsDKE0=
-Received: from mail-pl1-f199.google.com (mail-pl1-f199.google.com
- [209.85.214.199]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-398-zSKOyG7RPQiHHI8Vfb5hXg-1; Sun, 26 Jan 2025 03:04:17 -0500
-X-MC-Unique: zSKOyG7RPQiHHI8Vfb5hXg-1
-X-Mimecast-MFC-AGG-ID: zSKOyG7RPQiHHI8Vfb5hXg
-Received: by mail-pl1-f199.google.com with SMTP id d9443c01a7336-218ad674181so90775065ad.1
-        for <netdev@vger.kernel.org>; Sun, 26 Jan 2025 00:04:17 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1737878656; x=1738483456;
-        h=content-transfer-encoding:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=P/eC54RqFvM1K0GxY2qQosRFNAZx56Iy0IiA8zFllf4=;
-        b=ic78Yl4spHDRAi8gUknhwTSemv+TUm10viuFQByt45/zV6aLfBSa/VD/RMswezk8EB
-         G7CUMt6Ouvl6hzHjiMHTtniBzVfVZrwfiiPiMs87nJw9JoYO4olBhxzjKYKoCs+nUgEY
-         6UAiC5s0KvObBh9a0GtxgXi9Y7Mp4sh7JDvl327Kixel6rN5SFRxQo2MSUsmlfLpKdFC
-         16IIFu5S8loNCIbAlbOxi0X/As8gi9XXWQc0iGx+vnZJJwDi8H4DJa98C0VVlktF8DJ9
-         yjTTZQ2LyUlmzZgttxFuovUe8/ywRH9Y/cxTI305kN6iMcQCtyxygdn9S/TmfCAWJ1Cz
-         ibgA==
-X-Forwarded-Encrypted: i=1; AJvYcCXgrVCKJqXRj50KIFsOPB/oc3UjkdUPAqy/Y1hTWrOqvHy74XG+dHVjkZ/MdqpnHGjD8FJFcOI=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxdkSZULK+8Eco9JKRhBGuAEAGPWZGj2xaj9B1fTIS0PbBdjX4i
-	dpnLEoXQ+9fIU0RKQNL9T9d6owk9oJJ3+f72tcqKEUnxX6+82UxrVthYDNO9lu/x6617yx6OAFC
-	NmcrYLA782sRkHxBfuwUh5KxahkUdgpD0vSlVccNuM5hHNZgXHDU/T/5Lr4IlLw6qZGezMfAoSW
-	8LrD3/gXpn9VGYyOyIkl4mqyOtdYeJ
-X-Gm-Gg: ASbGnctxt7TCVP85YCvp7H9j9x9Hf3mJy9XH4P6lwb6kwZ5kBLyEVum4/EopVA3bVdZ
-	ArugOdg1uZbBO2a5sLZzrUN69Rj6BO8sLth/Q8/RAhWxm9726cK74b33edWHTgwVN
-X-Received: by 2002:a05:6a21:158d:b0:1e1:a449:ff71 with SMTP id adf61e73a8af0-1eb6968a845mr21791127637.1.1737878656561;
-        Sun, 26 Jan 2025 00:04:16 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IFQPmUWpkIvATEslfzV7Si6dQ5DCKuZzcMT2tS50nLTQbAUEv9A6x09wBrrKHebRblZnuNbf1FcN8imDYYAl/M=
-X-Received: by 2002:a05:6a21:158d:b0:1e1:a449:ff71 with SMTP id
- adf61e73a8af0-1eb6968a845mr21791090637.1.1737878656048; Sun, 26 Jan 2025
- 00:04:16 -0800 (PST)
+	s=arc-20240116; t=1737880890; c=relaxed/simple;
+	bh=1uU+IlNal+3EPTF/c40sK/iz5IjYkn5z3LCvgEtMl1E=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=JHOHozoAMlMTWIGeVPHF+m6VKnRmYyqpeFkzTr0vkzAFcDZw4kTBBHDv7I8nVVGuolzWLK4hEINMWShQfcS1o9/69rTZGg/vzA6wBRZiya2QgltASlodV7d0jbpTa+XU9WmSuGuPtv0HEOYGqykHdHMfuHDxpJMutO6qR74H64I=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=idosch.org; spf=none smtp.mailfrom=idosch.org; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=ghCz0DMH; arc=none smtp.client-ip=202.12.124.158
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=idosch.org
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=idosch.org
+Received: from phl-compute-08.internal (phl-compute-08.phl.internal [10.202.2.48])
+	by mailfhigh.stl.internal (Postfix) with ESMTP id 18FA92540103;
+	Sun, 26 Jan 2025 03:41:27 -0500 (EST)
+Received: from phl-mailfrontend-02 ([10.202.2.163])
+  by phl-compute-08.internal (MEProxy); Sun, 26 Jan 2025 03:41:27 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
+	messagingengine.com; h=cc:cc:content-type:content-type:date:date
+	:feedback-id:feedback-id:from:from:in-reply-to:in-reply-to
+	:message-id:mime-version:references:reply-to:subject:subject:to
+	:to:x-me-proxy:x-me-sender:x-me-sender:x-sasl-enc; s=fm3; t=
+	1737880886; x=1737967286; bh=HftiZnevtp2qsnswvVZXprhygnVO8ILoeqm
+	v/RLP7DQ=; b=ghCz0DMHEyWWC3P4FQncx+iKypq2RfrGaudZw7qPikAVrYP5SwZ
+	QqHH8AD13TlGQIK45fiecOhOQ+MR7XQx1mdMGSSsZ/ACh6Gm0HQMyOsLdBGYNnwO
+	yz7n2jlZ6i/8nUAd3qbmSjcK5nmfA7v2mAfVldbxTYiK+qvm077iPn2+DUwXnDrY
+	3R+FasvmpRUGlU+gY3ceEOVtNNpNzgyd+HyHsTA4SNBxXSqEXq4XxuioWKp+IeXi
+	oXqkJqdT5Wh+WMhIQ4/9nNN+kx8tHgzM59DuF45tPWHw3NrqfLLyGyCeNIka2X+0
+	unRuexvZamJouX19sI2prUzLN8qmyHCSgKQ==
+X-ME-Sender: <xms:NvWVZ0GRQYxjN6EG78mYvtoUJtC_ZiT3Nz5Ielkg8WTBSZPiqzj0lg>
+    <xme:NvWVZ9VaTS6rBkMbcs6FBEe_iRUj6vurXEom1CZvZhizN2lcgmneeBZp_cW03KxHJ
+    icjy_K5ISVFAec>
+X-ME-Received: <xmr:NvWVZ-JiR6BmOphchStlHlgASuJae87b5-qgMN4Clstgr8x6KXBPCRlwxtsV>
+X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeefuddrudejgedgleektdcutefuodetggdotefrod
+    ftvfcurfhrohhfihhlvgemucfhrghsthforghilhdpggftfghnshhusghstghrihgsvgdp
+    uffrtefokffrpgfnqfghnecuuegrihhlohhuthemuceftddtnecusecvtfgvtghiphhivg
+    hnthhsucdlqddutddtmdenucfjughrpeffhffvvefukfhfgggtuggjsehttdertddttddv
+    necuhfhrohhmpefkughoucfutghhihhmmhgvlhcuoehiughoshgthhesihguohhstghhrd
+    horhhgqeenucggtffrrghtthgvrhhnpeehhfdtjedviefffeduuddvffegteeiieeguefg
+    udffvdfftdefheeijedthfejkeenucffohhmrghinhepkhgvrhhnvghlrdhorhhgnecuve
+    hluhhsthgvrhfuihiivgeptdenucfrrghrrghmpehmrghilhhfrhhomhepihguohhstghh
+    sehiughoshgthhdrohhrghdpnhgspghrtghpthhtohepudekpdhmohguvgepshhmthhpoh
+    huthdprhgtphhtthhopedtgiduvddtjeesghhmrghilhdrtghomhdprhgtphhtthhopegr
+    nhgurhgvfieslhhunhhnrdgthhdprhgtphhtthhopegsghhrihhffhhishesnhhvihguih
+    grrdgtohhmpdhrtghpthhtohepjhhonhgrthhhrghnhhesnhhvihguihgrrdgtohhmpdhr
+    tghpthhtohepnhgvthguvghvsehvghgvrhdrkhgvrhhnvghlrdhorhhgpdhrtghpthhtoh
+    eplhhinhhugidqshhtmhefvdesshhtqdhmugdqmhgrihhlmhgrnhdrshhtohhrmhhrvghp
+    lhihrdgtohhmpdhrtghpthhtoheplhhinhhugidqrghrmhdqkhgvrhhnvghlsehlihhsth
+    hsrdhinhhfrhgruggvrggurdhorhhgpdhrtghpthhtoheplhhinhhugidqkhgvrhhnvghl
+    sehvghgvrhdrkhgvrhhnvghlrdhorhhgpdhrtghpthhtoheprghlvghkshgrnhguvghrrd
+    hlohgsrghkihhnsehinhhtvghlrdgtohhm
+X-ME-Proxy: <xmx:NvWVZ2GSd8rk6Q76dOpZQVJFjbCP83n5WvR-tm9AO6WUJTCBEp_oaA>
+    <xmx:NvWVZ6U9HO7GkxTTz7l2XFE8pYwGF8Ea_Brtb9sX78E8xo2LsSofpw>
+    <xmx:NvWVZ5MZayxKuK-jiCAay_c4NJHybliV6nwQ_NEUwGE6oOYXn34uaA>
+    <xmx:NvWVZx2HtaJT4RUf0DUY4FfOYjvzUe6p6IH6tR2genF6FfOmYRQPnA>
+    <xmx:NvWVZ4Yxox-UqScH-CKvvBbjRcJSxt4_PDvqf-1AqmL7Qg46l4QJ_VMC>
+Feedback-ID: i494840e7:Fastmail
+Received: by mail.messagingengine.com (Postfix) with ESMTPA; Sun,
+ 26 Jan 2025 03:41:25 -0500 (EST)
+Date: Sun, 26 Jan 2025 10:41:23 +0200
+From: Ido Schimmel <idosch@idosch.org>
+To: Furong Xu <0x1207@gmail.com>
+Cc: Andrew Lunn <andrew@lunn.ch>, Brad Griffis <bgriffis@nvidia.com>,
+	Jon Hunter <jonathanh@nvidia.com>, netdev@vger.kernel.org,
+	linux-stm32@st-md-mailman.stormreply.com,
+	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
+	Alexander Lobakin <aleksander.lobakin@intel.com>,
+	Joe Damato <jdamato@fastly.com>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Maxime Coquelin <mcoquelin.stm32@gmail.com>, xfr@outlook.com,
+	"linux-tegra@vger.kernel.org" <linux-tegra@vger.kernel.org>
+Subject: Re: [PATCH net-next v3 1/4] net: stmmac: Switch to zero-copy in
+ non-XDP RX path
+Message-ID: <Z5X1M0Fs-K6FkSAl@shredder>
+References: <cover.1736910454.git.0x1207@gmail.com>
+ <bd7aabf4d9b6696885922ed4bef8fc95142d3004.1736910454.git.0x1207@gmail.com>
+ <d465f277-bac7-439f-be1d-9a47dfe2d951@nvidia.com>
+ <20250124003501.5fff00bc@orangepi5-plus>
+ <e6305e71-5633-48bf-988d-fa2886e16aae@nvidia.com>
+ <ccbecd2a-7889-4389-977e-10da6a00391c@lunn.ch>
+ <20250124104256.00007d23@gmail.com>
+ <Z5S69kb7Qz_QZqOh@shredder>
+ <20250125224342.00006ced@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250121191047.269844-1-jdamato@fastly.com> <20250121191047.269844-3-jdamato@fastly.com>
- <CACGkMEvT=J4XrkGtPeiE+8fwLsMP_B-xebnocJV8c5_qQtCOTA@mail.gmail.com>
- <Z5EtqRrc_FAHbODM@LQ3V64L9R2> <CACGkMEu6XHx-1ST9GNYs8UnAZpSJhvkSYqa+AE8FKiwKO1=zXQ@mail.gmail.com>
- <Z5Gtve0NoZwPNP4A@LQ3V64L9R2> <CACGkMEvHVxZcp2efz5EEW96szHBeU0yAfkLy7qSQnVZmxm4GLQ@mail.gmail.com>
- <Z5P10c-gbVmXZne2@LQ3V64L9R2>
-In-Reply-To: <Z5P10c-gbVmXZne2@LQ3V64L9R2>
-From: Jason Wang <jasowang@redhat.com>
-Date: Sun, 26 Jan 2025 16:04:02 +0800
-X-Gm-Features: AWEUYZn0pFYWiwuO7DM8AlLXMKubWaWMScL_rJqH8CltUwKyuuhU9ZUlqE80pYk
-Message-ID: <CACGkMEv4bamNB0KGeZqzuJRazTtwHOEvH2rHamqRr1s90FQ2Vg@mail.gmail.com>
-Subject: Re: [RFC net-next v3 2/4] virtio_net: Prepare for NAPI to queue mapping
-To: Joe Damato <jdamato@fastly.com>, Jason Wang <jasowang@redhat.com>, netdev@vger.kernel.org, 
-	gerhard@engleder-embedded.com, leiyang@redhat.com, xuanzhuo@linux.alibaba.com, 
-	mkarsten@uwaterloo.ca, "Michael S. Tsirkin" <mst@redhat.com>, 
-	=?UTF-8?Q?Eugenio_P=C3=A9rez?= <eperezma@redhat.com>, 
-	Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller" <davem@davemloft.net>, 
-	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
-	"open list:VIRTIO CORE AND NET DRIVERS" <virtualization@lists.linux.dev>, open list <linux-kernel@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250125224342.00006ced@gmail.com>
 
-On Sat, Jan 25, 2025 at 4:19=E2=80=AFAM Joe Damato <jdamato@fastly.com> wro=
-te:
->
-> On Fri, Jan 24, 2025 at 09:14:54AM +0800, Jason Wang wrote:
-> > On Thu, Jan 23, 2025 at 10:47=E2=80=AFAM Joe Damato <jdamato@fastly.com=
-> wrote:
-> > >
-> > > On Thu, Jan 23, 2025 at 10:40:43AM +0800, Jason Wang wrote:
-> > > > On Thu, Jan 23, 2025 at 1:41=E2=80=AFAM Joe Damato <jdamato@fastly.=
-com> wrote:
-> > > > >
-> > > > > On Wed, Jan 22, 2025 at 02:12:46PM +0800, Jason Wang wrote:
-> > > > > > On Wed, Jan 22, 2025 at 3:11=E2=80=AFAM Joe Damato <jdamato@fas=
-tly.com> wrote:
-> > > > > > >
-> > > > > > > Slight refactor to prepare the code for NAPI to queue mapping=
-. No
-> > > > > > > functional changes.
-> > > > > > >
-> > > > > > > Signed-off-by: Joe Damato <jdamato@fastly.com>
-> > > > > > > Reviewed-by: Gerhard Engleder <gerhard@engleder-embedded.com>
-> > > > > > > Tested-by: Lei Yang <leiyang@redhat.com>
-> > > > > > > ---
-> > > > > > >  v2:
-> > > > > > >    - Previously patch 1 in the v1.
-> > > > > > >    - Added Reviewed-by and Tested-by tags to commit message. =
-No
-> > > > > > >      functional changes.
-> > > > > > >
-> > > > > > >  drivers/net/virtio_net.c | 10 ++++++++--
-> > > > > > >  1 file changed, 8 insertions(+), 2 deletions(-)
-> > > > > > >
-> > > > > > > diff --git a/drivers/net/virtio_net.c b/drivers/net/virtio_ne=
-t.c
-> > > > > > > index 7646ddd9bef7..cff18c66b54a 100644
-> > > > > > > --- a/drivers/net/virtio_net.c
-> > > > > > > +++ b/drivers/net/virtio_net.c
-> > > > > > > @@ -2789,7 +2789,8 @@ static void skb_recv_done(struct virtqu=
-eue *rvq)
-> > > > > > >         virtqueue_napi_schedule(&rq->napi, rvq);
-> > > > > > >  }
-> > > > > > >
-> > > > > > > -static void virtnet_napi_enable(struct virtqueue *vq, struct=
- napi_struct *napi)
-> > > > > > > +static void virtnet_napi_do_enable(struct virtqueue *vq,
-> > > > > > > +                                  struct napi_struct *napi)
-> > > > > > >  {
-> > > > > > >         napi_enable(napi);
-> > > > > >
-> > > > > > Nit: it might be better to not have this helper to avoid a misu=
-se of
-> > > > > > this function directly.
-> > > > >
-> > > > > Sorry, I'm probably missing something here.
-> > > > >
-> > > > > Both virtnet_napi_enable and virtnet_napi_tx_enable need the logi=
-c
-> > > > > in virtnet_napi_do_enable.
-> > > > >
-> > > > > Are you suggesting that I remove virtnet_napi_do_enable and repea=
-t
-> > > > > the block of code in there twice (in virtnet_napi_enable and
-> > > > > virtnet_napi_tx_enable)?
-> > > >
-> > > > I think I miss something here, it looks like virtnet_napi_tx_enable=
-()
-> > > > calls virtnet_napi_do_enable() directly.
-> > > >
-> > > > I would like to know why we don't call netif_queue_set_napi() for T=
-X NAPI here?
-> > >
-> > > Please see both the cover letter and the commit message of the next
-> > > commit which addresses this question.
-> > >
-> > > TX-only NAPIs do not have NAPI IDs so there is nothing to map.
-> >
-> > Interesting, but I have more questions
-> >
-> > 1) why need a driver to know the NAPI implementation like this?
->
-> I'm not sure I understand the question, but I'll try to give an
-> answer and please let me know if you have another question.
->
-> Mapping the NAPI IDs to queue IDs is useful for applications that
-> use epoll based busy polling (which relies on the NAPI ID, see also
-> SO_INCOMING_NAPI_ID and [1]), IRQ suspension [2], and generally
-> per-NAPI configuration [3].
->
-> Without this code added to the driver, the user application can get
-> the NAPI ID of an incoming connection, but has no way to know which
-> queue (or NIC) that NAPI ID is associated with or to set per-NAPI
-> configuration settings.
->
-> [1]: https://lore.kernel.org/all/20240213061652.6342-1-jdamato@fastly.com=
-/
-> [2]: https://lore.kernel.org/netdev/20241109050245.191288-5-jdamato@fastl=
-y.com/T/
-> [3]: https://lore.kernel.org/lkml/20241011184527.16393-1-jdamato@fastly.c=
-om/
+Hi,
 
-Yes, exactly. Sorry for being unclear, what I want to ask is actually:
+On Sat, Jan 25, 2025 at 10:43:42PM +0800, Furong Xu wrote:
+> Hi Ido
+> 
+> On Sat, 25 Jan 2025 12:20:38 +0200, Ido Schimmel wrote:
+> 
+> > On Fri, Jan 24, 2025 at 10:42:56AM +0800, Furong Xu wrote:
+> > > On Thu, 23 Jan 2025 22:48:42 +0100, Andrew Lunn <andrew@lunn.ch>
+> > > wrote: 
+> > > > > Just to clarify, the patch that you had us try was not intended
+> > > > > as an actual fix, correct? It was only for diagnostic purposes,
+> > > > > i.e. to see if there is some kind of cache coherence issue,
+> > > > > which seems to be the case?  So perhaps the only fix needed is
+> > > > > to add dma-coherent to our device tree?    
+> > > > 
+> > > > That sounds quite error prone. How many other DT blobs are
+> > > > missing the property? If the memory should be coherent, i would
+> > > > expect the driver to allocate coherent memory. Or the driver
+> > > > needs to handle non-coherent memory and add the necessary
+> > > > flush/invalidates etc.  
+> > > 
+> > > stmmac driver does the necessary cache flush/invalidates to
+> > > maintain cache lines explicitly.  
+> > 
+> > Given the problem happens when the kernel performs syncing, is it
+> > possible that there is a problem with how the syncing is performed?
+> > 
+> > I am not familiar with this driver, but it seems to allocate multiple
+> > buffers per packet when split header is enabled and these buffers are
+> > allocated from the same page pool (see stmmac_init_rx_buffers()).
+> > Despite that, the driver is creating the page pool with a non-zero
+> > offset (see __alloc_dma_rx_desc_resources()) to avoid syncing the
+> > headroom, which is only present in the head buffer.
+> > 
+> > I asked Thierry to test the following patch [1] and initial testing
+> > seems OK. He also confirmed that "SPH feature enabled" shows up in the
+> > kernel log.
+> > BTW, the commit that added split header support (67afd6d1cfdf0) says
+> > that it "reduces CPU usage because without the feature all the entire
+> > packet is memcpy'ed, while that with the feature only the header is".
+> > This is no longer correct after your patch, so is there still value in
+> > the split header feature? With two large buffers being allocated from
+> 
+> Thanks for these great insights!
+> 
+> Yes, when "SPH feature enabled", it is not correct after my patch,
+> pp_params.offset should be updated to match the offset of split payload.
+> 
+> But I would like to let pp_params.max_len remains to
+> dma_conf->dma_buf_sz since the sizes of both header and payload are
+> limited to dma_conf->dma_buf_sz by DMA engine, no more than
+> dma_conf->dma_buf_sz bytes will be written into a page buffer.
+> So my patch would be like [2]:
+> 
+> BTW, the split header feature will be very useful on some certain
+> cases, stmmac driver should support this feature always.
+> 
+> [2]
+> diff --git a/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c b/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
+> index edbf8994455d..def0d893efbb 100644
+> --- a/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
+> +++ b/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
+> @@ -2091,7 +2091,7 @@ static int __alloc_dma_rx_desc_resources(struct stmmac_priv *priv,
+>         pp_params.nid = dev_to_node(priv->device);
+>         pp_params.dev = priv->device;
+>         pp_params.dma_dir = xdp_prog ? DMA_BIDIRECTIONAL : DMA_FROM_DEVICE;
+> -       pp_params.offset = stmmac_rx_offset(priv);
+> +       pp_params.offset = priv->sph ? 0 : stmmac_rx_offset(priv);
 
-1) TX NAPI doesn't have a NAPI ID, this seems more like a NAPI
-implementation details which should be hidden from the driver.
-2) If 1 is true, in the netif_queue_set_napi(), should it be better to
-add and check for whether or not NAPI has an ID and return early if it
-doesn't have one
-3) Then driver doesn't need to know NAPI implementation details like
-NAPI stuffs?
+SPH is the only scenario in which the driver uses multiple buffers per
+packet?
 
->
-> > 2) does NAPI know (or why it needs to know) whether or not it's a TX
-> > or not? I only see the following code in napi_hash_add():
->
-> Note that I did not write the original implementation of NAPI IDs or
-> epoll-based busy poll, so I can only comment on what I know :)
->
-> I don't know why TX-only NAPIs do not have NAPI IDs. My guess is
-> that in the original implementation, the code was designed only for
-> RX busy polling, so TX-only NAPIs were not assigned NAPI IDs.
->
-> Perhaps in the future, TX-only NAPIs will be assigned NAPI IDs, but
-> currently they do not have NAPI IDs.
+>         pp_params.max_len = dma_conf->dma_buf_sz;
 
-Jakub, could you please help to clarify this part?
+Are you sure this is correct? Page pool documentation says that "For
+pages recycled on the XDP xmit and skb paths the page pool will use the
+max_len member of struct page_pool_params to decide how much of the page
+needs to be synced (starting at offset)" [1].
 
->
-> > static void napi_hash_add(struct napi_struct *napi)
-> > {
-> >         unsigned long flags;
-> >
-> >         if (test_bit(NAPI_STATE_NO_BUSY_POLL, &napi->state))
-> >                 return;
-> >
-> > ...
-> >
-> >         __napi_hash_add_with_id(napi, napi_gen_id);
-> >
-> >         spin_unlock_irqrestore(&napi_hash_lock, flags);
-> > }
-> >
-> > It seems it only matters with NAPI_STATE_NO_BUSY_POLL.
-> >
-> > And if NAPI knows everything, should it be better to just do the
-> > linking in napi_enable/disable() instead of letting each driver do it
-> > by itself?
->
-> It would be nice if this were possible, I agree. Perhaps in the
-> future some work could be done to make this possible.
->
-> I believe that this is not currently possible because the NAPI does
-> not know which queue ID it is associated with. That mapping of which
-> queue is associated with which NAPI is established in patch 3
-> (please see the commit message of patch 3 to see an example of the
-> output).
->
-> The driver knows both the queue ID and the NAPI for that queue, so
-> the mapping can be established only by the driver.
->
-> Let me know if that helps.
+While "no more than dma_conf->dma_buf_sz bytes will be written into a
+page buffer", for the head buffer they will be written starting at a
+non-zero offset unlike buffers used for the data, no?
 
-Yes, definitely.
-
-Let's see Jakub's comment.
-
-Thanks
-
->
-> - Joe
->
-
+[1] https://docs.kernel.org/networking/page_pool.html#dma-sync
 
