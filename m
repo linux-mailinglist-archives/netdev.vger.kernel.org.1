@@ -1,63 +1,65 @@
-Return-Path: <netdev+bounces-160993-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-160994-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 52DF7A1CA68
-	for <lists+netdev@lfdr.de>; Sun, 26 Jan 2025 16:24:29 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 78661A1CA7B
+	for <lists+netdev@lfdr.de>; Sun, 26 Jan 2025 16:25:55 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 6381F166E0F
-	for <lists+netdev@lfdr.de>; Sun, 26 Jan 2025 15:21:25 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id E0FCB188B88F
+	for <lists+netdev@lfdr.de>; Sun, 26 Jan 2025 15:23:43 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AC5891DB158;
-	Sun, 26 Jan 2025 15:00:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 10C01199EA1;
+	Sun, 26 Jan 2025 15:01:05 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="s2Cybz0A"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="hKp8hYVM"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7F79C1DB153;
-	Sun, 26 Jan 2025 15:00:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D5C9C1991DB;
+	Sun, 26 Jan 2025 15:01:04 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1737903637; cv=none; b=BXB5Cd6CezgY/1e5ZQOgxv7bT/zHfLgvkRoX2xDgEABwOlD7PA5U3Suaagl0wZgrEb9loDSSkkZzHkVpEnlBNW3EfchwqJYpI/2YaT8VeiXeSC3frtm0zmCF5z4MIdeE+P91oAf/N2j3U0pjurSR9bg/igOG1pB2MQCBRO7x4h0=
+	t=1737903664; cv=none; b=RIyGLONGmyIMziVYwbJ/cutJhQ5Uy69BlwS0lxZH0ow9YUhwaaGrxt3z/RCSt7wYGSKfD3KxIOA5OwolLdqkat2s99M0hPbR6mOiccKUWqU3s4Q/VZUU899LkFIf99hanNUzXVREjHCHf1dH1caWAnJQgOJFGp6gi350IayCqLc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1737903637; c=relaxed/simple;
-	bh=fObqih/2Zq/gvX/+WXZOufv98x30xVpavTBfRJMUPgM=;
+	s=arc-20240116; t=1737903664; c=relaxed/simple;
+	bh=vXz3NrQX5HK+DkHR+vTmua7NC3rct2Frbf5GEft/my8=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=Ajbo7Nfq1fIyaIbdEjcb3NhgD5tM1s3ZYqgA6WcviYlD/IRkqZx92RZMeUSVWoszUJMMApeQmbu4g5JWEHOip4TWnq1Z4p7YWT+ZT3k3Q8T3o871MlH7CrOqpf0ExS7Tj0b41c+c3qh/iulbI0C2ZrBNYKEJ9G5O2Tnj7EQ+0jw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=s2Cybz0A; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8146FC4CEE2;
-	Sun, 26 Jan 2025 15:00:35 +0000 (UTC)
+	 MIME-Version; b=nHtffXGabeS0/H6u2Eb3M4zHzuycVVAsGf48u68Eab1XYaM4/YhX/j9vS0AE0zwRXYV4V8dMc5MwKH01oRuu0ed63aWK7aa9wX8lqCSPApl/83T8Y6+n6pEz0X0bYOIPhr6N3CAWG3EWv/BaHBUs4JXC51DxqtJ5DettDV/eCI8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=hKp8hYVM; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 256E6C4CED3;
+	Sun, 26 Jan 2025 15:01:03 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1737903637;
-	bh=fObqih/2Zq/gvX/+WXZOufv98x30xVpavTBfRJMUPgM=;
+	s=k20201202; t=1737903664;
+	bh=vXz3NrQX5HK+DkHR+vTmua7NC3rct2Frbf5GEft/my8=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=s2Cybz0AnyKQLtMQUe4JdIkRftLUayCLMmL5p4wK2xH5qFUwxqzGjzBKANwFfbUAK
-	 LMiFJ+zBOfuOUCmY5I+yqVmpHOy//cK/7pKbA7ti0J6boWNJ2Nv+tcoR8RBgHe9zhH
-	 D6sfpf3TXG0O46ssDFBN/LwFWHPVgQdL6VpO42fYO2hFwRfMPG9H24fPFJCF9T4tCg
-	 YG4tEGLBjzgpTuqSo4/TYlPkEDxzx+XwX0uQH7rQ1o1C9Al8LWzcccLAGGNRDdDuiO
-	 LZYel46LYhu6zq6mLsPl1Q5GKn5DMAqRvIwz91zaeijTd9ks9tbySv6R4UG9gJR632
-	 i77FI0NxVVKUw==
+	b=hKp8hYVMH6AeJWP7SKn28AGVSuM2rImkC5lhGCwZiLClhQ9lqNdT89UYbG5UMhgr8
+	 4Hm4VZqye+LFVLsZHg+m4R+11jt3dkQWsdqC5hM3VRw2iq0dXTSCfKki8OtlEHgPGz
+	 cyTwnC7pi4WnTeVy4nGF8L+N/MVJEEBxk+zispm/SZW2zIS/BFV2lK9NfyFcXDy9YU
+	 2cKvUE5Bz7xfpniSUuWW4INq5foCK7M6FWyTpXnA1Lfa0oP2FM9D4UjITM6ovoKZ1o
+	 0RnWFDhLKCHxFY9RhXKf252bHZtw3jmK3j4Z8wV7Fk2PzujTRxITpLP4T6PurI7iMP
+	 I7ja/FXwlLLLA==
 From: Sasha Levin <sashal@kernel.org>
 To: linux-kernel@vger.kernel.org,
 	stable@vger.kernel.org
-Cc: Stas Sergeev <stsp2@yandex.ru>,
-	Willem de Bruijn <willemb@google.com>,
-	Jason Wang <jasowang@redhat.com>,
+Cc: Yevgeny Kliteynik <kliteyn@nvidia.com>,
+	Itamar Gozlan <igozlan@nvidia.com>,
+	Mark Bloch <mbloch@nvidia.com>,
+	Tariq Toukan <tariqt@nvidia.com>,
 	Jakub Kicinski <kuba@kernel.org>,
 	Sasha Levin <sashal@kernel.org>,
-	willemdebruijn.kernel@gmail.com,
+	saeedm@nvidia.com,
 	andrew+netdev@lunn.ch,
 	davem@davemloft.net,
 	edumazet@google.com,
 	pabeni@redhat.com,
-	netdev@vger.kernel.org
-Subject: [PATCH AUTOSEL 6.13 04/35] tun: fix group permission check
-Date: Sun, 26 Jan 2025 09:59:58 -0500
-Message-Id: <20250126150029.953021-4-sashal@kernel.org>
+	netdev@vger.kernel.org,
+	linux-rdma@vger.kernel.org
+Subject: [PATCH AUTOSEL 6.13 13/35] net/mlx5: HWS, change error flow on matcher disconnect
+Date: Sun, 26 Jan 2025 10:00:07 -0500
+Message-Id: <20250126150029.953021-13-sashal@kernel.org>
 X-Mailer: git-send-email 2.39.5
 In-Reply-To: <20250126150029.953021-1-sashal@kernel.org>
 References: <20250126150029.953021-1-sashal@kernel.org>
@@ -72,70 +74,94 @@ X-Patchwork-Hint: Ignore
 X-stable-base: Linux 6.13
 Content-Transfer-Encoding: 8bit
 
-From: Stas Sergeev <stsp2@yandex.ru>
+From: Yevgeny Kliteynik <kliteyn@nvidia.com>
 
-[ Upstream commit 3ca459eaba1bf96a8c7878de84fa8872259a01e3 ]
+[ Upstream commit 1ce840c7a659aa53a31ef49f0271b4fd0dc10296 ]
 
-Currently tun checks the group permission even if the user have matched.
-Besides going against the usual permission semantic, this has a
-very interesting implication: if the tun group is not among the
-supplementary groups of the tun user, then effectively no one can
-access the tun device. CAP_SYS_ADMIN still can, but its the same as
-not setting the tun ownership.
+Currently, when firmware failure occurs during matcher disconnect flow,
+the error flow of the function reconnects the matcher back and returns
+an error, which continues running the calling function and eventually
+frees the matcher that is being disconnected.
+This leads to a case where we have a freed matcher on the matchers list,
+which in turn leads to use-after-free and eventual crash.
 
-This patch relaxes the group checking so that either the user match
-or the group match is enough. This avoids the situation when no one
-can access the device even though the ownership is properly set.
+This patch fixes that by not trying to reconnect the matcher back when
+some FW command fails during disconnect.
 
-Also I simplified the logic by removing the redundant inversions:
-tun_not_capable() --> !tun_capable()
+Note that we're dealing here with FW error. We can't overcome this
+problem. This might lead to bad steering state (e.g. wrong connection
+between matchers), and will also lead to resource leakage, as it is
+the case with any other error handling during resource destruction.
 
-Signed-off-by: Stas Sergeev <stsp2@yandex.ru>
-Reviewed-by: Willem de Bruijn <willemb@google.com>
-Acked-by: Jason Wang <jasowang@redhat.com>
-Link: https://patch.msgid.link/20241205073614.294773-1-stsp2@yandex.ru
+However, the goal here is to allow the driver to continue and not crash
+the machine with use-after-free error.
+
+Signed-off-by: Yevgeny Kliteynik <kliteyn@nvidia.com>
+Signed-off-by: Itamar Gozlan <igozlan@nvidia.com>
+Reviewed-by: Mark Bloch <mbloch@nvidia.com>
+Signed-off-by: Tariq Toukan <tariqt@nvidia.com>
+Link: https://patch.msgid.link/20250102181415.1477316-7-tariqt@nvidia.com
 Signed-off-by: Jakub Kicinski <kuba@kernel.org>
 Signed-off-by: Sasha Levin <sashal@kernel.org>
 ---
- drivers/net/tun.c | 14 +++++++++-----
- 1 file changed, 9 insertions(+), 5 deletions(-)
+ .../mellanox/mlx5/core/steering/hws/matcher.c | 24 +++++++------------
+ 1 file changed, 8 insertions(+), 16 deletions(-)
 
-diff --git a/drivers/net/tun.c b/drivers/net/tun.c
-index e816aaba8e5f2..9186348c9e733 100644
---- a/drivers/net/tun.c
-+++ b/drivers/net/tun.c
-@@ -574,14 +574,18 @@ static u16 tun_select_queue(struct net_device *dev, struct sk_buff *skb,
- 	return ret;
+diff --git a/drivers/net/ethernet/mellanox/mlx5/core/steering/hws/matcher.c b/drivers/net/ethernet/mellanox/mlx5/core/steering/hws/matcher.c
+index 1bb3a6f8c3cda..e94f96c0c781f 100644
+--- a/drivers/net/ethernet/mellanox/mlx5/core/steering/hws/matcher.c
++++ b/drivers/net/ethernet/mellanox/mlx5/core/steering/hws/matcher.c
+@@ -165,14 +165,14 @@ static int hws_matcher_disconnect(struct mlx5hws_matcher *matcher)
+ 						    next->match_ste.rtc_0_id,
+ 						    next->match_ste.rtc_1_id);
+ 		if (ret) {
+-			mlx5hws_err(tbl->ctx, "Failed to disconnect matcher\n");
+-			goto matcher_reconnect;
++			mlx5hws_err(tbl->ctx, "Fatal error, failed to disconnect matcher\n");
++			return ret;
+ 		}
+ 	} else {
+ 		ret = mlx5hws_table_connect_to_miss_table(tbl, tbl->default_miss.miss_tbl);
+ 		if (ret) {
+-			mlx5hws_err(tbl->ctx, "Failed to disconnect last matcher\n");
+-			goto matcher_reconnect;
++			mlx5hws_err(tbl->ctx, "Fatal error, failed to disconnect last matcher\n");
++			return ret;
+ 		}
+ 	}
+ 
+@@ -180,27 +180,19 @@ static int hws_matcher_disconnect(struct mlx5hws_matcher *matcher)
+ 	if (prev_ft_id == tbl->ft_id) {
+ 		ret = mlx5hws_table_update_connected_miss_tables(tbl);
+ 		if (ret) {
+-			mlx5hws_err(tbl->ctx, "Fatal error, failed to update connected miss table\n");
+-			goto matcher_reconnect;
++			mlx5hws_err(tbl->ctx,
++				    "Fatal error, failed to update connected miss table\n");
++			return ret;
+ 		}
+ 	}
+ 
+ 	ret = mlx5hws_table_ft_set_default_next_ft(tbl, prev_ft_id);
+ 	if (ret) {
+ 		mlx5hws_err(tbl->ctx, "Fatal error, failed to restore matcher ft default miss\n");
+-		goto matcher_reconnect;
++		return ret;
+ 	}
+ 
+ 	return 0;
+-
+-matcher_reconnect:
+-	if (list_empty(&tbl->matchers_list) || !prev)
+-		list_add(&matcher->list_node, &tbl->matchers_list);
+-	else
+-		/* insert after prev matcher */
+-		list_add(&matcher->list_node, &prev->list_node);
+-
+-	return ret;
  }
  
--static inline bool tun_not_capable(struct tun_struct *tun)
-+static inline bool tun_capable(struct tun_struct *tun)
- {
- 	const struct cred *cred = current_cred();
- 	struct net *net = dev_net(tun->dev);
- 
--	return ((uid_valid(tun->owner) && !uid_eq(cred->euid, tun->owner)) ||
--		  (gid_valid(tun->group) && !in_egroup_p(tun->group))) &&
--		!ns_capable(net->user_ns, CAP_NET_ADMIN);
-+	if (ns_capable(net->user_ns, CAP_NET_ADMIN))
-+		return 1;
-+	if (uid_valid(tun->owner) && uid_eq(cred->euid, tun->owner))
-+		return 1;
-+	if (gid_valid(tun->group) && in_egroup_p(tun->group))
-+		return 1;
-+	return 0;
- }
- 
- static void tun_set_real_num_queues(struct tun_struct *tun)
-@@ -2778,7 +2782,7 @@ static int tun_set_iff(struct net *net, struct file *file, struct ifreq *ifr)
- 		    !!(tun->flags & IFF_MULTI_QUEUE))
- 			return -EINVAL;
- 
--		if (tun_not_capable(tun))
-+		if (!tun_capable(tun))
- 			return -EPERM;
- 		err = security_tun_dev_open(tun->security);
- 		if (err < 0)
+ static void hws_matcher_set_rtc_attr_sz(struct mlx5hws_matcher *matcher,
 -- 
 2.39.5
 
