@@ -1,68 +1,63 @@
-Return-Path: <netdev+bounces-161022-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-161023-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 28B37A1CBE5
-	for <lists+netdev@lfdr.de>; Sun, 26 Jan 2025 16:56:51 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id C912CA1CBB3
+	for <lists+netdev@lfdr.de>; Sun, 26 Jan 2025 16:53:11 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D212E3AB4A7
-	for <lists+netdev@lfdr.de>; Sun, 26 Jan 2025 15:47:58 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 7AF5E164CCA
+	for <lists+netdev@lfdr.de>; Sun, 26 Jan 2025 15:49:07 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6FCFA228CA2;
-	Sun, 26 Jan 2025 15:04:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 201ED22A4E2;
+	Sun, 26 Jan 2025 15:04:55 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Gkg337R2"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="UfSJ2LEZ"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3F306228C99;
-	Sun, 26 Jan 2025 15:04:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EB8C11A4F3C;
+	Sun, 26 Jan 2025 15:04:54 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1737903886; cv=none; b=F00Wn1oYHYP6aNmhyqi4VqqbB2CiIOhNjb2tHjZGZj/2kU06jHsDNk9dbVoLAPKgu2UPT2SNF1mSommxgtblRxuBeYN0oWFAGR4QQz1swTXEaDem0670mhVhoPOTNaqm+trj7/It8LgQ/wRGr5Ff1TGUcRcOozyixvydoMLVskk=
+	t=1737903895; cv=none; b=G/M9Yr2WGocLKV4qkWYVldBkl5rCrCyDjZBjzP0+abV2gBetf/mvSEyAn5BLHm1O2pL4Jk0AFZhE84Z0/V29IIR8g08ACQ1HVYo0TeDnk6UgzsZjxSehS5VEJJb36ExdN1fduxxEVH8L3G7athNlXm39ANqrSxhSdKZKoAJcX2s=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1737903886; c=relaxed/simple;
-	bh=cw+KWHZ1sZybl/8w3xIx8akhRsW/EuEKwhCM3OT44tc=;
+	s=arc-20240116; t=1737903895; c=relaxed/simple;
+	bh=SQWxZ0GpT3SqsCUOP+1nWRk1TGrxcTuMZnr9kQ2VdSQ=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=QVLxYud9nNyrIS8Jwj9jCwPplbT+Al4ScXWeNxLsjo8bwbJpeY3rYBxHZCaVM9XiFPpF6GmWHr6peWSUojfMtiZalAZgBCY1RQT86TGdNQDOXEAZFb4DtUXLVtpQkbF+zjDw+TlIZs5b9M3IlmLcRDGEuBTosjXqrT8Pn9M+Qrs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Gkg337R2; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 47231C4CEE2;
-	Sun, 26 Jan 2025 15:04:44 +0000 (UTC)
+	 MIME-Version; b=ZjNZXDW6RFHtaEGt4oaMpSLcX1R9xbfcXYcx6uCeMKLKXv0wODsjYkMEg4DIDgQVKhctsyidG84a5zsAR37w8eNc+WpHBoPaWT+UnBvijF8H4MNh3dKkrjh75rG6AxbLSF0BvcL2Ce5MV2NevFeTlNaNh6zeuvBZtfoeehozsfY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=UfSJ2LEZ; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 71B1AC4CEE3;
+	Sun, 26 Jan 2025 15:04:53 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1737903886;
-	bh=cw+KWHZ1sZybl/8w3xIx8akhRsW/EuEKwhCM3OT44tc=;
+	s=k20201202; t=1737903894;
+	bh=SQWxZ0GpT3SqsCUOP+1nWRk1TGrxcTuMZnr9kQ2VdSQ=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=Gkg337R2xCu1BMBxOhChcI0kCyZDoyY4DTL+o3YI3/n79ZuiOoGOEDOYwrxE0z06K
-	 sZTjI6fQ61NhMyLaFJ3pKFxBAPMkkqNLLAsHf7+Owa96e5+CE6fHKL1rdY+sfC9BgQ
-	 ov61N01i+QOawDLJOOPLIUNB4Hp3cZpUqTQz26gksUEVZFupG3i9PwyW2MQtMyLJP8
-	 g7GRaEc+QQ/ISPybcBGDXGZoNmvKb8iNCt9bugMeWHsS5FFt8U+5L4n3tXx+26y2pC
-	 7w+C/iq74wtn5wmAvJH/Oa3aPKIkxwRZvbvKilubx1Dfi9zAlj/YrTC7bzvxMsMY/r
-	 LohIWIDJFSOJA==
+	b=UfSJ2LEZAxiNjF5bPV1R0nMVN1N1/shaIU00wZizkL76K+aujLm0XAtvjCGwJRqX1
+	 vUYt5vv9bnwnOPAM+DxzvqEnpzipU++UfXl6ipUVMB+CXMV0R92BcvmJNIZAzeBwkL
+	 6QRaYqhZFFfG9eXe7tu3Z7zrLR3FLFFL1fs0AIgnZgB4DDwylru8zCdi2lhyTYY+R2
+	 1jG4+AW6eSqm54NpIQjNpaMr0OLNKgVV18UACyVNWw8kT+bYS8lFNAmC/YiZEzpcN4
+	 K1A8UHx3rf+NxZ85Z9CXG9amhH5M5G6Mi+5IuM7F3/0dcOD78QvKOLXH8KLrOTuhmn
+	 v9s5rQdx0xQCg==
 From: Sasha Levin <sashal@kernel.org>
 To: linux-kernel@vger.kernel.org,
 	stable@vger.kernel.org
-Cc: Vadim Fedorenko <vadfed@meta.com>,
-	Dragos Tatulea <dtatulea@nvidia.com>,
-	Tariq Toukan <tariqt@nvidia.com>,
-	Paolo Abeni <pabeni@redhat.com>,
+Cc: "Maciej S. Szmigiero" <mail@maciej.szmigiero.name>,
+	Sergey Ryazanov <ryazanov.s.a@gmail.com>,
+	Jakub Kicinski <kuba@kernel.org>,
 	Sasha Levin <sashal@kernel.org>,
-	saeedm@nvidia.com,
+	m.chetan.kumar@intel.com,
+	loic.poulain@linaro.org,
 	andrew+netdev@lunn.ch,
 	davem@davemloft.net,
 	edumazet@google.com,
-	kuba@kernel.org,
-	richardcochran@gmail.com,
-	rrameshbabu@nvidia.com,
-	vadim.fedorenko@linux.dev,
-	cjubran@nvidia.com,
-	netdev@vger.kernel.org,
-	linux-rdma@vger.kernel.org
-Subject: [PATCH AUTOSEL 5.15 07/14] net/mlx5: use do_aux_work for PHC overflow checks
-Date: Sun, 26 Jan 2025 10:04:23 -0500
-Message-Id: <20250126150430.958708-7-sashal@kernel.org>
+	pabeni@redhat.com,
+	netdev@vger.kernel.org
+Subject: [PATCH AUTOSEL 5.15 11/14] net: wwan: iosm: Fix hibernation by re-binding the driver around it
+Date: Sun, 26 Jan 2025 10:04:27 -0500
+Message-Id: <20250126150430.958708-11-sashal@kernel.org>
 X-Mailer: git-send-email 2.39.5
 In-Reply-To: <20250126150430.958708-1-sashal@kernel.org>
 References: <20250126150430.958708-1-sashal@kernel.org>
@@ -77,127 +72,144 @@ X-Patchwork-Hint: Ignore
 X-stable-base: Linux 5.15.177
 Content-Transfer-Encoding: 8bit
 
-From: Vadim Fedorenko <vadfed@meta.com>
+From: "Maciej S. Szmigiero" <mail@maciej.szmigiero.name>
 
-[ Upstream commit e61e6c415ba9ff2b32bb6780ce1b17d1d76238f1 ]
+[ Upstream commit 0b6f6593aa8c3a05f155c12fd0e7ad33a5149c31 ]
 
-The overflow_work is using system wq to do overflow checks and updates
-for PHC device timecounter, which might be overhelmed by other tasks.
-But there is dedicated kthread in PTP subsystem designed for such
-things. This patch changes the work queue to proper align with PTP
-subsystem and to avoid overloading system work queue.
-The adjfine() function acts the same way as overflow check worker,
-we can postpone ptp aux worker till the next overflow period after
-adjfine() was called.
+Currently, the driver is seriously broken with respect to the
+hibernation (S4): after image restore the device is back into
+IPC_MEM_EXEC_STAGE_BOOT (which AFAIK means bootloader stage) and needs
+full re-launch of the rest of its firmware, but the driver restore
+handler treats the device as merely sleeping and just sends it a
+wake-up command.
 
-Reviewed-by: Dragos Tatulea <dtatulea@nvidia.com>
-Signed-off-by: Vadim Fedorenko <vadfed@meta.com>
-Acked-by: Tariq Toukan <tariqt@nvidia.com>
-Link: https://patch.msgid.link/20250107104812.380225-1-vadfed@meta.com
-Signed-off-by: Paolo Abeni <pabeni@redhat.com>
+This wake-up command times out but device nodes (/dev/wwan*) remain
+accessible.
+However attempting to use them causes the bootloader to crash and
+enter IPC_MEM_EXEC_STAGE_CD_READY stage (which apparently means "a crash
+dump is ready").
+
+It seems that the device cannot be re-initialized from this crashed
+stage without toggling some reset pin (on my test platform that's
+apparently what the device _RST ACPI method does).
+
+While it would theoretically be possible to rewrite the driver to tear
+down the whole MUX / IPC layers on hibernation (so the bootloader does
+not crash from improper access) and then re-launch the device on
+restore this would require significant refactoring of the driver
+(believe me, I've tried), since there are quite a few assumptions
+hard-coded in the driver about the device never being partially
+de-initialized (like channels other than devlink cannot be closed,
+for example).
+Probably this would also need some programming guide for this hardware.
+
+Considering that the driver seems orphaned [1] and other people are
+hitting this issue too [2] fix it by simply unbinding the PCI driver
+before hibernation and re-binding it after restore, much like
+USB_QUIRK_RESET_RESUME does for USB devices that exhibit a similar
+problem.
+
+Tested on XMM7360 in HP EliteBook 855 G7 both with s2idle (which uses
+the existing suspend / resume handlers) and S4 (which uses the new code).
+
+[1]: https://lore.kernel.org/all/c248f0b4-2114-4c61-905f-466a786bdebb@leemhuis.info/
+[2]:
+https://github.com/xmm7360/xmm7360-pci/issues/211#issuecomment-1804139413
+
+Reviewed-by: Sergey Ryazanov <ryazanov.s.a@gmail.com>
+Signed-off-by: Maciej S. Szmigiero <mail@maciej.szmigiero.name>
+Link: https://patch.msgid.link/e60287ebdb0ab54c4075071b72568a40a75d0205.1736372610.git.mail@maciej.szmigiero.name
+Signed-off-by: Jakub Kicinski <kuba@kernel.org>
 Signed-off-by: Sasha Levin <sashal@kernel.org>
 ---
- .../ethernet/mellanox/mlx5/core/lib/clock.c   | 24 ++++++++++---------
- include/linux/mlx5/driver.h                   |  1 -
- 2 files changed, 13 insertions(+), 12 deletions(-)
+ drivers/net/wwan/iosm/iosm_ipc_pcie.c | 56 ++++++++++++++++++++++++++-
+ 1 file changed, 55 insertions(+), 1 deletion(-)
 
-diff --git a/drivers/net/ethernet/mellanox/mlx5/core/lib/clock.c b/drivers/net/ethernet/mellanox/mlx5/core/lib/clock.c
-index 6fece284de0f3..26d91b080d3c4 100644
---- a/drivers/net/ethernet/mellanox/mlx5/core/lib/clock.c
-+++ b/drivers/net/ethernet/mellanox/mlx5/core/lib/clock.c
-@@ -177,17 +177,16 @@ static void mlx5_pps_out(struct work_struct *work)
- 	}
- }
+diff --git a/drivers/net/wwan/iosm/iosm_ipc_pcie.c b/drivers/net/wwan/iosm/iosm_ipc_pcie.c
+index 8b4222b137d14..968ca9ff21df1 100644
+--- a/drivers/net/wwan/iosm/iosm_ipc_pcie.c
++++ b/drivers/net/wwan/iosm/iosm_ipc_pcie.c
+@@ -6,6 +6,7 @@
+ #include <linux/acpi.h>
+ #include <linux/bitfield.h>
+ #include <linux/module.h>
++#include <linux/suspend.h>
+ #include <net/rtnetlink.h>
  
--static void mlx5_timestamp_overflow(struct work_struct *work)
-+static long mlx5_timestamp_overflow(struct ptp_clock_info *ptp_info)
+ #include "iosm_ipc_imem.h"
+@@ -18,6 +19,7 @@ MODULE_LICENSE("GPL v2");
+ /* WWAN GUID */
+ static guid_t wwan_acpi_guid = GUID_INIT(0xbad01b75, 0x22a8, 0x4f48, 0x87, 0x92,
+ 				       0xbd, 0xde, 0x94, 0x67, 0x74, 0x7d);
++static bool pci_registered;
+ 
+ static void ipc_pcie_resources_release(struct iosm_pcie *ipc_pcie)
  {
--	struct delayed_work *dwork = to_delayed_work(work);
- 	struct mlx5_core_dev *mdev;
- 	struct mlx5_timer *timer;
- 	struct mlx5_clock *clock;
- 	unsigned long flags;
- 
--	timer = container_of(dwork, struct mlx5_timer, overflow_work);
--	clock = container_of(timer, struct mlx5_clock, timer);
-+	clock = container_of(ptp_info, struct mlx5_clock, ptp_info);
- 	mdev = container_of(clock, struct mlx5_core_dev, clock);
-+	timer = &clock->timer;
- 
- 	if (mdev->state == MLX5_DEVICE_STATE_INTERNAL_ERROR)
- 		goto out;
-@@ -198,7 +197,7 @@ static void mlx5_timestamp_overflow(struct work_struct *work)
- 	write_sequnlock_irqrestore(&clock->lock, flags);
- 
- out:
--	schedule_delayed_work(&timer->overflow_work, timer->overflow_period);
-+	return timer->overflow_period;
- }
- 
- static int mlx5_ptp_settime_real_time(struct mlx5_core_dev *mdev,
-@@ -366,6 +365,7 @@ static int mlx5_ptp_adjfreq(struct ptp_clock_info *ptp, s32 delta)
- 				       timer->nominal_c_mult + diff;
- 	mlx5_update_clock_info_page(mdev);
- 	write_sequnlock_irqrestore(&clock->lock, flags);
-+	ptp_schedule_worker(clock->ptp, timer->overflow_period);
- 
- 	return 0;
- }
-@@ -616,6 +616,7 @@ static const struct ptp_clock_info mlx5_ptp_clock_info = {
- 	.settime64	= mlx5_ptp_settime,
- 	.enable		= NULL,
- 	.verify		= NULL,
-+	.do_aux_work	= mlx5_timestamp_overflow,
+@@ -484,7 +486,6 @@ static struct pci_driver iosm_ipc_driver = {
+ 	},
+ 	.id_table = iosm_ipc_ids,
  };
+-module_pci_driver(iosm_ipc_driver);
  
- static int mlx5_query_mtpps_pin_mode(struct mlx5_core_dev *mdev, u8 pin,
-@@ -809,12 +810,11 @@ static void mlx5_init_overflow_period(struct mlx5_clock *clock)
- 	do_div(ns, NSEC_PER_SEC / HZ);
- 	timer->overflow_period = ns;
- 
--	INIT_DELAYED_WORK(&timer->overflow_work, mlx5_timestamp_overflow);
--	if (timer->overflow_period)
--		schedule_delayed_work(&timer->overflow_work, 0);
--	else
-+	if (!timer->overflow_period) {
-+		timer->overflow_period = HZ;
- 		mlx5_core_warn(mdev,
--			       "invalid overflow period, overflow_work is not scheduled\n");
-+			       "invalid overflow period, overflow_work is scheduled once per second\n");
-+	}
- 
- 	if (clock_info)
- 		clock_info->overflow_period = timer->overflow_period;
-@@ -900,6 +900,9 @@ void mlx5_init_clock(struct mlx5_core_dev *mdev)
- 
- 	MLX5_NB_INIT(&clock->pps_nb, mlx5_pps_event, PPS_EVENT);
- 	mlx5_eq_notifier_register(mdev, &clock->pps_nb);
+ int ipc_pcie_addr_map(struct iosm_pcie *ipc_pcie, unsigned char *data,
+ 		      size_t size, dma_addr_t *mapping, int direction)
+@@ -566,3 +567,56 @@ void ipc_pcie_kfree_skb(struct iosm_pcie *ipc_pcie, struct sk_buff *skb)
+ 	IPC_CB(skb)->mapping = 0;
+ 	dev_kfree_skb(skb);
+ }
 +
-+	if (clock->ptp)
-+		ptp_schedule_worker(clock->ptp, 0);
- }
- 
- void mlx5_cleanup_clock(struct mlx5_core_dev *mdev)
-@@ -916,7 +919,6 @@ void mlx5_cleanup_clock(struct mlx5_core_dev *mdev)
- 	}
- 
- 	cancel_work_sync(&clock->pps_info.out_work);
--	cancel_delayed_work_sync(&clock->timer.overflow_work);
- 
- 	if (mdev->clock_info) {
- 		free_page((unsigned long)mdev->clock_info);
-diff --git a/include/linux/mlx5/driver.h b/include/linux/mlx5/driver.h
-index 62d60a515b038..4efd83a7f14fe 100644
---- a/include/linux/mlx5/driver.h
-+++ b/include/linux/mlx5/driver.h
-@@ -686,7 +686,6 @@ struct mlx5_timer {
- 	struct timecounter         tc;
- 	u32                        nominal_c_mult;
- 	unsigned long              overflow_period;
--	struct delayed_work        overflow_work;
- };
- 
- struct mlx5_clock {
++static int pm_notify(struct notifier_block *nb, unsigned long mode, void *_unused)
++{
++	if (mode == PM_HIBERNATION_PREPARE || mode == PM_RESTORE_PREPARE) {
++		if (pci_registered) {
++			pci_unregister_driver(&iosm_ipc_driver);
++			pci_registered = false;
++		}
++	} else if (mode == PM_POST_HIBERNATION || mode == PM_POST_RESTORE) {
++		if (!pci_registered) {
++			int ret;
++
++			ret = pci_register_driver(&iosm_ipc_driver);
++			if (ret) {
++				pr_err(KBUILD_MODNAME ": unable to re-register PCI driver: %d\n",
++				       ret);
++			} else {
++				pci_registered = true;
++			}
++		}
++	}
++
++	return 0;
++}
++
++static struct notifier_block pm_notifier = {
++	.notifier_call = pm_notify,
++};
++
++static int __init iosm_ipc_driver_init(void)
++{
++	int ret;
++
++	ret = pci_register_driver(&iosm_ipc_driver);
++	if (ret)
++		return ret;
++
++	pci_registered = true;
++
++	register_pm_notifier(&pm_notifier);
++
++	return 0;
++}
++module_init(iosm_ipc_driver_init);
++
++static void __exit iosm_ipc_driver_exit(void)
++{
++	unregister_pm_notifier(&pm_notifier);
++
++	if (pci_registered)
++		pci_unregister_driver(&iosm_ipc_driver);
++}
++module_exit(iosm_ipc_driver_exit);
 -- 
 2.39.5
 
