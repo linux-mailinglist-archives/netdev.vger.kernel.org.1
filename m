@@ -1,159 +1,122 @@
-Return-Path: <netdev+bounces-160950-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-160951-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 95D8FA1C649
-	for <lists+netdev@lfdr.de>; Sun, 26 Jan 2025 05:13:48 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2FC98A1C659
+	for <lists+netdev@lfdr.de>; Sun, 26 Jan 2025 06:34:02 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 4D6853A7249
-	for <lists+netdev@lfdr.de>; Sun, 26 Jan 2025 04:13:35 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 4FB81166FAC
+	for <lists+netdev@lfdr.de>; Sun, 26 Jan 2025 05:34:00 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 98C7319E994;
-	Sun, 26 Jan 2025 04:13:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 46C3B3BBC9;
+	Sun, 26 Jan 2025 05:33:59 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="GbAZ/S52"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=cs.stanford.edu header.i=@cs.stanford.edu header.b="HrYaNufR"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f180.google.com (mail-pl1-f180.google.com [209.85.214.180])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp1.cs.Stanford.EDU (smtp1.cs.stanford.edu [171.64.64.25])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0F7D119DFA7
-	for <netdev@vger.kernel.org>; Sun, 26 Jan 2025 04:13:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.180
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B82DC1372
+	for <netdev@vger.kernel.org>; Sun, 26 Jan 2025 05:33:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=171.64.64.25
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1737864804; cv=none; b=X/5zqA5SgqM5kF+vkIe44nAakjJ//AgJVYjgGbMXRJX4HAoDKa2syC4Zn62VEyEIn4Qy/UyrkoSnd6cQsVdAGp+IH6JYzLVTJMPvoeNSfPsBLsP5ojuLTv3uW8zUT72QvcxoxrDiCQAN0r54R4+uOnlvw/xtvAy5dz1Yiiv1m4w=
+	t=1737869639; cv=none; b=q9lU4C25UNS+xMUBKIQLlKawX719kajU435b0CPxIBkCeRP6fYVhINImch8VHH2aCQL0L8UM7mIhBpeR8lkpM7V6cWwH+sKck1d/XVx1eor9agtL5L7ih6puxp4Df6Y/T0QAagIlAFlxutZ8lF1k5JV02wa6yApONfsVPUwXHBI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1737864804; c=relaxed/simple;
-	bh=LWgxvj/KN59RqGC2OzK72Rk7dSY8bsknwV4JHD+nX5I=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=FaucscUYbxQ333h8zaMADHzbHw9QLZusMX8ZG/HOhRZt67K5XWtK+1GhWW6uGmC8QKnT1lXw59cwImDAxr2Sx0kv29x+KlKotQZ8ZwhyOnWmeRWYZv/QggUHYSFP2BpccMwNQ8kmtmLlHjgNb9gPEE3lJB+36Vay7PUDwoTbl1I=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=GbAZ/S52; arc=none smtp.client-ip=209.85.214.180
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pl1-f180.google.com with SMTP id d9443c01a7336-2162c0f6a39so81165935ad.0
-        for <netdev@vger.kernel.org>; Sat, 25 Jan 2025 20:13:23 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1737864802; x=1738469602; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=odZxDNANPjw9aQ1OR267U96V34DuukeaJXbQIgo9WJg=;
-        b=GbAZ/S52WUl3NeU4ipdrzyO6QhfmA9Rmd0jGTFDV1/BWiKEsURFhXpzmlL1lPOAj04
-         Cmo+pIQl5QquAl+cf0FVeDpqErbmO2wyvpPmqTD8JY388CUk/+CpAO/+RJlgt066ut2H
-         olmmqhmwsKcRyit7jBR0Na4USNt3MbTQG56juJ0jjDLY1aPT373qqUEpJnlT61wLNujv
-         klJIoXOxyWR8J3nw9RTmqKWqVNPcZkmYfOmT/ne2J4G1HkxKGxkvTvCqUscilmW6Uvmr
-         Mtx9nCmDMPQts4Y+IUkyBbb4S5y93jluw4vfehDuAlILhNGX+BJbJbNI/kgZBCnJnRFO
-         IgXA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1737864802; x=1738469602;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=odZxDNANPjw9aQ1OR267U96V34DuukeaJXbQIgo9WJg=;
-        b=mrNp5g2taWnY+WjKVh8IL1ejicy0kmXENem6oDE4MzHI8Z8TOuVUmQtzRq20jPcnaB
-         Va5lXfZg/n16esMfdSPyQtHG21pNgEpctHS44v+Ipte6RBoDvmjmVRS3aYq5OvvJHSLz
-         U9DVqW7oCLl6WWygiheJY/wnbwOEjGs5DERudtuTJODs7E+WAkJKpK2z/khiojBKxpWT
-         Mb8N3CUxACdSD2XT5JDTqYmUe0BWNUfNH56B5uZW5VNb0m4dUNbP4QjgN9dnQtGUGYTN
-         YPnYs7DoxGHuTqHL8DZUMkLSHnlSrbN67tUCUASbBNMdiuNwBRBXRC9EpL373KZuKs0I
-         258A==
-X-Gm-Message-State: AOJu0YwohLXeEqbG0Qa4pOzUjB3UdWSc91xO9jbjDwEerKcx9rvqQPE3
-	P8uqfp1IKWykKxatwZ4t4nCAiXemBz6rBzjG9J/Su9scJxcMwVT2xuBlfA==
-X-Gm-Gg: ASbGnctEScfoQm/mr1/VsHMgbzJkRdkqCzl1FwMPJU0vwUS+ng9Btbjzup0PAYdkQ8a
-	WGLSwUvTzG0OZNihJzDRX5uv/6GYEdTwPwgpAk9b7TGGJMUZ8zu5T10dLuh+3qB45MR4qPN3UI0
-	3/Q7S6yAKXh1XtM1zLh8HAyTrgzciaWm8rohRh0FQh1TOi0C5L1aAKD8kCzKgJpgLvD4Sxa923T
-	N9CS6X4smGKbyHBj2Hyr34cfvdAR0nC7z9gsDEDyr3pqxajR3J2P8naq03DfKhOnFRQyhh7S3S8
-	AhptZRP8O3WQ3Cjvrd4aanGBVuzJw91qZA==
-X-Google-Smtp-Source: AGHT+IEfvIo8rIfrQrNzUsgVicOokvBY1Ety/4y4nJEkHA2/LGKnmy4P1QLQ4dAPPNFEnakoEdP6gw==
-X-Received: by 2002:a05:6a00:2719:b0:72a:83ec:b1cb with SMTP id d2e1a72fcca58-72f8adf4091mr12559933b3a.0.1737864802201;
-        Sat, 25 Jan 2025 20:13:22 -0800 (PST)
-Received: from pop-os.hsd1.ca.comcast.net ([2601:647:6881:9060:86c9:5de5:8784:6d0b])
-        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-72f8a69fd40sm4514213b3a.3.2025.01.25.20.13.21
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sat, 25 Jan 2025 20:13:21 -0800 (PST)
-From: Cong Wang <xiyou.wangcong@gmail.com>
-To: netdev@vger.kernel.org
-Cc: jhs@mojatatu.com,
-	jiri@resnulli.us,
-	quanglex97@gmail.com,
-	mincho@theori.io,
-	Cong Wang <cong.wang@bytedance.com>
-Subject: [Patch net v2 4/4] selftests/tc-testing: add a test case for qdisc_tree_reduce_backlog()
-Date: Sat, 25 Jan 2025 20:12:24 -0800
-Message-Id: <20250126041224.366350-5-xiyou.wangcong@gmail.com>
-X-Mailer: git-send-email 2.34.1
-In-Reply-To: <20250126041224.366350-1-xiyou.wangcong@gmail.com>
-References: <20250126041224.366350-1-xiyou.wangcong@gmail.com>
+	s=arc-20240116; t=1737869639; c=relaxed/simple;
+	bh=2gYxR5d7da66lnF5h+7BWq8060+/bZgFrmKa+kIh1hM=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=ojVqNWKJ3LVOnKAadrSFKQK7yvOSeDsHQeNmZdg5dvyWMr+8QCH/Df1Fao5n/0B18/3oj1afiNUm1NHKfuOtFdmF/yfosK8boaAezs/bdU0lvFWm2GIBF+h0KhmXEiXL/zrxW6dFu/Z/isjI5GIRlzTbiuS4jy2AJpEOHBBY/08=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=cs.stanford.edu; spf=pass smtp.mailfrom=cs.stanford.edu; dkim=pass (2048-bit key) header.d=cs.stanford.edu header.i=@cs.stanford.edu header.b=HrYaNufR; arc=none smtp.client-ip=171.64.64.25
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=cs.stanford.edu
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=cs.stanford.edu
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=cs.stanford.edu; s=cs2308; h=Content-Transfer-Encoding:Content-Type:Cc:To:
+	Subject:Message-ID:Date:From:In-Reply-To:References:MIME-Version:Sender:
+	Reply-To:Content-ID:Content-Description:Resent-Date:Resent-From:Resent-Sender
+	:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:List-Help:List-Unsubscribe:
+	List-Subscribe:List-Post:List-Owner:List-Archive;
+	bh=IY2Dr/a1H5FXWZ7dMUxgXEROqvjQkfpO6JP9Gih7SBs=; t=1737869637; x=1738733637; 
+	b=HrYaNufRVsaEEJzjiVlfmqNEE+Cdvputm7NV6kavXQco598V0glzNMov/oOZ7LI8N3/ARN9WoDF
+	AWjiQP1XyRQmyNqTuyeRQ9DgGIQlHUj5fsIQKf2M3X08a5bbVIIdMUgjNf6jkOFDn74w5MVD58Udg
+	TjRESLU+KS2L+cXIcVPd/y52k5mF4bwo7wMWXdFQrG5uc9jDTdf2QuT53O0ZwB6rcXP8Hq6Ts0D7f
+	gstsS259JUJwrWOXjJ1cctMXoKWCoeL/geNZoqRDeYP3SQKGAKn718WSR289n0Pu8O3l7WsPKPrpQ
+	htLJmoYJ8rzYTDtN9EyzuSWiVJ4Dekcmq3uA==;
+Received: from mail-oa1-f48.google.com ([209.85.160.48]:60536)
+	by smtp1.cs.Stanford.EDU with esmtpsa  (TLS1.2) tls TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256
+	(Exim 4.94.2)
+	(envelope-from <ouster@cs.stanford.edu>)
+	id 1tbvHK-0004vP-OW
+	for netdev@vger.kernel.org; Sat, 25 Jan 2025 21:33:51 -0800
+Received: by mail-oa1-f48.google.com with SMTP id 586e51a60fabf-2a3a40c69e3so1917873fac.0
+        for <netdev@vger.kernel.org>; Sat, 25 Jan 2025 21:33:50 -0800 (PST)
+X-Forwarded-Encrypted: i=1; AJvYcCWIBkDQB0ljxdzhbIeQ8VsZoXyDoYqBwUCcwrcCyHuVTWRaLtajajw1zdUXpvNUibSQ6k4NbtA=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzoDDin8GkJ82KGfTzyvzqNV/Ql1R883ixa2Ft5B0V3X6Py5fk5
+	hLSJPhXdbxhTjiYRrpIc4v3Iq9/tR9vJUDSC1fKdQvcWmL8Cl/sFVuNRqjzYX7ISSF+limhT0U7
+	+OgV+T76WmIeogbvOyfhyZboJ/QA=
+X-Google-Smtp-Source: AGHT+IGf4GmDt0/f/MFSdMoVrOUVlCHfeVOXXodSvGgan20H9ZtSEzIovNELvOPj/qOTyetfIuoJU1qp1X93yi4HdrA=
+X-Received: by 2002:a05:6871:7887:b0:29e:6547:bfe1 with SMTP id
+ 586e51a60fabf-2b1c0842a07mr20713314fac.4.1737869630197; Sat, 25 Jan 2025
+ 21:33:50 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+References: <20250115185937.1324-1-ouster@cs.stanford.edu> <20250115185937.1324-5-ouster@cs.stanford.edu>
+ <a39c8c5c-4e39-42e6-8d8a-7bfdc6ace688@redhat.com> <CAGXJAmw95dDUxUFNa7UjV3XRd66vQRByAP5T_zra6KWdavr2Pg@mail.gmail.com>
+ <c5a5f0da-f941-4818-8dd7-b181cbfdca30@lunn.ch>
+In-Reply-To: <c5a5f0da-f941-4818-8dd7-b181cbfdca30@lunn.ch>
+From: John Ousterhout <ouster@cs.stanford.edu>
+Date: Sat, 25 Jan 2025 21:33:14 -0800
+X-Gmail-Original-Message-ID: <CAGXJAmy3QB84Jp7nTCF_4s0Cwj6Yg4csX+aHUz7qYpw+QsvOcw@mail.gmail.com>
+X-Gm-Features: AWEUYZmGHL3jzC1aEl87908niWkm5o9BHmxPaZX3l-mG6H207mhwTkwlp7XuElI
+Message-ID: <CAGXJAmy3QB84Jp7nTCF_4s0Cwj6Yg4csX+aHUz7qYpw+QsvOcw@mail.gmail.com>
+Subject: Re: [PATCH net-next v6 04/12] net: homa: create homa_pool.h and homa_pool.c
+To: Andrew Lunn <andrew@lunn.ch>
+Cc: Paolo Abeni <pabeni@redhat.com>, netdev@vger.kernel.org, edumazet@google.com, 
+	horms@kernel.org, kuba@kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-Spam-Score: -1.0
+X-Spam-Level: 
+X-Scan-Signature: 67f4a389e065da33eb5969ecb4726704
 
-From: Cong Wang <cong.wang@bytedance.com>
+On Fri, Jan 24, 2025 at 4:46=E2=80=AFPM Andrew Lunn <andrew@lunn.ch> wrote:
+>
+> > > > +     homa_sock_lock(pool->hsk, "homa_pool_allocate");
+> > >
+> > > There is some chicken-egg issue, with homa_sock_lock() being defined
+> > > only later in the series, but it looks like the string argument is ne=
+ver
+> > > used.
+> >
+> > Right: in normal usage this argument is ignored. It exists because
+> > there are occasionally deadlocks involving socket locks; when that
+> > happens I temporarily add code to homa_sock_lock that uses this
+> > argument to help track them down. I'd prefer to keep it, even though
+> > it isn't normally used, because otherwise when a new deadlock arises
+> > I'd have to modify every call to homa_sock_lock in order to add the
+> > information back in again. I added a few more words to the comment for
+> > homa_sock_lock to make this more clear.
+>
+> CONFIG_PROVE_LOCKING is pretty good at finding deadlocks, before they
+> happen. With practice you can turn the stack traces back to lines of
+> code, to know where each lock was taken. This is why no other part of
+> Linux has this sort of annotate with a string indicating where a lock
+> was taken.
+>
+> You really should have CONFIG_PROVE_LOCKING enabled when doing
+> development and functional testing. Then turn it off for performance
+> testing.
 
-Integrate the test case provided by Mingi Cho into TDC.
+This makes sense. I wasn't aware of CONFIG_LOCKDEP or
+CONFIG_PROVE_LOCKING until Eric Dumazet mentioned them in a comment on
+an earlier version of this patch. I've had them set in my development
+environment ever since, and I agree that the extra annotations
+shouldn't be necessary anymore. I'll take them out.
 
-All test results:
-
-1..4
-ok 1 ca5e - Check class delete notification for ffff:
-ok 2 e4b7 - Check class delete notification for root ffff:
-ok 3 33a9 - Check ingress is not searchable on backlog update
-ok 4 a4b9 - Test class qlen notification
-
-Cc: Mingi Cho <mincho@theori.io>
-Signed-off-by: Cong Wang <cong.wang@bytedance.com>
----
- .../tc-testing/tc-tests/infra/qdiscs.json     | 34 ++++++++++++++++++-
- 1 file changed, 33 insertions(+), 1 deletion(-)
-
-diff --git a/tools/testing/selftests/tc-testing/tc-tests/infra/qdiscs.json b/tools/testing/selftests/tc-testing/tc-tests/infra/qdiscs.json
-index d3dd65b05b5f..9044ac054167 100644
---- a/tools/testing/selftests/tc-testing/tc-tests/infra/qdiscs.json
-+++ b/tools/testing/selftests/tc-testing/tc-tests/infra/qdiscs.json
-@@ -94,5 +94,37 @@
-             "$TC qdisc del dev $DUMMY ingress",
-             "$IP addr del 10.10.10.10/24 dev $DUMMY"
-         ]
--    }
-+    },
-+    {
-+	"id": "a4b9",
-+	"name": "Test class qlen notification",
-+	"category": [
-+	    "qdisc"
-+	],
-+	"plugins": {
-+	    "requires": "nsPlugin"
-+	},
-+	"setup": [
-+            "$IP link set dev $DUMMY up || true",
-+            "$IP addr add 10.10.10.10/24 dev $DUMMY || true",
-+            "$TC qdisc add dev $DUMMY root handle 1: drr",
-+            "$TC filter add dev $DUMMY parent 1: basic classid 1:1",
-+            "$TC class add dev $DUMMY parent 1: classid 1:1 drr",
-+            "$TC qdisc add dev $DUMMY parent 1:1 handle 2: netem",
-+            "$TC qdisc add dev $DUMMY parent 2: handle 3: drr",
-+            "$TC filter add dev $DUMMY parent 3: basic action drop",
-+            "$TC class add dev $DUMMY parent 3: classid 3:1 drr",
-+            "$TC class del dev $DUMMY classid 1:1",
-+            "$TC class add dev $DUMMY parent 1: classid 1:1 drr"
-+        ],
-+        "cmdUnderTest": "ping -c1 -W0.01 -I $DUMMY 10.10.10.1",
-+        "expExitCode": "1",
-+        "verifyCmd": "$TC qdisc ls dev $DUMMY",
-+        "matchPattern": "drr 1: root",
-+        "matchCount": "1",
-+        "teardown": [
-+            "$TC qdisc del dev $DUMMY root handle 1: drr",
-+            "$IP addr del 10.10.10.10/24 dev $DUMMY"
-+        ]
-+   }
- ]
--- 
-2.34.1
-
+-John-
 
