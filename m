@@ -1,231 +1,161 @@
-Return-Path: <netdev+bounces-160982-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-160983-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id C0D2DA1C7E4
-	for <lists+netdev@lfdr.de>; Sun, 26 Jan 2025 14:18:29 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id A6995A1C7E9
+	for <lists+netdev@lfdr.de>; Sun, 26 Jan 2025 14:19:51 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 1799B7A30BE
-	for <lists+netdev@lfdr.de>; Sun, 26 Jan 2025 13:18:20 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 031D77A2308
+	for <lists+netdev@lfdr.de>; Sun, 26 Jan 2025 13:19:42 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8067D126C17;
-	Sun, 26 Jan 2025 13:18:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A00E6335BA;
+	Sun, 26 Jan 2025 13:19:45 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="dyp/O8o3"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="GuMCZ6fB"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f176.google.com (mail-pl1-f176.google.com [209.85.214.176])
+Received: from mail-lj1-f169.google.com (mail-lj1-f169.google.com [209.85.208.169])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 95DB025A65D;
-	Sun, 26 Jan 2025 13:18:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.176
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D717825A65D;
+	Sun, 26 Jan 2025 13:19:43 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.169
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1737897499; cv=none; b=BhkhD/YbLTpKmTkXnHu2svSp0uEyt/ZzUOGqmMNba9IsK1QiJOI94pJsfsHW/OGCwX/e60uDJU0FMfzu9VN7Wng/zlKpW1G+WluqE2rxU+mVUUD0LcHpT91nsdkxRnX2X3NgnjlUq+SU7t5t3FPgdgAl5MNcvLXWg3JMof6v2wc=
+	t=1737897585; cv=none; b=bscvE+vXJAjIHoc0iwMx+phl+F6eI+kxKk2dwADxvqtY6QEvDrgl+aGtBfvl+nIqymPaPSeGIetIr8xnp2HSBNMc6u6Uekx5jwPk1ZKZ/eGa97Dbg4czDWcoU3ys7fSuQ46mH8kKpRmIvxawjjZw4BsR2YtP8MnZcc3it86EQXA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1737897499; c=relaxed/simple;
-	bh=mG3KC8E87HrVYVrx+3h1eyt0R0jzL5dqBps/ZIaD4TU=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=HS9/LVew1bGAUQAr/p2DziItvQKcqLPr/oJvPjTMLDxFPctmWT8U2ORzH/AvQTx7uOCH93ELnjwEGOONJBmbXgDbFxr6lTnxLCH0B//upr6QqFACaeecqoLotbZUWPRmspU8SO0YJ9VQvLjQpVtrmsld5WqhF3Utdhx3Bl2V5K4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=roeck-us.net; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=dyp/O8o3; arc=none smtp.client-ip=209.85.214.176
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=roeck-us.net
+	s=arc-20240116; t=1737897585; c=relaxed/simple;
+	bh=zXDKAU4VJmLZ6ToTMZQVoZJKwLDD9YijXRaPTATsquY=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=XIfxpTCnbQ7H6dAFeK/tx1UmfMqoLvWv/rIT9YkhWSw1ilvxSTPraAme5EsnAcipySN0yYocDM4Ro1gmiRDV9xOlpBxUhIcEJ9/Y0j78D4zzEPWUp86UOJOjhH43NExV3UyCJKGTXh7hhhIdyaD5czJW+1PfYieahQGRlQyp17A=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=GuMCZ6fB; arc=none smtp.client-ip=209.85.208.169
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pl1-f176.google.com with SMTP id d9443c01a7336-2161eb94cceso42551045ad.2;
-        Sun, 26 Jan 2025 05:18:16 -0800 (PST)
+Received: by mail-lj1-f169.google.com with SMTP id 38308e7fff4ca-305d840926fso29775641fa.2;
+        Sun, 26 Jan 2025 05:19:43 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1737897496; x=1738502296; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:autocrypt:from
-         :content-language:references:cc:to:subject:user-agent:mime-version
-         :date:message-id:sender:from:to:cc:subject:date:message-id:reply-to;
-        bh=QLoVlx6oEIPZAT8q+IhaVOvydmmsMymu4vL1n+j7EdA=;
-        b=dyp/O8o3pDnRI5O+GH8p/2mJ+g2C9G03YHQVh11jsDgF5TmL2uQtHnSQIari/PpPCX
-         Qw0eL6B4OHvypQZdMiGzk+aB3007wq+FKqXvjSVA9UTFLJHJeL7BABOM5XMerE/z8xng
-         fZHIoIJXptR3dsd1dQfAgyEZLG7ITfSRWtlPMn4WYtBjMzZX5XC8zochAUjr3zSLQ9hO
-         VYWXs7XSeOX4RPCYykgmhyzKrD/YzEia5Sjp3yIShrQf6qzPT/fSmCU81QDxE9LOQwQG
-         0IC2Kk7uHSny4yvoJUITJkkAE/ZrhyICqfYr8htrT20PLFRLEjp/a1bEeiNm8q4Eg7R1
-         MqCw==
+        d=gmail.com; s=20230601; t=1737897582; x=1738502382; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=EEKDecmejXifWffv2tVsuiNZVs59PculFTK7zvYm+zc=;
+        b=GuMCZ6fBDglLwRJbKxHb+4+T8E/sIKDTzxf9rtZraRYFzX1mdQ8shv06Ike7dJiO38
+         C5zEisyp/JvVA5t6/M4bRAhgr9EcPIDOU/L300MRJbtfl0wpdkL1KZvIpeiqkDlGz/y5
+         tqqbG9c5PvAQ5cNM0+ygNb+lE6Vh5MkjDvUu7tiTbjAQkTWShGqSxRiBwvgt+id+xeO5
+         0l0A0KYgN00cDwBh2ZahiD90pGzfD+yFPdEu53ONJ34CzWOSRPdPO7o7EfCNUj0MwTG8
+         t2bqMCytcB0yn1QVqy6YuaiNdZPtAKXhcIwOLTGmo1oXMMdSaxIaS1GOvbPrPiFfPbrv
+         uptg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1737897496; x=1738502296;
-        h=content-transfer-encoding:in-reply-to:autocrypt:from
-         :content-language:references:cc:to:subject:user-agent:mime-version
-         :date:message-id:sender:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=QLoVlx6oEIPZAT8q+IhaVOvydmmsMymu4vL1n+j7EdA=;
-        b=Clvxm2EVyXNSgyKm1mKGj5duEw2FbzVBgy4SOIzF9fFIbIQsGKn/XxRDdN7FYBLgMG
-         y3rpQ2831FOEgocSTWQuj2q89rQfNzA8XY2ULIKaq+PxTpoYCs19AcOEOFnzUfv3AVzv
-         U3MSTprhl0XXg7CrBYWVL62GG18y8HWzJq/B7GMtfp+94YLdxkleCeb7Z5FNnxQjrcGO
-         HGB4k8Hp2vUaIorWHLdpsJE2lH31qZR0k2YlIceYNMO06N6g5Cc+OYHLQH3QHug0dpzp
-         pzek/BePWyIEhVae7/qqIO5RHl2lzJCSyn1ZE7hrzuuswCBcQSyVJysGrkcfozDUl6gU
-         9y9g==
-X-Forwarded-Encrypted: i=1; AJvYcCUnrSE47wC0I2GOWT74iIQeksnIuowu/kEP+wd5EtBBKkdBF6DMRoA5QKF8EcMbnDEcvMDc5tiqVsjl@vger.kernel.org, AJvYcCUohuv9FjyfNtfGh5vl87Am3Su5KFFuGtMK9Wsq0QZy4LjyrntT/gM6V9Nisd/Pkg0/brkRpbmWQ78=@vger.kernel.org, AJvYcCVU89/JNr5FwmcIBqVS4EaM52uO+sYSM/vI3Uk/dMgl8wQnUZPrc02p5I9mjfQlzrkaameBvqIVocB4Pw==@vger.kernel.org, AJvYcCVZf4XMOVZl2JqG9ndzf0PUKRZFtPHypnTulA0sfpzf4gIYYYlXDflibR7w13Wfm+99tYcBUthM11SBtJ/YwkI=@vger.kernel.org, AJvYcCVd9+2V4ayJApNhjUBIPoCd1sh0y7TkDlOfl/Mcdvfjn9CL99qzMxTOYSjHkuOT3ATn/T24EHazKV7kLEA=@vger.kernel.org, AJvYcCVoAJ04ixrrQEgFxbRhWIPLkbiWkGe2td9q6Of68R1nWotkkb5Qq7kw+UOy1AGQbELZFMR1mlXhoJ7d@vger.kernel.org, AJvYcCWZUw9QKDBZl2pQ53fALbHZPY/JSoU/S1n+SDl13ei9ovuH7XtXeaCoSVpwdw11HJce9nIOxhwgbJfC@vger.kernel.org, AJvYcCWqgNyTRwW8/ns2aJQIeyh0GcDTpOEDE7PLY7IXKmy0kbKn0ak1drt10Cc9P01ljx+QAlgBJ7tAPeC8Dnk5@vger.kernel.org, AJvYcCXXMEQvKyE9vLOpjCFEyg/L8L5LrT7N2jRCVbkLP/uBst+aUs401DIlPw7LnYIOvLRBcUoaTx90@vger.kernel.org
-X-Gm-Message-State: AOJu0Yyllj4XKv3igB8b1p/Bj5qy3W0SvOZpC/2b2iaccl9Q5lL4m0Xi
-	3qracw2AcqvzKUn7ZjLVW2abgA9dcpG9QFjMxBGHZ0YIi+QeBdZB
-X-Gm-Gg: ASbGnctBQevylELUaZp59dhYr5FFSeR8FBfDQdekZ1nZHA7xxeKijw4dgb7kw4pyiWj
-	xr6bp/bB2Fw30TuHE9K3+XONXnzPVhfrILwOWcRWnBXrXEHJ2MtMHrLCz/Vq/wYevNI5xJ3Oizf
-	fwu0n1PZq7txJH89vN3pHe2VQOqgqEOQ7SC1qjxans6hEIpWLqgHZDPZVXYPs4U9LvtOv1QGQ9a
-	pF3pnFrcVRX2v/v9NiCqY96x4Rjle9+qxjjhhQvON9JCA7WD7pNQKxfNpzloFvWUI0XIBMMY4f+
-	0peCQw3VWysOOZ8msP1ltcQuxbadPspFhvXOjY6OVleV3LwcXgYTBA==
-X-Google-Smtp-Source: AGHT+IGMFiG105rSZ+Ev6CZzF2/4EhkVYSQdfdofXpKjATJ+ONYcld8Z1l0e0aViptb8FeBRJuyqvA==
-X-Received: by 2002:a17:90b:1f8f:b0:2ee:aa95:6de9 with SMTP id 98e67ed59e1d1-2f782d8c0c4mr58878158a91.33.1737897495787;
-        Sun, 26 Jan 2025 05:18:15 -0800 (PST)
-Received: from ?IPV6:2600:1700:e321:62f0:da43:aeff:fecc:bfd5? ([2600:1700:e321:62f0:da43:aeff:fecc:bfd5])
-        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-2f7ffa44cadsm5138806a91.4.2025.01.26.05.18.12
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Sun, 26 Jan 2025 05:18:15 -0800 (PST)
-Sender: Guenter Roeck <groeck7@gmail.com>
-Message-ID: <685ce5ff-127a-4f8b-b058-d36d3adb1c0d@roeck-us.net>
-Date: Sun, 26 Jan 2025 05:18:11 -0800
+        d=1e100.net; s=20230601; t=1737897582; x=1738502382;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=EEKDecmejXifWffv2tVsuiNZVs59PculFTK7zvYm+zc=;
+        b=PmyxV31FuTc/ufSS6yTZlmF+LdbS1Xr7XSUCCgBObEQNDP9va3r6KSVqPilwaWKhqm
+         JQ7B79+AooxTq5CbLjvCdlSgHoegpAWlWV12yOKr0biF2cU2NYjqyc4qwz8VIm+ZTNTP
+         BvWad58vLTfkVEeJYgUv+qPjNzO6+fQqFwGa/Wcp6DEY8nUjcfB64TkLV8PB+SZULvBJ
+         plu8JYTdK4OabJbMU0FVLap0v5BVAn9oCAHPmFuvi2CpKP2ewu3FalbR4yMCd3SFfum0
+         Mqf0Uv98gArqGlMwt6AKFiFI971mvlRrrB4iwke6D4fFTC/oT+asECVsbJlzG13akmrx
+         8y/g==
+X-Forwarded-Encrypted: i=1; AJvYcCUj93/GE8YA4T7bPeZdwx1ZZeZFLGVxvP5lfWQdj8K41zmQF06ifce4jlHGNjARMPjQRenU4lA=@vger.kernel.org, AJvYcCV+d8XOLQ1S3ZH8kyBHuUM5X++qxQbZX2eAjo6lAUV2UZgkOSViwh+20tqTRPuVDEoACtIRyLhZ9okSnEq2fq9o@vger.kernel.org
+X-Gm-Message-State: AOJu0Yy2t16TrJdv58w8dXIHURbSTMW4h0MLrK37cOjADNj/AIpgvNCQ
+	de2ENoMYB5+vQnpWajqA48MjnqGp6c32vm35vrSWxi82k8qBPTC5
+X-Gm-Gg: ASbGncsnVL0Ya5fuWIkD2JUdYbsSXdV7NdC5QIfJLSN63aycVyL4xrpThxGurNVmnca
+	QclURCflj4FbJDgUWlsDt+tqfn4aAMaFinETECJPWqldT+cjqpa1TcGYiDS+O96P2RqFO17paHW
+	/knoJhqS0iD8RSW15C31+oVqPKS4nmTO2MTfUfF6qFGq3yytWWYapsCj+ESE5ySpcF9PHZ8AoJI
+	L3CwueaDOFQInQq55SexP48dtKOb9To0kX8p9XUED8JLkUI8AsNSibgEPuQLzb55N0pZUn+74v8
+	lRdGLNzBC3m2uzs=
+X-Google-Smtp-Source: AGHT+IF7MWAEXQNQa5Bbm/WQ3/aMuc448vhbJt/p7tmke8PyxAa2D+g/jRWO2FoTf23oBLyBpVO6uw==
+X-Received: by 2002:a2e:b535:0:b0:302:3356:7c55 with SMTP id 38308e7fff4ca-3072ca89aebmr108339681fa.10.1737897581609;
+        Sun, 26 Jan 2025 05:19:41 -0800 (PST)
+Received: from localhost.localdomain ([83.217.202.104])
+        by smtp.gmail.com with ESMTPSA id 38308e7fff4ca-3076bc194cesm10496101fa.72.2025.01.26.05.19.40
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sun, 26 Jan 2025 05:19:40 -0800 (PST)
+From: Denis Kirjanov <kirjanov@gmail.com>
+To: pablo@netfilter.org,
+	kadlec@netfilter.org
+Cc: davem@davemloft.net,
+	netfilter-devel@vger.kernel.org,
+	netdev@vger.kernel.org,
+	Denis Kirjanov <kirjanov@gmail.com>
+Subject: [PATCH nf-next] netfilter: xt_hashlimit: replace vmalloc calls with kvmalloc
+Date: Sun, 26 Jan 2025 08:19:24 -0500
+Message-ID: <20250126131924.2656-1-kirjanov@gmail.com>
+X-Mailer: git-send-email 2.47.2
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v6 6/7] hwmon: Add Nuvoton NCT6694 HWMON support
-To: Vincent Mailhol <mailhol.vincent@wanadoo.fr>,
- Ming Yu <a0282524688@gmail.com>
-Cc: tmyu0@nuvoton.com, lee@kernel.org, linus.walleij@linaro.org,
- brgl@bgdev.pl, andi.shyti@kernel.org, mkl@pengutronix.de,
- andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com,
- kuba@kernel.org, pabeni@redhat.com, wim@linux-watchdog.org,
- jdelvare@suse.com, alexandre.belloni@bootlin.com,
- linux-kernel@vger.kernel.org, linux-gpio@vger.kernel.org,
- linux-i2c@vger.kernel.org, linux-can@vger.kernel.org,
- netdev@vger.kernel.org, linux-watchdog@vger.kernel.org,
- linux-hwmon@vger.kernel.org, linux-rtc@vger.kernel.org,
- linux-usb@vger.kernel.org
-References: <20250123091115.2079802-1-a0282524688@gmail.com>
- <20250123091115.2079802-7-a0282524688@gmail.com>
- <c1cbb337-9ca5-4071-b05a-a97ab451f358@wanadoo.fr>
-Content-Language: en-US
-From: Guenter Roeck <linux@roeck-us.net>
-Autocrypt: addr=linux@roeck-us.net; keydata=
- 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
- mDW4+i+XlNFUPUYMrIKi9joBhu18ssf5i5Q=
-In-Reply-To: <c1cbb337-9ca5-4071-b05a-a97ab451f358@wanadoo.fr>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 
-On 1/25/25 23:42, Vincent Mailhol wrote:
-> On 23/01/2025 at 18:11, Ming Yu wrote:
->> This driver supports Hardware monitor functionality for NCT6694 MFD
->> device based on USB interface.
->>
->> Signed-off-by: Ming Yu <a0282524688@gmail.com>
->> ---
-> 
-> (...)
-> 
->> +static int nct6694_temp_write(struct device *dev, u32 attr, int channel,
->> +			      long val)
->> +{
->> +	struct nct6694_hwmon_data *data = dev_get_drvdata(dev);
->> +	struct nct6694_cmd_header cmd_hd;
->> +	unsigned char temp_hyst;
->> +	signed char temp_max;
->> +	int ret;
->> +
->> +	guard(mutex)(&data->lock);
->> +
->> +	switch (attr) {
->> +	case hwmon_temp_enable:
->> +		if (val == 0)
->> +			data->hwmon_en.tin_en[channel / 8] &= ~BIT(channel % 8);
->> +		else if (val == 1)
->> +			data->hwmon_en.tin_en[channel / 8] |= BIT(channel % 8);
->> +		else
->> +			return -EINVAL;
->> +
->> +		cmd_hd = (struct nct6694_cmd_header) {
->> +			.mod = NCT6694_HWMON_MOD,
->> +			.cmd = NCT6694_HWMON_CONTROL,
->> +			.sel = NCT6694_HWMON_CONTROL_SEL,
->> +			.len = cpu_to_le16(sizeof(data->hwmon_en))
->> +		};
->> +
->> +		return nct6694_write_msg(data->nct6694, &cmd_hd,
->> +					 &data->hwmon_en);
->> +	case hwmon_temp_max:
->> +		cmd_hd = (struct nct6694_cmd_header) {
->> +			.mod = NCT6694_HWMON_MOD,
->> +			.cmd = NCT6694_HWMON_ALARM,
->> +			.sel = NCT6694_HWMON_ALARM_SEL,
->> +			.len = cpu_to_le16(sizeof(data->msg->hwmon_alarm))
->> +		};
->> +		ret = nct6694_read_msg(data->nct6694, &cmd_hd,
->> +				       &data->msg->hwmon_alarm);
->> +		if (ret)
->> +			return ret;
->> +
->> +		val = clamp_val(val, -127000, 127000);
->> +		data->msg->hwmon_alarm.tin_cfg[channel].hl = temp_to_reg(val);
->> +
->> +		return nct6694_write_msg(data->nct6694, &cmd_hd,
->> +					 &data->msg->hwmon_alarm);
->> +	case hwmon_temp_max_hyst:
->> +		cmd_hd = (struct nct6694_cmd_header) {
->> +			.mod = NCT6694_HWMON_MOD,
->> +			.cmd = NCT6694_HWMON_ALARM,
->> +			.sel = NCT6694_HWMON_ALARM_SEL,
->> +			.len = cpu_to_le16(sizeof(data->msg->hwmon_alarm))
->> +		};
->> +		ret = nct6694_read_msg(data->nct6694, &cmd_hd,
->> +				       &data->msg->hwmon_alarm);
->> +
->> +		val = clamp_val(val, -127000, 127000);
->> +		temp_max = data->msg->hwmon_alarm.tin_cfg[channel].hl;
->> +		temp_hyst = temp_max - temp_to_reg(val);
->> +		temp_hyst = clamp_val(temp_hyst, 0, 7);
-> 
-> temp_hyst is unsigned. It can not be smaller than zero. No need for
-> clamp(), using min here is sufficient.
-> 
+Replace vmalloc allocations with kvmalloc since
+kvmalloc is more flexible in memory allocation
 
-Wrong conclusion. It needs to be declared as signed variable because
-"temp_max - temp_to_reg(val)" could be negative.
+Signed-off-by: Denis Kirjanov <kirjanov@gmail.com>
+---
+ net/netfilter/xt_hashlimit.c | 12 +++++-------
+ 1 file changed, 5 insertions(+), 7 deletions(-)
 
-Guenter
+diff --git a/net/netfilter/xt_hashlimit.c b/net/netfilter/xt_hashlimit.c
+index 0859b8f76764..4132c37dea28 100644
+--- a/net/netfilter/xt_hashlimit.c
++++ b/net/netfilter/xt_hashlimit.c
+@@ -15,7 +15,6 @@
+ #include <linux/random.h>
+ #include <linux/jhash.h>
+ #include <linux/slab.h>
+-#include <linux/vmalloc.h>
+ #include <linux/proc_fs.h>
+ #include <linux/seq_file.h>
+ #include <linux/list.h>
+@@ -294,8 +293,7 @@ static int htable_create(struct net *net, struct hashlimit_cfg3 *cfg,
+ 		if (size < 16)
+ 			size = 16;
+ 	}
+-	/* FIXME: don't use vmalloc() here or anywhere else -HW */
+-	hinfo = vmalloc(struct_size(hinfo, hash, size));
++	hinfo = kvmalloc(struct_size(hinfo, hash, size), GFP_KERNEL);
+ 	if (hinfo == NULL)
+ 		return -ENOMEM;
+ 	*out_hinfo = hinfo;
+@@ -303,7 +301,7 @@ static int htable_create(struct net *net, struct hashlimit_cfg3 *cfg,
+ 	/* copy match config into hashtable config */
+ 	ret = cfg_copy(&hinfo->cfg, (void *)cfg, 3);
+ 	if (ret) {
+-		vfree(hinfo);
++		kvfree(hinfo);
+ 		return ret;
+ 	}
+ 
+@@ -322,7 +320,7 @@ static int htable_create(struct net *net, struct hashlimit_cfg3 *cfg,
+ 	hinfo->rnd_initialized = false;
+ 	hinfo->name = kstrdup(name, GFP_KERNEL);
+ 	if (!hinfo->name) {
+-		vfree(hinfo);
++		kvfree(hinfo);
+ 		return -ENOMEM;
+ 	}
+ 	spin_lock_init(&hinfo->lock);
+@@ -344,7 +342,7 @@ static int htable_create(struct net *net, struct hashlimit_cfg3 *cfg,
+ 		ops, hinfo);
+ 	if (hinfo->pde == NULL) {
+ 		kfree(hinfo->name);
+-		vfree(hinfo);
++		kvfree(hinfo);
+ 		return -ENOMEM;
+ 	}
+ 	hinfo->net = net;
+@@ -429,7 +427,7 @@ static void htable_put(struct xt_hashlimit_htable *hinfo)
+ 		cancel_delayed_work_sync(&hinfo->gc_work);
+ 		htable_selective_cleanup(hinfo, true);
+ 		kfree(hinfo->name);
+-		vfree(hinfo);
++		kvfree(hinfo);
+ 	}
+ }
+ 
+-- 
+2.47.2
 
 
