@@ -1,63 +1,62 @@
-Return-Path: <netdev+bounces-161023-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-161024-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id C912CA1CBB3
-	for <lists+netdev@lfdr.de>; Sun, 26 Jan 2025 16:53:11 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3027EA1CBB4
+	for <lists+netdev@lfdr.de>; Sun, 26 Jan 2025 16:53:12 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 7AF5E164CCA
-	for <lists+netdev@lfdr.de>; Sun, 26 Jan 2025 15:49:07 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id AE48F1885DCE
+	for <lists+netdev@lfdr.de>; Sun, 26 Jan 2025 15:49:44 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 201ED22A4E2;
-	Sun, 26 Jan 2025 15:04:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5AF2922A7FF;
+	Sun, 26 Jan 2025 15:04:58 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="UfSJ2LEZ"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="A+TK6QG7"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EB8C11A4F3C;
-	Sun, 26 Jan 2025 15:04:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 30F9A22A7FA;
+	Sun, 26 Jan 2025 15:04:58 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1737903895; cv=none; b=G/M9Yr2WGocLKV4qkWYVldBkl5rCrCyDjZBjzP0+abV2gBetf/mvSEyAn5BLHm1O2pL4Jk0AFZhE84Z0/V29IIR8g08ACQ1HVYo0TeDnk6UgzsZjxSehS5VEJJb36ExdN1fduxxEVH8L3G7athNlXm39ANqrSxhSdKZKoAJcX2s=
+	t=1737903898; cv=none; b=MGB9QqnE8OZeOUzbICpEsIdOL21o3v420qlZQxNbdfLiCi4A7RzbOV2ODuHh3OARwPCJpBVoHbtX5sNPOyXF7oWMCjffQ4Svghji9eAtvXpAzIR/qpSE7J2e7dPSJwFYL9zkE+mXH2921UkKm85xMjnmcsLTjJPb4dKo/OTFcZI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1737903895; c=relaxed/simple;
-	bh=SQWxZ0GpT3SqsCUOP+1nWRk1TGrxcTuMZnr9kQ2VdSQ=;
+	s=arc-20240116; t=1737903898; c=relaxed/simple;
+	bh=pwkJmB+zJ8BDzbAFafwV103sxFnANgTlDdQKWcc9Y+E=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=ZjNZXDW6RFHtaEGt4oaMpSLcX1R9xbfcXYcx6uCeMKLKXv0wODsjYkMEg4DIDgQVKhctsyidG84a5zsAR37w8eNc+WpHBoPaWT+UnBvijF8H4MNh3dKkrjh75rG6AxbLSF0BvcL2Ce5MV2NevFeTlNaNh6zeuvBZtfoeehozsfY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=UfSJ2LEZ; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 71B1AC4CEE3;
-	Sun, 26 Jan 2025 15:04:53 +0000 (UTC)
+	 MIME-Version; b=rMGPD2Fq7XAnziWzu2JnjLQoWyFxhdwdUfaeLjo7tDrBEkk1E9hQBi5joTQK2MMOzmw4R9d+F4o01CZOt2tjjC4AZXgvdLvdwzIGQwIRPcZaTfARDLLqj5Z7wXfGgrcfsE2EJpWap+FoEmIej8YzKQV+ftpU/MBtL7CBnjIs6pc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=A+TK6QG7; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id C0735C4CED3;
+	Sun, 26 Jan 2025 15:04:56 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1737903894;
-	bh=SQWxZ0GpT3SqsCUOP+1nWRk1TGrxcTuMZnr9kQ2VdSQ=;
+	s=k20201202; t=1737903898;
+	bh=pwkJmB+zJ8BDzbAFafwV103sxFnANgTlDdQKWcc9Y+E=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=UfSJ2LEZAxiNjF5bPV1R0nMVN1N1/shaIU00wZizkL76K+aujLm0XAtvjCGwJRqX1
-	 vUYt5vv9bnwnOPAM+DxzvqEnpzipU++UfXl6ipUVMB+CXMV0R92BcvmJNIZAzeBwkL
-	 6QRaYqhZFFfG9eXe7tu3Z7zrLR3FLFFL1fs0AIgnZgB4DDwylru8zCdi2lhyTYY+R2
-	 1jG4+AW6eSqm54NpIQjNpaMr0OLNKgVV18UACyVNWw8kT+bYS8lFNAmC/YiZEzpcN4
-	 K1A8UHx3rf+NxZ85Z9CXG9amhH5M5G6Mi+5IuM7F3/0dcOD78QvKOLXH8KLrOTuhmn
-	 v9s5rQdx0xQCg==
+	b=A+TK6QG758Kf8ERyfw3051kBMrw2G9ri+Vpc30CSIf9c/DP5biWgQAeUm68jxQQvH
+	 srSApnA190tXOceTToo3EICazHG+cPJhe6/SlR7D0mzxKtwvnCaUXxJJ/o87FXfiXw
+	 5P/Az2OrVpF4ra1nUHt42SWxYQ/sgAGbhCEkjE3c4EI6z7BjnksxfZesuDfXmxnqLR
+	 JuHn/o8qfMQAhyCDltFyWxOTopw/ogrT0ZMoxtWrOsDCWRyT7N6Ydjqb4EfrzwHS+J
+	 dlp3wNYjTdV0gaJfDNQlUYOTI8uHpvjoV00kmcLqth51IDPURHdAQXKw4zmnmFc7oe
+	 KyD8GhSaXukow==
 From: Sasha Levin <sashal@kernel.org>
 To: linux-kernel@vger.kernel.org,
 	stable@vger.kernel.org
-Cc: "Maciej S. Szmigiero" <mail@maciej.szmigiero.name>,
-	Sergey Ryazanov <ryazanov.s.a@gmail.com>,
-	Jakub Kicinski <kuba@kernel.org>,
+Cc: Dan Carpenter <dan.carpenter@linaro.org>,
+	Simon Horman <horms@kernel.org>,
+	"David S . Miller" <davem@davemloft.net>,
 	Sasha Levin <sashal@kernel.org>,
-	m.chetan.kumar@intel.com,
-	loic.poulain@linaro.org,
-	andrew+netdev@lunn.ch,
-	davem@davemloft.net,
+	jmaloy@redhat.com,
 	edumazet@google.com,
+	kuba@kernel.org,
 	pabeni@redhat.com,
-	netdev@vger.kernel.org
-Subject: [PATCH AUTOSEL 5.15 11/14] net: wwan: iosm: Fix hibernation by re-binding the driver around it
-Date: Sun, 26 Jan 2025 10:04:27 -0500
-Message-Id: <20250126150430.958708-11-sashal@kernel.org>
+	netdev@vger.kernel.org,
+	tipc-discussion@lists.sourceforge.net
+Subject: [PATCH AUTOSEL 5.15 13/14] tipc: re-order conditions in tipc_crypto_key_rcv()
+Date: Sun, 26 Jan 2025 10:04:29 -0500
+Message-Id: <20250126150430.958708-13-sashal@kernel.org>
 X-Mailer: git-send-email 2.39.5
 In-Reply-To: <20250126150430.958708-1-sashal@kernel.org>
 References: <20250126150430.958708-1-sashal@kernel.org>
@@ -72,144 +71,39 @@ X-Patchwork-Hint: Ignore
 X-stable-base: Linux 5.15.177
 Content-Transfer-Encoding: 8bit
 
-From: "Maciej S. Szmigiero" <mail@maciej.szmigiero.name>
+From: Dan Carpenter <dan.carpenter@linaro.org>
 
-[ Upstream commit 0b6f6593aa8c3a05f155c12fd0e7ad33a5149c31 ]
+[ Upstream commit 5fe71fda89745fc3cd95f70d06e9162b595c3702 ]
 
-Currently, the driver is seriously broken with respect to the
-hibernation (S4): after image restore the device is back into
-IPC_MEM_EXEC_STAGE_BOOT (which AFAIK means bootloader stage) and needs
-full re-launch of the rest of its firmware, but the driver restore
-handler treats the device as merely sleeping and just sends it a
-wake-up command.
+On a 32bit system the "keylen + sizeof(struct tipc_aead_key)" math could
+have an integer wrapping issue.  It doesn't matter because the "keylen"
+is checked on the next line, but just to make life easier for static
+analysis tools, let's re-order these conditions and avoid the integer
+overflow.
 
-This wake-up command times out but device nodes (/dev/wwan*) remain
-accessible.
-However attempting to use them causes the bootloader to crash and
-enter IPC_MEM_EXEC_STAGE_CD_READY stage (which apparently means "a crash
-dump is ready").
-
-It seems that the device cannot be re-initialized from this crashed
-stage without toggling some reset pin (on my test platform that's
-apparently what the device _RST ACPI method does).
-
-While it would theoretically be possible to rewrite the driver to tear
-down the whole MUX / IPC layers on hibernation (so the bootloader does
-not crash from improper access) and then re-launch the device on
-restore this would require significant refactoring of the driver
-(believe me, I've tried), since there are quite a few assumptions
-hard-coded in the driver about the device never being partially
-de-initialized (like channels other than devlink cannot be closed,
-for example).
-Probably this would also need some programming guide for this hardware.
-
-Considering that the driver seems orphaned [1] and other people are
-hitting this issue too [2] fix it by simply unbinding the PCI driver
-before hibernation and re-binding it after restore, much like
-USB_QUIRK_RESET_RESUME does for USB devices that exhibit a similar
-problem.
-
-Tested on XMM7360 in HP EliteBook 855 G7 both with s2idle (which uses
-the existing suspend / resume handlers) and S4 (which uses the new code).
-
-[1]: https://lore.kernel.org/all/c248f0b4-2114-4c61-905f-466a786bdebb@leemhuis.info/
-[2]:
-https://github.com/xmm7360/xmm7360-pci/issues/211#issuecomment-1804139413
-
-Reviewed-by: Sergey Ryazanov <ryazanov.s.a@gmail.com>
-Signed-off-by: Maciej S. Szmigiero <mail@maciej.szmigiero.name>
-Link: https://patch.msgid.link/e60287ebdb0ab54c4075071b72568a40a75d0205.1736372610.git.mail@maciej.szmigiero.name
-Signed-off-by: Jakub Kicinski <kuba@kernel.org>
+Signed-off-by: Dan Carpenter <dan.carpenter@linaro.org>
+Reviewed-by: Simon Horman <horms@kernel.org>
+Signed-off-by: David S. Miller <davem@davemloft.net>
 Signed-off-by: Sasha Levin <sashal@kernel.org>
 ---
- drivers/net/wwan/iosm/iosm_ipc_pcie.c | 56 ++++++++++++++++++++++++++-
- 1 file changed, 55 insertions(+), 1 deletion(-)
+ net/tipc/crypto.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
-diff --git a/drivers/net/wwan/iosm/iosm_ipc_pcie.c b/drivers/net/wwan/iosm/iosm_ipc_pcie.c
-index 8b4222b137d14..968ca9ff21df1 100644
---- a/drivers/net/wwan/iosm/iosm_ipc_pcie.c
-+++ b/drivers/net/wwan/iosm/iosm_ipc_pcie.c
-@@ -6,6 +6,7 @@
- #include <linux/acpi.h>
- #include <linux/bitfield.h>
- #include <linux/module.h>
-+#include <linux/suspend.h>
- #include <net/rtnetlink.h>
+diff --git a/net/tipc/crypto.c b/net/tipc/crypto.c
+index 86d1e782b8fca..b09c4a17b283e 100644
+--- a/net/tipc/crypto.c
++++ b/net/tipc/crypto.c
+@@ -2304,8 +2304,8 @@ static bool tipc_crypto_key_rcv(struct tipc_crypto *rx, struct tipc_msg *hdr)
+ 	keylen = ntohl(*((__be32 *)(data + TIPC_AEAD_ALG_NAME)));
  
- #include "iosm_ipc_imem.h"
-@@ -18,6 +19,7 @@ MODULE_LICENSE("GPL v2");
- /* WWAN GUID */
- static guid_t wwan_acpi_guid = GUID_INIT(0xbad01b75, 0x22a8, 0x4f48, 0x87, 0x92,
- 				       0xbd, 0xde, 0x94, 0x67, 0x74, 0x7d);
-+static bool pci_registered;
- 
- static void ipc_pcie_resources_release(struct iosm_pcie *ipc_pcie)
- {
-@@ -484,7 +486,6 @@ static struct pci_driver iosm_ipc_driver = {
- 	},
- 	.id_table = iosm_ipc_ids,
- };
--module_pci_driver(iosm_ipc_driver);
- 
- int ipc_pcie_addr_map(struct iosm_pcie *ipc_pcie, unsigned char *data,
- 		      size_t size, dma_addr_t *mapping, int direction)
-@@ -566,3 +567,56 @@ void ipc_pcie_kfree_skb(struct iosm_pcie *ipc_pcie, struct sk_buff *skb)
- 	IPC_CB(skb)->mapping = 0;
- 	dev_kfree_skb(skb);
- }
-+
-+static int pm_notify(struct notifier_block *nb, unsigned long mode, void *_unused)
-+{
-+	if (mode == PM_HIBERNATION_PREPARE || mode == PM_RESTORE_PREPARE) {
-+		if (pci_registered) {
-+			pci_unregister_driver(&iosm_ipc_driver);
-+			pci_registered = false;
-+		}
-+	} else if (mode == PM_POST_HIBERNATION || mode == PM_POST_RESTORE) {
-+		if (!pci_registered) {
-+			int ret;
-+
-+			ret = pci_register_driver(&iosm_ipc_driver);
-+			if (ret) {
-+				pr_err(KBUILD_MODNAME ": unable to re-register PCI driver: %d\n",
-+				       ret);
-+			} else {
-+				pci_registered = true;
-+			}
-+		}
-+	}
-+
-+	return 0;
-+}
-+
-+static struct notifier_block pm_notifier = {
-+	.notifier_call = pm_notify,
-+};
-+
-+static int __init iosm_ipc_driver_init(void)
-+{
-+	int ret;
-+
-+	ret = pci_register_driver(&iosm_ipc_driver);
-+	if (ret)
-+		return ret;
-+
-+	pci_registered = true;
-+
-+	register_pm_notifier(&pm_notifier);
-+
-+	return 0;
-+}
-+module_init(iosm_ipc_driver_init);
-+
-+static void __exit iosm_ipc_driver_exit(void)
-+{
-+	unregister_pm_notifier(&pm_notifier);
-+
-+	if (pci_registered)
-+		pci_unregister_driver(&iosm_ipc_driver);
-+}
-+module_exit(iosm_ipc_driver_exit);
+ 	/* Verify the supplied size values */
+-	if (unlikely(size != keylen + sizeof(struct tipc_aead_key) ||
+-		     keylen > TIPC_AEAD_KEY_SIZE_MAX)) {
++	if (unlikely(keylen > TIPC_AEAD_KEY_SIZE_MAX ||
++		     size != keylen + sizeof(struct tipc_aead_key))) {
+ 		pr_debug("%s: invalid MSG_CRYPTO key size\n", rx->name);
+ 		goto exit;
+ 	}
 -- 
 2.39.5
 
