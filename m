@@ -1,67 +1,62 @@
-Return-Path: <netdev+bounces-161027-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-161028-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6AECFA1CBC8
-	for <lists+netdev@lfdr.de>; Sun, 26 Jan 2025 16:55:05 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 65F20A1CBD5
+	for <lists+netdev@lfdr.de>; Sun, 26 Jan 2025 16:55:58 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 620481882E04
-	for <lists+netdev@lfdr.de>; Sun, 26 Jan 2025 15:51:44 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id BC0D6188419F
+	for <lists+netdev@lfdr.de>; Sun, 26 Jan 2025 15:52:48 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8AE9722CBF7;
-	Sun, 26 Jan 2025 15:05:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 60DF922E3E0;
+	Sun, 26 Jan 2025 15:05:25 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="jzMt3py1"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="dXHgnTsz"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5ACFE22CBEE;
-	Sun, 26 Jan 2025 15:05:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 387C022DFBB;
+	Sun, 26 Jan 2025 15:05:25 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1737903917; cv=none; b=GYLfgaV3TSiPhI6/7bHHdCqitJ8+MJ0mzRaY/nZPRp4eoDyW6MFXsX/oSz8DIpMsykQtACaWYGG+xkXetKz6t9Ndqfahh7Ma0ob6hGbr9g82M7fAwhEaAXxOL7jCM7nJl33DlCIuHJ6N/eLCrjpaHw7/e8+gBy5hJhKELqErqzw=
+	t=1737903925; cv=none; b=gYh2AO24PEzyo8PPABPSGFA4WZEX3agQQie5ww0o5ce8aAzrxjmGp8PMNc2OAn9EEcaw6EIUYrzxqXXU1o0FeRoHKvSC0PA05tyA29/cl9b95LHUPP74gECADixo7D9FFRER0PWvtH9k1p+InkvzFkgtGEaWquuS38FUPRWdxkU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1737903917; c=relaxed/simple;
-	bh=pie8lY34euIoOCgfhdbiR5FLjuqetzOaTXbkdyruQD4=;
+	s=arc-20240116; t=1737903925; c=relaxed/simple;
+	bh=GTV5pKFMp5uLTlYKxT1082FZdmLlioXLSHG6SNAlOPk=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=ZAeYKdziZOjSVLFi7BDXeGq90ukyLUJy0lOECfkSmSjOSBOopOnfyrlXEdUnJB7s4R5crIG6wqIr1YwiFXpwORVVljoaigUD+KTPwBR7ba9qvhgYGKVcyKy5kbRGQ+e3cA8hlfkO1SFBd29EuYTGVKNxm9YXI3RveD6IWhqsbB8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=jzMt3py1; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 71E93C4CEE3;
-	Sun, 26 Jan 2025 15:05:15 +0000 (UTC)
+	 MIME-Version; b=WbwPRv8LwK0P0l0u1e3bAKDiATteRR2wKx/y2inpez4I2f/w24SH5jHc5cSFOw7OTI+e95hb5ub/OBRmYwF5w6HUOkGKbIqhWuvBzgXleK/YXeiL5lXhARePNxgVvkbK1CP7YZ9nseFRZpT/T+y9XdaVkXZvCTwcpbEqmNQM8Ow=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=dXHgnTsz; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id C2702C4CEE2;
+	Sun, 26 Jan 2025 15:05:23 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1737903917;
-	bh=pie8lY34euIoOCgfhdbiR5FLjuqetzOaTXbkdyruQD4=;
+	s=k20201202; t=1737903925;
+	bh=GTV5pKFMp5uLTlYKxT1082FZdmLlioXLSHG6SNAlOPk=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=jzMt3py1FIgmuDOEg+Yq5UCxOthseTaDDLVx6j5M4eInBD9S3ms+omWWuDVFxtMmG
-	 Wc/wJ9cEqGkkEdLOjcNoW5rF1q0hRUZQkLNsHolGE/8MB4Vg9UflNv2AuUEJm72D7n
-	 bJZZ8zcpCcFbKuxP4YnwE6PUUP8RX8ur/CBEZbJ254S7He4DYSQSLpxckF2BFy7AJ0
-	 tlcUyoUdodCbbcRtK2sqMW38UECt0Pqba/G5Gn7ulRsVc1+qhvpWq2BnudMdr8V8Sz
-	 lhpMCEL3wRdzD0orcZHAhEcfRh5RBZ+POeDijaTA431Sw48em/DNThItEZyi5QQ7QG
-	 RuK2HTPv4UYew==
+	b=dXHgnTszMJI0vEtcw52D8jIJ0Vi8Ws5gwwYq0BMtA60KuE74MTtQm5BPZmmxoFEfz
+	 xygrokqromKMxrKkjB7I639H7RQA6pjoJACr1K1wf1CIlni4VF4K/eUw85bFcd16xU
+	 op2xh3Re3RSGrr0kXoC9j2zN9qb3B7b5cgc0qGa1AQcHYMjygfMIFbpOe4j3DdBOIT
+	 nYHCcs06HTAY3d5Ev/nx3CN0LnrITr00x4/FHJHgFRBhZK678JjtlotaY2JX1AQliC
+	 z2QebGnpuT3GAyFFXO5I/ItCB8FjzaDHvU9kte66pBsm9P4J2wQ/LccsXdNrhRrfEL
+	 DHSbCcs9ueavQ==
 From: Sasha Levin <sashal@kernel.org>
 To: linux-kernel@vger.kernel.org,
 	stable@vger.kernel.org
-Cc: Vadim Fedorenko <vadfed@meta.com>,
-	Dragos Tatulea <dtatulea@nvidia.com>,
-	Tariq Toukan <tariqt@nvidia.com>,
-	Paolo Abeni <pabeni@redhat.com>,
+Cc: Dan Carpenter <dan.carpenter@linaro.org>,
+	Simon Horman <horms@kernel.org>,
+	"David S . Miller" <davem@davemloft.net>,
 	Sasha Levin <sashal@kernel.org>,
-	saeedm@nvidia.com,
-	andrew+netdev@lunn.ch,
-	davem@davemloft.net,
+	jmaloy@redhat.com,
 	edumazet@google.com,
 	kuba@kernel.org,
-	richardcochran@gmail.com,
-	vadim.fedorenko@linux.dev,
-	rrameshbabu@nvidia.com,
+	pabeni@redhat.com,
 	netdev@vger.kernel.org,
-	linux-rdma@vger.kernel.org
-Subject: [PATCH AUTOSEL 5.10 07/12] net/mlx5: use do_aux_work for PHC overflow checks
-Date: Sun, 26 Jan 2025 10:04:55 -0500
-Message-Id: <20250126150500.959521-7-sashal@kernel.org>
+	tipc-discussion@lists.sourceforge.net
+Subject: [PATCH AUTOSEL 5.10 11/12] tipc: re-order conditions in tipc_crypto_key_rcv()
+Date: Sun, 26 Jan 2025 10:04:59 -0500
+Message-Id: <20250126150500.959521-11-sashal@kernel.org>
 X-Mailer: git-send-email 2.39.5
 In-Reply-To: <20250126150500.959521-1-sashal@kernel.org>
 References: <20250126150500.959521-1-sashal@kernel.org>
@@ -76,127 +71,39 @@ X-Patchwork-Hint: Ignore
 X-stable-base: Linux 5.10.233
 Content-Transfer-Encoding: 8bit
 
-From: Vadim Fedorenko <vadfed@meta.com>
+From: Dan Carpenter <dan.carpenter@linaro.org>
 
-[ Upstream commit e61e6c415ba9ff2b32bb6780ce1b17d1d76238f1 ]
+[ Upstream commit 5fe71fda89745fc3cd95f70d06e9162b595c3702 ]
 
-The overflow_work is using system wq to do overflow checks and updates
-for PHC device timecounter, which might be overhelmed by other tasks.
-But there is dedicated kthread in PTP subsystem designed for such
-things. This patch changes the work queue to proper align with PTP
-subsystem and to avoid overloading system work queue.
-The adjfine() function acts the same way as overflow check worker,
-we can postpone ptp aux worker till the next overflow period after
-adjfine() was called.
+On a 32bit system the "keylen + sizeof(struct tipc_aead_key)" math could
+have an integer wrapping issue.  It doesn't matter because the "keylen"
+is checked on the next line, but just to make life easier for static
+analysis tools, let's re-order these conditions and avoid the integer
+overflow.
 
-Reviewed-by: Dragos Tatulea <dtatulea@nvidia.com>
-Signed-off-by: Vadim Fedorenko <vadfed@meta.com>
-Acked-by: Tariq Toukan <tariqt@nvidia.com>
-Link: https://patch.msgid.link/20250107104812.380225-1-vadfed@meta.com
-Signed-off-by: Paolo Abeni <pabeni@redhat.com>
+Signed-off-by: Dan Carpenter <dan.carpenter@linaro.org>
+Reviewed-by: Simon Horman <horms@kernel.org>
+Signed-off-by: David S. Miller <davem@davemloft.net>
 Signed-off-by: Sasha Levin <sashal@kernel.org>
 ---
- .../ethernet/mellanox/mlx5/core/lib/clock.c   | 24 ++++++++++---------
- include/linux/mlx5/driver.h                   |  1 -
- 2 files changed, 13 insertions(+), 12 deletions(-)
+ net/tipc/crypto.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
-diff --git a/drivers/net/ethernet/mellanox/mlx5/core/lib/clock.c b/drivers/net/ethernet/mellanox/mlx5/core/lib/clock.c
-index 80dee8c692495..3d0029fb5b579 100644
---- a/drivers/net/ethernet/mellanox/mlx5/core/lib/clock.c
-+++ b/drivers/net/ethernet/mellanox/mlx5/core/lib/clock.c
-@@ -150,17 +150,16 @@ static void mlx5_pps_out(struct work_struct *work)
+diff --git a/net/tipc/crypto.c b/net/tipc/crypto.c
+index b5aa0a835bced..bf384bd126963 100644
+--- a/net/tipc/crypto.c
++++ b/net/tipc/crypto.c
+@@ -2297,8 +2297,8 @@ static bool tipc_crypto_key_rcv(struct tipc_crypto *rx, struct tipc_msg *hdr)
+ 	keylen = ntohl(*((__be32 *)(data + TIPC_AEAD_ALG_NAME)));
+ 
+ 	/* Verify the supplied size values */
+-	if (unlikely(size != keylen + sizeof(struct tipc_aead_key) ||
+-		     keylen > TIPC_AEAD_KEY_SIZE_MAX)) {
++	if (unlikely(keylen > TIPC_AEAD_KEY_SIZE_MAX ||
++		     size != keylen + sizeof(struct tipc_aead_key))) {
+ 		pr_debug("%s: invalid MSG_CRYPTO key size\n", rx->name);
+ 		goto exit;
  	}
- }
- 
--static void mlx5_timestamp_overflow(struct work_struct *work)
-+static long mlx5_timestamp_overflow(struct ptp_clock_info *ptp_info)
- {
--	struct delayed_work *dwork = to_delayed_work(work);
- 	struct mlx5_core_dev *mdev;
- 	struct mlx5_timer *timer;
- 	struct mlx5_clock *clock;
- 	unsigned long flags;
- 
--	timer = container_of(dwork, struct mlx5_timer, overflow_work);
--	clock = container_of(timer, struct mlx5_clock, timer);
-+	clock = container_of(ptp_info, struct mlx5_clock, ptp_info);
- 	mdev = container_of(clock, struct mlx5_core_dev, clock);
-+	timer = &clock->timer;
- 
- 	if (mdev->state == MLX5_DEVICE_STATE_INTERNAL_ERROR)
- 		goto out;
-@@ -171,7 +170,7 @@ static void mlx5_timestamp_overflow(struct work_struct *work)
- 	write_sequnlock_irqrestore(&clock->lock, flags);
- 
- out:
--	schedule_delayed_work(&timer->overflow_work, timer->overflow_period);
-+	return timer->overflow_period;
- }
- 
- static int mlx5_ptp_settime(struct ptp_clock_info *ptp, const struct timespec64 *ts)
-@@ -253,6 +252,7 @@ static int mlx5_ptp_adjfreq(struct ptp_clock_info *ptp, s32 delta)
- 				       timer->nominal_c_mult + diff;
- 	mlx5_update_clock_info_page(mdev);
- 	write_sequnlock_irqrestore(&clock->lock, flags);
-+	ptp_schedule_worker(clock->ptp, timer->overflow_period);
- 
- 	return 0;
- }
-@@ -467,6 +467,7 @@ static const struct ptp_clock_info mlx5_ptp_clock_info = {
- 	.settime64	= mlx5_ptp_settime,
- 	.enable		= NULL,
- 	.verify		= NULL,
-+	.do_aux_work	= mlx5_timestamp_overflow,
- };
- 
- static int mlx5_query_mtpps_pin_mode(struct mlx5_core_dev *mdev, u8 pin,
-@@ -649,12 +650,11 @@ static void mlx5_init_overflow_period(struct mlx5_clock *clock)
- 	do_div(ns, NSEC_PER_SEC / HZ);
- 	timer->overflow_period = ns;
- 
--	INIT_DELAYED_WORK(&timer->overflow_work, mlx5_timestamp_overflow);
--	if (timer->overflow_period)
--		schedule_delayed_work(&timer->overflow_work, 0);
--	else
-+	if (!timer->overflow_period) {
-+		timer->overflow_period = HZ;
- 		mlx5_core_warn(mdev,
--			       "invalid overflow period, overflow_work is not scheduled\n");
-+			       "invalid overflow period, overflow_work is scheduled once per second\n");
-+	}
- 
- 	if (clock_info)
- 		clock_info->overflow_period = timer->overflow_period;
-@@ -718,6 +718,9 @@ void mlx5_init_clock(struct mlx5_core_dev *mdev)
- 
- 	MLX5_NB_INIT(&clock->pps_nb, mlx5_pps_event, PPS_EVENT);
- 	mlx5_eq_notifier_register(mdev, &clock->pps_nb);
-+
-+	if (clock->ptp)
-+		ptp_schedule_worker(clock->ptp, 0);
- }
- 
- void mlx5_cleanup_clock(struct mlx5_core_dev *mdev)
-@@ -734,7 +737,6 @@ void mlx5_cleanup_clock(struct mlx5_core_dev *mdev)
- 	}
- 
- 	cancel_work_sync(&clock->pps_info.out_work);
--	cancel_delayed_work_sync(&clock->timer.overflow_work);
- 
- 	if (mdev->clock_info) {
- 		free_page((unsigned long)mdev->clock_info);
-diff --git a/include/linux/mlx5/driver.h b/include/linux/mlx5/driver.h
-index 68a12caf5eb16..56cb2fbc496e6 100644
---- a/include/linux/mlx5/driver.h
-+++ b/include/linux/mlx5/driver.h
-@@ -651,7 +651,6 @@ struct mlx5_timer {
- 	struct timecounter         tc;
- 	u32                        nominal_c_mult;
- 	unsigned long              overflow_period;
--	struct delayed_work        overflow_work;
- };
- 
- struct mlx5_clock {
 -- 
 2.39.5
 
