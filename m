@@ -1,145 +1,134 @@
-Return-Path: <netdev+bounces-160942-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-160943-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 12EA2A1C620
-	for <lists+netdev@lfdr.de>; Sun, 26 Jan 2025 03:20:21 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id B8362A1C62D
+	for <lists+netdev@lfdr.de>; Sun, 26 Jan 2025 03:40:18 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 38C8F18882BA
-	for <lists+netdev@lfdr.de>; Sun, 26 Jan 2025 02:20:25 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 05FBB166451
+	for <lists+netdev@lfdr.de>; Sun, 26 Jan 2025 02:40:15 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 991EC13CF9C;
-	Sun, 26 Jan 2025 02:20:15 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 756E3192D76;
+	Sun, 26 Jan 2025 02:40:11 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="TbH3BmLb"
 X-Original-To: netdev@vger.kernel.org
-Received: from szxga03-in.huawei.com (szxga03-in.huawei.com [45.249.212.189])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f176.google.com (mail-pl1-f176.google.com [209.85.214.176])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4621D8828;
-	Sun, 26 Jan 2025 02:20:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.189
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CFD1C4A08;
+	Sun, 26 Jan 2025 02:40:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.176
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1737858015; cv=none; b=EZxgKDM8fHh5U2G6b+V7J6e8rIs3UjLxxgULH11dC89Shd/L4e8GbUyJuLpMZ6yta+U9/+rMUycW6SLhwbH1oHSPIrTfa4dst9f86RORJK67Ns1etu+Ep9oDNBrV3fop0KZsqfE9LmonVs9KkqOEwHEhFh7mJVRPfRCpD7BDYvg=
+	t=1737859211; cv=none; b=osC8VE9fNwlt1tX7O3X4S0NAzACvqnmJJ99OAelmv9nxP0V/TBSeZRgqokReuloh2lWc5V7ln7Dm4XX86lR3Raz0tMwraUCfkYj8QyMIu52+sOboXE0GVSJI6822jwCMAk4iZm/bP49YxgIUt+TIo5BdDSLK/H4IonNuH2Sfnwc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1737858015; c=relaxed/simple;
-	bh=3R9vtvzA2fnGngFx7Exo7oKdsmC2U3/VpD/JY68oUkY=;
-	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
-	 In-Reply-To:Content-Type; b=PpPHZtIPn5TMtL+zvh9+dnc6MZI17NWAzFel/Uq51UcWnSwDXtov/VUW+vbx0KXKnwYG3QD4zgUneBqH/B/+6L0XHXC450qRNYPkS2ev4GB5bOmr3Tq7ZZu8VMU/CS03YdKsOCrEYbEcbIgARSHFsBRyEis8nUwkQ6Tr3Q9w8G0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.189
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
-Received: from mail.maildlp.com (unknown [172.19.88.194])
-	by szxga03-in.huawei.com (SkyGuard) with ESMTP id 4YgZvL0dGVzRlnl;
-	Sun, 26 Jan 2025 10:17:34 +0800 (CST)
-Received: from kwepemg500017.china.huawei.com (unknown [7.202.181.81])
-	by mail.maildlp.com (Postfix) with ESMTPS id 64A861402C1;
-	Sun, 26 Jan 2025 10:20:08 +0800 (CST)
-Received: from [10.174.179.155] (10.174.179.155) by
- kwepemg500017.china.huawei.com (7.202.181.81) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.11; Sun, 26 Jan 2025 10:20:06 +0800
-Message-ID: <e4510b86-e8d9-4550-bcca-9f8f03769be2@huawei.com>
-Date: Sun, 26 Jan 2025 10:20:05 +0800
+	s=arc-20240116; t=1737859211; c=relaxed/simple;
+	bh=BAUDmcJU+JWgNpQSpVG1BXlQ+Ce1zdKV+VBtIaZ4PP8=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=fb65X03PZEzKKxjg0akrwz8t7XdSix2LkwfO7i8SZsvfc93/JSdkPuIG39SrUGnq8gpwDCgH9dc1QzuVOxaSruk0Kc1IWdzbxXHbYe5gzLVZC+/BTUo0U5ETlEfWd/mL7nCR2Bf57zKv8yynZnoLm5kVw4fnQ7FWO/hjYRehxJ8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=TbH3BmLb; arc=none smtp.client-ip=209.85.214.176
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pl1-f176.google.com with SMTP id d9443c01a7336-215770613dbso41852685ad.2;
+        Sat, 25 Jan 2025 18:40:09 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1737859209; x=1738464009; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:subject:cc:to:from:date:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=zO1ms2VfnDa4Pg68YIbyfHsBiRPVKAqT5H3D+lbdTYM=;
+        b=TbH3BmLbzyn5e2bEWWWClTcKnr8cvE2LLmAoxn2vW0HWbxSsuQ0bCkciqlTGPcE7s4
+         89mCBbrWrKKF+T9bQLL7So0hmRvBipN0rbZRqX7i84tgPZ6t3qil3WEXepN91ilZbL0h
+         XcgjGYo5qZ/tnle0VF9Gguy3oz37zRQxn1QntviS4Sih/j1EOny0hHB1a+89ygoJoaq9
+         QK2bAUa1LpTXVaaaTAWRyIaIHA9gLc8x3g/bSWx3/iL7P6zf2XbkNFH/i7TYKJdTkVK/
+         TuMTOUOkG0YOgjM/J9yvG/r3wcbqtsLkkNALfKIwKwMM/fmb0tcFNEyYzxMmER0fDY/O
+         a6lg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1737859209; x=1738464009;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:subject:cc:to:from:date:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=zO1ms2VfnDa4Pg68YIbyfHsBiRPVKAqT5H3D+lbdTYM=;
+        b=YfuUQHLcMNiGa5Gt0gmy+Ds1AkZyw4ZEOT/9WTjDk/KAOLGgL9MMCTxx2yU8lrMFjC
+         r2RWLlGry+8RaCt6tFE1XoZ1WFi2afwdLVVgS7zhFEh1Ny8QzZA3yKkcddCF6gf/YPkr
+         69WeE4q3iRzFOaRooakEMnP5oH1mUwGs0JPax+/ewVJUa9JYAwaW1m5nNtHPGyR1KXrj
+         LFg3k0Hk3LfHo9RUf/FxmBY5eeT029iB4YggaOCCsmkzGZcHsQxgKqODGDqYmaEMx5nf
+         jZF/Oiv1K2z3HnMNpBuCYUccW7oukF8tbpOrOq9OTIbqGsket5uLMmev/iMNysPH47ho
+         thbQ==
+X-Forwarded-Encrypted: i=1; AJvYcCUZWlHMqZFQlRiu2TwbU6kltV0eZTiIj3j2YeA2rQvmQyQ9mLR8OADO7fvpZb4+EQBJShUWDoP5@vger.kernel.org, AJvYcCVQ1Sti6Ac8K6TVdJBikXDy4ju5Q9b/WijyeAihqQD3OI8KSDf+0jezMVfw+W0LVQE16yxjCaKTyXqlw5g=@vger.kernel.org, AJvYcCWsPY2tIOlM+OPuGm9W/b4xc669VlKTPZVFUtkdKXZ1n6oIZblFA3Y9MiibocfhHPY61MSixMvc6BTJTfY=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxsUQUoYZHwqF3+iOtv/+JFtyfPr5w4DOGmUszeKBrVSJVVfUGN
+	a1EkNioqtKomvCBvZsRDAycwMgoy5ZuvrWzqSsBHajoPknHunNs4
+X-Gm-Gg: ASbGnctWcXz2AqDuXEQWBZKgKqxa1ULDzj5Li96JfrpU1zVi10R2IJD/YYmQOXqcy2O
+	uOIXietvkVynlqjwYjNJjJPI8ehf9AGp5hvlMszJ/mvlY78hZCjtD8Pi5+Q2zo8NWkqJf27aiRf
+	0USdZETbTS3/W9gi1E38J5RvWDjK2XsHcpDrx37LVKCEy9D3a+RcOQusFg2TP47knMhWscjeiRf
+	bdPZ0fp6kj7Z+mPodouI0Dmn6h1D7GUpLR2BXOnY2/p4NKLAG6ZkKhG19NXLbnEUEr3s1rxcwoh
+	Mg==
+X-Google-Smtp-Source: AGHT+IFsqUm3b34km4WyrcizVaYpgbqweOU0v8OuV1KGFi0lmdJUkL/Z82B1rVH2F3YAwm0jejyo5Q==
+X-Received: by 2002:a05:6a20:a10c:b0:1d9:6c9c:75ea with SMTP id adf61e73a8af0-1eb21470203mr53454209637.5.1737859208701;
+        Sat, 25 Jan 2025 18:40:08 -0800 (PST)
+Received: from localhost ([129.146.253.192])
+        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-72f8a761193sm4591717b3a.93.2025.01.25.18.40.01
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sat, 25 Jan 2025 18:40:08 -0800 (PST)
+Date: Sun, 26 Jan 2025 10:39:52 +0800
+From: Furong Xu <0x1207@gmail.com>
+To: Andrew Lunn <andrew@lunn.ch>
+Cc: Ido Schimmel <idosch@idosch.org>, Brad Griffis <bgriffis@nvidia.com>,
+ Jon Hunter <jonathanh@nvidia.com>, netdev@vger.kernel.org,
+ linux-stm32@st-md-mailman.stormreply.com,
+ linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
+ Alexander Lobakin <aleksander.lobakin@intel.com>, Joe Damato
+ <jdamato@fastly.com>, Andrew Lunn <andrew+netdev@lunn.ch>, "David S.
+ Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Jakub
+ Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Maxime
+ Coquelin <mcoquelin.stm32@gmail.com>, xfr@outlook.com,
+ "linux-tegra@vger.kernel.org" <linux-tegra@vger.kernel.org>
+Subject: Re: [PATCH net-next v3 1/4] net: stmmac: Switch to zero-copy in
+ non-XDP RX path
+Message-ID: <20250126103952.00005556@gmail.com>
+In-Reply-To: <09442385-573c-4756-8c30-296631bc6272@lunn.ch>
+References: <cover.1736910454.git.0x1207@gmail.com>
+	<bd7aabf4d9b6696885922ed4bef8fc95142d3004.1736910454.git.0x1207@gmail.com>
+	<d465f277-bac7-439f-be1d-9a47dfe2d951@nvidia.com>
+	<20250124003501.5fff00bc@orangepi5-plus>
+	<e6305e71-5633-48bf-988d-fa2886e16aae@nvidia.com>
+	<ccbecd2a-7889-4389-977e-10da6a00391c@lunn.ch>
+	<20250124104256.00007d23@gmail.com>
+	<Z5S69kb7Qz_QZqOh@shredder>
+	<20250125230347.0000187b@gmail.com>
+	<09442385-573c-4756-8c30-296631bc6272@lunn.ch>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: =?UTF-8?B?TW96aWxsYSBUaHVuZGVyYmlyZCDmtYvor5XniYg=?=
-Subject: Re: [PATCH] SUNRPC: Set tk_rpc_status when RPC_TASK_SIGNALLED is
- detected
-To: Trond Myklebust <trondmy@hammerspace.com>, "tom@talpey.com"
-	<tom@talpey.com>, "davem@davemloft.net" <davem@davemloft.net>,
-	"chuck.lever@oracle.com" <chuck.lever@oracle.com>, "kuba@kernel.org"
-	<kuba@kernel.org>, "okorniev@redhat.com" <okorniev@redhat.com>,
-	"anna@kernel.org" <anna@kernel.org>, "pabeni@redhat.com" <pabeni@redhat.com>,
-	"horms@kernel.org" <horms@kernel.org>, "Dai.Ngo@oracle.com"
-	<Dai.Ngo@oracle.com>, "yangerkun@huawei.com" <yangerkun@huawei.com>,
-	"jlayton@kernel.org" <jlayton@kernel.org>, "edumazet@google.com"
-	<edumazet@google.com>, "neilb@suse.de" <neilb@suse.de>
-CC: "houtao1@huawei.com" <houtao1@huawei.com>, "linux-nfs@vger.kernel.org"
-	<linux-nfs@vger.kernel.org>, "yi.zhang@huawei.com" <yi.zhang@huawei.com>,
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-	"lilingfeng@huaweicloud.com" <lilingfeng@huaweicloud.com>,
-	"yukuai1@huaweicloud.com" <yukuai1@huaweicloud.com>, "netdev@vger.kernel.org"
-	<netdev@vger.kernel.org>
-References: <20250114144101.2511043-1-lilingfeng3@huawei.com>
- <fed3cd85-0a15-ae30-b167-84881d6a5efd@huawei.com>
- <642413c4bdbe296db722f0091ffa5190c992eb8e.camel@hammerspace.com>
- <58bf9d83-b58d-e5a6-4096-64eb96f3854a@huawei.com>
- <4d3e8d4385a511860ec9018b3ca864e7ef3a7b48.camel@hammerspace.com>
-From: Li Lingfeng <lilingfeng3@huawei.com>
-In-Reply-To: <4d3e8d4385a511860ec9018b3ca864e7ef3a7b48.camel@hammerspace.com>
-Content-Type: text/plain; charset="UTF-8"; format=flowed
-Content-Transfer-Encoding: 8bit
-X-ClientProxiedBy: dggems702-chm.china.huawei.com (10.3.19.179) To
- kwepemg500017.china.huawei.com (7.202.181.81)
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
+On Sat, 25 Jan 2025 20:08:12 +0100, Andrew Lunn <andrew@lunn.ch> wrote:
 
-在 2025/1/17 11:15, Trond Myklebust 写道:
-> On Fri, 2025-01-17 at 10:29 +0800, yangerkun wrote:
->>
->> 在 2025/1/17 4:52, Trond Myklebust 写道:
->>> On Thu, 2025-01-16 at 19:43 +0800, yangerkun wrote:
->>>> Hi,
->>>>
->>>> Thanks for the patch.
->>>>
->>>> Before 39494194f93b("SUNRPC: Fix races with rpc_killall_tasks()",
->>>> every
->>>> time we set RPC_TASK_SIGNALLED, when we go through __rpc_execute,
->>>> this
->>>> rpc_task will immediate break and exist.
->>>>
->>>> However after that, __rpc_execute won't judge RPC_TASK_SIGNNALED,
->>>> so
->>>> for
->>>> the case like you point out below, even after your commit
->>>> rpc_check_timeout will help break and exist eventually, but this
->>>> rpc_task has already do some work. I prefer reintroduce judging
->>>> RPC_TASK_SIGNNALED in __rpc_execute to help exist immediatly.
->>>>
->>> Better yet... Let's get rid of the RPC_TASK_SIGNALLED flag
->>> altogether
->>> and just replace
->>>
->>> #define RPC_TASK_SIGNALLED(task) (READ_ONCE(task->tk_rpc_status) ==
->>> -ERESTARTSYS)
+> > It is recommended to disable the "SPH feature" by default unless
+> > some certain cases depend on it. Like Ido said, two large buffers
+> > being allocated from the same page pool for each packet, this is a
+> > huge waste of memory, and brings performance drops for most of
+> > general cases.  
+> 
+> I don't know this driver, but it looks like SPH is required for
+> NETIF_F_GRO? Can you add this flag to hw_features, but not
+> wanted_features and leave SPH disabled until ethtool is used to enable
+> GRO?
 
-Hi,
+SPH has its own ethtool command, stmmac driver does not implement yet.
+see:
+https://patchwork.kernel.org/project/netdevbpf/cover/20250114142852.3364986-1-ap420073@gmail.com/
 
-I'm not quite clear on how this can resolve the issue.
-If we remove the RPC_TASK_SIGNALLED flag and replace setting tk_runstate
-to RPC_TASK_SIGNALLED with setting tk_rpc_status to -ERESTARTSYS in
-rpc_signal_task, wouldn't setting tk_rpc_status back to 0 in
-__rpc_restart_call still lead to an infinite loop in the rpc_task?
-Could you please provide a more detailed explanation?
+> Are there other use cases where SPH is needed?
 
-Thanks.
+https://patchwork.kernel.org/project/netdevbpf/cover/20240910171458.219195-1-almasrymina@google.com/
+https://patchwork.kernel.org/project/netdevbpf/cover/20250116231704.2402455-1-dw@davidwei.uk/
 
->> Hi,
->>
->> Thanks for your reply! Yeah, if all the places where tk_rpc_status is
->> updated are by calling rpc_task_set_rpc_status, we can use
->> task->tk_rpc_status == -ERESTARTSYS to determine whether rpc_task is
->> RPC_TASK_SIGNALLED. But for the case like Li has provided,
->> __rpc_restart_call won't do this, and will overwrite tk_rpc_status
->> unconditionally. This won't be a stable solution. Maybe it's better
->> to
->> change __rpc_restart_call calling rpc_task_set_rpc_status too? And
->> __rpc_execute will be enough to help solve this case.
->>
->>
-> That would break __rpc_restart_call() to the point of rendering it
-> completely useless.
-> The whole purpose of that call is to give the NFS layer a chance to
-> handle errors in the exit callback, and then kick off a fresh call.
-> Your suggestion would mean that any RPC level error sticks around, and
-> causes the new call to immediately fail.
->
-> I see no point in doing anything more than fixing the looping
-> behaviour. Eliminating the redundant flag will do that.
->
+The stmmac driver does not support both of them, but it will someday :)
 
