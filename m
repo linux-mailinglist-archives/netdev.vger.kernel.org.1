@@ -1,157 +1,141 @@
-Return-Path: <netdev+bounces-160980-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-160981-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8C5E7A1C7A7
-	for <lists+netdev@lfdr.de>; Sun, 26 Jan 2025 13:12:54 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id A2060A1C7C6
+	for <lists+netdev@lfdr.de>; Sun, 26 Jan 2025 13:56:51 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id F19753A72E4
-	for <lists+netdev@lfdr.de>; Sun, 26 Jan 2025 12:12:46 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 9EBE13A7072
+	for <lists+netdev@lfdr.de>; Sun, 26 Jan 2025 12:56:43 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C50EB1531DB;
-	Sun, 26 Jan 2025 12:12:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1723746BF;
+	Sun, 26 Jan 2025 12:56:46 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=online.de header.i=max.schulze@online.de header.b="irHIBIRL"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="XRy+5J0n"
 X-Original-To: netdev@vger.kernel.org
-Received: from mout.kundenserver.de (mout.kundenserver.de [212.227.126.131])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f180.google.com (mail-pl1-f180.google.com [209.85.214.180])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 44C12A59;
-	Sun, 26 Jan 2025 12:12:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=212.227.126.131
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8F3345383;
+	Sun, 26 Jan 2025 12:56:44 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.180
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1737893569; cv=none; b=GS79NlRXAjy1L7OrGk7UUyuUisVg9l101huGipAADYicOfol7D97nYS6O7ItE1hyaFBMb0JklgutBSQTdxV0Qy4MHfDYOjCM22h1EwhJqxltkzJJYbZviivTKri4QTHfBRkDhlKnxQl/SShBqfbfRCWCZI5mLl1eX5Ld5IzDGpA=
+	t=1737896206; cv=none; b=pL0iAgTEc8m+qBHa/PBpwVHK0bRn4htVmbZyhHHP1Lulq0Gx6+bSYB3TwftSpV0Sk10HF0IcfFyIuwGVVJtIBMcLfQN3B+Z4RqRhAPi+tgwndY8bWUjtWG8cMMSH014BsyfgTqqpuboWnYLCsGHZyK5S8//AwxV/LJlJ7myJs5A=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1737893569; c=relaxed/simple;
-	bh=n3Zuxo4+ofp6lzypUh52/XEAVt6q6ffux8GFlyD0BgQ=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=EYWZDen2DZtxOw8O9nl9aIKQ+hVe3WTTzWlZHjg9UFB4LRuap/gjTcEhlrkbUgeeSLkU+Nr7CLx1I+nqscgMd5DRCEXCy+jqqgDnz1fjeW184vAj6uCqw+8uL8kVoALhD7fhV9cV2yoB1ZFA1HNyy2VjqHZMo1O3zxRexuHwZdM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=online.de; spf=pass smtp.mailfrom=online.de; dkim=pass (2048-bit key) header.d=online.de header.i=max.schulze@online.de header.b=irHIBIRL; arc=none smtp.client-ip=212.227.126.131
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=online.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=online.de
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=online.de;
-	s=s42582890; t=1737893562; x=1738498362; i=max.schulze@online.de;
-	bh=yOo6p5moP6tZOTasWbdStw1xoOjx+08m41VytHHVAs4=;
-	h=X-UI-Sender-Class:From:To:Cc:Subject:Date:Message-ID:In-Reply-To:
-	 References:MIME-Version:Content-Transfer-Encoding:cc:
-	 content-transfer-encoding:content-type:date:from:message-id:
-	 mime-version:reply-to:subject:to;
-	b=irHIBIRL4Ot1LI5F1Bg50C0fShHppgmp+XJLPKLDXd03gxiWgucZ/WH+pRze6290
-	 P6OQhAv7jcL863h2Cf3Rp8y6qeFOZ26Pbm6KvPuuH1hZ3L4/BvrRxu9N+/tZrhRNB
-	 DrFYr22pWf1m0wHQf3BAkKDHX9Zsdt/o9QHFM+IrZ1PyjB+n+wuQcKKyzSbMCmBTD
-	 qok84GnMWqXzJxSS/WTmVATUBQqHc9PotV8KVFG7A6YssyWf0MnBin79LWhXEO/sM
-	 /oyfAjaThy+IfJgX5dGuzWAVuF/4VZ0f1++SdEJWflQnfLv9un6Ny+MeDwFv5788R
-	 mGxBGhlAOtWU76AgJQ==
-X-UI-Sender-Class: 6003b46c-3fee-4677-9b8b-2b628d989298
-Received: from ubu24desk.fritz.box ([84.160.55.49]) by
- mrelayeu.kundenserver.de (mreue012 [212.227.15.167]) with ESMTPSA (Nemesis)
- id 1MLzeb-1tty1o3Sev-00VW2y; Sun, 26 Jan 2025 13:12:41 +0100
-From: Max Schulze <max.schulze@online.de>
-To: netdev@vger.kernel.org,
-	linux-usb@vger.kernel.org,
-	andrew+netdev@lunn.ch
-Cc: Max Schulze <max.schulze@online.de>,
-	s.kreiensen@lyconsys.com,
-	dhollis@davehollis.com
-Subject: [PATCH v2] net: usb: asix: add FiberGecko DeviceID
-Date: Sun, 26 Jan 2025 13:12:19 +0100
-Message-ID: <20250126121227.14781-1-max.schulze@online.de>
-X-Mailer: git-send-email 2.43.0
-In-Reply-To: <20250126114203.12940-1-max.schulze@online.de>
-References: <20250126114203.12940-1-max.schulze@online.de>
+	s=arc-20240116; t=1737896206; c=relaxed/simple;
+	bh=Uf3DfaHFP2+89fbQq7IL1XG33t/w8iPDEXkGa3CzpWg=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=cvyS0s9ujv5BXju3P7lxCJOH+wafRnf8BvL+EtdiYNxbUrWkPLx5sQiy9aAoifkdYaq3N2t3C5z4XpRPV9Tkg+snHJ/OyZt5onOMLRjSl9Klz/c1J1/JoFJ6An5GL02OWasqb/1elh032ASUXjBcuAbA7jK8qiS+1x/LzsJtAVc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=XRy+5J0n; arc=none smtp.client-ip=209.85.214.180
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pl1-f180.google.com with SMTP id d9443c01a7336-21636268e43so76907445ad.2;
+        Sun, 26 Jan 2025 04:56:44 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1737896204; x=1738501004; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:subject:cc:to:from:date:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=9KGHfLuP3yfCvrd6niU02daJ3MN3GQPttYCq64ynsaU=;
+        b=XRy+5J0n3gaRtNCMu/kiCtbVSEfgQVTI2M0wBxmGwTcEwxXssnvJ6syzR1+H1SX+dj
+         RbofLQcQseEpGpTjlUZrddwR7HAzHBReFavpgBVEmVbH/Qek+oehuQeOnZRnTHtwkX+e
+         w3cT6qWtnHmY7x9CW0zhfgfAnsrY9ubu02qnqUMO/q+0eG1Gr0WsDMmFpJEUpcyqJ3Y7
+         cFPC34cvc40774ygsVQVR2WJrQTOlhyQsJDSIwiC/MUz5VBVbVg6GOdbXHsNf3y7R6Ia
+         e2vBemJy6PmGlZOgPjlmqwz+2mldDKD3aBrXSdHFx6NMlwv1gDJUN2cUcDXiwKbCZ5OH
+         2jDg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1737896204; x=1738501004;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:subject:cc:to:from:date:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=9KGHfLuP3yfCvrd6niU02daJ3MN3GQPttYCq64ynsaU=;
+        b=cpKw24nMuOUo74RbmXFXDeiZVAdYz39LXggyHBACq1YsDgRG8C5jke5ERU90xtguy4
+         I8u20xZVtYZuAzeQdvvHILF0dfiVFSDkIkeMgsWEjE4NjpB2dtyi3EJq3bx+/DaTeCWx
+         RMChQnj0oWBU/FVwyxUubNn7QOf6xx5vlAhRcS5CH1RHFPGOp75LcK5sUUFUR0HD/pDu
+         s8Dobw5sO1RmO87FdozgaR4CJFQAiZKLUlxvMNxBQ3OvYl5Y3R9mxzVTd9jPJvuyCPRP
+         s82it6MPaP1Mddqyal5kWksgmsN2GwrCWiQJu28o2jn7KvCI+acppEXYepJle/PipzmP
+         IlHw==
+X-Forwarded-Encrypted: i=1; AJvYcCVQGHgSvxsnOlfZH1SWidQ30e2wLOARKPftzn3VVmVujgOvXEagQfsFIdhQyf/bnLsPTAEiwby+C6e0wyI=@vger.kernel.org, AJvYcCWtXQpxOyNTiUn4nNjT+R7hQyiCVgSQXaG+S/MRVjMGnJzxBGF59I0LuIsFsryXjITWDIm1IqOy@vger.kernel.org, AJvYcCXqcglR9bB7OoZxwD1XyZsWxOZIg41KIGpohNB7MbkJc7dr7Zwi/WFazJX+0SLrhBZebjsIpTftB4nfoJ4=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxsiD37Ipsdn7CEeDiwUT6GNgBRKwxDEXV9nkSQV0EZ0KeeaKBK
+	b2h8HLYbJ/2iDDudmsrO7RX/MS/3iR+7xJDhP68/huqwxnpgmrcr
+X-Gm-Gg: ASbGnctLboB4z9XVpAsGF25gUe+JHiHNFTjrLJJcIopDehGYS/3igNSFDhvCDxan0Bw
+	8cMMo3psq8LsEwwUOORBNApr/K+Juqrt7rhAcrVHzKGBgNdbsLS/cfE37XMz+AfHP+OssX6NnyR
+	qOYbZs+6/WIuabhgjxnLZ81MrfpmynE6s4Za6go0pdn+zeB3hztil7cG4P92kaHpvT2zIOpTrur
+	lm91cf0juBBzSWGoTac+yED1R3fi9OJ0AS/g21myqLJz88ny5E7XZl7hgRKe6dgmqb4eTN1SckT
+	WA==
+X-Google-Smtp-Source: AGHT+IGYKczzJcB4xAPfGWm8estAlez/srV9f9KVlzRCuc8f9pkMAG6+IqGmDY3HU1400WQhVY/Cuw==
+X-Received: by 2002:a05:6a00:330b:b0:724:59e0:5d22 with SMTP id d2e1a72fcca58-72dafba2625mr53847801b3a.20.1737896203562;
+        Sun, 26 Jan 2025 04:56:43 -0800 (PST)
+Received: from localhost ([129.146.253.192])
+        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-72f8a77c7casm5263334b3a.139.2025.01.26.04.56.37
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sun, 26 Jan 2025 04:56:43 -0800 (PST)
+Date: Sun, 26 Jan 2025 20:56:25 +0800
+From: Furong Xu <0x1207@gmail.com>
+To: Ido Schimmel <idosch@idosch.org>
+Cc: Andrew Lunn <andrew@lunn.ch>, Brad Griffis <bgriffis@nvidia.com>, Jon
+ Hunter <jonathanh@nvidia.com>, netdev@vger.kernel.org,
+ linux-stm32@st-md-mailman.stormreply.com,
+ linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
+ Alexander Lobakin <aleksander.lobakin@intel.com>, Joe Damato
+ <jdamato@fastly.com>, Andrew Lunn <andrew+netdev@lunn.ch>, "David S.
+ Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Jakub
+ Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Maxime
+ Coquelin <mcoquelin.stm32@gmail.com>, xfr@outlook.com,
+ "linux-tegra@vger.kernel.org" <linux-tegra@vger.kernel.org>
+Subject: Re: [PATCH net-next v3 1/4] net: stmmac: Switch to zero-copy in
+ non-XDP RX path
+Message-ID: <20250126205625.00006d64@gmail.com>
+In-Reply-To: <Z5YeEVrI3zx4VOtF@shredder>
+References: <bd7aabf4d9b6696885922ed4bef8fc95142d3004.1736910454.git.0x1207@gmail.com>
+	<d465f277-bac7-439f-be1d-9a47dfe2d951@nvidia.com>
+	<20250124003501.5fff00bc@orangepi5-plus>
+	<e6305e71-5633-48bf-988d-fa2886e16aae@nvidia.com>
+	<ccbecd2a-7889-4389-977e-10da6a00391c@lunn.ch>
+	<20250124104256.00007d23@gmail.com>
+	<Z5S69kb7Qz_QZqOh@shredder>
+	<20250125224342.00006ced@gmail.com>
+	<Z5X1M0Fs-K6FkSAl@shredder>
+	<20250126183714.00005068@gmail.com>
+	<Z5YeEVrI3zx4VOtF@shredder>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: quoted-printable
-X-Provags-ID: V03:K1:hcR076eFuWWKyloIIB2hQQ1DxZDx17p5t/eEJdS30mFsY9XpVNB
- uheUdmcsRiArJzYmrkg9Q4rq+/Fo+MX9qTjPM//Jlo7WzfMJ6qw7puf7dLnt6Qk9fRP8WQr
- WARIxvMBol9GZ+wqt02QUTfdubgQdlHKhQqqwyhYi0vra0ueuIC9kgQg5WszPzhM05RgVmp
- rpYJn8YQOmLQYyYhU661w==
-X-Spam-Flag: NO
-UI-OutboundReport: notjunk:1;M01:P0:IH3Z69r/3aU=;eB0CHAlbyx54cipdnGhK0hsY3n5
- MvcMG1ye0DUS5Nj+g1kFQ9oTvN7SngJ1s1iCyDalNdFw4QXYEtJtTjGmxx88uKbqyyqCjodoZ
- abXYb7ynBI9B5K/06KMWOJPmqSsmSdOrC1QIDusU61eKb3Gcr5y+zbkaPCDdaGnFNXTxMLaxf
- jjmzpmx5ZjFQJTdM6FRUbRR8pE8IHU9iUV2MRYGTBGWP9sKoEa6KSSanpPcvhjqb7IRMLAA79
- x1WD5+z532nGMSYHM0pxJ4jhQVW8GGApqRBCDUlvXQSuQZP5lrFZvo61d5ZEa22RT3f0Y5ABB
- CihSNZLhhE58nLPyuWAVsHSWRZocIPltfuOdiGlifT5aoHZEp4ecB+9Ud7ysQowde2RUXdP46
- EmLPmv/BPCbuHSCf7ueLt+F3nsTgGW3hb9gCY9wQCPBHLMlKi0s39CvAQyx00Vwu+CcqR3DP8
- HLk6EKkvrek6YL/0G78/WMeDOrZNHhCeikFHflmv3TcnigwtSrlrqPsAmCVma1HHTuQDj/Gs4
- io5sQbVASxwN4EStyR3D7B2YjvtCtVHhKYU7caBs5OdmNRcHKOi0UNQk99eKeXSVwkS8eywSH
- f0HcRpgwcSciQuj1wwq73IIAPQSyRGPvwj65I2iV8WjfRFDTTles4y4VRUXQ33RRuTlcpulOa
- wUu+y2HxQnFtP5XuBqOMRlkScFq9ZnL41AvUWJsHGFdnVBCfiunGmA2oXWoVSaqY8lvkYGObl
- PSQnrUNhUF5RLxveIG14ozbIt0QMI0q/mYeD68kWHTMiCCBBqYI5feAdRrWevSBMvd6nxoVW0
- mzTxoc2zAY9Yzabok27e14hVa+3wH1xtgRJC6y+zPM+NrqOlARjQCQyApfySBcdIQAxqev5bB
- v1wNRvatUfb9u0QYY/W0CFL/biJC/fmh1cgCTeaGoQog7VrxZ8aUBYVfpPX6F59GA1ccsFUiL
- SVWhgofvXZIwpV2SL1inEsgwxN6rbuupwPfu0UGuRXka7BjckWPJnlmdFCbZPX3vi6TGSEu4n
- BNKvGlHlt21+ff/gNRLHwZCzBIbvpt50ShLmlvyl9o821WGP/yfY5XihqdD9tmApOvumgy3Jf
- ckjsJH3WuAr/CNV487lFsMcCVkY0GQXZ5heIQMfcWkIMViXUgozaKjtlU236IiK9LqmENmIjk
- =
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-Signed-off-by: Max Schulze <max.schulze@online.de>
-Tested-by: Max Schulze <max.schulze@online.de>
-Suggested-by: David Hollis <dhollis@davehollis.com>
-Reported-by: Sven Kreiensen <s.kreiensen@lyconsys.com>
+On Sun, 26 Jan 2025 13:35:45 +0200, Ido Schimmel wrote:
 
-=2D--
+> On Sun, Jan 26, 2025 at 06:37:14PM +0800, Furong Xu wrote:
+> > The "SPH feature" splits header into buf->page (non-zero offset) and
+> > splits payload into buf->sec_page (zero offset).
+> > 
+> > For buf->page, pp_params.max_len should be the size of L3/L4 header,
+> > and with a offset of NET_SKB_PAD.
+> > 
+> > For buf->sec_page, pp_params.max_len should be dma_conf->dma_buf_sz,
+> > and with a offset of 0.
+> > 
+> > This is always true:
+> > sizeof(L3/L4 header) + NET_SKB_PAD < dma_conf->dma_buf_sz + 0  
+> 
+> Thanks, understood, but are there situations where the device is
+> unable to split a packet? For example, a large L2 packet. I am trying
+> to understand if there are situations where the device will write
+> more than "dma_conf->dma_buf_sz - NET_SKB_PAD" to the head buffer.
 
-v2: change Spacing on Initializer, change Mailing List link
-This patch had previously been suggested at
-https://lore.kernel.org/netdev/1407426826-11335-2-git-send-email-dhollis@d=
-avehollis.com/
+Nice catch!
+When receiving a large L2/non-IP packet, more than "dma_conf->dma_buf_sz
+- NET_SKB_PAD" will be written.
 
-However, I found that the flag quirk is not necessary and I suspect
-it has never worked (because it references ".flag" whereas the
-identifying value is in ".data")
+So we should:
+pp_params.max_len = dma_conf->dma_buf_sz + stmmac_rx_offset(priv);
 
-I have compiled this and tested successfully with two devices.
-As it now only adds the USB Id it generates no extra maintenance
-burden that's why I suggest it for inclusion.
-
- drivers/net/usb/asix_devices.c | 17 +++++++++++++++++
- 1 file changed, 17 insertions(+)
-
-diff --git a/drivers/net/usb/asix_devices.c b/drivers/net/usb/asix_devices=
-.c
-index 57d6e5abc30e..ef7aae8f3594 100644
-=2D-- a/drivers/net/usb/asix_devices.c
-+++ b/drivers/net/usb/asix_devices.c
-@@ -1421,6 +1421,19 @@ static const struct driver_info hg20f9_info =3D {
- 	.data =3D FLAG_EEPROM_MAC,
- };
-
-+static const struct driver_info lyconsys_fibergecko100_info =3D {
-+	.description =3D "LyconSys FiberGecko 100 USB 2.0 to SFP Adapter",
-+	.bind =3D ax88178_bind,
-+	.status =3D asix_status,
-+	.link_reset =3D ax88178_link_reset,
-+	.reset =3D ax88178_link_reset,
-+	.flags =3D FLAG_ETHER | FLAG_FRAMING_AX | FLAG_LINK_INTR |
-+		 FLAG_MULTI_PACKET,
-+	.rx_fixup =3D asix_rx_fixup_common,
-+	.tx_fixup =3D asix_tx_fixup,
-+	.data =3D 0x20061201,
-+};
-+
- static const struct usb_device_id	products [] =3D {
- {
- 	// Linksys USB200M
-@@ -1578,6 +1591,10 @@ static const struct usb_device_id	products [] =3D {
- 	// Linux Automation GmbH USB 10Base-T1L
- 	USB_DEVICE(0x33f7, 0x0004),
- 	.driver_info =3D (unsigned long) &lxausb_t1l_info,
-+}, {
-+	/* LyconSys FiberGecko 100 */
-+	USB_DEVICE(0x1d2a, 0x0801),
-+	.driver_info =3D (unsigned long) &lyconsys_fibergecko100_info,
- },
- 	{ },		// END
- };
-=2D-
-2.43.0
-
+Thanks a lot, Ido
+Have a nice weekend :)
 
