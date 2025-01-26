@@ -1,88 +1,88 @@
-Return-Path: <netdev+bounces-160973-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-160974-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 34D1BA1C79B
-	for <lists+netdev@lfdr.de>; Sun, 26 Jan 2025 12:58:05 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 15C01A1C79E
+	for <lists+netdev@lfdr.de>; Sun, 26 Jan 2025 12:58:15 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id E54997A2691
-	for <lists+netdev@lfdr.de>; Sun, 26 Jan 2025 11:57:46 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 1B9341654DB
+	for <lists+netdev@lfdr.de>; Sun, 26 Jan 2025 11:58:01 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DE6551662E9;
-	Sun, 26 Jan 2025 11:57:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2EA86158536;
+	Sun, 26 Jan 2025 11:57:32 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="Cs4NChS5"
+	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="gZud4QLy"
 X-Original-To: netdev@vger.kernel.org
-Received: from NAM10-MW2-obe.outbound.protection.outlook.com (mail-mw2nam10on2049.outbound.protection.outlook.com [40.107.94.49])
+Received: from NAM10-DM6-obe.outbound.protection.outlook.com (mail-dm6nam10on2076.outbound.protection.outlook.com [40.107.93.76])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2F9C1156C74
-	for <netdev@vger.kernel.org>; Sun, 26 Jan 2025 11:57:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.94.49
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5C2FB157493
+	for <netdev@vger.kernel.org>; Sun, 26 Jan 2025 11:57:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.93.76
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1737892649; cv=fail; b=NwRxs5QxxrHfabAah2L2xLZv5Hy/MzfNtZaX3SVT5fyG3ASWDrfb1orXt2C7sNGvecrVHx5APqrmtKbCWRRQsWkSfDSqZ8X+Mk7tH5Y46o/LPVexGjOzdBNaMwiCZQQA+otkHFqzUvGbLc6mziVaYpyDhzqZGSUn+G/9PfM4aE0=
+	t=1737892652; cv=fail; b=hm09YMcnRAnt9RkzlmapMRGZyr9M5DgoUnBw1mX3WsugeMsVnlqsY0CdBPKBQPIfFbhsgyI949/OWIcRDsYEZ5GaJvWjl0v4CuMsamvVFAyjJlMjW0eT9NK2CKifN2NW+qRl4JknhyHqIMoYrLxj55So8rzZbZMChxo3i1p+rPM=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1737892649; c=relaxed/simple;
-	bh=+s27ckSxv5R4b5IXEyTeaLoK8A+EmA/6gnpXd08gpkg=;
+	s=arc-20240116; t=1737892652; c=relaxed/simple;
+	bh=qiL370fx02dCG+/05WkbVy/cy44tDZ69m2+s+pQdAnU=;
 	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=BKbDJFRUk37S2lvj3r1V/l2v9XcC7r+a60iv+s7o8VlYPIBvnwF02oCfp9qYWiUqIc193m2Da+7UXSV6dn7RNeZNScBFmgpUv8xFGWK6G3C5WPkYCjF6PrVLm2MQ0GzT3oJtNQjGp8iMbl2qPxz66oZ2UL9TYEjS9ZD2lekuOcY=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=Cs4NChS5; arc=fail smtp.client-ip=40.107.94.49
+	 MIME-Version:Content-Type; b=N4YkCe7CQCo22SEsCtJ8BfcjKMcHoemsammGjO6ISBIBxyIJL4IGNqtBL4qzyUym1bhEyc0n2pLcV4iQF23v6Z2+D214LdUwLKixHVNzMg1lrJ2SIwdDivTc3i5TdLT95OcZnCKtRrQMR2tWpnvmnbyTaMSmEZ6dXUOytrzMtgY=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=gZud4QLy; arc=fail smtp.client-ip=40.107.93.76
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
 Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=wB7OJVMjlcejBj/93NNyn7zyF2VTCjsl/FzaTHNECMHlHrDlccPA7B0PYpE3VNIRIgWf4jddk5bjrft2AS2vPCv8aEz71w+ku3B7ZhF6vSxbHcwpmAMKr3B0eM+ZgenvHe9OvSAczLgAkBi3hrJQrwalqtS80KmSskCArH34m9kgWC88r93GY7BnOVszVhwc9Nit04UbMGHR+JhNdf5q/SgSl5rn0Cuw8qIMb6jUkeaCApRW/lclOaBKknn1YaNZTL4C2IhDOBNoFEhOwSyrjlvvYR5wkXIxk2Pk+f8vfbZ6Y2L+JWlR295m2RyO5j/6sCkKQuFVG5GM47PDTrFYTA==
+ b=dgz2kDWmpsUMp5iG5gvIFly7ndnRv03qgaZyR1Sv0wDykE3uvxnqhqyyFVdIwqy086GIW/WnbIbX6nict62SlZfjdR781Wu+nHZAromaMt0IJiDcrMa9ewHVYnQuUk3NOR7B7qaLkx4kpwSbvmtcpZ9Cxm2h2xzFOe8BlPJxjT0w+MODLPfY6jwZV/v1FU4h8uMBj0t8tL0yEgEbn/l0qx4iqwVkmBvvpDNKEJQdg0jPqEp8BocHYZEf2YJJZkQsphAQH6mQDwhvZmNzjnhyJeH/aIVKYCp3OaBXvqgWY5SmF5Txh3UC9l70m1yhIfmcEeKWWvkl0VB8sqCnopwsEA==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector10001;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=sKngEn9AaMNgYYCf05Vro7CLiYOiYY1CNnKdPACSSxc=;
- b=jx0RXnLEIMexnTRkmTuIhr1aKri/qcxmopwYM9/xn7oke9XwaRmpMLoahgoQ/rRr3TAoRHt8chkO98fkMy09/JRxTO9syZOEZb92x1rG43T0SQeIJ3eD8puwsN3iKabgGPfn145fUfjZ09TcdjDl+dP/0Dc0+8OBakUQ3UW2zXe0kFU1Onje+Q7NXOh+WOk0pzc4eiqFk2+WKBhc8PBN0d0RhOTHG8bX455A9vVIbnhOcLmdxna8AufZ4a4VVVAwGTn097QYjFh+hBxCMJ0WWL6Iz8WXxJgMjC/Ff+LPPyRtlUL9KalE7Lb+p9UjrJjFW5NG50jqYKt3FS62+ipi4Q==
+ bh=JI8a9cM84q3HGm0vPb6il/Nj+3l1m476W5yF1HUBEtw=;
+ b=n+4hcjuFaLYRMFTlcQvObHkcZFjBDHkyj/WkVYB8snLAOEEyVULSQX7gUz4xozHpLJ2rL6TReblN05r4+TwIjouNWfn8cUobSgN7USDh1/p+l48tQgJsrGjtfDe5fwOVDyIaGtG9HcZ44D4w2RdnY/r7Aajm9dZbWcPCi2JeQuLUFFpxETJXwZv6nSJfDUzfS83WEiYm77N3eCj7C9wWKkWlDn3hrVGNsBpXKsMncunf+2KXPoO1i/UrmQiXlocvkJp+ZNlHjplImdUdzxBqyz+2QBLi7k0YGe1MYThEOSJPzB1thrk8alWFLDZ04JzZVj5ZdTtjT3c7bEs8+OFj8Q==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
- 216.228.117.160) smtp.rcpttodomain=vger.kernel.org smtp.mailfrom=nvidia.com;
+ 216.228.117.161) smtp.rcpttodomain=vger.kernel.org smtp.mailfrom=nvidia.com;
  dmarc=pass (p=reject sp=reject pct=100) action=none header.from=nvidia.com;
  dkim=none (message not signed); arc=none (0)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
  s=selector2;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=sKngEn9AaMNgYYCf05Vro7CLiYOiYY1CNnKdPACSSxc=;
- b=Cs4NChS5VxxveS0ZPlGL/GKvP1ZE5wJ+cE6F89a9bUHX3JTpxpBxGxSHg5Z0A77voBDpQ+gal3cY1u5FP4nltHyk9su9MQj9/7/M15z/TT1S263oOS8I1s4D1aAe6DrD/5kBjN85D17DvOphVpnstY9ysEtnetzWzhzMlKuR0VcuEqp8wPR+ch5HBSQvNfs6HIVnRIHLL+PEvMXhRedIDWwNQFKzYGS860wfY/pJZE0tpn3AVu2TMC4jcKC1g1/QK1x2Im62Vmpe8S7LGgjfXFKJ8rZfpmPJlH0QCAe41TDBZKX0yqv/dsplhDoK4xcd+09jfQwP1Gcdf3FhKe0AOA==
-Received: from PH7PR17CA0063.namprd17.prod.outlook.com (2603:10b6:510:325::27)
- by CYYPR12MB8750.namprd12.prod.outlook.com (2603:10b6:930:be::18) with
+ bh=JI8a9cM84q3HGm0vPb6il/Nj+3l1m476W5yF1HUBEtw=;
+ b=gZud4QLybTs6l/9rmNFDHi+Ayq10NN0xH25MRa8EccfnTnnLILlOJmQ4yHwDCey0am4g1VZzQkxBUw+/ZpbWyvChdIxnO/tyQp/WkZpuqjk9kMpfQJhhoT4DRlkGP/7I2lgQntSUQJ0xcZdo7aBMX3xWldeFPqUH1XRTEvDBOuIMsc5lKf5gT4RiaSUbkKm0q3TvU4Iyn+0lsQ9n6Pfsb46KpIcCcZ19YQDMSG+V7E1Q/sl+S0YHRyzM4bF6RANenNxMSgac8uFN8kxXaxpscPzEXknBbp0OmVgJubor5qH4wnz4Ngl6bnD7cvB9Nsvu/PCdBtd1vq7BNZEvdKtcCw==
+Received: from CYZPR11CA0016.namprd11.prod.outlook.com (2603:10b6:930:8d::21)
+ by SA1PR12MB7173.namprd12.prod.outlook.com (2603:10b6:806:2b4::5) with
  Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8377.20; Sun, 26 Jan
- 2025 11:57:24 +0000
-Received: from CY4PEPF0000E9D1.namprd03.prod.outlook.com
- (2603:10b6:510:325:cafe::c2) by PH7PR17CA0063.outlook.office365.com
- (2603:10b6:510:325::27) with Microsoft SMTP Server (version=TLS1_3,
- cipher=TLS_AES_256_GCM_SHA384) id 15.20.8377.22 via Frontend Transport; Sun,
- 26 Jan 2025 11:57:24 +0000
-X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 216.228.117.160)
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8377.21; Sun, 26 Jan
+ 2025 11:57:23 +0000
+Received: from CY4PEPF0000EE3D.namprd03.prod.outlook.com
+ (2603:10b6:930:8d:cafe::ee) by CYZPR11CA0016.outlook.office365.com
+ (2603:10b6:930:8d::21) with Microsoft SMTP Server (version=TLS1_3,
+ cipher=TLS_AES_256_GCM_SHA384) id 15.20.8377.21 via Frontend Transport; Sun,
+ 26 Jan 2025 11:57:23 +0000
+X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 216.228.117.161)
  smtp.mailfrom=nvidia.com; dkim=none (message not signed)
  header.d=none;dmarc=pass action=none header.from=nvidia.com;
 Received-SPF: Pass (protection.outlook.com: domain of nvidia.com designates
- 216.228.117.160 as permitted sender) receiver=protection.outlook.com;
- client-ip=216.228.117.160; helo=mail.nvidia.com; pr=C
-Received: from mail.nvidia.com (216.228.117.160) by
- CY4PEPF0000E9D1.mail.protection.outlook.com (10.167.241.136) with Microsoft
+ 216.228.117.161 as permitted sender) receiver=protection.outlook.com;
+ client-ip=216.228.117.161; helo=mail.nvidia.com; pr=C
+Received: from mail.nvidia.com (216.228.117.161) by
+ CY4PEPF0000EE3D.mail.protection.outlook.com (10.167.242.15) with Microsoft
  SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
  15.20.8377.8 via Frontend Transport; Sun, 26 Jan 2025 11:57:23 +0000
 Received: from rnnvmail201.nvidia.com (10.129.68.8) by mail.nvidia.com
- (10.129.200.66) with Microsoft SMTP Server (version=TLS1_2,
+ (10.129.200.67) with Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.4; Sun, 26 Jan
- 2025 03:57:09 -0800
+ 2025 03:57:12 -0800
 Received: from dev-r-vrt-155.mtr.labs.mlnx (10.126.230.35) by
  rnnvmail201.nvidia.com (10.129.68.8) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.4; Sun, 26 Jan 2025 03:57:07 -0800
+ 15.2.1544.4; Sun, 26 Jan 2025 03:57:09 -0800
 From: Danielle Ratson <danieller@nvidia.com>
 To: <netdev@vger.kernel.org>
 CC: <mkubecek@suse.cz>, <matt@traverse.com.au>, <daniel.zahka@gmail.com>,
 	<amcohen@nvidia.com>, <nbu-mlxsw@exchange.nvidia.com>, Danielle Ratson
 	<danieller@nvidia.com>
-Subject: [PATCH ethtool-next 08/14] cmis: Enable JSON output support in CMIS modules
-Date: Sun, 26 Jan 2025 13:56:29 +0200
-Message-ID: <20250126115635.801935-9-danieller@nvidia.com>
+Subject: [PATCH ethtool-next 09/14] qsfp: Add JSON output handling to --module-info in SFF8636 modules
+Date: Sun, 26 Jan 2025 13:56:30 +0200
+Message-ID: <20250126115635.801935-10-danieller@nvidia.com>
 X-Mailer: git-send-email 2.47.0
 In-Reply-To: <20250126115635.801935-1-danieller@nvidia.com>
 References: <20250126115635.801935-1-danieller@nvidia.com>
@@ -98,243 +98,986 @@ X-ClientProxiedBy: rnnvmail202.nvidia.com (10.129.68.7) To
  rnnvmail201.nvidia.com (10.129.68.8)
 X-EOPAttributedMessage: 0
 X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: CY4PEPF0000E9D1:EE_|CYYPR12MB8750:EE_
-X-MS-Office365-Filtering-Correlation-Id: a4f6186b-44b7-4525-a833-08dd3e0098c0
+X-MS-TrafficTypeDiagnostic: CY4PEPF0000EE3D:EE_|SA1PR12MB7173:EE_
+X-MS-Office365-Filtering-Correlation-Id: 3efd8949-826f-4383-04f4-08dd3e009845
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
 X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|1800799024|376014|36860700013|82310400026;
+	BCL:0;ARA:13230040|1800799024|36860700013|376014|82310400026;
 X-Microsoft-Antispam-Message-Info:
-	=?us-ascii?Q?tc/3NNSBA4nXR8bxpZCQs1IxrQH91sOmw0dBbsf982FY8tZBBqFBtP9xjFfF?=
- =?us-ascii?Q?mIE1T20Fj8WAwJmKnQZygcDYMLwaskdiYCQT2cpJfM9OreMgFtO+8AWkt9oJ?=
- =?us-ascii?Q?y6eAUOjLK25M04MXazXfWTZJgPnPlSVZNOu4tEt9tMFBLhIC3e8i6F0K+NPX?=
- =?us-ascii?Q?eHIlxcVYTVRcIGDMkaydyJv7BKzUziqHza9m8yN2NIgAn/OZm6rDycA93C4d?=
- =?us-ascii?Q?fGQxw088hkGhaoeBg42NxQgqVHHcitSTcyVKIN3wcD62aiDkpLfmn88ulzKk?=
- =?us-ascii?Q?XeX0FCHeYTNz1wwauBlvBKwmJQfAi6fWNep67OTU6YB+Dkhfz8mE7TNAXrpB?=
- =?us-ascii?Q?09C+BnGkNGpxgFXobmalS2VZoMd1Wegszqvs1oBc0pyfFqTKWiiG1RYim3Bf?=
- =?us-ascii?Q?lZZofEmKyKDY6gKUeVCgpHWN2db4ZGFKqla/BZLkuLGtFFJYM6qB/Jb9v9cP?=
- =?us-ascii?Q?h5RTAPyOCIxzm69AzsULZ3UIjvl24jwJszSjAzM3s/EhUdh0vZFzJ7Z9QJsP?=
- =?us-ascii?Q?bLbd5HEIN6Y7K/u3yhExQr0hXSfC5GBCB3z1V9KYmgwyc+X5E3m8pffUCYnU?=
- =?us-ascii?Q?tWv6tMCpCBgxEaFvowvB+2Tv7Ih25srWoQHml3tqHUZtRgmqvxyz/3Fx/Su6?=
- =?us-ascii?Q?8U+3BZcdT/oTkw4L4zbSV6Qh8zabPp+36fGz5XVNTwz1IjFTp8OIuE5cImve?=
- =?us-ascii?Q?kfdZjB+QyNFY/TXa9MFY+GA1Kx0fc2Dvquaun0JaeD1cXiP4HC0qIQV9aRrf?=
- =?us-ascii?Q?gZ5xPqe0WuDB4NOkbOyo8Sn9vQaxbTN1n7DqY5mVpWIo8H5jjo3acXr9I4zN?=
- =?us-ascii?Q?esfp9ab0pv9GC4AY2AhWH6+O0ljFXv/llzhmM12Hd+gUowmTnjB+739kRzBM?=
- =?us-ascii?Q?g+FfYi3Km2rI4xFgEATR91f2Zy14rv5mbHk5oejj6wQpYahSPDwdRkGsChhq?=
- =?us-ascii?Q?aoxuZJABTurnbcYOSiSwzNuVVW7X79aSQ0FMBrBSpwHsJrrJ9fXd8NVS4XdA?=
- =?us-ascii?Q?LFQw1eM1anDvGvGoCnwtwSjV7yRJMDI/1N3L2u6QymLVQmEt4fMhVgN9G/dA?=
- =?us-ascii?Q?oDv2Nf3kfM9FkLuashn3kHYAZ2IxLOzbBrZjS9RY5kK2dW1E8OsdihQ/Rspv?=
- =?us-ascii?Q?UPasxc5gdaaGGk6Dl7D/tBuAWNwvwcjMr0tFtX1qBBtPm9OyJH3m5ffuP2vu?=
- =?us-ascii?Q?3fjGdr/IkewxafqadJ9qjwNYz/DIutxGS06aMUkpUqjVQDaD7RG3Luk9KXtB?=
- =?us-ascii?Q?N95mCUj3aopg9m6yxLOeIj56JwcQAtUtxP5kbWCIwtI/aGKxRPbAncHB53QX?=
- =?us-ascii?Q?e1EfxDH12jEjRmhVs0iuQskW3mbr6BdoWSWXGzCj3s60TEDdGLSSQEXayrJL?=
- =?us-ascii?Q?/S9/AgXVzVwwIQR/0vk0crnCFsXSICTRTbWBHChe39DWu9w7Dc1g07ibVN+Y?=
- =?us-ascii?Q?LQabdqtQ1Ymjh0nxWF9yCqO5YMCh0Oiyp8+HOKXiTp0vZww5eXlYdxmoSF9c?=
- =?us-ascii?Q?l7a+HGcN+5I7U70=3D?=
+	=?us-ascii?Q?BBhbKIn1CU8tbS7UhRyRWtp7KMcFq6HipLgJ8oEgPe0WQqbgM15U22ex6sOv?=
+ =?us-ascii?Q?QXZHd0lV5hoX9rhCnmquYB8ikaaoN/BiUb8Q1ZuAg9eQkFmxiOMgR1lC93RZ?=
+ =?us-ascii?Q?ft+Y2arevsub5J+rQWMtCFuJAPv1QieNqejp3Y3QtyRjYlj7C5CFn1CZZ20K?=
+ =?us-ascii?Q?tS20c4lYcjVjcNBEbtbLz4jPnbeTeko3V8oJ3zDxvMGxzXkNWMopBtRWdSvP?=
+ =?us-ascii?Q?wnLBdmht6MEpbfkMUWEA2JCnze6NV58txjvoEE//uukLY8iOLb9gzL4gBkpb?=
+ =?us-ascii?Q?kFnuVFtHf0NkzogYawzNxbhNIxOdxHeE6l3d/zEcm50pF/BmSByuiNBO443Q?=
+ =?us-ascii?Q?o2Ez7+4o0ay0IvQa7IHFrBKvMkMgx112QtYYZQyet+aC1lMZoJJuySt0gEkJ?=
+ =?us-ascii?Q?vk0Tz6lYXzK0fqp4gKZ0MVbVpa1tVkfxBFZ8uiBNc/ETnx37dIMaN2wqoTCQ?=
+ =?us-ascii?Q?icS+mnXRlfTujubLW4lU9w7VkZVMhQ8CzoKel/y/S2SBP8vCYkI22odpWrGW?=
+ =?us-ascii?Q?B8D6jXlE8lSdYyB1+M/coM9ts8yeN4tHMVEmO4nAGEX4Yb/5XRVXiz5hafWM?=
+ =?us-ascii?Q?4/feTMzWOehCKjWxfa7BLxKJrGKDweAdRgHLiipF7WX0+iEcw3nrD4qA/5HT?=
+ =?us-ascii?Q?KoANKsO7CQKFI5JZl+Akb6m7UdtioCjmejkj1OrEE+4mAr1XmFqS4OU8VeJv?=
+ =?us-ascii?Q?Ks0JVzIMY7OLcgxyGJE61Ps1PcC9BAqtgihz+vvs3D4Afzriwnhh/kTFgRE7?=
+ =?us-ascii?Q?2+G5tDa1WFvHNIpeaT18Rl5hvdh2QdILRMExEgOyyfzpHnHLqHBA0Prx+63L?=
+ =?us-ascii?Q?g3Afy59XI3EVn2HAqEyuIX434gb0vGtOgvLrY/pEeNHvMDx1sfIlwMtZdTqS?=
+ =?us-ascii?Q?ntBSOLWDk53z1GxApb5ujF99zk7frvsem2vlx+HUSRsnpfSALsvhvcoilQan?=
+ =?us-ascii?Q?CyaHD8ncnMjUX/t5zObS7g1vTNsaaEIt/hx/drknfi3afIkk6thrRKYLcvNn?=
+ =?us-ascii?Q?3r6eogBR1bLLYt572w3sNpe3mqTsRIHduwSXuCPAZAEUtT8d6RQGdXL7xgGc?=
+ =?us-ascii?Q?/3h78b/jMvnheyJhRS7SIpIC6jmrE60NoSQLwtUAsYL8ZjCkAsQfFF3NwS0W?=
+ =?us-ascii?Q?w7H6+sFph+Tfs2P64wmcYgerkGLv/GwlkMrb2WPATqxxF/KNx6CKk9D/pPup?=
+ =?us-ascii?Q?6nsNhFPV4ywQ3uqkcINBzmbP6YgZxjoIb/oLktJW/hHveK7eMpJrSyGJnlPr?=
+ =?us-ascii?Q?YxKL8K0P6fpL9WPEs4NBiU7ErMOo0QWGkPDi5Ydi+6a4CmV3MdflRyP+JHmL?=
+ =?us-ascii?Q?mv49BiX153ITV/MiVdOnIJOb7g06skVsDtuA9kGtG1XMGr/k0OSsZeOKnj1G?=
+ =?us-ascii?Q?ivAN5vYW+S2hKZ2rz1zMjwBeSxp8vkjDmTFbVvi38O8AyTAxdH82Zxl81cMC?=
+ =?us-ascii?Q?8N2XY5lHTlD3d6HqoSFkp//MGwl99rlofvocgqOfB1hsTyJQJb98tfs4Kow/?=
+ =?us-ascii?Q?2mROyXhKlIubilM=3D?=
 X-Forefront-Antispam-Report:
-	CIP:216.228.117.160;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:dc6edge1.nvidia.com;CAT:NONE;SFS:(13230040)(1800799024)(376014)(36860700013)(82310400026);DIR:OUT;SFP:1101;
+	CIP:216.228.117.161;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:dc6edge2.nvidia.com;CAT:NONE;SFS:(13230040)(1800799024)(36860700013)(376014)(82310400026);DIR:OUT;SFP:1101;
 X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 26 Jan 2025 11:57:23.8757
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 26 Jan 2025 11:57:23.0654
  (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: a4f6186b-44b7-4525-a833-08dd3e0098c0
+X-MS-Exchange-CrossTenant-Network-Message-Id: 3efd8949-826f-4383-04f4-08dd3e009845
 X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[216.228.117.160];Helo=[mail.nvidia.com]
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[216.228.117.161];Helo=[mail.nvidia.com]
 X-MS-Exchange-CrossTenant-AuthSource:
-	CY4PEPF0000E9D1.namprd03.prod.outlook.com
+	CY4PEPF0000EE3D.namprd03.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Anonymous
 X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: CYYPR12MB8750
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SA1PR12MB7173
 
-A sample output:
+Add JSON output handling for 'ethtool -m' / --module-info, following the
+guideline below:
 
-$ ethtool --json -m swp23
-[ {
-        "identifier": 24,
-        "identifier_description": "QSFP-DD Double Density 8X Pluggable
-Transceiver (INF-8628)",
-        "power_class": 5,
-        "max_power": 10.0000,
-        "max_power_units": "W",
-        "connector": 40,
-        "connector_description": "MPO 1x16",
-        "cable_assembly_length": 0.0000,
-        "cable_assembly_length_units": "m",
-        "tx_cdr_bypass_control": false,
-        "rx_cdr_bypass_control": false,
-        "tx_cdr": true,
-        "rx_cdr": true,
-        "transmitter_technology": 0,
-        "transmitter_technology_description": "850 nm VCSEL",
-        "laser_wavelength": 850.0000,
-        "laser_wavelength_units": "nm",
-        "laser_wavelength_tolerance": 94.8000,
-        "laser_wavelength_tolerance_units": "nm",
-        "length_(smf)": 0.0000,
-        "length_(smf)_units": "km",
-        "length_(om5)": 0,
-        "length_(om5)_units": "m",
-        "length_(om4)": 100,
-        "length_(om4)_units": "m",
-        "length_(om3_50/125um)": 70,
-        "length_(om3_50/125um)_units": "m",
-        "length_(om2_50/125um)": 0,
-        "length_(om2_50/125um)_units": "m",
-        "vendor_name": "FINISAR CORP.",
-        "vendor_oui": [ 0,144,101 ],
-        "vendor_pn": "FTCD8613E1PCM",
-        "vendor_rev": "A0",
-        "vendor_sn": "X6LBE6H",
-        "date_code": "211229__",
-        "revision_compliance": {
-            "major": 4,
-            "minor": 0
-        },
-        "rx_loss_of_signal": [
-"Yes","Yes","Yes","Yes","Yes","Yes","Yes","Yes" ],
-        "tx_loss_of_signal": "None",
-        "rx_loss_of_lock": "None",
-        "tx_loss_of_lock": "None",
-        "tx_fault": "None",
-        "module_state": 3,
-        "module_state_description": "ModuleReady",
-        "low_pwr_allow_request_hw": false,
-        "low_pwr_request_sw": false,
-        "module_temperature": 36.8203,
-        "module_temperature_units": "degrees C",
-        "module_voltage": 3.3385,
-        "module_voltage_units": "V",
-        "laser_tx_bias_current": [
-0.0000,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000 ],
-        "laser_tx_bias_current_units": "mA",
-        "transmit_avg_optical_power": [
-0.0001,0.0001,0.0001,0.0001,0.0001,0.0001,0.0001,0.0001 ],
-        "transmit_avg_optical_power_units": "mW",
-        "rcvr_signal_avg_optical_power": [
-0.0001,0.0001,0.0001,0.0001,0.0001,0.0001,0.0001,0.0001 ],
-        "rcvr_signal_avg_optical_power_units": "mW",
-        "module_temperature_high_alarm": false,
-        "module_temperature_low_alarm": false,
-        "module_temperature_high_warning": false,
-        "module_temperature_low_warning": false,
-        "module_voltage_high_alarm": false,
-        "module_voltage_low_alarm": false,
-        "module_voltage_high_warning": false,
-        "module_voltage_low_warning": false,
-        "laser_bias_current_high_alarm": [
-false,false,false,false,false,false,false,false ],
-        "laser_bias_current_low_alarm": [
-false,false,false,false,false,false,false,false ],
-        "laser_bias_current_high_warning": [
-false,false,false,false,false,false,false,false ],
-        "laser_bias_current_low_warning": [
-false,false,false,false,false,false,false,false ],
-        "laser_tx_power_high_alarm": [
-false,false,false,false,false,false,false,false ],
-        "laser_tx_power_low_alarm": [
-false,false,false,false,false,false,false,false ],
-        "laser_tx_power_high_warning": [
-false,false,false,false,false,false,false,false ],
-        "laser_tx_power_low_warning": [
-false,false,false,false,false,false,false,false ],
-        "laser_rx_power_high_alarm": [
-false,false,false,false,false,false,false,false ],
-        "laser_rx_power_low_alarm": [
-false,false,false,false,false,false,false,false ],
-        "laser_rx_power_high_warning": [
-false,false,false,false,false,false,false,false ],
-        "laser_rx_power_low_warning": [
-false,false,false,false,false,false,false,false ],
-        "laser_bias_current": {
-            "high_alarm_threshold": 13.0000,
-            "low_alarm_threshold": 3.0000,
-            "high_warning_threshold": 11.0000,
-            "low_warning_threshold": 5.0000,
-            "units": "mA"
-        },
-        "laser_output_power": {
-            "high_alarm_threshold": 3.1623,
-            "low_alarm_threshold": 0.1000,
-            "high_warning_threshold": 1.9953,
-            "low_warning_threshold": 0.1585,
-            "units": "mW"
-        },
-        "module_temperature": {
-            "high_alarm_threshold": 75.0000,
-            "low_alarm_threshold": -5.0000,
-            "high_warning_threshold": 70.0000,
-            "low_warning_threshold": 0.0000,
-            "units": "degrees C"
-        },
-        "module_voltage": {
-            "high_alarm_threshold": 3.4650,
-            "low_alarm_threshold": 3.1350,
-            "high_warning_threshold": 3.4500,
-            "low_warning_threshold": 3.1500,
-            "units": "V"
-        },
-        "laser_rx_power": {
-            "high_alarm_threshold": 3.1623,
-            "low_alarm_threshold": 0.0398,
-            "high_warning_threshold": 2.5119,
-            "low_warning_threshold": 0.0794,
-            "units": "mW"
-        },
-        "active_firmware_version": {
-            "major": 2,
-            "minor": 7
-        },
-        "inactive_firmware_version": {
-            "major": 2,
-            "minor": 7
-        },
-        "cdb_instances": 1,
-        "cdb_background_mode": "Supported",
-        "cdb_epl_pages": 0,
-        "cdb_maximum_epl_rw_length": 128,
-        "cdb_maximum_lpl_rw_length": 128,
-        "cdb_trigger_method": "Single write"
-    } ]
+1. Fields with description, will have a separate description field.
+2. Fields with units, will have a separate unit field.
+3. ASCII fields will be presented as strings.
+4. On/Off is rendered as true/false.
+5. Yes/no is rendered as true/false.
+6. Per-channel fields will be presented as array, when each element
+   represents a channel.
+7. Fields that hold version, will be split to major and minor sub fields.
 
 Signed-off-by: Danielle Ratson <danieller@nvidia.com>
-Reviewed-by: Amit Cohen <amcohen@nvidia.com>
 ---
- cmis.c    | 6 ++++++
- ethtool.c | 1 +
- 2 files changed, 7 insertions(+)
+ cmis.h |   3 +
+ qsfp.c | 538 +++++++++++++++++++++++++++++++++++----------------------
+ 2 files changed, 337 insertions(+), 204 deletions(-)
 
-diff --git a/cmis.c b/cmis.c
-index 4901f57..f12548e 100644
---- a/cmis.c
-+++ b/cmis.c
-@@ -1129,10 +1129,16 @@ int cmis_show_all_nl(struct cmd_context *ctx)
- 	struct cmis_memory_map map = {};
- 	int ret;
+diff --git a/cmis.h b/cmis.h
+index 007632a..d2b3d24 100644
+--- a/cmis.h
++++ b/cmis.h
+@@ -199,6 +199,9 @@
+ #define CMIS_RX_PWR_HWARN_OFFSET		0xC4
+ #define CMIS_RX_PWR_LWARN_OFFSET		0xC6
  
-+	new_json_obj(ctx->json);
-+	open_json_object(NULL);
++#define YESNO(x) (((x) != 0) ? "Yes" : "No")
++#define ONOFF(x) (((x) != 0) ? "On" : "Off")
 +
- 	ret = cmis_memory_map_init_pages(ctx, &map);
- 	if (ret < 0)
- 		return ret;
- 	cmis_show_all_common(&map);
+ void cmis_show_all_ioctl(const __u8 *id);
  
+ int cmis_show_all_nl(struct cmd_context *ctx);
+diff --git a/qsfp.c b/qsfp.c
+index 13d8fb7..d835067 100644
+--- a/qsfp.c
++++ b/qsfp.c
+@@ -82,64 +82,92 @@ static void sff8636_show_identifier(const struct sff8636_memory_map *map)
+ 
+ static void sff8636_show_ext_identifier(const struct sff8636_memory_map *map)
+ {
+-	printf("\t%-41s : 0x%02x\n", "Extended identifier",
+-	       map->page_00h[SFF8636_EXT_ID_OFFSET]);
+-
+ 	static const char *pfx =
+ 		"\tExtended identifier description           :";
++	char description[64];
++
++	if (is_json_context()) {
++		open_json_object("extended_identifier");
++		print_int(PRINT_JSON, "value", "0x%02x",
++			  map->page_00h[SFF8636_EXT_ID_OFFSET]);
++	} else {
++		printf("\t%-41s : 0x%02x\n", "Extended identifier",
++		       map->page_00h[SFF8636_EXT_ID_OFFSET]);
++	}
+ 
+ 	switch (map->page_00h[SFF8636_EXT_ID_OFFSET] &
+ 		SFF8636_EXT_ID_PWR_CLASS_MASK) {
+ 	case SFF8636_EXT_ID_PWR_CLASS_1:
+-		printf("%s 1.5W max. Power consumption\n", pfx);
++		strncpy(description, "1.5W max. Power consumption", 64);
+ 		break;
+ 	case SFF8636_EXT_ID_PWR_CLASS_2:
+-		printf("%s 2.0W max. Power consumption\n", pfx);
++		strncpy(description, "1.5W max. Power consumption", 64);
+ 		break;
+ 	case SFF8636_EXT_ID_PWR_CLASS_3:
+-		printf("%s 2.5W max. Power consumption\n", pfx);
++		strncpy(description, "2.5W max. Power consumption", 64);
+ 		break;
+ 	case SFF8636_EXT_ID_PWR_CLASS_4:
+-		printf("%s 3.5W max. Power consumption\n", pfx);
++		strncpy(description, "3.5W max. Power consumption", 64);
+ 		break;
+ 	}
+ 
++	if (is_json_context())
++		print_string(PRINT_JSON, "description", "%s", description);
++	else
++		printf("%s %s\n", pfx, description);
++
+ 	if (map->page_00h[SFF8636_EXT_ID_OFFSET] & SFF8636_EXT_ID_CDR_TX_MASK)
+-		printf("%s CDR present in TX,", pfx);
++		strncpy(description, "CDR present in TX,", 64);
+ 	else
+-		printf("%s No CDR in TX,", pfx);
++		strncpy(description, "No CDR in TX,", 64);
+ 
+ 	if (map->page_00h[SFF8636_EXT_ID_OFFSET] & SFF8636_EXT_ID_CDR_RX_MASK)
+-		printf(" CDR present in RX\n");
++		strcat(description, " CDR present in RX");
++	else
++		strcat(description, " No CDR in RX");
++
++	if (is_json_context())
++		print_string(PRINT_JSON, "description", "%s", description);
+ 	else
+-		printf(" No CDR in RX\n");
++		printf("%s %s\n", pfx, description);
+ 
+ 	switch (map->page_00h[SFF8636_EXT_ID_OFFSET] &
+ 		SFF8636_EXT_ID_EPWR_CLASS_MASK) {
+ 	case SFF8636_EXT_ID_PWR_CLASS_LEGACY:
+-		printf("%s", pfx);
++		strncpy(description, "", 64);
+ 		break;
+ 	case SFF8636_EXT_ID_PWR_CLASS_5:
+-		printf("%s 4.0W max. Power consumption,", pfx);
++		strncpy(description, "4.0W max. Power consumption,", 64);
+ 		break;
+ 	case SFF8636_EXT_ID_PWR_CLASS_6:
+-		printf("%s 4.5W max. Power consumption, ", pfx);
++		strncpy(description, "4.5W max. Power consumption,", 64);
+ 		break;
+ 	case SFF8636_EXT_ID_PWR_CLASS_7:
+-		printf("%s 5.0W max. Power consumption, ", pfx);
++		strncpy(description, "5.0W max. Power consumption,", 64);
+ 		break;
+ 	}
++
+ 	if (map->lower_memory[SFF8636_PWR_MODE_OFFSET] &
+ 	    SFF8636_HIGH_PWR_ENABLE)
+-		printf(" High Power Class (> 3.5 W) enabled\n");
++		strcat(description, " High Power Class (> 3.5 W) enabled");
+ 	else
+-		printf(" High Power Class (> 3.5 W) not enabled\n");
+-	printf("\t%-41s : ", "Power set");
+-	printf("%s\n", ONOFF(map->lower_memory[SFF8636_PWR_MODE_OFFSET] &
+-			     SFF8636_LOW_PWR_SET));
+-	printf("\t%-41s : ", "Power override");
+-	printf("%s\n", ONOFF(map->lower_memory[SFF8636_PWR_MODE_OFFSET] &
+-			     SFF8636_PWR_OVERRIDE));
++		strcat(description,
++		       " High Power Class (> 3.5 W) not enabled");
++
++	if (is_json_context())
++		print_string(PRINT_JSON, "description", "%s", description);
++	else
++		printf("%s %s\n", pfx, description);
++
 +	close_json_object();
-+	delete_json_obj();
 +
- 	return 0;
++	bool value = map->lower_memory[SFF8636_PWR_MODE_OFFSET] &
++			SFF8636_LOW_PWR_SET;
++	module_print_any_bool("Power set", "power_set", value, ONOFF(value));
++	value = map->lower_memory[SFF8636_PWR_MODE_OFFSET] &
++			SFF8636_PWR_OVERRIDE;
++	module_print_any_bool("Power override", "power_override", value,
++			      ONOFF(value));
  }
-diff --git a/ethtool.c b/ethtool.c
-index 225f3aa..2818206 100644
---- a/ethtool.c
-+++ b/ethtool.c
-@@ -6044,6 +6044,7 @@ static const struct option args[] = {
- 	},
- 	{
- 		.opts	= "-m|--dump-module-eeprom|--module-info",
-+		.json	= true,
- 		.func	= do_getmodule,
- 		.nlfunc = nl_getmodule,
- 		.help	= "Query/Decode Module EEPROM information and optical diagnostics if available",
+ 
+ static void sff8636_show_connector(const struct sff8636_memory_map *map)
+@@ -149,232 +177,262 @@ static void sff8636_show_connector(const struct sff8636_memory_map *map)
+ 
+ static void sff8636_show_transceiver(const struct sff8636_memory_map *map)
+ {
+-	static const char *pfx =
+-		"\tTransceiver type                          :";
+-
+-	printf("\t%-41s : 0x%02x 0x%02x 0x%02x " \
+-			"0x%02x 0x%02x 0x%02x 0x%02x 0x%02x\n",
+-			"Transceiver codes",
+-			map->page_00h[SFF8636_ETHERNET_COMP_OFFSET],
+-			map->page_00h[SFF8636_SONET_COMP_OFFSET],
+-			map->page_00h[SFF8636_SAS_COMP_OFFSET],
+-			map->page_00h[SFF8636_GIGE_COMP_OFFSET],
+-			map->page_00h[SFF8636_FC_LEN_OFFSET],
+-			map->page_00h[SFF8636_FC_TECH_OFFSET],
+-			map->page_00h[SFF8636_FC_TRANS_MEDIA_OFFSET],
+-			map->page_00h[SFF8636_FC_SPEED_OFFSET]);
++	static const char *pfx = "Transceiver type";
++	char value[140] = "";
++
++	if (is_json_context()) {
++		open_json_array("transceiver_codes", "");
++		print_int(PRINT_JSON, NULL, "0x%02x",
++			  map->page_00h[SFF8636_ETHERNET_COMP_OFFSET]);
++		print_int(PRINT_JSON, NULL, "0x%02x",
++			  map->page_00h[SFF8636_SONET_COMP_OFFSET]);
++		print_int(PRINT_JSON, NULL, "0x%02x",
++			  map->page_00h[SFF8636_SAS_COMP_OFFSET]);
++		print_int(PRINT_JSON, NULL, "0x%02x",
++			  map->page_00h[SFF8636_GIGE_COMP_OFFSET]);
++		print_int(PRINT_JSON, NULL, "0x%02x",
++			  map->page_00h[SFF8636_FC_LEN_OFFSET]);
++		print_int(PRINT_JSON, NULL, "0x%02x",
++			  map->page_00h[SFF8636_FC_TECH_OFFSET]);
++		print_int(PRINT_JSON, NULL, "0x%02x",
++			  map->page_00h[SFF8636_FC_TRANS_MEDIA_OFFSET]);
++		print_int(PRINT_JSON, NULL, "0x%02x",
++			  map->page_00h[SFF8636_FC_SPEED_OFFSET]);
++		close_json_array("");
++	} else {
++		printf("\t%-41s : 0x%02x 0x%02x 0x%02x " \
++		       "0x%02x 0x%02x 0x%02x 0x%02x 0x%02x\n",
++		       "Transceiver codes",
++		       map->page_00h[SFF8636_ETHERNET_COMP_OFFSET],
++		       map->page_00h[SFF8636_SONET_COMP_OFFSET],
++		       map->page_00h[SFF8636_SAS_COMP_OFFSET],
++		       map->page_00h[SFF8636_GIGE_COMP_OFFSET],
++		       map->page_00h[SFF8636_FC_LEN_OFFSET],
++		       map->page_00h[SFF8636_FC_TECH_OFFSET],
++		       map->page_00h[SFF8636_FC_TRANS_MEDIA_OFFSET],
++		       map->page_00h[SFF8636_FC_SPEED_OFFSET]);
++	}
+ 
+ 	/* 10G/40G Ethernet Compliance Codes */
+ 	if (map->page_00h[SFF8636_ETHERNET_COMP_OFFSET] &
+ 	    SFF8636_ETHERNET_10G_LRM)
+-		printf("%s 10G Ethernet: 10G Base-LRM\n", pfx);
++		sprintf(value, "%s", "10G Ethernet: 10G Base-LRM");
+ 	if (map->page_00h[SFF8636_ETHERNET_COMP_OFFSET] &
+ 	    SFF8636_ETHERNET_10G_LR)
+-		printf("%s 10G Ethernet: 10G Base-LR\n", pfx);
++		sprintf(value, "%s", "10G Ethernet: 10G Base-LR");
+ 	if (map->page_00h[SFF8636_ETHERNET_COMP_OFFSET] &
+ 	    SFF8636_ETHERNET_10G_SR)
+-		printf("%s 10G Ethernet: 10G Base-SR\n", pfx);
++		sprintf(value, "%s", "10G Ethernet: 10G Base-SR");
+ 	if (map->page_00h[SFF8636_ETHERNET_COMP_OFFSET] &
+ 	    SFF8636_ETHERNET_40G_CR4)
+-		printf("%s 40G Ethernet: 40G Base-CR4\n", pfx);
++		sprintf(value, "%s", "40G Ethernet: 40G Base-CR4");
+ 	if (map->page_00h[SFF8636_ETHERNET_COMP_OFFSET] &
+ 	    SFF8636_ETHERNET_40G_SR4)
+-		printf("%s 40G Ethernet: 40G Base-SR4\n", pfx);
++		sprintf(value, "%s", "40G Ethernet: 40G Base-SR4");
+ 	if (map->page_00h[SFF8636_ETHERNET_COMP_OFFSET] &
+ 	    SFF8636_ETHERNET_40G_LR4)
+-		printf("%s 40G Ethernet: 40G Base-LR4\n", pfx);
++		sprintf(value, "%s", "40G Ethernet: 40G Base-LR4");
+ 	if (map->page_00h[SFF8636_ETHERNET_COMP_OFFSET] &
+ 	    SFF8636_ETHERNET_40G_ACTIVE)
+-		printf("%s 40G Ethernet: 40G Active Cable (XLPPI)\n", pfx);
++		sprintf(value, "%s", "40G Ethernet: 40G Active Cable (XLPPI)");
+ 	/* Extended Specification Compliance Codes from SFF-8024 */
+ 	if (map->page_00h[SFF8636_ETHERNET_COMP_OFFSET] &
+ 	    SFF8636_ETHERNET_RSRVD) {
+ 		switch (map->page_00h[SFF8636_OPTION_1_OFFSET]) {
+ 		case SFF8636_ETHERNET_UNSPECIFIED:
+-			printf("%s (reserved or unknown)\n", pfx);
++			sprintf(value, "%s", "(reserved or unknown)");
+ 			break;
+ 		case SFF8636_ETHERNET_100G_AOC:
+-			printf("%s 100G Ethernet: 100G AOC or 25GAUI C2M AOC with worst BER of 5x10^(-5)\n",
+-					pfx);
++			sprintf(value, "%s",
++				"100G Ethernet: 100G AOC or 25GAUI C2M AOC with worst BER of 5x10^(-5)");
+ 			break;
+ 		case SFF8636_ETHERNET_100G_SR4:
+-			printf("%s 100G Ethernet: 100G Base-SR4 or 25GBase-SR\n",
+-					pfx);
++			sprintf(value, "%s",
++				"100G Ethernet: 100G Base-SR4 or 25GBase-SR");
+ 			break;
+ 		case SFF8636_ETHERNET_100G_LR4:
+-			printf("%s 100G Ethernet: 100G Base-LR4\n", pfx);
++			sprintf(value, "%s", "100G Ethernet: 100G Base-LR4");
+ 			break;
+ 		case SFF8636_ETHERNET_100G_ER4:
+-			printf("%s 100G Ethernet: 100G Base-ER4\n", pfx);
++			sprintf(value, "%s", "100G Ethernet: 100G Base-ER4");
+ 			break;
+ 		case SFF8636_ETHERNET_100G_SR10:
+-			printf("%s 100G Ethernet: 100G Base-SR10\n", pfx);
++			sprintf(value, "%s", "100G Ethernet: 100G Base-SR10");
+ 			break;
+ 		case SFF8636_ETHERNET_100G_CWDM4_FEC:
+-			printf("%s 100G Ethernet: 100G CWDM4 MSA with FEC\n", pfx);
++			sprintf(value, "%s",
++				"100G Ethernet: 100G CWDM4 MSA with FEC");
+ 			break;
+ 		case SFF8636_ETHERNET_100G_PSM4:
+-			printf("%s 100G Ethernet: 100G PSM4 Parallel SMF\n", pfx);
++			sprintf(value, "%s",
++				"100G Ethernet: 100G PSM4 Parallel SMF");
+ 			break;
+ 		case SFF8636_ETHERNET_100G_ACC:
+-			printf("%s 100G Ethernet: 100G ACC or 25GAUI C2M ACC with worst BER of 5x10^(-5)\n",
+-				pfx);
++			sprintf(value, "%s",
++				"100G Ethernet: 100G ACC or 25GAUI C2M ACC with worst BER of 5x10^(-5)");
+ 			break;
+ 		case SFF8636_ETHERNET_100G_CWDM4_NO_FEC:
+-			printf("%s 100G Ethernet: 100G CWDM4 MSA without FEC\n", pfx);
++			sprintf(value, "%s",
++				"100G Ethernet: 100G CWDM4 MSA without FEC");
+ 			break;
+ 		case SFF8636_ETHERNET_100G_RSVD1:
+-			printf("%s (reserved or unknown)\n", pfx);
++			sprintf(value, "%s", "(reserved or unknown)");
+ 			break;
+ 		case SFF8636_ETHERNET_100G_CR4:
+-			printf("%s 100G Ethernet: 100G Base-CR4 or 25G Base-CR CA-L\n",
+-				pfx);
++			sprintf(value, "%s",
++				"100G Ethernet: 100G Base-CR4 or 25G Base-CR CA-L");
+ 			break;
+ 		case SFF8636_ETHERNET_25G_CR_CA_S:
+-			printf("%s 25G Ethernet: 25G Base-CR CA-S\n", pfx);
++			sprintf(value, "%s", "25G Ethernet: 25G Base-CR CA-S");
+ 			break;
+ 		case SFF8636_ETHERNET_25G_CR_CA_N:
+-			printf("%s 25G Ethernet: 25G Base-CR CA-N\n", pfx);
++			sprintf(value, "%s", "25G Ethernet: 25G Base-CR CA-N");
+ 			break;
+ 		case SFF8636_ETHERNET_40G_ER4:
+-			printf("%s 40G Ethernet: 40G Base-ER4\n", pfx);
++			sprintf(value, "%s", "40G Ethernet: 40G Base-ER4");
+ 			break;
+ 		case SFF8636_ETHERNET_4X10_SR:
+-			printf("%s 4x10G Ethernet: 10G Base-SR\n", pfx);
++			sprintf(value, "%s", "4x10G Ethernet: 10G Base-SR");
+ 			break;
+ 		case SFF8636_ETHERNET_40G_PSM4:
+-			printf("%s 40G Ethernet: 40G PSM4 Parallel SMF\n", pfx);
++			sprintf(value, "%s",
++				"40G Ethernet: 40G PSM4 Parallel SMF");
+ 			break;
+ 		case SFF8636_ETHERNET_G959_P1I1_2D1:
+-			printf("%s Ethernet: G959.1 profile P1I1-2D1 (10709 MBd, 2km, 1310nm SM)\n",
+-					pfx);
++			sprintf(value, "%s",
++				"Ethernet: G959.1 profile P1I1-2D1 (10709 MBd, 2km, 1310nm SM)");
+ 			break;
+ 		case SFF8636_ETHERNET_G959_P1S1_2D2:
+-			printf("%s Ethernet: G959.1 profile P1S1-2D2 (10709 MBd, 40km, 1550nm SM)\n",
+-					pfx);
++			sprintf(value, "%s",
++				"Ethernet: G959.1 profile P1S1-2D2 (10709 MBd, 40km, 1550nm SM)");
+ 			break;
+ 		case SFF8636_ETHERNET_G959_P1L1_2D2:
+-			printf("%s Ethernet: G959.1 profile P1L1-2D2 (10709 MBd, 80km, 1550nm SM)\n",
+-					pfx);
++			sprintf(value, "%s",
++				"Ethernet: G959.1 profile P1L1-2D2 (10709 MBd, 80km, 1550nm SM)");
+ 			break;
+ 		case SFF8636_ETHERNET_10GT_SFI:
+-			printf("%s 10G Ethernet: 10G Base-T with SFI electrical interface\n",
+-					pfx);
++			sprintf(value, "%s",
++				"10G Ethernet: 10G Base-T with SFI electrical interface");
+ 			break;
+ 		case SFF8636_ETHERNET_100G_CLR4:
+-			printf("%s 100G Ethernet: 100G CLR4\n", pfx);
++			sprintf(value, "%s", "100G Ethernet: 100G CLR4");
+ 			break;
+ 		case SFF8636_ETHERNET_100G_AOC2:
+-			printf("%s 100G Ethernet: 100G AOC or 25GAUI C2M AOC with worst BER of 10^(-12)\n",
+-					pfx);
++			sprintf(value, "%s",
++				"100G Ethernet: 100G AOC or 25GAUI C2M AOC with worst BER of 10^(-12)");
+ 			break;
+ 		case SFF8636_ETHERNET_100G_ACC2:
+-			printf("%s 100G Ethernet: 100G ACC or 25GAUI C2M ACC with worst BER of 10^(-12)\n",
+-					pfx);
++			sprintf(value, "%s",
++				"100G Ethernet: 100G ACC or 25GAUI C2M ACC with worst BER of 10^(-12)");
+ 			break;
+ 		case SFF8636_ETHERNET_100GE_DWDM2:
+-			printf("%s 100GE-DWDM2 (DWDM transceiver using 2 wavelengths on a 1550 nm DWDM grid with a reach up to 80 km)\n",
+-					pfx);
++			sprintf(value, "%s",
++				"100GE-DWDM2 (DWDM transceiver using 2 wavelengths on a 1550 nm DWDM grid with a reach up to 80 km)");
+ 			break;
+ 		case SFF8636_ETHERNET_100G_1550NM_WDM:
+-			printf("%s 100G 1550nm WDM (4 wavelengths)\n", pfx);
++			sprintf(value, "%s", "100G 1550nm WDM (4 wavelengths)");
+ 			break;
+ 		case SFF8636_ETHERNET_10G_BASET_SR:
+-			printf("%s 10GBASE-T Short Reach (30 meters)\n", pfx);
++			sprintf(value, "%s",
++				"10GBASE-T Short Reach (30 meters)");
+ 			break;
+ 		case SFF8636_ETHERNET_5G_BASET:
+-			printf("%s 5GBASE-T\n", pfx);
++			sprintf(value, "%s", "5GBASE-T");
+ 			break;
+ 		case SFF8636_ETHERNET_2HALFG_BASET:
+-			printf("%s 2.5GBASE-T\n", pfx);
++			sprintf(value, "%s", "2.5GBASE-T");
+ 			break;
+ 		case SFF8636_ETHERNET_40G_SWDM4:
+-			printf("%s 40G SWDM4\n", pfx);
++			sprintf(value, "%s", "40G SWDM4");
+ 			break;
+ 		case SFF8636_ETHERNET_100G_SWDM4:
+-			printf("%s 100G SWDM4\n", pfx);
++			sprintf(value, "%s", "100G SWDM4");
+ 			break;
+ 		case SFF8636_ETHERNET_100G_PAM4_BIDI:
+-			printf("%s 100G PAM4 BiDi\n", pfx);
++			sprintf(value, "%s", "100G PAM4 BiDi");
+ 			break;
+ 		case SFF8636_ETHERNET_4WDM10_MSA:
+-			printf("%s 4WDM-10 MSA (10km version of 100G CWDM4 with same RS(528,514) FEC in host system)\n",
+-					pfx);
++			sprintf(value, "%s",
++				"4WDM-10 MSA (10km version of 100G CWDM4 with same RS(528,514) FEC in host system)");
+ 			break;
+ 		case SFF8636_ETHERNET_4WDM20_MSA:
+-			printf("%s 4WDM-20 MSA (20km version of 100GBASE-LR4 with RS(528,514) FEC in host system)\n",
+-					pfx);
++			sprintf(value, "%s", "4WDM-20 MSA (20km version of 100GBASE-LR4 with RS(528,514) FEC in host system)");
+ 			break;
+ 		case SFF8636_ETHERNET_4WDM40_MSA:
+-			printf("%s 4WDM-40 MSA (40km reach with APD receiver and RS(528,514) FEC in host system)\n",
+-					pfx);
++			sprintf(value, "%s",
++				"4WDM-40 MSA (40km reach with APD receiver and RS(528,514) FEC in host system)");
+ 			break;
+ 		case SFF8636_ETHERNET_100G_DR:
+-			printf("%s 100GBASE-DR (clause 140), CAUI-4 (no FEC)\n", pfx);
++			sprintf(value, "%s",
++				"100GBASE-DR (clause 140), CAUI-4 (no FEC)");
+ 			break;
+ 		case SFF8636_ETHERNET_100G_FR_NOFEC:
+-			 printf("%s 100G-FR or 100GBASE-FR1 (clause 140), CAUI-4 (no FEC)\n", pfx);
++			sprintf(value, "%s",
++				"100G-FR or 100GBASE-FR1 (clause 140), CAUI-4 (no FEC)");
+ 			break;
+ 		case SFF8636_ETHERNET_100G_LR_NOFEC:
+-			printf("%s 100G-LR or 100GBASE-LR1 (clause 140), CAUI-4 (no FEC)\n", pfx);
++			sprintf(value, "%s",
++				"100G-LR or 100GBASE-LR1 (clause 140), CAUI-4 (no FEC)");
+ 			break;
+ 		case SFF8636_ETHERNET_200G_ACC1:
+-			printf("%s Active Copper Cable with 50GAUI, 100GAUI-2 or 200GAUI-4 C2M. Providing a worst BER of 10-6 or below\n",
+-					pfx);
++			sprintf(value, "%s",
++				"Active Copper Cable with 50GAUI, 100GAUI-2 or 200GAUI-4 C2M. Providing a worst BER of 10-6 or below");
+ 			break;
+ 		case SFF8636_ETHERNET_200G_AOC1:
+-			printf("%s Active Optical Cable with 50GAUI, 100GAUI-2 or 200GAUI-4 C2M. Providing a worst BER of 10-6 or below\n",
+-					pfx);
++			sprintf(value, "%s",
++				"Active Optical Cable with 50GAUI, 100GAUI-2 or 200GAUI-4 C2M. Providing a worst BER of 10-6 or below");
+ 			break;
+ 		case SFF8636_ETHERNET_200G_ACC2:
+-			printf("%s Active Copper Cable with 50GAUI, 100GAUI-2 or 200GAUI-4 C2M. Providing a worst BER of 2.6x10-4 for ACC, 10-5 for AUI, or below\n",
+-					pfx);
++			sprintf(value, "%s",
++				"Active Copper Cable with 50GAUI, 100GAUI-2 or 200GAUI-4 C2M. Providing a worst BER of 2.6x10-4 for ACC, 10-5 for AUI, or below");
+ 			break;
+ 		case SFF8636_ETHERNET_200G_A0C2:
+-			printf("%s Active Optical Cable with 50GAUI, 100GAUI-2 or 200GAUI-4 C2M. Providing a worst BER of 2.6x10-4 for ACC, 10-5 for AUI, or below\n",
+-					pfx);
++			sprintf(value, "%s",
++				"Active Optical Cable with 50GAUI, 100GAUI-2 or 200GAUI-4 C2M. Providing a worst BER of 2.6x10-4 for ACC, 10-5 for AUI, or below");
+ 			break;
+ 		case SFF8636_ETHERNET_200G_CR4:
+-			printf("%s 50GBASE-CR, 100GBASE-CR2, or 200GBASE-CR4\n", pfx);
++			sprintf(value, "%s",
++				"50GBASE-CR, 100GBASE-CR2, or 200GBASE-CR4");
+ 			break;
+ 		case SFF8636_ETHERNET_200G_SR4:
+-			printf("%s 50GBASE-SR, 100GBASE-SR2, or 200GBASE-SR4\n", pfx);
++			sprintf(value, "%s",
++				"50GBASE-SR, 100GBASE-SR2, or 200GBASE-SR4");
+ 			break;
+ 		case SFF8636_ETHERNET_200G_DR4:
+-			printf("%s 50GBASE-FR or 200GBASE-DR4\n", pfx);
++			sprintf(value, "%s", "50GBASE-FR or 200GBASE-DR4");
+ 			break;
+ 		case SFF8636_ETHERNET_200G_FR4:
+-			printf("%s 200GBASE-FR4\n", pfx);
++			sprintf(value, "%s", "200GBASE-FR4");
+ 			break;
+ 		case SFF8636_ETHERNET_200G_PSM4:
+-			 printf("%s 200G 1550 nm PSM4\n", pfx);
++			sprintf(value, "%s", "200G 1550 nm PSM4");
+ 			break;
+ 		case SFF8636_ETHERNET_50G_LR:
+-			printf("%s 50GBASE-LR\n", pfx);
++			sprintf(value, "%s", "50GBASE-LR");
+ 			break;
+ 		case SFF8636_ETHERNET_200G_LR4:
+-			printf("%s 200GBASE-LR4\n", pfx);
++			sprintf(value, "%s", "200GBASE-LR4");
+ 			break;
+ 		case SFF8636_ETHERNET_64G_EA:
+-			printf("%s 64GFC EA\n", pfx);
++			sprintf(value, "%s", "64GFC EA");
+ 			break;
+ 		case SFF8636_ETHERNET_64G_SW:
+-			printf("%s 64GFC SW\n", pfx);
++			sprintf(value, "%s", "64GFC SW");
+ 			break;
+ 		case SFF8636_ETHERNET_64G_LW:
+-			printf("%s 64GFC LW\n", pfx);
++			sprintf(value, "%s", "64GFC LW");
+ 			break;
+ 		case SFF8636_ETHERNET_128FC_EA:
+-			printf("%s 128GFC EA\n", pfx);
++			sprintf(value, "%s", "128GFC EA");
+ 			break;
+ 		case SFF8636_ETHERNET_128FC_SW:
+-			printf("%s 128GFC SW\n", pfx);
++			sprintf(value, "%s", "128GFC SW");
+ 			break;
+ 		case SFF8636_ETHERNET_128FC_LW:
+-			printf("%s 128GFC LW\n", pfx);
++			sprintf(value, "%s", "128GFC LW");
+ 			break;
+ 		default:
+-			printf("%s (reserved or unknown)\n", pfx);
++			sprintf(value, "%s", "(reserved or unknown)");
+ 			break;
+ 		}
+ 	}
+@@ -382,96 +440,98 @@ static void sff8636_show_transceiver(const struct sff8636_memory_map *map)
+ 	/* SONET Compliance Codes */
+ 	if (map->page_00h[SFF8636_SONET_COMP_OFFSET] &
+ 	    (SFF8636_SONET_40G_OTN))
+-		printf("%s 40G OTN (OTU3B/OTU3C)\n", pfx);
++		sprintf(value, "%s", "40G OTN (OTU3B/OTU3C)");
+ 	if (map->page_00h[SFF8636_SONET_COMP_OFFSET] & (SFF8636_SONET_OC48_LR))
+-		printf("%s SONET: OC-48, long reach\n", pfx);
++		sprintf(value, "%s", "SONET: OC-48, long reach");
+ 	if (map->page_00h[SFF8636_SONET_COMP_OFFSET] & (SFF8636_SONET_OC48_IR))
+-		printf("%s SONET: OC-48, intermediate reach\n", pfx);
++		sprintf(value, "%s", "SONET: OC-48, intermediate reach");
+ 	if (map->page_00h[SFF8636_SONET_COMP_OFFSET] & (SFF8636_SONET_OC48_SR))
+-		printf("%s SONET: OC-48, short reach\n", pfx);
++		sprintf(value, "%s", "SONET: OC-48, short reach");
+ 
+ 	/* SAS/SATA Compliance Codes */
+ 	if (map->page_00h[SFF8636_SAS_COMP_OFFSET] & (SFF8636_SAS_6G))
+-		printf("%s SAS 6.0G\n", pfx);
++		sprintf(value, "%s", "SAS 6.0G");
+ 	if (map->page_00h[SFF8636_SAS_COMP_OFFSET] & (SFF8636_SAS_3G))
+-		printf("%s SAS 3.0G\n", pfx);
++		sprintf(value, "%s", "SAS 3.0G");
+ 
+ 	/* Ethernet Compliance Codes */
+ 	if (map->page_00h[SFF8636_GIGE_COMP_OFFSET] & SFF8636_GIGE_1000_BASE_T)
+-		printf("%s Ethernet: 1000BASE-T\n", pfx);
++		sprintf(value, "%s", "Ethernet: 1000BASE-T");
+ 	if (map->page_00h[SFF8636_GIGE_COMP_OFFSET] & SFF8636_GIGE_1000_BASE_CX)
+-		printf("%s Ethernet: 1000BASE-CX\n", pfx);
++		sprintf(value, "%s", "Ethernet: 1000BASE-CX");
+ 	if (map->page_00h[SFF8636_GIGE_COMP_OFFSET] & SFF8636_GIGE_1000_BASE_LX)
+-		printf("%s Ethernet: 1000BASE-LX\n", pfx);
++		sprintf(value, "%s", "Ethernet: 1000BASE-LX");
+ 	if (map->page_00h[SFF8636_GIGE_COMP_OFFSET] & SFF8636_GIGE_1000_BASE_SX)
+-		printf("%s Ethernet: 1000BASE-SX\n", pfx);
++		sprintf(value, "%s", "Ethernet: 1000BASE-SX");
+ 
+ 	/* Fibre Channel link length */
+ 	if (map->page_00h[SFF8636_FC_LEN_OFFSET] & SFF8636_FC_LEN_VERY_LONG)
+-		printf("%s FC: very long distance (V)\n", pfx);
++		sprintf(value, "%s", "FC: very long distance (V)");
+ 	if (map->page_00h[SFF8636_FC_LEN_OFFSET] & SFF8636_FC_LEN_SHORT)
+-		printf("%s FC: short distance (S)\n", pfx);
++		sprintf(value, "%s", "FC: short distance (S)");
+ 	if (map->page_00h[SFF8636_FC_LEN_OFFSET] & SFF8636_FC_LEN_INT)
+-		printf("%s FC: intermediate distance (I)\n", pfx);
++		sprintf(value, "%s", "FC: intermediate distance (I)");
+ 	if (map->page_00h[SFF8636_FC_LEN_OFFSET] & SFF8636_FC_LEN_LONG)
+-		printf("%s FC: long distance (L)\n", pfx);
++		sprintf(value, "%s", "FC: long distance (L)");
+ 	if (map->page_00h[SFF8636_FC_LEN_OFFSET] & SFF8636_FC_LEN_MED)
+-		printf("%s FC: medium distance (M)\n", pfx);
++		sprintf(value, "%s", "FC: medium distance (M)");
+ 
+ 	/* Fibre Channel transmitter technology */
+ 	if (map->page_00h[SFF8636_FC_LEN_OFFSET] & SFF8636_FC_TECH_LONG_LC)
+-		printf("%s FC: Longwave laser (LC)\n", pfx);
++		sprintf(value, "%s", "FC: Longwave laser (LC)");
+ 	if (map->page_00h[SFF8636_FC_LEN_OFFSET] & SFF8636_FC_TECH_ELEC_INTER)
+-		printf("%s FC: Electrical inter-enclosure (EL)\n", pfx);
++		sprintf(value, "%s", "FC: Electrical inter-enclosure (EL)");
+ 	if (map->page_00h[SFF8636_FC_TECH_OFFSET] & SFF8636_FC_TECH_ELEC_INTRA)
+-		printf("%s FC: Electrical intra-enclosure (EL)\n", pfx);
++		sprintf(value, "%s", "FC: Electrical intra-enclosure (EL)");
+ 	if (map->page_00h[SFF8636_FC_TECH_OFFSET] &
+ 	    SFF8636_FC_TECH_SHORT_WO_OFC)
+-		printf("%s FC: Shortwave laser w/o OFC (SN)\n", pfx);
++		sprintf(value, "%s", "FC: Shortwave laser w/o OFC (SN)");
+ 	if (map->page_00h[SFF8636_FC_TECH_OFFSET] & SFF8636_FC_TECH_SHORT_W_OFC)
+-		printf("%s FC: Shortwave laser with OFC (SL)\n", pfx);
++		sprintf(value, "%s", "FC: Shortwave laser with OFC (SL)");
+ 	if (map->page_00h[SFF8636_FC_TECH_OFFSET] & SFF8636_FC_TECH_LONG_LL)
+-		printf("%s FC: Longwave laser (LL)\n", pfx);
++		sprintf(value, "%s", "FC: Longwave laser (LL)");
+ 
+ 	/* Fibre Channel transmission media */
+ 	if (map->page_00h[SFF8636_FC_TRANS_MEDIA_OFFSET] &
+ 	    SFF8636_FC_TRANS_MEDIA_TW)
+-		printf("%s FC: Twin Axial Pair (TW)\n", pfx);
++		sprintf(value, "%s", "FC: Twin Axial Pair (TW)");
+ 	if (map->page_00h[SFF8636_FC_TRANS_MEDIA_OFFSET] &
+ 	    SFF8636_FC_TRANS_MEDIA_TP)
+-		printf("%s FC: Twisted Pair (TP)\n", pfx);
++		sprintf(value, "%s", "FC: Twisted Pair (TP)");
+ 	if (map->page_00h[SFF8636_FC_TRANS_MEDIA_OFFSET] &
+ 	    SFF8636_FC_TRANS_MEDIA_MI)
+-		printf("%s FC: Miniature Coax (MI)\n", pfx);
++		sprintf(value, "%s", "FC: Miniature Coax (MI)");
+ 	if (map->page_00h[SFF8636_FC_TRANS_MEDIA_OFFSET] &
+ 	    SFF8636_FC_TRANS_MEDIA_TV)
+-		printf("%s FC: Video Coax (TV)\n", pfx);
++		sprintf(value, "%s", "FC: Video Coax (TV)");
+ 	if (map->page_00h[SFF8636_FC_TRANS_MEDIA_OFFSET] &
+ 	    SFF8636_FC_TRANS_MEDIA_M6)
+-		printf("%s FC: Multimode, 62.5m (M6)\n", pfx);
++		sprintf(value, "%s", "FC: Multimode, 62.5m (M6)");
+ 	if (map->page_00h[SFF8636_FC_TRANS_MEDIA_OFFSET] &
+ 	    SFF8636_FC_TRANS_MEDIA_M5)
+-		printf("%s FC: Multimode, 50m (M5)\n", pfx);
++		sprintf(value, "%s", "FC: Multimode, 50m (M5)");
+ 	if (map->page_00h[SFF8636_FC_TRANS_MEDIA_OFFSET] &
+ 	    SFF8636_FC_TRANS_MEDIA_OM3)
+-		printf("%s FC: Multimode, 50um (OM3)\n", pfx);
++		sprintf(value, "%s", "FC: Multimode, 50um (OM3)");
+ 	if (map->page_00h[SFF8636_FC_TRANS_MEDIA_OFFSET] &
+ 	    SFF8636_FC_TRANS_MEDIA_SM)
+-		printf("%s FC: Single Mode (SM)\n", pfx);
++		sprintf(value, "%s", "FC: Single Mode (SM)");
+ 
+ 	/* Fibre Channel speed */
+ 	if (map->page_00h[SFF8636_FC_SPEED_OFFSET] & SFF8636_FC_SPEED_1200_MBPS)
+-		printf("%s FC: 1200 MBytes/sec\n", pfx);
++		sprintf(value, "%s", "FC: 1200 MBytes/sec");
+ 	if (map->page_00h[SFF8636_FC_SPEED_OFFSET] & SFF8636_FC_SPEED_800_MBPS)
+-		printf("%s FC: 800 MBytes/sec\n", pfx);
++		sprintf(value, "%s", "FC: 800 MBytes/sec");
+ 	if (map->page_00h[SFF8636_FC_SPEED_OFFSET] & SFF8636_FC_SPEED_1600_MBPS)
+-		printf("%s FC: 1600 MBytes/sec\n", pfx);
++		sprintf(value, "%s", "FC: 1600 MBytes/sec");
+ 	if (map->page_00h[SFF8636_FC_SPEED_OFFSET] & SFF8636_FC_SPEED_400_MBPS)
+-		printf("%s FC: 400 MBytes/sec\n", pfx);
++		sprintf(value, "%s", "FC: 400 MBytes/sec");
+ 	if (map->page_00h[SFF8636_FC_SPEED_OFFSET] & SFF8636_FC_SPEED_200_MBPS)
+-		printf("%s FC: 200 MBytes/sec\n", pfx);
++		sprintf(value, "%s", "FC: 200 MBytes/sec");
+ 	if (map->page_00h[SFF8636_FC_SPEED_OFFSET] & SFF8636_FC_SPEED_100_MBPS)
+-		printf("%s FC: 100 MBytes/sec\n", pfx);
++		sprintf(value, "%s", "FC: 100 MBytes/sec");
++
++	module_print_any_string(pfx, value);
+ }
+ 
+ static void sff8636_show_encoding(const struct sff8636_memory_map *map)
+@@ -483,8 +543,10 @@ static void sff8636_show_encoding(const struct sff8636_memory_map *map)
+ static void sff8636_show_rate_identifier(const struct sff8636_memory_map *map)
+ {
+ 	/* TODO: Need to fix rate select logic */
+-	printf("\t%-41s : 0x%02x\n", "Rate identifier",
+-	       map->page_00h[SFF8636_EXT_RS_OFFSET]);
++	sff_print_any_hex_field("Rate identifier", "rate_identifier",
++				map->page_00h[SFF8636_EXT_RS_OFFSET], NULL);
++
++
+ }
+ 
+ static void
+@@ -496,58 +558,65 @@ sff8636_show_wavelength_or_copper_compliance(const struct sff8636_memory_map *ma
+ 	module_show_mit_compliance(value);
+ 
+ 	if (value >= SFF8636_TRANS_COPPER_PAS_UNEQUAL) {
+-		printf("\t%-41s : %udb\n", "Attenuation at 2.5GHz",
+-			map->page_00h[SFF8636_WAVELEN_HIGH_BYTE_OFFSET]);
+-		printf("\t%-41s : %udb\n", "Attenuation at 5.0GHz",
+-			map->page_00h[SFF8636_WAVELEN_LOW_BYTE_OFFSET]);
+-		printf("\t%-41s : %udb\n", "Attenuation at 7.0GHz",
+-			map->page_00h[SFF8636_WAVE_TOL_HIGH_BYTE_OFFSET]);
+-		printf("\t%-41s : %udb\n", "Attenuation at 12.9GHz",
+-		       map->page_00h[SFF8636_WAVE_TOL_LOW_BYTE_OFFSET]);
++		module_print_any_uint("Attenuation at 2.5GHz",
++				      map->page_00h[SFF8636_WAVELEN_HIGH_BYTE_OFFSET],
++				      "db");
++		module_print_any_uint("Attenuation at 5.0GHz",
++				      map->page_00h[SFF8636_WAVELEN_LOW_BYTE_OFFSET],
++				      "db");
++		module_print_any_uint("Attenuation at 7.0GHz",
++				      map->page_00h[SFF8636_WAVELEN_HIGH_BYTE_OFFSET],
++				      "db");
++		module_print_any_uint("Attenuation at 12.9GHz",
++				      map->page_00h[SFF8636_WAVELEN_LOW_BYTE_OFFSET],
++				      "db");
+ 	} else {
+-		printf("\t%-41s : %.3lfnm\n", "Laser wavelength",
+-		       (((map->page_00h[SFF8636_WAVELEN_HIGH_BYTE_OFFSET] << 8) |
+-			 map->page_00h[SFF8636_WAVELEN_LOW_BYTE_OFFSET]) * 0.05));
+-		printf("\t%-41s : %.3lfnm\n", "Laser wavelength tolerance",
+-		       (((map->page_00h[SFF8636_WAVE_TOL_HIGH_BYTE_OFFSET] << 8) |
+-			 map->page_00h[SFF8636_WAVE_TOL_LOW_BYTE_OFFSET]) * 0.005));
++		module_print_any_float("Laser wavelength",
++				       (((map->page_00h[SFF8636_WAVELEN_HIGH_BYTE_OFFSET] << 8) |
++					map->page_00h[SFF8636_WAVELEN_LOW_BYTE_OFFSET]) * 0.05),
++				       "nm");
++		module_print_any_float("Laser wavelength tolerance",
++				       (((map->page_00h[SFF8636_WAVE_TOL_HIGH_BYTE_OFFSET] << 8) |
++					map->page_00h[SFF8636_WAVE_TOL_LOW_BYTE_OFFSET]) * 0.05),
++				       "nm");
+ 	}
+ }
+ 
+ static void sff8636_show_revision_compliance(const __u8 *id, int rev_offset)
+ {
+-	static const char *pfx =
+-		"\tRevision Compliance                       :";
++	const char *pfx = "Revision Compliance";
++	char value[64] = "";
+ 
+ 	switch (id[rev_offset]) {
+ 	case SFF8636_REV_UNSPECIFIED:
+-		printf("%s Revision not specified\n", pfx);
++		sprintf(value, "%s", "Revision not specified");
+ 		break;
+ 	case SFF8636_REV_8436_48:
+-		printf("%s SFF-8436 Rev 4.8 or earlier\n", pfx);
++		sprintf(value, "%s", "SFF-8436 Rev 4.8 or earlier");
+ 		break;
+ 	case SFF8636_REV_8436_8636:
+-		printf("%s SFF-8436 Rev 4.8 or earlier\n", pfx);
++		sprintf(value, "%s", "SFF-8436 Rev 4.8 or earlier");
+ 		break;
+ 	case SFF8636_REV_8636_13:
+-		printf("%s SFF-8636 Rev 1.3 or earlier\n", pfx);
++		sprintf(value, "%s", "SFF-8636 Rev 1.3 or earlier");
+ 		break;
+ 	case SFF8636_REV_8636_14:
+-		printf("%s SFF-8636 Rev 1.4\n", pfx);
++		sprintf(value, "%s", "SFF-8636 Rev 1.4");
+ 		break;
+ 	case SFF8636_REV_8636_15:
+-		printf("%s SFF-8636 Rev 1.5\n", pfx);
++		sprintf(value, "%s", "SFF-8636 Rev 1.5");
+ 		break;
+ 	case SFF8636_REV_8636_20:
+-		printf("%s SFF-8636 Rev 2.0\n", pfx);
++		sprintf(value, "%s", "SFF-8636 Rev 2.0");
+ 		break;
+ 	case SFF8636_REV_8636_27:
+-		printf("%s SFF-8636 Rev 2.5/2.6/2.7\n", pfx);
++		sprintf(value, "%s", "SFF-8636 Rev 2.5/2.6/2.7");
+ 		break;
+ 	default:
+-		printf("%s Unallocated\n", pfx);
++		sprintf(value, "%s", "Unallocated");
+ 		break;
+ 	}
++	module_print_any_string(pfx, value);
+ }
+ 
+ /*
+@@ -654,11 +723,21 @@ static void sff8636_show_dom_chan_lvl_tx_bias(const struct sff_diags *sd)
+ 	char power_string[MAX_DESC_SIZE];
+ 	int i;
+ 
++	open_json_array("laser_tx_bias_current", "");
+ 	for (i = 0; i < SFF8636_MAX_CHANNEL_NUM; i++) {
+-		snprintf(power_string, MAX_DESC_SIZE, "%s (Channel %d)",
+-			 "Laser tx bias current", i+1);
+-		PRINT_BIAS(power_string, sd->scd[i].bias_cur);
++		if (is_json_context()) {
++			print_float(PRINT_JSON, NULL, "%.3f",
++				    (double)sd->scd[i].bias_cur / 500.);
++		} else {
++			snprintf(power_string, MAX_DESC_SIZE, "%s (Channel %d)",
++				 "Laser tx bias current", i+1);
++			PRINT_BIAS(power_string, sd->scd[i].bias_cur);
++		}
+ 	}
++	close_json_array("");
++
++	if (is_json_context())
++		module_print_any_units("laser_tx_bias_current", "mA");
+ }
+ 
+ static void sff8636_show_dom_chan_lvl_tx_power(const struct sff_diags *sd)
+@@ -666,11 +745,21 @@ static void sff8636_show_dom_chan_lvl_tx_power(const struct sff_diags *sd)
+ 	char power_string[MAX_DESC_SIZE];
+ 	int i;
+ 
++	open_json_array("transmit_avg_optical_power", "");
+ 	for (i = 0; i < SFF8636_MAX_CHANNEL_NUM; i++) {
+-		snprintf(power_string, MAX_DESC_SIZE, "%s (Channel %d)",
+-			 "Transmit avg optical power", i+1);
+-		PRINT_xX_PWR(power_string, sd->scd[i].tx_power);
++		if (is_json_context()) {
++			print_float(PRINT_JSON, NULL, "%.4f",
++				    (double)sd->scd[i].tx_power / 10000.);
++		} else {
++			snprintf(power_string, MAX_DESC_SIZE, "%s (Channel %d)",
++				 "Transmit avg optical power", i+1);
++			PRINT_xX_PWR(power_string, sd->scd[i].tx_power);
++		}
+ 	}
++	close_json_array("");
++
++	if (is_json_context())
++		module_print_any_units("transmit_avg_optical_power", "mW");
+ }
+ 
+ static void sff8636_show_dom_chan_lvl_rx_power(const struct sff_diags *sd)
+@@ -684,11 +773,25 @@ static void sff8636_show_dom_chan_lvl_rx_power(const struct sff_diags *sd)
+ 	else
+ 		rx_power_string = "Rcvr signal avg optical power";
+ 
++	char rx_power_json_str[strlen(rx_power_string)];
++
++	convert_json_field_name(rx_power_string, rx_power_json_str);
++
++	open_json_array(rx_power_json_str, "");
+ 	for (i = 0; i < SFF8636_MAX_CHANNEL_NUM; i++) {
+-		snprintf(power_string, MAX_DESC_SIZE, "%s (Channel %d)",
+-			 rx_power_string, i+1);
+-		PRINT_xX_PWR(power_string, sd->scd[i].rx_power);
++		if (is_json_context()) {
++			print_float(PRINT_JSON, NULL, "%.4f",
++				    (double)sd->scd[i].rx_power / 10000.);
++		} else {
++			snprintf(power_string, MAX_DESC_SIZE, "%s (Channel %d)",
++				 rx_power_string, i+1);
++			PRINT_xX_PWR(power_string, sd->scd[i].rx_power);
++		}
+ 	}
++	close_json_array("");
++
++	if (is_json_context())
++		module_print_any_units(rx_power_json_str, "mW");
+ }
+ 
+ static void
+@@ -698,38 +801,61 @@ sff8636_show_dom_chan_lvl_flags(const struct sff8636_memory_map *map)
+ 	int i;
+ 
+ 	for (i = 0; module_aw_chan_flags[i].fmt_str; ++i) {
++		char json_str[80] = {};
++		char str[80] = {};
+ 		int j = 1;
+ 
+ 		if (module_aw_chan_flags[i].type != MODULE_TYPE_SFF8636)
+ 			continue;
+ 
++		convert_json_field_name(module_aw_chan_flags[i].fmt_str,
++					json_str);
++
++		open_json_array(json_str, "");
+ 		do {
+ 			value = map->lower_memory[module_aw_chan_flags[i].offset] &
+ 				module_aw_chan_flags[i].adver_value;
+-			printf("\t%-41s (Chan %d) : %s\n",
+-			       module_aw_chan_flags[i].fmt_str, j,
+-			       ONOFF(value));
++			if (is_json_context()) {
++				print_bool(PRINT_JSON, NULL, NULL, value);
++			} else {
++				snprintf(str, 80, "%s (Chan %d)",
++					 module_aw_chan_flags[i].fmt_str, j);
++				printf("\t%-41s : %s\n", str, ONOFF(value));
++			}
+ 			j++;
+ 			i++;
+-		}
+-		while (module_aw_chan_flags[i].fmt_str &&
+-		       strcmp(module_aw_chan_flags[i].fmt_str,
+-			      module_aw_chan_flags[i-1].fmt_str) == 0);
++		} while (module_aw_chan_flags[i].fmt_str &&
++			 strcmp(module_aw_chan_flags[i].fmt_str,
++				module_aw_chan_flags[i-1].fmt_str) == 0);
+ 		i--;
++		close_json_array("");
+ 	}
+ }
+ 
+ static void
+ sff8636_show_dom_mod_lvl_flags(const struct sff8636_memory_map *map)
+ {
++	bool value;
+ 	int i;
+ 
+ 	for (i = 0; module_aw_mod_flags[i].str; ++i) {
+-		if (module_aw_mod_flags[i].type == MODULE_TYPE_SFF8636)
++		char str[80] = {};
++
++		if (module_aw_mod_flags[i].type != MODULE_TYPE_SFF8636)
++			continue;
++
++		value = map->lower_memory[module_aw_mod_flags[i].offset] &
++			module_aw_mod_flags[i].value;
++
++		if (is_json_context()) {
++			print_bool(PRINT_JSON, module_aw_mod_flags[i].str,
++				   NULL, value);
++		} else {
++			snprintf(str, 80, "%s (Chan %d)",
++				 module_aw_mod_flags[i].str, i+1);
+ 			printf("\t%-41s : %s\n",
+-			       module_aw_mod_flags[i].str,
+-			       ONOFF(map->lower_memory[module_aw_mod_flags[i].offset]
+-				     & module_aw_mod_flags[i].value));
++			       module_aw_mod_flags[i].str, ONOFF(value));
++		}
+ 	}
+ }
+ 
+@@ -765,8 +891,9 @@ static void sff8636_show_dom(const struct sff8636_memory_map *map)
+ 	    (sd.sfp_temp[MCURR] == (__s16)0xFFFF))
+ 		return;
+ 
+-	printf("\t%-41s : %s\n", "Alarm/warning flags implemented",
+-		(sd.supports_alarms ? "Yes" : "No"));
++	module_print_any_bool("Alarm/warning flags implemented",
++			      "alarm/warning_flags_implemented",
++			      sd.supports_alarms, YESNO(sd.supports_alarms));
+ 
+ 	sff8636_show_dom_chan_lvl_tx_bias(&sd);
+ 	sff8636_show_dom_chan_lvl_tx_power(&sd);
+@@ -776,7 +903,10 @@ static void sff8636_show_dom(const struct sff8636_memory_map *map)
+ 		sff8636_show_dom_chan_lvl_flags(map);
+ 		sff8636_show_dom_mod_lvl_flags(map);
+ 
+-		sff_show_thresholds(sd);
++		if (is_json_context())
++			sff_show_thresholds_json(sd);
++		else
++			sff_show_thresholds(sd);
+ 	}
+ }
+ 
+@@ -817,7 +947,7 @@ static void sff8636_show_page_zero(const struct sff8636_memory_map *map)
+ 	sff8636_show_transceiver(map);
+ 	sff8636_show_encoding(map);
+ 	module_show_value_with_unit(map->page_00h, SFF8636_BR_NOMINAL_OFFSET,
+-				    "BR, Nominal", 100, "Mbps");
++				    "BR Nominal", 100, "Mbps");
+ 	sff8636_show_rate_identifier(map);
+ 	module_show_value_with_unit(map->page_00h, SFF8636_SM_LEN_OFFSET,
+ 				    "Length (SMF,km)", 1, "km");
 -- 
 2.47.0
 
