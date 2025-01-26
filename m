@@ -1,88 +1,88 @@
-Return-Path: <netdev+bounces-160971-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-160972-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id F0E51A1C799
-	for <lists+netdev@lfdr.de>; Sun, 26 Jan 2025 12:57:45 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 024DFA1C79A
+	for <lists+netdev@lfdr.de>; Sun, 26 Jan 2025 12:57:49 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id C8F9018860A5
-	for <lists+netdev@lfdr.de>; Sun, 26 Jan 2025 11:57:49 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id CFAAF1886205
+	for <lists+netdev@lfdr.de>; Sun, 26 Jan 2025 11:57:52 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7EDD6156F44;
-	Sun, 26 Jan 2025 11:57:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3749615ADB4;
+	Sun, 26 Jan 2025 11:57:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="pdiPzRxf"
+	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="oHSil/YT"
 X-Original-To: netdev@vger.kernel.org
-Received: from NAM12-DM6-obe.outbound.protection.outlook.com (mail-dm6nam12on2054.outbound.protection.outlook.com [40.107.243.54])
+Received: from NAM11-DM6-obe.outbound.protection.outlook.com (mail-dm6nam11on2051.outbound.protection.outlook.com [40.107.223.51])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 045F1156C6F
-	for <netdev@vger.kernel.org>; Sun, 26 Jan 2025 11:57:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.243.54
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E98B7156F39
+	for <netdev@vger.kernel.org>; Sun, 26 Jan 2025 11:57:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.223.51
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1737892648; cv=fail; b=LTKxqwpIu3gxFFLk88WgE/dwhIyMSrBCf2MSt3MmzqoiauGh0nDSnvIpIv3MQoZbFfbBzroOUMVptB9oHxmNz9Ta0zgSQTQx/N1obZvWncqVqXBDB/oa6iWCUlxEP1BBK1X85PkzOnyLVCdOX7CRir0P96InFgl8WIxPHW5HME4=
+	t=1737892649; cv=fail; b=i9ZuA8m33nm7V3dLGKlB+yuVkMUSXmLMPOMQMKBcl53WIDbB/OXjC7d6HtiDDeRDU4sg5DvxWo8bbL9N0M4d7AOquOD0NmzkwM8rphXyVuHVM6kF9X4VvKIMS1ZHdZuxNzCTA2PWu4a0gSw5lb5vQiIuIsKRtRpxyzZ2H1AjUR0=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1737892648; c=relaxed/simple;
-	bh=1nEktTpVz7IrCEybBH8GyMY3kGTwiZVWFjZP1ZqlcDE=;
+	s=arc-20240116; t=1737892649; c=relaxed/simple;
+	bh=bjKen3qQ3QTMcd5TYDd051eRv9ZRCBcyqkPhJ6f4mDU=;
 	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=VwnjWEfrralaIQS23i6OFjPEahSuJYPsPjBw7xxxZ8v0YMyYkdQKOIw00tFknajElnzPhC9aonN53+21taYG/qryKWnydlJdSQAgTYlCpgpKoyumnSWmRVqWgyVdhGhj1ZEIXHzwUfT+FU6HM4qoA8pPi/H4vx6VST5JRlnQmpY=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=pdiPzRxf; arc=fail smtp.client-ip=40.107.243.54
+	 MIME-Version:Content-Type; b=XG+qOnAEEFbj9XMaisVSP/Zx5JlRk9zfn8EToM+Jv0KzSSjw9OfacyjddapxYMMJfJiNhPSi4IutspBmSPOimlMFl8DZj5h5oxsRlVpM/S++r7qrG9DCJwf3JqttZ5q5ADbU2N9f4U4KL9RxvYp1kHVBOoVm8O81kuaXbuDfXt0=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=oHSil/YT; arc=fail smtp.client-ip=40.107.223.51
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
 Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=glUG64xVavuCh4zpvbDCe+p/tqF1jlOtrVTbvFku8ysZ8tU6rp1tT76QeKoGzNMQmSEzzEpp5Q3+7oB9nHcrPe8GEc6aUL9i3IrpaXnVh4LMOWg7Pbc+KZTrHO061aTWHFn9lcEBOoxlT9tuuQlHLg1Mbw3kIpOzAEcyL0m6w8OCH05hh5pkBIpfP7fdQSSGPtAw3Hpo3TJgVjfaXD+kTWarNaKuQEuSokSzB4m0UnI28Y14Wo8WzV7yWeftphxawPtCuMdv8yRVNS2+eq+1pNVYqgCy3uJuQC+/V7aDP0BLJ/pmRvSRCzRXZdS/7BqLO1npzOoqCb3vEnjvIlO1TQ==
+ b=tY5usZNDuSb8vUvY6sJdQSD0QmHcXu3hsRrBhnX6V45TcPrXdxaXFqeDusikUUWR8aQaZfGx6m8A+80Zc8InCESKfIOr4IRd7dWQov7fGFnOpGd8uQg9LFSC36EanOpus/Ced/ylXSd8OWTDoCm68c1xGy96pV3Cl+nqksmcJSseLHSqwHyjFUkNQKjWkMu2KxwyNkMpKalBN6cF0Wrquc7tza6P/9UxON0gt3ZJhyt09G7DqZ4bmbQpiBOZmrSfpG7gBAa87UEX+bX+Q7jCjwiM0ME/cw17CQC+0vCIoSBGG8qz+5W3jNRSE3/daBGkVZ8XUzZM8NjEfZVRdNzjFg==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector10001;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=FC6dvvx5mRKHvoXcOQVZPTlnMPRhfjKfGgjK+JtWd7Y=;
- b=tdwABiU7XWs0OUCINaYYhOdkeBsf1G+1jX/Oe1hnJ0hdEaxw5mgJBU/kwFI0MLkyu08I44PNyYfF5CKvWyfkhCFmN+K3r6Jo5ngDAxB8NpntGo52GR9oU3EbvUwJFWjrRi6C+Y/wu+fxCKGzQXSyGnvUzr5XCDx5Lyy6p2ephD8cDVwxXbzJmXLkCf3vJw7Yc4wsfPvb3IyR4XUzzNgoLtI9XJHKZsphlCyDFXVP5Q0HnOAGjrIchgOKc2XGfh1uWr0UpAi5KRoGpvN1JH/39ilDb/bfBFRqW78nirM7kX/abZ8cZax+cjaI1bK2SJ+ZAKZBfDyYapteonrb2+b+MQ==
+ bh=CWN+TXB5m18+0Gknfc6z455q1phIF5e+6tS7BcYOxec=;
+ b=dEE0oCBvJQi4Eu2oiDdEg6Ra0nsPkd2zRwxiAYMHDm/M3K5C9YtwD/HsBr+x3ZTPOr4w6eMFp9JEvVBzhVD+iiF8higqOS/bR97WewiyTnOQt4dzmh8RGV9cc0vzXj5475qMpaRIxQ6rSc4jlyEcswg0MLVUO6KGEue1jFd1uwKjCeHETySS1WqGx8w/u1PDcItxlCjJ2IgySFhmJOBs5OsCurU0DBOoBA3hTkI5/tuRpMQtl+cyF7f/zJM0Dxx9Kbe8F10HRwqWQi3n1D1Uknu3fDIMdpf+tVf+4MhotuBMM4HaCyAUefzNYpgoZfotYIbMmm167Uav3eavVbajtA==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
- 216.228.117.161) smtp.rcpttodomain=vger.kernel.org smtp.mailfrom=nvidia.com;
+ 216.228.117.160) smtp.rcpttodomain=vger.kernel.org smtp.mailfrom=nvidia.com;
  dmarc=pass (p=reject sp=reject pct=100) action=none header.from=nvidia.com;
  dkim=none (message not signed); arc=none (0)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
  s=selector2;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=FC6dvvx5mRKHvoXcOQVZPTlnMPRhfjKfGgjK+JtWd7Y=;
- b=pdiPzRxfXkli8VUnTa9aTSCQTbE/PXcrIZ7431uph3PF/jmlKaXCHDJgxDOg5CPqxBQfWpSoboD9tvYOGmeijvoU8vwF21NWpPFIc+uf7tfFvPHO/kr50UVztNj3baBZsbZnSFFiFEfD2d/2Ysj/PgnJnh9KHIp/uOyxEejdLpyPxhNGbWiooV9pW8YGbxHg60MX1zvglRx95ASBqexVPCQdqJQhsfPgieyS2K0h8B8pYoe+X9FEwMMEH/6aMT0zu/H2+ncubRC4WU7FSWJ0Vcv3avBEa1Z6WfRBqe4Ks5F2TWrZZbI5PKjOOwsNc97zl/w/t0pmOtIZy0ZudorY3w==
-Received: from CYZPR11CA0001.namprd11.prod.outlook.com (2603:10b6:930:8d::28)
- by MW4PR12MB6999.namprd12.prod.outlook.com (2603:10b6:303:20a::11) with
+ bh=CWN+TXB5m18+0Gknfc6z455q1phIF5e+6tS7BcYOxec=;
+ b=oHSil/YTcxIxduWmpYzsbU/7FgPHcgAEdroLfrRwKw8g+/zWhtWnCDse94julUXpfT7Ccw0Sm+XqH/VrxA/Z0vE3qjp4OuEDk/xUna697jXwHzO/IBFEcKKWl+UH7174DUj1bRsc+vDBewXJ0dDOspT1k96kA/X3ABgQLcvyw2+eRpOotw6Olis+QFQsEfjotV4/2Z3FAsH8ci6rtfl7Y0/SQE/kyGmJx0877Np52JuFbLYt/zs5UGaf90OtLbUTwHNaka4CpZrfhRPnC2YhLMBQ+Yodt8Z2p1fU54kKwb0ZBLgoj1vCQbwBd0PbX1Is8JABg9Y+axLuQJbb3xAlAA==
+Received: from DS7PR03CA0088.namprd03.prod.outlook.com (2603:10b6:5:3bb::33)
+ by SJ0PR12MB6686.namprd12.prod.outlook.com (2603:10b6:a03:479::22) with
  Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8377.21; Sun, 26 Jan
- 2025 11:57:20 +0000
-Received: from CY4PEPF0000EE3D.namprd03.prod.outlook.com
- (2603:10b6:930:8d:cafe::27) by CYZPR11CA0001.outlook.office365.com
- (2603:10b6:930:8d::28) with Microsoft SMTP Server (version=TLS1_3,
- cipher=TLS_AES_256_GCM_SHA384) id 15.20.8377.22 via Frontend Transport; Sun,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8377.22; Sun, 26 Jan
+ 2025 11:57:21 +0000
+Received: from CY4PEPF0000E9D2.namprd03.prod.outlook.com
+ (2603:10b6:5:3bb:cafe::43) by DS7PR03CA0088.outlook.office365.com
+ (2603:10b6:5:3bb::33) with Microsoft SMTP Server (version=TLS1_3,
+ cipher=TLS_AES_256_GCM_SHA384) id 15.20.8377.21 via Frontend Transport; Sun,
  26 Jan 2025 11:57:20 +0000
-X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 216.228.117.161)
+X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 216.228.117.160)
  smtp.mailfrom=nvidia.com; dkim=none (message not signed)
  header.d=none;dmarc=pass action=none header.from=nvidia.com;
 Received-SPF: Pass (protection.outlook.com: domain of nvidia.com designates
- 216.228.117.161 as permitted sender) receiver=protection.outlook.com;
- client-ip=216.228.117.161; helo=mail.nvidia.com; pr=C
-Received: from mail.nvidia.com (216.228.117.161) by
- CY4PEPF0000EE3D.mail.protection.outlook.com (10.167.242.15) with Microsoft
+ 216.228.117.160 as permitted sender) receiver=protection.outlook.com;
+ client-ip=216.228.117.160; helo=mail.nvidia.com; pr=C
+Received: from mail.nvidia.com (216.228.117.160) by
+ CY4PEPF0000E9D2.mail.protection.outlook.com (10.167.241.137) with Microsoft
  SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
  15.20.8377.8 via Frontend Transport; Sun, 26 Jan 2025 11:57:20 +0000
 Received: from rnnvmail201.nvidia.com (10.129.68.8) by mail.nvidia.com
- (10.129.200.67) with Microsoft SMTP Server (version=TLS1_2,
+ (10.129.200.66) with Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.4; Sun, 26 Jan
- 2025 03:57:05 -0800
+ 2025 03:57:07 -0800
 Received: from dev-r-vrt-155.mtr.labs.mlnx (10.126.230.35) by
  rnnvmail201.nvidia.com (10.129.68.8) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.4; Sun, 26 Jan 2025 03:57:02 -0800
+ 15.2.1544.4; Sun, 26 Jan 2025 03:57:05 -0800
 From: Danielle Ratson <danieller@nvidia.com>
 To: <netdev@vger.kernel.org>
 CC: <mkubecek@suse.cz>, <matt@traverse.com.au>, <daniel.zahka@gmail.com>,
 	<amcohen@nvidia.com>, <nbu-mlxsw@exchange.nvidia.com>, Danielle Ratson
 	<danieller@nvidia.com>
-Subject: [PATCH ethtool-next 06/14] module_common: Add helpers to support JSON printing for common value types
-Date: Sun, 26 Jan 2025 13:56:27 +0200
-Message-ID: <20250126115635.801935-7-danieller@nvidia.com>
+Subject: [PATCH ethtool-next 07/14] cmis: Add JSON output handling to --module-info in CMIS modules
+Date: Sun, 26 Jan 2025 13:56:28 +0200
+Message-ID: <20250126115635.801935-8-danieller@nvidia.com>
 X-Mailer: git-send-email 2.47.0
 In-Reply-To: <20250126115635.801935-1-danieller@nvidia.com>
 References: <20250126115635.801935-1-danieller@nvidia.com>
@@ -98,905 +98,599 @@ X-ClientProxiedBy: rnnvmail202.nvidia.com (10.129.68.7) To
  rnnvmail201.nvidia.com (10.129.68.8)
 X-EOPAttributedMessage: 0
 X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: CY4PEPF0000EE3D:EE_|MW4PR12MB6999:EE_
-X-MS-Office365-Filtering-Correlation-Id: 0b744070-507b-4495-cb63-08dd3e009684
+X-MS-TrafficTypeDiagnostic: CY4PEPF0000E9D2:EE_|SJ0PR12MB6686:EE_
+X-MS-Office365-Filtering-Correlation-Id: ea2b4649-8b4f-44fa-2269-08dd3e0096c1
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
 X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|1800799024|376014|36860700013|82310400026;
+	BCL:0;ARA:13230040|36860700013|376014|82310400026|1800799024;
 X-Microsoft-Antispam-Message-Info:
-	=?us-ascii?Q?GA5e0/WR5VyhwvaBS1CiRLLQJ5+Nxc9/QRpmMC1WCwhTrmfh4XkoOD62dPES?=
- =?us-ascii?Q?DTU1ZD2G5Y1QJ/Gz//b15dXl0HS9jIfjFRvKwHGs2ycbbuUX9RioposGOydW?=
- =?us-ascii?Q?IT1k2Kx5hqrr8fHjUMig3JGUFNKHXUIsHs5L2TBjGif8YE06guw/9hiBZUvs?=
- =?us-ascii?Q?iFzlbv7OX1nxAPu8eUd3oOLK+OES8/yiMOw8kz25s+9j9dng4vLajQ37/RkX?=
- =?us-ascii?Q?rC4fU2jfoYMY6Gj99w12BiJ5snll26xsoZb2MnOfrivcA+5ramUDJiCu0rNJ?=
- =?us-ascii?Q?jaM7p99wuNlwhG0GWWMA0CHC0AF8q6+RwOb6AoT0eO3I8gwcLbv9swvfJJqc?=
- =?us-ascii?Q?GwW1Ol7kdSDcoFzSwBJzLffSOXbrUrm+YT1m5l7Cdyk37nS+fkX0RSDO/QGy?=
- =?us-ascii?Q?gHtygI6KuM5BDQCW0oqFGA7uMtiffi/1Tcgdw1XmUHLBm4yvtcQs5uEheQ9Z?=
- =?us-ascii?Q?PA2RVdIq7L+vYy9shI4NEv/YBfQCiZw9/2voErPs+u1cu5Bf8TNpLSJX6JsS?=
- =?us-ascii?Q?9iN8T6uipozaFqJOl3y/3iwyzUiqNeEKetIBTJP3WZWJLj9XFGEBR3tBBtwo?=
- =?us-ascii?Q?kgbRzvfMezX4GFn6APWpL1LnC+9pG5REoUBRK7cIQUf/5N5WvxAxFv1DVSTY?=
- =?us-ascii?Q?g6MEHsmn903cTLPamCbMOCo+/+3dUWBSaEg9lcKSvcqFesdoxz2+p1nyP5qN?=
- =?us-ascii?Q?w0zoA004aG5WM6kRru+nseAQn1jJDk4U48aeZSzGj7h1+TjP/1qjpQE0LTmU?=
- =?us-ascii?Q?zrHdl+jyMxW6ckzU108fNxSA3NrElcIjld9CqUtnnIX0i88fMnYL01zcDS88?=
- =?us-ascii?Q?YbhFeQfc9OEjfQcpghtligEQIRPKHqWhCPbnKqndvV39mflBiaCq/urNyOyl?=
- =?us-ascii?Q?UXqgQTYTmyP2eVxwM+o4iBua+XkFGuFDsQnTQ2f6sb7tnyIzLr8rW2+WzuDK?=
- =?us-ascii?Q?WwSLW2X6GRITV3esxFecLGSj/ITI+vBWp6JC6gFhLcl8TsLl84ZlWRvhWdYl?=
- =?us-ascii?Q?UQzaERii8QrE8zNHt1NHmxOt9BXtBNdl3bmex6RfU7TXHk0ZJZvHHTUui+jB?=
- =?us-ascii?Q?U8USN8Ay+oRMv7TYltUbyUH3ZirHFbV0Un/twQRJ3t/ri6Cz2t/K3NEzQpjk?=
- =?us-ascii?Q?ys0UVCq868vYSNtMr7y53xIxSHSWfaZqMljHwUg6YK+IPJdkS6h1uBiLM7D3?=
- =?us-ascii?Q?VBaeXDeJK7U7YSEGHX120wle2u2ZOXXLy8GhBdENOoVEQrvRLykiHb3yN+dD?=
- =?us-ascii?Q?QtuzyBLxcafgpgTm1w1CHan99kdMQ1FTFk8Bwd2jb/qwVDCSpsbB12KCErz0?=
- =?us-ascii?Q?oAf86M5uUVWw2GwzVxizPfCKzYKmcPFh/It64Zmo7qKfuW4W/xbOJLijB7Tw?=
- =?us-ascii?Q?IN4Kt0NbTgPoAcMj58whYU4NQ0n3mSpj/bEtrjf4TnJUtiyj2X0KDPosvabj?=
- =?us-ascii?Q?kX9/Rboanxvc2+VTWY7aM0bAHBcjAjiHptNtKndoRtalMz08fodCcSZ2gi9i?=
- =?us-ascii?Q?LSUJ1RbxlL16BTg=3D?=
+	=?us-ascii?Q?iBB03dd6pEPCn1G7S/Yof0WdivoxrLlRdKWJT6SHT01JOgQOkEj6jfWlE8a/?=
+ =?us-ascii?Q?GDruuX7G3uDsNvW44YMnqP6hERecSIRMCc8MUZk7CMsHD+OGRTUdZmvGlN6V?=
+ =?us-ascii?Q?zFcB/7RePutx+Nvo0xQ7Qbbdr7cTEC4oWB6SINfeuHpLnluk+cMmMlznJF8+?=
+ =?us-ascii?Q?hrMwYJQ5EFQ4AgvEXu2+kTrsucgC6awwyLsTi87pKXhwCaWOcoGamgUOKDok?=
+ =?us-ascii?Q?Thc97IdClEojImyt8voEXV/B8d5ogBwuEKAbAmnjk/kVYqlct4i328C+SjmX?=
+ =?us-ascii?Q?uPFLlTCec+PzEgax7UdHRPTHN7e/oXFZOCqWrB/T5uMz68MjrCFqj+IgenoJ?=
+ =?us-ascii?Q?En7JG7zC8YLkDrK0eNQYlZX4MnubUZ59voF05mIdTwb6XHWWwwG0I7qqRg+g?=
+ =?us-ascii?Q?+clOLgFvgiuRXPWLzrVS/Zz0gk+VljM15qbEhCG9v0M5EsHSE0FQENwEAoid?=
+ =?us-ascii?Q?9mGEsmVM2W9hMOt03qmNvjMsBhERk0P5Kyd06aa/oTbgCmwh6F0kj6DZx9JN?=
+ =?us-ascii?Q?MLpe8LcEd41Xp0+DVYoQIWJNABbNT2xwjy+tV3JbUEZsaW/TMspYEBja0oUL?=
+ =?us-ascii?Q?t9bqgt8GjPkME3Bklb1XY8ma5+d5g9mQ7mqIeOJjjhGmDWkzsdxNBRtK/NGE?=
+ =?us-ascii?Q?IxZy9WSj+r0l1O9JdKoGEr6FdbpwX2Av0VX+MREZiXEtlqNB2owhey6aglsP?=
+ =?us-ascii?Q?old3IofsfctG/x2H9IYBa8/qYuT+BQzOWfU6K2KWly0TeOqMWpNt17Qce0X4?=
+ =?us-ascii?Q?xWHpeSmoj4/FWHeGloQsSK+BCnbXQK7dlWqMmteVIVsRKsTJo0CAoGRE9xkv?=
+ =?us-ascii?Q?+Zb3Vzxj+p9RMIuWmTSWRuH2MGTxbJIxMJXEBM977hah8K/9d4hAubqsCJkx?=
+ =?us-ascii?Q?vTKTI71jhhWEOVA1W6BFz9w/qG84XOWRTIQ4Q3tBPJ97TqU232a+kBlEu6+g?=
+ =?us-ascii?Q?290xo1NG2lN17LkhYqismPktKhoeDaAUUSeCiN5eEzw+KBzHDV9F3/Ay/zjq?=
+ =?us-ascii?Q?WHnyL/VTYDa7NG/DFvsSfaV9F68ZwBXMUv1wtH6KTO4QNjBv7KMTYEN6GO2S?=
+ =?us-ascii?Q?1U+DlAGIeFp5pReRkn5ydG9uX5zkz5hrzzn2OCNT5WxYxRaWe8nfnL1WMWUu?=
+ =?us-ascii?Q?RL8cywmg7wUB63KQ9Pu2TvSabGZjx4PIBYHO1QhyByJGePPYoa+xaWM4AECe?=
+ =?us-ascii?Q?9AFME5Kdmp1U9t3cC2MJmbnhIAAoEQYeJkRDaYP/OA1qqM/f5rdEG2kJoKj4?=
+ =?us-ascii?Q?KC0yyQBgmA8HbCPZuSE6IAtoMSs7UmuctZs2lyjRu0EmqJHPoC1Hme/zdbmH?=
+ =?us-ascii?Q?WjEQv+O5sk8vASv7uHNuJu4JbJTJ0QEwHio5UjoW1/JQsnij9xjtud1GknWs?=
+ =?us-ascii?Q?2S4YDlxn9mjdSaeqFKFFgHsHI+uQrdRpu/eQKFYDi/hixbvDXs+WO3+NP7m7?=
+ =?us-ascii?Q?TIhfg1UlrXzwD1eTE8jyiz3rZse1rgmJTXnVP5nTooadslGz+ZRpJX9T2NTB?=
+ =?us-ascii?Q?T0lo0I+iMxWjwUU=3D?=
 X-Forefront-Antispam-Report:
-	CIP:216.228.117.161;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:dc6edge2.nvidia.com;CAT:NONE;SFS:(13230040)(1800799024)(376014)(36860700013)(82310400026);DIR:OUT;SFP:1101;
+	CIP:216.228.117.160;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:dc6edge1.nvidia.com;CAT:NONE;SFS:(13230040)(36860700013)(376014)(82310400026)(1800799024);DIR:OUT;SFP:1101;
 X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 26 Jan 2025 11:57:20.1124
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 26 Jan 2025 11:57:20.5233
  (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: 0b744070-507b-4495-cb63-08dd3e009684
+X-MS-Exchange-CrossTenant-Network-Message-Id: ea2b4649-8b4f-44fa-2269-08dd3e0096c1
 X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[216.228.117.161];Helo=[mail.nvidia.com]
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[216.228.117.160];Helo=[mail.nvidia.com]
 X-MS-Exchange-CrossTenant-AuthSource:
-	CY4PEPF0000EE3D.namprd03.prod.outlook.com
+	CY4PEPF0000E9D2.namprd03.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Anonymous
 X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: MW4PR12MB6999
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SJ0PR12MB6686
 
-Upcoming patches will introduce JSON support to the ethtool dump. The
-ethtool dump currently handles various field types, including strings,
-unsigned integers, floats, etc.
+Add JSON output handling for 'ethtool -m' / --module-info, following the
+guideline below:
 
-To facilitate this transition, implement helper functions for commonly
-used types. These helpers will enable consistent printing for both JSON
-and regular dump formats.
-
-In addition, add JSON support for common functions and defines to use in
-the upcoming patches.
+1. Fields with description, will have a separate description field.
+2. Fields with units, will have a separate unit field.
+3. ASCII fields will be presented as strings.
+4. On/Off is rendered as true/false.
+5. Yes/no is rendered as true/false.
+6. Per-channel fields will be presented as array, when each element
+   represents a channel.
+7. Fields that hold version, will be split to major and minor sub fields.
 
 Signed-off-by: Danielle Ratson <danieller@nvidia.com>
 ---
- module-common.c | 367 ++++++++++++++++++++++++++++++++++++------------
- module-common.h |   7 +
- sff-common.c    |  98 +++++++++++--
- sff-common.h    |  41 ++++++
- 4 files changed, 407 insertions(+), 106 deletions(-)
+ cmis.c | 285 +++++++++++++++++++++++++++++++++++++++------------------
+ 1 file changed, 196 insertions(+), 89 deletions(-)
 
-diff --git a/module-common.c b/module-common.c
-index 4146a84..e6fbbb2 100644
---- a/module-common.c
-+++ b/module-common.c
-@@ -5,6 +5,7 @@
+diff --git a/cmis.c b/cmis.c
+index 9d89a5e..4901f57 100644
+--- a/cmis.c
++++ b/cmis.c
+@@ -62,7 +62,15 @@ static void cmis_show_rev_compliance(const struct cmis_memory_map *map)
+ 	int major = (rev >> 4) & 0x0F;
+ 	int minor = rev & 0x0F;
  
- #include <stdio.h>
- #include <math.h>
-+#include <ctype.h>
- #include "module-common.h"
- 
- const struct module_aw_mod module_aw_mod_flags[] = {
-@@ -198,309 +199,491 @@ const struct module_aw_chan module_aw_chan_flags[] = {
- 	{ 0, NULL, 0, 0, 0 },
- };
- 
-+void convert_json_field_name(const char *str,  char *json_str)
-+{
-+	for (size_t i = 0; i < strlen(str); i++)
-+		json_str[i] = (str[i] == ' ') ?
-+				'_' : tolower((unsigned char)str[i]);
-+}
-+
-+void module_print_any_units(const char *json_fn, const char *unit)
-+{
-+	char units_fn[64];
-+
-+	sprintf(units_fn, "%s_units", json_fn);
-+
+-	printf("\t%-41s : Rev. %d.%d\n", "Revision compliance", major, minor);
 +	if (is_json_context()) {
-+		if (unit)
-+			print_string(PRINT_JSON, units_fn, "%s", unit);
++		open_json_object("revision_compliance");
++		print_uint(PRINT_JSON, "major", "%u", major);
++		print_uint(PRINT_JSON, "minor", "%u", minor);
++		close_json_object();
 +	} else {
-+		if (unit)
-+			printf("%s", unit);
++		printf("\t%-41s : Rev. %d.%d\n", "Revision compliance", major,
++		       minor);
 +	}
-+}
-+
-+void module_print_any_uint(const char *fn, int value, const char *unit)
-+{
-+	char json_fn[100] = "";
-+
-+	if (is_json_context()) {
-+		convert_json_field_name(fn, json_fn);
-+		print_uint(PRINT_JSON, json_fn, "%u", value);
-+	} else {
-+		printf("\t%-41s : %u", fn, value);
-+	}
-+
-+	if (unit)
-+		module_print_any_units(json_fn, unit);
-+	print_nl();
-+}
-+
-+void module_print_any_string(const char *fn, const char *value)
-+{
-+	char json_fn[100] = "";
-+
-+	if (is_json_context()) {
-+		convert_json_field_name(fn, json_fn);
-+		print_string(PRINT_JSON, json_fn, "%s", value);
-+	} else {
-+		printf("\t%-41s : %s\n", fn, value);
-+	}
-+}
-+
-+void module_print_any_float(const char *fn, float value, const char *unit)
-+{
-+	char json_fn[100] = "";
-+
-+	if (is_json_context()) {
-+		convert_json_field_name(fn, json_fn);
-+		print_float(PRINT_JSON, json_fn, "%.04f", value);
-+	} else {
-+		printf("\t%-41s : %.04f", fn, value);
-+	}
-+
-+	if (unit)
-+		module_print_any_units(json_fn, unit);
-+	print_nl();
-+}
-+
-+void module_print_any_bool(const char *fn, char *given_json_fn, bool value,
-+			   const char *str_value)
-+{
-+	char json_fn[100] = "";
-+
-+	if (!given_json_fn)
-+		convert_json_field_name(fn, json_fn);
-+	else
-+		strcpy(json_fn, given_json_fn);
-+
-+	if (is_json_context())
-+		print_bool(PRINT_JSON, json_fn, NULL, value);
-+	else
-+		printf("\t%-41s : %s\n", fn, str_value);
-+}
-+
- void module_show_value_with_unit(const __u8 *id, unsigned int reg,
- 				 const char *name, unsigned int mult,
- 				 const char *unit)
- {
- 	unsigned int val = id[reg];
- 
--	printf("\t%-41s : %u%s\n", name, val * mult, unit);
-+	module_print_any_uint(name, val * mult, unit);
  }
  
- void module_show_ascii(const __u8 *id, unsigned int first_reg,
- 		       unsigned int last_reg, const char *name)
- {
-+	char json_fn[100] = "";
-+	char val_str[32] = "";
- 	unsigned int reg, val;
+ static void
+@@ -123,8 +131,8 @@ static void cmis_show_power_info(const struct cmis_memory_map *map)
+ 	base_power = map->page_00h[CMIS_PWR_MAX_POWER_OFFSET];
+ 	max_power = base_power * 0.25f;
  
--	printf("\t%-41s : ", name);
-+	if (is_json_context())
-+		convert_json_field_name(name, json_fn);
-+	else
-+		printf("\t%-41s : ", name);
-+
- 	while (first_reg <= last_reg && id[last_reg] == ' ')
- 		last_reg--;
- 	for (reg = first_reg; reg <= last_reg; reg++) {
-+		char val_char;
-+
- 		val = id[reg];
--		putchar(((val >= 32) && (val <= 126)) ? val : '_');
-+		val_char = (char)val;
-+
-+		if (is_json_context())
-+			val_str[reg - first_reg] = (((val >= 32) && (val <= 126)) ?
-+						    val_char : '_');
-+		else
-+			putchar(((val >= 32) && (val <= 126)) ? val : '_');
- 	}
--	printf("\n");
-+
-+	if (is_json_context())
-+		print_string(PRINT_JSON, json_fn, "%s", val_str);
-+	else
-+		printf("\n");
+-	printf("\t%-41s : %d\n", "Power class", power_class + 1);
+-	printf("\t%-41s : %.02fW\n", "Max power", max_power);
++	module_print_any_uint("Power class", power_class + 1, NULL);
++	module_print_any_float("Max power", max_power, "W");
  }
  
- void module_show_lane_status(const char *name, unsigned int lane_cnt,
- 			     const char *yes, const char *no,
- 			     unsigned int value)
- {
--	printf("\t%-41s : ", name);
-+	char json_fn[100] = "";
-+
-+	convert_json_field_name(name, json_fn);
-+
- 	if (!value) {
--		printf("None\n");
-+		if (is_json_context())
-+			print_string(PRINT_JSON, json_fn, NULL, "None");
-+		else
-+			printf("\t%-41s : None\n", name);
+ /**
+@@ -143,7 +151,7 @@ static void cmis_show_cbl_asm_len(const struct cmis_memory_map *map)
+ 
+ 	/* Check if max length */
+ 	if (map->page_00h[CMIS_CBL_ASM_LEN_OFFSET] == CMIS_6300M_MAX_LEN) {
+-		printf("\t%-41s : > 6.3km\n", fn);
++		module_print_any_string(fn, "> 6.3km");
  		return;
  	}
  
--	printf("[");
--	while (lane_cnt--) {
--		printf(" %s%c", value & 1 ? yes : no, lane_cnt ? ',': ' ');
--		value >>= 1;
-+	if (is_json_context()) {
-+		open_json_array(json_fn, "");
+@@ -168,7 +176,7 @@ static void cmis_show_cbl_asm_len(const struct cmis_memory_map *map)
+ 	/* Get base value from first 6 bits and multiply by mul */
+ 	val = (map->page_00h[CMIS_CBL_ASM_LEN_OFFSET] & CMIS_LEN_VAL_MASK);
+ 	val = (float)val * mul;
+-	printf("\t%-41s : %0.2fm\n", fn, val);
++	module_print_any_float(fn, val, "m");
+ }
+ 
+ /**
+@@ -202,7 +210,7 @@ static void cmis_print_smf_cbl_len(const struct cmis_memory_map *map)
+ 	/* Get base value from first 6 bits and multiply by mul */
+ 	val = (map->page_01h[CMIS_SMF_LEN_OFFSET] & CMIS_LEN_VAL_MASK);
+ 	val = (float)val * mul;
+-	printf("\t%-41s : %0.2fkm\n", fn, val);
++	module_print_any_float(fn, val, "km");
+ }
+ 
+ /**
+@@ -212,22 +220,26 @@ static void cmis_print_smf_cbl_len(const struct cmis_memory_map *map)
+  */
+ static void cmis_show_sig_integrity(const struct cmis_memory_map *map)
+ {
++	bool value;
 +
-+		while (lane_cnt--) {
-+			print_string(PRINT_JSON, NULL, "%s",
-+				     value & 1 ? yes : no);
-+			value >>= 1;
-+		}
-+		close_json_array("");
-+	} else {
-+		printf("\t%-41s : [", name);
-+		while (lane_cnt--) {
-+			printf(" %s%c", value & 1 ? yes : no, lane_cnt ? ',': ' ');
-+			value >>= 1;
-+		}
-+		printf("]\n");
+ 	if (!map->page_01h)
+ 		return;
+ 
+ 	/* CDR Bypass control: 2nd bit from each byte */
+-	printf("\t%-41s : ", "Tx CDR bypass control");
+-	printf("%s\n", YESNO(map->page_01h[CMIS_SIG_INTEG_TX_OFFSET] & 0x02));
++	value = map->page_01h[CMIS_SIG_INTEG_TX_OFFSET] & 0x02;
++	module_print_any_bool("Tx CDR bypass control", NULL, value,
++			      YESNO(value));
+ 
+-	printf("\t%-41s : ", "Rx CDR bypass control");
+-	printf("%s\n", YESNO(map->page_01h[CMIS_SIG_INTEG_RX_OFFSET] & 0x02));
++	value = map->page_01h[CMIS_SIG_INTEG_RX_OFFSET] & 0x02;
++	module_print_any_bool("Rx CDR bypass control", NULL, value,
++			      YESNO(value));
+ 
+ 	/* CDR Implementation: 1st bit from each byte */
+-	printf("\t%-41s : ", "Tx CDR");
+-	printf("%s\n", YESNO(map->page_01h[CMIS_SIG_INTEG_TX_OFFSET] & 0x01));
++	value = map->page_01h[CMIS_SIG_INTEG_TX_OFFSET] & 0x01;
++	module_print_any_bool("Tx CDR", NULL, value, YESNO(value));
+ 
+-	printf("\t%-41s : ", "Rx CDR");
+-	printf("%s\n", YESNO(map->page_01h[CMIS_SIG_INTEG_RX_OFFSET] & 0x01));
++	value = map->page_01h[CMIS_SIG_INTEG_RX_OFFSET] & 0x01;
++	module_print_any_bool("Rx CDR", NULL, value, YESNO(value));
+ }
+ 
+ /**
+@@ -247,21 +259,25 @@ static void cmis_show_mit_compliance(const struct cmis_memory_map *map)
+ 	module_show_mit_compliance(value);
+ 
+ 	if (value >= CMIS_COPPER_UNEQUAL) {
+-		printf("\t%-41s : %udb\n", "Attenuation at 5GHz",
+-		       map->page_00h[CMIS_COPPER_ATT_5GHZ]);
+-		printf("\t%-41s : %udb\n", "Attenuation at 7GHz",
+-		       map->page_00h[CMIS_COPPER_ATT_7GHZ]);
+-		printf("\t%-41s : %udb\n", "Attenuation at 12.9GHz",
+-		       map->page_00h[CMIS_COPPER_ATT_12P9GHZ]);
+-		printf("\t%-41s : %udb\n", "Attenuation at 25.8GHz",
+-		       map->page_00h[CMIS_COPPER_ATT_25P8GHZ]);
++		module_print_any_uint("Attenuation at 5GHz",
++				      map->page_00h[CMIS_COPPER_ATT_5GHZ], "db");
++		module_print_any_uint("Attenuation at 7GHz",
++				      map->page_00h[CMIS_COPPER_ATT_7GHZ], "db");
++		module_print_any_uint("Attenuation at 12.9GHz",
++				      map->page_00h[CMIS_COPPER_ATT_12P9GHZ],
++				      "db");
++		module_print_any_uint("Attenuation at 25.8GHz",
++				      map->page_00h[CMIS_COPPER_ATT_25P8GHZ],
++				      "db");
+ 	} else if (map->page_01h) {
+-		printf("\t%-41s : %.3lfnm\n", "Laser wavelength",
+-		       (((map->page_01h[CMIS_NOM_WAVELENGTH_MSB] << 8) |
+-			  map->page_01h[CMIS_NOM_WAVELENGTH_LSB]) * 0.05));
+-		printf("\t%-41s : %.3lfnm\n", "Laser wavelength tolerance",
+-		       (((map->page_01h[CMIS_WAVELENGTH_TOL_MSB] << 8) |
+-			  map->page_01h[CMIS_WAVELENGTH_TOL_LSB]) * 0.005));
++		module_print_any_float("Laser wavelength",
++				       (((map->page_01h[CMIS_NOM_WAVELENGTH_MSB] << 8) |
++				        map->page_01h[CMIS_NOM_WAVELENGTH_LSB]) * 0.05),
++				       "nm");
++		module_print_any_float("Laser wavelength tolerance",
++				       (((map->page_01h[CMIS_WAVELENGTH_TOL_MSB] << 8) |
++				        map->page_01h[CMIS_NOM_WAVELENGTH_LSB]) * 0.05),
++				       "nm");
  	}
--	printf("]\n");
  }
  
- void module_show_oui(const __u8 *id, int id_offset)
- {
--	printf("\t%-41s : %02x:%02x:%02x\n", "Vendor OUI",
--		      id[id_offset], id[(id_offset) + 1],
--		      id[(id_offset) + 2]);
-+	char oui_value[16];
-+
-+	if (is_json_context()) {
-+		open_json_array("vendor_oui", "");
-+		print_int(PRINT_JSON, NULL, NULL, id[id_offset]);
-+		print_int(PRINT_JSON, NULL, NULL, id[(id_offset) + 1]);
-+		print_int(PRINT_JSON, NULL, NULL, id[(id_offset) + 2]);
-+		close_json_array("");
-+	} else {
-+		snprintf(oui_value, 16, "%02x:%02x:%02x", id[id_offset],
-+			 id[(id_offset) + 1], id[(id_offset) + 2]);
-+		printf("\t%-41s : %s\n", "Vendor OUI", oui_value);
-+	}
+@@ -314,6 +330,8 @@ static void cmis_show_vendor_info(const struct cmis_memory_map *map)
+ 				  CMIS_CLEI_END_OFFSET, "CLEI code");
  }
  
- void module_show_identifier(const __u8 *id, int id_offset)
- {
--	printf("\t%-41s : 0x%02x", "Identifier", id[id_offset]);
-+	char id_description[SFF_MAX_DESC_LEN];
++#define CMIS_MAX_DESC_LEN	64
 +
- 	switch (id[id_offset]) {
- 	case MODULE_ID_UNKNOWN:
--		printf(" (no module present, unknown, or unspecified)\n");
-+		strncpy(id_description,
-+			"no module present, unknown, or unspecified",
-+			SFF_MAX_DESC_LEN);
+ /* Print the current Module State. Relevant documents:
+  * [1] CMIS Rev. 5, pag. 57, section 6.3.2.2, Figure 6-3
+  * [2] CMIS Rev. 5, pag. 60, section 6.3.2.3, Figure 6-4
+@@ -321,31 +339,40 @@ static void cmis_show_vendor_info(const struct cmis_memory_map *map)
+  */
+ static void cmis_show_mod_state(const struct cmis_memory_map *map)
+ {
++	char mod_state_description[CMIS_MAX_DESC_LEN];
+ 	__u8 mod_state;
+ 
+ 	mod_state = (map->lower_memory[CMIS_MODULE_STATE_OFFSET] &
+ 		     CMIS_MODULE_STATE_MASK) >> 1;
+-	printf("\t%-41s : 0x%02x", "Module State", mod_state);
+ 	switch (mod_state) {
+ 	case CMIS_MODULE_STATE_MODULE_LOW_PWR:
+-		printf(" (ModuleLowPwr)\n");
++		strncpy(mod_state_description, "ModuleLowPwr",
++			CMIS_MAX_DESC_LEN);
  		break;
- 	case MODULE_ID_GBIC:
--		printf(" (GBIC)\n");
-+		strncpy(id_description, "GBIC", SFF_MAX_DESC_LEN);
+ 	case CMIS_MODULE_STATE_MODULE_PWR_UP:
+-		printf(" (ModulePwrUp)\n");
++		strncpy(mod_state_description, "ModulePwrUp",
++			CMIS_MAX_DESC_LEN);
  		break;
- 	case MODULE_ID_SOLDERED_MODULE:
--		printf(" (module soldered to motherboard)\n");
-+		strncpy(id_description,
-+			"module soldered to motherboard", SFF_MAX_DESC_LEN);
+ 	case CMIS_MODULE_STATE_MODULE_READY:
+-		printf(" (ModuleReady)\n");
++		strncpy(mod_state_description, "ModuleReady",
++			CMIS_MAX_DESC_LEN);
  		break;
- 	case MODULE_ID_SFP:
--		printf(" (SFP)\n");
-+		strncpy(id_description, "SFP", SFF_MAX_DESC_LEN);
+ 	case CMIS_MODULE_STATE_MODULE_PWR_DN:
+-		printf(" (ModulePwrDn)\n");
++		strncpy(mod_state_description, "ModulePwrDn",
++			CMIS_MAX_DESC_LEN);
  		break;
- 	case MODULE_ID_300_PIN_XBI:
--		printf(" (300 pin XBI)\n");
-+		strncpy(id_description, "300 pin XBI", SFF_MAX_DESC_LEN);
- 		break;
- 	case MODULE_ID_XENPAK:
--		printf(" (XENPAK)\n");
-+		strncpy(id_description, "XENPAK", SFF_MAX_DESC_LEN);
- 		break;
- 	case MODULE_ID_XFP:
--		printf(" (XFP)\n");
-+		strncpy(id_description, "XFP", SFF_MAX_DESC_LEN);
- 		break;
- 	case MODULE_ID_XFF:
--		printf(" (XFF)\n");
-+		strncpy(id_description, "XFF", SFF_MAX_DESC_LEN);
- 		break;
- 	case MODULE_ID_XFP_E:
--		printf(" (XFP-E)\n");
-+		strncpy(id_description, "XFP-E", SFF_MAX_DESC_LEN);
- 		break;
- 	case MODULE_ID_XPAK:
--		printf(" (XPAK)\n");
-+		strncpy(id_description, "XPAK", SFF_MAX_DESC_LEN);
- 		break;
- 	case MODULE_ID_X2:
--		printf(" (X2)\n");
-+		strncpy(id_description, "X2", SFF_MAX_DESC_LEN);
- 		break;
- 	case MODULE_ID_DWDM_SFP:
--		printf(" (DWDM-SFP)\n");
-+		strncpy(id_description, "DWDM-SFP", SFF_MAX_DESC_LEN);
- 		break;
- 	case MODULE_ID_QSFP:
--		printf(" (QSFP)\n");
-+		strncpy(id_description, "QSFP", SFF_MAX_DESC_LEN);
- 		break;
- 	case MODULE_ID_QSFP_PLUS:
--		printf(" (QSFP+)\n");
-+		strncpy(id_description, "QSFP+", SFF_MAX_DESC_LEN);
- 		break;
- 	case MODULE_ID_CXP:
--		printf(" (CXP)\n");
-+		strncpy(id_description, "CXP", SFF_MAX_DESC_LEN);
- 		break;
- 	case MODULE_ID_HD4X:
--		printf(" (Shielded Mini Multilane HD 4X)\n");
-+		strncpy(id_description, "Shielded Mini Multilane HD 4X",
-+			SFF_MAX_DESC_LEN);
- 		break;
- 	case MODULE_ID_HD8X:
--		printf(" (Shielded Mini Multilane HD 8X)\n");
-+		strncpy(id_description, "Shielded Mini Multilane HD 8X",
-+			SFF_MAX_DESC_LEN);
- 		break;
- 	case MODULE_ID_QSFP28:
--		printf(" (QSFP28)\n");
-+		strncpy(id_description, "QSFP28", SFF_MAX_DESC_LEN);
- 		break;
- 	case MODULE_ID_CXP2:
--		printf(" (CXP2/CXP28)\n");
-+		strncpy(id_description, "CXP2/CXP28", SFF_MAX_DESC_LEN);
- 		break;
- 	case MODULE_ID_CDFP:
--		printf(" (CDFP Style 1/Style 2)\n");
-+		strncpy(id_description, "CDFP Style 1/Style 2",
-+			SFF_MAX_DESC_LEN);
- 		break;
- 	case MODULE_ID_HD4X_FANOUT:
--		printf(" (Shielded Mini Multilane HD 4X Fanout Cable)\n");
-+		strncpy(id_description,
-+			"Shielded Mini Multilane HD 4X Fanout Cable",
-+			SFF_MAX_DESC_LEN);
- 		break;
- 	case MODULE_ID_HD8X_FANOUT:
--		printf(" (Shielded Mini Multilane HD 8X Fanout Cable)\n");
-+		strncpy(id_description,
-+			"Shielded Mini Multilane HD 8X Fanout Cable",
-+			SFF_MAX_DESC_LEN);
- 		break;
- 	case MODULE_ID_CDFP_S3:
--		printf(" (CDFP Style 3)\n");
-+		strncpy(id_description, "CDFP Style 3", SFF_MAX_DESC_LEN);
- 		break;
- 	case MODULE_ID_MICRO_QSFP:
--		printf(" (microQSFP)\n");
-+		strncpy(id_description, "microQSFP", SFF_MAX_DESC_LEN);
- 		break;
- 	case MODULE_ID_QSFP_DD:
--		printf(" (QSFP-DD Double Density 8X Pluggable Transceiver (INF-8628))\n");
-+		strncpy(id_description,
-+			"QSFP-DD Double Density 8X Pluggable Transceiver (INF-8628)",
-+			SFF_MAX_DESC_LEN);
- 		break;
- 	case MODULE_ID_OSFP:
--		printf(" (OSFP 8X Pluggable Transceiver)\n");
-+		strncpy(id_description, "OSFP 8X Pluggable Transceiver",
-+			SFF_MAX_DESC_LEN);
- 		break;
- 	case MODULE_ID_DSFP:
--		printf(" (DSFP Dual Small Form Factor Pluggable Transceiver)\n");
-+		strncpy(id_description,
-+			"DSFP Dual Small Form Factor Pluggable Transceiver",
-+			SFF_MAX_DESC_LEN);
- 		break;
- 	case MODULE_ID_QSFP_PLUS_CMIS:
--		printf(" (QSFP+ or later with Common Management Interface Specification (CMIS))\n");
-+		strncpy(id_description,
-+			"QSFP+ or later with Common Management Interface Specification (CMIS)",
-+			SFF_MAX_DESC_LEN);
- 		break;
- 	case MODULE_ID_SFP_DD_CMIS:
--		printf(" (SFP-DD Double Density 2X Pluggable Transceiver with Common Management Interface Specification (CMIS))\n");
-+		strncpy(id_description,
-+			"SFP-DD Double Density 2X Pluggable Transceiver with Common Management Interface Specification (CMIS)",
-+			SFF_MAX_DESC_LEN);
- 		break;
- 	case MODULE_ID_SFP_PLUS_CMIS:
--		printf(" (SFP+ and later with Common Management Interface Specification (CMIS))\n");
-+		strncpy(id_description,
-+			"SFP+ and later with Common Management Interface Specification (CMIS)",
-+			SFF_MAX_DESC_LEN);
+ 	case CMIS_MODULE_STATE_MODULE_FAULT:
+-		printf(" (ModuleFault)\n");
++		strncpy(mod_state_description, "ModuleFault",
++			CMIS_MAX_DESC_LEN);
  		break;
  	default:
 -		printf(" (reserved or unknown)\n");
-+		strncpy(id_description, "reserved or unknown",
-+			SFF_MAX_DESC_LEN);
++		strncpy(mod_state_description, "reserved or unknown",
++			CMIS_MAX_DESC_LEN);
  		break;
  	}
 +
-+	sff_print_any_hex_field("Identifier", "identifier", id[id_offset],
-+				id_description);
++	sff_print_any_hex_field("Module state", "module_state",
++				mod_state, mod_state_description);
  }
  
- void module_show_connector(const __u8 *id, int ctor_offset)
+ /* Print the Module Fault Information. Relevant documents:
+@@ -354,6 +381,7 @@ static void cmis_show_mod_state(const struct cmis_memory_map *map)
+  */
+ static void cmis_show_mod_fault_cause(const struct cmis_memory_map *map)
  {
--	printf("\t%-41s : 0x%02x", "Connector", id[ctor_offset]);
-+	char ctor_description[SFF_MAX_DESC_LEN];
-+
- 	switch (id[ctor_offset]) {
- 	case  MODULE_CTOR_UNKNOWN:
--		printf(" (unknown or unspecified)\n");
-+		strncpy(ctor_description, "unknown or unspecified",
-+			SFF_MAX_DESC_LEN);
++	char fault_cause_description[CMIS_MAX_DESC_LEN];
+ 	__u8 mod_state, fault_cause;
+ 
+ 	mod_state = (map->lower_memory[CMIS_MODULE_STATE_OFFSET] &
+@@ -362,24 +390,31 @@ static void cmis_show_mod_fault_cause(const struct cmis_memory_map *map)
+ 		return;
+ 
+ 	fault_cause = map->lower_memory[CMIS_MODULE_FAULT_OFFSET];
+-	printf("\t%-41s : 0x%02x", "Module Fault Cause", fault_cause);
+ 	switch (fault_cause) {
+ 	case CMIS_MODULE_FAULT_NO_FAULT:
+-		printf(" (No fault detected / not supported)\n");
++		strncpy(fault_cause_description,
++			"No fault detected / not supported", CMIS_MAX_DESC_LEN);
  		break;
- 	case MODULE_CTOR_SC:
--		printf(" (SC)\n");
-+		strncpy(ctor_description, "SC", SFF_MAX_DESC_LEN);
+ 	case CMIS_MODULE_FAULT_TEC_RUNAWAY:
+-		printf(" (TEC runaway)\n");
++		strncpy(fault_cause_description, "TEC runaway",
++			CMIS_MAX_DESC_LEN);
  		break;
- 	case MODULE_CTOR_FC_STYLE_1:
--		printf(" (Fibre Channel Style 1 copper)\n");
-+		strncpy(ctor_description, "Fibre Channel Style 1 copper",
-+			SFF_MAX_DESC_LEN);
+ 	case CMIS_MODULE_FAULT_DATA_MEM_CORRUPTED:
+-		printf(" (Data memory corrupted)\n");
++		strncpy(fault_cause_description, "Data memory corrupted",
++			CMIS_MAX_DESC_LEN);
  		break;
- 	case MODULE_CTOR_FC_STYLE_2:
--		printf(" (Fibre Channel Style 2 copper)\n");
-+		strncpy(ctor_description, "Fibre Channel Style 2 copper",
-+			SFF_MAX_DESC_LEN);
- 		break;
- 	case MODULE_CTOR_BNC_TNC:
--		printf(" (BNC/TNC)\n");
-+		strncpy(ctor_description, "BNC/TNC", SFF_MAX_DESC_LEN);
- 		break;
- 	case MODULE_CTOR_FC_COAX:
--		printf(" (Fibre Channel coaxial headers)\n");
-+		strncpy(ctor_description, "Fibre Channel coaxial headers",
-+			SFF_MAX_DESC_LEN);
- 		break;
- 	case MODULE_CTOR_FIBER_JACK:
--		printf(" (FibreJack)\n");
-+		strncpy(ctor_description, "FibreJack", SFF_MAX_DESC_LEN);
- 		break;
- 	case MODULE_CTOR_LC:
--		printf(" (LC)\n");
-+		strncpy(ctor_description, "LC", SFF_MAX_DESC_LEN);
- 		break;
- 	case MODULE_CTOR_MT_RJ:
--		printf(" (MT-RJ)\n");
-+		strncpy(ctor_description, "MT-RJ", SFF_MAX_DESC_LEN);
- 		break;
- 	case MODULE_CTOR_MU:
--		printf(" (MU)\n");
-+		strncpy(ctor_description, "MU", SFF_MAX_DESC_LEN);
- 		break;
- 	case MODULE_CTOR_SG:
--		printf(" (SG)\n");
-+		strncpy(ctor_description, "SG", SFF_MAX_DESC_LEN);
- 		break;
- 	case MODULE_CTOR_OPT_PT:
--		printf(" (Optical pigtail)\n");
-+		strncpy(ctor_description, "Optical pigtail",
-+			SFF_MAX_DESC_LEN);
- 		break;
- 	case MODULE_CTOR_MPO:
--		printf(" (MPO Parallel Optic)\n");
-+		strncpy(ctor_description, "MPO Parallel Optic",
-+			SFF_MAX_DESC_LEN);
- 		break;
- 	case MODULE_CTOR_MPO_2:
--		printf(" (MPO Parallel Optic - 2x16)\n");
-+		strncpy(ctor_description, "MPO Parallel Optic - 2x16",
-+			SFF_MAX_DESC_LEN);
- 		break;
- 	case MODULE_CTOR_HSDC_II:
--		printf(" (HSSDC II)\n");
-+		strncpy(ctor_description, "HSSDC II", SFF_MAX_DESC_LEN);
- 		break;
- 	case MODULE_CTOR_COPPER_PT:
--		printf(" (Copper pigtail)\n");
-+		strncpy(ctor_description, "Copper pigtail",
-+			SFF_MAX_DESC_LEN);
- 		break;
- 	case MODULE_CTOR_RJ45:
--		printf(" (RJ45)\n");
-+		strncpy(ctor_description, "RJ45", SFF_MAX_DESC_LEN);
- 		break;
- 	case MODULE_CTOR_NO_SEPARABLE:
--		printf(" (No separable connector)\n");
-+		strncpy(ctor_description, "No separable connector",
-+			SFF_MAX_DESC_LEN);
- 		break;
- 	case MODULE_CTOR_MXC_2x16:
--		printf(" (MXC 2x16)\n");
-+		strncpy(ctor_description, "MXC 2x16", SFF_MAX_DESC_LEN);
- 		break;
- 	case MODULE_CTOR_CS_OPTICAL:
--		printf(" (CS optical connector)\n");
-+		strncpy(ctor_description, "CS optical connector",
-+			SFF_MAX_DESC_LEN);
- 		break;
- 	case MODULE_CTOR_CS_OPTICAL_MINI:
--		printf(" (Mini CS optical connector)\n");
-+		strncpy(ctor_description, "Mini CS optical connector",
-+			SFF_MAX_DESC_LEN);
- 		break;
- 	case MODULE_CTOR_MPO_2X12:
--		printf(" (MPO 2x12)\n");
-+		strncpy(ctor_description, "MPO 2x12", SFF_MAX_DESC_LEN);
- 		break;
- 	case MODULE_CTOR_MPO_1X16:
--		printf(" (MPO 1x16)\n");
-+		strncpy(ctor_description, "MPO 1x16", SFF_MAX_DESC_LEN);
+ 	case CMIS_MODULE_FAULT_PROG_MEM_CORRUPTED:
+-		printf(" (Program memory corrupted)\n");
++		strncpy(fault_cause_description, "Program memory corrupted",
++			CMIS_MAX_DESC_LEN);
  		break;
  	default:
 -		printf(" (reserved or unknown)\n");
-+		strncpy(ctor_description, "reserved or unknown",
-+			SFF_MAX_DESC_LEN);
++		strncpy(fault_cause_description, "reserved or unknown",
++			CMIS_MAX_DESC_LEN);
  		break;
  	}
 +
-+	sff_print_any_hex_field("Connector", "connector", id[ctor_offset],
-+				ctor_description);
++	sff_print_any_hex_field("Module Fault Cause", "module_fault_cause",
++				fault_cause, fault_cause_description);
  }
  
- void module_show_mit_compliance(u16 value)
+ /* Print the current Module-Level Controls. Relevant documents:
+@@ -388,12 +423,17 @@ static void cmis_show_mod_fault_cause(const struct cmis_memory_map *map)
+  */
+ static void cmis_show_mod_lvl_controls(const struct cmis_memory_map *map)
  {
--	static const char *cc = " (Copper cable,";
+-	printf("\t%-41s : ", "LowPwrAllowRequestHW");
+-	printf("%s\n", ONOFF(map->lower_memory[CMIS_MODULE_CONTROL_OFFSET] &
+-			     CMIS_LOW_PWR_ALLOW_REQUEST_HW_MASK));
+-	printf("\t%-41s : ", "LowPwrRequestSW");
+-	printf("%s\n", ONOFF(map->lower_memory[CMIS_MODULE_CONTROL_OFFSET] &
+-			     CMIS_LOW_PWR_REQUEST_SW_MASK));
++	bool value;
++
++	value = map->lower_memory[CMIS_MODULE_CONTROL_OFFSET] &
++		CMIS_LOW_PWR_ALLOW_REQUEST_HW_MASK;
++	module_print_any_bool("LowPwrAllowRequestHW", "low_pwr_allow_request_hw",
++			      value, ONOFF(value));
++
++	value = map->lower_memory[CMIS_MODULE_CONTROL_OFFSET] &
++		CMIS_LOW_PWR_REQUEST_SW_MASK;
++	module_print_any_bool("LowPwrRequestSW", "low_pwr_request_sw", value,
++			      ONOFF(value));
+ }
+ 
+ static void cmis_parse_dom_power_type(const struct cmis_memory_map *map,
+@@ -557,14 +597,25 @@ cmis_show_dom_chan_lvl_tx_bias_bank(const struct cmis_memory_map *map,
+ 	if (!page_11h)
+ 		return;
+ 
++	open_json_array("laser_tx_bias_current", "");
++
+ 	for (i = 0; i < CMIS_CHANNELS_PER_BANK; i++) {
+ 		int chan = bank * CMIS_CHANNELS_PER_BANK + i;
+ 		char fmt_str[80];
+ 
+-		snprintf(fmt_str, 80, "%s (Channel %d)",
+-			 "Laser tx bias current", chan + 1);
+-		PRINT_BIAS(fmt_str, sd->scd[chan].bias_cur);
++		if (is_json_context()) {
++			print_float(PRINT_JSON, NULL, "%.3f",
++				    (double)sd->scd[chan].bias_cur / 500.);
++		} else {
++			snprintf(fmt_str, 80, "%s (Channel %d)",
++				 "Laser tx bias current", chan + 1);
++			PRINT_BIAS(fmt_str, sd->scd[chan].bias_cur);
++		}
+ 	}
++	close_json_array("");
++
++	if (is_json_context())
++		module_print_any_units("laser_tx_bias_current", "mA");
+ }
+ 
+ static void cmis_show_dom_chan_lvl_tx_bias(const struct cmis_memory_map *map,
+@@ -593,14 +644,25 @@ cmis_show_dom_chan_lvl_tx_power_bank(const struct cmis_memory_map *map,
+ 	if (!page_11h)
+ 		return;
+ 
++	open_json_array("transmit_avg_optical_power", "");
++
+ 	for (i = 0; i < CMIS_CHANNELS_PER_BANK; i++) {
+ 		int chan = bank * CMIS_CHANNELS_PER_BANK + i;
+ 		char fmt_str[80];
+ 
+-		snprintf(fmt_str, 80, "%s (Channel %d)",
+-			 "Transmit avg optical power", chan + 1);
+-		PRINT_xX_PWR(fmt_str, sd->scd[chan].tx_power);
++		if (is_json_context()) {
++			print_float(PRINT_JSON, NULL, "%.4f",
++				    (double)sd->scd[chan].tx_power / 10000.);
++		} else {
++			snprintf(fmt_str, 80, "%s (Channel %d)",
++				 "Transmit avg optical power", chan + 1);
++			PRINT_xX_PWR(fmt_str, sd->scd[chan].tx_power);
++		}
+ 	}
++	close_json_array("");
++
++	if (is_json_context())
++		module_print_any_units("transmit_avg_optical_power", "mW");
+ }
+ 
+ static void cmis_show_dom_chan_lvl_tx_power(const struct cmis_memory_map *map,
+@@ -623,25 +685,39 @@ cmis_show_dom_chan_lvl_rx_power_bank(const struct cmis_memory_map *map,
+ 				     const struct sff_diags *sd, int bank)
+ {
+ 	const __u8 *page_11h = map->upper_memory[bank][0x11];
++	char *rx_power_str;
+ 	int i;
+ 
+ 	if (!page_11h)
+ 		return;
+ 
++	if (!sd->rx_power_type)
++		rx_power_str = "Receiver signal OMA";
++	else
++		rx_power_str = "Rcvr signal avg optical power";
++
++	char rx_power_json_str[strlen(rx_power_str)];
++
++	convert_json_field_name(rx_power_str, rx_power_json_str);
++	open_json_array(rx_power_json_str, "");
++
+ 	for (i = 0; i < CMIS_CHANNELS_PER_BANK; i++) {
+ 		int chan = bank * CMIS_CHANNELS_PER_BANK + i;
+-		char *rx_power_str;
+ 		char fmt_str[80];
+ 
+-		if (!sd->rx_power_type)
+-			rx_power_str = "Receiver signal OMA";
+-		else
+-			rx_power_str = "Rcvr signal avg optical power";
 -
--	printf("\t%-41s : 0x%02x", "Transmitter technology", value);
-+	static const char *cc = "Copper cable,";
-+	char description[SFF_MAX_DESC_LEN];
- 
- 	switch (value) {
- 	case MODULE_850_VCSEL:
--		printf(" (850 nm VCSEL)\n");
-+		strncpy(description, "850 nm VCSEL", SFF_MAX_DESC_LEN);
- 		break;
- 	case CMIS_1310_VCSEL:
- 	case SFF8636_TRANS_1310_VCSEL:
--		printf(" (1310 nm VCSEL)\n");
-+		strncpy(description, "1310 nm VCSEL", SFF_MAX_DESC_LEN);
- 		break;
- 	case CMIS_1550_VCSEL:
- 	case SFF8636_TRANS_1550_VCSEL:
--		printf(" (1550 nm VCSEL)\n");
-+		strncpy(description, "1550 nm VCSEL", SFF_MAX_DESC_LEN);
- 		break;
- 	case CMIS_1310_FP:
- 	case SFF8636_TRANS_1310_FP:
--		printf(" (1310 nm FP)\n");
-+		strncpy(description, "1310 nm FP", SFF_MAX_DESC_LEN);
- 		break;
- 	case CMIS_1310_DFB:
- 	case SFF8636_TRANS_1310_DFB:
--		printf(" (1310 nm DFB)\n");
-+		strncpy(description, "1310 nm DFB", SFF_MAX_DESC_LEN);
- 		break;
- 	case CMIS_1550_DFB:
- 	case SFF8636_TRANS_1550_DFB:
--		printf(" (1550 nm DFB)\n");
-+		strncpy(description, "1550 nm DFB", SFF_MAX_DESC_LEN);
- 		break;
- 	case CMIS_1310_EML:
- 	case SFF8636_TRANS_1310_EML:
--		printf(" (1310 nm EML)\n");
-+		strncpy(description, "1310 nm EML", SFF_MAX_DESC_LEN);
- 		break;
- 	case CMIS_1550_EML:
- 	case SFF8636_TRANS_1550_EML:
--		printf(" (1550 nm EML)\n");
-+		strncpy(description, "1550 nm EML", SFF_MAX_DESC_LEN);
- 		break;
- 	case CMIS_OTHERS:
- 	case SFF8636_TRANS_OTHERS:
--		printf(" (Others/Undefined)\n");
-+		strncpy(description, "Others/Undefined", SFF_MAX_DESC_LEN);
- 		break;
- 	case CMIS_1490_DFB:
- 	case SFF8636_TRANS_1490_DFB:
--		printf(" (1490 nm DFB)\n");
-+		strncpy(description, "1490 nm DFB", SFF_MAX_DESC_LEN);
- 		break;
- 	case CMIS_COPPER_UNEQUAL:
- 	case SFF8636_TRANS_COPPER_PAS_UNEQUAL:
--		printf("%s unequalized)\n", cc);
-+		snprintf(description, SFF_MAX_DESC_LEN, "%s unequalized", cc);
- 		break;
- 	case CMIS_COPPER_PASS_EQUAL:
- 	case SFF8636_TRANS_COPPER_PAS_EQUAL:
--		printf("%s passive equalized)\n", cc);
-+		snprintf(description, SFF_MAX_DESC_LEN, "%s passive equalized",
-+			 cc);
- 		break;
- 	case CMIS_COPPER_NF_EQUAL:
- 	case SFF8636_TRANS_COPPER_LNR_FAR_EQUAL:
--		printf("%s near and far end limiting active equalizers)\n", cc);
-+		snprintf(description, SFF_MAX_DESC_LEN,
-+			 "%s near and far end limiting active equalizers", cc);
- 		break;
- 	case CMIS_COPPER_F_EQUAL:
- 	case SFF8636_TRANS_COPPER_FAR_EQUAL:
--		printf("%s far end limiting active equalizers)\n", cc);
-+		snprintf(description, SFF_MAX_DESC_LEN,
-+			 "%s far end limiting active equalizers", cc);
- 		break;
- 	case CMIS_COPPER_N_EQUAL:
- 	case SFF8636_TRANS_COPPER_NEAR_EQUAL:
--		printf("%s near end limiting active equalizers)\n", cc);
-+		snprintf(description, SFF_MAX_DESC_LEN,
-+			 "%s near end limiting active equalizers", cc);
- 		break;
- 	case CMIS_COPPER_LINEAR_EQUAL:
- 	case SFF8636_TRANS_COPPER_LNR_EQUAL:
--		printf("%s linear active equalizers)\n", cc);
-+		snprintf(description, SFF_MAX_DESC_LEN, "%s linear active equalizers",
-+			 cc);
- 		break;
- 	}
-+
-+	sff_print_any_hex_field("Transmitter technology",
-+				"transmitter_technology", value, description);
- }
- 
- void module_show_dom_mod_lvl_monitors(const struct sff_diags *sd)
- {
--	PRINT_TEMP("Module temperature", sd->sfp_temp[MCURR]);
--	PRINT_VCC("Module voltage", sd->sfp_voltage[MCURR]);
-+	PRINT_TEMP_ALL("Module temperature", "module_temperature",
-+		       sd->sfp_temp[MCURR]);
-+	print_string(PRINT_JSON, "module_temperature_units", "%s", "degrees C");
-+
-+
-+	PRINT_VCC_ALL("Module voltage", "module_voltage",
-+		      sd->sfp_voltage[MCURR]);
-+	print_string(PRINT_JSON, "module_voltage_units", "%s", "V");
- }
-diff --git a/module-common.h b/module-common.h
-index 8c34779..9c0adbb 100644
---- a/module-common.h
-+++ b/module-common.h
-@@ -264,6 +264,13 @@ struct module_aw_chan {
- extern const struct module_aw_mod module_aw_mod_flags[];
- extern const struct module_aw_chan module_aw_chan_flags[];
- 
-+void convert_json_field_name(const char *str, char *json_str);
-+void module_print_any_units(const char *json_fn, const char *unit);
-+void module_print_any_uint(const char *fn, int value, const char *unit);
-+void module_print_any_string(const char *fn, const char *value);
-+void module_print_any_float(const char *fn, float value, const char *unit);
-+void module_print_any_bool(const char *fn, char *given_json_fn, bool value,
-+			   const char *str_value);
- void module_show_value_with_unit(const __u8 *id, unsigned int reg,
- 				 const char *name, unsigned int mult,
- 				 const char *unit);
-diff --git a/sff-common.c b/sff-common.c
-index e2f2463..fb3945c 100644
---- a/sff-common.c
-+++ b/sff-common.c
-@@ -29,50 +29,120 @@ double convert_mw_to_dbm(double mw)
- 	return (10. * log10(mw / 1000.)) + 30.;
- }
- 
-+void sff_print_any_hex_field(const char *field_name,
-+			     const char *json_field_name, u8 value,
-+			     const char *desc)
-+{
-+	char desc_name[SFF_MAX_FIELD_LEN];
-+
-+	if (is_json_context()) {
-+		print_int(PRINT_JSON, json_field_name, "0x%02x", value);
-+		if (desc) {
-+			snprintf(desc_name, SFF_MAX_FIELD_LEN,
-+				 "%s_description", json_field_name);
-+			print_string(PRINT_JSON, desc_name, "%s", desc);
+-		snprintf(fmt_str, 80, "%s (Channel %d)", rx_power_str,
+-			 chan + 1);
+-		PRINT_xX_PWR(fmt_str, sd->scd[chan].rx_power);
++		if (is_json_context()) {
++			print_float(PRINT_JSON, NULL, "%.4f",
++				    (double)sd->scd[chan].rx_power / 10000.);
++		} else {
++			snprintf(fmt_str, 80, "%s (Channel %d)", rx_power_str,
++				 chan + 1);
++			PRINT_xX_PWR(fmt_str, sd->scd[chan].rx_power);
 +		}
-+	} else {
-+		printf("\t%-41s : 0x%02x", field_name, value);
-+		if (desc)
-+			printf(" (%s)", desc);
-+		print_nl();
-+	}
-+}
-+
- void sff8024_show_encoding(const __u8 *id, int encoding_offset, int sff_type)
- {
--	printf("\t%-41s : 0x%02x", "Encoding", id[encoding_offset]);
-+	char encoding_desc[64];
-+
- 	switch (id[encoding_offset]) {
- 	case SFF8024_ENCODING_UNSPEC:
--		printf(" (unspecified)\n");
-+		strncpy(encoding_desc, "unspecified", 64);
- 		break;
- 	case SFF8024_ENCODING_8B10B:
--		printf(" (8B/10B)\n");
-+		strncpy(encoding_desc, "8B/10B", 64);
- 		break;
- 	case SFF8024_ENCODING_4B5B:
--		printf(" (4B/5B)\n");
-+		strncpy(encoding_desc, "4B/5B", 64);
- 		break;
- 	case SFF8024_ENCODING_NRZ:
--		printf(" (NRZ)\n");
-+		strncpy(encoding_desc, "NRZ", 64);
- 		break;
- 	case SFF8024_ENCODING_4h:
- 		if (sff_type == ETH_MODULE_SFF_8472)
--			printf(" (Manchester)\n");
-+			strncpy(encoding_desc, "Manchester", 64);
- 		else if (sff_type == ETH_MODULE_SFF_8636)
--			printf(" (SONET Scrambled)\n");
-+			strncpy(encoding_desc, "SONET Scrambled", 64);
- 		break;
- 	case SFF8024_ENCODING_5h:
- 		if (sff_type == ETH_MODULE_SFF_8472)
--			printf(" (SONET Scrambled)\n");
-+			strncpy(encoding_desc, "SONET Scrambled", 64);
- 		else if (sff_type == ETH_MODULE_SFF_8636)
--			printf(" (64B/66B)\n");
-+			strncpy(encoding_desc, "64B/66B", 64);
- 		break;
- 	case SFF8024_ENCODING_6h:
- 		if (sff_type == ETH_MODULE_SFF_8472)
--			printf(" (64B/66B)\n");
-+			strncpy(encoding_desc, "64B/66B", 64);
- 		else if (sff_type == ETH_MODULE_SFF_8636)
--			printf(" (Manchester)\n");
-+			strncpy(encoding_desc, "Manchester", 64);
- 		break;
- 	case SFF8024_ENCODING_256B:
--		printf(" ((256B/257B (transcoded FEC-enabled data))\n");
-+		strncpy(encoding_desc,
-+			"256B/257B (transcoded FEC-enabled data)", 64);
- 		break;
- 	case SFF8024_ENCODING_PAM4:
--		printf(" (PAM4)\n");
-+		strncpy(encoding_desc, "PAM4", 64);
- 		break;
- 	default:
--		printf(" (reserved or unknown)\n");
-+		strncpy(encoding_desc, "reserved or unknown", 64);
- 		break;
  	}
++	close_json_array("");
 +
-+	sff_print_any_hex_field("Encoding", "encoding", id[encoding_offset],
-+				encoding_desc);
-+}
-+
-+
-+void sff_show_thresholds_json(struct sff_diags sd)
-+{
-+	open_json_object("laser_bias_current");
-+	PRINT_BIAS_JSON("high_alarm_threshold", sd.bias_cur[HALRM]);
-+	PRINT_BIAS_JSON("low_alarm_threshold", sd.bias_cur[LALRM]);
-+	PRINT_BIAS_JSON("high_warning_threshold", sd.bias_cur[HWARN]);
-+	PRINT_BIAS_JSON("low_warning_threshold", sd.bias_cur[LWARN]);
-+	print_string(PRINT_JSON, "units", "%s", "mA");
-+	close_json_object();
-+
-+	open_json_object("laser_output_power");
-+	PRINT_xX_PWR_JSON("high_alarm_threshold", sd.tx_power[HALRM]);
-+	PRINT_xX_PWR_JSON("low_alarm_threshold", sd.tx_power[LALRM]);
-+	PRINT_xX_PWR_JSON("high_warning_threshold", sd.tx_power[HWARN]);
-+	PRINT_xX_PWR_JSON("low_warning_threshold", sd.tx_power[LWARN]);
-+	print_string(PRINT_JSON, "units", "%s", "mW");
-+	close_json_object();
-+
-+	open_json_object("module_temperature");
-+	PRINT_TEMP_JSON("high_alarm_threshold", sd.sfp_temp[HALRM]);
-+	PRINT_TEMP_JSON("low_alarm_threshold", sd.sfp_temp[LALRM]);
-+	PRINT_TEMP_JSON("high_warning_threshold", sd.sfp_temp[HWARN]);
-+	PRINT_TEMP_JSON("low_warning_threshold", sd.sfp_temp[LWARN]);
-+	print_string(PRINT_JSON, "units", "%s", "degrees C");
-+	close_json_object();
-+
-+	open_json_object("module_voltage");
-+	PRINT_VCC_JSON("high_alarm_threshold", sd.sfp_voltage[HALRM]);
-+	PRINT_VCC_JSON("low_alarm_threshold", sd.sfp_voltage[LALRM]);
-+	PRINT_VCC_JSON("high_warning_threshold", sd.sfp_voltage[HWARN]);
-+	PRINT_VCC_JSON("low_warning_threshold", sd.sfp_voltage[LWARN]);
-+	print_string(PRINT_JSON, "units", "%s", "V");
-+	close_json_object();
-+
-+	open_json_object("laser_rx_power");
-+	PRINT_xX_PWR_JSON("high_alarm_threshold", sd.rx_power[HALRM]);
-+	PRINT_xX_PWR_JSON("low_alarm_threshold", sd.rx_power[LALRM]);
-+	PRINT_xX_PWR_JSON("high_warning_threshold", sd.rx_power[HWARN]);
-+	PRINT_xX_PWR_JSON("low_warning_threshold", sd.rx_power[LWARN]);
-+	print_string(PRINT_JSON, "units", "%s", "mW");
-+	close_json_object();
++	if (is_json_context())
++		module_print_any_units(rx_power_json_str, "mW");
  }
  
- void sff_show_thresholds(struct sff_diags sd)
-diff --git a/sff-common.h b/sff-common.h
-index 161860c..3c02a69 100644
---- a/sff-common.h
-+++ b/sff-common.h
-@@ -26,6 +26,9 @@
- #include <stdio.h>
- #include "internal.h"
+ static void cmis_show_dom_chan_lvl_rx_power(const struct cmis_memory_map *map,
+@@ -672,10 +748,13 @@ static void cmis_show_dom_mod_lvl_flags(const struct cmis_memory_map *map)
+ 	int i;
  
-+#define SFF_MAX_DESC_LEN   120
-+#define SFF_MAX_FIELD_LEN  64
+ 	for (i = 0; module_aw_mod_flags[i].str; i++) {
+-		if (module_aw_mod_flags[i].type == MODULE_TYPE_CMIS)
+-			printf("\t%-41s : %s\n", module_aw_mod_flags[i].str,
+-			       map->lower_memory[module_aw_mod_flags[i].offset] &
+-			       module_aw_mod_flags[i].value ? "On" : "Off");
++		if (module_aw_mod_flags[i].type == MODULE_TYPE_CMIS) {
++			bool value = map->lower_memory[module_aw_mod_flags[i].offset] &
++					module_aw_mod_flags[i].value;
 +
- /* Revision compliance */
- #define  SFF8636_REV_UNSPECIFIED		0x00
- #define  SFF8636_REV_8436_48			0x01
-@@ -71,19 +74,53 @@
- 		      (double)((var) / 10000.),                           \
- 		       convert_mw_to_dbm((double)((var) / 10000.)))
++			module_print_any_bool(module_aw_mod_flags[i].str, NULL,
++					      value, ONOFF(value));
++		}
+ 	}
+ }
  
-+#define PRINT_xX_PWR_JSON(string, var)				\
-+		print_float(PRINT_JSON, string, "%.2f",		\
-+			    (double)((var) / 10000.))
+@@ -692,11 +771,16 @@ static void cmis_show_dom_chan_lvl_flag(const struct cmis_memory_map *map,
+ 	for (i = 0; i < CMIS_CHANNELS_PER_BANK; i++) {
+ 		int chan = bank * CMIS_CHANNELS_PER_BANK + i;
+ 		char str[80];
+-
+-		snprintf(str, 80, module_aw_chan_flags[flag].fmt_str, chan + 1);
+-		printf("\t%-41s : %s\n", str,
+-		       page_11h[module_aw_chan_flags[flag].offset] & chan ?
+-		       "On" : "Off");
++		bool value;
 +
-+#define PRINT_xX_PWR_ALL(string, json_string, var)		\
-+		is_json_context() ?				\
-+		PRINT_xX_PWR_JSON(json_string, var) :		\
-+		PRINT_xX_PWR(string, var)
-+
- #define PRINT_BIAS(string, bias_cur)                             \
- 		printf("\t%-41s : %.3f mA\n", (string),                       \
- 		      (double)(bias_cur / 500.))
++		value = page_11h[module_aw_chan_flags[flag].offset] & chan;
++		if (is_json_context()) {
++			print_bool(PRINT_JSON, NULL, NULL, value);
++		} else {
++			snprintf(str, 80, "%s (Chan %d)",
++				 module_aw_chan_flags[flag].fmt_str, chan + 1);
++			printf("\t%-41s : %s\n", str, ONOFF(value));
++		}
+ 	}
+ }
  
-+#define PRINT_BIAS_JSON(string, bias_cur)			\
-+		print_float(PRINT_JSON, string, "%.3f",		\
-+			    (double)(bias_cur / 500.))
-+
-+#define PRINT_BIAS_ALL(string, json_string, bias_cur)		\
-+		is_json_context() ?				\
-+		PRINT_BIAS_JSON(json_string, bias_cur) :	\
-+		PRINT_BIAS(string, bias_cur)
-+
- #define PRINT_TEMP(string, temp)                                   \
- 		printf("\t%-41s : %.2f degrees C / %.2f degrees F\n", \
- 		      (string), (double)(temp / 256.),                \
- 		      (double)(temp / 256. * 1.8 + 32.))
+@@ -711,11 +795,19 @@ cmis_show_dom_chan_lvl_flags_bank(const struct cmis_memory_map *map,
+ 		return;
  
-+#define PRINT_TEMP_JSON(string, temp)				\
-+		print_float(PRINT_JSON, string, "%.2f", (double)(temp / 256.))
+ 	for (flag = 0; module_aw_chan_flags[flag].fmt_str; flag++) {
+-		if (!(map->page_01h[module_aw_chan_flags[flag].adver_offset] &
+-		      module_aw_chan_flags[flag].adver_value))
+-			continue;
+-
+-		cmis_show_dom_chan_lvl_flag(map, bank, flag);
++		char json_str[80] = {};
 +
-+#define PRINT_TEMP_ALL(string, json_string, temp)		\
-+		is_json_context() ?				\
-+		PRINT_TEMP_JSON(json_string, temp) : PRINT_TEMP(string, temp)
++		if (module_aw_chan_flags[flag].type == MODULE_TYPE_CMIS) {
++			if (!(map->page_01h[module_aw_chan_flags[flag].adver_offset] &
++			   module_aw_chan_flags[flag].adver_value))
++				continue;
 +
- #define PRINT_VCC(string, sfp_voltage)          \
- 		printf("\t%-41s : %.4f V\n", (string),       \
- 		      (double)(sfp_voltage / 10000.))
++			convert_json_field_name(module_aw_chan_flags[flag].fmt_str,
++						json_str);
++			open_json_array(json_str, "");
++			cmis_show_dom_chan_lvl_flag(map, bank, flag);
++			close_json_array("");
++		}
+ 	}
+ }
  
-+#define PRINT_VCC_JSON(string, sfp_voltage)			\
-+		print_float(PRINT_JSON, string, "%.4f",		\
-+			    (double)(sfp_voltage / 10000.))
+@@ -745,8 +837,12 @@ static void cmis_show_dom(const struct cmis_memory_map *map)
+ 	cmis_show_dom_chan_lvl_monitors(map, &sd);
+ 	cmis_show_dom_mod_lvl_flags(map);
+ 	cmis_show_dom_chan_lvl_flags(map);
+-	if (sd.supports_alarms)
+-		sff_show_thresholds(sd);
++	if (sd.supports_alarms) {
++		if (is_json_context())
++			sff_show_thresholds_json(sd);
++		else
++			sff_show_thresholds(sd);
++	}
+ }
+ 
+ /* Print active and inactive firmware versions. Relevant documents:
+@@ -756,14 +852,24 @@ static void cmis_show_dom(const struct cmis_memory_map *map)
+ static void cmis_show_fw_version_common(const char *name, __u8 major,
+ 					__u8 minor)
+ {
++	char json_fn[32] = "";
 +
-+#define PRINT_VCC_ALL(string, json_string, sfp_voltage)		\
-+		is_json_context() ? 				\
-+		PRINT_VCC_JSON(json_string, sfp_voltage) :	\
-+		PRINT_VCC(string, sfp_voltage)
-+
- # define PRINT_xX_THRESH_PWR(string, var, index)                       \
- 		PRINT_xX_PWR(string, (var)[(index)])
+ 	if (major == 0 && minor == 0) {
+ 		return;
+ 	} else if (major == 0xFF && minor == 0xFF) {
+-		printf("\t%-41s : Invalid\n", name);
++		module_print_any_string(name, "Invalid");
+ 		return;
+ 	}
  
-@@ -129,7 +166,11 @@ struct sff_diags {
- };
+-	printf("\t%-41s : %d.%d\n", name, major, minor);
++	if (is_json_context()) {
++		convert_json_field_name(name, json_fn);
++		open_json_object(json_fn);
++		print_uint(PRINT_JSON, "major", "%u", major);
++		print_uint(PRINT_JSON, "minor", "%u", minor);
++		close_json_object();
++	} else {
++		printf("\t%-41s : %d.%d\n", name, major, minor);
++	}
+ }
  
- double convert_mw_to_dbm(double mw);
-+void sff_print_any_hex_field(const char *field_name,
-+			     const char *json_field_name, u8 value,
-+			     const char *desc);
- void sff_show_thresholds(struct sff_diags sd);
-+void sff_show_thresholds_json(struct sff_diags sd);
+ static void cmis_show_fw_active_version(const struct cmis_memory_map *map)
+@@ -811,7 +917,7 @@ static void cmis_show_cdb_instances(const struct cmis_memory_map *map)
+ {
+ 	__u8 cdb_instances = cmis_cdb_instances_get(map);
  
- void sff8024_show_encoding(const __u8 *id, int encoding_offset, int sff_type);
+-	printf("\t%-41s : %u\n", "CDB instances", cdb_instances);
++	module_print_any_uint("CDB instances", cdb_instances, NULL);
+ }
  
+ static void cmis_show_cdb_mode(const struct cmis_memory_map *map)
+@@ -819,8 +925,8 @@ static void cmis_show_cdb_mode(const struct cmis_memory_map *map)
+ 	__u8 mode = map->page_01h[CMIS_CDB_ADVER_OFFSET] &
+ 		    CMIS_CDB_ADVER_MODE_MASK;
+ 
+-	printf("\t%-41s : %s\n", "CDB background mode",
+-	       mode ? "Supported" : "Not supported");
++	module_print_any_string("CDB background mode",
++			        mode ? "Supported" : "Not supported");
+ }
+ 
+ static void cmis_show_cdb_epl_pages(const struct cmis_memory_map *map)
+@@ -828,7 +934,7 @@ static void cmis_show_cdb_epl_pages(const struct cmis_memory_map *map)
+ 	__u8 epl_pages = map->page_01h[CMIS_CDB_ADVER_OFFSET] &
+ 			 CMIS_CDB_ADVER_EPL_MASK;
+ 
+-	printf("\t%-41s : %u\n", "CDB EPL pages", epl_pages);
++	module_print_any_uint("CDB EPL pages", epl_pages, NULL);
+ }
+ 
+ static void cmis_show_cdb_rw_len(const struct cmis_memory_map *map)
+@@ -839,9 +945,10 @@ static void cmis_show_cdb_rw_len(const struct cmis_memory_map *map)
+ 	 * units of 8 bytes, in addition to the minimum 8 bytes.
+ 	 */
+ 	rw_len = (rw_len + 1) * 8;
+-	printf("\t%-41s : %u\n", "CDB Maximum EPL RW length", rw_len);
+-	printf("\t%-41s : %u\n", "CDB Maximum LPL RW length",
+-	       rw_len > CMIS_PAGE_SIZE ? CMIS_PAGE_SIZE : rw_len);
++	module_print_any_uint("CDB Maximum EPL RW length", rw_len, NULL);
++	module_print_any_uint("CDB Maximum LPL RW length",
++			      rw_len > CMIS_PAGE_SIZE ? CMIS_PAGE_SIZE : rw_len,
++			      NULL);
+ }
+ 
+ static void cmis_show_cdb_trigger(const struct cmis_memory_map *map)
+@@ -853,8 +960,8 @@ static void cmis_show_cdb_trigger(const struct cmis_memory_map *map)
+ 	 * page, or by multiple writes ending with the writing of the CDB
+ 	 * Command Code (CMDID).
+ 	 */
+-	printf("\t%-41s : %s\n", "CDB trigger method",
+-	       trigger ? "Single write" : "Multiple writes");
++	module_print_any_string("CDB trigger method",
++				trigger ? "Single write" : "Multiple writes");
+ }
+ 
+ /* Print CDB messaging support advertisement. Relevant documents:
 -- 
 2.47.0
 
