@@ -1,111 +1,145 @@
-Return-Path: <netdev+bounces-160941-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-160942-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 35EE4A1C617
-	for <lists+netdev@lfdr.de>; Sun, 26 Jan 2025 03:03:39 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 12EA2A1C620
+	for <lists+netdev@lfdr.de>; Sun, 26 Jan 2025 03:20:21 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A53DE3A79F1
-	for <lists+netdev@lfdr.de>; Sun, 26 Jan 2025 02:03:31 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 38C8F18882BA
+	for <lists+netdev@lfdr.de>; Sun, 26 Jan 2025 02:20:25 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1A592171E43;
-	Sun, 26 Jan 2025 02:03:35 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="T+kbEopA"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 991EC13CF9C;
+	Sun, 26 Jan 2025 02:20:15 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f170.google.com (mail-pl1-f170.google.com [209.85.214.170])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from szxga03-in.huawei.com (szxga03-in.huawei.com [45.249.212.189])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9B42B288DA;
-	Sun, 26 Jan 2025 02:03:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.170
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4621D8828;
+	Sun, 26 Jan 2025 02:20:11 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.189
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1737857015; cv=none; b=RXqyxGbnaLOQc7Rf0Utgb9J9EOo+joa9pOI48h1DbDu3H5mIBX53piEHkuuzo3piqjh+Prz1YwOuvwA3hpKhQDRy/APXOPFEHeqlfZ3xDLeBc+v+ZPwJ6HpNT/wk2eHNNrDHH40aG3ePNMT6rKtALFd4y4bwBjXXFbeu6dqCPts=
+	t=1737858015; cv=none; b=EZxgKDM8fHh5U2G6b+V7J6e8rIs3UjLxxgULH11dC89Shd/L4e8GbUyJuLpMZ6yta+U9/+rMUycW6SLhwbH1oHSPIrTfa4dst9f86RORJK67Ns1etu+Ep9oDNBrV3fop0KZsqfE9LmonVs9KkqOEwHEhFh7mJVRPfRCpD7BDYvg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1737857015; c=relaxed/simple;
-	bh=MfNmqo28UUpusfOMSYIFfY+YUnsTo2r4H/xMK7isI+I=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=EwTygu+wN+PTCHTgVw/xPqxBV6xAkfv9cdoZnqAefK/Fqh1pzLcrwOVjiYvw5q8Ik9AwgNlEYjyw18pnPrg6ffqc8ybGUHDAfqr7PiBJph6+nQALvk0Vun0Fwq/kaOOoA9odX5nbUm4gbXvZmY/5o0ApLdMN9pHN4G7ohj/KQac=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=T+kbEopA; arc=none smtp.client-ip=209.85.214.170
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pl1-f170.google.com with SMTP id d9443c01a7336-21bc1512a63so66920885ad.1;
-        Sat, 25 Jan 2025 18:03:33 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1737857013; x=1738461813; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=pgTyPCriW4fhrR+pmULZkv4C0qMMiZVcoywU8rj//4s=;
-        b=T+kbEopAOJEAGO+y/N03ZU3qdqrO0wdv0z5R6/yWyI94B273OpxKXu2SxINvj64KK6
-         0bw/Opa681DlUhzZXt9uCFzT2XKAEsPztgvKBDVh75xMrMnAusOYmrJswTgbPrhNS5ev
-         aM5MUazbNtKLhe61HLifvN7CUJ8Ku26ZNAcXYWlqDAq86NIpbbVJfu1DTfsLSE9a6c7f
-         TXjeq425yOWkSRMforR4SEhnLLrCopik4MJk+qh2Hyp4Pgc7olteGQt1WTgmkfIKISbv
-         2ARKkvmQS/Fwy04ZtFrTVdWpqM9W4GipXtcDbn1j5S5Htw9TxhHmmaPzO6YmHXYtFXvQ
-         OcSw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1737857013; x=1738461813;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=pgTyPCriW4fhrR+pmULZkv4C0qMMiZVcoywU8rj//4s=;
-        b=D5vcEYdSbJk083Ep17N+NAE2jtEp1oabpPJYFXAEhl8Bm/pm0YCPzFKID5/nNhoEE3
-         UUX6aB8Rbpp0/82m3BauVTjuizfbTAzx2AtJIBp1WqP4liPPipw/OQ2RoaWxgZ+Nm300
-         UZfeG+Sc0QJZMQhEAOuUxuw+freONcZ8Lvst81UHryVoRxyla9ZBgFAOLNGvs7iUGcse
-         RcTHsNv0FYzpv8vKjCQ0b6svengw4QIeuTlZVvcRWNxgdKh1r4Tbydgo4Xr6fLKNYhoe
-         3rO5OwhI17Xy/F2TxMEW0Rea8bcIdKYnJDJIAgkjcX69UrxjMlUJvc+RNsTEr1G8B6e6
-         o3SA==
-X-Forwarded-Encrypted: i=1; AJvYcCUFfJcflidX8F+VY+KO1D619z/JBy4u2O2VVuKTjUcR8CSTQhOHDa8wiAqgKxYaRdJdza42RfMjczwtpKRqE3Q=@vger.kernel.org, AJvYcCUaCE38QTMwAzJTqKdutE52aLAHq0X7B5L21O4KImnVFqGUrlzWa9PIuJnmcaVwsTAkLfFH+yDq@vger.kernel.org
-X-Gm-Message-State: AOJu0YxfXj8xCzXFEzLl5LqGk94YHGGiRT3NLY2WaZ/gNZ2oGeITLWUD
-	rMehwd74HSAPW4VavUo/LJNwCqhYsCmzDB18M8TkEvSQJzjFTRs/QirF7QR5bwA=
-X-Gm-Gg: ASbGncujXZ/s6CIpFuPW2egOFP52b7EgIeNEMoC6+I4h3zQ9Wd7g89uM8g4sCBNP4SV
-	MV5k8IApnQzvmZpLlegEnR1rj8Ayl8C6KrqkwtkFNMkTGoXUEn2Ze4V+DN3YC3DXSffmBhX/PL5
-	FbiO2kJL9midOe4TfffUjaFs9DUzOY5qwe1kLJxe/t4PxnaggPE+hpEnjmc62xywYmLg9cNrUOi
-	72DyYNAVS6oaMK6xI75C/EiP9s7EbvTweZ6Ab0DTW4AezjQsP6DmVBwNj/argitvBAhBkLjglMg
-	Oh0ESLz3bQ==
-X-Google-Smtp-Source: AGHT+IHSNUXiE7mXE2mQNbRtrUlh0BXR1895ZZHvTbbMYRJyyqq3u5SnzJtFRw7iNuhYdzex064zxA==
-X-Received: by 2002:a17:903:2d0:b0:212:996:353a with SMTP id d9443c01a7336-21c355750fbmr579421645ad.12.1737857012871;
-        Sat, 25 Jan 2025 18:03:32 -0800 (PST)
-Received: from fedora ([43.228.180.230])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-21da3d9dedcsm38955815ad.46.2025.01.25.18.03.28
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sat, 25 Jan 2025 18:03:32 -0800 (PST)
-Date: Sun, 26 Jan 2025 02:03:26 +0000
-From: Hangbin Liu <liuhangbin@gmail.com>
-To: Matthieu Baerts <matttbe@kernel.org>
-Cc: Jan Stancek <jstancek@redhat.com>, pshelar@ovn.org, kuba@kernel.org,
-	davem@davemloft.net, edumazet@google.com, pabeni@redhat.com,
-	linux-kselftest@vger.kernel.org, netdev@vger.kernel.org
-Subject: Re: [PATCH net] selftests: net/{lib,openvswitch}: extend CFLAGS to
- keep options from environment
-Message-ID: <Z5WX7rUMINgA3KVJ@fedora>
-References: <3d173603ee258f419d0403363765c9f9494ff79a.1737635092.git.jstancek@redhat.com>
- <26ad0900-bd9d-464e-be9f-c1806b96c971@kernel.org>
+	s=arc-20240116; t=1737858015; c=relaxed/simple;
+	bh=3R9vtvzA2fnGngFx7Exo7oKdsmC2U3/VpD/JY68oUkY=;
+	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
+	 In-Reply-To:Content-Type; b=PpPHZtIPn5TMtL+zvh9+dnc6MZI17NWAzFel/Uq51UcWnSwDXtov/VUW+vbx0KXKnwYG3QD4zgUneBqH/B/+6L0XHXC450qRNYPkS2ev4GB5bOmr3Tq7ZZu8VMU/CS03YdKsOCrEYbEcbIgARSHFsBRyEis8nUwkQ6Tr3Q9w8G0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.189
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
+Received: from mail.maildlp.com (unknown [172.19.88.194])
+	by szxga03-in.huawei.com (SkyGuard) with ESMTP id 4YgZvL0dGVzRlnl;
+	Sun, 26 Jan 2025 10:17:34 +0800 (CST)
+Received: from kwepemg500017.china.huawei.com (unknown [7.202.181.81])
+	by mail.maildlp.com (Postfix) with ESMTPS id 64A861402C1;
+	Sun, 26 Jan 2025 10:20:08 +0800 (CST)
+Received: from [10.174.179.155] (10.174.179.155) by
+ kwepemg500017.china.huawei.com (7.202.181.81) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1544.11; Sun, 26 Jan 2025 10:20:06 +0800
+Message-ID: <e4510b86-e8d9-4550-bcca-9f8f03769be2@huawei.com>
+Date: Sun, 26 Jan 2025 10:20:05 +0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <26ad0900-bd9d-464e-be9f-c1806b96c971@kernel.org>
+User-Agent: =?UTF-8?B?TW96aWxsYSBUaHVuZGVyYmlyZCDmtYvor5XniYg=?=
+Subject: Re: [PATCH] SUNRPC: Set tk_rpc_status when RPC_TASK_SIGNALLED is
+ detected
+To: Trond Myklebust <trondmy@hammerspace.com>, "tom@talpey.com"
+	<tom@talpey.com>, "davem@davemloft.net" <davem@davemloft.net>,
+	"chuck.lever@oracle.com" <chuck.lever@oracle.com>, "kuba@kernel.org"
+	<kuba@kernel.org>, "okorniev@redhat.com" <okorniev@redhat.com>,
+	"anna@kernel.org" <anna@kernel.org>, "pabeni@redhat.com" <pabeni@redhat.com>,
+	"horms@kernel.org" <horms@kernel.org>, "Dai.Ngo@oracle.com"
+	<Dai.Ngo@oracle.com>, "yangerkun@huawei.com" <yangerkun@huawei.com>,
+	"jlayton@kernel.org" <jlayton@kernel.org>, "edumazet@google.com"
+	<edumazet@google.com>, "neilb@suse.de" <neilb@suse.de>
+CC: "houtao1@huawei.com" <houtao1@huawei.com>, "linux-nfs@vger.kernel.org"
+	<linux-nfs@vger.kernel.org>, "yi.zhang@huawei.com" <yi.zhang@huawei.com>,
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+	"lilingfeng@huaweicloud.com" <lilingfeng@huaweicloud.com>,
+	"yukuai1@huaweicloud.com" <yukuai1@huaweicloud.com>, "netdev@vger.kernel.org"
+	<netdev@vger.kernel.org>
+References: <20250114144101.2511043-1-lilingfeng3@huawei.com>
+ <fed3cd85-0a15-ae30-b167-84881d6a5efd@huawei.com>
+ <642413c4bdbe296db722f0091ffa5190c992eb8e.camel@hammerspace.com>
+ <58bf9d83-b58d-e5a6-4096-64eb96f3854a@huawei.com>
+ <4d3e8d4385a511860ec9018b3ca864e7ef3a7b48.camel@hammerspace.com>
+From: Li Lingfeng <lilingfeng3@huawei.com>
+In-Reply-To: <4d3e8d4385a511860ec9018b3ca864e7ef3a7b48.camel@hammerspace.com>
+Content-Type: text/plain; charset="UTF-8"; format=flowed
+Content-Transfer-Encoding: 8bit
+X-ClientProxiedBy: dggems702-chm.china.huawei.com (10.3.19.179) To
+ kwepemg500017.china.huawei.com (7.202.181.81)
 
-On Thu, Jan 23, 2025 at 01:51:27PM +0100, Matthieu Baerts wrote:
-> > openvswitch/Makefile CFLAGS currently do not appear to be used, but
-> > fix it anyway for the case when new tests are introduced in future.
-> > 
-> > Fixes: 1d0dc857b5d8 ("selftests: drv-net: add checksum tests")
-> 
-> Note that this commit is only for the Makefile in 'lib', not in
-> 'openvswitch', but I guess there is no need to backport that all along.
-> Maybe the two modifications should be split, but I guess that's fine here.
 
-Maybe we can also add
+在 2025/1/17 11:15, Trond Myklebust 写道:
+> On Fri, 2025-01-17 at 10:29 +0800, yangerkun wrote:
+>>
+>> 在 2025/1/17 4:52, Trond Myklebust 写道:
+>>> On Thu, 2025-01-16 at 19:43 +0800, yangerkun wrote:
+>>>> Hi,
+>>>>
+>>>> Thanks for the patch.
+>>>>
+>>>> Before 39494194f93b("SUNRPC: Fix races with rpc_killall_tasks()",
+>>>> every
+>>>> time we set RPC_TASK_SIGNALLED, when we go through __rpc_execute,
+>>>> this
+>>>> rpc_task will immediate break and exist.
+>>>>
+>>>> However after that, __rpc_execute won't judge RPC_TASK_SIGNNALED,
+>>>> so
+>>>> for
+>>>> the case like you point out below, even after your commit
+>>>> rpc_check_timeout will help break and exist eventually, but this
+>>>> rpc_task has already do some work. I prefer reintroduce judging
+>>>> RPC_TASK_SIGNNALED in __rpc_execute to help exist immediatly.
+>>>>
+>>> Better yet... Let's get rid of the RPC_TASK_SIGNALLED flag
+>>> altogether
+>>> and just replace
+>>>
+>>> #define RPC_TASK_SIGNALLED(task) (READ_ONCE(task->tk_rpc_status) ==
+>>> -ERESTARTSYS)
 
-Fixes: 25f16c873fb1 ("selftests: add openvswitch selftest suite")
+Hi,
 
+I'm not quite clear on how this can resolve the issue.
+If we remove the RPC_TASK_SIGNALLED flag and replace setting tk_runstate
+to RPC_TASK_SIGNALLED with setting tk_rpc_status to -ERESTARTSYS in
+rpc_signal_task, wouldn't setting tk_rpc_status back to 0 in
+__rpc_restart_call still lead to an infinite loop in the rpc_task?
+Could you please provide a more detailed explanation?
 
-Reviewed-by: Hangbin Liu <liuhangbin@gmail.com>
+Thanks.
+
+>> Hi,
+>>
+>> Thanks for your reply! Yeah, if all the places where tk_rpc_status is
+>> updated are by calling rpc_task_set_rpc_status, we can use
+>> task->tk_rpc_status == -ERESTARTSYS to determine whether rpc_task is
+>> RPC_TASK_SIGNALLED. But for the case like Li has provided,
+>> __rpc_restart_call won't do this, and will overwrite tk_rpc_status
+>> unconditionally. This won't be a stable solution. Maybe it's better
+>> to
+>> change __rpc_restart_call calling rpc_task_set_rpc_status too? And
+>> __rpc_execute will be enough to help solve this case.
+>>
+>>
+> That would break __rpc_restart_call() to the point of rendering it
+> completely useless.
+> The whole purpose of that call is to give the NFS layer a chance to
+> handle errors in the exit callback, and then kick off a fresh call.
+> Your suggestion would mean that any RPC level error sticks around, and
+> causes the new call to immediately fail.
+>
+> I see no point in doing anything more than fixing the looping
+> behaviour. Eliminating the redundant flag will do that.
+>
 
