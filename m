@@ -1,63 +1,67 @@
-Return-Path: <netdev+bounces-161011-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-161012-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id AF9FCA1CB2A
-	for <lists+netdev@lfdr.de>; Sun, 26 Jan 2025 16:41:34 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4411FA1CB5F
+	for <lists+netdev@lfdr.de>; Sun, 26 Jan 2025 16:45:42 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 0A7E016122F
-	for <lists+netdev@lfdr.de>; Sun, 26 Jan 2025 15:37:18 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B9C773A98E8
+	for <lists+netdev@lfdr.de>; Sun, 26 Jan 2025 15:39:18 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 50EBE21770B;
-	Sun, 26 Jan 2025 15:03:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BBD3B21C197;
+	Sun, 26 Jan 2025 15:03:35 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="lA4rPEib"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="SrovdLxy"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 285C1217707;
-	Sun, 26 Jan 2025 15:03:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8FABA1A83EB;
+	Sun, 26 Jan 2025 15:03:35 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1737903799; cv=none; b=UEB41nUv3AaMheqccU27tAPnXTPVmNlWrp2FHRqvzds8s3f82Ig2jzGULrmfLhQES4FdhJw+QxKXXeBiCtEcU7vVx96rp5W38mgbgccxS/xC7de6sowbEGgMw/16WFKHRJPxwoZfa7uEuO5ig3zwh5VYGheaQD5osLtKcsr5yQI=
+	t=1737903815; cv=none; b=NNaSvYHNT3UjvPSoBBfu7s4Q8oEd8ELZiws5pYcdmdVdZiprsj1BCAGH1WIii8JbqZgTz1CqIgC1izbRNNAggS20iftBMZY7eFRX1GGAmuLOWNtNBOs0O7nymOyRvmzp8DtIz6R5tet4+rsi42688EPXWECaXS8clijeMZHDiTE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1737903799; c=relaxed/simple;
-	bh=CFWENkclnQkkNIgbz0yJqrbb08YbW0tTy5wBBl30SNM=;
+	s=arc-20240116; t=1737903815; c=relaxed/simple;
+	bh=D6JHhhoGJhx26mmkHRlXsIwn/nweTzEcQwBQtrl6scE=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=JWRQRL66oXt+mZpTWgJkBta/Pj74qxA5g234NRKtWvZrH5rEL0CuFkd0XevAG5YPvrZWmn038x4gBo6qbdOLabl2XvVSqHmKuB7FczA/Nx8sthZeDIE02va6ZFjiygGRg3GsEwnQCqH221/fZtU2Ff6pO+wQYZ0EEADBpoWZQs4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=lA4rPEib; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9CD5BC4CEE4;
-	Sun, 26 Jan 2025 15:03:17 +0000 (UTC)
+	 MIME-Version; b=oL82Sr7jiHBZa3maBpg01S7rdDUBBII263Yh9DlMuaNo0waaPA5i1MIn11mGxuZE7A2vD17mlbFmc3DH+DrL9HtP6gD9GBH8C8zNDU3wg4UA7xVBvrPO1iP+p26KSILAFL2LkG6yzCNaNSUkvAlvSX8JQYBHTjq+S1vvrdarTc0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=SrovdLxy; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 46684C4CED3;
+	Sun, 26 Jan 2025 15:03:33 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1737903799;
-	bh=CFWENkclnQkkNIgbz0yJqrbb08YbW0tTy5wBBl30SNM=;
+	s=k20201202; t=1737903815;
+	bh=D6JHhhoGJhx26mmkHRlXsIwn/nweTzEcQwBQtrl6scE=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=lA4rPEibvsouOilc9v5csap9l0hbM3bdTcml9tyPG45+qsRbbzA10qOg6kDQv1M+a
-	 aP1LFPprEbSomJmb9vndRmUwIjQmr7ziEqzYLhlgTfWv2EYIIFq3LoFvgBDAh90tHe
-	 HiigpPURSBtLyL9Bk61qyo7+Mfd0HACxOr98sQi+8ePcrscEfgGZjV7KWaC4FdX+z2
-	 F56Gc/Of4BcZ12yQuKkbrkkXuFP1pdUD0frY7ssYIk8JcqMkxbsRIA1oGLC3q3QnUp
-	 fAFOSw4LlaGZaTHRAdp8/8LxzOw/MA5DofSQU+0emgo7N1XExqodPgwEW/quJqr/o5
-	 PdYUK6U9Gc7lg==
+	b=SrovdLxyvqTl/YVuzhjKuve8DtH5eF4d+3L1nr/XvJRi6R6lsnDyJ78xTHa1DCiB4
+	 9hRl3fQLg7KJCZ9pXAdY0k8jsRarwk9I8BEoJa1bCl5OBXGOSxnuKmMxt8PRjnnc00
+	 G6uBLIGWRhU/XNhyBYaSqlrSgl/O3yeJyVGD6lom1wP6J+yg+DDw06Wd+/ZCNGZs7t
+	 TMbMxHxMERiIbKNclaM2QcBSc7XnOYXYYjTZmuDMvjncmdcNSEwkqbyPaxj2Mrk1nV
+	 tmEefKZeYiW2tMT6fy610rZntueOrCsH4+S0JC0o1P9w0ZPlMeua+5t6+rEQ6OlVCf
+	 t4dQ6B0/BnwdA==
 From: Sasha Levin <sashal@kernel.org>
 To: linux-kernel@vger.kernel.org,
 	stable@vger.kernel.org
-Cc: Stas Sergeev <stsp2@yandex.ru>,
-	Willem de Bruijn <willemb@google.com>,
-	Jason Wang <jasowang@redhat.com>,
-	Jakub Kicinski <kuba@kernel.org>,
+Cc: Vadim Fedorenko <vadfed@meta.com>,
+	Dragos Tatulea <dtatulea@nvidia.com>,
+	Tariq Toukan <tariqt@nvidia.com>,
+	Paolo Abeni <pabeni@redhat.com>,
 	Sasha Levin <sashal@kernel.org>,
-	willemdebruijn.kernel@gmail.com,
+	saeedm@nvidia.com,
 	andrew+netdev@lunn.ch,
 	davem@davemloft.net,
 	edumazet@google.com,
-	pabeni@redhat.com,
-	netdev@vger.kernel.org
-Subject: [PATCH AUTOSEL 6.6 02/19] tun: fix group permission check
-Date: Sun, 26 Jan 2025 10:02:57 -0500
-Message-Id: <20250126150315.956795-2-sashal@kernel.org>
+	kuba@kernel.org,
+	richardcochran@gmail.com,
+	vadim.fedorenko@linux.dev,
+	rrameshbabu@nvidia.com,
+	netdev@vger.kernel.org,
+	linux-rdma@vger.kernel.org
+Subject: [PATCH AUTOSEL 6.6 10/19] net/mlx5: use do_aux_work for PHC overflow checks
+Date: Sun, 26 Jan 2025 10:03:05 -0500
+Message-Id: <20250126150315.956795-10-sashal@kernel.org>
 X-Mailer: git-send-email 2.39.5
 In-Reply-To: <20250126150315.956795-1-sashal@kernel.org>
 References: <20250126150315.956795-1-sashal@kernel.org>
@@ -72,70 +76,127 @@ X-Patchwork-Hint: Ignore
 X-stable-base: Linux 6.6.74
 Content-Transfer-Encoding: 8bit
 
-From: Stas Sergeev <stsp2@yandex.ru>
+From: Vadim Fedorenko <vadfed@meta.com>
 
-[ Upstream commit 3ca459eaba1bf96a8c7878de84fa8872259a01e3 ]
+[ Upstream commit e61e6c415ba9ff2b32bb6780ce1b17d1d76238f1 ]
 
-Currently tun checks the group permission even if the user have matched.
-Besides going against the usual permission semantic, this has a
-very interesting implication: if the tun group is not among the
-supplementary groups of the tun user, then effectively no one can
-access the tun device. CAP_SYS_ADMIN still can, but its the same as
-not setting the tun ownership.
+The overflow_work is using system wq to do overflow checks and updates
+for PHC device timecounter, which might be overhelmed by other tasks.
+But there is dedicated kthread in PTP subsystem designed for such
+things. This patch changes the work queue to proper align with PTP
+subsystem and to avoid overloading system work queue.
+The adjfine() function acts the same way as overflow check worker,
+we can postpone ptp aux worker till the next overflow period after
+adjfine() was called.
 
-This patch relaxes the group checking so that either the user match
-or the group match is enough. This avoids the situation when no one
-can access the device even though the ownership is properly set.
-
-Also I simplified the logic by removing the redundant inversions:
-tun_not_capable() --> !tun_capable()
-
-Signed-off-by: Stas Sergeev <stsp2@yandex.ru>
-Reviewed-by: Willem de Bruijn <willemb@google.com>
-Acked-by: Jason Wang <jasowang@redhat.com>
-Link: https://patch.msgid.link/20241205073614.294773-1-stsp2@yandex.ru
-Signed-off-by: Jakub Kicinski <kuba@kernel.org>
+Reviewed-by: Dragos Tatulea <dtatulea@nvidia.com>
+Signed-off-by: Vadim Fedorenko <vadfed@meta.com>
+Acked-by: Tariq Toukan <tariqt@nvidia.com>
+Link: https://patch.msgid.link/20250107104812.380225-1-vadfed@meta.com
+Signed-off-by: Paolo Abeni <pabeni@redhat.com>
 Signed-off-by: Sasha Levin <sashal@kernel.org>
 ---
- drivers/net/tun.c | 14 +++++++++-----
- 1 file changed, 9 insertions(+), 5 deletions(-)
+ .../ethernet/mellanox/mlx5/core/lib/clock.c   | 24 ++++++++++---------
+ include/linux/mlx5/driver.h                   |  1 -
+ 2 files changed, 13 insertions(+), 12 deletions(-)
 
-diff --git a/drivers/net/tun.c b/drivers/net/tun.c
-index cbb2f78ffde03..c84a749c52d12 100644
---- a/drivers/net/tun.c
-+++ b/drivers/net/tun.c
-@@ -574,14 +574,18 @@ static u16 tun_select_queue(struct net_device *dev, struct sk_buff *skb,
- 	return ret;
+diff --git a/drivers/net/ethernet/mellanox/mlx5/core/lib/clock.c b/drivers/net/ethernet/mellanox/mlx5/core/lib/clock.c
+index 0c83ef174275a..f00702bf781f1 100644
+--- a/drivers/net/ethernet/mellanox/mlx5/core/lib/clock.c
++++ b/drivers/net/ethernet/mellanox/mlx5/core/lib/clock.c
+@@ -237,17 +237,16 @@ static void mlx5_pps_out(struct work_struct *work)
+ 	}
  }
  
--static inline bool tun_not_capable(struct tun_struct *tun)
-+static inline bool tun_capable(struct tun_struct *tun)
+-static void mlx5_timestamp_overflow(struct work_struct *work)
++static long mlx5_timestamp_overflow(struct ptp_clock_info *ptp_info)
  {
- 	const struct cred *cred = current_cred();
- 	struct net *net = dev_net(tun->dev);
+-	struct delayed_work *dwork = to_delayed_work(work);
+ 	struct mlx5_core_dev *mdev;
+ 	struct mlx5_timer *timer;
+ 	struct mlx5_clock *clock;
+ 	unsigned long flags;
  
--	return ((uid_valid(tun->owner) && !uid_eq(cred->euid, tun->owner)) ||
--		  (gid_valid(tun->group) && !in_egroup_p(tun->group))) &&
--		!ns_capable(net->user_ns, CAP_NET_ADMIN);
-+	if (ns_capable(net->user_ns, CAP_NET_ADMIN))
-+		return 1;
-+	if (uid_valid(tun->owner) && uid_eq(cred->euid, tun->owner))
-+		return 1;
-+	if (gid_valid(tun->group) && in_egroup_p(tun->group))
-+		return 1;
-+	return 0;
+-	timer = container_of(dwork, struct mlx5_timer, overflow_work);
+-	clock = container_of(timer, struct mlx5_clock, timer);
++	clock = container_of(ptp_info, struct mlx5_clock, ptp_info);
+ 	mdev = container_of(clock, struct mlx5_core_dev, clock);
++	timer = &clock->timer;
+ 
+ 	if (mdev->state == MLX5_DEVICE_STATE_INTERNAL_ERROR)
+ 		goto out;
+@@ -258,7 +257,7 @@ static void mlx5_timestamp_overflow(struct work_struct *work)
+ 	write_sequnlock_irqrestore(&clock->lock, flags);
+ 
+ out:
+-	schedule_delayed_work(&timer->overflow_work, timer->overflow_period);
++	return timer->overflow_period;
  }
  
- static void tun_set_real_num_queues(struct tun_struct *tun)
-@@ -2778,7 +2782,7 @@ static int tun_set_iff(struct net *net, struct file *file, struct ifreq *ifr)
- 		    !!(tun->flags & IFF_MULTI_QUEUE))
- 			return -EINVAL;
+ static int mlx5_ptp_settime_real_time(struct mlx5_core_dev *mdev,
+@@ -435,6 +434,7 @@ static int mlx5_ptp_adjfine(struct ptp_clock_info *ptp, long scaled_ppm)
+ 	timer->cycles.mult = mult;
+ 	mlx5_update_clock_info_page(mdev);
+ 	write_sequnlock_irqrestore(&clock->lock, flags);
++	ptp_schedule_worker(clock->ptp, timer->overflow_period);
  
--		if (tun_not_capable(tun))
-+		if (!tun_capable(tun))
- 			return -EPERM;
- 		err = security_tun_dev_open(tun->security);
- 		if (err < 0)
+ 	return 0;
+ }
+@@ -770,6 +770,7 @@ static const struct ptp_clock_info mlx5_ptp_clock_info = {
+ 	.settime64	= mlx5_ptp_settime,
+ 	.enable		= NULL,
+ 	.verify		= NULL,
++	.do_aux_work	= mlx5_timestamp_overflow,
+ };
+ 
+ static int mlx5_query_mtpps_pin_mode(struct mlx5_core_dev *mdev, u8 pin,
+@@ -970,12 +971,11 @@ static void mlx5_init_overflow_period(struct mlx5_clock *clock)
+ 	do_div(ns, NSEC_PER_SEC / HZ);
+ 	timer->overflow_period = ns;
+ 
+-	INIT_DELAYED_WORK(&timer->overflow_work, mlx5_timestamp_overflow);
+-	if (timer->overflow_period)
+-		schedule_delayed_work(&timer->overflow_work, 0);
+-	else
++	if (!timer->overflow_period) {
++		timer->overflow_period = HZ;
+ 		mlx5_core_warn(mdev,
+-			       "invalid overflow period, overflow_work is not scheduled\n");
++			       "invalid overflow period, overflow_work is scheduled once per second\n");
++	}
+ 
+ 	if (clock_info)
+ 		clock_info->overflow_period = timer->overflow_period;
+@@ -1061,6 +1061,9 @@ void mlx5_init_clock(struct mlx5_core_dev *mdev)
+ 
+ 	MLX5_NB_INIT(&clock->pps_nb, mlx5_pps_event, PPS_EVENT);
+ 	mlx5_eq_notifier_register(mdev, &clock->pps_nb);
++
++	if (clock->ptp)
++		ptp_schedule_worker(clock->ptp, 0);
+ }
+ 
+ void mlx5_cleanup_clock(struct mlx5_core_dev *mdev)
+@@ -1077,7 +1080,6 @@ void mlx5_cleanup_clock(struct mlx5_core_dev *mdev)
+ 	}
+ 
+ 	cancel_work_sync(&clock->pps_info.out_work);
+-	cancel_delayed_work_sync(&clock->timer.overflow_work);
+ 
+ 	if (mdev->clock_info) {
+ 		free_page((unsigned long)mdev->clock_info);
+diff --git a/include/linux/mlx5/driver.h b/include/linux/mlx5/driver.h
+index 38a8ff9c685cb..69d844b34da0d 100644
+--- a/include/linux/mlx5/driver.h
++++ b/include/linux/mlx5/driver.h
+@@ -709,7 +709,6 @@ struct mlx5_timer {
+ 	struct timecounter         tc;
+ 	u32                        nominal_c_mult;
+ 	unsigned long              overflow_period;
+-	struct delayed_work        overflow_work;
+ };
+ 
+ struct mlx5_clock {
 -- 
 2.39.5
 
