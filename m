@@ -1,121 +1,146 @@
-Return-Path: <netdev+bounces-161065-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-161066-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id E26ACA1D0E2
-	for <lists+netdev@lfdr.de>; Mon, 27 Jan 2025 07:21:48 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id AD4EDA1D0EC
+	for <lists+netdev@lfdr.de>; Mon, 27 Jan 2025 07:32:05 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 528747A2BA5
-	for <lists+netdev@lfdr.de>; Mon, 27 Jan 2025 06:21:39 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id F09ED1886DD5
+	for <lists+netdev@lfdr.de>; Mon, 27 Jan 2025 06:32:09 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 05D8F15852E;
-	Mon, 27 Jan 2025 06:21:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B1FBA154C08;
+	Mon, 27 Jan 2025 06:31:59 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="LPu0su/Y"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="cQ87XOTL"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.13])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f169.google.com (mail-pl1-f169.google.com [209.85.214.169])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6904EBA42
-	for <netdev@vger.kernel.org>; Mon, 27 Jan 2025 06:21:43 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.13
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3DFF0A59;
+	Mon, 27 Jan 2025 06:31:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.169
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1737958904; cv=none; b=etUPhe0AuWiUdlU7vhSYy61moOlDpQf78kl1ljE6BvQk4mFB3Fejq8vFCH95guaxNdTtXoSR5Gw0jp04Zuh0V/DXHw61rfNpADXRBmBEjSg0YXQ8zycCLM0QnDZqtXnXHljOGdQmOx4FCyIYn+cwKnzNY8y5/YFVuocuWYuZPHE=
+	t=1737959519; cv=none; b=Z9U4CVHBWzsJMAkiBXDiiRPdJtjr6XquCAitB7KrDMeR8M0im9KZKh8yTd3uJFSgF1SU4tMAwywUy0co8swTQYWEmO/KK19gTuIQDNP2VX1+aUejrWGzl1Eh8IOucp8ZzPt24o+huqBovKZ0IbF4F8dwOEc6U1Dt5om/gciplw8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1737958904; c=relaxed/simple;
-	bh=gLgVcpeXmrnwWfEPyO3gi3JHNEofjORs9Alhd3iDPs8=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=iS9XHcF8bfDeyq588aWqskGXH4w1VmprvB9QEyRsPO3BIr8xvTgCYyHJbkSoFdyolbrxtNbKXdV+cMjGcirgcfGn7jNrxBUbkDxezlDwAy1u+nnwpZ8kwbneoQUNo5SPDAfjDonQGI0iIaOwxc/eJuuWCkFxUWY4NAzCrc2zgqg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=LPu0su/Y; arc=none smtp.client-ip=198.175.65.13
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1737958903; x=1769494903;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=gLgVcpeXmrnwWfEPyO3gi3JHNEofjORs9Alhd3iDPs8=;
-  b=LPu0su/Yt8CLSiKP+jP35gmThLjRqQzSC0HeZPrRG1yArrzsrbqQtxOI
-   PhSJ5NgjfrHVmo9l9vly2gbADq22DVb5wzPFMdfoZyWek+x9pXDPF3uaG
-   nVfyP8XCU4/0WtgP7ieCf79N1GeCnKJ3fdZ4o47VMOzxp1IwciXk94BZZ
-   KV8hui4WhGpoFhjz7kviwHpWcnNReeV6tOjbV+ky++LBTK+2/tLrBkhnF
-   q54FvlolvbPNrBcxF36CV3hyT4BKkZurcJkiR8uBcr6NmSUM0wfSUg+uk
-   L8EaaFdj2P7V9lwBkTpTF6F4APYWbWr0XFHmi3wZmWe6WcUCoVp5GWf2N
-   Q==;
-X-CSE-ConnectionGUID: W2+QWcT/SsSecWdugZZ/Fg==
-X-CSE-MsgGUID: wJOQa7g/RgqSRSmB9Q+2tQ==
-X-IronPort-AV: E=McAfee;i="6700,10204,11327"; a="49395861"
-X-IronPort-AV: E=Sophos;i="6.13,237,1732608000"; 
-   d="scan'208";a="49395861"
-Received: from fmviesa005.fm.intel.com ([10.60.135.145])
-  by orvoesa105.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 26 Jan 2025 22:21:43 -0800
-X-CSE-ConnectionGUID: kVv3AiEdSrKMVBMQizo7xQ==
-X-CSE-MsgGUID: ZUnvfQwIQiyzwcQfwtlvmA==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.12,224,1728975600"; 
-   d="scan'208";a="112957217"
-Received: from mev-dev.igk.intel.com ([10.237.112.144])
-  by fmviesa005-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 26 Jan 2025 22:21:40 -0800
-Date: Mon, 27 Jan 2025 07:18:12 +0100
-From: Michal Swiatkowski <michal.swiatkowski@linux.intel.com>
-To: Gal Pressman <gal@nvidia.com>
-Cc: "David S. Miller" <davem@davemloft.net>,
-	Jakub Kicinski <kuba@kernel.org>, Simon Horman <horms@kernel.org>,
-	Edward Cree <ecree.xilinx@gmail.com>, netdev@vger.kernel.org,
-	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
-	Ahmed Zaki <ahmed.zaki@intel.com>, Tariq Toukan <tariqt@nvidia.com>
-Subject: Re: [PATCH net] ethtool: Fix set RXNFC command with symmetric RSS
- hash
-Message-ID: <Z5clJP6mmfrupjos@mev-dev.igk.intel.com>
-References: <20250126191845.316589-1-gal@nvidia.com>
+	s=arc-20240116; t=1737959519; c=relaxed/simple;
+	bh=fq28+7Cu3/O1HXsG/L8DNlMk50ETj/lwjGNA6ls4GnU=;
+	h=Date:Message-Id:To:Cc:Subject:From:In-Reply-To:References:
+	 Mime-Version:Content-Type; b=BbIFK0gX+dkTOr4boDq8tYOlI8yI3JwPX2fo5E563hHS2RiwqeqSyY1nUN3P1/Wo6ktlJszLz7CyCUM3dUfKRDX7OthyRA1pUM9HPAg+s67tJ2EenISFnC6cqwfQoBr/G4TpDYY9tLbRVpvSYK1Q643mRPwPbOStWBNfD4PIZZw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=cQ87XOTL; arc=none smtp.client-ip=209.85.214.169
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pl1-f169.google.com with SMTP id d9443c01a7336-219f8263ae0so72840645ad.0;
+        Sun, 26 Jan 2025 22:31:57 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1737959517; x=1738564317; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to:from
+         :subject:cc:to:message-id:date:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=tfNfYKCvqZaMihwMFiRrtekyPJr0TEi8O4d8CRrU8/c=;
+        b=cQ87XOTLMqAL9SCuhz+Vzk4DV4VooRb9A4Tu4XLz6sCbQJ6mO5bb2g8ROWJkNY1CNr
+         G4yajBCspsMk48feradSxnEPo+mzD1OKZ84V2lwhy3MukDjDuZvOwxZgaz2khPmVg8vb
+         8EVc3rcbHZyXz4kQJQFNOp1UMuHK3oX57gDXPGlPAT/+6Cgu5CsYTEObEbkCF8O0KXvB
+         b1/8lWSzWsCjbfVuC55h+DJ+0Za6JueXTGI7aHVxecN6tjrMs02HjNyXUM2DLejTzPcr
+         lHgTECyhYiG0aDYASToR4nNUzePn08gA1IRrPp0Euik7aUtrkxxrOlpMMKMI3aVGni4w
+         DG8g==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1737959517; x=1738564317;
+        h=content-transfer-encoding:mime-version:references:in-reply-to:from
+         :subject:cc:to:message-id:date:x-gm-message-state:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=tfNfYKCvqZaMihwMFiRrtekyPJr0TEi8O4d8CRrU8/c=;
+        b=TerDVA+qS81MJvaKaFZf6nZiN5t4OidS90h3b24/y5iXa46vqtsZoaPQwrFxnh3ljT
+         Myf2RRU3MuAc+B0NvracZfQuH4Lo7dC2bzR1l24b5V4ecJUksfeZVzu6ZR7BX+9Yq3j3
+         9t3BtDgUHUbZBxos3tMsWa5+o/Zny1MD+X4y0PzDYHuKNfMeOETuiS8xosnbjPsmEFvP
+         HEHnXwY4VcV5khex59oYTsW+VpAkoTYEjAU0QmJPTcUjXRuhL365p4tltvmCxTYO1FX9
+         N4qTCR5llShzZYKj4ov6iYJSNoACl02cMfr6Qv9Vk0q9FNbhVoTupHW8/OSads0yBXMm
+         eqpw==
+X-Forwarded-Encrypted: i=1; AJvYcCU7FvDNt1Q6nHavUVgwc5s3WInwz1LEn5lO4R1qagJnFo0JLnl7M+ue38/LyEWStoTTu3ZRCB9BJe397Xabg3A=@vger.kernel.org, AJvYcCVhRWUk6adnlmYNl4aVLWZsT2GDjP43Jq1GrLGiDHgiKlhjME5EWpR6qSmctlVQUipvCRbtHNFxuuYGHAU=@vger.kernel.org, AJvYcCWdmFXl4Ngx3/GdN32moCvRfyV/TDGjeho8Z8QuZlLqVrsR81x8epnz22qeMdt+wgSnQq6Zvkhk@vger.kernel.org
+X-Gm-Message-State: AOJu0Ywzp0TG858o05uvcu1eYj1TiWS81TTiraiaC5fzOuWVT8bU6VEy
+	ESn5Z/kgWp4ES+PpEV5QwjCJ/qMS4xLTot9TV35m1eibml0KQ6nsXrtuWQVP
+X-Gm-Gg: ASbGncvkRpkuspDNrpqgGqjMO4//INekc9MGFlV6taMZyZpXHTV5eSfA9psqF/6NG28
+	K5KgKPoJpAnehII9Xkj/SKE9LSbp0XbNTcyV8Bujfl2V5zugdeCBjxb3/JQRaDmFN+nvh8318Sz
+	Jf/E871Kx8WgIDNDt6oqVvQlT24sfH/z2pyykUAf4YYzPLxvcQGtNIxakaqJA9B7FtpoYmh5Did
+	+z3tPlXX+lHEDBPf8H6fukyLJV7AevEgb22MDmONf8WI3vJkTvgmAimD4d94lZP2LUP9LZBrSf6
+	Yw/ypqifUE/7jZJvYpO7PBUm7+7Rb+oNf3WDxGXOLFj5bB7WHYvzNcbQrdA+Dw==
+X-Google-Smtp-Source: AGHT+IG3t88XE1H39FP4TiaMyOZ+wufBvP6/f4L48+GD8EeMzE13UPlvF15gmieonw0XeswKwcTKOA==
+X-Received: by 2002:a17:902:c94a:b0:216:2abc:195c with SMTP id d9443c01a7336-21c352dd6ffmr548671125ad.7.1737959517362;
+        Sun, 26 Jan 2025 22:31:57 -0800 (PST)
+Received: from localhost (p3882177-ipxg22501hodogaya.kanagawa.ocn.ne.jp. [180.15.148.177])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-21da3ea3b45sm56276125ad.97.2025.01.26.22.31.50
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sun, 26 Jan 2025 22:31:56 -0800 (PST)
+Date: Mon, 27 Jan 2025 15:31:47 +0900 (JST)
+Message-Id: <20250127.153147.1789884009486719687.fujita.tomonori@gmail.com>
+To: gary@garyguo.net
+Cc: fujita.tomonori@gmail.com, linux-kernel@vger.kernel.org,
+ rust-for-linux@vger.kernel.org, netdev@vger.kernel.org, andrew@lunn.ch,
+ hkallweit1@gmail.com, tmgross@umich.edu, ojeda@kernel.org,
+ alex.gaynor@gmail.com, bjorn3_gh@protonmail.com, benno.lossin@proton.me,
+ a.hindborg@samsung.com, aliceryhl@google.com, anna-maria@linutronix.de,
+ frederic@kernel.org, tglx@linutronix.de, arnd@arndb.de,
+ jstultz@google.com, sboyd@kernel.org, mingo@redhat.com,
+ peterz@infradead.org, juri.lelli@redhat.com, vincent.guittot@linaro.org,
+ dietmar.eggemann@arm.com, rostedt@goodmis.org, bsegall@google.com,
+ mgorman@suse.de, vschneid@redhat.com, tgunders@redhat.com
+Subject: Re: [PATCH v9 7/8] rust: Add read_poll_timeout functions
+From: FUJITA Tomonori <fujita.tomonori@gmail.com>
+In-Reply-To: <20250127114646.6ad6d65f@eugeo>
+References: <20250125101854.112261-1-fujita.tomonori@gmail.com>
+	<20250125101854.112261-8-fujita.tomonori@gmail.com>
+	<20250127114646.6ad6d65f@eugeo>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250126191845.316589-1-gal@nvidia.com>
+Mime-Version: 1.0
+Content-Type: Text/Plain; charset=us-ascii
+Content-Transfer-Encoding: 7bit
 
-On Sun, Jan 26, 2025 at 09:18:45PM +0200, Gal Pressman wrote:
-> The sanity check that both source and destination are set when symmetric
-> RSS hash is requested is only relevant for ETHTOOL_SRXFH (rx-flow-hash),
-> it should not be performed on any other commands (e.g.
-> ETHTOOL_SRXCLSRLINS/ETHTOOL_SRXCLSRLDEL).
-> 
-> This resolves accessing uninitialized 'info.data' field, and fixes false
-> errors in rule insertion:
->   # ethtool --config-ntuple eth2 flow-type ip4 dst-ip 255.255.255.255 action -1 loc 0
->   rmgr: Cannot insert RX class rule: Invalid argument
->   Cannot insert classification rule
-> 
-> Fixes: 13e59344fb9d ("net: ethtool: add support for symmetric-xor RSS hash")
-> Cc: Ahmed Zaki <ahmed.zaki@intel.com>
-> Reviewed-by: Tariq Toukan <tariqt@nvidia.com>
-> Signed-off-by: Gal Pressman <gal@nvidia.com>
-> ---
->  net/ethtool/ioctl.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
-> 
-> diff --git a/net/ethtool/ioctl.c b/net/ethtool/ioctl.c
-> index 7bb94875a7ec..34bee42e1247 100644
-> --- a/net/ethtool/ioctl.c
-> +++ b/net/ethtool/ioctl.c
-> @@ -998,7 +998,7 @@ static noinline_for_stack int ethtool_set_rxnfc(struct net_device *dev,
->  	    ethtool_get_flow_spec_ring(info.fs.ring_cookie))
->  		return -EINVAL;
->  
-> -	if (ops->get_rxfh) {
-> +	if (cmd == ETHTOOL_SRXFH && ops->get_rxfh) {
->  		struct ethtool_rxfh_param rxfh = {};
->  
->  		rc = ops->get_rxfh(dev, &rxfh);
-> -- 
-> 2.40.1
+On Mon, 27 Jan 2025 11:46:46 +0800
+Gary Guo <gary@garyguo.net> wrote:
 
-Thanks for fixing
-Reviewed-by: Michal Swiatkowski <michal.swiatkowski@linux.intel.com>
+>> +#[track_caller]
+>> +pub fn read_poll_timeout<Op, Cond, T: Copy>(
+>> +    mut op: Op,
+>> +    mut cond: Cond,
+>> +    sleep_delta: Delta,
+>> +    timeout_delta: Delta,
+>> +) -> Result<T>
+>> +where
+>> +    Op: FnMut() -> Result<T>,
+>> +    Cond: FnMut(&T) -> bool,
+>> +{
+>> +    let start = Instant::now();
+>> +    let sleep = !sleep_delta.is_zero();
+>> +    let timeout = !timeout_delta.is_zero();
+>> +
+>> +    if sleep {
+>> +        might_sleep(Location::caller());
+>> +    }
+>> +
+>> +    loop {
+>> +        let val = op()?;
+>> +        if cond(&val) {
+>> +            // Unlike the C version, we immediately return.
+>> +            // We know the condition is met so we don't need to check again.
+>> +            return Ok(val);
+>> +        }
+>> +        if timeout && start.elapsed() > timeout_delta {
+> 
+> Re-reading this again I wonder if this is the desired behaviour? Maybe
+> a timeout of 0 should mean check-once instead of no timeout. The
+> special-casing of 0 makes sense in C but in Rust we should use `None`
+> to mean it instead?
+
+It's the behavior of the C version; the comment of this function says:
+
+* @timeout_us: Timeout in us, 0 means never timeout
+
+You meant that waiting for a condition without a timeout is generally
+a bad idea? If so, can we simply return EINVAL for zero Delta?
+
 
