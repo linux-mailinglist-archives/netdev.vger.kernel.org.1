@@ -1,173 +1,136 @@
-Return-Path: <netdev+bounces-161130-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-161131-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 07174A1D8AF
-	for <lists+netdev@lfdr.de>; Mon, 27 Jan 2025 15:50:24 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id A3FD6A1D8B4
+	for <lists+netdev@lfdr.de>; Mon, 27 Jan 2025 15:50:47 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 436D93A5153
-	for <lists+netdev@lfdr.de>; Mon, 27 Jan 2025 14:50:16 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id F04F416410C
+	for <lists+netdev@lfdr.de>; Mon, 27 Jan 2025 14:50:45 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 196443596D;
-	Mon, 27 Jan 2025 14:50:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BDA2C55887;
+	Mon, 27 Jan 2025 14:50:43 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="TZvylBee"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="IoiUC9Bg"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-vs1-f43.google.com (mail-vs1-f43.google.com [209.85.217.43])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6D49F78F41;
-	Mon, 27 Jan 2025 14:50:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.217.43
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 945EA6AAD;
+	Mon, 27 Jan 2025 14:50:43 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1737989419; cv=none; b=IpJGZIF/mahLGrmMhJfvcr2YSeDJghoCjNM5nHLC1OlsL+IpLgmSqFa5+AQRqJ/pFcMtCAI9nGqvRrxbHvAdu4ZEkYe9Z0XflFGh9oyEAU7m/1nKfLQcs0bR2Lhe6CcnKlHOdpvGCZ6/YNemeXQCNTJ+9Xl8y4fv3VIiLrP6O6U=
+	t=1737989443; cv=none; b=rV04CIjcz/W8kpecJE4v5SMDJ4Ag5/4Fvb2iDPPNMw8hXmlE9MPkLXKZOnfUMl4CLAm8R4ouyezTomxkX7aXjSizllS4fDzEg7UgGCtp976sKtRIrRdNuob/N1PskabnEeeHBUWmqm9WlEHE2ZT9Cci6UlDcHO2Po5/e0IsAvTg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1737989419; c=relaxed/simple;
-	bh=4jmummf21eCG5N7yeeWqWb8xZ7DSnhTI4KnzJZ2Brdg=;
-	h=Date:From:To:Cc:Message-ID:In-Reply-To:References:Subject:
-	 Mime-Version:Content-Type; b=DzMuBIRGMBNtyNA8LZtV6lweSrhbcz3kfbZDSPs78fKCfggn2gHPY9Ika/J59qOKlTXUe2gguHil3o1oE65CO84itGXeF01G9cP/wQ4xSq8NHKxpbhGohNohHmjVoerj0OJhD96sehQKNpA1iFsTtoe/CLVEQNL8Ys1hp9imtjE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=TZvylBee; arc=none smtp.client-ip=209.85.217.43
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-vs1-f43.google.com with SMTP id ada2fe7eead31-4afde39e360so1156169137.0;
-        Mon, 27 Jan 2025 06:50:15 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1737989414; x=1738594214; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:subject:references
-         :in-reply-to:message-id:cc:to:from:date:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=j+4PFphjG6BR9vrdCpxlvOY56GsX5BOUCbDC8gOl9Zs=;
-        b=TZvylBee0wnmUmZb5Dw1rjWHugdMpT4Jk19QLxB1q069Xzx006zhdpcbrrt5OHX8t3
-         TWgVThSJWszRHfGusKRmeeCq27y7C4D62JALk+so+uIFA85q0cvKH7in57Bm009mqyEl
-         J99cuEFJh71px6z9xXrw3g9hs1BsJRyvAmSsZI6mqwtgk1yD37bHwvdAxKphva0yUJgd
-         USCgLf8QDNSkJjvqpxT+BbSF/Lye2i5CtWVcaAmXtqwCdRbHasEmx8DHIEwva2Xtai9w
-         HkI82kKS7CLBZdm7CSMB4nspwNr8kR2tSxsu77B8XHhoaulyTfj/GWVqaBqz+uM3Z3Tx
-         c0sQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1737989414; x=1738594214;
-        h=content-transfer-encoding:mime-version:subject:references
-         :in-reply-to:message-id:cc:to:from:date:x-gm-message-state:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=j+4PFphjG6BR9vrdCpxlvOY56GsX5BOUCbDC8gOl9Zs=;
-        b=ZgZl4+VO6uJF/Z2zWzZjG5VDpZYbDTIV32iY+xXvGG93JxK4WrEyr3D/VbKrzSstQt
-         2dNQ7QXbRQPMXvEsjXes+Urh1wpJJK9POJP6/gJqF1rGR2O5ybA1Psq5qb2raWvZpnCP
-         ljZ/SUJUVG47J2pUejY97bxb3xffnZe4Ol6MsYuhasJgxmAGnhgwh8sXZ9XGyRSsdI1G
-         LGx8NF1azLJr+JxuFJWNJLmkrTius07ov7eOmM5Paixhp4kI0v5wmpiaHegSIt/+kKzn
-         QEHLix8EEsysUmjnfCfRlDb2C4qknMvHJfSupxXiItYAdRtmFBErl2aEX4nHrMSWKN7l
-         DAnA==
-X-Forwarded-Encrypted: i=1; AJvYcCUNYBUHFQ0VgcrlTihmnsc8Ee2U9ZT81264ru5u3zvDOeZbNSCRAbCgztOMz2QpU+MXLpwvhA+wJw==@vger.kernel.org, AJvYcCWBF2Os3npPTCkJjU5PaCe66UO/qWJF6lEq6VMhmaKsulC2odYW2bx1BfQETQH6xyFoQ6bTpsq/@vger.kernel.org, AJvYcCWtUtV5P/yfKmmXD16/a0089b11dvKOXxbZwpVxf84Vxx2Dg6lUryeS1dJvyH9RQvWVqXNQ4t/Vzyfy4yBibMZ23s2VZEw=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwAJQB6AAlGEC29O8BN/HhzX4EASL7igIEC1FbUfYf5XLkLpOCJ
-	KogZTZZhcq6U7TSqpphYUMsAH6gSzryOyB8aUTXf58M9i++k9HwW
-X-Gm-Gg: ASbGnctfpAitHrpo/V7C2kCK8NjZWnTrfeIxNFWO5gHiu/Jtn/h0u9eG7smS0eSmePU
-	zdsyJJnfSLzWDgPRXrxuvAYbeQtnzkYenr31bVTpWr+V6yaHO2J1V8QN1W2qDyp21LIGrTh0Qpa
-	d05xm8aYZ4QVlcc3K4LSqz9bza+X00P5krgoxLdvhKv7kqyX1EfdIuctUVhvs4GAdW/WkrYbVh+
-	zwadorQRx59paOWTJZ/3VmzrrSadfY5SaT+7fto2pzxb5tDBgatQtwADIAnLi+bAdT1PuLm9ZNs
-	bvk0xLo3+87cpTPV21MREoUJdo7lx1b3hM3fKfQKegGWn39F2n7K
-X-Google-Smtp-Source: AGHT+IHiPK8GERIaHyGFAwU9SeGFw2Lt/7vnkO4qXmXaLxYiJ6qqJJKmrSbn29Bn7h/SuNMzrSVk3w==
-X-Received: by 2002:a05:6102:5249:b0:4af:e5fd:77fc with SMTP id ada2fe7eead31-4b690b5ba88mr36746604137.3.1737989414037;
-        Mon, 27 Jan 2025 06:50:14 -0800 (PST)
-Received: from localhost (15.60.86.34.bc.googleusercontent.com. [34.86.60.15])
-        by smtp.gmail.com with ESMTPSA id a1e0cc1a2514c-864a9af3a53sm1915095241.11.2025.01.27.06.50.13
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 27 Jan 2025 06:50:13 -0800 (PST)
-Date: Mon, 27 Jan 2025 09:50:12 -0500
-From: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
-To: stsp <stsp2@yandex.ru>, 
- Ondrej Mosnacek <omosnace@redhat.com>, 
- Willem de Bruijn <willemb@google.com>, 
- Jason Wang <jasowang@redhat.com>
-Cc: Jakub Kicinski <kuba@kernel.org>, 
- network dev <netdev@vger.kernel.org>, 
- Linux Security Module list <linux-security-module@vger.kernel.org>, 
- SElinux list <selinux@vger.kernel.org>
-Message-ID: <67979d24d21bc_3f1a29434@willemb.c.googlers.com.notmuch>
-In-Reply-To: <e8b6c6f9-9647-4ab6-8bbb-ccc94b04ade4@yandex.ru>
-References: <CAFqZXNtkCBT4f+PwyVRmQGoT3p1eVa01fCG_aNtpt6dakXncUg@mail.gmail.com>
- <e8b6c6f9-9647-4ab6-8bbb-ccc94b04ade4@yandex.ru>
-Subject: Re: Possible mistake in commit 3ca459eaba1b ("tun: fix group
- permission check")
+	s=arc-20240116; t=1737989443; c=relaxed/simple;
+	bh=QEz1yFq/V8zSFHz3+qgq45Ycq9MksFCCHAq9KY5uK20=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=AIIXCssMKmlcMzjKkI0ubVlfUKIqEWgbAz++cM2UzvnemLsuXOvbUDxuWaH+vJC6uARS9sJrlqyTdi/xK9JDoZpzQRJrPls/K9jRF/nCVZHD3jbE6GHwKGpCdM/0lI9fqtt6SuFUfbzlVQR79BOYpN/Pciq755aD15Hagx7AEak=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=IoiUC9Bg; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2A10EC4CED2;
+	Mon, 27 Jan 2025 14:50:40 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1737989443;
+	bh=QEz1yFq/V8zSFHz3+qgq45Ycq9MksFCCHAq9KY5uK20=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=IoiUC9Bg0jbGGqRwBLgRInz1Ea4HTgKYBVKeICJvEP0udBmm57VGyQho/WGuEcaHc
+	 oIdFknmLMX0bJTKMH6dcy0gYNUrclTFVNP+htRXTlqCqGULWCdY6LNohpt3C2fXv/L
+	 AHqJ8aRv9eF6eZUphz7adDkJNHB1giYIp2SFEF6z7YuJdobctsI4/m1akBDXraT8Xv
+	 RIvwRAEGIzi8fGIT/hzagQXABAUiEgHYH97qzxNCNyl3OxBgjBuv4e0UsBSNo53dkP
+	 N/6GctycBaxqsy3ZfhdU8Mv7YGfvFQ26P6UDBnmnFXpY4UvENDY+E/n7G97ZGjFQ7L
+	 oi0sZ+DouNr7g==
+Message-ID: <1e9ec1e3-7a74-4566-ba5b-e937e33336e2@kernel.org>
+Date: Mon, 27 Jan 2025 15:50:30 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Content-Type: text/plain;
- charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird Beta
+Subject: Re: [PATCH net] selftests: net/{lib,openvswitch}: extend CFLAGS to
+ keep options from environment
+Content-Language: en-GB
+To: Hangbin Liu <liuhangbin@gmail.com>
+Cc: Jan Stancek <jstancek@redhat.com>, pshelar@ovn.org, kuba@kernel.org,
+ davem@davemloft.net, edumazet@google.com, pabeni@redhat.com,
+ linux-kselftest@vger.kernel.org, netdev@vger.kernel.org
+References: <3d173603ee258f419d0403363765c9f9494ff79a.1737635092.git.jstancek@redhat.com>
+ <26ad0900-bd9d-464e-be9f-c1806b96c971@kernel.org> <Z5WX7rUMINgA3KVJ@fedora>
+From: Matthieu Baerts <matttbe@kernel.org>
+Autocrypt: addr=matttbe@kernel.org; keydata=
+ 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
+ lzVbFe7fduHbABmYz9cefQpO7wDE/Q==
+Organization: NGI0 Core
+In-Reply-To: <Z5WX7rUMINgA3KVJ@fedora>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-stsp wrote:
-> 27.01.2025 12:10, Ondrej Mosnacek =D0=BF=D0=B8=D1=88=D0=B5=D1=82:
-> > Hello,
-> >
-> > It looks like the commit in $SUBJ may have introduced an unintended
-> > change in behavior. According to the commit message, the intent was t=
-o
-> > require just one of {user, group} to match instead of both, which
-> > sounds reasonable, but the commit also changes the behavior for when
-> > neither of tun->owner and tun->group is set. Before the commit the
-> > access was always allowed, while after the commit CAP_NET_ADMIN is
-> > required in this case.
-> >
-> > I'm asking because the tun_tap subtest of selinux-testuite [1] starte=
-d
-> > to fail after this commit (it assumed CAP_NET_ADMIN was not needed),
-> > so I'm trying to figure out if we need to change the test or if it
-> > needs to be fixed in the kernel.
-> >
-> > Thanks,
-> >
-> > [1] https://github.com/SELinuxProject/selinux-testsuite/
-> >
-> Hi, IMHO having the persistent
-> TAP device inaccessible by anyone
-> but the CAP_NET_ADMIN is rather
-> useless, so the compatibility should
-> be restored on the kernel side.
-> I'd raise the questions about adding
-> the CAP_NET_ADMIN checks into
-> TUNSETOWNER and/or TUNSETPERSIST,
-> but this particular change to TUNSETIFF,
-> at least on my side, was unintentional.
-> =
+Hi Hangbin,
 
-> Sorry about that. :(
+On 26/01/2025 03:03, Hangbin Liu wrote:
+> On Thu, Jan 23, 2025 at 01:51:27PM +0100, Matthieu Baerts wrote:
+>>> openvswitch/Makefile CFLAGS currently do not appear to be used, but
+>>> fix it anyway for the case when new tests are introduced in future.
+>>>
+>>> Fixes: 1d0dc857b5d8 ("selftests: drv-net: add checksum tests")
+>>
+>> Note that this commit is only for the Makefile in 'lib', not in
+>> 'openvswitch', but I guess there is no need to backport that all along.
+>> Maybe the two modifications should be split, but I guess that's fine here.
+> 
+> Maybe we can also add
+> 
+> Fixes: 25f16c873fb1 ("selftests: add openvswitch selftest suite")
 
-Thanks for the report Ondrej.
+I don't think it is needed. If it is, probably best to split the patch
+in two then.
 
-Agreed that we need to reinstate this. I suggest this explicit
-extra branch after the more likely cases:
-
-        @@ -585,6 +585,9 @@ static inline bool tun_capable(struct tun_str=
-uct *tun)
-        		return 1;
-        	if (gid_valid(tun->group) && in_egroup_p(tun->group))
-        		return 1;
-        +       if (!uid_valid(tun->owner) && !gid_valid(tun->group))
-        +               return 1;
-        +
-        	return 0;
-         }
-
-The intent clearly has always been to allow access if owner and group
-are not explicitly set.
-
-It's easy to see when group support was added in commit 8c644623fe7e
-("[NET]: Allow group ownership of TUN/TAP devices."), and the even
-simpler check before that:
-
-                /* Check permissions */
--               if (tun->owner !=3D -1 &&
--                   current->euid !=3D tun->owner && !capable(CAP_NET_ADM=
-IN))
-+               if (((tun->owner !=3D -1 &&
-+                     current->euid !=3D tun->owner) ||
-+                    (tun->group !=3D -1 &&
-+                     current->egid !=3D tun->group)) &&
-+                    !capable(CAP_NET_ADMIN))
-                        return -EPERM;
-
+Cheers,
+Matt
+-- 
+Sponsored by the NGI0 Core fund.
 
 
