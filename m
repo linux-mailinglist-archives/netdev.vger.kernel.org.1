@@ -1,190 +1,125 @@
-Return-Path: <netdev+bounces-161079-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-161080-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id E0083A1D3AC
-	for <lists+netdev@lfdr.de>; Mon, 27 Jan 2025 10:41:25 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 24283A1D3B0
+	for <lists+netdev@lfdr.de>; Mon, 27 Jan 2025 10:42:17 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 3A5033A1F4D
-	for <lists+netdev@lfdr.de>; Mon, 27 Jan 2025 09:41:18 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 34E0D3A3D85
+	for <lists+netdev@lfdr.de>; Mon, 27 Jan 2025 09:42:07 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 35C1D1FCFE6;
-	Mon, 27 Jan 2025 09:41:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2143D1FDE1B;
+	Mon, 27 Jan 2025 09:41:58 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="SnFwG6HO"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="PeZgFuKM"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wr1-f43.google.com (mail-wr1-f43.google.com [209.85.221.43])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1F7031FBEBC
-	for <netdev@vger.kernel.org>; Mon, 27 Jan 2025 09:41:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F063A1FDA6B
+	for <netdev@vger.kernel.org>; Mon, 27 Jan 2025 09:41:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.43
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1737970882; cv=none; b=R9XKv/AlJmPNholATnRj6qcWyHb4q6++/6ThNpMGjLlQxgwSSyN4O2dSMjlL2kei33CQ+0NFiX4QCwTkkJKW3y6tjGCVammaXiNKvnZEu/lw1ZDKmeN4ihvFUgW3Ka/T71AJUciwrAOhRGt7TyhF/duIEU496K7xYfm9f6uNYjo=
+	t=1737970918; cv=none; b=V8lzbkhHGgovJLTAb6bP5IyHVdfigKy9yrCS1P4/hx82d61vy5Rat3Uft81N2hVyekVWHdqzgGby1EBQy9kOpI9gsmIfbwKqvZUEl69GGQza2Lff1osiDtdKQVFtew1vMy0M1If4wB/j1vpKqytyr6KfiyG1GuZ20MVQ9NlmnP4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1737970882; c=relaxed/simple;
-	bh=Vh0YpHIcneIEqjkfRJ3WsAFw3UXgK6dGsGV67o4k9ko=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=UP84WPNMftOrhXXEGQGRocgNxKq3oBVwWsSkm33w9blYDU4KVFlYmJAZUcH2cyNfX0LLrpOaF4UysdavA/DSdmSB0eLuspfh/PhBLyfp4DFgqOQRtj3vW9TJTQXrF1Gc6buOFRhkgEaq43aIduBoYy1fkZb4dx+iGv8fvcpfbog=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=SnFwG6HO; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1737970878;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=XZ2hI7n69a4AOR2SoCss1C4rYT+akeHKKW1KyuNfloI=;
-	b=SnFwG6HOLOhvxmU6VIskwJfMh8PAIjcCoodp9J/rpbfbB/PRTeyLN2hGRlrgyGg5PVdAbK
-	r4oCfY1JqanFdI7mTH61SJSL86kwb6er3H7H2+SerBZ+SIh2yBWQEaHcwgJO8+Ke9ZuKco
-	Qu5AWm0J/bNoAfEt4wfYyLLA++XWSjs=
-Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
- [209.85.128.71]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-329-X0lim3nFO3Oy8RvfdaQkow-1; Mon, 27 Jan 2025 04:41:17 -0500
-X-MC-Unique: X0lim3nFO3Oy8RvfdaQkow-1
-X-Mimecast-MFC-AGG-ID: X0lim3nFO3Oy8RvfdaQkow
-Received: by mail-wm1-f71.google.com with SMTP id 5b1f17b1804b1-43625ceae52so22686905e9.0
-        for <netdev@vger.kernel.org>; Mon, 27 Jan 2025 01:41:17 -0800 (PST)
+	s=arc-20240116; t=1737970918; c=relaxed/simple;
+	bh=nzKCGhIBGbAovNqP/cTvBZ+hhK7tqCGzqLIrBTkSOls=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=HIpG/5BwRl26H7MpN8nu0JqRD2mfgBsUhxwJvj3LrtI2KbB1InfN4sY3CdF7bjVE2/7ptMtw38PsORiCN+lstq4scsF19M9cbyeRu+djexR6kQhbgzMOryKoDk5jCldLi60zGI+PJIW815Xj/tbzwgdcIbKH8L2E+9XVahKY3yY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=PeZgFuKM; arc=none smtp.client-ip=209.85.221.43
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-wr1-f43.google.com with SMTP id ffacd0b85a97d-3862b40a6e0so2972130f8f.0
+        for <netdev@vger.kernel.org>; Mon, 27 Jan 2025 01:41:54 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1737970913; x=1738575713; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=nzKCGhIBGbAovNqP/cTvBZ+hhK7tqCGzqLIrBTkSOls=;
+        b=PeZgFuKMjYajZKF1JQ2KC6NF9pv23nJ1WhjRQGBNkJaqo7pYEF2lhKz9nOqPa3TH0k
+         XHsEuAp+IR10vBVPdWh94lkStKIomGAgJSTMZrotma8Qozhlf8kk71joVpnsc1H3i6Z7
+         T37pypgccTjzD8vuLl2HYw3uQd3eoy6vE+sdlvTT4u5u3N14E03UiSCFikW8mjnILKl8
+         D2X1fpFqhGddvYFD+yRp9lHRQ6CIJii1aGyu/5LBpsRP839l/r9L/HIaXee23K8OMhou
+         +SlkByT7LTEiZZDQW6B9rbEgGt1RKyWDBpE5ACpBPfhSfjRla95MkLGO5Nv3q1yX6EMa
+         w03g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1737970876; x=1738575676;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=XZ2hI7n69a4AOR2SoCss1C4rYT+akeHKKW1KyuNfloI=;
-        b=vErKKcIjycYm8vr1+/eGxc8CLONJ5VsN9GYRlchNM5ZyX6K8q+LIHELPwvIb+wlbci
-         cvKwev2BnaWUEqZJvBE8/gik9JkEI74puD1W5j+i6jVHiguAnKFaMd4wwtvl8fmKBFYu
-         TEzdvo9utxJnrJ7Yv81qgb3X4AUncZWiYSCYD6PVsXB8a3YPT1cvrJTEcPFOrVBAE1Wp
-         FuiISUux6k5E+/BoPlvR4SP6gRaEen5eK+JVMu2WgnGouBGVShO+A+Q1t8XPj4iW6Awe
-         uFsfmLLuBNye9BuwFgCqrith9cIf0yp24cIlCy0QNC1ll7RXnQklcUSn+cknR4iiN9i+
-         L/WQ==
-X-Gm-Message-State: AOJu0YzfrStMVTthzB12xjWF6TPLI3tBO5cSUvnccwhv1UPsjXXbG7+w
-	P0KZOfO6XEnRKY9tH/nRxqb7OBSN/pB0cx5shdYLzGj8dYCkh3BsEu9YKRP/+FkLD2z8TND9aic
-	AjDdEsRGZiYrcieGrinDcrS5V9uT9TSc9oZFvasnl56Ge4ZB98BpF0Dhaa5MV4w==
-X-Gm-Gg: ASbGnctT5iedTJEHLc9B7IpVmBYCxdzD1dOoLVtYE+3aPXu/px3I5y+YGa824tz0yQ5
-	hfFC68JXbVM77odkWLxK5d7P6DSdGX4jCmLpZjmoYOkoOgCInQb1VNzsDXTduM94xu2TebfbS8Z
-	x4cZpDYDXoLLqdp6Zo5TOPtCvasywZqLhpBQBFQi4w4u1I1eUel4EcDW+jkcLfKUehV28s6auj8
-	z+Mb65B3j6b6dAT/nt06DaQSvik05UetqiusIPWlgv+6gzVwZ3i47Z9EXINSUTkCvRETIJIta1s
-	QOFCZCxNv5sB0iAgPgY6/pZwU07YInA3KV8=
-X-Received: by 2002:a05:600c:3484:b0:434:f8e5:1bb with SMTP id 5b1f17b1804b1-438913e48fdmr379299165e9.12.1737970875862;
-        Mon, 27 Jan 2025 01:41:15 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IFMPPIIceVzpoSemVrt5k8yJHPC7Scw8DAuNcRNiO58raIiIAPmuqfE+MMKuaa4Z2AgVZYVsw==
-X-Received: by 2002:a05:600c:3484:b0:434:f8e5:1bb with SMTP id 5b1f17b1804b1-438913e48fdmr379298925e9.12.1737970875540;
-        Mon, 27 Jan 2025 01:41:15 -0800 (PST)
-Received: from [192.168.88.253] (146-241-95-172.dyn.eolo.it. [146.241.95.172])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-38c2a1bb0dfsm10814583f8f.63.2025.01.27.01.41.14
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 27 Jan 2025 01:41:14 -0800 (PST)
-Message-ID: <4e43078f-a41e-4953-9ee9-de579bd92914@redhat.com>
-Date: Mon, 27 Jan 2025 10:41:13 +0100
+        d=1e100.net; s=20230601; t=1737970913; x=1738575713;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=nzKCGhIBGbAovNqP/cTvBZ+hhK7tqCGzqLIrBTkSOls=;
+        b=wJqenOJ1DEUE0aEhvWuceuGIwynnWy70JFU1vsBAsm91dxmj6fsL1XCUW0s8ZxvqGA
+         QF9ieodR7ORypdULrH8m2miyrCOFDcLvlZSzt8/9Q83yOVHJU+SpYBT+vXZ/g4JxNTwM
+         2I2UMTVfzkEKnDnTc6pELLrqGzh/1IyibSI6AXKCwT+waNVypm2gbYqVCHZNmzSuXOXV
+         43NQK2fp0s3Xbk/ZXw1ue0lzr9wi/MxMsBFZK+6xtWTljz4zL36eoeBGnvhRR93g+LUE
+         Q1GI7E0qX2+RjCWSfcPn1Oj63/Np4/q4aK0bx29oyxu7sUyA02L7LnNjGK8TuKe+8nDo
+         9PMA==
+X-Forwarded-Encrypted: i=1; AJvYcCVgMHhyookw5CxMCbd/AbbvhX+2kKP1mbNudXFsBtkTEdyRSKbJIdDKRn/p/3vcwQswdYkKBVA=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxxwrtCvydBH/bWhK+ntHSReB4QqEY4/doEvUiSfWXU28E7j9c2
+	x0C7udCz0GzrZIe3takEjXooVBiw/nDfAczQx99ug8lwrT1Fr8yPVYmGGiiiPf6lWgscsvQ0hI4
+	xWjN7B91UHql6U+mUFh90QFbPUuMdSQ+PP49i
+X-Gm-Gg: ASbGncsOz1KKOS43I7n3sOM/gkz6yH2XDhFBByY25eAYfT3DmT4enlLhJUusA7vToOa
+	6DTg7P5NRoKItQ3gcrM3zahOraacNASyos9phYLSKIbOSnirNbgWANgOW60Fzsmg77n67KvOgMD
+	ZRZom6JdP3nmNzwENq
+X-Google-Smtp-Source: AGHT+IF3Fa/51VjEvqTXA2TBuCWrIRI5p8GDJMR5Gi8qMiYR++SQ9kcT6R8GJw9EmMPbFNuETF8j5XHiPrpKHxrhbZ4=
+X-Received: by 2002:a05:6000:1faa:b0:385:ed20:3be2 with SMTP id
+ ffacd0b85a97d-38bf57b608amr43395804f8f.48.1737970913119; Mon, 27 Jan 2025
+ 01:41:53 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next v6 04/12] net: homa: create homa_pool.h and
- homa_pool.c
-To: John Ousterhout <ouster@cs.stanford.edu>
-Cc: netdev@vger.kernel.org, edumazet@google.com, horms@kernel.org,
- kuba@kernel.org
-References: <20250115185937.1324-1-ouster@cs.stanford.edu>
- <20250115185937.1324-5-ouster@cs.stanford.edu>
- <a39c8c5c-4e39-42e6-8d8a-7bfdc6ace688@redhat.com>
- <CAGXJAmw95dDUxUFNa7UjV3XRd66vQRByAP5T_zra6KWdavr2Pg@mail.gmail.com>
-Content-Language: en-US
-From: Paolo Abeni <pabeni@redhat.com>
-In-Reply-To: <CAGXJAmw95dDUxUFNa7UjV3XRd66vQRByAP5T_zra6KWdavr2Pg@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+References: <20250125101854.112261-1-fujita.tomonori@gmail.com> <20250125101854.112261-2-fujita.tomonori@gmail.com>
+In-Reply-To: <20250125101854.112261-2-fujita.tomonori@gmail.com>
+From: Alice Ryhl <aliceryhl@google.com>
+Date: Mon, 27 Jan 2025 10:41:41 +0100
+X-Gm-Features: AWEUYZnXe5T7ez17VITh2Lj7-kTBM3pYabt7E1YxWy6CPYBARJB7HR2901cVEHE
+Message-ID: <CAH5fLgjVuSu=N3iVLTvx4BjPHpvBrV=TOUtOJ1Qu2JrVZpiifw@mail.gmail.com>
+Subject: Re: [PATCH v9 1/8] sched/core: Add __might_sleep_precision()
+To: FUJITA Tomonori <fujita.tomonori@gmail.com>
+Cc: linux-kernel@vger.kernel.org, Boqun Feng <boqun.feng@gmail.com>, 
+	rust-for-linux@vger.kernel.org, netdev@vger.kernel.org, andrew@lunn.ch, 
+	hkallweit1@gmail.com, tmgross@umich.edu, ojeda@kernel.org, 
+	alex.gaynor@gmail.com, gary@garyguo.net, bjorn3_gh@protonmail.com, 
+	benno.lossin@proton.me, a.hindborg@samsung.com, anna-maria@linutronix.de, 
+	frederic@kernel.org, tglx@linutronix.de, arnd@arndb.de, jstultz@google.com, 
+	sboyd@kernel.org, mingo@redhat.com, peterz@infradead.org, 
+	juri.lelli@redhat.com, vincent.guittot@linaro.org, dietmar.eggemann@arm.com, 
+	rostedt@goodmis.org, bsegall@google.com, mgorman@suse.de, vschneid@redhat.com, 
+	tgunders@redhat.com
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On 1/25/25 12:53 AM, John Ousterhout wrote:
-> On Thu, Jan 23, 2025 at 4:06 AM Paolo Abeni <pabeni@redhat.com> wrote:
-> ...
->>> +     pool->descriptors = kmalloc_array(pool->num_bpages,
->>> +                                       sizeof(struct homa_bpage),
->>> +                                       GFP_ATOMIC);
->>
->> Possibly wort adding '| __GFP_ZERO' and avoid zeroing some fields later.
-> 
-> I prefer to do all the initialization explicitly (this makes it
-> totally clear that a zero value is intended, as opposed to accidental
-> omission of an initializer). If you still think I should use
-> __GFP_ZERO, let me know and I'll add it.
+On Sat, Jan 25, 2025 at 11:20=E2=80=AFAM FUJITA Tomonori
+<fujita.tomonori@gmail.com> wrote:
+>
+> Add __might_sleep_precision(), Rust friendly version of
+> __might_sleep(), which takes a pointer to a string with the length
+> instead of a null-terminated string.
+>
+> Rust's core::panic::Location::file(), which gives the file name of a
+> caller, doesn't provide a null-terminated
+> string. __might_sleep_precision() uses a precision specifier in the
+> printk format, which specifies the length of a string; a string
+> doesn't need to be a null-terminated.
+>
+> Modify __might_sleep() to call __might_sleep_precision() but the
+> impact should be negligible. strlen() isn't called in a normal case;
+> it's called only when printing the error (sleeping function called
+> from invalid context).
+>
+> Note that Location::file() providing a null-terminated string for
+> better C interoperability is under discussion [1].
+>
+> [1]: https://github.com/rust-lang/libs-team/issues/466
+> Co-developed-by: Boqun Feng <boqun.feng@gmail.com>
+> Signed-off-by: Boqun Feng <boqun.feng@gmail.com>
+> Signed-off-by: FUJITA Tomonori <fujita.tomonori@gmail.com>
 
-Indeed the __GFP_ZERO flag is the preferred for such allocation, as it
-at very least reduce the generated code size.
-
->>> +int homa_pool_get_pages(struct homa_pool *pool, int num_pages, __u32 *pages,
->>> +                     int set_owner)
->>> +{
->>> +     int core_num = raw_smp_processor_id();
->>
->> Why the 'raw' variant? If this code is pre-emptible it means another
->> process could be scheduled on the same core...
-> 
-> My understanding is that raw_smp_processor_id is faster.
-> homa_pool_get_pages is invoked with a spinlock held, so there is no
-> risk of a core switch while it is executing. Is there some other
-> problem I have missed?
-
-raw_* variants, alike __* ones, fall under the 'use at your own risk'
-category.
-
-In this specific case raw_smp_processor_id() is supposed to be used if
-you don't care the process being move on other cores while using the
-'id' value.
-
-Using raw_smp_processor_id() and building with the CONFIG_DEBUG_PREEMPT
-knob, the generated code will miss run-time check for preemption being
-actually disabled at invocation time. Such check will be added while
-using smp_processor_id(), with no performance cost for non debug build.
-
->>> +struct homa_bpage {
->>> +     union {
->>> +             /**
->>> +              * @cache_line: Ensures that each homa_bpage object
->>> +              * is exactly one cache line long.
->>> +              */
->>> +             char cache_line[L1_CACHE_BYTES];
->>> +             struct {
->>> +                     /** @lock: to synchronize shared access. */
->>> +                     spinlock_t lock;
->>> +
->>> +                     /**
->>> +                      * @refs: Counts number of distinct uses of this
->>> +                      * bpage (1 tick for each message that is using
->>> +                      * this page, plus an additional tick if the @owner
->>> +                      * field is set).
->>> +                      */
->>> +                     atomic_t refs;
->>> +
->>> +                     /**
->>> +                      * @owner: kernel core that currently owns this page
->>> +                      * (< 0 if none).
->>> +                      */
->>> +                     int owner;
->>> +
->>> +                     /**
->>> +                      * @expiration: time (in sched_clock() units) after
->>> +                      * which it's OK to steal this page from its current
->>> +                      * owner (if @refs is 1).
->>> +                      */
->>> +                     __u64 expiration;
->>> +             };
->>
->> ____cacheline_aligned instead of inserting the struct into an union
->> should suffice.
-> 
-> Done (but now that alloc_percpu_gfp is being used I'm not sure this is
-> needed to ensure alignment?).
-
-Yep, cacheline alignment should not be needed for percpu data.
-
-/P
-
+Reviewed-by: Alice Ryhl <aliceryhl@google.com>
 
