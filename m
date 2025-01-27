@@ -1,99 +1,97 @@
-Return-Path: <netdev+bounces-161198-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-161199-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2C592A1FFDC
-	for <lists+netdev@lfdr.de>; Mon, 27 Jan 2025 22:33:12 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id A329EA1FFF8
+	for <lists+netdev@lfdr.de>; Mon, 27 Jan 2025 22:37:31 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 695891887572
-	for <lists+netdev@lfdr.de>; Mon, 27 Jan 2025 21:33:16 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 0BE82165775
+	for <lists+netdev@lfdr.de>; Mon, 27 Jan 2025 21:37:30 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4BD3F1D88D7;
-	Mon, 27 Jan 2025 21:33:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BA31F1D86E4;
+	Mon, 27 Jan 2025 21:37:26 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="oqFUBH1V"
+	dkim=pass (2048-bit key) header.d=treblig.org header.i=@treblig.org header.b="VrMHoolz"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from mx.treblig.org (mx.treblig.org [46.235.229.95])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1C2961D7E31;
-	Mon, 27 Jan 2025 21:33:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BD4B71D7E31;
+	Mon, 27 Jan 2025 21:37:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=46.235.229.95
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1738013587; cv=none; b=IUsWtTylcvohutQ2W0NI5L27DYJo0BfxglQhMaMcPNvMaXXBH+Zpwtw97PZZ0zt0uoYXXc7CI7qZzx96YxpzZmu6aJP/SUEvzOwb3yW8z/1knAsUv0uqWYBq5VDdl1tjiXbIJpqccRg8GJmfPhz2SjI0jJ2IkcYoQd18+mK6P84=
+	t=1738013846; cv=none; b=AbE9TN1+4wCWjhkLr3hyij3AYzO8k1OPXZ3XgjQMyCnF1fOXD1AqC5hGKDNF2IurnC3jBMxiKj1FJsTTS8vNKi+8CwyUKYN3gg7MlIycdXWghQRTTHqshgZteMIEfNrlG/S6Pl80Mw19XkUJKPIMQzAZdnSDUg7kyzmpdQebvvY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1738013587; c=relaxed/simple;
-	bh=/OeDR5k+4FDDPhh8tmp+lqPzXI7McdFUvLCLFm+Izqw=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=kAOQi01W9MBP9VoffpkyUv0PdHEyyIBCT5hLIHIvjnCmWeBWpPaMjDRvKB03sOWbht94nhf0jIXShd2DPCw0b/1bvGOcSHsmJaBMCDpHL0p3uRj285/jXAxo7oq5tgvM2p28KWUXV1xfbrgwhbZfpFc8WxmjlmuoJXqXRPFwQBg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=oqFUBH1V; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id EF808C4CED2;
-	Mon, 27 Jan 2025 21:33:05 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1738013586;
-	bh=/OeDR5k+4FDDPhh8tmp+lqPzXI7McdFUvLCLFm+Izqw=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=oqFUBH1VuudKCknXx1YNMhHxiUykBJYLVoxVqkGjrTrKgODVwjI4oF9CjwfjihZ54
-	 1qM/Wpy4BYXhcbaMZQ3Tpd6pmPx2bOlqKb86uLIJNA/o10yNcyIQc42z5T9DLg8tGC
-	 Q1ejjwB71++GJ1mLC3tHJv3H9ngLTyAxR+noQ9UitJt3rpcru1rIo6VXvLEi/l6HA7
-	 FvRFZ6sSyq6KlzJV/SWYN3P1rch2yVOfia1lLwAChJxOOR52pyEZHJ2Zx0ukM13eHG
-	 OW2W2A/BLaOsIHtBDgGMgwJXl74E3X+5+9bW1nv2RThvkQ/9SPW2Q5ldgrzDmAQvDd
-	 hFHFz2GQQhmJA==
-Date: Mon, 27 Jan 2025 13:33:04 -0800
-From: Jakub Kicinski <kuba@kernel.org>
-To: Joe Damato <jdamato@fastly.com>
-Cc: Jason Wang <jasowang@redhat.com>, netdev@vger.kernel.org,
- gerhard@engleder-embedded.com, leiyang@redhat.com,
- xuanzhuo@linux.alibaba.com, mkarsten@uwaterloo.ca, "Michael S. Tsirkin"
- <mst@redhat.com>, Eugenio =?UTF-8?B?UMOpcmV6?= <eperezma@redhat.com>,
- Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller"
- <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Paolo Abeni
- <pabeni@redhat.com>, "open list:VIRTIO CORE AND NET DRIVERS"
- <virtualization@lists.linux.dev>, open list <linux-kernel@vger.kernel.org>
-Subject: Re: [RFC net-next v3 2/4] virtio_net: Prepare for NAPI to queue
- mapping
-Message-ID: <20250127133304.7898e4c2@kernel.org>
-In-Reply-To: <Z5ffCVsbasJKnW6Q@LQ3V64L9R2>
-References: <20250121191047.269844-1-jdamato@fastly.com>
-	<20250121191047.269844-3-jdamato@fastly.com>
-	<CACGkMEvT=J4XrkGtPeiE+8fwLsMP_B-xebnocJV8c5_qQtCOTA@mail.gmail.com>
-	<Z5EtqRrc_FAHbODM@LQ3V64L9R2>
-	<CACGkMEu6XHx-1ST9GNYs8UnAZpSJhvkSYqa+AE8FKiwKO1=zXQ@mail.gmail.com>
-	<Z5Gtve0NoZwPNP4A@LQ3V64L9R2>
-	<CACGkMEvHVxZcp2efz5EEW96szHBeU0yAfkLy7qSQnVZmxm4GLQ@mail.gmail.com>
-	<Z5P10c-gbVmXZne2@LQ3V64L9R2>
-	<CACGkMEv4bamNB0KGeZqzuJRazTtwHOEvH2rHamqRr1s90FQ2Vg@mail.gmail.com>
-	<Z5fHxutzfsNMoLxS@LQ3V64L9R2>
-	<Z5ffCVsbasJKnW6Q@LQ3V64L9R2>
+	s=arc-20240116; t=1738013846; c=relaxed/simple;
+	bh=azgMEnD6r8HfsrMZT1Y82Fn/fiuBFmXON8stF68REpQ=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=aTdtM2JTzmu4OVmLmCLL0ZLZdHlf/YLc1YcxTwusn5zcg2AoJciQUXEZAiYerSWHK22hAcmEcaw4A98ekh0rcjtPXlO/9LLhx1MCCwIX4W/hFHj0IVv4Q1ZMiC1nmVBumDQXHaTy6oeBmyQoaZCL2PZK9OXq/2xTT6wNnJUtXHs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=treblig.org; spf=pass smtp.mailfrom=treblig.org; dkim=pass (2048-bit key) header.d=treblig.org header.i=@treblig.org header.b=VrMHoolz; arc=none smtp.client-ip=46.235.229.95
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=treblig.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=treblig.org
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=treblig.org
+	; s=bytemarkmx; h=MIME-Version:Message-ID:Date:Subject:From:Content-Type:From
+	:Subject; bh=ifMP4EWyzhCrMfXhnckJ28Yc7rD0y2bx5+E1WJBchr8=; b=VrMHoolzruMRtoWl
+	FscqVcwsbJXTVaOapHqbHziOsCiBjLmY9nmWzm3Dn9kiVKueoCrIkittPhUCftBlbKkccXwobasau
+	PyCjZL4e9n6qI8vM/0e0A7bcJaiY9I+b/VnjUh3L/yxi/Yp9PfPZwIlWnYp5+tuIsIZtCxe44FZ0q
+	tsvyeGDvGJ2Ub3u3FbweoQLxxGTuGu99M0C5XY2jD8G7EDfS7Z9TgmjSijAn3vnihfskpuLYcCJKC
+	ONOJ8SxPzZg6c0JC7LrlXwqJUVetg8MAZb5/dBqlKhPYmvXlGPL4ublQAlzAUKitgSIvqRY6jX8O7
+	XPg4+MTCuG4Rbb2rrQ==;
+Received: from localhost ([127.0.0.1] helo=dalek.home.treblig.org)
+	by mx.treblig.org with esmtp (Exim 4.96)
+	(envelope-from <linux@treblig.org>)
+	id 1tcWnF-00CMm7-0K;
+	Mon, 27 Jan 2025 21:37:17 +0000
+From: linux@treblig.org
+To: marcel@holtmann.org,
+	johan.hedberg@gmail.com,
+	luiz.dentz@gmail.com
+Cc: davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	horms@kernel.org,
+	linux-bluetooth@vger.kernel.org,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	"Dr. David Alan Gilbert" <linux@treblig.org>
+Subject: [PATCH 0/2] Bluetooth: MGMT: Deadcode cleanup
+Date: Mon, 27 Jan 2025 21:37:14 +0000
+Message-ID: <20250127213716.232551-1-linux@treblig.org>
+X-Mailer: git-send-email 2.48.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 
-On Mon, 27 Jan 2025 14:31:21 -0500 Joe Damato wrote:
-> Actually, I missed a patch Jakub submit to net [1], which prevents
-> dumping TX-only NAPIs.
+From: "Dr. David Alan Gilbert" <linux@treblig.org>
 
-That patch only addresses NAPI ops, here I think we're talking about
-attributes of the queue object.
+Hi,
+  A couple of deadcode removal patches.
 
-> So, I think this RFC as-is (only calling netif_queue_set_napi
-> for RX NAPIs) should be fine without changes.
+They're both strictly function removals, no internal changes
+to a function.
 
-Weak preference towards making netdev_nl_queue_fill_one() "do the right
-thing" when NAPI does not have ID assigned. And right thing IMO would
-be to skip reporting the NAPI_ID attribute.
+Build tested only.
 
-Tx NAPIs are one aspect, whether they have ID or not we may want direct
-access to the struct somewhere in the core, via txq, at some point, and
-then people may forget the linking has an unintended effect of also
-changing the netlink attrs. The other aspect is that driver may link
-queue to a Rx NAPI instance before napi_enable(), so before ID is
-assigned. Again, we don't want to report ID of 0 in that case.
+Signed-off-by: Dr. David Alan Gilbert <linux@treblig.org>
+
+
+Dr. David Alan Gilbert (2):
+  Bluetooth: MGMT: Remove unused mgmt_pending_find_data
+  Bluetooth: MGMT: Remove unused mgmt_*_discovery_complete
+
+ include/net/bluetooth/hci_core.h |  2 --
+ net/bluetooth/mgmt.c             | 40 --------------------------------
+ net/bluetooth/mgmt_util.c        | 17 --------------
+ net/bluetooth/mgmt_util.h        |  4 ----
+ 4 files changed, 63 deletions(-)
+
+-- 
+2.48.1
+
 
