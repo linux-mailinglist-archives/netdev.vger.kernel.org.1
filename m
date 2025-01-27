@@ -1,119 +1,143 @@
-Return-Path: <netdev+bounces-161170-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-161171-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6E8ACA1DBCF
-	for <lists+netdev@lfdr.de>; Mon, 27 Jan 2025 19:04:49 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 52E94A1DBD6
+	for <lists+netdev@lfdr.de>; Mon, 27 Jan 2025 19:05:42 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C29B13A16AE
-	for <lists+netdev@lfdr.de>; Mon, 27 Jan 2025 18:04:41 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B11FA164B6E
+	for <lists+netdev@lfdr.de>; Mon, 27 Jan 2025 18:05:40 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 571CB18A6A9;
-	Mon, 27 Jan 2025 18:04:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7B7CF18C03B;
+	Mon, 27 Jan 2025 18:05:37 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="pa1i/Uqj"
+	dkim=pass (1024-bit key) header.d=fastly.com header.i=@fastly.com header.b="DjcEO86d"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qk1-f173.google.com (mail-qk1-f173.google.com [209.85.222.173])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1F83D153808;
-	Mon, 27 Jan 2025 18:04:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AFEF413D52E
+	for <netdev@vger.kernel.org>; Mon, 27 Jan 2025 18:05:35 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.173
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1738001085; cv=none; b=BghCQGr3wpesljYMhRc78izPvuWBY1eAORiVG8AE0cfoQFRe0aM6zgPorZfS6Ob6TWGc5Q/SuYq9NI8mY3vV24UNnhmYJEaR3+fF4YDBMMHNv9kjv25pFBnlWyTBp5306NtQXZnn+IG9GZYq9nmuCGhQODh9Mf3XpUgKdTzLsYY=
+	t=1738001137; cv=none; b=bOFa3gV2R9clu8UzlE8QIFBLVVF0h9NZKOcM5EN9uPKen0U7lSl29mQUC6A6PJg+4RzMrxnDRdhv1UdJe0AXFfPs9FavqK7omK29ElZbMUwe4G9QLcbcdz+k4C/BiYJsBUoswqTqxDQ7z5YuPpJp5+fNquJAsw+dLaLg0v+6DJQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1738001085; c=relaxed/simple;
-	bh=H/TAc9fGLArvc2BRtJuDGahSmYMiOfZlb3sEWjWRvdk=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=L4YPJobzaTzIVE03OCabjQqMGEt8hrqHejbahLIDpFcGTIsPv9qWYmCSX/zRg/ZG/z3NgV8Ninsk91W8IiczlvXloocvtxFmahAlaT2S7GErq6WMWPxWxbO2jNebI0absyOgsnX3U0nkuLb0DKwHBG0KSTZw431dbStlruhYSFM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=pa1i/Uqj; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9F93BC4CED2;
-	Mon, 27 Jan 2025 18:04:42 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1738001084;
-	bh=H/TAc9fGLArvc2BRtJuDGahSmYMiOfZlb3sEWjWRvdk=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=pa1i/Uqj8nt3XnOgB4es4hq3WXqmWYJe+K+7Ypr1PhtZKUOMb+h3wCHGV8pGfCXWf
-	 V/jNdW1KJ0DAgBElQtp27kbynF6Xdb64ebEeDtcaavOt9nt3wH1DLI4Alev/ln14Z5
-	 8MnTCYVHpwTy5t3/GnzlRYIwYejiGooeUjDn1YgpVCFKG0fB11N85ZNFumQQbSP2kU
-	 WigdIP+MK+4Ziy2Bpk1ilyK4PIrxFTjdf+y0w2rgNqfwu0cfUToiNhOhF8q3sAM18+
-	 xPG+JfYTyHktRw2Gk07i3VSNMzu5ZS6RERP5ylIMJESoE+MWfyQ7kbBA6E5MKHoZY2
-	 EGi/oAiz8W3jA==
-Date: Mon, 27 Jan 2025 10:04:41 -0800
-From: Jakub Kicinski <kuba@kernel.org>
-To: Toke =?UTF-8?B?SMO4aWxhbmQtSsO4cmdlbnNlbg==?= <toke@redhat.com>
-Cc: Stanislav Fomichev <stfomichev@gmail.com>, Florian Bezdeka
- <florian.bezdeka@siemens.com>, "Song, Yoong Siang"
- <yoong.siang.song@intel.com>, "Bouska, Zdenek" <zdenek.bouska@siemens.com>,
- "David S . Miller" <davem@davemloft.net>, Eric Dumazet
- <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, Simon Horman
- <horms@kernel.org>, Willem de Bruijn <willemb@google.com>, Donald Hunter
- <donald.hunter@gmail.com>, Jonathan Corbet <corbet@lwn.net>, Bjorn Topel
- <bjorn@kernel.org>, "Karlsson, Magnus" <magnus.karlsson@intel.com>,
- "Fijalkowski, Maciej" <maciej.fijalkowski@intel.com>, Jonathan Lemon
- <jonathan.lemon@gmail.com>, Andrew Lunn <andrew+netdev@lunn.ch>, Alexei
- Starovoitov <ast@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>,
- Jesper Dangaard Brouer <hawk@kernel.org>, John Fastabend
- <john.fastabend@gmail.com>, "Damato, Joe" <jdamato@fastly.com>, Stanislav
- Fomichev <sdf@fomichev.me>, Xuan Zhuo <xuanzhuo@linux.alibaba.com>, Mina
- Almasry <almasrymina@google.com>, Daniel Jurgens <danielj@nvidia.com>,
- Andrii Nakryiko <andrii@kernel.org>, Eduard Zingerman <eddyz87@gmail.com>,
- Mykola Lysenko <mykolal@fb.com>, Martin KaFai Lau <martin.lau@linux.dev>,
- Song Liu <song@kernel.org>, Yonghong Song <yonghong.song@linux.dev>, KP
- Singh <kpsingh@kernel.org>, Hao Luo <haoluo@google.com>, Jiri Olsa
- <jolsa@kernel.org>, Shuah Khan <shuah@kernel.org>, Alexandre Torgue
- <alexandre.torgue@foss.st.com>, Jose Abreu <joabreu@synopsys.com>, Maxime
- Coquelin <mcoquelin.stm32@gmail.com>, "Nguyen, Anthony L"
- <anthony.l.nguyen@intel.com>, "Kitszel, Przemyslaw"
- <przemyslaw.kitszel@intel.com>, "netdev@vger.kernel.org"
- <netdev@vger.kernel.org>, "linux-kernel@vger.kernel.org"
- <linux-kernel@vger.kernel.org>, "linux-doc@vger.kernel.org"
- <linux-doc@vger.kernel.org>, "bpf@vger.kernel.org" <bpf@vger.kernel.org>,
- "linux-kselftest@vger.kernel.org" <linux-kselftest@vger.kernel.org>,
- "linux-stm32@st-md-mailman.stormreply.com"
- <linux-stm32@st-md-mailman.stormreply.com>,
- "linux-arm-kernel@lists.infradead.org"
- <linux-arm-kernel@lists.infradead.org>, "intel-wired-lan@lists.osuosl.org"
- <intel-wired-lan@lists.osuosl.org>, "xdp-hints@xdp-project.net"
- <xdp-hints@xdp-project.net>
-Subject: Re: [xdp-hints] Re: [PATCH bpf-next v6 4/4] igc: Add launch time
- support to XDP ZC
-Message-ID: <20250127100441.0b11e1b8@kernel.org>
-In-Reply-To: <87bjvwqvtl.fsf@toke.dk>
-References: <20250116155350.555374-1-yoong.siang.song@intel.com>
-	<20250116155350.555374-5-yoong.siang.song@intel.com>
-	<AS1PR10MB5675499EE0ED3A579151D3D3EBE02@AS1PR10MB5675.EURPRD10.PROD.OUTLOOK.COM>
-	<PH0PR11MB583095A2F12DA10D57781D18D8E02@PH0PR11MB5830.namprd11.prod.outlook.com>
-	<ea087229cc6f7953875fc69f1b73df1ae1ee9b72.camel@siemens.com>
-	<Z5KdSlzmyCKUyXTn@mini-arch>
-	<87bjvwqvtl.fsf@toke.dk>
+	s=arc-20240116; t=1738001137; c=relaxed/simple;
+	bh=BEsb6n9siTaP4x7qFV/R66om8n+Tzywea90SydC5C44=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=B6R0wF4gUauK13IuTOnuxhv7s+gNI2n1jezY67ICjJyyzhGihT5jW9R6UChmpUt/Ryv9rCXfz7kB3wHNdWn857xMUgo6Rny5aPhJI+RlVciR7L5ZvYKAcViRlKhkpCewG9X5rlP7zfMkEW7bMW+zv5qpGIGWI6KmAPSlYAKkReo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fastly.com; spf=pass smtp.mailfrom=fastly.com; dkim=pass (1024-bit key) header.d=fastly.com header.i=@fastly.com header.b=DjcEO86d; arc=none smtp.client-ip=209.85.222.173
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fastly.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=fastly.com
+Received: by mail-qk1-f173.google.com with SMTP id af79cd13be357-7b6fc3e9e4aso414780785a.2
+        for <netdev@vger.kernel.org>; Mon, 27 Jan 2025 10:05:35 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=fastly.com; s=google; t=1738001134; x=1738605934; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references
+         :mail-followup-to:message-id:subject:cc:to:from:date:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=AMDn01SWIjmfdhQcwUIs75izjTf9Hnbhitqkx9MGjr8=;
+        b=DjcEO86dDG+nK02pcFEjZRpNhTXqYRYWF0R0TQ/xldO+P9mKnndPEHX1lF4mM471Cr
+         89gAabhK0KjKTQ0xTiekmEGyzVanbzJ9dlJp/gw3ihgSc7Gj79H/Xt1xdF/mHon29PYF
+         OypBAZm2MH7hOXpHogXOIZS6oEm7YoA0j+iBc=
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1738001134; x=1738605934;
+        h=in-reply-to:content-disposition:mime-version:references
+         :mail-followup-to:message-id:subject:cc:to:from:date
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=AMDn01SWIjmfdhQcwUIs75izjTf9Hnbhitqkx9MGjr8=;
+        b=h1wnx50sgVpp3i8NVnNBXTLQxj0LsW+O3qAJAju8o5oEiBtMcFyh3llHKEsm/A5N73
+         dV6w/WpocqrKP2rd6zv1yn6k8z4fDQDyZSHKb/9dBtJZz/t0t7o9ynQSovaxgKa21nSW
+         aanloz+Tvle38uWAfqc3+xDCjIbSzPTAEzdxJemE8+6UWM2gWij9vMxoVE7RY9xGEEyp
+         NWAFQLZJ6cd7qdRUTkoxARr198YfGxhLLWg9d6hQkPhsVd06HRXGzf/2OlMOci7u7Wzf
+         3YRn4azL9jpVjCot2EeU1KOkpVqUBc01Wx8BPt4adOHIydg8Fiu8P+/rLGqPEiTu6yj+
+         I27g==
+X-Forwarded-Encrypted: i=1; AJvYcCUPHhnKAPEpBnTZehJrb1vPQVDSf6+0KSfeWkcoF7HVWL0x9WqLj30eKogdJAKpNo7csrtc2pE=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyEoOE1ykxm0jmShBySTJmq1DqYZ2U55JrKSebYRy8cjCM7uR4T
+	bTbLTMwP+D9a0sfQGvcStEp3fMaIkVt9PXo87fplpvCFXV2TI8zrpnn12F72EqU=
+X-Gm-Gg: ASbGncvhD7+ybR5lxvhc/E8MTJk3F+hVSkjETyWbvZ44puDZEvLrp4nqZW1ybsxlG08
+	UVCY8cZenb2dl0yofwMBsCAzWWGkO90ALqSkjAccR+QWjh2ywUQ/SjhbdPK3XLzm40HeOkgfBNH
+	YdriwELU3CCMUZqmOHd7DILwGowLF95AT0v5rm3904rplJxQT6xnzmHUOBLIbUYymRQAFTNwmqs
+	/j+IxZZ0DlPIzgV8IMXy3AWV1Pu81CVZq7z5sl2vp2WXN8WUXxxIFSYVqp4tX9xU/Qal0xyLaMK
+	LRpMlwXEllJxuhkmPi5+mWPeYngYhHRe7hcQk5GqIrIfJLAQ
+X-Google-Smtp-Source: AGHT+IGyYeeR4TsA+WdrCQYCr/8+qk1j+5VwubRGe5d2pC8iYUgJlAW0YwezLbYdTJ+RcwEWCyf2Yg==
+X-Received: by 2002:a05:620a:14e:b0:7be:6eb1:f4dc with SMTP id af79cd13be357-7be6eb1f594mr4305704785a.51.1738001134568;
+        Mon, 27 Jan 2025 10:05:34 -0800 (PST)
+Received: from LQ3V64L9R2 (ip-185-104-139-70.ptr.icomera.net. [185.104.139.70])
+        by smtp.gmail.com with ESMTPSA id af79cd13be357-7be9aeefd88sm414259285a.77.2025.01.27.10.05.32
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 27 Jan 2025 10:05:34 -0800 (PST)
+Date: Mon, 27 Jan 2025 13:05:30 -0500
+From: Joe Damato <jdamato@fastly.com>
+To: nicolas.bouchinet@clip-os.org
+Cc: linux-kernel@vger.kernel.org, linux-rdma@vger.kernel.org,
+	linux-scsi@vger.kernel.org, codalist@coda.cs.cmu.edu,
+	linux-nfs@vger.kernel.org, netdev@vger.kernel.org,
+	netfilter-devel@vger.kernel.org, coreteam@netfilter.org,
+	Nicolas Bouchinet <nicolas.bouchinet@ssi.gouv.fr>,
+	Joel Granados <j.granados@samsung.com>,
+	Bart Van Assche <bvanassche@acm.org>,
+	Leon Romanovsky <leon@kernel.org>,
+	Zhu Yanjun <yanjun.zhu@linux.dev>, Jason Gunthorpe <jgg@ziepe.ca>,
+	Al Viro <viro@zeniv.linux.org.uk>,
+	Christian Brauner <brauner@kernel.org>
+Subject: Re: [PATCH v1 0/9] Fixes multiple sysctl bound checks
+Message-ID: <Z5fK6jnrjMBDrDJg@LQ3V64L9R2>
+Mail-Followup-To: Joe Damato <jdamato@fastly.com>,
+	nicolas.bouchinet@clip-os.org, linux-kernel@vger.kernel.org,
+	linux-rdma@vger.kernel.org, linux-scsi@vger.kernel.org,
+	codalist@coda.cs.cmu.edu, linux-nfs@vger.kernel.org,
+	netdev@vger.kernel.org, netfilter-devel@vger.kernel.org,
+	coreteam@netfilter.org,
+	Nicolas Bouchinet <nicolas.bouchinet@ssi.gouv.fr>,
+	Joel Granados <j.granados@samsung.com>,
+	Bart Van Assche <bvanassche@acm.org>,
+	Leon Romanovsky <leon@kernel.org>,
+	Zhu Yanjun <yanjun.zhu@linux.dev>, Jason Gunthorpe <jgg@ziepe.ca>,
+	Al Viro <viro@zeniv.linux.org.uk>,
+	Christian Brauner <brauner@kernel.org>
+References: <20250127142014.37834-1-nicolas.bouchinet@clip-os.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250127142014.37834-1-nicolas.bouchinet@clip-os.org>
 
-On Fri, 24 Jan 2025 12:45:42 +0100 Toke H=C3=B8iland-J=C3=B8rgensen wrote:
-> >> I think there is no simple fix for that. That needs some discussion
-> >> around the "expectations" to the headroom / meta data area in front of
-> >> the actual packet data. =20
-> >
-> > By 'simple' you mean without some new UAPI to signal the size of that
-> > 'reserved area' by the driver? I don't see any other easy way out as we=
-ll :-/ =20
->=20
-> Yeah, I don't think we can impose UAPI restrictions on the metadata area
-> at this point. I guess the best we can do is to educate users that they
-> should call the timestamp kfunc before they modify the metadata?
+On Mon, Jan 27, 2025 at 03:19:57PM +0100, nicolas.bouchinet@clip-os.org wrote:
+> From: Nicolas Bouchinet <nicolas.bouchinet@ssi.gouv.fr>
+> 
+> Hi,
+> 
+> This patchset adds some bound checks to sysctls to avoid negative
+> value writes.
+> 
+> The patched sysctls were storing the result of the proc_dointvec
+> proc_handler into an unsigned int data. proc_dointvec being able to
+> parse negative value, and it return value being a signed int, this could
+> lead to undefined behaviors.
+> This has led to kernel crash in the past as described in commit
+> 3b3376f222e3 ("sysctl.c: fix underflow value setting risk in vm_table")
+> 
+> Most of them are now bounded between SYSCTL_ZERO and SYSCTL_INT_MAX.
+> nf_conntrack_expect_max is bounded between SYSCTL_ONE and SYSCTL_INT_MAX
+> as defined by its documentation.
 
-I may be misunderstanding the discussion, but I think the answer=20
-is that the driver must be fixed. The metadata-in-prepend problem
-also exists for simple adjust head use case, so it existed since
-early days of BPF. The driver should copy out (or parse) the metadata
-before it invokes the XDP prog. The nfp driver does that.
+I noticed that none of the patches have a Fixes tags. Do any of
+these fix existing crashes or is this just cleanup?
+
+I am asking because if this is cleanup then it would be "net-next"
+material instead of "net" and would need to be resubmit when then
+merge window has passed [1].
+
+FWIW, I submit a similar change some time ago and it was submit to
+net-next as cleanup [2].
+
+[1]: https://lore.kernel.org/netdev/20250117182059.7ce1196f@kernel.org/
+[2]: https://lore.kernel.org/netdev/CANn89i+=HiffVo9iv2NKMC2LFT15xFLG16h7wN3MCrTiKT3zQQ@mail.gmail.com/T/
 
