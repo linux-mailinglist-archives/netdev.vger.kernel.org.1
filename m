@@ -1,92 +1,80 @@
-Return-Path: <netdev+bounces-161158-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-161159-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id BF819A1DAFE
-	for <lists+netdev@lfdr.de>; Mon, 27 Jan 2025 18:06:47 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 544D6A1DB07
+	for <lists+netdev@lfdr.de>; Mon, 27 Jan 2025 18:11:03 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 0278018873F1
-	for <lists+netdev@lfdr.de>; Mon, 27 Jan 2025 17:06:52 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A91D03A4CF5
+	for <lists+netdev@lfdr.de>; Mon, 27 Jan 2025 17:10:55 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C371518628F;
-	Mon, 27 Jan 2025 17:06:45 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=fastly.com header.i=@fastly.com header.b="w4WFE9mX"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E893018952C;
+	Mon, 27 Jan 2025 17:10:56 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f175.google.com (mail-pl1-f175.google.com [209.85.214.175])
+Received: from mail-ed1-f44.google.com (mail-ed1-f44.google.com [209.85.208.44])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1EC293D64
-	for <netdev@vger.kernel.org>; Mon, 27 Jan 2025 17:06:43 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.175
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1D110188736;
+	Mon, 27 Jan 2025 17:10:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.44
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1737997605; cv=none; b=pXXCmPT463GNM8wqh6srdnt2aJ6owA9EcUHlDVji656Wmxn854WeIa1M7F16gXUgicvihplqZ9a57ayvAORxiw3yVZ+RZi13wSuAaTw/YlBV8Jk3aIqOhXGCYNE9d7ke7HCyKj/rex9SBYmzFYswbte9aDN33JCcLu5onbfVy/s=
+	t=1737997856; cv=none; b=MbbG7tIL/T/SUHCPqEsKEFyub+WjVV5eRGfA/fhkukiO23ynvUdy6aG6Y2Oy/3zsnupBxSWuwIYXxnKYRRNVQ+Hif7NgBIFx6NG+hpEgiqSBJ7VN485KzmLAdJ6sr+0/YAnsQjn3wZgwsEH4LXLrO6EqZDr5vNCtG9xNkq4XWgY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1737997605; c=relaxed/simple;
-	bh=qlqx4rZqHC/l3KePO8UHK/0zGhIXXgbP80fO3bq2P5I=;
+	s=arc-20240116; t=1737997856; c=relaxed/simple;
+	bh=Bi+qspMKKsh4IalPW5ItwF1IXJOMsqx915Y+atCisKE=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=mhG1TI6bgD9EomhWzatd0XBrMHW9hHGsrEBtORIcyH8im8pWYTca8f3hFK4bDR+COfu1z6IPx8iE22Rro4KDNlyBkecOwJEM/5jORO7Y3LHemYZSdMKmavUh5WUQkwSnsdaT3sKbzMhxcqj5H8Ey6cMqAgblShbrEoOUMgjoW1c=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fastly.com; spf=pass smtp.mailfrom=fastly.com; dkim=pass (1024-bit key) header.d=fastly.com header.i=@fastly.com header.b=w4WFE9mX; arc=none smtp.client-ip=209.85.214.175
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fastly.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=fastly.com
-Received: by mail-pl1-f175.google.com with SMTP id d9443c01a7336-21636268e43so103082955ad.2
-        for <netdev@vger.kernel.org>; Mon, 27 Jan 2025 09:06:43 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=fastly.com; s=google; t=1737997603; x=1738602403; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references
-         :mail-followup-to:message-id:subject:cc:to:from:date:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=E34pl0BoUrncaZIlq/JLi0x1yytukPdl98VLmKsLLMY=;
-        b=w4WFE9mX6Tgf9Wpk3llCE1L2l7m2NM6VvwIggnZDE6Ji/JZORz8BFJ73zuxwx4lfXB
-         7yNnZcjc5TJHoEO43IzO1y33PxDfnGBfKNakaV8AZgcdqVrS7GlykkUQWa0oNyISnMU1
-         youfyRwRfL+vnmZ6Nl0qRHT3MDScBV7wRdkck=
+	 Content-Type:Content-Disposition:In-Reply-To; b=g/eLt8hdBp5vqZJBhbdzylGN8iuL0zOELrKX2mlIxPbq2MTtgSnJNVcnUTk5zWIyC6YaNfgXaCtKEPAPeIEmpXsujFB6WqkKmOpX00EkE4Vj9es9MrZKelaZ3Sxl0RrsQPuB/3JR77pJKYx/Psc6HsOnGrQ6cwokIaI+3oh0+28=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.208.44
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-ed1-f44.google.com with SMTP id 4fb4d7f45d1cf-5d932eac638so9201757a12.1;
+        Mon, 27 Jan 2025 09:10:53 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1737997603; x=1738602403;
-        h=in-reply-to:content-disposition:mime-version:references
-         :mail-followup-to:message-id:subject:cc:to:from:date
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=E34pl0BoUrncaZIlq/JLi0x1yytukPdl98VLmKsLLMY=;
-        b=qX9GWdoUZrOWvBtfwwL7patAFrjKt12ySiyU0w2tEHewMHZnoxWkCKIxu3iNRpghSK
-         xU41cLP47YDctB4ZbFfvXpHK4GLw9GtXixnH9KhxMDQoEAPjeP5e81qSjrJt6U+p2KL5
-         +qGzgoY1+RX8zezjMehnQTvC0rz5acTPlFgBY/zfz2/FxFv7P/5zDv0JG7NTsi1KdbaS
-         3TsKAvA9ucPO4XNxqL+CtIddL8jcXDwRGQ2x0/zdJ1Hou7JegT4+1KiGQ1LpF0/mM519
-         MHZmsVIzXEB53Gq72+cF3EfQcSWlmzLuc3jniSNmrRn6Keyo8qsardAR+ADSlYn5HQ/t
-         BKAA==
-X-Forwarded-Encrypted: i=1; AJvYcCXnsxIqnNPNYSbv4Xfr4Xn760KrZcq0WCeQGj49OqWKF87bGWARl2yXUncOVGnnjkYsJDKe9DU=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxruOBePXMoFi6oiQVaDA/ktaxORGKYlCXpD1AvKb9B8KrN/dTm
-	33cIbwFD2l38gFwou7nTq2SL+oxhJlx1yvnu4f7urCyFk+uvNTbqK2WnR4P1qPA=
-X-Gm-Gg: ASbGncvFfeIqCpwKDcjh0nx4TfwVkxQcelo5OiQQKd9D6RSJJJmcTwon+jAx3xNeFzk
-	b+8D9JbGULvb0lDq4qKCOIzZMl3npUbcHl/TIkXjtZEepdm1NJiJd56iL+MTC7MtbrT/MNYQoIn
-	dY9kZUkO7gMFRujkCWtx23xEFf6IMAa5ul8yYkz904eBfea6dEfy+qX75jwL02iHhK/wKDXRj7T
-	3KVcSeBd06Re6C6jsO85GTCztU5b+vRW+dV6JjO2rT9yYJWcdybmF2RslbzlvUokDHlNXxQSfmi
-	k/0Wsb5yrdGvSbDHqw5Tsp3hHjTlFa/XpgUCtfrEz/7uiY1d
-X-Google-Smtp-Source: AGHT+IFO7lCRngJ2/Aoer2/vVcK0gak0j2svkFSPh0vTnwbSvuIYQZoRmS5k3Yckv3NAUnyMvW4Twg==
-X-Received: by 2002:a17:903:2283:b0:215:7421:262 with SMTP id d9443c01a7336-21c3540a248mr713566675ad.12.1737997603237;
-        Mon, 27 Jan 2025 09:06:43 -0800 (PST)
-Received: from LQ3V64L9R2 (ip-185-104-139-70.ptr.icomera.net. [185.104.139.70])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-21da414cc61sm65382575ad.164.2025.01.27.09.06.41
+        d=1e100.net; s=20230601; t=1737997852; x=1738602652;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=FVF05zC6+ZNJvFRi7LzbSSs7l9kPd2AWr8fGMwkBgvQ=;
+        b=OnTM0pWEhHeBXpj7Ovj8RlOJsYqCUtDDnWAzQOErbi+57aM2kw4gHQ05FbNb1IbVd4
+         9NgMb7RWa+IfMGuFQ9y1WK2ikR0slbYcvZYFJQ8o5BwRum292N1+/UYhvm1wRg9BZKH+
+         4Bpk2ImtG3UTYXV9cbvOi8VLlDo98DiU/bv90Bxrm0MjB3UwW2TXRGIdIs+hxJFV/8R6
+         jXSpRlsGgLxR/T+zUtF7TbL4zohS6Wg2u2YbDe53OZki8uTPikWGRX7Fsoy+8PQqjtUa
+         5OQ5kjWPzwPCKUX6PMxW3jwq3M45nSuYJoMvT9F1+xiFDRssn9QnH6GRJZwB2+qHleja
+         Fwjw==
+X-Forwarded-Encrypted: i=1; AJvYcCUgG7ipDmTZ2M2e8xMCnkITN5MYgH2D7/zfj1D/cCTiDSur41MEZRXF8T9Q/766T6F5nSV6ICmoNeI=@vger.kernel.org, AJvYcCX2h0G7utKtAQFCxAGbJI42IQrMP/Hsxp/m3yzMCSjiBBc1EQJEsm5Jwcx0t9Y024+cKukxl0k1@vger.kernel.org, AJvYcCXPZ82bkyQSPekaHaJWxYAqPR4aKLG0z84Pd8OS1YgCQB1fbfEYcLHK6G2TTVF7utpfRQdXATbVWoldjmOC@vger.kernel.org, AJvYcCXiLWJhparBtVCPouam+GckBACNu4e8DggJnvaGUj00mR3EiTmtEtbOGzDPlzfhe0Sz4L79X8HMFxlj7NanCZKZ@vger.kernel.org
+X-Gm-Message-State: AOJu0YzPMZpTE8xGosC6QDb8C5ZWRp6h9tsi3bplNit1pTYjKI5IG++1
+	tUHHqcnfRFgtGfqdv1Apy4bgdkLN0Dx2sMI3H/WtbQbJIfgwA+/J
+X-Gm-Gg: ASbGncs821rqLRe9siR4lEX4Il1nQ0qpI+eKq3OVkd0Uxila3ZR0GWMcM0/diO+Z2zT
+	Th7YotwHUuhVKH/wzOg8SVNoH8NPK4iOjl29N4fdTSVCQlj34L7lrtuXM7HqQOk2hZ9WVefMy9E
+	uR32Xfb6HKU9EJrJ1QOHKLVtPm3YN+14DuSE8obxcXimgDvafDesMpc3L4+CYWLVRZ2z7RCNPEM
+	B9LUoknKiVUgmx9RiGqdTIN5IZOOy8WpbqM6nDlCeatoZI2lSJNYGfMLQCdhlogthXk/4/C
+X-Google-Smtp-Source: AGHT+IHMnJgkyhto2i1MusAfY+8Ds920O+thYSdmOl+AWDxF3QeeuCuyz+cNSCTcLes5zVM7LriJXg==
+X-Received: by 2002:a17:907:3e1c:b0:aa6:a7ef:7f1f with SMTP id a640c23a62f3a-ab38b0bb338mr4133233766b.11.1737997852069;
+        Mon, 27 Jan 2025 09:10:52 -0800 (PST)
+Received: from gmail.com ([2a03:2880:30ff:71::])
+        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-ab6760fbd46sm619285566b.135.2025.01.27.09.10.50
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 27 Jan 2025 09:06:42 -0800 (PST)
-Date: Mon, 27 Jan 2025 12:06:39 -0500
-From: Joe Damato <jdamato@fastly.com>
-To: Samiullah Khawaja <skhawaja@google.com>
-Cc: Jakub Kicinski <kuba@kernel.org>,
-	"David S . Miller " <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
-	almasrymina@google.com, netdev@vger.kernel.org,
-	mkarsten@uwaterloo.ca
-Subject: Re: [PATCH net-next v2 0/4] Add support to do threaded napi busy poll
-Message-ID: <Z5e9H6dtwyrGQFfK@LQ3V64L9R2>
-Mail-Followup-To: Joe Damato <jdamato@fastly.com>,
-	Samiullah Khawaja <skhawaja@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	"David S . Miller " <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
-	almasrymina@google.com, netdev@vger.kernel.org,
-	mkarsten@uwaterloo.ca
-References: <20250123231236.2657321-1-skhawaja@google.com>
+        Mon, 27 Jan 2025 09:10:51 -0800 (PST)
+Date: Mon, 27 Jan 2025 09:10:49 -0800
+From: Breno Leitao <leitao@debian.org>
+To: Andrew Lunn <andrew@lunn.ch>
+Cc: Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Simon Horman <horms@kernel.org>, Jonathan Corbet <corbet@lwn.net>,
+	Shuah Khan <shuah@kernel.org>, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org, linux-doc@vger.kernel.org,
+	linux-kselftest@vger.kernel.org, rdunlap@infradead.org,
+	kernel-team@meta.com
+Subject: Re: [PATCH RFC net-next v3 8/8] netconsole: docs: Add documentation
+ for CPU number auto-population
+Message-ID: <20250127-passionate-scallop-of-exercise-bcfa03@leitao>
+References: <20250124-netcon_cpu-v3-0-12a0d286ba1d@debian.org>
+ <20250124-netcon_cpu-v3-8-12a0d286ba1d@debian.org>
+ <57392381-497c-49d8-9ad7-4b50c4939448@lunn.ch>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -95,32 +83,22 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20250123231236.2657321-1-skhawaja@google.com>
+In-Reply-To: <57392381-497c-49d8-9ad7-4b50c4939448@lunn.ch>
 
-On Thu, Jan 23, 2025 at 11:12:32PM +0000, Samiullah Khawaja wrote:
-> Extend the already existing support of threaded napi poll to do continuous
-> busy polling.
+On Fri, Jan 24, 2025 at 05:15:10PM +0100, Andrew Lunn wrote:
+> > +CPU number auto population in userdata
+> > +--------------------------------------
+> > +
+> > +Inside the netconsole configfs hierarchy, there is a file called
+> > +`cpu_nr` under the `userdata` directory. This file is used to enable or disable
+> > +the automatic CPU number population feature. This feature automatically
+> > +populates the CPU number that is sending the message.
 > 
-> This is used for doing continuous polling of napi to fetch descriptors from
-> backing RX/TX queues for low latency applications. Allow enabling of threaded
-> busypoll using netlink so this can be enabled on a set of dedicated napis for
-> low latency applications.
-> 
-> It allows enabling NAPI busy poll for any userspace application
-> indepdendent of userspace API being used for packet and event processing
-> (epoll, io_uring, raw socket APIs). Once enabled user can fetch the PID
-> of the kthread doing NAPI polling and set affinity, priority and
-> scheduler for it depending on the low-latency requirements.
+> Biking shedding a bit, but to me `cpu_nr` is the number of a
+> CPU. However, you want this to be an enable/disable feature. Would
+> `cpu_nr_enable`, or `cpu_nr_auto_populate` be clearer?
 
-When you resubmit this after the merge window (or if you resubmit it
-as an RFC), would you mind CCing both me (jdamato@fastly.com) and
-Martin (mkarsten@uwaterloo.ca) ?
+Agree, I think `cpu_nr_enable` is way better than just `cpu_nr`. I will
+update.
 
-We almost missed this revision after commenting on the previous
-version, since we weren't included in the CC list.
-
-Both Martin and I read through the cover letter and proposed changes
-and have several questions/comments, but given that the thread is
-marked as deferred/closed due to the merge window, we'll hold off
-on digging in until the next revision is posted.
 
