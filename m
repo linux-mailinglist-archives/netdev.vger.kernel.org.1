@@ -1,137 +1,141 @@
-Return-Path: <netdev+bounces-161176-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-161177-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1E435A1DC0B
-	for <lists+netdev@lfdr.de>; Mon, 27 Jan 2025 19:29:54 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id A221FA1DC6E
+	for <lists+netdev@lfdr.de>; Mon, 27 Jan 2025 20:07:42 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 7C655165DE4
-	for <lists+netdev@lfdr.de>; Mon, 27 Jan 2025 18:29:52 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id F39F77A05C3
+	for <lists+netdev@lfdr.de>; Mon, 27 Jan 2025 19:07:32 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6975918FC9D;
-	Mon, 27 Jan 2025 18:29:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 752AF18F2EF;
+	Mon, 27 Jan 2025 19:07:36 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=siemens.com header.i=florian.bezdeka@siemens.com header.b="A1zeyUFF"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="kfiWs/Cr"
 X-Original-To: netdev@vger.kernel.org
-Received: from mta-65-227.siemens.flowmailer.net (mta-65-227.siemens.flowmailer.net [185.136.65.227])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DE47718DF6B
-	for <netdev@vger.kernel.org>; Mon, 27 Jan 2025 18:29:45 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.136.65.227
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 45B5A18A924;
+	Mon, 27 Jan 2025 19:07:35 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1738002588; cv=none; b=E/75SujLxzMAyRxE2kSosfTEfun1LRLtU9bkWPW27b2u9pGxnpijbIDxZyADHNcZCok6GITttZ0kvZEX8Aq3CFN9NCeiiYs9cE72KP+Rfo4Xvr6lDytzBOdLhGgxH9kdCsR/235mSIgujQiHRNlsBmfMQthNWyVPL/ps52PeVME=
+	t=1738004856; cv=none; b=k/HU3j/XKsTwPLE9y7TOzta29zLEGNyfWefTYT3cNxwCRZfX02h2w5bHWZeys7s4djDpV7AMlBF+htjzSU48BXWhDU2gLadwtUt9IauCRporG8ZmUdm1IcFYZ84+mZoXINZvWS2fizCpo/3HZH4t2b0PSYVOnKwnUX158lHqDXU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1738002588; c=relaxed/simple;
-	bh=6panixb/x0os5ZapLWWRdFuJUYpBXz06VpJ2DjP+mog=;
-	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=g6LCAQ1N+ulMn/D3CUtj1WcXm3Eufg6X4yUVv6rhGkRqkAC5UBg8L7PVZ6ZpEAVEtutq5aDbu9b48BYMPW/NswGUkeM6RAKHK1PKyoF4IAlgBicY0s5Xch4eZc6/nWGNQqxR6Bbk8o4w1K+WugDEAy4pVv1dVs+TzkMy/izHUW8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=siemens.com; spf=pass smtp.mailfrom=rts-flowmailer.siemens.com; dkim=pass (2048-bit key) header.d=siemens.com header.i=florian.bezdeka@siemens.com header.b=A1zeyUFF; arc=none smtp.client-ip=185.136.65.227
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=siemens.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=rts-flowmailer.siemens.com
-Received: by mta-65-227.siemens.flowmailer.net with ESMTPSA id 20250127182936134811b9804c3192f6
-        for <netdev@vger.kernel.org>;
-        Mon, 27 Jan 2025 19:29:37 +0100
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; s=fm2;
- d=siemens.com; i=florian.bezdeka@siemens.com;
- h=Date:From:Subject:To:Message-ID:MIME-Version:Content-Type:Content-Transfer-Encoding:Cc:References:In-Reply-To;
- bh=6panixb/x0os5ZapLWWRdFuJUYpBXz06VpJ2DjP+mog=;
- b=A1zeyUFFCuD1/01IlvyP8a7nStl/yDefRzLmN46eDButuHBxshahsCwHerO9PK5bZUwBaa
- JjuZ5wN8wapbhPC7RQH833+3AZaTuy5Hg9Ykwfzz2qbR4tv9DDUEljsoo1ZPr0Oe7Ctz7mC+
- wTnT8ep8aZOaz2/vVNjJtHPEGReehUgGbNGdIiGu/viqY/zVDKE21ZWEMttrkvLeZcasGW7/
- bUjQ/l9tUym2erHZPCi2O/EuxulhwAgkra8vG+fKXFKYgN5pwU4OI0YQpq+ElJ/AqKR+EZmY
- GFEQX2KONvo3NAcX/+vsmHnehfI7eOIDOwh9xoWZpnQY3dJH4fvY2VUg==;
-Message-ID: <221bb71f7d2464cd566e4a4110423ea56b173cf6.camel@siemens.com>
-Subject: Re: [xdp-hints] Re: [PATCH bpf-next v6 4/4] igc: Add launch time
- support to XDP ZC
-From: Florian Bezdeka <florian.bezdeka@siemens.com>
-To: Jakub Kicinski <kuba@kernel.org>, Toke
- =?ISO-8859-1?Q?H=F8iland-J=F8rgensen?=
-	 <toke@redhat.com>
-Cc: Stanislav Fomichev <stfomichev@gmail.com>, "Song, Yoong Siang"
- <yoong.siang.song@intel.com>, "Bouska, Zdenek" <zdenek.bouska@siemens.com>,
- "David S . Miller" <davem@davemloft.net>, Eric Dumazet
- <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, Simon Horman
- <horms@kernel.org>, Willem de Bruijn <willemb@google.com>, Donald Hunter
- <donald.hunter@gmail.com>, Jonathan Corbet <corbet@lwn.net>, Bjorn Topel
- <bjorn@kernel.org>, "Karlsson, Magnus" <magnus.karlsson@intel.com>,
- "Fijalkowski, Maciej" <maciej.fijalkowski@intel.com>, Jonathan Lemon
- <jonathan.lemon@gmail.com>, Andrew Lunn <andrew+netdev@lunn.ch>, Alexei
- Starovoitov <ast@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>,
- Jesper Dangaard Brouer <hawk@kernel.org>, John Fastabend
- <john.fastabend@gmail.com>, "Damato, Joe" <jdamato@fastly.com>, Stanislav
- Fomichev <sdf@fomichev.me>, Xuan Zhuo <xuanzhuo@linux.alibaba.com>, Mina
- Almasry <almasrymina@google.com>, Daniel Jurgens <danielj@nvidia.com>,
- Andrii Nakryiko <andrii@kernel.org>, Eduard Zingerman <eddyz87@gmail.com>,
- Mykola Lysenko <mykolal@fb.com>, Martin KaFai Lau <martin.lau@linux.dev>,
- Song Liu <song@kernel.org>, Yonghong Song <yonghong.song@linux.dev>, KP
- Singh <kpsingh@kernel.org>, Hao Luo <haoluo@google.com>, Jiri Olsa
- <jolsa@kernel.org>, Shuah Khan <shuah@kernel.org>, Alexandre Torgue
- <alexandre.torgue@foss.st.com>, Jose Abreu <joabreu@synopsys.com>, Maxime
- Coquelin <mcoquelin.stm32@gmail.com>, "Nguyen, Anthony L"
- <anthony.l.nguyen@intel.com>, "Kitszel, Przemyslaw"
- <przemyslaw.kitszel@intel.com>, "netdev@vger.kernel.org"
- <netdev@vger.kernel.org>, "linux-kernel@vger.kernel.org"
- <linux-kernel@vger.kernel.org>, "linux-doc@vger.kernel.org"
- <linux-doc@vger.kernel.org>, "bpf@vger.kernel.org" <bpf@vger.kernel.org>,
- "linux-kselftest@vger.kernel.org" <linux-kselftest@vger.kernel.org>,
- "linux-stm32@st-md-mailman.stormreply.com"
- <linux-stm32@st-md-mailman.stormreply.com>,
- "linux-arm-kernel@lists.infradead.org"
- <linux-arm-kernel@lists.infradead.org>, "intel-wired-lan@lists.osuosl.org"
- <intel-wired-lan@lists.osuosl.org>, "xdp-hints@xdp-project.net"
- <xdp-hints@xdp-project.net>
-Date: Mon, 27 Jan 2025 19:29:35 +0100
-In-Reply-To: <20250127100441.0b11e1b8@kernel.org>
-References: <20250116155350.555374-1-yoong.siang.song@intel.com>
-	 <20250116155350.555374-5-yoong.siang.song@intel.com>
-	 <AS1PR10MB5675499EE0ED3A579151D3D3EBE02@AS1PR10MB5675.EURPRD10.PROD.OUTLOOK.COM>
-	 <PH0PR11MB583095A2F12DA10D57781D18D8E02@PH0PR11MB5830.namprd11.prod.outlook.com>
-	 <ea087229cc6f7953875fc69f1b73df1ae1ee9b72.camel@siemens.com>
-	 <Z5KdSlzmyCKUyXTn@mini-arch> <87bjvwqvtl.fsf@toke.dk>
-	 <20250127100441.0b11e1b8@kernel.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+	s=arc-20240116; t=1738004856; c=relaxed/simple;
+	bh=nOgE1Xm78sYrNXodpnGbC8FTPluHnfJLmlj0zh7LwTU=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=i91TdpAqtBlHF9BGldHLODdbKw+ZwxkNTXJRyhSE/p/rlGk3xYHho0YkFP6wYYs5uhI2jOQ4pzkkg2/X149hpGe7Fn/wjl7um89BsMBAveI/3s6dB0W7DyjdZZq5KsOL3yHiQBRiV5s3+N6oC0aOBBU+18UR0g18gHEKbM+H7xk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=kfiWs/Cr; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9162FC4CED2;
+	Mon, 27 Jan 2025 19:07:35 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1738004855;
+	bh=nOgE1Xm78sYrNXodpnGbC8FTPluHnfJLmlj0zh7LwTU=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=kfiWs/CrIrIPUXoBn9u859lQhtBX3yvkqmHKjO8DqTUw2A6DT8EKBjR9sMR5sF1KX
+	 mW1MfJ24szzFYquhahIAE3Ay+4oCDnKw4Y8F8W5dclgq7/JGONRhTxTDcGYl29OEyk
+	 IJrolWWpz1n3/7idwKXg51IwpjiYKLGJn0Iw3n2H2LQaUi02vpaeCdsQ7bA+IKKEB7
+	 g9FQntEBAhwfeHo8AhT+6eafPqQ1nPqzqYjUPyrEmmFLDzYwVgA/3cX6Q7ReVlh2tu
+	 o90wgm5w3JDYpj52WASkq1T11KU3UTBReF+12Z/P7qhHYJPrUDFEX1vtv668TD3kfK
+	 iTz0dWpyVDN+g==
+Date: Mon, 27 Jan 2025 13:07:34 -0600
+From: Rob Herring <robh@kernel.org>
+To: Maxime Chevallier <maxime.chevallier@bootlin.com>
+Cc: davem@davemloft.net, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org, devicetree@vger.kernel.org,
+	thomas.petazzoni@bootlin.com, Andrew Lunn <andrew@lunn.ch>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
+	Russell King <linux@armlinux.org.uk>,
+	linux-arm-kernel@lists.infradead.org,
+	Christophe Leroy <christophe.leroy@csgroup.eu>,
+	Herve Codina <herve.codina@bootlin.com>,
+	Florian Fainelli <f.fainelli@gmail.com>,
+	Heiner Kallweit <hkallweit1@gmail.com>,
+	Vladimir Oltean <vladimir.oltean@nxp.com>,
+	=?iso-8859-1?Q?K=F6ry?= Maincent <kory.maincent@bootlin.com>,
+	Marek =?iso-8859-1?Q?Beh=FAn?= <kabel@kernel.org>,
+	Oleksij Rempel <o.rempel@pengutronix.de>,
+	=?iso-8859-1?Q?Nicol=F2?= Veronese <nicveronese@gmail.com>,
+	Simon Horman <horms@kernel.org>, mwojtas@chromium.org,
+	Antoine Tenart <atenart@kernel.org>,
+	Krzysztof Kozlowski <krzk+dt@kernel.org>,
+	Conor Dooley <conor+dt@kernel.org>
+Subject: Re: [PATCH net-next RFC v2 6/6] dt-bindings: net: Introduce the
+ phy-port description
+Message-ID: <20250127190734.GA635780-robh@kernel.org>
+References: <20250122174252.82730-1-maxime.chevallier@bootlin.com>
+ <20250122174252.82730-7-maxime.chevallier@bootlin.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Flowmailer-Platform: Siemens
-Feedback-ID: 519:519-68982:519-21489:flowmailer
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250122174252.82730-7-maxime.chevallier@bootlin.com>
 
-On Mon, 2025-01-27 at 10:04 -0800, Jakub Kicinski wrote:
-> On Fri, 24 Jan 2025 12:45:42 +0100 Toke H=C3=B8iland-J=C3=B8rgensen wrote=
-:
-> > > > I think there is no simple fix for that. That needs some discussion
-> > > > around the "expectations" to the headroom / meta data area in front=
- of
-> > > > the actual packet data. =20
-> > >=20
-> > > By 'simple' you mean without some new UAPI to signal the size of that
-> > > 'reserved area' by the driver? I don't see any other easy way out as =
-well :-/ =20
-> >=20
-> > Yeah, I don't think we can impose UAPI restrictions on the metadata are=
-a
-> > at this point. I guess the best we can do is to educate users that they
-> > should call the timestamp kfunc before they modify the metadata?
->=20
-> I may be misunderstanding the discussion, but I think the answer=20
-> is that the driver must be fixed. The metadata-in-prepend problem
-> also exists for simple adjust head use case, so it existed since
-> early days of BPF. The driver should copy out (or parse) the metadata
-> before it invokes the XDP prog. The nfp driver does that.
+On Wed, Jan 22, 2025 at 06:42:51PM +0100, Maxime Chevallier wrote:
+> The ability to describe the physical ports of Ethernet devices is useful
+> to describe multi-port devices, as well as to remove any ambiguity with
+> regard to the nature of the port.
+> 
+> Moreover, describing ports allows for a better description of features
+> that are tied to connectors, such as PoE through the PSE-PD devices.
 
-That would have to happen for each packet, without affecting ZC
-performance. How can that be achieved?
+Seems like we need a connector binding like we've ended up needing in 
+other cases.
 
-So we have at least two drivers with that problem, igc + nfp.=20
+> 
+> Introduce a binding to allow describing the ports, for now with 2
+> attributes :
+> 
+>  - The number of lanes, which is a quite generic property that allows
+>    differentating between multiple similar technologies such as BaseT1
+>    and "regular" BaseT (which usually means BaseT4).
+> 
+>  - The media that can be used on that port, such as BaseT for Twisted
+>    Copper, BaseC for coax copper, BaseS/L for Fiber, BaseK for backplane
+>    ethernet, etc. This allows defining the nature of the port, and
+>    therefore avoids the need for vendor-specific properties such as
+>    "micrel,fiber-mode" or "ti,fiber-mode".
+> 
+> The port description lives in its own file, as it is intended in the
+> future to allow describing the ports for phy-less devices.
+> 
+> Signed-off-by: Maxime Chevallier <maxime.chevallier@bootlin.com>
+> ---
+> RFC V2: New patch
+> 
+>  .../devicetree/bindings/net/ethernet-phy.yaml | 18 +++++++
+>  .../bindings/net/ethernet-port.yaml           | 47 +++++++++++++++++++
+>  2 files changed, 65 insertions(+)
+>  create mode 100644 Documentation/devicetree/bindings/net/ethernet-port.yaml
+> 
+> diff --git a/Documentation/devicetree/bindings/net/ethernet-phy.yaml b/Documentation/devicetree/bindings/net/ethernet-phy.yaml
+> index 2c71454ae8e3..950fdacfd27d 100644
+> --- a/Documentation/devicetree/bindings/net/ethernet-phy.yaml
+> +++ b/Documentation/devicetree/bindings/net/ethernet-phy.yaml
+> @@ -261,6 +261,17 @@ properties:
+>  
+>      additionalProperties: false
+>  
+> +  mdi:
+> +    type: object
+> +
+> +    patternProperties:
+> +      '^port-[a-f0-9]+$':
 
-My main point: Enabling and implementing ZC (zero copy) mode at one
-hand, but then starting to copy the meta data for each packet doesn't
-sound reasonable.
+'port' is already a node name for graphs. It's also the deprecated name 
+for 'ethernet-port' in the switch/DSA bindings.
+
+> +        $ref: /schemas/net/ethernet-port.yaml#
+
+A confusing name considering we already have 'ethernet-port'.
+
+Rob
 
