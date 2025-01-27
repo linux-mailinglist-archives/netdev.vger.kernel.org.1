@@ -1,183 +1,161 @@
-Return-Path: <netdev+bounces-161185-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-161186-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id EDEE6A1DCDE
-	for <lists+netdev@lfdr.de>; Mon, 27 Jan 2025 20:41:05 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0580DA1DCE0
+	for <lists+netdev@lfdr.de>; Mon, 27 Jan 2025 20:42:02 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 0EADC1885232
-	for <lists+netdev@lfdr.de>; Mon, 27 Jan 2025 19:41:10 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 4DF613A1FD0
+	for <lists+netdev@lfdr.de>; Mon, 27 Jan 2025 19:41:54 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3F042198851;
-	Mon, 27 Jan 2025 19:40:39 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B2A41192B90;
+	Mon, 27 Jan 2025 19:41:57 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="jrPKvUwI"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="LFWSKUmW"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f52.google.com (mail-wm1-f52.google.com [209.85.128.52])
+Received: from mail-pl1-f177.google.com (mail-pl1-f177.google.com [209.85.214.177])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4952D197A7A;
-	Mon, 27 Jan 2025 19:40:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.52
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2AE9819066D
+	for <netdev@vger.kernel.org>; Mon, 27 Jan 2025 19:41:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.177
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1738006839; cv=none; b=XNXGwECWFvHHuc17m4ntnMUrFdTJNnlZgvhV00aTWuehsMleJnMOK1+KfOCJ44C8oSfbTYZmP6DtCj2VCYaFFOzpQNPmJSYPfV3mRSnL8ZRpWlATvgiXKyVp0lcWMGRJStZI7ZOwdavdY/LFRnoChEYqTsJDaIFieaHtTRvhklM=
+	t=1738006917; cv=none; b=n42jJ3xLIgC7qb/0Gxo7FpwaHkMsWvzEu6vMfKFf3IHPqy43uemiZlPd+IqsOKbKJmRDOjedx62n9gku9/Ez3s9wR7MUjeeVjHQLz3vmH517OHlQwWLLJ0EhFtl8w9s3sZN2f1oOfgeiPmcj5fg9Ir6TEZrhFnTPbSFt718D2EI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1738006839; c=relaxed/simple;
-	bh=g+AxYWjXVNWpaarNJMPKzf17ERgOjptq08gSpGe1VWc=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=esjsgOQQ1B+SeRrdXzKQAIdtPRLuFZmzh4K1U5I8Mjc/XqAG8AY4hQ2rJSTtHk9O/kfU0i2UgPPjAKwA1ZfTj9WZ6Rc963tEavscDqJVL7vQoekR6FeM7AovDc0Q2fCA0UO/8JTzmZJdOV1lBVTOuJR4JJd9GEBI8U4pM1rHrAI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=jrPKvUwI; arc=none smtp.client-ip=209.85.128.52
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wm1-f52.google.com with SMTP id 5b1f17b1804b1-436281c8a38so34160545e9.3;
-        Mon, 27 Jan 2025 11:40:36 -0800 (PST)
+	s=arc-20240116; t=1738006917; c=relaxed/simple;
+	bh=gieH0hqF851JC+PGfjXEJS8TB6U8bnPjMDCbDwwKVtg=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=opBCHQGsNwLzLvkkthvkwBP+Sv5uF5qCTyZxi7hvIKbvFzhTN5Z5kzKM2AY9AMYtIIIslUpo0GNSjbOgW3CUOx8cqLNsHJusf/btFa6iM9SVH/hP9sGAzFAg9FQ9kQAgrXy3VMA0u4T73EZmLhZb4hXvck/5KRRsbesha3T3quU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=LFWSKUmW; arc=none smtp.client-ip=209.85.214.177
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-pl1-f177.google.com with SMTP id d9443c01a7336-215740b7fb8so23005ad.0
+        for <netdev@vger.kernel.org>; Mon, 27 Jan 2025 11:41:55 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1738006835; x=1738611635; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
+        d=google.com; s=20230601; t=1738006915; x=1738611715; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=je5F1oeT9EANUQ7CVwwtzdu4+qN5fBAp7uP62rWKpdw=;
-        b=jrPKvUwIhNlzuJjmgSB5LiRhQmbAE4wdjS+zOEq5jpx7krWkfxYz0ldhgzbcMu8OZB
-         yKIRnEkXAhbbfE5/CLeODT6fIBAqAUFDCnG/8Ry4nKrdiAPFmWpM0ZyqqQv7yBhPe3S1
-         /nYqqX/pJrdGOiadUNRsOXPPpdqoN65I/wCDLYMhkBOCsy9brzI04NxLOD7sxLFIpQWX
-         Csu7z2KfphNMHaT2mrhxGq/6VD4UOVfCsUJ+85pNaxQo4SRhpgABJXaUhViT6M8MzeLd
-         HpqMM8riPATPYJG+GUSPqshannNYrN+IUu5JG6ee+id6/HC7wieBV/nL0MLAshQ5NfR5
-         ABZg==
+        bh=FjunlDg2ZxWmfVt8C8pmyI9BtnNpXmXok5P9BvQ8hs4=;
+        b=LFWSKUmWkDwgz1wHWH9+HjqOZUx5YVm951WUvEbtKz3zEiTcSbv55UXTLkoJDDY/lX
+         /uu72EG/isW2XECTMSjtsSXG1gvruiKoHoTy5JCmVWHefx0ldXALioNovVBTS7FlgIvr
+         uTvcUcRkYG0QhoVo7GuZaHKZ9Jr+4brn2AUd7EdJ4ug5lXML+Rk3zhSbgkpjzZq+FvQ3
+         Gs/xkpbB7MjQDgY7GIG3CVFtQWMts06fmOi6Wb7p2YXzk0Qlc6ptuPPh0O1B4mvb4sWa
+         qnLZnIeNDghXTBjvOofrZyuY69JyhJsmbjzaxDcHYOMA20dBHojm94ovY/WOo+vKDaGL
+         CYRw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1738006835; x=1738611635;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
+        d=1e100.net; s=20230601; t=1738006915; x=1738611715;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=je5F1oeT9EANUQ7CVwwtzdu4+qN5fBAp7uP62rWKpdw=;
-        b=Vq203I235kg7ZGdh7p0aVZbxYDDccRkgzgZW0XW6Et/kE9RVqdjW6Mblic+Y3yD9YZ
-         gPugePPlBrhWoa1lTBqUIf4ZfPNm/oa4JPsBFIf9kdQRaTYyCtTydSiYnWhzVZ/p8y2M
-         Y2qZWSiEgAVajH7/G3UtCZrMZPP2de7+e2bMhHYGRJHinCCNIcwX3vqXhNvCNbrncjsu
-         O0ezP0lwXp0y4BbPA//1ARkxD1Tm3DlKrsi9ktm9uUDZ1/ng2UNTs7pe4jc16xexr9h2
-         AdlkQUKEVNis/YFjdRyRHFr3lgzQFUdRoBhHYGPsxUzAsAYUVxM+FX6XaWlJM/X/j8OQ
-         tP1g==
-X-Forwarded-Encrypted: i=1; AJvYcCV6AXH9gDBl/A9blRH8NFbznZvExcQQOyrY/QQIJzbvMFjQl7s9l5sSQOYfv6q+3pWWb5KtDwKg@vger.kernel.org, AJvYcCXgNAWn2m0vBohghYKf8kbF68jX2OLTYBkOU6gWuXv5GzkBc4MEBbepToAya8exNpnf5/0zOoSqo0w9GHs=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxgXYvkEtD1nM8Uvc+6PrNw7V9KaB8MJl3lTJWhWlALM1qe/WgJ
-	2CLrXfX7pgfARE9rrrPfgeDYl6baKUSeAUTxUeG2YffJ6/4HkX2p
-X-Gm-Gg: ASbGncseivcKbM2RGl3F2/Wx864Tm01uAlUGg4PJsw8GOjFLMevyVMW5kXSAaaXA12n
-	U+3nrQyQ8Cz9o1ykBUxcb0NMM7hL48aj/Hl4C8oUre3F544OUoegfbyHPU5s7eBzDT5ZSpu+vW7
-	NEmBuufHjP+VbPnTu+Vq7Re7+S4cXR2DQum5BLMMVS2IwUPpXS8j2RqR5U/TWFAPhr/YyR6eTT3
-	5DLij/Xnkh1ExALizQqHem0SLjmmA52ySSL3r7bhjXcuSc3wieB/c45q+4cB/QOPTe+bKUakrBx
-	BDE/AzxZw1Ag/ZV8Op9TORNbpKIA8Rki+d1SeL62x+SE3g5jhGZ4RlyA2WyWog==
-X-Google-Smtp-Source: AGHT+IGygeJXkWkTgrQOXz/y9uCWknywF51AbIzApgYzv1vzT68MrMw5DgJFP2PXHfEa0m0p1lJRAg==
-X-Received: by 2002:a05:600c:4710:b0:434:a59c:43c6 with SMTP id 5b1f17b1804b1-43891451388mr318670375e9.26.1738006835153;
-        Mon, 27 Jan 2025 11:40:35 -0800 (PST)
-Received: from snowdrop.snailnet.com (82-69-66-36.dsl.in-addr.zen.co.uk. [82.69.66.36])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-438bd4c6fadsm141031705e9.32.2025.01.27.11.40.34
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 27 Jan 2025 11:40:34 -0800 (PST)
-From: David Laight <david.laight.linux@gmail.com>
-To: "David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Cc: David Laight <david.laight.linux@gmail.com>,
-	David Ahern <dsahern@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Simon Horman <horms@kernel.org>,
-	Tom Herbert <tom@herbertland.com>,
-	Gabriel Krisman Bertazi <krisman@suse.de>,
-	Lorenz Bauer <lmb@isovalent.com>,
-	Kuniyuki Iwashima <kuniyu@amazon.com>
-Subject: [PATCH net 2/2] udp6: Rescan udp hash chains if cross-linked.
-Date: Mon, 27 Jan 2025 19:40:24 +0000
-Message-Id: <20250127194024.3647-3-david.laight.linux@gmail.com>
-X-Mailer: git-send-email 2.39.5
-In-Reply-To: <20250127194024.3647-2-david.laight.linux@gmail.com>
-References: <20250127194024.3647-1-david.laight.linux@gmail.com>
- <20250127194024.3647-2-david.laight.linux@gmail.com>
+        bh=FjunlDg2ZxWmfVt8C8pmyI9BtnNpXmXok5P9BvQ8hs4=;
+        b=h+aZBfpe/5EC7ZW1GUJlwbzGVyx7maiBQ1R2ylDAeH5HAtZt8EPnWjHWL8JOtqR195
+         Vi+D03BPpoIhkYXzJIl6e40sIqvBRaLNL6+7jqSZib8Q5/wu8Fx9F4PV6iXUp1/9dWbv
+         qwS70kVXDMhLPgZUhEMiT+Xhjp+shw1S1sbIu/tpGdCqhE8VTu/vKlN0lZ82t4kMsM/7
+         OQjlXXf82RitCvOwkVo1KAE07UgM+gFbiPASHJx5Sfks0206zw4EWukACyxIEWGsd3/3
+         qcZZTDu9jTJjJPyp8QZJ4F8ecu4213MeGgfVB9Ig4kiE/QYd+gvgFwwlDZapqWVkoKVR
+         eVew==
+X-Forwarded-Encrypted: i=1; AJvYcCWd7wnRbcUAmWkdRLF5jhqcUNafN8e6X1U6gDCOTr8S49fKnqm89044w0ho2+Tloo1XdaHsPFk=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxZYSy6sxK2XuKKQBQVX6yh3mCpjp+dDGBCS4fLUBOg0PRI+AgO
+	A3pKgs3gZrrdkStPt0woRuIlbNwk9avM41+9PrmjJmOyIwYKlm4MWhqhTdgtaxmRE47j5WA1JsL
+	BBBbX07lSkQNE5k6+oeIIxmEvDjbVkceAyceZ
+X-Gm-Gg: ASbGncs7GZVsrxB1kg3a24oPN8HhzLs6V3EG/Sq6IRxQBTAuJPifKEGFByW5Hk6i8dV
+	67ofd3X3fGUaXDT5yNYEEyqHdJe39vUYo0WF+TumWY6v6NjZXoOKtsXEQoUTZR4Vie7xzzLer8x
+	tUoYZIFZ2yRxcKcHGlKTX951IS00Y=
+X-Google-Smtp-Source: AGHT+IEZtMo0CSV7XiFNH+Vtol8La5vL0JtfV+S1GGNmNAYSJ0/PnW5Pb6XWNes2chkP4OWX70siq49zdBmkQaNlvPQ=
+X-Received: by 2002:a17:902:d54d:b0:215:7ced:9d66 with SMTP id
+ d9443c01a7336-21dcce27897mr285615ad.10.1738006915156; Mon, 27 Jan 2025
+ 11:41:55 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+References: <20250123231620.1086401-1-kuba@kernel.org> <CAHS8izNdpe7rDm7K4zn4QU-6VqwMwf-LeOJrvXOXhpaikY+tLg@mail.gmail.com>
+ <87r04rq2jj.fsf@toke.dk> <CAHS8izOv=tUiuzha6NFq1-ZurLGz9Jdi78jb3ey4ExVJirMprA@mail.gmail.com>
+ <877c6gpen5.fsf@toke.dk> <20250127113750.54ed83d4@kernel.org>
+In-Reply-To: <20250127113750.54ed83d4@kernel.org>
+From: Mina Almasry <almasrymina@google.com>
+Date: Mon, 27 Jan 2025 11:41:42 -0800
+X-Gm-Features: AWEUYZkJzMa1nQRCOAWRlQebZiyjShG3dqUHlvXi8sR1woNn_JZPSOnDxOCr9RU
+Message-ID: <CAHS8izPDTNUV5vZ-JebU6nio3x+w-22VHz9r0gpRfdRfr6-vVA@mail.gmail.com>
+Subject: Re: [PATCH net] net: page_pool: don't try to stash the napi id
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: =?UTF-8?B?VG9rZSBIw7hpbGFuZC1Kw7hyZ2Vuc2Vu?= <toke@redhat.com>, 
+	davem@davemloft.net, netdev@vger.kernel.org, edumazet@google.com, 
+	pabeni@redhat.com, andrew+netdev@lunn.ch, horms@kernel.org, hawk@kernel.org, 
+	ilias.apalodimas@linaro.org, asml.silence@gmail.com, kaiyuanz@google.com, 
+	willemb@google.com, mkarsten@uwaterloo.ca, jdamato@fastly.com
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-udp_lib_rehash() can get called at any time and will move a
-socket to a different hash2 chain.
-This can cause udp6_lib_lookup2() (processing incoming UDP) to
-fail to find a socket and an ICMP port unreachable be sent.
- 
-Prior to ca065d0cf80fa the lookup used 'hlist_nulls' and checked
-that the 'end if list' marker was on the correct list.
+On Mon, Jan 27, 2025 at 11:37=E2=80=AFAM Jakub Kicinski <kuba@kernel.org> w=
+rote:
+>
+> On Mon, 27 Jan 2025 14:31:10 +0100 Toke H=C3=B8iland-J=C3=B8rgensen wrote=
+:
+> > > +
+> > > +/* page_pool_destroy or page_pool_disable_direct_recycling must be
+> > > called before
+> > > + * netif_napi_del if pool->p.napi is set.
+> > > + */
+>
+> FWIW the comment is better placed on the warning, that's where people
+> will look when they hit it ;)
+>
+> > >  void page_pool_destroy(struct page_pool *pool);
+> > >  void page_pool_use_xdp_mem(struct page_pool *pool, void (*disconnect=
+)(void *),
+> > >                            const struct xdp_mem_info *mem);
+> > >
+> > > diff --git a/net/core/page_pool.c b/net/core/page_pool.c
+> > > index 5c4b788b811b..dc82767b2516 100644
+> > > --- a/net/core/page_pool.c
+> > > +++ b/net/core/page_pool.c
+> > > @@ -1161,6 +1161,8 @@ void page_pool_destroy(struct page_pool *pool)
+> > >         if (!page_pool_put(pool))
+> > >                 return;
+> > >
+> > > +       DEBUG_NET_WARN_ON(pool->p.napi && !napi_is_valid(pool->p.napi=
+));
+>
+> IDK what "napi_is_valid()" is. I think like this:
+>
 
-Signed-off-by: David Laight <david.laight.linux@gmail.com>
----
- net/ipv6/udp.c | 22 +++++++++++++++++++---
- 1 file changed, 19 insertions(+), 3 deletions(-)
+Yeah, napi_is_valid() was just pseudo code because I wasn't sure how
+to actually check yet, but thanks for the diff below.
 
-diff --git a/net/ipv6/udp.c b/net/ipv6/udp.c
-index d766fd798ecf..903ccb46495a 100644
---- a/net/ipv6/udp.c
-+++ b/net/ipv6/udp.c
-@@ -174,16 +174,22 @@ static int compute_score(struct sock *sk, const struct net *net,
- static struct sock *udp6_lib_lookup2(const struct net *net,
- 		const struct in6_addr *saddr, __be16 sport,
- 		const struct in6_addr *daddr, unsigned int hnum,
--		int dif, int sdif, struct udp_hslot *hslot2,
-+		int dif, int sdif,
-+		unsigned int hash2, unsigned int mask,
-+		struct udp_hslot *hslot2,
- 		struct sk_buff *skb)
- {
-+	unsigned int hash2_rescan;
- 	struct sock *sk, *result;
- 	int score, badness;
- 	bool need_rescore;
- 
-+rescan:
-+	hash2_rescan = hash2;
- 	result = NULL;
- 	badness = -1;
- 	udp_portaddr_for_each_entry_rcu(sk, &hslot2->head) {
-+		hash2_rescan = udp_sk(sk)->udp_portaddr_hash;
- 		need_rescore = false;
- rescore:
- 		score = compute_score(need_rescore ? result : sk, net, saddr,
-@@ -224,6 +230,16 @@ static struct sock *udp6_lib_lookup2(const struct net *net,
- 			goto rescore;
- 		}
- 	}
-+
-+	/* udp sockets can get moved to a different hash chain.
-+	 * If the chains have got crossed then rescan.
-+	 */
-+	if ((hash2_rescan ^ hash2) & mask) {
-+		/* Ensure hslot2->head is reread */
-+		barrier();
-+		goto rescan;
-+	}
-+
- 	return result;
- }
- 
-@@ -320,7 +336,7 @@ struct sock *__udp6_lib_lookup(const struct net *net,
- 	/* Lookup connected or non-wildcard sockets */
- 	result = udp6_lib_lookup2(net, saddr, sport,
- 				  daddr, hnum, dif, sdif,
--				  hslot2, skb);
-+				  hash2, udptable->mask, hslot2, skb);
- 	if (!IS_ERR_OR_NULL(result) && result->sk_state == TCP_ESTABLISHED)
- 		goto done;
- 
-@@ -346,7 +362,7 @@ struct sock *__udp6_lib_lookup(const struct net *net,
- 
- 	result = udp6_lib_lookup2(net, saddr, sport,
- 				  &in6addr_any, hnum, dif, sdif,
--				  hslot2, skb);
-+				  hash2, udptable->mask, hslot2, skb);
- done:
- 	if (IS_ERR(result))
- 		return NULL;
--- 
-2.39.5
+> diff --git a/net/core/page_pool.c b/net/core/page_pool.c
+> index a3de752c5178..837ed36472db 100644
+> --- a/net/core/page_pool.c
+> +++ b/net/core/page_pool.c
+> @@ -1145,6 +1145,7 @@ void page_pool_disable_direct_recycling(struct page=
+_pool *pool)
+>          * pool and NAPI are unlinked when NAPI is disabled.
+>          */
+>         WARN_ON(!test_bit(NAPI_STATE_SCHED, &pool->p.napi->state));
+> +       WARN_ON(!test_bit(NAPI_STATE_LISTED, &pool->p.napi->state));
+>         WARN_ON(READ_ONCE(pool->p.napi->list_owner) !=3D -1);
+>
+>         WRITE_ONCE(pool->p.napi, NULL);
+>
+> Because page_pool_disable_direct_recycling() must also be called while
+> NAPI is listed. Technically we should also sync rcu if the driver calls
+> this directly, because NAPI may be reused :(
+>
+> > >         page_pool_disable_direct_recycling(pool);
+> > >         page_pool_free_frag(pool);
+> >
+> > Yeah, good idea; care to send a proper patch? :)
+>
+> ...for net-next ? :)
 
+Will put it on my TODO list for when the tree reopens, thanks.
+
+--=20
+Thanks,
+Mina
 
