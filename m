@@ -1,47 +1,48 @@
-Return-Path: <netdev+bounces-161199-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-161201-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id A329EA1FFF8
-	for <lists+netdev@lfdr.de>; Mon, 27 Jan 2025 22:37:31 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 62F8DA1FFFE
+	for <lists+netdev@lfdr.de>; Mon, 27 Jan 2025 22:38:11 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 0BE82165775
-	for <lists+netdev@lfdr.de>; Mon, 27 Jan 2025 21:37:30 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id CA6771887CFB
+	for <lists+netdev@lfdr.de>; Mon, 27 Jan 2025 21:38:13 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BA31F1D86E4;
-	Mon, 27 Jan 2025 21:37:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 261151D86E4;
+	Mon, 27 Jan 2025 21:37:34 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=treblig.org header.i=@treblig.org header.b="VrMHoolz"
+	dkim=pass (2048-bit key) header.d=treblig.org header.i=@treblig.org header.b="Z1hsLN9Z"
 X-Original-To: netdev@vger.kernel.org
 Received: from mx.treblig.org (mx.treblig.org [46.235.229.95])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BD4B71D7E31;
-	Mon, 27 Jan 2025 21:37:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 55BF91D7E47;
+	Mon, 27 Jan 2025 21:37:31 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=46.235.229.95
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1738013846; cv=none; b=AbE9TN1+4wCWjhkLr3hyij3AYzO8k1OPXZ3XgjQMyCnF1fOXD1AqC5hGKDNF2IurnC3jBMxiKj1FJsTTS8vNKi+8CwyUKYN3gg7MlIycdXWghQRTTHqshgZteMIEfNrlG/S6Pl80Mw19XkUJKPIMQzAZdnSDUg7kyzmpdQebvvY=
+	t=1738013854; cv=none; b=oKSy/amdaCokPrjKEcLTTZGYbzRd8EqYahiCmag8aXIOkMmt7pH412nmCjtNJkHy6wpg9caK/u2OS/HQ+SrBQK7DFhJbhSWJCe34nyDzo50kBhKzl4XRYv1ewFRyvihhQgZSyWRvGgd0Jp+tqp+xvPl8VQmY3XjTThvbn3UKBBI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1738013846; c=relaxed/simple;
-	bh=azgMEnD6r8HfsrMZT1Y82Fn/fiuBFmXON8stF68REpQ=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=aTdtM2JTzmu4OVmLmCLL0ZLZdHlf/YLc1YcxTwusn5zcg2AoJciQUXEZAiYerSWHK22hAcmEcaw4A98ekh0rcjtPXlO/9LLhx1MCCwIX4W/hFHj0IVv4Q1ZMiC1nmVBumDQXHaTy6oeBmyQoaZCL2PZK9OXq/2xTT6wNnJUtXHs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=treblig.org; spf=pass smtp.mailfrom=treblig.org; dkim=pass (2048-bit key) header.d=treblig.org header.i=@treblig.org header.b=VrMHoolz; arc=none smtp.client-ip=46.235.229.95
+	s=arc-20240116; t=1738013854; c=relaxed/simple;
+	bh=FQjxcukhBSRKyXDHqUoaoy0lmOtZ76UZ/VFTLM0hQwI=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=A+dHrdwKvQVKVzImlm4wZCv5kqyL1i0fQ2/bua5uk/Tp94XwYmJA19N1mynV2dR5RI4oqs82vd0k8P1NzZ9sBMSKkKz/7EIv3WZadF5jw78lEmBH5c3+R+sF+BDm0DEhNJ4YHE0lh5lMnysVw1JyBQ0LIbh3eVEseY5/+yplMRg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=treblig.org; spf=pass smtp.mailfrom=treblig.org; dkim=pass (2048-bit key) header.d=treblig.org header.i=@treblig.org header.b=Z1hsLN9Z; arc=none smtp.client-ip=46.235.229.95
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=treblig.org
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=treblig.org
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=treblig.org
 	; s=bytemarkmx; h=MIME-Version:Message-ID:Date:Subject:From:Content-Type:From
-	:Subject; bh=ifMP4EWyzhCrMfXhnckJ28Yc7rD0y2bx5+E1WJBchr8=; b=VrMHoolzruMRtoWl
-	FscqVcwsbJXTVaOapHqbHziOsCiBjLmY9nmWzm3Dn9kiVKueoCrIkittPhUCftBlbKkccXwobasau
-	PyCjZL4e9n6qI8vM/0e0A7bcJaiY9I+b/VnjUh3L/yxi/Yp9PfPZwIlWnYp5+tuIsIZtCxe44FZ0q
-	tsvyeGDvGJ2Ub3u3FbweoQLxxGTuGu99M0C5XY2jD8G7EDfS7Z9TgmjSijAn3vnihfskpuLYcCJKC
-	ONOJ8SxPzZg6c0JC7LrlXwqJUVetg8MAZb5/dBqlKhPYmvXlGPL4ublQAlzAUKitgSIvqRY6jX8O7
-	XPg4+MTCuG4Rbb2rrQ==;
+	:Subject; bh=Q8DeE6I21KdBtXf2UfwnvRGRhf/hWXsyOW9lcfV/klU=; b=Z1hsLN9ZabpWcSwL
+	DqYivA9Tj6o0TsyKsvprHs3XDDQP96dN4lf2UbzKrrEjbDs2yRK9+Ucabtoti0Ca5yfvz5cWlKQVS
+	yKyGNZHI9dbaeNTMpkf2Ir9UxByypCVdqXJAifMPKphmGtANWXCzJfkrC0JqRvlW9/5Gq4rEJ5vLE
+	uuUoip3O/FVExVpMBRgmOEXgAlt2MxXVg9q3TIYkR2nymmlc/1Oo1NsiIrvHNFcG2jolZFlm7vXP8
+	IbxnXGMZWUQiHGeLd2z85HxgOlUvRMmtnPXd1EJu+4oRX07jO7Rhi96cocoMTawx0DMSwBzNrzeje
+	76HXdVsStVUYbsZzgA==;
 Received: from localhost ([127.0.0.1] helo=dalek.home.treblig.org)
 	by mx.treblig.org with esmtp (Exim 4.96)
 	(envelope-from <linux@treblig.org>)
-	id 1tcWnF-00CMm7-0K;
+	id 1tcWnF-00CMm7-2I;
 	Mon, 27 Jan 2025 21:37:17 +0000
 From: linux@treblig.org
 To: marcel@holtmann.org,
@@ -56,10 +57,12 @@ Cc: davem@davemloft.net,
 	netdev@vger.kernel.org,
 	linux-kernel@vger.kernel.org,
 	"Dr. David Alan Gilbert" <linux@treblig.org>
-Subject: [PATCH 0/2] Bluetooth: MGMT: Deadcode cleanup
-Date: Mon, 27 Jan 2025 21:37:14 +0000
-Message-ID: <20250127213716.232551-1-linux@treblig.org>
+Subject: [PATCH 1/2] Bluetooth: MGMT: Remove unused mgmt_pending_find_data
+Date: Mon, 27 Jan 2025 21:37:15 +0000
+Message-ID: <20250127213716.232551-2-linux@treblig.org>
 X-Mailer: git-send-email 2.48.1
+In-Reply-To: <20250127213716.232551-1-linux@treblig.org>
+References: <20250127213716.232551-1-linux@treblig.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -70,27 +73,60 @@ Content-Transfer-Encoding: 8bit
 
 From: "Dr. David Alan Gilbert" <linux@treblig.org>
 
-Hi,
-  A couple of deadcode removal patches.
+mgmt_pending_find_data() last use was removed in 2021 by
+commit 5a7501374664 ("Bluetooth: hci_sync: Convert MGMT_OP_GET_CLOCK_INFO")
 
-They're both strictly function removals, no internal changes
-to a function.
-
-Build tested only.
+Remove it.
 
 Signed-off-by: Dr. David Alan Gilbert <linux@treblig.org>
+---
+ net/bluetooth/mgmt_util.c | 17 -----------------
+ net/bluetooth/mgmt_util.h |  4 ----
+ 2 files changed, 21 deletions(-)
 
-
-Dr. David Alan Gilbert (2):
-  Bluetooth: MGMT: Remove unused mgmt_pending_find_data
-  Bluetooth: MGMT: Remove unused mgmt_*_discovery_complete
-
- include/net/bluetooth/hci_core.h |  2 --
- net/bluetooth/mgmt.c             | 40 --------------------------------
- net/bluetooth/mgmt_util.c        | 17 --------------
- net/bluetooth/mgmt_util.h        |  4 ----
- 4 files changed, 63 deletions(-)
-
+diff --git a/net/bluetooth/mgmt_util.c b/net/bluetooth/mgmt_util.c
+index 17ab909a7c07..e5ff65e424b5 100644
+--- a/net/bluetooth/mgmt_util.c
++++ b/net/bluetooth/mgmt_util.c
+@@ -229,23 +229,6 @@ struct mgmt_pending_cmd *mgmt_pending_find(unsigned short channel, u16 opcode,
+ 	return NULL;
+ }
+ 
+-struct mgmt_pending_cmd *mgmt_pending_find_data(unsigned short channel,
+-						u16 opcode,
+-						struct hci_dev *hdev,
+-						const void *data)
+-{
+-	struct mgmt_pending_cmd *cmd;
+-
+-	list_for_each_entry(cmd, &hdev->mgmt_pending, list) {
+-		if (cmd->user_data != data)
+-			continue;
+-		if (cmd->opcode == opcode)
+-			return cmd;
+-	}
+-
+-	return NULL;
+-}
+-
+ void mgmt_pending_foreach(u16 opcode, struct hci_dev *hdev,
+ 			  void (*cb)(struct mgmt_pending_cmd *cmd, void *data),
+ 			  void *data)
+diff --git a/net/bluetooth/mgmt_util.h b/net/bluetooth/mgmt_util.h
+index bdf978605d5a..f2ba994ab1d8 100644
+--- a/net/bluetooth/mgmt_util.h
++++ b/net/bluetooth/mgmt_util.h
+@@ -54,10 +54,6 @@ int mgmt_cmd_complete(struct sock *sk, u16 index, u16 cmd, u8 status,
+ 
+ struct mgmt_pending_cmd *mgmt_pending_find(unsigned short channel, u16 opcode,
+ 					   struct hci_dev *hdev);
+-struct mgmt_pending_cmd *mgmt_pending_find_data(unsigned short channel,
+-						u16 opcode,
+-						struct hci_dev *hdev,
+-						const void *data);
+ void mgmt_pending_foreach(u16 opcode, struct hci_dev *hdev,
+ 			  void (*cb)(struct mgmt_pending_cmd *cmd, void *data),
+ 			  void *data);
 -- 
 2.48.1
 
