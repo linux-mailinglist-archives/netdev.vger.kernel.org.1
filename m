@@ -1,189 +1,142 @@
-Return-Path: <netdev+bounces-161085-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-161087-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id A8532A1D400
-	for <lists+netdev@lfdr.de>; Mon, 27 Jan 2025 11:02:10 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id DA547A1D40E
+	for <lists+netdev@lfdr.de>; Mon, 27 Jan 2025 11:06:24 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id E4BCC7A2BC9
-	for <lists+netdev@lfdr.de>; Mon, 27 Jan 2025 10:02:00 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 17D96188797B
+	for <lists+netdev@lfdr.de>; Mon, 27 Jan 2025 10:06:29 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6E8DA1FC0F1;
-	Mon, 27 Jan 2025 10:02:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 86B501FDA7A;
+	Mon, 27 Jan 2025 10:06:21 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="apNMaAti"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="11UDfTpI"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ed1-f41.google.com (mail-ed1-f41.google.com [209.85.208.41])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9E7103FFD
-	for <netdev@vger.kernel.org>; Mon, 27 Jan 2025 10:02:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C24F8135A63
+	for <netdev@vger.kernel.org>; Mon, 27 Jan 2025 10:06:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.41
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1737972124; cv=none; b=BgkfgnbdDOlexh5VFEmuOFxdJj5lPr91zgJ0xUyed0kFLOJerz7Xk5pGL2BHL0bocIVsGvoTufS5UcMyCG2DV2R4/Qw4XGKwxul7dL9f14Nju+dPzd4JUsJ4fXJghCdLhynX/EjGFHcADn8kKqSDatO6U7nM/Zo7Xt7GyuZktBs=
+	t=1737972381; cv=none; b=T7qPvJTPNaslrVNLYSy/5rnb3NrtGVcoL+FbvQeamv83Rh5iaVqZMHhfsHmTWv9oWEACFxnN4ai27A9XNciLnUGrxxz/gUD+bVsE+f6a7pX1RUHk9KoKkvWhM5EkLducV9qMyn5qjppLZA8dZdttJnPaIi/c3vIOStsIM1nZENE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1737972124; c=relaxed/simple;
-	bh=B8y1ONe/+TGZzQfZ6BGBlOt9/Wzs88AoO3lVq+nTh9g=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=k1o1P4z1kUiRNFfXsNx3XKVCPJwbIjlXjIe336ZqiO74uulUtBpqj/3myRrzPawHwr3L4daYN5f5JRdBP4Vmaj88lNr0OSdfdDq4Vq3JENnoyDufxKFfq6tpOYVaPG8njHzvLlvfKFJa2aHp5IhURt0bjpCNdwBeaH8BLneqgOc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=apNMaAti; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1737972121;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=gFZOHZcg3Qx0OcvWeZvQVyEDdj3ZOmkXZvkyYP7ymEQ=;
-	b=apNMaAtizsiQQIccNQvPN6KGeHUYVkDpyHtGwsSPpE8jKdj6qeP+tNDVTtqZOzWv5lZ2NQ
-	7nXlFDMdW2XqS71nIejwCi5aU/snSjC+PrkOiAB9u8F8j0yP5xnVLDbdv2XQ1O2cq0cAUn
-	IMjaDYY5rSFQF8tabbemwMESO+04T64=
-Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com
- [209.85.221.69]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-205-pIMFrqKWOd2xMYwXdbXJ1A-1; Mon, 27 Jan 2025 05:01:58 -0500
-X-MC-Unique: pIMFrqKWOd2xMYwXdbXJ1A-1
-X-Mimecast-MFC-AGG-ID: pIMFrqKWOd2xMYwXdbXJ1A
-Received: by mail-wr1-f69.google.com with SMTP id ffacd0b85a97d-38a35a65575so2793613f8f.1
-        for <netdev@vger.kernel.org>; Mon, 27 Jan 2025 02:01:58 -0800 (PST)
+	s=arc-20240116; t=1737972381; c=relaxed/simple;
+	bh=5Lifs3KGI40OaqehMKK9Y8v1k7tnm8krtzXb/s3F6Nk=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=rRANYRqWSjsJBVHwA03IE6rS+TSTrp8lmqwoaGrAiGCITYADtUwIM/TOYIWPGPH+tjiVlwFiQej8smm4SALBzhiO7I0yY6yqYIt0OFDeedRh0UXuB82hlWnG2f2yB6Heu1C0B4e4AvMtHJXWqeh40j+Fx27lWATakyfaKts0pHM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=11UDfTpI; arc=none smtp.client-ip=209.85.208.41
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-ed1-f41.google.com with SMTP id 4fb4d7f45d1cf-5d4e2aa7ea9so8248112a12.2
+        for <netdev@vger.kernel.org>; Mon, 27 Jan 2025 02:06:19 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1737972378; x=1738577178; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=VH4CnsVoFIKrMW+ju8mTDp4FzGeBRfrpK/9n+IGNSMk=;
+        b=11UDfTpIcukuQ4mPIs/gz+FFZcOp3hFFRVEnzMe482mWSPd1CqYJWjxgwhZXgTaKoX
+         bZxPC9uSd0NNGuhh5btNKyOi/eX3pxKPIz7fcUPnk1ipDa9lSGOwkGYWgonJoUt4BuLP
+         +w4fl48ovtqwgeXyBGVycK3XptrFMuwFuGGy0MubzC6cMtxhzjX4szDtApd93mnzrz/h
+         LFyoT/SIQ71f85rl/g5VbP/KyiqIatWtuWC+NaXQAsMK0QJRMFL6cQYOmzn2OGTYf5XN
+         m6nlWjdz0172oG/a6zKD4zT8DYbkeq+nr+1HIIg285GBnegAUmGgudoICn9v/urPzUE4
+         WVFQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1737972118; x=1738576918;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=gFZOHZcg3Qx0OcvWeZvQVyEDdj3ZOmkXZvkyYP7ymEQ=;
-        b=LxvNb3zoiQg4dEu3amPZY2iLDsi37hhbgbN/W41We7cd1HiuTyPlwjL94Tq4YQ3EfW
-         L3PLBFol9TcSL7IxS9Wgf0EX+sGVX2Saf56/ijFAQ3bMlgOQJ1qPouEwitE4FjSsc6yC
-         y6x+2uy7yvN7JMsmND6WZj+6sWKxXOE0d+8rCWzQE+gU/eo0fI1fVS3cTReUVyh1+t4g
-         Ob/j4xlW7L4pkAfuEe8ei5QQPpWTfzxuJdQvLK1sNJD1dcv6sKhFzTVi1GHxkx2FF/7+
-         mtBMVLRkTKEgRrJKf4AxN4lnYShHx664tvO6ahKwNYyTLF2t6dyYEoCx2wSynJUVHBLl
-         pgGQ==
-X-Gm-Message-State: AOJu0YyzBZ7z8Sl41TcmSKUDNkVA5qclwmRutameDuxhlrmWL3e+sSrr
-	7hkhb+bPX2Cq8/BJQF/A3LJ9l7uJxuyfX3F6UdAzzzom1bi5+c760lJUaXeWI21V+5FPm+DqmCl
-	rYsQrCwbcTznZKoYk8UqbK02zlLwmBwZrCE7e3E9lY4o9Ty5K7sEpJw==
-X-Gm-Gg: ASbGncsMY76XQD34jI1fleCB3aRbxMIvOSxIMUpL1W05iQI7+U4EDuSdQMq/u0zzWLp
-	6kLH3IHFvVfvyGShkASeFBugWjiXiFKf4vgZt9tI7a19knGI/jCjJ3QCtXK/nhXlIZdmBX7+ym1
-	mVtoaB+mFRTnFu8zc1snOniDUfzS6FO/UyQJ9mYprQGR5H989K1NT48cKc6gzdIJO79jZrvAmYw
-	AhxF0ZyAh2tSbtTGJG3SfW77/Td5VyYsf7P//0JORauBpeCCA8AVFGyjA3G9wjncB8AO8kuZOFj
-	8fQJSDozQCjP0ymce/pvcUDbD61ArbEznRM=
-X-Received: by 2002:a05:6000:402a:b0:38a:a047:6c0b with SMTP id ffacd0b85a97d-38bf57a97e0mr40573081f8f.35.1737972117628;
-        Mon, 27 Jan 2025 02:01:57 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IGwuO7rGVsT0WbHefUe0qlzfeg7gMn97k/Ijz7A7MBN/KGcNhnXwkNx/zJv7Yq5MpgoRvH1vg==
-X-Received: by 2002:a05:6000:402a:b0:38a:a047:6c0b with SMTP id ffacd0b85a97d-38bf57a97e0mr40573048f8f.35.1737972117198;
-        Mon, 27 Jan 2025 02:01:57 -0800 (PST)
-Received: from [192.168.88.253] (146-241-95-172.dyn.eolo.it. [146.241.95.172])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-438bd54c0ecsm127069085e9.30.2025.01.27.02.01.56
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 27 Jan 2025 02:01:56 -0800 (PST)
-Message-ID: <2ace650b-5697-4fc4-91f9-4857fa64feea@redhat.com>
-Date: Mon, 27 Jan 2025 11:01:55 +0100
+        d=1e100.net; s=20230601; t=1737972378; x=1738577178;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=VH4CnsVoFIKrMW+ju8mTDp4FzGeBRfrpK/9n+IGNSMk=;
+        b=A+EEpZ8zXmUVZIMHlPeFomXKvelG/xp7Eio4rtna4zWdV2Yo0XXR7WfWWbktWO0Pmi
+         QkZf35/ayH8/GyEdzqakJW6zLn7NzLzTR5x6SA+GN2FsMY5KSWU85V77mpyWf8GhRdr+
+         lRoTdS/L5JN7ejz0JGN7JAKNIU5moWhO/OcAb4hTZZlD9ms4EBQyQS/+VjArW2uV77jo
+         NJaiq/Y4VTPUQWUWqPjekwMrKEarm9Ah/R44jklVnPVEgK7ogaGfjokM2/kLzCIMfmnV
+         VuiImX+1hNvwvzUYJyMSd9XHLEJI0bVliJ3ULta0y7n274kVr/pp++mmyIMFIgB43g7l
+         /9+w==
+X-Forwarded-Encrypted: i=1; AJvYcCXe3LAsFEAFlrK0Jx+n7HZwmJilQBBiXo4DdGdvUKmjJA/CO7i1U5fwSE0tcZ5yxSVRsBr719g=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yx4pW8n+N021EMNQ+hKzAk3WU8syF7VKhf3+13tLofzC/p7SFti
+	A30z4X9JMb6x9xBt8Qk+yhl1HLtxCArLSn+cgygoNX/mNyCyYjq88R8CGBCHxvt2RrFKhxPfBet
+	7aVhz0qEjffN2EQi/ED3obFuFstWi5bGIIvKV
+X-Gm-Gg: ASbGncv5tM1RdE8FPNv2TfsIsKfvl64gX4HEMml00eEflev2+CgHvySXEDTfzWdPOuJ
+	99NnlSU9BJl6obJo7wjboAfTvh26W/msiLmXp5okLWkRiknhGCWscxslUNb6+Iw==
+X-Google-Smtp-Source: AGHT+IEK0mfFCDU+rZIY3KCdjtBVZ94LbVI87w4XHtZxLqFTpobyjupwLsSAXcuDdRgIJurDmKfQLwh2SuyS+UzEkEc=
+X-Received: by 2002:a05:6402:1e96:b0:5dc:1239:1e40 with SMTP id
+ 4fb4d7f45d1cf-5dc12391edamr12713038a12.31.1737972377908; Mon, 27 Jan 2025
+ 02:06:17 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next v6 05/12] net: homa: create homa_rpc.h and
- homa_rpc.c
-To: John Ousterhout <ouster@cs.stanford.edu>
-Cc: netdev@vger.kernel.org, edumazet@google.com, horms@kernel.org,
- kuba@kernel.org
-References: <20250115185937.1324-1-ouster@cs.stanford.edu>
- <20250115185937.1324-6-ouster@cs.stanford.edu>
- <1c82f56c-4353-407b-8897-b8a485606a5f@redhat.com>
- <CAGXJAmwyp6tSO4KT_NSHKHSnUn-GSzSN=ucfjnBuXbg8uiw2pg@mail.gmail.com>
-Content-Language: en-US
-From: Paolo Abeni <pabeni@redhat.com>
-In-Reply-To: <CAGXJAmwyp6tSO4KT_NSHKHSnUn-GSzSN=ucfjnBuXbg8uiw2pg@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+References: <20250117214035.2414668-1-jmaloy@redhat.com> <CADVnQymiwUG3uYBGMc1ZEV9vAUQzEOD4ymdN7Rcqi7yAK9ZB5A@mail.gmail.com>
+ <afb9ff14-a2f1-4c5a-a920-bce0105a7d41@redhat.com> <c41deefb-9bc8-47b8-bff0-226bb03265fe@redhat.com>
+ <CANn89i+RRxyROe3wx6f4y1nk92Y-0eaahjh-OGb326d8NZnK9A@mail.gmail.com>
+ <e15ff7f6-00b7-4071-866a-666a296d0b15@redhat.com> <20250127110121.1f53b27d@elisabeth>
+In-Reply-To: <20250127110121.1f53b27d@elisabeth>
+From: Eric Dumazet <edumazet@google.com>
+Date: Mon, 27 Jan 2025 11:06:07 +0100
+X-Gm-Features: AWEUYZnFUBRn0g4lzs0Ys1IPU6Wx9pJClaC24giX4xaag7aSllHJ2EKBa1kjAvY
+Message-ID: <CANn89iJ4u5QBfhc1LC6ipmmmiEG0bCWhRG1obm3=05A_BsPt4w@mail.gmail.com>
+Subject: Re: [net,v2] tcp: correct handling of extreme memory squeeze
+To: Stefano Brivio <sbrivio@redhat.com>
+Cc: Jon Maloy <jmaloy@redhat.com>, Neal Cardwell <ncardwell@google.com>, netdev@vger.kernel.org, 
+	davem@davemloft.net, kuba@kernel.org, passt-dev@passt.top, lvivier@redhat.com, 
+	dgibson@redhat.com, eric.dumazet@gmail.com, 
+	Menglong Dong <menglong8.dong@gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On 1/27/25 6:22 AM, John Ousterhout wrote:
-> On Thu, Jan 23, 2025 at 6:30 AM Paolo Abeni <pabeni@redhat.com> wrote:
->> ...
->> How many RPCs should concurrently exist in a real server? with 1024
->> buckets there could be a lot of them on each/some list and linear search
->> could be very expansive. And this happens with BH disabled.
-> 
-> Server RPCs tend to be short-lived, so my best guess is that the
-> number of concurrent server RPCs will be relatively small (maybe a few
-> hundred?). But this is just a guess: I won't know for sure until I can
-> measure Homa in production use. If the number of concurrent RPCs turns
-> out to be huge then we'll have to find a different solution.
-> 
->>> +
->>> +     /* Initialize fields that don't require the socket lock. */
->>> +     srpc = kmalloc(sizeof(*srpc), GFP_ATOMIC);
->>
->> You could do the allocation outside the bucket lock, too and avoid the
->> ATOMIC flag.
-> 
-> In many cases this function will return an existing RPC so there won't
-> be any need to allocate; I wouldn't want to pay the allocation
-> overhead in that case. I could conceivably check the offset in the
-> packet and pre-allocate if the offset is zero (in this case it's
-> highly unlikely that there will be an existing RPC). 
+On Mon, Jan 27, 2025 at 11:01=E2=80=AFAM Stefano Brivio <sbrivio@redhat.com=
+> wrote:
+>
+> On Fri, 24 Jan 2025 12:40:16 -0500
+> Jon Maloy <jmaloy@redhat.com> wrote:
+>
+> > I can certainly clear tp->pred_flags and post it again, maybe with
+> > an improved and shortened log. Would that be acceptable?
+>
+> Talking about an improved log, what strikes me the most of the whole
+> problem is:
+>
+> $ tshark -r iperf3_jon_zero_window.pcap -td -Y 'frame.number in { 1064 ..=
+ 1068 }'
+>  1064   0.004416 192.168.122.1 =E2=86=92 192.168.122.198 TCP 65534 34482 =
+=E2=86=92 5201 [ACK] Seq=3D1611679466 Ack=3D1 Win=3D36864 Len=3D65480
+>  1065   0.007334 192.168.122.1 =E2=86=92 192.168.122.198 TCP 65534 34482 =
+=E2=86=92 5201 [ACK] Seq=3D1611744946 Ack=3D1 Win=3D36864 Len=3D65480
+>  1066   0.005104 192.168.122.1 =E2=86=92 192.168.122.198 TCP 56382 [TCP W=
+indow Full] 34482 =E2=86=92 5201 [ACK] Seq=3D1611810426 Ack=3D1 Win=3D36864=
+ Len=3D56328
+>  1067   0.015226 192.168.122.198 =E2=86=92 192.168.122.1 TCP 54 [TCP Zero=
+Window] 5201 =E2=86=92 34482 [ACK] Seq=3D1 Ack=3D1611090146 Win=3D0 Len=3D0
+>  1068   6.298138 fe80::44b3:f5ff:fe86:c529 =E2=86=92 ff02::2      ICMPv6 =
+70 Router Solicitation from 46:b3:f5:86:c5:29
+>
+> ...and then the silence, 192.168.122.198 never announces that its
+> window is not zero, so the peer gives up 15 seconds later:
+>
+> $ tshark -r iperf3_jon_zero_window_cut.pcap -td -Y 'frame.number in { 106=
+9 .. 1070 }'
+>  1069   8.709313 192.168.122.1 =E2=86=92 192.168.122.198 TCP 55 34466 =E2=
+=86=92 5201 [ACK] Seq=3D166 Ack=3D5 Win=3D36864 Len=3D1
+>  1070   0.008943 192.168.122.198 =E2=86=92 192.168.122.1 TCP 54 5201 =E2=
+=86=92 34482 [FIN, ACK] Seq=3D1 Ack=3D1611090146 Win=3D778240 Len=3D0
+>
+> Data in frame #1069 is iperf3 ending the test.
+>
+> This didn't happen before e2142825c120 ("net: tcp: send zero-window
+> ACK when no memory") so it's a relatively recent (17 months) regression.
+>
+> It actually looks pretty simple (and rather serious) to me.
+>
 
-If you use RCU properly here, you could do a lockless lookup. If such
-lookup fail, you could do the allocation still outside the lock and
-avoiding it in most of cases.
+With all that, it should be pretty easy to cook a packetdrill test, right ?
 
->>> +/**
->>> + * homa_find_client_rpc() - Locate client-side information about the RPC that
->>> + * a packet belongs to, if there is any. Thread-safe without socket lock.
->>> + * @hsk:      Socket via which packet was received.
->>> + * @id:       Unique identifier for the RPC.
->>> + *
->>> + * Return:    A pointer to the homa_rpc for this id, or NULL if none.
->>> + *            The RPC will be locked; the caller must eventually unlock it
->>> + *            by invoking homa_rpc_unlock.
->>
->> Why are using this lock schema? It looks like it adds quite a bit of
->> complexity. The usual way of handling this kind of hash lookup is do the
->> lookup locklessly, under RCU, and eventually add a refcnt to the
->> looked-up entity - homa_rpc - to ensure it will not change under the
->> hood after the lookup.
-> 
-> I considered using RCU for this, but the time period for RCU
-> reclamation is too long (10's - 100's of ms, if I recall correctly).
-
-RCU grace period usually extend on a kernel jiffy (1-10 ms depending on
-your kernel build option).
-
-> Homa needs to handle a very high rate of RPCs, so this would result in
-> too much accumulated memory  (in particular, skbs don't get reclaimed
-> until the RPC is reclaimed).
-
-For the RPC struct, that above is a fair point, but why skbs need to be
-freed together with the RCP struct? if you have skbs i.e. sitting in a
-RX queue, you can flush such queue when the RPC goes out of scope,
-without any additional delay.
-
-> The caller must have a lock on the homa_rpc anyway, so RCU wouldn't
-> save the overhead of acquiring a lock. The reason for putting the lock
-> in the hash table instead of the homa_rpc is that this makes RPC
-> creation/deletion atomic with respect to lookups. The lock was
-> initially in the homa_rpc, but that led to complex races with hash
-> table insertion/deletion. This is explained in sync.txt, but of course
-> you don't have that (yet).
-
-The per bucket RPC lock is prone to contention, a per RPC lock will
-avoid such problem.
-
-> This approach is unusual, but it has worked out really well. Before
-> implementing this approach I had what seemed like a never-ending
-> stream of synchronization problems over the socket hash tables; each
-> "fix" introduced new problems. Once I implemented this, all the
-> problems went away and the code has been very stable ever since
-> (several years now).
-
-Have you tried running a fuzzer on this code? I bet syzkaller will give
-a lot of interesting results, if you teach it about the homa APIs.
-
-/P
-
+packetdrill tests are part of tools/testing/selftests/net/ already, we
+are not asking for something unreasonable.
 
