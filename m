@@ -1,169 +1,168 @@
-Return-Path: <netdev+bounces-161143-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-161144-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0F8DDA1DA1E
-	for <lists+netdev@lfdr.de>; Mon, 27 Jan 2025 17:04:53 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 4B6D6A1DA2A
+	for <lists+netdev@lfdr.de>; Mon, 27 Jan 2025 17:07:36 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 5F0901675F3
-	for <lists+netdev@lfdr.de>; Mon, 27 Jan 2025 16:04:51 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 8E382167986
+	for <lists+netdev@lfdr.de>; Mon, 27 Jan 2025 16:07:34 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 242E386359;
-	Mon, 27 Jan 2025 16:04:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 34928157493;
+	Mon, 27 Jan 2025 16:07:24 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="FGGV/9sp"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="BeaP5XGD"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f169.google.com (mail-pl1-f169.google.com [209.85.214.169])
+Received: from mail-ej1-f50.google.com (mail-ej1-f50.google.com [209.85.218.50])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8DFB07BAEC;
-	Mon, 27 Jan 2025 16:04:45 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.169
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5FE18155747;
+	Mon, 27 Jan 2025 16:07:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.50
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1737993887; cv=none; b=a0uk5ChCQNLor8MNMvEhE4Hvq61v9QN1jJrrAGUsUu5PmOFt4Ty5OKY0A9mFgJz4ZLt4yF5ruDvdxGHKMhSKFmdiS/Z7L6s4PQsJzr/1oB9K+pj6V/mL9jX3XII0ezs2tGlKpeEhwVGGKP2mdXopLytGnnBOiLxiGEixYX0TH/8=
+	t=1737994044; cv=none; b=MUYFabCUczi/2yYweWEofRW304V5zCSvTZko9TFxC2Cy7G0CK94BFDfQT0wBh/88IXP9VLrXgnSt9OaZc2osa0wCFYV+b5oUaFVlU1JC4XGbCN0oE7TBF0Ad9hqXl27cJ0lxYzCuBgRxtFNiTrEMp8ZVN50dGHnxOmnJP4iXnv8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1737993887; c=relaxed/simple;
-	bh=apZ5E3/lHSBZLZjJrFRNg92Lj7oD7FG7hxu8W7ybIv4=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=JTIund1cG6gAGyL/I6U+uYp6/iCP/1s6t3QGmHhzXo+iCiGcxi2rnS+U7Yo+ctR2VuRFyFgN5b9ugUOJ5BJSYgWwo2Ws3l5i7jy1xhezIXPwLfCwPoFe4/U1SZjiqZgrRyqVDYmM/bSOBuk2AypxTjxNCrpKGHzeCxO5I6XsqZc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=FGGV/9sp; arc=none smtp.client-ip=209.85.214.169
+	s=arc-20240116; t=1737994044; c=relaxed/simple;
+	bh=+QwPUp3qsE13Mkc3DWfjMlz0Em0OicoIS5FT71+NDyY=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version:Content-Type; b=DkvT1tRJdZr3+erNjZ1Nq+3C6okhiHlZD8BbadyQDx4ccxqczoYNwsuvA3R/6Yuih+mUrA+TKDeZzwSCEywOkX00QCDSQc8wa/hJbU8+AhYEcx/r9gQSKR1PK9SRhbZ/huUBHWacLsBKyhIbTwTeJUrl6UfEMHLt6+jJRjc+kzc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=BeaP5XGD; arc=none smtp.client-ip=209.85.218.50
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pl1-f169.google.com with SMTP id d9443c01a7336-2163b0c09afso84285165ad.0;
-        Mon, 27 Jan 2025 08:04:45 -0800 (PST)
+Received: by mail-ej1-f50.google.com with SMTP id a640c23a62f3a-aab925654d9so909936366b.2;
+        Mon, 27 Jan 2025 08:07:22 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1737993884; x=1738598684; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=bhtYqaf9HNl2Tvv5wf0rnBEEHSiWm6k/ivguWbD71P0=;
-        b=FGGV/9spSfc8Nvz9AzXSQaY+t2Dvgcqmsi80imqIHEITy++wkTQFrJkbTowuxgJ/mt
-         NdFa6x9b8OZceCA3fPKozgP9MMHairIN2wNnoVoA+QGSSI+M+1mOvHpN3g+nuhHMAgCv
-         iVsVMNzsXCSRrEsfvy19Tzt97QuqK5BAiePekza+RgnjsieIm24oTUUCg+J4wOxx7MTT
-         b8rHlAOh5LrpFSpkRZJQ7nOd8SlkiK7YoP3hb8aCqCYJPPjQXh1T4D/miTVEd9MAzZuP
-         9PmgHHpbK8B3jRGlvAaDiH0Eg5tvOuBWlB9zhZBO1Y5ubwDPDtddGa+blr68qAfKh+ey
-         tzKQ==
+        d=gmail.com; s=20230601; t=1737994040; x=1738598840; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=WT5eWH6rZrIJLgUZzxnI1r9howrcT7ENhSKc9wgIf9U=;
+        b=BeaP5XGDltUN8ywCC3iGfh5oy5oab5XGxEnEOseh/f0Y6H3vzd1LwRIHKGjj5pD2Le
+         xe36+pTRGutyKoZkL6UYFmvOV/g/nWon4wJQ1crrGMrmB1BYYAXEYN6yE8PT7F9WvyIx
+         0f7kXEHeNg8txQKDPCPAiYT3cXQ2ugBiOiQ/YeGSuBSmoEbjNfOVZ85TG6eXCqb7Gubq
+         v/i29s0XHiHVSW7LyhfPSBKM3DSuucFyxCWs3hPLK70ajgXDiA7o9vzsF8fwo17T9RcS
+         HDTOgeSsZUC2dCovEfJ/kk77mHSjh58S123VmQhMva5PGmBRA/HfJxAW113RrHyPUrg0
+         1Jcg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1737993885; x=1738598685;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=bhtYqaf9HNl2Tvv5wf0rnBEEHSiWm6k/ivguWbD71P0=;
-        b=pEOgchqX5mq+kF/SIxHB3+BMnc0VGc1/ZxQKuF1T9Frv14EEko+rNjEjMSPb7JNj3g
-         qmvJfUaqoUaMXiUCRwafcrzYgNWQC5vgvd7hNYuNAdacCUJk1TCa5RzEwAG79Y+s4HWK
-         1JBEQBQgzvXlb1EF8/1gGh70nuCrXArZvHSNQuRdHDzjD6mke40TE2fcCBDgiNLi31Y5
-         edXrqh0z533fUE6AsqwD36t0ArnqAlUSrpMnC3LMAvY99dPXQpdtl7V+M6qQwHowbDpr
-         SmzNP6n2wjmGnhDTylwO3vly27lG4ws1BE0pw4ZWC2JY8kw2sMiHBBeF7WzqQMSY36lO
-         yzlQ==
-X-Forwarded-Encrypted: i=1; AJvYcCUCjs9pnqIkMUdl63yt/17cwAZBeTF/Lv71LGoisf6CTmcLUrVwkeSSQM1z8B5zxbyoSSliYC1k+NRh@vger.kernel.org, AJvYcCUbqkLlVfO+o1nTqG1SR6xnb6kWf+EejrtXW5Ab4lS9v8bTMVl86bUEpluHswXsug4rj+a+6A3mx5zylOOycfL4@vger.kernel.org, AJvYcCWFOG0f+XCMyJqsx8mEcVSVMK95qJDCDufpP1s+Gev6JTAvAAotsWqfuEh+0ce/H8O9MBc=@vger.kernel.org, AJvYcCXSsYnNlJweNndMJjLsu55512zN+ppnRSe4vxaO1J6pbC1srmsYxYo/N8hxEmUnMr9ormw5ItNKgcFOui+C@vger.kernel.org, AJvYcCXmoUJBpPxsV4ENq+Bdqrn1Nc18OkC8umxpx4ejFkPltmyDMWNFLwbBVXN+H6uWlHoSlXUBpvnF@vger.kernel.org
-X-Gm-Message-State: AOJu0YyA17x8xTyaoHv7xplMtxMUndNc3wWtkkfYPPC/EZAmrL2Fya3Q
-	4R5Mfg9tVA4kwKIEV1i08mfso0opkO7SAInLYBDCa/PgTv9kNBKs
-X-Gm-Gg: ASbGncsFa1QnH6Tm2uvY3d76CCG95x1glQAVS/xoPpPVezO5smbmtaYUGPXVUpp9LJT
-	P3mfCR7gdIAEakiB+w8LkR3a8rZskZyEeW/G5izrU4Hi05QmRVhb1R5AxOD41638+1LAkKsjfRH
-	2UMjutj1d+jpgYHDUl0rxdNaFAJnwQPVsaepufjZ+AhTJLCcnCj9u61ezaOHr8J9tCLHoGttZ9V
-	yegrs3a2FbI9JsYzzBkMKlWeHzx+vBVwo2W6HYtpCYl9jd+QWeImdrZckhE9Wj5oNtmbRuoJSfc
-	Q3K2NQ==
-X-Google-Smtp-Source: AGHT+IESvwfGyLqmu3jP5n+pNmNlyBZKOsDbT4avridkVgJrMVZ+QuspeR4I4KnEw+lvpFE0YHH7iA==
-X-Received: by 2002:a05:6a21:3391:b0:1e0:d123:7166 with SMTP id adf61e73a8af0-1eb2148de80mr63097969637.14.1737993884394;
-        Mon, 27 Jan 2025 08:04:44 -0800 (PST)
-Received: from gmail.com ([98.97.39.174])
-        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-72f8a6b307fsm7317183b3a.46.2025.01.27.08.04.42
+        d=1e100.net; s=20230601; t=1737994040; x=1738598840;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=WT5eWH6rZrIJLgUZzxnI1r9howrcT7ENhSKc9wgIf9U=;
+        b=F9C/5qY5Gf2G8xSr4036OFdJEdVp4NRfUpxOY0/XmB1ecE9Oc8ixFH9nFIqI+TUWrn
+         OQp/KX0rhjIJyh1NB3iIOXp9HWvGWtE9kkHB/p6wYPAefsMM8ACZnXMMfSeB96zLlbah
+         tn5Fvzp6JzekbuWOgmIxtKbzHkYKAQXfRIu8Nt+lXd13mKLSH3CZXETpkSEYqa+ctpt0
+         DLY2R8BTih3sPBHEwpQmZWpX38h8M7B9jGyas7rrW4uSqH9g7pDU4pwU5n33xs9iI2KS
+         lCdlRhbMumm3dE/EDXsxSPzC8TZVMZL1h+aroyfM15oMSVfoUW7DTS5Hh8g8AclgLyfY
+         VLwg==
+X-Forwarded-Encrypted: i=1; AJvYcCU0fJQh3Xg4ZaR/UuJkNjV/Qb2Y1ONNN+KzRQpWoWWiLwEc2HWN32xj2vUsKysL/9me3zxNM3zCJx3h@vger.kernel.org, AJvYcCVQALGYN9tOYoqLugUs7e/taj6dUmIvho7/rWSg5dyEL3sdSKvyjcrafYBESvvdpZSIRVHccgE56ZaR+zH/@vger.kernel.org, AJvYcCVQPRlMSyj8u2huhe1h2txuAkF1+OuIv3W6kR896pB4JNAtpxpLvERpr7vUaQVhWb1uh9UQ2JBZVbrYlEcxMTE=@vger.kernel.org, AJvYcCWu07v1byz5T7l1gf/RWZpvKWXqszoYvimcHoK2XBUIfR4xIQoW4TafbsNjjRPoPWcSXckf1BHB@vger.kernel.org
+X-Gm-Message-State: AOJu0YxNJxZw3kYb+2RC3PhomeADLRrXC7hgGiMo5pR4+42oqSZ/yOF1
+	+BKJBbwa9V2DOAAwHvtH2cbX3+ulDabWXEo7LyboFEzGXvEqogNd
+X-Gm-Gg: ASbGncu+UBS3ygA2dXPyDdq8UwwhbSXLvGWqcsyBFJbPc9a7O242LfbgWUx8er14PFz
+	SObwcvVj8l5cRFnLPuT3nuyR41i9sOHx8HXGVcvH0Ahl9A++bj7Q76hvdaREXh/UyZ5aDKrUU3F
+	ywIxVbcJ/cjJ2z5jyZhMkgxKIJA3WS5PXNIXHUmY+1sFyRkOaSQkDt+TS9nZ0e1YqL0hwnHVUn+
+	+nvqhkiD+k8+N7tvXONpHQkcIUskNTfE2htlqi6MQDHtkhlfxBu+k9BptLE/0K57Z1j2O+a7R6f
+	WO7Oi3in0HcyRA==
+X-Google-Smtp-Source: AGHT+IFuULEp0GQymnkX/TKA35qIg1LycjVhC3Ts9VWHQc6Q18z1cFu8eW/Z/NP2jJeLUu8LFdZJ8A==
+X-Received: by 2002:a17:907:940b:b0:aac:619:7ed8 with SMTP id a640c23a62f3a-ab38b1e651bmr3499843866b.7.1737994040271;
+        Mon, 27 Jan 2025 08:07:20 -0800 (PST)
+Received: from localhost.localdomain ([46.248.82.114])
+        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-ab675e8b01asm592643866b.84.2025.01.27.08.07.18
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 27 Jan 2025 08:04:43 -0800 (PST)
-Date: Mon, 27 Jan 2025 08:04:29 -0800
-From: John Fastabend <john.fastabend@gmail.com>
-To: Jakub Sitnicki <jakub@cloudflare.com>
-Cc: Jiayuan Chen <mrpre@163.com>, bpf@vger.kernel.org, 
-	netdev@vger.kernel.org, martin.lau@linux.dev, ast@kernel.org, edumazet@google.com, 
-	davem@davemloft.net, dsahern@kernel.org, kuba@kernel.org, pabeni@redhat.com, 
-	linux-kernel@vger.kernel.org, song@kernel.org, andrii@kernel.org, mhal@rbox.co, 
-	yonghong.song@linux.dev, daniel@iogearbox.net, xiyou.wangcong@gmail.com, horms@kernel.org, 
-	corbet@lwn.net, eddyz87@gmail.com, cong.wang@bytedance.com, shuah@kernel.org, 
-	mykolal@fb.com, jolsa@kernel.org, haoluo@google.com, sdf@fomichev.me, 
-	kpsingh@kernel.org, linux-doc@vger.kernel.org, linux-kselftest@vger.kernel.org
-Subject: Re: [PATCH bpf v9 0/5] bpf: fix wrong copied_seq calculation and add
- tests
-Message-ID: <i2pmhcfge4my5rl4sy5uvu3lhnbtov5rhcjdrqbwunicnefrzy@uhs35blc47lv>
-References: <20250122100917.49845-1-mrpre@163.com>
- <877c6hd5io.fsf@cloudflare.com>
+        Mon, 27 Jan 2025 08:07:19 -0800 (PST)
+From: Uros Bizjak <ubizjak@gmail.com>
+To: x86@kernel.org,
+	linux-mm@kvack.org,
+	linux-kernel@vger.kernel.org,
+	linux-bcachefs@vger.kernel.org,
+	linux-arch@vger.kernel.org,
+	netdev@vger.kernel.org
+Cc: Uros Bizjak <ubizjak@gmail.com>,
+	Thomas Gleixner <tglx@linutronix.de>,
+	Dennis Zhou <dennis@kernel.org>,
+	Tejun Heo <tj@kernel.org>,
+	Christoph Lameter <cl@linux.com>,
+	Linus Torvalds <torvalds@linux-foundation.org>,
+	Andrew Morton <akpm@linux-foundation.org>,
+	Andy Lutomirski <luto@kernel.org>,
+	Ingo Molnar <mingo@kernel.org>,
+	Nadav Amit <nadav.amit@gmail.com>,
+	Brian Gerst <brgerst@gmail.com>,
+	Dan Carpenter <dan.carpenter@linaro.org>,
+	"H . Peter Anvin" <hpa@zytor.com>,
+	Peter Zijlstra <peterz@infradead.org>
+Subject: [PATCH v4 0/6] Enable strict percpu address space checks
+Date: Mon, 27 Jan 2025 17:05:04 +0100
+Message-ID: <20250127160709.80604-1-ubizjak@gmail.com>
+X-Mailer: git-send-email 2.42.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <877c6hd5io.fsf@cloudflare.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 
-On 2025-01-26 15:16:47, Jakub Sitnicki wrote:
-> On Wed, Jan 22, 2025 at 06:09 PM +08, Jiayuan Chen wrote:
-> > A previous commit described in this topic
-> > http://lore.kernel.org/bpf/20230523025618.113937-9-john.fastabend@gmail.com
-> > directly updated 'sk->copied_seq' in the tcp_eat_skb() function when the
-> > action of a BPF program was SK_REDIRECT. For other actions, like SK_PASS,
-> > the update logic for 'sk->copied_seq' was moved to
-> > tcp_bpf_recvmsg_parser() to ensure the accuracy of the 'fionread' feature.
-> >
-> > That commit works for a single stream_verdict scenario, as it also
-> > modified 'sk_data_ready->sk_psock_verdict_data_ready->tcp_read_skb'
-> > to remove updating 'sk->copied_seq'.
-> >
-> > However, for programs where both stream_parser and stream_verdict are
-> > active (strparser purpose), tcp_read_sock() was used instead of
-> > tcp_read_skb() (sk_data_ready->strp_data_ready->tcp_read_sock).
-> > tcp_read_sock() now still updates 'sk->copied_seq', leading to duplicated
-> > updates.
-> >
-> > In summary, for strparser + SK_PASS, copied_seq is redundantly calculated
-> > in both tcp_read_sock() and tcp_bpf_recvmsg_parser().
-> >
-> > The issue causes incorrect copied_seq calculations, which prevent
-> > correct data reads from the recv() interface in user-land.
-> >
-> > Also we added test cases for bpf + strparser and separated them from
-> > sockmap_basic, as strparser has more encapsulation and parsing
-> > capabilities compared to sockmap.
-> >
-> > ---
-> > V8 -> v9
-> > https://lore.kernel.org/bpf/20250121050707.55523-1-mrpre@163.com/
-> > Fixed some issues suggested by Jakub Sitnicki.
-> >
-> > V7 -> V8
-> > https://lore.kernel.org/bpf/20250116140531.108636-1-mrpre@163.com/
-> > Avoid using add read_sock to psock. (Jakub Sitnicki)
-> > Avoid using warpper function to check whether strparser is supported.
-> >
-> > V3 -> V7:
-> > https://lore.kernel.org/bpf/20250109094402.50838-1-mrpre@163.com/
-> > https://lore.kernel.org/bpf/20241218053408.437295-1-mrpre@163.com/
-> > Avoid introducing new proto_ops. (Jakub Sitnicki).
-> > Add more edge test cases for strparser + bpf.
-> > Fix patchwork fail of test cases code.
-> > Fix psock fetch without rcu lock.
-> > Move code of modifying to tcp_bpf.c.
-> >
-> > V1 -> V3:
-> > https://lore.kernel.org/bpf/20241209152740.281125-1-mrpre@163.com/
-> > Fix patchwork fail by adding Fixes tag.
-> > Save skb data offset for ENOMEM. (John Fastabend)
-> > ---
-> 
-> Thanks for addressing all feedback, Jiayuan. Series LGTM.
-> Feel free to carry my tags if there is another iteration.
+Enable strict percpu address space checks via x86 named address space
+qualifiers. Percpu variables are declared in __seg_gs/__seg_fs named
+AS and kept named AS qualified until they are dereferenced via percpu
+accessor. This approach enables various compiler checks for
+cross-namespace variable assignments.
 
-+1 Thanks Jiayuan for sticking with this.
+Please note that current version of sparse doesn't know anything about
+__typeof_unqual__() operator. Avoid the usage of __typeof_unqual__()
+when sparse checking is active to prevent sparse errors with unknowing
+keyword. The proposed patch by Dan Carpenter to implement
+__typeof_unqual__() handling in sparse is located at:
 
-I've reviewed this a couple times. I had one nit on the if/else branch
-for a read call, but I haven't come up with anything better on my end
-and this fixes a real bug. So lets take it.
+https://lore.kernel.org/lkml/5b8d0dee-8fb6-45af-ba6c-7f74aff9a4b8@stanley.mountain/
 
-For the series.
+v2: - Add comment to remove test for __CHECKER__ once sparse learns
+      about __typeof_unqual__.
+    - Add Acked-by: tags.
+v3: - Rename __per_cpu_qual to __percpu_qual.
+    - Add more Acked-by: tags.
+v4: - Do not auto-detect compiler support for __typeof_unqual__()
 
-Acked-by: John Fastabend <john.fastabend@gmail.com>
+Cc: Thomas Gleixner <tglx@linutronix.de>
+Cc: Dennis Zhou <dennis@kernel.org>
+Cc: Tejun Heo <tj@kernel.org>
+Cc: Christoph Lameter <cl@linux.com>
+Cc: Linus Torvalds <torvalds@linux-foundation.org>
+Cc: Andrew Morton <akpm@linux-foundation.org>
+Cc: Andy Lutomirski <luto@kernel.org>
+Cc: Ingo Molnar <mingo@kernel.org>
+Cc: Nadav Amit <nadav.amit@gmail.com>
+Cc: Brian Gerst <brgerst@gmail.com>
+Cc: Dan Carpenter <dan.carpenter@linaro.org>
+Cc: H. Peter Anvin <hpa@zytor.com>
+Cc: Peter Zijlstra <peterz@infradead.org>
 
-> 
-> -jkbs
+Uros Bizjak (6):
+  x86/kgdb: Use IS_ERR_PCPU() macro
+  compiler.h: Introduce TYPEOF_UNQUAL() macro
+  percpu: Use TYPEOF_UNQUAL() in variable declarations
+  percpu: Use TYPEOF_UNQUAL() in *_cpu_ptr() accessors
+  percpu: Repurpose __percpu tag as a named address space qualifier
+  percpu/x86: Enable strict percpu checks via named AS qualifiers
+
+ arch/x86/include/asm/percpu.h  | 33 +++++++++++++++++++---------
+ arch/x86/kernel/kgdb.c         |  2 +-
+ fs/bcachefs/util.h             |  2 +-
+ include/asm-generic/percpu.h   | 39 ++++++++++++++++++++++------------
+ include/linux/compiler-clang.h |  8 +++++++
+ include/linux/compiler-gcc.h   |  8 +++++++
+ include/linux/compiler.h       | 20 +++++++++++++++++
+ include/linux/compiler_types.h |  2 +-
+ include/linux/part_stat.h      |  2 +-
+ include/linux/percpu-defs.h    |  6 +++---
+ include/net/snmp.h             |  5 ++---
+ kernel/locking/percpu-rwsem.c  |  2 +-
+ net/mpls/internal.h            |  4 ++--
+ 13 files changed, 97 insertions(+), 36 deletions(-)
+
+-- 
+2.42.0
+
 
