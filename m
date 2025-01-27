@@ -1,196 +1,210 @@
-Return-Path: <netdev+bounces-161109-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-161110-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3F40EA1D6CE
-	for <lists+netdev@lfdr.de>; Mon, 27 Jan 2025 14:29:08 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id AABB7A1D6D6
+	for <lists+netdev@lfdr.de>; Mon, 27 Jan 2025 14:31:29 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 8E640160B9F
-	for <lists+netdev@lfdr.de>; Mon, 27 Jan 2025 13:29:06 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 0579B16214F
+	for <lists+netdev@lfdr.de>; Mon, 27 Jan 2025 13:31:28 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 713771FF7BB;
-	Mon, 27 Jan 2025 13:29:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9E5881FFC57;
+	Mon, 27 Jan 2025 13:31:18 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="fm1MVK8O"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="FrKONCBI"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wr1-f48.google.com (mail-wr1-f48.google.com [209.85.221.48])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9F79C1FF7B3;
-	Mon, 27 Jan 2025 13:29:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.48
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C22E61FF7DD
+	for <netdev@vger.kernel.org>; Mon, 27 Jan 2025 13:31:16 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1737984544; cv=none; b=OEumU8KtMsA/wA4hY6x5cyCF8rHDOnHD3/xxGGVNXQlh7pOc1+Iu0Tcc/gpDwrUx3S0XtSJvpo5dQI6a0aBL+7wPJ7i6PkPehFBDLti1o3aqft/IBvhZYSPB9Tv/ZwW44H4n7Byzg5PJtDcxqhWtVFqZvDKn16VzCof10Y/vA+k=
+	t=1737984678; cv=none; b=VTRf51xPCLp7F0LnCfuKthEdZ57L043BWnX1kFt71qLYcZoqomtkni13idCWCqHaj+kqNk9oYKSiszVklGI2b98Nou/IJU/hovJGyxLBMhFc4dYvKVjrYR/1kfRRrayKnwmlFgBSfxvvElHj2Gq3YY7BZwPJqWYsZmW2vufEBXQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1737984544; c=relaxed/simple;
-	bh=mh3CDR+ykf509LxwGf2N4WrrtrOinr2AgygZBWAePzo=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=pB4EIobHvagwq2JogmKEgQ4FjL7iNR7UPfV91K+OUwxpmtzrijMU6sAvjde0gfF/CoXg2R71UlY6q5Gx3FJNMB9f6jQSWtz0zUjQHXXsiRFCf5N8P4U4nOU7gJiBNkkyuOCCtymneBtZUGS6zs8sf+ZT8jVZ9Ku8hEoFgYSY+H8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=fm1MVK8O; arc=none smtp.client-ip=209.85.221.48
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wr1-f48.google.com with SMTP id ffacd0b85a97d-385f07cd1a4so4620744f8f.1;
-        Mon, 27 Jan 2025 05:29:02 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1737984541; x=1738589341; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=FvzYFhX8SUBJyGpqjsoQ6jIbjkQaAtJdp897xoVPh9M=;
-        b=fm1MVK8OVXeUnJd9giyJGNB2o36Wl+RAEBivtGT5HxwqBI6svANTmMg5/xlXg8S6yO
-         NoyTSsK3kF5h0of88dMXPBUOUOwLm0xoncnhuF4No2mdk/QXU7uAVtbQCnDEQZudVVz6
-         IPoGVAZq88Lxht+vn+zk4HYB5xtIX6I/29Rlnf1+TsocZyByzSb77wKQOvGH9tjPO0O+
-         u/kq0tBqqrVTKGwQD8n89G5FXoHfsqB8FWvydJTRjE/a/UJD11xSRoCVU8pu/prsrhJj
-         OCOuDw6Eod4yNRjVI+wwbJxo4gQEFv2wo8/nXcQfcHPUk4gCfy9qHMnwc0BRFBFmE9hs
-         7eaA==
+	s=arc-20240116; t=1737984678; c=relaxed/simple;
+	bh=xdQIqpy+FKqy0AlW4QMtn7nvVsTCgNAwO/r9HOC9XO4=;
+	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
+	 MIME-Version:Content-Type; b=GUu7pUSkP3BJtRkLTdtsa04D/LQVK/gQEiUq6vDELxEaZSITH+m3grEgfplcXCxMJX1k144xhdUeGOuSx4RLsFceoNwtJuTqcOWjgf+RUUhIMXR/D2u3+V2co1Efnl9JfZ+GP3d2+cBow/XZ69DhGtSqZBYrmnUY3b1CZuDgn5Q=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=FrKONCBI; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1737984675;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=4BiMIZClPATtzyOxdSengJQIH9yeWvqFFhr5iuZB3y8=;
+	b=FrKONCBIxgT9mN0nVJrf2wJ0IHnTvwYXZN61BvGmGwaNDeUga8DhqriDAUoS4ZrjIqraLi
+	CSPO6xtFeFy8CMddtEpiJSAU3Wi0i0ldgPvB4H6zk5Vg9QabeUbrB1VSAKOfviO6uR1Yd8
+	13zwWM4eRr6dcW6VAqkcyvarwFd1u7c=
+Received: from mail-ej1-f70.google.com (mail-ej1-f70.google.com
+ [209.85.218.70]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-170-q-gU1Yc6NWawmkacWGoyvQ-1; Mon, 27 Jan 2025 08:31:14 -0500
+X-MC-Unique: q-gU1Yc6NWawmkacWGoyvQ-1
+X-Mimecast-MFC-AGG-ID: q-gU1Yc6NWawmkacWGoyvQ
+Received: by mail-ej1-f70.google.com with SMTP id a640c23a62f3a-ab547c18515so511821866b.2
+        for <netdev@vger.kernel.org>; Mon, 27 Jan 2025 05:31:13 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1737984541; x=1738589341;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=FvzYFhX8SUBJyGpqjsoQ6jIbjkQaAtJdp897xoVPh9M=;
-        b=ixyA2VFRYiyTx8eFNJOshproJVAKBmlfxZj6iMHiKwPC/NpOaC/pzEO2ChHhwAiRdP
-         zpgVNcv4v6YNvxy9ZrGhGrn8UQSTbsBD0Vgj+m1T5OUeaohKF1UdEpo9v12Y1z2j3MTt
-         sbfOtf0Gk3veBsWzOMflviBhJW4PlKcJRnZtSeocJkPJq8aaD6bkdDUTE7xJmDjsYhJp
-         rF/7hYfwKMN64bv0KitNiOjOsnVf42SUE9Nd3a8nzCfZUzmdDQRRCxFX+DIvES1rYXKP
-         BYP0e04J4+Oz8yhKKsESSKrn5bCmcNPB0T+x5dKPTZ8rpe+rBNA5X9hERWJD4d4na0cU
-         Cbeg==
-X-Forwarded-Encrypted: i=1; AJvYcCWTpGkvyORtY39iotZvBiTpEHv0UOIRrNNNE3e3fcnWWrHabcH0O/PGn2fXBBtOEbXyrL9EiePGRS23gU0=@vger.kernel.org, AJvYcCXBKe1c4k7QHgBvsLbKQsUlXfMjFw9swMZT+lv5pmo/spl/Za1hF0E9rasMZbmccB4fWibBEn+QPlxDys0=@vger.kernel.org, AJvYcCXGOtW9QRdbLqRDSepmNN2Vgjqb3mHLnGJ/97AzXlEeCMr5mxaAbFpsCNcA3W+bukA2ybQlX0/a@vger.kernel.org
-X-Gm-Message-State: AOJu0YzbD9quXuC8YKGBAY2pItI/ntKxkYvY2eLDRtUlrW3oZ3gRd89y
-	uGh2/7TJ39XJ9wCeN8dzf9QDzm97CoBxODbNSbk52Fmn5ByKHfuOw7F2EA==
-X-Gm-Gg: ASbGncv46Y8KK1QSEmjuhWO2b+ixTJnMb9WrskCcMBk4eVzwYy0aqAF/zy2reEpT+0+
-	hslRsGoGLAeLmk0tBqlxMkSnRK98wlaThOOHgMNZIyZ492CnGmaoerBVWMb79cK09TbXVZ9KY6F
-	HkNdqlT/TaVnYR9vUM7NwQZmYGbSx3S0YJPWp+uzpxd4CcJdsVV3lZ8xK1zKIUwE7CLl8tl+ZMx
-	lDYOEV406B6bjdIpiuZ8gbdTNjYB5JEYpiYlXe3F+uZhExAMOmdRip0GEwN98eJATTBvex2YY8t
-	Vl/guNeajbbrAJ5xE+MVmqyoD9SBf7tNNAfyqH8GByXpJvI726P0N4SsguLSyqld/cY=
-X-Google-Smtp-Source: AGHT+IFdDa7a3oSeFSq3XdbGtmA71EbKMopM7KAl71p/Rr59XXaBfgDYSq3pBLs5ZQTyA8iqtGNjYg==
-X-Received: by 2002:adf:ef04:0:b0:385:f23a:2fe1 with SMTP id ffacd0b85a97d-38bf566f7c9mr25956570f8f.26.1737984540632;
-        Mon, 27 Jan 2025 05:29:00 -0800 (PST)
-Received: from orome (p200300e41f281900f22f74fffe1f3a53.dip0.t-ipconnect.de. [2003:e4:1f28:1900:f22f:74ff:fe1f:3a53])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-38c2a17d7a7sm11357596f8f.32.2025.01.27.05.28.58
+        d=1e100.net; s=20230601; t=1737984673; x=1738589473;
+        h=content-transfer-encoding:mime-version:message-id:date:references
+         :in-reply-to:subject:cc:to:from:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=4BiMIZClPATtzyOxdSengJQIH9yeWvqFFhr5iuZB3y8=;
+        b=w1TiKUuDDe7hGlAVf4H0dy26Ypq//RSX/Qey0t7BmRN/xcMJ/9Gr0fFFoa6ARQyVTR
+         qJ2fBG+vBjTWJOTsCAtNSZA3QCFtgoZZ54Y+lQLb1N1p6uqrUesCl8ddUCaXXNoQFine
+         nf3lGDsV+DNQHM6DrZNeP0p6oNh5l91/6mHxKPO589CTdeJvrWJFbxDjF92r+XtBq4W1
+         Gcit+SzO5hg0POuIdNvdrf4kx+f7CXqk1FoW54odqF9MoxkgKUmo/rbvUgzxeYcb6FoD
+         wvi2fDZak6lCGcJBubDkxC6kfOUF3xCxhNAmV1OTv9c7HZHc7CJNDCuiITVyuLhHcaui
+         UFuw==
+X-Forwarded-Encrypted: i=1; AJvYcCVthQKwY8z1V3Gp9RqUcJnqgdwyxM/ogtieuzVy9hy91BSjwXbdwfPQojOCejosYR9Pi3uXckU=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwT+/fX8GxB5TZO1z2To7U3nnHSA8J6apKb5/2c6TqNg5L44/wM
+	6qeWAvC23agV+t6SLHMBWBcbajNuuN33HItN7DlvMZcfFrWYPDk5hil+K24onXz2IfH6//w+2y6
+	3U6MUo+DbDSJIqH2arqyofpbhtqpIaeZ92n8vnIkNRAYVnvZ6M3//FA==
+X-Gm-Gg: ASbGncsDZju0SnueY7TWMe01mey6ttEGEyO5wCaeLD/VBmQpzwLdggrIeFhfBP2Xbuc
+	t6g3hBnNJQulAk8ZlW9Nwmwnuh4EQse5C+DFD4jnCHoyxh6SXbzSdq6RmUnoW5WwzPlWrsYNOfb
+	cI0q49yuEoInNvBzyqKYIr8U0Ve/WVHnskow4h9n6y0Tnfa6CDGsysH08aA64u4dr0rp6EoOyNF
+	/h0uOj53h4FIG4xyZb2+btlq65p6KLoeer/P0sRjdpm+ZWWmVNuR0puses/xkBEBDy8mHVcI16b
+	Eg==
+X-Received: by 2002:a17:906:dac2:b0:ab6:71cd:36f5 with SMTP id a640c23a62f3a-ab671cd42ecmr1481430566b.25.1737984672730;
+        Mon, 27 Jan 2025 05:31:12 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IEkQMEvSiJwZJciMKMtripfp3tvFxy9J8ObspHmpXetwyudhJqFoS9a1zrx2hDmkVxac5UPBg==
+X-Received: by 2002:a17:906:dac2:b0:ab6:71cd:36f5 with SMTP id a640c23a62f3a-ab671cd42ecmr1481426666b.25.1737984672265;
+        Mon, 27 Jan 2025 05:31:12 -0800 (PST)
+Received: from alrua-x1.borgediget.toke.dk ([2a0c:4d80:42:443::2])
+        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-ab675e12ddcsm595125966b.13.2025.01.27.05.31.11
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 27 Jan 2025 05:28:58 -0800 (PST)
-Date: Mon, 27 Jan 2025 14:28:56 +0100
-From: Thierry Reding <thierry.reding@gmail.com>
-To: Furong Xu <0x1207@gmail.com>
-Cc: Ido Schimmel <idosch@idosch.org>, Andrew Lunn <andrew@lunn.ch>, 
-	Brad Griffis <bgriffis@nvidia.com>, Jon Hunter <jonathanh@nvidia.com>, netdev@vger.kernel.org, 
-	linux-stm32@st-md-mailman.stormreply.com, linux-arm-kernel@lists.infradead.org, 
-	linux-kernel@vger.kernel.org, Alexander Lobakin <aleksander.lobakin@intel.com>, 
-	Joe Damato <jdamato@fastly.com>, Andrew Lunn <andrew+netdev@lunn.ch>, 
-	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
-	Maxime Coquelin <mcoquelin.stm32@gmail.com>, xfr@outlook.com, 
-	"linux-tegra@vger.kernel.org" <linux-tegra@vger.kernel.org>
-Subject: Re: [PATCH net-next v3 1/4] net: stmmac: Switch to zero-copy in
- non-XDP RX path
-Message-ID: <kyskevcr5wru66s4l6p4rhx3lynshak3y2wxjfjafup3cbneca@7xpcfg5dljb2>
-References: <cover.1736910454.git.0x1207@gmail.com>
- <bd7aabf4d9b6696885922ed4bef8fc95142d3004.1736910454.git.0x1207@gmail.com>
- <d465f277-bac7-439f-be1d-9a47dfe2d951@nvidia.com>
- <20250124003501.5fff00bc@orangepi5-plus>
- <e6305e71-5633-48bf-988d-fa2886e16aae@nvidia.com>
- <ccbecd2a-7889-4389-977e-10da6a00391c@lunn.ch>
- <20250124104256.00007d23@gmail.com>
- <Z5S69kb7Qz_QZqOh@shredder>
- <20250125230347.0000187b@gmail.com>
+        Mon, 27 Jan 2025 05:31:11 -0800 (PST)
+Received: by alrua-x1.borgediget.toke.dk (Postfix, from userid 1000)
+	id B3023180AEC1; Mon, 27 Jan 2025 14:31:10 +0100 (CET)
+From: Toke =?utf-8?Q?H=C3=B8iland-J=C3=B8rgensen?= <toke@redhat.com>
+To: Mina Almasry <almasrymina@google.com>
+Cc: Jakub Kicinski <kuba@kernel.org>, davem@davemloft.net,
+ netdev@vger.kernel.org, edumazet@google.com, pabeni@redhat.com,
+ andrew+netdev@lunn.ch, horms@kernel.org, hawk@kernel.org,
+ ilias.apalodimas@linaro.org, asml.silence@gmail.com, kaiyuanz@google.com,
+ willemb@google.com, mkarsten@uwaterloo.ca, jdamato@fastly.com
+Subject: Re: [PATCH net] net: page_pool: don't try to stash the napi id
+In-Reply-To: <CAHS8izOv=tUiuzha6NFq1-ZurLGz9Jdi78jb3ey4ExVJirMprA@mail.gmail.com>
+References: <20250123231620.1086401-1-kuba@kernel.org>
+ <CAHS8izNdpe7rDm7K4zn4QU-6VqwMwf-LeOJrvXOXhpaikY+tLg@mail.gmail.com>
+ <87r04rq2jj.fsf@toke.dk>
+ <CAHS8izOv=tUiuzha6NFq1-ZurLGz9Jdi78jb3ey4ExVJirMprA@mail.gmail.com>
+X-Clacks-Overhead: GNU Terry Pratchett
+Date: Mon, 27 Jan 2025 14:31:10 +0100
+Message-ID: <877c6gpen5.fsf@toke.dk>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature"; boundary="le5bosxlscibz3la"
-Content-Disposition: inline
-In-Reply-To: <20250125230347.0000187b@gmail.com>
-
-
---le5bosxlscibz3la
-Content-Type: text/plain; protected-headers=v1; charset=us-ascii
-Content-Disposition: inline
+Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
-Subject: Re: [PATCH net-next v3 1/4] net: stmmac: Switch to zero-copy in
- non-XDP RX path
-MIME-Version: 1.0
 
-On Sat, Jan 25, 2025 at 11:03:47PM +0800, Furong Xu wrote:
-> Hi Thierry
->=20
-> On Sat, 25 Jan 2025 12:20:38 +0200, Ido Schimmel wrote:
->=20
-> > On Fri, Jan 24, 2025 at 10:42:56AM +0800, Furong Xu wrote:
-> > > On Thu, 23 Jan 2025 22:48:42 +0100, Andrew Lunn <andrew@lunn.ch>
-> > > wrote:=20
-> > > > > Just to clarify, the patch that you had us try was not intended
-> > > > > as an actual fix, correct? It was only for diagnostic purposes,
-> > > > > i.e. to see if there is some kind of cache coherence issue,
-> > > > > which seems to be the case?  So perhaps the only fix needed is
-> > > > > to add dma-coherent to our device tree?   =20
-> > > >=20
-> > > > That sounds quite error prone. How many other DT blobs are
-> > > > missing the property? If the memory should be coherent, i would
-> > > > expect the driver to allocate coherent memory. Or the driver
-> > > > needs to handle non-coherent memory and add the necessary
-> > > > flush/invalidates etc. =20
-> > >=20
-> > > stmmac driver does the necessary cache flush/invalidates to
-> > > maintain cache lines explicitly. =20
-> >=20
-> > Given the problem happens when the kernel performs syncing, is it
-> > possible that there is a problem with how the syncing is performed?
-> >=20
-> > I am not familiar with this driver, but it seems to allocate multiple
-> > buffers per packet when split header is enabled and these buffers are
-> > allocated from the same page pool (see stmmac_init_rx_buffers()).
-> > Despite that, the driver is creating the page pool with a non-zero
-> > offset (see __alloc_dma_rx_desc_resources()) to avoid syncing the
-> > headroom, which is only present in the head buffer.
-> >=20
-> > I asked Thierry to test the following patch [1] and initial testing
-> > seems OK. He also confirmed that "SPH feature enabled" shows up in the
-> > kernel log.
->=20
-> It is recommended to disable the "SPH feature" by default unless some
-> certain cases depend on it. Like Ido said, two large buffers being
-> allocated from the same page pool for each packet, this is a huge waste
-> of memory, and brings performance drops for most of general cases.
->=20
-> Our downstream driver and two mainline drivers disable SPH by default:
-> https://git.kernel.org/pub/scm/linux/kernel/git/netdev/net-next.git/tree/=
-drivers/net/ethernet/stmicro/stmmac/dwmac-dwc-qos-eth.c#n357
-> https://git.kernel.org/pub/scm/linux/kernel/git/netdev/net-next.git/tree/=
-drivers/net/ethernet/stmicro/stmmac/dwmac-intel.c#n471
+Mina Almasry <almasrymina@google.com> writes:
 
-Okay, that's something we can look into changing. What would be an
-example of a use-case depending on SPH? Also, isn't this something
-that should be a policy that users can configure?
+> On Fri, Jan 24, 2025 at 2:18=E2=80=AFPM Toke H=C3=B8iland-J=C3=B8rgensen =
+<toke@redhat.com> wrote:
+>>
+>> Mina Almasry <almasrymina@google.com> writes:
+>>
+>> > On Thu, Jan 23, 2025 at 3:16=E2=80=AFPM Jakub Kicinski <kuba@kernel.or=
+g> wrote:
+>> >>
+>> >> Page ppol tried to cache the NAPI ID in page pool info to avoid
+>> >
+>> > Page pool
+>> >
+>> >> having a dependency on the life cycle of the NAPI instance.
+>> >> Since commit under Fixes the NAPI ID is not populated until
+>> >> napi_enable() and there's a good chance that page pool is
+>> >> created before NAPI gets enabled.
+>> >>
+>> >> Protect the NAPI pointer with the existing page pool mutex,
+>> >> the reading path already holds it. napi_id itself we need
+>> >
+>> > The reading paths in page_pool.c don't hold the lock, no? Only the
+>> > reading paths in page_pool_user.c seem to do.
+>> >
+>> > I could not immediately wrap my head around why pool->p.napi can be
+>> > accessed in page_pool_napi_local with no lock, but needs to be
+>> > protected in the code in page_pool_user.c. It seems
+>> > READ_ONCE/WRITE_ONCE protection is good enough to make sure
+>> > page_pool_napi_local doesn't race with
+>> > page_pool_disable_direct_recycling in a way that can crash (the
+>> > reading code either sees a valid pointer or NULL). Why is that not
+>> > good enough to also synchronize the accesses between
+>> > page_pool_disable_direct_recycling and page_pool_nl_fill? I.e., drop
+>> > the locking?
+>>
+>> It actually seems that this is *not* currently the case. See the
+>> discussion here:
+>>
+>> https://lore.kernel.org/all/8734h8qgmz.fsf@toke.dk/
+>>
+>> IMO (as indicated in the message linked above), we should require users
+>> to destroy the page pool before freeing the NAPI memory, rather than add
+>> additional synchronisation.
+>>
+>
+> Ah, I see. I wonder if we should make this part of the API via comment
+> and/or add DEBUG_NET_WARN_ON to catch misuse, something like:
+>
+> diff --git a/include/net/page_pool/types.h b/include/net/page_pool/types.h
+> index ed4cd114180a..3919ca302e95 100644
+> --- a/include/net/page_pool/types.h
+> +++ b/include/net/page_pool/types.h
+> @@ -257,6 +257,10 @@ struct xdp_mem_info;
+>
+>  #ifdef CONFIG_PAGE_POOL
+>  void page_pool_disable_direct_recycling(struct page_pool *pool);
+> +
+> +/* page_pool_destroy or page_pool_disable_direct_recycling must be
+> called before
+> + * netif_napi_del if pool->p.napi is set.
+> + */
+>  void page_pool_destroy(struct page_pool *pool);
+>  void page_pool_use_xdp_mem(struct page_pool *pool, void (*disconnect)(vo=
+id *),
+>                            const struct xdp_mem_info *mem);
+>
+> diff --git a/net/core/page_pool.c b/net/core/page_pool.c
+> index 5c4b788b811b..dc82767b2516 100644
+> --- a/net/core/page_pool.c
+> +++ b/net/core/page_pool.c
+> @@ -1161,6 +1161,8 @@ void page_pool_destroy(struct page_pool *pool)
+>         if (!page_pool_put(pool))
+>                 return;
+>
+> +       DEBUG_NET_WARN_ON(pool->p.napi && !napi_is_valid(pool->p.napi));
+> +
+>         page_pool_disable_direct_recycling(pool);
+>         page_pool_free_frag(pool);
 
-Irrespective of that we should fix the problems we are seeing with
-SPH enabled.
+Yeah, good idea; care to send a proper patch? :)
 
-Thierry
+> I also took a quick spot check - which could be wrong - but it seems
+> to me both gve and bnxt free the napi before destroying the pool :(
 
---le5bosxlscibz3la
-Content-Type: application/pgp-signature; name="signature.asc"
+Right, that fits with what Yunsheng found over in that other thread, at
+least (for bnxt).
 
------BEGIN PGP SIGNATURE-----
+> But I think this entire discussion is unrelated to this patch, so and
+> the mutex sync in this patch seems necessary for the page_pool_user.c
+> code which runs outside of softirq context:
+>
+> Reviewed-by: Mina Almasry <almasrymina@google.com>
 
-iQIzBAABCAAdFiEEiOrDCAFJzPfAjcif3SOs138+s6EFAmeXihUACgkQ3SOs138+
-s6FoPhAAqxOsjlx6etEbkgUZAt/RbOShSCthQYEh+Lc+Fk856UbSJeQ3h2jIDUKE
-LeAtoppjWnoZbrJGesP99QLBsq5R1ouYiacktzWwyp9PciXmWivAxAmdUZ5kqXsC
-Y/OrrsL7PLxMlhij/qY+pMBH1UiTfuLLftMNxYAY/3w5QIAt1hfFIlA0qEb2B+ZN
-C9Ir1Ma1TRKSosngX/WNlEacT9jh4mpx7zk8IcD5LEur3mEIWcGrF82zhUf+3Xi0
-92sBCxHz4ydKwXTOtFZDm8EiBo43Xo9R14OTaOR9Q8Odv3Hz0ywEuMDjt4NzryXd
-bm014ztiC52fmSkDCIy3TM42q3NNBVlDUJDqYZjc/9S+MBhPNyyug8WKsnz6QWiV
-4DPxCw/mrKYZNOjQnUOGx/WTpkQY8lSs4LGNusP2Fg+FUcqbfnODBO6nRFOUSI4z
-dI1Bn34IjnEIM+zddlYP8Q+JNbcVK3JUWF93lVX2YdJGmELCNEGMrt5TDxMOJSNm
-AFTJdmNRUvGf6hM7xhqOZXABWY6/qKQhR3UaKWavOJMc5kG6gQbxsIHpHE6zWRig
-jFEnol2StQW1PAm2fCdlrBdFADFzgrkfsvbIv9r/XegXU/vTIQXmLm5U4O8DJ58Q
-y4HTY/66dTEmd//qV+a3jonm88YEvcXIXiaJBFvchrJflKFtHYY=
-=dCSI
------END PGP SIGNATURE-----
+Yeah, didn't really mean this comment to have anything to do with this
+patch, just mentioned it since you were talking about the data path :)
 
---le5bosxlscibz3la--
+For this patch, I agree, the mutex seems fine:
+
+Reviewed-by: Toke H=C3=B8iland-J=C3=B8rgensen <toke@redhat.com>
+
 
