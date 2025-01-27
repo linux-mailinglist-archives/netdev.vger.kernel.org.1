@@ -1,58 +1,59 @@
-Return-Path: <netdev+bounces-161063-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-161060-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 522ACA1D0D1
-	for <lists+netdev@lfdr.de>; Mon, 27 Jan 2025 07:08:48 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id C4437A1D0CD
+	for <lists+netdev@lfdr.de>; Mon, 27 Jan 2025 07:08:19 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id D09387A33A2
-	for <lists+netdev@lfdr.de>; Mon, 27 Jan 2025 06:08:21 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C9E173A6B4A
+	for <lists+netdev@lfdr.de>; Mon, 27 Jan 2025 06:08:10 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6511C1FC7F3;
-	Mon, 27 Jan 2025 06:08:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A843A1FC7D0;
+	Mon, 27 Jan 2025 06:08:06 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=secunet.com header.i=@secunet.com header.b="voOonaOB"
+	dkim=pass (2048-bit key) header.d=secunet.com header.i=@secunet.com header.b="sF4VNdi7"
 X-Original-To: netdev@vger.kernel.org
 Received: from a.mx.secunet.com (a.mx.secunet.com [62.96.220.36])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A89F615C13A
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CF3421FC7CE
 	for <netdev@vger.kernel.org>; Mon, 27 Jan 2025 06:08:04 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=62.96.220.36
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1737958087; cv=none; b=DHn7gJRR+FshAPD6MvYMCsPbM3whmKna482OjAkR9ETo5Q2Io4E+IYkoJXfS3bhAw43xI1eUsb8ALZApTDX/EC+4VXM5BUh+5zvA7H/HizR+1j1P2/Toh5QhmUDC0Bxvx5vCI4vcA9yl0KoWMDt88SMdcSayOBRtolTTR6IXC+w=
+	t=1737958086; cv=none; b=PFPheuq2ubHTOTl56qABunHEczWdQGHunSUmSbdHVlTiZ+jmFI43Q1F8XRxslayeJj2H812tvCeDAv58Cb5uUzUhIw2tvEDGnH0XEDJPvLv+5swolzhRVuO8HkP0WUIqLzXaGq5i0hdbyHmWB1f1wyriIekTypU67N6ehqiFmMc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1737958087; c=relaxed/simple;
-	bh=lXQ51tKKhR7BNwhn8ASJ+7YNtA/DKLP6LOLLma5kZow=;
-	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=nkaKKQGIzQtcLivViqD3QzkFEp06LJ568vkUB+pgBylRA3GD4mhz5l6r1YtDYxIcsqJA31HMeCV8WonBYWk1LcvqjPYsd1MSS7C8xDUfSoG8ZO9RguGXH3Hhi0XYbIWRgpWl+5d+Nad33cG4h+PsTY2+LTqloIjClX+FUqvOqfE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=secunet.com; spf=pass smtp.mailfrom=secunet.com; dkim=pass (2048-bit key) header.d=secunet.com header.i=@secunet.com header.b=voOonaOB; arc=none smtp.client-ip=62.96.220.36
+	s=arc-20240116; t=1737958086; c=relaxed/simple;
+	bh=aWWohmYw2H9P//PGTeMTRlcBDUV7hhrycorrD8bAnN4=;
+	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=hKgYpIzqbfPO/UIAFYz12kM95xUqud6CFg4WcNThZMH0Rds/dd2ip7dv3TONYSA6RkWnHrZ0pHJoaCI7H9fR5lzlmqDdl0sG2VyJnLskIAQSQJg/A2bTjDRyjYxM0a82qDntjXfsPqNaxsdFAP3aTfCT6R+eHtBqEiI04HloPbw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=secunet.com; spf=pass smtp.mailfrom=secunet.com; dkim=pass (2048-bit key) header.d=secunet.com header.i=@secunet.com header.b=sF4VNdi7; arc=none smtp.client-ip=62.96.220.36
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=secunet.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=secunet.com
 Received: from localhost (localhost [127.0.0.1])
-	by a.mx.secunet.com (Postfix) with ESMTP id 29DEF2074F;
-	Mon, 27 Jan 2025 07:08:03 +0100 (CET)
+	by a.mx.secunet.com (Postfix) with ESMTP id DA39020518;
+	Mon, 27 Jan 2025 07:08:02 +0100 (CET)
 X-Virus-Scanned: by secunet
 Received: from a.mx.secunet.com ([127.0.0.1])
 	by localhost (a.mx.secunet.com [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id SbqEpdhwsqDQ; Mon, 27 Jan 2025 07:08:02 +0100 (CET)
+	with ESMTP id TyRTom4vjm6a; Mon, 27 Jan 2025 07:08:02 +0100 (CET)
 Received: from cas-essen-02.secunet.de (rl2.secunet.de [10.53.40.202])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by a.mx.secunet.com (Postfix) with ESMTPS id 110F8207B2;
-	Mon, 27 Jan 2025 07:08:01 +0100 (CET)
-DKIM-Filter: OpenDKIM Filter v2.11.0 a.mx.secunet.com 110F8207B2
+	by a.mx.secunet.com (Postfix) with ESMTPS id D8092207AC;
+	Mon, 27 Jan 2025 07:08:00 +0100 (CET)
+DKIM-Filter: OpenDKIM Filter v2.11.0 a.mx.secunet.com D8092207AC
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=secunet.com;
-	s=202301; t=1737958081;
-	bh=2nIEm+ym58VpH7EgQQg1KPaQcWk0KzYEeqmePv792Yc=;
-	h=From:To:CC:Subject:Date:From;
-	b=voOonaOBBMfnp61XEBXtwOjh3cfU/7gwxik8QEpMnkNfIgAzkxut82XWMgCPNQp+Z
-	 LgERTqqA8SxLX+5dmlLfpDsuniV7wp4gnoLmE05LpOdds8mLe70usDSE3+dB5uED9g
-	 oDeLoqhaTkiNdC4J1CGinErUaCXGvMAOeoUkw1EFt2kTPAdeCfG8raFCs4X+YrxJI4
-	 FhAQdjt2feODmEzGuA4sTX7ViKQBBQjrfjXNMOqWr5WS5CrsYh9lcA5mCi0b6ApNWI
-	 HAa5/Ktnazp5GxyZF+WOey4B4KGLGKDvR8yznUuTdzoiynyRB+XQB+22ctd1kggKBC
-	 71JlrI+Rx65eg==
+	s=202301; t=1737958080;
+	bh=UeOskQ6csRAAogDjKy0FM27y5bnGyr9x/0vNP5OdCvA=;
+	h=From:To:CC:Subject:Date:In-Reply-To:References:From;
+	b=sF4VNdi7NeCZ7ZZvgyHUxjFFQxwsO4EelFi357QYHRsNl1Ey6NcrZjGqBhMg5OUJJ
+	 hbZ0P5mZj8mekoqOFxI7Jxg8mUtF5Mcaw/ZfOTxKMrJjOIOX3bJ9B0k5KAP287mABF
+	 6GHCD1zgCnWE5YLAoU5nKqqjefJisRGaNbMAyVsEzVzXqQgTcFNSTgCUA74R5Lrhtv
+	 Wmexh6RVaMpTCfXA/OG2CgTsq6PXDLw8wyrfhezJrO986brTr8dJ/LSdA0TczjbJWX
+	 jxUHDmc5acxralb/oB2PqxxR7+0RiRwMcg0Oy1vNRpK4TXXAVywDbivhWvUy4HVZaW
+	 isQhOp+mh6+0A==
 Received: from mbx-essen-02.secunet.de (10.53.40.198) by
  cas-essen-02.secunet.de (10.53.40.202) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
@@ -62,15 +63,17 @@ Received: from gauss2.secunet.de (10.182.7.193) by mbx-essen-02.secunet.de
  cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.39; Mon, 27 Jan
  2025 07:08:00 +0100
 Received: by gauss2.secunet.de (Postfix, from userid 1000)
-	id C51613183BF2; Mon, 27 Jan 2025 07:07:59 +0100 (CET)
+	id C7BFE3180585; Mon, 27 Jan 2025 07:07:59 +0100 (CET)
 From: Steffen Klassert <steffen.klassert@secunet.com>
 To: David Miller <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>
 CC: Herbert Xu <herbert@gondor.apana.org.au>, Steffen Klassert
 	<steffen.klassert@secunet.com>, <netdev@vger.kernel.org>
-Subject: [PATCH 0/5] pull request (net): ipsec 2025-01-27
-Date: Mon, 27 Jan 2025 07:07:52 +0100
-Message-ID: <20250127060757.3946314-1-steffen.klassert@secunet.com>
+Subject: [PATCH 1/5] xfrm: replay: Fix the update of replay_esn->oseq_hi for GSO
+Date: Mon, 27 Jan 2025 07:07:53 +0100
+Message-ID: <20250127060757.3946314-2-steffen.klassert@secunet.com>
 X-Mailer: git-send-email 2.34.1
+In-Reply-To: <20250127060757.3946314-1-steffen.klassert@secunet.com>
+References: <20250127060757.3946314-1-steffen.klassert@secunet.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -79,68 +82,61 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 Content-Type: text/plain
-X-ClientProxiedBy: cas-essen-02.secunet.de (10.53.40.202) To
+X-ClientProxiedBy: cas-essen-01.secunet.de (10.53.40.201) To
  mbx-essen-02.secunet.de (10.53.40.198)
 X-EXCLAIMER-MD-CONFIG: 2c86f778-e09b-4440-8b15-867914633a10
 
-1) Fix incrementing the upper 32 bit sequence numbers for GSO skbs.
-   From Jianbo Liu.
+From: Jianbo Liu <jianbol@nvidia.com>
 
-2) Fix an out-of-bounds read on xfrm state lookup.
-   From Florian Westphal.
+When skb needs GSO and wrap around happens, if xo->seq.low (seqno of
+the first skb segment) is before the last seq number but oseq (seqno
+of the last segment) is after it, xo->seq.low is still bigger than
+replay_esn->oseq while oseq is smaller than it, so the update of
+replay_esn->oseq_hi is missed for this case wrap around because of
+the change in the cited commit.
 
-3) Fix secpath handling on packet offload mode.
-   From Alexandre Cassen.
+For example, if sending a packet with gso_segs=3 while old
+replay_esn->oseq=0xfffffffe, we calculate:
+    xo->seq.low = 0xfffffffe + 1 = 0x0xffffffff
+    oseq = 0xfffffffe + 3 = 0x1
+(oseq < replay_esn->oseq) is true, but (xo->seq.low <
+replay_esn->oseq) is false, so replay_esn->oseq_hi is not incremented.
 
-4) Fix the usage of skb->sk in the xfrm layer.
+To fix this issue, change the outer checking back for the update of
+replay_esn->oseq_hi. And add new checking inside for the update of
+packet's oseq_hi.
 
-5) Don't disable preemption while looking up cache state
-   to fix PREEMPT_RT.
-   From Sebastian Sewior.
+Fixes: 4b549ccce941 ("xfrm: replay: Fix ESN wrap around for GSO")
+Signed-off-by: Jianbo Liu <jianbol@nvidia.com>
+Reviewed-by: Patrisious Haddad <phaddad@nvidia.com>
+Signed-off-by: Leon Romanovsky <leonro@nvidia.com>
+Signed-off-by: Steffen Klassert <steffen.klassert@secunet.com>
+---
+ net/xfrm/xfrm_replay.c | 10 ++++++----
+ 1 file changed, 6 insertions(+), 4 deletions(-)
 
-Please pull or let me know if there are problems.
+diff --git a/net/xfrm/xfrm_replay.c b/net/xfrm/xfrm_replay.c
+index bc56c6305725..235bbefc2aba 100644
+--- a/net/xfrm/xfrm_replay.c
++++ b/net/xfrm/xfrm_replay.c
+@@ -714,10 +714,12 @@ static int xfrm_replay_overflow_offload_esn(struct xfrm_state *x, struct sk_buff
+ 			oseq += skb_shinfo(skb)->gso_segs;
+ 		}
+ 
+-		if (unlikely(xo->seq.low < replay_esn->oseq)) {
+-			XFRM_SKB_CB(skb)->seq.output.hi = ++oseq_hi;
+-			xo->seq.hi = oseq_hi;
+-			replay_esn->oseq_hi = oseq_hi;
++		if (unlikely(oseq < replay_esn->oseq)) {
++			replay_esn->oseq_hi = ++oseq_hi;
++			if (xo->seq.low < replay_esn->oseq) {
++				XFRM_SKB_CB(skb)->seq.output.hi = oseq_hi;
++				xo->seq.hi = oseq_hi;
++			}
+ 			if (replay_esn->oseq_hi == 0) {
+ 				replay_esn->oseq--;
+ 				replay_esn->oseq_hi--;
+-- 
+2.34.1
 
-Thanks!
-
-The following changes since commit 9bb88c659673003453fd42e0ddf95c9628409094:
-
-  selftests: net: test extacks in netlink dumps (2024-11-24 17:00:06 -0800)
-
-are available in the Git repository at:
-
-  git://git.kernel.org/pub/scm/linux/kernel/git/klassert/ipsec.git tags/ipsec-2025-01-27
-
-for you to fetch changes up to 6c9b7db96db62ee9ad8d359d90ff468d462518c4:
-
-  xfrm: Don't disable preemption while looking up cache state. (2025-01-24 07:46:11 +0100)
-
-----------------------------------------------------------------
-ipsec-2025-01-27
-
-----------------------------------------------------------------
-Alexandre Cassen (1):
-      xfrm: delete intermediate secpath entry in packet offload mode
-
-Florian Westphal (1):
-      xfrm: state: fix out-of-bounds read during lookup
-
-Jianbo Liu (1):
-      xfrm: replay: Fix the update of replay_esn->oseq_hi for GSO
-
-Sebastian Sewior (1):
-      xfrm: Don't disable preemption while looking up cache state.
-
-Steffen Klassert (1):
-      xfrm: Fix the usage of skb->sk
-
- include/net/xfrm.h             | 16 ++++++--
- net/ipv4/esp4.c                |  2 +-
- net/ipv6/esp6.c                |  2 +-
- net/ipv6/xfrm6_output.c        |  4 +-
- net/xfrm/xfrm_interface_core.c |  2 +-
- net/xfrm/xfrm_output.c         |  7 ++--
- net/xfrm/xfrm_policy.c         |  2 +-
- net/xfrm/xfrm_replay.c         | 10 +++--
- net/xfrm/xfrm_state.c          | 93 ++++++++++++++++++++++++++++++++----------
- 9 files changed, 100 insertions(+), 38 deletions(-)
 
