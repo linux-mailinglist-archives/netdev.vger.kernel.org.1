@@ -1,117 +1,215 @@
-Return-Path: <netdev+bounces-161111-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-161112-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 757E0A1D6F3
-	for <lists+netdev@lfdr.de>; Mon, 27 Jan 2025 14:36:31 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 19CFBA1D6FA
+	for <lists+netdev@lfdr.de>; Mon, 27 Jan 2025 14:38:30 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 586C23A40DF
-	for <lists+netdev@lfdr.de>; Mon, 27 Jan 2025 13:36:23 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 28BA41886BB2
+	for <lists+netdev@lfdr.de>; Mon, 27 Jan 2025 13:38:34 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6C1CA1FF601;
-	Mon, 27 Jan 2025 13:36:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 320371FF1C4;
+	Mon, 27 Jan 2025 13:38:26 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="XEXvaxPH"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="lVCvCQvF"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f47.google.com (mail-wm1-f47.google.com [209.85.128.47])
+Received: from mail-yb1-f194.google.com (mail-yb1-f194.google.com [209.85.219.194])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BDD9E1FDA9C;
-	Mon, 27 Jan 2025 13:36:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.47
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7F58A1FDA84
+	for <netdev@vger.kernel.org>; Mon, 27 Jan 2025 13:38:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.194
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1737984986; cv=none; b=mZhTXvy/27QHdWlZigg1lT5gN04Ss46bE4ON3/tJMFIvjh1d59mM5u+kl991dfYfwtRvYsOSvYK+DyTkyHd1zEdaqDAIB0BxIwz0i9a+Bq8l6HExgNzVfGrRLsiAy2zMiOxLC662aSUzKNiqnXGfHs1SOtp3LazGHuii1eqXNA4=
+	t=1737985106; cv=none; b=FS8/dkGOybj/6q1lDEKYyapVV3kVg9WCD3/153vxudjb7KsvOSq4oavmmxtesqxI9bgppSP0KjQTze0iUFJi9ALKh0wdnMTSTuIr2FKE78+XnG9xJJ4w2+a03gNOYTMJkCf7LIPRbOMmrRuRSbsky8RcjWkx76fDCj8jAgClCGc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1737984986; c=relaxed/simple;
-	bh=/F2O78bKsyqpJgf4I2uHLIckmztjlBfhVY6KmE/E7PI=;
+	s=arc-20240116; t=1737985106; c=relaxed/simple;
+	bh=JDZMNf7lCYXszFwAnroTEjcwUAmUcn0iF5vKPyHtRjk=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=tQRUTa5ALeXus56a3n57hp53dYd8OGVUcJReyhVL4uooU18aXjfGhghXm91N/GFIRFhrCuE0aXG4APl2fHK4lAYeygoX8IX8ci3jltFKAqIS/WLuRWrEELn+/aKxnBT/nedfj5dstlhhNEBvns/XNxRl3JbgqRKNbJPIB5Ta3hw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=XEXvaxPH; arc=none smtp.client-ip=209.85.128.47
+	 To:Cc:Content-Type; b=Lz057/5kp12Iku/CJfvfNMG0qyfDBR4R/gCzZq5ZQYbx93NLaBBffJ9Fp9fWNB4y0jjowoUEbXgfthgr4bGwwxsZuDd+C5J4LVHnoukFM2/V2O9AT5A8jOq+K5qJ9hj2JZT5M/pRDnTs8qITwR680lUcdGf62xMS88EV+SzDyZQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=lVCvCQvF; arc=none smtp.client-ip=209.85.219.194
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wm1-f47.google.com with SMTP id 5b1f17b1804b1-4363298fff2so2775735e9.3;
-        Mon, 27 Jan 2025 05:36:24 -0800 (PST)
+Received: by mail-yb1-f194.google.com with SMTP id 3f1490d57ef6-e479e529ebcso5658116276.3
+        for <netdev@vger.kernel.org>; Mon, 27 Jan 2025 05:38:24 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1737984983; x=1738589783; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1737985103; x=1738589903; darn=vger.kernel.org;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=CHlG6AWWEnigDewIm8jICn9LKhM+kgmczZJmbvtFgt4=;
-        b=XEXvaxPH9qisAaBu4FNZuTOHhtyimhokfop7Ex+1+lrXNI4HTJfMjT0vhWb45xovTB
-         HtTT8+buIBkWS3q00Aq/w3D685PiijULRQQtxD5vL/WTQ6uu5UOYudXV6buXtRkZCbM6
-         ek/dJHq7QDK9l5Y6TN1dmXv2DhcKtQqBIuw84F44mIyOep1uUISs9n0tceh8pNB1jpQl
-         eo68gMXJ2BvDmJFuOyC8C7hqm/ultFF+PajOf0ggXT/jSdbbWSyAtSbfBIat8Z9BWD91
-         cpY4PBDS5NfImYpvwEUuzEXYyiW7FaPmjP2j2PND+fRROsX/5QION6Ci1+3ARGJ4CuYq
-         sCJQ==
+        bh=/m4bNax3mvm571AsnC8jtRusVwQLXsEzhjxRPyvW2ko=;
+        b=lVCvCQvFk9lsILeo017poI0fp5CJG1tQr8SqGm/8GGmNHJ2fOkLoDYJlEe0D1s+Ni/
+         XBhJzL57Fb+ecGXG7djmlMf2ZR40cORje5ZeifmaPJRvT2QZPV66MVetcocvO46tSPmN
+         IA/Fa5Xq+YhuC0hkc4df9mdLOsAm+hU7fbJjkMAtwRnPG0vtYtropYMwnpZ3MiePhLLM
+         ZR3poQwvNvgRA9LaetXXWM95d6dqIYXXA6SnKiOYEP80C2WLRYEhmvqblyL8KMEoBVEJ
+         WLqFMZ/S3o9ayPNMim4al8AgmGUrP05uhSohQJpydFyFopjoWY20fD7njj2IfA2uIqYw
+         XSxQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1737984983; x=1738589783;
+        d=1e100.net; s=20230601; t=1737985103; x=1738589903;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=CHlG6AWWEnigDewIm8jICn9LKhM+kgmczZJmbvtFgt4=;
-        b=xQJZZ72RI9ncLOpEDdltBfexcwWKC/RqtO3mzstZDWiqAwXDNmeBw6jfyJYxtsXYdx
-         oJZbyvCWwr8KxN+3AYJ06aXIvNP8urLcwgNRctytVQ82tdf11TMv6IIZwa8FR2oOMels
-         zULeVZkc+X2VkrwOL2u5W6CxLefEnj6oDCc34WeqXBPh7mtBTS9TtE3JSphy2cTFBdTP
-         yZeQ4YnYuid5XY0Z1O4yTYvsftX7rQHBL1FZZvjm1GRKMZaM1ViI/QizCacaQizU9xAT
-         3UjEWsMUfDXZqTAXLlJMDUO0CM5/Et0m4rut7cHonVrhDIi+/5ebyEd4XWYcacfqHPFK
-         2gJA==
-X-Forwarded-Encrypted: i=1; AJvYcCUmRnQBgLbQyo6izapzY8BjQOjELiOIHLaN9pyn9SBLXVwfDMLBbdQWdUVzy1x6taeEoZegDswX3w==@vger.kernel.org, AJvYcCVgpjN5LwqQUbHOd2roOPoDVwgSZKfOPzjACJJKxMDhv5+Y1rFyvuHLJ1pA3104D8ps1AkVuPeE@vger.kernel.org, AJvYcCW2uNCA5C+mU8D/9TgfIQGvdrjVkZkDEa3NnMn6XYXWrCXYFSWESNXd9ryxxFJhXdLeawHQOQln@vger.kernel.org, AJvYcCXjncwo/lCk6UyNCel7xvpdtEDWOK+oS/CNAm+BOV8FXvbYPe/lczz7RJ/Xk82yeMAh2EzuKrCBXwzDZgy+@vger.kernel.org
-X-Gm-Message-State: AOJu0YyZSQsLC/JZeJu3+vPANEEDe07wnqu5FlTOLAaGjqlRuF+dca0y
-	QiAZNs/MCJaWlwM/sum1xW2YNKg2sRzZGgadFm66xDgXEZs+1yVn2F0hamnVhR9rcln6qVvYnmZ
-	ZBKcZOvTsVvLnS6gWro+VSozn4vI=
-X-Gm-Gg: ASbGncvJp41ME5nAByuNAMuFU7sVUaOZTHUTsf4UrwsLUy1DcwR/Aq7FeUCceYERGRZ
-	LTTYoCgPGcHwDm+gr9zInIvqM9OC8ui+8jomQL0azb7tDCIIzqJWqyXSfOcen83q7xVdIFO01J7
-	pMI4BoND8QTJm5XtqA
-X-Google-Smtp-Source: AGHT+IEwQVGDIO9MKpdkIIvrOhuXW1o8nFtUK6gztIT8hZx4gsH6RlXtlNX/S1wokPE91HdAIbcgS9rbkhD0dmLxJcM=
-X-Received: by 2002:a05:6000:4022:b0:385:ef39:6ce3 with SMTP id
- ffacd0b85a97d-38c1a7d087cmr7134980f8f.0.1737984982791; Mon, 27 Jan 2025
- 05:36:22 -0800 (PST)
+        bh=/m4bNax3mvm571AsnC8jtRusVwQLXsEzhjxRPyvW2ko=;
+        b=uUCyLMTjmVlLD/lwecYLqAQn7lLyipe913fHpTcNNWDju2iJWIdua4qHMEfhoMuK5y
+         noG66BFyV8jhKT57EtVVrdolKhkS8mEmnJ9nuZtKhg9zsXQlCajJBTOD95OpD0a58Bd2
+         CnQwCzH0+wRn+mEgLLp1WRNza18+hPhZ6LiRFfw8I7SrrFVqKIb+Xq+5HR6dZd6UDaDt
+         5as//0gsJZGXlCJvAWEZzGTW/Yf8t1KGZY9wEvm9f1D4KJlxs/6+SpFNqw6sC3bctR3Z
+         +fq9h/aj3dZ/wsmeVMDBoitf+AbRY/l30DlqQBQQAIlULDSSjBe7RZ9Z/kGIsStlVhtX
+         3orA==
+X-Forwarded-Encrypted: i=1; AJvYcCU0VUyK4QnA3x+AgZa/HXTXOEwnq0agU6Er+MUfvYIuzB7ZDo41M0PkMG70keIJuqNk8NK4PfI=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxuSxZyhsGqVBrrsNzTjsLaVFC7gvkk6SUeKHCL5/jl49A6LYxr
+	4irLEGyrzg0qiqnsBTLjO8cILRjfoa0geMn9L+zTlBsWS7EmSXF4oVKe9+BnL9fw9GzONUiBP3n
+	AwR+JF1SBJL/yzSagsGwCBee/UcM=
+X-Gm-Gg: ASbGnctl85lqZZGqilB85VOMoUYEFCyvyfby8gb5gqP77Ql4oIG8xv9V9ujxaci4FFC
+	15NL69ti3cxGDpvesc1BsGPxMTx/ErhTPZu2d8hnP6Ik4VzAhYICO54gxdyJstQ==
+X-Google-Smtp-Source: AGHT+IHo/v27RytTX8hu0X01pjjFZoduu3VL7UiwWJ9Rz9WpDWaU0bUj6ukOEQxOxclkg+jfZmvUYJYbb81l82UaZh0=
+X-Received: by 2002:a05:6902:2e01:b0:e58:30c9:c684 with SMTP id
+ 3f1490d57ef6-e5830c9c815mr11186277276.15.1737985103294; Mon, 27 Jan 2025
+ 05:38:23 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <CAPAsAGwzBeGXbVtWtZKhbUDbD4b4PtgAS9MJYU2kkiNHgyKpfQ@mail.gmail.com>
- <20250122160645.28926-1-ryabinin.a.a@gmail.com> <CA+fCnZdU2GdAw4eUk9b3Ox8_nLXv-s4isxdoTXePU2J6x5pcGw@mail.gmail.com>
-In-Reply-To: <CA+fCnZdU2GdAw4eUk9b3Ox8_nLXv-s4isxdoTXePU2J6x5pcGw@mail.gmail.com>
-From: Andrey Ryabinin <ryabinin.a.a@gmail.com>
-Date: Mon, 27 Jan 2025 14:35:03 +0100
-X-Gm-Features: AWEUYZlL-o4Q2NjgFkTgV84l7QgdO4LRWJbYKyDVa5jE4weNS1kRLZqv5Yt4eEU
-Message-ID: <CAPAsAGy8HBMFpeV900thoXUr8QC6V5sCzRh65+NNbYGpJpYgHg@mail.gmail.com>
-Subject: Re: [PATCH] kasan, mempool: don't store free stacktrace in
- io_alloc_cache objects.
-To: Andrey Konovalov <andreyknvl@gmail.com>
-Cc: Andrew Morton <akpm@linux-foundation.org>, kasan-dev@googlegroups.com, 
-	io-uring@vger.kernel.org, linux-mm@kvack.org, netdev@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, juntong.deng@outlook.com, lizetao1@huawei.com, 
-	stable@vger.kernel.org, Alexander Potapenko <glider@google.com>, 
-	Dmitry Vyukov <dvyukov@google.com>, Vincenzo Frascino <vincenzo.frascino@arm.com>, 
-	Jens Axboe <axboe@kernel.dk>, Pavel Begunkov <asml.silence@gmail.com>, 
-	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>
+References: <20250117214035.2414668-1-jmaloy@redhat.com> <CADVnQymiwUG3uYBGMc1ZEV9vAUQzEOD4ymdN7Rcqi7yAK9ZB5A@mail.gmail.com>
+ <afb9ff14-a2f1-4c5a-a920-bce0105a7d41@redhat.com> <c41deefb-9bc8-47b8-bff0-226bb03265fe@redhat.com>
+ <CANn89i+RRxyROe3wx6f4y1nk92Y-0eaahjh-OGb326d8NZnK9A@mail.gmail.com>
+ <e15ff7f6-00b7-4071-866a-666a296d0b15@redhat.com> <20250127110121.1f53b27d@elisabeth>
+ <CAL+tcoBwEG_oVn3WL_gXxSkZLs92qeMgEvgwhGM0g0maA=xJ=g@mail.gmail.com> <20250127113214.294bcafb@elisabeth>
+In-Reply-To: <20250127113214.294bcafb@elisabeth>
+From: Menglong Dong <menglong8.dong@gmail.com>
+Date: Mon, 27 Jan 2025 21:37:23 +0800
+X-Gm-Features: AWEUYZlU6knkjXO45irCari8w8PtWQgQolh7IjF_Vp7DArLkHK4uj8TC84dXQwI
+Message-ID: <CADxym3Zji3NZy2tBAxSm5GaQ8tVG8PmxcyJ_AGnUC-H386tq7g@mail.gmail.com>
+Subject: Re: [net,v2] tcp: correct handling of extreme memory squeeze
+To: Stefano Brivio <sbrivio@redhat.com>
+Cc: Jason Xing <kerneljasonxing@gmail.com>, Jon Maloy <jmaloy@redhat.com>, 
+	Eric Dumazet <edumazet@google.com>, Neal Cardwell <ncardwell@google.com>, netdev@vger.kernel.org, 
+	davem@davemloft.net, kuba@kernel.org, passt-dev@passt.top, lvivier@redhat.com, 
+	dgibson@redhat.com, eric.dumazet@gmail.com
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-On Sat, Jan 25, 2025 at 1:03=E2=80=AFAM Andrey Konovalov <andreyknvl@gmail.=
-com> wrote:
+On Mon, Jan 27, 2025 at 6:32=E2=80=AFPM Stefano Brivio <sbrivio@redhat.com>=
+ wrote:
 >
-> On Wed, Jan 22, 2025 at 5:07=E2=80=AFPM Andrey Ryabinin <ryabinin.a.a@gma=
-il.com> wrote:
+> On Mon, 27 Jan 2025 18:17:28 +0800
+> Jason Xing <kerneljasonxing@gmail.com> wrote:
+>
+> > I'm not that sure if it's a bug belonging to the Linux kernel.
+>
+> It is, because for at least 20-25 years (before that it's a bit hard to
+> understand from history) a non-zero window would be announced, as
+> obviously expected, once there's again space in the receive window.
 
-> > @@ -261,7 +262,7 @@ bool __kasan_slab_free(struct kmem_cache *cache, vo=
-id *object, bool init,
-> >         if (!kasan_arch_is_ready() || is_kfence_address(object))
-> >                 return false;
-> >
-> > -       poison_slab_object(cache, object, init, still_accessible);
-> > +       poison_slab_object(cache, object, init, still_accessible, true)=
-;
->
-> Should notrack be false here?
->
+Sorry for the late reply. I think the key of this problem is
+what should we do when we receive a tcp packet and we are
+out of memory.
 
-Yep.
+The RFC doesn't define such a thing, so in the commit
+e2142825c120 ("net: tcp: send zero-window ACK when no memory"),
+I reply with a zero-window ACK to the peer. And the peer will keep
+probing the window by retransmitting the packet that we dropped if
+the peer is a LINUX SYSTEM.
+
+As I said, the RFC doesn't define such a case, so the behavior of
+the peer is undefined if it is not a LINUX SYSTEM. If the peer doesn't
+keep retransmitting the packet, it will hang the connection, just like
+the problem that described in this commit log.
+
+However, we can make some optimization to make it more
+adaptable. We can send a ACK with the right window to the
+peer when the memory is available, and __tcp_cleanup_rbuf()
+is a good choice.
+
+Generally speaking, I think this patch makes sense. However,
+I'm not sure if there is any other influence if we make
+"tp->rcv_wnd=3D0", but it can trigger a ACK in __tcp_cleanup_rbuf().
+
+Following is the code that I thought before to optimize this
+case (the code is totally not tested):
+
+diff --git a/include/net/inet_connection_sock.h
+b/include/net/inet_connection_sock.h
+index 3c82fad904d4..bedd78946762 100644
+--- a/include/net/inet_connection_sock.h
++++ b/include/net/inet_connection_sock.h
+@@ -116,7 +116,8 @@ struct inet_connection_sock {
+         #define ATO_BITS 8
+         __u32          ato:ATO_BITS,     /* Predicted tick of soft
+clock       */
+                   lrcv_flowlabel:20, /* last received ipv6 flowlabel      =
+ */
+-                  unused:4;
++                  is_oom:1,
++                  unused:3;
+         unsigned long      timeout;     /* Currently scheduled
+timeout           */
+         __u32          lrcvtime;     /* timestamp of last received
+data packet */
+         __u16          last_seg_size; /* Size of last incoming segment    =
+   */
+diff --git a/net/ipv4/tcp.c b/net/ipv4/tcp.c
+index 0d704bda6c41..6f3c85a1f4da 100644
+--- a/net/ipv4/tcp.c
++++ b/net/ipv4/tcp.c
+@@ -1458,11 +1458,11 @@ static int tcp_peek_sndq(struct sock *sk,
+struct msghdr *msg, int len)
+  */
+ void __tcp_cleanup_rbuf(struct sock *sk, int copied)
+ {
++    struct inet_connection_sock *icsk =3D inet_csk(sk);
+     struct tcp_sock *tp =3D tcp_sk(sk);
+     bool time_to_ack =3D false;
+
+     if (inet_csk_ack_scheduled(sk)) {
+-        const struct inet_connection_sock *icsk =3D inet_csk(sk);
+
+         if (/* Once-per-two-segments ACK was not sent by tcp_input.c */
+             tp->rcv_nxt - tp->rcv_wup > icsk->icsk_ack.rcv_mss ||
+@@ -1502,6 +1502,11 @@ void __tcp_cleanup_rbuf(struct sock *sk, int copied)
+                 time_to_ack =3D true;
+         }
+     }
++    if (unlikely(icsk->icsk_ack.is_oom)) {
++        icsk->icsk_ack.is_oom =3D false;
++        time_to_ack =3D true;
++    }
++
+     if (time_to_ack)
+         tcp_send_ack(sk);
+ }
+diff --git a/net/ipv4/tcp_output.c b/net/ipv4/tcp_output.c
+index 0e5b9a654254..e2d65213b3b7 100644
+--- a/net/ipv4/tcp_output.c
++++ b/net/ipv4/tcp_output.c
+@@ -268,9 +268,12 @@ static u16 tcp_select_window(struct sock *sk)
+      * are out of memory. The window is temporary, so we don't store
+      * it on the socket.
+      */
+-    if (unlikely(inet_csk(sk)->icsk_ack.pending & ICSK_ACK_NOMEM))
++    if (unlikely(inet_csk(sk)->icsk_ack.pending & ICSK_ACK_NOMEM)) {
++        inet_csk(sk)->icsk_ack.is_oom =3D true;
+         return 0;
++    }
+
++    inet_csk(sk)->icsk_ack.is_oom =3D false;
+     cur_win =3D tcp_receive_window(tp);
+     new_win =3D __tcp_select_window(sk);
+     if (new_win < cur_win) {
+
+>
+> > The other side not sending a window probe causes this issue...?
+>
+> It doesn't cause this issue, but it triggers it.
+>
+> > The other part of me says we cannot break the user's behaviour.
+>
+> This sounds quite relevant, yes.
+>
+> --
+> Stefano
+>
 
