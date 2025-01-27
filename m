@@ -1,98 +1,93 @@
-Return-Path: <netdev+bounces-161129-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-161130-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 87E6BA1D87C
-	for <lists+netdev@lfdr.de>; Mon, 27 Jan 2025 15:33:30 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 07174A1D8AF
+	for <lists+netdev@lfdr.de>; Mon, 27 Jan 2025 15:50:24 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 9E9587A3E4B
-	for <lists+netdev@lfdr.de>; Mon, 27 Jan 2025 14:33:20 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 436D93A5153
+	for <lists+netdev@lfdr.de>; Mon, 27 Jan 2025 14:50:16 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A9EC817BA1;
-	Mon, 27 Jan 2025 14:33:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 196443596D;
+	Mon, 27 Jan 2025 14:50:19 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="RFvt2H4h"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="TZvylBee"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qk1-f174.google.com (mail-qk1-f174.google.com [209.85.222.174])
+Received: from mail-vs1-f43.google.com (mail-vs1-f43.google.com [209.85.217.43])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D3E783D64;
-	Mon, 27 Jan 2025 14:33:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.174
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6D49F78F41;
+	Mon, 27 Jan 2025 14:50:15 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.217.43
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1737988401; cv=none; b=PXkgqyYyBFTNH3YCZN33QkeuBM6kxTFlX9IdIhTju8/ITnbjuXMIPkzoCpj1m2z42jejLGNrvad0Q6hVNEihjMGA/GEHAnE5/T5f+CYuseC89ae9CYYFaIKlQRxa1nhjaRdneyPYKW1TAkbeNifO3Y5ZumgknO0TK2ajGKLEVYU=
+	t=1737989419; cv=none; b=IpJGZIF/mahLGrmMhJfvcr2YSeDJghoCjNM5nHLC1OlsL+IpLgmSqFa5+AQRqJ/pFcMtCAI9nGqvRrxbHvAdu4ZEkYe9Z0XflFGh9oyEAU7m/1nKfLQcs0bR2Lhe6CcnKlHOdpvGCZ6/YNemeXQCNTJ+9Xl8y4fv3VIiLrP6O6U=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1737988401; c=relaxed/simple;
-	bh=FaRAosq2Dn/9WrhcX9lSIG96XO9n67MGygKTNGXSyGo=;
+	s=arc-20240116; t=1737989419; c=relaxed/simple;
+	bh=4jmummf21eCG5N7yeeWqWb8xZ7DSnhTI4KnzJZ2Brdg=;
 	h=Date:From:To:Cc:Message-ID:In-Reply-To:References:Subject:
-	 Mime-Version:Content-Type; b=kc1cXzu+vQU8SuH4osXD+tCfMFMBL8RnaB6cny6M5GAX9vS0q1VXz2/AYvDJkFzW/qF+2UpXaxVgt3eiIXNmeaCeyzKLbBec8u+Wv3f19BE4j+0qFotAe84apk5TRoY10lXtWFr7cs3CilYkVeqR0JfU6mNxWbn9W0OZf9hYs5g=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=RFvt2H4h; arc=none smtp.client-ip=209.85.222.174
+	 Mime-Version:Content-Type; b=DzMuBIRGMBNtyNA8LZtV6lweSrhbcz3kfbZDSPs78fKCfggn2gHPY9Ika/J59qOKlTXUe2gguHil3o1oE65CO84itGXeF01G9cP/wQ4xSq8NHKxpbhGohNohHmjVoerj0OJhD96sehQKNpA1iFsTtoe/CLVEQNL8Ys1hp9imtjE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=TZvylBee; arc=none smtp.client-ip=209.85.217.43
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-qk1-f174.google.com with SMTP id af79cd13be357-7b6ed9ed5b9so671058985a.2;
-        Mon, 27 Jan 2025 06:33:18 -0800 (PST)
+Received: by mail-vs1-f43.google.com with SMTP id ada2fe7eead31-4afde39e360so1156169137.0;
+        Mon, 27 Jan 2025 06:50:15 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1737988398; x=1738593198; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1737989414; x=1738594214; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:subject:references
          :in-reply-to:message-id:cc:to:from:date:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=ZTaRABt9WEj+gqGe6GqcQlVywh5NvD+IMM2h++oT6ik=;
-        b=RFvt2H4hUV9l8FAchALgP/vY6hgesORmpdTglgvKvYbNMs98J8RfnLj5o2SUNnEiYO
-         zS2W86T0K1OrT9ycG9M1UCvTjqflD5111NFpNxumMZnvuMR6sA486surUxWxSUs2/qe3
-         dayxcgJJ119fjDAwT9QGd6n8lEYRVgVi1OgTQhPJ0NPofmIjT+UXLiutNrc3FnIr9fmJ
-         wiotPZd6j9dbZ3rxfMv7hKGABuO3WK5U2LVCvgv0t3YBb1IXhIIrASvHfkaYJKEu5cIw
-         tXQr7TB4ubdDciSbu/qAaNf5OZCaFX12NasRwJBOFxNUjNr/2hyRNNxSTIrvJhugZRBD
-         w/Ew==
+        bh=j+4PFphjG6BR9vrdCpxlvOY56GsX5BOUCbDC8gOl9Zs=;
+        b=TZvylBee0wnmUmZb5Dw1rjWHugdMpT4Jk19QLxB1q069Xzx006zhdpcbrrt5OHX8t3
+         TWgVThSJWszRHfGusKRmeeCq27y7C4D62JALk+so+uIFA85q0cvKH7in57Bm009mqyEl
+         J99cuEFJh71px6z9xXrw3g9hs1BsJRyvAmSsZI6mqwtgk1yD37bHwvdAxKphva0yUJgd
+         USCgLf8QDNSkJjvqpxT+BbSF/Lye2i5CtWVcaAmXtqwCdRbHasEmx8DHIEwva2Xtai9w
+         HkI82kKS7CLBZdm7CSMB4nspwNr8kR2tSxsu77B8XHhoaulyTfj/GWVqaBqz+uM3Z3Tx
+         c0sQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1737988398; x=1738593198;
+        d=1e100.net; s=20230601; t=1737989414; x=1738594214;
         h=content-transfer-encoding:mime-version:subject:references
          :in-reply-to:message-id:cc:to:from:date:x-gm-message-state:from:to
          :cc:subject:date:message-id:reply-to;
-        bh=ZTaRABt9WEj+gqGe6GqcQlVywh5NvD+IMM2h++oT6ik=;
-        b=FKr6iA1QE0C5axz/2Okrf7xfQ+7u+sH74DvxCCc7Cyz/hnTdrnLrOCY3w9X2p15KwP
-         +oFDQyVsRAIdE9txpmPF9GmtFpiTgyR9qJD9WQmIlwbnYe/c2ekJtXGyJw5/mecTMITN
-         2A0McQK+bDWcSLk9I8HsSVaGPDVGe0SZDSJBlYzyNyuJD7qxn3Cg7+61pmXawpWH1H1d
-         N6rRoRPB84R3z9mIewfizQZ8D8WnESmF5mxhj/8ZS486ZUiu5YQPHKApg4MVp51+PMxU
-         j2Wq9s4KPWsit4sYJJyWUe+ZQsO1M3L6BcbUybG58grJhmSxr94VjQsux1d33hTvtWkH
-         GWIg==
-X-Forwarded-Encrypted: i=1; AJvYcCVZpCGNGOJDbyE4YCyD90y7qFs3oPSCn+WOe5VpFtYHik/+UYEMh0LzZ6HKJrJZKTZGVmrVExX3@vger.kernel.org, AJvYcCVl92kxQ20w5OZqT9OlEJ82osWPfbISb1d+KdGpNCDUbH6nA/IcyO5hIfsb1Zzb6+wbphSRwyJtZWYV7lQ=@vger.kernel.org, AJvYcCW+ae5PAc59k6SMRYbZdDuvi6d/jJWh7wOfI6SEd9g4dXADXhFf4znXqJp4PRtSI/MMxUcpaRlZHQr/ldrr2kx5@vger.kernel.org
-X-Gm-Message-State: AOJu0YzLpX7viAjY/hk3g38g+FU4k+fPXFWx/hq7Hg2bWvyliC6dk8tr
-	gPkFqDyZN2dHBMv2DZdYHepTuPDydT0F+q9Xb1EsWRvfZi1k2Nilclugtw==
-X-Gm-Gg: ASbGncsMJCSwfI4RYGplhXrcNcSId/483Chgt0/+VVFLgkZh1d+gZpvAt0j9AMwVJVt
-	8JrJIEEfGeu/BNfLlGwb/AHGOW7Gd2J4zakkN6vpjQMghXbrLeBlBQ3p0Mtsm96ogx1PmQEKHRh
-	gcBNbt/pqCogu6E5offgGrlPvpB1tGZn6nEvtD8axaeXescU0BY83/TvgD+gwuVi2vZjVuw11k8
-	WZM8QMbrjeulnWESZhX1KyC23d0IIpiXN2WlTKqchx9DD08V6BYo9qbZj4KwHoGQZ55XlUJod/V
-	qY5ZZNtFQ+0Qfzyh+p5xnWppNOQOEuN45fnKD912VcK71QVqbdAf
-X-Google-Smtp-Source: AGHT+IFW9c4VoXRtbmmXIJoIVD+GxDMQBIhzDLUsHtgRq8DIDe3eTZKvXdArclp3f300/smiAEtY2w==
-X-Received: by 2002:a05:622a:15c8:b0:45d:8be9:b0e6 with SMTP id d75a77b69052e-46e12bdc8bemr668652771cf.43.1737988397639;
-        Mon, 27 Jan 2025 06:33:17 -0800 (PST)
+        bh=j+4PFphjG6BR9vrdCpxlvOY56GsX5BOUCbDC8gOl9Zs=;
+        b=ZgZl4+VO6uJF/Z2zWzZjG5VDpZYbDTIV32iY+xXvGG93JxK4WrEyr3D/VbKrzSstQt
+         2dNQ7QXbRQPMXvEsjXes+Urh1wpJJK9POJP6/gJqF1rGR2O5ybA1Psq5qb2raWvZpnCP
+         ljZ/SUJUVG47J2pUejY97bxb3xffnZe4Ol6MsYuhasJgxmAGnhgwh8sXZ9XGyRSsdI1G
+         LGx8NF1azLJr+JxuFJWNJLmkrTius07ov7eOmM5Paixhp4kI0v5wmpiaHegSIt/+kKzn
+         QEHLix8EEsysUmjnfCfRlDb2C4qknMvHJfSupxXiItYAdRtmFBErl2aEX4nHrMSWKN7l
+         DAnA==
+X-Forwarded-Encrypted: i=1; AJvYcCUNYBUHFQ0VgcrlTihmnsc8Ee2U9ZT81264ru5u3zvDOeZbNSCRAbCgztOMz2QpU+MXLpwvhA+wJw==@vger.kernel.org, AJvYcCWBF2Os3npPTCkJjU5PaCe66UO/qWJF6lEq6VMhmaKsulC2odYW2bx1BfQETQH6xyFoQ6bTpsq/@vger.kernel.org, AJvYcCWtUtV5P/yfKmmXD16/a0089b11dvKOXxbZwpVxf84Vxx2Dg6lUryeS1dJvyH9RQvWVqXNQ4t/Vzyfy4yBibMZ23s2VZEw=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwAJQB6AAlGEC29O8BN/HhzX4EASL7igIEC1FbUfYf5XLkLpOCJ
+	KogZTZZhcq6U7TSqpphYUMsAH6gSzryOyB8aUTXf58M9i++k9HwW
+X-Gm-Gg: ASbGnctfpAitHrpo/V7C2kCK8NjZWnTrfeIxNFWO5gHiu/Jtn/h0u9eG7smS0eSmePU
+	zdsyJJnfSLzWDgPRXrxuvAYbeQtnzkYenr31bVTpWr+V6yaHO2J1V8QN1W2qDyp21LIGrTh0Qpa
+	d05xm8aYZ4QVlcc3K4LSqz9bza+X00P5krgoxLdvhKv7kqyX1EfdIuctUVhvs4GAdW/WkrYbVh+
+	zwadorQRx59paOWTJZ/3VmzrrSadfY5SaT+7fto2pzxb5tDBgatQtwADIAnLi+bAdT1PuLm9ZNs
+	bvk0xLo3+87cpTPV21MREoUJdo7lx1b3hM3fKfQKegGWn39F2n7K
+X-Google-Smtp-Source: AGHT+IHiPK8GERIaHyGFAwU9SeGFw2Lt/7vnkO4qXmXaLxYiJ6qqJJKmrSbn29Bn7h/SuNMzrSVk3w==
+X-Received: by 2002:a05:6102:5249:b0:4af:e5fd:77fc with SMTP id ada2fe7eead31-4b690b5ba88mr36746604137.3.1737989414037;
+        Mon, 27 Jan 2025 06:50:14 -0800 (PST)
 Received: from localhost (15.60.86.34.bc.googleusercontent.com. [34.86.60.15])
-        by smtp.gmail.com with ESMTPSA id 71dfb90a1353d-51e4ea35b4bsm1445410e0c.6.2025.01.27.06.33.16
+        by smtp.gmail.com with ESMTPSA id a1e0cc1a2514c-864a9af3a53sm1915095241.11.2025.01.27.06.50.13
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 27 Jan 2025 06:33:16 -0800 (PST)
-Date: Mon, 27 Jan 2025 09:33:16 -0500
+        Mon, 27 Jan 2025 06:50:13 -0800 (PST)
+Date: Mon, 27 Jan 2025 09:50:12 -0500
 From: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
-To: Yan Zhai <yan@cloudflare.com>, 
- netdev@vger.kernel.org
-Cc: Willem de Bruijn <willemdebruijn.kernel@gmail.com>, 
- "David S. Miller" <davem@davemloft.net>, 
- David Ahern <dsahern@kernel.org>, 
- Eric Dumazet <edumazet@google.com>, 
- Jakub Kicinski <kuba@kernel.org>, 
- Paolo Abeni <pabeni@redhat.com>, 
- Simon Horman <horms@kernel.org>, 
- Shuah Khan <shuah@kernel.org>, 
- Josh Hunt <johunt@akamai.com>, 
- Alexander Duyck <alexander.h.duyck@linux.intel.com>, 
- netdev@vger.kernel.org, 
- linux-kernel@vger.kernel.org, 
- linux-kselftest@vger.kernel.org
-Message-ID: <6797992c28a23_3f1a294d6@willemb.c.googlers.com.notmuch>
-In-Reply-To: <Z5cgWh/6bRQm9vVU@debian.debian>
-References: <Z5cgWh/6bRQm9vVU@debian.debian>
-Subject: Re: [PATCH] udp: gso: fix MTU check for small packets
+To: stsp <stsp2@yandex.ru>, 
+ Ondrej Mosnacek <omosnace@redhat.com>, 
+ Willem de Bruijn <willemb@google.com>, 
+ Jason Wang <jasowang@redhat.com>
+Cc: Jakub Kicinski <kuba@kernel.org>, 
+ network dev <netdev@vger.kernel.org>, 
+ Linux Security Module list <linux-security-module@vger.kernel.org>, 
+ SElinux list <selinux@vger.kernel.org>
+Message-ID: <67979d24d21bc_3f1a29434@willemb.c.googlers.com.notmuch>
+In-Reply-To: <e8b6c6f9-9647-4ab6-8bbb-ccc94b04ade4@yandex.ru>
+References: <CAFqZXNtkCBT4f+PwyVRmQGoT3p1eVa01fCG_aNtpt6dakXncUg@mail.gmail.com>
+ <e8b6c6f9-9647-4ab6-8bbb-ccc94b04ade4@yandex.ru>
+Subject: Re: Possible mistake in commit 3ca459eaba1b ("tun: fix group
+ permission check")
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -101,162 +96,78 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
 Content-Type: text/plain;
  charset=utf-8
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: quoted-printable
 
-Yan Zhai wrote:
-> Commit 4094871db1d6 ("udp: only do GSO if # of segs > 1") avoided GSO
-> for small packets. But the kernel currently dismisses GSO requests only
-> after checking MTU on gso_size. This means any packets, regardless of
-> their payload sizes, would be dropped when MTU is smaller than requested
-> gso_size.
+stsp wrote:
+> 27.01.2025 12:10, Ondrej Mosnacek =D0=BF=D0=B8=D1=88=D0=B5=D1=82:
+> > Hello,
+> >
+> > It looks like the commit in $SUBJ may have introduced an unintended
+> > change in behavior. According to the commit message, the intent was t=
+o
+> > require just one of {user, group} to match instead of both, which
+> > sounds reasonable, but the commit also changes the behavior for when
+> > neither of tun->owner and tun->group is set. Before the commit the
+> > access was always allowed, while after the commit CAP_NET_ADMIN is
+> > required in this case.
+> >
+> > I'm asking because the tun_tap subtest of selinux-testuite [1] starte=
+d
+> > to fail after this commit (it assumed CAP_NET_ADMIN was not needed),
+> > so I'm trying to figure out if we need to change the test or if it
+> > needs to be fixed in the kernel.
+> >
+> > Thanks,
+> >
+> > [1] https://github.com/SELinuxProject/selinux-testsuite/
+> >
+> Hi, IMHO having the persistent
+> TAP device inaccessible by anyone
+> but the CAP_NET_ADMIN is rather
+> useless, so the compatibility should
+> be restored on the kernel side.
+> I'd raise the questions about adding
+> the CAP_NET_ADMIN checks into
+> TUNSETOWNER and/or TUNSETPERSIST,
+> but this particular change to TUNSETIFF,
+> at least on my side, was unintentional.
+> =
 
-Is this a realistic concern? How did you encounter this in practice.
+> Sorry about that. :(
 
-It *is* a misconfiguration to configure a gso_size larger than MTU.
+Thanks for the report Ondrej.
 
-> Meanwhile, EINVAL would be returned in this case, making it
-> very misleading to debug.
+Agreed that we need to reinstate this. I suggest this explicit
+extra branch after the more likely cases:
 
-Misleading is subjective. I'm not sure what is misleading here. From
-my above comment, I believe this is correctly EINVAL.
+        @@ -585,6 +585,9 @@ static inline bool tun_capable(struct tun_str=
+uct *tun)
+        		return 1;
+        	if (gid_valid(tun->group) && in_egroup_p(tun->group))
+        		return 1;
+        +       if (!uid_valid(tun->owner) && !gid_valid(tun->group))
+        +               return 1;
+        +
+        	return 0;
+         }
 
-That said, if this impacts a real workload we could reconsider
-relaxing the check. I.e., allowing through packets even when an
-application has clearly misconfigured UDP_SEGMENT.
+The intent clearly has always been to allow access if owner and group
+are not explicitly set.
 
-> 
-> Ideally, do not check any GSO related constraints when payload size is
-> smaller than requested gso_size, and return EMSGSIZE on MTU check
-> failure consistently for all packets to ease debugging.
-> 
-> Fixes: 4094871db1d6 ("udp: only do GSO if # of segs > 1")
-> Signed-off-by: Yan Zhai <yan@cloudflare.com>
-> ---
->  net/ipv4/udp.c                       | 18 ++++++++----------
->  net/ipv6/udp.c                       | 18 ++++++++----------
->  tools/testing/selftests/net/udpgso.c | 14 ++++++++++++++
->  3 files changed, 30 insertions(+), 20 deletions(-)
-> 
-> diff --git a/net/ipv4/udp.c b/net/ipv4/udp.c
-> index c472c9a57cf6..9aed1b4a871f 100644
-> --- a/net/ipv4/udp.c
-> +++ b/net/ipv4/udp.c
-> @@ -1137,13 +1137,13 @@ static int udp_send_skb(struct sk_buff *skb, struct flowi4 *fl4,
->  	uh->len = htons(len);
->  	uh->check = 0;
->  
-> -	if (cork->gso_size) {
-> +	if (cork->gso_size && datalen > cork->gso_size) {
->  		const int hlen = skb_network_header_len(skb) +
->  				 sizeof(struct udphdr);
->  
->  		if (hlen + cork->gso_size > cork->fragsize) {
->  			kfree_skb(skb);
-> -			return -EINVAL;
-> +			return -EMSGSIZE;
->  		}
->  		if (datalen > cork->gso_size * UDP_MAX_SEGMENTS) {
->  			kfree_skb(skb);
-> @@ -1158,15 +1158,13 @@ static int udp_send_skb(struct sk_buff *skb, struct flowi4 *fl4,
->  			return -EIO;
->  		}
->  
-> -		if (datalen > cork->gso_size) {
-> -			skb_shinfo(skb)->gso_size = cork->gso_size;
-> -			skb_shinfo(skb)->gso_type = SKB_GSO_UDP_L4;
-> -			skb_shinfo(skb)->gso_segs = DIV_ROUND_UP(datalen,
-> -								 cork->gso_size);
-> +		skb_shinfo(skb)->gso_size = cork->gso_size;
-> +		skb_shinfo(skb)->gso_type = SKB_GSO_UDP_L4;
-> +		skb_shinfo(skb)->gso_segs = DIV_ROUND_UP(datalen,
-> +							 cork->gso_size);
->  
-> -			/* Don't checksum the payload, skb will get segmented */
-> -			goto csum_partial;
-> -		}
-> +		/* Don't checksum the payload, skb will get segmented */
-> +		goto csum_partial;
->  	}
->  
->  	if (is_udplite)  				 /*     UDP-Lite      */
-> diff --git a/net/ipv6/udp.c b/net/ipv6/udp.c
-> index 6671daa67f4f..6cdc8ce4c6f9 100644
-> --- a/net/ipv6/udp.c
-> +++ b/net/ipv6/udp.c
-> @@ -1385,13 +1385,13 @@ static int udp_v6_send_skb(struct sk_buff *skb, struct flowi6 *fl6,
->  	uh->len = htons(len);
->  	uh->check = 0;
->  
-> -	if (cork->gso_size) {
-> +	if (cork->gso_size && datalen > cork->gso_size) {
->  		const int hlen = skb_network_header_len(skb) +
->  				 sizeof(struct udphdr);
->  
->  		if (hlen + cork->gso_size > cork->fragsize) {
->  			kfree_skb(skb);
-> -			return -EINVAL;
-> +			return -EMSGSIZE;
->  		}
->  		if (datalen > cork->gso_size * UDP_MAX_SEGMENTS) {
->  			kfree_skb(skb);
-> @@ -1406,15 +1406,13 @@ static int udp_v6_send_skb(struct sk_buff *skb, struct flowi6 *fl6,
->  			return -EIO;
->  		}
->  
-> -		if (datalen > cork->gso_size) {
-> -			skb_shinfo(skb)->gso_size = cork->gso_size;
-> -			skb_shinfo(skb)->gso_type = SKB_GSO_UDP_L4;
-> -			skb_shinfo(skb)->gso_segs = DIV_ROUND_UP(datalen,
-> -								 cork->gso_size);
-> +		skb_shinfo(skb)->gso_size = cork->gso_size;
-> +		skb_shinfo(skb)->gso_type = SKB_GSO_UDP_L4;
-> +		skb_shinfo(skb)->gso_segs = DIV_ROUND_UP(datalen,
-> +							 cork->gso_size);
->  
-> -			/* Don't checksum the payload, skb will get segmented */
-> -			goto csum_partial;
-> -		}
-> +		/* Don't checksum the payload, skb will get segmented */
-> +		goto csum_partial;
->  	}
->  
->  	if (is_udplite)
-> diff --git a/tools/testing/selftests/net/udpgso.c b/tools/testing/selftests/net/udpgso.c
-> index 3f2fca02fec5..fb73f1c331fb 100644
-> --- a/tools/testing/selftests/net/udpgso.c
-> +++ b/tools/testing/selftests/net/udpgso.c
-> @@ -102,6 +102,13 @@ struct testcase testcases_v4[] = {
->  		.gso_len = CONST_MSS_V4,
->  		.r_num_mss = 1,
->  	},
-> +	{
-> +		/* datalen <= MSS < gso_len: will fall back to no GSO */
-> +		.tlen = CONST_MSS_V4,
-> +		.gso_len = CONST_MSS_V4 + 1,
-> +		.r_num_mss = 0,
-> +		.r_len_last = CONST_MSS_V4,
-> +	},
->  	{
->  		/* send a single MSS + 1B */
->  		.tlen = CONST_MSS_V4 + 1,
-> @@ -205,6 +212,13 @@ struct testcase testcases_v6[] = {
->  		.gso_len = CONST_MSS_V6,
->  		.r_num_mss = 1,
->  	},
-> +	{
-> +		/* datalen <= MSS < gso_len: will fall back to no GSO */
-> +		.tlen = CONST_MSS_V6,
-> +		.gso_len = CONST_MSS_V6 + 1,
-> +		.r_num_mss = 0,
-> +		.r_len_last = CONST_MSS_V6,
-> +	},
->  	{
->  		/* send a single MSS + 1B */
->  		.tlen = CONST_MSS_V6 + 1,
-> -- 
-> 2.30.2
-> 
-> 
+It's easy to see when group support was added in commit 8c644623fe7e
+("[NET]: Allow group ownership of TUN/TAP devices."), and the even
+simpler check before that:
+
+                /* Check permissions */
+-               if (tun->owner !=3D -1 &&
+-                   current->euid !=3D tun->owner && !capable(CAP_NET_ADM=
+IN))
++               if (((tun->owner !=3D -1 &&
++                     current->euid !=3D tun->owner) ||
++                    (tun->group !=3D -1 &&
++                     current->egid !=3D tun->group)) &&
++                    !capable(CAP_NET_ADMIN))
+                        return -EPERM;
 
 
 
