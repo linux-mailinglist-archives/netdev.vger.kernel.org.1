@@ -1,153 +1,218 @@
-Return-Path: <netdev+bounces-161162-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-161163-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 04531A1DB5B
-	for <lists+netdev@lfdr.de>; Mon, 27 Jan 2025 18:35:10 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id BB7A6A1DB6B
+	for <lists+netdev@lfdr.de>; Mon, 27 Jan 2025 18:39:44 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 4FBA03A5596
-	for <lists+netdev@lfdr.de>; Mon, 27 Jan 2025 17:35:02 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 60124166925
+	for <lists+netdev@lfdr.de>; Mon, 27 Jan 2025 17:39:40 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 657881632EF;
-	Mon, 27 Jan 2025 17:35:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3F44218F2EF;
+	Mon, 27 Jan 2025 17:39:25 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=cs.stanford.edu header.i=@cs.stanford.edu header.b="A22l7C2w"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="dXAJ2csS"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp1.cs.Stanford.EDU (smtp1.cs.stanford.edu [171.64.64.25])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D05A6291E
-	for <netdev@vger.kernel.org>; Mon, 27 Jan 2025 17:35:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=171.64.64.25
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0E78318E377;
+	Mon, 27 Jan 2025 17:39:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1737999306; cv=none; b=A6Ny+Lx1U2SNMoKAk9ZuQs7egNngrcbtG7h3MjDuZm9Zmm3Wsu8n8Jxp1H3t19VtiQVgvT64DNLdT+ISKnXqj3+/zglAqQVD3fQnIogawBLOuih1V0DyVYS/wmFXtOooFgbApBL+b3krokPB2C0ynk5LpCM6klJhWaJaVgzNx9E=
+	t=1737999565; cv=none; b=Opeqc/T4eRwvl6fqrlcq2r1RCBAfEfRcch0CouaZ8Hu2XfqPDgA8eL3uAmLNQCbQAXZcJB8i3sTg3+D5d/zHiFrO+YyryJ8pDIb3UkSkQ45efxQkJMC101EjWNq/Pf4OAyFB1aEdgZ5HBjujneJIJ2A4tD3jtD8uysxIlFokSc4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1737999306; c=relaxed/simple;
-	bh=961HqXJwNVJZKPlt3cYKp7pfF3d8iqk8XxQqkImZ/sw=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=mHnyfJYHaB8A3pkWXFCyLPHsZdEsYxF6zE305YLRqKoTb9wiQBLmv9Xw+aOnVE2DX/6B/5Ph9wFvjkbuJYzXrfRmYoJD2dPNASo9Z/DlmXKEQQd11Ni2NnAHDImxLBiwUxieHoC/euXq4L5VW4F3HuHNNZ1RG7pBW9Bp5MBh/qg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=cs.stanford.edu; spf=pass smtp.mailfrom=cs.stanford.edu; dkim=pass (2048-bit key) header.d=cs.stanford.edu header.i=@cs.stanford.edu header.b=A22l7C2w; arc=none smtp.client-ip=171.64.64.25
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=cs.stanford.edu
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=cs.stanford.edu
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=cs.stanford.edu; s=cs2308; h=Content-Transfer-Encoding:Content-Type:Cc:To:
-	Subject:Message-ID:Date:From:In-Reply-To:References:MIME-Version:Sender:
-	Reply-To:Content-ID:Content-Description:Resent-Date:Resent-From:Resent-Sender
-	:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:List-Help:List-Unsubscribe:
-	List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=sud94Ik0kSncgZa2W1KW8YLnXwJRzpqdIvSdf8ZhQG4=; t=1737999304; x=1738863304; 
-	b=A22l7C2w8qwPXpDZ8iE80AmMbgm5W09IP4jgVqKIgFjY6Nv/jZFVm2gtVSRSLgWd31epI33HzmW
-	dfLPFdm03jnrBl8GjHpw2rTkRaHC/86r/BgjTFLBSvS8BHUL8WMnBfZamRzXUY0PDTDqIbPFJ+KMG
-	zkAGmcu27I/gHrDEhFzdHyVe5SOuyZapcX0yNwQGrZealE6UdocDAIWpn0tc2T19Bz2NFPTkFrtIC
-	pJjYu8G0EghapNmGMx0i2iyoktAbO3zecZBsIf/iY8Cl40fcXopXupQN5NuGx2j85xt1iHruHc1Ny
-	Z0v6i5XCvLhiO1RA0805Qq4bPKFD7H8Y2KPQ==;
-Received: from mail-oa1-f51.google.com ([209.85.160.51]:45067)
-	by smtp1.cs.Stanford.EDU with esmtpsa  (TLS1.2) tls TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256
-	(Exim 4.94.2)
-	(envelope-from <ouster@cs.stanford.edu>)
-	id 1tcT0p-00063m-K5
-	for netdev@vger.kernel.org; Mon, 27 Jan 2025 09:35:04 -0800
-Received: by mail-oa1-f51.google.com with SMTP id 586e51a60fabf-2a3c075ddb6so2443561fac.2
-        for <netdev@vger.kernel.org>; Mon, 27 Jan 2025 09:35:03 -0800 (PST)
-X-Gm-Message-State: AOJu0YyYPrfFdyRUeTg5Yn/UC0QAx1rc+DEyZrx8an/Tts9eaGQo+/5f
-	LeRuJHs/jOHa+GEwfoTJ9Djbl6fblYqZUDHni0zzYCxfmJtiujbNvXYWKlTfKhlMUGqUZrmKjvh
-	3Sd/z9xhSaNG5O3D2FdsPXmuz4Wc=
-X-Google-Smtp-Source: AGHT+IHX4AY8UTbGpvMBpUrUVR261HOtv/jLsPH2WLC8c/yOp/h9nY3i/ALTaGr9yOJh3pTyftw549WxXHL+PVQnzgs=
-X-Received: by 2002:a05:6870:2f0d:b0:29e:5522:8eea with SMTP id
- 586e51a60fabf-2b1c0b6cdc0mr25076534fac.38.1737999303069; Mon, 27 Jan 2025
- 09:35:03 -0800 (PST)
+	s=arc-20240116; t=1737999565; c=relaxed/simple;
+	bh=wpuUfk3xJ+7ZFWpq2VOqbBzfkPi5/HqlF4YuWWwmh54=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=MSE+B3Sb8MvhYStddTsg5ZRAzHF/KPm5F6Tkf0ohK/NspbcaQXhnM6rEkZVWti8IN26tk2AkrxpDk9fknP2BEGay10V2cEKN+tqBjtkG8UTeEY3Xef+3BudL/wugTTIUlaTJvV6AyoXLKUYHbNLSR6gu+d+gyxdJ5MLwmCGbfdY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=dXAJ2csS; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 413A7C4CEE3;
+	Mon, 27 Jan 2025 17:39:22 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1737999564;
+	bh=wpuUfk3xJ+7ZFWpq2VOqbBzfkPi5/HqlF4YuWWwmh54=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=dXAJ2csS6nLZ736vpPLD7SpDUWrmtf3jUP5hxR31CarIAdXyZ1qGtVU3m+nZp3GFM
+	 nIbA1lPdklw9oC4WGVYGXHCUtJV9H1KIHuhwehGHstPi4Nic7IPIvRqEy6ffpEidH0
+	 0Bz/XL3Xfqj1Afrn7jH6Jt1Fv8adFc9tYEOPHlnMcHqX3zf1yTpfufKpcPvbtrPrLT
+	 k+xwbUapVy28bVffprEn90InQqoR5lvWLOUtScphKMgMwCyMuv37hsbxkHGJGaQG5c
+	 mGp7v9tro4eYfNf0/r8/gtPGuCjgPYbPIuUcQ+12zd30twgyJTTVyM6q7Zf23YZXs0
+	 8r9hEB4L+Wd5Q==
+Message-ID: <8392dd6b-1c20-4f7b-b879-6e940f2dcbc0@kernel.org>
+Date: Mon, 27 Jan 2025 18:39:11 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250115185937.1324-1-ouster@cs.stanford.edu> <20250115185937.1324-5-ouster@cs.stanford.edu>
- <a39c8c5c-4e39-42e6-8d8a-7bfdc6ace688@redhat.com> <CAGXJAmw95dDUxUFNa7UjV3XRd66vQRByAP5T_zra6KWdavr2Pg@mail.gmail.com>
- <4e43078f-a41e-4953-9ee9-de579bd92914@redhat.com>
-In-Reply-To: <4e43078f-a41e-4953-9ee9-de579bd92914@redhat.com>
-From: John Ousterhout <ouster@cs.stanford.edu>
-Date: Mon, 27 Jan 2025 09:34:27 -0800
-X-Gmail-Original-Message-ID: <CAGXJAmxPzrnve-LKKhVNnHCpTeYV=MkuBu0qaAu_YmQP5CSXhg@mail.gmail.com>
-X-Gm-Features: AWEUYZmyVDG_E9BQGL3p3Bq1aUuaeUrT4-bBbT4bkZDbZuZnd9ibIFnXy11FM3A
-Message-ID: <CAGXJAmxPzrnve-LKKhVNnHCpTeYV=MkuBu0qaAu_YmQP5CSXhg@mail.gmail.com>
-Subject: Re: [PATCH net-next v6 04/12] net: homa: create homa_pool.h and homa_pool.c
-To: Paolo Abeni <pabeni@redhat.com>
-Cc: netdev@vger.kernel.org, edumazet@google.com, horms@kernel.org, 
-	kuba@kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Spam-Score: -1.0
-X-Spam-Level: 
-X-Scan-Signature: cb5916722246bf80bd9488153e8e2604
+User-Agent: Mozilla Thunderbird Beta
+Subject: Re: [GIT PULL] Networking for v6.13-rc7
+To: Catalin Marinas <catalin.marinas@arm.com>
+Cc: torvalds@linux-foundation.org, davem@davemloft.net,
+ netdev@vger.kernel.org, linux-kernel@vger.kernel.org, pabeni@redhat.com,
+ Guo Weikang <guoweikang.kernel@gmail.com>,
+ Andrew Morton <akpm@linux-foundation.org>, Jakub Kicinski <kuba@kernel.org>,
+ Andrea Righi <arighi@nvidia.com>, Patrick Wang <patrick.wang.shcn@gmail.com>
+References: <20250109182953.2752717-1-kuba@kernel.org>
+ <173646486752.1541533.15419405499323104668.pr-tracker-bot@kernel.org>
+ <20250116193821.2e12e728@kernel.org> <Z4uwbqAwKvR4_24t@arm.com>
+ <Z45i4YT1YRccf4dH@arm.com> <20250120094547.202f4718@kernel.org>
+ <Z4-AYDvWNaUo-ZQ7@arm.com> <20250121074218.52ce108b@kernel.org>
+ <Z5AHlDLU6I8zh71D@arm.com> <426d4476-e3b4-4a95-84a1-850015651ee6@kernel.org>
+ <Z5eX4BjErq8FsNIa@arm.com>
+Content-Language: en-GB
+From: Matthieu Baerts <matttbe@kernel.org>
+Autocrypt: addr=matttbe@kernel.org; keydata=
+ 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
+ lzVbFe7fduHbABmYz9cefQpO7wDE/Q==
+Organization: NGI0 Core
+In-Reply-To: <Z5eX4BjErq8FsNIa@arm.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-On Mon, Jan 27, 2025 at 1:41=E2=80=AFAM Paolo Abeni <pabeni@redhat.com> wro=
-te:
->
-> On 1/25/25 12:53 AM, John Ousterhout wrote:
-> > On Thu, Jan 23, 2025 at 4:06=E2=80=AFAM Paolo Abeni <pabeni@redhat.com>=
- wrote:
-> > ...
-> >>> +     pool->descriptors =3D kmalloc_array(pool->num_bpages,
-> >>> +                                       sizeof(struct homa_bpage),
-> >>> +                                       GFP_ATOMIC);
-> >>
-> >> Possibly wort adding '| __GFP_ZERO' and avoid zeroing some fields late=
-r.
-> >
-> > I prefer to do all the initialization explicitly (this makes it
-> > totally clear that a zero value is intended, as opposed to accidental
-> > omission of an initializer). If you still think I should use
-> > __GFP_ZERO, let me know and I'll add it.
->
-> Indeed the __GFP_ZERO flag is the preferred for such allocation, as it
-> at very least reduce the generated code size.
+Hi Catalin,
 
-OK, I have added __GFP_ZERO and removed explicit zero initializers,
-both here and in similar situations elsewhere in the code.
+On 27/01/2025 15:27, Catalin Marinas wrote:
+> On Thu, Jan 23, 2025 at 06:11:16PM +0100, Matthieu Baerts wrote:
+>> On 21/01/2025 21:46, Catalin Marinas wrote:
+>>> On Tue, Jan 21, 2025 at 07:42:18AM -0800, Jakub Kicinski wrote:
+>>>> On Tue, 21 Jan 2025 11:09:20 +0000 Catalin Marinas wrote:
+>>>>>>> Hmm, I don't think this would make any difference as kmemleak does scan
+>>>>>>> the memblock allocations as long as they have a correspondent VA in the
+>>>>>>> linear map.
+>>>>>>>
+>>>>>>> BTW, is NUMA enabled or disabled in your .config?  
+>>>>>>
+>>>>>> It's pretty much kernel/configs/debug.config, with virtme-ng, booted
+>>>>>> with 4 CPUs. LMK if you can't repro with that, I can provide exact
+>>>>>> cmdline.  
+>>>>>
+>>>>> Please do. I haven't tried to reproduce it yet on x86 as I don't have
+>>>>> any non-arm hardware around. It did not trigger on arm64. I think
+>>>>> virtme-ng may work with qemu. Anyway, I'll be off from tomorrow until
+>>>>> the end of the week, so more likely to try it next week.
+>>>>
+>>>> vng -b -f tools/testing/selftests/net/config -f kernel/configs/debug.config
+>>>>
+>>>> vng -r arch/x86_64/boot/bzImage --cpus 4 --user root -v --network loop
+>>>
+>>> Great, thanks. I managed to reproduce it
+>>
+>> Thank you for investigating this issue!
+>>
+>> Please note that on our side with MPTCP, I can only reproduce this issue
+>> locally, but not from our CI on GitHub Actions. The main difference is
+>> the kernel (6.8 on the CI, 6.12 here) and the fact our CI is launching
+>> virtme-ng from a VM. The rest should be the same.
+> 
+> It won't show up in 6.8 as kmemleak did not report per-cpu allocation
+> leaks. But even with the latest kernel, it's probabilistic, some data
+> somewhere may look like a pointer and not be reported (I couldn't
+> reproduce it on arm64).
 
-> >>> +int homa_pool_get_pages(struct homa_pool *pool, int num_pages, __u32=
- *pages,
-> >>> +                     int set_owner)
-> >>> +{
-> >>> +     int core_num =3D raw_smp_processor_id();
-> >>
-> >> Why the 'raw' variant? If this code is pre-emptible it means another
-> >> process could be scheduled on the same core...
-> >
-> > My understanding is that raw_smp_processor_id is faster.
-> > homa_pool_get_pages is invoked with a spinlock held, so there is no
-> > risk of a core switch while it is executing. Is there some other
-> > problem I have missed?
->
-> raw_* variants, alike __* ones, fall under the 'use at your own risk'
-> category.
->
-> In this specific case raw_smp_processor_id() is supposed to be used if
-> you don't care the process being move on other cores while using the
-> 'id' value.
->
-> Using raw_smp_processor_id() and building with the CONFIG_DEBUG_PREEMPT
-> knob, the generated code will miss run-time check for preemption being
-> actually disabled at invocation time. Such check will be added while
-> using smp_processor_id(), with no performance cost for non debug build.
+My bad, I was talking about the host kernel. Or to be precise, I should
+say the kernel starting the test VM running a >=v6.13-rc7 kernel.
 
-I'm pretty confident that the raw variant is safe. However, are you
-saying that there is no performance advantage of the raw version in
-production builds? If so, then I might as well switch to the non-raw
-version.
+> It turns out to be a false positive. The __percpu pointers are
+> referenced from node_data[]. The latter is populated in
+> alloc_node_data() and kmemleak registers the pg_data_t object from the
+> memblock allocation. However, due to an incorrect pfn range check
+> introduced by commit 84c326299191 ("mm: kmemleak: check physical address
+> when scan"), we ignore the node_data[0] allocation. Some printks in
+> alloc_node_data() show:
+> 
+> 	nd_pa = 0x3ffda140
+> 	nd_size = 0x4ec0
+> 	min_low_pfn = 0x0
+> 	max_low_pfn = 0x3ffdf
+> 	nd_pa + nd_size == 0x3ffdf000
+> 
+> So the "PHYS_PFN(nd_pa + nd_size) >= max_low_pfn" check in kmemleak is
+> true and the whole pg_data_t object ignored (not scanned). The __percpu
+> pointers won't be detected. The fix is simple:
+> 
+> diff --git a/mm/kmemleak.c b/mm/kmemleak.c
+> index 820ba3b5cbfc..bb7d61fc4da3 100644
+> --- a/mm/kmemleak.c
+> +++ b/mm/kmemleak.c
+> @@ -1689,7 +1689,7 @@ static void kmemleak_scan(void)
+>  			unsigned long phys = object->pointer;
+> 
+>  			if (PHYS_PFN(phys) < min_low_pfn ||
+> -			    PHYS_PFN(phys + object->size) >= max_low_pfn)
+> +			    PHYS_PFN(phys + object->size) > max_low_pfn)
+>  				__paint_it(object, KMEMLEAK_BLACK);
+>  		}
 
-> >> ____cacheline_aligned instead of inserting the struct into an union
-> >> should suffice.
-> >
-> > Done (but now that alloc_percpu_gfp is being used I'm not sure this is
-> > needed to ensure alignment?).
->
-> Yep, cacheline alignment should not be needed for percpu data.
+Thank you for having looked at that and provided a fix quickly!
 
-OK, I've removed the alignment directive for the percpu data.
+I confirm that it fixes the issue on my side! Just in case you want a
+tested-by tag:
 
--John-
+Tested-by: Matthieu Baerts (NGI0) <matttbe@kernel.org>
+
+> I'll post this as a proper patch and I found some minor things to clean
+> up in kmemleak in the meantime.
+
+Great!
+
+>>> (after hacking vng to allow x86_64 as non-host architecture).
+>>
+>> Do not hesitate to report this issue + hack on vng's bug tracker :)
+> 
+> Done ;)
+> 
+> https://github.com/arighi/virtme-ng/issues/223
+
+Thank you! :)
+
+Cheers,
+Matt
+-- 
+Sponsored by the NGI0 Core fund.
+
 
