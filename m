@@ -1,49 +1,49 @@
-Return-Path: <netdev+bounces-161209-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-161210-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 62428A20090
-	for <lists+netdev@lfdr.de>; Mon, 27 Jan 2025 23:30:23 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id AC940A20094
+	for <lists+netdev@lfdr.de>; Mon, 27 Jan 2025 23:30:37 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 1FA323A48BA
-	for <lists+netdev@lfdr.de>; Mon, 27 Jan 2025 22:30:15 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 475CD1620C2
+	for <lists+netdev@lfdr.de>; Mon, 27 Jan 2025 22:30:34 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9AE491D89F8;
-	Mon, 27 Jan 2025 22:30:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DC2231DDA18;
+	Mon, 27 Jan 2025 22:30:12 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="BPiCXb+7"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="o2RMlrF3"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 657151DAC81;
-	Mon, 27 Jan 2025 22:30:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B67EB1DBB19;
+	Mon, 27 Jan 2025 22:30:12 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1738017011; cv=none; b=lWPrBmu95MjuwNomn9i7Uupzey/yGTy4CxD1Hq6ZFHqhK2vqkdnVrlZj5aMAXI5RZODy/t4YSRzXavurmphh2qpzNbfhdSFFQ/sUNzZgHR1KVF6Zja1gT39dyin+wa6OQHCdMy260goNJiTmjR8d8JlL8ZxIJGjhJj4r3zBW8LA=
+	t=1738017012; cv=none; b=sRIPW8DwaIr2itkb5rL27xhjUVUeAeO8O1oSXrEOxgPFw9MqbALYryoRqb5tz7yOEKOsyNgiH6PKIeL7IWDpTAOd/BAADl5Ra7RYBLtjgyXONjDMwD0oU/e8jkyHC2vQlJlCsePLWxYr9huiGUAiJIAYVc7UZezgXkMG3bY2vqI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1738017011; c=relaxed/simple;
-	bh=MdPsZ5UZtudSz4Wpx++FeSr4eGuTNKnfYGDGC28Tkok=;
+	s=arc-20240116; t=1738017012; c=relaxed/simple;
+	bh=QjYVtcxok/QmrRLchrO7jn7VkjM/qbaJ9qevY2e3USI=;
 	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=DWNMcl/zOfL7Ag59PRJjc1jCSWzhcaQcZmtBbBoTn6ZwFchYBROKrYmhM3kYOAYnHaEsbAF10EtNVOL7Si11RGl6//fwyLicUHpR4ZOyOzuGYH+XCLQSv4fS4bkhGIF50Nq3Ji3btdMqOZy0m41anCFSXJkVY7gp3LQDvr5+RJU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=BPiCXb+7; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id CE263C4CEE3;
-	Mon, 27 Jan 2025 22:30:10 +0000 (UTC)
+	 In-Reply-To:To:Cc; b=o8Q/MOCNpK4V7Efbfu9V20Msr0cSw6Y+Cu24NzVKDf4LQ/7HrOeMmU2UnZ1ftPrrjCuLbJxBy+Fs9Evx3ugMV6CF5pl+etTBP3TQokBrQL/Ngy3NPmxiz8vUdVYUllkp0CR4sIHx+tdC03iEStspGp+LSCcGeSoW6rTkzd534Wg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=o2RMlrF3; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 27607C4CEE3;
+	Mon, 27 Jan 2025 22:30:12 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1738017010;
-	bh=MdPsZ5UZtudSz4Wpx++FeSr4eGuTNKnfYGDGC28Tkok=;
+	s=k20201202; t=1738017012;
+	bh=QjYVtcxok/QmrRLchrO7jn7VkjM/qbaJ9qevY2e3USI=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=BPiCXb+7oS0RRDAFjEV+x/o+ITkZXQXjSeLoEE53QL0vMgg6lgk9+LveXTU0hj4p0
-	 /vnZEntbR/FoUx4oPijGhaOZBvPiN6bM99ScOy+OaNLUnvSm50e+albD2flKGUZHQd
-	 1MxSY0gqUVbLag8R/8mKo77XkfsZ/txeB3Do0+RUa8TLEj6j5wortEKxOLL523+GmR
-	 FNExD36qMapT3XaleyYDQy+iQ47cnUnEOnKCiUoBz7Ly58L+Z1XszhJWLPQA5XD0f7
-	 rMfXb6G59YZRL0bdfcW/V+cwKp3KCa+z8nFAArNHisUYAmhoB+SajhxRvrseexpGm4
-	 nC35eSBqvFmfw==
+	b=o2RMlrF3rptGS8gGcRXni+x5O52DKTKt/qtfRTtMqR7xB1IqwAHiqN9eeC98W0UFZ
+	 INxtMohSyfAmxVLHb+RrKkeb+98Q/g5K5+y+j/6EtHLZmpJoHUZcViyww4Saxy74dl
+	 khyauNTkjMlwH9MMihHx/0L7GdCbsKsxXRHH+K3iXM2emS/S0xKID51qxmk2LM5hqX
+	 s/cChcRBIoAq7KGOpcfsvXjGVD6W6wYJLeLonx4Ierxj0pIIULpK7vqHy3gCnBUgvo
+	 e54ieJwoiG7eEAGFLDkleOcsAMnV7cMRRvbvtrmGYsbXAmhykedZ+0HUWxW2CgwkbK
+	 oHcJCZ0qAAUTw==
 Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id AE040380AA63;
-	Mon, 27 Jan 2025 22:30:37 +0000 (UTC)
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id EBAE0380AA63;
+	Mon, 27 Jan 2025 22:30:38 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -52,41 +52,38 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net] net/mlx5e: add missing cpu_to_node to kvzalloc_node in
- mlx5e_open_xdpredirect_sq
+Subject: Re: [PATCH net] net: netdevsim: try to close UDP port harness races
 From: patchwork-bot+netdevbpf@kernel.org
 Message-Id: 
- <173801703651.3242514.2748673226443124182.git-patchwork-notify@kernel.org>
-Date: Mon, 27 Jan 2025 22:30:36 +0000
-References: <20250123000407.3464715-1-sdf@fomichev.me>
-In-Reply-To: <20250123000407.3464715-1-sdf@fomichev.me>
-To: Stanislav Fomichev <sdf@fomichev.me>
-Cc: netdev@vger.kernel.org, davem@davemloft.net, edumazet@google.com,
- kuba@kernel.org, pabeni@redhat.com, linux-rdma@vger.kernel.org,
- linux-kernel@vger.kernel.org, llvm@lists.linux.dev, saeedm@nvidia.com,
- tariqt@nvidia.com, leon@kernel.org, andrew+netdev@lunn.ch, nathan@kernel.org,
- ndesaulniers@google.com, morbo@google.com, justinstitt@google.com,
- witu@nvidia.com, parav@nvidia.com
+ <173801703774.3242514.7632581450583878601.git-patchwork-notify@kernel.org>
+Date: Mon, 27 Jan 2025 22:30:37 +0000
+References: <20250122224503.762705-1-kuba@kernel.org>
+In-Reply-To: <20250122224503.762705-1-kuba@kernel.org>
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: davem@davemloft.net, netdev@vger.kernel.org, edumazet@google.com,
+ pabeni@redhat.com, andrew+netdev@lunn.ch, horms@kernel.org,
+ syzbot+2e5de9e3ab986b71d2bf@syzkaller.appspotmail.com, shuah@kernel.org,
+ linux-kselftest@vger.kernel.org
 
 Hello:
 
 This patch was applied to netdev/net.git (main)
 by Jakub Kicinski <kuba@kernel.org>:
 
-On Wed, 22 Jan 2025 16:04:07 -0800 you wrote:
-> kvzalloc_node is not doing a runtime check on the node argument
-> (__alloc_pages_node_noprof does have a VM_BUG_ON, but it expands to
-> nothing on !CONFIG_DEBUG_VM builds), so doing any ethtool/netlink
-> operation that calls mlx5e_open on a CPU that's larger that MAX_NUMNODES
-> triggers OOB access and panic (see the trace below).
+On Wed, 22 Jan 2025 14:45:03 -0800 you wrote:
+> syzbot discovered that we remove the debugfs files after we free
+> the netdev. Try to clean up the relevant dir while the device
+> is still around.
 > 
-> Add missing cpu_to_node call to convert cpu id to node id.
+> Reported-by: syzbot+2e5de9e3ab986b71d2bf@syzkaller.appspotmail.com
+> Fixes: 424be63ad831 ("netdevsim: add UDP tunnel port offload support")
+> Signed-off-by: Jakub Kicinski <kuba@kernel.org>
 > 
 > [...]
 
 Here is the summary with links:
-  - [net] net/mlx5e: add missing cpu_to_node to kvzalloc_node in mlx5e_open_xdpredirect_sq
-    https://git.kernel.org/netdev/net/c/979284535aaf
+  - [net] net: netdevsim: try to close UDP port harness races
+    https://git.kernel.org/netdev/net/c/50bf398e1cea
 
 You are awesome, thank you!
 -- 
