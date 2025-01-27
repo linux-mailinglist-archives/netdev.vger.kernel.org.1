@@ -1,121 +1,133 @@
-Return-Path: <netdev+bounces-161178-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-161179-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 89FBEA1DC8D
-	for <lists+netdev@lfdr.de>; Mon, 27 Jan 2025 20:13:42 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id A922EA1DCA0
+	for <lists+netdev@lfdr.de>; Mon, 27 Jan 2025 20:20:56 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E7B35161A35
-	for <lists+netdev@lfdr.de>; Mon, 27 Jan 2025 19:13:40 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 003147A1E20
+	for <lists+netdev@lfdr.de>; Mon, 27 Jan 2025 19:20:47 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B8B4415FD13;
-	Mon, 27 Jan 2025 19:13:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DA5051917E3;
+	Mon, 27 Jan 2025 19:20:48 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=cs.stanford.edu header.i=@cs.stanford.edu header.b="OsrI9Mp8"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="X/EKy9Og"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp1.cs.Stanford.EDU (smtp1.cs.stanford.edu [171.64.64.25])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 355A0191F74
-	for <netdev@vger.kernel.org>; Mon, 27 Jan 2025 19:13:36 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=171.64.64.25
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A26B318A6CE;
+	Mon, 27 Jan 2025 19:20:48 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1738005218; cv=none; b=OgYhyix7uJElckuD8cpXCG88k83Jh1ONW3YMZJuJL354XAawwnHv8kPW9lONaiXQwHznFUj1XXkgjQf0ANVosSnweKfe6wgTgcYfuqKRnjy8vF+pdxpVkn03HT81JboQv4pFaDo9jPVXmMwGTNd2QPwgl194ulpYxIirtDWEEns=
+	t=1738005648; cv=none; b=eoaSH+WsXJTuroO+GM/mPxvj39xskMYBHGQeFg/O9JOWLtuUzwK7ec78qT1ben7j5CLKCeG/Gw1XSTcqHZ/lSvT7qKwT3aPVknSnTCnf/4atc+fyFGEgo02Rnt1PqVHcw5ZUnY93+l2JXsiJAUERsTOFSuEQBEaxV1K0ykbkL9I=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1738005218; c=relaxed/simple;
-	bh=L6FNMOJ9qcvFHLP+01JMMuhWIXyhWCbqbr27FiG4LXk=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=DFcohCGwSlZTe2zOLMl/0haCwXXcKVA8v3hg3rsZYWqzdCB/QV2SmAueS/KzoAc8k0bI2fVPeKwwTo9KDvz+SBwXhwtJcnv96q14FYE/9VE3NJv7267h0tkD4s3c0Bh4Tqx3wveSSBcRr9FvQ3fevnbcF0/3gE1l63Y4NNT7Sdo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=cs.stanford.edu; spf=pass smtp.mailfrom=cs.stanford.edu; dkim=pass (2048-bit key) header.d=cs.stanford.edu header.i=@cs.stanford.edu header.b=OsrI9Mp8; arc=none smtp.client-ip=171.64.64.25
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=cs.stanford.edu
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=cs.stanford.edu
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=cs.stanford.edu; s=cs2308; h=Content-Transfer-Encoding:Content-Type:Cc:To:
-	Subject:Message-ID:Date:From:In-Reply-To:References:MIME-Version:Sender:
-	Reply-To:Content-ID:Content-Description:Resent-Date:Resent-From:Resent-Sender
-	:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:List-Help:List-Unsubscribe:
-	List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=L6FNMOJ9qcvFHLP+01JMMuhWIXyhWCbqbr27FiG4LXk=; t=1738005217; x=1738869217; 
-	b=OsrI9Mp8mnOPsX2ImIBoUAhoQMsCGxzIbXpkCLUemp+aUKIEHRyEkCjwWmahKQ82a+fbF34Q2AA
-	We/4NAkneaexDQ+aqcaeJgvWj2zRyXe69q4JcXZcsB+ZvU5IGfuxf5bfXf3jYA6mpP9nZEywrHm4j
-	2EfxFuigAk+YeO7XpSJhGteU/aN+EVu86BSeikLODsALkMNXbQX1lbwjydqEX5e6gxgZK23FP7muf
-	ahkGZZdhCEtJ+/Tl1sf/D1VeMn8nFOyAMb448ixYHg0Yx6bWxvTSFRd+ZXnlh/4qjkKZwCCpB2OIi
-	WD78XYZ+kuYmH8SC2+/WQ3f6HUx83erfmyJw==;
-Received: from mail-oi1-f176.google.com ([209.85.167.176]:61566)
-	by smtp1.cs.Stanford.EDU with esmtpsa  (TLS1.2) tls TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256
-	(Exim 4.94.2)
-	(envelope-from <ouster@cs.stanford.edu>)
-	id 1tcUYB-00037y-V7
-	for netdev@vger.kernel.org; Mon, 27 Jan 2025 11:13:36 -0800
-Received: by mail-oi1-f176.google.com with SMTP id 5614622812f47-3eb9de518e2so2372927b6e.2
-        for <netdev@vger.kernel.org>; Mon, 27 Jan 2025 11:13:35 -0800 (PST)
-X-Gm-Message-State: AOJu0YwrdzWkw6TV/kyuR6z8Ijwn8IL/80hNsOfPeqb/pX7ml1D5wdAv
-	XSNioRytqejtv32nLHVJFOgKpz2b2yWX50DVE/UV8Uiric/R27ZJ3OizO9mnIDvG6BJ+rbp4hqH
-	yrkU7cbwTjVjtFSKMzxqC/GtSTrY=
-X-Google-Smtp-Source: AGHT+IE8Hteh0CbPEHtLqrDFZ2R698ASFL51+T8/PCDKLSxl01hR6Jt/UKek1S8mvGj9n6tgpVP2fF2apYLn7y81kK0=
-X-Received: by 2002:a05:6870:ad93:b0:29e:4ba5:4ddc with SMTP id
- 586e51a60fabf-2b1c0b4eb01mr21304570fac.24.1738005215428; Mon, 27 Jan 2025
- 11:13:35 -0800 (PST)
+	s=arc-20240116; t=1738005648; c=relaxed/simple;
+	bh=YeJVXMPKQVT2qsyx36ahTAqXBMoa9oYa3q1Abfi3NGk=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=AVVEhHmCAhkG675aIOSq6SI7pIROOYAhiFg0EjFE36l+437MmP+va2Mp1BilJWpdvcA5cSV3ojLtP4s34US6S9y6Z5IC9Z4A4H5L6GMNcfkcNm65Q5UgglwlIAVX9gpa2WfK9AEc1gI2w89Z/yunCeb752BWeyztM/6vaCceetA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=X/EKy9Og; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8E1C8C4CED2;
+	Mon, 27 Jan 2025 19:20:46 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1738005648;
+	bh=YeJVXMPKQVT2qsyx36ahTAqXBMoa9oYa3q1Abfi3NGk=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=X/EKy9OgP8a/LbZ2+lTRgcEO98s5Q0e1iAJTMz4l9hD2J3dHrzjvTTRln8GGKfwMx
+	 gXoEPDaOxs1078NbidR7ETR3lQXPuvQj6o97rpdgTt5nmVX7CnW9kVpybWiq52kcjO
+	 PnQSV0eQyFqEIM6fwU09ysiQVyygIu5mQBoh6wcWh00yGxuCAqMy84r6TrUt3JqcGQ
+	 Ige7cvkgY8D7eTqbUJ4smnrzZK9K6t1/No66UKwMjSznrq7Izo3TDhCW3hQRaV2U8A
+	 EL0zrywHlI0Sj+Y7YMn+op7H7PbtXeAbIz0riCWqAKG/P6SGefd57yFL550KIAwfnZ
+	 TbJou8dble8Xw==
+Date: Mon, 27 Jan 2025 11:20:45 -0800
+From: Jakub Kicinski <kuba@kernel.org>
+To: Florian Bezdeka <florian.bezdeka@siemens.com>
+Cc: Toke =?UTF-8?B?SMO4aWxhbmQtSsO4cmdlbnNlbg==?=  <toke@redhat.com>,
+ Stanislav Fomichev <stfomichev@gmail.com>, "Song, Yoong Siang"
+ <yoong.siang.song@intel.com>, "Bouska, Zdenek" <zdenek.bouska@siemens.com>,
+ "David S . Miller" <davem@davemloft.net>, Eric Dumazet
+ <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, Simon Horman
+ <horms@kernel.org>, Willem de Bruijn <willemb@google.com>, Donald Hunter
+ <donald.hunter@gmail.com>, Jonathan Corbet <corbet@lwn.net>, Bjorn Topel
+ <bjorn@kernel.org>, "Karlsson, Magnus" <magnus.karlsson@intel.com>,
+ "Fijalkowski, Maciej" <maciej.fijalkowski@intel.com>, Jonathan Lemon
+ <jonathan.lemon@gmail.com>, Andrew Lunn <andrew+netdev@lunn.ch>, Alexei
+ Starovoitov <ast@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>,
+ Jesper Dangaard Brouer <hawk@kernel.org>, John Fastabend
+ <john.fastabend@gmail.com>, "Damato, Joe" <jdamato@fastly.com>, Stanislav
+ Fomichev <sdf@fomichev.me>, Xuan Zhuo <xuanzhuo@linux.alibaba.com>, Mina
+ Almasry <almasrymina@google.com>, Daniel Jurgens <danielj@nvidia.com>,
+ Andrii Nakryiko <andrii@kernel.org>, Eduard Zingerman <eddyz87@gmail.com>,
+ Mykola Lysenko <mykolal@fb.com>, Martin KaFai Lau <martin.lau@linux.dev>,
+ Song Liu <song@kernel.org>, Yonghong Song <yonghong.song@linux.dev>, KP
+ Singh <kpsingh@kernel.org>, Hao Luo <haoluo@google.com>, Jiri Olsa
+ <jolsa@kernel.org>, Shuah Khan <shuah@kernel.org>, Alexandre Torgue
+ <alexandre.torgue@foss.st.com>, Jose Abreu <joabreu@synopsys.com>, Maxime
+ Coquelin <mcoquelin.stm32@gmail.com>, "Nguyen, Anthony L"
+ <anthony.l.nguyen@intel.com>, "Kitszel, Przemyslaw"
+ <przemyslaw.kitszel@intel.com>, "netdev@vger.kernel.org"
+ <netdev@vger.kernel.org>, "linux-kernel@vger.kernel.org"
+ <linux-kernel@vger.kernel.org>, "linux-doc@vger.kernel.org"
+ <linux-doc@vger.kernel.org>, "bpf@vger.kernel.org" <bpf@vger.kernel.org>,
+ "linux-kselftest@vger.kernel.org" <linux-kselftest@vger.kernel.org>,
+ "linux-stm32@st-md-mailman.stormreply.com"
+ <linux-stm32@st-md-mailman.stormreply.com>,
+ "linux-arm-kernel@lists.infradead.org"
+ <linux-arm-kernel@lists.infradead.org>, "intel-wired-lan@lists.osuosl.org"
+ <intel-wired-lan@lists.osuosl.org>, "xdp-hints@xdp-project.net"
+ <xdp-hints@xdp-project.net>
+Subject: Re: [xdp-hints] Re: [PATCH bpf-next v6 4/4] igc: Add launch time
+ support to XDP ZC
+Message-ID: <20250127112045.7e3997fc@kernel.org>
+In-Reply-To: <221bb71f7d2464cd566e4a4110423ea56b173cf6.camel@siemens.com>
+References: <20250116155350.555374-1-yoong.siang.song@intel.com>
+	<20250116155350.555374-5-yoong.siang.song@intel.com>
+	<AS1PR10MB5675499EE0ED3A579151D3D3EBE02@AS1PR10MB5675.EURPRD10.PROD.OUTLOOK.COM>
+	<PH0PR11MB583095A2F12DA10D57781D18D8E02@PH0PR11MB5830.namprd11.prod.outlook.com>
+	<ea087229cc6f7953875fc69f1b73df1ae1ee9b72.camel@siemens.com>
+	<Z5KdSlzmyCKUyXTn@mini-arch>
+	<87bjvwqvtl.fsf@toke.dk>
+	<20250127100441.0b11e1b8@kernel.org>
+	<221bb71f7d2464cd566e4a4110423ea56b173cf6.camel@siemens.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250115185937.1324-1-ouster@cs.stanford.edu> <20250115185937.1324-5-ouster@cs.stanford.edu>
- <a39c8c5c-4e39-42e6-8d8a-7bfdc6ace688@redhat.com> <CAGXJAmw95dDUxUFNa7UjV3XRd66vQRByAP5T_zra6KWdavr2Pg@mail.gmail.com>
- <4e43078f-a41e-4953-9ee9-de579bd92914@redhat.com> <CAGXJAmxPzrnve-LKKhVNnHCpTeYV=MkuBu0qaAu_YmQP5CSXhg@mail.gmail.com>
- <595520fc-d456-4e62-9c39-947ccfb86d0d@redhat.com>
-In-Reply-To: <595520fc-d456-4e62-9c39-947ccfb86d0d@redhat.com>
-From: John Ousterhout <ouster@cs.stanford.edu>
-Date: Mon, 27 Jan 2025 11:12:58 -0800
-X-Gmail-Original-Message-ID: <CAGXJAmz6TL8C5Q2=__5nxCBudDd_+NbnaabnB6+Tt79A3HyK9g@mail.gmail.com>
-X-Gm-Features: AWEUYZnLf0j4J8bexZUKzZYdpDQNxDc0WBZUqIWSuBFzjc8y3zmF8U2_cvenQyA
-Message-ID: <CAGXJAmz6TL8C5Q2=__5nxCBudDd_+NbnaabnB6+Tt79A3HyK9g@mail.gmail.com>
-Subject: Re: [PATCH net-next v6 04/12] net: homa: create homa_pool.h and homa_pool.c
-To: Paolo Abeni <pabeni@redhat.com>
-Cc: netdev@vger.kernel.org, edumazet@google.com, horms@kernel.org, 
-	kuba@kernel.org
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-X-Spam-Score: -1.0
-X-Spam-Level: 
-X-Scan-Signature: 6b0537b5faa14548adc1759647fcb4de
 
-On Mon, Jan 27, 2025 at 10:28=E2=80=AFAM Paolo Abeni <pabeni@redhat.com> wr=
-ote:
->
-> On 1/27/25 6:34 PM, John Ousterhout wrote:
-> > On Mon, Jan 27, 2025 at 1:41=E2=80=AFAM Paolo Abeni <pabeni@redhat.com>=
- wrote:
-> >> raw_* variants, alike __* ones, fall under the 'use at your own risk'
-> >> category.
-> >>
-> >> In this specific case raw_smp_processor_id() is supposed to be used if
-> >> you don't care the process being move on other cores while using the
-> >> 'id' value.
-> >>
-> >> Using raw_smp_processor_id() and building with the CONFIG_DEBUG_PREEMP=
-T
-> >> knob, the generated code will miss run-time check for preemption being
-> >> actually disabled at invocation time. Such check will be added while
-> >> using smp_processor_id(), with no performance cost for non debug build=
-.
-> >
-> > I'm pretty confident that the raw variant is safe. However, are you
-> > saying that there is no performance advantage of the raw version in
-> > production builds?
->
-> Yes.
->
-> > If so, then I might as well switch to the non-raw version.
->
-> Please do. In fact using the raw variant when not needed will bring only
-> shortcoming.
+On Mon, 27 Jan 2025 19:29:35 +0100 Florian Bezdeka wrote:
+> > > Yeah, I don't think we can impose UAPI restrictions on the metadata a=
+rea
+> > > at this point. I guess the best we can do is to educate users that th=
+ey
+> > > should call the timestamp kfunc before they modify the metadata? =20
+> >=20
+> > I may be misunderstanding the discussion, but I think the answer=20
+> > is that the driver must be fixed. The metadata-in-prepend problem
+> > also exists for simple adjust head use case, so it existed since
+> > early days of BPF. The driver should copy out (or parse) the metadata
+> > before it invokes the XDP prog. The nfp driver does that. =20
+>=20
+> That would have to happen for each packet, without affecting ZC
+> performance. How can that be achieved?
 
-Will do. Just for my information, when is the raw variant "needed"?
+Are you asking how we can make it not affect performance?
+We should really see some benchmarks before we say that it is okay
+to sacrifice correctness..
 
--John-
+> So we have at least two drivers with that problem, igc + nfp.=20
+
+To be clear nfp copies the HW metadata out before calling XDP.
+So XDP program can do whatever it wants to the space before the packet.
+
+> My main point: Enabling and implementing ZC (zero copy) mode at one
+> hand, but then starting to copy the meta data for each packet doesn't
+> sound reasonable.
+
+=F0=9F=A4=B7=EF=B8=8F
 
