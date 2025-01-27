@@ -1,86 +1,79 @@
-Return-Path: <netdev+bounces-161098-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-161099-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2283CA1D4CC
-	for <lists+netdev@lfdr.de>; Mon, 27 Jan 2025 11:49:50 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id B391BA1D4D8
+	for <lists+netdev@lfdr.de>; Mon, 27 Jan 2025 11:52:43 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 3027C18813E0
-	for <lists+netdev@lfdr.de>; Mon, 27 Jan 2025 10:49:54 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 04274164FD6
+	for <lists+netdev@lfdr.de>; Mon, 27 Jan 2025 10:52:42 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7BB071FE443;
-	Mon, 27 Jan 2025 10:49:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2CC551FDE2D;
+	Mon, 27 Jan 2025 10:52:38 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=qualcomm.com header.i=@qualcomm.com header.b="VGMMxiyM"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="cmHFQDoV"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0a-0031df01.pphosted.com (mx0a-0031df01.pphosted.com [205.220.168.131])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wm1-f43.google.com (mail-wm1-f43.google.com [209.85.128.43])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E3B281FDE08
-	for <netdev@vger.kernel.org>; Mon, 27 Jan 2025 10:49:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.168.131
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7C00A1FDA86;
+	Mon, 27 Jan 2025 10:52:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.43
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1737974982; cv=none; b=gEnAjHVGP5gLk6o+ds6SsTSkjfn1YTVULpUEa+1Vuxem68s+jor09NHFOsviGAT54xE5GansFTwtVnIudwHejNAbJoee3+SyNkUlEwyU9o34nOm5SV8kNu3eqIEP1Jgt5htF7aNAnTP9nKvCDfeQLEv3X/kCfntItFqoDzMBkQY=
+	t=1737975158; cv=none; b=hMi4tis9JNP2tvt5ho+1RBWH06eLUapM0Rk46bk8F5EGs4zMoyGeKpjbrPSUIvtaJ+g4peHVu6+3sv99HSD6uUPXHEeWvk1uHp2kHb/jJ25iO9feIZRgy4d4dqZIzLHwgx+VF7W9RqfJB93aq3M3MzoszyTvpwb+eAvNAkUI5jI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1737974982; c=relaxed/simple;
-	bh=xM40sLL6xyjfQcLpAX6AKDWuBZKYNh3BFNPCLLBGnbQ=;
+	s=arc-20240116; t=1737975158; c=relaxed/simple;
+	bh=ADvqvVJx5NrxaNgOcJ/ES1arTuX9/tUYcouTIU2fsJI=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=k1xiKnKezOozJamYeosMs+TqJkmauFbPvG1WLjSRf2tDc3j+KkbifWOfgukcEudDF7/qfLlJk8Y1lq/fOB+Ls7/mxS9f1k4OoPdbf9P4JyQ8zi0mn7SrBvHqtF9k3kTvK0gTI0Hixyw7Y/1idqA/iezwrRrQ9y+IAzAQGNpJMyU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oss.qualcomm.com; spf=pass smtp.mailfrom=oss.qualcomm.com; dkim=pass (2048-bit key) header.d=qualcomm.com header.i=@qualcomm.com header.b=VGMMxiyM; arc=none smtp.client-ip=205.220.168.131
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oss.qualcomm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=oss.qualcomm.com
-Received: from pps.filterd (m0279862.ppops.net [127.0.0.1])
-	by mx0a-0031df01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 50R0ppbM012193
-	for <netdev@vger.kernel.org>; Mon, 27 Jan 2025 10:49:40 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=qualcomm.com; h=
-	cc:content-transfer-encoding:content-type:date:from:in-reply-to
-	:message-id:mime-version:references:subject:to; s=qcppdkim1; bh=
-	adphgYyuraDm+8q9lCcomTmDXgUPSbCBsDgLoCmq7bo=; b=VGMMxiyMJDS7AYWD
-	AlCnYoJbFAIFUk65rKWCAY+7bByO4bXUeaqOnoZL2bzpFvKg8vmk10CU3mC9oc3T
-	ti2DZr0p2bEtLkwPTeSTdw0WFVew+jrWNZZtRL70+l2UsB5Fmpj58YOCJXsJuCuK
-	bflkB/K8472Ffn8Dowr/9yAQ89BeyczFtGUYmbYZDPCE0YmqFv2m85gVCCyh2YLb
-	m9MNIuKqcO/jRlymGXiaLp8E7OXR8DdfxZMUduhfzouxQEXwfni7FpXTWR2i5AuU
-	nwMwxxAMVl7Nwb7cXR037lq/+ihqKo7ZJGKrHuRqbFSD8H+kLOl/RL6H53jV4B5A
-	2Ui51w==
-Received: from mail-qt1-f199.google.com (mail-qt1-f199.google.com [209.85.160.199])
-	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 44dsav1bfg-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128 verify=NOT)
-	for <netdev@vger.kernel.org>; Mon, 27 Jan 2025 10:49:40 +0000 (GMT)
-Received: by mail-qt1-f199.google.com with SMTP id d75a77b69052e-467922cf961so6218041cf.0
-        for <netdev@vger.kernel.org>; Mon, 27 Jan 2025 02:49:39 -0800 (PST)
+	 In-Reply-To:Content-Type; b=X9BjTBGdDB1yWD5Gp9M9ZPPC2l9QcJKj5gAkgySaCjRwUd66q1R1IYfUV9HU+pka9duJbaS/wN7cVe4KnXADQoDHmgl7g4cPpkOPkEAIYvXQ/uj+oRksAkvPk8ze3IlCgiR7XfUNDTfkrt62nW6TwIrpEOjpcbbRHM2uPBzZoG4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=cmHFQDoV; arc=none smtp.client-ip=209.85.128.43
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-wm1-f43.google.com with SMTP id 5b1f17b1804b1-4364a37a1d7so43998775e9.3;
+        Mon, 27 Jan 2025 02:52:36 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1737975155; x=1738579955; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=ADvqvVJx5NrxaNgOcJ/ES1arTuX9/tUYcouTIU2fsJI=;
+        b=cmHFQDoVMvTQw0TWni2h1rM3DpF4dvT2BNOVEygC3M76RXX3/I9W+z0WhkWHQwd9iG
+         XMHtsOan0mDlQE0pa9cpJZJqSghZh137KlYCdMeoD8wzTFIL6TQIECgnsLe3HhGAnHcL
+         nL2ztsMadUL0t+aAtqAL+HQeOP0/hZTmUbFH2Cyb4lox30KBOj0ZPXot7rzkdIoHgLxQ
+         8HvmekXzZRq8341zpWA4yM2wDUAzvkeFSCzUtaZRkYI3PEDB5VcQpcEhWuLkj9ULFCK1
+         x9z+OmVfFOzFtzOH0DMGcxUnsl6uWg4psQy1e74KQyVTU8Md5xKHt3X+5EJr3aegdMCH
+         98Eg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1737974979; x=1738579779;
+        d=1e100.net; s=20230601; t=1737975155; x=1738579955;
         h=content-transfer-encoding:in-reply-to:from:content-language
          :references:cc:to:subject:user-agent:mime-version:date:message-id
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=adphgYyuraDm+8q9lCcomTmDXgUPSbCBsDgLoCmq7bo=;
-        b=IQ8fORMMRpwR4/tHcqlEBmLlRlOdND8rrsAm6fR4xJGOf22xy/r69wlCG/g9efCzqv
-         VvBT3sstWwOzCXUeTFdvBP4GF0ApK4wppZo/ATTUOi/u2mi4Lu6Y/Rv4uGHtayshpAye
-         qYL+/M3ixUg1JUJuJcA2HDcseaHYoHkfcYJ0e7X5W+gcv891JebBxnoKeaDKUlLBwfdq
-         yCUH/eMDgSLlVprSDZmNL3+mGIjQI0nlXJkeI4ul2CWgL6FeYIldK+trsQF/DDzCW8MQ
-         prnY9A1M1hcEac7NZTvN8AB0ezOVx3W15Oh6KUmOiG21LHLao/ByXf1IsMqKkgHCqb16
-         76lw==
-X-Gm-Message-State: AOJu0Yw/P7DtI0DIKiEBHZnjqHIN72y+GDEVQon+NgSo83G5hhEGkuq1
-	jZRRSXU4cVvmC4ZbJxzDSEWMBAO3Fr6EWBgz1ZynLoFlTYXB61fwSuSnUC21gnBmpbnAyDAFUch
-	VMnKgY851grVITPOpfBdmkifEl6QSEZHLlTrVgGvnSPRjfqmgS+RdmrE=
-X-Gm-Gg: ASbGncuoTazjgnsKaVpx0TFHcFtNNuk+XOygyhANAQ335HWvYhIW0UB9Wd2Abx6fw+p
-	DWF3OFz/uzPgasUX7ZigVhN2XOUM94Rab5bYiJFVAovgF7gXs5sfzdZBrSTFMKrFs0xxwjg+LVo
-	pDtkv+/82GvcO+A+a7FylkM/8dt3FdX3kP7ACuRIYzSQw7hgXSk8D3NHWvsoYM4Cty4gqTbmJEC
-	v6nny+BOTzs++RFIRRLU6Q1P+x8/v6bCoEoxuwO6nrK75HUuc04YgR2JAeHBh5T/YdQmMuejTXP
-	my2dHAYZkgfT04syBec9RElXXKPUHJI+6xGgZa/4FOEYwQaClSNHBQghziQ=
-X-Received: by 2002:a05:622a:610:b0:467:6eee:1138 with SMTP id d75a77b69052e-46e4e726f1dmr121602851cf.6.1737974978666;
-        Mon, 27 Jan 2025 02:49:38 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IHdnH4J6HaLZ6tC9UeTjZWaxwVuzqp/4HLK9P8eKFWexw6YCwzdP8ffhfgKmAo0wFiSbNS1AA==
-X-Received: by 2002:a05:622a:610:b0:467:6eee:1138 with SMTP id d75a77b69052e-46e4e726f1dmr121602601cf.6.1737974978120;
-        Mon, 27 Jan 2025 02:49:38 -0800 (PST)
-Received: from [192.168.65.90] (078088045245.garwolin.vectranet.pl. [78.88.45.245])
-        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-ab6760b6f4bsm569985266b.90.2025.01.27.02.49.35
+        bh=ADvqvVJx5NrxaNgOcJ/ES1arTuX9/tUYcouTIU2fsJI=;
+        b=CWWAqKstrb1EdOd2dXs0ptrPZefOsgNjqSK0oEq6cJPTn8zygX53jeCoR38xL69PPI
+         l3V5VgsmAXnu4Mo0fTrlGY+crzdxDaTVbwtyxdPVa1461Z4K62omcK3ONYls6nokAP+2
+         1KAHFhN93CiX48NYVbDC1KkNoBqKATnv9O9yuRG/oeeeJZD/xtLvolTf124L2m2Rw4fA
+         6d+wjPNkJ24PsM0cCL1jI+4ceG4KTBJYMD8G5uAraXg9oVC9KhqWXrLTel/nREUWbcCE
+         dHEZj8+fR1Fzwv51/u9mGz2fSl12teITdrSwzEgu5M/sPrdkdhB8WH2CyB+8vRXfofhG
+         oqsA==
+X-Forwarded-Encrypted: i=1; AJvYcCU3h/j6QB7QqnFSw7n0wDLMcX2RPJYXcEOhNVDT41wxn3DEDYhqRRSNNM0/TiiZndvZ0hoF3R1cPrwbd/CN@vger.kernel.org, AJvYcCVXVcpJkDbiygw4+3zD6l5v5rb2w6IgkOU9alETL58piRF9oahhwogs/qm/2zIgt4+A3OxJp1xNnFc=@vger.kernel.org, AJvYcCXAsEpMPkrUhealL1es3beAay6yUR7p1cQ5atVyv+8HfKSasrUkPpTx84JuHyKbhLCoyFsFU1uq@vger.kernel.org, AJvYcCXHuRz3AKPnN9LCLW66iR23fCczZp4LpXrxFw56+HsqQu5JoNlqh3X1JH/xYKkxxaB4TFDCEitCoLfv@vger.kernel.org
+X-Gm-Message-State: AOJu0YzsZpbbVyfK7O2ipr/m+21HcQ3epyqERxs06udUfax+HrwJn3p8
+	O46JzOS7EJFT5JNc5ydUmHBVGX2sY4MM7BZwHf0PbssokG/RKp5l
+X-Gm-Gg: ASbGncvlHyfcvjy33TqYe5ztuF/qQBrd3SRUcmh24/MgHl0+SUOc61q2WYy3PpZXo9J
+	L5cz+MpI4AuDT7REH39cT7gvQcU24a43X4hT9RGwzHA0pn0fNr7GVJ2Lskuvev87Dt5AN2xtNQo
+	+CcAmqSDIO9XfmDHUNxNzP5o+cEWQtjYz9LAq3ELiixLJmZf4kd/y6pDs+N1Kp53wrn7+qmpnIo
+	7wp7mflRNTDsaVXQnP0kcD/MRhZNuNKeNcfxTydSB0HXpjxB56lbduGcg6Z/tnN6ICQPg6T04M+
+	8dI33wqdXx1A2u3C1wqr1A==
+X-Google-Smtp-Source: AGHT+IEgpzbSjsuqjQId01p+RPqeHrhSFk6HkwDvd4tGyN8bqiyDwlOekgzKmPN0g+igJw9RgC9ajQ==
+X-Received: by 2002:a05:600c:9a3:b0:434:fa73:a907 with SMTP id 5b1f17b1804b1-4389191b819mr374688965e9.13.1737975154471;
+        Mon, 27 Jan 2025 02:52:34 -0800 (PST)
+Received: from [192.168.1.14] ([197.63.236.210])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-38c2a17d6f8sm10524823f8f.28.2025.01.27.02.52.33
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 27 Jan 2025 02:49:37 -0800 (PST)
-Message-ID: <71da0edf-9b2a-464e-8979-8e09f7828120@oss.qualcomm.com>
-Date: Mon, 27 Jan 2025 11:49:34 +0100
+        Mon, 27 Jan 2025 02:52:34 -0800 (PST)
+Message-ID: <5cddb702-1cfa-4961-a7a5-dd0c759379dd@gmail.com>
+Date: Mon, 27 Jan 2025 12:52:31 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -88,126 +81,29 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v3 2/4] net: stmmac: dwmac-qcom-ethqos: Mask PHY mode if
- configured with rgmii-id
-To: Krzysztof Kozlowski <krzk@kernel.org>,
-        Yijie Yang <quic_yijiyang@quicinc.com>,
-        Andrew Lunn <andrew+netdev@lunn.ch>,
-        "David S. Miller" <davem@davemloft.net>,
-        Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
-        Paolo Abeni <pabeni@redhat.com>, Rob Herring <robh@kernel.org>,
-        Krzysztof Kozlowski <krzk+dt@kernel.org>,
-        Conor Dooley <conor+dt@kernel.org>, Vinod Koul <vkoul@kernel.org>,
-        Maxime Coquelin <mcoquelin.stm32@gmail.com>,
-        Alexandre Torgue <alexandre.torgue@foss.st.com>,
-        Bjorn Andersson <andersson@kernel.org>,
-        Konrad Dybcio <konradybcio@kernel.org>,
-        Richard Cochran <richardcochran@gmail.com>
-Cc: netdev@vger.kernel.org, devicetree@vger.kernel.org,
-        linux-kernel@vger.kernel.org, linux-arm-msm@vger.kernel.org,
-        linux-stm32@st-md-mailman.stormreply.com,
-        linux-arm-kernel@lists.infradead.org
-References: <20250121-dts_qcs615-v3-0-fa4496950d8a@quicinc.com>
- <20250121-dts_qcs615-v3-2-fa4496950d8a@quicinc.com>
- <30450f09-83d4-4ff0-96b2-9f251f0c0896@kernel.org>
- <48ce7924-bbb7-4a0f-9f56-681c8b2a21bd@quicinc.com>
- <2bd19e9e-775d-41b0-99d4-accb9ae8262d@kernel.org>
+Subject: Re: [PATCH] documentation: networking: fix spelling mistakes
+To: Przemek Kitszel <przemyslaw.kitszel@intel.com>
+Cc: shuah@kernel.org, linux-can@vger.kernel.org, netdev@vger.kernel.org,
+ linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org,
+ socketcan@hartkopp.net, mkl@pengutronix.de, davem@davemloft.net,
+ edumazet@google.com, kuba@kernel.org, pabeni@redhat.com, horms@kernel.org,
+ corbet@lwn.net
+References: <20250123082521.59997-1-khaledelnaggarlinux@gmail.com>
+ <69da3515-13c8-4626-a2b8-cce7c625da43@intel.com>
+ <5248fbae-982e-4efa-9481-5e2ded2b4443@gmail.com>
+ <009d8ff8-7b77-4b3c-b92a-525b1d6bd858@intel.com>
 Content-Language: en-US
-From: Konrad Dybcio <konrad.dybcio@oss.qualcomm.com>
-In-Reply-To: <2bd19e9e-775d-41b0-99d4-accb9ae8262d@kernel.org>
+From: Khaled Elnaggar <khaledelnaggarlinux@gmail.com>
+In-Reply-To: <009d8ff8-7b77-4b3c-b92a-525b1d6bd858@intel.com>
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
-X-Proofpoint-GUID: cvAGWTN4cT6LbH9NK4txerh5cVVW7Yjg
-X-Proofpoint-ORIG-GUID: cvAGWTN4cT6LbH9NK4txerh5cVVW7Yjg
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1057,Hydra:6.0.680,FMLib:17.12.68.34
- definitions=2025-01-27_04,2025-01-27_01,2024-11-22_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 adultscore=0 impostorscore=0
- priorityscore=1501 bulkscore=0 phishscore=0 clxscore=1015 mlxscore=0
- lowpriorityscore=0 suspectscore=0 malwarescore=0 spamscore=0
- mlxlogscore=999 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.19.0-2411120000 definitions=main-2501270087
 
-On 22.01.2025 10:48 AM, Krzysztof Kozlowski wrote:
-> On 22/01/2025 09:56, Yijie Yang wrote:
->>
->>
->> On 2025-01-21 20:47, Krzysztof Kozlowski wrote:
->>> On 21/01/2025 08:54, Yijie Yang wrote:
->>>> The Qualcomm board always chooses the MAC to provide the delay instead of
->>>> the PHY, which is completely opposite to the suggestion of the Linux
->>>> kernel.
->>>
->>>
->>> How does the Linux kernel suggest it?
->>>
->>>> The usage of phy-mode in legacy DTS was also incorrect. Change the
->>>> phy_mode passed from the DTS to the driver from PHY_INTERFACE_MODE_RGMII_ID
->>>> to PHY_INTERFACE_MODE_RGMII to ensure correct operation and adherence to
->>>> the definition.
->>>> To address the ABI compatibility issue between the kernel and DTS caused by
->>>> this change, handle the compatible string 'qcom,qcs404-evb-4000' in the
->>>> code, as it is the only legacy board that mistakenly uses the 'rgmii'
->>>> phy-mode.
->>>>
->>>> Signed-off-by: Yijie Yang <quic_yijiyang@quicinc.com>
->>>> ---
->>>>   .../net/ethernet/stmicro/stmmac/dwmac-qcom-ethqos.c    | 18 +++++++++++++-----
->>>>   1 file changed, 13 insertions(+), 5 deletions(-)
->>>>
->>>> diff --git a/drivers/net/ethernet/stmicro/stmmac/dwmac-qcom-ethqos.c b/drivers/net/ethernet/stmicro/stmmac/dwmac-qcom-ethqos.c
->>>> index 2a5b38723635b5ef9233ca4709e99dd5ddf06b77..e228a62723e221d58d8c4f104109e0dcf682d06d 100644
->>>> --- a/drivers/net/ethernet/stmicro/stmmac/dwmac-qcom-ethqos.c
->>>> +++ b/drivers/net/ethernet/stmicro/stmmac/dwmac-qcom-ethqos.c
->>>> @@ -401,14 +401,11 @@ static int ethqos_dll_configure(struct qcom_ethqos *ethqos)
->>>>   static int ethqos_rgmii_macro_init(struct qcom_ethqos *ethqos)
->>>>   {
->>>>   	struct device *dev = &ethqos->pdev->dev;
->>>> -	int phase_shift;
->>>> +	int phase_shift = 0;
->>>>   	int loopback;
->>>>   
->>>>   	/* Determine if the PHY adds a 2 ns TX delay or the MAC handles it */
->>>> -	if (ethqos->phy_mode == PHY_INTERFACE_MODE_RGMII_ID ||
->>>> -	    ethqos->phy_mode == PHY_INTERFACE_MODE_RGMII_TXID)
->>>> -		phase_shift = 0;
->>>> -	else
->>>> +	if (ethqos->phy_mode == PHY_INTERFACE_MODE_RGMII_ID)
->>>>   		phase_shift = RGMII_CONFIG2_TX_CLK_PHASE_SHIFT_EN;
->>>>   
->>>>   	/* Disable loopback mode */
->>>> @@ -810,6 +807,17 @@ static int qcom_ethqos_probe(struct platform_device *pdev)
->>>>   	ret = of_get_phy_mode(np, &ethqos->phy_mode);
->>>>   	if (ret)
->>>>   		return dev_err_probe(dev, ret, "Failed to get phy mode\n");
->>>> +
->>>> +	root = of_find_node_by_path("/");
->>>> +	if (root && of_device_is_compatible(root, "qcom,qcs404-evb-4000"))
->>>
->>>
->>> First, just check if machine is compatible, don't open code it.
->>>
->>> Second, drivers should really, really not rely on the machine. I don't
->>> think how this resolves ABI break for other users at all.
->>
->> As detailed in the commit description, some boards mistakenly use the 
->> 'rgmii' phy-mode, and the MAC driver has also incorrectly parsed and 
-> 
-> That's a kind of an ABI now, assuming it worked fine.
+On 1/27/25 10:16 AM, Przemek Kitszel wrote:
 
-I'm inclined to think it's better to drop compatibility given we're talking
-about rather obscure boards here.
+> this patch is fine for -net, as this is fixing the bugs in the text,
+> those are rather special, as there is no risk of regression :)
+> I'm not sure if Fixes tag is necessary for spelling fixes though.
 
-$ rg 'mode.*=.*"rgmii"' arch/arm64/boot/dts/qcom -l
-
-arch/arm64/boot/dts/qcom/sa8155p-adp.dts
-arch/arm64/boot/dts/qcom/qcs404-evb-4000.dts
-
-QCS404 seems to have zero interest from anyone (and has been considered
-for removal upstream..).
-
-The ADP doesn't see much traction either, last time around someone found
-a boot breaking issue months after it was committed.
-
-Konrad
+Makes sense. Thanks.
+Khaled
 
