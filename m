@@ -1,143 +1,127 @@
-Return-Path: <netdev+bounces-161206-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-161207-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 79667A20080
-	for <lists+netdev@lfdr.de>; Mon, 27 Jan 2025 23:23:06 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 469D5A20087
+	for <lists+netdev@lfdr.de>; Mon, 27 Jan 2025 23:24:13 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 84B1D7A47C4
-	for <lists+netdev@lfdr.de>; Mon, 27 Jan 2025 22:22:56 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C27E1162970
+	for <lists+netdev@lfdr.de>; Mon, 27 Jan 2025 22:24:06 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 88FB01DBB13;
-	Mon, 27 Jan 2025 22:21:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 75F3E1DAC81;
+	Mon, 27 Jan 2025 22:24:03 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=fastly.com header.i=@fastly.com header.b="jE1TvHST"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Xvx4vRR/"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qk1-f173.google.com (mail-qk1-f173.google.com [209.85.222.173])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CD3071D935C
-	for <netdev@vger.kernel.org>; Mon, 27 Jan 2025 22:21:57 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.173
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 40F8FB64A;
+	Mon, 27 Jan 2025 22:24:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1738016519; cv=none; b=UK1up5OIA0BOhgGLZQTHk7qk3/CWqzxQECLCN/GItF2wrmHSZXhmD2Psxj6WXtNfGYta393RCBwlYE5qsouziDKNKFM8hRw6vCKa2/3e/ScfND3+BEDnG29JU8lsH+9sLkMUz19MrEB1Omd5o3w4NhtoKRAlZhiI9tKzXGstxCs=
+	t=1738016643; cv=none; b=UwqrIMH0niZx3mO3hopdcPBKbRVh8yFHH++EJ4SIVk+3bHQlIOYgWecoypzmXYE68ww+yWKVNYtTW5V+ltCYqriMO9Db0UB2sp4dGrIkDb2GSEKuknOelizf5Dwu+YgGABaQzK1EGkhtcGj25lNmHxnGlnJ59k3DeJnv6P7AD6k=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1738016519; c=relaxed/simple;
-	bh=HfDv8yuZwZYBu03PLHPJuhXwvsGp27tdcr/KfDiKWwg=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=DTYalfk1wIoyMvOOD8lrLgQ7QsX3pjG/3UTBGr2CzBp90tw1bH+oi/16B5B0mJEf6XlRO5FXIV086seTfHs38aOAAiISsWbYAgo7YX+U6pU1FErZ35sJJ2Ze+ApoUHbLz6zgOEw/4HNbwGfEuEpm8KwgshI4IlamzENTSUr9C58=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fastly.com; spf=pass smtp.mailfrom=fastly.com; dkim=pass (1024-bit key) header.d=fastly.com header.i=@fastly.com header.b=jE1TvHST; arc=none smtp.client-ip=209.85.222.173
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fastly.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=fastly.com
-Received: by mail-qk1-f173.google.com with SMTP id af79cd13be357-7b6f8524f23so636668585a.2
-        for <netdev@vger.kernel.org>; Mon, 27 Jan 2025 14:21:57 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=fastly.com; s=google; t=1738016517; x=1738621317; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references
-         :mail-followup-to:message-id:subject:cc:to:from:date:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=Zgtg9sEYYepf1PWWMu6DdFDPfrhrnEUXJiVlMwbDK8o=;
-        b=jE1TvHSTRugP3N5J/Lg4NSlMHOhp1R5ZGLHh4lsSMDHSBlF0o7fAA1zjSpzy9ZOST1
-         dZxzveYQ28yn8nI4FUGNn9AqeIdBrIDbqYf0aY19PJVr0CMy9DEHplgSc+syV3jlT7mj
-         F7vI6wMWGKSFj5a5f4pIToEq7iyh2VWXF5Vg8=
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1738016517; x=1738621317;
-        h=in-reply-to:content-disposition:mime-version:references
-         :mail-followup-to:message-id:subject:cc:to:from:date
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=Zgtg9sEYYepf1PWWMu6DdFDPfrhrnEUXJiVlMwbDK8o=;
-        b=B2wmOPHY5SqjSr2bdlzufATZO0W2DJloJ8SKE+DqtZzPbrYd9ZHF74TVbGMZ1kqneo
-         Igh2gUNqt4Wxv+QI875+QTA2kkAY1Ny4iEm0PUtEWDYxpQaFoHCIBTiz2MSds9KV2rNC
-         YXuV2ed1KtFAHOqOPdYHlyc5wM1KHlLmDQkiuRUx5cMqM6rmngARUSeB6ATBEqA17Cmn
-         ljGbCu0fqNCxqpgN+lYdT3EcghYm7Q6ZRtXdSuyG7p/H1gicTzI7SWEbpVYMsU9z97ff
-         Koi7bMILvzBKl7jTagEZM4vYgol0RfTtDJ7UdX6zJjSPNWCUbW+94loDz056+SPADJRr
-         80NA==
-X-Gm-Message-State: AOJu0YwHGLHHwQwItU1a3qlSpQBLkORzxKcuxfjfJQpBG4LV0l62WZIa
-	Ne14yGrVGifd5K42eTXR32koxHQgn4cn/idSA1qmssnfnGYAHfB6IbYVO0C5yc0=
-X-Gm-Gg: ASbGnctIcNCFGd93qvbpvfNrx9Jq56dW5axpZ/vOr5/eywJd8X8c4f5/Bq7luUG7EHr
-	jnQKVuxmJO3CTtraJiBJeR6Iyckeqpy2dK6RMMhnbSdyM64ifheAj9jFcFBHgYqSMgCDgGcsKvs
-	7FKctkG2hCZLulenPzeWA10LcYwE7wJ2EO4VP6wBDibPRegy7Ds30qDBYxY8X3090sw61xYY3nC
-	pucC+Iv5WpB9iAlRpM8Wp82xm5PhrsYJot+qQFALH+y1uDKZDdfJL2PEcoibfiraBre2fRDsOaW
-	HxLuy0v7/ET84j6OujB2XUzC/WdC+LX1R2cPEP3fo/s=
-X-Google-Smtp-Source: AGHT+IFwEVN1fNwLMWq8+hBoMC0fAeQqthTVKxqiNjFFaEHa55r9SdnkWzcSkqaYij0jYQMDA3y18w==
-X-Received: by 2002:a05:620a:17a3:b0:7b1:19f4:c6e0 with SMTP id af79cd13be357-7be63253f1amr6652328185a.51.1738016516733;
-        Mon, 27 Jan 2025 14:21:56 -0800 (PST)
-Received: from LQ3V64L9R2 (ool-44c5a22e.dyn.optonline.net. [68.197.162.46])
-        by smtp.gmail.com with ESMTPSA id d75a77b69052e-46e6689c838sm43527321cf.37.2025.01.27.14.21.55
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 27 Jan 2025 14:21:56 -0800 (PST)
-Date: Mon, 27 Jan 2025 17:21:54 -0500
-From: Joe Damato <jdamato@fastly.com>
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: netdev@vger.kernel.org, gerhard@engleder-embedded.com,
-	jasowang@redhat.com, leiyang@redhat.com, xuanzhuo@linux.alibaba.com,
-	mkarsten@uwaterloo.ca, Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
-	Simon Horman <horms@kernel.org>,
-	Kuniyuki Iwashima <kuniyu@amazon.com>,
-	Sebastian Andrzej Siewior <bigeasy@linutronix.de>,
-	Lorenzo Bianconi <lorenzo@kernel.org>,
-	Alexander Lobakin <aleksander.lobakin@intel.com>,
-	open list <linux-kernel@vger.kernel.org>
-Subject: Re: [RFC net-next v3 1/4] net: protect queue -> napi linking with
- netdev_lock()
-Message-ID: <Z5gHAmNpXGBS2Mp8@LQ3V64L9R2>
-Mail-Followup-To: Joe Damato <jdamato@fastly.com>,
-	Jakub Kicinski <kuba@kernel.org>, netdev@vger.kernel.org,
-	gerhard@engleder-embedded.com, jasowang@redhat.com,
-	leiyang@redhat.com, xuanzhuo@linux.alibaba.com,
-	mkarsten@uwaterloo.ca, Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
-	Simon Horman <horms@kernel.org>,
-	Kuniyuki Iwashima <kuniyu@amazon.com>,
-	Sebastian Andrzej Siewior <bigeasy@linutronix.de>,
-	Lorenzo Bianconi <lorenzo@kernel.org>,
-	Alexander Lobakin <aleksander.lobakin@intel.com>,
-	open list <linux-kernel@vger.kernel.org>
-References: <20250121191047.269844-1-jdamato@fastly.com>
- <20250121191047.269844-2-jdamato@fastly.com>
- <20250127133756.413efb24@kernel.org>
+	s=arc-20240116; t=1738016643; c=relaxed/simple;
+	bh=XGepAOlaGVpZbPKJ9qsKU3cIrTbHjdgZ6PAelXcfGXg=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=cE6hUbpJbggO8uo5fMgotWiRiKk8a2afYLqroFMB3MPn0vkbeFibThwNpL9dSca9sD+fFZ9B8bQ9wQufnhC9DdsO6dOU7XQ3Ro1eo3RJjSpRddbdNSeGa/w/mah0nwWkrAJ2Y+7wHkyVPVk/uMmijmKKmm07CZrrI/qBSfZ5vc0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Xvx4vRR/; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0CC34C4CED2;
+	Mon, 27 Jan 2025 22:24:02 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1738016642;
+	bh=XGepAOlaGVpZbPKJ9qsKU3cIrTbHjdgZ6PAelXcfGXg=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=Xvx4vRR/yyq+BbukOaT0YG90hBeu8liLZd2VHgAlD4rrhd+9vnFcE3bf+hmgEMxEj
+	 nP5lqC2SVB94SR1gTiWRMlPwhAUc7kRlo710dbtO1XLNvLE2BSbA4clnRqgQOLycLd
+	 O6iC7rRHKkdy+MJDWmEdikOxx2PLfOVXHr1jtqqt+YP2lqkNr2dE2LkLAuHxsb8uyw
+	 7l1ax/W3oLRiN9ZhExAcchEVotvwQ5VPXbTxXl9UWBDZOGAXlcljdzYozt16tkcuvS
+	 TnDxW1OvPt5p8zhw50J6ByecG5npSJp66/hOe/ioAh1YAcrkZIPS+6Tgd6DyYXG052
+	 YweQ+MrX5Vxqw==
+Date: Mon, 27 Jan 2025 14:24:00 -0800
+From: Jakub Kicinski <kuba@kernel.org>
+To: Joe Damato <jdamato@fastly.com>
+Cc: Jason Wang <jasowang@redhat.com>, netdev@vger.kernel.org,
+ gerhard@engleder-embedded.com, leiyang@redhat.com,
+ xuanzhuo@linux.alibaba.com, mkarsten@uwaterloo.ca, "Michael S. Tsirkin"
+ <mst@redhat.com>, Eugenio =?UTF-8?B?UMOpcmV6?= <eperezma@redhat.com>,
+ Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller"
+ <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Paolo Abeni
+ <pabeni@redhat.com>, "open list:VIRTIO CORE AND NET DRIVERS"
+ <virtualization@lists.linux.dev>, open list <linux-kernel@vger.kernel.org>
+Subject: Re: [RFC net-next v3 2/4] virtio_net: Prepare for NAPI to queue
+ mapping
+Message-ID: <20250127142400.24eca319@kernel.org>
+In-Reply-To: <Z5gDut3Tuzd1npPe@LQ3V64L9R2>
+References: <CACGkMEvT=J4XrkGtPeiE+8fwLsMP_B-xebnocJV8c5_qQtCOTA@mail.gmail.com>
+	<Z5EtqRrc_FAHbODM@LQ3V64L9R2>
+	<CACGkMEu6XHx-1ST9GNYs8UnAZpSJhvkSYqa+AE8FKiwKO1=zXQ@mail.gmail.com>
+	<Z5Gtve0NoZwPNP4A@LQ3V64L9R2>
+	<CACGkMEvHVxZcp2efz5EEW96szHBeU0yAfkLy7qSQnVZmxm4GLQ@mail.gmail.com>
+	<Z5P10c-gbVmXZne2@LQ3V64L9R2>
+	<CACGkMEv4bamNB0KGeZqzuJRazTtwHOEvH2rHamqRr1s90FQ2Vg@mail.gmail.com>
+	<Z5fHxutzfsNMoLxS@LQ3V64L9R2>
+	<Z5ffCVsbasJKnW6Q@LQ3V64L9R2>
+	<20250127133304.7898e4c2@kernel.org>
+	<Z5gDut3Tuzd1npPe@LQ3V64L9R2>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250127133756.413efb24@kernel.org>
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-On Mon, Jan 27, 2025 at 01:37:56PM -0800, Jakub Kicinski wrote:
-> On Tue, 21 Jan 2025 19:10:41 +0000 Joe Damato wrote:
-> > From: Jakub Kicinski <kuba@kernel.org>
-> > 
-> > netdev netlink is the only reader of netdev_{,rx_}queue->napi,
-> > and it already holds netdev->lock. Switch protection of the
-> > writes to netdev->lock as well.
-> > 
-> > Add netif_queue_set_napi_locked() for API completeness,
-> > but the expectation is that most current drivers won't have
-> > to worry about locking any more. Today they jump thru hoops
-> > to take rtnl_lock.
+On Mon, 27 Jan 2025 17:07:54 -0500 Joe Damato wrote:
+> > Tx NAPIs are one aspect, whether they have ID or not we may want direct
+> > access to the struct somewhere in the core, via txq, at some point, and
+> > then people may forget the linking has an unintended effect of also
+> > changing the netlink attrs. The other aspect is that driver may link
+> > queue to a Rx NAPI instance before napi_enable(), so before ID is
+> > assigned. Again, we don't want to report ID of 0 in that case.  
 > 
-> I started having second thoughts about this patch, sorry to say.
-> NAPI objects were easy to protect with the lock because there's
-> a clear registration and unregistration API. Queues OTOH are made
-> visible by the netif_set_real_num_queues() call, which is tricky 
-> to protect with the instance lock. Queues are made visible, then
-> we configure them.
+> I'm sorry I'm not sure I'm following what you are saying here; I
+> think there might be separate threads concurrently and I'm probably
+> just confused :)
 > 
-> My thinking changed a bit, I think we should aim to protect all
-> ndos and ethtool ops with the instance lock. Stanislav and Saeed
-> seem to be working on that:
-> https://lore.kernel.org/all/Z5LhKdNMO5CvAvZf@mini-arch/
-> so hopefully that doesn't cause too much of a delay.
-> But you may need to rework this series further :(
+> I think you are saying that netdev_nl_napi_fill_one should not
+> report 0, which I think is fine but probably a separate patch?
+> 
+> I think, but am not sure, that Jason was asking for guidance on
+> TX-only NAPIs and linking them with calls to netif_queue_set_napi.
+> It seems that Jason may be suggesting that the driver shouldn't have
+> to know that TX-only NAPIs have a NAPI ID of 0 and thus should call
+> netif_queue_set_napi for all NAPIs and not have to deal think about
+> TX-only NAPIs at all.
+> 
+> From you've written, Jakub, I think you are suggesting you agree
+> with that, but with the caveat that netdev_nl_napi_fill_one should
+> not report 0.
 
-OK, I'll wait for something to emerge from that work before
-re-spinning this.
+Right up to this point.
+
+> Then, one day in the future, if TX-only NAPIs get an ID they will
+> magically start to show up.
+> 
+> Is that right?
+
+Sort of. I was trying to point out corner cases which would also
+benefit from netdev_nl_queue_fill_one() being more careful about 
+the NAPI IDs it reports. But the conclusion is the same.
+
+> If so, I'll re-spin the RFC to call netif_queue_set_napi for all
+> NAPIs in virtio_net, including TX-only NAPIs and see about including
+> a patch to tweak netdev_nl_napi_fill_one, if necessary.
+
+netdev_nl_queue_fill_one(), not netdev_nl_napi_fill_one()
+
+Otherwise SG.
+
+After net-next reopens I think the patch to netdev_nl_queue_fill_one()
+could be posted separately. There may be drivers out there which already
+link Tx NAPIs, we shouldn't delay making the reporting more careful.
 
