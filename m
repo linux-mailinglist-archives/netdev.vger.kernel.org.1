@@ -1,242 +1,195 @@
-Return-Path: <netdev+bounces-161090-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-161091-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id AFFACA1D444
-	for <lists+netdev@lfdr.de>; Mon, 27 Jan 2025 11:20:12 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1BDFFA1D460
+	for <lists+netdev@lfdr.de>; Mon, 27 Jan 2025 11:27:24 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id BEAE118882C0
-	for <lists+netdev@lfdr.de>; Mon, 27 Jan 2025 10:20:16 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 6043A163546
+	for <lists+netdev@lfdr.de>; Mon, 27 Jan 2025 10:27:22 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DE56B1FCFE5;
-	Mon, 27 Jan 2025 10:20:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9569B1FCFE5;
+	Mon, 27 Jan 2025 10:27:20 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="AeqIpRGZ"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="IS8WERqf"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-io1-f41.google.com (mail-io1-f41.google.com [209.85.166.41])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 472111FC7D3;
-	Mon, 27 Jan 2025 10:20:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.41
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C0CE1179BF
+	for <netdev@vger.kernel.org>; Mon, 27 Jan 2025 10:27:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1737973208; cv=none; b=NwQKTz/V/aRS/LUEQEP37l7xaw1GNNw2TsIbPcKy9Ccdv6dq+onFV2zD9Gn3CRsf7vkbWoDxYs54Bt7kYCBLYl3d4kcPdRxtqPHFQhbtU63q8tQJK8AlKjvkM3x5CM9LurhRqV79PjQRZmcwgJqcWRgfgOgt9Ob/kkpPXq3CVcE=
+	t=1737973640; cv=none; b=YKq8FCqd1Kf1rkUHk+m0sCfMnwLuDoINC1Q3BNWT/YTpJUmSiihP0pPjYEVp3RWZUZopuDGpwHOrlREWcij/GQf3xbHCFxGFUmYCDCVwJcVHczNdhcwqAcVGjzT5jRaK+zzzrhnEyFWfEyo5W35WkaRQ/nI7tFuFaGHysDYIelQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1737973208; c=relaxed/simple;
-	bh=pHI8nT9tX06VZba+Qy/u+b6PysIrs2+wh1W6z+gCEaQ=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=fJFttYfIxc6sNxL5XAn2+20o4lgezl9XC+EhhwzAwaIjapVlIyidtz1brU3lx2LU/uEA37SbG9cmxOcpUoWVW4C69fWmlQPzIhOkjct2wRbkndwTz1mHt0TIN+1NvIrAwUVeamDOv9gRBIWzLeiPOIuoWJMm9kMtNZy4N1SOK28=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=AeqIpRGZ; arc=none smtp.client-ip=209.85.166.41
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-io1-f41.google.com with SMTP id ca18e2360f4ac-844eac51429so347926839f.2;
-        Mon, 27 Jan 2025 02:20:06 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1737973206; x=1738578006; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=sckdr71MrnKjBSWxkzb932HcRLBhiMEG/B2/474sLNA=;
-        b=AeqIpRGZgfeQAldzCVzY7aq/nfMkUmUYn3w3z4fZnQ9i+rgezNo/4QaCTcpJe8TXdj
-         Q++Aa/P4Ike5ohgL/GW2cO+izzCvPENHPAPRhfcqagiAxB+m7VZBeKHwo2SgbJ0Sx/sm
-         X4Wiem6m74ASJgqQ0KxwMJr+ZVnIhAN3OLqftohCT9f9bukwijoaJPaDvXb60wLK50a+
-         FSvKL9166/5k0ySFyFExgMlxpxU/Xx/LFwI0vnyxti4ApnrdTuHCSGPOi+5SYTL9lI9f
-         bxKem7Ai9mogfvTeFGqSe68lpZE+9NMkE6AlTjwGlqk4h1HMPy3qHRgtHHLZ041VPF1e
-         qzJA==
+	s=arc-20240116; t=1737973640; c=relaxed/simple;
+	bh=xiLh/LF5vdzL4TJiPHNiVASmoamkmOzEKMquzhhAkk8=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=LwmLV/ootFy/UGS6tBSpBIyfCNR6bNw683uHjy0FCFyc9rC66hZGtIuYa0leV3XU6IWhiuV531D8bG9mtM3BQhD6iMjbhOdKFSn8NZi430KL/O3BJzOZMTP2f4+Pdzv+7Ro+qzRmmPngDDidg64cKqlpkVVAW7+Ac2dcc06QevM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=IS8WERqf; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1737973637;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=aPQF6s94+SLLK6q09hcYNsrxkJ7FIGbSw5VTIudV5Rs=;
+	b=IS8WERqf9rrlyIsxYw4i791gEC2mepTAbeRqUBs8VxpLJISo/QUxeKoir788IuQhyR2uGE
+	9HjjuJhM6tElZKzoVfrnkBgA4caOuymapVoLSPbSeKOLSnZuF6wJ/SxNSYzM8MsP+0jBsO
+	/XhLRSipohxk4rp7t2MzFxIA0ryCbE4=
+Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
+ [209.85.128.70]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-624-b8OYTB4NPuuG6PaYVlzgGw-1; Mon, 27 Jan 2025 05:27:16 -0500
+X-MC-Unique: b8OYTB4NPuuG6PaYVlzgGw-1
+X-Mimecast-MFC-AGG-ID: b8OYTB4NPuuG6PaYVlzgGw
+Received: by mail-wm1-f70.google.com with SMTP id 5b1f17b1804b1-4361f371908so29110995e9.0
+        for <netdev@vger.kernel.org>; Mon, 27 Jan 2025 02:27:16 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1737973206; x=1738578006;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=sckdr71MrnKjBSWxkzb932HcRLBhiMEG/B2/474sLNA=;
-        b=rz5RiQqFVm6Na3R17mLORNz2HvXdUBURRN4NbKPjRL3rGOZDcsoMjys4eZIMvlKMYX
-         YgGhDNVZLlEygl/Wp0Q1nyOMDrMjcvgR6ehKRpySsb8gByPcQzZkjPu+f5n/XWvgcge8
-         17lP9j5NeopUaB081ab+Y46MWdNEJ3BIdQDd7pInwyoU7tKlC7hRdUJ1BsQnly5cSn3g
-         WXak6efJ25WEd2UwS6KuFizfxmOWzahrhddMXiczgIo5WfLiowija63fgh7vuev0w+wM
-         vYSJmUQxG2fP8GYFvuMpQOYfj98tyvD4zdf5w3vSLEner99cDLgj9GBpg5/2zuUCVBjz
-         zWxg==
-X-Forwarded-Encrypted: i=1; AJvYcCW3FKzFHSJtNf+Yt6glCpq59ZuvV6rc1jddsvQpHlV2xdRgeyYNL7cxNQ8bh+K7bhDsHjMTjQKvdX5hgiY=@vger.kernel.org, AJvYcCXGQ9C5GS5XlKWVe8jl7OnFTkwCfLLYg7vkR5S6Y0kPXIjoj2aT5qQqN1f+nDXjrezvsoh69fmf@vger.kernel.org
-X-Gm-Message-State: AOJu0Yz4fd+8WCbnf1XSt8a2BfLYSsm3G2IeEnpJERsXXj2YOdsWj98g
-	W/eWN4FxY4XNQ9tw1sKrTlUmcF5boPFNoKzRrHT3Roerfg4ZXwq2+pOdIMbI2oFspSWVvWJ1qZM
-	miVJZLPT0Kdsbvb8wVQa2kd/PhHcaWA==
-X-Gm-Gg: ASbGncvFRZ0k2Y9aprlpyaxL2B/RbjW49zBLVn3+M2X4MyXQb1LfTA1X4HPYtfdciYx
-	9j8TxdwTBnUUapg/SHhxfZBaSVuF5EeqJaKy+i8D+fy4zYCkhkFFEX0AmoA6ESdxdxP4czZ0s
-X-Google-Smtp-Source: AGHT+IH+oQffYDjVTEsZUgquRRYzcp2aVY/U1Tlc+chFH/eaQzlzqpFS/VT0LzpDx9GoCkmkV/XiWPmeS0X2EUnCIu4=
-X-Received: by 2002:a05:6e02:16cb:b0:3cf:cdb8:78fb with SMTP id
- e9e14a558f8ab-3cfcdb87ac6mr90820885ab.16.1737973206316; Mon, 27 Jan 2025
- 02:20:06 -0800 (PST)
+        d=1e100.net; s=20230601; t=1737973635; x=1738578435;
+        h=content-transfer-encoding:mime-version:organization:references
+         :in-reply-to:message-id:subject:cc:to:from:date:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=aPQF6s94+SLLK6q09hcYNsrxkJ7FIGbSw5VTIudV5Rs=;
+        b=gNvwOzLTQb3VZlfyo5mQpGxweoqtqkYHk2IG7qo0dDSZjDlJAoQeq/mMBPIyMGaom0
+         GkMR0eXoxrNrESG5ZWHLwO0Clgmolbyc63RqtB4uEzemiTCkw2Gj0oKtBBAobuhbkCui
+         hLKFHEB/CG62dBhiretTwFSy1jJXMqjjAELkX7sk4yVONLkiugcrbHKtsOdeMRe4WqjR
+         CdB4j+0adAsPQ7d+n8h8WvD4yoeS6TFu8rdzo1PJ3jtdlcJ+vRt6dZFEpYVbNmTcTTd9
+         GLZcHlq25uoGBKOUcVtBg45aMSgQeLfnd//vbtxvlUQdWFdZFwRJJ/1Ap8giKTfjdFj4
+         v77g==
+X-Forwarded-Encrypted: i=1; AJvYcCUa2cnyRTTGvLeonqPRFtpbTluxELChXH9KyaVyJ3d1zkps2bpgtD3Qe+7hka8N8uSHOWUMk9k=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yw6lQuZ3298Fh1rwuftmSOMWTAXsXpaCN58che1/GYe37u4Zmhk
+	0i8gjPrevmS5D8ogTO6yxLoTQn1bPfv/ulgnanGuHJ2z9xni+BrtXSPpyRbU89Fn0L9gtiOxVzJ
+	IxP2CcRMt7ehbAts+Fiasr9urokvYVZMQ+yT/sXH7as4KxNqFqZpcxA==
+X-Gm-Gg: ASbGncsP+wDI8yXhVsmvGH6odbKiXybfqvJKS7LV7TW2klwSmHD50KtXPElBkTk0Z/u
+	BEAuAesj2w5Hmtt+Ez9xYqB1I1bRvFZAcDlt82G5eDpJL857YwJt+8BSIEzlQbREGluTTUEdyep
+	p0t6vAaMhf6S+xfZCFYl8+B2aK4MVxsrHeGukUo/YD+5LZlDphPW+R8gfmqNAbIFbzamBHb442Y
+	FkCxJ5l1tGQwUry3KJh16DUn3ByDVJOrVWT4K+1h9vtfLGlIJlBUIzh8bhOI0c8L72fMxZviEUx
+	O1excUaJ40SAsgEG
+X-Received: by 2002:a05:600c:ccc:b0:434:e9ee:c3d with SMTP id 5b1f17b1804b1-4389141c1e5mr308044035e9.20.1737973634950;
+        Mon, 27 Jan 2025 02:27:14 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IG/vOIlh8NUolnxEhhezqtFrfya33PW0mZ2/xkcVF+l0sldXD54BuiD9icmtPhfhQPA+ua5zA==
+X-Received: by 2002:a05:600c:ccc:b0:434:e9ee:c3d with SMTP id 5b1f17b1804b1-4389141c1e5mr308043805e9.20.1737973634567;
+        Mon, 27 Jan 2025 02:27:14 -0800 (PST)
+Received: from maya.myfinge.rs (ifcgrfdd.trafficplex.cloud. [2a10:fc81:a806:d6a9::1])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-438bd501721sm125050985e9.9.2025.01.27.02.27.13
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 27 Jan 2025 02:27:13 -0800 (PST)
+Date: Mon, 27 Jan 2025 11:27:12 +0100
+From: Stefano Brivio <sbrivio@redhat.com>
+To: Eric Dumazet <edumazet@google.com>
+Cc: Jon Maloy <jmaloy@redhat.com>, Neal Cardwell <ncardwell@google.com>,
+ netdev@vger.kernel.org, davem@davemloft.net, kuba@kernel.org,
+ passt-dev@passt.top, lvivier@redhat.com, dgibson@redhat.com,
+ eric.dumazet@gmail.com, Menglong Dong <menglong8.dong@gmail.com>
+Subject: Re: [net,v2] tcp: correct handling of extreme memory squeeze
+Message-ID: <20250127112712.50bb6341@elisabeth>
+In-Reply-To: <CANn89iJ4u5QBfhc1LC6ipmmmiEG0bCWhRG1obm3=05A_BsPt4w@mail.gmail.com>
+References: <20250117214035.2414668-1-jmaloy@redhat.com>
+	<CADVnQymiwUG3uYBGMc1ZEV9vAUQzEOD4ymdN7Rcqi7yAK9ZB5A@mail.gmail.com>
+	<afb9ff14-a2f1-4c5a-a920-bce0105a7d41@redhat.com>
+	<c41deefb-9bc8-47b8-bff0-226bb03265fe@redhat.com>
+	<CANn89i+RRxyROe3wx6f4y1nk92Y-0eaahjh-OGb326d8NZnK9A@mail.gmail.com>
+	<e15ff7f6-00b7-4071-866a-666a296d0b15@redhat.com>
+	<20250127110121.1f53b27d@elisabeth>
+	<CANn89iJ4u5QBfhc1LC6ipmmmiEG0bCWhRG1obm3=05A_BsPt4w@mail.gmail.com>
+Organization: Red Hat
+X-Mailer: Claws Mail 4.2.0 (GTK 3.24.41; x86_64-pc-linux-gnu)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <202501261315.c6c7dbb4-lkp@intel.com> <CAL+tcoBBjLsmWUt9PkzDhVtGLm-s53EyTzcHhpTkVnLpgz0FXw@mail.gmail.com>
-In-Reply-To: <CAL+tcoBBjLsmWUt9PkzDhVtGLm-s53EyTzcHhpTkVnLpgz0FXw@mail.gmail.com>
-From: Jason Xing <kerneljasonxing@gmail.com>
-Date: Mon, 27 Jan 2025 18:19:30 +0800
-X-Gm-Features: AWEUYZkHEbWK10UcMluPXye9arxpRxbeEpiKlDFBBrcOJIjVFyWB1-42gpACmvM
-Message-ID: <CAL+tcoBmRVKUfhR8DiMryD4h5ZJeQpGuhPyzK3fexiEBvE_KDA@mail.gmail.com>
-Subject: Re: [linus:master] [tcp_cubic] 25c1a9ca53: packetdrill.packetdrill/gtests/net/tcp/cubic/cubic-bulk-166k-idle-restart_ipv4-mapped-v6.fail
-To: kernel test robot <oliver.sang@intel.com>
-Cc: Mahdi Arghavani <ma.arghavani@yahoo.com>, oe-lkp@lists.linux.dev, lkp@intel.com, 
-	linux-kernel@vger.kernel.org, "David S. Miller" <davem@davemloft.net>, 
-	Neal Cardwell <ncardwell@google.com>, Eric Dumazet <edumazet@google.com>, 
-	Haibo Zhang <haibo.zhang@otago.ac.nz>, David Eyers <david.eyers@otago.ac.nz>, 
-	Abbas Arghavani <abbas.arghavani@mdu.se>, netdev@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
 
-On Sun, Jan 26, 2025 at 4:49=E2=80=AFPM Jason Xing <kerneljasonxing@gmail.c=
+On Mon, 27 Jan 2025 11:06:07 +0100
+Eric Dumazet <edumazet@google.com> wrote:
+
+> On Mon, Jan 27, 2025 at 11:01=E2=80=AFAM Stefano Brivio <sbrivio@redhat.c=
 om> wrote:
->
-> On Sun, Jan 26, 2025 at 2:30=E2=80=AFPM kernel test robot <oliver.sang@in=
-tel.com> wrote:
 > >
+> > On Fri, 24 Jan 2025 12:40:16 -0500
+> > Jon Maloy <jmaloy@redhat.com> wrote:
+> > =20
+> > > I can certainly clear tp->pred_flags and post it again, maybe with
+> > > an improved and shortened log. Would that be acceptable? =20
 > >
+> > Talking about an improved log, what strikes me the most of the whole
+> > problem is:
 > >
-> > Hello,
+> > $ tshark -r iperf3_jon_zero_window.pcap -td -Y 'frame.number in { 1064 =
+.. 1068 }'
+> >  1064   0.004416 192.168.122.1 =E2=86=92 192.168.122.198 TCP 65534 3448=
+2 =E2=86=92 5201 [ACK] Seq=3D1611679466 Ack=3D1 Win=3D36864 Len=3D65480
+> >  1065   0.007334 192.168.122.1 =E2=86=92 192.168.122.198 TCP 65534 3448=
+2 =E2=86=92 5201 [ACK] Seq=3D1611744946 Ack=3D1 Win=3D36864 Len=3D65480
+> >  1066   0.005104 192.168.122.1 =E2=86=92 192.168.122.198 TCP 56382 [TCP=
+ Window Full] 34482 =E2=86=92 5201 [ACK] Seq=3D1611810426 Ack=3D1 Win=3D368=
+64 Len=3D56328
+> >  1067   0.015226 192.168.122.198 =E2=86=92 192.168.122.1 TCP 54 [TCP Ze=
+roWindow] 5201 =E2=86=92 34482 [ACK] Seq=3D1 Ack=3D1611090146 Win=3D0 Len=
+=3D0
+> >  1068   6.298138 fe80::44b3:f5ff:fe86:c529 =E2=86=92 ff02::2      ICMPv=
+6 70 Router Solicitation from 46:b3:f5:86:c5:29
 > >
-> > kernel test robot noticed "packetdrill.packetdrill/gtests/net/tcp/cubic=
-/cubic-bulk-166k-idle-restart_ipv4-mapped-v6.fail" on:
+> > ...and then the silence, 192.168.122.198 never announces that its
+> > window is not zero, so the peer gives up 15 seconds later:
 > >
-> > (
-> > in fact, there are other failed cases which can pass on parent:
+> > $ tshark -r iperf3_jon_zero_window_cut.pcap -td -Y 'frame.number in { 1=
+069 .. 1070 }'
+> >  1069   8.709313 192.168.122.1 =E2=86=92 192.168.122.198 TCP 55 34466 =
+=E2=86=92 5201 [ACK] Seq=3D166 Ack=3D5 Win=3D36864 Len=3D1
+> >  1070   0.008943 192.168.122.198 =E2=86=92 192.168.122.1 TCP 54 5201 =
+=E2=86=92 34482 [FIN, ACK] Seq=3D1 Ack=3D1611090146 Win=3D778240 Len=3D0
 > >
-> > 4395a44acb15850e 25c1a9ca53db5780757e7f53e68
-> > ---------------- ---------------------------
-> >        fail:runs  %reproduction    fail:runs
-> >            |             |             |
-> >            :6          100%           6:6     packetdrill.packetdrill/g=
-tests/net/tcp/cubic/cubic-bulk-166k-idle-restart_ipv4-mapped-v6.fail
-> >            :6          100%           6:6     packetdrill.packetdrill/g=
-tests/net/tcp/cubic/cubic-bulk-166k-idle-restart_ipv4.fail
-> >            :6          100%           6:6     packetdrill.packetdrill/g=
-tests/net/tcp/cubic/cubic-bulk-166k-idle-restart_ipv6.fail
-> >            :6          100%           6:6     packetdrill.packetdrill/g=
-tests/net/tcp/cubic/cubic-bulk-166k_ipv4-mapped-v6.fail
-> >            :6          100%           6:6     packetdrill.packetdrill/g=
-tests/net/tcp/cubic/cubic-bulk-166k_ipv4.fail
-> >            :6          100%           6:6     packetdrill.packetdrill/g=
-tests/net/tcp/cubic/cubic-bulk-166k_ipv6.fail
->
-> Thanks for the report. I remembered that Mahdi once modified/adjusted
-> some of them, please see the link[1].
->
-> [1]: https://lore.kernel.org/all/223960459.607292.1737102176209@mail.yaho=
-o.com/
->
-> I think we're supposed to update them altogether?
+> > Data in frame #1069 is iperf3 ending the test.
+> >
+> > This didn't happen before e2142825c120 ("net: tcp: send zero-window
+> > ACK when no memory") so it's a relatively recent (17 months) regression.
+> >
+> > It actually looks pretty simple (and rather serious) to me.
+>=20
+> With all that, it should be pretty easy to cook a packetdrill test, right=
+ ?
 
-Should the updated pkt scripts target net or net-next tree, BTW?
+Not really :( because to reproduce this exact condition you need to
+somehow get the right amount of memory pressure so that you can
+actually establish a connection, start the transfer, and then exhaust
+the receive buffer at the right moment.
 
-Thanks,
-Jason
+And packetdrill doesn't do that. Sure, it would be great if it did, and
+it's probably a nice feature to implement... given enough time. Given
+less time, I guess fixing regressions has a higher priority.
 
->
-> Thanks,
-> Jason
->
-> > )
-> >
-> > commit: 25c1a9ca53db5780757e7f53e688b8f916821baa ("tcp_cubic: fix incor=
-rect HyStart round start detection")
-> > https://git.kernel.org/cgit/linux/kernel/git/torvalds/linux.git master
-> >
-> > [test failed on linus/master      405057718a1f9074133979a9f2ff0c9fa4a19=
-948]
-> > [test failed on linux-next/master 5ffa57f6eecefababb8cbe327222ef171943b=
-183]
-> >
-> > in testcase: packetdrill
-> > version: packetdrill-x86_64-8d63bbc-1_20250115
-> > with following parameters:
-> >
-> >
-> > config: x86_64-rhel-9.4-func
-> > compiler: gcc-12
-> > test machine: 8 threads 1 sockets Intel(R) Core(TM) i7-4770 CPU @ 3.40G=
-Hz (Haswell) with 8G memory
-> >
-> > (please refer to attached dmesg/kmsg for entire log/backtrace)
-> >
-> >
-> > If you fix the issue in a separate patch/commit (i.e. not just a new ve=
-rsion of
-> > the same patch/commit), kindly add following tags
-> > | Reported-by: kernel test robot <oliver.sang@intel.com>
-> > | Closes: https://lore.kernel.org/oe-lkp/202501261315.c6c7dbb4-lkp@inte=
-l.com
-> >
-> >
-> >
-> > FAIL [/lkp/benchmarks/packetdrill/gtests/net/tcp/cubic/cubic-bulk-166k-=
-idle-restart.pkt (ipv4-mapped-v6)]
-> > stdout:
-> > 20
-> > 30
-> > 36
-> > stderr:
-> > FAIL [/lkp/benchmarks/packetdrill/gtests/net/tcp/cubic/cubic-bulk-166k-=
-idle-restart.pkt (ipv6)]
-> > stdout:
-> > 20
-> > 30
-> > 36
-> > stderr:
-> >
-> > ...
-> >
-> > FAIL [/lkp/benchmarks/packetdrill/gtests/net/tcp/cubic/cubic-bulk-166k-=
-idle-restart.pkt (ipv4)]
-> > stdout:
-> > 20
-> > 30
-> > 36
-> > stderr:
-> >
-> > ...
-> >
-> > FAIL [/lkp/benchmarks/packetdrill/gtests/net/tcp/cubic/cubic-bulk-166k.=
-pkt (ipv4)]
-> > stdout:
-> > 20
-> > 30
-> > 36
-> > stderr:
-> >
-> > ...
-> >
-> > FAIL [/lkp/benchmarks/packetdrill/gtests/net/tcp/cubic/cubic-bulk-166k.=
-pkt (ipv4-mapped-v6)]
-> > stdout:
-> > 20
-> > 30
-> > 36
-> > stderr:
-> >
-> > ...
-> >
-> > FAIL [/lkp/benchmarks/packetdrill/gtests/net/tcp/cubic/cubic-bulk-166k.=
-pkt (ipv6)]
-> > stdout:
-> > 20
-> > 30
-> > 36
-> > stderr:
-> >
-> >
-> >
-> > The kernel config and materials to reproduce are available at:
-> > https://download.01.org/0day-ci/archive/20250126/202501261315.c6c7dbb4-=
-lkp@intel.com
-> >
-> >
-> >
-> > --
-> > 0-DAY CI Kernel Test Service
-> > https://github.com/intel/lkp-tests/wiki
-> >
+One could perhaps tweak sk->sk_rcvbuf as you suggested but that just
+artificially reproduces one part of it. It's not a really fitting test.
+For example: when would you increase it back?
+
+> packetdrill tests are part of tools/testing/selftests/net/ already, we
+> are not asking for something unreasonable.
+
+I would agree, in general, except that I don't see a way to craft a
+test like this with packetdrill. At least not trivially with the
+current feature set.
+
+On top of that, this is not a new feature, it's a fix for a regression
+(that was introduced without adding any test, of course). And the fix
+itself was definitely tested, just not with packetdrill.
+
+Requesting that tests are 1. automated and 2. written with a specific
+tool is something I can quite understand for general convenience, but
+I don't think it always makes sense.
+
+Especially as this fix has been blocked for about 9 months now because
+of the fact that automating a test for it is quite hard.
+
+--=20
+Stefano
+
 
