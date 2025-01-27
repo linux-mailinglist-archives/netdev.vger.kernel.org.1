@@ -1,218 +1,72 @@
-Return-Path: <netdev+bounces-161163-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-161164-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id BB7A6A1DB6B
-	for <lists+netdev@lfdr.de>; Mon, 27 Jan 2025 18:39:44 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 58F31A1DB7F
+	for <lists+netdev@lfdr.de>; Mon, 27 Jan 2025 18:42:52 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 60124166925
-	for <lists+netdev@lfdr.de>; Mon, 27 Jan 2025 17:39:40 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B72101622F0
+	for <lists+netdev@lfdr.de>; Mon, 27 Jan 2025 17:42:50 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3F44218F2EF;
-	Mon, 27 Jan 2025 17:39:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 11F0D189905;
+	Mon, 27 Jan 2025 17:42:49 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="dXAJ2csS"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="oFX358ef"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0E78318E377;
-	Mon, 27 Jan 2025 17:39:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E2055166F1A
+	for <netdev@vger.kernel.org>; Mon, 27 Jan 2025 17:42:48 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1737999565; cv=none; b=Opeqc/T4eRwvl6fqrlcq2r1RCBAfEfRcch0CouaZ8Hu2XfqPDgA8eL3uAmLNQCbQAXZcJB8i3sTg3+D5d/zHiFrO+YyryJ8pDIb3UkSkQ45efxQkJMC101EjWNq/Pf4OAyFB1aEdgZ5HBjujneJIJ2A4tD3jtD8uysxIlFokSc4=
+	t=1737999769; cv=none; b=c9T7+UCO2rXUt90TuTUHrLhinHM02D1mD5FFgbFZUxzu72rOt8p6N1gSneqhT/9hfSsRDPQEw77iCgEMXTQB717HDzreLKaXhcyfleojR1P5VCNxY6KtAg3P7qR2zfUlMHdBHKQM/gICaOj6ONAGcbH1f5zGTkvW07roEVDKTtY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1737999565; c=relaxed/simple;
-	bh=wpuUfk3xJ+7ZFWpq2VOqbBzfkPi5/HqlF4YuWWwmh54=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=MSE+B3Sb8MvhYStddTsg5ZRAzHF/KPm5F6Tkf0ohK/NspbcaQXhnM6rEkZVWti8IN26tk2AkrxpDk9fknP2BEGay10V2cEKN+tqBjtkG8UTeEY3Xef+3BudL/wugTTIUlaTJvV6AyoXLKUYHbNLSR6gu+d+gyxdJ5MLwmCGbfdY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=dXAJ2csS; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 413A7C4CEE3;
-	Mon, 27 Jan 2025 17:39:22 +0000 (UTC)
+	s=arc-20240116; t=1737999769; c=relaxed/simple;
+	bh=+GaeAUSMWZ4A3X5PbuQRiRWRpQk3A6nipAojdcxufRU=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=pSDe6tIoy9WWbt+kdZAlUTNuk3mkxxoZI/51lbmGwD//apr1X5yteyjJ4DB5QrN1iUN7LqsH0Ro60JtJAcxRAnIGeM/mK4fVM3SfTo7Qd6TqcVNJdKTjeiNaDBz6SSOp+AFgL3ytjZq6qs42dQZpQbq93a9ZrvJsUyXnP3LynsI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=oFX358ef; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1FC78C4CED2;
+	Mon, 27 Jan 2025 17:42:48 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1737999564;
-	bh=wpuUfk3xJ+7ZFWpq2VOqbBzfkPi5/HqlF4YuWWwmh54=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=dXAJ2csS6nLZ736vpPLD7SpDUWrmtf3jUP5hxR31CarIAdXyZ1qGtVU3m+nZp3GFM
-	 nIbA1lPdklw9oC4WGVYGXHCUtJV9H1KIHuhwehGHstPi4Nic7IPIvRqEy6ffpEidH0
-	 0Bz/XL3Xfqj1Afrn7jH6Jt1Fv8adFc9tYEOPHlnMcHqX3zf1yTpfufKpcPvbtrPrLT
-	 k+xwbUapVy28bVffprEn90InQqoR5lvWLOUtScphKMgMwCyMuv37hsbxkHGJGaQG5c
-	 mGp7v9tro4eYfNf0/r8/gtPGuCjgPYbPIuUcQ+12zd30twgyJTTVyM6q7Zf23YZXs0
-	 8r9hEB4L+Wd5Q==
-Message-ID: <8392dd6b-1c20-4f7b-b879-6e940f2dcbc0@kernel.org>
-Date: Mon, 27 Jan 2025 18:39:11 +0100
+	s=k20201202; t=1737999768;
+	bh=+GaeAUSMWZ4A3X5PbuQRiRWRpQk3A6nipAojdcxufRU=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=oFX358efwc3DfsvWJbikh7ppR1u7iZRGB6Zru4GWJlTtv77C9Ul4Jt2J74YXOfPQf
+	 ncoJ7EJNbE0X/fHViuJlkLmUB2NluvFFwysVTjVeIXrU4Qsu66MOCeXDDH8JTSZto1
+	 7LikANewMHFw/HTSyhkRbUFR7Gu3vUH5tCYzS9+pzbFHKTk4bXRcPzg3k/TeTHlVf0
+	 Msp+6vlyCr6HD4DW3zmHIKoBEJ0UNJ5CF+CqEXMZ7D3UQq3Dfh+Gg/igwlwquPaCgy
+	 WdC47emUXm6K1It8ccEB4vvRf8+D2LKZfu7II1sCTm0V94b/CrFCGO0Y50SuOaEYBl
+	 qGQ2GRWPfJuXQ==
+Date: Mon, 27 Jan 2025 09:42:47 -0800
+From: Jakub Kicinski <kuba@kernel.org>
+To: Przemek Kitszel <przemyslaw.kitszel@intel.com>
+Cc: "Singh, Krishneil K" <krishneil.k.singh@intel.com>,
+ "intel-wired-lan@lists.osuosl.org" <intel-wired-lan@lists.osuosl.org>,
+ "Emil Tantilov" <emil.s.tantilov@intel.com>, "netdev@vger.kernel.org"
+ <netdev@vger.kernel.org>, Ahmed Zaki <ahmed.zaki@intel.com>
+Subject: Re: [PATCH iwl-net v1 0/4] fix locking issue
+Message-ID: <20250127094247.40b169a1@kernel.org>
+In-Reply-To: <95288bb1-8931-4d18-b8f6-25a4f6148afe@intel.com>
+References: <20241105184859.741473-1-tarun.k.singh@intel.com>
+	<MW4PR11MB5911F6BAECF5DAC79199B362BAEC2@MW4PR11MB5911.namprd11.prod.outlook.com>
+	<95288bb1-8931-4d18-b8f6-25a4f6148afe@intel.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird Beta
-Subject: Re: [GIT PULL] Networking for v6.13-rc7
-To: Catalin Marinas <catalin.marinas@arm.com>
-Cc: torvalds@linux-foundation.org, davem@davemloft.net,
- netdev@vger.kernel.org, linux-kernel@vger.kernel.org, pabeni@redhat.com,
- Guo Weikang <guoweikang.kernel@gmail.com>,
- Andrew Morton <akpm@linux-foundation.org>, Jakub Kicinski <kuba@kernel.org>,
- Andrea Righi <arighi@nvidia.com>, Patrick Wang <patrick.wang.shcn@gmail.com>
-References: <20250109182953.2752717-1-kuba@kernel.org>
- <173646486752.1541533.15419405499323104668.pr-tracker-bot@kernel.org>
- <20250116193821.2e12e728@kernel.org> <Z4uwbqAwKvR4_24t@arm.com>
- <Z45i4YT1YRccf4dH@arm.com> <20250120094547.202f4718@kernel.org>
- <Z4-AYDvWNaUo-ZQ7@arm.com> <20250121074218.52ce108b@kernel.org>
- <Z5AHlDLU6I8zh71D@arm.com> <426d4476-e3b4-4a95-84a1-850015651ee6@kernel.org>
- <Z5eX4BjErq8FsNIa@arm.com>
-Content-Language: en-GB
-From: Matthieu Baerts <matttbe@kernel.org>
-Autocrypt: addr=matttbe@kernel.org; keydata=
- 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
- lzVbFe7fduHbABmYz9cefQpO7wDE/Q==
-Organization: NGI0 Core
-In-Reply-To: <Z5eX4BjErq8FsNIa@arm.com>
-Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
 
-Hi Catalin,
+On Mon, 27 Jan 2025 09:11:41 +0100 Przemek Kitszel wrote:
+> @netdev
+> I would like to consider adding "in reset" state for the netdev,
+> to prevent such behavior in more civilized way though.
 
-On 27/01/2025 15:27, Catalin Marinas wrote:
-> On Thu, Jan 23, 2025 at 06:11:16PM +0100, Matthieu Baerts wrote:
->> On 21/01/2025 21:46, Catalin Marinas wrote:
->>> On Tue, Jan 21, 2025 at 07:42:18AM -0800, Jakub Kicinski wrote:
->>>> On Tue, 21 Jan 2025 11:09:20 +0000 Catalin Marinas wrote:
->>>>>>> Hmm, I don't think this would make any difference as kmemleak does scan
->>>>>>> the memblock allocations as long as they have a correspondent VA in the
->>>>>>> linear map.
->>>>>>>
->>>>>>> BTW, is NUMA enabled or disabled in your .config?  
->>>>>>
->>>>>> It's pretty much kernel/configs/debug.config, with virtme-ng, booted
->>>>>> with 4 CPUs. LMK if you can't repro with that, I can provide exact
->>>>>> cmdline.  
->>>>>
->>>>> Please do. I haven't tried to reproduce it yet on x86 as I don't have
->>>>> any non-arm hardware around. It did not trigger on arm64. I think
->>>>> virtme-ng may work with qemu. Anyway, I'll be off from tomorrow until
->>>>> the end of the week, so more likely to try it next week.
->>>>
->>>> vng -b -f tools/testing/selftests/net/config -f kernel/configs/debug.config
->>>>
->>>> vng -r arch/x86_64/boot/bzImage --cpus 4 --user root -v --network loop
->>>
->>> Great, thanks. I managed to reproduce it
->>
->> Thank you for investigating this issue!
->>
->> Please note that on our side with MPTCP, I can only reproduce this issue
->> locally, but not from our CI on GitHub Actions. The main difference is
->> the kernel (6.8 on the CI, 6.12 here) and the fact our CI is launching
->> virtme-ng from a VM. The rest should be the same.
-> 
-> It won't show up in 6.8 as kmemleak did not report per-cpu allocation
-> leaks. But even with the latest kernel, it's probabilistic, some data
-> somewhere may look like a pointer and not be reported (I couldn't
-> reproduce it on arm64).
-
-My bad, I was talking about the host kernel. Or to be precise, I should
-say the kernel starting the test VM running a >=v6.13-rc7 kernel.
-
-> It turns out to be a false positive. The __percpu pointers are
-> referenced from node_data[]. The latter is populated in
-> alloc_node_data() and kmemleak registers the pg_data_t object from the
-> memblock allocation. However, due to an incorrect pfn range check
-> introduced by commit 84c326299191 ("mm: kmemleak: check physical address
-> when scan"), we ignore the node_data[0] allocation. Some printks in
-> alloc_node_data() show:
-> 
-> 	nd_pa = 0x3ffda140
-> 	nd_size = 0x4ec0
-> 	min_low_pfn = 0x0
-> 	max_low_pfn = 0x3ffdf
-> 	nd_pa + nd_size == 0x3ffdf000
-> 
-> So the "PHYS_PFN(nd_pa + nd_size) >= max_low_pfn" check in kmemleak is
-> true and the whole pg_data_t object ignored (not scanned). The __percpu
-> pointers won't be detected. The fix is simple:
-> 
-> diff --git a/mm/kmemleak.c b/mm/kmemleak.c
-> index 820ba3b5cbfc..bb7d61fc4da3 100644
-> --- a/mm/kmemleak.c
-> +++ b/mm/kmemleak.c
-> @@ -1689,7 +1689,7 @@ static void kmemleak_scan(void)
->  			unsigned long phys = object->pointer;
-> 
->  			if (PHYS_PFN(phys) < min_low_pfn ||
-> -			    PHYS_PFN(phys + object->size) >= max_low_pfn)
-> +			    PHYS_PFN(phys + object->size) > max_low_pfn)
->  				__paint_it(object, KMEMLEAK_BLACK);
->  		}
-
-Thank you for having looked at that and provided a fix quickly!
-
-I confirm that it fixes the issue on my side! Just in case you want a
-tested-by tag:
-
-Tested-by: Matthieu Baerts (NGI0) <matttbe@kernel.org>
-
-> I'll post this as a proper patch and I found some minor things to clean
-> up in kmemleak in the meantime.
-
-Great!
-
->>> (after hacking vng to allow x86_64 as non-host architecture).
->>
->> Do not hesitate to report this issue + hack on vng's bug tracker :)
-> 
-> Done ;)
-> 
-> https://github.com/arighi/virtme-ng/issues/223
-
-Thank you! :)
-
-Cheers,
-Matt
--- 
-Sponsored by the NGI0 Core fund.
-
+Can you provide more context? We already have netif_device_detach()
 
