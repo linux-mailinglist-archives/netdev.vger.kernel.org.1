@@ -1,77 +1,96 @@
-Return-Path: <netdev+bounces-161223-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-161224-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4750BA20154
-	for <lists+netdev@lfdr.de>; Tue, 28 Jan 2025 00:04:15 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 27A04A2016A
+	for <lists+netdev@lfdr.de>; Tue, 28 Jan 2025 00:10:19 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 946CB7A20E5
-	for <lists+netdev@lfdr.de>; Mon, 27 Jan 2025 23:04:04 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 65CCE188053A
+	for <lists+netdev@lfdr.de>; Mon, 27 Jan 2025 23:10:23 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 71FE31B4F0C;
-	Mon, 27 Jan 2025 23:04:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7858F1DD877;
+	Mon, 27 Jan 2025 23:10:14 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="txqCkd5m"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="pXgZ4SfV"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 470301EB2A;
-	Mon, 27 Jan 2025 23:04:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4D3681DD0EF;
+	Mon, 27 Jan 2025 23:10:14 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1738019048; cv=none; b=hRg8RfKWHSxLJv6j3Ys7mpBNBCirs6yd24+IMDTG2qQjsYGu9qwBevhGfYX7KfJUS/STxz0AxEGD19ivpczPOykFoq4Y3LZAA5R3ooed7uyp2PxOLtGc0gbXFLmdcdv6BoHvtiqZEpxWrodABXFQzopsNveVtOcHiT1GlDZMrIw=
+	t=1738019414; cv=none; b=op0K/WjIQMAGIDBXlBUSDgDGcIBLpLjRUtFW0FpZjHmedDhXRba+j4S5tdA2dD2VQmQE0relkkVo4Z8GfTEm+wgSgqHBsdjgPwm7mE79nD9XMxqcuU5tpJsatuViJhOeV4w/74nkFgXQT9P6tBrjf02EIGVbIEoiBbBhQO4I0go=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1738019048; c=relaxed/simple;
-	bh=S+q9E81fwjvKrr5avSJ7WQLIaON0+6nn+3UXi0+nD6M=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=W6OJzSDdzL9VlMHJhezt6ODxS5rnu0zaxl5XcbMqj6Fy8cwtiTFKReJyd1XJbL7Q01StfNkMIORxG39ZE2nk9UpN93TxP8MqtQJy0FIoN4NETOI6eYZz/atnHWLvuhtmt8fAsfrgqCaZmCRnrOnPdQPH+xKSb9vQSlzXoFBR3GM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=txqCkd5m; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5EEBFC4CEE0;
-	Mon, 27 Jan 2025 23:04:07 +0000 (UTC)
+	s=arc-20240116; t=1738019414; c=relaxed/simple;
+	bh=mDgQXiGRsNxUmlPS3V5RfuoevqF1jp8XRilu/ivQirM=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=N8dIwY1ImoHP8uARRyD2Pavvz6NPTsFDjwQHkB+Ezzprmu8zw10+jWIx5Kau8nAhUTnHvXhBbYuGCX2o5xyHJ3CI32dkEw8bmj/XNOHKG2CJXPMrZhy38vgyan8+BPbJ0GbmBHCK2Jn5Nk4hRkOqTXxobPx0NdeBPzFXDe9f2gc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=pXgZ4SfV; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id D8429C4CED2;
+	Mon, 27 Jan 2025 23:10:13 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1738019047;
-	bh=S+q9E81fwjvKrr5avSJ7WQLIaON0+6nn+3UXi0+nD6M=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=txqCkd5mzbFjjJ/P2y0kqLzWWIBI3E6S1lJeUqLTPpNlbODCk8lVD8blRDdt2lbaI
-	 /Bj/W6NtS5N34ytC7TXtBQ4wVV1zj+oZCASaNknHjt+ytUzx4AO+3m7/J9UQCjuHOF
-	 QqiHQEwaPGxp9c0Fnim9skvlMIphBO+rUQ2ArFyX4hiuOHYPcLGYTGd5mT/4JLW7yV
-	 ZkCNoQEtGs9c8ArHA7uHNtydrfqOmFV2sUUg89GrKYSlPiGdbS0Ea2tUILwMDxmJzg
-	 7LtolK7QwAK1lWO9ctrhcr4u831X80WXRoFevMS8f6JqglajQthB1FxD2HKZ2fGYAZ
-	 u8d7ZrIgKn75g==
-Date: Mon, 27 Jan 2025 15:04:06 -0800
-From: Jakub Kicinski <kuba@kernel.org>
-To: Matthieu Baerts <matttbe@kernel.org>, Jan Stancek <jstancek@redhat.com>
-Cc: pshelar@ovn.org, davem@davemloft.net, edumazet@google.com,
- pabeni@redhat.com, liuhangbin@gmail.com, linux-kselftest@vger.kernel.org,
- netdev@vger.kernel.org
-Subject: Re: [PATCH net] selftests: net/{lib,openvswitch}: extend CFLAGS to
- keep options from environment
-Message-ID: <20250127150406.0d97a181@kernel.org>
-In-Reply-To: <26ad0900-bd9d-464e-be9f-c1806b96c971@kernel.org>
-References: <3d173603ee258f419d0403363765c9f9494ff79a.1737635092.git.jstancek@redhat.com>
-	<26ad0900-bd9d-464e-be9f-c1806b96c971@kernel.org>
+	s=k20201202; t=1738019413;
+	bh=mDgQXiGRsNxUmlPS3V5RfuoevqF1jp8XRilu/ivQirM=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=pXgZ4SfVcBD9gIcDXZYf/qMtQIX3dBq/tQG4lntDSWK2l1xPlWC+fxYKoLmJ3zss+
+	 QmcS+67P5UgrL2M84KPBTCrVZAr8B8qTrRuyubi0dBt1HUv0atEflXs1hYvOgix1Qz
+	 ilHJJYRM7atA7YkYXtkbunMnwGLumz9nTvMub0ZTHZjjY8HBwLMGl0iUNZ2s1cCWc6
+	 /qF2Yn8WaCQhZCnUU9giPcdyZqviIzWfpyoMzNyLbFYS6/5SV2km+X6WkO0PGn2Jy/
+	 0XmAWwgm+PootgzsY0t5BPsrFJV74Fox0zbQYGgNFy1lFhK4I2MXHT6TF8/LcnY07j
+	 C2SKbrFOc9/sw==
+Received: from [10.30.226.235] (localhost [IPv6:::1])
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id AEF21380AA63;
+	Mon, 27 Jan 2025 23:10:40 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH net v3] net: phy: c45-tjaxx: add delay between MDIO write and
+ read in soft_reset
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <173801943950.3253418.6560196118515385560.git-patchwork-notify@kernel.org>
+Date: Mon, 27 Jan 2025 23:10:39 +0000
+References: <AM8P250MB0124D258E5A71041AF2CC322E1E32@AM8P250MB0124.EURP250.PROD.OUTLOOK.COM>
+In-Reply-To: <AM8P250MB0124D258E5A71041AF2CC322E1E32@AM8P250MB0124.EURP250.PROD.OUTLOOK.COM>
+To: Milos Reljin <milos_reljin@outlook.com>
+Cc: andrei.botila@oss.nxp.com, andrew@lunn.ch, hkallweit1@gmail.com,
+ linux@armlinux.org.uk, davem@davemloft.net, edumazet@google.com,
+ kuba@kernel.org, pabeni@redhat.com, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org, milos.reljin@rt-rk.com
 
-On Thu, 23 Jan 2025 13:51:27 +0100 Matthieu Baerts wrote:
-> > -CFLAGS =  -Wall -Wl,--no-as-needed -O2 -g
-> > +CFLAGS +=  -Wall -Wl,--no-as-needed -O2 -g  
+Hello:
+
+This patch was applied to netdev/net.git (main)
+by Jakub Kicinski <kuba@kernel.org>:
+
+On Fri, 24 Jan 2025 10:41:02 +0000 you wrote:
+> In application note (AN13663) for TJA1120, on page 30, there's a figure
+> with average PHY startup timing values following software reset.
+> The time it takes for SMI to become operational after software reset
+> ranges roughly from 500 us to 1500 us.
 > 
-> (small detail: I guess the double whitespaces after the '=' were there
-> to keep the alignment with the next line, so probably there should be
-> only one now, but I don't think this alone is enough to ask for a v2!)
+> This commit adds 2000 us delay after MDIO write which triggers software
+> reset. Without this delay, soft_reset function returns an error and
+> prevents successful PHY init.
+> 
+> [...]
 
-Adjusted when applying in both patches, so the bot will probably not
-respond.
+Here is the summary with links:
+  - [net,v3] net: phy: c45-tjaxx: add delay between MDIO write and read in soft_reset
+    https://git.kernel.org/netdev/net/c/bd1bbab71760
 
-Thanks for these fixes!
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
+
+
 
