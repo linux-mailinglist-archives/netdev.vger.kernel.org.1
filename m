@@ -1,195 +1,117 @@
-Return-Path: <netdev+bounces-161116-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-161117-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 68507A1D7A2
-	for <lists+netdev@lfdr.de>; Mon, 27 Jan 2025 15:03:18 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id AE5CBA1D7E1
+	for <lists+netdev@lfdr.de>; Mon, 27 Jan 2025 15:14:51 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id AD9DC3A5248
-	for <lists+netdev@lfdr.de>; Mon, 27 Jan 2025 14:03:10 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id E528C1886482
+	for <lists+netdev@lfdr.de>; Mon, 27 Jan 2025 14:14:55 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9127925A643;
-	Mon, 27 Jan 2025 14:03:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EFBCA1FE467;
+	Mon, 27 Jan 2025 14:14:47 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="cVk02v4z"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="dwafEZOm"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wr1-f47.google.com (mail-wr1-f47.google.com [209.85.221.47])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CFF685672
-	for <netdev@vger.kernel.org>; Mon, 27 Jan 2025 14:03:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 42F5815747D
+	for <netdev@vger.kernel.org>; Mon, 27 Jan 2025 14:14:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.47
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1737986594; cv=none; b=RsB6rNmuwQm4QSLnYXNuA+GiL3hyB9kz0UafYj8o8tfx76d1I1kZLE+XUz25tfUVQsW+XghfxZWPNersdoqR35Pwwpqpd+y6EIh9D2+1wdgbzVoYEXaldq43jg7NnH6+scJtJTcB+gCzjMIrA5lUH6qOB8zJ0EQ1KwC9g+GcaME=
+	t=1737987287; cv=none; b=eX6AUtykNJYazKIl3njfkQqEje0ss1e3aJSwLEGYJxaM8tBlJ+xVswlyRPDzDZ3PlaEY6jHOxNnOw3kTRMnzkhoKMyL9JGyJ2IEYkG3IhzSIR6+44u0qrc/BM/XbvRXxKk3hJSlWYhlaQ9RKulFDLD9JZk9YlB4jLkWfL4bFIns=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1737986594; c=relaxed/simple;
-	bh=UYU4dzIJMyLfJHKnKewgJlcxIYZnzejpina/0JOwPgI=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=IAr0uy42Y/O6UDZdVqYM1foIMo+yhPcxW/GPSFHUqQeuQAlwbyEogXktKVuzfuydjbMTp0yHNEqJmWwdd9zazEAc7Ey3G4lEN84DuppetkgQWPChD7g6vuU5tqphw8YhnpRS7oPQLoLHHGwZIx1/fZS8vzWsL1REp9acz8x4s7c=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=cVk02v4z; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1737986591;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=2yEaKPHLKMOA5meZrsgLJjdr3xqDqApW5Y4VWczVlm4=;
-	b=cVk02v4ztQ0qOTOQtdRkWDFYkdhR8ggqq+fJsWwGpoF4lH09r3KKEomOWl5HIV0WvHD4Q9
-	kcyenH+rZBqkzaeVUH26nlPyF5lMhfiyC1J5bRI1AVRtPLybp2ZZEdLp4ctXeyzJXXhzt6
-	txxR9eSWNTgwzWuhuVX6t1uDaA+uilg=
-Received: from mail-lf1-f69.google.com (mail-lf1-f69.google.com
- [209.85.167.69]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-149-xGKjPJrAPb-B8tZmG1t8BQ-1; Mon, 27 Jan 2025 09:03:10 -0500
-X-MC-Unique: xGKjPJrAPb-B8tZmG1t8BQ-1
-X-Mimecast-MFC-AGG-ID: xGKjPJrAPb-B8tZmG1t8BQ
-Received: by mail-lf1-f69.google.com with SMTP id 2adb3069b0e04-5401af853fbso2331931e87.3
-        for <netdev@vger.kernel.org>; Mon, 27 Jan 2025 06:03:10 -0800 (PST)
+	s=arc-20240116; t=1737987287; c=relaxed/simple;
+	bh=q0hnqzxRKJe1xlk3rjc0tgYufyPj0tvzGIF+8G1Tygk=;
+	h=Subject:To:Cc:References:From:Message-ID:Date:MIME-Version:
+	 In-Reply-To:Content-Type; b=kGIr/1iSsUpjmyIqcxycdSTNOja26wCfyvBdxiCd4DLQwtzf9ArM4lW+Oe+nyNHN1sdiLzThKR6lmTkWMSwJd6ggc1uikoSSSBLc86raI4RTXn5dzBHBIWew/be66zNbSszI3GNT1wRgWfBpeMG8aD1TkLvwge8YP6RSc9OzmKQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=dwafEZOm; arc=none smtp.client-ip=209.85.221.47
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-wr1-f47.google.com with SMTP id ffacd0b85a97d-3862d161947so2312550f8f.3
+        for <netdev@vger.kernel.org>; Mon, 27 Jan 2025 06:14:45 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1737987284; x=1738592084; darn=vger.kernel.org;
+        h=content-transfer-encoding:content-language:in-reply-to:mime-version
+         :user-agent:date:message-id:from:references:cc:to:subject:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=b7OEX1FEH30CiSTxvGdqR6kzrrVdogX9xTrr5eYHX4c=;
+        b=dwafEZOmWt4OvkdacyVGTQQ8BVHLTAv46RZPAb7QpYDJYHp5EUqfWs11W2X1pa/VnT
+         qNH5wrJH9xtnJ1rb+kCUxPv+pJATCLUmfGHno15hUAWjcAA0BSDLbMoi1/fbd+VOxIZU
+         +fUN+VrqwezqdLuVD7CE9ADO7E8HNlt59OmyE0k5n5rJJhHAjxIcbbicsxBkNMh0xc0g
+         KlN06rEm2NVdU4oYispjh+dYKwVfFjE4KdjNgVCZxdnYIrutA7nl8sods4VypNsTJOIR
+         yH0OaCcFCn14DDUpUEq7ZVU5pBiJJJcukFUSRVsYXHy0fSZ6OwVADdC/AhR9LwqpCMxi
+         xaRA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1737986589; x=1738591389;
-        h=content-transfer-encoding:mime-version:organization:references
-         :in-reply-to:message-id:subject:cc:to:from:date:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=2yEaKPHLKMOA5meZrsgLJjdr3xqDqApW5Y4VWczVlm4=;
-        b=hM8h1NP79NxN0Xvzpd+WWXI0Qpw1/aGsAIb7Kpq0EiPxpt3XDoffCyfws66/zdAuBE
-         14E/iPTc5tokSaAhobuIcihIZEuZEgp+teKTNa05DtGmphuxR7SLGPTfhEAad7jRRuIo
-         JbURvk+fDruIxt+p5wqIhMQ6EtKse0mn1f1DH+G/qGDTU3DH4hT6AS119hl6LhBVH+zv
-         ns8wqq7Kfl/KIJ4TkDw/JdUoR+JQF/4OK8XYC1asU6CluD6qmTwhF0rHJE+JcRyNy5t2
-         FUz1Sbp4Ljgu/PYtwzNH19wRdjS4Se4L0614L/lZgUO4X6KxNeOQA7XfFighuvFlAXEu
-         NxcA==
-X-Forwarded-Encrypted: i=1; AJvYcCVzQld7KnJQG77tbVBLL7z0r+BkWADcahyjAUE2BEcwPl3PploJ7+R4cpUjDqvFtd68qK3iuM8=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yw2700234nyKiSkcYsIacWW1h6kA3OVYkJFDGGrG5QqQC/vl4Kp
-	69FoQKa7OkrtU+DYSBcXqRRjdzJ6eRBQ7JcivyxT9ADXek0pZcwEDHsJB7YfcwJTt++BTdunNEO
-	fmtSbFOg+XJXNr85z+uAGGID05Hb4osdN5toz8eXALM5AqzjYUwMaFw==
-X-Gm-Gg: ASbGncuxBLE+mwox1BbUhuyVtipwarRvB1qD+f7PGX0InE9CPeNqrjjbTYfg4zfEHfx
-	3erPnLat4njvFUtZlHok6z50FNGGmbGlzSJH5EGp9fsGKHBRFtC4urxIZmwzoKrKcvkO3scfh62
-	OhpC1gpZKl6+wglmooQNUbOqR3wO44LWEGSSfoLRATSZd3AZDUIPEvsI7sKMUJLy9KfS2UD8pwe
-	DO98vbkY5gOO9HliaMc/JOJwN5vRwJiz2TdU1fPv8CFkTiFwPeoInY3Qs2M+w/VPbM4lxINzhI+
-	uMiKijcUViS6ZlnR
-X-Received: by 2002:a05:6512:1154:b0:541:1c48:8bf1 with SMTP id 2adb3069b0e04-5439c24108fmr13525734e87.13.1737986588497;
-        Mon, 27 Jan 2025 06:03:08 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IFPdnM5+tvUc7QDNtq/WnuXpbAUzEdHRTJutlDgDEGZNmEe8Hq5/yP4BmMPPqY0Qi/KewVCbg==
-X-Received: by 2002:a05:6512:1154:b0:541:1c48:8bf1 with SMTP id 2adb3069b0e04-5439c24108fmr13525547e87.13.1737986586733;
-        Mon, 27 Jan 2025 06:03:06 -0800 (PST)
-Received: from maya.myfinge.rs (ifcgrfdd.trafficplex.cloud. [2a10:fc81:a806:d6a9::1])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-438bd47f355sm131207135e9.4.2025.01.27.06.03.05
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 27 Jan 2025 06:03:06 -0800 (PST)
-Date: Mon, 27 Jan 2025 15:03:03 +0100
-From: Stefano Brivio <sbrivio@redhat.com>
-To: Menglong Dong <menglong8.dong@gmail.com>
-Cc: Jason Xing <kerneljasonxing@gmail.com>, Jon Maloy <jmaloy@redhat.com>,
- Eric Dumazet <edumazet@google.com>, Neal Cardwell <ncardwell@google.com>,
- netdev@vger.kernel.org, davem@davemloft.net, kuba@kernel.org,
- passt-dev@passt.top, lvivier@redhat.com, dgibson@redhat.com,
- eric.dumazet@gmail.com
-Subject: Re: [net,v2] tcp: correct handling of extreme memory squeeze
-Message-ID: <20250127150303.46c9d9f5@elisabeth>
-In-Reply-To: <CADxym3Zji3NZy2tBAxSm5GaQ8tVG8PmxcyJ_AGnUC-H386tq7g@mail.gmail.com>
-References: <20250117214035.2414668-1-jmaloy@redhat.com>
-	<CADVnQymiwUG3uYBGMc1ZEV9vAUQzEOD4ymdN7Rcqi7yAK9ZB5A@mail.gmail.com>
-	<afb9ff14-a2f1-4c5a-a920-bce0105a7d41@redhat.com>
-	<c41deefb-9bc8-47b8-bff0-226bb03265fe@redhat.com>
-	<CANn89i+RRxyROe3wx6f4y1nk92Y-0eaahjh-OGb326d8NZnK9A@mail.gmail.com>
-	<e15ff7f6-00b7-4071-866a-666a296d0b15@redhat.com>
-	<20250127110121.1f53b27d@elisabeth>
-	<CAL+tcoBwEG_oVn3WL_gXxSkZLs92qeMgEvgwhGM0g0maA=xJ=g@mail.gmail.com>
-	<20250127113214.294bcafb@elisabeth>
-	<CADxym3Zji3NZy2tBAxSm5GaQ8tVG8PmxcyJ_AGnUC-H386tq7g@mail.gmail.com>
-Organization: Red Hat
-X-Mailer: Claws Mail 4.2.0 (GTK 3.24.41; x86_64-pc-linux-gnu)
+        d=1e100.net; s=20230601; t=1737987284; x=1738592084;
+        h=content-transfer-encoding:content-language:in-reply-to:mime-version
+         :user-agent:date:message-id:from:references:cc:to:subject
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=b7OEX1FEH30CiSTxvGdqR6kzrrVdogX9xTrr5eYHX4c=;
+        b=ZL3nUmwT9KI3y5y0kGCbsOw6bJFb96RfuDs1QXXxqghlMv9Q4eVhZfTImQcZP/mJVk
+         pi8dsd06zALgZhmVoqbxx90+9+NzfkDKzJiZ1pB4DpMhLoow+15VhuGfR2B4mKL7CEa6
+         wwW9h64JgMMR7LW00h7TCYcnH7Vx7/8zFJPCrqVQVmPuye2LufJ+ofJA/Is7Q4tSCh/e
+         jhWFGlgziq8iaWMoBY65u8zjntw19yYxkMwufglwnvRsnW57vfMa9q0s5SXxcN/BEOWm
+         aSxPfLj0pyETZsxVUZI+/n6ILVukKBgqqC8t8WT/iGTtfXVYH/ys+xPNrnXnf8dPn3IT
+         EGcw==
+X-Forwarded-Encrypted: i=1; AJvYcCWXswj878Xttu8gVS7/teKBsvXn6PA7tbK+KCLkOQEQcFtn8DzBJElQp9Q7bf/StT+SW+Nk8Ms=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyfeFrQXxCLE9aTW/773cIqLlQLSynJWDfhCYkwsRe301dsidBB
+	mPyGQaDitqe3Xt9BEKNIrrbz9qxRpvvyDLuj2+j+7UYzfVcz/qA0
+X-Gm-Gg: ASbGncvFxnKSi643ZmJYgLxFtLNUa3GJ5mU+QXRC+kc6zciU8DUMDWHO2eFvf6Hhh5f
+	F9ZsgaamIsIHP3tMcojlTE61Pl6dpWbqOxquGWFmgPYC6MjVWHVYOWe5jQ13zCvPxcpgsMfyQWb
+	FNt92BAeyP9L+oc4rFFDURuGb91vzzZdulixRQLMC8XHKClhp+zHLcxpq1LgrssuHToO6kRjoH8
+	yTgNuF5rlWHUaRkAfWHhM0RPFB+kJ+FqSe39+TUSP6vakOuCYa7k/5iNEJlb0bOcBfS65OWFfIQ
+	OWJwnzpGvrRxT6vVBlgWZLSOEQlwmEs4LEju1e7rBiiyl7pJh5ATlsrVTLLglrmEMeTj
+X-Google-Smtp-Source: AGHT+IGEL5JL+cJVUE1bYbaZQ7AmorMrsrb1eqNQjioeHxGKVZpxRCj5puuA6vAAUFwzNi0gldGodg==
+X-Received: by 2002:a05:6000:ac1:b0:385:f7d2:7e9b with SMTP id ffacd0b85a97d-38bf5673c57mr23086282f8f.30.1737987284242;
+        Mon, 27 Jan 2025 06:14:44 -0800 (PST)
+Received: from [192.168.1.122] (cpc159313-cmbg20-2-0-cust161.5-4.cable.virginm.net. [82.0.78.162])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-38c2a1761f4sm11179423f8f.20.2025.01.27.06.14.43
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 27 Jan 2025 06:14:43 -0800 (PST)
+Subject: Re: [PATCH net] ethtool: Fix set RXNFC command with symmetric RSS
+ hash
+To: Gal Pressman <gal@nvidia.com>, "David S. Miller" <davem@davemloft.net>,
+ Jakub Kicinski <kuba@kernel.org>
+Cc: Simon Horman <horms@kernel.org>, netdev@vger.kernel.org,
+ Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
+ Ahmed Zaki <ahmed.zaki@intel.com>, Tariq Toukan <tariqt@nvidia.com>
+References: <20250126191845.316589-1-gal@nvidia.com>
+From: Edward Cree <ecree.xilinx@gmail.com>
+Message-ID: <d0bad3a5-1f5b-9b48-59f6-879ea803efd7@gmail.com>
+Date: Mon, 27 Jan 2025 14:14:42 +0000
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.14.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
+In-Reply-To: <20250126191845.316589-1-gal@nvidia.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-GB
+Content-Transfer-Encoding: 7bit
 
-On Mon, 27 Jan 2025 21:37:23 +0800
-Menglong Dong <menglong8.dong@gmail.com> wrote:
+On 26/01/2025 19:18, Gal Pressman wrote:
+> The sanity check that both source and destination are set when symmetric
+> RSS hash is requested is only relevant for ETHTOOL_SRXFH (rx-flow-hash),
+> it should not be performed on any other commands (e.g.
+> ETHTOOL_SRXCLSRLINS/ETHTOOL_SRXCLSRLDEL).
+> 
+> This resolves accessing uninitialized 'info.data' field, and fixes false
+> errors in rule insertion:
+>   # ethtool --config-ntuple eth2 flow-type ip4 dst-ip 255.255.255.255 action -1 loc 0
+>   rmgr: Cannot insert RX class rule: Invalid argument
+>   Cannot insert classification rule
+> 
+> Fixes: 13e59344fb9d ("net: ethtool: add support for symmetric-xor RSS hash")
+> Cc: Ahmed Zaki <ahmed.zaki@intel.com>
+> Reviewed-by: Tariq Toukan <tariqt@nvidia.com>
+> Signed-off-by: Gal Pressman <gal@nvidia.com>
 
-> On Mon, Jan 27, 2025 at 6:32=E2=80=AFPM Stefano Brivio <sbrivio@redhat.co=
-m> wrote:
-> >
-> > On Mon, 27 Jan 2025 18:17:28 +0800
-> > Jason Xing <kerneljasonxing@gmail.com> wrote:
-> > =20
-> > > I'm not that sure if it's a bug belonging to the Linux kernel. =20
-> >
-> > It is, because for at least 20-25 years (before that it's a bit hard to
-> > understand from history) a non-zero window would be announced, as
-> > obviously expected, once there's again space in the receive window. =20
->=20
-> Sorry for the late reply. I think the key of this problem is
-> what should we do when we receive a tcp packet and we are
-> out of memory.
->=20
-> The RFC doesn't define such a thing,
-
-Why not? RFC 9293, 3.8.6:
-
-  There is an assumption that this is related to the data buffer space
-  currently available for this connection.
-
-That is, out-of-memory -> zero window.
-
-> so in the commit
-> e2142825c120 ("net: tcp: send zero-window ACK when no memory"),
-> I reply with a zero-window ACK to the peer.
-
-Your patch is fundamentally correct, nobody is disputing that. The
-problem is that it introduces a side effect because it gets the notion
-of "current window" out of sync by sending a one-off packet with a
-zero-window, without recording that.
-
-> And the peer will keep
-> probing the window by retransmitting the packet that we dropped if
-> the peer is a LINUX SYSTEM.
->=20
-> As I said, the RFC doesn't define such a case, so the behavior of
-> the peer is undefined if it is not a LINUX SYSTEM. If the peer doesn't
-> keep retransmitting the packet, it will hang the connection, just like
-> the problem that described in this commit log.
-
-It's not undefined. RFC 9293 3.8.6.1 (just like RFC 1122 4.2.2.17,
-RFC 793 3.7) requires zero-window probes.
-
-But keeping the window closed indefinitely if there's no zero-window
-probe is a regression anyway:
-
-- a retransmission timeout must elapse (RFC 9293 3.8.1) before the
-  zero-window probe is sent, so relying on zero-window probes means
-  introducing an unnecessary delay
-
-- if the peer (as it was the case here) fails to send a zero-window
-  probe for whatever reason, things break. This is a userspace
-  breakage, regardless of the fact that the peer should send a
-  zero-window probe
-
-> However, we can make some optimization to make it more
-> adaptable. We can send a ACK with the right window to the
-> peer when the memory is available, and __tcp_cleanup_rbuf()
-> is a good choice.
->=20
-> Generally speaking, I think this patch makes sense. However,
-> I'm not sure if there is any other influence if we make
-> "tp->rcv_wnd=3D0", but it can trigger a ACK in __tcp_cleanup_rbuf().
-
-I don't understand what's your concern with the patch that was proposed
-(and tested quite thoroughly, by the way).
-
-> Following is the code that I thought before to optimize this
-> case (the code is totally not tested):
->
-> [...]
-
---=20
-Stefano
-
+Reviewed-by: Edward Cree <ecree.xilinx@gmail.com>
 
