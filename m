@@ -1,162 +1,175 @@
-Return-Path: <netdev+bounces-161150-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-161151-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 95C71A1DA40
-	for <lists+netdev@lfdr.de>; Mon, 27 Jan 2025 17:10:00 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4D9D6A1DAAD
+	for <lists+netdev@lfdr.de>; Mon, 27 Jan 2025 17:37:26 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 9A9741679A4
-	for <lists+netdev@lfdr.de>; Mon, 27 Jan 2025 16:09:22 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 6A9A6188767F
+	for <lists+netdev@lfdr.de>; Mon, 27 Jan 2025 16:37:30 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9AC2D18E37D;
-	Mon, 27 Jan 2025 16:07:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 83B201632D7;
+	Mon, 27 Jan 2025 16:37:17 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Rrk+SjZC"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="EFZ1K4e/"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ej1-f41.google.com (mail-ej1-f41.google.com [209.85.218.41])
+Received: from mail-ej1-f46.google.com (mail-ej1-f46.google.com [209.85.218.46])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9ECCD18BBBB;
-	Mon, 27 Jan 2025 16:07:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.41
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B4816158DC5
+	for <netdev@vger.kernel.org>; Mon, 27 Jan 2025 16:37:15 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.46
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1737994054; cv=none; b=D6w0BSvdTfjMi1fL2lKQlR1RROjAowKG5qO/ET2XrN9Nec4wsHDBsTtYkr9VSvYYxrwJdWA2yHYSSm92pKXMJpMlW/C9KeqhG3xVmrzjn5ouEatQ5DISuG6wiopsecRnEofUNBP4AgSOxS8ernYlgpEYNVty6dc41DP7DtWXNho=
+	t=1737995837; cv=none; b=XPeonzt/br0c5EwPeRCDTHtSS622vKVrIMOtCxo8jydKpyhBHEi4RR4oh3RGeS5jwKhAUrKToAKxydX4Irwv3JTVw7a/xKNINVi5gPv6hghBAkyLw1Q9OywHKm1tGrlye/NmPUQ330DMQZJDrmBdi+u5W9D6sZaeSGjIIelz+nw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1737994054; c=relaxed/simple;
-	bh=akMqODiqeN8wWk3NHvjbNPcxc03Zh5d0pwf+U9K424c=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=Tc42QmAbc54rC2sCtK/BF4m9o8di/vpuFbnENsaUiyI3o3hjCapFdNOlzaOlYiybAasBLcWRcMa8VdWotvBuW5MYbXO0fwQ++zcR+tIRhyXCspYaDfopVWJWiAyqO50+gDU7PCNMfCM8QzrlUZfTLAVb9Q2S6TGYVkt3TJBDBAY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Rrk+SjZC; arc=none smtp.client-ip=209.85.218.41
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ej1-f41.google.com with SMTP id a640c23a62f3a-aaeef97ff02so767671966b.1;
-        Mon, 27 Jan 2025 08:07:31 -0800 (PST)
+	s=arc-20240116; t=1737995837; c=relaxed/simple;
+	bh=9Euv7UqqfBsOfGvW/NKr2SpMv/xKh6rZEI73AeL9Sx8=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=IcALHA7yBntBW/ZUxDZ1xikquNU3KNnVj7ZWWM+VP/W+l23ky51A6dvmLKswTYoZb14JVKsYavPfwG1klH2Py2qSHrhGllaADS0BTsqatC1tDAOgjyEhJu6CqExWKeC7vIKPF3fsC6vAt9qw7nEFNQU3UY95QSuNhjOcUqVINx8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=EFZ1K4e/; arc=none smtp.client-ip=209.85.218.46
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-ej1-f46.google.com with SMTP id a640c23a62f3a-aa68b513abcso959023066b.0
+        for <netdev@vger.kernel.org>; Mon, 27 Jan 2025 08:37:15 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1737994050; x=1738598850; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
+        d=google.com; s=20230601; t=1737995834; x=1738600634; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=lrZpQikn3aM6B3Iqd/Ucnjx7jHzSyajd3QTmq9Vwrvo=;
-        b=Rrk+SjZCZFuKVTuU3ZxE/CBmDV4khDaEmpCki1+V4khao0clWNGCKzVpyyMhrwXHoI
-         l6W9VAuzEfaC2+D2sD9ZqksrYh7muCEAqkzOQlYZnfk6nrGQghEBXvAMNISdlX81f2Rh
-         4b9c8lShMDohWV4cBWwW9MqREfaFkB5PtvCpKTx7sE4TQB/6N1dIvjykHxklz3h/aYqL
-         ZSoBlRkTdovCuI0tluFuwZLdZn9TnutUyeF09Y7dw9Ef+SalRBseUe4cS0r9AP9/OYvs
-         8itmFrturJnBsLsT6Iw4KHzVQyRSfpmfxjQXEZ0zGzwVwMPnNWtjEig4Ow6J8XM8qpEr
-         M3ng==
+        bh=BsgDs7vjk37Nv0OdmfDEhpVK2JsB/E4w2pYC01BWuCg=;
+        b=EFZ1K4e/76Kk060M/h05FUkOipigqDKh3OD2TZFzc9hhZ7MSN+XvyEuRwVVm3++uM/
+         +4Jqoi3li5Q/NeB5pFpOS9d0fehL24eHTQGGLAqTSCe9Fntpp0uqpchQurp4itf6e3du
+         rLN4RuZZO6efnRT8nHtRKdKuVLBKWx3nm4FGKo4MBd/9zcR3otvAIJE2cYrJd6yyDqBF
+         a69/ftGYgZE31Jl8OvP6vMGx6k7Q0E2nAQ5y5k0iobMj1UPR30ENyvqKgkdrgp8/OZ2R
+         tmDOPJTmtZMNr+vI/cSHnwVCBL8/SNGUlTKRzrIxmIXxUy1WzxTOXXbPmYqdrEqApWiY
+         wyDQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1737994050; x=1738598850;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
+        d=1e100.net; s=20230601; t=1737995834; x=1738600634;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=lrZpQikn3aM6B3Iqd/Ucnjx7jHzSyajd3QTmq9Vwrvo=;
-        b=YPvSfUPbCSGdupb9a/2S0ScrdPvhQgn+1otXGLXA8drKHgVw+BWqg2Ui8Q0Bz7R/MQ
-         iR4Tmqn10P9ZIjnE0WVB4rUClP9hb+wdZtRTqxrVldvwUTP2lnduKB4AqHcFnswAhGdz
-         f5x7HGh3btUgcL47siWCrvAGjwko0Hyu/041I6YV+cqBnX0IC53Vab20UiA4B8dFr2kv
-         2tMe0+KKBTu/shinmqtdY2qOflkhyd70jGVn+OiVjr317ICR85r91eyI7fS9g690hzHT
-         07bdlcIOUbkSOd8ORHN/Dv7p4aoFWqlvcxRL/JdDYWyQUhQD1HyMeUqrV5GIvQjDxe1C
-         PSmA==
-X-Forwarded-Encrypted: i=1; AJvYcCVgKaUo90mNJaO0ttHKhKAukRv+C8oVofWSEd9QWo2frPRsmUQ1Ipuf4K8IOttgSIuf1fJnSkqO@vger.kernel.org, AJvYcCVuK4YUK43BT3KDrj5K9F9+RUNV47Eg6c/QQFaFTuN1gJzB1VfxhNG3MgTmzTatoWxolAUwTeWROZj+RhBT@vger.kernel.org, AJvYcCW32n+7KYF8HKsRiwbPRmQD9PM4bfsgppE6ON43gyo2xf9F4wTwm4xf873FFKT44dpDyW7Abs1ErKU5@vger.kernel.org, AJvYcCWAgqeVujaSXfD1ToXY5p96dh0iWSuLi00BLOAgPHSdu5a2ujSXA0bxyQtgVRdcaI3/Vnc/OgPqTO6k136PaiA=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyaRq8k+gsnE4dEtO4JySGdyJ8WEkuKzDrSRGS00a1aJjCguatc
-	Utf0IPIlVkb9wPQsWS+jL9AhHxwpeWze+4js8JtHDmG8JcUzIecy
-X-Gm-Gg: ASbGncsB0GL0SQLkQhvrxgG7O8FBb43FY+UoqYlQH1oGiBDSGkIbSfY20LV7Q/6ho8p
-	6zo1xQukrCx5fcznPUq0Ji3tTbAe0E0V4rwlU9dmsGP+wMGJ2y+15gnaAJumfHcfCQlyQi0yGDo
-	mCvDN36xU3wKrVyat7upIM77ULJR5OMuLO9dh2f0b7drSfKoZpYFqcZNe5x8Ul/aXO04KkWvXFF
-	c3Mo6xofPxWtN/t/mSI+zZXBNcuJ/IRZvHUOMP2hSgpRAVXay2LQWejweS9BdncakRRjBa0id+o
-	CXJqPi461Z3tgw==
-X-Google-Smtp-Source: AGHT+IHVilwWp86cIXuCPcSCEjAlKAPSZRo0H0MsLWLvAzoRKeZuFBp6uVwp/VtMeJUTjVHCLgUcfw==
-X-Received: by 2002:a17:906:4f8c:b0:ab6:362c:a8ab with SMTP id a640c23a62f3a-ab6362caa41mr2246025266b.29.1737994049651;
-        Mon, 27 Jan 2025 08:07:29 -0800 (PST)
-Received: from localhost.localdomain ([46.248.82.114])
-        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-ab675e8b01asm592643866b.84.2025.01.27.08.07.28
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 27 Jan 2025 08:07:29 -0800 (PST)
-From: Uros Bizjak <ubizjak@gmail.com>
-To: x86@kernel.org,
-	linux-mm@kvack.org,
-	linux-kernel@vger.kernel.org,
-	linux-bcachefs@vger.kernel.org,
-	linux-arch@vger.kernel.org,
-	netdev@vger.kernel.org
-Cc: Uros Bizjak <ubizjak@gmail.com>,
-	Nadav Amit <nadav.amit@gmail.com>,
-	Dennis Zhou <dennis@kernel.org>,
-	Tejun Heo <tj@kernel.org>,
-	Christoph Lameter <cl@linux.com>,
-	Thomas Gleixner <tglx@linutronix.de>,
-	Ingo Molnar <mingo@kernel.org>,
-	Borislav Petkov <bp@alien8.de>,
-	Dave Hansen <dave.hansen@linux.intel.com>,
-	"H. Peter Anvin" <hpa@zytor.com>,
-	Linus Torvalds <torvalds@linux-foundation.org>,
-	Andy Lutomirski <luto@kernel.org>,
-	Brian Gerst <brgerst@gmail.com>,
-	Peter Zijlstra <peterz@infradead.org>
-Subject: [PATCH v4 6/6] percpu/x86: Enable strict percpu checks via named AS qualifiers
-Date: Mon, 27 Jan 2025 17:05:10 +0100
-Message-ID: <20250127160709.80604-7-ubizjak@gmail.com>
-X-Mailer: git-send-email 2.42.0
-In-Reply-To: <20250127160709.80604-1-ubizjak@gmail.com>
-References: <20250127160709.80604-1-ubizjak@gmail.com>
+        bh=BsgDs7vjk37Nv0OdmfDEhpVK2JsB/E4w2pYC01BWuCg=;
+        b=ndwaoemsuRrdBunIK5CUk9QB7U7EhrxVvw1GMH93twwVWMef5YgGGeMrYO25aDUahQ
+         iYnaiQuUO4qExvucR41U+t397rWg7OWa1cHQN+gNmJIIoDUlHFdYwmI+sSuQt6v8fdj+
+         5oRm3er+skBMCuSKDcvWy+fwq5d1GOadUDfee1OtfHkZTQb1WEH4KyizoCVEkjjlWQ9y
+         aKwSzXrbM2FIxNggmXRG4xFZz/GG61ywZVa1d6ouhM0SWX7KWU1dYOD+ND/Tbw0iovgP
+         7h792tCxqnrSjyIg6RkXi5iUBxNVUAN5M/Sdnbwj0vTzax4DKgk/wd/nBSDW/e7d//5x
+         cnzA==
+X-Forwarded-Encrypted: i=1; AJvYcCWn2X9XRc5buwk72rjnfHgkZXXqHOwpM/93gkVj6y3P7xES8XubY714G/9KM/3p0vDm6ThpWE8=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxxRnkn9nNWbL50Os7dX03NQgv08CMbkg8BxBQXY1kRgNEB66LG
+	DCXgFGgBC2MCIcXFYr4+frHg+CdUYG1yBmnxXCtYshTt2gXKYG1IVEjfAgnvQYzC786ONVGcJ0F
+	Kv2oO6oeefPEG3LSPocXv1z3CA3ZVoBeWySSW
+X-Gm-Gg: ASbGnctPuoEfNBM9T7f6gayZgdQeM5QYzgoEdj80BSGnXx7XN2GJf0adR+XAfyoxQ0S
+	zTpCduned39/UDCUNT3haEOjpDJYp82MNcbciSN8JSOmEMCLtQL3J6wrBx4P9jw==
+X-Google-Smtp-Source: AGHT+IEC7871tnGPEW7pCJoHJwcH326cGDcMV/EqYFJcDsAr6z3H+tfiOCOdtA+RDxxV8Kap4Iv2pMhSRxynnNcHQ24=
+X-Received: by 2002:a17:907:97cb:b0:aaf:c259:7f6 with SMTP id
+ a640c23a62f3a-ab38b36bcf0mr3762742066b.45.1737995833746; Mon, 27 Jan 2025
+ 08:37:13 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+References: <20250117214035.2414668-1-jmaloy@redhat.com> <CADVnQymiwUG3uYBGMc1ZEV9vAUQzEOD4ymdN7Rcqi7yAK9ZB5A@mail.gmail.com>
+ <afb9ff14-a2f1-4c5a-a920-bce0105a7d41@redhat.com> <c41deefb-9bc8-47b8-bff0-226bb03265fe@redhat.com>
+ <CANn89i+RRxyROe3wx6f4y1nk92Y-0eaahjh-OGb326d8NZnK9A@mail.gmail.com> <e15ff7f6-00b7-4071-866a-666a296d0b15@redhat.com>
+In-Reply-To: <e15ff7f6-00b7-4071-866a-666a296d0b15@redhat.com>
+From: Eric Dumazet <edumazet@google.com>
+Date: Mon, 27 Jan 2025 17:37:02 +0100
+X-Gm-Features: AWEUYZlyr6kt4nD2O6C2lXtTxoIC0GSvZOwHzbAuI92mVQe7kwjeSA-M-afX5h4
+Message-ID: <CANn89iJmQc6r+Ajh3N1V3Q22iJ4C=Ldte5pBVd=jC-YTQYuQTA@mail.gmail.com>
+Subject: Re: [net,v2] tcp: correct handling of extreme memory squeeze
+To: Jon Maloy <jmaloy@redhat.com>
+Cc: Neal Cardwell <ncardwell@google.com>, netdev@vger.kernel.org, davem@davemloft.net, 
+	kuba@kernel.org, passt-dev@passt.top, sbrivio@redhat.com, lvivier@redhat.com, 
+	dgibson@redhat.com, eric.dumazet@gmail.com, 
+	Menglong Dong <menglong8.dong@gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-This patch declares percpu variables in __seg_gs/__seg_fs named AS
-and keeps them named AS qualified until they are dereferenced with
-percpu accessor. This approach enables various compiler check
-for cross-namespace variable assignments.
+On Fri, Jan 24, 2025 at 6:40=E2=80=AFPM Jon Maloy <jmaloy@redhat.com> wrote=
+:
+>
+>
+>
+> On 2025-01-20 11:22, Eric Dumazet wrote:
+> > On Mon, Jan 20, 2025 at 5:10=E2=80=AFPM Jon Maloy <jmaloy@redhat.com> w=
+rote:
+> >>
+> >>
+> >>
+> >> On 2025-01-20 00:03, Jon Maloy wrote:
+> >>>
+> >>>
+>
+> [...]
+>
+> >>>> I agree with Eric that probably tp->pred_flags should be cleared, an=
+d
+> >>>> a packetdrill test for this would be super-helpful.
+> >>>
+> >>> I must admit I have never used packetdrill, but I can make an effort.
+> >>
+> >> I hear from other sources that you cannot force a memory exhaustion wi=
+th
+> >> packetdrill anyway, so this sounds like a pointless exercise.
+> >
+> > We certainly can and should add a feature like that to packetdrill.
+> >
+> > Documentation/fault-injection/ has some relevant information.
+> >
+> > Even without this, tcp_try_rmem_schedule() is reading sk->sk_rcvbuf
+> > that could be lowered by a packetdrill script I think.
+> >
+> Neal, Eric,
+> How do you suggest we proceed with this?
+> I downloaded packetdrill and tried it a bit, but to understand it well
+> enough to introduce a new feature would require more time than I am
+> able to spend on this. Maybe Neal, who I see is one of the contributors
+> to packetdrill could help out?
+>
+> I can certainly clear tp->pred_flags and post it again, maybe with
+> an improved and shortened log. Would that be acceptable?
 
-Signed-off-by: Uros Bizjak <ubizjak@gmail.com>
-Acked-by: Nadav Amit <nadav.amit@gmail.com>
-Cc: Dennis Zhou <dennis@kernel.org>
-Cc: Tejun Heo <tj@kernel.org>
-Cc: Christoph Lameter <cl@linux.com>
-Cc: Thomas Gleixner <tglx@linutronix.de>
-Cc: Ingo Molnar <mingo@kernel.org>
-Cc: Borislav Petkov <bp@alien8.de>
-Cc: Dave Hansen <dave.hansen@linux.intel.com>
-Cc: "H. Peter Anvin" <hpa@zytor.com>
-Cc: Linus Torvalds <torvalds@linux-foundation.org>
-Cc: Andy Lutomirski <luto@kernel.org>
-Cc: Brian Gerst <brgerst@gmail.com>
-Cc: Peter Zijlstra <peterz@infradead.org>
----
- arch/x86/include/asm/percpu.h | 15 ++++++++++++---
- 1 file changed, 12 insertions(+), 3 deletions(-)
+Yes.
 
-diff --git a/arch/x86/include/asm/percpu.h b/arch/x86/include/asm/percpu.h
-index 27f668660abe..474d648bca9a 100644
---- a/arch/x86/include/asm/percpu.h
-+++ b/arch/x86/include/asm/percpu.h
-@@ -95,9 +95,18 @@
- 
- #endif /* CONFIG_SMP */
- 
--#define __my_cpu_type(var)	typeof(var) __percpu_seg_override
--#define __my_cpu_ptr(ptr)	(__my_cpu_type(*(ptr))*)(__force uintptr_t)(ptr)
--#define __my_cpu_var(var)	(*__my_cpu_ptr(&(var)))
-+#if defined(CONFIG_USE_X86_SEG_SUPPORT) && defined(USE_TYPEOF_UNQUAL)
-+# define __my_cpu_type(var)	typeof(var)
-+# define __my_cpu_ptr(ptr)	(ptr)
-+# define __my_cpu_var(var)	(var)
-+
-+# define __percpu_qual		__percpu_seg_override
-+#else
-+# define __my_cpu_type(var)	typeof(var) __percpu_seg_override
-+# define __my_cpu_ptr(ptr)	(__my_cpu_type(*(ptr))*)(__force uintptr_t)(ptr)
-+# define __my_cpu_var(var)	(*__my_cpu_ptr(&(var)))
-+#endif
-+
- #define __percpu_arg(x)		__percpu_prefix "%" #x
- #define __force_percpu_arg(x)	__force_percpu_prefix "%" #x
- 
--- 
-2.42.0
+>
+> I also made a run where I looked into why __tcp_select_window()
+> ignores all the space that has been freed up:
+>
+>
+>   tcp_recvmsg_locked(->)
+>     __tcp_cleanup_rbuf(->) (copied 131072)
+>       tp->rcv_wup: 1788299855, tp->rcv_wnd: 5812224,
+>       tp->rcv_nxt 1793800175
+>       __tcp_select_window(->)
+>         tcp_space(->)
+>         tcp_space(<-) returning 458163
+>         free_space =3D round_down(458163, 1 << 4096) =3D 454656
+>         (free_space > tp->rcv_ssthresh) -->
+>           free_space =3D tp->rcv_ssthresh =3D 261920
+>         window =3D ALIGN(261920, 4096) =3D 26144
+>       __tcp_select_window(<-) returning 262144
+>       [rcv_win_now 311904, 2 * rcv_win_now 623808, new_window 262144]
+>       (new_window >=3D (2 * rcv_win_now)) ? --> time_to_ack 0
+>       NOT calling tcp_send_ack()
+>     __tcp_cleanup_rbuf(<-)
+>     [tp->rcv_wup 1788299855, tp->rcv_wnd 5812224,
+>      tp->rcv_nxt 1793800175]
+>   tcp_recvmsg_locked(<-) returning 131072 bytes.
+>   [tp->rcv_nxt 1793800175, tp->rcv_wnd 5812224,
+>    tp->rcv_wup 1788299855, sk->last_ack 0, tcp_receive_win() 311904,
+>    copied_seq 1788299855->1788395953 (96098), unread 5404222,
+>    sk_rcv_qlen 83, ofo_qlen 0]
+>
+>
+> As we see tp->rcv_ssthresh is the limiting factor, causing
+> a consistent situation where (new_window < (rcv_win_now * 2)),
+> and even (new_window < rcv_win_now).
 
+Your changelog could simply explain this, in one sentence. instead of
+lengthy traces.
 
