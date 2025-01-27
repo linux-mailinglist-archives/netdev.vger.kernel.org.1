@@ -1,189 +1,95 @@
-Return-Path: <netdev+bounces-161219-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-161220-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 26E36A20112
-	for <lists+netdev@lfdr.de>; Mon, 27 Jan 2025 23:50:31 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8A9F7A20116
+	for <lists+netdev@lfdr.de>; Mon, 27 Jan 2025 23:50:56 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 71CD53A20E3
-	for <lists+netdev@lfdr.de>; Mon, 27 Jan 2025 22:50:23 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id DA0BD3A2456
+	for <lists+netdev@lfdr.de>; Mon, 27 Jan 2025 22:50:48 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D2B2A1DD877;
-	Mon, 27 Jan 2025 22:47:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4E48B1D9A50;
+	Mon, 27 Jan 2025 22:50:07 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="aKMR5aKH"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="LgtOU7Gi"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f180.google.com (mail-pl1-f180.google.com [209.85.214.180])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D04731DC9B3
-	for <netdev@vger.kernel.org>; Mon, 27 Jan 2025 22:47:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.180
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 294E61990B7
+	for <netdev@vger.kernel.org>; Mon, 27 Jan 2025 22:50:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1738018041; cv=none; b=iHBm9YkQMxeo9uo+l8dsyNxDnIZ8pponeKUIzoXq0UQVjUzMVu6Cg+1puJyDP41kg59JgEHXcLZtNfr++xOdeYVpo6dJBninM+9dlEiLrSR83syFZ99DJaJwmEfvj4OUOMo4nv/LMPwP0+iALPdpHVxfqIq4/eD2ojMXmP+LcM8=
+	t=1738018207; cv=none; b=YXvOcdKC7eNo7SjEOkZsaPje8mfvtjzSY6WfhmW51FyeEVATGOKB96Pua+PW7UPa0jokSmCQzs4tVfwxs6m2x/qALPcMcWgZj8iF0MYilYrSWsKlF1OieyeK/0yahIcGSYNAvTbUc17QfQ6DoVnN8E3lxMrbXvLih82MAJpBmU4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1738018041; c=relaxed/simple;
-	bh=t3bA5F2W65JXGhyTRu140mCuHtb5LN716DCfVuOfs+U=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=gJNGX3lQ5fYXVOahdJsNo/qbtmKs0PdLOiw92wR7Xg3qfeNG0Ql+yZ28hubNOVqVgHT/UaZCvx8n4KDHwKGUB1n8iz/rWR59FapwUckEwWu8WLty46nOzVg+/waff+He4qlKskcWEv5ul0+K2JQu/ZAnin38WXVwu8yvsU81HoY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=aKMR5aKH; arc=none smtp.client-ip=209.85.214.180
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-pl1-f180.google.com with SMTP id d9443c01a7336-219f6ca9a81so18665ad.1
-        for <netdev@vger.kernel.org>; Mon, 27 Jan 2025 14:47:19 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1738018039; x=1738622839; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=q3ggzQ8ffa5aEYPb9vk8ap4m5/pZIAlh688tUvZLlmg=;
-        b=aKMR5aKHhe1HNtNLW1UB2Q1LI3YtIwdyL8lU5u0D0Kwl8oFOPPOffbzrfoMbOYqCYz
-         W6rbyakJ9Zm7jnFRXfrY+/hPvZ9evbpZ1Oznog2fqFOWAjv7YqsTgffHTSSEKdnG4p+y
-         lXhocSxA+jmiU5TQB9UqvClnO4swy2QdilbXCokyCVMfy6lStMff1PBS15yQYfnuOuyO
-         6SpFltlljJLLNSCzb5c9yNlu/dAIJ/U2NLCrPbRd6iApA9oj7t1R7hW+xNU0cpA7+d05
-         9pTYIoHACOPg1J/LszIFowOujHLjd4jjV3siGqjKzihh34A673X9uStlj4ISdNga231q
-         PePg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1738018039; x=1738622839;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=q3ggzQ8ffa5aEYPb9vk8ap4m5/pZIAlh688tUvZLlmg=;
-        b=TYaqfA2+M81l/RQn4wDaD2ceTf9+qwO9ZK2x6YbnQT9Gfi8FQNRKNI9EWENydlFF7q
-         0MX80q0UrfveffHqCHtdkzcIDs/qI/ThW7DUE2iC3+9Rd4H1+x2koqwX/2uuEOK3XsX5
-         EAj4Lkv1ySba3KJEusGcft7uPlIgo4hdyDOgc8rFg3jX65PtRv2HJyC6tI2vasVkY8vK
-         7vFSrfNRgs05A9oYrvaFDN5dc9QAhjp5IN0mkxJjRv5Y5PBR6oEPeSeu9CGC/wW8iymB
-         W0nA61eK4x4anThzHnBjRtkntMbZBFDeZkwn7dXvoRPAScoQUXUvHKzm40l9eOGd+v5J
-         QGDw==
-X-Gm-Message-State: AOJu0Yz/54X4pgmDC9qSJq24lvbBPUl45Go1lT3e7WTtxC0cifJD6u33
-	F6NGW1XB6KsmiCWG+S1J8Ijq3qBUGEtiGsA4ynWfcBRaGg93zMWFWACOVlDLJVn+vWrQg0f0a8w
-	1+C3jw8jjAnBCStn3cn+PJUffclFyXk9TD+c/
-X-Gm-Gg: ASbGncusAUZ7IGkFw6UcEYjDq8xp3s8NvEmf22qhxU6n9t/uiMDQrCnfwXxpW2ivS3d
-	ZJ17tpH+NWh1yo+L1HblUm0Iod9zIqOJy7NJd8BCNoVrQL9gSsM+WtDNp6/sZF6wssDx4dtCdcj
-	GknOaWLIkXxuDsZ/If
-X-Google-Smtp-Source: AGHT+IFqML9+QvHHoFqJC9LKtRpfjaasVH9e6us8A8yTyrwAjKPnQICiAUxsKn/ru/d9mYtnRK877NZXyv5QlITTnzU=
-X-Received: by 2002:a17:902:f789:b0:215:367f:2967 with SMTP id
- d9443c01a7336-21dcce26186mr833575ad.2.1738018038858; Mon, 27 Jan 2025
- 14:47:18 -0800 (PST)
+	s=arc-20240116; t=1738018207; c=relaxed/simple;
+	bh=SjLOcQ912BLkkTZ5imgfW5bh2IwtninnrceNd2cR0u4=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=pX22qdqRgPoirhucSLZ1lBuzpwZU0Tryi5Q7AlrDrAHArbJBKDt3OYDVkx9sS7Oysrgm9NrYrGNi+pc+jYxWZRPkBQ2ApkjVh4Gu7SzJFSJwnAdwBvMQ2vfGW9zhLKFL9fdwnWpLQ55wa9NlZVnMONPn5ZAED8Y2vX1x1jr3hg4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=LgtOU7Gi; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8C29AC4CED2;
+	Mon, 27 Jan 2025 22:50:05 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1738018205;
+	bh=SjLOcQ912BLkkTZ5imgfW5bh2IwtninnrceNd2cR0u4=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=LgtOU7GiRn3wbo0YNLwueSwaferWZm+mqT1dBX2fdzHigDfP+na23dd6Lu8+8Ltbe
+	 AkvFjzkQfM6XJvQPS5fzWMm6GIAtPgNmZEVCQlxpOzxEcvzijjEnlZspJyllqh/N2Z
+	 TVLCzeiShkGfY+0S2zkBxbh77ZWsIRn1sN5SehT08+RQ8Mdv7m7gBH2w5hg5GQNg5E
+	 qvA6lUFseDY6ZkH8bzNn20MWTwUlSZHwu0+72Z65Iv0WBbUQQL164McJqS/pLfZmj5
+	 5m878PlWyWOI/t2GB2Efd4SukOzA7tW26z2DsG2Oc0yFoMkHs8B3bo6apzSIHB/owL
+	 bPkoGGk5OILAg==
+Received: from [10.30.226.235] (localhost [IPv6:::1])
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 70D1D380AA63;
+	Mon, 27 Jan 2025 22:50:32 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20241221004236.2629280-1-almasrymina@google.com>
- <20241221004236.2629280-4-almasrymina@google.com> <Z22pVRcr-B624UcG@mini-arch>
-In-Reply-To: <Z22pVRcr-B624UcG@mini-arch>
-From: Mina Almasry <almasrymina@google.com>
-Date: Mon, 27 Jan 2025 14:47:06 -0800
-X-Gm-Features: AWEUYZmde949ve7En1vqYfCo-7RhN5LjsRnsvkGge4Hf0Xqf5fGcYM_37rushQI
-Message-ID: <CAHS8izMXKYBiTX_jCNcmN+4unBHXT9jF0CkNWBvjia9eP=Z3zA@mail.gmail.com>
-Subject: Re: [PATCH RFC net-next v1 3/5] net: add get_netmem/put_netmem support
-To: Stanislav Fomichev <stfomichev@gmail.com>
-Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	linux-doc@vger.kernel.org, virtualization@lists.linux.dev, 
-	kvm@vger.kernel.org, linux-kselftest@vger.kernel.org, 
-	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, 
-	Donald Hunter <donald.hunter@gmail.com>, Jonathan Corbet <corbet@lwn.net>, 
-	Andrew Lunn <andrew+netdev@lunn.ch>, David Ahern <dsahern@kernel.org>, 
-	"Michael S. Tsirkin" <mst@redhat.com>, Jason Wang <jasowang@redhat.com>, 
-	Xuan Zhuo <xuanzhuo@linux.alibaba.com>, =?UTF-8?Q?Eugenio_P=C3=A9rez?= <eperezma@redhat.com>, 
-	Stefan Hajnoczi <stefanha@redhat.com>, Stefano Garzarella <sgarzare@redhat.com>, Shuah Khan <shuah@kernel.org>, 
-	Kaiyuan Zhang <kaiyuanz@google.com>, Pavel Begunkov <asml.silence@gmail.com>, 
-	Willem de Bruijn <willemb@google.com>, Samiullah Khawaja <skhawaja@google.com>, 
-	Stanislav Fomichev <sdf@fomichev.me>, Joe Damato <jdamato@fastly.com>, dw@davidwei.uk
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH net] netdevsim: don't assume core pre-populates HDS params on
+ GET
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <173801823127.3248259.15864016856612867120.git-patchwork-notify@kernel.org>
+Date: Mon, 27 Jan 2025 22:50:31 +0000
+References: <20250123221410.1067678-1-kuba@kernel.org>
+In-Reply-To: <20250123221410.1067678-1-kuba@kernel.org>
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: davem@davemloft.net, netdev@vger.kernel.org, edumazet@google.com,
+ pabeni@redhat.com, andrew+netdev@lunn.ch, horms@kernel.org,
+ syzbot+b3bcd80232d00091e061@syzkaller.appspotmail.com
 
-On Thu, Dec 26, 2024 at 11:07=E2=80=AFAM Stanislav Fomichev
-<stfomichev@gmail.com> wrote:
->
-> On 12/21, Mina Almasry wrote:
-> > Currently net_iovs support only pp ref counts, and do not support a
-> > page ref equivalent.
-> >
-> > This is fine for the RX path as net_iovs are used exclusively with the
-> > pp and only pp refcounting is needed there. The TX path however does no=
-t
-> > use pp ref counts, thus, support for get_page/put_page equivalent is
-> > needed for netmem.
-> >
-> > Support get_netmem/put_netmem. Check the type of the netmem before
-> > passing it to page or net_iov specific code to obtain a page ref
-> > equivalent.
-> >
-> > For dmabuf net_iovs, we obtain a ref on the underlying binding. This
-> > ensures the entire binding doesn't disappear until all the net_iovs hav=
-e
-> > been put_netmem'ed. We do not need to track the refcount of individual
-> > dmabuf net_iovs as we don't allocate/free them from a pool similar to
-> > what the buddy allocator does for pages.
-> >
-> > This code is written to be extensible by other net_iov implementers.
-> > get_netmem/put_netmem will check the type of the netmem and route it to
-> > the correct helper:
-> >
-> > pages -> [get|put]_page()
-> > dmabuf net_iovs -> net_devmem_[get|put]_net_iov()
-> > new net_iovs ->       new helpers
-> >
-> > Signed-off-by: Mina Almasry <almasrymina@google.com>
-> >
-> > ---
-> >  include/linux/skbuff_ref.h |  4 ++--
-> >  include/net/netmem.h       |  3 +++
-> >  net/core/devmem.c          | 10 ++++++++++
-> >  net/core/devmem.h          | 11 +++++++++++
-> >  net/core/skbuff.c          | 30 ++++++++++++++++++++++++++++++
-> >  5 files changed, 56 insertions(+), 2 deletions(-)
-> >
-> > diff --git a/include/linux/skbuff_ref.h b/include/linux/skbuff_ref.h
-> > index 0f3c58007488..9e49372ef1a0 100644
-> > --- a/include/linux/skbuff_ref.h
-> > +++ b/include/linux/skbuff_ref.h
-> > @@ -17,7 +17,7 @@
-> >   */
-> >  static inline void __skb_frag_ref(skb_frag_t *frag)
-> >  {
-> > -     get_page(skb_frag_page(frag));
-> > +     get_netmem(skb_frag_netmem(frag));
-> >  }
-> >
-> >  /**
-> > @@ -40,7 +40,7 @@ static inline void skb_page_unref(netmem_ref netmem, =
-bool recycle)
-> >       if (recycle && napi_pp_put_page(netmem))
-> >               return;
-> >  #endif
->
-> [..]
->
-> > -     put_page(netmem_to_page(netmem));
-> > +     put_netmem(netmem);
->
-> I moved the release operation onto a workqueue in my series [1] to avoid
-> calling dmabuf detach (which can sleep) from the socket close path
-> (which is called with bh disabled). You should probably do something simi=
-lar,
-> see the trace attached below.
->
-> 1: https://github.com/fomichev/linux/commit/3b3ad4f36771a376c204727e5a167=
-c4993d4c65a#diff-3c58b866674b2f9beb5ac7349f81566e4df595c25c647710203549589d=
-450f2dR436
->
-> (the condition to trigger that is to have an skb in the write queue
-> and call close from the userspace)
->
+Hello:
 
-Thanks for catching this indeed. I've also changed the unbinding to
-scheduled_work, although I arrived at a slightly different
-implementation that is simpler to my eye. I'll upload what I have for
-review shortly as RFC.
+This patch was applied to netdev/net.git (main)
+by Jakub Kicinski <kuba@kernel.org>:
 
---=20
-Thanks,
-Mina
+On Thu, 23 Jan 2025 14:14:10 -0800 you wrote:
+> Syzbot reports:
+> 
+>   BUG: KMSAN: uninit-value in nsim_get_ringparam+0xa8/0xe0 drivers/net/netdevsim/ethtool.c:77
+>    nsim_get_ringparam+0xa8/0xe0 drivers/net/netdevsim/ethtool.c:77
+>    ethtool_set_ringparam+0x268/0x570 net/ethtool/ioctl.c:2072
+>    __dev_ethtool net/ethtool/ioctl.c:3209 [inline]
+>    dev_ethtool+0x126d/0x2a40 net/ethtool/ioctl.c:3398
+>    dev_ioctl+0xb0e/0x1280 net/core/dev_ioctl.c:759
+> 
+> [...]
+
+Here is the summary with links:
+  - [net] netdevsim: don't assume core pre-populates HDS params on GET
+    https://git.kernel.org/netdev/net/c/6db9d3a536cd
+
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
+
+
 
