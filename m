@@ -1,56 +1,58 @@
-Return-Path: <netdev+bounces-161222-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-161223-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5AE58A2014F
-	for <lists+netdev@lfdr.de>; Tue, 28 Jan 2025 00:01:21 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4750BA20154
+	for <lists+netdev@lfdr.de>; Tue, 28 Jan 2025 00:04:15 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 8BCA71885334
-	for <lists+netdev@lfdr.de>; Mon, 27 Jan 2025 23:01:25 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 946CB7A20E5
+	for <lists+netdev@lfdr.de>; Mon, 27 Jan 2025 23:04:04 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B8FE71A83E4;
-	Mon, 27 Jan 2025 23:01:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 71FE31B4F0C;
+	Mon, 27 Jan 2025 23:04:08 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="gXJ1ezjD"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="txqCkd5m"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8F0AA2AD1C;
-	Mon, 27 Jan 2025 23:01:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 470301EB2A;
+	Mon, 27 Jan 2025 23:04:07 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1738018876; cv=none; b=LZfKkJmXlUlfbQVd3qLT3C/T4MAvG0YL/vMgPG2vxjoAW8cVwEkMEDNvY05zy3jPhWf9xwy+lrosNTQ0kMnVo5tpEnPgFvFWTNxb7BXeRicrxoLYMcQBDUPRMEfuSrvBVMWJTLNsJ2tRjiW4qIzwN82aq9y4o9RMytBtiL7xpBE=
+	t=1738019048; cv=none; b=hRg8RfKWHSxLJv6j3Ys7mpBNBCirs6yd24+IMDTG2qQjsYGu9qwBevhGfYX7KfJUS/STxz0AxEGD19ivpczPOykFoq4Y3LZAA5R3ooed7uyp2PxOLtGc0gbXFLmdcdv6BoHvtiqZEpxWrodABXFQzopsNveVtOcHiT1GlDZMrIw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1738018876; c=relaxed/simple;
-	bh=zHaJ24cQkJtZVzuNZtIZQVNFnCV2F7Q9RkEH+q3Ofeg=;
+	s=arc-20240116; t=1738019048; c=relaxed/simple;
+	bh=S+q9E81fwjvKrr5avSJ7WQLIaON0+6nn+3UXi0+nD6M=;
 	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=OqwIA/F9c9XIx65aMsF3XRSb+H9+uva9heqpbMH2I/2UftDPOD35SGL+u5ocmNuEDD4VfNdmu7k4URdufnHjud/vgfJYKod+o6tZaFTtwWxU5ScSOWE+2zPKZ2gQl9Dl3R/hVHFJi/QPOCGCE5iKFwwAvpKhr628kAoYuj0c/yI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=gXJ1ezjD; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7BB61C4CED2;
-	Mon, 27 Jan 2025 23:01:13 +0000 (UTC)
+	 MIME-Version:Content-Type; b=W6OJzSDdzL9VlMHJhezt6ODxS5rnu0zaxl5XcbMqj6Fy8cwtiTFKReJyd1XJbL7Q01StfNkMIORxG39ZE2nk9UpN93TxP8MqtQJy0FIoN4NETOI6eYZz/atnHWLvuhtmt8fAsfrgqCaZmCRnrOnPdQPH+xKSb9vQSlzXoFBR3GM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=txqCkd5m; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5EEBFC4CEE0;
+	Mon, 27 Jan 2025 23:04:07 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1738018873;
-	bh=zHaJ24cQkJtZVzuNZtIZQVNFnCV2F7Q9RkEH+q3Ofeg=;
+	s=k20201202; t=1738019047;
+	bh=S+q9E81fwjvKrr5avSJ7WQLIaON0+6nn+3UXi0+nD6M=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=gXJ1ezjDr3B8d4Q54UcBfUrghCbdj9PxvqvV/fzIVnWnlAD7qTsexjHl4fXPywhN8
-	 eBd3HuI4b1EL5zYWd23l/tQ9x0ZmXeqh6hZVB13B/2DaI1dZ22en+xpCUo3lsDLsNJ
-	 I6M5mRDIrPNQp/LUo0TAw9Be5NkY+dXikz3FPepC32BeU0FcWa5s3c65LoUz56B02j
-	 CoIRSuufrXsqQipqOkeBKM7ta6kwxt8DE3FERhOUd2Xnzcd0fn6SMnCEIb+mv4EUgx
-	 Zhx3dOShbEJ5XIOWHwckrsuKuleqGQOEO9n7aRyFAKhUyn2Ifl6Xj7/eFqJHjgZ8ow
-	 8D8b6Og2Va+UA==
-Date: Mon, 27 Jan 2025 15:01:12 -0800
+	b=txqCkd5mzbFjjJ/P2y0kqLzWWIBI3E6S1lJeUqLTPpNlbODCk8lVD8blRDdt2lbaI
+	 /Bj/W6NtS5N34ytC7TXtBQ4wVV1zj+oZCASaNknHjt+ytUzx4AO+3m7/J9UQCjuHOF
+	 QqiHQEwaPGxp9c0Fnim9skvlMIphBO+rUQ2ArFyX4hiuOHYPcLGYTGd5mT/4JLW7yV
+	 ZkCNoQEtGs9c8ArHA7uHNtydrfqOmFV2sUUg89GrKYSlPiGdbS0Ea2tUILwMDxmJzg
+	 7LtolK7QwAK1lWO9ctrhcr4u831X80WXRoFevMS8f6JqglajQthB1FxD2HKZ2fGYAZ
+	 u8d7ZrIgKn75g==
+Date: Mon, 27 Jan 2025 15:04:06 -0800
 From: Jakub Kicinski <kuba@kernel.org>
-To: netdev@vger.kernel.org
-Cc: Shigeru Yoshida <syoshida@redhat.com>, andrew+netdev@lunn.ch,
- davem@davemloft.net, edumazet@google.com, pabeni@redhat.com,
- linux-kernel@vger.kernel.org, syzkaller <syzkaller@googlegroups.com>
-Subject: Re: [PATCH net] vxlan: Fix uninit-value in vxlan_vnifilter_dump()
-Message-ID: <20250127150112.5e395327@kernel.org>
-In-Reply-To: <20250123145746.785768-1-syoshida@redhat.com>
-References: <20250123145746.785768-1-syoshida@redhat.com>
+To: Matthieu Baerts <matttbe@kernel.org>, Jan Stancek <jstancek@redhat.com>
+Cc: pshelar@ovn.org, davem@davemloft.net, edumazet@google.com,
+ pabeni@redhat.com, liuhangbin@gmail.com, linux-kselftest@vger.kernel.org,
+ netdev@vger.kernel.org
+Subject: Re: [PATCH net] selftests: net/{lib,openvswitch}: extend CFLAGS to
+ keep options from environment
+Message-ID: <20250127150406.0d97a181@kernel.org>
+In-Reply-To: <26ad0900-bd9d-464e-be9f-c1806b96c971@kernel.org>
+References: <3d173603ee258f419d0403363765c9f9494ff79a.1737635092.git.jstancek@redhat.com>
+	<26ad0900-bd9d-464e-be9f-c1806b96c971@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -60,15 +62,16 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
 
-On Thu, 23 Jan 2025 23:57:46 +0900 Shigeru Yoshida wrote:
-> +	if (cb->nlh->nlmsg_len < nlmsg_msg_size(sizeof(struct tunnel_msg))) {
-> +		NL_SET_ERR_MSG(cb->extack, "Invalid msg length");
-> +		return -EINVAL;
-> +	}
-> +
->  	tmsg = nlmsg_data(cb->nlh);
+On Thu, 23 Jan 2025 13:51:27 +0100 Matthieu Baerts wrote:
+> > -CFLAGS =  -Wall -Wl,--no-as-needed -O2 -g
+> > +CFLAGS +=  -Wall -Wl,--no-as-needed -O2 -g  
+> 
+> (small detail: I guess the double whitespaces after the '=' were there
+> to keep the alignment with the next line, so probably there should be
+> only one now, but I don't think this alone is enough to ask for a v2!)
 
-We really should have a better helper for combined message length
-validation and nlmsg_data(). I'll add this to our list of outstanding
-cleanup tasks..
+Adjusted when applying in both patches, so the bot will probably not
+respond.
+
+Thanks for these fixes!
 
