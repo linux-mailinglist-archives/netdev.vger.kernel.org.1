@@ -1,100 +1,102 @@
-Return-Path: <netdev+bounces-161344-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-161343-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7A9A4A20C8D
-	for <lists+netdev@lfdr.de>; Tue, 28 Jan 2025 16:04:43 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id A2D1AA20C6E
+	for <lists+netdev@lfdr.de>; Tue, 28 Jan 2025 16:00:28 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B7ACD3A1A3B
-	for <lists+netdev@lfdr.de>; Tue, 28 Jan 2025 15:04:35 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 0D55A167409
+	for <lists+netdev@lfdr.de>; Tue, 28 Jan 2025 15:00:27 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4DEC01ACECF;
-	Tue, 28 Jan 2025 15:04:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E68B31A7249;
+	Tue, 28 Jan 2025 15:00:23 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=yandex.ru header.i=@yandex.ru header.b="i1ymYKMc"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="bQv7y2Vk"
 X-Original-To: netdev@vger.kernel.org
-Received: from forward501d.mail.yandex.net (forward501d.mail.yandex.net [178.154.239.209])
+Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 26DFB1ACED7;
-	Tue, 28 Jan 2025 15:04:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=178.154.239.209
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DDE51199EAD;
+	Tue, 28 Jan 2025 15:00:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1738076657; cv=none; b=hNj51xF0RPJ1XrFkqwoAnTgvwy5Lym1QhoPCcsyphzqGEpF4zzYc/lK78aTIU6frmoKS/2oWvsSQPwL4U1/7txlZGoj8W+4zqPCTFYSlZhw0I7ZitFoctrZ+LRljspptAZqWLEfiKZmXdKyLqfUIsRhy2zO21tZukT5VwGIGQ1A=
+	t=1738076423; cv=none; b=DJo/JCbE5X9DCQhMCx0IvXjHzdFk9Q6XeEAsFrP5H3FW92vFy1s1CjDr/0UIm6ApL20EMhETQVDdzey4hXsKxerBi3/ngtjsTaXqQM2EmJ30sG7XHvWBbxuwyhSWOi7mwZmpbEABFoxS2HvV+lBP12lSJZrjApTpIc81uEdpueo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1738076657; c=relaxed/simple;
-	bh=ZzrIR3hQ/Nebaq+39nzM0SlnLzkgNb0FbarXiUN1eCk=;
-	h=Message-ID:Date:MIME-Version:Subject:From:To:Cc:References:
-	 In-Reply-To:Content-Type; b=lW8Wqh/WGUKE24tfSSYeO1TdOXfDIkySFpVBaDMRaHNBldTwjOimemHH+J+3VmVl4FwkspmBUKU6oYQgaQLFmOXCgYaj2pUg7/fn1JnENi/LjeSwxwDAPr+nqs7AHCAQg9sQFFe7B+u0KHrBstHBVUoXStbhiFcOFdF/CCxIzI8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=yandex.ru; spf=pass smtp.mailfrom=yandex.ru; dkim=pass (1024-bit key) header.d=yandex.ru header.i=@yandex.ru header.b=i1ymYKMc; arc=none smtp.client-ip=178.154.239.209
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=yandex.ru
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=yandex.ru
-Received: from mail-nwsmtp-smtp-production-main-69.iva.yp-c.yandex.net (mail-nwsmtp-smtp-production-main-69.iva.yp-c.yandex.net [IPv6:2a02:6b8:c0c:a28e:0:640:cac8:0])
-	by forward501d.mail.yandex.net (Yandex) with ESMTPS id EA6726097C;
-	Tue, 28 Jan 2025 17:58:41 +0300 (MSK)
-Received: by mail-nwsmtp-smtp-production-main-69.iva.yp-c.yandex.net (smtp/Yandex) with ESMTPSA id ewe6pVLOpGk0-7uo6oAgE;
-	Tue, 28 Jan 2025 17:58:41 +0300
-X-Yandex-Fwd: 1
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=yandex.ru; s=mail;
-	t=1738076321; bh=ZzrIR3hQ/Nebaq+39nzM0SlnLzkgNb0FbarXiUN1eCk=;
-	h=In-Reply-To:Cc:Date:References:To:From:Subject:Message-ID;
-	b=i1ymYKMcemak1/rUGQRZKswI02W0NVx3J0CLGxeXS7JnGpL6FRjgkqGLLQ5ialPsw
-	 mI6b4hb5H7HoJL8VOWI8wuF6H7L0SVNEOVuzPXFoKGWcLguFjerhfoqOigIcOiVi1/
-	 /SdnPEM0gaImFV3Xzskfu8Y9MXBqT1RH14YSfZTU=
-Authentication-Results: mail-nwsmtp-smtp-production-main-69.iva.yp-c.yandex.net; dkim=pass header.i=@yandex.ru
-Message-ID: <d1eed411-789a-48ec-8468-8e5005fff909@yandex.ru>
-Date: Tue, 28 Jan 2025 17:58:40 +0300
+	s=arc-20240116; t=1738076423; c=relaxed/simple;
+	bh=QRfiqBpEw7/liJXDoioKBx1vNw67bwXhn1uGoicqW/k=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=cATf9E1crkMT+8bi95olDJWxdX7kG/OZ9UzRvQHgaO8z/QFz6fCL3Pc2Cbhlcz9L3VNCPnJc0bsfz2Dj2Ilqv/J/nwB0ftAhpxu5bLIb6He/jUlXRu0P24qhEu8YHXL+x3Koy8MLM70qiNUNo3BnyX+GGOVzajnjQxGYtTAyxvc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=bQv7y2Vk; arc=none smtp.client-ip=78.32.30.218
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
+	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
+	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
+	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
+	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
+	bh=U0y1/5KjujPLLYN0/a/OAGfW6wEftE6jNU0MO4+5f08=; b=bQv7y2Vk//g3H/hdiNSHTo2fkb
+	5rkNlvgrieDxx2+XrUXeykAh16ZYPuQonhyRvcDlXZsibeVKZvw2rQ3A5ChZeTW7Dr7a6HXQqgpq0
+	M7mg8suoSySCT1qYG1uG5Io1T5I24Ouk19C7lxE/mlrQdHQnnBBMPFWVinUc3qbge6w/C5LkkGbQa
+	VnIjA6fBz6nq28N+1C0LEe6Jq12INu+vt++UroH0nqdRrZwFJysb9SkDhcguTxTfn9PBzFSWY45zD
+	MTt3IGISTU3pufnRvMhep54CEt8+V4mqWdyWEhat0v3dlLWKeW/jLeI0C8zjY+GetUnXM5jLl/PYc
+	zcOGnM0g==;
+Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:58350)
+	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.96)
+	(envelope-from <linux@armlinux.org.uk>)
+	id 1tcn4Q-0007Nk-0L;
+	Tue, 28 Jan 2025 15:00:06 +0000
+Received: from linux by shell.armlinux.org.uk with local (Exim 4.96)
+	(envelope-from <linux@shell.armlinux.org.uk>)
+	id 1tcn4I-0002jM-0z;
+	Tue, 28 Jan 2025 14:59:58 +0000
+Date: Tue, 28 Jan 2025 14:59:58 +0000
+From: "Russell King (Oracle)" <linux@armlinux.org.uk>
+To: Swathi K S <swathi.ks@samsung.com>
+Cc: krzk@kernel.org, robh@kernel.org, davem@davemloft.net,
+	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
+	conor+dt@kernel.org, richardcochran@gmail.com,
+	mcoquelin.stm32@gmail.com, andrew@lunn.ch, alim.akhtar@samsung.com,
+	linux-fsd@tesla.com, netdev@vger.kernel.org,
+	devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
+	linux-stm32@st-md-mailman.stormreply.com,
+	linux-arm-kernel@lists.infradead.org,
+	linux-samsung-soc@vger.kernel.org, alexandre.torgue@foss.st.com,
+	peppe.cavallaro@st.com, joabreu@synopsys.com, rcsekar@samsung.com,
+	ssiddha@tesla.com, jayati.sahu@samsung.com,
+	pankaj.dubey@samsung.com, ravi.patel@samsung.com,
+	gost.dev@samsung.com
+Subject: Re: [PATCH v5 2/4] net: stmmac: dwc-qos: Add FSD EQoS support
+Message-ID: <Z5jw7pUXEoGjLtgP@shell.armlinux.org.uk>
+References: <20250128102558.22459-1-swathi.ks@samsung.com>
+ <CGME20250128102732epcas5p4618e808063ffa992b476f03f7098d991@epcas5p4.samsung.com>
+ <20250128102558.22459-3-swathi.ks@samsung.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: Possible mistake in commit 3ca459eaba1b ("tun: fix group
- permission check")
-Content-Language: en-US
-From: stsp <stsp2@yandex.ru>
-To: Ondrej Mosnacek <omosnace@redhat.com>,
- Willem de Bruijn <willemdebruijn.kernel@gmail.com>
-Cc: Willem de Bruijn <willemb@google.com>, Jason Wang <jasowang@redhat.com>,
- Jakub Kicinski <kuba@kernel.org>, network dev <netdev@vger.kernel.org>,
- Linux Security Module list <linux-security-module@vger.kernel.org>,
- SElinux list <selinux@vger.kernel.org>
-References: <CAFqZXNtkCBT4f+PwyVRmQGoT3p1eVa01fCG_aNtpt6dakXncUg@mail.gmail.com>
- <e8b6c6f9-9647-4ab6-8bbb-ccc94b04ade4@yandex.ru>
- <67979d24d21bc_3f1a29434@willemb.c.googlers.com.notmuch>
- <CAFqZXNscJnX2VF-TyZaEC5nBtUUXdWPM2ejXTWBL8=5UyakssA@mail.gmail.com>
- <fd2f411b-c499-47dc-8472-321d42a35f13@yandex.ru>
-In-Reply-To: <fd2f411b-c499-47dc-8472-321d42a35f13@yandex.ru>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250128102558.22459-3-swathi.ks@samsung.com>
+Sender: Russell King (Oracle) <linux@armlinux.org.uk>
 
-28.01.2025 17:45, stsp пишет:
-> 28.01.2025 17:20, Ondrej Mosnacek пишет:
->> That could work, but the semantics become a bit weird, actually: When
->> you set both uid and gid, one of them needs to match. If you unset
->> uid/gid, you get a stricter condition (gid/uid must match). And if you
->> then also unset the other one, you suddenly get a less strict
->> condition than the first two - nothing has to match.
-> Maybe this means that
-> unsetting with -1 is something
-> that shouldn't be done and/or
-> allowed?
-> In this case you only stricten.
-> Modulo the inability to set both
-> user/group at the same time,
-> so you still get "less strict" when
-> setting group after user already
-> set...
+On Tue, Jan 28, 2025 at 03:55:56PM +0530, Swathi K S wrote:
+> +struct fsd_eqos_plat_data {
+> +	struct clk_bulk_data *clks;
+> +	int num_clks;
+> +	struct device *dev;
 
-It may actually be possible to
-add the ioctl to set both at once.
-In this case you also reset both
-(with the same ioctl or add another
-one for resetting both), which
-makes the problem fully solved.
+You only write to this, so it serves no purpose in this patch. Please
+remove.
 
+Thanks.
+
+-- 
+RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
+FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
 
