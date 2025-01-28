@@ -1,60 +1,60 @@
-Return-Path: <netdev+bounces-161325-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-161322-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 98AB2A20B26
-	for <lists+netdev@lfdr.de>; Tue, 28 Jan 2025 14:16:38 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 36D06A20B21
+	for <lists+netdev@lfdr.de>; Tue, 28 Jan 2025 14:16:19 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 04119164E90
-	for <lists+netdev@lfdr.de>; Tue, 28 Jan 2025 13:16:37 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C7C3E3A868B
+	for <lists+netdev@lfdr.de>; Tue, 28 Jan 2025 13:16:09 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4A2661A9B4D;
-	Tue, 28 Jan 2025 13:16:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 784641A38E4;
+	Tue, 28 Jan 2025 13:16:10 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=rbox.co header.i=@rbox.co header.b="Bb4urRsS"
+	dkim=pass (2048-bit key) header.d=rbox.co header.i=@rbox.co header.b="PVrtubZ4"
 X-Original-To: netdev@vger.kernel.org
-Received: from mailtransmit04.runbox.com (mailtransmit04.runbox.com [185.226.149.37])
+Received: from mailtransmit05.runbox.com (mailtransmit05.runbox.com [185.226.149.38])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ABEA91A9B40
-	for <netdev@vger.kernel.org>; Tue, 28 Jan 2025 13:16:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.226.149.37
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A376519CCEC;
+	Tue, 28 Jan 2025 13:16:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.226.149.38
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1738070174; cv=none; b=uOPAqWYt7fYMDH28iFQY8BO8sXl6fMVYoHBmbsXmZoPArLOrUgtdMDR/+7wGjfNU21F/BEce2lfdUXCuP9wDRFAShphXgrbW4Xz3ecrwmRpxwadWQY4QWzrdw60pc3Y3yYgWm9Kfg9CBfkSadJbayTD9uNVo61HXv8rm00dn/Js=
+	t=1738070170; cv=none; b=ZsfITWWcMAW7e3tpJ7zkHQ51PD3LTW1B/ycjuWUyGteUDUlZHaR+uifRpFDPUGAlg6h1ypB++PJuYz7l5vcsDkEpiEyglXbyGd7vEjqvNKjexvCzpS4u1f4Q8syC8Cj63xb/ZJ4QXWT1IJGAUhy8/VRUiUSJuPzH4uNr/0lpFK4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1738070174; c=relaxed/simple;
-	bh=qEghCYw90LvLl/UsHV0yG5FBhJG01TkgMBGl7th78es=;
+	s=arc-20240116; t=1738070170; c=relaxed/simple;
+	bh=cQm26A2r2B4pkQB1WSlu2i0TqGAguDpmJPl2biUcK9A=;
 	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=ZoxYJBj1A1cZTFH5wIvxQibqlE95dEb9BGxr/ndo+KO88tntFNP94uTgpH9tx1HwEHTBJf0OW67+4F7ZOvJaFBlc0j8nkg2dspvvlTx5DWHKkUER5/ogRpJFT6cM2ACxZs5tz2a8HaqyHatbbtG1XIxSzTCez1ahmcUtMdaNi4A=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=rbox.co; spf=pass smtp.mailfrom=rbox.co; dkim=pass (2048-bit key) header.d=rbox.co header.i=@rbox.co header.b=Bb4urRsS; arc=none smtp.client-ip=185.226.149.37
+	 In-Reply-To:To:Cc; b=l5gii342+70wyNVsbXGJ+LkhtrC5xmrwC9RxZkWgNdq6rFkwC0fp2ATuVTFfOF0lc0oL6kL7utbBZTd+Uot3QXZfzv+047FyE2HkyGKdCIswUjdaBWaYQ1Rdu9TdgcMJHYygX8RnE3M854BXJOoyAzu0/6M92B1wPakGiV8W9SQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=rbox.co; spf=pass smtp.mailfrom=rbox.co; dkim=pass (2048-bit key) header.d=rbox.co header.i=@rbox.co header.b=PVrtubZ4; arc=none smtp.client-ip=185.226.149.38
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=rbox.co
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=rbox.co
 Received: from mailtransmit02.runbox ([10.9.9.162] helo=aibo.runbox.com)
-	by mailtransmit04.runbox.com with esmtps  (TLS1.2) tls TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256
+	by mailtransmit05.runbox.com with esmtps  (TLS1.2) tls TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256
 	(Exim 4.93)
 	(envelope-from <mhal@rbox.co>)
-	id 1tclRo-002exw-Rb; Tue, 28 Jan 2025 14:16:08 +0100
+	id 1tclRl-002o4T-OD; Tue, 28 Jan 2025 14:16:05 +0100
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=rbox.co;
 	s=selector2; h=Cc:To:In-Reply-To:References:Message-Id:
 	Content-Transfer-Encoding:Content-Type:MIME-Version:Subject:Date:From;
-	bh=50sw8+RLYxtrONIEeNuYTgWEQ2DmBdco7580O/YdZEI=; b=Bb4urRsSXepjlV/UbEYOiBfbza
-	Er9217poUVswq9HMXXkliZT3lvhKIPVnFq4lGMMgvl1ptLIEpVlBjl90JjyEKifaQe10Ozf45a+Zo
-	muvLjrhBTHFTnG4d1WnqNxDJgjaU+zyiQ2CQQLn2BqzvG/EzibdJx2knc3hvBXyHDJ1lti0bHIcNS
-	7LQ5ETDZws+CvCzcmosaDt0ELAAA9PbFJGUEaaIXJASC+UpVb3BxCuEHKO+/SruEUHMOo4HgTqf8B
-	N7kc3IyWy4yWl1LN3HXY+qgpIe22pxUIReM2ZsdK9kHE6/j+p7Vj3cspSNy0g6LxyUpEnUqxoaLGw
-	hsXiolSg==;
+	bh=9R5OvuG4Ddv4DLQydiPu1JDwrmDM37Ahgjrn2vEoGdY=; b=PVrtubZ4VswtH+R19mJDVy3F8q
+	rsj25XuYWWw8ljxvSQacddwZpfBN9e6YX9EtcCaM6tPu7D6atr6RDukF5qRr6Eridsxbb83rNJ4Ti
+	T5eEtKiccKwDY0sdtdWVvohDlBbBJKS8z/42WHDjV58Db0lbt6uho8C5RWFkxpwMaEZ60Z6Wqsli5
+	YNoJBMFkorKA5IDg/UFedBbN47YfV75W2/n90Z9Gmqb/6ZsMn7nbInWOuPhSw8fNRkx/aYhIelfms
+	RRyoJLX2MucxNApkllCtL1E/wiJe9ODfaoe2kVkQcICslbSrMB7RDdnOZYU/J0IhxKhvm0gul/NC2
+	vacFfaFg==;
 Received: from [10.9.9.73] (helo=submission02.runbox)
 	by mailtransmit02.runbox with esmtp (Exim 4.86_2)
 	(envelope-from <mhal@rbox.co>)
-	id 1tclRo-0006wY-DV; Tue, 28 Jan 2025 14:16:08 +0100
+	id 1tclRl-0006wF-9u; Tue, 28 Jan 2025 14:16:05 +0100
 Received: by submission02.runbox with esmtpsa  [Authenticated ID (604044)]  (TLS1.2:ECDHE_SECP256R1__RSA_PSS_RSAE_SHA256__AES_256_GCM:256)
 	(Exim 4.93)
-	id 1tclRJ-000mZg-Py; Tue, 28 Jan 2025 14:15:37 +0100
+	id 1tclRK-000mZg-9O; Tue, 28 Jan 2025 14:15:38 +0100
 From: Michal Luczaj <mhal@rbox.co>
-Date: Tue, 28 Jan 2025 14:15:28 +0100
-Subject: [PATCH net v3 2/6] vsock: Allow retrying on connect() failure
+Date: Tue, 28 Jan 2025 14:15:29 +0100
+Subject: [PATCH net v3 3/6] vsock/test: Introduce vsock_bind()
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -63,7 +63,7 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-Message-Id: <20250128-vsock-transport-vs-autobind-v3-2-1cf57065b770@rbox.co>
+Message-Id: <20250128-vsock-transport-vs-autobind-v3-3-1cf57065b770@rbox.co>
 References: <20250128-vsock-transport-vs-autobind-v3-0-1cf57065b770@rbox.co>
 In-Reply-To: <20250128-vsock-transport-vs-autobind-v3-0-1cf57065b770@rbox.co>
 To: Stefano Garzarella <sgarzare@redhat.com>, 
@@ -74,36 +74,150 @@ Cc: netdev@vger.kernel.org, virtualization@lists.linux.dev,
  Michal Luczaj <mhal@rbox.co>, Luigi Leonardi <leonardi@redhat.com>
 X-Mailer: b4 0.14.2
 
-sk_err is set when a (connectible) connect() fails. Effectively, this makes
-an otherwise still healthy SS_UNCONNECTED socket impossible to use for any
-subsequent connection attempts.
+Add a helper for socket()+bind(). Adapt callers.
 
-Clear sk_err upon trying to establish a connection.
-
-Fixes: d021c344051a ("VSOCK: Introduce VM Sockets")
 Reviewed-by: Stefano Garzarella <sgarzare@redhat.com>
 Reviewed-by: Luigi Leonardi <leonardi@redhat.com>
 Signed-off-by: Michal Luczaj <mhal@rbox.co>
 ---
- net/vmw_vsock/af_vsock.c | 5 +++++
- 1 file changed, 5 insertions(+)
+ tools/testing/vsock/util.c       | 57 +++++++++++++++++-----------------------
+ tools/testing/vsock/util.h       |  1 +
+ tools/testing/vsock/vsock_test.c | 17 +-----------
+ 3 files changed, 26 insertions(+), 49 deletions(-)
 
-diff --git a/net/vmw_vsock/af_vsock.c b/net/vmw_vsock/af_vsock.c
-index cfe18bc8fdbe7ced073c6b3644d635fdbfa02610..075695173648d3a4ecbd04e908130efdbb393b41 100644
---- a/net/vmw_vsock/af_vsock.c
-+++ b/net/vmw_vsock/af_vsock.c
-@@ -1523,6 +1523,11 @@ static int vsock_connect(struct socket *sock, struct sockaddr *addr,
- 		if (err < 0)
- 			goto out;
+diff --git a/tools/testing/vsock/util.c b/tools/testing/vsock/util.c
+index 7058dc614c25f546fc3219d6b9ade2dcef21a9bd..6e36f9371532cfc75dd14131b84bf8393ca0952b 100644
+--- a/tools/testing/vsock/util.c
++++ b/tools/testing/vsock/util.c
+@@ -96,33 +96,43 @@ void vsock_wait_remote_close(int fd)
+ 	close(epollfd);
+ }
  
-+		/* sk_err might have been set as a result of an earlier
-+		 * (failed) connect attempt.
-+		 */
-+		sk->sk_err = 0;
+-/* Bind to <bind_port>, connect to <cid, port> and return the file descriptor. */
+-int vsock_bind_connect(unsigned int cid, unsigned int port, unsigned int bind_port, int type)
++/* Create socket <type>, bind to <cid, port> and return the file descriptor. */
++int vsock_bind(unsigned int cid, unsigned int port, int type)
+ {
+-	struct sockaddr_vm sa_client = {
+-		.svm_family = AF_VSOCK,
+-		.svm_cid = VMADDR_CID_ANY,
+-		.svm_port = bind_port,
+-	};
+-	struct sockaddr_vm sa_server = {
++	struct sockaddr_vm sa = {
+ 		.svm_family = AF_VSOCK,
+ 		.svm_cid = cid,
+ 		.svm_port = port,
+ 	};
++	int fd;
+ 
+-	int client_fd, ret;
+-
+-	client_fd = socket(AF_VSOCK, type, 0);
+-	if (client_fd < 0) {
++	fd = socket(AF_VSOCK, type, 0);
++	if (fd < 0) {
+ 		perror("socket");
+ 		exit(EXIT_FAILURE);
+ 	}
+ 
+-	if (bind(client_fd, (struct sockaddr *)&sa_client, sizeof(sa_client))) {
++	if (bind(fd, (struct sockaddr *)&sa, sizeof(sa))) {
+ 		perror("bind");
+ 		exit(EXIT_FAILURE);
+ 	}
+ 
++	return fd;
++}
 +
- 		/* Mark sock as connecting and set the error code to in
- 		 * progress in case this is a non-blocking connect.
- 		 */
++/* Bind to <bind_port>, connect to <cid, port> and return the file descriptor. */
++int vsock_bind_connect(unsigned int cid, unsigned int port, unsigned int bind_port, int type)
++{
++	struct sockaddr_vm sa_server = {
++		.svm_family = AF_VSOCK,
++		.svm_cid = cid,
++		.svm_port = port,
++	};
++
++	int client_fd, ret;
++
++	client_fd = vsock_bind(VMADDR_CID_ANY, bind_port, type);
++
+ 	timeout_begin(TIMEOUT);
+ 	do {
+ 		ret = connect(client_fd, (struct sockaddr *)&sa_server, sizeof(sa_server));
+@@ -192,28 +202,9 @@ int vsock_seqpacket_connect(unsigned int cid, unsigned int port)
+ /* Listen on <cid, port> and return the file descriptor. */
+ static int vsock_listen(unsigned int cid, unsigned int port, int type)
+ {
+-	union {
+-		struct sockaddr sa;
+-		struct sockaddr_vm svm;
+-	} addr = {
+-		.svm = {
+-			.svm_family = AF_VSOCK,
+-			.svm_port = port,
+-			.svm_cid = cid,
+-		},
+-	};
+ 	int fd;
+ 
+-	fd = socket(AF_VSOCK, type, 0);
+-	if (fd < 0) {
+-		perror("socket");
+-		exit(EXIT_FAILURE);
+-	}
+-
+-	if (bind(fd, &addr.sa, sizeof(addr.svm)) < 0) {
+-		perror("bind");
+-		exit(EXIT_FAILURE);
+-	}
++	fd = vsock_bind(cid, port, type);
+ 
+ 	if (listen(fd, 1) < 0) {
+ 		perror("listen");
+diff --git a/tools/testing/vsock/util.h b/tools/testing/vsock/util.h
+index e62f46b2b92a7916e83e1e623b43c811b077db3e..077842905bc3e7a4bbd22caba4b7bde976de2718 100644
+--- a/tools/testing/vsock/util.h
++++ b/tools/testing/vsock/util.h
+@@ -43,6 +43,7 @@ int vsock_connect(unsigned int cid, unsigned int port, int type);
+ int vsock_accept(unsigned int cid, unsigned int port,
+ 		 struct sockaddr_vm *clientaddrp, int type);
+ int vsock_stream_connect(unsigned int cid, unsigned int port);
++int vsock_bind(unsigned int cid, unsigned int port, int type);
+ int vsock_bind_connect(unsigned int cid, unsigned int port,
+ 		       unsigned int bind_port, int type);
+ int vsock_seqpacket_connect(unsigned int cid, unsigned int port);
+diff --git a/tools/testing/vsock/vsock_test.c b/tools/testing/vsock/vsock_test.c
+index 1eebbc0d5f616bb1afab3ec3f9e59cb609f9f6e8..daa4f3ca9b6e7267d1bb14a7d43499da3bafb108 100644
+--- a/tools/testing/vsock/vsock_test.c
++++ b/tools/testing/vsock/vsock_test.c
+@@ -113,24 +113,9 @@ static void test_stream_bind_only_client(const struct test_opts *opts)
+ 
+ static void test_stream_bind_only_server(const struct test_opts *opts)
+ {
+-	union {
+-		struct sockaddr sa;
+-		struct sockaddr_vm svm;
+-	} addr = {
+-		.svm = {
+-			.svm_family = AF_VSOCK,
+-			.svm_port = opts->peer_port,
+-			.svm_cid = VMADDR_CID_ANY,
+-		},
+-	};
+ 	int fd;
+ 
+-	fd = socket(AF_VSOCK, SOCK_STREAM, 0);
+-
+-	if (bind(fd, &addr.sa, sizeof(addr.svm)) < 0) {
+-		perror("bind");
+-		exit(EXIT_FAILURE);
+-	}
++	fd = vsock_bind(VMADDR_CID_ANY, opts->peer_port, SOCK_STREAM);
+ 
+ 	/* Notify the client that the server is ready */
+ 	control_writeln("BIND");
 
 -- 
 2.48.1
