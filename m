@@ -1,100 +1,197 @@
-Return-Path: <netdev+bounces-161310-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-161311-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id D2F69A20A81
-	for <lists+netdev@lfdr.de>; Tue, 28 Jan 2025 13:20:12 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8EBCEA20A8A
+	for <lists+netdev@lfdr.de>; Tue, 28 Jan 2025 13:27:30 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 3DE9F1615B5
-	for <lists+netdev@lfdr.de>; Tue, 28 Jan 2025 12:20:11 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id CF1633A702B
+	for <lists+netdev@lfdr.de>; Tue, 28 Jan 2025 12:27:22 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C528E12F5A5;
-	Tue, 28 Jan 2025 12:20:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9601319DFA4;
+	Tue, 28 Jan 2025 12:27:26 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="cwfFHpDO"
+	dkim=pass (2048-bit key) header.d=siemens.com header.i=zdenek.bouska@siemens.com header.b="hQqdfVBP"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from mta-65-225.siemens.flowmailer.net (mta-65-225.siemens.flowmailer.net [185.136.65.225])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 99F18BA27;
-	Tue, 28 Jan 2025 12:20:07 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DAECB19ABAB
+	for <netdev@vger.kernel.org>; Tue, 28 Jan 2025 12:27:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.136.65.225
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1738066807; cv=none; b=UyWcuv3BzG9UOdF/wSU3Vn1BkYfcQGbCFCinPfq/whCJOqNxV2A55GBHAjgJD+5bedXniqmZUKjWBWG+SwePgRbXKzfO7G5uks/wifY8a9lO8eGRpjw5A/Eoma+xy9BEP8SzYGipkWGT6IjPU4WYQ39USndZ9bMObR2Sp05git8=
+	t=1738067246; cv=none; b=WsI01zBAKimCIS8Trq/l1vD0PEghIZ/WtY6JRPn4jjJKdq+QjCuDRaKTEMyxv9xodZ+m+xaXGTd6quQNhCtn9OpAWEJnDGoU/nz8+C3hkVQwGEp3Lw9VfObfCNG4u06w+PZmptRHzyHG+ZtgNSFseiLJXceNtT4oExd7ot7xdhs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1738066807; c=relaxed/simple;
-	bh=hGRAHKFUCDKAuwe3CGHbeVZG49CT7ecXG5otU32lUgg=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=o/I26gFFtiMcf9X4S3Zg/UHtCwx2AFXzA1ZNNNHyIyNtWTHpxoLHCmulFDMzJX+2WoSDBW1xhI+/hTqt8oL2kbYc9QtP/iu+3/vjMpib+m2wR1KgX4TRrNNHbjM9lLsjCFR3r7s+0xIpun4XaE6sL5l/lo63Qxd0uTjalYQ3vHc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=cwfFHpDO; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0064EC4CED3;
-	Tue, 28 Jan 2025 12:20:07 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1738066807;
-	bh=hGRAHKFUCDKAuwe3CGHbeVZG49CT7ecXG5otU32lUgg=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=cwfFHpDOMF43ZbhuhVr3ZbDmUOPsIf6c6Vodr6d6bghMyPyiTQkHVYIaIe/Xx3HIy
-	 /V/vnFFZScwU1qc/UYs6QoOOY2cWJiW1FggvRQShQtcvjdXMQU4wZ6PdgUXhMFxLd8
-	 uWBn8Kxovfo0/FjOrQnXozJHDFodHowcPTgKU7W9TPsMnlw/CxcUSbKyJTkkyaFu7J
-	 4uMdWFYFkOV2ql+Wzn4KhJJYeCuuA5QuhBUnle4cKGmXQJiFJH19u66yr88MsWbdEa
-	 EFwjykFH471jvawzyB0RKdDURsq86lKnTkys/S8TNBUf1C6wrcPjMgZ4IrSLk4+hqu
-	 jWH6782480JNA==
-Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id EB249380AA66;
-	Tue, 28 Jan 2025 12:20:33 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=arc-20240116; t=1738067246; c=relaxed/simple;
+	bh=1gWtyaI+egDjezQYz9OVoseWuHwXlTKaft5yT0HP2UY=;
+	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:To:Cc; b=CBAgqxlNx3p4x4J4webAOv33gNrwITynl5OcN7+8tmg6Dmy48XY4GUjcbawH7+LoUFrFLPlLukwC5DItofJNSvoeJncuY1/xrxRS3+hOGfWEYdMpYfspOPQWnLEtQ7ADjkUOhQVdUhzCzimug9Hsm3Og6i8U4oa+LCio0qm2BJ0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=siemens.com; spf=pass smtp.mailfrom=rts-flowmailer.siemens.com; dkim=pass (2048-bit key) header.d=siemens.com header.i=zdenek.bouska@siemens.com header.b=hQqdfVBP; arc=none smtp.client-ip=185.136.65.225
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=siemens.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=rts-flowmailer.siemens.com
+Received: by mta-65-225.siemens.flowmailer.net with ESMTPSA id 20250128122715377fe9e0c5c8c61b79
+        for <netdev@vger.kernel.org>;
+        Tue, 28 Jan 2025 13:27:15 +0100
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; s=fm2;
+ d=siemens.com; i=zdenek.bouska@siemens.com;
+ h=Date:From:Subject:To:Message-ID:MIME-Version:Content-Type:Content-Transfer-Encoding:Cc;
+ bh=p4ixpKONXaTxPgBnMeyq9hz7nD1mrYbVaBMo2Q6Zl2w=;
+ b=hQqdfVBP3AM7WaZHqHi1myUev0D3MsOvJpsfORbVHsl8HkRZx6Rzx1cU+7jTaPu/kHngdL
+ oEi6uxyZSpu3Av4Rq3WjG+O5rDPrtU4OzJLw73iw47usrcTl6SjrRQKRtt6yPRBIDRNHyNwZ
+ fFxzKjH3oyYZBh/3R1h01hGluE4XVGYQlZ9CQdeYjIMNHjbInQSVEpxdOprKSAdNkUMhM1i7
+ tzrLfGplmbAfDHzMi2iCkBl1nhQAGllXJ0rbdoCd9XnZLR73MckcFyM/DyzlpEhA/FMBoiSY
+ WTDjA87pns/piTcjqm7HU+LifhzLcSUCcNGlnWTNHfWeJHh98DpuDbMQ==;
+From: Zdenek Bouska <zdenek.bouska@siemens.com>
+Date: Tue, 28 Jan 2025 13:26:48 +0100
+Subject: [PATCH] igc: Fix HW RX timestamp when passed by ZC XDP
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net v4 0/3] Limit devicetree parameters to hardware capability
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <173806683276.3776163.12860723746760741556.git-patchwork-notify@kernel.org>
-Date: Tue, 28 Jan 2025 12:20:32 +0000
-References: <20250127013820.2941044-1-hayashi.kunihiko@socionext.com>
-In-Reply-To: <20250127013820.2941044-1-hayashi.kunihiko@socionext.com>
-To: Kunihiko Hayashi <hayashi.kunihiko@socionext.com>
-Cc: alexandre.torgue@foss.st.com, joabreu@synopsys.com, andrew+netdev@lunn.ch,
- davem@davemloft.net, edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
- mcoquelin.stm32@gmail.com, linux@armlinux.org.uk, si.yanteng@linux.dev,
- 0x1207@gmail.com, Joao.Pinto@synopsys.com, netdev@vger.kernel.org,
- linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+Message-Id: <20250128-igc-fix-hw-rx-timestamp-when-passed-by-zc-xdp-v1-1-b765d3e972de@siemens.com>
+X-B4-Tracking: v=1; b=H4sIAAfNmGcC/x2NwQ7CIBAFf6XZsy+BxibqrxgPCEvZQ5GwjUWb/
+ rvE4xxmZiflKqx0G3aq/BaVV+5gTwP55PLMkNCZRjNOxo4XyOwRpSFtqA2rLKyrWwq2xBnFqXL
+ A84OvRwsF1ymwM9bEaM/Um6Vyl/+/++M4fhyn/7t/AAAA
+To: Tony Nguyen <anthony.l.nguyen@intel.com>, 
+ Przemek Kitszel <przemyslaw.kitszel@intel.com>, 
+ Andrew Lunn <andrew+netdev@lunn.ch>, 
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+ Alexei Starovoitov <ast@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>, 
+ Jesper Dangaard Brouer <hawk@kernel.org>, 
+ John Fastabend <john.fastabend@gmail.com>, 
+ Vinicius Costa Gomes <vinicius.gomes@intel.com>, 
+ Florian Bezdeka <florian.bezdeka@siemens.com>, 
+ Jan Kiszka <jan.kiszka@siemens.com>, 
+ Song Yoong Siang <yoong.siang.song@intel.com>
+Cc: intel-wired-lan@lists.osuosl.org, netdev@vger.kernel.org, 
+ linux-kernel@vger.kernel.org, bpf@vger.kernel.org, 
+ Zdenek Bouska <zdenek.bouska@siemens.com>
+X-Flowmailer-Platform: Siemens
+Feedback-ID: 519:519-1328595:519-21489:flowmailer
 
-Hello:
+Fixes HW RX timestamp in the following scenario:
+- AF_PACKET socket with enabled HW RX timestamps is created
+- AF_XDP socket with enabled zero copy is created
+- frame is forwarded to the BPF program, where the timestamp should
+  still be readable (extracted by igc_xdp_rx_timestamp(), kfunc
+  behind bpf_xdp_metadata_rx_timestamp())
+- the frame got XDP_PASS from BPF program, redirecting to the stack
+- AF_PACKET socket receives the frame with HW RX timestamp
 
-This series was applied to netdev/net.git (main)
-by Paolo Abeni <pabeni@redhat.com>:
+Moves the skb timestamp setting from igc_dispatch_skb_zc() to
+igc_construct_skb_zc() so that igc_construct_skb_zc() is similar to
+igc_construct_skb().
 
-On Mon, 27 Jan 2025 10:38:17 +0900 you wrote:
-> This series includes patches that checks the devicetree properties,
-> the number of MTL queues and FIFO size values, and if these specified
-> values exceed the value contained in hardware capabilities, limit to
-> the values from the capabilities. Do nothing if the capabilities don't
-> have any specified values.
-> 
-> And this sets hardware capability values if FIFO sizes are not specified
-> and removes redundant lines.
-> 
-> [...]
+This issue can also be reproduced by running:
+ # tools/testing/selftests/bpf/xdp_hw_metadata enp1s0
+When a frame with the wrong port 9092 (instead of 9091) is used:
+ # echo -n xdp | nc -u -q1 192.168.10.9 9092
+then the RX timestamp is missing and xdp_hw_metadata prints:
+ skb hwtstamp is not found!
 
-Here is the summary with links:
-  - [net,v4,1/3] net: stmmac: Limit the number of MTL queues to hardware capability
-    https://git.kernel.org/netdev/net/c/f5fb35a3d6b3
-  - [net,v4,2/3] net: stmmac: Limit FIFO size by hardware capability
-    https://git.kernel.org/netdev/net/c/044f2fbaa272
-  - [net,v4,3/3] net: stmmac: Specify hardware capability value when FIFO size isn't specified
-    https://git.kernel.org/netdev/net/c/8865d22656b4
+With this fix or when copy mode is used:
+ # tools/testing/selftests/bpf/xdp_hw_metadata -c enp1s0
+then RX timestamp is found and xdp_hw_metadata prints:
+ found skb hwtstamp = 1736509937.852786132
 
-You are awesome, thank you!
+Fixes: 069b142f5819 ("igc: Add support for PTP .getcyclesx64()")
+Signed-off-by: Zdenek Bouska <zdenek.bouska@siemens.com>
+---
+ drivers/net/ethernet/intel/igc/igc_main.c | 21 ++++++++++++---------
+ 1 file changed, 12 insertions(+), 9 deletions(-)
+
+diff --git a/drivers/net/ethernet/intel/igc/igc_main.c b/drivers/net/ethernet/intel/igc/igc_main.c
+index 27872bdea9bd..d6c3147725b7 100644
+--- a/drivers/net/ethernet/intel/igc/igc_main.c
++++ b/drivers/net/ethernet/intel/igc/igc_main.c
+@@ -2707,8 +2707,9 @@ static int igc_clean_rx_irq(struct igc_q_vector *q_vector, const int budget)
+ }
+ 
+ static struct sk_buff *igc_construct_skb_zc(struct igc_ring *ring,
+-					    struct xdp_buff *xdp)
++					    struct igc_xdp_buff *ctx)
+ {
++	struct xdp_buff *xdp = &ctx->xdp;
+ 	unsigned int totalsize = xdp->data_end - xdp->data_meta;
+ 	unsigned int metasize = xdp->data - xdp->data_meta;
+ 	struct sk_buff *skb;
+@@ -2727,27 +2728,28 @@ static struct sk_buff *igc_construct_skb_zc(struct igc_ring *ring,
+ 		__skb_pull(skb, metasize);
+ 	}
+ 
++	if (ctx->rx_ts) {
++		skb_shinfo(skb)->tx_flags |= SKBTX_HW_TSTAMP_NETDEV;
++		skb_hwtstamps(skb)->netdev_data = ctx->rx_ts;
++	}
++
+ 	return skb;
+ }
+ 
+ static void igc_dispatch_skb_zc(struct igc_q_vector *q_vector,
+ 				union igc_adv_rx_desc *desc,
+-				struct xdp_buff *xdp,
+-				ktime_t timestamp)
++				struct igc_xdp_buff *ctx)
+ {
+ 	struct igc_ring *ring = q_vector->rx.ring;
+ 	struct sk_buff *skb;
+ 
+-	skb = igc_construct_skb_zc(ring, xdp);
++	skb = igc_construct_skb_zc(ring, ctx);
+ 	if (!skb) {
+ 		ring->rx_stats.alloc_failed++;
+ 		set_bit(IGC_RING_FLAG_RX_ALLOC_FAILED, &ring->flags);
+ 		return;
+ 	}
+ 
+-	if (timestamp)
+-		skb_hwtstamps(skb)->hwtstamp = timestamp;
+-
+ 	if (igc_cleanup_headers(ring, desc, skb))
+ 		return;
+ 
+@@ -2783,7 +2785,6 @@ static int igc_clean_rx_irq_zc(struct igc_q_vector *q_vector, const int budget)
+ 		union igc_adv_rx_desc *desc;
+ 		struct igc_rx_buffer *bi;
+ 		struct igc_xdp_buff *ctx;
+-		ktime_t timestamp = 0;
+ 		unsigned int size;
+ 		int res;
+ 
+@@ -2813,6 +2814,8 @@ static int igc_clean_rx_irq_zc(struct igc_q_vector *q_vector, const int budget)
+ 			 */
+ 			bi->xdp->data_meta += IGC_TS_HDR_LEN;
+ 			size -= IGC_TS_HDR_LEN;
++		} else {
++			ctx->rx_ts = NULL;
+ 		}
+ 
+ 		bi->xdp->data_end = bi->xdp->data + size;
+@@ -2821,7 +2824,7 @@ static int igc_clean_rx_irq_zc(struct igc_q_vector *q_vector, const int budget)
+ 		res = __igc_xdp_run_prog(adapter, prog, bi->xdp);
+ 		switch (res) {
+ 		case IGC_XDP_PASS:
+-			igc_dispatch_skb_zc(q_vector, desc, bi->xdp, timestamp);
++			igc_dispatch_skb_zc(q_vector, desc, ctx);
+ 			fallthrough;
+ 		case IGC_XDP_CONSUMED:
+ 			xsk_buff_free(bi->xdp);
+
+---
+base-commit: ffd294d346d185b70e28b1a28abe367bbfe53c04
+change-id: 20250128-igc-fix-hw-rx-timestamp-when-passed-by-zc-xdp-95dea010ff14
+
+Best regards,
 -- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
+Zdenek Bouska
 
+Siemens, s.r.o.
+Foundational Technologies
 
 
