@@ -1,80 +1,128 @@
-Return-Path: <netdev+bounces-161421-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-161422-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id C5993A21424
-	for <lists+netdev@lfdr.de>; Tue, 28 Jan 2025 23:27:37 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id E9EC4A21489
+	for <lists+netdev@lfdr.de>; Tue, 28 Jan 2025 23:42:10 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 23153164182
-	for <lists+netdev@lfdr.de>; Tue, 28 Jan 2025 22:27:34 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 4E33A16458E
+	for <lists+netdev@lfdr.de>; Tue, 28 Jan 2025 22:42:09 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 68C051ACEBF;
-	Tue, 28 Jan 2025 22:27:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C068F1E0B86;
+	Tue, 28 Jan 2025 22:42:03 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="p38sq237"
+	dkim=pass (2048-bit key) header.d=lwn.net header.i=@lwn.net header.b="NUNSUUGt"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from ms.lwn.net (ms.lwn.net [45.79.88.28])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3D3D519CC28;
-	Tue, 28 Jan 2025 22:27:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F052B18F2D8;
+	Tue, 28 Jan 2025 22:42:01 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.79.88.28
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1738103252; cv=none; b=YcqdqJJOFW2k9/YhHGG8NaE5bTROe4Y5lqgFN9Of6UXowyKQcYK3gT4MRBbMdT9dH1R5lkBAFhXauFU44yeiwXZ10OvuiQdoh0frTzU1gac3tdJR4HXOHooMJowviOxcPt1vaGiCK0/SY2t/5Aylc0JPnj6g7q8vuT1sWarRxEI=
+	t=1738104123; cv=none; b=ZSF1tzNNEft+ZEMz5E4zgPPXk+febAiAn33i/Eh/A6X2yRIlMKHMYXePkYGjBA29YrW1R0lzdzk27xkElQ1TfsRtEt5A+Csf4YkVhqrQuLgDt0bgaRRhNqmMnL/t6zPWAoS/PF7kQE0QMZlFM67269x0X7WL/qUqMWlBuZ/lMyE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1738103252; c=relaxed/simple;
-	bh=+sCER/TvfbFT8BvofkZPUfcwnYmE1UU8CTEHTAioC8U=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=LzXDaTJuVXwSfLxwfdyi2e44fU9L+RLYFiBfhVVxkepmsY8M05NJxH11pejBHkJ7luEqWPiXI9jjLBNPpOWLoam6yffVhC+DxYT/1oZm06Ca5VLst9DyeElPTNEgFv4w5cDVIlvl0EmpyFPAHZt0M/fAP40p1dTJJffLxNriVq4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=p38sq237; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3633CC4CED3;
-	Tue, 28 Jan 2025 22:27:31 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1738103251;
-	bh=+sCER/TvfbFT8BvofkZPUfcwnYmE1UU8CTEHTAioC8U=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=p38sq237eT3LqbbHAZsmFb2hKLWTxJAWjwiMEQAYPM1un+pM1hrqryHm/qMEYN0o8
-	 znzZjmhptq6Cu2k3iaqemU1898+eFhAqPfhbG9MdFSnaFpepSUowIJnNBNKFaenDNZ
-	 7mPSKmcVrUOkYfOpnb5f4jGXN/vkT+IUctDXJwpIZg5KHV3f+550+ma5cO9DyX1OEU
-	 eQ1KNQSajrj+2vQyPI3/4h6tcgzzAYoj4u4Zp0Im6RbE/dlUFpmaQ/TbL9UbB3cXuQ
-	 njBFSApfsihwbiuf5mV5EatCqTd9iapqL8yXW9Nh4J634oGcEzxElGDEx/EbQh9lwr
-	 vCwM0Qd/N/R6Q==
-Date: Tue, 28 Jan 2025 14:27:30 -0800
-From: Jakub Kicinski <kuba@kernel.org>
-To: Joe Damato <jdamato@fastly.com>
-Cc: netdev@vger.kernel.org, sridhar.samudrala@intel.com, "David S. Miller"
- <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Paolo Abeni
- <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, Stanislav Fomichev
- <sdf@fomichev.me>, Mina Almasry <almasrymina@google.com>,
- linux-kernel@vger.kernel.org (open list)
-Subject: Re: [RFC net-next] netdev-genl: Elide napi_id for TX-only NAPIs
-Message-ID: <20250128142730.39be476b@kernel.org>
-In-Reply-To: <20250128163038.429864-1-jdamato@fastly.com>
-References: <20250128163038.429864-1-jdamato@fastly.com>
+	s=arc-20240116; t=1738104123; c=relaxed/simple;
+	bh=AOq0SJfJiBWND1wZ8FCd25+xqo3YTjsEqxOPO7EP2Os=;
+	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
+	 MIME-Version:Content-Type; b=FstZ4C6DuUxK9n5M/3sg7jpX/GB3dpw1cVdd0Rje5e+IrzQ204QiRqwwmVyx07DktIGradd5Ie/WbNADPj5RPL0y8Zpyb+ibRpIexleAFtYiDUFvEW3KX+VkOpd/umHn281FNaZhLY+iyFPjMBcDcp1VSYcbo8UhwRuSgJsix8o=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lwn.net; spf=pass smtp.mailfrom=lwn.net; dkim=pass (2048-bit key) header.d=lwn.net header.i=@lwn.net header.b=NUNSUUGt; arc=none smtp.client-ip=45.79.88.28
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lwn.net
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lwn.net
+DKIM-Filter: OpenDKIM Filter v2.11.0 ms.lwn.net 06ECA403FA
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=lwn.net; s=20201203;
+	t=1738104121; bh=+meNH1juZBBtvrp/xo2cF0Sh2lEGZRx9Dv3JEMGVfwQ=;
+	h=From:To:Cc:Subject:In-Reply-To:References:Date:From;
+	b=NUNSUUGtYAw8IZ7v+u9urKWTHqRqgIaFDi/LwOklT1yZ+dVdXczOD9aTVo9dL8GaQ
+	 OAf5s35W/sLcrCXBP9L1rzztGXQrZf82Io4oQsEPVhxr2Gmfam9dfHpeHYHM4gAzS8
+	 Z5wJvtiQGdryhtYMX/RqM8UUTkxsZ7qqsI/DxEU04UzFD7wrLVaAgpDF9YgOAVZODR
+	 ghFfoDDu31L5plmrTy4y8+t+6MkL5TJscft0G5BNRz45gjvAU7I+oGLILjgoaHhU9M
+	 9iNee1I8iwhHjJ3JhYnCMWXNAtQ6QziZH5AMs5lTvSyDYyN1vQVIIWC4TLGwjRIBKs
+	 EZQClEOOCB0lQ==
+Received: from localhost (unknown [IPv6:2601:280:5e00:625::1fe])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by ms.lwn.net (Postfix) with ESMTPSA id 06ECA403FA;
+	Tue, 28 Jan 2025 22:42:00 +0000 (UTC)
+From: Jonathan Corbet <corbet@lwn.net>
+To: Mauro Carvalho Chehab <mchehab+huawei@kernel.org>, Linux Doc Mailing
+ List <linux-doc@vger.kernel.org>, Greg Kroah-Hartman
+ <gregkh@linuxfoundation.org>
+Cc: Mauro Carvalho Chehab <mchehab+huawei@kernel.org>, Mauro Carvalho Chehab
+ <mchehab+huawei@kernel.org>, linux-kernel@vger.kernel.org,
+ bpf@vger.kernel.org, coresight@lists.linaro.org,
+ linux-arm-kernel@lists.infradead.org, linux-block@vger.kernel.org,
+ linux-f2fs-devel@lists.sourceforge.net, linux-hardening@vger.kernel.org,
+ linux-iio@vger.kernel.org, linux-media@vger.kernel.org,
+ linux-pm@vger.kernel.org, linux-usb@vger.kernel.org,
+ linux-wireless@vger.kernel.org, netdev@vger.kernel.org,
+ workflows@vger.kernel.org
+Subject: Re: [RFC v2 00/38] Improve ABI documentation generation
+In-Reply-To: <cover.1738020236.git.mchehab+huawei@kernel.org>
+References: <cover.1738020236.git.mchehab+huawei@kernel.org>
+Date: Tue, 28 Jan 2025 15:42:00 -0700
+Message-ID: <87h65i7e87.fsf@trenco.lwn.net>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain
 
-On Tue, 28 Jan 2025 16:30:37 +0000 Joe Damato wrote:
-> -		if (txq->napi && nla_put_u32(rsp, NETDEV_A_QUEUE_NAPI_ID,
-> -					     txq->napi->napi_id))
-> +		if (!txq->napi)
->  			goto nla_put_failure;
+Mauro Carvalho Chehab <mchehab+huawei@kernel.org> writes:
 
-Skip the attr but no need to fail. We're reporting info about a queue
-here, the queue still exists, even if we can't report a valid NAPI ID.
+> Hi Jon/Greg,
+>
+> That's the second version of my RFC patches meant to modenize the ABI
+> parser that I wrote in Perl.
 
-> +		if (txq->napi->napi_id >= MIN_NAPI_ID)
-> +			if (nla_put_u32(rsp, NETDEV_A_QUEUE_NAPI_ID,
-> +					txq->napi->napi_id))
-> +				goto nla_put_failure;
+I have a couple of minor comments on the individual patches, but overall
+I do like this direction.
 
-Similar treatment should be applied to the Rx queues, I reckon.
+It would be nice, though, if the code were a bit more extensively
+commented.  Parts of it get into the "twistly maze of regexes" mode that
+can be awfully hard to follow.
+
+> On this series we have:
+>
+> patches 1 to 11: several bug fixes addressing issues at ABI symbols;
+
+1-3 aren't needed - it seems you already upstreamed #2?
+
+For the rest, is there any reason to not apply them right away?  They
+just seem like worthwhile fixes.
+
+> patch 12: a fix for scripts/documentation-file-ref-check
+> patches 13-15: create new script with rest and search logic and 
+>   minimally integrate with kernel_abi Sphinx extension(phase 1);
+> patches 16-19: implement phase 2: class integration (phase 2);
+> patch 20: fix a bug at kernel_abi: the way it splits lines is buggy;
+> patches  21-24: rewrite kernel_abi logic to make it simpler and more
+>   robust;
+> patches 25-27: add cross-reference support at automarkup;
+> patches 28-36: several ABI cleanups to cope with the improvements;
+> patch 37: implement undefined command;
+> patch 38: get rid of the old Perl script.
+>
+> To make it easier to review/apply, I may end breaking the next version
+> on a couple of different patchsets. Still it would be nice to have more
+> people testing it and providing some feedback.
+
+I've looked over everything, though with limited depth.  My testing
+hasn't turned up any problems.  I've only tested with current Sphinx,
+have you tried this with the more ancient versions we support?
+
+[It's probably time to raise our minimum version again, especially now
+that current Sphinx has better performance.]
+
+I don't see a whole lot of reasons not to apply this set shortly after
+the merge window; anybody disagree?
+
+Thanks,
+
+jon
 
