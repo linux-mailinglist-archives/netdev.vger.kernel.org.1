@@ -1,154 +1,169 @@
-Return-Path: <netdev+bounces-161302-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-161303-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id E5DCCA208F4
-	for <lists+netdev@lfdr.de>; Tue, 28 Jan 2025 11:49:57 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 253A2A20904
+	for <lists+netdev@lfdr.de>; Tue, 28 Jan 2025 11:52:54 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 4740216255B
-	for <lists+netdev@lfdr.de>; Tue, 28 Jan 2025 10:49:56 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 628D03A2197
+	for <lists+netdev@lfdr.de>; Tue, 28 Jan 2025 10:52:46 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 35C5A19E7F7;
-	Tue, 28 Jan 2025 10:49:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5F51019E971;
+	Tue, 28 Jan 2025 10:52:49 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=kloenk.dev header.i=@kloenk.dev header.b="h46/7Sbw"
+	dkim=pass (1024-bit key) header.d=kloenk.dev header.i=@kloenk.dev header.b="i7ZHd+8l"
 X-Original-To: netdev@vger.kernel.org
 Received: from gimli.kloenk.de (gimli.kloenk.de [49.12.72.200])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 51F981991CA;
-	Tue, 28 Jan 2025 10:49:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B875119DF61;
+	Tue, 28 Jan 2025 10:52:46 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=49.12.72.200
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1738061396; cv=none; b=CRZUGIfm4krWGWx6ynfppc07XH3mM7agUCDC5m8Cdze0Go6/Grg9AtWONgYxiXRZLI45n9tnTo5ybWSDTrQLEXUI4cWjS+7EH9TNd/rJMl3fXWWipwDfvY1VrDomOGEEouchk1soWkfRqr0WpGkqOVPm/v+ucG5P9vsSKPV7nNY=
+	t=1738061569; cv=none; b=bmSLRJ+79BLRMTPZ0RJUISpaP7HztEyPGMVKxuF/BEcnbuIrRLXEtQuVo+qeJYr4QPBufPnO0CIuDw32hOrNN+79J0E/xKkC5alyMF579gIoIlEG/yUvCpVggTJeswkX14qZlkz78QPPd/jFEN3H4VuKyqYs6+aYmhvhVpp+jT8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1738061396; c=relaxed/simple;
-	bh=tQhZVViOKdYJwmJY9BFxJKbUw0FsxPZQFp5vTBlEyIw=;
+	s=arc-20240116; t=1738061569; c=relaxed/simple;
+	bh=PfCdzxsbws1eBdcw38huDK/jKhGdbdGpeOJKZkwLwKs=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=VWSMXP/wJHSPiwrMfLIFcoxW2vqFOFgEgQES1VRncw7a+nk35hBtnaSBCJzq4D76worr72FNJxa2O0NLDcyd1V03K+eG2gup2ttJvVGnI/f6TFwj7A+YFwkAMidcgnVbguhK0nnc0KYq6WqC/TYyyGMtCHaLVcQbgt729fB/FBA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=kloenk.dev; spf=pass smtp.mailfrom=kloenk.dev; dkim=pass (1024-bit key) header.d=kloenk.dev header.i=@kloenk.dev header.b=h46/7Sbw; arc=none smtp.client-ip=49.12.72.200
+	 MIME-Version:Content-Type; b=TMaPiV3TbsLKbUzSiL7EkWyVgl/OeOEBrskcJN2OmtjPHy5amvl6Gvnv8SAL77LsO7kXfEEbS2Ct2eJO1rWuf861uchVl24TkJpqtlN1zguwGI+e8ZgHGf8oABAu3QIap+M/DpgQy7h4uzMG+pu3srU2SaoqcytQce0OZ69S7xQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=kloenk.dev; spf=pass smtp.mailfrom=kloenk.dev; dkim=pass (1024-bit key) header.d=kloenk.dev header.i=@kloenk.dev header.b=i7ZHd+8l; arc=none smtp.client-ip=49.12.72.200
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=kloenk.dev
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kloenk.dev
 From: Fiona Behrens <me@kloenk.dev>
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kloenk.dev; s=mail;
-	t=1738061390; bh=Sk5hqTOZF0xdzUDKdnW0ug8ercxLESQwOxYtUVWbC6A=;
+	t=1738061564; bh=GVAB7md79HnKqybn7MqI9eX/+oFlbzYDCqZBX2HB8cg=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References;
-	b=h46/7SbwWDW8a1VN0JXa3K525yqCrz1dBJFFA0Tk+xtL/tbi8KD9ysQC/oO2aFQaV
-	 HsNqK8RCTev7lsuql9phKG+vC9LqEptSjfXikyt5K6Vbo60IhKcTw80jwKI/Q0WRGR
-	 c7VzRmom8qrDv5uNjSc/Q8eOEROW/T+AV/BEQTQg=
+	b=i7ZHd+8lqRITRgcHAjo9tgTaALap3ECpCiMw2MYGIUehtPe4nkOTf4ZLbXYNBgr5s
+	 qqutonTK3jR+3Yk0kXTnPpWMfH9tx9ubASu4P/YlTutXCJbtitkbh4UfiQgOlNQ4Ag
+	 YadB3juUQ6yJ1k/QvSiyo5Vi2LoVb+BwvByhOIbA=
 To: FUJITA Tomonori <fujita.tomonori@gmail.com>
-Cc: gary@garyguo.net, linux-kernel@vger.kernel.org,
- rust-for-linux@vger.kernel.org, netdev@vger.kernel.org, andrew@lunn.ch,
- hkallweit1@gmail.com, tmgross@umich.edu, ojeda@kernel.org,
- alex.gaynor@gmail.com, bjorn3_gh@protonmail.com, benno.lossin@proton.me,
- a.hindborg@samsung.com, aliceryhl@google.com, anna-maria@linutronix.de,
- frederic@kernel.org, tglx@linutronix.de, arnd@arndb.de, jstultz@google.com,
- sboyd@kernel.org, mingo@redhat.com, peterz@infradead.org,
- juri.lelli@redhat.com, vincent.guittot@linaro.org, dietmar.eggemann@arm.com,
- rostedt@goodmis.org, bsegall@google.com, mgorman@suse.de,
- vschneid@redhat.com, tgunders@redhat.com
+Cc: linux-kernel@vger.kernel.org, rust-for-linux@vger.kernel.org,
+ netdev@vger.kernel.org, andrew@lunn.ch, hkallweit1@gmail.com,
+ tmgross@umich.edu, ojeda@kernel.org, alex.gaynor@gmail.com, gary@garyguo.net,
+ bjorn3_gh@protonmail.com, benno.lossin@proton.me, a.hindborg@samsung.com,
+ aliceryhl@google.com, anna-maria@linutronix.de, frederic@kernel.org,
+ tglx@linutronix.de, arnd@arndb.de, jstultz@google.com, sboyd@kernel.org,
+ mingo@redhat.com, peterz@infradead.org, juri.lelli@redhat.com,
+ vincent.guittot@linaro.org, dietmar.eggemann@arm.com, rostedt@goodmis.org,
+ bsegall@google.com, mgorman@suse.de, vschneid@redhat.com, tgunders@redhat.com
 Subject: Re: [PATCH v9 7/8] rust: Add read_poll_timeout functions
-Date: Tue, 28 Jan 2025 11:49:48 +0100
-Message-ID: <64335523-D12A-4E65-9518-64FC08C26D39@kloenk.dev>
-In-Reply-To: <20250128.152957.202492012529466658.fujita.tomonori@gmail.com>
-References: <20250127114646.6ad6d65f@eugeo>
- <20250127.153147.1789884009486719687.fujita.tomonori@gmail.com>
- <20250128084937.2927bab9@eugeo>
- <20250128.152957.202492012529466658.fujita.tomonori@gmail.com>
+Date: Tue, 28 Jan 2025 11:52:42 +0100
+Message-ID: <C466653B-D8DA-4176-8059-7FD60F76040E@kloenk.dev>
+In-Reply-To: <20250125101854.112261-8-fujita.tomonori@gmail.com>
+References: <20250125101854.112261-1-fujita.tomonori@gmail.com>
+ <20250125101854.112261-8-fujita.tomonori@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
 
 
 
-On 28 Jan 2025, at 7:29, FUJITA Tomonori wrote:
+On 25 Jan 2025, at 11:18, FUJITA Tomonori wrote:
 
-> On Tue, 28 Jan 2025 08:49:37 +0800
-> Gary Guo <gary@garyguo.net> wrote:
+> Add read_poll_timeout functions which poll periodically until a
+> condition is met or a timeout is reached.
 >
->> On Mon, 27 Jan 2025 15:31:47 +0900 (JST)
->> FUJITA Tomonori <fujita.tomonori@gmail.com> wrote:
->>
->>> On Mon, 27 Jan 2025 11:46:46 +0800
->>> Gary Guo <gary@garyguo.net> wrote:
->>>
->>>>> +#[track_caller]
->>>>> +pub fn read_poll_timeout<Op, Cond, T: Copy>(
->>>>> +    mut op: Op,
->>>>> +    mut cond: Cond,
->>>>> +    sleep_delta: Delta,
->>>>> +    timeout_delta: Delta,
->>>>> +) -> Result<T>
->>>>> +where
->>>>> +    Op: FnMut() -> Result<T>,
->>>>> +    Cond: FnMut(&T) -> bool,
->>>>> +{
->>>>> +    let start =3D Instant::now();
->>>>> +    let sleep =3D !sleep_delta.is_zero();
->>>>> +    let timeout =3D !timeout_delta.is_zero();
->>>>> +
->>>>> +    if sleep {
->>>>> +        might_sleep(Location::caller());
->>>>> +    }
->>>>> +
->>>>> +    loop {
->>>>> +        let val =3D op()?;
->>>>> +        if cond(&val) {
->>>>> +            // Unlike the C version, we immediately return.
->>>>> +            // We know the condition is met so we don't need to ch=
-eck again.
->>>>> +            return Ok(val);
->>>>> +        }
->>>>> +        if timeout && start.elapsed() > timeout_delta {
->>>>
->>>> Re-reading this again I wonder if this is the desired behaviour? May=
-be
->>>> a timeout of 0 should mean check-once instead of no timeout. The
->>>> special-casing of 0 makes sense in C but in Rust we should use `None=
-`
->>>> to mean it instead?
->>>
->>> It's the behavior of the C version; the comment of this function says=
-:
->>>
->>> * @timeout_us: Timeout in us, 0 means never timeout
->>>
->>> You meant that waiting for a condition without a timeout is generally=
+> The C's read_poll_timeout (include/linux/iopoll.h) is a complicated
+> macro and a simple wrapper for Rust doesn't work. So this implements
+> the same functionality in Rust.
+>
+> The C version uses usleep_range() while the Rust version uses
+> fsleep(), which uses the best sleep method so it works with spans that
+> usleep_range() doesn't work nicely with.
+>
+> Unlike the C version, __might_sleep() is used instead of might_sleep()
+> to show proper debug info; the file name and line
+> number. might_resched() could be added to match what the C version
+> does but this function works without it.
+>
+> The sleep_before_read argument isn't supported since there is no user
+> for now. It's rarely used in the C version.
+>
+> read_poll_timeout() can only be used in a nonatomic context. This
+> requirement is not checked by these abstractions, but it is intended
+> that klint [1] or a similar tool will be used to check it in the
+> future.
+>
+> Link: https://rust-for-linux.com/klint [1]
+> Signed-off-by: FUJITA Tomonori <fujita.tomonori@gmail.com>
+> ---
+>  rust/helpers/helpers.c |  1 +
+>  rust/helpers/kernel.c  | 13 +++++++
+>  rust/kernel/cpu.rs     | 13 +++++++
+>  rust/kernel/error.rs   |  1 +
+>  rust/kernel/io.rs      |  5 +++
+>  rust/kernel/io/poll.rs | 79 ++++++++++++++++++++++++++++++++++++++++++=
 
->>> a bad idea? If so, can we simply return EINVAL for zero Delta?
->>>
->>
->> No, I think we should still keep the ability to represent indefinite
->> wait (no timeout) but we should use `None` to represent this rather
->> than `Delta::ZERO`.
->>
->> I know that we use 0 to mean indefinite wait in C, I am saying that
->> it's not the most intuitive way to represent in Rust.
->>
->> Intuitively, a timeout of 0 should be closer to a timeout of 1 and thu=
-s
->> should mean "return with ETIMEDOUT immedidately" rather than "wait
->> forever".
->>
->> In C since we don't have a very good sum type support, so we
->> special case 0 to be the special value to represent indefinite wait,
->> but I don't think we need to repeat this in Rust.
+>  rust/kernel/lib.rs     |  2 ++
+>  7 files changed, 114 insertions(+)
+>  create mode 100644 rust/helpers/kernel.c
+>  create mode 100644 rust/kernel/cpu.rs
+>  create mode 100644 rust/kernel/io.rs
+>  create mode 100644 rust/kernel/io/poll.rs
 >
-> Understood, thanks. How about the following code?
->
+(..)
+> diff --git a/rust/kernel/io/poll.rs b/rust/kernel/io/poll.rs
+> new file mode 100644
+> index 000000000000..7a503cf643a1
+> --- /dev/null
+> +++ b/rust/kernel/io/poll.rs
+> @@ -0,0 +1,79 @@
+> +// SPDX-License-Identifier: GPL-2.0
+> +
+> +//! IO polling.
+> +//!
+> +//! C header: [`include/linux/iopoll.h`](srctree/include/linux/iopoll.=
+h).
+> +
+> +use crate::{
+> +    cpu::cpu_relax,
+> +    error::{code::*, Result},
+> +    time::{delay::fsleep, Delta, Instant},
+> +};
+> +
+> +use core::panic::Location;
+> +
+> +/// Polls periodically until a condition is met or a timeout is reache=
+d.
+> +///
+> +/// Public but hidden since it should only be used from public macros.=
+
+
+This states the function should be hidden, but I don=E2=80=99t see a `#[d=
+oc(hidden)]` in here so bit confused by that comment what part now is hid=
+den.
+
+Thanks,
+Fiona
+
+> +///
+> +/// ```rust
+> +/// use kernel::io::poll::read_poll_timeout;
+> +/// use kernel::time::Delta;
+> +/// use kernel::sync::{SpinLock, new_spinlock};
+> +///
+> +/// let lock =3D KBox::pin_init(new_spinlock!(()), kernel::alloc::flag=
+s::GFP_KERNEL)?;
+> +/// let g =3D lock.lock();
+> +/// read_poll_timeout(|| Ok(()), |()| true, Delta::from_micros(42), De=
+lta::from_micros(42));
+> +/// drop(g);
+> +///
+> +/// # Ok::<(), Error>(())
+> +/// ```
 > +#[track_caller]
 > +pub fn read_poll_timeout<Op, Cond, T: Copy>(
 > +    mut op: Op,
 > +    mut cond: Cond,
 > +    sleep_delta: Delta,
-> +    timeout_delta: Option<Delta>,
+> +    timeout_delta: Delta,
 > +) -> Result<T>
 > +where
 > +    Op: FnMut() -> Result<T>,
@@ -156,6 +171,7 @@ s
 > +{
 > +    let start =3D Instant::now();
 > +    let sleep =3D !sleep_delta.is_zero();
+> +    let timeout =3D !timeout_delta.is_zero();
 > +
 > +    if sleep {
 > +        might_sleep(Location::caller());
@@ -169,13 +185,11 @@ s
 again.
 > +            return Ok(val);
 > +        }
-> +        if let Some(timeout_delta) =3D timeout_delta {
-> +            if start.elapsed() > timeout_delta {
-> +                // Unlike the C version, we immediately return.
-> +                // We have just called `op()` so we don't need to call=
- it again.
-> +                return Err(ETIMEDOUT);
-> +            }
+> +        if timeout && start.elapsed() > timeout_delta {
+> +            // Unlike the C version, we immediately return.
+> +            // We have just called `op()` so we don't need to call it =
+again.
+> +            return Err(ETIMEDOUT);
 > +        }
 > +        if sleep {
 > +            fsleep(sleep_delta);
@@ -185,12 +199,38 @@ x().
 > +        cpu_relax();
 > +    }
 > +}
+> +
+> +fn might_sleep(loc: &Location<'_>) {
+> +    // SAFETY: FFI call.
+> +    unsafe {
+> +        crate::bindings::__might_sleep_precision(
+> +            loc.file().as_ptr().cast(),
+> +            loc.file().len() as i32,
+> +            loc.line() as i32,
+> +        )
+> +    }
+> +}
+> diff --git a/rust/kernel/lib.rs b/rust/kernel/lib.rs
+> index 545d1170ee63..c477701b2efa 100644
+> --- a/rust/kernel/lib.rs
+> +++ b/rust/kernel/lib.rs
+> @@ -35,6 +35,7 @@
+>  pub mod block;
+>  #[doc(hidden)]
+>  pub mod build_assert;
+> +pub mod cpu;
+>  pub mod cred;
+>  pub mod device;
+>  pub mod error;
+> @@ -42,6 +43,7 @@
+>  pub mod firmware;
+>  pub mod fs;
+>  pub mod init;
+> +pub mod io;
+>  pub mod ioctl;
+>  pub mod jump_label;
+>  #[cfg(CONFIG_KUNIT)]
+> -- =
 
-I wonder if it makes sense to then switch `Delta` to wrap a  `NonZeroI64`=
- and forbid deltas with 0 nanoseconds with that and use the niche optimiz=
-ation. Not sure if we make other apis horrible by that, but this would pr=
-event deltas that encode no time passing.
-
-Thanks,
-Fiona
+> 2.43.0
 
