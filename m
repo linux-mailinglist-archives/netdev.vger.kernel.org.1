@@ -1,193 +1,192 @@
-Return-Path: <netdev+bounces-161339-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-161340-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4539BA20BE6
-	for <lists+netdev@lfdr.de>; Tue, 28 Jan 2025 15:21:07 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 23478A20C36
+	for <lists+netdev@lfdr.de>; Tue, 28 Jan 2025 15:45:47 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 3F4521623B8
-	for <lists+netdev@lfdr.de>; Tue, 28 Jan 2025 14:21:06 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 4EA3518887D8
+	for <lists+netdev@lfdr.de>; Tue, 28 Jan 2025 14:45:51 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A42DA199238;
-	Tue, 28 Jan 2025 14:21:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 750EA1A727D;
+	Tue, 28 Jan 2025 14:45:42 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Z++VAZR1"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="mlRZLirg"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-vk1-f179.google.com (mail-vk1-f179.google.com [209.85.221.179])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 80C1ABE40
-	for <netdev@vger.kernel.org>; Tue, 28 Jan 2025 14:21:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CF5F019EED7;
+	Tue, 28 Jan 2025 14:45:40 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.179
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1738074063; cv=none; b=cD3WyiuQYMKoDE4UDPH/9Y9i51LLbxd4BR1/TLiJo2tP+PXD0n4HuHSe3CI4SxR2dmVMeu0QAyKu0uDP+SIyNiUK0orYRmA4OVcjQerGd/3HagADckZK/8zDpyro8hd0rfK/e9fBZn0ULLolvBa8NWWYUVNnrYEAn50EknGd0YI=
+	t=1738075542; cv=none; b=UKNRXI8jMVGFOjTr1xQW/zzgK0UAIQ7ECPGa4qfqhya8n5WJxwPCHOGcJ/Rrl75YnKK1xySdCXxTD0jhNBVXVKb2nYWbwJ8mzied1qfAKtW43J4uO8ihyGJIEqF0lZkt0lpNSMv9ABz9++/6+5qIccLBl6gbj3x4PeFXz6reRAk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1738074063; c=relaxed/simple;
-	bh=D9oaxmNhn8bPdVAIadKxuci7iQwJYkfAW+dvYSZC5Is=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=lMzFlpBtIVbYyaZRthUXTmQljDzGhN0rq+lC0e/KH3xtxFe3j49lmu9rC+yERDkf8CyXj7JSvnhJjP1LvBmBvnC5pwZVlNa11re/T8UD0bKRDIRT8hDIJQI95LWDIzB3SZt2DeUEzk+kgkK28xPUdx7gH4Rz+ILN5NVCUMvJmtU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=Z++VAZR1; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1738074059;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=nDtwGzyLUhFclHuJegL5qQB4wHn79dxySq4hBsimLtM=;
-	b=Z++VAZR1sJUmVLUYJ4UEmWQdSxgtCUa7EiKesGUn4d1F4kjUC87Bm/ck7oADNZz5NlJPwD
-	s1UCE0BSR6LpgWz8tMnVtuSW44hou4LXeHEWWw15eTpFv3PWX6K433HSGBOXa7fCNpkqt+
-	wrwMakIG/6R3Xe7/Xp2dgpjpAwaOCbA=
-Received: from mail-pj1-f72.google.com (mail-pj1-f72.google.com
- [209.85.216.72]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-448-aDg3U7EkNM2YWWlxSfLTqA-1; Tue, 28 Jan 2025 09:20:58 -0500
-X-MC-Unique: aDg3U7EkNM2YWWlxSfLTqA-1
-X-Mimecast-MFC-AGG-ID: aDg3U7EkNM2YWWlxSfLTqA
-Received: by mail-pj1-f72.google.com with SMTP id 98e67ed59e1d1-2ee8ced572eso11691562a91.0
-        for <netdev@vger.kernel.org>; Tue, 28 Jan 2025 06:20:57 -0800 (PST)
+	s=arc-20240116; t=1738075542; c=relaxed/simple;
+	bh=/csEvLRUMucPRyRdSUwZOs8F0rkU5vIyJTNl6uyBlR8=;
+	h=Date:From:To:Cc:Message-ID:In-Reply-To:References:Subject:
+	 Mime-Version:Content-Type; b=cANS/6VhZ5adXYIkkI8cXMp3bfiN0wmZkkfEXt8NSJr1bzABT84ANyQ/sqOxI9gLJgJEa+4dgh6W5mUMH0V0mqO7I4GEw/mn9CXVFgNnBC/9ezlOEWWdaNUHzD791p8uaRaArgfLlSdU19Y5/xdPjUcA8kjr2WLojgU7w44vjko=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=mlRZLirg; arc=none smtp.client-ip=209.85.221.179
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-vk1-f179.google.com with SMTP id 71dfb90a1353d-51640f7bbd3so1821312e0c.2;
+        Tue, 28 Jan 2025 06:45:40 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1738075539; x=1738680339; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:subject:references
+         :in-reply-to:message-id:cc:to:from:date:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=fakcm+rH6Ht22JqZeovxMYLDOTFTQ4rDAH4rXh1qvOE=;
+        b=mlRZLirgudvDOE9ztoVVFpVNUIyEP1s9M0yN+PR6IUlr2APgSiCgrhTOepExplldS1
+         UbYzmcyX1mBv2cyikPNgyyHSGJxwc6DKAIe89UYTz4wcDc80ROI+kySx4Bp5eRetPWqp
+         scD3RnOqjoymVgMaY6liCaCtqK6u6iR5k5YmGLUVT9k7aTfg1EHPLwEcbba8+lPWzX9K
+         YbmnJqVEVQFJpbeTsn4GAToaTJaiinHGeGozRjEppG8gT+VSDLP4r9tKgNMfop8UbVqo
+         RgC5znHf+yq9rj1ofCpqIA7xIWSjfTwMXNWXiIQKPji/PtcTU9vuNKlLvmEveglJaNLg
+         FUeA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1738074057; x=1738678857;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=nDtwGzyLUhFclHuJegL5qQB4wHn79dxySq4hBsimLtM=;
-        b=rJj+4QsUmZg31aCJ8rHkvC82BeFSIdJ4UrbmopqxNGZD5I8Hk12W3n9a4gc1Twr3sR
-         MstCc7eXaa0nAQFgQT2Gra+dENLf1abJVYuzwK43LZ6um4D8bLQteK4qsleA568UoAoh
-         vMlxSIk+bZln7iN0dOx1y41d3/aq70O2s+pTbLKzxAjlyFNqtXM8HgkxPwXp0/ksAXOA
-         i/5PRok/5ed3Juzuoe1z4VC7dgrdDPMkcXdqabEUpRGIccHIwlEUcLRaeOU9iYGCUwVT
-         iURIDt2vWwlS62aZghRfK1WXCOPQghqPLasm9qirk7SWxBqq1QXiiZr1M6A7UG4QuDY0
-         ++LQ==
-X-Forwarded-Encrypted: i=1; AJvYcCXFQsx1JuvBIvX9z7ivuhrfdptq72Cj+79w/9+TWoBkUcHI0aFST1XTPgQdt51rVP2CMq5LZDY=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yzw6PbQEWGtUBGAcOIyoYloXb0UnVuEaWa1Mw6XCM8BEVt0vkod
-	mQpJhtcKOdZuZgT+mbUuKu4tNn2LRCAMzL4n6qdvKTQuAbrB8spNYi97h/HJ4CShS0eZR0SrzCG
-	2B6NwlLUyS9w2PGPsQk0oBV05uH1zxcUdXRmt5N7xQBlJxEIY2HDoNJ/xLK/OQktYs5UY921ICk
-	wo/tkQPW2LJu1J+4pvd9XiTIZdgkHM
-X-Gm-Gg: ASbGncvqSx+KsKC3oFeGP6LnwDvB6O3wd0D/0/XmBhzUpsARj3QcEhCf8GdSyJw01CT
-	iJdx5ZKP9JoOPLVfJ6l1r2XpFf6Zdc+mM0QVseS1VWIsy+bPJkNjsoyqg2ovDZw==
-X-Received: by 2002:a17:90a:c888:b0:2ea:37b4:5373 with SMTP id 98e67ed59e1d1-2f782c6ff50mr68022158a91.10.1738074056987;
-        Tue, 28 Jan 2025 06:20:56 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IGLkoSVP9en9QzpKcY6Xy4YZ+5p8cA8G7GD7Vv+4m4AfNhzz2DAH+n7ciNQzuMlQSBYd+zt6z1HhcoTe2jxAzY=
-X-Received: by 2002:a17:90a:c888:b0:2ea:37b4:5373 with SMTP id
- 98e67ed59e1d1-2f782c6ff50mr68022124a91.10.1738074056671; Tue, 28 Jan 2025
- 06:20:56 -0800 (PST)
+        d=1e100.net; s=20230601; t=1738075539; x=1738680339;
+        h=content-transfer-encoding:mime-version:subject:references
+         :in-reply-to:message-id:cc:to:from:date:x-gm-message-state:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=fakcm+rH6Ht22JqZeovxMYLDOTFTQ4rDAH4rXh1qvOE=;
+        b=vCug+FnIM/PFP7lL8hExBSXWlc5eLTJQPEGYYqG5GKA9aRFR1BYpIK7QYRTllsLeFu
+         T24dKaBm8R7gFIcNg9+sYN/bd4SKHWY40sPBpHErMYrFJl8qT2MHhCbWmZjMPGk6LfBp
+         I9p23QT6ugWiOStpWpPj2mELyW7dDbfALbkaD9MlYDw8FUXhwvDCZXZh2dpH7WgvYVyY
+         /sWJBQuTIGisIc+ySawnXqbomtcHtSZHcaR9Wu5UgHpdv+JL2U0Fq9rYKMfoi+bmEOpF
+         EEd7H2EvG/smwICG7psUnuYjUSvCLgy13u9K/JDLSlPL+bcrKDUJEdyzWUfPC5YY3NJP
+         SCHw==
+X-Forwarded-Encrypted: i=1; AJvYcCUN3WVwZeTVwiacZtMNJXV91XYrFWMVChh5+5g14eEDl09AVQXHCkMRBFBH8fVZ2LiigeoCQXaCpKxkFDQ=@vger.kernel.org, AJvYcCWXDsauzQr/F/WPqiUBKewgm7KZaeGD63/QBgMp+z3Dk3BF+obsJz3/WVWQRI/S0LckkQ5gsqVJzr4O98SBdKNt@vger.kernel.org
+X-Gm-Message-State: AOJu0YyXDbPp4kpsmP4FVEfugzFS94Zj56uId3L9apitLGwG/kxnq89V
+	mcO49WqqxmjxK0rQH9cKiLzmRezkMtagorlsS6vlt54xbvfwErMn
+X-Gm-Gg: ASbGnctWAPHNLob2jYg9tctAs5tbHufDr51mHR5IXmzaOdIApRNUArKMT0ujAACFoPD
+	z+sQapljqBnjod2dhxEsIY/4JpScWliMWpdTaWRfsDgGaZQNgBp1udk/j2A3co6L03LlH1vkQb9
+	H8psj2keB3enpQPJATAOnJKRfW5E9gDx9em6OsVAudrOHWPhnkOAaB10PUgM44szX8MH6TnwrQT
+	8gkGflLfidFgRsqLmcU/hRbFj2nY2rCuC3mUk9KjVF1HS6oP4zRIkgE5paOW2f+JuaN7qYvt8YE
+	2+EJtGeHtr7+HMigMJy5Qba/xG+LRdD3Nm932LN2k9omrDY3yKhIKgMUw70omjY=
+X-Google-Smtp-Source: AGHT+IH15H9JPwbH1F+JmB7HXP9OTFcSXFQ71rdpzS8md7yeH76V23u8pEHPsJ4aRsKMybm2dXZw0w==
+X-Received: by 2002:a05:6122:29c2:b0:518:865e:d177 with SMTP id 71dfb90a1353d-51d5b33f5c9mr37756715e0c.9.1738075539555;
+        Tue, 28 Jan 2025 06:45:39 -0800 (PST)
+Received: from localhost (15.60.86.34.bc.googleusercontent.com. [34.86.60.15])
+        by smtp.gmail.com with ESMTPSA id a1e0cc1a2514c-864a9ada068sm2406919241.5.2025.01.28.06.45.38
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 28 Jan 2025 06:45:38 -0800 (PST)
+Date: Tue, 28 Jan 2025 09:45:37 -0500
+From: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
+To: Yan Zhai <yan@cloudflare.com>, 
+ Willem de Bruijn <willemdebruijn.kernel@gmail.com>
+Cc: netdev@vger.kernel.org, 
+ "David S. Miller" <davem@davemloft.net>, 
+ David Ahern <dsahern@kernel.org>, 
+ Eric Dumazet <edumazet@google.com>, 
+ Jakub Kicinski <kuba@kernel.org>, 
+ Paolo Abeni <pabeni@redhat.com>, 
+ Simon Horman <horms@kernel.org>, 
+ Shuah Khan <shuah@kernel.org>, 
+ Josh Hunt <johunt@akamai.com>, 
+ Alexander Duyck <alexander.h.duyck@linux.intel.com>, 
+ linux-kernel@vger.kernel.org, 
+ linux-kselftest@vger.kernel.org
+Message-ID: <6798ed91e94a9_987d9294c2@willemb.c.googlers.com.notmuch>
+In-Reply-To: <CAO3-Pbqx_sLxdLsTg+NX3z1rrenK=0qpvfL5h_K-RX-Yk9A4YA@mail.gmail.com>
+References: <Z5cgWh/6bRQm9vVU@debian.debian>
+ <6797992c28a23_3f1a294d6@willemb.c.googlers.com.notmuch>
+ <CAO3-Pbqx_sLxdLsTg+NX3z1rrenK=0qpvfL5h_K-RX-Yk9A4YA@mail.gmail.com>
+Subject: Re: [PATCH] udp: gso: fix MTU check for small packets
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-References: <CAFqZXNtkCBT4f+PwyVRmQGoT3p1eVa01fCG_aNtpt6dakXncUg@mail.gmail.com>
- <e8b6c6f9-9647-4ab6-8bbb-ccc94b04ade4@yandex.ru> <67979d24d21bc_3f1a29434@willemb.c.googlers.com.notmuch>
-In-Reply-To: <67979d24d21bc_3f1a29434@willemb.c.googlers.com.notmuch>
-From: Ondrej Mosnacek <omosnace@redhat.com>
-Date: Tue, 28 Jan 2025 15:20:45 +0100
-X-Gm-Features: AWEUYZnKMKSPkvMHSDBYDNT5dz12aid0Wz74BtrYevaWtBSeLiLEN3niiqklU-U
-Message-ID: <CAFqZXNscJnX2VF-TyZaEC5nBtUUXdWPM2ejXTWBL8=5UyakssA@mail.gmail.com>
-Subject: Re: Possible mistake in commit 3ca459eaba1b ("tun: fix group
- permission check")
-To: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
-Cc: stsp <stsp2@yandex.ru>, Willem de Bruijn <willemb@google.com>, 
-	Jason Wang <jasowang@redhat.com>, Jakub Kicinski <kuba@kernel.org>, 
-	network dev <netdev@vger.kernel.org>, 
-	Linux Security Module list <linux-security-module@vger.kernel.org>, 
-	SElinux list <selinux@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
+Mime-Version: 1.0
+Content-Type: text/plain;
+ charset=utf-8
 Content-Transfer-Encoding: quoted-printable
 
-On Mon, Jan 27, 2025 at 3:50=E2=80=AFPM Willem de Bruijn
-<willemdebruijn.kernel@gmail.com> wrote:
->
-> stsp wrote:
-> > 27.01.2025 12:10, Ondrej Mosnacek =D0=BF=D0=B8=D1=88=D0=B5=D1=82:
-> > > Hello,
-> > >
-> > > It looks like the commit in $SUBJ may have introduced an unintended
-> > > change in behavior. According to the commit message, the intent was t=
-o
-> > > require just one of {user, group} to match instead of both, which
-> > > sounds reasonable, but the commit also changes the behavior for when
-> > > neither of tun->owner and tun->group is set. Before the commit the
-> > > access was always allowed, while after the commit CAP_NET_ADMIN is
-> > > required in this case.
-> > >
-> > > I'm asking because the tun_tap subtest of selinux-testuite [1] starte=
-d
-> > > to fail after this commit (it assumed CAP_NET_ADMIN was not needed),
-> > > so I'm trying to figure out if we need to change the test or if it
-> > > needs to be fixed in the kernel.
-> > >
-> > > Thanks,
-> > >
-> > > [1] https://github.com/SELinuxProject/selinux-testsuite/
-> > >
-> > Hi, IMHO having the persistent
-> > TAP device inaccessible by anyone
-> > but the CAP_NET_ADMIN is rather
-> > useless, so the compatibility should
-> > be restored on the kernel side.
-> > I'd raise the questions about adding
-> > the CAP_NET_ADMIN checks into
-> > TUNSETOWNER and/or TUNSETPERSIST,
-> > but this particular change to TUNSETIFF,
-> > at least on my side, was unintentional.
+Yan Zhai wrote:
+> Hi Willem,
+> =
+
+> Thanks for getting back to me.
+> =
+
+> On Mon, Jan 27, 2025 at 8:33=E2=80=AFAM Willem de Bruijn
+> <willemdebruijn.kernel@gmail.com> wrote:
 > >
-> > Sorry about that. :(
->
-> Thanks for the report Ondrej.
->
-> Agreed that we need to reinstate this. I suggest this explicit
-> extra branch after the more likely cases:
->
->         @@ -585,6 +585,9 @@ static inline bool tun_capable(struct tun_str=
-uct *tun)
->                         return 1;
->                 if (gid_valid(tun->group) && in_egroup_p(tun->group))
->                         return 1;
->         +       if (!uid_valid(tun->owner) && !gid_valid(tun->group))
->         +               return 1;
->         +
->                 return 0;
->          }
+> > Yan Zhai wrote:
+> > > Commit 4094871db1d6 ("udp: only do GSO if # of segs > 1") avoided G=
+SO
+> > > for small packets. But the kernel currently dismisses GSO requests =
+only
+> > > after checking MTU on gso_size. This means any packets, regardless =
+of
+> > > their payload sizes, would be dropped when MTU is smaller than requ=
+ested
+> > > gso_size.
+> >
+> > Is this a realistic concern? How did you encounter this in practice.
+> >
+> > It *is* a misconfiguration to configure a gso_size larger than MTU.
+> >
+> > > Meanwhile, EINVAL would be returned in this case, making it
+> > > very misleading to debug.
+> >
+> > Misleading is subjective. I'm not sure what is misleading here. From
+> > my above comment, I believe this is correctly EINVAL.
+> >
+> > That said, if this impacts a real workload we could reconsider
+> > relaxing the check. I.e., allowing through packets even when an
+> > application has clearly misconfigured UDP_SEGMENT.
+> >
+> We did encounter a painful reliability issue in production last month.
+> =
 
-That could work, but the semantics become a bit weird, actually: When
-you set both uid and gid, one of them needs to match. If you unset
-uid/gid, you get a stricter condition (gid/uid must match). And if you
-then also unset the other one, you suddenly get a less strict
-condition than the first two - nothing has to match. Might be
-acceptable, but it may confuse people unless well documented.
+> To simplify the scenario, we had these symptoms when the issue occurred=
+:
+> 1. QUIC connections to host A started to fail, and cannot establish new=
+ ones
+> 2. User space Wireguard to the exact same host worked 100% fine
+> =
 
-Also there is another smaller issue in the new code that I forgot to
-mention - with LSMs (such as SELinux) the ns_capable() call will
-produce an audit record when the capability is denied by an LSM. These
-audit records are meant to indicate that the permission was needed but
-denied and that the policy was either breached or needs to be
-adjusted. Therefore, the ns_capable() call should ideally only happen
-after the user/group checks so that only accesses that actually
-wouldn't succeed without the capability yield an audit record.
+> This happened rarely, like one or twice a day, lasting for a few
+> minutes usually, but it was quite visible since it is an office
+> network.
+> =
 
-So I would suggest this version:
+> Initially this prompted something wrong at the protocol layer. But
+> after multiple rounds of digging, we finally figured the root cause
+> was:
+> 3. Something sometimes pings host B, which shares the same IP with
+> host A but different ports (thanks to limited IPv4 space), and its
+> PMTU was reduced to 1280 occasionally. This unexpectedly affected all
+> traffic to that IP including traffic toward host A. Our QUIC client
+> set gso_size to 1350, and that's why it got hit.
+> =
 
-static inline bool tun_capable(struct tun_struct *tun)
-{
-    const struct cred *cred =3D current_cred();
-    struct net *net =3D dev_net(tun->dev);
+> I agree that configurations do matter a lot here. Given how broken the
+> PMTU was for the Internet, we might just turn off pmtudisc option on
+> our end to avoid this failure path. But for those who hasn't yet, this
+> could still be confusing if it ever happens, because nothing seems to
+> point to PMTU in the first place:
+> * small packets also get dropped
+> * error code was EINVAL from sendmsg
+> =
 
-    if (uid_valid(tun->owner) && uid_eq(cred->euid, tun->owner))
-        return 1;
-    if (gid_valid(tun->group) && in_egroup_p(tun->group))
-        return 1;
-    if (!uid_valid(tun->owner) && !gid_valid(tun->group))
-        return 1;
-    return ns_capable(net->user_ns, CAP_NET_ADMIN);
-}
+> That said, I probably should have used PMTU in my commit message to be
+> more clear for our problem. But meanwhile I am also concerned about
+> newly added tunnels to trigger the same issue, even if it has a static
+> device MTU. My proposal should make the error reason more clear:
+> EMSGSIZE itself is a direct signal pointing to MTU/PMTU. Larger
+> packets getting dropped would have a similar effect.
 
---=20
-Ondrej Mosnacek
-Senior Software Engineer, Linux Security - SELinux kernel
-Red Hat, Inc.
+Thanks for that context. Makes sense that this is a real issue.
 
+One issue is that with segmentation, the initial mtu checks are
+skipped, so they have to be enforced later. In __ip_append_data:
+
+    mtu =3D cork->gso_size ? IP_MAX_MTU : cork->fragsize;
+
+Also, might this make the debugging actually harder, as the
+error condition is now triggered intermittently.
 
