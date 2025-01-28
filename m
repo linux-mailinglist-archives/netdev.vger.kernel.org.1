@@ -1,142 +1,133 @@
-Return-Path: <netdev+bounces-161248-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-161249-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 02761A202E1
-	for <lists+netdev@lfdr.de>; Tue, 28 Jan 2025 02:09:09 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id DEFFAA2030B
+	for <lists+netdev@lfdr.de>; Tue, 28 Jan 2025 02:35:04 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id EB9673A28B2
-	for <lists+netdev@lfdr.de>; Tue, 28 Jan 2025 01:08:54 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 28A501886F1B
+	for <lists+netdev@lfdr.de>; Tue, 28 Jan 2025 01:35:09 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B26A525A636;
-	Tue, 28 Jan 2025 01:08:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CFED5383A5;
+	Tue, 28 Jan 2025 01:34:59 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="l7BQTTEf"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="MtyH7X4O"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ua1-f44.google.com (mail-ua1-f44.google.com [209.85.222.44])
+Received: from mail-il1-f174.google.com (mail-il1-f174.google.com [209.85.166.174])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2046E18C910
-	for <netdev@vger.kernel.org>; Tue, 28 Jan 2025 01:08:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.44
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 533A58F54;
+	Tue, 28 Jan 2025 01:34:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.174
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1738026538; cv=none; b=LgQkmSJ10aoHApPbSq7nTOMtQe/K7SWO1cT9udVmIKS/2QNnhAayznMHRgNLjRcnYsI+O4D8ENsem75egHNKGhMy0EwtktiZzWgR3r6u5xuq6lwOVF9+viTjlPnEJsf17mh0gd5CVEKW1pNO2xOoOexKQXnld+BUnh7CU+VEWjg=
+	t=1738028099; cv=none; b=q0OMnPdxWS6W52ZJpfYBHYbotlSJq5auv1uQ6RUVsozFYz9qdHm2bBIEi24xso1vpev0i7e99+Nvh5EETb54VTvdyjLEg/yPVxjGLz87tgqzvDk7+dFP5SkXaRH2NpI+YN9d01Btzvs2sfkmoOtIL4em5XNM8NOlIBK5H0OjDR4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1738026538; c=relaxed/simple;
-	bh=Wjr6JSoOhjKACq0TrBE03Tq18AZgxaolU3lUxHzMUoE=;
+	s=arc-20240116; t=1738028099; c=relaxed/simple;
+	bh=+oPBgWwqGUOexPCWAxNqZHrFZ/fA248oiW8luLVn7/8=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=mmubw3iqWk92pZrohu5lbmvQ/yEtZBgBiTG3OQnShL0FW1DAZgiGIJG4ai6VujH4rzEX42X4U/3Wn/cm55+/URDOuDuxEZkgr8TrgCRcwkLysLCN9X6jbGNw0eX/0v8UUHhYq4DSBFMTmGclLvgbeSOfgECVD7KD/on5aY2L3Fc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=l7BQTTEf; arc=none smtp.client-ip=209.85.222.44
+	 To:Cc:Content-Type; b=K68Z9/2pr05gWgC7E3VESskKPr89//OhOVltoM2vqaSSjK8nQOyqTgM5GQ1Tm/CWnVE/C1qI6qzAnJiRxoChEOpW8NIld+/cHgDifBlsUIeE7FZZxPukOSmYfSoUHC59pHrc/dQFj4U1203WBUDURNi9sqN+Xs9tfQGheTrzGh4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=MtyH7X4O; arc=none smtp.client-ip=209.85.166.174
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ua1-f44.google.com with SMTP id a1e0cc1a2514c-85c61388e68so1049943241.3
-        for <netdev@vger.kernel.org>; Mon, 27 Jan 2025 17:08:55 -0800 (PST)
+Received: by mail-il1-f174.google.com with SMTP id e9e14a558f8ab-3a8160382d4so13407085ab.0;
+        Mon, 27 Jan 2025 17:34:57 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1738026535; x=1738631335; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1738028097; x=1738632897; darn=vger.kernel.org;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=ltp4PoFbd9a2JjDxLDumhbcgzCFaEqThZRQcV8ipsaQ=;
-        b=l7BQTTEfVNZMsUTFi1coy0RLlOTLvVejZAR7B1DWUwvv0R0qjCj6B0UEhdF6PqOdpN
-         E/tfgwC1HS3yCQxbsUWt58cgY1tIaeaoYGKpsC9c2CKtPbhyk/JCKRhaAIkJfAsWI+xI
-         EGsMUAixDa9QJy+Fs10jUuGldXYRFDUjprtTWIfsCno5TpZb45ZZssX1EcPpoBxbUGAr
-         GK6wKydvf1txPvzZ978QKkHdcSJmyOHOC6zqJ2OmXSiq52YvbKb8FTdR7tza9wUeHJoA
-         0UIPYdGaacwRDDL+JWp294AaXnfhGCPrWJTTJO8aj05+fagbpsrziNQjYNhX2g+xYkCZ
-         XM3w==
+        bh=+oPBgWwqGUOexPCWAxNqZHrFZ/fA248oiW8luLVn7/8=;
+        b=MtyH7X4OUvXA8Bc9Fsb9VgFH+HpP5YCMiUaa6Vhm3oZQeT2e5dSpWTcQ21TLYqUStO
+         8w6eEijC6tTVwz4xLuuj4syOH0gbPa2y2mqqLatLyE7uRKi+e8juUH7VPcQGkiV2hgO6
+         BEYhv38J7RYaToU4lXw1+4lMFm0R3p13TqT8RzS8fqXZC9pnhx4ydupqKryg7gjX6a3q
+         1yECLgfXxhRpvgrX6+8qLEE6Fe0FDKXyjk8N0/tQVdCIljy/BP4UHWv4Wq+a+r6K2Ol5
+         iR2u/K7Gkk7yTG6VI8dNiHnanEqFs8IfSn3tyQignpiinsp3lE7JstOtZUZfHhLjntxl
+         eYBA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1738026535; x=1738631335;
+        d=1e100.net; s=20230601; t=1738028097; x=1738632897;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=ltp4PoFbd9a2JjDxLDumhbcgzCFaEqThZRQcV8ipsaQ=;
-        b=eMLGi5f2nBxYevd4oPCUMOzA4EjftL2fR9geFzd/H5PE41xL+U1Ie1I03pZ3Sidh8n
-         mtZGZ8DgZSPpT7Dr9Wy2+rm5YUX8EqgqwlcrdnTxRR2mnTH/CfpTA0EHSGv70uKyBR1i
-         tv4ozNgXfERlxMHjy84w1NmjXc6sMKYvV632xku6QrXgS9cfnQ6W8F7u8VEXve+VirY2
-         eYeeP6V3F6NZITQby5o6GnD+tHj7mJV31EXCtM2S+KwbQoxlbb5PvIAwutk/TA3doqcQ
-         +zy3Ch4IF3DWpgZmsuyJNlF8DOWY2aJ5mJ7WbqKrPBEQWRwMgiRiRLjmUKqzJn709BL6
-         rUsw==
-X-Gm-Message-State: AOJu0Yw+EOtgG9YD8Vc5TkBY6kDYf3+dxBkr9vQl1TjZsGszm/EOqPek
-	qWdUxMmOUCvot4r0Ycj3ZmK7DI9refdyowDhgj+2YmXq19cBPz8jyjHJ2MI2JXCsYRRtOa3AL+t
-	XUdxs0QuYsPlBAJOWQpSWJkUZZKQ=
-X-Gm-Gg: ASbGnctAuf9+EmFl0okytoL4Oo2mFiSgscuBbUbpEv0vbFoDjVbk5t87NjhnvWPn8Nu
-	jXt7waCYbgyzIdczKlD7BbkhRApDBEFQqZtkgTXSqgNNlXRQsZLRi6rEE9KKitaIskrwsTlKty4
-	slfX/qkcQv7N6JQgbOjdo=
-X-Google-Smtp-Source: AGHT+IEdnzutJB+xnI2X8yRgBgDWBxkJBByyhXZp2tjJ9ep14ARm1nzFKesHnuudJp/ydTfUtp9GxD2Va+eX2NETs6A=
-X-Received: by 2002:a05:6102:162c:b0:4b2:48cc:74f3 with SMTP id
- ada2fe7eead31-4b690bdc67emr37527748137.12.1738026533393; Mon, 27 Jan 2025
- 17:08:53 -0800 (PST)
+        bh=+oPBgWwqGUOexPCWAxNqZHrFZ/fA248oiW8luLVn7/8=;
+        b=dmQ4yFgQ1qk3x/s8q2V6vtH9e+2p24wMJoKYsEDEkt2yBao3u7WRPvsPBs930giDQv
+         F//W5F8xOh0zr89bWZH3yuQ1oz/wvPebSaYfPq/QqF0RUNuJoFIvIQj/Raippc1/iqJQ
+         x/z0GtpcD2nqT+i91sHZSf0kM3wyFZUQ0geBp3B0gTZ3ffzlFD4pv6cSmhzlbdaJvzl4
+         y16HTPITid/5Nrz97bh8kFbyNi+KOJdR8wWGBOa6Fu94cs/Tl/4sirb07vBWzyt5Yl2y
+         0AZnqA85FLQKSNsuj/rZsoJih5eEc4iryPYLovoKBZtr+N3vuq4zZ2RqpQFileXYbR60
+         QMCg==
+X-Forwarded-Encrypted: i=1; AJvYcCVJp7XzGtkKE9RRglYHsilkXm4ybbcICiHrOEmu1/ZtBIzrE426DAg4u7AQUPfd2MNn1Bi47nVd@vger.kernel.org, AJvYcCVvNCjzzwTtcETna4EAIZjXr1TJB2t4yYp23VJa+UbZyHbIR935gjNAw1TEHwJ7K+30MAo=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzB2UtgXTksY0eULnNre78ii9c/2jyyRVNMuf2NUgNMvWDGhdP8
+	cLpVpEH5K57M1FJcrpoNvtcqD2iVNvuLv3lnXKY1zDvd2a6yfkQHTZg40PLr/bLru1QI6AOPC2D
+	ASgWMVtHx1oTuueVm6UFqv8vLmY8=
+X-Gm-Gg: ASbGnct6GSKuEoJOm4nqR0QY4e4c64Thv1uhaJMvf6KbcXApGkP6B+5BCYOxLg/ZL/V
+	p+ii0xR5mPDLqfUncnsKGM05WvkBlSl5OjYMBc8YfpsYEP+wwtrR+anbtDQlSRA==
+X-Google-Smtp-Source: AGHT+IHt6+VjtGmVY0WpD9cHknxl56A8hB/aEspZJdQ4DqCAwIhCOrkRr70OLOhtbhsFJ/kr8wKe3lu+qhkJ/Z63AYU=
+X-Received: by 2002:a92:c248:0:b0:3cf:cbac:3ba6 with SMTP id
+ e9e14a558f8ab-3cfcbac3c55mr106177545ab.5.1738028097295; Mon, 27 Jan 2025
+ 17:34:57 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250126041224.366350-1-xiyou.wangcong@gmail.com>
- <20250126041224.366350-3-xiyou.wangcong@gmail.com> <20250127085756.4b680226@kernel.org>
-In-Reply-To: <20250127085756.4b680226@kernel.org>
-From: Cong Wang <xiyou.wangcong@gmail.com>
-Date: Mon, 27 Jan 2025 17:08:41 -0800
-X-Gm-Features: AWEUYZlP6UoiQF6XQGg6l85wt36PIMcvMaB1l0Qqkhy_8V-5SIXbCoJTTTAA-ic
-Message-ID: <CAM_iQpXaf9132bjg=MkJYttoz7ikypmeJbpo=-t6qJmutYe9-g@mail.gmail.com>
-Subject: Re: [Patch net v2 2/4] selftests/tc-testing: Add a test case for
- pfifo_head_drop qdisc when limit==0
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: netdev@vger.kernel.org, jhs@mojatatu.com, jiri@resnulli.us, 
-	quanglex97@gmail.com, mincho@theori.io, Cong Wang <cong.wang@bytedance.com>
+References: <20250121012901.87763-1-kerneljasonxing@gmail.com>
+ <20250121012901.87763-4-kerneljasonxing@gmail.com> <e1440d0b-4803-49b2-ba17-b9523649ca8b@linux.dev>
+ <CAL+tcoB182=QS0hLN9_ihf5Fcivr3BHuom8rrm+75bjpgC___Q@mail.gmail.com>
+In-Reply-To: <CAL+tcoB182=QS0hLN9_ihf5Fcivr3BHuom8rrm+75bjpgC___Q@mail.gmail.com>
+From: Jason Xing <kerneljasonxing@gmail.com>
+Date: Tue, 28 Jan 2025 09:34:20 +0800
+X-Gm-Features: AWEUYZlzuxuMJPKVAVrqD2QCV5fPg2pOiKA1hFD6q7CbPy6NRINam-wuXi7YKyc
+Message-ID: <CAL+tcoAjQFT57wSxcLaVUJJi1qQYYtE7OH2Q+KpZUziB49uBZg@mail.gmail.com>
+Subject: Re: [RFC PATCH net-next v6 03/13] bpf: stop UDP sock accessing TCP
+ fields in bpf callbacks
+To: Martin KaFai Lau <martin.lau@linux.dev>
+Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org, 
+	pabeni@redhat.com, dsahern@kernel.org, willemdebruijn.kernel@gmail.com, 
+	willemb@google.com, ast@kernel.org, daniel@iogearbox.net, andrii@kernel.org, 
+	eddyz87@gmail.com, song@kernel.org, yonghong.song@linux.dev, 
+	john.fastabend@gmail.com, kpsingh@kernel.org, sdf@fomichev.me, 
+	haoluo@google.com, jolsa@kernel.org, horms@kernel.org, bpf@vger.kernel.org, 
+	netdev@vger.kernel.org
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-On Mon, Jan 27, 2025 at 8:57=E2=80=AFAM Jakub Kicinski <kuba@kernel.org> wr=
-ote:
+On Sat, Jan 25, 2025 at 8:28=E2=80=AFAM Jason Xing <kerneljasonxing@gmail.c=
+om> wrote:
 >
-> On Sat, 25 Jan 2025 20:12:22 -0800 Cong Wang wrote:
-> > From: Quang Le <quanglex97@gmail.com>
+> On Sat, Jan 25, 2025 at 7:41=E2=80=AFAM Martin KaFai Lau <martin.lau@linu=
+x.dev> wrote:
 > >
-> > When limit =3D=3D 0, pfifo_tail_enqueue() must drop new packet and
-> > increase dropped packets count of the qdisc.
+> > On 1/20/25 5:28 PM, Jason Xing wrote:
+> > > Applying the new member allow_tcp_access in the existing callbacks
+> > > where is_fullsock is set to 1 can help us stop UDP socket accessing
+> > > struct tcp_sock, or else it could be catastrophe leading to panic.
+> > >
+> > > For now, those existing callbacks are used only for TCP. I believe
+> > > in the short run, we will have timestamping UDP callbacks support.
 > >
-> > All test results:
-> >
-> > 1..16
-> > ok 1 a519 - Add bfifo qdisc with system default parameters on egress
-> > ok 2 585c - Add pfifo qdisc with system default parameters on egress
-> > ok 3 a86e - Add bfifo qdisc with system default parameters on egress wi=
-th handle of maximum value
-> > ok 4 9ac8 - Add bfifo qdisc on egress with queue size of 3000 bytes
-> > ok 5 f4e6 - Add pfifo qdisc on egress with queue size of 3000 packets
-> > ok 6 b1b1 - Add bfifo qdisc with system default parameters on egress wi=
-th invalid handle exceeding maximum value
-> > ok 7 8d5e - Add bfifo qdisc on egress with unsupported argument
-> > ok 8 7787 - Add pfifo qdisc on egress with unsupported argument
-> > ok 9 c4b6 - Replace bfifo qdisc on egress with new queue size
-> > ok 10 3df6 - Replace pfifo qdisc on egress with new queue size
-> > ok 11 7a67 - Add bfifo qdisc on egress with queue size in invalid forma=
-t
-> > ok 12 1298 - Add duplicate bfifo qdisc on egress
-> > ok 13 45a0 - Delete nonexistent bfifo qdisc
-> > ok 14 972b - Add prio qdisc on egress with invalid format for handles
-> > ok 15 4d39 - Delete bfifo qdisc twice
-> > ok 16 d774 - Check pfifo_head_drop qdisc enqueue behaviour when limit =
-=3D=3D 0
+> > The commit message needs adjustment. UDP is not supported yet, so this =
+change
+> > feels like it's unnecessary based on the commit message. However, even =
+without
+> > UDP support, the new timestamping callbacks cannot directly write some =
+fields
+> > because the sk lock is not held, so this change is needed for TCP times=
+tamping
 >
-> Same problem as on v1:
->
-> # Could not match regex pattern. Verify command output:
-> # qdisc pfifo_head_drop 1: root refcnt 2 limit 0p
-> #  Sent 0 bytes 0 pkt (dropped 0, overlimits 0 requeues 0)
-> #  backlog 0b 0p requeues 0
->
-> https://github.com/p4tc-dev/tc-executor/blob/storage/artifacts/966506/1-t=
-dc-sh/stdout
->
-> Did you run the full suite? I wonder if some other test leaks an
-> interface with a 10.x network.
+> Thanks and I will revise them. But I still want to say that the
+> timestamping callbacks after this series are all under the protection
+> of socket lock.
 
-No, I only ran the tests shown above, I will run all the TDC tests.
+For the record only, I was wrong about the understanding of socket
+lock like above because there remains cases where this kind of path,
+say, i40e_intr()->i40e_ptp_tx_hwtstamp()->skb_tstamp_tx()->__skb_tstamp_tx(=
+),
+will not be protected under the socket lock. With that said, directly
+accessing tcp_sock is not safe even if the socket type is TCP.
 
-This is indeed a good hint.
-
-Thanks!
+Thanks,
+Jason
 
