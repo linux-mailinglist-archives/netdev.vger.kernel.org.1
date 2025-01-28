@@ -1,179 +1,164 @@
-Return-Path: <netdev+bounces-161299-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-161300-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id AC402A208A9
-	for <lists+netdev@lfdr.de>; Tue, 28 Jan 2025 11:37:51 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id DA510A208B2
+	for <lists+netdev@lfdr.de>; Tue, 28 Jan 2025 11:39:33 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id CF86E188797E
-	for <lists+netdev@lfdr.de>; Tue, 28 Jan 2025 10:37:55 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 4B8993A3D3F
+	for <lists+netdev@lfdr.de>; Tue, 28 Jan 2025 10:39:12 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B2C6F19D087;
-	Tue, 28 Jan 2025 10:37:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C57F219DFA2;
+	Tue, 28 Jan 2025 10:39:10 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=kloenk.dev header.i=@kloenk.dev header.b="WHGNPrCL"
+	dkim=pass (2048-bit key) header.d=clip-os.org header.i=@clip-os.org header.b="ehGEcu4d"
 X-Original-To: netdev@vger.kernel.org
-Received: from gimli.kloenk.de (gimli.kloenk.de [49.12.72.200])
+Received: from relay1-d.mail.gandi.net (relay1-d.mail.gandi.net [217.70.183.193])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BBBC919D8A2;
-	Tue, 28 Jan 2025 10:37:45 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=49.12.72.200
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 25434199EB2;
+	Tue, 28 Jan 2025 10:39:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.193
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1738060668; cv=none; b=KgfAvwSw+LzlDWAC6lEDWL0QV9tVbdsSl3hY3fHCOLYMsJE5GpecVLMdiTWJ9YUHfYv29i9vdsDCSS/KykVUhF/d2yyy0CaWmyOJfjGkrrSR7ZoCkpa9Bv1d0isAEYNVe/lxbLET9UWm7TTcIJebRMqJmzEpS3bmbkPRJfzilXo=
+	t=1738060750; cv=none; b=huOJumBPVw+M9tMCJ+tFcSWXBOnkFZkgj1iECkuPeBjYV6ud06J6oO5hvr5Cnkr6Ve1ce+htTO9HEISBsJbcexO6113gk1yV/QiTCEOTz7VmLGJDtwkv79x6m537CGMqPkm3sHM18SU6yUji8M2gkLUmxeVUqEa6SrHhk3ScOn8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1738060668; c=relaxed/simple;
-	bh=J5/Vx9QGK/5guF29mxCjOCY3nClAAPUBwwr9t9b2Ts8=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=tutlhXW/J1vOtvUxcJtIdtjWllLgEP7wVIT1GNdP9SLWCuG9azAnRa0jriZP8rqwniqw64CBwC5Fv7ikLZJZdyPUAD4cdVWpdFS40SZe5n1NqVr9N9EwP+BdYJXI8uVpaodrw3vQyfiRS8XxoZYmMuonYKU6HprhCxN0ZQXOTt4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=kloenk.dev; spf=pass smtp.mailfrom=kloenk.dev; dkim=pass (1024-bit key) header.d=kloenk.dev header.i=@kloenk.dev header.b=WHGNPrCL; arc=none smtp.client-ip=49.12.72.200
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=kloenk.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kloenk.dev
-From: Fiona Behrens <me@kloenk.dev>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kloenk.dev; s=mail;
-	t=1738060663; bh=wllYclaLxUYQNyuG1jr38OF3SHspdtratLV3VjnhYdU=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References;
-	b=WHGNPrCL/J2vpGe7lXoQK7IR7druK4V6JSkL8CSuOXUIINzXZEgxLboSUKdHYItsZ
-	 7SFbC1nQiQdT67lwZspLEqDlfN6UrWC7Dd0GOjPVU5iGW5OTJx65VLHDtdv7XXbgDs
-	 Ro50G4d1/0Cbpqk9ssuPoQFnb2Cw2CGIK8iS8bG8=
-To: FUJITA Tomonori <fujita.tomonori@gmail.com>
-Cc: linux-kernel@vger.kernel.org, rust-for-linux@vger.kernel.org,
- netdev@vger.kernel.org, andrew@lunn.ch, hkallweit1@gmail.com,
- tmgross@umich.edu, ojeda@kernel.org, alex.gaynor@gmail.com, gary@garyguo.net,
- bjorn3_gh@protonmail.com, benno.lossin@proton.me, a.hindborg@samsung.com,
- aliceryhl@google.com, anna-maria@linutronix.de, frederic@kernel.org,
- tglx@linutronix.de, arnd@arndb.de, jstultz@google.com, sboyd@kernel.org,
- mingo@redhat.com, peterz@infradead.org, juri.lelli@redhat.com,
- vincent.guittot@linaro.org, dietmar.eggemann@arm.com, rostedt@goodmis.org,
- bsegall@google.com, mgorman@suse.de, vschneid@redhat.com, tgunders@redhat.com
-Subject: Re: [PATCH v9 5/8] rust: time: Add wrapper for fsleep() function
-Date: Tue, 28 Jan 2025 11:37:41 +0100
-Message-ID: <EED019B1-8DEB-43BF-8F59-1A71520F5ABB@kloenk.dev>
-In-Reply-To: <20250125101854.112261-6-fujita.tomonori@gmail.com>
-References: <20250125101854.112261-1-fujita.tomonori@gmail.com>
- <20250125101854.112261-6-fujita.tomonori@gmail.com>
+	s=arc-20240116; t=1738060750; c=relaxed/simple;
+	bh=41wcHiYxeFxToMryqAfdaZMgTBLFcU/9qhaAj3PSsTY=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=iMeZG3UUt3JiiBOXupMvp/37/GOhdv1nO0WQfQNaatrIqlqJxsoAPZpA+sWaY0j+1wAKLiasFTO2USHN6bs3XnQ0DlI39qAfjvyOA0Krjv3schTYuQyV8WsvBb6/SYqsFRAi4BakN+LbPKeqOW09mxrw+3q1NdxFGzvL0xMyZik=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=clip-os.org; spf=pass smtp.mailfrom=clip-os.org; dkim=pass (2048-bit key) header.d=clip-os.org header.i=@clip-os.org header.b=ehGEcu4d; arc=none smtp.client-ip=217.70.183.193
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=clip-os.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=clip-os.org
+Received: by mail.gandi.net (Postfix) with ESMTPSA id DD6D7442A5;
+	Tue, 28 Jan 2025 10:39:03 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=clip-os.org; s=gm1;
+	t=1738060746;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=ku8Urfs6x+yp3O43UoWTObdPouPEDHLl4CwrrMtzQ40=;
+	b=ehGEcu4dH+SRKaoo0maWXTdGzaOFNdcx2F+SrPAsnnX3ItiFjX1gNV0p+rs2i4vB/Hnr/o
+	uCBla2/I5vOtVuSsX1mO8gdZS3GY9TpFfc93xMrim3J6ueJSw9uegQlF+tvuYgfTVvOcui
+	9OqwwqOKziJBf/6hzjU63zbCofbenuf+mexljFXYwIbi0WYTsbuafRRqXrv1A56yvhubd2
+	NfvEKDPWMQAvL5nxIhbaHj7xMDMOL/MzA4A7a1XzKoR7VRtgN8hwZm7ofW/nnXtFBCFFwx
+	DqZ1uMTZC9uOf6oI6qO1WMaeu70s0ooKBZ1zWFLRldaIPVXTJU0BjaxidwXKZA==
+From: nicolas.bouchinet@clip-os.org
+To: netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Cc: Nicolas Bouchinet <nicolas.bouchinet@ssi.gouv.fr>,
+	Joel Granados <j.granados@samsung.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	David Ahern <dsahern@kernel.org>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Simon Horman <horms@kernel.org>,
+	Steffen Klassert <steffen.klassert@secunet.com>,
+	Herbert Xu <herbert@gondor.apana.org.au>
+Subject: [PATCH v2 1/1] net: sysctl: Bound check gc_thresh sysctls
+Date: Tue, 28 Jan 2025 11:38:17 +0100
+Message-ID: <20250128103821.29745-1-nicolas.bouchinet@clip-os.org>
+X-Mailer: git-send-email 2.48.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
+X-GND-State: clean
+X-GND-Score: -100
+X-GND-Cause: gggruggvucftvghtrhhoucdtuddrgeefuddrudejgedgudehkeekucetufdoteggodetrfdotffvucfrrhhofhhilhgvmecuifetpfffkfdpucggtfgfnhhsuhgsshgtrhhisggvnecuuegrihhlohhuthemuceftddunecusecvtfgvtghiphhivghnthhsucdlqddutddtmdenucfjughrpefhvfevufffkffoggfgsedtkeertdertddtnecuhfhrohhmpehnihgtohhlrghsrdgsohhutghhihhnvghtsegtlhhiphdqohhsrdhorhhgnecuggftrfgrthhtvghrnhepieeigeehteehfeetuddtieefuefgfeevheevvdeiudetvdelleejveekkedvleeknecuffhomhgrihhnpehkvghrnhgvlhdrohhrghenucfkphepledtrdeifedrvdegiedrudekjeenucevlhhushhtvghrufhiiigvpedtnecurfgrrhgrmhepihhnvghtpeeltddrieefrddvgeeirddukeejpdhhvghloheprghrtghhlhhinhhugidrrddpmhgrihhlfhhrohhmpehnihgtohhlrghsrdgsohhutghhihhnvghtsegtlhhiphdqohhsrdhorhhgpdhnsggprhgtphhtthhopeduvddprhgtphhtthhopehnvghtuggvvhesvhhgvghrrdhkvghrnhgvlhdrohhrghdprhgtphhtthhopehlihhnuhigqdhkvghrnhgvlhesvhhgvghrrdhkvghrnhgvlhdrohhrghdprhgtphhtthhopehnihgtohhlrghsrdgsohhutghhihhnvghtsehsshhirdhgohhuvhdrfhhrpdhrtghpthhtohepjhdrghhrrghnrgguohhssehsrghmshhunhhgrdgtohhmpdhrtghpthhto
+ hepuggrvhgvmhesuggrvhgvmhhlohhfthdrnhgvthdprhgtphhtthhopegushgrhhgvrhhnsehkvghrnhgvlhdrohhrghdprhgtphhtthhopegvughumhgriigvthesghhoohhglhgvrdgtohhmpdhrtghpthhtohepkhhusggrsehkvghrnhgvlhdrohhrgh
+X-GND-Sasl: nicolas.bouchinet@clip-os.org
 
+From: Nicolas Bouchinet <nicolas.bouchinet@ssi.gouv.fr>
 
+ipv4, ipv6 and xfrm6 gc_thresh sysctls were authorized to be written any
+negative values, which would be stored in an unsigned int backing data
+(the gc_thresh variable in the dst_ops struct) since the proc_handler
+was proc_dointvec.
 
-On 25 Jan 2025, at 11:18, FUJITA Tomonori wrote:
+It seems to be used to disables garbage collection of
+`net/ipv4/route/gc_thresh` since commit: 4ff3885262d0 ("ipv4: Delete
+routing cache."). gc_thresh variable being set to `~0`.
 
-> Add a wrapper for fsleep(), flexible sleep functions in
-> include/linux/delay.h which typically deals with hardware delays.
->
-> The kernel supports several sleep functions to handle various lengths
-> of delay. This adds fsleep(), automatically chooses the best sleep
-> method based on a duration.
->
-> sleep functions including fsleep() belongs to TIMERS, not
-> TIMEKEEPING. They are maintained separately. rust/kernel/time.rs is an
-> abstraction for TIMEKEEPING. To make Rust abstractions match the C
-> side, add rust/kernel/time/delay.rs for this wrapper.
->
-> fsleep() can only be used in a nonatomic context. This requirement is
-> not checked by these abstractions, but it is intended that klint [1]
-> or a similar tool will be used to check it in the future.
->
-> Link: https://rust-for-linux.com/klint [1]
-> Signed-off-by: FUJITA Tomonori <fujita.tomonori@gmail.com>
+To clarify the sysctl interface, the proc_handler has thus been updated
+to proc_dointvec_minmax and writings have between limited between
+SYSCTL_NEG_ONE and SYSCTL_INT_MAX.
 
-One question below, but fine with this as well
+With this patch applied, sysctl writes outside the defined in the bound
+will thus lead to a write error :
 
-Reviewed-by: Fiona Behrens <me@kloenk.dev>
+```
+echo "-2" > /proc/sys/net/ipv4/route/gc_thresh
+bash: echo: write error: Invalid argument
+```
 
-> ---
->  rust/helpers/helpers.c    |  1 +
->  rust/helpers/time.c       |  8 +++++++
->  rust/kernel/time.rs       |  2 ++
->  rust/kernel/time/delay.rs | 49 +++++++++++++++++++++++++++++++++++++++=
+Signed-off-by: Nicolas Bouchinet <nicolas.bouchinet@ssi.gouv.fr>
 
->  4 files changed, 60 insertions(+)
->  create mode 100644 rust/helpers/time.c
->  create mode 100644 rust/kernel/time/delay.rs
->
-(..)
-> diff --git a/rust/kernel/time/delay.rs b/rust/kernel/time/delay.rs
-> new file mode 100644
-> index 000000000000..02b8731433c7
-> --- /dev/null
-> +++ b/rust/kernel/time/delay.rs
-> @@ -0,0 +1,49 @@
-> +// SPDX-License-Identifier: GPL-2.0
-> +
-> +//! Delay and sleep primitives.
-> +//!
-> +//! This module contains the kernel APIs related to delay and sleep th=
-at
-> +//! have been ported or wrapped for usage by Rust code in the kernel.
-> +//!
-> +//! C header: [`include/linux/delay.h`](srctree/include/linux/delay.h)=
-=2E
-> +
-> +use super::Delta;
-> +use crate::ffi::c_ulong;
-> +
-> +/// Sleeps for a given duration at least.
-> +///
-> +/// Equivalent to the C side [`fsleep()`], flexible sleep function,
-> +/// which automatically chooses the best sleep method based on a durat=
-ion.
-> +///
-> +/// `delta` must be within `[0, i32::MAX]` microseconds;
-> +/// otherwise, it is erroneous behavior. That is, it is considered a b=
-ug
-> +/// to call this function with an out-of-range value, in which case th=
-e function
-> +/// will sleep for at least the maximum value in the range and may war=
-n
-> +/// in the future.
-> +///
-> +/// The behavior above differs from the C side [`fsleep()`] for which =
-out-of-range
-> +/// values mean "infinite timeout" instead.
-> +///
-> +/// This function can only be used in a nonatomic context.
-> +///
-> +/// [`fsleep`]: https://docs.kernel.org/timers/delay_sleep_functions.h=
-tml#c.fsleep
-> +pub fn fsleep(delta: Delta) {
-> +    // The maximum value is set to `i32::MAX` microseconds to prevent =
-integer
-> +    // overflow inside fsleep, which could lead to unintentional infin=
-ite sleep.
-> +    const MAX_DELTA: Delta =3D Delta::from_micros(i32::MAX as i64);
-> +
-> +    let delta =3D if (Delta::ZERO..=3DMAX_DELTA).contains(&delta) {
-> +        delta
-> +    } else {
-> +        // TODO: Add WARN_ONCE() when it's supported.
-> +        MAX_DELTA
-> +    };
+---
 
-Did you try that with std::cmp::Ord you derived on Delta? This `.contains=
-` looks a bit weird, maybe it also works with `delta <=3D MAX_DELTA`?
+Changes since v1:
+https://lore.kernel.org/all/20250127142014.37834-1-nicolas.bouchinet@clip-os.org/
 
-> +
-> +    // SAFETY: It is always safe to call `fsleep()` with any duration.=
+* Detatched the patch from the patchset
+* Updated the boundcheck between SYSCTL_NEG_ONE and SYSCTL_INT_MAX.
+* Reworded the commit message to make it more clear.
 
-> +    unsafe {
-> +        // Convert the duration to microseconds and round up to preser=
-ve
-> +        // the guarantee; `fsleep()` sleeps for at least the provided =
-duration,
-> +        // but that it may sleep for longer under some circumstances.
-> +        bindings::fsleep(delta.as_micros_ceil() as c_ulong)
-> +    }
-> +}
-> -- =
+---
+ net/ipv4/route.c        | 4 +++-
+ net/ipv6/route.c        | 4 +++-
+ net/ipv6/xfrm6_policy.c | 4 +++-
+ 3 files changed, 9 insertions(+), 3 deletions(-)
 
-> 2.43.0
+diff --git a/net/ipv4/route.c b/net/ipv4/route.c
+index 0fbec35096186..96641ae15049a 100644
+--- a/net/ipv4/route.c
++++ b/net/ipv4/route.c
+@@ -3453,7 +3453,9 @@ static struct ctl_table ipv4_route_table[] = {
+ 		.data		= &ipv4_dst_ops.gc_thresh,
+ 		.maxlen		= sizeof(int),
+ 		.mode		= 0644,
+-		.proc_handler	= proc_dointvec,
++		.proc_handler	= proc_dointvec_minmax,
++		.extra1		= SYSCTL_NEG_ONE,
++		.extra2		= SYSCTL_INT_MAX,
+ 	},
+ 	{
+ 		.procname	= "max_size",
+diff --git a/net/ipv6/route.c b/net/ipv6/route.c
+index 67ff16c047180..3fc7f336dfa04 100644
+--- a/net/ipv6/route.c
++++ b/net/ipv6/route.c
+@@ -6379,7 +6379,9 @@ static struct ctl_table ipv6_route_table_template[] = {
+ 		.data		=	&ip6_dst_ops_template.gc_thresh,
+ 		.maxlen		=	sizeof(int),
+ 		.mode		=	0644,
+-		.proc_handler	=	proc_dointvec,
++		.proc_handler	=	proc_dointvec_minmax,
++		.extra1		=	SYSCTL_NEG_ONE,
++		.extra2		=	SYSCTL_INT_MAX,
+ 	},
+ 	{
+ 		.procname	=	"flush",
+diff --git a/net/ipv6/xfrm6_policy.c b/net/ipv6/xfrm6_policy.c
+index 1f19b6f14484c..1e212d5341839 100644
+--- a/net/ipv6/xfrm6_policy.c
++++ b/net/ipv6/xfrm6_policy.c
+@@ -189,7 +189,9 @@ static struct ctl_table xfrm6_policy_table[] = {
+ 		.data		= &init_net.xfrm.xfrm6_dst_ops.gc_thresh,
+ 		.maxlen		= sizeof(int),
+ 		.mode		= 0644,
+-		.proc_handler   = proc_dointvec,
++		.proc_handler   = proc_dointvec_minmax,
++		.extra1		= SYSCTL_NEG_ONE,
++		.extra2		= SYSCTL_INT_MAX,
+ 	},
+ };
+ 
+-- 
+2.48.1
+
 
