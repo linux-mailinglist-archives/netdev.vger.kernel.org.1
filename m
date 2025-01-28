@@ -1,160 +1,108 @@
-Return-Path: <netdev+bounces-161256-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-161257-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id C1685A20381
-	for <lists+netdev@lfdr.de>; Tue, 28 Jan 2025 05:25:30 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id B59DDA20382
+	for <lists+netdev@lfdr.de>; Tue, 28 Jan 2025 05:27:06 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 049667A3EC0
-	for <lists+netdev@lfdr.de>; Tue, 28 Jan 2025 04:25:21 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 0A4281887394
+	for <lists+netdev@lfdr.de>; Tue, 28 Jan 2025 04:27:11 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D7F04198A06;
-	Tue, 28 Jan 2025 04:25:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8B94E19DF52;
+	Tue, 28 Jan 2025 04:27:02 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="bdTZ/Jba"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=cs.stanford.edu header.i=@cs.stanford.edu header.b="BqpzoCtp"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-vs1-f48.google.com (mail-vs1-f48.google.com [209.85.217.48])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp1.cs.Stanford.EDU (smtp1.cs.stanford.edu [171.64.64.25])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 39B2D1991BF
-	for <netdev@vger.kernel.org>; Tue, 28 Jan 2025 04:25:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.217.48
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F10644315F
+	for <netdev@vger.kernel.org>; Tue, 28 Jan 2025 04:27:00 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=171.64.64.25
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1738038323; cv=none; b=A1TQM98VcIcD+94kHp11PHqLlOelOX83y9fdJB2X07cKBWVP1XMVyW9XHXMWLw4G+tM6QU44kCKUwiQuKYbbVQwrb9x7jaErhlZs4d9GnCn6MWLlF2tTu22X2y3YNd4jaTb2fUK37PIPS7EOPm49t2SCcOn9F0b/dvUsMtHruaM=
+	t=1738038422; cv=none; b=tbjTcM/uYU+t5xW2KMw16JCX1suYATjbFrotKPhem8FjfyKGXyns2xvcQnczt8RSm4AtPw2s7VLDp6LrnnzikgSI9rQFNpTMY7OkdO7VTfplUOPYXA+iMWnmqjtSUmU5uph9yCVtw1hBW2f+1Shf4CAgUl3qEIK12MJUU5f8ooA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1738038323; c=relaxed/simple;
-	bh=11bqkB54pIHiKc5ButCzGwgr45pJIQMnrCAWq8p3lA0=;
+	s=arc-20240116; t=1738038422; c=relaxed/simple;
+	bh=Kzml2V52+BTPTW7hDbYqvGU/zuEgDIha+UrdEs/pc+8=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=EcYhun97saVmV8QlnNT9VU7qCIOkc5lNGl0HyyPUEkVXtgYGhiDjFXXvhyR+OP6R/Z5xi9Z0dJNTa6hXIixGGWnZHf48a5ZIG1qcx8oPxkQcZ49gvsQONTw+o0G+10FcM48qZkGgpshqYCYsr6+v0uCksMWY+C87h1xb4uZ4Q0E=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=bdTZ/Jba; arc=none smtp.client-ip=209.85.217.48
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-vs1-f48.google.com with SMTP id ada2fe7eead31-4afd56903b7so1391449137.1
-        for <netdev@vger.kernel.org>; Mon, 27 Jan 2025 20:25:21 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1738038321; x=1738643121; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=soTEC2hs0hDsA/Hx6T0AxgC+2Bfdh1wRmBwdrMabW6s=;
-        b=bdTZ/JbaodE1C/UR4p5omUeHA5qUU8RpTlx0S8B6YRCrbE+Wey+vyjaDTDy09xaTGZ
-         JMlR2kgAL0KXnjhqvHKLdxJeZ8jhJPY27aCt8SqqOmyspNydz7Cmgq58fueEnZ3K1sTv
-         iHmTc6OPVg++cAGkFqiW0VB2FOjQttXgfYaj23IbkP8FuEvhFZ6NYHDKN/QYRZU2kNpk
-         TECX1Y/5dITkEpyOaxFk+oQp3rk/HwFy36odvieha6o4qNdq6ZN9a/rAVoYokHQYlfhs
-         ESkUpkhv7U2DyzAfua/fAV3GBcNquXtbbE+UpLi66qPa3hoUC4WJksNJjoiQUOhEwFJZ
-         T7iQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1738038321; x=1738643121;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=soTEC2hs0hDsA/Hx6T0AxgC+2Bfdh1wRmBwdrMabW6s=;
-        b=szs87tS5Saj+shQEdVzMHA1FLwrE9YUHxT8go7M2RrD9V2FRaXRTNy5mmDViPlbD1I
-         NlDV5k5D1Kz4sjkiK+5zcB7oxhIdgoj8V4qZkHstnI6eUh5hMw2aj/uMdHYwCCJ440zf
-         FN/YzMfKmjkj5UOISrwKOXMgTw0UxJRq10dxPcnGYeIjCI4Iu4uLGHRwFLp8658KaoAJ
-         KPEJjHwDHVwxxy30AYwurSzG27cPYqaR7VDx8Ug0SfFp5W21YiIqVjxvc6djlo3+txzL
-         Vv54p/pYv5EgmxmtUV0sP+c3uznYswOeEfcrDsgdQGUIofgA1q3DxVF0fLPe4KQGtm3z
-         5Rcw==
-X-Gm-Message-State: AOJu0YyrTjwDZ9w4MMksQQXRWN8+VFX9EcSICsLvEC8vkDLFbr0bfxdo
-	royHY3E+R94QS5ayoZZW8Ig0C0GAbeVI2REhHqGz+zHnUnVZpnGggucAPZ32huYaKzrB2bVv7je
-	KLVB7tcKVYuRdhD8KzL3nFLPbLm8=
-X-Gm-Gg: ASbGncsABT8nIM+alKT5kBSh6/NSLVjO2fOb3nZyXJWQy477B7XI/uH11vNxbb0wMr5
-	owmvOkbHyaTtYZCYuPobw08Zt4MOfQiaU7jJHVPS3F+Dva2rCfSOpcB6jQGHNoLHdka71V0zFN1
-	raU8M0HgzVOKYiXdPMZzfeKReg/gA5Gg==
-X-Google-Smtp-Source: AGHT+IEhpTe6VnwskkgRskp76WQ5pV1z7pLNONm6BCF5QFuzFzZlKLluoGh4wnsNNESC8Y3ntCm6BeocZu9scGeZo8I=
-X-Received: by 2002:a05:6102:3c8d:b0:4b6:35c4:6fcd with SMTP id
- ada2fe7eead31-4b690be4319mr38988544137.7.1738038320913; Mon, 27 Jan 2025
- 20:25:20 -0800 (PST)
+	 To:Cc:Content-Type; b=hA0/a8Qipy4GDm48vggc2IpOzzwT4sFa8acHXghaTw3h73TsBgrTEowycmXLZ0dJBO+LYgrBIJW/pGUq1BEBazKRCu2/GUimMCtctnx3xLaFkfnejOKc77MMSS/lazya2vi9eu6TrXsN84fnAXu4UJfzVDcAl5WqBMyLHThNwi8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=cs.stanford.edu; spf=pass smtp.mailfrom=cs.stanford.edu; dkim=pass (2048-bit key) header.d=cs.stanford.edu header.i=@cs.stanford.edu header.b=BqpzoCtp; arc=none smtp.client-ip=171.64.64.25
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=cs.stanford.edu
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=cs.stanford.edu
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=cs.stanford.edu; s=cs2308; h=Content-Transfer-Encoding:Content-Type:Cc:To:
+	Subject:Message-ID:Date:From:In-Reply-To:References:MIME-Version:Sender:
+	Reply-To:Content-ID:Content-Description:Resent-Date:Resent-From:Resent-Sender
+	:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:List-Help:List-Unsubscribe:
+	List-Subscribe:List-Post:List-Owner:List-Archive;
+	bh=ACM3pEAH2aULWHwKk+fHWFoepTuzeBgAIxtgNjxuQkc=; t=1738038420; x=1738902420; 
+	b=BqpzoCtpXLqYRLKmfaGI7Te4P0oScA2HQ4yYJNp+KcJy7iTSe2eQ/PSVfqIu3+64whYKlFCVSIR
+	YnHuubHiw8R6HHJfD8sH4vyX6MqTz1QyU2TpXt1f8dzzZsTMnGwDIJOj5d1z/nMyE4Fhz1gsZM5mA
+	yu/v5ydOTHt3chGZsVqHAUrutVsJWHrzm7RHeengxBoa/2LiqgeOsW2xr1NVbPPPmrbNAJ8l7rWCL
+	gXBirIV9zlAhSL7DrjX78w/N+Z+khS2t6PVkb/XOLHs9/WTyEuNdaG5rHlsaU7K1KsF2iAoqCI+XM
+	1rCLkonng3O/pXhFocEtnw0iLh7ddY11qFSQ==;
+Received: from mail-oa1-f43.google.com ([209.85.160.43]:58647)
+	by smtp1.cs.Stanford.EDU with esmtpsa  (TLS1.2) tls TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256
+	(Exim 4.94.2)
+	(envelope-from <ouster@cs.stanford.edu>)
+	id 1tcdBj-0001ko-OR
+	for netdev@vger.kernel.org; Mon, 27 Jan 2025 20:27:00 -0800
+Received: by mail-oa1-f43.google.com with SMTP id 586e51a60fabf-29fad34bb62so2691007fac.1
+        for <netdev@vger.kernel.org>; Mon, 27 Jan 2025 20:26:59 -0800 (PST)
+X-Gm-Message-State: AOJu0Yx9FXWJmabKz/KZN+mEoyshlcLzBrhg2k9JXw+ph0Th8da3yaXJ
+	3OmKrRe86FD4/3QV7rcBfWCKmXQCW4U0AM4sHFShARrn6KEt10Q5ZMXQjrqH8VPdsCPehGKg8SE
+	E1fQG9UXqv374u6tqxBOOAa1Pz48=
+X-Google-Smtp-Source: AGHT+IE4/eY8+DEjLC6YvEvhFvMRKLqtlscx64fBFh/iHosqNe4x4fJE2WWasPs9vB96s9bdPfpGBNUGWVAybDa81AQ=
+X-Received: by 2002:a05:6870:b022:b0:29e:6096:c25f with SMTP id
+ 586e51a60fabf-2b1c0ab53f5mr24688125fac.23.1738038419176; Mon, 27 Jan 2025
+ 20:26:59 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250126041224.366350-1-xiyou.wangcong@gmail.com>
- <20250126041224.366350-3-xiyou.wangcong@gmail.com> <20250127085756.4b680226@kernel.org>
- <CAM_iQpXaf9132bjg=MkJYttoz7ikypmeJbpo=-t6qJmutYe9-g@mail.gmail.com>
-In-Reply-To: <CAM_iQpXaf9132bjg=MkJYttoz7ikypmeJbpo=-t6qJmutYe9-g@mail.gmail.com>
-From: Cong Wang <xiyou.wangcong@gmail.com>
-Date: Mon, 27 Jan 2025 20:25:09 -0800
-X-Gm-Features: AWEUYZkUjVR0QYXstz8IBySf7ODeIORdOA4kQTOM81N7lgAuaTRiCksQ-XSWFPc
-Message-ID: <CAM_iQpXDtMngE1Pcf9KBmRpb5sZK4EJj6qgPgt1ioYW4QC9W3g@mail.gmail.com>
-Subject: Re: [Patch net v2 2/4] selftests/tc-testing: Add a test case for
- pfifo_head_drop qdisc when limit==0
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: netdev@vger.kernel.org, jhs@mojatatu.com, jiri@resnulli.us, 
-	quanglex97@gmail.com, mincho@theori.io, Cong Wang <cong.wang@bytedance.com>
+References: <20250115185937.1324-1-ouster@cs.stanford.edu> <20250115185937.1324-8-ouster@cs.stanford.edu>
+ <028f492f-41db-4c70-9527-cf0db03da4df@redhat.com> <CAGXJAmxqoPw8iTH0Bt4z5V2feM8rekDDOJapek4eyMuLJhUAtA@mail.gmail.com>
+In-Reply-To: <CAGXJAmxqoPw8iTH0Bt4z5V2feM8rekDDOJapek4eyMuLJhUAtA@mail.gmail.com>
+From: John Ousterhout <ouster@cs.stanford.edu>
+Date: Mon, 27 Jan 2025 20:26:21 -0800
+X-Gmail-Original-Message-ID: <CAGXJAmwcsyngTjX3XihgVZ88a+-nW6QQb-UO1hYHBjfD8jNEDA@mail.gmail.com>
+X-Gm-Features: AWEUYZnVIiwSIHAi_th2nAGnSwcWQlpFekG2ut6JmWwOxU9Gdqljrp6vAdQ_ESE
+Message-ID: <CAGXJAmwcsyngTjX3XihgVZ88a+-nW6QQb-UO1hYHBjfD8jNEDA@mail.gmail.com>
+Subject: Re: [PATCH net-next v6 07/12] net: homa: create homa_sock.h and homa_sock.c
+To: Paolo Abeni <pabeni@redhat.com>
+Cc: netdev@vger.kernel.org, edumazet@google.com, horms@kernel.org, 
+	kuba@kernel.org
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
+X-Spam-Score: -1.0
+X-Spam-Level: 
+X-Scan-Signature: acf3039aa8d32d1ac60a71149e52b94c
 
-On Mon, Jan 27, 2025 at 5:08=E2=80=AFPM Cong Wang <xiyou.wangcong@gmail.com=
-> wrote:
+On Mon, Jan 27, 2025 at 4:40=E2=80=AFPM John Ousterhout <ouster@cs.stanford=
+.edu> wrote:
+
+> > This homa_socktab thing looks quite complex. A simpler implementation
+> > could use a simple RCU list _and_ acquire a reference to the hsk before
+> > releasing the RCU lock.
 >
-> On Mon, Jan 27, 2025 at 8:57=E2=80=AFAM Jakub Kicinski <kuba@kernel.org> =
-wrote:
-> >
-> > On Sat, 25 Jan 2025 20:12:22 -0800 Cong Wang wrote:
-> > > From: Quang Le <quanglex97@gmail.com>
-> > >
-> > > When limit =3D=3D 0, pfifo_tail_enqueue() must drop new packet and
-> > > increase dropped packets count of the qdisc.
-> > >
-> > > All test results:
-> > >
-> > > 1..16
-> > > ok 1 a519 - Add bfifo qdisc with system default parameters on egress
-> > > ok 2 585c - Add pfifo qdisc with system default parameters on egress
-> > > ok 3 a86e - Add bfifo qdisc with system default parameters on egress =
-with handle of maximum value
-> > > ok 4 9ac8 - Add bfifo qdisc on egress with queue size of 3000 bytes
-> > > ok 5 f4e6 - Add pfifo qdisc on egress with queue size of 3000 packets
-> > > ok 6 b1b1 - Add bfifo qdisc with system default parameters on egress =
-with invalid handle exceeding maximum value
-> > > ok 7 8d5e - Add bfifo qdisc on egress with unsupported argument
-> > > ok 8 7787 - Add pfifo qdisc on egress with unsupported argument
-> > > ok 9 c4b6 - Replace bfifo qdisc on egress with new queue size
-> > > ok 10 3df6 - Replace pfifo qdisc on egress with new queue size
-> > > ok 11 7a67 - Add bfifo qdisc on egress with queue size in invalid for=
-mat
-> > > ok 12 1298 - Add duplicate bfifo qdisc on egress
-> > > ok 13 45a0 - Delete nonexistent bfifo qdisc
-> > > ok 14 972b - Add prio qdisc on egress with invalid format for handles
-> > > ok 15 4d39 - Delete bfifo qdisc twice
-> > > ok 16 d774 - Check pfifo_head_drop qdisc enqueue behaviour when limit=
- =3D=3D 0
-> >
-> > Same problem as on v1:
-> >
-> > # Could not match regex pattern. Verify command output:
-> > # qdisc pfifo_head_drop 1: root refcnt 2 limit 0p
-> > #  Sent 0 bytes 0 pkt (dropped 0, overlimits 0 requeues 0)
-> > #  backlog 0b 0p requeues 0
-> >
-> > https://github.com/p4tc-dev/tc-executor/blob/storage/artifacts/966506/1=
--tdc-sh/stdout
-> >
-> > Did you run the full suite? I wonder if some other test leaks an
-> > interface with a 10.x network.
->
-> No, I only ran the tests shown above, I will run all the TDC tests.
+> I agree that this is complicated. But I can't see a simpler solution.
+> The problem is that we need to iterate through all of the sockets and
+> release the RCU lock at some points during the iteration. The problem
+> isn't preserving the current hsk; it's preserving the validity of the
+> pointer to the next one also. I don't fully understand what you're
+> proposing above; if you can make it a bit more precise I'll see if it
+> solves all the problems I'm aware of and does it in a simpler way.
 
-Hmm, I just got another error which prevents me from starting all the tests=
-:
+Responding to my own email: about 15 minutes after sending this email
+I realized what you were getting at with your suggestion.  I agree
+that's a much better approach than the one currently implemented, so
+I'm going to switch to that. Among other things, I think it may allow
+all of the RCU stuff  to be encapsulated entirely within the socket
+iteration mechanism  (no need for callers to invoke rcu_read_lock).
 
-# -----> prepare stage *** Could not execute: "$TC qdisc replace dev
-$ETH handle 8001: parent root stab overhead 24 taprio num_tc 8 map 0 1
-2 3 4 5 6 7 queues 1@0 1@1 1@2 1@3 1@4 1@5 1@6 1@7 base-time 0
-sched-entry S ff 20000000 flags 0x2"
-#
-# -----> prepare stage *** Error message: "Error: Device does not have
-a PTP clock.
-# "
-#
-# -----> prepare stage *** Aborting test run.
-
-Let me see if I can workaround it before looking into it.
-
-Thanks.
+-John-
 
