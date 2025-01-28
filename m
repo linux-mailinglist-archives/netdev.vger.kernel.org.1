@@ -1,149 +1,196 @@
-Return-Path: <netdev+bounces-161301-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-161302-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0B6E2A208E4
-	for <lists+netdev@lfdr.de>; Tue, 28 Jan 2025 11:47:55 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id E5DCCA208F4
+	for <lists+netdev@lfdr.de>; Tue, 28 Jan 2025 11:49:57 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 5FAB918847C4
-	for <lists+netdev@lfdr.de>; Tue, 28 Jan 2025 10:47:59 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 4740216255B
+	for <lists+netdev@lfdr.de>; Tue, 28 Jan 2025 10:49:56 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5CF33188CA9;
-	Tue, 28 Jan 2025 10:47:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 35C5A19E7F7;
+	Tue, 28 Jan 2025 10:49:56 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="VNSPBpIL"
+	dkim=pass (1024-bit key) header.d=kloenk.dev header.i=@kloenk.dev header.b="h46/7Sbw"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from gimli.kloenk.de (gimli.kloenk.de [49.12.72.200])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A25A619ADB0
-	for <netdev@vger.kernel.org>; Tue, 28 Jan 2025 10:47:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 51F981991CA;
+	Tue, 28 Jan 2025 10:49:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=49.12.72.200
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1738061273; cv=none; b=DhSi6sVTmGa+vvJIJdFSU5NO1JKDqAxWHo2Q5Jnmnf8Sqi19DCWmd+WNtVh2IPxZn4S08d4stHdorkFiL4MkvHS6bWXyGXg0QTGwqEnnY8174MwV7ohMQrkx43F6H6Fh+hO9v/yy6QiiLzgcizpLCDpGCxB13+YmBayyf8Tcm10=
+	t=1738061396; cv=none; b=CRZUGIfm4krWGWx6ynfppc07XH3mM7agUCDC5m8Cdze0Go6/Grg9AtWONgYxiXRZLI45n9tnTo5ybWSDTrQLEXUI4cWjS+7EH9TNd/rJMl3fXWWipwDfvY1VrDomOGEEouchk1soWkfRqr0WpGkqOVPm/v+ucG5P9vsSKPV7nNY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1738061273; c=relaxed/simple;
-	bh=HP90OcOHcFAOlSNCgyDknUeF3odb/iX69QRWvitG1Gk=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=TRWWktfTSO3KTO+hCjSftS14vvWRoiBSxCpCaR5P8p85490h4JjSOHhSPewL8wvnln4iQ3Xg25kOoRCLBnabMOvVIWIUrC1cYFiLL7haavI2zXhbfxpcKmFq94NSZvxyQeO+4YHNZczPYKWdLJVCLpxGroW/BOD69e+2y1YtnS4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=VNSPBpIL; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1738061270;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=yWQ0ihpGpO21seLBQCed0Ou2kpJonW2uY4Y9Srpr4ik=;
-	b=VNSPBpILBZRBG4Rmb0hVZS/T+Cv+JduKJP7L0KOkQjtK5f8jN1rk/EmwFYjt4colgVCl4Y
-	BFyDbOtMRSgKL0Zm+goIEncoAWc07+8FXIHsrB9K9RtSGTUBPg5JEU9XcKsO30a+75w0xf
-	RSd5yxoUv2sguxtW2AHPU8F9XdQy/Ys=
-Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
- [209.85.128.70]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-589-ER5r8xCMOWu5loC3luv_dg-1; Tue, 28 Jan 2025 05:47:49 -0500
-X-MC-Unique: ER5r8xCMOWu5loC3luv_dg-1
-X-Mimecast-MFC-AGG-ID: ER5r8xCMOWu5loC3luv_dg
-Received: by mail-wm1-f70.google.com with SMTP id 5b1f17b1804b1-4362153dcd6so27813125e9.2
-        for <netdev@vger.kernel.org>; Tue, 28 Jan 2025 02:47:48 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1738061268; x=1738666068;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=yWQ0ihpGpO21seLBQCed0Ou2kpJonW2uY4Y9Srpr4ik=;
-        b=XWQgA0ahpzYMIzwK5T0SEvUYFRNzDRqdTe7uLCFTE/uX5ObdfWNzq40Yj0dlcPPxOo
-         dEIyxB11lZBFUMPiLZtxNDN8pnvwJc27Sj0wLe10Y1qnej2/D+5WyupqPlOyObDorvz5
-         /T7Laq2JT/vFGeKPAz5g7ch46E1YaXQz5fwJBNiiTt3d0F2HMauEOf8vbaN4KgZyBUxR
-         oqgkq4sm4sEU6pUcuUyWfXFX5+m1xCtiyDL5j28XBdWCBka7XZ5KZGEpVfUld3bNet2r
-         M34J7zijypEcMUDZnC1hXYMTbux7F4KXexU7CGVRtwm4zDiw9izoI8IMWXch3JFUknUp
-         3+jQ==
-X-Forwarded-Encrypted: i=1; AJvYcCXiBodQFCxPiFJHbLQG0tCCENSRowKi9MZR2/+J99vGVCEe0i1KdAwSyX2ykSwtwfo3nRTYtrU=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yx+0Dc5Z+sPrWGcmHP/7hHXdWRDys2msPOU6YJT0Q+mgN+sBZca
-	3GR2oLfQ/Zpb+OY5Flhaviw3pBJyysnI8LXAJFgP9hXYfUhDSpnHQAEmIeJw/2DxkulTgfO2Lcl
-	+29ENqZHghupaamRyJAbxUFN76wVndPvFd2oFqk78fmu/DVwuwSA7aw==
-X-Gm-Gg: ASbGncuaAae4r+dTNJhCVmnjHSlfFwB1DJXmYFbxVOD7TfYpvqLHjEpo4hwuDqB3qdF
-	2eCGHM+MFLKVX7XNylpIZfs4yOVV8Ewa5z3qVjkFYLWW5PyebhVQaEXeWOMto5CAg3XPM1BWUvK
-	ejoetJhVHlihJ7DEpTkd+nZvCpw/2h7YvBqj7Pui8zg2dXQfwuh7BbFYwgIW+Wt5H5VRdr/gkFd
-	pUN6DLhlD/U9b3n4Oiwd0P9BuADPKGHMC52hugj5KjMOR8bicyxiaUmlejjjWtREyUXj360Cmks
-	QZ3lDMa3dZL6Yxor9dHW88v6akcCE53GYBA=
-X-Received: by 2002:a05:600c:3495:b0:434:a315:19c with SMTP id 5b1f17b1804b1-438913bdb0emr392319625e9.3.1738061267905;
-        Tue, 28 Jan 2025 02:47:47 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IGfpF8y2CKT7XcJmqqjAg4t+V7DDDQQWuN/Rs/6h2ZaxFYDfNi1pmHGQZn1TUOOoFipdTcdSg==
-X-Received: by 2002:a05:600c:3495:b0:434:a315:19c with SMTP id 5b1f17b1804b1-438913bdb0emr392319425e9.3.1738061267537;
-        Tue, 28 Jan 2025 02:47:47 -0800 (PST)
-Received: from [192.168.88.253] (146-241-48-130.dyn.eolo.it. [146.241.48.130])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-438bd4d3393sm162551155e9.37.2025.01.28.02.47.45
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 28 Jan 2025 02:47:47 -0800 (PST)
-Message-ID: <32e872e1-e842-4839-beeb-a1e9f235ed42@redhat.com>
-Date: Tue, 28 Jan 2025 11:47:45 +0100
+	s=arc-20240116; t=1738061396; c=relaxed/simple;
+	bh=tQhZVViOKdYJwmJY9BFxJKbUw0FsxPZQFp5vTBlEyIw=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=VWSMXP/wJHSPiwrMfLIFcoxW2vqFOFgEgQES1VRncw7a+nk35hBtnaSBCJzq4D76worr72FNJxa2O0NLDcyd1V03K+eG2gup2ttJvVGnI/f6TFwj7A+YFwkAMidcgnVbguhK0nnc0KYq6WqC/TYyyGMtCHaLVcQbgt729fB/FBA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=kloenk.dev; spf=pass smtp.mailfrom=kloenk.dev; dkim=pass (1024-bit key) header.d=kloenk.dev header.i=@kloenk.dev header.b=h46/7Sbw; arc=none smtp.client-ip=49.12.72.200
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=kloenk.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kloenk.dev
+From: Fiona Behrens <me@kloenk.dev>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=kloenk.dev; s=mail;
+	t=1738061390; bh=Sk5hqTOZF0xdzUDKdnW0ug8ercxLESQwOxYtUVWbC6A=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References;
+	b=h46/7SbwWDW8a1VN0JXa3K525yqCrz1dBJFFA0Tk+xtL/tbi8KD9ysQC/oO2aFQaV
+	 HsNqK8RCTev7lsuql9phKG+vC9LqEptSjfXikyt5K6Vbo60IhKcTw80jwKI/Q0WRGR
+	 c7VzRmom8qrDv5uNjSc/Q8eOEROW/T+AV/BEQTQg=
+To: FUJITA Tomonori <fujita.tomonori@gmail.com>
+Cc: gary@garyguo.net, linux-kernel@vger.kernel.org,
+ rust-for-linux@vger.kernel.org, netdev@vger.kernel.org, andrew@lunn.ch,
+ hkallweit1@gmail.com, tmgross@umich.edu, ojeda@kernel.org,
+ alex.gaynor@gmail.com, bjorn3_gh@protonmail.com, benno.lossin@proton.me,
+ a.hindborg@samsung.com, aliceryhl@google.com, anna-maria@linutronix.de,
+ frederic@kernel.org, tglx@linutronix.de, arnd@arndb.de, jstultz@google.com,
+ sboyd@kernel.org, mingo@redhat.com, peterz@infradead.org,
+ juri.lelli@redhat.com, vincent.guittot@linaro.org, dietmar.eggemann@arm.com,
+ rostedt@goodmis.org, bsegall@google.com, mgorman@suse.de,
+ vschneid@redhat.com, tgunders@redhat.com
+Subject: Re: [PATCH v9 7/8] rust: Add read_poll_timeout functions
+Date: Tue, 28 Jan 2025 11:49:48 +0100
+Message-ID: <64335523-D12A-4E65-9518-64FC08C26D39@kloenk.dev>
+In-Reply-To: <20250128.152957.202492012529466658.fujita.tomonori@gmail.com>
+References: <20250127114646.6ad6d65f@eugeo>
+ <20250127.153147.1789884009486719687.fujita.tomonori@gmail.com>
+ <20250128084937.2927bab9@eugeo>
+ <20250128.152957.202492012529466658.fujita.tomonori@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net] net: mv643xx_eth: implement descriptor cleanup in
- txq_submit_tso
-To: Dheeraj Reddy Jonnalagadda <dheeraj.linuxdev@gmail.com>,
- sebastian.hesselbarth@gmail.com, netdev@vger.kernel.org
-Cc: andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com,
- kuba@kernel.org, linux-kernel@vger.kernel.org
-References: <20250124062414.195101-1-dheeraj.linuxdev@gmail.com>
-Content-Language: en-US
-From: Paolo Abeni <pabeni@redhat.com>
-In-Reply-To: <20250124062414.195101-1-dheeraj.linuxdev@gmail.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain
+Content-Transfer-Encoding: quoted-printable
 
-On 1/24/25 7:24 AM, Dheeraj Reddy Jonnalagadda wrote:
-> Implement cleanup of used descriptors in the error path of txq_submit_tso.
-> 
-> Fixes: 3ae8f4e0b98b ("net: mv643xx_eth: Implement software TSO")
-> Signed-off-by: Dheeraj Reddy Jonnalagadda <dheeraj.linuxdev@gmail.com>
-> ---
->  drivers/net/ethernet/marvell/mv643xx_eth.c | 12 +++++++++++-
->  1 file changed, 11 insertions(+), 1 deletion(-)
-> 
-> diff --git a/drivers/net/ethernet/marvell/mv643xx_eth.c b/drivers/net/ethernet/marvell/mv643xx_eth.c
-> index 67a6ff07c83d..8d217f8d451e 100644
-> --- a/drivers/net/ethernet/marvell/mv643xx_eth.c
-> +++ b/drivers/net/ethernet/marvell/mv643xx_eth.c
-> @@ -881,10 +881,20 @@ static int txq_submit_tso(struct tx_queue *txq, struct sk_buff *skb,
->  	txq_enable(txq);
->  	txq->tx_desc_count += desc_count;
->  	return 0;
+
+
+On 28 Jan 2025, at 7:29, FUJITA Tomonori wrote:
+
+> On Tue, 28 Jan 2025 08:49:37 +0800
+> Gary Guo <gary@garyguo.net> wrote:
+>
+>> On Mon, 27 Jan 2025 15:31:47 +0900 (JST)
+>> FUJITA Tomonori <fujita.tomonori@gmail.com> wrote:
+>>
+>>> On Mon, 27 Jan 2025 11:46:46 +0800
+>>> Gary Guo <gary@garyguo.net> wrote:
+>>>
+>>>>> +#[track_caller]
+>>>>> +pub fn read_poll_timeout<Op, Cond, T: Copy>(
+>>>>> +    mut op: Op,
+>>>>> +    mut cond: Cond,
+>>>>> +    sleep_delta: Delta,
+>>>>> +    timeout_delta: Delta,
+>>>>> +) -> Result<T>
+>>>>> +where
+>>>>> +    Op: FnMut() -> Result<T>,
+>>>>> +    Cond: FnMut(&T) -> bool,
+>>>>> +{
+>>>>> +    let start =3D Instant::now();
+>>>>> +    let sleep =3D !sleep_delta.is_zero();
+>>>>> +    let timeout =3D !timeout_delta.is_zero();
+>>>>> +
+>>>>> +    if sleep {
+>>>>> +        might_sleep(Location::caller());
+>>>>> +    }
+>>>>> +
+>>>>> +    loop {
+>>>>> +        let val =3D op()?;
+>>>>> +        if cond(&val) {
+>>>>> +            // Unlike the C version, we immediately return.
+>>>>> +            // We know the condition is met so we don't need to ch=
+eck again.
+>>>>> +            return Ok(val);
+>>>>> +        }
+>>>>> +        if timeout && start.elapsed() > timeout_delta {
+>>>>
+>>>> Re-reading this again I wonder if this is the desired behaviour? May=
+be
+>>>> a timeout of 0 should mean check-once instead of no timeout. The
+>>>> special-casing of 0 makes sense in C but in Rust we should use `None=
+`
+>>>> to mean it instead?
+>>>
+>>> It's the behavior of the C version; the comment of this function says=
+:
+>>>
+>>> * @timeout_us: Timeout in us, 0 means never timeout
+>>>
+>>> You meant that waiting for a condition without a timeout is generally=
+
+>>> a bad idea? If so, can we simply return EINVAL for zero Delta?
+>>>
+>>
+>> No, I think we should still keep the ability to represent indefinite
+>> wait (no timeout) but we should use `None` to represent this rather
+>> than `Delta::ZERO`.
+>>
+>> I know that we use 0 to mean indefinite wait in C, I am saying that
+>> it's not the most intuitive way to represent in Rust.
+>>
+>> Intuitively, a timeout of 0 should be closer to a timeout of 1 and thu=
+s
+>> should mean "return with ETIMEDOUT immedidately" rather than "wait
+>> forever".
+>>
+>> In C since we don't have a very good sum type support, so we
+>> special case 0 to be the special value to represent indefinite wait,
+>> but I don't think we need to repeat this in Rust.
+>
+> Understood, thanks. How about the following code?
+>
+> +#[track_caller]
+> +pub fn read_poll_timeout<Op, Cond, T: Copy>(
+> +    mut op: Op,
+> +    mut cond: Cond,
+> +    sleep_delta: Delta,
+> +    timeout_delta: Option<Delta>,
+> +) -> Result<T>
+> +where
+> +    Op: FnMut() -> Result<T>,
+> +    Cond: FnMut(&T) -> bool,
+> +{
+> +    let start =3D Instant::now();
+> +    let sleep =3D !sleep_delta.is_zero();
 > +
->  err_release:
-> -	/* TODO: Release all used data descriptors; header descriptors must not
-> +	/* Release all used data descriptors; header descriptors must not
->  	 * be DMA-unmapped.
->  	 */
-> +	for (int i = 0; i < desc_count; i++) {
+> +    if sleep {
+> +        might_sleep(Location::caller());
+> +    }
+> +
+> +    loop {
+> +        let val =3D op()?;
+> +        if cond(&val) {
+> +            // Unlike the C version, we immediately return.
+> +            // We know the condition is met so we don't need to check =
+again.
+> +            return Ok(val);
+> +        }
+> +        if let Some(timeout_delta) =3D timeout_delta {
+> +            if start.elapsed() > timeout_delta {
+> +                // Unlike the C version, we immediately return.
+> +                // We have just called `op()` so we don't need to call=
+ it again.
+> +                return Err(ETIMEDOUT);
+> +            }
+> +        }
+> +        if sleep {
+> +            fsleep(sleep_delta);
+> +        }
+> +        // fsleep() could be busy-wait loop so we always call cpu_rela=
+x().
+> +        cpu_relax();
+> +    }
+> +}
 
-Please move the 'i' variable definition into the initial definition for
-this function.
+I wonder if it makes sense to then switch `Delta` to wrap a  `NonZeroI64`=
+ and forbid deltas with 0 nanoseconds with that and use the niche optimiz=
+ation. Not sure if we make other apis horrible by that, but this would pr=
+event deltas that encode no time passing.
 
-> +		int desc_index = (txq->tx_curr_desc + i) % txq->tx_ring_size;
-
-AFAICS we reach here when the first `desc_count - 1` descriptor for the
-current TSO packet has been filled and filling the `desc_count`th one,
-in the `txq->tx_curr_desc` index failed.
-
-Given the above, you should free the previous `desc_count - 1`
-descriptors, i.e. txq->tx_curr_desc - i.
-
-> +		struct tx_desc *desc = &txq->tx_desc_area[desc_index];
-> +		desc->cmd_sts = 0; /* Reset the descriptor */
-
-It looks like you should still unmap data descriptor as done in
-txq_reclaim()
-
-/P
-
+Thanks,
+Fiona
 
