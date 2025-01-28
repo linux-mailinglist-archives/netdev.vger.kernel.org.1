@@ -1,34 +1,34 @@
-Return-Path: <netdev+bounces-161379-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-161380-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7D355A20D95
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1BC59A20D94
 	for <lists+netdev@lfdr.de>; Tue, 28 Jan 2025 16:49:19 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 6F727165818
-	for <lists+netdev@lfdr.de>; Tue, 28 Jan 2025 15:48:46 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 38EEF188AACC
+	for <lists+netdev@lfdr.de>; Tue, 28 Jan 2025 15:48:57 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 029571D63CC;
-	Tue, 28 Jan 2025 15:48:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9E1641D6187;
+	Tue, 28 Jan 2025 15:48:44 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="a/aV2LOt"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="oe44UCKY"
 X-Original-To: netdev@vger.kernel.org
 Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 68A181CF5E2
-	for <netdev@vger.kernel.org>; Tue, 28 Jan 2025 15:48:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 09B141CF5E2
+	for <netdev@vger.kernel.org>; Tue, 28 Jan 2025 15:48:43 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1738079319; cv=none; b=lFql0I/N/wvWTORXjXreE8XArr6i+Klun1ua6Mxi1SBPC0hYPfC7g2mC18FY8ymAs+OLBTw9D4tLlZAtf2nDIqM8+1zbBwUuhgYleJ8rdhvJzl28ew3UsokYPKWh+lUJOx7MrW8e2MXPmvkyzqRhiwNZiCvIptJl0iUCZ1t3zYg=
+	t=1738079324; cv=none; b=DWWCSISXRJm+xg1BBTVrWT4jVrC+Kw75b7kQW/K6bQw7zvmSkakL65NyvyBt6Ffxby7N5tgrUEhrSWzVUNHpNcraGkKJeI+3dKb0G0ELwfO+XY8W/Q3W5es34TBHS/ylho/WL8ILwGqEPCYtXEFS6B1YssJlw2zZoVTJuNrtxIM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1738079319; c=relaxed/simple;
-	bh=Sn/MEUMsk2TVTj/tfMTfKw4YYi1N2qB0G/JoTzTjh4c=;
+	s=arc-20240116; t=1738079324; c=relaxed/simple;
+	bh=auudkUENHR/rzJTrBZhDpWZRXW5L7xS8S3P1pJxlUnI=;
 	h=In-Reply-To:References:From:To:Cc:Subject:MIME-Version:
-	 Content-Disposition:Content-Type:Message-Id:Date; b=P2wPBOvkJWveRLjgs2Qeot/UnUx3qrYiLain8x51J9hpjoM1fKnq7xkNr/xNbzz99SO2D7FjWFGTvewxmkYND/VSTgO+woJvRMUIpENmhpDOgMjJYfGN53K4AXHcGLpd4QNrPTiX1dRjRdykjFG1JmcjP7xLeJapp4Ik6VXjiC0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=a/aV2LOt; arc=none smtp.client-ip=78.32.30.218
+	 Content-Disposition:Content-Type:Message-Id:Date; b=Ise7C23HUYfrw5LJ/kEegekuH5rGOTF+m56GrVI7lsEW8KjaiObOxA4H+0FI3Ijq83stNi1PC4BI6RYbw6YQNF46PpVv8fURNc6BaWYbXb4kt4KpyxUdcsqGxyj9xd3FaJ6y4kvLh30a3OoJOLdb5pv+E7DWoDi7od8zLYZPJ+s=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=oe44UCKY; arc=none smtp.client-ip=78.32.30.218
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
 Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
@@ -37,21 +37,21 @@ DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
 	In-Reply-To:Reply-To:Content-ID:Content-Description:Resent-Date:Resent-From:
 	Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:List-Help:
 	List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=EBcD+jSZTJ87ExoztZaJ1Ni32E6UJjFerwHmJRvv+KY=; b=a/aV2LOt7xBw5yzLtxitUS1+2I
-	L+G+Myvps3CvvfoW30NH3lqiYQYPEzbPKh2ZT5ocOFwslPs+8ApI6iZDyLIxfkxjkEdq4W8G6qvS7
-	VDAQfUFivavg5dU/DPyM1tTXlc2b0JMmzUHj6wlsEL++riacU/Lkud4xKYjUnAO1kvudawn7Lmhy4
-	avl4MXF8vu5H6byq3L4agO/dSFPJuhgl1vrKx3lrcYfN9iSCKEM/ytkDMuOtcPaYs7MbQGo4Zj9/L
-	PA0n0HCl4DF8BgYLgCfJeFiV7BdiHvu03aVCFdg1F3zhaB7335az7NiP9nGS1FeR8ky4Weq+d9W0E
-	6CEUynbw==;
-Received: from e0022681537dd.dyn.armlinux.org.uk ([fd8f:7570:feb6:1:222:68ff:fe15:37dd]:45704 helo=rmk-PC.armlinux.org.uk)
+	bh=j461s14qgObm3BQcSpP69PwmbamUjRyDGX5X2yhG5V8=; b=oe44UCKY8l5X1WRxH1YJQkcxVl
+	E6fOGhrBZANAxzVyo9bWBMGLJGRm3n6tkqJlJcFXh4aymNHlPBKgT5MwLpAx6pp3mP33+bOs+Hb1M
+	dKDJ+ZnGkAIah0SF2w85oC7SyZWg9hd5naUQJxaadXt3DCanjtSPt0nWN2yHNFWFaUrAqwEysDeDE
+	0piFftfZ+7TrcF3v207yhem/TVYpn+LwlQmkiQ18L0kHIGaZqCT6l6SdzrzXKqQ5hADUNxdreubf/
+	dO1V2fFUrhY0xqvnYg7kiFNr0N2tlizwpQWmRcgVgHaCaNQcnIRAL5etWHkRMESg/7rRLhrKrG1CJ
+	DUx4H4fA==;
+Received: from e0022681537dd.dyn.armlinux.org.uk ([fd8f:7570:feb6:1:222:68ff:fe15:37dd]:45710 helo=rmk-PC.armlinux.org.uk)
 	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.96)
 	(envelope-from <rmk@armlinux.org.uk>)
-	id 1tcnpH-0007XK-1F;
-	Tue, 28 Jan 2025 15:48:31 +0000
+	id 1tcnpM-0007Xf-1C;
+	Tue, 28 Jan 2025 15:48:36 +0000
 Received: from rmk by rmk-PC.armlinux.org.uk with local (Exim 4.94.2)
 	(envelope-from <rmk@rmk-PC.armlinux.org.uk>)
-	id 1tcnox-0037Hi-Su; Tue, 28 Jan 2025 15:48:11 +0000
+	id 1tcnp3-0037Ho-0d; Tue, 28 Jan 2025 15:48:17 +0000
 In-Reply-To: <Z5j7yCYSsQ7beznD@shell.armlinux.org.uk>
 References: <Z5j7yCYSsQ7beznD@shell.armlinux.org.uk>
 From: "Russell King (Oracle)" <rmk+kernel@armlinux.org.uk>
@@ -69,8 +69,7 @@ Cc: Alexandre Torgue <alexandre.torgue@foss.st.com>,
 	Paolo Abeni <pabeni@redhat.com>,
 	 Vladimir Oltean <olteanv@gmail.com>,
 	 Jiawen Wu <jiawenwu@trustnetic.com>
-Subject: [PATCH RFC net-next 17/22] net: stmmac: call
- xpcs_config_eee_mult_fact()
+Subject: [PATCH RFC net-next 18/22] net: xpcs: convert to phylink managed EEE
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -80,32 +79,80 @@ MIME-Version: 1.0
 Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
 Content-Type: text/plain; charset="utf-8"
-Message-Id: <E1tcnox-0037Hi-Su@rmk-PC.armlinux.org.uk>
+Message-Id: <E1tcnp3-0037Ho-0d@rmk-PC.armlinux.org.uk>
 Sender: Russell King <rmk@armlinux.org.uk>
-Date: Tue, 28 Jan 2025 15:48:11 +0000
+Date: Tue, 28 Jan 2025 15:48:17 +0000
 
-Arrange for stmmac to call the new xpcs_config_eee_mult_fact() function
-to configure the EEE clock multiplying factor. This will allow the
-removal of the xpcs_config_eee() calls in the next patch.
+Convert XPCS to use the new pcs_disable_eee() and pcs_enable_eee()
+methods. Since stmmac is the only user of xpcs_config_eee(), we can
+make this a no-op along with this change.
+
+Questions:
+1. Do we actually need this level of control at the PCS - or would it
+   be sufficient to configure it once during initialisation?
+2. Do we need to clear the mult_fact field when disabling EEE?
 
 Signed-off-by: Russell King (Oracle) <rmk+kernel@armlinux.org.uk>
 ---
- drivers/net/ethernet/stmicro/stmmac/stmmac_mdio.c | 2 ++
- 1 file changed, 2 insertions(+)
+ drivers/net/pcs/pcs-xpcs.c | 24 +++++++++++++++++++++++-
+ 1 file changed, 23 insertions(+), 1 deletion(-)
 
-diff --git a/drivers/net/ethernet/stmicro/stmmac/stmmac_mdio.c b/drivers/net/ethernet/stmicro/stmmac/stmmac_mdio.c
-index 0c7d81ddd440..7c0a4046bbe3 100644
---- a/drivers/net/ethernet/stmicro/stmmac/stmmac_mdio.c
-+++ b/drivers/net/ethernet/stmicro/stmmac/stmmac_mdio.c
-@@ -524,6 +524,8 @@ int stmmac_pcs_setup(struct net_device *ndev)
- 	if (ret)
- 		return dev_err_probe(priv->device, ret, "No xPCS found\n");
+diff --git a/drivers/net/pcs/pcs-xpcs.c b/drivers/net/pcs/pcs-xpcs.c
+index 91ce4b13df32..1f312b5589a3 100644
+--- a/drivers/net/pcs/pcs-xpcs.c
++++ b/drivers/net/pcs/pcs-xpcs.c
+@@ -602,7 +602,8 @@ static void xpcs_get_interfaces(struct dw_xpcs *xpcs, unsigned long *interfaces)
+ 		__set_bit(compat->interface, interfaces);
+ }
  
-+	xpcs_config_eee_mult_fact(xpcs, priv->plat->mult_fact_100ns);
+-int xpcs_config_eee(struct dw_xpcs *xpcs, int mult_fact_100ns, int enable)
++static int __xpcs_config_eee(struct dw_xpcs *xpcs, int mult_fact_100ns,
++			     int enable)
+ {
+ 	u16 mask, val;
+ 	int ret;
+@@ -630,6 +631,11 @@ int xpcs_config_eee(struct dw_xpcs *xpcs, int mult_fact_100ns, int enable)
+ 			   DW_VR_MII_EEE_TRN_LPI,
+ 			   enable ? DW_VR_MII_EEE_TRN_LPI : 0);
+ }
 +
- 	priv->hw->xpcs = xpcs;
++int xpcs_config_eee(struct dw_xpcs *xpcs, int mult_fact_100ns, int enable)
++{
++	return 0;
++}
+ EXPORT_SYMBOL_GPL(xpcs_config_eee);
  
- 	return 0;
+ static void xpcs_pre_config(struct phylink_pcs *pcs, phy_interface_t interface)
+@@ -1193,6 +1199,20 @@ static void xpcs_an_restart(struct phylink_pcs *pcs)
+ 		    BMCR_ANRESTART);
+ }
+ 
++static void xpcs_disable_eee(struct phylink_pcs *pcs)
++{
++	struct dw_xpcs *xpcs = phylink_pcs_to_xpcs(pcs);
++
++	__xpcs_config_eee(xpcs, 0, false);
++}
++
++static void xpcs_enable_eee(struct phylink_pcs *pcs)
++{
++	struct dw_xpcs *xpcs = phylink_pcs_to_xpcs(pcs);
++
++	__xpcs_config_eee(xpcs, xpcs->eee_mult_fact, true);
++}
++
+ /**
+  * xpcs_config_eee_mult_fact() - set the EEE clock multiplying factor
+  * @xpcs: pointer to a &struct dw_xpcs instance
+@@ -1355,6 +1375,8 @@ static const struct phylink_pcs_ops xpcs_phylink_ops = {
+ 	.pcs_get_state = xpcs_get_state,
+ 	.pcs_an_restart = xpcs_an_restart,
+ 	.pcs_link_up = xpcs_link_up,
++	.pcs_disable_eee = xpcs_disable_eee,
++	.pcs_enable_eee = xpcs_enable_eee,
+ };
+ 
+ static int xpcs_identify(struct dw_xpcs *xpcs)
 -- 
 2.30.2
 
