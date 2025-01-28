@@ -1,34 +1,34 @@
-Return-Path: <netdev+bounces-161372-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-161373-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9A07DA20D88
-	for <lists+netdev@lfdr.de>; Tue, 28 Jan 2025 16:48:41 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0C23EA20D86
+	for <lists+netdev@lfdr.de>; Tue, 28 Jan 2025 16:48:39 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A13683A7EE6
-	for <lists+netdev@lfdr.de>; Tue, 28 Jan 2025 15:48:07 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id C36CE188A6A0
+	for <lists+netdev@lfdr.de>; Tue, 28 Jan 2025 15:48:24 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7C8A41D47B4;
-	Tue, 28 Jan 2025 15:48:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7B0B51D61A4;
+	Tue, 28 Jan 2025 15:48:10 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="I+fOel8a"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="PveBDKny"
 X-Original-To: netdev@vger.kernel.org
 Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 882BB1D5AAD
-	for <netdev@vger.kernel.org>; Tue, 28 Jan 2025 15:48:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 609301D63CC
+	for <netdev@vger.kernel.org>; Tue, 28 Jan 2025 15:48:08 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1738079284; cv=none; b=cK4MfCYLKA2OMgEaUnqEZ2vil3P6h7YTywsE/YmCasdRId1VH9V5GSlHqTYBxEh1NiX3ipWexbwqT9no7U7PvBdl6oDuvjhccaYgvPen/ej8DQrkmKWo2fLfk7JDPMVMuafhdWH1C0bumb4wIBLYyXAMW/KQDPjky/Pp+g4TDJQ=
+	t=1738079290; cv=none; b=Y7gZO+U1SEDOY+KQsCHNyltwAGvFVrY/IDffYjwa74hSohxeE0qAJO5Ur03TQgD5a4T39Ekzy4GpiIdzIYkmd9hlVwRt8W43IslZRtEjG3vdiqdK9Ozqj8QfE4kQNVg5nTBx7oDCGn2RcpVo2lhMRN2IV4I9BQohFWKtlq82Qp8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1738079284; c=relaxed/simple;
-	bh=CuMhmakQHhGdT+HpG2EpR2kiIpdkwsmsjF2TCnjBiiQ=;
+	s=arc-20240116; t=1738079290; c=relaxed/simple;
+	bh=YV5l/XFy8YdmRfdAARdyuGsLA+oCwXvTW+hHMjbJa0I=;
 	h=In-Reply-To:References:From:To:Cc:Subject:MIME-Version:
-	 Content-Disposition:Content-Type:Message-Id:Date; b=j3LjDcRAEzWnKWNPadNiD7TTWdBrDSncSqDhzC47cWakuM7k/iLRRlh6vZiCvL1tyh7MRXIaQqrA7CQgmghR0A23U5OP+hDQLP91MXOlPMZwY8H7RWmsuiz5Xkb+czTOvgecROhTXa0UZ9KR8G/6WWRvLAWP6Vca3CGoMiqZg7o=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=I+fOel8a; arc=none smtp.client-ip=78.32.30.218
+	 Content-Disposition:Content-Type:Message-Id:Date; b=bqle1HF0prgxLHRD5z3aFQ8gv3HVbEZzdqYmRwV3AhMwuVjln1+vg086JJ4zvjWuMmbD8SmxqeoIVYCPyuhqXdX8Txp/FgMjJ0vYpMJq1I6Qdya6jTgjNF6RqY/8mJUEOkN04uc6dimDO2G6hZUcz9/eFAQ2k7weHltUuPVUyN0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=PveBDKny; arc=none smtp.client-ip=78.32.30.218
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
 Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
@@ -37,21 +37,21 @@ DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
 	In-Reply-To:Reply-To:Content-ID:Content-Description:Resent-Date:Resent-From:
 	Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:List-Help:
 	List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=TekHCCUHCmCERxcU/o0a7msZFaeEFOla/9UtzyX7LR4=; b=I+fOel8aDuz+i6VE549Bd8OkCh
-	/K3qCJi8eJ75D2jN69DhjrYWXMsGpZnxEG+cXstAL8qIQ5hyGO16RgifA3qbzdjdOCLLidQCFLzla
-	MBZ03Psq5uaoKIxBA70gc5WOrVrVRFCssUx3NwVehjwbouwQgUIvoGOgQsuP46Odt9oWWVbzVNOX6
-	rS2vXySdxMwbC64L/K8/JacUemnMKGxU7p+Mk8YAp1wTZpEiMODMCqYk6XZ04KniIRna3y90u3Mjo
-	ua5YxEhmNc516LeKgEoByIH5eNwjPz6CjaDOA04hxVh2vFXGRGJ2Au0gbSfvvLQhDehWzsEYNe4By
-	MuaK/dqA==;
-Received: from e0022681537dd.dyn.armlinux.org.uk ([fd8f:7570:feb6:1:222:68ff:fe15:37dd]:42464 helo=rmk-PC.armlinux.org.uk)
+	bh=1YBzEe/H5RKJuBk5a2TLtgHkf+Agl63gaQLV5BGeS+8=; b=PveBDKnyRgwX82zNa1Bm9Sze2y
+	xgdOTr4+AFMJIhlSAFxuiYTFflxSOqZ0o0SEq9qj+oW2SgTxfyTOwgS+RMGuXJlFYUHaqI8fXJfpT
+	d6eU163c4v8CI4rDV6Yt0j/20vsavHjv93m82LVAjKyJiKlDtFhiAzZYARAO0lZp8oACcvQh+tJbU
+	djCIh3Q7eH/9gFMlp8fwxnEbDu3C6F1NlNJj0bELkPexYOuMw9Qnyj0wu9KIFWeMuKqPwhDj6FLCL
+	I/Zk9oAiyWmdWRdm/NN+kjEMTFx1p0+swRroBPLHvfO+QuQaia2uUQCLF6qfeVNjeii6tMN+gyFDJ
+	Be9Lnk8w==;
+Received: from e0022681537dd.dyn.armlinux.org.uk ([fd8f:7570:feb6:1:222:68ff:fe15:37dd]:42478 helo=rmk-PC.armlinux.org.uk)
 	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.96)
 	(envelope-from <rmk@armlinux.org.uk>)
-	id 1tcnoh-0007VL-1C;
-	Tue, 28 Jan 2025 15:47:55 +0000
+	id 1tcnom-0007Vc-1f;
+	Tue, 28 Jan 2025 15:48:00 +0000
 Received: from rmk by rmk-PC.armlinux.org.uk with local (Exim 4.94.2)
 	(envelope-from <rmk@rmk-PC.armlinux.org.uk>)
-	id 1tcnoO-0037H0-1n; Tue, 28 Jan 2025 15:47:36 +0000
+	id 1tcnoT-0037H8-5s; Tue, 28 Jan 2025 15:47:41 +0000
 In-Reply-To: <Z5j7yCYSsQ7beznD@shell.armlinux.org.uk>
 References: <Z5j7yCYSsQ7beznD@shell.armlinux.org.uk>
 From: "Russell King (Oracle)" <rmk+kernel@armlinux.org.uk>
@@ -69,8 +69,8 @@ Cc: Alexandre Torgue <alexandre.torgue@foss.st.com>,
 	Paolo Abeni <pabeni@redhat.com>,
 	 Vladimir Oltean <olteanv@gmail.com>,
 	 Jiawen Wu <jiawenwu@trustnetic.com>
-Subject: [PATCH RFC net-next 10/22] net: stmmac: use common LPI_CTRL_STATUS
- bit definitions
+Subject: [PATCH RFC net-next 11/22] net: stmmac: add new MAC method
+ set_lpi_mode()
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -80,267 +80,330 @@ MIME-Version: 1.0
 Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
 Content-Type: text/plain; charset="utf-8"
-Message-Id: <E1tcnoO-0037H0-1n@rmk-PC.armlinux.org.uk>
+Message-Id: <E1tcnoT-0037H8-5s@rmk-PC.armlinux.org.uk>
 Sender: Russell King <rmk@armlinux.org.uk>
-Date: Tue, 28 Jan 2025 15:47:36 +0000
+Date: Tue, 28 Jan 2025 15:47:41 +0000
 
-The bit definitions for the LPI control/status register are
-identical across all MAC versions, with the exception that some
-bits may not be implemented. Provide definitions for bits in this
-register in common.h, convert to use them, and remove the core-
-specific definitions.
+Add a new method to control LPI mode configuration. This is architected
+to have three configuration states: LPI disabled, LPI forced (active),
+or LPI under hardware timer control. This reflects the three modes
+which the main body of the driver wishes to deal with.
+
+We pass in whether transmit clock gating should be used, and the
+hardware timer value in microseconds to be set when using hardware
+timer control.
 
 Signed-off-by: Russell King (Oracle) <rmk+kernel@armlinux.org.uk>
 ---
- drivers/net/ethernet/stmicro/stmmac/common.h  | 14 ++++++++++
- .../net/ethernet/stmicro/stmmac/dwmac1000.h   | 13 +--------
- drivers/net/ethernet/stmicro/stmmac/dwmac4.h  | 12 +-------
- .../net/ethernet/stmicro/stmmac/dwmac4_core.c | 28 +++++++++----------
- .../net/ethernet/stmicro/stmmac/dwxgmac2.h    |  9 +-----
- .../ethernet/stmicro/stmmac/dwxgmac2_core.c   | 18 ++++++------
- 6 files changed, 40 insertions(+), 54 deletions(-)
+ .../ethernet/stmicro/stmmac/dwmac1000_core.c  | 33 ++++----
+ .../net/ethernet/stmicro/stmmac/dwmac4_core.c | 83 +++++++++++--------
+ .../ethernet/stmicro/stmmac/dwxgmac2_core.c   | 36 +++++---
+ drivers/net/ethernet/stmicro/stmmac/hwif.h    | 11 +++
+ 4 files changed, 102 insertions(+), 61 deletions(-)
 
-diff --git a/drivers/net/ethernet/stmicro/stmmac/common.h b/drivers/net/ethernet/stmicro/stmmac/common.h
-index e25db747a81a..55053528e498 100644
---- a/drivers/net/ethernet/stmicro/stmmac/common.h
-+++ b/drivers/net/ethernet/stmicro/stmmac/common.h
-@@ -530,6 +530,20 @@ struct dma_features {
- #define STMMAC_DEFAULT_TWT_LS	0x1E
- #define STMMAC_ET_MAX		0xFFFFF
+diff --git a/drivers/net/ethernet/stmicro/stmmac/dwmac1000_core.c b/drivers/net/ethernet/stmicro/stmmac/dwmac1000_core.c
+index 96bcda0856ec..622f5ef241d4 100644
+--- a/drivers/net/ethernet/stmicro/stmmac/dwmac1000_core.c
++++ b/drivers/net/ethernet/stmicro/stmmac/dwmac1000_core.c
+@@ -342,31 +342,35 @@ static int dwmac1000_irq_status(struct mac_device_info *hw,
+ 	return ret;
+ }
  
-+/* Common LPI register bits */
-+#define LPI_CTRL_STATUS_LPITCSE	BIT(21)	/* LPI Tx Clock Stop Enable, gmac4, xgmac2 only */
-+#define LPI_CTRL_STATUS_LPIATE	BIT(20)	/* LPI Timer Enable, gmac4 only */
-+#define LPI_CTRL_STATUS_LPITXA	BIT(19)	/* Enable LPI TX Automate */
-+#define LPI_CTRL_STATUS_PLSEN	BIT(18)	/* Enable PHY Link Status */
-+#define LPI_CTRL_STATUS_PLS	BIT(17)	/* PHY Link Status */
-+#define LPI_CTRL_STATUS_LPIEN	BIT(16)	/* LPI Enable */
-+#define LPI_CTRL_STATUS_RLPIST	BIT(9)	/* Receive LPI state, gmac1000 only? */
-+#define LPI_CTRL_STATUS_TLPIST	BIT(8)	/* Transmit LPI state, gmac1000 only? */
-+#define LPI_CTRL_STATUS_RLPIEX	BIT(3)	/* Receive LPI Exit */
-+#define LPI_CTRL_STATUS_RLPIEN	BIT(2)	/* Receive LPI Entry */
-+#define LPI_CTRL_STATUS_TLPIEX	BIT(1)	/* Transmit LPI Exit */
-+#define LPI_CTRL_STATUS_TLPIEN	BIT(0)	/* Transmit LPI Entry */
+-static void dwmac1000_set_eee_mode(struct mac_device_info *hw,
+-				   bool en_tx_lpi_clockgating)
++static int dwmac1000_set_lpi_mode(struct mac_device_info *hw,
++				  enum stmmac_lpi_mode mode,
++				  bool en_tx_lpi_clockgating, u32 et)
+ {
+ 	void __iomem *ioaddr = hw->pcsr;
+ 	u32 value;
+ 
+-	/*TODO - en_tx_lpi_clockgating treatment */
++	if (mode == STMMAC_LPI_TIMER)
++		return -EOPNOTSUPP;
+ 
+-	/* Enable the link status receive on RGMII, SGMII ore SMII
+-	 * receive path and instruct the transmit to enter in LPI
+-	 * state.
+-	 */
+ 	value = readl(ioaddr + LPI_CTRL_STATUS);
+-	value |= LPI_CTRL_STATUS_LPIEN | LPI_CTRL_STATUS_LPITXA;
++	if (mode == STMMAC_LPI_FORCED)
++		value |= LPI_CTRL_STATUS_LPIEN | LPI_CTRL_STATUS_LPITXA;
++	else
++		value &= ~(LPI_CTRL_STATUS_LPIEN | LPI_CTRL_STATUS_LPITXA);
+ 	writel(value, ioaddr + LPI_CTRL_STATUS);
 +
- #define STMMAC_CHAIN_MODE	0x1
- #define STMMAC_RING_MODE	0x2
++	return 0;
+ }
  
-diff --git a/drivers/net/ethernet/stmicro/stmmac/dwmac1000.h b/drivers/net/ethernet/stmicro/stmmac/dwmac1000.h
-index 600fea8f712f..967a16212faf 100644
---- a/drivers/net/ethernet/stmicro/stmmac/dwmac1000.h
-+++ b/drivers/net/ethernet/stmicro/stmmac/dwmac1000.h
-@@ -59,22 +59,11 @@ enum power_event {
- /* Energy Efficient Ethernet (EEE)
-  *
-  * LPI status, timer and control register offset
-+ * For LPI control and status bit definitions, see common.h.
-  */
- #define LPI_CTRL_STATUS	0x0030
- #define LPI_TIMER_CTRL	0x0034
+-static void dwmac1000_reset_eee_mode(struct mac_device_info *hw)
++static void dwmac1000_set_eee_mode(struct mac_device_info *hw,
++				   bool en_tx_lpi_clockgating)
+ {
+-	void __iomem *ioaddr = hw->pcsr;
+-	u32 value;
++	dwmac1000_set_lpi_mode(hw, STMMAC_LPI_FORCED, en_tx_lpi_clockgating, 0);
++}
  
--/* LPI control and status defines */
--#define LPI_CTRL_STATUS_LPITXA	0x00080000	/* Enable LPI TX Automate */
--#define LPI_CTRL_STATUS_PLSEN	0x00040000	/* Enable PHY Link Status */
--#define LPI_CTRL_STATUS_PLS	0x00020000	/* PHY Link Status */
--#define LPI_CTRL_STATUS_LPIEN	0x00010000	/* LPI Enable */
--#define LPI_CTRL_STATUS_RLPIST	0x00000200	/* Receive LPI state */
--#define LPI_CTRL_STATUS_TLPIST	0x00000100	/* Transmit LPI state */
--#define LPI_CTRL_STATUS_RLPIEX	0x00000008	/* Receive LPI Exit */
--#define LPI_CTRL_STATUS_RLPIEN	0x00000004	/* Receive LPI Entry */
--#define LPI_CTRL_STATUS_TLPIEX	0x00000002	/* Transmit LPI Exit */
--#define LPI_CTRL_STATUS_TLPIEN	0x00000001	/* Transmit LPI Entry */
--
- /* GMAC HW ADDR regs */
- #define GMAC_ADDR_HIGH(reg)	((reg > 15) ? 0x00000800 + (reg - 16) * 8 : \
- 				 0x00000040 + (reg * 8))
-diff --git a/drivers/net/ethernet/stmicro/stmmac/dwmac4.h b/drivers/net/ethernet/stmicro/stmmac/dwmac4.h
-index 184d41a306af..42fe29a4e300 100644
---- a/drivers/net/ethernet/stmicro/stmmac/dwmac4.h
-+++ b/drivers/net/ethernet/stmicro/stmmac/dwmac4.h
-@@ -177,23 +177,13 @@ enum power_event {
- /* Energy Efficient Ethernet (EEE) for GMAC4
-  *
-  * LPI status, timer and control register offset
-+ * For LPI control and status bit definitions, see common.h.
-  */
- #define GMAC4_LPI_CTRL_STATUS	0xd0
- #define GMAC4_LPI_TIMER_CTRL	0xd4
- #define GMAC4_LPI_ENTRY_TIMER	0xd8
- #define GMAC4_MAC_ONEUS_TIC_COUNTER	0xdc
+-	value = readl(ioaddr + LPI_CTRL_STATUS);
+-	value &= ~(LPI_CTRL_STATUS_LPIEN | LPI_CTRL_STATUS_LPITXA);
+-	writel(value, ioaddr + LPI_CTRL_STATUS);
++static void dwmac1000_reset_eee_mode(struct mac_device_info *hw)
++{
++	dwmac1000_set_lpi_mode(hw, STMMAC_LPI_DISABLE, false, 0);
+ }
  
--/* LPI control and status defines */
--#define GMAC4_LPI_CTRL_STATUS_LPITCSE	BIT(21)	/* LPI Tx Clock Stop Enable */
--#define GMAC4_LPI_CTRL_STATUS_LPIATE	BIT(20) /* LPI Timer Enable */
--#define GMAC4_LPI_CTRL_STATUS_LPITXA	BIT(19)	/* Enable LPI TX Automate */
--#define GMAC4_LPI_CTRL_STATUS_PLS	BIT(17) /* PHY Link Status */
--#define GMAC4_LPI_CTRL_STATUS_LPIEN	BIT(16)	/* LPI Enable */
--#define GMAC4_LPI_CTRL_STATUS_RLPIEX	BIT(3) /* Receive LPI Exit */
--#define GMAC4_LPI_CTRL_STATUS_RLPIEN	BIT(2) /* Receive LPI Entry */
--#define GMAC4_LPI_CTRL_STATUS_TLPIEX	BIT(1) /* Transmit LPI Exit */
--#define GMAC4_LPI_CTRL_STATUS_TLPIEN	BIT(0) /* Transmit LPI Entry */
--
- /* MAC Debug bitmap */
- #define GMAC_DEBUG_TFCSTS_MASK		GENMASK(18, 17)
- #define GMAC_DEBUG_TFCSTS_SHIFT		17
+ static void dwmac1000_set_eee_pls(struct mac_device_info *hw, int link)
+@@ -509,6 +513,7 @@ const struct stmmac_ops dwmac1000_ops = {
+ 	.pmt = dwmac1000_pmt,
+ 	.set_umac_addr = dwmac1000_set_umac_addr,
+ 	.get_umac_addr = dwmac1000_get_umac_addr,
++	.set_lpi_mode = dwmac1000_set_lpi_mode,
+ 	.set_eee_mode = dwmac1000_set_eee_mode,
+ 	.reset_eee_mode = dwmac1000_reset_eee_mode,
+ 	.set_eee_timer = dwmac1000_set_eee_timer,
 diff --git a/drivers/net/ethernet/stmicro/stmmac/dwmac4_core.c b/drivers/net/ethernet/stmicro/stmmac/dwmac4_core.c
-index 17bf836eba7f..c324aaf691e0 100644
+index c324aaf691e0..dc2d8c096fa3 100644
 --- a/drivers/net/ethernet/stmicro/stmmac/dwmac4_core.c
 +++ b/drivers/net/ethernet/stmicro/stmmac/dwmac4_core.c
-@@ -387,11 +387,11 @@ static void dwmac4_set_eee_mode(struct mac_device_info *hw,
+@@ -376,35 +376,61 @@ static void dwmac4_get_umac_addr(struct mac_device_info *hw,
+ 				   GMAC_ADDR_LOW(reg_n));
+ }
+ 
+-static void dwmac4_set_eee_mode(struct mac_device_info *hw,
+-				bool en_tx_lpi_clockgating)
++static int dwmac4_set_lpi_mode(struct mac_device_info *hw,
++			       enum stmmac_lpi_mode mode,
++			       bool en_tx_lpi_clockgating, u32 et)
+ {
+ 	void __iomem *ioaddr = hw->pcsr;
+-	u32 value;
++	u32 value, mask;
++
++	if (mode == STMMAC_LPI_DISABLE) {
++		value = 0;
++	} else {
++		value = LPI_CTRL_STATUS_LPIEN | LPI_CTRL_STATUS_LPITXA;
++
++		if (mode == STMMAC_LPI_TIMER) {
++			/* Return ERANGE if the timer is larger than the
++			 * register field.
++			 */
++			if (et > STMMAC_ET_MAX)
++				return -ERANGE;
++
++			/* Set the hardware LPI entry timer */
++			writel(et, ioaddr + GMAC4_LPI_ENTRY_TIMER);
++
++			/* Interpret a zero LPI entry timer to mean
++			 * immediate entry into LPI mode.
++			 */
++			if (et)
++				value |= LPI_CTRL_STATUS_LPIATE;
++		}
++
++		if (en_tx_lpi_clockgating)
++			value |= LPI_CTRL_STATUS_LPITCSE;
++	}
++
++	mask = LPI_CTRL_STATUS_LPIATE | LPI_CTRL_STATUS_LPIEN |
++	       LPI_CTRL_STATUS_LPITXA;
++
++	value |= readl(ioaddr + GMAC4_LPI_CTRL_STATUS) & ~mask;
++	writel(value, ioaddr + GMAC4_LPI_CTRL_STATUS);
++
++	return 0;
++}
+ 
++static void dwmac4_set_eee_mode(struct mac_device_info *hw,
++				bool en_tx_lpi_clockgating)
++{
+ 	/* Enable the link status receive on RGMII, SGMII ore SMII
+ 	 * receive path and instruct the transmit to enter in LPI
  	 * state.
  	 */
- 	value = readl(ioaddr + GMAC4_LPI_CTRL_STATUS);
--	value &= ~GMAC4_LPI_CTRL_STATUS_LPIATE;
--	value |= GMAC4_LPI_CTRL_STATUS_LPIEN | GMAC4_LPI_CTRL_STATUS_LPITXA;
-+	value &= ~LPI_CTRL_STATUS_LPIATE;
-+	value |= LPI_CTRL_STATUS_LPIEN | LPI_CTRL_STATUS_LPITXA;
- 
- 	if (en_tx_lpi_clockgating)
--		value |= GMAC4_LPI_CTRL_STATUS_LPITCSE;
-+		value |= LPI_CTRL_STATUS_LPITCSE;
- 
- 	writel(value, ioaddr + GMAC4_LPI_CTRL_STATUS);
- }
-@@ -402,8 +402,8 @@ static void dwmac4_reset_eee_mode(struct mac_device_info *hw)
- 	u32 value;
- 
- 	value = readl(ioaddr + GMAC4_LPI_CTRL_STATUS);
--	value &= ~(GMAC4_LPI_CTRL_STATUS_LPIATE | GMAC4_LPI_CTRL_STATUS_LPIEN |
--		   GMAC4_LPI_CTRL_STATUS_LPITXA);
-+	value &= ~(LPI_CTRL_STATUS_LPIATE | LPI_CTRL_STATUS_LPIEN |
-+		   LPI_CTRL_STATUS_LPITXA);
- 	writel(value, ioaddr + GMAC4_LPI_CTRL_STATUS);
+-	value = readl(ioaddr + GMAC4_LPI_CTRL_STATUS);
+-	value &= ~LPI_CTRL_STATUS_LPIATE;
+-	value |= LPI_CTRL_STATUS_LPIEN | LPI_CTRL_STATUS_LPITXA;
+-
+-	if (en_tx_lpi_clockgating)
+-		value |= LPI_CTRL_STATUS_LPITCSE;
+-
+-	writel(value, ioaddr + GMAC4_LPI_CTRL_STATUS);
++	dwmac4_set_lpi_mode(hw, STMMAC_LPI_FORCED, en_tx_lpi_clockgating, 0);
  }
  
-@@ -415,9 +415,9 @@ static void dwmac4_set_eee_pls(struct mac_device_info *hw, int link)
- 	value = readl(ioaddr + GMAC4_LPI_CTRL_STATUS);
- 
- 	if (link)
--		value |= GMAC4_LPI_CTRL_STATUS_PLS;
-+		value |= LPI_CTRL_STATUS_PLS;
- 	else
--		value &= ~GMAC4_LPI_CTRL_STATUS_PLS;
-+		value &= ~LPI_CTRL_STATUS_PLS;
- 
- 	writel(value, ioaddr + GMAC4_LPI_CTRL_STATUS);
+ static void dwmac4_reset_eee_mode(struct mac_device_info *hw)
+ {
+-	void __iomem *ioaddr = hw->pcsr;
+-	u32 value;
+-
+-	value = readl(ioaddr + GMAC4_LPI_CTRL_STATUS);
+-	value &= ~(LPI_CTRL_STATUS_LPIATE | LPI_CTRL_STATUS_LPIEN |
+-		   LPI_CTRL_STATUS_LPITXA);
+-	writel(value, ioaddr + GMAC4_LPI_CTRL_STATUS);
++	dwmac4_set_lpi_mode(hw, STMMAC_LPI_DISABLE, false, 0);
  }
-@@ -433,12 +433,12 @@ static void dwmac4_set_eee_lpi_entry_timer(struct mac_device_info *hw, u32 et)
  
- 	/* Enable/disable LPI entry timer */
- 	regval = readl(ioaddr + GMAC4_LPI_CTRL_STATUS);
--	regval |= GMAC4_LPI_CTRL_STATUS_LPIEN | GMAC4_LPI_CTRL_STATUS_LPITXA;
-+	regval |= LPI_CTRL_STATUS_LPIEN | LPI_CTRL_STATUS_LPITXA;
+ static void dwmac4_set_eee_pls(struct mac_device_info *hw, int link)
+@@ -424,23 +450,7 @@ static void dwmac4_set_eee_pls(struct mac_device_info *hw, int link)
  
- 	if (et)
--		regval |= GMAC4_LPI_CTRL_STATUS_LPIATE;
-+		regval |= LPI_CTRL_STATUS_LPIATE;
- 	else
--		regval &= ~GMAC4_LPI_CTRL_STATUS_LPIATE;
-+		regval &= ~LPI_CTRL_STATUS_LPIATE;
- 
- 	writel(regval, ioaddr + GMAC4_LPI_CTRL_STATUS);
+ static void dwmac4_set_eee_lpi_entry_timer(struct mac_device_info *hw, u32 et)
+ {
+-	void __iomem *ioaddr = hw->pcsr;
+-	u32 value = et & STMMAC_ET_MAX;
+-	int regval;
+-
+-	/* Program LPI entry timer value into register */
+-	writel(value, ioaddr + GMAC4_LPI_ENTRY_TIMER);
+-
+-	/* Enable/disable LPI entry timer */
+-	regval = readl(ioaddr + GMAC4_LPI_CTRL_STATUS);
+-	regval |= LPI_CTRL_STATUS_LPIEN | LPI_CTRL_STATUS_LPITXA;
+-
+-	if (et)
+-		regval |= LPI_CTRL_STATUS_LPIATE;
+-	else
+-		regval &= ~LPI_CTRL_STATUS_LPIATE;
+-
+-	writel(regval, ioaddr + GMAC4_LPI_CTRL_STATUS);
++	dwmac4_set_lpi_mode(hw, STMMAC_LPI_TIMER, false, et & STMMAC_ET_MAX);
  }
-@@ -851,17 +851,17 @@ static int dwmac4_irq_status(struct mac_device_info *hw,
- 		/* Clear LPI interrupt by reading MAC_LPI_Control_Status */
- 		u32 status = readl(ioaddr + GMAC4_LPI_CTRL_STATUS);
  
--		if (status & GMAC4_LPI_CTRL_STATUS_TLPIEN) {
-+		if (status & LPI_CTRL_STATUS_TLPIEN) {
- 			ret |= CORE_IRQ_TX_PATH_IN_LPI_MODE;
- 			x->irq_tx_path_in_lpi_mode_n++;
- 		}
--		if (status & GMAC4_LPI_CTRL_STATUS_TLPIEX) {
-+		if (status & LPI_CTRL_STATUS_TLPIEX) {
- 			ret |= CORE_IRQ_TX_PATH_EXIT_LPI_MODE;
- 			x->irq_tx_path_exit_lpi_mode_n++;
- 		}
--		if (status & GMAC4_LPI_CTRL_STATUS_RLPIEN)
-+		if (status & LPI_CTRL_STATUS_RLPIEN)
- 			x->irq_rx_path_in_lpi_mode_n++;
--		if (status & GMAC4_LPI_CTRL_STATUS_RLPIEX)
-+		if (status & LPI_CTRL_STATUS_RLPIEX)
- 			x->irq_rx_path_exit_lpi_mode_n++;
- 	}
- 
-diff --git a/drivers/net/ethernet/stmicro/stmmac/dwxgmac2.h b/drivers/net/ethernet/stmicro/stmmac/dwxgmac2.h
-index 20027d3c25a7..a03f5d771566 100644
---- a/drivers/net/ethernet/stmicro/stmmac/dwxgmac2.h
-+++ b/drivers/net/ethernet/stmicro/stmmac/dwxgmac2.h
-@@ -112,14 +112,7 @@
- #define XGMAC_MGKPKTEN			BIT(1)
- #define XGMAC_PWRDWN			BIT(0)
- #define XGMAC_LPI_CTRL			0x000000d0
--#define XGMAC_TXCGE			BIT(21)
--#define XGMAC_LPITXA			BIT(19)
--#define XGMAC_PLS			BIT(17)
--#define XGMAC_LPITXEN			BIT(16)
--#define XGMAC_RLPIEX			BIT(3)
--#define XGMAC_RLPIEN			BIT(2)
--#define XGMAC_TLPIEX			BIT(1)
--#define XGMAC_TLPIEN			BIT(0)
-+/* For definitions, see LPI_CTRL_STATUS_xxx in common.h */
- #define XGMAC_LPI_TIMER_CTRL		0x000000d4
- #define XGMAC_HW_FEATURE0		0x0000011c
- #define XGMAC_HWFEAT_EDMA		BIT(31)
+ static void dwmac4_set_eee_timer(struct mac_device_info *hw, int ls, int tw)
+@@ -1203,6 +1213,7 @@ const struct stmmac_ops dwmac4_ops = {
+ 	.pmt = dwmac4_pmt,
+ 	.set_umac_addr = dwmac4_set_umac_addr,
+ 	.get_umac_addr = dwmac4_get_umac_addr,
++	.set_lpi_mode = dwmac4_set_lpi_mode,
+ 	.set_eee_mode = dwmac4_set_eee_mode,
+ 	.reset_eee_mode = dwmac4_reset_eee_mode,
+ 	.set_eee_lpi_entry_timer = dwmac4_set_eee_lpi_entry_timer,
+@@ -1247,6 +1258,7 @@ const struct stmmac_ops dwmac410_ops = {
+ 	.pmt = dwmac4_pmt,
+ 	.set_umac_addr = dwmac4_set_umac_addr,
+ 	.get_umac_addr = dwmac4_get_umac_addr,
++	.set_lpi_mode = dwmac4_set_lpi_mode,
+ 	.set_eee_mode = dwmac4_set_eee_mode,
+ 	.reset_eee_mode = dwmac4_reset_eee_mode,
+ 	.set_eee_lpi_entry_timer = dwmac4_set_eee_lpi_entry_timer,
+@@ -1293,6 +1305,7 @@ const struct stmmac_ops dwmac510_ops = {
+ 	.pmt = dwmac4_pmt,
+ 	.set_umac_addr = dwmac4_set_umac_addr,
+ 	.get_umac_addr = dwmac4_get_umac_addr,
++	.set_lpi_mode = dwmac4_set_lpi_mode,
+ 	.set_eee_mode = dwmac4_set_eee_mode,
+ 	.reset_eee_mode = dwmac4_reset_eee_mode,
+ 	.set_eee_lpi_entry_timer = dwmac4_set_eee_lpi_entry_timer,
 diff --git a/drivers/net/ethernet/stmicro/stmmac/dwxgmac2_core.c b/drivers/net/ethernet/stmicro/stmmac/dwxgmac2_core.c
-index 9a60a6e8f633..19cfb1dcb332 100644
+index 19cfb1dcb332..51c37a1180ac 100644
 --- a/drivers/net/ethernet/stmicro/stmmac/dwxgmac2_core.c
 +++ b/drivers/net/ethernet/stmicro/stmmac/dwxgmac2_core.c
-@@ -316,17 +316,17 @@ static int dwxgmac2_host_irq_status(struct mac_device_info *hw,
- 	if (stat & XGMAC_LPIIS) {
- 		u32 lpi = readl(ioaddr + XGMAC_LPI_CTRL);
- 
--		if (lpi & XGMAC_TLPIEN) {
-+		if (lpi & LPI_CTRL_STATUS_TLPIEN) {
- 			ret |= CORE_IRQ_TX_PATH_IN_LPI_MODE;
- 			x->irq_tx_path_in_lpi_mode_n++;
- 		}
--		if (lpi & XGMAC_TLPIEX) {
-+		if (lpi & LPI_CTRL_STATUS_TLPIEX) {
- 			ret |= CORE_IRQ_TX_PATH_EXIT_LPI_MODE;
- 			x->irq_tx_path_exit_lpi_mode_n++;
- 		}
--		if (lpi & XGMAC_RLPIEN)
-+		if (lpi & LPI_CTRL_STATUS_RLPIEN)
- 			x->irq_rx_path_in_lpi_mode_n++;
--		if (lpi & XGMAC_RLPIEX)
-+		if (lpi & LPI_CTRL_STATUS_RLPIEX)
- 			x->irq_rx_path_exit_lpi_mode_n++;
- 	}
- 
-@@ -433,9 +433,9 @@ static void dwxgmac2_set_eee_mode(struct mac_device_info *hw,
- 
- 	value = readl(ioaddr + XGMAC_LPI_CTRL);
- 
--	value |= XGMAC_LPITXEN | XGMAC_LPITXA;
-+	value |= LPI_CTRL_STATUS_LPIEN | LPI_CTRL_STATUS_LPITXA;
- 	if (en_tx_lpi_clockgating)
--		value |= XGMAC_TXCGE;
-+		value |= LPI_CTRL_STATUS_LPITCSE;
- 
- 	writel(value, ioaddr + XGMAC_LPI_CTRL);
+@@ -425,29 +425,39 @@ static void dwxgmac2_get_umac_addr(struct mac_device_info *hw,
+ 	addr[5] = (hi_addr >> 8) & 0xff;
  }
-@@ -446,7 +446,7 @@ static void dwxgmac2_reset_eee_mode(struct mac_device_info *hw)
+ 
+-static void dwxgmac2_set_eee_mode(struct mac_device_info *hw,
+-				  bool en_tx_lpi_clockgating)
++static int dwxgmac2_set_lpi_mode(struct mac_device_info *hw,
++				 enum stmmac_lpi_mode mode,
++				 bool en_tx_lpi_clockgating, u32 et)
+ {
+ 	void __iomem *ioaddr = hw->pcsr;
  	u32 value;
  
++	if (mode == STMMAC_LPI_TIMER)
++		return -EOPNOTSUPP;
++
  	value = readl(ioaddr + XGMAC_LPI_CTRL);
--	value &= ~(XGMAC_LPITXEN | XGMAC_LPITXA | XGMAC_TXCGE);
-+	value &= ~(LPI_CTRL_STATUS_LPIEN | LPI_CTRL_STATUS_LPITXA | LPI_CTRL_STATUS_LPITCSE);
- 	writel(value, ioaddr + XGMAC_LPI_CTRL);
++	if (mode == STMMAC_LPI_FORCED) {
++		value |= LPI_CTRL_STATUS_LPIEN | LPI_CTRL_STATUS_LPITXA;
++		if (en_tx_lpi_clockgating)
++			value |= LPI_CTRL_STATUS_LPITCSE;
++	} else {
++		value &= ~(LPI_CTRL_STATUS_LPIEN | LPI_CTRL_STATUS_LPITXA |
++			   LPI_CTRL_STATUS_LPITCSE);
++	}
++	writel(value, ioaddr + XGMAC_LPI_CTRL);
+ 
+-	value |= LPI_CTRL_STATUS_LPIEN | LPI_CTRL_STATUS_LPITXA;
+-	if (en_tx_lpi_clockgating)
+-		value |= LPI_CTRL_STATUS_LPITCSE;
++	return 0;
++}
+ 
+-	writel(value, ioaddr + XGMAC_LPI_CTRL);
++static void dwxgmac2_set_eee_mode(struct mac_device_info *hw,
++				  bool en_tx_lpi_clockgating)
++{
++	dwxgmac2_set_lpi_mode(hw, STMMAC_LPI_FORCED, en_tx_lpi_clockgating, 0);
  }
  
-@@ -457,9 +457,9 @@ static void dwxgmac2_set_eee_pls(struct mac_device_info *hw, int link)
- 
- 	value = readl(ioaddr + XGMAC_LPI_CTRL);
- 	if (link)
--		value |= XGMAC_PLS;
-+		value |= LPI_CTRL_STATUS_PLS;
- 	else
--		value &= ~XGMAC_PLS;
-+		value &= ~LPI_CTRL_STATUS_PLS;
- 	writel(value, ioaddr + XGMAC_LPI_CTRL);
+ static void dwxgmac2_reset_eee_mode(struct mac_device_info *hw)
+ {
+-	void __iomem *ioaddr = hw->pcsr;
+-	u32 value;
+-
+-	value = readl(ioaddr + XGMAC_LPI_CTRL);
+-	value &= ~(LPI_CTRL_STATUS_LPIEN | LPI_CTRL_STATUS_LPITXA | LPI_CTRL_STATUS_LPITCSE);
+-	writel(value, ioaddr + XGMAC_LPI_CTRL);
++	dwxgmac2_set_lpi_mode(hw, STMMAC_LPI_DISABLE, false, 0);
  }
  
+ static void dwxgmac2_set_eee_pls(struct mac_device_info *hw, int link)
+@@ -1525,6 +1535,7 @@ const struct stmmac_ops dwxgmac210_ops = {
+ 	.pmt = dwxgmac2_pmt,
+ 	.set_umac_addr = dwxgmac2_set_umac_addr,
+ 	.get_umac_addr = dwxgmac2_get_umac_addr,
++	.set_lpi_mode = dwxgmac2_set_lpi_mode,
+ 	.set_eee_mode = dwxgmac2_set_eee_mode,
+ 	.reset_eee_mode = dwxgmac2_reset_eee_mode,
+ 	.set_eee_timer = dwxgmac2_set_eee_timer,
+@@ -1582,6 +1593,7 @@ const struct stmmac_ops dwxlgmac2_ops = {
+ 	.pmt = dwxgmac2_pmt,
+ 	.set_umac_addr = dwxgmac2_set_umac_addr,
+ 	.get_umac_addr = dwxgmac2_get_umac_addr,
++	.set_lpi_mode = dwxgmac2_set_lpi_mode,
+ 	.set_eee_mode = dwxgmac2_set_eee_mode,
+ 	.reset_eee_mode = dwxgmac2_reset_eee_mode,
+ 	.set_eee_timer = dwxgmac2_set_eee_timer,
+diff --git a/drivers/net/ethernet/stmicro/stmmac/hwif.h b/drivers/net/ethernet/stmicro/stmmac/hwif.h
+index 0f200b72c225..7279d30d6a8b 100644
+--- a/drivers/net/ethernet/stmicro/stmmac/hwif.h
++++ b/drivers/net/ethernet/stmicro/stmmac/hwif.h
+@@ -306,6 +306,12 @@ struct stmmac_pps_cfg;
+ struct stmmac_rss;
+ struct stmmac_est;
+ 
++enum stmmac_lpi_mode {
++	STMMAC_LPI_DISABLE,
++	STMMAC_LPI_FORCED,
++	STMMAC_LPI_TIMER,
++};
++
+ /* Helpers to program the MAC core */
+ struct stmmac_ops {
+ 	/* MAC core initialization */
+@@ -360,6 +366,9 @@ struct stmmac_ops {
+ 			      unsigned int reg_n);
+ 	void (*get_umac_addr)(struct mac_device_info *hw, unsigned char *addr,
+ 			      unsigned int reg_n);
++	int (*set_lpi_mode)(struct mac_device_info *hw,
++			    enum stmmac_lpi_mode mode,
++			    bool en_tx_lpi_clockgating, u32 et);
+ 	void (*set_eee_mode)(struct mac_device_info *hw,
+ 			     bool en_tx_lpi_clockgating);
+ 	void (*reset_eee_mode)(struct mac_device_info *hw);
+@@ -467,6 +476,8 @@ struct stmmac_ops {
+ 	stmmac_do_void_callback(__priv, mac, set_umac_addr, __args)
+ #define stmmac_get_umac_addr(__priv, __args...) \
+ 	stmmac_do_void_callback(__priv, mac, get_umac_addr, __args)
++#define stmmac_set_lpi_mode(__priv, __args...) \
++	stmmac_do_callback(__priv, mac, set_lpi_mode, __args)
+ #define stmmac_set_eee_mode(__priv, __args...) \
+ 	stmmac_do_void_callback(__priv, mac, set_eee_mode, __args)
+ #define stmmac_reset_eee_mode(__priv, __args...) \
 -- 
 2.30.2
 
