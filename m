@@ -1,61 +1,61 @@
-Return-Path: <netdev+bounces-161413-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-161414-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 95821A213F9
-	for <lists+netdev@lfdr.de>; Tue, 28 Jan 2025 23:10:44 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4A9B4A213FF
+	for <lists+netdev@lfdr.de>; Tue, 28 Jan 2025 23:13:45 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C20613A7732
-	for <lists+netdev@lfdr.de>; Tue, 28 Jan 2025 22:10:36 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 7C6EF3A6CE0
+	for <lists+netdev@lfdr.de>; Tue, 28 Jan 2025 22:13:37 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6C61A1DF741;
-	Tue, 28 Jan 2025 22:09:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C69E01946BC;
+	Tue, 28 Jan 2025 22:13:41 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="BVVPao4D"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="q0+ZmWNk"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3F8CF1DE884
-	for <netdev@vger.kernel.org>; Tue, 28 Jan 2025 22:09:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A1788136988
+	for <netdev@vger.kernel.org>; Tue, 28 Jan 2025 22:13:41 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1738102165; cv=none; b=geo5VXK7f+aXdg4nayVUm+iS/0lGlrvqVqKgLyj2mpNOJVddd1YG2+LciAnVwZLzmNMtXUEet5E2vmYDWa1g+Bb72dg0zBm92s3rij/4euxmubzg4RN3NKWUSF+3IWFm9tdD9USB4TUEH16l+jsmzd9sI09xliQGyAPAu+LN7aY=
+	t=1738102421; cv=none; b=XquVC9I9/gLi7lomKjzdula04agkeB/XHVitJwlUqk99+fHlepxOiYaS8WuhlNT1RPYpqy5WOUv8b0IDrhcklaMw8e0KyuAMwGQvQ/O990vkBT6OyGOna5NdJEFyBHoQWTHLwBqXBN7IusplYPvhqnwWqPSPok3jD+RLmlNZQy0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1738102165; c=relaxed/simple;
-	bh=9tlvILY3bxAtK2NNNpiqDywhWoGbGx4Ar+np1D29ykI=;
+	s=arc-20240116; t=1738102421; c=relaxed/simple;
+	bh=RqW8MtpaEcxbWHTJddZE7Gcl1SJ/I2iTrm58WfDfj7s=;
 	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=XQoufX7ojy5QEseSSp98SwD/vTAEOOFimILIrprjMVsiMO1CxsXnhzno2Vw+qNJE9iRqomT47SkdRWTCaK4WhzbX1vD31NOWZLLSak2uKqPYG+lDQulzeq3sNVT8dkl7LNXbrBczZCBxinM2vq39du05U3+bzKTqm7mlf77WzYU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=BVVPao4D; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 43C0AC4CED3;
-	Tue, 28 Jan 2025 22:09:24 +0000 (UTC)
+	 MIME-Version:Content-Type; b=A8LPw3NPPbJFa6nIb9kypCJaBR7k4hr7ID/hjpqwp0N6i8BNisVzyHArRbfshbpndrycHF1iJVB5iZpDFpqJHMtCKDPwO29O6ciDTOu9nV63oqlPFdYQiFNqxNTHtwmbXWzL8U0kKkAEEyhkCiFUKA+ujQI97+edXCVa69Nl2Xk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=q0+ZmWNk; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id BBEBEC4CED3;
+	Tue, 28 Jan 2025 22:13:40 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1738102164;
-	bh=9tlvILY3bxAtK2NNNpiqDywhWoGbGx4Ar+np1D29ykI=;
+	s=k20201202; t=1738102421;
+	bh=RqW8MtpaEcxbWHTJddZE7Gcl1SJ/I2iTrm58WfDfj7s=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=BVVPao4DWtUWu48u/Kq7acJ492ygjOyM8ufpU0EAoz6LrPaXvz4cFvoqSbtyT6jNa
-	 5XJbCe+0WPnc/Ga/KRpSbRXbxeRqWWRWQVIH73g/IpOMf6QxVYVjPeqZYtDV2/aXwy
-	 OWRdz4bSTIVypvsgU2OoJmyyBpvTKE0sl3ZpAgq+1aMVrLANs8HT+y0OJeLwngmQuF
-	 7L6AkQaGOR/4Jz+8wFBYM/jylHfPS+wKKocnaL2EJ49MvyG2ETX6p6UxeA3nERytcV
-	 DUD8qyo3WtrYUfmR5uzZikjGL4yw/je48Fpuj0e/hzRjzfLVxFvWWQR9hqx8SxMvb9
-	 bShxt0Jnxt6qQ==
-Date: Tue, 28 Jan 2025 14:09:23 -0800
+	b=q0+ZmWNkzfQ3yEeGs8tA2ZgJrTYEzAKpW/ZfxnePU9MfuAoKo4M2L2nsJwbEDsMpo
+	 YgsvKhUw+KpkuedJI2n0+659/nslhIUXSZfixvezMOIb/QO7h6c11yol7s+gJV182u
+	 XPeBatOrcloG1hy3foAgNc2/uTyrNS08QcixUQ3tnEjMjeNpLlV0y1LaB9yewcTCBW
+	 APBG3aynjFaWRoU9Zp3n8jLNqrT2xRHE9+z9j5+WFkbyWDrkbaavLfIquog81UwyBi
+	 Kh+zI6shftDpTW6BmW1+NjG95jKYmj62Z8ktdG+mrk4A98JwXLUyRJAOatG/K1fZ7o
+	 fcHKpk7Oinw5g==
+Date: Tue, 28 Jan 2025 14:13:39 -0800
 From: Jakub Kicinski <kuba@kernel.org>
 To: Danielle Ratson <danieller@nvidia.com>
 Cc: "netdev@vger.kernel.org" <netdev@vger.kernel.org>, "mkubecek@suse.cz"
  <mkubecek@suse.cz>, "matt@traverse.com.au" <matt@traverse.com.au>,
  "daniel.zahka@gmail.com" <daniel.zahka@gmail.com>, Amit Cohen
  <amcohen@nvidia.com>, NBU-mlxsw <NBU-mlxsw@exchange.nvidia.com>
-Subject: Re: [PATCH ethtool-next 08/14] cmis: Enable JSON output support in
- CMIS modules
-Message-ID: <20250128140923.144412cf@kernel.org>
-In-Reply-To: <DM6PR12MB45169E557CE078AB5C7CB116D8EF2@DM6PR12MB4516.namprd12.prod.outlook.com>
+Subject: Re: [PATCH ethtool-next 09/14] qsfp: Add JSON output handling to
+ --module-info in SFF8636 modules
+Message-ID: <20250128141339.40ba2ae2@kernel.org>
+In-Reply-To: <DM6PR12MB4516969F2EEE1CBF7E5E7A03D8EF2@DM6PR12MB4516.namprd12.prod.outlook.com>
 References: <20250126115635.801935-1-danieller@nvidia.com>
-	<20250126115635.801935-9-danieller@nvidia.com>
-	<20250127121258.63f79e53@kernel.org>
-	<DM6PR12MB45169E557CE078AB5C7CB116D8EF2@DM6PR12MB4516.namprd12.prod.outlook.com>
+	<20250126115635.801935-10-danieller@nvidia.com>
+	<20250127121606.0c9ace12@kernel.org>
+	<DM6PR12MB4516969F2EEE1CBF7E5E7A03D8EF2@DM6PR12MB4516.namprd12.prod.outlook.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -65,46 +65,23 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
 
-On Tue, 28 Jan 2025 13:18:54 +0000 Danielle Ratson wrote:
-> > >         "module_state": 3,
-> > >         "module_state_description": "ModuleReady",
-> > >         "low_pwr_allow_request_hw": false,
-> > >         "low_pwr_request_sw": false,
-> > >         "module_temperature": 36.8203,
-> > >         "module_temperature_units": "degrees C",
-> > >         "module_voltage": 3.3385,
-> > >         "module_voltage_units": "V",
-> > >         "laser_tx_bias_current": [
-> > > 0.0000,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000,0.0000 ],
-> > >         "laser_tx_bias_current_units": "mA",  
+On Tue, 28 Jan 2025 13:23:42 +0000 Danielle Ratson wrote:
+> > On Sun, 26 Jan 2025 13:56:30 +0200 Danielle Ratson wrote:  
+> > > +		open_json_object("extended_identifier");
+> > > +		print_int(PRINT_JSON, "value", "0x%02x",
+> > > +			  map->page_00h[SFF8636_EXT_ID_OFFSET]);  
 > > 
-> > How do you think about the units?
-> > If they may differ module to module - should we aim to normalize those?  
+> > Hm, why hex here?
+> > Priority for JSON output is to make it easy to handle in code, rather than easy
+> > to read. Hex strings need extra manual decoding, no?  
 > 
-> Not sure if I understand what you mean. What do you wish to normalize and how?
+> I kept the same convention as in the regular output.
+> And as agreed in Daniel's design those hex fields remain hex fields
+> and are followed by a description field.
+> 
+> Do you think otherwise?  
 
-I don't understand the "_units" keys, basically:
-
-        "max_power": 10.0000,
-        "max_power_units": "W",     <<
-	[...]
-            "low_warning_threshold": 0.1585,
-            "units": "mW"           <<
-
-or:
-
-        "length_(smf)": 0.0000,
-        "length_(smf)_units": "km",  <<
-        "length_(om5)": 0,
-        "length_(om5)_units": "m",   <<
-
-What are these for?
-
-Is the consumer of the JSON output supposed to be parsing the units 
-and making sure to scale the values every time it reads (e.g. divide 
-by 1000 if it wants W but unit is mW)?
-
-Or the unit is fully implied by the key, and can't change? IOW the unit
-is only listed so that the human writing the consumer can figure out
-the unit and then hardcode it?
+I have a weak preference to never use hex strings.
+I have regretted using hex strings in JSON multiple times but haven't
+regretted using plain integers, yet.
 
