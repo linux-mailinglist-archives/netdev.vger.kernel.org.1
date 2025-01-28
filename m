@@ -1,125 +1,116 @@
-Return-Path: <netdev+bounces-161251-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-161252-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 13844A20331
-	for <lists+netdev@lfdr.de>; Tue, 28 Jan 2025 03:42:29 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7CB9AA20359
+	for <lists+netdev@lfdr.de>; Tue, 28 Jan 2025 04:33:04 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 717EF162F16
-	for <lists+netdev@lfdr.de>; Tue, 28 Jan 2025 02:42:27 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id B59021886F82
+	for <lists+netdev@lfdr.de>; Tue, 28 Jan 2025 03:33:08 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4416418A959;
-	Tue, 28 Jan 2025 02:42:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 430A41DA4E;
+	Tue, 28 Jan 2025 03:32:59 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b="zRrHcH3N"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx.socionext.com (mx.socionext.com [202.248.49.38])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BDA6D32C85;
-	Tue, 28 Jan 2025 02:42:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=202.248.49.38
+Received: from esa.microchip.iphmx.com (esa.microchip.iphmx.com [68.232.154.123])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8B8586AA7;
+	Tue, 28 Jan 2025 03:32:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=68.232.154.123
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1738032144; cv=none; b=nSUiUx/4GIdqGzE4KIPS0BTlJoYl1/PC9FV/wNvZfht7TyuYUqhPtKujBLff6/ufSdEq/Be3HXl3bFqXsgDdWX44p8aGOlxPBu10/mX+wh9HKH8ZQXTmyTgexkGgi1kw7y2wOt9UKa1uXBYqEFVMlFNLQv8BcsIGQt2D0FnmRq0=
+	t=1738035179; cv=none; b=ICV0Dj4ClqYU7kusrwVBtc7HGNQ1PTH/SAUZISM9/40DHrW4SIuebEZsT/DnFq9lQr6ehelb8DZP66jbHmf4yZhEknj9Kc2glCxs3u3GymbTtuTQ6PO6VJwQEY9zdGQ8JSIbBk6TXwIcUf4oViHiVhtLNX2nK+NRzB3LYyIN6Ew=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1738032144; c=relaxed/simple;
-	bh=ZyR0BCxiyI298zf48IFj26c3SNlnS1Pxgu7G0TavxhE=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=cO6mIKhKpEXbx/0U2lBng9h6plO21TPEuLwu38Y5kh9e8ClD21FafuQjGUNAEiDYUWYE2v46BYnCR7i37clDQxnW4jlOryHEZ8pn9h5L5N/LyU1yXFU+laZC8xgtNEDlNNnw+7WRvqCpk2MyY8dIFFLmngrxdwSh9kmp20hyOPc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=socionext.com; spf=pass smtp.mailfrom=socionext.com; arc=none smtp.client-ip=202.248.49.38
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=socionext.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=socionext.com
-Received: from unknown (HELO iyokan2-ex.css.socionext.com) ([172.31.9.54])
-  by mx.socionext.com with ESMTP; 28 Jan 2025 11:42:20 +0900
-Received: from mail.mfilter.local (mail-arc01.css.socionext.com [10.213.46.36])
-	by iyokan2-ex.css.socionext.com (Postfix) with ESMTP id 6BDC72007046;
-	Tue, 28 Jan 2025 11:42:20 +0900 (JST)
-Received: from iyokan2.css.socionext.com ([172.31.9.53]) by m-FILTER with ESMTP; Tue, 28 Jan 2025 11:42:20 +0900
-Received: from [10.212.246.222] (unknown [10.212.246.222])
-	by iyokan2.css.socionext.com (Postfix) with ESMTP id 99E4FAB186;
-	Tue, 28 Jan 2025 11:42:19 +0900 (JST)
-Message-ID: <336580ad-e8f6-436a-bf62-adcd348c553b@socionext.com>
-Date: Tue, 28 Jan 2025 11:42:19 +0900
+	s=arc-20240116; t=1738035179; c=relaxed/simple;
+	bh=SMnbSJ/GwFixCB+O/WJHKlJaqhfQ9qXsQyOSgWcVtbM=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=e1QqW66PLzxxObH9yxM8ZS7Xh1Op4k3gp1p8c5SXA2KFURyP8q6nc1Htmt3l+MC5HqRKNxizmHZ8mABljd0aYNmZS9tinv9v/iOunN71ElGmgh5hNeZ/FhGuXyyJvlvMOH3qIuY8gokimWkq0sZr9lqwQ+PSeg48a7ll6yMQmU0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microchip.com; spf=pass smtp.mailfrom=microchip.com; dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b=zRrHcH3N; arc=none smtp.client-ip=68.232.154.123
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microchip.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=microchip.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=microchip.com; i=@microchip.com; q=dns/txt; s=mchp;
+  t=1738035177; x=1769571177;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=SMnbSJ/GwFixCB+O/WJHKlJaqhfQ9qXsQyOSgWcVtbM=;
+  b=zRrHcH3NVVa7qObKdjsxrmUSdvIonNpkFW2/IDu9gJbPPf99e/H9HcMe
+   r78H+BhFaY/4YNeuR4j9T0HnVJYoB2yN8hkLGn2ushPSIhel4I8Gtxkng
+   dfUEAAphLLN3ask96fjCkwsUvJ3V1nLdesVCqJT4qQF8E8/p7L+Hyo9Df
+   hsdthiCdI6Ah9ruomBvb554tk1dBEE+FXs7TAjAZ70cLv6VNjGoq5uGTt
+   A5QiDNtexq/V1I0Cko5HWRLrzAgFLz0fnqbgT8lpylWkC9qobM3MyKW+Q
+   8uhu6jhWAbmZQw9piPSFERPadUoliYY/FkT/AM6t4bquUX9nxQI10Lz1Y
+   A==;
+X-CSE-ConnectionGUID: YiGSDTCPSFu7LwZMtoWv2g==
+X-CSE-MsgGUID: 0pe3QvznSw+oQtZ7+w0ojg==
+X-IronPort-AV: E=Sophos;i="6.13,240,1732604400"; 
+   d="scan'208";a="204506388"
+X-Amp-Result: SKIPPED(no attachment in message)
+Received: from unknown (HELO email.microchip.com) ([170.129.1.10])
+  by esa6.microchip.iphmx.com with ESMTP/TLS/ECDHE-RSA-AES128-GCM-SHA256; 27 Jan 2025 20:32:55 -0700
+Received: from chn-vm-ex04.mchp-main.com (10.10.85.152) by
+ chn-vm-ex01.mchp-main.com (10.10.85.143) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.35; Mon, 27 Jan 2025 20:32:15 -0700
+Received: from pop-os.microchip.com (10.10.85.11) by chn-vm-ex04.mchp-main.com
+ (10.10.85.152) with Microsoft SMTP Server id 15.1.2507.35 via Frontend
+ Transport; Mon, 27 Jan 2025 20:32:14 -0700
+From: <Tristram.Ha@microchip.com>
+To: Woojung Huh <woojung.huh@microchip.com>, Andrew Lunn <andrew@lunn.ch>,
+	Vladimir Oltean <olteanv@gmail.com>, Heiner Kallweit <hkallweit1@gmail.com>,
+	Russell King <linux@armlinux.org.uk>, Maxime Chevallier
+	<maxime.chevallier@bootlin.com>
+CC: "David S. Miller" <davem@davemloft.net>, Eric Dumazet
+	<edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
+	<pabeni@redhat.com>, <UNGLinuxDriver@microchip.com>,
+	<netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>, Tristram Ha
+	<tristram.ha@microchip.com>
+Subject: [PATCH RFC net-next 0/2] Add SGMII port support to KSZ9477 switch
+Date: Mon, 27 Jan 2025 19:32:24 -0800
+Message-ID: <20250128033226.70866-1-Tristram.Ha@microchip.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net 0/3] net: stmmac: Fix usage of maximum queue number
- macros
-To: Huacai Chen <chenhuacai@kernel.org>, Andrew Lunn <andrew@lunn.ch>
-Cc: "Russell King (Oracle)" <linux@armlinux.org.uk>,
- Alexandre Torgue <alexandre.torgue@foss.st.com>,
- Jose Abreu <joabreu@synopsys.com>, Andrew Lunn <andrew+netdev@lunn.ch>,
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- netdev@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
- linux-kernel@vger.kernel.org
-References: <20250127092450.2945611-1-hayashi.kunihiko@socionext.com>
- <Z5dXJ1EIUx8DAh6J@shell.armlinux.org.uk>
- <CAAhV-H78fbK+jAsootOaZW=eQ3RPna3VQTxHd33vDSueYkyYtA@mail.gmail.com>
- <f1912a83-0840-4e82-9a60-9a59f1657694@lunn.ch>
- <CAAhV-H73FNTzhjwkZwO4RAZFF1Ri6EzpJL3jnWW4rPRFZQRZZA@mail.gmail.com>
-Content-Language: en-US
-From: Kunihiko Hayashi <hayashi.kunihiko@socionext.com>
-In-Reply-To: <CAAhV-H73FNTzhjwkZwO4RAZFF1Ri6EzpJL3jnWW4rPRFZQRZZA@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
 
-Hi Huacai, Andrew,
+From: Tristram Ha <tristram.ha@microchip.com>
 
-On 2025/01/27 22:47, Huacai Chen wrote:
-> Hi, Andrew,
-> 
-> On Mon, Jan 27, 2025 at 9:21 PM Andrew Lunn <andrew@lunn.ch> wrote:
->>
->>> I'm not very familiar with the difference between net and net-next,
->>> but I think this series should be backported to stable branches.
->>
->> https://www.kernel.org/doc/html/latest/process/stable-kernel-rules.html
-> According to the rules a "bug" should break build or break runtime or
-> a security issue, but shouldn't be spelling fixes.
-> 
-> But from my point of view, this series is not just "spelling fixes",
-> and not "trivial fixes without benefit for users". It is obviously a
-> copy-paste error and may confuse developers, so I think the patches
-> really have "benefits".
-> 
->>
->>
->>    It must either fix a real bug that bothers people or just add a
->>    device ID.
->>
->> Does this really bother people? Have we seen bug reports?
-> No bug report is because MTL_MAX_RX_QUEUES is accidentally equal to
-> MTL_MAX_TX_QUEUES and it just works, not because the logic is correct.
-> And Kunihiko's patch can also be treated as a report.
-> 
->>
->> There is another aspect to this. We are adding warnings saying that
->> the device tree blob is broken. That should encourage users to upgrade
->> their device tree blob. But most won't find any newer version. If this
->> goes into net-next, the roll out will be a lot slower, developers on
->> the leading edge will find the DT issue and submit a DT patch. By the
->> time this is in a distro kernel, maybe most of the DT issues will
->> already be fixed?
-> Goto net or goto net-next are both fine to me, I just think this
-> series should be backported to stable branches. There are lots of
-> patches backported even though they are less important than this
-> series (maybe not in the network subsystem).
+This patch is to add SGMII port support to KSZ9477 switch.  It was
+recommended to use the XPCS driver in the kernel as the SGMII
+implementation uses Synopsys DesignWare IP.  However, that driver does
+not work for KSZ9477 in some cases, so it is necessary to modify that
+driver.
 
-Currently both macros define the same value and there is no critical
-break for previous kernels.
+As there is no way to know whether the new code breaks other
+implementations a new field is added to differentiate the new KSZ9477
+specific code.  If in future the new code is tested to be compatible
+then it can be updated.
 
-When different values are defined for these macros, this can cause
-problems, however, I don't think that these different values are
-adopted (backported) in the current stable kernels.
+Because of that it will require somebody to verify the new code in
+different DesignWare implementations.
 
-So I think it's reasonable to repost this series to net-next.
+Tristram Ha (2):
+  net: pcs: xpcs: Add special code to operate in Microchip KSZ9477
+    switch
+  net: dsa: microchip: Add SGMII port support to KSZ9477 switch
 
-Thank you,
+ drivers/net/dsa/microchip/ksz9477.c    | 116 ++++++++++++++++++++++++-
+ drivers/net/dsa/microchip/ksz9477.h    |   4 +-
+ drivers/net/dsa/microchip/ksz_common.c |  37 +++++++-
+ drivers/net/dsa/microchip/ksz_common.h |  23 ++++-
+ drivers/net/pcs/pcs-xpcs.c             |  52 ++++++++++-
+ drivers/net/pcs/pcs-xpcs.h             |   2 +
+ include/linux/pcs/pcs-xpcs.h           |   6 ++
+ 7 files changed, 231 insertions(+), 9 deletions(-)
 
----
-Best Regards
-Kunihiko Hayashi
+-- 
+2.34.1
+
 
