@@ -1,195 +1,136 @@
-Return-Path: <netdev+bounces-161278-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-161279-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 53F9FA20781
-	for <lists+netdev@lfdr.de>; Tue, 28 Jan 2025 10:39:49 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id B70E5A20798
+	for <lists+netdev@lfdr.de>; Tue, 28 Jan 2025 10:43:40 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B21B3167181
-	for <lists+netdev@lfdr.de>; Tue, 28 Jan 2025 09:39:47 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 098211889776
+	for <lists+netdev@lfdr.de>; Tue, 28 Jan 2025 09:43:45 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5444B19A288;
-	Tue, 28 Jan 2025 09:39:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 169CF19ABA3;
+	Tue, 28 Jan 2025 09:43:27 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="mNLgD8ma"
+	dkim=pass (2048-bit key) header.d=clip-os.org header.i=@clip-os.org header.b="CvwD9NT4"
 X-Original-To: netdev@vger.kernel.org
-Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
+Received: from relay9-d.mail.gandi.net (relay9-d.mail.gandi.net [217.70.183.199])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 537111990AF;
-	Tue, 28 Jan 2025 09:39:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8652F199385;
+	Tue, 28 Jan 2025 09:43:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.199
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1738057148; cv=none; b=DusiHPgEDK1AWVKhPO1k5piKvZN3u574G7b8BQP1yxnBRlhfHGQSlYyBpvCKcAgHfYUwd5w6zq7C3euIVrNtIyeuOYInMogKiXLLVJluhq2Gswfbfm7iBftOWCg4ZkJuLUB5aa8BoM5pcS90J1KYKB6SdufnZp88USw8PG8SxRY=
+	t=1738057407; cv=none; b=iEEGMp/j3YzRSiSTKgLYjjvfovmz95fuoUYiU1dsGnzTEUGZtP+MvR9Gf4zS/jSQsYjXBv6f38GBR3TlHnxcSGa4uV8BY5hziiECYopHVYnRY0SRBYXvXBRxV+jK/T5358NTQ3BTtp3txqnWgSGUR87PIcMhefGLj3r7IAXiB3w=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1738057148; c=relaxed/simple;
-	bh=GYCo/Kndq3nfJ6judEOYDhx9u7QO15r8HwrtlgIeWWQ=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=fZEoqZHOR7qmMQ1gpEXZ035n6xOPux9AEkRMsvspglqLuaWmzGLYN/DNiBJmBQh82iDmT0h+Z5+1uYMCJyHNBoZ+JNQuCrYMvlXhgdkS6KwssWaVpFh9/53PHawED4HMnXOgNlC05RHYfXdBxvcU7EKYzmQE8iNv/D13AWDG4eI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=mNLgD8ma; arc=none smtp.client-ip=78.32.30.218
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
-	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
-	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
-	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=ObV7BoAqZImnctXDVt7lyjV5cNiG7Dopxwg+5yeYBlQ=; b=mNLgD8maBCZSq2NlXzcOpgkc5E
-	oxhTSKtLZOPU5qgdnBHOXe/uzwpNsOv0YyfKu0eiWOdC9xM4Px4wI2K3NNoR7iY085NV3bi5uLm6u
-	KFZSqfyzTi//WPDJ4cJdrrqu+MinP2+srMzaSgBjcsa3xnqf0sXT9m2zLwB5JtNTgu+2uG1P/nKvi
-	z3TtLqh4niPWq4JHYryDlqx3fPOiUXQ5ZhNsao2L3VF0+LBN2GMXamG+1Q3z2d9xlMyfl9lr4prFQ
-	TQ4pkew12wNFjs+7AHPfn0axjAsJHVlU5p7IhOgqJuliC5l5Mkd67ikH18PpUTFXAA039FDPj8NHF
-	9cYkokBQ==;
-Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:53066)
-	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.96)
-	(envelope-from <linux@armlinux.org.uk>)
-	id 1tci3c-0006nm-0v;
-	Tue, 28 Jan 2025 09:38:56 +0000
-Received: from linux by shell.armlinux.org.uk with local (Exim 4.96)
-	(envelope-from <linux@shell.armlinux.org.uk>)
-	id 1tci3a-0002Wq-2R;
-	Tue, 28 Jan 2025 09:38:54 +0000
-Date: Tue, 28 Jan 2025 09:38:54 +0000
-From: "Russell King (Oracle)" <linux@armlinux.org.uk>
-To: Tristram.Ha@microchip.com
-Cc: Woojung Huh <woojung.huh@microchip.com>, Andrew Lunn <andrew@lunn.ch>,
-	Vladimir Oltean <olteanv@gmail.com>,
-	Heiner Kallweit <hkallweit1@gmail.com>,
-	Maxime Chevallier <maxime.chevallier@bootlin.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	UNGLinuxDriver@microchip.com, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH RFC net-next 2/2] net: dsa: microchip: Add SGMII port
- support to KSZ9477 switch
-Message-ID: <Z5ilrp1c6lbMGqbl@shell.armlinux.org.uk>
-References: <20250128033226.70866-1-Tristram.Ha@microchip.com>
- <20250128033226.70866-3-Tristram.Ha@microchip.com>
+	s=arc-20240116; t=1738057407; c=relaxed/simple;
+	bh=dENO/oSZL4YN1E2GWU4YlF70onT5q7LmAVAl1FRWQMM=;
+	h=Message-ID:Date:MIME-Version:Subject:To:References:From:
+	 In-Reply-To:Content-Type; b=N6Ky+MmZpUz/Fru1IoatQdDi1CujYA67YwPsosJeUsQuDB4yzWsqNUsSK7SKohxjRnKSCORFCzDUchsjSm6y3mjuDFRq1yF1dje9pbXT2vtoAFgFUG8kpEXOTzAGSYT3FwPFOkio7APOwKF3mlzzHvJl5E2fDWkX+uG59+HHIaI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=clip-os.org; spf=pass smtp.mailfrom=clip-os.org; dkim=pass (2048-bit key) header.d=clip-os.org header.i=@clip-os.org header.b=CvwD9NT4; arc=none smtp.client-ip=217.70.183.199
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=clip-os.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=clip-os.org
+Received: by mail.gandi.net (Postfix) with ESMTPSA id AE34DFF807;
+	Tue, 28 Jan 2025 09:43:13 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=clip-os.org; s=gm1;
+	t=1738057396;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=eaz9YOMv0cC2o84WWZHZqF4Zkm0uRbALe+GHZz7OYhQ=;
+	b=CvwD9NT4j+WIHpH7BHuA5lGxqGUk1QYZ7fTaDY8yoEdZ5mbATIGUxT/1MN9/uP4z/ZMsev
+	hBb4updQGuMtVZ1VUJQY3lwuHaTaAaYFNGLlb6PWP3aIZg9yWN6Jmx6F6nmnkPV8TZVrQO
+	VJvVea89Wgo9XUG/fNJIJEtPT0i0QEGqvkodT1O5+iJ2z4mxL06Vuef40FWoAOHitI2oZl
+	zbSgoHE22Yc8KSp8BxbVtM5sh6I6GQsVLiJXMEc52i4KKMK/d1ILcvKu2aLb8CE157C//5
+	ojysacr84i3YBNB+80BXgABya35ROLupWE9fdr5TPY39V/QUDufiRcm0j3Gpag==
+Message-ID: <3b7a4fb3-9c88-47ca-afc3-a1bb7913fc3d@clip-os.org>
+Date: Tue, 28 Jan 2025 10:43:13 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250128033226.70866-3-Tristram.Ha@microchip.com>
-Sender: Russell King (Oracle) <linux@armlinux.org.uk>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v1 0/9] Fixes multiple sysctl bound checks
+To: Joe Damato <jdamato@fastly.com>, linux-kernel@vger.kernel.org,
+ linux-rdma@vger.kernel.org, linux-scsi@vger.kernel.org,
+ codalist@coda.cs.cmu.edu, linux-nfs@vger.kernel.org, netdev@vger.kernel.org,
+ netfilter-devel@vger.kernel.org, coreteam@netfilter.org,
+ Nicolas Bouchinet <nicolas.bouchinet@ssi.gouv.fr>,
+ Joel Granados <j.granados@samsung.com>, Bart Van Assche
+ <bvanassche@acm.org>, Leon Romanovsky <leon@kernel.org>,
+ Zhu Yanjun <yanjun.zhu@linux.dev>, Jason Gunthorpe <jgg@ziepe.ca>,
+ Al Viro <viro@zeniv.linux.org.uk>, Christian Brauner <brauner@kernel.org>
+References: <20250127142014.37834-1-nicolas.bouchinet@clip-os.org>
+ <Z5fK6jnrjMBDrDJg@LQ3V64L9R2>
+Content-Language: en-US
+From: Nicolas Bouchinet <nicolas.bouchinet@clip-os.org>
+In-Reply-To: <Z5fK6jnrjMBDrDJg@LQ3V64L9R2>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-GND-Sasl: nicolas.bouchinet@clip-os.org
 
-On Mon, Jan 27, 2025 at 07:32:26PM -0800, Tristram.Ha@microchip.com wrote:
-> @@ -161,6 +161,113 @@ static int ksz9477_wait_alu_sta_ready(struct ksz_device *dev)
->  					10, 1000);
->  }
->  
-> +static void port_sgmii_s(struct ksz_device *dev, uint port, u16 devid, u16 reg,
-> +			 u16 len)
-> +{
-> +	u32 data;
-> +
-> +	data = (devid & MII_MMD_CTRL_DEVAD_MASK) << 16;
-> +	data |= reg;
-> +	if (len > 1)
-> +		data |= PORT_SGMII_AUTO_INCR;
-> +	ksz_pwrite32(dev, port, REG_PORT_SGMII_ADDR__4, data);
-> +}
-> +
-> +static void port_sgmii_r(struct ksz_device *dev, uint port, u16 devid, u16 reg,
-> +			 u16 *buf, u16 len)
-> +{
-> +	u32 data;
-> +
-> +	mutex_lock(&dev->sgmii_mutex);
+Hi,
 
-You won't need sgmii_mutex if all accesses go through the MDIO bus
-accessors (please do so and get rid of this mutex.)
+Thank's for your reply.
 
-> +	port_sgmii_s(dev, port, devid, reg, len);
-> +	while (len) {
-> +		ksz_pread32(dev, port, REG_PORT_SGMII_DATA__4, &data);
-> +		*buf++ = (u16)data;
-> +		len--;
-> +	}
-> +	mutex_unlock(&dev->sgmii_mutex);
-> +}
-> +
-> +static void port_sgmii_w(struct ksz_device *dev, uint port, u16 devid, u16 reg,
-> +			 u16 *buf, u16 len)
-> +{
-> +	u32 data;
-> +
-> +	mutex_lock(&dev->sgmii_mutex);
-> +	port_sgmii_s(dev, port, devid, reg, len);
-> +	while (len) {
-> +		data = *buf++;
-> +		ksz_pwrite32(dev, port, REG_PORT_SGMII_DATA__4, data);
-> +		len--;
-> +	}
-> +	mutex_unlock(&dev->sgmii_mutex);
-> +}
+On 1/27/25 19:05, Joe Damato wrote:
+> On Mon, Jan 27, 2025 at 03:19:57PM +0100, nicolas.bouchinet@clip-os.org wrote:
+>> From: Nicolas Bouchinet <nicolas.bouchinet@ssi.gouv.fr>
+>>
+>> Hi,
+>>
+>> This patchset adds some bound checks to sysctls to avoid negative
+>> value writes.
+>>
+>> The patched sysctls were storing the result of the proc_dointvec
+>> proc_handler into an unsigned int data. proc_dointvec being able to
+>> parse negative value, and it return value being a signed int, this could
+>> lead to undefined behaviors.
+>> This has led to kernel crash in the past as described in commit
+>> 3b3376f222e3 ("sysctl.c: fix underflow value setting risk in vm_table")
+>>
+>> Most of them are now bounded between SYSCTL_ZERO and SYSCTL_INT_MAX.
+>> nf_conntrack_expect_max is bounded between SYSCTL_ONE and SYSCTL_INT_MAX
+>> as defined by its documentation.
+> I noticed that none of the patches have a Fixes tags. Do any of
+> these fix existing crashes or is this just cleanup?
 
-I don't see any need for any of the above complexity for writing
-multiple registers. All your calls to the above two functions only
-pass a value of 1 for len.
+I've just saw that xfrm{4,6}_gc_thresh sysctls where obsolete since 4.14 
+in the documentation...
 
-> +
-> +static void port_sgmii_reset(struct ksz_device *dev, uint p)
-> +{
-> +	u16 ctrl = BMCR_RESET;
-> +
-> +	port_sgmii_w(dev, p, MDIO_MMD_VEND2, MII_BMCR, &ctrl, 1);
-> +}
+Also, ipv4_dst_ops.gc_thresh is set to `~0` since commit 4ff3885262d0 
+("ipv4: Delete routing cache.").
 
-doesn't xpcs_create() result in xpcs->need_reset being set true, and
-thus when the XPCS is used, cause xpcs_pre_config() to do a soft reset
-of the XPCS? More importantly, the XPCS driver waits for the reset
-to complete...
+Wich will be printed as -1 when this syctl is read.
 
-> @@ -978,6 +1085,13 @@ void ksz9477_get_caps(struct ksz_device *dev, int port,
->  
->  	if (dev->info->gbit_capable[port])
->  		config->mac_capabilities |= MAC_1000FD;
-> +
-> +	if (ksz_is_sgmii_port(dev, port)) {
-> +		__set_bit(PHY_INTERFACE_MODE_1000BASEX,
-> +			  config->supported_interfaces);
-> +		__set_bit(PHY_INTERFACE_MODE_SGMII,
-> +			  config->supported_interfaces);
-> +	}
+```
+$ cat /proc/sys/net/ipv4/route/gc_thresh
+-1
+```
 
-	f (ksz_is_sgmii_port(dev, port))
-		phy_interface_or(config->supported_interfaces,
-				 config->supported_interfaces,
-				 xpcs_to_phylink_pcs(port->xpcs)->supported_interfaces);
+IIUC, it seems to be used in order to disable the garbage collection, 
+hence, this patch would make it impossible
+to a user to disable it this way.
+It should thus be bounded it between SYSCTL_NEG_ONE and SYSCTL_INT_MAX.
 
-If xpcs_to_phylink_pcs(port->xpcs)->supported_interfaces does not
-accurately indicate the interfaces that are supported on your XPCS
-model, then you need further xpcs driver changes.
 
-> +static inline int ksz_get_sgmii_port(struct ksz_device *dev)
-> +{
-> +	return (dev->info->sgmii_port - 1);
-> +}
-> +
-> +static inline bool ksz_has_sgmii_port(struct ksz_device *dev)
-> +{
-> +	return (dev->info->sgmii_port > 0);
-> +}
-> +
-> +static inline bool ksz_is_sgmii_port(struct ksz_device *dev, int port)
-> +{
-> +	return (dev->info->sgmii_port == port + 1);
-> +}
+Your right, it's only cleanup, I'll push patch 3 separately only on 
+netdev, with extended impact analyses, sorry for that.
 
-No need for the parens in any of the above three.
 
-Thanks.
-
--- 
-RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
-FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
+>
+> I am asking because if this is cleanup then it would be "net-next"
+> material instead of "net" and would need to be resubmit when then
+> merge window has passed [1].
+>
+> FWIW, I submit a similar change some time ago and it was submit to
+> net-next as cleanup [2].
+>
+> [1]: https://lore.kernel.org/netdev/20250117182059.7ce1196f@kernel.org/
+> [2]: https://lore.kernel.org/netdev/CANn89i+=HiffVo9iv2NKMC2LFT15xFLG16h7wN3MCrTiKT3zQQ@mail.gmail.com/T/
+>
 
