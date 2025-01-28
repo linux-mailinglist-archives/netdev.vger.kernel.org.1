@@ -1,141 +1,130 @@
-Return-Path: <netdev+bounces-161426-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-161425-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 32EC0A214BE
-	for <lists+netdev@lfdr.de>; Wed, 29 Jan 2025 00:00:55 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id B4F0DA214BB
+	for <lists+netdev@lfdr.de>; Wed, 29 Jan 2025 00:00:45 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 689FD3A4EF9
-	for <lists+netdev@lfdr.de>; Tue, 28 Jan 2025 23:00:44 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 1C10B188837E
+	for <lists+netdev@lfdr.de>; Tue, 28 Jan 2025 23:00:50 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E7E051DFD8C;
-	Tue, 28 Jan 2025 23:00:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D79301DFD8C;
+	Tue, 28 Jan 2025 23:00:43 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="A9qMvB01"
+	dkim=pass (2048-bit key) header.d=netfilter.org header.i=@netfilter.org header.b="J/G8kirw";
+	dkim=pass (2048-bit key) header.d=netfilter.org header.i=@netfilter.org header.b="A0+vP5tV"
 X-Original-To: netdev@vger.kernel.org
-Received: from out-178.mta1.migadu.com (out-178.mta1.migadu.com [95.215.58.178])
+Received: from mail.netfilter.org (mail.netfilter.org [217.70.190.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 033BC1DED68
-	for <netdev@vger.kernel.org>; Tue, 28 Jan 2025 23:00:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.178
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6F5241991AE;
+	Tue, 28 Jan 2025 23:00:40 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.190.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1738105248; cv=none; b=ZnrmcX3K2rnYFF+uX310ncC7Wbfood/KpapGlUbEPnfgShk5n1XsqgdbGbDK5EWGC23sOof0igxDATPn8oPRmRcv915lBSUXy48u/jVofMKMf0+VcV6ch8XZSzE78Ry6QifXUQXSQS7twDGkr6ZmnOUhJKvQQAzoj5nN1gYYXZ4=
+	t=1738105243; cv=none; b=WMhIlTF8pa4mkOhVGexW90BjcEYF/p4iiNB6y4vEYz20XMd2wpSaiKD30nrPWdqwAicQwbC5qVwH9vC1qijtDnh9cVt2ssjdJhrqNBuZXi6WOTNz6fSqWI+ogcTpQQncphE0rTGDjkEE4bpFVoecDKq8EVvosPHCKME+uqGvSNQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1738105248; c=relaxed/simple;
-	bh=chm2ypBwThzpaL84x7U9Nnr9yzQ9rB4wBZ7jwetLeJA=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=LeO0uVuLyQxe5+/x/sjQJdlech+19AJAgszr1rJihC/1Lvo1OLarN6lKFh1+RXU6algzlqy5ckAZAymkbdVvppzdkLFMQdeXNFYsPn6rMZ4JUg7fU7hMz6VCForuroiYj2vZYyyONIDJqa7JV97OrjGOz0VT1H1icHGQcvVyYkk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=A9qMvB01; arc=none smtp.client-ip=95.215.58.178
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
-Message-ID: <3a499ffe-0514-49bf-8022-06a9b713b920@linux.dev>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1738105235;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=TxQEaHtAioWTOPE03cWnnU3Ly/20naE0Cm9ju2UfWJQ=;
-	b=A9qMvB01qCeiCa/T4G25MGdbBz2f54lHVjQarpqlOtEXnURllkJWwJ59l40LYSRsJ4roE7
-	Ta/eFhjXYhdjq36qPqvgqvUFG6JMV2TE6xGhr2wGdvY/q92gmdsIbQI0G6CoybzzkJTYwn
-	tmKC4hWbPJxeueIdOENw0FbE0ZrxFEI=
-Date: Tue, 28 Jan 2025 15:00:26 -0800
+	s=arc-20240116; t=1738105243; c=relaxed/simple;
+	bh=4lrW8B/Ks7dmksUO/r9iAbBxO5SOn/tFewwNmZL0GT0=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=RlFnuo40YT/SEH1lpY5s7d86k7fMMfbv2IdUuyxoXamMvatBCgjstp6Tk3GW4yCn4luSRtPYO8TuCQeVROz8dlQoW9P91SevMS9NqSCpoPzr6kTmvpDNNF6yqvADHI63JmVyRMq41/XfGtVDgB1PRslNoe47hJCNjnExOFhVKFc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=netfilter.org; spf=pass smtp.mailfrom=netfilter.org; dkim=pass (2048-bit key) header.d=netfilter.org header.i=@netfilter.org header.b=J/G8kirw; dkim=pass (2048-bit key) header.d=netfilter.org header.i=@netfilter.org header.b=A0+vP5tV; arc=none smtp.client-ip=217.70.190.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=netfilter.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=netfilter.org
+Received: by mail.netfilter.org (Postfix, from userid 109)
+	id 5ECF36029E; Wed, 29 Jan 2025 00:00:38 +0100 (CET)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=netfilter.org;
+	s=2025; t=1738105238;
+	bh=s+ipqSn3PJpkOvV5RX8Pq3oL2ReB/A8vdgVcQ23wwk8=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=J/G8kirwqp5j0Wtvk71CcmpwMnxra1LcGGI9Ijc5eV0obVa93ywnBeFvCjiq1I9U2
+	 Of5CKER3KiLLSJr06zIC1Q33G7PONNafNhOpBwKVbzYS0BJ1/y6RPENpUeFeVrSpr6
+	 YZisPOjCYAgw6oupgn6J8IllUQ4nsGYwax0EEcl5R6ZgdMvBAQJDcLwgpyZk6jnU7V
+	 DVZzF8Nzaa6CMuIblKHTMFIbjB37LdCWfOqa6COvt2rIcl0K/Ls2gOUrD9Lsw3zOIy
+	 IQQ3TrjzvvgqjGAkG61A1E7/nCvRdlMkL5BvLMyWKqtYwhmslX6+ZWXYQf4ds+AsM2
+	 pTN/T5ucMapMg==
+X-Spam-Level: 
+Received: from netfilter.org (mail-agni [217.70.190.124])
+	by mail.netfilter.org (Postfix) with ESMTPSA id 4B9D06028C;
+	Wed, 29 Jan 2025 00:00:37 +0100 (CET)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=netfilter.org;
+	s=2025; t=1738105237;
+	bh=s+ipqSn3PJpkOvV5RX8Pq3oL2ReB/A8vdgVcQ23wwk8=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=A0+vP5tV0wZ71l2uS0Z+utMhSGqpBVhwyiaF+6Efi1qHGnjn5JIU+8bfGlDlvmn3v
+	 isFX+4Y1L7sSxs0Ri35CYbsx2qhsfyyX8MNF+p2tETGp5BX9GCpAmxXTsotxi6VshR
+	 URzBhxomjoFUAys8cqN/wvDwTN1D0bL2SxwqvHZFLH+0Tu08guLhLCOOGRNThvhWPu
+	 4ldjCyIr1OLEok9W03+dJ8WXLqWxfJyf0YhfYQA4JVbB/Ft2ypmN0r8F0S7biItH1y
+	 yRjJjAbj6DSzn56k0gO7ruGemk9rK6sJP48/VU7v+zrCqy4MSnxLDTo052ZH+t9/Ud
+	 ZDs4KsG4odrOQ==
+Date: Wed, 29 Jan 2025 00:00:34 +0100
+From: Pablo Neira Ayuso <pablo@netfilter.org>
+To: nicolas.bouchinet@clip-os.org
+Cc: netdev@vger.kernel.org, netfilter-devel@vger.kernel.org,
+	coreteam@netfilter.org
+Subject: Re: [PATCH v1 1/9] sysctl: Fixes nf_conntrack_max bounds
+Message-ID: <Z5lhkiWI9-nP9O1g@calendula>
+References: <20250127142014.37834-1-nicolas.bouchinet@clip-os.org>
+ <20250127142014.37834-2-nicolas.bouchinet@clip-os.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Subject: Re: [PATCH bpf-next v3 09/14] selftests/bpf: test_xdp_veth: Use
- unique names
-To: "Bastien Curutchet (eBPF Foundation)" <bastien.curutchet@bootlin.com>
-Cc: Alexei Starovoitov <ast@kernel.org>,
- Daniel Borkmann <daniel@iogearbox.net>, "David S. Miller"
- <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>,
- Jesper Dangaard Brouer <hawk@kernel.org>,
- John Fastabend <john.fastabend@gmail.com>,
- Andrii Nakryiko <andrii@kernel.org>, Eduard Zingerman <eddyz87@gmail.com>,
- Song Liu <song@kernel.org>, Yonghong Song <yonghong.song@linux.dev>,
- KP Singh <kpsingh@kernel.org>, Stanislav Fomichev <sdf@fomichev.me>,
- Hao Luo <haoluo@google.com>, Jiri Olsa <jolsa@kernel.org>,
- Mykola Lysenko <mykolal@fb.com>, Shuah Khan <shuah@kernel.org>,
- Alexis Lothore <alexis.lothore@bootlin.com>,
- Thomas Petazzoni <thomas.petazzoni@bootlin.com>, netdev@vger.kernel.org,
- bpf@vger.kernel.org, linux-kselftest@vger.kernel.org,
- linux-kernel@vger.kernel.org
-References: <20250128-redirect-multi-v3-0-c1ce69997c01@bootlin.com>
- <20250128-redirect-multi-v3-9-c1ce69997c01@bootlin.com>
-Content-Language: en-US
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Martin KaFai Lau <martin.lau@linux.dev>
-In-Reply-To: <20250128-redirect-multi-v3-9-c1ce69997c01@bootlin.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Migadu-Flow: FLOW_OUT
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20250127142014.37834-2-nicolas.bouchinet@clip-os.org>
 
-On 1/28/25 1:57 AM, Bastien Curutchet (eBPF Foundation) wrote:
-> +#define NO_IP				"NO_IP"
->   #define PROG_NAME_MAX_LEN	128
-> +#define NS_NAME_MAX_LEN		32
->   
->   struct veth_configuration {
->   	char local_veth[VETH_NAME_MAX_LEN]; /* Interface in main namespace */
->   	char remote_veth[VETH_NAME_MAX_LEN]; /* Peer interface in dedicated namespace*/
-> -	const char *namespace; /* Namespace for the remote veth */
-> +	char namespace[NS_NAME_MAX_LEN]; /* Namespace for the remote veth */
->   	int next_veth; /* Local interface to redirect traffic to */
-> -	char *remote_addr; /* IP address of the remote veth */
-> +	char remote_addr[IP_MAX_LEN]; /* IP address of the remote veth */
->   };
->   
+Hi,
 
->   	{
-> -		.local_veth = "veth2",
-> +		.local_veth = "veth2-",
->   		.remote_veth = "veth22",
->   		.next_veth = 2,
-> -		.remote_addr = NULL,
-> -		.namespace = "ns-veth22"
-> +		.remote_addr = NO_IP,
-> +		.namespace = "ns-veth22-"
->   	},
+Please, collapse patch 1/9 and 2/9 and post it to
+netfilter-devel@vger.kernel.org targeting at the nf-next tree.
 
-> -static int create_network(void)
-> +static int create_network(struct veth_configuration *net_config)
->   {
-> -	int i;
-> +	int i, err;
-> +
-> +	memcpy(net_config, default_config, VETH_PAIRS_COUNT * sizeof(struct veth_configuration));
->   
->   	/* First create and configure all interfaces */
->   	for (i = 0; i < VETH_PAIRS_COUNT; i++) {
-> +		err = append_tid(net_config[i].namespace, strlen(net_config[i].namespace));
-> +		if (!ASSERT_OK(err, "append TID to ns name"))
-> +			return -1;
-> +
-> +		err = append_tid(net_config[i].local_veth, strlen(net_config[i].local_veth));
-> +		if (!ASSERT_OK(err, "append TID to local veth name"))
-> +			return -1;
-> +
->   		SYS(fail, "ip netns add %s", net_config[i].namespace);
->   		SYS(fail, "ip link add %s type veth peer name %s netns %s",
->   		    net_config[i].local_veth, net_config[i].remote_veth, net_config[i].namespace);
->   		SYS(fail, "ip link set dev %s up", net_config[i].local_veth);
-> -		if (net_config[i].remote_addr)
-> +		if (memcmp(net_config[i].remote_addr, NO_IP, 5))
+Thanks.
 
-nit. May be "if (net_config[i].remote_addr[0])" instead of defining a new 
-"NO_IP" and then memcmp.
-
->   			SYS(fail, "ip -n %s addr add %s/24 dev %s",	net_config[i].namespace,
->   			    net_config[i].remote_addr, net_config[i].remote_veth);
->   		SYS(fail, "ip -n %s link set dev %s up", net_config[i].namespace,
-> @@ -155,7 +169,7 @@ static int create_network(void)
->   	return -1;
->   }
-
+On Mon, Jan 27, 2025 at 03:19:58PM +0100, nicolas.bouchinet@clip-os.org wrote:
+> From: Nicolas Bouchinet <nicolas.bouchinet@ssi.gouv.fr>
+> 
+> Bound nf_conntrack_max sysctl writings between SYSCTL_ZERO
+> and SYSCTL_INT_MAX.
+> 
+> The proc_handler has thus been updated to proc_dointvec_minmax.
+> 
+> Signed-off-by: Nicolas Bouchinet <nicolas.bouchinet@ssi.gouv.fr>
+> ---
+>  net/netfilter/nf_conntrack_standalone.c | 8 ++++++--
+>  1 file changed, 6 insertions(+), 2 deletions(-)
+> 
+> diff --git a/net/netfilter/nf_conntrack_standalone.c b/net/netfilter/nf_conntrack_standalone.c
+> index 7d4f0fa8b609d..40ed3ef9cb22d 100644
+> --- a/net/netfilter/nf_conntrack_standalone.c
+> +++ b/net/netfilter/nf_conntrack_standalone.c
+> @@ -619,7 +619,9 @@ static struct ctl_table nf_ct_sysctl_table[] = {
+>  		.data		= &nf_conntrack_max,
+>  		.maxlen		= sizeof(int),
+>  		.mode		= 0644,
+> -		.proc_handler	= proc_dointvec,
+> +		.proc_handler	= proc_dointvec_minmax,
+> +		.extra1		= SYSCTL_ZERO,
+> +		.extra2		= SYSCTL_INT_MAX,
+>  	},
+>  	[NF_SYSCTL_CT_COUNT] = {
+>  		.procname	= "nf_conntrack_count",
+> @@ -948,7 +950,9 @@ static struct ctl_table nf_ct_netfilter_table[] = {
+>  		.data		= &nf_conntrack_max,
+>  		.maxlen		= sizeof(int),
+>  		.mode		= 0644,
+> -		.proc_handler	= proc_dointvec,
+> +		.proc_handler	= proc_dointvec_minmax,
+> +		.extra1		= SYSCTL_ZERO,
+> +		.extra2		= SYSCTL_INT_MAX,
+>  	},
+>  };
+>  
+> -- 
+> 2.48.1
+> 
+> 
 
