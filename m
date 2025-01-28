@@ -1,128 +1,145 @@
-Return-Path: <netdev+bounces-161422-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-161423-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id E9EC4A21489
-	for <lists+netdev@lfdr.de>; Tue, 28 Jan 2025 23:42:10 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id EF60BA2149D
+	for <lists+netdev@lfdr.de>; Tue, 28 Jan 2025 23:49:43 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 4E33A16458E
-	for <lists+netdev@lfdr.de>; Tue, 28 Jan 2025 22:42:09 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 2951C3A45A8
+	for <lists+netdev@lfdr.de>; Tue, 28 Jan 2025 22:49:36 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C068F1E0B86;
-	Tue, 28 Jan 2025 22:42:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 80C0D1EE039;
+	Tue, 28 Jan 2025 22:49:33 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=lwn.net header.i=@lwn.net header.b="NUNSUUGt"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="YVhKKmVD"
 X-Original-To: netdev@vger.kernel.org
-Received: from ms.lwn.net (ms.lwn.net [45.79.88.28])
+Received: from out-188.mta1.migadu.com (out-188.mta1.migadu.com [95.215.58.188])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F052B18F2D8;
-	Tue, 28 Jan 2025 22:42:01 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.79.88.28
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D63D928DA1
+	for <netdev@vger.kernel.org>; Tue, 28 Jan 2025 22:49:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.188
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1738104123; cv=none; b=ZSF1tzNNEft+ZEMz5E4zgPPXk+febAiAn33i/Eh/A6X2yRIlMKHMYXePkYGjBA29YrW1R0lzdzk27xkElQ1TfsRtEt5A+Csf4YkVhqrQuLgDt0bgaRRhNqmMnL/t6zPWAoS/PF7kQE0QMZlFM67269x0X7WL/qUqMWlBuZ/lMyE=
+	t=1738104573; cv=none; b=VSIllAFys3z5gDxYa+BsJLO0NnkhHANbp34k4QV2kvQrq6BKTrULzj6eHVTErq3FlpUnNNi6zxlaZ8+wMaqmGBBazej3+wpIBmf4009W1IPIb68IBUmx7XsqTGNnRvICi6SNAIaeleu/0oQv2qoq2KcdCOKUMm1NeRFAGjkWj1I=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1738104123; c=relaxed/simple;
-	bh=AOq0SJfJiBWND1wZ8FCd25+xqo3YTjsEqxOPO7EP2Os=;
-	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
-	 MIME-Version:Content-Type; b=FstZ4C6DuUxK9n5M/3sg7jpX/GB3dpw1cVdd0Rje5e+IrzQ204QiRqwwmVyx07DktIGradd5Ie/WbNADPj5RPL0y8Zpyb+ibRpIexleAFtYiDUFvEW3KX+VkOpd/umHn281FNaZhLY+iyFPjMBcDcp1VSYcbo8UhwRuSgJsix8o=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lwn.net; spf=pass smtp.mailfrom=lwn.net; dkim=pass (2048-bit key) header.d=lwn.net header.i=@lwn.net header.b=NUNSUUGt; arc=none smtp.client-ip=45.79.88.28
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lwn.net
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lwn.net
-DKIM-Filter: OpenDKIM Filter v2.11.0 ms.lwn.net 06ECA403FA
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=lwn.net; s=20201203;
-	t=1738104121; bh=+meNH1juZBBtvrp/xo2cF0Sh2lEGZRx9Dv3JEMGVfwQ=;
-	h=From:To:Cc:Subject:In-Reply-To:References:Date:From;
-	b=NUNSUUGtYAw8IZ7v+u9urKWTHqRqgIaFDi/LwOklT1yZ+dVdXczOD9aTVo9dL8GaQ
-	 OAf5s35W/sLcrCXBP9L1rzztGXQrZf82Io4oQsEPVhxr2Gmfam9dfHpeHYHM4gAzS8
-	 Z5wJvtiQGdryhtYMX/RqM8UUTkxsZ7qqsI/DxEU04UzFD7wrLVaAgpDF9YgOAVZODR
-	 ghFfoDDu31L5plmrTy4y8+t+6MkL5TJscft0G5BNRz45gjvAU7I+oGLILjgoaHhU9M
-	 9iNee1I8iwhHjJ3JhYnCMWXNAtQ6QziZH5AMs5lTvSyDYyN1vQVIIWC4TLGwjRIBKs
-	 EZQClEOOCB0lQ==
-Received: from localhost (unknown [IPv6:2601:280:5e00:625::1fe])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by ms.lwn.net (Postfix) with ESMTPSA id 06ECA403FA;
-	Tue, 28 Jan 2025 22:42:00 +0000 (UTC)
-From: Jonathan Corbet <corbet@lwn.net>
-To: Mauro Carvalho Chehab <mchehab+huawei@kernel.org>, Linux Doc Mailing
- List <linux-doc@vger.kernel.org>, Greg Kroah-Hartman
- <gregkh@linuxfoundation.org>
-Cc: Mauro Carvalho Chehab <mchehab+huawei@kernel.org>, Mauro Carvalho Chehab
- <mchehab+huawei@kernel.org>, linux-kernel@vger.kernel.org,
- bpf@vger.kernel.org, coresight@lists.linaro.org,
- linux-arm-kernel@lists.infradead.org, linux-block@vger.kernel.org,
- linux-f2fs-devel@lists.sourceforge.net, linux-hardening@vger.kernel.org,
- linux-iio@vger.kernel.org, linux-media@vger.kernel.org,
- linux-pm@vger.kernel.org, linux-usb@vger.kernel.org,
- linux-wireless@vger.kernel.org, netdev@vger.kernel.org,
- workflows@vger.kernel.org
-Subject: Re: [RFC v2 00/38] Improve ABI documentation generation
-In-Reply-To: <cover.1738020236.git.mchehab+huawei@kernel.org>
-References: <cover.1738020236.git.mchehab+huawei@kernel.org>
-Date: Tue, 28 Jan 2025 15:42:00 -0700
-Message-ID: <87h65i7e87.fsf@trenco.lwn.net>
+	s=arc-20240116; t=1738104573; c=relaxed/simple;
+	bh=0z1Uu2ZoNK4FMlqQYppsrJJjYCmDj0CbPV0ZLW+wLgE=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=r59UE19hNKbzt7nt5u8XorpDyOOlmriVaiLpb9eYBCEf5A9KED5t/W2j9Wc52kp89b2mcZkTckjyiZEJiT1BgdXor8CCHWRn8j5bE/AnjmDZYMm0ldFD27hzHvrOBxYPqhxO0JRVohq+hGwuniRkJZ8mEq4jZCtcV1YJuiaQ65M=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=YVhKKmVD; arc=none smtp.client-ip=95.215.58.188
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+Message-ID: <e03f6c1d-37c3-4d0b-8e42-1f8980ed379a@linux.dev>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1738104558;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=ylNTxkBjhSFS6U9A/qTUzi5AjkmPH4/OseDQKYmB8n0=;
+	b=YVhKKmVDZ2GYQ86Ja4x+ridvVmRjz8qkKsXJtXzCsLrHv03xzQZFJewvKpJtxIWSpv8qcs
+	03tp/WBNyWoFsY4lEB7ooopBor6e02tV5FxIMOkixgRI2F/V9tKzVsIrnKjow2lHSCRPwA
+	3VpInGxoaY1FUSTMWTryzqidmkT32OE=
+Date: Tue, 28 Jan 2025 14:49:08 -0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain
+Subject: Re: [PATCH bpf-next v3 01/14] selftests/bpf: helpers: Add
+ append_tid()
+To: "Bastien Curutchet (eBPF Foundation)" <bastien.curutchet@bootlin.com>
+Cc: Alexei Starovoitov <ast@kernel.org>,
+ Daniel Borkmann <daniel@iogearbox.net>, "David S. Miller"
+ <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>,
+ Jesper Dangaard Brouer <hawk@kernel.org>,
+ John Fastabend <john.fastabend@gmail.com>,
+ Andrii Nakryiko <andrii@kernel.org>, Eduard Zingerman <eddyz87@gmail.com>,
+ Song Liu <song@kernel.org>, Yonghong Song <yonghong.song@linux.dev>,
+ KP Singh <kpsingh@kernel.org>, Stanislav Fomichev <sdf@fomichev.me>,
+ Hao Luo <haoluo@google.com>, Jiri Olsa <jolsa@kernel.org>,
+ Mykola Lysenko <mykolal@fb.com>, Shuah Khan <shuah@kernel.org>,
+ Alexis Lothore <alexis.lothore@bootlin.com>,
+ Thomas Petazzoni <thomas.petazzoni@bootlin.com>, netdev@vger.kernel.org,
+ bpf@vger.kernel.org, linux-kselftest@vger.kernel.org,
+ linux-kernel@vger.kernel.org
+References: <20250128-redirect-multi-v3-0-c1ce69997c01@bootlin.com>
+ <20250128-redirect-multi-v3-1-c1ce69997c01@bootlin.com>
+Content-Language: en-US
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Martin KaFai Lau <martin.lau@linux.dev>
+In-Reply-To: <20250128-redirect-multi-v3-1-c1ce69997c01@bootlin.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Migadu-Flow: FLOW_OUT
 
-Mauro Carvalho Chehab <mchehab+huawei@kernel.org> writes:
+On 1/28/25 1:57 AM, Bastien Curutchet (eBPF Foundation) wrote:
+> Some tests can't be run in parallel because they use same namespace
+> names or veth names.
+> 
+> Create an helper that appends the thread ID to a given string. 8
+> characters are used for it (7 digits + '\0')
+> 
+> Signed-off-by: Bastien Curutchet (eBPF Foundation) <bastien.curutchet@bootlin.com>
+> ---
+>   tools/testing/selftests/bpf/network_helpers.c | 11 +++++++++++
+>   tools/testing/selftests/bpf/network_helpers.h | 10 ++++++++++
+>   2 files changed, 21 insertions(+)
+> 
+> diff --git a/tools/testing/selftests/bpf/network_helpers.c b/tools/testing/selftests/bpf/network_helpers.c
+> index 80844a5fb1feef2ff73c2f0293e52495803ab769..d2ff7521aaa696ed04d8f1308394b4c01c1c038b 100644
+> --- a/tools/testing/selftests/bpf/network_helpers.c
+> +++ b/tools/testing/selftests/bpf/network_helpers.c
+> @@ -446,6 +446,17 @@ char *ping_command(int family)
+>   	return "ping";
+>   }
+>   
+> +int append_tid(char *str, size_t offset)
+nit. offset should always be strlen(str) now. The append_tid will be easier to 
+use if the append_tid always does the strlen() itself to figure out the end of 
+the str.
 
-> Hi Jon/Greg,
->
-> That's the second version of my RFC patches meant to modenize the ABI
-> parser that I wrote in Perl.
+It will be useful to replace the "size_t offset" arg with "size_t sz" which 
+tells the max size of the "char *str" and the append_tid does a check to ensure 
+there is enough space to append the "%07d" tid.
 
-I have a couple of minor comments on the individual patches, but overall
-I do like this direction.
+> +{
+> +	if (!str)
+> +		return -1;
+> +
+> +	sprintf(&str[offset], "%07d", gettid());
+> +	str[offset + 7] = '\0';
+> +
+> +	return 0;
+> +}
+> +
+>   int remove_netns(const char *name)
+>   {
+>   	char *cmd;
+> diff --git a/tools/testing/selftests/bpf/network_helpers.h b/tools/testing/selftests/bpf/network_helpers.h
+> index ebec8a8d6f81e9d079a3b087127a37885c656856..b2451dd00594190e1dcb58498d70dd80c0e7c51c 100644
+> --- a/tools/testing/selftests/bpf/network_helpers.h
+> +++ b/tools/testing/selftests/bpf/network_helpers.h
+> @@ -98,6 +98,16 @@ int send_recv_data(int lfd, int fd, uint32_t total_bytes);
+>   int make_netns(const char *name);
+>   int remove_netns(const char *name);
+>   
+> +/**
+> + * append_tid() - Append thread ID to the given string.
+> + *
+> + * /!\ the appended thread ID is 8 characters long
+> + *     so the input string must be allocated accordingly
+> + *
+> + * Returns -1 if input is NULL, 0 otherwise
+> + */
+> +int append_tid(char *str, size_t offset);
+> +
+>   static __u16 csum_fold(__u32 csum)
+>   {
+>   	csum = (csum & 0xffff) + (csum >> 16);
+> 
 
-It would be nice, though, if the code were a bit more extensively
-commented.  Parts of it get into the "twistly maze of regexes" mode that
-can be awfully hard to follow.
-
-> On this series we have:
->
-> patches 1 to 11: several bug fixes addressing issues at ABI symbols;
-
-1-3 aren't needed - it seems you already upstreamed #2?
-
-For the rest, is there any reason to not apply them right away?  They
-just seem like worthwhile fixes.
-
-> patch 12: a fix for scripts/documentation-file-ref-check
-> patches 13-15: create new script with rest and search logic and 
->   minimally integrate with kernel_abi Sphinx extension(phase 1);
-> patches 16-19: implement phase 2: class integration (phase 2);
-> patch 20: fix a bug at kernel_abi: the way it splits lines is buggy;
-> patches  21-24: rewrite kernel_abi logic to make it simpler and more
->   robust;
-> patches 25-27: add cross-reference support at automarkup;
-> patches 28-36: several ABI cleanups to cope with the improvements;
-> patch 37: implement undefined command;
-> patch 38: get rid of the old Perl script.
->
-> To make it easier to review/apply, I may end breaking the next version
-> on a couple of different patchsets. Still it would be nice to have more
-> people testing it and providing some feedback.
-
-I've looked over everything, though with limited depth.  My testing
-hasn't turned up any problems.  I've only tested with current Sphinx,
-have you tried this with the more ancient versions we support?
-
-[It's probably time to raise our minimum version again, especially now
-that current Sphinx has better performance.]
-
-I don't see a whole lot of reasons not to apply this set shortly after
-the merge window; anybody disagree?
-
-Thanks,
-
-jon
 
