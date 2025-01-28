@@ -1,49 +1,49 @@
-Return-Path: <netdev+bounces-161306-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-161307-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id EC4D0A20943
-	for <lists+netdev@lfdr.de>; Tue, 28 Jan 2025 12:10:22 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8952AA20981
+	for <lists+netdev@lfdr.de>; Tue, 28 Jan 2025 12:20:12 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id EA423188936C
-	for <lists+netdev@lfdr.de>; Tue, 28 Jan 2025 11:10:25 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id AB80418865C9
+	for <lists+netdev@lfdr.de>; Tue, 28 Jan 2025 11:20:14 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7F0F21A0711;
-	Tue, 28 Jan 2025 11:10:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8BEFE19F111;
+	Tue, 28 Jan 2025 11:20:08 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="FP7MKTOy"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Oij6JUsR"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5744C1A01BF;
-	Tue, 28 Jan 2025 11:10:05 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5C50919DFA5;
+	Tue, 28 Jan 2025 11:20:07 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1738062606; cv=none; b=WbLhMEQVuXtf7LiPrXGl24ECNyT3HVgdaJRNytCQBvKT7uMG1nr6GIB8+0ORzlIEYT+1tElVT73ixbzApEPt0lvmdMv+YYDryGn2bPUG02FoJ3uj0my3v7UBqjJJFzRcFsqCgKZlzOjKG+8oOrvz82adMcIyPwi59AvNabvF14w=
+	t=1738063208; cv=none; b=KzqghjkBJC5hmCTlswd9+vju7CaJpglOrOx8JV6gwIMkMzGDs8pX/E175xl2XhGd8H9hjSh5KFRmTdOrSHVYDGW0nxtToePE5yF5MUN3dDrckRtavQLDaeixBtCRIqZ5DX+IcDGONNeUEWRgiX+cp2wqu8RVCocX5pXHqUh+Ew8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1738062606; c=relaxed/simple;
-	bh=FmWRL0mDSs1CYZ7eIDarhdAtcTTpaIAjICcw4wxU9Ms=;
+	s=arc-20240116; t=1738063208; c=relaxed/simple;
+	bh=+wN+xyHCWm7Mr05FKtb0eiMkKTeqnJP0gRwFVC0K7qs=;
 	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=e+siteIOkXp2Yyfzxz5lF2NB2BHu7wfqold6ok7ssxc+8/ZkGamWM564t6UByNUHSx36toUm6JlWkzURf5ZlijOFhhxUp+d3MUemZTvfdERY6yjq3Ox4dm8ILYOAS8QpM2LnA+IaN7qEuNoBJac6LajNkA/8KzfsWyBJmJNP4Mk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=FP7MKTOy; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id BE1E8C4CEE3;
-	Tue, 28 Jan 2025 11:10:05 +0000 (UTC)
+	 In-Reply-To:To:Cc; b=V6/vLGx+NFDjbFQZvYfYxMD3Gq/GQdwlwaaSUrCB6ZTHC51SPZ2eH93r/OrV+vmVqYlhN7FJuJBDhGTQF49Pw/345s4elBza5znydZXBZ0T+o72dHeZCmY0BIY5/3BuHL7gGntUSWc9Q6Pcae7vvPi3eXErZE8o7iqEGYKYaUGs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Oij6JUsR; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id C1EACC4CED3;
+	Tue, 28 Jan 2025 11:20:07 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1738062605;
-	bh=FmWRL0mDSs1CYZ7eIDarhdAtcTTpaIAjICcw4wxU9Ms=;
+	s=k20201202; t=1738063207;
+	bh=+wN+xyHCWm7Mr05FKtb0eiMkKTeqnJP0gRwFVC0K7qs=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=FP7MKTOyjlsX8z78Sjdgyk6Bxed3zRALoL8c/0uMBCTy6NMS0kSyRNpXBC3tVKnHu
-	 RVu3SSJgyT1Gms+15/R3ONMKnI+bn5F5JIi9q4EsgBKwj2iyBgwo1wPoLEC9nPHVwE
-	 CLWxhzAJ/PhlqZdprKQ+m3L9Oi8CW40q3PWJCuJ29TpBzIkgNG17H0TvdX8kBmNOL0
-	 V9oSyW6cYQDfPqmzFg0Y1PgprvqH5WGeBKWBb4FDNwEJR8VXfFOuaa7p52Dq4THrOe
-	 c+P8Pik85IWWi6cdHG4uz+tv4/sC8/ND34nz6fuKJtpG/6PJcndtiB5ks6i3j1SdQD
-	 OjJ0nedxJzynw==
+	b=Oij6JUsRuxaWsHWMkScOZbhYm5JGcw3P4mNOQrn7EAfei6+jXDh6IaeXwF/Rrxujg
+	 123d4m7t7e4qr8kDi/jmPGPerSoQ2iZ22QgEFfCXIn7gPXIYLQE8h5ayGFzAucFJPI
+	 1unn5TOU/sCHd3v7FPGC7EAnAxVnJDP6rWpVpYbSIwgTBxLMq233TdJKJEGPfC215s
+	 etM7HHj8+mV/R3yRVnbxIEvlVmZSZWc0yU7a5p1R5PSShOJxerMTHvZdLwP4Hkjumx
+	 WcRT9vnwXZcmhHgMs+mYVWlmYQkDUzpj9J3JRv23DukZR/SBLDQSoUxaieK5Epi30l
+	 k0oUzJGf+mnNw==
 Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id AEC1F380AA66;
-	Tue, 28 Jan 2025 11:10:32 +0000 (UTC)
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id AE521380AA66;
+	Tue, 28 Jan 2025 11:20:34 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -52,41 +52,50 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net v2] ptp: Properly handle compat ioctls
+Subject: Re: [PATCH net v5 0/7] usbnet: ipheth: prevent OoB reads of NDP16
 From: patchwork-bot+netdevbpf@kernel.org
 Message-Id: 
- <173806263149.3755886.15811094950826923330.git-patchwork-notify@kernel.org>
-Date: Tue, 28 Jan 2025 11:10:31 +0000
-References: <20250125-posix-clock-compat_ioctl-v2-1-11c865c500eb@weissschuh.net>
-In-Reply-To: <20250125-posix-clock-compat_ioctl-v2-1-11c865c500eb@weissschuh.net>
-To: =?utf-8?q?Thomas_Wei=C3=9Fschuh_=3Clinux=40weissschuh=2Enet=3E?=@codeaurora.org
-Cc: richardcochran@gmail.com, andrew+netdev@lunn.ch, davem@davemloft.net,
- edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
- anna-maria@linutronix.de, frederic@kernel.org, tglx@linutronix.de,
- jstultz@google.com, arnd@arndb.de, john.stultz@linaro.org,
- netdev@vger.kernel.org, linux-kernel@vger.kernel.org, gorcunov@gmail.com
+ <173806323350.3759067.5078692360425955195.git-patchwork-notify@kernel.org>
+Date: Tue, 28 Jan 2025 11:20:33 +0000
+References: <20250125235409.3106594-1-forst@pen.gy>
+In-Reply-To: <20250125235409.3106594-1-forst@pen.gy>
+To: Foster Snowhill <forst@pen.gy>
+Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+ pabeni@redhat.com, gvalkov@gmail.com, horms@kernel.org, oneukum@suse.com,
+ netdev@vger.kernel.org, linux-usb@vger.kernel.org
 
 Hello:
 
-This patch was applied to netdev/net.git (main)
+This series was applied to netdev/net.git (main)
 by Paolo Abeni <pabeni@redhat.com>:
 
-On Sat, 25 Jan 2025 10:28:38 +0100 you wrote:
-> Pointer arguments passed to ioctls need to pass through compat_ptr() to
-> work correctly on s390; as explained in Documentation/driver-api/ioctl.rst.
-> Detect compat mode at runtime and call compat_ptr() for those commands
-> which do take pointer arguments.
+On Sun, 26 Jan 2025 00:54:02 +0100 you wrote:
+> iOS devices support two types of tethering over USB: regular, where the
+> internet connection is shared from the phone to the attached computer,
+> and reverse, where the internet connection is shared from the attached
+> computer to the phone.
 > 
-> Suggested-by: Arnd Bergmann <arnd@arndb.de>
-> Link: https://lore.kernel.org/lkml/1ba5d3a4-7931-455b-a3ce-85a968a7cb10@app.fastmail.com/
-> Fixes: d94ba80ebbea ("ptp: Added a brand new class driver for ptp clocks.")
-> Signed-off-by: Thomas Weißschuh <linux@weissschuh.net>
+> The `ipheth` driver is responsible for regular tethering only. With this
+> tethering type, iOS devices support two encapsulation modes on RX:
+> legacy and NCM.
 > 
 > [...]
 
 Here is the summary with links:
-  - [net,v2] ptp: Properly handle compat ioctls
-    https://git.kernel.org/netdev/net/c/19ae40f572a9
+  - [net,v5,1/7] usbnet: ipheth: fix possible overflow in DPE length check
+    https://git.kernel.org/netdev/net/c/c219427ed296
+  - [net,v5,2/7] usbnet: ipheth: check that DPE points past NCM header
+    https://git.kernel.org/netdev/net/c/429fa68b58ce
+  - [net,v5,3/7] usbnet: ipheth: use static NDP16 location in URB
+    https://git.kernel.org/netdev/net/c/86586dcb75cb
+  - [net,v5,4/7] usbnet: ipheth: refactor NCM datagram loop
+    https://git.kernel.org/netdev/net/c/2a9a196429e9
+  - [net,v5,5/7] usbnet: ipheth: break up NCM header size computation
+    https://git.kernel.org/netdev/net/c/efcbc678a14b
+  - [net,v5,6/7] usbnet: ipheth: fix DPE OoB read
+    https://git.kernel.org/netdev/net/c/ee591f2b2817
+  - [net,v5,7/7] usbnet: ipheth: document scope of NCM implementation
+    https://git.kernel.org/netdev/net/c/be154b598fa5
 
 You are awesome, thank you!
 -- 
