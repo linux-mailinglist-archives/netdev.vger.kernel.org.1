@@ -1,226 +1,235 @@
-Return-Path: <netdev+bounces-161400-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-161401-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8E046A20F0C
-	for <lists+netdev@lfdr.de>; Tue, 28 Jan 2025 17:48:55 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 760C9A20F36
+	for <lists+netdev@lfdr.de>; Tue, 28 Jan 2025 17:53:03 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 43687188A782
-	for <lists+netdev@lfdr.de>; Tue, 28 Jan 2025 16:48:59 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 9BC8B3A8F9E
+	for <lists+netdev@lfdr.de>; Tue, 28 Jan 2025 16:51:41 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A0FDD1E102A;
-	Tue, 28 Jan 2025 16:47:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EAE2919DF52;
+	Tue, 28 Jan 2025 16:51:36 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="a9UGeBZ+"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Oa0XH6Hm"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-yb1-f177.google.com (mail-yb1-f177.google.com [209.85.219.177])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DA5721DF99C;
-	Tue, 28 Jan 2025 16:47:01 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.177
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0BE35194A67
+	for <netdev@vger.kernel.org>; Tue, 28 Jan 2025 16:51:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1738082823; cv=none; b=WFwDjGWpJJijYx06C79e5tRQaCt8aTILtYlUQDlU5HAsFhzdkz/lPyo5Yje/cV92IL51Aufhrnz65pkWiASdq8sAVdL3kYeJOi4qpZmn8jtesIeAtxTbM1GcLYrGRIKALQXg4NwKwR4i91S44HzCrBfCkzaK/Eb8KAfxzlcfcI4=
+	t=1738083096; cv=none; b=FV/YTTvNlHDOPV5EOJNu7e0xYNXhXyiJo40B7qD9DJ2Ht9NHPQA7dU/ANRBukfYlMQAYV1ZXn4Shg+OxkGLayS9OdGPz6k3MvUlluHFg8jTTT4ZSsHbX0B3ocEBuv3AWiIo76dJPPHvPhIONPydd7gDGJlJiqBFChjmWpVoNnBA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1738082823; c=relaxed/simple;
-	bh=3Nw6u6TcLstz84UwM+gUpBPEmbRa4zVJY8ONgf+AwsI=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=FSodrBO7wUU8MMBnzDDgQ8O5zQcCaxu06VVJmCICdBZJa6tYuvrQokHLGfG4z0qt8rIdX/K5nqdahid0quFQUb45Jrq5ln3vmiAbijzUvS9FLHj+/LIj33wIwTlLwDAgaaoBL3u8vjHPjzyHBhyKBCI/OLo7m0Qfqa3ESfzL288=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=a9UGeBZ+; arc=none smtp.client-ip=209.85.219.177
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-yb1-f177.google.com with SMTP id 3f1490d57ef6-e46ac799015so7740234276.0;
-        Tue, 28 Jan 2025 08:47:01 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1738082821; x=1738687621; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=mPo0Qmhd/LgFOJoY/TurPrp2onCgGxY+Z0rc3zytFz4=;
-        b=a9UGeBZ+Dno0Hqv6IasDiD8ZD+hk+4MOxDk3m+WeFm1wxfhE5xgXERj2DscxD48/tE
-         f4csOBOmqyCeRDC78ibzKgcISvJXKb3PlH6KlTMl8zqubgyYhoIBdgdmPN3BeKhc1k9V
-         QbQvLREla2BJvVYxY4Q1H7c59f51E5IYoBLwzrVx66dYq+IR4Lnz1nd0hLXSRJQ9mHRO
-         PcPhq/v+zlJzjM1SOysIwyVXqjGA3Xz8YCCPSu35GhgPd8UFNQQ8oL3ax5MqDNtwYrsQ
-         wsb9KahlQRPsog/F4MSXnGiH+tywFandzovmbnh33AipmXyg7rvPKcQpsS7XejQAexWk
-         rOCg==
+	s=arc-20240116; t=1738083096; c=relaxed/simple;
+	bh=0v6vhp14HNiEF4v500LR2QRhHQWjpUkgmORQMyl4yNA=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=isaNYoXm33DilpAXRxbhrByuh9tGSUvt+7qvCJZ2KZtUp3jwFiFyr960L5CShmYTj2U0SngUX0lr+36/BsFQuq4Avc1SWzwPqmwGk2mJT9S0KuFI8MxmHAmZOeXVzn728B8KyuYGN8IIj+5oERSCcIl7iPVEi6JDJlODwkjt674=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=Oa0XH6Hm; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1738083093;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=rboJfVxLlAbl2p+2/ud8/N7Cynxru4+mLw79GAjRHYA=;
+	b=Oa0XH6HmWPzU2cG8ieXJbrXvKfbxAzHYsT/rX1iEQ9oBwq2Ki3zHmODOyPEL2z02a6XfSF
+	0S+5dIAhIFLvKcZxuRRjPI/HKjh1VF7+DJ7uFUrfUTXe34IFWX70oIWf9LXsAykURKw0Ja
+	dqOpfHfMsjQxx7OGFo6u8q1L3ZLeQRQ=
+Received: from mail-qt1-f199.google.com (mail-qt1-f199.google.com
+ [209.85.160.199]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-503-cJq5NMMcO4aa4nYWOUoSOg-1; Tue, 28 Jan 2025 11:51:32 -0500
+X-MC-Unique: cJq5NMMcO4aa4nYWOUoSOg-1
+X-Mimecast-MFC-AGG-ID: cJq5NMMcO4aa4nYWOUoSOg
+Received: by mail-qt1-f199.google.com with SMTP id d75a77b69052e-4679d6ef2f9so137360821cf.1
+        for <netdev@vger.kernel.org>; Tue, 28 Jan 2025 08:51:32 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1738082821; x=1738687621;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=mPo0Qmhd/LgFOJoY/TurPrp2onCgGxY+Z0rc3zytFz4=;
-        b=X5Yx5FIeR/f66E47J9vlGznyqpCct5m5+6680xg0oT3DxQUfQgTGdnlYCuA+pK54KS
-         tKV0AxhCdrMcfSClax2nLvCStE6pSGDuD4/1DHBoMRhaUiL1Kfq8Llt7/x6lOM52NYkB
-         ieQ9NieY4qlWF+x85EgRmcoyMJxbI03/NqCKLJO1HOVlinOpx2kDz7eOQawhTLLfMkhp
-         rqbuzkhYmaotO2KFxTO/MC72MnY1jxbe6HZdC35aqr7LOqPRFmqlrJpKqryO+33yCM4g
-         OJvYRufgqWGlc2KhYrVcJfYDDFJG7zRKDmmFcoABgWL/F4QUWcChTKGxndtVxrvxPmuI
-         dYQg==
-X-Forwarded-Encrypted: i=1; AJvYcCU35hHcfnlqtpJEN+O82UN1Brf/72LZZES5UQ8NqQqRa42xCOz30RQGwEs1dKEZ9HlEd9iuGGR9sTkZIQ==@vger.kernel.org, AJvYcCUbtpxn7lrnLe6Dpme+arpijr8w8fEqPXB0LpCcAkFA/5N281DO+F8YSo1LuEfZMZkmr8rYwNAM3uYa9Xo=@vger.kernel.org, AJvYcCUweCNvy0SPTZueHpesRX2m1V31u2Mtq55GL7Y7jiyJpyLEvJvPKz5zKddlG4GxBFxgzN48t9Tql1Wk@vger.kernel.org, AJvYcCVId/NIazBXfhFUus7mfEy/ZTmbRNO1txa7gNAUbYeTIH9qSvIF7XCodXkdNf1AiHC5tINVZI9AnoJp+Q==@vger.kernel.org, AJvYcCWdG9M1jPa6XgtUmzP3bqTeBP1GT8g1vBXB+v+LfHMzjo9x1WvEg8cb8xQ+9VsbpI2HwohxNGpc9KV1w+XT@vger.kernel.org, AJvYcCWo10fMyNYOIks7POrIMPkp1V70sJ58XVW1uJnMYzN7kOg9AEnVFep4jJvKGAIz9rhS6vgCfZco@vger.kernel.org
-X-Gm-Message-State: AOJu0Yz5BMayPiOFo3C4dq+VfFf940YiItomgLLzAA6tiFWet8x/yR2D
-	isbqe3smHuij6MtzK/YlmbtdaoSYvKnI+Tj+IAjuKnxhDWgOSRHxlWEhXPx22PI=
-X-Gm-Gg: ASbGnctZcQmlHAnxbsOmglEk6+8wErnieRp6d9hRtPRo3oMoDC1bYmNky0vyBkq2uBc
-	r/QSa+xWkNffp+0tIxbmm+ljoJMYM6WmFhEU6elVR/D3KzKzKbJKdXXcunNI/Bs0kDCQoFVMxnt
-	SzxBQAfHtlv1hMg9AdmTN2zzTB6qWqNkK3E7PcIO3tfiQW99CIsMQH5v2ggOLVbeM1uMiMyaeJE
-	Su48iNgP9yqt/S3/UiH0tP3VV/hTCdbZWCXLNcw5gzz7U6gjvTrCPFxLV7cdMFHnb+/YxxzYd6/
-	4nOjyOZAjBAulHqSNaygHC3QFQSO3tB/68kr1fEthufr/L9EIXA=
-X-Google-Smtp-Source: AGHT+IEbCDwztaXs4775wdhVhgVxaydy6EUMlQBUSRYIasXW3lx4ypNqxsjWkznwG36W84zpcNPfgw==
-X-Received: by 2002:a05:6902:982:b0:e58:306f:e83a with SMTP id 3f1490d57ef6-e58306fe89cmr14077851276.29.1738082820769;
-        Tue, 28 Jan 2025 08:47:00 -0800 (PST)
-Received: from localhost (c-73-224-175-84.hsd1.fl.comcast.net. [73.224.175.84])
-        by smtp.gmail.com with ESMTPSA id 3f1490d57ef6-e589a2260a9sm196205276.37.2025.01.28.08.46.59
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 28 Jan 2025 08:47:00 -0800 (PST)
-From: Yury Norov <yury.norov@gmail.com>
-To: linux-kernel@vger.kernel.org,
-	linuxppc-dev@lists.ozlabs.org,
-	linux-s390@vger.kernel.org,
-	netdev@vger.kernel.org,
-	virtualization@lists.linux.dev,
-	linux-nvme@lists.infradead.org,
-	linux-hyperv@vger.kernel.org,
-	linux-pci@vger.kernel.org,
-	linux-scsi@vger.kernel.org,
-	linux-crypto@vger.kernel.org,
-	Michael Ellerman <mpe@ellerman.id.au>,
-	Nicholas Piggin <npiggin@gmail.com>,
-	Christophe Leroy <christophe.leroy@csgroup.eu>,
-	Naveen N Rao <naveen@kernel.org>,
-	Madhavan Srinivasan <maddy@linux.ibm.com>,
-	Heiko Carstens <hca@linux.ibm.com>,
-	Vasily Gorbik <gor@linux.ibm.com>,
-	Alexander Gordeev <agordeev@linux.ibm.com>,
-	Christian Borntraeger <borntraeger@linux.ibm.com>,
-	Sven Schnelle <svens@linux.ibm.com>,
-	Haren Myneni <haren@linux.ibm.com>,
-	Rick Lindsley <ricklind@linux.ibm.com>,
-	Nick Child <nnac123@linux.ibm.com>,
-	Thomas Falcon <tlfalcon@linux.ibm.com>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	"Michael S. Tsirkin" <mst@redhat.com>,
-	Jason Wang <jasowang@redhat.com>,
-	Xuan Zhuo <xuanzhuo@linux.alibaba.com>,
-	=?UTF-8?q?Eugenio=20P=C3=A9rez?= <eperezma@redhat.com>,
-	Keith Busch <kbusch@kernel.org>,
-	Jens Axboe <axboe@kernel.dk>,
-	Christoph Hellwig <hch@lst.de>,
-	Sagi Grimberg <sagi@grimberg.me>,
-	"K. Y. Srinivasan" <kys@microsoft.com>,
-	Haiyang Zhang <haiyangz@microsoft.com>,
-	Wei Liu <wei.liu@kernel.org>,
-	Dexuan Cui <decui@microsoft.com>,
-	Lorenzo Pieralisi <lpieralisi@kernel.org>,
-	=?UTF-8?q?Krzysztof=20Wilczy=C5=84ski?= <kw@linux.com>,
-	Manivannan Sadhasivam <manivannan.sadhasivam@linaro.org>,
-	Rob Herring <robh@kernel.org>,
-	Bjorn Helgaas <bhelgaas@google.com>,
-	James Smart <james.smart@broadcom.com>,
-	Dick Kennedy <dick.kennedy@broadcom.com>,
-	"James E.J. Bottomley" <James.Bottomley@HansenPartnership.com>,
-	"Martin K. Petersen" <martin.petersen@oracle.com>,
-	Yury Norov <yury.norov@gmail.com>,
-	Rasmus Villemoes <linux@rasmusvillemoes.dk>,
-	Matt Wu <wuqiang.matt@bytedance.com>,
-	Steffen Klassert <steffen.klassert@secunet.com>,
-	Daniel Jordan <daniel.m.jordan@oracle.com>,
-	Andrew Morton <akpm@linux-foundation.org>,
-	Greg Kurz <groug@kaod.org>,
-	Peter Xu <peterx@redhat.com>,
-	Shrikanth Hegde <sshegde@linux.ibm.com>,
-	Hendrik Brueckner <brueckner@linux.ibm.com>
-Cc: Bjorn Helgaas <helgaas@kernel.org>
-Subject: [PATCH v2 06/13] cpumask: re-introduce cpumask_next{,_and}_wrap()
-Date: Tue, 28 Jan 2025 11:46:35 -0500
-Message-ID: <20250128164646.4009-7-yury.norov@gmail.com>
-X-Mailer: git-send-email 2.43.0
-In-Reply-To: <20250128164646.4009-1-yury.norov@gmail.com>
-References: <20250128164646.4009-1-yury.norov@gmail.com>
+        d=1e100.net; s=20230601; t=1738083092; x=1738687892;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=rboJfVxLlAbl2p+2/ud8/N7Cynxru4+mLw79GAjRHYA=;
+        b=J+73hLCjmH18RbiUxqUOeG7XVaKbp5+08r6LDgToeYMgi6vT4sxJCB/rl+UtofwGXS
+         SNCQaHhtbS7p1e0BXeG4EVrR0UhE2S26V3DNMoBGSKkTifin3Wpc2Hb7eGWimFDJ1VDI
+         ipPK/TjOQ6HFIl8Hef9Px6mZiJ5ahaYORrWwHn9L0uBi8qXvhdRpmjBLV2J0F95bndrk
+         4FdYEcEEvCK5YYNHS6qYSBCTcKQexHyh4G2khjb1KMU9iGRBTmPGqM/Wziwm8uLEs4Lt
+         gEUwQS062pXEWFuDpaDo1qOlhGUKr+bHDYOpXu2mvHjVpmb04vSr6W4SUUN/L2vH1ba7
+         /olg==
+X-Gm-Message-State: AOJu0YzcCwIFcg2pxjCZvmKGVcdE2FOkZsC7zFo+eI+XF1wAZick1Q7h
+	xUCMrM66MVL0J+79UaKCtQHAhtpm25JvL3/Syhq41sgTmBV9WZuIML18HGZLfY5TDexQYR8ugZz
+	MLSJnR5X30bs6GJn2nRgv0Z0Hl/hNXU0RpLPYq7TKRG0foygfm65YmVzAuHmIid1n
+X-Gm-Gg: ASbGncuuB8OW6767xzcLUin7l3Iv1tb5V8BiYFaRoTBiAXq+aO5bQ0uL4CRUbFVXSYG
+	GwPHveaxviGxE4+DKG7QXmlYmsFKE6k2KQk+FcCKJAflRMoMA20i1Dgv57H9L9RLuQycTOytCUA
+	/p9pOwzyO0lGvzfQh2Tn811atuTOS9RXAkS93ngIi1phzsZnm4chVdi2vEKP8se2z1Lse18QjgX
+	TzGnaTmW6NC0LktbpfatCD1MIfAYj1b1vz7V3mvoTH6/yYyf9jny3V0hy/8Ctj87fDrwY9QZGsL
+	Qgs=
+X-Received: by 2002:a05:622a:199b:b0:46c:728c:8862 with SMTP id d75a77b69052e-46e12ab5b44mr741513551cf.31.1738083091566;
+        Tue, 28 Jan 2025 08:51:31 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IFWMOKu3lU0YUt5wBrqc9F1Vb18MZCLlzXjmORmdWniXRd2yyciy6lpkjhypCkXKu8l02olUQ==
+X-Received: by 2002:a05:622a:199b:b0:46c:728c:8862 with SMTP id d75a77b69052e-46e12ab5b44mr741512991cf.31.1738083091058;
+        Tue, 28 Jan 2025 08:51:31 -0800 (PST)
+Received: from [10.0.0.215] ([24.225.235.209])
+        by smtp.gmail.com with ESMTPSA id d75a77b69052e-46fc968abc1sm6680311cf.58.2025.01.28.08.51.29
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 28 Jan 2025 08:51:30 -0800 (PST)
+Message-ID: <415dde0a-2272-45d2-8fa8-473fe7637a78@redhat.com>
+Date: Tue, 28 Jan 2025 11:51:29 -0500
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [net,v3] tcp: correct handling of extreme memory squeeze
+To: Eric Dumazet <edumazet@google.com>
+Cc: netdev@vger.kernel.org, davem@davemloft.net, kuba@kernel.org,
+ passt-dev@passt.top, sbrivio@redhat.com, lvivier@redhat.com,
+ dgibson@redhat.com, memnglong8.dong@gmail.com, kerneljasonxing@gmail.com,
+ ncardwell@google.com, eric.dumazet@gmail.com
+References: <20250127231304.1465565-1-jmaloy@redhat.com>
+ <CANn89i+x2RGHDA6W-oo=Hs8bM=4Ao_aAKFsRrFhq=U133j+FvA@mail.gmail.com>
+Content-Language: en-US
+From: Jon Maloy <jmaloy@redhat.com>
+In-Reply-To: <CANn89i+x2RGHDA6W-oo=Hs8bM=4Ao_aAKFsRrFhq=U133j+FvA@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
 
-cpumask_next_wrap_old() has two additional parameters, comparing to its
-generic counterpart find_next_bit_wrap(). The reason for that is
-historical.
 
-Before 4fe49b3b97c262 ("lib/bitmap: introduce for_each_set_bit_wrap()
-macro"), cpumask_next_wrap() was used to implement for_each_cpu_wrap()
-iterator. Now that the iterator is an alias to generic
-for_each_set_bit_wrap(), the additional parameters aren't used and may
-confuse readers.
 
-All existing users call cpumask_next_wrap() in a way that makes it
-possible to turn it to straight and simple alias to find_next_bit_wrap().
+On 2025-01-28 10:04, Eric Dumazet wrote:
+> On Tue, Jan 28, 2025 at 12:13 AM <jmaloy@redhat.com> wrote:
+>>
+>> From: Jon Maloy <jmaloy@redhat.com>
+>>
+>> Testing with iperf3 using the "pasta" protocol splicer has revealed
+>> a bug in the way tcp handles window advertising in extreme memory
+>> squeeze situations.
+>>
+>> Under memory pressure, a socket endpoint may temporarily advertise
+>> a zero-sized window, but this is not stored as part of the socket data.
+>> The reasoning behind this is that it is considered a temporary setting
+>> which shouldn't influence any further calculations.
+>>
+>> However, if we happen to stall at an unfortunate value of the current
+>> window size, the algorithm selecting a new value will consistently fail
+>> to advertise a non-zero window once we have freed up enough memory.
+>> This means that this side's notion of the current window size is
+>> different from the one last advertised to the peer, causing the latter
+>> to not send any data to resolve the sitution.
+>>
+>> The problem occurs on the iperf3 server side, and the socket in question
+>> is a completely regular socket with the default settings for the
+>> fedora40 kernel. We do not use SO_PEEK or SO_RCVBUF on the socket.
+>>
+>> The following excerpt of a logging session, with own comments added,
+>> shows more in detail what is happening:
+>>
+>> //              tcp_v4_rcv(->)
+>> //                tcp_rcv_established(->)
+>> [5201<->39222]:     ==== Activating log @ net/ipv4/tcp_input.c/tcp_data_queue()/5257 ====
+>> [5201<->39222]:     tcp_data_queue(->)
+>> [5201<->39222]:        DROPPING skb [265600160..265665640], reason: SKB_DROP_REASON_PROTO_MEM
+>>                         [rcv_nxt 265600160, rcv_wnd 262144, snt_ack 265469200, win_now 131184]
+>>                         [copied_seq 259909392->260034360 (124968), unread 5565800, qlen 85, ofoq 0]
+>>                         [OFO queue: gap: 65480, len: 0]
+>> [5201<->39222]:     tcp_data_queue(<-)
+>> [5201<->39222]:     __tcp_transmit_skb(->)
+>>                          [tp->rcv_wup: 265469200, tp->rcv_wnd: 262144, tp->rcv_nxt 265600160]
+>> [5201<->39222]:       tcp_select_window(->)
+>> [5201<->39222]:         (inet_csk(sk)->icsk_ack.pending & ICSK_ACK_NOMEM) ? --> TRUE
+>>                          [tp->rcv_wup: 265469200, tp->rcv_wnd: 262144, tp->rcv_nxt 265600160]
+>>                          returning 0
+>> [5201<->39222]:       tcp_select_window(<-)
+>> [5201<->39222]:       ADVERTISING WIN 0, ACK_SEQ: 265600160
+>> [5201<->39222]:     [__tcp_transmit_skb(<-)
+>> [5201<->39222]:   tcp_rcv_established(<-)
+>> [5201<->39222]: tcp_v4_rcv(<-)
+>>
+>> // Receive queue is at 85 buffers and we are out of memory.
+>> // We drop the incoming buffer, although it is in sequence, and decide
+>> // to send an advertisement with a window of zero.
+>> // We don't update tp->rcv_wnd and tp->rcv_wup accordingly, which means
+>> // we unconditionally shrink the window.
+>>
+>> [5201<->39222]: tcp_recvmsg_locked(->)
+>> [5201<->39222]:   __tcp_cleanup_rbuf(->) tp->rcv_wup: 265469200, tp->rcv_wnd: 262144, tp->rcv_nxt 265600160
+>> [5201<->39222]:     [new_win = 0, win_now = 131184, 2 * win_now = 262368]
+>> [5201<->39222]:     [new_win >= (2 * win_now) ? --> time_to_ack = 0]
+>> [5201<->39222]:     NOT calling tcp_send_ack()
+>>                      [tp->rcv_wup: 265469200, tp->rcv_wnd: 262144, tp->rcv_nxt 265600160]
+>> [5201<->39222]:   __tcp_cleanup_rbuf(<-)
+>>                    [rcv_nxt 265600160, rcv_wnd 262144, snt_ack 265469200, win_now 131184]
+>>                    [copied_seq 260040464->260040464 (0), unread 5559696, qlen 85, ofoq 0]
+>>                    returning 6104 bytes
+>> [5201<->39222]: tcp_recvmsg_locked(<-)
+>>
+>> // After each read, the algorithm for calculating the new receive
+>> // window in __tcp_cleanup_rbuf() finds it is too small to advertise
+>> // or to update tp->rcv_wnd.
+>> // Meanwhile, the peer thinks the window is zero, and will not send
+>> // any more data to trigger an update from the interrupt mode side.
+>>
+>> [5201<->39222]: tcp_recvmsg_locked(->)
+>> [5201<->39222]:   __tcp_cleanup_rbuf(->) tp->rcv_wup: 265469200, tp->rcv_wnd: 262144, tp->rcv_nxt 265600160
+>> [5201<->39222]:     [new_win = 262144, win_now = 131184, 2 * win_now = 262368]
+>> [5201<->39222]:     [new_win >= (2 * win_now) ? --> time_to_ack = 0]
+>> [5201<->39222]:     NOT calling tcp_send_ack()
+>>                      [tp->rcv_wup: 265469200, tp->rcv_wnd: 262144, tp->rcv_nxt 265600160]
+>> [5201<->39222]:   __tcp_cleanup_rbuf(<-)
+>>                    [rcv_nxt 265600160, rcv_wnd 262144, snt_ack 265469200, win_now 131184]
+>>                    [copied_seq 260099840->260171536 (71696), unread 5428624, qlen 83, ofoq 0]
+>>                    returning 131072 bytes
+>> [5201<->39222]: tcp_recvmsg_locked(<-)
+>>
+>> // The above pattern repeats again and again, since nothing changes
+>> // between the reads.
+>>
+>> [...]
+>>
+>> [5201<->39222]: tcp_recvmsg_locked(->)
+>> [5201<->39222]:   __tcp_cleanup_rbuf(->) tp->rcv_wup: 265469200, tp->rcv_wnd: 262144, tp->rcv_nxt 265600160
+>> [5201<->39222]:     [new_win = 262144, win_now = 131184, 2 * win_now = 262368]
+>> [5201<->39222]:     [new_win >= (2 * win_now) ? --> time_to_ack = 0]
+>> [5201<->39222]:     NOT calling tcp_send_ack()
+>>                      [tp->rcv_wup: 265469200, tp->rcv_wnd: 262144, tp->rcv_nxt 265600160]
+>> [5201<->39222]:   __tcp_cleanup_rbuf(<-)
+>>                    [rcv_nxt 265600160, rcv_wnd 262144, snt_ack 265469200, win_now 131184]
+>>                    [copied_seq 265600160->265600160 (0), unread 0, qlen 0, ofoq 0]
+>>                    returning 54672 bytes
+>> [5201<->39222]: tcp_recvmsg_locked(<-)
+>>
+>> // The receive queue is empty, but no new advertisement has been sent.
+>> // The peer still thinks the receive window is zero, and sends nothing.
+>> // We have ended up in a deadlock situation.
+> 
+> This so-called 'deadlock' only occurs if a remote TCP stack is unable
+> to send win0 probes.
+> 
+> In this case, sending some ACK will not help reliably if these ACK get lost.
+> 
+> I find the description tries very hard to hide a bug in another stack,
+> for some reason.
 
-In a couple of places kernel users opencode missing cpumask_next_and_wrap().
-Add it as well.
+I clearly stated in a previous comment that this was the case, and that
+it has been fixed now. My reason for posting this is because I still
+think this is a bug, just as I think the way we use rcv_ssthresh in 
+_tcp_select)window() is a bug that eventually should be fixed.
 
-CC: Alexander Gordeev <agordeev@linux.ibm.com>
-CC: Bjorn Helgaas <helgaas@kernel.org>
-Signed-off-by: Yury Norov <yury.norov@gmail.com>
----
- include/linux/cpumask.h | 38 ++++++++++++++++++++++++++++++++++++++
- 1 file changed, 38 insertions(+)
-
-diff --git a/include/linux/cpumask.h b/include/linux/cpumask.h
-index b267a4f6a917..4f3d8d66e86e 100644
---- a/include/linux/cpumask.h
-+++ b/include/linux/cpumask.h
-@@ -284,6 +284,44 @@ unsigned int cpumask_next_and(int n, const struct cpumask *src1p,
- 		small_cpumask_bits, n + 1);
- }
- 
-+/**
-+ * cpumask_next_and_wrap - get the next cpu in *src1p & *src2p, starting from
-+ *			   @n+1. If nothing found, wrap around and start from
-+ *			   the beginning
-+ * @n: the cpu prior to the place to search (i.e. search starts from @n+1)
-+ * @src1p: the first cpumask pointer
-+ * @src2p: the second cpumask pointer
-+ *
-+ * Return: next set bit, wrapped if needed, or >= nr_cpu_ids if @src1p & @src2p is empty.
-+ */
-+static __always_inline
-+unsigned int cpumask_next_and_wrap(int n, const struct cpumask *src1p,
-+			      const struct cpumask *src2p)
-+{
-+	/* -1 is a legal arg here. */
-+	if (n != -1)
-+		cpumask_check(n);
-+	return find_next_and_bit_wrap(cpumask_bits(src1p), cpumask_bits(src2p),
-+		small_cpumask_bits, n + 1);
-+}
-+
-+/**
-+ * cpumask_next_wrap - get the next cpu in *src, starting from @n+1. If nothing
-+ *		       found, wrap around and start from the beginning
-+ * @n: the cpu prior to the place to search (i.e. search starts from @n+1)
-+ * @src: cpumask pointer
-+ *
-+ * Return: next set bit, wrapped if needed, or >= nr_cpu_ids if @src is empty.
-+ */
-+static __always_inline
-+unsigned int cpumask_next_wrap(int n, const struct cpumask *src)
-+{
-+	/* -1 is a legal arg here. */
-+	if (n != -1)
-+		cpumask_check(n);
-+	return find_next_bit_wrap(cpumask_bits(src), small_cpumask_bits, n + 1);
-+}
-+
- /**
-  * for_each_cpu - iterate over every cpu in a mask
-  * @cpu: the (optionally unsigned) integer iterator
--- 
-2.43.0
+> 
+> When under memory stress, not sending an opening ACK as fast as possible,
+> giving time for the host to recover from this memory stress was also a
+> sensible thing to do.
+> 
+> Reviewed-by: Eric Dumazet <edumazet@google.com>
+> 
+> Thanks for the fix.
+> 
 
 
