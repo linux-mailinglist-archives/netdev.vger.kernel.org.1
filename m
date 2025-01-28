@@ -1,129 +1,102 @@
-Return-Path: <netdev+bounces-161239-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-161240-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id BD7E7A20289
-	for <lists+netdev@lfdr.de>; Tue, 28 Jan 2025 01:19:50 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3C1A7A2028B
+	for <lists+netdev@lfdr.de>; Tue, 28 Jan 2025 01:20:11 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 17D113A13F8
-	for <lists+netdev@lfdr.de>; Tue, 28 Jan 2025 00:19:43 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 7AC951884069
+	for <lists+netdev@lfdr.de>; Tue, 28 Jan 2025 00:20:15 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8466F16419;
-	Tue, 28 Jan 2025 00:19:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5CB801FA4;
+	Tue, 28 Jan 2025 00:20:07 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="aLZ0bXpo"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="k3Oi2/pb"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-io1-f46.google.com (mail-io1-f46.google.com [209.85.166.46])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0C3D016415;
-	Tue, 28 Jan 2025 00:19:45 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.46
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 37AD023BB
+	for <netdev@vger.kernel.org>; Tue, 28 Jan 2025 00:20:06 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1738023587; cv=none; b=O0XW9eSiLDOvZPBLXPtTRw3b4dv/s2DP1lBgeDvHjqZIODiyBaqQreyWiyXWWT9w82kwGoCbg8Jf5m2SG5T70sDmoRE7xDkQMDLKKXpxpocXZc2pRSJqRTAk/gOGP+pAbl90L7OpcnQK4r+LihGxcNQiGg2W4AcNtn3KOHRl6Uo=
+	t=1738023607; cv=none; b=XckbVFZV+HhqP3/1NvxSEcMKJJs0HOwBgLxDLFtvF9ImeA5pJTItwyO6VUdiGcRIbwZMxKxWuD7YGqTocmeqjPsp19xh8qiRxEW2RGv5w9mIIassQrNZwCXfrd78GGMDPMDA9UOX3QTUVG6ZeDnQl+tJxPB4dPJrmn9hYMPjBzQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1738023587; c=relaxed/simple;
-	bh=CQPutVse/DEyP2XKii8SJ79omHPZaCdgojtQO4vSnEo=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=It+rHlET/sLDywOon244QY1pDSPoiC2oP0NnZzNRqat/Mp9pDVupwEs28DHyv7vNL9dUNpGwLvRbyHdjK6E0QiCgg6r1d+agf2ra4SLSIR88wBJQ4aapn85PVGKIYToR3C4vo3oXKz+w+dva0Ll/Rgbj89Lov3cRs1iJdcSrYkM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=aLZ0bXpo; arc=none smtp.client-ip=209.85.166.46
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-io1-f46.google.com with SMTP id ca18e2360f4ac-844ce213af6so138964039f.1;
-        Mon, 27 Jan 2025 16:19:45 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1738023585; x=1738628385; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=CQPutVse/DEyP2XKii8SJ79omHPZaCdgojtQO4vSnEo=;
-        b=aLZ0bXpo3+ig5zdqscbuEmp64gefOXxLSiWk9IGDrBr0H7/wwXkNwM9LSGWixWwkPN
-         Pv6N/KExUbOlaf+39uM22WKxCwN2Ll46AT7ac3aEn0JdRNiEwVAg2L0r7vjX+owsgvvZ
-         Wx73P3Hn5ZBd0+5WeJF6HG0YGq5Xg4+t1Ay9loPoYITzEK2HJiWtzQ19vuvixTWRwzdz
-         wyBdqdm2gaUBhR3XKXm7TZlH0JJJeraZDfZJjth028NH6zaMpdFLQXNzh4Y4rGUOkOEt
-         ac18gSeJ8ieit19wDvPb55PfOV6lQqF4eafNV3DtuZGQGcBCjJK3QN3MWrM5CXA4Yju1
-         WmAQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1738023585; x=1738628385;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=CQPutVse/DEyP2XKii8SJ79omHPZaCdgojtQO4vSnEo=;
-        b=hyCPPSLOi7sbxn99Et72zft2OmCwx/40ULbhj3DFlPtevSppIpRToVOv2WpHwaXRNW
-         tOKZ3zHsb4txGqtmKN2tCvyUy0RIsLF6ylEApJ4FqLgWRk1Gl7rqEJeG6z5NzFK+XH/y
-         tFKhNQm+73WigZRY+a2NImkN3veugSQZm/fQkZAu+pYDn1cejgwdPLb85O0SVYJfLSsY
-         1/DxrHq9PXWSZTCTPjgIi6oAbuwJLmwhWRjZezoOgWld288VgbMOhJaLQ2uWeMqMSngC
-         P+XQVUuoVi02UsrUHiz1eSNEW2euj8Qlr9jg5FgIstiGwl/Rbdu5Tw63PJw40ZCQRYV3
-         95uw==
-X-Forwarded-Encrypted: i=1; AJvYcCV0UuD9jJN4XPRE8rHVIJ3JG5w8QcJwB2+ff3l2iyv0uQ4neHsZLfmVebsSUqGjUv3V6do=@vger.kernel.org, AJvYcCW9gA9AdXbFEq67kQDJOAGm0gSC49Khos2kT/Wg12dBFxRMJHG8xHrq8U8FnAK7te5goukIU3Vt@vger.kernel.org
-X-Gm-Message-State: AOJu0Yx6fRSGPagiTRHgVUqouNxjg7hzXhSKPS9DmFXjclsi0kUTrKHm
-	zLHG2ih9cDI2+cH9jYnw4FhHkpQP51LDTakr/LgMsK/r0p4wF/aMxShR7PzbN4y4IRkDwBmfIwR
-	R0Ag8PTysVzGPOoJdOTuNec4SX54=
-X-Gm-Gg: ASbGncs39ETtuAnuheAmqlbSr/y5uwa0Bom2e+ItpgYZdyCa4NwBloSoozkxVKe7/03
-	6woy3WbZG9RF8WAdANWQOa4iPwdU6bW7EXtyMc+op/hDh/CdeoGkIrrogc0yF
-X-Google-Smtp-Source: AGHT+IH5YfvUQofN/ifqH3btdlsZaUo8Yu7ZpRSJieOZ9sdpcy2svVfl3QxvK9Zgw8/0y6p/cDPPm+UWf44gIxxJ2kQ=
-X-Received: by 2002:a05:6e02:20e7:b0:3ce:7fc3:9f76 with SMTP id
- e9e14a558f8ab-3cf743eae5amr325895715ab.6.1738023585074; Mon, 27 Jan 2025
- 16:19:45 -0800 (PST)
+	s=arc-20240116; t=1738023607; c=relaxed/simple;
+	bh=9tXlFeDf1WNttyldfHd1br1hIl+zHnyrhYpHwzoNih4=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=KymHx2fyFclCFwyPDH8MEre6eUHo3EcMlGShG++lzcZyZJWCtmZ+TvV1eUnPXy3xEVJskaG4BLuEyaviJZJunMnTeD+jiwetP++pVABFOHlx+A4y5WavwytZ2AkYEg9bG2ytbyNC4sCJ7advBZLR3jaX9XwQo0ea4g/JDBFl2CQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=k3Oi2/pb; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9BBEBC4CED2;
+	Tue, 28 Jan 2025 00:20:06 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1738023606;
+	bh=9tXlFeDf1WNttyldfHd1br1hIl+zHnyrhYpHwzoNih4=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=k3Oi2/pbtDLw4g1QB8t92DJDOX7bsrA/v7AtIivgg3H3/wekfWvacE/wXXiUaJk1t
+	 7VUdvL2kofllbIG+ui5mwyij0lawXjXZWFLgDNGsaAOBgQ0QgLFu4OJH3VD4KIJRsF
+	 13Wn3H4vkL0TI81ojATzpCfizZr6d/scR1NyQJBHqX+CfFjAgqlvikil5SUwI3deos
+	 4XwmFoyzoAm9aAPrKa4XNTKf+PlTYS0nqvXtFWpJf9JOgkN/sKpDpLjOrHdo5XtpcF
+	 cf8KlNsRXHJb1UnFcIQ5varPz/dOlwtC0fqbL98puEq6bQAYc/rCz9OeGU7npy3k+5
+	 x70AjGF6jSxTQ==
+Received: from [10.30.226.235] (localhost [IPv6:::1])
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 70CE6380AA63;
+	Tue, 28 Jan 2025 00:20:33 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250121012901.87763-1-kerneljasonxing@gmail.com>
- <20250121012901.87763-14-kerneljasonxing@gmail.com> <564d8d62-3148-41a1-ae08-ed4ad08996d3@linux.dev>
- <CAL+tcoCpJESydmRXp9ASeXYjFkjOyXn+dF+7dYa0Ek6DdnMHKw@mail.gmail.com> <29073a9e-23ea-49c2-b0ad-d33bd3ea8974@linux.dev>
-In-Reply-To: <29073a9e-23ea-49c2-b0ad-d33bd3ea8974@linux.dev>
-From: Jason Xing <kerneljasonxing@gmail.com>
-Date: Tue, 28 Jan 2025 08:19:09 +0800
-X-Gm-Features: AWEUYZlxauSbaAiKtImkBAcXJAZ5a4vSHBqSdcRo6g46Ajkj_6nC5gSfDt6wnUw
-Message-ID: <CAL+tcoCOLZy-hsASN5St+9HK_y47VHGO3fbyvzxG5-D0jBB5WQ@mail.gmail.com>
-Subject: Re: [RFC PATCH net-next v6 13/13] bpf: add simple bpf tests in the tx
- path for so_timestamping feature
-To: Martin KaFai Lau <martin.lau@linux.dev>
-Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org, 
-	pabeni@redhat.com, dsahern@kernel.org, willemdebruijn.kernel@gmail.com, 
-	willemb@google.com, ast@kernel.org, daniel@iogearbox.net, andrii@kernel.org, 
-	eddyz87@gmail.com, song@kernel.org, yonghong.song@linux.dev, 
-	john.fastabend@gmail.com, kpsingh@kernel.org, sdf@fomichev.me, 
-	haoluo@google.com, jolsa@kernel.org, horms@kernel.org, bpf@vger.kernel.org, 
-	netdev@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH 1/5] xfrm: replay: Fix the update of replay_esn->oseq_hi for
+ GSO
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <173802363226.3270482.10141084426152181904.git-patchwork-notify@kernel.org>
+Date: Tue, 28 Jan 2025 00:20:32 +0000
+References: <20250127060757.3946314-2-steffen.klassert@secunet.com>
+In-Reply-To: <20250127060757.3946314-2-steffen.klassert@secunet.com>
+To: Steffen Klassert <steffen.klassert@secunet.com>
+Cc: davem@davemloft.net, kuba@kernel.org, herbert@gondor.apana.org.au,
+ netdev@vger.kernel.org
 
-On Tue, Jan 28, 2025 at 7:49=E2=80=AFAM Martin KaFai Lau <martin.lau@linux.=
-dev> wrote:
->
-> On 1/24/25 7:42 PM, Jason Xing wrote:
-> >> Please also add some details on how the UDP BPF_SOCK_OPS_TS_TCP_SND_CB=
- (or to be
-> >> renamed to BPF_SOCK_OPS_TS_SND_CB ?) will look like. It is the only ca=
-llback
-> >> that I don't have a clear idea for UDP.
-> > I think I will rename it as you said. But I wonder if I can add more
-> > details about UDP after this series gets merged which should not be
-> > too late. After this series, I will carefully consider and test how we
-> > use for UDP type.
->
-> Not asking for a full UDP implementation, having this set staying with TC=
-P is
-> ok. We have pretty clear idea on all the new TS_*_CB will work in UDP exc=
-ept the
-> TS_SND_CB.
->
-> I am asking at least a description on where this SND hook will be in UDP =
-and how
-> the delay will be measured from the udp_sendmsg(). I haven't looked, so t=
-he
-> question. It is better to get some visibility first instead of scrambling=
- to
-> change it after landing to -next.
+Hello:
 
-No problem. Let me give it more thoughts :)
+This series was applied to netdev/net.git (main)
+by Steffen Klassert <steffen.klassert@secunet.com>:
 
-Thanks,
-Jason
+On Mon, 27 Jan 2025 07:07:53 +0100 you wrote:
+> From: Jianbo Liu <jianbol@nvidia.com>
+> 
+> When skb needs GSO and wrap around happens, if xo->seq.low (seqno of
+> the first skb segment) is before the last seq number but oseq (seqno
+> of the last segment) is after it, xo->seq.low is still bigger than
+> replay_esn->oseq while oseq is smaller than it, so the update of
+> replay_esn->oseq_hi is missed for this case wrap around because of
+> the change in the cited commit.
+> 
+> [...]
+
+Here is the summary with links:
+  - [1/5] xfrm: replay: Fix the update of replay_esn->oseq_hi for GSO
+    https://git.kernel.org/netdev/net/c/c05c5e5aa163
+  - [2/5] xfrm: state: fix out-of-bounds read during lookup
+    https://git.kernel.org/netdev/net/c/e952837f3ddb
+  - [3/5] xfrm: delete intermediate secpath entry in packet offload mode
+    https://git.kernel.org/netdev/net/c/600258d555f0
+  - [4/5] xfrm: Fix the usage of skb->sk
+    https://git.kernel.org/netdev/net/c/1620c88887b1
+  - [5/5] xfrm: Don't disable preemption while looking up cache state.
+    https://git.kernel.org/netdev/net/c/6c9b7db96db6
+
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
+
+
 
