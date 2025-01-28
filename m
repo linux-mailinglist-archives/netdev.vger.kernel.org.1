@@ -1,263 +1,232 @@
-Return-Path: <netdev+bounces-161237-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-161235-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1CFDEA20245
-	for <lists+netdev@lfdr.de>; Tue, 28 Jan 2025 01:07:49 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 85462A2023C
+	for <lists+netdev@lfdr.de>; Tue, 28 Jan 2025 01:07:38 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 3483418842D9
-	for <lists+netdev@lfdr.de>; Tue, 28 Jan 2025 00:07:53 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 9C5731884FBA
+	for <lists+netdev@lfdr.de>; Tue, 28 Jan 2025 00:07:42 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1444718C01D;
-	Tue, 28 Jan 2025 00:06:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="YVMdUUsP"
-X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7623C33CFC;
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9F4F8664C6;
 	Tue, 28 Jan 2025 00:06:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="j3QyAzEY"
+X-Original-To: netdev@vger.kernel.org
+Received: from mail-pl1-f182.google.com (mail-pl1-f182.google.com [209.85.214.182])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9D6282F29
+	for <netdev@vger.kernel.org>; Tue, 28 Jan 2025 00:06:35 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.182
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1738022797; cv=none; b=czQx09cJQyQSZBP1BGgcNSPDnT/33NLH458yGgYegrxzEkMlKIWHpoEiTAZ81pp0GgYXFyfn2bx+1M2nBKPqio9+O9McP1ALYdDeIrCoR2S9pBV33Hu9yjghdInZOAMNq5+aqlc8LYgOqjeumxcERC58NaqefZZ9Ri/y5OdRAMY=
+	t=1738022797; cv=none; b=biEBMidMSS1BmP10MZX6tTDIuJ4o523a0SUXohKDOOsCKlL/NxrIwJZtRO3tOc1QIAPt7Fmie5WfKNAE+WQ2ekJ0hvldG/8gt5BgIXRKFcFEUd3Dx6L8h3T+AUrBmOSqGgWfYle9InpcgzTZjggIqGeaDu3jaerO3jrOTVEo2kE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1738022797; c=relaxed/simple;
-	bh=x0APBPBQWrivChaCg4k0Jly7N3L+drRwEE2afrYm3Ko=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=pG7vhzPeB2x/+yDwbNhJFIvm2jB/JWVTv+koS8hxTDg5Z8vqsXUMFlVaWKj0c1vnGe3Ib5tI8WY+a0QWCU7JGNxXNd2ZOTeL6JU+kenOZTLGkalPyzF3gOL/8SADA4mtZH/PNqc1Qu9OOsNupeiDlZQVhQmePYu7Rk4kIqicx/M=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=YVMdUUsP; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id BA0CDC4CEE7;
-	Tue, 28 Jan 2025 00:06:35 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1738022796;
-	bh=x0APBPBQWrivChaCg4k0Jly7N3L+drRwEE2afrYm3Ko=;
-	h=From:To:Cc:Subject:Date:From;
-	b=YVMdUUsPMxPbkAk4qEzxydaiheiKgPq0V/bec3NjHqtsuNI4LbgEBDEej9+LgNza+
-	 ljIEnlJ8dOW66epiiZtLELOhM7CI9Xmfl04mwJsxOPi5DZqupGOzyLYI8OrEB0YMLK
-	 2aabCdo/efDt+1ketrNTclboOiYMqtBF3chVGB2EMC4yfr4ULHJGHphSkN/9c0uXJr
-	 2zeCibWgf8wkOz10yK0tDHg/2UyTNfnmjDli87oee4K3CFTkaD0PhvQA9VygWXf7kB
-	 Qo1Ry12uzmRsVIoEnhnI2jD01cboTneK2GBz8V4u2Zk1oJeS56JxjuAeS7Lo5BEMUu
-	 9jWWaNQP5ViKg==
-Received: from mchehab by mail.kernel.org with local (Exim 4.98)
-	(envelope-from <mchehab+huawei@kernel.org>)
-	id 1tcZ7h-0000000DRKO-2KyQ;
-	Tue, 28 Jan 2025 01:06:33 +0100
-From: Mauro Carvalho Chehab <mchehab+huawei@kernel.org>
-To: Linux Doc Mailing List <linux-doc@vger.kernel.org>,
-	Jonathan Corbet <corbet@lwn.net>,
-	Greg Kroah-Hartman <gregkh@linuxfoundation.org>
-Cc: Mauro Carvalho Chehab <mchehab+huawei@kernel.org>,
-	Mauro Carvalho Chehab <mchehab+huawei@kernel.org>,
-	linux-kernel@vger.kernel.org,
-	bpf@vger.kernel.org,
-	coresight@lists.linaro.org,
-	linux-arm-kernel@lists.infradead.org,
-	linux-block@vger.kernel.org,
-	linux-f2fs-devel@lists.sourceforge.net,
-	linux-hardening@vger.kernel.org,
-	linux-iio@vger.kernel.org,
-	linux-media@vger.kernel.org,
-	linux-pm@vger.kernel.org,
-	linux-usb@vger.kernel.org,
-	linux-wireless@vger.kernel.org,
-	netdev@vger.kernel.org,
-	workflows@vger.kernel.org
-Subject: [RFC v2 00/38] Improve ABI documentation generation
-Date: Tue, 28 Jan 2025 01:05:49 +0100
-Message-ID: <cover.1738020236.git.mchehab+huawei@kernel.org>
-X-Mailer: git-send-email 2.48.1
+	bh=vIYGlQQLzAw46r0Z3bDzT2a7FcE9eES5fcBOVr9hdHg=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=rTG9HvJOeDUGj6Kt/ZDyNAzG8JYDOaysp2TPkZqX0LAJehLcOfkI/XBoq4iR9SY4kiyupaJeTf7y2dX0g7xnZtKhRaaoWMq8oJnBfBcu8MW4ynIOejPEoWzI8WCoLALi5jQk876EKxyHrxljsozwnKjBgZ//0UOPEy98DRtv/o0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=j3QyAzEY; arc=none smtp.client-ip=209.85.214.182
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-pl1-f182.google.com with SMTP id d9443c01a7336-219f6ca9a81so26945ad.1
+        for <netdev@vger.kernel.org>; Mon, 27 Jan 2025 16:06:35 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1738022795; x=1738627595; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=GTwUA9HGZNHUf+5UwlxxWdcBSpL25QR1010NZd1Op4g=;
+        b=j3QyAzEYHiXDCtJ/sK3ZIfjxcd/MCDLVElgd2dLDaptXArB0dPptI2JC3DNBQirRCo
+         usu9FyVk/OgxzpI+Z79RpoANbbrn/4emDX5RrwdeFRjTiaDMj+lXcm9DF4So+Xnnk2Y6
+         dKuc7yj5PhqRZIgFlgVp35YCwhfjC31IlCOHs9RKYlMCHf4E7Fiv3UQg4gJefpnyoF9u
+         h/Ka2bxzzCLF8Vb06uLE9R/rvAgYSDa4codFyblpm3GAxPZbVVro9GaEtTPWUtjlA+gf
+         qFEQERrQg1XqL1fREnbImlFyvObTXAu/eRlrGqSGBYDBCzv53r9npJW7BgvNMRoUwiJ7
+         zKow==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1738022795; x=1738627595;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=GTwUA9HGZNHUf+5UwlxxWdcBSpL25QR1010NZd1Op4g=;
+        b=aUQY7KQVR4hu1ypY1vvvoV540C4Wz7AjPt2Jp6Y+f6zIwsk+6RmXTMy0wejmidsg7K
+         6lTE2irf11OgS8KBTKz+jkqOsh4jSZN+x/DJ9I0NuM0E3GyqkL5xlDFhxLa1KuXqZvQa
+         XTTKeD+8bAKUVMrFJHhr5tdmPmc6P+cnno64awui+0UxFFYs2u8VB3JHEUXyn1g2jGQO
+         HCgoPvio1z7yVCq6lCjT1/s+i1iqqNt5BpvDnyHNfk9EXYWVxzLiGrFydNOv8xdxx3YB
+         LZ95P/18hal2mg0HEhf2c7UhCMxov62/Q/LuqgbhIMbm87mjLl0x+VF5bpd4FDYrgvnx
+         Wqdw==
+X-Gm-Message-State: AOJu0YzCl37ECgt1YCtOnhvLvX7Dltn/N1HKP+Qt4XXsQKggouR3+a/n
+	zKIgOHFy5hHFWmqdD033op8BKi0/Flyv1IY+og5gNqMy3wQIk+OBm3n4Sm4XUT53WmwLlKclPB/
+	7vQVMU0uj5wugCo94p1Pep1bQweqdLDqUz5Ls
+X-Gm-Gg: ASbGncu8QU5sbPS4ciXDpkF0K1rCRlVovUucUx9Rvw4BPYjMNAA4YYGlOCfSeGgZYl2
+	s25cG6gQMsq66HYGH0Exni7kVJU4p9oxSDX5i82qrjqF+NlZL+fNk0voAGV8LZE6YsxBwHJHkTJ
+	yHWVVFA34gV7OHxKlU
+X-Google-Smtp-Source: AGHT+IEWittEpcVawCqb4np7OonpS+GnwzcxguFzBAVLnrbtfgn1c98rhrepzx2DgXmMJ6SbfguY6ZjS+dEcRIpKwRw=
+X-Received: by 2002:a17:903:2984:b0:21c:e45:338 with SMTP id
+ d9443c01a7336-21dce200af0mr482205ad.1.1738022794647; Mon, 27 Jan 2025
+ 16:06:34 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Sender: Mauro Carvalho Chehab <mchehab+huawei@kernel.org>
+References: <20241221004236.2629280-1-almasrymina@google.com>
+ <20241221004236.2629280-6-almasrymina@google.com> <676dd022d1388_1d346b2947@willemb.c.googlers.com.notmuch>
+In-Reply-To: <676dd022d1388_1d346b2947@willemb.c.googlers.com.notmuch>
+From: Mina Almasry <almasrymina@google.com>
+Date: Mon, 27 Jan 2025 16:06:21 -0800
+X-Gm-Features: AWEUYZnxo-6ZVhmi6iBgygbjpRKTRKCgXG5DlMCN1ewQwSYGdgpaX28wNMX5igU
+Message-ID: <CAHS8izNzbEi_Dn+hDohF9Go=et7kts-BnmEpq=Znpot7o7B5wA@mail.gmail.com>
+Subject: Re: [PATCH RFC net-next v1 5/5] net: devmem: Implement TX path
+To: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
+Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	linux-doc@vger.kernel.org, virtualization@lists.linux.dev, 
+	kvm@vger.kernel.org, linux-kselftest@vger.kernel.org, 
+	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, 
+	Donald Hunter <donald.hunter@gmail.com>, Jonathan Corbet <corbet@lwn.net>, 
+	Andrew Lunn <andrew+netdev@lunn.ch>, David Ahern <dsahern@kernel.org>, 
+	"Michael S. Tsirkin" <mst@redhat.com>, Jason Wang <jasowang@redhat.com>, 
+	Xuan Zhuo <xuanzhuo@linux.alibaba.com>, =?UTF-8?Q?Eugenio_P=C3=A9rez?= <eperezma@redhat.com>, 
+	Stefan Hajnoczi <stefanha@redhat.com>, Stefano Garzarella <sgarzare@redhat.com>, Shuah Khan <shuah@kernel.org>, 
+	Kaiyuan Zhang <kaiyuanz@google.com>, Pavel Begunkov <asml.silence@gmail.com>, 
+	Willem de Bruijn <willemb@google.com>, Samiullah Khawaja <skhawaja@google.com>, 
+	Stanislav Fomichev <sdf@fomichev.me>, Joe Damato <jdamato@fastly.com>, dw@davidwei.uk
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Hi Jon/Greg,
+Hi Willem, sorry for the late reply, some holiday vacations and other
+priorities pulled me away from this a bit. I'm getting ready to post
+RFC V2, so answering some questions ahead of when I do that.
 
-That's the second version of my RFC patches meant to modenize the ABI
-parser that I wrote in Perl.
+On Thu, Dec 26, 2024 at 1:52=E2=80=AFPM Willem de Bruijn
+<willemdebruijn.kernel@gmail.com> wrote:
+...
+> > +static int zerocopy_fill_skb_from_devmem(struct sk_buff *skb,
+> > +                                      struct msghdr *msg,
+> > +                                      struct iov_iter *from, int lengt=
+h)
+> > +{
+> > +     int i =3D skb_shinfo(skb)->nr_frags;
+> > +     int orig_length =3D length;
+> > +     netmem_ref netmem;
+> > +     size_t size;
+> > +
+> > +     while (length && iov_iter_count(from)) {
+> > +             if (i =3D=3D MAX_SKB_FRAGS)
+> > +                     return -EMSGSIZE;
+> > +
+> > +             size =3D min_t(size_t, iter_iov_len(from), length);
+> > +             if (!size)
+> > +                     return -EFAULT;
+>
+> On error, should caller skb_zerocopy_iter_stream rewind from, rather
+> than (or as well as) msg->msg_iter?
 
-I originally started it due to some issues I noticed when searching for
-ABI symbols. While I could just go ahead and fix the already existing
-script, I noticed that the script maintainance didn't have much care over
-all those years, probably because it is easier to find Python programmers
-those days.
+Ah, so this was confusing, because there were 2 iterators to keep
+track off, (a) binding->tx_iter, which is `from` and (b)
+msg->msg_iter.
 
-Also, the code is complex and was not using modules or classes and
-were using lots of global variables.
+Stan suggested removing binding->tx_iter entirely, so that we're back
+to using only 1 iterator, which is msg->msg_iter. That does simplify
+the code greatly, and I think addresses this comment as well, because
+there will be no need to make sure from is advanced/reverted with
+msg->msg_iter.
 
-So, I decided to rewrite it in Python. I started with a manual conversion
-for each function. Yet, to avoid future maintainership issues, I opted to
-divide the code on three classes. One class for the ABI parser, another
-one for regex conversion (used when checking symbols from local hardware,
-and an extra class for undefined symbols check.
+> > +
+> > +             netmem =3D net_iov_to_netmem(iter_iov(from)->iov_base);
+> > +             get_netmem(netmem);
+> > +             skb_add_rx_frag_netmem(skb, i, netmem, from->iov_offset, =
+size,
+> > +                                    PAGE_SIZE);
+> > +
+> > +             iov_iter_advance(from, size);
+> > +             length -=3D size;
+> > +             i++;
+> > +     }
+> > +
+> > +     iov_iter_advance(&msg->msg_iter, orig_length);
+>
+> What does this do if sendmsg is called with NULL as buffer?
 
-I opted to change the Sphinx integration gradually using different
-patch sets on 4 phases:
+So even if iov_base =3D=3D NULL, the iterator is created anyhow. The
+iterator will be from addresses 0 -> iov_len.
 
-1. minimal integration: just execute the new script on a similar way as
-   the perl one;
-2. the kernel_abi module was changed to import the ABI parser class,
-   using it directly;
-3. the logic at kernel_abi were rewritten to better integrate. As a bonus,
-   Sphinx now imports ReST data symbol by symbol. That solves one of
-   the issues I was discomfortable with the original approach: when lots
-   of data is sent to Sphinx parser, it stops in the middle of processing.
-   This was addressed in the past on a hacky way, but it could cause
-   problems in the future as the number of symbols increase;
-4. the ABI parser part is now called either by automarkup and kernel_abi.
-   This allowed automarkup to solve ABI symbols.
+In the next iteration, I've applied Stan's suggestion to use iov_base
+as the offset into the dma-buf to send from. I think it ends up being
+a much cleaner UAPI, but let me know what you think.
 
-Together with this series, I added some patches fixing issues and warnings
-when generating documentation.
+...
 
-Some notes about this new RFC:
+> >  struct net_iov *
+> >  net_devmem_alloc_dmabuf(struct net_devmem_dmabuf_binding *binding)
+> > @@ -109,6 +112,13 @@ void net_devmem_unbind_dmabuf(struct net_devmem_dm=
+abuf_binding *binding)
+> >       unsigned long xa_idx;
+> >       unsigned int rxq_idx;
+> >
+> > +     xa_erase(&net_devmem_dmabuf_bindings, binding->id);
+> > +
+> > +     /* Ensure no tx net_devmem_lookup_dmabuf() are in flight after th=
+e
+> > +      * erase.
+> > +      */
+> > +     synchronize_net();
+> > +
+>
+> What precisely does this protect?
+>
+> synchronize_net() ensures no packet is in flight inside an rcu
+> readside section. But a packet can still be in flight, such as posted
+> to the device or queued in a qdisc.
+>
 
-- despite being able to generate documentation cross-references with
-  auto-markup, the documentation build timt didn't increase on my machine
-  (it was actually 5 seconds faster);
-- I rewrote some algorithms at the undefined symbol detection code. With
-  that, it is now a lot faster than the previous version, at least on my desktop
-  (wich has 24 CPU threads). I didn't try it on a server yet;
-- the undefined parser can optionally use multiple CPUs. This sounds
-  fancier than it seems: Python (up to version 3.12) is really bad with
-  multi-CPU support and doesn't have real multi-thread support. Python
-  3.13 has now an optional way to address that (although I didn't test yet,
-  as it requires Python manual compilation). When such feature becomes
-  standard, maybe the undefined symbols detection will be faster.
+The TX data path does a net_devmem_lookup_dmabuf() to lookup the
+dmabuf_id provided by the user.
 
-Btw, I'm opting to send this as an RFC because I'd like to have more
-people testing and checking it. In particular, the undefined ABI check
-is complex, as it requires lots of tricks to reduce the run time from hours
-to seconds.
-  
-On this series we have:
+But that dmabuf_id may be unbind'd via net_devmem_unbind_dmabuf () by
+the user at any time, so some synchronization is needed to make sure
+we don't do a send from a dmabuf that is being freed in another
+thread.
 
-patches 1 to 11: several bug fixes addressing issues at ABI symbols;
-patch 12: a fix for scripts/documentation-file-ref-check
-patches 13-15: create new script with rest and search logic and 
-  minimally integrate with kernel_abi Sphinx extension(phase 1);
-patches 16-19: implement phase 2: class integration (phase 2);
-patch 20: fix a bug at kernel_abi: the way it splits lines is buggy;
-patches  21-24: rewrite kernel_abi logic to make it simpler and more
-  robust;
-patches 25-27: add cross-reference support at automarkup;
-patches 28-36: several ABI cleanups to cope with the improvements;
-patch 37: implement undefined command;
-patch 38: get rid of the old Perl script.
+The synchronization in this patch is such that the lookup path obtains
+a reference under rcu lock, and the unbind control path makes sure to
+wait a full RCU grace period before dropping reference via
+net_devmem_dmabuf_binding_put(). net_devmem_dmabuf_binding_put() will
+trigger freeing the binding if the refcount hits zero.
 
-To make it easier to review/apply, I may end breaking the next version
-on a couple of different patchsets. Still it would be nice to have more
-people testing it and providing some feedback.
+...
 
----
-RFC v2:
-  - Dropped a patch touching the perl script;
-  - Implemented phases 2-4 of the script's logic;
-  - Added ABI cross-references via automarkup;
-  - Added support for undefined logic;
-  - Added more ABI and scripts' fixes;
-  - Added undefined logic;
-  - Added a patch to remove the old tool.
+> > +struct net_devmem_dmabuf_binding *
+> > +net_devmem_get_sockc_binding(struct sock *sk, struct sockcm_cookie *so=
+ckc)
+> > +{
+> > +     struct net_devmem_dmabuf_binding *binding;
+> > +     int err =3D 0;
+> > +
+> > +     binding =3D net_devmem_lookup_dmabuf(sockc->dmabuf_id);
+>
+> This lookup is from global xarray net_devmem_dmabuf_bindings.
+>
+> Is there a check that the socket is sending out through the device
+> to which this dmabuf was bound with netlink? Should there be?
+> (e.g., SO_BINDTODEVICE).
+>
 
-Mauro Carvalho Chehab (38):
-  docs: power: video.rst: fix a footnote reference
-  docs: media: ipu3: fix two footnote references
-  docs: block: ublk.rst: remove a reference from a dropped text
-  docs: sphinx: remove kernellog.py file
-  docs: sphinx/kernel_abi: adjust coding style
-  docs: admin-guide: abi: add SPDX tags to ABI files
-  ABI: sysfs-class-rfkill: fix kernelversion tags
-  ABI: sysfs-bus-coresight-*: fix kernelversion tags
-  ABI: sysfs-driver-dma-idxd: fix date tags
-  ABI: sysfs-fs-f2fs: fix date tags
-  ABI: sysfs-power: fix a what tag
-  scripts/documentation-file-ref-check: don't check perl/python scripts
-  scripts/get_abi.py: add a Python tool to generate ReST output
-  scripts/get_abi.py: add support for symbol search
-  docs: use get_abi.py for ABI generation
-  scripts/get_abi.py: optimize parse_abi() function
-  scripts/get_abi.py: use an interactor for ReST output
-  docs: sphinx/kernel_abi: use AbiParser directly
-  docs: sphinx/kernel_abi: reduce buffer usage for ABI messages
-  docs: sphinx/kernel_abi: properly split lines
-  scripts/get_abi.pl: Add filtering capabilities to rest output
-  scripts/get_abi.pl: add support to parse ABI README file
-  docs: sphinx/kernel_abi: parse ABI files only once
-  docs: admin-guide/abi: split files from symbols
-  docs: sphinx/automarkup: add cross-references for ABI
-  docs: sphinx/kernel_abi: avoid warnings during Sphinx module init
-  scripts/get_abi.py: Rename title name for ABI files
-  docs: media: Allow creating cross-references for RC ABI
-  docs: thunderbolt: Allow creating cross-references for ABI
-  docs: arm: asymmetric-32bit: Allow creating cross-references for ABI
-  docs: arm: generic-counter: Allow creating cross-references for ABI
-  docs: iio: Allow creating cross-references ABI
-  docs: networking: Allow creating cross-references statistics ABI
-  docs: submit-checklist: Allow creating cross-references for ABI README
-  docs: translations: Allow creating cross-references for ABI README
-  docs: ABI: drop two duplicate symbols
-  scripts/get_abi.py: add support for undefined ABIs
-  scripts/get_abi.pl: drop now obsoleted script
+Yes, I think it may be an issue if the user triggers a send from a
+different netdevice, because indeed when we bind a dmabuf we bind it
+to a specific netdevice.
 
- Documentation/ABI/removed/sysfs-class-rfkill  |    2 +-
- Documentation/ABI/stable/sysfs-class-rfkill   |   12 +-
- .../ABI/stable/sysfs-devices-system-cpu       |   10 -
- .../ABI/stable/sysfs-driver-dma-idxd          |    4 +-
- .../testing/sysfs-bus-coresight-devices-cti   |   78 +-
- .../testing/sysfs-bus-coresight-devices-tpdm  |   52 +-
- Documentation/ABI/testing/sysfs-fs-f2fs       |    4 +-
- Documentation/ABI/testing/sysfs-power         |    2 +-
- .../admin-guide/abi-obsolete-files.rst        |    7 +
- Documentation/admin-guide/abi-obsolete.rst    |    6 +-
- Documentation/admin-guide/abi-readme-file.rst |    6 +
- .../admin-guide/abi-removed-files.rst         |    7 +
- Documentation/admin-guide/abi-removed.rst     |    6 +-
- .../admin-guide/abi-stable-files.rst          |    7 +
- Documentation/admin-guide/abi-stable.rst      |    6 +-
- .../admin-guide/abi-testing-files.rst         |    7 +
- Documentation/admin-guide/abi-testing.rst     |    6 +-
- Documentation/admin-guide/abi.rst             |   17 +
- Documentation/admin-guide/media/ipu3.rst      |   12 +-
- Documentation/admin-guide/thunderbolt.rst     |    2 +-
- Documentation/arch/arm64/asymmetric-32bit.rst |    2 +-
- Documentation/block/ublk.rst                  |    2 -
- Documentation/driver-api/generic-counter.rst  |    4 +-
- Documentation/driver-api/iio/core.rst         |    2 +-
- Documentation/iio/iio_devbuf.rst              |    2 +-
- Documentation/networking/statistics.rst       |    2 +-
- Documentation/power/video.rst                 |    2 +-
- Documentation/process/submit-checklist.rst    |    2 +-
- Documentation/sphinx/automarkup.py            |   56 +
- Documentation/sphinx/kernel_abi.py            |  162 +-
- Documentation/sphinx/kerneldoc.py             |   14 +-
- Documentation/sphinx/kernellog.py             |   22 -
- Documentation/sphinx/kfigure.py               |   81 +-
- .../it_IT/process/submit-checklist.rst        |    2 +-
- .../sp_SP/process/submit-checklist.rst        |    2 +-
- .../zh_CN/process/submit-checklist.rst        |    2 +-
- .../zh_TW/process/submit-checklist.rst        |    2 +-
- .../userspace-api/media/rc/rc-sysfs-nodes.rst |    2 +-
- scripts/documentation-file-ref-check          |    2 +-
- scripts/get_abi.pl                            | 1103 -------------
- scripts/get_abi.py                            | 1437 +++++++++++++++++
- 41 files changed, 1804 insertions(+), 1354 deletions(-)
- create mode 100644 Documentation/admin-guide/abi-obsolete-files.rst
- create mode 100644 Documentation/admin-guide/abi-readme-file.rst
- create mode 100644 Documentation/admin-guide/abi-removed-files.rst
- create mode 100644 Documentation/admin-guide/abi-stable-files.rst
- create mode 100644 Documentation/admin-guide/abi-testing-files.rst
- delete mode 100644 Documentation/sphinx/kernellog.py
- delete mode 100755 scripts/get_abi.pl
- create mode 100755 scripts/get_abi.py
+One option is as you say to require TX sockets to be bound and to
+check that we're bound to the correct netdev. I also wonder if I can
+make this work without SO_BINDTODEVICE, by querying the netdev the
+sock is currently trying to send out on and doing a check in the
+tcp_sendmsg. I'm not sure if this is possible but I'll give it a look.
 
--- 
-2.48.1
-
-
+--
+Thanks,
+Mina
 
