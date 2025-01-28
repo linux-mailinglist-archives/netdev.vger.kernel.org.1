@@ -1,96 +1,99 @@
-Return-Path: <netdev+bounces-161411-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-161412-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id A4584A21321
-	for <lists+netdev@lfdr.de>; Tue, 28 Jan 2025 21:30:12 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 93482A213CA
+	for <lists+netdev@lfdr.de>; Tue, 28 Jan 2025 23:00:17 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id E4CA01888141
-	for <lists+netdev@lfdr.de>; Tue, 28 Jan 2025 20:30:16 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id F4133167B49
+	for <lists+netdev@lfdr.de>; Tue, 28 Jan 2025 22:00:15 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 053291E98E8;
-	Tue, 28 Jan 2025 20:30:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 34B74195B1A;
+	Tue, 28 Jan 2025 22:00:13 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="qMAVSXuZ"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="gL1sq3w2"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C808C1DE2C3;
-	Tue, 28 Jan 2025 20:30:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0CFDF198E75
+	for <netdev@vger.kernel.org>; Tue, 28 Jan 2025 22:00:12 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1738096207; cv=none; b=UtV1goSI9oojvf6NmjgBhF3o2Q83MUyCe4RR8OsBzp0pnW1E5kaLQFaWKdf0lKLTGJRIqgeVqcg2UkjzXKx/2isv56716sr3Jrjk+hz+UzzjtondSxAJLRstsulxJBW9yJEnIQaAR/s7LAE/ub8F+ilgdrGW/4bqxU65+Wf0hNs=
+	t=1738101613; cv=none; b=XRGzh3V6cBJRZVLuS9OhCnnIYCZi7m+TaQAfg1n+GvjU3w8g6jzxd2xj7t7aw5nL941b7sZGYZNAxkJ/7SC00BUy7c4yV1v6HRYZPDYEcGVgRi9BZY7HkwZf8ncvCaPBktHqZmVfQMav5hodVYMDElyKGfwVK9tL5xiHNJMryU0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1738096207; c=relaxed/simple;
-	bh=MhLQhkH2iTv4pZiXNhY7bLzBF5m5NLcz07Y9mN16uXM=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=TjsgOx2RwgS/3dJsgw71XbqyIZbxOIcsM5UKC20LRyNZPi//2FIJFZwOM1RFYkGSCK9TR6OPFuWOTDYoKRVqp4L2AAmKMLeaK9RbFwQqTHtc4VQ+FqRE2ZhBwhCFcuYHSHeZzEPnuBO1Yy116R4Xg88kuOEqfJ0OG8TiRphQPuU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=qMAVSXuZ; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 28DCBC4CED3;
-	Tue, 28 Jan 2025 20:30:07 +0000 (UTC)
+	s=arc-20240116; t=1738101613; c=relaxed/simple;
+	bh=TzaYQ3Ae+f6sa5sFP6BMyvaDIoYjCOl16y7IaTzgACw=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=rmFVlU+DExD2sdbhDaIMKbBOXtkUSDjJ6v9Uz+CA6sxDX2fzDiB14F9R4U4Ao6zTgqw1xKJApxxoLkO020MoN3MjX8veJFOcmDhSCKBtBsdQ0VCgdpXmWNyX40koKGH7rFbmFwSPZcWiw17ci7uFIjKdQ6hTgNe3d/jaQZQQNoA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=gL1sq3w2; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 14566C4CED3;
+	Tue, 28 Jan 2025 22:00:12 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1738096207;
-	bh=MhLQhkH2iTv4pZiXNhY7bLzBF5m5NLcz07Y9mN16uXM=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=qMAVSXuZXeIcLhN385+X6uNWYptut8BS0i2booUzU/Hrpv+YmY1oS/YZhh1MnO0oC
-	 56RjkVA+zbu7uTlhvXIbrHllCuvfKyGBTkZ7oX1bm0w/Imix+AIyer1aPwvwYC2EYU
-	 Sb9ktO3sdZPlag3yU8MKwfni3Gj4UMdB7L48Px2onJQrEB0CduxD5sLv3FBTtqALqm
-	 3DA1l+OfoNjwujsH3UhaK2MemAsldYaE2jOViTx8Xx7xQRAEny8+6b0rCxMR75wdMJ
-	 8GFO1Iqglr4koQkEtzKX+japg2pjG+q9L72ZCcJuRiYnBrRhz4Vm2ruI2Najnlf9QT
-	 A7oeqXybMzDAw==
-Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 349E9380AA66;
-	Tue, 28 Jan 2025 20:30:34 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=k20201202; t=1738101612;
+	bh=TzaYQ3Ae+f6sa5sFP6BMyvaDIoYjCOl16y7IaTzgACw=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=gL1sq3w2a7M1b3Qi7Ipl3T4ZdusTa5/FUrS0b8LaRYIvqDnewzDov9RJ+KEVRXlCD
+	 S620ju11vS8CBp/F+GYo2uasWKOrFjo8ldv2P4rtF+2fFDJ7ncTDU6+F2wvCRiI3hF
+	 69XTmRh2+a9GnGHH1KYZp4q7dD+7hy7KAii8hG6dSdZ9ILSr/SuMcXgGVySXW+5y16
+	 j3OgbUb2bIbcVRqGHL4bIc2FUiM4a59mGXa1jigW9Jv853ufeVPxjBD3E5FuLw4IX/
+	 +vOjqNuNmJeYMgbVlttCV8jVuOI1c2KCAOxprZWoTP2t0lrly4r9yBaQovK3oPchPE
+	 +k9gu5nAPV8Wg==
+Date: Tue, 28 Jan 2025 14:00:11 -0800
+From: Jakub Kicinski <kuba@kernel.org>
+To: Pedro Tammela <pctammela@mojatatu.com>
+Cc: Cong Wang <xiyou.wangcong@gmail.com>, netdev@vger.kernel.org,
+ jhs@mojatatu.com, jiri@resnulli.us, quanglex97@gmail.com, mincho@theori.io,
+ Cong Wang <cong.wang@bytedance.com>
+Subject: Re: [Patch net v2 2/4] selftests/tc-testing: Add a test case for
+ pfifo_head_drop qdisc when limit==0
+Message-ID: <20250128140011.221f4712@kernel.org>
+In-Reply-To: <CAM_iQpXDtMngE1Pcf9KBmRpb5sZK4EJj6qgPgt1ioYW4QC9W3g@mail.gmail.com>
+References: <20250126041224.366350-1-xiyou.wangcong@gmail.com>
+	<20250126041224.366350-3-xiyou.wangcong@gmail.com>
+	<20250127085756.4b680226@kernel.org>
+	<CAM_iQpXaf9132bjg=MkJYttoz7ikypmeJbpo=-t6qJmutYe9-g@mail.gmail.com>
+	<CAM_iQpXDtMngE1Pcf9KBmRpb5sZK4EJj6qgPgt1ioYW4QC9W3g@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH 0/2] Bluetooth: MGMT: Deadcode cleanup
-From: patchwork-bot+bluetooth@kernel.org
-Message-Id: 
- <173809623301.3912505.5958977606230134366.git-patchwork-notify@kernel.org>
-Date: Tue, 28 Jan 2025 20:30:33 +0000
-References: <20250127213716.232551-1-linux@treblig.org>
-In-Reply-To: <20250127213716.232551-1-linux@treblig.org>
-To: Dr. David Alan Gilbert <linux@treblig.org>
-Cc: marcel@holtmann.org, johan.hedberg@gmail.com, luiz.dentz@gmail.com,
- davem@davemloft.net, edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
- horms@kernel.org, linux-bluetooth@vger.kernel.org, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-Hello:
-
-This series was applied to bluetooth/bluetooth-next.git (master)
-by Luiz Augusto von Dentz <luiz.von.dentz@intel.com>:
-
-On Mon, 27 Jan 2025 21:37:14 +0000 you wrote:
-> From: "Dr. David Alan Gilbert" <linux@treblig.org>
+On Mon, 27 Jan 2025 20:25:09 -0800 Cong Wang wrote:
+> > > Same problem as on v1:
+> > >
+> > > # Could not match regex pattern. Verify command output:
+> > > # qdisc pfifo_head_drop 1: root refcnt 2 limit 0p
+> > > #  Sent 0 bytes 0 pkt (dropped 0, overlimits 0 requeues 0)
+> > > #  backlog 0b 0p requeues 0
+> > >
+> > > https://github.com/p4tc-dev/tc-executor/blob/storage/artifacts/966506/1-tdc-sh/stdout
+> > >
+> > > Did you run the full suite? I wonder if some other test leaks an
+> > > interface with a 10.x network.  
+> >
+> > No, I only ran the tests shown above, I will run all the TDC tests.  
 > 
-> Hi,
->   A couple of deadcode removal patches.
+> Hmm, I just got another error which prevents me from starting all the tests:
 > 
-> They're both strictly function removals, no internal changes
-> to a function.
+> # -----> prepare stage *** Could not execute: "$TC qdisc replace dev
+> $ETH handle 8001: parent root stab overhead 24 taprio num_tc 8 map 0 1
+> 2 3 4 5 6 7 queues 1@0 1@1 1@2 1@3 1@4 1@5 1@6 1@7 base-time 0
+> sched-entry S ff 20000000 flags 0x2"
+> #
+> # -----> prepare stage *** Error message: "Error: Device does not have
+> a PTP clock.
+> # "
+> #
+> # -----> prepare stage *** Aborting test run.
 > 
-> [...]
+> Let me see if I can workaround it before looking into it.
 
-Here is the summary with links:
-  - [1/2] Bluetooth: MGMT: Remove unused mgmt_pending_find_data
-    https://git.kernel.org/bluetooth/bluetooth-next/c/f694e720fddd
-  - [2/2] Bluetooth: MGMT: Remove unused mgmt_*_discovery_complete
-    https://git.kernel.org/bluetooth/bluetooth-next/c/55b8d4c01dde
-
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
-
-
+CC Pedro, in case he has cycles to take a look.
 
