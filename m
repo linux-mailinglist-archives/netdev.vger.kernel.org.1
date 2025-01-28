@@ -1,106 +1,98 @@
-Return-Path: <netdev+bounces-161307-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-161308-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8952AA20981
-	for <lists+netdev@lfdr.de>; Tue, 28 Jan 2025 12:20:12 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 55C3FA209C6
+	for <lists+netdev@lfdr.de>; Tue, 28 Jan 2025 12:38:01 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id AB80418865C9
-	for <lists+netdev@lfdr.de>; Tue, 28 Jan 2025 11:20:14 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id AB824163B57
+	for <lists+netdev@lfdr.de>; Tue, 28 Jan 2025 11:37:59 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8BEFE19F111;
-	Tue, 28 Jan 2025 11:20:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CC7CF19FA8D;
+	Tue, 28 Jan 2025 11:37:55 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Oij6JUsR"
+	dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b="GmaINHki"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from desiato.infradead.org (desiato.infradead.org [90.155.92.199])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5C50919DFA5;
-	Tue, 28 Jan 2025 11:20:07 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F225519F111;
+	Tue, 28 Jan 2025 11:37:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=90.155.92.199
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1738063208; cv=none; b=KzqghjkBJC5hmCTlswd9+vju7CaJpglOrOx8JV6gwIMkMzGDs8pX/E175xl2XhGd8H9hjSh5KFRmTdOrSHVYDGW0nxtToePE5yF5MUN3dDrckRtavQLDaeixBtCRIqZ5DX+IcDGONNeUEWRgiX+cp2wqu8RVCocX5pXHqUh+Ew8=
+	t=1738064275; cv=none; b=R3W4Jx8kRnooV8AK9nAh49Igtqvqzggo1a9+UyHC6Gznj5NgpTJLnCsIXCNkym3v6YL+LN2zJWWkv0zJH81lIC2HrTMAcPvK9IHajOms+HEn+q0BWYEKZRTHy1h+TRVZ99Cw4gp9rcTpiKY/ri82XNsPSUcZ7ozoA8fArGOIgaE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1738063208; c=relaxed/simple;
-	bh=+wN+xyHCWm7Mr05FKtb0eiMkKTeqnJP0gRwFVC0K7qs=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=V6/vLGx+NFDjbFQZvYfYxMD3Gq/GQdwlwaaSUrCB6ZTHC51SPZ2eH93r/OrV+vmVqYlhN7FJuJBDhGTQF49Pw/345s4elBza5znydZXBZ0T+o72dHeZCmY0BIY5/3BuHL7gGntUSWc9Q6Pcae7vvPi3eXErZE8o7iqEGYKYaUGs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Oij6JUsR; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id C1EACC4CED3;
-	Tue, 28 Jan 2025 11:20:07 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1738063207;
-	bh=+wN+xyHCWm7Mr05FKtb0eiMkKTeqnJP0gRwFVC0K7qs=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=Oij6JUsRuxaWsHWMkScOZbhYm5JGcw3P4mNOQrn7EAfei6+jXDh6IaeXwF/Rrxujg
-	 123d4m7t7e4qr8kDi/jmPGPerSoQ2iZ22QgEFfCXIn7gPXIYLQE8h5ayGFzAucFJPI
-	 1unn5TOU/sCHd3v7FPGC7EAnAxVnJDP6rWpVpYbSIwgTBxLMq233TdJKJEGPfC215s
-	 etM7HHj8+mV/R3yRVnbxIEvlVmZSZWc0yU7a5p1R5PSShOJxerMTHvZdLwP4Hkjumx
-	 WcRT9vnwXZcmhHgMs+mYVWlmYQkDUzpj9J3JRv23DukZR/SBLDQSoUxaieK5Epi30l
-	 k0oUzJGf+mnNw==
-Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id AE521380AA66;
-	Tue, 28 Jan 2025 11:20:34 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=arc-20240116; t=1738064275; c=relaxed/simple;
+	bh=iW5mPyaVRt58KWqGX4R/8fXMgM94ROxcwullrfypsII=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=kDC3YlGeZPBAzyoffYUIa7ifUwtj1bdR4GEImvDs3GshmSMmFvZp5Zi7thOYwTXaSBvIdO2Ye/cAzIwAa+tc9M5z5D47FmlgJL/WrtxXcyesp9l4af0jDXKB3xsYm4KrCGLiY2b0C8hHfvm3dJewaFYweje4P5IGIe5Ar51FJXc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org; spf=none smtp.mailfrom=infradead.org; dkim=pass (2048-bit key) header.d=infradead.org header.i=@infradead.org header.b=GmaINHki; arc=none smtp.client-ip=90.155.92.199
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=infradead.org
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=infradead.org
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=infradead.org; s=desiato.20200630; h=In-Reply-To:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
+	Content-Transfer-Encoding:Content-ID:Content-Description;
+	bh=YxJMDJpcb0hx8brZC1qpWzYpsXcI2/beMqyx1/b0dls=; b=GmaINHkipIqeyIHm8B8iyv4eFx
+	ZBMl2CTVmOB0jPxCTN+f/eZowzz8VbS3UmTSzHMDP6LzyQA4F9rhSBvVSDrUgkPQbJWY5d8kzrZr3
+	sgUBTOZGYPVK5Xjj2Rs2aeoYyFLFmulTtOelCQWky7VOjENUNEMy4BjPG+JPMLgVKg57xz2fAf8tL
+	F2KBPUEdqGRmaJREzNhZJ4QKUssS7WnreKoIopdtH25tLd6vIAi7N3LWyF1jH2Os+OtAXst1PgzWZ
+	xfVUHPFgiGdVTeFFPZwhLtnzaVZD7ujz9STh710eZ8N61LLEKDQ6RPEzMTaSlS3ggLEgLQQm6Q6bj
+	YNH+kdVw==;
+Received: from 77-249-17-89.cable.dynamic.v4.ziggo.nl ([77.249.17.89] helo=noisy.programming.kicks-ass.net)
+	by desiato.infradead.org with esmtpsa (Exim 4.98 #2 (Red Hat Linux))
+	id 1tcjuV-0000000Evlv-1CKE;
+	Tue, 28 Jan 2025 11:37:39 +0000
+Received: by noisy.programming.kicks-ass.net (Postfix, from userid 1000)
+	id A3DBA30050D; Tue, 28 Jan 2025 12:37:38 +0100 (CET)
+Date: Tue, 28 Jan 2025 12:37:38 +0100
+From: Peter Zijlstra <peterz@infradead.org>
+To: FUJITA Tomonori <fujita.tomonori@gmail.com>
+Cc: linux-kernel@vger.kernel.org, Boqun Feng <boqun.feng@gmail.com>,
+	rust-for-linux@vger.kernel.org, netdev@vger.kernel.org,
+	andrew@lunn.ch, hkallweit1@gmail.com, tmgross@umich.edu,
+	ojeda@kernel.org, alex.gaynor@gmail.com, gary@garyguo.net,
+	bjorn3_gh@protonmail.com, benno.lossin@proton.me,
+	a.hindborg@samsung.com, aliceryhl@google.com,
+	anna-maria@linutronix.de, frederic@kernel.org, tglx@linutronix.de,
+	arnd@arndb.de, jstultz@google.com, sboyd@kernel.org,
+	mingo@redhat.com, juri.lelli@redhat.com, vincent.guittot@linaro.org,
+	dietmar.eggemann@arm.com, rostedt@goodmis.org, bsegall@google.com,
+	mgorman@suse.de, vschneid@redhat.com, tgunders@redhat.com
+Subject: Re: [PATCH v9 1/8] sched/core: Add __might_sleep_precision()
+Message-ID: <20250128113738.GC7145@noisy.programming.kicks-ass.net>
+References: <20250125101854.112261-1-fujita.tomonori@gmail.com>
+ <20250125101854.112261-2-fujita.tomonori@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net v5 0/7] usbnet: ipheth: prevent OoB reads of NDP16
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <173806323350.3759067.5078692360425955195.git-patchwork-notify@kernel.org>
-Date: Tue, 28 Jan 2025 11:20:33 +0000
-References: <20250125235409.3106594-1-forst@pen.gy>
-In-Reply-To: <20250125235409.3106594-1-forst@pen.gy>
-To: Foster Snowhill <forst@pen.gy>
-Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
- pabeni@redhat.com, gvalkov@gmail.com, horms@kernel.org, oneukum@suse.com,
- netdev@vger.kernel.org, linux-usb@vger.kernel.org
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250125101854.112261-2-fujita.tomonori@gmail.com>
 
-Hello:
-
-This series was applied to netdev/net.git (main)
-by Paolo Abeni <pabeni@redhat.com>:
-
-On Sun, 26 Jan 2025 00:54:02 +0100 you wrote:
-> iOS devices support two types of tethering over USB: regular, where the
-> internet connection is shared from the phone to the attached computer,
-> and reverse, where the internet connection is shared from the attached
-> computer to the phone.
+On Sat, Jan 25, 2025 at 07:18:46PM +0900, FUJITA Tomonori wrote:
+> Add __might_sleep_precision(), Rust friendly version of
+> __might_sleep(), which takes a pointer to a string with the length
+> instead of a null-terminated string.
 > 
-> The `ipheth` driver is responsible for regular tethering only. With this
-> tethering type, iOS devices support two encapsulation modes on RX:
-> legacy and NCM.
+> Rust's core::panic::Location::file(), which gives the file name of a
+> caller, doesn't provide a null-terminated
+> string. __might_sleep_precision() uses a precision specifier in the
+> printk format, which specifies the length of a string; a string
+> doesn't need to be a null-terminated.
 > 
-> [...]
+> Modify __might_sleep() to call __might_sleep_precision() but the
+> impact should be negligible. strlen() isn't called in a normal case;
+> it's called only when printing the error (sleeping function called
+> from invalid context).
+> 
+> Note that Location::file() providing a null-terminated string for
+> better C interoperability is under discussion [1].
 
-Here is the summary with links:
-  - [net,v5,1/7] usbnet: ipheth: fix possible overflow in DPE length check
-    https://git.kernel.org/netdev/net/c/c219427ed296
-  - [net,v5,2/7] usbnet: ipheth: check that DPE points past NCM header
-    https://git.kernel.org/netdev/net/c/429fa68b58ce
-  - [net,v5,3/7] usbnet: ipheth: use static NDP16 location in URB
-    https://git.kernel.org/netdev/net/c/86586dcb75cb
-  - [net,v5,4/7] usbnet: ipheth: refactor NCM datagram loop
-    https://git.kernel.org/netdev/net/c/2a9a196429e9
-  - [net,v5,5/7] usbnet: ipheth: break up NCM header size computation
-    https://git.kernel.org/netdev/net/c/efcbc678a14b
-  - [net,v5,6/7] usbnet: ipheth: fix DPE OoB read
-    https://git.kernel.org/netdev/net/c/ee591f2b2817
-  - [net,v5,7/7] usbnet: ipheth: document scope of NCM implementation
-    https://git.kernel.org/netdev/net/c/be154b598fa5
-
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
-
-
+Urgh :/
 
