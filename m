@@ -1,120 +1,215 @@
-Return-Path: <netdev+bounces-161394-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-161396-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 49928A20E9F
-	for <lists+netdev@lfdr.de>; Tue, 28 Jan 2025 17:32:39 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 92DB4A20EF2
+	for <lists+netdev@lfdr.de>; Tue, 28 Jan 2025 17:47:31 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id B54217A2FCA
-	for <lists+netdev@lfdr.de>; Tue, 28 Jan 2025 16:31:44 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 50BC93A8453
+	for <lists+netdev@lfdr.de>; Tue, 28 Jan 2025 16:47:11 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8058C1DE2CB;
-	Tue, 28 Jan 2025 16:32:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 406A61CB9EA;
+	Tue, 28 Jan 2025 16:46:55 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Xyen8+KX"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="PywFc3sI"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f46.google.com (mail-wm1-f46.google.com [209.85.128.46])
+Received: from mail-yb1-f174.google.com (mail-yb1-f174.google.com [209.85.219.174])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C6768199E8D;
-	Tue, 28 Jan 2025 16:32:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.46
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 700892904;
+	Tue, 28 Jan 2025 16:46:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.174
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1738081943; cv=none; b=d1C1kdUdHB98N0nx6PgBfKIT6FdCZ4o2bybY6+a2B+Wet4e2Ru+WvEuf/LZSe90E7bO/dW31s8Ataj14DAzlDpQGTdp2390MkhwT37q/DvATfc+R9Cqo84hdGFdTX0InyHGfwkGk1ClMLbK3CwYXKhOCbMBBYZal6mFSV6CBmdE=
+	t=1738082815; cv=none; b=T4PJRgH+7zsceXUgCb0no4Vmx9DPtZCLBJVpaCXHdz6lEudr2Mr9KNmJyooPWyNVagxiJBgKi84oizDrMetThKylUYxXy83aPxGTnEGSQ9tYI03eCMnIHxN0G/lrJMrU2qA1Tl99MlAnknMij7qt2Itm1B/E9dF9pJveY9dARL0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1738081943; c=relaxed/simple;
-	bh=JKPRQNGo6c05mOEmhP70KvkTAwaDPBWMaGDQBYo3ZRE=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=JXquVtfsAWMn1zxOzV/1kgbFCGJ0CcfG2/geQXHkBJ2ZbDIZLwagb3bkTLOQz/Il3NJBkMikphZCmB9GrcdjQmT5epZBj8hCvT9HHChZ3Ldej8E3H8cl4AW2CfXIj+GzaxUXDFI70d/6irZ5eUjYfzUpBp457vg6yxjlxeNx4Kk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Xyen8+KX; arc=none smtp.client-ip=209.85.128.46
+	s=arc-20240116; t=1738082815; c=relaxed/simple;
+	bh=MnNisqc0NqM7r0VRLdYxL9biktVBMmD/OyitwnsNYBQ=;
+	h=From:To:Subject:Date:Message-ID:MIME-Version; b=n2NFDmO4g907QLI9+Rl4GLTpewG+m1dZVGJPOdTMdPg4BAUsWtLUI6iZmpnxOp80CzAT1+6Rh9Jz12KpCby7uJCGA+aZvSXSNpas+/iNsruAbC6bW1ovuz9OzhGu+3bVhLf6Qb0GMkGlZJiEnZW6MswMg+o+peDLFKiL1cDJXt4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=PywFc3sI; arc=none smtp.client-ip=209.85.219.174
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wm1-f46.google.com with SMTP id 5b1f17b1804b1-43616bf3358so9301045e9.3;
-        Tue, 28 Jan 2025 08:32:20 -0800 (PST)
+Received: by mail-yb1-f174.google.com with SMTP id 3f1490d57ef6-e53a5ff2233so10578620276.3;
+        Tue, 28 Jan 2025 08:46:53 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1738081939; x=1738686739; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=SbISzZ/bYtDhpiUav/h8xTZnz5VMDjY6HJC4K2tyU3o=;
-        b=Xyen8+KXDrNuxt28vng1g2G7zmqTY6r143wy59PtWskNlSJzvw6o+tisvSRG0W4L7K
-         7bWl6lEb7UWR8QwYxEvyAQlw/p9a57o9DUvUL176liPX+6HXrloDPO2BOZ3zqbIfw5U2
-         jHObk8E+6cQl5bL9P+/Wz1JydBt8SYwzygMqDXWf9kvsl4NFsAhva++2tJKU78cl0Vkx
-         0EursLtHE2znm1BcM7WBzkcVOCfUwLmogA5BhJybmN3jtBlQSFV6sSNFDv4sewMXPavS
-         ToGC7S7904FPsrxVnrzMm+gDJSgrAmNrnkW+U+euvXsyB+IPTQv1v1Ygk1Qf9VE+xrRe
-         0E4g==
+        d=gmail.com; s=20230601; t=1738082812; x=1738687612; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:to
+         :from:from:to:cc:subject:date:message-id:reply-to;
+        bh=Y7I3FQn+a3IeKpvoyXVLY346phLoqlukuEhizyoucyY=;
+        b=PywFc3sI7IvCYfljupHJDeqTN0qgHFuNtm2sh616Yi8HMGe2uxDSrhfnaTmR9sg7vQ
+         6ast+9ATzSkJ3NlSFXzTAo2bhl7P5evAdCuyTOgOxOFJEULLPZ+35CwXDkjsXi9N01iO
+         11ZXNqCgIg0hMSYsOxxKFzmlqsrB2cLYt4VyXBOp6SajaegBWAn9ZGn2IejJ1U1KrlRR
+         YEY6BMmnxLUeFIvcoD9Uv+yHiIS1k8B26GdLmR925inSOod88Dg3/3alN9VKd8/aB3dS
+         +mz70cyQvZLp3MqNQT7L8inlKyB6EOg0bZF2mpmr35eBUdxtue7z/kQKv3zUHWuN6Oxc
+         55DA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1738081939; x=1738686739;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=SbISzZ/bYtDhpiUav/h8xTZnz5VMDjY6HJC4K2tyU3o=;
-        b=LqmrEJHE5/De50eBES0LP4AcZRSdCZ2HXN3N0/0/cbFQeSkP8Z0Y3hMV+wxec11i1P
-         RFYcgHcIbJXmIRuvjN7jLssp34T86hoazD/ldys/IbcUMKDiJiVV10HM3Ef2Eqwmi/UQ
-         u5UnRLp3CrPuq0j6Ysx+QLJPBSlMOyoNLjCM88uGodQj3dVtN8wxZlgBB3hfEltIRp9h
-         ntsCa3h1BJbKPGkTOdeKpbJHtFOrNys2P2mBD3coDRqRXg/G/UYyHWBmA8o7xZ/40V7V
-         MtH2b0wVah6bzZkUlSL08CsZbXipckuEUAiwky3rMn/MX95XXFLIDoTGy3kjSsthL4Yw
-         FxaA==
-X-Forwarded-Encrypted: i=1; AJvYcCVRb7dgLZvCc104Hq0mNTLor9L0vfv10NWL1KqmS7pAsmgOwghZ/qjpWjTREdmcKnQFfAccnjUS@vger.kernel.org, AJvYcCXbzNe+noflVo02zeSnGAWl6/+8XfEk/E0EPMedW1xp1+70oERft3SsQYaGF2v7krhePP35S8h5KAOzgCw=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yx5rSaGS0LC1VQVtTfulhmmeiIYwJmf/Vm3uej8fzsB55YJTuJP
-	sUK90/8vHcbE+UcIMvzIeI8EqS9V4qgQMrVv8zeGbXENFhfuUSjO
-X-Gm-Gg: ASbGncub1oGUVdxJ1uTJXx+gvAEqXoENTg+uLKdc8mBmRK+EnKxtvj7yeTynpyiaZtJ
-	DAtzMifw/LH7weWqBW47wG6ciBjzbmMuhh0BE+GcHXS3U9wfz/r6iLNb6UCOySDHoDgjYboMBPG
-	2LHjcqNE0o9sh7F78SQFdROedXgAmyJxrNk9jnja57EPn2ai6hSuWx7RIec2RbHKt/FAP/57A5Z
-	HYK9BbCGRfqUd1kEGzCg4OSFR1lyKvPfcw8jpmlmLyzIelOoO72MgAGVH5e0mhWdXNgnot3kbOU
-	aaI=
-X-Google-Smtp-Source: AGHT+IFltqlhR556R2ZjnbCvfwmfPzvxxBlkD0aWPYrGciZhaW9rfiS9WTDOkrDeIogbDkCsdRWjwA==
-X-Received: by 2002:a05:6000:4582:b0:38c:28d0:7517 with SMTP id ffacd0b85a97d-38c28d0756dmr5142286f8f.6.1738081938778;
-        Tue, 28 Jan 2025 08:32:18 -0800 (PST)
-Received: from skbuf ([86.127.124.81])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-38c2a17d7a7sm14904105f8f.32.2025.01.28.08.32.17
+        d=1e100.net; s=20230601; t=1738082812; x=1738687612;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:to
+         :from:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=Y7I3FQn+a3IeKpvoyXVLY346phLoqlukuEhizyoucyY=;
+        b=u2JorK4Vnik8rYcCOp4uMQ8ZAKh3jjQEm914r9ZMQMbJLX2fWTrPSzGXrhgkdsDchW
+         4Mq5I2CamEzSyRI5iXOoAvNMcH1QCzVCEfpo/2/llO3zjna9dVAqowVS9Hd16By6sZGt
+         X5jzvrzouqnwS/Q0xqt6jau/anRShgoL983+0MBjKrFI/CmkDqQuzBH1enN2ul1GDXMl
+         bOrfCAxvkCCoN4v0d5V/uDCWsHfbG/9wtlakGNF2fBvtpu0yAgnYa8B23dpxKdABd1r/
+         u6S56tLJ01scBuKsGqAgm3DupUqnYILcCfcbzYm9QS+NubYDmk2B5Qck0qc2+h5SaWBw
+         6d8w==
+X-Forwarded-Encrypted: i=1; AJvYcCUw7A4/aKodNnfvJHQ9JFMNzR3F2GOT4qtClourtrtGxU5WXERiJTuFnJ0d7VKf7eierPEZ8y7W4Sxb4A==@vger.kernel.org, AJvYcCV3QVjvxW205kpZNF74ZCGay4xwepFP0ZT+W/GWCPrncTH5Qo3tVZBS782yjvzL3nd9e0lrTfY7@vger.kernel.org, AJvYcCWuh9YLWqNU+pS2jYMh7lExdNi5NKoIG1Y7AjyNwoOz8sHPM84dDuZlXV/0PW9UEX9+xBKqXX0oq2d46pMZ@vger.kernel.org, AJvYcCWulg7RuwxTFIT+30FXb1AI8UnASifUSUqn1fzIpcMKlEWEEZ9+LuIVPaP2V9gWNh96StgLW9/34VVw@vger.kernel.org, AJvYcCX1HbcttBIKrNALy0J9adrE0rj+9P2QYOaBNBW+JSowLrDufexrqfLsDJOMuP+oGm7VbF/uQTGO08bS81Q=@vger.kernel.org, AJvYcCXqK43iZzu1fqPj4nVKYyfryRzLnMFbjlm3Ys2mUZRkHvT60NvIt2gEODfD1fD6BsSp2JIBas5Pyx8wdw==@vger.kernel.org
+X-Gm-Message-State: AOJu0Ywjo2ljoqSVzCl6flbi/G8VHhaHbEsQBqLWSSE6l/W1ZVFhFb6Q
+	n1iL+GisL04b+8zPZhhgXujr4kHhKK3WoyCJSRX5X32tpJ6ZCfPyCVomGxa1/Ao=
+X-Gm-Gg: ASbGncuBMGFLWFBJEjwXGljiZN+hN4PXJTkMqLfvMVQg+5kEG6DGk7aemKsJLfBuyE6
+	AWHEQFd7im1O5LwqrTpuVlEuR5gFnthWrBs/3kpzW4p1hAeugRNDXV+JiXabqhxdr2eDRMkI/Jn
+	21ayFxP8xiHMzyZjK0QPyeW0oEN4sXfmDs7aLH9R0xHCBfSUmHoaOEKxvaNWsFzKeX/O5w2/HdU
+	vmiMM+Nn3gZVeWOhMao1xAPt0iKJYriGSe5tibfo0JBu520VFMi0YT/a7BVSihEvd40sUHPHbM5
+	po/lcQKWxEdfIhpmCFU2gvf8/rUXkQK6UxNipyBj3i6qzdexi5w=
+X-Google-Smtp-Source: AGHT+IFvmgf54bypeg06iXMG7R6vW3zKyn1725RIYJUIjUALciExdJNbHjTn7B/5gtx7qirVGTp6aA==
+X-Received: by 2002:a05:6902:70c:b0:e58:5a:7694 with SMTP id 3f1490d57ef6-e58005a7945mr26770575276.20.1738082811957;
+        Tue, 28 Jan 2025 08:46:51 -0800 (PST)
+Received: from localhost (c-73-224-175-84.hsd1.fl.comcast.net. [73.224.175.84])
+        by smtp.gmail.com with ESMTPSA id 3f1490d57ef6-e583b7697c9sm2098812276.16.2025.01.28.08.46.51
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 28 Jan 2025 08:32:18 -0800 (PST)
-Date: Tue, 28 Jan 2025 18:32:15 +0200
-From: Vladimir Oltean <olteanv@gmail.com>
-To: Elliot Ayrey <Elliot.Ayrey@alliedtelesis.co.nz>
-Cc: "andrew@lunn.ch" <andrew@lunn.ch>,
-	"davem@davemloft.net" <davem@davemloft.net>,
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-	"netdev@vger.kernel.org" <netdev@vger.kernel.org>,
-	"netdev@kapio-technology.com" <netdev@kapio-technology.com>,
-	"edumazet@google.com" <edumazet@google.com>,
-	"kuba@kernel.org" <kuba@kernel.org>,
-	"pabeni@redhat.com" <pabeni@redhat.com>
-Subject: Re: [PATCH net] net: dsa: mv88e6xxx: Fix switchdev error code
-Message-ID: <20250128163215.4yyf6xo5bd6kr6ns@skbuf>
-References: <20241217043930.260536-1-elliot.ayrey@alliedtelesis.co.nz>
- <ab85afaf-bd9d-416a-b54c-9c85062f3f3f@lunn.ch>
- <e546520005bfbdb09e66d7b9e823af1da796aae6.camel@alliedtelesis.co.nz>
+        Tue, 28 Jan 2025 08:46:51 -0800 (PST)
+From: Yury Norov <yury.norov@gmail.com>
+To: linux-kernel@vger.kernel.org,
+	linuxppc-dev@lists.ozlabs.org,
+	linux-s390@vger.kernel.org,
+	netdev@vger.kernel.org,
+	virtualization@lists.linux.dev,
+	linux-nvme@lists.infradead.org,
+	linux-hyperv@vger.kernel.org,
+	linux-pci@vger.kernel.org,
+	linux-scsi@vger.kernel.org,
+	linux-crypto@vger.kernel.org,
+	Michael Ellerman <mpe@ellerman.id.au>,
+	Nicholas Piggin <npiggin@gmail.com>,
+	Christophe Leroy <christophe.leroy@csgroup.eu>,
+	Naveen N Rao <naveen@kernel.org>,
+	Madhavan Srinivasan <maddy@linux.ibm.com>,
+	Heiko Carstens <hca@linux.ibm.com>,
+	Vasily Gorbik <gor@linux.ibm.com>,
+	Alexander Gordeev <agordeev@linux.ibm.com>,
+	Christian Borntraeger <borntraeger@linux.ibm.com>,
+	Sven Schnelle <svens@linux.ibm.com>,
+	Haren Myneni <haren@linux.ibm.com>,
+	Rick Lindsley <ricklind@linux.ibm.com>,
+	Nick Child <nnac123@linux.ibm.com>,
+	Thomas Falcon <tlfalcon@linux.ibm.com>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	"Michael S. Tsirkin" <mst@redhat.com>,
+	Jason Wang <jasowang@redhat.com>,
+	Xuan Zhuo <xuanzhuo@linux.alibaba.com>,
+	=?UTF-8?q?Eugenio=20P=C3=A9rez?= <eperezma@redhat.com>,
+	Keith Busch <kbusch@kernel.org>,
+	Jens Axboe <axboe@kernel.dk>,
+	Christoph Hellwig <hch@lst.de>,
+	Sagi Grimberg <sagi@grimberg.me>,
+	"K. Y. Srinivasan" <kys@microsoft.com>,
+	Haiyang Zhang <haiyangz@microsoft.com>,
+	Wei Liu <wei.liu@kernel.org>,
+	Dexuan Cui <decui@microsoft.com>,
+	Lorenzo Pieralisi <lpieralisi@kernel.org>,
+	=?UTF-8?q?Krzysztof=20Wilczy=C5=84ski?= <kw@linux.com>,
+	Manivannan Sadhasivam <manivannan.sadhasivam@linaro.org>,
+	Rob Herring <robh@kernel.org>,
+	Bjorn Helgaas <bhelgaas@google.com>,
+	James Smart <james.smart@broadcom.com>,
+	Dick Kennedy <dick.kennedy@broadcom.com>,
+	"James E.J. Bottomley" <James.Bottomley@HansenPartnership.com>,
+	"Martin K. Petersen" <martin.petersen@oracle.com>,
+	Yury Norov <yury.norov@gmail.com>,
+	Rasmus Villemoes <linux@rasmusvillemoes.dk>,
+	Matt Wu <wuqiang.matt@bytedance.com>,
+	Steffen Klassert <steffen.klassert@secunet.com>,
+	Daniel Jordan <daniel.m.jordan@oracle.com>,
+	Andrew Morton <akpm@linux-foundation.org>,
+	Greg Kurz <groug@kaod.org>,
+	Peter Xu <peterx@redhat.com>,
+	Shrikanth Hegde <sshegde@linux.ibm.com>,
+	Hendrik Brueckner <brueckner@linux.ibm.com>
+Subject: [PATCH v2 00/13] cpumask: cleanup cpumask_next_wrap() implementation and usage
+Date: Tue, 28 Jan 2025 11:46:29 -0500
+Message-ID: <20250128164646.4009-1-yury.norov@gmail.com>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <e546520005bfbdb09e66d7b9e823af1da796aae6.camel@alliedtelesis.co.nz>
+Content-Transfer-Encoding: 8bit
 
-On Sun, Jan 26, 2025 at 10:07:26PM +0000, Elliot Ayrey wrote:
-> On Tue, 2024-12-17 at 10:54 +0100, Andrew Lunn wrote:
-> > I just had a quick look at other users of call_switchdev_notifiers()
-> > and all but vxlan_core.c and this one discarded the return
-> > value. Would that be a better fix, making the code more uniform?
-> > 
-> > 	Andrew
-> 
-> Hi Andrew, I am hesitant to remove this error as it was very helpful
-> during development and helped to diagnose some subtle issues that would
-> have otherwise been very hard to notice.
+cpumask_next_wrap() is overly complicated, comparing to it's generic
+version find_next_bit_wrap(), not mentioning it duplicates the above.
+It roots to the times when the function was used in the implementation
+of for_each_cpu_wrap() iterator. The function has 2 additional parameters
+that were used to catch loop termination condition for the iterator.
+(Although, only one is needed.)
 
-Can you give more details about how you encountered this issue?
-One could similarly argue that a call_switchdev_notifiers() error was
-ignored until now, and maybe the system still did something reasonable
-and thus, properly handling the error now risks introducing a regression
-for them. No way to really know except if the commit author (you) makes
-a reasonable analysis in the commit message leading to the conclusion
-that the patch is worthy of backporting to stable kernels (i.e. fixes a
-user-visible incorrect behavior).
+Since 4fe49b3b97c262 ("lib/bitmap: introduce for_each_set_bit_wrap()
+macro"), for_each_cpu_wrap() is wired to corresponding generic
+wrapping bitmap iterator, and additional complexity of
+cpumask_next_wrap() is not needed anymore.
+
+All existing users call cpumask_next_wrap() in a manner that makes
+it possible to turn it to a straight and simple alias to
+find_next_bit_wrap().
+
+This series replaces historical 4-parameter cpumask_next_wrap() with a
+thin 2-parameter wrapper around find_next_bit_wrap().
+
+Where it's possible to use for_each_cpu_wrap() iterator, the code is
+switched to use it because it's always preferable to use iterators over
+open loops.
+
+This series touches various scattered subsystems and To-list for the
+whole series is quite a long. To minimize noise, I send cover-letter and
+key patches #5 and 6 to every person involved. All other patches are sent
+individually to those pointed by scripts/get_maintainers.pl.
+
+I'd like to move the series with my bitmap-for-next branch as a whole.
+
+v1: https://lore.kernel.org/netdev/20241228184949.31582-1-yury.norov@gmail.com/T/
+v2:
+ - rebase on top of today's origin/master;
+ - drop #v1-10: not needed since v6.14 @ Sagi Grinberg;
+ - #2, #3: fix picking next unused CPU @ Nick Child;
+ - fix typos, cleanup comments @ Bjorn Helgaas, Alexander Gordeev;
+ - CC Christoph Hellwig for the whole series.
+
+Yury Norov (13):
+  objpool: rework objpool_pop()
+  virtio_net: simplify virtnet_set_affinity()
+  ibmvnic: simplify ibmvnic_set_queue_affinity()
+  powerpc/xmon: simplify xmon_batch_next_cpu()
+  cpumask: deprecate cpumask_next_wrap()
+  cpumask: re-introduce cpumask_next{,_and}_wrap()
+  cpumask: use cpumask_next_wrap() where appropriate
+  padata: switch padata_find_next() to using cpumask_next_wrap()
+  s390: switch stop_machine_yield() to using cpumask_next_wrap()
+  scsi: lpfc: switch lpfc_irq_rebalance() to using cpumask_next_wrap()
+  scsi: lpfc: rework lpfc_next_{online,present}_cpu()
+  PCI: hv: Switch hv_compose_multi_msi_req_get_cpu() to using
+    cpumask_next_wrap()
+  cpumask: drop cpumask_next_wrap_old()
+
+ arch/powerpc/xmon/xmon.c            |  6 +--
+ arch/s390/kernel/processor.c        |  2 +-
+ drivers/net/ethernet/ibm/ibmvnic.c  | 18 +++++---
+ drivers/net/virtio_net.c            | 12 ++---
+ drivers/pci/controller/pci-hyperv.c |  3 +-
+ drivers/scsi/lpfc/lpfc.h            | 23 +++-------
+ drivers/scsi/lpfc/lpfc_init.c       |  2 +-
+ include/linux/cpumask.h             | 69 ++++++++++++++++++++---------
+ include/linux/objpool.h             |  7 ++-
+ kernel/padata.c                     |  2 +-
+ lib/cpumask.c                       | 37 +---------------
+ 11 files changed, 81 insertions(+), 100 deletions(-)
+
+-- 
+2.43.0
+
 
