@@ -1,87 +1,76 @@
-Return-Path: <netdev+bounces-161414-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-161415-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4A9B4A213FF
-	for <lists+netdev@lfdr.de>; Tue, 28 Jan 2025 23:13:45 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id E315EA21402
+	for <lists+netdev@lfdr.de>; Tue, 28 Jan 2025 23:15:53 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 7C6EF3A6CE0
-	for <lists+netdev@lfdr.de>; Tue, 28 Jan 2025 22:13:37 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 438BA1882A6F
+	for <lists+netdev@lfdr.de>; Tue, 28 Jan 2025 22:15:58 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C69E01946BC;
-	Tue, 28 Jan 2025 22:13:41 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="q0+ZmWNk"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4442D194A53;
+	Tue, 28 Jan 2025 22:15:50 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from air.basealt.ru (air.basealt.ru [193.43.8.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A1788136988
-	for <netdev@vger.kernel.org>; Tue, 28 Jan 2025 22:13:41 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8DF4A192D76;
+	Tue, 28 Jan 2025 22:15:47 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=193.43.8.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1738102421; cv=none; b=XquVC9I9/gLi7lomKjzdula04agkeB/XHVitJwlUqk99+fHlepxOiYaS8WuhlNT1RPYpqy5WOUv8b0IDrhcklaMw8e0KyuAMwGQvQ/O990vkBT6OyGOna5NdJEFyBHoQWTHLwBqXBN7IusplYPvhqnwWqPSPok3jD+RLmlNZQy0=
+	t=1738102550; cv=none; b=L+atMqGf0gXrYzPZ7MjePjHUipoPdDRoKaD3/E8or0GjZT8oZz5TnrmrXygk5qbswc72Z13cAeRpIPfBK01gHtl1goAaD26mcl/FtVeKHByiBU1V6DNqIAMLiaIIcGVybdSMzaW3WqrWs4i9PbbjjC8BLy3Lh+ALIGIwxTdx2n0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1738102421; c=relaxed/simple;
-	bh=RqW8MtpaEcxbWHTJddZE7Gcl1SJ/I2iTrm58WfDfj7s=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=A8LPw3NPPbJFa6nIb9kypCJaBR7k4hr7ID/hjpqwp0N6i8BNisVzyHArRbfshbpndrycHF1iJVB5iZpDFpqJHMtCKDPwO29O6ciDTOu9nV63oqlPFdYQiFNqxNTHtwmbXWzL8U0kKkAEEyhkCiFUKA+ujQI97+edXCVa69Nl2Xk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=q0+ZmWNk; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id BBEBEC4CED3;
-	Tue, 28 Jan 2025 22:13:40 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1738102421;
-	bh=RqW8MtpaEcxbWHTJddZE7Gcl1SJ/I2iTrm58WfDfj7s=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=q0+ZmWNkzfQ3yEeGs8tA2ZgJrTYEzAKpW/ZfxnePU9MfuAoKo4M2L2nsJwbEDsMpo
-	 YgsvKhUw+KpkuedJI2n0+659/nslhIUXSZfixvezMOIb/QO7h6c11yol7s+gJV182u
-	 XPeBatOrcloG1hy3foAgNc2/uTyrNS08QcixUQ3tnEjMjeNpLlV0y1LaB9yewcTCBW
-	 APBG3aynjFaWRoU9Zp3n8jLNqrT2xRHE9+z9j5+WFkbyWDrkbaavLfIquog81UwyBi
-	 Kh+zI6shftDpTW6BmW1+NjG95jKYmj62Z8ktdG+mrk4A98JwXLUyRJAOatG/K1fZ7o
-	 fcHKpk7Oinw5g==
-Date: Tue, 28 Jan 2025 14:13:39 -0800
-From: Jakub Kicinski <kuba@kernel.org>
-To: Danielle Ratson <danieller@nvidia.com>
-Cc: "netdev@vger.kernel.org" <netdev@vger.kernel.org>, "mkubecek@suse.cz"
- <mkubecek@suse.cz>, "matt@traverse.com.au" <matt@traverse.com.au>,
- "daniel.zahka@gmail.com" <daniel.zahka@gmail.com>, Amit Cohen
- <amcohen@nvidia.com>, NBU-mlxsw <NBU-mlxsw@exchange.nvidia.com>
-Subject: Re: [PATCH ethtool-next 09/14] qsfp: Add JSON output handling to
- --module-info in SFF8636 modules
-Message-ID: <20250128141339.40ba2ae2@kernel.org>
-In-Reply-To: <DM6PR12MB4516969F2EEE1CBF7E5E7A03D8EF2@DM6PR12MB4516.namprd12.prod.outlook.com>
-References: <20250126115635.801935-1-danieller@nvidia.com>
-	<20250126115635.801935-10-danieller@nvidia.com>
-	<20250127121606.0c9ace12@kernel.org>
-	<DM6PR12MB4516969F2EEE1CBF7E5E7A03D8EF2@DM6PR12MB4516.namprd12.prod.outlook.com>
+	s=arc-20240116; t=1738102550; c=relaxed/simple;
+	bh=QZtstUTeu3/QKVPQw5YJYEj+nE65D4XGIfJBf1mcaQU=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=aoIF82H8CzmwzhgrgedUedCifVXSBLn8EWwTQRYuOhbcXOesybvUPtgx4AffyqrZQ5Sb0M9sEdNwxR++Xy5IQH3NLvzLZy9q/cnpeQPYDlvKXoIoyQgfTYXpTW9jLyrcqIVsfZO1pORWNI9gzVurQzge93LoytEzpwT6c/EPNgI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=altlinux.org; spf=pass smtp.mailfrom=altlinux.org; arc=none smtp.client-ip=193.43.8.18
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=altlinux.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=altlinux.org
+Received: from altlinux.ipa.basealt.ru (unknown [178.76.204.78])
+	(Authenticated sender: kovalevvv)
+	by air.basealt.ru (Postfix) with ESMTPSA id 32AF923339;
+	Wed, 29 Jan 2025 01:15:37 +0300 (MSK)
+From: Vasiliy Kovalev <kovalev@altlinux.org>
+To: stable@vger.kernel.org
+Cc: netdev@vger.kernel.org,
+	Eric Dumazet <edumazet@google.com>,
+	Yajun Deng <yajun.deng@linux.dev>,
+	"David S . Miller" <davem@davemloft.net>,
+	Hazem Mohamed Abuelfotoh <abuehaze@amazon.com>,
+	lvc-project@linuxtesting.org,
+	kovalev@altlinux.org
+Subject: [PATCH v3 5.10 0/2] net: Backport to fix CVE-2024-56658
+Date: Wed, 29 Jan 2025 01:15:20 +0300
+Message-Id: <20250128221522.21706-1-kovalev@altlinux.org>
+X-Mailer: git-send-email 2.33.8
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 
-On Tue, 28 Jan 2025 13:23:42 +0000 Danielle Ratson wrote:
-> > On Sun, 26 Jan 2025 13:56:30 +0200 Danielle Ratson wrote:  
-> > > +		open_json_object("extended_identifier");
-> > > +		print_int(PRINT_JSON, "value", "0x%02x",
-> > > +			  map->page_00h[SFF8636_EXT_ID_OFFSET]);  
-> > 
-> > Hm, why hex here?
-> > Priority for JSON output is to make it easy to handle in code, rather than easy
-> > to read. Hex strings need extra manual decoding, no?  
-> 
-> I kept the same convention as in the regular output.
-> And as agreed in Daniel's design those hex fields remain hex fields
-> and are followed by a description field.
-> 
-> Do you think otherwise?  
+Link: https://www.cve.org/CVERecord/?id=CVE-2024-56658
 
-I have a weak preference to never use hex strings.
-I have regretted using hex strings in JSON multiple times but haven't
-regretted using plain integers, yet.
+5.15: https://lore.kernel.org/all/20250115091642.335047-1-kovalev@altlinux.org/
+
+---
+v1: https://lore.kernel.org/all/20250115091913.335173-1-kovalev@altlinux.org/
+
+v2: https://lore.kernel.org/all/20250121192730.155559-1-kovalev@altlinux.org/
+
+v3:  (Suggested-by [1]: Hazem Mohamed Abuelfotoh <abuehaze@amazon.com>)
+Added a backport of commit
+41467d2ff4df ("net: net_namespace: Optimize the code")
+as a prerequisite for
+0f6ede9fbc74 ("net: defer final 'struct net' free in netns dismantle").
+
+[1] https://lore.kernel.org/all/20250127134248.25731-1-abuehaze@amazon.com/
+
+[PATCH v3 5.10 1/2] net: net_namespace: Optimize the code
+[PATCH v3 5.10 2/2] net: defer final 'struct net' free in netns dismantle
+
 
