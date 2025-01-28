@@ -1,155 +1,132 @@
-Return-Path: <netdev+bounces-161333-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-161334-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id F1151A20B48
-	for <lists+netdev@lfdr.de>; Tue, 28 Jan 2025 14:25:50 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 846E8A20B71
+	for <lists+netdev@lfdr.de>; Tue, 28 Jan 2025 14:41:44 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 5B3F5164E43
-	for <lists+netdev@lfdr.de>; Tue, 28 Jan 2025 13:25:49 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 9F5A67A45AB
+	for <lists+netdev@lfdr.de>; Tue, 28 Jan 2025 13:41:34 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 51D4C1A7249;
-	Tue, 28 Jan 2025 13:25:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DC2741A9B40;
+	Tue, 28 Jan 2025 13:40:09 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Xxn69lTI"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="z64FuhbQ"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 79CAD1A08A6
-	for <netdev@vger.kernel.org>; Tue, 28 Jan 2025 13:25:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6CE381A725A;
+	Tue, 28 Jan 2025 13:40:06 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1738070748; cv=none; b=rJgAxHc5pTh0kVjUFEOLh6Kb55NTNdVQNPCwwJdbENItHSllOarxiTivBPpi6/2zmXyQx5PnO6bNj5wMh/8UWT2B+IO610mGIv+yhalRxaUfe4J83vQaZ+2hDxzcAcvwhMha4eBjL2X4pd7WyjYVYEr2GDLtd1sl9UEpKYyR+FQ=
+	t=1738071609; cv=none; b=XBT0lgUqfS6ooTNeJLUX8Zhb/eSnisHy0hGtTLRvMho/EGQTtwdqcbmM3zhxgKG1H55lFrzpg+kjgtdRGV41WP2PJSWv2Th8IddOSMw0PBj1cKpw3FgdR/QYZeX08M7Yy+EnpgOMg1sjd4Cap0GY1WV5y3dBO1AO7CzhVRqwz2w=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1738070748; c=relaxed/simple;
-	bh=xXmQSPCOE/q0+j4J49P0P6RP4ItkqYK84im10n0cc6U=;
+	s=arc-20240116; t=1738071609; c=relaxed/simple;
+	bh=0iNfeZHcQX/hyxiA0F3IDJeQsZwcYvtZ89NrvRszhew=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=bRciSW3GdeJAf7aLp90hEWftT87ifWHM/ZH+MkUX9XZ4HLiWhn8+mEEJ/olurHtbwXV6ziNLfY/Z4M/jwWdoXUrKPCJRLQ1VtGkcgQwu7hKLgDQrgeW1d8zz85h4VKSS55+6kaZf4wJREo2wEOaPlOV5pbUlNM7xfCoYiLL3WNs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=Xxn69lTI; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1738070745;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=5n485xg/tbqT5XAK7sBKs4ZveDcXWXBDinLLkF7KVwU=;
-	b=Xxn69lTI1TXbsaxWXBCOxyQl3gNjscRJof4JD0LHnkudGBcJ4pwkGI+ZQ5sifH2WkR3t4S
-	+e8mGvv5fb3HlFsCJ0H94gzx50Qxkgp4Zh+XnuEXqi6B3yQkm+f9IHAg2W1D/5JRHRl7Q/
-	F56gneamqjqoaK2TM+3cKbrBtSOvM2E=
-Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
- [209.85.221.71]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-592-5qJhgs60M_yxE169LOjVZA-1; Tue, 28 Jan 2025 08:25:43 -0500
-X-MC-Unique: 5qJhgs60M_yxE169LOjVZA-1
-X-Mimecast-MFC-AGG-ID: 5qJhgs60M_yxE169LOjVZA
-Received: by mail-wr1-f71.google.com with SMTP id ffacd0b85a97d-385ded5e92aso2297659f8f.3
-        for <netdev@vger.kernel.org>; Tue, 28 Jan 2025 05:25:43 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1738070742; x=1738675542;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=5n485xg/tbqT5XAK7sBKs4ZveDcXWXBDinLLkF7KVwU=;
-        b=JDut3K2BCSQMfgPTEc3lFq/M5arYTJbs9RXUknHshJ6jQKLP23yKq5HkZ32ozcpBAW
-         QhwSZ874HEmu29PJUWL14mM8dSZ49lFJYDLRxmPBcwMB446pb+dx117TewUkh2yRbdOL
-         Wp63rTmtNj+1kUCko6bgDOUZcdMfX15dRUMwD8HP+qcVi5ilky8GvpT88r5mKoQyXSzY
-         3S52HI/mBPXL+3GOJdg/gpPU4ynvBvt9zstvMLk67I7C55KFf3gHfZFxwv4IJnJGSIBz
-         IzbgwX4j0q1v9CcHJQ5+9ztAPA23XvP2ZaRgCbtqmPTiIJ6/7IRrRP4Q7R+YPCLwlrJM
-         ZcAw==
-X-Forwarded-Encrypted: i=1; AJvYcCVzj5/1P64Mnhgw1QvNWMvC1TFlORnK7ObO2CWfSSlZidcyU/oxB4J1lL8bq+nXgGKFTOGA3xI=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yx5j0Q7F3Za+0HeGPP4fVa/Mzak8YYIxf93aTO1VqNq5vg+9F9v
-	P0Eva2a//Wanh970H9gdyUI56b0/YzhlJnkhMO6K0ubgT0cXQr15KunFaLtNgU09K+WBEvgDrhE
-	HvUrFCKvAumzWITMURd7vn6qrNQRG805ACHNwaOy5g1hzykVY6NxS/Q==
-X-Gm-Gg: ASbGnct6bheC97fvgsyQmLyoxxlO3ijyTpt+vMhdhqmOAnVNjTF4C5stHkGR5+CIDGu
-	G4/4au2OzBgtleE+HPT7FRsHsMRyaYiSCaBVJOEjOsM61hR/dhfxqFQuWcYWVOSXdZOpat11SK2
-	egLDks+nSH+cWeYT69bGPRTYNLQigKpDkQbiuQvwc9syDO2pZ1gJQOif08i/ehPB7AiOCxKHqxR
-	4ZBL4SokdJoQPbdjwHsSZdOW2THvExxtd6D4axgCU+oxtTW4TPoR6puzCMHZesizZeFmZFCDJ7m
-	SNO0/yQO
-X-Received: by 2002:a05:6000:2a3:b0:38a:888c:679c with SMTP id ffacd0b85a97d-38bf59e21d6mr38958519f8f.42.1738070742311;
-        Tue, 28 Jan 2025 05:25:42 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IEI1ckDOGbH2Z/XjBCGkfB1aD+MOGF0AFxjkiOnY1C6dGrybeYxKyU2FFmlM6TSPD89uDvoSA==
-X-Received: by 2002:a05:6000:2a3:b0:38a:888c:679c with SMTP id ffacd0b85a97d-38bf59e21d6mr38958494f8f.42.1738070741914;
-        Tue, 28 Jan 2025 05:25:41 -0800 (PST)
-Received: from leonardi-redhat ([176.206.32.19])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-438bd507dc9sm172083215e9.19.2025.01.28.05.25.41
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 28 Jan 2025 05:25:41 -0800 (PST)
-Date: Tue, 28 Jan 2025 14:25:39 +0100
-From: Luigi Leonardi <leonardi@redhat.com>
-To: Michal Luczaj <mhal@rbox.co>
-Cc: Stefano Garzarella <sgarzare@redhat.com>, 
-	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, 
-	netdev@vger.kernel.org, virtualization@lists.linux.dev
-Subject: Re: [PATCH net v3 0/6] vsock: Transport reassignment and error
- handling issues
-Message-ID: <xqtxs5auazrrfqess6fewfjt3vc6t7jato3if3thnjtkwr5g34@anly3yn64yxo>
-References: <20250128-vsock-transport-vs-autobind-v3-0-1cf57065b770@rbox.co>
+	 Content-Type:Content-Disposition:In-Reply-To; b=swO368XpICJYietg+jZCo6WEU9YrbMUGE6pja+rMCgG4LUQynd/SFZw0bdzEB75hfyRHb3FpIIlf5/exU42cQ2IIZ/upxqGFJQlhq7hYlF6PMBIgQuJX/BxENo3zo/AVV9tjL+Bshp9paR5OhXmA8aZ2qBqJ7fwj5ynenr8dO5E=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=z64FuhbQ; arc=none smtp.client-ip=78.32.30.218
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
+	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
+	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
+	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
+	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
+	bh=mCtfPLXq4GNmCA1Ax/oTvwmuawp3GE7H6PmnBY/CzT4=; b=z64FuhbQbE6lBuAM9arRIgTNTR
+	bEdR+EnIIjwTeaOVzNTBHI6rRG1NUd/XSbtVHFGtNbVplaW1dW2WlQib779MLzskOMZ6EMU0JvTPS
+	66w0H8lLcq1/Cyk6LJfP+f0kdQecbhpnPgmme58UsuPOtRAiBhf/EDd3kjvaaqaLSDdfWPjhYcIob
+	9qAZ9w5wfekNNL7kbNKjL8b0XplBNCTN/78Epg+i8y+zhE0ejvxE5otQCP7Ybd/fClziFexawIukk
+	bcV72ntH+fshl5oF8jKL83EmfpFBaJAbYUaJ73HuEcDYQhlKKXyS1QjKeMTDAOYpMoKUGhbdts+Q0
+	QZfZEyqQ==;
+Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:37626)
+	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.96)
+	(envelope-from <linux@armlinux.org.uk>)
+	id 1tclop-0007Fm-0b;
+	Tue, 28 Jan 2025 13:39:55 +0000
+Received: from linux by shell.armlinux.org.uk with local (Exim 4.96)
+	(envelope-from <linux@shell.armlinux.org.uk>)
+	id 1tclol-0002gs-1t;
+	Tue, 28 Jan 2025 13:39:51 +0000
+Date: Tue, 28 Jan 2025 13:39:51 +0000
+From: "Russell King (Oracle)" <linux@armlinux.org.uk>
+To: Andrew Lunn <andrew@lunn.ch>
+Cc: Tristram.Ha@microchip.com, Woojung Huh <woojung.huh@microchip.com>,
+	Vladimir Oltean <olteanv@gmail.com>,
+	Heiner Kallweit <hkallweit1@gmail.com>,
+	Maxime Chevallier <maxime.chevallier@bootlin.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	UNGLinuxDriver@microchip.com, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: Re: [PATCH RFC net-next 1/2] net: pcs: xpcs: Add special code to
+ operate in Microchip KSZ9477 switch
+Message-ID: <Z5jeJ_p22fF1AqDZ@shell.armlinux.org.uk>
+References: <20250128033226.70866-1-Tristram.Ha@microchip.com>
+ <20250128033226.70866-2-Tristram.Ha@microchip.com>
+ <69e2c86e-b463-4c4a-8f2c-0613b29be916@lunn.ch>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii; format=flowed
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20250128-vsock-transport-vs-autobind-v3-0-1cf57065b770@rbox.co>
+In-Reply-To: <69e2c86e-b463-4c4a-8f2c-0613b29be916@lunn.ch>
+Sender: Russell King (Oracle) <linux@armlinux.org.uk>
 
-On Tue, Jan 28, 2025 at 02:15:26PM +0100, Michal Luczaj wrote:
->Series deals with two issues:
->- socket reference count imbalance due to an unforgiving transport release
->  (triggered by transport reassignment);
->- unintentional API feature, a failing connect() making the socket
->  impossible to use for any subsequent connect() attempts.
->
->Luigi, I took the opportunity to comment vsock_bind() (patch 3/6), and I've
->kept your Reviewed-by. Is this okay?
-Hi Michal,
+On Tue, Jan 28, 2025 at 02:16:28PM +0100, Andrew Lunn wrote:
+> > For 1000BaseX mode setting neg_mode to false works, but that does not
+> > work for SGMII mode.  Setting 0x18 value in register 0x1f8001 allows
+> > 1000BaseX mode to work with auto-negotiation enabled.
+> 
+> Unless you have the datasheet, writing 0x18 to 0x1f8001 is pretty
+> meaningless. You need to explain what these two bits mean in this
+> register.
 
-Yes, absolutely! Thanks for adding the comment :)
+Well, this is the reason I searched for the datasheet to find out
+what it was, and discovered further information which suggests
+other stuff is wrong in the current driver.
 
-Cheers,
-Luigi
+bit 4: SGMII link status. This is used to populate the SGMII tx_config
+register bit 15 when XPCS is operating in PHY mode. KSZ9477
+documentation states that this bit must be set in "SerDes" mode, aka
+1000base-X. If that requirement comes from Synopsys, then the current
+XPCS driver is buggy...
 
->
->Signed-off-by: Michal Luczaj <mhal@rbox.co>
->---
->Changes in v3:
->- Rebase
->- Comment vsock_bind() (Luigi)
->- Collect Reviewed-by (Stefano, Luigi)
->- Link to v2: https://lore.kernel.org/r/20250121-vsock-transport-vs-autobind-v2-0-aad6069a4e8c@rbox.co
->
->Changes in v2:
->- Introduce vsock_connect_fd(), simplify the tests, stick to SOCK_STREAM,
->  collect Reviewed-by (Stefano)
->- Link to v1: https://lore.kernel.org/r/20250117-vsock-transport-vs-autobind-v1-0-c802c803762d@rbox.co
->
->---
->Michal Luczaj (6):
->      vsock: Keep the binding until socket destruction
->      vsock: Allow retrying on connect() failure
->      vsock/test: Introduce vsock_bind()
->      vsock/test: Introduce vsock_connect_fd()
->      vsock/test: Add test for UAF due to socket unbinding
->      vsock/test: Add test for connect() retries
->
-> net/vmw_vsock/af_vsock.c         |  13 ++++-
-> tools/testing/vsock/util.c       |  88 +++++++++++-----------------
-> tools/testing/vsock/util.h       |   2 +
-> tools/testing/vsock/vsock_test.c | 122 ++++++++++++++++++++++++++++++++++-----
-> 4 files changed, 153 insertions(+), 72 deletions(-)
->---
->base-commit: 9e6c4e6b605c1fa3e24f74ee0b641e95f090188a
->change-id: 20250116-vsock-transport-vs-autobind-2da49f1d5a0a
->
->Best regards,
->-- 
->Michal Luczaj <mhal@rbox.co>
->
+bit 3: Transmit configuration. In SGMII mode, selects between PHY mode
+(=1) or MAC mode (=0). KSZ9477 documentation states that this bit must
+be set when operating in "SerDes" mode. (Same concern as for bit 4.)
 
+I will also note here that bits 2:1 are documented as 00=SerDes mode,
+10=SGMII mode.
+
+Cross-referencing with the SJA1105 documentation, Digital Control
+Register 1 bit 0 = 0 gives a tx_config format of:
+
+	tx_config[15] = comes from SGMII link status above
+	tx_config[12] = MII_ADVERTISE.bit5 (which, even though operating
+			in SGMII mode, MII_ADVERTISE is 802.3z format.)
+	tx_config[11:10] = MII_BMCR speed bits
+
+As stated elsewhere, changes to the AN control register in KSZ9477
+are documented as only taking effect when the MII_ADVERTISE register
+is subsequently written (which the driver doesn't do, nor does this
+patch!)
+
+The lack of access to Synopsys Designware XPCS documentation makes
+working out how to properly drive this hardware problematical. We're
+subject to the randomness of the register set documentation that can
+be found in various chip manufacturers who publish it.
+
+-- 
+RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
+FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
 
