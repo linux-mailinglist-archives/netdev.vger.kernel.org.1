@@ -1,129 +1,187 @@
-Return-Path: <netdev+bounces-161336-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-161337-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id E41D4A20B8D
-	for <lists+netdev@lfdr.de>; Tue, 28 Jan 2025 14:51:06 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 04435A20BD0
+	for <lists+netdev@lfdr.de>; Tue, 28 Jan 2025 15:15:12 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 1F99818847BF
-	for <lists+netdev@lfdr.de>; Tue, 28 Jan 2025 13:51:11 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 29570188694B
+	for <lists+netdev@lfdr.de>; Tue, 28 Jan 2025 14:15:16 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 996281A83E8;
-	Tue, 28 Jan 2025 13:51:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CCD2A1AAA10;
+	Tue, 28 Jan 2025 14:15:07 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="OqcbrljH"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="e14cbGaI"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-f46.google.com (mail-ed1-f46.google.com [209.85.208.46])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D7E92199FAB
-	for <netdev@vger.kernel.org>; Tue, 28 Jan 2025 13:51:01 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.46
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 939151AAA32;
+	Tue, 28 Jan 2025 14:15:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1738072263; cv=none; b=mdn9IdxLRCvKeVvKWHYhyyg8veUHZNoV53GWpHupyCQW/2iUinQQEe8cNF34X0W+pT6XkYYlyKrQCWE+WAja2Ose5kixeMdSPdK7ZCnGPC5sNoTXDp61hAnGZkFbYN2LDYQTYAguB1RcnNLcK1aKwylB1hlehlpO7gBRYA/2EOs=
+	t=1738073707; cv=none; b=RsKh+JZBOEtDtsXbUIZaOlNZFuPHrcrPJ9vNjWB+CKY3JrbZ6/Eqj8nvd9wqRSkhtKZ07685gMtDrmAo2NUOcThH6rIzc8NejDsCXK3T4x5/cJO79iZCUCNQVOmLqP7EeHuliu1y+CsaTnHFeJF5oMZU+AZOHJPqdFyaM2877yU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1738072263; c=relaxed/simple;
-	bh=xJOwPXqhh/teSt0MCPqNXYRZqfUhJl+ceW+bTZQjATM=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=k3i9maP3M2Z0BwvkSSSdy/trON85Oe5xV7a0BS1TldOBV8WEDz2m/uUUcsjjMxjBxN/cWVLnlv/qIsxk3hfmgVWkMOIwwE0HPPaFpFBzkRuufw88awNckb/MgfNT9HzlKT8sUEbKGWJC3XVn6ISbr6S2DO0pRmeb8CFfBibn1JQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=OqcbrljH; arc=none smtp.client-ip=209.85.208.46
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-ed1-f46.google.com with SMTP id 4fb4d7f45d1cf-5d414b8af7bso12224249a12.0
-        for <netdev@vger.kernel.org>; Tue, 28 Jan 2025 05:51:01 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1738072260; x=1738677060; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=xJOwPXqhh/teSt0MCPqNXYRZqfUhJl+ceW+bTZQjATM=;
-        b=OqcbrljHq0gVYNWnGRSfKoJRDu3Q5zddJX3yGtJGg76ix8KTjkpxEwHABmdBLz6UE8
-         hcoVbndiboBInGpMGcT7OY3Ev8M0WccMCSCrWI3UmDNlXS0HdrUYDLzNjN2Ddp0ysagc
-         hLsmcTeKtOG+94x6pSipPC3//vHcqU5tzK9t7o0ynMFLxi1G6Ipbqr/RaI1DypUZTJ6T
-         1N4GNnRbtzjiG09uTmsn5Lm98UPhm9d5AfSC9eaSjNzz8E/bcRmgeznmE9b1/TdtfW0I
-         qlMiLJ/t/dpXgzwI7m7SiCJujx9Wn8ZLDgPhaImVTMW5yCTka6EL51aCDogqk4cpoPDR
-         I11g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1738072260; x=1738677060;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=xJOwPXqhh/teSt0MCPqNXYRZqfUhJl+ceW+bTZQjATM=;
-        b=tHow+I6+84xqcb8SvyPu4GcnOd0jyJx4S+H86CObA6POWkl08/t5mRoD4tzcQ4Dynk
-         I38Bjc6g6NvZCIESBJD485g4Q5q2nJ71CPdi0CcXkO4gfq1pyKJ0I1QeojWppAZ5PFfN
-         M4jpB4L6sfEzgDFsHLND2AUG5vMSEPG7aWkgFeZa05soC3uJYyFDT0yR79QTsMbJTwqq
-         QARzkpi1gt/WmOloqHxwExYlGrhHPfUz1SfXuKH4mPq+7yB+0lqq3EdXbeC84Gtqn+sy
-         4srYmL3fKRB8U4QxOtreRm4rmNqQgEvVsBNSnXWjim4iSkv7fXtWwHCsxb/HIxVqVeDl
-         DLfA==
-X-Gm-Message-State: AOJu0YxsS0TZOMrgeDoBdnlD2qyBA+gOWTKNrupL5VW2BafcqzmcRHzj
-	fjk14uIwqJkiehwsfiLsPugBq3RY4o3hKh1rluoQSDxzjq1Ms6/rQjiMDBxeE9yW43n0btAjmcm
-	MjRD+PXy8jvyW17ut5OZ+RU+Up3u1V633fUmkLCpJFpQHGv+tqGEL
-X-Gm-Gg: ASbGncuS1e8PHktE1S3C2vmTEoj1Nx4NT8HiyS9P/xB/lIatkiF/tnuAGi9Ba7rU0rf
-	Uqtq/AG7V8/iaTEjIp0XfRv+AyvwGK/x6thu7gBeqPdotY9fFzYPYcFkEAVs3zvS6kqci6Jw+
-X-Google-Smtp-Source: AGHT+IFEnTg9R/qann/lOPelXehoFTGTatIeMCkCtVrEwnDcdtyqpvfAkonWG+nAVh/MnSIWhJGjE48Lvu9aiHqzw14=
-X-Received: by 2002:a05:6402:4306:b0:5d0:e570:508d with SMTP id
- 4fb4d7f45d1cf-5db7d2fe766mr46104157a12.17.1738072260094; Tue, 28 Jan 2025
- 05:51:00 -0800 (PST)
+	s=arc-20240116; t=1738073707; c=relaxed/simple;
+	bh=8PBtS2S3XxVdCLSaJH6kLfHYrdk4SM3PxxSrFIw6x5Y=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=g/64PHX0IiTJEV/WHEgJfzaFzdmbRkBcBI+p+vyEb3OwwQTn3630t4WyuyZwoTDSJUkuvP5OLhuzY2TamB9z1CS0CRRpWyyRpi0mK2UHbiaFx5Ok1KVlUe9tp8NXxbOGcMOwJnVFqCPQg8Q7qcAbWRP2x8uRlG3DuH5LNcX35+c=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=e14cbGaI; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7E98BC4CED3;
+	Tue, 28 Jan 2025 14:14:59 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1738073707;
+	bh=8PBtS2S3XxVdCLSaJH6kLfHYrdk4SM3PxxSrFIw6x5Y=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=e14cbGaInh0NR+A7fT0HG70AK6WyyR5LKWFhSpaLTBYwHajZwUfD240x6RbBB/tas
+	 92Zwp7qwywqz27UUJ6sWm4btAj+fNFAYmXfK02eODiCnuDd+wGaK+smbaqOLNx+7Tt
+	 YjydWdZaVeR9nUpOTaOXhs/uKhYufgiCX15xopb8EOJZrhE2M1wrXSwQq1ULpFnZVo
+	 VLBAnezF/TRiHWwCz9kcJAM7MR3zVspyq7dRZ06q3zfH70zwlz0WA14B865nFbuhcX
+	 pLBqNTiJ+tr3fP5Lxf05MbYH03YEarWqQty7JZB8cEJLff1cER5HXViGVfKQtl7+K1
+	 AWPH7o8wQMp8w==
+Message-ID: <1da56c20-c522-428e-81ff-bc2f9ee0f524@kernel.org>
+Date: Tue, 28 Jan 2025 15:14:55 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250128103821.29745-1-nicolas.bouchinet@clip-os.org>
-In-Reply-To: <20250128103821.29745-1-nicolas.bouchinet@clip-os.org>
-From: Eric Dumazet <edumazet@google.com>
-Date: Tue, 28 Jan 2025 14:50:48 +0100
-X-Gm-Features: AWEUYZnj0wLkPbZkLPZaDf0_hDXXhoPkhATX-_CrgJINqcwh6bwfWAV-22rK7tI
-Message-ID: <CANn89iJ5CMe+gYpEKJFWu6hBVWNZt9VFCc7ANu3_gk6_88zh=A@mail.gmail.com>
-Subject: Re: [PATCH v2 1/1] net: sysctl: Bound check gc_thresh sysctls
-To: nicolas.bouchinet@clip-os.org
-Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	Nicolas Bouchinet <nicolas.bouchinet@ssi.gouv.fr>, Joel Granados <j.granados@samsung.com>, 
-	"David S. Miller" <davem@davemloft.net>, David Ahern <dsahern@kernel.org>, 
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, 
-	Steffen Klassert <steffen.klassert@secunet.com>, Herbert Xu <herbert@gondor.apana.org.au>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v5 1/4] dt-bindings: net: Add FSD EQoS device tree
+ bindings
+To: Swathi K S <swathi.ks@samsung.com>, robh@kernel.org, davem@davemloft.net,
+ edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
+ conor+dt@kernel.org, richardcochran@gmail.com, mcoquelin.stm32@gmail.com,
+ andrew@lunn.ch, alim.akhtar@samsung.com, linux-fsd@tesla.com
+Cc: netdev@vger.kernel.org, devicetree@vger.kernel.org,
+ linux-kernel@vger.kernel.org, linux-stm32@st-md-mailman.stormreply.com,
+ linux-arm-kernel@lists.infradead.org, linux-samsung-soc@vger.kernel.org,
+ alexandre.torgue@foss.st.com, peppe.cavallaro@st.com, joabreu@synopsys.com,
+ rcsekar@samsung.com, ssiddha@tesla.com, jayati.sahu@samsung.com,
+ pankaj.dubey@samsung.com, ravi.patel@samsung.com, gost.dev@samsung.com
+References: <20250128102558.22459-1-swathi.ks@samsung.com>
+ <CGME20250128102725epcas5p44b02ac2980a3aeb0016ce9fdef011ecf@epcas5p4.samsung.com>
+ <20250128102558.22459-2-swathi.ks@samsung.com>
+From: Krzysztof Kozlowski <krzk@kernel.org>
+Content-Language: en-US
+Autocrypt: addr=krzk@kernel.org; keydata=
+ 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 fv0=
+In-Reply-To: <20250128102558.22459-2-swathi.ks@samsung.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-On Tue, Jan 28, 2025 at 11:39=E2=80=AFAM <nicolas.bouchinet@clip-os.org> wr=
-ote:
->
-> From: Nicolas Bouchinet <nicolas.bouchinet@ssi.gouv.fr>
->
-> ipv4, ipv6 and xfrm6 gc_thresh sysctls were authorized to be written any
-> negative values, which would be stored in an unsigned int backing data
-> (the gc_thresh variable in the dst_ops struct) since the proc_handler
-> was proc_dointvec.
->
-> It seems to be used to disables garbage collection of
-> `net/ipv4/route/gc_thresh` since commit: 4ff3885262d0 ("ipv4: Delete
-> routing cache."). gc_thresh variable being set to `~0`.
+On 28/01/2025 11:25, Swathi K S wrote:
+> +  Tesla ethernet devices based on dwmmac support Gigabit ethernet.
+> +
+> +allOf:
+> +  - $ref: snps,dwmac.yaml#
+> +
+> +properties:
+> +  compatible:
+> +    const: tesla,fsd-ethqos.yaml
+> +
+> +  reg:
+> +    maxItems: 1
+> +
+> +  interrupts:
+> +    maxItems: 1
+> +
+> +  clocks:
+> +    minItems: 5
+> +    maxItems: 10
 
-Simply reflecting this sysctl was kept to avoid user scripts to fail.
+Why is this flexible?
 
-Kernel ignores its value.
+Anyway, you need to list and describe the items instead of min/maxItems.
 
->
-> To clarify the sysctl interface, the proc_handler has thus been updated
-> to proc_dointvec_minmax and writings have between limited between
-> SYSCTL_NEG_ONE and SYSCTL_INT_MAX.
->
-> With this patch applied, sysctl writes outside the defined in the bound
-> will thus lead to a write error :
->
-> ```
-> echo "-2" > /proc/sys/net/ipv4/route/gc_thresh
-> bash: echo: write error: Invalid argument
-> ```
->
-> Signed-off-by: Nicolas Bouchinet <nicolas.bouchinet@ssi.gouv.fr>
+> +
+> +  clock-names:
+> +    minItems: 5
+> +    maxItems: 10
 
-gc_thresh is "unsigned int"
+Same here.
 
-Why would we allow setting it to 0xFFFFFFFF but not 0xCF012345 ?
+> +
+> +  iommus:
+> +    maxItems: 1
+> +
+> +  phy-mode:
+> +    enum:
+> +     - rgmii-id
+> +
+> +required:
+> +  - compatible
+> +  - reg
+> +  - interrupts
+> +  - clocks
+> +  - clock-names
+> +  - iommus
+> +  - phy-mode
+> +
+> +unevaluatedProperties: false
+> +
+> +examples:
+> +  - |
+> +    #include <dt-bindings/clock/fsd-clk.h>
+> +    #include <dt-bindings/interrupt-controller/arm-gic.h>
+> +
+> +    ethernet_1: ethernet@14300000 {
 
-Your patch seems not needed to me.
+Please implement last comment from Rob.
+
+> +              compatible = "tesla,fsd-ethqos";
+> +              reg = <0x0 0x14300000 0x0 0x10000>;
+
+And since there is going to be new version, switch to the preferred
+indentation (4-space). Other option is 2 spaces, but not 8.
+
+> +...
+
+
+Best regards,
+Krzysztof
 
