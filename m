@@ -1,178 +1,246 @@
-Return-Path: <netdev+bounces-161466-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-161467-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id B0AC0A21B6F
-	for <lists+netdev@lfdr.de>; Wed, 29 Jan 2025 11:58:52 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id BA20BA21B9F
+	for <lists+netdev@lfdr.de>; Wed, 29 Jan 2025 12:03:59 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D02293A6580
-	for <lists+netdev@lfdr.de>; Wed, 29 Jan 2025 10:58:32 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 0762916194D
+	for <lists+netdev@lfdr.de>; Wed, 29 Jan 2025 11:03:56 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 63F091B85D1;
-	Wed, 29 Jan 2025 10:58:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="lXflVJkF"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4A9571ADC7B;
+	Wed, 29 Jan 2025 11:02:54 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from NAM12-BN8-obe.outbound.protection.outlook.com (mail-bn8nam12on2046.outbound.protection.outlook.com [40.107.237.46])
+Received: from frasgout.his.huawei.com (frasgout.his.huawei.com [185.176.79.56])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9D17C1B4F0A
-	for <netdev@vger.kernel.org>; Wed, 29 Jan 2025 10:58:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.237.46
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1738148305; cv=fail; b=iXvlK3tZilw6wIuiNusbxn3zL9o779iwph6cvzhdtL0w1jbqv9UdAQwgfguWVaAr8xaspq8T/VIms5sJYw5br+a2oZpLyD+PUpPtkFzGqaHfgRr0uDHIpqa2RYrO7qmo4SpeGl0ytunYZfpjT+HTQ+RJkOwnkmmBuSi19i5rSEs=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1738148305; c=relaxed/simple;
-	bh=dtwWJPpAsaM8ttVBEu+wLTb7tpkOQeKDhYD2LxiAbXA=;
-	h=References:From:To:CC:Subject:Date:In-Reply-To:Message-ID:
-	 MIME-Version:Content-Type; b=RnL5rUmxNpGE6p7qVmtLiHQVw8W77wNov6KRzRPI3XwlLj65Z9UgmevxMwmQnWbZwirtjplTkGH5V8bxRFurIxd+jgNjJxIbBdmGQWZExQJF3bLz+rQ093rFSdbGCsRa+LaNxSOEJcRoJlTvxOk98kQfRTrFbbIrzj2RmEEPRd4=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=lXflVJkF; arc=fail smtp.client-ip=40.107.237.46
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=a49r8H1u5znJKfOr2gZGe7NIRxcjon9k29GWlPifiwQemjmPh8qFlQcycSMt6ATx2+rXTflkv0gKjhUygLxnhyyGytYs8iLAbbi7Kj2lqwkZw2kplvD0oZgoLSqVtQtZPWmCwtUb4tGCyzoenp3Dur8PotO2GNcfJGQz/m4/+yLLwnoI+kQuTc5RdemCvoDN26BvnHFKWNsSbDL9ieyj2r3ibXwBvc5RVNEUdssnbHSAf/PyYLHg8JQQRQsR4Eepr5YpeF6S1/XF89DV2o096QOb45HHteZ8y78moW5smtZmE0Cq+hfpi3ClxKNar6dpXNZaAGjUagNbtxEumXJZIw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=pc9qSDGJnaOEzFTGORVAkF7IGrOwuHgKVaQmQAn/sPI=;
- b=wOPwCsKEZvOOnQeAkVWudWa9k2cy2aAXPR6Z/+m36gIfr2HP90cYOruLuQV0PH3Wwo9QFCvkPXiBmle3wE9FqenRa2Xv2GdXt1LACyeYNxQ2tmwLPtHjXgHulrFN+8i0Buw+aIl6hzydluPLRU371u4K/gNPscUmFXjOP+VBsavrWNNq5Dj9By608Y5hvrShNYa+N5AdJoXZAcU8u4O6IT/nVIjSWbJXqviH6NClBRhiopeW3MDk5dcvqFRAQ5lL4Zyvstuonc+x9aVXn9pN87iZR2jEcXogpSQSbor2krNXciF3mFhLKt/cCymrGwy/TsNN+4jhgP2VEoZ2YlYyIw==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
- 216.228.117.161) smtp.rcpttodomain=gmail.com smtp.mailfrom=nvidia.com;
- dmarc=pass (p=reject sp=reject pct=100) action=none header.from=nvidia.com;
- dkim=none (message not signed); arc=none (0)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=pc9qSDGJnaOEzFTGORVAkF7IGrOwuHgKVaQmQAn/sPI=;
- b=lXflVJkFfdBRDsEE7nFRP6numgO2ByarR7wAeiGKlq3LVW2jpQGGiySrXPTNGKuZAzi3qyRUL4khL0E3Z/oT2f5IuIIkbydtdv9pE9cAMXLedDFGb7L1JI1Rj1BS5rjeUDmhDNgQX4LRl1phfLc/H/LQNRPzESTxQ0LZEop8wuahkQ8ryubnNGPrte4LSB1VO0plwD6mjh8doIV9d6ofcwzfN8nIp9rfmY3RyBJ58YD/bPOqPazXYtiyMJ8KpmCbj2vkOklqzWxvEIaEBYMX6gNmLb9hOuU6lkFlOt2Xt4dHEb+1DmFEt3w6uy0gjQk2OepjBKh5hUL9s896lQb/mA==
-Received: from SA9PR11CA0019.namprd11.prod.outlook.com (2603:10b6:806:6e::24)
- by IA0PR12MB8278.namprd12.prod.outlook.com (2603:10b6:208:3dc::11) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8377.22; Wed, 29 Jan
- 2025 10:58:17 +0000
-Received: from SA2PEPF00003F61.namprd04.prod.outlook.com
- (2603:10b6:806:6e:cafe::46) by SA9PR11CA0019.outlook.office365.com
- (2603:10b6:806:6e::24) with Microsoft SMTP Server (version=TLS1_3,
- cipher=TLS_AES_256_GCM_SHA384) id 15.20.8398.18 via Frontend Transport; Wed,
- 29 Jan 2025 10:58:17 +0000
-X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 216.228.117.161)
- smtp.mailfrom=nvidia.com; dkim=none (message not signed)
- header.d=none;dmarc=pass action=none header.from=nvidia.com;
-Received-SPF: Pass (protection.outlook.com: domain of nvidia.com designates
- 216.228.117.161 as permitted sender) receiver=protection.outlook.com;
- client-ip=216.228.117.161; helo=mail.nvidia.com; pr=C
-Received: from mail.nvidia.com (216.228.117.161) by
- SA2PEPF00003F61.mail.protection.outlook.com (10.167.248.36) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.8398.14 via Frontend Transport; Wed, 29 Jan 2025 10:58:17 +0000
-Received: from rnnvmail201.nvidia.com (10.129.68.8) by mail.nvidia.com
- (10.129.200.67) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.4; Wed, 29 Jan
- 2025 02:58:01 -0800
-Received: from fedora (10.126.231.35) by rnnvmail201.nvidia.com (10.129.68.8)
- with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.14; Wed, 29 Jan
- 2025 02:57:57 -0800
-References: <20250126115635.801935-1-danieller@nvidia.com>
- <20250126115635.801935-10-danieller@nvidia.com>
- <20250127121606.0c9ace12@kernel.org>
- <DM6PR12MB4516969F2EEE1CBF7E5E7A03D8EF2@DM6PR12MB4516.namprd12.prod.outlook.com>
-User-agent: mu4e 1.8.14; emacs 29.4
-From: Petr Machata <petrm@nvidia.com>
-To: Danielle Ratson <danieller@nvidia.com>
-CC: Jakub Kicinski <kuba@kernel.org>, "netdev@vger.kernel.org"
-	<netdev@vger.kernel.org>, "mkubecek@suse.cz" <mkubecek@suse.cz>,
-	"matt@traverse.com.au" <matt@traverse.com.au>, "daniel.zahka@gmail.com"
-	<daniel.zahka@gmail.com>, Amit Cohen <amcohen@nvidia.com>, NBU-mlxsw
-	<NBU-mlxsw@exchange.nvidia.com>
-Subject: Re: [PATCH ethtool-next 09/14] qsfp: Add JSON output handling to
- --module-info in SFF8636 modules
-Date: Wed, 29 Jan 2025 11:44:26 +0100
-In-Reply-To: <DM6PR12MB4516969F2EEE1CBF7E5E7A03D8EF2@DM6PR12MB4516.namprd12.prod.outlook.com>
-Message-ID: <87ed0lq43y.fsf@nvidia.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2F5C61D9346;
+	Wed, 29 Jan 2025 11:02:50 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.176.79.56
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1738148574; cv=none; b=hJVBKrB9R4OnE138cctFvbwOVtYq2UoVaSNtmBQXIC4mmjswfwloaNX1m9cau+7Y2aobfcqSkYRMlKFwp/klo++vsPFdzU9AV4laleqxcRTNaHQux82+O7spw6rTg5zCK6KEuohsmZZULtlJPXDZhtulbjGhn7fcMORagwREe9o=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1738148574; c=relaxed/simple;
+	bh=a8wVuDa971b8zNqIsHQA7qlVQkaGnw4JI1vy/uvMChg=;
+	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
+	 In-Reply-To:Content-Type; b=hhdINjKoonNSPlzx5kq/tZqO6pu+HNEZNV3NMkenCXBrKSntsITOVHlcRoSS6+83JLFM9+vJGo8ZYtM/BSjQ+dvolQ0tbuOQdb08iKKaKyePz0h3d+xyokOrZlhwbH4WdXcighQ1ClZhHt2wWgj5631eXSAJ2dnZpc04zkxUm3M=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei-partners.com; spf=pass smtp.mailfrom=huawei-partners.com; arc=none smtp.client-ip=185.176.79.56
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei-partners.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei-partners.com
+Received: from mail.maildlp.com (unknown [172.18.186.231])
+	by frasgout.his.huawei.com (SkyGuard) with ESMTP id 4YjfMT1b5Wz6D9DJ;
+	Wed, 29 Jan 2025 19:00:37 +0800 (CST)
+Received: from mscpeml500004.china.huawei.com (unknown [7.188.26.250])
+	by mail.maildlp.com (Postfix) with ESMTPS id 7BD47140B30;
+	Wed, 29 Jan 2025 19:02:42 +0800 (CST)
+Received: from [10.123.123.159] (10.123.123.159) by
+ mscpeml500004.china.huawei.com (7.188.26.250) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1258.34; Wed, 29 Jan 2025 14:02:40 +0300
+Message-ID: <103de503-be0e-2eb2-b6f0-88567d765148@huawei-partners.com>
+Date: Wed, 29 Jan 2025 14:02:38 +0300
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain
-X-ClientProxiedBy: rnnvmail203.nvidia.com (10.129.68.9) To
- rnnvmail201.nvidia.com (10.129.68.8)
-X-EOPAttributedMessage: 0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: SA2PEPF00003F61:EE_|IA0PR12MB8278:EE_
-X-MS-Office365-Filtering-Correlation-Id: 89cec8f7-01b9-499e-f1e7-08dd4053d5fa
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|1800799024|36860700013|82310400026|376014;
-X-Microsoft-Antispam-Message-Info:
-	=?us-ascii?Q?IwHCCMExuC7wee2T0FuMHc4LFbFbrrPgHwmPbH3bzBC5sgRMvwK4k/QSRXps?=
- =?us-ascii?Q?cX9Ay0pCNKmunRv4s6cphzumuae30pg9zVXxFbLo6aqaYNEvXkm9c2P3SLju?=
- =?us-ascii?Q?Evb5WLucUF6Yxl36gnI2TDDcBjPFG1J1WMjLgkVjesDHYRXNC2Zxd9yoZvEO?=
- =?us-ascii?Q?ERNcpwIdkkaUuD4bPd4Ug5jrSVLVY8NclKEsWwJxA3FdL73aFMArE8NQ/oKS?=
- =?us-ascii?Q?lVYbjaPX91XESBzIapnXD0/xGOVLTSMMESujaMqw/vG80veq+PEGOhzQyY8D?=
- =?us-ascii?Q?1LHJwSteG7eCcbpX1NEi7L+ViL+MwVS6GwbKF6fInmq8rVJLfIUKmYprAtwC?=
- =?us-ascii?Q?xDIHEkoLW9eHg/oD5RwkXecIxRD4v0iBt26qj/hVomxg9Gq9kd8xWW4QOoVb?=
- =?us-ascii?Q?4ERjxnz7c7xnZr6Q3iACr0RxJnulgovXSGv2ojShcmBUsk31Ej80AFNmz0Fh?=
- =?us-ascii?Q?59CbTTzJQmKJFwk1V37wiV3JMjuTWDTwVIQ9tHnBPg5f9NOFCQ0W7eFKbkIE?=
- =?us-ascii?Q?FQGstJbWl2EkXKM/1gdKXZP1OQObL+Vbey1TpNuPmjr/u336lohoc8+R9cFR?=
- =?us-ascii?Q?Y0Q9jtRb8/dpK5bhQg5E0qOat2PTy4TZ/PVVCljeTXnoondjtF2E6Rj34TdH?=
- =?us-ascii?Q?ic68C8Hv2ruIy+/p3bWbMlSrwq+GkmXeU6xXHfUObEEWgXOUvIMJErTDLU4i?=
- =?us-ascii?Q?58617zMXge6gzxyUPs7fZvrS6JCWgWVmCSGNz1OTHqlc9LqQLBrNEtsWhqrZ?=
- =?us-ascii?Q?JTT1UjYkDnqtHijHUInyeBGeq8M/XEN2FBtRbEdbIJHep6x24cAWyoJEcfXH?=
- =?us-ascii?Q?JaQR/ACwL5yV/BLHoc+zLFqSnN0bTeFFszJeMpPXzF+F6kJOzNEgBkQNINYf?=
- =?us-ascii?Q?OilF9u/vW9F7sQljtY+Z/C7y3pyY89X7f5mS/XklZv51nhdQ1xddCqIh0zVq?=
- =?us-ascii?Q?V8UQimDH7IQ1CM6GUpBhx6wwlQkVwStGmVRPldBJ0PsdzO2C77IofeL+7hmD?=
- =?us-ascii?Q?zk5jfQfM8F7kCux7cEwdkHgxzqz5AdCct97qmuu73LElzxU8MeN2iFSd9bLS?=
- =?us-ascii?Q?YaM7PfmmQYKciMj9ursH+oIMLybe/nAS2XxonLTFtjpUliHgn+3Dr9kFGaIZ?=
- =?us-ascii?Q?eFYS+RjrF8HBW5km/dJym+AjQIuymKVblk9R/LLQazgYoLgyPrwSYNQKGoy0?=
- =?us-ascii?Q?WO9mojc81LkRK2YUBhFWf8PBWzd+zfBSJfbwbuWznhrIG4pXIQuAz7/uAr9N?=
- =?us-ascii?Q?f9ygD2f3VN1oZhTSrhPTJFLrGnIzzQwtTMdMBVA94rYa4GbESBJVX9+LXc+d?=
- =?us-ascii?Q?L8HWiB2Py0QP1xAAC++EC2lpS5GTFyxYsB3nc2UFH5qemm2ELU8Nk2x3eyoQ?=
- =?us-ascii?Q?UGhWAAfQqpxLcXAm0d5OPwYIhjkG/P83TSjuhwckCj/Qse8TfVoYvqFpuvnF?=
- =?us-ascii?Q?ZRLVO0X065AG5Kuw6rOjMnlkXCgISefv+MerQejGNNZnfv7a6fgRvEz0hLLh?=
- =?us-ascii?Q?LTSjxs3cHOFw0RM=3D?=
-X-Forefront-Antispam-Report:
-	CIP:216.228.117.161;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:dc6edge2.nvidia.com;CAT:NONE;SFS:(13230040)(1800799024)(36860700013)(82310400026)(376014);DIR:OUT;SFP:1101;
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 29 Jan 2025 10:58:17.1528
- (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: 89cec8f7-01b9-499e-f1e7-08dd4053d5fa
-X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[216.228.117.161];Helo=[mail.nvidia.com]
-X-MS-Exchange-CrossTenant-AuthSource:
-	SA2PEPF00003F61.namprd04.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Anonymous
-X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: IA0PR12MB8278
+User-Agent: Mozilla Thunderbird
+Subject: Re: [RFC PATCH v2 1/8] landlock: Fix non-TCP sockets restriction
+Content-Language: ru
+To: Matthieu Baerts <matttbe@kernel.org>, =?UTF-8?Q?Micka=C3=ABl_Sala=C3=BCn?=
+	<mic@digikod.net>
+CC: <gnoack@google.com>, <willemdebruijn.kernel@gmail.com>,
+	<matthieu@buffet.re>, <linux-security-module@vger.kernel.org>,
+	<netdev@vger.kernel.org>, <netfilter-devel@vger.kernel.org>,
+	<yusongping@huawei.com>, <artem.kuzin@huawei.com>,
+	<konstantin.meskhidze@huawei.com>, MPTCP Linux <mptcp@lists.linux.dev>,
+	<linux-nfs@vger.kernel.org>, Paul Moore <paul@paul-moore.com>
+References: <20241017110454.265818-1-ivanov.mikhail1@huawei-partners.com>
+ <20241017110454.265818-2-ivanov.mikhail1@huawei-partners.com>
+ <49bc2227-d8e1-4233-8bc4-4c2f0a191b7c@kernel.org>
+ <20241018.Kahdeik0aaCh@digikod.net>
+ <62336067-18c2-3493-d0ec-6dd6a6d3a1b5@huawei-partners.com>
+ <20241212.qua0Os3sheev@digikod.net>
+ <f480bbea-989d-378a-9493-c2bee412db00@huawei-partners.com>
+ <20250124.gaegoo0Ayahn@digikod.net>
+ <2f970b00-7648-1865-858a-214c5c6af0c4@huawei-partners.com>
+ <20250127.Uph4aiph9jae@digikod.net>
+ <d3d589c3-a70b-fc6e-e1bb-d221833dfef5@huawei-partners.com>
+ <594263fc-f4e7-43ce-a613-d3f8ebb7f874@kernel.org>
+ <f6e72e71-c5ed-8a9c-f33e-f190a47b8c27@huawei-partners.com>
+ <2e727df0-c981-4e0c-8d0d-09109cf27d6f@kernel.org>
+From: Mikhail Ivanov <ivanov.mikhail1@huawei-partners.com>
+In-Reply-To: <2e727df0-c981-4e0c-8d0d-09109cf27d6f@kernel.org>
+Content-Type: text/plain; charset="UTF-8"; format=flowed
+Content-Transfer-Encoding: 8bit
+X-ClientProxiedBy: lhrpeml500006.china.huawei.com (7.191.161.198) To
+ mscpeml500004.china.huawei.com (7.188.26.250)
 
+On 1/29/2025 1:25 PM, Matthieu Baerts wrote:
+> Hi Mikhail,
+> 
+> On 29/01/2025 10:52, Mikhail Ivanov wrote:
+>> On 1/28/2025 9:14 PM, Matthieu Baerts wrote:
+>>> Hi Mikhail,
+>>>
+>>> Sorry, I didn't follow all the discussions in this thread, but here are
+>>> some comments, hoping this can help to clarify the MPTCP case.
+>>
+>> Thanks a lot for sharing your knowledge, Matthieu!
+>>
+>>>
+>>> On 28/01/2025 11:56, Mikhail Ivanov wrote:
+>>>> On 1/27/2025 10:48 PM, Mickaël Salaün wrote:
+>>>
+>>> (...)
+>>>
+>>>>> I'm a bit worried that we miss some of these places (now or in future
+>>>>> kernel versions).  We'll need a new LSM hook for that.
+>>>>>
+>>>>> Could you list the current locations?
+>>>>
+>>>> Currently, I know only about TCP-related transformations:
+>>>>
+>>>> * SMC can fallback to TCP during connection. TCP connection is used
+>>>>     (1) to exchange CLC control messages in default case and (2) for the
+>>>>     communication in the case of fallback. If socket was connected or
+>>>>     connection failed, socket can not be reconnected again. There is no
+>>>>     existing security hook to control the fallback case,
+>>>>
+>>>> * MPTCP uses TCP for communication between two network interfaces in the
+>>>>     default case and can fallback to plain TCP if remote peer does not
+>>>>     support MPTCP. AFAICS, there is also no security hook to control the
+>>>>     fallback transformation,
+>>>
+>>> There are security hooks to control the path creation, but not to
+>>> control the "fallback transformation".
+>>>
+>>> Technically, with MPTCP, the userspace will create an IPPROTO_MPTCP
+>>> socket. This is only used "internally": to communicate between the
+>>> userspace and the kernelspace, but not directly used between network
+>>> interfaces. This "external" communication is done via one or multiple
+>>> kernel TCP sockets carrying extra TCP options for the mapping. The
+>>> userspace cannot directly control these sockets created by the kernel.
+>>>
+>>> In case of fallback, the kernel TCP socket "simply" drop the extra TCP
+>>> options needed for MPTCP, and carry on like normal TCP. So on the wire
+>>> and in the Linux network stack, it is the same TCP connection, without
+>>> the MPTCP options in the TCP header. The userspace continue to
+>>> communicate with the same socket.
+>>>
+>>> I'm not sure if there is a need to block the fallback: it means only one
+>>> path can be used at a time.
+>>
+>> You mean that users always rely on a plain TCP communication in the case
+>> the connection of MPTCP multipath communication fails?
+> 
+> Yes, that's the same TCP connection, just without extra bit to be able
+> to use multiple TCP connections associated to the same MPTCP one.
 
-Danielle Ratson <danieller@nvidia.com> writes:
+Indeed, so MPTCP communication should be restricted the same way as TCP.
+AFAICS this should be intuitive for MPTCP users and it'll be better
+to let userland define this dependency.
 
-> From: Jakub Kicinski <kuba@kernel.org>
->> 
->> On Sun, 26 Jan 2025 13:56:30 +0200 Danielle Ratson wrote:
->> > +		open_json_object("extended_identifier");
->> > +		print_int(PRINT_JSON, "value", "0x%02x",
->> > +			  map->page_00h[SFF8636_EXT_ID_OFFSET]);
->> 
->> Hm, why hex here?
->> Priority for JSON output is to make it easy to handle in code, rather than easy
->> to read. Hex strings need extra manual decoding, no?
->
-> I kept the same convention as in the regular output.
->
-> And as agreed in Daniel's design those hex fields remain hex fields and are followed by a description field.
->
-> Do you think otherwise?  
+> 
+>>>> * IPv6 -> IPv4 transformation for TCP and UDP sockets withon
+>>>>     IPV6_ADDRFORM. Can be controlled with setsockopt() security hook.
+>>>>
+>>>> As I said before, I wonder if user may want to use SMC or MPTCP and deny
+>>>> TCP communication, since he should rely on fallback transformation
+>>>> during the connection in the common case. It may be unexpected for
+>>>> connect(2) to fail during the fallback due to security politics.
+>>>
+>>> With MPTCP, fallbacks can happen at the beginning of a connection, when
+>>> there is only one path. This is done after the userspace's connect(). If
+>>> the fallback is blocked, I guess the userspace will get the same errors
+>>> as when an open connection is reset.
+>>
+>> In the case of blocking due to security policy, userspace should get
+>> -EACESS. I mean, the user might not expect the fallback path to be
+>> blocked during the connection if he has allowed only MPTCP communication
+>> using the Landlock policy.
+> 
+> A "fallback" can happen on different occasions as mentioned in the
+> RFC8684 [1], e.g.
+> 
+> - The client asks to use MPTCP, but the other peer doesn't support it:
+> 
+>    Client                Server
+>    |     SYN + MP_CAPABLE     |
+>    |------------------------->|
+>    |         SYN/ACK          |
+>    |<-------------------------|  => Fallback on the client side
+>    |           ACK            |
+>    |------------------------->|
+> 
+> - A middle box doesn't touch the 3WHS, but intercept the communication
+> just after:
+> 
+>    Client                Server
+>    |     SYN + MP_CAPABLE     |
+>    |------------------------->|
+>    |   SYN/ACK + MP_CAPABLE   |
+>    |<-------------------------|
+>    |     ACK + MP_CAPABLE     |
+>    |------------------------->|
+>    |        DSS + data        | => but the server doesn't receive the DSS
+>    |------------------------->| => So fallback on the server side
+>    |           ACK            |
+>    |<-------------------------| => Fallback on the client side
+> 
+> - etc.
+> 
+> So the connect(), even in blocking mode, can be OK, but the "fallback"
+> will happen later.
 
-Regular output is for human consumption, JSON is for machine
-consumption. IMHO it makes sense to reasonably diverge and use the
-"correct" JSON type where available, even if the human-readable output
-is different. So numbers should IMHO be numbers, true / false, yes / no,
-off / on etc. should probably be booleans, arrays should be arrays, etc.
+Thanks! Theoretical "socket transformation" control should cover all
+these cases.
+
+You mean that it might be reasonable for a Landlock policy to block
+MPTCP fallback when establishing first sublflow (when client does not
+receive MP_CAPABLE)?
+
+> 
+> Again, once the "fallback" has been done, it just means there will be no
+> more MPTCP options in the TCP headers, and these TCP connections,
+> created and controlled by the kernel, will continue as "plain" TCP
+> connections. It simply means that the MPTCP connection will be
+> restricted to one path, because it will not be possible to create
+> additional paths any more without these MPTCP options in the initial path.
+
+Correct, thanks
+
+> 
+> [1] https://datatracker.ietf.org/doc/html/rfc8684#name-fallback
+> 
+>>> (Note that on the listener side, the fallback can happen before the
+>>> userspace's accept() which can even get an IPPROTO_TCP socket in return)
+>>
+>> Indeed, fallback can happen on a server side as well.
+> 
+> Same here, this fallback can happen at different stages of the
+> connection, e.g. the server, supporting MPTCP, can receive a SYN without
+> MP_CAPABLE option ; or the 3WHS is OK, but the MPTCP options are
+> stripped later.
+> 
+>>>> Theoretically, any TCP restriction should cause similar SMC and MPTCP
+>>>> restriction. If we deny creation of TCP sockets, we should also deny
+>>>> creation of SMC and MPTCP sockets. I thought that such dependencies may
+>>>> be too complex and it will be better to leave them for the user and not
+>>>> provide any transformation control at all. What do you think?
+>>> I guess the creation of "kernel" TCP sockets used by MPTCP (and SMC?)
+>>> can be restricted, it depends on where this hook is placed I suppose.
+>>
+>> Calling
+>>      socket(AF_INET, SOCK_STREAM, IPPROTO_MPTCP)
+>> causes creation of kernel TCP socket, so we can use
+>> security_socket_create() hook for this purpose.
+> 
+> That's good if you use this hook then!
+> 
+> Cheers,
+> Matt
 
