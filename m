@@ -1,354 +1,255 @@
-Return-Path: <netdev+bounces-161520-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-161522-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id DAED8A21F50
-	for <lists+netdev@lfdr.de>; Wed, 29 Jan 2025 15:36:47 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6EB10A21FAF
+	for <lists+netdev@lfdr.de>; Wed, 29 Jan 2025 15:52:06 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 462287A1955
-	for <lists+netdev@lfdr.de>; Wed, 29 Jan 2025 14:35:50 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id A612F1885009
+	for <lists+netdev@lfdr.de>; Wed, 29 Jan 2025 14:52:10 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BDFD01922F5;
-	Wed, 29 Jan 2025 14:36:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1F5FB1B4257;
+	Wed, 29 Jan 2025 14:52:00 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="gVEoiwXE"
+	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="aIuh8Ifo"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f48.google.com (mail-wm1-f48.google.com [209.85.128.48])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from NAM10-MW2-obe.outbound.protection.outlook.com (mail-mw2nam10on2077.outbound.protection.outlook.com [40.107.94.77])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A97F81474A7;
-	Wed, 29 Jan 2025 14:36:35 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.48
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1738161397; cv=none; b=MYv9X/GRTlfeNDx1MPUQQplREv9JZqmvA06f5TbOK6IFWwiMheMWYF6gxWWHMLoJsR1va4U/s6NNUtMg02QxOb5WsZHLFsfzLQL4AMJkR5QuORtpVwjoB+27yOqg98eES8d/v8IePsE1qDZA7MJg0xpVLIrq5qNwuWvjX02wDRs=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1738161397; c=relaxed/simple;
-	bh=GdEI/Xk2j5FiMtc++O5jVQhNKnf5OWc1lfUXq0M/18Y=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=KDbZpo+lxsrWXi5Wl7I6Y5MDfxF/1w/1Q2bApVJ6ayVMYGG+yr7m75vzECBPF590Pu75OCzMF5KzbALQfFTwd2tbn/kp2llsAJ4SUcgyP6zvcaw8clKsHMsRF/0rAXJUo3DUsvk8gzIzZw+3tmybIH1KyhjSxxyV49os/xyV6pc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=gVEoiwXE; arc=none smtp.client-ip=209.85.128.48
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wm1-f48.google.com with SMTP id 5b1f17b1804b1-436326dcb1cso47785775e9.0;
-        Wed, 29 Jan 2025 06:36:35 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1738161394; x=1738766194; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=2sIfHEvcxCY3pnpcdFB+oh5QhdHA0BfWgcYNXklwgHQ=;
-        b=gVEoiwXEhbU7gcgOlXvyBV/94kE87QEpe2/EAJjQDGG8TDFHwpqszN2RnO7a2VJJ3r
-         BVT9um0fuUzwsT/akDGHGZqf6hF3p/1vYxECEQm+b7jldCW5xLcCT7dvk+gC2mF9RcJn
-         CzVfgdWWWTkRWRE82escxV14YLFklHOfxtmS1AwGpQr5QKavDYRsgAVyRV2zxtdJLfXc
-         sHhKxkKpGt3FvIiUpKmjY9QPeeE2H1plvUZje6a4xr6ozK4IMIdYFtlrhLhUTOM5drrL
-         qy+MZPh94vZMSdT2JljT4Aa+Uatrp4TvVr7HEcPzLSK5E9zBDixUoSCJXwEt5XPMBr5A
-         ZI9g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1738161394; x=1738766194;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=2sIfHEvcxCY3pnpcdFB+oh5QhdHA0BfWgcYNXklwgHQ=;
-        b=msPYg1/NEkngLUwdm70XMq7HFeeKqrDyLd9ZPwxr5z2YvInk5h6NAaU/rz0nxn510W
-         0Hb/xavHFUtw8TDIMCTESv/wtgqfXrNJzgfF7otaKk/5q+/6CQUpIzIZFAIlFPpdAVO+
-         Vh6ZY6ogvuKKnM1n2fzMK5tQ2VLF97jUStOFeUEKcqUsAyqd3iMsmuydoKLIIRmeoX47
-         2CQ3lmofjmz+hgR3uO7zpQ3OJpSp7it/NE41vpoEiphdLk13BYXDwGHfxfiibtGySXxm
-         grhjeDsDnlj1gviH+uexI5kYVHQP9J9k9ct/Byep7eLmpWOqukaspP7Ribq5cIeboDjm
-         Pcfg==
-X-Forwarded-Encrypted: i=1; AJvYcCV5DuS3nWj0z9tdxWVBePjvBWLJnxsXwOVNQOL3mt+kWc36NsCVsvT8y6IiynfUPmiG35kOOqdrIBghFgJr49A=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yzm++kkmT598d7GVi8SQZfsBBOzCs6x3zKQLpHb4Lpx9XbMndIw
-	GInGIHxBEo5uhF6T1x4gXG1cTQg95Cv2iNsOvI3g0p7osqYH9pCBZfplCqrm
-X-Gm-Gg: ASbGncsM/Oh1iyY09IsZ/fsqtGRkp9OAGZKGqx0mSdI/2d2buffv4uh5G7GHxsfcRNs
-	/y4JwrDl0zTZJ/wmkrdG7V1BhIcCMQ3GYMtI/sFypq5NdlB0TYm2aWaPo7X1onsdwUY09xQF40U
-	OCruDEEdL8bC3tUUm8oKrbzryVexxMkbX6N1zWnB+JL+X7iE+ZyxCuc1rrSc9muLUX9KOBBv/02
-	iT+XumUd5oTvhOLDTtPyNpT2OkzQvIMPpu6f7M2j2iouJ8TMFhq/viOl8My72JbbXywCCIXFizj
-	TY1OHzvMuVmbkJTvxse4MOANpbYiM15UqDYPfw==
-X-Google-Smtp-Source: AGHT+IFIFR8iv/eVaU11QgIa3cyc7+1szefMZosV1a+eSFkjJCYbCxA9WYj1pFXZGMSpdhB9/X2Z0w==
-X-Received: by 2002:a05:600c:1f15:b0:434:f335:83b with SMTP id 5b1f17b1804b1-438dc3a84aamr31947285e9.5.1738161393326;
-        Wed, 29 Jan 2025 06:36:33 -0800 (PST)
-Received: from localhost.localdomain ([2001:4c4e:1eb5:de00:1ff8:8b09:84cb:1239])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-438dcc6df36sm26472465e9.25.2025.01.29.06.36.32
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 29 Jan 2025 06:36:32 -0800 (PST)
-From: Anna Emese Nyiri <annaemesenyiri@gmail.com>
-To: netdev@vger.kernel.org
-Cc: fejes@inf.elte.hu,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	willemb@google.com,
-	idosch@idosch.org,
-	davem@davemloft.net,
-	horms@kernel.org,
-	shuah@kernel.org,
-	linux-kselftest@vger.kernel.org,
-	Anna Emese Nyiri <annaemesenyiri@gmail.com>
-Subject: [PATCH net-next 1/1] selftests: net: Add support for testing SO_RCVMARK and SO_RCVPRIORITY
-Date: Wed, 29 Jan 2025 15:36:01 +0100
-Message-ID: <20250129143601.16035-2-annaemesenyiri@gmail.com>
-X-Mailer: git-send-email 2.43.0
-In-Reply-To: <20250129143601.16035-1-annaemesenyiri@gmail.com>
-References: <20250129143601.16035-1-annaemesenyiri@gmail.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4BCAA191F95;
+	Wed, 29 Jan 2025 14:51:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.94.77
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1738162320; cv=fail; b=YRMfwnHPYDDtfaBjqNDsof8FhlYWsvCLHx3OOCL3bxSg6cMsVo1usg700qBYfChiYh3LdHZwh49K52VeVDrWf1QBGRPDMiQ/YGXy/+1p89DI1vKG/uD6HEgYLsetO1IYW0N3Ulh/3cXhUny8DSsVpiviUrRXulkxQo0+m2BKsu8=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1738162320; c=relaxed/simple;
+	bh=761QXyax1fikhX08rlR7WHOOrnXW5pLjN+yKhGnMiac=;
+	h=Message-ID:Date:Subject:To:Cc:References:From:In-Reply-To:
+	 Content-Type:MIME-Version; b=mIlbNSjvh4fLYIf/2L9xUtJ1cFwuv2GjrdmDNQCKgciCNiauWGKXc+ITCIT0T35KMwcN1GrnQMT43SKjTOqGY/94KyrjKnLx58bHHcOAFnUsWAw7lXXtxe/YzJzMw5DOzb3siptU/XeALVUXnFF2+mKkL1iGcrKrpwASmKynTEk=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=aIuh8Ifo; arc=fail smtp.client-ip=40.107.94.77
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=Aduf/xQ5Yj7RInB0BeV2mANOQrJ6+sQ4EYqooAeWrehofGySmUC9q9DHsyYByQHqj4kqjRtnZ9074NGk5LfzPcSsVzwhluX7edYIJsNtUgT8X2Pb+AyaIXvGx+GRiMDGtpQdh49A7x4heod0+kZ5MuU+UaMFwRxit30ckpDyn+qVPZAJ4pEc4Dt+7n5870MPXqBGEjR+aH3iRDwNyIlr4TsxcyF+KYL1MGWTHtWMwYXdfsAxy/2GnJ5IqN1o96JQm5V/4gd8enSGOj6m0zueiAnLTcIsmjCtIGfMaU/1tEeQinBktndK1L40LxsgWR9V+H16y8HwK5ThO0n5q9fAUw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=bl/7CN/1aSDoK7kdURx+lTtGBwEUh+6dntcmLvDMrwQ=;
+ b=qrMGFn2UYSSgFKw6+SQaRi2YenaEO23/Nhm7o3wuzYFQxEZzmFOMvHuM02WVO4mj54dxb453q+TUrtCLJ/Ii2hmCc72mOUd1h9zYB0OQ+Sg5HJY1Ei5y5etTLcdu5RJNdeJL6Ye7tMZHsaKTTKqJ6XI5WzCRsgCH9j6JZlh+0VbdL6TzcBPjW/b5P2fgXshAE0wlZ1Zrq0AD2h1IU73V8HLdqnHFlPXKgIfnngamqNpuxNqcDftvEP9moESecTqw1hyv6ENH7IDbquOYVxNSe/dMmVRGzSlVCl15MjR6rDlPzVmAn7uyyT3HX31FUbKH+lFfu58HIg4Wu1B8Y27piw==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
+ dkim=pass header.d=nvidia.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=bl/7CN/1aSDoK7kdURx+lTtGBwEUh+6dntcmLvDMrwQ=;
+ b=aIuh8IfoopwVXlhxoK4LIyTM0wryubYfKgiLnbwuZllxkk4OlrrDis4m0IjKKz8yzSSdBz3VTy4PlX1u7FNNa+hK/DYpkb6fmF65MkGJGIPsE3ZENPL6uMllXwN47H/XOZZchAsim5dcdhlR84zvYIHBJosQt3ca4RgRUbFlDHkgzvhVBqcjpzFxYRHXDN+NQFKLu66uBGiizbdQ/X2O/B5JMqEVEPAFxlBW4OvPxFfmhQ522qClWSRN9+EoE/Y7otPAQOqFBjZs49wbPCYhHtAvLrXE4iJCZBmQ5eJEmU6uo7oMGEVfrSCw+kifPyXUTPK5mleD5oceLHuMeNmI1Q==
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=nvidia.com;
+Received: from SJ2PR12MB8784.namprd12.prod.outlook.com (2603:10b6:a03:4d0::11)
+ by MN0PR12MB5859.namprd12.prod.outlook.com (2603:10b6:208:37a::17) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8377.22; Wed, 29 Jan
+ 2025 14:51:55 +0000
+Received: from SJ2PR12MB8784.namprd12.prod.outlook.com
+ ([fe80::1660:3173:eef6:6cd9]) by SJ2PR12MB8784.namprd12.prod.outlook.com
+ ([fe80::1660:3173:eef6:6cd9%4]) with mapi id 15.20.8377.021; Wed, 29 Jan 2025
+ 14:51:53 +0000
+Message-ID: <108592a6-de5b-4804-92ff-c7d4547beff0@nvidia.com>
+Date: Wed, 29 Jan 2025 14:51:35 +0000
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next v3 1/4] net: stmmac: Switch to zero-copy in
+ non-XDP RX path
+To: Thierry Reding <thierry.reding@gmail.com>, Furong Xu <0x1207@gmail.com>
+Cc: Ido Schimmel <idosch@idosch.org>, Andrew Lunn <andrew@lunn.ch>,
+ Brad Griffis <bgriffis@nvidia.com>, netdev@vger.kernel.org,
+ linux-stm32@st-md-mailman.stormreply.com,
+ linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
+ Alexander Lobakin <aleksander.lobakin@intel.com>,
+ Joe Damato <jdamato@fastly.com>, Andrew Lunn <andrew+netdev@lunn.ch>,
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ Maxime Coquelin <mcoquelin.stm32@gmail.com>, xfr@outlook.com,
+ "linux-tegra@vger.kernel.org" <linux-tegra@vger.kernel.org>
+References: <cover.1736910454.git.0x1207@gmail.com>
+ <bd7aabf4d9b6696885922ed4bef8fc95142d3004.1736910454.git.0x1207@gmail.com>
+ <d465f277-bac7-439f-be1d-9a47dfe2d951@nvidia.com>
+ <20250124003501.5fff00bc@orangepi5-plus>
+ <e6305e71-5633-48bf-988d-fa2886e16aae@nvidia.com>
+ <ccbecd2a-7889-4389-977e-10da6a00391c@lunn.ch>
+ <20250124104256.00007d23@gmail.com> <Z5S69kb7Qz_QZqOh@shredder>
+ <20250125230347.0000187b@gmail.com>
+ <kyskevcr5wru66s4l6p4rhx3lynshak3y2wxjfjafup3cbneca@7xpcfg5dljb2>
+From: Jon Hunter <jonathanh@nvidia.com>
+Content-Language: en-US
+In-Reply-To: <kyskevcr5wru66s4l6p4rhx3lynshak3y2wxjfjafup3cbneca@7xpcfg5dljb2>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: LO0P123CA0012.GBRP123.PROD.OUTLOOK.COM
+ (2603:10a6:600:354::20) To SJ2PR12MB8784.namprd12.prod.outlook.com
+ (2603:10b6:a03:4d0::11)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: SJ2PR12MB8784:EE_|MN0PR12MB5859:EE_
+X-MS-Office365-Filtering-Correlation-Id: 49ddc7b1-f3aa-4b44-445b-08dd40747848
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;ARA:13230040|1800799024|376014|7416014|366016;
+X-Microsoft-Antispam-Message-Info:
+	=?utf-8?B?aFNKM3JnY1lZME9qajhOZ1VFalZZbVdncXplVmRXd0t0eklJNlgwSGwrQ05l?=
+ =?utf-8?B?OThtYmhtcGxSd0hKeWRHV2ZSNmxEbTNnVUIzdVlXWHp0b01kMDVRL1Jod1Za?=
+ =?utf-8?B?d3hjV3R1RnhDVjhWbk5OWVUrRGt5YzBMMy9KYmVyUGtoOTJ3eGlKQlVBY3lm?=
+ =?utf-8?B?QVM1dlU1Uk05akRQYWdTS0l2TkZQRUpmK0NGeGoraVFXK0R0bTI5b2VFbko5?=
+ =?utf-8?B?aXJ3WVBkZnpNYi9JNjA3dWYxS2xoNmw5KzQyZWNCSjFtdVBqa2Rjb2hxL1FV?=
+ =?utf-8?B?a0xjZkZUaW1FTU5MYVpkSC9uUTJNRUF5a2tSaEdGaVpHN1g3eXFhM2cyWDB3?=
+ =?utf-8?B?NG5uL0ovTkJPSXN0K3NHdGxONjZtbVp3Y0kvZ3VUdUJsUU93cDFFMDFTSUI3?=
+ =?utf-8?B?RjY3bjNxd0FHbHlkV3N0akRIM3dVRzIrTEJ0RGRUUW1aMVFZM1VpbEFBdUlx?=
+ =?utf-8?B?Q2ExWkVjZXl5MHBFdjhyZ3JkWjVwV0JRdXJpdjJQQ0dLQWVLK0JjUHFoTjhC?=
+ =?utf-8?B?Ymhkc2t4c1A2MWdHUTUvNnhYSm5UQ0Fjd0RBSUVYUDlidEVvNzBqdko5TGR1?=
+ =?utf-8?B?K0xMUm1TM2NXWUZtYlRLczNtMDdqcFJuWkhDb0hvazJNVXE4TU1YRCtmL00z?=
+ =?utf-8?B?emUzY0c5M2JNMVJyeWV0QkpVZnl0NWVvbjByWkljazlIWEw3SUFUcFJNVkp5?=
+ =?utf-8?B?aU12d01IblRpaDY2bEh4c1kySmVJTmVPRTJmMWd6WUo2MXJDZnE2WWFuWWl3?=
+ =?utf-8?B?NTJVeWxNRHozUkhnMDB6Yno3SlhNTlF5aCs4TnBObXdxNmN2bnhBOWZnaHUv?=
+ =?utf-8?B?eitpSERCckhUcGRxVTU3T1RldGNjNm43M1krYmV5M1VuRWptWFhmckJyWCsz?=
+ =?utf-8?B?bCtEWnlVQ0hBdzIrQVVneFRDekJ5SFB5Q0Z0MG1yMDRmVmRPTlM2OXBpL1ZI?=
+ =?utf-8?B?eU95dmNvVFFOclZhMHZ1RG5LQjZFellnaFlmcmxtNU9SWFRxT0dYNWxYWWY5?=
+ =?utf-8?B?VE44VkxpS1JiY1lLSWRlMnowMnVBUkJZZnhmQUZBLzZmYUV0VTZrZTJUQkZt?=
+ =?utf-8?B?b3NFZVpIQkJ6R2dFZTI4ZXFFakZuRUkzVWwyOWNXR1g3ZC9YTFp2MjBmOEJY?=
+ =?utf-8?B?WkJVZVh0Z0hUYnZvR3lFVnN6ZzBOYVdQNmszaVNQSG5BSG5mcWZWTStYdTZG?=
+ =?utf-8?B?enpPNXdZc3VGbFh2UFo0aVlFNTFEQzBwV3BDTk1Fbm9CUVQ0dTdZelZUOEVF?=
+ =?utf-8?B?cUlITDdMR2w1UEtUdzd1bDdTOVdzZGF1ek1KUTFMR2ZBUkNycXNmWjVKTllV?=
+ =?utf-8?B?bk4yMXFoMDgwcXpyNlcxdlFjS2dYbUdTL0JwUUhHZXkrLzhZY1ZKdnBpaDQv?=
+ =?utf-8?B?S09RUVROZnRmZ2k4MGF2NWNnMmxwUFNqcGdDZEVXU2R0TjVadUgxQ3J1WmEz?=
+ =?utf-8?B?WGRtMUFPeGNIeHpXTjFhc1duZmNXN3J6OEtRVXJRTDlieHdCNDFXWC9qWFhX?=
+ =?utf-8?B?S1N4TFhCcDFEcE1MVk83YUFwKzdtMTNjdzFzWmlGOGxCUUh4TjI5dDRmdDVZ?=
+ =?utf-8?B?cWx5eUttSCsrMGZwQ1B1SXM0aHVNcnBoKzRRTnY0aDZ6cnp0OFdEM0h4Ukhw?=
+ =?utf-8?B?cHNTNzAvc2dLb1ladEcrWGJqWHo0bmk2OVpySWd1UHpSNjVyUzQ3bENqNmh5?=
+ =?utf-8?B?RE9pSTdrZFdVMkw4bjJZSCt4K1VwUFZoMVJLVDA5dVJTR0t6bHBxdVFkLytk?=
+ =?utf-8?B?bHZBNFNpblBVblNwdDJJWm9Ycmk5NHNiblhVVjVka3E2Uk5LdDcyUEJyc1RD?=
+ =?utf-8?B?dEQrYTQvMm56MzRzM1RicmdNREphWmRvQjBibFdoVzMrL3NxM2Vpb2FZVXB6?=
+ =?utf-8?Q?0tTlvBaX/PBP0?=
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SJ2PR12MB8784.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(1800799024)(376014)(7416014)(366016);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?utf-8?B?Q3doaWJDQWZBdlJBdHRyd210WVRnZGoxNE96Umg0U0RvSkpRR2FjSjRiUUJw?=
+ =?utf-8?B?aWRHYWRmSGMxaXdMbGhYQ3htdWFqMnBOYnU4RGNoMUZRazJvNnVVenMvSXpr?=
+ =?utf-8?B?RnVGaENGKytOVjVYcTRhRVZFL0JMWWtOcGo3cTRseEJML0lKRHhDODhzUGhD?=
+ =?utf-8?B?bitQUG9sbHZxODhBcEt0ZEZDeUp3cnRGUHU5ZEh0UTQwTzZQaHJMVjVuY1hl?=
+ =?utf-8?B?UU9vaDQvb2lGZkxQeFprYm5OUmt5Q2Q1eVhQbnpJemlpSHlSbkNhNXJqclRu?=
+ =?utf-8?B?ZElQeXpBejZpN01uc3JPdWtKQzh5eFg3akRRUThZM1FKSW1Iai81RnBmRysw?=
+ =?utf-8?B?S29LbEk2aWVMUWNrUzZ5eExrcnZmMDVXZWRaWG1yL2oyZzJmbXJQSHpuanFn?=
+ =?utf-8?B?ak1MLzhwWng1VUZBWklBU0N5d2hwb1c1ZFJKaVhyRFNvemVsU2xaa0xKUFYx?=
+ =?utf-8?B?NWZwNlZ3alFuaEJYVEdsNFE2akdhUkNYRC9oSFhxUmNmVzZ1TWxwUWh1bTdw?=
+ =?utf-8?B?RUFTLy9vMHFYd2J3cm1kT3NjZ015d25COWFXVXFvUW9kTXhSTG9QdllTQ1My?=
+ =?utf-8?B?dTc0MFN5L2VSdXJoRlVWQ0lCZVViWjcwZkFEQU4vMk5MS1l3VUJtcWlJYXhp?=
+ =?utf-8?B?aGZBd2NGL1IwUWhpU0JCaVVqdzlTSnRXRFVTMWpLcjNHdThwU2l2cTIrK3VZ?=
+ =?utf-8?B?eGpiejZHZUFrejRJbXIydG1DdnkwNFVZQjl5eWlBS29BcU5nUHpPc1gwWDd0?=
+ =?utf-8?B?MVZaVk5aZEJKTWdLQnZuczVIUEk5TlYxVEhUUHZMM3l5SHdwbzkwN2JteWJV?=
+ =?utf-8?B?K3RNVzBBMmYzNGoxUC8xbEFsck5GYXdJNVM1RG5FdmErYWJjYUR2MHZIVFJD?=
+ =?utf-8?B?Y2k0L3pnNDkxQkdoQVJrRFhFWStNcE5pTlFqdmtjWGllaXRRRXpleEdGTGJN?=
+ =?utf-8?B?ak5mNDZtcktLc3JqNUhxTTdBK2xsd2QwUW1tTnc1S3hPK1VFaUI4UjY0STBE?=
+ =?utf-8?B?OVlBcmJNVnhNaE1WMExQekZmNUNOSnNCM3F2U2NXTDBzNURPOERPREx3RmRs?=
+ =?utf-8?B?S2lMZHBjR2dIbkhTT1B6VHpjeUN2VTVZa2Ricjh5dGJPN09VT1Uwc0pxYTFv?=
+ =?utf-8?B?MXRYbVdFWCtEa0tWTGpGaExvWkNkczU0Q0pIYVRnd1Jmb0xsT3NIL1UydTBs?=
+ =?utf-8?B?aEtYQTgvcy9EdmxqK1JiS3p4Mzk3ZVQ1LzlnWU1RdXIvV21pMXQxRkVYSTV4?=
+ =?utf-8?B?VjNoL2E2bmlWVzV6TytydkQwRTJ5OTUyeTVyNEFwQmR0VWdtdHBjSE50WW1h?=
+ =?utf-8?B?V0NjT0R6OFpSMkcveXFRbVY5ZGRsdG1rZVRQVmRIcm9mTFRoUnRxT2xVN05Y?=
+ =?utf-8?B?RGFVNVExUGFaY3NyamwyNnR4Q2hNVVcyZnVEa29iSjRmczYzQU5rZ0FWajZD?=
+ =?utf-8?B?dU94SE1UVUZ0V0hVTVVLTUJoN3dTeHdabzk0ODI4QUhoVE5WYytQQytJVCtO?=
+ =?utf-8?B?ZHRFS1RzdHFQVUhrbnVLMGZxRWxOWXRsTFZxbGN0Vkdvek10NmN4N0RmY21E?=
+ =?utf-8?B?UmVzNVI4M3lFZXUweS9xK0dudENEdmxiMDhqbThPWm4vMWdqVHZoc3psMDZE?=
+ =?utf-8?B?T0xwVWVFTmFVU2l2UVlmUlBzRDM1eFgwVDdpSjFQZ3ZLa2NHQ1VPWWJESmdv?=
+ =?utf-8?B?YkZWWWtUZkF1alQ0YmVONlRvckIrRW1EdWIxelFUUEZSUWN5K1RVUExCRmts?=
+ =?utf-8?B?ZEN6a1NYSnY4Tk1JVjJuTDVhUjFIN2ZINHAvTzlHRmxrK3NhTTFqQmFvYVgr?=
+ =?utf-8?B?dXRCVWthVHAzYmk5U05INDJ4RW5ZWS95REYvYkt2MGdKbHlaL0E0d0VlbEtR?=
+ =?utf-8?B?QTdPNGtrdER2bmhZVDdlaDExYWt0TnV3a2VDNXpXazY2cEhrM0dKRExoak9o?=
+ =?utf-8?B?SFFod1ZiMHdMd2pPcStnbk1mOGxlUitvQlJ4YmxOaGhTZ0dNTWRVeGk0NWZM?=
+ =?utf-8?B?VTJmbXRlVWRCUUlLaHZMM1FjZURvUTMrOHg1ZlMrMThwVnpQYWxoTkdpZXFL?=
+ =?utf-8?B?OFAwcFdVa1Myd0V2bEtMdVgzT3pnS0pObFVsOVN5bEt0T0JuakM3a2hUR1pv?=
+ =?utf-8?Q?+yJqG0NYi+L3FqrFiT2KtNxMM?=
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 49ddc7b1-f3aa-4b44-445b-08dd40747848
+X-MS-Exchange-CrossTenant-AuthSource: SJ2PR12MB8784.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 29 Jan 2025 14:51:53.6343
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: rk7WDLjLp373Ln9+n9dEVsPydz0EoIxNti+CyWMSqvZcvq52ONStNswovLnA3pLWkybV8k4I5tsGLOof8CTX2g==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: MN0PR12MB5859
 
-Introduce tests to verify the correct functionality of the SO_RCVMARK and 
-SO_RCVPRIORITY socket options.
+Hi Furong,
 
-Key changes include:
+On 27/01/2025 13:28, Thierry Reding wrote:
+> On Sat, Jan 25, 2025 at 11:03:47PM +0800, Furong Xu wrote:
+>> Hi Thierry
+>>
+>> On Sat, 25 Jan 2025 12:20:38 +0200, Ido Schimmel wrote:
+>>
+>>> On Fri, Jan 24, 2025 at 10:42:56AM +0800, Furong Xu wrote:
+>>>> On Thu, 23 Jan 2025 22:48:42 +0100, Andrew Lunn <andrew@lunn.ch>
+>>>> wrote:
+>>>>>> Just to clarify, the patch that you had us try was not intended
+>>>>>> as an actual fix, correct? It was only for diagnostic purposes,
+>>>>>> i.e. to see if there is some kind of cache coherence issue,
+>>>>>> which seems to be the case?  So perhaps the only fix needed is
+>>>>>> to add dma-coherent to our device tree?
+>>>>>
+>>>>> That sounds quite error prone. How many other DT blobs are
+>>>>> missing the property? If the memory should be coherent, i would
+>>>>> expect the driver to allocate coherent memory. Or the driver
+>>>>> needs to handle non-coherent memory and add the necessary
+>>>>> flush/invalidates etc.
+>>>>
+>>>> stmmac driver does the necessary cache flush/invalidates to
+>>>> maintain cache lines explicitly.
+>>>
+>>> Given the problem happens when the kernel performs syncing, is it
+>>> possible that there is a problem with how the syncing is performed?
+>>>
+>>> I am not familiar with this driver, but it seems to allocate multiple
+>>> buffers per packet when split header is enabled and these buffers are
+>>> allocated from the same page pool (see stmmac_init_rx_buffers()).
+>>> Despite that, the driver is creating the page pool with a non-zero
+>>> offset (see __alloc_dma_rx_desc_resources()) to avoid syncing the
+>>> headroom, which is only present in the head buffer.
+>>>
+>>> I asked Thierry to test the following patch [1] and initial testing
+>>> seems OK. He also confirmed that "SPH feature enabled" shows up in the
+>>> kernel log.
+>>
+>> It is recommended to disable the "SPH feature" by default unless some
+>> certain cases depend on it. Like Ido said, two large buffers being
+>> allocated from the same page pool for each packet, this is a huge waste
+>> of memory, and brings performance drops for most of general cases.
+>>
+>> Our downstream driver and two mainline drivers disable SPH by default:
+>> https://git.kernel.org/pub/scm/linux/kernel/git/netdev/net-next.git/tree/drivers/net/ethernet/stmicro/stmmac/dwmac-dwc-qos-eth.c#n357
+>> https://git.kernel.org/pub/scm/linux/kernel/git/netdev/net-next.git/tree/drivers/net/ethernet/stmicro/stmmac/dwmac-intel.c#n471
+> 
+> Okay, that's something we can look into changing. What would be an
+> example of a use-case depending on SPH? Also, isn't this something
+> that should be a policy that users can configure?
+> 
+> Irrespective of that we should fix the problems we are seeing with
+> SPH enabled.
 
-- so_rcv_listener.c: Implements a receiver application to test the correct 
-behavior of the SO_RCVMARK and SO_RCVPRIORITY options.
-- test_so_rcv.sh: Provides a shell script to automate testing for these options.
-- Makefile: Integrates test_so_rcv.sh into the kernel selftests.
 
-Suggested-by: Jakub Kicinski <kuba@kernel.org>
-Suggested-by: Ferenc Fejes <fejes@inf.elte.hu>
-Signed-off-by: Anna Emese Nyiri <annaemesenyiri@gmail.com>
+Any update on this?
 
----
- tools/testing/selftests/net/Makefile          |   1 +
- tools/testing/selftests/net/so_rcv_listener.c | 147 ++++++++++++++++++
- tools/testing/selftests/net/test_so_rcv.sh    |  56 +++++++
- 3 files changed, 204 insertions(+)
- create mode 100644 tools/testing/selftests/net/so_rcv_listener.c
- create mode 100755 tools/testing/selftests/net/test_so_rcv.sh
+Thanks
+Jon
 
-diff --git a/tools/testing/selftests/net/Makefile b/tools/testing/selftests/net/Makefile
-index 73ee88d6b043..98f05473e672 100644
---- a/tools/testing/selftests/net/Makefile
-+++ b/tools/testing/selftests/net/Makefile
-@@ -33,6 +33,7 @@ TEST_PROGS += gro.sh
- TEST_PROGS += gre_gso.sh
- TEST_PROGS += cmsg_so_mark.sh
- TEST_PROGS += cmsg_so_priority.sh
-+TEST_PROGS += test_so_rcv.sh
- TEST_PROGS += cmsg_time.sh cmsg_ipv6.sh
- TEST_PROGS += netns-name.sh
- TEST_PROGS += nl_netdev.py
-diff --git a/tools/testing/selftests/net/so_rcv_listener.c b/tools/testing/selftests/net/so_rcv_listener.c
-new file mode 100644
-index 000000000000..53b09582a7e3
---- /dev/null
-+++ b/tools/testing/selftests/net/so_rcv_listener.c
-@@ -0,0 +1,147 @@
-+// SPDX-License-Identifier: GPL-2.0
-+
-+#include <errno.h>
-+#include <netdb.h>
-+#include <stdbool.h>
-+#include <stdio.h>
-+#include <stdlib.h>
-+#include <string.h>
-+#include <unistd.h>
-+#include <linux/types.h>
-+#include <sys/socket.h>
-+#include <netinet/in.h>
-+#include <arpa/inet.h>
-+
-+#ifndef SO_RCVPRIORITY
-+#define SO_RCVPRIORITY 82
-+#endif
-+
-+struct options {
-+	__u32 val;
-+	int name;
-+	int rcvname;
-+	const char *host;
-+	const char *service;
-+} opt;
-+
-+static void __attribute__((noreturn)) usage(const char *bin)
-+{
-+	printf("Usage: %s [opts] <dst host> <dst port / service>\n", bin);
-+	printf("Options:\n"
-+		"\t\t-M val  Test SO_RCVMARK\n"
-+		"\t\t-P val  Test SO_RCVPRIORITY\n"
-+		"");
-+	exit(EXIT_FAILURE);
-+}
-+
-+static void parse_args(int argc, char *argv[])
-+{
-+	int o;
-+
-+	while ((o = getopt(argc, argv, "M:P:")) != -1) {
-+		switch (o) {
-+		case 'M':
-+			opt.val = atoi(optarg);
-+			opt.name = SO_MARK;
-+			opt.rcvname = SO_RCVMARK;
-+			break;
-+		case 'P':
-+			opt.val = atoi(optarg);
-+			opt.name = SO_PRIORITY;
-+			opt.rcvname = SO_RCVPRIORITY;
-+			break;
-+		default:
-+			usage(argv[0]);
-+			break;
-+		}
-+	}
-+
-+	if (optind != argc - 2)
-+		usage(argv[0]);
-+
-+	opt.host = argv[optind];
-+	opt.service = argv[optind + 1];
-+}
-+
-+int main(int argc, char *argv[])
-+{
-+	int err = 0;
-+	int recv_fd = -1;
-+	int ret_value = 0;
-+	__u32 recv_val;
-+	struct cmsghdr *cmsg;
-+	char cbuf[1024];
-+	char recv_buf[1024];
-+	struct iovec iov[1];
-+	struct msghdr msg;
-+	struct sockaddr_in recv_addr;
-+
-+	parse_args(argc, argv);
-+
-+	recv_fd = socket(AF_INET, SOCK_DGRAM, IPPROTO_UDP);
-+	if (recv_fd < 0) {
-+		perror("Can't open recv socket");
-+		ret_value = -errno;
-+		goto cleanup;
-+	}
-+
-+	err = setsockopt(recv_fd, SOL_SOCKET, opt.rcvname, &opt.val, sizeof(opt.val));
-+	if (err < 0) {
-+		perror("Recv setsockopt error");
-+		ret_value = -errno;
-+		goto cleanup;
-+	}
-+
-+	memset(&recv_addr, 0, sizeof(recv_addr));
-+	recv_addr.sin_family = AF_INET;
-+	recv_addr.sin_port = htons(atoi(opt.service));
-+
-+	if (inet_pton(AF_INET, opt.host, &recv_addr.sin_addr) <= 0) {
-+		perror("Invalid address");
-+		ret_value = -errno;
-+		goto cleanup;
-+	}
-+
-+	err = bind(recv_fd, (struct sockaddr *)&recv_addr, sizeof(recv_addr));
-+	if (err < 0) {
-+		perror("Recv bind error");
-+		ret_value = -errno;
-+		goto cleanup;
-+	}
-+
-+	iov[0].iov_base = recv_buf;
-+	iov[0].iov_len = sizeof(recv_buf);
-+
-+	memset(&msg, 0, sizeof(msg));
-+	msg.msg_iov = iov;
-+	msg.msg_iovlen = 1;
-+	msg.msg_control = cbuf;
-+	msg.msg_controllen = sizeof(cbuf);
-+
-+	err = recvmsg(recv_fd, &msg, 0);
-+	if (err < 0) {
-+		perror("Message receive error");
-+		ret_value = -errno;
-+		goto cleanup;
-+	}
-+
-+	for (cmsg = CMSG_FIRSTHDR(&msg); cmsg != NULL; cmsg = CMSG_NXTHDR(&msg, cmsg)) {
-+		if (cmsg->cmsg_level == SOL_SOCKET && cmsg->cmsg_type == opt.name) {
-+			recv_val = *(__u32 *)CMSG_DATA(cmsg);
-+			printf("Received value: %u\n", recv_val);
-+
-+			if (recv_val != opt.val) {
-+				fprintf(stderr, "Error: expected value: %u, got: %u\n",
-+					opt.val, recv_val);
-+				ret_value = -EINVAL;
-+				goto cleanup;
-+			}
-+		}
-+	}
-+
-+cleanup:
-+	if (recv_fd >= 0)
-+		close(recv_fd);
-+
-+	return ret_value;
-+}
-diff --git a/tools/testing/selftests/net/test_so_rcv.sh b/tools/testing/selftests/net/test_so_rcv.sh
-new file mode 100755
-index 000000000000..12d37f9ab905
---- /dev/null
-+++ b/tools/testing/selftests/net/test_so_rcv.sh
-@@ -0,0 +1,56 @@
-+#!/bin/bash
-+# SPDX-License-Identifier: GPL-2.0
-+
-+HOST=127.0.0.1
-+PORT=1234
-+TOTAL_TESTS=0
-+FAILED_TESTS=0
-+
-+declare -A TESTS=(
-+	["SO_RCVPRIORITY"]="-P 2"
-+	["SO_RCVMARK"]="-M 3"
-+)
-+
-+check_result() {
-+	((TOTAL_TESTS++))
-+	if [ "$1" -ne 0 ]; then
-+		((FAILED_TESTS++))
-+	fi
-+}
-+
-+for test_name in "${!TESTS[@]}"; do
-+	echo "Running $test_name test"
-+	arg=${TESTS[$test_name]}
-+
-+	./so_rcv_listener $arg $HOST $PORT &
-+	LISTENER_PID=$!
-+
-+	if ./cmsg_sender $arg $HOST $PORT; then
-+		echo "Sender succeeded for $test_name"
-+	else
-+		echo "Sender failed for $test_name"
-+		kill "$LISTENER_PID" 2>/dev/null
-+		wait "$LISTENER_PID"
-+		check_result 1
-+		continue
-+	fi
-+
-+	wait "$LISTENER_PID"
-+	LISTENER_EXIT_CODE=$?
-+
-+	if [ "$LISTENER_EXIT_CODE" -eq 0 ]; then
-+		echo "Rcv test OK for $test_name"
-+		check_result 0
-+	else
-+		echo "Rcv test FAILED for $test_name"
-+		check_result 1
-+	fi
-+done
-+
-+if [ "$FAILED_TESTS" -ne 0 ]; then
-+	echo "FAIL - $FAILED_TESTS/$TOTAL_TESTS tests failed"
-+	exit 1
-+else
-+	echo "OK - All $TOTAL_TESTS tests passed"
-+	exit 0
-+fi
 -- 
-2.43.0
+nvpublic
 
 
