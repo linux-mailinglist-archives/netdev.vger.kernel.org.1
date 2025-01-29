@@ -1,123 +1,155 @@
-Return-Path: <netdev+bounces-161541-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-161542-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id F3AE8A2229A
-	for <lists+netdev@lfdr.de>; Wed, 29 Jan 2025 18:12:59 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8D7A6A222E4
+	for <lists+netdev@lfdr.de>; Wed, 29 Jan 2025 18:25:44 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id AAA893A71C5
-	for <lists+netdev@lfdr.de>; Wed, 29 Jan 2025 17:12:46 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 95343166D59
+	for <lists+netdev@lfdr.de>; Wed, 29 Jan 2025 17:25:41 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5366F1DFD8C;
-	Wed, 29 Jan 2025 17:12:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7E6811E25E8;
+	Wed, 29 Jan 2025 17:24:49 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=fastly.com header.i=@fastly.com header.b="xa8qBN8l"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-f48.google.com (mail-ed1-f48.google.com [209.85.208.48])
+Received: from mail-pl1-f179.google.com (mail-pl1-f179.google.com [209.85.214.179])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7C15B1DF975
-	for <netdev@vger.kernel.org>; Wed, 29 Jan 2025 17:12:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.48
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9F9881E0DCA
+	for <netdev@vger.kernel.org>; Wed, 29 Jan 2025 17:24:44 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.179
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1738170760; cv=none; b=MbxnC9w+uiv+ZMqv2QtfrQ1EOGpYW4KJjGtoPcX4tOzx1mrqIMXTXpfO9oQSvHPhROFKvoJ++eMtUgY5OPMkRdZETXII47C74cmzRbzkV3yHAMiWg+xu1/tFr7xpa6ssPXh8CPbsNsp4Q8mmg8eWLJDtnD7fKOsEdrYsYVZ4IMc=
+	t=1738171489; cv=none; b=Ir8VdEjAZwhLgqZpmVgDqnTBQ6l2HQBFlG4o1fAUvRxY4PLhIuHhOVqSKizzSuctg87U8OVp3iqqtgFegoATID80o2pYASiiGlBc9W6lwj7FoSaLkmbveSvyh5X3BQblBfsQhPB9IPh4IFchcA10l8e4hFkKkLz9/jN4wKis/fI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1738170760; c=relaxed/simple;
-	bh=IxsRd6cNQepHsUvJtKYmg5JSzMGb5rO4OaT7zgyifDE=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=F+sUgP2o4EH3AE6tadJQSorhINvWGP+BsdR5IaVwRHu61WrdRo8QSRiinohyF3ldUB8A0QzLMgFD3YWCbwmlKknTX1XhSvmEs9zvHupA9BMFnN6DDgu0h4geZdnvrs1PWJE4jRtZxqEPHr297McktZZX8cE1Qm/37pjwhXuuetk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.208.48
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ed1-f48.google.com with SMTP id 4fb4d7f45d1cf-5d3dce16a3dso1942589a12.1
-        for <netdev@vger.kernel.org>; Wed, 29 Jan 2025 09:12:38 -0800 (PST)
+	s=arc-20240116; t=1738171489; c=relaxed/simple;
+	bh=N0YneRw92WXGIHdikNV2IiZfnjq0rTZVJ82U1x+yMTQ=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=U3/Jo2ZFB2mJ6m96nASHTCBTlxbh1qhdF7PYwTmOilWb/qw1zNSFXL3qzxA2ZScByTzkzph3fZpxLQENrlJomN6mH9VnxY1Pf1PIQ5sJB0dQd9h/DjeSaWDdK6T52Nrd51mreGAcoZoy+KOuNRJJh+kJnx8QiwWZb3ee6B6Ta/I=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fastly.com; spf=pass smtp.mailfrom=fastly.com; dkim=pass (1024-bit key) header.d=fastly.com header.i=@fastly.com header.b=xa8qBN8l; arc=none smtp.client-ip=209.85.214.179
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fastly.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=fastly.com
+Received: by mail-pl1-f179.google.com with SMTP id d9443c01a7336-21670dce0a7so10770435ad.1
+        for <netdev@vger.kernel.org>; Wed, 29 Jan 2025 09:24:44 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=fastly.com; s=google; t=1738171483; x=1738776283; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=Aq4/gMpDYbPjuvYfh3I5NVoS6GqeADLR3UUjHmAsbcU=;
+        b=xa8qBN8l2XoRvMYZwWZQJncjhJoLDsyLSgqNlpR+8hL6A3ivSynKS+K3QsamVnOjIO
+         eDIduaBcHxNDObdNuWPYZNGjT/P8O8cJFJzKYyDzYrpdOzS38tggknJmNvH6RsGJ8S5D
+         L37PcYrzG0S7e+Mve0XhvUosU3eVRqj3rfeVk=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1738170757; x=1738775557;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=WnHIhVhHuUTgcEKFgibp5Dqb0u6FQLhR0Ir35xRb85I=;
-        b=g0zOU5GWj9sDO9/zF6NgCx5ibykrAxnmZtzbSCunBf4cIqlSwsyZ3yG8ow5nTIBXsy
-         fojbUOSZP4WA2hHUMB/ArJWxfE1Wfp1R1CvglOIOWE5sANpWsPtUTv1RFvWVfRzEbkVE
-         gwu69qN2PgvBaI7gcbUjKGjzebj9OCLgTqWMWqBg3MQBOQIits2oHy6a9AM9ehSS5638
-         r8GwjrpPVZyXqspuxM81ZjbW4NgQd1bsCptK9u/I0WwWuz2CmhRLnjDDz5Xz0tGtfa3k
-         Hsyfh7SC+2k4ODwBjvKQaT3sXihB8H63PDWxHBqjshLrvWlKfPSaiXPzkUReufjy3XMn
-         PXAQ==
-X-Forwarded-Encrypted: i=1; AJvYcCXy8MgCTbpYmwXcgPh1CQHBt2Fi5xpX/agMext0sKxrmdh0YUcDp2IboPOqq75HNau/8eRJJkM=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyvJeX1yv33ZVCAGC99OeUVMzwRb50JxPnN2b+ofwobzLcKjifV
-	/bXfElkXhSeLAvvEcv00wbLQWBDmcPNeXS1fl7RELO/zPXmyzrYiRPE55Q==
-X-Gm-Gg: ASbGnctAUQ0EZCqCcle4wImspkhnXjdXUtKYor3LEiPAAypxbDLO7F+CFyfpn1BMeMq
-	i0294ca6GPEQGqaSbbuSrRHTfiauRImUj681khRXPdlppMupX4dpsWpkU8BN/6Rp7r98lKm/sHX
-	nmsmvSl/gDBppQzCmsVt3kmOcBTnyn+m5P/ZQpWkuzbTiApL8gN7w+a6F3FUZCyJiK+ZGKskKlP
-	aKJbKDSi6Q4JAbByCMA02K3v9i6eUXzsXAQJ67VuGiy9rgtiuAew325YFSWmvXtxn5eq7FJbbLz
-	IC3m7A==
-X-Google-Smtp-Source: AGHT+IFx3qzzAYKw8f4joEM4F+b1uy708zZOZn636FT0o66pIMpi26QlxWhhPwcN1bDnZsxg4xcsnA==
-X-Received: by 2002:a05:6402:3592:b0:5d3:e99c:6bda with SMTP id 4fb4d7f45d1cf-5dc6f64e8damr68359a12.16.1738170756423;
-        Wed, 29 Jan 2025 09:12:36 -0800 (PST)
-Received: from gmail.com ([2a03:2880:30ff:9::])
-        by smtp.gmail.com with ESMTPSA id 4fb4d7f45d1cf-5dc186b37absm8799927a12.53.2025.01.29.09.12.34
+        d=1e100.net; s=20230601; t=1738171483; x=1738776283;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=Aq4/gMpDYbPjuvYfh3I5NVoS6GqeADLR3UUjHmAsbcU=;
+        b=bvetmLuARjI/YgwaP/kZeQMuUkE28P6Cqt58Tm5qQ0QuX2ICFTdjpDNWBTimp7jrWx
+         0luhQnIKQ5rHPPmKjpgYOlRnFaLgDJdqd2hAU0kQdQ/84HuYZ9ox5J5qjVALXKyJ9vXH
+         3ZgLEt9FSs90ViZke8uZrRhtcKBUdpfSlH+2SMcjm5GBg5Mu2CvCJlM68tIeqorQ3cI9
+         SG9drjQXSGg1xfUwevVJUfLwuRcrZv+erT2P2OGg346+O1IAENYe6iWckxigagunYniz
+         6iuk/PGdZcoshoq7tJ+6pwIIdLKAl/0FDhSX5DDC2gbXi1GSVLxQWO2jzliK7SA3RraT
+         Iirg==
+X-Gm-Message-State: AOJu0Yxrkn2Plu7Fvm19cZ9g/AKAGohdVdeiCgmaABRu1Xw/GQIZjZtq
+	7E2J7IQ7q17JPpPEEaAYJ+cp87f0KX/AwnqibfIjgYYiDfMIVV2z7p7YZkI67MPofJRUVXIBXIm
+	TmClLjov4ELz9m3kPmyC/eKivyJrS3JhWatnkwwkMkHEYB0XHAzDkA+jMZQUZYAJHY7waI64gJG
+	cPDuVoHKSx3jV3Fq8J+SXvUafTUvn/TtddqVE=
+X-Gm-Gg: ASbGncu3kyTyDZJGsxE1W/taJITv5yeYYTz0bVw4bRz+/rSmbJKg1hhPH1ry6tWVN2Z
+	JiVurQrCu2Xkj8OSZjnqDOYhGH5UrGKpPdBtg/EO+KWIxj7g7URR+yoQTszJc40Wy/E8Pm6ti9t
+	l+/iKhSw7KxxwBmE8UEqKPSpUF8WdabticqDvpSlc4h7bmgH6Vgjr8GVy2gQciGWykHA8jO3cF7
+	1+oQYe3SPnOwwr1TvEUwjOLq+tMK7hzTDnG0XllQt1kQF2oN1cV1TyDFQMkR5e37mtFCEIGdMrh
+	qh2oYpFrvKryG3SrOQXwzgQ=
+X-Google-Smtp-Source: AGHT+IFTb6XDnBS6Kmn63C4xyF4rg4Vtlz0IPi7h1hNldfq2r+c1V0Jig8cb4HmfqwS/oFthayJOoA==
+X-Received: by 2002:a17:902:d48a:b0:216:4064:53ad with SMTP id d9443c01a7336-21dd7de20f8mr69481155ad.48.1738171483392;
+        Wed, 29 Jan 2025 09:24:43 -0800 (PST)
+Received: from localhost.localdomain ([2620:11a:c019:0:65e:3115:2f58:c5fd])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-21da4bc5c1fsm101147295ad.82.2025.01.29.09.24.41
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 29 Jan 2025 09:12:35 -0800 (PST)
-Date: Wed, 29 Jan 2025 09:12:33 -0800
-From: Breno Leitao <leitao@debian.org>
-To: Michael Chan <michael.chan@broadcom.com>
-Cc: pavan.chebbi@broadcom.com, netdev@vger.kernel.org, kuba@kernel.org,
-	kernel-team@meta.com
-Subject: Re: bnxt_en: NETDEV WATCHDOG in 6.13-rc7
-Message-ID: <20250129-quiet-ermine-of-growth-0ee6b6@leitao>
-References: <20250117-frisky-macho-bustard-e92632@leitao>
- <CACKFLik4bdefMtUe_CjKcQuekadPj+kqExUnNrim2qiyyhG-QQ@mail.gmail.com>
+        Wed, 29 Jan 2025 09:24:42 -0800 (PST)
+From: Joe Damato <jdamato@fastly.com>
+To: netdev@vger.kernel.org
+Cc: sridhar.samudrala@intel.com,
+	Joe Damato <jdamato@fastly.com>,
+	Alexei Starovoitov <ast@kernel.org>,
+	Amritha Nambiar <amritha.nambiar@intel.com>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	bpf@vger.kernel.org (open list:XDP (eXpress Data Path):Keyword:(?:\b|_)xdp(?:\b|_)),
+	Daniel Borkmann <daniel@iogearbox.net>,
+	"David S. Miller" <davem@davemloft.net>,
+	Donald Hunter <donald.hunter@gmail.com>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Jesper Dangaard Brouer <hawk@kernel.org>,
+	John Fastabend <john.fastabend@gmail.com>,
+	linux-kernel@vger.kernel.org (open list),
+	linux-kselftest@vger.kernel.org (open list:KERNEL SELFTEST FRAMEWORK),
+	Martin Karsten <mkarsten@uwaterloo.ca>,
+	Mina Almasry <almasrymina@google.com>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Shuah Khan <shuah@kernel.org>,
+	Simon Horman <horms@kernel.org>,
+	Stanislav Fomichev <sdf@fomichev.me>,
+	Xuan Zhuo <xuanzhuo@linux.alibaba.com>
+Subject: [RFC net-next 0/2] netdevgenl: Add an xsk attribute to queues
+Date: Wed, 29 Jan 2025 17:24:23 +0000
+Message-Id: <20250129172431.65773-1-jdamato@fastly.com>
+X-Mailer: git-send-email 2.25.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <CACKFLik4bdefMtUe_CjKcQuekadPj+kqExUnNrim2qiyyhG-QQ@mail.gmail.com>
 
-Hello Michael,
+Greetings:
 
-On Fri, Jan 17, 2025 at 09:44:12AM -0800, Michael Chan wrote:
-> On Fri, Jan 17, 2025 at 4:08 AM Breno Leitao <leitao@debian.org> wrote:
-> 
-> >          Showing all locks held in the system:
-> 
-> >          7 locks held by kworker/u144:3/208:
-> >          4 locks held by kworker/u144:4/290:
-> >           #0: ffff88811db39948 ((wq_completion)bnxt_pf_wq){+.+.}-{0:0}, at: process_one_work+0x1090/0x1950
-> >           #1: ffffc9000303fda0 ((work_completion)(&bp->sp_task)){+.+.}-{0:0}, at: process_one_work+0x7eb/0x1950
-> >           #2: ffffffff86f71208 (rtnl_mutex){+.+.}-{4:4}, at: bnxt_reset+0x30/0xa0
-> >           #3: ffff88811e41d160 (&bp->hwrm_cmd_lock){+.+.}-{4:4}, at: __hwrm_send+0x2f6/0x28d0
-> 
-> Since there is TX timeout, we will call bnxt_reset() from
-> bnxt_sp_task() workqueue.  rtnl_lock will be held and we will hold the
-> hwrm_cmd_lock mutex for every command we send to the firmware.
-> Perhaps there is a problem communicating with the firmware.  This will
-> cause the firmware command to timeout in about a second with these
-> locks held.  We send many commands to the firmware and this can take a
-> while if firmware is not responding.
-> 
-> >          3 locks held by kworker/u144:6/322:
-> >           #0: ffff88810812a948 ((wq_completion)events_unbound){+.+.}-{0:0}, at: process_one_work+0x1090/0x1950
-> >           #1: ffffc90003a4fda0 ((linkwatch_work).work){+.+.}-{0:0}, at: process_one_work+0x7eb/0x1950
-> >           #2: ffffffff86f71208 (rtnl_mutex){+.+.}-{4:4}, at: linkwatch_event+0xe/0x60
-> 
-> Meanwhile linkwatch is trying to get the rtnl_lock.
-> 
-> >
-> >
-> > Full log at https://pastebin.com/4pWmaayt
-> >
-> 
-> I will take a closer look at the full log today.  Thanks.
+This is an attempt to followup on something Jakub asked me about [1],
+adding an xsk attribute to queues and more clearly documenting which
+queues are linked to NAPIs...
 
-Thanks. Have you had a chance to look at it?
+But:
 
-Do you suggest anything I can do on my side to get more data?
+1. I couldn't pick a good "thing" to expose as "xsk", so I chose 0 or 1.
+   Happy to take suggestions on what might be better to expose for the
+   xsk queue attribute.
 
-Thanks
---breno
+2. I create a silly C helper program to create an XDP socket in order to
+   add a new test to queues.py. I'm not particularly good at python
+   programming, so there's probably a better way to do this. Notably,
+   python does not seem to have a socket.AF_XDP, so I needed the C
+   helper to make a socket and bind it to a queue to perform the test.
+
+Tested this on my mlx5 machine and the test seems to pass.
+
+Happy to take any suggestions / feedback on this one; sorry in advance
+if I missed many obvious better ways to do things.
+
+Thanks,
+Joe
+
+[1]: https://lore.kernel.org/netdev/20250113143109.60afa59a@kernel.org/
+
+Joe Damato (2):
+  netdev-genl: Add an XSK attribute to queues
+  selftests: drv-net: Test queue xsk attribute
+
+ Documentation/netlink/specs/netdev.yaml       | 10 ++-
+ include/uapi/linux/netdev.h                   |  1 +
+ net/core/netdev-genl.c                        |  6 ++
+ tools/include/uapi/linux/netdev.h             |  1 +
+ tools/testing/selftests/drivers/.gitignore    |  1 +
+ tools/testing/selftests/drivers/net/Makefile  |  3 +
+ tools/testing/selftests/drivers/net/queues.py | 32 ++++++-
+ .../selftests/drivers/net/xdp_helper.c        | 90 +++++++++++++++++++
+ 8 files changed, 141 insertions(+), 3 deletions(-)
+ create mode 100644 tools/testing/selftests/drivers/net/xdp_helper.c
+
+
+base-commit: 0ad9617c78acbc71373fb341a6f75d4012b01d69
+-- 
+2.25.1
+
 
