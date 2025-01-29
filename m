@@ -1,150 +1,275 @@
-Return-Path: <netdev+bounces-161453-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-161452-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1BE3BA21878
-	for <lists+netdev@lfdr.de>; Wed, 29 Jan 2025 09:03:37 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id CC9B7A21877
+	for <lists+netdev@lfdr.de>; Wed, 29 Jan 2025 09:03:30 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id DB1E41889E60
-	for <lists+netdev@lfdr.de>; Wed, 29 Jan 2025 08:03:40 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id DB65C3A5281
+	for <lists+netdev@lfdr.de>; Wed, 29 Jan 2025 08:03:22 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 96A0319992D;
-	Wed, 29 Jan 2025 08:03:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 77E5518C031;
+	Wed, 29 Jan 2025 08:03:26 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="WzCm92ye"
+	dkim=pass (1024-bit key) header.d=mysnt.onmicrosoft.com header.i=@mysnt.onmicrosoft.com header.b="oKdQPV4I"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.13])
+Received: from DU2PR03CU002.outbound.protection.outlook.com (mail-northeuropeazon11022079.outbound.protection.outlook.com [52.101.66.79])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F147D42A92
-	for <netdev@vger.kernel.org>; Wed, 29 Jan 2025 08:03:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.13
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1738137807; cv=none; b=GCl1S22aYbzA8viUmi05JzFMZjzoPAze1SMw1HVnMW/dLWACUQRWtEAaTScT6qJ/jNXpZ9p59Pjv+c40BhJC9M8T60lL97H/frxzq29NGB1UTaMXjLA2QvTxTJBOENFIcfdFuGiPTcTB6IFE7+d9qFmOQ7ZIKo/0gVoAVhW99IA=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1738137807; c=relaxed/simple;
-	bh=VA1wsl1Ra0E6fpt9pPvOpi7VJWfJhk+EgZCR3xduRPw=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=DHk8zh2/BPa2hKSVs6ZzKu3faxTgXBYZmk6SATd9COkrmC/45FIxx51fAxalQW9QEvtK9aLzNokJKhDKxZ9C+tAg46Z/clqjEKh4mOwwFljUOcPClmIyUU8Kw56ABRr6WhQ8uX/NDwD7ycKbVS1ZvbnYto1JigqpzIxYH3hV03Q=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=WzCm92ye; arc=none smtp.client-ip=192.198.163.13
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1738137806; x=1769673806;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=VA1wsl1Ra0E6fpt9pPvOpi7VJWfJhk+EgZCR3xduRPw=;
-  b=WzCm92ye7cXJneUGgNMuIWkH0sXm94D5NoMY4rnbX9MJPEkTQcAUEcMS
-   M4MdpbpEI5GjYs7PFkYMMuHqVPst6FRmaUPvYsTtMl9xHLlSunFZSTHvs
-   JZsKuFlffPsMzxGnGFmP2w9cEOlNAYUK3386Er9GFw5J2tYFMYNfF44o/
-   2+teEs3ugF7i26BY/O0UJ+5D6WqlAKoVihkW+JoSUWEpmYCOLhG1vrq8z
-   pIXnVt9rSTtcYqZ6FuHbvaGLZFjkFzYCU84I9Z3TyALBo0Bt6QUF/3dkj
-   HOaOUalCccVlXzs+nRqAvaGzUpcuraUhIVIpBJdLe7ULcC/eL9YYbjzJX
-   A==;
-X-CSE-ConnectionGUID: +UkSmV+dRiWUa3d2lY6p5A==
-X-CSE-MsgGUID: LvqclL33RyC4zfnzmSaOzQ==
-X-IronPort-AV: E=McAfee;i="6700,10204,11329"; a="41478341"
-X-IronPort-AV: E=Sophos;i="6.13,242,1732608000"; 
-   d="scan'208";a="41478341"
-Received: from orviesa006.jf.intel.com ([10.64.159.146])
-  by fmvoesa107.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 29 Jan 2025 00:03:25 -0800
-X-CSE-ConnectionGUID: pMugBHphQ4C43qZuXaNplg==
-X-CSE-MsgGUID: bBZKD1xSTgSpv6bPynZDWQ==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.13,242,1732608000"; 
-   d="scan'208";a="108932973"
-Received: from mev-dev.igk.intel.com ([10.237.112.144])
-  by orviesa006-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 29 Jan 2025 00:03:23 -0800
-Date: Wed, 29 Jan 2025 08:59:54 +0100
-From: Michal Swiatkowski <michal.swiatkowski@linux.intel.com>
-To: Shannon Nelson <shannon.nelson@amd.com>
-Cc: netdev@vger.kernel.org, davem@davemloft.net, kuba@kernel.org,
-	andrew+netdev@lunn.ch, edumazet@google.com, pabeni@redhat.com,
-	brett.creeley@amd.com
-Subject: Re: [PATCH net 1/2] pds_core: Prevent possible adminq overflow/stuck
- condition
-Message-ID: <Z5nf+kn1uefCb/wj@mev-dev.igk.intel.com>
-References: <20250129004337.36898-1-shannon.nelson@amd.com>
- <20250129004337.36898-2-shannon.nelson@amd.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 37DD411713
+	for <netdev@vger.kernel.org>; Wed, 29 Jan 2025 08:03:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.66.79
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1738137806; cv=fail; b=Q+qdQJC+dLwd0iZLDd3ZEMOrcdWaZwbvnoeJ+h6QUgxUuOsS4h3BVvAsQsOJA/4DLFYkpSrlIo1aZ/IOoBcjxjdwxaNpjbPeCTj5DkXR01lQFFjrJrhLL3hoqwRjyBXs4afG97U0qLbuYZ7jpTihdtl7R6ddcJa+zsXBiH5WwZQ=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1738137806; c=relaxed/simple;
+	bh=XwvFPZjhkBMnBLy2xmiyLnhAyJEhxxbPMQDCjy7p5iI=;
+	h=Message-ID:Date:Subject:From:To:Cc:References:In-Reply-To:
+	 Content-Type:MIME-Version; b=NsvMCuchmMMGYykNNGpvqDaiBMxEEap0Xqtwt0M7OO4iFt9gy82VFkEw2k7eXMiCRu2K7DktaBhgzyVIhWj0dZ6wo6l81LnLn+SvuJMZ9enMrotadFsZQw1jNoWRNaPcN1bodosJDDIMSIwMUU5fzFOh9bEgoJLvUvnB6J3WyzA=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kontron.de; spf=pass smtp.mailfrom=kontron.de; dkim=pass (1024-bit key) header.d=mysnt.onmicrosoft.com header.i=@mysnt.onmicrosoft.com header.b=oKdQPV4I; arc=fail smtp.client-ip=52.101.66.79
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kontron.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kontron.de
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=epSh4sootCBD3cBECecCBC3ZC9CYZwWQnDYoykglikFGWOyDdFV0vqZm2fhi9iUpw6Gk2d1G7XJ3pZ7YQ7AoOsVCcAgc/2JUCWWTtngw/LO5z6DAU8xMRM+2bZxZXbfyRcSOaSQ4oSEnTH+AQO6ue2zeJ3eUXPumwByLhXLc4DQ3UwIFraYW57jagupzxynFu7lZuPmAxNrfLmkZcbSvFocJFLeZvXeBqsRQZ6sNr5DrZG1RUmOeDLIhKFIAI7iXqaA9k9vITvJ8CL/kLdp6Mgxv9N9F0CCgT5sKakd77iHQ9Funt7d+unYEYc0v4yEuLQzgrOpxXLpCrkFXJMpKPw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=+j7F8sVudTisFtFmt7prbGoZjoQbPKAkjabesDo0KDc=;
+ b=oDrhgwjgQHb0D/W2LSZVVzlAV+KNQdUHfybgSxb0cP39UfeSN7S7g5CmUVjkVCmdAwfhlrzONcaGq4yFG2+5iTFxkFKhG+jJnjBh2ynTzo4DkEgipzAyTdvV6chiXlX2yb0ojCQRrMBnylyyg+Kq4FNw2q7QnVJPJUhyfxMFJ+zwQnXb0lXUy5/1B9yS7boqJjXrVnPtkMlGWg/HEiqxFiPBl7UhCdY4E42kZVB20uw1bJ1sP8d7E0dVt/Iq4ZukO2EeWYiU1+fmqekSsKr5xCkcMoI/9m8owCkBC/+r+hc6D7L+xQ6BvOhRBTqwvlcNRQOE3IcfqX+33PN+l8ZF+Q==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=kontron.de; dmarc=pass action=none header.from=kontron.de;
+ dkim=pass header.d=kontron.de; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=mysnt.onmicrosoft.com;
+ s=selector2-mysnt-onmicrosoft-com;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=+j7F8sVudTisFtFmt7prbGoZjoQbPKAkjabesDo0KDc=;
+ b=oKdQPV4IUFScZ0HvnEyUZ9u31g77ZJARaT+C9mn12u8nH4lsBgRKyNSgYHtJ9q9Furvd6LvBVkzxauWcPW9EQ8DKOgGZDI4xrK8Vl4lyjwl2Dqd1F7pw8oUfKkWltXq7YHQINL2vvTOPUfyqi+TwdFaDmjnMv6pYPW5/dwOll7s=
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=kontron.de;
+Received: from AS4PR10MB5671.EURPRD10.PROD.OUTLOOK.COM (2603:10a6:20b:4f2::14)
+ by PAXPR10MB5613.EURPRD10.PROD.OUTLOOK.COM (2603:10a6:102:243::14) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8398.13; Wed, 29 Jan
+ 2025 08:03:18 +0000
+Received: from AS4PR10MB5671.EURPRD10.PROD.OUTLOOK.COM
+ ([fe80::95c1:ff1e:275d:26aa]) by AS4PR10MB5671.EURPRD10.PROD.OUTLOOK.COM
+ ([fe80::95c1:ff1e:275d:26aa%4]) with mapi id 15.20.8398.013; Wed, 29 Jan 2025
+ 08:03:18 +0000
+Message-ID: <6400e73a-b165-41a8-9fc9-e2226060a68c@kontron.de>
+Date: Wed, 29 Jan 2025 09:03:17 +0100
+User-Agent: Mozilla Thunderbird
+Subject: Re: KSZ9477 HSR Offloading
+From: Frieder Schrempf <frieder.schrempf@kontron.de>
+To: Andrew Lunn <andrew@lunn.ch>
+Cc: "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+ Lukasz Majewski <lukma@denx.de>
+References: <05a6e63e-96c1-4d78-91b9-b00deed044b5@kontron.de>
+ <6d0e1f47-874e-42bf-9bc7-34856c1168d1@lunn.ch>
+ <1c140c92-3be6-4917-b600-fa5d1ef96404@kontron.de>
+Content-Language: en-US, de-DE
+In-Reply-To: <1c140c92-3be6-4917-b600-fa5d1ef96404@kontron.de>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: FR4P281CA0216.DEUP281.PROD.OUTLOOK.COM
+ (2603:10a6:d10:e4::20) To AS4PR10MB5671.EURPRD10.PROD.OUTLOOK.COM
+ (2603:10a6:20b:4f2::14)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250129004337.36898-2-shannon.nelson@amd.com>
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: AS4PR10MB5671:EE_|PAXPR10MB5613:EE_
+X-MS-Office365-Filtering-Correlation-Id: 09cec129-76c2-4930-77e2-08dd403b63f8
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;ARA:13230040|1800799024|366016|376014;
+X-Microsoft-Antispam-Message-Info:
+	=?utf-8?B?anMrQ2o0N2xDNVVJL1pPbWxXZ1FoTW93TTNMMEdNTzA3SEJFSTdFdHZBdGlh?=
+ =?utf-8?B?SUE4bVN0OHZabEQza2NIQWVITmN0T3dsQ2QwU2FBUXV4ZXY0TlF3VU5SZTlz?=
+ =?utf-8?B?Q2RjbzdkTVRScGZlM0diakMyTnhhb2h5VmNjcDIrZEdiMFR5T3MvaXR0NmJX?=
+ =?utf-8?B?VEZ0a0t3cUphNlFVVmlWRFdSY0s4UnlPZVRQOTVmbGJCYjF6ZWVFaHBEcTR3?=
+ =?utf-8?B?QkJWWXFUZmZ4MmgvTVNFaVJYQVdmS0RhSmNNRVdPVWJLWDZ2cnY2MURXalBt?=
+ =?utf-8?B?RUNLdWVwbmdDL01TQzAza0c2LzYzSXA0ZnhFdElvZjZwaWZJZGJWQ3JOMmg2?=
+ =?utf-8?B?ekltczZpcGdqeXVWZlN5UW1aZEIvalU2ZStSRW9HWDB5T0p3V0hFRll5cE55?=
+ =?utf-8?B?VDQ4Y3FPVnc4RTNSa2pUbklLUWRnT3lkcnhVVEUzZ0ZHTUNybmN4TzNTOXNn?=
+ =?utf-8?B?MjlhREdTbW45QTJGeVp6N20xQnNNbDdRRVBEQk0xKzhSbFduRUJabFZ4V1ZL?=
+ =?utf-8?B?QXlFZGtUNjlObi9PbHY0ei9FSm1Ha25iNmhnWk5rcjhHaWJLVWFFenVLckRi?=
+ =?utf-8?B?NFVkZ2xxSUo0MDJSVHlvUkF2emVSWmVMSEtvV0JnMzVkL0VRQXZ1dTZVWXNV?=
+ =?utf-8?B?cDlCWmZZS1lmZ0hCTkJzUjFVZVZkeHRnMjdhN0R1NzN0WHVIRGdpU2xMcEJF?=
+ =?utf-8?B?ZC9lOWxWM2kvVkdQVEp0ODN5V1ZCQlB5ZnZhTEorRUZqV1BpWWlPRCtMT3dx?=
+ =?utf-8?B?WXVJNG03NDRuQmY3dFBQaUk4OXdzU0hiLzh4RzhhOGVXWU5tK01JMGZYUHpZ?=
+ =?utf-8?B?eWpYNWJpbEI3K3RHTlBHNEZtc052YlFNY0RVN1BFWG9JcThKbzFZS3ZRQ2Vv?=
+ =?utf-8?B?RUtFWkFDSkJqUVlFb09PWWpLOENzNHZ6UUN2anZPdDNmSmRDNCtlUjV2QzRS?=
+ =?utf-8?B?ckNuOFcwTG5QLzZPNFBHQzZJNGRDQkVvRXdpVU01VWRVbEdjWHRSbmw2MndH?=
+ =?utf-8?B?M2ZJVGJBbUVHS1JOYVp4NUgyZnF3T211RnlIb3psaXVTMmdManFFWnBYb1hJ?=
+ =?utf-8?B?eXNHV3NteTdTM09TMCtmZXRnTHlpTTBiSkk0MVFWblFiNVZxazc4YUdFak8v?=
+ =?utf-8?B?L01FaDhOMW1HY3VXcnMyOGJyOXNFbkJBeVVDYnRPYkUwSWtlTzc2R3FrNG1y?=
+ =?utf-8?B?S0VKbVRuS1JxaHB1ZzAzbkc4L2lrL1FSekRWQzkxRXlnZngwNEtIWmh6alVj?=
+ =?utf-8?B?ckoxWEhrZ1luSm4yaDIzVVJjNHNsQVpqYnhFTFI1OFdDNUczQUh1aFpoMFVi?=
+ =?utf-8?B?Vlp2eldTamFOMEg4NnhlWEhiY0MrSDBYSDJPODdhREl3Ui9HamNoQlFBcWtV?=
+ =?utf-8?B?K3hBSGx1T0lKNXFNZENvV2E5K3ZkYVNxWUFXZ1pEd3NOTlZWZUpraS9lMzQx?=
+ =?utf-8?B?ZjdmcjlDUVdEVGdSL2lISVBJVkZVRlFLdHBQdmJ3RUVVdmIxa0tjQ2VMeWR6?=
+ =?utf-8?B?UWU5ZllVcGRoYmowVVIrT0F5d2psemJFTGhJZDZDczR5K1RlMWFFMlBuQktS?=
+ =?utf-8?B?VC9JOVZLeC9lS0hpaTZBZ2JZODBFRGNYcDdJMTFObGYrakg2cUhpKzZONmY1?=
+ =?utf-8?B?bkxDTTY5WGRPVXhKNjVFcXYyVGNCaXVOemdLRkhIdzBtN2dpNldIQ3dLRkl0?=
+ =?utf-8?B?SU5RamNWek1yb3hZSktqUXhST3haU3FyK1lkYkpGUFh2eFYzL2ZINlNaaGFR?=
+ =?utf-8?B?a2FPRGhsV3g2VjlxY0dETitmMTQ3dXR5djNFVVY1Ymp2aG9jUnVoajRLcElz?=
+ =?utf-8?B?UjQ0RFM0WDBnV0Vhc3FqNzcxMHBYOHJQTm9IcGFoY2FZWUZzOS9sSVNBaGpm?=
+ =?utf-8?Q?rrO+e+bY3rOYL?=
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:AS4PR10MB5671.EURPRD10.PROD.OUTLOOK.COM;PTR:;CAT:NONE;SFS:(13230040)(1800799024)(366016)(376014);DIR:OUT;SFP:1102;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?utf-8?B?R1RuOFd0WmUrMmljQW1yeEZxbUphQjdDK0I5dlc4ZGpIclFZMmN3WktwdnVI?=
+ =?utf-8?B?SzNnMXFBc1RiNTdmQXJpNm0wOHIrcGkyY1lNcG5oRnF0STNVNEcrNjlHU28v?=
+ =?utf-8?B?RktPQzY1U0I5bzc0MDhOZ1QxbFJJUzV4a2w3OE1sbSsxSmN6b3NCaGtKOWFQ?=
+ =?utf-8?B?enAvSU1kVFZ4UDY3cHJNUkpTNFhxay84cFJOK0wzMS9SVXBMWEdtWWE4cWxF?=
+ =?utf-8?B?RXV6dnFKVWgxODF1ejdJV0tMbVlMUi9sYmN4YU9vQnNoVTdzR3JaaWVxMkps?=
+ =?utf-8?B?YmlxaytqOW85Tm1wamt2eThkWkYzVHBkN1NlWHBrYnRXWVRSWTB5Szl3LzdQ?=
+ =?utf-8?B?TjVaNm5tM09oSGFGZEtMYmQrSjBKemY5ZzZ3Qnp3M3NtcGwwTW9tamI1ajlw?=
+ =?utf-8?B?NTUyOFBMMWJFRjVJYU5yWVNiK0JEck1HU01RaWZQYkZUSU5HK1ZQWXFWWlFz?=
+ =?utf-8?B?U0gwMUJtbzMyWW1RQTZleVRYelUwZDZnYlVUTCs4RzBNVFlaSUhHNkpTWXR6?=
+ =?utf-8?B?MXJWMXdrNzY0L1lsdmJER1hub3dnUkRHSjVHSWxaVlNTOWM5bERTRzJsMVlw?=
+ =?utf-8?B?a2k0RDVrM3ZsQi85N1MwdndHZHl5K01oMWJ4Q0NQc2RkY1FQWXUxb0FKWE5n?=
+ =?utf-8?B?bXg0Z3ZKV212dmRTWFJXR2F3eGdJMnlXV2pvTDFzL1BpZ1EvSnBVNWVyMTR3?=
+ =?utf-8?B?WVBodDVUOFRUK1dDa2pQRm5PUno4bG4xNi90ODZabkU5VXAvZmwzY1VRNjQ5?=
+ =?utf-8?B?QkZMak8vK0N0OUVIL0N4S3pTNVFSTkZkdUg4aklUaDRkVkFYOXhzNU5iUWc1?=
+ =?utf-8?B?eGI3S1N1VytFUFBNcU9BWG9CbmhaZDgvMjYraVVnRG5yem1FNnJxT2xQOHRJ?=
+ =?utf-8?B?WFBMU1NTT1dzaHVvZU52MzVTVEtQQStheWNIVE0zZjlFNEFaMTBEdmZHUjVi?=
+ =?utf-8?B?T3JIN1VHYVM0Zjd6WUNncVZxQUVEZ0I4UG9qaDNWWFJyYjA4OWdnRGpTR1Nt?=
+ =?utf-8?B?TUxZUTQwZTVjbjRlUzZzZmFuMDBBS3lQMnhEZWdZd2psVlY1YmhXNEtNVSt0?=
+ =?utf-8?B?NXJBTmxEV3ZleWJKQzA2MjEzUXhEOEpvZ1F4a3NmRE8vamtqenhrdVdFdjVF?=
+ =?utf-8?B?TkRHVlB4MHVlcUZINWNwekpqMTNmazBsTVUwbHQ4T2ErZGZyWjJTenArd0dt?=
+ =?utf-8?B?dWR4cHU4dUlPZkFRMktWbXp1c3lWL0xHR05PZmw0SzlIVmRuZEdxc1dFeHdQ?=
+ =?utf-8?B?UndsdkIwRGJRbmp4Y1I4UHlIcFhkQlZ0Mk9MMHdITGlWMnFUTVJXK1BRNU54?=
+ =?utf-8?B?WFVUK29LSG9vRnZEVXVWSzFBbk1DeVhpTFoxbDNrbnhqYU5nMTBMeGYyMGxa?=
+ =?utf-8?B?WHdGOWRmcWRqM1JTTjhKck5YTzZyQmtBWnlQd1Q1czZiNHphcFZVSWVKalBi?=
+ =?utf-8?B?U2ZKZkdTbXhyVUMzbS92RVMyLzUzYTVVMkN6RkthaUpQOXZoeWE0WENXbjhK?=
+ =?utf-8?B?Rm5MbjF3MmVGdFBaMlZHODVGdUx6Q21zL1NHMlZaVWxsL2pLOWtmdUx1U2Ev?=
+ =?utf-8?B?SXp1NTEwVFV1M0o3NjFIREtMMTRYeFhYRmNKdGZ2cmYzQ3RQbWRzdFBMaVZU?=
+ =?utf-8?B?MGxxdjd2TEdvUEFaY2sva1FDUGk3MFh6KzZYL3YwSHM1NCs5c0VLM2tRNUNQ?=
+ =?utf-8?B?VnR1SmhBQW80MHNHcXUzSjlFb1NEYkliM3BqcklMTlR5bjFKdDB3bXJiSVVs?=
+ =?utf-8?B?SE9xaVM5a0Y1eGZ5T2NERWlZK09SS0hmQ3VoZ3ZRNUdSTCt1c0RkL0JmYUtW?=
+ =?utf-8?B?SFFvL0lya3h4L2NLRmIxYXYyQUdwRTlkOGo1dlJNQUpWcWl1UjRYZmVuN09F?=
+ =?utf-8?B?RGhSbHQyR2xlSTBidFdoSVpZYkt3eTlXdzZmY1RaRUJFQnlVRXN5eDM0Qk9w?=
+ =?utf-8?B?TEQxOWEzdU5BS2ZuNUFCWUdLaU1vL1I0TUExN3JIOVFjLzN2WkpQL2NZL2FI?=
+ =?utf-8?B?YXFSUjZ4RThvRTVEbUgxaTdRS2dCRjBTejVZQU1aYWFXbzEwYnJvZis5YWY2?=
+ =?utf-8?B?L2FES2hYWm5Jbk9hMHBNVFNtd0pMR1FiWjJucWtlc1d6UWFwS3J0QTRsa2h6?=
+ =?utf-8?B?OVB3STdYV3pjSWlETmg3T0JrSlc2Z1l6YThZTm5ZcGU5ODkzWkdhSFpGQlAy?=
+ =?utf-8?B?V3c9PQ==?=
+X-OriginatorOrg: kontron.de
+X-MS-Exchange-CrossTenant-Network-Message-Id: 09cec129-76c2-4930-77e2-08dd403b63f8
+X-MS-Exchange-CrossTenant-AuthSource: AS4PR10MB5671.EURPRD10.PROD.OUTLOOK.COM
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 29 Jan 2025 08:03:18.1980
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 8c9d3c97-3fd9-41c8-a2b1-646f3942daf1
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: BZyOKsUWNpUeuZFh76Skrv/R5S43GWLO7H5cZIVbOeqxAVKDeI16nl8VdCjCjSxqONdBIANMTGOc20qZnZ4IRkbvm07s1CSanLi3ilDRru0=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: PAXPR10MB5613
 
-On Tue, Jan 28, 2025 at 04:43:36PM -0800, Shannon Nelson wrote:
-> From: Brett Creeley <brett.creeley@amd.com>
+On 29.01.25 8:24 AM, Frieder Schrempf wrote:
+> Hi Andrew,
 > 
-> The pds_core's adminq is protected by the adminq_lock, which prevents
-> more than 1 command to be posted onto it at any one time. This makes it
-> so the client drivers cannot simultaneously post adminq commands.
-> However, the completions happen in a different context, which means
-> multiple adminq commands can be posted sequentially and all waiting
-> on completion.
+> On 28.01.25 6:51 PM, Andrew Lunn wrote:
+>> On Tue, Jan 28, 2025 at 05:14:46PM +0100, Frieder Schrempf wrote:
+>>> Hi,
+>>>
+>>> I'm trying out HSR support on KSZ9477 with v6.12. My setup looks like this:
+>>>
+>>> +-------------+         +-------------+
+>>> |             |         |             |
+>>> |   Node A    |         |   Node D    |
+>>> |             |         |             |
+>>> |             |         |             |
+>>> | LAN1   LAN2 |         | LAN1   LAN2 |
+>>> +--+-------+--+         +--+------+---+
+>>>    |       |               |      |
+>>>    |       +---------------+      |
+>>>    |                              |
+>>>    |       +---------------+      |
+>>>    |       |               |      |
+>>> +--+-------+--+         +--+------+---+
+>>> | LAN1   LAN2 |         | LAN1   LAN2 |
+>>> |             |         |             |
+>>> |             |         |             |
+>>> |   Node B    |         |   Node C    |
+>>> |             |         |             |
+>>> +-------------+         +-------------+
+>>>
+>>> On each device the LAN1 and LAN2 are added as HSR slaves. Then I try to
+>>> do ping tests between each of the HSR interfaces.
+>>>
+>>> The result is that I can reach the neighboring nodes just fine, but I
+>>> can't reach the remote node that needs packages to be forwarded through
+>>> the other nodes. For example I can't ping from node A to C.
+>>>
+>>> I've tried to disable HW offloading in the driver and then everything
+>>> starts working.
+>>>
+>>> Is this a problem with HW offloading in the KSZ driver, or am I missing
+>>> something essential?
+>>
+>> How are IP addresses configured? I assume you have a bridge, LAN1 and
+>> LAN2 are members of the bridge, and the IP address is on the bridge
+>> interface?
 > 
-> On the FW side, the backing adminq request queue is only 16 entries
-> long and the retry mechanism and/or overflow/stuck prevention is
-> lacking. This can cause the adminq to get stuck, so commands are no
-> longer processed and completions are no longer sent by the FW.
+> I have a HSR interface on each node that covers LAN1 and LAN2 as slaves
+> and the IP addresses are on those HSR interfaces. For node A:
 > 
-> As an initial fix, prevent more than 16 outstanding adminq commands so
-> there's no way to cause the adminq from getting stuck. This works
-> because the backing adminq request queue will never have more than 16
-> pending adminq commands, so it will never overflow. This is done by
-> reducing the adminq depth to 16.
+> ip link add name hsr type hsr slave1 lan1 slave2 lan2 supervision 45
+> version 1
+> ip addr add 172.20.1.1/24 dev hsr
 > 
-> This is just the first step to fix this issue because there are already
-> devices being used. Moving forward a new capability bit will be defined
-> and set if the FW can gracefully handle the host driver/device having a
-> deeper adminq.
+> The other nodes have the addresses 172.20.1.2/24, 172.20.1.3/24 and
+> 172.20.1.4/24 respectively.
 > 
-> Fixes: 792d36ccc163 ("pds_core: Clean up init/uninit flows to be more readable")
-> Signed-off-by: Brett Creeley <brett.creeley@amd.com>
-> Signed-off-by: Shannon Nelson <shannon.nelson@amd.com>
-> ---
->  drivers/net/ethernet/amd/pds_core/core.c | 5 +----
->  drivers/net/ethernet/amd/pds_core/core.h | 2 +-
->  2 files changed, 2 insertions(+), 5 deletions(-)
+> Then on node A, I'm doing:
 > 
-> diff --git a/drivers/net/ethernet/amd/pds_core/core.c b/drivers/net/ethernet/amd/pds_core/core.c
-> index 536635e57727..4830292d5f87 100644
-> --- a/drivers/net/ethernet/amd/pds_core/core.c
-> +++ b/drivers/net/ethernet/amd/pds_core/core.c
-> @@ -325,10 +325,7 @@ static int pdsc_core_init(struct pdsc *pdsc)
->  	size_t sz;
->  	int err;
->  
-> -	/* Scale the descriptor ring length based on number of CPUs and VFs */
-> -	numdescs = max_t(int, PDSC_ADMINQ_MIN_LENGTH, num_online_cpus());
-> -	numdescs += 2 * pci_sriov_get_totalvfs(pdsc->pdev);
-> -	numdescs = roundup_pow_of_two(numdescs);
-> +	numdescs = PDSC_ADMINQ_MAX_LENGTH;
->  	err = pdsc_qcq_alloc(pdsc, PDS_CORE_QTYPE_ADMINQ, 0, "adminq",
->  			     PDS_CORE_QCQ_F_CORE | PDS_CORE_QCQ_F_INTR,
->  			     numdescs,
-> diff --git a/drivers/net/ethernet/amd/pds_core/core.h b/drivers/net/ethernet/amd/pds_core/core.h
-> index 14522d6d5f86..543097983bf6 100644
-> --- a/drivers/net/ethernet/amd/pds_core/core.h
-> +++ b/drivers/net/ethernet/amd/pds_core/core.h
-> @@ -16,7 +16,7 @@
->  
->  #define PDSC_WATCHDOG_SECS	5
->  #define PDSC_QUEUE_NAME_MAX_SZ  16
-> -#define PDSC_ADMINQ_MIN_LENGTH	16	/* must be a power of two */
-> +#define PDSC_ADMINQ_MAX_LENGTH	16	/* must be a power of two */
->  #define PDSC_NOTIFYQ_LENGTH	64	/* must be a power of two */
->  #define PDSC_TEARDOWN_RECOVERY	false
->  #define PDSC_TEARDOWN_REMOVING	true
-> -- 
+> ping 172.20.1.2 # neighboring node B works
+> ping 172.20.1.4 # neighboring node D works
+> ping 172.20.1.3 # remote node C works only if I disable offloading
 
-Reviewed-by: Michal Swiatkowski <michal.swiatkowski@linux.intel.com>
+BTW, it's enough to disable the offloading of the forwarding for HSR
+frames to make it work.
 
-> 2.17.1
+--- a/drivers/net/dsa/microchip/ksz9477.c
++++ b/drivers/net/dsa/microchip/ksz9477.c
+@@ -1267,7 +1267,7 @@ int ksz9477_tc_cbs_set_cinc(struct ksz_device
+*dev, int port, u32 val)
+  * Moreover, the NETIF_F_HW_HSR_FWD feature is also enabled, as HSR frames
+  * can be forwarded in the switch fabric between HSR ports.
+  */
+-#define KSZ9477_SUPPORTED_HSR_FEATURES (NETIF_F_HW_HSR_DUP |
+NETIF_F_HW_HSR_FWD)
++#define KSZ9477_SUPPORTED_HSR_FEATURES (NETIF_F_HW_HSR_DUP)
+
+ void ksz9477_hsr_join(struct dsa_switch *ds, int port, struct
+net_device *hsr)
+ {
+@@ -1279,16 +1279,6 @@ void ksz9477_hsr_join(struct dsa_switch *ds, int
+port, struct net_device *hsr)
+        /* Program which port(s) shall support HSR */
+        ksz_rmw32(dev, REG_HSR_PORT_MAP__4, BIT(port), BIT(port));
+
+-       /* Forward frames between HSR ports (i.e. bridge together HSR
+ports) */
+-       if (dev->hsr_ports) {
+-               dsa_hsr_foreach_port(hsr_dp, ds, hsr)
+-                       hsr_ports |= BIT(hsr_dp->index);
+-
+-               hsr_ports |= BIT(dsa_upstream_port(ds, port));
+-               dsa_hsr_foreach_port(hsr_dp, ds, hsr)
+-                       ksz9477_cfg_port_member(dev, hsr_dp->index,
+hsr_ports);
+-       }
+-
+        if (!dev->hsr_ports) {
+                /* Enable discarding of received HSR frames */
+                ksz_read8(dev, REG_HSR_ALU_CTRL_0__1, &data);
 
