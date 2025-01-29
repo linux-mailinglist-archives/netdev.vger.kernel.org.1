@@ -1,118 +1,242 @@
-Return-Path: <netdev+bounces-161534-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-161535-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7565EA221FD
-	for <lists+netdev@lfdr.de>; Wed, 29 Jan 2025 17:44:19 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id A5CF4A22211
+	for <lists+netdev@lfdr.de>; Wed, 29 Jan 2025 17:49:23 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E88CD162C28
-	for <lists+netdev@lfdr.de>; Wed, 29 Jan 2025 16:44:13 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 7CF08163AB2
+	for <lists+netdev@lfdr.de>; Wed, 29 Jan 2025 16:49:18 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1882B1DF248;
-	Wed, 29 Jan 2025 16:44:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A91AA1DF255;
+	Wed, 29 Jan 2025 16:49:13 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=cs.stanford.edu header.i=@cs.stanford.edu header.b="aCHYEhO+"
+	dkim=pass (2048-bit key) header.d=cloudflare.com header.i=@cloudflare.com header.b="F9csjIoY"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp1.cs.Stanford.EDU (smtp1.cs.stanford.edu [171.64.64.25])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ed1-f42.google.com (mail-ed1-f42.google.com [209.85.208.42])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8EEF3143722
-	for <netdev@vger.kernel.org>; Wed, 29 Jan 2025 16:44:05 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=171.64.64.25
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 870191DF743
+	for <netdev@vger.kernel.org>; Wed, 29 Jan 2025 16:49:11 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.42
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1738169047; cv=none; b=I5TcrzAtSOakljsy6hpGPjfWoV1Uoet1fEDgsyNZwbgv/Ytn2HHMvKw8BNYpt7bXYZtcnofcCm5wdKM6RHQnkmCc44mHea7CiRfzIFH2tn72Oh81mDCW/VT6E8S0hGJKppJr9jtddpGLwOjbeLChmFECReAWTzocLX7sYDOZFNY=
+	t=1738169353; cv=none; b=IxhFbpnNPZRR+91bnkWZb9qmcDlIh8C1mQz/2I5P60OUIoXEft+nwCorEj0kkVTFSdDpomBAUmipYoSW8iE3j5gcwq46DllBWEUbWC7o/VNpDyOzqXrmwtMFaeHFw2mBfzXlH6yKzeocMVhNTE2fpI1ick3lAPupwVcGJtc2RFc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1738169047; c=relaxed/simple;
-	bh=hKg5QSxKCFrPNhnrX8Gp+pkhaBSGardrL+l3tr4t8wc=;
+	s=arc-20240116; t=1738169353; c=relaxed/simple;
+	bh=Hgkh/0Y0TyOZtL3tMmuDhaoz4mDZ9yXLeg6Xlz++XBo=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=q05wZj+KStU2bYaXouXdrcAIclcw8sp7MfPfYzcUSjN4JYKczng736Mm8lkPLN7jfOlhpuAz6q1rvRjsqqGojzvJeKQyXzDNt8QH4qkr0xwnP6Jt+3UVwSyFV/Gq3b5XKvjfeBMWx8tE2oxpzZqcyrryfQpchDKGYzEjZrcEA7g=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=cs.stanford.edu; spf=pass smtp.mailfrom=cs.stanford.edu; dkim=pass (2048-bit key) header.d=cs.stanford.edu header.i=@cs.stanford.edu header.b=aCHYEhO+; arc=none smtp.client-ip=171.64.64.25
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=cs.stanford.edu
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=cs.stanford.edu
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=cs.stanford.edu; s=cs2308; h=Content-Transfer-Encoding:Content-Type:Cc:To:
-	Subject:Message-ID:Date:From:In-Reply-To:References:MIME-Version:Sender:
-	Reply-To:Content-ID:Content-Description:Resent-Date:Resent-From:Resent-Sender
-	:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:List-Help:List-Unsubscribe:
-	List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=hKg5QSxKCFrPNhnrX8Gp+pkhaBSGardrL+l3tr4t8wc=; t=1738169045; x=1739033045; 
-	b=aCHYEhO+5wOfqYJcrVk898FHI54g2gLOeBgtaxTZ/cdL1WUe1ZpjDidGVDgGH31ffkYX7gOmPxy
-	fcVg40SCaWlD4Q3VGpbPbmNqeK6XzLL5pQjQHZiFOeJ0CSIWGNneRRAfIqRpVyyCILrY8MetClwem
-	4iZSRUA7gabXQJEcolB8IkigytqEAbrqFHvpLqi4LHw4GSLzPSuPWBIe0hK9mmRvHWzjBp4oTrNq9
-	AbEf/4KrGy95xyPXQ0/jJCX5wK7D3K9bTuL81pm7gigRri/k3foVwPTvjN5MyF9S/jWXMFS4fUtGb
-	IoPw4flNqOvJMlK8bm/jtBoef82n6MWqNXrw==;
-Received: from mail-oa1-f42.google.com ([209.85.160.42]:49321)
-	by smtp1.cs.Stanford.EDU with esmtpsa  (TLS1.2) tls TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256
-	(Exim 4.94.2)
-	(envelope-from <ouster@cs.stanford.edu>)
-	id 1tdBAa-0004Ev-9c
-	for netdev@vger.kernel.org; Wed, 29 Jan 2025 08:44:04 -0800
-Received: by mail-oa1-f42.google.com with SMTP id 586e51a60fabf-29f87f1152cso3579872fac.2
-        for <netdev@vger.kernel.org>; Wed, 29 Jan 2025 08:44:04 -0800 (PST)
-X-Gm-Message-State: AOJu0YxQDj7OX2lPh3O1Hx7jkAfWOmNXbqQjkoCsSscjxya2HNHcnN/p
-	+0JIIY+7R8Zu1cbPmAdvwF0DPTl/N+7MXD81kU3Qw/yZhbrJ2JnfuKioHw7eUhmld6Omm+fvLvH
-	MNbUffd/Wrkk64Ea1vH21UFM9tY8=
-X-Google-Smtp-Source: AGHT+IEqovigGXqdRWt8g66jn5b/I8jeUGfPTBQcCosSeIATCMZaXsdLBVXr2RuzKSEsULcbj6zFQhg6Gq0H7k9Nxdo=
-X-Received: by 2002:a05:6871:3a8e:b0:29e:592f:f4f3 with SMTP id
- 586e51a60fabf-2b32f27fe8emr2067442fac.27.1738169043702; Wed, 29 Jan 2025
- 08:44:03 -0800 (PST)
+	 To:Cc:Content-Type; b=KxXCyfqQE/lDTn//w+FJdeB9ZlQhKxqlgPWqcWn07C4gCVS73wbclBJckc/8IQBWj/DDSomFMZdfe2Z6JXLJGJqrazDvgFs/wh6uI5wo9w1gXmBAgPExi+rymQ1vE5p/wA8Lrke2fVl4vFoGAv6Pfa50fYfcZwngstfAoqBwkpw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=cloudflare.com; spf=pass smtp.mailfrom=cloudflare.com; dkim=pass (2048-bit key) header.d=cloudflare.com header.i=@cloudflare.com header.b=F9csjIoY; arc=none smtp.client-ip=209.85.208.42
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=cloudflare.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=cloudflare.com
+Received: by mail-ed1-f42.google.com with SMTP id 4fb4d7f45d1cf-5dc59303334so2836197a12.2
+        for <netdev@vger.kernel.org>; Wed, 29 Jan 2025 08:49:11 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=cloudflare.com; s=google09082023; t=1738169350; x=1738774150; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=24mFNTs5JTFo0m2JMhT7QRNiD2ytZH7rVwvkzzD60y8=;
+        b=F9csjIoYvJMbEtg8ptQTyIyirtFb3rD/KcpKhDEqbF3rmNRPtoVHJZV3KCNMA5DfVR
+         NDponZn/j7YAfqciWKiP8xYaHdpFWS7U/ssOtGOaBnkKj2fCOSJLGVaFs3UQ+kEy56dc
+         +cdthm+L3KfmZjSqneWHAvOM75xdZwnTkCttRO4RB7mU9C4eQm7Oxnl0CynAGneqxjxC
+         FhkceFykIsoideGsWfixjXSRlupStiRO8rnknir6PYEpKbs6SxvX/3f/vhIvE/iiGkgJ
+         z7f9W0fPjaT1TnefeB7Tu1JazJxXO5pRxTR9KjdKhwbV4G2drPtt2hv4dP3KmF0J3LPj
+         hNzw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1738169350; x=1738774150;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=24mFNTs5JTFo0m2JMhT7QRNiD2ytZH7rVwvkzzD60y8=;
+        b=k2Rblt5jIJkYa2GNrM5xyEZBAS+VSOtyet3PjdoxtWHopv/4LfK0TnOkX3yRQGJ900
+         ciOqi9Oc2a9XUCY4obVDMVbuToXtP1Q72pfTcz14x4I6NhvJjIZ3UFgfy1VLvhk5gyHZ
+         V+o0HGj/cT1AS3kD4sBDT+oQp9Y43ErAoWkDAEK2xdaTCPGZ81UPhTD22+p/BrwGPUb9
+         eFg2ltsVFQqFhpMtZcsiHtmBXVmjZTw/n6Pnkt1REl/yXrcuVWicujeiM5uXJjYLp76t
+         jjH33JlK9KuiSfQkBT3hXbscBFNKyPBShDbJ+22WwxumLDoZWbz7P0O8TwogFCwDmnxA
+         //xg==
+X-Gm-Message-State: AOJu0YwPYwDjxUDPpsMek2pClzO+nS78NwVT1NCgAew8NTS7kDKtinJD
+	+es441HURX1NXkAbzzGw+9VRvtRA/Bt+KJdYK/Bii1PPD73Devu1ZkjTbhcMO7LsSjBppjVkPlY
+	eJpn3qs5P+LM0wOuE9Ka5N7WKIlID475VS0aM5A==
+X-Gm-Gg: ASbGncsI8QkdHKGWoMogeuWDaZZ/XcKeFJVNIxObPWUGcN6x/0U24NBnGNZLmF3QReo
+	8Y943hxat08G5OSQTylOu+a3O65b3GKBEFMJ013rbHs04gRShXSBOYQowmZzdV8SHxKpqtOWWvu
+	JBZ4YQiFGbYYY=
+X-Google-Smtp-Source: AGHT+IFNVgiMkVJIbrv6oo/KsxMQ2wthoaQl/ttMBhRczemhVIIoaZYCQxK+nPbUhHuh1xAsfsy9eREZqVlKLUwJtpY=
+X-Received: by 2002:a05:6402:90c:b0:5d0:d84c:abb3 with SMTP id
+ 4fb4d7f45d1cf-5dc5efebf52mr2864461a12.26.1738169349705; Wed, 29 Jan 2025
+ 08:49:09 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250115185937.1324-1-ouster@cs.stanford.edu> <20250115185937.1324-6-ouster@cs.stanford.edu>
- <1c82f56c-4353-407b-8897-b8a485606a5f@redhat.com> <CAGXJAmwyp6tSO4KT_NSHKHSnUn-GSzSN=ucfjnBuXbg8uiw2pg@mail.gmail.com>
- <2ace650b-5697-4fc4-91f9-4857fa64feea@redhat.com> <CAGXJAmxHDVhxKb3M0--rySAgewmLpmfJkAeRSBNRgZ=cQonDtg@mail.gmail.com>
- <9209dfbb-ca3a-4fb7-a2fb-0567394f8cda@redhat.com> <CAGXJAmyb8s5xu9W1dXxhwnQfeY4=P21FquBymonUseM_OpaU2w@mail.gmail.com>
- <13345e2a-849d-4bd8-a95e-9cd7f287c7df@redhat.com>
-In-Reply-To: <13345e2a-849d-4bd8-a95e-9cd7f287c7df@redhat.com>
-From: John Ousterhout <ouster@cs.stanford.edu>
-Date: Wed, 29 Jan 2025 08:43:28 -0800
-X-Gmail-Original-Message-ID: <CAGXJAmweUSP8-eG--nOrcst4tv-qq9RKuE0arme4FJzXW67x3Q@mail.gmail.com>
-X-Gm-Features: AWEUYZkCvG4Jmt1JfJVM5w3XAhsPX2QKawMHQzqOnf3gx_VzYAHTq8r9Z_CpUyM
-Message-ID: <CAGXJAmweUSP8-eG--nOrcst4tv-qq9RKuE0arme4FJzXW67x3Q@mail.gmail.com>
-Subject: Re: [PATCH net-next v6 05/12] net: homa: create homa_rpc.h and homa_rpc.c
-To: Paolo Abeni <pabeni@redhat.com>
-Cc: Netdev <netdev@vger.kernel.org>, Eric Dumazet <edumazet@google.com>, 
-	Simon Horman <horms@kernel.org>, Jakub Kicinski <kuba@kernel.org>
+References: <Z5cgWh/6bRQm9vVU@debian.debian> <6797992c28a23_3f1a294d6@willemb.c.googlers.com.notmuch>
+ <CAO3-Pbqx_sLxdLsTg+NX3z1rrenK=0qpvfL5h_K-RX-Yk9A4YA@mail.gmail.com>
+ <6798ed91e94a9_987d9294c2@willemb.c.googlers.com.notmuch> <CAO3-PboS3JB1GhhbmoJc2-h5zvHe-iNsk9Hkg-_-eNATq99D1Q@mail.gmail.com>
+ <679a367198f13_132e0829467@willemb.c.googlers.com.notmuch>
+In-Reply-To: <679a367198f13_132e0829467@willemb.c.googlers.com.notmuch>
+From: Yan Zhai <yan@cloudflare.com>
+Date: Wed, 29 Jan 2025 10:48:58 -0600
+X-Gm-Features: AWEUYZkoD9-G2Gb2BMJKOXr7zCSy1PEo0iP8iXxgX__McdlsVTcTjQqXioGb9gs
+Message-ID: <CAO3-Pbpxt9K=mT3ozFqMHAQcy0B30snxq9Kg9xvP7pmzmXP5=w@mail.gmail.com>
+Subject: Re: [PATCH] udp: gso: fix MTU check for small packets
+To: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
+Cc: netdev@vger.kernel.org, "David S. Miller" <davem@davemloft.net>, 
+	David Ahern <dsahern@kernel.org>, Eric Dumazet <edumazet@google.com>, 
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, 
+	Shuah Khan <shuah@kernel.org>, Josh Hunt <johunt@akamai.com>, 
+	Alexander Duyck <alexander.h.duyck@linux.intel.com>, linux-kernel@vger.kernel.org, 
+	linux-kselftest@vger.kernel.org, kernel-team <kernel-team@cloudflare.com>
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
-X-Spam-Score: 0.8
-X-Spam-Level: 
-X-Scan-Signature: f219e97bb238ccbb8ed40879dafdba3c
 
-On Wed, Jan 29, 2025 at 2:24=E2=80=AFAM Paolo Abeni <pabeni@redhat.com> wro=
-te:
+On Wed, Jan 29, 2025 at 8:08=E2=80=AFAM Willem de Bruijn
+<willemdebruijn.kernel@gmail.com> wrote:
 >
-> On 1/29/25 2:23 AM, John Ousterhout wrote:
-> > In my measurements, skb freeing is by far the largest cost in RPC
-> > reaping. I'm not currently in a good position to remeasure this, but
-> > my recollection is that it takes a few hundred ns to free an skb. A
-> > large RPC (1 MByte is Homa's current limit) will have at least 100
-> > skbs (with jumbo frames) and more than 600 skbs with 1500B frames:
-> > that's 20-100 usec.
+> Yan Zhai wrote:
+> > On Tue, Jan 28, 2025 at 8:45=E2=80=AFAM Willem de Bruijn
+> > <willemdebruijn.kernel@gmail.com> wrote:
+> > >
+> > > Yan Zhai wrote:
+> > > > Hi Willem,
+> > > >
+> > > > Thanks for getting back to me.
+> > > >
+> > > > On Mon, Jan 27, 2025 at 8:33=E2=80=AFAM Willem de Bruijn
+> > > > <willemdebruijn.kernel@gmail.com> wrote:
+> > > > >
+> > > > > Yan Zhai wrote:
+> > > > > > Commit 4094871db1d6 ("udp: only do GSO if # of segs > 1") avoid=
+ed GSO
+> > > > > > for small packets. But the kernel currently dismisses GSO reque=
+sts only
+> > > > > > after checking MTU on gso_size. This means any packets, regardl=
+ess of
+> > > > > > their payload sizes, would be dropped when MTU is smaller than =
+requested
+> > > > > > gso_size.
+> > > > >
+> > > > > Is this a realistic concern? How did you encounter this in practi=
+ce.
+> > > > >
+> > > > > It *is* a misconfiguration to configure a gso_size larger than MT=
+U.
+> > > > >
+> > > > > > Meanwhile, EINVAL would be returned in this case, making it
+> > > > > > very misleading to debug.
+> > > > >
+> > > > > Misleading is subjective. I'm not sure what is misleading here. F=
+rom
+> > > > > my above comment, I believe this is correctly EINVAL.
+> > > > >
+> > > > > That said, if this impacts a real workload we could reconsider
+> > > > > relaxing the check. I.e., allowing through packets even when an
+> > > > > application has clearly misconfigured UDP_SEGMENT.
+> > > > >
+> > > > We did encounter a painful reliability issue in production last mon=
+th.
+> > > >
+> > > > To simplify the scenario, we had these symptoms when the issue occu=
+rred:
+> > > > 1. QUIC connections to host A started to fail, and cannot establish=
+ new ones
+> > > > 2. User space Wireguard to the exact same host worked 100% fine
+> > > >
+> > > > This happened rarely, like one or twice a day, lasting for a few
+> > > > minutes usually, but it was quite visible since it is an office
+> > > > network.
+> > > >
+> > > > Initially this prompted something wrong at the protocol layer. But
+> > > > after multiple rounds of digging, we finally figured the root cause
+> > > > was:
+> > > > 3. Something sometimes pings host B, which shares the same IP with
+> > > > host A but different ports (thanks to limited IPv4 space), and its
+> > > > PMTU was reduced to 1280 occasionally. This unexpectedly affected a=
+ll
+> > > > traffic to that IP including traffic toward host A. Our QUIC client
+> > > > set gso_size to 1350, and that's why it got hit.
+> > > >
+> > > > I agree that configurations do matter a lot here. Given how broken =
+the
+> > > > PMTU was for the Internet, we might just turn off pmtudisc option o=
+n
+> > > > our end to avoid this failure path. But for those who hasn't yet, t=
+his
+> > > > could still be confusing if it ever happens, because nothing seems =
+to
+> > > > point to PMTU in the first place:
+> > > > * small packets also get dropped
+> > > > * error code was EINVAL from sendmsg
+> > > >
+> > > > That said, I probably should have used PMTU in my commit message to=
+ be
+> > > > more clear for our problem. But meanwhile I am also concerned about
+> > > > newly added tunnels to trigger the same issue, even if it has a sta=
+tic
+> > > > device MTU. My proposal should make the error reason more clear:
+> > > > EMSGSIZE itself is a direct signal pointing to MTU/PMTU. Larger
+> > > > packets getting dropped would have a similar effect.
+> > >
+> > > Thanks for that context. Makes sense that this is a real issue.
+> > >
+> > > One issue is that with segmentation, the initial mtu checks are
+> > > skipped, so they have to be enforced later. In __ip_append_data:
+> > >
+> > >     mtu =3D cork->gso_size ? IP_MAX_MTU : cork->fragsize;
+> > >
+> > You are right, if packet sizes are between (PMTU, gso_size), then they
+> > should still be dropped. But instead of checking explicitly in
+> > udp_send_skb, maybe we can leave them to be dropped in
+> > ip_finish_output?
 >
-> I guess a couple of things could improve skb free performances:
+> Not sure how to do this, or whether it will be simpler than having all
+> the UDP GSO checks in udp_send_skb.
 >
-> - packet aggregation for home protocol - either at the GRO stage[*] or
-> skb coalescing while enqueuing in `msgin.packets`, see
-> skb_try_coalesce()/tcp_try_coalesce().
+> For a "don't add cost to the hot path" point of view, it's actually
+> best to keep all these checks in one place only when UDP_SEGMENT is
+> negotiated (where the hot path is the common case without GSO).
 >
-> - deferred skb freeing, see skb_attempt_defer_free() in net/core/skbuff.c=
-.
->
-> [*] I see a bunch of parameters for it but no actual code, I guess it's
-> planned for later?
+I mean ip_finish_output is already dropping packets with length larger
+than dst MTU. But I guess it doesn't hurt to check it also in GSO
+branch. Let me send a V2 later to address it.
 
-GRO is implemented in the "full" Homa (and essential for decent
-performance); I left it out of this initial patch series to reduce the
-size of the patch. But that doesn't affect the cost of freeing skbs.
-GRO aggregates skb's into batches for more efficient processing, but
-the same number of skb's ends up being freed in the end.
+> > This way there is no need to add an extra branch for
+> > non GSO code paths. PMTU shrinking should be rare, so the overhead
+> > should be minimal.
+> >
+> > > Also, might this make the debugging actually harder, as the
+> > > error condition is now triggered intermittently.
+> > Yes sendmsg may only return errors for a portion of packets now under
+> > the same situation. But IMHO it's not trading debugging for
+> > reliability. Consistent error is good news for engineers to reproduce
+> > locally, but in production I find people (SREs, solution and
+> > escalation engineers) rely on pcaps and errno a lot. The pattern in
+> > pcaps (lack of large packets of certain sizes, since they are dropped
+> > before dev_queue_xmit), and exact error reasons like EMSGSIZE are both
+> > good indicators for root causes. EINVAL is more generic on the other
+> > hand. For example, I remembered we had another issue on UDP sendmsg,
+> > which also returned a bunch of EINVAL. But that was due to some
+> > attacker tricking us to reply with source port 0.
+>
+> Relying on error code is fraught anyway. For online analysis (which
+> I think can be assumed when pcap is mentioned), function tracing and
+> bpf trace are much more powerful.
+>
+Totally agree tracing is more powerful. Time by time we see issues
+lingering for a few months get addressed in a few days or even hours
+when tracing is plugged in. Unfortunately at least for us, the number
+of people who can trace properly is far behind the volume of problems.
+I can only hope in the future more people will recognize this as a
+golden skill, in addition to current standard skills like pcap
+analysis.
 
--John-
+Yan
+
+> That said, no objections to returning EMSGSIZE instead of EINVAL. That
+> is the same UDP returns when sending a single datagram that exceeds
+> MTU, after all.
+>
 
