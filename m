@@ -1,128 +1,178 @@
-Return-Path: <netdev+bounces-161463-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-161464-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 54A4FA21A62
-	for <lists+netdev@lfdr.de>; Wed, 29 Jan 2025 10:51:45 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0DD84A21A68
+	for <lists+netdev@lfdr.de>; Wed, 29 Jan 2025 10:52:15 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id DB8CA1888D4F
-	for <lists+netdev@lfdr.de>; Wed, 29 Jan 2025 09:51:44 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 609231666EB
+	for <lists+netdev@lfdr.de>; Wed, 29 Jan 2025 09:52:13 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 12CFD1B4242;
-	Wed, 29 Jan 2025 09:51:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="MclPon4d"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8B0B51AB52F;
+	Wed, 29 Jan 2025 09:52:09 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from relay2-d.mail.gandi.net (relay2-d.mail.gandi.net [217.70.183.194])
+Received: from frasgout.his.huawei.com (frasgout.his.huawei.com [185.176.79.56])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 002B51ACEC2;
-	Wed, 29 Jan 2025 09:51:01 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.194
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 19917191F84;
+	Wed, 29 Jan 2025 09:52:06 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.176.79.56
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1738144266; cv=none; b=ru/2DP9kIS2JhPT5NNrBDr1PddUXCzhZF7U7E00tvtUj1CXBhW8q5U/Y3RMUxfh2/rbPnYVMsxXYbYr+Kp4eS/1pyY3Gq6k+1T1SVtSfnKnIqAlqaHu6QpGvXPxTRRld4Yvrpn3a476s2QhZHL+3uHs80x2j8aYHqREWYywT9yQ=
+	t=1738144329; cv=none; b=OVxYGVa/Sr1Hig5juEGtzwMJg0dahoOBKM/l4B2J/IpbozGvN9FDmlLXtgHO/cK+WW1qbq4E9m1UB9cfz52b1VGRRdlLWoY+qhoIl8TGIKhxi3tQEAH2mSeyLfcuvnrNTgNYqbQzVrVGGVdVmcjAFCvIODNn7jUbc/nOrVCMQaI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1738144266; c=relaxed/simple;
-	bh=WJIOirS4NfRBxnd17RVtI7uhPHobYgknVkBuym75zXs=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=JGZi2i4jL/HfNWbrK3vr1eXPvuqHpkdHflcopdBM+Jz89p56bJTldibf40FzXlD5DlAsk/f8Ds28wX/XjIZ+JlQNSET1RGAg5LDyvEsyvtUBjtPzta5H2CuQNl33U/E+hqIGlBJjff/GC9L26Mf+rGnxg30ZxMEJiiqNhh9sUIw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=MclPon4d; arc=none smtp.client-ip=217.70.183.194
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
-Received: by mail.gandi.net (Postfix) with ESMTPSA id A837443160;
-	Wed, 29 Jan 2025 09:50:59 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
-	t=1738144260;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=dCT7Wfx+rQPn7xMLFJVZnOU4kMMXieZuPB/RHqItue0=;
-	b=MclPon4dJkNH3qvR4z68NE4/KkdVRi9AOu9BKenUOt5J30TbkCvoi03yvPe044tuSTSvjP
-	bZWw7cbYtREw///V2ZWnoHkN52YeK3qIsxT57m5R5MLgql0pYh47I8jOqvA9x/A76ojrZO
-	LRKPn4Pww6A2jXmwhNptKCetHSL9A/ypILmNL4bbFRyRtRco+lKq2N7zfzOW5PS9v+aeUX
-	zgGNYCVoU5/iWX9Lb84sulOUxVpCKQgoL2j+Lg7XuHAdUJIb1m4BdGpz+x4xsXT6cB33EX
-	MptF0xFzIWelsQ1aSy2D1JGSECC4NiY8w1zTma1S2PQUOW7H3FgHi7y45CCW/g==
-From: Kory Maincent <kory.maincent@bootlin.com>
-Date: Wed, 29 Jan 2025 10:50:47 +0100
-Subject: [PATCH net v3 2/2] net: sh_eth: Fix missing rtnl lock in
- suspend/resume path
+	s=arc-20240116; t=1738144329; c=relaxed/simple;
+	bh=vnm2Sr7Bpz2tMcpRtHGyI6+lG68KZTS3zvIXOoyG9cA=;
+	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
+	 In-Reply-To:Content-Type; b=JTir/0g5/tNERMU1KrJ/bL0EC7lCclRv5oKIhNoaceTNmNBlSYsyb7QZFj3w4Jv5G/TkUCVlhiHFvkFczlXT47R3ZzMZGYV8Mx6Qd0FR/kB/ZxlslvqrBvvtBepSN9ExjBYLe64Tv7ASlFzf/uZgWhrySPjfVftIeL/5NktrtwE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei-partners.com; spf=pass smtp.mailfrom=huawei-partners.com; arc=none smtp.client-ip=185.176.79.56
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei-partners.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei-partners.com
+Received: from mail.maildlp.com (unknown [172.18.186.216])
+	by frasgout.his.huawei.com (SkyGuard) with ESMTP id 4Yjcnn1VR1z6J67n;
+	Wed, 29 Jan 2025 17:49:49 +0800 (CST)
+Received: from mscpeml500004.china.huawei.com (unknown [7.188.26.250])
+	by mail.maildlp.com (Postfix) with ESMTPS id 73F8A140B18;
+	Wed, 29 Jan 2025 17:52:04 +0800 (CST)
+Received: from [10.123.123.159] (10.123.123.159) by
+ mscpeml500004.china.huawei.com (7.188.26.250) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1258.34; Wed, 29 Jan 2025 12:52:02 +0300
+Message-ID: <f6e72e71-c5ed-8a9c-f33e-f190a47b8c27@huawei-partners.com>
+Date: Wed, 29 Jan 2025 12:52:00 +0300
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+User-Agent: Mozilla Thunderbird
+Subject: Re: [RFC PATCH v2 1/8] landlock: Fix non-TCP sockets restriction
+Content-Language: ru
+To: Matthieu Baerts <matttbe@kernel.org>, =?UTF-8?Q?Micka=C3=ABl_Sala=C3=BCn?=
+	<mic@digikod.net>
+CC: <gnoack@google.com>, <willemdebruijn.kernel@gmail.com>,
+	<matthieu@buffet.re>, <linux-security-module@vger.kernel.org>,
+	<netdev@vger.kernel.org>, <netfilter-devel@vger.kernel.org>,
+	<yusongping@huawei.com>, <artem.kuzin@huawei.com>,
+	<konstantin.meskhidze@huawei.com>, MPTCP Linux <mptcp@lists.linux.dev>,
+	<linux-nfs@vger.kernel.org>, Paul Moore <paul@paul-moore.com>
+References: <20241017110454.265818-1-ivanov.mikhail1@huawei-partners.com>
+ <20241017110454.265818-2-ivanov.mikhail1@huawei-partners.com>
+ <49bc2227-d8e1-4233-8bc4-4c2f0a191b7c@kernel.org>
+ <20241018.Kahdeik0aaCh@digikod.net>
+ <62336067-18c2-3493-d0ec-6dd6a6d3a1b5@huawei-partners.com>
+ <20241212.qua0Os3sheev@digikod.net>
+ <f480bbea-989d-378a-9493-c2bee412db00@huawei-partners.com>
+ <20250124.gaegoo0Ayahn@digikod.net>
+ <2f970b00-7648-1865-858a-214c5c6af0c4@huawei-partners.com>
+ <20250127.Uph4aiph9jae@digikod.net>
+ <d3d589c3-a70b-fc6e-e1bb-d221833dfef5@huawei-partners.com>
+ <594263fc-f4e7-43ce-a613-d3f8ebb7f874@kernel.org>
+From: Mikhail Ivanov <ivanov.mikhail1@huawei-partners.com>
+In-Reply-To: <594263fc-f4e7-43ce-a613-d3f8ebb7f874@kernel.org>
+Content-Type: text/plain; charset="UTF-8"; format=flowed
 Content-Transfer-Encoding: 8bit
-Message-Id: <20250129-fix_missing_rtnl_lock_phy_disconnect-v3-2-24c4ba185a92@bootlin.com>
-References: <20250129-fix_missing_rtnl_lock_phy_disconnect-v3-0-24c4ba185a92@bootlin.com>
-In-Reply-To: <20250129-fix_missing_rtnl_lock_phy_disconnect-v3-0-24c4ba185a92@bootlin.com>
-To: Paul Barker <paul.barker.ct@bp.renesas.com>, 
- =?utf-8?q?Niklas_S=C3=B6derlund?= <niklas.soderlund@ragnatech.se>, 
- Andrew Lunn <andrew+netdev@lunn.ch>, 
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>
-Cc: Sergey Shtylyov <s.shtylyov@omp.ru>, 
- Thomas Petazzoni <thomas.petazzoni@bootlin.com>, 
- =?utf-8?q?Niklas_S=C3=B6derlund?= <niklas.soderlund+renesas@ragnatech.se>, 
- Claudiu Beznea <claudiu.beznea.uj@bp.renesas.com>, netdev@vger.kernel.org, 
- linux-renesas-soc@vger.kernel.org, linux-kernel@vger.kernel.org, 
- Kory Maincent <kory.maincent@bootlin.com>
-X-Mailer: b4 0.14.1
-X-GND-State: clean
-X-GND-Score: -100
-X-GND-Cause: gggruggvucftvghtrhhoucdtuddrgeefvddrtddtgddvieejucetufdoteggodetrfdotffvucfrrhhofhhilhgvmecuifetpfffkfdpucggtfgfnhhsuhgsshgtrhhisggvnecuuegrihhlohhuthemuceftddunecusecvtfgvtghiphhivghnthhsucdlqddutddtmdenucfjughrpefhfffugggtgffkfhgjvfevofesthekredtredtjeenucfhrhhomhepmfhorhihucforghinhgtvghnthcuoehkohhrhidrmhgrihhntggvnhhtsegsohhothhlihhnrdgtohhmqeenucggtffrrghtthgvrhhnpeeikefgjedvkedugfeiheffgeeflefgteduleeuvdeitdfgtddvleetieekffffkeenucfkphepledtrdekledrudeifedruddvjeenucevlhhushhtvghrufhiiigvpedtnecurfgrrhgrmhepihhnvghtpeeltddrkeelrdduieefrdduvdejpdhhvghloheplgduvdejrddtrddurddungdpmhgrihhlfhhrohhmpehkohhrhidrmhgrihhntggvnhhtsegsohhothhlihhnrdgtohhmpdhnsggprhgtphhtthhopeduhedprhgtphhtthhopegtlhgruhguihhurdgsvgiinhgvrgdruhhjsegsphdrrhgvnhgvshgrshdrtghomhdprhgtphhtthhopehlihhnuhigqdhrvghnvghsrghsqdhsohgtsehvghgvrhdrkhgvrhhnvghlrdhorhhgpdhrtghpthhtohepphgruhhlrdgsrghrkhgvrhdrtghtsegsphdrrhgvnhgvshgrshdrtghomhdprhgtphhtthhopehkuhgsrgeskhgvrhhnvghlrdhorhhgpdhrtghpthhtohepn
- hhikhhlrghsrdhsohguvghrlhhunhguodhrvghnvghsrghssehrrghgnhgrthgvtghhrdhsvgdprhgtphhtthhopehnvghtuggvvhesvhhgvghrrdhkvghrnhgvlhdrohhrghdprhgtphhtthhopehthhhomhgrshdrphgvthgriiiiohhnihessghoohhtlhhinhdrtghomhdprhgtphhtthhopehkohhrhidrmhgrihhntggvnhhtsegsohhothhlihhnrdgtohhm
-X-GND-Sasl: kory.maincent@bootlin.com
+X-ClientProxiedBy: lhrpeml100001.china.huawei.com (7.191.160.183) To
+ mscpeml500004.china.huawei.com (7.188.26.250)
 
-Fix the suspend/resume path by ensuring the rtnl lock is held where
-required. Calls to sh_eth_close, sh_eth_open and wol operations must be
-performed under the rtnl lock to prevent conflicts with ongoing ndo
-operations.
+On 1/28/2025 9:14 PM, Matthieu Baerts wrote:
+> Hi Mikhail,
+> 
+> Sorry, I didn't follow all the discussions in this thread, but here are
+> some comments, hoping this can help to clarify the MPTCP case.
 
-Fixes: b71af04676e9 ("sh_eth: add more PM methods")
-Tested-by: Niklas Söderlund <niklas.soderlund+renesas@ragnatech.se>
-Reviewed-by: Sergey Shtylyov <s.shtylyov@omp.ru>
-Signed-off-by: Kory Maincent <kory.maincent@bootlin.com>
----
- drivers/net/ethernet/renesas/sh_eth.c | 4 ++++
- 1 file changed, 4 insertions(+)
+Thanks a lot for sharing your knowledge, Matthieu!
 
-diff --git a/drivers/net/ethernet/renesas/sh_eth.c b/drivers/net/ethernet/renesas/sh_eth.c
-index 8887b8921009..5fc8027c92c7 100644
---- a/drivers/net/ethernet/renesas/sh_eth.c
-+++ b/drivers/net/ethernet/renesas/sh_eth.c
-@@ -3494,10 +3494,12 @@ static int sh_eth_suspend(struct device *dev)
- 
- 	netif_device_detach(ndev);
- 
-+	rtnl_lock();
- 	if (mdp->wol_enabled)
- 		ret = sh_eth_wol_setup(ndev);
- 	else
- 		ret = sh_eth_close(ndev);
-+	rtnl_unlock();
- 
- 	return ret;
- }
-@@ -3511,10 +3513,12 @@ static int sh_eth_resume(struct device *dev)
- 	if (!netif_running(ndev))
- 		return 0;
- 
-+	rtnl_lock();
- 	if (mdp->wol_enabled)
- 		ret = sh_eth_wol_restore(ndev);
- 	else
- 		ret = sh_eth_open(ndev);
-+	rtnl_unlock();
- 
- 	if (ret < 0)
- 		return ret;
+> 
+> On 28/01/2025 11:56, Mikhail Ivanov wrote:
+>> On 1/27/2025 10:48 PM, Mickaël Salaün wrote:
+> 
+> (...)
+> 
+>>> I'm a bit worried that we miss some of these places (now or in future
+>>> kernel versions).  We'll need a new LSM hook for that.
+>>>
+>>> Could you list the current locations?
+>>
+>> Currently, I know only about TCP-related transformations:
+>>
+>> * SMC can fallback to TCP during connection. TCP connection is used
+>>    (1) to exchange CLC control messages in default case and (2) for the
+>>    communication in the case of fallback. If socket was connected or
+>>    connection failed, socket can not be reconnected again. There is no
+>>    existing security hook to control the fallback case,
+>>
+>> * MPTCP uses TCP for communication between two network interfaces in the
+>>    default case and can fallback to plain TCP if remote peer does not
+>>    support MPTCP. AFAICS, there is also no security hook to control the
+>>    fallback transformation,
+> 
+> There are security hooks to control the path creation, but not to
+> control the "fallback transformation".
+> 
+> Technically, with MPTCP, the userspace will create an IPPROTO_MPTCP
+> socket. This is only used "internally": to communicate between the
+> userspace and the kernelspace, but not directly used between network
+> interfaces. This "external" communication is done via one or multiple
+> kernel TCP sockets carrying extra TCP options for the mapping. The
+> userspace cannot directly control these sockets created by the kernel.
+> 
+> In case of fallback, the kernel TCP socket "simply" drop the extra TCP
+> options needed for MPTCP, and carry on like normal TCP. So on the wire
+> and in the Linux network stack, it is the same TCP connection, without
+> the MPTCP options in the TCP header. The userspace continue to
+> communicate with the same socket.
+> 
+> I'm not sure if there is a need to block the fallback: it means only one
+> path can be used at a time.
 
--- 
-2.34.1
+You mean that users always rely on a plain TCP communication in the case
+the connection of MPTCP multipath communication fails?
 
+> 
+>> * IPv6 -> IPv4 transformation for TCP and UDP sockets withon
+>>    IPV6_ADDRFORM. Can be controlled with setsockopt() security hook.
+>>
+>> As I said before, I wonder if user may want to use SMC or MPTCP and deny
+>> TCP communication, since he should rely on fallback transformation
+>> during the connection in the common case. It may be unexpected for
+>> connect(2) to fail during the fallback due to security politics.
+> 
+> With MPTCP, fallbacks can happen at the beginning of a connection, when
+> there is only one path. This is done after the userspace's connect(). If
+> the fallback is blocked, I guess the userspace will get the same errors
+> as when an open connection is reset.
+
+In the case of blocking due to security policy, userspace should get
+-EACESS. I mean, the user might not expect the fallback path to be
+blocked during the connection if he has allowed only MPTCP communication
+using the Landlock policy.
+
+> 
+> (Note that on the listener side, the fallback can happen before the
+> userspace's accept() which can even get an IPPROTO_TCP socket in return)
+
+Indeed, fallback can happen on a server side as well.
+
+> 
+>> Theoretically, any TCP restriction should cause similar SMC and MPTCP
+>> restriction. If we deny creation of TCP sockets, we should also deny
+>> creation of SMC and MPTCP sockets. I thought that such dependencies may
+>> be too complex and it will be better to leave them for the user and not
+>> provide any transformation control at all. What do you think?
+> I guess the creation of "kernel" TCP sockets used by MPTCP (and SMC?)
+> can be restricted, it depends on where this hook is placed I suppose.
+
+Calling
+	socket(AF_INET, SOCK_STREAM, IPPROTO_MPTCP)
+causes creation of kernel TCP socket, so we can use
+security_socket_create() hook for this purpose.
+
+> 
+> (...)
+> 
+> Cheers,
+> Matt
 
