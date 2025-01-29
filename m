@@ -1,296 +1,118 @@
-Return-Path: <netdev+bounces-161521-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-161523-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id E42B0A21FAA
-	for <lists+netdev@lfdr.de>; Wed, 29 Jan 2025 15:51:56 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 65794A22009
+	for <lists+netdev@lfdr.de>; Wed, 29 Jan 2025 16:13:49 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 3415C1884F85
-	for <lists+netdev@lfdr.de>; Wed, 29 Jan 2025 14:52:01 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 4C4C37A2E97
+	for <lists+netdev@lfdr.de>; Wed, 29 Jan 2025 15:12:55 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2EF241B422F;
-	Wed, 29 Jan 2025 14:51:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5475A18F2EA;
+	Wed, 29 Jan 2025 15:13:43 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=digikod.net header.i=@digikod.net header.b="cNHnr2G6"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="LKl7h323"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp-8fad.mail.infomaniak.ch (smtp-8fad.mail.infomaniak.ch [83.166.143.173])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CD019191F95
-	for <netdev@vger.kernel.org>; Wed, 29 Jan 2025 14:51:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=83.166.143.173
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 251334C83
+	for <netdev@vger.kernel.org>; Wed, 29 Jan 2025 15:13:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1738162311; cv=none; b=X1I7uD4JFZKvnk6HC52sMdg4+itwPmw0jcfTZSkEvKdcpm1ibtPIJ8Sl9+iZwD4zsWjn2rS5Axjc1LdPyMcFd6nMRi+FfyNmJtNmZRhgtjW+UoP/eruVFBnHKNOLYj/1yfF0l62St6qBDIPfyLQ12UL+YkMC4hgYtBtcJ+fx8CE=
+	t=1738163623; cv=none; b=FNCzXSs+owL5dQW2MlFXjrkywykuFeePt3gNYwnklu8adFpYB4Zh7zJ/PWbAcj8bglgLeMpUq4d8h5aJkK7rxBJ0fSpq4SEovzv5HOkP5ItHr3nFi8CrkPfvFdn6AA6Oomp1RQUAeSMyPPuH7IznAd7s52SY91XBoFfBYTVos7A=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1738162311; c=relaxed/simple;
-	bh=uuQ4gUyr4T98j5sQ5sSoBuo1/xncsxBUuh+PdKyTBVc=;
+	s=arc-20240116; t=1738163623; c=relaxed/simple;
+	bh=Hvz9dhoRwhrgylZOp0pRqOKkQMVxc0WF7F7XvFwdQmY=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=CnlXlYztSO+Dtuo+larVbKugtQ4VMtBNyCzaiufSMwqgTcXGhg+KwxH6QcTv239CBrTyGTdkp7yMRLq80wAV8ZqhL1wyOkCGLsExmZthMLN4gcjR7jcUL2Di7EmqvGPHRqrLFBepAzRucJHhBKsGmOp6JLehk0V5mY4JPaFVwFo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=digikod.net; spf=pass smtp.mailfrom=digikod.net; dkim=pass (1024-bit key) header.d=digikod.net header.i=@digikod.net header.b=cNHnr2G6; arc=none smtp.client-ip=83.166.143.173
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=digikod.net
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=digikod.net
-Received: from smtp-4-0001.mail.infomaniak.ch (unknown [IPv6:2001:1600:7:10:40ca:feff:fe05:1])
-	by smtp-4-3000.mail.infomaniak.ch (Postfix) with ESMTPS id 4YjlV3415nzfSj;
-	Wed, 29 Jan 2025 15:51:39 +0100 (CET)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=digikod.net;
-	s=20191114; t=1738162299;
-	bh=2erhwkosldZzlYXN0aQNMdfWuWfgAvD7dxnnGlGxpL8=;
+	 Content-Type:Content-Disposition:In-Reply-To; b=bnhdw4j2io2HW7lKbyAP/u3dh4EYA+NqnOcNdITUGb3nVzXQC5ypsZy/CQ/XPGJlKMdiigmzg4k38Y1a6iaOZp6Gni+XcGRSUPUJQUK7zxiKlxXoZkw//ehSsO+5EJt3/kRA149vrNLVg+v00r45SfaqEVkZFzDsLfDSkdkA2BA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=LKl7h323; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1985CC4CED1;
+	Wed, 29 Jan 2025 15:13:40 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1738163622;
+	bh=Hvz9dhoRwhrgylZOp0pRqOKkQMVxc0WF7F7XvFwdQmY=;
 	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=cNHnr2G6Ooekqbm7My2q4rIn6J5wICpi8LnTdj8sUbTTzAjmOAJn/sG4LRLNklStU
-	 zRWF09DWvM60RwwRH2PNVKsQwGwQ/Gt/X5XfujgsE3ea+VdEfDJ2RIdDV8GE0+NK7S
-	 OBX9jIzjJkIpCtrxhEVxuW31Dzl8dkiNl1HWwDS0=
-Received: from unknown by smtp-4-0001.mail.infomaniak.ch (Postfix) with ESMTPA id 4YjlV26H4hzX82;
-	Wed, 29 Jan 2025 15:51:38 +0100 (CET)
-Date: Wed, 29 Jan 2025 15:51:37 +0100
-From: =?utf-8?Q?Micka=C3=ABl_Sala=C3=BCn?= <mic@digikod.net>
-To: Mikhail Ivanov <ivanov.mikhail1@huawei-partners.com>
-Cc: Matthieu Baerts <matttbe@kernel.org>, gnoack@google.com, 
-	willemdebruijn.kernel@gmail.com, matthieu@buffet.re, linux-security-module@vger.kernel.org, 
-	netdev@vger.kernel.org, netfilter-devel@vger.kernel.org, yusongping@huawei.com, 
-	artem.kuzin@huawei.com, konstantin.meskhidze@huawei.com, 
-	MPTCP Linux <mptcp@lists.linux.dev>, linux-nfs@vger.kernel.org, Paul Moore <paul@paul-moore.com>
-Subject: Re: [RFC PATCH v2 1/8] landlock: Fix non-TCP sockets restriction
-Message-ID: <20250129.Oo1xou8ieche@digikod.net>
-References: <20250124.gaegoo0Ayahn@digikod.net>
- <2f970b00-7648-1865-858a-214c5c6af0c4@huawei-partners.com>
- <20250127.Uph4aiph9jae@digikod.net>
- <d3d589c3-a70b-fc6e-e1bb-d221833dfef5@huawei-partners.com>
- <594263fc-f4e7-43ce-a613-d3f8ebb7f874@kernel.org>
- <f6e72e71-c5ed-8a9c-f33e-f190a47b8c27@huawei-partners.com>
- <2e727df0-c981-4e0c-8d0d-09109cf27d6f@kernel.org>
- <103de503-be0e-2eb2-b6f0-88567d765148@huawei-partners.com>
- <1d1d58b3-2516-4fc8-9f9a-b10604bbe05b@kernel.org>
- <b9823ff1-2f66-3992-b389-b8e631ec03ba@huawei-partners.com>
+	b=LKl7h323mBRY/nCCXJ6UPqgc1mhg462O9ezvfKn8mD+7/wDL/pqOxAYceF47Gx1OE
+	 hFY0kB1uqcvSrG4cGfMt6lLuZ0LI7BygmuI/xTjrin/6XC1QjuVhCTMcU+4+Qe/ckx
+	 yoBfapCtXKyTdGGRqecTI0Bc/F7mvHqBkBlLKxs8UitF2CZ42nR/lTReYIWz3WBCe5
+	 m0SJJEHex6i3jukzeBpOJaQZI0Q+1TGHHFW1WP1BDqYQu+CpoUE9lWMTcml/EI5Cek
+	 wUXBHEraS/r148O4YLIQ+Pa3g4J2K18Wi5EO5e+8RktRSMazCKsOY6nZKHbYOjO795
+	 3Eb6fBygVul9Q==
+Date: Wed, 29 Jan 2025 15:13:38 +0000
+From: Simon Horman <horms@kernel.org>
+To: Eric Dumazet <edumazet@google.com>
+Cc: "David S. Miller" <davem@davemloft.net>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	netdev@vger.kernel.org, eric.dumazet@gmail.com,
+	Stephan Wurm <stephan.wurm@a-eberle.de>
+Subject: Re: [PATCH net] net: hsr: fix fill_frame_info() regression vs VLAN
+ packets
+Message-ID: <20250129151338.GB83549@kernel.org>
+References: <20250129130007.644084-1-edumazet@google.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <b9823ff1-2f66-3992-b389-b8e631ec03ba@huawei-partners.com>
-X-Infomaniak-Routing: alpha
+In-Reply-To: <20250129130007.644084-1-edumazet@google.com>
 
-On Wed, Jan 29, 2025 at 02:47:19PM +0300, Mikhail Ivanov wrote:
-> On 1/29/2025 2:33 PM, Matthieu Baerts wrote:
-> > On 29/01/2025 12:02, Mikhail Ivanov wrote:
-> > > On 1/29/2025 1:25 PM, Matthieu Baerts wrote:
-> > > > Hi Mikhail,
-> > > > 
-> > > > On 29/01/2025 10:52, Mikhail Ivanov wrote:
-> > > > > On 1/28/2025 9:14 PM, Matthieu Baerts wrote:
-> > > > > > Hi Mikhail,
-> > > > > > 
-> > > > > > Sorry, I didn't follow all the discussions in this thread, but here are
-> > > > > > some comments, hoping this can help to clarify the MPTCP case.
-> > > > > 
-> > > > > Thanks a lot for sharing your knowledge, Matthieu!
-> > > > > 
-> > > > > > 
-> > > > > > On 28/01/2025 11:56, Mikhail Ivanov wrote:
-> > > > > > > On 1/27/2025 10:48 PM, Mickaël Salaün wrote:
-> > > > > > 
-> > > > > > (...)
-> > > > > > 
-> > > > > > > > I'm a bit worried that we miss some of these places (now or in future
-> > > > > > > > kernel versions).  We'll need a new LSM hook for that.
-> > > > > > > > 
-> > > > > > > > Could you list the current locations?
-> > > > > > > 
-> > > > > > > Currently, I know only about TCP-related transformations:
-> > > > > > > 
-> > > > > > > * SMC can fallback to TCP during connection. TCP connection is used
-> > > > > > >      (1) to exchange CLC control messages in default case and (2)
-> > > > > > > for the
-> > > > > > >      communication in the case of fallback. If socket was connected or
-> > > > > > >      connection failed, socket can not be reconnected again. There
-> > > > > > > is no
-> > > > > > >      existing security hook to control the fallback case,
-> > > > > > > 
-> > > > > > > * MPTCP uses TCP for communication between two network interfaces
-> > > > > > > in the
-> > > > > > >      default case and can fallback to plain TCP if remote peer does not
-> > > > > > >      support MPTCP. AFAICS, there is also no security hook to
-> > > > > > > control the
-> > > > > > >      fallback transformation,
-> > > > > > 
-> > > > > > There are security hooks to control the path creation, but not to
-> > > > > > control the "fallback transformation".
-> > > > > > 
-> > > > > > Technically, with MPTCP, the userspace will create an IPPROTO_MPTCP
-> > > > > > socket. This is only used "internally": to communicate between the
-> > > > > > userspace and the kernelspace, but not directly used between network
-> > > > > > interfaces. This "external" communication is done via one or multiple
-> > > > > > kernel TCP sockets carrying extra TCP options for the mapping. The
-> > > > > > userspace cannot directly control these sockets created by the kernel.
-> > > > > > 
-> > > > > > In case of fallback, the kernel TCP socket "simply" drop the extra TCP
-> > > > > > options needed for MPTCP, and carry on like normal TCP. So on the wire
-> > > > > > and in the Linux network stack, it is the same TCP connection, without
-> > > > > > the MPTCP options in the TCP header. The userspace continue to
-> > > > > > communicate with the same socket.
-> > > > > > 
-> > > > > > I'm not sure if there is a need to block the fallback: it means only
-> > > > > > one
-> > > > > > path can be used at a time.
-
-Thanks Matthieu.
-
-So user space needs to specific IPPROTO_MPTCP to use MPTCP, but on the
-network this socket can translate to "augmented" or plain TCP.
-
-From Landlock point of view, what matters is to have a consistent policy
-that maps to user space code.  The fear was that a malicious user space
-that is only allowed to use MPTCP could still transform an MPTCP socket
-to a TCP socket, while it wasn't allowed to create a TCP socket in the
-first place.  I now think this should not be an issue because:
-1. MPTCP is kind of a superset of TCP
-2. user space legitimately using MPTCP should not get any error related
-   to a Landlock policy because of TCP/any automatic fallback.  To say
-   it another way, such fallback is independent of user space requests
-   and may not be predicted because it is related to the current network
-   path.  This follows the principle of least astonishment (at least
-   from user space point of view).
-
-So, if I understand correctly, this should be simple for the Landlock
-socket creation control:  we only check socket properties at creation
-time and we ignore potential fallbacks.  This should be documented
-though.
-
-As an example, if a Landlock policies only allows MPTCP: socket(...,
-IPPROTO_MPTCP) should be allowed and any legitimate use of the returned
-socket (according to MPTCP) should be allowed, including TCP fallback.
-However, socket(..., IPPROTO_TCP/0), should only be allowed if TCP is
-explicitly allowed.  This means that we might end up with an MPTCP
-socket only using TCP, which is OK.
-
-I guess this should be the same for other protocols, except if user
-space can explicitly transform a specific socket type to use an
-*arbitrary* protocol, but I think this is not possible.
-
-> > > > > 
-> > > > > You mean that users always rely on a plain TCP communication in the case
-> > > > > the connection of MPTCP multipath communication fails?
-> > > > 
-> > > > Yes, that's the same TCP connection, just without extra bit to be able
-> > > > to use multiple TCP connections associated to the same MPTCP one.
-> > > 
-> > > Indeed, so MPTCP communication should be restricted the same way as TCP.
-> > > AFAICS this should be intuitive for MPTCP users and it'll be better
-> > > to let userland define this dependency.
-> > 
-> > Yes, I think that would make more sense.
-> > 
-> > I guess we can look at MPTCP as TCP with extra features.
+On Wed, Jan 29, 2025 at 01:00:07PM +0000, Eric Dumazet wrote:
+> Stephan Wurm reported that my recent patch broke VLAN support.
 > 
-> Yeap
+> Apparently skb->mac_len is not correct for VLAN traffic as
+> shown by debug traces [1].
 > 
-> > 
-> > So if TCP is blocked, MPTCP should be blocked as well. (And eventually
-> > having the possibility to block only TCP but not MPTCP and the opposite,
-> > but that's a different topic: a possible new feature, but not a bug-fix)
-> What do you mean by the "bug fix"?
+> Use instead pskb_may_pull() to make sure the expected header
+> is present in skb->head.
 > 
-> > 
-> > > > > > > * IPv6 -> IPv4 transformation for TCP and UDP sockets withon
-> > > > > > >      IPV6_ADDRFORM. Can be controlled with setsockopt() security hook.
-
-According to the man page: "It is allowed only for IPv6 sockets that are
-connected and bound to a v4-mapped-on-v6 address."
-
-This compatibility feature makes sense from user space point of view and
-should not result in an error because of Landlock.
-
-> > > > > > > 
-> > > > > > > As I said before, I wonder if user may want to use SMC or MPTCP and
-> > > > > > > deny
-> > > > > > > TCP communication, since he should rely on fallback transformation
-> > > > > > > during the connection in the common case. It may be unexpected for
-> > > > > > > connect(2) to fail during the fallback due to security politics.
-> > > > > > 
-> > > > > > With MPTCP, fallbacks can happen at the beginning of a connection, when
-> > > > > > there is only one path. This is done after the userspace's
-> > > > > > connect(). If
-
-A remaining question is then, can we repurpose an MPTCP socket that did
-fallback to TCP, to (re)connect to another destination (this time
-directly with TCP)?
-
-I guess this is possible.  If it is the case, I think it should be OK
-anyway.  That could be used by an attacker, but that should not give
-more access because of the MPTCP fallback mechanism anyway.  We should
-see MPTCP as a superset of TCP.  At the end, security policy is in the
-hands of user space.
-
-> > > > > > the fallback is blocked, I guess the userspace will get the same errors
-> > > > > > as when an open connection is reset.
-> > > > > 
-> > > > > In the case of blocking due to security policy, userspace should get
-> > > > > -EACESS. I mean, the user might not expect the fallback path to be
-> > > > > blocked during the connection if he has allowed only MPTCP communication
-> > > > > using the Landlock policy.
-> > > > 
-> > > > A "fallback" can happen on different occasions as mentioned in the
-> > > > RFC8684 [1], e.g.
-> > > > 
-> > > > - The client asks to use MPTCP, but the other peer doesn't support it:
-> > > > 
-> > > >     Client                Server
-> > > >     |     SYN + MP_CAPABLE     |
-> > > >     |------------------------->|
-> > > >     |         SYN/ACK          |
-> > > >     |<-------------------------|  => Fallback on the client side
-> > > >     |           ACK            |
-> > > >     |------------------------->|
-> > > > 
-> > > > - A middle box doesn't touch the 3WHS, but intercept the communication
-> > > > just after:
-> > > > 
-> > > >     Client                Server
-> > > >     |     SYN + MP_CAPABLE     |
-> > > >     |------------------------->|
-> > > >     |   SYN/ACK + MP_CAPABLE   |
-> > > >     |<-------------------------|
-> > > >     |     ACK + MP_CAPABLE     |
-> > > >     |------------------------->|
-> > > >     |        DSS + data        | => but the server doesn't receive the DSS
-> > > >     |------------------------->| => So fallback on the server side
-> > > >     |           ACK            |
-> > > >     |<-------------------------| => Fallback on the client side
-> > > > 
-> > > > - etc.
-> > > > 
-> > > > So the connect(), even in blocking mode, can be OK, but the "fallback"
-> > > > will happen later.
-> > > 
-> > > Thanks! Theoretical "socket transformation" control should cover all
-> > > these cases.
-> > > 
-> > > You mean that it might be reasonable for a Landlock policy to block
-> > > MPTCP fallback when establishing first sublflow (when client does not
-> > > receive MP_CAPABLE)?
-> > 
-> > Personally, I don't even know if there is really a need for such
-> > policies. The fallback is there not to block a connection if the other
-> > peer doesn't support MPTCP, or if a middlebox decides to mess-up with
-> > MPTCP options. So instead of an error, the connection continues but is
-> > "degraded" by not being able to create multiple paths later on.
-
-I agree, this kind of compatibility feature should not be denied.
-
-> > 
-> > Maybe best to wait for a concrete use-case before implementing this?
+> Many thanks to Stephan for his help.
 > 
-> Ok, got it! I agree that such policies does not seem to be useful.
+> [1]
+> kernel: skb len=170 headroom=2 headlen=170 tailroom=20
+>         mac=(2,14) mac_len=14 net=(16,-1) trans=-1
+>         shinfo(txflags=0 nr_frags=0 gso(size=0 type=0 segs=0))
+>         csum(0x0 start=0 offset=0 ip_summed=0 complete_sw=0 valid=0 level=0)
+>         hash(0x0 sw=0 l4=0) proto=0x0000 pkttype=0 iif=0
+>         priority=0x0 mark=0x0 alloc_cpu=0 vlan_all=0x0
+>         encapsulation=0 inner(proto=0x0000, mac=0, net=0, trans=0)
+> kernel: dev name=prp0 feat=0x0000000000007000
+> kernel: sk family=17 type=3 proto=0
+> kernel: skb headroom: 00000000: 74 00
+> kernel: skb linear:   00000000: 01 0c cd 01 00 01 00 d0 93 53 9c cb 81 00 80 00
+> kernel: skb linear:   00000010: 88 b8 00 01 00 98 00 00 00 00 61 81 8d 80 16 52
+> kernel: skb linear:   00000020: 45 47 44 4e 43 54 52 4c 2f 4c 4c 4e 30 24 47 4f
+> kernel: skb linear:   00000030: 24 47 6f 43 62 81 01 14 82 16 52 45 47 44 4e 43
+> kernel: skb linear:   00000040: 54 52 4c 2f 4c 4c 4e 30 24 44 73 47 6f 6f 73 65
+> kernel: skb linear:   00000050: 83 07 47 6f 49 64 65 6e 74 84 08 67 8d f5 93 7e
+> kernel: skb linear:   00000060: 76 c8 00 85 01 01 86 01 00 87 01 00 88 01 01 89
+> kernel: skb linear:   00000070: 01 00 8a 01 02 ab 33 a2 15 83 01 00 84 03 03 00
+> kernel: skb linear:   00000080: 00 91 08 67 8d f5 92 77 4b c6 1f 83 01 00 a2 1a
+> kernel: skb linear:   00000090: a2 06 85 01 00 83 01 00 84 03 03 00 00 91 08 67
+> kernel: skb linear:   000000a0: 8d f5 92 77 4b c6 1f 83 01 00
+> kernel: skb tailroom: 00000000: 80 18 02 00 fe 4e 00 00 01 01 08 0a 4f fd 5e d1
+> kernel: skb tailroom: 00000010: 4f fd 5e cd
 > 
-> > 
-> > (...)
-> > 
-> > Cheers,
-> > Matt
-> 
+> Fixes: b9653d19e556 ("net: hsr: avoid potential out-of-bound access in fill_frame_info()")
+> Reported-by: Stephan Wurm <stephan.wurm@a-eberle.de>
+> Tested-by: Stephan Wurm <stephan.wurm@a-eberle.de>
+> Closes: https://lore.kernel.org/netdev/Z4o_UC0HweBHJ_cw@PC-LX-SteWu/
+> Signed-off-by: Eric Dumazet <edumazet@google.com>
+
+Reviewed-by: Simon Horman <horms@kernel.org>
+
+Hi Eric,
+
+Just to clarify things for me:
+
+I see at the Closes link that you mention that
+"I am unsure why hsr_get_node() is working, since it also uses skb->mac_len".
+
+Did you gain any insight into that?
+If not, do you plan to look into it any further?
 
