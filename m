@@ -1,189 +1,119 @@
-Return-Path: <netdev+bounces-161484-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-161485-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9C57FA21CF2
-	for <lists+netdev@lfdr.de>; Wed, 29 Jan 2025 13:07:10 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8ED46A21D0C
+	for <lists+netdev@lfdr.de>; Wed, 29 Jan 2025 13:24:54 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id DBE771883CF1
-	for <lists+netdev@lfdr.de>; Wed, 29 Jan 2025 12:07:14 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A0BEF3A5A9C
+	for <lists+netdev@lfdr.de>; Wed, 29 Jan 2025 12:24:46 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EDDE71B87FD;
-	Wed, 29 Jan 2025 12:07:05 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B1B0A1D9329;
+	Wed, 29 Jan 2025 12:24:48 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="IDV8yEUF"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="aqr+dzEK"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-f42.google.com (mail-ed1-f42.google.com [209.85.208.42])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 22BE41B4257
-	for <netdev@vger.kernel.org>; Wed, 29 Jan 2025 12:07:03 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.42
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7A3CD18C31;
+	Wed, 29 Jan 2025 12:24:48 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1738152425; cv=none; b=gkxW4EWldawr7K0mYl4z2soHow3m0fEfolhC00915VJytykDkO1gjc/Z8AeUQF8BNIuN/0j2xVA1TaX6Cm7fbJzGHfD98PpG/ncVSEbKP2ZsEB39udF6/0K7VNnpia1FOsK81qQ5wQd4L8Jou9dJx0/XQfMjnHcGcOW+5RaxooU=
+	t=1738153488; cv=none; b=shCi1+NaVE+u7DPysZyBo/zOk7FTMCCCle6mRwkBWrQazdqPOxQ7CyD1MqPwhSiFQ46UMjegzh6qM39Ax9jHbpO8EJEiJAbMIw88Cgs6FoWteBFZJgjyKQ+juMrc/cG7OYRJ4+8c0UO9H7xLbUcITNuS06vtqABO/GSAAPQQqd0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1738152425; c=relaxed/simple;
-	bh=ggOb6/bUg+LMTkchnpi/WaHmb/7Q+k9Unz/QsB8pkeY=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=QQvwdWKcRtYTDLhqV1en31o7eKOEKn1Qc+1lR4dWyzwm0MOMYGSvtwvEq2k4tgSzoR6BTvmqndCBQ0KdAKRD3xBoO9fcJWG6CY4YGmSf7OnE6Jogt7uXf82ojngnPJACMR4iwHsDOzckC81qrUnCn7xFBPxsycGuOBrM7der9EU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=IDV8yEUF; arc=none smtp.client-ip=209.85.208.42
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-ed1-f42.google.com with SMTP id 4fb4d7f45d1cf-5d982de9547so12839380a12.2
-        for <netdev@vger.kernel.org>; Wed, 29 Jan 2025 04:07:03 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1738152422; x=1738757222; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=NebxqF6KGxF658993D454WxvQzrkg33HnseQyQvF1d4=;
-        b=IDV8yEUFfIbDwcAZnPG6kVL1ZifAHzIde8mZC3b2a0w/07UEyVDDbOoHOic541rJyH
-         TEMbEcanLeYco7PkozF+XgeBOrdnDmCfjwGt4YzjzhNCmLFKIno+GVHYGQCGrVarPbxX
-         gjTWS7PguLGmKykXPQMSfAX9OlJDOXMUMPCX/Wy70gyuPw/UpGn4r5v2PNYeRJz8UbCb
-         B6cTFWfgqIGZzo5lFK/Y2XH1fYmhWwGjha3j26xUxAnifjvpHBIkk0uJWRa817RAGjSr
-         qtaLbpE/EIFxuF/aQVvtHoyhcqmuAjduUtIknSuNYu/bIkKpLx2GP7DzfIPG5jXeIxIX
-         DBXg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1738152422; x=1738757222;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=NebxqF6KGxF658993D454WxvQzrkg33HnseQyQvF1d4=;
-        b=gD1vPtb0R45WpK81LH6Yq0qz3CmFlB/Mt3bK65BEH9eX+LDgrx6WntPoqJBFtOCV/Z
-         IeMPyuYA6HLiGchgQ3r1MvGvRE+RzXaqIfNXHoDvRNGXRWQP8kXCakVwix2BUPL2/eOv
-         ORB8ACWd/GJGwIhK4HZ0P1vYdqMVX6PWVvDyuK9yG2rBf7RS4gYDKW/+llJCFijEhJCy
-         F9PQ/i4jLVDUlEIXFOOBZGyLNTCZzEJ6V8llDd4HS5HCgesauuvDpvSCnxMxgndpl1QE
-         mtT37FQRnp4NRsAYDbP39UIlZKsM+nWCncu61PZgTGxCinwqsOlKWKUgPb5KldrR0fSd
-         lxtg==
-X-Forwarded-Encrypted: i=1; AJvYcCX5vS/jp8Wsd5XpfimyscO2QgOXDOjsC5J1l/uOmEIlI24uGBMN5L5G2RFai8EgsW4eq3qb0gA=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yz/tLkO1eKfN7osFvtrXut3kRthxTp6ekWuymRpelsx/1t8DBEX
-	j7HKUR5o8Kw+f669xJCmBp8loz2RH17t0m9h49Nd14m1xlErZyhX/A8eXGCBUigKbfNw0m/5F77
-	HFBogEFs8dU/ViBONTLBQVI863QzOctBG4NGr
-X-Gm-Gg: ASbGncvxDJoBuHJxrRNTeCu/GgXYJEUtIBrAVdQHTrnvXGwwn1MK17A3hvvwHECjUzG
-	qxoIBDnws+pgEzXuG3OBkrJ9Kc1EmSoSQzTMQMGP2YhyzteYGmJ+TSRadXV1jOitVYsDBD3Slmg
-	==
-X-Google-Smtp-Source: AGHT+IEct2Sbjfz/YjmA2VqJVZp/+8WKqCF6kTdBLC3ruDlfqbhwLy++YOYPf+Y4reX3DUIz1TVNHTvsY+ba13Jhnic=
-X-Received: by 2002:a05:6402:2683:b0:5dc:5743:5923 with SMTP id
- 4fb4d7f45d1cf-5dc5efbd474mr2636818a12.3.1738152420518; Wed, 29 Jan 2025
- 04:07:00 -0800 (PST)
+	s=arc-20240116; t=1738153488; c=relaxed/simple;
+	bh=Xd19OZKWuut9/ZzoZ0Vz3sTx3A/Z+hSrwoa0yLGPA2g=;
+	h=From:Subject:Date:Message-Id:MIME-Version:Content-Type:To:Cc; b=tkzBEiy95GRPjLOrQQ/N7xoawcsjXTGqzggxsUZ6oZl2IarjXqmrZ8P5dUh3fWrmsNUjr7m+ipVAsyBzlQ9rR4Hw1q+kUzBJhkHHofiCiO8wBh8aQLBTwkBlYZ+sjzW6xAOvq5dUDFK6bGGT5nwVMZbe/yDfxUdS5YK0UX88RBc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=aqr+dzEK; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 583C9C4CED3;
+	Wed, 29 Jan 2025 12:24:45 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1738153488;
+	bh=Xd19OZKWuut9/ZzoZ0Vz3sTx3A/Z+hSrwoa0yLGPA2g=;
+	h=From:Subject:Date:To:Cc:From;
+	b=aqr+dzEKeojrPAidC0db9VAEU5tEe0F3vU8PuoErBwT8MZl1VgDawFbF2jF/JUDDu
+	 tkodiHRm5yd8GYJpfhchPfG4LcQ64qN1S/CcuiWWFnwqRXcYI13HM2YM1oPauRm+qm
+	 Cs8HQmAHvmK8E06zCgaBSG2BOqkCfPxVzxzkCOG+4dWCjZzJNGUnHzAksE0mbPjszP
+	 +6BYgAPWbzqEIutCPS6F7irI+NCc76CGxW0/9FtHInbk+nyknuj3z6UwbjbCV80LLK
+	 G804wKBDFSZUE/ex6qmnMqGnyPnuDMTDooGih2p7M1KbaN28hrrkToA4yfKz7eBlgR
+	 D3ocDW5z+3Rqg==
+From: "Matthieu Baerts (NGI0)" <matttbe@kernel.org>
+Subject: [PATCH net 0/2] mptcp: blackhole only if 1st SYN retrans w/o MPC
+ is accepted
+Date: Wed, 29 Jan 2025 13:24:31 +0100
+Message-Id: <20250129-net-mptcp-blackhole-fix-v1-0-afe88e5a6d2c@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250121115010.110053-1-tbogendoerfer@suse.de>
- <3fe1299c-9aea-4d6a-b65b-6ac050769d6e@redhat.com> <CANn89iLwOWvzZqN2VpUQ74a5BXRgvZH4_D2iesQBdnGWmZodcg@mail.gmail.com>
- <de2d5f6e-9913-44c1-9f4e-3e274b215ebf@redhat.com> <CANn89iJODT0+qe678jOfs4ssy10cNXg5ZsYbvgHKDYyZ6q_rgg@mail.gmail.com>
- <20250129123129.0c102586@samweis> <20250129125700.2337ecdb@samweis>
-In-Reply-To: <20250129125700.2337ecdb@samweis>
-From: Eric Dumazet <edumazet@google.com>
-Date: Wed, 29 Jan 2025 13:06:49 +0100
-X-Gm-Features: AWEUYZkT7_oOcIjlT-gANFIRGY6p6JSCNmW9QWucqiP6653Unlk6DXnMAIry1SQ
-Message-ID: <CANn89iKSrG40FKLpE3-qbftdXs9Goo61JfkmfXX_1=R5XV-=eQ@mail.gmail.com>
-Subject: Re: [PATCH v2 net] gro_cells: Avoid packet re-ordering for cloned skbs
-To: Thomas Bogendoerfer <tbogendoerfer@suse.de>
-Cc: Paolo Abeni <pabeni@redhat.com>, "David S. Miller" <davem@davemloft.net>, 
-	Jakub Kicinski <kuba@kernel.org>, Simon Horman <horms@kernel.org>, netdev@vger.kernel.org, 
-	linux-kernel@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+X-B4-Tracking: v=1; b=H4sIAP8dmmcC/x2MSQqAMAwAvyI5G6gV16+IB62pBrWWVkQQ/27wO
+ AMzD0QKTBHa5IFAF0c+nECWJmCWwc2EPAmDVrpQma7R0Ym7P43HcRvMuhwboeUb8zK3qqktVbo
+ EqX0g0f+5A4mgf98PdkfAfm4AAAA=
+X-Change-ID: 20250128-net-mptcp-blackhole-fix-363f098fe726
+To: mptcp@lists.linux.dev, Mat Martineau <martineau@kernel.org>, 
+ Geliang Tang <geliang@kernel.org>, "David S. Miller" <davem@davemloft.net>, 
+ Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
+ Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, 
+ Jonathan Corbet <corbet@lwn.net>
+Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
+ linux-doc@vger.kernel.org, "Matthieu Baerts (NGI0)" <matttbe@kernel.org>, 
+ stable@vger.kernel.org
+X-Mailer: b4 0.14.2
+X-Developer-Signature: v=1; a=openpgp-sha256; l=1219; i=matttbe@kernel.org;
+ h=from:subject:message-id; bh=Xd19OZKWuut9/ZzoZ0Vz3sTx3A/Z+hSrwoa0yLGPA2g=;
+ b=owEBbQKS/ZANAwAIAfa3gk9CaaBzAcsmYgBnmh4I7Gi7VWoCsNhoXhXuTEgQ9TsWiUcNmpMjh
+ oEhO6T3p9WJAjMEAAEIAB0WIQToy4X3aHcFem4n93r2t4JPQmmgcwUCZ5oeCAAKCRD2t4JPQmmg
+ c6+nEADPC0EtDguixrsMsnjAJHrsFPQSGV4aymISHWII0cIskSGSlWTAH4NoE/wnjJ8bPJPRz0f
+ GYWgbx5am3PhAV3hZ+vIdZm0aObULKYZCL17e+q8BhNieW5DGZjaqUm1QUfAL8WBoINnMYxeMgH
+ A6Q0heRKtg2P30FdMWv7vZ1sqJ4s1CNC9mZrS5DmvRCXUHgRnPPsiuywp6Qz9XWitG04b6gMq7d
+ 61DO4GgVr0XTV38YzSMVI0+Od8ffwt+yZdENN61YVNzeLWuEMu36PuUJ9YABgTTDJeeHjm4urt/
+ Iw3UpK/wPEOMF5B2Pwy3E6mEUMvbjIKXxzGUAF+dngQnvym/zSbESkLk0D3UJE7GSG+Znnzyav5
+ K1LmAqI4BpbtLbQ2dWJ/MKfARg2gW0dynDCaj9JI+uQXhBIK/jCcpfpyIaGw8ggweynhQ4qIvuD
+ jBzWYnh388jvUScFLwg+NIjeb7bQTCvLrwqr1kNSMDUPI2LzQSz3jGqWg8Mw8vkNRVBORPOfXxx
+ 7y45dXh4HPObv3cX0R/kzH+XDe0fydKDob4x7GTlggNYaZIbycLJNfOycQQowsguA8tK2xM5gPy
+ K9V9buYWG4h10xBSS20zoHVGum/jWGSA/wp1ATkrPaOIao9XXDk8QOtJCDjUx0/icVxhJzEVTnJ
+ GHl3Tx/kD6qPGbA==
+X-Developer-Key: i=matttbe@kernel.org; a=openpgp;
+ fpr=E8CB85F76877057A6E27F77AF6B7824F4269A073
 
-On Wed, Jan 29, 2025 at 12:57=E2=80=AFPM Thomas Bogendoerfer
-<tbogendoerfer@suse.de> wrote:
->
-> On Wed, 29 Jan 2025 12:31:29 +0100
-> Thomas Bogendoerfer <tbogendoerfer@suse.de> wrote:
->
-> > My test scenario is simple:
-> >
-> > TCP Sender in namespace A -> ip6_tunnel -> ipvlan -> ipvlan -> ip6_tunn=
-el -> TCP receiver
->
-> sorry, messed it up. It looks like this
->
-> <-        Namespace A           ->    <-        Namespace b             -=
->
-> TCP Sender -> ip6_tunnel -> ipvlan -> ipvlan -> ip6_tunnel -> TCP Receive=
-r
->
+Here are two small fixes for issues introduced in v6.12.
 
+- Patch 1: reset the mpc_drop mark for other SYN retransmits, to only
+  consider an MPTCP blackhole when the first SYN retransmitted without
+  the MPTCP options is accepted, as initially intended.
 
-We are trying to avoid adding costs in GRO layer (a critical piece of
-software for high speed flows), for a doubtful use case,
-possibly obsolete.
+- Patch 2: also mention in the doc that the blackhole_timeout sysctl
+  knob is per-netns, like all the others.
 
-BTW I am still unsure about the skb_cloned() test vs
-skb_header_cloned() which would solve this case just  fine.
-Because TCP sender is ok if some layer wants to change the headers,
-thanks to __skb_header_release() call
-from tcp_skb_entail()
+Signed-off-by: Matthieu Baerts (NGI0) <matttbe@kernel.org>
+---
+Notes:
+- The Cc stable tag has only been added to the first patch, I don't
+  think it is usually added on fixes related to the doc, right?
+- A Fixes tag is present in both patches: I hope that's also OK for the
+  one modifying the doc. It can be removed if preferred.
 
-"TCP Sender in namespace A -> ip6_tunnel -> ipvlan -> ipvlan ->
-ip6_tunnel -> TCP receiver"
-or
-" TCP Sender -> ip6_tunnel -> ipvlan -> ipvlan -> ip6_tunnel -> TCP Receive=
-r"
+---
+Matthieu Baerts (NGI0) (2):
+      mptcp: blackhole only if 1st SYN retrans w/o MPC is accepted
+      doc: mptcp: sysctl: blackhole_timeout is per-netns
 
-In this case, GRO in ip6_tunnel is not needed at all, since proper TSO
-packets should already be cooked by TCP sender and be carried
-to the receiver as plain GRO packets.
+ Documentation/networking/mptcp-sysctl.rst | 2 +-
+ net/mptcp/ctrl.c                          | 4 ++--
+ 2 files changed, 3 insertions(+), 3 deletions(-)
+---
+base-commit: 9e6c4e6b605c1fa3e24f74ee0b641e95f090188a
+change-id: 20250128-net-mptcp-blackhole-fix-363f098fe726
 
-gro_cells was added at a time GRO layer was only  supporting native
-encapsulations : IPv4 + TCP or IPv6 + TCP.
+Best regards,
+-- 
+Matthieu Baerts (NGI0) <matttbe@kernel.org>
 
-Nowadays, GRO supports encapsulated traffic just fine, same for TSO
-packets encapsulated in ip6_tunnel
-
-Maybe it is time to remove gro_cells from net/ipv6/ip6_tunnel.c
-
-diff --git a/net/ipv6/ip6_tunnel.c b/net/ipv6/ip6_tunnel.c
-index 48fd53b9897265338086136e96ea8e8c6ec3cac..b91c253dc4f1998f8df74251a93e=
-29d00c03db5
-100644
---- a/net/ipv6/ip6_tunnel.c
-+++ b/net/ipv6/ip6_tunnel.c
-@@ -246,7 +246,6 @@ static void ip6_dev_free(struct net_device *dev)
- {
-        struct ip6_tnl *t =3D netdev_priv(dev);
-
--       gro_cells_destroy(&t->gro_cells);
-        dst_cache_destroy(&t->dst_cache);
- }
-
-@@ -877,7 +876,7 @@ static int __ip6_tnl_rcv(struct ip6_tnl *tunnel,
-struct sk_buff *skb,
-        if (tun_dst)
-                skb_dst_set(skb, (struct dst_entry *)tun_dst);
-
--       gro_cells_receive(&tunnel->gro_cells, skb);
-+       netif_rx(skb);
-        return 0;
-
- drop:
-@@ -1884,10 +1883,6 @@ ip6_tnl_dev_init_gen(struct net_device *dev)
-        if (ret)
-                return ret;
-
--       ret =3D gro_cells_init(&t->gro_cells, dev);
--       if (ret)
--               goto destroy_dst;
--
-        t->tun_hlen =3D 0;
-        t->hlen =3D t->encap_hlen + t->tun_hlen;
-        t_hlen =3D t->hlen + sizeof(struct ipv6hdr);
-@@ -1902,11 +1897,6 @@ ip6_tnl_dev_init_gen(struct net_device *dev)
-        netdev_hold(dev, &t->dev_tracker, GFP_KERNEL);
-        netdev_lockdep_set_classes(dev);
-        return 0;
--
--destroy_dst:
--       dst_cache_destroy(&t->dst_cache);
--
--       return ret;
- }
-
- /**
 
