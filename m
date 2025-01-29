@@ -1,59 +1,59 @@
-Return-Path: <netdev+bounces-161555-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-161556-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2DA9BA224F5
-	for <lists+netdev@lfdr.de>; Wed, 29 Jan 2025 21:05:30 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id D3E9DA22505
+	for <lists+netdev@lfdr.de>; Wed, 29 Jan 2025 21:14:14 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 93122167CB3
-	for <lists+netdev@lfdr.de>; Wed, 29 Jan 2025 20:05:28 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 49A01188606F
+	for <lists+netdev@lfdr.de>; Wed, 29 Jan 2025 20:14:19 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7D326199939;
-	Wed, 29 Jan 2025 20:05:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9AEFD1DFE02;
+	Wed, 29 Jan 2025 20:14:11 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="TBYGpX/2"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="I4+Zx2YO"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5385B29A2;
-	Wed, 29 Jan 2025 20:05:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 76B4F18FC65
+	for <netdev@vger.kernel.org>; Wed, 29 Jan 2025 20:14:10 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1738181128; cv=none; b=UBJZAlNfmz8JOGLxnlSa2U96rTXkFmB0HSmH3XskKt8xXyax41R+oo0oylnyIm/bzAXX4aJ1Mp4lw3mFN2zEVcifoe0hp9aJCdodZS3s+VPSMBSSZFYc+OV2GGKbHsp4Fyp3qKs5iaHpnqdUG3llxsL0ztwKV9mICAh0RQgHMMc=
+	t=1738181651; cv=none; b=RD6v3PW07BbyYaSiUfGjBi4N9yWbgg4oTx9Kk3MKtvEBBbZU67evArgQHg0EX2hejNo41s/ucnyB7RYRKlUxu4wshT4zH3sH50HyzmKTb0p3n7kh8RorNkpedPtrx10DBlbq6D4OF/6SY6MBVPaLHea5esnkuDnCKNzLMDWWAow=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1738181128; c=relaxed/simple;
-	bh=ctiHtXdHi1w62PgzZwSkmiiiPPdzp0pSp2L7RWvYviE=;
+	s=arc-20240116; t=1738181651; c=relaxed/simple;
+	bh=yx3yY/slSq5xw8TnnIPisPq9WFOY4us/KORWOt0txpE=;
 	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=i0C6M/Wc6ptE7JTS/tOv/23/kCHGrgt8tPCrJKJ560R9gYXUo+GxNL4eRr91GIU61wWnjbGxApIUh3lm8sSRj30kFtc8IwUQlqZpL4hJdRHvi9WzrM20vkKZ3R+4FxywllDmULErus5TUc9ZukSkpglD/jwF0VEYACrfY+62pd4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=TBYGpX/2; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9AFE9C4CED1;
-	Wed, 29 Jan 2025 20:05:27 +0000 (UTC)
+	 MIME-Version:Content-Type; b=iw25JSTmZnHBVlXzW24aF5V6ngDm/mcU/PIRycw8TBllHGzW7c/hdgHJTPNp8ZmzB2AlNnn5GENwENGMr4UssDukcMsB+aojPtmJY8QX8JhNidUv6gBOp5urEwxXaVyZCfI1uL24V9sqRHkoizpGHBwMaHCyZ1cG54Rdl05r5NE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=I4+Zx2YO; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8791DC4CED1;
+	Wed, 29 Jan 2025 20:14:09 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1738181128;
-	bh=ctiHtXdHi1w62PgzZwSkmiiiPPdzp0pSp2L7RWvYviE=;
+	s=k20201202; t=1738181649;
+	bh=yx3yY/slSq5xw8TnnIPisPq9WFOY4us/KORWOt0txpE=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=TBYGpX/23LzeD9iFp5304St7Oq8+pAv7QL64Im1mzecTvpZK2XGJwPa/W4wiz1nYb
-	 T7bYxuIH+cyNJKmPBohy7mQl2U/VT1TwgSeQOOeNqVUjI3ka/bPpO6nT9n2+b3em8G
-	 K7m4ko0DmMLTbHaTubNgluq6wVhLgikDeQd00Uf+Y4YoHrwYywzcy9DwBZrl1oCgrk
-	 Pk78ydKcrN9EUDaWEjjCTkRcY3jCLVjmGxd8f2DQT56KgFFElBgI2V79NkBXNkREC6
-	 R0amNmk61eKcOX695Np9rLBQsGDobQ7okAsUBuuuV2y0vEK5iAruGaNgEopBueTpXq
-	 Yn6nN79tk4ufw==
-Date: Wed, 29 Jan 2025 12:05:26 -0800
+	b=I4+Zx2YOs/LPGAf/ubcZoa5aGbTaq7MhRAp2ZjmpGVz66jsJlF4op2qzOHyu9JCtA
+	 qaY9cV9M3Qc4yc3r6AieC5gl7NOM8s8kM8GJrBqXXwaktvEjAoAH4N+hbuQhl4E69Y
+	 sSqbrclKeFGjGi2JnjPwquZpP1Ev6elUsJUU7rlAjbmajou2INleKhnio27Y0HmxN5
+	 ggpIQXP6HWDZhJ3/qIkTQH9Jgw8x9acL6u16y9zJW+WK1HzvO1cghs6nt1Blw82ybY
+	 mJ0Qz7sz+NoRIoNVXyXE8f2YkTPGcXpk5c3cvDdloY/qcGKXQEfZ18rfTOO8b5dsdB
+	 EpehJVCEjwErw==
+Date: Wed, 29 Jan 2025 12:14:08 -0800
 From: Jakub Kicinski <kuba@kernel.org>
-To: Anna Emese Nyiri <annaemesenyiri@gmail.com>
-Cc: netdev@vger.kernel.org, fejes@inf.elte.hu, edumazet@google.com,
- pabeni@redhat.com, willemb@google.com, idosch@idosch.org,
- davem@davemloft.net, horms@kernel.org, shuah@kernel.org,
- linux-kselftest@vger.kernel.org
-Subject: Re: [PATCH net-next 1/1] selftests: net: Add support for testing
- SO_RCVMARK and SO_RCVPRIORITY
-Message-ID: <20250129120526.7ba0958b@kernel.org>
-In-Reply-To: <20250129143601.16035-2-annaemesenyiri@gmail.com>
-References: <20250129143601.16035-1-annaemesenyiri@gmail.com>
-	<20250129143601.16035-2-annaemesenyiri@gmail.com>
+To: Justin Iurman <justin.iurman@uliege.be>
+Cc: davem@davemloft.net, netdev@vger.kernel.org, edumazet@google.com,
+ pabeni@redhat.com, andrew+netdev@lunn.ch, horms@kernel.org,
+ dsahern@kernel.org
+Subject: Re: [PATCH net 2/2] net: ipv6: fix dst ref loops in rpl, seg6 and
+ ioam6 lwtunnels
+Message-ID: <20250129121408.0fe5d481@kernel.org>
+In-Reply-To: <4a30a0aa-2893-4f6a-a858-61e51b2430b2@uliege.be>
+References: <20250129021346.2333089-1-kuba@kernel.org>
+	<20250129021346.2333089-2-kuba@kernel.org>
+	<4a30a0aa-2893-4f6a-a858-61e51b2430b2@uliege.be>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -63,37 +63,19 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
 
-On Wed, 29 Jan 2025 15:36:01 +0100 Anna Emese Nyiri wrote:
-> diff --git a/tools/testing/selftests/net/Makefile b/tools/testing/selftests/net/Makefile
-> index 73ee88d6b043..98f05473e672 100644
-> --- a/tools/testing/selftests/net/Makefile
-> +++ b/tools/testing/selftests/net/Makefile
-> @@ -33,6 +33,7 @@ TEST_PROGS += gro.sh
->  TEST_PROGS += gre_gso.sh
->  TEST_PROGS += cmsg_so_mark.sh
->  TEST_PROGS += cmsg_so_priority.sh
-> +TEST_PROGS += test_so_rcv.sh
+On Wed, 29 Jan 2025 17:50:14 +0100 Justin Iurman wrote:
+> > +		if (dst->lwtstate != cache_dst->lwtstate) {
+> > +			local_bh_disable();
+> > +			dst_cache_set_ip6(&ilwt->cache, cache_dst, &fl6.saddr);
+> > +			local_bh_enable();
+> > +		}  
+> 
+> I agree the above patch fixes what kmemleak reported. However, I think 
+> it'd bring the double-reallocation issue back when the packet 
+> destination did not change (i.e., cache will always be empty). I'll try 
+> to come up with a solution...
 
-You need to add the C part to the TEST_GEN_PROGS, otherwise it won't
-get built. We're seeing:
-
-./test_so_rcv.sh: line 25: ./so_rcv_listener: No such file or directory
-
-in the CI.
-
-> +	memset(&recv_addr, 0, sizeof(recv_addr));
-> +	recv_addr.sin_family = AF_INET;
-> +	recv_addr.sin_port = htons(atoi(opt.service));
-> +
-> +	if (inet_pton(AF_INET, opt.host, &recv_addr.sin_addr) <= 0) {
-> +		perror("Invalid address");
-> +		ret_value = -errno;
-> +		goto cleanup;
-> +	}
-
-Any reason not to use getaddrinfo() ?
-
-Otherwise LGTM, thanks for following up!
--- 
-pw-bot: cr
+True, dunno enough about use cases so I may be missing the point.
+But the naive solution would be to remember that the tunnel "doesn't
+re-route" and use dst directly, instead of cache_dst?
 
