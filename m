@@ -1,190 +1,130 @@
-Return-Path: <netdev+bounces-161516-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-161517-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 007CAA21F1B
-	for <lists+netdev@lfdr.de>; Wed, 29 Jan 2025 15:27:41 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 88A12A21F1E
+	for <lists+netdev@lfdr.de>; Wed, 29 Jan 2025 15:28:16 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 5FEA6188246A
-	for <lists+netdev@lfdr.de>; Wed, 29 Jan 2025 14:27:46 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D7C1F163EB5
+	for <lists+netdev@lfdr.de>; Wed, 29 Jan 2025 14:28:14 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EB40319CD1D;
-	Wed, 29 Jan 2025 14:27:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 045DA29CE8;
+	Wed, 29 Jan 2025 14:28:10 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="U69TWF6Q"
+	dkim=pass (1024-bit key) header.d=yandex.ru header.i=@yandex.ru header.b="bOUxl2g4"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qt1-f201.google.com (mail-qt1-f201.google.com [209.85.160.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from forward502d.mail.yandex.net (forward502d.mail.yandex.net [178.154.239.210])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 436C21ACED2
-	for <netdev@vger.kernel.org>; Wed, 29 Jan 2025 14:27:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AB3BFDF78;
+	Wed, 29 Jan 2025 14:28:06 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=178.154.239.210
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1738160850; cv=none; b=NPRYQdxjH9kNHcTJHfQr5sh/jTLNHX1hlyG+b8fKTDgQwqOJClTUYJwU1TzlScaPhJ69Tv8qmn7rLTEyuOenzqs9NUug2RjvvNfXBGKg6nmqR3Fj/pv4uNOBmYni3D/q8NdSIWy2XWig68NUgsg+3doFTTWdEorvduq1EcMiF0Y=
+	t=1738160889; cv=none; b=bZ6GZDUo0TqZhvmbaPBVJaZ5TIuSmDmhSkpeJyy5j5ODpejP9F74mpvwTozW+ONtoXuaadVxk6dErWfN6Z1AXlMsGHiss66hRhgo0ov+wcBk4xuABhYSTzGOkJdTTW0ZVuMlko6iIepqafegUYnu8vZ32bIo0HvObKDhNKZ9JsU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1738160850; c=relaxed/simple;
-	bh=MUyb6y5v8/o0kgaj9A25952HIxzkZWefYVcRZBF7soI=;
-	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=tu/zoOfZsznXjTeu0k45C0CaSAdwj8vHKGOytXBCq3cmlvJxiqdPQzgndHABQrrYcZ6Y+GlV7hNtt5XVz8ScuqrDsQiKNsHbPVhbLWlvvFR09kS/yiFJKKDiFa/1L1DyVYkUyMMGaZ1Zr3Nm5DAAGWZ550RC93dVVZE5A/Tru7Y=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=U69TWF6Q; arc=none smtp.client-ip=209.85.160.201
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com
-Received: by mail-qt1-f201.google.com with SMTP id d75a77b69052e-4679becb47eso161263651cf.3
-        for <netdev@vger.kernel.org>; Wed, 29 Jan 2025 06:27:28 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1738160848; x=1738765648; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=tw37yL/oKf+UW2FGnjwCxM+DTQzrS+CeSsyFdQEWVc4=;
-        b=U69TWF6QXe1TXUxNVRMbZeQCJg7HVcJ7mXOAWlMyIYiZSyiQmKGKfV4RUI3h0cI7+b
-         nS0FDsFCNf8X+uF3hleldV7B4voxvO9SMbeMJR/5PxVbkhUbK3gCiVtfUdmKgkPHZ6/t
-         JGPaHXVYZj8dNlGQQtF26aPfLU7nuoL7FJ5mvgs+/Dz6HKMtbUHq7Czp0SN1hmHytwHG
-         iSQ7/+CnOXmWMX2N3zjOXgwAPM9ogw0xWAElicSroCO2ISwUWc2TWBu8JJ3+xYSZYd4c
-         B8gXlaFjPd3N2uEAbGW0+oBsiTliiOX6yWMYCbV+YoXj/qPOGNcWl2MgciFzm/jBNAdm
-         LY8A==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1738160848; x=1738765648;
-        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=tw37yL/oKf+UW2FGnjwCxM+DTQzrS+CeSsyFdQEWVc4=;
-        b=bxEUVwqs7KB+nZIQucp2/VPfD8/NCAqfIdJQck9GCQP5XEf2lDlQax6kYo+LxZmffx
-         Fw8LfRRwWiE5tZiJKAAtfQGSDJv1f/weg5Rzpa3e6AWLe/RnOTEDmtjbPV3GIbexuTM8
-         Hddmoxow+Mk8r1/98FjV/hLV4OgBKVj2ukSQIZ8lhiFAy/XrjkCKnTWvrBImAT9YIh+e
-         Epn8ynUDug/kuxrw3Z0JHidEqIwSgqfgz+XqoujnJac5R5Dal//JwKXVenDm7kHUr9Vn
-         6MuNigpg91+L8dksLUs3NfUnm4kbl5MEWkjIkqc6Z25WIhXoGkU73euAPMzyAc4FSgnR
-         sByA==
-X-Gm-Message-State: AOJu0YwY+kPK6kwLkCeKkTQqqR9Bmu0JBai1P4mi/MEF0KcwEgWLcKjy
-	k6R6Vlf5Q4msIBAgfvGhdiso91G574a4D5XhfnYQJJ6I+aAb2iykjh3DSUw8kc25+9ta66H3c+U
-	uf/cjZU24sQ==
-X-Google-Smtp-Source: AGHT+IFzmAd+CRaYAnzbWRNlZAcMwdMylM62wfrSTkoEqdm2PbGuTGm2tNRHq/fT0PT+9mfKY3Du0OGyUcQfhQ==
-X-Received: from qtbbs8.prod.google.com ([2002:ac8:6f08:0:b0:467:2027:233b])
- (user=edumazet job=prod-delivery.src-stubby-dispatcher) by
- 2002:a05:622a:446:b0:467:85b1:402b with SMTP id d75a77b69052e-46fd0bd1a10mr60642161cf.47.1738160848033;
- Wed, 29 Jan 2025 06:27:28 -0800 (PST)
-Date: Wed, 29 Jan 2025 14:27:26 +0000
+	s=arc-20240116; t=1738160889; c=relaxed/simple;
+	bh=0X6XA8qSo+B+sKUSwtlUX1AWbUmalf/RLSTJ+WfBTSo=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=I/Ef7ZS7SQtXdd9uPi97wXDcfjNFB3DCFDpXvR/birIFJzEV8ZEOAWd4CtZ3jVTzg91gfC9FzpRI8fY48VYzzS6ftjdeetNVxusi7GS63Gccyf1xzTuiOUE/xwcuZ/H0T5fpJo4IQPgSbBq/kVKc6sDeQsc3OQzC+3Kb8LfQu8I=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=yandex.ru; spf=pass smtp.mailfrom=yandex.ru; dkim=pass (1024-bit key) header.d=yandex.ru header.i=@yandex.ru header.b=bOUxl2g4; arc=none smtp.client-ip=178.154.239.210
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=yandex.ru
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=yandex.ru
+Received: from mail-nwsmtp-smtp-production-main-99.klg.yp-c.yandex.net (mail-nwsmtp-smtp-production-main-99.klg.yp-c.yandex.net [IPv6:2a02:6b8:c42:26a5:0:640:547b:0])
+	by forward502d.mail.yandex.net (Yandex) with ESMTPS id 6EF10612F2;
+	Wed, 29 Jan 2025 17:27:53 +0300 (MSK)
+Received: by mail-nwsmtp-smtp-production-main-99.klg.yp-c.yandex.net (smtp/Yandex) with ESMTPSA id qRfUoG5OfiE0-P3CXM5K9;
+	Wed, 29 Jan 2025 17:27:52 +0300
+X-Yandex-Fwd: 1
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=yandex.ru; s=mail;
+	t=1738160872; bh=0X6XA8qSo+B+sKUSwtlUX1AWbUmalf/RLSTJ+WfBTSo=;
+	h=From:In-Reply-To:Cc:Date:References:To:Subject:Message-ID;
+	b=bOUxl2g4vLRh8AZDdxTv7Sm8SuNDXXZz8jVKWMcbNlAyrZeX0oIa1qmurtP5YXhmw
+	 nhDrL/zCHNNod337Jy1fLtRnL8nZ20SUMlJlYjjP9pHHaX2f3o8eoEwS3F+IqYA8J7
+	 X0lEQJWE+nSPIZCkI+0C7OJ82uaPEeSOGO9OvDX4=
+Authentication-Results: mail-nwsmtp-smtp-production-main-99.klg.yp-c.yandex.net; dkim=pass header.i=@yandex.ru
+Message-ID: <04879909-72e5-4ab6-8c28-5d3cb551feb5@yandex.ru>
+Date: Wed, 29 Jan 2025 17:27:52 +0300
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-X-Mailer: git-send-email 2.48.1.262.g85cc9f2d1e-goog
-Message-ID: <20250129142726.747726-1-edumazet@google.com>
-Subject: [PATCH net] net: revert RTNL changes in unregister_netdevice_many_notify()
-From: Eric Dumazet <edumazet@google.com>
-To: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
-	Paolo Abeni <pabeni@redhat.com>
-Cc: netdev@vger.kernel.org, Simon Horman <horms@kernel.org>, eric.dumazet@gmail.com, 
-	Eric Dumazet <edumazet@google.com>, syzbot+5b9196ecf74447172a9a@syzkaller.appspotmail.com
-Content-Type: text/plain; charset="UTF-8"
+MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: Possible mistake in commit 3ca459eaba1b ("tun: fix group
+ permission check")
+Content-Language: en-US
+To: Willem de Bruijn <willemdebruijn.kernel@gmail.com>,
+ Ondrej Mosnacek <omosnace@redhat.com>
+Cc: Willem de Bruijn <willemb@google.com>, Jason Wang <jasowang@redhat.com>,
+ Jakub Kicinski <kuba@kernel.org>, network dev <netdev@vger.kernel.org>,
+ Linux Security Module list <linux-security-module@vger.kernel.org>,
+ SElinux list <selinux@vger.kernel.org>
+References: <CAFqZXNtkCBT4f+PwyVRmQGoT3p1eVa01fCG_aNtpt6dakXncUg@mail.gmail.com>
+ <e8b6c6f9-9647-4ab6-8bbb-ccc94b04ade4@yandex.ru>
+ <67979d24d21bc_3f1a29434@willemb.c.googlers.com.notmuch>
+ <CAFqZXNscJnX2VF-TyZaEC5nBtUUXdWPM2ejXTWBL8=5UyakssA@mail.gmail.com>
+ <6798f1fb5e1ba_987d9294dc@willemb.c.googlers.com.notmuch>
+ <c4413e16-d04f-4370-8edc-e4db21cc25f6@yandex.ru>
+ <67996154e30ce_d9324294c4@willemb.c.googlers.com.notmuch>
+ <8b81a534-9c30-4123-bd7d-bf3a9d89dfcb@yandex.ru>
+ <679a376739b99_132e08294f3@willemb.c.googlers.com.notmuch>
+From: stsp <stsp2@yandex.ru>
+In-Reply-To: <679a376739b99_132e08294f3@willemb.c.googlers.com.notmuch>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
 
-This patch reverts following changes:
+29.01.2025 17:12, Willem de Bruijn пишет:
+> stsp wrote:
+>> 29.01.2025 01:59, Willem de Bruijn пишет:
+>>> stsp wrote:
+>>>> By doing that you indeed avoid
+>>>> the problem of "completely
+>>>> inaccessible tap". However, that
+>>>> breaks my setup, as I really
+>>>> intended to provide tap to the
+>>>> owner and the unrelated group.
+>>>> This is because, eg when setting
+>>>> a CI job, you can add the needed
+>>>> user to the needed group, but
+>>>> you also need to re-login, which
+>>>> is not always possible. :(
+>>> Could you leave tun->owner unset?
+>> That's exactly the problem: when
+>> the user is not in the needed group,
+>> then you need to unset _both_.
+>> Unsetting only owner is not enough.
+>> Adding the user to the group is not
+>> enough because then you need to
+>> re-login (bad for CI jobs).
+> At some point we can question whether the issue is with the setup,
+> rather than the kernel mechanism.
+>
+> Why does your setup have an initial user that lacks the group
+> permissions of the later processes, and a tun instance that has both
+> owner and group constraints set?
+>
+> Can this be fixed in userspace, rather than allow this odd case in the
+> kernel. Is it baked deeply into common containerization tools, say?
 
-83419b61d187 net: reduce RTNL hold duration in unregister_netdevice_many_notify() (part 2)
-ae646f1a0bb9 net: reduce RTNL hold duration in unregister_netdevice_many_notify() (part 1)
-cfa579f66656 net: no longer hold RTNL while calling flush_all_backlogs()
-
-This caused issues in layers holding a private mutex:
-
-cleanup_net()
-  rtnl_lock();
-	mutex_lock(subsystem_mutex);
-
-	unregister_netdevice();
-
-	   rtnl_unlock();		// LOCKDEP violation
-	   rtnl_lock();
-
-I will revisit this in next cycle, opt-in for the new behavior
-from safe contexts only.
-
-Fixes: cfa579f66656 ("net: no longer hold RTNL while calling flush_all_backlogs()")
-Fixes: ae646f1a0bb9 ("net: reduce RTNL hold duration in unregister_netdevice_many_notify() (part 1)")
-Fixes: 83419b61d187 ("net: reduce RTNL hold duration in unregister_netdevice_many_notify() (part 2)")
-Reported-by: syzbot+5b9196ecf74447172a9a@syzkaller.appspotmail.com
-Closes: https://lore.kernel.org/netdev/6789d55f.050a0220.20d369.004e.GAE@google.com/
-Signed-off-by: Eric Dumazet <edumazet@google.com>
----
- net/core/dev.c | 33 +++------------------------------
- 1 file changed, 3 insertions(+), 30 deletions(-)
-
-diff --git a/net/core/dev.c b/net/core/dev.c
-index 07b2bb1ce64f..63e5dc75d58b 100644
---- a/net/core/dev.c
-+++ b/net/core/dev.c
-@@ -10260,37 +10260,14 @@ static bool from_cleanup_net(void)
- #endif
- }
- 
--static void rtnl_drop_if_cleanup_net(void)
--{
--	if (from_cleanup_net())
--		__rtnl_unlock();
--}
--
--static void rtnl_acquire_if_cleanup_net(void)
--{
--	if (from_cleanup_net())
--		rtnl_lock();
--}
--
- /* Delayed registration/unregisteration */
- LIST_HEAD(net_todo_list);
--static LIST_HEAD(net_todo_list_for_cleanup_net);
--
--/* TODO: net_todo_list/net_todo_list_for_cleanup_net should probably
-- * be provided by callers, instead of being static, rtnl protected.
-- */
--static struct list_head *todo_list(void)
--{
--	return from_cleanup_net() ? &net_todo_list_for_cleanup_net :
--				    &net_todo_list;
--}
--
- DECLARE_WAIT_QUEUE_HEAD(netdev_unregistering_wq);
- atomic_t dev_unreg_count = ATOMIC_INIT(0);
- 
- static void net_set_todo(struct net_device *dev)
- {
--	list_add_tail(&dev->todo_list, todo_list());
-+	list_add_tail(&dev->todo_list, &net_todo_list);
- }
- 
- static netdev_features_t netdev_sync_upper_features(struct net_device *lower,
-@@ -11140,7 +11117,7 @@ void netdev_run_todo(void)
- #endif
- 
- 	/* Snapshot list, allow later requests */
--	list_replace_init(todo_list(), &list);
-+	list_replace_init(&net_todo_list, &list);
- 
- 	__rtnl_unlock();
- 
-@@ -11785,11 +11762,9 @@ void unregister_netdevice_many_notify(struct list_head *head,
- 		WRITE_ONCE(dev->reg_state, NETREG_UNREGISTERING);
- 		netdev_unlock(dev);
- 	}
--
--	rtnl_drop_if_cleanup_net();
- 	flush_all_backlogs();
-+
- 	synchronize_net();
--	rtnl_acquire_if_cleanup_net();
- 
- 	list_for_each_entry(dev, head, unreg_list) {
- 		struct sk_buff *skb = NULL;
-@@ -11849,9 +11824,7 @@ void unregister_netdevice_many_notify(struct list_head *head,
- #endif
- 	}
- 
--	rtnl_drop_if_cleanup_net();
- 	synchronize_net();
--	rtnl_acquire_if_cleanup_net();
- 
- 	list_for_each_entry(dev, head, unreg_list) {
- 		netdev_put(dev, &dev->dev_registered_tracker);
--- 
-2.48.1.262.g85cc9f2d1e-goog
+No-no, its not a real or unfixible
+problem. At the end, I can just
+drop both group and user ownership
+of the TAP, and simply not to care.
+My aforementioned attempt to
+allow changing suppl groups, was
+not directed to this particular case -
+inability to change suppl groups
+create much bigger problems in
+other areas, but my TAP problem
+is really very small.
+Which is why, eg if you decide to
+use "either-or" semantic - fine with
+me. I just think that completely
+reverting the patch is a sub-optimal
+choice, as the previous situation
+was even more broken than now.
 
 
