@@ -1,152 +1,219 @@
-Return-Path: <netdev+bounces-161445-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-161446-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id F20C0A2177A
-	for <lists+netdev@lfdr.de>; Wed, 29 Jan 2025 06:43:37 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0F1F5A217BA
+	for <lists+netdev@lfdr.de>; Wed, 29 Jan 2025 07:31:39 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 626C5166785
-	for <lists+netdev@lfdr.de>; Wed, 29 Jan 2025 05:43:36 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id DF0C27A0797
+	for <lists+netdev@lfdr.de>; Wed, 29 Jan 2025 06:30:44 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3263E192B85;
-	Wed, 29 Jan 2025 05:43:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 25AC2176FB0;
+	Wed, 29 Jan 2025 06:31:32 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=couthit.com header.i=@couthit.com header.b="GmbAZpSQ"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="T381RpQE"
 X-Original-To: netdev@vger.kernel.org
-Received: from server.wki.vra.mybluehostin.me (server.wki.vra.mybluehostin.me [162.240.238.73])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f173.google.com (mail-pl1-f173.google.com [209.85.214.173])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A825F149C4A;
-	Wed, 29 Jan 2025 05:43:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=162.240.238.73
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 899AA25A641;
+	Wed, 29 Jan 2025 06:31:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.173
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1738129405; cv=none; b=VW9rNQnZ6HOvKXAB+WhiKbCOFJ4CGAyq0byiZEUO+feMv1zZCGmjZ/Z3H47ILwDmWtIjW6bP0Iao7Q+PfRJcyvOH8OtHbtSdG2CATF1ZXlVgGWqbzH+zOL6528u6748bhI5OoxvdMFfDh5KDvp4SIBQOLABXNj3G7UWdi37TeD4=
+	t=1738132292; cv=none; b=nSlo+TQ813HVN9G/GR+ThUzw2VREBt+uXSUCJh4fK9UMl1im4sQoEtnNFEOOm4RgJ96aSV5jgjk5K+tUJTZV3fqRYdLeBa3iZldP8pmIwLFqv4GsRqosiH56uwqowNxhM4vMD7maJS2cnkfrYCOWt54Svhb1HRIXPsuCcyLIEX0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1738129405; c=relaxed/simple;
-	bh=a/Ivj8cr/2/1ZR539Vx9LPaREmucV7PslKiU0ESzDYU=;
-	h=Date:From:To:Cc:Message-ID:In-Reply-To:References:Subject:
-	 MIME-Version:Content-Type; b=YwhQd6xYUzu6lfUaSAAhwosWuP2eBJHfQ19NIr4skjIEp0h8z5O5HxgxAQa4KGmvxyZF/0zJhm26zb8BeelmifPzhmbnUFu2WKUGQrmH9U2bXi7WXWTixr6nKwq7s2dPWgk6nTxOjR/MDoANFc1mEPoEQubaazHo3X3AG6+jnXc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=couthit.com; spf=pass smtp.mailfrom=couthit.com; dkim=pass (2048-bit key) header.d=couthit.com header.i=@couthit.com header.b=GmbAZpSQ; arc=none smtp.client-ip=162.240.238.73
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=couthit.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=couthit.com
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=couthit.com
-	; s=default; h=Content-Transfer-Encoding:Content-Type:MIME-Version:Subject:
-	References:In-Reply-To:Message-ID:Cc:To:From:Date:Sender:Reply-To:Content-ID:
-	Content-Description:Resent-Date:Resent-From:Resent-Sender:Resent-To:Resent-Cc
-	:Resent-Message-ID:List-Id:List-Help:List-Unsubscribe:List-Subscribe:
-	List-Post:List-Owner:List-Archive;
-	bh=lF+CIRph9PZhptroJNKOInSrSEFt7RGWkV6dkzmXep4=; b=GmbAZpSQX64uePyjfW07O1zI5M
-	7Qzfr7XG4LtpoVq+jGix0ruD+/TKAs7WQq3e/Axw/1CjfH5Y+TUXx0i7HFvk9tPdQ2a4D6vrhCVXH
-	+ugD+HxFoOHgIRsdzFWfFIjK18A3kd7qZdPj2vN2mWh8C/q/RoEbQaFltNf7j6TZ7XgqxyD+QZxsb
-	/mTIINNW/OoXdec2pk6mAuP+gxXjF1kcMDI78jwc4Ux5I9ZztuxeMfkCdDBVpmQxCYrMVTt57EH+7
-	QBBZSsrqfvc8jqpaXljgzC5jMHlxniYUzHHn3a0ln+z86vg1wP3CjwUjM7BC8tLfKZn7bxlLx1vY9
-	6MB/9abg==;
-Received: from [122.175.9.182] (port=58282 helo=zimbra.couthit.local)
-	by server.wki.vra.mybluehostin.me with esmtpsa  (TLS1.2) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.96.2)
-	(envelope-from <basharath@couthit.com>)
-	id 1td0r7-0007xu-0t;
-	Wed, 29 Jan 2025 11:13:17 +0530
-Received: from zimbra.couthit.local (localhost [127.0.0.1])
-	by zimbra.couthit.local (Postfix) with ESMTPS id 3535D17823F4;
-	Wed, 29 Jan 2025 11:13:10 +0530 (IST)
-Received: from localhost (localhost [127.0.0.1])
-	by zimbra.couthit.local (Postfix) with ESMTP id 154061782431;
-	Wed, 29 Jan 2025 11:13:10 +0530 (IST)
-Received: from zimbra.couthit.local ([127.0.0.1])
-	by localhost (zimbra.couthit.local [127.0.0.1]) (amavisd-new, port 10026)
-	with ESMTP id m6r8Cg2k0lcC; Wed, 29 Jan 2025 11:13:09 +0530 (IST)
-Received: from zimbra.couthit.local (zimbra.couthit.local [10.10.10.103])
-	by zimbra.couthit.local (Postfix) with ESMTP id BFFD317823F4;
-	Wed, 29 Jan 2025 11:13:09 +0530 (IST)
-Date: Wed, 29 Jan 2025 11:13:09 +0530 (IST)
-From: Basharath Hussain Khaja <basharath@couthit.com>
-To: Joe Damato <jdamato@fastly.com>
-Cc: basharath <basharath@couthit.com>, danishanwar <danishanwar@ti.com>, 
-	rogerq <rogerq@kernel.org>, andrew+netdev <andrew+netdev@lunn.ch>, 
-	davem <davem@davemloft.net>, edumazet <edumazet@google.com>, 
-	kuba <kuba@kernel.org>, pabeni <pabeni@redhat.com>, 
-	Rob Herring <robh@kernel.org>, krzk+dt <krzk+dt@kernel.org>, 
-	conor+dt <conor+dt@kernel.org>, nm <nm@ti.com>, 
-	ssantosh <ssantosh@kernel.org>, tony <tony@atomide.com>, 
-	richardcochran <richardcochran@gmail.com>, 
-	parvathi <parvathi@couthit.com>, schnelle <schnelle@linux.ibm.com>, 
-	rdunlap <rdunlap@infradead.org>, diogo ivo <diogo.ivo@siemens.com>, 
-	m-karicheri2 <m-karicheri2@ti.com>, horms <horms@kernel.org>, 
-	jacob e keller <jacob.e.keller@intel.com>, 
-	m-malladi <m-malladi@ti.com>, 
-	javier carrasco cruz <javier.carrasco.cruz@gmail.com>, 
-	afd <afd@ti.com>, s-anna <s-anna@ti.com>, 
-	linux-arm-kernel <linux-arm-kernel@lists.infradead.org>, 
-	netdev <netdev@vger.kernel.org>, 
-	devicetree <devicetree@vger.kernel.org>, 
-	linux-kernel <linux-kernel@vger.kernel.org>, 
-	linux-omap <linux-omap@vger.kernel.org>, 
-	pratheesh <pratheesh@ti.com>, prajith <prajith@ti.com>, 
-	vigneshr <vigneshr@ti.com>, praneeth <praneeth@ti.com>, 
-	srk <srk@ti.com>, rogerq <rogerq@ti.com>, 
-	krishna <krishna@couthit.com>, pmohan <pmohan@couthit.com>, 
-	mohan <mohan@couthit.com>
-Message-ID: <1124259986.450336.1738129389588.JavaMail.zimbra@couthit.local>
-In-Reply-To: <Z5QgNu9AOzRre91J@LQ3V64L9R2>
-References: <20250124122353.1457174-1-basharath@couthit.com> <20250124134056.1459060-5-basharath@couthit.com> <Z5QgNu9AOzRre91J@LQ3V64L9R2>
-Subject: Re: [RFC v2 PATCH 04/10] net: ti: prueth: Adds link detection, RX
- and TX support.
+	s=arc-20240116; t=1738132292; c=relaxed/simple;
+	bh=tXLV31mhA7vI69BSZdH15qxXUdGvnJcB9Uf7Wz7TSDA=;
+	h=Date:Message-Id:To:Cc:Subject:From:In-Reply-To:References:
+	 Mime-Version:Content-Type; b=BN8icmp1vQBNr4WZxo48eGzP/AD7QDC/67WGhOzdezGn2vne2tW5K2u2BlyyXrm7jW9k5aIuFGCyOfvXZINT3mWtxzO38IsCH9LEDPD88py7LbSGvBEvVZN6gXNUZYthe8AemDSjvASRwLaTEXtOK8uRi/zA4LNhHx0NfT8Cl2g=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=T381RpQE; arc=none smtp.client-ip=209.85.214.173
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pl1-f173.google.com with SMTP id d9443c01a7336-216426b0865so107984915ad.0;
+        Tue, 28 Jan 2025 22:31:30 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1738132290; x=1738737090; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to:from
+         :subject:cc:to:message-id:date:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=fFM+vjyA32CqCtTyb2DyVGfSEHXUhalkrOEEB2zsPis=;
+        b=T381RpQEvknZ94MBvk4O6p4uWPWjZa0gdPEZKxOfa7tAWzlpgYarids7Wjsjm28Kgy
+         Q62/dZ/5Up0ILWT77uoZDHObJta0/44g/ZWMynJXYFqzPhEjGCvXzOkrq7YPn9IzKGXY
+         XqVMLWoaDTWyp5JLE0oZK0nOK4nUHv0/IQt16gJsNGx8+iwDFBNzvUzxaPnvcLZBNh9G
+         Mzp10duuKnmokWJIXGckpLo1z5w296OKT1QqEXqf2sPbyXErhwg2qRed6NWPCe34ZR+O
+         ABhFUbJsoY9ch9L/uMXJT2iUg4h5KsobJJwTF7MiTK2hoLRAg3ceH884MZi7PpV9lqhH
+         2qIQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1738132290; x=1738737090;
+        h=content-transfer-encoding:mime-version:references:in-reply-to:from
+         :subject:cc:to:message-id:date:x-gm-message-state:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=fFM+vjyA32CqCtTyb2DyVGfSEHXUhalkrOEEB2zsPis=;
+        b=nQugkqkddPKJ8CLajmaxW2ivRF+Uyq0PIQo/6LCJ94qWWudrJ3lyug6TnQxmxHAXIr
+         emGKyikzX87w5Kia/tfrN0RSeQMsrbppDUg7oyc0tBXAB9wQmZQN31dnXNBNV6z8kCPP
+         aKsKO/mlJJNbtgCqCzZgYHvvcjGAO+AEws9jHQpuQDFWh0pFosZPntD2oEkVZ2lF9hB5
+         A0AhzKzoebfAqdwsqPMfpes2BNGZt3vjLc3IO4gYK60okg5kKG6HHgEAz4HXNURy6NBO
+         n7mYMHw3KX1QgQCkHrACGPnXCmDrCdDMIwBKAEuERHfJ4z7VpfyteyphTnwLfIgit7FW
+         mFVg==
+X-Forwarded-Encrypted: i=1; AJvYcCUwTmoG/4CEYKyOOWDUwhX3nGPFHNZbAjoz60L5D7jC9NW710S3X9zxJSk0Si0O2NpdYDAhc/BAS5+DAV0=@vger.kernel.org, AJvYcCV7IF/IyUIEwuICSpX6/0wVGmKhw8utHTHpYi6OaLjYCg3d99BPl5fyyKfweZcohYLjNhl7YsqpogvMaqkcDJk=@vger.kernel.org, AJvYcCVhjkFlfv1z6eCqxzM52VKq7PugV7wvDY7TUyAcoGbS4E18ejXH1CkMKCaP6mT15G9en/wezoat@vger.kernel.org
+X-Gm-Message-State: AOJu0YxkRULiIG0o+sFqJjVdTrTAGa0vnUUsfEFVyXx99JwQdsUBfukO
+	N6gxdMkD/nqG4JnNTbFCufyZrdNPbunlX1kvt0eKQGgG7tZNfxea
+X-Gm-Gg: ASbGncs9et2kUPO1GjCG/juPsIK8rfrJxjTtl4awhLrLewGdnp+FgOiwQG2xwqTj8Fo
+	yMI5ZmlV+uma97+ej+4WyOxW4UdOuVnETlgMPR93wK31nF6pkaoFivM3NEMV6vPYeeD3Xc+0ka1
+	gpdjMMWRXBY/tTCM8e7t0QAiMiv3EJM55qkg8THFI0sQcORvwAiW+hRa2k+Q5FAQ7s2GaA3KZ8Z
+	AfXpsjcZzTD0joFmCazn4qyiXw900I0n1q/61S4fsiPMewkOsYRiEIDqM/7kZSk9uG6Kdc06oWy
+	zr7hHroZ3+JW7zH9u4G8Y9PIX7H40SWxXQD8mbqEI+1fP9E9TUi6PK1Bmg7vC8D8BMUap3xO
+X-Google-Smtp-Source: AGHT+IFMNxgF4sXLJo81rYnFc11rYgJ+L512CIATJLEgYq4qkXbMMUXtQeIv9jp0LLKadbZ/x3Mx0w==
+X-Received: by 2002:a05:6a21:3511:b0:1ed:75f4:d289 with SMTP id adf61e73a8af0-1ed7a52b048mr3500557637.19.1738132289650;
+        Tue, 28 Jan 2025 22:31:29 -0800 (PST)
+Received: from localhost (p3882177-ipxg22501hodogaya.kanagawa.ocn.ne.jp. [180.15.148.177])
+        by smtp.gmail.com with ESMTPSA id 41be03b00d2f7-ac48e660061sm9472498a12.3.2025.01.28.22.31.22
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 28 Jan 2025 22:31:29 -0800 (PST)
+Date: Wed, 29 Jan 2025 15:31:20 +0900 (JST)
+Message-Id: <20250129.153120.170416639063888853.fujita.tomonori@gmail.com>
+To: fujita.tomonori@gmail.com
+Cc: gary@garyguo.net, linux-kernel@vger.kernel.org,
+ rust-for-linux@vger.kernel.org, netdev@vger.kernel.org, andrew@lunn.ch,
+ hkallweit1@gmail.com, tmgross@umich.edu, ojeda@kernel.org,
+ alex.gaynor@gmail.com, bjorn3_gh@protonmail.com, benno.lossin@proton.me,
+ a.hindborg@samsung.com, aliceryhl@google.com, anna-maria@linutronix.de,
+ frederic@kernel.org, tglx@linutronix.de, arnd@arndb.de,
+ jstultz@google.com, sboyd@kernel.org, mingo@redhat.com,
+ peterz@infradead.org, juri.lelli@redhat.com, vincent.guittot@linaro.org,
+ dietmar.eggemann@arm.com, rostedt@goodmis.org, bsegall@google.com,
+ mgorman@suse.de, vschneid@redhat.com, tgunders@redhat.com
+Subject: Re: [PATCH v9 7/8] rust: Add read_poll_timeout functions
+From: FUJITA Tomonori <fujita.tomonori@gmail.com>
+In-Reply-To: <20250128.152957.202492012529466658.fujita.tomonori@gmail.com>
+References: <20250127.153147.1789884009486719687.fujita.tomonori@gmail.com>
+	<20250128084937.2927bab9@eugeo>
+	<20250128.152957.202492012529466658.fujita.tomonori@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Mime-Version: 1.0
+Content-Type: Text/Plain; charset=us-ascii
 Content-Transfer-Encoding: 7bit
-X-Mailer: Zimbra 8.8.15_GA_3968 (ZimbraWebClient - FF113 (Linux)/8.8.15_GA_3968)
-Thread-Topic: prueth: Adds link detection, RX and TX support.
-Thread-Index: Id3fz+1DPwxTNAkjE+YT/LkbLXOzTA==
-X-AntiAbuse: This header was added to track abuse, please include it with any abuse report
-X-AntiAbuse: Primary Hostname - server.wki.vra.mybluehostin.me
-X-AntiAbuse: Original Domain - vger.kernel.org
-X-AntiAbuse: Originator/Caller UID/GID - [47 12] / [47 12]
-X-AntiAbuse: Sender Address Domain - couthit.com
-X-Get-Message-Sender-Via: server.wki.vra.mybluehostin.me: authenticated_id: smtp@couthit.com
-X-Authenticated-Sender: server.wki.vra.mybluehostin.me: smtp@couthit.com
-X-Source: 
-X-Source-Args: 
-X-Source-Dir: 
 
-> On Fri, Jan 24, 2025 at 07:10:50PM +0530, Basharath Hussain Khaja wrote:
->> From: Roger Quadros <rogerq@ti.com>
->> 
->> Changes corresponding to link configuration such as speed and duplexity.
->> IRQ and handler initializations are performed for packet reception.Firmware
->> receives the packet from the wire and stores it into OCMC queue. Next, it
->> notifies the CPU via interrupt. Upon receiving the interrupt CPU will
->> service the IRQ and packet will be processed by pushing the newly allocated
->> SKB to upper layers.
->> 
->> When the user application want to transmit a packet, it will invoke
->> sys_send() which will inturn invoke the PRUETH driver, then it will write
->> the packet into OCMC queues. PRU firmware will pick up the packet and
->> transmit it on to the wire.
->> 
->> Signed-off-by: Roger Quadros <rogerq@ti.com>
->> Signed-off-by: Andrew F. Davis <afd@ti.com>
->> Signed-off-by: Parvathi Pudi <parvathi@couthit.com>
->> Signed-off-by: Basharath Hussain Khaja <basharath@couthit.com>
->> ---
->>  drivers/net/ethernet/ti/icssm/icssm_prueth.c | 599 ++++++++++++++++++-
->>  drivers/net/ethernet/ti/icssm/icssm_prueth.h |  46 ++
->>  2 files changed, 640 insertions(+), 5 deletions(-)
+On Tue, 28 Jan 2025 15:29:57 +0900 (JST)
+FUJITA Tomonori <fujita.tomonori@gmail.com> wrote:
+
+> On Tue, 28 Jan 2025 08:49:37 +0800
+> Gary Guo <gary@garyguo.net> wrote:
 > 
-> Looks like this patch was duplicated and posted twice ?
+>> On Mon, 27 Jan 2025 15:31:47 +0900 (JST)
+>> FUJITA Tomonori <fujita.tomonori@gmail.com> wrote:
+>> 
+>>> On Mon, 27 Jan 2025 11:46:46 +0800
+>>> Gary Guo <gary@garyguo.net> wrote:
+>>> 
+>>> >> +#[track_caller]
+>>> >> +pub fn read_poll_timeout<Op, Cond, T: Copy>(
+>>> >> +    mut op: Op,
+>>> >> +    mut cond: Cond,
+>>> >> +    sleep_delta: Delta,
+>>> >> +    timeout_delta: Delta,
+>>> >> +) -> Result<T>
+>>> >> +where
+>>> >> +    Op: FnMut() -> Result<T>,
+>>> >> +    Cond: FnMut(&T) -> bool,
+>>> >> +{
+>>> >> +    let start = Instant::now();
+>>> >> +    let sleep = !sleep_delta.is_zero();
+>>> >> +    let timeout = !timeout_delta.is_zero();
+>>> >> +
+>>> >> +    if sleep {
+>>> >> +        might_sleep(Location::caller());
+>>> >> +    }
+>>> >> +
+>>> >> +    loop {
+>>> >> +        let val = op()?;
+>>> >> +        if cond(&val) {
+>>> >> +            // Unlike the C version, we immediately return.
+>>> >> +            // We know the condition is met so we don't need to check again.
+>>> >> +            return Ok(val);
+>>> >> +        }
+>>> >> +        if timeout && start.elapsed() > timeout_delta {  
+>>> > 
+>>> > Re-reading this again I wonder if this is the desired behaviour? Maybe
+>>> > a timeout of 0 should mean check-once instead of no timeout. The
+>>> > special-casing of 0 makes sense in C but in Rust we should use `None`
+>>> > to mean it instead?  
+>>> 
+>>> It's the behavior of the C version; the comment of this function says:
+>>> 
+>>> * @timeout_us: Timeout in us, 0 means never timeout
+>>> 
+>>> You meant that waiting for a condition without a timeout is generally
+>>> a bad idea? If so, can we simply return EINVAL for zero Delta?
+>>> 
+>> 
+>> No, I think we should still keep the ability to represent indefinite
+>> wait (no timeout) but we should use `None` to represent this rather
+>> than `Delta::ZERO`.
+>> 
+>> I know that we use 0 to mean indefinite wait in C, I am saying that
+>> it's not the most intuitive way to represent in Rust.
+>> 
+>> Intuitively, a timeout of 0 should be closer to a timeout of 1 and thus
+>> should mean "return with ETIMEDOUT immedidately" rather than "wait
+>> forever".
+>> 
+>> In C since we don't have a very good sum type support, so we
+>> special case 0 to be the special value to represent indefinite wait,
+>> but I don't think we need to repeat this in Rust.
+> 
+> Understood, thanks. How about the following code?
+> 
+> +#[track_caller]
+> +pub fn read_poll_timeout<Op, Cond, T: Copy>(
 
-When I posted the patch first time I received a bounce back error.
-So I was not sure if the patch got posted successfully or not so 
-I have to re-sent. Sorry for the confusion.
+Oops, `Copy` should be dropped:
+
++pub fn read_poll_timeout<Op, Cond, T>(
 
 
-Thanks & Best Regards,
-Basharath.
+> +    mut op: Op,
+> +    mut cond: Cond,
+> +    sleep_delta: Delta,
+> +    timeout_delta: Option<Delta>,
+> +) -> Result<T>
+> +where
+> +    Op: FnMut() -> Result<T>,
+> +    Cond: FnMut(&T) -> bool,
+> +{
+> +    let start = Instant::now();
+> +    let sleep = !sleep_delta.is_zero();
+> +
+> +    if sleep {
+> +        might_sleep(Location::caller());
+> +    }
+> +
+> +    loop {
+> +        let val = op()?;
+> +        if cond(&val) {
+> +            // Unlike the C version, we immediately return.
+> +            // We know the condition is met so we don't need to check again.
+> +            return Ok(val);
+> +        }
+> +        if let Some(timeout_delta) = timeout_delta {
+> +            if start.elapsed() > timeout_delta {
+> +                // Unlike the C version, we immediately return.
+> +                // We have just called `op()` so we don't need to call it again.
+> +                return Err(ETIMEDOUT);
+> +            }
+> +        }
+> +        if sleep {
+> +            fsleep(sleep_delta);
+> +        }
+> +        // fsleep() could be busy-wait loop so we always call cpu_relax().
+> +        cpu_relax();
+> +    }
+> +}
+> 
 
