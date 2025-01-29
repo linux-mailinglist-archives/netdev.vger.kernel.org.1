@@ -1,242 +1,107 @@
-Return-Path: <netdev+bounces-161535-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-161536-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id A5CF4A22211
-	for <lists+netdev@lfdr.de>; Wed, 29 Jan 2025 17:49:23 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 03518A2221A
+	for <lists+netdev@lfdr.de>; Wed, 29 Jan 2025 17:50:18 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 7CF08163AB2
-	for <lists+netdev@lfdr.de>; Wed, 29 Jan 2025 16:49:18 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 586473A2E77
+	for <lists+netdev@lfdr.de>; Wed, 29 Jan 2025 16:50:06 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A91AA1DF255;
-	Wed, 29 Jan 2025 16:49:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 831411DF75C;
+	Wed, 29 Jan 2025 16:50:10 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=cloudflare.com header.i=@cloudflare.com header.b="F9csjIoY"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="AQgD/HDb"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-f42.google.com (mail-ed1-f42.google.com [209.85.208.42])
+Received: from mail-ed1-f53.google.com (mail-ed1-f53.google.com [209.85.208.53])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 870191DF743
-	for <netdev@vger.kernel.org>; Wed, 29 Jan 2025 16:49:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.42
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F21A01DF255
+	for <netdev@vger.kernel.org>; Wed, 29 Jan 2025 16:50:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.53
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1738169353; cv=none; b=IxhFbpnNPZRR+91bnkWZb9qmcDlIh8C1mQz/2I5P60OUIoXEft+nwCorEj0kkVTFSdDpomBAUmipYoSW8iE3j5gcwq46DllBWEUbWC7o/VNpDyOzqXrmwtMFaeHFw2mBfzXlH6yKzeocMVhNTE2fpI1ick3lAPupwVcGJtc2RFc=
+	t=1738169410; cv=none; b=oxbC5acxvnl4kU2tNEA6+/i+uPMVEgYl92zxxVb30yH/1XYtPtSK12MCIdl4+AFasGEOYC/9ShEIg+4wpOGxJusSf4w6f57UNpBf7iJrDJ/UoIcPgvdqqXZvevnYzSsT2sjcJpGyss/C0Qs1IDOjhGl9/gojDQu9umoRBgcWqoc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1738169353; c=relaxed/simple;
-	bh=Hgkh/0Y0TyOZtL3tMmuDhaoz4mDZ9yXLeg6Xlz++XBo=;
+	s=arc-20240116; t=1738169410; c=relaxed/simple;
+	bh=icky5A8lxT+Wd2DlxTPeXZcrZfgs8ZiQeIrXrrowRc8=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=KxXCyfqQE/lDTn//w+FJdeB9ZlQhKxqlgPWqcWn07C4gCVS73wbclBJckc/8IQBWj/DDSomFMZdfe2Z6JXLJGJqrazDvgFs/wh6uI5wo9w1gXmBAgPExi+rymQ1vE5p/wA8Lrke2fVl4vFoGAv6Pfa50fYfcZwngstfAoqBwkpw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=cloudflare.com; spf=pass smtp.mailfrom=cloudflare.com; dkim=pass (2048-bit key) header.d=cloudflare.com header.i=@cloudflare.com header.b=F9csjIoY; arc=none smtp.client-ip=209.85.208.42
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=cloudflare.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=cloudflare.com
-Received: by mail-ed1-f42.google.com with SMTP id 4fb4d7f45d1cf-5dc59303334so2836197a12.2
-        for <netdev@vger.kernel.org>; Wed, 29 Jan 2025 08:49:11 -0800 (PST)
+	 To:Cc:Content-Type; b=t1BgQNh81hvadSM3rlparGDOqPXbB0a+0p2/Lrhv+bb8Fe2FejvAVudnm64NCOPBhKM3bwGHLRzAoyVa9AMhMkZMwSDOSCI8l21fLwz8wMYLv1qICxead0/Hm4CLVzsm0cdrj9xigjuOUPd08n/MBGOef3hlVDSL458Zgt2eQEA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=AQgD/HDb; arc=none smtp.client-ip=209.85.208.53
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-ed1-f53.google.com with SMTP id 4fb4d7f45d1cf-5d3d143376dso9819342a12.3
+        for <netdev@vger.kernel.org>; Wed, 29 Jan 2025 08:50:07 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=cloudflare.com; s=google09082023; t=1738169350; x=1738774150; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1738169406; x=1738774206; darn=vger.kernel.org;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=24mFNTs5JTFo0m2JMhT7QRNiD2ytZH7rVwvkzzD60y8=;
-        b=F9csjIoYvJMbEtg8ptQTyIyirtFb3rD/KcpKhDEqbF3rmNRPtoVHJZV3KCNMA5DfVR
-         NDponZn/j7YAfqciWKiP8xYaHdpFWS7U/ssOtGOaBnkKj2fCOSJLGVaFs3UQ+kEy56dc
-         +cdthm+L3KfmZjSqneWHAvOM75xdZwnTkCttRO4RB7mU9C4eQm7Oxnl0CynAGneqxjxC
-         FhkceFykIsoideGsWfixjXSRlupStiRO8rnknir6PYEpKbs6SxvX/3f/vhIvE/iiGkgJ
-         z7f9W0fPjaT1TnefeB7Tu1JazJxXO5pRxTR9KjdKhwbV4G2drPtt2hv4dP3KmF0J3LPj
-         hNzw==
+        bh=icky5A8lxT+Wd2DlxTPeXZcrZfgs8ZiQeIrXrrowRc8=;
+        b=AQgD/HDbixKO3I/MNUi2Ukp0QMaigLRqqnYkHdOD+2YrWRgo2uoQc9Tme7vw3mrCFh
+         ijzLBcZQe7yrsBEvaVlUohfDFHiPMJTIoz80nCTCDwiv5xRAdLHOcGVI1E4XiVnvd+zZ
+         ZiNqDiTtxeAOBTYeb46Q4hamqmmFB97TRRTxqu7Yd53wfwi6Jtq8HbaENxnPjU+A5/F6
+         dynPNjMk0oBk/iENvp+W5mG10IhQ1cNgbEGJTMn7HitM9cH6FfqVcoovrvu0LYaeFVG0
+         AtActnjNKQhO+6Weg1hP3ECRAB+wDJpMtDf/dmpvm+8xEWAPGp7wc4zIj25xbYQvROiT
+         OwZQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1738169350; x=1738774150;
+        d=1e100.net; s=20230601; t=1738169406; x=1738774206;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=24mFNTs5JTFo0m2JMhT7QRNiD2ytZH7rVwvkzzD60y8=;
-        b=k2Rblt5jIJkYa2GNrM5xyEZBAS+VSOtyet3PjdoxtWHopv/4LfK0TnOkX3yRQGJ900
-         ciOqi9Oc2a9XUCY4obVDMVbuToXtP1Q72pfTcz14x4I6NhvJjIZ3UFgfy1VLvhk5gyHZ
-         V+o0HGj/cT1AS3kD4sBDT+oQp9Y43ErAoWkDAEK2xdaTCPGZ81UPhTD22+p/BrwGPUb9
-         eFg2ltsVFQqFhpMtZcsiHtmBXVmjZTw/n6Pnkt1REl/yXrcuVWicujeiM5uXJjYLp76t
-         jjH33JlK9KuiSfQkBT3hXbscBFNKyPBShDbJ+22WwxumLDoZWbz7P0O8TwogFCwDmnxA
-         //xg==
-X-Gm-Message-State: AOJu0YwPYwDjxUDPpsMek2pClzO+nS78NwVT1NCgAew8NTS7kDKtinJD
-	+es441HURX1NXkAbzzGw+9VRvtRA/Bt+KJdYK/Bii1PPD73Devu1ZkjTbhcMO7LsSjBppjVkPlY
-	eJpn3qs5P+LM0wOuE9Ka5N7WKIlID475VS0aM5A==
-X-Gm-Gg: ASbGncsI8QkdHKGWoMogeuWDaZZ/XcKeFJVNIxObPWUGcN6x/0U24NBnGNZLmF3QReo
-	8Y943hxat08G5OSQTylOu+a3O65b3GKBEFMJ013rbHs04gRShXSBOYQowmZzdV8SHxKpqtOWWvu
-	JBZ4YQiFGbYYY=
-X-Google-Smtp-Source: AGHT+IFNVgiMkVJIbrv6oo/KsxMQ2wthoaQl/ttMBhRczemhVIIoaZYCQxK+nPbUhHuh1xAsfsy9eREZqVlKLUwJtpY=
-X-Received: by 2002:a05:6402:90c:b0:5d0:d84c:abb3 with SMTP id
- 4fb4d7f45d1cf-5dc5efebf52mr2864461a12.26.1738169349705; Wed, 29 Jan 2025
- 08:49:09 -0800 (PST)
+        bh=icky5A8lxT+Wd2DlxTPeXZcrZfgs8ZiQeIrXrrowRc8=;
+        b=pDRYEiMOkbwNNhcZhoE6UI1BEiVg9AV/PVolQHbPbZDfoKGLGXa8De2tPj5lDWwTJS
+         lw+R3KC6TIVzXxCfG5v1OkBPafjjgeHdV81pvtPkUBjLC92mKB8riaRCXmWQkiv2X4d0
+         7fnnvmspPx0nXgJ+/V9kC5XfbJeGNHAukRHR26UwhHet0mezDKgzajMSe42y6/t8jVDU
+         kzJ94iy0/HYtDOlcxl0Cb1fUgb0jgPMPGbGFLJEx+lTfK6w5Z0rRCh54wE4O0HxpXETl
+         DwtcwzVCAqRdINNnoiIh9yU6CAVia61KFO4TSgQePfyBSFgEW/qUJIBjDcAWlW1a29wl
+         dnFA==
+X-Forwarded-Encrypted: i=1; AJvYcCWI0xISkDm35uXjZU/oY8Sg1J/9TmBYogICkszeZTG88yrYpSpX5GM5QQMH3yvyoNCno5n5FnM=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yy3Cxm0DGVA/M5KH4qxmKh8V0ZoSnLx9PJcDCx1mj8jAj8leW1I
+	Gk7jnKxVfAlwD+fgbtNnrgsp5E9DavVmzaYob00EwdRDMhu6STfIN12fHP3UkG2flqg8ubS/SKC
+	ufpN2ngXZdbdauZ9Spq9ysavUb8AT8crpOPkE
+X-Gm-Gg: ASbGnctYU1T3z1ELZ/1ViDNzpbpQywmkKrGFhsl7Xb0whxoIGuMfMtYrF7JuzJVPBVQ
+	NVmWdYZ6T9qNLQkKhgjgjpXBeUvi/jREOHzqwwYg07GqF2Gtt22KdSLITHJgg2A7bvIo/aALYTw
+	==
+X-Google-Smtp-Source: AGHT+IFGd6wu4wlEBzchtfM0LWUPMt8300mB6lrGxWEG6Na5G/QuwpEBTEqS572WSGPsz1dPpEVyUwA+lV3iuN9RTn8=
+X-Received: by 2002:a05:6402:1ec9:b0:5d0:e410:468b with SMTP id
+ 4fb4d7f45d1cf-5dc5efa8adamr3525986a12.2.1738169406103; Wed, 29 Jan 2025
+ 08:50:06 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <Z5cgWh/6bRQm9vVU@debian.debian> <6797992c28a23_3f1a294d6@willemb.c.googlers.com.notmuch>
- <CAO3-Pbqx_sLxdLsTg+NX3z1rrenK=0qpvfL5h_K-RX-Yk9A4YA@mail.gmail.com>
- <6798ed91e94a9_987d9294c2@willemb.c.googlers.com.notmuch> <CAO3-PboS3JB1GhhbmoJc2-h5zvHe-iNsk9Hkg-_-eNATq99D1Q@mail.gmail.com>
- <679a367198f13_132e0829467@willemb.c.googlers.com.notmuch>
-In-Reply-To: <679a367198f13_132e0829467@willemb.c.googlers.com.notmuch>
-From: Yan Zhai <yan@cloudflare.com>
-Date: Wed, 29 Jan 2025 10:48:58 -0600
-X-Gm-Features: AWEUYZkoD9-G2Gb2BMJKOXr7zCSy1PEo0iP8iXxgX__McdlsVTcTjQqXioGb9gs
-Message-ID: <CAO3-Pbpxt9K=mT3ozFqMHAQcy0B30snxq9Kg9xvP7pmzmXP5=w@mail.gmail.com>
-Subject: Re: [PATCH] udp: gso: fix MTU check for small packets
-To: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
-Cc: netdev@vger.kernel.org, "David S. Miller" <davem@davemloft.net>, 
-	David Ahern <dsahern@kernel.org>, Eric Dumazet <edumazet@google.com>, 
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, 
-	Shuah Khan <shuah@kernel.org>, Josh Hunt <johunt@akamai.com>, 
-	Alexander Duyck <alexander.h.duyck@linux.intel.com>, linux-kernel@vger.kernel.org, 
-	linux-kselftest@vger.kernel.org, kernel-team <kernel-team@cloudflare.com>
+References: <20250115185937.1324-1-ouster@cs.stanford.edu> <20250115185937.1324-6-ouster@cs.stanford.edu>
+ <1c82f56c-4353-407b-8897-b8a485606a5f@redhat.com> <CAGXJAmwyp6tSO4KT_NSHKHSnUn-GSzSN=ucfjnBuXbg8uiw2pg@mail.gmail.com>
+ <2ace650b-5697-4fc4-91f9-4857fa64feea@redhat.com> <CAGXJAmxHDVhxKb3M0--rySAgewmLpmfJkAeRSBNRgZ=cQonDtg@mail.gmail.com>
+ <9209dfbb-ca3a-4fb7-a2fb-0567394f8cda@redhat.com> <CAGXJAmyb8s5xu9W1dXxhwnQfeY4=P21FquBymonUseM_OpaU2w@mail.gmail.com>
+ <13345e2a-849d-4bd8-a95e-9cd7f287c7df@redhat.com> <CAGXJAmweUSP8-eG--nOrcst4tv-qq9RKuE0arme4FJzXW67x3Q@mail.gmail.com>
+In-Reply-To: <CAGXJAmweUSP8-eG--nOrcst4tv-qq9RKuE0arme4FJzXW67x3Q@mail.gmail.com>
+From: Eric Dumazet <edumazet@google.com>
+Date: Wed, 29 Jan 2025 17:49:55 +0100
+X-Gm-Features: AWEUYZmLbfhfMKwdgjYo-t6NbBabYcSwHp6t2GlLNZ8HoaUcNrwS7OfIOqaYpQI
+Message-ID: <CANn89iL2yRLEZsfuHOtZ8bgWiZVwy-=R5UVNFkc1QdYrSxF5Qg@mail.gmail.com>
+Subject: Re: [PATCH net-next v6 05/12] net: homa: create homa_rpc.h and homa_rpc.c
+To: John Ousterhout <ouster@cs.stanford.edu>
+Cc: Paolo Abeni <pabeni@redhat.com>, Netdev <netdev@vger.kernel.org>, 
+	Simon Horman <horms@kernel.org>, Jakub Kicinski <kuba@kernel.org>
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-On Wed, Jan 29, 2025 at 8:08=E2=80=AFAM Willem de Bruijn
-<willemdebruijn.kernel@gmail.com> wrote:
+On Wed, Jan 29, 2025 at 5:44=E2=80=AFPM John Ousterhout <ouster@cs.stanford=
+.edu> wrote:
 >
-> Yan Zhai wrote:
-> > On Tue, Jan 28, 2025 at 8:45=E2=80=AFAM Willem de Bruijn
-> > <willemdebruijn.kernel@gmail.com> wrote:
-> > >
-> > > Yan Zhai wrote:
-> > > > Hi Willem,
-> > > >
-> > > > Thanks for getting back to me.
-> > > >
-> > > > On Mon, Jan 27, 2025 at 8:33=E2=80=AFAM Willem de Bruijn
-> > > > <willemdebruijn.kernel@gmail.com> wrote:
-> > > > >
-> > > > > Yan Zhai wrote:
-> > > > > > Commit 4094871db1d6 ("udp: only do GSO if # of segs > 1") avoid=
-ed GSO
-> > > > > > for small packets. But the kernel currently dismisses GSO reque=
-sts only
-> > > > > > after checking MTU on gso_size. This means any packets, regardl=
-ess of
-> > > > > > their payload sizes, would be dropped when MTU is smaller than =
-requested
-> > > > > > gso_size.
-> > > > >
-> > > > > Is this a realistic concern? How did you encounter this in practi=
-ce.
-> > > > >
-> > > > > It *is* a misconfiguration to configure a gso_size larger than MT=
-U.
-> > > > >
-> > > > > > Meanwhile, EINVAL would be returned in this case, making it
-> > > > > > very misleading to debug.
-> > > > >
-> > > > > Misleading is subjective. I'm not sure what is misleading here. F=
-rom
-> > > > > my above comment, I believe this is correctly EINVAL.
-> > > > >
-> > > > > That said, if this impacts a real workload we could reconsider
-> > > > > relaxing the check. I.e., allowing through packets even when an
-> > > > > application has clearly misconfigured UDP_SEGMENT.
-> > > > >
-> > > > We did encounter a painful reliability issue in production last mon=
-th.
-> > > >
-> > > > To simplify the scenario, we had these symptoms when the issue occu=
-rred:
-> > > > 1. QUIC connections to host A started to fail, and cannot establish=
- new ones
-> > > > 2. User space Wireguard to the exact same host worked 100% fine
-> > > >
-> > > > This happened rarely, like one or twice a day, lasting for a few
-> > > > minutes usually, but it was quite visible since it is an office
-> > > > network.
-> > > >
-> > > > Initially this prompted something wrong at the protocol layer. But
-> > > > after multiple rounds of digging, we finally figured the root cause
-> > > > was:
-> > > > 3. Something sometimes pings host B, which shares the same IP with
-> > > > host A but different ports (thanks to limited IPv4 space), and its
-> > > > PMTU was reduced to 1280 occasionally. This unexpectedly affected a=
-ll
-> > > > traffic to that IP including traffic toward host A. Our QUIC client
-> > > > set gso_size to 1350, and that's why it got hit.
-> > > >
-> > > > I agree that configurations do matter a lot here. Given how broken =
-the
-> > > > PMTU was for the Internet, we might just turn off pmtudisc option o=
-n
-> > > > our end to avoid this failure path. But for those who hasn't yet, t=
-his
-> > > > could still be confusing if it ever happens, because nothing seems =
-to
-> > > > point to PMTU in the first place:
-> > > > * small packets also get dropped
-> > > > * error code was EINVAL from sendmsg
-> > > >
-> > > > That said, I probably should have used PMTU in my commit message to=
- be
-> > > > more clear for our problem. But meanwhile I am also concerned about
-> > > > newly added tunnels to trigger the same issue, even if it has a sta=
-tic
-> > > > device MTU. My proposal should make the error reason more clear:
-> > > > EMSGSIZE itself is a direct signal pointing to MTU/PMTU. Larger
-> > > > packets getting dropped would have a similar effect.
-> > >
-> > > Thanks for that context. Makes sense that this is a real issue.
-> > >
-> > > One issue is that with segmentation, the initial mtu checks are
-> > > skipped, so they have to be enforced later. In __ip_append_data:
-> > >
-> > >     mtu =3D cork->gso_size ? IP_MAX_MTU : cork->fragsize;
-> > >
-> > You are right, if packet sizes are between (PMTU, gso_size), then they
-> > should still be dropped. But instead of checking explicitly in
-> > udp_send_skb, maybe we can leave them to be dropped in
-> > ip_finish_output?
->
-> Not sure how to do this, or whether it will be simpler than having all
-> the UDP GSO checks in udp_send_skb.
->
-> For a "don't add cost to the hot path" point of view, it's actually
-> best to keep all these checks in one place only when UDP_SEGMENT is
-> negotiated (where the hot path is the common case without GSO).
->
-I mean ip_finish_output is already dropping packets with length larger
-than dst MTU. But I guess it doesn't hurt to check it also in GSO
-branch. Let me send a V2 later to address it.
+> GRO is implemented in the "full" Homa (and essential for decent
+> performance); I left it out of this initial patch series to reduce the
+> size of the patch. But that doesn't affect the cost of freeing skbs.
+> GRO aggregates skb's into batches for more efficient processing, but
+> the same number of skb's ends up being freed in the end.
 
-> > This way there is no need to add an extra branch for
-> > non GSO code paths. PMTU shrinking should be rare, so the overhead
-> > should be minimal.
-> >
-> > > Also, might this make the debugging actually harder, as the
-> > > error condition is now triggered intermittently.
-> > Yes sendmsg may only return errors for a portion of packets now under
-> > the same situation. But IMHO it's not trading debugging for
-> > reliability. Consistent error is good news for engineers to reproduce
-> > locally, but in production I find people (SREs, solution and
-> > escalation engineers) rely on pcaps and errno a lot. The pattern in
-> > pcaps (lack of large packets of certain sizes, since they are dropped
-> > before dev_queue_xmit), and exact error reasons like EMSGSIZE are both
-> > good indicators for root causes. EINVAL is more generic on the other
-> > hand. For example, I remembered we had another issue on UDP sendmsg,
-> > which also returned a bunch of EINVAL. But that was due to some
-> > attacker tricking us to reply with source port 0.
->
-> Relying on error code is fraught anyway. For online analysis (which
-> I think can be assumed when pcap is mentioned), function tracing and
-> bpf trace are much more powerful.
->
-Totally agree tracing is more powerful. Time by time we see issues
-lingering for a few months get addressed in a few days or even hours
-when tracing is plugged in. Unfortunately at least for us, the number
-of people who can trace properly is far behind the volume of problems.
-I can only hope in the future more people will recognize this as a
-golden skill, in addition to current standard skills like pcap
-analysis.
+Not at all, unless GRO is forced to use shinfo->frag_list.
 
-Yan
-
-> That said, no objections to returning EMSGSIZE instead of EINVAL. That
-> is the same UDP returns when sending a single datagram that exceeds
-> MTU, after all.
->
+GRO fast path cooks a single skb for a large payload, usually adding
+as many page fragments as possible.
 
