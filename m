@@ -1,147 +1,189 @@
-Return-Path: <netdev+bounces-161483-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-161484-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 126C1A21CCA
-	for <lists+netdev@lfdr.de>; Wed, 29 Jan 2025 12:58:15 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9C57FA21CF2
+	for <lists+netdev@lfdr.de>; Wed, 29 Jan 2025 13:07:10 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 77795166FCC
-	for <lists+netdev@lfdr.de>; Wed, 29 Jan 2025 11:58:13 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id DBE771883CF1
+	for <lists+netdev@lfdr.de>; Wed, 29 Jan 2025 12:07:14 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6B3551D63CE;
-	Wed, 29 Jan 2025 11:58:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EDDE71B87FD;
+	Wed, 29 Jan 2025 12:07:05 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ErGUYESZ"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="IDV8yEUF"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ed1-f42.google.com (mail-ed1-f42.google.com [209.85.208.42])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2F9461ABEC1;
-	Wed, 29 Jan 2025 11:58:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 22BE41B4257
+	for <netdev@vger.kernel.org>; Wed, 29 Jan 2025 12:07:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.42
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1738151890; cv=none; b=W6ycqxHGoJqMuN3PWqmbwFvFUve7fJUFA+22qGyiv1DtPqIFSUf2lUaWCF/Phe0vPwiYo4dare/rQXacKXVq8eStQMtkomLRpRjP1Wz5/UVZe8ubLf/GHy3HhwWeWBWpehCTTwUBvn5iL055Eqw+XU6UTjhqEMbLiy8NYf6Qa9s=
+	t=1738152425; cv=none; b=gkxW4EWldawr7K0mYl4z2soHow3m0fEfolhC00915VJytykDkO1gjc/Z8AeUQF8BNIuN/0j2xVA1TaX6Cm7fbJzGHfD98PpG/ncVSEbKP2ZsEB39udF6/0K7VNnpia1FOsK81qQ5wQd4L8Jou9dJx0/XQfMjnHcGcOW+5RaxooU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1738151890; c=relaxed/simple;
-	bh=Ilw00a6G6Ql4ZXBudTfDh5BnWnO+zfJts05SApMQlBY=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=kubt20DRsTrzRmTol+yUIj6G0ZdLfm9ng+LzAS9EC9lV6dxdiElYhirk36vBJEyl4N5bLkuQVtUu5EBiSXrxTrgA6Roy5hl0SHfTDL+NABdcjZKffdSC9tSeV69ss0jZN4V3GtaUl1GsHKLj6DXETiptX9W1izR/RQAqgxF20xg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ErGUYESZ; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id F2E07C4CED3;
-	Wed, 29 Jan 2025 11:58:06 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1738151889;
-	bh=Ilw00a6G6Ql4ZXBudTfDh5BnWnO+zfJts05SApMQlBY=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=ErGUYESZj8bTEcD470vW1TI/mTSAbqRkC9zF2daVYS4APguAgSWX8kF4SGSBFc/fd
-	 A6be956ADPhHxz8aN9PTR/C7FtcY/coFKk1m0PIN9Vb8euAChPFzgJ+AHvYjRergtu
-	 JY+mkqbGjHzLfiBnIxNHXNcHQuRt4y7HCafDuKygdP57MMopJEayFV82eNvBqxn22G
-	 SpOaiVeXjGYvUtHEAF6PE9Ij8YocTiLwlkuijxb82bwWLsBlYF+UPMChxZeTRImoOB
-	 bXs0R32GozH0i8vb+qSpamc6kN70EmBqHJzISACxT+OapTWzP7iUGtKPKxdRo+m1Af
-	 PnzHVcYOhN/lg==
-Message-ID: <69612036-8223-4f13-adf4-e247f9dd1f23@kernel.org>
-Date: Wed, 29 Jan 2025 12:57:54 +0100
+	s=arc-20240116; t=1738152425; c=relaxed/simple;
+	bh=ggOb6/bUg+LMTkchnpi/WaHmb/7Q+k9Unz/QsB8pkeY=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=QQvwdWKcRtYTDLhqV1en31o7eKOEKn1Qc+1lR4dWyzwm0MOMYGSvtwvEq2k4tgSzoR6BTvmqndCBQ0KdAKRD3xBoO9fcJWG6CY4YGmSf7OnE6Jogt7uXf82ojngnPJACMR4iwHsDOzckC81qrUnCn7xFBPxsycGuOBrM7der9EU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=IDV8yEUF; arc=none smtp.client-ip=209.85.208.42
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-ed1-f42.google.com with SMTP id 4fb4d7f45d1cf-5d982de9547so12839380a12.2
+        for <netdev@vger.kernel.org>; Wed, 29 Jan 2025 04:07:03 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1738152422; x=1738757222; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=NebxqF6KGxF658993D454WxvQzrkg33HnseQyQvF1d4=;
+        b=IDV8yEUFfIbDwcAZnPG6kVL1ZifAHzIde8mZC3b2a0w/07UEyVDDbOoHOic541rJyH
+         TEMbEcanLeYco7PkozF+XgeBOrdnDmCfjwGt4YzjzhNCmLFKIno+GVHYGQCGrVarPbxX
+         gjTWS7PguLGmKykXPQMSfAX9OlJDOXMUMPCX/Wy70gyuPw/UpGn4r5v2PNYeRJz8UbCb
+         B6cTFWfgqIGZzo5lFK/Y2XH1fYmhWwGjha3j26xUxAnifjvpHBIkk0uJWRa817RAGjSr
+         qtaLbpE/EIFxuF/aQVvtHoyhcqmuAjduUtIknSuNYu/bIkKpLx2GP7DzfIPG5jXeIxIX
+         DBXg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1738152422; x=1738757222;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=NebxqF6KGxF658993D454WxvQzrkg33HnseQyQvF1d4=;
+        b=gD1vPtb0R45WpK81LH6Yq0qz3CmFlB/Mt3bK65BEH9eX+LDgrx6WntPoqJBFtOCV/Z
+         IeMPyuYA6HLiGchgQ3r1MvGvRE+RzXaqIfNXHoDvRNGXRWQP8kXCakVwix2BUPL2/eOv
+         ORB8ACWd/GJGwIhK4HZ0P1vYdqMVX6PWVvDyuK9yG2rBf7RS4gYDKW/+llJCFijEhJCy
+         F9PQ/i4jLVDUlEIXFOOBZGyLNTCZzEJ6V8llDd4HS5HCgesauuvDpvSCnxMxgndpl1QE
+         mtT37FQRnp4NRsAYDbP39UIlZKsM+nWCncu61PZgTGxCinwqsOlKWKUgPb5KldrR0fSd
+         lxtg==
+X-Forwarded-Encrypted: i=1; AJvYcCX5vS/jp8Wsd5XpfimyscO2QgOXDOjsC5J1l/uOmEIlI24uGBMN5L5G2RFai8EgsW4eq3qb0gA=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yz/tLkO1eKfN7osFvtrXut3kRthxTp6ekWuymRpelsx/1t8DBEX
+	j7HKUR5o8Kw+f669xJCmBp8loz2RH17t0m9h49Nd14m1xlErZyhX/A8eXGCBUigKbfNw0m/5F77
+	HFBogEFs8dU/ViBONTLBQVI863QzOctBG4NGr
+X-Gm-Gg: ASbGncvxDJoBuHJxrRNTeCu/GgXYJEUtIBrAVdQHTrnvXGwwn1MK17A3hvvwHECjUzG
+	qxoIBDnws+pgEzXuG3OBkrJ9Kc1EmSoSQzTMQMGP2YhyzteYGmJ+TSRadXV1jOitVYsDBD3Slmg
+	==
+X-Google-Smtp-Source: AGHT+IEct2Sbjfz/YjmA2VqJVZp/+8WKqCF6kTdBLC3ruDlfqbhwLy++YOYPf+Y4reX3DUIz1TVNHTvsY+ba13Jhnic=
+X-Received: by 2002:a05:6402:2683:b0:5dc:5743:5923 with SMTP id
+ 4fb4d7f45d1cf-5dc5efbd474mr2636818a12.3.1738152420518; Wed, 29 Jan 2025
+ 04:07:00 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird Beta
-Subject: Re: [RFC PATCH v2 1/8] landlock: Fix non-TCP sockets restriction
-Content-Language: en-GB
-To: Mikhail Ivanov <ivanov.mikhail1@huawei-partners.com>,
- =?UTF-8?Q?Micka=C3=ABl_Sala=C3=BCn?= <mic@digikod.net>
-Cc: gnoack@google.com, willemdebruijn.kernel@gmail.com, matthieu@buffet.re,
- linux-security-module@vger.kernel.org, netdev@vger.kernel.org,
- netfilter-devel@vger.kernel.org, yusongping@huawei.com,
- artem.kuzin@huawei.com, konstantin.meskhidze@huawei.com,
- MPTCP Linux <mptcp@lists.linux.dev>, linux-nfs@vger.kernel.org,
- Paul Moore <paul@paul-moore.com>
-References: <20241017110454.265818-1-ivanov.mikhail1@huawei-partners.com>
- <20241017110454.265818-2-ivanov.mikhail1@huawei-partners.com>
- <49bc2227-d8e1-4233-8bc4-4c2f0a191b7c@kernel.org>
- <20241018.Kahdeik0aaCh@digikod.net>
- <62336067-18c2-3493-d0ec-6dd6a6d3a1b5@huawei-partners.com>
- <20241212.qua0Os3sheev@digikod.net>
- <f480bbea-989d-378a-9493-c2bee412db00@huawei-partners.com>
- <20250124.gaegoo0Ayahn@digikod.net>
- <2f970b00-7648-1865-858a-214c5c6af0c4@huawei-partners.com>
- <20250127.Uph4aiph9jae@digikod.net>
- <d3d589c3-a70b-fc6e-e1bb-d221833dfef5@huawei-partners.com>
- <594263fc-f4e7-43ce-a613-d3f8ebb7f874@kernel.org>
- <f6e72e71-c5ed-8a9c-f33e-f190a47b8c27@huawei-partners.com>
- <2e727df0-c981-4e0c-8d0d-09109cf27d6f@kernel.org>
- <103de503-be0e-2eb2-b6f0-88567d765148@huawei-partners.com>
- <1d1d58b3-2516-4fc8-9f9a-b10604bbe05b@kernel.org>
- <b9823ff1-2f66-3992-b389-b8e631ec03ba@huawei-partners.com>
-From: Matthieu Baerts <matttbe@kernel.org>
-Autocrypt: addr=matttbe@kernel.org; keydata=
- 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
- lzVbFe7fduHbABmYz9cefQpO7wDE/Q==
-Organization: NGI0 Core
-In-Reply-To: <b9823ff1-2f66-3992-b389-b8e631ec03ba@huawei-partners.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+References: <20250121115010.110053-1-tbogendoerfer@suse.de>
+ <3fe1299c-9aea-4d6a-b65b-6ac050769d6e@redhat.com> <CANn89iLwOWvzZqN2VpUQ74a5BXRgvZH4_D2iesQBdnGWmZodcg@mail.gmail.com>
+ <de2d5f6e-9913-44c1-9f4e-3e274b215ebf@redhat.com> <CANn89iJODT0+qe678jOfs4ssy10cNXg5ZsYbvgHKDYyZ6q_rgg@mail.gmail.com>
+ <20250129123129.0c102586@samweis> <20250129125700.2337ecdb@samweis>
+In-Reply-To: <20250129125700.2337ecdb@samweis>
+From: Eric Dumazet <edumazet@google.com>
+Date: Wed, 29 Jan 2025 13:06:49 +0100
+X-Gm-Features: AWEUYZkT7_oOcIjlT-gANFIRGY6p6JSCNmW9QWucqiP6653Unlk6DXnMAIry1SQ
+Message-ID: <CANn89iKSrG40FKLpE3-qbftdXs9Goo61JfkmfXX_1=R5XV-=eQ@mail.gmail.com>
+Subject: Re: [PATCH v2 net] gro_cells: Avoid packet re-ordering for cloned skbs
+To: Thomas Bogendoerfer <tbogendoerfer@suse.de>
+Cc: Paolo Abeni <pabeni@redhat.com>, "David S. Miller" <davem@davemloft.net>, 
+	Jakub Kicinski <kuba@kernel.org>, Simon Horman <horms@kernel.org>, netdev@vger.kernel.org, 
+	linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On 29/01/2025 12:47, Mikhail Ivanov wrote:
-> On 1/29/2025 2:33 PM, Matthieu Baerts wrote:
->> So if TCP is blocked, MPTCP should be blocked as well. (And eventually
->> having the possibility to block only TCP but not MPTCP and the opposite,
->> but that's a different topic: a possible new feature, but not a bug-fix)
+On Wed, Jan 29, 2025 at 12:57=E2=80=AFPM Thomas Bogendoerfer
+<tbogendoerfer@suse.de> wrote:
 >
-> What do you mean by the "bug fix"?
+> On Wed, 29 Jan 2025 12:31:29 +0100
+> Thomas Bogendoerfer <tbogendoerfer@suse.de> wrote:
+>
+> > My test scenario is simple:
+> >
+> > TCP Sender in namespace A -> ip6_tunnel -> ipvlan -> ipvlan -> ip6_tunn=
+el -> TCP receiver
+>
+> sorry, messed it up. It looks like this
+>
+> <-        Namespace A           ->    <-        Namespace b             -=
+>
+> TCP Sender -> ip6_tunnel -> ipvlan -> ipvlan -> ip6_tunnel -> TCP Receive=
+r
+>
 
-I mean that to me, adding the possibility to block one but not the other
-might be seen as a new feature. But at the end, that's up to the
-Landlocks maintainers to decide! So feel free to ignore this previous
-comment :)
 
-Cheers,
-Matt
--- 
-Sponsored by the NGI0 Core fund.
+We are trying to avoid adding costs in GRO layer (a critical piece of
+software for high speed flows), for a doubtful use case,
+possibly obsolete.
 
+BTW I am still unsure about the skb_cloned() test vs
+skb_header_cloned() which would solve this case just  fine.
+Because TCP sender is ok if some layer wants to change the headers,
+thanks to __skb_header_release() call
+from tcp_skb_entail()
+
+"TCP Sender in namespace A -> ip6_tunnel -> ipvlan -> ipvlan ->
+ip6_tunnel -> TCP receiver"
+or
+" TCP Sender -> ip6_tunnel -> ipvlan -> ipvlan -> ip6_tunnel -> TCP Receive=
+r"
+
+In this case, GRO in ip6_tunnel is not needed at all, since proper TSO
+packets should already be cooked by TCP sender and be carried
+to the receiver as plain GRO packets.
+
+gro_cells was added at a time GRO layer was only  supporting native
+encapsulations : IPv4 + TCP or IPv6 + TCP.
+
+Nowadays, GRO supports encapsulated traffic just fine, same for TSO
+packets encapsulated in ip6_tunnel
+
+Maybe it is time to remove gro_cells from net/ipv6/ip6_tunnel.c
+
+diff --git a/net/ipv6/ip6_tunnel.c b/net/ipv6/ip6_tunnel.c
+index 48fd53b9897265338086136e96ea8e8c6ec3cac..b91c253dc4f1998f8df74251a93e=
+29d00c03db5
+100644
+--- a/net/ipv6/ip6_tunnel.c
++++ b/net/ipv6/ip6_tunnel.c
+@@ -246,7 +246,6 @@ static void ip6_dev_free(struct net_device *dev)
+ {
+        struct ip6_tnl *t =3D netdev_priv(dev);
+
+-       gro_cells_destroy(&t->gro_cells);
+        dst_cache_destroy(&t->dst_cache);
+ }
+
+@@ -877,7 +876,7 @@ static int __ip6_tnl_rcv(struct ip6_tnl *tunnel,
+struct sk_buff *skb,
+        if (tun_dst)
+                skb_dst_set(skb, (struct dst_entry *)tun_dst);
+
+-       gro_cells_receive(&tunnel->gro_cells, skb);
++       netif_rx(skb);
+        return 0;
+
+ drop:
+@@ -1884,10 +1883,6 @@ ip6_tnl_dev_init_gen(struct net_device *dev)
+        if (ret)
+                return ret;
+
+-       ret =3D gro_cells_init(&t->gro_cells, dev);
+-       if (ret)
+-               goto destroy_dst;
+-
+        t->tun_hlen =3D 0;
+        t->hlen =3D t->encap_hlen + t->tun_hlen;
+        t_hlen =3D t->hlen + sizeof(struct ipv6hdr);
+@@ -1902,11 +1897,6 @@ ip6_tnl_dev_init_gen(struct net_device *dev)
+        netdev_hold(dev, &t->dev_tracker, GFP_KERNEL);
+        netdev_lockdep_set_classes(dev);
+        return 0;
+-
+-destroy_dst:
+-       dst_cache_destroy(&t->dst_cache);
+-
+-       return ret;
+ }
+
+ /**
 
