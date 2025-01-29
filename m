@@ -1,135 +1,132 @@
-Return-Path: <netdev+bounces-161569-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-161570-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id A2F62A226E1
-	for <lists+netdev@lfdr.de>; Thu, 30 Jan 2025 00:22:36 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9F8F8A2270B
+	for <lists+netdev@lfdr.de>; Thu, 30 Jan 2025 00:57:01 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 146451887BBE
-	for <lists+netdev@lfdr.de>; Wed, 29 Jan 2025 23:22:41 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id EF675165B46
+	for <lists+netdev@lfdr.de>; Wed, 29 Jan 2025 23:56:59 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0F0091D6DC5;
-	Wed, 29 Jan 2025 23:21:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6D80C1DDC22;
+	Wed, 29 Jan 2025 23:56:57 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b="K5KcHlLe"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="fgkciRK0"
 X-Original-To: netdev@vger.kernel.org
-Received: from relay.smtp-ext.broadcom.com (relay.smtp-ext.broadcom.com [192.19.144.205])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f170.google.com (mail-pl1-f170.google.com [209.85.214.170])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3C6B11BC07B;
-	Wed, 29 Jan 2025 23:21:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.19.144.205
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E42AD1A2398;
+	Wed, 29 Jan 2025 23:56:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.170
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1738192894; cv=none; b=nKA9Hdr7trNmiz9kxvr+qzxeClmXE0/4kNHdlRm1wV6CcrNZ4wK4uMmyGrmtGF+/svGoLJdsHKWWWC/FBQEMumVNNZ48xXu4JCVdFAHgZIk0HzBWhabKF5gwtT012q1I0GKkXZmqCd752b+9D/BIwnvR5eRhSRLnOjYePicXeCg=
+	t=1738195017; cv=none; b=IrGGJCE7GJpHHJ/8Xaea/QgF4IrO0hngAqkGxVEXzAVXAMFmhSwk3Rz3WMtLQ3sZLc4Hce+ADXiSIlZZOh0x5IMs0hgQd3NnfNuyO2ur1l/fXx9AtadnqXCSALqIa+XiS0v9mIrPwnoHsNn/NeWSk04x7yHnG+IFVIbSex8UXPk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1738192894; c=relaxed/simple;
-	bh=4FeOkGZBh/0yuCr003fig1VlcrHaZw3JD4/R63A9Isk=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=AHUPeQGOgy4/PvWXPQgp9niytxwBU4fdz1iSnskXDYj+7ZIvNHP1Gs//6qfmI82Db7KQKG8e0AxW0l5EW/BXdjXLUoNjQaQCB0psOEbeBS6vZUh3yBJqHe7f/ViUvRh7fflF/zz6y1khsqyDuHnhbaht7dpohujmgf+OychvYCw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com; spf=fail smtp.mailfrom=broadcom.com; dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b=K5KcHlLe; arc=none smtp.client-ip=192.19.144.205
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=broadcom.com
-Received: from mail-lvn-it-01.lvn.broadcom.net (mail-lvn-it-01.lvn.broadcom.net [10.36.132.253])
-	by relay.smtp-ext.broadcom.com (Postfix) with ESMTP id 971CFC0005F5;
-	Wed, 29 Jan 2025 15:13:48 -0800 (PST)
-DKIM-Filter: OpenDKIM Filter v2.11.0 relay.smtp-ext.broadcom.com 971CFC0005F5
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=broadcom.com;
-	s=dkimrelay; t=1738192428;
-	bh=4FeOkGZBh/0yuCr003fig1VlcrHaZw3JD4/R63A9Isk=;
-	h=From:To:Cc:Subject:Date:From;
-	b=K5KcHlLeZsIl4A2GQbl1pRpXZb7ceayKKN51nfXTdYyUkojMpj8XFcj2HNuTaxVSf
-	 iflVZWZ06wYRmT/Obc+8ba0eUOuFQf0y6gLMYAwe3hn/KWeU47LUOttrQpbOneVOuw
-	 lNYabOyZhC5CXuxw5N8t2zJe2Nfg1wheIGC+wud4=
-Received: from fainelli-desktop.igp.broadcom.net (fainelli-desktop.dhcp.broadcom.net [10.67.48.245])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by mail-lvn-it-01.lvn.broadcom.net (Postfix) with ESMTPSA id 386F318041CAC6;
-	Wed, 29 Jan 2025 15:13:48 -0800 (PST)
-From: Florian Fainelli <florian.fainelli@broadcom.com>
-To: netdev@vger.kernel.org
-Cc: Florian Fainelli <florian.fainelli@broadcom.com>,
-	Doug Berger <opendmb@gmail.com>,
-	Broadcom internal kernel review list <bcm-kernel-feedback-list@broadcom.com>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Simon Horman <horms@kernel.org>,
-	linux-kernel@vger.kernel.org (open list)
-Subject: [PATCH net] net: bcmgenet: Correct overlaying of PHY and MAC Wake-on-LAN
-Date: Wed, 29 Jan 2025 15:13:42 -0800
-Message-ID: <20250129231342.35013-1-florian.fainelli@broadcom.com>
-X-Mailer: git-send-email 2.43.0
+	s=arc-20240116; t=1738195017; c=relaxed/simple;
+	bh=CUV6idxLMiMBeotyTkobqVkSejdUQmJ3omLElEEXwk8=;
+	h=Date:Message-Id:To:Cc:Subject:From:In-Reply-To:References:
+	 Mime-Version:Content-Type; b=HGjH52rkBzFz4dj1+Z/T7b4Se181Pyh2R9TJ+FZrjkH4/ndflAvQ4Z9TONIzgS8Y2awtNjopwUoVSHStEn0N8Iu1gvVEELDZIn4w/T/Zx1XAsgrJKqBe1Qy7nJ+GCzJsXDaCZmqplBfs1hFGEmP3Rvsfly8B/dhY8WLv4+sHCVk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=fgkciRK0; arc=none smtp.client-ip=209.85.214.170
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pl1-f170.google.com with SMTP id d9443c01a7336-21649a7bcdcso3281075ad.1;
+        Wed, 29 Jan 2025 15:56:54 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1738195014; x=1738799814; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to:from
+         :subject:cc:to:message-id:date:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=eHWUEFLBFWIm/AfPLL++N3GkQDYP6DoVXgxmhuGsEuM=;
+        b=fgkciRK0MxY/frtPwkOeSr9zX0osZPCS3RXbISKxPjPkTWnyN2hmBWEaVZH6OoMKAe
+         xJvAWebpRbZDGNKmjZEjNMJSMEwy2/5AsLJEYU5UOncD444vXWKTQCmARJvGZ/4HF5cF
+         cCr5YfrqXMUQKmFCIHotOSok3ajR9t4+Wxig/inFEtsIkZ59xtnLn0CNlRvh/O9HR0Gp
+         WYdx3MD220B8t+ZCwzl1TgKr7WzwOsyfFY3H59SOWgx0aiDsveZExI31nyRBbeHlZhTy
+         R04UzLpyUM6bINWYqsM/riWy8WwX5DGRZCDG13K9Z2bGbjGVs7+Mx6zojy87q8y+TZZ7
+         W7Sw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1738195014; x=1738799814;
+        h=content-transfer-encoding:mime-version:references:in-reply-to:from
+         :subject:cc:to:message-id:date:x-gm-message-state:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=eHWUEFLBFWIm/AfPLL++N3GkQDYP6DoVXgxmhuGsEuM=;
+        b=sYWDn4DltSo2/npFneRoIR2qiakqSPvwpnHoddqFmcyMWNRvI+p1M1gSv5dQQuryRA
+         DQ0b/oCdecffs0ktC2h6X6a8g+qGdB++IKX2qepa5ZNGduFeBSppbyBkBoII8sXT6DWf
+         nA9eTHEBICZSaRPSFWPi1WEftnuHbeuhjA4tELGVeru/MdWdcl55tzRlM8XMsTbr9SgN
+         OWDGjugSSwGgWrgbzSqW5HwEdSlhyAQcsYTUu73beSKfB0QtSEO9i2Oqrq5SQ+wVM4f3
+         HivIqSVPiHl2OVMjyMElVZBYez2mHdE55BNcxtvSf4pl6YC+DnvPRQwotWk+WSd/DDSG
+         2TiQ==
+X-Forwarded-Encrypted: i=1; AJvYcCUNOTOfRJ2wS9Hw+x4YBztDtYz3WFqJjyrE4aO3dxZknw6S1aLrtCdOAeMTXCdfFY24sSuT8l7l@vger.kernel.org, AJvYcCXb4B3NuYFjF1eOyF7LIzyHp6CRdFN9JKGhJo9zVE32fXk61PH/xlW4wYSGnbnAwCrh4LsmtwZVP3Lyvd8=@vger.kernel.org, AJvYcCXtxq6+ZkXkmc4QQOC5zXeD2+vV8iTa2MRGRmuJZsy464F3lsKjQGQ49cDPn5kU2UTPquAFc/kmP6cJAXxjnsU=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxX4wV3d0xe5MWuahBls1eqIN6TEIwi94vhiqbnb/b72DLxOJuU
+	H6kuK/9B5DRLWkr2NZTRoBja/bpUKc9uNPoQtUNU/Byy/Pme+Qge
+X-Gm-Gg: ASbGncuMu3IQYgmuhdb9NNbdl6fiy41dmzH69IBTMbDpp1+Wn0jeJn2kTfgfOcDMfh/
+	K5a/DyVrn/QnOTqmYo90iYDOpRQQ+XyvQ5s774LMN2zT5jXXZdpSDn340jLZL6Cdo8PZ6Gr4fZU
+	qmzG3SKZaYfR0/ocJMCG4dVCfby9zQBfiJju8HlUiXY5TbqkColKFT80nxeAdh9iRyHcIGQSVLF
+	5tMJyqQCCh3nLI/58mKNeiPKOd9E2q5Pery/dbpc3UVP98VwBqRTpCjjvUp3mssSJDSld2M6Twr
+	0E25L98QwAmMiM/KXG0wqu5g0beBsUVWROkMA9vdlWbbNdqoAAyfkDWwqd4ZagueJ64Bu38Y
+X-Google-Smtp-Source: AGHT+IEqQHqIq3nQXCLQ1vzxdYZ9/MIsGlho7lL+QRLnpBBE205Ui9H7sSwJ72ErcpH3zk5dJUcvKQ==
+X-Received: by 2002:a05:6a00:4642:b0:724:f86e:e3d9 with SMTP id d2e1a72fcca58-72fd0c02ec9mr7271441b3a.14.1738195014049;
+        Wed, 29 Jan 2025 15:56:54 -0800 (PST)
+Received: from localhost (p3882177-ipxg22501hodogaya.kanagawa.ocn.ne.jp. [180.15.148.177])
+        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-72fe6a1a958sm58138b3a.172.2025.01.29.15.56.46
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 29 Jan 2025 15:56:53 -0800 (PST)
+Date: Thu, 30 Jan 2025 08:56:44 +0900 (JST)
+Message-Id: <20250130.085644.2298700991414831587.fujita.tomonori@gmail.com>
+To: peterz@infradead.org
+Cc: fujita.tomonori@gmail.com, linux-kernel@vger.kernel.org,
+ boqun.feng@gmail.com, rust-for-linux@vger.kernel.org,
+ netdev@vger.kernel.org, andrew@lunn.ch, hkallweit1@gmail.com,
+ tmgross@umich.edu, ojeda@kernel.org, alex.gaynor@gmail.com,
+ gary@garyguo.net, bjorn3_gh@protonmail.com, benno.lossin@proton.me,
+ a.hindborg@samsung.com, aliceryhl@google.com, anna-maria@linutronix.de,
+ frederic@kernel.org, tglx@linutronix.de, arnd@arndb.de,
+ jstultz@google.com, sboyd@kernel.org, mingo@redhat.com,
+ juri.lelli@redhat.com, vincent.guittot@linaro.org,
+ dietmar.eggemann@arm.com, rostedt@goodmis.org, bsegall@google.com,
+ mgorman@suse.de, vschneid@redhat.com, tgunders@redhat.com
+Subject: Re: [PATCH v9 1/8] sched/core: Add __might_sleep_precision()
+From: FUJITA Tomonori <fujita.tomonori@gmail.com>
+In-Reply-To: <20250128113738.GC7145@noisy.programming.kicks-ass.net>
+References: <20250125101854.112261-1-fujita.tomonori@gmail.com>
+	<20250125101854.112261-2-fujita.tomonori@gmail.com>
+	<20250128113738.GC7145@noisy.programming.kicks-ass.net>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Mime-Version: 1.0
+Content-Type: Text/Plain; charset=us-ascii
+Content-Transfer-Encoding: 7bit
 
-Some Wake-on-LAN modes such as WAKE_FILTER may only be supported by the MAC,
-while others might be only supported by the PHY. Make sure that the .get_wol()
-returns the union of both rather than only that of the PHY if the PHY supports
-Wake-on-LAN.
+On Tue, 28 Jan 2025 12:37:38 +0100
+Peter Zijlstra <peterz@infradead.org> wrote:
 
-When disabling Wake-on-LAN, make sure that this is done at both the PHY
-and MAC level, rather than doing an early return from the PHY driver.
+> On Sat, Jan 25, 2025 at 07:18:46PM +0900, FUJITA Tomonori wrote:
+>> Add __might_sleep_precision(), Rust friendly version of
+>> __might_sleep(), which takes a pointer to a string with the length
+>> instead of a null-terminated string.
+>> 
+>> Rust's core::panic::Location::file(), which gives the file name of a
+>> caller, doesn't provide a null-terminated
+>> string. __might_sleep_precision() uses a precision specifier in the
+>> printk format, which specifies the length of a string; a string
+>> doesn't need to be a null-terminated.
+>> 
+>> Modify __might_sleep() to call __might_sleep_precision() but the
+>> impact should be negligible. strlen() isn't called in a normal case;
+>> it's called only when printing the error (sleeping function called
+>> from invalid context).
+>> 
+>> Note that Location::file() providing a null-terminated string for
+>> better C interoperability is under discussion [1].
+> 
+> Urgh :/
 
-Fixes: 7e400ff35cbe ("net: bcmgenet: Add support for PHY-based Wake-on-LAN")
-Fixes: 9ee09edc05f2 ("net: bcmgenet: Properly overlay PHY and MAC Wake-on-LAN capabilities")
-Signed-off-by: Florian Fainelli <florian.fainelli@broadcom.com>
----
- .../net/ethernet/broadcom/genet/bcmgenet_wol.c   | 16 ++++++++++++----
- 1 file changed, 12 insertions(+), 4 deletions(-)
+Yeah... so not acceptable?
 
-diff --git a/drivers/net/ethernet/broadcom/genet/bcmgenet_wol.c b/drivers/net/ethernet/broadcom/genet/bcmgenet_wol.c
-index 0715ea5bf13e..3b082114f2e5 100644
---- a/drivers/net/ethernet/broadcom/genet/bcmgenet_wol.c
-+++ b/drivers/net/ethernet/broadcom/genet/bcmgenet_wol.c
-@@ -41,9 +41,12 @@ void bcmgenet_get_wol(struct net_device *dev, struct ethtool_wolinfo *wol)
- {
- 	struct bcmgenet_priv *priv = netdev_priv(dev);
- 	struct device *kdev = &priv->pdev->dev;
-+	u32 phy_wolopts = 0;
- 
--	if (dev->phydev)
-+	if (dev->phydev) {
- 		phy_ethtool_get_wol(dev->phydev, wol);
-+		phy_wolopts = wol->wolopts;
-+	}
- 
- 	/* MAC is not wake-up capable, return what the PHY does */
- 	if (!device_can_wakeup(kdev))
-@@ -51,9 +54,14 @@ void bcmgenet_get_wol(struct net_device *dev, struct ethtool_wolinfo *wol)
- 
- 	/* Overlay MAC capabilities with that of the PHY queried before */
- 	wol->supported |= WAKE_MAGIC | WAKE_MAGICSECURE | WAKE_FILTER;
--	wol->wolopts = priv->wolopts;
--	memset(wol->sopass, 0, sizeof(wol->sopass));
-+	wol->wolopts |= priv->wolopts;
- 
-+	/* Return the PHY configured magic password */
-+	if (phy_wolopts & WAKE_MAGICSECURE)
-+		return;
-+
-+	/* Otherwise the MAC one */
-+	memset(wol->sopass, 0, sizeof(wol->sopass));
- 	if (wol->wolopts & WAKE_MAGICSECURE)
- 		memcpy(wol->sopass, priv->sopass, sizeof(priv->sopass));
- }
-@@ -70,7 +78,7 @@ int bcmgenet_set_wol(struct net_device *dev, struct ethtool_wolinfo *wol)
- 	/* Try Wake-on-LAN from the PHY first */
- 	if (dev->phydev) {
- 		ret = phy_ethtool_set_wol(dev->phydev, wol);
--		if (ret != -EOPNOTSUPP)
-+		if (ret != -EOPNOTSUPP && wol->wolopts)
- 			return ret;
- 	}
- 
--- 
-2.43.0
-
+Then I switch to the implementation with Rust macros, which gives a
+null terminated string.
 
