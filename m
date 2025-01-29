@@ -1,54 +1,54 @@
-Return-Path: <netdev+bounces-161531-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-161529-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9FF84A2219E
-	for <lists+netdev@lfdr.de>; Wed, 29 Jan 2025 17:20:33 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 608AFA2218B
+	for <lists+netdev@lfdr.de>; Wed, 29 Jan 2025 17:17:35 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 04B7216819D
-	for <lists+netdev@lfdr.de>; Wed, 29 Jan 2025 16:20:32 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C7E61167E7F
+	for <lists+netdev@lfdr.de>; Wed, 29 Jan 2025 16:17:33 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 729311DF268;
-	Wed, 29 Jan 2025 16:19:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 71BB21D61B5;
+	Wed, 29 Jan 2025 16:17:32 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=uliege.be header.i=@uliege.be header.b="T6Ct2xtt"
+	dkim=pass (2048-bit key) header.d=uliege.be header.i=@uliege.be header.b="q7QJTTNj"
 X-Original-To: netdev@vger.kernel.org
 Received: from serv108.segi.ulg.ac.be (serv108.segi.ulg.ac.be [139.165.32.111])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3D4481DF250
-	for <netdev@vger.kernel.org>; Wed, 29 Jan 2025 16:19:52 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 698371DE4E6
+	for <netdev@vger.kernel.org>; Wed, 29 Jan 2025 16:17:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=139.165.32.111
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1738167595; cv=none; b=XvzkHBKDryBo6hwCnHMBnKQZCETrn58pf3sMU1f4WEsG8ygV1yzQnvgO93vrdXSFoYsIy7khs9jzs5gI4V1M3ktxY3vl8lgsCbXKPJDIiUGiZTwz55ZWD4uw5kVt1SZH0R7rOwd6+mhmdyAkP+y8g1SX5MTCwXXUhdkzrsPyY8Y=
+	t=1738167452; cv=none; b=b6BZVnnlZdEPx7M6rLpW6EdiEatzzGZaZ1aBhhVpgh2NMRNdzLC7lITWn7GYju8aLLuUhzXX5XbjKbCKMoicMcvGM8fu6rtcffvSneZZDAXzikc25NE3IY6xUyC6PibA07Z0LHb73lJb9phTVyaQRxEmFWEEP0F1azEnjlBYJDk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1738167595; c=relaxed/simple;
-	bh=GTeykiNC/qdml3wD1IEZx2fYlZKOq0tA1ceG3wD+sGU=;
+	s=arc-20240116; t=1738167452; c=relaxed/simple;
+	bh=rZmEshHoXwZoN2KoEP+XL5rDT5zaWx8DcTuL7uucOOM=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=TPOe9zCOuqTWj7HXOxo347WD/xdu5X00YD8oPTcutsG7CSBToseJ0zTdVl7Wxd9Sv7RBQCo7V4BQMrTRfjtnn5S8UVcBFaOVNbWDmqDPURwdTOB7f59+hUbYNpV9m1zEywGTsHBbjG5bvAylORXaJFpYMZt+RVMeQ/TSl54XwNg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=uliege.be; spf=pass smtp.mailfrom=uliege.be; dkim=pass (2048-bit key) header.d=uliege.be header.i=@uliege.be header.b=T6Ct2xtt; arc=none smtp.client-ip=139.165.32.111
+	 In-Reply-To:Content-Type; b=hPS800D9aRktWngXWDYUwK7qw/xt7u1kF+3vZ1TEH++Evx5B+ZysvYhh1ssEf8z+U9dgG3+RI2aS8EsxLFuHAOf8GIkBG1U2XIEnXQPYdUcQLNsKmuow8qGG22yxuzC/M/9QkysdD1pnqLo3am22ltJeMvwKoRKuxYZL7mIepTs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=uliege.be; spf=pass smtp.mailfrom=uliege.be; dkim=pass (2048-bit key) header.d=uliege.be header.i=@uliege.be header.b=q7QJTTNj; arc=none smtp.client-ip=139.165.32.111
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=uliege.be
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=uliege.be
 Received: from [192.168.1.58] (220.24-245-81.adsl-dyn.isp.belgacom.be [81.245.24.220])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by serv108.segi.ulg.ac.be (Postfix) with ESMTPSA id 4A4AF2031871;
-	Wed, 29 Jan 2025 17:10:26 +0100 (CET)
-DKIM-Filter: OpenDKIM Filter v2.11.0 serv108.segi.ulg.ac.be 4A4AF2031871
+	by serv108.segi.ulg.ac.be (Postfix) with ESMTPSA id 8DB18201222A;
+	Wed, 29 Jan 2025 17:17:28 +0100 (CET)
+DKIM-Filter: OpenDKIM Filter v2.11.0 serv108.segi.ulg.ac.be 8DB18201222A
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=uliege.be;
-	s=ulg20190529; t=1738167026;
-	bh=Tqvwtyv4wPaaG4TiejGs361FlC9tdbZtZSaEWbolcAw=;
+	s=ulg20190529; t=1738167448;
+	bh=yQ4MgnjLsUYHsXicBvhg7aoei5f0YoPtmnqfF6/W4Oo=;
 	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=T6Ct2xttR09F/tqWwoP+emtTJ+x/YRxtWsXiQW/UQSna89iuIuDSfGcpqLf8xjg5y
-	 5AIWymQR6MJb8XRsYeytXbeYYlIIHNIJjN/hIkFjD8XAXgZGPIOxLiy6tl3WiBL/4Y
-	 vHXe2kerEuYik4Fq3+8Rin+o9F2mmJEpjvB9tpVgbsIrWezFuvwRcZ2Er6PqJHHmoN
-	 mNDAB6ez6/8jS448xVLUzgM23wwFDlKqVGlEDg4Tp2VEc05m+cUQAS0b14kXpBQiBg
-	 05M6tLs13BDu0ZjQ8b8aGhjAa+gmZJmx//tKf4UId/t91l9tkY3DhFH+YXwWxQj4Gi
-	 YTCDaULx7Wp8A==
-Message-ID: <738be35e-c891-48a2-9267-ca2dfd8fa650@uliege.be>
-Date: Wed, 29 Jan 2025 17:10:25 +0100
+	b=q7QJTTNj2HbwmbYARjHbmgZHCrUoOUwxPvf93Dy1GBwldCdjrmt1O1KDfB3Jib5J1
+	 iCUbdUpdD89PF4cFKaZtjIHpqCHLCsyEcGdIwJQrn2x9oWnoFGal/IVRhS9oF597U9
+	 KAn64T7sZxSse8iRKZId+uaxjBOgOJr005z05EknPTQCujgiG4XjNj8i4GU9Y4t8dN
+	 1Zh6GsCTh0Sfe8QX3QCBYMgOpa9bKwYnY6xiCHDcQWt8S7RfdWBE98Vf/MMfa03fDA
+	 c3auB169L37M+ZJrDzgzTF7TU+cONcdGikVM/u6ErVG9adDPMKTUtlmu4g+fPMeNYN
+	 aXzcnR7R5PG+w==
+Message-ID: <d4cb495d-6549-4b5a-bcf4-38dbbdda202e@uliege.be>
+Date: Wed, 29 Jan 2025 17:17:28 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -86,7 +86,10 @@ On 1/29/25 03:13, Jakub Kicinski wrote:
 >   net/ipv6/rpl_iptunnel.c   | 6 ++++--
 >   net/ipv6/seg6_iptunnel.c  | 6 ++++--
 >   3 files changed, 11 insertions(+), 6 deletions(-)
-> 
+
+I think both ila_output() and tipc_udp_xmit() should also be patched 
+accordingly. Other users seem fine.
+
 > diff --git a/net/ipv6/ioam6_iptunnel.c b/net/ipv6/ioam6_iptunnel.c
 > index 28e5a89dc255..3936c137a572 100644
 > --- a/net/ipv6/ioam6_iptunnel.c
@@ -183,8 +186,4 @@ On 1/29/25 03:13, Jakub Kicinski wrote:
 >   	kfree_skb(skb);
 >   	return err;
 >   }
-
-Reviewed-by: Justin Iurman <justin.iurman@uliege.be>
-
-Thanks Jakub!
 
