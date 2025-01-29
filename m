@@ -1,55 +1,66 @@
-Return-Path: <netdev+bounces-161553-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-161554-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id B94E3A2247A
-	for <lists+netdev@lfdr.de>; Wed, 29 Jan 2025 20:14:49 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3D9B1A2248F
+	for <lists+netdev@lfdr.de>; Wed, 29 Jan 2025 20:30:24 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 27DDC1883C7E
-	for <lists+netdev@lfdr.de>; Wed, 29 Jan 2025 19:14:54 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 5D6953A1729
+	for <lists+netdev@lfdr.de>; Wed, 29 Jan 2025 19:30:16 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A03441E2838;
-	Wed, 29 Jan 2025 19:14:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B5EF91E0DCB;
+	Wed, 29 Jan 2025 19:30:20 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="T8bbnKHz"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="iliYlKf8"
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DAE791E1C36
-	for <netdev@vger.kernel.org>; Wed, 29 Jan 2025 19:14:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DD6F6190462
+	for <netdev@vger.kernel.org>; Wed, 29 Jan 2025 19:30:17 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1738178081; cv=none; b=muSa0okkWo9f25+1XkJ99tMiXyS1K1KM8u0RtwakluF7fgkXn/d9m1ulq4E5i3VxsUSy1QPX2tmi0zup0HyRv5Ccz2ABOpBfnUWVbZZEPeCMlh1A0mOFIklfY/ydlncBAieNUQUnS8Lr6bRbpUg3ysOz5BGLZYd9vU+R5cWqAXQ=
+	t=1738179020; cv=none; b=KmCjPkenGTg7pYCYYLJ91GhIWMb0LNFdfClDA2PkCET3/66pYFGaBU5A2NXfqbNrhnIyM6RfPml3mWbIJHdq+cU4K87fMRgeG/hpIINZmMTKyJoithks3DbVGlTBVEa+dCGrEqlEBdO1LrDKE0/6+DhEON4ia/TyDwip8UBs7h4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1738178081; c=relaxed/simple;
-	bh=EQHxKuLhNQxdGzHD93B13a+iRXldLmeMfBsGxjsR+fE=;
+	s=arc-20240116; t=1738179020; c=relaxed/simple;
+	bh=jtShdk1cLxI3rsQL364KYAtkjGyrugsFoIDco1+bSw0=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=hbbuFFkpvFCNrM4+4hkasxpibT7/6rbbP5mu2/lLL1vVmyMLkAKf6dNktePMwIeT6hb6ydJ1UgfJ36fsoTDONjHZCojDW39Yxf7E9b2v+CwmJ0BIJrITGMXrFQuefHl4rTgOIsRPoVtTxIUAdwO2c4R1K3VOgAvxOLAE9X9UXWM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=T8bbnKHz; arc=none smtp.client-ip=156.67.10.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=RePCD8csmQd1FQCw+uT83FJgrl3GQ664A7Y3jgIp1WI=; b=T8bbnKHz6Tr9bl626Tc3XzaUNk
-	vuk9CoF54MjxX3Lf1YoQNMWKz+zaT6/1i5t00wcHYMOHmumFRouEjCAr5m55k6FXn/AeSuu+87SUT
-	s+9TXm/UbJD0yv+tM281a9b2O4lLt1g4jkIK7SIUXHufadVwrso72zaB4rqyQqISHeG4=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1tdDW5-009Cgg-VN; Wed, 29 Jan 2025 20:14:25 +0100
-Date: Wed, 29 Jan 2025 20:14:25 +0100
-From: Andrew Lunn <andrew@lunn.ch>
+	 Content-Type:Content-Disposition:In-Reply-To; b=dPkksL0lOzdJlOzF8FqL93vLg6AMoH9Yme6gsBhhQ8wg0hJQn2SQcOr+2hlqd/JcaxmKUYajfKSq77nCiUBq7NJTyAuuidpcDU2HyQNLep7INEf5au9cqSei/VWru+Nwjt9qyzDIbr/o9P9X8UFrsw7i5U8gZJTLFw49+gGGpNw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=iliYlKf8; arc=none smtp.client-ip=78.32.30.218
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
+	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
+	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
+	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
+	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
+	bh=dl5tdFJKGkb0tly6/jg3uxs+uJgTOsmpr2dUEi3zFeQ=; b=iliYlKf8V0uex8sekdGf6ezWT+
+	l7qob9WqpiqHTlYhtB7tD3b22uDcIvcgdRBAXS2M45JsBYIxXn2ialDOyheijmyIEEOKNhB0aV7sf
+	RkhNn3bB0TiCKe5z/VxN2HZp9foATsH0ObnciK2IkVx+mI0P238TQqk4ynMCbBqObjipTGYNtYb2p
+	ovJoQMHjpM8OXqRoyziFOy1+AGg2GKLSX0N4oU+haHRQ9YUH5B9kMY9ImollxTXaCD8c9xi+RR2Xo
+	7fT2Ci6k+OMIspZlieA1ScuVTFb9IMtV2TP9NPzVV0qo8WIB/buAPIF3I1gNudDV7D0oCXB3Cs/ON
+	hJ0rW55Q==;
+Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:32908)
+	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.96)
+	(envelope-from <linux@armlinux.org.uk>)
+	id 1tdDlC-0001zc-2K;
+	Wed, 29 Jan 2025 19:30:02 +0000
+Received: from linux by shell.armlinux.org.uk with local (Exim 4.96)
+	(envelope-from <linux@shell.armlinux.org.uk>)
+	id 1tdDl9-0003uU-2Q;
+	Wed, 29 Jan 2025 19:29:59 +0000
+Date: Wed, 29 Jan 2025 19:29:59 +0000
+From: "Russell King (Oracle)" <linux@armlinux.org.uk>
 To: "sreedevi.joshi" <joshisre@ecsmtp.an.intel.com>
-Cc: hkallweit1@gmail.com, linux@armlinux.org.uk, edumazet@google.com,
+Cc: andrew@lunn.ch, hkallweit1@gmail.com, edumazet@google.com,
 	kuba@kernel.org, pabeni@redhat.com, netdev@vger.kernel.org,
 	Sreedevi Joshi <sreedevi.joshi@intel.com>
 Subject: Re: [PATCH net] phy: fix null pointer issue in phy_attach_direct()
-Message-ID: <fa054892-b501-4e98-a8a5-6fc9acc68be5@lunn.ch>
+Message-ID: <Z5qBt4Cnds7NvBea@shell.armlinux.org.uk>
 References: <20250129183638.695010-1-sreedevi.joshi@intel.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -60,13 +71,25 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
 In-Reply-To: <20250129183638.695010-1-sreedevi.joshi@intel.com>
+Sender: Russell King (Oracle) <linux@armlinux.org.uk>
 
 On Wed, Jan 29, 2025 at 12:36:38PM -0600, sreedevi.joshi wrote:
 > From: Sreedevi Joshi <sreedevi.joshi@intel.com>
 > 
-> When attaching a fixed phy to devices like veth
+> When attaching a fixed phy to devices like veth, it is
+> possible that there is no parent. The logic in
+> phy_attach_direct() tries to access the driver member
+> without checking for the null. This causes segfault in the
+> case of fixed phy.
 
-Humm. Zoom out. What is the big picture? Why would a veth need a PHY?
+Kernel mode doesn't segfault. That's a userspace thing. Kernel mode
+oopses.
 
-	Andrew
+I'm confused. You mention veth, which presumably is drivers/net/veth.c.
+Grepping this driver for "phy" returns nothing. So how can veth be
+broken by a phylib change?
+
+-- 
+RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
+FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
 
