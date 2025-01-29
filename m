@@ -1,262 +1,337 @@
-Return-Path: <netdev+bounces-161566-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-161567-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 38F7FA22627
-	for <lists+netdev@lfdr.de>; Wed, 29 Jan 2025 23:22:46 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id D5EFBA2266C
+	for <lists+netdev@lfdr.de>; Wed, 29 Jan 2025 23:52:19 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 773261885A0B
-	for <lists+netdev@lfdr.de>; Wed, 29 Jan 2025 22:22:50 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 3B11F160A7B
+	for <lists+netdev@lfdr.de>; Wed, 29 Jan 2025 22:52:18 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2A3B51AD41F;
-	Wed, 29 Jan 2025 22:22:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3314217A5A4;
+	Wed, 29 Jan 2025 22:52:16 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=microsoft.com header.i=@microsoft.com header.b="iiJ4YwHE"
+	dkim=pass (2048-bit key) header.d=denx.de header.i=@denx.de header.b="OsxuGJV0"
 X-Original-To: netdev@vger.kernel.org
-Received: from CY3PR05CU001.outbound.protection.outlook.com (mail-westcentralusazon11023123.outbound.protection.outlook.com [40.93.201.123])
+Received: from mx.denx.de (mx.denx.de [89.58.32.78])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7948418DF60;
-	Wed, 29 Jan 2025 22:22:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.93.201.123
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1738189360; cv=fail; b=XThmbXcmJ0gE5nOvztpsOywTR5IrVUb/dcj837ogeRrP//qfVtYSFagsYSE32EfMHphpbdsQaL2bn8R19L+emq7SB3poxf4tT9eWfd5QgU5aUI7XZKnQphGyQFC6yFv8SK8QTvgFdftNuhJ7upOO0i8D9D5sCx6RUD/jq+cYgB4=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1738189360; c=relaxed/simple;
-	bh=Kn0C+K/PZvMlCPagmNBNMEnSk45FL9Ik7Qt/WtCYm50=;
-	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
-	 Content-Type:MIME-Version; b=VS5ok8acrHZGlgz1QAkV38yK5BWaM0nTJJN6KLb3ijaW/+AnNaVrSXGdsfhQsVUUokr4om1e27QjScSRq58jFNrfZ3fzVcblXcMckuLyQau+EvyFLpNPKihnUcTMyp+svhR8WOKBPZwcNp+XwO09kiNz9FB8ArpFz3dqUJH/3G0=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microsoft.com; spf=pass smtp.mailfrom=microsoft.com; dkim=pass (1024-bit key) header.d=microsoft.com header.i=@microsoft.com header.b=iiJ4YwHE; arc=fail smtp.client-ip=40.93.201.123
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microsoft.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=microsoft.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=cvH2JFLn16yZD7g2htG3tBNR+ktsV0q7CRaRCV++q3CJTA7hCBqQifJaGZG6oo3ZJUqZcwgxWwiykB4IlNcjMRqotfnQErMp+bMh/CAXk/pIO8nUtvTuazdy0R0p4ikUWYAxyxj/xJnkgXMjo8pLuw59tnxc1p24JmTd57ydv/RYUVeK3Tzh44c6ko4B6jPpiwG8E/sVcvhne3wkDscxwgtpg2g43yNTGHvFKtz+rQlb9A67orChm3hALBncz309UpEDrrPq2isMHEJLyKGn9zuG86vrXO4RtbJKckZWM/C6Bchy0z5jmsUQ6DHKOfKD9myi2yxULnfhcxlnhlt/aw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=V/mCL+7At2KmKzfpgPpJ1Asj01oOo9hLVRGItRcmUFI=;
- b=R87S4XkIhDJxohyqDYy6ojCp9hZaIB7q1x/teXPfbMj6RTtqzsGuOtZH7crIiCV4nRcOCbH+O4KivbUbm/8AZLGVin2QczZBgR7+ZVgM9OYjpDP+0SrZvr7T9BXVfdc/tswvTZLogsx66HjYNdRhqwfnBkCFtdcF4gbxZ4tg9vLj0MQwriN+Muqge6K0b8a4kqfJzPyajlzSyYyiY9nQNPdtx1S4ZzrbSBzhsneiQLStgINi4BOlrSQCXTE9CmxxUqai2MpLZX1EJaAnKLJ5Q5psYL4HQdUnEPWxvjyCBPOGVVzQprou/wlleYYD3M8ZV0VY7gBx4m1eKQBXX82BVg==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=microsoft.com; dmarc=pass action=none
- header.from=microsoft.com; dkim=pass header.d=microsoft.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=V/mCL+7At2KmKzfpgPpJ1Asj01oOo9hLVRGItRcmUFI=;
- b=iiJ4YwHE/GGGNwvZ9F1yaAFKqDEPBXZbImOONTV/lgfPjVIUgx5vB/8lzqZq3VIKklUf2NxUtP8Spcnm4rESV8Nbv/e8tq0PVDM8+K8Xsx+cmGCk5iurcPiPJFnnh+21EMtQo45RSOUWCFIJToqr5G+OSB2LnNF3itNqrQ+HJkk=
-Received: from LV8PR21MB4236.namprd21.prod.outlook.com (2603:10b6:408:263::19)
- by LV3PR21MB4190.namprd21.prod.outlook.com (2603:10b6:408:27a::12) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8422.4; Wed, 29 Jan
- 2025 22:22:35 +0000
-Received: from LV8PR21MB4236.namprd21.prod.outlook.com
- ([fe80::4be9:20ef:887c:1a0c]) by LV8PR21MB4236.namprd21.prod.outlook.com
- ([fe80::4be9:20ef:887c:1a0c%5]) with mapi id 15.20.8422.001; Wed, 29 Jan 2025
- 22:22:35 +0000
-From: Long Li <longli@microsoft.com>
-To: Jakub Kicinski <kuba@kernel.org>, "longli@linuxonhyperv.com"
-	<longli@linuxonhyperv.com>
-CC: Jason Gunthorpe <jgg@ziepe.ca>, Leon Romanovsky <leon@kernel.org>, Ajay
- Sharma <sharmaajay@microsoft.com>, Konstantin Taranov
-	<kotaranov@microsoft.com>, "David S. Miller" <davem@davemloft.net>, Eric
- Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, Stephen
- Hemminger <stephen@networkplumber.org>, "linux-rdma@vger.kernel.org"
-	<linux-rdma@vger.kernel.org>, "netdev@vger.kernel.org"
-	<netdev@vger.kernel.org>, "linux-kernel@vger.kernel.org"
-	<linux-kernel@vger.kernel.org>, "linux-hyperv@vger.kernel.org"
-	<linux-hyperv@vger.kernel.org>
-Subject: RE: [EXTERNAL] Re: [Patch net-next v2] hv_netvsc: Set device flags
- for properly indicating bonding in Hyper-V
-Thread-Topic: [EXTERNAL] Re: [Patch net-next v2] hv_netvsc: Set device flags
- for properly indicating bonding in Hyper-V
-Thread-Index: AQHbUCfZ0QtZYURs2ECCYf6zMtqJ27MtTXhA
-Date: Wed, 29 Jan 2025 22:22:35 +0000
-Message-ID:
- <LV8PR21MB4236726636CF9CA5E3EB6BE1CEEE2@LV8PR21MB4236.namprd21.prod.outlook.com>
-References: <1734120361-26599-1-git-send-email-longli@linuxonhyperv.com>
- <20241216180300.23a54f27@kernel.org>
-In-Reply-To: <20241216180300.23a54f27@kernel.org>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach:
-X-MS-TNEF-Correlator:
-msip_labels:
- MSIP_Label_f42aa342-8706-4288-bd11-ebb85995028c_ActionId=80e8231f-b06f-4790-a25a-e70929f31f07;MSIP_Label_f42aa342-8706-4288-bd11-ebb85995028c_ContentBits=0;MSIP_Label_f42aa342-8706-4288-bd11-ebb85995028c_Enabled=true;MSIP_Label_f42aa342-8706-4288-bd11-ebb85995028c_Method=Standard;MSIP_Label_f42aa342-8706-4288-bd11-ebb85995028c_Name=Internal;MSIP_Label_f42aa342-8706-4288-bd11-ebb85995028c_SetDate=2025-01-29T02:38:33Z;MSIP_Label_f42aa342-8706-4288-bd11-ebb85995028c_SiteId=72f988bf-86f1-41af-91ab-2d7cd011db47;MSIP_Label_f42aa342-8706-4288-bd11-ebb85995028c_Tag=10,
- 3, 0, 1;
-authentication-results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=microsoft.com;
-x-ms-publictraffictype: Email
-x-ms-traffictypediagnostic: LV8PR21MB4236:EE_|LV3PR21MB4190:EE_
-x-ms-office365-filtering-correlation-id: d5f5d417-cfd3-4081-144d-08dd40b36ec3
-x-ms-exchange-senderadcheck: 1
-x-ms-exchange-antispam-relay: 0
-x-microsoft-antispam:
- BCL:0;ARA:13230040|1800799024|10070799003|376014|7416014|366016|38070700018;
-x-microsoft-antispam-message-info:
- =?us-ascii?Q?TCgAIATPcE1hRxP3phgRtK1Dn4462QfdmngpgqbZqyIgxt/2K3ExjuHz2Z3N?=
- =?us-ascii?Q?jAVaP9HpI7NrOXmn4/FsSEaOs+CCC1xz0auZ/lVFgOzM7LCp30Yvwprdxh8R?=
- =?us-ascii?Q?elOE3toBySXZsqUntZNvZVW2g4840nRULypfYnBnROESM6JxBE6+K63DjvID?=
- =?us-ascii?Q?AaGzLmFNujKLJgUoI/P14eL2RXkqTe7uhk8+ujPSfhMRLE2O2C2dHVezIV7K?=
- =?us-ascii?Q?jgoFQyctzpqb0/OKP2UsfbTlpknG5Bf59Yq5YbZRcXjOWnW9RpqhcJx7NPGw?=
- =?us-ascii?Q?e3NE9j3uycWlkXkrgIK8SOnuoVynVroXTApfIl9XgpNxbq5c1WXEC4LOd35W?=
- =?us-ascii?Q?/uXoCuhAJXyXTHL9rYKbbci8UG9gZzQV/G1OMUrSQIztjphldEgDtpXFc2QE?=
- =?us-ascii?Q?k502J1gwW3arKpkw3KLXpWCXdFVVb0oEe2oaNoIAiaZWlZtknGVzTSo+oMw3?=
- =?us-ascii?Q?rKg4X1QlwAuwG5QQAxfssRxcYqnjLI+p9bO71frKHulEBSndxtAVX7Sbc04w?=
- =?us-ascii?Q?cGuSCItfb6OEWWQriG4UfehaYg1gqWXtQUD3MtKMPzpkulmcm6sMS2DTPetL?=
- =?us-ascii?Q?yTtQndpkgSU/0bchdYhwwnbJOCjuQ0fXb1zmd4aAqjS2/YEJ/28YfKHFSHaX?=
- =?us-ascii?Q?XQKY2B384HQ32LKP8LI0G1mkNxoBNXyvVqBScx90JV3alyQ4UDfd6V7XLVQZ?=
- =?us-ascii?Q?vfN6FBXuRUCsBdNcQ1Sq6nrYWH+OHA3fG6La/5Ugrf3dWhMLt4LGh4A2YUCN?=
- =?us-ascii?Q?bfPfizA9oV9/iDgM4t5mGAzVoNmnfJfSgl4saVAiMLXSeR6LgyR4O424wtEV?=
- =?us-ascii?Q?1eXSZLS69iXLXv+KVE7PcT1IhPMyI5XrahRoUfjhWStkEwBHF/0t4ItgEY5e?=
- =?us-ascii?Q?45C7VyDEiSE6AD6z3mxeGGZSELTrRjf2BM3hu9Q5Aq3axbAezADp2lKrQLSo?=
- =?us-ascii?Q?cGBk8Qnnpw5YwUcHsonh/fLEoStKGMTJoFqOJvs2KXbzOSg4ArQ8YHWIlXmj?=
- =?us-ascii?Q?spj0u/sY/KqG2MmKwM9BFcJCDzpYAG0xYQg+dgwLIeE/JOXd36tni/mCkcYg?=
- =?us-ascii?Q?IYF6ZepNy6/EG91pHCd3NEl1WUV60Zm46XQyEN9fVlAb9yjUn4ACtV/pprJd?=
- =?us-ascii?Q?y5KKbFshV3H1fGcmBSzPa/e0SADDi3xuKzX8E85HO47oVwlkrtrXNV43b0N6?=
- =?us-ascii?Q?UfHT6Ox5ifOPKUrUCpM++YTltWF2dVU4MYj8M4NXbFHl8HNUq7lPIr9dipiv?=
- =?us-ascii?Q?Z3829aeSukXQ+WZ4GfphDGP5/D/LSYcydiye56d2PHOdgtjwSqRwQuKG+VFP?=
- =?us-ascii?Q?/wY1sxeaCzTHeHVghz0NtguST1N1Nq1J05QP2MNTMQM5Pjb4LDD7YhRBznEd?=
- =?us-ascii?Q?qiV4BC90iaKka/RE6lUlzgBCQkgu8srj8Sbh6C5QGobomQkfCC4aIPDHETYO?=
- =?us-ascii?Q?Qm/ErDVtO99Dx/iOnJDYhxHGklcDjygm?=
-x-forefront-antispam-report:
- CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:LV8PR21MB4236.namprd21.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(1800799024)(10070799003)(376014)(7416014)(366016)(38070700018);DIR:OUT;SFP:1102;
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0:
- =?us-ascii?Q?beR1NzQQPQyqpDKwEJK5QvQZ5xkekBcjhpvIkiG/fVnMMTiDQ4qk8Z5BDGg6?=
- =?us-ascii?Q?WBdFmGpX5Czsm6rc5S8En7+v5avG/lpDXUBJ4Ruc5u6ZozeCO6Umq5vMyunA?=
- =?us-ascii?Q?eIvirVY7Di2GtsFk7hNANibwHUyxIpG8vNf04jZ2FpIly0e2aCgooUAsmmZg?=
- =?us-ascii?Q?cD2ApliwsTUUxA5JRDD3nBJGtJCm3yRByYI/cJnJ4aaOKZsGnMMFcZZkz8Ll?=
- =?us-ascii?Q?lGFokz/IYMgQdz8lVguvxcoNwSSTXVBLDp7AnvUalI7n3CO1TyBC97XHzh0L?=
- =?us-ascii?Q?MpaxIxdOfLCrGUVz1LUhJgCFjrCAmRLeKoX+xeCiQy82aHXwWDQmozxwVvzc?=
- =?us-ascii?Q?l2cNDk8LbQKgBxBzqZP2lNWCy75pVSgRb6ik1eBTGTHR27I1SLUFXFXb3PYb?=
- =?us-ascii?Q?ysbM7CgmN3vqkKYvHmKn1KDcNACx8z5OEiKgedqt/FAzLFZGhTeZYKNUpMGK?=
- =?us-ascii?Q?q4ar++m9G7zfE/VGB+Qso7Ildl46gaVrfsGOcVuVrUoOh2lTuuPh5lEodjcH?=
- =?us-ascii?Q?RUnnVWo2IehRJupPCnweAyQG0p/CCtzkpacKglKGt10j7TeOye/oj/G5dyxM?=
- =?us-ascii?Q?gngyFMCWxz82aUho+U+6leRZt8zxY7PUCLc5nldNlM5f/ER2KBmx3WsGSnlQ?=
- =?us-ascii?Q?p+Hq4DGI3EVChQxurm5JF2dAN0IaNS2pmFbZWQY4Z77IMD0uNpr7ysli7REz?=
- =?us-ascii?Q?HYlYsGQ0pES0+NVXSnWt631nsZFy1TtkC+At2KeWvir52SPOHOmQ8AFhZlE1?=
- =?us-ascii?Q?eCzm8ntnUVO07VvQEZVvYRL2wU+IVgmBM2+Bm5EPqHEA+fCDFtpuYhs0Ovbj?=
- =?us-ascii?Q?ZF95hKOhEMU481y4FJ1TkE4EMagImLh+OJuvKM54oPCE4fMlsBXb9kKwVeUJ?=
- =?us-ascii?Q?ZjQ73ZccVx2N04LUWK3l0GXa++vLgA0gIq945iJrK7ifWdp1iaId0sKk9ly0?=
- =?us-ascii?Q?rbKNnF4RWn9dt7ZZlUt947t92XQIW5y+7oHDMY7IUS1RvO5mAaDsta+NybWt?=
- =?us-ascii?Q?umnqIS/vDGOFAZs625J6yUyRPevJzbizcFHYZUD8MZPDwjqLOafvh4Dam/6G?=
- =?us-ascii?Q?ZEGNyZzz67zzH3D6GKY9YvuyzJ0GDRrS4b2fDK5TDJkpokFMWZA8kVxJ48Jq?=
- =?us-ascii?Q?/aZ8U+HLDIfIZvB34vboYuJ5ErKKtxQnt9RJ6YBfC5CxI1LhsdABRXG+TiDe?=
- =?us-ascii?Q?tO6mimsO0RXulNc/+nWvEtOwDUG7BDjYhrLd1H5Ml3d/md/XLqZz9x2kRbwB?=
- =?us-ascii?Q?YyKfEZQpZIX0zGiA8yc4qRpcPv1jQGbDGVxpUANWaumZAAuUjRvnVay8f9Nm?=
- =?us-ascii?Q?LF049jUTTWyr3KHaEWoYxTkyGPYSirEYpsKmOyPq4/XzYhw8T2JP30MU1eSa?=
- =?us-ascii?Q?WoPQHBpzXyQgbQxbeNVG1qNKOD8zChdO/aig9G0XPKRn0WWUI+SWJGy0nMDq?=
- =?us-ascii?Q?lYOpCCXZSjeOzlGl7xMuNfIXGa7CiNImAwl2tGfGtNYVUT2ya5SXe/3ZYVVb?=
- =?us-ascii?Q?+OduyaqgP9UO4cS42byULS75NtRYTZILOogRfqfTw8ztyrk2lYnYzc0QkLST?=
- =?us-ascii?Q?0Vf8hrtRtbjmLA4OUjvTNyZrbB3PjwzXkDUURG9mz9RdO7esebahFUnoBAak?=
- =?us-ascii?Q?xymMvD8m5iSqU9ZiZrkZYt79JZteB3qSyHxK2HuzM7zh?=
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 544EB1FC8
+	for <netdev@vger.kernel.org>; Wed, 29 Jan 2025 22:52:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=89.58.32.78
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1738191136; cv=none; b=gt0R1PZ4Cs3iw+W21ZTdF7wTfxEUqn6t3jn4f4WrlXEdsSkctaf8f/TOPstdL/Bzuz0uZ6ODYpxPxWzMBJ4Gwt/rzacPQAS/WzYWHyKKlTQB82feiUd0fNSlHWOKu5SSmYs+I6Lhr1Rq4faEY7f9jLd013zWArQ9RLShVTEtBoA=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1738191136; c=relaxed/simple;
+	bh=9aPLkzKtq4Ols7kgyn0d0UfXL2rJfe5kl7BKREz5L2Y=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=HJeEsySacX2lErKBPvDEddWHSmuR1JPSCWrxJjxjwHplXPs5ofU4+bvSRRfkSjTjufcqmX2IKMv33CCPOWKTtZpoQDenhWcYpzQ1VCLUldDbV2/iIJdwOplHnx2qUyOAvbtxgQCwURzcEmberv6QemdEAW0XXS6bwy2HqVRumDY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=denx.de; spf=pass smtp.mailfrom=denx.de; dkim=pass (2048-bit key) header.d=denx.de header.i=@denx.de header.b=OsxuGJV0; arc=none smtp.client-ip=89.58.32.78
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=denx.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=denx.de
+Received: from [127.0.0.1] (localhost [127.0.0.1]) by localhost (Mailerdaemon) with ESMTPSA id 7034510382D08;
+	Wed, 29 Jan 2025 23:52:09 +0100 (CET)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=denx.de; s=mx-20241105;
+	t=1738191130;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=nXKVG0t4zGITf8n7S2vyu/Jwr8ecXTNlpEF1AdVYRX0=;
+	b=OsxuGJV03HbhTj7h2FJSD0DY2+3CizTnOJxvf+vYr+vJ66OxB6q0JUBht4Y81CTHOD7+6O
+	9II1FGet5n7ZIU5PUS2luXNs4YIdkAJVoFustXtI30KUIVNN0m7LjF348eZAfa8mG08n+O
+	EGTDVH5pbuu8ziN8Tu+fl6qp1W45N3yGsh4Vx0fmPm8IafKtRmzZxi5AwgjI6pjiU4NH9n
+	/SNhdi3Po36e5DNcI+8aN5b3PN1UOOeWRaxk8PQLOyMOhhg3vIIi7w3Z4S8k3F8LscOu/H
+	3upR5frCt9FQ6yf8ER6Lq5EoKrNAgo2rVZZP3qltbcNSfvogZc8DIIXpPUtijQ==
+Date: Wed, 29 Jan 2025 23:52:06 +0100
+From: Lukasz Majewski <lukma@denx.de>
+To: Frieder Schrempf <frieder.schrempf@kontron.de>
+Cc: Andrew Lunn <andrew@lunn.ch>, "netdev@vger.kernel.org"
+ <netdev@vger.kernel.org>
+Subject: Re: KSZ9477 HSR Offloading
+Message-ID: <20250129235206.125142f4@wsk>
+In-Reply-To: <42a2f96f-34cd-4d95-99d5-3b4c4af226af@kontron.de>
+References: <05a6e63e-96c1-4d78-91b9-b00deed044b5@kontron.de>
+	<6d0e1f47-874e-42bf-9bc7-34856c1168d1@lunn.ch>
+	<1c140c92-3be6-4917-b600-fa5d1ef96404@kontron.de>
+	<6400e73a-b165-41a8-9fc9-e2226060a68c@kontron.de>
+	<20250129121733.1e99f29c@wsk>
+	<0383e3d9-b229-4218-a931-73185d393177@kontron.de>
+	<20250129145845.3988cf04@wsk>
+	<42a2f96f-34cd-4d95-99d5-3b4c4af226af@kontron.de>
+Organization: denx.de
+X-Mailer: Claws Mail 3.19.0 (GTK+ 2.24.33; x86_64-pc-linux-gnu)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-OriginatorOrg: microsoft.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: LV8PR21MB4236.namprd21.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: d5f5d417-cfd3-4081-144d-08dd40b36ec3
-X-MS-Exchange-CrossTenant-originalarrivaltime: 29 Jan 2025 22:22:35.7810
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 72f988bf-86f1-41af-91ab-2d7cd011db47
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: 8EYh0m/Rm2NQu6XYNvm53/eefxlnQRHnXVRTWcT3qSe1cyvVUbC937NF53MrrIP9JUrQG4litFJI6c8RWKivhQ==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: LV3PR21MB4190
+Content-Type: multipart/signed; boundary="Sig_/yzc38.I7onKQho4G/_1xAeb";
+ protocol="application/pgp-signature"; micalg=pgp-sha512
+X-Last-TLS-Session-Version: TLSv1.3
 
-> Subject: [EXTERNAL] Re: [Patch net-next v2] hv_netvsc: Set device flags f=
-or
-> properly indicating bonding in Hyper-V
+--Sig_/yzc38.I7onKQho4G/_1xAeb
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: quoted-printable
+
+Hi Frieder,
+
+> On 29.01.25 2:58 PM, Lukasz Majewski wrote:
+> > Hi Frieder,
+> >  =20
+> >> Hi Lukasz,
+> >>
+> >> On 29.01.25 12:17 PM, Lukasz Majewski wrote: =20
+> >>> Hi Frieder,
+> >>>    =20
+> >>>> On 29.01.25 8:24 AM, Frieder Schrempf wrote:   =20
+> >>>>> Hi Andrew,
+> >>>>>
+> >>>>> On 28.01.25 6:51 PM, Andrew Lunn wrote:     =20
+> >>>>>> On Tue, Jan 28, 2025 at 05:14:46PM +0100, Frieder Schrempf
+> >>>>>> wrote:     =20
+> >>>>>>> Hi,
+> >>>>>>>
+> >>>>>>> I'm trying out HSR support on KSZ9477 with v6.12. My setup
+> >>>>>>> looks like this:
+> >>>>>>>
+> >>>>>>> +-------------+         +-------------+
+> >>>>>>> |             |         |             |
+> >>>>>>> |   Node A    |         |   Node D    |
+> >>>>>>> |             |         |             |
+> >>>>>>> |             |         |             |
+> >>>>>>> | LAN1   LAN2 |         | LAN1   LAN2 |
+> >>>>>>> +--+-------+--+         +--+------+---+
+> >>>>>>>    |       |               |      |
+> >>>>>>>    |       +---------------+      |
+> >>>>>>>    |                              |
+> >>>>>>>    |       +---------------+      |
+> >>>>>>>    |       |               |      |
+> >>>>>>> +--+-------+--+         +--+------+---+
+> >>>>>>> | LAN1   LAN2 |         | LAN1   LAN2 |
+> >>>>>>> |             |         |             |
+> >>>>>>> |             |         |             |
+> >>>>>>> |   Node B    |         |   Node C    |
+> >>>>>>> |             |         |             |
+> >>>>>>> +-------------+         +-------------+
+> >>>>>>>
+> >>>>>>> On each device the LAN1 and LAN2 are added as HSR slaves.
+> >>>>>>> Then I try to do ping tests between each of the HSR
+> >>>>>>> interfaces.
+> >>>>>>>
+> >>>>>>> The result is that I can reach the neighboring nodes just
+> >>>>>>> fine, but I can't reach the remote node that needs packages
+> >>>>>>> to be forwarded through the other nodes. For example I can't
+> >>>>>>> ping from node A to C.
+> >>>>>>>
+> >>>>>>> I've tried to disable HW offloading in the driver and then
+> >>>>>>> everything starts working.
+> >>>>>>>
+> >>>>>>> Is this a problem with HW offloading in the KSZ driver, or am
+> >>>>>>> I missing something essential?     =20
+> >>>
+> >>> Thanks for looking and testing such large scale setup.
+> >>>    =20
+> >>>>>>
+> >>>>>> How are IP addresses configured? I assume you have a bridge,
+> >>>>>> LAN1 and LAN2 are members of the bridge, and the IP address is
+> >>>>>> on the bridge interface?     =20
+> >>>>>
+> >>>>> I have a HSR interface on each node that covers LAN1 and LAN2 as
+> >>>>> slaves and the IP addresses are on those HSR interfaces. For
+> >>>>> node A:
+> >>>>>
+> >>>>> ip link add name hsr type hsr slave1 lan1 slave2 lan2
+> >>>>> supervision 45 version 1
+> >>>>> ip addr add 172.20.1.1/24 dev hsr
+> >>>>>
+> >>>>> The other nodes have the addresses 172.20.1.2/24, 172.20.1.3/24
+> >>>>> and 172.20.1.4/24 respectively.
+> >>>>>
+> >>>>> Then on node A, I'm doing:
+> >>>>>
+> >>>>> ping 172.20.1.2 # neighboring node B works
+> >>>>> ping 172.20.1.4 # neighboring node D works
+> >>>>> ping 172.20.1.3 # remote node C works only if I disable
+> >>>>> offloading     =20
+> >>>>
+> >>>> BTW, it's enough to disable the offloading of the forwarding for
+> >>>> HSR frames to make it work.
+> >>>>
+> >>>> --- a/drivers/net/dsa/microchip/ksz9477.c
+> >>>> +++ b/drivers/net/dsa/microchip/ksz9477.c
+> >>>> @@ -1267,7 +1267,7 @@ int ksz9477_tc_cbs_set_cinc(struct
+> >>>> ksz_device *dev, int port, u32 val)
+> >>>>   * Moreover, the NETIF_F_HW_HSR_FWD feature is also enabled, as
+> >>>> HSR frames
+> >>>>   * can be forwarded in the switch fabric between HSR ports.
+> >>>>   */
+> >>>> -#define KSZ9477_SUPPORTED_HSR_FEATURES (NETIF_F_HW_HSR_DUP |
+> >>>> NETIF_F_HW_HSR_FWD)
+> >>>> +#define KSZ9477_SUPPORTED_HSR_FEATURES (NETIF_F_HW_HSR_DUP)
+> >>>>
+> >>>>  void ksz9477_hsr_join(struct dsa_switch *ds, int port, struct
+> >>>> net_device *hsr)
+> >>>>  {
+> >>>> @@ -1279,16 +1279,6 @@ void ksz9477_hsr_join(struct dsa_switch
+> >>>> *ds, int port, struct net_device *hsr)
+> >>>>         /* Program which port(s) shall support HSR */
+> >>>>         ksz_rmw32(dev, REG_HSR_PORT_MAP__4, BIT(port),
+> >>>> BIT(port));
+> >>>>
+> >>>> -       /* Forward frames between HSR ports (i.e. bridge together
+> >>>> HSR ports) */
+> >>>> -       if (dev->hsr_ports) {
+> >>>> -               dsa_hsr_foreach_port(hsr_dp, ds, hsr)
+> >>>> -                       hsr_ports |=3D BIT(hsr_dp->index);
+> >>>> -
+> >>>> -               hsr_ports |=3D BIT(dsa_upstream_port(ds, port));
+> >>>> -               dsa_hsr_foreach_port(hsr_dp, ds, hsr)
+> >>>> -                       ksz9477_cfg_port_member(dev,
+> >>>> hsr_dp->index, hsr_ports);
+> >>>> -       }
+> >>>> -
+> >>>>         if (!dev->hsr_ports) {
+> >>>>                 /* Enable discarding of received HSR frames */
+> >>>>                 ksz_read8(dev, REG_HSR_ALU_CTRL_0__1, &data);   =20
+> >>>
+> >>> This means that KSZ9477 forwarding is dropping frames when HW
+> >>> acceleration is used (for non "neighbour" nodes).
+> >>>
+> >>> On my setup I only had 2 KSZ9477 devel boards.
+> >>>
+> >>> And as you wrote - the SW based one works, so extending
+> >>> https://elixir.bootlin.com/linux/v6.12-rc2/source/tools/testing/selft=
+ests/net/hsr
+> >>>
+> >>> would not help in this case.   =20
+> >>
+> >> I see. With two boards you can't test the accelerated forwarding.
+> >> So how did you test the forwarding at all? Or are you telling me,
+> >> that this was added to the driver without prior testing (which
+> >> seems a bit bold and unusual)? =20
+> >=20
+> > The packet forwarding is for generating two frames copies on two HSR
+> > coupled ports on a single KSZ9477: =20
 >=20
-> On Fri, 13 Dec 2024 12:06:01 -0800 longli@linuxonhyperv.com wrote:
-> > Other kernel APIs (e.g those in "include/linux/netdevice.h") check for
-> > IFF_MASTER, IFF_SLAVE and IFF_BONDING for determing if those are used
-> > in a master/slave bonded setup. RDMA uses those APIs extensively when
-> > looking for master/slave devices. Netvsc's bonding setup with its
-> > slave device falls into this category.
-> >
-> > Make hv_netvsc properly indicate bonding with its slave and change the
-> > API to reflect this bonding setup.
->=20
-> This is severely lacking in terms of safety analysis.
+> Isn't that what duplication aka NETIF_F_HW_HSR_DUP is for?
 
-I'm sorry for the late reply.=20
+As I mentioned - the NETIF_F_HW_HSR_DUP is to remove duplicated frames.
 
-The usage of netif_is_bond_slave() and netif_is_bond_master() are mostly in=
- device drivers that checks for bonding as configured from user-mode. The c=
-heck is consistent with the netvsc bonding (bonding is done in kernel mode =
-without any user-mode configuration). I don't see any security risk if netv=
-sc is bonded and becomes a master device to the bonded slave device. Any th=
-ose checks will return the same value as if the bonding is done from the us=
-er-mode.=20
-
-There are two places other than individual device driver that check for bon=
-ded slave/master.
-1. ./net/tls/tls_device.c and ./net/tls/tls_device_fallback.c: it checks fo=
-r sending packets over a netdev for an SKB if that netdev is within the con=
-text of TLS or the netdev is a bonded master. If netvsc uses this bonding f=
-lag, the check will pass for netvsc netdev as if it is the bonded master. T=
-his has the same effect of user-configured bonding devices. Please see poss=
-ible security implications below.
-
-2. drivers/infiniband/core/roce_gid_mgmt.c:: it checks of net device for ca=
-ching their addresses for RoCE gid lookup. The code check for master/slave =
-bonded devices and determined which of their addresses should be used in th=
-e GID cache. If netvsc uses this bonding flag, it will be consistent with a=
-ll the checks on identifying the correct addresses (master's, not slave's) =
-for GIDs. This has the same effect of bonding configuration from user-mode.
-
-One possible security problem is that the user-mode can assign different pe=
-rmissions to different netdev (and expose to containers) and that the slave=
- device and netvsc may have different permissions. I want to point out this=
- is an invalid configuration when a slave device doesn't have the same perm=
-ission of its parent netvsc. Because the slave device along can't function =
-in the hyper-v environment when netvsc is present. It must bond to the netv=
-sc for any outgoing/incoming packets to work. If a user wants to configure =
-different permissions, it must assume the kernel will always bond netvsc wi=
-th the slave device and they must use the same permissions (and for assigni=
-ng to containers).
+NETIF_F_HW_HSR_FWD is to in-hw generate frame copy for HSR port to be
+sent:
+https://elixir.bootlin.com/linux/v6.13/source/drivers/net/dsa/microchip/ksz=
+9477.c#L1252
 
 >=20
-> > @@ -2204,6 +2204,10 @@ static int netvsc_vf_join(struct net_device
-> *vf_netdev,
-> >  		goto rx_handler_failed;
-> >  	}
-> >
-> > +	vf_netdev->permanent_bond =3D 1;
-> > +	ndev->permanent_bond =3D 1;
-> > +	ndev->flags |=3D IFF_MASTER;
+> >=20
+> > https://ww1.microchip.com/downloads/aemDocuments/documents/UNG/Applicat=
+ionNotes/ApplicationNotes/AN3474-KSZ9477-High-Availability-Seamless-Redunda=
+ncy-Application-Note-00003474A.pdf
+> >=20
+> > The KSZ9477 chip also supports RX packet duplication removal, but
+> > cannot guarantee 100% success (so as a fallback it is done in SW).
+> >=20
+> > The infrastructure from:
+> > https://elixir.bootlin.com/linux/v6.13/source/tools/testing/selftests/n=
+et/hsr/hsr_redbox.sh#L50
+> >=20
+> > is enough to test HW accelerated forwarding (of KSZ9477) from NS1
+> > and NS2. =20
 >=20
-> > @@ -2484,7 +2488,15 @@ static int netvsc_unregister_vf(struct
-> > net_device *vf_netdev)
-> >
-> >  	reinit_completion(&net_device_ctx->vf_add);
-> >  	netdev_rx_handler_unregister(vf_netdev);
-> > +
-> > +	/* Unlink the slave device and clear flag */
-> > +	vf_netdev->permanent_bond =3D 0;
-> > +	ndev->permanent_bond =3D 0;
+> I'm not really sure if I get it. In this setup NS1 and NS2 are
+> connected via HSR link (two physical links). On one side packets are
+> sent duplicated on both physical ports. On the receiving side the
+> duplication is removed and one packet is forwarded to the CPU.
 >=20
-> > + *	@permanent_bond: device is permanently bonded to another device
+> Where is forwarding involved here?=20
+
+In-HW forwarding is when KSZ9477 duplicates frame to be send on second
+HSR aware port.
+
+(only 2 of them can be coupled to have in-hw support for duplication
+and forwarding. Creating more hsr "interfaces" would just use SW).
+
+> Isn't forwarding only for cases
+> with one intermediate node between the sending and receiving node?
+
+This kind of "forwarding" is done in software in the hsr driver.
+
 >=20
-> I think we have been taught a definition of the word "permanent"
+> >  =20
+> >>
+> >> Anyway, do you have any suggestions for debugging this?
+> >> Unfortunately I know almost nothing about this topic. But I can
+> >> offer to test on my setup, at least for now. I don't know how long
+> >> I will still have access to the hardware. =20
+> >=20
+> > For some reason only frames to neighbours are delivered.
+> >=20
+> > So those are removed at some point (either in KSZ9477 HW or in HSR
+> > driver itself).
+> >=20
+> > Do you have some dumps from tshark/wireshark to share?
+> >  =20
+> >>
+> >> If we can't find a proper solution in the long run, I will probably
+> >> send a patch to disable the accelerated forwarding to at least make
+> >> HSR work by default. =20
+> >=20
+> > As I've noted above - the HW accelerated forwarding is in the
+> > KSZ9477 chip. =20
+>=20
+> Yeah, but if the HW accelerated forwarding doesn't work
 
-Is it okay that it uses "kernel_bond" here? The reason is that netvsc is do=
-ing unconditional bonding without any user configuration.
+The "forwarding" in KSZ9477 IC works OK, as frames are duplicated (i.e.
+forwarded) to both HSR coupled ports.
 
-IMHO, using IFF_BONDING is the least disruptive way to express this relatio=
-nship without adding new flags, given the behavior of netvsc bonding is ide=
-ntical to that of the bonding driver, but without any configuration from us=
-er-mode.
+The problem is with dropping frames travelling in connected KSZ9477
+devices.
 
-Thanks,
-Long
+> it would be
+> better to use no acceleration and have it work in SW at least by
+> default, right?
+
+IMHO, it would be best to fix the code.
+
+>=20
+> >=20
+> > The code which you uncomment, is following what I've understood from
+> > the standard (and maybe the bug is somewhere there). =20
+>=20
+> Ok, thanks for explaining. I will see if I can find some time to
+> gather some more information on the problem.
+
+That would be very helpful. Thanks in advance for it.
+
+
+Best regards,
+
+Lukasz Majewski
+
+--
+
+DENX Software Engineering GmbH,      Managing Director: Erika Unter
+HRB 165235 Munich, Office: Kirchenstr.5, D-82194 Groebenzell, Germany
+Phone: (+49)-8142-66989-59 Fax: (+49)-8142-66989-80 Email: lukma@denx.de
+
+--Sig_/yzc38.I7onKQho4G/_1xAeb
+Content-Type: application/pgp-signature
+Content-Description: OpenPGP digital signature
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCgAdFiEEgAyFJ+N6uu6+XupJAR8vZIA0zr0FAmeasRYACgkQAR8vZIA0
+zr0VjAgAg3S/GY2arMuccRKR4EUdt6yNhv6HvmKm4ycuLc31gyQiZFvQT6HFXSlV
+LQ4tvcKRNWOUOYsu/SdIS0hdK+n4j6YFu5YKrvQcJ0vmYN+f5HL4GBWoFXrR6Ib+
+GadlOtqIJjz0jX1LVvxdh/84y2zPoQCcO/vgXGCul6leqlqVv062UIY9mDAjPXLJ
+jsdyfTT5jwRQlX5nf7TOtE8UACFIKKpPP4vPedyywsjnM+NA714/FTZofn8qZvL4
+0GmBpsnB6q/cn8Hzbcq54LQjRApY1lq8PdvYHi3LGFBB7Ef36yXoIY6eBLcYJLdm
+Hgf91rq06sxPMxcNgue1EhAe1DMfbw==
+=ND6J
+-----END PGP SIGNATURE-----
+
+--Sig_/yzc38.I7onKQho4G/_1xAeb--
 
