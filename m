@@ -1,102 +1,100 @@
-Return-Path: <netdev+bounces-161512-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-161513-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id AE015A21ECF
-	for <lists+netdev@lfdr.de>; Wed, 29 Jan 2025 15:14:32 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id F2A3FA21EDE
+	for <lists+netdev@lfdr.de>; Wed, 29 Jan 2025 15:15:52 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 8291F188BD4C
-	for <lists+netdev@lfdr.de>; Wed, 29 Jan 2025 14:11:35 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id B93141887AFC
+	for <lists+netdev@lfdr.de>; Wed, 29 Jan 2025 14:13:07 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4ACA51DE3DF;
-	Wed, 29 Jan 2025 14:08:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DB63F2C9D;
+	Wed, 29 Jan 2025 14:12:58 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="fPtWWEHs"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="UdQpeuv2"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qv1-f48.google.com (mail-qv1-f48.google.com [209.85.219.48])
+Received: from mail-qv1-f47.google.com (mail-qv1-f47.google.com [209.85.219.47])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 69F831BD9E6;
-	Wed, 29 Jan 2025 14:08:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.48
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3ED54191F84;
+	Wed, 29 Jan 2025 14:12:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.47
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1738159735; cv=none; b=W6ktTXtcdgQ/BGxcyZnht5ZSWiiScjF6Vxyjj33aT3f3HdqaMnLigUI4nhDJd6ZU4jB+0KdUQNrlQzn75qCwN97cqBydPweoeuMKpTBgNF4/Bs69f7amFusazl+Qh1TnB8yhp6Fwktpjre7Yr2xiDYxvKmcNp0xiHfj7TmL03Eo=
+	t=1738159978; cv=none; b=AD29T0UurXHuxbMdRMtjtt84ShuWXsH6IiJ6RkYT8SNDDtOoFQjSEosLKMFYhzeoOaxjPQuBUSQOM/Cmo6h8K98gJs36GJO1InoKE074BtE0ndudVw0Y2QvOCQ6BkPSX0M+hJiCUqE8WoQ6hbE792l+l+fXILCNWYYH+gLDoRVk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1738159735; c=relaxed/simple;
-	bh=rqhhwXKGByeE8r89cbnCBNvF1PnM7jIfUTqAYfzJo1Y=;
+	s=arc-20240116; t=1738159978; c=relaxed/simple;
+	bh=O4lNDCz6kT9xbeqIv1IjkcASwMTjjglNG2A/rVC7KXE=;
 	h=Date:From:To:Cc:Message-ID:In-Reply-To:References:Subject:
-	 Mime-Version:Content-Type; b=EusBjjS236Ehqg6KMiJo151DQpPvTOj54G1h7oxp47BPrySTdacwaYNG/3aSbvHcKwRwT3P+dSnnFkeen7NIc/6c2gNXK3PSkNncIQNfrOaG1V5cI4se8uhvT6b/hZad44uOvuITLgQHHdMGvgFupWY8YCrc33q+wPqmYdtwNVY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=fPtWWEHs; arc=none smtp.client-ip=209.85.219.48
+	 Mime-Version:Content-Type; b=EV1WQIC2D/8+M7mA+MdzC4eo0x5hIPZkQL2HKV+pQNQAqK9yeJUPRTszKesLfm/Xxog5zfJKVSzLVveqFY5w47/QQAiaV4XqIKV1BdGbnAK/PLrkGTl3MmwNy9NPNXvslOv1y8LptEd4fxjpsIPTE1LvLB3TECPC+Pdn0OvkfDo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=UdQpeuv2; arc=none smtp.client-ip=209.85.219.47
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-qv1-f48.google.com with SMTP id 6a1803df08f44-6dd01781b56so77998046d6.0;
-        Wed, 29 Jan 2025 06:08:53 -0800 (PST)
+Received: by mail-qv1-f47.google.com with SMTP id 6a1803df08f44-6e1b11859a7so36935836d6.1;
+        Wed, 29 Jan 2025 06:12:57 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1738159732; x=1738764532; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1738159976; x=1738764776; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:subject:references
          :in-reply-to:message-id:cc:to:from:date:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=6MjXPcEMKbR6gUdgk/5lZvgG3KEYIRNOpZTNc0pegh8=;
-        b=fPtWWEHsNNLDrMwy9BzZ72euZRTTzJhiBov4GonICml0wWAcFOtMORn7cdrJVYfpcO
-         9d2oQ6n7wW4ZnjoWEvTjeNoKN2tt1FUKB2a4XPBy1LgtgP/fibBDH5Eu6gMKIjtWLG0L
-         2bhbCbcdNAjJMyEOE7TzDf7op/JZ6zcFp4ZgdrJAXXDLqnlQ931ZnNydDc7RMWP6Y8xt
-         XR5pS+/978FzWHjsJJ4pB9rJlpcpaa2HL7cA+YGTrlyqIWkKws65Klu+4jAnQ0UiHGd+
-         +TGFa/v14RAhpFXB+5EZ/zQ2jsnwgzZgjal3JMoeNZl28/bML/c0tKYeazfhXFLDHIvf
-         4yGQ==
+        bh=Ek8eJCXUCCmExLQLQk58UyQSg8MbUlPNZk5icxwHmmI=;
+        b=UdQpeuv29dL5nNTouQ/4eqqmX9f6MbFlUd9eOPPjIGZ2cFtQV4PKBExDXyz7XMBH2v
+         TNq4/WXy+uMr7ytugS+PeSz16GdSJidSjtz+l8YGvECSOIaoTWRrqY5KkuMnZcX/wOE7
+         1zyQg8dBfSELMU4XLSJm+9JD8OmxPzOA68+rCs0N6JA9W+Zwhri/fHhgzOMqLCU49vva
+         3JwSlfYg3e4OHR9zr4K/LtWPf4REGN4S3cuW8eR6qXMWR/9VkfuQqFHoo94UkyChRrLf
+         GqxUQNc7jkVQJNVHS56SaEOlLDoebHOEPj8UqkS4t/DHCOwONF9HPWB5Gw6iDI4hArUl
+         QbYA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1738159732; x=1738764532;
+        d=1e100.net; s=20230601; t=1738159976; x=1738764776;
         h=content-transfer-encoding:mime-version:subject:references
          :in-reply-to:message-id:cc:to:from:date:x-gm-message-state:from:to
          :cc:subject:date:message-id:reply-to;
-        bh=6MjXPcEMKbR6gUdgk/5lZvgG3KEYIRNOpZTNc0pegh8=;
-        b=p2B+mXcCN75toAT0vCM69wMGr7kMreLILFhYUnLi8sHxMZuN/8+TmFWX72iLB5ONP9
-         FMlm1PW+vNYA3KdOc7H1GcELlHR/JFhKH2YWbCJDF/nyqUIAaHYEW6xJ2pcQ3LTjl3D3
-         cUOPg65B5DAx4ZLQ6ksw2pnmi8dmT3ToWrkxywRALankWaKW/Xa7MQWTE7IL6hOaRs3p
-         2dooJc97iWMJ7GIa1rHB/kXh9jrsBQmxENNWBYk3ylyPzc2cNZyB8Eo/iuJPoztg0TC0
-         8KvseFetdoJ8U2auSJcxjHrM+fN6pMqfEhSPAG/8Vo2QWlJLRdIJuXjJmvWpJ+HJcF7k
-         hLdA==
-X-Forwarded-Encrypted: i=1; AJvYcCVIIFr75+GA2YZGhvgdA8zhxEGHm+dpBbewhUL1vAi3+oRay9EEzVJ2evd2JoPTePY29fj1k/C7MEjzumGhtgHc@vger.kernel.org, AJvYcCVghSDIy1z9+cM3qABx0jKlhhOt5YQ/XvzQHi4OIAX6ump0Kc8lqZdW6azb4rDQCfsHGymegIfPqm3fWlc=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yza83ohCoB/1WG5a7hlOzUxhnNgTIG36NxW5a3o7su35LJ56W8g
-	mkpAwueCnkP8yyMNth+Ib8hI8Kp+tn4d/sDdum9/s7us8k5nWtkN
-X-Gm-Gg: ASbGnct4YhOav1z70f1296r9p2CZYpUV+ZOKT/ZtPXMBDoMpknoNVFBQbS0V4FYDIDP
-	7tLnkqjd6NvD6XSEPxZ9c22w8ROZjDmZCvtZpaCHjUYt6gJ4mAuyiR9LzUXQXU17TRImthUAWl8
-	TMP6v+bScD4VId/DPxSyTBSHE+eKKUoBBiiAlrubobOYa50044jGC20kGxYY/tcxoeyLvDbvcIS
-	DpP/dBJPTCuYY1OSHFBV26FNkwESR+UiI0hAJ0C2bwq3vydzduV2yX8dndJnXUfCLBvQWsz9pn8
-	yfX0d7Cri2F8FHSTpTYUV5eU+LKaf8ptMujzYto3fy5febRaE8H6TY3XdJ1yDQg=
-X-Google-Smtp-Source: AGHT+IGin2FqQStz1/iddWMQu+LTtXlc7FkeAXWkw9fwUCSfzEmhcK7kaFTSmr4rIauWIX5YWXi4vA==
-X-Received: by 2002:a05:6214:408:b0:6d8:aba8:837b with SMTP id 6a1803df08f44-6e243c78da1mr41902336d6.41.1738159732065;
-        Wed, 29 Jan 2025 06:08:52 -0800 (PST)
+        bh=Ek8eJCXUCCmExLQLQk58UyQSg8MbUlPNZk5icxwHmmI=;
+        b=GfZi9xorpQ4u0V9mm+qv5CUVpuR4H894VcZxvQDyi3QCmFYwz3AK5qUWe2xs9AF03X
+         OYzCVje3wfJCU9pELfAY6xp/323gdGdBa5RzythOtP2ZUlCO4mJwwtPRMyVN93SccMbk
+         rbzvfhM5VlW5ufOlTdYWf5otLhuj1VA1J1X2DQ7zM1cWHSAhCwcS1248npyUi5E7XVa2
+         VOflqnTvB9zclcnV46hM8AadNFmVAGXiAf+nLCsMGmr1sCqqJIPejXCiaxlgddPts6gI
+         EN4PgX4m5+HX3999/gbysFGabgEMcW2D8WbujPdir0cAY3J9564M8F53Mp4waLh/J1QE
+         NPqg==
+X-Forwarded-Encrypted: i=1; AJvYcCV7PCDPg6XSziO7EsW3sd58bqISBAwvz3ngnhtbMuuW6Bp+DU6xuRBLBFVndwahFbskAc7nL3kZ39G8ps9pJRRnE8ZmEyg=@vger.kernel.org, AJvYcCWP3/9yYyCzuy/eZMAHvYqQeh0DWplLfwYvUsNtsuhbeNeCZ949IO9pTO5MbjETU308uKX1NUvP8g==@vger.kernel.org, AJvYcCX5caw+wirfk9ziSMusHai1HpMz4jYH9RnPuWlm2MXOEWpbpIM49VGmE2VzkMN2KAczoelEghXx@vger.kernel.org
+X-Gm-Message-State: AOJu0YxPYMAvfmcGL48yqulLlF5Nr7QCsgmxIdFPW4wn5BoofU+o9dpQ
+	SnGRuDehAjUEy5nmV9el1k2F2A+0UfJ0XCaplGtp1usmNsm9uUN6
+X-Gm-Gg: ASbGncuK/+1HMaYxvU8ulVgKe6LHXCms7h9lqTeg5RRv2t8YeZ+kAJGUJDoCHhMDafq
+	iXBjYntBQW0CVigbVWxUfs4O9pR7RbS98PAq3L4aX1Dv2OonsjDvxFEb7rKiq8yyztOqSDEQTbx
+	pWnWxhFp/8gnRqXzIa8YpY/W6VaSsggvctBUdZqy/pXCuIY7J3HWZza1e3nA9Y3Cii7IRaRlLWr
+	6L+5srfAPix9qEBbF1gTaqMi4arrtVuZTvRJXBj1NDxWwkAxubeSpp2d1DPKPMJrNACduth46ki
+	RcPpZ+Rx7TbDYbUZpbw/XTZZbTkLohrpiaRfGjheUD+8HDEMiPSAimWk7cQZSH4=
+X-Google-Smtp-Source: AGHT+IFVSDYJ5VMngE/uoZVT+AczkFSwpn/OWJjKkh8cFG9+qC0IfsSA7DfJwIMSZRUZfOWM6Ej3OQ==
+X-Received: by 2002:a05:6214:1c46:b0:6d8:b401:44a6 with SMTP id 6a1803df08f44-6e243c7e0f2mr50612156d6.43.1738159976023;
+        Wed, 29 Jan 2025 06:12:56 -0800 (PST)
 Received: from localhost (15.60.86.34.bc.googleusercontent.com. [34.86.60.15])
-        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-6e2057a88e1sm55475816d6.89.2025.01.29.06.08.49
+        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-6e2058c304dsm55900026d6.110.2025.01.29.06.12.55
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 29 Jan 2025 06:08:51 -0800 (PST)
-Date: Wed, 29 Jan 2025 09:08:49 -0500
+        Wed, 29 Jan 2025 06:12:55 -0800 (PST)
+Date: Wed, 29 Jan 2025 09:12:55 -0500
 From: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
-To: Yan Zhai <yan@cloudflare.com>, 
- Willem de Bruijn <willemdebruijn.kernel@gmail.com>
-Cc: netdev@vger.kernel.org, 
- "David S. Miller" <davem@davemloft.net>, 
- David Ahern <dsahern@kernel.org>, 
- Eric Dumazet <edumazet@google.com>, 
+To: stsp <stsp2@yandex.ru>, 
+ Willem de Bruijn <willemdebruijn.kernel@gmail.com>, 
+ Ondrej Mosnacek <omosnace@redhat.com>
+Cc: Willem de Bruijn <willemb@google.com>, 
+ Jason Wang <jasowang@redhat.com>, 
  Jakub Kicinski <kuba@kernel.org>, 
- Paolo Abeni <pabeni@redhat.com>, 
- Simon Horman <horms@kernel.org>, 
- Shuah Khan <shuah@kernel.org>, 
- Josh Hunt <johunt@akamai.com>, 
- Alexander Duyck <alexander.h.duyck@linux.intel.com>, 
- linux-kernel@vger.kernel.org, 
- linux-kselftest@vger.kernel.org, 
- kernel-team <kernel-team@cloudflare.com>
-Message-ID: <679a367198f13_132e0829467@willemb.c.googlers.com.notmuch>
-In-Reply-To: <CAO3-PboS3JB1GhhbmoJc2-h5zvHe-iNsk9Hkg-_-eNATq99D1Q@mail.gmail.com>
-References: <Z5cgWh/6bRQm9vVU@debian.debian>
- <6797992c28a23_3f1a294d6@willemb.c.googlers.com.notmuch>
- <CAO3-Pbqx_sLxdLsTg+NX3z1rrenK=0qpvfL5h_K-RX-Yk9A4YA@mail.gmail.com>
- <6798ed91e94a9_987d9294c2@willemb.c.googlers.com.notmuch>
- <CAO3-PboS3JB1GhhbmoJc2-h5zvHe-iNsk9Hkg-_-eNATq99D1Q@mail.gmail.com>
-Subject: Re: [PATCH] udp: gso: fix MTU check for small packets
+ network dev <netdev@vger.kernel.org>, 
+ Linux Security Module list <linux-security-module@vger.kernel.org>, 
+ SElinux list <selinux@vger.kernel.org>
+Message-ID: <679a376739b99_132e08294f3@willemb.c.googlers.com.notmuch>
+In-Reply-To: <8b81a534-9c30-4123-bd7d-bf3a9d89dfcb@yandex.ru>
+References: <CAFqZXNtkCBT4f+PwyVRmQGoT3p1eVa01fCG_aNtpt6dakXncUg@mail.gmail.com>
+ <e8b6c6f9-9647-4ab6-8bbb-ccc94b04ade4@yandex.ru>
+ <67979d24d21bc_3f1a29434@willemb.c.googlers.com.notmuch>
+ <CAFqZXNscJnX2VF-TyZaEC5nBtUUXdWPM2ejXTWBL8=5UyakssA@mail.gmail.com>
+ <6798f1fb5e1ba_987d9294dc@willemb.c.googlers.com.notmuch>
+ <c4413e16-d04f-4370-8edc-e4db21cc25f6@yandex.ru>
+ <67996154e30ce_d9324294c4@willemb.c.googlers.com.notmuch>
+ <8b81a534-9c30-4123-bd7d-bf3a9d89dfcb@yandex.ru>
+Subject: Re: Possible mistake in commit 3ca459eaba1b ("tun: fix group
+ permission check")
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -107,137 +105,96 @@ Content-Type: text/plain;
  charset=utf-8
 Content-Transfer-Encoding: quoted-printable
 
-Yan Zhai wrote:
-> On Tue, Jan 28, 2025 at 8:45=E2=80=AFAM Willem de Bruijn
-> <willemdebruijn.kernel@gmail.com> wrote:
-> >
-> > Yan Zhai wrote:
-> > > Hi Willem,
-> > >
-> > > Thanks for getting back to me.
-> > >
-> > > On Mon, Jan 27, 2025 at 8:33=E2=80=AFAM Willem de Bruijn
-> > > <willemdebruijn.kernel@gmail.com> wrote:
-> > > >
-> > > > Yan Zhai wrote:
-> > > > > Commit 4094871db1d6 ("udp: only do GSO if # of segs > 1") avoid=
-ed GSO
-> > > > > for small packets. But the kernel currently dismisses GSO reque=
-sts only
-> > > > > after checking MTU on gso_size. This means any packets, regardl=
-ess of
-> > > > > their payload sizes, would be dropped when MTU is smaller than =
-requested
-> > > > > gso_size.
-> > > >
-> > > > Is this a realistic concern? How did you encounter this in practi=
-ce.
-> > > >
-> > > > It *is* a misconfiguration to configure a gso_size larger than MT=
-U.
-> > > >
-> > > > > Meanwhile, EINVAL would be returned in this case, making it
-> > > > > very misleading to debug.
-> > > >
-> > > > Misleading is subjective. I'm not sure what is misleading here. F=
-rom
-> > > > my above comment, I believe this is correctly EINVAL.
-> > > >
-> > > > That said, if this impacts a real workload we could reconsider
-> > > > relaxing the check. I.e., allowing through packets even when an
-> > > > application has clearly misconfigured UDP_SEGMENT.
-> > > >
-> > > We did encounter a painful reliability issue in production last mon=
-th.
-> > >
-> > > To simplify the scenario, we had these symptoms when the issue occu=
-rred:
-> > > 1. QUIC connections to host A started to fail, and cannot establish=
- new ones
-> > > 2. User space Wireguard to the exact same host worked 100% fine
-> > >
-> > > This happened rarely, like one or twice a day, lasting for a few
-> > > minutes usually, but it was quite visible since it is an office
-> > > network.
-> > >
-> > > Initially this prompted something wrong at the protocol layer. But
-> > > after multiple rounds of digging, we finally figured the root cause=
-
-> > > was:
-> > > 3. Something sometimes pings host B, which shares the same IP with
-> > > host A but different ports (thanks to limited IPv4 space), and its
-> > > PMTU was reduced to 1280 occasionally. This unexpectedly affected a=
-ll
-> > > traffic to that IP including traffic toward host A. Our QUIC client=
-
-> > > set gso_size to 1350, and that's why it got hit.
-> > >
-> > > I agree that configurations do matter a lot here. Given how broken =
-the
-> > > PMTU was for the Internet, we might just turn off pmtudisc option o=
-n
-> > > our end to avoid this failure path. But for those who hasn't yet, t=
-his
-> > > could still be confusing if it ever happens, because nothing seems =
-to
-> > > point to PMTU in the first place:
-> > > * small packets also get dropped
-> > > * error code was EINVAL from sendmsg
-> > >
-> > > That said, I probably should have used PMTU in my commit message to=
- be
-> > > more clear for our problem. But meanwhile I am also concerned about=
-
-> > > newly added tunnels to trigger the same issue, even if it has a sta=
-tic
-> > > device MTU. My proposal should make the error reason more clear:
-> > > EMSGSIZE itself is a direct signal pointing to MTU/PMTU. Larger
-> > > packets getting dropped would have a similar effect.
-> >
-> > Thanks for that context. Makes sense that this is a real issue.
-> >
-> > One issue is that with segmentation, the initial mtu checks are
-> > skipped, so they have to be enforced later. In __ip_append_data:
-> >
-> >     mtu =3D cork->gso_size ? IP_MAX_MTU : cork->fragsize;
-> >
-> You are right, if packet sizes are between (PMTU, gso_size), then they
-> should still be dropped. But instead of checking explicitly in
-> udp_send_skb, maybe we can leave them to be dropped in
-> ip_finish_output?
-
-Not sure how to do this, or whether it will be simpler than having all
-the UDP GSO checks in udp_send_skb.
-
-For a "don't add cost to the hot path" point of view, it's actually
-best to keep all these checks in one place only when UDP_SEGMENT is
-negotiated (where the hot path is the common case without GSO).
-
-> This way there is no need to add an extra branch for
-> non GSO code paths. PMTU shrinking should be rare, so the overhead
-> should be minimal.
+stsp wrote:
+> 29.01.2025 01:59, Willem de Bruijn =D0=BF=D0=B8=D1=88=D0=B5=D1=82:
+> > stsp wrote:
+> >> By doing that you indeed avoid
+> >> the problem of "completely
+> >> inaccessible tap". However, that
+> >> breaks my setup, as I really
+> >> intended to provide tap to the
+> >> owner and the unrelated group.
+> >> This is because, eg when setting
+> >> a CI job, you can add the needed
+> >> user to the needed group, but
+> >> you also need to re-login, which
+> >> is not always possible. :(
+> > Could you leave tun->owner unset?
 > =
 
-> > Also, might this make the debugging actually harder, as the
-> > error condition is now triggered intermittently.
-> Yes sendmsg may only return errors for a portion of packets now under
-> the same situation. But IMHO it's not trading debugging for
-> reliability. Consistent error is good news for engineers to reproduce
-> locally, but in production I find people (SREs, solution and
-> escalation engineers) rely on pcaps and errno a lot. The pattern in
-> pcaps (lack of large packets of certain sizes, since they are dropped
-> before dev_queue_xmit), and exact error reasons like EMSGSIZE are both
-> good indicators for root causes. EINVAL is more generic on the other
-> hand. For example, I remembered we had another issue on UDP sendmsg,
-> which also returned a bunch of EINVAL. But that was due to some
-> attacker tricking us to reply with source port 0.
+> That's exactly the problem: when
+> the user is not in the needed group,
+> then you need to unset _both_.
+> Unsetting only owner is not enough.
+> Adding the user to the group is not
+> enough because then you need to
+> re-login (bad for CI jobs).
 
-Relying on error code is fraught anyway. For online analysis (which
-I think can be assumed when pcap is mentioned), function tracing and
-bpf trace are much more powerful.
+At some point we can question whether the issue is with the setup,
+rather than the kernel mechanism.
 
-That said, no objections to returning EMSGSIZE instead of EINVAL. That
-is the same UDP returns when sending a single datagram that exceeds
-MTU, after all.
+Why does your setup have an initial user that lacks the group
+permissions of the later processes, and a tun instance that has both
+owner and group constraints set?
+
+Can this be fixed in userspace, rather than allow this odd case in the
+kernel. Is it baked deeply into common containerization tools, say?
+ =
+
+> I actually tried to address the
+> supplementary groups problem:
+> https://lore.kernel.org/lkml/20241108204102.1752206-1-stsp2@yandex.ru/T=
+/
+> but nothing came out, so I have
+> to walk around multiple projects,
+> talking them into a new semantics
+> and representing the problems
+> like this one. If people instead
+> concentrate on solving the inability
+> to change the supplementary group
+> list, nothing like this would ever
+> happen. :)
+> =
+
+> >> Also completely ignoring group
+> >> when the user is set, is somewhat
+> >> questionable. At the very least,
+> >> perhaps then you need to explicitly
+> >> clear the group when the user
+> >> is set, to avoid the confusion.
+> >> Having "either user or group"
+> >> sounds like a sensible semantic,
+> >> but its a different semantic.
+> > True. I think that would have satisfied the intent of adding the
+> > group check at the time, and would have avoided this situation.
+> >
+> > But we indeed cannot retroactively restrict allowed behavior.
+> > As that will break users.
+> >
+> > Conversely, it might be that an existing user out there depends on
+> > the prior behavior that only a process that matches both user and
+> > group can use the device. Which might be reason for reverting the
+> > patch entirely.
+> But this is not an option too, let
+> me remind the previous situation:
+> 1. If the user is in the group, then
+>  =C2=A0=C2=A0 the group doesn't have any effect
+>  =C2=A0=C2=A0 at all.
+> 2. if the user is not in the group -
+>  =C2=A0=C2=A0 no one can access the device.
+> =
+
+> "either-or" semantic is a direct fix
+> to that, as it represents case 1 and
+> fixes case 2. My semantic covers the
+> real-world situation of inability to
+> change the group list, but it needs
+> further tweaking and discussing.
+> Applying "either-or" may be feasible,
+> but the complete revert looks like
+> returning to a quite broken state.
+> =
+
+
 
 
