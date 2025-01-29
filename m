@@ -1,400 +1,281 @@
-Return-Path: <netdev+bounces-161475-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-161476-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id A4BC1A21C57
-	for <lists+netdev@lfdr.de>; Wed, 29 Jan 2025 12:32:00 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 355D0A21C5B
+	for <lists+netdev@lfdr.de>; Wed, 29 Jan 2025 12:33:48 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 056D0166979
-	for <lists+netdev@lfdr.de>; Wed, 29 Jan 2025 11:31:59 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 58EEA3A13A0
+	for <lists+netdev@lfdr.de>; Wed, 29 Jan 2025 11:33:40 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7DE881AF4E9;
-	Wed, 29 Jan 2025 11:31:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AACFE1B414E;
+	Wed, 29 Jan 2025 11:33:43 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="nU2nFaWk";
-	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="j1kw4YWE";
-	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="HV3JnNK4";
-	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="L3zKaIXh"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="CwoAvmkd"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp-out1.suse.de (smtp-out1.suse.de [195.135.223.130])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 282B2186615;
-	Wed, 29 Jan 2025 11:31:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.130
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 708161ABEC1;
+	Wed, 29 Jan 2025 11:33:43 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1738150301; cv=none; b=cKYQkBm9lrY7vkegz18CAUlpQ8PQ+R8/eH4OGFdYBT4pDliCIN92NhIXL8jy5ab0IU2mid/MKKx8/7gtbQqNQP1taZiKeJeGq0c8d/8ixdYpE8yezUsYRZPWPVdZCp4SljLwNDDGWY3rkI72sWYNKsLwGxs9VJAk38YloLX0VEU=
+	t=1738150423; cv=none; b=M+T6AppkfZXH+tUR/12/Li5wsK/HcYsCHtvsrI96mQ4QktA4Mu8JEBWZuvLtaQNuNdK1FTn8t+AF6UT34v7q3Brs8DukUv3IzUEUoGbSQLDTYe1dnovMf2w1NBnpfoYsltrBxP6kkFfTTqLOVVZR2uRsGojaG9F+sHGrPGFUpdw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1738150301; c=relaxed/simple;
-	bh=WUl8faxreAR5NMBCJ1M6ObnVZ59G1D8IoPaqQ74AJ1o=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=gU7l7PGJbLgpr+Vz0daq1GesC4TPOFEfaTL72P7EjbrH4G6rXGuNW1qsPKxBU7Iy8jDheEn7apXF4abJybtnsGX3gHe08BNCEwYDijoIpGWu+yVclJFSC6ncauQlokGliYU2zNYEt0EE/OdM1e0LAvLNoV7lRja03PV1Zx0hRK0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de; spf=pass smtp.mailfrom=suse.de; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=nU2nFaWk; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=j1kw4YWE; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=HV3JnNK4; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=L3zKaIXh; arc=none smtp.client-ip=195.135.223.130
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.de
-Received: from imap1.dmz-prg2.suse.org (imap1.dmz-prg2.suse.org [IPv6:2a07:de40:b281:104:10:150:64:97])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by smtp-out1.suse.de (Postfix) with ESMTPS id EF8BF210F7;
-	Wed, 29 Jan 2025 11:31:36 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-	t=1738150297; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=Gm6ZkWTIU04p43tALdfwd8iDD1PBnWsYZdHrDAB1F10=;
-	b=nU2nFaWkzOahH2RbEzX1MP1tFf2th6c0/rqe9JxI8yG7IS1xw5wa2Z/oJ4LAORbu2tbqTp
-	ntt9kL90u3KsR2LfCsw5fCxm0PZpZbGc6aX4Pc9VTK13fbRl3vVG9yKSlVtQeJHY+Qe6t4
-	Fz0B8CuvezUvBgbpEbBsXcuSzJOWncw=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-	s=susede2_ed25519; t=1738150297;
-	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=Gm6ZkWTIU04p43tALdfwd8iDD1PBnWsYZdHrDAB1F10=;
-	b=j1kw4YWEx74S9RkAT7eY6t4D6u2Z3VS8wKZ3KOI20Cw1XARFymibEOnH4fLZ9k2EQhI5A/
-	BYPhmMiaz4cjsEDA==
-Authentication-Results: smtp-out1.suse.de;
-	dkim=pass header.d=suse.de header.s=susede2_rsa header.b=HV3JnNK4;
-	dkim=pass header.d=suse.de header.s=susede2_ed25519 header.b=L3zKaIXh
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-	t=1738150296; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=Gm6ZkWTIU04p43tALdfwd8iDD1PBnWsYZdHrDAB1F10=;
-	b=HV3JnNK4w4Y4/uhTqrgfzJT0vZ+ksyfNfogjuG78leRGkSmx88aYUT3kHzrshhew9aqRQW
-	U89QWkaoO+pXK4IrJ4ypRppNHRo+1HuebXymKRaTtdsuFwYs5/TjtG1Ms+ex6WPe1yLDZm
-	mSuqriENMgm9YjOn2s8F4Ypey8b3w48=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-	s=susede2_ed25519; t=1738150296;
-	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=Gm6ZkWTIU04p43tALdfwd8iDD1PBnWsYZdHrDAB1F10=;
-	b=L3zKaIXhP8KijyNLmmlPMTRks2w8Q8RXl0SHU+DJGJ0yRzsMA3SupEsobZf2I9u5wuyL+A
-	mFo1RS6GJ7db47Dw==
-Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id C6571137DB;
-	Wed, 29 Jan 2025 11:31:36 +0000 (UTC)
-Received: from dovecot-director2.suse.de ([2a07:de40:b281:106:10:150:64:167])
-	by imap1.dmz-prg2.suse.org with ESMTPSA
-	id r3JpL5gRmmftYgAAD6G6ig
-	(envelope-from <tbogendoerfer@suse.de>); Wed, 29 Jan 2025 11:31:36 +0000
-Date: Wed, 29 Jan 2025 12:31:29 +0100
-From: Thomas Bogendoerfer <tbogendoerfer@suse.de>
-To: Eric Dumazet <edumazet@google.com>
-Cc: Paolo Abeni <pabeni@redhat.com>, "David S. Miller"
- <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, Simon Horman
- <horms@kernel.org>, netdev@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v2 net] gro_cells: Avoid packet re-ordering for cloned
- skbs
-Message-ID: <20250129123129.0c102586@samweis>
-In-Reply-To: <CANn89iJODT0+qe678jOfs4ssy10cNXg5ZsYbvgHKDYyZ6q_rgg@mail.gmail.com>
-References: <20250121115010.110053-1-tbogendoerfer@suse.de>
-	<3fe1299c-9aea-4d6a-b65b-6ac050769d6e@redhat.com>
-	<CANn89iLwOWvzZqN2VpUQ74a5BXRgvZH4_D2iesQBdnGWmZodcg@mail.gmail.com>
-	<de2d5f6e-9913-44c1-9f4e-3e274b215ebf@redhat.com>
-	<CANn89iJODT0+qe678jOfs4ssy10cNXg5ZsYbvgHKDYyZ6q_rgg@mail.gmail.com>
-X-Mailer: Claws Mail 4.3.0 (GTK 3.24.43; x86_64-suse-linux-gnu)
+	s=arc-20240116; t=1738150423; c=relaxed/simple;
+	bh=Mhxv2Loh+GGqlP2OneIojdbaaki81n2bu1IiKIVotSw=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=pkGipj2JS3CmcGnN6u3NwYFP9VQDpremnShSzj4v1Hs6SmElGwyALVm4mYIzxI/nca5Ynp2tKLJhUHFn0yq36m3bYGX/AF0SVluJFoCyXMxI8lmaz1xWryApf3R7X/M4YkCv1+mwuU3CF718ixKl89Gm1mwYcBKDFXSbm4MF7Hw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=CwoAvmkd; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2A501C4CED3;
+	Wed, 29 Jan 2025 11:33:39 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1738150423;
+	bh=Mhxv2Loh+GGqlP2OneIojdbaaki81n2bu1IiKIVotSw=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=CwoAvmkdvgqNosOM7q+TPi1Qv9awlSZZbxdiVZAAKt1K0CYR2QSJ/R1NUSjcFKvJl
+	 /pS84KGdD0FbZ7dO29Xq+fxjujyH2w5kpA4cS+Z5A81yuc79hv0exScg9ERLHw7C8g
+	 oZtYPo7bnDt9+zemfdidvr5hF3XU+TYl3LI/LZj/1gfJuXpzeZr8SMf/JspvPlhEkW
+	 T8c/c9Q2lNig7WHKNHAaiEzzFmcNK3emL9xA1OwtnB93vqHGFVq3Tb0neKMI50Z5Vo
+	 LOHT0jQSuo8zIZBT53b36l1t+sKDnoN5Z1KrAzKWgHEFAAC+rjIdpdwOfGb9SEdhuB
+	 A6eBcAeHICwGA==
+Message-ID: <1d1d58b3-2516-4fc8-9f9a-b10604bbe05b@kernel.org>
+Date: Wed, 29 Jan 2025 12:33:27 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird Beta
+Subject: Re: [RFC PATCH v2 1/8] landlock: Fix non-TCP sockets restriction
+Content-Language: en-GB
+To: Mikhail Ivanov <ivanov.mikhail1@huawei-partners.com>,
+ =?UTF-8?Q?Micka=C3=ABl_Sala=C3=BCn?= <mic@digikod.net>
+Cc: gnoack@google.com, willemdebruijn.kernel@gmail.com, matthieu@buffet.re,
+ linux-security-module@vger.kernel.org, netdev@vger.kernel.org,
+ netfilter-devel@vger.kernel.org, yusongping@huawei.com,
+ artem.kuzin@huawei.com, konstantin.meskhidze@huawei.com,
+ MPTCP Linux <mptcp@lists.linux.dev>, linux-nfs@vger.kernel.org,
+ Paul Moore <paul@paul-moore.com>
+References: <20241017110454.265818-1-ivanov.mikhail1@huawei-partners.com>
+ <20241017110454.265818-2-ivanov.mikhail1@huawei-partners.com>
+ <49bc2227-d8e1-4233-8bc4-4c2f0a191b7c@kernel.org>
+ <20241018.Kahdeik0aaCh@digikod.net>
+ <62336067-18c2-3493-d0ec-6dd6a6d3a1b5@huawei-partners.com>
+ <20241212.qua0Os3sheev@digikod.net>
+ <f480bbea-989d-378a-9493-c2bee412db00@huawei-partners.com>
+ <20250124.gaegoo0Ayahn@digikod.net>
+ <2f970b00-7648-1865-858a-214c5c6af0c4@huawei-partners.com>
+ <20250127.Uph4aiph9jae@digikod.net>
+ <d3d589c3-a70b-fc6e-e1bb-d221833dfef5@huawei-partners.com>
+ <594263fc-f4e7-43ce-a613-d3f8ebb7f874@kernel.org>
+ <f6e72e71-c5ed-8a9c-f33e-f190a47b8c27@huawei-partners.com>
+ <2e727df0-c981-4e0c-8d0d-09109cf27d6f@kernel.org>
+ <103de503-be0e-2eb2-b6f0-88567d765148@huawei-partners.com>
+From: Matthieu Baerts <matttbe@kernel.org>
+Autocrypt: addr=matttbe@kernel.org; keydata=
+ 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
+ lzVbFe7fduHbABmYz9cefQpO7wDE/Q==
+Organization: NGI0 Core
+In-Reply-To: <103de503-be0e-2eb2-b6f0-88567d765148@huawei-partners.com>
 Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-X-Rspamd-Queue-Id: EF8BF210F7
-X-Spam-Level: 
-X-Spamd-Result: default: False [-4.01 / 50.00];
-	BAYES_HAM(-3.00)[100.00%];
-	NEURAL_HAM_LONG(-1.00)[-1.000];
-	MID_RHS_NOT_FQDN(0.50)[];
-	R_DKIM_ALLOW(-0.20)[suse.de:s=susede2_rsa,suse.de:s=susede2_ed25519];
-	NEURAL_HAM_SHORT(-0.20)[-1.000];
-	MIME_GOOD(-0.10)[text/plain];
-	MX_GOOD(-0.01)[];
-	FUZZY_BLOCKED(0.00)[rspamd.com];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	ASN(0.00)[asn:25478, ipnet:::/0, country:RU];
-	ARC_NA(0.00)[];
-	MIME_TRACE(0.00)[0:+];
-	RCPT_COUNT_SEVEN(0.00)[7];
-	RCVD_TLS_ALL(0.00)[];
-	DKIM_SIGNED(0.00)[suse.de:s=susede2_rsa,suse.de:s=susede2_ed25519];
-	FROM_EQ_ENVFROM(0.00)[];
-	FROM_HAS_DN(0.00)[];
-	TO_DN_SOME(0.00)[];
-	RCVD_COUNT_TWO(0.00)[2];
-	TO_MATCH_ENVRCPT_ALL(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[suse.de:dkim,suse.de:email,imap1.dmz-prg2.suse.org:helo,imap1.dmz-prg2.suse.org:rdns];
-	DKIM_TRACE(0.00)[suse.de:+]
-X-Rspamd-Server: rspamd2.dmz-prg2.suse.org
-X-Rspamd-Action: no action
-X-Spam-Score: -4.01
-X-Spam-Flag: NO
+Content-Transfer-Encoding: 8bit
 
-On Thu, 23 Jan 2025 11:43:05 +0100
-Eric Dumazet <edumazet@google.com> wrote:
+On 29/01/2025 12:02, Mikhail Ivanov wrote:
+> On 1/29/2025 1:25 PM, Matthieu Baerts wrote:
+>> Hi Mikhail,
+>>
+>> On 29/01/2025 10:52, Mikhail Ivanov wrote:
+>>> On 1/28/2025 9:14 PM, Matthieu Baerts wrote:
+>>>> Hi Mikhail,
+>>>>
+>>>> Sorry, I didn't follow all the discussions in this thread, but here are
+>>>> some comments, hoping this can help to clarify the MPTCP case.
+>>>
+>>> Thanks a lot for sharing your knowledge, Matthieu!
+>>>
+>>>>
+>>>> On 28/01/2025 11:56, Mikhail Ivanov wrote:
+>>>>> On 1/27/2025 10:48 PM, Mickaël Salaün wrote:
+>>>>
+>>>> (...)
+>>>>
+>>>>>> I'm a bit worried that we miss some of these places (now or in future
+>>>>>> kernel versions).  We'll need a new LSM hook for that.
+>>>>>>
+>>>>>> Could you list the current locations?
+>>>>>
+>>>>> Currently, I know only about TCP-related transformations:
+>>>>>
+>>>>> * SMC can fallback to TCP during connection. TCP connection is used
+>>>>>     (1) to exchange CLC control messages in default case and (2)
+>>>>> for the
+>>>>>     communication in the case of fallback. If socket was connected or
+>>>>>     connection failed, socket can not be reconnected again. There
+>>>>> is no
+>>>>>     existing security hook to control the fallback case,
+>>>>>
+>>>>> * MPTCP uses TCP for communication between two network interfaces
+>>>>> in the
+>>>>>     default case and can fallback to plain TCP if remote peer does not
+>>>>>     support MPTCP. AFAICS, there is also no security hook to
+>>>>> control the
+>>>>>     fallback transformation,
+>>>>
+>>>> There are security hooks to control the path creation, but not to
+>>>> control the "fallback transformation".
+>>>>
+>>>> Technically, with MPTCP, the userspace will create an IPPROTO_MPTCP
+>>>> socket. This is only used "internally": to communicate between the
+>>>> userspace and the kernelspace, but not directly used between network
+>>>> interfaces. This "external" communication is done via one or multiple
+>>>> kernel TCP sockets carrying extra TCP options for the mapping. The
+>>>> userspace cannot directly control these sockets created by the kernel.
+>>>>
+>>>> In case of fallback, the kernel TCP socket "simply" drop the extra TCP
+>>>> options needed for MPTCP, and carry on like normal TCP. So on the wire
+>>>> and in the Linux network stack, it is the same TCP connection, without
+>>>> the MPTCP options in the TCP header. The userspace continue to
+>>>> communicate with the same socket.
+>>>>
+>>>> I'm not sure if there is a need to block the fallback: it means only
+>>>> one
+>>>> path can be used at a time.
+>>>
+>>> You mean that users always rely on a plain TCP communication in the case
+>>> the connection of MPTCP multipath communication fails?
+>>
+>> Yes, that's the same TCP connection, just without extra bit to be able
+>> to use multiple TCP connections associated to the same MPTCP one.
+> 
+> Indeed, so MPTCP communication should be restricted the same way as TCP.
+> AFAICS this should be intuitive for MPTCP users and it'll be better
+> to let userland define this dependency.
 
-> On Thu, Jan 23, 2025 at 11:42=E2=80=AFAM Paolo Abeni <pabeni@redhat.com> =
-wrote:
-> >
-> > On 1/23/25 11:07 AM, Eric Dumazet wrote: =20
-> > > On Thu, Jan 23, 2025 at 9:43=E2=80=AFAM Paolo Abeni <pabeni@redhat.co=
-m> wrote: =20
-> > >> On 1/21/25 12:50 PM, Thomas Bogendoerfer wrote: =20
-> > >>> gro_cells_receive() passes a cloned skb directly up the stack and
-> > >>> could cause re-ordering against segments still in GRO. To avoid
-> > >>> this queue cloned skbs and use gro_normal_one() to pass it during
-> > >>> normal NAPI work.
-> > >>>
-> > >>> Fixes: c9e6bc644e55 ("net: add gro_cells infrastructure")
-> > >>> Suggested-by: Eric Dumazet <edumazet@google.com>
-> > >>> Signed-off-by: Thomas Bogendoerfer <tbogendoerfer@suse.de>
-> > >>> --
-> > >>> v2: don't use skb_copy(), but make decision how to pass cloned skbs=
- in
-> > >>>     napi poll function (suggested by Eric)
-> > >>> v1: https://lore.kernel.org/lkml/20250109142724.29228-1-tbogendoerf=
-er@suse.de/
-> > >>>
-> > >>>  net/core/gro_cells.c | 9 +++++++--
-> > >>>  1 file changed, 7 insertions(+), 2 deletions(-)
-> > >>>
-> > >>> diff --git a/net/core/gro_cells.c b/net/core/gro_cells.c
-> > >>> index ff8e5b64bf6b..762746d18486 100644
-> > >>> --- a/net/core/gro_cells.c
-> > >>> +++ b/net/core/gro_cells.c
-> > >>> @@ -2,6 +2,7 @@
-> > >>>  #include <linux/skbuff.h>
-> > >>>  #include <linux/slab.h>
-> > >>>  #include <linux/netdevice.h>
-> > >>> +#include <net/gro.h>
-> > >>>  #include <net/gro_cells.h>
-> > >>>  #include <net/hotdata.h>
-> > >>>
-> > >>> @@ -20,7 +21,7 @@ int gro_cells_receive(struct gro_cells *gcells, s=
-truct sk_buff *skb)
-> > >>>       if (unlikely(!(dev->flags & IFF_UP)))
-> > >>>               goto drop;
-> > >>>
-> > >>> -     if (!gcells->cells || skb_cloned(skb) || netif_elide_gro(dev)=
-) {
-> > >>> +     if (!gcells->cells || netif_elide_gro(dev)) {
-> > >>>               res =3D netif_rx(skb);
-> > >>>               goto unlock;
-> > >>>       }
-> > >>> @@ -58,7 +59,11 @@ static int gro_cell_poll(struct napi_struct *nap=
-i, int budget)
-> > >>>               skb =3D __skb_dequeue(&cell->napi_skbs);
-> > >>>               if (!skb)
-> > >>>                       break;
-> > >>> -             napi_gro_receive(napi, skb);
-> > >>> +             /* Core GRO stack does not play well with clones. */
-> > >>> +             if (skb_cloned(skb))
-> > >>> +                     gro_normal_one(napi, skb, 1);
-> > >>> +             else
-> > >>> +                     napi_gro_receive(napi, skb); =20
-> > >>
-> > >> I must admit it's not clear to me how/why the above will avoid OoO. I
-> > >> assume OoO happens when we observe both cloned and uncloned packets
-> > >> belonging to the same connection/flow.
-> > >>
-> > >> What if we have a (uncloned) packet for the relevant flow in the GRO,
-> > >> 'rx_count - 1' packets already sitting in 'rx_list' and a cloned pac=
-ket
-> > >> for the critical flow reaches gro_cells_receive()?
-> > >>
-> > >> Don't we need to unconditionally flush any packets belonging to the =
-same
-> > >> flow? =20
-> > >
-> > > It would only matter if we had 2 or more segments that would belong
-> > > to the same flow and packet train (potential 'GRO super packet'), with
-> > > the 'cloned'
-> > > status being of mixed value on various segments.
-> > >
-> > > In practice, the cloned status will be the same for all segments. =20
-> >
-> > I agree with the above, but my doubt is: does the above also mean that
-> > in practice there are no OoO to deal with, even without this patch?
-> >
-> > To rephrase my doubt: which scenario is addressed by this patch that
-> > would lead to OoO without it? =20
->=20
-> Fair point, a detailed changelog would be really nice.
+Yes, I think that would make more sense.
 
-My test scenario is simple:
+I guess we can look at MPTCP as TCP with extra features.
 
-TCP Sender in namespace A -> ip6_tunnel -> ipvlan -> ipvlan -> ip6_tunnel -=
-> TCP receiver
+So if TCP is blocked, MPTCP should be blocked as well. (And eventually
+having the possibility to block only TCP but not MPTCP and the opposite,
+but that's a different topic: a possible new feature, but not a bug-fix)
 
-Sender does continuous writes in 15k chunks, receiver reads data from socke=
-t in a loop.
+>>>>> * IPv6 -> IPv4 transformation for TCP and UDP sockets withon
+>>>>>     IPV6_ADDRFORM. Can be controlled with setsockopt() security hook.
+>>>>>
+>>>>> As I said before, I wonder if user may want to use SMC or MPTCP and
+>>>>> deny
+>>>>> TCP communication, since he should rely on fallback transformation
+>>>>> during the connection in the common case. It may be unexpected for
+>>>>> connect(2) to fail during the fallback due to security politics.
+>>>>
+>>>> With MPTCP, fallbacks can happen at the beginning of a connection, when
+>>>> there is only one path. This is done after the userspace's
+>>>> connect(). If
+>>>> the fallback is blocked, I guess the userspace will get the same errors
+>>>> as when an open connection is reset.
+>>>
+>>> In the case of blocking due to security policy, userspace should get
+>>> -EACESS. I mean, the user might not expect the fallback path to be
+>>> blocked during the connection if he has allowed only MPTCP communication
+>>> using the Landlock policy.
+>>
+>> A "fallback" can happen on different occasions as mentioned in the
+>> RFC8684 [1], e.g.
+>>
+>> - The client asks to use MPTCP, but the other peer doesn't support it:
+>>
+>>    Client                Server
+>>    |     SYN + MP_CAPABLE     |
+>>    |------------------------->|
+>>    |         SYN/ACK          |
+>>    |<-------------------------|  => Fallback on the client side
+>>    |           ACK            |
+>>    |------------------------->|
+>>
+>> - A middle box doesn't touch the 3WHS, but intercept the communication
+>> just after:
+>>
+>>    Client                Server
+>>    |     SYN + MP_CAPABLE     |
+>>    |------------------------->|
+>>    |   SYN/ACK + MP_CAPABLE   |
+>>    |<-------------------------|
+>>    |     ACK + MP_CAPABLE     |
+>>    |------------------------->|
+>>    |        DSS + data        | => but the server doesn't receive the DSS
+>>    |------------------------->| => So fallback on the server side
+>>    |           ACK            |
+>>    |<-------------------------| => Fallback on the client side
+>>
+>> - etc.
+>>
+>> So the connect(), even in blocking mode, can be OK, but the "fallback"
+>> will happen later.
+> 
+> Thanks! Theoretical "socket transformation" control should cover all
+> these cases.
+> 
+> You mean that it might be reasonable for a Landlock policy to block
+> MPTCP fallback when establishing first sublflow (when client does not
+> receive MP_CAPABLE)?
 
-And that is what I see:
+Personally, I don't even know if there is really a need for such
+policies. The fallback is there not to block a connection if the other
+peer doesn't support MPTCP, or if a middlebox decides to mess-up with
+MPTCP options. So instead of an error, the connection continues but is
+"degraded" by not being able to create multiple paths later on.
 
-   40   0.002766      1000::1 =E2=86=92 2000::1      TCP 15088 51238 =E2=86=
-=92 5060 [PSH, ACK] Seq=3D2862576060 Ack=3D1152583678 Win=3D65536 Len=3D150=
-00 TSval=3D3343493494 TSecr=3D629171944
-   41   0.002844      1000::1 =E2=86=92 2000::1      TCP 9816 51238 =E2=86=
-=92 5060 [PSH, ACK] Seq=3D2862591060 Ack=3D1152583678 Win=3D65536 Len=3D972=
-8 TSval=3D3343493494 TSecr=3D629171944
-   42   0.004122      1000::1 =E2=86=92 2000::1      TCP 1468 [TCP Previous=
- segment not captured] 51238 =E2=86=92 5060 [ACK] Seq=3D2862642188 Ack=3D11=
-52583678 Win=3D65536 Len=3D1380 TSval=3D3343493496 TSecr=3D629171946
-   43   0.004128      1000::1 =E2=86=92 2000::1      TCP 20788 [TCP Out-Of-=
-Order] 51238 =E2=86=92 5060 [PSH, ACK] Seq=3D2862600788 Ack=3D1152583678 Wi=
-n=3D65536 Len=3D20700 TSval=3D3343493496 TSecr=3D629171946
-   44   0.004133      1000::1 =E2=86=92 2000::1      TCP 20788 [TCP Out-Of-=
-Order] 51238 =E2=86=92 5060 [PSH, ACK] Seq=3D2862621488 Ack=3D1152583678 Wi=
-n=3D65536 Len=3D20700 TSval=3D3343493496 TSecr=3D629171946
-   45   0.004169      1000::1 =E2=86=92 2000::1      TCP 500 [TCP Previous =
-segment not captured] 51238 =E2=86=92 5060 [PSH, ACK] Seq=3D2862665648 Ack=
-=3D1152583678 Win=3D65536 Len=3D412 TSval=3D3343493496 TSecr=3D629171946
-   46   0.004180      1000::1 =E2=86=92 2000::1      TCP 22168 [TCP Out-Of-=
-Order] 51238 =E2=86=92 5060 [PSH, ACK] Seq=3D2862643568 Ack=3D1152583678 Wi=
-n=3D65536 Len=3D22080 TSval=3D3343493496 TSecr=3D629171946
-   47   0.004187      1000::1 =E2=86=92 2000::1      TCP 13888 51238 =E2=86=
-=92 5060 [PSH, ACK] Seq=3D2862666060 Ack=3D1152583678 Win=3D65536 Len=3D138=
-00 TSval=3D3343493496 TSecr=3D629171946
-   48   0.004201      1000::1 =E2=86=92 2000::1      TCP 1288 51238 =E2=86=
-=92 5060 [PSH, ACK] Seq=3D2862679860 Ack=3D1152583678 Win=3D65536 Len=3D120=
-0 TSval=3D3343493496 TSecr=3D629171946
-   49   0.004273      1000::1 =E2=86=92 2000::1      TCP 13888 51238 =E2=86=
-=92 5060 [PSH, ACK] Seq=3D2862681060 Ack=3D1152583678 Win=3D65536 Len=3D138=
-00 TSval=3D3343493496 TSecr=3D629171946
+Maybe best to wait for a concrete use-case before implementing this?
 
-IMHO these ooO are retransmits for segments still waiting in GRO. With the
-v2 patch this looks applied trace looks like this:
+(...)
 
- 2856   9.526256      1000::1 =E2=86=92 2000::1      TCP 64948 50452 =E2=86=
-=92 5060 [PSH, ACK] Seq=3D1871837193 Ack=3D209151777 Win=3D65536 Len=3D6486=
-0 TSval=3D2755210164 TSecr=3D2795235137
- 2857   9.526258      1000::1 =E2=86=92 2000::1      TCP 5480 50452 =E2=86=
-=92 5060 [PSH, ACK] Seq=3D1871902053 Ack=3D209151777 Win=3D65536 Len=3D5392=
- TSval=3D2755210164 TSecr=3D2795235137
- 2858   9.535262      1000::1 =E2=86=92 2000::1      TCP 1340 [TCP Retransm=
-ission] 50452 =E2=86=92 5060 [ACK] Seq=3D1871906193 Ack=3D209151777 Win=3D6=
-5536 Len=3D1252 TSval=3D2755210174 TSecr=3D2795235137
- 2859   9.585477      1000::1 =E2=86=92 2000::1      TCP 64948 50452 =E2=86=
-=92 5060 [PSH, ACK] Seq=3D1871907445 Ack=3D209151777 Win=3D65536 Len=3D6486=
-0 TSval=3D2755210224 TSecr=3D2795235197
- 2860   9.585486      1000::1 =E2=86=92 2000::1      TCP 64948 50452 =E2=86=
-=92 5060 [PSH, ACK] Seq=3D1871972305 Ack=3D209151777 Win=3D65536 Len=3D6486=
-0 TSval=3D2755210224 TSecr=3D2795235197
+Cheers,
+Matt
+-- 
+Sponsored by the NGI0 Core fund.
 
-Looks ok to me, but without a GRO flush there is still a chance of ooO pack=
-ets.
-I've worked on a new patch (below as a RFC) which pushes the check for skb_=
-cloned()
-into GRO. Result is comparable to the v2 patch:
-
-  604   1.987863      1000::1 =E2=86=92 2000::1      TCP 64948 57278 =E2=86=
-=92 5060 [PSH, ACK] Seq=3D1220895319 Ack=3D1484877190 Win=3D65536 Len=3D648=
-60 TSval=3D646104760 TSecr=3D459787214
-  605   1.987866      1000::1 =E2=86=92 2000::1      TCP 16488 57278 =E2=86=
-=92 5060 [PSH, ACK] Seq=3D1220960179 Ack=3D1484877190 Win=3D65536 Len=3D164=
-00 TSval=3D646104760 TSecr=3D459787214
-  606   1.998231      1000::1 =E2=86=92 2000::1      TCP 1308 [TCP Retransm=
-ission] 57278 =E2=86=92 5060 [ACK] Seq=3D1220975359 Ack=3D1484877190 Win=3D=
-65536 Len=3D1220 TSval=3D646104771 TSecr=3D459787214
-  607   2.049288      1000::1 =E2=86=92 2000::1      TCP 64948 57278 =E2=86=
-=92 5060 [PSH,
-  ACK] Seq=3D1220976579 Ack=3D1484877190 Win=3D65536 Len=3D64860 TSval=3D64=
-6104822
-  TSecr=3D459787276
-  608   2.049304      1000::1 =E2=86=92 2000::1      TCP 64948 57278 =E2=86=
-=92 5060 [PSH,
-  ACK] Seq=3D1221041439 Ack=3D1484877190 Win=3D65536 Len=3D64860 TSval=3D64=
-6104822
-  TSecr=3D459787276
-
-
-
-diff --git a/net/core/gro_cells.c b/net/core/gro_cells.c
-index ff8e5b64bf6b..06e6889138ba 100644
---- a/net/core/gro_cells.c
-+++ b/net/core/gro_cells.c
-@@ -20,7 +20,7 @@ int gro_cells_receive(struct gro_cells *gcells, struct sk=
-_buff *skb)
- 	if (unlikely(!(dev->flags & IFF_UP)))
- 		goto drop;
-=20
--	if (!gcells->cells || skb_cloned(skb) || netif_elide_gro(dev)) {
-+	if (!gcells->cells || netif_elide_gro(dev)) {
- 		res =3D netif_rx(skb);
- 		goto unlock;
- 	}
-diff --git a/net/ipv4/tcp_offload.c b/net/ipv4/tcp_offload.c
-index 2308665b51c5..66a2bb849e85 100644
---- a/net/ipv4/tcp_offload.c
-+++ b/net/ipv4/tcp_offload.c
-@@ -322,6 +322,12 @@ struct sk_buff *tcp_gro_receive(struct list_head *head=
-, struct sk_buff *skb,
- 	if (!p)
- 		goto out_check_final;
-=20
-+	if (unlikely(skb_cloned(skb))) {
-+		NAPI_GRO_CB(skb)->flush |=3D 1;
-+		NAPI_GRO_CB(skb)->same_flow =3D 0;
-+		return p;
-+	}
-+
- 	th2 =3D tcp_hdr(p);
- 	flush =3D (__force int)(flags & TCP_FLAG_CWR);
- 	flush |=3D (__force int)((flags ^ tcp_flag_word(th2)) &
-diff --git a/net/ipv4/udp_offload.c b/net/ipv4/udp_offload.c
-index a5be6e4ed326..a9c85b0556ce 100644
---- a/net/ipv4/udp_offload.c
-+++ b/net/ipv4/udp_offload.c
-@@ -647,6 +647,11 @@ struct sk_buff *udp4_gro_receive(struct list_head *hea=
-d, struct sk_buff *skb)
- 	struct sock *sk =3D NULL;
- 	struct sk_buff *pp;
-=20
-+	if (unlikely(skb_cloned(skb))) {
-+		NAPI_GRO_CB(skb)->same_flow =3D 0;
-+		goto flush;
-+	}
-+
- 	if (unlikely(!uh))
- 		goto flush;
-=20
-diff --git a/net/ipv6/udp_offload.c b/net/ipv6/udp_offload.c
-index b41152dd4246..b754747e3e8a 100644
---- a/net/ipv6/udp_offload.c
-+++ b/net/ipv6/udp_offload.c
-@@ -134,6 +134,11 @@ struct sk_buff *udp6_gro_receive(struct list_head *hea=
-d, struct sk_buff *skb)
- 	struct sock *sk =3D NULL;
- 	struct sk_buff *pp;
-=20
-+	if (unlikely(skb_cloned(skb))) {
-+		NAPI_GRO_CB(skb)->same_flow =3D 0;
-+		goto flush;
-+	}
-+
- 	if (unlikely(!uh))
- 		goto flush;
-=20
-
-What do you think about this approach ?
-
-Thomas.
-
---=20
-SUSE Software Solutions Germany GmbH
-HRB 36809 (AG N=C3=BCrnberg)
-Gesch=C3=A4ftsf=C3=BChrer: Ivo Totev, Andrew McDonald, Werner Knoblich
 
