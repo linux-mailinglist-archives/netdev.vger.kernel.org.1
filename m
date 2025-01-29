@@ -1,244 +1,213 @@
-Return-Path: <netdev+bounces-161479-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-161480-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 45711A21C70
-	for <lists+netdev@lfdr.de>; Wed, 29 Jan 2025 12:47:34 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7CE2CA21C84
+	for <lists+netdev@lfdr.de>; Wed, 29 Jan 2025 12:53:23 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 68ADB3A2EDA
-	for <lists+netdev@lfdr.de>; Wed, 29 Jan 2025 11:47:26 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D0B62164608
+	for <lists+netdev@lfdr.de>; Wed, 29 Jan 2025 11:53:21 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 57CB51EEE6;
-	Wed, 29 Jan 2025 11:47:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 27D671B4141;
+	Wed, 29 Jan 2025 11:53:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="t+eB32Wr"
 X-Original-To: netdev@vger.kernel.org
-Received: from frasgout.his.huawei.com (frasgout.his.huawei.com [185.176.79.56])
+Received: from NAM12-DM6-obe.outbound.protection.outlook.com (mail-dm6nam12on2040.outbound.protection.outlook.com [40.107.243.40])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 642585672;
-	Wed, 29 Jan 2025 11:47:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.176.79.56
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1738151249; cv=none; b=FBpy17sPu4wHHnKg8Ju550D5Rs+nJ/0kt0dqcS/kaW8sOZkrIOLrpnt0XxScjhB1gfxaNwM/DX+DqWGI0Di7ygQ0+ASqCcudEAVXkaXxSipnahrSjbsYyb1JHKxPuX+03DjUebaE4R+2Q6SdkQoPbq8gE5UkNJpUL/YYjRCzqus=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1738151249; c=relaxed/simple;
-	bh=haK7g3FTLV1yMkxYGmT0vm14Le3zJednLqBUS/94VVg=;
-	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
-	 In-Reply-To:Content-Type; b=VqD/c0Wn04hYSM1swYSz4SGL/XVRlCgWvIwOxYIxHtFqNNotOaT9lrYv2eNz18Xw53ZTX1aJqz+jRcm1XcCXhqF2VIQWx4FVtpLBRnVjH29Ff+p8AxQ901OV+xCY8kXq2nl7b8oe1Lo2/2vjo+OSBrC/ujiilKnzn5x+p7sbWaA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei-partners.com; spf=pass smtp.mailfrom=huawei-partners.com; arc=none smtp.client-ip=185.176.79.56
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei-partners.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei-partners.com
-Received: from mail.maildlp.com (unknown [172.18.186.231])
-	by frasgout.his.huawei.com (SkyGuard) with ESMTP id 4YjgM24ncTz6D9DX;
-	Wed, 29 Jan 2025 19:45:18 +0800 (CST)
-Received: from mscpeml500004.china.huawei.com (unknown [7.188.26.250])
-	by mail.maildlp.com (Postfix) with ESMTPS id 00380140B30;
-	Wed, 29 Jan 2025 19:47:24 +0800 (CST)
-Received: from [10.123.123.159] (10.123.123.159) by
- mscpeml500004.china.huawei.com (7.188.26.250) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1258.34; Wed, 29 Jan 2025 14:47:21 +0300
-Message-ID: <b9823ff1-2f66-3992-b389-b8e631ec03ba@huawei-partners.com>
-Date: Wed, 29 Jan 2025 14:47:19 +0300
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 85B2A1B5EA4
+	for <netdev@vger.kernel.org>; Wed, 29 Jan 2025 11:53:17 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.243.40
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1738151599; cv=fail; b=S5oog1vglU0arlu+jRC0xlwXnTeQAIKSG4AAOx/3p4WTbyejfeNx18dwVQW3zoQFnFLQbW0ECbN5sq7AGwZ6386FKnaQtKQJW7scWXr4S2/VmOBpHq/9QiaEJeSuCmGGo1z+tpF72jfgDyqIu655r2jEDw+T0Aioyidnc8kJPr8=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1738151599; c=relaxed/simple;
+	bh=2HuKOFJqlcszMZ8qTxOdAL0mzJbITW2tA1YBbPdwGxs=;
+	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
+	 Content-Type:MIME-Version; b=TEZzn0VXoAlXbYMtu1POyzsTQ5mTyWKyAeoZW7T5UrNW3IfAdE5Ukwdqk3rPNP/sBgOXn3ZPqcNF3tv/4olcKjBXm5unY0JQAHQQiUW66Z28LYkwgT9Mh80okua2y4HFh+RqNPBPC75BlvjqBaMx9prKe1VCcXWcONSZ2Vxw9bA=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=t+eB32Wr; arc=fail smtp.client-ip=40.107.243.40
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=ih1zo65XTBDdS0Fpjzksqcef9erYoB63NxRjQz31vojmMGCEurRYKxp/7wufNgQso3sRy0lJBsSv7EIYUko+kYw2Px6nkIoVGrGT3q7TNi0dP9L7kypMhzcBvZDjpv65Ygb7IBSNwx1FBhvWHF+Jv2qROnBh0IfcZ1Y6nVI04ra86Z9m99c9/5org2Dz0s+0ZjjUEgCZvTPDj/h2bNJFDCPfcxtnvJcdQrvfpBinmlEg/rTaatlB5ynMW9aCVLlVFbKzSPQe022Euw75HmoJF64hYSnYO0g+tE6uy3to0PI9fIIisic2Din0eT36z81U1ohhG/vWh21PawIBgo/dIg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=2HuKOFJqlcszMZ8qTxOdAL0mzJbITW2tA1YBbPdwGxs=;
+ b=YXRjw6Ja4s8YOfVI+59KLRH6Q1Te49xwCPYNRQ1z0sXIIA7c019OwcSvtxnwAE3ZDhsGa2R+8qQAi6vVLfY/8T/vHw28FzSRmRnTTCd0HKfkkYpc/EHsIhWowbCT1G0/YnIdToSv035/3T9XNTnEo8iH2WgqdfK9dRiir2sxoZ8drRLbLcAm6kUr2AxMN0wTWtjEvlnWwfzNYxge7Hht8114itBX10roEtxaqiCgJofSB0yTGTSqsKl5FZNfLj2/8jCHi+HDsINeI7M5TCsSbDEfRYroqi4nJ6cIYwNvcL/PuMvXylsZn5jvMLxeyi0/oUlglk2ZR7Dj0JUsyq9+mg==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
+ dkim=pass header.d=nvidia.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=2HuKOFJqlcszMZ8qTxOdAL0mzJbITW2tA1YBbPdwGxs=;
+ b=t+eB32WrsBtC/zV6b4/VBcoJwnC0bLwQw/RJjwfXYfL+p45/XPtJFYROk7PqSE0iEzNn1X2yL2MjrEE8DfNDvFporFMJWb0fHpgOZsnyBhU0biqUwak2t30IHxC2aYD0MAlt3zb2VG6JkwPouuAuMumkqeMkAeo70ggVeoUKFSQY86vZ4v9yyKqgLPPiZvAVNzYWnCQ/Hg045RtfyenqjIC9QWZRXkPA2ZNTthMkqeX+EhaPJGSXFhrHmplj9U8dqMMAj43ROSov6tzJjQyBF1PYkjjH5H6sQOEWV8mRL602G6aTe7Wa0ypyB6fqjjiXV1Y9p/UVrGqs4l31YezBVA==
+Received: from DM6PR12MB4516.namprd12.prod.outlook.com (2603:10b6:5:2ac::20)
+ by DS0PR12MB6629.namprd12.prod.outlook.com (2603:10b6:8:d3::15) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8398.20; Wed, 29 Jan
+ 2025 11:53:14 +0000
+Received: from DM6PR12MB4516.namprd12.prod.outlook.com
+ ([fe80::43e9:7b19:9e11:d6bd]) by DM6PR12MB4516.namprd12.prod.outlook.com
+ ([fe80::43e9:7b19:9e11:d6bd%5]) with mapi id 15.20.8398.017; Wed, 29 Jan 2025
+ 11:53:14 +0000
+From: Danielle Ratson <danieller@nvidia.com>
+To: Petr Machata <petrm@nvidia.com>, Jakub Kicinski <kuba@kernel.org>
+CC: "netdev@vger.kernel.org" <netdev@vger.kernel.org>, "mkubecek@suse.cz"
+	<mkubecek@suse.cz>, "matt@traverse.com.au" <matt@traverse.com.au>,
+	"daniel.zahka@gmail.com" <daniel.zahka@gmail.com>, Amit Cohen
+	<amcohen@nvidia.com>, NBU-mlxsw <NBU-mlxsw@exchange.nvidia.com>
+Subject: RE: [PATCH ethtool-next 09/14] qsfp: Add JSON output handling to
+ --module-info in SFF8636 modules
+Thread-Topic: [PATCH ethtool-next 09/14] qsfp: Add JSON output handling to
+ --module-info in SFF8636 modules
+Thread-Index: AQHbb+l5fdqqldfRAUu+2iXPDyW3KrMrEMQAgAEdyvCAAWcnAIAAEvmQ
+Date: Wed, 29 Jan 2025 11:53:14 +0000
+Message-ID:
+ <DM6PR12MB45160F2C04E1644F8384BBACD8EE2@DM6PR12MB4516.namprd12.prod.outlook.com>
+References: <20250126115635.801935-1-danieller@nvidia.com>
+ <20250126115635.801935-10-danieller@nvidia.com>
+ <20250127121606.0c9ace12@kernel.org>
+ <DM6PR12MB4516969F2EEE1CBF7E5E7A03D8EF2@DM6PR12MB4516.namprd12.prod.outlook.com>
+ <87ed0lq43y.fsf@nvidia.com>
+In-Reply-To: <87ed0lq43y.fsf@nvidia.com>
+Accept-Language: he-IL, en-US
+Content-Language: en-US
+X-MS-Has-Attach:
+X-MS-TNEF-Correlator:
+authentication-results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=nvidia.com;
+x-ms-publictraffictype: Email
+x-ms-traffictypediagnostic: DM6PR12MB4516:EE_|DS0PR12MB6629:EE_
+x-ms-office365-filtering-correlation-id: bc4c9d59-09b5-4c67-fecf-08dd405b8330
+x-ms-exchange-senderadcheck: 1
+x-ms-exchange-antispam-relay: 0
+x-microsoft-antispam: BCL:0;ARA:13230040|1800799024|366016|376014|38070700018;
+x-microsoft-antispam-message-info:
+ =?utf-8?B?MkRwSXIwQXo3NmY2U1lRd0V4Z0FrSExGek16bUY3UUNZVHlVdXBkMkdETkVw?=
+ =?utf-8?B?V09uM3F3dEd2b1ROQi9Zd08vbW01eHZua1gxY0cvRElvWFk5dGc2czFpQU5E?=
+ =?utf-8?B?dUNqZDh1UHZEYjF2VXdtby9vWUZKclBCei9QK0N1K2xvWXd6YVlnSmVJcGxq?=
+ =?utf-8?B?akpRbFl0MmtTS21ZbWFwUXZvekNkM2pNdDB1dVBPUEV1L3NRNVJHTFl6Wlpn?=
+ =?utf-8?B?R3I1bm54UUQ0N2FVeHBZNzFDbVNTdGpCYVBhbDcvR3hiTHJxdkRUM2Zrb2FE?=
+ =?utf-8?B?c29vV09ZcVBWZ0tJS3o1ZGFkRDBGdHpXY2xUR29EeFlOcjRjRlFBcXEzbmdw?=
+ =?utf-8?B?UGZPZThITXhqRUVRTjF6V1pibXhISzc4U1NHK3k2aHdiQ29EemNwSXdaMGJa?=
+ =?utf-8?B?N3RqREZXYnRwc0xzcnljWk1FeUgxM3dDcFhPS1F1QUcweFJYZnBPR2I4MWRU?=
+ =?utf-8?B?SlJiUnZXZndtL2ZDNVpOcTQ2VUF1ZDV6RFdlQ0lneGFKVkdKQzNBM0ErUCtK?=
+ =?utf-8?B?QXRaUXdCMGg3TzB5RUJpaVM1NVVKb3llWk9WU3Z2Z3JGK3Y4cnFPQ1N0K1p1?=
+ =?utf-8?B?cG5aNlZLQ3l6bFgrOHFCQmxsa0p0dU96ZWI1SWRSZXNramloYlh6SGpEWUVK?=
+ =?utf-8?B?UHgvS2M2RGl0ZXUrK3puUXNsNEk5V2tBZGxaU3lpS2hFS2tnOFJlOHFDQmha?=
+ =?utf-8?B?ZWsvN3pnamp3N0RmWkUyMDBYa0lqbFV0aTIxZDJPdkkwZmFIdUNJeUswTXQ1?=
+ =?utf-8?B?NFNGUm9PZ3dFZmNheVFNTUVhS3A0ZCtXempydW1ia2p3QUJabXprUEE2a3hn?=
+ =?utf-8?B?TlRNcE1UeTJDYkdQQUZPSkk0TEg5YnNQVEUwdzBGSkxoanZJbk0wK2xJSXg5?=
+ =?utf-8?B?Yitndjd1TWdYSzV3SXNWVUNOT2xYaXowT3g5by90UGIwUW9BenhIRjFLVm5j?=
+ =?utf-8?B?THh5djMvRmRnSGNWNjVxOS8xOEtoQVpDZGFjMDl4TVh3ck52Nk1id1N3VzFC?=
+ =?utf-8?B?S2RuVzBmWk9nb1ppL2dSUVdjQjl2YmhGTEJjUTBwRjVuUGprcllYaVgvaVBN?=
+ =?utf-8?B?azhheGZVUEVFWi9rUmpGVzROTTJBbWRzUDhxNVl3YUEwdjllcmRBWXorelpN?=
+ =?utf-8?B?Y0w0d0RJQzdrVTZaVlVYckRxK1lPNjhrbkJFWlZUZEV2SHE0T3M4Y09WbjNv?=
+ =?utf-8?B?TXJJOUE0OEgySDNiR0QvR3NodkRrcGdFNEVrMmJ0ek5FT2lsYjdRYnYzT2g2?=
+ =?utf-8?B?QkNoM3c2RlhkaHFtRkVkK0xwbXBoREYvVDlBQ0RhSDB0WXRQcS8yOXdSQzdG?=
+ =?utf-8?B?UXhpN01NZjVnUzJ0QStaeisrdStsNGhFNmc2YzZVNUxKZU1HdXFndmJQNmJU?=
+ =?utf-8?B?QkQxdEo0eTNsNE1JWDV0VExMZXhFMlk4MmNDdUt5M1MrTVRaa2tKSW5Lb2JR?=
+ =?utf-8?B?bVFETE5MOW9vVUN1Y0dOblFRNUQzWEpPKzJsRlh2K1Y5OVMvTHpiRWVQeHJR?=
+ =?utf-8?B?QVUrMUhqbTE3Nm1mY09WSnQzRDVLaysrMjMxMlkxZUp3ak9USTlsbDNwbWF0?=
+ =?utf-8?B?dmZ0QllrbjRpdUk1anJkeWMyTDZzdmkvODQwdFdEUW5xMURMZm5IUExKU3BI?=
+ =?utf-8?B?NHZNU0E4NHFWQXNtNnF6KzVHWVIxM2lMWlhOZjNDTmFGN2toL3FrUlZicFVL?=
+ =?utf-8?B?bUxSVGRFeW9JelY3K2lsT0VobTBZTHNKMnJET3BxMDIwQi82MXlYOTJ2Vy9m?=
+ =?utf-8?B?eFYxd210ZlpSK1FrR1RoQ3gxVys4MTZ3S3FUQWJRTXFKeDVFM29ZZGVzY2xS?=
+ =?utf-8?B?THNQTXRyRnBUbEZrdzVvT0VGTmloQ3BMUjd5MitRN05CVjFmU2tiUWYxSVBF?=
+ =?utf-8?B?N2p2V2lVRmN6TXJJZHJlYUJwR1lMUE9Oamt6RFY1c0dFclJZd2ZmR1RTV2p4?=
+ =?utf-8?Q?iY26aHnnSANUT4nQp+89JrDXmDIl8F/S?=
+x-forefront-antispam-report:
+ CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DM6PR12MB4516.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(1800799024)(366016)(376014)(38070700018);DIR:OUT;SFP:1101;
+x-ms-exchange-antispam-messagedata-chunkcount: 1
+x-ms-exchange-antispam-messagedata-0:
+ =?utf-8?B?bFRMaXpkVUZsUWhhcUErWVZ1RmVzZ2NWYVhMWjYvdm0rNjRVMWROU3FZVFdN?=
+ =?utf-8?B?dEtxOWdsQXdHbFdMT3pvVjcrbjl5ZDVkcElETmE1MWNPdWM4Y1IzR1VVWWN3?=
+ =?utf-8?B?RVdWakVYdnppSVlNSXBNcmd4dnBIdXdQU3JQeHRRWkx3SDJjVHhKZy9Dend6?=
+ =?utf-8?B?SjFwWCtwZHlqVzdwbnBQc1ZFcnhQSnZBZE0xN0R3YTVKeklKL0hlREVIbGdO?=
+ =?utf-8?B?REVabUFjN09TTFBHRUVMWVl2eFdhcGZyUGw3czN0NjQzeHBzdStRK3orZUY4?=
+ =?utf-8?B?VEkzNHVDVEdIdjNDQ1p5MGpMbWEvUFlwSGg4YW4vcVd0TUdveTJ0K3FESE4v?=
+ =?utf-8?B?U2c1cFYwNmxQcUQ4Wk1maDJydmRpZlBUUU1MZDJDUUZRRzh1aG9TRmVKRksy?=
+ =?utf-8?B?WkdzQVNNQW5JMTZyZGZWQWVyT044S1o0MGVZYUVkSFIvV2RQQ3M5RzVoc0xL?=
+ =?utf-8?B?VjV5Ui94SG1uU1hZOHhxNTkrWHhNVDBHbFMwMkFVRUVCSjVWYlFWSWxnQ1pG?=
+ =?utf-8?B?Y1dKMnQxWHdvb0FIWUEvTTBPSDhVdXNqWU5zVXBxT1FFb29QUnFEa1lQSjhQ?=
+ =?utf-8?B?K3lMVkdrZWliTDQzSnJBcUtMOXdsYTZpNVdXeVhGZGJiaXQwTFBDcDh6cUtv?=
+ =?utf-8?B?SXJkQlJWMUpuc0hoSHhhV0pOaEN1ZVZnVzJEU0NFN2tIZnoxYVRsUGhSMWxG?=
+ =?utf-8?B?RDhMRGw4SGZ6dHdHZjNWMGFnQzVXSFFFWFVMZkVCQ2RHdTN5QWdVWDJRN2FW?=
+ =?utf-8?B?T1BHSkJhMnh4ZnlHaFNHRTRPNGFXajVacmMxZEVmM0E3ZlA2U0FUMEp4amN6?=
+ =?utf-8?B?Ulg0S0svM2xXOElGRVRhbHUvQVljOG5kQ2xmejl6L0VtbHBmclF3eXkwVU44?=
+ =?utf-8?B?bytlMjNlM1EwYjZNYjlDelFBT1hlYlN3VlJHMFl3eGJ0RjZFWHRiYS8yaGg0?=
+ =?utf-8?B?dGtxM2Rkc2pCNlFOZndsd1RReHBoNUhzeHNzNHM4RThnVTBDUWNNMGREZlBv?=
+ =?utf-8?B?NnZnVnA2R2xNTW85Yk5nQ0xFVmZ0QmdrU2dlVTNWSHJHbW9XalJPMXBuNWtJ?=
+ =?utf-8?B?TnI4UldoaVY4dXp5MlFra29xRlhNaTE1VytDZWY2Y3FvbTN6cy9wMVhZZENl?=
+ =?utf-8?B?VHBoNHpyMnBmNnFwODZFVE9udExYbDlmRStXTXhxeVp4L3R5c0F6cUUwcGhY?=
+ =?utf-8?B?VFIycDYxR084dVNCek9kMFBOdVRuOCsrdkptT1lVWk83ckhmR0JuNUR6SThr?=
+ =?utf-8?B?Mm8xdzJVc2hETC8rSFJQNG1sQk55ZldhUVlXWXpoOGNvUytrZFV0SSt3c1Y2?=
+ =?utf-8?B?dU8zTGp3dXo2YitqeVcvbFpVaHJyWlkyZDFlN2hqUkFObTRyWFJDckFFdTdt?=
+ =?utf-8?B?Y1JHZGZqZnFRZW1PN1B0NEhmeUJrMXpGSHhUU3ExeU9XUjRkWWJEdlJEQ3Jm?=
+ =?utf-8?B?SmkrVUVUL2VBY3JnaERSc1p1eFAvWjhzOURJdWdXeTU5eUh2djAwZVUwYUVl?=
+ =?utf-8?B?NGF3dkFCUldIRFl2dEJQRm1NYXJXRkhNSHlnMTZNZ00ySXdBc0VoSndBdlVB?=
+ =?utf-8?B?blUwKzYzRTVWS2FUYTcyT3VoUUFXakhIUEUwNG5GcDl3VEZOTHNVUVQ4ZHZK?=
+ =?utf-8?B?Qi91aFdxVFcxbVZxMUV6eGlXcm9XOENBSyt6Y0g5NDFqbzNjaFJaMFNTc3pF?=
+ =?utf-8?B?azUydVR2eEVHMHpZU282bFZ0dnFOeXlvbmk1YTFrSjZnSDYvZS81OXJIdkE2?=
+ =?utf-8?B?N0JFRjE3M3Q3M1FYNFVjVC94L0MrUmN4TDVZRldENTZyWVpqUlVUL3VCYXBN?=
+ =?utf-8?B?RUt6eGlORUxSNEJCUFd2M0RGU3pWWnNyS3ZFcWFxcWZaM2tBd1BEUytscWd0?=
+ =?utf-8?B?eHZ5ckFBb01PdG45SXp1RHU0R2JINmd1L01FSDhLd3N2MHc4ZSszRm8wK1Ba?=
+ =?utf-8?B?SXN4WWVGUmQydEM1eUNBZ2IvOTNmL0V5djJvR2MrN3lFN2QvYjdpYnVCOWhM?=
+ =?utf-8?B?VjNmcTVxcjJOaEdvbjNUQjdwTDlXZXZiOFpnY21CMkpnWUhMcW85Q1NscmZB?=
+ =?utf-8?B?VUVLcEo3M2s0aG15RzdsTXNvSTJzQUpGb3kwM1RTcXA5S0cvL21FR002Y2tS?=
+ =?utf-8?Q?XQmw6Vf+nfAXzy/7s+uWWhHXG?=
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [RFC PATCH v2 1/8] landlock: Fix non-TCP sockets restriction
-Content-Language: ru
-To: Matthieu Baerts <matttbe@kernel.org>, =?UTF-8?Q?Micka=C3=ABl_Sala=C3=BCn?=
-	<mic@digikod.net>
-CC: <gnoack@google.com>, <willemdebruijn.kernel@gmail.com>,
-	<matthieu@buffet.re>, <linux-security-module@vger.kernel.org>,
-	<netdev@vger.kernel.org>, <netfilter-devel@vger.kernel.org>,
-	<yusongping@huawei.com>, <artem.kuzin@huawei.com>,
-	<konstantin.meskhidze@huawei.com>, MPTCP Linux <mptcp@lists.linux.dev>,
-	<linux-nfs@vger.kernel.org>, Paul Moore <paul@paul-moore.com>
-References: <20241017110454.265818-1-ivanov.mikhail1@huawei-partners.com>
- <20241017110454.265818-2-ivanov.mikhail1@huawei-partners.com>
- <49bc2227-d8e1-4233-8bc4-4c2f0a191b7c@kernel.org>
- <20241018.Kahdeik0aaCh@digikod.net>
- <62336067-18c2-3493-d0ec-6dd6a6d3a1b5@huawei-partners.com>
- <20241212.qua0Os3sheev@digikod.net>
- <f480bbea-989d-378a-9493-c2bee412db00@huawei-partners.com>
- <20250124.gaegoo0Ayahn@digikod.net>
- <2f970b00-7648-1865-858a-214c5c6af0c4@huawei-partners.com>
- <20250127.Uph4aiph9jae@digikod.net>
- <d3d589c3-a70b-fc6e-e1bb-d221833dfef5@huawei-partners.com>
- <594263fc-f4e7-43ce-a613-d3f8ebb7f874@kernel.org>
- <f6e72e71-c5ed-8a9c-f33e-f190a47b8c27@huawei-partners.com>
- <2e727df0-c981-4e0c-8d0d-09109cf27d6f@kernel.org>
- <103de503-be0e-2eb2-b6f0-88567d765148@huawei-partners.com>
- <1d1d58b3-2516-4fc8-9f9a-b10604bbe05b@kernel.org>
-From: Mikhail Ivanov <ivanov.mikhail1@huawei-partners.com>
-In-Reply-To: <1d1d58b3-2516-4fc8-9f9a-b10604bbe05b@kernel.org>
-Content-Type: text/plain; charset="UTF-8"; format=flowed
-Content-Transfer-Encoding: 8bit
-X-ClientProxiedBy: lhrpeml500009.china.huawei.com (7.191.174.84) To
- mscpeml500004.china.huawei.com (7.188.26.250)
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: DM6PR12MB4516.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: bc4c9d59-09b5-4c67-fecf-08dd405b8330
+X-MS-Exchange-CrossTenant-originalarrivaltime: 29 Jan 2025 11:53:14.3565
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: WvIbyITBJ6BOfT01VTdJusbvT3Iz4cgI9fcWVhArV+CuPd/1gR1IqtrVtHFZkf2J3w3MZU+aUvOxvWOEFkDeig==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DS0PR12MB6629
 
-On 1/29/2025 2:33 PM, Matthieu Baerts wrote:
-> On 29/01/2025 12:02, Mikhail Ivanov wrote:
->> On 1/29/2025 1:25 PM, Matthieu Baerts wrote:
->>> Hi Mikhail,
->>>
->>> On 29/01/2025 10:52, Mikhail Ivanov wrote:
->>>> On 1/28/2025 9:14 PM, Matthieu Baerts wrote:
->>>>> Hi Mikhail,
->>>>>
->>>>> Sorry, I didn't follow all the discussions in this thread, but here are
->>>>> some comments, hoping this can help to clarify the MPTCP case.
->>>>
->>>> Thanks a lot for sharing your knowledge, Matthieu!
->>>>
->>>>>
->>>>> On 28/01/2025 11:56, Mikhail Ivanov wrote:
->>>>>> On 1/27/2025 10:48 PM, Mickaël Salaün wrote:
->>>>>
->>>>> (...)
->>>>>
->>>>>>> I'm a bit worried that we miss some of these places (now or in future
->>>>>>> kernel versions).  We'll need a new LSM hook for that.
->>>>>>>
->>>>>>> Could you list the current locations?
->>>>>>
->>>>>> Currently, I know only about TCP-related transformations:
->>>>>>
->>>>>> * SMC can fallback to TCP during connection. TCP connection is used
->>>>>>      (1) to exchange CLC control messages in default case and (2)
->>>>>> for the
->>>>>>      communication in the case of fallback. If socket was connected or
->>>>>>      connection failed, socket can not be reconnected again. There
->>>>>> is no
->>>>>>      existing security hook to control the fallback case,
->>>>>>
->>>>>> * MPTCP uses TCP for communication between two network interfaces
->>>>>> in the
->>>>>>      default case and can fallback to plain TCP if remote peer does not
->>>>>>      support MPTCP. AFAICS, there is also no security hook to
->>>>>> control the
->>>>>>      fallback transformation,
->>>>>
->>>>> There are security hooks to control the path creation, but not to
->>>>> control the "fallback transformation".
->>>>>
->>>>> Technically, with MPTCP, the userspace will create an IPPROTO_MPTCP
->>>>> socket. This is only used "internally": to communicate between the
->>>>> userspace and the kernelspace, but not directly used between network
->>>>> interfaces. This "external" communication is done via one or multiple
->>>>> kernel TCP sockets carrying extra TCP options for the mapping. The
->>>>> userspace cannot directly control these sockets created by the kernel.
->>>>>
->>>>> In case of fallback, the kernel TCP socket "simply" drop the extra TCP
->>>>> options needed for MPTCP, and carry on like normal TCP. So on the wire
->>>>> and in the Linux network stack, it is the same TCP connection, without
->>>>> the MPTCP options in the TCP header. The userspace continue to
->>>>> communicate with the same socket.
->>>>>
->>>>> I'm not sure if there is a need to block the fallback: it means only
->>>>> one
->>>>> path can be used at a time.
->>>>
->>>> You mean that users always rely on a plain TCP communication in the case
->>>> the connection of MPTCP multipath communication fails?
->>>
->>> Yes, that's the same TCP connection, just without extra bit to be able
->>> to use multiple TCP connections associated to the same MPTCP one.
->>
->> Indeed, so MPTCP communication should be restricted the same way as TCP.
->> AFAICS this should be intuitive for MPTCP users and it'll be better
->> to let userland define this dependency.
-> 
-> Yes, I think that would make more sense.
-> 
-> I guess we can look at MPTCP as TCP with extra features.
-
-Yeap
-
-> 
-> So if TCP is blocked, MPTCP should be blocked as well. (And eventually
-> having the possibility to block only TCP but not MPTCP and the opposite,
-> but that's a different topic: a possible new feature, but not a bug-fix)
-What do you mean by the "bug fix"?
-
-> 
->>>>>> * IPv6 -> IPv4 transformation for TCP and UDP sockets withon
->>>>>>      IPV6_ADDRFORM. Can be controlled with setsockopt() security hook.
->>>>>>
->>>>>> As I said before, I wonder if user may want to use SMC or MPTCP and
->>>>>> deny
->>>>>> TCP communication, since he should rely on fallback transformation
->>>>>> during the connection in the common case. It may be unexpected for
->>>>>> connect(2) to fail during the fallback due to security politics.
->>>>>
->>>>> With MPTCP, fallbacks can happen at the beginning of a connection, when
->>>>> there is only one path. This is done after the userspace's
->>>>> connect(). If
->>>>> the fallback is blocked, I guess the userspace will get the same errors
->>>>> as when an open connection is reset.
->>>>
->>>> In the case of blocking due to security policy, userspace should get
->>>> -EACESS. I mean, the user might not expect the fallback path to be
->>>> blocked during the connection if he has allowed only MPTCP communication
->>>> using the Landlock policy.
->>>
->>> A "fallback" can happen on different occasions as mentioned in the
->>> RFC8684 [1], e.g.
->>>
->>> - The client asks to use MPTCP, but the other peer doesn't support it:
->>>
->>>     Client                Server
->>>     |     SYN + MP_CAPABLE     |
->>>     |------------------------->|
->>>     |         SYN/ACK          |
->>>     |<-------------------------|  => Fallback on the client side
->>>     |           ACK            |
->>>     |------------------------->|
->>>
->>> - A middle box doesn't touch the 3WHS, but intercept the communication
->>> just after:
->>>
->>>     Client                Server
->>>     |     SYN + MP_CAPABLE     |
->>>     |------------------------->|
->>>     |   SYN/ACK + MP_CAPABLE   |
->>>     |<-------------------------|
->>>     |     ACK + MP_CAPABLE     |
->>>     |------------------------->|
->>>     |        DSS + data        | => but the server doesn't receive the DSS
->>>     |------------------------->| => So fallback on the server side
->>>     |           ACK            |
->>>     |<-------------------------| => Fallback on the client side
->>>
->>> - etc.
->>>
->>> So the connect(), even in blocking mode, can be OK, but the "fallback"
->>> will happen later.
->>
->> Thanks! Theoretical "socket transformation" control should cover all
->> these cases.
->>
->> You mean that it might be reasonable for a Landlock policy to block
->> MPTCP fallback when establishing first sublflow (when client does not
->> receive MP_CAPABLE)?
-> 
-> Personally, I don't even know if there is really a need for such
-> policies. The fallback is there not to block a connection if the other
-> peer doesn't support MPTCP, or if a middlebox decides to mess-up with
-> MPTCP options. So instead of an error, the connection continues but is
-> "degraded" by not being able to create multiple paths later on.
-> 
-> Maybe best to wait for a concrete use-case before implementing this?
-
-Ok, got it! I agree that such policies does not seem to be useful.
-
-> 
-> (...)
-> 
-> Cheers,
-> Matt
+DQoNCj4gLS0tLS1PcmlnaW5hbCBNZXNzYWdlLS0tLS0NCj4gRnJvbTogUGV0ciBNYWNoYXRhIDxw
+ZXRybUBudmlkaWEuY29tPg0KPiBTZW50OiBXZWRuZXNkYXksIDI5IEphbnVhcnkgMjAyNSAxMjo0
+NA0KPiBUbzogRGFuaWVsbGUgUmF0c29uIDxkYW5pZWxsZXJAbnZpZGlhLmNvbT4NCj4gQ2M6IEph
+a3ViIEtpY2luc2tpIDxrdWJhQGtlcm5lbC5vcmc+OyBuZXRkZXZAdmdlci5rZXJuZWwub3JnOw0K
+PiBta3ViZWNla0BzdXNlLmN6OyBtYXR0QHRyYXZlcnNlLmNvbS5hdTsgZGFuaWVsLnphaGthQGdt
+YWlsLmNvbTsgQW1pdA0KPiBDb2hlbiA8YW1jb2hlbkBudmlkaWEuY29tPjsgTkJVLW1seHN3IDxO
+QlUtDQo+IG1seHN3QGV4Y2hhbmdlLm52aWRpYS5jb20+DQo+IFN1YmplY3Q6IFJlOiBbUEFUQ0gg
+ZXRodG9vbC1uZXh0IDA5LzE0XSBxc2ZwOiBBZGQgSlNPTiBvdXRwdXQgaGFuZGxpbmcgdG8gLS0N
+Cj4gbW9kdWxlLWluZm8gaW4gU0ZGODYzNiBtb2R1bGVzDQo+IA0KPiANCj4gRGFuaWVsbGUgUmF0
+c29uIDxkYW5pZWxsZXJAbnZpZGlhLmNvbT4gd3JpdGVzOg0KPiANCj4gPiBGcm9tOiBKYWt1YiBL
+aWNpbnNraSA8a3ViYUBrZXJuZWwub3JnPg0KPiA+Pg0KPiA+PiBPbiBTdW4sIDI2IEphbiAyMDI1
+IDEzOjU2OjMwICswMjAwIERhbmllbGxlIFJhdHNvbiB3cm90ZToNCj4gPj4gPiArCQlvcGVuX2pz
+b25fb2JqZWN0KCJleHRlbmRlZF9pZGVudGlmaWVyIik7DQo+ID4+ID4gKwkJcHJpbnRfaW50KFBS
+SU5UX0pTT04sICJ2YWx1ZSIsICIweCUwMngiLA0KPiA+PiA+ICsJCQkgIG1hcC0+cGFnZV8wMGhb
+U0ZGODYzNl9FWFRfSURfT0ZGU0VUXSk7DQo+ID4+DQo+ID4+IEhtLCB3aHkgaGV4IGhlcmU/DQo+
+ID4+IFByaW9yaXR5IGZvciBKU09OIG91dHB1dCBpcyB0byBtYWtlIGl0IGVhc3kgdG8gaGFuZGxl
+IGluIGNvZGUsIHJhdGhlcg0KPiA+PiB0aGFuIGVhc3kgdG8gcmVhZC4gSGV4IHN0cmluZ3MgbmVl
+ZCBleHRyYSBtYW51YWwgZGVjb2RpbmcsIG5vPw0KPiA+DQo+ID4gSSBrZXB0IHRoZSBzYW1lIGNv
+bnZlbnRpb24gYXMgaW4gdGhlIHJlZ3VsYXIgb3V0cHV0Lg0KPiA+DQo+ID4gQW5kIGFzIGFncmVl
+ZCBpbiBEYW5pZWwncyBkZXNpZ24gdGhvc2UgaGV4IGZpZWxkcyByZW1haW4gaGV4IGZpZWxkcyBh
+bmQgYXJlDQo+IGZvbGxvd2VkIGJ5IGEgZGVzY3JpcHRpb24gZmllbGQuDQo+ID4NCj4gPiBEbyB5
+b3UgdGhpbmsgb3RoZXJ3aXNlPw0KPiANCj4gUmVndWxhciBvdXRwdXQgaXMgZm9yIGh1bWFuIGNv
+bnN1bXB0aW9uLCBKU09OIGlzIGZvciBtYWNoaW5lIGNvbnN1bXB0aW9uLg0KPiBJTUhPIGl0IG1h
+a2VzIHNlbnNlIHRvIHJlYXNvbmFibHkgZGl2ZXJnZSBhbmQgdXNlIHRoZSAiY29ycmVjdCIgSlNP
+TiB0eXBlDQo+IHdoZXJlIGF2YWlsYWJsZSwgZXZlbiBpZiB0aGUgaHVtYW4tcmVhZGFibGUgb3V0
+cHV0IGlzIGRpZmZlcmVudC4gU28gbnVtYmVycw0KPiBzaG91bGQgSU1ITyBiZSBudW1iZXJzLCB0
+cnVlIC8gZmFsc2UsIHllcyAvIG5vLCBvZmYgLyBvbiBldGMuIHNob3VsZCBwcm9iYWJseQ0KPiBi
+ZSBib29sZWFucywgYXJyYXlzIHNob3VsZCBiZSBhcnJheXMsIGV0Yy4NCg0KT2ssIGZvciBib3Ro
+IG9mIHlvdSwgd2lsbCB1c2UgaW50cyBpbnN0ZWFkIG9mIGluIEpTT04gb3V0cHV0Lg0K
 
