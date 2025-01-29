@@ -1,89 +1,72 @@
-Return-Path: <netdev+bounces-161552-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-161553-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7A6EEA22474
-	for <lists+netdev@lfdr.de>; Wed, 29 Jan 2025 20:13:42 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id B94E3A2247A
+	for <lists+netdev@lfdr.de>; Wed, 29 Jan 2025 20:14:49 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 8E7B93A2A7F
-	for <lists+netdev@lfdr.de>; Wed, 29 Jan 2025 19:13:34 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 27DDC1883C7E
+	for <lists+netdev@lfdr.de>; Wed, 29 Jan 2025 19:14:54 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8DD5F1E1C1F;
-	Wed, 29 Jan 2025 19:13:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A03441E2838;
+	Wed, 29 Jan 2025 19:14:41 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Wsj/W3yd"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="T8bbnKHz"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 68ECB194089
-	for <netdev@vger.kernel.org>; Wed, 29 Jan 2025 19:13:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DAE791E1C36
+	for <netdev@vger.kernel.org>; Wed, 29 Jan 2025 19:14:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1738178018; cv=none; b=rhVXmZE1BEuD2Wjrn3bcuJnDLILXqNGaFIGGLIVHjeVo6jEOl95ocm4fHqf4sPOnymWHZ3VjbliNMApf/VbtIME5bUZ9n+ueSRo3E0C2knqM5wTJEexZTdqU1+eTc4tMRAGnWutC30ll0SDhoII+N9b7CGFHb7sZ6i6qviGJ2Vs=
+	t=1738178081; cv=none; b=muSa0okkWo9f25+1XkJ99tMiXyS1K1KM8u0RtwakluF7fgkXn/d9m1ulq4E5i3VxsUSy1QPX2tmi0zup0HyRv5Ccz2ABOpBfnUWVbZZEPeCMlh1A0mOFIklfY/ydlncBAieNUQUnS8Lr6bRbpUg3ysOz5BGLZYd9vU+R5cWqAXQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1738178018; c=relaxed/simple;
-	bh=Msud56ndjxyg3+7UNV4u6VFr093ng8xlqxmmSSFtdh0=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=Fj2nrbgWr/jL2J9+tcQl9u3qHeAd29VNJ4FTCp3CVNj/HmPjhMsHPscOnY2C8Sd+/VAkLOiMm+qdYEaU1Mb9s3dFNOjQKWAzIq/a0a6LUvFcOiaeqKVzF+O/Clkll146N/xsKf8FeMXdjhOQ3u2HfZfuOlqr2wefMG8uXvPZV3I=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Wsj/W3yd; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 73C89C4CED1;
-	Wed, 29 Jan 2025 19:13:37 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1738178017;
-	bh=Msud56ndjxyg3+7UNV4u6VFr093ng8xlqxmmSSFtdh0=;
-	h=From:To:Cc:Subject:Date:From;
-	b=Wsj/W3ydP4wKn7qPWzt3gH4fdN5sn8CiEICHc41+E5ml68p/3tBvDFRQbdP6uS/Ln
-	 N5KAXQ1xlbedzK4cb9zXnTqp0+VHBwAw+fbKNl8IaFbO9SBs8YMgqhsgVb0wC4n4IY
-	 9n54LYJFiUlYodXvQGm1fHRBzQctr+o5KAqEOpJXJ1wqNajdAWRL8XYq1EVuy65W9a
-	 3hJ6cuxWkzLMhfz93QPUZ8UMXnLuf9+Jt4uKK839znwgwqToNxMsLkqCdGMdIAcZv/
-	 TDKEJDA6/N4s+nh9+mc/kMCzPuSHFo+e1kmxK0tpl94zv87uRAymejMCKjQ4lsCAZV
-	 p9HO2pqVNJ76A==
-From: Jakub Kicinski <kuba@kernel.org>
-To: davem@davemloft.net
-Cc: netdev@vger.kernel.org,
-	edumazet@google.com,
-	pabeni@redhat.com,
-	andrew+netdev@lunn.ch,
-	horms@kernel.org,
-	ncardwell@google.com,
-	Jakub Kicinski <kuba@kernel.org>
-Subject: [PATCH net] MAINTAINERS: add Neal to TCP maintainers
-Date: Wed, 29 Jan 2025 11:13:32 -0800
-Message-ID: <20250129191332.2526140-1-kuba@kernel.org>
-X-Mailer: git-send-email 2.48.1
+	s=arc-20240116; t=1738178081; c=relaxed/simple;
+	bh=EQHxKuLhNQxdGzHD93B13a+iRXldLmeMfBsGxjsR+fE=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=hbbuFFkpvFCNrM4+4hkasxpibT7/6rbbP5mu2/lLL1vVmyMLkAKf6dNktePMwIeT6hb6ydJ1UgfJ36fsoTDONjHZCojDW39Yxf7E9b2v+CwmJ0BIJrITGMXrFQuefHl4rTgOIsRPoVtTxIUAdwO2c4R1K3VOgAvxOLAE9X9UXWM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=T8bbnKHz; arc=none smtp.client-ip=156.67.10.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=RePCD8csmQd1FQCw+uT83FJgrl3GQ664A7Y3jgIp1WI=; b=T8bbnKHz6Tr9bl626Tc3XzaUNk
+	vuk9CoF54MjxX3Lf1YoQNMWKz+zaT6/1i5t00wcHYMOHmumFRouEjCAr5m55k6FXn/AeSuu+87SUT
+	s+9TXm/UbJD0yv+tM281a9b2O4lLt1g4jkIK7SIUXHufadVwrso72zaB4rqyQqISHeG4=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1tdDW5-009Cgg-VN; Wed, 29 Jan 2025 20:14:25 +0100
+Date: Wed, 29 Jan 2025 20:14:25 +0100
+From: Andrew Lunn <andrew@lunn.ch>
+To: "sreedevi.joshi" <joshisre@ecsmtp.an.intel.com>
+Cc: hkallweit1@gmail.com, linux@armlinux.org.uk, edumazet@google.com,
+	kuba@kernel.org, pabeni@redhat.com, netdev@vger.kernel.org,
+	Sreedevi Joshi <sreedevi.joshi@intel.com>
+Subject: Re: [PATCH net] phy: fix null pointer issue in phy_attach_direct()
+Message-ID: <fa054892-b501-4e98-a8a5-6fc9acc68be5@lunn.ch>
+References: <20250129183638.695010-1-sreedevi.joshi@intel.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250129183638.695010-1-sreedevi.joshi@intel.com>
 
-Neal Cardwell has been indispensable in TCP reviews
-and investigations, especially protocol-related.
-Neal is also the author of packetdrill.
+On Wed, Jan 29, 2025 at 12:36:38PM -0600, sreedevi.joshi wrote:
+> From: Sreedevi Joshi <sreedevi.joshi@intel.com>
+> 
+> When attaching a fixed phy to devices like veth
 
-Reviewed-by: Eric Dumazet <edumazet@google.com>
-Signed-off-by: Jakub Kicinski <kuba@kernel.org>
----
- MAINTAINERS | 1 +
- 1 file changed, 1 insertion(+)
+Humm. Zoom out. What is the big picture? Why would a veth need a PHY?
 
-diff --git a/MAINTAINERS b/MAINTAINERS
-index 5bcc78c0be70..48030557031e 100644
---- a/MAINTAINERS
-+++ b/MAINTAINERS
-@@ -16524,6 +16524,7 @@ F:	tools/testing/selftests/net/mptcp/
- 
- NETWORKING [TCP]
- M:	Eric Dumazet <edumazet@google.com>
-+M:	Neal Cardwell <ncardwell@google.com>
- L:	netdev@vger.kernel.org
- S:	Maintained
- F:	Documentation/networking/net_cachelines/tcp_sock.rst
--- 
-2.48.1
-
+	Andrew
 
