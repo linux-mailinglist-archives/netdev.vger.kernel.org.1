@@ -1,148 +1,90 @@
-Return-Path: <netdev+bounces-161490-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-161491-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0DA05A21D69
-	for <lists+netdev@lfdr.de>; Wed, 29 Jan 2025 14:00:21 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 57CC8A21D6C
+	for <lists+netdev@lfdr.de>; Wed, 29 Jan 2025 14:01:52 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 5F9A91626DC
-	for <lists+netdev@lfdr.de>; Wed, 29 Jan 2025 13:00:19 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id BBCDE161F97
+	for <lists+netdev@lfdr.de>; Wed, 29 Jan 2025 13:01:50 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B3F7DEEC5;
-	Wed, 29 Jan 2025 13:00:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8C1EADDA9;
+	Wed, 29 Jan 2025 13:01:47 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="Q+9EzOr3"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="cju5zJgv"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qk1-f202.google.com (mail-qk1-f202.google.com [209.85.222.202])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C4E4413FFC
-	for <netdev@vger.kernel.org>; Wed, 29 Jan 2025 13:00:10 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.202
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E64CFDF78;
+	Wed, 29 Jan 2025 13:01:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1738155612; cv=none; b=WIt2eqSUpuR6UgX1FMoSa+N/QCGbb+viNMD6x7cZW5V1pVs01rzO2qf/Jf/c/bC9pOKtAg3JrB7zE3JYTtdxWHJYIAxuNfCV74RM3WfnFeeNhT+VpEBVxvfeXVpIo2twwyjonS/gXjbWP5ykkDMhGnEStuuwCorbZAcXYv9SCF0=
+	t=1738155707; cv=none; b=I9T5Ol+EoYeWsdENj/mDnbvWn4zFrgvd1QRl3H868FWXHADcmWgGPzq2+p4eEu4PSJoSRNN507442unf+mAb1rJxL4kkDuIXsGmPQr7eE8dlYFF8U3c/YffcaaJPMVnXRZ7Aw8hEFgTNqb9t13CrsW3UYSn5lWOGM5fwOXe19Kk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1738155612; c=relaxed/simple;
-	bh=+j5PMJShL0lfRdnO8XjJXQAb2rEwNAVELfSQSgD9Weg=;
-	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=OzWtwUx617/IJC2dKZnkSVEMHqMe+T98Nw5mRv/wcNXFUybwwQZ9SKst8QaWrzD79jd+M6xFU7JJXQDcuxRhBOhuIcuhIQwTxZWnxQtYlriWX2tb3K63WFQRgg3sy6kUYt9G097WMGmwkUKEB07aoAt03Rv2Sm5SArPVjOFrLKI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=Q+9EzOr3; arc=none smtp.client-ip=209.85.222.202
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com
-Received: by mail-qk1-f202.google.com with SMTP id af79cd13be357-7b7477f005eso1513044885a.0
-        for <netdev@vger.kernel.org>; Wed, 29 Jan 2025 05:00:10 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1738155609; x=1738760409; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=tr5/gkkULDrBQfJioiEpApCPSDsPP+Goa6+/08waBq8=;
-        b=Q+9EzOr3leYJyWhx0l0qf1EdoVHP0wyM41u5HxskZ2ZlfN19TvHp9FP1Nsirv9XeEw
-         r79BmiCl3IVhTkipEUzKQhnKxg8NnbwnJl7fi5jcT0pw6a84OE00xPkb6T5QcRBEp/Z/
-         uBPklBGH1M0fmAtLICb/Sf8IkKFagzseu0TwF9FaoPa8cFT6PhJA6+PhCFuvWtiM/Lpw
-         aW3faddRuEp+YQe/Kvq8/L0167d7vszq86d5MlrZIzBUuib6Mdc4j488xE4VnxJETbmE
-         B7AZ6c7STCeRF7FQA8jn71yQMukHk1F0PmfjqFCOEldYVMkBAPiGv3FZEli1ba2AXSSo
-         +Dmw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1738155609; x=1738760409;
-        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=tr5/gkkULDrBQfJioiEpApCPSDsPP+Goa6+/08waBq8=;
-        b=pE0Sa2O066aXHE2v/UkEvOn0f5DfWEvMAU8j6JIrwUjm4JL4AMy2yTHvlxTZvE7ESO
-         CKka3illAoavOLMxz8QgIx3bgLgHVr74d/UbhZLgyhQqrldf1WVIE01OH/j8YldQbxK9
-         vrMZpCn3hNr9kuu4ml+HBOsn0FzIHVRzEsa7CouKDUoH301pAwXCWjjB1QRWZ7gfS+29
-         6SqyXfnyl0xsrnZqhJr78htK/Os0AWMVIlED0R/5zyUkqzJb9yjWc8IZE8Wav+aF7G4W
-         dIvkH1CZUAJmD8FBeg0PE/fSwwZOJyrniLSWQWPHzVq/VRFhs7oS8BvmQN3cmWLA7A35
-         /MDA==
-X-Gm-Message-State: AOJu0YxvXE7xj3A6puxVvw6+AmULQyZqkMXRPspKsoDzqdfSNi3Xd11p
-	asX0QBm0UNcmApKlGE8cdgERZ5cBY2C2Ki04UdQD3wAQ/Kcj1UoHHGna2fdtLYzun98L4K0Ls8l
-	XY4QZxrWhzQ==
-X-Google-Smtp-Source: AGHT+IEL+a13mxynke2QoQ+0CgBzt6eAhMoScNn/8xs7hu1Er8JE8pZMWlKr1O1n8Vxjtn9reyItCycFthXwjg==
-X-Received: from qkpf15.prod.google.com ([2002:a05:620a:280f:b0:7b6:742e:a33e])
- (user=edumazet job=prod-delivery.src-stubby-dispatcher) by
- 2002:a05:620a:44d1:b0:7b7:7d6:dfe2 with SMTP id af79cd13be357-7bffccc9f63mr300318885a.10.1738155609477;
- Wed, 29 Jan 2025 05:00:09 -0800 (PST)
-Date: Wed, 29 Jan 2025 13:00:07 +0000
+	s=arc-20240116; t=1738155707; c=relaxed/simple;
+	bh=4AI+Fm08nheOH11DrjdsHuMLkFKIId0rP5Kx1B2yzoc=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=MSZfzT6zz3iXgSm4g33eP/2VF0N7jogw2ZbfBCbGP7dOftmcruQyWmPFcr76vIjjgW/zvh6oZAe7vaAqNAuXNB8usS3Lf+JLqj+j4/pExsVIvVwSO9Tr0uroqp4uJtsoEbnUVspuMQmN5NEZ7udw52uZOwS9EoBD7brP+Mmdan0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=cju5zJgv; arc=none smtp.client-ip=156.67.10.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=bPfF7tWGgIi6QwyGI04z66zIqd+2JEVIDkcPLUeXhus=; b=cju5zJgvOX+7ImKdA5tVG6fcMz
+	VdvaVvwCdT3YzfVtMA5mFgkhZ6L+XHXjMrz8yfSeZdi57m2QYhlCt2F/xZG3wctCrnZJovopUXnpK
+	tVhmZW0PZUBfM9orfkgwdCfeFMOvL0ig7aMTVkxsH+PUHRMafWPsUJ9SXf5bzYMmC420=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1td7hD-00986o-0i; Wed, 29 Jan 2025 14:01:31 +0100
+Date: Wed, 29 Jan 2025 14:01:31 +0100
+From: Andrew Lunn <andrew@lunn.ch>
+To: Swathi K S <swathi.ks@samsung.com>
+Cc: krzk@kernel.org, robh@kernel.org, davem@davemloft.net,
+	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
+	conor+dt@kernel.org, richardcochran@gmail.com,
+	mcoquelin.stm32@gmail.com, alim.akhtar@samsung.com,
+	linux-fsd@tesla.com, netdev@vger.kernel.org,
+	devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
+	linux-stm32@st-md-mailman.stormreply.com,
+	linux-arm-kernel@lists.infradead.org,
+	linux-samsung-soc@vger.kernel.org, alexandre.torgue@foss.st.com,
+	peppe.cavallaro@st.com, joabreu@synopsys.com, rcsekar@samsung.com,
+	ssiddha@tesla.com, jayati.sahu@samsung.com,
+	pankaj.dubey@samsung.com, ravi.patel@samsung.com,
+	gost.dev@samsung.com
+Subject: Re: [PATCH v5 2/4] net: stmmac: dwc-qos: Add FSD EQoS support
+Message-ID: <8b0f068c-26f7-455a-a546-65531cd7fe48@lunn.ch>
+References: <20250128102558.22459-1-swathi.ks@samsung.com>
+ <CGME20250128102732epcas5p4618e808063ffa992b476f03f7098d991@epcas5p4.samsung.com>
+ <20250128102558.22459-3-swathi.ks@samsung.com>
+ <63e64aa6-d018-4e45-acc7-f9d88a7db60f@lunn.ch>
+ <002c01db722e$5abc8d10$1035a730$@samsung.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-X-Mailer: git-send-email 2.48.1.262.g85cc9f2d1e-goog
-Message-ID: <20250129130007.644084-1-edumazet@google.com>
-Subject: [PATCH net] net: hsr: fix fill_frame_info() regression vs VLAN packets
-From: Eric Dumazet <edumazet@google.com>
-To: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
-	Paolo Abeni <pabeni@redhat.com>
-Cc: netdev@vger.kernel.org, Simon Horman <horms@kernel.org>, eric.dumazet@gmail.com, 
-	Eric Dumazet <edumazet@google.com>, Stephan Wurm <stephan.wurm@a-eberle.de>
-Content-Type: text/plain; charset="UTF-8"
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <002c01db722e$5abc8d10$1035a730$@samsung.com>
 
-Stephan Wurm reported that my recent patch broke VLAN support.
+> > It looks like you should be able to share all the clk_bulk code with
+> > tegra_eqos_probe(). The stmmac driver suffers from lots of cut/paste code
+> > with no consolidation. You can at least not make the tegra code worse by
+> > doing a little refactoring.
+> 
+> Hi Andrew, 
+> Just to clarify, you were referring to refactoring tegra code to use
+> clk_bulk APIs, right?
 
-Apparently skb->mac_len is not correct for VLAN traffic as
-shown by debug traces [1].
+Yes.
 
-Use instead pskb_may_pull() to make sure the expected header
-is present in skb->head.
-
-Many thanks to Stephan for his help.
-
-[1]
-kernel: skb len=170 headroom=2 headlen=170 tailroom=20
-        mac=(2,14) mac_len=14 net=(16,-1) trans=-1
-        shinfo(txflags=0 nr_frags=0 gso(size=0 type=0 segs=0))
-        csum(0x0 start=0 offset=0 ip_summed=0 complete_sw=0 valid=0 level=0)
-        hash(0x0 sw=0 l4=0) proto=0x0000 pkttype=0 iif=0
-        priority=0x0 mark=0x0 alloc_cpu=0 vlan_all=0x0
-        encapsulation=0 inner(proto=0x0000, mac=0, net=0, trans=0)
-kernel: dev name=prp0 feat=0x0000000000007000
-kernel: sk family=17 type=3 proto=0
-kernel: skb headroom: 00000000: 74 00
-kernel: skb linear:   00000000: 01 0c cd 01 00 01 00 d0 93 53 9c cb 81 00 80 00
-kernel: skb linear:   00000010: 88 b8 00 01 00 98 00 00 00 00 61 81 8d 80 16 52
-kernel: skb linear:   00000020: 45 47 44 4e 43 54 52 4c 2f 4c 4c 4e 30 24 47 4f
-kernel: skb linear:   00000030: 24 47 6f 43 62 81 01 14 82 16 52 45 47 44 4e 43
-kernel: skb linear:   00000040: 54 52 4c 2f 4c 4c 4e 30 24 44 73 47 6f 6f 73 65
-kernel: skb linear:   00000050: 83 07 47 6f 49 64 65 6e 74 84 08 67 8d f5 93 7e
-kernel: skb linear:   00000060: 76 c8 00 85 01 01 86 01 00 87 01 00 88 01 01 89
-kernel: skb linear:   00000070: 01 00 8a 01 02 ab 33 a2 15 83 01 00 84 03 03 00
-kernel: skb linear:   00000080: 00 91 08 67 8d f5 92 77 4b c6 1f 83 01 00 a2 1a
-kernel: skb linear:   00000090: a2 06 85 01 00 83 01 00 84 03 03 00 00 91 08 67
-kernel: skb linear:   000000a0: 8d f5 92 77 4b c6 1f 83 01 00
-kernel: skb tailroom: 00000000: 80 18 02 00 fe 4e 00 00 01 01 08 0a 4f fd 5e d1
-kernel: skb tailroom: 00000010: 4f fd 5e cd
-
-Fixes: b9653d19e556 ("net: hsr: avoid potential out-of-bound access in fill_frame_info()")
-Reported-by: Stephan Wurm <stephan.wurm@a-eberle.de>
-Tested-by: Stephan Wurm <stephan.wurm@a-eberle.de>
-Closes: https://lore.kernel.org/netdev/Z4o_UC0HweBHJ_cw@PC-LX-SteWu/
-Signed-off-by: Eric Dumazet <edumazet@google.com>
----
- net/hsr/hsr_forward.c | 7 +++++--
- 1 file changed, 5 insertions(+), 2 deletions(-)
-
-diff --git a/net/hsr/hsr_forward.c b/net/hsr/hsr_forward.c
-index 87bb3a91598ee96b825f7aaff53aafb32ffe4f9..c80575db8b91d9bcce376e1a8c3fda76aa91c17 100644
---- a/net/hsr/hsr_forward.c
-+++ b/net/hsr/hsr_forward.c
-@@ -700,9 +700,12 @@ static int fill_frame_info(struct hsr_frame_info *frame,
- 		frame->is_vlan = true;
- 
- 	if (frame->is_vlan) {
--		if (skb->mac_len < offsetofend(struct hsr_vlan_ethhdr, vlanhdr))
-+		/* Note: skb->mac_len might be wrong here. */
-+		if (!pskb_may_pull(skb,
-+				   skb_mac_offset(skb) +
-+				   offsetofend(struct hsr_vlan_ethhdr, vlanhdr)))
- 			return -EINVAL;
--		vlan_hdr = (struct hsr_vlan_ethhdr *)ethhdr;
-+		vlan_hdr = (struct hsr_vlan_ethhdr *)skb_mac_header(skb);
- 		proto = vlan_hdr->vlanhdr.h_vlan_encapsulated_proto;
- 	}
- 
--- 
-2.48.1.262.g85cc9f2d1e-goog
-
+	Andrew
 
