@@ -1,95 +1,99 @@
-Return-Path: <netdev+bounces-161554-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-161555-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3D9B1A2248F
-	for <lists+netdev@lfdr.de>; Wed, 29 Jan 2025 20:30:24 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2DA9BA224F5
+	for <lists+netdev@lfdr.de>; Wed, 29 Jan 2025 21:05:30 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 5D6953A1729
-	for <lists+netdev@lfdr.de>; Wed, 29 Jan 2025 19:30:16 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 93122167CB3
+	for <lists+netdev@lfdr.de>; Wed, 29 Jan 2025 20:05:28 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B5EF91E0DCB;
-	Wed, 29 Jan 2025 19:30:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7D326199939;
+	Wed, 29 Jan 2025 20:05:28 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="iliYlKf8"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="TBYGpX/2"
 X-Original-To: netdev@vger.kernel.org
-Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DD6F6190462
-	for <netdev@vger.kernel.org>; Wed, 29 Jan 2025 19:30:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5385B29A2;
+	Wed, 29 Jan 2025 20:05:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1738179020; cv=none; b=KmCjPkenGTg7pYCYYLJ91GhIWMb0LNFdfClDA2PkCET3/66pYFGaBU5A2NXfqbNrhnIyM6RfPml3mWbIJHdq+cU4K87fMRgeG/hpIINZmMTKyJoithks3DbVGlTBVEa+dCGrEqlEBdO1LrDKE0/6+DhEON4ia/TyDwip8UBs7h4=
+	t=1738181128; cv=none; b=UBJZAlNfmz8JOGLxnlSa2U96rTXkFmB0HSmH3XskKt8xXyax41R+oo0oylnyIm/bzAXX4aJ1Mp4lw3mFN2zEVcifoe0hp9aJCdodZS3s+VPSMBSSZFYc+OV2GGKbHsp4Fyp3qKs5iaHpnqdUG3llxsL0ztwKV9mICAh0RQgHMMc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1738179020; c=relaxed/simple;
-	bh=jtShdk1cLxI3rsQL364KYAtkjGyrugsFoIDco1+bSw0=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=dPkksL0lOzdJlOzF8FqL93vLg6AMoH9Yme6gsBhhQ8wg0hJQn2SQcOr+2hlqd/JcaxmKUYajfKSq77nCiUBq7NJTyAuuidpcDU2HyQNLep7INEf5au9cqSei/VWru+Nwjt9qyzDIbr/o9P9X8UFrsw7i5U8gZJTLFw49+gGGpNw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=iliYlKf8; arc=none smtp.client-ip=78.32.30.218
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
-	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
-	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
-	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=dl5tdFJKGkb0tly6/jg3uxs+uJgTOsmpr2dUEi3zFeQ=; b=iliYlKf8V0uex8sekdGf6ezWT+
-	l7qob9WqpiqHTlYhtB7tD3b22uDcIvcgdRBAXS2M45JsBYIxXn2ialDOyheijmyIEEOKNhB0aV7sf
-	RkhNn3bB0TiCKe5z/VxN2HZp9foATsH0ObnciK2IkVx+mI0P238TQqk4ynMCbBqObjipTGYNtYb2p
-	ovJoQMHjpM8OXqRoyziFOy1+AGg2GKLSX0N4oU+haHRQ9YUH5B9kMY9ImollxTXaCD8c9xi+RR2Xo
-	7fT2Ci6k+OMIspZlieA1ScuVTFb9IMtV2TP9NPzVV0qo8WIB/buAPIF3I1gNudDV7D0oCXB3Cs/ON
-	hJ0rW55Q==;
-Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:32908)
-	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.96)
-	(envelope-from <linux@armlinux.org.uk>)
-	id 1tdDlC-0001zc-2K;
-	Wed, 29 Jan 2025 19:30:02 +0000
-Received: from linux by shell.armlinux.org.uk with local (Exim 4.96)
-	(envelope-from <linux@shell.armlinux.org.uk>)
-	id 1tdDl9-0003uU-2Q;
-	Wed, 29 Jan 2025 19:29:59 +0000
-Date: Wed, 29 Jan 2025 19:29:59 +0000
-From: "Russell King (Oracle)" <linux@armlinux.org.uk>
-To: "sreedevi.joshi" <joshisre@ecsmtp.an.intel.com>
-Cc: andrew@lunn.ch, hkallweit1@gmail.com, edumazet@google.com,
-	kuba@kernel.org, pabeni@redhat.com, netdev@vger.kernel.org,
-	Sreedevi Joshi <sreedevi.joshi@intel.com>
-Subject: Re: [PATCH net] phy: fix null pointer issue in phy_attach_direct()
-Message-ID: <Z5qBt4Cnds7NvBea@shell.armlinux.org.uk>
-References: <20250129183638.695010-1-sreedevi.joshi@intel.com>
+	s=arc-20240116; t=1738181128; c=relaxed/simple;
+	bh=ctiHtXdHi1w62PgzZwSkmiiiPPdzp0pSp2L7RWvYviE=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=i0C6M/Wc6ptE7JTS/tOv/23/kCHGrgt8tPCrJKJ560R9gYXUo+GxNL4eRr91GIU61wWnjbGxApIUh3lm8sSRj30kFtc8IwUQlqZpL4hJdRHvi9WzrM20vkKZ3R+4FxywllDmULErus5TUc9ZukSkpglD/jwF0VEYACrfY+62pd4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=TBYGpX/2; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9AFE9C4CED1;
+	Wed, 29 Jan 2025 20:05:27 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1738181128;
+	bh=ctiHtXdHi1w62PgzZwSkmiiiPPdzp0pSp2L7RWvYviE=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=TBYGpX/23LzeD9iFp5304St7Oq8+pAv7QL64Im1mzecTvpZK2XGJwPa/W4wiz1nYb
+	 T7bYxuIH+cyNJKmPBohy7mQl2U/VT1TwgSeQOOeNqVUjI3ka/bPpO6nT9n2+b3em8G
+	 K7m4ko0DmMLTbHaTubNgluq6wVhLgikDeQd00Uf+Y4YoHrwYywzcy9DwBZrl1oCgrk
+	 Pk78ydKcrN9EUDaWEjjCTkRcY3jCLVjmGxd8f2DQT56KgFFElBgI2V79NkBXNkREC6
+	 R0amNmk61eKcOX695Np9rLBQsGDobQ7okAsUBuuuV2y0vEK5iAruGaNgEopBueTpXq
+	 Yn6nN79tk4ufw==
+Date: Wed, 29 Jan 2025 12:05:26 -0800
+From: Jakub Kicinski <kuba@kernel.org>
+To: Anna Emese Nyiri <annaemesenyiri@gmail.com>
+Cc: netdev@vger.kernel.org, fejes@inf.elte.hu, edumazet@google.com,
+ pabeni@redhat.com, willemb@google.com, idosch@idosch.org,
+ davem@davemloft.net, horms@kernel.org, shuah@kernel.org,
+ linux-kselftest@vger.kernel.org
+Subject: Re: [PATCH net-next 1/1] selftests: net: Add support for testing
+ SO_RCVMARK and SO_RCVPRIORITY
+Message-ID: <20250129120526.7ba0958b@kernel.org>
+In-Reply-To: <20250129143601.16035-2-annaemesenyiri@gmail.com>
+References: <20250129143601.16035-1-annaemesenyiri@gmail.com>
+	<20250129143601.16035-2-annaemesenyiri@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250129183638.695010-1-sreedevi.joshi@intel.com>
-Sender: Russell King (Oracle) <linux@armlinux.org.uk>
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-On Wed, Jan 29, 2025 at 12:36:38PM -0600, sreedevi.joshi wrote:
-> From: Sreedevi Joshi <sreedevi.joshi@intel.com>
-> 
-> When attaching a fixed phy to devices like veth, it is
-> possible that there is no parent. The logic in
-> phy_attach_direct() tries to access the driver member
-> without checking for the null. This causes segfault in the
-> case of fixed phy.
+On Wed, 29 Jan 2025 15:36:01 +0100 Anna Emese Nyiri wrote:
+> diff --git a/tools/testing/selftests/net/Makefile b/tools/testing/selftests/net/Makefile
+> index 73ee88d6b043..98f05473e672 100644
+> --- a/tools/testing/selftests/net/Makefile
+> +++ b/tools/testing/selftests/net/Makefile
+> @@ -33,6 +33,7 @@ TEST_PROGS += gro.sh
+>  TEST_PROGS += gre_gso.sh
+>  TEST_PROGS += cmsg_so_mark.sh
+>  TEST_PROGS += cmsg_so_priority.sh
+> +TEST_PROGS += test_so_rcv.sh
 
-Kernel mode doesn't segfault. That's a userspace thing. Kernel mode
-oopses.
+You need to add the C part to the TEST_GEN_PROGS, otherwise it won't
+get built. We're seeing:
 
-I'm confused. You mention veth, which presumably is drivers/net/veth.c.
-Grepping this driver for "phy" returns nothing. So how can veth be
-broken by a phylib change?
+./test_so_rcv.sh: line 25: ./so_rcv_listener: No such file or directory
 
+in the CI.
+
+> +	memset(&recv_addr, 0, sizeof(recv_addr));
+> +	recv_addr.sin_family = AF_INET;
+> +	recv_addr.sin_port = htons(atoi(opt.service));
+> +
+> +	if (inet_pton(AF_INET, opt.host, &recv_addr.sin_addr) <= 0) {
+> +		perror("Invalid address");
+> +		ret_value = -errno;
+> +		goto cleanup;
+> +	}
+
+Any reason not to use getaddrinfo() ?
+
+Otherwise LGTM, thanks for following up!
 -- 
-RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
-FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
+pw-bot: cr
 
