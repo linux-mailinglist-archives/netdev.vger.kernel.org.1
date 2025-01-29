@@ -1,132 +1,163 @@
-Return-Path: <netdev+bounces-161561-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-161562-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0B611A22567
-	for <lists+netdev@lfdr.de>; Wed, 29 Jan 2025 22:02:30 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9C762A2257E
+	for <lists+netdev@lfdr.de>; Wed, 29 Jan 2025 22:09:07 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 6F6131886E4A
-	for <lists+netdev@lfdr.de>; Wed, 29 Jan 2025 21:02:34 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id D2FA11885D22
+	for <lists+netdev@lfdr.de>; Wed, 29 Jan 2025 21:09:11 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B9EAE1B040B;
-	Wed, 29 Jan 2025 21:01:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 345F61A2C29;
+	Wed, 29 Jan 2025 21:09:04 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="WvLf88tf"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=cs.stanford.edu header.i=@cs.stanford.edu header.b="pIeaG4lN"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ua1-f52.google.com (mail-ua1-f52.google.com [209.85.222.52])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp1.cs.Stanford.EDU (smtp1.cs.stanford.edu [171.64.64.25])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1C5381E9B26;
-	Wed, 29 Jan 2025 21:01:01 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.52
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 97A187081B
+	for <netdev@vger.kernel.org>; Wed, 29 Jan 2025 21:09:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=171.64.64.25
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1738184463; cv=none; b=YAnvIDNjPp5jaZ/NdQHZrKa6kniWXdcLalfh0ZHXQdfh8tPxGfgc1Xb9TrFkC1K25xdd2i1gsgf1bP2hfMepySHA78zZ7z3RTbr0k50E2qFG22sJU8u3rBDRti4F5opGmczkwpy5ZItoQq4dCxzj7B0wLf0MUBMbLSG0muQZ/oY=
+	t=1738184944; cv=none; b=JS37j46dzXo+MrE0G2OifUUHs9K5aHVL/avTWVZe98ISiCUX0JRU9R9Id0PYnTtjey+bM17U7Yz0lfhky5K79XNKpoG6XmBLH2ldKW002ql/6NOT3MN7rvHxab5xJqRAgKviAY1GG0SsEnB5UylcE8AfR4bLbpGS15TtICLVSlA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1738184463; c=relaxed/simple;
-	bh=3918yyY/rmiIB8dZr2zN4aDK7nWlHPADetn5LSMjFQQ=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=CGhiHJEk4SaryvdDirXz/tA5oeBdBVq4/LWDAjjop7q3cySsU8hxQQJ0v/eIEepsYxzRLVR6VvfS163aJ/pC/C6dEsYXrHWQq0Z5CIc2lXPBtyROJ0/E+Zl+E8SWSr+2H6h9BQMnvDDTRTl+6pwV46QllDWVf67ZLFH9UiATPGk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=WvLf88tf; arc=none smtp.client-ip=209.85.222.52
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ua1-f52.google.com with SMTP id a1e0cc1a2514c-85ba8b1c7b9so21165241.1;
-        Wed, 29 Jan 2025 13:01:01 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1738184461; x=1738789261; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=ochc5UOkCdW3bUFvqMywnHFt76blntsb/2IqZqQT3fc=;
-        b=WvLf88tfjxCvNuFU6WYmqHxlHSPn5v5UxCdObpKtHzbfkR2oHTglCOTUFfdLeCuy52
-         937elKQ5vbniGj/M3xiu/l1TAddGy+wkhZlRhn2zyuSPor0w0urk/fbkkAbsu44Pt27T
-         pZQ6+bGoMUmxctpuVA9s3QlV7OI9NfPjmsusgxpK6bNATaxL+I5yc3boDbTpmf57PDgj
-         4R2vdz9hRLICuGGul1GCUkeggLQFElhLyUyvw/uSvurrreEnpU7ixsqXgl9rduXD9Nkp
-         FgpXZf+alqANQcbFyys5dbmv1B8eRPkGthBmRyfJripzlvf4XOXYPG+ufFI/SiwhQjgH
-         l4Zg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1738184461; x=1738789261;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=ochc5UOkCdW3bUFvqMywnHFt76blntsb/2IqZqQT3fc=;
-        b=jtxpUAxKuezWeMgfCDIG7u3z3G66GHNXqZPygUsTY1GDTB4wvKz0GDVV93hHBxrb0+
-         phXj7BJnnAZI7SdTHQegzr04cWHn3oGNT1EC17c7gIFPE7h3dQi7l3uHP3ImJiuNezRw
-         wcC4/FYKW48QRD6D0zGRhAArnKHlFUn8HPTZ86XdI0mq57iGJ/48769c3K7lcd3SOlZr
-         DFQZIM9YRSfaifEvYw7wzSm7lqM0c7zZVI+4uw54uzl+ShhbKD8Bx7jIFTUfPNziX4cK
-         5taV0yKtI1/9Evoxu5+ZewncSbmvaRmBBiUvAWm/YwFaskojd9gNXzjAxepJjXV6hVDs
-         81Cw==
-X-Forwarded-Encrypted: i=1; AJvYcCWY959gUK9RqweLO0++XMaXHl6/nxUikRp3nWh+K1sj4hCvVDJoIXi5OWuIqr8L0S8mR4C1UMw=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxrOyVNJskX7yBW+zbdo25WY0q3Wz89NVUNO859UDaWHjdoAZKW
-	StpIdNkQdva4HiPLGib++OsT+7h5MiWTDmnWWWL3sPDGXa28XB/l
-X-Gm-Gg: ASbGncuBz4RKh/TujXXgeoVOXJWIo64W3S2eST8tVzukar8qNbcw6f3GdziVP3u2M1+
-	T8GfkIeCOvWwESQUpgpVz/+FeY2A4qf7dSZgrDK2wuyZX7F97xLL9ypy4vfebcsDBmWMmHrDb/h
-	s69zHXU28fc8fodIS+0yQ1WheYQc6Y7gxvjMCvSeaZaZEU9OBWl/XMhChN1LOWHJx4/EVM0M6lG
-	jhdIUXYLxmPDx2XRpce830q5y00G4hegTL0oIvetcdXCL+QQOpyaqrJJLwFSapl915xZDkveNMg
-	Q/5W7AwjwKiKvYQpR5jqahK1avgQeuuAIVOsBQ2XNStPZgMEdwnVLUfxipZfyNg=
-X-Google-Smtp-Source: AGHT+IG7o4TSaXqi/NhAyLNQgLpFwufuG91cYViGvbIoStH86vNB0GmJuKk4cDOM7gYh4by7dj1TNw==
-X-Received: by 2002:a05:6102:4647:b0:4b6:8cf4:9a23 with SMTP id ada2fe7eead31-4b9b6e55634mr1052977137.0.1738184460800;
-        Wed, 29 Jan 2025 13:01:00 -0800 (PST)
-Received: from lvondent-mobl5.. (syn-107-146-107-067.res.spectrum.com. [107.146.107.67])
-        by smtp.gmail.com with ESMTPSA id ada2fe7eead31-4b7097ab10csm2857516137.7.2025.01.29.13.00.58
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 29 Jan 2025 13:00:59 -0800 (PST)
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: davem@davemloft.net,
-	kuba@kernel.org
-Cc: linux-bluetooth@vger.kernel.org,
-	netdev@vger.kernel.org
-Subject: pull request: bluetooth 2025-01-29
-Date: Wed, 29 Jan 2025 16:00:57 -0500
-Message-ID: <20250129210057.1318963-1-luiz.dentz@gmail.com>
-X-Mailer: git-send-email 2.48.1
+	s=arc-20240116; t=1738184944; c=relaxed/simple;
+	bh=1Sqo37OhWPRlmoPqoREeQsbQn4FLSSquiaGFjUN8DnM=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=D0OpmekGe2K6B3kz/ZEqgdGUAZngnHndN3ci8N/+wPX6gyw2mvSQdMuu2KVgQ/2PUyzGnR/1NL578HS4IK4MHxYFtr/WJzFNVzOOOK5lzR9kGu+W6Muau9XbWPXjTYKw7b7kGZuuJUYixH55dEBGEdQQMQWfznjVTVCVbEs8JP8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=cs.stanford.edu; spf=pass smtp.mailfrom=cs.stanford.edu; dkim=pass (2048-bit key) header.d=cs.stanford.edu header.i=@cs.stanford.edu header.b=pIeaG4lN; arc=none smtp.client-ip=171.64.64.25
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=cs.stanford.edu
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=cs.stanford.edu
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=cs.stanford.edu; s=cs2308; h=Content-Transfer-Encoding:Content-Type:Cc:To:
+	Subject:Message-ID:Date:From:In-Reply-To:References:MIME-Version:Sender:
+	Reply-To:Content-ID:Content-Description:Resent-Date:Resent-From:Resent-Sender
+	:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:List-Help:List-Unsubscribe:
+	List-Subscribe:List-Post:List-Owner:List-Archive;
+	bh=LnDwjoIl0aaoV62Cpjq0jSv3fYlDj8lr0exZ7ybCiFw=; t=1738184942; x=1739048942; 
+	b=pIeaG4lNIuOSE4Plx+19gCr+vzf7e1xFY8pGMslzAalMRi8Yy2ks98IJj/bmcT76db1i/y5mnad
+	UZxmzlQYYSYHNHY98wVioMHwUOMrhnlBPoC4qGEJfVtAo7X5SWiZaHDVhIsN24sFg43myXvXX3s+V
+	2yKIvQDpDmEPRyp6dJpvTpfsCDk67pINweIBiMNDlqZdlGoh1Yj3wdXn1WlTGo9OI2hSQEWQ9OuoX
+	C9BWOQ/J0Oq4B9AoOtjlkhaGGdunA4AQmzZ0cpD/ww8dnIn+cBbOmM6xtqom+Pzc3K3CtBftsmFaG
+	/xd/C4UhxgUDjXblrU3jLN4j+xzUci+DzePg==;
+Received: from mail-oa1-f46.google.com ([209.85.160.46]:58829)
+	by smtp1.cs.Stanford.EDU with esmtpsa  (TLS1.2) tls TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256
+	(Exim 4.94.2)
+	(envelope-from <ouster@cs.stanford.edu>)
+	id 1tdFIy-0007Gn-PL
+	for netdev@vger.kernel.org; Wed, 29 Jan 2025 13:09:01 -0800
+Received: by mail-oa1-f46.google.com with SMTP id 586e51a60fabf-29fad34bb62so48967fac.1
+        for <netdev@vger.kernel.org>; Wed, 29 Jan 2025 13:09:00 -0800 (PST)
+X-Forwarded-Encrypted: i=1; AJvYcCV/Himy+pT33xX6WFAbF4E4+ZWW3TcRCLB2FXTICeuxNZvG/YYzC+nLGcJVBusU0Ywz/JfJhuk=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwSsuqP3IxplRNVf6Gtg8m/E2YrY0pXxW7GaLZG9fbC2PzeQNFn
+	F2XySRiCY0isl+MKos8lNkoibjFQCZyiLw5897+aKvqISVNLTNJLRv29YA5RtWG+vvQdo0YWBcU
+	4oPtU0i0EyySPO2LW4WW9U47ClTU=
+X-Google-Smtp-Source: AGHT+IFbZQqa5FB9GfVotKsIAOI0DDBeVe06itKmiHVstG4cV3TZ8q29MJmUUGNGYwKIoQq2QOzMkQMhqCc4mlER4aw=
+X-Received: by 2002:a05:6871:8802:b0:2a3:c59f:577b with SMTP id
+ 586e51a60fabf-2b32f280283mr2382874fac.24.1738184940238; Wed, 29 Jan 2025
+ 13:09:00 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+References: <20250115185937.1324-1-ouster@cs.stanford.edu> <20250115185937.1324-6-ouster@cs.stanford.edu>
+ <1c82f56c-4353-407b-8897-b8a485606a5f@redhat.com> <CAGXJAmwyp6tSO4KT_NSHKHSnUn-GSzSN=ucfjnBuXbg8uiw2pg@mail.gmail.com>
+ <2ace650b-5697-4fc4-91f9-4857fa64feea@redhat.com> <CAGXJAmxHDVhxKb3M0--rySAgewmLpmfJkAeRSBNRgZ=cQonDtg@mail.gmail.com>
+ <9209dfbb-ca3a-4fb7-a2fb-0567394f8cda@redhat.com> <CAGXJAmyb8s5xu9W1dXxhwnQfeY4=P21FquBymonUseM_OpaU2w@mail.gmail.com>
+ <13345e2a-849d-4bd8-a95e-9cd7f287c7df@redhat.com> <CAGXJAmweUSP8-eG--nOrcst4tv-qq9RKuE0arme4FJzXW67x3Q@mail.gmail.com>
+ <CANn89iL2yRLEZsfuHOtZ8bgWiZVwy-=R5UVNFkc1QdYrSxF5Qg@mail.gmail.com>
+ <CAGXJAmyKPdu5-JEQ4WOX9fPacO19wyBLOzzn0CwE5rjErcfNYw@mail.gmail.com>
+ <CANn89iJmbefLpPW-jgJjFkx79yso3jUUzuH0voPaF+2Kz3EW2g@mail.gmail.com>
+ <CAGXJAmz5=V2DmGHHh2XRHKQYynXmqYk_Nqw-y_QBWBQBMjbuag@mail.gmail.com> <CANn89iJ+mvp48F9tMmO=ttK3ai2WTVC7NNKy8YbV1d0wr-BD+Q@mail.gmail.com>
+In-Reply-To: <CANn89iJ+mvp48F9tMmO=ttK3ai2WTVC7NNKy8YbV1d0wr-BD+Q@mail.gmail.com>
+From: John Ousterhout <ouster@cs.stanford.edu>
+Date: Wed, 29 Jan 2025 13:08:24 -0800
+X-Gmail-Original-Message-ID: <CAGXJAmx0WXfUg-D77vDMg-R6Bw74gX4c==xqTzF4XoyetrhHcw@mail.gmail.com>
+X-Gm-Features: AWEUYZmx1fidhUuG7UOQbvxeTQ_xZPzBQXjZNkXb3DD2JdF6gzAThrkGTJ2jINM
+Message-ID: <CAGXJAmx0WXfUg-D77vDMg-R6Bw74gX4c==xqTzF4XoyetrhHcw@mail.gmail.com>
+Subject: Re: [PATCH net-next v6 05/12] net: homa: create homa_rpc.h and homa_rpc.c
+To: Eric Dumazet <edumazet@google.com>
+Cc: Paolo Abeni <pabeni@redhat.com>, Netdev <netdev@vger.kernel.org>, 
+	Simon Horman <horms@kernel.org>, Jakub Kicinski <kuba@kernel.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-Spam-Score: 0.8
+X-Spam-Level: 
+X-Scan-Signature: b05cf9a5276a81ca133e41a937654b06
 
-The following changes since commit 9e6c4e6b605c1fa3e24f74ee0b641e95f090188a:
+Thanks for the additional information; very helpful.
 
-  bonding: Correctly support GSO ESP offload (2025-01-28 13:20:48 +0100)
+-John-
 
-are available in the Git repository at:
-
-  git://git.kernel.org/pub/scm/linux/kernel/git/bluetooth/bluetooth.git tags/for-net-2025-01-29
-
-for you to fetch changes up to 5c61419e02033eaf01733d66e2fcd4044808f482:
-
-  Bluetooth: L2CAP: accept zero as a special value for MTU auto-selection (2025-01-29 15:29:41 -0500)
-
-----------------------------------------------------------------
-bluetooth pull request for net:
-
- - btusb: mediatek: Add locks for usb_driver_claim_interface()
- - L2CAP: accept zero as a special value for MTU auto-selection
- - btusb: Fix possible infinite recursion of btusb_reset
- - Add ABI doc for sysfs reset
- - btnxpuart: Fix glitches seen in dual A2DP streaming
-
-----------------------------------------------------------------
-Douglas Anderson (1):
-      Bluetooth: btusb: mediatek: Add locks for usb_driver_claim_interface()
-
-Fedor Pchelkin (1):
-      Bluetooth: L2CAP: accept zero as a special value for MTU auto-selection
-
-Hsin-chen Chuang (2):
-      Bluetooth: Fix possible infinite recursion of btusb_reset
-      Bluetooth: Add ABI doc for sysfs reset
-
-Neeraj Sanjay Kale (1):
-      Bluetooth: btnxpuart: Fix glitches seen in dual A2DP streaming
-
- Documentation/ABI/stable/sysfs-class-bluetooth |  9 +++++++++
- MAINTAINERS                                    |  1 +
- drivers/bluetooth/btnxpuart.c                  |  3 +--
- drivers/bluetooth/btusb.c                      | 12 +++++++-----
- net/bluetooth/l2cap_sock.c                     |  4 ++--
- 5 files changed, 20 insertions(+), 9 deletions(-)
- create mode 100644 Documentation/ABI/stable/sysfs-class-bluetooth
+On Wed, Jan 29, 2025 at 12:41=E2=80=AFPM Eric Dumazet <edumazet@google.com>=
+ wrote:
+>
+> On Wed, Jan 29, 2025 at 9:27=E2=80=AFPM John Ousterhout <ouster@cs.stanfo=
+rd.edu> wrote:
+> >
+> > On Wed, Jan 29, 2025 at 9:04=E2=80=AFAM Eric Dumazet <edumazet@google.c=
+om> wrote:
+> > >
+> > > On Wed, Jan 29, 2025 at 5:55=E2=80=AFPM John Ousterhout <ouster@cs.st=
+anford.edu> wrote:
+> > > >
+> > > > On Wed, Jan 29, 2025 at 8:50=E2=80=AFAM Eric Dumazet <edumazet@goog=
+le.com> wrote:
+> > > > >
+> > > > > On Wed, Jan 29, 2025 at 5:44=E2=80=AFPM John Ousterhout <ouster@c=
+s.stanford.edu> wrote:
+> > > > > >
+> > > > > > GRO is implemented in the "full" Homa (and essential for decent
+> > > > > > performance); I left it out of this initial patch series to red=
+uce the
+> > > > > > size of the patch. But that doesn't affect the cost of freeing =
+skbs.
+> > > > > > GRO aggregates skb's into batches for more efficient processing=
+, but
+> > > > > > the same number of skb's ends up being freed in the end.
+> > > > >
+> > > > > Not at all, unless GRO is forced to use shinfo->frag_list.
+> > > > >
+> > > > > GRO fast path cooks a single skb for a large payload, usually add=
+ing
+> > > > > as many page fragments as possible.
+> > > >
+> > > > Are you referring to hardware GRO or software GRO? I was referring =
+to
+> > > > software GRO, which is what Homa currently implements. With softwar=
+e
+> > > > GRO there is a stream of skb's coming up from the driver; regardles=
+s
+> > > > of how GRO re-arranges them, each skb eventually has to be freed, n=
+o?
+> > >
+> > > I am referring to software GRO.
+> > > We do not allocate/free skbs for each aggregated segment.
+> > > napi_get_frags() & napi_reuse_skb() for details.
+> >
+> >  YATIDNK (Yet Another Thing I Did Not Know); thanks for the information=
+.
+> >
+> > So it sounds like GRO moves the page frags into another skb and
+> > returns the skb shell to napi for reuse, eliminating an
+> > alloc_skb/kfree_skb pair? Nice.
+> >
+> > The skb that receives all of the page frags: does that eventually get
+> > kfree_skb'ed, or is there an optimization for that that I'm also not
+> > aware of?
+>
+> This fat skb is going to be stored into a socket receive queue,
+> so that its content can be copied or given to the user application.
+>
+> TCP then gives back the fat skb to the cpu which allocated the pages,
+> so that kfree_skb() is very cheap. Fast NIC have page pools.
+>
+> tcp_eat_recv_skb()
+>
+> With BIG TCP, we typically store 180 KB of payload per sk_buff
 
