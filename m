@@ -1,64 +1,73 @@
-Return-Path: <netdev+bounces-161538-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-161539-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 63703A2225A
-	for <lists+netdev@lfdr.de>; Wed, 29 Jan 2025 17:56:50 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id B77B5A22280
+	for <lists+netdev@lfdr.de>; Wed, 29 Jan 2025 18:04:58 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 85E653A51DD
-	for <lists+netdev@lfdr.de>; Wed, 29 Jan 2025 16:55:59 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 042BD18823A3
+	for <lists+netdev@lfdr.de>; Wed, 29 Jan 2025 17:04:59 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E4C6D1DFE16;
-	Wed, 29 Jan 2025 16:55:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EFB3B1DF977;
+	Wed, 29 Jan 2025 17:04:50 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=cs.stanford.edu header.i=@cs.stanford.edu header.b="VJqbtEEO"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="g4u3z7LN"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp1.cs.Stanford.EDU (smtp1.cs.stanford.edu [171.64.64.25])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ej1-f47.google.com (mail-ej1-f47.google.com [209.85.218.47])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 716831DFE02
-	for <netdev@vger.kernel.org>; Wed, 29 Jan 2025 16:55:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=171.64.64.25
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3779842A8B
+	for <netdev@vger.kernel.org>; Wed, 29 Jan 2025 17:04:48 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.47
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1738169721; cv=none; b=VFAxoJGMfEDYpJxMDkNxarZgAO3wCo8K/fvuNuG0j2e+3FJxmK6yWFIxLd1lG7iGHbam7W/FT5OTt6GjPEpwKTsdHLy7VIV1MSfvtYRYXkuPxTNjM20bIDW3dUdYXB24ZSeoCAkW1mZ1n3OVHhym6QQUaOBFyn+IUBiYd/a9GjI=
+	t=1738170290; cv=none; b=lHvBFycIigY6wIeiLY9hXwC/dczuWOwi8PXTXv17ZAkLXuYcvgub/tA1BYuXZl47AskdGE9bf8QFDEEmLbqPRNophOvK6mrZBgJSvi4aGIKtFhSuDKR4McPz12hcLsWlOo8sy5V/fYypO7YXVUYUFdFAwXpJ995olA/6845wyzA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1738169721; c=relaxed/simple;
-	bh=OTOt3a3xCZ3d+amh6jix6pNcBFDs2cLOK/auAucstEs=;
+	s=arc-20240116; t=1738170290; c=relaxed/simple;
+	bh=9PJwGCb/VZtui3L5qOUGJQP5Tb/QmMsr7V1Ii3+2xZI=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=PpidFQxrKCriNDfWErGdHx1ZOeP3bR//0qVN7MBnACw2AYx0rYactvxx56MwlHgyE3s7+vg1fp3v0AmqPiSyatBen8D5zET6/y+mkUXpS0xOT4NOxVfA/+nFfABo53NBQ6JTmAlea1IM4hyMy48LHI9uPgG551QXXFZSY3tRyMs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=cs.stanford.edu; spf=pass smtp.mailfrom=cs.stanford.edu; dkim=pass (2048-bit key) header.d=cs.stanford.edu header.i=@cs.stanford.edu header.b=VJqbtEEO; arc=none smtp.client-ip=171.64.64.25
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=cs.stanford.edu
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=cs.stanford.edu
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=cs.stanford.edu; s=cs2308; h=Content-Transfer-Encoding:Content-Type:Cc:To:
-	Subject:Message-ID:Date:From:In-Reply-To:References:MIME-Version:Sender:
-	Reply-To:Content-ID:Content-Description:Resent-Date:Resent-From:Resent-Sender
-	:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:List-Help:List-Unsubscribe:
-	List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=OTOt3a3xCZ3d+amh6jix6pNcBFDs2cLOK/auAucstEs=; t=1738169720; x=1739033720; 
-	b=VJqbtEEOwLCeH+BegHJqzKwn3MVhkCnw9uBd09nlrhuLovN1MMORwsrahrKOyDV1UUeVmnA9IjG
-	bTXQtysBh1UT9jELuiiFfA9ThQ8tTpIKJvOrQWDAa1wMd/oaF/PD49h5BOI2STG+E1hceA+FcocHT
-	wfKyMqBER2QE4BGxJpDzBrQIjhWODDt6yrjtjySm7sldgNlhCJE/Rf5Bq1nIQQGlEHPZSqXaG2OeC
-	CXFlhgdngbXCUMEd0cqt6+GSySMLmuudYpJt/qa0BRN0FgBbXehI8a18/pMdCfyQa7q8ri4oRKAV5
-	Epoe76RthAijh9XrdDlIeq8cTdPkEzhj5jlg==;
-Received: from mail-ot1-f50.google.com ([209.85.210.50]:46395)
-	by smtp1.cs.Stanford.EDU with esmtpsa  (TLS1.2) tls TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256
-	(Exim 4.94.2)
-	(envelope-from <ouster@cs.stanford.edu>)
-	id 1tdBLT-0004nA-8U
-	for netdev@vger.kernel.org; Wed, 29 Jan 2025 08:55:19 -0800
-Received: by mail-ot1-f50.google.com with SMTP id 46e09a7af769-71e3cbd0583so1627353a34.1
-        for <netdev@vger.kernel.org>; Wed, 29 Jan 2025 08:55:19 -0800 (PST)
-X-Forwarded-Encrypted: i=1; AJvYcCWDVmXNjn5vlDfT0SUNVPvEOUSWHqLS+5m4pJaGwYVjaiP28UZg8yIm1q9j5NHxW+IfZ21O1MY=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwIOsbuef9/CYHQhsp+LpjKpzj5Bt2fL135UF3UiiaxPnW2l81a
-	1A/dE0mSV7yGw1DehfNrwgsJM6o6Onp2IWOHooddBYXXEdr2jshF1tCk1X8h8lHe4tvdBJnC/OJ
-	tN4ZQS62OOvxxRdbvVsoNBcCh2fc=
-X-Google-Smtp-Source: AGHT+IFVOejpahZKuGbmRgf6UsC9ioPA4FtIivBtVJm3CICFrBSe7ftBB11UuovB338qU2xk2y4lR34IhLVwRmI2B3U=
-X-Received: by 2002:a05:6870:6190:b0:29e:2422:49f9 with SMTP id
- 586e51a60fabf-2b32f28f374mr2152890fac.25.1738169718702; Wed, 29 Jan 2025
- 08:55:18 -0800 (PST)
+	 To:Cc:Content-Type; b=bOzCkk2ND6hWT7watLggPIIB85vtWRm9ei6jNojCrOWol3rGUQYOEVJO2Rcrd8V6iC5RBczBSbD+max0bdi4VXV7kUMHGVZkrFSclxkomGXgFffTzT4RB1nirEl8x+sgv256mIefmN0fQh2Z5jud9ZjozYFk8erhEqQrOppG0W4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=g4u3z7LN; arc=none smtp.client-ip=209.85.218.47
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-ej1-f47.google.com with SMTP id a640c23a62f3a-aa684b6d9c7so375391566b.2
+        for <netdev@vger.kernel.org>; Wed, 29 Jan 2025 09:04:48 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1738170287; x=1738775087; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=9PJwGCb/VZtui3L5qOUGJQP5Tb/QmMsr7V1Ii3+2xZI=;
+        b=g4u3z7LNPqbJjKQpdEy8z/rFBhvtjavhbJLQ5FCwL7qEiC3aMOGzn8al3NQ/QK8ZwW
+         FOnuPeqR3LSelWWGCEvTo/fSfDElJA05KButuE5W8Zzh9toWXMaq8lXiaeuPOGGCf7Y6
+         6HlgsHEZUC0xvGPMciuOWO+IRpefHqNDGyQPASo5Zsakper4AwhO6a8u2CwEI9Onz30N
+         hbj5xPbgweKd3Y0jVnXjT6m9RpqekhI1xIWJxMBTSLXNX3jMsyCi+CSKEpfZaMgJak9G
+         YlETPKuXMFVT/7Ldp7cBgLR9lIPuIoiCgcsdltTgtEGhXfGrIJPlJwIE9F3vq5GRBn2F
+         pQTA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1738170287; x=1738775087;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=9PJwGCb/VZtui3L5qOUGJQP5Tb/QmMsr7V1Ii3+2xZI=;
+        b=XO0yqLYikjiuqCfTsU5C2I6DQ4BbBZg5adafZ7DxaNo4b0v3JL8KQSuEiM80eJSomb
+         TnH+eUgTpPEDOLns8A4xkJaIZAFhxFIfM9IJIXgTxObaHSsUy0Y83T1TPZn1gvWGd+3y
+         n+uQv3blznLJDDxHTES2n0qAtbVOYloiHcBdg/8FbC8xPVnRCnVRnNPRgbdDnugmBxNR
+         cJHnsiHtSa3Eg4j5Q20CDTNTbt7DpBWqNe03Q9Us93M9LDzpWtZlI3U/ra+s2xkwVkoN
+         1JH+5vJQXelsYedxLjPJHNImp7EgO2cozMacYeSHZTAggQBRKpQDvGsC8+BTbpb4KtfM
+         xKgQ==
+X-Forwarded-Encrypted: i=1; AJvYcCUc0ZCBSvdKBTsxIfOA6Y//lclqjmsyJD8+9hyrRv5yvuspQPHbbKHp49tm02K7NKh+LzmdDB0=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwFhx/WehdRYBYmIb0MHVmawnAabukqmypkwbWQQLbRaHF5kpon
+	oJcsP8VIkAr66PMDOLCiEajelqWJUp7QaxT9fR0BU8EwIaUveungcbTaK7Tw1UK5uKdLrojBjwj
+	W0Bm/knyhyxSJtZeJiLuCr0YBXLdRVDkN6HjG
+X-Gm-Gg: ASbGncvaP5GYiyx7HmKD1+LlSN2xD5eWjPSTr6ks5x9TTtY6tLR0Bf1q7KxTXRND6Bv
+	GDj+eCjmIZa9rZKKIwKHVVBQUPsmfE6LVetrwJozpaqbfzqkZy0xedHwZUAhNUaFiNVpxE8g/gg
+	==
+X-Google-Smtp-Source: AGHT+IHLHkXsWut7BzXrQMri1ku4+1hvDnjq1NpY5CNowtpBL4K36ZxrfVTI2qDZHw/4EUK6S9GgHqxVzFuakahPW/A=
+X-Received: by 2002:a17:907:7e96:b0:aa6:a9fe:46dd with SMTP id
+ a640c23a62f3a-ab6cfdbc619mr382747466b.38.1738170287102; Wed, 29 Jan 2025
+ 09:04:47 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -70,44 +79,46 @@ References: <20250115185937.1324-1-ouster@cs.stanford.edu> <20250115185937.1324-
  <2ace650b-5697-4fc4-91f9-4857fa64feea@redhat.com> <CAGXJAmxHDVhxKb3M0--rySAgewmLpmfJkAeRSBNRgZ=cQonDtg@mail.gmail.com>
  <9209dfbb-ca3a-4fb7-a2fb-0567394f8cda@redhat.com> <CAGXJAmyb8s5xu9W1dXxhwnQfeY4=P21FquBymonUseM_OpaU2w@mail.gmail.com>
  <13345e2a-849d-4bd8-a95e-9cd7f287c7df@redhat.com> <CAGXJAmweUSP8-eG--nOrcst4tv-qq9RKuE0arme4FJzXW67x3Q@mail.gmail.com>
- <CANn89iL2yRLEZsfuHOtZ8bgWiZVwy-=R5UVNFkc1QdYrSxF5Qg@mail.gmail.com>
-In-Reply-To: <CANn89iL2yRLEZsfuHOtZ8bgWiZVwy-=R5UVNFkc1QdYrSxF5Qg@mail.gmail.com>
-From: John Ousterhout <ouster@cs.stanford.edu>
-Date: Wed, 29 Jan 2025 08:54:43 -0800
-X-Gmail-Original-Message-ID: <CAGXJAmyKPdu5-JEQ4WOX9fPacO19wyBLOzzn0CwE5rjErcfNYw@mail.gmail.com>
-X-Gm-Features: AWEUYZlzO6CXv5EpIf_u4w6fsS5cBTku2r6a413bSZqavVBFCPuJWmyxLOMzXRU
-Message-ID: <CAGXJAmyKPdu5-JEQ4WOX9fPacO19wyBLOzzn0CwE5rjErcfNYw@mail.gmail.com>
+ <CANn89iL2yRLEZsfuHOtZ8bgWiZVwy-=R5UVNFkc1QdYrSxF5Qg@mail.gmail.com> <CAGXJAmyKPdu5-JEQ4WOX9fPacO19wyBLOzzn0CwE5rjErcfNYw@mail.gmail.com>
+In-Reply-To: <CAGXJAmyKPdu5-JEQ4WOX9fPacO19wyBLOzzn0CwE5rjErcfNYw@mail.gmail.com>
+From: Eric Dumazet <edumazet@google.com>
+Date: Wed, 29 Jan 2025 18:04:36 +0100
+X-Gm-Features: AWEUYZk995CLzz3ysTjvOmGnb_Aca4bIJlC13qo4wM7naSfODngXCohgdj0gTmo
+Message-ID: <CANn89iJmbefLpPW-jgJjFkx79yso3jUUzuH0voPaF+2Kz3EW2g@mail.gmail.com>
 Subject: Re: [PATCH net-next v6 05/12] net: homa: create homa_rpc.h and homa_rpc.c
-To: Eric Dumazet <edumazet@google.com>
+To: John Ousterhout <ouster@cs.stanford.edu>
 Cc: Paolo Abeni <pabeni@redhat.com>, Netdev <netdev@vger.kernel.org>, 
 	Simon Horman <horms@kernel.org>, Jakub Kicinski <kuba@kernel.org>
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
-X-Spam-Score: 0.8
-X-Spam-Level: 
-X-Scan-Signature: acf3039aa8d32d1ac60a71149e52b94c
 
-On Wed, Jan 29, 2025 at 8:50=E2=80=AFAM Eric Dumazet <edumazet@google.com> =
-wrote:
+On Wed, Jan 29, 2025 at 5:55=E2=80=AFPM John Ousterhout <ouster@cs.stanford=
+.edu> wrote:
 >
-> On Wed, Jan 29, 2025 at 5:44=E2=80=AFPM John Ousterhout <ouster@cs.stanfo=
-rd.edu> wrote:
+> On Wed, Jan 29, 2025 at 8:50=E2=80=AFAM Eric Dumazet <edumazet@google.com=
+> wrote:
 > >
-> > GRO is implemented in the "full" Homa (and essential for decent
-> > performance); I left it out of this initial patch series to reduce the
-> > size of the patch. But that doesn't affect the cost of freeing skbs.
-> > GRO aggregates skb's into batches for more efficient processing, but
-> > the same number of skb's ends up being freed in the end.
+> > On Wed, Jan 29, 2025 at 5:44=E2=80=AFPM John Ousterhout <ouster@cs.stan=
+ford.edu> wrote:
+> > >
+> > > GRO is implemented in the "full" Homa (and essential for decent
+> > > performance); I left it out of this initial patch series to reduce th=
+e
+> > > size of the patch. But that doesn't affect the cost of freeing skbs.
+> > > GRO aggregates skb's into batches for more efficient processing, but
+> > > the same number of skb's ends up being freed in the end.
+> >
+> > Not at all, unless GRO is forced to use shinfo->frag_list.
+> >
+> > GRO fast path cooks a single skb for a large payload, usually adding
+> > as many page fragments as possible.
 >
-> Not at all, unless GRO is forced to use shinfo->frag_list.
->
-> GRO fast path cooks a single skb for a large payload, usually adding
-> as many page fragments as possible.
+> Are you referring to hardware GRO or software GRO? I was referring to
+> software GRO, which is what Homa currently implements. With software
+> GRO there is a stream of skb's coming up from the driver; regardless
+> of how GRO re-arranges them, each skb eventually has to be freed, no?
 
-Are you referring to hardware GRO or software GRO? I was referring to
-software GRO, which is what Homa currently implements. With software
-GRO there is a stream of skb's coming up from the driver; regardless
-of how GRO re-arranges them, each skb eventually has to be freed, no?
-
--John-
+I am referring to software GRO.
+We do not allocate/free skbs for each aggregated segment.
+napi_get_frags() & napi_reuse_skb() for details.
 
