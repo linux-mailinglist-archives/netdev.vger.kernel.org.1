@@ -1,281 +1,313 @@
-Return-Path: <netdev+bounces-161476-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-161477-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 355D0A21C5B
-	for <lists+netdev@lfdr.de>; Wed, 29 Jan 2025 12:33:48 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 60413A21C60
+	for <lists+netdev@lfdr.de>; Wed, 29 Jan 2025 12:35:44 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 58EEA3A13A0
-	for <lists+netdev@lfdr.de>; Wed, 29 Jan 2025 11:33:40 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 96A421885860
+	for <lists+netdev@lfdr.de>; Wed, 29 Jan 2025 11:35:48 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AACFE1B414E;
-	Wed, 29 Jan 2025 11:33:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C6B6E1ABEC1;
+	Wed, 29 Jan 2025 11:35:39 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="CwoAvmkd"
+	dkim=pass (1024-bit key) header.d=mysnt.onmicrosoft.com header.i=@mysnt.onmicrosoft.com header.b="lXMn0ZG7"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from EUR05-AM6-obe.outbound.protection.outlook.com (mail-am6eur05on2129.outbound.protection.outlook.com [40.107.22.129])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 708161ABEC1;
-	Wed, 29 Jan 2025 11:33:43 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1738150423; cv=none; b=M+T6AppkfZXH+tUR/12/Li5wsK/HcYsCHtvsrI96mQ4QktA4Mu8JEBWZuvLtaQNuNdK1FTn8t+AF6UT34v7q3Brs8DukUv3IzUEUoGbSQLDTYe1dnovMf2w1NBnpfoYsltrBxP6kkFfTTqLOVVZR2uRsGojaG9F+sHGrPGFUpdw=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1738150423; c=relaxed/simple;
-	bh=Mhxv2Loh+GGqlP2OneIojdbaaki81n2bu1IiKIVotSw=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=pkGipj2JS3CmcGnN6u3NwYFP9VQDpremnShSzj4v1Hs6SmElGwyALVm4mYIzxI/nca5Ynp2tKLJhUHFn0yq36m3bYGX/AF0SVluJFoCyXMxI8lmaz1xWryApf3R7X/M4YkCv1+mwuU3CF718ixKl89Gm1mwYcBKDFXSbm4MF7Hw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=CwoAvmkd; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2A501C4CED3;
-	Wed, 29 Jan 2025 11:33:39 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1738150423;
-	bh=Mhxv2Loh+GGqlP2OneIojdbaaki81n2bu1IiKIVotSw=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=CwoAvmkdvgqNosOM7q+TPi1Qv9awlSZZbxdiVZAAKt1K0CYR2QSJ/R1NUSjcFKvJl
-	 /pS84KGdD0FbZ7dO29Xq+fxjujyH2w5kpA4cS+Z5A81yuc79hv0exScg9ERLHw7C8g
-	 oZtYPo7bnDt9+zemfdidvr5hF3XU+TYl3LI/LZj/1gfJuXpzeZr8SMf/JspvPlhEkW
-	 T8c/c9Q2lNig7WHKNHAaiEzzFmcNK3emL9xA1OwtnB93vqHGFVq3Tb0neKMI50Z5Vo
-	 LOHT0jQSuo8zIZBT53b36l1t+sKDnoN5Z1KrAzKWgHEFAAC+rjIdpdwOfGb9SEdhuB
-	 A6eBcAeHICwGA==
-Message-ID: <1d1d58b3-2516-4fc8-9f9a-b10604bbe05b@kernel.org>
-Date: Wed, 29 Jan 2025 12:33:27 +0100
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EAA8819597F
+	for <netdev@vger.kernel.org>; Wed, 29 Jan 2025 11:35:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.22.129
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1738150539; cv=fail; b=KY5MWMzNOJWpBoj10eBInurOj9fNThnb08BDvdP7Oaot88GXh9DRA9UAIAeh6rGEobaGujNQUSamskAGJe9es1SlPORegbeSCg0CXY5tcvAvlqZG8noXrBxJBaZXsjvEFw+mMI1CFsJNrbF6z8jCtZbAtifTiSVqYZX0qkGaNHI=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1738150539; c=relaxed/simple;
+	bh=PdwAgfaaCwxkeHD+PaKO3ObfzKg08vIz3XV0t+bv3lY=;
+	h=Message-ID:Date:Subject:To:Cc:References:From:In-Reply-To:
+	 Content-Type:MIME-Version; b=YZuGEW8AkhKYMzDAgI9wHQW7292L5PShDgbCmGTSeSVbgYH99oGtfEhR3098fNPHCi2gsT2Ti3D20g7+rsv0oUeFd/flc7VxCmdsR4JDgKUTyNdeV8FA06h7Ui+xWTFKiyyDUXLdaORA50FSPKbVl70bsbz6X0L6gmcofJzfuKM=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kontron.de; spf=pass smtp.mailfrom=kontron.de; dkim=pass (1024-bit key) header.d=mysnt.onmicrosoft.com header.i=@mysnt.onmicrosoft.com header.b=lXMn0ZG7; arc=fail smtp.client-ip=40.107.22.129
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kontron.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kontron.de
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=Fwhdp5bjrvsP18qLFegrPrOSQgrk24V/uCnSZ9nTBkrtBJ6sIBAxK32XIBW1JoCw9sTFG6gWiY7ruemixLfjsds+uW44BEW5oroe1fOZqwcXe+kAzn3bhFUUF28TR5XLDgvkpicAD6bRvwAydrlqm94CBIBM0XLO3wPmzV94ztry9ay4IsQWUO52a2vEASH2OlKjtMEk1hUlLsroWEdO16pl1Y5qR+EcHUNM74RaTnm9ZTH9J8dynby8JxVG3JpT91pOlbh+5N3l3qaFBIjP6yWMO+IVx4DaM2OrDilTix38oaXlaNuNfVNQVVdyOgpFDeweD/Zjw9r6TMfYaeFkfw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=+VQL4HeRC91QqSjGaLDHvzFHCJ3/nrPrynIfUtuzmoo=;
+ b=vaR2VgZhzo1A9lkJFCikhwnGUuW7MmqmGJPJ3AspCxxuedueMRH06+22MLLnD7NSnubLIb58BkZT3jQfJBaq/mJmkoB2jS5bpJo4IMi1NS3LB0hlNYnP4XZGg9j8pNHrh3Mf2ZhsPLfg8uRbFcFAHQUkBuMc0mraFmtXrGX5kJR0i0OGk2OsA2E2TkrT2LBIo/5y+NiwYIZ/NZ4mfsz0JFoYW9Xk5cxiDWQP8mk1MhIYWl9K2zm9/S0wggwFUxzRilQV5tjfC5CORxwRqHAfAAEmg3e3q3VZeTmCDcoH26RjXXXeqc2aUCuWAvW663LH9QhWJmlvNsoyMZQJkICBew==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=kontron.de; dmarc=pass action=none header.from=kontron.de;
+ dkim=pass header.d=kontron.de; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=mysnt.onmicrosoft.com;
+ s=selector2-mysnt-onmicrosoft-com;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=+VQL4HeRC91QqSjGaLDHvzFHCJ3/nrPrynIfUtuzmoo=;
+ b=lXMn0ZG7SXpYgs4ndVtKh3MNwZyZGjOS8xu57BUA1Uk3HbPv+ux54KBhhMyhUhyJqv9YWPsTCepZHM1sOg2Kgc7R7MaW6Qg6lWD11kXkyA+jAKObHnR8mhKPshcZlkJk+a8Y4lp1XEjvgW7M9RgmzFJ9ljjK8c1GoLR81HcL/pM=
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=kontron.de;
+Received: from AS4PR10MB5671.EURPRD10.PROD.OUTLOOK.COM (2603:10a6:20b:4f2::14)
+ by GV1PR10MB6292.EURPRD10.PROD.OUTLOOK.COM (2603:10a6:150:90::18) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8398.13; Wed, 29 Jan
+ 2025 11:35:31 +0000
+Received: from AS4PR10MB5671.EURPRD10.PROD.OUTLOOK.COM
+ ([fe80::95c1:ff1e:275d:26aa]) by AS4PR10MB5671.EURPRD10.PROD.OUTLOOK.COM
+ ([fe80::95c1:ff1e:275d:26aa%4]) with mapi id 15.20.8398.013; Wed, 29 Jan 2025
+ 11:35:31 +0000
+Message-ID: <0383e3d9-b229-4218-a931-73185d393177@kontron.de>
+Date: Wed, 29 Jan 2025 12:35:30 +0100
+User-Agent: Mozilla Thunderbird
+Subject: Re: KSZ9477 HSR Offloading
+To: Lukasz Majewski <lukma@denx.de>
+Cc: Andrew Lunn <andrew@lunn.ch>,
+ "netdev@vger.kernel.org" <netdev@vger.kernel.org>
+References: <05a6e63e-96c1-4d78-91b9-b00deed044b5@kontron.de>
+ <6d0e1f47-874e-42bf-9bc7-34856c1168d1@lunn.ch>
+ <1c140c92-3be6-4917-b600-fa5d1ef96404@kontron.de>
+ <6400e73a-b165-41a8-9fc9-e2226060a68c@kontron.de>
+ <20250129121733.1e99f29c@wsk>
+Content-Language: en-US, de-DE
+From: Frieder Schrempf <frieder.schrempf@kontron.de>
+In-Reply-To: <20250129121733.1e99f29c@wsk>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: FR0P281CA0169.DEUP281.PROD.OUTLOOK.COM
+ (2603:10a6:d10:b4::11) To AS4PR10MB5671.EURPRD10.PROD.OUTLOOK.COM
+ (2603:10a6:20b:4f2::14)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird Beta
-Subject: Re: [RFC PATCH v2 1/8] landlock: Fix non-TCP sockets restriction
-Content-Language: en-GB
-To: Mikhail Ivanov <ivanov.mikhail1@huawei-partners.com>,
- =?UTF-8?Q?Micka=C3=ABl_Sala=C3=BCn?= <mic@digikod.net>
-Cc: gnoack@google.com, willemdebruijn.kernel@gmail.com, matthieu@buffet.re,
- linux-security-module@vger.kernel.org, netdev@vger.kernel.org,
- netfilter-devel@vger.kernel.org, yusongping@huawei.com,
- artem.kuzin@huawei.com, konstantin.meskhidze@huawei.com,
- MPTCP Linux <mptcp@lists.linux.dev>, linux-nfs@vger.kernel.org,
- Paul Moore <paul@paul-moore.com>
-References: <20241017110454.265818-1-ivanov.mikhail1@huawei-partners.com>
- <20241017110454.265818-2-ivanov.mikhail1@huawei-partners.com>
- <49bc2227-d8e1-4233-8bc4-4c2f0a191b7c@kernel.org>
- <20241018.Kahdeik0aaCh@digikod.net>
- <62336067-18c2-3493-d0ec-6dd6a6d3a1b5@huawei-partners.com>
- <20241212.qua0Os3sheev@digikod.net>
- <f480bbea-989d-378a-9493-c2bee412db00@huawei-partners.com>
- <20250124.gaegoo0Ayahn@digikod.net>
- <2f970b00-7648-1865-858a-214c5c6af0c4@huawei-partners.com>
- <20250127.Uph4aiph9jae@digikod.net>
- <d3d589c3-a70b-fc6e-e1bb-d221833dfef5@huawei-partners.com>
- <594263fc-f4e7-43ce-a613-d3f8ebb7f874@kernel.org>
- <f6e72e71-c5ed-8a9c-f33e-f190a47b8c27@huawei-partners.com>
- <2e727df0-c981-4e0c-8d0d-09109cf27d6f@kernel.org>
- <103de503-be0e-2eb2-b6f0-88567d765148@huawei-partners.com>
-From: Matthieu Baerts <matttbe@kernel.org>
-Autocrypt: addr=matttbe@kernel.org; keydata=
- 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
- lzVbFe7fduHbABmYz9cefQpO7wDE/Q==
-Organization: NGI0 Core
-In-Reply-To: <103de503-be0e-2eb2-b6f0-88567d765148@huawei-partners.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: AS4PR10MB5671:EE_|GV1PR10MB6292:EE_
+X-MS-Office365-Filtering-Correlation-Id: 8ba466d4-6540-4473-d02b-08dd40590972
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;ARA:13230040|1800799024|376014|366016;
+X-Microsoft-Antispam-Message-Info:
+	=?utf-8?B?MFN4NHU1ZUkxM2c1MlV5K20yeG9CbFdEYVJid0ZzNFljY1d5UlZ3a1lpVDBy?=
+ =?utf-8?B?RjF2T28wL25BdnpIZlJ4cHlYdUo2enNQMnBsTG5rSzRxUWZTRWpBeFIyRHgy?=
+ =?utf-8?B?MGgrMXJwY3NBNVRCcWRiNytPaGcwemprSEVjU2t3U1hOVjNycXlBSzNVYnVV?=
+ =?utf-8?B?ZTFZZ21LZXJ4Q1hJZGQzeUdCZW1aVUJ4SENFMjJ4cjk1Zy9qRUVtd3RCVnpO?=
+ =?utf-8?B?VGEzY04wazVuYWZFdlhGZHB6ekNNRVRNM3JmeDA4SU1raFcvQTZqSVpzK0pJ?=
+ =?utf-8?B?MCtmaHFKQm5hYi84N2xvckZKeWtnK3JwbmxIaUVxRWpSeHVibFpqd1pkZUla?=
+ =?utf-8?B?bmtKVEo1UU1JYS9tSWtLZXhCRVY4UGZHL1dxQi9iVEEzM2VnQ2RqSGx0UEk5?=
+ =?utf-8?B?dGpyb3I2amhOY08zQU1vZloxSVlhY3duSzZNa3JQZEdGbWpPR3pRaHJWaGU0?=
+ =?utf-8?B?UTFOM2xLMklFVDBiSUl4UDN2WmpYZ21DNTlHQkpHR1IzRUl0WTBtaFZscTZT?=
+ =?utf-8?B?dXNvTmFBaTU4U0hCendnTUUxQ05xQ3M2OXZvb1l0Z1pZYlZNaVZXVGc0TXc2?=
+ =?utf-8?B?c0xleFVrcjUybmpEcmFtS2UvbnJUZGhuSyt3cGdWSC9VcEUrYlhYZkRYU1Ja?=
+ =?utf-8?B?R0NvUnVzQ2l5WkliSzA5VWhVN0VtV0VPa1NoYkhWbmJSbGpXL0pEdk9ZY0Jp?=
+ =?utf-8?B?SVQ5TEIzZ1VlbERlSy8wWEZzM2VaUnhYL3lqdUhyWXo1WVRFSEVMTW0wU1hV?=
+ =?utf-8?B?L1NQWkFaWTBWRlc4aWNpRmQyeXhnenJNWWlMR1VaQ1ZCcU1uZzl3Qjg5M0Y0?=
+ =?utf-8?B?VDJjekZEeFZJdDJDT1d5SnozNHZsbWt1emNYSGJUZGJlODRlS1J3Tnl3cXJs?=
+ =?utf-8?B?Y2hzNUFiMFJ3amhPM2VpNEpob0FkTlNTZVJYL0pjNkRmY0JTWEFVd3p2L3Zh?=
+ =?utf-8?B?WFVCMkhybUxqWDJCV1l3cnpua3R2REpMRUwrelhqK25WTkErdldqUXR4UWxy?=
+ =?utf-8?B?OFJSOURTaXJWL1VseGZaekRyUnpZNkZsOXZ3N2lYcDdYeTdIZGlhTk9VM3NQ?=
+ =?utf-8?B?cmZ5THZZNjhKczk0eVpOSURJaUtBK3dVbEk2Vng3clJmbUdOWHdlQVJXVkd5?=
+ =?utf-8?B?ZlVyZHZMUU5nZzl2bXhMSVNyNWlIUzR0T3NUNkhSYkU2RzhxbEkzV25tM3Jy?=
+ =?utf-8?B?NnZEOU43Umh1aktya3Y3aTJpS3A4L083aWFSOGFVcDRuNGNDR0VtY245ZWlu?=
+ =?utf-8?B?UGptV3dhbEM0QlgvK1NMQ0h3SHZQd1FsMEpKRk9Pd3BWUUdXM2FXRkhlaEN5?=
+ =?utf-8?B?dS8wSXNld2RrOTE2RUN0ZGNuQStkRkhtdkJIWEl1c1NydktMdGszTlVmNFBp?=
+ =?utf-8?B?MmJTVEVRTjJDODVSUFlLZkh3SEJyem1XTmM2ZDZ6Y3ZlOWFjbG95KzAveHJQ?=
+ =?utf-8?B?aUw0MFpEdTN3RjQxL1VuY0hMSjBlenhVd1daUFRiQXQxcnZoYmZHOU5FVXRq?=
+ =?utf-8?B?ZERHWUw0eDNZMmlyT1Fjbk5CV0VvTXFtbyszeEh5dGJlZEdHRk1Nd3ZlUnAw?=
+ =?utf-8?B?UkI5dTY1RFgxWVdUalk1QWsvREtBYUdpVDRkUFg1NGEwUUJHUHV1a3Z4aDlL?=
+ =?utf-8?B?MjRHajE4Mm05aHBydTlWYlloaVVUSG5YaWJxdmRWcW82Wmh0aTVWQVZGQ1Vp?=
+ =?utf-8?B?c0JzU0wrci9jSjdKTEp1cFZFYW5yZm9LY3dNOTh3cWZPSmlTVUVYZmt2SFFP?=
+ =?utf-8?Q?4sKCFGne57nBKK5hshlkmhkYBL1imMCRNIP+Xml?=
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:AS4PR10MB5671.EURPRD10.PROD.OUTLOOK.COM;PTR:;CAT:NONE;SFS:(13230040)(1800799024)(376014)(366016);DIR:OUT;SFP:1102;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?utf-8?B?NzFHa2FmUGNQN25qSmlyVXVDZVV5ZHNBLzlheWIzemVnOXBTUnBaTHhKRmd4?=
+ =?utf-8?B?c0NEZUtZZmRGMStHT3puTkV4U002N2dONmQrcTJNSnNGOHFSdjVBZ3BWcG9p?=
+ =?utf-8?B?eExiL0FHcGtBRHVpdkNsdUZ5WDFaczF3V1AvYUNKNW0yQ1liYTJJcDNEZWxv?=
+ =?utf-8?B?bkJ3ektDRnhrUVNPSDdNL1lMNjN1bUdURmVqTnFOV1JuZzcyWVZzbDIwYlFm?=
+ =?utf-8?B?ZmZtSW0wWmlKaDhiR0F1bDFEVmZxNFJkSDYxK3djMXZkdFFMb3BINEpnZDJ4?=
+ =?utf-8?B?cU1udjlZeVNtVVNkR1hHMHRDaDZhaU1rRk5SaEYxa1pLQ3JtZ0dqS241UWlq?=
+ =?utf-8?B?VnExRThnaFhQN3N6ZEhvRCtiYm5qNUwwNjM0L2VLSThWcjc2aVFsK05PWGFv?=
+ =?utf-8?B?emFxQ09HZXEzSE03djFWZmZncFdZYUpuazhadkZTcXdkNzJDUE12dUIwYzBN?=
+ =?utf-8?B?Umhkb1czWDVFeUptb2cvNFlUK3UzVlUzbFFmUlM5TUdabGt2eTlLN0NzSEww?=
+ =?utf-8?B?aHRiYVYvbHBpSTZ2R1gwUERBWG5DUnhZOTY2cWxiRHZvM1U4ZC9SajZYdVZu?=
+ =?utf-8?B?RkxDM1RLaGx0ellYQS9MSnIzWm9UZmxxV0VYcFNaZEFTbVo1UzdFOEoyMUta?=
+ =?utf-8?B?VUlYQkVaVnpxWXV1THZTUk5lVjl6WE92SHlLU21lOFVRMVJQdXhPNTltbmZl?=
+ =?utf-8?B?QytkVFQ4VjBGTnZwRG0zS1l1TlhpRk8wQ09ycTdqSzlSK1VVaXVnQlRNNStC?=
+ =?utf-8?B?NndZeFpmRlcwbFRSM0QrQVVWNFBiSUNXRUs0R2svYkJNRmI1b2pTSDJJSXNN?=
+ =?utf-8?B?QVRjRW8yTEtTOC9tK3Nwd0JMckZHdjJBWjNZYkZYRHo0T09lUUovNzRvcXhj?=
+ =?utf-8?B?MDlXQXA1VU9ac0dyMWtib0pLcGxRL3JLRStUbnFjN2cvbkU5NVJnMnFUWCt3?=
+ =?utf-8?B?bTBKOE9MSGlxclo2Y1AzNExrRGowN1Via25MSkpsbFdreTVUTmE5MklIdk1t?=
+ =?utf-8?B?UGhoNVVkQUFNVjh3a0JIaDJBRGN6UHl1UDZQM1lEWmpYRUZoY2VvTEJ1Z3h3?=
+ =?utf-8?B?WnJFQkpNTmplZDVHOU9GV2RkMUlNd2E5bTNmMDFES3JHY3l2QXZEcDE5QnJF?=
+ =?utf-8?B?ZklUNC9Wb0d6MUJvSGtONUNOcUk3Q1BGWnRmNWZLLzdBOThsTTQ0cnZwR0t4?=
+ =?utf-8?B?SXNzTEZXb1M3bUxpRHVKc0k5OVRPZFp3Rk0raHB5b05RNXJ5UEJJZjVYUXNC?=
+ =?utf-8?B?WmZKRUdXRmVYeHJUR21iTno1alVEOWE4VGpkQjRkZmh1c3h3S0g1YVdSUEVh?=
+ =?utf-8?B?cW9LcGhJb3I2R2JRRWZneEIyWjh5TVJJTHVWOHRCMTJsSjJpMzNyY2JTWDgv?=
+ =?utf-8?B?YVJOWWFsY2ZHNUFkSVdsSXpkK3NIVWFob1BGaHBzZitrc2JUdjlWNVZCYkRQ?=
+ =?utf-8?B?V1JUWGFlekQ1NGd1NnhzVUNtTDJuak9YUmtiTEF3UmVHZTczd29IM2Z4U2pu?=
+ =?utf-8?B?YzF3NFVRK2JnWGpBTzRLWGU2TmRRQUs0RmhSbm1aazMwRGxQWG5HbXFVeWlM?=
+ =?utf-8?B?aTBtUjBuM2wyMDEwWCsyLzE1WmlDd0J3dEJDMHplOU1VYTR2TU1WOXdPMC8x?=
+ =?utf-8?B?UlRwbzV2Sno0Q29hc1F2bDgyQXRMbGpCV3pPc3dsNnU2WTJlOU5UVXN4a2hp?=
+ =?utf-8?B?ZEVEYnpaUThxR01iZ2dNelVjWXdzU01TSlVYbjhNbjdhYXQ2Uk9PVDE2SVlK?=
+ =?utf-8?B?Sk5wZ1hOS1VtZWNRd2hCQUZsdW5vVG1iNnRsK2ZCRWpxSllVaG9ob1N4S0JT?=
+ =?utf-8?B?cVZLNmgwZFlWcGJ0K1JiVGVGL1B4SGxkbjZ0MURyeEQ0cUZaTHNJcURkRktB?=
+ =?utf-8?B?bk1GOURyYmU0K29UVk9JbVd2elZyakVIbDBQQmRVc2xBUnNCTHIvV21xS3Jr?=
+ =?utf-8?B?SGRKQy9NTTBBbEtYd3VPTWMySTBvK0lOVXpyclVLQ2xXMzlJV25VRENPdmsv?=
+ =?utf-8?B?YnFRcGNPOU9Rc2ZpUTRXdEpaQ0lJaVVKKzE2U0Z1UjJiczFpMTJZRklNcVVH?=
+ =?utf-8?B?cExrM3lNVDVaNTJ0anVRVTRDOC95SGRUTlJsS0Y5NnNSK0VPWGN2RHB4S0s3?=
+ =?utf-8?B?UTZJamJzRzJaNVdtWWcyZmkrUzBVd0FUZ3RuMU1VeVRxR1d6cTRFZjUwOExt?=
+ =?utf-8?B?VUE9PQ==?=
+X-OriginatorOrg: kontron.de
+X-MS-Exchange-CrossTenant-Network-Message-Id: 8ba466d4-6540-4473-d02b-08dd40590972
+X-MS-Exchange-CrossTenant-AuthSource: AS4PR10MB5671.EURPRD10.PROD.OUTLOOK.COM
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 29 Jan 2025 11:35:31.2800
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 8c9d3c97-3fd9-41c8-a2b1-646f3942daf1
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: BNPJlCvp05ITXpFpijh+U6NUZ7RjeCMEGnmfZ3NolzwN3KZcwalesv5u7vXaaIGkOZ0qfMr0dRM4WLjN28TUrl8pWNtevD3qDzp0rSYCHFE=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: GV1PR10MB6292
 
-On 29/01/2025 12:02, Mikhail Ivanov wrote:
-> On 1/29/2025 1:25 PM, Matthieu Baerts wrote:
->> Hi Mikhail,
->>
->> On 29/01/2025 10:52, Mikhail Ivanov wrote:
->>> On 1/28/2025 9:14 PM, Matthieu Baerts wrote:
->>>> Hi Mikhail,
->>>>
->>>> Sorry, I didn't follow all the discussions in this thread, but here are
->>>> some comments, hoping this can help to clarify the MPTCP case.
->>>
->>> Thanks a lot for sharing your knowledge, Matthieu!
->>>
->>>>
->>>> On 28/01/2025 11:56, Mikhail Ivanov wrote:
->>>>> On 1/27/2025 10:48 PM, Mickaël Salaün wrote:
->>>>
->>>> (...)
->>>>
->>>>>> I'm a bit worried that we miss some of these places (now or in future
->>>>>> kernel versions).  We'll need a new LSM hook for that.
->>>>>>
->>>>>> Could you list the current locations?
->>>>>
->>>>> Currently, I know only about TCP-related transformations:
->>>>>
->>>>> * SMC can fallback to TCP during connection. TCP connection is used
->>>>>     (1) to exchange CLC control messages in default case and (2)
->>>>> for the
->>>>>     communication in the case of fallback. If socket was connected or
->>>>>     connection failed, socket can not be reconnected again. There
->>>>> is no
->>>>>     existing security hook to control the fallback case,
->>>>>
->>>>> * MPTCP uses TCP for communication between two network interfaces
->>>>> in the
->>>>>     default case and can fallback to plain TCP if remote peer does not
->>>>>     support MPTCP. AFAICS, there is also no security hook to
->>>>> control the
->>>>>     fallback transformation,
->>>>
->>>> There are security hooks to control the path creation, but not to
->>>> control the "fallback transformation".
->>>>
->>>> Technically, with MPTCP, the userspace will create an IPPROTO_MPTCP
->>>> socket. This is only used "internally": to communicate between the
->>>> userspace and the kernelspace, but not directly used between network
->>>> interfaces. This "external" communication is done via one or multiple
->>>> kernel TCP sockets carrying extra TCP options for the mapping. The
->>>> userspace cannot directly control these sockets created by the kernel.
->>>>
->>>> In case of fallback, the kernel TCP socket "simply" drop the extra TCP
->>>> options needed for MPTCP, and carry on like normal TCP. So on the wire
->>>> and in the Linux network stack, it is the same TCP connection, without
->>>> the MPTCP options in the TCP header. The userspace continue to
->>>> communicate with the same socket.
->>>>
->>>> I'm not sure if there is a need to block the fallback: it means only
->>>> one
->>>> path can be used at a time.
->>>
->>> You mean that users always rely on a plain TCP communication in the case
->>> the connection of MPTCP multipath communication fails?
->>
->> Yes, that's the same TCP connection, just without extra bit to be able
->> to use multiple TCP connections associated to the same MPTCP one.
+Hi Lukasz,
+
+On 29.01.25 12:17 PM, Lukasz Majewski wrote:
+> Hi Frieder,
 > 
-> Indeed, so MPTCP communication should be restricted the same way as TCP.
-> AFAICS this should be intuitive for MPTCP users and it'll be better
-> to let userland define this dependency.
-
-Yes, I think that would make more sense.
-
-I guess we can look at MPTCP as TCP with extra features.
-
-So if TCP is blocked, MPTCP should be blocked as well. (And eventually
-having the possibility to block only TCP but not MPTCP and the opposite,
-but that's a different topic: a possible new feature, but not a bug-fix)
-
->>>>> * IPv6 -> IPv4 transformation for TCP and UDP sockets withon
->>>>>     IPV6_ADDRFORM. Can be controlled with setsockopt() security hook.
->>>>>
->>>>> As I said before, I wonder if user may want to use SMC or MPTCP and
->>>>> deny
->>>>> TCP communication, since he should rely on fallback transformation
->>>>> during the connection in the common case. It may be unexpected for
->>>>> connect(2) to fail during the fallback due to security politics.
->>>>
->>>> With MPTCP, fallbacks can happen at the beginning of a connection, when
->>>> there is only one path. This is done after the userspace's
->>>> connect(). If
->>>> the fallback is blocked, I guess the userspace will get the same errors
->>>> as when an open connection is reset.
+>> On 29.01.25 8:24 AM, Frieder Schrempf wrote:
+>>> Hi Andrew,
 >>>
->>> In the case of blocking due to security policy, userspace should get
->>> -EACESS. I mean, the user might not expect the fallback path to be
->>> blocked during the connection if he has allowed only MPTCP communication
->>> using the Landlock policy.
->>
->> A "fallback" can happen on different occasions as mentioned in the
->> RFC8684 [1], e.g.
->>
->> - The client asks to use MPTCP, but the other peer doesn't support it:
->>
->>    Client                Server
->>    |     SYN + MP_CAPABLE     |
->>    |------------------------->|
->>    |         SYN/ACK          |
->>    |<-------------------------|  => Fallback on the client side
->>    |           ACK            |
->>    |------------------------->|
->>
->> - A middle box doesn't touch the 3WHS, but intercept the communication
->> just after:
->>
->>    Client                Server
->>    |     SYN + MP_CAPABLE     |
->>    |------------------------->|
->>    |   SYN/ACK + MP_CAPABLE   |
->>    |<-------------------------|
->>    |     ACK + MP_CAPABLE     |
->>    |------------------------->|
->>    |        DSS + data        | => but the server doesn't receive the DSS
->>    |------------------------->| => So fallback on the server side
->>    |           ACK            |
->>    |<-------------------------| => Fallback on the client side
->>
->> - etc.
->>
->> So the connect(), even in blocking mode, can be OK, but the "fallback"
->> will happen later.
+>>> On 28.01.25 6:51 PM, Andrew Lunn wrote:  
+>>>> On Tue, Jan 28, 2025 at 05:14:46PM +0100, Frieder Schrempf wrote:  
+>>>>> Hi,
+>>>>>
+>>>>> I'm trying out HSR support on KSZ9477 with v6.12. My setup looks
+>>>>> like this:
+>>>>>
+>>>>> +-------------+         +-------------+
+>>>>> |             |         |             |
+>>>>> |   Node A    |         |   Node D    |
+>>>>> |             |         |             |
+>>>>> |             |         |             |
+>>>>> | LAN1   LAN2 |         | LAN1   LAN2 |
+>>>>> +--+-------+--+         +--+------+---+
+>>>>>    |       |               |      |
+>>>>>    |       +---------------+      |
+>>>>>    |                              |
+>>>>>    |       +---------------+      |
+>>>>>    |       |               |      |
+>>>>> +--+-------+--+         +--+------+---+
+>>>>> | LAN1   LAN2 |         | LAN1   LAN2 |
+>>>>> |             |         |             |
+>>>>> |             |         |             |
+>>>>> |   Node B    |         |   Node C    |
+>>>>> |             |         |             |
+>>>>> +-------------+         +-------------+
+>>>>>
+>>>>> On each device the LAN1 and LAN2 are added as HSR slaves. Then I
+>>>>> try to do ping tests between each of the HSR interfaces.
+>>>>>
+>>>>> The result is that I can reach the neighboring nodes just fine,
+>>>>> but I can't reach the remote node that needs packages to be
+>>>>> forwarded through the other nodes. For example I can't ping from
+>>>>> node A to C.
+>>>>>
+>>>>> I've tried to disable HW offloading in the driver and then
+>>>>> everything starts working.
+>>>>>
+>>>>> Is this a problem with HW offloading in the KSZ driver, or am I
+>>>>> missing something essential?  
 > 
-> Thanks! Theoretical "socket transformation" control should cover all
-> these cases.
+> Thanks for looking and testing such large scale setup.
 > 
-> You mean that it might be reasonable for a Landlock policy to block
-> MPTCP fallback when establishing first sublflow (when client does not
-> receive MP_CAPABLE)?
+>>>>
+>>>> How are IP addresses configured? I assume you have a bridge, LAN1
+>>>> and LAN2 are members of the bridge, and the IP address is on the
+>>>> bridge interface?  
+>>>
+>>> I have a HSR interface on each node that covers LAN1 and LAN2 as
+>>> slaves and the IP addresses are on those HSR interfaces. For node A:
+>>>
+>>> ip link add name hsr type hsr slave1 lan1 slave2 lan2 supervision 45
+>>> version 1
+>>> ip addr add 172.20.1.1/24 dev hsr
+>>>
+>>> The other nodes have the addresses 172.20.1.2/24, 172.20.1.3/24 and
+>>> 172.20.1.4/24 respectively.
+>>>
+>>> Then on node A, I'm doing:
+>>>
+>>> ping 172.20.1.2 # neighboring node B works
+>>> ping 172.20.1.4 # neighboring node D works
+>>> ping 172.20.1.3 # remote node C works only if I disable offloading  
+>>
+>> BTW, it's enough to disable the offloading of the forwarding for HSR
+>> frames to make it work.
+>>
+>> --- a/drivers/net/dsa/microchip/ksz9477.c
+>> +++ b/drivers/net/dsa/microchip/ksz9477.c
+>> @@ -1267,7 +1267,7 @@ int ksz9477_tc_cbs_set_cinc(struct ksz_device
+>> *dev, int port, u32 val)
+>>   * Moreover, the NETIF_F_HW_HSR_FWD feature is also enabled, as HSR
+>> frames
+>>   * can be forwarded in the switch fabric between HSR ports.
+>>   */
+>> -#define KSZ9477_SUPPORTED_HSR_FEATURES (NETIF_F_HW_HSR_DUP |
+>> NETIF_F_HW_HSR_FWD)
+>> +#define KSZ9477_SUPPORTED_HSR_FEATURES (NETIF_F_HW_HSR_DUP)
+>>
+>>  void ksz9477_hsr_join(struct dsa_switch *ds, int port, struct
+>> net_device *hsr)
+>>  {
+>> @@ -1279,16 +1279,6 @@ void ksz9477_hsr_join(struct dsa_switch *ds,
+>> int port, struct net_device *hsr)
+>>         /* Program which port(s) shall support HSR */
+>>         ksz_rmw32(dev, REG_HSR_PORT_MAP__4, BIT(port), BIT(port));
+>>
+>> -       /* Forward frames between HSR ports (i.e. bridge together HSR
+>> ports) */
+>> -       if (dev->hsr_ports) {
+>> -               dsa_hsr_foreach_port(hsr_dp, ds, hsr)
+>> -                       hsr_ports |= BIT(hsr_dp->index);
+>> -
+>> -               hsr_ports |= BIT(dsa_upstream_port(ds, port));
+>> -               dsa_hsr_foreach_port(hsr_dp, ds, hsr)
+>> -                       ksz9477_cfg_port_member(dev, hsr_dp->index,
+>> hsr_ports);
+>> -       }
+>> -
+>>         if (!dev->hsr_ports) {
+>>                 /* Enable discarding of received HSR frames */
+>>                 ksz_read8(dev, REG_HSR_ALU_CTRL_0__1, &data);
+> 
+> This means that KSZ9477 forwarding is dropping frames when HW
+> acceleration is used (for non "neighbour" nodes).
+> 
+> On my setup I only had 2 KSZ9477 devel boards.
+> 
+> And as you wrote - the SW based one works, so extending
+> https://elixir.bootlin.com/linux/v6.12-rc2/source/tools/testing/selftests/net/hsr
+> 
+> would not help in this case.
 
-Personally, I don't even know if there is really a need for such
-policies. The fallback is there not to block a connection if the other
-peer doesn't support MPTCP, or if a middlebox decides to mess-up with
-MPTCP options. So instead of an error, the connection continues but is
-"degraded" by not being able to create multiple paths later on.
+I see. With two boards you can't test the accelerated forwarding. So how
+did you test the forwarding at all? Or are you telling me, that this was
+added to the driver without prior testing (which seems a bit bold and
+unusual)?
 
-Maybe best to wait for a concrete use-case before implementing this?
+Anyway, do you have any suggestions for debugging this? Unfortunately I
+know almost nothing about this topic. But I can offer to test on my
+setup, at least for now. I don't know how long I will still have access
+to the hardware.
 
-(...)
+If we can't find a proper solution in the long run, I will probably send
+a patch to disable the accelerated forwarding to at least make HSR work
+by default.
 
-Cheers,
-Matt
--- 
-Sponsored by the NGI0 Core fund.
-
+Thanks
+Frieder
 
