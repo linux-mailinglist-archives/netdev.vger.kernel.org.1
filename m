@@ -1,210 +1,323 @@
-Return-Path: <netdev+bounces-161530-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-161532-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id C97AEA22194
-	for <lists+netdev@lfdr.de>; Wed, 29 Jan 2025 17:19:39 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id D0265A221A6
+	for <lists+netdev@lfdr.de>; Wed, 29 Jan 2025 17:21:36 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E70823A3245
-	for <lists+netdev@lfdr.de>; Wed, 29 Jan 2025 16:19:31 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 357721684DC
+	for <lists+netdev@lfdr.de>; Wed, 29 Jan 2025 16:21:35 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 38C511DF279;
-	Wed, 29 Jan 2025 16:19:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1DDFD1DDC3B;
+	Wed, 29 Jan 2025 16:21:35 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="n/4WzsGK"
+	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="BVDqLgc/"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from NAM02-SN1-obe.outbound.protection.outlook.com (mail-sn1nam02on2047.outbound.protection.outlook.com [40.107.96.47])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CDE0228EB;
-	Wed, 29 Jan 2025 16:19:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1738167569; cv=none; b=K6ZXkCa6FvrRRx45ew/+4I0fv2d90yQkbZmPmXXVXjduNPECCes6nqUrmppH3b8nSV8uMR4S47oMklJsWUD3sC6gIWyj97TeWH9SFYNyLT8HGE0v29a4xIT0BgC6gkj2ybibkgnLt7sNi+gVtxWMaeCAiD1T063PzfeFyjJAtLI=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1738167569; c=relaxed/simple;
-	bh=VQ1tE7auwykWHFaAWlmFtxRv+H5gTV+mb3VLluuo+bU=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=lqzadzTRERZY+E6SIv5+4fNfw0TM3HQpyCZ0D5wRZh29RYk6+9gxQ91aCn25YVkydcXJRbVoZwhcCOUT4Dlu6XLQRkJaDp5ImK5cFc8o2LT9/xJklj00KwyAE4bmHYDo79ZRlrH0Qa8MZZY0EaqOL0pA5w9aR2ooiaLe3HqL7bw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=n/4WzsGK; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id DDB92C4CED1;
-	Wed, 29 Jan 2025 16:19:24 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1738167568;
-	bh=VQ1tE7auwykWHFaAWlmFtxRv+H5gTV+mb3VLluuo+bU=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=n/4WzsGK81F59SkkUMb+WMCMS5ZHaRbmeLw6ahJDhfCBABA4a6KVBCSwK9uQe2dCx
-	 x0mNRgNXoAzA3H2ahKHYKJqAKXXN8MREVyvIrV0GgJAcoI7h6gX9LHdjLTxtClMSx4
-	 EddIHSjyw6wAz2IS3Q+EeK4Ip3z4ZZbwoD7CtalDQ7OeIU8gJmPRFPLhFO6904UeOL
-	 pbOtP49em5EsHn7LjmGJCQd4vKS5POHzZdHn43fsshTYlLqDnGfVcMwX7Xp0QR2BJT
-	 vmSJuwnOZQMB3s3i2xEUR2Vvxazeak0N6s9PY8c7YRZAkNftTuLHW4TgGq2APSSIua
-	 GqdW/Bxq24vdQ==
-Date: Wed, 29 Jan 2025 17:19:22 +0100
-From: Mauro Carvalho Chehab <mchehab+huawei@kernel.org>
-To: Jonathan Corbet <corbet@lwn.net>
-Cc: Linux Doc Mailing List <linux-doc@vger.kernel.org>, Greg Kroah-Hartman
- <gregkh@linuxfoundation.org>, linux-kernel@vger.kernel.org,
- bpf@vger.kernel.org, coresight@lists.linaro.org,
- linux-arm-kernel@lists.infradead.org, linux-block@vger.kernel.org,
- linux-f2fs-devel@lists.sourceforge.net, linux-hardening@vger.kernel.org,
- linux-iio@vger.kernel.org, linux-media@vger.kernel.org,
- linux-pm@vger.kernel.org, linux-usb@vger.kernel.org,
- linux-wireless@vger.kernel.org, netdev@vger.kernel.org,
- workflows@vger.kernel.org
-Subject: Re: [RFC v2 00/38] Improve ABI documentation generation
-Message-ID: <20250129171922.4322c338@foz.lan>
-In-Reply-To: <87a5b96296.fsf@trenco.lwn.net>
-References: <cover.1738020236.git.mchehab+huawei@kernel.org>
-	<87h65i7e87.fsf@trenco.lwn.net>
-	<20250129164157.3c7c072d@foz.lan>
-	<87a5b96296.fsf@trenco.lwn.net>
-X-Mailer: Claws Mail 4.3.0 (GTK 3.24.43; x86_64-redhat-linux-gnu)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 607DC28EB
+	for <netdev@vger.kernel.org>; Wed, 29 Jan 2025 16:21:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.96.47
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1738167695; cv=fail; b=dbsP7WdLt+mCs8JWAshRjdSDonRUDD6a5w0V9R2VyWqQtnU6XeCdD5zeSCUek7UU4Q50mt9FR0yM63ixqYZYheliADtstPKsJ8wi8R7U/HeYlTGHmEI38xru05HkTIjWt3qobZA9/atlrN8I6oVkOKJzzHrtwBpfTal0mOALrbg=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1738167695; c=relaxed/simple;
+	bh=a6fVWkRc3kqcD7s8E4BHc5XyJCfiEfTNV3b84Y53XEY=;
+	h=Message-ID:Date:Subject:To:Cc:References:From:In-Reply-To:
+	 Content-Type:MIME-Version; b=Cd27wwuEWoJa6rYiQFIcbPSaEZBEhGy9DPyvLA9aKbwmh5ehcQmrUQeQzr+YOeSuq21A0aEgRGHJrmqQt/5lT5ZqBEUX6idBglKB6+I++lfxX/kjGsZX0eEHiVzlC0JXQXgk1+qFwurHJUmwqRcC69oj5FJ3wzM8ujbZ/zJ8YCw=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=BVDqLgc/; arc=fail smtp.client-ip=40.107.96.47
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=PJ2J7SMPF18fuD+wJytO/y94hQFhjLi9pQB3vgrTpSuOeueYlmhiqH84IF5Jj052I8j6dHa8/7uJmoM9FMQlAbFOzqPL8OMv299FkSLZjaH+sTvF8mEYkO6NeRszP7zzU39uMwKsPbH/fXZUqxXlOcRXa+412DGpBBVKg8o7oyk/c234KjRGDEL0sBYepJ6xOCpJgaG50FUFVvvjyhrLgT1Pul1So/35WaN842K5u7x0j0dInNlihrITQFZ+0AWJgKXkdQwbw7fEkxagFfLfnPRzhREsBfZBDX4l6WsDC29gQBy1Wq3PkF0cJyVgRgVBGhJA1FXI74a2puff0W95Rg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=ZKV8dFTLyD9H92ZQFih+izk/p9hG/gT0fN4o9Ea4z0o=;
+ b=ih3lnNTo06gDHEnbJYh26fv8YvuBb6SVoBea2CFsabgGsbjbs3uj1hSw9DnN50E77pODkwWF5AAXynzs/rz5GMu4HYGk3eYKbWU5+t0f/7ghKHPPHJxIVAqnFE0qqoYR1PJtIUg2Gjx3Rpj+AQbI8lbXOU5RudI1zl5atUThkigYTNNk4yrhx+uLOKaHTeYFH0aMSNXcdIcwDOdYh0rfssBFgDXE/5HyMsjkFciJkravOLP6hYDBz4r7x0SdSBKu4hKMRKvWjz/nl5OMjmPPYS3RaboIrtPZ0NN8O17gkU/IOjVgeQ0FVqpjUNeP12NrbxIU/cHWA2NpzXGkinEllg==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
+ dkim=pass header.d=nvidia.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=ZKV8dFTLyD9H92ZQFih+izk/p9hG/gT0fN4o9Ea4z0o=;
+ b=BVDqLgc/Ng3wmk8vG0WkaUSgrb/J0lLwu2irWvHL0N18w+CEhfWwbRWy9Bhv+A7tJlOQjDv/3FC++CpMvzqUHFI0Wys8eHSgjd/ooWbXIZguiHwTFSSxLaGxNMiceytUO+5OAb7TomZy/GmprFrzYnyuxzyQ/o9VSwFTWeOxCZF3Vms9GmaY6GhHkYKRtyTMvo71VTrAJ6XmdwIEdslZaG5Mhb/4lU2fwd9Q7KT9O/GqlRcon2AaMiRi/QQb0ngpmKQ2IW27jgTjPu03KhVZC7qveJtPFnygFJzsfpxfjxv2HQv9fRISnSzH3+FILj5lNbpL/2YtnmxLmFWWipieWQ==
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=nvidia.com;
+Received: from SN6PR12MB2847.namprd12.prod.outlook.com (2603:10b6:805:76::10)
+ by CH3PR12MB8235.namprd12.prod.outlook.com (2603:10b6:610:120::17) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8377.23; Wed, 29 Jan
+ 2025 16:21:30 +0000
+Received: from SN6PR12MB2847.namprd12.prod.outlook.com
+ ([fe80::1b1e:e01d:667:9d6b]) by SN6PR12MB2847.namprd12.prod.outlook.com
+ ([fe80::1b1e:e01d:667:9d6b%4]) with mapi id 15.20.8398.017; Wed, 29 Jan 2025
+ 16:21:30 +0000
+Message-ID: <049d3a80-1b51-4796-83df-efb80f3b3107@nvidia.com>
+Date: Wed, 29 Jan 2025 18:21:23 +0200
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v1 net-next 4/4] net: Hold rtnl_net_lock() in
+ (un)?register_netdevice_notifier_dev_net().
+To: Kuniyuki Iwashima <kuniyu@amazon.com>
+Cc: davem@davemloft.net, edumazet@google.com, horms@kernel.org,
+ kuba@kernel.org, kuni1840@gmail.com, netdev@vger.kernel.org,
+ pabeni@redhat.com
+References: <dc118ae9-4ec0-4180-b7aa-90eba5283010@nvidia.com>
+ <20250127232634.83744-1-kuniyu@amazon.com>
+Content-Language: en-US
+From: Yael Chemla <ychemla@nvidia.com>
+In-Reply-To: <20250127232634.83744-1-kuniyu@amazon.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
+X-ClientProxiedBy: LO2P265CA0132.GBRP265.PROD.OUTLOOK.COM
+ (2603:10a6:600:9f::24) To SN6PR12MB2847.namprd12.prod.outlook.com
+ (2603:10b6:805:76::10)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: SN6PR12MB2847:EE_|CH3PR12MB8235:EE_
+X-MS-Office365-Filtering-Correlation-Id: 17c53e9a-0da7-4bfc-32c4-08dd4080fcbc
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;ARA:13230040|1800799024|376014|366016;
+X-Microsoft-Antispam-Message-Info:
+	=?utf-8?B?cXN1KytMNmFWNUZhZHdRNE1QOHdtelMzcDROMk1pNWFQRGFremJVbE1NcUZ3?=
+ =?utf-8?B?WU1tM2Z3UjJvam5ya0lwQTQ3dlB6OFNOZ3Y4ek14bFJ5a2dRQ09hc1pNblFV?=
+ =?utf-8?B?WGNmMXk3T1FiOVBMaW1WMERHbWJBYzNvcWVYRzNQS0hzN1F1d1pVZHp4ZDYw?=
+ =?utf-8?B?czFmcm9hL3RtMXBRdVlOclF2SVl4cWZXSHRZc3lhTmJWa0xZZVRTdnhlaUM2?=
+ =?utf-8?B?NHBqYm4vNEpwWHZTUTQzRTVGRU9hZ3VZdkp1WFRPNm9QT004bmhScEVoaXhp?=
+ =?utf-8?B?SERTNXdMNEU5ZTZRVVA2Zm9jUGZ6U0hZUXJWWSt2UHAzQzVLL1dRQ3QzZFAr?=
+ =?utf-8?B?T0FiMkdZb3RTdnpDTWYzNkozK0doVzJ3ZmFndkQ2U1hucEpxMzFSRjdlRVJZ?=
+ =?utf-8?B?Vzc5QkZwNHNZRlNMaitXcmg1b0JmVEZXM3BhbENsT0tlOXo5WDZKaWd1UlRq?=
+ =?utf-8?B?ZlVXRnl0YWtTOXVzSUp5QzlWeFBXcXpKbi9kMFZHSk4wNnFZSG1GWHhsZ0FL?=
+ =?utf-8?B?Y2srQkw1N0hINVpHUmpudlJWTmxsRVM0YnVoYml6elYxakVhcE9Zay83bExB?=
+ =?utf-8?B?ZEJBMjh5N1pDMVZMM25NMEpIY2UzNGZTTUhLWlB6b0g1dlB4cDQxTXJxQng1?=
+ =?utf-8?B?czY1NjBRTDJ6c3dLN1QrcnhoNkw5S3FuQjRmcjBXekt5RXdVWVpzNnlWRkNw?=
+ =?utf-8?B?N05NdVpubUppcVBlajJ0YTQ2STA0bm5MUms4OHIyRFExdnF3dXVkMExqRFBD?=
+ =?utf-8?B?UEFLYzVzWG5YQ2hDekkxNEN2T1JJMjUvWlJRN2N5emlVWHRJWHdyYTl1OCth?=
+ =?utf-8?B?dVY5K3JZeC9hS1A1aHVNaURmRU10YlI1UGVpTVVTTE9vTUdxT1FOMStCY0Ja?=
+ =?utf-8?B?Y1MzZFRsVHZIUjNnWlRxOWhaaEFPeTNEY04rdU9VZVVsYThKSGM1eDJ6Zll0?=
+ =?utf-8?B?ZEZRQVdxbnZqVTdoMERjZVZNUUhpcGF6ZWpxNnhXa1dUbUl0YXplNjR6QkZE?=
+ =?utf-8?B?NXBuaHhSdjlPNEhTK2dtdUpScVpQSHZnRWh4c3F1R1VQUDlQTUhxcUFNYlF3?=
+ =?utf-8?B?MkJtcjJBNTlRdnNMM1ZtaTd6UFZQWGVMQ2QvZ2pub3poMGhqRkd4enFWa2I0?=
+ =?utf-8?B?YzdJNGtsZjNJdjBNdVVWSStDRDl2bk91ZU5RZ05SLzJodGdRemF1YU1VR2lI?=
+ =?utf-8?B?anZHRjhtQ1crT1JxR3Q0QUM5TjhOWEErdGxEWE5nZlhZbmJxRndBNlpyclFQ?=
+ =?utf-8?B?VkorUXBhZ0J2MzJaSmxUTGx6MzN4V2hmR1BNRmcxTE4wSDlqU2FmdEF1dThZ?=
+ =?utf-8?B?d21vWnF3K2NoZmZ2SnB2YlJrRS9lZjZqVVZDc3RJakk3MHgyRFFadXhFVG9P?=
+ =?utf-8?B?cmxjbkpEclJ6aXlwc0ljUk9KVTN0OS9ORnFxQXFPSE8zZ2g5eEhNa3NoSGEw?=
+ =?utf-8?B?bjFWUlNPZGxUZGtCT3JHbWdGNmtjVGVHdTBkWXBHc1VyczJQelQyQm5OZzhC?=
+ =?utf-8?B?eHgwNXU4SytBeVNtdUp5YVdwaVd4ZUttS0U3ZzZSVGE4U0tkTHhqKzIwZTZ1?=
+ =?utf-8?B?VmtMQ3ZxNGQxSnplbzhFcFdIUElMUHhVVHg0S2liOVYyNGFkNndhMHNMeWpx?=
+ =?utf-8?B?bXdIK1ZyVU9PWUQ1Z0pVRlJOdCtNSTUrMm9hZ2Y4NXBzVEowZVlqa0h2Q1Rs?=
+ =?utf-8?B?c1pKM2k2bFZocDl3RkJNdHVsVjVPTHFkN0JjM2hMWVZEZHpUYUNKVytOYjF2?=
+ =?utf-8?B?WEE3RGVxYTkyd3d5R3pEa0doZm9BUVRpOUM0NTV2c3oyb0ZZQXdJQWFJWm9Z?=
+ =?utf-8?B?NUtza0sxV29VQ1R0RS9HR2Y1bmVzeEZGaGpTZThBQ21XdXRPVHNqbWluVS83?=
+ =?utf-8?Q?97AGDOc2k9BbL?=
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SN6PR12MB2847.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(1800799024)(376014)(366016);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?utf-8?B?VHJHVjJpOGR5Z1RNRGY3RDVFWWpReXNNL0RVTE5iREI2Z3BoR0VlbVJDZ1U2?=
+ =?utf-8?B?bmZZNHZIUWI2UmdNRkNpa2QxN0R0N2VBZUl0VE9TTysrM2VWWWFOZnlBU3ht?=
+ =?utf-8?B?cU9Pajk1c0dLTlJiTXV5eUx4RWpXbXZvSm9Eb0xnOUdQKzFxdTB3ZHp1Zmp3?=
+ =?utf-8?B?dU81RS9BWWtyVStMajNhaWsyVkRhYzc5YXE1QU9YTExua1FjaGc5NjZTa2xH?=
+ =?utf-8?B?Rmsrc1I3bThnRzljbTFNcUdUbzhvdXJ1UG9DM1h6dzBnTWtFM1NSbEhCWElT?=
+ =?utf-8?B?ZmJSYVNCUUVEc0tFUWl1bGZPVlRTQmJnU3FadEV5QzdydVJSKzVDZ2x5TUIr?=
+ =?utf-8?B?SDVUbkZYejIrVXEyRDJLTGtFZ05LTzVkaG9qQ01ubWVDWU45SEpnTXREbTI1?=
+ =?utf-8?B?YmxtQUw2clArS255Vkl0eWgyM0ExQWdPcUwwUjlsNE4rR1cyV09EdTY1eWVs?=
+ =?utf-8?B?WEVBVCtOQnF6MmxvZ1gwMGVIZnJzT21PZzJoOGRaTkhFSVpEZXNGMWJPZnQv?=
+ =?utf-8?B?azFaUXptK1FpcTVuNzdncUNFRXFEOFpYU0FUckJYYVNpVW5mSVo1dStPQ21D?=
+ =?utf-8?B?a2FnOGFzc0pvcEllaUNaQ1NWcklZTHV5QmRZR0FHT2ZqSzBLU0MvTGpoNFF2?=
+ =?utf-8?B?Y252amNZQTc1QkZKd00yZitTSXY4cjJUcWRFQ2NHYjV0TjRVeWYzdlBkY3FE?=
+ =?utf-8?B?N2o5aS9YbXIrNUtKOVM0cHVRY3greGhZRlRUeEF3bjB1dkk1V1UyZWwxK3VX?=
+ =?utf-8?B?SktSS2ZQcGNFUTAxWkNUZkhiSmt1ZUlPaDRveFEyUVFNZHZSallTNTZncTFU?=
+ =?utf-8?B?N0NUWElsRzBqSG8wbFNVZGVhMmRUNS9YTmttcVFyYXFVYXpxekZtMjhkNmxx?=
+ =?utf-8?B?VGNHalRScWljYkI0YkNKOHdlcFhMckhDRmRic0h4dFlmdnZtWUcvRVMybDBx?=
+ =?utf-8?B?R0hoemlkaGpLa0d2KzNkWUZwb2NQWTZPR1FFSjRraDdqZE9LdDlGcld4ZWd2?=
+ =?utf-8?B?bERvUW5EeEtCUTdkQTVvQ2RtRFFNRnhrcWdwN3dtUFU2azlOT2hqa2QvQzVV?=
+ =?utf-8?B?Zy9qZWJISUZWQ0doL0prSGFPTHZKYk9zdjJQSUp2SjJMcjdTbUZRbUx5VFVi?=
+ =?utf-8?B?KzVFV2FmWDkxMmhmRmhYOEpaeVJ0MmJ4QWFkTTRSY2RTWUhIWlRjOElzUm44?=
+ =?utf-8?B?QkVXZ0UvTEdZSzROWmo1OHZ0Um4zb0h3OGpENnNVSkV5cGhjWnEra0xSbFE0?=
+ =?utf-8?B?RGJaRkdwMEdVL2k0Y0t4Z29pSWFVYW8wdWkzRFRBTStQV3ZOdzZ2Wmk2LzJz?=
+ =?utf-8?B?VGxYeTRNWnhFRFByTGFtVnhPRWlSNFpxajF0VTZWdWdncG1BOElRMlJpOEMz?=
+ =?utf-8?B?T0FPYm9XbWN2VnlQZjJEZndvaDAxdDlkd2ZMTDNySGtGSVRCQTZBL204QVhQ?=
+ =?utf-8?B?bk11TzRsZWE5YkRnNnZxRjhEUTB5MEhDSVBGeS9PRm13dGRaY21KZHZtaVBx?=
+ =?utf-8?B?TDJWcHdVcTlhV2ErUWUzYXJkZXVzVG92ZnkvOG1nVW16aStpRU45Vm9lQ2M4?=
+ =?utf-8?B?SWRyRDZFZlhxZkhSZHB2dU5iWmRTZFRqODI2d2ZXaFNUSXZQdjNFbXpDUXdF?=
+ =?utf-8?B?SHFqZEFjelZ1MTI1ekNDdWNQNVNBZzhhR3BMb3FBMWFqNlFBajVPY0ZSUjEv?=
+ =?utf-8?B?L1JBSHU3cHBLeERLVkJuSitOdXlwLzhoanAyVWd5dmpiL2tyajlheTdpK3h5?=
+ =?utf-8?B?eXljSGdTT0ZGRFRaSC81bElHbWNRbDRnT3R6a21udkxmY0gzcWIvRysxN1Y1?=
+ =?utf-8?B?akxXMFN4OTlNQ2tXZnhVSFl1MEp5NGpKbmxNeEtkOVB5Um5XY3c0cktnbTEx?=
+ =?utf-8?B?QWdReUNRSm44NTZJbGY2MjVDVEN1MjAralpjNnpqVG9BZC9XaEFEVnpRUzJt?=
+ =?utf-8?B?VmZzNVhNaEtWUHFzd0Z3RDNycTRoNm9uRFdPam5NQktWdEJMWjBsdlpSaFB2?=
+ =?utf-8?B?MzVzYWN2SGZYNXQ3b1czODhIRXJEa2xFS0cxOUR3bFlXNUxCZWJiT3dGWmE5?=
+ =?utf-8?B?Z251NzlxaDJZNzJmWmV3VmhjZE5kWWVtV1hKQmp6Nm1zNm9ISGIxbGFzNUxm?=
+ =?utf-8?Q?jegBFKHr3vdALyTgPptF2Wt8E?=
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 17c53e9a-0da7-4bfc-32c4-08dd4080fcbc
+X-MS-Exchange-CrossTenant-AuthSource: SN6PR12MB2847.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 29 Jan 2025 16:21:29.9207
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: vY36TkHfbpg7BVYHGGx7LCLzCdsYozKEijIRVPrqhTixaeEkTr+NRlGl5SxF/P403cjpPWQ+EvfMSO8CYVN7Vw==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: CH3PR12MB8235
 
-Em Wed, 29 Jan 2025 08:58:13 -0700
-Jonathan Corbet <corbet@lwn.net> escreveu:
-
-> Mauro Carvalho Chehab <mchehab+huawei@kernel.org> writes:
+On 28/01/2025 1:26, Kuniyuki Iwashima wrote:
+> From: Yael Chemla <ychemla@nvidia.com>
+> Date: Mon, 20 Jan 2025 20:55:07 +0200
+>>>>> diff --git a/net/core/dev.c b/net/core/dev.c
+>>>>> index f6c6559e2548..a0dd34463901 100644
+>>>>> --- a/net/core/dev.c
+>>>>> +++ b/net/core/dev.c
+>>>>> @@ -1943,15 +1943,17 @@ int register_netdevice_notifier_dev_net(struct net_device *dev,
+>>>>>     					struct notifier_block *nb,
+>>>>>     					struct netdev_net_notifier *nn)
+>>>>>     {
+>>>>> +	struct net *net = dev_net(dev);
+>>>>
+>>>> it seems to happen since the net pointer is acquired here without a lock.
+>>>> Note that KASAN issue is not triggered when executing with rtnl_lock()
+>>>> taken before this line. and our kernel .config expands
+>>>> rtnl_net_lock(net) to rtnl_lock() (CONFIG_DEBUG_NET_SMALL_RTNL is not set).
+>>>
+>>> It sounds like the device was being moved to another netns while
+>>> unregister_netdevice_notifier_dev_net() was called.
+>>>
+>>> Could you check if dev_net() is changed before/after rtnl_lock() in
+>>>
+>>>     * register_netdevice_notifier_dev_net()
+>>>     * unregister_netdevice_notifier_dev_net()
+>>>
+>>> ?
+>>
+>> When checking dev_net before and after taking the lock the issue won’t
+>> reproduce.
+>> note that when issue reproduce we arrive to
+>> unregister_netdevice_notifier_dev_net with an invalid net pointer
+>> (verified it with prints of its value, and it's not the same consistent
+>> value as is throughout rest of the test).
 > 
-> > So, I'm proposing to change the minimal requirements to:
-> > 	- Sphinx 3.4.3;
-> > 	- Python 3.9
-> >
-> > By setting Sphinx minimal version to 3.4.3, we can get rid of all
-> > Sphinx backward-compatible code.  
+> Does an invalid net pointer means a dead netns pointer ?
+> dev_net() and dev_net_set() use rcu_dereference() and rcu_assign_pointer(),
+> so I guess it should not be an invalid address at least.
 > 
-> That's certainly a nice thought.
+I logged several values at the entrance of 
+unregister_netdevice_notifier_dev_net when issue reproduced:
+1) fields of net->ns (struct ns_common):
+count: the namespace refcount is 0 (i.e. net->ns.count, used 
+refcount_read to read it).
+
+inum: the value doesn't appear to be garbage but differ from its 
+constant value throughout the test.
+
+2) net pointer (struct net): value differ from its constant value 
+observed during the rest of the test.
+
+hope this helps and please let me know if more info is needed.
+
 > 
-> With regard to Python ... are all reasonable distributions at 3.9 at
-> least?  CentOS 9 seems to be there, and Debian beyond it.  So probably
-> that is a reasonable floor to set?
+>> we suspect the issue related to the async ns deletion.
+> 
+> I think async netns change would trigger the issue too.
+> 
+> Could you try this patch ?
+> 
 
-I didn't check, but those are the current minimal versions above 3.5 for
-what we have at the Kernel tree[1]:
+I tested your patch and issue won't reproduce with it 
+(CONFIG_DEBUG_NET_SMALL_RTNL is not set in my config).
 
-            !2, 3.10     tools/net/sunrpc/xdrgen/generators/__init__.py
-            !2, 3.10     tools/net/sunrpc/xdrgen/generators/program.py
-            !2, 3.10     tools/net/sunrpc/xdrgen/subcmds/source.py
-            !2, 3.10     tools/net/sunrpc/xdrgen/xdr_ast.py
-            !2, 3.10     tools/power/cpupower/bindings/python/test_raw_pylibcpupower.py
-            !2, 3.9      tools/testing/selftests/net/rds/test.py
-            !2, 3.9      tools/net/ynl/ethtool.py
-            !2, 3.9      tools/net/ynl/cli.py
-            !2, 3.9      scripts/checktransupdate.py
-            !2, 3.8      tools/testing/selftests/tc-testing/plugin-lib/nsPlugin.py
-            !2, 3.8      tools/testing/selftests/hid/tests/base.py
-            !2, 3.7      tools/testing/selftests/turbostat/smi_aperf_mperf.py
-            !2, 3.7      tools/testing/selftests/turbostat/defcolumns.py
-            !2, 3.7      tools/testing/selftests/turbostat/added_perf_counters.py
-            !2, 3.7      tools/testing/selftests/hid/tests/conftest.py
-            !2, 3.7      tools/testing/kunit/qemu_config.py
-            !2, 3.7      tools/testing/kunit/kunit_tool_test.py
-            !2, 3.7      tools/testing/kunit/kunit.py
-            !2, 3.7      tools/testing/kunit/kunit_parser.py
-            !2, 3.7      tools/testing/kunit/kunit_kernel.py
-            !2, 3.7      tools/testing/kunit/kunit_json.py
-            !2, 3.7      tools/testing/kunit/kunit_config.py
-            !2, 3.7      tools/perf/scripts/python/gecko.py
-            !2, 3.7      scripts/rust_is_available_test.py
-            !2, 3.7      scripts/bpf_doc.py
-            !2, 3.6      tools/writeback/wb_monitor.py
-            !2, 3.6      tools/workqueue/wq_monitor.py
-            !2, 3.6      tools/workqueue/wq_dump.py
-            !2, 3.6      tools/usb/p9_fwd.py
-            !2, 3.6      tools/tracing/rtla/sample/timerlat_load.py
-            !2, 3.6      tools/testing/selftests/net/openvswitch/ovs-dpctl.py
-            !2, 3.6      tools/testing/selftests/net/nl_netdev.py
-            !2, 3.6      tools/testing/selftests/net/lib/py/ynl.py
-            !2, 3.6      tools/testing/selftests/net/lib/py/utils.py
-            !2, 3.6      tools/testing/selftests/net/lib/py/nsim.py
-            !2, 3.6      tools/testing/selftests/net/lib/py/netns.py
-            !2, 3.6      tools/testing/selftests/net/lib/py/ksft.py
-            !2, 3.6      tools/testing/selftests/kselftest/ksft.py
-            !2, 3.6      tools/testing/selftests/hid/tests/test_tablet.py
-            !2, 3.6      tools/testing/selftests/hid/tests/test_sony.py
-            !2, 3.6      tools/testing/selftests/hid/tests/test_multitouch.py
-            !2, 3.6      tools/testing/selftests/hid/tests/test_mouse.py
-            !2, 3.6      tools/testing/selftests/hid/tests/base_gamepad.py
-            !2, 3.6      tools/testing/selftests/hid/tests/base_device.py
-            !2, 3.6      tools/testing/selftests/drivers/net/stats.py
-            !2, 3.6      tools/testing/selftests/drivers/net/shaper.py
-            !2, 3.6      tools/testing/selftests/drivers/net/queues.py
-            !2, 3.6      tools/testing/selftests/drivers/net/ping.py
-            !2, 3.6      tools/testing/selftests/drivers/net/lib/py/remote_ssh.py
-            !2, 3.6      tools/testing/selftests/drivers/net/lib/py/load.py
-            !2, 3.6      tools/testing/selftests/drivers/net/lib/py/__init__.py
-            !2, 3.6      tools/testing/selftests/drivers/net/lib/py/env.py
-            !2, 3.6      tools/testing/selftests/drivers/net/hw/rss_ctx.py
-            !2, 3.6      tools/testing/selftests/drivers/net/hw/pp_alloc_fail.py
-            !2, 3.6      tools/testing/selftests/drivers/net/hw/nic_performance.py
-            !2, 3.6      tools/testing/selftests/drivers/net/hw/nic_link_layer.py
-            !2, 3.6      tools/testing/selftests/drivers/net/hw/lib/py/linkconfig.py
-            !2, 3.6      tools/testing/selftests/drivers/net/hw/lib/py/__init__.py
-            !2, 3.6      tools/testing/selftests/drivers/net/hw/devmem.py
-            !2, 3.6      tools/testing/selftests/drivers/net/hw/devlink_port_split.py
-            !2, 3.6      tools/testing/selftests/drivers/net/hw/csum.py
-            !2, 3.6      tools/testing/selftests/devices/probe/test_discoverable_devices.py
-            !2, 3.6      tools/testing/selftests/bpf/test_bpftool_synctypes.py
-            !2, 3.6      tools/testing/selftests/bpf/generate_udp_fragments.py
-            !2, 3.6      tools/testing/kunit/run_checks.py
-            !2, 3.6      tools/testing/kunit/kunit_printer.py
-            !2, 3.6      tools/sched_ext/scx_show_state.py
-            !2, 3.6      tools/perf/tests/shell/lib/perf_metric_validation.py
-            !2, 3.6      tools/perf/tests/shell/lib/perf_json_output_lint.py
-            !2, 3.6      tools/perf/scripts/python/parallel-perf.py
-            !2, 3.6      tools/perf/scripts/python/flamegraph.py
-            !2, 3.6      tools/perf/scripts/python/arm-cs-trace-disasm.py
-            !2, 3.6      tools/perf/pmu-events/models.py
-            !2, 3.6      tools/perf/pmu-events/metric_test.py
-            !2, 3.6      tools/perf/pmu-events/metric.py
-            !2, 3.6      tools/perf/pmu-events/jevents.py
-            !2, 3.6      tools/net/ynl/ynl-gen-rst.py
-            !2, 3.6      tools/net/ynl/ynl-gen-c.py
-            !2, 3.6      tools/net/ynl/lib/ynl.py
-            !2, 3.6      tools/net/ynl/lib/nlspec.py
-            !2, 3.6      tools/crypto/tcrypt/tcrypt_speed_compare.py
-            !2, 3.6      tools/cgroup/iocost_monitor.py
-            !2, 3.6      tools/cgroup/iocost_coef_gen.py
-            !2, 3.6      scripts/make_fit.py
-            !2, 3.6      scripts/macro_checker.py
-            !2, 3.6      scripts/get_abi.py
-            !2, 3.6      scripts/generate_rust_analyzer.py
-            !2, 3.6      scripts/gdb/linux/timerlist.py
-            !2, 3.6      scripts/gdb/linux/pgtable.py
-            !2, 3.6      scripts/clang-tools/run-clang-tools.py
-            !2, 3.6      Documentation/sphinx/automarkup.py
+Tested-by: Yael Chemla <ychemla@nvidia.com>
 
-[1] Checked with:
-	vermin -v $(git ls-files *.py)
+Thanks a lot!
 
-    Please notice that vermin is not perfect: my script passed as version 3.6
-    because the f-string check there didn't verify f-string improvements over
-    time. Still, it is a quick way to check that our current minimal version
-    is not aligned with reality.
- 
-Btw, vermin explains what is requiring more at the scripts. For instance:
+> ---8<---
+> diff --git a/net/core/dev.c b/net/core/dev.c
+> index afa2282f2604..f4438ec24683 100644
+> --- a/net/core/dev.c
+> +++ b/net/core/dev.c
+> @@ -2070,20 +2070,50 @@ static void __move_netdevice_notifier_net(struct net *src_net,
+>   	__register_netdevice_notifier_net(dst_net, nb, true);
+>   }
+>   
+> +static void rtnl_net_dev_lock(struct net_device *dev)
+> +{
+> +	struct net *net;
+> +
+> +again:
+> +	/* netns might be being dismantled. */
+> +	net = maybe_get_net(dev_net(dev));
+> +	if (!net) {
+> +		cond_resched();
+> +		goto again;
+> +	}
+> +
+> +	rtnl_net_lock(net);
+> +
+> +	/* dev might be moved to another netns. */
+> +	if (!net_eq(net, dev_net(dev))) {
+> +		rtnl_net_unlock(net);
+> +		put_net(net);
+> +		cond_resched();
+> +		goto again;
+> +	}
+> +}
+> +
+> +static void rtnl_net_dev_unlock(struct net_device *dev)
+> +{
+> +	struct net *net = dev_net(dev);
+> +
+> +	rtnl_net_unlock(net);
+> +	put_net(net);
+> +}
+> +
+>   int register_netdevice_notifier_dev_net(struct net_device *dev,
+>   					struct notifier_block *nb,
+>   					struct netdev_net_notifier *nn)
+>   {
+> -	struct net *net = dev_net(dev);
+>   	int err;
+>   
+> -	rtnl_net_lock(net);
+> -	err = __register_netdevice_notifier_net(net, nb, false);
+> +	rtnl_net_dev_lock(dev);
+> +	err = __register_netdevice_notifier_net(dev_net(dev), nb, false);
+>   	if (!err) {
+>   		nn->nb = nb;
+>   		list_add(&nn->list, &dev->net_notifier_list);
+>   	}
+> -	rtnl_net_unlock(net);
+> +	rtnl_net_dev_unlock(dev);
+>   
+>   	return err;
+>   }
+> @@ -2093,13 +2123,12 @@ int unregister_netdevice_notifier_dev_net(struct net_device *dev,
+>   					  struct notifier_block *nb,
+>   					  struct netdev_net_notifier *nn)
+>   {
+> -	struct net *net = dev_net(dev);
+>   	int err;
+>   
+> -	rtnl_net_lock(net);
+> +	rtnl_net_dev_lock(dev);
+>   	list_del(&nn->list);
+> -	err = __unregister_netdevice_notifier_net(net, nb);
+> -	rtnl_net_unlock(net);
+> +	err = __unregister_netdevice_notifier_net(dev_net(dev), nb);
+> +	rtnl_net_dev_unlock(dev);
+>   
+>   	return err;
+>   }
+> ---8<---
 
-	$ vermin -vv scripts/checktransupdate.py
-	...
-	!2, 3.9      /new_devel/v4l/docs/scripts/checktransupdate.py
-	  'argparse' module requires 2.7, 3.2
-	  'argparse.BooleanOptionalAction' member requires !2, 3.9
-	  'datetime' module requires 2.3, 3.0
-	  'datetime.datetime.strptime' member requires 2.5, 3.0
-	  'logging' module requires 2.3, 3.0
-	  'logging.StreamHandler' member requires 2.6, 3.0
-	  'os.path.relpath' member requires 2.6, 3.0
-	  f-strings require !2, 3.6
-
-Thanks,
-Mauro
 
