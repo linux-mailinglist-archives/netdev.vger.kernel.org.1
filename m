@@ -1,107 +1,176 @@
-Return-Path: <netdev+bounces-161536-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-161537-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 03518A2221A
-	for <lists+netdev@lfdr.de>; Wed, 29 Jan 2025 17:50:18 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 01DC3A22221
+	for <lists+netdev@lfdr.de>; Wed, 29 Jan 2025 17:50:56 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 586473A2E77
-	for <lists+netdev@lfdr.de>; Wed, 29 Jan 2025 16:50:06 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B67C2165634
+	for <lists+netdev@lfdr.de>; Wed, 29 Jan 2025 16:50:43 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 831411DF75C;
-	Wed, 29 Jan 2025 16:50:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D8A091DF75C;
+	Wed, 29 Jan 2025 16:50:18 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="AQgD/HDb"
+	dkim=pass (2048-bit key) header.d=uliege.be header.i=@uliege.be header.b="i54/j1K1"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-f53.google.com (mail-ed1-f53.google.com [209.85.208.53])
+Received: from serv108.segi.ulg.ac.be (serv108.segi.ulg.ac.be [139.165.32.111])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3F47D1DF960
+	for <netdev@vger.kernel.org>; Wed, 29 Jan 2025 16:50:15 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=139.165.32.111
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1738169418; cv=none; b=sSTg4BE0JA3lGZ24ch33u+pBRmbsVjji1wS294ZwrNMh3GI7rjUxjMZL95RfCOPSPlne1lEtZKsqszaVRD6luIdsBDA1qFnd4IuKPssVWhIbSYqbtnkVStAzlKpSSiy1ctFzWxk7NJTuJuQCNO3aWVGo2aDuDoE2jene32POAeY=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1738169418; c=relaxed/simple;
+	bh=2DsBIe8pHkCYCltKuLG4w8jcvYuYNYm8nCJSW4r1gGQ=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=Yhku/f4vIijIOP47gJ3gfLYueAcMY8HNw9o2GV+tIoXRlHkkx7ltY1tTwno/k9VwNzjs7yODKHduoVxjUAystJSTidVRjv8ebrSdc6AGGr+KNwtZRpvY73k5FWetX7iNUqO1iA8jvgWJArPNEOVI2uW11ssL0tgPSEGmN0pmUVw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=uliege.be; spf=pass smtp.mailfrom=uliege.be; dkim=pass (2048-bit key) header.d=uliege.be header.i=@uliege.be header.b=i54/j1K1; arc=none smtp.client-ip=139.165.32.111
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=uliege.be
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=uliege.be
+Received: from [192.168.1.58] (220.24-245-81.adsl-dyn.isp.belgacom.be [81.245.24.220])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F21A01DF255
-	for <netdev@vger.kernel.org>; Wed, 29 Jan 2025 16:50:07 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.53
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1738169410; cv=none; b=oxbC5acxvnl4kU2tNEA6+/i+uPMVEgYl92zxxVb30yH/1XYtPtSK12MCIdl4+AFasGEOYC/9ShEIg+4wpOGxJusSf4w6f57UNpBf7iJrDJ/UoIcPgvdqqXZvevnYzSsT2sjcJpGyss/C0Qs1IDOjhGl9/gojDQu9umoRBgcWqoc=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1738169410; c=relaxed/simple;
-	bh=icky5A8lxT+Wd2DlxTPeXZcrZfgs8ZiQeIrXrrowRc8=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=t1BgQNh81hvadSM3rlparGDOqPXbB0a+0p2/Lrhv+bb8Fe2FejvAVudnm64NCOPBhKM3bwGHLRzAoyVa9AMhMkZMwSDOSCI8l21fLwz8wMYLv1qICxead0/Hm4CLVzsm0cdrj9xigjuOUPd08n/MBGOef3hlVDSL458Zgt2eQEA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=AQgD/HDb; arc=none smtp.client-ip=209.85.208.53
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-ed1-f53.google.com with SMTP id 4fb4d7f45d1cf-5d3d143376dso9819342a12.3
-        for <netdev@vger.kernel.org>; Wed, 29 Jan 2025 08:50:07 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1738169406; x=1738774206; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=icky5A8lxT+Wd2DlxTPeXZcrZfgs8ZiQeIrXrrowRc8=;
-        b=AQgD/HDbixKO3I/MNUi2Ukp0QMaigLRqqnYkHdOD+2YrWRgo2uoQc9Tme7vw3mrCFh
-         ijzLBcZQe7yrsBEvaVlUohfDFHiPMJTIoz80nCTCDwiv5xRAdLHOcGVI1E4XiVnvd+zZ
-         ZiNqDiTtxeAOBTYeb46Q4hamqmmFB97TRRTxqu7Yd53wfwi6Jtq8HbaENxnPjU+A5/F6
-         dynPNjMk0oBk/iENvp+W5mG10IhQ1cNgbEGJTMn7HitM9cH6FfqVcoovrvu0LYaeFVG0
-         AtActnjNKQhO+6Weg1hP3ECRAB+wDJpMtDf/dmpvm+8xEWAPGp7wc4zIj25xbYQvROiT
-         OwZQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1738169406; x=1738774206;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=icky5A8lxT+Wd2DlxTPeXZcrZfgs8ZiQeIrXrrowRc8=;
-        b=pDRYEiMOkbwNNhcZhoE6UI1BEiVg9AV/PVolQHbPbZDfoKGLGXa8De2tPj5lDWwTJS
-         lw+R3KC6TIVzXxCfG5v1OkBPafjjgeHdV81pvtPkUBjLC92mKB8riaRCXmWQkiv2X4d0
-         7fnnvmspPx0nXgJ+/V9kC5XfbJeGNHAukRHR26UwhHet0mezDKgzajMSe42y6/t8jVDU
-         kzJ94iy0/HYtDOlcxl0Cb1fUgb0jgPMPGbGFLJEx+lTfK6w5Z0rRCh54wE4O0HxpXETl
-         DwtcwzVCAqRdINNnoiIh9yU6CAVia61KFO4TSgQePfyBSFgEW/qUJIBjDcAWlW1a29wl
-         dnFA==
-X-Forwarded-Encrypted: i=1; AJvYcCWI0xISkDm35uXjZU/oY8Sg1J/9TmBYogICkszeZTG88yrYpSpX5GM5QQMH3yvyoNCno5n5FnM=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yy3Cxm0DGVA/M5KH4qxmKh8V0ZoSnLx9PJcDCx1mj8jAj8leW1I
-	Gk7jnKxVfAlwD+fgbtNnrgsp5E9DavVmzaYob00EwdRDMhu6STfIN12fHP3UkG2flqg8ubS/SKC
-	ufpN2ngXZdbdauZ9Spq9ysavUb8AT8crpOPkE
-X-Gm-Gg: ASbGnctYU1T3z1ELZ/1ViDNzpbpQywmkKrGFhsl7Xb0whxoIGuMfMtYrF7JuzJVPBVQ
-	NVmWdYZ6T9qNLQkKhgjgjpXBeUvi/jREOHzqwwYg07GqF2Gtt22KdSLITHJgg2A7bvIo/aALYTw
-	==
-X-Google-Smtp-Source: AGHT+IFGd6wu4wlEBzchtfM0LWUPMt8300mB6lrGxWEG6Na5G/QuwpEBTEqS572WSGPsz1dPpEVyUwA+lV3iuN9RTn8=
-X-Received: by 2002:a05:6402:1ec9:b0:5d0:e410:468b with SMTP id
- 4fb4d7f45d1cf-5dc5efa8adamr3525986a12.2.1738169406103; Wed, 29 Jan 2025
- 08:50:06 -0800 (PST)
+	by serv108.segi.ulg.ac.be (Postfix) with ESMTPSA id 3A1D22012344;
+	Wed, 29 Jan 2025 17:50:14 +0100 (CET)
+DKIM-Filter: OpenDKIM Filter v2.11.0 serv108.segi.ulg.ac.be 3A1D22012344
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=uliege.be;
+	s=ulg20190529; t=1738169414;
+	bh=Rn3v1QZv6u8sk+oBqa1no3+QgSmpwemxDchvb2/8LAA=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=i54/j1K1KbqgtiLOVYsp2/H2YSymncb5UeXxpS8bxVbbSyeg67Ab9RxVdmGuj4dPe
+	 3K31wxLyMzAEW0ZWlIIA3QXmZP5sAlOoMaVlt/7lb/Gv17KbfcJ72dfUvQtG4+Z3u6
+	 nnR8RK+XAc+8vn7ELACoMPdLduxYD8RboXNllbIuUoW4Nwhm88TgFxti75OkgEVq+y
+	 6sLLQ64jj5gLT+JiltwcXPc1ZvYMTfzGUlX9d9VHG5NzxSyxaIReOOx1p1hzje8iw8
+	 EVDh/1uGaIhvh4IeyLUT0bYwtLjQ4aqV9K8mfMnpGd5SXG/3zwhIAw2OubEnXnUTdl
+	 XwxtHnXIU4Xwg==
+Message-ID: <4a30a0aa-2893-4f6a-a858-61e51b2430b2@uliege.be>
+Date: Wed, 29 Jan 2025 17:50:14 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250115185937.1324-1-ouster@cs.stanford.edu> <20250115185937.1324-6-ouster@cs.stanford.edu>
- <1c82f56c-4353-407b-8897-b8a485606a5f@redhat.com> <CAGXJAmwyp6tSO4KT_NSHKHSnUn-GSzSN=ucfjnBuXbg8uiw2pg@mail.gmail.com>
- <2ace650b-5697-4fc4-91f9-4857fa64feea@redhat.com> <CAGXJAmxHDVhxKb3M0--rySAgewmLpmfJkAeRSBNRgZ=cQonDtg@mail.gmail.com>
- <9209dfbb-ca3a-4fb7-a2fb-0567394f8cda@redhat.com> <CAGXJAmyb8s5xu9W1dXxhwnQfeY4=P21FquBymonUseM_OpaU2w@mail.gmail.com>
- <13345e2a-849d-4bd8-a95e-9cd7f287c7df@redhat.com> <CAGXJAmweUSP8-eG--nOrcst4tv-qq9RKuE0arme4FJzXW67x3Q@mail.gmail.com>
-In-Reply-To: <CAGXJAmweUSP8-eG--nOrcst4tv-qq9RKuE0arme4FJzXW67x3Q@mail.gmail.com>
-From: Eric Dumazet <edumazet@google.com>
-Date: Wed, 29 Jan 2025 17:49:55 +0100
-X-Gm-Features: AWEUYZmLbfhfMKwdgjYo-t6NbBabYcSwHp6t2GlLNZ8HoaUcNrwS7OfIOqaYpQI
-Message-ID: <CANn89iL2yRLEZsfuHOtZ8bgWiZVwy-=R5UVNFkc1QdYrSxF5Qg@mail.gmail.com>
-Subject: Re: [PATCH net-next v6 05/12] net: homa: create homa_rpc.h and homa_rpc.c
-To: John Ousterhout <ouster@cs.stanford.edu>
-Cc: Paolo Abeni <pabeni@redhat.com>, Netdev <netdev@vger.kernel.org>, 
-	Simon Horman <horms@kernel.org>, Jakub Kicinski <kuba@kernel.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net 2/2] net: ipv6: fix dst ref loops in rpl, seg6 and
+ ioam6 lwtunnels
+To: Jakub Kicinski <kuba@kernel.org>, davem@davemloft.net
+Cc: netdev@vger.kernel.org, edumazet@google.com, pabeni@redhat.com,
+ andrew+netdev@lunn.ch, horms@kernel.org, dsahern@kernel.org
+References: <20250129021346.2333089-1-kuba@kernel.org>
+ <20250129021346.2333089-2-kuba@kernel.org>
+Content-Language: en-US
+From: Justin Iurman <justin.iurman@uliege.be>
+In-Reply-To: <20250129021346.2333089-2-kuba@kernel.org>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-On Wed, Jan 29, 2025 at 5:44=E2=80=AFPM John Ousterhout <ouster@cs.stanford=
-.edu> wrote:
->
-> GRO is implemented in the "full" Homa (and essential for decent
-> performance); I left it out of this initial patch series to reduce the
-> size of the patch. But that doesn't affect the cost of freeing skbs.
-> GRO aggregates skb's into batches for more efficient processing, but
-> the same number of skb's ends up being freed in the end.
+On 1/29/25 03:13, Jakub Kicinski wrote:
+> Some lwtunnels have a dst cache for post-transformation dst.
+> If the packet destination did not change we may end up recording
+> a reference to the lwtunnel in its own cache, and the lwtunnel
+> state will never be freed.
+> 
+> Discovered by the ioam6.sh test, kmemleak was recently fixed
+> to catch per-cpu memory leaks. I'm not sure if rpl and seg6
+> can actually hit this, but in principle I don't see why not.
 
-Not at all, unless GRO is forced to use shinfo->frag_list.
+Agree, both can theoretically hit this too.
 
-GRO fast path cooks a single skb for a large payload, usually adding
-as many page fragments as possible.
+> Fixes: 985ec6f5e623 ("net: ipv6: rpl_iptunnel: mitigate 2-realloc issue")
+> Fixes: 40475b63761a ("net: ipv6: seg6_iptunnel: mitigate 2-realloc issue")
+> Fixes: dce525185bc9 ("net: ipv6: ioam6_iptunnel: mitigate 2-realloc issue")
+> Signed-off-by: Jakub Kicinski <kuba@kernel.org>
+> ---
+> CC: dsahern@kernel.org
+> CC: justin.iurman@uliege.be
+> ---
+>   net/ipv6/ioam6_iptunnel.c | 9 ++++++---
+>   net/ipv6/rpl_iptunnel.c   | 9 ++++++---
+>   net/ipv6/seg6_iptunnel.c  | 9 ++++++---
+>   3 files changed, 18 insertions(+), 9 deletions(-)
+> 
+> diff --git a/net/ipv6/ioam6_iptunnel.c b/net/ipv6/ioam6_iptunnel.c
+> index 3936c137a572..0279f1327ad5 100644
+> --- a/net/ipv6/ioam6_iptunnel.c
+> +++ b/net/ipv6/ioam6_iptunnel.c
+> @@ -410,9 +410,12 @@ static int ioam6_output(struct net *net, struct sock *sk, struct sk_buff *skb)
+>   			goto drop;
+>   		}
+>   
+> -		local_bh_disable();
+> -		dst_cache_set_ip6(&ilwt->cache, cache_dst, &fl6.saddr);
+> -		local_bh_enable();
+> +		/* cache only if we don't create a dst refrence loop */
+
+s/refrence/reference
+
+> +		if (dst->lwtstate != cache_dst->lwtstate) {
+> +			local_bh_disable();
+> +			dst_cache_set_ip6(&ilwt->cache, cache_dst, &fl6.saddr);
+> +			local_bh_enable();
+> +		}
+
+I agree the above patch fixes what kmemleak reported. However, I think 
+it'd bring the double-reallocation issue back when the packet 
+destination did not change (i.e., cache will always be empty). I'll try 
+to come up with a solution...
+
+>   
+>   		err = skb_cow_head(skb, LL_RESERVED_SPACE(cache_dst->dev));
+>   		if (unlikely(err))
+> diff --git a/net/ipv6/rpl_iptunnel.c b/net/ipv6/rpl_iptunnel.c
+> index 9b7d03563115..f3febe4881a5 100644
+> --- a/net/ipv6/rpl_iptunnel.c
+> +++ b/net/ipv6/rpl_iptunnel.c
+> @@ -235,9 +235,12 @@ static int rpl_output(struct net *net, struct sock *sk, struct sk_buff *skb)
+>   			goto drop;
+>   		}
+>   
+> -		local_bh_disable();
+> -		dst_cache_set_ip6(&rlwt->cache, dst, &fl6.saddr);
+> -		local_bh_enable();
+> +		/* cache only if we don't create a dst refrence loop */
+
+s/refrence/reference
+
+Same comment as above.
+
+> +		if (orig_dst->lwtstate != dst->lwtstate) {
+> +			local_bh_disable();
+> +			dst_cache_set_ip6(&rlwt->cache, dst, &fl6.saddr);
+> +			local_bh_enable();
+> +		}
+>   
+>   		err = skb_cow_head(skb, LL_RESERVED_SPACE(dst->dev));
+>   		if (unlikely(err))
+> diff --git a/net/ipv6/seg6_iptunnel.c b/net/ipv6/seg6_iptunnel.c
+> index eacc4e91b48e..0da989f07376 100644
+> --- a/net/ipv6/seg6_iptunnel.c
+> +++ b/net/ipv6/seg6_iptunnel.c
+> @@ -576,9 +576,12 @@ static int seg6_output_core(struct net *net, struct sock *sk,
+>   			goto drop;
+>   		}
+>   
+> -		local_bh_disable();
+> -		dst_cache_set_ip6(&slwt->cache, dst, &fl6.saddr);
+> -		local_bh_enable();
+> +		/* cache only if we don't create a dst refrence loop */
+
+s/refrence/reference
+
+Same comment as above.
+
+> +		if (orig_dst->lwtstate != dst->lwtstate) {
+> +			local_bh_disable();
+> +			dst_cache_set_ip6(&slwt->cache, dst, &fl6.saddr);
+> +			local_bh_enable();
+> +		}
+>   
+>   		err = skb_cow_head(skb, LL_RESERVED_SPACE(dst->dev));
+>   		if (unlikely(err))
 
