@@ -1,156 +1,204 @@
-Return-Path: <netdev+bounces-161546-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-161545-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id D7C29A22306
-	for <lists+netdev@lfdr.de>; Wed, 29 Jan 2025 18:34:32 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2E30EA22300
+	for <lists+netdev@lfdr.de>; Wed, 29 Jan 2025 18:32:51 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 0059E3A553C
-	for <lists+netdev@lfdr.de>; Wed, 29 Jan 2025 17:34:25 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 72C89188576B
+	for <lists+netdev@lfdr.de>; Wed, 29 Jan 2025 17:32:55 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DAA671E0E01;
-	Wed, 29 Jan 2025 17:34:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AE9D91DE3DC;
+	Wed, 29 Jan 2025 17:32:46 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=fastly.com header.i=@fastly.com header.b="kYZqUmTd"
+	dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b="SQHcc07h"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qv1-f53.google.com (mail-qv1-f53.google.com [209.85.219.53])
+Received: from mail-oo1-f47.google.com (mail-oo1-f47.google.com [209.85.161.47])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4DAE41E04BE
-	for <netdev@vger.kernel.org>; Wed, 29 Jan 2025 17:34:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.53
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 05E88372
+	for <netdev@vger.kernel.org>; Wed, 29 Jan 2025 17:32:44 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.161.47
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1738172061; cv=none; b=q5M74POgZ3Uva9juUVglXtY1VqK4LR1GAKwmfuNexraINZBdfU5UaAv+T5lOkY5zvB9/Z/+Manafk+UiYfz2M0hjLl8ysvoueCEkwXLev20zAQc/UXLbayuADR5k2gjzBm1bCPjQIAPRqyumjYpr4Gk7HzOhU38p7flZ+ZslTto=
+	t=1738171966; cv=none; b=qgcmhE5HpT1pHoC2Bm1tgKZVPJghA+LD5BSWG83WO5S61Y1pqWrUvUQWg62kUxogJ5a5fc5VSCCwFf9F+NskuuCc0Sm18N+GdmwP9IWZtdfApIwz/qaO8+2anHNOlhO/BZz3kh42hB9tnakRAfaPjPoB34b3Pm/GbCKQzfWopYc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1738172061; c=relaxed/simple;
-	bh=zGljS/9FhfUb47+VGIh8ikTRIRMMgOhXhmPgPUZSEIw=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=ZiNRIK7+3+yepxgor0RRBMGmMowt3DClLXqx9fMZ3dQ3L4d543w12C6QulYvkm326ObPV1KMPaS5iOidJwW1Ujr+yi6ct89IF3aW7fEX57p1cL/RTIU08m6dgPhlLGI38wY9xpE+FqPxBO90DgBCFmgMXAmIo47+pHwwijQWYAs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fastly.com; spf=pass smtp.mailfrom=fastly.com; dkim=pass (1024-bit key) header.d=fastly.com header.i=@fastly.com header.b=kYZqUmTd; arc=none smtp.client-ip=209.85.219.53
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fastly.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=fastly.com
-Received: by mail-qv1-f53.google.com with SMTP id 6a1803df08f44-6dd420f82e2so87437186d6.1
-        for <netdev@vger.kernel.org>; Wed, 29 Jan 2025 09:34:19 -0800 (PST)
+	s=arc-20240116; t=1738171966; c=relaxed/simple;
+	bh=bzI2HF00fiDQjFXMHdTBDTNovNNwt3zxrGTPuK/4xm4=;
+	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=rnWjMqXb4TD3PVTU2GGoQ6+k/r2jIhh0xZdMzWBPlns5G4Pwoksr5a20SYmB4MKGA/T39ozkk7Jqnh1x79a4Yi6Ulcvd8yN2ZdYZNCFjUx8akMnYNgui3Hv+WGOhUuq3MBv3+IArnWf9AV1ivnT4bsKqcGUs8F2GDEg1OqIj7vE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com; spf=fail smtp.mailfrom=broadcom.com; dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b=SQHcc07h; arc=none smtp.client-ip=209.85.161.47
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=broadcom.com
+Received: by mail-oo1-f47.google.com with SMTP id 006d021491bc7-5fc0c06e1deso166524eaf.1
+        for <netdev@vger.kernel.org>; Wed, 29 Jan 2025 09:32:44 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=fastly.com; s=google; t=1738172058; x=1738776858; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references
-         :mail-followup-to:message-id:subject:cc:to:from:date:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=GoQDpS1qfePfDFzhVnadb3EAh/sAqIsSZHWqGtMfdWk=;
-        b=kYZqUmTdziQYxynReb2cOavmQh9Jbl2OPXXLWAvTm018EAB5qFGONw5033h0NrQ6Wj
-         FXzIO/y3Oq4mCBQdTi7sGutH/TecQgxbOpfIMmom7EFgQtNYt8qNgpzNX/0vWXFVHDgt
-         f95BWMSqFtTfLlUo/DxgNQuJc+bUBUo7flIb4=
+        d=broadcom.com; s=google; t=1738171964; x=1738776764; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=+mmqNHhmNdxqC4g8IfZMWhVXE5QHm3xsHzzSXQvlgXs=;
+        b=SQHcc07hsid9ukcKvxFdI1BTp5rBtFyJBC5nH0X+/JMyzpi0dLSOfG+AN1p1wU5MA6
+         krznTPLO6uXGEA4cR9Mey7xHJRyEyjoxwRWY2RZ+FX3iUFRwQUycrS5yKX17Nc4rpHxn
+         NVwd+sGA7nWCgEqGhkKvCH7LBmeA1KOHu+uwo=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1738172058; x=1738776858;
-        h=in-reply-to:content-disposition:mime-version:references
-         :mail-followup-to:message-id:subject:cc:to:from:date
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=GoQDpS1qfePfDFzhVnadb3EAh/sAqIsSZHWqGtMfdWk=;
-        b=Hh5ussl/LPQuWtiLbf+Ds0+YwjtVYIeaOpiSxU8PTkOoIVUFc9sU15fyYukpXdBasp
-         TPXK/yUlzk/KkMoQYKXC3+FrajY5gbAaPrBcE+kYUMLJPrisZDs9CfdxtuTHp8FoblTF
-         LwNN79e4gNUJc25U+gtJRsCYomXE2FNAEJjlwOVNSratJ+DKk8NtRBQ1nKCpsLYiSwqV
-         DuHjNVQGxdnCJmseVQSBDyMwWnNEJ404MEh9fHmDf+M1Zpu81l9bHaHy13Sr6dNRCSzq
-         wDtYWFOLUy05fNgOfgJ4qF2i+SEhhjUZR6CwnzRVH14TwlpS5wXUk5gwMieBTpFU+J4g
-         3Slw==
-X-Gm-Message-State: AOJu0Yw50CmBWDkEOrUHZvRh/U72i9XvPUb/wbDokFofwutVpU69ijz0
-	qCJb/+OP89t5OfObV5JMa8b8sTNndIaAkH9HULdc9BtHhcsnCACPtUn9vAIhJjxfgvFlonx/Q89
-	SSIMAV5gn1MT/yshvED7pxd9O7chVRII8aTfH5rHyTidLkVJOcLfoeGz1N9cosjTwy9/RmOokmZ
-	VCeZ1XXx4Wnl2vi/LX6MuguUJnWJnjju2Q1P0=
-X-Gm-Gg: ASbGncu+ZmrOwQOwWxH6ukDSzRzKRubltdKvHJdZJ9RwRN8W1QlN07N+bFD1aVrscWB
-	iGl5f0TFvDsO39UqzgGdlZKhshCPdKTOpYdUtpR4Gl81dXF9xCt9unh9P17ZcmEJSNBjP6rlaCa
-	2aKttpNao8t1HBwafxxs9Z+fAO+h2UvI8l/rKAZXGG0xF467YSCI4quc8IrKdg50iWFA3w+Dkvj
-	N8Tue1gmwgsDmbxO89JMvrqdI5EgKRmoV9gEoKdI6727qbdkylYZbAuq+P540ZDKV7TUI9v+qZl
-	YhIZYr8Pu88ui9G9DgawuoiUS9A30tEi5YOf1LasWdMdyWBWV8lXKA==
-X-Google-Smtp-Source: AGHT+IF4BBG8e6/7GOvUoRvTwqooHavsdcNd1DktR9rvgjZFPh+v5/6zznBp3CHsRrcIltj/YWsCgg==
-X-Received: by 2002:a05:6214:1307:b0:6d4:e0a:230e with SMTP id 6a1803df08f44-6e243bbba57mr62866726d6.16.1738172057768;
-        Wed, 29 Jan 2025 09:34:17 -0800 (PST)
-Received: from LQ3V64L9R2 (ool-44c5a22e.dyn.optonline.net. [68.197.162.46])
-        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-6e20525aabcsm56814206d6.58.2025.01.29.09.34.16
+        d=1e100.net; s=20230601; t=1738171964; x=1738776764;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=+mmqNHhmNdxqC4g8IfZMWhVXE5QHm3xsHzzSXQvlgXs=;
+        b=QCTRKznGV0njW7A4hILYFYEgeuyV0XMk6UbZTdqp4pImMhLeiEA4RAS5rhKstTtPCd
+         15XldGvDEW95PvezEOZ9gV/ClL3xysn46w8DUVpGL5pSxMO10atKKKf3B5XH9pbj/r79
+         D4ZOb9fQKj/cx5QL5iBvyNmZY85pvFW+1+x03k2/tVFPOauic7gsqTfrKFZVPD/eR5x4
+         QiluZJkfmucdJkNxFyuqSSEoiEPnVgCIrpy5S5RlkxNrro2sLDKIADiCKjultSV0dgMN
+         auLkaTbO2AHDUwbg9AaRhj47UFBBCZ4E8QpjBoJ3oqDt0JDbEiMRFl/lPB72/9VMBxUa
+         WItQ==
+X-Forwarded-Encrypted: i=1; AJvYcCVpQ0kOKwdPm2YyV1dFiEUrUI9VbbBFvsHpBNbTssWsWs/SgoaG4s3g0WKYoTXbnuG6/1d/lRw=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyAPdy/DwmIcw7SKUvF4wItpatvSmoSuaAwNCpFis5JhSBnH/J3
+	93Ib+b01lNenDCKf3Vp6PYTREJfhXLlvlUd5dwHX1r+57CvjXvc/iWMQdU33jw==
+X-Gm-Gg: ASbGnctMEXh3yw7rgSiYBXzDXk/SbiWHgwfNUYoImrrQ41wsePdN71cQYLxQ21eIbaB
+	JLWmunpIKHDp4bzE2bEmk3n3QeAzDF3cNdYHfQHf39S/KwmxO0xvpTkFQK9wKQSGh93Odi5vX/D
+	vz/+Q4KveAr8GEUqwnHtFBnX0/DK1EEf4oDpp+XQ/8YLwAr6zuKq5jMCieaQz+IGcWcGEzojy48
+	Pzqd559Z3liqqzYqQKstwkmbB6djUUP+WfANgTIGDL0jJt4lRXcfwmRfOBr7EA4GyIfqFDQpHgQ
+	BZCPpzwuBP7/klCs5oPVbcclVTtuUhC1AEGsN7dcXELCWBeBnruSCFCTg6wD86R66m9dASEhOZI
+	auFHtpshI5FuFhZu/cOhieL/aq1Mk
+X-Google-Smtp-Source: AGHT+IFFBOio0yS/W6+Ih6T9hzMuo5ZubUZrMuApePYc4nO6eAq1BblChDvzYJG9wtKlB2BVi3YxWg==
+X-Received: by 2002:a05:6820:810a:b0:5fa:4c16:e641 with SMTP id 006d021491bc7-5fc00297daamr2598155eaf.3.1738171964013;
+        Wed, 29 Jan 2025 09:32:44 -0800 (PST)
+Received: from sankartest7x-virtual-machine.lvn.broadcom.net ([192.19.161.250])
+        by smtp.gmail.com with ESMTPSA id 006d021491bc7-5fa8b5296e5sm3623678eaf.7.2025.01.29.09.32.40
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 29 Jan 2025 09:34:17 -0800 (PST)
-Date: Wed, 29 Jan 2025 12:34:15 -0500
-From: Joe Damato <jdamato@fastly.com>
-To: netdev@vger.kernel.org
-Cc: sridhar.samudrala@intel.com, Alexei Starovoitov <ast@kernel.org>,
-	Amritha Nambiar <amritha.nambiar@intel.com>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	"open list:XDP (eXpress Data Path):Keyword:(?:b|_)xdp(?:b|_)" <bpf@vger.kernel.org>,
-	Daniel Borkmann <daniel@iogearbox.net>,
-	"David S. Miller" <davem@davemloft.net>,
-	Donald Hunter <donald.hunter@gmail.com>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Jesper Dangaard Brouer <hawk@kernel.org>,
-	John Fastabend <john.fastabend@gmail.com>,
-	open list <linux-kernel@vger.kernel.org>,
-	"open list:KERNEL SELFTEST FRAMEWORK" <linux-kselftest@vger.kernel.org>,
-	Martin Karsten <mkarsten@uwaterloo.ca>,
-	Mina Almasry <almasrymina@google.com>,
-	Paolo Abeni <pabeni@redhat.com>, Shuah Khan <shuah@kernel.org>,
-	Simon Horman <horms@kernel.org>,
-	Stanislav Fomichev <sdf@fomichev.me>,
-	Xuan Zhuo <xuanzhuo@linux.alibaba.com>
-Subject: Re: [RFC net-next 0/2] netdevgenl: Add an xsk attribute to queues
-Message-ID: <Z5pml3Hn3m3Km7Yk@LQ3V64L9R2>
-Mail-Followup-To: Joe Damato <jdamato@fastly.com>, netdev@vger.kernel.org,
-	sridhar.samudrala@intel.com, Alexei Starovoitov <ast@kernel.org>,
-	Amritha Nambiar <amritha.nambiar@intel.com>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	"open list:XDP (eXpress Data Path):Keyword:(?:b|_)xdp(?:b|_)" <bpf@vger.kernel.org>,
-	Daniel Borkmann <daniel@iogearbox.net>,
-	"David S. Miller" <davem@davemloft.net>,
-	Donald Hunter <donald.hunter@gmail.com>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Jesper Dangaard Brouer <hawk@kernel.org>,
-	John Fastabend <john.fastabend@gmail.com>,
-	open list <linux-kernel@vger.kernel.org>,
-	"open list:KERNEL SELFTEST FRAMEWORK" <linux-kselftest@vger.kernel.org>,
-	Martin Karsten <mkarsten@uwaterloo.ca>,
-	Mina Almasry <almasrymina@google.com>,
-	Paolo Abeni <pabeni@redhat.com>, Shuah Khan <shuah@kernel.org>,
-	Simon Horman <horms@kernel.org>,
-	Stanislav Fomichev <sdf@fomichev.me>,
-	Xuan Zhuo <xuanzhuo@linux.alibaba.com>
-References: <20250129172431.65773-1-jdamato@fastly.com>
+        Wed, 29 Jan 2025 09:32:42 -0800 (PST)
+From: Sankararaman Jayaraman <sankararaman.jayaraman@broadcom.com>
+To: kuba@kernel.org
+Cc: alexanderduyck@fb.com,
+	alexandr.lobakin@intel.com,
+	andrew+netdev@lunn.ch,
+	ast@kernel.org,
+	bcm-kernel-feedback-list@broadcom.com,
+	bpf@vger.kernel.org,
+	daniel@iogearbox.net,
+	davem@davemloft.net,
+	edumazet@google.com,
+	hawk@kernel.org,
+	john.fastabend@gmail.com,
+	netdev@vger.kernel.org,
+	pabeni@redhat.com,
+	ronak.doshi@broadcom.com,
+	sankararaman.jayaraman@broadcom.com,
+	u9012063@gmail.com
+Subject: [PATCH net] vmxnet3: Fix tx queue race condition with XDP
+Date: Wed, 29 Jan 2025 23:04:15 +0530
+Message-Id: <20250129173414.147705-1-sankararaman.jayaraman@broadcom.com>
+X-Mailer: git-send-email 2.25.1
+In-Reply-To: <20250127143635.623dc3b0@kernel.org>
+References: <20250127143635.623dc3b0@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250129172431.65773-1-jdamato@fastly.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 
-On Wed, Jan 29, 2025 at 05:24:23PM +0000, Joe Damato wrote:
-> Greetings:
-> 
-> This is an attempt to followup on something Jakub asked me about [1],
-> adding an xsk attribute to queues and more clearly documenting which
-> queues are linked to NAPIs...
-> 
-> But:
-> 
-> 1. I couldn't pick a good "thing" to expose as "xsk", so I chose 0 or 1.
->    Happy to take suggestions on what might be better to expose for the
->    xsk queue attribute.
-> 
-> 2. I create a silly C helper program to create an XDP socket in order to
->    add a new test to queues.py. I'm not particularly good at python
->    programming, so there's probably a better way to do this. Notably,
->    python does not seem to have a socket.AF_XDP, so I needed the C
->    helper to make a socket and bind it to a queue to perform the test.
-> 
-> Tested this on my mlx5 machine and the test seems to pass.
+If XDP traffic runs on a CPU which is greater than or equal to
+the number of the Tx queues of the NIC, then vmxnet3_xdp_get_tq()
+always picks up queue 0 for transmission as it uses reciprocal scale
+instead of simple modulo operation.
 
-I should have been slightly more specific, I ran queues.py two ways:
+vmxnet3_xdp_xmit() and vmxnet3_xdp_xmit_frame() use the above
+returned queue without any locking which can lead to race conditions
+when multiple XDP xmits run in parallel on different CPU's.
 
-1. By setting NETIF= to my mlx5 NIC
-2. By just running queues.py (without NETIF) set (which I presume
-   uses netdevsim)
+This patch uses a simple module scheme when the current CPU equals or
+exceeds the number of Tx queues on the NIC. It also adds locking in
+vmxnet3_xdp_xmit() and vmxnet3_xdp_xmit_frame() functions.
 
-The test passes in both cases.
+Fixes: 54f00cce1178 ("vmxnet3: Add XDP support.")
+Signed-off-by: Sankararaman Jayaraman <sankararaman.jayaraman@broadcom.com>
+Signed-off-by: Ronak Doshi <ronak.doshi@broadcom.com>
+---
+ drivers/net/vmxnet3/vmxnet3_xdp.c | 14 ++++++++++++--
+ 1 file changed, 12 insertions(+), 2 deletions(-)
+
+diff --git a/drivers/net/vmxnet3/vmxnet3_xdp.c b/drivers/net/vmxnet3/vmxnet3_xdp.c
+index 1341374a4588..e3f94b3374f9 100644
+--- a/drivers/net/vmxnet3/vmxnet3_xdp.c
++++ b/drivers/net/vmxnet3/vmxnet3_xdp.c
+@@ -28,7 +28,7 @@ vmxnet3_xdp_get_tq(struct vmxnet3_adapter *adapter)
+ 	if (likely(cpu < tq_number))
+ 		tq = &adapter->tx_queue[cpu];
+ 	else
+-		tq = &adapter->tx_queue[reciprocal_scale(cpu, tq_number)];
++		tq = &adapter->tx_queue[cpu % tq_number];
+ 
+ 	return tq;
+ }
+@@ -124,6 +124,7 @@ vmxnet3_xdp_xmit_frame(struct vmxnet3_adapter *adapter,
+ 	u32 buf_size;
+ 	u32 dw2;
+ 
++	spin_lock(&tq->tx_lock);
+ 	dw2 = (tq->tx_ring.gen ^ 0x1) << VMXNET3_TXD_GEN_SHIFT;
+ 	dw2 |= xdpf->len;
+ 	ctx.sop_txd = tq->tx_ring.base + tq->tx_ring.next2fill;
+@@ -134,6 +135,7 @@ vmxnet3_xdp_xmit_frame(struct vmxnet3_adapter *adapter,
+ 
+ 	if (vmxnet3_cmd_ring_desc_avail(&tq->tx_ring) == 0) {
+ 		tq->stats.tx_ring_full++;
++		spin_unlock(&tq->tx_lock);
+ 		return -ENOSPC;
+ 	}
+ 
+@@ -142,8 +144,10 @@ vmxnet3_xdp_xmit_frame(struct vmxnet3_adapter *adapter,
+ 		tbi->dma_addr = dma_map_single(&adapter->pdev->dev,
+ 					       xdpf->data, buf_size,
+ 					       DMA_TO_DEVICE);
+-		if (dma_mapping_error(&adapter->pdev->dev, tbi->dma_addr))
++		if (dma_mapping_error(&adapter->pdev->dev, tbi->dma_addr)) {
++			spin_unlock(&tq->tx_lock);
+ 			return -EFAULT;
++		}
+ 		tbi->map_type |= VMXNET3_MAP_SINGLE;
+ 	} else { /* XDP buffer from page pool */
+ 		page = virt_to_page(xdpf->data);
+@@ -182,6 +186,7 @@ vmxnet3_xdp_xmit_frame(struct vmxnet3_adapter *adapter,
+ 	dma_wmb();
+ 	gdesc->dword[2] = cpu_to_le32(le32_to_cpu(gdesc->dword[2]) ^
+ 						  VMXNET3_TXD_GEN);
++	spin_unlock(&tq->tx_lock);
+ 
+ 	/* No need to handle the case when tx_num_deferred doesn't reach
+ 	 * threshold. Backend driver at hypervisor side will poll and reset
+@@ -226,6 +231,7 @@ vmxnet3_xdp_xmit(struct net_device *dev,
+ 	struct vmxnet3_adapter *adapter = netdev_priv(dev);
+ 	struct vmxnet3_tx_queue *tq;
+ 	int i;
++	struct netdev_queue *nq;
+ 
+ 	if (unlikely(test_bit(VMXNET3_STATE_BIT_QUIESCED, &adapter->state)))
+ 		return -ENETDOWN;
+@@ -236,6 +242,9 @@ vmxnet3_xdp_xmit(struct net_device *dev,
+ 	if (tq->stopped)
+ 		return -ENETDOWN;
+ 
++	nq = netdev_get_tx_queue(adapter->netdev, tq->qid);
++
++	__netif_tx_lock(nq, smp_processor_id());
+ 	for (i = 0; i < n; i++) {
+ 		if (vmxnet3_xdp_xmit_frame(adapter, frames[i], tq, true)) {
+ 			tq->stats.xdp_xmit_err++;
+@@ -243,6 +252,7 @@ vmxnet3_xdp_xmit(struct net_device *dev,
+ 		}
+ 	}
+ 	tq->stats.xdp_xmit += i;
++	__netif_tx_unlock(nq);
+ 
+ 	return i;
+ }
+-- 
+2.25.1
+
 
