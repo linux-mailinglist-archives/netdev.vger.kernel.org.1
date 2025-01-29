@@ -1,246 +1,219 @@
-Return-Path: <netdev+bounces-161467-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-161471-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id BA20BA21B9F
-	for <lists+netdev@lfdr.de>; Wed, 29 Jan 2025 12:03:59 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id C7022A21BF6
+	for <lists+netdev@lfdr.de>; Wed, 29 Jan 2025 12:16:33 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 0762916194D
-	for <lists+netdev@lfdr.de>; Wed, 29 Jan 2025 11:03:56 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 076F81884A95
+	for <lists+netdev@lfdr.de>; Wed, 29 Jan 2025 11:16:38 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4A9571ADC7B;
-	Wed, 29 Jan 2025 11:02:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7ACD71DE2CF;
+	Wed, 29 Jan 2025 11:15:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=samsung.com header.i=@samsung.com header.b="lAryOmNl"
 X-Original-To: netdev@vger.kernel.org
-Received: from frasgout.his.huawei.com (frasgout.his.huawei.com [185.176.79.56])
+Received: from mailout4.samsung.com (mailout4.samsung.com [203.254.224.34])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2F5C61D9346;
-	Wed, 29 Jan 2025 11:02:50 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.176.79.56
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 88C4A1DE2C4
+	for <netdev@vger.kernel.org>; Wed, 29 Jan 2025 11:15:35 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=203.254.224.34
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1738148574; cv=none; b=hJVBKrB9R4OnE138cctFvbwOVtYq2UoVaSNtmBQXIC4mmjswfwloaNX1m9cau+7Y2aobfcqSkYRMlKFwp/klo++vsPFdzU9AV4laleqxcRTNaHQux82+O7spw6rTg5zCK6KEuohsmZZULtlJPXDZhtulbjGhn7fcMORagwREe9o=
+	t=1738149337; cv=none; b=VROs5bYTeinlcRK4Sy6bZ2zb0Uvu8OdtFEPCi9TAqc+PZy6Q/ccQdRffDo0aIC84BOjsbwnrqhNxCttr5Kzc3t8gqQBjvQDok6USTjDZ/IBosX0to4TUJKGW+4xzKC8Ry+8LjHNyrgDX0C22YWe2RS4+fDRA4l9GUUj2iGo28Ak=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1738148574; c=relaxed/simple;
-	bh=a8wVuDa971b8zNqIsHQA7qlVQkaGnw4JI1vy/uvMChg=;
-	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
-	 In-Reply-To:Content-Type; b=hhdINjKoonNSPlzx5kq/tZqO6pu+HNEZNV3NMkenCXBrKSntsITOVHlcRoSS6+83JLFM9+vJGo8ZYtM/BSjQ+dvolQ0tbuOQdb08iKKaKyePz0h3d+xyokOrZlhwbH4WdXcighQ1ClZhHt2wWgj5631eXSAJ2dnZpc04zkxUm3M=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei-partners.com; spf=pass smtp.mailfrom=huawei-partners.com; arc=none smtp.client-ip=185.176.79.56
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei-partners.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei-partners.com
-Received: from mail.maildlp.com (unknown [172.18.186.231])
-	by frasgout.his.huawei.com (SkyGuard) with ESMTP id 4YjfMT1b5Wz6D9DJ;
-	Wed, 29 Jan 2025 19:00:37 +0800 (CST)
-Received: from mscpeml500004.china.huawei.com (unknown [7.188.26.250])
-	by mail.maildlp.com (Postfix) with ESMTPS id 7BD47140B30;
-	Wed, 29 Jan 2025 19:02:42 +0800 (CST)
-Received: from [10.123.123.159] (10.123.123.159) by
- mscpeml500004.china.huawei.com (7.188.26.250) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1258.34; Wed, 29 Jan 2025 14:02:40 +0300
-Message-ID: <103de503-be0e-2eb2-b6f0-88567d765148@huawei-partners.com>
-Date: Wed, 29 Jan 2025 14:02:38 +0300
+	s=arc-20240116; t=1738149337; c=relaxed/simple;
+	bh=MJsLvRSeOoUSSHDcVwIfXqsvThwM3b2jgUdx9AERp/o=;
+	h=From:To:Cc:In-Reply-To:Subject:Date:Message-ID:MIME-Version:
+	 Content-Type:References; b=SaX2RMrGTc9pOpTfJnDA+P8AtlgELVF47615nive3EfZD9QsYyVEpBwCNQwUoUmWdKrfLEclSP1h6k0BbV/UH1Hg9omJqFbR1LjGJTPr9YG0qNg3NVm5oDDvJks03IpunLUViGhj5qHg0CRH8DXuBwi6Hw3YIRlLG350jx71qMI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=samsung.com; spf=pass smtp.mailfrom=samsung.com; dkim=pass (1024-bit key) header.d=samsung.com header.i=@samsung.com header.b=lAryOmNl; arc=none smtp.client-ip=203.254.224.34
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=samsung.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=samsung.com
+Received: from epcas5p2.samsung.com (unknown [182.195.41.40])
+	by mailout4.samsung.com (KnoxPortal) with ESMTP id 20250129111533epoutp04b209e5f66505e2ccf63e6b5f68d08ece~fJZwk-ruQ1184511845epoutp04U
+	for <netdev@vger.kernel.org>; Wed, 29 Jan 2025 11:15:33 +0000 (GMT)
+DKIM-Filter: OpenDKIM Filter v2.11.0 mailout4.samsung.com 20250129111533epoutp04b209e5f66505e2ccf63e6b5f68d08ece~fJZwk-ruQ1184511845epoutp04U
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=samsung.com;
+	s=mail20170921; t=1738149333;
+	bh=7KafLwe5Ak864laadz4lWr0U4uUHjRPyDm3Um1r99to=;
+	h=From:To:Cc:In-Reply-To:Subject:Date:References:From;
+	b=lAryOmNlo8wF2Yt09qmbIalPFwNJwZisuwRl63Aw5mKAGzw73JwJ9rGVWvgLeCaFx
+	 iSLSJDxGDoterQZvIOW5wJ3RrxHVcbZwi7VQlkJBfuuhwUJufH/PfzaKGjX1Pk2m55
+	 hHEnSG+onKJDir/+mXS2NhXWPYfTqEux0WR02PVQ=
+Received: from epsnrtp4.localdomain (unknown [182.195.42.165]) by
+	epcas5p3.samsung.com (KnoxPortal) with ESMTP id
+	20250129111533epcas5p3fb6c773931fe4b1ec6a10c86d9dfa680~fJZv9gpLW2607226072epcas5p3J;
+	Wed, 29 Jan 2025 11:15:33 +0000 (GMT)
+Received: from epsmgec5p1new.samsung.com (unknown [182.195.38.176]) by
+	epsnrtp4.localdomain (Postfix) with ESMTP id 4Yjfhg52tRz4x9Pv; Wed, 29 Jan
+	2025 11:15:31 +0000 (GMT)
+Received: from epcas5p3.samsung.com ( [182.195.41.41]) by
+	epsmgec5p1new.samsung.com (Symantec Messaging Gateway) with SMTP id
+	7A.A6.19710.3DD0A976; Wed, 29 Jan 2025 20:15:31 +0900 (KST)
+Received: from epsmtrp1.samsung.com (unknown [182.195.40.13]) by
+	epcas5p3.samsung.com (KnoxPortal) with ESMTPA id
+	20250129091536epcas5p34ebefd253ea0f1dfd5156bf61d2178be~fHxBy2mfS1265012650epcas5p3i;
+	Wed, 29 Jan 2025 09:15:36 +0000 (GMT)
+Received: from epsmgms1p2new.samsung.com (unknown [182.195.42.42]) by
+	epsmtrp1.samsung.com (KnoxPortal) with ESMTP id
+	20250129091536epsmtrp165ebd84cf7b218de312cb1eaa5292f00~fHxBwoZFK2781527815epsmtrp1D;
+	Wed, 29 Jan 2025 09:15:36 +0000 (GMT)
+X-AuditID: b6c32a44-363dc70000004cfe-91-679a0dd38b67
+Received: from epsmtip1.samsung.com ( [182.195.34.30]) by
+	epsmgms1p2new.samsung.com (Symantec Messaging Gateway) with SMTP id
+	39.D8.18949.8B1F9976; Wed, 29 Jan 2025 18:15:36 +0900 (KST)
+Received: from FDSFTE596 (unknown [107.122.82.131]) by epsmtip1.samsung.com
+	(KnoxPortal) with ESMTPA id
+	20250129091532epsmtip1c2376a781b64ca3de87ec443b8928834~fHw_L9rX62441124411epsmtip1O;
+	Wed, 29 Jan 2025 09:15:32 +0000 (GMT)
+From: "Swathi K S" <swathi.ks@samsung.com>
+To: "'Andrew Lunn'" <andrew@lunn.ch>
+Cc: <krzk@kernel.org>, <robh@kernel.org>, <davem@davemloft.net>,
+	<edumazet@google.com>, <kuba@kernel.org>, <pabeni@redhat.com>,
+	<conor+dt@kernel.org>, <richardcochran@gmail.com>,
+	<mcoquelin.stm32@gmail.com>, <alim.akhtar@samsung.com>,
+	<linux-fsd@tesla.com>, <netdev@vger.kernel.org>,
+	<devicetree@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
+	<linux-stm32@st-md-mailman.stormreply.com>,
+	<linux-arm-kernel@lists.infradead.org>, <linux-samsung-soc@vger.kernel.org>,
+	<alexandre.torgue@foss.st.com>, <peppe.cavallaro@st.com>,
+	<joabreu@synopsys.com>, <rcsekar@samsung.com>, <ssiddha@tesla.com>,
+	<jayati.sahu@samsung.com>, <pankaj.dubey@samsung.com>,
+	<ravi.patel@samsung.com>, <gost.dev@samsung.com>
+In-Reply-To: <63e64aa6-d018-4e45-acc7-f9d88a7db60f@lunn.ch>
+Subject: RE: [PATCH v5 2/4] net: stmmac: dwc-qos: Add FSD EQoS support
+Date: Wed, 29 Jan 2025 14:45:30 +0530
+Message-ID: <002c01db722e$5abc8d10$1035a730$@samsung.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [RFC PATCH v2 1/8] landlock: Fix non-TCP sockets restriction
-Content-Language: ru
-To: Matthieu Baerts <matttbe@kernel.org>, =?UTF-8?Q?Micka=C3=ABl_Sala=C3=BCn?=
-	<mic@digikod.net>
-CC: <gnoack@google.com>, <willemdebruijn.kernel@gmail.com>,
-	<matthieu@buffet.re>, <linux-security-module@vger.kernel.org>,
-	<netdev@vger.kernel.org>, <netfilter-devel@vger.kernel.org>,
-	<yusongping@huawei.com>, <artem.kuzin@huawei.com>,
-	<konstantin.meskhidze@huawei.com>, MPTCP Linux <mptcp@lists.linux.dev>,
-	<linux-nfs@vger.kernel.org>, Paul Moore <paul@paul-moore.com>
-References: <20241017110454.265818-1-ivanov.mikhail1@huawei-partners.com>
- <20241017110454.265818-2-ivanov.mikhail1@huawei-partners.com>
- <49bc2227-d8e1-4233-8bc4-4c2f0a191b7c@kernel.org>
- <20241018.Kahdeik0aaCh@digikod.net>
- <62336067-18c2-3493-d0ec-6dd6a6d3a1b5@huawei-partners.com>
- <20241212.qua0Os3sheev@digikod.net>
- <f480bbea-989d-378a-9493-c2bee412db00@huawei-partners.com>
- <20250124.gaegoo0Ayahn@digikod.net>
- <2f970b00-7648-1865-858a-214c5c6af0c4@huawei-partners.com>
- <20250127.Uph4aiph9jae@digikod.net>
- <d3d589c3-a70b-fc6e-e1bb-d221833dfef5@huawei-partners.com>
- <594263fc-f4e7-43ce-a613-d3f8ebb7f874@kernel.org>
- <f6e72e71-c5ed-8a9c-f33e-f190a47b8c27@huawei-partners.com>
- <2e727df0-c981-4e0c-8d0d-09109cf27d6f@kernel.org>
-From: Mikhail Ivanov <ivanov.mikhail1@huawei-partners.com>
-In-Reply-To: <2e727df0-c981-4e0c-8d0d-09109cf27d6f@kernel.org>
-Content-Type: text/plain; charset="UTF-8"; format=flowed
-Content-Transfer-Encoding: 8bit
-X-ClientProxiedBy: lhrpeml500006.china.huawei.com (7.191.161.198) To
- mscpeml500004.china.huawei.com (7.188.26.250)
+Content-Transfer-Encoding: 7bit
+X-Mailer: Microsoft Outlook 16.0
+Thread-Index: AQDx5RsunPn3lkU9PtjwM0wRa6rGBAGYfFpdAhQG56QCgzy5ibTPFAeg
+Content-Language: en-in
+X-Brightmail-Tracker: H4sIAAAAAAAAA02TeUybZRzH97x927csdrwcbs9YcFhHFDaObtA9TBg7muXVzYAh0Wg0pYHX
+	cvWgLUz8Q1GJhg6ZjLGUWkppUA6FSS215RzIMbdJwTHGiCychmPdZMyNww1bCsp/n+eb7+98
+	8mMzvI2EHztVqqIVUlEGl7Udt/wSFBRyk6MVhy+pA9Hy7CWAxvQWFrKPdjLQD619GNLZ83BU
+	3tXHRNM9EwS6c8WGoa5rlRi6a7zPRHb7jwTqtxQykWlyiInG595GN5t0LKSxt2FIPTTFRPqn
+	dUzUY9iJHl+/B5Cx8RGB1uYbARr/q4VA2n4rE3XdmGGgtRYrgYxjBuaxPZS55g5GTZ9vJCib
+	dpSgDKYsylSbz6J+qvyEslkXMepB2y0WVWiuBVRHG4+aXmplUOb2RUA9+6yMoBZNL8TveDc9
+	OoUWJdOKAFqaJEtOlYpjuKcThCeFkfxwXggvCh3mBkhFEjqGKzgTH3IqNcO5Em5AtigjyynF
+	i5RKbtjRaIUsS0UHpMiUqhguLU/OkEfIQ5UiiTJLKg6V0qojvPDwg5FOY2J6ymhhEy4f9v6w
+	blKaCy57qoEHG5IR8A+rGqjBdrY32Qxg/3IToQZs5+MhgGWBLo83+RjAmRGvTX/dioHh9rcC
+	qFnVbwTPANj8pAlzuVhkMDQWthEu9iX3QX3ZxXWdQfYx4bl+0lXAg3wVrmhed8k+5ClYPVUC
+	XIyTgbDh4SDuYg4ZBS/kjwE3e8FfS6dwd5q98GeHjuFuKAAuT3/HdKX0deaxnXvFbdkFu5cL
+	1vuE5JwHHLxvJ9x+AZx80gzc7APnes0buh+cPf/FBgvh94W3cDenwNGVIpabY+GVQR3uqsUg
+	g+DlpjC37A9LrtVvTLgDfrU6hbl1DrTqN/kl+HR+aCPlbmj59gHxNeBqt0ym3TKZdssI2v+r
+	GQBeC3bTcqVETCdFynlS+ux/f50kk5jA+rEEC6xguPxZaCfA2KATQDaD68t5v08j9uYki3I+
+	ohUyoSIrg1Z2gkjnuosYfs8nyZzXJlUJeRFR4RF8Pj8i6hCfx93F+dyWJ/YmxSIVnU7Tclqx
+	GYexPfxyse40cXbSAl4kekPTDAuuHlAXB/yOeHUfV2ftNUpjMyfWLtQTwd/ggw3H06r827w8
+	wmDCm522+YGF4YriYqMhLuxwYZc1O/10qaOSNxLXcXcBtzg6ehUCHfO25mBK2ZL1ekuNztP8
+	28k9jqrqoE+jfPP49bGv9YzUBhdILi3GvRiWeigx1XFvddySeYzaVlrV7khM6H2ugmc9IckR
+	WOxBBdWCt7QfNDTum3jPnMT9shszlaQF/cmX8/Vn+PnK49suHq3ZX97o8/LqPzmJjyIYNQua
+	/YH9FZUHhvyF7Z4wsy8+OrRmYFaVe/tv3w408M6JNc+zV48038C7A9dkO3E7i4srU0S8YIZC
+	KfoXeU2tyLUEAAA=
+X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFupileLIzCtJLcpLzFFi42LZdlhJTnfHx5npBj+65Cx+vpzGaPFg3jY2
+	i/N3DzFbrNl7jslizvkWFov5R86xWjw99ojd4uaBnUwWR04tYbK4t+gdq8X58xvYLS5s62O1
+	2PT4GqvFw1fhFpd3zWGzmHF+H5NF17UnrBbz/q5ltTi2QMzi2+k3jBaLtn5ht/j/eiujxcMP
+	e9gtZl3YwWpx5MwLZov/e3awWyx6sIDVQdpjy8qbTB5P+7eye+ycdZfdY8GmUo9NqzrZPDYv
+	qffYueMzk8f7fVfZPPq2rGL0OLjP0OPpj73MHlv2f2b0+Nc0l93j8ya5AL4oLpuU1JzMstQi
+	fbsEroy7fbtYCm4IVax9nNfAuJ6/i5GTQ0LARGLtrwXMILaQwG5GiW+79SHikhKfmqeyQtjC
+	Eiv/PWfvYuQCqnnGKPH64FNGkASbgJbEor597CC2iICKxLy5U5hAipgFXrFKPDg9hQVi6itG
+	iZdPlbsYOTg4Bawlfs3wAgkLC7hJrHgyFWwOi4CqxMZPV8DKeQUsJSZ1PmCEsAUlTs58wgLS
+	yiygJ9G2ESzMLCAvsf3tHGaI2xQkfj5dxgpSIgI0cme3BkSJuMTRnz3MExiFZyEZNAth0Cwk
+	g2Yh6VjAyLKKUTK1oDg3PbfYsMAoL7Vcrzgxt7g0L10vOT93EyM4uWhp7WDcs+qD3iFGJg7G
+	Q4wSHMxKIryx52akC/GmJFZWpRblxxeV5qQWH2KU5mBREuf99ro3RUggPbEkNTs1tSC1CCbL
+	xMEp1cDkaM4nE1AcpBrmdrP+pEWoxJ/+59nrfdUSbQOPpvDvUQlLzEoS4PrVZZmjo7J9i+jb
+	80XHZi3iMnFVnvRYc7f2bsFHgrO+R4V/Y2VhO8D1eIH9e/ns4uaLX7VrohTPTN2pHzjv1kre
+	2hl6DfmH/xaYtp5JEnznXRnuaFAQp2t9+EebkFFA16VSO/EnYosUp0i/DSg91JM6/9ex4wVb
+	ww2z/2d8vnqt3i2He8VcvWN2hq8Pvdqzc+YJX47egweDfWYePSe+as98yci3tfL9nrLLvkaf
+	35m3Za/nOrU9tQXVS85v/b7lWfp0nR/tly9vmdDsaLZk2fdH1XH8M7ZaLg9Z8141U+ecnd50
+	p08GeTxKLMUZiYZazEXFiQBz2b4dnQMAAA==
+X-CMS-MailID: 20250129091536epcas5p34ebefd253ea0f1dfd5156bf61d2178be
+X-Msg-Generator: CA
+Content-Type: text/plain; charset="utf-8"
+X-Sendblock-Type: REQ_APPROVE
+CMS-TYPE: 105P
+DLP-Filter: Pass
+X-CFilter-Loop: Reflected
+X-CMS-RootMailID: 20250128102732epcas5p4618e808063ffa992b476f03f7098d991
+References: <20250128102558.22459-1-swathi.ks@samsung.com>
+	<CGME20250128102732epcas5p4618e808063ffa992b476f03f7098d991@epcas5p4.samsung.com>
+	<20250128102558.22459-3-swathi.ks@samsung.com>
+	<63e64aa6-d018-4e45-acc7-f9d88a7db60f@lunn.ch>
 
-On 1/29/2025 1:25 PM, Matthieu Baerts wrote:
-> Hi Mikhail,
-> 
-> On 29/01/2025 10:52, Mikhail Ivanov wrote:
->> On 1/28/2025 9:14 PM, Matthieu Baerts wrote:
->>> Hi Mikhail,
->>>
->>> Sorry, I didn't follow all the discussions in this thread, but here are
->>> some comments, hoping this can help to clarify the MPTCP case.
->>
->> Thanks a lot for sharing your knowledge, Matthieu!
->>
->>>
->>> On 28/01/2025 11:56, Mikhail Ivanov wrote:
->>>> On 1/27/2025 10:48 PM, Mickaël Salaün wrote:
->>>
->>> (...)
->>>
->>>>> I'm a bit worried that we miss some of these places (now or in future
->>>>> kernel versions).  We'll need a new LSM hook for that.
->>>>>
->>>>> Could you list the current locations?
->>>>
->>>> Currently, I know only about TCP-related transformations:
->>>>
->>>> * SMC can fallback to TCP during connection. TCP connection is used
->>>>     (1) to exchange CLC control messages in default case and (2) for the
->>>>     communication in the case of fallback. If socket was connected or
->>>>     connection failed, socket can not be reconnected again. There is no
->>>>     existing security hook to control the fallback case,
->>>>
->>>> * MPTCP uses TCP for communication between two network interfaces in the
->>>>     default case and can fallback to plain TCP if remote peer does not
->>>>     support MPTCP. AFAICS, there is also no security hook to control the
->>>>     fallback transformation,
->>>
->>> There are security hooks to control the path creation, but not to
->>> control the "fallback transformation".
->>>
->>> Technically, with MPTCP, the userspace will create an IPPROTO_MPTCP
->>> socket. This is only used "internally": to communicate between the
->>> userspace and the kernelspace, but not directly used between network
->>> interfaces. This "external" communication is done via one or multiple
->>> kernel TCP sockets carrying extra TCP options for the mapping. The
->>> userspace cannot directly control these sockets created by the kernel.
->>>
->>> In case of fallback, the kernel TCP socket "simply" drop the extra TCP
->>> options needed for MPTCP, and carry on like normal TCP. So on the wire
->>> and in the Linux network stack, it is the same TCP connection, without
->>> the MPTCP options in the TCP header. The userspace continue to
->>> communicate with the same socket.
->>>
->>> I'm not sure if there is a need to block the fallback: it means only one
->>> path can be used at a time.
->>
->> You mean that users always rely on a plain TCP communication in the case
->> the connection of MPTCP multipath communication fails?
-> 
-> Yes, that's the same TCP connection, just without extra bit to be able
-> to use multiple TCP connections associated to the same MPTCP one.
 
-Indeed, so MPTCP communication should be restricted the same way as TCP.
-AFAICS this should be intuitive for MPTCP users and it'll be better
-to let userland define this dependency.
 
+> -----Original Message-----
+> From: Andrew Lunn <andrew@lunn.ch>
+> Sent: 28 January 2025 19:19
+> To: Swathi K S <swathi.ks@samsung.com>
+> Cc: krzk@kernel.org; robh@kernel.org; davem@davemloft.net;
+> edumazet@google.com; kuba@kernel.org; pabeni@redhat.com;
+> conor+dt@kernel.org; richardcochran@gmail.com;
+> mcoquelin.stm32@gmail.com; alim.akhtar@samsung.com; linux-
+> fsd@tesla.com; netdev@vger.kernel.org; devicetree@vger.kernel.org; linux-
+> kernel@vger.kernel.org; linux-stm32@st-md-mailman.stormreply.com;
+> linux-arm-kernel@lists.infradead.org; linux-samsung-soc@vger.kernel.org;
+> alexandre.torgue@foss.st.com; peppe.cavallaro@st.com;
+> joabreu@synopsys.com; rcsekar@samsung.com; ssiddha@tesla.com;
+> jayati.sahu@samsung.com; pankaj.dubey@samsung.com;
+> ravi.patel@samsung.com; gost.dev@samsung.com
+> Subject: Re: [PATCH v5 2/4] net: stmmac: dwc-qos: Add FSD EQoS support
 > 
->>>> * IPv6 -> IPv4 transformation for TCP and UDP sockets withon
->>>>     IPV6_ADDRFORM. Can be controlled with setsockopt() security hook.
->>>>
->>>> As I said before, I wonder if user may want to use SMC or MPTCP and deny
->>>> TCP communication, since he should rely on fallback transformation
->>>> during the connection in the common case. It may be unexpected for
->>>> connect(2) to fail during the fallback due to security politics.
->>>
->>> With MPTCP, fallbacks can happen at the beginning of a connection, when
->>> there is only one path. This is done after the userspace's connect(). If
->>> the fallback is blocked, I guess the userspace will get the same errors
->>> as when an open connection is reset.
->>
->> In the case of blocking due to security policy, userspace should get
->> -EACESS. I mean, the user might not expect the fallback path to be
->> blocked during the connection if he has allowed only MPTCP communication
->> using the Landlock policy.
+> > +static int fsd_clks_endisable(void *priv, bool enabled) {
+> > +	struct fsd_eqos_plat_data *plat = priv;
+> > +
+> > +	if (enabled) {
+> > +		return clk_bulk_prepare_enable(plat->num_clks, plat->clks);
+> > +	} else {
+> > +		clk_bulk_disable_unprepare(plat->num_clks, plat->clks);
+> > +		return 0;
+> > +	}
+> > +}
+> > +
+> > +static int fsd_eqos_probe(struct platform_device *pdev,
+> > +			  struct plat_stmmacenet_data *data,
+> > +			  struct stmmac_resources *res)
+> > +{
+> > +	struct fsd_eqos_plat_data *priv_plat;
+> > +	struct clk *rx1 = NULL;
+> > +	struct clk *rx2 = NULL;
+> > +	int ret = 0;
+> > +
+> > +	priv_plat = devm_kzalloc(&pdev->dev, sizeof(*priv_plat),
+> GFP_KERNEL);
+> > +	if (!priv_plat)
+> > +		return -ENOMEM;
+> > +
+> > +	priv_plat->dev = &pdev->dev;
+> > +
+> > +	ret = devm_clk_bulk_get_all(&pdev->dev, &priv_plat->clks);
+> > +	if (ret < 0)
+> > +		return dev_err_probe(&pdev->dev, ret, "No clocks
+> available\n");
+> > +
+> > +	priv_plat->num_clks = ret;
 > 
-> A "fallback" can happen on different occasions as mentioned in the
-> RFC8684 [1], e.g.
-> 
-> - The client asks to use MPTCP, but the other peer doesn't support it:
-> 
->    Client                Server
->    |     SYN + MP_CAPABLE     |
->    |------------------------->|
->    |         SYN/ACK          |
->    |<-------------------------|  => Fallback on the client side
->    |           ACK            |
->    |------------------------->|
-> 
-> - A middle box doesn't touch the 3WHS, but intercept the communication
-> just after:
-> 
->    Client                Server
->    |     SYN + MP_CAPABLE     |
->    |------------------------->|
->    |   SYN/ACK + MP_CAPABLE   |
->    |<-------------------------|
->    |     ACK + MP_CAPABLE     |
->    |------------------------->|
->    |        DSS + data        | => but the server doesn't receive the DSS
->    |------------------------->| => So fallback on the server side
->    |           ACK            |
->    |<-------------------------| => Fallback on the client side
-> 
-> - etc.
-> 
-> So the connect(), even in blocking mode, can be OK, but the "fallback"
-> will happen later.
+> It looks like you should be able to share all the clk_bulk code with
+> tegra_eqos_probe(). The stmmac driver suffers from lots of cut/paste code
+> with no consolidation. You can at least not make the tegra code worse by
+> doing a little refactoring.
 
-Thanks! Theoretical "socket transformation" control should cover all
-these cases.
+Hi Andrew, 
+Just to clarify, you were referring to refactoring tegra code to use
+clk_bulk APIs, right?
+In that case, will look into this and evaluate the best approach for
+refactoring the code. 
 
-You mean that it might be reasonable for a Landlock policy to block
-MPTCP fallback when establishing first sublflow (when client does not
-receive MP_CAPABLE)?
+- Swathi
 
 > 
-> Again, once the "fallback" has been done, it just means there will be no
-> more MPTCP options in the TCP headers, and these TCP connections,
-> created and controlled by the kernel, will continue as "plain" TCP
-> connections. It simply means that the MPTCP connection will be
-> restricted to one path, because it will not be possible to create
-> additional paths any more without these MPTCP options in the initial path.
+> 	Andrew
 
-Correct, thanks
-
-> 
-> [1] https://datatracker.ietf.org/doc/html/rfc8684#name-fallback
-> 
->>> (Note that on the listener side, the fallback can happen before the
->>> userspace's accept() which can even get an IPPROTO_TCP socket in return)
->>
->> Indeed, fallback can happen on a server side as well.
-> 
-> Same here, this fallback can happen at different stages of the
-> connection, e.g. the server, supporting MPTCP, can receive a SYN without
-> MP_CAPABLE option ; or the 3WHS is OK, but the MPTCP options are
-> stripped later.
-> 
->>>> Theoretically, any TCP restriction should cause similar SMC and MPTCP
->>>> restriction. If we deny creation of TCP sockets, we should also deny
->>>> creation of SMC and MPTCP sockets. I thought that such dependencies may
->>>> be too complex and it will be better to leave them for the user and not
->>>> provide any transformation control at all. What do you think?
->>> I guess the creation of "kernel" TCP sockets used by MPTCP (and SMC?)
->>> can be restricted, it depends on where this hook is placed I suppose.
->>
->> Calling
->>      socket(AF_INET, SOCK_STREAM, IPPROTO_MPTCP)
->> causes creation of kernel TCP socket, so we can use
->> security_socket_create() hook for this purpose.
-> 
-> That's good if you use this hook then!
-> 
-> Cheers,
-> Matt
 
