@@ -1,137 +1,271 @@
-Return-Path: <netdev+bounces-161558-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-161559-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id DC050A2251F
-	for <lists+netdev@lfdr.de>; Wed, 29 Jan 2025 21:27:59 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 3D997A22524
+	for <lists+netdev@lfdr.de>; Wed, 29 Jan 2025 21:32:36 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 983223A211E
-	for <lists+netdev@lfdr.de>; Wed, 29 Jan 2025 20:27:51 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 2CF2F3A3B7D
+	for <lists+netdev@lfdr.de>; Wed, 29 Jan 2025 20:32:28 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3592F1E2606;
-	Wed, 29 Jan 2025 20:27:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=cs.stanford.edu header.i=@cs.stanford.edu header.b="afj+OXtY"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0EA19199239;
+	Wed, 29 Jan 2025 20:32:33 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp1.cs.Stanford.EDU (smtp1.cs.stanford.edu [171.64.64.25])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mx01.omp.ru (mx01.omp.ru [90.154.21.10])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AB96C199EBB
-	for <netdev@vger.kernel.org>; Wed, 29 Jan 2025 20:27:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=171.64.64.25
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5F247193084;
+	Wed, 29 Jan 2025 20:32:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=90.154.21.10
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1738182476; cv=none; b=nbV17j6d8qhtD4wwCe5xbqTN7rLEaS1W1g/KRvW8BTk0IRxB9QUHxPy1RyI3NJdTET5wz7+vraV5Xc3A8Z3CXeO6OjiraF2n1VoxG4Vgd2VJIxCe8Izb3qQFP94rB5sk3uVLuUGnr6z90xgdCN54JzjyIq5r5GnoMCRcBhvjNw4=
+	t=1738182752; cv=none; b=QPemeB5UeUuN8/arfJ/nQL80Gklc8xEpMkoyuDPv1UHYsNzm+r0PEFdLNtwtQMUQ/8OeShVXwT8/dGYOwk+Pfc7PiszEBGhvR1MfdmlMc8d3LQlSfYExn48w465G2i8iFet/3pWIESXRH+RUzVhY/XYur6KZhZyXw3aUHyzhayM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1738182476; c=relaxed/simple;
-	bh=Ad94CEG7Be3qgYF7zPhi5GiXMkoMukgzQwABnrlrEe8=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=CnIxyGZeAsyJS34fVCz0g2oLSQXq3fEAZFDKR0xY7Jv3UBXmVT12hnzPISdHghFA1cMDWfazNoxclJ0ngIOVV14DIDqaZ2/9bPvYHbOecJhWvLx+VwaDXmdSGSZ183I4lF8IsipI3THfifftCpia+kU5RgqW4mCG8N6ciIKdzmQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=cs.stanford.edu; spf=pass smtp.mailfrom=cs.stanford.edu; dkim=pass (2048-bit key) header.d=cs.stanford.edu header.i=@cs.stanford.edu header.b=afj+OXtY; arc=none smtp.client-ip=171.64.64.25
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=cs.stanford.edu
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=cs.stanford.edu
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=cs.stanford.edu; s=cs2308; h=Content-Transfer-Encoding:Content-Type:Cc:To:
-	Subject:Message-ID:Date:From:In-Reply-To:References:MIME-Version:Sender:
-	Reply-To:Content-ID:Content-Description:Resent-Date:Resent-From:Resent-Sender
-	:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:List-Help:List-Unsubscribe:
-	List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=Ad94CEG7Be3qgYF7zPhi5GiXMkoMukgzQwABnrlrEe8=; t=1738182474; x=1739046474; 
-	b=afj+OXtYcAnCmY0yGHovnNJxFqXd6/7jQJuRAs/5bjpyxTTabIgMV7U6PpgRwUoDd7zzFtiM+PY
-	jPPhyRAk14FBtNnQOQ06LftdE8eBOM+xMZn63gK6cPMlgnJt1I35yOSWe8oHyZIbVctZ7t94g+Isk
-	I4H2mv//60bvqb5S2xtv2bixVYYbLiUKCCfGXnbeplOUbM4+s3m2NqXh0enR/WekORgREZlUWhL7j
-	rW73lUxccsRU02sr6eA6QZEwSBy45l5X9kIIDDuN1u4uEzz7Gux5JTw/uPSzCMbbqiEKYaN4qJut+
-	iFrswQ7KrITXSyAZG+P6aoRPpfVpcjYMCR4g==;
-Received: from mail-oo1-f49.google.com ([209.85.161.49]:46476)
-	by smtp1.cs.Stanford.EDU with esmtpsa  (TLS1.2) tls TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256
-	(Exim 4.94.2)
-	(envelope-from <ouster@cs.stanford.edu>)
-	id 1tdEf5-00050P-Hz
-	for netdev@vger.kernel.org; Wed, 29 Jan 2025 12:27:48 -0800
-Received: by mail-oo1-f49.google.com with SMTP id 006d021491bc7-5f2b21a0784so36635eaf.1
-        for <netdev@vger.kernel.org>; Wed, 29 Jan 2025 12:27:47 -0800 (PST)
-X-Forwarded-Encrypted: i=1; AJvYcCXtc8zwq0o28ULXP+ZylYXX2eY/AdRPPOtyljJ3ptXFDKae7sDlaImqWyGBVleXtval4vEiq4Q=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxjYPluj5O/XkjQ8p4x/FWHRLGmA3b8QIDMf6LKFpGxEBxo3j0Q
-	Jr5JGEBz1wx5dywp2iK/Sjz9mlR1IjfMwMNmmGEzUg6RQAj9WTqEbAaJRybGhZ2WlUiO/VXE4Wc
-	p1Z7/tt4OGL6Oqta3fUeW9PqMT8I=
-X-Google-Smtp-Source: AGHT+IFXD9lfG0JETd4xaJz8vpBMTB+f3lxaTbF1MJv2wsO/hoZcU5rk51EEw6Ff39Q69L2E57IMd8w2DfxJiL/VPU0=
-X-Received: by 2002:a05:6871:ea0c:b0:29e:2bbd:51cb with SMTP id
- 586e51a60fabf-2b32f2908cfmr2495090fac.24.1738182466970; Wed, 29 Jan 2025
- 12:27:46 -0800 (PST)
+	s=arc-20240116; t=1738182752; c=relaxed/simple;
+	bh=doKbFZSHIjqC5hztRH1Vm+tRs7UxX7wI+mzCLhndAjM=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=WvngZZocHK+Vq/0M0lAYDn7qmsf0+MSG+0kafOvFpKTf/7HTVa0niVDQdJux3m7VHxxbUsg05HYMpVFendRC6vDZuNaKNm1GBnQqtMoHjLPa506DYQULhDWH33TkbYA8oyDnhxNLdYyOu5lYewm2iInZW7umBMi5UrsXb0qHE4M=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=omp.ru; spf=pass smtp.mailfrom=omp.ru; arc=none smtp.client-ip=90.154.21.10
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=omp.ru
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=omp.ru
+Received: from localhost.localdomain (188.234.20.53) by msexch01.omp.ru
+ (10.188.4.12) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384) id 15.2.1258.12; Wed, 29 Jan
+ 2025 23:32:07 +0300
+From: d.privalov <d.privalov@omp.ru>
+To: <stable@vger.kernel.org>, Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+CC: "David S. Miller" <davem@davemloft.net>, Alexey Kuznetsov
+	<kuznet@ms2.inr.ac.ru>, Hideaki YOSHIFUJI <yoshfuji@linux-ipv6.org>, Jakub
+ Kicinski <kuba@kernel.org>, Alexei Starovoitov <ast@kernel.org>, Daniel
+ Borkmann <daniel@iogearbox.net>, Andrii Nakryiko <andrii@kernel.org>, Martin
+ KaFai Lau <kafai@fb.com>, Song Liu <songliubraving@fb.com>, Yonghong Song
+	<yhs@fb.com>, John Fastabend <john.fastabend@gmail.com>, KP Singh
+	<kpsingh@kernel.org>, Eric Dumazet <edumazet@google.com>,
+	<netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
+	<bpf@vger.kernel.org>, <lvc-project@linuxtesting.org>, Martin KaFai Lau
+	<martin.lau@kernel.org>, Kuniyuki Iwashima <kuniyu@amazon.com>, Dmitriy
+ Privalov <d.privalov@omp.ru>
+Subject: [PATCH v3 5.10 1/1] tcp/dccp: Don't use timer_pending() in reqsk_queue_unlink().
+Date: Wed, 29 Jan 2025 23:31:40 +0300
+Message-ID: <20250129203140.199699-1-d.privalov@omp.ru>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250115185937.1324-1-ouster@cs.stanford.edu> <20250115185937.1324-6-ouster@cs.stanford.edu>
- <1c82f56c-4353-407b-8897-b8a485606a5f@redhat.com> <CAGXJAmwyp6tSO4KT_NSHKHSnUn-GSzSN=ucfjnBuXbg8uiw2pg@mail.gmail.com>
- <2ace650b-5697-4fc4-91f9-4857fa64feea@redhat.com> <CAGXJAmxHDVhxKb3M0--rySAgewmLpmfJkAeRSBNRgZ=cQonDtg@mail.gmail.com>
- <9209dfbb-ca3a-4fb7-a2fb-0567394f8cda@redhat.com> <CAGXJAmyb8s5xu9W1dXxhwnQfeY4=P21FquBymonUseM_OpaU2w@mail.gmail.com>
- <13345e2a-849d-4bd8-a95e-9cd7f287c7df@redhat.com> <CAGXJAmweUSP8-eG--nOrcst4tv-qq9RKuE0arme4FJzXW67x3Q@mail.gmail.com>
- <CANn89iL2yRLEZsfuHOtZ8bgWiZVwy-=R5UVNFkc1QdYrSxF5Qg@mail.gmail.com>
- <CAGXJAmyKPdu5-JEQ4WOX9fPacO19wyBLOzzn0CwE5rjErcfNYw@mail.gmail.com> <CANn89iJmbefLpPW-jgJjFkx79yso3jUUzuH0voPaF+2Kz3EW2g@mail.gmail.com>
-In-Reply-To: <CANn89iJmbefLpPW-jgJjFkx79yso3jUUzuH0voPaF+2Kz3EW2g@mail.gmail.com>
-From: John Ousterhout <ouster@cs.stanford.edu>
-Date: Wed, 29 Jan 2025 12:27:11 -0800
-X-Gmail-Original-Message-ID: <CAGXJAmz5=V2DmGHHh2XRHKQYynXmqYk_Nqw-y_QBWBQBMjbuag@mail.gmail.com>
-X-Gm-Features: AWEUYZm9GUiGvc6JW_dedYW7xtCfwShNRYqyiAi2Nncs6eR4CnlQKKo4mpPmv9U
-Message-ID: <CAGXJAmz5=V2DmGHHh2XRHKQYynXmqYk_Nqw-y_QBWBQBMjbuag@mail.gmail.com>
-Subject: Re: [PATCH net-next v6 05/12] net: homa: create homa_rpc.h and homa_rpc.c
-To: Eric Dumazet <edumazet@google.com>
-Cc: Paolo Abeni <pabeni@redhat.com>, Netdev <netdev@vger.kernel.org>, 
-	Simon Horman <horms@kernel.org>, Jakub Kicinski <kuba@kernel.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Spam-Score: 1.7
-X-Spam-Level: *
-X-Scan-Signature: ae35470b07fbe4e2dbb6b33d1de23969
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-ClientProxiedBy: msexch01.omp.ru (10.188.4.12) To msexch01.omp.ru
+ (10.188.4.12)
+X-KSE-ServerInfo: msexch01.omp.ru, 9
+X-KSE-AntiSpam-Interceptor-Info: scan successful
+X-KSE-AntiSpam-Version: 6.1.1, Database issued on: 01/29/2025 20:13:52
+X-KSE-AntiSpam-Status: KAS_STATUS_NOT_DETECTED
+X-KSE-AntiSpam-Method: none
+X-KSE-AntiSpam-Rate: 19
+X-KSE-AntiSpam-Info: Lua profiles 190672 [Jan 29 2025]
+X-KSE-AntiSpam-Info: Version: 6.1.1.7
+X-KSE-AntiSpam-Info: Envelope from: d.privalov@omp.ru
+X-KSE-AntiSpam-Info: LuaCore: 50 0.3.50
+ df4aeb250ed63fd3baa80a493fa6caee5dd9e10f
+X-KSE-AntiSpam-Info: {rep_avail}
+X-KSE-AntiSpam-Info: {Tracking_uf_ne_domains}
+X-KSE-AntiSpam-Info: {Tracking_from_domain_doesnt_match_to}
+X-KSE-AntiSpam-Info: {SMTP from is not routable}
+X-KSE-AntiSpam-Info: {Found in DNSBL: 188.234.20.53 in (user)
+ b.barracudacentral.org}
+X-KSE-AntiSpam-Info:
+	omp.ru:7.1.1;lore.kernel.org:7.1.1;patch.msgid.link:7.1.1;d41d8cd98f00b204e9800998ecf8427e.com:7.1.1;127.0.0.199:7.1.2;nvd.nist.gov:7.1.1
+X-KSE-AntiSpam-Info: FromAlignment: s
+X-KSE-AntiSpam-Info: ApMailHostAddress: 188.234.20.53
+X-KSE-AntiSpam-Info: {DNS response errors}
+X-KSE-AntiSpam-Info: Rate: 19
+X-KSE-AntiSpam-Info: Status: not_detected
+X-KSE-AntiSpam-Info: Method: none
+X-KSE-AntiSpam-Info: Auth:dmarc=temperror header.from=omp.ru;spf=temperror
+ smtp.mailfrom=omp.ru;dkim=none
+X-KSE-Antiphishing-Info: Clean
+X-KSE-Antiphishing-ScanningType: Heuristic
+X-KSE-Antiphishing-Method: None
+X-KSE-Antiphishing-Bases: 01/29/2025 20:15:00
+X-KSE-Antivirus-Interceptor-Info: scan successful
+X-KSE-Antivirus-Info: Clean, bases: 1/29/2025 7:28:00 PM
+X-KSE-Attachment-Filter-Triggered-Rules: Clean
+X-KSE-Attachment-Filter-Triggered-Filters: Clean
+X-KSE-BulkMessagesFiltering-Scan-Result: InTheLimit
 
-On Wed, Jan 29, 2025 at 9:04=E2=80=AFAM Eric Dumazet <edumazet@google.com> =
-wrote:
->
-> On Wed, Jan 29, 2025 at 5:55=E2=80=AFPM John Ousterhout <ouster@cs.stanfo=
-rd.edu> wrote:
-> >
-> > On Wed, Jan 29, 2025 at 8:50=E2=80=AFAM Eric Dumazet <edumazet@google.c=
-om> wrote:
-> > >
-> > > On Wed, Jan 29, 2025 at 5:44=E2=80=AFPM John Ousterhout <ouster@cs.st=
-anford.edu> wrote:
-> > > >
-> > > > GRO is implemented in the "full" Homa (and essential for decent
-> > > > performance); I left it out of this initial patch series to reduce =
-the
-> > > > size of the patch. But that doesn't affect the cost of freeing skbs=
-.
-> > > > GRO aggregates skb's into batches for more efficient processing, bu=
-t
-> > > > the same number of skb's ends up being freed in the end.
-> > >
-> > > Not at all, unless GRO is forced to use shinfo->frag_list.
-> > >
-> > > GRO fast path cooks a single skb for a large payload, usually adding
-> > > as many page fragments as possible.
-> >
-> > Are you referring to hardware GRO or software GRO? I was referring to
-> > software GRO, which is what Homa currently implements. With software
-> > GRO there is a stream of skb's coming up from the driver; regardless
-> > of how GRO re-arranges them, each skb eventually has to be freed, no?
->
-> I am referring to software GRO.
-> We do not allocate/free skbs for each aggregated segment.
-> napi_get_frags() & napi_reuse_skb() for details.
+From: Kuniyuki Iwashima <kuniyu@amazon.com>
 
- YATIDNK (Yet Another Thing I Did Not Know); thanks for the information.
+commit e8c526f2bdf1845bedaf6a478816a3d06fa78b8f upstream.
 
-So it sounds like GRO moves the page frags into another skb and
-returns the skb shell to napi for reuse, eliminating an
-alloc_skb/kfree_skb pair? Nice.
+Martin KaFai Lau reported use-after-free [0] in reqsk_timer_handler().
 
-The skb that receives all of the page frags: does that eventually get
-kfree_skb'ed, or is there an optimization for that that I'm also not
-aware of?
+  """
+  We are seeing a use-after-free from a bpf prog attached to
+  trace_tcp_retransmit_synack. The program passes the req->sk to the
+  bpf_sk_storage_get_tracing kernel helper which does check for null
+  before using it.
+  """
 
--John-
+The commit 83fccfc3940c ("inet: fix potential deadlock in
+reqsk_queue_unlink()") added timer_pending() in reqsk_queue_unlink() not
+to call del_timer_sync() from reqsk_timer_handler(), but it introduced a
+small race window.
+
+Before the timer is called, expire_timers() calls detach_timer(timer, true)
+to clear timer->entry.pprev and marks it as not pending.
+
+If reqsk_queue_unlink() checks timer_pending() just after expire_timers()
+calls detach_timer(), TCP will miss del_timer_sync(); the reqsk timer will
+continue running and send multiple SYN+ACKs until it expires.
+
+The reported UAF could happen if req->sk is close()d earlier than the timer
+expiration, which is 63s by default.
+
+The scenario would be
+
+  1. inet_csk_complete_hashdance() calls inet_csk_reqsk_queue_drop(),
+     but del_timer_sync() is missed
+
+  2. reqsk timer is executed and scheduled again
+
+  3. req->sk is accept()ed and reqsk_put() decrements rsk_refcnt, but
+     reqsk timer still has another one, and inet_csk_accept() does not
+     clear req->sk for non-TFO sockets
+
+  4. sk is close()d
+
+  5. reqsk timer is executed again, and BPF touches req->sk
+
+Let's not use timer_pending() by passing the caller context to
+__inet_csk_reqsk_queue_drop().
+
+Note that reqsk timer is pinned, so the issue does not happen in most
+use cases. [1]
+
+[0]
+BUG: KFENCE: use-after-free read in bpf_sk_storage_get_tracing+0x2e/0x1b0
+
+Use-after-free read at 0x00000000a891fb3a (in kfence-#1):
+bpf_sk_storage_get_tracing+0x2e/0x1b0
+bpf_prog_5ea3e95db6da0438_tcp_retransmit_synack+0x1d20/0x1dda
+bpf_trace_run2+0x4c/0xc0
+tcp_rtx_synack+0xf9/0x100
+reqsk_timer_handler+0xda/0x3d0
+run_timer_softirq+0x292/0x8a0
+irq_exit_rcu+0xf5/0x320
+sysvec_apic_timer_interrupt+0x6d/0x80
+asm_sysvec_apic_timer_interrupt+0x16/0x20
+intel_idle_irq+0x5a/0xa0
+cpuidle_enter_state+0x94/0x273
+cpu_startup_entry+0x15e/0x260
+start_secondary+0x8a/0x90
+secondary_startup_64_no_verify+0xfa/0xfb
+
+kfence-#1: 0x00000000a72cc7b6-0x00000000d97616d9, size=2376, cache=TCPv6
+
+allocated by task 0 on cpu 9 at 260507.901592s:
+sk_prot_alloc+0x35/0x140
+sk_clone_lock+0x1f/0x3f0
+inet_csk_clone_lock+0x15/0x160
+tcp_create_openreq_child+0x1f/0x410
+tcp_v6_syn_recv_sock+0x1da/0x700
+tcp_check_req+0x1fb/0x510
+tcp_v6_rcv+0x98b/0x1420
+ipv6_list_rcv+0x2258/0x26e0
+napi_complete_done+0x5b1/0x2990
+mlx5e_napi_poll+0x2ae/0x8d0
+net_rx_action+0x13e/0x590
+irq_exit_rcu+0xf5/0x320
+common_interrupt+0x80/0x90
+asm_common_interrupt+0x22/0x40
+cpuidle_enter_state+0xfb/0x273
+cpu_startup_entry+0x15e/0x260
+start_secondary+0x8a/0x90
+secondary_startup_64_no_verify+0xfa/0xfb
+
+freed by task 0 on cpu 9 at 260507.927527s:
+rcu_core_si+0x4ff/0xf10
+irq_exit_rcu+0xf5/0x320
+sysvec_apic_timer_interrupt+0x6d/0x80
+asm_sysvec_apic_timer_interrupt+0x16/0x20
+cpuidle_enter_state+0xfb/0x273
+cpu_startup_entry+0x15e/0x260
+start_secondary+0x8a/0x90
+secondary_startup_64_no_verify+0xfa/0xfb
+
+Fixes: 83fccfc3940c ("inet: fix potential deadlock in reqsk_queue_unlink()")
+Reported-by: Martin KaFai Lau <martin.lau@kernel.org>
+Closes: https://lore.kernel.org/netdev/eb6684d0-ffd9-4bdc-9196-33f690c25824@linux.dev/
+Link: https://lore.kernel.org/netdev/b55e2ca0-42f2-4b7c-b445-6ffd87ca74a0@linux.dev/ [1]
+Signed-off-by: Kuniyuki Iwashima <kuniyu@amazon.com>
+Reviewed-by: Eric Dumazet <edumazet@google.com>
+Reviewed-by: Martin KaFai Lau <martin.lau@kernel.org>
+Link: https://patch.msgid.link/20241014223312.4254-1-kuniyu@amazon.com
+Signed-off-by: Jakub Kicinski <kuba@kernel.org>
+[d.privalov: adapt calling __inet_csk_reqsk_queue_drop()]
+Signed-off-by: Dmitriy Privalov <d.privalov@omp.ru>
+---
+Backport fix for CVE-2024-50154
+Link: https://nvd.nist.gov/vuln/detail/CVE-2024-50154
+---
+v3: Return using timer_delete_sync()
+v2: Fix patch applying
+
+ net/ipv4/inet_connection_sock.c | 19 +++++++++++++++----
+ 1 file changed, 15 insertions(+), 4 deletions(-)
+
+diff --git a/net/ipv4/inet_connection_sock.c b/net/ipv4/inet_connection_sock.c
+index 1dfa561e8f981..d912894ad4adc 100644
+--- a/net/ipv4/inet_connection_sock.c
++++ b/net/ipv4/inet_connection_sock.c
+@@ -700,21 +700,31 @@ static bool reqsk_queue_unlink(struct request_sock *req)
+ 		found = __sk_nulls_del_node_init_rcu(req_to_sk(req));
+ 		spin_unlock(lock);
+ 	}
+-	if (timer_pending(&req->rsk_timer) && del_timer_sync(&req->rsk_timer))
+-		reqsk_put(req);
++
+ 	return found;
+ }
+ 
+-bool inet_csk_reqsk_queue_drop(struct sock *sk, struct request_sock *req)
++static bool __inet_csk_reqsk_queue_drop(struct sock *sk,
++					struct request_sock *req,
++					bool from_timer)
+ {
+ 	bool unlinked = reqsk_queue_unlink(req);
+ 
++	if (!from_timer && timer_delete_sync(&req->rsk_timer))
++		reqsk_put(req);
++
+ 	if (unlinked) {
+ 		reqsk_queue_removed(&inet_csk(sk)->icsk_accept_queue, req);
+ 		reqsk_put(req);
+ 	}
++
+ 	return unlinked;
+ }
++
++bool inet_csk_reqsk_queue_drop(struct sock *sk, struct request_sock *req)
++{
++	return __inet_csk_reqsk_queue_drop(sk, req, false);
++}
+ EXPORT_SYMBOL(inet_csk_reqsk_queue_drop);
+ 
+ void inet_csk_reqsk_queue_drop_and_put(struct sock *sk, struct request_sock *req)
+@@ -781,7 +791,8 @@ static void reqsk_timer_handler(struct timer_list *t)
+ 		return;
+ 	}
+ drop:
+-	inet_csk_reqsk_queue_drop_and_put(sk_listener, req);
++	__inet_csk_reqsk_queue_drop(sk_listener, req, true);
++	reqsk_put(req);
+ }
+ 
+ static void reqsk_queue_hash_req(struct request_sock *req,
+-- 
+2.34.1
 
