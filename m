@@ -1,50 +1,64 @@
-Return-Path: <netdev+bounces-161674-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-161676-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id DA1C1A23285
-	for <lists+netdev@lfdr.de>; Thu, 30 Jan 2025 18:10:36 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id B8618A232A8
+	for <lists+netdev@lfdr.de>; Thu, 30 Jan 2025 18:17:03 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id BDA1118838E5
-	for <lists+netdev@lfdr.de>; Thu, 30 Jan 2025 17:10:33 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 418373A2A95
+	for <lists+netdev@lfdr.de>; Thu, 30 Jan 2025 17:16:52 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C79961EF0A6;
-	Thu, 30 Jan 2025 17:10:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Uy5lhc5r"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C18901EE7D8;
+	Thu, 30 Jan 2025 17:16:52 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from dediextern.your-server.de (dediextern.your-server.de [85.10.215.232])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A38811EF0A0
-	for <netdev@vger.kernel.org>; Thu, 30 Jan 2025 17:10:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 259388831;
+	Thu, 30 Jan 2025 17:16:49 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=85.10.215.232
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1738257013; cv=none; b=lzNRrmBV+SfIh74oGKl0ydaFW2cpM65oYkyN3HqnGsaPAlZV5H0QjZq8VACckz4AUZzNhsUeNiTYavZ8c9E9+SJHuG94/Wq44YrgbQLPqHX2XIzENFspTsj2/3cSyDIx1QO/OmmhuFUk8Qt8V8llQIZqMa8cNxo0gVDvzcrr/c4=
+	t=1738257412; cv=none; b=oojkVJXdTcAbeHBnrdvC70mkikbsZoeI1pg7Dc3KfvTg+WmI/qa/zyn1N0ls4eby6vexk9BEozG6zKM0Jp/kjD3DeI65WLlBnCLXSIbX5AS2XXNx79FmgkeHzQlwbpOup/QojEeDV4sqWvzei7kcGTwKEdH7J4sy0soE2d5BLNQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1738257013; c=relaxed/simple;
-	bh=jcBlgrXcvv+KHflMclQaRO9D/3MXZ8SxlxLEh0VM4aE=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=EilXtyQkD2tLesFm8BDfSdHafFXIb57bIIOedmIZG9Z8py3Ozej/PpRiccXlsdYk+jBhww8Uh9ILCQNLKcgjCRJQvnigwhzkxfnuiJ1mUoCingrDvYz2gunzv2r1z1/YEj3l5DFS9nFjqbfwuolApkujKMVGmgsblYsiBzAkhXk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Uy5lhc5r; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 777C8C4CEE7;
-	Thu, 30 Jan 2025 17:10:13 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1738257013;
-	bh=jcBlgrXcvv+KHflMclQaRO9D/3MXZ8SxlxLEh0VM4aE=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=Uy5lhc5rRO8kE+P4ui1sMvCbmqhNOTkkwnKV1M4vCk21WcJJog6pDMK2IBv3IvB9L
-	 1MV8RF70t0W+551S+lByryELRaXlwXcZ4nqE0F/J9mTqldrhcNcxNro/ncw1+vWWsx
-	 61kF7uYSxaf5Vp6qF1Uhkh2u8fNUGB9MTymUIWG713CKpv+/MXBqI37OToi1JUFH7X
-	 F39SqlsYVq6hyuq1qtDj8KiQ3gtvAtOQJDbW0YBgtrgX6vspQDlKSY+jLrjMU80BfK
-	 cpcev3vN727MjHWzud1lQ/xzeey2u2KUuPMAWPy7LTaewmneg3eFI1bB5nQAz2j3AU
-	 Rxqx9GW/3qRrg==
-Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id ECC82380AA66;
-	Thu, 30 Jan 2025 17:10:40 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=arc-20240116; t=1738257412; c=relaxed/simple;
+	bh=fK+/9oym63si8P9jIBuNpwIi3xmkIpi+BfwvMmUDJ9Q=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=r4rxH1I/plgYVvmMKo5Sy9ffnRvltmoj6/OgQ1my0PAYvrGFEaD+Vh7/3YBtmrlQ9HhewbY1qrRH2iAtWTfMDDlkzYGLHlS7/qSjXFvifiLpfeuMqOcR3n1RLrH2yBXSLEDK6ywYAds9zIsiULd04iKwscUkUDlphlIowCSyA3U=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=hetzner-cloud.de; spf=pass smtp.mailfrom=hetzner-cloud.de; arc=none smtp.client-ip=85.10.215.232
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=hetzner-cloud.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=hetzner-cloud.de
+Received: from sslproxy01.your-server.de ([78.46.139.224])
+	by dediextern.your-server.de with esmtpsa  (TLS1.3) tls TLS_AES_256_GCM_SHA384
+	(Exim 4.94.2)
+	(envelope-from <marcus.wichelmann@hetzner-cloud.de>)
+	id 1tdY9P-000OMK-HA; Thu, 30 Jan 2025 18:16:23 +0100
+Received: from [2a0d:3344:1523:1f10:f118:b2d4:edbb:54af] (helo=marcus-worktop.lohne.int.wichelmann.cloud)
+	by sslproxy01.your-server.de with esmtpsa  (TLS1.3) tls TLS_AES_256_GCM_SHA384
+	(Exim 4.96)
+	(envelope-from <marcus.wichelmann@hetzner-cloud.de>)
+	id 1tdY9P-000163-0l;
+	Thu, 30 Jan 2025 18:16:23 +0100
+From: Marcus Wichelmann <marcus.wichelmann@hetzner-cloud.de>
+To: netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	bpf@vger.kernel.org
+Cc: willemdebruijn.kernel@gmail.com,
+	jasowang@redhat.com,
+	andrew+netdev@lunn.ch,
+	davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	ast@kernel.org,
+	daniel@iogearbox.net,
+	hawk@kernel.org,
+	john.fastabend@gmail.com,
+	Marcus Wichelmann <marcus.wichelmann@hetzner-cloud.de>
+Subject: [PATCH 0/1] XDP metadata support for tun driver
+Date: Thu, 30 Jan 2025 18:16:13 +0100
+Message-ID: <20250130171614.1657224-1-marcus.wichelmann@hetzner-cloud.de>
+X-Mailer: git-send-email 2.48.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -52,43 +66,27 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net] net: hsr: fix fill_frame_info() regression vs VLAN
- packets
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <173825703950.1021356.10166996136540749458.git-patchwork-notify@kernel.org>
-Date: Thu, 30 Jan 2025 17:10:39 +0000
-References: <20250129130007.644084-1-edumazet@google.com>
-In-Reply-To: <20250129130007.644084-1-edumazet@google.com>
-To: Eric Dumazet <edumazet@google.com>
-Cc: davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com,
- netdev@vger.kernel.org, horms@kernel.org, eric.dumazet@gmail.com,
- stephan.wurm@a-eberle.de
+X-Authenticated-Sender: marcus.wichelmann@hetzner-cloud.de
+X-Virus-Scanned: Clear (ClamAV 1.0.7/27534/Thu Jan 30 10:34:41 2025)
 
-Hello:
+Hi,
 
-This patch was applied to netdev/net.git (main)
-by Jakub Kicinski <kuba@kernel.org>:
+please check out the following patch that adds XDP metadata support to
+the tun driver.
 
-On Wed, 29 Jan 2025 13:00:07 +0000 you wrote:
-> Stephan Wurm reported that my recent patch broke VLAN support.
-> 
-> Apparently skb->mac_len is not correct for VLAN traffic as
-> shown by debug traces [1].
-> 
-> Use instead pskb_may_pull() to make sure the expected header
-> is present in skb->head.
-> 
-> [...]
+This is my first patch sent to a Linux kernel mailinglist (and more are
+planned), so please let me know if there is something to improve.
 
-Here is the summary with links:
-  - [net] net: hsr: fix fill_frame_info() regression vs VLAN packets
-    https://git.kernel.org/netdev/net/c/0f5697f1a3f9
+Kind regards,
+Marcus
 
-You are awesome, thank you!
+Marcus Wichelmann (1):
+  net: tun: add XDP metadata support
+
+ drivers/net/tun.c | 23 ++++++++++++++++++-----
+ 1 file changed, 18 insertions(+), 5 deletions(-)
+
 -- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
-
+2.48.1
 
 
