@@ -1,78 +1,89 @@
-Return-Path: <netdev+bounces-161651-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-161652-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id ABAF8A230B1
-	for <lists+netdev@lfdr.de>; Thu, 30 Jan 2025 15:56:15 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id AAE66A230BC
+	for <lists+netdev@lfdr.de>; Thu, 30 Jan 2025 16:02:07 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 24D4A188851A
-	for <lists+netdev@lfdr.de>; Thu, 30 Jan 2025 14:56:20 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 4229B164D98
+	for <lists+netdev@lfdr.de>; Thu, 30 Jan 2025 15:02:04 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 444711E7C18;
-	Thu, 30 Jan 2025 14:56:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id F18731E573F;
+	Thu, 30 Jan 2025 15:02:01 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="jrIEd/qZ"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="bkDBHqYy"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ed1-f48.google.com (mail-ed1-f48.google.com [209.85.208.48])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1EF9B1E285A
-	for <netdev@vger.kernel.org>; Thu, 30 Jan 2025 14:56:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3890F158545;
+	Thu, 30 Jan 2025 15:01:59 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.48
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1738248972; cv=none; b=ax/DlVozYwDk72CpFZN/AcsbGSu7D7LFY8uGkcWOU2tzYZFwZf0rdQERURv/M2f1RVB6XcmSgDFFTEzcB2nfSvRjSq05Cr4U+DI4UyzF+kFqmZVps1Qk6GhPtrNt06kob3ENSqYsYuWzw5XKKOOfWCXSfpx5DqyNcJLNI/mDElE=
+	t=1738249321; cv=none; b=t7RrJZ/jl9gVGQ9Dq/qJPizw1rRr0+Ov8plIDg/H4/KLZrVNSbt5Cmi1WuXzNdMPXcHWCHzHSvugaZLNLz6sKlEHb2mhZ5qeraUe4FQhPHDRXtX5BCpnPKnuwM63EcrLo8EnnHGxP54gbDEazfBgkuqWPnC7JsXTtqM9oJCm6BY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1738248972; c=relaxed/simple;
-	bh=uEBJaIgm9yaActeKUG0czWvfc/SHOt5RMpErHycXtAI=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=aHIaXGCNkbHAYszEMqCP0dkr0WZxVzT01jOeORRtKc3Hl0iRYPKp5V7qsTgkeU63qwsxS/2i8Osih7OQMuPdetLR5Ig2oUmSTjZHddXFhDMtOuS16EEoChkUblDfcgIlj81SD2G2GZYPs1y6GU1iWS6oHyCbF+hFt73LNDfYZes=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=jrIEd/qZ; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4717CC4CED2;
-	Thu, 30 Jan 2025 14:56:11 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1738248971;
-	bh=uEBJaIgm9yaActeKUG0czWvfc/SHOt5RMpErHycXtAI=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=jrIEd/qZxmVKpVaVp4LmWi/PFtABSQidZd2A/3aeeB67HQS1OVIfWGRKeGfwNASsZ
-	 T3GSpCE/X2H5iL3/HhIJdXOYJAGR3aNslDM4VxQppxI9Nri9fyR925cbqQrd40+m9l
-	 Rqk0DzXAtws3OgwBCvxYVeZUTojGS0DsztpSuvoVp17XaEN/En+C5KofHUfvxuTq1o
-	 cpDMOByBm9A1dT8lYeo4pOi4UDAQ7E1M9kwbNElyMQAMLi4LaZImT6jROCFib8CZdW
-	 Bfot2ajBjY67oLvdmQ88q5/zwwC+eiBgPq9K5qeXbebq3EK4Yc68KQljUvNKA7dAqH
-	 eUyWTCi4fp0Yg==
-Date: Thu, 30 Jan 2025 06:56:10 -0800
-From: Jakub Kicinski <kuba@kernel.org>
-To: Justin Iurman <justin.iurman@uliege.be>
-Cc: Simon Horman <horms@kernel.org>, davem@davemloft.net,
- netdev@vger.kernel.org, edumazet@google.com, pabeni@redhat.com,
- andrew+netdev@lunn.ch, dsahern@kernel.org
-Subject: Re: [PATCH net v2 2/2] net: ipv6: fix dst ref loops in rpl, seg6
- and ioam6 lwtunnels
-Message-ID: <20250130065610.1f5aa007@kernel.org>
-In-Reply-To: <91681490-63fa-405f-84cc-7ec0236eba8a@uliege.be>
-References: <20250130031519.2716843-1-kuba@kernel.org>
-	<20250130031519.2716843-2-kuba@kernel.org>
-	<20250130102813.GD113107@kernel.org>
-	<91681490-63fa-405f-84cc-7ec0236eba8a@uliege.be>
+	s=arc-20240116; t=1738249321; c=relaxed/simple;
+	bh=mfCOdbeCX77mBFY/SsE+J1XetqxL5CfcbaLfUlfpX2c=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=d6dT4WeqD8IE8p8d2vOKHtOmB+1VZyRcofJguTtSJXLX7qi4xsgrHakkjtXJRJOJDvz+L6ggiU3WfKugfPoJjO+aXqCcozJJWpzY+L2q7wq3wYNHhBZHHPsqEMbBW+L+gB+xBoG/K/I7Nu3oQ7xNi9d436sh+x0Wy4T06dzcqNI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=bkDBHqYy; arc=none smtp.client-ip=209.85.208.48
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-ed1-f48.google.com with SMTP id 4fb4d7f45d1cf-5d3d0205bd5so1275840a12.3;
+        Thu, 30 Jan 2025 07:01:59 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1738249318; x=1738854118; darn=vger.kernel.org;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=mfCOdbeCX77mBFY/SsE+J1XetqxL5CfcbaLfUlfpX2c=;
+        b=bkDBHqYywU9ws0n+QiubYsaL9TxdrpykMIcldWaiCmT5MU4sfz1+X6wnHurqIrrJgb
+         JsJkrjQYDrVI24bh9usZHRQ8jXB1IrAF9uw168LmLiIpL1Wugg6cOjeVxi2fnGJ0mmqn
+         PARnpzxOwKIxpixmhn23mao7p1KX1se7ZMrtKyfRV1zcCQBoUakbN9kUJ3fHKHamJixC
+         DuJWx6MrZCDeDPQTV0dO/B5Nb90XYZ1zlYRR9wmtlf3cbEm+A8s+ix6K8/g9X0VNgXYy
+         b3J0bAylPhLhoIkKlGGZnxj7BcXWw7r/8yHCS/N0SHtXCdkaSsyzyskQ2h0FNF6+PZMv
+         Y2EQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1738249318; x=1738854118;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=mfCOdbeCX77mBFY/SsE+J1XetqxL5CfcbaLfUlfpX2c=;
+        b=DCcxejX4YQmHkGRJe8bZQeJU5qm4s5F9GttQ9Um2GbyWBWBnL+VZZyJnGt3xszpSkN
+         PqdXvdOwRwlcBDS8XWigPsNl8/UxMYVn0fkujO6ksuFlbLYYI8Gg5oHFCbqQNbnAc4+V
+         FN8FiO3+53gX8duOg68Rc5OUfcnkYyYW5BMGL5q76eT7obbyQbATLPZR5RSimBjzaj7O
+         lKSjjj6OKVRGuG4qi48pbXJMZqqLC3bdroaMyY0E6XTiaWMA1tXBIyOOsO3FkTViobR+
+         mUhUnBkseCrMvdGFsJfseRbkfoj7IzvuzRPqzOTHVWwXx9k5duPBROuGprDd7IpSSTzk
+         2YqA==
+X-Forwarded-Encrypted: i=1; AJvYcCV8K5ComH/EmhvxmilqGAq2Io5AMuGRxgSdKywm1a2vyv6o7k/m0LPoiJ2r8ZTQT9yUxYgnOg0=@vger.kernel.org, AJvYcCVIo8wp21gg9GU+fh/YXwd4zI1Jhoyuzq4CXsS5MEFCxqf5/add037pek4hW+HJRzMnjYPQN/5N41ZoSKkafcrU@vger.kernel.org
+X-Gm-Message-State: AOJu0YzoRqZovZNdPIteMxd+JioRedsuL0O7JKi4wa8ghTnK9jfn3vkM
+	+Un13OWbbGugbBiqeYvTu6/CjztqNqyMxe34CCWj9TGp2EQiC/pfSr+7v+CAS7qyoi76LSWIgc3
+	sPfIgVuWrdb8RzWo6y5DQgJmcTx7javYGI+c=
+X-Gm-Gg: ASbGncu7m5OSSinK1IE7bP7T66MsCVI6tkgjUZJsjArZH2V2LT64cqOv49H5wtXBMHJ
+	91wEPVXNXz+U5C6x1Xi+RNJdmSQpFkZ2afnrUDHlQA9GAetEeCduKhTzw5nRGJCJQDTi0NCc2yw
+	==
+X-Google-Smtp-Source: AGHT+IFatBDTu/hzuprxAFEvE7bmH+4UNeXTKM7tlE76rgonvSHvrp+thtT3SJEyY91gKAzX/+wQ3duh7w35Ec+lyTM=
+X-Received: by 2002:a05:6402:2711:b0:5d3:bc1d:e56d with SMTP id
+ 4fb4d7f45d1cf-5dc5f01e7famr6541900a12.31.1738249318165; Thu, 30 Jan 2025
+ 07:01:58 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+References: <20250130142037.1945-1-kirjanov@gmail.com>
+In-Reply-To: <20250130142037.1945-1-kirjanov@gmail.com>
+From: Denis Kirjanov <kirjanov@gmail.com>
+Date: Thu, 30 Jan 2025 18:01:45 +0300
+X-Gm-Features: AWEUYZk030xIyWlSQIOd8_zd4qI7XJ7QRbWfR325L5LmK5SPMg3xLVE-hBFRzss
+Message-ID: <CAHj3AVn0jADTnuLtGtDmr_-+0==8_=ARJ1V+y8iOPU-Yz=6cEQ@mail.gmail.com>
+Subject: Re: [PATCH nf-next] netfilter: ip6_tables: replace the loop with xt_entry_foreach
+To: pablo@netfilter.org, kadlec@netfilter.org
+Cc: davem@davemloft.net, netfilter-devel@vger.kernel.org, 
+	netdev@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
 
-On Thu, 30 Jan 2025 14:41:56 +0100 Justin Iurman wrote:
-> This was my thought as well. While Fixes tags are correct for #1, what 
-> #2 is trying to fix was already there before 985ec6f5e623, 40475b63761a 
-> and dce525185bc9 respectively. I think it should be:
-> 
-> Fixes: 8cb3bf8bff3c ("ipv6: ioam: Add support for the ip6ip6 encapsulation")
-> Fixes: 6c8702c60b88 ("ipv6: sr: add support for SRH encapsulation and 
-> injection with lwtunnels")
-> Fixes: a7a29f9c361f ("net: ipv6: add rpl sr tunnel")
-
-I'll swap the tags when applying, if there are no other comments.
+please ignore
 
