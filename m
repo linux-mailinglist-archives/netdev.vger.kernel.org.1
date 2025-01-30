@@ -1,103 +1,80 @@
-Return-Path: <netdev+bounces-161606-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-161607-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id F3F6CA22A40
-	for <lists+netdev@lfdr.de>; Thu, 30 Jan 2025 10:27:31 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id A703AA22A63
+	for <lists+netdev@lfdr.de>; Thu, 30 Jan 2025 10:37:01 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 6AEE6165F05
-	for <lists+netdev@lfdr.de>; Thu, 30 Jan 2025 09:27:30 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 08E40164FB6
+	for <lists+netdev@lfdr.de>; Thu, 30 Jan 2025 09:37:00 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F3C091B4228;
-	Thu, 30 Jan 2025 09:27:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DD10719D070;
+	Thu, 30 Jan 2025 09:36:56 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="Mw8u/BN4"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="JD03vQCH"
 X-Original-To: netdev@vger.kernel.org
-Received: from relay6-d.mail.gandi.net (relay6-d.mail.gandi.net [217.70.183.198])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AD34F139B;
-	Thu, 30 Jan 2025 09:27:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.198
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AE40B1553A7;
+	Thu, 30 Jan 2025 09:36:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1738229247; cv=none; b=JleOswK9/vpYPArgD2gfTC48ApTBqzB1Fi0F38fU6kxnZVwoeMrN3sqczXJWBCk44hZ9L5V5N8nkTd+iJo5p/YRoQbMIxlkOh8D/R+dy5LjP72mk1T/4N4ImZQCCyy2AMFRgBj3R+YkgvOy32scmIT/4rJvvzcjfZWrbYtzTdlk=
+	t=1738229816; cv=none; b=cpy6FzCWX0CTYZi5vAS4QZK0saiXr0KtEzo8BIBUI1bDu2YjIZHNCx05l3RYIeF5qwcRyX5ESdOiw0RPOCDZDpKkIvGNRtOyOrqfTBrdZuFoJOgIX3iY33aHM7Cdx9mskuKZkxFAkBOxBSqHOYF9goPnF6Jd632r9vgKMnpswAk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1738229247; c=relaxed/simple;
-	bh=ceg2xbuImqEiBLzoIokxmg31a3QbfMzmVUm70up/mvg=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=tRoy8orhViZFrquuNIV5uB9a6hnB/RszMPPtGuueMVHFHsB+wqa4LrTTAakcuIVpsLjPm4VI0RqMoYM7JAsYXeUlj7woNBkx5dPPqIRtWhf+R+NBb7H78fF7ixumhpcfEJL9BEmoDh9+h8GhI56JQ5TNR8mcf4cCIEH4b8PRFrc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=Mw8u/BN4; arc=none smtp.client-ip=217.70.183.198
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
-Received: by mail.gandi.net (Postfix) with ESMTPSA id B1A1043288;
-	Thu, 30 Jan 2025 09:27:17 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
-	t=1738229238;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=ceg2xbuImqEiBLzoIokxmg31a3QbfMzmVUm70up/mvg=;
-	b=Mw8u/BN4CUbD3nFoGzA6w6ye4hm2VJbzUArFo344xceJKki2zt0mVIF/PWGoi/LMrX9XHk
-	uN3lzy/SeDWJyTmNhT0OI+U85SFhWbgq0ZLm9ACrixWGkQ4EJpVh+LRw25ZRWkx0R/iQgJ
-	biM4QeAoNKzvIhScmwon1q2NlDSvgeOV7YEsSDndLk17gvKuaJTR8T92lBgIPIPOnk/Vf8
-	D4wHgnJ94aiHEKgksIV3DCjIaKGj9uMzU1ChpjlWSokpEH9NtFpE+TKX+9mgbRSn4kEi9b
-	VVTg2ZzUtznS142xMsDYdaldt2F7SYnLeXtIWf54CgdawU1pXIeFzizLfT01TA==
-Date: Thu, 30 Jan 2025 10:27:16 +0100
-From: Kory Maincent <kory.maincent@bootlin.com>
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: Willem de Bruijn <willemdebruijn.kernel@gmail.com>, "David S. Miller"
- <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Paolo Abeni
- <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, Donald Hunter
- <donald.hunter@gmail.com>, Thomas Petazzoni <thomas.petazzoni@bootlin.com>,
- linux-kernel@vger.kernel.org, netdev@vger.kernel.org
-Subject: Re: [PATCH net 3/3] net: ethtool: tsconfig: Fix netlink type of
- hwtstamp flags
-Message-ID: <20250130102716.3e15adb6@kmaincent-XPS-13-7390>
-In-Reply-To: <20250129164907.6dd0b750@kernel.org>
-References: <20250128-fix_tsconfig-v1-0-87adcdc4e394@bootlin.com>
-	<20250128-fix_tsconfig-v1-3-87adcdc4e394@bootlin.com>
-	<20250129164907.6dd0b750@kernel.org>
-Organization: bootlin
-X-Mailer: Claws Mail 4.0.0 (GTK+ 3.24.33; x86_64-pc-linux-gnu)
+	s=arc-20240116; t=1738229816; c=relaxed/simple;
+	bh=V1cZUvvofTc/IT+RjEXFm3iwKdNneKAKmls5cWOk7j0=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=Q5uCxvj0ffsIK3hPZh3EN9OF0FmkB+sg42zy/7+sftjEoQ7n7/tnWJhhreiZ9veh+ISH8xAbJdDLXhGogSu+4YsFP7ZqQSQCWc9F4Up21UYdvEz3bc4M70BF8m56eFpRKfVS27uxKxh5OIZVdVdj+KShJlie0uzoTrySp+cflps=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=JD03vQCH; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0E0A2C4CED2;
+	Thu, 30 Jan 2025 09:36:53 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1738229816;
+	bh=V1cZUvvofTc/IT+RjEXFm3iwKdNneKAKmls5cWOk7j0=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=JD03vQCHrZfoIb/LQrzphrzv29e5sHlDEykWbZUyWJJLC3H2RfFNkPU8ZUPCB2A0X
+	 /abt6IOk14l2Bp1ua9FaZGzvkUBrX0tWEzgn6MeUQOREjBoUNLlv9Ne+2CFGXbtdPP
+	 O5G0XaiAD1bUzJ1HyBNLOjUo0fcW1YJipRdBexIxSAutFZGYHY4FpM0Rwan3tIzQBa
+	 h1TNiQVysf94tVFu6ol1bP5UYV3Ksu6WLk1WS+0iOkkyFqBBVHGOORk5xrbTgAmn/U
+	 bLQ5QLNjKokicOjoxYu7KUfaKwxR04uvlqvP9I9sy5Jo/mKgkk9R8oe2p8j7sZUyTG
+	 RJt8OHVItv7LQ==
+Date: Thu, 30 Jan 2025 09:36:51 +0000
+From: Simon Horman <horms@kernel.org>
+To: linux@treblig.org
+Cc: tariqt@nvidia.com, andrew+netdev@lunn.ch, davem@davemloft.net,
+	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
+	yishaih@nvidia.com, netdev@vger.kernel.org,
+	linux-rdma@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [RFC net-next] mlx4: Remove unused functions
+Message-ID: <20250130093651.GB113107@kernel.org>
+References: <20250130013927.266260-1-linux@treblig.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-X-GND-State: clean
-X-GND-Score: -100
-X-GND-Cause: gggruggvucftvghtrhhoucdtuddrgeefvddrtddtgdehgeehucetufdoteggodetrfdotffvucfrrhhofhhilhgvmecuifetpfffkfdpucggtfgfnhhsuhgsshgtrhhisggvnecuuegrihhlohhuthemuceftddunecusecvtfgvtghiphhivghnthhsucdlqddutddtmdenucfjughrpeffhffvvefukfgjfhhoofggtgfgsehtqhertdertdejnecuhfhrohhmpefmohhrhicuofgrihhntggvnhhtuceokhhorhihrdhmrghinhgtvghnthessghoohhtlhhinhdrtghomheqnecuggftrfgrthhtvghrnhepgfdutdefvedtudegvefgvedtgfdvhfdtueeltefffefffffhgfetkedvfeduieeinecuffhomhgrihhnpegsohhothhlihhnrdgtohhmnecukfhppeeltddrkeelrdduieefrdduvdejnecuvehluhhsthgvrhfuihiivgeptdenucfrrghrrghmpehinhgvthepledtrdekledrudeifedruddvjedphhgvlhhopehkmhgrihhntggvnhhtqdgirffuqddufedqjeefledtpdhmrghilhhfrhhomhepkhhorhihrdhmrghinhgtvghnthessghoohhtlhhinhdrtghomhdpnhgspghrtghpthhtohepuddtpdhrtghpthhtohepkhhusggrsehkvghrnhgvlhdrohhrghdprhgtphhtthhopeifihhllhgvmhguvggsrhhuihhjnhdrkhgvrhhnvghlsehgmhgrihhlrdgtohhmpdhrtghpthhtohepuggrvhgvmhesuggrvhgvmhhlohhfthdrnhgvthdprhgtphhtthhopegvughumhgriigvthesghhoohhglhgvrdgtohhmpdhrt
- ghpthhtohepphgrsggvnhhisehrvgguhhgrthdrtghomhdprhgtphhtthhopehhohhrmhhssehkvghrnhgvlhdrohhrghdprhgtphhtthhopeguohhnrghlugdrhhhunhhtvghrsehgmhgrihhlrdgtohhmpdhrtghpthhtohepthhhohhmrghsrdhpvghtrgiiiihonhhisegsohhothhlihhnrdgtohhm
-X-GND-Sasl: kory.maincent@bootlin.com
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250130013927.266260-1-linux@treblig.org>
 
-On Wed, 29 Jan 2025 16:49:07 -0800
-Jakub Kicinski <kuba@kernel.org> wrote:
+On Thu, Jan 30, 2025 at 01:39:27AM +0000, linux@treblig.org wrote:
+> From: "Dr. David Alan Gilbert" <linux@treblig.org>
+> 
+> The last use of mlx4_find_cached_mac() was removed in 2014 by
+> commit 2f5bb473681b ("mlx4: Add ref counting to port MAC table for RoCE")
+> 
+> mlx4_zone_free_entries() was added in 2014 by
+> commit 7a89399ffad7 ("net/mlx4: Add mlx4_bitmap zone allocator")
+> but hasn't been used. (The _unique version is used)
+> 
+> Remove them.
+> 
+> Signed-off-by: Dr. David Alan Gilbert <linux@treblig.org>
 
-> On Tue, 28 Jan 2025 16:35:48 +0100 Kory Maincent wrote:
-> > Fix the netlink type for hardware timestamp flags, which are represented
-> > as a bitset of flags. Although only one flag is supported currently, the
-> > correct netlink bitset type should be used instead of u32. Address this
-> > by adding a new named string set description for the hwtstamp flag
-> > structure. =20
->=20
-> Makes sense, please mention explicitly in the commit message that the
-> code has been introduced in the current release so the uAPI change is
-> still okay.
+Reviewed-by: Simon Horman <horms@kernel.org>
 
-Ack.
-
-> In general IMHO YNL makes the bitset functionality less important.
-
-Do you mean you prefer u32 for bitfield instead of the bitset type? Why?
-
---=20
-K=C3=B6ry Maincent, Bootlin
-Embedded Linux and kernel engineering
-https://bootlin.com
 
