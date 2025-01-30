@@ -1,51 +1,51 @@
-Return-Path: <netdev+bounces-161605-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-161606-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3C5ACA22A38
-	for <lists+netdev@lfdr.de>; Thu, 30 Jan 2025 10:25:07 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id F3F6CA22A40
+	for <lists+netdev@lfdr.de>; Thu, 30 Jan 2025 10:27:31 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 476C63A604E
-	for <lists+netdev@lfdr.de>; Thu, 30 Jan 2025 09:24:59 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 6AEE6165F05
+	for <lists+netdev@lfdr.de>; Thu, 30 Jan 2025 09:27:30 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E1DAA1B4152;
-	Thu, 30 Jan 2025 09:25:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id F3C091B4228;
+	Thu, 30 Jan 2025 09:27:27 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="ol4GbfYT"
+	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="Mw8u/BN4"
 X-Original-To: netdev@vger.kernel.org
-Received: from relay2-d.mail.gandi.net (relay2-d.mail.gandi.net [217.70.183.194])
+Received: from relay6-d.mail.gandi.net (relay6-d.mail.gandi.net [217.70.183.198])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B26951AB53A;
-	Thu, 30 Jan 2025 09:25:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.194
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AD34F139B;
+	Thu, 30 Jan 2025 09:27:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.198
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1738229102; cv=none; b=Zq7uNf7P9yLUB6f6utqChHt/ULulhBJwEGpG0JYjqf1nkpornxXAs7RVg2Cxk2uDQgr2+gQRQJnpLsgNmtrMJ+Mq0VeE4c/hQZmFIu17j/Hk8sl+xDHJmSo1Q4U3+vGp1LJGW6e8BllgKOCI9AvB8uwb4y7P/NYsco+qXd4xyJ0=
+	t=1738229247; cv=none; b=JleOswK9/vpYPArgD2gfTC48ApTBqzB1Fi0F38fU6kxnZVwoeMrN3sqczXJWBCk44hZ9L5V5N8nkTd+iJo5p/YRoQbMIxlkOh8D/R+dy5LjP72mk1T/4N4ImZQCCyy2AMFRgBj3R+YkgvOy32scmIT/4rJvvzcjfZWrbYtzTdlk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1738229102; c=relaxed/simple;
-	bh=dGJVJ+aAk0MEZz8wKOpCiujn30vUAukIGzGEc+THQVs=;
+	s=arc-20240116; t=1738229247; c=relaxed/simple;
+	bh=ceg2xbuImqEiBLzoIokxmg31a3QbfMzmVUm70up/mvg=;
 	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=lJ1UpT5zFuloSZVNMA/b5W4bWh94dSBG86gwHTYyGp8pXrtXUdWNcX5f33fe9vUUB9YxWMo06GVj1AVixuDPdCKHZbKTTZmoui1H7Wk/rGxOM51HmxVz9Y4skJroYqgPX5jpWVNP8FKOILuGi6R+KnJb51XzPhyNPsXfx1gnT3Q=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=ol4GbfYT; arc=none smtp.client-ip=217.70.183.194
+	 MIME-Version:Content-Type; b=tRoy8orhViZFrquuNIV5uB9a6hnB/RszMPPtGuueMVHFHsB+wqa4LrTTAakcuIVpsLjPm4VI0RqMoYM7JAsYXeUlj7woNBkx5dPPqIRtWhf+R+NBb7H78fF7ixumhpcfEJL9BEmoDh9+h8GhI56JQ5TNR8mcf4cCIEH4b8PRFrc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=Mw8u/BN4; arc=none smtp.client-ip=217.70.183.198
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
-Received: by mail.gandi.net (Postfix) with ESMTPSA id 7DAB143153;
-	Thu, 30 Jan 2025 09:24:52 +0000 (UTC)
+Received: by mail.gandi.net (Postfix) with ESMTPSA id B1A1043288;
+	Thu, 30 Jan 2025 09:27:17 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
-	t=1738229093;
+	t=1738229238;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=dGJVJ+aAk0MEZz8wKOpCiujn30vUAukIGzGEc+THQVs=;
-	b=ol4GbfYTpGa+TNi5Wbsrvua1p8wnbi74Dhn5CFHdcOW4enrM1J9A48eNkjEDGhH42u0mUw
-	PwNwMHbSeZUlrk81FMjx0LiYhoV2LfAYkyYg2Okp9xp9RmigFBGv+3dfA4w3xrazLwepUf
-	Cx3uC3LZw1mwb0w4fH/4RXctpqkHpV7DJiFmzfj3kEE34dRDSOmjKsjhXdTkoDLD1wZMBP
-	h3ah8jY5RhYSTR/fGml0ApHwUZwZcRlkXCOhYP2mZ8I1bXYG5g2wYYhXuIWxUK2iJzJ518
-	vAeG60Ebs21QBm0AKMA6SN9ini09jkGTjVWWKnAEOUzMHrVjLwlW2ksJzEHwbA==
-Date: Thu, 30 Jan 2025 10:24:51 +0100
+	bh=ceg2xbuImqEiBLzoIokxmg31a3QbfMzmVUm70up/mvg=;
+	b=Mw8u/BN4CUbD3nFoGzA6w6ye4hm2VJbzUArFo344xceJKki2zt0mVIF/PWGoi/LMrX9XHk
+	uN3lzy/SeDWJyTmNhT0OI+U85SFhWbgq0ZLm9ACrixWGkQ4EJpVh+LRw25ZRWkx0R/iQgJ
+	biM4QeAoNKzvIhScmwon1q2NlDSvgeOV7YEsSDndLk17gvKuaJTR8T92lBgIPIPOnk/Vf8
+	D4wHgnJ94aiHEKgksIV3DCjIaKGj9uMzU1ChpjlWSokpEH9NtFpE+TKX+9mgbRSn4kEi9b
+	VVTg2ZzUtznS142xMsDYdaldt2F7SYnLeXtIWf54CgdawU1pXIeFzizLfT01TA==
+Date: Thu, 30 Jan 2025 10:27:16 +0100
 From: Kory Maincent <kory.maincent@bootlin.com>
 To: Jakub Kicinski <kuba@kernel.org>
 Cc: Willem de Bruijn <willemdebruijn.kernel@gmail.com>, "David S. Miller"
@@ -53,13 +53,13 @@ Cc: Willem de Bruijn <willemdebruijn.kernel@gmail.com>, "David S. Miller"
  <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, Donald Hunter
  <donald.hunter@gmail.com>, Thomas Petazzoni <thomas.petazzoni@bootlin.com>,
  linux-kernel@vger.kernel.org, netdev@vger.kernel.org
-Subject: Re: [PATCH net 2/3] net: ethtool: tsconfig: Fix ts filters and
- types enums size check
-Message-ID: <20250130102451.46a4b247@kmaincent-XPS-13-7390>
-In-Reply-To: <20250129164508.22351915@kernel.org>
+Subject: Re: [PATCH net 3/3] net: ethtool: tsconfig: Fix netlink type of
+ hwtstamp flags
+Message-ID: <20250130102716.3e15adb6@kmaincent-XPS-13-7390>
+In-Reply-To: <20250129164907.6dd0b750@kernel.org>
 References: <20250128-fix_tsconfig-v1-0-87adcdc4e394@bootlin.com>
-	<20250128-fix_tsconfig-v1-2-87adcdc4e394@bootlin.com>
-	<20250129164508.22351915@kernel.org>
+	<20250128-fix_tsconfig-v1-3-87adcdc4e394@bootlin.com>
+	<20250129164907.6dd0b750@kernel.org>
 Organization: bootlin
 X-Mailer: Claws Mail 4.0.0 (GTK+ 3.24.33; x86_64-pc-linux-gnu)
 Precedence: bulk
@@ -72,36 +72,30 @@ Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
 X-GND-State: clean
 X-GND-Score: -100
-X-GND-Cause: gggruggvucftvghtrhhoucdtuddrgeefvddrtddtgdehgeegucetufdoteggodetrfdotffvucfrrhhofhhilhgvmecuifetpfffkfdpucggtfgfnhhsuhgsshgtrhhisggvnecuuegrihhlohhuthemuceftddunecusecvtfgvtghiphhivghnthhsucdlqddutddtmdenucfjughrpeffhffvvefukfgjfhhoofggtgfgsehtqhertdertdejnecuhfhrohhmpefmohhrhicuofgrihhntggvnhhtuceokhhorhihrdhmrghinhgtvghnthessghoohhtlhhinhdrtghomheqnecuggftrfgrthhtvghrnhepgfdutdefvedtudegvefgvedtgfdvhfdtueeltefffefffffhgfetkedvfeduieeinecuffhomhgrihhnpegsohhothhlihhnrdgtohhmnecukfhppeeltddrkeelrdduieefrdduvdejnecuvehluhhsthgvrhfuihiivgeptdenucfrrghrrghmpehinhgvthepledtrdekledrudeifedruddvjedphhgvlhhopehkmhgrihhntggvnhhtqdgirffuqddufedqjeefledtpdhmrghilhhfrhhomhepkhhorhihrdhmrghinhgtvghnthessghoohhtlhhinhdrtghomhdpnhgspghrtghpthhtohepuddtpdhrtghpthhtohepkhhusggrsehkvghrnhgvlhdrohhrghdprhgtphhtthhopeifihhllhgvmhguvggsrhhuihhjnhdrkhgvrhhnvghlsehgmhgrihhlrdgtohhmpdhrtghpthhtohepuggrvhgvmhesuggrvhgvmhhlohhfthdrnhgvthdprhgtphhtthhopegvughumhgriigvthesghhoohhglhgvrdgtohhmpdhrt
+X-GND-Cause: gggruggvucftvghtrhhoucdtuddrgeefvddrtddtgdehgeehucetufdoteggodetrfdotffvucfrrhhofhhilhgvmecuifetpfffkfdpucggtfgfnhhsuhgsshgtrhhisggvnecuuegrihhlohhuthemuceftddunecusecvtfgvtghiphhivghnthhsucdlqddutddtmdenucfjughrpeffhffvvefukfgjfhhoofggtgfgsehtqhertdertdejnecuhfhrohhmpefmohhrhicuofgrihhntggvnhhtuceokhhorhihrdhmrghinhgtvghnthessghoohhtlhhinhdrtghomheqnecuggftrfgrthhtvghrnhepgfdutdefvedtudegvefgvedtgfdvhfdtueeltefffefffffhgfetkedvfeduieeinecuffhomhgrihhnpegsohhothhlihhnrdgtohhmnecukfhppeeltddrkeelrdduieefrdduvdejnecuvehluhhsthgvrhfuihiivgeptdenucfrrghrrghmpehinhgvthepledtrdekledrudeifedruddvjedphhgvlhhopehkmhgrihhntggvnhhtqdgirffuqddufedqjeefledtpdhmrghilhhfrhhomhepkhhorhihrdhmrghinhgtvghnthessghoohhtlhhinhdrtghomhdpnhgspghrtghpthhtohepuddtpdhrtghpthhtohepkhhusggrsehkvghrnhgvlhdrohhrghdprhgtphhtthhopeifihhllhgvmhguvggsrhhuihhjnhdrkhgvrhhnvghlsehgmhgrihhlrdgtohhmpdhrtghpthhtohepuggrvhgvmhesuggrvhgvmhhlohhfthdrnhgvthdprhgtphhtthhopegvughumhgriigvthesghhoohhglhgvrdgtohhmpdhrt
  ghpthhtohepphgrsggvnhhisehrvgguhhgrthdrtghomhdprhgtphhtthhopehhohhrmhhssehkvghrnhgvlhdrohhrghdprhgtphhtthhopeguohhnrghlugdrhhhunhhtvghrsehgmhgrihhlrdgtohhmpdhrtghpthhtohepthhhohhmrghsrdhpvghtrgiiiihonhhisegsohhothhlihhnrdgtohhm
 X-GND-Sasl: kory.maincent@bootlin.com
 
-On Wed, 29 Jan 2025 16:45:08 -0800
+On Wed, 29 Jan 2025 16:49:07 -0800
 Jakub Kicinski <kuba@kernel.org> wrote:
 
-> On Tue, 28 Jan 2025 16:35:47 +0100 Kory Maincent wrote:
-> > Fix the size check for the hwtstamp_tx_types and hwtstamp_rx_filters
-> > enumerations. =20
+> On Tue, 28 Jan 2025 16:35:48 +0100 Kory Maincent wrote:
+> > Fix the netlink type for hardware timestamp flags, which are represented
+> > as a bitset of flags. Although only one flag is supported currently, the
+> > correct netlink bitset type should be used instead of u32. Address this
+> > by adding a new named string set description for the hwtstamp flag
+> > structure. =20
 >=20
-> This is just a code cleanup, the constants are way smaller than 32
-> today. The assert being too restrictive makes no functional difference.
+> Makes sense, please mention explicitly in the commit message that the
+> code has been introduced in the current release so the uAPI change is
+> still okay.
 
-That's right, it was mainly for consistency with the other assert. And to a=
-void
-possible future mistake but indeed reaching 32 bit is not expected soon. Sh=
-ould
-I remove the patch as it is not a functional issue?
+Ack.
 
-> > Align this check with the approach used in tsinfo for
-> > consistency and correctness. =20
->=20
-> First-principles based explanation of why 32 is the correct value would
-> be much better than just alignment. Otherwise reviewer has to figure out
-> whether we should be changing from >=3D to > or vice versa...
+> In general IMHO YNL makes the bitset functionality less important.
 
-Ack, I will if I keep the patch.
+Do you mean you prefer u32 for bitfield instead of the bitset type? Why?
 
-Regards,
 --=20
 K=C3=B6ry Maincent, Bootlin
 Embedded Linux and kernel engineering
