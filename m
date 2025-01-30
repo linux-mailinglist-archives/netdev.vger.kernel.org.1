@@ -1,506 +1,124 @@
-Return-Path: <netdev+bounces-161704-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-161705-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 63848A237D2
-	for <lists+netdev@lfdr.de>; Fri, 31 Jan 2025 00:30:17 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6EB0AA23802
+	for <lists+netdev@lfdr.de>; Fri, 31 Jan 2025 00:42:50 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C2FF7165717
-	for <lists+netdev@lfdr.de>; Thu, 30 Jan 2025 23:30:15 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 6D1723A738A
+	for <lists+netdev@lfdr.de>; Thu, 30 Jan 2025 23:42:42 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0276B1F1521;
-	Thu, 30 Jan 2025 23:30:15 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AADE21F2360;
+	Thu, 30 Jan 2025 23:42:45 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="ebtU0B/u"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="njBD4Cqe"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f179.google.com (mail-pl1-f179.google.com [209.85.214.179])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.8])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B57871F1909
-	for <netdev@vger.kernel.org>; Thu, 30 Jan 2025 23:30:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.179
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5D7CD1537C6;
+	Thu, 30 Jan 2025 23:42:43 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.8
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1738279814; cv=none; b=HxU0CKHI4yCvsGJcRAv/oPLsVgwEysE7sP9HbTsjQWYcm86Uv7QXnqRkoMwLeYcrPetsYRwFZ9/WYXthu8U8x6hS/kWhM9hYBCkanLqcDizOdwkLtLC1NaYIBn05QWrhStWkx+XJdDjPZH5HfD/gn5CyuOa1TJho5UcN1AHanUE=
+	t=1738280565; cv=none; b=Z+qiGuLARqZHt8OAlL0yRv339yMcz/ySJXPpzfjrsp013IAwXvc13WliwOKafT1tL/1X5ngV3ytviBOYkFQXhM99rzX3/YNkTodIFM+yU0LmD8PYJJEmF+Ckcv1ypekJD1lmVl1DGjFDtBGVrfj+glq0hQwFSuJBCmEONcgbpf4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1738279814; c=relaxed/simple;
-	bh=j1zJsxZDjmgRXarrUjCuotIAKoRYOS5g0bOFikrRh64=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=Tl5okWHBIa8wI/ZyQyqRNzJ7aXtcQnlivOqgHn+YDqfjodxJ9LIwRfWlE+k8qXkV3cgYBoenlbsVqADaDMvadM0KOmVI1sDXTvCDL+l6XlDFCrbt89mzaCl8YOJ4GzyMsvAyOy49lQNNL0jRU4FQc2ORXXY7DAktGqGYLY+tAI8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=ebtU0B/u; arc=none smtp.client-ip=209.85.214.179
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-pl1-f179.google.com with SMTP id d9443c01a7336-2163affd184so21325ad.1
-        for <netdev@vger.kernel.org>; Thu, 30 Jan 2025 15:30:12 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1738279812; x=1738884612; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=1rmIesab6i2p3RCJXlVDBZqIYZ/awInCMyNBMuFmviI=;
-        b=ebtU0B/uGfDkO8tUxFKtKkduhi1YuBR1gS5w8Ic4YpTySruqa7JWFzve29C1STke9h
-         2Is4GPtWaWLXnQx0UV7OTacnj4R6uVs+TarHdYBH0rwLcZ52gAIS3tQGdOW1Wr07JM43
-         nr9igxJXaGbLmLkCU2o1wciBGyHrMLXbHVnOJeE3yZWJCm4o7UMGBmr3j66U6nRPhpNv
-         q9CDWrlZdkQ6fbS+DfqSVaGqhtFlQw32Ot6PGuv/oAEGQVASfg538T6PAiPID6go5a/i
-         CdpYc7YLyzfGPWZhIUqim9VtCOmvFA3+SWHYEgGIwykWefq5zEGSfxfKeTlzYCGXUOf9
-         4Cig==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1738279812; x=1738884612;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=1rmIesab6i2p3RCJXlVDBZqIYZ/awInCMyNBMuFmviI=;
-        b=upmcqwJ0arZNLrod/3g2u0bsgaM3kxZGNCQ5kQ04eFEtdLjkD744SoGvHYHGfNY0DB
-         +0BL9vh/eyF7seVRIJwNGAzuWsvQA6Km/J0wwePTj+WcnnY+p3tiA8G94FzZO8+SS/Kz
-         1jC75WtF1LE0uWadSedHyhmTCwRn1TsP/HalVJ5R33GrauI0F9e1Omjhhkk83H6st+G6
-         UszMzYZif4uZ4sYGSue5mnfBc4Uia0+wYyDdYJ4TJEZ2zUVa7Ko3USWSWNNrTkLXHt7i
-         64yavz9fU9VftKY2kE7/9lWg+KtNnWm3ASaQQnUNaPLQ6dHn0eHbaDbApuEfkJdYQb4H
-         D/IQ==
-X-Gm-Message-State: AOJu0YzAfTbFywEOujUVrOfmTZ7lLjlN/Ua6b4fq8CQnKQlM5NPS9uI7
-	+Ox1zKQoBc6QE6+0Q92bFjhKsKOsaDzg0ZnBWtA90JQ95nFBnwcOJjc9mLkADZBbE6cd7Z9eqgm
-	3PeumlB5NCyTS/lcjTyyKEEQvNkimAMTog83H
-X-Gm-Gg: ASbGnctgzNArjW3/kbGFEFj5jgTHGGVMQgY3+E4U7lpi9VfsXPq16ka1DQWnKCyKstE
-	Ac3XN5aKtm/uuhcB/vCgCCHz8i8nY//MDEQ8cbnRKojoEGD8G080zmSF7vwuQ1KRRm9+12M1+dd
-	UwWu3SQOmTbrxBb40gtdrmGT4Gsds=
-X-Google-Smtp-Source: AGHT+IF4fex0zEZPDdhq4r0hwOdVVLdnLANJBfKGdI2Hv9YV8rfN/WnxP54e/v6+9MLpQlX+TdRkKqMftmE/vS75cus=
-X-Received: by 2002:a17:902:778f:b0:216:25a2:2ee3 with SMTP id
- d9443c01a7336-21edf067fc8mr351855ad.25.1738279811617; Thu, 30 Jan 2025
- 15:30:11 -0800 (PST)
+	s=arc-20240116; t=1738280565; c=relaxed/simple;
+	bh=SNgWdW0+w8g7zWzmvBJ6hqxTIrMFupouLSnDTRPedqs=;
+	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
+	 MIME-Version:Content-Type; b=J0Cf9nrwbfYy1nk/OPvNKgmUxvVCpf1YGyn6cb2AZiHbMd7YNcxJHdu8ePWpuObn6tDGsA590kB/e3gqJf18T1JVX/oeB7+ggUpJPutMGJ5+BwO+viR+3O9Q7J5/RAlSqPu6mWalSOZfunnJLukeAIVZBfYEhhrew1Rze2UvkN8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=njBD4Cqe; arc=none smtp.client-ip=192.198.163.8
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1738280564; x=1769816564;
+  h=from:to:cc:subject:in-reply-to:references:date:
+   message-id:mime-version;
+  bh=SNgWdW0+w8g7zWzmvBJ6hqxTIrMFupouLSnDTRPedqs=;
+  b=njBD4CqeB5D6xy51Tc8bVyUbpf5GhYjisE/+RIUI25Dnsi7knQt37i8z
+   //ijX4l6nYKHHS0knmhUaRKBvco9pV0iarSJuxZiyu+5SezGAvDMIM5Wp
+   ZebOAruyR7yqYNWyBgB+8QvxPNhS3svWXqCR+52c2YqLUYR74D8l2Q84/
+   pCmMfO0mKFOpQ4vocePBpmNlezhf/mtWNCM/Q5G0aJVj2IkyYocXzXbar
+   06Z5WWdawqfu5mnVYRxKJXPqZqq7Ygu8v0fokcd9mA1JmlvYZoLDXEzUk
+   r+kX2xXFiXUlnvL0BF162Gw11lvWf2qEnJ6vCpVf8UpKOR8sRFWDMd6QT
+   w==;
+X-CSE-ConnectionGUID: MFZdPN7BRiOJxwDUgsSmuA==
+X-CSE-MsgGUID: osTrCAaoTqugUPDE/80O4A==
+X-IronPort-AV: E=McAfee;i="6700,10204,11331"; a="56392369"
+X-IronPort-AV: E=Sophos;i="6.13,246,1732608000"; 
+   d="scan'208";a="56392369"
+Received: from fmviesa005.fm.intel.com ([10.60.135.145])
+  by fmvoesa102.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 30 Jan 2025 15:42:43 -0800
+X-CSE-ConnectionGUID: AX6mNGHhQwWBZd3qMSmH6A==
+X-CSE-MsgGUID: tg0EZPT9SgeNGo2EEfp3cg==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.12,224,1728975600"; 
+   d="scan'208";a="114081720"
+Received: from johunt-mobl9.ger.corp.intel.com (HELO vcostago-mobl3) ([10.124.222.4])
+  by fmviesa005-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 30 Jan 2025 15:42:41 -0800
+From: Vinicius Costa Gomes <vinicius.gomes@intel.com>
+To: Zdenek Bouska <zdenek.bouska@siemens.com>, Tony Nguyen
+ <anthony.l.nguyen@intel.com>, Przemek Kitszel
+ <przemyslaw.kitszel@intel.com>, Andrew Lunn <andrew+netdev@lunn.ch>,
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet
+ <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
+ <pabeni@redhat.com>, Alexei Starovoitov <ast@kernel.org>, Daniel Borkmann
+ <daniel@iogearbox.net>, Jesper Dangaard Brouer <hawk@kernel.org>, John
+ Fastabend <john.fastabend@gmail.com>, Florian Bezdeka
+ <florian.bezdeka@siemens.com>, Jan Kiszka <jan.kiszka@siemens.com>, Song
+ Yoong Siang <yoong.siang.song@intel.com>
+Cc: intel-wired-lan@lists.osuosl.org, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org, bpf@vger.kernel.org, Zdenek Bouska
+ <zdenek.bouska@siemens.com>
+Subject: Re: [PATCH] igc: Fix HW RX timestamp when passed by ZC XDP
+In-Reply-To: <20250128-igc-fix-hw-rx-timestamp-when-passed-by-zc-xdp-v1-1-b765d3e972de@siemens.com>
+References: <20250128-igc-fix-hw-rx-timestamp-when-passed-by-zc-xdp-v1-1-b765d3e972de@siemens.com>
+Date: Thu, 30 Jan 2025 15:42:41 -0800
+Message-ID: <87r04jc1hq.fsf@intel.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250130211539.428952-1-almasrymina@google.com>
- <20250130211539.428952-3-almasrymina@google.com> <Z5wFs3-6pNWARhRL@mini-arch>
-In-Reply-To: <Z5wFs3-6pNWARhRL@mini-arch>
-From: Mina Almasry <almasrymina@google.com>
-Date: Thu, 30 Jan 2025 15:29:57 -0800
-X-Gm-Features: AWEUYZkPTESrno2iYzeo1K78PcJfaZsMxGDDzhBy002v1BDbsQGxVfN2xbBIxT0
-Message-ID: <CAHS8izMMm--CSCm1c9Ud1WdjxLeCXdNiqLzjeM_ACgKUP35O0w@mail.gmail.com>
-Subject: Re: [PATCH RFC net-next v2 2/6] selftests: ncdevmem: Implement devmem
- TCP TX
-To: Stanislav Fomichev <stfomichev@gmail.com>
-Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	linux-doc@vger.kernel.org, kvm@vger.kernel.org, 
-	virtualization@lists.linux.dev, linux-kselftest@vger.kernel.org, 
-	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, 
-	Donald Hunter <donald.hunter@gmail.com>, Jonathan Corbet <corbet@lwn.net>, 
-	Andrew Lunn <andrew+netdev@lunn.ch>, David Ahern <dsahern@kernel.org>, 
-	Stefan Hajnoczi <stefanha@redhat.com>, Stefano Garzarella <sgarzare@redhat.com>, 
-	"Michael S. Tsirkin" <mst@redhat.com>, Jason Wang <jasowang@redhat.com>, 
-	Xuan Zhuo <xuanzhuo@linux.alibaba.com>, =?UTF-8?Q?Eugenio_P=C3=A9rez?= <eperezma@redhat.com>, 
-	Shuah Khan <shuah@kernel.org>, sdf@fomichev.me, asml.silence@gmail.com, dw@davidwei.uk, 
-	Jamal Hadi Salim <jhs@mojatatu.com>, Victor Nogueira <victor@mojatatu.com>, 
-	Pedro Tammela <pctammela@mojatatu.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain
 
-On Thu, Jan 30, 2025 at 3:05=E2=80=AFPM Stanislav Fomichev <stfomichev@gmai=
-l.com> wrote:
+Zdenek Bouska <zdenek.bouska@siemens.com> writes:
+
+> Fixes HW RX timestamp in the following scenario:
+> - AF_PACKET socket with enabled HW RX timestamps is created
+> - AF_XDP socket with enabled zero copy is created
+> - frame is forwarded to the BPF program, where the timestamp should
+>   still be readable (extracted by igc_xdp_rx_timestamp(), kfunc
+>   behind bpf_xdp_metadata_rx_timestamp())
+> - the frame got XDP_PASS from BPF program, redirecting to the stack
+> - AF_PACKET socket receives the frame with HW RX timestamp
 >
-> On 01/30, Mina Almasry wrote:
-> > Add support for devmem TX in ncdevmem.
-> >
-> > This is a combination of the ncdevmem from the devmem TCP series RFCv1
-> > which included the TX path, and work by Stan to include the netlink API
-> > and refactored on top of his generic memory_provider support.
-> >
-> > Signed-off-by: Mina Almasry <almasrymina@google.com>
-> > Signed-off-by: Stanislav Fomichev <sdf@fomichev.me>
-> >
-> > ---
-> >
-> > v2:
-> > - make errors a static variable so that we catch instances where there
-> >   are less than 20 errors across different buffers.
-> > - Fix the issue where the seed is reset to 0 instead of its starting
-> >   value 1.
-> > - Use 1000ULL instead of 1000 to guard against overflow (Willem).
-> > - Do not set POLLERR (Willem).
-> > - Update the test to use the new interface where iov_base is the
-> >   dmabuf_offset.
-> > - Update the test to send 2 iov instead of 1, so we get some test
-> >   coverage over sending multiple iovs at once.
-> > - Print the ifindex the test is using, useful for debugging issues wher=
-e
-> >   maybe the test may fail because the ifindex of the socket is differen=
-t
-> >   from the dmabuf binding.
-> > ---
-> >  .../selftests/drivers/net/hw/ncdevmem.c       | 276 +++++++++++++++++-
-> >  1 file changed, 272 insertions(+), 4 deletions(-)
-> >
-> > diff --git a/tools/testing/selftests/drivers/net/hw/ncdevmem.c b/tools/=
-testing/selftests/drivers/net/hw/ncdevmem.c
-> > index 19a6969643f4..8455f19ecd1a 100644
-> > --- a/tools/testing/selftests/drivers/net/hw/ncdevmem.c
-> > +++ b/tools/testing/selftests/drivers/net/hw/ncdevmem.c
-> > @@ -40,15 +40,18 @@
-> >  #include <fcntl.h>
-> >  #include <malloc.h>
-> >  #include <error.h>
-> > +#include <poll.h>
-> >
-> >  #include <arpa/inet.h>
-> >  #include <sys/socket.h>
-> >  #include <sys/mman.h>
-> >  #include <sys/ioctl.h>
-> >  #include <sys/syscall.h>
-> > +#include <sys/time.h>
-> >
-> >  #include <linux/memfd.h>
-> >  #include <linux/dma-buf.h>
-> > +#include <linux/errqueue.h>
-> >  #include <linux/udmabuf.h>
-> >  #include <libmnl/libmnl.h>
-> >  #include <linux/types.h>
-> > @@ -80,6 +83,8 @@ static int num_queues =3D -1;
-> >  static char *ifname;
-> >  static unsigned int ifindex;
-> >  static unsigned int dmabuf_id;
-> > +static uint32_t tx_dmabuf_id;
-> > +static int waittime_ms =3D 500;
-> >
-> >  struct memory_buffer {
-> >       int fd;
-> > @@ -93,6 +98,8 @@ struct memory_buffer {
-> >  struct memory_provider {
-> >       struct memory_buffer *(*alloc)(size_t size);
-> >       void (*free)(struct memory_buffer *ctx);
-> > +     void (*memcpy_to_device)(struct memory_buffer *dst, size_t off,
-> > +                              void *src, int n);
-> >       void (*memcpy_from_device)(void *dst, struct memory_buffer *src,
-> >                                  size_t off, int n);
-> >  };
-> > @@ -153,6 +160,20 @@ static void udmabuf_free(struct memory_buffer *ctx=
-)
-> >       free(ctx);
-> >  }
-> >
-> > +static void udmabuf_memcpy_to_device(struct memory_buffer *dst, size_t=
- off,
-> > +                                  void *src, int n)
-> > +{
-> > +     struct dma_buf_sync sync =3D {};
-> > +
-> > +     sync.flags =3D DMA_BUF_SYNC_START | DMA_BUF_SYNC_WRITE;
-> > +     ioctl(dst->fd, DMA_BUF_IOCTL_SYNC, &sync);
-> > +
-> > +     memcpy(dst->buf_mem + off, src, n);
-> > +
-> > +     sync.flags =3D DMA_BUF_SYNC_END | DMA_BUF_SYNC_WRITE;
-> > +     ioctl(dst->fd, DMA_BUF_IOCTL_SYNC, &sync);
-> > +}
-> > +
-> >  static void udmabuf_memcpy_from_device(void *dst, struct memory_buffer=
- *src,
-> >                                      size_t off, int n)
-> >  {
-> > @@ -170,6 +191,7 @@ static void udmabuf_memcpy_from_device(void *dst, s=
-truct memory_buffer *src,
-> >  static struct memory_provider udmabuf_memory_provider =3D {
-> >       .alloc =3D udmabuf_alloc,
-> >       .free =3D udmabuf_free,
-> > +     .memcpy_to_device =3D udmabuf_memcpy_to_device,
-> >       .memcpy_from_device =3D udmabuf_memcpy_from_device,
-> >  };
-> >
-> > @@ -188,7 +210,7 @@ void validate_buffer(void *line, size_t size)
-> >  {
-> >       static unsigned char seed =3D 1;
-> >       unsigned char *ptr =3D line;
-> > -     int errors =3D 0;
-> > +     static int errors;
-> >       size_t i;
-> >
-> >       for (i =3D 0; i < size; i++) {
-> > @@ -202,7 +224,7 @@ void validate_buffer(void *line, size_t size)
-> >               }
-> >               seed++;
-> >               if (seed =3D=3D do_validation)
-> > -                     seed =3D 0;
-> > +                     seed =3D 1;
-> >       }
-> >
-> >       fprintf(stdout, "Validated buffer\n");
-> > @@ -394,6 +416,49 @@ static int bind_rx_queue(unsigned int ifindex, uns=
-igned int dmabuf_fd,
-> >       return -1;
-> >  }
-> >
-> > +static int bind_tx_queue(unsigned int ifindex, unsigned int dmabuf_fd,
-> > +                      struct ynl_sock **ys)
-> > +{
-> > +     struct netdev_bind_tx_req *req =3D NULL;
-> > +     struct netdev_bind_tx_rsp *rsp =3D NULL;
-> > +     struct ynl_error yerr;
-> > +
-> > +     *ys =3D ynl_sock_create(&ynl_netdev_family, &yerr);
-> > +     if (!*ys) {
-> > +             fprintf(stderr, "YNL: %s\n", yerr.msg);
-> > +             return -1;
-> > +     }
-> > +
-> > +     req =3D netdev_bind_tx_req_alloc();
-> > +     netdev_bind_tx_req_set_ifindex(req, ifindex);
-> > +     netdev_bind_tx_req_set_fd(req, dmabuf_fd);
-> > +
-> > +     rsp =3D netdev_bind_tx(*ys, req);
-> > +     if (!rsp) {
-> > +             perror("netdev_bind_tx");
-> > +             goto err_close;
-> > +     }
-> > +
-> > +     if (!rsp->_present.id) {
-> > +             perror("id not present");
-> > +             goto err_close;
-> > +     }
-> > +
-> > +     fprintf(stderr, "got tx dmabuf id=3D%d\n", rsp->id);
-> > +     tx_dmabuf_id =3D rsp->id;
-> > +
-> > +     netdev_bind_tx_req_free(req);
-> > +     netdev_bind_tx_rsp_free(rsp);
-> > +
-> > +     return 0;
-> > +
-> > +err_close:
-> > +     fprintf(stderr, "YNL failed: %s\n", (*ys)->err.msg);
-> > +     netdev_bind_tx_req_free(req);
-> > +     ynl_sock_destroy(*ys);
-> > +     return -1;
-> > +}
-> > +
-> >  static void enable_reuseaddr(int fd)
-> >  {
-> >       int opt =3D 1;
-> > @@ -432,7 +497,7 @@ static int parse_address(const char *str, int port,=
- struct sockaddr_in6 *sin6)
-> >       return 0;
-> >  }
-> >
-> > -int do_server(struct memory_buffer *mem)
-> > +static int do_server(struct memory_buffer *mem)
-> >  {
-> >       char ctrl_data[sizeof(int) * 20000];
-> >       struct netdev_queue_id *queues;
-> > @@ -686,6 +751,207 @@ void run_devmem_tests(void)
-> >       provider->free(mem);
-> >  }
-> >
-> > +static uint64_t gettimeofday_ms(void)
-> > +{
-> > +     struct timeval tv;
-> > +
-> > +     gettimeofday(&tv, NULL);
-> > +     return (tv.tv_sec * 1000ULL) + (tv.tv_usec / 1000ULL);
-> > +}
-> > +
-> > +static int do_poll(int fd)
-> > +{
-> > +     struct pollfd pfd;
-> > +     int ret;
-> > +
-> > +     pfd.revents =3D 0;
-> > +     pfd.fd =3D fd;
-> > +
-> > +     ret =3D poll(&pfd, 1, waittime_ms);
-> > +     if (ret =3D=3D -1)
-> > +             error(1, errno, "poll");
-> > +
-> > +     return ret && (pfd.revents & POLLERR);
-> > +}
-> > +
-> > +static void wait_compl(int fd)
-> > +{
-> > +     int64_t tstop =3D gettimeofday_ms() + waittime_ms;
-> > +     char control[CMSG_SPACE(100)] =3D {};
-> > +     struct sock_extended_err *serr;
-> > +     struct msghdr msg =3D {};
-> > +     struct cmsghdr *cm;
-> > +     int retries =3D 10;
-> > +     __u32 hi, lo;
-> > +     int ret;
-> > +
-> > +     msg.msg_control =3D control;
-> > +     msg.msg_controllen =3D sizeof(control);
-> > +
-> > +     while (gettimeofday_ms() < tstop) {
-> > +             if (!do_poll(fd))
-> > +                     continue;
-> > +
-> > +             ret =3D recvmsg(fd, &msg, MSG_ERRQUEUE);
-> > +             if (ret < 0) {
-> > +                     if (errno =3D=3D EAGAIN)
-> > +                             continue;
-> > +                     error(1, ret, "recvmsg(MSG_ERRQUEUE)");
-> > +                     return;
-> > +             }
-> > +             if (msg.msg_flags & MSG_CTRUNC)
-> > +                     error(1, 0, "MSG_CTRUNC\n");
-> > +
-> > +             for (cm =3D CMSG_FIRSTHDR(&msg); cm; cm =3D CMSG_NXTHDR(&=
-msg, cm)) {
-> > +                     if (cm->cmsg_level !=3D SOL_IP &&
-> > +                         cm->cmsg_level !=3D SOL_IPV6)
-> > +                             continue;
-> > +                     if (cm->cmsg_level =3D=3D SOL_IP &&
-> > +                         cm->cmsg_type !=3D IP_RECVERR)
-> > +                             continue;
-> > +                     if (cm->cmsg_level =3D=3D SOL_IPV6 &&
-> > +                         cm->cmsg_type !=3D IPV6_RECVERR)
-> > +                             continue;
-> > +
-> > +                     serr =3D (void *)CMSG_DATA(cm);
-> > +                     if (serr->ee_origin !=3D SO_EE_ORIGIN_ZEROCOPY)
-> > +                             error(1, 0, "wrong origin %u", serr->ee_o=
-rigin);
-> > +                     if (serr->ee_errno !=3D 0)
-> > +                             error(1, 0, "wrong errno %d", serr->ee_er=
-rno);
-> > +
-> > +                     hi =3D serr->ee_data;
-> > +                     lo =3D serr->ee_info;
-> > +
-> > +                     fprintf(stderr, "tx complete [%d,%d]\n", lo, hi);
-> > +                     return;
-> > +             }
-> > +     }
-> > +
-> > +     error(1, 0, "did not receive tx completion");
-> > +}
-> > +
-> > +static int do_client(struct memory_buffer *mem)
-> > +{
-> > +     char ctrl_data[CMSG_SPACE(sizeof(struct dmabuf_tx_cmsg))];
-> > +     struct sockaddr_in6 server_sin;
-> > +     struct sockaddr_in6 client_sin;
-> > +     struct dmabuf_tx_cmsg ddmabuf;
-> > +     struct ynl_sock *ys =3D NULL;
-> > +     struct msghdr msg =3D {};
-> > +     ssize_t line_size =3D 0;
-> > +     struct cmsghdr *cmsg;
-> > +     struct iovec iov[2];
-> > +     uint64_t off =3D 100;
-> > +     char *line =3D NULL;
-> > +     size_t len =3D 0;
-> > +     int socket_fd;
-> > +     int ret, mid;
-> > +     int opt =3D 1;
-> > +
-> > +     ret =3D parse_address(server_ip, atoi(port), &server_sin);
-> > +     if (ret < 0)
-> > +             error(1, 0, "parse server address");
-> > +
-> > +     socket_fd =3D socket(AF_INET6, SOCK_STREAM, 0);
-> > +     if (socket_fd < 0)
-> > +             error(1, socket_fd, "create socket");
-> > +
-> > +     enable_reuseaddr(socket_fd);
-> > +
-> > +     ret =3D setsockopt(socket_fd, SOL_SOCKET, SO_BINDTODEVICE, ifname=
-,
-> > +                      strlen(ifname) + 1);
-> > +     if (ret)
-> > +             error(1, ret, "bindtodevice");
-> > +
-> > +     if (bind_tx_queue(ifindex, mem->fd, &ys))
-> > +             error(1, 0, "Failed to bind\n");
-> > +
-> > +     ret =3D parse_address(client_ip, atoi(port), &client_sin);
-> > +     if (ret < 0)
-> > +             error(1, 0, "parse client address");
-> > +
-> > +     ret =3D bind(socket_fd, &client_sin, sizeof(client_sin));
-> > +     if (ret)
-> > +             error(1, ret, "bind");
-> > +
-> > +     ret =3D setsockopt(socket_fd, SOL_SOCKET, SO_ZEROCOPY, &opt, size=
-of(opt));
-> > +     if (ret)
-> > +             error(1, ret, "set sock opt");
-> > +
-> > +     fprintf(stderr, "Connect to %s %d (via %s)\n", server_ip,
-> > +             ntohs(server_sin.sin6_port), ifname);
-> > +
-> > +     ret =3D connect(socket_fd, &server_sin, sizeof(server_sin));
-> > +     if (ret)
-> > +             error(1, ret, "connect");
-> > +
-> > +     while (1) {
-> > +             free(line);
-> > +             line =3D NULL;
-> > +             /* Subtract 1 from line_size to remove trailing newlines =
-that
-> > +              * get_line are surely to parse...
-> > +              */
-> > +             line_size =3D getline(&line, &len, stdin) - 1;
+> Moves the skb timestamp setting from igc_dispatch_skb_zc() to
+> igc_construct_skb_zc() so that igc_construct_skb_zc() is similar to
+> igc_construct_skb().
 >
-> Why not send the '\n' as well? If we skip the '\n', it's not keeping
-> netcat-like behavior :-(
+> This issue can also be reproduced by running:
+>  # tools/testing/selftests/bpf/xdp_hw_metadata enp1s0
+> When a frame with the wrong port 9092 (instead of 9091) is used:
+>  # echo -n xdp | nc -u -q1 192.168.10.9 9092
+> then the RX timestamp is missing and xdp_hw_metadata prints:
+>  skb hwtstamp is not found!
 >
-
-Ah, this is to make the validation on the RX side work. The validation
-expects a repeating pattern:
-
-1, 2, 3, 4, 5, 6, 1, 2, 3, 4, 5, 6, ....
-
-With no newlines.
-
-But it does become weird that TX doesn't match netcat. Let me think on
-this a bit. Maybe I can resolve this in a way where the validation
-works but also the tx side behaves like netcat. Maybe the RX
-validation can skip newlines or something. Maybe I can massage how I
-invoke the test.
-
-This can become a rabbit hole because I do want to invoke multiple
-sendmsg() in one iteration of the test as well, and not overcomplicate
-the series.
-
-> > +
-> > +             if (line_size < 0)
-> > +                     break;
+> With this fix or when copy mode is used:
+>  # tools/testing/selftests/bpf/xdp_hw_metadata -c enp1s0
+> then RX timestamp is found and xdp_hw_metadata prints:
+>  found skb hwtstamp = 1736509937.852786132
 >
-> [..]
->
-> > +             mid =3D (line_size / 2) + 1;
-> > +
-> > +             iov[0].iov_base =3D (void *)100;
-> > +             iov[0].iov_len =3D mid;
-> > +             iov[1].iov_base =3D (void *)2000;
-> > +             iov[1].iov_len =3D line_size - mid;
->
-> This seems a bit hard-coded. We should at least test that mid is < 2000?
->
+> Fixes: 069b142f5819 ("igc: Add support for PTP .getcyclesx64()")
+> Signed-off-by: Zdenek Bouska <zdenek.bouska@siemens.com>
 
-Yep, I should do at least do that. FWIW (although missed it in this
-iteration), at the top of the file I put docs that list exactly what I
-run for others to repro the results (and nipa should eventually run
-similar, I have that on my todo list), but the test should be more
-flexible to at least catch instances where mid is too large.
-
-> But ideally we should have two modes for tx with a flag (and run them
-> both from the selftest):
-> - pass one big iov, this will test the sendmsg path which creates
->   multiple skbs internally
-> - break 'line' into N sections (as you do here), but maybe have more
->   control over the number of sections?
->
-> Maybe let's have a new --max-iov-size flag? Then we can call ncdevmem
-> with --max-iov-size <some prime number close to 4k> to exercise all
-> sorts of weird offsets?
->
-> (seems ok to also follow up on that separately)
-
-Yeah, improvements to tests are always possible, lets have some
-reasonable tests in the first iteration and expand.
+Acked-by: Vinicius Costa Gomes <vinicius.gomes@intel.com>
 
 
---=20
-Thanks,
-Mina
+Cheers,
+-- 
+Vinicius
 
