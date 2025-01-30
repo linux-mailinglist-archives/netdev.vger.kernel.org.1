@@ -1,396 +1,468 @@
-Return-Path: <netdev+bounces-161613-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-161614-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5CDA8A22B88
-	for <lists+netdev@lfdr.de>; Thu, 30 Jan 2025 11:18:45 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id AA4E6A22B8C
+	for <lists+netdev@lfdr.de>; Thu, 30 Jan 2025 11:20:07 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 5C3C73A06FB
-	for <lists+netdev@lfdr.de>; Thu, 30 Jan 2025 10:18:37 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id EFF9C188274C
+	for <lists+netdev@lfdr.de>; Thu, 30 Jan 2025 10:20:11 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9266F1B4137;
-	Thu, 30 Jan 2025 10:18:39 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 56E8533987;
+	Thu, 30 Jan 2025 10:20:03 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="loiJhm01"
+	dkim=pass (1024-bit key) header.d=mysnt.onmicrosoft.com header.i=@mysnt.onmicrosoft.com header.b="mdTWHpbS"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from EUR02-AM0-obe.outbound.protection.outlook.com (mail-am0eur02on2109.outbound.protection.outlook.com [40.107.247.109])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5142415382E;
-	Thu, 30 Jan 2025 10:18:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1738232319; cv=none; b=bSxoZAaks/qmcfGxyVCtj+ffhjFLXmjJ897jj3CdFV6MzVIJsoVdVvgCjXyvB5wbUEOMBKvFZWJDNlVKbvpePQyC05UXXsx75++o1XLcgcmEpwWkaP4C9hz38CmVJaQAUgVzjNgXlsu1LMSic4eM8WqTD46mISyIrmVcf4vpGuM=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1738232319; c=relaxed/simple;
-	bh=gp8mnyM4gxWqFXz5BlBgd0fNLkA71lEnWXVUiQnKDsU=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=XKLRo0V6xpBGRy3WvyGx+KiTzfUT99D6bz4zYWevWi9A2HMXH/CI/0mbqfBUIkMGrAd6XqZdAisypPMJQ1uzobW9vdZOJ/8SNdkJ2/MCmFFINKScOt0kDm8Psb3OIhU/IYrku5CN346tR6oYOHZZ/DA9o0Izs4reKumsci1tC6M=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=loiJhm01; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id CB773C4CED2;
-	Thu, 30 Jan 2025 10:18:35 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1738232318;
-	bh=gp8mnyM4gxWqFXz5BlBgd0fNLkA71lEnWXVUiQnKDsU=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=loiJhm01S8dfXtUi+VSSAUwUMSMvkXMOG3wc9DBr1Os/QEWKQMZ6OxqnYmijyoWtJ
-	 4feBb3jeS6YUoWZZNg9PPFF312ath1wW9OiSU86q9jDztmeOZGRhcl+o+2USoKwUUB
-	 pQe7jLNzzqHQNw5Z2wmShlHHUoRo1tYd2MJfjvOnE+gP/gygGSU07+no04yDKYQvga
-	 2U8PZYCsblhkMjRM9ODaWPgU1ulUJ/jCt/qDs/FpX1CNnlqb1Qig7FasLVr+wUAbgv
-	 pqZNGBHjKs1tz901IZ1bJ2DAfCbdcFH9T6BhS4SkQH4rB0c6kVu5MVN/avYh+h1f+7
-	 g8t6lOcqtAcYA==
-Message-ID: <ba299d75-7417-40fd-b32e-b75713f57011@kernel.org>
-Date: Thu, 30 Jan 2025 11:18:25 +0100
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 859FB20328
+	for <netdev@vger.kernel.org>; Thu, 30 Jan 2025 10:20:00 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.247.109
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1738232403; cv=fail; b=uvz98MDwonxJReMizq9GFJG/PpK8eBLQGA9ruNPDJVdYyTkahbUnkpyPs8Fu262/HdW8gvBhjYI0yEpHn5dv3YDZUIoaoVPwXbHhjudYo9nJJYxAfq2FLEYLkPgBi1OrztvxaOS9o+WjrQK+gncm/dEd6sg58jYfi1RPZ2wJ1rM=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1738232403; c=relaxed/simple;
+	bh=EN7pTnsYpdFG7mOdx6hXpxSCd2qcoETYcxzEDsk6VTI=;
+	h=Message-ID:Date:From:Subject:To:Cc:References:In-Reply-To:
+	 Content-Type:MIME-Version; b=pIDaWlq81zQTwf/rwL7Vib24QMNXQSJs6I0Mq1tHiGztZgfw7n3rmNqH2nF4BvlERivVlsZgpcWKegeDCgJCw3esP5/UHzCVQbzDlMEgHP5shojz9MhgqWf8RSGz6TqlstN13sPw0S4WTJNZWipdrgdATXHUPs4UqTU1sRcQRT4=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kontron.de; spf=pass smtp.mailfrom=kontron.de; dkim=pass (1024-bit key) header.d=mysnt.onmicrosoft.com header.i=@mysnt.onmicrosoft.com header.b=mdTWHpbS; arc=fail smtp.client-ip=40.107.247.109
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kontron.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=kontron.de
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=yX6NKekG+f5C2S4GpJpphhsOlrnFgWzdz+1xcbRpjpJ23sr0aBw0sQbc4b13krhNnOQ0qtA7GYOokW7ls4YfLc10Rvwf66NGEg7Aw/Hd+Srdp1XPO4GU9Zte5fB/YpUfP2CCv6JDtd2GusmKdpLcX6uJxmkRaeWdTz04EqyhsHbR4lsVfdqa6VdYxQ1V4RRuGui4a10Xas5dLyXjSjQmRVlN950XpcGbLmAMeWRYr7vQrMRfk3XXlZQTNiD/wDDGHIcgfXZNichEwWSMByGeliHlzAuQizU56kEfOktb+UVzVKl+uom193bF/5PX32rr/Am9hGpPg34rWAeGI1AMTA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=C6rV/lEMhH2E3aan/aZBk0uwgK0cnEXg4S/LvzdXols=;
+ b=hF6A1sqhPK/45zwxT5D2laY5nxS5mWdNG/Rrzo3xNQxPxeerKuZeksunBs+LvsVxPeK8fu/XQFnMBxe3v91NFC+bwf723THHHB/g30OpuRksdaYfypil+P6RhCrxShkZq6r8X96A6n8FkbLSozylKEQbq+yfADTTAl/W+0r0CkWrY6Tu5dNMd2Ejo6X3ciutJdlTU1RwjN1hfjUACx/1vW+7znHo4ZRooxBN5iiuKoP2nRLI1uqCXEMo8aMVT3rDIi0AcRY0YI65MIq6Yf9Bjs3eZmHlks928X5W1C3f32lkLyWp9R5bfk675neLrmT4ciS9GUyU4lJAHAUJLxmQeg==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=kontron.de; dmarc=pass action=none header.from=kontron.de;
+ dkim=pass header.d=kontron.de; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=mysnt.onmicrosoft.com;
+ s=selector2-mysnt-onmicrosoft-com;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=C6rV/lEMhH2E3aan/aZBk0uwgK0cnEXg4S/LvzdXols=;
+ b=mdTWHpbSOEzeekyWVy8jg/LCMg5Ch1/guNKUlOMvqnh5SziXrY/+KzEMADW4z/0V3cUPRYu/BSjA58ABWE8k6ULYMYeeEzlC5pTWRV91fdBdmAIJmc7z25/ENgDjBwnqP5yoMo0ygEu23W1FA5ZGdUGzIUBOTS3LpPAQ0hI0qUc=
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=kontron.de;
+Received: from PA4PR10MB5681.EURPRD10.PROD.OUTLOOK.COM (2603:10a6:102:263::10)
+ by PAWPR10MB7748.EURPRD10.PROD.OUTLOOK.COM (2603:10a6:102:369::17) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8422.5; Thu, 30 Jan
+ 2025 10:19:57 +0000
+Received: from PA4PR10MB5681.EURPRD10.PROD.OUTLOOK.COM
+ ([fe80::b854:7611:1533:2a19]) by PA4PR10MB5681.EURPRD10.PROD.OUTLOOK.COM
+ ([fe80::b854:7611:1533:2a19%4]) with mapi id 15.20.8398.017; Thu, 30 Jan 2025
+ 10:19:56 +0000
+Message-ID: <d8603413-d410-4cc9-ab3a-da9c6d868eca@kontron.de>
+Date: Thu, 30 Jan 2025 11:19:55 +0100
+User-Agent: Mozilla Thunderbird
+From: Frieder Schrempf <frieder.schrempf@kontron.de>
+Subject: Re: KSZ9477 HSR Offloading
+To: Lukasz Majewski <lukma@denx.de>
+Cc: Andrew Lunn <andrew@lunn.ch>,
+ "netdev@vger.kernel.org" <netdev@vger.kernel.org>
+References: <05a6e63e-96c1-4d78-91b9-b00deed044b5@kontron.de>
+ <6d0e1f47-874e-42bf-9bc7-34856c1168d1@lunn.ch>
+ <1c140c92-3be6-4917-b600-fa5d1ef96404@kontron.de>
+ <6400e73a-b165-41a8-9fc9-e2226060a68c@kontron.de>
+ <20250129121733.1e99f29c@wsk>
+ <0383e3d9-b229-4218-a931-73185d393177@kontron.de>
+ <20250129145845.3988cf04@wsk>
+ <42a2f96f-34cd-4d95-99d5-3b4c4af226af@kontron.de>
+ <20250129235206.125142f4@wsk>
+Content-Language: en-US, de-DE
+In-Reply-To: <20250129235206.125142f4@wsk>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: FR2P281CA0151.DEUP281.PROD.OUTLOOK.COM
+ (2603:10a6:d10:98::14) To PA4PR10MB5681.EURPRD10.PROD.OUTLOOK.COM
+ (2603:10a6:102:263::10)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird Beta
-Subject: Re: [RFC PATCH v2 1/8] landlock: Fix non-TCP sockets restriction
-Content-Language: en-GB
-To: =?UTF-8?Q?Micka=C3=ABl_Sala=C3=BCn?= <mic@digikod.net>
-Cc: Mikhail Ivanov <ivanov.mikhail1@huawei-partners.com>, gnoack@google.com,
- willemdebruijn.kernel@gmail.com, matthieu@buffet.re,
- linux-security-module@vger.kernel.org, netdev@vger.kernel.org,
- netfilter-devel@vger.kernel.org, yusongping@huawei.com,
- artem.kuzin@huawei.com, konstantin.meskhidze@huawei.com,
- MPTCP Linux <mptcp@lists.linux.dev>, linux-nfs@vger.kernel.org,
- Paul Moore <paul@paul-moore.com>
-References: <20250127.Uph4aiph9jae@digikod.net>
- <d3d589c3-a70b-fc6e-e1bb-d221833dfef5@huawei-partners.com>
- <594263fc-f4e7-43ce-a613-d3f8ebb7f874@kernel.org>
- <f6e72e71-c5ed-8a9c-f33e-f190a47b8c27@huawei-partners.com>
- <2e727df0-c981-4e0c-8d0d-09109cf27d6f@kernel.org>
- <103de503-be0e-2eb2-b6f0-88567d765148@huawei-partners.com>
- <1d1d58b3-2516-4fc8-9f9a-b10604bbe05b@kernel.org>
- <b9823ff1-2f66-3992-b389-b8e631ec03ba@huawei-partners.com>
- <20250129.Oo1xou8ieche@digikod.net>
- <64b1de00-c724-4748-9133-acd0a79b6d72@kernel.org>
- <20250130.Xe3Ohtai5aen@digikod.net>
-From: Matthieu Baerts <matttbe@kernel.org>
-Autocrypt: addr=matttbe@kernel.org; keydata=
- xsFNBFXj+ekBEADxVr99p2guPcqHFeI/JcFxls6KibzyZD5TQTyfuYlzEp7C7A9swoK5iCvf
- YBNdx5Xl74NLSgx6y/1NiMQGuKeu+2BmtnkiGxBNanfXcnl4L4Lzz+iXBvvbtCbynnnqDDqU
- c7SPFMpMesgpcu1xFt0F6bcxE+0ojRtSCZ5HDElKlHJNYtD1uwY4UYVGWUGCF/+cY1YLmtfb
- WdNb/SFo+Mp0HItfBC12qtDIXYvbfNUGVnA5jXeWMEyYhSNktLnpDL2gBUCsdbkov5VjiOX7
- CRTkX0UgNWRjyFZwThaZADEvAOo12M5uSBk7h07yJ97gqvBtcx45IsJwfUJE4hy8qZqsA62A
- nTRflBvp647IXAiCcwWsEgE5AXKwA3aL6dcpVR17JXJ6nwHHnslVi8WesiqzUI9sbO/hXeXw
- TDSB+YhErbNOxvHqCzZEnGAAFf6ges26fRVyuU119AzO40sjdLV0l6LE7GshddyazWZf0iac
- nEhX9NKxGnuhMu5SXmo2poIQttJuYAvTVUNwQVEx/0yY5xmiuyqvXa+XT7NKJkOZSiAPlNt6
- VffjgOP62S7M9wDShUghN3F7CPOrrRsOHWO/l6I/qJdUMW+MHSFYPfYiFXoLUZyPvNVCYSgs
- 3oQaFhHapq1f345XBtfG3fOYp1K2wTXd4ThFraTLl8PHxCn4ywARAQABzSRNYXR0aGlldSBC
- YWVydHMgPG1hdHR0YmVAa2VybmVsLm9yZz7CwZEEEwEIADsCGwMFCwkIBwIGFQoJCAsCBBYC
- AwECHgECF4AWIQToy4X3aHcFem4n93r2t4JPQmmgcwUCZUDpDAIZAQAKCRD2t4JPQmmgcz33
- EACjROM3nj9FGclR5AlyPUbAq/txEX7E0EFQCDtdLPrjBcLAoaYJIQUV8IDCcPjZMJy2ADp7
- /zSwYba2rE2C9vRgjXZJNt21mySvKnnkPbNQGkNRl3TZAinO1Ddq3fp2c/GmYaW1NWFSfOmw
- MvB5CJaN0UK5l0/drnaA6Hxsu62V5UnpvxWgexqDuo0wfpEeP1PEqMNzyiVPvJ8bJxgM8qoC
- cpXLp1Rq/jq7pbUycY8GeYw2j+FVZJHlhL0w0Zm9CFHThHxRAm1tsIPc+oTorx7haXP+nN0J
- iqBXVAxLK2KxrHtMygim50xk2QpUotWYfZpRRv8dMygEPIB3f1Vi5JMwP4M47NZNdpqVkHrm
- jvcNuLfDgf/vqUvuXs2eA2/BkIHcOuAAbsvreX1WX1rTHmx5ud3OhsWQQRVL2rt+0p1DpROI
- 3Ob8F78W5rKr4HYvjX2Inpy3WahAm7FzUY184OyfPO/2zadKCqg8n01mWA9PXxs84bFEV2mP
- VzC5j6K8U3RNA6cb9bpE5bzXut6T2gxj6j+7TsgMQFhbyH/tZgpDjWvAiPZHb3sV29t8XaOF
- BwzqiI2AEkiWMySiHwCCMsIH9WUH7r7vpwROko89Tk+InpEbiphPjd7qAkyJ+tNIEWd1+MlX
- ZPtOaFLVHhLQ3PLFLkrU3+Yi3tXqpvLE3gO3LM7BTQRV4/npARAA5+u/Sx1n9anIqcgHpA7l
- 5SUCP1e/qF7n5DK8LiM10gYglgY0XHOBi0S7vHppH8hrtpizx+7t5DBdPJgVtR6SilyK0/mp
- 9nWHDhc9rwU3KmHYgFFsnX58eEmZxz2qsIY8juFor5r7kpcM5dRR9aB+HjlOOJJgyDxcJTwM
- 1ey4L/79P72wuXRhMibN14SX6TZzf+/XIOrM6TsULVJEIv1+NdczQbs6pBTpEK/G2apME7vf
- mjTsZU26Ezn+LDMX16lHTmIJi7Hlh7eifCGGM+g/AlDV6aWKFS+sBbwy+YoS0Zc3Yz8zrdbi
- Kzn3kbKd+99//mysSVsHaekQYyVvO0KD2KPKBs1S/ImrBb6XecqxGy/y/3HWHdngGEY2v2IP
- Qox7mAPznyKyXEfG+0rrVseZSEssKmY01IsgwwbmN9ZcqUKYNhjv67WMX7tNwiVbSrGLZoqf
- Xlgw4aAdnIMQyTW8nE6hH/Iwqay4S2str4HZtWwyWLitk7N+e+vxuK5qto4AxtB7VdimvKUs
- x6kQO5F3YWcC3vCXCgPwyV8133+fIR2L81R1L1q3swaEuh95vWj6iskxeNWSTyFAVKYYVskG
- V+OTtB71P1XCnb6AJCW9cKpC25+zxQqD2Zy0dK3u2RuKErajKBa/YWzuSaKAOkneFxG3LJIv
- Hl7iqPF+JDCjB5sAEQEAAcLBXwQYAQIACQUCVeP56QIbDAAKCRD2t4JPQmmgc5VnD/9YgbCr
- HR1FbMbm7td54UrYvZV/i7m3dIQNXK2e+Cbv5PXf19ce3XluaE+wA8D+vnIW5mbAAiojt3Mb
- 6p0WJS3QzbObzHNgAp3zy/L4lXwc6WW5vnpWAzqXFHP8D9PTpqvBALbXqL06smP47JqbyQxj
- Xf7D2rrPeIqbYmVY9da1KzMOVf3gReazYa89zZSdVkMojfWsbq05zwYU+SCWS3NiyF6QghbW
- voxbFwX1i/0xRwJiX9NNbRj1huVKQuS4W7rbWA87TrVQPXUAdkyd7FRYICNW+0gddysIwPoa
- KrLfx3Ba6Rpx0JznbrVOtXlihjl4KV8mtOPjYDY9u+8x412xXnlGl6AC4HLu2F3ECkamY4G6
- UxejX+E6vW6Xe4n7H+rEX5UFgPRdYkS1TA/X3nMen9bouxNsvIJv7C6adZmMHqu/2azX7S7I
- vrxxySzOw9GxjoVTuzWMKWpDGP8n71IFeOot8JuPZtJ8omz+DZel+WCNZMVdVNLPOd5frqOv
- mpz0VhFAlNTjU1Vy0CnuxX3AM51J8dpdNyG0S8rADh6C8AKCDOfUstpq28/6oTaQv7QZdge0
- JY6dglzGKnCi/zsmp2+1w559frz4+IC7j/igvJGX4KDDKUs0mlld8J2u2sBXv7CGxdzQoHaz
- lzVbFe7fduHbABmYz9cefQpO7wDE/Q==
-Organization: NGI0 Core
-In-Reply-To: <20250130.Xe3Ohtai5aen@digikod.net>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: PA4PR10MB5681:EE_|PAWPR10MB7748:EE_
+X-MS-Office365-Filtering-Correlation-Id: 117e4dae-90e9-4538-ecf2-08dd4117a50b
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;ARA:13230040|1800799024|376014|366016;
+X-Microsoft-Antispam-Message-Info:
+	=?utf-8?B?VE15ekJoQXZnd2w2amV3dUx3RTFUaVp6bHhBZmxFVzljZFo2Q21VYldlRE40?=
+ =?utf-8?B?TkR4K2JMdm5xQ2h3cUFKY1lheWhxR3dXNC9XUDVyZVBuanRqZ2R3eDNvYnVI?=
+ =?utf-8?B?Z0RBWi9Pd2FEbFNhcFl2bDB3bmpaLzIyOHIzbU5JL0Z5SlExV3dNak4yVlBv?=
+ =?utf-8?B?VTBBSzRYa2NnMzk3MUpQdzB5S3I3RThwNWhYbDZVZ01IVTZ2bE1XbmprcG45?=
+ =?utf-8?B?SjBndjdCRGFzYjYzM1g4NUU3RUhwWGJQekJvTUFsZVMzV21rRnVYbnI1YlNj?=
+ =?utf-8?B?MTJJWFNRSU8zTGxHRGF6Rkc5elRFa3A5eHMvOEZ6OHhkTm9NVmdHU1NHb1d0?=
+ =?utf-8?B?b1dLdThXbzJaWnZNTXZQMkNmTWVKTVhYNG0xeHY2MHJPTllWcWlhWWRXMFpN?=
+ =?utf-8?B?Q2xwbVI3VDh2Nk1iZWk3MEhESGhhUisvUGc4T0RKdkJkVkxBTDh2NVZ3RHpp?=
+ =?utf-8?B?SlI1ZFg5ek5Zc0lseCtKaTN0MTJFaU1wdVVhRW1jcGJDMHNscWN4eWc4QlIv?=
+ =?utf-8?B?SzRaWTdSSzBLbDg5RHp2RitlY3o0NUx0VUN4TmZBdWRid3BCTk45clQzYjBL?=
+ =?utf-8?B?QTgzM0U2MTF5b3pScUVmWmQ2azkwdFY2dDloUm5pVGsrM0VOcHUwelNxaUtq?=
+ =?utf-8?B?eU9QM0VSSXBZUlhrOWV4bkMvMzJSZ2kzK1FTUlM5SVZnKzRJR2pHZjdGQXVI?=
+ =?utf-8?B?aXpLME41bjZ0dHZ4NU5Cd1BJTFVMOEFqZHowMW1LekNOOWNMcCt5bExieHU2?=
+ =?utf-8?B?ZEFGRVV1T3VHN0xGbEx3MHZLdlQxZmpPelZSQmVYOGg2eFNEY20yTDgxN1I2?=
+ =?utf-8?B?T3g3d1g0ZVIrTUhkZ1BYZmwvYmtzTE4vK2lMc25rbmd2SEhwUHQ1S0psREIw?=
+ =?utf-8?B?d0lhS3VGeEsrQTFxNTlZQ0lUcUdvNitoRVd1MGJ0OGoveVFaOXJWNzAva1dM?=
+ =?utf-8?B?VkZ4T05KMEY2NHg3YUpiSDR0dUthby9uY2Ixc3p0YzdkNmlwelR1L2dlT0Zs?=
+ =?utf-8?B?ZmgzZHgrRlRYelEzeS9DcEdsSGRnajdqaktTUFI0L2J5cVZHVlNJN3YzQkVj?=
+ =?utf-8?B?ejJlbVpvUGkreGNlWEQ2aVFCU0tYN291M0ZiblZQOFMxNERiZjZ6UmYxTHpo?=
+ =?utf-8?B?TDZ2bmhSamxMMWlTSldoRHNXWkFEem5PaE9tRmRIMFh0bG1MZkJlOFEyZHI4?=
+ =?utf-8?B?ZHlqQUNrZURydFNHVGZkZGkyY0hSdEw2NmM3NEd6L0ZIL1ZZNlhPUlhvWURw?=
+ =?utf-8?B?aDVYUXVXd3hNWS81cERENjh3eGtwWWV0K2Zjb055cXNVeHQ4V3FmY01PckFq?=
+ =?utf-8?B?Y3c4dytLSnh6WFlIWVh0UVlaNytueXoxMC85c1lYeFZib3hYU0F4YVJsN3lk?=
+ =?utf-8?B?NWdleDRJZEJIRXBzN2IvMDR3Sm8xRkhKRkh4RGh0MkVHbmQ1cHovWUtYcnEr?=
+ =?utf-8?B?M3pveEt6V0cxb3pBZEFOMk5LZ2lVQXZ4VkMrMmFjbnhKaWoycEVEdVNQcCtW?=
+ =?utf-8?B?aktKajI5SmJYWk9Wb2NvSzl6Qkx0MjhZWnNLWHhLN0ZhM045QmFFMUxqa1ZP?=
+ =?utf-8?B?dEFrdXhjWGhtaitodEJ6TkdlT3E4RjRhWEQ5M20rZzF6YTJTOTFRLzQ2bGxZ?=
+ =?utf-8?B?RjRVWlp3dFpXbm10WmNBR2RYV1ZtOHRwSVhrUnArKzZ1TzExUFF5U3BQQVUz?=
+ =?utf-8?B?RDVIeGxiTWl2ZkhZRHp0L3NQL01mSUp1TUN2UnE3Zk12UmJDSUJ5V1Z0Z05p?=
+ =?utf-8?Q?PVY0dfsdODYqxRjatfIBF9xn64U45cLJdZWByh1?=
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:PA4PR10MB5681.EURPRD10.PROD.OUTLOOK.COM;PTR:;CAT:NONE;SFS:(13230040)(1800799024)(376014)(366016);DIR:OUT;SFP:1102;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?utf-8?B?RWJwN2c4SVFza1hPZnpZYkx0S3FQTlU1bkZuQ0R4M3YyN2ZIbUJvN1Q5dG9j?=
+ =?utf-8?B?ckpQUURsRmpKZU5lNDh0SzlEYmNYN2RIOWQ2bmliMVlDSE1YWnpkVTBJWTZv?=
+ =?utf-8?B?NE9IVUtkTWNxaGtpOWkzTmdSYVdSZVpERjd2NzRoZjVXMUJTc2h3Z2pIMXRr?=
+ =?utf-8?B?QmtCSjFKNWFmSERuU29oNHI0NXRKRVhGWVQyNGo2eUszZE1xYnpXeGxXeHMr?=
+ =?utf-8?B?MmNqVWZRTkVJWitJOUNNS0hLcnA4K043ZWpDRVlLNThCL0pON1l2ZENKcVJz?=
+ =?utf-8?B?b2sydC9TdEg2T2dscTNKcUtRd0R4dzE2aTNycWMyTkg4SFN1SmpzMWZ0WHcv?=
+ =?utf-8?B?amg5VXVmSks1akRjbUJTaVRpbERxOXM4eTRRNmswRkNMa0RPSi85V1lKOVcw?=
+ =?utf-8?B?YmNPYUcwN055NXJqTlg4SGNEZzJsSkQxRUVGeldKNG5nK1RoS2VIb1lObHRH?=
+ =?utf-8?B?UVYxUHIzOGRReVo0K0hKRUtMNGFXT2t6c2tQR0RtRGV2U0FMdjJwaWczdzJI?=
+ =?utf-8?B?SlJyeGNpSk5weHVoa3FOK2NhZy9GeFhwbURRME54dWx1bk4vUStlN3VTd1cy?=
+ =?utf-8?B?a2prR3J5eStNS3ZWeVNPL1FiM29pbEQxRS9tbm9YSVowaW9jZUV5cCt4TDRu?=
+ =?utf-8?B?ZnJ3eE5qZXdLMkhnUUMvcjJMRHB5Y0UrcVhuNHRsY3dnV3NmRk0xc3Z5bVh5?=
+ =?utf-8?B?R3ltY04rQjNWQldDSTRaeGY1dGRtcGFKSlF2d080MUgvN1BUbUxlMmw5ZGFD?=
+ =?utf-8?B?Y0FkZ29TNHRuZnpSSDh5M2dWTVNLaTE0QVhnVytNc2t6WDZnS0YwQWc1b1ls?=
+ =?utf-8?B?cVMrVlZIcE81UXoyTkt3Vnp6L2Q5V2xwSTNudU90SHVHZG45aTNCdE5xeFRz?=
+ =?utf-8?B?T1g5MDFXS1NtL1lvTjdxZzYvRzhpVnVEbWZnK0ZpTG9GUVlYazdLUFdmTWE3?=
+ =?utf-8?B?ZDNoQVduTHg1cTdiSFZINit6Y1I4c3lPOWd4Q0VrZGI1eGdxSjYzcUo5ZEZk?=
+ =?utf-8?B?cnc3QXdjOVM1UHhwMENGZFRtMUhBSXFRa1NocEdteU1UbTNQdkFOVGlsSUhI?=
+ =?utf-8?B?Wld3UGYrb25Yd3dnV1dMQnJjdm04ZUZyUlk2SGplbUFBbjkvMGd5NjdnSDFH?=
+ =?utf-8?B?TGN0a3NYci9iTlRmOVJEWlhQeSsxYXdQckFFaTVMTGVJR2gvOHdTa2VGUXlD?=
+ =?utf-8?B?NEpvQldtWnFsQnBjVnZ1dXNpMlNkQTV5dS90RVp3QWdDbzA1eHg3NEdCZjNl?=
+ =?utf-8?B?L2ZNMVE1aWlzTy9xZm51RHFnRUh2Y3VPeXgvbnJyUWRMcm1rTURVcDZRbHJI?=
+ =?utf-8?B?bHhaeG8yY0diUldzN3hHYUdUdThtbThBdUZvaVpBQ0xIL1BZYVFOa0JpZzFL?=
+ =?utf-8?B?TmpSdUNrSEErZTNVMkVmcVF5c3dEYnMwNnBnMmZSc1BZdlppc0l0QTlDYlg4?=
+ =?utf-8?B?K01Zb2hmQnpXQ0piWEVQNFF3Z2hDbWlLNFliWVJMSU5WUGpSa2R1QUFqYXVr?=
+ =?utf-8?B?eVZGZWIraW9nNUh6YXdGRWF3NFhDRU1BTGp2UzJGbGZjQm56anUzblVoTU9y?=
+ =?utf-8?B?OVNXbVBiQ1k4WnB6b0R6UCtlK1dWdVRDVkEzdytrVUUxbDlhaTNxSlRTbG9W?=
+ =?utf-8?B?djdSaWppUDU1TWNzSlkwV1B1RUJnZ3FoY3lFME13MEI1b0xMRXhLTUpPVEhs?=
+ =?utf-8?B?ZkxEYVJTRFNSWHhYNERYNmdhbmJaUXA2aU1TU1VVSittQ0Fncm8zandsY1R0?=
+ =?utf-8?B?QytreDVySTl6QTNUWDdWY3BBN0tybzZoaEtvU3ZZcVVSK3lISVRXSkNLOWlY?=
+ =?utf-8?B?T0Z5em40RFYzczkwbGdJYjl1MWw0eE5EM0ZyQU5KNUhTdHJ4d2lvVjk5Ny9o?=
+ =?utf-8?B?MzlRLzNUa01WWllvenBrVWQ4ZUUreUdXeEcyMFYrTEpsWFdKMGY5R3ZJMXEr?=
+ =?utf-8?B?SE5rNjQ3SldNY2ZBNWtCTGRVZTV4bTFpSGhSQ0JRbEtiN3dLR2FrVlMyNFZO?=
+ =?utf-8?B?VkhZZTZzUHNST2dEU01NdklQUXNnRWFoWndaWXZzSXBuRkJNNzRyejc5a0Np?=
+ =?utf-8?B?RzNPQzc0UUFINk1xMlJHV1NuMDd3L0t0YjRrOHJjdmFWci8veWJyR1I0UFdZ?=
+ =?utf-8?B?ajFhdnpDVnhmaUVaeXlpaXRsa2lTcVBiK3RxbFVDWldCbjF6SjFPMU1FbkpE?=
+ =?utf-8?B?Mnc9PQ==?=
+X-OriginatorOrg: kontron.de
+X-MS-Exchange-CrossTenant-Network-Message-Id: 117e4dae-90e9-4538-ecf2-08dd4117a50b
+X-MS-Exchange-CrossTenant-AuthSource: PA4PR10MB5681.EURPRD10.PROD.OUTLOOK.COM
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 30 Jan 2025 10:19:56.8009
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 8c9d3c97-3fd9-41c8-a2b1-646f3942daf1
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: vGUpP3ZMu0xx8wJM/bTxFfBQcgXljiXtAakRgLVjgiUJXPYXZVbdEjif7f1QM6ni81NJ4SlGSVixAOLUflplMmP/UadAAyEZh7Xgtror76Q=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: PAWPR10MB7748
 
-Hi Mickaël,
+Hi Lukasz,
 
-On 30/01/2025 10:51, Mickaël Salaün wrote:
-> On Wed, Jan 29, 2025 at 04:44:18PM +0100, Matthieu Baerts wrote:
->> Hi Mickaël,
->>
->> On 29/01/2025 15:51, Mickaël Salaün wrote:
->>> On Wed, Jan 29, 2025 at 02:47:19PM +0300, Mikhail Ivanov wrote:
->>>> On 1/29/2025 2:33 PM, Matthieu Baerts wrote:
->>>>> On 29/01/2025 12:02, Mikhail Ivanov wrote:
->>>>>> On 1/29/2025 1:25 PM, Matthieu Baerts wrote:
->>>>>>> Hi Mikhail,
+On 29.01.25 11:52 PM, Lukasz Majewski wrote:
+> Hi Frieder,
+> 
+>> On 29.01.25 2:58 PM, Lukasz Majewski wrote:
+>>> Hi Frieder,
+>>>   
+>>>> Hi Lukasz,
+>>>>
+>>>> On 29.01.25 12:17 PM, Lukasz Majewski wrote:  
+>>>>> Hi Frieder,
+>>>>>     
+>>>>>> On 29.01.25 8:24 AM, Frieder Schrempf wrote:    
+>>>>>>> Hi Andrew,
 >>>>>>>
->>>>>>> On 29/01/2025 10:52, Mikhail Ivanov wrote:
->>>>>>>> On 1/28/2025 9:14 PM, Matthieu Baerts wrote:
->>>>>>>>> Hi Mikhail,
+>>>>>>> On 28.01.25 6:51 PM, Andrew Lunn wrote:      
+>>>>>>>> On Tue, Jan 28, 2025 at 05:14:46PM +0100, Frieder Schrempf
+>>>>>>>> wrote:      
+>>>>>>>>> Hi,
 >>>>>>>>>
->>>>>>>>> Sorry, I didn't follow all the discussions in this thread, but here are
->>>>>>>>> some comments, hoping this can help to clarify the MPTCP case.
+>>>>>>>>> I'm trying out HSR support on KSZ9477 with v6.12. My setup
+>>>>>>>>> looks like this:
+>>>>>>>>>
+>>>>>>>>> +-------------+         +-------------+
+>>>>>>>>> |             |         |             |
+>>>>>>>>> |   Node A    |         |   Node D    |
+>>>>>>>>> |             |         |             |
+>>>>>>>>> |             |         |             |
+>>>>>>>>> | LAN1   LAN2 |         | LAN1   LAN2 |
+>>>>>>>>> +--+-------+--+         +--+------+---+
+>>>>>>>>>    |       |               |      |
+>>>>>>>>>    |       +---------------+      |
+>>>>>>>>>    |                              |
+>>>>>>>>>    |       +---------------+      |
+>>>>>>>>>    |       |               |      |
+>>>>>>>>> +--+-------+--+         +--+------+---+
+>>>>>>>>> | LAN1   LAN2 |         | LAN1   LAN2 |
+>>>>>>>>> |             |         |             |
+>>>>>>>>> |             |         |             |
+>>>>>>>>> |   Node B    |         |   Node C    |
+>>>>>>>>> |             |         |             |
+>>>>>>>>> +-------------+         +-------------+
+>>>>>>>>>
+>>>>>>>>> On each device the LAN1 and LAN2 are added as HSR slaves.
+>>>>>>>>> Then I try to do ping tests between each of the HSR
+>>>>>>>>> interfaces.
+>>>>>>>>>
+>>>>>>>>> The result is that I can reach the neighboring nodes just
+>>>>>>>>> fine, but I can't reach the remote node that needs packages
+>>>>>>>>> to be forwarded through the other nodes. For example I can't
+>>>>>>>>> ping from node A to C.
+>>>>>>>>>
+>>>>>>>>> I've tried to disable HW offloading in the driver and then
+>>>>>>>>> everything starts working.
+>>>>>>>>>
+>>>>>>>>> Is this a problem with HW offloading in the KSZ driver, or am
+>>>>>>>>> I missing something essential?      
+>>>>>
+>>>>> Thanks for looking and testing such large scale setup.
+>>>>>     
 >>>>>>>>
->>>>>>>> Thanks a lot for sharing your knowledge, Matthieu!
->>>>>>>>
->>>>>>>>>
->>>>>>>>> On 28/01/2025 11:56, Mikhail Ivanov wrote:
->>>>>>>>>> On 1/27/2025 10:48 PM, Mickaël Salaün wrote:
->>>>>>>>>
->>>>>>>>> (...)
->>>>>>>>>
->>>>>>>>>>> I'm a bit worried that we miss some of these places (now or in future
->>>>>>>>>>> kernel versions).  We'll need a new LSM hook for that.
->>>>>>>>>>>
->>>>>>>>>>> Could you list the current locations?
->>>>>>>>>>
->>>>>>>>>> Currently, I know only about TCP-related transformations:
->>>>>>>>>>
->>>>>>>>>> * SMC can fallback to TCP during connection. TCP connection is used
->>>>>>>>>>      (1) to exchange CLC control messages in default case and (2)
->>>>>>>>>> for the
->>>>>>>>>>      communication in the case of fallback. If socket was connected or
->>>>>>>>>>      connection failed, socket can not be reconnected again. There
->>>>>>>>>> is no
->>>>>>>>>>      existing security hook to control the fallback case,
->>>>>>>>>>
->>>>>>>>>> * MPTCP uses TCP for communication between two network interfaces
->>>>>>>>>> in the
->>>>>>>>>>      default case and can fallback to plain TCP if remote peer does not
->>>>>>>>>>      support MPTCP. AFAICS, there is also no security hook to
->>>>>>>>>> control the
->>>>>>>>>>      fallback transformation,
->>>>>>>>>
->>>>>>>>> There are security hooks to control the path creation, but not to
->>>>>>>>> control the "fallback transformation".
->>>>>>>>>
->>>>>>>>> Technically, with MPTCP, the userspace will create an IPPROTO_MPTCP
->>>>>>>>> socket. This is only used "internally": to communicate between the
->>>>>>>>> userspace and the kernelspace, but not directly used between network
->>>>>>>>> interfaces. This "external" communication is done via one or multiple
->>>>>>>>> kernel TCP sockets carrying extra TCP options for the mapping. The
->>>>>>>>> userspace cannot directly control these sockets created by the kernel.
->>>>>>>>>
->>>>>>>>> In case of fallback, the kernel TCP socket "simply" drop the extra TCP
->>>>>>>>> options needed for MPTCP, and carry on like normal TCP. So on the wire
->>>>>>>>> and in the Linux network stack, it is the same TCP connection, without
->>>>>>>>> the MPTCP options in the TCP header. The userspace continue to
->>>>>>>>> communicate with the same socket.
->>>>>>>>>
->>>>>>>>> I'm not sure if there is a need to block the fallback: it means only
->>>>>>>>> one
->>>>>>>>> path can be used at a time.
->>>
->>> Thanks Matthieu.
->>>
->>> So user space needs to specific IPPROTO_MPTCP to use MPTCP, but on the
->>> network this socket can translate to "augmented" or plain TCP.
->>
->> Correct. On the wire, you will only see packet with the IPPROTO_TCP
->> protocol. When MPTCP is used, extra MPTCP options will be present in the
->> TCP headers, but the protocol is still IPPROTO_TCP on the network.
->>
->>> From Landlock point of view, what matters is to have a consistent policy
->>> that maps to user space code.  The fear was that a malicious user space
->>> that is only allowed to use MPTCP could still transform an MPTCP socket
->>> to a TCP socket, while it wasn't allowed to create a TCP socket in the
->>> first place.  I now think this should not be an issue because:
->>> 1. MPTCP is kind of a superset of TCP
->>> 2. user space legitimately using MPTCP should not get any error related
->>>    to a Landlock policy because of TCP/any automatic fallback.  To say
->>>    it another way, such fallback is independent of user space requests
->>>    and may not be predicted because it is related to the current network
->>>    path.  This follows the principle of least astonishment (at least
->>>    from user space point of view).
->>>
->>> So, if I understand correctly, this should be simple for the Landlock
->>> socket creation control:  we only check socket properties at creation
->>> time and we ignore potential fallbacks.  This should be documented
->>> though.
->>
->> It depends on the restrictions that are put in place: are the user and
->> kernel sockets treated the same way? If yes, blocking TCP means that
->> even if it will be possible for the userspace to create an IPPROTO_MPTCP
->> socket, the kernel will not be allowed to IPPROTO_TCP ones to
->> communicate with the outside world. So blocking TCP will implicitly
->> block MPTCP.
->>
->> On the other hand, if only TCP user sockets are blocked, then it will be
->> possible to use MPTCP to communicate to any TCP sockets: with an
->> IPPROTO_MPTCP socket, it is possible to communicate with any IPPROTO_TCP
->> sockets, but without the extra features supported by MPTCP.
-> 
-> Yes, that how Landlock works, it only enforces a security policy defined
-> by user space on user space.  The kernel on its own is never restricted.
-
-OK, thank you, that's clearer.
-
->>> As an example, if a Landlock policies only allows MPTCP: socket(...,
->>> IPPROTO_MPTCP) should be allowed and any legitimate use of the returned
->>> socket (according to MPTCP) should be allowed, including TCP fallback.
->>> However, socket(..., IPPROTO_TCP/0), should only be allowed if TCP is
->>> explicitly allowed.  This means that we might end up with an MPTCP
->>> socket only using TCP, which is OK.
->>
->> Would it not be confusing for the person who set the Landlock policies?
->> Especially for the ones who had policies to block TCP, and thought they
->> were "safe", no?
-> 
-> There are two kind of users for Landlock:
-> 1. developers sandboxing their applications;
-> 2. sysadmins or security experts sandboxing execution environments (e.g.
->    with container runtimes, service managers, sandboxing tools...).
-> 
-> It would make sense for developers to allow what their code request,
-> whatever fallback the kernel might use instead.  In this case, they
-> should not care about MPTCP being TCP with some flags underneath.
-> Moreover, developers might not be aware of the system on which their
-> application is running, and their concern should mainly be about
-> compatibility.
-> 
-> For security or network experts, implying that allowing MPTCP means that
-> fallback to TCP is allowed might be a bit surprising at first, but they
-> should have the knowledge to know how MPTCP works underneath, including
-> this fallback mechanism.  Moreover, this kind of users can (and should)
-> also rely on system-wide security policies such as Netfilter, which
-> give more control.
-> 
-> In a nutshell, Landlock should favor compatibility at the sandboxing/app
-> layers and we should rely on system-wide security policies (taking into
-> account the running system's context) for more fine-grained control.
-> This compatibility behaviors should be explained in the Landlock
-> documentation though.
-
-Thank you, also clearer!
-
-In my mind, Landlock would be used to get a sort of "jail" so that "any"
-users could use it to run untrusted apps for example. In that case, I
-was thinking no everybody will know that MPTCP can be used to bypass
-some restrictions only applied to TCP sockets.
-
->> If only TCP is blocked on the userspace side, simply using IPPROTO_MPTCP
->> instead of IPPROTO_TCP will allow any users to continue to talk with the
->> outside world. Also, it is easy to force apps to use IPPROTO_MPTCP
->> instead of IPPROTO_TCP, e.g. using 'mptcpize' which set LD_PRELOAD in
->> order to change the parameters of the socket() call.
->>
->>    mptcpize run curl https://check.mptcp.dev
-> 
-> Landlock restrictions are enforced at a specific time for a process and
-> all its future children.  LD_PRELOAD is not an issue because a security
-> policy cannot be disabled once enforced.  If a sandboxed program uses
-> MPTCP (because of LD_PRELOAD) instead of TCP, the previously enforced
-> policy will be enforced the same (either to allow or deny the use of
-> MPTCP).
-> 
-> The only issue with LD_PRELOAD could be when e.g. curl sandboxes itself
-> and denies itself the use of MPTCP, whereas mptcpize would "patch" the
-> curl process to use MPTCP.  In this case, connections would failed.  A
-> solution would be for mptcpize to "patch" the Landlock security as well,
-> or for curl to be more permissive.  If the sandboxing happens before
-> calling mptcpize, or if it is enforced by mptcpize, then it would work
-> as expected.
-
-OK, it is clearer for me now that I understand apps can sandbox themselves!
-
->>> I guess this should be the same for other protocols, except if user
->>> space can explicitly transform a specific socket type to use an
->>> *arbitrary* protocol, but I think this is not possible.
->> I'm sorry, I don't know what is possible with the other ones. But again,
->> blocking both user and kernel sockets the same way might make more sense
->> here.
->>
->>>>>>>>
->>>>>>>> You mean that users always rely on a plain TCP communication in the case
->>>>>>>> the connection of MPTCP multipath communication fails?
+>>>>>>>> How are IP addresses configured? I assume you have a bridge,
+>>>>>>>> LAN1 and LAN2 are members of the bridge, and the IP address is
+>>>>>>>> on the bridge interface?      
 >>>>>>>
->>>>>>> Yes, that's the same TCP connection, just without extra bit to be able
->>>>>>> to use multiple TCP connections associated to the same MPTCP one.
+>>>>>>> I have a HSR interface on each node that covers LAN1 and LAN2 as
+>>>>>>> slaves and the IP addresses are on those HSR interfaces. For
+>>>>>>> node A:
+>>>>>>>
+>>>>>>> ip link add name hsr type hsr slave1 lan1 slave2 lan2
+>>>>>>> supervision 45 version 1
+>>>>>>> ip addr add 172.20.1.1/24 dev hsr
+>>>>>>>
+>>>>>>> The other nodes have the addresses 172.20.1.2/24, 172.20.1.3/24
+>>>>>>> and 172.20.1.4/24 respectively.
+>>>>>>>
+>>>>>>> Then on node A, I'm doing:
+>>>>>>>
+>>>>>>> ping 172.20.1.2 # neighboring node B works
+>>>>>>> ping 172.20.1.4 # neighboring node D works
+>>>>>>> ping 172.20.1.3 # remote node C works only if I disable
+>>>>>>> offloading      
 >>>>>>
->>>>>> Indeed, so MPTCP communication should be restricted the same way as TCP.
->>>>>> AFAICS this should be intuitive for MPTCP users and it'll be better
->>>>>> to let userland define this dependency.
+>>>>>> BTW, it's enough to disable the offloading of the forwarding for
+>>>>>> HSR frames to make it work.
+>>>>>>
+>>>>>> --- a/drivers/net/dsa/microchip/ksz9477.c
+>>>>>> +++ b/drivers/net/dsa/microchip/ksz9477.c
+>>>>>> @@ -1267,7 +1267,7 @@ int ksz9477_tc_cbs_set_cinc(struct
+>>>>>> ksz_device *dev, int port, u32 val)
+>>>>>>   * Moreover, the NETIF_F_HW_HSR_FWD feature is also enabled, as
+>>>>>> HSR frames
+>>>>>>   * can be forwarded in the switch fabric between HSR ports.
+>>>>>>   */
+>>>>>> -#define KSZ9477_SUPPORTED_HSR_FEATURES (NETIF_F_HW_HSR_DUP |
+>>>>>> NETIF_F_HW_HSR_FWD)
+>>>>>> +#define KSZ9477_SUPPORTED_HSR_FEATURES (NETIF_F_HW_HSR_DUP)
+>>>>>>
+>>>>>>  void ksz9477_hsr_join(struct dsa_switch *ds, int port, struct
+>>>>>> net_device *hsr)
+>>>>>>  {
+>>>>>> @@ -1279,16 +1279,6 @@ void ksz9477_hsr_join(struct dsa_switch
+>>>>>> *ds, int port, struct net_device *hsr)
+>>>>>>         /* Program which port(s) shall support HSR */
+>>>>>>         ksz_rmw32(dev, REG_HSR_PORT_MAP__4, BIT(port),
+>>>>>> BIT(port));
+>>>>>>
+>>>>>> -       /* Forward frames between HSR ports (i.e. bridge together
+>>>>>> HSR ports) */
+>>>>>> -       if (dev->hsr_ports) {
+>>>>>> -               dsa_hsr_foreach_port(hsr_dp, ds, hsr)
+>>>>>> -                       hsr_ports |= BIT(hsr_dp->index);
+>>>>>> -
+>>>>>> -               hsr_ports |= BIT(dsa_upstream_port(ds, port));
+>>>>>> -               dsa_hsr_foreach_port(hsr_dp, ds, hsr)
+>>>>>> -                       ksz9477_cfg_port_member(dev,
+>>>>>> hsr_dp->index, hsr_ports);
+>>>>>> -       }
+>>>>>> -
+>>>>>>         if (!dev->hsr_ports) {
+>>>>>>                 /* Enable discarding of received HSR frames */
+>>>>>>                 ksz_read8(dev, REG_HSR_ALU_CTRL_0__1, &data);    
 >>>>>
->>>>> Yes, I think that would make more sense.
+>>>>> This means that KSZ9477 forwarding is dropping frames when HW
+>>>>> acceleration is used (for non "neighbour" nodes).
 >>>>>
->>>>> I guess we can look at MPTCP as TCP with extra features.
+>>>>> On my setup I only had 2 KSZ9477 devel boards.
+>>>>>
+>>>>> And as you wrote - the SW based one works, so extending
+>>>>> https://elixir.bootlin.com/linux/v6.12-rc2/source/tools/testing/selftests/net/hsr
+>>>>>
+>>>>> would not help in this case.    
 >>>>
->>>> Yeap
+>>>> I see. With two boards you can't test the accelerated forwarding.
+>>>> So how did you test the forwarding at all? Or are you telling me,
+>>>> that this was added to the driver without prior testing (which
+>>>> seems a bit bold and unusual)?  
+>>>
+>>> The packet forwarding is for generating two frames copies on two HSR
+>>> coupled ports on a single KSZ9477:  
+>>
+>> Isn't that what duplication aka NETIF_F_HW_HSR_DUP is for?
+> 
+> As I mentioned - the NETIF_F_HW_HSR_DUP is to remove duplicated frames.
+> 
+> NETIF_F_HW_HSR_FWD is to in-hw generate frame copy for HSR port to be
+> sent:
+> https://elixir.bootlin.com/linux/v6.13/source/drivers/net/dsa/microchip/ksz9477.c#L1252
+
+Ok, so you are using a different definition for the "forwarding". What
+puzzles me is the explanation for the HSR feature flags here [1]. They
+seem to suggest the following, which differs from your explanation:
+
+Forwarding (aka NETIF_F_HW_HSR_FWD):
+
+"Forwarding involves automatically forwarding between redundant ports in
+an HSR."
+
+This sounds more like the "forwarding" of a HSR frame within the Ring,
+between two HSR ports, that I was thinking of.
+
+Duplication (aka NETIF_F_HW_HSR_DUP):
+
+"Duplication involves the switch automatically sending a single frame
+from the CPU port to both redundant ports."
+
+This is contradictory to what you wrote above and sounds more
+reasonable. This is what you instead call forwarding above.
+
+Are you mixing things up, here? Am I completely on the wrong track? I'm
+just trying to understand the basics here.
+
+>>
+>>>
+>>> https://ww1.microchip.com/downloads/aemDocuments/documents/UNG/ApplicationNotes/ApplicationNotes/AN3474-KSZ9477-High-Availability-Seamless-Redundancy-Application-Note-00003474A.pdf
+>>>
+>>> The KSZ9477 chip also supports RX packet duplication removal, but
+>>> cannot guarantee 100% success (so as a fallback it is done in SW).
+>>>
+>>> The infrastructure from:
+>>> https://elixir.bootlin.com/linux/v6.13/source/tools/testing/selftests/net/hsr/hsr_redbox.sh#L50
+>>>
+>>> is enough to test HW accelerated forwarding (of KSZ9477) from NS1
+>>> and NS2.  
+>>
+>> I'm not really sure if I get it. In this setup NS1 and NS2 are
+>> connected via HSR link (two physical links). On one side packets are
+>> sent duplicated on both physical ports. On the receiving side the
+>> duplication is removed and one packet is forwarded to the CPU.
+>>
+>> Where is forwarding involved here? 
+> 
+> In-HW forwarding is when KSZ9477 duplicates frame to be send on second
+> HSR aware port.
+> 
+> (only 2 of them can be coupled to have in-hw support for duplication
+> and forwarding. Creating more hsr "interfaces" would just use SW).
+> 
+>> Isn't forwarding only for cases
+>> with one intermediate node between the sending and receiving node?
+> 
+> This kind of "forwarding" is done in software in the hsr driver.
+
+But according to the official explanation of the flags [1] this kind of
+forwarding is exactly what NETIF_F_HW_HSR_FWD seems to be about.
+
+> 
+>>
+>>>   
 >>>>
->>>>>
->>>>> So if TCP is blocked, MPTCP should be blocked as well. (And eventually
->>>>> having the possibility to block only TCP but not MPTCP and the opposite,
->>>>> but that's a different topic: a possible new feature, but not a bug-fix)
->>>> What do you mean by the "bug fix"?
+>>>> Anyway, do you have any suggestions for debugging this?
+>>>> Unfortunately I know almost nothing about this topic. But I can
+>>>> offer to test on my setup, at least for now. I don't know how long
+>>>> I will still have access to the hardware.  
+>>>
+>>> For some reason only frames to neighbours are delivered.
+>>>
+>>> So those are removed at some point (either in KSZ9477 HW or in HSR
+>>> driver itself).
+>>>
+>>> Do you have some dumps from tshark/wireshark to share?
+>>>   
 >>>>
->>>>>
->>>>>>>>>> * IPv6 -> IPv4 transformation for TCP and UDP sockets withon
->>>>>>>>>>      IPV6_ADDRFORM. Can be controlled with setsockopt() security hook.
+>>>> If we can't find a proper solution in the long run, I will probably
+>>>> send a patch to disable the accelerated forwarding to at least make
+>>>> HSR work by default.  
 >>>
->>> According to the man page: "It is allowed only for IPv6 sockets that are
->>> connected and bound to a v4-mapped-on-v6 address."
->>>
->>> This compatibility feature makes sense from user space point of view and
->>> should not result in an error because of Landlock.
->>>
->>>>>>>>>>
->>>>>>>>>> As I said before, I wonder if user may want to use SMC or MPTCP and
->>>>>>>>>> deny
->>>>>>>>>> TCP communication, since he should rely on fallback transformation
->>>>>>>>>> during the connection in the common case. It may be unexpected for
->>>>>>>>>> connect(2) to fail during the fallback due to security politics.
->>>>>>>>>
->>>>>>>>> With MPTCP, fallbacks can happen at the beginning of a connection, when
->>>>>>>>> there is only one path. This is done after the userspace's
->>>>>>>>> connect(). If
->>>
->>> A remaining question is then, can we repurpose an MPTCP socket that did
->>> fallback to TCP, to (re)connect to another destination (this time
->>> directly with TCP)?
+>>> As I've noted above - the HW accelerated forwarding is in the
+>>> KSZ9477 chip.  
 >>
->> If the socket was created with the IPPROTO_MPTCP protocol, the protocol
->> will not change after a disconnection. But still, with an MPTCP socket,
->> it is by design possible to connect to a TCP one no mater how the socket
->> was used before.
+>> Yeah, but if the HW accelerated forwarding doesn't work
 > 
-> OK, this makes sense if we see MPTCP as a superset of TCP.
+> The "forwarding" in KSZ9477 IC works OK, as frames are duplicated (i.e.
+> forwarded) to both HSR coupled ports.
+
+No, I don't think duplication and forwarding refer to the same thing
+here. At least it doesn't make sense for me.
+
+> The problem is with dropping frames travelling in connected KSZ9477
+> devices.
+
+I'm not really sure.
+
 > 
->>
->>> I guess this is possible.  If it is the case, I think it should be OK
->>> anyway.  That could be used by an attacker, but that should not give
->>> more access because of the MPTCP fallback mechanism anyway.  We should
->>> see MPTCP as a superset of TCP.  At the end, security policy is in the
->>> hands of user space.
->>
->> As long as it is documented and not seen as a regression :)
->>
->> To me, it sounds strange to have to add extra rules for MPTCP if TCP is
->> blocked, but that's certainly because I see MPTCP like it is seen on the
->> wire: as an extension to TCP, not as a different protocol.
+>> it would be
+>> better to use no acceleration and have it work in SW at least by
+>> default, right?
 > 
-> I understand.  For Landlock, I'd prefer to not add exceptions according
-> to protocol implementations, but to define a security policy that could
-> easily map to user space code.  The current proposal is to map the
-> Landlock API to (a superset of) the socket(2) API, and then being able
-> to specify restrictions on a domain, a type, or a protocol.  However, we
-> could document and encourage users to only specify AF_INET/AF_INET6 +
-> SOCK_STREAM but without specifying any protocol (not "0" but a wildcard
-> "(u64)-1"), which would then implicitly allow TCP and MPTCP.
+> IMHO, it would be best to fix the code.
 
-Good idea!
+Agreed.
 
-Cheers,
-Matt
--- 
-Sponsored by the NGI0 Core fund.
+>>
+>>>
+>>> The code which you uncomment, is following what I've understood from
+>>> the standard (and maybe the bug is somewhere there).  
+>>
+>> Ok, thanks for explaining. I will see if I can find some time to
+>> gather some more information on the problem.
+> 
+> That would be very helpful. Thanks in advance for it.
+One more information I just found out: I can leave ksz9477_hsr_join()
+untouched and only remove the feature flags from
+KSZ9477_SUPPORTED_HSR_FEATURES to make things work.
 
+Broken:
+
+#define KSZ9477_SUPPORTED_HSR_FEATURES (NETIF_F_HW_HSR_DUP |
+NETIF_F_HW_HSR_FWD)
+
+Works:
+
+#define KSZ9477_SUPPORTED_HSR_FEATURES (NETIF_F_HW_HSR_DUP)
+
+Works:
+
+#define KSZ9477_SUPPORTED_HSR_FEATURES (NETIF_F_HW_HSR_FWD)
+
+Works:
+
+#define KSZ9477_SUPPORTED_HSR_FEATURES (0)
+
+Thanks
+Frieder
+
+[1]
+https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/commit?id=dcf0cd1cc58b8e88793ad6531db9b3a47324ca09
 
