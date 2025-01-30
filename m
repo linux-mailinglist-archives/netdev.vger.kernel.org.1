@@ -1,179 +1,275 @@
-Return-Path: <netdev+bounces-161699-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-161700-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 11A1CA237B5
-	for <lists+netdev@lfdr.de>; Fri, 31 Jan 2025 00:17:02 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id BAC2AA237C3
+	for <lists+netdev@lfdr.de>; Fri, 31 Jan 2025 00:23:13 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 0378C3A2F34
-	for <lists+netdev@lfdr.de>; Thu, 30 Jan 2025 23:16:54 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id AA1433A574A
+	for <lists+netdev@lfdr.de>; Thu, 30 Jan 2025 23:23:05 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F20301B81C1;
-	Thu, 30 Jan 2025 23:16:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AD4511F130D;
+	Thu, 30 Jan 2025 23:23:09 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="F5VVkaEC"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="wqZ7cJrW"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f178.google.com (mail-pl1-f178.google.com [209.85.214.178])
+Received: from mail-pl1-f171.google.com (mail-pl1-f171.google.com [209.85.214.171])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6F3551AE01B;
-	Thu, 30 Jan 2025 23:16:57 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.178
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C88F71D7E5F
+	for <netdev@vger.kernel.org>; Thu, 30 Jan 2025 23:23:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.171
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1738279018; cv=none; b=eka3HERzqDxb6hHXIl0fHcxSKWEeWgDcA7VgR8U31kjnQYAuPVIiCO8Kpm4sMdQeQcHSOXS+ckDuhL0rXhVdPzP9WGd9QjcEkowNI1a0UK0ff1hw5W0E5UfA+TaK4dz43SqW08LY9wQBl1L0j/CSY4p+7G15DrU4NPtpGKpcA+w=
+	t=1738279389; cv=none; b=TATX5HHTUxMAAExPHzTR9ibXzntMV9A0dJvLdF8LMgi7j0XdPvhtChBtHZp2vFG06leJcni0C32y74+JY22qAMEm/USR4fKA/9vSiQ+EQ5KGfgVS8imwtFhgeDXEnM/W5jEwnZgMvN1hTSl8cuBT951nQXPT2n+8lARzBzcMM+A=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1738279018; c=relaxed/simple;
-	bh=wo+wStWFEQrrBjO1OBO/vWO6WU339RRuHvfA7tbjhlk=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=OPaH0lXLe5/1atNy9lKDVlAOe+3DpNAHVX/B43iflgGaQqvr1gC0/ERRp7QsIoO72j+O4k7bftq9a2ymy97PKSzP3H5XaZteTiVGvw28aOk4X47g0MTF4Dje6fo1cL6Irlh1va1br4QvEBBgdF0D6/xjA2BUAvXbrP+Yct7CG9Q=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=F5VVkaEC; arc=none smtp.client-ip=209.85.214.178
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pl1-f178.google.com with SMTP id d9443c01a7336-2166360285dso23421475ad.1;
-        Thu, 30 Jan 2025 15:16:57 -0800 (PST)
+	s=arc-20240116; t=1738279389; c=relaxed/simple;
+	bh=l3pLSAMR5hyZwynYjVj0f5+5gQyw1x0yVwTtSl3x4CE=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=A/la2TFzL5R2FnusxbCPriZLudgibYZhlpJJVNSfzI4kW/lfIdX/4EVD3Y0IxhEwL1z6AOK2Pd5BNA/LW01FfZ8yj5gxWP6315GkXB3dQdZC5c8T6v8F+Eda7HtD1MYfBh5CgAXU8wheV8b39MgUgHH2imSCtNb549S5W36cvD8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=wqZ7cJrW; arc=none smtp.client-ip=209.85.214.171
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-pl1-f171.google.com with SMTP id d9443c01a7336-21625b4f978so47335ad.0
+        for <netdev@vger.kernel.org>; Thu, 30 Jan 2025 15:23:07 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1738279017; x=1738883817; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=Tbqava3jtlaDprzajGDs9SGnWXc8v9IpGNHGKUCgKIc=;
-        b=F5VVkaECbA7pvOzbCFpwTSeGVTZ6/fWt11sGfCW+YvJLxjHJDMvN4MnzQ2HhF5TVij
-         18qJ3okTM5tacy2k3ul0CvZKJYu0xwnSYmG2OGwOHWR6K911xWFKA2aWYNrSz3T12C6B
-         4uIc+WyD8dViP+bQuqwFy8C9ifMX3ncq9XJ9KA8oLBB2aqU7ivpIB92rbpj7PHvhkm7A
-         ATGCPqeBe8Rfymxojv75rCHldHApp809/JzD8vZfhfivk2yMq49uT53lpDaI+s7TYJJE
-         JVsFZYKUf3TOzkwOP1vv7rkHxK5Z/d/Lfh4tLxsbN4jGpVUpOsvetuL/65yoLja8IoxU
-         6mVQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1738279017; x=1738883817;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+        d=google.com; s=20230601; t=1738279387; x=1738884187; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=Tbqava3jtlaDprzajGDs9SGnWXc8v9IpGNHGKUCgKIc=;
-        b=sPaznHmHvqJEs9n54g3KknE/E35M0yLh0Vb1d9i8r6Gwq1JeluIcSkxOqZ1QEGZ/nD
-         jRf9rDWF84N2SdHyuDAUEnoBW9mZrNxTZKq00s5IYlQl1oOBYV/OgVmFwsrW7fahFVUj
-         x+BTldaG0aP2VTuXB6G+iiVatDxGomITdkrNxYo5V5B8kVDORljuUbDeNGANXZAyoiq7
-         E2VgY8uPLJqL+3lxXAHo7OX5J/qzEHfrJ3tq1GZezJz6WvH54nBa3tRaGiypfOieyH5p
-         PQ7+yOkMzpM1ZrUrc4OKayna+W+vrSA3AS+m7H/0Paulju8WdqOC+yWIPzidejr36OZj
-         cx3w==
-X-Forwarded-Encrypted: i=1; AJvYcCVmQqb+K8E+wdeO1vIKXCJEAZdTmr/xVXhS9mbGtjVw35XzBitjWDHnF5gxfuqmOyr1Iwo=@vger.kernel.org, AJvYcCW590mvGS21k8foh+qfk07pgPJvp0+hrsQdUh3UPgG8sR6k+BqzGZsjIcDeFg74frFBME6LChOsGQWYbwGz@vger.kernel.org
-X-Gm-Message-State: AOJu0YyGKXf7H320lzeYi+JCwGPAvx8716+G4FKLOPfLkAXLshKd3wft
-	nNiPiZgQqoSaon00uraVmGg2T8qskU9eJF0qqvH+dtrzXIPcGrbHbyox
-X-Gm-Gg: ASbGncs6K//hHnGUq9vwVL4ARvBeuRXL2F5It60JNE5x9M04DDM9M93M9unE6V3qYDp
-	xjPBdaHMkYTiNJF37wHpfQ6wXXvv6Ka/yCqwnLCB2UFNv1Rry9IlCqT/cVhScWKT/eGIj2xmNNW
-	He8iDRwzxhm8xk1q8FtunWN3Tb2eQRnB7h8q0b/oIuKU36lND6UFghi3QvsznL4uP8GA0cGHEdM
-	saV/iVvKk8DVX8Vpau2x+9sD2v6p6YRPao8QtmsoRi8BPdnbK/JaFMO5vcWaFX8GlRZHcHrr1Gg
-	Xt5XfScKAfVW2xU=
-X-Google-Smtp-Source: AGHT+IE6hCBfx4/xoaxPyXHXQbecrCD/hL19H6rR5ZPSMy1Iv75zVThdZOL2MTyzyF8zrr40aso6SA==
-X-Received: by 2002:a05:6a21:3388:b0:1e0:d1db:4d8a with SMTP id adf61e73a8af0-1ed7a5f6ea8mr12515356637.10.1738279016578;
-        Thu, 30 Jan 2025 15:16:56 -0800 (PST)
-Received: from localhost ([2601:646:9e00:f56e:123b:cea3:439a:b3e3])
-        by smtp.gmail.com with UTF8SMTPSA id d2e1a72fcca58-72fe69ba38bsm2054920b3a.90.2025.01.30.15.16.56
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 30 Jan 2025 15:16:56 -0800 (PST)
-Date: Thu, 30 Jan 2025 15:16:55 -0800
-From: Stanislav Fomichev <stfomichev@gmail.com>
-To: Marcus Wichelmann <marcus.wichelmann@hetzner-cloud.de>
-Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
-	bpf@vger.kernel.org, willemdebruijn.kernel@gmail.com,
-	jasowang@redhat.com, andrew+netdev@lunn.ch, davem@davemloft.net,
-	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
-	ast@kernel.org, daniel@iogearbox.net, hawk@kernel.org,
-	john.fastabend@gmail.com
-Subject: Re: [PATCH 1/1] net: tun: add XDP metadata support
-Message-ID: <Z5wIZ2LAjz0wTWg5@mini-arch>
-References: <20250130171614.1657224-1-marcus.wichelmann@hetzner-cloud.de>
- <20250130171614.1657224-2-marcus.wichelmann@hetzner-cloud.de>
+        bh=K4RB+Jf+i5RqaVVfCNjehyqZK5R36kdLSdheWh6HH74=;
+        b=wqZ7cJrWeeOaR/VEl/1Y/Nfo68v04blrTWX5DFC87V5G2HXBFts5OIKehwft8wK7T3
+         hnu3mx8DIs3jqleiUN+/8WaQzonYRPjtXf8BL3tkTR0MjfwiyPpnpUFU0Z0eZecCwqFR
+         NoEgIi23r03IN2s9ul6WVuOKrVYQjC88+d2n0paldltglATbxXIuoH3zZSsmqOmOCT+l
+         RP79bAla9RUMjl/c6ykyPVwOnT743KJ+wGurWWK5P8rSDXz1TvKxDSADUHK+fLbu59Nt
+         FU8SPbes1kEhEPKh1dFW6haQfQdjeTJD8Uj/cRxNzgxYdCXR2sfWeQh1SKKk3l5BGPoT
+         tCYw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1738279387; x=1738884187;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=K4RB+Jf+i5RqaVVfCNjehyqZK5R36kdLSdheWh6HH74=;
+        b=m2E0JIeteMGbSuMP/M4hmcFt4O3QNJ9yfGyUm8NjLHlZbNvFimhEXGSTK9XOUy7AWn
+         VKhAjbt/DcVxRM1FYaI6Qy9De8UL58jKKmU4CKnBCQWcPBSzScAHOBeEfUGl3mRZzhXC
+         98rYlpkBJEiSTOTY9te3R8V4mGlqkxakBpcMP5EquyIa/z7H4QeZWTtIbp+ImlohbXrJ
+         cVnZbsNqeYpZRv7Hg5ceC3RTr01CwI8sdfmJe3w01rvgnCLGRqcWEh92ABeAttc6+8A9
+         m6Ber4rtfgbLukEh3Ix8OXivtEaNkL06GUm/O7vbKqWSONCan90E/UD05oNnkwTQ4XnT
+         dBdA==
+X-Gm-Message-State: AOJu0Yz3B0IciMMUG8vqjjQkqtn/kJEsEay3pC4U66p9/LHhOLYL1Tl8
+	4zuC/zAnTkUMRDJNaj9o8hbq7ypK8SeWlwoT/12BmmcAVx21P/DcksWz1LdrwPfWbBok04Lol02
+	+pfqI7gum5/MC2+Y7IxcisySEV89IlSbAfrIe
+X-Gm-Gg: ASbGncvn7rU3Pr+Ty4ly9v0GpspMkyFeOwenxt1vk2xQ4Qa/3qjd27rXHvjR7VUxm4Y
+	BTJbHJvQwEMbbtk4tv+nfoT5Hj15BcN1giqok9kXe/emhmYmGU21T7u6zvXPv+bKv6r8imcnNe6
+	sso/7Dy0CQ7BH+jqLpQ+opXIfkXu0=
+X-Google-Smtp-Source: AGHT+IE/QPS22mFf0S15DpgJBmM4XVfL576eNpFPYru7l4fiKqYBqjQMzyyVnrRxZd0Rnz4Q8ehW/Qpmn9SwV7Q1bns=
+X-Received: by 2002:a17:902:8343:b0:215:79b5:aa7e with SMTP id
+ d9443c01a7336-21edf0435c0mr348145ad.13.1738279386767; Thu, 30 Jan 2025
+ 15:23:06 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20250130171614.1657224-2-marcus.wichelmann@hetzner-cloud.de>
+References: <20250130211539.428952-1-almasrymina@google.com>
+ <20250130211539.428952-2-almasrymina@google.com> <Z5wEPlsRoU6Kx9S-@mini-arch>
+In-Reply-To: <Z5wEPlsRoU6Kx9S-@mini-arch>
+From: Mina Almasry <almasrymina@google.com>
+Date: Thu, 30 Jan 2025 15:22:53 -0800
+X-Gm-Features: AWEUYZkqj5XooHiN2tyUua1n1f68bkkfjeEH2K8q451D_O0CCPBOyX4tiBp941s
+Message-ID: <CAHS8izMKdcpQkWjmP9OmQFox2CFvZyJVnKG9k9YAdmLYPn6bPw@mail.gmail.com>
+Subject: Re: [PATCH RFC net-next v2 1/6] net: add devmem TCP TX documentation
+To: Stanislav Fomichev <stfomichev@gmail.com>
+Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	linux-doc@vger.kernel.org, kvm@vger.kernel.org, 
+	virtualization@lists.linux.dev, linux-kselftest@vger.kernel.org, 
+	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, 
+	Donald Hunter <donald.hunter@gmail.com>, Jonathan Corbet <corbet@lwn.net>, 
+	Andrew Lunn <andrew+netdev@lunn.ch>, David Ahern <dsahern@kernel.org>, 
+	Stefan Hajnoczi <stefanha@redhat.com>, Stefano Garzarella <sgarzare@redhat.com>, 
+	"Michael S. Tsirkin" <mst@redhat.com>, Jason Wang <jasowang@redhat.com>, 
+	Xuan Zhuo <xuanzhuo@linux.alibaba.com>, =?UTF-8?Q?Eugenio_P=C3=A9rez?= <eperezma@redhat.com>, 
+	Shuah Khan <shuah@kernel.org>, sdf@fomichev.me, asml.silence@gmail.com, dw@davidwei.uk, 
+	Jamal Hadi Salim <jhs@mojatatu.com>, Victor Nogueira <victor@mojatatu.com>, 
+	Pedro Tammela <pctammela@mojatatu.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On 01/30, Marcus Wichelmann wrote:
-> Enable the support for bpf_xdp_adjust_meta for XDP buffers initialized
-> by the tun driver. This is useful to pass metadata from an XDP program
-> that's attached to a tap device to following XDP/TC programs.
-> 
-> When used together with vhost_net, the batched XDP buffers were already
-> initialized with metadata support by the vhost_net driver, but the
-> metadata was not yet passed to the skb on XDP_PASS. So this also adds
-> the required skb_metadata_set calls.
+On Thu, Jan 30, 2025 at 2:59=E2=80=AFPM Stanislav Fomichev <stfomichev@gmai=
+l.com> wrote:
+>
+> On 01/30, Mina Almasry wrote:
+> > Add documentation outlining the usage and details of the devmem TCP TX
+> > API.
+> >
+> > Signed-off-by: Mina Almasry <almasrymina@google.com>
+> >
+> > ---
+> >
+> > v2:
+> > - Update documentation for iov_base is the dmabuf offset (Stan)
+> > ---
+> >  Documentation/networking/devmem.rst | 144 +++++++++++++++++++++++++++-
+> >  1 file changed, 140 insertions(+), 4 deletions(-)
+> >
+> > diff --git a/Documentation/networking/devmem.rst b/Documentation/networ=
+king/devmem.rst
+> > index d95363645331..8166fe09da13 100644
+> > --- a/Documentation/networking/devmem.rst
+> > +++ b/Documentation/networking/devmem.rst
+> > @@ -62,15 +62,15 @@ More Info
+> >      https://lore.kernel.org/netdev/20240831004313.3713467-1-almasrymin=
+a@google.com/
+> >
+> >
+> > -Interface
+> > -=3D=3D=3D=3D=3D=3D=3D=3D=3D
+> > +RX Interface
+> > +=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
+> >
+> >
+> >  Example
+> >  -------
+> >
+> > -tools/testing/selftests/net/ncdevmem.c:do_server shows an example of s=
+etting up
+> > -the RX path of this API.
+> > +./tools/testing/selftests/drivers/net/hw/ncdevmem:do_server shows an e=
+xample of
+> > +setting up the RX path of this API.
+> >
+> >
+> >  NIC Setup
+> > @@ -235,6 +235,142 @@ can be less than the tokens provided by the user =
+in case of:
+> >  (a) an internal kernel leak bug.
+> >  (b) the user passed more than 1024 frags.
+> >
+> > +TX Interface
+> > +=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
+> > +
+> > +
+> > +Example
+> > +-------
+> > +
+> > +./tools/testing/selftests/drivers/net/hw/ncdevmem:do_client shows an e=
+xample of
+> > +setting up the TX path of this API.
+> > +
+> > +
+> > +NIC Setup
+> > +---------
+> > +
+> > +The user must bind a TX dmabuf to a given NIC using the netlink API::
+> > +
+> > +        struct netdev_bind_tx_req *req =3D NULL;
+> > +        struct netdev_bind_tx_rsp *rsp =3D NULL;
+> > +        struct ynl_error yerr;
+> > +
+> > +        *ys =3D ynl_sock_create(&ynl_netdev_family, &yerr);
+> > +
+> > +        req =3D netdev_bind_tx_req_alloc();
+> > +        netdev_bind_tx_req_set_ifindex(req, ifindex);
+> > +        netdev_bind_tx_req_set_fd(req, dmabuf_fd);
+> > +
+> > +        rsp =3D netdev_bind_tx(*ys, req);
+> > +
+> > +        tx_dmabuf_id =3D rsp->id;
+> > +
+> > +
+> > +The netlink API returns a dmabuf_id: a unique ID that refers to this d=
+mabuf
+> > +that has been bound.
+> > +
+> > +The user can unbind the dmabuf from the netdevice by closing the netli=
+nk socket
+> > +that established the binding. We do this so that the binding is automa=
+tically
+> > +unbound even if the userspace process crashes.
+> > +
+> > +Note that any reasonably well-behaved dmabuf from any exporter should =
+work with
+> > +devmem TCP, even if the dmabuf is not actually backed by devmem. An ex=
+ample of
+> > +this is udmabuf, which wraps user memory (non-devmem) in a dmabuf.
+> > +
+> > +Socket Setup
+> > +------------
+> > +
+> > +The user application must use MSG_ZEROCOPY flag when sending devmem TC=
+P. Devmem
+> > +cannot be copied by the kernel, so the semantics of the devmem TX are =
+similar
+> > +to the semantics of MSG_ZEROCOPY.
+> > +
+> > +     ret =3D setsockopt(socket_fd, SOL_SOCKET, SO_ZEROCOPY, &opt, size=
+of(opt));
+> > +
+> > +Sending data
+> > +--------------
+> > +
+> > +Devmem data is sent using the SCM_DEVMEM_DMABUF cmsg.
+> > +
+> > +The user should create a msghdr where,
+> > +
+> > +iov_base is set to the offset into the dmabuf to start sending from.
+> > +iov_len is set to the number of bytes to be sent from the dmabuf.
+> > +
+> > +The user passes the dma-buf id to send from via the dmabuf_tx_cmsg.dma=
+buf_id.
+> > +
+> > +The example below sends 1024 bytes from offset 100 into the dmabuf, an=
+d 2048
+> > +from offset 2000 into the dmabuf. The dmabuf to send from is tx_dmabuf=
+_id::
+> > +
+> > +       char ctrl_data[CMSG_SPACE(sizeof(struct dmabuf_tx_cmsg))];
+> > +       struct dmabuf_tx_cmsg ddmabuf;
+> > +       struct msghdr msg =3D {};
+> > +       struct cmsghdr *cmsg;
+> > +       struct iovec iov[2];
+> > +
+> > +       iov[0].iov_base =3D (void*)100;
+> > +       iov[0].iov_len =3D 1024;
+> > +       iov[1].iov_base =3D (void*)2000;
+> > +       iov[1].iov_len =3D 2048;
+> > +
+> > +       msg.msg_iov =3D iov;
+> > +       msg.msg_iovlen =3D 2;
+> > +
+> > +       msg.msg_control =3D ctrl_data;
+> > +       msg.msg_controllen =3D sizeof(ctrl_data);
+> > +
+> > +       cmsg =3D CMSG_FIRSTHDR(&msg);
+> > +       cmsg->cmsg_level =3D SOL_SOCKET;
+> > +       cmsg->cmsg_type =3D SCM_DEVMEM_DMABUF;
+> > +       cmsg->cmsg_len =3D CMSG_LEN(sizeof(struct dmabuf_tx_cmsg));
+> > +
+> > +       ddmabuf.dmabuf_id =3D tx_dmabuf_id;
+> > +
+> > +       *((struct dmabuf_tx_cmsg *)CMSG_DATA(cmsg)) =3D ddmabuf;
+>
+> [..]
+>
+> > +       sendmsg(socket_fd, &msg, MSG_ZEROCOPY);
+>
+> Not super important, but any reason not to use MSG_SOCK_DEVMEM as a
+> flag? We already use it for recvmsg, seems logical to mirror the same
+> flag on the transmit side?
 
-Can you expand more on what kind of metadata is present with vhost_net
-and who fills it in? Is it virtio header stuff? I wonder how you
-want to consume it..
+Only to remove redundancy, and the possible confusion that could
+arise, and the extra checks needed to catch invalid input.
 
-Can you also add a selftest to use this new functionality?
+With this, the user tells the kernel to send from the dmabuf by
+supplying the SCM_DEVMEM_DMABUF cmsg. If we add another signal like
+MSG_SOCK_DEVMEM, there is room for the user to supply the cmg but not
+the flag (confusion), and the kernel needs to have the code and
+overhead to check that both the flag and the cmsg are provided.
 
-> Signed-off-by: Marcus Wichelmann <marcus.wichelmann@hetzner-cloud.de>
-> ---
->  drivers/net/tun.c | 23 ++++++++++++++++++-----
->  1 file changed, 18 insertions(+), 5 deletions(-)
-> 
-> diff --git a/drivers/net/tun.c b/drivers/net/tun.c
-> index e816aaba8..d3cfea40a 100644
-> --- a/drivers/net/tun.c
-> +++ b/drivers/net/tun.c
-> @@ -1600,7 +1600,8 @@ static bool tun_can_build_skb(struct tun_struct *tun, struct tun_file *tfile,
->  
->  static struct sk_buff *__tun_build_skb(struct tun_file *tfile,
->  				       struct page_frag *alloc_frag, char *buf,
-> -				       int buflen, int len, int pad)
-> +				       int buflen, int len, int pad,
-> +				       int metasize)
->  {
->  	struct sk_buff *skb = build_skb(buf, buflen);
->  
-> @@ -1609,6 +1610,8 @@ static struct sk_buff *__tun_build_skb(struct tun_file *tfile,
->  
->  	skb_reserve(skb, pad);
->  	skb_put(skb, len);
-> +	if (metasize)
-> +		skb_metadata_set(skb, metasize);
->  	skb_set_owner_w(skb, tfile->socket.sk);
->  
->  	get_page(alloc_frag->page);
-> @@ -1668,6 +1671,7 @@ static struct sk_buff *tun_build_skb(struct tun_struct *tun,
->  	char *buf;
->  	size_t copied;
->  	int pad = TUN_RX_PAD;
-> +	int metasize = 0;
->  	int err = 0;
->  
->  	rcu_read_lock();
-> @@ -1695,7 +1699,7 @@ static struct sk_buff *tun_build_skb(struct tun_struct *tun,
->  	if (hdr->gso_type || !xdp_prog) {
->  		*skb_xdp = 1;
->  		return __tun_build_skb(tfile, alloc_frag, buf, buflen, len,
-> -				       pad);
-> +				       pad, metasize);
->  	}
->  
->  	*skb_xdp = 0;
-> @@ -1709,7 +1713,7 @@ static struct sk_buff *tun_build_skb(struct tun_struct *tun,
->  		u32 act;
->  
->  		xdp_init_buff(&xdp, buflen, &tfile->xdp_rxq);
-> -		xdp_prepare_buff(&xdp, buf, pad, len, false);
-> +		xdp_prepare_buff(&xdp, buf, pad, len, true);
->  
->  		act = bpf_prog_run_xdp(xdp_prog, &xdp);
->  		if (act == XDP_REDIRECT || act == XDP_TX) {
-> @@ -1730,12 +1734,16 @@ static struct sk_buff *tun_build_skb(struct tun_struct *tun,
->  
->  		pad = xdp.data - xdp.data_hard_start;
->  		len = xdp.data_end - xdp.data;
-> +
-> +		metasize = xdp.data - xdp.data_meta;
-
-[..]
-
-> +		metasize = metasize > 0 ? metasize : 0;
-
-Why is this part needed?
+--=20
+Thanks,
+Mina
 
