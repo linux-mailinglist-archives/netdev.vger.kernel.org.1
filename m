@@ -1,57 +1,63 @@
-Return-Path: <netdev+bounces-161617-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-161618-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9B151A22B96
-	for <lists+netdev@lfdr.de>; Thu, 30 Jan 2025 11:28:20 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id E5A23A22BAB
+	for <lists+netdev@lfdr.de>; Thu, 30 Jan 2025 11:35:55 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A0ED13A938C
-	for <lists+netdev@lfdr.de>; Thu, 30 Jan 2025 10:28:12 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 4D78C167A40
+	for <lists+netdev@lfdr.de>; Thu, 30 Jan 2025 10:35:54 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A0CFF1B87CF;
-	Thu, 30 Jan 2025 10:28:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7B1791BBBCA;
+	Thu, 30 Jan 2025 10:35:51 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="QPVKRosm"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="RNGCKl4S"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7AF8B1ADFE0
-	for <netdev@vger.kernel.org>; Thu, 30 Jan 2025 10:28:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 49759185955;
+	Thu, 30 Jan 2025 10:35:50 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1738232897; cv=none; b=eT0di7GFaRTyQbcx+vv9o/yCFFEYzIrJ34ZyraUcicKnH6e2bIsH7sGEhL+u17ORieGF0X29Pc6mt7d4WzaA/Y3Zqy105wcQyCAGGmu09PG2cmXNMyCN9TljO/lv4DwqyuzsISf6oCGdyHr/Aa4F6TSSy7bvvcyDLLpqFW5L16g=
+	t=1738233351; cv=none; b=AGuNKJx9hNEQvxR/4VRw94NQoPBzlMZ7MfL2+EPWLbL7nYFne7Yc0rIsg7t/WUwKYp216yusR1ib7UTZEs2uFGyiQVlXyFuPJU2Ri9PlRZHjCSLa1HSc6auG95Oz8RR/F95uKnD989rrc92eHt9xJorQrFs5pTYVK54ZJx0kWtI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1738232897; c=relaxed/simple;
-	bh=fx5mvH5yM6eCNfabGNwHfvXE+wD6v7NjQ0aCgT82TEY=;
+	s=arc-20240116; t=1738233351; c=relaxed/simple;
+	bh=8JZcVpcGWcqfEFuX82FHVX+6WV6k8ISLrVwBtu4Esoo=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=WnKWmkQ621n+1ayPb8iX6tPLHY1EZlaGi0a+HJn85Ou22yjUaeGVECwPR9hu+4lQ8oodZJZvkYIBfoFzghGHCk8MRRKOjHugn/4OlIVpITAFmWNuj9f1SfDQgaz8UTUi/oRFM5lBi1qEuWjwWE9kFOX1jmXwPqKb049q7Vaxg6M=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=QPVKRosm; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5992BC4CED2;
-	Thu, 30 Jan 2025 10:28:15 +0000 (UTC)
+	 Content-Type:Content-Disposition:In-Reply-To; b=d3ILwKm0eNaJbMUgLxE5iZDi12ekqbIM78+WEEcRr0umgka8EH9N6GZfy9JATlcJDNbcVTaaM9SBFHfgKXiFayKHT6mX8Xni+eSYUwMjcNODuqHTZMPk2HhNPfVEV2eIllODFaNzg4y4ByINBMeHrd0O0mQBwhuPuyhwX7HmLLE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=RNGCKl4S; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1F456C4CED2;
+	Thu, 30 Jan 2025 10:35:46 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1738232897;
-	bh=fx5mvH5yM6eCNfabGNwHfvXE+wD6v7NjQ0aCgT82TEY=;
+	s=k20201202; t=1738233350;
+	bh=8JZcVpcGWcqfEFuX82FHVX+6WV6k8ISLrVwBtu4Esoo=;
 	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=QPVKRosmmf237YNc0d0BX/E8A0y4DVGSnAD6nS9Xwsh3QRU9TRFSD/bF3gmp3Xtcu
-	 mhYWVQ/vRb8mrZR1O2QGrsxG4o7GKtNqW7tdvWPgxPLAPz2glig01+ppAkoVLfn4jI
-	 qqrM5pDUn2XsLCZ82XsB7C8yb2b3lJuUpENu8orGqWZ6PBoENYxRuBTTNb1UpOXCTi
-	 wie6OcfnBniF+dWT5DAdQPed2LXiwjxYnUnWSQCKr2y3T2yMbZkAxqsumKynYJC/Sr
-	 i0NF2HF/NwS+QRb9VFOirwIwRl6VT4S1Ky21m0Oxe5MxnKpPLBx10X/mOFh1i5vK4z
-	 rWPVuOR4E+TIw==
-Date: Thu, 30 Jan 2025 10:28:13 +0000
+	b=RNGCKl4Sjf3cTNpyQiwFUw2Q3xlNGEDvKTlicGmu2Ukyk/MM4owz71fGRPSFLcAPj
+	 PsfbxL+RHQpcU6tkfw6qJdOMuRO2XjjmP9ysl/vjbIedHUxox9K94sWLnFuvDYebPp
+	 UJYA8EafEC6WqJwfUhqfkONziANCiVG23iQB+oFS8PsR+ZK0B4dfPovqfhkf06fsOK
+	 gU2FIQypX8wdGbVUa8Sh3NFN7ICgLrQ8CWUWcjAYq+zn1qvywja5oTZBE0yzIZtJC4
+	 PmhXCtsiyBRI9ZINKXMLR9DCdXeNs1i2Is9cU0/Gjkn0gX/IbSkNI/WVqOE+Fsy3ZL
+	 89+xFPl/bprrQ==
+Date: Thu, 30 Jan 2025 10:35:44 +0000
 From: Simon Horman <horms@kernel.org>
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: davem@davemloft.net, netdev@vger.kernel.org, edumazet@google.com,
-	pabeni@redhat.com, andrew+netdev@lunn.ch, dsahern@kernel.org,
-	justin.iurman@uliege.be
-Subject: Re: [PATCH net v2 2/2] net: ipv6: fix dst ref loops in rpl, seg6 and
- ioam6 lwtunnels
-Message-ID: <20250130102813.GD113107@kernel.org>
-References: <20250130031519.2716843-1-kuba@kernel.org>
- <20250130031519.2716843-2-kuba@kernel.org>
+To: Breno Leitao <leitao@debian.org>
+Cc: Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Jonathan Corbet <corbet@lwn.net>, Shuah Khan <shuah@kernel.org>,
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+	linux-doc@vger.kernel.org, linux-kselftest@vger.kernel.org,
+	rdunlap@infradead.org, kernel-team@meta.com
+Subject: Re: [PATCH RFC net-next v3 1/8] netconsole: consolidate send buffers
+ into netconsole_target struct
+Message-ID: <20250130103544.GE113107@kernel.org>
+References: <20250124-netcon_cpu-v3-0-12a0d286ba1d@debian.org>
+ <20250124-netcon_cpu-v3-1-12a0d286ba1d@debian.org>
+ <20250128161128.GB277827@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -60,39 +66,45 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20250130031519.2716843-2-kuba@kernel.org>
+In-Reply-To: <20250128161128.GB277827@kernel.org>
 
-On Wed, Jan 29, 2025 at 07:15:19PM -0800, Jakub Kicinski wrote:
-> Some lwtunnels have a dst cache for post-transformation dst.
-> If the packet destination did not change we may end up recording
-> a reference to the lwtunnel in its own cache, and the lwtunnel
-> state will never be freed.
+On Tue, Jan 28, 2025 at 04:11:28PM +0000, Simon Horman wrote:
+> On Fri, Jan 24, 2025 at 07:16:40AM -0800, Breno Leitao wrote:
+> > Move the static buffers from send_msg_no_fragmentation() and
+> > send_msg_fragmented() into the netconsole_target structure. This
+> > simplifies the code by:
+> > - Eliminating redundant static buffers
+> > - Centralizing buffer management in the target structure
+> > - Reducing memory usage by 1KB (one buffer instead of two)
+> > 
+> > The buffer in netconsole_target is protected by target_list_lock,
+> > maintaining the same synchronization semantics as the original code.
+> > 
+> > Suggested-by: Jakub Kicinski <kuba@kernel.org>
+> > Signed-off-by: Breno Leitao <leitao@debian.org>
+> > ---
+> >  drivers/net/netconsole.c | 29 +++++++++++++++--------------
+> >  1 file changed, 15 insertions(+), 14 deletions(-)
+> > 
+> > diff --git a/drivers/net/netconsole.c b/drivers/net/netconsole.c
+> > index 86ab4a42769a49eebe5dd6f01dafafc6c86ec54f..1a78704681184673f5c1ba8ae665e46751384293 100644
+> > --- a/drivers/net/netconsole.c
+> > +++ b/drivers/net/netconsole.c
+> > @@ -137,6 +137,8 @@ struct netconsole_target {
+> >  	bool			extended;
+> >  	bool			release;
+> >  	struct netpoll		np;
+> > +	/* protected by target_list_lock */
+> > +	char			buf[MAX_PRINT_CHUNK];
 > 
-> Discovered by the ioam6.sh test, kmemleak was recently fixed
-> to catch per-cpu memory leaks. I'm not sure if rpl and seg6
-> can actually hit this, but in principle I don't see why not.
+> nit: buf should also be added to the Kernel doc for this structure.
 > 
-> Fixes: 985ec6f5e623 ("net: ipv6: rpl_iptunnel: mitigate 2-realloc issue")
-> Fixes: 40475b63761a ("net: ipv6: seg6_iptunnel: mitigate 2-realloc issue")
-> Fixes: dce525185bc9 ("net: ipv6: ioam6_iptunnel: mitigate 2-realloc issue")
-> Signed-off-by: Jakub Kicinski <kuba@kernel.org>
-> ---
-> v2:
->  - fix spello in the comments
-> v1: https://lore.kernel.org/20250129021346.2333089-2-kuba@kernel.org
+> ...
 
-Hi Jakub,
+Hi Breno,
 
-This fix looks correct to me. And I believe that the double allocation
-issue raised at the cited link for v1 relates to an optimisation
-rather than a bug, so this patch seems appropriate for net without
-addressing that issue.
+With that fixed feel free to add:
 
-I am, however, unsure why the cited patches are used in the Fixes tags
-rather than the patches that added use of the cache to the output
-routines.
+Reviewed-by: Simon Horman <horms@kernel.org>
 
-e.g. af4a2209b134 ("ipv6: sr: use dst_cache in seg6_input")
-
-...
 
