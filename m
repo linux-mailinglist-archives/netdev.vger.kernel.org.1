@@ -1,60 +1,56 @@
-Return-Path: <netdev+bounces-161580-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-161581-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9DF73A22759
-	for <lists+netdev@lfdr.de>; Thu, 30 Jan 2025 01:56:38 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 06CA8A22760
+	for <lists+netdev@lfdr.de>; Thu, 30 Jan 2025 02:01:05 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 0593B164395
-	for <lists+netdev@lfdr.de>; Thu, 30 Jan 2025 00:56:37 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 1291B3A39FC
+	for <lists+netdev@lfdr.de>; Thu, 30 Jan 2025 01:00:57 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9095D182BC;
-	Thu, 30 Jan 2025 00:56:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 393817482;
+	Thu, 30 Jan 2025 01:00:59 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="JtYiQcX2"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="tqOw4eYe"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 64B0B2F5B;
-	Thu, 30 Jan 2025 00:56:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0F8C2C8FE;
+	Thu, 30 Jan 2025 01:00:59 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1738198593; cv=none; b=Ht/8q3pVyYC2NaF+Nb+nQp/lHMmjN7d47F4WNL8OpocaXn0WtNlr2SZCGKrLHHVNZUHZi9pa3ewA8O3fubvrbLSYCHVP8LFljGHE2TAYzNmPH93W09Ei9QjLi5n8RG9CC2LCpm33tszNJN5ibkLl3m+01vZjq+ArnTgIXVMH4Dg=
+	t=1738198859; cv=none; b=QKBx9lHLUrlwmNihj1FudpaRR0a1PMY5pOWu+Yrj0VylFDRk6wiQ/gLnfWJJQ1kzdGdUpC6sXXNc75AGC7vQmcDbeQ0qvws5iuXoADMPDhOVXsegyckvmFPXe1kdrqgDFhAv/bxonS0ELMIWfiw/gNxfF4Rit8PPt4Z/+sDOvII=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1738198593; c=relaxed/simple;
-	bh=RATQnFJ4yiIq994c3gK6VZsKGmFoYXBwpgXJneTRwn8=;
+	s=arc-20240116; t=1738198859; c=relaxed/simple;
+	bh=/B+JDZnEPBEY4JtpS/yo0QnKZC74bI/QnPSHlEUQ42o=;
 	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=Hauvi41wJfcrKUNX8Jc7tdq5enRLZN+41kWYbxRkA61R4T9ziUv6RVws8nyIU9NM1Tr1asJzzf/V/2bXk94OcH1hYOMpP0MOXZnWZYPd4d9wdfDdetU0DTlE8OLwlZ5FWsqVBptKYcBCsrNrgoO5PrpEzPherZ87ReeEgl5jfuY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=JtYiQcX2; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5A3D1C4CED1;
-	Thu, 30 Jan 2025 00:56:32 +0000 (UTC)
+	 MIME-Version:Content-Type; b=Ae48fvXAxAEa4wqXyOD9DWbIzb7jDkchcmyqQTV1zJAWIoSPglWD7CwCHbdiWa1JQHA6hroYjru6D8tLLzzUqIOx8Qt0N5oJvRFozzCpfhEyIC/KThoSRx9u5Z3xUTRnZOQZAYNE6gtvEl/BL0u7sjsNJ3766OuqJMnXb5IPdgI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=tqOw4eYe; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id B0471C4CED1;
+	Thu, 30 Jan 2025 01:00:58 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1738198592;
-	bh=RATQnFJ4yiIq994c3gK6VZsKGmFoYXBwpgXJneTRwn8=;
+	s=k20201202; t=1738198858;
+	bh=/B+JDZnEPBEY4JtpS/yo0QnKZC74bI/QnPSHlEUQ42o=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=JtYiQcX2MGNna3OAdzbxyK70cvNJkUQ8DBSbawlSzt1iA1b6B2qW/J5olt7MRwStv
-	 w1H5BfUkww0MIRt9lUBHoO4Eyq/2XVAiCu9fNC0c68Q/KnIc0moRSqTdloXzQrFCjp
-	 Isq7f/ZLpxZ/ZKprSHjpheAtfQTOIuSriETlmmoNLJIDTO/94zUO8KL8aI6dHZVFVp
-	 ZHW/mNsWr64X8vrLsfUYqSXS7LoWq/Y7INkLqiGZkX/L5S5L4Ft4Qs6P+PSX/dlTNB
-	 oaU1N5cW3qsatly6Sc1UelHASUZ63byzUg7P8XlNXYN4MllHB1dl1CMb8fM94GuVvY
-	 l5caLAnhoDqiw==
-Date: Wed, 29 Jan 2025 16:56:31 -0800
+	b=tqOw4eYeC2iK+0Zs+XfznXT4B+QMe/7vVFntB+GvliiUBAFjevy3NHb1D3CTsaYpV
+	 5zJLqtJ2SdLTRf4psI/txbhpR+2JGZ4iRTxtVRRMD9YcswOXRtAisp3B3FdvuqnAu0
+	 13yYcg5G/cc+5xcQtBNx9I7n6p9X0dsCB4cwx/G3gnkgo4vOu5OUlgmqoeRy+CkWJK
+	 jM1C6KB7rOqdA7D2N64dT8qI1gq252E6CFVxBQI2rRp2MFbQ1hj+imAndNdFcySrhT
+	 +6fP3eBKSrZv6C0Y28sNPl8eIkA/zI4WwHNcbPS7/DwlAxKDPkcx+BK3D44sPv2v7V
+	 KTsAax/7zTk3w==
+Date: Wed, 29 Jan 2025 17:00:57 -0800
 From: Jakub Kicinski <kuba@kernel.org>
-To: Abdullah <asharji1828@gmail.com>
-Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
- skhan@linuxfoundation.org, davem@davemloft.net, dsahern@kernel.org,
- edumazet@google.com, horms@kernel.org, pabeni@redhat.com,
- syzkaller-bugs@googlegroups.com,
- syzbot+5cfae50c0e5f2c500013@syzkaller.appspotmail.com
-Subject: Re: [PATCH v3] net: ipmr: Fix out-of-bounds access i
- mr_mfc_uses_dev()
-Message-ID: <20250129165631.50e9e58d@kernel.org>
-In-Reply-To: <20250129085017.55991-1-asharji1828@gmail.com>
-References: <678fe2d1.050a0220.15cac.00b3.GAE@google.com>
-	<20250129085017.55991-1-asharji1828@gmail.com>
+To: Pablo Neira Ayuso <pablo@netfilter.org>
+Cc: netdev@vger.kernel.org, fw@strlen.de, netfilter-devel@vger.kernel.org
+Subject: Re: [TEST] nft-flowtable-sh flaking after pulling first chunk of
+ the merge window
+Message-ID: <20250129170057.77738677@kernel.org>
+In-Reply-To: <Z5oPNA0IFd7-zBts@calendula>
+References: <20250123080444.4d92030c@kernel.org>
+	<Z5oPNA0IFd7-zBts@calendula>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -64,29 +60,35 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
 
-On Wed, 29 Jan 2025 12:50:17 +0400 Abdullah wrote:
-> The issue was reported by Syzbot as an out-of-bounds read:
-> UBSAN: array-index-out-of-bounds in net/ipv4/ipmr_base.c:289:10
-> Index -772737152 is out of range for type 'const struct vif_device[32]'
+On Wed, 29 Jan 2025 12:21:24 +0100 Pablo Neira Ayuso wrote:
+> > Could be very bad luck but after we fast forwarded net-next yesterday
+> > we have 3 failures in less than 24h in nft_flowtabl.sh:
+> > 
+> > https://netdev.bots.linux.dev/contest.html?test=nft-flowtable-sh
+> > 
+> > # FAIL: flow offload for ns1/ns2 with masquerade and pmtu discovery : original counter  2113852 exceeds expected value 2097152, reply counter  60
+> > https://netdev-3.bots.linux.dev/vmksft-nf/results/960740/11-nft-flowtable-sh/stdout
+> > 
+> > # FAIL: flow offload for ns1/ns2 with masquerade and pmtu discovery : original counter  3530493 exceeds expected value 3478585, reply counter  60
+> > https://netdev-3.bots.linux.dev/vmksft-nf/results/960022/10-nft-flowtable-sh/stdout  
 > 
-> The problem occurs when the minvif/maxvif values in the mr_mfc struct
-> become invalid (possibly due to memory corruption or uninitialized values).
-> This patch fixes the issue by ensuring proper boundary checks and rcu_read
-> locking before accessing vif_table[] in mr_mfc_uses_dev().
+> this is reporting a flow in forward chain going over the size of the
+> file, this is a flow that is not follow flowtable path.
 > 
-> Fixes: <COMMIT_HASH>
-> Reported-by: syzbot+5cfae50c0e5f2c500013@syzkaller.appspotmail.com
-> Signed-off-by: Abdullah <asharji1828@gmail.com>
+> > # FAIL: dscp counters do not match, expected dscp3 and dscp0 > 0 but got  1431 , 0 
+> > https://netdev-3.bots.linux.dev/vmksft-nf/results/960740/11-nft-flowtable-sh-retry/stdout  
+> 
+> this is reporting that occasionally a flow does not follow flowtable
+> path, dscp3 gets bumped from the forward chain.
+> 
+> I can rarely see this last dscp tests FAIL when running this test in a
+> loop here.
+> 
+> Just a follow up, I am still diagnosing.
 
-Could you explain what you're trying to do here?
+Thanks for the update!
 
-Are you just tossing patches to test at syzbot? If yes, please remove
-the unnecessary CCs, reply directly to the syzbot address, there is no
-need to spam the mailing lists.
-
-Or do you mean this as a real submissions? In which case why is there
-<COMMIT_HASH> instead of the correct commit? The entire submission
-feels a little.. LLM-aided.
--- 
-pw-bot: cr
+FWIW we hit 4 more flakes since I reported it to you last week
+(first link from previous message will take you to them).
+All four in dscp_fwd
 
