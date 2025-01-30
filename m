@@ -1,134 +1,118 @@
-Return-Path: <netdev+bounces-161631-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-161632-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id EF215A22C8E
-	for <lists+netdev@lfdr.de>; Thu, 30 Jan 2025 12:33:46 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 73D28A22C90
+	for <lists+netdev@lfdr.de>; Thu, 30 Jan 2025 12:34:29 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 83D8F3A88A5
-	for <lists+netdev@lfdr.de>; Thu, 30 Jan 2025 11:33:38 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E87B01672F9
+	for <lists+netdev@lfdr.de>; Thu, 30 Jan 2025 11:34:27 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 438241DFE1C;
-	Thu, 30 Jan 2025 11:33:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9FE5F1B4228;
+	Thu, 30 Jan 2025 11:34:25 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=netfilter.org header.i=@netfilter.org header.b="TGGRc7QQ";
-	dkim=pass (2048-bit key) header.d=netfilter.org header.i=@netfilter.org header.b="PB7HjeOm"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="RNnZhTQr"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail.netfilter.org (mail.netfilter.org [217.70.190.124])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2A69F1AB507;
-	Thu, 30 Jan 2025 11:33:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.190.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DE0CBB641
+	for <netdev@vger.kernel.org>; Thu, 30 Jan 2025 11:34:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1738236810; cv=none; b=WkcknEuLFFxwhjvxPoCXhLFsa9gBQSrAEZRknnnspV1e9JlhBOtJQ9RGCWihcTjzsqO4sYlLK2dy+q/ri97Hzxa+Xf9LDAXQcUKtf3/1XA/JsAZyPHls4Jq3972ZOBVp6WiUAxzgMu2lfqQdGYolYZDCZ20e5yXRCmc7i/fAVIY=
+	t=1738236865; cv=none; b=i6L+27zcu9JMzP2lBeC1XELwSzYSKPe6UqZriFdXxUoKHHQNmXepxj5wFCiD/1aV0N665pd9L42PTAhiBYXnkSYDvoClkqOFj2jcSay2bBxYTClOAjsz718Vy+KEmQNxl6YrWOrT5vAwW74QW53gfimDGfyhAqBZlqKl5FIaexY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1738236810; c=relaxed/simple;
-	bh=cCvyuTywZJOEZd43eSucenVCDBaHeiJEy2+zxsJJOfk=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=MUn4arZZ8ts1nmobVBtbT72L5rTfIP77DLq6sUQpg6ZlPDBNlYqPyPnZrPqlalJdKL/LClLYcmlj5ovnVUzdBV8HsH4SFtRgZR8ReFfSXvOwb4AP66Ir4nM+k5CbOBvlcP7oYafH34vIpgvGwGhduFhzy2C9w2tmEMFbozGRAUM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=netfilter.org; spf=pass smtp.mailfrom=netfilter.org; dkim=pass (2048-bit key) header.d=netfilter.org header.i=@netfilter.org header.b=TGGRc7QQ; dkim=pass (2048-bit key) header.d=netfilter.org header.i=@netfilter.org header.b=PB7HjeOm; arc=none smtp.client-ip=217.70.190.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=netfilter.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=netfilter.org
-Received: by mail.netfilter.org (Postfix, from userid 109)
-	id 78BD6602A0; Thu, 30 Jan 2025 12:33:20 +0100 (CET)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=netfilter.org;
-	s=2025; t=1738236800;
-	bh=UDpdvzehFZ6YWDrWZCL4eElqBT+MzmimR4sYE9a+lJI=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=TGGRc7QQbc+QWJJxBDd9IZI5w7lZybuv7KDbLsM/rQo9/HnRahhlZlvo0TxkZjKsm
-	 AK+w3UHqoyqsEtOsaltHjUPtny/QAvEQbhgkE2nyZYEUtHfJgC0ZKjEpEbuSJRlBEl
-	 zW5XN6YGu9CsSoM9fu5p+vIak1PW/TAk1QKO3dXU+gL2BVvYOOTkc2Yu7ui3KA8BiZ
-	 vIkUelldQdIYaWJXWAnPvSKWuAb/Rb17xTrYYbx8ICbLyVsbtOvw8kh1zfEzwblM58
-	 JRlAMFhcqpS8mWdXWMn91yfulkbR+s3mMIiCr43gHjPzpdZEQ1QuBFTERDc8huj6XD
-	 xxJXrKKxXyVDw==
-X-Spam-Level: 
-Received: from localhost.localdomain (mail-agni [217.70.190.124])
-	by mail.netfilter.org (Postfix) with ESMTPSA id B9E0660297;
-	Thu, 30 Jan 2025 12:33:18 +0100 (CET)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=netfilter.org;
-	s=2025; t=1738236799;
-	bh=UDpdvzehFZ6YWDrWZCL4eElqBT+MzmimR4sYE9a+lJI=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=PB7HjeOmou3O34rnnn2gJ/BJH3yth2uA9xn+9NOOgA9UMm8Ml8tdG9X+z9mEee4Nx
-	 t2RfIcbtlL8akRxqnCryyLIcLKFqRWFTuW2MY4yRTn7JHDfFxXoalIht8dis4ITjVm
-	 6P2AgCIexRSMNTzYLFq1/Rl7wQkd/5CjmyhLDPpQbjvGLdpgeMh33EG1Er9p3HTWpf
-	 H1JvVT0rf3ab0TsH7SUF4Szka13U/hRbh8/BVyE0d6OeZZrq2fUst2OnaKMmZlLnlE
-	 Hg1duPLqXWhSG/ZGK0Bqm1ZzDgPD9Nn8GAiniy2mKIOqvD/7sSsX7+11mPapn/9w5z
-	 bvKdTyhvW7oUg==
-From: Pablo Neira Ayuso <pablo@netfilter.org>
-To: netfilter-devel@vger.kernel.org
-Cc: davem@davemloft.net,
-	netdev@vger.kernel.org,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	edumazet@google.com,
-	fw@strlen.de,
-	horms@kernel.org
-Subject: [PATCH net 1/1] netfilter: nf_tables: reject mismatching sum of field_len with set key length
-Date: Thu, 30 Jan 2025 12:33:07 +0100
-Message-Id: <20250130113307.2327470-2-pablo@netfilter.org>
-X-Mailer: git-send-email 2.30.2
-In-Reply-To: <20250130113307.2327470-1-pablo@netfilter.org>
-References: <20250130113307.2327470-1-pablo@netfilter.org>
+	s=arc-20240116; t=1738236865; c=relaxed/simple;
+	bh=KFnu8ilRLneYRXxS8LEvkL4i+coBbtCKTRmYf1kTUig=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=ePRZA3jTgNkMKdR9uuKYnS1xY7sz0liygpLyjc4leT+yaMUgirO9+YQrjTvvOqqSjs3tP6ox5EDmGgUCLk21A69gUnL/wAuVGSUoOwRUZTYqryq92CnfaaZsMKjszwvr3RqnzrgK/4WcHKKOSu/rsZW284ORroe1cq8suIYEYdU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=RNnZhTQr; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1738236862;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=KFnu8ilRLneYRXxS8LEvkL4i+coBbtCKTRmYf1kTUig=;
+	b=RNnZhTQrUw5q+MOwVCHB3F0symkkoBNLvZmO29ukdIvmFsledSgtD/WP5PcZPtuKshM8Ya
+	pWcY9HwONqiVRPv+ltufhyUD2eKxHsl5Oq7nfwMmwkxHCfiezgXNiXD947hy90g8ZzCaC/
+	dzc/mcPBwCOI8V0ulaMcplnPVGSrpIE=
+Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
+ [209.85.128.71]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-59-Qm7zLNDNMSqHE4IQJIE0ng-1; Thu, 30 Jan 2025 06:34:20 -0500
+X-MC-Unique: Qm7zLNDNMSqHE4IQJIE0ng-1
+X-Mimecast-MFC-AGG-ID: Qm7zLNDNMSqHE4IQJIE0ng
+Received: by mail-wm1-f71.google.com with SMTP id 5b1f17b1804b1-43646b453bcso3329835e9.3
+        for <netdev@vger.kernel.org>; Thu, 30 Jan 2025 03:34:20 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1738236860; x=1738841660;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=KFnu8ilRLneYRXxS8LEvkL4i+coBbtCKTRmYf1kTUig=;
+        b=nZcee0fStLkIaM098qc/flztTJlRwAif9bY04eyJBytTFm62kRtcyc8sGQL7In45Xe
+         H4e2wUzzsbA+5U+VvPqYxNBLO+1FFpL2AbDmnMsn3AXwWIKL2kUtOyUKNkYv8XH4gbxA
+         p3zvD1FyZQTZHbhBxhCEN8+r9rNgMQzGsx/XQdsQTypM8Bdqxz8fLlCTxCTcDQ2m403j
+         YNHjB04DP1NriHGqN+C20nqUECeUW7B7Kuw4SgprFaH4B924VxGcxvleqvoIdyOulM87
+         C8vDibtXk6/vjPO1jt6Edln+fW3LattzbZPUxwlmQZz6yFKh+Uyks+4TagPE1kXuZ7c8
+         GycQ==
+X-Gm-Message-State: AOJu0YxI99NcZrnhUIzTH4oZZEKW58i6APU1vMDNkRVHaig01dxqKdzj
+	TKqOyGraS3vvKGDYJl18MEbRrAPrlouvegMekkmQYp/dhM53DiUy8VJb3wXvUCdcdXYchPaEBnl
+	qjDavoN6bKbjiEActKtCrr8g6bixE06BedIQGdn5ajYbuyHm3X4hWew==
+X-Gm-Gg: ASbGncuNt9jBJBnh0w8IlISi9N0nHrlXu/Vy8efiBhjY2P3Te/OwzjOtlA6Qsjvfuca
+	1sQAAdc8lezSo9h9jCDFsxz4De9e8Ibfuxex+63iRigVELWQEPA/DnRl4yTE64Zyg9TfeiEUWi/
+	qOTLIw2Me1rEA3+Rn/D5WOIC8rswpwm+3TK85qlR8/uRANUTymRGPN4Fy4WdhyZfYDWpF0PRAKc
+	V5uzmyL6hjpqfzNciyTjPBSPwzEbTW3SsKGYfinK0nj6nAKZFQOEKOn68I4E8k7qR5QOrgVGJ+Z
+	rIUhZm/gyLdEjyxAHYK9pJZLmVI9H+F9TCc=
+X-Received: by 2002:a05:600c:4e09:b0:436:1c04:aa8e with SMTP id 5b1f17b1804b1-438dc3c8200mr65751185e9.16.1738236859747;
+        Thu, 30 Jan 2025 03:34:19 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IHMOqkFVgkJT/N9OpRP+8HABFoiEk2Tp/MthEnnxk+Zun7kdDXSutwKQEKdZQj52UWwmCVQtA==
+X-Received: by 2002:a05:600c:4e09:b0:436:1c04:aa8e with SMTP id 5b1f17b1804b1-438dc3c8200mr65750975e9.16.1738236859415;
+        Thu, 30 Jan 2025 03:34:19 -0800 (PST)
+Received: from [192.168.88.253] (146-241-12-107.dyn.eolo.it. [146.241.12.107])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-438dcc81941sm55568625e9.36.2025.01.30.03.34.15
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 30 Jan 2025 03:34:18 -0800 (PST)
+Message-ID: <21027e9a-60f1-4d4b-a09d-9d74f6a692e5@redhat.com>
+Date: Thu, 30 Jan 2025 12:34:14 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net v2 2/2] net: ipv6: fix dst ref loops in rpl, seg6 and
+ ioam6 lwtunnels
+To: Jakub Kicinski <kuba@kernel.org>, davem@davemloft.net
+Cc: netdev@vger.kernel.org, edumazet@google.com, andrew+netdev@lunn.ch,
+ horms@kernel.org, dsahern@kernel.org, justin.iurman@uliege.be
+References: <20250130031519.2716843-1-kuba@kernel.org>
+ <20250130031519.2716843-2-kuba@kernel.org>
+Content-Language: en-US
+From: Paolo Abeni <pabeni@redhat.com>
+In-Reply-To: <20250130031519.2716843-2-kuba@kernel.org>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-The field length description provides the length of each separated key
-field in the concatenation, each field gets rounded up to 32-bits to
-calculate the pipapo rule width from pipapo_init(). The set key length
-provides the total size of the key aligned to 32-bits.
 
-Register-based arithmetics still allows for combining mismatching set
-key length and field length description, eg. set key length 10 and field
-description [ 5, 4 ] leading to pipapo width of 12.
 
-Cc: stable@vger.kernel.org
-Fixes: 3ce67e3793f4 ("netfilter: nf_tables: do not allow mismatch field size and set key length")
-Reported-by: Noam Rathaus <noamr@ssd-disclosure.com>
-Reviewed-by: Florian Westphal <fw@strlen.de>
-Signed-off-by: Pablo Neira Ayuso <pablo@netfilter.org>
----
- net/netfilter/nf_tables_api.c | 8 ++++----
- 1 file changed, 4 insertions(+), 4 deletions(-)
+On 1/30/25 4:15 AM, Jakub Kicinski wrote:
+> Some lwtunnels have a dst cache for post-transformation dst.
+> If the packet destination did not change we may end up recording
+> a reference to the lwtunnel in its own cache, and the lwtunnel
+> state will never be freed.
 
-diff --git a/net/netfilter/nf_tables_api.c b/net/netfilter/nf_tables_api.c
-index c4af283356e7..e5662dc087c8 100644
---- a/net/netfilter/nf_tables_api.c
-+++ b/net/netfilter/nf_tables_api.c
-@@ -5065,7 +5065,7 @@ static int nft_set_desc_concat_parse(const struct nlattr *attr,
- static int nft_set_desc_concat(struct nft_set_desc *desc,
- 			       const struct nlattr *nla)
- {
--	u32 num_regs = 0, key_num_regs = 0;
-+	u32 len = 0, num_regs;
- 	struct nlattr *attr;
- 	int rem, err, i;
- 
-@@ -5079,12 +5079,12 @@ static int nft_set_desc_concat(struct nft_set_desc *desc,
- 	}
- 
- 	for (i = 0; i < desc->field_count; i++)
--		num_regs += DIV_ROUND_UP(desc->field_len[i], sizeof(u32));
-+		len += round_up(desc->field_len[i], sizeof(u32));
- 
--	key_num_regs = DIV_ROUND_UP(desc->klen, sizeof(u32));
--	if (key_num_regs != num_regs)
-+	if (len != desc->klen)
- 		return -EINVAL;
- 
-+	num_regs = DIV_ROUND_UP(desc->klen, sizeof(u32));
- 	if (num_regs > NFT_REG32_COUNT)
- 		return -E2BIG;
- 
--- 
-2.30.2
+The series LGTM, but I'm wondering if we can't have a similar loop for
+input lwt?
+
+Thanks,
+
+Paolo
 
 
