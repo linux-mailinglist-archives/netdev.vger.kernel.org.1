@@ -1,87 +1,69 @@
-Return-Path: <netdev+bounces-161611-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-161612-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id E2ED7A22B33
-	for <lists+netdev@lfdr.de>; Thu, 30 Jan 2025 11:04:40 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id C3729A22B7C
+	for <lists+netdev@lfdr.de>; Thu, 30 Jan 2025 11:15:34 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id EA3B61889232
-	for <lists+netdev@lfdr.de>; Thu, 30 Jan 2025 10:04:14 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 2AFFE167BF7
+	for <lists+netdev@lfdr.de>; Thu, 30 Jan 2025 10:15:33 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 644821BAEDC;
-	Thu, 30 Jan 2025 10:02:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4392B1B21B5;
+	Thu, 30 Jan 2025 10:15:31 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="WusdYqMp"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="VvJOfYdX"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wr1-f49.google.com (mail-wr1-f49.google.com [209.85.221.49])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9669F19F13F;
-	Thu, 30 Jan 2025 10:02:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.49
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9C5221F95E;
+	Thu, 30 Jan 2025 10:15:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1738231354; cv=none; b=q5ec8xpFvJQna6WBNE7j3I0X8HE9ifMTevgjSzkVAv9SXcod2jlsJ30jLacSCIvJoxIxWW400G0AEyMAUQQ6DOBm+so3P3vXNU/05CHzWtw/6uLRWr5VHMbuRWg8dnHeQjAqJkWD2NOmzFBm82XM+f+/yozfBgFFF5pyrlOAMRk=
+	t=1738232131; cv=none; b=Rf5BDw6NsHWmn7qDfqx6EnSpOdAHHk9EpNXSAG0HYTyDzSZyPC7OfxGxhgaO8ouTss7UP313tJTpwcobRypVK5HbDWhP5slx69Q/rgdaAnqyYPjRig/IwJOHimwFHCqyb0Ppkr8ReVzM8PAN+dTPFZVrsvQPDwtXei8MAuy0faE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1738231354; c=relaxed/simple;
-	bh=g6NT99kCYlu2bAm2C7e45OSPi49TwQfekfaWpV+BLWs=;
+	s=arc-20240116; t=1738232131; c=relaxed/simple;
+	bh=pBjFopFTIz/A5Zz3Us1V/Fl727xQA5IBNO+q4qWloNM=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=VEi1vG1aJUpsGz6XOn1QSz/tVCf7GYZUVTiovbmgDU9lPvAwgqbIohjnJVWM+dKQpxyYLkDsq3dlrSwTTkVz38YzAeeAA1S06TW0173+PjwQU7qyMeRQR81t6pib5Ns2ehu6GcvIfRRvG3jtwysjtayn2FY0kClgBMWgDOj1/ik=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=WusdYqMp; arc=none smtp.client-ip=209.85.221.49
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wr1-f49.google.com with SMTP id ffacd0b85a97d-385e44a1a2dso89550f8f.3;
-        Thu, 30 Jan 2025 02:02:32 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1738231351; x=1738836151; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=VAj/+6ugpW0lcARLGUzj2/Kg/DjBYxwbsq4/1Hp+yh8=;
-        b=WusdYqMpxx9EBwMCfi0AM0m0eaR/KmQLXULy17jS8r2a1tu5M1LQkWIOL9Nwq6qNMr
-         Vo4/vWeYAusN+315uE2a5qLD67hBQlCI+okvfbKJrh3Guq6N2tkhPknWDK0GZ+EpKiFX
-         wbOdpcO2ycm9sLDccK9RHX2rn0BvQq/FyBcgIiN1F4OqORApj7+knKOLwyD5gXPqXCbd
-         XBzRq7t70xvvQRVpB5QhmdmO4wMf9thoruVy3x8KjXb2KhkpaPjcI+5XOvmG82ipDTtJ
-         cY+h6pRiJhiai27Pt3FwKRWLL9ci8R+Yh23SPIR9ePhpJ/H+b9LxnB/mzFU9mQEV4HzL
-         s/tg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1738231351; x=1738836151;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=VAj/+6ugpW0lcARLGUzj2/Kg/DjBYxwbsq4/1Hp+yh8=;
-        b=rEpzbh7y21myovm/ze8fN2Or337YMkhecvUP97EoMj/xlAuIabU5BZnCKsnjrAERPS
-         OvEFM0C3lROyTQOnDrPvkrkTbKgdi6kWTPW/RKv6UOG2nFr9lbeqNu/6mRt6nLnDBIET
-         LBwKYSsSQSs4uMNjEBY6AQSiBcFWloKNlVzKOv8V/vkn/o8YRy2RegI5GyPY5hKTdz70
-         /jidk2JkOE1axDLsnX2KavBykhIQUIk88CjL8LEryek4gK4jrCHPBl9TJtRx7hSi2Jux
-         u1rQ55hFKYtGG3/YLdHzbfPDgqy7Xv7LPGJqQv5q5WwlfCk9XvBxDYdHiH4LnhrOChwC
-         Cqvg==
-X-Forwarded-Encrypted: i=1; AJvYcCUxHKBzj1dP94BAJLF0TKvnC1BeYrCyNDNJwZokSUjvAr82Tn9jPqt4+uIlhafFL4bDkLTmM59s@vger.kernel.org, AJvYcCWFCEbo4SsVheRWpe8QjSqRkSuGDhHXPn88PqDkWfz2z8xGH02VVHuwAMll6siYZgNz8otvCaD57YCT3ok=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyvP07rp53tFTIAXVFscl9NwPhWjZzpSAwvA7Ev9npldqUCchZM
-	W7JjgVAGu7al8rEK1MtECbRJ1qhBQant7W2I+HsGCGkK8begsgXa
-X-Gm-Gg: ASbGnctFV7eFSvHip/5f3tJEij+peVsDulY1vPgS/faTgM6ygPHbqD2dH6rB0skbMSY
-	SN7CNK5pKO4CpR4a3yk1oeBMcMXzVK1aGnBLa67+yn5VrUfAZKwUkhOY40nG+oYp2T6OFHCG/tu
-	IoIMQFhDUZyPTU4kUELn8XoPPSyjYkTGhib8wwdVWjkEFIgF5nnoSittfAx4R2N0NtM6oyrrv6u
-	ES8myKOZeTla3j+NWj3e/WjP73UHo2OCXGsrGLzUFApSVnVa4RAETR0VXXWHWtHpi3bSWDC0ZSH
-	xgs=
-X-Google-Smtp-Source: AGHT+IEFNuFJMrQJoYiBhgBqjUhkHpcE/Et30pFazQ0ZffCvLRewq6UyYNLYpoAzADLPNm/9TqsJdA==
-X-Received: by 2002:a5d:5f4b:0:b0:385:f909:eb33 with SMTP id ffacd0b85a97d-38c52092755mr2147799f8f.10.1738231350670;
-        Thu, 30 Jan 2025 02:02:30 -0800 (PST)
-Received: from skbuf ([86.127.124.81])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-38c5c1cf7cfsm1439532f8f.86.2025.01.30.02.02.29
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 30 Jan 2025 02:02:29 -0800 (PST)
-Date: Thu, 30 Jan 2025 12:02:27 +0200
-From: Vladimir Oltean <olteanv@gmail.com>
+	 Content-Type:Content-Disposition:In-Reply-To; b=R/fVcXeZT+kyWYQ0euOprdR/Gp+P87B0/2oEj/TDaO/AXYEilsAZeUT27Z+Px/2H2JM5YhEnIrpSDbb2Ivp8ArlAdsyLueIz3sDwBPc7eTzouqr2Prlor9yjhia3g15WgxkHElqcp8glihx0H8TirkQdMSZJP5Ym3/v6XewjnE4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=VvJOfYdX; arc=none smtp.client-ip=78.32.30.218
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
+	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
+	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
+	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
+	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
+	bh=65d9H1YHsrkqrMlCIpWUa4AJacnKGhXrM6Fqbtals0E=; b=VvJOfYdXoTlqCvEqRjSet9EepF
+	Zf6+X2YoVBpPriMnSM9yJqaQMN4/w1RQIhDS3JVe8atGajDeKJ9p0UeEwssPNq3i5OV7dnvruswAx
+	DLkG5XnQBVbiG3vjVpRXjTaq1BPAfKIPSO1v+6a/zCOV0Iu3fdWCAkppJ7gV0f4GIYUdVLkOGCJTs
+	+8Vkz3Emq+GcRDEZCkDZ1pUDbdtIYZ2Kao9K5QUbatdY7qkE7ypUVAjqZsFQCuSzInpSxO39FOIMA
+	gqwRr/dFumfZFuN3qhtdSwIWLUFG4Ousef79KXRIf+9NtN+aYw2hegfqMyxmEalZ3lcByFBhG8Mwg
+	duQJbJ9Q==;
+Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:38278)
+	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.96)
+	(envelope-from <linux@armlinux.org.uk>)
+	id 1tdRZt-0003pg-1t;
+	Thu, 30 Jan 2025 10:15:17 +0000
+Received: from linux by shell.armlinux.org.uk with local (Exim 4.96)
+	(envelope-from <linux@shell.armlinux.org.uk>)
+	id 1tdRZr-0004ft-1O;
+	Thu, 30 Jan 2025 10:15:15 +0000
+Date: Thu, 30 Jan 2025 10:15:15 +0000
+From: "Russell King (Oracle)" <linux@armlinux.org.uk>
 To: Tristram.Ha@microchip.com
-Cc: linux@armlinux.org.uk, Woojung.Huh@microchip.com, andrew@lunn.ch,
+Cc: olteanv@gmail.com, Woojung.Huh@microchip.com, andrew@lunn.ch,
 	hkallweit1@gmail.com, maxime.chevallier@bootlin.com,
 	davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
 	pabeni@redhat.com, UNGLinuxDriver@microchip.com,
 	netdev@vger.kernel.org, linux-kernel@vger.kernel.org
 Subject: Re: [WARNING: ATTACHMENT UNSCANNED]Re: [PATCH RFC net-next 1/2] net:
  pcs: xpcs: Add special code to operate in Microchip KSZ9477 switch
-Message-ID: <20250130100227.isffoveezoqk5jpw@skbuf>
+Message-ID: <Z5tRM5TYuMeCPXb-@shell.armlinux.org.uk>
 References: <20250128033226.70866-2-Tristram.Ha@microchip.com>
  <Z5iiXWkhm2OvbjOx@shell.armlinux.org.uk>
  <20250128102128.z3pwym6kdgz4yjw4@skbuf>
@@ -101,32 +83,211 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
 In-Reply-To: <DM3PR11MB873652D36F1FC20999F45772ECE92@DM3PR11MB8736.namprd11.prod.outlook.com>
+Sender: Russell King (Oracle) <linux@armlinux.org.uk>
 
 On Thu, Jan 30, 2025 at 04:50:18AM +0000, Tristram.Ha@microchip.com wrote:
+> > The next question would be whether it's something that we _could_
+> > always do - if it has no effect for anyone else, then removing a
+> > conditional simplifies the code.
+> 
 > I explained in the other email that this SGMII_LINK_STS |
 > TX_CONFIG_PHY_SIDE_SGMII setting is only required for 1000BASEX where
 > C37_1000BASEX is used instead of C37_SGMII and auto-negotiation is
 > enabled.
+
+This sentence reads to me "if we want to use 1000base-X mode, and we
+configure the XPCS to use 1000base-X rather than Cisco SGMII then
+setting both SGMII_LINK_STS and TX_CONFIG_PHY_SIDE_SGMII bits are
+required.
+
+Thanks, that tells me nothing that I don't already know. I know full
+well that hardware needs to be configured for 1000base-X mode to use
+1000base-X negotiation. I also have been saying for some time that
+KSZ9477 documetation states that these two "SGMII" bits need to be
+set in 1000base-X mode.
+
+This is not what I'm questioning here. What I am questioning is whether
+we can set these two "SGMII" bits _unconditionally_ in the
+xpcs_config_aneg_c37_1000basex() path in the driver without impacting
+newer XPCS IPs.
+
+> > > Never touched by whom? xpcs_config_aneg_c37_sgmii() surely tries to
+> > > touch it... Don't you think that the absence of this bit from the
+> > > KSZ9477 implementation might have something to do with KSZ9477's unique
+> > > need to force the link speed when in in-band mode?
+> > 
+> > I think Tristram is talking about xpcs_config_aneg_c37_1000basex()
+> > here, not SGMII.
+> > 
+> > Tristram, as a general note: there is a reason I utterly hate the term
+> > "SGMII" - and the above illustrates exactly why. There is Cisco SGMII
+> > (the modified 1000base-X protocol for use with PHYs.) Then there is the
+> > "other" SGMII that manufacturers like to band about because they want
+> > to describe their "Serial Gigabit Media Independent Interface" and they
+> > use it to describe an interface that supports both 1000base-X and Cisco
+> > SGMII.
+> > 
+> > This overloading of "SGMII" leads to nothing but confusion - please be
+> > specific about whether you are talking about 1000base-X or Cisco SGMII,
+> > and please please please avoid using "SGMII".
+> > 
+> > However, in the kernel code, we use "SGMII" exclusively to mean Cisco
+> > SGMII.
 > 
-> This behavior only occurs in KSZ9477 with old IP and so may not reflect
-> in current specs.  If neg_mode can be set in certain way that disables
-> auto-negotiation in 1000BASEX mode but enables auto-negotiation in SGMII
-> mode then this setting is not required.
+> I use the terms SGMII and 1000BASEX just like in Linux driver where there
+> are PHY_INTERFACE_MODE_SGMII and PHY_INTERFACE_MODE_1000BASEX, and it is
+> also how the SGMII module operates where there are two register settings
+> to use on these modes.
 
-I see that the KSZ9477 documentation specifies that these bits "must be
-set to 1 when operating in SerDes mode", but gives no explanation whatsoever,
-and gives the description of the bits that matches what I see in the
-XPCS data book (which suggests they would not be needed for 1000Base-X,
-just for SGMII PHY role).
+Useful to know, but its not always clear when discussing.
 
-There must exist a block guide of the Designware PCS that was integrated
-in KSZ9477 in the entire Microchip company. Or at least, the hardware
-architects must know what is going on. Can you help reconcile the XPCS
-specification with the KSZ9477 implementation? "The bits must be set" is
-not satisfactory when we are considering a common PCS driver. Were these
-bits overloaded by Microchip for 1000Base-X mode for KSZ9477?
+> What is confusing is how to call the SFPs using which mode.
+> 
+> All the fiber transceivers like 1000Base-SX and 1000Base-LX operate in
+> 1000BASEX mode.
 
-At the very least, it sounds like it is improper to name these fields by
-their documented role for SGMII PHY mode, when clearly it is a different
-and undocumented role here.
+I already know this.
+
+> All 10/100/1000Base-T SFPs I tested operate in SGMII mode.
+> All 1000Base-T SFPs with RJ45 connector operate in 1000BASEX mode at the
+> beginning.  If a PHY is found inside (typically Marvell) that PHY driver
+> can change the mode to SGMII.  If that PHY driver is forced to not change
+> it to SGMII mode then 1000BASEX mode can still be used.
+
+I already know this.
+
+> The major difference between 1000BASEX and SGMII modes in KSZ9477 is
+> there are link up and link down interrupts in SGMII mode but only link up
+> interrupt in 1000BASEX mode.  The phylink code can use the SFP cage logic
+> to detect the fiber cable is unplugged and say the link is down, so that
+> may be why the implementation behaves like that, but that does not work
+> for 1000Base-T SFP that operates in 1000BASEX mode.
+
+At this point, given all the discussion that has occurred, I'm really
+not sure how to take "only link up in 1000base-X mode" - whether you're
+talking about using 1000base-X with the other side operating in Cisco
+SGMII mode or whether you're talking about e.g. a fibre link.
+
+So I'm going to say it clearly: never operate the link with dis-similar
+negotiation protocols. Don't operate the link with 1000base-X at one end
+and Cisco SGMII at the other end. It's wrong. It's incorrect. The
+configuration words are different formats. The interpretation of the
+configuration words are different. Don't do it. Am I clear?
+
+If it's still that 1000base-X mode to another 1000base-X partner doesn't
+generate a link-down interrupt, then you will have no option but to use
+phylink's polling mode for all protocols with this version of XPCS.
+
+> > Hang on one moment... I think we're going off to another problem.
+> > 
+> > For 1000base-X, we do use phylink_mii_c22_pcs_encode_advertisement()
+> > which will generate the advertisement word for 1000base-X.
+> > 
+> > For Cisco SGMII, it will generate the tx_config word for a MAC-side
+> > setup (which is basically the fixed 0x4001 value.) From what I read
+> > in KSZ9477, this value would be unsuitable for a case where the
+> > following register values are:
+> > 
+> >         DW_VR_MII_PCS_MODE_C37_SGMII set
+> >         DW_VR_MII_TX_CONFIG_PHY_SIDE_SGMII set
+> >         DW_VR_MII_DIG_CTRL1_PHY_MODE_CTRL clear
+> > 
+> > meaning that we're generating a SGMII PHY-side word indicating the
+> > parameters to be used from the registers rather than hardware signals.
+> > 
+> > > > The default value of this register is 0x20.  This update
+> > > > depends on SFP.  So far I did not find a SGMII SFP that requires this
+> > > > setting.  This issue is more like the hardware did not set the default
+> > > > value properly.  As I said, the SGMII port works with SGMII SFP after
+> > > > power up without programming anything.
+> 
+> TX_CONFIG_PHY_SIDE_SGMII is never set for C37_SGMII mode.
+> Again I am not sure how this problem can be triggered.  I was just told
+> to set this value.  And a different chip with new IP has this value by
+> default.
+
+I'm at a loss to work out how to respond to this. You've cut the
+context to which I was replying to, and instead included following
+context. Confused.
+
+> > > > I am always confused by the master/slave - phy/mac nature of the SFP.
+> > > > The hardware designers seem to think the SGMII module is acting as a
+> > > > master then the slave is on the other side, like physically outside the
+> > > > chip.  I generally think of the slave is inside the SFP, as every board
+> > > > is programmed that way.
+> > 
+> > I think you're getting confused by microchip terminology.
+> > 
+> > Cisco SGMII is an asymmetric protocol. Cisco invented it as a way of:
+> > 1. supporting 10M and 100M speeds over a single data pair in each
+> >    direction.
+> > 2. sending the parameters of that link from the PHY to the MAC/PCS over
+> >    that single data pair.
+> > 
+> > They took the IEEE 1000base-X specification as a basis (which is
+> > symmetric negotiation via a 16-bit word).
+> > 
+> > The Cisco SGMII configuration word from the PHY to the PCS/MAC
+> > contains:
+> > 
+> >         bit 15 - link status
+> >         bit 14 - (reserved for AN acknowledge as per 1000base-X)
+> >         bit 13 - reserved (zero)
+> >         bit 12 - duplex mode
+> >         bit 11, 10 - speed
+> >         bits 9..1 - reserved (zero)
+> >         bit 0 - set to 1
+> > 
+> > This is "PHY" mode, or in Microchip parlence "master" mode - because
+> > the PHY is dictating what the other end should be doing.
+> > 
+> > When the PCS/MAC receives this, the PCS/MAC is expected to respond
+> > with a configuration word containing:
+> > 
+> >         bit 15 - zero
+> >         bit 14 - set to 1 (indicating acknowledge)
+> >         bit 13..1 - zero
+> >         bit 0 - set to 1
+> > 
+> > This is MAC mode, or in Microchip parlence "slave" mode - because the
+> > MAC is being told what it should do.
+> > 
+> > So, for a Cisco SGMII link with a SFP module which has a PHY embedded
+> > inside, you definitely want to be using MAC mode, because the PHY on
+> > the SFP module will be dictating the speed and duplex to the components
+> > outside of the SFP - in other words the PCS and MAC.
+> 
+> I do not know the internal working in the SGMII module where the
+> registers may have incorrect values.  I only verify the SGMII port is
+> working by sending and receiving traffic after changing some registers.
+
+The information I've provided is to aid you in understanding "master" and
+"slave" mode SGMII. I'm trying to educate you. I'm not questioning
+register values or anything like that. I'm giving you information to aid
+your understanding of SGMII.
+
+> > > > There are some SFPs
+> > > > that will use only 1000BaseX mode.  I wonder why the SFP manufacturers do
+> > > > that.  It seems the PHY access is also not reliable as some registers
+> > > > always have 0xff value in lower part of the 16-bit value.  That may be
+> > > > the reason that there is a special Marvell PHY id just for Finisar.
+> > 
+> > I don't have any modules that have a Finisar PHY rather than a Marvell
+> > PHY. I wonder if the problem is that the Finisar module doesn't like
+> > multi-byte I2C accesses to the PHY.
+> > 
+> > Another thing - make sure that the I2C bus to the SFP cage is running
+> > at 100kHz, not 400kHz.
+> 
+> What I meant is this Marvell PHY ID 0x01ff0cc0.  Basically it is
+> 0x01410cc0 for Marvell 88E1111 with 0x41 replaced with 0xff.  Some
+> registers like the status register even has 0xff value all the time so
+> the PHY can never report the link is down.
+
+Which module does this happen with, and is it still available to buy
+(can I get one to test with?)
+
+-- 
+RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
+FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
 
