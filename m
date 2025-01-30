@@ -1,105 +1,84 @@
-Return-Path: <netdev+bounces-161640-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-161641-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id A3008A22D66
-	for <lists+netdev@lfdr.de>; Thu, 30 Jan 2025 14:12:35 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id E7147A22DAA
+	for <lists+netdev@lfdr.de>; Thu, 30 Jan 2025 14:24:48 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 1953C162A85
-	for <lists+netdev@lfdr.de>; Thu, 30 Jan 2025 13:12:34 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 6E225188910E
+	for <lists+netdev@lfdr.de>; Thu, 30 Jan 2025 13:24:53 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1210D1E3775;
-	Thu, 30 Jan 2025 13:12:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D6A961E376E;
+	Thu, 30 Jan 2025 13:24:44 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="JS89fvrY"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-il1-f199.google.com (mail-il1-f199.google.com [209.85.166.199])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 71B691BC9F0
-	for <netdev@vger.kernel.org>; Thu, 30 Jan 2025 13:12:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.199
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5941B819;
+	Thu, 30 Jan 2025 13:24:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1738242751; cv=none; b=qM5Gh/+oxQK/Hyg+TSdLDp7gGQnRRfy0wEmPBhvBTOD+xTK+ZUAbyx/FhB6B+MoLLksYkj8+v7MQoqceHwAEfXkNIzO7KG356sNL2ArurZTH9zbElAMqL9djm5+UzW/2AWa5TZ7BpxbB2zb+tR9fI64sIdZXDQMMyVkUGakFBZw=
+	t=1738243484; cv=none; b=iq2JZJPEVhzjpX0RYuDqlhB9J42qeD0Tmu1C4gpHQghIdW1qg7LKSQCaqUGO2yyFJB7xl66ZScpR2Q6n+PqO7Su0ExXeyLrVQuUG2gPmRqT65wWnNC4GEL8LvO32wJgPa7ouRlhmmsv972RAFMaaphjy2eNvgkL0qdIxkNqmsnI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1738242751; c=relaxed/simple;
-	bh=UWhx295qmY3GWSKOMZW+APOnFJqWoObpRK5OQrnQBYk=;
-	h=MIME-Version:Date:Message-ID:Subject:From:To:Content-Type; b=kbuCcWGahjhm92iNO4e+eTTWS1c4L98IawBNt+GZMn8YW9gVG/nHhASNxbxv3X6Bc9NQ6GD7rRPNtyTzNWb01/rx/5zuhX3M0kLEDNTDiqJTxOvBitbyNR2gWfwFsJgK3kIShogl+OLWNs7Ss55n5E0cJgSkALcUSbXT/i53U2o=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.199
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
-Received: by mail-il1-f199.google.com with SMTP id e9e14a558f8ab-3ce3bbb2b9dso4344955ab.3
-        for <netdev@vger.kernel.org>; Thu, 30 Jan 2025 05:12:29 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1738242748; x=1738847548;
-        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=fcXw+weI9Kk8+GGZ8VUeVAxRzMM7UfZFaRgdoYJYpjg=;
-        b=IHwQL/aOw/bkcl2cVZhn0MOUMnTs/SvFl/FvevlV8V98IFGQb1OLkSYFaTNRk9HyMC
-         LDw2miQo/aSdETsq5vxs6LHzPXNGcLPbbwdNG26Oyb5OAg+E2P+qCauT0jvtooj9iyk1
-         /eyWPDamsUn35vKL0UVSZm7jNZSlqz1xUuNnJmaHHQdhxY/I25RFv+UkXZg+2eG4V8FH
-         pfjoYme8892e1Z/YgLL1W5iaOEonui2VoNbWye3v+PQAnv561h2hPvtLt3Iy6WEX4757
-         XI9ech25mWv66tnGINIWZAmyLmFZmjcLD1SGRIcbzyEATo7Y+0LEz4VB+pTjmMJDYYBk
-         EWJA==
-X-Forwarded-Encrypted: i=1; AJvYcCUzc4GJz9gIysD7be/K7i56qzbOS/8K6hT0J7Bq35QT2xcoe+rZoXkO2S6pU+LfGV2xbv2dqM8=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzZX8mrqAun3vXOu7WrMrFh0bpdgQNPwCjQbaAsNTUem/p/Ii7z
-	2o2DZCpXrHMA3lkm08Y0POd9WGeyP965gM5uIKL2+IymQl4rlLxMRbSpiOh4r36PYpJA9HUYgAe
-	FNqXuT/CpdXVp7/NZCcKXW9c+Xs8LwbP6B369Y/jJVcHYD/uFRLuZDYg=
-X-Google-Smtp-Source: AGHT+IGNGlTx07cXqgLqsCN1w/mv7AKqoofadPmiBbvugykq4wQQuUgPz9Is0j9cRsAtzgcYvLYd/T0AsKEqT//r1fcggDQhJ3Q9
+	s=arc-20240116; t=1738243484; c=relaxed/simple;
+	bh=lJiOt4TjwzF0s7cAcZoJ6GVtoajcILHi8WWa/mfpuSM=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=hOdAQyUOIvRyNQYyhEnPjsfsBFxuGV+KQMJWG1Wim/kYVLrDvOWi/vsk+Hf5r2/FLe5K355G5dh6xH2gTxK1lQiN6wtVzAKkJxVmy26+mb8J3Zu9QcX7/2B/nwAZOv/y0nWxhbnUGS01cTxEUuQvS9Sz+c/fyujkh0BXAtH1RSg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=JS89fvrY; arc=none smtp.client-ip=156.67.10.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=PXe4JbbDh0vvlSGOfbnRZy/Cv+zCvilTMEJheMeI+Sc=; b=JS89fvrYcDRcww4ABuBvy52Ux/
+	yQ8hVP5AyAPmXlyfdqiopk2Qom24luNUaBaPUxiXuFUDlGR/2WG8R1Pxki429mGntUFOAPJ7G0F6f
+	B/VoCutAGCT2wWdvL1Jph7S8h8X2pvb/rkGG3QOb068Q4Id3zOJfr04G53sfJNVaq8Lw=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1tdUWy-009PlG-N0; Thu, 30 Jan 2025 14:24:28 +0100
+Date: Thu, 30 Jan 2025 14:24:28 +0100
+From: Andrew Lunn <andrew@lunn.ch>
+To: Tristram.Ha@microchip.com
+Cc: olteanv@gmail.com, Woojung.Huh@microchip.com, hkallweit1@gmail.com,
+	maxime.chevallier@bootlin.com, davem@davemloft.net,
+	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
+	linux@armlinux.org.uk, UNGLinuxDriver@microchip.com,
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH RFC net-next 1/2] net: pcs: xpcs: Add special code to
+ operate in Microchip KSZ9477 switch
+Message-ID: <dd2e35c7-0bfd-4679-8ee9-5c69244acb8f@lunn.ch>
+References: <20250128033226.70866-1-Tristram.Ha@microchip.com>
+ <20250128033226.70866-2-Tristram.Ha@microchip.com>
+ <Z5iiXWkhm2OvbjOx@shell.armlinux.org.uk>
+ <20250128102128.z3pwym6kdgz4yjw4@skbuf>
+ <Z5jOhzmQAGkv9Jlw@shell.armlinux.org.uk>
+ <20250128152324.3p2ccnxoz5xta7ct@skbuf>
+ <DM3PR11MB8736F7C3A021CAE9AB92F84EECEE2@DM3PR11MB8736.namprd11.prod.outlook.com>
+ <DM3PR11MB8736F7C3A021CAE9AB92F84EECEE2@DM3PR11MB8736.namprd11.prod.outlook.com>
+ <20250129211226.cfrhv4nn3jomooxc@skbuf>
+ <DM3PR11MB87365B3AD3C360B0EF0432F3ECE92@DM3PR11MB8736.namprd11.prod.outlook.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Received: by 2002:a92:cda7:0:b0:3cf:bac5:d90c with SMTP id
- e9e14a558f8ab-3cffe42f28cmr68960695ab.18.1738242748599; Thu, 30 Jan 2025
- 05:12:28 -0800 (PST)
-Date: Thu, 30 Jan 2025 05:12:28 -0800
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <679b7abc.050a0220.48cbc.0006.GAE@google.com>
-Subject: [syzbot] Monthly rdma report (Jan 2025)
-From: syzbot <syzbot+list68ee45d79914eff2710d@syzkaller.appspotmail.com>
-To: linux-kernel@vger.kernel.org, linux-rdma@vger.kernel.org, 
-	netdev@vger.kernel.org, syzkaller-bugs@googlegroups.com
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <DM3PR11MB87365B3AD3C360B0EF0432F3ECE92@DM3PR11MB8736.namprd11.prod.outlook.com>
 
-Hello rdma maintainers/developers,
+> As I mentioned before, the IP used in KSZ9477 is old and so may not match
+> the behavior in current DesignWare specifications.
 
-This is a 31-day syzbot report for the rdma subsystem.
-All related reports/information can be found at:
-https://syzkaller.appspot.com/upstream/s/rdma
+Can you tell us the exact revision? Now that Synopsys have said they
+will try to answer questions, they should have access to all the
+versions of the data book, and can do comparisons between revisions.
 
-During the period, 1 new issues were detected and 0 were fixed.
-In total, 9 issues are still open and 62 have already been fixed.
-
-Some of the still happening issues:
-
-Ref Crashes Repro Title
-<1> 267     No    INFO: task hung in rdma_dev_change_netns
-                  https://syzkaller.appspot.com/bug?extid=73c5eab674c7e1e7012e
-<2> 88      No    WARNING in rxe_pool_cleanup
-                  https://syzkaller.appspot.com/bug?extid=221e213bf17f17e0d6cd
-<3> 61      No    INFO: task hung in add_one_compat_dev (3)
-                  https://syzkaller.appspot.com/bug?extid=6dee15fdb0606ef7b6ba
-<4> 59      Yes   possible deadlock in sock_set_reuseaddr
-                  https://syzkaller.appspot.com/bug?extid=af5682e4f50cd6bce838
-<5> 39      No    INFO: task hung in rdma_dev_exit_net (6)
-                  https://syzkaller.appspot.com/bug?extid=3658758f38a2f0f062e7
-<6> 5       No    possible deadlock in siw_create_listen (2)
-                  https://syzkaller.appspot.com/bug?extid=3eb27595de9aa3cf63c3
-
----
-This report is generated by a bot. It may contain errors.
-See https://goo.gl/tpsmEJ for more information about syzbot.
-syzbot engineers can be reached at syzkaller@googlegroups.com.
-
-To disable reminders for individual bugs, reply with the following command:
-#syz set <Ref> no-reminders
-
-To change bug's subsystems, reply with:
-#syz set <Ref> subsystems: new-subsystem
-
-You may send multiple commands in a single email message.
+	 Andrew
 
