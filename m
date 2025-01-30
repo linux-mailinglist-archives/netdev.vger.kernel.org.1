@@ -1,144 +1,101 @@
-Return-Path: <netdev+bounces-161653-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-161654-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 85A4FA230CF
-	for <lists+netdev@lfdr.de>; Thu, 30 Jan 2025 16:06:50 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 70707A230E0
+	for <lists+netdev@lfdr.de>; Thu, 30 Jan 2025 16:12:33 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 0219C1888C45
-	for <lists+netdev@lfdr.de>; Thu, 30 Jan 2025 15:06:55 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 0CEA83A6CCE
+	for <lists+netdev@lfdr.de>; Thu, 30 Jan 2025 15:12:25 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1F1D31E9B17;
-	Thu, 30 Jan 2025 15:06:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0787F1E9B2A;
+	Thu, 30 Jan 2025 15:12:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="hsu1fFn8"
+	dkim=pass (2048-bit key) header.d=uliege.be header.i=@uliege.be header.b="Bm3nWnc3"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qk1-f171.google.com (mail-qk1-f171.google.com [209.85.222.171])
+Received: from serv108.segi.ulg.ac.be (serv108.segi.ulg.ac.be [139.165.32.111])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 171F81E98E7
+	for <netdev@vger.kernel.org>; Thu, 30 Jan 2025 15:12:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=139.165.32.111
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1738249948; cv=none; b=aVRoGD3bUiRtM72pTp2qmJzdVuQuzbvJrTykDjSPdyZFpopKM1yjanVm+FV66D8DYmrteA+ZqV+qMSMJ39YzzV2LHtJg2hAv06u7UkdOQpz3EBDlqsSwW3gV0A4NIYT13tkO7ifUTYXrE7snRoL8lvaf4GNvhlpUb8HcsXtSofg=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1738249948; c=relaxed/simple;
+	bh=nif4wB4y/qzE2wni3GYV/h4+8/p5NS5VPsDgiux12Vg=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=MQk3rHgnJ/3JfC2IQv62s6BMqWqzp+y1zVMTUMYLEMiHijUaZfyMuRhXrArkWx3+VM18UFQp+5SV3HcypwjjOnBIPfH7t+Wc6GgZ0gSbpEQaGWNVuFt9KQBkyNRfj1vw8dpmZUPGebEGC2A5//9zsYhudK8FGHbk0lAPSy7Os2A=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=uliege.be; spf=pass smtp.mailfrom=uliege.be; dkim=pass (2048-bit key) header.d=uliege.be header.i=@uliege.be header.b=Bm3nWnc3; arc=none smtp.client-ip=139.165.32.111
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=uliege.be
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=uliege.be
+Received: from [192.168.1.58] (220.24-245-81.adsl-dyn.isp.belgacom.be [81.245.24.220])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 88D611E2853;
-	Thu, 30 Jan 2025 15:06:45 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.171
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1738249607; cv=none; b=nOg/nJ+v2fH2RpiM2ZWkJqjdT9oblScuUCAlcX+It3HAKfssdxaUf8czVqv0rqX+gf9dOsrZEpETtSYlgYmlydFYp7F7LVzD+lNj0sCzywaR4vC84si9cBql8ys8W1lurYP7/Oa6D1ClzH5MCKqeooNzpYVPBx40PIv7lLamPsc=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1738249607; c=relaxed/simple;
-	bh=lPHx7WaZsUhvB70yZzHrPTeASZHFEDazFq/DwQM9k+c=;
-	h=Date:From:To:Cc:Message-ID:In-Reply-To:References:Subject:
-	 Mime-Version:Content-Type; b=jSq7IG/CK4IOPTTnVVdAplj/XvltAaDR7UzBIbxeKhmr66irR/EHXpnhEPCz6sZJChq9+4OOiuM0yRUL0kKZZ06AjP9G9thUHucvS0buqvAgowsE+WID1ez7wYyqa7j5yYHUyFSx9pAjaKhHOGQG8F2qKj9z1f/V2fRc5agCYkE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=hsu1fFn8; arc=none smtp.client-ip=209.85.222.171
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-qk1-f171.google.com with SMTP id af79cd13be357-7be44a90468so108970685a.3;
-        Thu, 30 Jan 2025 07:06:45 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1738249604; x=1738854404; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:subject:references
-         :in-reply-to:message-id:cc:to:from:date:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=JI5cvnHUtQaistWIrGNna3l1hMRw3Olm90CfuK7nl+8=;
-        b=hsu1fFn8DWVYPCnfe5qorKaaPUsG9mbCqv0nVkUKd/QDYH0cumfWj6JxwJca6h3+0n
-         XoOaaKWM76h7GjCuClOId43ka3zerqZHon99OKKpwp0DBxTsywPh+XPlzHTMe6Ao7eaG
-         bHuoFZ0M7fxqmHrF7dbXYkL+F/ABYSAxtdOHLL/Q7srGZe49+DjNQLpqKvQcLX88O4n0
-         xRlmUPfktHbpVQ4dlTCxaOHDFoTBIcvQgurx3sBadvB3taF9SZmKcsEkNruiv3oYV78E
-         iNewFwwgOndNxiRNNcoOPN1fxT5ADGuU4NwEZK+Lerg8LLxRStvOFqHmjXofKjJKGjze
-         KyMw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1738249604; x=1738854404;
-        h=content-transfer-encoding:mime-version:subject:references
-         :in-reply-to:message-id:cc:to:from:date:x-gm-message-state:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=JI5cvnHUtQaistWIrGNna3l1hMRw3Olm90CfuK7nl+8=;
-        b=Yp/WYeyOozKKryVUP8BB4MUJPY/ba3RU21eZTFnZqxoWw/mbpuEJcuYmCqjgKumOKS
-         ZioZeirCfy/yolUZur2DgRuhwbYoliXkEyQVFRslU5z+3vmNjp6kcs9LbMgtzpgLcTno
-         1N/aGkl/vjmg4FZQWxnlISghFiB0EcLi4+xnWIKEiL8h4jeDujcytppUl3PN7s1lgmY0
-         wJJfkrjm5qQRXmsX+tD65315cNJHaTSAgSP/NRQ430VmzyU4NEOd9HoUZQje0EJ3Pugy
-         uP4IClnD1H/TSekK2XLWtw8bY/bzwYhfRVb/aZvpi2K6I2+dRAAU8/CCX83jvs+l+7uL
-         xfaQ==
-X-Forwarded-Encrypted: i=1; AJvYcCU66OUMf/HYFEBDIORqzsl8fp/+rwvLeEoMP3MPg4bfzdwFkmgbbQpG8to48cYtqj5ChCQSo9Gsp0cONpUZGbM=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzlVJfmKHVSP4R1Gp65d7vQv7P281C66s82trriWtRcvTSFdyZa
-	lvvjiz0fcc/ksXpPTydMCWg7Offw4bBSsduB+yRwYthsLCdRcnju
-X-Gm-Gg: ASbGncv/wCHfQ78UXsO/9lMzGTgD73dCGBReqHtnDoC8vfP/ds1QFMGSd2DaMkKbgGb
-	dQSabPRs8t0ye4vxewn8ETLBCp8Pwgeb9aRn3v6WdKreBBRB2EyiJQ1YBY4ADlD5cjc+JTcTzZf
-	PNKqxmF6u/BL/H3oR0l9zi69gIYRLGLDWC+b2yOrX8rcvgyUBomyId3UMoFZBrI/qzIVtDbeBCp
-	W8s44xbn2TJ6LSLTW3tvG7PDEnunmfYsa7O5LmSWJsY2+DUkjUxkl46l5F73RF3MV7yMagN9DlC
-	ew2dWI20ca8rET2XruJr6kxKKfx1IJIcQmC+MWIK3gylFiwHZ66q0/LODj3q/gs=
-X-Google-Smtp-Source: AGHT+IEhcvqek8X/10GXPUdrkYOae79A4soxEePRG/3Mi9gTYA5EN3/mO+so46rHgN3Bc8y1Vyihyw==
-X-Received: by 2002:a05:620a:390e:b0:7b6:bbe8:7d6e with SMTP id af79cd13be357-7bffcd9b6c7mr1236325485a.40.1738249604189;
-        Thu, 30 Jan 2025 07:06:44 -0800 (PST)
-Received: from localhost (15.60.86.34.bc.googleusercontent.com. [34.86.60.15])
-        by smtp.gmail.com with ESMTPSA id af79cd13be357-7c00a905afdsm81570285a.81.2025.01.30.07.06.43
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 30 Jan 2025 07:06:43 -0800 (PST)
-Date: Thu, 30 Jan 2025 10:06:43 -0500
-From: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
-To: Jakub Kicinski <kuba@kernel.org>, 
- Anna Emese Nyiri <annaemesenyiri@gmail.com>
-Cc: netdev@vger.kernel.org, 
- fejes@inf.elte.hu, 
- edumazet@google.com, 
- pabeni@redhat.com, 
- willemb@google.com, 
- idosch@idosch.org, 
- davem@davemloft.net, 
- horms@kernel.org, 
- shuah@kernel.org, 
- linux-kselftest@vger.kernel.org
-Message-ID: <679b95838f17_1c77632944f@willemb.c.googlers.com.notmuch>
-In-Reply-To: <20250129120526.7ba0958b@kernel.org>
-References: <20250129143601.16035-1-annaemesenyiri@gmail.com>
- <20250129143601.16035-2-annaemesenyiri@gmail.com>
- <20250129120526.7ba0958b@kernel.org>
-Subject: Re: [PATCH net-next 1/1] selftests: net: Add support for testing
- SO_RCVMARK and SO_RCVPRIORITY
+	by serv108.segi.ulg.ac.be (Postfix) with ESMTPSA id 37F9E200E2B9;
+	Thu, 30 Jan 2025 16:12:24 +0100 (CET)
+DKIM-Filter: OpenDKIM Filter v2.11.0 serv108.segi.ulg.ac.be 37F9E200E2B9
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=uliege.be;
+	s=ulg20190529; t=1738249944;
+	bh=tM2ZriC32/SfoOJpT2SXMIQO8un/LyqDVwXNOuePRh0=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=Bm3nWnc3/RFF00zHJOP13vGTCNGMiDT7sGIeX0jQj8MMAxanAhr9rSoE6ylxcd+ZL
+	 bGP0jzYjZxdx5jZ8BmFdMaMfyvtkp6MotxRwRsrWX2YvIul/bl7mpMebmo+sNFlnZj
+	 nLmWGG9ZABlUgN8JKl4tDl/0DoJwo4QOrpzsUOc2Y6LBZp/U6NFk/Ll1MKUabb7+Qm
+	 gHBdUQ0dtWZRGbFTImWHagFY4GY5kp7tErFATbCK45vYgCeCOLLxmsViV4BMwbR9lT
+	 askOLMQURDRGtOBiuva1iuP9Zf2wpWF8kqmIAZZjfsgukif/MYhyWQQ5XFtjxFm/py
+	 jkf8pohlbNw6w==
+Message-ID: <59f99151-b1ca-456f-9e87-85dcac5db797@uliege.be>
+Date: Thu, 30 Jan 2025 16:12:23 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Content-Type: text/plain;
- charset=utf-8
+MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net v2 2/2] net: ipv6: fix dst ref loops in rpl, seg6 and
+ ioam6 lwtunnels
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: Paolo Abeni <pabeni@redhat.com>, davem@davemloft.net,
+ netdev@vger.kernel.org, edumazet@google.com, andrew+netdev@lunn.ch,
+ horms@kernel.org, dsahern@kernel.org
+References: <20250130031519.2716843-1-kuba@kernel.org>
+ <20250130031519.2716843-2-kuba@kernel.org>
+ <21027e9a-60f1-4d4b-a09d-9d74f6a692e5@redhat.com>
+ <cc9dd246-e8f8-4d10-9ca1-c7fed44ecde6@uliege.be>
+ <20250130065518.5872bbfa@kernel.org>
+Content-Language: en-US
+From: Justin Iurman <justin.iurman@uliege.be>
+In-Reply-To: <20250130065518.5872bbfa@kernel.org>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 
-Jakub Kicinski wrote:
-> On Wed, 29 Jan 2025 15:36:01 +0100 Anna Emese Nyiri wrote:
-> > diff --git a/tools/testing/selftests/net/Makefile b/tools/testing/selftests/net/Makefile
-> > index 73ee88d6b043..98f05473e672 100644
-> > --- a/tools/testing/selftests/net/Makefile
-> > +++ b/tools/testing/selftests/net/Makefile
-> > @@ -33,6 +33,7 @@ TEST_PROGS += gro.sh
-> >  TEST_PROGS += gre_gso.sh
-> >  TEST_PROGS += cmsg_so_mark.sh
-> >  TEST_PROGS += cmsg_so_priority.sh
-> > +TEST_PROGS += test_so_rcv.sh
-> 
-> You need to add the C part to the TEST_GEN_PROGS, otherwise it won't
-> get built. We're seeing:
-
-and to .gitignore
- 
-> ./test_so_rcv.sh: line 25: ./so_rcv_listener: No such file or directory
-> 
-> in the CI.
-> 
-> > +	memset(&recv_addr, 0, sizeof(recv_addr));
-> > +	recv_addr.sin_family = AF_INET;
-> > +	recv_addr.sin_port = htons(atoi(opt.service));
-> > +
-> > +	if (inet_pton(AF_INET, opt.host, &recv_addr.sin_addr) <= 0) {
-> > +		perror("Invalid address");
-> > +		ret_value = -errno;
-> > +		goto cleanup;
-> > +	}
-> 
-> Any reason not to use getaddrinfo() ?
-> 
-> Otherwise LGTM, thanks for following up!
-> -- 
-> pw-bot: cr
 
 
+On 1/30/25 15:55, Jakub Kicinski wrote:
+> On Thu, 30 Jan 2025 14:52:14 +0100 Justin Iurman wrote:
+>>> On 1/30/25 4:15 AM, Jakub Kicinski wrote:
+>>>> Some lwtunnels have a dst cache for post-transformation dst.
+>>>> If the packet destination did not change we may end up recording
+>>>> a reference to the lwtunnel in its own cache, and the lwtunnel
+>>>> state will never be freed.
+>>>
+>>> The series LGTM, but I'm wondering if we can't have a similar loop for
+>>> input lwt?
+>>
+>> Hmmm, I think Paolo is right. At least, I don't see a reason why it
+>> wouldn't be correct. We should also take care of input lwt for both
+>> seg6_iptunnel and rpl_iptunnel (ioam6_iptunnel does not implement input).
+> 
+> Would you be able to take care of that?
+
+Sure, I'll send a patch as soon as this patchset is merged to net.
+
+> And perhaps add a selftest at least for the looped cases?
+
+ioam6.sh already triggers the looped cases in both inline and encap 
+tests. Not sure about seg6 though, and there is no selftest for rpl.
 
