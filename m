@@ -1,176 +1,222 @@
-Return-Path: <netdev+bounces-161678-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-161679-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4B02CA232BA
-	for <lists+netdev@lfdr.de>; Thu, 30 Jan 2025 18:23:20 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id F274CA23349
+	for <lists+netdev@lfdr.de>; Thu, 30 Jan 2025 18:42:56 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 480BF3A4574
-	for <lists+netdev@lfdr.de>; Thu, 30 Jan 2025 17:23:12 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 53F2E1623D9
+	for <lists+netdev@lfdr.de>; Thu, 30 Jan 2025 17:42:55 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5D31F1EE7CD;
-	Thu, 30 Jan 2025 17:23:15 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 84C191F03C3;
+	Thu, 30 Jan 2025 17:42:53 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="upySuXt6"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="pAOGNf1x"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 258852770C;
-	Thu, 30 Jan 2025 17:23:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B949D17597;
+	Thu, 30 Jan 2025 17:42:50 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1738257795; cv=none; b=uS9siY3wV7+QlXujOFbja5vK2p8NMBHANnwy3v3+/C3upAvNix6y/bg9p/NK3LW+bwT6sP7Zkllj8Okx6apo2oLWvdaOjkFHaq5WPLZQNR8eN02nU+XWOumXFRiWGOpLsvmSunEJSZx3XRzJ9a7oFdt2Ddv2vNQLwrt1lr9evfw=
+	t=1738258973; cv=none; b=BeNXGev4Lx832K2lju/hPWwDLHBvKQNsVIO/8pDpODCB06WmtWUCwKLZfw8/KL02d04kS9+37La6uW7XH9WXi7kr454JMTwrvRKH6PRVCw26xsfv6mpBgQsPQr2o1ZxRYcy3F2rhrvySSU9rWAPmOOraSLuRZkL3zx8DXOgijRk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1738257795; c=relaxed/simple;
-	bh=yH4FEbQVXyMxFaB7hk1ruwl/3FyAw8z0JzuE+B/DXpM=;
+	s=arc-20240116; t=1738258973; c=relaxed/simple;
+	bh=owHGhlOxqkTJZf1QKp2zLFkv9bpKwBGaiiWtVHtyhuI=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=ERKgkTT7TUXz91oi/BYNTi8l//KPdKsPQn8p97lnyWS6Ou7qiZ5mOJE4PqqEAw3hzt27T6+goKtgAMdgpwOf6sVSTkcLNXzHLgUs24uA4lfZxc4S5UyD+AHWAFhY2PadjWTnocunoKe1nO3k5uyTYBhnZe33SeC+yaMADreU6PM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=upySuXt6; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id C1F4AC4CED2;
-	Thu, 30 Jan 2025 17:23:06 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1738257793;
-	bh=yH4FEbQVXyMxFaB7hk1ruwl/3FyAw8z0JzuE+B/DXpM=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=upySuXt69EgxtJcJBjPKJLKq/sT++GHdJLl2ro5gBbZNK4U64HWApRXSLxfb8eFw0
-	 CI/IjFGVut8N3OHewG3MvKiRmcSfSNNZ5ykiHjTTGmeYvMj9VBh5/2BZ1n2iVT7nRk
-	 +EI23txGIo3cN3lTDEqeHccBBtQHqfvwuULpBtGjEi0XC4aivzW02RTO80hTOgADBc
-	 wbX9ocvq5U3cJU64lLn7bWeQyrWuXI050ij/SsZRqm8NAzJfMoTZk8rUqPfzOJTngl
-	 +g8cdyMfWtmFvIENKtDO8EOaaMMMKJtNs7wz+mFGikGXV2YXP/9TUsiVK8Mo47P7TW
-	 GabRao+AJ+L0Q==
-Date: Thu, 30 Jan 2025 17:23:04 +0000
-From: Simon Horman <horms@kernel.org>
-To: Basharath Hussain Khaja <basharath@couthit.com>
-Cc: danishanwar@ti.com, rogerq@kernel.org, andrew+netdev@lunn.ch,
+	 Content-Type:Content-Disposition:In-Reply-To; b=DVZ7wCGIxlIRSx7FduoOv9iOzyoy6vlSTwMT2ZRlmAWVFEukv4S+KDKvmXLEyhK3FhSkd3xiOu8mN5m92ZxsjjYDEvSFOUIn5OWsxFBYRy3wkOEGvTbyS3P9ljI20UMGa/2Tjp1IEAKhAdmh8cKzyPaTluelvwCaKB+am3mxALQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=pAOGNf1x; arc=none smtp.client-ip=78.32.30.218
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
+	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
+	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
+	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
+	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
+	bh=xasRZEja/joABEkMp98bjtx1gSYQAG+ohRktNZoL2vw=; b=pAOGNf1xfxkTbyoApyyRbDfzwb
+	bM7Cxb4AHGNfMqMoMr3h2AGCgs8xtWfDH5dRjvQP8u1YVRhfqHblcg6ciXkf1trQwKNC/xPk3zcjh
+	E6vkLZoLEn2aySQuEEvHcleEMEOgoI94h3wH3ITNDI6ly34tAqlNslSAx+mq3jANZzkMOPwCApztY
+	2rcrq6gMPN3fjKSX0+9fldOThtJXOMJ0aM0i0TrK186i2+mHTOj9C+jnaGFgL3GqGopXiH7yu/9+B
+	Vcu8oAYh4yfiX2S3xCo4Y4NSkxE+hc4vCkiueJCVT2KPmRRjsBrbcP2Ww8zGyo0EO+wYcAQ6IdZtn
+	fyqYpsaw==;
+Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:46808)
+	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.96)
+	(envelope-from <linux@armlinux.org.uk>)
+	id 1tdYYn-0004nx-15;
+	Thu, 30 Jan 2025 17:42:37 +0000
+Received: from linux by shell.armlinux.org.uk with local (Exim 4.96)
+	(envelope-from <linux@shell.armlinux.org.uk>)
+	id 1tdYYj-0004wV-2A;
+	Thu, 30 Jan 2025 17:42:33 +0000
+Date: Thu, 30 Jan 2025 17:42:33 +0000
+From: "Russell King (Oracle)" <linux@armlinux.org.uk>
+To: Vladimir Oltean <olteanv@gmail.com>
+Cc: Tristram.Ha@microchip.com, Woojung.Huh@microchip.com, andrew@lunn.ch,
+	hkallweit1@gmail.com, maxime.chevallier@bootlin.com,
 	davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
-	pabeni@redhat.com, robh@kernel.org, krzk+dt@kernel.org,
-	conor+dt@kernel.org, nm@ti.com, ssantosh@kernel.org,
-	tony@atomide.com, richardcochran@gmail.com, parvathi@couthit.com,
-	schnelle@linux.ibm.com, rdunlap@infradead.org,
-	diogo.ivo@siemens.com, m-karicheri2@ti.com,
-	jacob.e.keller@intel.com, m-malladi@ti.com,
-	javier.carrasco.cruz@gmail.com, afd@ti.com, s-anna@ti.com,
-	linux-arm-kernel@lists.infradead.org, netdev@vger.kernel.org,
-	devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
-	linux-omap@vger.kernel.org, pratheesh@ti.com, prajith@ti.com,
-	vigneshr@ti.com, praneeth@ti.com, srk@ti.com, rogerq@ti.com,
-	krishna@couthit.com, pmohan@couthit.com, mohan@couthit.com
-Subject: Re: [RFC v2 PATCH 05/10] net: ti: prueth: Adds ethtool support for
- ICSSM PRUETH Driver
-Message-ID: <20250130172304.GD13457@kernel.org>
-References: <20250124122353.1457174-1-basharath@couthit.com>
- <20250124134056.1459060-6-basharath@couthit.com>
+	pabeni@redhat.com, UNGLinuxDriver@microchip.com,
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH RFC net-next 1/2] net: pcs: xpcs: Add special code to
+ operate in Microchip KSZ9477 switch
+Message-ID: <Z5u6CajmOV6T1Tkv@shell.armlinux.org.uk>
+References: <Z5iiXWkhm2OvbjOx@shell.armlinux.org.uk>
+ <20250128102128.z3pwym6kdgz4yjw4@skbuf>
+ <Z5jOhzmQAGkv9Jlw@shell.armlinux.org.uk>
+ <20250128152324.3p2ccnxoz5xta7ct@skbuf>
+ <DM3PR11MB8736F7C3A021CAE9AB92F84EECEE2@DM3PR11MB8736.namprd11.prod.outlook.com>
+ <DM3PR11MB8736F7C3A021CAE9AB92F84EECEE2@DM3PR11MB8736.namprd11.prod.outlook.com>
+ <20250129211226.cfrhv4nn3jomooxc@skbuf>
+ <Z5qmIEc6xEaeY6ys@shell.armlinux.org.uk>
+ <20250129230549.kwkcxdn62mghdlx3@skbuf>
+ <Z5t0RvoUOhxqeh25@shell.armlinux.org.uk>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: multipart/mixed; boundary="dB35/U62McMbXIoP"
+Content-Disposition: inline
+In-Reply-To: <Z5t0RvoUOhxqeh25@shell.armlinux.org.uk>
+Sender: Russell King (Oracle) <linux@armlinux.org.uk>
+
+
+--dB35/U62McMbXIoP
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20250124134056.1459060-6-basharath@couthit.com>
 
-On Fri, Jan 24, 2025 at 07:10:51PM +0530, Basharath Hussain Khaja wrote:
-> From: Roger Quadros <rogerq@ti.com>
-> 
-> Changes for enabling ethtool support for the newly added PRU Ethernet
-> interfaces. Extends the support for statistics collection from PRU internal
-> memory and displays it in the user space. Along with statistics,
-> enable/disable of features, configuring link speed etc.are now supported.
-> 
-> The firmware running on PRU maintains statistics in internal data memory.
-> When requested ethtool collects all the statistics for the specified
-> interface and displays it in the user space.
-> 
-> Makefile is updated to include ethtool support into PRUETH driver.
-> 
-> Signed-off-by: Roger Quadros <rogerq@ti.com>
-> Signed-off-by: Andrew F. Davis <afd@ti.com>
-> Signed-off-by: Parvathi Pudi <parvathi@couthit.com>
-> Signed-off-by: Basharath Hussain Khaja <basharath@couthit.com>
+On Thu, Jan 30, 2025 at 12:44:54PM +0000, Russell King (Oracle) wrote:
+> @@ -1123,7 +1126,9 @@ static void xpcs_link_up_sgmii_1000basex(struct dw_xpcs *xpcs,
+>  {
+>  	int ret;
+>  
+> -	if (neg_mode == PHYLINK_PCS_NEG_INBAND_ENABLED)
+> +	if (neg_mode == PHYLINK_PCS_NEG_INBAND_ENABLED &&
+> +	    !(interface == PHY_INTERFACE_MODE_SGMII &&
+> +	      xpcs->sgmii_mode == )
+                                  ^ DW_XPCS_SGMII_MODE_MAC_MANUAL
 
-...
+Not sure where that went. :(
 
-> diff --git a/drivers/net/ethernet/ti/icssm/icssm_ethtool.c b/drivers/net/ethernet/ti/icssm/icssm_ethtool.c
+>  		return;
+>  
+>  	if (interface == PHY_INTERFACE_MODE_1000BASEX) {
 
-...
+Note that with this change, we also need to change the xpcs_write() to
+BMCR at the end of this function to xpcs_modify() so we don't clear the
+AN-enable bit. It's also a good idea in general to only modify the bits
+we need to modify.
 
-> +static const struct {
-> +	char string[ETH_GSTRING_LEN];
-> +	u32 offset;
-> +} prueth_ethtool_stats[] = {
-> +	{"txBcast", PRUETH_STAT_OFFSET(tx_bcast)},
-> +	{"txMcast", PRUETH_STAT_OFFSET(tx_mcast)},
-> +	{"txUcast", PRUETH_STAT_OFFSET(tx_ucast)},
-> +	{"txOctets", PRUETH_STAT_OFFSET(tx_octets)},
-> +	{"rxBcast", PRUETH_STAT_OFFSET(rx_bcast)},
-> +	{"rxMcast", PRUETH_STAT_OFFSET(rx_mcast)},
-> +	{"rxUcast", PRUETH_STAT_OFFSET(rx_ucast)},
-> +	{"rxOctets", PRUETH_STAT_OFFSET(rx_octets)},
+New patch attached.
 
-Hi Roger, Basharath, all,
+-- 
+RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
+FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
 
-There seems to be some overlap between the above and struct rtnl_link_stats64.
+--dB35/U62McMbXIoP
+Content-Type: text/x-diff; charset=us-ascii
+Content-Disposition: attachment;
+	filename="0001-net-xpcs-add-support-for-manual-update-for-SGMII.patch"
 
-Please implement those stats which are present in struct rtnl_link_stats64
-using ndo_get_stats64 and omit them from your implementation of
-get_ethtool_stats.
+From: "Russell King (Oracle)" <rmk+kernel@armlinux.org.uk>
+Subject: [PATCH net-next] net: xpcs: add support for manual update for SGMII
 
-IOW, get_ethtool_stats() is for extended stats, whereas is for standard
-stats ndo_get_stats64().  And standard stats should not be presented to the
-user as extended stats.
+Older revisions of the XPCS IP do not support the MAC_AUTO_SW flag and
+need the BMCR register updated with the speed information from the PHY.
+Split the DW_XPCS_SGMII_MODE_MAC mode into _AUTO and _MANUAL variants,
+where _AUTO mode means the update happens in hardware autonomously,
+whereas the _MANUAL mode means that we need to update the BMCR register
+when the link comes up.
 
-Link: https://docs.kernel.org/networking/statistics.html#notes-for-driver-authors
+Signed-off-by: Russell King (Oracle) <rmk+kernel@armlinux.org.uk>
+---
+ drivers/net/pcs/pcs-xpcs.c | 16 +++++++++++-----
+ drivers/net/pcs/pcs-xpcs.h | 11 ++++++++---
+ 2 files changed, 19 insertions(+), 8 deletions(-)
 
-> +	{"tx64byte", PRUETH_STAT_OFFSET(tx64byte)},
-> +	{"tx65_127byte", PRUETH_STAT_OFFSET(tx65_127byte)},
-> +	{"tx128_255byte", PRUETH_STAT_OFFSET(tx128_255byte)},
-> +	{"tx256_511byte", PRUETH_STAT_OFFSET(tx256_511byte)},
-> +	{"tx512_1023byte", PRUETH_STAT_OFFSET(tx512_1023byte)},
-> +	{"tx1024byte", PRUETH_STAT_OFFSET(tx1024byte)},
-> +	{"rx64byte", PRUETH_STAT_OFFSET(rx64byte)},
-> +	{"rx65_127byte", PRUETH_STAT_OFFSET(rx65_127byte)},
-> +	{"rx128_255byte", PRUETH_STAT_OFFSET(rx128_255byte)},
-> +	{"rx256_511byte", PRUETH_STAT_OFFSET(rx256_511byte)},
-> +	{"rx512_1023byte", PRUETH_STAT_OFFSET(rx512_1023byte)},
-> +	{"rx1024byte", PRUETH_STAT_OFFSET(rx1024byte)},
+diff --git a/drivers/net/pcs/pcs-xpcs.c b/drivers/net/pcs/pcs-xpcs.c
+index e7aad3c402a4..29269d5c5f3a 100644
+--- a/drivers/net/pcs/pcs-xpcs.c
++++ b/drivers/net/pcs/pcs-xpcs.c
+@@ -691,11 +691,14 @@ static int xpcs_config_aneg_c37_sgmii(struct dw_xpcs *xpcs,
+ 	mask = DW_VR_MII_DIG_CTRL1_2G5_EN | DW_VR_MII_DIG_CTRL1_MAC_AUTO_SW;
+ 
+ 	switch (xpcs->sgmii_mode) {
+-	case DW_XPCS_SGMII_MODE_MAC:
++	case DW_XPCS_SGMII_MODE_MAC_AUTO:
+ 		if (neg_mode == PHYLINK_PCS_NEG_INBAND_ENABLED)
+ 			val = DW_VR_MII_DIG_CTRL1_MAC_AUTO_SW;
+ 		break;
+ 
++	case DW_XPCS_SGMII_MODE_MAC_MANUAL:
++		break;
++
+ 	case DW_XPCS_SGMII_MODE_PHY_HW:
+ 		val |= DW_VR_MII_DIG_CTRL1_PHY_MODE_CTRL;
+ 		fallthrough;
+@@ -1123,7 +1126,9 @@ static void xpcs_link_up_sgmii_1000basex(struct dw_xpcs *xpcs,
+ {
+ 	int ret;
+ 
+-	if (neg_mode == PHYLINK_PCS_NEG_INBAND_ENABLED)
++	if (neg_mode == PHYLINK_PCS_NEG_INBAND_ENABLED &&
++	    !(interface == PHY_INTERFACE_MODE_SGMII &&
++	      xpcs->sgmii_mode == DW_XPCS_SGMII_MODE_MAC_MANUAL)
+ 		return;
+ 
+ 	if (interface == PHY_INTERFACE_MODE_1000BASEX) {
+@@ -1140,10 +1145,11 @@ static void xpcs_link_up_sgmii_1000basex(struct dw_xpcs *xpcs,
+ 				__func__);
+ 	}
+ 
+-	ret = xpcs_write(xpcs, MDIO_MMD_VEND2, MII_BMCR,
+-			 mii_bmcr_encode_fixed(speed, duplex));
++	ret = xpcs_modify(xpcs, MDIO_MMD_VEND2, MII_BMCR,
++			  BMCR_SPEED1000 | BMCR_FULLDPLX | BMCR_SPEED100,
++			  mii_bmcr_encode_fixed(speed, duplex));
+ 	if (ret)
+-		dev_err(&xpcs->mdiodev->dev, "%s: xpcs_write returned %pe\n",
++		dev_err(&xpcs->mdiodev->dev, "%s: xpcs_modify returned %pe\n",
+ 			__func__, ERR_PTR(ret));
+ }
+ 
+diff --git a/drivers/net/pcs/pcs-xpcs.h b/drivers/net/pcs/pcs-xpcs.h
+index 4bd6a82f1a18..be8fab40b012 100644
+--- a/drivers/net/pcs/pcs-xpcs.h
++++ b/drivers/net/pcs/pcs-xpcs.h
+@@ -112,8 +112,12 @@ enum dw_xpcs_sgmii_10_100 {
+ };
+ 
+ /* The SGMII mode:
+- * DW_XPCS_SGMII_MODE_MAC: the XPCS acts as a MAC, reading and acknowledging
+- * the config word.
++ * DW_XPCS_SGMII_MODE_MAC_AUTO: the XPCS acts as a MAC, accepting the
++ * parameters from the PHY end of the SGMII link and acknowledging the
++ * config word. The XPCS autonomously switches speed.
++ *
++ * DW_XPCS_SGMII_MODE_MAC_MANUAL: the XPCS acts as a MAC as above, but
++ * does not autonomously switch speed.
+  *
+  * DW_XPCS_SGMII_MODE_PHY_HW: the XPCS acts as a PHY, deriving the tx_config
+  * bits 15 (link), 12 (duplex) and 11:10 (speed) from hardware inputs to the
+@@ -125,7 +129,8 @@ enum dw_xpcs_sgmii_10_100 {
+  * integration documentation states that MII_ADVERTISE must be written last.
+  */
+ enum dw_xpcs_sgmii_mode {
+-	DW_XPCS_SGMII_MODE_MAC,		/* XPCS is MAC on SGMII */
++	DW_XPCS_SGMII_MODE_MAC_AUTO,	/* XPCS is MAC, auto update */
++	DW_XPCS_SGMII_MODE_MAC_MANUAL,	/* XPCS is MAC, manual update */
+ 	DW_XPCS_SGMII_MODE_PHY_HW,	/* XPCS is PHY, tx_config from hw */
+ 	DW_XPCS_SGMII_MODE_PHY_REG,	/* XPCS is PHY, tx_config from regs */
+ };
+-- 
+2.30.2
 
-Similarly, the above, along with rxOverSizedFrames and rxUnderSizedFrames
-below seem to be RMON (RFC 2819) statistics. So I think they should
-be handled by implementing get_rmon_stats().
 
-> +
-> +	{"lateColl", PRUETH_STAT_OFFSET(late_coll)},
-> +	{"singleColl", PRUETH_STAT_OFFSET(single_coll)},
-> +	{"multiColl", PRUETH_STAT_OFFSET(multi_coll)},
-> +	{"excessColl", PRUETH_STAT_OFFSET(excess_coll)},
-
-And likewise, the section above and below seem to overlap
-with Basic IEEE 802.3 MAC statistics which I believe
-should be handled by implementing get_eth_mac_stats()
-
-> +
-> +	{"rxMisAlignmentFrames", PRUETH_STAT_OFFSET(rx_misalignment_frames)},
-> +	{"stormPrevCounterBC", PRUETH_STAT_OFFSET(stormprev_counter_bc)},
-> +	{"stormPrevCounterMC", PRUETH_STAT_OFFSET(stormprev_counter_mc)},
-> +	{"stormPrevCounterUC", PRUETH_STAT_OFFSET(stormprev_counter_uc)},
-> +	{"macRxError", PRUETH_STAT_OFFSET(mac_rxerror)},
-> +	{"SFDError", PRUETH_STAT_OFFSET(sfd_error)},
-> +	{"defTx", PRUETH_STAT_OFFSET(def_tx)},
-> +	{"macTxError", PRUETH_STAT_OFFSET(mac_txerror)},
-> +	{"rxOverSizedFrames", PRUETH_STAT_OFFSET(rx_oversized_frames)},
-> +	{"rxUnderSizedFrames", PRUETH_STAT_OFFSET(rx_undersized_frames)},
-> +	{"rxCRCFrames", PRUETH_STAT_OFFSET(rx_crc_frames)},
-> +	{"droppedPackets", PRUETH_STAT_OFFSET(dropped_packets)},
-> +
-> +	{"txHWQOverFlow", PRUETH_STAT_OFFSET(tx_hwq_overflow)},
-> +	{"txHWQUnderFlow", PRUETH_STAT_OFFSET(tx_hwq_underflow)},
-> +	{"vlanDropped", PRUETH_STAT_OFFSET(vlan_dropped)},
-> +	{"multicastDropped", PRUETH_STAT_OFFSET(multicast_dropped)},
-> +};
-
-...
+--dB35/U62McMbXIoP--
 
