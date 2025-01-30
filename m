@@ -1,118 +1,257 @@
-Return-Path: <netdev+bounces-161632-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-161633-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 73D28A22C90
-	for <lists+netdev@lfdr.de>; Thu, 30 Jan 2025 12:34:29 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id AF2D0A22CA5
+	for <lists+netdev@lfdr.de>; Thu, 30 Jan 2025 12:42:03 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E87B01672F9
-	for <lists+netdev@lfdr.de>; Thu, 30 Jan 2025 11:34:27 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 021941886954
+	for <lists+netdev@lfdr.de>; Thu, 30 Jan 2025 11:42:08 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9FE5F1B4228;
-	Thu, 30 Jan 2025 11:34:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 579B51DDC19;
+	Thu, 30 Jan 2025 11:41:55 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="RNnZhTQr"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="DVeS/PJ5"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DE0CBB641
-	for <netdev@vger.kernel.org>; Thu, 30 Jan 2025 11:34:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1D77C1AB507;
+	Thu, 30 Jan 2025 11:41:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1738236865; cv=none; b=i6L+27zcu9JMzP2lBeC1XELwSzYSKPe6UqZriFdXxUoKHHQNmXepxj5wFCiD/1aV0N665pd9L42PTAhiBYXnkSYDvoClkqOFj2jcSay2bBxYTClOAjsz718Vy+KEmQNxl6YrWOrT5vAwW74QW53gfimDGfyhAqBZlqKl5FIaexY=
+	t=1738237315; cv=none; b=Gpzytzci/wMSqd4HOHulElY1vDo8ZGXJNjRHUDmftDsSJBKeV2f2QmY5OdD7eha7QYQcF8jsBCnFoUj+BrCFlTbVu5yHmJEmZz2FS5EuXa55mmSQ0UTuk83s+JxvJbra3724XBMF7jmv6II1XoS57jKDJ8zKAyNk7kYld255T48=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1738236865; c=relaxed/simple;
-	bh=KFnu8ilRLneYRXxS8LEvkL4i+coBbtCKTRmYf1kTUig=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=ePRZA3jTgNkMKdR9uuKYnS1xY7sz0liygpLyjc4leT+yaMUgirO9+YQrjTvvOqqSjs3tP6ox5EDmGgUCLk21A69gUnL/wAuVGSUoOwRUZTYqryq92CnfaaZsMKjszwvr3RqnzrgK/4WcHKKOSu/rsZW284ORroe1cq8suIYEYdU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=RNnZhTQr; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1738236862;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=KFnu8ilRLneYRXxS8LEvkL4i+coBbtCKTRmYf1kTUig=;
-	b=RNnZhTQrUw5q+MOwVCHB3F0symkkoBNLvZmO29ukdIvmFsledSgtD/WP5PcZPtuKshM8Ya
-	pWcY9HwONqiVRPv+ltufhyUD2eKxHsl5Oq7nfwMmwkxHCfiezgXNiXD947hy90g8ZzCaC/
-	dzc/mcPBwCOI8V0ulaMcplnPVGSrpIE=
-Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
- [209.85.128.71]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-59-Qm7zLNDNMSqHE4IQJIE0ng-1; Thu, 30 Jan 2025 06:34:20 -0500
-X-MC-Unique: Qm7zLNDNMSqHE4IQJIE0ng-1
-X-Mimecast-MFC-AGG-ID: Qm7zLNDNMSqHE4IQJIE0ng
-Received: by mail-wm1-f71.google.com with SMTP id 5b1f17b1804b1-43646b453bcso3329835e9.3
-        for <netdev@vger.kernel.org>; Thu, 30 Jan 2025 03:34:20 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1738236860; x=1738841660;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=KFnu8ilRLneYRXxS8LEvkL4i+coBbtCKTRmYf1kTUig=;
-        b=nZcee0fStLkIaM098qc/flztTJlRwAif9bY04eyJBytTFm62kRtcyc8sGQL7In45Xe
-         H4e2wUzzsbA+5U+VvPqYxNBLO+1FFpL2AbDmnMsn3AXwWIKL2kUtOyUKNkYv8XH4gbxA
-         p3zvD1FyZQTZHbhBxhCEN8+r9rNgMQzGsx/XQdsQTypM8Bdqxz8fLlCTxCTcDQ2m403j
-         YNHjB04DP1NriHGqN+C20nqUECeUW7B7Kuw4SgprFaH4B924VxGcxvleqvoIdyOulM87
-         C8vDibtXk6/vjPO1jt6Edln+fW3LattzbZPUxwlmQZz6yFKh+Uyks+4TagPE1kXuZ7c8
-         GycQ==
-X-Gm-Message-State: AOJu0YxI99NcZrnhUIzTH4oZZEKW58i6APU1vMDNkRVHaig01dxqKdzj
-	TKqOyGraS3vvKGDYJl18MEbRrAPrlouvegMekkmQYp/dhM53DiUy8VJb3wXvUCdcdXYchPaEBnl
-	qjDavoN6bKbjiEActKtCrr8g6bixE06BedIQGdn5ajYbuyHm3X4hWew==
-X-Gm-Gg: ASbGncuNt9jBJBnh0w8IlISi9N0nHrlXu/Vy8efiBhjY2P3Te/OwzjOtlA6Qsjvfuca
-	1sQAAdc8lezSo9h9jCDFsxz4De9e8Ibfuxex+63iRigVELWQEPA/DnRl4yTE64Zyg9TfeiEUWi/
-	qOTLIw2Me1rEA3+Rn/D5WOIC8rswpwm+3TK85qlR8/uRANUTymRGPN4Fy4WdhyZfYDWpF0PRAKc
-	V5uzmyL6hjpqfzNciyTjPBSPwzEbTW3SsKGYfinK0nj6nAKZFQOEKOn68I4E8k7qR5QOrgVGJ+Z
-	rIUhZm/gyLdEjyxAHYK9pJZLmVI9H+F9TCc=
-X-Received: by 2002:a05:600c:4e09:b0:436:1c04:aa8e with SMTP id 5b1f17b1804b1-438dc3c8200mr65751185e9.16.1738236859747;
-        Thu, 30 Jan 2025 03:34:19 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IHMOqkFVgkJT/N9OpRP+8HABFoiEk2Tp/MthEnnxk+Zun7kdDXSutwKQEKdZQj52UWwmCVQtA==
-X-Received: by 2002:a05:600c:4e09:b0:436:1c04:aa8e with SMTP id 5b1f17b1804b1-438dc3c8200mr65750975e9.16.1738236859415;
-        Thu, 30 Jan 2025 03:34:19 -0800 (PST)
-Received: from [192.168.88.253] (146-241-12-107.dyn.eolo.it. [146.241.12.107])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-438dcc81941sm55568625e9.36.2025.01.30.03.34.15
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 30 Jan 2025 03:34:18 -0800 (PST)
-Message-ID: <21027e9a-60f1-4d4b-a09d-9d74f6a692e5@redhat.com>
-Date: Thu, 30 Jan 2025 12:34:14 +0100
+	s=arc-20240116; t=1738237315; c=relaxed/simple;
+	bh=zGGDx72jO5SaCwxhGo8Hf3CSZMZACAKlKE/UujYgRPU=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=lwhP4ScffAz0sJ/AHehAASKZwKuoh4dHBE6lHx2FISAqzX3iq6Z+2pJ3XQ4geBIvwH9TjHjlV7vOtPG2+adPJgrf+mhCcfvGuASqrwmb5RP8s/kEny/Hl+9vfUM3D1f6O7wisaJ+UezaDuPR600J+EGeIVX/fmQ5AIcZpZZkzuo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=DVeS/PJ5; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id BA076C4CED2;
+	Thu, 30 Jan 2025 11:41:47 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1738237314;
+	bh=zGGDx72jO5SaCwxhGo8Hf3CSZMZACAKlKE/UujYgRPU=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=DVeS/PJ55W7IvF7P3tKbosmE6FOorkc/HwVcjgBKE4RcehzsLYuFEEyhFjAjOfEk+
+	 oUKNhRM7zYp5izAXKmJUjv75tJFPy1TY9pDc1Vys0MhJpf/j3lMvEytBz5+/fpjqiB
+	 kMPTGT/slnYOqvCvAciwcdpFNK/phdbPXTQYX61PrAQBqREcwO96j67r0P56dB9HcH
+	 qWdGIY9lpZDpPY+ZRhIu1N2GaeGEKA2G89E4dQUovpHs+54lzsLNL5m1sXqLm8Eg88
+	 1BxQngOUNnhBo+iAXFBUnJ8DC6hmPbUcWLLTiPsUnKYl/NoPF2hFnOB8TmSLQOzxdW
+	 ONG2Y1kM3Thgw==
+Date: Thu, 30 Jan 2025 11:41:45 +0000
+From: Simon Horman <horms@kernel.org>
+To: Basharath Hussain Khaja <basharath@couthit.com>
+Cc: danishanwar@ti.com, rogerq@kernel.org, andrew+netdev@lunn.ch,
+	davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+	pabeni@redhat.com, robh@kernel.org, krzk+dt@kernel.org,
+	conor+dt@kernel.org, nm@ti.com, ssantosh@kernel.org,
+	tony@atomide.com, richardcochran@gmail.com, parvathi@couthit.com,
+	schnelle@linux.ibm.com, rdunlap@infradead.org,
+	diogo.ivo@siemens.com, m-karicheri2@ti.com,
+	jacob.e.keller@intel.com, m-malladi@ti.com,
+	javier.carrasco.cruz@gmail.com, afd@ti.com, s-anna@ti.com,
+	linux-arm-kernel@lists.infradead.org, netdev@vger.kernel.org,
+	devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
+	linux-omap@vger.kernel.org, pratheesh@ti.com, prajith@ti.com,
+	vigneshr@ti.com, praneeth@ti.com, srk@ti.com, rogerq@ti.com,
+	krishna@couthit.com, pmohan@couthit.com, mohan@couthit.com
+Subject: Re: [RFC v2 PATCH 02/10] net: ti: prueth: Adds ICSSM Ethernet driver
+Message-ID: <20250130114145.GM113107@kernel.org>
+References: <20250124122353.1457174-1-basharath@couthit.com>
+ <20250124122353.1457174-3-basharath@couthit.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net v2 2/2] net: ipv6: fix dst ref loops in rpl, seg6 and
- ioam6 lwtunnels
-To: Jakub Kicinski <kuba@kernel.org>, davem@davemloft.net
-Cc: netdev@vger.kernel.org, edumazet@google.com, andrew+netdev@lunn.ch,
- horms@kernel.org, dsahern@kernel.org, justin.iurman@uliege.be
-References: <20250130031519.2716843-1-kuba@kernel.org>
- <20250130031519.2716843-2-kuba@kernel.org>
-Content-Language: en-US
-From: Paolo Abeni <pabeni@redhat.com>
-In-Reply-To: <20250130031519.2716843-2-kuba@kernel.org>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250124122353.1457174-3-basharath@couthit.com>
 
+On Fri, Jan 24, 2025 at 05:53:45PM +0530, Basharath Hussain Khaja wrote:
+> From: Roger Quadros <rogerq@ti.com>
+> 
+> Updates Kernel configuration to enable PRUETH driver and its dependencies
+> along with makefile changes to add the new PRUETH driver.
+> 
+> Changes includes init and deinit of ICSSM PRU Ethernet driver including
+> net dev registration and firmware loading for DUAL-MAC mode running on
+> PRU-ICSS2 instance.
+> 
+> Changes also includes link handling, PRU booting, default firmware loading
+> and PRU stopping using existing remoteproc driver APIs.
+> 
+> Signed-off-by: Roger Quadros <rogerq@ti.com>
+> Signed-off-by: Andrew F. Davis <afd@ti.com>
+> Signed-off-by: Parvathi Pudi <parvathi@couthit.com>
+> Signed-off-by: Basharath Hussain Khaja <basharath@couthit.com>
 
+...
 
-On 1/30/25 4:15 AM, Jakub Kicinski wrote:
-> Some lwtunnels have a dst cache for post-transformation dst.
-> If the packet destination did not change we may end up recording
-> a reference to the lwtunnel in its own cache, and the lwtunnel
-> state will never be freed.
+> diff --git a/drivers/net/ethernet/ti/icssm/icssm_prueth.c b/drivers/net/ethernet/ti/icssm/icssm_prueth.c
 
-The series LGTM, but I'm wondering if we can't have a similar loop for
-input lwt?
+...
 
-Thanks,
+> +static int icssm_emac_set_boot_pru(struct prueth_emac *emac,
+> +				   struct net_device *ndev)
+> +{
+> +	const struct prueth_firmware *pru_firmwares;
+> +	struct prueth *prueth = emac->prueth;
+> +	const char *fw_name;
+> +	int ret;
+> +
+> +	pru_firmwares = &prueth->fw_data->fw_pru[emac->port_id - 1];
+> +	fw_name = pru_firmwares->fw_name[prueth->eth_type];
+> +	if (!fw_name) {
+> +		netdev_err(ndev, "eth_type %d not supported\n",
+> +			   prueth->eth_type);
+> +		return -ENODEV;
+> +	}
+> +
+> +	ret = rproc_set_firmware(emac->pru, fw_name);
+> +	if (ret) {
+> +		netdev_err(ndev, "failed to set PRU0 firmware %s: %d\n",
+> +			   fw_name, ret);
+> +		return ret;
+> +	}
+> +
+> +	ret = rproc_boot(emac->pru);
+> +	if (ret) {
+> +		netdev_err(ndev, "failed to boot PRU0: %d\n", ret);
+> +		return ret;
+> +	}
+> +
+> +	return ret;
+> +}
+> +
+> +/**
+> + * icssm_emac_ndo_open - EMAC device open
+> + * @ndev: network adapter device
+> + *
+> + * Called when system wants to start the interface.
+> + *
+> + * Return: 0 for a successful open, or appropriate error code
+> + */
+> +static int icssm_emac_ndo_open(struct net_device *ndev)
+> +{
+> +	struct prueth_emac *emac = netdev_priv(ndev);
+> +	int ret;
+> +
+> +	ret = icssm_emac_set_boot_pru(emac, ndev);
+> +	if (ret)
+> +		netdev_err(ndev, "failed to boot PRU: %d\n", ret);
 
-Paolo
+Hi Roger, Basharath, all,
 
+icssm_emac_set_boot_pru() already logs errors, including the one above.
+So this log seems unnecessary to me.
+
+Also, should an error be returned here?  If so, it looks like
+icssm_emac_set_boot_pru() should release resources allocated by
+rproc_set_firmware() if rproc_boot() fails.
+
+> +
+> +	/* start PHY */
+> +	phy_start(emac->phydev);
+> +
+> +	return 0;
+> +}
+
+...
+
+> +static int icssm_prueth_netdev_init(struct prueth *prueth,
+> +				    struct device_node *eth_node)
+> +{
+> +	struct prueth_emac *emac;
+> +	struct net_device *ndev;
+> +	enum prueth_port port;
+> +	enum prueth_mac mac;
+> +	int ret;
+> +
+> +	port = icssm_prueth_node_port(eth_node);
+> +	if (port == PRUETH_PORT_INVALID)
+> +		return -EINVAL;
+> +
+> +	mac = icssm_prueth_node_mac(eth_node);
+> +	if (mac == PRUETH_MAC_INVALID)
+> +		return -EINVAL;
+> +
+> +	ndev = devm_alloc_etherdev(prueth->dev, sizeof(*emac));
+> +	if (!ndev)
+> +		return -ENOMEM;
+> +
+> +	SET_NETDEV_DEV(ndev, prueth->dev);
+> +	emac = netdev_priv(ndev);
+> +	prueth->emac[mac] = emac;
+> +	emac->prueth = prueth;
+> +	emac->ndev = ndev;
+> +	emac->port_id = port;
+> +
+> +	/* by default eth_type is EMAC */
+> +	switch (port) {
+> +	case PRUETH_PORT_MII0:
+> +		emac->pru = prueth->pru0;
+> +		break;
+> +	case PRUETH_PORT_MII1:
+> +		emac->pru = prueth->pru1;
+> +		break;
+> +	default:
+> +		return -EINVAL;
+> +	}
+> +	/* get mac address from DT and set private and netdev addr */
+> +	ret = of_get_ethdev_address(eth_node, ndev);
+> +	if (!is_valid_ether_addr(ndev->dev_addr)) {
+> +		eth_hw_addr_random(ndev);
+> +		dev_warn(prueth->dev, "port %d: using random MAC addr: %pM\n",
+> +			 port, ndev->dev_addr);
+> +	}
+> +	ether_addr_copy(emac->mac_addr, ndev->dev_addr);
+> +
+> +	/* connect PHY */
+> +	emac->phydev = of_phy_get_and_connect(ndev, eth_node,
+> +					      icssm_emac_adjust_link);
+> +	if (!emac->phydev) {
+> +		dev_dbg(prueth->dev, "PHY connection failed\n");
+> +		ret = -EPROBE_DEFER;
+
+Perhaps I misunderstand things, but if this occurs then
+presumably icssm_prueth_netdev_init() will be called again.
+And for each time this occirs another ndev will be allocated
+by devm_alloc_etherdev(), each of which will only be freed
+once the device is eventually torn-down.
+
+I wonder if it would be better to free ndev here.
+Which I think would imply using a non-mdev allocation for symmetry.
+
+Similarly for resources allocated in the caller icssm_prueth_probe().
+
+> +		goto free;
+> +	}
+> +
+> +	/* remove unsupported modes */
+> +	phy_remove_link_mode(emac->phydev, ETHTOOL_LINK_MODE_10baseT_Full_BIT);
+> +
+> +	phy_remove_link_mode(emac->phydev, ETHTOOL_LINK_MODE_10baseT_Half_BIT);
+> +	phy_remove_link_mode(emac->phydev, ETHTOOL_LINK_MODE_100baseT_Half_BIT);
+> +
+> +	phy_remove_link_mode(emac->phydev, ETHTOOL_LINK_MODE_Pause_BIT);
+> +	phy_remove_link_mode(emac->phydev, ETHTOOL_LINK_MODE_Asym_Pause_BIT);
+> +
+> +	ndev->netdev_ops = &emac_netdev_ops;
+> +
+> +	return 0;
+> +free:
+
+nit: This doesn't free anything.
+
+> +	prueth->emac[mac] = NULL;
+> +
+> +	return ret;
+> +}
+
+...
 
