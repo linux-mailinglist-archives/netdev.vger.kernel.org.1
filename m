@@ -1,187 +1,104 @@
-Return-Path: <netdev+bounces-161675-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-161677-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1096CA232A5
-	for <lists+netdev@lfdr.de>; Thu, 30 Jan 2025 18:16:56 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 90BB8A232B7
+	for <lists+netdev@lfdr.de>; Thu, 30 Jan 2025 18:20:46 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 0437B3A27BA
-	for <lists+netdev@lfdr.de>; Thu, 30 Jan 2025 17:16:48 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 1116B163C3A
+	for <lists+netdev@lfdr.de>; Thu, 30 Jan 2025 17:20:45 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 908231990DB;
-	Thu, 30 Jan 2025 17:16:52 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3DAE31EE00E;
+	Thu, 30 Jan 2025 17:20:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="5My1YfF4"
 X-Original-To: netdev@vger.kernel.org
-Received: from dediextern.your-server.de (dediextern.your-server.de [85.10.215.232])
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 25977136337;
-	Thu, 30 Jan 2025 17:16:49 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=85.10.215.232
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6E0B41E9B39
+	for <netdev@vger.kernel.org>; Thu, 30 Jan 2025 17:20:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1738257412; cv=none; b=ROcxvMksIB9u75zs5m7hQKKSqd7WgRNsjAvLBfeKzTHB7b//WHk60GkA67ZxaD8jUekXxdVJAH5lmijR3jbc6ZDYtaUNq0jOleNZzv0FPfOSj5v9qxMhHyn4kxcz9t7BFQ+qWnqjpUS6bjSkjV1Q7d+PgVB2gjEDaKNBPVqgl0Q=
+	t=1738257645; cv=none; b=jAoqxDh9phMFBWhZ68oeUfFfBaifApPPPEMoc1vFzuKmB3YF8v/kH9dPLf9JM92xnQCchbcrZ5iekSkDIu4N1ihk8R626O7KhgNSRGg+4CUD7b2JCQu4/57z0sAJrKvXaanVUKpBnFYaj6KFXKoU/PRniDUaeMVbHtEBIbQRjnc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1738257412; c=relaxed/simple;
-	bh=kbY96610c4qVJ1a/s9BCQ8VCCiT6RH+hUk7H/IHX74c=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=jZrqGot41bj+mAWUUt4Qk0w9DEbBSIrpBlbssSVMIyOIVUKMHLMI1pdmBtskDw5SJxpS493MESe9oZacxXhdrBOvCxUhPAcZXedH6/70yaECDHqKU31apZ0Ey4gp7bOFl/i9jH/V89T8J9FmWOE9Z9WdORDLPr2w0jmhOCgs0co=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=hetzner-cloud.de; spf=pass smtp.mailfrom=hetzner-cloud.de; arc=none smtp.client-ip=85.10.215.232
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=hetzner-cloud.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=hetzner-cloud.de
-Received: from sslproxy01.your-server.de ([78.46.139.224])
-	by dediextern.your-server.de with esmtpsa  (TLS1.3) tls TLS_AES_256_GCM_SHA384
-	(Exim 4.94.2)
-	(envelope-from <marcus.wichelmann@hetzner-cloud.de>)
-	id 1tdY9Q-000OMO-5L; Thu, 30 Jan 2025 18:16:24 +0100
-Received: from [2a0d:3344:1523:1f10:f118:b2d4:edbb:54af] (helo=marcus-worktop.lohne.int.wichelmann.cloud)
-	by sslproxy01.your-server.de with esmtpsa  (TLS1.3) tls TLS_AES_256_GCM_SHA384
-	(Exim 4.96)
-	(envelope-from <marcus.wichelmann@hetzner-cloud.de>)
-	id 1tdY9P-000163-2i;
-	Thu, 30 Jan 2025 18:16:23 +0100
-From: Marcus Wichelmann <marcus.wichelmann@hetzner-cloud.de>
-To: netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	bpf@vger.kernel.org
-Cc: willemdebruijn.kernel@gmail.com,
-	jasowang@redhat.com,
-	andrew+netdev@lunn.ch,
-	davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	ast@kernel.org,
-	daniel@iogearbox.net,
-	hawk@kernel.org,
-	john.fastabend@gmail.com,
-	Marcus Wichelmann <marcus.wichelmann@hetzner-cloud.de>
-Subject: [PATCH 1/1] net: tun: add XDP metadata support
-Date: Thu, 30 Jan 2025 18:16:14 +0100
-Message-ID: <20250130171614.1657224-2-marcus.wichelmann@hetzner-cloud.de>
-X-Mailer: git-send-email 2.48.1
-In-Reply-To: <20250130171614.1657224-1-marcus.wichelmann@hetzner-cloud.de>
-References: <20250130171614.1657224-1-marcus.wichelmann@hetzner-cloud.de>
+	s=arc-20240116; t=1738257645; c=relaxed/simple;
+	bh=6jUG/FPXcaE/HiJxY4akdZdHmQ768F46jYAVzMYR8z0=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=QP7SQFahDljbOe5dVEA2BdOkvnAwDEloiNYYNTceZuVNYu8aTDid69o7OGXnIPHRUv+UHz511V1RCaOtguvTuAGuEVHnSVC0JPzKE+AvP5YtN7ZMf6GQF4RSjkgbJdgIeg93+KSmHBhth5Z9Vw8vwKct1MBFIMIIp5Mhs4pmwz4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=5My1YfF4; arc=none smtp.client-ip=156.67.10.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=cZiTUwb2aGSwVIJ4hFCKe5rxCV0Gc3euo9PRAd+A4SQ=; b=5My1YfF4mWgpjOG7k5kBBSQlEx
+	uD7VY1PEmjtgC+zQB1OjzwvO9vkoPYvPRp9JQnpnj4H4rs+RBj94YC1DkvIIR1w66gQZI9fDswH4p
+	Jt9+K9Y3Z8GCFt60u3g2z1KPMsgfkpMMxHaBhx5EToiYbgimnBQyaqvq5GEB9XRfooNQ=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1tdYDV-009Suo-Ay; Thu, 30 Jan 2025 18:20:37 +0100
+Date: Thu, 30 Jan 2025 18:20:37 +0100
+From: Andrew Lunn <andrew@lunn.ch>
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: Danielle Ratson <danieller@nvidia.com>,
+	"netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+	"mkubecek@suse.cz" <mkubecek@suse.cz>,
+	"matt@traverse.com.au" <matt@traverse.com.au>,
+	"daniel.zahka@gmail.com" <daniel.zahka@gmail.com>,
+	Amit Cohen <amcohen@nvidia.com>,
+	NBU-mlxsw <NBU-mlxsw@exchange.nvidia.com>
+Subject: Re: [PATCH ethtool-next 08/14] cmis: Enable JSON output support in
+ CMIS modules
+Message-ID: <05a6045b-b4d6-4739-8352-dabd1ad386c6@lunn.ch>
+References: <20250126115635.801935-1-danieller@nvidia.com>
+ <20250126115635.801935-9-danieller@nvidia.com>
+ <20250127121258.63f79e53@kernel.org>
+ <DM6PR12MB45169E557CE078AB5C7CB116D8EF2@DM6PR12MB4516.namprd12.prod.outlook.com>
+ <20250128140923.144412cf@kernel.org>
+ <DM6PR12MB4516FF124D760E1D3A826161D8EE2@DM6PR12MB4516.namprd12.prod.outlook.com>
+ <20250129171728.1ad90a87@kernel.org>
+ <DM6PR12MB451613256BB4FB8227F3D971D8E92@DM6PR12MB4516.namprd12.prod.outlook.com>
+ <20250130082435.0a3a7922@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Authenticated-Sender: marcus.wichelmann@hetzner-cloud.de
-X-Virus-Scanned: Clear (ClamAV 1.0.7/27534/Thu Jan 30 10:34:41 2025)
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250130082435.0a3a7922@kernel.org>
 
-Enable the support for bpf_xdp_adjust_meta for XDP buffers initialized
-by the tun driver. This is useful to pass metadata from an XDP program
-that's attached to a tap device to following XDP/TC programs.
+On Thu, Jan 30, 2025 at 08:24:35AM -0800, Jakub Kicinski wrote:
+> On Thu, 30 Jan 2025 12:38:56 +0000 Danielle Ratson wrote:
+> > > > Yes, the unit is implied by the key is hardcoded. Same as for the
+> > > > regular output, it should give the costumer idea about the scale.
+> > > > There are also temperature fields that could be either F or C degrees.
+> > > > So overall , the units fields should align all the fields that implies
+> > > > some sort of scale.  
+> > > 
+> > > Some sort of a schema would be a better place to document the unit of the
+> > > fields, IMO.  
+> > 
+> > So should the units fields be removed entirely?  And only be
+> > documented in the json schema file?
+> 
+> Yes, more than happy to hear from others but a schema file would
+> be my first choice. Short of that as long as the unit is the same
+> as in the plain text output there should also not be any ambiguity.
 
-When used together with vhost_net, the batched XDP buffers were already
-initialized with metadata support by the vhost_net driver, but the
-metadata was not yet passed to the skb on XDP_PASS. So this also adds
-the required skb_metadata_set calls.
+Sorry, not been monitoring this patchset.
 
-Signed-off-by: Marcus Wichelmann <marcus.wichelmann@hetzner-cloud.de>
----
- drivers/net/tun.c | 23 ++++++++++++++++++-----
- 1 file changed, 18 insertions(+), 5 deletions(-)
+If units are an issue, you could just use the standard units hwmon
+uses. milli centigrade, milli amps, milli volts, micro watts, micro
+joule, etc. I don't think hwmon has needed to handle distances, but
+milli meter seems like the obvious choice given this pattern, although
+160km in millimeters is a rather big number.
 
-diff --git a/drivers/net/tun.c b/drivers/net/tun.c
-index e816aaba8..d3cfea40a 100644
---- a/drivers/net/tun.c
-+++ b/drivers/net/tun.c
-@@ -1600,7 +1600,8 @@ static bool tun_can_build_skb(struct tun_struct *tun, struct tun_file *tfile,
- 
- static struct sk_buff *__tun_build_skb(struct tun_file *tfile,
- 				       struct page_frag *alloc_frag, char *buf,
--				       int buflen, int len, int pad)
-+				       int buflen, int len, int pad,
-+				       int metasize)
- {
- 	struct sk_buff *skb = build_skb(buf, buflen);
- 
-@@ -1609,6 +1610,8 @@ static struct sk_buff *__tun_build_skb(struct tun_file *tfile,
- 
- 	skb_reserve(skb, pad);
- 	skb_put(skb, len);
-+	if (metasize)
-+		skb_metadata_set(skb, metasize);
- 	skb_set_owner_w(skb, tfile->socket.sk);
- 
- 	get_page(alloc_frag->page);
-@@ -1668,6 +1671,7 @@ static struct sk_buff *tun_build_skb(struct tun_struct *tun,
- 	char *buf;
- 	size_t copied;
- 	int pad = TUN_RX_PAD;
-+	int metasize = 0;
- 	int err = 0;
- 
- 	rcu_read_lock();
-@@ -1695,7 +1699,7 @@ static struct sk_buff *tun_build_skb(struct tun_struct *tun,
- 	if (hdr->gso_type || !xdp_prog) {
- 		*skb_xdp = 1;
- 		return __tun_build_skb(tfile, alloc_frag, buf, buflen, len,
--				       pad);
-+				       pad, metasize);
- 	}
- 
- 	*skb_xdp = 0;
-@@ -1709,7 +1713,7 @@ static struct sk_buff *tun_build_skb(struct tun_struct *tun,
- 		u32 act;
- 
- 		xdp_init_buff(&xdp, buflen, &tfile->xdp_rxq);
--		xdp_prepare_buff(&xdp, buf, pad, len, false);
-+		xdp_prepare_buff(&xdp, buf, pad, len, true);
- 
- 		act = bpf_prog_run_xdp(xdp_prog, &xdp);
- 		if (act == XDP_REDIRECT || act == XDP_TX) {
-@@ -1730,12 +1734,16 @@ static struct sk_buff *tun_build_skb(struct tun_struct *tun,
- 
- 		pad = xdp.data - xdp.data_hard_start;
- 		len = xdp.data_end - xdp.data;
-+
-+		metasize = xdp.data - xdp.data_meta;
-+		metasize = metasize > 0 ? metasize : 0;
- 	}
- 	bpf_net_ctx_clear(bpf_net_ctx);
- 	rcu_read_unlock();
- 	local_bh_enable();
- 
--	return __tun_build_skb(tfile, alloc_frag, buf, buflen, len, pad);
-+	return __tun_build_skb(tfile, alloc_frag, buf, buflen, len, pad,
-+			       metasize);
- 
- out:
- 	bpf_net_ctx_clear(bpf_net_ctx);
-@@ -2452,6 +2460,7 @@ static int tun_xdp_one(struct tun_struct *tun,
- 	struct sk_buff_head *queue;
- 	u32 rxhash = 0, act;
- 	int buflen = hdr->buflen;
-+	int metasize = 0;
- 	int ret = 0;
- 	bool skb_xdp = false;
- 	struct page *page;
-@@ -2467,7 +2476,6 @@ static int tun_xdp_one(struct tun_struct *tun,
- 		}
- 
- 		xdp_init_buff(xdp, buflen, &tfile->xdp_rxq);
--		xdp_set_data_meta_invalid(xdp);
- 
- 		act = bpf_prog_run_xdp(xdp_prog, xdp);
- 		ret = tun_xdp_act(tun, xdp_prog, xdp, act);
-@@ -2507,6 +2515,11 @@ static int tun_xdp_one(struct tun_struct *tun,
- 	skb_reserve(skb, xdp->data - xdp->data_hard_start);
- 	skb_put(skb, xdp->data_end - xdp->data);
- 
-+	metasize = xdp->data - xdp->data_meta;
-+	metasize = metasize > 0 ? metasize : 0;
-+	if (metasize)
-+		skb_metadata_set(skb, metasize);
-+
- 	if (virtio_net_hdr_to_skb(skb, gso, tun_is_little_endian(tun))) {
- 		atomic_long_inc(&tun->rx_frame_errors);
- 		kfree_skb(skb);
--- 
-2.48.1
-
+      Andrew
 
