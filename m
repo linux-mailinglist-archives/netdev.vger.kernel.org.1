@@ -1,275 +1,102 @@
-Return-Path: <netdev+bounces-161700-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-161701-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id BAC2AA237C3
-	for <lists+netdev@lfdr.de>; Fri, 31 Jan 2025 00:23:13 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 6E9BEA237C9
+	for <lists+netdev@lfdr.de>; Fri, 31 Jan 2025 00:25:02 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id AA1433A574A
-	for <lists+netdev@lfdr.de>; Thu, 30 Jan 2025 23:23:05 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 6F3AF3A56CB
+	for <lists+netdev@lfdr.de>; Thu, 30 Jan 2025 23:24:54 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AD4511F130D;
-	Thu, 30 Jan 2025 23:23:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 65C2E185B4C;
+	Thu, 30 Jan 2025 23:24:59 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="wqZ7cJrW"
+	dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b="rjwVdSXz"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f171.google.com (mail-pl1-f171.google.com [209.85.214.171])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp-fw-52002.amazon.com (smtp-fw-52002.amazon.com [52.119.213.150])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C88F71D7E5F
-	for <netdev@vger.kernel.org>; Thu, 30 Jan 2025 23:23:07 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.171
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B45447081F
+	for <netdev@vger.kernel.org>; Thu, 30 Jan 2025 23:24:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=52.119.213.150
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1738279389; cv=none; b=TATX5HHTUxMAAExPHzTR9ibXzntMV9A0dJvLdF8LMgi7j0XdPvhtChBtHZp2vFG06leJcni0C32y74+JY22qAMEm/USR4fKA/9vSiQ+EQ5KGfgVS8imwtFhgeDXEnM/W5jEwnZgMvN1hTSl8cuBT951nQXPT2n+8lARzBzcMM+A=
+	t=1738279499; cv=none; b=hhLJfMD72l/lyQtKvOr4CHMVGVZHvUd01JasXmUIjFfWjnkMCqDfiGTMeSROphuoqhri5rh44h3EX6lQ4GbjlJG3+JUIJfOVV654aTbXISptzlP1/VvlQfUx6k3MlYUWHlwgjrjoEIDHZfn6vKbiWu/bB/RZy4NALW6gq2S6WkA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1738279389; c=relaxed/simple;
-	bh=l3pLSAMR5hyZwynYjVj0f5+5gQyw1x0yVwTtSl3x4CE=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=A/la2TFzL5R2FnusxbCPriZLudgibYZhlpJJVNSfzI4kW/lfIdX/4EVD3Y0IxhEwL1z6AOK2Pd5BNA/LW01FfZ8yj5gxWP6315GkXB3dQdZC5c8T6v8F+Eda7HtD1MYfBh5CgAXU8wheV8b39MgUgHH2imSCtNb549S5W36cvD8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=wqZ7cJrW; arc=none smtp.client-ip=209.85.214.171
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-pl1-f171.google.com with SMTP id d9443c01a7336-21625b4f978so47335ad.0
-        for <netdev@vger.kernel.org>; Thu, 30 Jan 2025 15:23:07 -0800 (PST)
+	s=arc-20240116; t=1738279499; c=relaxed/simple;
+	bh=96k4NZUvynoaNxUWutqhqXQcNgYvgu+UZluOOMj9vnE=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=JbW9paOgTIy2+/H3CtBUcFhomzI2G5fZf0fswY4Nbm2veoY+mFIioImPVVswFIUHtvNQgPEMjrw4Mxb9BlIJEIrgSYY9rFQmzZop3pdxksVM3Z4o9JLljH6er/hrgpVJnBzZYF/j/MXtz1lKfN1axqSg2OyfXSdOq0x+T0gCPJo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.co.jp; dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b=rjwVdSXz; arc=none smtp.client-ip=52.119.213.150
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.co.jp
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1738279387; x=1738884187; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=K4RB+Jf+i5RqaVVfCNjehyqZK5R36kdLSdheWh6HH74=;
-        b=wqZ7cJrWeeOaR/VEl/1Y/Nfo68v04blrTWX5DFC87V5G2HXBFts5OIKehwft8wK7T3
-         hnu3mx8DIs3jqleiUN+/8WaQzonYRPjtXf8BL3tkTR0MjfwiyPpnpUFU0Z0eZecCwqFR
-         NoEgIi23r03IN2s9ul6WVuOKrVYQjC88+d2n0paldltglATbxXIuoH3zZSsmqOmOCT+l
-         RP79bAla9RUMjl/c6ykyPVwOnT743KJ+wGurWWK5P8rSDXz1TvKxDSADUHK+fLbu59Nt
-         FU8SPbes1kEhEPKh1dFW6haQfQdjeTJD8Uj/cRxNzgxYdCXR2sfWeQh1SKKk3l5BGPoT
-         tCYw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1738279387; x=1738884187;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=K4RB+Jf+i5RqaVVfCNjehyqZK5R36kdLSdheWh6HH74=;
-        b=m2E0JIeteMGbSuMP/M4hmcFt4O3QNJ9yfGyUm8NjLHlZbNvFimhEXGSTK9XOUy7AWn
-         VKhAjbt/DcVxRM1FYaI6Qy9De8UL58jKKmU4CKnBCQWcPBSzScAHOBeEfUGl3mRZzhXC
-         98rYlpkBJEiSTOTY9te3R8V4mGlqkxakBpcMP5EquyIa/z7H4QeZWTtIbp+ImlohbXrJ
-         cVnZbsNqeYpZRv7Hg5ceC3RTr01CwI8sdfmJe3w01rvgnCLGRqcWEh92ABeAttc6+8A9
-         m6Ber4rtfgbLukEh3Ix8OXivtEaNkL06GUm/O7vbKqWSONCan90E/UD05oNnkwTQ4XnT
-         dBdA==
-X-Gm-Message-State: AOJu0Yz3B0IciMMUG8vqjjQkqtn/kJEsEay3pC4U66p9/LHhOLYL1Tl8
-	4zuC/zAnTkUMRDJNaj9o8hbq7ypK8SeWlwoT/12BmmcAVx21P/DcksWz1LdrwPfWbBok04Lol02
-	+pfqI7gum5/MC2+Y7IxcisySEV89IlSbAfrIe
-X-Gm-Gg: ASbGncvn7rU3Pr+Ty4ly9v0GpspMkyFeOwenxt1vk2xQ4Qa/3qjd27rXHvjR7VUxm4Y
-	BTJbHJvQwEMbbtk4tv+nfoT5Hj15BcN1giqok9kXe/emhmYmGU21T7u6zvXPv+bKv6r8imcnNe6
-	sso/7Dy0CQ7BH+jqLpQ+opXIfkXu0=
-X-Google-Smtp-Source: AGHT+IE/QPS22mFf0S15DpgJBmM4XVfL576eNpFPYru7l4fiKqYBqjQMzyyVnrRxZd0Rnz4Q8ehW/Qpmn9SwV7Q1bns=
-X-Received: by 2002:a17:902:8343:b0:215:79b5:aa7e with SMTP id
- d9443c01a7336-21edf0435c0mr348145ad.13.1738279386767; Thu, 30 Jan 2025
- 15:23:06 -0800 (PST)
+  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
+  t=1738279498; x=1769815498;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=HJ6oZaKkppjzys2Knm6wQcTxDHCq7cjwhuGQkRiYU2s=;
+  b=rjwVdSXza2+aFajOQWV/GwLUwZs+Zan7HFJcFwRA2UpSuEX84pIPNcXT
+   Oj64HeVK+bs8oxckJd3OPqXhCvdSHZifk1KvSjaxSrXNYvGtWIT59o52x
+   LYhsNeYEGfMm5koSJaP5VDzeqn7/deHMqW3uVLcQaeuNCB42XBgiyL7AR
+   k=;
+X-IronPort-AV: E=Sophos;i="6.13,246,1732579200"; 
+   d="scan'208";a="693243698"
+Received: from iad12-co-svc-p1-lb1-vlan3.amazon.com (HELO smtpout.prod.us-west-2.prod.farcaster.email.amazon.dev) ([10.43.8.6])
+  by smtp-border-fw-52002.iad7.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 30 Jan 2025 23:24:54 +0000
+Received: from EX19MTAUWA001.ant.amazon.com [10.0.21.151:63505]
+ by smtpin.naws.us-west-2.prod.farcaster.email.amazon.dev [10.0.19.117:2525] with esmtp (Farcaster)
+ id b2dca34b-d1b9-4fde-9862-1b9f128c138e; Thu, 30 Jan 2025 23:24:53 +0000 (UTC)
+X-Farcaster-Flow-ID: b2dca34b-d1b9-4fde-9862-1b9f128c138e
+Received: from EX19D004ANA001.ant.amazon.com (10.37.240.138) by
+ EX19MTAUWA001.ant.amazon.com (10.250.64.218) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1258.39;
+ Thu, 30 Jan 2025 23:24:52 +0000
+Received: from 6c7e67bfbae3.amazon.com (10.187.171.27) by
+ EX19D004ANA001.ant.amazon.com (10.37.240.138) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1258.39;
+ Thu, 30 Jan 2025 23:24:50 +0000
+From: Kuniyuki Iwashima <kuniyu@amazon.com>
+To: "David S. Miller" <davem@davemloft.net>, Eric Dumazet
+	<edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
+	<pabeni@redhat.com>, Simon Horman <horms@kernel.org>
+CC: Kuniyuki Iwashima <kuniyu@amazon.com>, Kuniyuki Iwashima
+	<kuni1840@gmail.com>, <netdev@vger.kernel.org>
+Subject: [PATCH v1 net 0/2] net: Fix race of rtnl_net_lock(dev_net(dev)).
+Date: Thu, 30 Jan 2025 15:24:33 -0800
+Message-ID: <20250130232435.43622-1-kuniyu@amazon.com>
+X-Mailer: git-send-email 2.39.5 (Apple Git-154)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250130211539.428952-1-almasrymina@google.com>
- <20250130211539.428952-2-almasrymina@google.com> <Z5wEPlsRoU6Kx9S-@mini-arch>
-In-Reply-To: <Z5wEPlsRoU6Kx9S-@mini-arch>
-From: Mina Almasry <almasrymina@google.com>
-Date: Thu, 30 Jan 2025 15:22:53 -0800
-X-Gm-Features: AWEUYZkqj5XooHiN2tyUua1n1f68bkkfjeEH2K8q451D_O0CCPBOyX4tiBp941s
-Message-ID: <CAHS8izMKdcpQkWjmP9OmQFox2CFvZyJVnKG9k9YAdmLYPn6bPw@mail.gmail.com>
-Subject: Re: [PATCH RFC net-next v2 1/6] net: add devmem TCP TX documentation
-To: Stanislav Fomichev <stfomichev@gmail.com>
-Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	linux-doc@vger.kernel.org, kvm@vger.kernel.org, 
-	virtualization@lists.linux.dev, linux-kselftest@vger.kernel.org, 
-	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, 
-	Donald Hunter <donald.hunter@gmail.com>, Jonathan Corbet <corbet@lwn.net>, 
-	Andrew Lunn <andrew+netdev@lunn.ch>, David Ahern <dsahern@kernel.org>, 
-	Stefan Hajnoczi <stefanha@redhat.com>, Stefano Garzarella <sgarzare@redhat.com>, 
-	"Michael S. Tsirkin" <mst@redhat.com>, Jason Wang <jasowang@redhat.com>, 
-	Xuan Zhuo <xuanzhuo@linux.alibaba.com>, =?UTF-8?Q?Eugenio_P=C3=A9rez?= <eperezma@redhat.com>, 
-	Shuah Khan <shuah@kernel.org>, sdf@fomichev.me, asml.silence@gmail.com, dw@davidwei.uk, 
-	Jamal Hadi Salim <jhs@mojatatu.com>, Victor Nogueira <victor@mojatatu.com>, 
-	Pedro Tammela <pctammela@mojatatu.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-ClientProxiedBy: EX19D036UWC002.ant.amazon.com (10.13.139.242) To
+ EX19D004ANA001.ant.amazon.com (10.37.240.138)
 
-On Thu, Jan 30, 2025 at 2:59=E2=80=AFPM Stanislav Fomichev <stfomichev@gmai=
-l.com> wrote:
->
-> On 01/30, Mina Almasry wrote:
-> > Add documentation outlining the usage and details of the devmem TCP TX
-> > API.
-> >
-> > Signed-off-by: Mina Almasry <almasrymina@google.com>
-> >
-> > ---
-> >
-> > v2:
-> > - Update documentation for iov_base is the dmabuf offset (Stan)
-> > ---
-> >  Documentation/networking/devmem.rst | 144 +++++++++++++++++++++++++++-
-> >  1 file changed, 140 insertions(+), 4 deletions(-)
-> >
-> > diff --git a/Documentation/networking/devmem.rst b/Documentation/networ=
-king/devmem.rst
-> > index d95363645331..8166fe09da13 100644
-> > --- a/Documentation/networking/devmem.rst
-> > +++ b/Documentation/networking/devmem.rst
-> > @@ -62,15 +62,15 @@ More Info
-> >      https://lore.kernel.org/netdev/20240831004313.3713467-1-almasrymin=
-a@google.com/
-> >
-> >
-> > -Interface
-> > -=3D=3D=3D=3D=3D=3D=3D=3D=3D
-> > +RX Interface
-> > +=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
-> >
-> >
-> >  Example
-> >  -------
-> >
-> > -tools/testing/selftests/net/ncdevmem.c:do_server shows an example of s=
-etting up
-> > -the RX path of this API.
-> > +./tools/testing/selftests/drivers/net/hw/ncdevmem:do_server shows an e=
-xample of
-> > +setting up the RX path of this API.
-> >
-> >
-> >  NIC Setup
-> > @@ -235,6 +235,142 @@ can be less than the tokens provided by the user =
-in case of:
-> >  (a) an internal kernel leak bug.
-> >  (b) the user passed more than 1024 frags.
-> >
-> > +TX Interface
-> > +=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
-> > +
-> > +
-> > +Example
-> > +-------
-> > +
-> > +./tools/testing/selftests/drivers/net/hw/ncdevmem:do_client shows an e=
-xample of
-> > +setting up the TX path of this API.
-> > +
-> > +
-> > +NIC Setup
-> > +---------
-> > +
-> > +The user must bind a TX dmabuf to a given NIC using the netlink API::
-> > +
-> > +        struct netdev_bind_tx_req *req =3D NULL;
-> > +        struct netdev_bind_tx_rsp *rsp =3D NULL;
-> > +        struct ynl_error yerr;
-> > +
-> > +        *ys =3D ynl_sock_create(&ynl_netdev_family, &yerr);
-> > +
-> > +        req =3D netdev_bind_tx_req_alloc();
-> > +        netdev_bind_tx_req_set_ifindex(req, ifindex);
-> > +        netdev_bind_tx_req_set_fd(req, dmabuf_fd);
-> > +
-> > +        rsp =3D netdev_bind_tx(*ys, req);
-> > +
-> > +        tx_dmabuf_id =3D rsp->id;
-> > +
-> > +
-> > +The netlink API returns a dmabuf_id: a unique ID that refers to this d=
-mabuf
-> > +that has been bound.
-> > +
-> > +The user can unbind the dmabuf from the netdevice by closing the netli=
-nk socket
-> > +that established the binding. We do this so that the binding is automa=
-tically
-> > +unbound even if the userspace process crashes.
-> > +
-> > +Note that any reasonably well-behaved dmabuf from any exporter should =
-work with
-> > +devmem TCP, even if the dmabuf is not actually backed by devmem. An ex=
-ample of
-> > +this is udmabuf, which wraps user memory (non-devmem) in a dmabuf.
-> > +
-> > +Socket Setup
-> > +------------
-> > +
-> > +The user application must use MSG_ZEROCOPY flag when sending devmem TC=
-P. Devmem
-> > +cannot be copied by the kernel, so the semantics of the devmem TX are =
-similar
-> > +to the semantics of MSG_ZEROCOPY.
-> > +
-> > +     ret =3D setsockopt(socket_fd, SOL_SOCKET, SO_ZEROCOPY, &opt, size=
-of(opt));
-> > +
-> > +Sending data
-> > +--------------
-> > +
-> > +Devmem data is sent using the SCM_DEVMEM_DMABUF cmsg.
-> > +
-> > +The user should create a msghdr where,
-> > +
-> > +iov_base is set to the offset into the dmabuf to start sending from.
-> > +iov_len is set to the number of bytes to be sent from the dmabuf.
-> > +
-> > +The user passes the dma-buf id to send from via the dmabuf_tx_cmsg.dma=
-buf_id.
-> > +
-> > +The example below sends 1024 bytes from offset 100 into the dmabuf, an=
-d 2048
-> > +from offset 2000 into the dmabuf. The dmabuf to send from is tx_dmabuf=
-_id::
-> > +
-> > +       char ctrl_data[CMSG_SPACE(sizeof(struct dmabuf_tx_cmsg))];
-> > +       struct dmabuf_tx_cmsg ddmabuf;
-> > +       struct msghdr msg =3D {};
-> > +       struct cmsghdr *cmsg;
-> > +       struct iovec iov[2];
-> > +
-> > +       iov[0].iov_base =3D (void*)100;
-> > +       iov[0].iov_len =3D 1024;
-> > +       iov[1].iov_base =3D (void*)2000;
-> > +       iov[1].iov_len =3D 2048;
-> > +
-> > +       msg.msg_iov =3D iov;
-> > +       msg.msg_iovlen =3D 2;
-> > +
-> > +       msg.msg_control =3D ctrl_data;
-> > +       msg.msg_controllen =3D sizeof(ctrl_data);
-> > +
-> > +       cmsg =3D CMSG_FIRSTHDR(&msg);
-> > +       cmsg->cmsg_level =3D SOL_SOCKET;
-> > +       cmsg->cmsg_type =3D SCM_DEVMEM_DMABUF;
-> > +       cmsg->cmsg_len =3D CMSG_LEN(sizeof(struct dmabuf_tx_cmsg));
-> > +
-> > +       ddmabuf.dmabuf_id =3D tx_dmabuf_id;
-> > +
-> > +       *((struct dmabuf_tx_cmsg *)CMSG_DATA(cmsg)) =3D ddmabuf;
->
-> [..]
->
-> > +       sendmsg(socket_fd, &msg, MSG_ZEROCOPY);
->
-> Not super important, but any reason not to use MSG_SOCK_DEVMEM as a
-> flag? We already use it for recvmsg, seems logical to mirror the same
-> flag on the transmit side?
+Yael Chemla reported that commit 7fb1073300a2 ("net: Hold rtnl_net_lock()
+in (un)?register_netdevice_notifier_dev_net().") started to trigger KASAN's
+use-after-free splat.
 
-Only to remove redundancy, and the possible confusion that could
-arise, and the extra checks needed to catch invalid input.
+The problem is that dev_net(dev) fetched before rtnl_net_lock() might be
+different after rtnl_net_lock().
 
-With this, the user tells the kernel to send from the dmabuf by
-supplying the SCM_DEVMEM_DMABUF cmsg. If we add another signal like
-MSG_SOCK_DEVMEM, there is room for the user to supply the cmg but not
-the flag (confusion), and the kernel needs to have the code and
-overhead to check that both the flag and the cmsg are provided.
+The patch 1 fixes the issue by checking dev_net(dev) after rtnl_net_lock(),
+and the patch 2 fixes the same potential issue that would emerge once RTNL
+is removed.
 
---=20
-Thanks,
-Mina
+
+Kuniyuki Iwashima (2):
+  net: Fix dev_net(dev) race in unregister_netdevice_notifier_dev_net().
+  dev: Use rtnl_net_dev_lock() in unregister_netdev().
+
+ net/core/dev.c | 65 +++++++++++++++++++++++++++++++++++++-------------
+ 1 file changed, 48 insertions(+), 17 deletions(-)
+
+-- 
+2.39.5 (Apple Git-154)
+
 
