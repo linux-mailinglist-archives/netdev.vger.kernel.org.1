@@ -1,102 +1,119 @@
-Return-Path: <netdev+bounces-161644-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-161645-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id D816BA22DF6
-	for <lists+netdev@lfdr.de>; Thu, 30 Jan 2025 14:40:02 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4B91AA22DF7
+	for <lists+netdev@lfdr.de>; Thu, 30 Jan 2025 14:42:04 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E2A303A8020
-	for <lists+netdev@lfdr.de>; Thu, 30 Jan 2025 13:39:54 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id BCEF91888DE8
+	for <lists+netdev@lfdr.de>; Thu, 30 Jan 2025 13:42:08 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 395091E493C;
-	Thu, 30 Jan 2025 13:39:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id F36091E47D9;
+	Thu, 30 Jan 2025 13:42:00 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="s6bbLY77"
+	dkim=pass (2048-bit key) header.d=uliege.be header.i=@uliege.be header.b="N+3JK4aw"
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+Received: from serv108.segi.ulg.ac.be (serv108.segi.ulg.ac.be [139.165.32.111])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 84E8F8462
-	for <netdev@vger.kernel.org>; Thu, 30 Jan 2025 13:39:57 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6E1878462
+	for <netdev@vger.kernel.org>; Thu, 30 Jan 2025 13:41:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=139.165.32.111
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1738244399; cv=none; b=YVb4bC3tf6ckw1xft2oQDGb7IWA4XeQ2DzyZ5NQch2Lhna/lEHa3bnYlnd9AjCv91bgXKfQoaGtM3kc51X37bqfFX3B4TJGlFBj44GpkM8fp2Bkt/shV0kNg/mHimNyRLn3oD4nczHMWW2kV3Y/S4glOHjjHBqq944UtEuVKNuw=
+	t=1738244520; cv=none; b=blmkdjdvIprQEgsEJbINoQqGQdvmUoZDreWjZTU4s1o1hpp0bx8HVM+U5k9qwMzgzzK0fpW+ZMkeYpdZaLE3kg3DejDD0/R7Od+OTslQqJOz+o389Ib0bEejn7ucNTcsnWAqTW2/GZDWQ4bBQHhygna6WIQ5Ma2PxdKAQr5Tqy4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1738244399; c=relaxed/simple;
-	bh=PYCnyy94DPSY6xalqxeWlXkdP7xelHaR6aTKQ3vWtn0=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=l9BUopg5h8NhXpwd0yzFkMUxTS2qHkY92gAKUD/nRqbUyNFAa6H4+F08FQ2uvPYd6cWsJ0/jo7TOHWHUz+FkwYZ7n0Wtb8htBhKT3nP3qATZ7J6D4LHmABSxW8PQmIhBCacTxqkQRuBzu2MSsc9cs1mNkYl6dwtpyPW98evfgYA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=s6bbLY77; arc=none smtp.client-ip=156.67.10.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=0Fi2Zdt7XxjkPDuq0HkCt/Aj4z3c/ag5zSClCC+5Jjw=; b=s6bbLY77EDtuIhcM8w2t4uMgo/
-	G+YwtlgDJQLF6lp/VAqz/W/LEBx4l4QF0ysu86qkIEJU8NEXUXqH1C1NEEj7uTF7OEvudfD1i2Hy6
-	ZdIQAdQsQi9TuwVonYx75Q3n9whNOAwrc2lCe63Yy1wAKd7cY10m/Umi/ouWU7ZutQWk=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1tdUln-009Pzq-KA; Thu, 30 Jan 2025 14:39:47 +0100
-Date: Thu, 30 Jan 2025 14:39:47 +0100
-From: Andrew Lunn <andrew@lunn.ch>
-To: Frieder Schrempf <frieder.schrempf@kontron.de>
-Cc: Lukasz Majewski <lukma@denx.de>,
-	"netdev@vger.kernel.org" <netdev@vger.kernel.org>
-Subject: Re: KSZ9477 HSR Offloading
-Message-ID: <91b842e7-a7c9-49b9-8d14-486f10ea3724@lunn.ch>
-References: <05a6e63e-96c1-4d78-91b9-b00deed044b5@kontron.de>
- <6d0e1f47-874e-42bf-9bc7-34856c1168d1@lunn.ch>
- <1c140c92-3be6-4917-b600-fa5d1ef96404@kontron.de>
- <6400e73a-b165-41a8-9fc9-e2226060a68c@kontron.de>
- <20250129121733.1e99f29c@wsk>
- <0383e3d9-b229-4218-a931-73185d393177@kontron.de>
- <20250129145845.3988cf04@wsk>
- <42a2f96f-34cd-4d95-99d5-3b4c4af226af@kontron.de>
- <20250129235206.125142f4@wsk>
- <d8603413-d410-4cc9-ab3a-da9c6d868eca@kontron.de>
+	s=arc-20240116; t=1738244520; c=relaxed/simple;
+	bh=CjB8uDNJ43uJFJnrsu1uCFKshhqrk6rkriCxeCy++RI=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=Y0MYGRtuWfp+2gkuewq8ekhSTh95ZcULWO2cBqC3/T4qDpLoFWoonhLNnBwaQ8j2NZs3MCIEwdmtexqfRrckBQ7bpyO5HELnQH+gji3BANOez4GdX6979+iLNjgCs6yWwd8MEZlNPkCHpX7F9yitPOHEfnnIZOIrIR2GkvLGVY0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=uliege.be; spf=pass smtp.mailfrom=uliege.be; dkim=pass (2048-bit key) header.d=uliege.be header.i=@uliege.be header.b=N+3JK4aw; arc=none smtp.client-ip=139.165.32.111
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=uliege.be
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=uliege.be
+Received: from [192.168.1.58] (220.24-245-81.adsl-dyn.isp.belgacom.be [81.245.24.220])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+	(No client certificate requested)
+	by serv108.segi.ulg.ac.be (Postfix) with ESMTPSA id 567B8200E2B3;
+	Thu, 30 Jan 2025 14:41:56 +0100 (CET)
+DKIM-Filter: OpenDKIM Filter v2.11.0 serv108.segi.ulg.ac.be 567B8200E2B3
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=uliege.be;
+	s=ulg20190529; t=1738244516;
+	bh=NZjzO3wtdQCzmj+58ing4Lc4i1yHW4SW2Z2H3N3cJ8o=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=N+3JK4awtf4n8gKgBBdqb46/36RWmH7d99LODqo/2JB3w1QNjS7PJ8Zs+aRs+rbET
+	 oY9iLkKRbBhQk7xEUvXQ0I/52+ffoX4jHJrPFd+vyv9w/O+qG4SZd0s0vfVVBRAkFV
+	 3mXgTAg30+YNm3uMwn98p5sFZUa7DsjfJ8AzuKqRShVrpozHgqBNm5tA7aFQIU3uAR
+	 cXWL7QGvv8LVX6skAFkDeMfGtOXiidap6Uo4h24xenDPv37hMQ+z9hEvvm6g2h06xl
+	 ukbY4o250CaKz5rQ2b61uqPxaSJ0Q89Y1vNFI003jO1/TXzz9GD8uNfwv+k1MlC62s
+	 8DIwC5m32qWCw==
+Message-ID: <91681490-63fa-405f-84cc-7ec0236eba8a@uliege.be>
+Date: Thu, 30 Jan 2025 14:41:56 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <d8603413-d410-4cc9-ab3a-da9c6d868eca@kontron.de>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net v2 2/2] net: ipv6: fix dst ref loops in rpl, seg6 and
+ ioam6 lwtunnels
+To: Simon Horman <horms@kernel.org>, Jakub Kicinski <kuba@kernel.org>
+Cc: davem@davemloft.net, netdev@vger.kernel.org, edumazet@google.com,
+ pabeni@redhat.com, andrew+netdev@lunn.ch, dsahern@kernel.org
+References: <20250130031519.2716843-1-kuba@kernel.org>
+ <20250130031519.2716843-2-kuba@kernel.org>
+ <20250130102813.GD113107@kernel.org>
+Content-Language: en-US
+From: Justin Iurman <justin.iurman@uliege.be>
+In-Reply-To: <20250130102813.GD113107@kernel.org>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-> One more information I just found out: I can leave ksz9477_hsr_join()
-> untouched and only remove the feature flags from
-> KSZ9477_SUPPORTED_HSR_FEATURES to make things work.
+On 1/30/25 11:28, Simon Horman wrote:
+> On Wed, Jan 29, 2025 at 07:15:19PM -0800, Jakub Kicinski wrote:
+>> Some lwtunnels have a dst cache for post-transformation dst.
+>> If the packet destination did not change we may end up recording
+>> a reference to the lwtunnel in its own cache, and the lwtunnel
+>> state will never be freed.
+>>
+>> Discovered by the ioam6.sh test, kmemleak was recently fixed
+>> to catch per-cpu memory leaks. I'm not sure if rpl and seg6
+>> can actually hit this, but in principle I don't see why not.
+>>
+>> Fixes: 985ec6f5e623 ("net: ipv6: rpl_iptunnel: mitigate 2-realloc issue")
+>> Fixes: 40475b63761a ("net: ipv6: seg6_iptunnel: mitigate 2-realloc issue")
+>> Fixes: dce525185bc9 ("net: ipv6: ioam6_iptunnel: mitigate 2-realloc issue")
+>> Signed-off-by: Jakub Kicinski <kuba@kernel.org>
+>> ---
+>> v2:
+>>   - fix spello in the comments
+>> v1: https://lore.kernel.org/20250129021346.2333089-2-kuba@kernel.org
 > 
-> Broken:
+> Hi Jakub,
 > 
-> #define KSZ9477_SUPPORTED_HSR_FEATURES (NETIF_F_HW_HSR_DUP |
-> NETIF_F_HW_HSR_FWD)
-> 
-> Works:
-> 
-> #define KSZ9477_SUPPORTED_HSR_FEATURES (NETIF_F_HW_HSR_DUP)
-> 
-> Works:
-> 
-> #define KSZ9477_SUPPORTED_HSR_FEATURES (NETIF_F_HW_HSR_FWD)
-> 
-> Works:
-> 
-> #define KSZ9477_SUPPORTED_HSR_FEATURES (0)
+> This fix looks correct to me. And I believe that the double allocation
+> issue raised at the cited link for v1 relates to an optimisation
+> rather than a bug, so this patch seems appropriate for net without
+> addressing that issue.
 
-It would be good to define "works". Are the packets getting delivered
-to Linux and then the software HSR bridge in Linux is emitting the
-packets back out the interfaces? Or is it all happening in hardware
-and Linux never sees the packet.
++1. Just to make sure, do you think I should re-apply a fix for the 
+double allocation on top of this one and target net or net-next?
 
-Ideally we want the hardware to be doing all the work, in the "Works"
-condition.
+> I am, however, unsure why the cited patches are used in the Fixes tags
+> rather than the patches that added use of the cache to the output
+> routines.
+> 
+> e.g. af4a2209b134 ("ipv6: sr: use dst_cache in seg6_input")
+> 
+> ...
 
-	Andrew
+This was my thought as well. While Fixes tags are correct for #1, what 
+#2 is trying to fix was already there before 985ec6f5e623, 40475b63761a 
+and dce525185bc9 respectively. I think it should be:
+
+Fixes: 8cb3bf8bff3c ("ipv6: ioam: Add support for the ip6ip6 encapsulation")
+Fixes: 6c8702c60b88 ("ipv6: sr: add support for SRH encapsulation and 
+injection with lwtunnels")
+Fixes: a7a29f9c361f ("net: ipv6: add rpl sr tunnel")
 
