@@ -1,187 +1,135 @@
-Return-Path: <netdev+bounces-161642-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-161643-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 265D3A22DB7
-	for <lists+netdev@lfdr.de>; Thu, 30 Jan 2025 14:26:49 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3CFD7A22DBB
+	for <lists+netdev@lfdr.de>; Thu, 30 Jan 2025 14:27:44 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 82E2E167009
-	for <lists+netdev@lfdr.de>; Thu, 30 Jan 2025 13:26:47 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 8294E1889117
+	for <lists+netdev@lfdr.de>; Thu, 30 Jan 2025 13:27:48 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A69341E3DEF;
-	Thu, 30 Jan 2025 13:26:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 944D21E3772;
+	Thu, 30 Jan 2025 13:27:40 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="BS0Gug+u";
-	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="GFKGpyDV";
-	dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b="pomLn+gj";
-	dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b="NuwFBNSP"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ByHuLa8H"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp-out2.suse.de (smtp-out2.suse.de [195.135.223.131])
+Received: from mail-io1-f41.google.com (mail-io1-f41.google.com [209.85.166.41])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D8157819;
-	Thu, 30 Jan 2025 13:26:43 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.131
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0BA80819;
+	Thu, 30 Jan 2025 13:27:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.41
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1738243605; cv=none; b=ecl5nf5r3ppcWF7c0iDoWgSZJo/KSuMR3xQIdoidOx/kQMlWTC9HrXVhgbEMPQBh109uNh6uvi6i+uIpUaFzUrFQnJBI7h1gxfsdp7/aJYiswkDEiQf0juMMob0RTg8YA0y51vaPbUUHA6XlfZ8yD4VeTgr1uv88TYU3BGui+Bs=
+	t=1738243660; cv=none; b=PoSaI4+ctVpCSL80UkwA5fOL6i/+ze0D0TcvhIlv5GkZgkJNzqCsqNmxtlLP7l6hXKh1XXCGGXLbER6d49icVsYrZZtHikLwbLzZHb0iTsazmX4x/TMsmCtXDCgQgr76gKWnsC00jp2/HV1rSeXufcsQt29GMyMptrZIZKbBP40=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1738243605; c=relaxed/simple;
-	bh=o0W7CwYXiaMksx/uxQbxwSUNptgOd3iIBjTqvNBmsg0=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=YPxQ2Gl6MEOXzIncwzC/EJitjuutehbn9q6TX2moxs9VpFbUmGLC0aLt5BWaRf8FDqx/GvAxtcF7X9A9UOhrUZUF+2zWWKHApN53yMJPEs8e25TpdECSrQMrXPEeEl5C5+jYXCehURsHk3nVU2pr4+ctoxQ/p6jDNbKuJgAHX0Y=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de; spf=pass smtp.mailfrom=suse.de; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=BS0Gug+u; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=GFKGpyDV; dkim=pass (1024-bit key) header.d=suse.de header.i=@suse.de header.b=pomLn+gj; dkim=permerror (0-bit key) header.d=suse.de header.i=@suse.de header.b=NuwFBNSP; arc=none smtp.client-ip=195.135.223.131
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=suse.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.de
-Received: from imap1.dmz-prg2.suse.org (imap1.dmz-prg2.suse.org [IPv6:2a07:de40:b281:104:10:150:64:97])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by smtp-out2.suse.de (Postfix) with ESMTPS id D0CFD1F38D;
-	Thu, 30 Jan 2025 13:26:41 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-	t=1738243602; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=0K2NSCqe89RUEievoFS2ztJqRbJIfGFt9yWV3cXB/As=;
-	b=BS0Gug+uEwSEU9IqZBdZ9XJYDBQ70oV8BsBRMMYDaXRQ/0RFGnzDWtD2LuIwqqSmcU5LA+
-	oC3pIvSr38LAf80zLm6YBC49gMUOgvLpsAnD0TP0rCwK/X577t0ZcK/9CKZnT/LaLBmn8q
-	qjeIcZw7PNZSzaY8b2pSz1MN4HgqF9U=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-	s=susede2_ed25519; t=1738243602;
-	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=0K2NSCqe89RUEievoFS2ztJqRbJIfGFt9yWV3cXB/As=;
-	b=GFKGpyDVOFS+12QZu8hFUplofOuXdxFMGXIRa1Doh7TXZEYuSt0jfzmbZ53UgBjUUistQ6
-	UFfF5eyGq4FNwcCA==
-Authentication-Results: smtp-out2.suse.de;
-	dkim=pass header.d=suse.de header.s=susede2_rsa header.b=pomLn+gj;
-	dkim=pass header.d=suse.de header.s=susede2_ed25519 header.b=NuwFBNSP
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
-	t=1738243601; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=0K2NSCqe89RUEievoFS2ztJqRbJIfGFt9yWV3cXB/As=;
-	b=pomLn+gjgAW2HRZtVo6RWMDxca0ZsuBe6fWb+B2HH4FZOp3YO8nSmFM14U8BWA0lPEBTiT
-	YHJGrZgqMNAWi4+DPDzbgQtCOAGeMSpnMlCjoHbMlSmBHu6mhmjCK7+po+gxnpWrgjBPk7
-	pTuH07ayXELM1ri9D5CXEJb+yqAXKH8=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
-	s=susede2_ed25519; t=1738243601;
-	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=0K2NSCqe89RUEievoFS2ztJqRbJIfGFt9yWV3cXB/As=;
-	b=NuwFBNSPjljpOPCsvUO6Rc1CLSQpz19vDqqSjj5T27VOR+vXpM52YRkkOOOIb9nR8tVWS0
-	Sc1uKbSof1an2TDQ==
-Received: from imap1.dmz-prg2.suse.org (localhost [127.0.0.1])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by imap1.dmz-prg2.suse.org (Postfix) with ESMTPS id A1AEF1396E;
-	Thu, 30 Jan 2025 13:26:41 +0000 (UTC)
-Received: from dovecot-director2.suse.de ([2a07:de40:b281:106:10:150:64:167])
-	by imap1.dmz-prg2.suse.org with ESMTPSA
-	id QCscJhF+m2dIXQAAD6G6ig
-	(envelope-from <tbogendoerfer@suse.de>); Thu, 30 Jan 2025 13:26:41 +0000
-Date: Thu, 30 Jan 2025 14:26:31 +0100
-From: Thomas Bogendoerfer <tbogendoerfer@suse.de>
-To: Eric Dumazet <edumazet@google.com>
-Cc: Paolo Abeni <pabeni@redhat.com>, "David S. Miller"
- <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, Simon Horman
- <horms@kernel.org>, netdev@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v2 net] gro_cells: Avoid packet re-ordering for cloned
- skbs
-Message-ID: <20250130142631.55651270@samweis>
-In-Reply-To: <CANn89iKSrG40FKLpE3-qbftdXs9Goo61JfkmfXX_1=R5XV-=eQ@mail.gmail.com>
-References: <20250121115010.110053-1-tbogendoerfer@suse.de>
-	<3fe1299c-9aea-4d6a-b65b-6ac050769d6e@redhat.com>
-	<CANn89iLwOWvzZqN2VpUQ74a5BXRgvZH4_D2iesQBdnGWmZodcg@mail.gmail.com>
-	<de2d5f6e-9913-44c1-9f4e-3e274b215ebf@redhat.com>
-	<CANn89iJODT0+qe678jOfs4ssy10cNXg5ZsYbvgHKDYyZ6q_rgg@mail.gmail.com>
-	<20250129123129.0c102586@samweis>
-	<20250129125700.2337ecdb@samweis>
-	<CANn89iKSrG40FKLpE3-qbftdXs9Goo61JfkmfXX_1=R5XV-=eQ@mail.gmail.com>
-X-Mailer: Claws Mail 4.3.0 (GTK 3.24.43; x86_64-suse-linux-gnu)
+	s=arc-20240116; t=1738243660; c=relaxed/simple;
+	bh=nCvbnjCsBbJ5FsxX4YRrfQaHw0Tx+zG6GrSTdxNaiQs=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=cEQIL58eWx3Tprb+49EqnSRxnEVPSh/MK0JTJQV3gKAE0AlMuynnf/AJauWyO3IIMSomJOw5/O4OhqeT4zhAwTKYyl7asG/iXIBvyCWgXFusDAj0vRGEFHZ55SpBzxeabxXhkyUc18eeLr0Pn3VPEJ3rJI4HXX0pvGwHU3yEVmM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=ByHuLa8H; arc=none smtp.client-ip=209.85.166.41
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-io1-f41.google.com with SMTP id ca18e2360f4ac-854a68f5afcso6423039f.0;
+        Thu, 30 Jan 2025 05:27:38 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1738243658; x=1738848458; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=xq1XFa9etbTxIeq8MzY5AubOpQwzI5sUCBw+tZsW4jk=;
+        b=ByHuLa8HyUqYCsB2Qmn4qx7OL+eC/42NIfkUySGfnL+yJRWPKMizGozoGuJlCAb6w4
+         11HEFYr7VFQzdKwGsoafzlKidKsQkfan86ImO2Do9IZwlVzMwcyW4OJs5aCIoXP39KNc
+         d9fTf++9YJFzHpvfIc1V8jbJVr/dkVpW57k5OwiIvklAxmpWsH3RTVipLJkfgDvnyC3l
+         ayL5h37vhaA90QoEJUoFC8F4rw7oCY278E91CkJ61/vxX+vLikkF5eyss9A7eYr+bJyr
+         rHs9lZccxSarN8Hic0pKgNrAXWjxPn4YjEc3PUTzvouMQjX2uYKlk18XpuSMf9GGkIvb
+         PfRg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1738243658; x=1738848458;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=xq1XFa9etbTxIeq8MzY5AubOpQwzI5sUCBw+tZsW4jk=;
+        b=gVzcabKguyHPcLVvuIaz2yQ5chuubLRoCGkuqYNoRAzFwJSMWP+kIPDKeNl5KNJJAt
+         HwUcHUg+bKi+rpJHJtp5YDmxBx8DUJNlL6q1Jb9WFxNmrnyBFYeGWLRNkN85vjj60rUP
+         C3LZ/1v5nq6BpGlNBfIssjRX7hj4+udPIYkjJ5nM26lAmrdywHsobjg+BtbVTbBaKctR
+         PlaTY2PN3zSwBscThMN/Wtyz25dnBVw9abNcukkqND+G3buceFFQZ9LCckwk7PQulQ1I
+         b2/S6FRJS+g+YSD9SAJ3lMc1m745gCtitAWafqD5XdF6hxDGb1tnyzll0Eq+CMPDduYM
+         yADg==
+X-Forwarded-Encrypted: i=1; AJvYcCVPwgj2WgsgqttWe1I1bGCdDFh4tpy1IHTmt3KmKo4DNASFhpsp7NeUq6J9TSne/Dp4qQcVS6oSubq6wfQ8+fE=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwESL40nXrVV9cNJw39fmtOjUqz5IzgE7zv7vrNS0MafKgWkx6I
+	6L9lV4I0kG6hWEJsSrgg+h3e2TOdv/pS6BF5L6rAJ4hUy/M+OtYkkjZv6I/ynEg7lNAV6RbjPB9
+	JppMgihGi7f3gwLiiX2wuu5TDBwr1S25pcRU=
+X-Gm-Gg: ASbGncuVZUg/tUgk9JXEkw9D7ElLcM33ZliDpsd3QwqaDgO58a6UkmsHdk1Y4I1HTwN
+	57GIgxecCyw6jDKZM63mFZp2fc/pjxqXutBgWVIKBT2FvXit1CQI8YJYVgrXyatCI3jhsq+pWVv
+	fjID7E21iqnQ3yM/AJTIyZDR20lCc9Aqo=
+X-Google-Smtp-Source: AGHT+IFtKCmoV6sMWqKrVvA4GF5oxUKXvP72zYNd2p82qdKpGXowwtCWgdSJvQNxoJt2/FhjEZqlzRUgPC5kKws6Ueg=
+X-Received: by 2002:a05:6602:7505:b0:83d:ff89:218c with SMTP id
+ ca18e2360f4ac-85427e24f96mr716842039f.7.1738243658005; Thu, 30 Jan 2025
+ 05:27:38 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
+References: <20250129143601.16035-1-annaemesenyiri@gmail.com>
+ <20250129143601.16035-2-annaemesenyiri@gmail.com> <20250129120526.7ba0958b@kernel.org>
+In-Reply-To: <20250129120526.7ba0958b@kernel.org>
+From: Anna Nyiri <annaemesenyiri@gmail.com>
+Date: Thu, 30 Jan 2025 14:27:27 +0100
+X-Gm-Features: AWEUYZmgRNw3ve5dDOJt5tNThmBvK8l20BuTSdvPp9iayb-Gv6grYrkeZ3f5EnQ
+Message-ID: <CAKm6_Rvp+KotAyYrr6w0GCQT1ji5J+R5qX6X8B8ZZQoOBwveDQ@mail.gmail.com>
+Subject: Re: [PATCH net-next 1/1] selftests: net: Add support for testing
+ SO_RCVMARK and SO_RCVPRIORITY
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: netdev@vger.kernel.org, fejes@inf.elte.hu, edumazet@google.com, 
+	pabeni@redhat.com, willemb@google.com, idosch@idosch.org, davem@davemloft.net, 
+	horms@kernel.org, shuah@kernel.org, linux-kselftest@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
-X-Rspamd-Queue-Id: D0CFD1F38D
-X-Spam-Score: -4.01
-X-Rspamd-Action: no action
-X-Spamd-Result: default: False [-4.01 / 50.00];
-	BAYES_HAM(-3.00)[100.00%];
-	NEURAL_HAM_LONG(-1.00)[-1.000];
-	MID_RHS_NOT_FQDN(0.50)[];
-	R_DKIM_ALLOW(-0.20)[suse.de:s=susede2_rsa,suse.de:s=susede2_ed25519];
-	NEURAL_HAM_SHORT(-0.20)[-1.000];
-	MIME_GOOD(-0.10)[text/plain];
-	MX_GOOD(-0.01)[];
-	ARC_NA(0.00)[];
-	RCPT_COUNT_SEVEN(0.00)[7];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	MIME_TRACE(0.00)[0:+];
-	FUZZY_BLOCKED(0.00)[rspamd.com];
-	RCVD_TLS_ALL(0.00)[];
-	DKIM_SIGNED(0.00)[suse.de:s=susede2_rsa,suse.de:s=susede2_ed25519];
-	URIBL_BLOCKED(0.00)[suse.de:dkim,imap1.dmz-prg2.suse.org:rdns,imap1.dmz-prg2.suse.org:helo];
-	FROM_EQ_ENVFROM(0.00)[];
-	FROM_HAS_DN(0.00)[];
-	TO_DN_SOME(0.00)[];
-	RCVD_COUNT_TWO(0.00)[2];
-	TO_MATCH_ENVRCPT_ALL(0.00)[];
-	DBL_BLOCKED_OPENRESOLVER(0.00)[suse.de:dkim];
-	DKIM_TRACE(0.00)[suse.de:+]
-X-Rspamd-Server: rspamd1.dmz-prg2.suse.org
-X-Spam-Flag: NO
-X-Spam-Level: 
 
-On Wed, 29 Jan 2025 13:06:49 +0100
-Eric Dumazet <edumazet@google.com> wrote:
+Jakub Kicinski <kuba@kernel.org> ezt =C3=ADrta (id=C5=91pont: 2025. jan. 29=
+., Sze, 21:05):
+>
+> On Wed, 29 Jan 2025 15:36:01 +0100 Anna Emese Nyiri wrote:
+> > diff --git a/tools/testing/selftests/net/Makefile b/tools/testing/selft=
+ests/net/Makefile
+> > index 73ee88d6b043..98f05473e672 100644
+> > --- a/tools/testing/selftests/net/Makefile
+> > +++ b/tools/testing/selftests/net/Makefile
+> > @@ -33,6 +33,7 @@ TEST_PROGS +=3D gro.sh
+> >  TEST_PROGS +=3D gre_gso.sh
+> >  TEST_PROGS +=3D cmsg_so_mark.sh
+> >  TEST_PROGS +=3D cmsg_so_priority.sh
+> > +TEST_PROGS +=3D test_so_rcv.sh
+>
+> You need to add the C part to the TEST_GEN_PROGS, otherwise it won't
+> get built. We're seeing:
+>
+> ./test_so_rcv.sh: line 25: ./so_rcv_listener: No such file or directory
+>
+> in the CI.
+>
+> > +     memset(&recv_addr, 0, sizeof(recv_addr));
+> > +     recv_addr.sin_family =3D AF_INET;
+> > +     recv_addr.sin_port =3D htons(atoi(opt.service));
+> > +
+> > +     if (inet_pton(AF_INET, opt.host, &recv_addr.sin_addr) <=3D 0) {
+> > +             perror("Invalid address");
+> > +             ret_value =3D -errno;
+> > +             goto cleanup;
+> > +     }
+>
+> Any reason not to use getaddrinfo() ?
 
-> "TCP Sender in namespace A -> ip6_tunnel -> ipvlan -> ipvlan ->
-> ip6_tunnel -> TCP receiver"
-> or
-> " TCP Sender -> ip6_tunnel -> ipvlan -> ipvlan -> ip6_tunnel -> TCP Recei=
-ver"
->=20
-> In this case, GRO in ip6_tunnel is not needed at all, since proper TSO
-> packets should already be cooked by TCP sender and be carried
-> to the receiver as plain GRO packets.
->=20
-> gro_cells was added at a time GRO layer was only  supporting native
-> encapsulations : IPv4 + TCP or IPv6 + TCP.
->=20
-> Nowadays, GRO supports encapsulated traffic just fine, same for TSO
-> packets encapsulated in ip6_tunnel
->=20
-> Maybe it is time to remove gro_cells from net/ipv6/ip6_tunnel.c
->=20
-> diff --git a/net/ipv6/ip6_tunnel.c b/net/ipv6/ip6_tunnel.c
-> index 48fd53b9897265338086136e96ea8e8c6ec3cac..b91c253dc4f1998f8df74251a9=
-3e29d00c03db5
-> 100644
-> --- a/net/ipv6/ip6_tunnel.c
-> +++ b/net/ipv6/ip6_tunnel.c
-> [...]
+I chose inet_pton() over getaddrinfo() because getaddrinfo() depends
+on libnss, which can cause warnings and linking issues in static
+builds. In contrast, inet_pton() is fully part of libc, so it seemed
+like a safer choice.
 
-this patch works for my test case. So the same thing should be probably
-done for net/ipv4/ip_tunnel.c and net/ipv6/ip6_gre.c, too ?
-
-Thomas.
-
---=20
-SUSE Software Solutions Germany GmbH
-HRB 36809 (AG N=C3=BCrnberg)
-Gesch=C3=A4ftsf=C3=BChrer: Ivo Totev, Andrew McDonald, Werner Knoblich
+> Otherwise LGTM, thanks for following up!
+> --
+> pw-bot: cr
 
