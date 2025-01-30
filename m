@@ -1,89 +1,144 @@
-Return-Path: <netdev+bounces-161652-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-161653-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id AAE66A230BC
-	for <lists+netdev@lfdr.de>; Thu, 30 Jan 2025 16:02:07 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 85A4FA230CF
+	for <lists+netdev@lfdr.de>; Thu, 30 Jan 2025 16:06:50 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 4229B164D98
-	for <lists+netdev@lfdr.de>; Thu, 30 Jan 2025 15:02:04 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 0219C1888C45
+	for <lists+netdev@lfdr.de>; Thu, 30 Jan 2025 15:06:55 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F18731E573F;
-	Thu, 30 Jan 2025 15:02:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1F1D31E9B17;
+	Thu, 30 Jan 2025 15:06:47 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="bkDBHqYy"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="hsu1fFn8"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-f48.google.com (mail-ed1-f48.google.com [209.85.208.48])
+Received: from mail-qk1-f171.google.com (mail-qk1-f171.google.com [209.85.222.171])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3890F158545;
-	Thu, 30 Jan 2025 15:01:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.48
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 88D611E2853;
+	Thu, 30 Jan 2025 15:06:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.171
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1738249321; cv=none; b=t7RrJZ/jl9gVGQ9Dq/qJPizw1rRr0+Ov8plIDg/H4/KLZrVNSbt5Cmi1WuXzNdMPXcHWCHzHSvugaZLNLz6sKlEHb2mhZ5qeraUe4FQhPHDRXtX5BCpnPKnuwM63EcrLo8EnnHGxP54gbDEazfBgkuqWPnC7JsXTtqM9oJCm6BY=
+	t=1738249607; cv=none; b=nOg/nJ+v2fH2RpiM2ZWkJqjdT9oblScuUCAlcX+It3HAKfssdxaUf8czVqv0rqX+gf9dOsrZEpETtSYlgYmlydFYp7F7LVzD+lNj0sCzywaR4vC84si9cBql8ys8W1lurYP7/Oa6D1ClzH5MCKqeooNzpYVPBx40PIv7lLamPsc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1738249321; c=relaxed/simple;
-	bh=mfCOdbeCX77mBFY/SsE+J1XetqxL5CfcbaLfUlfpX2c=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=d6dT4WeqD8IE8p8d2vOKHtOmB+1VZyRcofJguTtSJXLX7qi4xsgrHakkjtXJRJOJDvz+L6ggiU3WfKugfPoJjO+aXqCcozJJWpzY+L2q7wq3wYNHhBZHHPsqEMbBW+L+gB+xBoG/K/I7Nu3oQ7xNi9d436sh+x0Wy4T06dzcqNI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=bkDBHqYy; arc=none smtp.client-ip=209.85.208.48
+	s=arc-20240116; t=1738249607; c=relaxed/simple;
+	bh=lPHx7WaZsUhvB70yZzHrPTeASZHFEDazFq/DwQM9k+c=;
+	h=Date:From:To:Cc:Message-ID:In-Reply-To:References:Subject:
+	 Mime-Version:Content-Type; b=jSq7IG/CK4IOPTTnVVdAplj/XvltAaDR7UzBIbxeKhmr66irR/EHXpnhEPCz6sZJChq9+4OOiuM0yRUL0kKZZ06AjP9G9thUHucvS0buqvAgowsE+WID1ez7wYyqa7j5yYHUyFSx9pAjaKhHOGQG8F2qKj9z1f/V2fRc5agCYkE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=hsu1fFn8; arc=none smtp.client-ip=209.85.222.171
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ed1-f48.google.com with SMTP id 4fb4d7f45d1cf-5d3d0205bd5so1275840a12.3;
-        Thu, 30 Jan 2025 07:01:59 -0800 (PST)
+Received: by mail-qk1-f171.google.com with SMTP id af79cd13be357-7be44a90468so108970685a.3;
+        Thu, 30 Jan 2025 07:06:45 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1738249318; x=1738854118; darn=vger.kernel.org;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=mfCOdbeCX77mBFY/SsE+J1XetqxL5CfcbaLfUlfpX2c=;
-        b=bkDBHqYywU9ws0n+QiubYsaL9TxdrpykMIcldWaiCmT5MU4sfz1+X6wnHurqIrrJgb
-         JsJkrjQYDrVI24bh9usZHRQ8jXB1IrAF9uw168LmLiIpL1Wugg6cOjeVxi2fnGJ0mmqn
-         PARnpzxOwKIxpixmhn23mao7p1KX1se7ZMrtKyfRV1zcCQBoUakbN9kUJ3fHKHamJixC
-         DuJWx6MrZCDeDPQTV0dO/B5Nb90XYZ1zlYRR9wmtlf3cbEm+A8s+ix6K8/g9X0VNgXYy
-         b3J0bAylPhLhoIkKlGGZnxj7BcXWw7r/8yHCS/N0SHtXCdkaSsyzyskQ2h0FNF6+PZMv
-         Y2EQ==
+        d=gmail.com; s=20230601; t=1738249604; x=1738854404; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:subject:references
+         :in-reply-to:message-id:cc:to:from:date:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=JI5cvnHUtQaistWIrGNna3l1hMRw3Olm90CfuK7nl+8=;
+        b=hsu1fFn8DWVYPCnfe5qorKaaPUsG9mbCqv0nVkUKd/QDYH0cumfWj6JxwJca6h3+0n
+         XoOaaKWM76h7GjCuClOId43ka3zerqZHon99OKKpwp0DBxTsywPh+XPlzHTMe6Ao7eaG
+         bHuoFZ0M7fxqmHrF7dbXYkL+F/ABYSAxtdOHLL/Q7srGZe49+DjNQLpqKvQcLX88O4n0
+         xRlmUPfktHbpVQ4dlTCxaOHDFoTBIcvQgurx3sBadvB3taF9SZmKcsEkNruiv3oYV78E
+         iNewFwwgOndNxiRNNcoOPN1fxT5ADGuU4NwEZK+Lerg8LLxRStvOFqHmjXofKjJKGjze
+         KyMw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1738249318; x=1738854118;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=mfCOdbeCX77mBFY/SsE+J1XetqxL5CfcbaLfUlfpX2c=;
-        b=DCcxejX4YQmHkGRJe8bZQeJU5qm4s5F9GttQ9Um2GbyWBWBnL+VZZyJnGt3xszpSkN
-         PqdXvdOwRwlcBDS8XWigPsNl8/UxMYVn0fkujO6ksuFlbLYYI8Gg5oHFCbqQNbnAc4+V
-         FN8FiO3+53gX8duOg68Rc5OUfcnkYyYW5BMGL5q76eT7obbyQbATLPZR5RSimBjzaj7O
-         lKSjjj6OKVRGuG4qi48pbXJMZqqLC3bdroaMyY0E6XTiaWMA1tXBIyOOsO3FkTViobR+
-         mUhUnBkseCrMvdGFsJfseRbkfoj7IzvuzRPqzOTHVWwXx9k5duPBROuGprDd7IpSSTzk
-         2YqA==
-X-Forwarded-Encrypted: i=1; AJvYcCV8K5ComH/EmhvxmilqGAq2Io5AMuGRxgSdKywm1a2vyv6o7k/m0LPoiJ2r8ZTQT9yUxYgnOg0=@vger.kernel.org, AJvYcCVIo8wp21gg9GU+fh/YXwd4zI1Jhoyuzq4CXsS5MEFCxqf5/add037pek4hW+HJRzMnjYPQN/5N41ZoSKkafcrU@vger.kernel.org
-X-Gm-Message-State: AOJu0YzoRqZovZNdPIteMxd+JioRedsuL0O7JKi4wa8ghTnK9jfn3vkM
-	+Un13OWbbGugbBiqeYvTu6/CjztqNqyMxe34CCWj9TGp2EQiC/pfSr+7v+CAS7qyoi76LSWIgc3
-	sPfIgVuWrdb8RzWo6y5DQgJmcTx7javYGI+c=
-X-Gm-Gg: ASbGncu7m5OSSinK1IE7bP7T66MsCVI6tkgjUZJsjArZH2V2LT64cqOv49H5wtXBMHJ
-	91wEPVXNXz+U5C6x1Xi+RNJdmSQpFkZ2afnrUDHlQA9GAetEeCduKhTzw5nRGJCJQDTi0NCc2yw
-	==
-X-Google-Smtp-Source: AGHT+IFatBDTu/hzuprxAFEvE7bmH+4UNeXTKM7tlE76rgonvSHvrp+thtT3SJEyY91gKAzX/+wQ3duh7w35Ec+lyTM=
-X-Received: by 2002:a05:6402:2711:b0:5d3:bc1d:e56d with SMTP id
- 4fb4d7f45d1cf-5dc5f01e7famr6541900a12.31.1738249318165; Thu, 30 Jan 2025
- 07:01:58 -0800 (PST)
+        d=1e100.net; s=20230601; t=1738249604; x=1738854404;
+        h=content-transfer-encoding:mime-version:subject:references
+         :in-reply-to:message-id:cc:to:from:date:x-gm-message-state:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=JI5cvnHUtQaistWIrGNna3l1hMRw3Olm90CfuK7nl+8=;
+        b=Yp/WYeyOozKKryVUP8BB4MUJPY/ba3RU21eZTFnZqxoWw/mbpuEJcuYmCqjgKumOKS
+         ZioZeirCfy/yolUZur2DgRuhwbYoliXkEyQVFRslU5z+3vmNjp6kcs9LbMgtzpgLcTno
+         1N/aGkl/vjmg4FZQWxnlISghFiB0EcLi4+xnWIKEiL8h4jeDujcytppUl3PN7s1lgmY0
+         wJJfkrjm5qQRXmsX+tD65315cNJHaTSAgSP/NRQ430VmzyU4NEOd9HoUZQje0EJ3Pugy
+         uP4IClnD1H/TSekK2XLWtw8bY/bzwYhfRVb/aZvpi2K6I2+dRAAU8/CCX83jvs+l+7uL
+         xfaQ==
+X-Forwarded-Encrypted: i=1; AJvYcCU66OUMf/HYFEBDIORqzsl8fp/+rwvLeEoMP3MPg4bfzdwFkmgbbQpG8to48cYtqj5ChCQSo9Gsp0cONpUZGbM=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzlVJfmKHVSP4R1Gp65d7vQv7P281C66s82trriWtRcvTSFdyZa
+	lvvjiz0fcc/ksXpPTydMCWg7Offw4bBSsduB+yRwYthsLCdRcnju
+X-Gm-Gg: ASbGncv/wCHfQ78UXsO/9lMzGTgD73dCGBReqHtnDoC8vfP/ds1QFMGSd2DaMkKbgGb
+	dQSabPRs8t0ye4vxewn8ETLBCp8Pwgeb9aRn3v6WdKreBBRB2EyiJQ1YBY4ADlD5cjc+JTcTzZf
+	PNKqxmF6u/BL/H3oR0l9zi69gIYRLGLDWC+b2yOrX8rcvgyUBomyId3UMoFZBrI/qzIVtDbeBCp
+	W8s44xbn2TJ6LSLTW3tvG7PDEnunmfYsa7O5LmSWJsY2+DUkjUxkl46l5F73RF3MV7yMagN9DlC
+	ew2dWI20ca8rET2XruJr6kxKKfx1IJIcQmC+MWIK3gylFiwHZ66q0/LODj3q/gs=
+X-Google-Smtp-Source: AGHT+IEhcvqek8X/10GXPUdrkYOae79A4soxEePRG/3Mi9gTYA5EN3/mO+so46rHgN3Bc8y1Vyihyw==
+X-Received: by 2002:a05:620a:390e:b0:7b6:bbe8:7d6e with SMTP id af79cd13be357-7bffcd9b6c7mr1236325485a.40.1738249604189;
+        Thu, 30 Jan 2025 07:06:44 -0800 (PST)
+Received: from localhost (15.60.86.34.bc.googleusercontent.com. [34.86.60.15])
+        by smtp.gmail.com with ESMTPSA id af79cd13be357-7c00a905afdsm81570285a.81.2025.01.30.07.06.43
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 30 Jan 2025 07:06:43 -0800 (PST)
+Date: Thu, 30 Jan 2025 10:06:43 -0500
+From: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
+To: Jakub Kicinski <kuba@kernel.org>, 
+ Anna Emese Nyiri <annaemesenyiri@gmail.com>
+Cc: netdev@vger.kernel.org, 
+ fejes@inf.elte.hu, 
+ edumazet@google.com, 
+ pabeni@redhat.com, 
+ willemb@google.com, 
+ idosch@idosch.org, 
+ davem@davemloft.net, 
+ horms@kernel.org, 
+ shuah@kernel.org, 
+ linux-kselftest@vger.kernel.org
+Message-ID: <679b95838f17_1c77632944f@willemb.c.googlers.com.notmuch>
+In-Reply-To: <20250129120526.7ba0958b@kernel.org>
+References: <20250129143601.16035-1-annaemesenyiri@gmail.com>
+ <20250129143601.16035-2-annaemesenyiri@gmail.com>
+ <20250129120526.7ba0958b@kernel.org>
+Subject: Re: [PATCH net-next 1/1] selftests: net: Add support for testing
+ SO_RCVMARK and SO_RCVPRIORITY
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-References: <20250130142037.1945-1-kirjanov@gmail.com>
-In-Reply-To: <20250130142037.1945-1-kirjanov@gmail.com>
-From: Denis Kirjanov <kirjanov@gmail.com>
-Date: Thu, 30 Jan 2025 18:01:45 +0300
-X-Gm-Features: AWEUYZk030xIyWlSQIOd8_zd4qI7XJ7QRbWfR325L5LmK5SPMg3xLVE-hBFRzss
-Message-ID: <CAHj3AVn0jADTnuLtGtDmr_-+0==8_=ARJ1V+y8iOPU-Yz=6cEQ@mail.gmail.com>
-Subject: Re: [PATCH nf-next] netfilter: ip6_tables: replace the loop with xt_entry_foreach
-To: pablo@netfilter.org, kadlec@netfilter.org
-Cc: davem@davemloft.net, netfilter-devel@vger.kernel.org, 
-	netdev@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
+Mime-Version: 1.0
+Content-Type: text/plain;
+ charset=utf-8
+Content-Transfer-Encoding: 7bit
 
-please ignore
+Jakub Kicinski wrote:
+> On Wed, 29 Jan 2025 15:36:01 +0100 Anna Emese Nyiri wrote:
+> > diff --git a/tools/testing/selftests/net/Makefile b/tools/testing/selftests/net/Makefile
+> > index 73ee88d6b043..98f05473e672 100644
+> > --- a/tools/testing/selftests/net/Makefile
+> > +++ b/tools/testing/selftests/net/Makefile
+> > @@ -33,6 +33,7 @@ TEST_PROGS += gro.sh
+> >  TEST_PROGS += gre_gso.sh
+> >  TEST_PROGS += cmsg_so_mark.sh
+> >  TEST_PROGS += cmsg_so_priority.sh
+> > +TEST_PROGS += test_so_rcv.sh
+> 
+> You need to add the C part to the TEST_GEN_PROGS, otherwise it won't
+> get built. We're seeing:
+
+and to .gitignore
+ 
+> ./test_so_rcv.sh: line 25: ./so_rcv_listener: No such file or directory
+> 
+> in the CI.
+> 
+> > +	memset(&recv_addr, 0, sizeof(recv_addr));
+> > +	recv_addr.sin_family = AF_INET;
+> > +	recv_addr.sin_port = htons(atoi(opt.service));
+> > +
+> > +	if (inet_pton(AF_INET, opt.host, &recv_addr.sin_addr) <= 0) {
+> > +		perror("Invalid address");
+> > +		ret_value = -errno;
+> > +		goto cleanup;
+> > +	}
+> 
+> Any reason not to use getaddrinfo() ?
+> 
+> Otherwise LGTM, thanks for following up!
+> -- 
+> pw-bot: cr
+
+
 
