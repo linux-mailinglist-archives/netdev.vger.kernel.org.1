@@ -1,148 +1,265 @@
-Return-Path: <netdev+bounces-161609-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-161610-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5CD4EA22B04
-	for <lists+netdev@lfdr.de>; Thu, 30 Jan 2025 10:57:41 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3F4B9A22B18
+	for <lists+netdev@lfdr.de>; Thu, 30 Jan 2025 10:59:47 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 67DC43A5C0F
-	for <lists+netdev@lfdr.de>; Thu, 30 Jan 2025 09:57:33 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 58337163E83
+	for <lists+netdev@lfdr.de>; Thu, 30 Jan 2025 09:59:40 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 79EB51B6D0F;
-	Thu, 30 Jan 2025 09:57:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5142F1B85F6;
+	Thu, 30 Jan 2025 09:59:32 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ijgiZz8W"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="VRFRmuXS"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BDDFB183098
-	for <netdev@vger.kernel.org>; Thu, 30 Jan 2025 09:57:36 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6CABB1B982E;
+	Thu, 30 Jan 2025 09:59:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1738231058; cv=none; b=VU/puSs3wi8/byOkIzOxa8lig0kgN3axl7AKR/NwDVDvhLV6N8wKQFJq/I/DTELZ3LEJmOz3uC2AhqTuA0PKSeHMaYAXOlfqAGLnnYIP0RHO/fiIxBeBZcJHmlqr9F8BbxaMnPdlZGi5UcIFQhogfLhuaCjj0zsvAJ3nG7QtX2E=
+	t=1738231172; cv=none; b=g29euFU5S3AvO/Qh4kkD6gs/qOcXTpJMqJnE58Y6YIM+IxExL3FfO3aIDWTnsDOiSkAED9Rew2xufL95vv4/mLHM1QWYEvjhWa61t+2kbDDQCq82tuzG8hEfNh65HeDjAyfJ78rhr3hSzxEo6pIhMYiGhAdztPY8pe7gi+x4sAY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1738231058; c=relaxed/simple;
-	bh=5JRSropCo22FJxz/20O3KHDYywagAzFau8cpXYyVhEM=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=rG7yPTlc2fisQ9VgjaWui+AL3XxxbQZ2p7ZWIPXhpl60JPeoCyoDrB9ND66pj63WncWyLRRlwDz3RAaearLLNpzJoyScqtZBXFkNzcQy6ehzjvfckDjfQg2vxYn6ZckvFD1gUYEOIoegmNNMi2z+Iq836K2AjERg2409u8RWz8U=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=ijgiZz8W; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1738231055;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=U3UsS/EyvoSw46BJtQFwLW26Flj42eSQpHQKqBsQFEs=;
-	b=ijgiZz8W4T9KjGJaR1A1+dbyuPsCHCAWuhtmlhdF5EjHZsen8lR13jAhLoNR0v5OmmxDTO
-	wmG5PTXhnr1PUrV8JqJ23KXNLEx2kjEorhpjixe+CLEmCImP8lGLHo1aGSYy9dz4MJ8kWA
-	VU41TRMuQCEFPoRV1q+/wAf/cnV22ls=
-Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
- [209.85.128.70]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-632-cfRfGdlPM0CCnh9_0edtGg-1; Thu, 30 Jan 2025 04:57:33 -0500
-X-MC-Unique: cfRfGdlPM0CCnh9_0edtGg-1
-X-Mimecast-MFC-AGG-ID: cfRfGdlPM0CCnh9_0edtGg
-Received: by mail-wm1-f70.google.com with SMTP id 5b1f17b1804b1-4362b9c15d8so2520595e9.3
-        for <netdev@vger.kernel.org>; Thu, 30 Jan 2025 01:57:33 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1738231052; x=1738835852;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=U3UsS/EyvoSw46BJtQFwLW26Flj42eSQpHQKqBsQFEs=;
-        b=HCFKST27IjSrC6Q5ldwi5rlHLJCYKV7i9CQIuD4Ch8w+vws6luXOio43DYdwpKX8EL
-         IUqQMe/PkpbnIa4CoYysRI8Gy7Y7/5iHd6MaaNXTVc1aHDDgCciquVQ0IXfRMZv810zF
-         aiNODnugwx3qIXq13P1bVp6qAHhA4VSlrKvWNdqiUXlg6R4LJqAv8I/Bi3IJNfxOeMGZ
-         oynzYoG+qfWk/MZhcZx76f6J7ewYDo0rAewnq2Os0Yu9Mru3wtv7lQ+TDrY8gdz/6tRK
-         wl9aJjos0RyLgquAgeNSUKCCWlkzKUK78xxRNgdc4EQxafVnItdHHlJs3ywrXz5DM9wX
-         bGQA==
-X-Gm-Message-State: AOJu0YxenGcgt/oOAQYrXLNjaqFaT0jtPO5k0K5Twzg6Hn5WBaXkZMvJ
-	Dlwt0LlRGcd7UCb5W9iyygZLbqRQrC0HoxuDyPC3tBkMYjEyReyAX7iVe+PjRuPi21eRHwETrLI
-	ZJZ0IhC7VJU48oSuixnBu2rq7T88ezcF+R5HLVHeVGunsfqXx9b9wFA==
-X-Gm-Gg: ASbGncuvwq89ubp/W1XIjenZjntgWwzJnQY6JNL6bfV8Jj5ynAIMrltNEEdaCUUDoM6
-	pkrslYooTeGy9qNaG2jx6K+F5fT/wtpAUbTYbeD9sDhfbbxINoJME868f/RGiFgnKG60kWzkIZ3
-	qkNmOLY0vhvcgOKOsOUZBArXTNpMsUqXIwo2VmBzG37eZ9Bh5t3EHqyyKHhNcOx1XaL99cc7yUL
-	0ELa13nF3ncNUGSpcmWMI1oDQ3aOWwSaKE8keABf8mQD+PySNrA5GbnMVkuFLkpdTQ/77RPfVOk
-	otJVd7v1i2HHF15K3WGhl+XSHWtxcVZHC7c=
-X-Received: by 2002:a05:600c:1c1e:b0:434:a4b3:5ebe with SMTP id 5b1f17b1804b1-438dc40be31mr55374965e9.24.1738231052640;
-        Thu, 30 Jan 2025 01:57:32 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IEe1ecQSpaa2hVLs2Y1pYNKxULDO87Z2+cbpfDxKikfWMqMjGI9Kf1AxOaDsrY/QI89jyz3tg==
-X-Received: by 2002:a05:600c:1c1e:b0:434:a4b3:5ebe with SMTP id 5b1f17b1804b1-438dc40be31mr55374655e9.24.1738231052223;
-        Thu, 30 Jan 2025 01:57:32 -0800 (PST)
-Received: from [192.168.88.253] (146-241-12-107.dyn.eolo.it. [146.241.12.107])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-438dcc2f17dsm52822205e9.23.2025.01.30.01.57.31
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 30 Jan 2025 01:57:31 -0800 (PST)
-Message-ID: <82cdba95-83cb-4902-bb2a-a2ab880797a8@redhat.com>
-Date: Thu, 30 Jan 2025 10:57:30 +0100
+	s=arc-20240116; t=1738231172; c=relaxed/simple;
+	bh=oq24UHMaPmGCo5HlfeS2N50Nmm5122a0qZ9LgL1yOtg=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=f9Lk9hDQ8tgiIIovZr3X+E+AHH/mD04sXy7BTdlus14Qq4YxQi+sM8ZtddlEI2B//mAYxgGVITfYQYmo7I9ZwCqu65EKIG40GStw5nqJnaGn3eMchr7kUYOkEcb0VP+tSmQfsADGV53GacpwFjq6REliXrDL7LcgDwGwgK5di/A=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=VRFRmuXS; arc=none smtp.client-ip=78.32.30.218
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
+	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
+	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
+	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
+	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
+	bh=Xq/dbKn2cqYFDFkwa2MlzXwxzo24l5ayOV+fVmFP4tU=; b=VRFRmuXSXlO6pk86fKSPvuFsHB
+	YAUCH6S+xPl1ceL1/oKT7I9KkZjQzYdbNJqQTuMsqu0WgBPyz/DDgWe41gxtZF38HGrsaNKuD7wPH
+	Pw7mxEzf9BzHoeCVhioHPK88d+FjhhCKmS0pPspnCAlukAvFQ6EcsegoB9aCXNHi8v1WoUpggwVPO
+	5lUF6BKAC0OVzn3XkUdA1GvAiSN+rJVBj1A3sg4Xy4LdOZGjl0XVz1f//yeT6v4cdbGtoDdBB1oro
+	gvDZ7acSK4ClliyBnO1WnwSTO161NbihSz8dv5UFaVlOib1g4JzR6/To4YrSJc4dsQi37VMBZj2cW
+	PVHqqZSg==;
+Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:36802)
+	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.96)
+	(envelope-from <linux@armlinux.org.uk>)
+	id 1tdRKO-0003mS-2w;
+	Thu, 30 Jan 2025 09:59:16 +0000
+Received: from linux by shell.armlinux.org.uk with local (Exim 4.96)
+	(envelope-from <linux@shell.armlinux.org.uk>)
+	id 1tdRKK-0004eo-1x;
+	Thu, 30 Jan 2025 09:59:12 +0000
+Date: Thu, 30 Jan 2025 09:59:12 +0000
+From: "Russell King (Oracle)" <linux@armlinux.org.uk>
+To: Tristram.Ha@microchip.com
+Cc: olteanv@gmail.com, Woojung.Huh@microchip.com, andrew@lunn.ch,
+	hkallweit1@gmail.com, maxime.chevallier@bootlin.com,
+	davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+	pabeni@redhat.com, UNGLinuxDriver@microchip.com,
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH RFC net-next 1/2] net: pcs: xpcs: Add special code to
+ operate in Microchip KSZ9477 switch
+Message-ID: <Z5tNcNINk1CMDBeo@shell.armlinux.org.uk>
+References: <20250128033226.70866-1-Tristram.Ha@microchip.com>
+ <20250128033226.70866-2-Tristram.Ha@microchip.com>
+ <Z5iiXWkhm2OvbjOx@shell.armlinux.org.uk>
+ <20250128102128.z3pwym6kdgz4yjw4@skbuf>
+ <Z5jOhzmQAGkv9Jlw@shell.armlinux.org.uk>
+ <20250128152324.3p2ccnxoz5xta7ct@skbuf>
+ <DM3PR11MB8736F7C3A021CAE9AB92F84EECEE2@DM3PR11MB8736.namprd11.prod.outlook.com>
+ <DM3PR11MB8736F7C3A021CAE9AB92F84EECEE2@DM3PR11MB8736.namprd11.prod.outlook.com>
+ <20250129211226.cfrhv4nn3jomooxc@skbuf>
+ <DM3PR11MB87365B3AD3C360B0EF0432F3ECE92@DM3PR11MB8736.namprd11.prod.outlook.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next v6 08/12] net: homa: create homa_incoming.c
-To: John Ousterhout <ouster@cs.stanford.edu>
-Cc: netdev@vger.kernel.org, edumazet@google.com, horms@kernel.org,
- kuba@kernel.org
-References: <20250115185937.1324-1-ouster@cs.stanford.edu>
- <20250115185937.1324-9-ouster@cs.stanford.edu>
- <9083adf9-4e3f-47d9-8a79-d8fb052f99b5@redhat.com>
- <CAGXJAmxWOmPi-khSUugzOOjMSgVpWnn7QZ28jORK4sL9=vrA9A@mail.gmail.com>
-Content-Language: en-US
-From: Paolo Abeni <pabeni@redhat.com>
-In-Reply-To: <CAGXJAmxWOmPi-khSUugzOOjMSgVpWnn7QZ28jORK4sL9=vrA9A@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <DM3PR11MB87365B3AD3C360B0EF0432F3ECE92@DM3PR11MB8736.namprd11.prod.outlook.com>
+Sender: Russell King (Oracle) <linux@armlinux.org.uk>
 
-
-
-On 1/30/25 1:48 AM, John Ousterhout wrote:
-> On Mon, Jan 27, 2025 at 2:19 AM Paolo Abeni <pabeni@redhat.com> wrote:
->>
->> On 1/15/25 7:59 PM, John Ousterhout wrote:
->>> +     /* Each iteration through the following loop processes one packet. */
->>> +     for (; skb; skb = next) {
->>> +             h = (struct homa_data_hdr *)skb->data;
->>> +             next = skb->next;
->>> +
->>> +             /* Relinquish the RPC lock temporarily if it's needed
->>> +              * elsewhere.
->>> +              */
->>> +             if (rpc) {
->>> +                     int flags = atomic_read(&rpc->flags);
->>> +
->>> +                     if (flags & APP_NEEDS_LOCK) {
->>> +                             homa_rpc_unlock(rpc);
->>> +                             homa_spin(200);
->>
->> Why spinning on the current CPU here? This is completely unexpected, and
->> usually tolerated only to deal with H/W imposed delay while programming
->> some device registers.
+On Thu, Jan 30, 2025 at 04:50:14AM +0000, Tristram.Ha@microchip.com wrote:
+> > On Wed, Jan 29, 2025 at 12:31:09AM +0000, Tristram.Ha@microchip.com wrote:
+> > > The default value of DW_VR_MII_AN_CTRL is DW_VR_MII_PCS_MODE_C37_SGMII
+> > > (0x04).  When a SGMII SFP is used the SGMII port works without any
+> > > programming.  So for example network communication can be done in U-Boot
+> > > through the SGMII port.  When a 1000BaseX SFP is used that register needs
+> > > to be programmed (DW_VR_MII_SGMII_LINK_STS |
+> > > DW_VR_MII_TX_CONFIG_PHY_SIDE_SGMII |
+> > DW_VR_MII_PCS_MODE_C37_1000BASEX)
+> > > (0x18) for it to work.
+> > 
+> > Can it be that DW_VR_MII_PCS_MODE_C37_1000BASEX is the important setting
+> > when writing 0x18, and the rest is just irrelevant and bogus? If not,
+> > could you please explain what is the role of DW_VR_MII_SGMII_LINK_STS |
+> > DW_VR_MII_TX_CONFIG_PHY_SIDE_SGMII for 1000Base-X? The XPCS data book
+> > does not suggest they would be considered for 1000Base-X operation. Are
+> > you suggesting for KSZ9477 that is different? If so, please back that
+> > statement up.
 > 
-> This is done to pass the RPC lock off to another thread (the
-> application); the spin is there to allow the other thread to acquire
-> the lock before this thread tries to acquire it again (almost
-> immediately). There's no performance impact from the spin because this
-> thread is going to turn around and try to acquire the RPC lock again
-> (at which point it will spin until the other thread releases the
-> lock). Thus it's either spin here or spin there. I've added a comment
-> to explain this.
+> As I mentioned before, the IP used in KSZ9477 is old and so may not match
+> the behavior in current DesignWare specifications.  I experimented with
+> different settings and observed these behaviors.
+> 
+> DW_VR_MII_DIG_CTRL1 has default value 0x2200.  Setting MAC_AUTO_SW (9)
+> has no effect as the value read back does not retain the bit.  Setting
+> PHY_MODE_CTRL (0) retains the bit but does not seem to have any effect
+> and it is not required for operation.  So we can ignore this register
+> for KSZ9477.
 
-What if another process is spinning on the RPC lock without setting
-APP_NEEDS_LOCK? AFAICS incoming packets targeting the same RPC could
-land on different RX queues.
+So the value of 0x2200 for DIG_CTRL1 means that bits 13 and 9 are both
+set, which are the EN_VSMMD1 and MAC_AUTO_SW bits. So, are you saying
+that MAC_AUTO_SW can't be cleared in KSZ9477? This is key information
+that we need.
 
-If the spin is not functionally needed, just drop it. If it's needed, it
-would be better to find some functional replacement, possibly explicit
-notification via waitqueue or completion.
+PHY_MODE_CTRL only has an effect when:
+	DW_VR_MII_PCS_MODE_C37_SGMII
+	DW_VR_MII_TX_CONFIG_PHY_SIDE_SGMII
+are both set.
 
-/P
+are set, and it determines the source for the bits in the configuration
+word to be sent to the _MAC_ (since XPCS is acting as a PHY with both
+these bits set.) 
 
+> DW_VR_MII_AN_CTRL has default value 0x0004, which means C37_SGMII is
+> enabled.  Plugging in a 10/100/1000Base-T SFP will work without doing
+> anything.
+> 
+> Setting TX_CONFIG_PHY_SIDE_SGMII (3) requires auto-negotiation to be
+> disabled in MII_BMCR for the port to work.
+
+If you have a SFP plugged in, then setting PHY-side on the XPCS is
+wrong. TX_CONFIG_MAC_SIDE_SGMII should be used, and thus PHY_MODE_CTRL
+is irrelevant as we are not generating a PHY-side Cisco SGMII config
+word (as I detailed when I described the Cisco SGMII config words which
+are asymmetric in nature.)
+
+> SGMII_LINK_STS (4) depends on TX_CONFIG_PHY_SIDE_SGMII.  If that bit is
+> not set then this bit has no effect.  The result of setting this bit is
+> auto-negotiation can be enabled in MII_BMCR.
+
+"that bit" and "this bit" makes this difficult to follow as I'm not
+sure which of SGMII_LINK_STS or TX_CONFIG_PHY_SIDE_SGMII that "this"
+and "that" are referring to. Please be explicit to avoid confusion.
+
+Since in later documentation, SGMII_LINK_STS is used to populate bit
+15 of the Cisco SGMII configuration word when operating in PHY mode
+when these bits are set:
+
+	TX_CONFIG_PHY_SIDE_SGMII
+	PHY_MODE_CTRL
+
+then, as PHY_MODE_CTRL is not supported by your hardware (it's marked
+as reserved) I suggest that this older version of XPCS either has this
+PHY_MODE_CTRL as an integration-time option, or the logic of taking
+the values from registers was not implemented in that revision. Thus
+why it only depends on TX_CONFIG_PHY_SIDE_SGMII in your case.
+
+> So C37_SGMII mode can still work with TX_CONFIG_PHY_SIDE_SGMII on and
+> auto-negotiation disabled.
+
+That's because if the XPCS acts as a PHY and is talking to another PHY,
+the only then that the remote PHY (in the SFP module) is looking for is
+an acknowledgement (bit 14 set.) It's possible that XPCS does this
+despite operating as a PHY. However, there is another (remote)
+possibility.
+
+> But the problem is when the cable is
+> unplugged and plugged the port does not work as the module cannot detect
+> the link.  Enabling auto-negotiation and then disabling it will cause
+> the port to work again.
+
+... because the XPCS is operating in the wrong mode, and when operating
+as a PHY does not expect the other end "the MAC" to be signalling link
+status to it. One end of a Cisco SGMII link must operate as a PHY and
+the other end must operate as a MAC to be correct. Other configurations
+may sort-of work but are incorrect to the Cisco SGMII documentation.
+
+> Now for 1000BaseX mode C37_1000BASEX is used and when auto-negotiation
+> is disabled the port works.
+
+There's something which can complicate "works" - some implementations
+have a "bypass" mode for negotiation. If they only receive idles
+without any sign of negotiation, after a timeout expires, they enter
+"bypass" mode and bring the data link up anyway.
+
+> For the XPCS driver this can be done by setting neg_mode to false at
+> the beginning. Problem is this flag can > only be set once at driver
+> initialization.
+
+Sigh. So you are referring to struct phylink_pcs's boolean neg_mode
+member here, and fiddling with that is _wrong_. This flag is a
+property of the driver code. It's "this driver code wants to see the
+PHYLINK_PCS_NEG_* constants passed into its functions" when set,
+as opposed to the MLO_AN_* constants that legacy drivers had. This
+flag _must_ match the driver. It is _not_ to be fiddled with depending
+on IP versions or other crap like that. It's purely about the code in
+the driver. Do not touch this boolean. Do not change it in the XPCS
+driver. It is correct. Setting it to false is incorrect. Am I clear?
+
+> So for 1000BaseX mode TX_CONFIG_PHY_SIDE_SGMII can be turned on and then
+> SGMII_LINK_STS allows auto-negotiation to be enabled all the time for
+> both SGMII and 1000BaseX modes to work.
+> 
+> C37_SGMII working:
+> 
+> Auto-negotiation enabled
+> 
+> Auto-negotiation disabled
+> TX_CONFIG_PHY_SIDE_SGMII on
+> (stop working after cable is unplugged and re-plugged)
+> 
+> C37_1000BASEX working:
+> 
+> Auto-negotiation disabled
+> 
+> Auto-negotiation disabled
+> TX_CONFIG_PHY_SIDE_SGMII on
+> 
+> Auto-negotiation enabled
+> TX_CONFIG_PHY_SIDE_SGMII on
+> SGMII_LINK_STS on
+> 
+> Note this behavior for 1000BaseX mode only occurs in KSZ9477, so we can
+> stop finding the reasons with current specs.
+
+Right, and its as documented in the KSZ9477 documentation. 1000base-X
+mode requires TX_CONFIG_PHY_SIDE_SGMII and SGMII_LINK_STS. Likely
+because of the older IP version.
+
+Let me get back to what I said in my previous email - but word it
+differently:
+
+   Can we think that setting both TX_CONFIG_PHY_SIDE_SGMII and
+   SGMII_LINK_STS unconditionally in the 1000base-X path with will
+   not have any deterimental effects on newer IP versions?
+
+> Microchip has another chip with newer IP version that does not have this
+> behavior for 1000BaseX mode.  That is, it does not require
+> auto-negotiation to be disabled for the port to work.  However, that chip
+> has major issues when using 2.5G mode so I do not know how reliable it is
+> when using 1G mode.
+
+I think we're getting mixed up here. I think you've said that:
+
+In Cisco SGMII mode, setting MAC mode with AN enabled works.
+In 1000base-X mode, setting both TX_CONFIG_PHY_SIDE_SGMII and
+SGMII_LINK_STS with AN enabled works.
+
+To me, this seems to be the right configuration. The problem all along
+that Vladimir has been trying to get to the bottom of is why you need
+TX_CONFIG_PHY_SIDE_SGMII and SGMII_LINK_STS set in 1000base-X mode,
+and the answer to that is: KSZ9477 documentation for an older XPCS IP
+version states that this is necessary.
+
+-- 
+RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
+FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
 
