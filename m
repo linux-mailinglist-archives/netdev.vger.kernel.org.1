@@ -1,117 +1,87 @@
-Return-Path: <netdev+bounces-161582-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-161584-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 19710A22766
-	for <lists+netdev@lfdr.de>; Thu, 30 Jan 2025 02:15:10 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id F1D09A2276E
+	for <lists+netdev@lfdr.de>; Thu, 30 Jan 2025 02:17:40 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id D8C507A257B
-	for <lists+netdev@lfdr.de>; Thu, 30 Jan 2025 01:14:15 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id E1B4A7A296E
+	for <lists+netdev@lfdr.de>; Thu, 30 Jan 2025 01:16:42 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 21205339A8;
-	Thu, 30 Jan 2025 01:15:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 723821D52B;
+	Thu, 30 Jan 2025 01:17:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="OH8s0o/h"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="QH+ODpsg"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E9F152E822;
-	Thu, 30 Jan 2025 01:15:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4E00E8C1F
+	for <netdev@vger.kernel.org>; Thu, 30 Jan 2025 01:17:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1738199704; cv=none; b=NvXLplVRQTopsqoL7xeJK5m9IH/euJUijxTsjOwsmFVgRaBsdsUy5EfuAfvce0XMIBhMrqRibX2dHei5YC9JZ0T98UmZ/ZCyGwtHSNM67kDIt5WdonmtgzWiCQeknEvVXT97qmT8CfrwRUbC2Q1l7FJqR7IUetFhU0NKpvbOIuU=
+	t=1738199850; cv=none; b=LM+sYxJyCTw0RybLaDDY+TXy5y/J4eNGI06Jf+4MIhVJ5eS1P0mr1vqBdvHnPLHGeUdeSt3p6n+sp/vWTm9ppzvNi+xlOBBMUtO+uCYLpSn6G22Wavfk4rTG8OJ/MzimeElfNBtfJJE4WrYPnS0RBKuGB8+pyPqePTNeP7FFJtw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1738199704; c=relaxed/simple;
-	bh=FZNjlG0LP2vC/Ut4yUAu2ih857dBojr6Itm/8rGld9c=;
+	s=arc-20240116; t=1738199850; c=relaxed/simple;
+	bh=sEDoEDIT6l8s6vcPxjZ2Ah7yyn+PM6QOedykYX3TKG0=;
 	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=IthFdVgkbE0MCKq2RiwBKkfhAhu1RXxLVLDfg7qu1us90EIkghuVINO74YRFBJ2f/x/yLtapPJAT4aVx932W4TKHT1foLAtnnDFhZ6zM1nvQ0MOOkYP3WWzsx7N/lsdSU6BElB1/D34mkt5UIdfM1dd6rdkIlreNoUIm60SbBHA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=OH8s0o/h; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 845ACC4CED1;
-	Thu, 30 Jan 2025 01:15:02 +0000 (UTC)
+	 MIME-Version:Content-Type; b=TxQSiYPADc5sp7oKuO+JAz/DZoXoouRl7WZr1SkE1Fp5rbD1DoIlAVW7j+lV2vJyFHN1OzrXY0owjopLKQtvXViHMcNh8dRX+IogrlyNT66c/1KH5RfDko03/l7pHE2bZ3Mxc7b34pzTt47DAoiu0GJ1nkz4J/GlUnnG6YUv8B0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=QH+ODpsg; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 86243C4CED1;
+	Thu, 30 Jan 2025 01:17:29 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1738199703;
-	bh=FZNjlG0LP2vC/Ut4yUAu2ih857dBojr6Itm/8rGld9c=;
+	s=k20201202; t=1738199849;
+	bh=sEDoEDIT6l8s6vcPxjZ2Ah7yyn+PM6QOedykYX3TKG0=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=OH8s0o/hkA5lCKpWe0gqnz6PH44dRKunHZTuRdEr7gGvolDQmJ8gdhVuAE2ojbjhw
-	 jrVDbLQ187rgcUX9vAOPwnR3nQgxvm/8C15jxoxQE7Mc+OedmDku0kffIfqnPBS5cg
-	 /5zH6KgaR4GpYoQDsq03fh2b4rd2J3rGEtjD3IfM3STNbavsGZAoUslrE6mqjW3nGy
-	 vxJLL4DUOCMd1fCDiIWKYAgNXbXXBXf+aZ73Df9bDwmjjS/tC6nIVqX11fld20G06j
-	 HPlZbILaPP7xYeDLf5Yi5XCyCEzPmsPoZfOZ6juHT5HNXAswYopaUvi3ZUiMMJ0tar
-	 /bnR9XKmoLAsw==
-Date: Wed, 29 Jan 2025 17:15:01 -0800
+	b=QH+ODpsgeThPCiGmOzhExoxAfaCTAmhQ0dbB3MDGVxxc4CUb6bVjj2ZYO7ge/cL2O
+	 t2yn1ageidhHWKu/oFs4G0M/0h8R7S4Nn2c+i0g63uCNeUUu38MVxZjMTHXqBL5n+g
+	 oolPTjKIfxjSEY2Wi2cXfKwXsdROycHFBz89mKF+fulBresve5MB3p9+iRh6Y2LLfK
+	 bWX1vBdAL1E5Br4c27AeJZIiYH3u8pbqIP/zHJy1X8wgUkOSaf+Z9/hjAEKvsjbs38
+	 lLWXy+RBSeyenyy4afPE+dvViUFWNDmzv5SvfjbVYhbTwHCoUYuJ/jjGLrkO8iLoGi
+	 ++8OFA3BnZh2g==
+Date: Wed, 29 Jan 2025 17:17:28 -0800
 From: Jakub Kicinski <kuba@kernel.org>
-To: Sankararaman Jayaraman <sankararaman.jayaraman@broadcom.com>
-Cc: alexanderduyck@fb.com, alexandr.lobakin@intel.com,
- andrew+netdev@lunn.ch, ast@kernel.org,
- bcm-kernel-feedback-list@broadcom.com, bpf@vger.kernel.org,
- daniel@iogearbox.net, davem@davemloft.net, edumazet@google.com,
- hawk@kernel.org, john.fastabend@gmail.com, netdev@vger.kernel.org,
- pabeni@redhat.com, ronak.doshi@broadcom.com, u9012063@gmail.com
-Subject: Re: [PATCH net v2] vmxnet3: Fix tx queue race condition with XDP
-Message-ID: <20250129171501.7d120cae@kernel.org>
-In-Reply-To: <20250129181703.148027-1-sankararaman.jayaraman@broadcom.com>
-References: <20250127143635.623dc3b0@kernel.org>
-	<20250129181703.148027-1-sankararaman.jayaraman@broadcom.com>
+To: Danielle Ratson <danieller@nvidia.com>
+Cc: "netdev@vger.kernel.org" <netdev@vger.kernel.org>, "mkubecek@suse.cz"
+ <mkubecek@suse.cz>, "matt@traverse.com.au" <matt@traverse.com.au>,
+ "daniel.zahka@gmail.com" <daniel.zahka@gmail.com>, Amit Cohen
+ <amcohen@nvidia.com>, NBU-mlxsw <NBU-mlxsw@exchange.nvidia.com>
+Subject: Re: [PATCH ethtool-next 08/14] cmis: Enable JSON output support in
+ CMIS modules
+Message-ID: <20250129171728.1ad90a87@kernel.org>
+In-Reply-To: <DM6PR12MB4516FF124D760E1D3A826161D8EE2@DM6PR12MB4516.namprd12.prod.outlook.com>
+References: <20250126115635.801935-1-danieller@nvidia.com>
+	<20250126115635.801935-9-danieller@nvidia.com>
+	<20250127121258.63f79e53@kernel.org>
+	<DM6PR12MB45169E557CE078AB5C7CB116D8EF2@DM6PR12MB4516.namprd12.prod.outlook.com>
+	<20250128140923.144412cf@kernel.org>
+	<DM6PR12MB4516FF124D760E1D3A826161D8EE2@DM6PR12MB4516.namprd12.prod.outlook.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-On Wed, 29 Jan 2025 23:47:03 +0530 Sankararaman Jayaraman wrote:
-> If XDP traffic runs on a CPU which is greater than or equal to
-> the number of the Tx queues of the NIC, then vmxnet3_xdp_get_tq()
-> always picks up queue 0 for transmission as it uses reciprocal scale
-> instead of simple modulo operation.
->=20
-> vmxnet3_xdp_xmit() and vmxnet3_xdp_xmit_frame() use the above
-> returned queue without any locking which can lead to race conditions
-> when multiple XDP xmits run in parallel on different=C2=A0CPU's.
->=20
-> This patch uses a simple module scheme when the current CPU equals or
-> exceeds the number of Tx queues on the NIC. It also adds locking in
-> vmxnet3_xdp_xmit() and vmxnet3_xdp_xmit_frame() functions.
->=20
-> Fixes: 54f00cce1178 ("vmxnet3: Add XDP support.")
-> Signed-off-by: Sankararaman Jayaraman <sankararaman.jayaraman@broadcom.co=
-m>
-> Signed-off-by: Ronak Doshi <ronak.doshi@broadcom.com>
+On Wed, 29 Jan 2025 07:06:09 +0000 Danielle Ratson wrote:
+> > Is the consumer of the JSON output supposed to be parsing the units and
+> > making sure to scale the values every time it reads (e.g. divide by 1000 if it
+> > wants W but unit is mW)?
+> > 
+> > Or the unit is fully implied by the key, and can't change? IOW the unit is only
+> > listed so that the human writing the consumer can figure out the unit and then
+> > hardcode it?  
+> 
+> Yes, the unit is implied by the key is hardcoded. Same as for the
+> regular output, it should give the costumer idea about the scale.
+> There are also temperature fields that could be either F or C
+> degrees. So overall , the units fields should align all the fields
+> that implies some sort of scale. 
 
-Please add a --- separator between commit message and change log
-
-> Changes v1-> v2:
-> Retained the copyright dates as it is.
-> Used spin_lock()/spin_unlock() instead of spin_lock_irqsave().=20
-
-Wrong way around AFAICT. The lock is taken on the xmit path,
-and driver supports netpoll. But this path won't be called
-from IRQ. So the right type of call is very likely _irq().
-
-Please do not post next version of the patch in reply to previous
-posting. Instead add to the change log a lore link to previous
-posting. See:
-https://www.kernel.org/doc/html/next/process/maintainer-netdev.html#changes=
--requested
-Actually, also make sure you read at least the tl;dr section, too.
-
-> @@ -226,6 +231,7 @@ vmxnet3_xdp_xmit(struct net_device *dev,
->  	struct vmxnet3_adapter *adapter =3D netdev_priv(dev);
->  	struct vmxnet3_tx_queue *tq;
->  	int i;
-> +	struct netdev_queue *nq;
-
-Reverse length order. So:
-
- 	struct vmxnet3_adapter *adapter =3D netdev_priv(dev);
- 	struct vmxnet3_tx_queue *tq;
-+	struct netdev_queue *nq;
- 	int i;
---=20
-pw-bot: cr
+Some sort of a schema would be a better place to document the unit
+of the fields, IMO.
 
