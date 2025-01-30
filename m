@@ -1,185 +1,180 @@
-Return-Path: <netdev+bounces-161601-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-161602-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 41A8BA22977
-	for <lists+netdev@lfdr.de>; Thu, 30 Jan 2025 09:16:56 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 42056A229A1
+	for <lists+netdev@lfdr.de>; Thu, 30 Jan 2025 09:34:30 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 4D7863A6943
-	for <lists+netdev@lfdr.de>; Thu, 30 Jan 2025 08:16:48 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id B58937A2F80
+	for <lists+netdev@lfdr.de>; Thu, 30 Jan 2025 08:33:35 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 68F1E1A2C29;
-	Thu, 30 Jan 2025 08:16:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="g3zFRLgg"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AA4DA1A8F74;
+	Thu, 30 Jan 2025 08:34:23 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f52.google.com (mail-wm1-f52.google.com [209.85.128.52])
+Received: from mail-il1-f206.google.com (mail-il1-f206.google.com [209.85.166.206])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3057D1A4AAA
-	for <netdev@vger.kernel.org>; Thu, 30 Jan 2025 08:16:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.52
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EC9E9148832
+	for <netdev@vger.kernel.org>; Thu, 30 Jan 2025 08:34:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.206
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1738225011; cv=none; b=mmgZfGBCugPwx8jj8gJAqSv04wsilUowO9ZVAWSfP6kBnc+5ZehpFO7l3U1YyHutgQOLJQ2yBWu1FVqdur1jmu6ocE4g4VaxRp7zThgNASVLVnLXzatfHyJa91E1ObSs7jeqiw/x1m+jZv57H4YtifW39hhP+Sc5znttraScv10=
+	t=1738226063; cv=none; b=CDwv+6HvU8NLALjOUbQHS24tumCHkCzCKzELuS7eH2ciUwpPaMYKBEj9Tq4ehHGHQiC+ONskGQUytNDkfhSqslWkA1cyjIIEbntF/jxogZ6EYhOvfAojzds88ft6I6Q8COk5TCbmL/uTg6HNXlmgoP6NXqojkEYiUEp9nzYAYC8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1738225011; c=relaxed/simple;
-	bh=thFpIKSrzc48zBWfFcfPLiqFrhjEdaU6F0FW+zf4rsM=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Nch1UwUs8vBodoD3vFFvnYVSh/lChs5sp+YrzE0XgdU8iFaFX4YZHy2gCAaKxseXexAZEAkw6rvHigi4xVAY3fqtyw3JFT84BHmODkYgOHa3lnidRGqjNZNlt9oLQTYppYyDdl1u46ULndxiFxwFBpka8zUHkgHG7A6OslUMhRU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=g3zFRLgg; arc=none smtp.client-ip=209.85.128.52
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
-Received: by mail-wm1-f52.google.com with SMTP id 5b1f17b1804b1-43625c4a50dso3018865e9.0
-        for <netdev@vger.kernel.org>; Thu, 30 Jan 2025 00:16:48 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1738225007; x=1738829807; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=HbemEf+xhUc2mT3lWThkeJWiexh/Of8vPXBaz6+0qAg=;
-        b=g3zFRLggPFw0YtjBkN6YnEFRlZMZW9LTQXOBwWWYMPG0QndvItFdHI8KWn5lFbs+Fg
-         mNGM8mryHwjJFpsBw8gluchHkA5fqxMlaYGBojfjn3MbH7KX3DNRSKrnOmIuj8HrrpSy
-         Rw4hFUZjbTp+8unK9frVIWeWY60yGLOhxL1heS3pt6edPBh9ge/EXqIq+bX3T7SoZjIH
-         j3HiatdDWSBG24X59yvSKGI58SKls9nukbw9oL02TfJ/Tsw2WYzoCO2SAzBDM+xLqHxQ
-         7knVL4nsCO2RMAN1ifT0SGVLfUG7ln+VLGpxMvcV49U2TaTqawi79z2nRUtmk8x3qA6U
-         iiIA==
+	s=arc-20240116; t=1738226063; c=relaxed/simple;
+	bh=wR+Z6K1GgOLuF+lGSInZHWuV82Wfi8tZE152oYjdFsw=;
+	h=MIME-Version:Date:Message-ID:Subject:From:To:Content-Type; b=OD6CcArS6zh5ubj4jhgS4zk2VFNVHyD7nUmQC5xA9D73sZu25wiS1Su+z9x0c4rxQ/oWYN/nDMeGU4HDb1yNltcKQekLv+SER7vfR05Vm0KE0ZEsTkwjQc18PmtYmqbxrroqQ12+6osQ9h4uFDwYPrPpU9h9BD4ryQ2H9Ik/Mp0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.206
+Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
+Received: by mail-il1-f206.google.com with SMTP id e9e14a558f8ab-3cfe0ce0dbbso8115435ab.3
+        for <netdev@vger.kernel.org>; Thu, 30 Jan 2025 00:34:21 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1738225007; x=1738829807;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=HbemEf+xhUc2mT3lWThkeJWiexh/Of8vPXBaz6+0qAg=;
-        b=QEzVKyXdpCRyaZkPsXmCIbghvKWkEsZmUdTm/FOHYHc4tIQpoQWEILU5d4cEj+AQgF
-         dyN83EtrGOufq/tZdGmC60koOrcC0bVGpmODywyzr92FiV76xtINRW7O8oXjkSMbWvs0
-         LGngyv+eLbu0PWOvIso8Yrb79Py1bsCsaQ0wf9iAupK099/ua55GS6cJk6P2+QHDd4Ng
-         xJsQ3wcE/HRNy7LppTZEF3tHmavGIFdF7FRt9qPwMxUeE4Ih5B9QkrbzWU3WE2KNoDPX
-         pzoKlVFk2iBmTXi/vifSMFbCFn8E9Zi+Ajz5eBNn49PithMWPs0Oxbu7rfu0Z1bW4cST
-         qC/g==
-X-Forwarded-Encrypted: i=1; AJvYcCUmisHYZXSHh03ejGuba+rShMbdadjm61brdP710wMIuNPnhd0jZpBfHSkYZkKU6FcD5i9XuMQ=@vger.kernel.org
-X-Gm-Message-State: AOJu0YydGTdFfqzAvLu6oMyJ7XLlF5ucqa8ieM/yClsPNdFzVG148Mnr
-	nT3GmA244KTxGi8FhnFjhYV3RAyXUYu5AjtwQMnAK5JhDID3klwj95LNYEV6EVg=
-X-Gm-Gg: ASbGnct8ke9S2rB9lnUQMThk8FXVRwxled4KjKjnAgBCqo/kDLh650ZJHG3zvGw9Co+
-	iYPFMillcXDyeNpmIuSxeMK3IiOU9hXP5yvOO0XyBIEMTxdhbYn7MgP1kmN76x89AlgCpSfzB1b
-	OJvcWB3P+YXeij8gVZy/bbM+dPCegbBU/HQ1vNxlVBLPgiqv13MHSWQM0HdJ1kMA9md1OkHi6bm
-	SM/ZQOEg8WCnGf6vom1gbK34ckEbTmUSIC5Dz9kHCyeT0GfFMirO6fplO2YkPsv++mJQx7ZhtOx
-	TpgcGRUZwOZwt8iWfDlP
-X-Google-Smtp-Source: AGHT+IHhtr9w91Nho4TPvuAAvm8MqwAGRZsNV86QLdJ6VOdB7b7cJnCAZnjkLka/hqqB6XtKlVfCAg==
-X-Received: by 2002:a05:600c:870a:b0:434:a7b6:10e9 with SMTP id 5b1f17b1804b1-438dc3cbadcmr53604745e9.17.1738225007382;
-        Thu, 30 Jan 2025 00:16:47 -0800 (PST)
-Received: from localhost ([196.207.164.177])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-438dcc6df1esm50323705e9.27.2025.01.30.00.16.46
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 30 Jan 2025 00:16:46 -0800 (PST)
-Date: Thu, 30 Jan 2025 11:16:43 +0300
-From: Dan Carpenter <dan.carpenter@linaro.org>
-To: kernel test robot <lkp@intel.com>
-Cc: Dan Carpenter <error27@gmail.com>,
-	Steffen Klassert <steffen.klassert@secunet.com>,
-	oe-kbuild-all@lists.linux.dev,
-	Herbert Xu <herbert@gondor.apana.org.au>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Simon Horman <horms@kernel.org>, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org, kernel-janitors@vger.kernel.org,
-	linux-hardening@vger.kernel.org
-Subject: Re: [PATCH net] xfrm: fix integer overflow in
- xfrm_replay_state_esn_len()
-Message-ID: <f86c7660-0910-4ca2-9ff9-d2d142a968c7@stanley.mountain>
-References: <018ecf13-e371-4b39-8946-c7510baf916b@stanley.mountain>
- <202501230035.cFbLTHtZ-lkp@intel.com>
+        d=1e100.net; s=20230601; t=1738226061; x=1738830861;
+        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=fQ/o4/b6Ex4RAzVYvoOkrNxkjEsseTNCeqYnPshcqow=;
+        b=qOw2TTErgRcFmrhkAPOJL7JrOAsoPT6zt5fMdFq6k0vQ2Q3PKisUcXP4CD+/NclxjC
+         Se8alI25G3DZ+WoaBg7gRd4tn6BNgXPcjH6Bt83SSiy3CSEf4VEhzKxIq4pK+9Dbp/9I
+         7sDx2R0ZhGbs5yC2ZqkBMWu1yhPrUYBchQQd1+j1EVTZI7k+2yrC1m7SRcO1093WJyT0
+         ZNPw4dWGjuMENmU+IXtgmWnTVhjjeLvAFX/qovll6L9wd1za2DO1iIGqeJc5Nub211TU
+         dMNyZv3H/BKkRdNeGepFcYn7TF27kyI3BKNFvKdw1MZ5oaBKNC4SBMk/rKZUyp+K+teP
+         mH/Q==
+X-Forwarded-Encrypted: i=1; AJvYcCXTvbQ+24t9BdHHTQNsDNTfr3LN6+5X5HxLypXa/rTtCYw1pcBMXbqwK/mMWGmN/nRznETGf+s=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwrD52vNxoolHvWYGedSzD9RLDAfdZW6geQICzVXnRsIjXNL1kv
+	k3nwh9RDzgj1Qea1191LPaEyRAarJI5454G0Iqmli2OcjH6YJ4LXo5cbdvhNq8NWmla1faB9nrK
+	ww4ceogPJyctGEWQI4ltYr7VMiL5y/ju020xXC2db4DIpgilJwRu7Vpg=
+X-Google-Smtp-Source: AGHT+IG0zbLTMwlsYNF9aK6Ma79fu3b0ZtPLHtGzfC+iMAq9WW2j2Ex60YLgFoNd4Gt2cIvQsYevSPvpuoJys8ZWxepfTvyPew6K
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <202501230035.cFbLTHtZ-lkp@intel.com>
+X-Received: by 2002:a05:6e02:198b:b0:3cf:fcc4:eff9 with SMTP id
+ e9e14a558f8ab-3cffe3e5dbemr58975175ab.8.1738226061121; Thu, 30 Jan 2025
+ 00:34:21 -0800 (PST)
+Date: Thu, 30 Jan 2025 00:34:21 -0800
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <679b398d.050a0220.48cbc.0004.GAE@google.com>
+Subject: [syzbot] [wireless?] WARNING in ieee80211_prep_channel
+From: syzbot <syzbot+c90039fcfb40175abe28@syzkaller.appspotmail.com>
+To: johannes@sipsolutions.net, linux-kernel@vger.kernel.org, 
+	linux-wireless@vger.kernel.org, netdev@vger.kernel.org, 
+	syzkaller-bugs@googlegroups.com
+Content-Type: text/plain; charset="UTF-8"
 
-I've added linux-hardening to the CC.
+Hello,
 
-This is a fortify false positive.  I can't reproduce it on x86 with
-gcc-14.  Perhaps it only affect mips?  It's a W=1 warning so it shouldn't
-be a blocker in that sense.
+syzbot found the following issue on:
 
-regards,
-dan carpenter
+HEAD commit:    805ba04cb7cc Merge tag 'mips_6.14' of git://git.kernel.org..
+git tree:       upstream
+console output: https://syzkaller.appspot.com/x/log.txt?x=15d3ae24580000
+kernel config:  https://syzkaller.appspot.com/x/.config?x=7d796da73b2f708c
+dashboard link: https://syzkaller.appspot.com/bug?extid=c90039fcfb40175abe28
+compiler:       Debian clang version 15.0.6, GNU ld (GNU Binutils for Debian) 2.40
 
-On Thu, Jan 23, 2025 at 12:53:14AM +0800, kernel test robot wrote:
-> Hi Dan,
-> 
-> kernel test robot noticed the following build warnings:
-> 
-> [auto build test WARNING on net/main]
-> 
-> url:    https://github.com/intel-lab-lkp/linux/commits/Dan-Carpenter/xfrm-fix-integer-overflow-in-xfrm_replay_state_esn_len/20250121-191827
-> base:   net/main
-> patch link:    https://lore.kernel.org/r/018ecf13-e371-4b39-8946-c7510baf916b%40stanley.mountain
-> patch subject: [PATCH net] xfrm: fix integer overflow in xfrm_replay_state_esn_len()
-> config: mips-allyesconfig (https://download.01.org/0day-ci/archive/20250123/202501230035.cFbLTHtZ-lkp@intel.com/config)
-> compiler: mips-linux-gcc (GCC) 14.2.0
-> reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20250123/202501230035.cFbLTHtZ-lkp@intel.com/reproduce)
-> 
-> If you fix the issue in a separate patch/commit (i.e. not just a new version of
-> the same patch/commit), kindly add following tags
-> | Reported-by: kernel test robot <lkp@intel.com>
-> | Closes: https://lore.kernel.org/oe-kbuild-all/202501230035.cFbLTHtZ-lkp@intel.com/
-> 
-> All warnings (new ones prefixed by >>):
-> 
->    In file included from include/linux/string.h:389,
->                     from include/linux/bitmap.h:13,
->                     from include/linux/cpumask.h:12,
->                     from arch/mips/include/asm/processor.h:15,
->                     from arch/mips/include/asm/thread_info.h:16,
->                     from include/linux/thread_info.h:60,
->                     from include/asm-generic/preempt.h:5,
->                     from ./arch/mips/include/generated/asm/preempt.h:1,
->                     from include/linux/preempt.h:79,
->                     from include/linux/spinlock.h:56,
->                     from include/net/xfrm.h:7,
->                     from net/xfrm/xfrm_replay.c:10:
->    In function 'memcmp',
->        inlined from 'xfrm_replay_notify_bmp' at net/xfrm/xfrm_replay.c:336:7:
-> >> include/linux/fortify-string.h:120:33: warning: '__builtin_memcmp' specified bound 4294967295 exceeds maximum object size 2147483647 [-Wstringop-overread]
->      120 | #define __underlying_memcmp     __builtin_memcmp
->          |                                 ^
->    include/linux/fortify-string.h:727:16: note: in expansion of macro '__underlying_memcmp'
->      727 |         return __underlying_memcmp(p, q, size);
->          |                ^~~~~~~~~~~~~~~~~~~
->    net/xfrm/xfrm_replay.c: In function 'xfrm_replay_notify_bmp':
->    net/xfrm/xfrm_replay.c:308:53: note: source object allocated here
->      308 |         struct xfrm_replay_state_esn *replay_esn = x->replay_esn;
->          |                                                    ~^~~~~~~~~~~~
->    In function 'memcmp',
->        inlined from 'xfrm_replay_notify_esn' at net/xfrm/xfrm_replay.c:402:7:
-> >> include/linux/fortify-string.h:120:33: warning: '__builtin_memcmp' specified bound 4294967295 exceeds maximum object size 2147483647 [-Wstringop-overread]
->      120 | #define __underlying_memcmp     __builtin_memcmp
->          |                                 ^
->    include/linux/fortify-string.h:727:16: note: in expansion of macro '__underlying_memcmp'
->      727 |         return __underlying_memcmp(p, q, size);
->          |                ^~~~~~~~~~~~~~~~~~~
->    net/xfrm/xfrm_replay.c: In function 'xfrm_replay_notify_esn':
->    net/xfrm/xfrm_replay.c:360:53: note: source object allocated here
->      360 |         struct xfrm_replay_state_esn *replay_esn = x->replay_esn;
->          |                                                    ~^~~~~~~~~~~~
-> 
-> 
-> vim +/__builtin_memcmp +120 include/linux/fortify-string.h
-> 
-> 78a498c3a227f2 Alexander Potapenko 2022-10-24  118  
-> 78a498c3a227f2 Alexander Potapenko 2022-10-24  119  #define __underlying_memchr	__builtin_memchr
-> 78a498c3a227f2 Alexander Potapenko 2022-10-24 @120  #define __underlying_memcmp	__builtin_memcmp
-> a28a6e860c6cf2 Francis Laniel      2021-02-25  121  #define __underlying_strcat	__builtin_strcat
-> a28a6e860c6cf2 Francis Laniel      2021-02-25  122  #define __underlying_strcpy	__builtin_strcpy
-> a28a6e860c6cf2 Francis Laniel      2021-02-25  123  #define __underlying_strlen	__builtin_strlen
-> a28a6e860c6cf2 Francis Laniel      2021-02-25  124  #define __underlying_strncat	__builtin_strncat
-> a28a6e860c6cf2 Francis Laniel      2021-02-25  125  #define __underlying_strncpy	__builtin_strncpy
-> 2e577732e8d28b Andrey Konovalov    2024-05-17  126  
-> 
-> -- 
-> 0-DAY CI Kernel Test Service
-> https://github.com/intel/lkp-tests/wiki
+Unfortunately, I don't have any reproducer for this issue yet.
+
+Downloadable assets:
+disk image (non-bootable): https://storage.googleapis.com/syzbot-assets/7feb34a89c2a/non_bootable_disk-805ba04c.raw.xz
+vmlinux: https://storage.googleapis.com/syzbot-assets/85ee30d862e7/vmlinux-805ba04c.xz
+kernel image: https://storage.googleapis.com/syzbot-assets/0fcbe505a48e/bzImage-805ba04c.xz
+
+IMPORTANT: if you fix the issue, please add the following tag to the commit:
+Reported-by: syzbot+c90039fcfb40175abe28@syzkaller.appspotmail.com
+
+wg2: entered promiscuous mode
+wg2: entered allmulticast mode
+mac80211_hwsim: wmediumd released netlink socket, switching to perfect channel medium
+loop0: detected capacity change from 0 to 40427
+F2FS-fs (loop0): Unrecognized mount option "activR_logs=6" or missing value
+loop0: detected capacity change from 0 to 65536
+XFS (loop0): Mounting V5 Filesystem 9b7348e5-2fa0-41a5-9526-c53a678b01f3
+XFS (loop0): Torn write (CRC failure) detected at log block 0x10. Truncating head block from 0x12.
+XFS (loop0): Tail block (0x10000) overwrite detected. Updated to 0x0
+XFS (loop0): Corruption warning: Metadata has LSN (1:48) ahead of current LSN (1:16). Please unmount and run xfs_repair (>= v4.3) to resolve.
+XFS (loop0): log mount/recovery failed: error -22
+XFS (loop0): log mount failed
+wlan1: No basic rates, using min rate instead
+------------[ cut here ]------------
+WARNING: CPU: 0 PID: 5314 at net/mac80211/mlme.c:1012 ieee80211_determine_chan_mode net/mac80211/mlme.c:1012 [inline]
+WARNING: CPU: 0 PID: 5314 at net/mac80211/mlme.c:1012 ieee80211_prep_channel+0x389b/0x5120 net/mac80211/mlme.c:5666
+Modules linked in:
+CPU: 0 UID: 0 PID: 5314 Comm: syz.0.0 Not tainted 6.13.0-syzkaller-08291-g805ba04cb7cc #0
+Hardware name: QEMU Standard PC (Q35 + ICH9, 2009), BIOS 1.16.3-debian-1.16.3-2~bpo12+1 04/01/2014
+RIP: 0010:ieee80211_determine_chan_mode net/mac80211/mlme.c:1012 [inline]
+RIP: 0010:ieee80211_prep_channel+0x389b/0x5120 net/mac80211/mlme.c:5666
+Code: c6 05 e7 7e 87 04 01 48 c7 c7 77 8d 29 8d be 78 03 00 00 48 c7 c2 60 8e 29 8d e8 50 1c 1d f6 e9 7e ca ff ff e8 76 4d 41 f6 90 <0f> 0b 90 48 8b 7c 24 30 e8 a8 69 9c f6 48 c7 44 24 30 ea ff ff ff
+RSP: 0018:ffffc9000d3f6540 EFLAGS: 00010283
+RAX: ffffffff8b7e1f5a RBX: 0000000000000000 RCX: 0000000000100000
+RDX: ffffc9000e91a000 RSI: 00000000000008be RDI: 00000000000008bf
+RBP: ffffc9000d3f6890 R08: ffffffff8b7df479 R09: ffffffff8b50af99
+R10: 000000000000000e R11: ffff88801cd5a440 R12: dffffc0000000000
+R13: ffff88805317a758 R14: ffffc9000d3f6750 R15: ffffc9000d3f6790
+FS:  00007f4f4434a6c0(0000) GS:ffff88801fc00000(0000) knlGS:0000000000000000
+CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+CR2: 00007f2ab7f95ed8 CR3: 0000000041010000 CR4: 0000000000352ef0
+DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
+DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
+Call Trace:
+ <TASK>
+ ieee80211_prep_connection+0xda1/0x1310 net/mac80211/mlme.c:8538
+ ieee80211_mgd_auth+0xcec/0x1480 net/mac80211/mlme.c:8828
+ rdev_auth net/wireless/rdev-ops.h:486 [inline]
+ cfg80211_mlme_auth+0x59f/0x970 net/wireless/mlme.c:291
+ cfg80211_conn_do_work+0x601/0xeb0 net/wireless/sme.c:183
+ cfg80211_sme_connect net/wireless/sme.c:626 [inline]
+ cfg80211_connect+0x1486/0x1d10 net/wireless/sme.c:1525
+ nl80211_connect+0x188f/0x1fe0 net/wireless/nl80211.c:12236
+ genl_family_rcv_msg_doit net/netlink/genetlink.c:1115 [inline]
+ genl_family_rcv_msg net/netlink/genetlink.c:1195 [inline]
+ genl_rcv_msg+0xb14/0xec0 net/netlink/genetlink.c:1210
+ netlink_rcv_skb+0x1e3/0x430 net/netlink/af_netlink.c:2543
+ genl_rcv+0x28/0x40 net/netlink/genetlink.c:1219
+ netlink_unicast_kernel net/netlink/af_netlink.c:1322 [inline]
+ netlink_unicast+0x7f6/0x990 net/netlink/af_netlink.c:1348
+ netlink_sendmsg+0x8e4/0xcb0 net/netlink/af_netlink.c:1892
+ sock_sendmsg_nosec net/socket.c:713 [inline]
+ __sock_sendmsg+0x221/0x270 net/socket.c:728
+ ____sys_sendmsg+0x52a/0x7e0 net/socket.c:2568
+ ___sys_sendmsg net/socket.c:2622 [inline]
+ __sys_sendmsg+0x269/0x350 net/socket.c:2654
+ do_syscall_x64 arch/x86/entry/common.c:52 [inline]
+ do_syscall_64+0xf3/0x230 arch/x86/entry/common.c:83
+ entry_SYSCALL_64_after_hwframe+0x77/0x7f
+RIP: 0033:0x7f4f4358cd29
+Code: ff ff c3 66 2e 0f 1f 84 00 00 00 00 00 0f 1f 40 00 48 89 f8 48 89 f7 48 89 d6 48 89 ca 4d 89 c2 4d 89 c8 4c 8b 4c 24 08 0f 05 <48> 3d 01 f0 ff ff 73 01 c3 48 c7 c1 a8 ff ff ff f7 d8 64 89 01 48
+RSP: 002b:00007f4f4434a038 EFLAGS: 00000246 ORIG_RAX: 000000000000002e
+RAX: ffffffffffffffda RBX: 00007f4f437a5fa0 RCX: 00007f4f4358cd29
+RDX: 0000000000000000 RSI: 00000000200001c0 RDI: 0000000000000008
+RBP: 00007f4f4360e2a0 R08: 0000000000000000 R09: 0000000000000000
+R10: 0000000000000000 R11: 0000000000000246 R12: 0000000000000000
+R13: 0000000000000000 R14: 00007f4f437a5fa0 R15: 00007ffdba3bb598
+ </TASK>
+
+
+---
+This report is generated by a bot. It may contain errors.
+See https://goo.gl/tpsmEJ for more information about syzbot.
+syzbot engineers can be reached at syzkaller@googlegroups.com.
+
+syzbot will keep track of this issue. See:
+https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
+
+If the report is already addressed, let syzbot know by replying with:
+#syz fix: exact-commit-title
+
+If you want to overwrite report's subsystems, reply with:
+#syz set subsystems: new-subsystem
+(See the list of subsystem names on the web dashboard)
+
+If the report is a duplicate of another one, reply with:
+#syz dup: exact-subject-of-another-report
+
+If you want to undo deduplication, reply with:
+#syz undup
 
