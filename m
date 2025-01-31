@@ -1,289 +1,246 @@
-Return-Path: <netdev+bounces-161769-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-161770-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id F0DB5A23DD6
-	for <lists+netdev@lfdr.de>; Fri, 31 Jan 2025 13:39:59 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 29C0FA23E04
+	for <lists+netdev@lfdr.de>; Fri, 31 Jan 2025 13:56:15 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D0E1D3A94FE
-	for <lists+netdev@lfdr.de>; Fri, 31 Jan 2025 12:39:51 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 930D4164734
+	for <lists+netdev@lfdr.de>; Fri, 31 Jan 2025 12:56:13 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 17C1C1B87FB;
-	Fri, 31 Jan 2025 12:39:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BD5751C174E;
+	Fri, 31 Jan 2025 12:56:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="O6opQLI+"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ej1-f49.google.com (mail-ej1-f49.google.com [209.85.218.49])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.13])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E138C4C7C;
-	Fri, 31 Jan 2025 12:39:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.49
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1738327195; cv=none; b=sh62HrbQXqj6GxLNORojtoKcwtC+Hrtl4tN2HIuBpIxk/H3AnBLmjZSS0PHqjon/pIVoK3zjub/5QNWl8YzsuqIueE+IuvFuCpSUlU5UXO7wpm64CoxizaSMt/hPuPG+vvg6eLiS0Nibto2pPCWJrnPIjsPRvJM86VfzXdg0EN0=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1738327195; c=relaxed/simple;
-	bh=WurhRTUteD8sGKFQNuEJYBz6ShWRfiWUQLthuX+tlXM=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:To:Cc; b=NN91WNJlT4A9Jerr9vN+a2N/Sr0fwLHFCOMxpcJtE9RbcVb5DVl6VaQ0YUs57/leNty3bVZnL4G1PsYKZI16IR7MQEKmc94BD+prlLQSQ2X+0r8idXbKsiMW3CY/8aAxeFB6H6tTvT/F8i8gRk7gTAPrTzjxFE2gOvG19eFSERw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.218.49
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ej1-f49.google.com with SMTP id a640c23a62f3a-a9e44654ae3so317049166b.1;
-        Fri, 31 Jan 2025 04:39:52 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1738327191; x=1738931991;
-        h=cc:to:message-id:content-transfer-encoding:mime-version:subject
-         :date:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=gG0BXuRRCC+KYWnxXLITESshYQ/auauU0ULNTK06oOg=;
-        b=HqAARnd9Xz5GpVwejqgdrlNejI1yY7tHUCZMBYF1vZFxW9TNuaCgwvAMsMyQ3qPnFM
-         +s44fAOGBReGK6pPfdtlS/4GP9kmp6ETRgLrcIbgzbNWGAQFaw6NoKxJqVc7m8i9GWl1
-         K3iChCeC9FybYFSLGKjd8vd6kH99oLu1QD6Duv9eQ9DfpL0CL6qM5Ihbj02yWWPhbW+5
-         FYC2zU2JRfUV0ONFSu5hE65NUICTvFe1ReeOMVSSAX7Mn4w876IXnAVVGfKlSpDi5irL
-         JHF9QY5S/+3/r1RKEqOObkZOMSAXNiy7qz9Y0l+9ULiKP/Vrjo9lxplnhcemNgIF3wm8
-         VTZg==
-X-Forwarded-Encrypted: i=1; AJvYcCUO72bWCWLEEokO5dQtWKWUoXM73fDfAeHBPu7PkgDuSvO1ujmkzQYLiLXDj1Y+WpXKFVpbB9ol7q8LKlkEuQI=@vger.kernel.org, AJvYcCUbdH9AvhDVboGmW+T2oS5vCP38vNqNQQwZA/3F0ehaXraE1z29nANyoShJfPjheTxO/rk2FcjL@vger.kernel.org
-X-Gm-Message-State: AOJu0YzfNZgjNij+B+Pk+8eJLZy5xUiA/ZeKCeiySuRRluBRRXuUiGgJ
-	Gqq1c29UPNySWG03Vb3JgFkjBN0Uqn3iJh8KbAXW1Tp3dru5aHsr
-X-Gm-Gg: ASbGncvgTXqWlRc1LgYiOv+X4b+xBh7JvMJp49r5iq8dmOiHtvxphvvz7ocMc22l1+P
-	0sRxNFNt1ng7LTHnvNOMeM8PiHxXLQDRoMhXycJVZO+afml+rLqNg09yUm4aAliDlfxfqN3/6KV
-	4VpmGiEvHQvJDOLypabpj9rcgRA0mpClSb3e55VYy4Lqhc8uQx1vofW6cLCyQgSTpuT8shiTWWv
-	cf2htjet8iOWjRgASvPwr0scs+wsqtzPHi37zvS85BBLGLhQm+jlW0ugzMC5bhSNWlibg+GkqFg
-	gMBF/A==
-X-Google-Smtp-Source: AGHT+IG+AMrHha429VFBPA+KD07+eUfMRNFPyA8voaBZVSFHnmadCc6/o3oi7PkP3uyOqgG3avYifQ==
-X-Received: by 2002:a17:907:7f8d:b0:ab3:4b0c:ea44 with SMTP id a640c23a62f3a-ab6cfcb428emr1151623766b.9.1738327190726;
-        Fri, 31 Jan 2025 04:39:50 -0800 (PST)
-Received: from localhost ([2a03:2880:30ff:4::])
-        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-ab6e47cf48esm290881466b.50.2025.01.31.04.39.49
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 31 Jan 2025 04:39:49 -0800 (PST)
-From: Breno Leitao <leitao@debian.org>
-Date: Fri, 31 Jan 2025 04:39:38 -0800
-Subject: [PATCH RFC net-next] netconsole: selftest: Add test for fragmented
- messages
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 17A581DFF0;
+	Fri, 31 Jan 2025 12:56:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=192.198.163.13
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1738328172; cv=fail; b=jegjqq0LqbqFJAw6jFF3QKf6oQEqOLy54G4sULbeS3NiMTtZFg69jtQi5R0QJ3BBEasxAs3NSFmeCNgadHZweK6fFgNyD7y4DHULVcS7rwMUrEGrZEiowgnV+pq+svJtYY9iBHzEC9GFezhHyfchMWbnM2rltYdQhGfwgq5hWS0=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1738328172; c=relaxed/simple;
+	bh=UM4pVhPJnDSkX9SyfVwsL0KnVAdL7o/ibzW3beAsEHs=;
+	h=Message-ID:Date:Subject:To:References:From:CC:In-Reply-To:
+	 Content-Type:MIME-Version; b=ejIV3dd0oXqg0Qfjw1Db8ESolGdVgVnIerzKtcFtjzs+Gw/ZZnfF2AG8N6G1dwFRRh5fi4hRyIWCULGfkHGtm+i7yI+gzwsrqrJzAZ3KH+6HkF8CIENyYrzUtso+xxB3mMCjU0PE22VvKF92vuogNppMS2VH9qPNrOYZUK4GRFw=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=O6opQLI+; arc=fail smtp.client-ip=192.198.163.13
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1738328171; x=1769864171;
+  h=message-id:date:subject:to:references:from:cc:
+   in-reply-to:content-transfer-encoding:mime-version;
+  bh=UM4pVhPJnDSkX9SyfVwsL0KnVAdL7o/ibzW3beAsEHs=;
+  b=O6opQLI+pzwG4oFc2ls2JYJRQXAvMivJxMlGZ4Q/mFI7DVpkFOOtJZIE
+   Wc+IwdnVz80tVHRlpWt4S+Cm3qqCQFZhYjMw6uiNnFQVU/UzgaiV6qvls
+   fqDGDaZgRZrzpzf5a6xSmFyP9pN4G5OWPiWhBtdicwpbEcZB6I9PvslMt
+   0m1wuRYAoYrZcWO8+7tTcKMqIohV0WHWq65R6UxjZjHbvrU6S+a0OvG06
+   ob6Eg2sh4KqhuxWkZ43tJRwPjF3AlR4iwbnlnoVH+Jr2pDHE8kPeu1Id9
+   HyotE71FZEzMMZ3EAoU0RL+ScQLRPKXYbnux2oj7Amt2FcLzisNJJal4Y
+   Q==;
+X-CSE-ConnectionGUID: vcqUAUZ/R7K1LtxUNr/TWA==
+X-CSE-MsgGUID: fF3S58ilQqa8XlffIabTAQ==
+X-IronPort-AV: E=McAfee;i="6700,10204,11332"; a="41727853"
+X-IronPort-AV: E=Sophos;i="6.13,248,1732608000"; 
+   d="scan'208";a="41727853"
+Received: from orviesa005.jf.intel.com ([10.64.159.145])
+  by fmvoesa107.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 31 Jan 2025 04:56:10 -0800
+X-CSE-ConnectionGUID: PqiO7ZoqTleaWzwNBuKAVw==
+X-CSE-MsgGUID: cHm5sGRwT1qkvNGJYc08Zw==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.12,224,1728975600"; 
+   d="scan'208";a="114772898"
+Received: from orsmsx601.amr.corp.intel.com ([10.22.229.14])
+  by orviesa005.jf.intel.com with ESMTP/TLS/AES256-GCM-SHA384; 31 Jan 2025 04:56:10 -0800
+Received: from orsmsx603.amr.corp.intel.com (10.22.229.16) by
+ ORSMSX601.amr.corp.intel.com (10.22.229.14) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.44; Fri, 31 Jan 2025 04:56:09 -0800
+Received: from orsedg603.ED.cps.intel.com (10.7.248.4) by
+ orsmsx603.amr.corp.intel.com (10.22.229.16) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.44 via Frontend Transport; Fri, 31 Jan 2025 04:56:09 -0800
+Received: from NAM11-CO1-obe.outbound.protection.outlook.com (104.47.56.169)
+ by edgegateway.intel.com (134.134.137.100) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.1.2507.44; Fri, 31 Jan 2025 04:56:09 -0800
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=kNmt26AQDWTLnI6pWqvyMQfXb4iA0gbm+1v3Ytgpw2qDjFxzg6dJm2szeTIXmL5HvLzWJpWus7AgVWn3PUvz2t4UnJzrWxCTkB1tolwMV6ASguQa2w6xv15QfOoxLICxR87arB69SWegu+851lllWmsvo2gH/EeNlI2LPKjFWKnv/lzMoLsPExxObI850wumcGRBvWiyecEekUy1m6llM4eE2DahJH/XgAAkRrQYDfUGBY7wTYxhG7l+zw85xyT0MR4X5tSUJc/vdHwmLd7tPS9J0XuZhzYc2nd/YbvyMsOhBX5E7v8kRvjLntqRYnTNqidaD7QZNVuFRH6+YEsRDQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=bqfMMZAoghx9GoRC6oFyrQ3Rsb+KdD5acgz8/qmceMs=;
+ b=peeixDj/Wge8ZYSpWafV8Kt+D0mwxlQs6WaggbwxcSYRzLHkSZbBeU3UVKkeiOiK5apNQ/gxrgjPP6xdkVzclnSlrXevIpw86T6s0/Z5WFN9vWCCKsA0GA7pzMyUqPN8XBEy2hfsag8Ftqs1YxfGROk4/UAw0Q2B7Mr2I2nhTmte4xk/bwgB6XZWWPb+Q3bjGn02lVZKg77NpmEwD612yP2oC+C/FFXZyIBoJCUGcgCkUQd6RBG1uNTmOqgdS1eC+ZJHvIf5NzIaYRTMQMIGlsRzBKlfzRT9NI2KbjjiKA8+6jPEBMJ8NQJBB+x1/8zi5oMeOiuU6XxthzrnHC7Gjw==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=intel.com;
+Received: from MN6PR11MB8102.namprd11.prod.outlook.com (2603:10b6:208:46d::9)
+ by SN7PR11MB7592.namprd11.prod.outlook.com (2603:10b6:806:343::16) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8398.20; Fri, 31 Jan
+ 2025 12:56:07 +0000
+Received: from MN6PR11MB8102.namprd11.prod.outlook.com
+ ([fe80::15b2:ee05:2ae7:cfd6]) by MN6PR11MB8102.namprd11.prod.outlook.com
+ ([fe80::15b2:ee05:2ae7:cfd6%6]) with mapi id 15.20.8398.017; Fri, 31 Jan 2025
+ 12:56:07 +0000
+Message-ID: <769c50c5-51ac-42d1-9c8e-97783a621a0e@intel.com>
+Date: Fri, 31 Jan 2025 13:56:00 +0100
+User-Agent: Mozilla Thunderbird
+Subject: Re: [patch v2] tg3: Disable tg3 PCIe AER on system reboot
+To: Lenny Szubowicz <lszubowi@redhat.com>, <pavan.chebbi@broadcom.com>,
+	<mchan@broadcom.com>, <andrew+netdev@lunn.ch>, <davem@davemloft.net>,
+	<edumazet@google.com>, <kuba@kernel.org>, <pabeni@redhat.com>,
+	<george.shuklin@gmail.com>, <andrea.fois@eventsense.it>
+References: <20241129203640.54492-1-lszubowi@redhat.com>
+From: Przemek Kitszel <przemyslaw.kitszel@intel.com>
+Content-Language: en-US
+CC: <netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>, Yue Zhao
+	<yue.zhao@shopee.com>, <chunguang.xu@shopee.com>, <haifeng.xu@shopee.com>,
+	Dawid Osuchowski <dawid.osuchowski@linux.intel.com>
+In-Reply-To: <20241129203640.54492-1-lszubowi@redhat.com>
+Content-Type: text/plain; charset="UTF-8"; format=flowed
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: VI1PR04CA0092.eurprd04.prod.outlook.com
+ (2603:10a6:803:64::27) To MN6PR11MB8102.namprd11.prod.outlook.com
+ (2603:10b6:208:46d::9)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Message-Id: <20250131-netcons_frag_msgs-v1-1-0de83bf2a7e6@debian.org>
-X-B4-Tracking: v=1; b=H4sIAInEnGcC/x3MQQqDMBAF0KuEvzaQpEQw20IP0K0UEZ2ks+hYM
- qEI4t1Lu32Ld0CpMimSOVDpw8qbIBnfGSzPWQpZXpEMggvR+TBYobZsolOuc5leWtQOPrp+9Zc
- +R4fO4F0p8/4/R9xv158JNSu0NzzO8wvE4Et0dAAAAA==
-X-Change-ID: 20250129-netcons_frag_msgs-91506d136f50
-To: Andrew Lunn <andrew+netdev@lunn.ch>, 
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
- Shuah Khan <shuah@kernel.org>, horms@kernel.org
-Cc: linux-kernel@vger.kernel.org, netdev@vger.kernel.org, 
- linux-kselftest@vger.kernel.org, matttbe@kernel.org, 
- Breno Leitao <leitao@debian.org>
-X-Mailer: b4 0.14.2
-X-Developer-Signature: v=1; a=openpgp-sha256; l=8109; i=leitao@debian.org;
- h=from:subject:message-id; bh=WurhRTUteD8sGKFQNuEJYBz6ShWRfiWUQLthuX+tlXM=;
- b=owEBbQKS/ZANAwAIATWjk5/8eHdtAcsmYgBnnMSU5QPHRRYwPvL1ncIl6viFFx9/IlMzmDYBc
- gWizlVqBSSJAjMEAAEIAB0WIQSshTmm6PRnAspKQ5s1o5Of/Hh3bQUCZ5zElAAKCRA1o5Of/Hh3
- bUxnD/41AScj9X3utthKYI34D4s14u6KecKm3tbIXFlWPn/fs+mbN3do9BktHbg8thqM6uRHdF2
- pX1aoJradKqfqxlUkOhL0bqOLvLnTi9FxXhqvFlAeN4EhbWWrTFbqW+rvNJFP/z5N4vv00e6kWy
- vH9VwgPZ12cAiihB7+jiKv0poDDD2GxPdSSlAfWz3SfVXP2LiVmUqjIruY95CjEQ7RfxfX4sbfc
- YhNnpDxaoDr9Rw1gf4/hgeE8TgLWuQYLyqtgEL2XiMwB8yCsvw7gnxpCvcxi+naCXqf9mxtCAwr
- kM99MhOnbd9pNHE8cekIH4RjEvcvf2+0D9eXxfPJ25g1lFTPDmmAbpomKob5IURxpHL7dK9apRN
- Qnlm5DpEmMuByprbW2maFXy71KnTvanv14yTlxUJnc6Mk4I8pltXQkXMm3tmG0uWPKy3LjoHPui
- WjXCBcbKbxvPCOxtzWzoPVnj+/VBbjqalmTs8X0YGzom/Hedp7bfmVjNB1pn4Ie5b4KgANURdAk
- NpQ96e2y+q1gZyP6c2vfSSsuRJUsy0KZ/DrM2+U9VBfd1tXMaattmf6vV3ziH9hWKsv2PMxgxed
- SmtlIWcqGu89I47juFGQhbjTgnSHeSXWdD029QubgMoZ1zGCRLMqPMIfZbByTYoPDTLGhLmidWz
- 5RzLxlEU+oJuOow==
-X-Developer-Key: i=leitao@debian.org; a=openpgp;
- fpr=AC8539A6E8F46702CA4A439B35A3939FFC78776D
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: MN6PR11MB8102:EE_|SN7PR11MB7592:EE_
+X-MS-Office365-Filtering-Correlation-Id: 0b936347-ca81-4ddd-186b-08dd41f6a0b1
+X-LD-Processed: 46c98d88-e344-4ed4-8496-4ed7712e255d,ExtAddr
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;ARA:13230040|366016|376014|1800799024|7416014|7053199007|921020;
+X-Microsoft-Antispam-Message-Info: =?utf-8?B?YTlnWXNXYjEwSjBjRlA0QnppUTFET05TL1hINWpWYmo3RG9QV25aMkg5UXFO?=
+ =?utf-8?B?eUtZdGhDOGpWemp3ZHlScHVCaSt3YWdxUkFEcWFyK3pMeUR5aFdJNXptcHBs?=
+ =?utf-8?B?OEZ2S2JmY2lNUUk4TGVyNzJoa0xtVlpaTWJXUkJqTEFycVN0bmRDK09iMmNR?=
+ =?utf-8?B?ZzZDUVBaUWNGSDVtMC9wUDVFN3BWOEV5czJYR2I0aENncjMvRHZBUjVnS0g2?=
+ =?utf-8?B?U1VoaWRQZkYreGZYbHBqeng4eWV1bGhvUVlaMDFlSDRPUzZVMGpNRFdtbDdx?=
+ =?utf-8?B?ZFlmenFLV20zYzk2VnphTzEvMEhsV25DUDF0US9ZU3pXWklLMlN4bGpsUU9s?=
+ =?utf-8?B?WWc0N2xnR1cyNjFCOXBtbjAzeWdkRjNuWDgxWjQyUmNubVpKY1c2cHNFWmp0?=
+ =?utf-8?B?Snc4TXZaVVR1cFlUdlJPSmpFYkNZaHFWT0lYdnAzM2dOMEZGOUloSlZKSjJq?=
+ =?utf-8?B?VXRmVFhzUklpUmRvdUQ2WFZMNTltQkRKeXd3UmpySVNYc3JwNHdkZlFBM0Na?=
+ =?utf-8?B?MTlxMjhCMHhDdlorWmY3ZjY1NEpUQTFEUEY0blVMempZOU1rRnFhcVdXV05h?=
+ =?utf-8?B?UlpnK2VGWlgvMldBQlpTVmViM3ZRUnNXblRwMFEzTjFXZ1NWMnczWkV6bFBE?=
+ =?utf-8?B?NDFPTDBqTlNCdmZPditIYU93YTEzcjdlRFlpQzJ4U1BieklpemV4NndPeTQx?=
+ =?utf-8?B?VTFQWEhkSmlDbnNKazZ1d0hPa2FVTDkvRzdaTmhTQndscU1IVW05Q2NJd09I?=
+ =?utf-8?B?Mnh5d3hFb1BGRVlDZXkyM0RMaDBtR093cjk2ZTZuNzd6eHRMOVNiR1JMcC9I?=
+ =?utf-8?B?bnZNWDBHbXV5aUtwdG5CWFIzZ09RbDdtOFV5dStGK1JVOE9JaVZsQjI0L3V0?=
+ =?utf-8?B?Q2p0YTNFOVYwcFprOVc2eHRaaFZFaEU3NjdFK0YvOFcvZHJQd2cwbDNYbkpu?=
+ =?utf-8?B?RmxNcmFQWWVHeUNxbkd2WTdyNVUrdW5RNER0MHNXRHpHNkNlcG9sa0xxM0Ji?=
+ =?utf-8?B?WWJMQlFKd0VIM0Q2UklRWTJjVHRvVTVCQVNyeEZHUHlaZU94Q0djTVNDWmQ1?=
+ =?utf-8?B?cTg4c1E5YzlHcld0ZVZMaUd4UDc0bXlnUFF5eWxXY0pOeURjOVcvTndDQmx6?=
+ =?utf-8?B?QzgyMDJtQ0FCYjcwdTNpMG56RGdWM3JvZTJjeVZESXFoYnJlZWJqWU9KeDNu?=
+ =?utf-8?B?SXZWcnZMUjMxeHhiMWplL0c5TURyVUt3Y2FiL2czK0NhY0JHRE5kMHV5dHRM?=
+ =?utf-8?B?azQrUUNJYWxSUVF5aVRTQVZCRlhLN0Jybk8vZUFwTTh3NHJqUktIeUtlUG5Z?=
+ =?utf-8?B?YU1tQVZ5Y3ZsQ1dBVHByUDVub3lNbmY4dGJYOFNVOWVldFdYcitxaW5ZcFNs?=
+ =?utf-8?B?SWt1TUZoaW0wdzdFdFF5Wk5ML203RVdDTzdJNDN4a1M3MzVLUEtCNzlnYi9W?=
+ =?utf-8?B?Z29yYzZCelFpSFhmSXJLY0hGZGg2WGdOb1JGRjhzWG5OcUNSUGMzVEVsU2ZO?=
+ =?utf-8?B?TTdHeHd0MWVpdlpVTGJEcWx0VWZUS2xVYUpYS0lhRGppMlhienR1VTB6a2pn?=
+ =?utf-8?B?eWVvWDZteGlISzJib3FyUTNYc1JiWE5DcUdrNDBqcnZLL08wV3k1TDZDVkhi?=
+ =?utf-8?B?ZWx3L3IzSW9RTndQWnFWMXZOWWtrYXhIeWs5bG11TjJLeEc5emFGcWZSa2lj?=
+ =?utf-8?B?Qm82eWNkSEMxYk93aTBCbk1aemc1OEVBMjQzWWVPZkhldWJyRXVMc2ZPOXBy?=
+ =?utf-8?B?Y3NxbnRJbjlucU1NaFJ1blJLcEM1cEVPeW1QUVcvWVRBT1h2MGdycGNSR0Yy?=
+ =?utf-8?B?cEFkM1ordW5RaTVSWDNKTWtkSHBrZjl1WURkWVQ4eUFnOGJDemdUYldzem1Z?=
+ =?utf-8?Q?Z/u3c71VQlqEc?=
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:MN6PR11MB8102.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(366016)(376014)(1800799024)(7416014)(7053199007)(921020);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?a1VETmJwVnJ1Q1RYSVpjZkcvcWlUMVZBbTc1dkFEdHVLZVEwcVpnQ2M4L2U2?=
+ =?utf-8?B?ZHd6eXUwanY1aUcrVTZjYXJxUzJyemVYSlVUeFc4WWVjSDlEWVlrdmo4cmNl?=
+ =?utf-8?B?UWk0QXRPc3NCQk04TXcvcGhSd2RWVFVsQXh1WVNBWHZDL25rWG5MaEVuN1dH?=
+ =?utf-8?B?NWQvVllhYi92WFJwNVpIeitiN040TE1hV3BCcUFLZTY5VjNWRWJVRDBlY2JR?=
+ =?utf-8?B?TS9UQ2pXdm1Qa0t1amdxVGlFTWN0WTFKM2ZiQWNOZis0cnZOaW1jUytqUEhC?=
+ =?utf-8?B?bmh1VER0YTN5bU81bFgySzU0aHpjdkM0ZUtDNks5dThqT0tvQ3JzbTlsM2dk?=
+ =?utf-8?B?cTdrMkJ4Qi8rVEFRUERObUkrSkZBaEgwY0hxVXdvU1ZuREFnSGkwMmR5WVRw?=
+ =?utf-8?B?RnBvd1VOR01QUUN4NGhTRTdYVUdHd3BoT05OSUt0QTVMVXpENW1IbXVCTDNO?=
+ =?utf-8?B?N2l1N01SdkJ3VHNaeG01YkZDa1NJZStKYXppUmlHSXVqWVV0WGxFbDYzaXhp?=
+ =?utf-8?B?SytIVDRRV1ozdjh3UHRKNGtGdUo1RXNWVVNkYnl4UXE1VEZRZjBLUW5aQXdM?=
+ =?utf-8?B?akMvY1NnZ0IvYnRXZ1l4L2RmT291Z2xTN2VvSVplWlBFQzJvMkFrZDVEZ09u?=
+ =?utf-8?B?ZEdFbW83MWE3NlRXRHpad2NrMUVHV1RWbDg3bG9zb1J2ODk4Yi9HR0hiRDVi?=
+ =?utf-8?B?a0F3M1dVZTBrckFhMFNPc3UyNmtlWUt0N0t1KzUzYmNKRkZtRmJ4MUEzZGFV?=
+ =?utf-8?B?bmhIbnRwVjVqeHYvVzdGNFA0Tkh6SDY2N2llOExaclI0Y0VCWnNhb0pJamph?=
+ =?utf-8?B?U2UxV0xWcjFpNkpTT3NuWTdpVUJLbk52bFJlbHlnYzZleTFFbVoxZVR2ajVu?=
+ =?utf-8?B?MkphV1RsRUQwMDdpa0pLMk80VG9IVVloWnJjRUhYcy8wbjFnbUQvLzd2c2VN?=
+ =?utf-8?B?OXBzYlJQOFlFcGt6QVdQY0V1MlB5bit2cGJFTWthQ2x2MFlzOGlIRmFuWlVr?=
+ =?utf-8?B?Q0lYVEtPNSs0WmoyeVlxdDkwUU9LcGFTVFRSVlBweXdpUTNKaEcxWFNPN3ZT?=
+ =?utf-8?B?cWxEdGYvRjd1R3pxMG0xTGM1QXFNOHBLb09EalM3V0VzQ2NrdFJvQXJ1QUZo?=
+ =?utf-8?B?cjdQTUx5S1pFS1A2RVhiU1FPY2dkVkl6a0Z4YTNRTWNzYjB1V0NPekNpbGV3?=
+ =?utf-8?B?RVo1WFFwUHZ0L2NQQ01sRDVVb29yY25wME83cjRra3VESGNhRlArL2tvalRE?=
+ =?utf-8?B?T0ZvaVVtNHdlc0xvd1B1TjIyNVFNdlVTSkFGSmxabDYrM1ExWUhoVlIvUGZq?=
+ =?utf-8?B?L0ZZbTJnVVZybEo5U0QyNXhzY3crTFkyTHlOcU1rSnBuWTVCRnR2NVR2NEJ1?=
+ =?utf-8?B?a3lpTDhwS1Zldkh3cjJVdU14Qmh2R3dIV0I1QWJXVlV5TFZkU2VNN2puTXJH?=
+ =?utf-8?B?SWtTTmdiai9LcjFkaVM3Mm1aaXZPZHRJUXpZck5wM1BSbXYxaUJkL0RoM2d3?=
+ =?utf-8?B?OTBQT0NzVjhGd2NnVlFSRmpjczNCYUhhTHpqUFBlemNpMEtsTkp0b25pMGs3?=
+ =?utf-8?B?VityQ09UTnFHMFdqQjhPcHgzZCtFZkoyL3F0Nkk4dzJaSTlSSUthSDlGVXgz?=
+ =?utf-8?B?Z1VNSVFsSjFvSjhxWDkzVWJ6YW54amdCM2JxeHBhVDZOTWlwcWo3ek9wSEw5?=
+ =?utf-8?B?WVF1R2hXR2Z0ODFCajF4L2dKWDRuUkorM0kxbzVJVm1CS0JRSVlrK2VkVFJR?=
+ =?utf-8?B?eDdTa2ZSMDhZR1h1Z1pjOW1JNWZ4K0NWMXgxUHFVcks3dGdmcHgrbC9SbmRB?=
+ =?utf-8?B?OUk5RkhuYlVVSXFGNHhGYTBWMHExbGxjS3NlMEkrbmJyaGFEUVgwVE1jazRt?=
+ =?utf-8?B?dnpOaXpaMXh6bE1NR2RuQ1NtZysyYXlsSDlOa0QwVHdpR2VQS28xRk1uVnQx?=
+ =?utf-8?B?UHhXN1k0ck1hZVJ1VTl6NGRFSzdtOTN3bmpncTVGWUlQUWxqZFNSaDRTODhU?=
+ =?utf-8?B?ZU5EdHc2NlFiKy9ZSUhNVU9DRUwwcjRMSGt4VW5VVThQS1Y3WC8xb0h2SXBu?=
+ =?utf-8?B?VFU3Zmo5ZXBxdUtINHppTGlPaC9ybTlvbjlucnlQYXRaU2ZhY0s0VWQvM3dO?=
+ =?utf-8?B?VWd6U05QbjUyV2VYL2Z6VHdqcWJGQnA2d1NHSVlCOVZNMFFpZkxZZzZhU2Uw?=
+ =?utf-8?B?VXc9PQ==?=
+X-MS-Exchange-CrossTenant-Network-Message-Id: 0b936347-ca81-4ddd-186b-08dd41f6a0b1
+X-MS-Exchange-CrossTenant-AuthSource: MN6PR11MB8102.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 31 Jan 2025 12:56:07.1473
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: UtS8BIk9VctKf+QjLDJUFWaBdgP0Ez13xD5UA3Y3xOZnpl2ArZH7upvWW32NKeZaGejcAgvuDnlVUGBjyoBNP+LxMu5iDYSsnbShzHWrecQ=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SN7PR11MB7592
+X-OriginatorOrg: intel.com
 
-Add a new selftest to verify netconsole's handling of messages that
-exceed the packet size limit and require fragmentation. The test sends
-messages with varying sizes and userdata, validating that:
+On 11/29/24 21:36, Lenny Szubowicz wrote:
+> Disable PCIe AER on the tg3 device on system reboot on a limited
+> list of Dell PowerEdge systems. This prevents a fatal PCIe AER event
+> on the tg3 device during the ACPI _PTS (prepare to sleep) method for
+> S5 on those systems. The _PTS is invoked by acpi_enter_sleep_state_prep()
+> as part of the kernel's reboot sequence as a result of commit
+> 38f34dba806a ("PM: ACPI: reboot: Reinstate S5 for reboot").
+> 
+> There was an earlier fix for this problem by commit 2ca1c94ce0b6
+> ("tg3: Disable tg3 device on system reboot to avoid triggering AER").
+> But it was discovered that this earlier fix caused a reboot hang
+> when some Dell PowerEdge servers were booted via ipxe. To address
+> this reboot hang, the earlier fix was essentially reverted by commit
+> 9fc3bc764334 ("tg3: power down device only on SYSTEM_POWER_OFF").
+> This re-exposed the tg3 PCIe AER on reboot problem.
+> 
+> This fix is not an ideal solution because the root cause of the AER
+> is in system firmware. Instead, it's a targeted work-around in the
+> tg3 driver.
+> 
+> Note also that the PCIe AER must be disabled on the tg3 device even
+> if the system is configured to use "firmware first" error handling.
+> 
+> Fixes: 9fc3bc764334 ("tg3: power down device only on SYSTEM_POWER_OFF")
+> Signed-off-by: Lenny Szubowicz <lszubowi@redhat.com>
 
-1. Large messages are correctly fragmented and reassembled
-2. Userdata fields are properly preserved across fragments
-3. Messages work correctly with and without kernel release version
-   appending
+the bug occurs also on Intel drivers, we even got the ~very same fix
+proposed:
+https://lore.kernel.org/netdev/20241227035459.90602-1-yue.zhao@shopee.com/T/
 
-The test creates a networking environment using netdevsim, sends
-messages through /dev/kmsg, and verifies the received fragments maintain
-message integrity.
+I believe that such fix should be centralized, instead of repeating for
+each driver. Especially that the list of platforms is likely to be
+extended in the future.
 
-Signed-off-by: Breno Leitao <leitao@debian.org>
----
- tools/testing/selftests/drivers/net/Makefile       |   1 +
- .../selftests/drivers/net/lib/sh/lib_netcons.sh    |   7 ++
- .../drivers/net/netcons_fragmented_msg.sh          | 122 +++++++++++++++++++++
- 3 files changed, 130 insertions(+)
-
-diff --git a/tools/testing/selftests/drivers/net/Makefile b/tools/testing/selftests/drivers/net/Makefile
-index 137470bdee0c7fd2517bd1baafc12d575de4b4ac..c7f1c443f2af091aa13f67dd1df9ae05d7a43f40 100644
---- a/tools/testing/selftests/drivers/net/Makefile
-+++ b/tools/testing/selftests/drivers/net/Makefile
-@@ -7,6 +7,7 @@ TEST_INCLUDES := $(wildcard lib/py/*.py) \
- 
- TEST_PROGS := \
- 	netcons_basic.sh \
-+	netcons_fragmented_msg.sh \
- 	netcons_overflow.sh \
- 	ping.py \
- 	queues.py \
-diff --git a/tools/testing/selftests/drivers/net/lib/sh/lib_netcons.sh b/tools/testing/selftests/drivers/net/lib/sh/lib_netcons.sh
-index 3acaba41ac7b21aa2fd8457ed640a5ac8a41bc12..0c262b123fdd3082c40b2bd899ec626d223226ed 100644
---- a/tools/testing/selftests/drivers/net/lib/sh/lib_netcons.sh
-+++ b/tools/testing/selftests/drivers/net/lib/sh/lib_netcons.sh
-@@ -110,6 +110,13 @@ function create_dynamic_target() {
- 	echo 1 > "${NETCONS_PATH}"/enabled
- }
- 
-+# Do not append the release to the header of the message
-+function disable_release_append() {
-+	echo 0 > "${NETCONS_PATH}"/enabled
-+	echo 0 > "${NETCONS_PATH}"/release
-+	echo 1 > "${NETCONS_PATH}"/enabled
-+}
-+
- function cleanup() {
- 	local NSIM_DEV_SYS_DEL="/sys/bus/netdevsim/del_device"
- 
-diff --git a/tools/testing/selftests/drivers/net/netcons_fragmented_msg.sh b/tools/testing/selftests/drivers/net/netcons_fragmented_msg.sh
-new file mode 100755
-index 0000000000000000000000000000000000000000..d175d5b9db662ab9a6ee203794569cc620801a4f
---- /dev/null
-+++ b/tools/testing/selftests/drivers/net/netcons_fragmented_msg.sh
-@@ -0,0 +1,122 @@
-+#!/usr/bin/env bash
-+# SPDX-License-Identifier: GPL-2.0
-+
-+# Test netconsole's message fragmentation functionality.
-+#
-+# When a message exceeds the maximum packet size, netconsole splits it into
-+# multiple fragments for transmission. This test verifies:
-+#  - Correct fragmentation of large messages
-+#  - Proper reassembly of fragments at the receiver
-+#  - Preservation of userdata across fragments
-+#  - Behavior with and without kernel release version appending
-+#
-+# Author: Breno Leitao <leitao@debian.org>
-+
-+set -euo pipefail
-+
-+SCRIPTDIR=$(dirname "$(readlink -e "${BASH_SOURCE[0]}")")
-+
-+source "${SCRIPTDIR}"/lib/sh/lib_netcons.sh
-+
-+modprobe netdevsim 2> /dev/null || true
-+modprobe netconsole 2> /dev/null || true
-+
-+# The content of kmsg will be save to the following file
-+OUTPUT_FILE="/tmp/${TARGET}"
-+
-+# set userdata to a long value. In this case, it is "1-2-3-4...50-"
-+USERDATA_VALUE=$(printf -- '%.2s-' {1..60})
-+
-+# Convert the header string in a regexp, so, we can remove
-+# the second header as well.
-+# A header looks like "13,468,514729715,-,ncfrag=0/1135;". If
-+# release is appended, you might find something like:L
-+# "6.13.0-04048-g4f561a87745a,13,468,514729715,-,ncfrag=0/1135;"
-+function header_to_regex() {
-+	# header is everything before ;
-+	local HEADER="${1}"
-+	REGEX=$(echo "${HEADER}" | cut -d'=' -f1)
-+	echo "${REGEX}=[0-9]*\/[0-9]*;"
-+}
-+
-+# We have two headers in the message. Remove both to get the full message,
-+# and extract the full message.
-+function extract_msg() {
-+	local MSGFILE="${1}"
-+	# Extract the header, which is the very first thing that arrives in the
-+	# first list.
-+	HEADER=$(sed -n '1p' "${MSGFILE}" | cut -d';' -f1)
-+	HEADER_REGEX=$(header_to_regex "${HEADER}")
-+
-+	# Remove the two headers from the received message
-+	# This will return the message without any header, similarly to what
-+	# was sent.
-+	sed "s/""${HEADER_REGEX}""//g" "${MSGFILE}"
-+}
-+
-+# Validate the message, which has two messages glued together.
-+# unwrap them to make sure all the characters were transmitted.
-+# File will look like the following:
-+#   13,468,514729715,-,ncfrag=0/1135;MSG1=MSG2=MSG3=MSG4=MSG5=MSG6=MSG7=MSG8=MSG9=MSG10=MSG11=MSG12=MSG13=MSG14=MSG15=MSG16=MSG17=MSG18=MSG19=MSG20=MSG21=MSG22=MSG23=MSG24=MSG25=MSG26=MSG27=MSG28=MSG29=MSG30=MSG31=MSG32=MSG33=MSG34=MSG35=MSG36=MSG37=MSG38=MSG39=MSG40=MSG41=MSG42=MSG43=MSG44=MSG45=MSG46=MSG47=MSG48=MSG49=MSG50=MSG51=MSG52=MSG53=MSG54=MSG55=MSG56=MSG57=MSG58=MSG59=MSG60=MSG61=MSG62=MSG63=MSG64=MSG65=MSG66=MSG67=MSG68=MSG69=MSG70=MSG71=MSG72=MSG73=MSG74=MSG75=MSG76=MSG77=MSG78=MSG79=MSG80=MSG81=MSG82=MSG83=MSG84=MSG85=MSG86=MSG87=MSG88=MSG89=MSG90=MSG91=MSG92=MSG93=MSG94=MSG95=MSG96=MSG97=MSG98=MSG99=MSG100=MSG101=MSG102=MSG103=MSG104=MSG105=MSG106=MSG107=MSG108=MSG109=MSG110=MSG111=MSG112=MSG113=MSG114=MSG115=MSG116=MSG117=MSG118=MSG119=MSG120=MSG121=MSG122=MSG123=MSG124=MSG125=MSG126=MSG127=MSG128=MSG129=MSG130=MSG131=MSG132=MSG133=MSG134=MSG135=MSG136=MSG137=MSG138=MSG139=MSG140=MSG141=MSG142=MSG143=MSG144=MSG145=MSG146=MSG147=MSG148=MSG149=MSG150=: netcons_nzmJQ
-+#    key=1-2-13,468,514729715,-,ncfrag=967/1135;3-4-5-6-7-8-9-10-11-12-13-14-15-16-17-18-19-20-21-22-23-24-25-26-27-28-29-30-31-32-33-34-35-36-37-38-39-40-41-42-43-44-45-46-47-48-49-50-51-52-53-54-55-56-57-58-59-60-
-+function validate_fragmented_result() {
-+	# Discard the netconsole headers, and assemble the full message
-+	RCVMSG=$(extract_msg "${1}")
-+
-+	# check for the main message
-+	if ! echo "${RCVMSG}" | grep -q "${MSG}"; then
-+		echo "Message body doesn't match." >&2
-+		echo "msg received=" "${RCVMSG}" >&2
-+		exit "${ksft_fail}"
-+	fi
-+
-+	# check userdata
-+	if ! echo "${RCVMSG}" | grep -q "${USERDATA_VALUE}"; then
-+		echo "message userdata doesn't match" >&2
-+		echo "msg received=" "${RCVMSG}" >&2
-+		exit "${ksft_fail}"
-+	fi
-+	# test passed. hooray
-+}
-+
-+# Check for basic system dependency and exit if not found
-+check_for_dependencies
-+# Set current loglevel to KERN_INFO(6), and default to KERN_NOTICE(5)
-+echo "6 5" > /proc/sys/kernel/printk
-+# Remove the namespace, interfaces and netconsole target on exit
-+trap cleanup EXIT
-+# Create one namespace and two interfaces
-+set_network
-+# Create a dynamic target for netconsole
-+create_dynamic_target
-+# Set userdata "key" with the "value" value
-+set_user_data
-+
-+
-+# TEST 1: Send message and userdata. They will fragment
-+# =======
-+MSG=$(printf -- 'MSG%.3s=' {1..150})
-+
-+# Listen for netconsole port inside the namespace and destination interface
-+listen_port_and_save_to "${OUTPUT_FILE}" &
-+# Wait for socat to start and listen to the port.
-+wait_local_port_listen "${NAMESPACE}" "${PORT}" udp
-+# Send the message
-+echo "${MSG}: ${TARGET}" > /dev/kmsg
-+# Wait until socat saves the file to disk
-+busywait "${BUSYWAIT_TIMEOUT}" test -s "${OUTPUT_FILE}"
-+# Check if the message was not corrupted
-+validate_fragmented_result "${OUTPUT_FILE}"
-+
-+# TEST 2: Test with smaller message, and without release appended
-+# =======
-+MSG=$(printf -- 'FOOBAR%.3s=' {1..100})
-+# Let's disable release and test again.
-+disable_release_append
-+
-+listen_port_and_save_to "${OUTPUT_FILE}" &
-+wait_local_port_listen "${NAMESPACE}" "${PORT}" udp
-+echo "${MSG}: ${TARGET}" > /dev/kmsg
-+busywait "${BUSYWAIT_TIMEOUT}" test -s "${OUTPUT_FILE}"
-+validate_fragmented_result "${OUTPUT_FILE}"
-+exit "${ksft_pass}"
-
----
-base-commit: 0ad9617c78acbc71373fb341a6f75d4012b01d69
-change-id: 20250129-netcons_frag_msgs-91506d136f50
-
-Best regards,
--- 
-Breno Leitao <leitao@debian.org>
-
+It's sad that we don't have Dell cced here, I'm trying to get some
+relevant contacts, but without success so far.
 
