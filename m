@@ -1,245 +1,150 @@
-Return-Path: <netdev+bounces-161874-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-161875-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 75275A2455D
-	for <lists+netdev@lfdr.de>; Fri, 31 Jan 2025 23:50:26 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id CBE69A24563
+	for <lists+netdev@lfdr.de>; Fri, 31 Jan 2025 23:51:54 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id BF4EC166C2B
-	for <lists+netdev@lfdr.de>; Fri, 31 Jan 2025 22:50:24 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 46CFB166D06
+	for <lists+netdev@lfdr.de>; Fri, 31 Jan 2025 22:51:53 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 214631A724C;
-	Fri, 31 Jan 2025 22:50:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 789C21F03DB;
+	Fri, 31 Jan 2025 22:51:52 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=cs.stanford.edu header.i=@cs.stanford.edu header.b="vXbIeR2E"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-il1-f205.google.com (mail-il1-f205.google.com [209.85.166.205])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp1.cs.Stanford.EDU (smtp1.cs.stanford.edu [171.64.64.25])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 55B27F9FE
-	for <netdev@vger.kernel.org>; Fri, 31 Jan 2025 22:50:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.205
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 034311C5D74
+	for <netdev@vger.kernel.org>; Fri, 31 Jan 2025 22:51:50 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=171.64.64.25
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1738363822; cv=none; b=tfgogsnWuVcgGfQt2r5WZpG96llpIhPORWpuVyFCc88wNaY/m91V4KxQASpMXIzxG7RtbE4JiFr4KOSkvjIQEtuhtTo3UIio0Mztb3LAWwdmk1KFFStSuZOqSTh28b/GZ8uol+TqduuNisU4DljMMUvPFa4WOFO4aqtRME6fq/E=
+	t=1738363912; cv=none; b=cPL8c1t7L9i32IfRx0jFtgm+IOd8q48C8flCRMjIjLmHYJ8Swbypbt7hJJxYvMckyZgYt3UwQA2rEdkSLQ4HT1eSYUfi5iA84IYYJjS3tzNv1rl448DhQEKEmzFqQIjjb6T3IucZ3Yq501M6F9tGi4IBosNBM0IBGHgEapVJmMY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1738363822; c=relaxed/simple;
-	bh=aeAIsLBBZ8s5g2/D072rZCgg2rjpiehI/S1+NknrUS4=;
-	h=MIME-Version:Date:Message-ID:Subject:From:To:Content-Type; b=PMQy7S2uAE44O4jDyTLaDypL+QecedA2c4j+Z89iD84/OHdfj332zfl5+pcddrEDH4KYFt4ykbyc1vi/pq1Zd9DkqBa5Wt8WMglT16MwuqSi6itpzNIqE+q1ku/MBij1ZVeg1QmZl1LS8AxoegD8cf2XjO/gpT4PjmV924YjqsM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.205
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
-Received: by mail-il1-f205.google.com with SMTP id e9e14a558f8ab-3cffc8affa1so15578505ab.3
-        for <netdev@vger.kernel.org>; Fri, 31 Jan 2025 14:50:20 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1738363819; x=1738968619;
-        h=content-transfer-encoding:to:from:subject:message-id:date
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=gsqHjDjVi6C1YGxz/YdXtxrZCgAyQICEPHDU7pf+lds=;
-        b=aH2+dY/3jZ15vA9HkqTldFH32f1IHAQLZrAXMyo0SC5Xx+p3k1j7Mz8wf1V/w7E+d3
-         gAFtbBqJnyjhjvBj/iAIOmtwJ9WXLJpJoO3WX/gxSduq9rJJQlvHNoWBt8WIrz6Pv+oH
-         AFs8CQZyC35xXnvyy5OztazGQhWPlk7M/7tTVxd7zGAKLLiLnAkuZ+WOtP+z7zPWZaDo
-         lBf9F5WWmPj4r+bqrqBTzHJQNzl/pESWDW6Ni6d12TAuIyA5e6P3C25O5+OUPJbLpP12
-         EofP55WCkG2FVIPkdfHAuJPbTmmbGbjLlKSsv+2zoG1GLlIwe4n7KYO+vJQmwx4639BK
-         W1mA==
-X-Forwarded-Encrypted: i=1; AJvYcCW9JYEs8p4clLo5zRHEYvgYOtM2BPPUPfAf9/PIMIUgIpoHg8A5LrjkFbER2YfF9jGOwBgedSY=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxIphZTynlBX87cNX1tx377uouZGOPT3ofuCZwwWFhZajFT1NY/
-	wvhfDWVo14orkrqrrbxZCJSygbYIbShUxDa7a5IQRZQFD7IvagKIRNwiSj/qocBbqsN/26uooRG
-	wT1GSKMugSbXiYbTRpbgoSgV1+VnEu4qZbXM7NfuW/2tUTDmy9q2p3RY=
-X-Google-Smtp-Source: AGHT+IHKEkpHD4WJFMxu/E9qd/wERDt9ZnPEBM88yjdbiJ2W4dXkvf/4/gvgBidOoam+irlu/FdZ007ELWBno5V5mZ/khOWYg0LF
+	s=arc-20240116; t=1738363912; c=relaxed/simple;
+	bh=wOiQQ/NR+ufy6rrzti2+Gsiiq8HU0MaSXqynkGkBOFM=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=n5tbocdae7dGaQJb/UpQd5DvvHI8NKxlZVO2aUn/wx+jzra1rWoZYyGJ/85tBbskiL0rZnZV2+E/ePccw7pbkuvHWlquf3eGqbG2xN26xsl0UkaUjD89pNKoE3/gKrS6CtrGhPlWrWgdP+aG7jb8l1KDMEqa0yk36xVZZRqFknM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=cs.stanford.edu; spf=pass smtp.mailfrom=cs.stanford.edu; dkim=pass (2048-bit key) header.d=cs.stanford.edu header.i=@cs.stanford.edu header.b=vXbIeR2E; arc=none smtp.client-ip=171.64.64.25
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=cs.stanford.edu
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=cs.stanford.edu
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=cs.stanford.edu; s=cs2308; h=Content-Transfer-Encoding:Content-Type:Cc:To:
+	Subject:Message-ID:Date:From:In-Reply-To:References:MIME-Version:Sender:
+	Reply-To:Content-ID:Content-Description:Resent-Date:Resent-From:Resent-Sender
+	:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:List-Help:List-Unsubscribe:
+	List-Subscribe:List-Post:List-Owner:List-Archive;
+	bh=2xTWxnzhSDCvLLqIZxAmwBah4dFcmfhs0lhP/PcIKDI=; t=1738363911; x=1739227911; 
+	b=vXbIeR2EH5ugKzb0hCQBYqV60RsNpVbdQqObcgE875H3G6jKlJYfDTVktYP1f2Cj3h4gDrTgOfy
+	53/Tu3giT8G0kxQ0LCEgGxkf4el6tcK9VxKizVUYiJPA4eymz2V0dljE7l4t+cH/Uomn9u1OpzfxI
+	0PXnyDB3qq75ue6tjxjeC9doz9KlQXhY0pi+3UzqlL2FpX4MGjiET8QwacJDAOoJ43Igl+OBi31V2
+	ULdPF3yVOo4K67v6KxkfBI09ijBW397H5d5QqXYK8dx3V6D99aBL1yTq5A3rN4/9HAGzuTGBM1f3M
+	/rOREjlYE/WuRxeysQeL8oHJQvHOPmd5AjdQ==;
+Received: from mail-oo1-f52.google.com ([209.85.161.52]:58421)
+	by smtp1.cs.Stanford.EDU with esmtpsa  (TLS1.2) tls TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256
+	(Exim 4.94.2)
+	(envelope-from <ouster@cs.stanford.edu>)
+	id 1tdzrZ-0005l5-JG
+	for netdev@vger.kernel.org; Fri, 31 Jan 2025 14:51:50 -0800
+Received: by mail-oo1-f52.google.com with SMTP id 006d021491bc7-5f31b3db5ecso1051910eaf.0
+        for <netdev@vger.kernel.org>; Fri, 31 Jan 2025 14:51:49 -0800 (PST)
+X-Gm-Message-State: AOJu0YzI3Gf2G+tXNEsWmyCdL9IMVmRRGPn2PU9ULTJTfrX8D9yASogL
+	Ypgy5gAlUAq0UG6xvASS5Dw/6WXPEATx88+0B3iaLZxf5Uyzqw4q+51NG/6569M94Vrzi4Cbq5O
+	lFcFh5JyCSdSE8/ZZM3jFv/X57KA=
+X-Google-Smtp-Source: AGHT+IFDow4rEuAiHpA3IfyYq4s1Zsp/ovyrHyVa57P0jfaFw6cDKJoXFQe2/CODaVcCXrojVLIPLQ+ewHmZTKTP0RE=
+X-Received: by 2002:a05:6871:2085:b0:296:bbc8:4a82 with SMTP id
+ 586e51a60fabf-2b32f28615amr8851564fac.27.1738363909031; Fri, 31 Jan 2025
+ 14:51:49 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Received: by 2002:a05:6e02:338a:b0:3cf:fbe8:aa1a with SMTP id
- e9e14a558f8ab-3cffe3a6878mr121573425ab.7.1738363819424; Fri, 31 Jan 2025
- 14:50:19 -0800 (PST)
-Date: Fri, 31 Jan 2025 14:50:19 -0800
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <679d53ab.050a0220.163cdc.0012.GAE@google.com>
-Subject: [syzbot] [wireless?] WARNING in ADDR
-From: syzbot <syzbot+652bceddc8ff90c594ad@syzkaller.appspotmail.com>
-To: johannes@sipsolutions.net, linux-kernel@vger.kernel.org, 
-	linux-wireless@vger.kernel.org, netdev@vger.kernel.org, 
-	syzkaller-bugs@googlegroups.com
+References: <20250115185937.1324-1-ouster@cs.stanford.edu> <20250115185937.1324-9-ouster@cs.stanford.edu>
+ <9083adf9-4e3f-47d9-8a79-d8fb052f99b5@redhat.com> <CAGXJAmxWOmPi-khSUugzOOjMSgVpWnn7QZ28jORK4sL9=vrA9A@mail.gmail.com>
+ <82cdba95-83cb-4902-bb2a-a2ab880797a8@redhat.com>
+In-Reply-To: <82cdba95-83cb-4902-bb2a-a2ab880797a8@redhat.com>
+From: John Ousterhout <ouster@cs.stanford.edu>
+Date: Fri, 31 Jan 2025 14:51:13 -0800
+X-Gmail-Original-Message-ID: <CAGXJAmxDozdg3FPDNkFUcQU9FXENr-Oefnp61eWzXo5Sne4C1g@mail.gmail.com>
+X-Gm-Features: AWEUYZlxqUrnfpg6jKSEZdYrayjRnySfdKUq5LB760-u7FWLk_1LRA0dwzEr4SY
+Message-ID: <CAGXJAmxDozdg3FPDNkFUcQU9FXENr-Oefnp61eWzXo5Sne4C1g@mail.gmail.com>
+Subject: Re: [PATCH net-next v6 08/12] net: homa: create homa_incoming.c
+To: Paolo Abeni <pabeni@redhat.com>
+Cc: netdev@vger.kernel.org, edumazet@google.com, horms@kernel.org, 
+	kuba@kernel.org
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
+X-Spam-Score: 0.8
+X-Spam-Level: 
+X-Scan-Signature: 8577cc8f8d13cb4ae2b02fc82e253015
 
-Hello,
+Also resending this message to get rid of HTML in the original...
 
-syzbot found the following issue on:
+On Thu, Jan 30, 2025 at 1:57=E2=80=AFAM Paolo Abeni <pabeni@redhat.com> wro=
+te:
+> On 1/30/25 1:48 AM, John Ousterhout wrote:
+> > On Mon, Jan 27, 2025 at 2:19=E2=80=AFAM Paolo Abeni <pabeni@redhat.com>=
+ wrote:
+> >>
+> >> On 1/15/25 7:59 PM, John Ousterhout wrote:
+> >>> +     /* Each iteration through the following loop processes one pack=
+et. */
+> >>> +     for (; skb; skb =3D next) {
+> >>> +             h =3D (struct homa_data_hdr *)skb->data;
+> >>> +             next =3D skb->next;
+> >>> +
+> >>> +             /* Relinquish the RPC lock temporarily if it's needed
+> >>> +              * elsewhere.
+> >>> +              */
+> >>> +             if (rpc) {
+> >>> +                     int flags =3D atomic_read(&rpc->flags);
+> >>> +
+> >>> +                     if (flags & APP_NEEDS_LOCK) {
+> >>> +                             homa_rpc_unlock(rpc);
+> >>> +                             homa_spin(200);
+> >>
+> >> Why spinning on the current CPU here? This is completely unexpected, a=
+nd
+> >> usually tolerated only to deal with H/W imposed delay while programmin=
+g
+> >> some device registers.
+> >
+> > This is done to pass the RPC lock off to another thread (the
+> > application); the spin is there to allow the other thread to acquire
+> > the lock before this thread tries to acquire it again (almost
+> > immediately). There's no performance impact from the spin because this
+> > thread is going to turn around and try to acquire the RPC lock again
+> > (at which point it will spin until the other thread releases the
+> > lock). Thus it's either spin here or spin there. I've added a comment
+> > to explain this.
+>
+> What if another process is spinning on the RPC lock without setting
+> APP_NEEDS_LOCK? AFAICS incoming packets targeting the same RPC could
+> land on different RX queues.
 
-HEAD commit:    805ba04cb7cc Merge tag 'mips_6.14' of git://git.kernel.org.=
-.
-git tree:       upstream
-console output: https://syzkaller.appspot.com/x/log.txt?x=3D102805f8580000
-kernel config:  https://syzkaller.appspot.com/x/.config?x=3D2ae8afe424ee551=
-e
-dashboard link: https://syzkaller.appspot.com/bug?extid=3D652bceddc8ff90c59=
-4ad
-compiler:       gcc (Debian 12.2.0-14) 12.2.0, GNU ld (GNU Binutils for Deb=
-ian) 2.40
+If that happens then it could grab the lock instead of the desired
+application, which would defeat the performance optimization and delay
+the application a bit. This would be no worse than if the
+APP_NEEDS_LOCK mechanism were not present.
 
-Unfortunately, I don't have any reproducer for this issue yet.
+> If the spin is not functionally needed, just drop it. If it's needed, it
+> would be better to find some functional replacement, possibly explicit
+> notification via waitqueue or completion.
 
-Downloadable assets:
-disk image (non-bootable): https://storage.googleapis.com/syzbot-assets/7fe=
-b34a89c2a/non_bootable_disk-805ba04c.raw.xz
-vmlinux: https://storage.googleapis.com/syzbot-assets/f9b9a1354470/vmlinux-=
-805ba04c.xz
-kernel image: https://storage.googleapis.com/syzbot-assets/6c77f51f864a/bzI=
-mage-805ba04c.xz
+The goal is to have a very lightweight mechanism for an application to
+preempt the RPC lock. I'd be happy to use an existing mechanism if
+something appropriate exists, but waitqueues and completions sound
+more heavyweight to me; aren't they both based on blocking rather than
+spinning?
 
-IMPORTANT: if you fix the issue, please add the following tag to the commit=
-:
-Reported-by: syzbot+652bceddc8ff90c594ad@syzkaller.appspotmail.com
+One of the reasons Homa has rolled its own mechanisms is that it's
+trying to operate at a timescale that's different from the rest of the
+kernel.
 
-Jan 27 22:47:14 syzkaller kern.notice kernel: [   71.133063][   T39] audit:=
- type=3D1400 audit(1738018034.313:3483): avc:  denied  { read } for  pid=3D=
-5336 comm=3D"syslogd" name=3D"log" dev=3D"sda1" ino=3D1915 scontext=3Dsyste=
-m_u:system_r:syslogd_t tcontext=3Dsystem_u:object_r:var_t tclas[   71.51912=
-8][    C2] ------------[ cut here ]------------
-s=3D[   71.521211][    C2] WARNING: CPU: 2 PID: 1418 at net/mac80211/tx.c:5=
-040 __ieee80211_beacon_update_cntdwn net/mac80211/tx.c:5040 [inline]
-s=3D[   71.521211][    C2] WARNING: CPU: 2 PID: 1418 at net/mac80211/tx.c:5=
-040 __ieee80211_beacon_update_cntdwn net/mac80211/tx.c:5035 [inline]
-s=3D[   71.521211][    C2] WARNING: CPU: 2 PID: 1418 at net/mac80211/tx.c:5=
-040 __ieee80211_beacon_get+0x14ac/0x16b0 net/mac80211/tx.c:5469
-
-Jan 27 22:47:14 [   71.555288][    C2] FS:  0000000000000000(0000) GS:ffff8=
-8806a800000(0000) knlGS:0000000000000000
-syzkaller kern.n[   71.558416][    C2] CS:  0010 DS: 0000 ES: 0000 CR0: 000=
-0000080050033
-otice kernel: [ [   71.560778][    C2] CR2: 00007f188c918f98 CR3: 000000000=
-df80000 CR4: 0000000000352ef0
-  71.183083][   [   71.563537][    C2] DR0: 0000000000000000 DR1: 000000000=
-0000000 DR2: 0000000000000000
-T39] audit: type[   71.566318][    C2] DR3: 0000000000000000 DR6: 00000000f=
-ffe0ff0 DR7: 0000000000000400
-=3D1400 audit(1738[   71.569117][    C2] Call Trace:
-018034.323:3484)[   71.570531][    C2]  <IRQ>
-: avc:  denied  [   71.571844][    C2]  ? __warn+0xea/0x3c0 kernel/panic.c:=
-746
-{ create } for  [   71.573494][    C2]  ? __ieee80211_beacon_update_cntdwn =
-net/mac80211/tx.c:5040 [inline]
-{ create } for  [   71.573494][    C2]  ? __ieee80211_beacon_update_cntdwn =
-net/mac80211/tx.c:5035 [inline]
-{ create } for  [   71.573494][    C2]  ? __ieee80211_beacon_get+0x14ac/0x1=
-6b0 net/mac80211/tx.c:5469
-pid=3D7155 comm=3D"s[   71.575627][    C2]  ? __report_bug lib/bug.c:199 [i=
-nline]
-pid=3D7155 comm=3D"s[   71.575627][    C2]  ? report_bug+0x3c0/0x580 lib/bu=
-g.c:219
-yz.0.427" sconte[   71.577454][    C2]  ? handle_bug+0x54/0xa0 arch/x86/ker=
-nel/traps.c:285
-xt=3Droot:sysadm_r[   71.579210][    C2]  ? exc_invalid_op+0x17/0x50 arch/x=
-86/kernel/traps.c:309
-:sysadm_t tconte[   71.581290][    C2]  ? asm_exc_invalid_op+0x1a/0x20 arch=
-/x86/include/asm/idtentry.h:621
-xt=3Droot:sysadm_r[   71.583223][    C2]  ? __ieee80211_beacon_update_cntdw=
-n net/mac80211/tx.c:5040 [inline]
-xt=3Droot:sysadm_r[   71.583223][    C2]  ? __ieee80211_beacon_get+0xb32/0x=
-16b0 net/mac80211/tx.c:5469
-:sysadm_t tclass[   71.585319][    C2]  ? __ieee80211_beacon_update_cntdwn =
-net/mac80211/tx.c:5040 [inline]
-:sysadm_t tclass[   71.585319][    C2]  ? __ieee80211_beacon_update_cntdwn =
-net/mac80211/tx.c:5035 [inline]
-:sysadm_t tclass[   71.585319][    C2]  ? __ieee80211_beacon_get+0x14ab/0x1=
-6b0 net/mac80211/tx.c:5469
-=3Dnetlink_netfilt[   71.587451][    C2]  ? __ieee80211_beacon_update_cntdw=
-n net/mac80211/tx.c:5040 [inline]
-=3Dnetlink_netfilt[   71.587451][    C2]  ? __ieee80211_beacon_update_cntdw=
-n net/mac80211/tx.c:5035 [inline]
-=3Dnetlink_netfilt[   71.587451][    C2]  ? __ieee80211_beacon_get+0x14ac/0=
-x16b0 net/mac80211/tx.c:5469
-er_socket permis[   71.589588][    C2]  ? __ieee80211_beacon_update_cntdwn =
-net/mac80211/tx.c:5040 [inline]
-er_socket permis[   71.589588][    C2]  ? __ieee80211_beacon_update_cntdwn =
-net/mac80211/tx.c:5035 [inline]
-er_socket permis[   71.589588][    C2]  ? __ieee80211_beacon_get+0x14ab/0x1=
-6b0 net/mac80211/tx.c:5469
-si[   71.591735][    C2]  ieee80211_beacon_get_tim+0xa7/0x280 net/mac80211/=
-tx.c:5596
-
-Jan 27 22:47:14 [   71.614223][    C2]  ? __pfx___hrtimer_run_queues+0x10/0=
-x10 include/trace/events/timer.h:222
-syzkaller kern.n[   71.619260][    C2]  handle_softirqs+0x213/0x8f0 kernel/=
-softirq.c:561
-otice kernel: [ [   71.621158][    C2]  ? __pfx_handle_softirqs+0x10/0x10 i=
-nclude/trace/events/irq.h:156
-  71.206999][   [   71.623160][    C2]  ? rcu_lock_release include/linux/rc=
-update.h:347 [inline]
-  71.206999][   [   71.623160][    C2]  ? rcu_read_unlock_bh include/linux/=
-rcupdate.h:917 [inline]
-  71.206999][   [   71.623160][    C2]  ? __dev_queue_xmit+0x89b/0x43e0 net=
-/core/dev.c:4611
-T39] audit: type[   71.625157][    C2]  do_softirq kernel/softirq.c:462 [in=
-line]
-T39] audit: type[   71.625157][    C2]  do_softirq+0xb2/0xf0 kernel/softirq=
-.c:449
-=3D1400 audit(1738[   71.626849][    C2]  </IRQ>
-018034.323:3485)[   71.628241][    C2]  <TASK>
-: avc:  denied  [   71.629591][    C2]  __local_bh_enable_ip+0x100/0x120 ke=
-rnel/softirq.c:389
-{ read } for  pi[   71.631612][    C2]  ? rcu_lock_release include/linux/rc=
-update.h:347 [inline]
-{ read } for  pi[   71.631612][    C2]  ? rcu_read_unlock_bh include/linux/=
-rcupdate.h:917 [inline]
-{ read } for  pi[   71.631612][    C2]  ? __dev_queue_xmit+0x89b/0x43e0 net=
-/core/dev.c:4611
-d=3D5336 comm=3D"sys[   71.633591][    C2]  local_bh_enable include/linux/b=
-ottom_half.h:33 [inline]
-d=3D5336 comm=3D"sys[   71.633591][    C2]  rcu_read_unlock_bh include/linu=
-x/rcupdate.h:919 [inline]
-d=3D5336 comm=3D"sys[   71.633591][    C2]  __dev_queue_xmit+0x8b0/0x43e0 n=
-et/core/dev.c:4611
-logd" name=3D"log"[   71.635522][    C2]  ? __pfx___dev_queue_xmit+0x10/0x1=
-0 include/linux/netdevice.h:3825
- dev=3D"sda1" ino=3D[   71.637626][    C2]  ? __pfx___lock_acquire+0x10/0x1=
-0 kernel/locking/lockdep.c:4389
-1915 scontext=3Dsy[   71.639638][    C2]  ? __pfx___lock_acquire+0x10/0x10 =
-kernel/locking/lockdep.c:4389
-stem_u:system_r:[   71.641634][    C2]  ? lock_acquire.part.0+0x11b/0x380 k=
-ernel/locking/lockdep.c:5851
-syslogd_t tconte[   71.643650][    C2]  ? find_held_lock+0x2d/0x110 kernel/=
-locking/lockdep.c:5341
-xt=3Dsystem_u:obje[   71.645540][    C2]  ? find_held_lock+0x2d/0x110 kerne=
-l/locking/lockdep.c:5341
-ct_r:var_t tclas[   71.647398][    C2]  ? spin_unlock_irq include/linux/spi=
-nlock.h:401 [inline]
-ct_r:var_t tclas[   71.647398][    C2]  ? tx+0xa8/0x190 drivers/block/aoe/a=
-oenet.c:60
-s=3D
-Jan 27 22:47:14 [   71.658874][    C2]  ? __pfx_kthread+0x10/0x10 arch/x86/=
-include/asm/bitops.h:206
-syzkaller kern.n[   71.669505][    C2]  ? __pfx_kthread+0x10/0x10 arch/x86/=
-include/asm/bitops.h:206
-otice kernel: [ [   71.671354][    C2]  ret_from_fork_asm+0x1a/0x30 arch/x8=
-6/entry/entry_64.S:244
-  71.238225][   [   71.673261][    C2]  </TASK>
-
-
----
-This report is generated by a bot. It may contain errors.
-See https://goo.gl/tpsmEJ for more information about syzbot.
-syzbot engineers can be reached at syzkaller@googlegroups.com.
-
-syzbot will keep track of this issue. See:
-https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
-
-If the report is already addressed, let syzbot know by replying with:
-#syz fix: exact-commit-title
-
-If you want to overwrite report's subsystems, reply with:
-#syz set subsystems: new-subsystem
-(See the list of subsystem names on the web dashboard)
-
-If the report is a duplicate of another one, reply with:
-#syz dup: exact-subject-of-another-report
-
-If you want to undo deduplication, reply with:
-#syz undup
+-John-
 
