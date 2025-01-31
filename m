@@ -1,76 +1,58 @@
-Return-Path: <netdev+bounces-161725-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-161726-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 07835A2397D
-	for <lists+netdev@lfdr.de>; Fri, 31 Jan 2025 07:21:36 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id ECA54A2397F
+	for <lists+netdev@lfdr.de>; Fri, 31 Jan 2025 07:21:49 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 1FA497A0768
-	for <lists+netdev@lfdr.de>; Fri, 31 Jan 2025 06:20:41 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 5CF5E1889E06
+	for <lists+netdev@lfdr.de>; Fri, 31 Jan 2025 06:21:50 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 24A6F7B3E1;
-	Fri, 31 Jan 2025 06:21:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8CEA014C5AA;
+	Fri, 31 Jan 2025 06:21:32 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="BjzaAp7R"
+	dkim=pass (1024-bit key) header.d=163.com header.i=@163.com header.b="nWphTHD2"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.17])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 76D0CC8EB;
+Received: from m16.mail.163.com (m16.mail.163.com [220.197.31.5])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 36E7118AFC;
 	Fri, 31 Jan 2025 06:21:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.17
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=220.197.31.5
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1738304490; cv=none; b=FCsfaSvcAwdTYFKo5Hg1EqbuJUHdNmz6mrkg90Y8CPcoJ5px4aU9tPSy0fQdMI2ayJgmdI61GMEi/4KRS48WMHqMp5bBF8kQ3cnlTIeldsHnSYiFdewQJftrfNjxhpLOPD2KrLRdPrk50DnMJHWZKrD7sy8Gsxz5LDErq3RDTtY=
+	t=1738304492; cv=none; b=OHAVGJbU3qHtZHs+90XME3f0ZPxS1hONQqy4O0NqDCoXmRLGd75p4axsctyJ21LXK9VflMJK12lfiGlv5rSoIpSG1hKwFEXxhzf/k0A0O6cEinN+eCYF1BWP4cDLcM8fDYlC5GRnCQ6pZ1841JV5spgs8slvZlwkV7qP1A4UQgc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1738304490; c=relaxed/simple;
-	bh=4457f3QO7jxAij1w8K8qI9z2zpN0Sb/yTbSaXGKXzAQ=;
+	s=arc-20240116; t=1738304492; c=relaxed/simple;
+	bh=Xp1cTvufI1MWZ+uBRjginA/3vr7DeWm0hMhiwsUsnfE=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=br9unCWde18V07l7eyuzwUWBQ81PhLZh9vIY3+9Q+u5BI4iHTjp4wjHX60lqw3yldmF96yKZs7WX/GaSf0dOQtyhVNfnSwksOCZqUaKNEumt9fFn2lYUrHTLGp5JH6WRJ987hk41Zrq0itDruR0Gevg92v6BgCW8u98c7OCGFQQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=BjzaAp7R; arc=none smtp.client-ip=198.175.65.17
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1738304488; x=1769840488;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=4457f3QO7jxAij1w8K8qI9z2zpN0Sb/yTbSaXGKXzAQ=;
-  b=BjzaAp7RuWCGEq2EGRmZmq376vgWvNLwp72iFMljd4h2P0qxod4EtIL+
-   rXRVzYR20/VZtOchotBT3inaLXy2nfDDA0pSRegvwQORcQkyTeDTKvw1n
-   s58tu5q3eOSh7y3Iec2DTZz701tYk/rnbeq+uidubgsN6vobtXivWZd/I
-   0DAHYxR8P1Lk04TdKNvO3gO7zhTjOvGy1ivdsrrJuzu/tK/8TzbWetPfj
-   gP8x10G4OLfOxhyHuq93ss+SdWBThWEa4UHPtiAHi+kTXRm9kEqQTHXzH
-   GH2QhRgUxysQjX3cJ7czeXIuP+UDQCet2lem/SWoXryGXXz4zQAt4P6+0
-   A==;
-X-CSE-ConnectionGUID: EZiD/ztZROeXaQyGj+m6lQ==
-X-CSE-MsgGUID: aDeXSpepS1acpB0xgdmJnA==
-X-IronPort-AV: E=McAfee;i="6700,10204,11331"; a="38898451"
-X-IronPort-AV: E=Sophos;i="6.13,247,1732608000"; 
-   d="scan'208";a="38898451"
-Received: from fmviesa010.fm.intel.com ([10.60.135.150])
-  by orvoesa109.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 30 Jan 2025 22:21:28 -0800
-X-CSE-ConnectionGUID: 8/BkORJtSKaC4/WFwBOUug==
-X-CSE-MsgGUID: 4dYWIjDlRoyHMpYHStLWJg==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.13,247,1732608000"; 
-   d="scan'208";a="110122754"
-Received: from mev-dev.igk.intel.com ([10.237.112.144])
-  by fmviesa010-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 30 Jan 2025 22:21:24 -0800
-Date: Fri, 31 Jan 2025 07:17:54 +0100
-From: Michal Swiatkowski <michal.swiatkowski@linux.intel.com>
-To: Jiasheng Jiang <jiashengjiangcool@gmail.com>
-Cc: anthony.l.nguyen@intel.com, przemyslaw.kitszel@intel.com,
-	andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com,
-	kuba@kernel.org, pabeni@redhat.com, horms@kernel.org,
-	wojciech.drewek@intel.com, piotr.raczynski@intel.com,
-	mateusz.polchlopek@intel.com, pawel.kaminski@intel.com,
-	michal.wilczynski@intel.com, intel-wired-lan@lists.osuosl.org,
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH] ice: Add check for devm_kzalloc()
-Message-ID: <Z5xrEtiFC4PtSFp6@mev-dev.igk.intel.com>
-References: <20250131013832.24805-1-jiashengjiangcool@gmail.com>
+	 Content-Type:Content-Disposition:In-Reply-To; b=dMyiiLtxKsfDzZO0S8lagAOl+b+R6WGEmNbH0GWH2bzGlUJdNU/hS3UFb7jj8K8LxBn6YROtbZ4xZBuuKRKsSJuZHeUZmTnNaghAGVO51/nacwcLgpTLSLps3aYSfN06kh6czHvNsPamRlPjlXyWnLiPlClrz/ni/127MIlQHS0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=163.com; spf=pass smtp.mailfrom=163.com; dkim=pass (1024-bit key) header.d=163.com header.i=@163.com header.b=nWphTHD2; arc=none smtp.client-ip=220.197.31.5
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=163.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=163.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=163.com;
+	s=s110527; h=Date:From:Subject:Message-ID:MIME-Version:
+	Content-Type; bh=UeMu/+TE/rr0e+8vl/GVGVx7p54RGFPPguck4b4jwFE=;
+	b=nWphTHD2Vy8mhL1rZNeB04V8P5NiHHMo2qwgSaefZc0n3J5TTfCegpmnUTj4YT
+	uaH6n+WWM6/ct7fKd54lBrW4+BvdE98bkvOz2Oqfvnj8n3BzGn3puyVUKlYB8Eb9
+	YnfZXgxfzIFf09e+BInRj5mM1OymBjMrLVcT9rjevAvGc=
+Received: from iZ0xi1olgj2q723wq4k6skZ (unknown [])
+	by gzga-smtp-mtada-g0-4 (Coremail) with SMTP id _____wDXP06aa5xnfAApJQ--.25293S2;
+	Fri, 31 Jan 2025 14:20:18 +0800 (CST)
+Date: Fri, 31 Jan 2025 14:20:09 +0800
+From: Jiayuan Chen <mrpre@163.com>
+To: John Fastabend <john.fastabend@gmail.com>
+Cc: bpf@vger.kernel.org, borisp@nvidia.com, kuba@kernel.org, 
+	davem@davemloft.net, edumazet@google.com, pabeni@redhat.com, horms@kernel.org, 
+	andrii@kernel.org, eddyz87@gmail.com, mykolal@fb.com, ast@kernel.org, 
+	daniel@iogearbox.net, martin.lau@linux.dev, song@kernel.org, yonghong.song@linux.dev, 
+	kpsingh@kernel.org, sdf@fomichev.me, haoluo@google.com, jolsa@kernel.org, 
+	shuah@kernel.org, netdev@vger.kernel.org
+Subject: Re: [PATCH bpf v1 1/2] bpf: fix ktls panic
+Message-ID: <y4ubu3oa3het5ofmyki52hhxy4uf6abasgfzjmyr4hawfvotjo@mbcb77maqppm>
+References: <20250123171552.57345-1-mrpre@163.com>
+ <20250123171552.57345-2-mrpre@163.com>
+ <gkx7axo3mau4jb7ojsdl4lwrtkuxsbnozplupscl3vvl3zfqg5@qnc5qfwzcwlj>
+ <g7y5kd2lkzkcklixeuyhq5rf6ijruicizcilakjl5uueb7ye2b@xu2kkhwbgv5w>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -79,36 +61,112 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20250131013832.24805-1-jiashengjiangcool@gmail.com>
+In-Reply-To: <g7y5kd2lkzkcklixeuyhq5rf6ijruicizcilakjl5uueb7ye2b@xu2kkhwbgv5w>
+X-CM-TRANSID:_____wDXP06aa5xnfAApJQ--.25293S2
+X-Coremail-Antispam: 1Uf129KBjvJXoWxGrWfCr13JryUurWxtr4DXFb_yoW5ur4fpF
+	WSqF4ayF4DtFy0krn2va10qr97ArWFqw4UGr1Yqw1FvrsIgF1xKa4rKF1F9ayvkr4v9F1I
+	vw4Dua93CFs8GFJanT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
+	9KBjDUYxBIdaVFxhVjvjDU0xZFpf9x07Uc2-nUUUUU=
+X-CM-SenderInfo: xpus2vi6rwjhhfrp/xtbBDwPlp2ecUJTlsQAAsl
 
-On Fri, Jan 31, 2025 at 01:38:32AM +0000, Jiasheng Jiang wrote:
-> Add check for the return value of devm_kzalloc() to guarantee the success
-> of allocation.
+On Sat, Jan 25, 2025 at 02:51:49PM +0800, Jiayuan Chen wrote:
+> On Fri, Jan 24, 2025 at 09:24:48PM -0800, John Fastabend wrote:
+> > On 2025-01-24 01:15:51, Jiayuan Chen wrote:
+> > > [ 2172.936997] ------------[ cut here ]------------
+> > > [ 2172.936999] kernel BUG at lib/iov_iter.c:629!
+> > > ......
+> > > pointless and can directly go to zero-copy logic.
+> > > 
+> > > 2. Suppose sg.size is initially 5, and we push it to 100, setting
+> > > apply_bytes to 7. Then, 98 bytes of data are sent out, leaving 2 bytes to
+> > > be processed. The rollback logic cannot determine which data has been
+> > > processed and which hasn't.
+> > 
+> > This is the error path we are talking about correct?
+> > 
+> >         if (msg->cork_bytes && msg->cork_bytes > msg->sg.size &&
+> >             !enospc && !full_record) {
+> >                 err = -ENOSPC;
+> >                 goto out_err;
+> >         }
+> > 
+> yes, it its.
+> > > 
+> > > diff --git a/net/tls/tls_sw.c b/net/tls/tls_sw.c
+> > > index 7bcc9b4408a2..b3cae4dd4f49 100644
+> > > --- a/net/tls/tls_sw.c
+> > > +++ b/net/tls/tls_sw.c
+> > > @@ -1120,9 +1120,13 @@ static int tls_sw_sendmsg_locked(struct sock *sk, struct msghdr *msg,
+> > >  					num_async++;
+> > >  				else if (ret == -ENOMEM)
+> > >  					goto wait_for_memory;
+> > > -				else if (ctx->open_rec && ret == -ENOSPC)
+> > > +				else if (ctx->open_rec && ret == -ENOSPC) {
+> > > +					if (msg_pl->cork_bytes) {
+> > > +						ret = 0;
+> > > +						goto send_end;
+> > > +					}
+> > 
+> > The app will lose bytes here I suspect if we return copied == try_to_copy then
+> > no error makes it to the user?
 > 
-> Fixes: 42c2eb6b1f43 ("ice: Implement devlink-rate API")
-> Signed-off-by: Jiasheng Jiang <jiashengjiangcool@gmail.com>
-> ---
->  drivers/net/ethernet/intel/ice/devlink/devlink.c | 3 +++
->  1 file changed, 3 insertions(+)
+> I looked into the corking logic for non-TLS sockets in tcp_bpf_sendmsg,
+> and I found that when a "cork" situation occurs, the user-space send
+> doesn't return an error, and the returned length is the same as the input
+> length parameter, even if some data is cached. I think TLS should also
+> behave similarly.
 > 
-> diff --git a/drivers/net/ethernet/intel/ice/devlink/devlink.c b/drivers/net/ethernet/intel/ice/devlink/devlink.c
-> index d116e2b10bce..dbdb83567364 100644
-> --- a/drivers/net/ethernet/intel/ice/devlink/devlink.c
-> +++ b/drivers/net/ethernet/intel/ice/devlink/devlink.c
-> @@ -981,6 +981,9 @@ static int ice_devlink_rate_node_new(struct devlink_rate *rate_node, void **priv
+> Additionally, I saw that the current non-zero-copy logic for handling
+> corking is written as:
+> '''
+> line 1177
+> 
+> else if (ret != -EAGAIN) {
+> 	if (ret == -ENOSPC)
+> 		ret = 0;
+> 	goto send_end;
+> }
+> '''
+> 
+> Meanwhile, I set cork_bytes to 1 and tested the following behavior logic:
+> '''
+> send(msg, 1);
+> send(msg+1, 1);
+> send(msg+2, remain_length);
+> '''
+> Both the sender and receiver seem to be working normally both for TLS and
+> non-TLS sockets.
 >  
->  	/* preallocate memory for ice_sched_node */
->  	node = devm_kzalloc(ice_hw_to_dev(pi->hw), sizeof(*node), GFP_KERNEL);
-> +	if (!node)
-> +		return -ENOMEM;
-> +
+> > Could we return delta from bpf_exec_tx_verdict and then we can calculate
+> > the correct number of bytes to revert? I'll need to check but its not
+> > clear to me if BPF program pushes data that the right thing is done with
+> > delta there now.
+> > 
+> > Thanks for looking into this.
+> 
+> Let's assume the original data is "abcdefgh" (8 bytes), and after 3 pushes
+> by the BPF program, it becomes 11-byte data: "abc?de?fgh?".
+> 
+> Then, we set cork_bytes to 6, which means the first 6 bytes have been
+> processed, and the remaining 5 bytes "?fgh?" will be cached until the
+> length meets the cork_bytes requirement.
+> 
+> However, some data in "?fgh?" is not within 'sg->msg_iter'
+> (but in msg_pl instead), especially the data "?" we pushed.
+> 
+> So it doesn't seem as simple as just reverting through an offset of msg_iter.
+> It appears that 'msg_iter' and 'msg_pl' are two separate objects,
+> and the BPF program modifies the scatterlist within the msg_pl.
+> 
+> --
+> Thanks.
+> 
 
-Thanks for fixing:
-Reviewed-by: Michal Swiatkowski <michal.swiatkowski@linux.intel.com>
+Hi John
 
->  	*priv = node;
->  
->  	return 0;
-> -- 
-> 2.25.1
+Just checking in on the status of my patch. If there's any new feedback,
+I'm happy to move forward with the next steps.
+
+Regards.
+
 
