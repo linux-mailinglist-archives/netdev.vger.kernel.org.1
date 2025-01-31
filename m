@@ -1,172 +1,208 @@
-Return-Path: <netdev+bounces-161751-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-161752-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5F6E6A23A94
-	for <lists+netdev@lfdr.de>; Fri, 31 Jan 2025 09:30:39 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 61F48A23A9D
+	for <lists+netdev@lfdr.de>; Fri, 31 Jan 2025 09:31:26 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id CF7BE167DC6
-	for <lists+netdev@lfdr.de>; Fri, 31 Jan 2025 08:30:37 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 583B33A921A
+	for <lists+netdev@lfdr.de>; Fri, 31 Jan 2025 08:31:18 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4FDD31531D2;
-	Fri, 31 Jan 2025 08:30:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 050321474B8;
+	Fri, 31 Jan 2025 08:31:23 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="PE+y/FN4"
+	dkim=pass (1024-bit key) header.d=swemel.ru header.i=@swemel.ru header.b="rwBMZVXw"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from mx.swemel.ru (mx.swemel.ru [95.143.211.150])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0B6F42563;
-	Fri, 31 Jan 2025 08:30:35 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 86DCC1487E9;
+	Fri, 31 Jan 2025 08:31:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.143.211.150
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1738312236; cv=none; b=Jtzgiy+s4X/I1g5T3+1oEpnYeD+DXpKQUfGGeK7/f7smrBCNeIRAnt0SY3ZJgcBgGrpX8dnSP3qyKs+SWobfq+QmgbFOYFwKCi/08pZj6/YMVmxsAEvRI56JN/RqnJI5Jzk7Z8VgvFTgQKsJOycMxwGsjWTPupAhiMBEn21UVss=
+	t=1738312282; cv=none; b=jtc5gku2lZ5N3r0g4t/DfhdJoH5ST5FSFf1aQjecEkKLrE6vL1fJ5Cu0uyBHk01yiPM8PoC69LxVOzCIiRQXRkm6nROlA/2tVrUdylZkIscCnC+91idnD40YU+8sEEx+jVL2uA2jfgLvkoUl5VPjOsjUqyyB3JX/XmRLP9uCzRU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1738312236; c=relaxed/simple;
-	bh=AtfBBDRe/v3005YeMC67dhp3He0uuAnKjvaGt1r4Do4=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=uIRAOb/5/jJuzcQMVym0kSE6lN7LPnaOWvpHUCrJQ5gFkiHjPQNm6YQIb4fsCSC6ls3wxZE+z965qlxWrOy0mZZHYFXvXCx4XeEOcPFxjphUFZiaEs2i4lHt9qjsrNDrg9FT3aSyXzu0JLxPsFitbHbj5qunq1v2ZJbtuG3LTIk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=PE+y/FN4; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7D6AFC4CED1;
-	Fri, 31 Jan 2025 08:30:30 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1738312235;
-	bh=AtfBBDRe/v3005YeMC67dhp3He0uuAnKjvaGt1r4Do4=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=PE+y/FN4y0l9nZnq29GNlQLNlbXrGpThMRU6p3o2rAMkkdn34doJYFABmB3N/nn2W
-	 IR8lItojDilpRouSjXW12hPTTaaHWdSVbR/mfXPSHQQW7C26ef/N3aoZInp1io6t12
-	 NHgDMFmsioWh2b4iCaKlIt7LVs4rqCauAhvxjl+uFqk1rQ4rBleyOwNVDDtdCrjHoG
-	 fquxgc2mcDnpsIOHma2QRoTszKRscKnU7XRSOfUxJvFCy3kfhv4rLSIqqPZ8gMsxkI
-	 nwO7m70Z6AmMNTnLfdXbrUF3LQBVjiZBiq5v/e89Wa6LXItv+xeMBnwjpX8JbKCJtn
-	 t4V9N6XJAXzjg==
-Date: Fri, 31 Jan 2025 08:29:28 +0000
-From: Simon Horman <horms@kernel.org>
-To: Mina Almasry <almasrymina@google.com>
-Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
-	linux-doc@vger.kernel.org, kvm@vger.kernel.org,
-	virtualization@lists.linux.dev, linux-kselftest@vger.kernel.org,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Donald Hunter <donald.hunter@gmail.com>,
-	Jonathan Corbet <corbet@lwn.net>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	David Ahern <dsahern@kernel.org>,
-	Stefan Hajnoczi <stefanha@redhat.com>,
-	Stefano Garzarella <sgarzare@redhat.com>,
-	"Michael S. Tsirkin" <mst@redhat.com>,
+	s=arc-20240116; t=1738312282; c=relaxed/simple;
+	bh=EdPxBgsK9ZXjj08v9WOwe/PgDxuv9DBDgwggEKvFXgo=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=gKglkq8s1rFrpKwUh6vrpbmQh5vo3iQhy8oXsrl1fb69GFYHLE45z4fXdNuVn9tMoRRklcvhaJA2z4IJMwLyYfSFedGqCM7cz/z6UvmnkG072tYKnuaCcPflJgbFux4VJrV1f70drRkp8WEiLExEBsT7cFRJKje9dr9XCqdk0tY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=swemel.ru; spf=pass smtp.mailfrom=swemel.ru; dkim=pass (1024-bit key) header.d=swemel.ru header.i=@swemel.ru header.b=rwBMZVXw; arc=none smtp.client-ip=95.143.211.150
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=swemel.ru
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=swemel.ru
+From: Denis Arefev <arefev@swemel.ru>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=swemel.ru; s=mail;
+	t=1738312277;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=TiZkqs3hb6Ha6sFHBsSXGkqzB4QUSc+pMjyMQC5X09c=;
+	b=rwBMZVXwAenRV8EYQFo1RecGiOPqgUEcvyA9VENEpUcQPhWZlhfPt5qfjLg/KuEcI2Fkkl
+	BcgvAzz2Ioz8OKVh2z3N7PNpNXI9u+WxNdwp7f/rggFjYdnzzNKwWgiyUtJmlscnl6DLJr
+	P+wdzy+2yMew4UCUeFoK1u0tn6yG5N8=
+To: stable@vger.kernel.org,
+	Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+Cc: "Michael S. Tsirkin" <mst@redhat.com>,
 	Jason Wang <jasowang@redhat.com>,
-	Xuan Zhuo <xuanzhuo@linux.alibaba.com>,
-	Eugenio =?utf-8?B?UMOpcmV6?= <eperezma@redhat.com>,
-	Shuah Khan <shuah@kernel.org>, sdf@fomichev.me,
-	asml.silence@gmail.com, dw@davidwei.uk,
-	Jamal Hadi Salim <jhs@mojatatu.com>,
-	Victor Nogueira <victor@mojatatu.com>,
-	Pedro Tammela <pctammela@mojatatu.com>
-Subject: Re: [PATCH RFC net-next v2 4/6] net: devmem: TCP tx netlink api
-Message-ID: <20250131082928.GA24105@kernel.org>
-References: <20250130211539.428952-1-almasrymina@google.com>
- <20250130211539.428952-5-almasrymina@google.com>
+	Eric Dumazet <edumazet@google.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Alexey Kuznetsov <kuznet@ms2.inr.ac.ru>,
+	Hideaki YOSHIFUJI <yoshfuji@linux-ipv6.org>,
+	Jakub Kicinski <kuba@kernel.org>,
+	virtualization@lists.linux-foundation.org,
+	linux-kernel@vger.kernel.org,
+	lvc-project@linuxtesting.org,
+	netdev@vger.kernel.org,
+	Willem de Bruijn <willemb@google.com>
+Subject: [PATCH 5.10 2/5] net: drop bad gso csum_start and offset in virtio_net_hdr
+Date: Fri, 31 Jan 2025 11:31:15 +0300
+Message-ID: <20250131083117.4187-1-arefev@swemel.ru>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250130211539.428952-5-almasrymina@google.com>
+Content-Transfer-Encoding: 8bit
 
-On Thu, Jan 30, 2025 at 09:15:37PM +0000, Mina Almasry wrote:
-> From: Stanislav Fomichev <sdf@fomichev.me>
-> 
-> Add bind-tx netlink call to attach dmabuf for TX; queue is not
-> required, only ifindex and dmabuf fd for attachment.
-> 
-> Signed-off-by: Stanislav Fomichev <sdf@fomichev.me>
-> Signed-off-by: Mina Almasry <almasrymina@google.com>
+From: Willem de Bruijn <willemb@google.com>
 
-Hi Mina,
+commit 89add40066f9ed9abe5f7f886fe5789ff7e0c50e upstream.
 
-I noticed minor issue relating to generated code.
+Tighten csum_start and csum_offset checks in virtio_net_hdr_to_skb
+for GSO packets.
 
-...
+The function already checks that a checksum requested with
+VIRTIO_NET_HDR_F_NEEDS_CSUM is in skb linear. But for GSO packets
+this might not hold for segs after segmentation.
 
-> diff --git a/Documentation/netlink/specs/netdev.yaml b/Documentation/netlink/specs/netdev.yaml
-> index cbb544bd6c84..93f4333e7bc6 100644
-> --- a/Documentation/netlink/specs/netdev.yaml
-> +++ b/Documentation/netlink/specs/netdev.yaml
+Syzkaller demonstrated to reach this warning in skb_checksum_help
 
-The lines preceding the hunk below are:
+	offset = skb_checksum_start_offset(skb);
+	ret = -EINVAL;
+	if (WARN_ON_ONCE(offset >= skb_headlen(skb)))
 
-      name: napi-set
-      doc: Set configurable NAPI instance settings.
-      attribute-set: napi
-      flags: [ admin-perm ]
-      do:
-        request:
-          attributes:
-            - id
+By injecting a TSO packet:
 
-> @@ -711,6 +711,18 @@ operations:
->              - defer-hard-irqs
->              - gro-flush-timeout
->              - irq-suspend-timeout
-> +    -
-> +      name: bind-tx
-> +      doc: Bind dmabuf to netdev for TX
-> +      attribute-set: dmabuf
+WARNING: CPU: 1 PID: 3539 at net/core/dev.c:3284 skb_checksum_help+0x3d0/0x5b0
+ ip_do_fragment+0x209/0x1b20 net/ipv4/ip_output.c:774
+ ip_finish_output_gso net/ipv4/ip_output.c:279 [inline]
+ __ip_finish_output+0x2bd/0x4b0 net/ipv4/ip_output.c:301
+ iptunnel_xmit+0x50c/0x930 net/ipv4/ip_tunnel_core.c:82
+ ip_tunnel_xmit+0x2296/0x2c70 net/ipv4/ip_tunnel.c:813
+ __gre_xmit net/ipv4/ip_gre.c:469 [inline]
+ ipgre_xmit+0x759/0xa60 net/ipv4/ip_gre.c:661
+ __netdev_start_xmit include/linux/netdevice.h:4850 [inline]
+ netdev_start_xmit include/linux/netdevice.h:4864 [inline]
+ xmit_one net/core/dev.c:3595 [inline]
+ dev_hard_start_xmit+0x261/0x8c0 net/core/dev.c:3611
+ __dev_queue_xmit+0x1b97/0x3c90 net/core/dev.c:4261
+ packet_snd net/packet/af_packet.c:3073 [inline]
 
-Unlike the entry for napi-set there is no "flags: [ admin-perm ]" fpr
-bind-tx...
+The geometry of the bad input packet at tcp_gso_segment:
 
-> +      do:
-> +        request:
-> +          attributes:
-> +            - ifindex
-> +            - fd
-> +        reply:
-> +          attributes:
-> +            - id
->  
->  kernel-family:
->    headers: [ "linux/list.h"]
+[   52.003050][ T8403] skb len=12202 headroom=244 headlen=12093 tailroom=0
+[   52.003050][ T8403] mac=(168,24) mac_len=24 net=(192,52) trans=244
+[   52.003050][ T8403] shinfo(txflags=0 nr_frags=1 gso(size=1552 type=3 segs=0))
+[   52.003050][ T8403] csum(0x60000c7 start=199 offset=1536
+ip_summed=3 complete_sw=0 valid=0 level=0)
 
-...
+Mitigate with stricter input validation.
 
-> diff --git a/net/core/netdev-genl-gen.c b/net/core/netdev-genl-gen.c
+csum_offset: for GSO packets, deduce the correct value from gso_type.
+This is already done for USO. Extend it to TSO. Let UFO be:
+udp[46]_ufo_fragment ignores these fields and always computes the
+checksum in software.
 
-...
+csum_start: finding the real offset requires parsing to the transport
+header. Do not add a parser, use existing segmentation parsing. Thanks
+to SKB_GSO_DODGY, that also catches bad packets that are hw offloaded.
+Again test both TSO and USO. Do not test UFO for the above reason, and
+do not test UDP tunnel offload.
 
-> @@ -190,6 +196,13 @@ static const struct genl_split_ops netdev_nl_ops[] = {
+GSO packet are almost always CHECKSUM_PARTIAL. USO packets may be
+CHECKSUM_NONE since commit 10154dbded6d6 ("udp: Allow GSO transmit
+from devices with no checksum offload"), but then still these fields
+are initialized correctly in udp4_hwcsum/udp6_hwcsum_outgoing. So no
+need to test for ip_summed == CHECKSUM_PARTIAL first.
 
-The lines preceding this hunk are:
+This revises an existing fix mentioned in the Fixes tag, which broke
+small packets with GSO offload, as detected by kselftests.
 
-	{
-		.cmd		= NETDEV_CMD_NAPI_SET,
-		.doit		= netdev_nl_napi_set_doit,
-		.policy		= netdev_napi_set_nl_policy,
+Link: https://syzkaller.appspot.com/bug?extid=e1db31216c789f552871
+Link: https://lore.kernel.org/netdev/20240723223109.2196886-1-kuba@kernel.org
+Fixes: e269d79c7d35 ("net: missing check virtio")
+Cc: stable@vger.kernel.org
+Signed-off-by: Willem de Bruijn <willemb@google.com>
+Link: https://patch.msgid.link/20240729201108.1615114-1-willemdebruijn.kernel@gmail.com
+Signed-off-by: Jakub Kicinski <kuba@kernel.org>
+[Denis: minor fix to resolve merge conflict.]                                           
+Signed-off-by: Denis Arefev <arefev@swemel.ru>                                    
+---
+Backport fix for CVE-2024-43817
+Link: https://nvd.nist.gov/vuln/detail/cve-2024-43817
+---
+ include/linux/virtio_net.h |  5 +++++
+ net/ipv4/tcp_offload.c     |  3 +++
+ net/ipv4/udp_offload.c     | 14 ++++++++++++++
+ 3 files changed, 22 insertions(+)
 
->  		.maxattr	= NETDEV_A_NAPI_IRQ_SUSPEND_TIMEOUT,
->  		.flags		= GENL_ADMIN_PERM | GENL_CMD_CAP_DO,
->  	},
-> +	{
-> +		.cmd		= NETDEV_CMD_BIND_TX,
-> +		.doit		= netdev_nl_bind_tx_doit,
-> +		.policy		= netdev_bind_tx_nl_policy,
-> +		.maxattr	= NETDEV_A_DMABUF_FD,
-> +		.flags		= GENL_ADMIN_PERM | GENL_CMD_CAP_DO,
+diff --git a/include/linux/virtio_net.h b/include/linux/virtio_net.h
+index 9bdba0c00c07..823e28042f41 100644
+--- a/include/linux/virtio_net.h
++++ b/include/linux/virtio_net.h
+@@ -159,6 +159,11 @@ static inline int virtio_net_hdr_to_skb(struct sk_buff *skb,
+ 			if (gso_type != SKB_GSO_UDP_L4)
+ 				return -EINVAL;
+ 			break;
++		case SKB_GSO_TCPV4:
++		case SKB_GSO_TCPV6:
++			if (skb->csum_offset != offsetof(struct tcphdr, check))
++				return -EINVAL;
++			break;
+ 		}
+ 
+ 		/* Kernel has a special handling for GSO_BY_FRAGS. */
+diff --git a/net/ipv4/tcp_offload.c b/net/ipv4/tcp_offload.c
+index fc61cd3fea65..357d3be04f84 100644
+--- a/net/ipv4/tcp_offload.c
++++ b/net/ipv4/tcp_offload.c
+@@ -71,6 +71,9 @@ struct sk_buff *tcp_gso_segment(struct sk_buff *skb,
+ 	if (thlen < sizeof(*th))
+ 		goto out;
+ 
++	if (unlikely(skb_checksum_start(skb) != skb_transport_header(skb)))
++		goto out;
++
+ 	if (!pskb_may_pull(skb, thlen))
+ 		goto out;
+ 
+diff --git a/net/ipv4/udp_offload.c b/net/ipv4/udp_offload.c
+index 6e36eb1ba276..9b757394ad4f 100644
+--- a/net/ipv4/udp_offload.c
++++ b/net/ipv4/udp_offload.c
+@@ -276,6 +276,20 @@ struct sk_buff *__udp_gso_segment(struct sk_buff *gso_skb,
+ 	if (gso_skb->len <= sizeof(*uh) + mss)
+ 		return ERR_PTR(-EINVAL);
+ 
++	if (unlikely(skb_checksum_start(gso_skb) !=
++		     skb_transport_header(gso_skb)))
++		return ERR_PTR(-EINVAL);
++
++	if (skb_gso_ok(gso_skb, features | NETIF_F_GSO_ROBUST)) {
++		/* Packet is from an untrusted source, reset gso_segs. */
++		skb_shinfo(gso_skb)->gso_segs = DIV_ROUND_UP(gso_skb->len - sizeof(*uh),
++							     mss);
++		return NULL;
++	}
++
++	if (skb_shinfo(gso_skb)->gso_type & SKB_GSO_FRAGLIST)
++		return __udp_gso_segment_list(gso_skb, features, is_ipv6);
++
+ 	skb_pull(gso_skb, sizeof(*uh));
+ 
+ 	/* clear destructor to avoid skb_segment assigning it to tail */
+-- 
+2.43.0
 
-... so I don't think GENL_ADMIN_PERM should be here.
-
-Flagged by running tools/net/ynl/ynl-regen.sh -f && git diff
-
-> +	},
->  };
->  
->  static const struct genl_multicast_group netdev_nl_mcgrps[] = {
-
-...
 
