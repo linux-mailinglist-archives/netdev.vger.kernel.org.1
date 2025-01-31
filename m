@@ -1,209 +1,198 @@
-Return-Path: <netdev+bounces-161722-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-161723-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id C17A8A23925
-	for <lists+netdev@lfdr.de>; Fri, 31 Jan 2025 05:22:47 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7BFD6A23928
+	for <lists+netdev@lfdr.de>; Fri, 31 Jan 2025 05:34:11 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 2B256167A2A
-	for <lists+netdev@lfdr.de>; Fri, 31 Jan 2025 04:22:46 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id A8BEE7A3444
+	for <lists+netdev@lfdr.de>; Fri, 31 Jan 2025 04:33:16 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9F4FD20EB;
-	Fri, 31 Jan 2025 04:22:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DCE92383A2;
+	Fri, 31 Jan 2025 04:34:03 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b="KWOPf2nn"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="yQ8d96aL"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f176.google.com (mail-pl1-f176.google.com [209.85.214.176])
+Received: from mail-ed1-f48.google.com (mail-ed1-f48.google.com [209.85.208.48])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EAFB9381B9
-	for <netdev@vger.kernel.org>; Fri, 31 Jan 2025 04:22:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.176
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 10EB310E0
+	for <netdev@vger.kernel.org>; Fri, 31 Jan 2025 04:34:01 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.48
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1738297360; cv=none; b=h1OBsZ4faz3ffGOKZX43u+GEJVslf57FbF8ub0KArn6SYrZOWIJeAgq/vjq6+IY2ovV39SDdbjH0dWnglH2zOcxrk803PY5rKIMh4ylAAid+VFJLp6AqLkOlnPS7U3rgLQkZsXNAYPQbPa2znym0OUveS+6KSmhlqAxNo5fh60M=
+	t=1738298043; cv=none; b=SIAugs2HQRiZEDAiMuTEiSDQ2H5S8fpQIu52I6DFZeWNAgvTXsyhaLFm7s6F4Yj8PoSnVPTJLRfAKNxYjndNhY4AINR4M0yuIjcypage3WWaQoj8mbEXhpy32ymQwyxJPNj7Ky6yBfkkVnM2HHvxgLHNCjRgSJHjbfoJFAqhIUs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1738297360; c=relaxed/simple;
-	bh=ZdJ4Km0576TBOZuxy9asMBIpCThcVSU6cC8jysJ/mDA=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version:Content-Type; b=s31c3xyt5M8ViiagiFCIossgYtty3GOOi2bWnAwRHTLQiU0+IZJ8dNNK19wo31Sy7AbCapLD3sHTVaLXhS3ggyEcfKho2impbf6YFpEXNA5wiCUSjbaQUX8a+fEiqR+GgQozUUsaI+Nci6JcPxDsN+FumLEvaGBuSRfGdveotNw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com; spf=fail smtp.mailfrom=broadcom.com; dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b=KWOPf2nn; arc=none smtp.client-ip=209.85.214.176
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=broadcom.com
-Received: by mail-pl1-f176.google.com with SMTP id d9443c01a7336-21649a7bcdcso27426465ad.1
-        for <netdev@vger.kernel.org>; Thu, 30 Jan 2025 20:22:38 -0800 (PST)
+	s=arc-20240116; t=1738298043; c=relaxed/simple;
+	bh=yDwkwaZQGviDgApLsk4GaCtYY0ivYgn87mWmA+4Tqvs=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=RMxa1ni/zTpLcwBe+5DV2UU9GIYLFinpGjnk9/uKcNbF418xEv0BN+35n82iTb3O2vxlPktaVi44da4RKceTxP+T/YgrRhsYma7CSOMxxJR3w+CiEbNR+q1pstGtN/NECoVDIp7lUwSUWy7JHCN1lkVeMilYjlZGK0pOQznj7XQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=yQ8d96aL; arc=none smtp.client-ip=209.85.208.48
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-ed1-f48.google.com with SMTP id 4fb4d7f45d1cf-5d41848901bso2804917a12.0
+        for <netdev@vger.kernel.org>; Thu, 30 Jan 2025 20:34:01 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=broadcom.com; s=google; t=1738297357; x=1738902157; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=4QXWnIBvEXqN/aWmO5GxG/RH03iGa2Rzw0LcuCh/AV4=;
-        b=KWOPf2nnju5fFdmLvLcx+xYLgomvV5vRXe9bI9DR8SCcLfuH4aYTZ2toZOn5sGV61r
-         jn8veFgdaNW1ZhIFBl3ABDZMB7G/A2UwzgI04Xf6BzWVub2Ss0JabCmZHiz2G+ziHuUH
-         fOkjfqQaRmztdcOjh7O+vM6F9Na156V2Pk6lQ=
+        d=google.com; s=20230601; t=1738298040; x=1738902840; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=B5syUaHV4x/XSDGLVnMjJTwItKaCBRRSmRp99SCOjEc=;
+        b=yQ8d96aLB9Fqf3I5spdEe1nfY5ctTuiOt9fU8pN/QGiZ8WhWfJDS7JIlLoBVlR56tg
+         DY9TgQTSQFijFasfJJGjNmIIeZOsWZq9P3SF5a7OMZVtIeLVi3GZcM1LtjBg0dk+RZjk
+         PrVMWb/pUimABCLoiGCXAT0uBjF+zjupp9oZgsdYYAzoB0btiK1od+zMCJrZZ7YEXtcm
+         o84BYDLJ0T+lFDI70cGdvgjhV7eYk7dvR90w0+/bIV15dI6XlQQV6uVfe6lWMRCnzB/E
+         R1ray9yy9uM5UPRKkX7PIv4yJFs4O4eEFflXczKx599W8NBJJEO6qpEeEYaGv+lSq9x3
+         jFtw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1738297357; x=1738902157;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=4QXWnIBvEXqN/aWmO5GxG/RH03iGa2Rzw0LcuCh/AV4=;
-        b=p00HOP+25UqVjAUCR9/lZfdPixVHlsyl5WPZ+6RtIE9bMMyuG0DmGEGEPPBCpSUPuc
-         dZU0SLrhy/Q2HNORpgRJ5q8e7pSP12TrxgDTww9xQeOn04hoaiPKMPEF094t8LBBOiGx
-         Ji6uHRyltfZsdcGcW7MAUhFcc/W6VvLJvBqmuE9E1+KhdppURUy6P7xKdAhZs+gWApNZ
-         JaQp5b1R2QfMTDTVJ9qvhR9qzl/wnICngBtIGVpIw9qjmRwhA4Pzcg+NWyDmK6TTVdIP
-         OAx6XcWZDjR5tSpK88AY7Hbc9tfmIRovOlEr07v/aexUGHioQ0fEdqkoq8IY+3petG+g
-         lwvw==
-X-Gm-Message-State: AOJu0Yywhy4GIOxyjRFPMrTswGURA0vsiO6OkNkA6SGWgcMLRvSa4jsx
-	OGzt5lmG+3jffL7scH1EalIqoPLDaxh39aJwI7bwxLAP1Ml30DEBT7hSWjfF7mwGjP97A+X7SMg
-	53iypa+6UwT7Tobbc9fy54E31m1biVzVfpiLNV2CenhhvtMNWk7zgknqDhEWcyL1qpLaQ78ar0Y
-	MpXwHStQaNFdEQfgQ4TzMuK6gUfkZDUPbGX6iRjZQ7brsWKJQn8ES6iJrEmu8=
-X-Gm-Gg: ASbGncuyAfSVvfCY7J9S4zWlG7yt3y7EIdJtlB82d+r3A+XVlTJnNhXElOx/YU//5dV
-	pbFlUxAueHBqegyJ1sVgMUYm/8tBvwBTiHK4GCZxWVMToLoDY3VMPQgsDHcEvrWMI847oyXC1zw
-	4jXzRKArW0U4JvESBKnQOD28guwYi7oE3k78zNKFKcgOFU3Wj3rrtphdpxU5M++Iw0A7K6zeCav
-	wfeVy1D4o/q0SUo4vQ/ZKoRVHikMGIA7zh2LKbFndGBE77ummBusDX84+G8ydoiK0p6/3EObrwO
-	Z1LMHotYKlsYGd9Jzf8yWrUAprUX1IY7hNI5y7g2gZZI010Bs3qajvnjpP4c8yufVmwXpxyOMOW
-	wuEqhMAApWdNbeucoI6uC6FASu7QZ
-X-Google-Smtp-Source: AGHT+IEAT5FmDX0mXiDSNFz8BLxZXYx0XQCsbuB0N6896r5L/FAO4S12TiJUn4VHsxsYi1HMMil56Q==
-X-Received: by 2002:a17:902:d551:b0:216:5556:8b46 with SMTP id d9443c01a7336-21dd7e0728fmr156207705ad.49.1738297357280;
-        Thu, 30 Jan 2025 20:22:37 -0800 (PST)
-Received: from sankartest7x-virtual-machine.lvn.broadcom.net ([192.19.161.250])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-21de330084bsm21276035ad.178.2025.01.30.20.22.35
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 30 Jan 2025 20:22:36 -0800 (PST)
-From: Sankararaman Jayaraman <sankararaman.jayaraman@broadcom.com>
-To: netdev@vger.kernel.org
-Cc: kuba@kernel.org,
-	alexanderduyck@fb.com,
-	alexandr.lobakin@intel.com,
-	andrew+netdev@lunn.ch,
-	ast@kernel.org,
-	bcm-kernel-feedback-list@broadcom.com,
-	bpf@vger.kernel.org,
-	daniel@iogearbox.net,
-	davem@davemloft.net,
-	edumazet@google.com,
-	hawk@kernel.org,
-	john.fastabend@gmail.com,
-	pabeni@redhat.com,
-	ronak.doshi@broadcom.com,
-	sankararaman.jayaraman@broadcom.com,
-	u9012063@gmail.com
-Subject: [PATCH net v3] vmxnet3: Fix tx queue race condition with XDP
-Date: Fri, 31 Jan 2025 09:53:41 +0530
-Message-Id: <20250131042340.156547-1-sankararaman.jayaraman@broadcom.com>
-X-Mailer: git-send-email 2.25.1
+        d=1e100.net; s=20230601; t=1738298040; x=1738902840;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=B5syUaHV4x/XSDGLVnMjJTwItKaCBRRSmRp99SCOjEc=;
+        b=a7YbLQsYHrQV8begbft7gwSdchI5j2MtWl2yQgfa4CVltnP0mtQV4l3ay0t5icQtY8
+         Fiejy7d9xN5j1q3Q+lNwiYZHEDy6xsCjvv+HH1pP53KlVTOdFgB4LFnIj9zxhYFVuq3g
+         6AbFEgscqXaN3xi3I+WzrqZV7jLQeKOwRa8sGBh3PUtbJxCzShF1KRycumOtbFFiE4Kq
+         PScdkqBlwUqk4Zs6tJHNCx/h9b6B1w5Do7oz4zwnrnPpm7kwHHQP5KltKj4qsxslz90L
+         3+v/QU/UUmHiDT1a7bweDUnnaBH5ALR97ih23P1+beKDJ6UjcCzRGVUWdVScSEX9SHvV
+         FJzw==
+X-Forwarded-Encrypted: i=1; AJvYcCX/Vd0TO5OveZavUPVpCzKQJTSn2MFvlygHCXAobJO+i6ep2TZ3Zq88bmKgcamGQen0TTJsg0Q=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzuzPqF/vWUbt4HQsasEqbgbr7f+Mf7g90l/czxvEhBipz8fGrd
+	aryYYxScLxrej161R5HU0QeItkgiMbUniNjjbydXl8YItqE5o2Pk6r5oLDw6JLtjicwOV8KWiFa
+	QLiWKHo6JN1lMmYtEV4YLe62bFUAZ0ndqFLql
+X-Gm-Gg: ASbGnctm+WZ4xFU+3gb+qOdTDayQTn8p3u06PyXtW3PUQu6LTwcU2+Bf3KDSkqQIlSo
+	ibpgAPAr8eU4THRnAg9KSrXZXTwaqYga0fwyn9vRUqVsnMzyeXPSXclDoAZV7XdGYRiFNe/Tfvg
+	==
+X-Google-Smtp-Source: AGHT+IFe5Baw6rQkNst9mbZkh925IA3q2EU/lxrNXamrrc7UmgdpagSKW3j04AUJJFrK5/EbrjGsYMuNUlIuXmM9Ygo=
+X-Received: by 2002:a05:6402:4306:b0:5dc:eb2:570d with SMTP id
+ 4fb4d7f45d1cf-5dc6f498d60mr5954354a12.2.1738298040275; Thu, 30 Jan 2025
+ 20:34:00 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+References: <20250130232435.43622-1-kuniyu@amazon.com> <20250130232435.43622-2-kuniyu@amazon.com>
+In-Reply-To: <20250130232435.43622-2-kuniyu@amazon.com>
+From: Eric Dumazet <edumazet@google.com>
+Date: Fri, 31 Jan 2025 05:33:49 +0100
+X-Gm-Features: AWEUYZl7IST8H-cIpmvgHZLk69iICoYDHSTJ8EiPgjs5jq9zk21B0LSqveURUPU
+Message-ID: <CANn89iJzav0za=tJq7MvXpEXYNFY_+1D6==w2jbKd0-0mhKO4g@mail.gmail.com>
+Subject: Re: [PATCH v1 net 1/2] net: Fix dev_net(dev) race in unregister_netdevice_notifier_dev_net().
+To: Kuniyuki Iwashima <kuniyu@amazon.com>
+Cc: "David S. Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
+	Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, 
+	Kuniyuki Iwashima <kuni1840@gmail.com>, netdev@vger.kernel.org, 
+	Yael Chemla <ychemla@nvidia.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-If XDP traffic runs on a CPU which is greater than or equal to
-the number of the Tx queues of the NIC, then vmxnet3_xdp_get_tq()
-always picks up queue 0 for transmission as it uses reciprocal scale
-instead of simple modulo operation.
+On Fri, Jan 31, 2025 at 12:25=E2=80=AFAM Kuniyuki Iwashima <kuniyu@amazon.c=
+om> wrote:
+>
+> After the cited commit, dev_net(dev) is fetched before holding RTNL
+> and passed to __unregister_netdevice_notifier_net().
+>
+> However, dev_net(dev) might be different after holding RTNL.
+>
+> In the reported case [0], while removing a VF device, its netns was
+> being dismantled and the VF was moved to init_net.
+>
+> So the following sequence is basically illegal when dev was fetched
+> without lookup:
+>
+>   net =3D dev_net(dev);
+>   rtnl_net_lock(net);
+>
+> Let's use a new helper rtnl_net_dev_lock() to fix the race.
+>
+> It calls maybe_get_net() for dev_net(dev) and checks dev_net(dev)
+> before/after rtnl_net_lock().
+>
+> The dev_net(dev) pointer itself is valid, thanks to RCU API, but the
 
-vmxnet3_xdp_xmit() and vmxnet3_xdp_xmit_frame() use the above
-returned queue without any locking which can lead to race conditions
-when multiple XDP xmits run in parallel on different CPU's.
+I am pretty sure dev_net(net) is not always called under rcu_read_lock().
 
-This patch uses a simple module scheme when the current CPU equals or
-exceeds the number of Tx queues on the NIC. It also adds locking in
-vmxnet3_xdp_xmit() and vmxnet3_xdp_xmit_frame() functions.
+And RTNL would not help in the future either.
 
-Fixes: 54f00cce1178 ("vmxnet3: Add XDP support.")
-Signed-off-by: Sankararaman Jayaraman <sankararaman.jayaraman@broadcom.com>
-Signed-off-by: Ronak Doshi <ronak.doshi@broadcom.com>
----
-v3:
-  - In vmxnet3_xdp_xmit_frame(), use the irq version of spin lock 
-  - Fixed the ordering of local variables in vmxnet3_xdp_xmit()
-v2: https://lore.kernel.org/netdev/20250129181703.148027-1-sankararaman.jayaraman@broadcom.com/
-  - Retained the earlier copyright dates as it is a bug fix
-  - Used spin_lock()/spin_unlock() instead of spin_lock_irqsave()
-v1: https://lore.kernel.org/netdev/20250124090211.110328-1-sankararaman.jayaraman@broadcom.com/
+> netns might be being dismantled.  maybe_get_net() is to avoid the race.
+> This can be done by holding pernet_ops_rwsem, but it will be overkill.
+>
+> [0]:
 
- drivers/net/vmxnet3/vmxnet3_xdp.c | 14 ++++++++++++--
- 1 file changed, 12 insertions(+), 2 deletions(-)
+> Fixes: 7fb1073300a2 ("net: Hold rtnl_net_lock() in (un)?register_netdevic=
+e_notifier_dev_net().")
+> Reported-by: Yael Chemla <ychemla@nvidia.com>
+> Closes: https://lore.kernel.org/netdev/146eabfe-123c-4970-901e-e961b4c09b=
+c3@nvidia.com/
+> Signed-off-by: Kuniyuki Iwashima <kuniyu@amazon.com>
+> Tested-by: Yael Chemla <ychemla@nvidia.com>
+> ---
+>  net/core/dev.c | 59 +++++++++++++++++++++++++++++++++++++++-----------
+>  1 file changed, 46 insertions(+), 13 deletions(-)
+>
+> diff --git a/net/core/dev.c b/net/core/dev.c
+> index c0021cbd28fc..f91ddb7f8bdf 100644
+> --- a/net/core/dev.c
+> +++ b/net/core/dev.c
+> @@ -2070,6 +2070,47 @@ static void __move_netdevice_notifier_net(struct n=
+et *src_net,
+>         __register_netdevice_notifier_net(dst_net, nb, true);
+>  }
+>
+> +static bool from_cleanup_net(void)
+> +{
+> +#ifdef CONFIG_NET_NS
+> +       return current =3D=3D cleanup_net_task;
+> +#else
+> +       return false;
+> +#endif
+> +}
+> +
+> +static void rtnl_net_dev_lock(struct net_device *dev)
+> +{
+> +       struct net *net;
+> +
+> +       DEBUG_NET_WARN_ON_ONCE(from_cleanup_net());
+> +again:
+> +       /* netns might be being dismantled. */
 
-diff --git a/drivers/net/vmxnet3/vmxnet3_xdp.c b/drivers/net/vmxnet3/vmxnet3_xdp.c
-index 1341374a4588..616ecc38d172 100644
---- a/drivers/net/vmxnet3/vmxnet3_xdp.c
-+++ b/drivers/net/vmxnet3/vmxnet3_xdp.c
-@@ -28,7 +28,7 @@ vmxnet3_xdp_get_tq(struct vmxnet3_adapter *adapter)
- 	if (likely(cpu < tq_number))
- 		tq = &adapter->tx_queue[cpu];
- 	else
--		tq = &adapter->tx_queue[reciprocal_scale(cpu, tq_number)];
-+		tq = &adapter->tx_queue[cpu % tq_number];
- 
- 	return tq;
- }
-@@ -124,6 +124,7 @@ vmxnet3_xdp_xmit_frame(struct vmxnet3_adapter *adapter,
- 	u32 buf_size;
- 	u32 dw2;
- 
-+	spin_lock_irq(&tq->tx_lock);
- 	dw2 = (tq->tx_ring.gen ^ 0x1) << VMXNET3_TXD_GEN_SHIFT;
- 	dw2 |= xdpf->len;
- 	ctx.sop_txd = tq->tx_ring.base + tq->tx_ring.next2fill;
-@@ -134,6 +135,7 @@ vmxnet3_xdp_xmit_frame(struct vmxnet3_adapter *adapter,
- 
- 	if (vmxnet3_cmd_ring_desc_avail(&tq->tx_ring) == 0) {
- 		tq->stats.tx_ring_full++;
-+		spin_unlock_irq(&tq->tx_lock);
- 		return -ENOSPC;
- 	}
- 
-@@ -142,8 +144,10 @@ vmxnet3_xdp_xmit_frame(struct vmxnet3_adapter *adapter,
- 		tbi->dma_addr = dma_map_single(&adapter->pdev->dev,
- 					       xdpf->data, buf_size,
- 					       DMA_TO_DEVICE);
--		if (dma_mapping_error(&adapter->pdev->dev, tbi->dma_addr))
-+		if (dma_mapping_error(&adapter->pdev->dev, tbi->dma_addr)) {
-+			spin_unlock_irq(&tq->tx_lock);
- 			return -EFAULT;
-+		}
- 		tbi->map_type |= VMXNET3_MAP_SINGLE;
- 	} else { /* XDP buffer from page pool */
- 		page = virt_to_page(xdpf->data);
-@@ -182,6 +186,7 @@ vmxnet3_xdp_xmit_frame(struct vmxnet3_adapter *adapter,
- 	dma_wmb();
- 	gdesc->dword[2] = cpu_to_le32(le32_to_cpu(gdesc->dword[2]) ^
- 						  VMXNET3_TXD_GEN);
-+	spin_unlock_irq(&tq->tx_lock);
- 
- 	/* No need to handle the case when tx_num_deferred doesn't reach
- 	 * threshold. Backend driver at hypervisor side will poll and reset
-@@ -225,6 +230,7 @@ vmxnet3_xdp_xmit(struct net_device *dev,
- {
- 	struct vmxnet3_adapter *adapter = netdev_priv(dev);
- 	struct vmxnet3_tx_queue *tq;
-+	struct netdev_queue *nq;
- 	int i;
- 
- 	if (unlikely(test_bit(VMXNET3_STATE_BIT_QUIESCED, &adapter->state)))
-@@ -236,6 +242,9 @@ vmxnet3_xdp_xmit(struct net_device *dev,
- 	if (tq->stopped)
- 		return -ENETDOWN;
- 
-+	nq = netdev_get_tx_queue(adapter->netdev, tq->qid);
-+
-+	__netif_tx_lock(nq, smp_processor_id());
- 	for (i = 0; i < n; i++) {
- 		if (vmxnet3_xdp_xmit_frame(adapter, frames[i], tq, true)) {
- 			tq->stats.xdp_xmit_err++;
-@@ -243,6 +252,7 @@ vmxnet3_xdp_xmit(struct net_device *dev,
- 		}
- 	}
- 	tq->stats.xdp_xmit += i;
-+	__netif_tx_unlock(nq);
- 
- 	return i;
- }
--- 
-2.25.1
+rcu_read_lock();
 
+> +       net =3D maybe_get_net(dev_net(dev));
+
+rcu_read_unlock();
+
+
+
+> +       if (!net) {
+> +               cond_resched();
+
+cond_resched() can be a NOP on some kernel builds.
+
+This loop might burn a lot of cpu cycles.
+
+Perhaps msleep(1) instead.
+
+> +               goto again;
+> +       }
+> +
+
+
+> +       rtnl_net_lock(net);
+> +
+> +       /* dev might have been moved to another netns. */
+> +       if (!net_eq(net, dev_net(dev))) {
+> +               rtnl_net_unlock(net);
+> +               put_net(net);
+> +               cond_resched();
+
+      This cond_resched() seems unnecessary, the net change can not
+occur more than once per rcu grace period (an eternity)
+
+> +               goto again;
+> +       }
+> +}
 
