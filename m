@@ -1,69 +1,69 @@
-Return-Path: <netdev+bounces-161802-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-161803-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 20C65A241AD
-	for <lists+netdev@lfdr.de>; Fri, 31 Jan 2025 18:14:50 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0ADD2A241B0
+	for <lists+netdev@lfdr.de>; Fri, 31 Jan 2025 18:15:04 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 45E9C3AA054
-	for <lists+netdev@lfdr.de>; Fri, 31 Jan 2025 17:14:24 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id EB50A188AD44
+	for <lists+netdev@lfdr.de>; Fri, 31 Jan 2025 17:14:44 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BB01F1F2364;
-	Fri, 31 Jan 2025 17:13:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5C3ED1F2388;
+	Fri, 31 Jan 2025 17:13:59 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="BhAXfEh7"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="CYRlLuqA"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qt1-f202.google.com (mail-qt1-f202.google.com [209.85.160.202])
+Received: from mail-qk1-f202.google.com (mail-qk1-f202.google.com [209.85.222.202])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2B6D81C4A24
-	for <netdev@vger.kernel.org>; Fri, 31 Jan 2025 17:13:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.202
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B59B81F0E2E
+	for <netdev@vger.kernel.org>; Fri, 31 Jan 2025 17:13:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.202
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1738343637; cv=none; b=k5ExwG80M959hPGj1LcpyVxKqZLY224901AZ7bGy8QigJEbtrRhvvukdM+pYekcM9kGohCT0On5+ovlGsDGijGOQLTpddy2fulNFGOzYgtiSvB6IsmnxWjSImrLv7C/+jPMvqHG0hty1HfhMvkXAq0Xyfnwtfbt4LhvwdIw9O7c=
+	t=1738343639; cv=none; b=MTovATICBuJa6o4U6Jj57g1S2N0J3kZe55t94dXPBvS0lMHx317FdaqdN3D/3/F//XEpKczdiGA9lq8WjpQk0davcsqgtWNvNaYbDAQYJfpNrrg/9/4sUOkHJlu7dsKyyTSX/tiNrtKcw5teEzH9FEQa4d2yy8tf+YOyqB4JGAc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1738343637; c=relaxed/simple;
-	bh=S4kgQ8BdXq/TdAZ7H6He9G8UV/L3A5YOQeh4Jaak8Fc=;
+	s=arc-20240116; t=1738343639; c=relaxed/simple;
+	bh=Rjkgkmd9WlNhCGLwhOYrVQy7Fu3bO/Qwn1QgOk94YJQ=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=KNfhHcy6srNdImbrjY9xayX5dInDexfdSsnWOU1Fp4S25NY5gS5mDLwY0JR/LSNALmPxfILdk9eYlhwBBPRxElKYa5JgFJ/LWD95F0liJuvgabPDmTOrKQZOIbyBvPQp7BVTdJiGzv3zbc+8WD9dKDITGesCkVGCGDOf9kJfCI0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=BhAXfEh7; arc=none smtp.client-ip=209.85.160.202
+	 To:Cc:Content-Type; b=FmRx4s5st5Fcdf3mqFjQ1soXhl2t37/x1C2vViPoSKZgRyR+qEnjXfW4gD9YtzOeu/4mKEhjRyCwVwL6PTdCtBLmU4+b2GvKFqC288I/SiS41LtGwl4QAz77eo7vVo4gh8UgL+WQ/0U11dEYXyZXL0YuKlKVY9sLdM/jdHHJt1I=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=CYRlLuqA; arc=none smtp.client-ip=209.85.222.202
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com
-Received: by mail-qt1-f202.google.com with SMTP id d75a77b69052e-467905ab1bbso64301661cf.1
-        for <netdev@vger.kernel.org>; Fri, 31 Jan 2025 09:13:55 -0800 (PST)
+Received: by mail-qk1-f202.google.com with SMTP id af79cd13be357-7be96bd50caso426717585a.3
+        for <netdev@vger.kernel.org>; Fri, 31 Jan 2025 09:13:57 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1738343635; x=1738948435; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1738343636; x=1738948436; darn=vger.kernel.org;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=eFHQV76ZnLVC/qjDKSlypzkf4Zt/+CO4gQ4lH7s0JB8=;
-        b=BhAXfEh7aUgeHF6DLST7esVwob3lZC4afJz7xVBj2iEeBHwcvMhXx+XH2tgK4ClJtd
-         EnUTtqfktnu9nMjnPGVU+hFodLzMCXS12KnIDgjHUd9Ta7NXXtWK0Rjk5mvMNT3CXyJD
-         bWGDkvvYKdYEoEblO3U1Dl+V11q+b6Z7DfCfooDkIx2Gv1fo0WmgkfArJ8jtU/HDxA57
-         PcKWac9uF0JZrxN54sgyf3aWMBf2hNyvoE4K6KdulTFndwHKht5jur/soeVGBv57oUaB
-         /IFnG8QVguB92o1+Kh1+IesZaKGBmbjy/BF4YUN2lV/K8CiVi9btrWDgUeNFNxcWGIsy
-         BGSA==
+        bh=fCuH8g8ti5NQ2ZijQC2+wOKhhnOhYLNmT0OBGWEk+1s=;
+        b=CYRlLuqAsQKWzbEV3emWR4YyXi/N4JsRFn0Egg2dlRhHOQdiCpxeWbU7LCE3kFCXYP
+         q9SJzXYft9ae9yBdMRNHHQrzTUyOoihzZb4psqoN4liNLcxIV97TdMf2nkxe+sUXS2AX
+         JnBlnEGo5kpmSdrsf13bOS1UFrOBIPKlnoK936C/EYUVQ0SboVKZQaXlwwqt8AbbREnF
+         zXiFTJtw/+wez8p5+vOOOrvStFz9RvM6TiLFKaXB5lqFWWEOACJyteoBjB6dxW433kGD
+         B9u6vEqkTcGFDsSZ+9fkz+6ad7AdxZ6Vkh3pJyFT0+Ihpht1FBGB7LJip37FgZeI0ZV1
+         Yzrg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1738343635; x=1738948435;
+        d=1e100.net; s=20230601; t=1738343636; x=1738948436;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=eFHQV76ZnLVC/qjDKSlypzkf4Zt/+CO4gQ4lH7s0JB8=;
-        b=owmDrX9BVZtgJAFXRrGX4pvhCqnX4cqIGBrpKPoVmuw3c1+ayk2fjyMuV+14chvEmT
-         DiBJujawYTcwBxPplEbvWnb3pRaUW/h5A7T99YsVy635yxoL8TU41NeBWkfpVvyyuy8q
-         d9bMyDkGmEk2NUhqHIwoW5p9HUhxfwZkjsCnJ8mwe/faQWKEVX6L3LnUegn2y1ESZt3y
-         YgvQFU2ig/r2r/jVRqZfKuW+QsS5MQ03qsF5LG9q8jajU9U+H/owR5DpiiZIKAAoscmG
-         YdyAd8EhP7GEzACXsRgvNnL16IS4arNY9nQaZi9W0bPzWoOmzOGAI+InCloded/eodYO
-         q8+A==
-X-Gm-Message-State: AOJu0YxMF9js+qQ0SZwbY5LtqAhHao3OqzXCP5CXyFXHSY2vjpIGVpwg
-	W7nUZXvzquT9DCgs31LYxHqQNAEjngrS/hrBcvJosaSp747cKfSrBotYmBDHLWjbG7UpcATyWfj
-	3A72neTutfw==
-X-Google-Smtp-Source: AGHT+IG8lPVOnnpSVtUE3lPuTQjrJYATDmcTF/Dgy1jKxY2iVklpAsD7Yae/HAi/V0c/9lBIPEe4C+VHC9UyCA==
-X-Received: from qtbbb14.prod.google.com ([2002:a05:622a:1b0e:b0:46b:1ac5:905c])
+        bh=fCuH8g8ti5NQ2ZijQC2+wOKhhnOhYLNmT0OBGWEk+1s=;
+        b=PaMYXptz5kLTGjgYwyRlfCSTPmK3o7HtgtcoE0ZEOKTbeUmjP2j7KMs4XIADCixr0f
+         Y3lIca1oeydV3huKl26pV+8/d+ZMhOrt0IAvfDq+4rJiJVzHpWNO7JFxgLjIYYhGoKYw
+         xByyv3kOyWT6UdR04HNzZ/DZdJdE+x826xXSj+uSqh4Fw/7vmdSTyslxLW71KZRZgDgf
+         LYtUqQHo5HjpOhw6blr4RwAANW6ltREEAxYtCY+nKmybTTKp0sq4e+Y85uaN+x3RZvno
+         bFquGG+f0mgp6ttBW62kzxYfGlWUqG7kLbiNZ816MDspi8pdiM0NDrXljmlXRjFBF8vN
+         cUlw==
+X-Gm-Message-State: AOJu0Yy4E1P7GO697Xa44wj4w2uGrAFsJGSKaifkJbFNRXZ9632NnNzG
+	V+75fSJdTdE2ynrot/fS5qa7Xc3+nf1mzu97XUZpDR6IID5UR9px2TwoAyrMT852V/0+o5cayka
+	tNMAHUTAYdA==
+X-Google-Smtp-Source: AGHT+IF5BgOJKOJyRzueP/Fylsd2XqzmCgDR0SA56Bon6svG3Tw4uwE/sp+7vb+iYf4FGHhBLrGg4GwAfHXc4w==
+X-Received: from qkoz12.prod.google.com ([2002:a05:620a:260c:b0:7b6:d073:9cb4])
  (user=edumazet job=prod-delivery.src-stubby-dispatcher) by
- 2002:ac8:7e82:0:b0:462:c14f:d13f with SMTP id d75a77b69052e-46fd0b6e2aamr183710251cf.41.1738343634999;
- Fri, 31 Jan 2025 09:13:54 -0800 (PST)
-Date: Fri, 31 Jan 2025 17:13:29 +0000
+ 2002:a05:620a:2586:b0:7b6:d0bd:c7e6 with SMTP id af79cd13be357-7bffcd125fbmr2052865585a.32.1738343636619;
+ Fri, 31 Jan 2025 09:13:56 -0800 (PST)
+Date: Fri, 31 Jan 2025 17:13:30 +0000
 In-Reply-To: <20250131171334.1172661-1-edumazet@google.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -73,8 +73,8 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
 References: <20250131171334.1172661-1-edumazet@google.com>
 X-Mailer: git-send-email 2.48.1.362.g079036d154-goog
-Message-ID: <20250131171334.1172661-12-edumazet@google.com>
-Subject: [PATCH net 11/16] ipv6: input: convert to dev_net_rcu()
+Message-ID: <20250131171334.1172661-13-edumazet@google.com>
+Subject: [PATCH net 12/16] ipv6: output: convert to dev_net_rcu()
 From: Eric Dumazet <edumazet@google.com>
 To: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
 	Paolo Abeni <pabeni@redhat.com>
@@ -83,73 +83,53 @@ Cc: netdev@vger.kernel.org, Kuniyuki Iwashima <kuniyu@amazon.com>,
 	Eric Dumazet <edumazet@google.com>
 Content-Type: text/plain; charset="UTF-8"
 
-dev_net() calls from net/ipv6/ip6_input.c seem to
-happen under RCU protection.
+dev_net() calls from net/ipv6/ip6_output.c
+and net/ipv6/output_core.c are happening under RCU
+protection.
 
 Convert them to dev_net_rcu() to ensure LOCKDEP support.
 
 Signed-off-by: Eric Dumazet <edumazet@google.com>
 ---
- net/ipv6/ip6_input.c | 12 ++++++------
- 1 file changed, 6 insertions(+), 6 deletions(-)
+ net/ipv6/ip6_output.c  | 4 ++--
+ net/ipv6/output_core.c | 2 +-
+ 2 files changed, 3 insertions(+), 3 deletions(-)
 
-diff --git a/net/ipv6/ip6_input.c b/net/ipv6/ip6_input.c
-index 70c0e16c0ae6837d1c64d0036829c8b61799578b..4030527ebe098e86764f37c9068d2f2f9af2d183 100644
---- a/net/ipv6/ip6_input.c
-+++ b/net/ipv6/ip6_input.c
-@@ -301,7 +301,7 @@ static struct sk_buff *ip6_rcv_core(struct sk_buff *skb, struct net_device *dev,
+diff --git a/net/ipv6/ip6_output.c b/net/ipv6/ip6_output.c
+index d577bf2f3053873d27b241029592cdbb0a124ad7..4c73a4cdcb23f76d81e572d5b1bd0f6902447c0e 100644
+--- a/net/ipv6/ip6_output.c
++++ b/net/ipv6/ip6_output.c
+@@ -393,7 +393,7 @@ static int ip6_call_ra_chain(struct sk_buff *skb, int sel)
+ 		     sk->sk_bound_dev_if == skb->dev->ifindex)) {
  
- int ipv6_rcv(struct sk_buff *skb, struct net_device *dev, struct packet_type *pt, struct net_device *orig_dev)
- {
--	struct net *net = dev_net(skb->dev);
-+	struct net *net = dev_net_rcu(skb->dev);
- 
- 	skb = ip6_rcv_core(skb, dev, net);
- 	if (skb == NULL)
-@@ -330,7 +330,7 @@ void ipv6_list_rcv(struct list_head *head, struct packet_type *pt,
- 
- 	list_for_each_entry_safe(skb, next, head, list) {
- 		struct net_device *dev = skb->dev;
--		struct net *net = dev_net(dev);
-+		struct net *net = dev_net_rcu(dev);
- 
- 		skb_list_del_init(skb);
- 		skb = ip6_rcv_core(skb, dev, net);
-@@ -488,7 +488,7 @@ static int ip6_input_finish(struct net *net, struct sock *sk, struct sk_buff *sk
- int ip6_input(struct sk_buff *skb)
- {
- 	return NF_HOOK(NFPROTO_IPV6, NF_INET_LOCAL_IN,
--		       dev_net(skb->dev), NULL, skb, skb->dev, NULL,
-+		       dev_net_rcu(skb->dev), NULL, skb, skb->dev, NULL,
- 		       ip6_input_finish);
- }
- EXPORT_SYMBOL_GPL(ip6_input);
-@@ -500,14 +500,14 @@ int ip6_mc_input(struct sk_buff *skb)
- 	struct net_device *dev;
- 	bool deliver;
- 
--	__IP6_UPD_PO_STATS(dev_net(skb_dst(skb)->dev),
-+	__IP6_UPD_PO_STATS(dev_net_rcu(skb_dst(skb)->dev),
- 			 __in6_dev_get_safely(skb->dev), IPSTATS_MIB_INMCAST,
- 			 skb->len);
- 
- 	/* skb->dev passed may be master dev for vrfs. */
- 	if (sdif) {
- 		rcu_read_lock();
--		dev = dev_get_by_index_rcu(dev_net(skb->dev), sdif);
-+		dev = dev_get_by_index_rcu(dev_net_rcu(skb->dev), sdif);
- 		if (!dev) {
- 			rcu_read_unlock();
- 			kfree_skb(skb);
-@@ -526,7 +526,7 @@ int ip6_mc_input(struct sk_buff *skb)
- 	/*
- 	 *      IPv6 multicast router mode is now supported ;)
- 	 */
--	if (atomic_read(&dev_net(skb->dev)->ipv6.devconf_all->mc_forwarding) &&
-+	if (atomic_read(&dev_net_rcu(skb->dev)->ipv6.devconf_all->mc_forwarding) &&
- 	    !(ipv6_addr_type(&hdr->daddr) &
- 	      (IPV6_ADDR_LOOPBACK|IPV6_ADDR_LINKLOCAL)) &&
- 	    likely(!(IP6CB(skb)->flags & IP6SKB_FORWARDED))) {
+ 			if (inet6_test_bit(RTALERT_ISOLATE, sk) &&
+-			    !net_eq(sock_net(sk), dev_net(skb->dev))) {
++			    !net_eq(sock_net(sk), dev_net_rcu(skb->dev))) {
+ 				continue;
+ 			}
+ 			if (last) {
+@@ -503,7 +503,7 @@ int ip6_forward(struct sk_buff *skb)
+ 	struct dst_entry *dst = skb_dst(skb);
+ 	struct ipv6hdr *hdr = ipv6_hdr(skb);
+ 	struct inet6_skb_parm *opt = IP6CB(skb);
+-	struct net *net = dev_net(dst->dev);
++	struct net *net = dev_net_rcu(dst->dev);
+ 	struct inet6_dev *idev;
+ 	SKB_DR(reason);
+ 	u32 mtu;
+diff --git a/net/ipv6/output_core.c b/net/ipv6/output_core.c
+index 806d4b5dd1e60b27726facbb59bbef97d6fee7f5..94438fd4f0e833bb8f5ea4822c7312376ea79304 100644
+--- a/net/ipv6/output_core.c
++++ b/net/ipv6/output_core.c
+@@ -113,7 +113,7 @@ int ip6_dst_hoplimit(struct dst_entry *dst)
+ 		if (idev)
+ 			hoplimit = READ_ONCE(idev->cnf.hop_limit);
+ 		else
+-			hoplimit = READ_ONCE(dev_net(dev)->ipv6.devconf_all->hop_limit);
++			hoplimit = READ_ONCE(dev_net_rcu(dev)->ipv6.devconf_all->hop_limit);
+ 		rcu_read_unlock();
+ 	}
+ 	return hoplimit;
 -- 
 2.48.1.362.g079036d154-goog
 
