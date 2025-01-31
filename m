@@ -1,130 +1,79 @@
-Return-Path: <netdev+bounces-161715-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-161716-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6C542A238A3
-	for <lists+netdev@lfdr.de>; Fri, 31 Jan 2025 02:38:44 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6DCBDA238BA
+	for <lists+netdev@lfdr.de>; Fri, 31 Jan 2025 03:00:42 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 183371889A98
-	for <lists+netdev@lfdr.de>; Fri, 31 Jan 2025 01:38:48 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 23F9B1889BCA
+	for <lists+netdev@lfdr.de>; Fri, 31 Jan 2025 02:00:40 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A60822CCC0;
-	Fri, 31 Jan 2025 01:38:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EBEB7146A66;
+	Fri, 31 Jan 2025 01:59:58 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="RgbcJkPE"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Vdhkxc8q"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qk1-f169.google.com (mail-qk1-f169.google.com [209.85.222.169])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1C9BD23A9;
-	Fri, 31 Jan 2025 01:38:36 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.169
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C5892146D53;
+	Fri, 31 Jan 2025 01:59:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1738287518; cv=none; b=GzRKNWEnKvRintS7TSKxutJOMBdwbMN23Vq6IryAooZ8rDmfJb8covMkWOENZLIbrasu2t/bsDTZImCNp87USN1R4HOfi5m0UoC0OCxI2mqaOLLT1c8n3zUN7Lw/iW9zTeSSY8/a7M2Hm0K3OoBEhYrAwceNTKXeV/5miiUM4+I=
+	t=1738288798; cv=none; b=rUVLZzN41nvSFysWwCgXpxDvxHVb6oddqsq3tG5xettVxAA4/JiJZwdsF/1HAS1SihpimqnGzrdxLyPZTcUqbmhAkyN2nwD6G88B/eUlOKfAKKhWGn6sfhObDxcde0WlL49VCtz2GGEMySz7IJJeHaaN/kLgrxLX0nuu2bD1vEE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1738287518; c=relaxed/simple;
-	bh=8T1brB6w6nSJSTLTaIr/V6qDnzmA1rzqOhE85sB/WkQ=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=cGQBZDcepxj8MrTcyDLC3+1gDBhF4d2lu1lMQSqUsQELrXa5iF/mc4eTPBzydytMczogxii7jms5+0qsqBVzDv6HQqpMcAFU2nG69VTfVedJhHywKcGKzJI/FYoHNd/dLOCMie90inVGJ9hAkKOXGPwuQDvnZ2m04nr4OnBfCRc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=RgbcJkPE; arc=none smtp.client-ip=209.85.222.169
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-qk1-f169.google.com with SMTP id af79cd13be357-7b6ef047e9bso128739685a.1;
-        Thu, 30 Jan 2025 17:38:36 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1738287516; x=1738892316; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=hfEBD8O4S41CSk8Ejf3kHFNH8o56a8/NnzuZ2Wxb/e4=;
-        b=RgbcJkPEPdpmqAOyja2WDhTO20rZ94yKlrbYMyZYM04u8Z1Tf51j9TWmxWFTlhjYWj
-         aa7sBehRY/VbKOCLVbcoMWOJU+NT05TpFWXGp8O//YtNHV/9nhPe69nDI0pLZ9VCsbE5
-         cVwJ0OpiDHk5vNUy/SfuZa9DN3IxuQXFUQ+cXcIu3+7EU9sOsrtvwEB4Nw+wNJQil0lH
-         qz5nykhIzNpG8r2RJ3eL/dSchWmu3gtfrx0Qvuol8Wx40RP/9m1cq04K6GxkEfBYkvOW
-         iEiASZ0zgPxcKLNghTeyFlR+DLCH6ZJz8nEWOfdo249gqNyVKfuOA5CduiWBwjMzEzyp
-         xr5w==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1738287516; x=1738892316;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=hfEBD8O4S41CSk8Ejf3kHFNH8o56a8/NnzuZ2Wxb/e4=;
-        b=m1I1mtEGbeWzo9Ww/+QjbfNsGhB93DUKzoMjoeBEiC1bYafP0/w3069cRbaDbE75xJ
-         6aWT547WiYlj+6mujL32sZkzxpulLxG+nIGo9Q2+1SqZmAMRn9YzEkGnOGhAA7UlSpMT
-         NTqb32vPxOoHzc8hByvZaRpf+MPZXu0Biiq5MHPWqUc40kGUCcirCHnr9uUkMZ2Ih+SY
-         /1QbLjy6iIegnA1pqnZlrl2GaAxoERap9MCuMdh715dh0G3d0f+olpfdqV7X9mN8ml2p
-         jTe5Gska0JCsDD6gY6ldaUe4Nxl6mErNG4tqUUvl0b/Cy3OWfh60m090GUfHtPl91p/F
-         AmEw==
-X-Forwarded-Encrypted: i=1; AJvYcCUplOCRVzx3Ox4l9fVcd1seVJUf+3hai8I4/j1nUjD84SyaEDowWx3YzSLwCA7bJokeTirmV9pQ@vger.kernel.org, AJvYcCXJ/BRQRW1TGDXl1XA7ExeO56ZIwnLv8ceR25pxUmjwUKPP+tQIuGnleGMOIB1zHl+yMYljeetQtRYcPHo=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyWKR1MNbAvlD+54x/8ymoeef/FgALKylLpXyG1WOxk+LkQyVeA
-	jXnaFcZeACAPUKs4ysZ64klE3HuMbuBLg42VUjTuREuFtHZsrRrU8HescA==
-X-Gm-Gg: ASbGncv+S1Aq4YC2dzbmTyPDaUcVGLdQXJMAa6ldxeG0neRYYiscSZ9qhnbiqcX70U2
-	xswze4J3gDju15INhe/W8yjznoS7z6TmcWKj5DYBjEQQBNsdDWoQylz3x84HhJnTJ/SFn/yzxnF
-	a5I5owx1SX3WKmpWP5KR74YNfmui+mh8s1Ph48VXBEQ7kMeYEHJu4n+nAIrY796ccjAVshtxw+l
-	Lh2blXf5x3xroTdmkkH/R5CjjnXKan/SEKTXNX1tuKTJSRtUAfNKRuXkVIQ20Lho6vZxEU0W/yN
-	g0OU1hiVUdhoNG0S5R3/00+otIuG/lQAtth2bw==
-X-Google-Smtp-Source: AGHT+IHF03Z1w5BISujPuhazjh6mZg2XUPcFhMysp+KcXv0RlqAPgtsxXI68XwaULsfJq1lzsS5vUg==
-X-Received: by 2002:a05:620a:2728:b0:7b6:d5b2:e58 with SMTP id af79cd13be357-7c0097ae5ccmr974617985a.18.1738287515767;
-        Thu, 30 Jan 2025 17:38:35 -0800 (PST)
-Received: from newman.cs.purdue.edu ([128.10.127.250])
-        by smtp.gmail.com with ESMTPSA id af79cd13be357-7c00a90ef7esm135314485a.110.2025.01.30.17.38.34
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 30 Jan 2025 17:38:35 -0800 (PST)
-From: Jiasheng Jiang <jiashengjiangcool@gmail.com>
-To: anthony.l.nguyen@intel.com,
-	przemyslaw.kitszel@intel.com,
-	andrew+netdev@lunn.ch,
-	davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	michal.swiatkowski@linux.intel.com,
-	horms@kernel.org,
-	wojciech.drewek@intel.com,
-	piotr.raczynski@intel.com,
-	mateusz.polchlopek@intel.com,
-	pawel.kaminski@intel.com,
-	michal.wilczynski@intel.com
-Cc: intel-wired-lan@lists.osuosl.org,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	Jiasheng Jiang <jiashengjiangcool@gmail.com>
-Subject: [PATCH] ice: Add check for devm_kzalloc()
-Date: Fri, 31 Jan 2025 01:38:32 +0000
-Message-Id: <20250131013832.24805-1-jiashengjiangcool@gmail.com>
-X-Mailer: git-send-email 2.25.1
+	s=arc-20240116; t=1738288798; c=relaxed/simple;
+	bh=nZP8+UgRDh02YWo+NQ+Z4kLeb849AbaMK8ntcRyMdi8=;
+	h=Subject:From:In-Reply-To:References:Message-Id:Date:To:Cc; b=iVedbnR9QrjszGhfIct3nlUs0fEyssEFVg9k85IYCxomUh6MfjA+SrPnlswqyMh/+7Up9iUn+IMKtFgHPy8DY6fv0ZXhxJucHWsv57j9x2iKRBPrOlHNDvqA4yFyDJ+iBZr9Jqvoi+uHP+O0MEHsht9TxWeMzdkGSdzkFKA8a6w=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Vdhkxc8q; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 98097C4CEE0;
+	Fri, 31 Jan 2025 01:59:58 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1738288798;
+	bh=nZP8+UgRDh02YWo+NQ+Z4kLeb849AbaMK8ntcRyMdi8=;
+	h=Subject:From:In-Reply-To:References:Date:To:Cc:From;
+	b=Vdhkxc8q6fsC18U+y4PFovvm4Wh6nXEnDkA40bf79EFzdu1t4JhOgS1HDB0iuE+ck
+	 ZZoIXwW183Po/Ge/7mfUBEmrMuw2lUUgN/aObX+56iV4gqEa328yFBxuk2Lz8GuB9m
+	 LkUoTG44hjA5AlWktjiDRYlUgtd2mM2uRfsA2LSNJ/CatnfRXFIG29qARj46OXPMLG
+	 YBKcKC2UvcdX9a5mf27aN3NPACS5wbgHEsdkd/Oka9NGgLmpXf5GnsZnWBYwqwb7Qd
+	 MgbdWSXeUNFdBlbiYziBzJsYNG+QRBD1abFqgH3vMChaalCXMPaCzk7pqNQTzF24Hp
+	 FyKCUqnEQOazQ==
+Received: from [10.30.226.235] (localhost [IPv6:::1])
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 340A0380AA66;
+	Fri, 31 Jan 2025 02:00:26 +0000 (UTC)
+Subject: Re: [GIT PULL] Networking for v6.14-rc1
+From: pr-tracker-bot@kernel.org
+In-Reply-To: <20250130190806.3217841-1-kuba@kernel.org>
+References: <20250130190806.3217841-1-kuba@kernel.org>
+X-PR-Tracked-List-Id: <netdev.vger.kernel.org>
+X-PR-Tracked-Message-Id: <20250130190806.3217841-1-kuba@kernel.org>
+X-PR-Tracked-Remote: git://git.kernel.org/pub/scm/linux/kernel/git/netdev/net.git tags/net-6.14-rc1
+X-PR-Tracked-Commit-Id: dfffaccffc53642b532c9942ade3535f25a8a8fb
+X-PR-Merge-Tree: torvalds/linux.git
+X-PR-Merge-Refname: refs/heads/master
+X-PR-Merge-Commit-Id: c2933b2befe25309f4c5cfbea0ca80909735fd76
+Message-Id: <173828882487.1145982.2538240306108037907.pr-tracker-bot@kernel.org>
+Date: Fri, 31 Jan 2025 02:00:24 +0000
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: torvalds@linux-foundation.org, kuba@kernel.org, davem@davemloft.net, netdev@vger.kernel.org, linux-kernel@vger.kernel.org, pabeni@redhat.com
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
 
-Add check for the return value of devm_kzalloc() to guarantee the success
-of allocation.
+The pull request you sent on Thu, 30 Jan 2025 11:08:06 -0800:
 
-Fixes: 42c2eb6b1f43 ("ice: Implement devlink-rate API")
-Signed-off-by: Jiasheng Jiang <jiashengjiangcool@gmail.com>
----
- drivers/net/ethernet/intel/ice/devlink/devlink.c | 3 +++
- 1 file changed, 3 insertions(+)
+> git://git.kernel.org/pub/scm/linux/kernel/git/netdev/net.git tags/net-6.14-rc1
 
-diff --git a/drivers/net/ethernet/intel/ice/devlink/devlink.c b/drivers/net/ethernet/intel/ice/devlink/devlink.c
-index d116e2b10bce..dbdb83567364 100644
---- a/drivers/net/ethernet/intel/ice/devlink/devlink.c
-+++ b/drivers/net/ethernet/intel/ice/devlink/devlink.c
-@@ -981,6 +981,9 @@ static int ice_devlink_rate_node_new(struct devlink_rate *rate_node, void **priv
- 
- 	/* preallocate memory for ice_sched_node */
- 	node = devm_kzalloc(ice_hw_to_dev(pi->hw), sizeof(*node), GFP_KERNEL);
-+	if (!node)
-+		return -ENOMEM;
-+
- 	*priv = node;
- 
- 	return 0;
+has been merged into torvalds/linux.git:
+https://git.kernel.org/torvalds/c/c2933b2befe25309f4c5cfbea0ca80909735fd76
+
+Thank you!
+
 -- 
-2.25.1
-
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/prtracker.html
 
