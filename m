@@ -1,73 +1,73 @@
-Return-Path: <netdev+bounces-161825-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-161826-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 811BAA24325
-	for <lists+netdev@lfdr.de>; Fri, 31 Jan 2025 20:13:23 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8549FA24327
+	for <lists+netdev@lfdr.de>; Fri, 31 Jan 2025 20:15:24 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 613913A7CE1
-	for <lists+netdev@lfdr.de>; Fri, 31 Jan 2025 19:13:15 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 2D0E21884CE3
+	for <lists+netdev@lfdr.de>; Fri, 31 Jan 2025 19:15:29 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C5E4A1F0E53;
-	Fri, 31 Jan 2025 19:13:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0C5B02AD11;
+	Fri, 31 Jan 2025 19:15:21 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b="RCHAM0iP"
+	dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b="puvpr6NB"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp-fw-2101.amazon.com (smtp-fw-2101.amazon.com [72.21.196.25])
+Received: from smtp-fw-80009.amazon.com (smtp-fw-80009.amazon.com [99.78.197.220])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1926754782
-	for <netdev@vger.kernel.org>; Fri, 31 Jan 2025 19:13:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=72.21.196.25
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 969DF28373
+	for <netdev@vger.kernel.org>; Fri, 31 Jan 2025 19:15:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=99.78.197.220
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1738350799; cv=none; b=dkhC2y/7n6bqwQ+TUsNqm3pg7OJgGfGz67PD0wQ1aus51dYwVs3HkjPDouUCJDO/BkVg5KwKa6+3fKa9W8KDywIe2eamA+Fty2oGE2kOms4OWhEU5MtLb98DCYZCwtQJCrog0h7cezoUYC5lIC5EJSoIatedr9KA/7nN4bjsIJY=
+	t=1738350920; cv=none; b=iAdftXEcNTW2K9xzMjtoSYz857DOVWcY36k9Crn6/jop30LBZjQRiTRO9gBzZtUQwdkjcp0PvEYplEZQvyPB/TLkq2CQ18Quq4ZTwrLYcNa3cZ63b64BG/N+GmX7VFMDrKXn6RndmTHvbiCyVYtCPwkQtkQQ8r+zv+2ySX3uDAw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1738350799; c=relaxed/simple;
-	bh=I0tolol4rlLVhredn2HC0nbzGKmvvkNAAW0GT5D/cHw=;
+	s=arc-20240116; t=1738350920; c=relaxed/simple;
+	bh=Tv8cwqz2tLtYAkXW+zQRa0oupw5jGleg67ZHANm70Ks=;
 	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=VeiVr1GcLNluwtmJsTKTWtngBHB4gK7ZTjXxyicVhvOxqic2qdNq8hV1KQgJU6l/w6Qt6PV9vCAOMfNiE124AMNGh5BxZkI0IJp9VLhrKkMgYvm8k491/iDIQk8UWNGlMclhSbPPdZwVIyFWkAEAe/YMcT+oVBv/614V9vSeSrQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.co.jp; dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b=RCHAM0iP; arc=none smtp.client-ip=72.21.196.25
+	 MIME-Version:Content-Type; b=hphuVXklByJNXZXy8O1psFd62EhnEmC7mc9MaMlFwVHWzhRP59SyuGAInE+8FlQJsPyhjHyG6H1EWUvO21Q5xUa7ZSN/JOWCw7bMXYghx8pwzCM2cwdCXR8o1dH1vv1V+qBkWUxXBkIhcSMfcTFeoM2N0w506cASvbp2T7kGT5A=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.co.jp; dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b=puvpr6NB; arc=none smtp.client-ip=99.78.197.220
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.co.jp
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
   d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
-  t=1738350798; x=1769886798;
+  t=1738350919; x=1769886919;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=bl8FACOOM8SeBTTl/xLU2Mik/vHmFhJl4mir/2AjR1E=;
-  b=RCHAM0iPlQnIYahxImxKplX2wuk47OWxcZ9r212gdIKXnx+iFzGgugyo
-   xzGcqnJqC4iIR7wTRifuTXjVU3gl7YIDUvSReUE6BhcX1HOo41d1pyObu
-   7+ws1VEuOzzBtKh46RrzUazXwru75KpD6gPTeZwawE1E29QDxBn3LpZhl
-   g=;
+  bh=G57pApv28Pn00yFQdeEH1YmIzDH0gcNNI0yMSrMlVXw=;
+  b=puvpr6NB9bB+TgC9SiZplQ+HJfuW6RZc2aDx7Fra3kjI6B5fLUSRxOUD
+   02B/i/51ze/oh8N7c32fnLBfoI1lwEobqw+djs1yVRuBP+xW90GE6CpUV
+   MOXVxwp9qEMq5KkCBJJ2CzQYaATX+/EL1RP2qCQRA1WCsMCVYHxEUIV0Z
+   Y=;
 X-IronPort-AV: E=Sophos;i="6.13,249,1732579200"; 
-   d="scan'208";a="463137778"
-Received: from iad12-co-svc-p1-lb1-vlan3.amazon.com (HELO smtpout.prod.us-west-2.prod.farcaster.email.amazon.dev) ([10.43.8.6])
-  by smtp-border-fw-2101.iad2.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 31 Jan 2025 19:13:15 +0000
-Received: from EX19MTAUWC002.ant.amazon.com [10.0.7.35:2520]
+   d="scan'208";a="168628082"
+Received: from pdx4-co-svc-p1-lb2-vlan2.amazon.com (HELO smtpout.prod.us-west-2.prod.farcaster.email.amazon.dev) ([10.25.36.210])
+  by smtp-border-fw-80009.pdx80.corp.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 31 Jan 2025 19:15:17 +0000
+Received: from EX19MTAUWA001.ant.amazon.com [10.0.21.151:20748]
  by smtpin.naws.us-west-2.prod.farcaster.email.amazon.dev [10.0.42.242:2525] with esmtp (Farcaster)
- id 01129028-0f85-4993-8569-e9e5f4e7ee9e; Fri, 31 Jan 2025 19:13:13 +0000 (UTC)
-X-Farcaster-Flow-ID: 01129028-0f85-4993-8569-e9e5f4e7ee9e
+ id 1495dc65-1b96-4ebc-97af-960d1449cacd; Fri, 31 Jan 2025 19:15:17 +0000 (UTC)
+X-Farcaster-Flow-ID: 1495dc65-1b96-4ebc-97af-960d1449cacd
 Received: from EX19D004ANA001.ant.amazon.com (10.37.240.138) by
- EX19MTAUWC002.ant.amazon.com (10.250.64.143) with Microsoft SMTP Server
+ EX19MTAUWA001.ant.amazon.com (10.250.64.204) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1258.39;
- Fri, 31 Jan 2025 19:13:02 +0000
+ Fri, 31 Jan 2025 19:15:14 +0000
 Received: from 6c7e67bfbae3.amazon.com (10.106.101.33) by
  EX19D004ANA001.ant.amazon.com (10.37.240.138) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1258.39;
- Fri, 31 Jan 2025 19:13:00 +0000
+ Fri, 31 Jan 2025 19:15:11 +0000
 From: Kuniyuki Iwashima <kuniyu@amazon.com>
 To: <edumazet@google.com>
 CC: <davem@davemloft.net>, <eric.dumazet@gmail.com>, <horms@kernel.org>,
 	<kuba@kernel.org>, <kuniyu@amazon.com>, <netdev@vger.kernel.org>,
 	<pabeni@redhat.com>
-Subject: Re: [PATCH net 09/16] ipv4: icmp: convert to dev_net_rcu()
-Date: Fri, 31 Jan 2025 11:12:50 -0800
-Message-ID: <20250131191250.95445-1-kuniyu@amazon.com>
+Subject: Re: [PATCH net 10/16] ipv6: icmp: convert to dev_net_rcu()
+Date: Fri, 31 Jan 2025 11:15:02 -0800
+Message-ID: <20250131191502.95709-1-kuniyu@amazon.com>
 X-Mailer: git-send-email 2.39.5 (Apple Git-154)
-In-Reply-To: <20250131171334.1172661-10-edumazet@google.com>
-References: <20250131171334.1172661-10-edumazet@google.com>
+In-Reply-To: <20250131171334.1172661-11-edumazet@google.com>
+References: <20250131171334.1172661-11-edumazet@google.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -76,11 +76,11 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 Content-Type: text/plain
-X-ClientProxiedBy: EX19D031UWC004.ant.amazon.com (10.13.139.246) To
+X-ClientProxiedBy: EX19D037UWC003.ant.amazon.com (10.13.139.231) To
  EX19D004ANA001.ant.amazon.com (10.37.240.138)
 
 From: Eric Dumazet <edumazet@google.com>
-Date: Fri, 31 Jan 2025 17:13:27 +0000
+Date: Fri, 31 Jan 2025 17:13:28 +0000
 > ICMP uses of dev_net() are safe, change them to dev_net_rcu()
 > to get LOCKDEP support.
 > 
