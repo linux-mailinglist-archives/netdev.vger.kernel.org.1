@@ -1,69 +1,69 @@
-Return-Path: <netdev+bounces-161799-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-161800-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 58640A241AB
-	for <lists+netdev@lfdr.de>; Fri, 31 Jan 2025 18:14:40 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id DAF5FA241AA
+	for <lists+netdev@lfdr.de>; Fri, 31 Jan 2025 18:14:28 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 9F7F31884E0A
-	for <lists+netdev@lfdr.de>; Fri, 31 Jan 2025 17:14:24 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id A6F867A39D4
+	for <lists+netdev@lfdr.de>; Fri, 31 Jan 2025 17:13:32 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4B74B1F1533;
-	Fri, 31 Jan 2025 17:13:52 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7B89E1EEA44;
+	Fri, 31 Jan 2025 17:13:53 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="fg/pTk7C"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="hX1xVv4m"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qk1-f201.google.com (mail-qk1-f201.google.com [209.85.222.201])
+Received: from mail-qv1-f73.google.com (mail-qv1-f73.google.com [209.85.219.73])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 84E071F03DB
-	for <netdev@vger.kernel.org>; Fri, 31 Jan 2025 17:13:50 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C3EC71F151E
+	for <netdev@vger.kernel.org>; Fri, 31 Jan 2025 17:13:51 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.73
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1738343632; cv=none; b=oq2+0CPzYbCV7nvf2stvQEIDhUEIG5r7Aiy1Z2J+03h5z+GXgZ9RApJQfb3xGZJNJH7rcfRDVP9Zsug0X6LDaCHsY1wnhZ1vpqTN0XfUDm5WNYw4YVJF29TXOTFz6DvcVdXrSWaF4VplpGaf9Tit1g6txr1S905uynegWN9PLv8=
+	t=1738343633; cv=none; b=qfgX4L/efCEidb4K5RCfsrwoipOLWZpDzBHDHXgoSrlKsTAxa0f9qNS1cVR8+tjzG4O68ALqfz8BV5v1Sf7exzG/mV7ukKd1faCeAvjFmx7HIX+L0JB2zrJ5bPWcZRhCpC8RFal8uw1WyR20ShoG+aWaXArHy2hXz7KqnSLDUqI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1738343632; c=relaxed/simple;
-	bh=Su71tS1t839pW0Qia6o4NdX50LNBz+q3aZFDeHWJyAk=;
+	s=arc-20240116; t=1738343633; c=relaxed/simple;
+	bh=IbL4pV519P+5BtuvaDgCVnklrPjC6i4lvL22nMn+tC8=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=WJsbLSabG54PFK4FWV7d83kVA6gHV4SlPwKRr38coFbzWjqHt3QrKoUe3qvRn8/Lx3NWdigwFq14hC++JZD0Y/2TSudSgUBPfxU6N0yDXSypdiqICEmUBu1PkuHP58cIGAWc8OJUSQmX62bgQSbLO8bhuJh/3iHN+Y2FvpcYRPQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=fg/pTk7C; arc=none smtp.client-ip=209.85.222.201
+	 To:Cc:Content-Type; b=QPo4MDawg/Cg0PAnfxP7kxhlHuSnjuby1/U+Xt5XGGM9hkcIx8DXsE4ZS6yNUFbBKVZBgZrLdc0MprV+fC/5yzS4UGLdJRBsji5atVQBgZy+xTbFBji2//QKxiYP4Pk24LKX7kbe45BXFSerVweYSdwJMgCxaKuA1uWgPbWaYbk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=hX1xVv4m; arc=none smtp.client-ip=209.85.219.73
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com
-Received: by mail-qk1-f201.google.com with SMTP id af79cd13be357-7b6e6cf6742so579279885a.3
-        for <netdev@vger.kernel.org>; Fri, 31 Jan 2025 09:13:50 -0800 (PST)
+Received: by mail-qv1-f73.google.com with SMTP id 6a1803df08f44-6d8f4a0df93so56555396d6.1
+        for <netdev@vger.kernel.org>; Fri, 31 Jan 2025 09:13:51 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1738343629; x=1738948429; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1738343630; x=1738948430; darn=vger.kernel.org;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=vZJPGFPK8A4N2BlEnxm50TTESOqK4C81A5N3OIT+bEs=;
-        b=fg/pTk7C85uyYjIk+qnpjoIb2j/Cg4xJIdFBWDtNgns5ey/ad6uocDjpDubmpxDLx9
-         spu/rP8c3fHo/BW4MNZsU0bKBh9fZpyc9I7sUIuL3n7m1WGlVpTFvjD62TYEOA9MQCyY
-         c6ybwbpYewVqmis2bhwb0PYLSqx1A6dlSVfXFgH8dcCTf58Hw2n/HxpDWJ5XryLSqOQX
-         0VuVaXg0gD7DbniJuPTTRhsn6JzIBvZ/kZy2/tNQ0rzgLyI4OdiCeuRjOtMANhcupOfs
-         7gVnOnz3jJZwgsPmw0JLbCwheGdwOZIP73jj49PGMuNQcfTGbQNQe8Bmz2O/ICBUvsW9
-         UfEw==
+        bh=xr0k9J8ircXguZd/XTDGs++ZqClk/BqaFLz/vlFnqfg=;
+        b=hX1xVv4mSSdp1ER5ajVqj16InywsZxJyF/Da/9UrkUS9DJ5gFCg24+vfW5AzJrRQnq
+         2u+f9kCRvPYZJgwFL9uqzelRuOsVeXZhgX7Sr6FrzcjYA9xQngw98snwBkfPv999E4wQ
+         kELkNcVHXXU9m0xHwve+iicQ8nCBmPvnfMBuxwEjQroJG2pnLuNMXUm90I4fvb6mhkbd
+         k2FY65GM+nAn8HkTKRvdhE9y1Z0mizAmEOg8CabAYVmAFkK8N4vL6cSO+47slxn5SX0H
+         MuBffHTezmuTvtI4ifAWgZBQaM+AXF63kdSNNH+usOfCF3sMs9WGZQ/ZXYsCBbj8F0Io
+         OS2w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1738343629; x=1738948429;
+        d=1e100.net; s=20230601; t=1738343630; x=1738948430;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=vZJPGFPK8A4N2BlEnxm50TTESOqK4C81A5N3OIT+bEs=;
-        b=ma3iNeSQLvGdlkhMN8c2RurC3FJm7w6OBQZhDZiIIQU5op9OwDX32817Pl+ZDU2emC
-         G50Nf7BxRxNIvnxhhqTS/AR7s7sofLNZQcvYdS5EXXi+8Q5bUbOWted/pEpdGNOcwu54
-         VE/IReorEzziQt94ds4fTGPpkqW9dpqfZ+5CsPGWxAOL4T/VPW9LTu0OG6UDJwwl/Cv3
-         edDNfWCx97zFl12Bj0fpx3SMYicuLc9fOtqUj9tbPz5504mrB11I8sGo56F3PmGKSu+L
-         f/2XuIlw6cz4lCadNwzEuZYL+OXhsDam4xOZmUKuzVtVUFfHCSVDrneEGh1lb+WWvUKp
-         Yo6Q==
-X-Gm-Message-State: AOJu0Yzp0FWOFjM15kX76DTTUmhoXRuN2nboEmqr3v49oAewLYoPqp6e
-	kbe49O2FwxnwYu/1qCWnha9ZqkHYMAlFd6+maX1r6nwAC6LcdFe1vzK/tJcNItF7R62LXTiGjeI
-	o3bXRYTVJ6g==
-X-Google-Smtp-Source: AGHT+IExuckDKdMUBWqVytUXNSvFnpKdz64zrs202tVn+3vn8+BO4WwzTr8y86XnzJbKiWqbWiL2kMpoXubtPQ==
-X-Received: from qkpc11.prod.google.com ([2002:a05:620a:268b:b0:7b6:ee83:e490])
+        bh=xr0k9J8ircXguZd/XTDGs++ZqClk/BqaFLz/vlFnqfg=;
+        b=TzcTXpZ/BEL8h77tfdx+ILmHwXoWzFEyD8k6Q1QlsX/7hKZHJT92JRz84QkXkUpZBl
+         k2zJH4aMEsA80lpYTJ3u2AUXKA3LKYDFhO2HyGRxIvlkXaoHi1hiZX0GdJlqK0e2pLfH
+         aPxD9MaunRuZ+31S3pHCHMRzm2tpTA5VU0sBGIplAsZSt9IvYT6wPnw33H+TgrY8e/au
+         1q8dOw7ewTXRWG0IZGfrUtFu9GfdODtXPz1F3ny4H0l6txw8YloV4nH2fjSQB31XE5Jw
+         pw/6hH2tbIZHcDtqQvTx7gmwmTcPVc3QvQwyMadQ+OgVxXkr1JK+GA9DJhNCHOLDgC/D
+         9lNg==
+X-Gm-Message-State: AOJu0Yxl+uFCRiIbf+msXpA8p6V6EDYWUa7sqHZ2aeb4xHoh2C5DH/1Y
+	Qzjnvm3moIvz0Yo2J+XESNQFEcc6742Afvn9RNByC69XnpY/GVfXPtnUSREZF0WGzlQmkfiR4al
+	qiuTDjHdhMw==
+X-Google-Smtp-Source: AGHT+IFo4yaUW3CRbIvGujWFiYDSG7KvZyK/QIHEyAUuvFaykuss0Ka6B4gutbkEKHS0P+ra2hiqHy536ZrQ9g==
+X-Received: from qvbmc10.prod.google.com ([2002:a05:6214:554a:b0:6e1:a069:1177])
  (user=edumazet job=prod-delivery.src-stubby-dispatcher) by
- 2002:a05:620a:1727:b0:7b6:c90e:e227 with SMTP id af79cd13be357-7bffccdfa77mr1645000185a.20.1738343629496;
- Fri, 31 Jan 2025 09:13:49 -0800 (PST)
-Date: Fri, 31 Jan 2025 17:13:26 +0000
+ 2002:a05:6214:238f:b0:6dd:c594:27a2 with SMTP id 6a1803df08f44-6e243c07fc9mr200676046d6.27.1738343630669;
+ Fri, 31 Jan 2025 09:13:50 -0800 (PST)
+Date: Fri, 31 Jan 2025 17:13:27 +0000
 In-Reply-To: <20250131171334.1172661-1-edumazet@google.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -73,8 +73,8 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
 References: <20250131171334.1172661-1-edumazet@google.com>
 X-Mailer: git-send-email 2.48.1.362.g079036d154-goog
-Message-ID: <20250131171334.1172661-9-edumazet@google.com>
-Subject: [PATCH net 08/16] udp: convert to dev_net_rcu()
+Message-ID: <20250131171334.1172661-10-edumazet@google.com>
+Subject: [PATCH net 09/16] ipv4: icmp: convert to dev_net_rcu()
 From: Eric Dumazet <edumazet@google.com>
 To: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
 	Paolo Abeni <pabeni@redhat.com>
@@ -83,190 +83,115 @@ Cc: netdev@vger.kernel.org, Kuniyuki Iwashima <kuniyu@amazon.com>,
 	Eric Dumazet <edumazet@google.com>
 Content-Type: text/plain; charset="UTF-8"
 
-TCP uses of dev_net() are safe, change them to dev_net_rcu()
+ICMP uses of dev_net() are safe, change them to dev_net_rcu()
 to get LOCKDEP support.
 
 Signed-off-by: Eric Dumazet <edumazet@google.com>
 ---
- net/ipv4/udp.c | 19 ++++++++++---------
- net/ipv6/udp.c | 18 +++++++++---------
- 2 files changed, 19 insertions(+), 18 deletions(-)
+ net/ipv4/icmp.c | 22 +++++++++++-----------
+ 1 file changed, 11 insertions(+), 11 deletions(-)
 
-diff --git a/net/ipv4/udp.c b/net/ipv4/udp.c
-index c472c9a57cf68880a277603b4a771152c6f79ff6..54912b31f57ce340dbaffc3e80719140f4e85ecd 100644
---- a/net/ipv4/udp.c
-+++ b/net/ipv4/udp.c
-@@ -750,7 +750,7 @@ static inline struct sock *__udp4_lib_lookup_skb(struct sk_buff *skb,
+diff --git a/net/ipv4/icmp.c b/net/ipv4/icmp.c
+index 094084b61bff8a17c4e85c99019b84e9cba21599..19bf8edd6759872fe667af82790b77b01212271b 100644
+--- a/net/ipv4/icmp.c
++++ b/net/ipv4/icmp.c
+@@ -401,7 +401,7 @@ static void icmp_reply(struct icmp_bxm *icmp_param, struct sk_buff *skb)
  {
- 	const struct iphdr *iph = ip_hdr(skb);
- 
--	return __udp4_lib_lookup(dev_net(skb->dev), iph->saddr, sport,
-+	return __udp4_lib_lookup(dev_net_rcu(skb->dev), iph->saddr, sport,
- 				 iph->daddr, dport, inet_iif(skb),
- 				 inet_sdif(skb), udptable, skb);
- }
-@@ -760,7 +760,7 @@ struct sock *udp4_lib_lookup_skb(const struct sk_buff *skb,
- {
- 	const u16 offset = NAPI_GRO_CB(skb)->network_offsets[skb->encapsulation];
- 	const struct iphdr *iph = (struct iphdr *)(skb->data + offset);
--	struct net *net = dev_net(skb->dev);
-+	struct net *net = dev_net_rcu(skb->dev);
- 	int iif, sdif;
- 
- 	inet_get_iif_sdif(skb, &iif, &sdif);
-@@ -934,13 +934,13 @@ int __udp4_lib_err(struct sk_buff *skb, u32 info, struct udp_table *udptable)
- 	struct inet_sock *inet;
- 	const struct iphdr *iph = (const struct iphdr *)skb->data;
- 	struct udphdr *uh = (struct udphdr *)(skb->data+(iph->ihl<<2));
-+	struct net *net = dev_net_rcu(skb->dev);
- 	const int type = icmp_hdr(skb)->type;
- 	const int code = icmp_hdr(skb)->code;
- 	bool tunnel = false;
+ 	struct ipcm_cookie ipc;
+ 	struct rtable *rt = skb_rtable(skb);
+-	struct net *net = dev_net(rt->dst.dev);
++	struct net *net = dev_net_rcu(rt->dst.dev);
+ 	bool apply_ratelimit = false;
+ 	struct flowi4 fl4;
  	struct sock *sk;
- 	int harderr;
- 	int err;
--	struct net *net = dev_net(skb->dev);
+@@ -611,9 +611,9 @@ void __icmp_send(struct sk_buff *skb_in, int type, int code, __be32 info,
+ 		goto out;
  
- 	sk = __udp4_lib_lookup(net, iph->daddr, uh->dest,
- 			       iph->saddr, uh->source, skb->dev->ifindex,
-@@ -1025,7 +1025,7 @@ int __udp4_lib_err(struct sk_buff *skb, u32 info, struct udp_table *udptable)
+ 	if (rt->dst.dev)
+-		net = dev_net(rt->dst.dev);
++		net = dev_net_rcu(rt->dst.dev);
+ 	else if (skb_in->dev)
+-		net = dev_net(skb_in->dev);
++		net = dev_net_rcu(skb_in->dev);
+ 	else
+ 		goto out;
  
- int udp_err(struct sk_buff *skb, u32 info)
- {
--	return __udp4_lib_err(skb, info, dev_net(skb->dev)->ipv4.udp_table);
-+	return __udp4_lib_err(skb, info, dev_net_rcu(skb->dev)->ipv4.udp_table);
- }
- 
- /*
-@@ -2466,7 +2466,7 @@ static int udp_queue_rcv_skb(struct sock *sk, struct sk_buff *skb)
- 		udp_post_segment_fix_csum(skb);
- 		ret = udp_queue_rcv_one_skb(sk, skb);
- 		if (ret > 0)
--			ip_protocol_deliver_rcu(dev_net(skb->dev), skb, ret);
-+			ip_protocol_deliver_rcu(dev_net_rcu(skb->dev), skb, ret);
+@@ -834,7 +834,7 @@ static void icmp_socket_deliver(struct sk_buff *skb, u32 info)
+ 	 * avoid additional coding at protocol handlers.
+ 	 */
+ 	if (!pskb_may_pull(skb, iph->ihl * 4 + 8)) {
+-		__ICMP_INC_STATS(dev_net(skb->dev), ICMP_MIB_INERRORS);
++		__ICMP_INC_STATS(dev_net_rcu(skb->dev), ICMP_MIB_INERRORS);
+ 		return;
  	}
- 	return 0;
- }
-@@ -2632,12 +2632,12 @@ static int udp_unicast_rcv_skb(struct sock *sk, struct sk_buff *skb,
- int __udp4_lib_rcv(struct sk_buff *skb, struct udp_table *udptable,
- 		   int proto)
+ 
+@@ -868,7 +868,7 @@ static enum skb_drop_reason icmp_unreach(struct sk_buff *skb)
+ 	struct net *net;
+ 	u32 info = 0;
+ 
+-	net = dev_net(skb_dst(skb)->dev);
++	net = dev_net_rcu(skb_dst(skb)->dev);
+ 
+ 	/*
+ 	 *	Incomplete header ?
+@@ -979,7 +979,7 @@ static enum skb_drop_reason icmp_unreach(struct sk_buff *skb)
+ static enum skb_drop_reason icmp_redirect(struct sk_buff *skb)
  {
-+	struct net *net = dev_net_rcu(skb->dev);
-+	struct rtable *rt = skb_rtable(skb);
- 	struct sock *sk = NULL;
- 	struct udphdr *uh;
- 	unsigned short ulen;
--	struct rtable *rt = skb_rtable(skb);
- 	__be32 saddr, daddr;
--	struct net *net = dev_net(skb->dev);
- 	bool refcounted;
- 	int drop_reason;
- 
-@@ -2804,7 +2804,7 @@ static struct sock *__udp4_lib_demux_lookup(struct net *net,
- 
- int udp_v4_early_demux(struct sk_buff *skb)
- {
--	struct net *net = dev_net(skb->dev);
-+	struct net *net = dev_net_rcu(skb->dev);
- 	struct in_device *in_dev = NULL;
- 	const struct iphdr *iph;
- 	const struct udphdr *uh;
-@@ -2873,7 +2873,8 @@ int udp_v4_early_demux(struct sk_buff *skb)
- 
- int udp_rcv(struct sk_buff *skb)
- {
--	return __udp4_lib_rcv(skb, dev_net(skb->dev)->ipv4.udp_table, IPPROTO_UDP);
-+	return __udp4_lib_rcv(skb, dev_net_rcu(skb->dev)->ipv4.udp_table,
-+			      IPPROTO_UDP);
- }
- 
- void udp_destroy_sock(struct sock *sk)
-diff --git a/net/ipv6/udp.c b/net/ipv6/udp.c
-index 6671daa67f4fab28f847bd4d8475ef752a63f05d..1972a0f9c9c39c8b311d536a60fa7d6e79f74c29 100644
---- a/net/ipv6/udp.c
-+++ b/net/ipv6/udp.c
-@@ -410,7 +410,7 @@ static struct sock *__udp6_lib_lookup_skb(struct sk_buff *skb,
- {
- 	const struct ipv6hdr *iph = ipv6_hdr(skb);
- 
--	return __udp6_lib_lookup(dev_net(skb->dev), &iph->saddr, sport,
-+	return __udp6_lib_lookup(dev_net_rcu(skb->dev), &iph->saddr, sport,
- 				 &iph->daddr, dport, inet6_iif(skb),
- 				 inet6_sdif(skb), udptable, skb);
- }
-@@ -420,7 +420,7 @@ struct sock *udp6_lib_lookup_skb(const struct sk_buff *skb,
- {
- 	const u16 offset = NAPI_GRO_CB(skb)->network_offsets[skb->encapsulation];
- 	const struct ipv6hdr *iph = (struct ipv6hdr *)(skb->data + offset);
--	struct net *net = dev_net(skb->dev);
-+	struct net *net = dev_net_rcu(skb->dev);
- 	int iif, sdif;
- 
- 	inet6_get_iif_sdif(skb, &iif, &sdif);
-@@ -702,16 +702,16 @@ int __udp6_lib_err(struct sk_buff *skb, struct inet6_skb_parm *opt,
- 		   u8 type, u8 code, int offset, __be32 info,
- 		   struct udp_table *udptable)
- {
--	struct ipv6_pinfo *np;
- 	const struct ipv6hdr *hdr = (const struct ipv6hdr *)skb->data;
- 	const struct in6_addr *saddr = &hdr->saddr;
- 	const struct in6_addr *daddr = seg6_get_daddr(skb, opt) ? : &hdr->daddr;
- 	struct udphdr *uh = (struct udphdr *)(skb->data+offset);
-+	struct net *net = dev_net_rcu(skb->dev);
-+	struct ipv6_pinfo *np;
- 	bool tunnel = false;
- 	struct sock *sk;
- 	int harderr;
- 	int err;
--	struct net *net = dev_net(skb->dev);
- 
- 	sk = __udp6_lib_lookup(net, daddr, uh->dest, saddr, uh->source,
- 			       inet6_iif(skb), inet6_sdif(skb), udptable, NULL);
-@@ -818,7 +818,7 @@ static __inline__ int udpv6_err(struct sk_buff *skb,
- 				u8 code, int offset, __be32 info)
- {
- 	return __udp6_lib_err(skb, opt, type, code, offset, info,
--			      dev_net(skb->dev)->ipv4.udp_table);
-+			      dev_net_rcu(skb->dev)->ipv4.udp_table);
- }
- 
- static int udpv6_queue_rcv_one_skb(struct sock *sk, struct sk_buff *skb)
-@@ -929,7 +929,7 @@ static int udpv6_queue_rcv_skb(struct sock *sk, struct sk_buff *skb)
- 		udp_post_segment_fix_csum(skb);
- 		ret = udpv6_queue_rcv_one_skb(sk, skb);
- 		if (ret > 0)
--			ip6_protocol_deliver_rcu(dev_net(skb->dev), skb, ret,
-+			ip6_protocol_deliver_rcu(dev_net_rcu(skb->dev), skb, ret,
- 						 true);
+ 	if (skb->len < sizeof(struct iphdr)) {
+-		__ICMP_INC_STATS(dev_net(skb->dev), ICMP_MIB_INERRORS);
++		__ICMP_INC_STATS(dev_net_rcu(skb->dev), ICMP_MIB_INERRORS);
+ 		return SKB_DROP_REASON_PKT_TOO_SMALL;
  	}
- 	return 0;
-@@ -1072,7 +1072,7 @@ int __udp6_lib_rcv(struct sk_buff *skb, struct udp_table *udptable,
+ 
+@@ -1011,7 +1011,7 @@ static enum skb_drop_reason icmp_echo(struct sk_buff *skb)
+ 	struct icmp_bxm icmp_param;
+ 	struct net *net;
+ 
+-	net = dev_net(skb_dst(skb)->dev);
++	net = dev_net_rcu(skb_dst(skb)->dev);
+ 	/* should there be an ICMP stat for ignored echos? */
+ 	if (READ_ONCE(net->ipv4.sysctl_icmp_echo_ignore_all))
+ 		return SKB_NOT_DROPPED_YET;
+@@ -1040,9 +1040,9 @@ static enum skb_drop_reason icmp_echo(struct sk_buff *skb)
+ 
+ bool icmp_build_probe(struct sk_buff *skb, struct icmphdr *icmphdr)
+ {
++	struct net *net = dev_net_rcu(skb->dev);
+ 	struct icmp_ext_hdr *ext_hdr, _ext_hdr;
+ 	struct icmp_ext_echo_iio *iio, _iio;
+-	struct net *net = dev_net(skb->dev);
+ 	struct inet6_dev *in6_dev;
+ 	struct in_device *in_dev;
+ 	struct net_device *dev;
+@@ -1181,7 +1181,7 @@ static enum skb_drop_reason icmp_timestamp(struct sk_buff *skb)
+ 	return SKB_NOT_DROPPED_YET;
+ 
+ out_err:
+-	__ICMP_INC_STATS(dev_net(skb_dst(skb)->dev), ICMP_MIB_INERRORS);
++	__ICMP_INC_STATS(dev_net_rcu(skb_dst(skb)->dev), ICMP_MIB_INERRORS);
+ 	return SKB_DROP_REASON_PKT_TOO_SMALL;
+ }
+ 
+@@ -1198,7 +1198,7 @@ int icmp_rcv(struct sk_buff *skb)
  {
  	enum skb_drop_reason reason = SKB_DROP_REASON_NOT_SPECIFIED;
- 	const struct in6_addr *saddr, *daddr;
--	struct net *net = dev_net(skb->dev);
+ 	struct rtable *rt = skb_rtable(skb);
+-	struct net *net = dev_net(rt->dst.dev);
++	struct net *net = dev_net_rcu(rt->dst.dev);
+ 	struct icmphdr *icmph;
+ 
+ 	if (!xfrm4_policy_check(NULL, XFRM_POLICY_IN, skb)) {
+@@ -1371,9 +1371,9 @@ int icmp_err(struct sk_buff *skb, u32 info)
+ 	struct iphdr *iph = (struct iphdr *)skb->data;
+ 	int offset = iph->ihl<<2;
+ 	struct icmphdr *icmph = (struct icmphdr *)(skb->data + offset);
 +	struct net *net = dev_net_rcu(skb->dev);
- 	struct sock *sk = NULL;
- 	struct udphdr *uh;
- 	bool refcounted;
-@@ -1220,7 +1220,7 @@ static struct sock *__udp6_lib_demux_lookup(struct net *net,
- 
- void udp_v6_early_demux(struct sk_buff *skb)
- {
+ 	int type = icmp_hdr(skb)->type;
+ 	int code = icmp_hdr(skb)->code;
 -	struct net *net = dev_net(skb->dev);
-+	struct net *net = dev_net_rcu(skb->dev);
- 	const struct udphdr *uh;
- 	struct sock *sk;
- 	struct dst_entry *dst;
-@@ -1262,7 +1262,7 @@ void udp_v6_early_demux(struct sk_buff *skb)
  
- INDIRECT_CALLABLE_SCOPE int udpv6_rcv(struct sk_buff *skb)
- {
--	return __udp6_lib_rcv(skb, dev_net(skb->dev)->ipv4.udp_table, IPPROTO_UDP);
-+	return __udp6_lib_rcv(skb, dev_net_rcu(skb->dev)->ipv4.udp_table, IPPROTO_UDP);
- }
- 
- /*
+ 	/*
+ 	 * Use ping_err to handle all icmp errors except those
 -- 
 2.48.1.362.g079036d154-goog
 
