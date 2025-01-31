@@ -1,69 +1,69 @@
-Return-Path: <netdev+bounces-161797-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-161798-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id C2F41A241A8
-	for <lists+netdev@lfdr.de>; Fri, 31 Jan 2025 18:14:19 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id F2364A241A9
+	for <lists+netdev@lfdr.de>; Fri, 31 Jan 2025 18:14:20 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 444031673AF
-	for <lists+netdev@lfdr.de>; Fri, 31 Jan 2025 17:14:09 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 896D27A3C83
+	for <lists+netdev@lfdr.de>; Fri, 31 Jan 2025 17:13:23 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E4D721F1316;
-	Fri, 31 Jan 2025 17:13:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 200CC1F150F;
+	Fri, 31 Jan 2025 17:13:51 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="LN1PNxdl"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="mlCUK1CV"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qv1-f74.google.com (mail-qv1-f74.google.com [209.85.219.74])
+Received: from mail-qv1-f73.google.com (mail-qv1-f73.google.com [209.85.219.73])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1706B1F12F3
-	for <netdev@vger.kernel.org>; Fri, 31 Jan 2025 17:13:47 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.74
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 697FF1F1312
+	for <netdev@vger.kernel.org>; Fri, 31 Jan 2025 17:13:49 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.73
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1738343629; cv=none; b=JSDYr2LiJqo4fq/ZWwvClfqNjBs3Fm4RDHbjLUQvBTz7FsK5Xqs2L0ZRiyp9q7tYoBEjX1Jm7iOh2OcLASnFEB32FfQeJeYx408VJ88rQkvzQypESX+FIxrzvlYHPW7XefT9AEk9VZ/iqcAiLQDtyQ1K7UlPiDF6OUID8rabsrk=
+	t=1738343631; cv=none; b=AAgKOIOzPPkzLJGBJo/4sjHgHKeqeJSi5udoKZlQlDAnnZLKiHgp+Fdi/26C1oEHPm3UJzK2LiS9eyqG+t38M2s/uUOdZDkzUUV4UOEawssbLwm2Z1koeNs2nDf6VZpfVgIVVkvt39t7HtXm6g2jFeGKKV+IKK6Np5Cd+mv3BdQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1738343629; c=relaxed/simple;
-	bh=OZ/Ay6YoUvuc1KfSlbjY4MiZa9XwhAgf2i3m5SVB9Sk=;
+	s=arc-20240116; t=1738343631; c=relaxed/simple;
+	bh=NeD1nii3AouYSbwzR3sR6+2Xufdqm1ETrAEZh0HRYRo=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=q5H2hYJElePFQn3QMRLqg1UT5yz3NH5fLyd7BjXmQHOP/2j4sQNoelzL+QUJrJPL3GOR7qszpqfPK9bnYXnai7yL0u3Bt6w5dMNnO3CzwBsQHvQEKrbpAmpEOdJ0lLs3SbAsIubQMZH5yif1zRq3zinaEoNsb2pISjg5oyP2mhY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=LN1PNxdl; arc=none smtp.client-ip=209.85.219.74
+	 To:Cc:Content-Type; b=PXeqWc3wPECLGAYZ8gkvjv2FgLcYrWvQe2SPrOytzI6c4cm0yDh3J3gJ8S2fNFa/Uc429BTeU9P+gW4G+fPfpmuDDeowbmGxosBC/i9R3ItOZxRrw3VCX/yX66jj4xTYzjYbCdhhwlywdC2+XGzETNFpcpHqZgDaIWJWgPwxPg4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=mlCUK1CV; arc=none smtp.client-ip=209.85.219.73
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com
-Received: by mail-qv1-f74.google.com with SMTP id 6a1803df08f44-6dcd1e4a051so40753876d6.2
-        for <netdev@vger.kernel.org>; Fri, 31 Jan 2025 09:13:47 -0800 (PST)
+Received: by mail-qv1-f73.google.com with SMTP id 6a1803df08f44-6d88d56beb7so19558416d6.3
+        for <netdev@vger.kernel.org>; Fri, 31 Jan 2025 09:13:49 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1738343627; x=1738948427; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1738343628; x=1738948428; darn=vger.kernel.org;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=KsxIoFSg/A4nG3Er1JIhxRq9uB0GREU4nT5A4X0Dej0=;
-        b=LN1PNxdlLcrNJAv/hNGyE/pFiAVd4Krsp9RJB4njzSgtUj48uzQAgW5mnq/RmoToSP
-         OGp4BzcXexcSznHweTaDjos14KTp/gUBNr+YFVvHcScZ0TmM9Uuvn+raYnMUrGN9bZ8Y
-         +eVz5byd6MhLdwyq4iaBD6BMsMCuvoBI4fUzXNsP01jb3hOVWfoMuW+6ludE8/KFhrJV
-         L4eqADEs/SWpd40L/BSJUWRpoQFqCUZvFd45zVdvNdvBXtzOsJpv+IKipvd+Zcl7BQG1
-         yC6w/TT5/yshkaddHVa1dE1fLoPDFgsGpXcnKvHFryqIWkAjLRCFwlbBuN8BthSj8OI1
-         Ghww==
+        bh=JT4Ih6F0+FsC+8yFJbyvYs/VpWrxLuqOODLLt/c1GqE=;
+        b=mlCUK1CVv+D7uEyJFpfwXpXpeaCamY8hAcgXhf0VLsopGXhDZ9a5n/BUuIFACTmWgG
+         xJm142bI9rkjg80yTVbG6Q8PzCz7OPOxbvZ+od8Ff0LpRfslL+C6zgfAIPzLMw4pw/Az
+         Y234Zv/ojGfA7wQKYaTYnNG+OmQZ3kVvHtyQx/ACciIfMWaw2bsNKZ1Bylbmk2p/K3tt
+         K5VGxSxaptpbptFbaqHB7FqCKHzdpGdoLuwsfRhdCvqpXd9qyhWY3OOEwWVH/JtDMgqW
+         CcSWmz/w3fyll7Pz9ePEJ1gsIcSiRDY/kTIBa213pS+TXM2Ux7+d9sPLlAg8rloCWpyP
+         dMug==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1738343627; x=1738948427;
+        d=1e100.net; s=20230601; t=1738343628; x=1738948428;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=KsxIoFSg/A4nG3Er1JIhxRq9uB0GREU4nT5A4X0Dej0=;
-        b=FciLPD8k9o8+zQsBC0LAYtz3Wq4Nld25nTzq4pK1HYi61V4fUGm/0CGx0ZEGvghD8y
-         4m8jEMkpXDBpwd5nudd3qBBfVuJYgTDU0C1wLRf+FRWTub+wxFSCNCb5lGOXB4OGGwfS
-         5fozhh0gBdBRtO+ic7xNUIeX/xbIWrANsEEJyfj9vc+VIytWNG189URzIfugUsZHlGCd
-         gVF3WuwGkQEUAS07WmraDn6Hra+NA5h6Qt2hI21cZk4c++gt/bhZet2g396qN1z68ahI
-         m/VWJLd5V4Fs6iWicdy5fVe1WFSfLClE/9TfHFDAzjx0tYPpdaNzdZlyvMWnrSJQgvKB
-         gYhw==
-X-Gm-Message-State: AOJu0YxD2T0zjnMsCPsZVLUBKmbb8iaYt7cqROsp9aEPRKLoTIA9RFYj
-	UKNggn/NafmHvNMvhWWwzAcDZw/SgUyCnLefJgwIi2QzfGsDlQEiNrjRrhGzBexv+YGJd+bx6b4
-	w2K+B3fZRiA==
-X-Google-Smtp-Source: AGHT+IHEbooL7oeATBm/eFII83fIG4vel37CTJtJr57gD0erNcU3rYv2ThGpCGJObKSxjxyfCj72voV7Gyc+4A==
-X-Received: from qvblz3.prod.google.com ([2002:a05:6214:5c43:b0:6e2:4da9:4e34])
+        bh=JT4Ih6F0+FsC+8yFJbyvYs/VpWrxLuqOODLLt/c1GqE=;
+        b=NvYjm93rL9yzPqDUyAroXKF/e6O+yM+GWaupdQHZD5Yep3fvHyxatZ7LHUBkx1KRu9
+         XSoTLkt1xFvnmOE9ItGx6PPVTHrJZWBf563JmSdSlEWVpUSm6UkKlejBPCV0CkD2c8fG
+         jD/LA4pRN4TofNO5QG5RS9aFhczmtQnjKyCH+vdHfcgqG2HrKsa8p3tjUg2nrEHWgEGj
+         /uoz4HJ27CObkpLgh9jGM/NEhV0wL1gLuutqF1mXg7kKhSKZXjlr+fz5AYb2nJpmm9GF
+         aglNIIvJMSmvacYnDQEiQt3xXLJepNXmFoEBc63VD8SkhcXqnJLUalodfwiWmSHhNr4K
+         GdAw==
+X-Gm-Message-State: AOJu0Yz0g/ba7ZfFT3kep/7te4eGkuojnHt/uiBFi9N9KuyGv8TbRfOz
+	rFxhChTUs+ikeZpJ92Qtzt+QzXf3tdjJaAVtbG0PWLfG3fOTXKXUxv1cbgc+rn04a2qUqy3gzTM
+	ga9jyD8G15A==
+X-Google-Smtp-Source: AGHT+IFHNR+Ra4pN76WVIbOaRIkNu2mTY9dFTqs3HMrU96UuZ09XRtla9pI+CJCUKJ9TbvroBgjEa5qSFgRLdw==
+X-Received: from qvbqj17.prod.google.com ([2002:a05:6214:3211:b0:6dd:d513:6126])
  (user=edumazet job=prod-delivery.src-stubby-dispatcher) by
- 2002:a05:6214:62e:b0:6d4:1813:1f20 with SMTP id 6a1803df08f44-6e243befc4cmr193776026d6.8.1738343626974;
- Fri, 31 Jan 2025 09:13:46 -0800 (PST)
-Date: Fri, 31 Jan 2025 17:13:24 +0000
+ 2002:a05:6214:1311:b0:6d8:b2f2:bccf with SMTP id 6a1803df08f44-6e243b910aamr152437286d6.1.1738343628300;
+ Fri, 31 Jan 2025 09:13:48 -0800 (PST)
+Date: Fri, 31 Jan 2025 17:13:25 +0000
 In-Reply-To: <20250131171334.1172661-1-edumazet@google.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -73,8 +73,8 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
 References: <20250131171334.1172661-1-edumazet@google.com>
 X-Mailer: git-send-email 2.48.1.362.g079036d154-goog
-Message-ID: <20250131171334.1172661-7-edumazet@google.com>
-Subject: [PATCH net 06/16] tcp: convert to dev_net_rcu()
+Message-ID: <20250131171334.1172661-8-edumazet@google.com>
+Subject: [PATCH net 07/16] net: gro: convert four dev_net() calls
 From: Eric Dumazet <edumazet@google.com>
 To: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
 	Paolo Abeni <pabeni@redhat.com>
@@ -83,171 +83,72 @@ Cc: netdev@vger.kernel.org, Kuniyuki Iwashima <kuniyu@amazon.com>,
 	Eric Dumazet <edumazet@google.com>
 Content-Type: text/plain; charset="UTF-8"
 
-TCP uses of dev_net() are safe, change them to dev_net_rcu()
-to get LOCKDEP support.
+tcp4_check_fraglist_gro(), tcp6_check_fraglist_gro(),
+udp4_gro_lookup_skb() and udp6_gro_lookup_skb()
+assume RCU is held so that the net structure does not disappear.
+
+Use dev_net_rcu() instead of dev_net() to get LOCKDEP support.
 
 Signed-off-by: Eric Dumazet <edumazet@google.com>
 ---
- include/net/inet6_hashtables.h |  2 +-
- include/net/inet_hashtables.h  |  2 +-
- net/ipv4/tcp_ipv4.c            |  8 ++++----
- net/ipv4/tcp_metrics.c         |  6 +++---
- net/ipv6/tcp_ipv6.c            | 10 +++++-----
- 5 files changed, 14 insertions(+), 14 deletions(-)
+ net/ipv4/tcp_offload.c   | 2 +-
+ net/ipv4/udp_offload.c   | 2 +-
+ net/ipv6/tcpv6_offload.c | 2 +-
+ net/ipv6/udp_offload.c   | 2 +-
+ 4 files changed, 4 insertions(+), 4 deletions(-)
 
-diff --git a/include/net/inet6_hashtables.h b/include/net/inet6_hashtables.h
-index 74dd90ff5f129fe4c8adad67a642ae5070410518..c32878c69179dac5a7fcfa098a297420d9adfab2 100644
---- a/include/net/inet6_hashtables.h
-+++ b/include/net/inet6_hashtables.h
-@@ -150,7 +150,7 @@ static inline struct sock *__inet6_lookup_skb(struct inet_hashinfo *hashinfo,
- 					      int iif, int sdif,
- 					      bool *refcounted)
- {
--	struct net *net = dev_net(skb_dst(skb)->dev);
-+	struct net *net = dev_net_rcu(skb_dst(skb)->dev);
- 	const struct ipv6hdr *ip6h = ipv6_hdr(skb);
- 	struct sock *sk;
+diff --git a/net/ipv4/tcp_offload.c b/net/ipv4/tcp_offload.c
+index 2308665b51c5388814e5b61a262a1636d897c4a9..ecef16c58c07146cbeebade0620a5ec7251ddbc5 100644
+--- a/net/ipv4/tcp_offload.c
++++ b/net/ipv4/tcp_offload.c
+@@ -425,7 +425,7 @@ static void tcp4_check_fraglist_gro(struct list_head *head, struct sk_buff *skb,
  
-diff --git a/include/net/inet_hashtables.h b/include/net/inet_hashtables.h
-index 5eea47f135a421ce8275d4cd83c5771b3f448e5c..da818fb0205fed6b4120946bc032e67e046b716f 100644
---- a/include/net/inet_hashtables.h
-+++ b/include/net/inet_hashtables.h
-@@ -492,7 +492,7 @@ static inline struct sock *__inet_lookup_skb(struct inet_hashinfo *hashinfo,
- 					     const int sdif,
- 					     bool *refcounted)
- {
--	struct net *net = dev_net(skb_dst(skb)->dev);
-+	struct net *net = dev_net_rcu(skb_dst(skb)->dev);
- 	const struct iphdr *iph = ip_hdr(skb);
- 	struct sock *sk;
- 
-diff --git a/net/ipv4/tcp_ipv4.c b/net/ipv4/tcp_ipv4.c
-index cc2b5194a18d2e64595f474f62c6f2fd3eff319f..3bd835220d43d6d6491fd5c8d5e9954c37303f83 100644
---- a/net/ipv4/tcp_ipv4.c
-+++ b/net/ipv4/tcp_ipv4.c
-@@ -503,7 +503,7 @@ int tcp_v4_err(struct sk_buff *skb, u32 info)
- 	struct request_sock *fastopen;
- 	u32 seq, snd_una;
- 	int err;
--	struct net *net = dev_net(skb->dev);
-+	struct net *net = dev_net_rcu(skb->dev);
- 
+ 	inet_get_iif_sdif(skb, &iif, &sdif);
+ 	iph = skb_gro_network_header(skb);
+-	net = dev_net(skb->dev);
++	net = dev_net_rcu(skb->dev);
  	sk = __inet_lookup_established(net, net->ipv4.tcp_death_row.hashinfo,
- 				       iph->daddr, th->dest, iph->saddr,
-@@ -788,7 +788,7 @@ static void tcp_v4_send_reset(const struct sock *sk, struct sk_buff *skb,
- 	arg.iov[0].iov_base = (unsigned char *)&rep;
- 	arg.iov[0].iov_len  = sizeof(rep.th);
- 
--	net = sk ? sock_net(sk) : dev_net(skb_dst(skb)->dev);
-+	net = sk ? sock_net(sk) : dev_net_rcu(skb_dst(skb)->dev);
- 
- 	/* Invalid TCP option size or twice included auth */
- 	if (tcp_parse_auth_options(tcp_hdr(skb), &md5_hash_location, &aoh))
-@@ -1967,7 +1967,7 @@ EXPORT_SYMBOL(tcp_v4_do_rcv);
- 
- int tcp_v4_early_demux(struct sk_buff *skb)
+ 				       iph->saddr, th->source,
+ 				       iph->daddr, ntohs(th->dest),
+diff --git a/net/ipv4/udp_offload.c b/net/ipv4/udp_offload.c
+index a5be6e4ed326fbdc6a9b3889db4da903f7f25d37..c1a85b300ee87758ee683a834248a600a3e7f18d 100644
+--- a/net/ipv4/udp_offload.c
++++ b/net/ipv4/udp_offload.c
+@@ -630,7 +630,7 @@ static struct sock *udp4_gro_lookup_skb(struct sk_buff *skb, __be16 sport,
+ 					__be16 dport)
  {
+ 	const struct iphdr *iph = skb_gro_network_header(skb);
 -	struct net *net = dev_net(skb->dev);
 +	struct net *net = dev_net_rcu(skb->dev);
- 	const struct iphdr *iph;
- 	const struct tcphdr *th;
- 	struct sock *sk;
-@@ -2178,7 +2178,7 @@ static void tcp_v4_fill_cb(struct sk_buff *skb, const struct iphdr *iph,
+ 	int iif, sdif;
  
- int tcp_v4_rcv(struct sk_buff *skb)
+ 	inet_get_iif_sdif(skb, &iif, &sdif);
+diff --git a/net/ipv6/tcpv6_offload.c b/net/ipv6/tcpv6_offload.c
+index a45bf17cb2a172d4612cb42f51481b97bbf364cd..91b88daa5b555cb1af591db7680b7d829ce7b1b7 100644
+--- a/net/ipv6/tcpv6_offload.c
++++ b/net/ipv6/tcpv6_offload.c
+@@ -35,7 +35,7 @@ static void tcp6_check_fraglist_gro(struct list_head *head, struct sk_buff *skb,
+ 
+ 	inet6_get_iif_sdif(skb, &iif, &sdif);
+ 	hdr = skb_gro_network_header(skb);
+-	net = dev_net(skb->dev);
++	net = dev_net_rcu(skb->dev);
+ 	sk = __inet6_lookup_established(net, net->ipv4.tcp_death_row.hashinfo,
+ 					&hdr->saddr, th->source,
+ 					&hdr->daddr, ntohs(th->dest),
+diff --git a/net/ipv6/udp_offload.c b/net/ipv6/udp_offload.c
+index b41152dd424697a9fc3cef13fbb430de49dcb913..404212dfc99abba4d48fc27a574b48ab53731d39 100644
+--- a/net/ipv6/udp_offload.c
++++ b/net/ipv6/udp_offload.c
+@@ -117,7 +117,7 @@ static struct sock *udp6_gro_lookup_skb(struct sk_buff *skb, __be16 sport,
+ 					__be16 dport)
  {
+ 	const struct ipv6hdr *iph = skb_gro_network_header(skb);
 -	struct net *net = dev_net(skb->dev);
 +	struct net *net = dev_net_rcu(skb->dev);
- 	enum skb_drop_reason drop_reason;
- 	int sdif = inet_sdif(skb);
- 	int dif = inet_iif(skb);
-diff --git a/net/ipv4/tcp_metrics.c b/net/ipv4/tcp_metrics.c
-index 95669935494ef8003a1877e2b86c76bd27307afd..4251670e328c83b55eff7bbda3cc3d97d78563a8 100644
---- a/net/ipv4/tcp_metrics.c
-+++ b/net/ipv4/tcp_metrics.c
-@@ -170,7 +170,7 @@ static struct tcp_metrics_block *tcpm_new(struct dst_entry *dst,
- 	bool reclaim = false;
+ 	int iif, sdif;
  
- 	spin_lock_bh(&tcp_metrics_lock);
--	net = dev_net(dst->dev);
-+	net = dev_net_rcu(dst->dev);
- 
- 	/* While waiting for the spin-lock the cache might have been populated
- 	 * with this entry and so we have to check again.
-@@ -273,7 +273,7 @@ static struct tcp_metrics_block *__tcp_get_metrics_req(struct request_sock *req,
- 		return NULL;
- 	}
- 
--	net = dev_net(dst->dev);
-+	net = dev_net_rcu(dst->dev);
- 	hash ^= net_hash_mix(net);
- 	hash = hash_32(hash, tcp_metrics_hash_log);
- 
-@@ -318,7 +318,7 @@ static struct tcp_metrics_block *tcp_get_metrics(struct sock *sk,
- 	else
- 		return NULL;
- 
--	net = dev_net(dst->dev);
-+	net = dev_net_rcu(dst->dev);
- 	hash ^= net_hash_mix(net);
- 	hash = hash_32(hash, tcp_metrics_hash_log);
- 
-diff --git a/net/ipv6/tcp_ipv6.c b/net/ipv6/tcp_ipv6.c
-index 2debdf085a3b4d2452b2b316cb5368507b17efc8..429f8a5ab511b671aa405ae20f7c1b3163839779 100644
---- a/net/ipv6/tcp_ipv6.c
-+++ b/net/ipv6/tcp_ipv6.c
-@@ -376,7 +376,7 @@ static int tcp_v6_err(struct sk_buff *skb, struct inet6_skb_parm *opt,
- {
- 	const struct ipv6hdr *hdr = (const struct ipv6hdr *)skb->data;
- 	const struct tcphdr *th = (struct tcphdr *)(skb->data+offset);
--	struct net *net = dev_net(skb->dev);
-+	struct net *net = dev_net_rcu(skb->dev);
- 	struct request_sock *fastopen;
- 	struct ipv6_pinfo *np;
- 	struct tcp_sock *tp;
-@@ -868,7 +868,7 @@ static void tcp_v6_send_response(const struct sock *sk, struct sk_buff *skb, u32
- 	struct tcphdr *t1;
- 	struct sk_buff *buff;
- 	struct flowi6 fl6;
--	struct net *net = sk ? sock_net(sk) : dev_net(skb_dst(skb)->dev);
-+	struct net *net = sk ? sock_net(sk) : dev_net_rcu(skb_dst(skb)->dev);
- 	struct sock *ctl_sk = net->ipv6.tcp_sk;
- 	unsigned int tot_len = sizeof(struct tcphdr);
- 	__be32 mrst = 0, *topt;
-@@ -1039,7 +1039,7 @@ static void tcp_v6_send_reset(const struct sock *sk, struct sk_buff *skb,
- 	if (!sk && !ipv6_unicast_destination(skb))
- 		return;
- 
--	net = sk ? sock_net(sk) : dev_net(skb_dst(skb)->dev);
-+	net = sk ? sock_net(sk) : dev_net_rcu(skb_dst(skb)->dev);
- 	/* Invalid TCP option size or twice included auth */
- 	if (tcp_parse_auth_options(th, &md5_hash_location, &aoh))
- 		return;
-@@ -1744,6 +1744,7 @@ static void tcp_v6_fill_cb(struct sk_buff *skb, const struct ipv6hdr *hdr,
- 
- INDIRECT_CALLABLE_SCOPE int tcp_v6_rcv(struct sk_buff *skb)
- {
-+	struct net *net = dev_net_rcu(skb->dev);
- 	enum skb_drop_reason drop_reason;
- 	int sdif = inet6_sdif(skb);
- 	int dif = inet6_iif(skb);
-@@ -1753,7 +1754,6 @@ INDIRECT_CALLABLE_SCOPE int tcp_v6_rcv(struct sk_buff *skb)
- 	bool refcounted;
- 	int ret;
- 	u32 isn;
--	struct net *net = dev_net(skb->dev);
- 
- 	drop_reason = SKB_DROP_REASON_NOT_SPECIFIED;
- 	if (skb->pkt_type != PACKET_HOST)
-@@ -2004,7 +2004,7 @@ INDIRECT_CALLABLE_SCOPE int tcp_v6_rcv(struct sk_buff *skb)
- 
- void tcp_v6_early_demux(struct sk_buff *skb)
- {
--	struct net *net = dev_net(skb->dev);
-+	struct net *net = dev_net_rcu(skb->dev);
- 	const struct ipv6hdr *hdr;
- 	const struct tcphdr *th;
- 	struct sock *sk;
+ 	inet6_get_iif_sdif(skb, &iif, &sdif);
 -- 
 2.48.1.362.g079036d154-goog
 
