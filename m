@@ -1,148 +1,114 @@
-Return-Path: <netdev+bounces-161744-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-161745-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 39300A23A19
-	for <lists+netdev@lfdr.de>; Fri, 31 Jan 2025 08:27:43 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5A55EA23A1D
+	for <lists+netdev@lfdr.de>; Fri, 31 Jan 2025 08:28:05 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 4A5251882C23
-	for <lists+netdev@lfdr.de>; Fri, 31 Jan 2025 07:27:12 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 0F2AE188235D
+	for <lists+netdev@lfdr.de>; Fri, 31 Jan 2025 07:28:06 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1E5BB156F28;
-	Fri, 31 Jan 2025 07:26:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B80DA14B092;
+	Fri, 31 Jan 2025 07:27:57 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Hajy3JfK"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="HxCjP0HC"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wr1-f53.google.com (mail-wr1-f53.google.com [209.85.221.53])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DBC38155C88;
-	Fri, 31 Jan 2025 07:26:50 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EC01413A3ED
+	for <netdev@vger.kernel.org>; Fri, 31 Jan 2025 07:27:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.53
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1738308411; cv=none; b=G+tw3sI40WuoIX159zr4eJDTZkHXSu9SxSRAjF4lBSF+CNncR0RzljMEBiKFIbRiKv6vhy/pZaMVSk//Iji4fIYJrkjDw3eRGixvCb88znr1SvvpLLcOBA97xkXIzrHvLwENlpWa5O+PjYDQxyufDdU2xVsBOrKRmPwDFpRJHYU=
+	t=1738308477; cv=none; b=ZHUoWUTpSHHOUDchI9KNQMnzO63QAat72xcM5cbp2FfTpGiDXZcMBh+zWzoBE4Px+DX0WHaGUwt7ZmZb/nR0y5eW8yq+Mbx3DCvHCEN0rD5aBRPNkB4P7KlJXnM/QCTFdtIYdYUvl1oBVl2ZXaRNevsrSji/7CoBZIrX5LH9Ru8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1738308411; c=relaxed/simple;
-	bh=Q2e7UALnZghKuCGZEzriVZeAWWaFg32d8OizcQKQJh0=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=lcCUguxvPvlqonRXtWQfhiV+ZCcvqJZ5PJUjUjyhYo9uZVoEEFGQ6H3uNIStt3IpdvwQI6ba4EdvZjVPHBthth5+b/xBUyPbsj05f6r4cBQM/Anl85qAfV8tMzOJnYTJKeR2pK6L+2b+ef9gWlxhlFkVI+Cb26oMtUcHpu8giXQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Hajy3JfK; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id B62F5C4CED1;
-	Fri, 31 Jan 2025 07:26:44 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1738308410;
-	bh=Q2e7UALnZghKuCGZEzriVZeAWWaFg32d8OizcQKQJh0=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=Hajy3JfKR7x9BURH9yzp3wI29pfSM8ktf5VzU73hgiA+MiQ/TBigT+jT6AG3kIlnX
-	 bvdysWvyp1wxcp49pQIfhiva0KLf8MlabSUgPjDfOo4Sw+eac6qGg00aik53VHkeed
-	 qLMslTRJMm+Xw+6ZzVl0JL6Syo2JuLsyTJYWfbLq3gs7OmUDfx6wzUEJ/XPnyEjVd4
-	 a8BDD6rKgDElsxltFeJ+Kh0/X3BBWUo8HIotbADc3I/lFRK0RKvseWbgw05p4Npqou
-	 u9aIbKbSwNZOVu489THEMc2KeSqf4dyvph2funwT2/FL1HUivxAfkss6jlP9VRkP0d
-	 mn3jk1jrcjDcQ==
-Message-ID: <3e020ca6-025e-4a88-9aaa-a432d8aa668d@kernel.org>
-Date: Fri, 31 Jan 2025 08:26:41 +0100
+	s=arc-20240116; t=1738308477; c=relaxed/simple;
+	bh=VvX+BywDjuLXLurRZUDTOeBdeR2HdspsFUORXtucLB4=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=ok1Rsx8+LJDwyiXG6SVlgieUgQKmm+GaIkkPpOFy3nz83saZ2q0ZgzEfdvmAj5T3gJlj7YwNHqjXscY9pCVHmwx/ZKHB9xFgMI+KV3IbNcrZ3rmlfEKjg2wWfgMdQT7BFxDU7cKSM4zhmQ59B052xZwsyaSsnhQf7jFjwgqAb8w=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=HxCjP0HC; arc=none smtp.client-ip=209.85.221.53
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-wr1-f53.google.com with SMTP id ffacd0b85a97d-38a88ba968aso1406037f8f.3
+        for <netdev@vger.kernel.org>; Thu, 30 Jan 2025 23:27:55 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1738308474; x=1738913274; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=VvX+BywDjuLXLurRZUDTOeBdeR2HdspsFUORXtucLB4=;
+        b=HxCjP0HCW1vFrQ3ebktGFSPEj7r3af7YoJAc3IsHTIr+1jnNG6+9xpqxSX1VQVZYXs
+         0BbgFN80dir4VsQA2Vptc0+ZOCxKncEkH+RJKl3Gggmt34rG/sOi23bGpdmkeBsFQjaX
+         HIZSz/WbJUzEKQo+FtykMFPr8osod3H7cVQMZlgEgKXVM2cEatc+ka20V56Vegg2CgQj
+         TNmvKTsYMN5cvdi5rMPn43tKpsVk/fIP4ZwO2Cq9xTnobF+QcnxbFAgstctTf+03a+ij
+         L8UZFZCIHLZEgK88zOBCQT5M1EMulT1b0RBmaqW152qAFtqlSbagAbVmjCDbxeOd4C8T
+         caIg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1738308474; x=1738913274;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=VvX+BywDjuLXLurRZUDTOeBdeR2HdspsFUORXtucLB4=;
+        b=XCeejkwF0FzaLAuAEkX4cRff41mQlvWPajFAVBRP2M5swr4fF78f4xoH9VmmDWZjyk
+         4KWWq4cRKch3ajsthDIflJPObRDeD8efZsFqyw9B63A9mbiZBILNMie7vFxhtKSvdZxB
+         hCk7sGJVyLXU1yXfFYGN9PYbxwDdfDKAFEBXL5t0pgrak5cN7u3vJ2Td+t85nu30+H2w
+         pjtP5w4KLZH0qarXHIsViVMQ6j/msfAD1xakuVaRlQl7Oe8IYgoSILEz50Mu05MwFkqw
+         LMPEWyFTgB9QIngLrLUtGi5ODKCZ13veabc6wbb73i2zslM9DrVsstu9clKP/WbFjy83
+         A0Ag==
+X-Forwarded-Encrypted: i=1; AJvYcCXSw+OflBT/W2GlP9S+6Rc3HY9TdalJYbamrEbaLPS0sb8i41T0UvYpJ5+AdGRHz4XuNVsv6Eg=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yw+R3oJj8Nps7RLfgmA9823QiXeRgEs6vmLQOUqMJg0nJmXfrCM
+	cXsHVoOvncT1VEAp68TEgPAjDNIu3E0+TO79X6GkRHL2cyL2YgjsgTKa8qXcuAAJKBRNG862Izd
+	bl2Yy2X72P5Q3JcOFLVDlLol1R7U=
+X-Gm-Gg: ASbGncuizkwXGkFsCSe6DQE/iZuNdb8Eu9VsOvfh93mmLnlBiTt4Tnsoa8v4DZtzwEE
+	SJZd/govDlFj0w6I72F/JRzIny2kj1QaX9oU0gSQleeooJm3qKaLULmGSC1QryfQ5rR9XRH7/+w
+	==
+X-Google-Smtp-Source: AGHT+IH9/f4Wcch/6Ieh0/CMVkT4oLoZvkF2QsmnNlzlbKScReVCT/3eOpzv4+A9cO+pHXfOYkj1UbF7zQjLvK+7dn8=
+X-Received: by 2002:a05:6000:1012:b0:38b:ec34:2d62 with SMTP id
+ ffacd0b85a97d-38c519698d2mr7790658f8f.24.1738308474037; Thu, 30 Jan 2025
+ 23:27:54 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v4 2/4] dt-bindings: mfd: Add MDIO interface to
- rtl9301-switch
-To: Chris Packham <Chris.Packham@alliedtelesis.co.nz>
-Cc: "lee@kernel.org" <lee@kernel.org>, "robh@kernel.org" <robh@kernel.org>,
- "krzk+dt@kernel.org" <krzk+dt@kernel.org>,
- "conor+dt@kernel.org" <conor+dt@kernel.org>,
- "andrew+netdev@lunn.ch" <andrew+netdev@lunn.ch>,
- "davem@davemloft.net" <davem@davemloft.net>,
- "edumazet@google.com" <edumazet@google.com>,
- "kuba@kernel.org" <kuba@kernel.org>, "pabeni@redhat.com"
- <pabeni@redhat.com>, "tsbogend@alpha.franken.de"
- <tsbogend@alpha.franken.de>, "hkallweit1@gmail.com" <hkallweit1@gmail.com>,
- "linux@armlinux.org.uk" <linux@armlinux.org.uk>,
- "sander@svanheule.net" <sander@svanheule.net>,
- "markus.stockhausen@gmx.de" <markus.stockhausen@gmx.de>,
- "devicetree@vger.kernel.org" <devicetree@vger.kernel.org>,
- "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
- "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
- "linux-mips@vger.kernel.org" <linux-mips@vger.kernel.org>
-References: <20250120040214.2538839-1-chris.packham@alliedtelesis.co.nz>
- <20250120040214.2538839-3-chris.packham@alliedtelesis.co.nz>
- <20250122-macho-flat-sawfly-7ca93d@krzk-bin>
- <db76d5ab-3eda-439d-8b92-c0423d1e39c8@alliedtelesis.co.nz>
-From: Krzysztof Kozlowski <krzk@kernel.org>
-Content-Language: en-US
-Autocrypt: addr=krzk@kernel.org; keydata=
- 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 fv0=
-In-Reply-To: <db76d5ab-3eda-439d-8b92-c0423d1e39c8@alliedtelesis.co.nz>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+References: <20250116195642.2794-1-ouster@cs.stanford.edu> <CAM0EoMkkk-dT5kQH6OoVp-zs9bhg8ZLW2w+Dp4SYAZnFfw=CTA@mail.gmail.com>
+ <CAGXJAmyxX0Ofkb-bzK=gXHJtjiVFczYcsvwAg9+JfS0qLjhqnA@mail.gmail.com>
+In-Reply-To: <CAGXJAmyxX0Ofkb-bzK=gXHJtjiVFczYcsvwAg9+JfS0qLjhqnA@mail.gmail.com>
+From: ericnetdev dumazet <erdnetdev@gmail.com>
+Date: Fri, 31 Jan 2025 08:27:42 +0100
+X-Gm-Features: AWEUYZlkux3dPZvPNkbZz48iqrLutqsP2gtXz7ub-MGWUxwI5wRbLLCG-0HCjuo
+Message-ID: <CAHTyZGwogJxVR1-yFjNgYCDDToU0wY=XJO4WOpsmt2gzeRFgZw@mail.gmail.com>
+Subject: Re: [PATCH netnext] net: tc: improve qdisc error messages
+To: John Ousterhout <ouster@cs.stanford.edu>
+Cc: Jamal Hadi Salim <jhs@mojatatu.com>, netdev@vger.kernel.org, xiyou.wangcong@gmail.com, 
+	jiri@resnulli.us
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On 22/01/2025 21:53, Chris Packham wrote:
->>>         };
->>> +
->>> +      mdio-controller {
->> No, no resources here, no unit address. Look at other nodes - they have
->> the resource, the address. Mixing such nodes is clear indication this is
->> not correct hardware description and you do this only for Linux.
->>
->> Fold child device into parent.
-> 
-> In this particular case all the mdio stuff is actually contained to a 
-> range starting at offset 0xca00. I dropped it because it was simpler in 
-> the driver to use the full 16-bit address rather than trying to use 
-> offsets from the base address that didn't correspond to the datasheet. 
-> As you've highlighted that's making the dt-binding impose driver 
-> specifics so would adding back `mdio-controller@ca00` and `reg = <0xca00 
-> 0x200>;` be OK even if the driver doesn't actually use them?
+Le ven. 31 janv. 2025 =C3=A0 07:39, John Ousterhout
+<ouster@cs.stanford.edu> a =C3=A9crit :
+>
+> On Thu, Jan 16, 2025 at 12:00=E2=80=AFPM Jamal Hadi Salim <jhs@mojatatu.c=
+om> wrote:
+> >
+> > LGTM.
+> > Acked-by: Jamal Hadi Salim <jhs@mojatatu.com>
+> >
+> > cheers,
+> > jamal
+> >
+> > > 2.34.1
+>
+> Sorry for my newbie ignorance (this will be my first accepted patch,
+> assuming it's accepted) but what happens next on this? Is there
+> anything else I need to do? I mistyped "net-next" as "netnext" in the
+> subject and patchwork complained about that; do I need to resubmit to
+> fix this?
 
+net-next was closed during the merge window, and still is.
 
-If this matches the hardware, then yes.
-
-Best regards,
-Krzysztof
+Details in Documentation/process/maintainer-netdev.rst
 
