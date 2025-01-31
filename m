@@ -1,137 +1,107 @@
-Return-Path: <netdev+bounces-161771-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-161772-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1838DA23E27
-	for <lists+netdev@lfdr.de>; Fri, 31 Jan 2025 14:12:08 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 141E7A23E36
+	for <lists+netdev@lfdr.de>; Fri, 31 Jan 2025 14:13:34 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 0B5EE3A89F1
-	for <lists+netdev@lfdr.de>; Fri, 31 Jan 2025 13:12:00 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 8F46F7A1EF5
+	for <lists+netdev@lfdr.de>; Fri, 31 Jan 2025 13:12:39 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 024F71C3F30;
-	Fri, 31 Jan 2025 13:12:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2722C1C4A0A;
+	Fri, 31 Jan 2025 13:13:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=siemens.com header.i=florian.bezdeka@siemens.com header.b="XWS5uL4R"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ej1-f46.google.com (mail-ej1-f46.google.com [209.85.218.46])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mta-65-225.siemens.flowmailer.net (mta-65-225.siemens.flowmailer.net [185.136.65.225])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2926A1B87D0;
-	Fri, 31 Jan 2025 13:11:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.46
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C88F11DFF0
+	for <netdev@vger.kernel.org>; Fri, 31 Jan 2025 13:13:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.136.65.225
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1738329121; cv=none; b=IKkEoT05UWYkfSKoAjuvuwinkQYuVwAS5AqSnNvlkSV2zTiOsz/25ac8or2Vpz6EOEJuIBlEcafqySr5ym/wls53uCJqj2/4cpmq+huKN1eBR/RSErFNz4zqF+bymxLp/9FaywnRSOtJc3jtin7S7f9qL4ISvhuTncoUe23Bw/Y=
+	t=1738329201; cv=none; b=kA786QoCBnsbqHP4CJbEUthSXTbh8t8XdI8N1Pk3MeV/OpAdrsBJ6u8CDFSOSQ1fsidyYDn8o0AhSnWBNfKVMgNpgjka2TIC1zi2UvnxWpS4XJ68XYgiWT//DMlBG8w/g7gAAZFrxDDqEgGMT/3hWbOs9sYR3F4lik2DWjnbyLA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1738329121; c=relaxed/simple;
-	bh=xgo8PliiTUsBZHIM+9deV9cbjLW5yzO0IUD4f4VXMZc=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=GdeXgWmSQedA2GsS97XedLaJae9UDHBSbyi6SZSoyt1DT0ixN2bJL9WTas18Q9Ym8FEHgwCa971tTRcQhSCWvNIHWvF1fMhqMP76ajUoNaIyXAKZpdWVcPeKrDFAqQetJ4dp4JLlK29Rlq7VmOX673ZnVyLqppmG8pJcaQM54FM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.218.46
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ej1-f46.google.com with SMTP id a640c23a62f3a-ab651f1dd36so388801366b.0;
-        Fri, 31 Jan 2025 05:11:59 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1738329118; x=1738933918;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=7a3Lglc6G9+kWxrhuoSHDLCbGQc4HDAJpuK5OBARqFI=;
-        b=F3BysSV1e5Y5z7vxUnZuWTlv9m3Z9H0ni/Wn6DXblNFwm2SKJx0kP8IF8W/D2GOjZN
-         LgyszgVWDTyFOmRLq0erF89nNRZYmeQ0krRzH0PRKpMgy8A1Ei795R8ZoE5GpAfGjhnX
-         G7Rr3+I1DRbSx0IkNIm52OJ5/QYa/UqBXjFsNL5slOa3eruzDjlQSOiuWQy8429Euqkh
-         Y23MEJqRWdjJJl8ykJruD38N44ViPf5bA2fEOPx5Y5bUBsTAK0AkzW62kXg/lCQ3g97P
-         jpDTRyqNdSklggGzguIFq4S+arCfOJvOZfPiLzyMAuX3CsK+wibPXSzCcDIF8dZPuzGi
-         ge/Q==
-X-Forwarded-Encrypted: i=1; AJvYcCUNWTpEFAQgfqRTjP/PW9jFFijIc/eJfspG90bKKPOJZkh7i9XLRb5Uyep/9ufHzIepUEKtVK1f@vger.kernel.org, AJvYcCUn35YwLAN+373x/cLz5eepWyvKR8RDHUjWzx4X8PlBGfQXTyR3KnH3lgvV2Kjxc7JhMuwmDHZ2+RdsMx5zk4pC@vger.kernel.org, AJvYcCX8zFBlZH/dJ/9y+rv/ZpV9vO9rVVQ8aUD862G44q5VjD9IxMZ4Zwqvy/tod19A8YVjoqXTdNxQCQRDGvQe@vger.kernel.org, AJvYcCXcCa1hSdwkm1u186MAprKPLFm2V0OQGi80iwb1CW2TJHB3323u7TwY15hllhkuD6HyOWKO0dpBef0=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzOR4EJK2edkfgvPL4iyfoW3FbHqDiIWYqfMurJ0l1yUh+/YUpL
-	r3nntCld/Oeen4PsnbLVPwoG7X7uEmaQiFB+xxw2MmVFcTLDu2P+
-X-Gm-Gg: ASbGncuVacFttu/Xi9Qc20pGfErBY+3BobN4Ct50GVRcjtgXaNNAQFN14M8pVg9u+L6
-	21492Q3EsCkuunRn6tlukQ+4UycpiqOsoZsHn9E/o9t/eyLWtvJkFJ6CJ7/FyfCKTdiFIQZw4sK
-	H1ptSaP22ng8hoHUTfL2GUNEQ4DQRAIkQyHvCC+n2n1hOvBmimRI6Xu+xt1K3V2IAriM2D/sLwi
-	SWCvWM012KwXtkVvUJ/A0W7zV+y2MZumcxVW79O1CVdOcCvLKk/iNaihPDujv/JYmBLX9DSDZkN
-	1+Jeww==
-X-Google-Smtp-Source: AGHT+IE7NkGUn2eaFUsNhIHou71Z8vK19KiczHWR1s+D15ErLXPyOdYS+OHPOvcCD1KAV+imm/5xvQ==
-X-Received: by 2002:a17:907:7f13:b0:aa6:7c8e:8087 with SMTP id a640c23a62f3a-ab6cfc87b15mr1160656066b.12.1738329118020;
-        Fri, 31 Jan 2025 05:11:58 -0800 (PST)
-Received: from gmail.com ([2a03:2880:30ff:6::])
-        by smtp.gmail.com with ESMTPSA id 4fb4d7f45d1cf-5dc724055e5sm2891330a12.45.2025.01.31.05.11.56
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 31 Jan 2025 05:11:56 -0800 (PST)
-Date: Fri, 31 Jan 2025 05:11:54 -0800
-From: Breno Leitao <leitao@debian.org>
-To: Simon Horman <horms@kernel.org>
-Cc: Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Jonathan Corbet <corbet@lwn.net>, Shuah Khan <shuah@kernel.org>,
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
-	linux-doc@vger.kernel.org, linux-kselftest@vger.kernel.org,
-	rdunlap@infradead.org, kernel-team@meta.com
-Subject: Re: [PATCH RFC net-next v3 1/8] netconsole: consolidate send buffers
- into netconsole_target struct
-Message-ID: <20250131-stalwart-lively-caracal-4e2063@leitao>
-References: <20250124-netcon_cpu-v3-0-12a0d286ba1d@debian.org>
- <20250124-netcon_cpu-v3-1-12a0d286ba1d@debian.org>
- <20250128161128.GB277827@kernel.org>
- <20250130103544.GE113107@kernel.org>
+	s=arc-20240116; t=1738329201; c=relaxed/simple;
+	bh=k5RkkXzF13rZXSL9io3ekPgEPUw+PXfJpxELXTQUpY4=;
+	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
+	 Content-Type:MIME-Version; b=GOT20+X2MHgwQ4wcWE4Xsytbe29GfCAeE94GXS2F85DW4pUn3K+P9s6lcRDrXRXWOBzoZzTc2RkD75a5nV+qPrfbQI/6FoRuBQGzN79UoFPR6GLk+8EuwnO2KalY5kTab2q+qdLlxK+rNPQ+GMo4p7B+srwnUivYyGe8FsrLsDI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=siemens.com; spf=pass smtp.mailfrom=rts-flowmailer.siemens.com; dkim=pass (2048-bit key) header.d=siemens.com header.i=florian.bezdeka@siemens.com header.b=XWS5uL4R; arc=none smtp.client-ip=185.136.65.225
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=siemens.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=rts-flowmailer.siemens.com
+Received: by mta-65-225.siemens.flowmailer.net with ESMTPSA id 20250131131309faf71448f22149c4f9
+        for <netdev@vger.kernel.org>;
+        Fri, 31 Jan 2025 14:13:10 +0100
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; s=fm2;
+ d=siemens.com; i=florian.bezdeka@siemens.com;
+ h=Date:From:Subject:To:Message-ID:MIME-Version:Content-Type:Content-Transfer-Encoding:Cc:References:In-Reply-To;
+ bh=7ddmw+MSH+bE+lpmVD4Wnv3gYJ4CsT3P6TUawXH7hJk=;
+ b=XWS5uL4RZBFQEOgbrkoinobFHaphy8O+5E+P3yGXLd7XDgQnHjyupzHw/nFjHHjoFdTGf8
+ mvcNlRBNYG8wW8IswCiNjHTMgAeNTd32AjpAXjStl8fyMt6y0rmFi/Yztz3oayTTUZiOqW3a
+ sQaxSTerPXPAzJLqFHYAVUGkM8zHd3MPwWKw6SUnzJqfKdUeo9bHmdirmf4oOL/0OiGPXbER
+ LJi8XzNCm80kQsfkobrEsJKbXnCXlQOD0N9Au9jkV92M0qC6kNZQPoxrc11wtPjGcoN+mHl5
+ 8Erb2wyxszaDR5KHq87NIv6bd1IyNXl4K6+BYuiaKdarLvOVMgfCkBEw==;
+Message-ID: <f86bc94c97d6e91b3564d3df6f91722318c8d24f.camel@siemens.com>
+Subject: Re: [PATCH] igc: Fix HW RX timestamp when passed by ZC XDP
+From: Florian Bezdeka <florian.bezdeka@siemens.com>
+To: Zdenek Bouska <zdenek.bouska@siemens.com>, Tony Nguyen	
+ <anthony.l.nguyen@intel.com>, Przemek Kitszel
+ <przemyslaw.kitszel@intel.com>,  Andrew Lunn <andrew+netdev@lunn.ch>,
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet	
+ <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni	
+ <pabeni@redhat.com>, Alexei Starovoitov <ast@kernel.org>, Daniel Borkmann	
+ <daniel@iogearbox.net>, Jesper Dangaard Brouer <hawk@kernel.org>, John
+ Fastabend <john.fastabend@gmail.com>, Vinicius Costa Gomes
+ <vinicius.gomes@intel.com>, Song Yoong Siang <yoong.siang.song@intel.com>
+Cc: intel-wired-lan@lists.osuosl.org, netdev@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, bpf@vger.kernel.org, Jan Kiszka
+	 <jan.kiszka@siemens.com>
+Date: Fri, 31 Jan 2025 14:13:08 +0100
+In-Reply-To: <20250128-igc-fix-hw-rx-timestamp-when-passed-by-zc-xdp-v1-1-b765d3e972de@siemens.com>
+References: 
+	<20250128-igc-fix-hw-rx-timestamp-when-passed-by-zc-xdp-v1-1-b765d3e972de@siemens.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250130103544.GE113107@kernel.org>
+X-Flowmailer-Platform: Siemens
+Feedback-ID: 519:519-68982:519-21489:flowmailer
 
-Hello Simon,
+On Tue, 2025-01-28 at 13:26 +0100, Zdenek Bouska wrote:
+> Fixes HW RX timestamp in the following scenario:
+> - AF_PACKET socket with enabled HW RX timestamps is created
+> - AF_XDP socket with enabled zero copy is created
+> - frame is forwarded to the BPF program, where the timestamp should
+>   still be readable (extracted by igc_xdp_rx_timestamp(), kfunc
+>   behind bpf_xdp_metadata_rx_timestamp())
+> - the frame got XDP_PASS from BPF program, redirecting to the stack
+> - AF_PACKET socket receives the frame with HW RX timestamp
+>=20
+> Moves the skb timestamp setting from igc_dispatch_skb_zc() to
+> igc_construct_skb_zc() so that igc_construct_skb_zc() is similar to
+> igc_construct_skb().
+>=20
+> This issue can also be reproduced by running:
+>  # tools/testing/selftests/bpf/xdp_hw_metadata enp1s0
+> When a frame with the wrong port 9092 (instead of 9091) is used:
+>  # echo -n xdp | nc -u -q1 192.168.10.9 9092
+> then the RX timestamp is missing and xdp_hw_metadata prints:
+>  skb hwtstamp is not found!
+>=20
+> With this fix or when copy mode is used:
+>  # tools/testing/selftests/bpf/xdp_hw_metadata -c enp1s0
+> then RX timestamp is found and xdp_hw_metadata prints:
+>  found skb hwtstamp =3D 1736509937.852786132
+>=20
+> Fixes: 069b142f5819 ("igc: Add support for PTP .getcyclesx64()")
+> Signed-off-by: Zdenek Bouska <zdenek.bouska@siemens.com>
+> ---
 
-On Thu, Jan 30, 2025 at 10:35:44AM +0000, Simon Horman wrote:
-> On Tue, Jan 28, 2025 at 04:11:28PM +0000, Simon Horman wrote:
-> > On Fri, Jan 24, 2025 at 07:16:40AM -0800, Breno Leitao wrote:
-> > > Move the static buffers from send_msg_no_fragmentation() and
-> > > send_msg_fragmented() into the netconsole_target structure. This
-> > > simplifies the code by:
-> > > - Eliminating redundant static buffers
-> > > - Centralizing buffer management in the target structure
-> > > - Reducing memory usage by 1KB (one buffer instead of two)
-> > > 
-> > > The buffer in netconsole_target is protected by target_list_lock,
-> > > maintaining the same synchronization semantics as the original code.
-> > > 
-> > > Suggested-by: Jakub Kicinski <kuba@kernel.org>
-> > > Signed-off-by: Breno Leitao <leitao@debian.org>
-> > > ---
-> > >  drivers/net/netconsole.c | 29 +++++++++++++++--------------
-> > >  1 file changed, 15 insertions(+), 14 deletions(-)
-> > > 
-> > > diff --git a/drivers/net/netconsole.c b/drivers/net/netconsole.c
-> > > index 86ab4a42769a49eebe5dd6f01dafafc6c86ec54f..1a78704681184673f5c1ba8ae665e46751384293 100644
-> > > --- a/drivers/net/netconsole.c
-> > > +++ b/drivers/net/netconsole.c
-> > > @@ -137,6 +137,8 @@ struct netconsole_target {
-> > >  	bool			extended;
-> > >  	bool			release;
-> > >  	struct netpoll		np;
-> > > +	/* protected by target_list_lock */
-> > > +	char			buf[MAX_PRINT_CHUNK];
-> > 
-> > nit: buf should also be added to the Kernel doc for this structure.
-> > 
-> > ...
-> 
-> Hi Breno,
-> 
-> With that fixed feel free to add:
-> 
-> Reviewed-by: Simon Horman <horms@kernel.org>
-
-Thanks again for the review.
-
-I will update according to your suggestion, and send the new version
-after the merge window is opened.
-
---breno
+Reviewed-by: Florian Bezdeka <florian.bezdeka@siemens.com>
 
