@@ -1,161 +1,129 @@
-Return-Path: <netdev+bounces-161766-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-161767-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8C682A23C51
-	for <lists+netdev@lfdr.de>; Fri, 31 Jan 2025 11:37:43 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 00AAEA23CA6
+	for <lists+netdev@lfdr.de>; Fri, 31 Jan 2025 12:05:10 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id EEB7D1662CC
-	for <lists+netdev@lfdr.de>; Fri, 31 Jan 2025 10:37:41 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E9AB03A943D
+	for <lists+netdev@lfdr.de>; Fri, 31 Jan 2025 11:05:02 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E33071B2190;
-	Fri, 31 Jan 2025 10:37:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="eF4zJSAa"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5D04D1BD032;
+	Fri, 31 Jan 2025 11:05:00 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ua1-f51.google.com (mail-ua1-f51.google.com [209.85.222.51])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from frasgout.his.huawei.com (frasgout.his.huawei.com [185.176.79.56])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 176F1169397
-	for <netdev@vger.kernel.org>; Fri, 31 Jan 2025 10:37:36 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.51
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DC0A31BBBF4;
+	Fri, 31 Jan 2025 11:04:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.176.79.56
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1738319858; cv=none; b=D9dWQhX1uU0EXAz0/srUWkG4GVmYrvfe+NnvyK+PJdYU7AzstWeQF8aC3ytytLEcUJjdo7opKi8d41rKofkfhdA/1AGrSC3ctl7W/stau4mhNzmo+X7vJ1gAIU4MuWr4EkxizuHMCC+jddlCjMHp4uMeVbBKppJne8/KiMEt2Nc=
+	t=1738321500; cv=none; b=B6WIMx/vXpe697SeSLGWdOfNhWG09j3yIkVnhFLYzNvXGJqbeJs/bELtlb3WSZSfNyfIblAy6KKAm7P5Er81rVSm5VmfO3POHbRuI71PAPrSZPThN0FEShMNVE1h3+fbG3mtWUNYAHUytKidEREBuIG4RzOtQZpI+VBHnaG/7DA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1738319858; c=relaxed/simple;
-	bh=msHXue7LsHGxaTn5pYiK/W/ChF7omJg1+nGnQMsxicI=;
-	h=MIME-Version:From:Date:Message-ID:Subject:To:Cc:Content-Type; b=VsUE5ZMf5dHaMO6k/X+NhXwBK2CfwBDfS7tWwME30tEPYr5UmSJuWfbxigsRTlH8rLYwTC91uUBrxaUq4ywNZnJJOHvTAgxEPo6xpKZV06DEW8wP2wl8rr+dldYOsGgezMLk89o8/xIr/Re7BsBCcSgafR0wv2VB+z7dkdd2HMI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=eF4zJSAa; arc=none smtp.client-ip=209.85.222.51
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
-Received: by mail-ua1-f51.google.com with SMTP id a1e0cc1a2514c-8622c3be2f4so538082241.1
-        for <netdev@vger.kernel.org>; Fri, 31 Jan 2025 02:37:36 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1738319856; x=1738924656; darn=vger.kernel.org;
-        h=cc:to:subject:message-id:date:from:mime-version:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=NL8rEb8TLQ4Gyxf38D1JzjLnEVApUa4l/COEM6vDqGg=;
-        b=eF4zJSAaGipwpu9DdjTsYbrtQ25PLQfkHSG0WXuq2UmIntKnDz95h6CDZ9sN1sPTj8
-         gd12x2xvCQdIo31O+rLWNHmNbhrHbF27NUky8+2uS6qEJLKXdujDQRbQiAC+zlfXAjUs
-         4CaUaYWGdNhDGq4jZAGuXFd0yYehkV4wzh7q2HXo+z5NCQ9jOsNGO2kCm0+zAOoyapCP
-         wnKd2VdQd7KqQ5DO3Othgj6WdC9B78jkP8c6Ft6c4SLuvBow5GbdR4FYB0Jf7RRVRLLi
-         3uNykSktAXPufCkyZpg62oAa5JqWFDLTpMSK3fHp80x3A81S7XnRaEGO++oQA+laohle
-         JtgQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1738319856; x=1738924656;
-        h=cc:to:subject:message-id:date:from:mime-version:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=NL8rEb8TLQ4Gyxf38D1JzjLnEVApUa4l/COEM6vDqGg=;
-        b=CD7yfTHWq9L6eOW3zysOfiMZGVeqtmXL6Od15XTbAHApqv4m6oVy4fqsDMf15rBi6V
-         srGsc93IFLkALc+Nssa4ZAOtHJKy6V7BBxj7B2UtSXWGkdDAwknEyFUHJTfiRCn18mEF
-         tPKQYxLMdbwugfqaEImLKZqTv6LlqLDq5ypAiOwT6cdC8dufmppLWlaF0DEfsCKvggPc
-         KUEomAXfo+qUsAgVPoBFZXbBocOmq27TXFITqW0JTaC/AaZAoJxoEmpEcOV85Vkm3p4f
-         cu+Rjzas+LoCdRjrIDXn+b7eXS5xsniCxZzDSBvVlhv2hcJaSsHC4v7cjwaAhmP929lm
-         WB4g==
-X-Forwarded-Encrypted: i=1; AJvYcCXecbCFWXgm2yN/lwhm9Cn4Y2SkSyzj+j77asDWxAE1e5cQCVOBGSr7iwek1h4oF0B0laIy5KU=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxHu3h8vqEmDrNWnP3FhSewhcg14OEIGAp5EEwnDQDzD17DLESD
-	C/atk5lSATfIsoxtZDHmka+3RugbW1TnzJEjsFD0ZeUKsphkKtIhUdL3lVvijbvSyi2pSZGjmcd
-	wLnjCoE5nRxBTprT2Y2uQnga5Tw/t3LFlN95u2w==
-X-Gm-Gg: ASbGncsdEr5tneLqFmXIkJt7j1ZSLTagqZyqujB0fjmyrMGYg1bAuxjEYC51vZarMVf
-	P4Dcq/cRAIT5KyS+FWfUypM4kUsD+5UXBV3jsCpiAhDRERIcD7bYveM+XSJvaVnYxvyY5KFhCkg
-	==
-X-Google-Smtp-Source: AGHT+IFUKgwJUUPWZCms/ASmcU/ClUD9GXhapxiyufUZS6lTDvxg1H4P9dPBBgmdz5SOw3Z5b7ARbULwquhr5OcQzXo=
-X-Received: by 2002:a05:6102:1495:b0:4b6:3d72:5c28 with SMTP id
- ada2fe7eead31-4b9a5221a27mr9064788137.18.1738319855799; Fri, 31 Jan 2025
- 02:37:35 -0800 (PST)
+	s=arc-20240116; t=1738321500; c=relaxed/simple;
+	bh=74zBxMbZtOF6IzL5eYn1BT1WP7txMHcRiO9uVjesNWg=;
+	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
+	 In-Reply-To:Content-Type; b=VTNDZgPBzRAaoI3/yuYnBK05P1eRIoYq34s2UF9tjT7ABjvkyQe/IQkmMR/nqNswxyVrJvVWVi+ktezVgSavLUKnoOQg85DcXHIxkmWbYfRW2eksED/Lccu+nzc3YbG6rgcrRpDJG/lfGhdsVWMaSHXfbPclDmDgp4MAzROtgNY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei-partners.com; spf=pass smtp.mailfrom=huawei-partners.com; arc=none smtp.client-ip=185.176.79.56
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei-partners.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei-partners.com
+Received: from mail.maildlp.com (unknown [172.18.186.231])
+	by frasgout.his.huawei.com (SkyGuard) with ESMTP id 4YktJn3zRrz6G90H;
+	Fri, 31 Jan 2025 19:02:33 +0800 (CST)
+Received: from mscpeml500004.china.huawei.com (unknown [7.188.26.250])
+	by mail.maildlp.com (Postfix) with ESMTPS id 5B5E21400DB;
+	Fri, 31 Jan 2025 19:04:55 +0800 (CST)
+Received: from [10.123.123.159] (10.123.123.159) by
+ mscpeml500004.china.huawei.com (7.188.26.250) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1258.34; Fri, 31 Jan 2025 14:04:53 +0300
+Message-ID: <9f7f282b-95c2-8849-7b71-e77213558fd4@huawei-partners.com>
+Date: Fri, 31 Jan 2025 14:04:51 +0300
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-From: Naresh Kamboju <naresh.kamboju@linaro.org>
-Date: Fri, 31 Jan 2025 16:07:24 +0530
-X-Gm-Features: AWEUYZmUJ2DXNgZLfJYjNT9yTpkfESWbueiq-lGs1komIRRCaOtrb3XVYH9OZ8c
-Message-ID: <CA+G9fYtqv_S+nK2cZB623yUuQS7HL18ELARpq_6W3_5m9ci7zA@mail.gmail.com>
-Subject: next-20250129: rk3399-rock-pi-4b NFS mount and boot failed
-To: open list <linux-kernel@vger.kernel.org>, lkft-triage@lists.linaro.org, 
-	Linux Regressions <regressions@lists.linux.dev>, Netdev <netdev@vger.kernel.org>
-Cc: Kunihiko Hayashi <hayashi.kunihiko@socionext.com>, Yanteng Si <si.yanteng@linux.dev>, 
-	Paolo Abeni <pabeni@redhat.com>, Arnd Bergmann <arnd@arndb.de>, 
-	Dan Carpenter <dan.carpenter@linaro.org>, Theodore Grey <theodore.grey@linaro.org>, 
-	Anders Roxell <anders.roxell@linaro.org>
-Content-Type: text/plain; charset="UTF-8"
+User-Agent: Mozilla Thunderbird
+Subject: Re: [RFC PATCH v2 1/8] landlock: Fix non-TCP sockets restriction
+Content-Language: ru
+To: =?UTF-8?Q?Micka=C3=ABl_Sala=C3=BCn?= <mic@digikod.net>
+CC: Matthieu Baerts <matttbe@kernel.org>, <gnoack@google.com>,
+	<willemdebruijn.kernel@gmail.com>, <matthieu@buffet.re>,
+	<linux-security-module@vger.kernel.org>, <netdev@vger.kernel.org>,
+	<netfilter-devel@vger.kernel.org>, <yusongping@huawei.com>,
+	<artem.kuzin@huawei.com>, <konstantin.meskhidze@huawei.com>, MPTCP Linux
+	<mptcp@lists.linux.dev>, <linux-nfs@vger.kernel.org>, Paul Moore
+	<paul@paul-moore.com>
+References: <20250124.gaegoo0Ayahn@digikod.net>
+ <2f970b00-7648-1865-858a-214c5c6af0c4@huawei-partners.com>
+ <20250127.Uph4aiph9jae@digikod.net>
+ <d3d589c3-a70b-fc6e-e1bb-d221833dfef5@huawei-partners.com>
+ <594263fc-f4e7-43ce-a613-d3f8ebb7f874@kernel.org>
+ <f6e72e71-c5ed-8a9c-f33e-f190a47b8c27@huawei-partners.com>
+ <2e727df0-c981-4e0c-8d0d-09109cf27d6f@kernel.org>
+ <103de503-be0e-2eb2-b6f0-88567d765148@huawei-partners.com>
+ <1d1d58b3-2516-4fc8-9f9a-b10604bbe05b@kernel.org>
+ <b9823ff1-2f66-3992-b389-b8e631ec03ba@huawei-partners.com>
+ <20250129.Oo1xou8ieche@digikod.net>
+From: Mikhail Ivanov <ivanov.mikhail1@huawei-partners.com>
+In-Reply-To: <20250129.Oo1xou8ieche@digikod.net>
+Content-Type: text/plain; charset="UTF-8"; format=flowed
+Content-Transfer-Encoding: 8bit
+X-ClientProxiedBy: lhrpeml100012.china.huawei.com (7.191.174.184) To
+ mscpeml500004.china.huawei.com (7.188.26.250)
 
-The arm64 rk3399-rock-pi-4b boot failed on Linux next-20250129
-while mounting rootfs via NFS. Whereas other arm64 devices boot fine.
+On 1/29/2025 5:51 PM, Mickaël Salaün wrote:>>>>>>> On 28/01/2025 11:56, 
+Mikhail Ivanov wrote:
 
-rk3399-rock-pi-4b:
-  boot:
-    * gcc-13-lkftconfig
+[...]
 
-First seen on the the Linux next-20250129..next-20250130
-Good: next-20250128
-Bad: next-20250129
+>>>>>>>> * IPv6 -> IPv4 transformation for TCP and UDP sockets withon
+>>>>>>>>       IPV6_ADDRFORM. Can be controlled with setsockopt() security hook.
+> 
+> According to the man page: "It is allowed only for IPv6 sockets that are
+> connected and bound to a v4-mapped-on-v6 address."
+> 
+> This compatibility feature makes sense from user space point of view and
+> should not result in an error because of Landlock.
 
-Theodore Grey bisected this to,
-first bad commit:
-  [8865d22656b442b8d0fb019e6acb2292b99a9c3c]
-  net: stmmac: Specify hardware capability value when FIFO size isn't specified
+IPV6_ADDRFORM is useful to pass IPv6 sockets binded and connected to
+v4-mapped-on-v6 addresses to pure IPv4 applications [1].
 
-Anyone have noticed this boot problem on rk3399-rock-pi-4b running the
-Linux next-20250129 and next-20250130 kernel.
+I just realized we first need to consider restriction of IPv4 access
+for IPv4/v6 dual stack. It's possible to communicate with IPv4 peer
+using IPv6 socket (on client or server side) that is mapped on
+v4-mapped-on-v6 address (RFC 3493 [2]). If socket access rights provide
+separate control over IPv6 and IPv4, v4-mapped-on-v6 looks like possible
+bypass of IPv4 restriction and violation of the least astonishment
+principle.
 
-Boot regression: arm64 rk3399-rock-pi-4b nfs mount and boot failed
-Reported-by: Linux Kernel Functional Testing <lkft@linaro.org>
+This can be controlled with IPV6_V6ONLY socket option or with
+net.ipv6.bindv6only sysctl knob. Restriction with sysctl knob is applied
+globally and may break some dual-stack dependent applications.
 
-Boot log:
-----
-[    0.000000] Linux version 6.13.0-next-20250129 (tuxmake@tuxmake)
-(aarch64-linux-gnu-gcc (Debian 13.3.0-5) 13.3.0, GNU ld (GNU Binutils
-for Debian) 2.43.50.20241215) #1 SMP PREEMPT @1738124074
-[    0.000000] KASLR disabled due to lack of seed
-[    0.000000] Machine model: Radxa ROCK Pi 4B
-...
-[  111.599122] VFS: Unable to mount root fs via NFS.
-[  111.599909] devtmpfs: mounted
-[  111.625869] Freeing unused kernel memory: 4800K
-[  111.626817] Run /sbin/init as init process
-[  111.627364] Run /etc/init as init process
-[  111.627858] Run /bin/init as init process
-[  111.628350] Run /bin/sh as init process
-[  111.628828] Kernel panic - not syncing: No working init found.  Try
-passing init= option to kernel. See Linux
-Documentation/admin-guide/init.rst for guidance.
-[  111.630076] CPU: 0 UID: 0 PID: 1 Comm: swapper/0 Not tainted
-6.13.0-next-20250129 #1
-[  111.630769] Hardware name: Radxa ROCK Pi 4B (DT)
-[  111.631185] Call trace:
-[  111.631411]  show_stack+0x20/0x38 (C)
-[  111.631761]  dump_stack_lvl+0x34/0xd0
-[  111.632110]  dump_stack+0x18/0x28
-[  111.632428]  panic+0x3b8/0x420
-[  111.632716]  kernel_init+0x1ac/0x1f0
-[  111.633052]  ret_from_fork+0x10/0x20
-[  111.633395] SMP: stopping secondary CPUs
-[  111.633894] Kernel Offset: disabled
-[  111.634209] CPU features: 0x100,0000002c,00800000,8200421b
-[  111.634701] Memory Limit: none
-[  111.634985] ---[ end Kernel panic - not syncing: No working init
-found.  Try passing init= option to kernel. See Linux
-Documentation/admin-guide/init.rst for guidance. ]---
+I'm currently trying to collect real-world examples in which user may
+want to allow IPv6-only communication in a sandboxed environment.
+Theoretically, this can be seen as unprivileged reduction of attack
+surface for IPv6-only programs in dual-stack network (disallow to open
+IPv4 connections and communicate with loopback via IPv4 stack).
+
+Earlier, it was also discussed about possible security issues on the
+userland side related to different address representation and address
+filtering [3]. But, I don't really think these are the good examples for
+the motivation.
+
+If the v4-mapped-on-v6 addressing control is deemed reasonable, it
+should be better implemented with a new access right for
+LANDLOCK_RULE_NET_PORT rather than a part of socket creation control.
+
+[1] https://man7.org/linux/man-pages/man7/ipv6.7.html
+[2] https://datatracker.ietf.org/doc/html/rfc3493#section-3.7
+[3] https://lwn.net/Articles/688462/
 
 
-metadata:
----
-kernel: 6.13.0
-git_repo: https://git.kernel.org/pub/scm/linux/kernel/git/next/linux-next.git
-git_sha: da7e6047a6264af16d2cb82bed9b6caa33eaf56a
-git_describe: next-20250129
-test details: https://qa-reports.linaro.org/lkft/linux-next-master/build/next-20250129
-boot log: https://qa-reports.linaro.org/lkft/linux-next-master/build/next-20250129/testrun/27058414/suite/boot/test/gcc-13-lkftconfig-no-kselftest-frag/log
-details: https://qa-reports.linaro.org/lkft/linux-next-master/build/next-20250129/testrun/27058414/suite/boot/test/gcc-13-lkftconfig-no-kselftest-frag/details/
-history: https://qa-reports.linaro.org/lkft/linux-next-master/build/next-20250129/testrun/27058414/suite/boot/test/gcc-13-lkftconfig-no-kselftest-frag/history/
-test job link: https://lkft.validation.linaro.org/scheduler/job/8100579
 
---
-Linaro LKFT
-https://lkft.linaro.org
 
