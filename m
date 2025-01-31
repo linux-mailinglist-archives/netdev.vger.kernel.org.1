@@ -1,201 +1,206 @@
-Return-Path: <netdev+bounces-161754-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-161755-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id BB46FA23AA8
-	for <lists+netdev@lfdr.de>; Fri, 31 Jan 2025 09:32:36 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3A8ACA23AA6
+	for <lists+netdev@lfdr.de>; Fri, 31 Jan 2025 09:32:25 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 878863A9ECF
-	for <lists+netdev@lfdr.de>; Fri, 31 Jan 2025 08:31:48 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 15B2416939C
+	for <lists+netdev@lfdr.de>; Fri, 31 Jan 2025 08:32:09 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7AD6115E5DC;
-	Fri, 31 Jan 2025 08:31:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 45E59191F99;
+	Fri, 31 Jan 2025 08:31:46 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=swemel.ru header.i=@swemel.ru header.b="NSWoLVvD"
+	dkim=pass (2048-bit key) header.d=cloudflare.com header.i=@cloudflare.com header.b="GYUQwEdQ"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx.swemel.ru (mx.swemel.ru [95.143.211.150])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qk1-f173.google.com (mail-qk1-f173.google.com [209.85.222.173])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 58B523D66;
-	Fri, 31 Jan 2025 08:31:41 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.143.211.150
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 77F9C15667D
+	for <netdev@vger.kernel.org>; Fri, 31 Jan 2025 08:31:44 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.173
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1738312303; cv=none; b=GzBLGNO0PRcYsRMlZ+GouAij13zNRBWoGx43pIRWYkvpDD82fvR+4YdXVyHNyzw7eybM6VQwIxs805cugThBXBGVPumYLon3Cklxh/beazmuLHAx0eETOgWXhyoK0h67vfCGhYJklDjp3i+M2gmXckk5dLlbGyGxR8+wuuK7dbA=
+	t=1738312306; cv=none; b=a7f0TXE2NTeJDA/M/pqGFmjamw/kJyxh1+OGncVJ6H7rg0Ks7wxSbJvuipukJkHm4/weoHE7fT3V4CekSf4OqQKiOe0YS9sMHp+fR9hjnlvLJCJg6P+ElefUbBZwWwfI0Wi7NE53oIwrvBuExAg7za24byXohrTJRWHWLgfF4WA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1738312303; c=relaxed/simple;
-	bh=xHm2s7P70JY5Qu0aXhp98li90tCIbVggrWS8QRB9X1Q=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=dbLhMICExKwHfuNg2awr8xM4b92sTRgMEwDcK6Tzzp6JmER1w4FtyVrV2CM13S6MVOm5vdEqzpnVUYmDAoJGVvHspKRIqij6Tn+kyuN7MmR1Ur6UiBD45gGWrxI/ukmLPojYg76qpU9grHAnr7PcfS9Wis4DTrO7ynFQntL8N6U=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=swemel.ru; spf=pass smtp.mailfrom=swemel.ru; dkim=pass (1024-bit key) header.d=swemel.ru header.i=@swemel.ru header.b=NSWoLVvD; arc=none smtp.client-ip=95.143.211.150
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=swemel.ru
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=swemel.ru
-From: Denis Arefev <arefev@swemel.ru>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=swemel.ru; s=mail;
-	t=1738312299;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding;
-	bh=aUhOHhddK40aufy6oIKd+VzJHIiJYORZ9iVNCbnihug=;
-	b=NSWoLVvDGPhzZ9LS9ht63RTy35t7o1RJojJcjeBFHO4pniUvL3XmHtjLKOYwMCmD0a9Vec
-	O20x9AWuyOKdaKlTnZdwLHy9nGwvgffvhVphLXD1UVXXGdehltuWOhDgsz34jDBGBzSWLg
-	L4gpBMgxiGdR79SbzWU8SujhFlhMf7s=
-To: stable@vger.kernel.org,
-	Greg Kroah-Hartman <gregkh@linuxfoundation.org>
-Cc: "Michael S. Tsirkin" <mst@redhat.com>,
-	Jason Wang <jasowang@redhat.com>,
+	s=arc-20240116; t=1738312306; c=relaxed/simple;
+	bh=mLVZo1nn0u2stAiG+4QhFqVXxWnxquoZHj9Efr03O4g=;
+	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:
+	 Content-Disposition; b=EM1teBPpHrpnL2hKj8bqofmXzmWx6nDXD60Yx6DL8tmwQx5w/WlZUcWQx+wIWjaHoBHV+o+AY4tFcSo98TD8SOCaq0ca+v9HZbQvWeusFzEh/i5rvrYyM2cpORblw753Hfksh08citd0yVZjCeS5aykjInEieJNyiZPNI0xtDEo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=cloudflare.com; spf=pass smtp.mailfrom=cloudflare.com; dkim=pass (2048-bit key) header.d=cloudflare.com header.i=@cloudflare.com header.b=GYUQwEdQ; arc=none smtp.client-ip=209.85.222.173
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=cloudflare.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=cloudflare.com
+Received: by mail-qk1-f173.google.com with SMTP id af79cd13be357-7b98a2e3b3eso93353885a.2
+        for <netdev@vger.kernel.org>; Fri, 31 Jan 2025 00:31:44 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=cloudflare.com; s=google09082023; t=1738312303; x=1738917103; darn=vger.kernel.org;
+        h=content-disposition:mime-version:message-id:subject:cc:to:from:date
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=iVTB8TWnA94KcBdPT26vLjAJb4R6rb8WNvZVBBonljQ=;
+        b=GYUQwEdQgTr8tG8u+EMr4mRmKtxnqu+fFp9QQoU6rgTfQQe9Fc9xPKRwcfh2WzXzAG
+         AQMOODBTxzxtB0BT2CzoxO1e3vct7UcPHDrPhyvWADYVrxXto0MfahZRue+sb73bCitb
+         ONBFDb7pWCijWD4t3R6/tIbciZ1h/sCg8DpBLLjPpyfyAPjbiSbw3LxrwbevE+iA3nbh
+         +nFItzdYpjajpKsu9tgDcSriVwSH3sxJXDg7R+N00Kem251SJ58TQQVFz4BXqJd3NjGg
+         6gXBPXw+2jrrwEkkItWq6RWhwOTB1Q61sgKxskX9rqOuiyFmbdtUT/fR8nyPGLAH0FR8
+         0vtQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1738312303; x=1738917103;
+        h=content-disposition:mime-version:message-id:subject:cc:to:from:date
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=iVTB8TWnA94KcBdPT26vLjAJb4R6rb8WNvZVBBonljQ=;
+        b=LhS2XonVzrflSRsw10AiVEmM3L85HjSPaBBEk2BtVbw0jHqRXnZzFvn/Jb80jkBPJ3
+         zHOky4OOXbu24fkI4iZGDXwZrnwA/2EscCRrd7fO1rLvmdmCFgaRZq7bwNf2GT5KhkXI
+         4iETTVlifTZCmqfZIbPsTwsbARHeKn/T4DCvhPuzsP9VFlB5on9NnSA3OvOdNjvTvOi6
+         Oxo/0VPdh09exeVhLtUkABH0ZZO7VHjkqmlhG7Ub7+w0sPrEBiR3vo+ilbLXTAbLSdBX
+         yij0yNA2dNmpiGzlRABSnQUSIm9GrToy1NHVY1N+tJ0+K+PquNSpSeB25E00qE+hcrQX
+         xXCA==
+X-Gm-Message-State: AOJu0YxUbpU81FEau+5WBskU4C4WkvtNmNKcYumf/Ff8HTbMlKCc/xCH
+	cMoOxghMeseUzQyDBIHpijrTuP3TJTTbutA1P6tS5dmZevjDnOlDE84a/kQlEkZV9KaC8NysL7U
+	G
+X-Gm-Gg: ASbGnctwkr3P5E6rTznBnP1mWq/9aQsRrI9Y1xpzKnQoysaQr/r0yuhDCWbJ8hr1wUU
+	xXj9tUDFm40K7+PyMk4p/Mw85+IOSWwHz1lDRwo8i0/jkYtSA5YK+O+ED9g3vpT6tbXpuXa0KEj
+	ccJuhq/wyFAhwSuNEZnLTS9zaGCUtASaqsUyI4WSaqxi+oZWf3hMTYEKl84zedC08NbNpYZm2SP
+	lz/H1bL5pi6OXAL9RezsEAaBsdJKT06RWJMBDajQn0F5YlrCwqGMSYxl87Sdd+ZEsHS461Ph2Mj
+	RA4=
+X-Google-Smtp-Source: AGHT+IECgy6pI27TV4mOjPfWNfcpUPo5je3fvGRUoMvMP18x9oJ1PwnxKMKsqqWESyJPQNOF9GWOug==
+X-Received: by 2002:a05:620a:1911:b0:7b6:cd90:c0e1 with SMTP id af79cd13be357-7bffcd903b1mr1532377685a.37.1738312303155;
+        Fri, 31 Jan 2025 00:31:43 -0800 (PST)
+Received: from debian.debian ([2a09:bac5:79dd:25a5::3c0:2])
+        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-6e254819f92sm15782546d6.48.2025.01.31.00.31.40
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 31 Jan 2025 00:31:41 -0800 (PST)
+Date: Fri, 31 Jan 2025 00:31:39 -0800
+From: Yan Zhai <yan@cloudflare.com>
+To: netdev@vger.kernel.org
+Cc: Willem de Bruijn <willemdebruijn.kernel@gmail.com>,
 	"David S. Miller" <davem@davemloft.net>,
-	Willem de Bruijn <willemb@google.com>,
+	David Ahern <dsahern@kernel.org>,
 	Eric Dumazet <edumazet@google.com>,
-	virtualization@lists.linux-foundation.org,
-	linux-kernel@vger.kernel.org,
-	netdev@vger.kernel.org,
-	lvc-project@linuxtesting.org,
-	syzbot+7f4d0ea3df4d4fa9a65f@syzkaller.appspotmail.com
-Subject: [PATCH 5.10 4/5] net: add more sanity check in virtio_net_hdr_to_skb()
-Date: Fri, 31 Jan 2025 11:31:37 +0300
-Message-ID: <20250131083138.4221-1-arefev@swemel.ru>
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Simon Horman <horms@kernel.org>, Shuah Khan <shuah@kernel.org>,
+	Josh Hunt <johunt@akamai.com>,
+	Alexander Duyck <alexander.h.duyck@linux.intel.com>,
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+	linux-kselftest@vger.kernel.org, kernel-team@cloudflare.com
+Subject: [PATCH v3 net] udp: gso: do not drop small packets when PMTU reduces
+Message-ID: <Z5yKa7gz72+JEOXr@debian.debian>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
 
-From: Eric Dumazet <edumazet@google.com>
+Commit 4094871db1d6 ("udp: only do GSO if # of segs > 1") avoided GSO
+for small packets. But the kernel currently dismisses GSO requests only
+after checking MTU/PMTU on gso_size. This means any packets, regardless
+of their payload sizes, could be dropped when PMTU becomes smaller than
+requested gso_size. We encountered this issue in production and it
+caused a reliability problem that new QUIC connection cannot be
+established before PMTU cache expired, while non GSO sockets still
+worked fine at the same time.
 
-commit 9181d6f8a2bb32d158de66a84164fac05e3ddd18 upstream.
+Ideally, do not check any GSO related constraints when payload size is
+smaller than requested gso_size, and return EMSGSIZE instead of EINVAL
+on MTU/PMTU check failure to be more specific on the error cause.
 
-syzbot/KMSAN reports access to uninitialized data from gso_features_check() [1]
-
-The repro use af_packet, injecting a gso packet and hdrlen == 0.
-
-We could fix the issue making gso_features_check() more careful
-while dealing with NETIF_F_TSO_MANGLEID in fast path.
-
-Or we can make sure virtio_net_hdr_to_skb() pulls minimal network and
-transport headers as intended.
-
-Note that for GSO packets coming from untrusted sources, SKB_GSO_DODGY
-bit forces a proper header validation (and pull) before the packet can
-hit any device ndo_start_xmit(), thus we do not need a precise disection
-at virtio_net_hdr_to_skb() stage.
-
-[1]
-BUG: KMSAN: uninit-value in skb_gso_segment include/net/gso.h:83 [inline]
-BUG: KMSAN: uninit-value in validate_xmit_skb+0x10f2/0x1930 net/core/dev.c:3629
- skb_gso_segment include/net/gso.h:83 [inline]
- validate_xmit_skb+0x10f2/0x1930 net/core/dev.c:3629
- __dev_queue_xmit+0x1eac/0x5130 net/core/dev.c:4341
- dev_queue_xmit include/linux/netdevice.h:3134 [inline]
- packet_xmit+0x9c/0x6b0 net/packet/af_packet.c:276
- packet_snd net/packet/af_packet.c:3087 [inline]
- packet_sendmsg+0x8b1d/0x9f30 net/packet/af_packet.c:3119
- sock_sendmsg_nosec net/socket.c:730 [inline]
- __sock_sendmsg net/socket.c:745 [inline]
- ____sys_sendmsg+0x9c2/0xd60 net/socket.c:2584
- ___sys_sendmsg+0x28d/0x3c0 net/socket.c:2638
- __sys_sendmsg net/socket.c:2667 [inline]
- __do_sys_sendmsg net/socket.c:2676 [inline]
- __se_sys_sendmsg net/socket.c:2674 [inline]
- __x64_sys_sendmsg+0x307/0x490 net/socket.c:2674
- do_syscall_x64 arch/x86/entry/common.c:52 [inline]
- do_syscall_64+0x44/0x110 arch/x86/entry/common.c:83
- entry_SYSCALL_64_after_hwframe+0x63/0x6b
-
-Uninit was created at:
- slab_post_alloc_hook+0x129/0xa70 mm/slab.h:768
- slab_alloc_node mm/slub.c:3478 [inline]
- kmem_cache_alloc_node+0x5e9/0xb10 mm/slub.c:3523
- kmalloc_reserve+0x13d/0x4a0 net/core/skbuff.c:560
- __alloc_skb+0x318/0x740 net/core/skbuff.c:651
- alloc_skb include/linux/skbuff.h:1286 [inline]
- alloc_skb_with_frags+0xc8/0xbd0 net/core/skbuff.c:6334
- sock_alloc_send_pskb+0xa80/0xbf0 net/core/sock.c:2780
- packet_alloc_skb net/packet/af_packet.c:2936 [inline]
- packet_snd net/packet/af_packet.c:3030 [inline]
- packet_sendmsg+0x70e8/0x9f30 net/packet/af_packet.c:3119
- sock_sendmsg_nosec net/socket.c:730 [inline]
- __sock_sendmsg net/socket.c:745 [inline]
- ____sys_sendmsg+0x9c2/0xd60 net/socket.c:2584
- ___sys_sendmsg+0x28d/0x3c0 net/socket.c:2638
- __sys_sendmsg net/socket.c:2667 [inline]
- __do_sys_sendmsg net/socket.c:2676 [inline]
- __se_sys_sendmsg net/socket.c:2674 [inline]
- __x64_sys_sendmsg+0x307/0x490 net/socket.c:2674
- do_syscall_x64 arch/x86/entry/common.c:52 [inline]
- do_syscall_64+0x44/0x110 arch/x86/entry/common.c:83
- entry_SYSCALL_64_after_hwframe+0x63/0x6b
-
-CPU: 0 PID: 5025 Comm: syz-executor279 Not tainted 6.7.0-rc7-syzkaller-00003-gfbafc3e621c3 #0
-Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 11/17/2023
-
-Reported-by: syzbot+7f4d0ea3df4d4fa9a65f@syzkaller.appspotmail.com
-Link: https://lore.kernel.org/netdev/0000000000005abd7b060eb160cd@google.com/
-Fixes: 9274124f023b ("net: stricter validation of untrusted gso packets")
-Signed-off-by: Eric Dumazet <edumazet@google.com>
-Cc: Willem de Bruijn <willemb@google.com>
-Reviewed-by: Willem de Bruijn <willemb@google.com>
-Signed-off-by: David S. Miller <davem@davemloft.net>
-[Denis: minor fix to resolve merge conflict.]                                           
-Signed-off-by: Denis Arefev <arefev@swemel.ru>                                    
+Fixes: 4094871db1d6 ("udp: only do GSO if # of segs > 1")
+Signed-off-by: Yan Zhai <yan@cloudflare.com>
+Suggested-by: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
 ---
-Backport fix for CVE-2024-43817
-Link: https://nvd.nist.gov/vuln/detail/cve-2024-43817
----
- include/linux/virtio_net.h | 9 +++++++--
- 1 file changed, 7 insertions(+), 2 deletions(-)
+v2->v3: simplify the code; adding two test cases
+v1->v2: add a missing MTU check when fall back to no GSO mode; Fixed up
+commit message to be more precise.
 
-diff --git a/include/linux/virtio_net.h b/include/linux/virtio_net.h
-index 62613d4d84b7..e9e681fab607 100644
---- a/include/linux/virtio_net.h
-+++ b/include/linux/virtio_net.h
-@@ -3,6 +3,8 @@
- #define _LINUX_VIRTIO_NET_H
+v2: https://lore.kernel.org/netdev/Z5swit7ykNRbJFMS@debian.debian/T/#u
+v1: https://lore.kernel.org/all/Z5cgWh%2F6bRQm9vVU@debian.debian/
+---
+ net/ipv4/udp.c                       |  4 ++--
+ net/ipv6/udp.c                       |  4 ++--
+ tools/testing/selftests/net/udpgso.c | 26 ++++++++++++++++++++++++++
+ 3 files changed, 30 insertions(+), 4 deletions(-)
+
+diff --git a/net/ipv4/udp.c b/net/ipv4/udp.c
+index c472c9a57cf6..a9bb9ce5438e 100644
+--- a/net/ipv4/udp.c
++++ b/net/ipv4/udp.c
+@@ -1141,9 +1141,9 @@ static int udp_send_skb(struct sk_buff *skb, struct flowi4 *fl4,
+ 		const int hlen = skb_network_header_len(skb) +
+ 				 sizeof(struct udphdr);
  
- #include <linux/if_vlan.h>
-+#include <linux/ip.h>
-+#include <linux/ipv6.h>
- #include <linux/udp.h>
- #include <uapi/linux/tcp.h>
- #include <uapi/linux/virtio_net.h>
-@@ -47,6 +49,7 @@ static inline int virtio_net_hdr_to_skb(struct sk_buff *skb,
- 					const struct virtio_net_hdr *hdr,
- 					bool little_endian)
- {
-+	unsigned int nh_min_len = sizeof(struct iphdr);
- 	unsigned int gso_type = 0;
- 	unsigned int thlen = 0;
- 	unsigned int p_off = 0;
-@@ -63,6 +66,7 @@ static inline int virtio_net_hdr_to_skb(struct sk_buff *skb,
- 			gso_type = SKB_GSO_TCPV6;
- 			ip_proto = IPPROTO_TCP;
- 			thlen = sizeof(struct tcphdr);
-+			nh_min_len = sizeof(struct ipv6hdr);
- 			break;
- 		case VIRTIO_NET_HDR_GSO_UDP:
- 			gso_type = SKB_GSO_UDP;
-@@ -93,7 +97,8 @@ static inline int virtio_net_hdr_to_skb(struct sk_buff *skb,
- 		if (!skb_partial_csum_set(skb, start, off))
- 			return -EINVAL;
- 
--		p_off = skb_transport_offset(skb) + thlen;
-+		nh_min_len = max_t(u32, nh_min_len, skb_transport_offset(skb));
-+		p_off = nh_min_len + thlen;
- 		if (!pskb_may_pull(skb, p_off))
- 			return -EINVAL;
- 	} else {
-@@ -133,7 +138,7 @@ static inline int virtio_net_hdr_to_skb(struct sk_buff *skb,
- 
- 			skb_set_transport_header(skb, keys.control.thoff);
- 		} else if (gso_type) {
--			p_off = thlen;
-+			p_off = nh_min_len + thlen;
- 			if (!pskb_may_pull(skb, p_off))
- 				return -EINVAL;
+-		if (hlen + cork->gso_size > cork->fragsize) {
++		if (hlen + min(datalen, cork->gso_size) > cork->fragsize) {
+ 			kfree_skb(skb);
+-			return -EINVAL;
++			return -EMSGSIZE;
  		}
+ 		if (datalen > cork->gso_size * UDP_MAX_SEGMENTS) {
+ 			kfree_skb(skb);
+diff --git a/net/ipv6/udp.c b/net/ipv6/udp.c
+index 6671daa67f4f..c6ea438b5c75 100644
+--- a/net/ipv6/udp.c
++++ b/net/ipv6/udp.c
+@@ -1389,9 +1389,9 @@ static int udp_v6_send_skb(struct sk_buff *skb, struct flowi6 *fl6,
+ 		const int hlen = skb_network_header_len(skb) +
+ 				 sizeof(struct udphdr);
+ 
+-		if (hlen + cork->gso_size > cork->fragsize) {
++		if (hlen + min(datalen, cork->gso_size) > cork->fragsize) {
+ 			kfree_skb(skb);
+-			return -EINVAL;
++			return -EMSGSIZE;
+ 		}
+ 		if (datalen > cork->gso_size * UDP_MAX_SEGMENTS) {
+ 			kfree_skb(skb);
+diff --git a/tools/testing/selftests/net/udpgso.c b/tools/testing/selftests/net/udpgso.c
+index 3f2fca02fec5..36ff28af4b19 100644
+--- a/tools/testing/selftests/net/udpgso.c
++++ b/tools/testing/selftests/net/udpgso.c
+@@ -102,6 +102,19 @@ struct testcase testcases_v4[] = {
+ 		.gso_len = CONST_MSS_V4,
+ 		.r_num_mss = 1,
+ 	},
++	{
++		/* datalen <= MSS < gso_len: will fall back to no GSO */
++		.tlen = CONST_MSS_V4,
++		.gso_len = CONST_MSS_V4 + 1,
++		.r_num_mss = 0,
++		.r_len_last = CONST_MSS_V4,
++	},
++	{
++		/* MSS < datalen < gso_len: fail */
++		.tlen = CONST_MSS_V4 + 1,
++		.gso_len = CONST_MSS_V4 + 2,
++		.tfail = true,
++	},
+ 	{
+ 		/* send a single MSS + 1B */
+ 		.tlen = CONST_MSS_V4 + 1,
+@@ -205,6 +218,19 @@ struct testcase testcases_v6[] = {
+ 		.gso_len = CONST_MSS_V6,
+ 		.r_num_mss = 1,
+ 	},
++	{
++		/* datalen <= MSS < gso_len: will fall back to no GSO */
++		.tlen = CONST_MSS_V6,
++		.gso_len = CONST_MSS_V6 + 1,
++		.r_num_mss = 0,
++		.r_len_last = CONST_MSS_V6,
++	},
++	{
++		/* MSS < datalen < gso_len: fail */
++		.tlen = CONST_MSS_V6 + 1,
++		.gso_len = CONST_MSS_V6 + 2,
++		.tfail = true
++	},
+ 	{
+ 		/* send a single MSS + 1B */
+ 		.tlen = CONST_MSS_V6 + 1,
 -- 
-2.43.0
+2.30.2
+
 
 
