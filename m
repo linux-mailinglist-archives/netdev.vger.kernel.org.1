@@ -1,137 +1,141 @@
-Return-Path: <netdev+bounces-161790-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-161791-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9C3F8A2400B
-	for <lists+netdev@lfdr.de>; Fri, 31 Jan 2025 17:07:29 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1B105A241A2
+	for <lists+netdev@lfdr.de>; Fri, 31 Jan 2025 18:13:43 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 8D7CD3A9000
-	for <lists+netdev@lfdr.de>; Fri, 31 Jan 2025 16:07:21 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id A9CFF188A849
+	for <lists+netdev@lfdr.de>; Fri, 31 Jan 2025 17:13:47 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 203091E1C3A;
-	Fri, 31 Jan 2025 16:07:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0F72B1EC00C;
+	Fri, 31 Jan 2025 17:13:39 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="s3gWnpoK"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="XA+1emBX"
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qk1-f202.google.com (mail-qk1-f202.google.com [209.85.222.202])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7EE6E1E2847;
-	Fri, 31 Jan 2025 16:07:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6AD4F38DF9
+	for <netdev@vger.kernel.org>; Fri, 31 Jan 2025 17:13:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.202
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1738339645; cv=none; b=kP172NoF9Fp5My4kBSck2jQwzCnHxScXceMyGvEukzuhawZrXoRTwmqIyTMSHYoq6FOSX8PDHzNowjcnMchXpQwlwEQOIfz7lSVziAZrdwPmiyawk4VJSnk8KwQ+Cp5tWh7dWC/5ZQrLdB9jVE2GPBkwW8V4gAPs3MuF4k0M27I=
+	t=1738343619; cv=none; b=gLo8SZaWtdVXbwwvPgVmleAAh4Vh4e5aUmQ0OR/uWIj5pldNc2fsBuTcBACFkxLwLEucRGV4ByftERveWDxxKc6A99WKsi/QF2XvjQzhiZM40gd4DHMMhCmvPyRAAoJZr4e5bSf2KV6zBoNEmyegQSJkNwVQa0f2Pzxydi5iQzI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1738339645; c=relaxed/simple;
-	bh=Agxx7aTPK9tNy81pnewxjXm5kCdedECEfgERsYeOsf0=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=RI8HsdGUrPSIL2UgnMlCD460lXtfx/ADJmRyP5vnBsHoeFjbPEfg6B0z/boJEJn4nxNIS9QTIWedom6HkoFwGfUvP98F3ky2d6ccnXsNYGHs6OqroSuzCreNwF5J1+wCrwSMh9IDIPKNcFbNsa9GVtnmc0SQYlOMumrIf8NHDWQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=s3gWnpoK; arc=none smtp.client-ip=156.67.10.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=IuPlZa6y6J6gXS+P+dgZflnpDfa3pb9jp5g4ifalhAs=; b=s3gWnpoKWyIy/LAY9j0YXccsrB
-	nJop06eJ56UHTRDBbXnSKI9+n25Dc/THTlUb4KuDvFCAxRJc+GOCIkT3qNj3EGkZDi3vrgFS6taIw
-	Iau7Spx5Sd3qnzRpzRTYl0rptVhktWP66qxNzP3ncc4awdmIM3QoKzilfZmkZ6m6KpWw=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1tdtXp-009jaZ-NK; Fri, 31 Jan 2025 17:07:01 +0100
-Date: Fri, 31 Jan 2025 17:07:01 +0100
-From: Andrew Lunn <andrew@lunn.ch>
-To: Steven Price <steven.price@arm.com>
-Cc: Kunihiko Hayashi <hayashi.kunihiko@socionext.com>,
-	Alexandre Torgue <alexandre.torgue@foss.st.com>,
-	Jose Abreu <joabreu@synopsys.com>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Maxime Coquelin <mcoquelin.stm32@gmail.com>,
-	Russell King <linux@armlinux.org.uk>,
-	Yanteng Si <si.yanteng@linux.dev>, Furong Xu <0x1207@gmail.com>,
-	Joao Pinto <Joao.Pinto@synopsys.com>, netdev@vger.kernel.org,
-	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH net v4 3/3] net: stmmac: Specify hardware capability
- value when FIFO size isn't specified
-Message-ID: <80cc9950-9f62-4369-be87-c022d55a2b6f@lunn.ch>
-References: <20250127013820.2941044-1-hayashi.kunihiko@socionext.com>
- <20250127013820.2941044-4-hayashi.kunihiko@socionext.com>
- <07af1102-0fa7-45ad-bcbc-aef0295ceb63@arm.com>
- <fc08926d-b9af-428f-8811-4bfe08acc5b7@lunn.ch>
- <f343c126-fed9-4209-a18d-61a4e604db2f@arm.com>
- <a4e31542-3534-4856-a90f-e47960ed0907@lunn.ch>
- <d6265f8e-51bc-4556-9ecb-bfb73f86260d@arm.com>
- <2ed9e7c7-e760-409e-a431-823bc3f21cb7@lunn.ch>
- <915713e1-b67f-4eae-82c6-8dceae8f97a7@arm.com>
+	s=arc-20240116; t=1738343619; c=relaxed/simple;
+	bh=X0dGUNwoYEJvq97Uq0IH+DgBY3Zx/xbPMSCOT0TYIlI=;
+	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=I3aD7j49fnZkyXYlr6oMrCiB/FZKsz56uFiRgXE718ChCUojPbYejGUH4TksPBZAF9w252dXs53OAIKIaK4xd+Gryf8NtO/OGzJn3zMj98SX4CxJOax36LzoSF4yz5M6Mea9EvaV/xEKBhOb3Nr9/cgt8lZZ36gxApga12H1XF8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=XA+1emBX; arc=none smtp.client-ip=209.85.222.202
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com
+Received: by mail-qk1-f202.google.com with SMTP id af79cd13be357-7b6e7f07332so383646385a.1
+        for <netdev@vger.kernel.org>; Fri, 31 Jan 2025 09:13:37 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1738343616; x=1738948416; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=DJrcjbGyIXZvSKLdt1hOUGQq59vSaOv0HDNOZZSylyA=;
+        b=XA+1emBX0oSnBfc2SawuhdTlGiRMWy4NNYRZkuS8IeMeuz5mZ84l5k5id6hcGhYsSk
+         it7GHDHSwdhuImB+b5ErntXB85anzvjpN1jPNUi8nIq5yvVhLX15YN+UowFq1EzdiDGT
+         7m/6FVn3lk9zBoNStFKwHOvvN/6aeROuhcuWS5La67Rfb/3m0RcpUXBWc8K8etpvAy71
+         BgVRXIvZAoceglOvOkpnSAl9WFShd7bPLiDcRARqWYbD+ec4MSd3FBWCqXaVEOiagFEV
+         woiCpzRQfffoxHrJcMKOa4wCnjuL52U/wjf476Acpc/RT4nOIFQ6+qOUhgFGIYW0feop
+         Il2g==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1738343616; x=1738948416;
+        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=DJrcjbGyIXZvSKLdt1hOUGQq59vSaOv0HDNOZZSylyA=;
+        b=vvolk5R+3FeffaIBWZrrS6GsDlwD8q1IX1N/H18zWoDB0VzEVjfoQG9q5rLf9ZOjrt
+         7ugaVlJ2X2XEr4od8pH4WWK5AOJ5p/0hIrAnv+lUum0O4tmPhubAKaS4h/X7JCHQyQ9g
+         a9LdoTICs6Kr39Zf5ugLVMYUMjJeyP5lJcSGi+AKJp6/qK0+Btire2hgKOoodi551Snz
+         cmM3MJDSe7tExuJtYi8uV3kNW24mGAoPIGX67w7qXH+1cm6X24LiYv3OvI6qI/LRY1RZ
+         YcOjq69aObSFJ9oR5OdrklxEaTCMpRlwWeqg7lkRMeWwqOC2xSjFbN2jFhPGPDzaIGiO
+         SaJA==
+X-Gm-Message-State: AOJu0YxXwqEtXdQ+d7joK4p+pIk56KTo5r/8fp4MJbqOM7hhWl0fggCo
+	3DmXrgNK5Oiemsi7F6ltvhYtvO1j03t59OrN4LUHS2qdZP8WZcOUAxVb0gAJJ97lRfW6FiTkWCS
+	dAQASKulcTw==
+X-Google-Smtp-Source: AGHT+IFvVcKzfn8QAr49BRV+muvFBrht6ttTLymbH2tWtIhdeNjDpn8Oeqr38h4BmBcgbJyn4FcRMCZf2gU62Q==
+X-Received: from qkbdz28.prod.google.com ([2002:a05:620a:2b9c:b0:7b6:f191:b68b])
+ (user=edumazet job=prod-delivery.src-stubby-dispatcher) by
+ 2002:a05:620a:4101:b0:7b6:eed4:695c with SMTP id af79cd13be357-7bffcd43d99mr1943443885a.32.1738343616281;
+ Fri, 31 Jan 2025 09:13:36 -0800 (PST)
+Date: Fri, 31 Jan 2025 17:13:18 +0000
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <915713e1-b67f-4eae-82c6-8dceae8f97a7@arm.com>
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.48.1.362.g079036d154-goog
+Message-ID: <20250131171334.1172661-1-edumazet@google.com>
+Subject: [PATCH net 00/16] net: first round to use dev_net_rcu()
+From: Eric Dumazet <edumazet@google.com>
+To: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
+	Paolo Abeni <pabeni@redhat.com>
+Cc: netdev@vger.kernel.org, Kuniyuki Iwashima <kuniyu@amazon.com>, 
+	Simon Horman <horms@kernel.org>, eric.dumazet@gmail.com, 
+	Eric Dumazet <edumazet@google.com>
+Content-Type: text/plain; charset="UTF-8"
 
-On Fri, Jan 31, 2025 at 03:54:16PM +0000, Steven Price wrote:
-> On 31/01/2025 15:29, Andrew Lunn wrote:
-> > On Fri, Jan 31, 2025 at 03:03:11PM +0000, Steven Price wrote:
-> >> On 31/01/2025 14:47, Andrew Lunn wrote:
-> >>>>> I'm guessing, but in your setup, i assume the value is never written
-> >>>>> to a register, hence 0 is O.K. e.g. dwmac1000_dma_operation_mode_rx(),
-> >>>>> the fifosz value is used to determine if flow control can be used, but
-> >>>>> is otherwise ignored.
-> >>>>
-> >>>> I haven't traced the code, but that fits my assumptions too.
-> >>>
-> >>> I could probably figure it out using code review, but do you know
-> >>> which set of DMA operations your hardware uses? A quick look at
-> >>> dwmac-rk.c i see:
-> >>>
-> >>>         /* If the stmmac is not already selected as gmac4,
-> >>>          * then make sure we fallback to gmac.
-> >>>          */
-> >>>         if (!plat_dat->has_gmac4)
-> >>>                 plat_dat->has_gmac = true;
-> >>
-> >> has_gmac4 is false on this board, so has_gmac will be set to true here.
-> > 
-> > Thanks. Looking in hwif.c, that means dwmac1000_dma_ops are used.
-> > 
-> > dwmac1000_dma_operation_mode_rx() just does a check:
-> > 
-> > 	if (rxfifosz < 4096) {
-> > 		csr6 &= ~DMA_CONTROL_EFC;
-> > 
-> > but otherwise does not use the value.
-> > 
-> > dwmac1000_dma_operation_mode_tx() appears to completely ignore fifosz.
-> > 
-> > So i would say all zero is valid for has_gmac == true, but you might
-> > gain flow control if a value was passed.
-> > 
-> > A quick look at dwmac100_dma_operation_mode_tx() suggests fifosz is
-> > also ignored, and dwmac100_dma_operation_mode_rx() does not exist. So
-> > all 0 is also valid for gmac == false, gmac4 == false, and xgmac ==
-> > false.
-> > 
-> > dwmac4_dma_rx_chan_op_mode() does use the value to determine mtl_rx_op
-> > which gets written to a register. So gmac4 == true looks to need
-> > values. dwxgmac2_dma_rx_mode() is the same, so xgmac = true also need
-> > valid values.
-> > 
-> > Could you cook up a fix based on this?
-> 
-> The below works for me, I haven't got the hardware to actually test the 
-> gmac4/xgmac paths:
+dev_net(dev) should either be protected by RTNL or RCU.
 
-This looks sensible. Hopefully Kunihiko can test on more platforms.
+There is no LOCKDEP support yet for this helper.
 
-	Andrew
+Adding it would trigger too many splats.
+
+Instead, add dev_net_rcu() and start to use it
+to either fix bugs or document points that were safely
+using dev_net().
+
+Eric Dumazet (16):
+  net: add dev_net_rcu() helper
+  ipv4: add RCU protection to ip4_dst_hoplimit()
+  ipv4: use RCU protection in ip_dst_mtu_maybe_forward()
+  ipv4: use RCU protection in ipv4_default_advmss()
+  ipv4: use RCU protection in rt_is_expired()
+  tcp: convert to dev_net_rcu()
+  net: gro: convert four dev_net() calls
+  udp: convert to dev_net_rcu()
+  ipv4: icmp: convert to dev_net_rcu()
+  ipv6: icmp: convert to dev_net_rcu()
+  ipv6: input: convert to dev_net_rcu()
+  ipv6: output: convert to dev_net_rcu()
+  ipv6: use RCU protection in ip6_default_advmss()
+  net: filter: convert to dev_net_rcu()
+  flow_dissector: use rcu protection to fetch dev_net()
+  ipv4: use RCU protection in inet_select_addr()
+
+ include/linux/netdevice.h      |  6 +++++
+ include/net/inet6_hashtables.h |  2 +-
+ include/net/inet_hashtables.h  |  2 +-
+ include/net/ip.h               | 13 ++++++++---
+ include/net/net_namespace.h    |  2 +-
+ include/net/route.h            |  9 ++++++--
+ net/core/filter.c              | 40 +++++++++++++++++-----------------
+ net/core/flow_dissector.c      | 21 +++++++++---------
+ net/ipv4/devinet.c             |  3 ++-
+ net/ipv4/icmp.c                | 22 +++++++++----------
+ net/ipv4/route.c               | 19 ++++++++++++----
+ net/ipv4/tcp_ipv4.c            |  8 +++----
+ net/ipv4/tcp_metrics.c         |  6 ++---
+ net/ipv4/tcp_offload.c         |  2 +-
+ net/ipv4/udp.c                 | 19 ++++++++--------
+ net/ipv4/udp_offload.c         |  2 +-
+ net/ipv6/icmp.c                | 22 +++++++++----------
+ net/ipv6/ip6_input.c           | 12 +++++-----
+ net/ipv6/ip6_output.c          |  4 ++--
+ net/ipv6/output_core.c         |  2 +-
+ net/ipv6/route.c               |  7 +++++-
+ net/ipv6/tcp_ipv6.c            | 10 ++++-----
+ net/ipv6/tcpv6_offload.c       |  2 +-
+ net/ipv6/udp.c                 | 18 +++++++--------
+ net/ipv6/udp_offload.c         |  2 +-
+ 25 files changed, 146 insertions(+), 109 deletions(-)
+
+-- 
+2.48.1.362.g079036d154-goog
+
 
