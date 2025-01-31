@@ -1,150 +1,227 @@
-Return-Path: <netdev+bounces-161875-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-161876-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id CBE69A24563
-	for <lists+netdev@lfdr.de>; Fri, 31 Jan 2025 23:51:54 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id BFB79A24593
+	for <lists+netdev@lfdr.de>; Sat,  1 Feb 2025 00:13:08 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 46CFB166D06
-	for <lists+netdev@lfdr.de>; Fri, 31 Jan 2025 22:51:53 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A08B53A63AC
+	for <lists+netdev@lfdr.de>; Fri, 31 Jan 2025 23:13:00 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 789C21F03DB;
-	Fri, 31 Jan 2025 22:51:52 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 944E51B21B9;
+	Fri, 31 Jan 2025 23:13:04 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=cs.stanford.edu header.i=@cs.stanford.edu header.b="vXbIeR2E"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="E56eFF1n"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp1.cs.Stanford.EDU (smtp1.cs.stanford.edu [171.64.64.25])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f169.google.com (mail-pl1-f169.google.com [209.85.214.169])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 034311C5D74
-	for <netdev@vger.kernel.org>; Fri, 31 Jan 2025 22:51:50 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=171.64.64.25
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DE404165F1D
+	for <netdev@vger.kernel.org>; Fri, 31 Jan 2025 23:13:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.169
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1738363912; cv=none; b=cPL8c1t7L9i32IfRx0jFtgm+IOd8q48C8flCRMjIjLmHYJ8Swbypbt7hJJxYvMckyZgYt3UwQA2rEdkSLQ4HT1eSYUfi5iA84IYYJjS3tzNv1rl448DhQEKEmzFqQIjjb6T3IucZ3Yq501M6F9tGi4IBosNBM0IBGHgEapVJmMY=
+	t=1738365184; cv=none; b=n8P51C3fPurWbNbe1cc9ATrH1JWVZyDlsQSDU3rRAVeO+iD8ZwqD/GnIzEiyoeSU3zvgUl31AskRYFBLkCFTRogFZ3sm7R23jbAbt7wj16QmpZFd3h92tIki9xNMCIEHRjCC5K1PYWL22+EGMZTzvg5x6uyO296wyDRO+Fxsmhc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1738363912; c=relaxed/simple;
-	bh=wOiQQ/NR+ufy6rrzti2+Gsiiq8HU0MaSXqynkGkBOFM=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=n5tbocdae7dGaQJb/UpQd5DvvHI8NKxlZVO2aUn/wx+jzra1rWoZYyGJ/85tBbskiL0rZnZV2+E/ePccw7pbkuvHWlquf3eGqbG2xN26xsl0UkaUjD89pNKoE3/gKrS6CtrGhPlWrWgdP+aG7jb8l1KDMEqa0yk36xVZZRqFknM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=cs.stanford.edu; spf=pass smtp.mailfrom=cs.stanford.edu; dkim=pass (2048-bit key) header.d=cs.stanford.edu header.i=@cs.stanford.edu header.b=vXbIeR2E; arc=none smtp.client-ip=171.64.64.25
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=cs.stanford.edu
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=cs.stanford.edu
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=cs.stanford.edu; s=cs2308; h=Content-Transfer-Encoding:Content-Type:Cc:To:
-	Subject:Message-ID:Date:From:In-Reply-To:References:MIME-Version:Sender:
-	Reply-To:Content-ID:Content-Description:Resent-Date:Resent-From:Resent-Sender
-	:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:List-Help:List-Unsubscribe:
-	List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=2xTWxnzhSDCvLLqIZxAmwBah4dFcmfhs0lhP/PcIKDI=; t=1738363911; x=1739227911; 
-	b=vXbIeR2EH5ugKzb0hCQBYqV60RsNpVbdQqObcgE875H3G6jKlJYfDTVktYP1f2Cj3h4gDrTgOfy
-	53/Tu3giT8G0kxQ0LCEgGxkf4el6tcK9VxKizVUYiJPA4eymz2V0dljE7l4t+cH/Uomn9u1OpzfxI
-	0PXnyDB3qq75ue6tjxjeC9doz9KlQXhY0pi+3UzqlL2FpX4MGjiET8QwacJDAOoJ43Igl+OBi31V2
-	ULdPF3yVOo4K67v6KxkfBI09ijBW397H5d5QqXYK8dx3V6D99aBL1yTq5A3rN4/9HAGzuTGBM1f3M
-	/rOREjlYE/WuRxeysQeL8oHJQvHOPmd5AjdQ==;
-Received: from mail-oo1-f52.google.com ([209.85.161.52]:58421)
-	by smtp1.cs.Stanford.EDU with esmtpsa  (TLS1.2) tls TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256
-	(Exim 4.94.2)
-	(envelope-from <ouster@cs.stanford.edu>)
-	id 1tdzrZ-0005l5-JG
-	for netdev@vger.kernel.org; Fri, 31 Jan 2025 14:51:50 -0800
-Received: by mail-oo1-f52.google.com with SMTP id 006d021491bc7-5f31b3db5ecso1051910eaf.0
-        for <netdev@vger.kernel.org>; Fri, 31 Jan 2025 14:51:49 -0800 (PST)
-X-Gm-Message-State: AOJu0YzI3Gf2G+tXNEsWmyCdL9IMVmRRGPn2PU9ULTJTfrX8D9yASogL
-	Ypgy5gAlUAq0UG6xvASS5Dw/6WXPEATx88+0B3iaLZxf5Uyzqw4q+51NG/6569M94Vrzi4Cbq5O
-	lFcFh5JyCSdSE8/ZZM3jFv/X57KA=
-X-Google-Smtp-Source: AGHT+IFDow4rEuAiHpA3IfyYq4s1Zsp/ovyrHyVa57P0jfaFw6cDKJoXFQe2/CODaVcCXrojVLIPLQ+ewHmZTKTP0RE=
-X-Received: by 2002:a05:6871:2085:b0:296:bbc8:4a82 with SMTP id
- 586e51a60fabf-2b32f28615amr8851564fac.27.1738363909031; Fri, 31 Jan 2025
- 14:51:49 -0800 (PST)
+	s=arc-20240116; t=1738365184; c=relaxed/simple;
+	bh=cMITw3dF4OxsL7ZuzfmnDzJTP4O3bgYL84hpwsx1Fp4=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=enlhlXe5dq+K9ORmmSje+o0VuSvf0VdkdJXe6pd7P9DokNriUQhuP41kiGt4D7PkETe64A0KobISQcaiM3Bp4d2IEHAht0glfKy1SNDiXa6Kn2BKXZxcRuf2frDwSEhZAnScUx9cdkNZRObmntxBMMa5os65BsySSVFOoxg9Vfo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=E56eFF1n; arc=none smtp.client-ip=209.85.214.169
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pl1-f169.google.com with SMTP id d9443c01a7336-2167141dfa1so45490075ad.1
+        for <netdev@vger.kernel.org>; Fri, 31 Jan 2025 15:13:02 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1738365182; x=1738969982; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=3zpCRAux+47xfrAV5Yp1f0fD/gT89DpynwaFMwh+EOo=;
+        b=E56eFF1nq0Uav2L1esQC6Asv+OLyWfIxkJsDzKiNMHUk8uvN+JS5nW535jYkMp55h2
+         LHBe5Q/qSCLFjqZtVwHNkVQ1vIn9FMaJ3epb/eAqRZVMC/rdoIUmUQcymeNDOANe2AaY
+         XA8eAg5+1nzRyXKvqbFQ1m+3ISHC51EYYzHYO9WDdd/Ym56U0ZQ6Lzo5e66FW52LbuR9
+         C+EKkXIabtTCaRrmzZisKdD6Wg0wGtT3g5b55xTj/wlgVQbACnHsMggb8VE25XQ0UZ9j
+         3s7SfJE40F4AB3nJu+HS6MUGt9zw7hW6lxESCwvE7WJyPfdemlC/bvFfiyBQSTRKOGlr
+         eikQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1738365182; x=1738969982;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=3zpCRAux+47xfrAV5Yp1f0fD/gT89DpynwaFMwh+EOo=;
+        b=fbzl9rC5fOkKgue/3grSVaryHp5z2owtnqCRk449Yvewe7NU6uDpMIRgn95N6t9tKO
+         DdYpp+xpEK7ixP1a2caScS4yOXjUwBJ1DE+K75GTtRgOGTVU9NgXpRDHmUKBSSY1J12J
+         c4RTYglhdz8MNIQDE8nKDFfR8uA7sgPu+VNXHlqUup1mXAgqYvF8kEfx25TFLcqz4LwS
+         rsgw/0/EhqOGe2aWwQGBNdxsiKMY+dKrDnD1G2oY2hGik5dwxP/cfRK9LnmVm5/Qkr8O
+         xxQAQCAGaUrfj1R/VVGsuI/dOBDxujKpq5znT6/lqIrEY0XUUbwCHlIGPPC/f3Ck5afz
+         zj8g==
+X-Gm-Message-State: AOJu0YxXSvIZ4zi+UuzKI73R3dfmd+5Ttn96ckbh89SDaIyWfwRIxQ77
+	jRVLDnHiPyyYyAdjF4mN5mBgWOgcvTpgC1I30Oh0Kqh9Xgp4JplOl994+Q==
+X-Gm-Gg: ASbGncuW9MMltHcgJg6kjvGVkSHKxPzQ82R7c6AZEATRJuIL+anKyOdaMeDLAicAS7U
+	uKCncvLzB73a0q0T/fL98GrDKDCam0W0rLM/N9KVrqh97joB4m+n5UsgP82W/92VgaLDfX2rPR1
+	gtd/heb26G8CFlW60Mar/P/xsmNLQZ2NGQ3CAW4QlMJv7Pc2t65YJ8UMFu11OLO8XiVd5cq5IQ7
+	gExfLVM+AT7m5XIvtvqPweK1Peockrjv3aW67tuzBXG9Y6z7LTS6z7MFFda168cu+nJosfzeNtq
+	Wl9v9TDgiS18fnMoIZF4
+X-Google-Smtp-Source: AGHT+IFMBz7o+Cd9/aFtoGJQtUDPzXWn2ICrMiB9AKxiIqBL9NJctOIjw0nKfrnl2ihrCwhbQSUXyg==
+X-Received: by 2002:a17:903:120a:b0:216:3f6e:fabd with SMTP id d9443c01a7336-21edd7eafccmr70785055ad.7.1738365181820;
+        Fri, 31 Jan 2025 15:13:01 -0800 (PST)
+Received: from localhost ([2601:647:6881:9060:9ca:6511:2ce0:8788])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-21de31efba5sm35395995ad.6.2025.01.31.15.13.01
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 31 Jan 2025 15:13:01 -0800 (PST)
+Date: Fri, 31 Jan 2025 15:13:00 -0800
+From: Cong Wang <xiyou.wangcong@gmail.com>
+To: Pedro Tammela <pctammela@mojatatu.com>
+Cc: netdev@vger.kernel.org, jhs@mojatatu.com, jiri@resnulli.us,
+	quanglex97@gmail.com, mincho@theori.io,
+	Cong Wang <cong.wang@bytedance.com>
+Subject: Re: [Patch net v2 2/4] selftests/tc-testing: Add a test case for
+ pfifo_head_drop qdisc when limit==0
+Message-ID: <Z51Y/KlsCyYi5VvB@pop-os.localdomain>
+References: <20250126041224.366350-1-xiyou.wangcong@gmail.com>
+ <20250126041224.366350-3-xiyou.wangcong@gmail.com>
+ <f49814fb-cd69-4c3b-b8d4-c529a99c10e5@mojatatu.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250115185937.1324-1-ouster@cs.stanford.edu> <20250115185937.1324-9-ouster@cs.stanford.edu>
- <9083adf9-4e3f-47d9-8a79-d8fb052f99b5@redhat.com> <CAGXJAmxWOmPi-khSUugzOOjMSgVpWnn7QZ28jORK4sL9=vrA9A@mail.gmail.com>
- <82cdba95-83cb-4902-bb2a-a2ab880797a8@redhat.com>
-In-Reply-To: <82cdba95-83cb-4902-bb2a-a2ab880797a8@redhat.com>
-From: John Ousterhout <ouster@cs.stanford.edu>
-Date: Fri, 31 Jan 2025 14:51:13 -0800
-X-Gmail-Original-Message-ID: <CAGXJAmxDozdg3FPDNkFUcQU9FXENr-Oefnp61eWzXo5Sne4C1g@mail.gmail.com>
-X-Gm-Features: AWEUYZlxqUrnfpg6jKSEZdYrayjRnySfdKUq5LB760-u7FWLk_1LRA0dwzEr4SY
-Message-ID: <CAGXJAmxDozdg3FPDNkFUcQU9FXENr-Oefnp61eWzXo5Sne4C1g@mail.gmail.com>
-Subject: Re: [PATCH net-next v6 08/12] net: homa: create homa_incoming.c
-To: Paolo Abeni <pabeni@redhat.com>
-Cc: netdev@vger.kernel.org, edumazet@google.com, horms@kernel.org, 
-	kuba@kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Spam-Score: 0.8
-X-Spam-Level: 
-X-Scan-Signature: 8577cc8f8d13cb4ae2b02fc82e253015
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <f49814fb-cd69-4c3b-b8d4-c529a99c10e5@mojatatu.com>
 
-Also resending this message to get rid of HTML in the original...
+On Tue, Jan 28, 2025 at 08:19:54PM -0300, Pedro Tammela wrote:
+> On 26/01/2025 01:12, Cong Wang wrote:
+> > From: Quang Le <quanglex97@gmail.com>
+> > 
+> > When limit == 0, pfifo_tail_enqueue() must drop new packet and
+> > increase dropped packets count of the qdisc.
+> > 
+> > All test results:
+> > 
+> > 1..16
+> > ok 1 a519 - Add bfifo qdisc with system default parameters on egress
+> > ok 2 585c - Add pfifo qdisc with system default parameters on egress
+> > ok 3 a86e - Add bfifo qdisc with system default parameters on egress with handle of maximum value
+> > ok 4 9ac8 - Add bfifo qdisc on egress with queue size of 3000 bytes
+> > ok 5 f4e6 - Add pfifo qdisc on egress with queue size of 3000 packets
+> > ok 6 b1b1 - Add bfifo qdisc with system default parameters on egress with invalid handle exceeding maximum value
+> > ok 7 8d5e - Add bfifo qdisc on egress with unsupported argument
+> > ok 8 7787 - Add pfifo qdisc on egress with unsupported argument
+> > ok 9 c4b6 - Replace bfifo qdisc on egress with new queue size
+> > ok 10 3df6 - Replace pfifo qdisc on egress with new queue size
+> > ok 11 7a67 - Add bfifo qdisc on egress with queue size in invalid format
+> > ok 12 1298 - Add duplicate bfifo qdisc on egress
+> > ok 13 45a0 - Delete nonexistent bfifo qdisc
+> > ok 14 972b - Add prio qdisc on egress with invalid format for handles
+> > ok 15 4d39 - Delete bfifo qdisc twice
+> > ok 16 d774 - Check pfifo_head_drop qdisc enqueue behaviour when limit == 0
+> > 
+> > Signed-off-by: Quang Le <quanglex97@gmail.com>
+> > Signed-off-by: Cong Wang <cong.wang@bytedance.com>
+> > ---
+> >   .../tc-testing/tc-tests/qdiscs/fifo.json      | 25 +++++++++++++++++++
+> >   1 file changed, 25 insertions(+)
+> > 
+> > diff --git a/tools/testing/selftests/tc-testing/tc-tests/qdiscs/fifo.json b/tools/testing/selftests/tc-testing/tc-tests/qdiscs/fifo.json
+> > index ae3d286a32b2..94f6456ab460 100644
+> > --- a/tools/testing/selftests/tc-testing/tc-tests/qdiscs/fifo.json
+> > +++ b/tools/testing/selftests/tc-testing/tc-tests/qdiscs/fifo.json
+> > @@ -313,6 +313,31 @@
+> >           "matchPattern": "qdisc bfifo 1: root",
+> >           "matchCount": "0",
+> >           "teardown": [
+> > +	]
+> > +    },
+> > +    {
+> > +        "id": "d774",
+> > +        "name": "Check pfifo_head_drop qdisc enqueue behaviour when limit == 0",
+> > +        "category": [
+> > +            "qdisc",
+> > +            "pfifo_head_drop"
+> > +        ],
+> > +        "plugins": {
+> > +            "requires": "nsPlugin"
+> > +        },
+> > +        "setup": [
+> > +            "$IP link add dev $DUMMY mtu 1279 type dummy || true",
+> 
+> You don't need to manually add or remove a dummy device for tdc anymore.
+> The nsPlugin is responsible for it.
 
-On Thu, Jan 30, 2025 at 1:57=E2=80=AFAM Paolo Abeni <pabeni@redhat.com> wro=
-te:
-> On 1/30/25 1:48 AM, John Ousterhout wrote:
-> > On Mon, Jan 27, 2025 at 2:19=E2=80=AFAM Paolo Abeni <pabeni@redhat.com>=
- wrote:
-> >>
-> >> On 1/15/25 7:59 PM, John Ousterhout wrote:
-> >>> +     /* Each iteration through the following loop processes one pack=
-et. */
-> >>> +     for (; skb; skb =3D next) {
-> >>> +             h =3D (struct homa_data_hdr *)skb->data;
-> >>> +             next =3D skb->next;
-> >>> +
-> >>> +             /* Relinquish the RPC lock temporarily if it's needed
-> >>> +              * elsewhere.
-> >>> +              */
-> >>> +             if (rpc) {
-> >>> +                     int flags =3D atomic_read(&rpc->flags);
-> >>> +
-> >>> +                     if (flags & APP_NEEDS_LOCK) {
-> >>> +                             homa_rpc_unlock(rpc);
-> >>> +                             homa_spin(200);
-> >>
-> >> Why spinning on the current CPU here? This is completely unexpected, a=
-nd
-> >> usually tolerated only to deal with H/W imposed delay while programmin=
-g
-> >> some device registers.
-> >
-> > This is done to pass the RPC lock off to another thread (the
-> > application); the spin is there to allow the other thread to acquire
-> > the lock before this thread tries to acquire it again (almost
-> > immediately). There's no performance impact from the spin because this
-> > thread is going to turn around and try to acquire the RPC lock again
-> > (at which point it will spin until the other thread releases the
-> > lock). Thus it's either spin here or spin there. I've added a comment
-> > to explain this.
->
-> What if another process is spinning on the RPC lock without setting
-> APP_NEEDS_LOCK? AFAICS incoming packets targeting the same RPC could
-> land on different RX queues.
+Thanks for the hint!
 
-If that happens then it could grab the lock instead of the desired
-application, which would defeat the performance optimization and delay
-the application a bit. This would be no worse than if the
-APP_NEEDS_LOCK mechanism were not present.
+> 
+> I ran the suite with both of the tests without the link add/del and it's
+> working!
+> 
+> Can you try it?
 
-> If the spin is not functionally needed, just drop it. If it's needed, it
-> would be better to find some functional replacement, possibly explicit
-> notification via waitqueue or completion.
+I tried it, but I saw the following error. I am not sure whether this
+error is related to these patches.
 
-The goal is to have a very lightweight mechanism for an application to
-preempt the RPC lock. I'd be happy to use an existing mechanism if
-something appropriate exists, but waitqueues and completions sound
-more heavyweight to me; aren't they both based on blocking rather than
-spinning?
+multiprocessing.pool.RemoteTraceback:
+# """
+# Traceback (most recent call last):
+#   File "/usr/lib64/python3.12/multiprocessing/pool.py", line 125, in worker
+#     result = (True, func(*args, **kwds))
+#                     ^^^^^^^^^^^^^^^^^^^
+#   File "/usr/lib64/python3.12/multiprocessing/pool.py", line 48, in mapstar
+#     return list(map(*args))
+#            ^^^^^^^^^^^^^^^^
+#   File "/host/tools/testing/selftests/tc-testing/./tdc.py", line 601, in __mp_runner
+#     (_, tsr) = test_runner(mp_pm, mp_args, tests)
+#                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+#   File "/host/tools/testing/selftests/tc-testing/./tdc.py", line 535, in test_runner
+#     res = run_one_test(pm, args, index, tidx)
+#           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+#   File "/host/tools/testing/selftests/tc-testing/./tdc.py", line 418, in run_one_test
+#     pm.call_pre_case(tidx)
+#   File "/host/tools/testing/selftests/tc-testing/./tdc.py", line 142, in call_pre_case
+#     pgn_inst.pre_case(caseinfo, test_skip)
+#   File "/host/tools/testing/selftests/tc-testing/plugin-lib/nsPlugin.py", line 63, in pre_case
+#     self.prepare_test(test)
+#   File "/host/tools/testing/selftests/tc-testing/plugin-lib/nsPlugin.py", line 36, in prepare_test
+#     self._nl_ns_create()
+#   File "/host/tools/testing/selftests/tc-testing/plugin-lib/nsPlugin.py", line 130, in _nl_ns_create
+#     ip.link('add', ifname=dev1, kind='veth', peer={'ifname': dev0, 'net_ns_fd':'/proc/1/ns/net'})
+#   File "/usr/local/lib/python3.12/site-packages/pyroute2/iproute/linux.py", line 1730, in link
+#     ret = self.nlm_request(msg, msg_type=msg_type, msg_flags=msg_flags)
+#           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+#   File "/usr/local/lib/python3.12/site-packages/pyroute2/netlink/nlsocket.py", line 875, in nlm_request
+#     return tuple(self._genlm_request(*argv, **kwarg))
+#            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+#   File "/usr/local/lib/python3.12/site-packages/pyroute2/netlink/nlsocket.py", line 1248, in nlm_request
+#     for msg in self.get(
+#                ^^^^^^^^^
+#   File "/usr/local/lib/python3.12/site-packages/pyroute2/netlink/nlsocket.py", line 878, in get
+#     return tuple(self._genlm_get(*argv, **kwarg))
+#            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+#   File "/usr/local/lib/python3.12/site-packages/pyroute2/netlink/nlsocket.py", line 555, in get
+#     raise msg['header']['error']
+# pyroute2.netlink.exceptions.NetlinkError: (17, 'File exists')
+# """
+#
+# The above exception was the direct cause of the following exception:
+#
+# Traceback (most recent call last):
+#   File "/host/tools/testing/selftests/tc-testing/./tdc.py", line 1027, in <module>
+#     main()
+#   File "/host/tools/testing/selftests/tc-testing/./tdc.py", line 1021, in main
+#     set_operation_mode(pm, parser, args, remaining)
+#   File "/host/tools/testing/selftests/tc-testing/./tdc.py", line 963, in set_operation_mode
+#     catresults = test_runner_mp(pm, args, alltests)
+#                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+#   File "/host/tools/testing/selftests/tc-testing/./tdc.py", line 623, in test_runner_mp
+#     pres = p.map(__mp_runner, batches)
+#            ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+#   File "/usr/lib64/python3.12/multiprocessing/pool.py", line 367, in map
+#     return self._map_async(func, iterable, mapstar, chunksize).get()
+#            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+#   File "/usr/lib64/python3.12/multiprocessing/pool.py", line 774, in get
+#     raise self._value
+# pyroute2.netlink.exceptions.NetlinkError: (17, 'File exists')
 
-One of the reasons Homa has rolled its own mechanisms is that it's
-trying to operate at a timescale that's different from the rest of the
-kernel.
-
--John-
 
