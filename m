@@ -1,121 +1,117 @@
-Return-Path: <netdev+bounces-161776-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-161777-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 76D10A23EA6
-	for <lists+netdev@lfdr.de>; Fri, 31 Jan 2025 14:49:49 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4008EA23F03
+	for <lists+netdev@lfdr.de>; Fri, 31 Jan 2025 15:16:16 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 02E3E1889916
-	for <lists+netdev@lfdr.de>; Fri, 31 Jan 2025 13:49:54 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id B24227A2121
+	for <lists+netdev@lfdr.de>; Fri, 31 Jan 2025 14:15:21 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8AC161C3BE9;
-	Fri, 31 Jan 2025 13:49:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 60BC71C5485;
+	Fri, 31 Jan 2025 14:16:09 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=mojatatu-com.20230601.gappssmtp.com header.i=@mojatatu-com.20230601.gappssmtp.com header.b="i4jMX5VQ"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="cs/OOv4t"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f179.google.com (mail-pl1-f179.google.com [209.85.214.179])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 940E1EAC6
-	for <netdev@vger.kernel.org>; Fri, 31 Jan 2025 13:49:43 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.179
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 03DCC25761;
+	Fri, 31 Jan 2025 14:16:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1738331385; cv=none; b=aFovDS7zQVFN16qSvbwIpO24N3w7Tm3klhUzYp9gsGQKA71SgaFY6k/YNHNcCuE3LaM3uMBy4ygs70h8o+optK0yah0J3mKRl8UH7j/0k+LVABrwVXTrk3qjiNONxbT50LuD3aB2AmjZQHZKIHhrAsyFPC9kivjDi7xDnWCXmqU=
+	t=1738332969; cv=none; b=O4Fh3i6sbzB5UD/bZzBkBjrsA6gwQM4Uv0lL7rtzr9m3KZIIiusXnBD87nlEn/A/0YqxfSl5TtMXlzhXvuURNAP49Sqs+KjihwT3SW5rUL4T/faTHh9i+yZARgcIe+xyNgClKI6SbJ7Yn0PPYsEMlfzbV7qHRumbv+DNPNr+0bM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1738331385; c=relaxed/simple;
-	bh=v97KmB/2DeWvCemPHBBP/AuSc7zKCL54Di9MXbB7Qzo=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=Y4it1lXZGxSLBFuptSmP+Ke6ArmWeeqTD+AgFKhSOdUyiXXDlFuvjL8NN2LL602qXx1PvFy+eP9Yg4zvEjwQs5E3/g8oPOc8FPJeLj6+FwNlcSBkXFQQAMR1fXuQj9yykx8G+oWbfuEEVPHLyMO9g7ki/u9hJJru88wk0vT24pY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=mojatatu.com; spf=none smtp.mailfrom=mojatatu.com; dkim=pass (2048-bit key) header.d=mojatatu-com.20230601.gappssmtp.com header.i=@mojatatu-com.20230601.gappssmtp.com header.b=i4jMX5VQ; arc=none smtp.client-ip=209.85.214.179
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=mojatatu.com
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=mojatatu.com
-Received: by mail-pl1-f179.google.com with SMTP id d9443c01a7336-21636268e43so44460065ad.2
-        for <netdev@vger.kernel.org>; Fri, 31 Jan 2025 05:49:43 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=mojatatu-com.20230601.gappssmtp.com; s=20230601; t=1738331383; x=1738936183; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=v97KmB/2DeWvCemPHBBP/AuSc7zKCL54Di9MXbB7Qzo=;
-        b=i4jMX5VQstVQOeGq1IeurWIRcmoR7HTISlVWaQgUwrQI1t/S8QJKhkaPmpt15c7M6V
-         Y7kzsENhoct9hWLU5hL5ZTyQcfTlGxmlSXdpgrgIl63XDjXtPNRhBWhcrKN44STo7Skc
-         GN8Ih250cC96+kgq5QXoCUKaic7CPCIDd+nNK7n/8KaPiJjJPtn/u56EHa5nkyW6LPOX
-         lNQpTXN5grj0EQzn929aY4XLO1sApd4Frdc3Li+cNtFsPFpmrEU3IlHRZCplpGlMwoci
-         JrsGwIJ9YYBTfWY2+p7J8Zi1UzwTNqWnec6G+dY4dW1fmMOZ0L4N7A0ke8Aa08U/s8Qj
-         FPLA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1738331383; x=1738936183;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=v97KmB/2DeWvCemPHBBP/AuSc7zKCL54Di9MXbB7Qzo=;
-        b=Gjs9w8swYiEjiq2i0dGMHPr6rr5dl4S0+GyzzUPb5VkP2PaRbDiqgEHZKPU1YeLgBV
-         xKrc/q0jotHvyDrxdFjAxmJOKDWyAptYPmqVMbQcwULQ8jemC9FOznG1FRGx+btgePWw
-         O8MQ4NwClIBkv5hHGPoRgYmpQUE5Lfq7wPVthZzcRcl8LLkCzOA6gIa3v4n3sRa+8vnq
-         oVo0Ibz24JfY8V1Z6sJ7607iLImy7GnyACAPUavUNJIiFmhXDMS0Q3R4g/LphL+aWfIn
-         sA96uEnu7HBM2r+T1N4n9yMLOx0rjcJ5Phi3jaD1gcxBAAKTZECvfiz/bnrYL8cfQOLI
-         nyRQ==
-X-Gm-Message-State: AOJu0Yxx3gdYLNz60rTGFe4bVSMZuK/kjwMWSf0jOa/s30tX4OTukQvp
-	i4P0EnnEQ50NknaHRH99toZUZIzUizevNNsfZ0g9YWluSoZ6GD52DS4POrvdPuZZ/W6gNvmLXP6
-	QKvYzSeo+Ys0+NT0Ecax/vnojHVYdUk5Hdqz0
-X-Gm-Gg: ASbGncvUq/jhJObbwJXIdTZrfX0YrDkiEYlOPNzVnFHDP1raE/pCjwxnOkgBCDvlppj
-	WZ1R4Ddl7dHMtQ5jeIopNfHSC3NbSSVY3T1niFEw1G3T2mR6F79K6ZCRAUdoVVI4q4ksRMFAJ
-X-Google-Smtp-Source: AGHT+IEr6kOvUGYZt7kf2xNUp9su7NCXPgFBJdbQpzkkrB6pvI5Gn0t3cguxCUeiDmP8x1UdaKcQjGBj4fL3vyg4WHk=
-X-Received: by 2002:a05:6a00:140e:b0:725:e444:2505 with SMTP id
- d2e1a72fcca58-72fd0bce3bfmr16337184b3a.4.1738331382693; Fri, 31 Jan 2025
- 05:49:42 -0800 (PST)
+	s=arc-20240116; t=1738332969; c=relaxed/simple;
+	bh=MguGDaREPUyfjHAQR3E13sI9sAH/3W0uJMw+qIQdsso=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=bsW6mFJqvuPwjfN2zvHR6OtAWcRysQKyoO05VS4oxqkSugPcLA/1f41nVRrh9kmLZ7tOxm2AqAbsxfxPSq1vHuiiOH++4nJdYdYBkx1UKJHUKL7Mtjay5Ko9Sb41OfZWBlVOEL14cBiSVxfUjeWVmGrbIb8qFMZDMEFrPaifR/U=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=cs/OOv4t; arc=none smtp.client-ip=156.67.10.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=6KGuy4EAuLHG4r0AND1uGQsHYqV6ULruAexpzmPJXj0=; b=cs/OOv4teDCakZI2PNJHMNZY5F
+	CSThPpDFV0qXz+D/8t74/eKu7sLH3JHb0lWt9GptCZKYkRblomsN3tBxQ2ezCc7QZ8ITuLvBv2ELB
+	Rl39HYkp2SOoBPdTfUr2haWDYhJDyPZfL0rzyIh88Kt3Jxl4qc24UOTI6XJ+lkFB5moQ=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1tdrnz-009iDb-1e; Fri, 31 Jan 2025 15:15:35 +0100
+Date: Fri, 31 Jan 2025 15:15:35 +0100
+From: Andrew Lunn <andrew@lunn.ch>
+To: Steven Price <steven.price@arm.com>
+Cc: Kunihiko Hayashi <hayashi.kunihiko@socionext.com>,
+	Alexandre Torgue <alexandre.torgue@foss.st.com>,
+	Jose Abreu <joabreu@synopsys.com>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Maxime Coquelin <mcoquelin.stm32@gmail.com>,
+	Russell King <linux@armlinux.org.uk>,
+	Yanteng Si <si.yanteng@linux.dev>, Furong Xu <0x1207@gmail.com>,
+	Joao Pinto <Joao.Pinto@synopsys.com>, netdev@vger.kernel.org,
+	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH net v4 3/3] net: stmmac: Specify hardware capability
+ value when FIFO size isn't specified
+Message-ID: <fc08926d-b9af-428f-8811-4bfe08acc5b7@lunn.ch>
+References: <20250127013820.2941044-1-hayashi.kunihiko@socionext.com>
+ <20250127013820.2941044-4-hayashi.kunihiko@socionext.com>
+ <07af1102-0fa7-45ad-bcbc-aef0295ceb63@arm.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250116195642.2794-1-ouster@cs.stanford.edu> <CAM0EoMkkk-dT5kQH6OoVp-zs9bhg8ZLW2w+Dp4SYAZnFfw=CTA@mail.gmail.com>
- <CAGXJAmyxX0Ofkb-bzK=gXHJtjiVFczYcsvwAg9+JfS0qLjhqnA@mail.gmail.com>
-In-Reply-To: <CAGXJAmyxX0Ofkb-bzK=gXHJtjiVFczYcsvwAg9+JfS0qLjhqnA@mail.gmail.com>
-From: Jamal Hadi Salim <jhs@mojatatu.com>
-Date: Fri, 31 Jan 2025 08:49:31 -0500
-X-Gm-Features: AWEUYZknC5cwQP_MNTbftX6my3p-wsF8kGJG5_imEzUGL5xJE0DNivlG4EyKBok
-Message-ID: <CAM0EoM=nO52XBrcbMvDbe-OiyK7dBd0aVY=oN=3FsW6wQ9P14g@mail.gmail.com>
-Subject: Re: [PATCH netnext] net: tc: improve qdisc error messages
-To: John Ousterhout <ouster@cs.stanford.edu>
-Cc: netdev@vger.kernel.org, xiyou.wangcong@gmail.com, jiri@resnulli.us
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <07af1102-0fa7-45ad-bcbc-aef0295ceb63@arm.com>
 
-Hi John,
+On Fri, Jan 31, 2025 at 09:46:41AM +0000, Steven Price wrote:
+> On 27/01/2025 01:38, Kunihiko Hayashi wrote:
+> > When Tx/Rx FIFO size is not specified in advance, the driver checks if
+> > the value is zero and sets the hardware capability value in functions
+> > where that value is used.
+> > 
+> > Consolidate the check and settings into function stmmac_hw_init() and
+> > remove redundant other statements.
+> > 
+> > If FIFO size is zero and the hardware capability also doesn't have upper
+> > limit values, return with an error message.
+> 
+> This patch breaks my Firefly RK3288 board. It appears that all of the 
+> following are true:
+> 
+>  * priv->plat->rx_fifo_size == 0
+>  * priv->dma_cap.rx_fifo_size == 0
+>  * priv->plat->tx_fifo_size == 0
+>  * priv->dma_cap.tx_fifo_size == 0
+> 
+> Simply removing the "return -ENODEV" lines gets this platform working 
+> again (and AFAICT matches the behaviour before this patch was applied).
+> I'm not sure whether this points to another bug causing these to 
+> all be zero or if this is just an oversight. The below patch gets my 
+> board working:
 
-On Fri, Jan 31, 2025 at 1:39=E2=80=AFAM John Ousterhout <ouster@cs.stanford=
-.edu> wrote:
->
-> On Thu, Jan 16, 2025 at 12:00=E2=80=AFPM Jamal Hadi Salim <jhs@mojatatu.c=
-om> wrote:
-> >
-> > LGTM.
-> > Acked-by: Jamal Hadi Salim <jhs@mojatatu.com>
-> >
-> > cheers,
-> > jamal
-> >
-> > > 2.34.1
->
-> Sorry for my newbie ignorance (this will be my first accepted patch,
-> assuming it's accepted) but what happens next on this? Is there
-> anything else I need to do? I mistyped "net-next" as "netnext" in the
-> subject and patchwork complained about that; do I need to resubmit to
-> fix this?
->
+Thanks for the quick report of the problem.
 
-My bad, I should have caught that subject and patchwork wont notify
-you if it didnt like something.
+Your 'fix' basically just reverts the patch. Let first try to
+understand what is going on, and fix the patch. We can do a revert
+later if we cannot find a better solution.
 
-Re-submit when net-next opens with --subject-prefix=3D"PATCH net-next"
---subject=3D"net: sched: improve qdisc error messages"
-You can add to the submission:
-Acked-by: Jamal Hadi Salim <jhs@mojatatu.com>
+I'm guessing, but in your setup, i assume the value is never written
+to a register, hence 0 is O.K. e.g. dwmac1000_dma_operation_mode_rx(),
+the fifosz value is used to determine if flow control can be used, but
+is otherwise ignored.
 
-cheers,
-jamal
+We should determine which versions of stmmac actually need values, and
+limit the test to those versions.
+
+	Andrew
 
