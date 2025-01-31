@@ -1,114 +1,112 @@
-Return-Path: <netdev+bounces-161745-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-161746-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5A55EA23A1D
-	for <lists+netdev@lfdr.de>; Fri, 31 Jan 2025 08:28:05 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id C6995A23A29
+	for <lists+netdev@lfdr.de>; Fri, 31 Jan 2025 08:31:48 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 0F2AE188235D
-	for <lists+netdev@lfdr.de>; Fri, 31 Jan 2025 07:28:06 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 399FD7A14E6
+	for <lists+netdev@lfdr.de>; Fri, 31 Jan 2025 07:30:54 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B80DA14B092;
-	Fri, 31 Jan 2025 07:27:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D53BD1487E9;
+	Fri, 31 Jan 2025 07:31:41 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="HxCjP0HC"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="r9XrRKKJ"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wr1-f53.google.com (mail-wr1-f53.google.com [209.85.221.53])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EC01413A3ED
-	for <netdev@vger.kernel.org>; Fri, 31 Jan 2025 07:27:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.53
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9AD56EED8;
+	Fri, 31 Jan 2025 07:31:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1738308477; cv=none; b=ZHUoWUTpSHHOUDchI9KNQMnzO63QAat72xcM5cbp2FfTpGiDXZcMBh+zWzoBE4Px+DX0WHaGUwt7ZmZb/nR0y5eW8yq+Mbx3DCvHCEN0rD5aBRPNkB4P7KlJXnM/QCTFdtIYdYUvl1oBVl2ZXaRNevsrSji/7CoBZIrX5LH9Ru8=
+	t=1738308701; cv=none; b=p5PTk/U2Em0wZFrEldAiX8upQxSXCdhfTIFCO1YSgQQEK60B7C0GUq2yRvq2FNkdAHB/5qbDiF+29o5QsoxSEA2LmlpMkkc47/Nr7nSTUrIbiMJv3GmtpoRtEj0ysP2RLKZIdzZd6BOsuEx4mWoQqzeMbFfF2Iza5n02JYP4UfE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1738308477; c=relaxed/simple;
-	bh=VvX+BywDjuLXLurRZUDTOeBdeR2HdspsFUORXtucLB4=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=ok1Rsx8+LJDwyiXG6SVlgieUgQKmm+GaIkkPpOFy3nz83saZ2q0ZgzEfdvmAj5T3gJlj7YwNHqjXscY9pCVHmwx/ZKHB9xFgMI+KV3IbNcrZ3rmlfEKjg2wWfgMdQT7BFxDU7cKSM4zhmQ59B052xZwsyaSsnhQf7jFjwgqAb8w=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=HxCjP0HC; arc=none smtp.client-ip=209.85.221.53
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wr1-f53.google.com with SMTP id ffacd0b85a97d-38a88ba968aso1406037f8f.3
-        for <netdev@vger.kernel.org>; Thu, 30 Jan 2025 23:27:55 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1738308474; x=1738913274; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=VvX+BywDjuLXLurRZUDTOeBdeR2HdspsFUORXtucLB4=;
-        b=HxCjP0HCW1vFrQ3ebktGFSPEj7r3af7YoJAc3IsHTIr+1jnNG6+9xpqxSX1VQVZYXs
-         0BbgFN80dir4VsQA2Vptc0+ZOCxKncEkH+RJKl3Gggmt34rG/sOi23bGpdmkeBsFQjaX
-         HIZSz/WbJUzEKQo+FtykMFPr8osod3H7cVQMZlgEgKXVM2cEatc+ka20V56Vegg2CgQj
-         TNmvKTsYMN5cvdi5rMPn43tKpsVk/fIP4ZwO2Cq9xTnobF+QcnxbFAgstctTf+03a+ij
-         L8UZFZCIHLZEgK88zOBCQT5M1EMulT1b0RBmaqW152qAFtqlSbagAbVmjCDbxeOd4C8T
-         caIg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1738308474; x=1738913274;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=VvX+BywDjuLXLurRZUDTOeBdeR2HdspsFUORXtucLB4=;
-        b=XCeejkwF0FzaLAuAEkX4cRff41mQlvWPajFAVBRP2M5swr4fF78f4xoH9VmmDWZjyk
-         4KWWq4cRKch3ajsthDIflJPObRDeD8efZsFqyw9B63A9mbiZBILNMie7vFxhtKSvdZxB
-         hCk7sGJVyLXU1yXfFYGN9PYbxwDdfDKAFEBXL5t0pgrak5cN7u3vJ2Td+t85nu30+H2w
-         pjtP5w4KLZH0qarXHIsViVMQ6j/msfAD1xakuVaRlQl7Oe8IYgoSILEz50Mu05MwFkqw
-         LMPEWyFTgB9QIngLrLUtGi5ODKCZ13veabc6wbb73i2zslM9DrVsstu9clKP/WbFjy83
-         A0Ag==
-X-Forwarded-Encrypted: i=1; AJvYcCXSw+OflBT/W2GlP9S+6Rc3HY9TdalJYbamrEbaLPS0sb8i41T0UvYpJ5+AdGRHz4XuNVsv6Eg=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yw+R3oJj8Nps7RLfgmA9823QiXeRgEs6vmLQOUqMJg0nJmXfrCM
-	cXsHVoOvncT1VEAp68TEgPAjDNIu3E0+TO79X6GkRHL2cyL2YgjsgTKa8qXcuAAJKBRNG862Izd
-	bl2Yy2X72P5Q3JcOFLVDlLol1R7U=
-X-Gm-Gg: ASbGncuizkwXGkFsCSe6DQE/iZuNdb8Eu9VsOvfh93mmLnlBiTt4Tnsoa8v4DZtzwEE
-	SJZd/govDlFj0w6I72F/JRzIny2kj1QaX9oU0gSQleeooJm3qKaLULmGSC1QryfQ5rR9XRH7/+w
-	==
-X-Google-Smtp-Source: AGHT+IH9/f4Wcch/6Ieh0/CMVkT4oLoZvkF2QsmnNlzlbKScReVCT/3eOpzv4+A9cO+pHXfOYkj1UbF7zQjLvK+7dn8=
-X-Received: by 2002:a05:6000:1012:b0:38b:ec34:2d62 with SMTP id
- ffacd0b85a97d-38c519698d2mr7790658f8f.24.1738308474037; Thu, 30 Jan 2025
- 23:27:54 -0800 (PST)
+	s=arc-20240116; t=1738308701; c=relaxed/simple;
+	bh=qdt9dwUcq0ta+TSNmQPWYtAwOwtBzqrQuyk0eGFKKQ0=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=Jx23KxhGMieHHeHNSTPEYQZHT4288E3NIDIp2WY5JT6rI6HAfPra6u0cIuQw82UzJZYULOqxvRU1x9WQKUe+sOqu+NBtCHVRQOm0uJx7rhHHRX2ThfKblfpl+3+U0+Oft4eK4lfX/6BA5qdP5mLa4zuffiiqUzmvxn2DAKrqJUY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=r9XrRKKJ; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id EC466C4CED1;
+	Fri, 31 Jan 2025 07:31:39 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1738308700;
+	bh=qdt9dwUcq0ta+TSNmQPWYtAwOwtBzqrQuyk0eGFKKQ0=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=r9XrRKKJiIl6VBBUrgystUKaCittMpIeRf0YynogsNTx8rJ1pw+IyDe1+ihvgqaeZ
+	 ife/ZG9ZOidFMO1XSEhIA34o+J1f3nuzLWTgxvR5u5SGkMJUMZLMWDLDmLE9MnYeiG
+	 usaARMt1bdosGcytO6IdRcmo9Rp/rPQHWPzLwO2RkeSw9u6ILgr3LlzWT28hBpuA6k
+	 q0/e0wKGZjS5lET68XEzVRkXKDENE7gtd6jAa6tKWM0F9F2CNT7pIg+ocGLx7zKxft
+	 YeMaNdBeM17lASmE6CXotfYkXWVw7qHNLcWskeejqODucgLbBUp/rdv7oomgDSgNQx
+	 RP5fE/HfEML0Q==
+Date: Fri, 31 Jan 2025 08:31:37 +0100
+From: Krzysztof Kozlowski <krzk@kernel.org>
+To: Chris Packham <chris.packham@alliedtelesis.co.nz>
+Cc: lee@kernel.org, robh@kernel.org, krzk+dt@kernel.org, 
+	conor+dt@kernel.org, andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com, 
+	kuba@kernel.org, pabeni@redhat.com, tsbogend@alpha.franken.de, 
+	hkallweit1@gmail.com, linux@armlinux.org.uk, sander@svanheule.net, 
+	markus.stockhausen@gmx.de, devicetree@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	netdev@vger.kernel.org, linux-mips@vger.kernel.org
+Subject: Re: [PATCH v5 1/4] dt-bindings: net: Add Realtek MDIO controller
+Message-ID: <20250131-omniscient-obedient-locust-9313c0@krzk-bin>
+References: <20250131010151.2527688-1-chris.packham@alliedtelesis.co.nz>
+ <20250131010151.2527688-2-chris.packham@alliedtelesis.co.nz>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250116195642.2794-1-ouster@cs.stanford.edu> <CAM0EoMkkk-dT5kQH6OoVp-zs9bhg8ZLW2w+Dp4SYAZnFfw=CTA@mail.gmail.com>
- <CAGXJAmyxX0Ofkb-bzK=gXHJtjiVFczYcsvwAg9+JfS0qLjhqnA@mail.gmail.com>
-In-Reply-To: <CAGXJAmyxX0Ofkb-bzK=gXHJtjiVFczYcsvwAg9+JfS0qLjhqnA@mail.gmail.com>
-From: ericnetdev dumazet <erdnetdev@gmail.com>
-Date: Fri, 31 Jan 2025 08:27:42 +0100
-X-Gm-Features: AWEUYZlkux3dPZvPNkbZz48iqrLutqsP2gtXz7ub-MGWUxwI5wRbLLCG-0HCjuo
-Message-ID: <CAHTyZGwogJxVR1-yFjNgYCDDToU0wY=XJO4WOpsmt2gzeRFgZw@mail.gmail.com>
-Subject: Re: [PATCH netnext] net: tc: improve qdisc error messages
-To: John Ousterhout <ouster@cs.stanford.edu>
-Cc: Jamal Hadi Salim <jhs@mojatatu.com>, netdev@vger.kernel.org, xiyou.wangcong@gmail.com, 
-	jiri@resnulli.us
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20250131010151.2527688-2-chris.packham@alliedtelesis.co.nz>
 
-Le ven. 31 janv. 2025 =C3=A0 07:39, John Ousterhout
-<ouster@cs.stanford.edu> a =C3=A9crit :
->
-> On Thu, Jan 16, 2025 at 12:00=E2=80=AFPM Jamal Hadi Salim <jhs@mojatatu.c=
-om> wrote:
-> >
-> > LGTM.
-> > Acked-by: Jamal Hadi Salim <jhs@mojatatu.com>
-> >
-> > cheers,
-> > jamal
-> >
-> > > 2.34.1
->
-> Sorry for my newbie ignorance (this will be my first accepted patch,
-> assuming it's accepted) but what happens next on this? Is there
-> anything else I need to do? I mistyped "net-next" as "netnext" in the
-> subject and patchwork complained about that; do I need to resubmit to
-> fix this?
+On Fri, Jan 31, 2025 at 02:01:48PM +1300, Chris Packham wrote:
+> +  '#address-cells':
+> +    const: 1
+> +
+> +  '#size-cells':
+> +    const: 0
+> +
+> +  reg:
+> +    maxItems: 1
+> +
+> +patternProperties:
+> +  '^mdio-bus@[0-4]$':
 
-net-next was closed during the merge window, and still is.
+4 or 5 buses?
 
-Details in Documentation/process/maintainer-netdev.rst
+> +    $ref: mdio.yaml#
+> +
+> +    properties:
+> +      reg:
+> +        maxItems: 1
+> +
+> +    required:
+> +      - reg
+> +
+> +    patternProperties:
+> +      '^ethernet-phy@[a-f0-9]+$':
+> +        type: object
+> +        $ref: ethernet-phy.yaml#
+> +
+> +        properties:
+> +          realtek,port:
+> +            $ref: /schemas/types.yaml#/definitions/uint32
+> +            description:
+> +              The MDIO communication on the RTL9300 is abstracted by the switch. At
+> +              the software level communication uses the switch port to address the
+> +              PHY with the actual MDIO bus and address having been setup via the
+> +              parent mdio-bus and reg property.
+
+maximum: 8 ?
+
+also property should be required or you miss here default.
+
+Best regards,
+Krzysztof
+
 
