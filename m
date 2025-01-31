@@ -1,107 +1,151 @@
-Return-Path: <netdev+bounces-161772-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-161773-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 141E7A23E36
-	for <lists+netdev@lfdr.de>; Fri, 31 Jan 2025 14:13:34 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3D67DA23E49
+	for <lists+netdev@lfdr.de>; Fri, 31 Jan 2025 14:23:20 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 8F46F7A1EF5
-	for <lists+netdev@lfdr.de>; Fri, 31 Jan 2025 13:12:39 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 29BCC3A8CA1
+	for <lists+netdev@lfdr.de>; Fri, 31 Jan 2025 13:23:12 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2722C1C4A0A;
-	Fri, 31 Jan 2025 13:13:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AF7801C3F36;
+	Fri, 31 Jan 2025 13:23:15 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=siemens.com header.i=florian.bezdeka@siemens.com header.b="XWS5uL4R"
+	dkim=pass (2048-bit key) header.d=sipsolutions.net header.i=@sipsolutions.net header.b="Q4w9orF+"
 X-Original-To: netdev@vger.kernel.org
-Received: from mta-65-225.siemens.flowmailer.net (mta-65-225.siemens.flowmailer.net [185.136.65.225])
+Received: from sipsolutions.net (s3.sipsolutions.net [168.119.38.16])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C88F11DFF0
-	for <netdev@vger.kernel.org>; Fri, 31 Jan 2025 13:13:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.136.65.225
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AF39A1E4AB;
+	Fri, 31 Jan 2025 13:23:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=168.119.38.16
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1738329201; cv=none; b=kA786QoCBnsbqHP4CJbEUthSXTbh8t8XdI8N1Pk3MeV/OpAdrsBJ6u8CDFSOSQ1fsidyYDn8o0AhSnWBNfKVMgNpgjka2TIC1zi2UvnxWpS4XJ68XYgiWT//DMlBG8w/g7gAAZFrxDDqEgGMT/3hWbOs9sYR3F4lik2DWjnbyLA=
+	t=1738329795; cv=none; b=PELf9M2eX9Zg+wHX1tpPMeEaThmhxreiM99NxlgHB2jfV/Iw/N//hwYH5b2RAYGSHO6F+9zMSIZyn6ABimY9FCcf3Lqds/F1Ian2N8WTFA0npAUi7D9LOQdIRE1aL5wFsFErMDta1JkZtWQDR/xvcbmjxKdZhEuscIcwUDgDW0A=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1738329201; c=relaxed/simple;
-	bh=k5RkkXzF13rZXSL9io3ekPgEPUw+PXfJpxELXTQUpY4=;
+	s=arc-20240116; t=1738329795; c=relaxed/simple;
+	bh=i98dv1hcShtHP6AHCDM9O3+gtS5Xr9m1puc+d9u+8pg=;
 	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=GOT20+X2MHgwQ4wcWE4Xsytbe29GfCAeE94GXS2F85DW4pUn3K+P9s6lcRDrXRXWOBzoZzTc2RkD75a5nV+qPrfbQI/6FoRuBQGzN79UoFPR6GLk+8EuwnO2KalY5kTab2q+qdLlxK+rNPQ+GMo4p7B+srwnUivYyGe8FsrLsDI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=siemens.com; spf=pass smtp.mailfrom=rts-flowmailer.siemens.com; dkim=pass (2048-bit key) header.d=siemens.com header.i=florian.bezdeka@siemens.com header.b=XWS5uL4R; arc=none smtp.client-ip=185.136.65.225
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=siemens.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=rts-flowmailer.siemens.com
-Received: by mta-65-225.siemens.flowmailer.net with ESMTPSA id 20250131131309faf71448f22149c4f9
-        for <netdev@vger.kernel.org>;
-        Fri, 31 Jan 2025 14:13:10 +0100
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; s=fm2;
- d=siemens.com; i=florian.bezdeka@siemens.com;
- h=Date:From:Subject:To:Message-ID:MIME-Version:Content-Type:Content-Transfer-Encoding:Cc:References:In-Reply-To;
- bh=7ddmw+MSH+bE+lpmVD4Wnv3gYJ4CsT3P6TUawXH7hJk=;
- b=XWS5uL4RZBFQEOgbrkoinobFHaphy8O+5E+P3yGXLd7XDgQnHjyupzHw/nFjHHjoFdTGf8
- mvcNlRBNYG8wW8IswCiNjHTMgAeNTd32AjpAXjStl8fyMt6y0rmFi/Yztz3oayTTUZiOqW3a
- sQaxSTerPXPAzJLqFHYAVUGkM8zHd3MPwWKw6SUnzJqfKdUeo9bHmdirmf4oOL/0OiGPXbER
- LJi8XzNCm80kQsfkobrEsJKbXnCXlQOD0N9Au9jkV92M0qC6kNZQPoxrc11wtPjGcoN+mHl5
- 8Erb2wyxszaDR5KHq87NIv6bd1IyNXl4K6+BYuiaKdarLvOVMgfCkBEw==;
-Message-ID: <f86bc94c97d6e91b3564d3df6f91722318c8d24f.camel@siemens.com>
-Subject: Re: [PATCH] igc: Fix HW RX timestamp when passed by ZC XDP
-From: Florian Bezdeka <florian.bezdeka@siemens.com>
-To: Zdenek Bouska <zdenek.bouska@siemens.com>, Tony Nguyen	
- <anthony.l.nguyen@intel.com>, Przemek Kitszel
- <przemyslaw.kitszel@intel.com>,  Andrew Lunn <andrew+netdev@lunn.ch>,
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet	
- <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni	
- <pabeni@redhat.com>, Alexei Starovoitov <ast@kernel.org>, Daniel Borkmann	
- <daniel@iogearbox.net>, Jesper Dangaard Brouer <hawk@kernel.org>, John
- Fastabend <john.fastabend@gmail.com>, Vinicius Costa Gomes
- <vinicius.gomes@intel.com>, Song Yoong Siang <yoong.siang.song@intel.com>
-Cc: intel-wired-lan@lists.osuosl.org, netdev@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, bpf@vger.kernel.org, Jan Kiszka
-	 <jan.kiszka@siemens.com>
-Date: Fri, 31 Jan 2025 14:13:08 +0100
-In-Reply-To: <20250128-igc-fix-hw-rx-timestamp-when-passed-by-zc-xdp-v1-1-b765d3e972de@siemens.com>
-References: 
-	<20250128-igc-fix-hw-rx-timestamp-when-passed-by-zc-xdp-v1-1-b765d3e972de@siemens.com>
+	 Content-Type:MIME-Version; b=bAkl+drl+kb92dGH6s42XP6iOCdkkgi+0MXM+aqvkg+apZHrAnxwEtR0ajFUBZ/TM2i8skbYt6RrJirTgyTppl1Zem4DNoZdh995qKvp1NVfqXf/SbujJxmiC3rRrtz73WYgOfJSH7UFJO01b5A0BkHAP6+lH5Jzppx71e5qrmc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=sipsolutions.net; spf=pass smtp.mailfrom=sipsolutions.net; dkim=pass (2048-bit key) header.d=sipsolutions.net header.i=@sipsolutions.net header.b=Q4w9orF+; arc=none smtp.client-ip=168.119.38.16
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=sipsolutions.net
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=sipsolutions.net
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=sipsolutions.net; s=mail; h=MIME-Version:Content-Transfer-Encoding:
+	Content-Type:References:In-Reply-To:Date:Cc:To:From:Subject:Message-ID:Sender
+	:Reply-To:Content-ID:Content-Description:Resent-Date:Resent-From:Resent-To:
+	Resent-Cc:Resent-Message-ID; bh=i98dv1hcShtHP6AHCDM9O3+gtS5Xr9m1puc+d9u+8pg=;
+	t=1738329793; x=1739539393; b=Q4w9orF+3sIn3D/ZAndJGufB+9yl/HRP20++/DTjmqNEsuK
+	1zNYphw98Jt5ebxd+AieewqKkIqPYjNfaNzevxybCQ3gewrnSDCPIhHjCtT6ECI2t/AyT1aBuRCDh
+	n4Jkem2CMVX1C84o/QcX+py6CC7lDKV3zX40LUpb3RVO49tDIf2a/JgHGVTby38WjgcATiYWV6aLd
+	WtEoC7cd3XsjIGwKJZwwq+8K3x6Fe0dl8JeblVy0ta+egtiWiVznkq2ZwvGIDkxPHz/tEKwd9npmf
+	7BzCrhHkrgLBeeyrMD7Q0ZtiXf5HlxBL+wiBZsRjme2RI3njLiqPO3sRtewDOSOg==;
+Received: by sipsolutions.net with esmtpsa (TLS1.3:ECDHE_X25519__RSA_PSS_RSAE_SHA256__AES_256_GCM:256)
+	(Exim 4.98)
+	(envelope-from <johannes@sipsolutions.net>)
+	id 1tdqzA-0000000G9Bj-3JqL;
+	Fri, 31 Jan 2025 14:23:05 +0100
+Message-ID: <21896d2788b8bc6c7fcb534cd43e75671a57f494.camel@sipsolutions.net>
+Subject: Re: Stepping down as maintainer
+From: Johannes Berg <johannes@sipsolutions.net>
+To: Kalle Valo <kvalo@kernel.org>, linux-wireless@vger.kernel.org, 
+	netdev@vger.kernel.org
+Cc: ath12k@lists.infradead.org, ath11k@lists.infradead.org, 
+	ath10k@lists.infradead.org
+Date: Fri, 31 Jan 2025 14:23:03 +0100
+In-Reply-To: <87wmefguqt.fsf@kernel.org>
+References: <87wmefguqt.fsf@kernel.org>
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
+User-Agent: Evolution 3.54.3 (3.54.3-1.fc41) 
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Flowmailer-Platform: Siemens
-Feedback-ID: 519:519-68982:519-21489:flowmailer
+X-malware-bazaar: not-scanned
 
-On Tue, 2025-01-28 at 13:26 +0100, Zdenek Bouska wrote:
-> Fixes HW RX timestamp in the following scenario:
-> - AF_PACKET socket with enabled HW RX timestamps is created
-> - AF_XDP socket with enabled zero copy is created
-> - frame is forwarded to the BPF program, where the timestamp should
->   still be readable (extracted by igc_xdp_rx_timestamp(), kfunc
->   behind bpf_xdp_metadata_rx_timestamp())
-> - the frame got XDP_PASS from BPF program, redirecting to the stack
-> - AF_PACKET socket receives the frame with HW RX timestamp
->=20
-> Moves the skb timestamp setting from igc_dispatch_skb_zc() to
-> igc_construct_skb_zc() so that igc_construct_skb_zc() is similar to
-> igc_construct_skb().
->=20
-> This issue can also be reproduced by running:
->  # tools/testing/selftests/bpf/xdp_hw_metadata enp1s0
-> When a frame with the wrong port 9092 (instead of 9091) is used:
->  # echo -n xdp | nc -u -q1 192.168.10.9 9092
-> then the RX timestamp is missing and xdp_hw_metadata prints:
->  skb hwtstamp is not found!
->=20
-> With this fix or when copy mode is used:
->  # tools/testing/selftests/bpf/xdp_hw_metadata -c enp1s0
-> then RX timestamp is found and xdp_hw_metadata prints:
->  found skb hwtstamp =3D 1736509937.852786132
->=20
-> Fixes: 069b142f5819 ("igc: Add support for PTP .getcyclesx64()")
-> Signed-off-by: Zdenek Bouska <zdenek.bouska@siemens.com>
-> ---
+Hi Kalle, all,
 
-Reviewed-by: Florian Bezdeka <florian.bezdeka@siemens.com>
+> I'm stepping down from all my maintainer roles. My first commit
+> feed9bab7b14 ("spi: omap2_mcspi PIO RX fix") to the kernel was back in
+> 2008 for v2.6.24 so I have been here for a long time. Thank you everyone
+> who I have worked with, there are too many to list here.
+
+First and foremost, let me add my thanks to the list here. We've worked
+together for many years on wireless now and I appreciate that greatly,
+personally and also in the role you've played in shaping wireless, be it
+through the reviews directly, or the more indirect things like sharing
+the tree maintenance etc. Thank you!
+
+This is also an opportunity to thank Qualcomm for sponsoring your work
+here. Certainly I'd expect they also got a lot of value out of it, but
+we the community definitely got a lot, so thank you Qualcomm!
+
+> Jeff continues to maintain ath10k, ath11k and ath12k drivers so they are
+> unaffected. But for the wireless driver maintainer (drivers/net/wireless/=
+)
+> there is no replacement at the moment. If anyone is interested, please
+> do let Johannes and me know.
+
+I'll be honest and say that I did delay my reply to see if anyone would
+speak up, but in the short term I really didn't expect anyone to step
+up. We're pretty niche in wireless, after all :)
+
+There's obviously reluctance of netdev picking up any wireless related
+activity, and that would anyway be impractical if cfg80211 and/or
+mac80211 were to remain separate. There's also a clear separation of the
+lists, and given the volumes involved I think that's likely better for
+everyone.
+
+In the short term at least, I therefore expect that I will (need to) be
+the custodian of the wireless trees. And I say "custodian" rather than
+"maintainer" quite intentionally, because I cannot really take on the
+role as you've filled it in the past. Shoes a few sizes too big, I
+guess.
+
+
+So as the wireless community, I think we will need to come to terms with
+the fact that our workflow and processes will change now, and we'll
+invariably have to take on some new work. In some ways, netdev has
+already undergone such a transformation in the past, with
+ * maintenance shared across more people (to some extent),
+ * a lot more emphasis on reviewers _other_ than the maintainers, and
+ * automation to take care of rote things.
+
+I'm not sure we will be able to find (trusted) people willing to share
+the maintenance with in the short term, but the other two things seem
+entirely manageable in the short term. I'm already checking if I can get
+(interim) automation set up in the short term, with a more permanent
+setup, independent of myself or hopefully any company, to come later.
+
+As for reviews, I suppose that'll be a new thing in the wireless world
+where pretty much everyone (with few exceptions) works in their driver
+niche. I would think that was also the case for Ethernet in the past
+though, where now we see "cross-vendor" Reviewed-by tags on many
+patches, even ones specific to other drivers. This is where we should
+get to, to distribute reviews across more people. For those of you who
+may not have seen, Jakub also publishes statistics about that, e.g.
+https://lore.kernel.org/netdev/20250121200710.19126f7d@kernel.org/
+
+Hopefully then over time we'll see where things fall, and find one or
+multiple people to share the tree maintenance with again. Bus factor and
+all that.
+
+
+However, that's only *my* vision for how we continue to maintain the
+wireless tree going from here. I'm open to other suggestions (though
+pre-emptively reject the suggestion that "every driver has their own
+maintainer and that's good enough...")
+
+
+Thanks for reading this far, and thanks again Kalle! :-)
+
+johannes
+
+
+PS: I'll update patchwork auto-delegation accordingly soon, just have to
+remember when I have enough time to click all the slow buttons there
 
