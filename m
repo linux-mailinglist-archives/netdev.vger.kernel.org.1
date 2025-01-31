@@ -1,101 +1,165 @@
-Return-Path: <netdev+bounces-161727-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-161729-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 21B6AA23992
-	for <lists+netdev@lfdr.de>; Fri, 31 Jan 2025 07:39:30 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 05E8DA239DD
+	for <lists+netdev@lfdr.de>; Fri, 31 Jan 2025 08:21:57 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 9F5F71887061
-	for <lists+netdev@lfdr.de>; Fri, 31 Jan 2025 06:39:34 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 54796188A089
+	for <lists+netdev@lfdr.de>; Fri, 31 Jan 2025 07:22:01 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5C85F1369B4;
-	Fri, 31 Jan 2025 06:39:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 78F8D14F9F4;
+	Fri, 31 Jan 2025 07:21:51 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=cs.stanford.edu header.i=@cs.stanford.edu header.b="E/TtfXBU"
+	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="M5/cazeK"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp1.cs.Stanford.EDU (smtp1.cs.stanford.edu [171.64.64.25])
+Received: from relay9-d.mail.gandi.net (relay9-d.mail.gandi.net [217.70.183.199])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AC5E4143888
-	for <netdev@vger.kernel.org>; Fri, 31 Jan 2025 06:39:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=171.64.64.25
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 05E024683;
+	Fri, 31 Jan 2025 07:21:47 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.199
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1738305566; cv=none; b=Pq2xfvU8qT9ID3za6YfTz2Kg6oB8f8kdJcd+Sc4KQ7wLQu6AekmkJPhZUYIrH3m3lBNI3R8s0HLM8L9PosrY7t+TAs+z8nQzw+89ZasCo55YcMwfYZAOHU7/UUbdja11mzbUuKk1J0JoaYm9BL1L3+/GS7sRs9wr75SqFSpVUs4=
+	t=1738308111; cv=none; b=S5zEFwPEMJGeRLI038buyX9sXuBiD1D8YN47cIAty5I5ZGhwFrGCbHekaHntN6IwedCp8pqkr82ySNx8ThQe6E0/aeXtcpVmFXHIjAKiKhrvEArnvstEHfgblAixeWhGb8JlX//yTGCIPda4UEt7b0LGhPYq+F9kM03RmTU2Rho=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1738305566; c=relaxed/simple;
-	bh=vYxGeBLhsC4Ii5nfXYewohZKI6sY1gOUaEQ62wwJB/Y=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=nlbipCtprevJRFdhhtQY21L+4HFQLkdggnP/9MPlG+26CRCOOJVHZEpuDJHZhg7kYRg+2ynvYgabxIXdXYhg1xTcY9+EklRYEFPj6Pm9VYXkdyu08mQnHhKlGSJ+87+QopnivJuKn6uZKcd2EO0+lPP6flDmwDyFmHhN/CedBVU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=cs.stanford.edu; spf=pass smtp.mailfrom=cs.stanford.edu; dkim=pass (2048-bit key) header.d=cs.stanford.edu header.i=@cs.stanford.edu header.b=E/TtfXBU; arc=none smtp.client-ip=171.64.64.25
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=cs.stanford.edu
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=cs.stanford.edu
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=cs.stanford.edu; s=cs2308; h=Content-Transfer-Encoding:Content-Type:Cc:To:
-	Subject:Message-ID:Date:From:In-Reply-To:References:MIME-Version:Sender:
-	Reply-To:Content-ID:Content-Description:Resent-Date:Resent-From:Resent-Sender
-	:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:List-Help:List-Unsubscribe:
-	List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=vYxGeBLhsC4Ii5nfXYewohZKI6sY1gOUaEQ62wwJB/Y=; t=1738305564; x=1739169564; 
-	b=E/TtfXBUPRylekYBIrAEc4TNdKPoZL/EbxpP/8n9P54B5KrhwAzFniH7/pfGUt4W523QV7zR3Yy
-	vJsnmMUsVHG9FW4q2aassL4/xwXmrTnxvNth5OTwwh6zV8ITDXNaYzgu0C/+CMSYChOJs7C4GJlTX
-	1Qca5DCgt0ej+FT3f7KvNIZAfSL49UMI1N4DZvgkauU4SJm5NE++cFM8QbI8T/HKCM/w/+jMGStkJ
-	0SSBgGXJHyId5C7VkCdM+8JA19Z6X+UYKMgCKaJBZmLK07kg0fMH/+eJWiBCIePeyvfmRWBl+PdwI
-	iJo5VFiafQNmRV1lVCoRm+XQ3PGXAJ3AlNqw==;
-Received: from mail-oo1-f49.google.com ([209.85.161.49]:42191)
-	by smtp1.cs.Stanford.EDU with esmtpsa  (TLS1.2) tls TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256
-	(Exim 4.94.2)
-	(envelope-from <ouster@cs.stanford.edu>)
-	id 1tdkgP-0001s3-KS
-	for netdev@vger.kernel.org; Thu, 30 Jan 2025 22:39:18 -0800
-Received: by mail-oo1-f49.google.com with SMTP id 006d021491bc7-5f4c111991bso842118eaf.0
-        for <netdev@vger.kernel.org>; Thu, 30 Jan 2025 22:39:17 -0800 (PST)
-X-Gm-Message-State: AOJu0Yyu81Bz6PduVy4Phot0/SwPf0VYYdWioYI+7lr/RoskQqV6M33C
-	KWidxvh5qX2e81e36+XCmWEgld3uGziDLcnR/WjUccIxhHshYGFt/Y7tX4sjqOBGb+CLZt8EAB8
-	lYWpc52wvi2X/3SdIwSNHA8Bne3s=
-X-Google-Smtp-Source: AGHT+IEx/rAFEXiggBQs3PkS/l6S8j4s3HJUCfzR46sUKlsZ9N2u3GaqhOllj/klBNaoi4wJ+VrzSHL6Ctz4CzAp3nQ=
-X-Received: by 2002:a05:6870:d1d0:b0:2ae:d23:3c2d with SMTP id
- 586e51a60fabf-2b34fe99372mr6288961fac.8.1738305557038; Thu, 30 Jan 2025
- 22:39:17 -0800 (PST)
+	s=arc-20240116; t=1738308111; c=relaxed/simple;
+	bh=G1mQtbBezYR4g2FL8YenYsWn2FkBkKbc/L95NOOsMLM=;
+	h=From:Subject:Date:Message-Id:MIME-Version:Content-Type:To:Cc; b=Xy5+V32yo4JyNdn6VCOg0TXNSWXqnwfCuwH69S26Bkrm02HuXefqDYeXVaOaWHz/04R4eogxos9nolWJzv7+r473E511xlOr+HkgV6XKXDFnWU9k3UGPHWK1JYw0gRM9vLaVI2yB7UaowN+JAoD6R2uQKiHGfv6dxoA0M4ApEu4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=M5/cazeK; arc=none smtp.client-ip=217.70.183.199
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
+Received: by mail.gandi.net (Postfix) with ESMTPSA id 53A63442CD;
+	Fri, 31 Jan 2025 07:21:44 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
+	t=1738308106;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=qvRMOflZcE1Dy/k3AvNk+EOJWj9DfDs/QUCF/RGgSbQ=;
+	b=M5/cazeKMja7vJfG5KJVTfua089HROREBbHVMizhcY+iY5yuxpE9zMIIH6ue1tTOmaC0eU
+	Ix/U68mP2EI6BoaDp2Eg+zLEvghGXXQ+KrqU5+zoHh7wVjlTcmx4oZZUP7WSFP3oc48+6/
+	d++zVCryn4P32HAVnE1ur9MH8cIDGj5g7iHWX6qYCAqYKRTltOyQsC98Y4bNO6rPdkrb6G
+	+D+//LfaVh85DS2kAWYcfmyspLZoN79y4U3MnpTOEnXhSeYZw1gQr07G5nNw02DxkaV3ig
+	4QeaCF6nDv4U1fLZJqPrXVDokf4nA5FWUqzm8/bUoqXscffqYqeC4eDJ0bEBWw==
+From: "Bastien Curutchet (eBPF Foundation)" <bastien.curutchet@bootlin.com>
+Subject: [PATCH bpf-next v4 00/14] selftests/bpf: Migrate
+ test_xdp_redirect_multi.sh to test_progs
+Date: Fri, 31 Jan 2025 08:21:39 +0100
+Message-Id: <20250131-redirect-multi-v4-0-970b33678512@bootlin.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250116195642.2794-1-ouster@cs.stanford.edu> <CAM0EoMkkk-dT5kQH6OoVp-zs9bhg8ZLW2w+Dp4SYAZnFfw=CTA@mail.gmail.com>
-In-Reply-To: <CAM0EoMkkk-dT5kQH6OoVp-zs9bhg8ZLW2w+Dp4SYAZnFfw=CTA@mail.gmail.com>
-From: John Ousterhout <ouster@cs.stanford.edu>
-Date: Thu, 30 Jan 2025 22:38:41 -0800
-X-Gmail-Original-Message-ID: <CAGXJAmyxX0Ofkb-bzK=gXHJtjiVFczYcsvwAg9+JfS0qLjhqnA@mail.gmail.com>
-X-Gm-Features: AWEUYZnZtWvYmteJf78K40hbtbFe0TKmBlnk3Jdg4L4SeBzTz32kgALctWW7ydg
-Message-ID: <CAGXJAmyxX0Ofkb-bzK=gXHJtjiVFczYcsvwAg9+JfS0qLjhqnA@mail.gmail.com>
-Subject: Re: [PATCH netnext] net: tc: improve qdisc error messages
-To: Jamal Hadi Salim <jhs@mojatatu.com>
-Cc: netdev@vger.kernel.org, xiyou.wangcong@gmail.com, jiri@resnulli.us
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Spam-Score: 0.8
-X-Spam-Level: 
-X-Scan-Signature: 9c8d7c79e82d9ccd3af9a51b4d3246f3
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+X-B4-Tracking: v=1; b=H4sIAAR6nGcC/33NQQ6CMBQE0KuYrq1pC0Vx5T2MC/r5lZ8AJW0lG
+ MLdbXCjkricTObNzAJ6wsDOu5l5HCmQ61PI9zsGTdXfkVOdMlNCaSFFxj3W5BEi7x5tJK5yXRd
+ YWaNrydJo8GhpWsErM4PlPU6R3VLTUIjOP9enUa79G1XyFx0lF9woqTHT1mqhL8a52FJ/ANet2
+ Kj+AyoBFkqooDJQGLUFsk/gtAGyBIAELMqyPIKQ38CyLC8iF7R4OgEAAA==
+X-Change-ID: 20250103-redirect-multi-245d6eafb5d1
+To: Alexei Starovoitov <ast@kernel.org>, 
+ Daniel Borkmann <daniel@iogearbox.net>, 
+ "David S. Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
+ Jesper Dangaard Brouer <hawk@kernel.org>, 
+ John Fastabend <john.fastabend@gmail.com>, 
+ Andrii Nakryiko <andrii@kernel.org>, 
+ Martin KaFai Lau <martin.lau@linux.dev>, 
+ Eduard Zingerman <eddyz87@gmail.com>, Song Liu <song@kernel.org>, 
+ Yonghong Song <yonghong.song@linux.dev>, KP Singh <kpsingh@kernel.org>, 
+ Stanislav Fomichev <sdf@fomichev.me>, Hao Luo <haoluo@google.com>, 
+ Jiri Olsa <jolsa@kernel.org>, Mykola Lysenko <mykolal@fb.com>, 
+ Shuah Khan <shuah@kernel.org>
+Cc: Alexis Lothore <alexis.lothore@bootlin.com>, 
+ Thomas Petazzoni <thomas.petazzoni@bootlin.com>, netdev@vger.kernel.org, 
+ bpf@vger.kernel.org, linux-kselftest@vger.kernel.org, 
+ linux-kernel@vger.kernel.org, 
+ "Bastien Curutchet (eBPF Foundation)" <bastien.curutchet@bootlin.com>
+X-Mailer: b4 0.14.2
+X-GND-State: clean
+X-GND-Score: -100
+X-GND-Cause: gggruggvucftvghtrhhoucdtuddrgeefvddrtddtgdekudegucetufdoteggodetrfdotffvucfrrhhofhhilhgvmecuifetpfffkfdpucggtfgfnhhsuhgsshgtrhhisggvnecuuegrihhlohhuthemuceftddunecusecvtfgvtghiphhivghnthhsucdlqddutddtmdenucfjughrpefhufffkfggtgfgvfevofesthejredtredtjeenucfhrhhomhepfdeurghsthhivghnucevuhhruhhttghhvghtucdlvgeurffhucfhohhunhgurghtihhonhdmfdcuoegsrghsthhivghnrdgtuhhruhhttghhvghtsegsohhothhlihhnrdgtohhmqeenucggtffrrghtthgvrhhnpefhgfehkeduheegudeiudefvedtjeejvdffkefftedujeeigfekgfeiueehfedtjeenucffohhmrghinhepkhgvrhhnvghlrdhorhhgnecukfhppeeltddrkeelrdduieefrdduvdejnecuvehluhhsthgvrhfuihiivgeptdenucfrrghrrghmpehinhgvthepledtrdekledrudeifedruddvjedphhgvlhhopegludelvddrudeikedrtddrudegngdpmhgrihhlfhhrohhmpegsrghsthhivghnrdgtuhhruhhttghhvghtsegsohhothhlihhnrdgtohhmpdhnsggprhgtphhtthhopedvgedprhgtphhtthhopehjohhhnhdrfhgrshhtrggsvghnugesghhmrghilhdrtghomhdprhgtphhtthhopegurghvvghmsegurghvvghmlhhofhhtrdhnvghtpdhrtghpthhtohepsggrshhtihgvnhdrtghurhhuthgthhgvthessghoohhtlhhinhdrtghomhdpr
+ hgtphhtthhopehhrgholhhuohesghhoohhglhgvrdgtohhmpdhrtghpthhtohepuggrnhhivghlsehiohhgvggrrhgsohigrdhnvghtpdhrtghpthhtoheprghlvgigihhsrdhlohhthhhorhgvsegsohhothhlihhnrdgtohhmpdhrtghpthhtohepnhgvthguvghvsehvghgvrhdrkhgvrhhnvghlrdhorhhgpdhrtghpthhtohepshhhuhgrhheskhgvrhhnvghlrdhorhhg
+X-GND-Sasl: bastien.curutchet@bootlin.com
 
-On Thu, Jan 16, 2025 at 12:00=E2=80=AFPM Jamal Hadi Salim <jhs@mojatatu.com=
-> wrote:
->
-> LGTM.
-> Acked-by: Jamal Hadi Salim <jhs@mojatatu.com>
->
-> cheers,
-> jamal
->
-> > 2.34.1
+Hi all,
 
-Sorry for my newbie ignorance (this will be my first accepted patch,
-assuming it's accepted) but what happens next on this? Is there
-anything else I need to do? I mistyped "net-next" as "netnext" in the
-subject and patchwork complained about that; do I need to resubmit to
-fix this?
+This patch series continues the work to migrate the *.sh tests into
+prog_tests framework.
 
--John-
+test_xdp_redirect_multi.sh tests the XDP redirections done through
+bpf_redirect_map().
+
+This is already partly covered by test_xdp_veth.c that already tests
+map redirections at XDP level. What isn't covered yet by test_xdp_veth is
+the use of the broadcast flags (BPF_F_BROADCAST or BPF_F_EXCLUDE_INGRESS)
+and XDP egress programs.
+
+Hence, this patch series add test cases to test_xdp_veth.c to get rid of
+the test_xdp_redirect_multi.sh:
+ - PATCH 1 Add an helper to generate unique names
+ - PATCH 2 to 9 rework test_xdp_veth to make it more generic and allow to
+   configure different test cases
+ - PATCH 10 adds test cases for 'classic' bpf_redirect_map()
+ - PATCH 11 and 12 cover the broadcast flags
+ - PATCH 13 covers the XDP egress programs
+ - PATCH 14 removes test_xdp_redirect_multi.sh
+
+Signed-off-by: Bastien Curutchet (eBPF Foundation) <bastien.curutchet@bootlin.com>
+---
+Changes in v4:
+- Remove the NO_IP #define
+- append_tid() takes string's size as input to ensure there is enough
+  space to fit the thread ID at the end
+- Fix PATCH 12's commit log
+- Link to v3: https://lore.kernel.org/r/20250128-redirect-multi-v3-0-c1ce69997c01@bootlin.com
+
+Changes in v3:
+- Add append_tid() helper and use unique names to allow parallel testing
+- Check create_network()'s return value through ASSERT_OK()
+- Remove check_ping() and unused defines
+- Change next_veth type (from string to int)
+- Link to v2: https://lore.kernel.org/r/20250121-redirect-multi-v2-0-fc9cacabc6b2@bootlin.com
+
+Changes in v2:
+- Use serial_test_* to avoid conflict between tests
+- Link to v1: https://lore.kernel.org/r/20250121-redirect-multi-v1-0-b215e35ff505@bootlin.com
+
+---
+Bastien Curutchet (eBPF Foundation) (14):
+      selftests/bpf: helpers: Add append_tid()
+      selftests/bpf: test_xdp_veth: Remove unused defines
+      selftests/bpf: test_xdp_veth: Remove unecessarry check_ping()
+      selftests/bpf: test_xdp_veth: Use int to describe next veth
+      selftests/bpf: test_xdp_veth: Split network configuration
+      selftests/bpf: test_xdp_veth: Rename config[]
+      selftests/bpf: test_xdp_veth: Add prog_config[] table
+      selftests/bpf: test_xdp_veth: Add XDP flags to prog_configuration
+      selftests/bpf: test_xdp_veth: Use unique names
+      selftests/bpf: test_xdp_veth: Add new test cases for XDP flags
+      selftests/bpf: Optionally select broadcasting flags
+      selftests/bpf: test_xdp_veth: Add XDP broadcast redirection tests
+      selftests/bpf: test_xdp_veth: Add XDP program on egress test
+      selftests/bpf: Remove test_xdp_redirect_multi.sh
+
+ tools/testing/selftests/bpf/Makefile               |   2 -
+ tools/testing/selftests/bpf/network_helpers.c      |  17 +
+ tools/testing/selftests/bpf/network_helpers.h      |  12 +
+ .../selftests/bpf/prog_tests/test_xdp_veth.c       | 588 ++++++++++++++++-----
+ .../testing/selftests/bpf/progs/xdp_redirect_map.c |  89 ++++
+ .../selftests/bpf/progs/xdp_redirect_multi_kern.c  |  41 +-
+ .../selftests/bpf/test_xdp_redirect_multi.sh       | 214 --------
+ tools/testing/selftests/bpf/xdp_redirect_multi.c   | 226 --------
+ 8 files changed, 615 insertions(+), 574 deletions(-)
+---
+base-commit: 421ec9c8f46a25743870a8cbaff76de293752e00
+change-id: 20250103-redirect-multi-245d6eafb5d1
+
+Best regards,
+-- 
+Bastien Curutchet (eBPF Foundation) <bastien.curutchet@bootlin.com>
+
 
