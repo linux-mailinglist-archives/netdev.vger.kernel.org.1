@@ -1,146 +1,288 @@
-Return-Path: <netdev+bounces-161926-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-161925-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 10687A24A47
-	for <lists+netdev@lfdr.de>; Sat,  1 Feb 2025 17:22:29 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 54463A24A46
+	for <lists+netdev@lfdr.de>; Sat,  1 Feb 2025 17:22:27 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E55A43A7C01
-	for <lists+netdev@lfdr.de>; Sat,  1 Feb 2025 16:22:20 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B82CB165024
+	for <lists+netdev@lfdr.de>; Sat,  1 Feb 2025 16:22:25 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8EEBA1C5D55;
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4B9031C5D4D;
 	Sat,  1 Feb 2025 16:22:23 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bgdev-pl.20230601.gappssmtp.com header.i=@bgdev-pl.20230601.gappssmtp.com header.b="k4gk33Oj"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="b+yZl/En"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-lf1-f42.google.com (mail-lf1-f42.google.com [209.85.167.42])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from out-184.mta1.migadu.com (out-184.mta1.migadu.com [95.215.58.184])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B926B1C3C14
-	for <netdev@vger.kernel.org>; Sat,  1 Feb 2025 16:22:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.42
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3E07C85C5E
+	for <netdev@vger.kernel.org>; Sat,  1 Feb 2025 16:22:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.184
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1738426943; cv=none; b=JlIC2JvEJptlssQUEGqQpyfx5Gr3z7ySvIoourw2ebQG3MQOL6L9e6G1ohXqiMCUYMnYSxMhufXkamV1pqYxVi2sjEEMFBj28Hrnb9+Z9qWOaKWHXwrp3LrhiWyDKuxVgq4YamqXz6ke6EoEPCOAuKlmlObZCfOVZm+FY1VWsv0=
+	t=1738426943; cv=none; b=nuoB/slgJR+5Mae4NAjphT2gOvpv9sFFpUJKWll2HnH5aqwVBlDMc2qWnl3pNUtcwPrKjlNRt213C2gk58QV5C14LMrU1faDTx1zkL89aj7FtQUN5eEe/LoSTx78ivy/xUeeCVWEG0SKNDjvep+Ipl885YEWuQmowtHnRSIzcc4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1738426943; c=relaxed/simple;
-	bh=gc2yB9uwC+CfjzlaXN3vOgLBSMdhCziTLFTpp/igtbI=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=AsrmW4M1Wi+sBmln5myp0DwHumREAmcQhwRYRiO22/QTyoC/EdrystHXKUI/HZg9bPqVYj7gCQIUnx/RjpLmB4FgTW6nxLdwqzKByZpwIJRbQd8Ww0+DyQUHPjnfAL6ATFtrFjAQgKZ71jsD0nED5gR4VuyS24GoDs1S9FOKaF8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=bgdev.pl; spf=none smtp.mailfrom=bgdev.pl; dkim=pass (2048-bit key) header.d=bgdev-pl.20230601.gappssmtp.com header.i=@bgdev-pl.20230601.gappssmtp.com header.b=k4gk33Oj; arc=none smtp.client-ip=209.85.167.42
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=bgdev.pl
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=bgdev.pl
-Received: by mail-lf1-f42.google.com with SMTP id 2adb3069b0e04-540201cfedbso2673459e87.3
-        for <netdev@vger.kernel.org>; Sat, 01 Feb 2025 08:22:21 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=bgdev-pl.20230601.gappssmtp.com; s=20230601; t=1738426940; x=1739031740; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=gc2yB9uwC+CfjzlaXN3vOgLBSMdhCziTLFTpp/igtbI=;
-        b=k4gk33OjrqZyZ8vAYmHFC6SVUZiZQtw7U/YUtZ4FvXExY4btcCxRNryyrCPvrcImcM
-         BHNCZMu4UDoo3CByDYH6ItDBUJB05WadJ+Xb9rKpYOD5HUQwLOzpigmQPjk8SpGqe6hd
-         8Gv6ou3vWTgqU8TJzgKNS/71JZk6vOgM1h2KEwCgWRc/qHMzMafQwOnBGS+bhjSOkSiY
-         oG9BbUOwNPPALUvi5Mf1S5xLjxJplPK5U/QBOu+TyAlA4HtMJloqZ8I5kcdc+syux9/O
-         O/FY2K/YloMAggAv3CyC3tHmb7XLxT75vc79S8wzDAcyKUlA405fJaa4LvO2QvU8qOsD
-         6qUA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1738426940; x=1739031740;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=gc2yB9uwC+CfjzlaXN3vOgLBSMdhCziTLFTpp/igtbI=;
-        b=sIAwp2QYXSYvZQX0C/e/X2GBIiRKQ8f8WVjR0s8KKkjQFG6znwcCJVJVX2LiW6gVB/
-         xfSO39B4u316aHJ4LtEquJg1snFUlfyBl8ZQ52rvGjf5EsdA42JyhI46EgjYtgaiNQlO
-         bcvhppH67w0FgasfNsKfLXNg2moEktCjVuEsDO+Qf6Y2hC+EY4gPpwAHkfCVR8X+Zzmp
-         tBtkeSKYLBNtfREt10k73KT3RAO6sjtBLpMFI+VsLP+pRPIEV4oRttWg4VqsvKzw78jL
-         j7bC38mwX9l7vsr7Q1ttUMkRwGPTLHZXrXt9X4H2RUYV7d/x6M4LuofroQdELhFxejpY
-         HINw==
-X-Forwarded-Encrypted: i=1; AJvYcCVaHyoQ9jEqmGEnMcz++n+CXnPwRmf8hvKLsrNbf15PDybm/q06Pu5utuQr3gX+h3RHL/WYucI=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yztww741IVpMpDlMNTVmn0JocRLUlgFcdOt+hUi/cIW7ki4GhDp
-	qadrqdYEDikHXD/jat2lS+W89BYHtJhOF/1Pc9W2/HTdu/PgU+nlwBaE/rmoCxNhN+PMARcsE2g
-	OMK7zK8a4trOmh5xND5kMys1xtPI2AJAIM7sSUA==
-X-Gm-Gg: ASbGncsfq+7BwwruypuRyrGBaZ+p2+Oz8a5bGnyDL5QnkIw/SFpqi16SCTJiZaJQycc
-	f6a0+BG/0GbK5uPfLA+BqjV7pPw1eIsXL9weGNpK2FxmXH2OaPJIkvNlO3zqBEMJAPzEqtjzl
-X-Google-Smtp-Source: AGHT+IEMrH29lOkWTlWC69aY0dD2xb+wCJlnehQsFFcBgOS7bovj0ZbCV4vzNowRaHEyenGDcRs81QzQOyPr/8xF7gY=
-X-Received: by 2002:a05:6512:12c7:b0:53e:239b:6097 with SMTP id
- 2adb3069b0e04-543e4c3fd4cmr5485244e87.50.1738426939852; Sat, 01 Feb 2025
- 08:22:19 -0800 (PST)
+	bh=uANndDBnE/MHPLaU5aZAamrXuROep8ILF+hrdVvGq2s=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=JJhOw3Q3Rf5fd8Ao+U8oZb6f/jMNAmCdU5hetrjc2QbK+R72YwDloAXKbFycFGxwG91Mem+YOJj8oJ7zTwqH14IxE4okLxgCYwutgGUzmzCC/kM2L5wSZvPQJEySKt1ui1lNySMuvNdZ5FKiAYCsyRtQh/f2I45yKEaeuIzaDMI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=b+yZl/En; arc=none smtp.client-ip=95.215.58.184
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+Message-ID: <8085eef9-9724-4148-bdfe-2b7e2066997d@linux.dev>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1738426938;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=zw1Acy/745b49IlGtU0qrEI2pXC8Lu5R01xakLcZU+U=;
+	b=b+yZl/EnRIlr3Tz4NtBnQ/T7SW1peL7IIRdrodVyicO5ASQzLH6rPdHqpUKJsgWkIvcjqZ
+	NKyJsUo/cdaUNCogzmQqOCqSODebAS3uUuXRcjRj6oUoIflVPWDntKim19kukHao/llS1W
+	VpomR5E51kKUifuixVv5sLSDgyEqWZw=
+Date: Sat, 1 Feb 2025 16:22:14 +0000
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250131-gpio-set-array-helper-v1-0-991c8ccb4d6e@baylibre.com>
- <CAMRc=MdwQL8dWU5zF5fp+KUbC2RA2Q264by8HGXMg2k1rxhsTA@mail.gmail.com>
- <9931433b-5cde-4819-ac96-eea4f1f0f1f2@baylibre.com> <CAMRc=McEdcDs01BAKN5vg9POg_xxJBY1k8bfgiDN60C1-e_jow@mail.gmail.com>
- <072be5a9-e0fb-4073-85b3-4a8efcafae09@baylibre.com>
-In-Reply-To: <072be5a9-e0fb-4073-85b3-4a8efcafae09@baylibre.com>
-From: Bartosz Golaszewski <brgl@bgdev.pl>
-Date: Sat, 1 Feb 2025 17:22:08 +0100
-X-Gm-Features: AWEUYZndtirbEg_aYtJ6wt5WMFYJObSWPO3NsWCnNmAFKxLlbxMM9F8rxlAsWp4
-Message-ID: <CAMRc=Meq_Gfhcjzx0vCL0JPzfnOcijFgB6AuqtsqgGn1eOTMVg@mail.gmail.com>
-Subject: Re: [PATCH 00/13] gpiolib: add gpiods_set_array_value_cansleep
-To: David Lechner <dlechner@baylibre.com>
-Cc: linux-gpio@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	linux-iio@vger.kernel.org, linux-mmc@vger.kernel.org, netdev@vger.kernel.org, 
-	linux-phy@lists.infradead.org, linux-sound@vger.kernel.org, 
-	Linus Walleij <linus.walleij@linaro.org>, Andy Shevchenko <andy@kernel.org>, 
-	Geert Uytterhoeven <geert@linux-m68k.org>, Lars-Peter Clausen <lars@metafoo.de>, 
-	Michael Hennerich <Michael.Hennerich@analog.com>, Jonathan Cameron <jic23@kernel.org>, 
-	Ulf Hansson <ulf.hansson@linaro.org>, Peter Rosin <peda@axentia.se>, Andrew Lunn <andrew@lunn.ch>, 
-	Heiner Kallweit <hkallweit1@gmail.com>, Russell King <linux@armlinux.org.uk>, 
-	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Vinod Koul <vkoul@kernel.org>, 
-	Kishon Vijay Abraham I <kishon@kernel.org>, =?UTF-8?B?TnVubyBTw6E=?= <nuno.sa@analog.com>, 
-	Liam Girdwood <lgirdwood@gmail.com>, Mark Brown <broonie@kernel.org>, 
-	Jaroslav Kysela <perex@perex.cz>, Takashi Iwai <tiwai@suse.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Subject: Re: [PATCH RFC net-next] ptp: Add file permission checks on PHC
+ chardevs
+To: Wojtek Wasko <wwasko@nvidia.com>,
+ "netdev@vger.kernel.org" <netdev@vger.kernel.org>
+Cc: "richardcochran@gmail.com" <richardcochran@gmail.com>,
+ Jakub Kicinski <kuba@kernel.org>, Simon Horman <horms@kernel.org>
+References: <DM4PR12MB8558AB3C0DEA666EE334D8BCBEE82@DM4PR12MB8558.namprd12.prod.outlook.com>
+Content-Language: en-US
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Vadim Fedorenko <vadim.fedorenko@linux.dev>
+In-Reply-To: <DM4PR12MB8558AB3C0DEA666EE334D8BCBEE82@DM4PR12MB8558.namprd12.prod.outlook.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Migadu-Flow: FLOW_OUT
 
-On Sat, Feb 1, 2025 at 5:17=E2=80=AFPM David Lechner <dlechner@baylibre.com=
-> wrote:
->
-> On 2/1/25 10:14 AM, Bartosz Golaszewski wrote:
-> > On Sat, Feb 1, 2025 at 5:09=E2=80=AFPM David Lechner <dlechner@baylibre=
-.com> wrote:
-> >>
-> >> On 2/1/25 4:36 AM, Bartosz Golaszewski wrote:
-> >>>
-> >>> This looks good to me except for one thing: the function prefix. I wo=
-uld
-> >>> really appreciate it if we could stay within the existing gpiod_ name=
-space and
-> >>> not add a new one in the form of gpiods_.
-> >>>
-> >>> Maybe: gpiod_multiple_set_ or gpiod_collected_set...?
-> >>>
-> >>> Bartosz
-> >>
-> >> I was waiting for someone to complain about the naming. ;-)
-> >>
-> >> I was going for as short as possible, but OK, the most obvious prefix =
-to me
-> >> would be `gpio_descs_...` (to match the first parameter). Any objectio=
-ns to
-> >> that?
-> >>
-> >
-> > Yes, objection! As far as any exported interfaces go: in my book
-> > "gpio_" is the prefix for legacy symbols we want to go away and
-> > "gpiod_" is the prefix for current, descriptor-based API. Anything
-> > else is a no-go. I prefer a longer name that starts with gpiod_ over
-> > anything that's shorter but doesn't.
-> >
-> > Bartosz
->
-> Oops, that was a typo. I meant to write gpiod_descs_.
+On 31/01/2025 18:29, Wojtek Wasko wrote:
+> Udev sets strict 600 permissions on /dev/ptp* devices, preventing
+> unprivileged users from accessing the time [1]. This patch enables
+> more granular permissions and allows readonly access to the PTP clocks.
+> 
+> Add permission checking for ioctls which modify the state of device.
+> Notably, require WRITE for polling as it is only used for later reading
+> timestamps from the queue (there is no peek support). POSIX clock
+> operations (settime, adjtime) are checked in the POSIX layer.
+> 
+> [1] https://lists.nwtime.org/sympa/arc/linuxptp-users/2024-01/msg00036.html
+> 
+> Signed-off-by: Wojtek Wasko <wwasko@nvidia.com>
+> ---
+>   drivers/ptp/ptp_chardev.c | 66 +++++++++++++++++++++++++++++++++++----
+>   drivers/ptp/ptp_private.h |  5 +++
+>   2 files changed, 65 insertions(+), 6 deletions(-)
+> 
+> diff --git a/drivers/ptp/ptp_chardev.c b/drivers/ptp/ptp_chardev.c
+> index bf6468c56419..5e6f404b9282 100644
+> --- a/drivers/ptp/ptp_chardev.c
+> +++ b/drivers/ptp/ptp_chardev.c
+> @@ -108,15 +108,22 @@ int ptp_open(struct posix_clock_context *pccontext, fmode_t fmode)
+>   {
+>   	struct ptp_clock *ptp =
+>   		container_of(pccontext->clk, struct ptp_clock, clock);
+> +	struct ptp_private_ctxdata *ctxdata;
+>   	struct timestamp_event_queue *queue;
+>   	char debugfsname[32];
+>   	unsigned long flags;
+>   
+> +	ctxdata = kzalloc(sizeof(*ctxdata), GFP_KERNEL);
+> +	if (!ctxdata)
+> +		return -EINVAL;
+>   	queue = kzalloc(sizeof(*queue), GFP_KERNEL);
+> -	if (!queue)
+> +	if (!queue) {
+> +		kfree(ctxdata);
+>   		return -EINVAL;
+> +	}
 
-Eh... the D in gpioD already stands for "GPIO Descriptor" but if
-there's no better option in your opinion than I guess I can live with
-that.
+Given that struct ptp_private_ctxdata is quite simple, we can
+potentially embed struct timestamp_event_queue into it and avoid
+double allocation here?
 
-Bart
+>   	queue->mask = bitmap_alloc(PTP_MAX_CHANNELS, GFP_KERNEL);
+>   	if (!queue->mask) {
+> +		kfree(ctxdata);
+>   		kfree(queue);
+>   		return -EINVAL;
+>   	}
+> @@ -125,7 +132,9 @@ int ptp_open(struct posix_clock_context *pccontext, fmode_t fmode)
+>   	spin_lock_irqsave(&ptp->tsevqs_lock, flags);
+>   	list_add_tail(&queue->qlist, &ptp->tsevqs);
+>   	spin_unlock_irqrestore(&ptp->tsevqs_lock, flags);
+> -	pccontext->private_clkdata = queue;
+> +	ctxdata->queue = queue;
+> +	ctxdata->fmode = fmode;
+> +	pccontext->private_clkdata = ctxdata;
+>   
+>   	/* Debugfs contents */
+>   	sprintf(debugfsname, "0x%p", queue);
+> @@ -142,7 +151,8 @@ int ptp_open(struct posix_clock_context *pccontext, fmode_t fmode)
+>   
+>   int ptp_release(struct posix_clock_context *pccontext)
+>   {
+> -	struct timestamp_event_queue *queue = pccontext->private_clkdata;
+> +	struct ptp_private_ctxdata *ctxdata = pccontext->private_clkdata;
+> +	struct timestamp_event_queue *queue = ctxdata->queue;
+>   	unsigned long flags;
+>   	struct ptp_clock *ptp =
+>   		container_of(pccontext->clk, struct ptp_clock, clock);
+> @@ -154,6 +164,7 @@ int ptp_release(struct posix_clock_context *pccontext)
+>   	spin_unlock_irqrestore(&ptp->tsevqs_lock, flags);
+>   	bitmap_free(queue->mask);
+>   	kfree(queue);
+> +	kfree(ctxdata);
+>   	return 0;
+>   }
+>   
+> @@ -167,6 +178,7 @@ long ptp_ioctl(struct posix_clock_context *pccontext, unsigned int cmd,
+>   	struct system_device_crosststamp xtstamp;
+>   	struct ptp_clock_info *ops = ptp->info;
+>   	struct ptp_sys_offset *sysoff = NULL;
+> +	struct ptp_private_ctxdata *ctxdata;
+>   	struct timestamp_event_queue *tsevq;
+>   	struct ptp_system_timestamp sts;
+>   	struct ptp_clock_request req;
+> @@ -180,7 +192,8 @@ long ptp_ioctl(struct posix_clock_context *pccontext, unsigned int cmd,
+>   	if (in_compat_syscall() && cmd != PTP_ENABLE_PPS && cmd != PTP_ENABLE_PPS2)
+>   		arg = (unsigned long)compat_ptr(arg);
+>   
+> -	tsevq = pccontext->private_clkdata;
+> +	ctxdata = pccontext->private_clkdata;
+> +	tsevq = ctxdata->queue;
+>   
+>   	switch (cmd) {
+>   
+> @@ -205,6 +218,11 @@ long ptp_ioctl(struct posix_clock_context *pccontext, unsigned int cmd,
+>   
+>   	case PTP_EXTTS_REQUEST:
+>   	case PTP_EXTTS_REQUEST2:
+> +		if ((ctxdata->fmode & FMODE_WRITE) == 0) {
+> +			err = -EACCES;
+> +			break;
+> +		}
+> +
+>   		memset(&req, 0, sizeof(req));
+>   
+>   		if (copy_from_user(&req.extts, (void __user *)arg,
+> @@ -246,6 +264,10 @@ long ptp_ioctl(struct posix_clock_context *pccontext, unsigned int cmd,
+>   
+>   	case PTP_PEROUT_REQUEST:
+>   	case PTP_PEROUT_REQUEST2:
+> +		if ((ctxdata->fmode & FMODE_WRITE) == 0) {
+> +			err = -EACCES;
+> +			break;
+> +		}
+>   		memset(&req, 0, sizeof(req));
+>   
+>   		if (copy_from_user(&req.perout, (void __user *)arg,
+> @@ -314,6 +336,10 @@ long ptp_ioctl(struct posix_clock_context *pccontext, unsigned int cmd,
+>   
+>   	case PTP_ENABLE_PPS:
+>   	case PTP_ENABLE_PPS2:
+> +		if ((ctxdata->fmode & FMODE_WRITE) == 0) {
+> +			err = -EACCES;
+> +			break;
+> +		}
+>   		memset(&req, 0, sizeof(req));
+>   
+>   		if (!capable(CAP_SYS_TIME))
+> @@ -456,6 +482,10 @@ long ptp_ioctl(struct posix_clock_context *pccontext, unsigned int cmd,
+>   
+>   	case PTP_PIN_SETFUNC:
+>   	case PTP_PIN_SETFUNC2:
+> +		if ((ctxdata->fmode & FMODE_WRITE) == 0) {
+> +			err = -EACCES;
+> +			break;
+> +		}
+>   		if (copy_from_user(&pd, (void __user *)arg, sizeof(pd))) {
+>   			err = -EFAULT;
+>   			break;
+> @@ -485,10 +515,18 @@ long ptp_ioctl(struct posix_clock_context *pccontext, unsigned int cmd,
+>   		break;
+>   
+>   	case PTP_MASK_CLEAR_ALL:
+> +		if ((ctxdata->fmode & FMODE_WRITE) == 0) {
+> +			err = -EACCES;
+> +			break;
+> +		}
+>   		bitmap_clear(tsevq->mask, 0, PTP_MAX_CHANNELS);
+>   		break;
+>   
+>   	case PTP_MASK_EN_SINGLE:
+> +		if ((ctxdata->fmode & FMODE_WRITE) == 0) {
+> +			err = -EACCES;
+> +			break;
+> +		}
+>   		if (copy_from_user(&i, (void __user *)arg, sizeof(i))) {
+>   			err = -EFAULT;
+>   			break;
+> @@ -516,9 +554,15 @@ __poll_t ptp_poll(struct posix_clock_context *pccontext, struct file *fp,
+>   {
+>   	struct ptp_clock *ptp =
+>   		container_of(pccontext->clk, struct ptp_clock, clock);
+> +	struct ptp_private_ctxdata *ctxdata;
+>   	struct timestamp_event_queue *queue;
+>   
+> -	queue = pccontext->private_clkdata;
+> +	ctxdata = pccontext->private_clkdata;
+> +	if (!ctxdata)
+> +		return EPOLLERR;
+> +	if ((ctxdata->fmode & FMODE_WRITE) == 0)
+> +		return EACCES;
+> +	queue = ctxdata->queue;
+>   	if (!queue)
+>   		return EPOLLERR;
+>   
+> @@ -534,13 +578,23 @@ ssize_t ptp_read(struct posix_clock_context *pccontext, uint rdflags,
+>   {
+>   	struct ptp_clock *ptp =
+>   		container_of(pccontext->clk, struct ptp_clock, clock);
+> +	struct ptp_private_ctxdata *ctxdata;
+>   	struct timestamp_event_queue *queue;
+>   	struct ptp_extts_event *event;
+>   	unsigned long flags;
+>   	size_t qcnt, i;
+>   	int result;
+>   
+> -	queue = pccontext->private_clkdata;
+> +	ctxdata = pccontext->private_clkdata;
+> +	if (!ctxdata) {
+> +		result = -EINVAL;
+> +		goto exit;
+> +	}
+> +	if ((ctxdata->fmode & FMODE_WRITE) == 0) {
+> +		result = -EACCES;
+> +		goto exit;
+> +	}
+> +	queue = ctxdata->queue;
+>   	if (!queue) {
+>   		result = -EINVAL;
+>   		goto exit;
+> diff --git a/drivers/ptp/ptp_private.h b/drivers/ptp/ptp_private.h
+> index 18934e28469e..fb4fa5c8c1c7 100644
+> --- a/drivers/ptp/ptp_private.h
+> +++ b/drivers/ptp/ptp_private.h
+> @@ -64,6 +64,11 @@ struct ptp_clock {
+>   	struct dentry *debugfs_root;
+>   };
+>   
+> +struct ptp_private_ctxdata {
+> +	struct timestamp_event_queue *queue;
+> +	fmode_t fmode;
+> +};
+> +
+>   #define info_to_vclock(d) container_of((d), struct ptp_vclock, info)
+>   #define cc_to_vclock(d) container_of((d), struct ptp_vclock, cc)
+>   #define dw_to_vclock(d) container_of((d), struct ptp_vclock, refresh_work)
+
 
