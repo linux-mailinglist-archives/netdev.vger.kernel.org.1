@@ -1,237 +1,97 @@
-Return-Path: <netdev+bounces-161914-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-161915-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0681CA2496F
-	for <lists+netdev@lfdr.de>; Sat,  1 Feb 2025 14:48:59 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3D12EA24976
+	for <lists+netdev@lfdr.de>; Sat,  1 Feb 2025 14:52:29 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 2AF6A7A24F3
-	for <lists+netdev@lfdr.de>; Sat,  1 Feb 2025 13:48:04 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id CF7E61888256
+	for <lists+netdev@lfdr.de>; Sat,  1 Feb 2025 13:52:33 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 020861B86DC;
-	Sat,  1 Feb 2025 13:48:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2501C1BDA9B;
+	Sat,  1 Feb 2025 13:52:17 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=couthit.com header.i=@couthit.com header.b="n9ZjdaM/"
+	dkim=pass (2048-bit key) header.d=uliege.be header.i=@uliege.be header.b="jHNJ1Pm4"
 X-Original-To: netdev@vger.kernel.org
-Received: from server.wki.vra.mybluehostin.me (server.wki.vra.mybluehostin.me [162.240.238.73])
+Received: from serv108.segi.ulg.ac.be (serv108.segi.ulg.ac.be [139.165.32.111])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6239D3EA83;
-	Sat,  1 Feb 2025 13:48:49 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=162.240.238.73
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BFBE01BD004
+	for <netdev@vger.kernel.org>; Sat,  1 Feb 2025 13:52:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=139.165.32.111
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1738417730; cv=none; b=XsReQRAxVqs1xQXyjf1k4qXwEGEm+XBmTeExjhdKQlOiW6LmZP8NJnuEMxSCsXIOJc5dWnPYY35CNMK3mUA3nf4Ubc4BMsIAkAHGHLHI8Ey9NFHarmxdfeZYwWsx1CJhqU5fP8nd66quWNw3BnYQPNFsJZGsiSHrhbMuxwvjjR4=
+	t=1738417937; cv=none; b=QU9BWCr33l9YyWb1nvcMkb8rWzpj6nRNmek7+fvD4T/WtvrEt+NwdZDTs/uFM4PWSbxUN+GzhCSRAPBBhjrlMyTztN718GmZvq2o5fBtWVnNDlcEzVhaRphpgXu9JOtvnwR/isD4+T+76YZUnHx/Qz/wht/MQPy1LlS7NtToIN4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1738417730; c=relaxed/simple;
-	bh=uzjxE3sWtDIpQ1L1wc2r8t2aHY2xICPXFUYi1UU3v6U=;
-	h=Date:From:To:Cc:Message-ID:In-Reply-To:References:Subject:
-	 MIME-Version:Content-Type; b=CtFTAApsrYLsXEs4AvDLy1YZFwnP8VJL5zAzNuSaqO2BoMxjEOuRRiObDiOLuTccyWhLMr51PNiL+/AtI+8V+wh4YewiIzsh/QPsF/CLsMukUsDXwMDHYBN3KSFXN8V5PcaktFlHIemPHLLkGjz0Z2ThymS6094KzwhtKU72Hn4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=couthit.com; spf=pass smtp.mailfrom=couthit.com; dkim=pass (2048-bit key) header.d=couthit.com header.i=@couthit.com header.b=n9ZjdaM/; arc=none smtp.client-ip=162.240.238.73
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=couthit.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=couthit.com
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=couthit.com
-	; s=default; h=Content-Transfer-Encoding:Content-Type:MIME-Version:Subject:
-	References:In-Reply-To:Message-ID:Cc:To:From:Date:Sender:Reply-To:Content-ID:
-	Content-Description:Resent-Date:Resent-From:Resent-Sender:Resent-To:Resent-Cc
-	:Resent-Message-ID:List-Id:List-Help:List-Unsubscribe:List-Subscribe:
-	List-Post:List-Owner:List-Archive;
-	bh=Nb68TYL9t8PS/LozpmfjHUwS6470gMW71XEiwbzKw6A=; b=n9ZjdaM/i7qy0tJn7RUe8jEJ4J
-	XREX0V7OJ3iWtN50yNNOwQQ3T7zNvTVgnqCxscsgkJvC9bqlQQbsMSYeaX9aIaVjBbyORue5YGOWo
-	FdEe+PvxhdfRt+U8YUcjGGiWl4Ry1FKn6pHrTas4B2myFM77k5oz+LJYpFZOPkWePQnFnfxJ7OIMH
-	iDfaeZyiUjI5j4aK3urYUi/LOK9UD7QdePo9vEC9nPrpjQyikLTPp6tZF825XCyyug/utraHbtzzL
-	AN7PayCdfexg4Jif/QvutTiPTntboTUpCCDum7fGb0yhdoXHUqHjYGHf75L3buv1ifc6Q54J8MP6h
-	PDfz1fSw==;
-Received: from [122.175.9.182] (port=27502 helo=zimbra.couthit.local)
-	by server.wki.vra.mybluehostin.me with esmtpsa  (TLS1.2) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.96.2)
-	(envelope-from <basharath@couthit.com>)
-	id 1teDrX-0004Dx-1v;
-	Sat, 01 Feb 2025 19:18:43 +0530
-Received: from zimbra.couthit.local (localhost [127.0.0.1])
-	by zimbra.couthit.local (Postfix) with ESMTPS id DA0821781C56;
-	Sat,  1 Feb 2025 19:18:37 +0530 (IST)
-Received: from localhost (localhost [127.0.0.1])
-	by zimbra.couthit.local (Postfix) with ESMTP id BA5DD1782035;
-	Sat,  1 Feb 2025 19:18:37 +0530 (IST)
-Received: from zimbra.couthit.local ([127.0.0.1])
-	by localhost (zimbra.couthit.local [127.0.0.1]) (amavisd-new, port 10026)
-	with ESMTP id VAvysSHs7gYN; Sat,  1 Feb 2025 19:18:37 +0530 (IST)
-Received: from zimbra.couthit.local (zimbra.couthit.local [10.10.10.103])
-	by zimbra.couthit.local (Postfix) with ESMTP id 747E01781C56;
-	Sat,  1 Feb 2025 19:18:37 +0530 (IST)
-Date: Sat, 1 Feb 2025 19:18:37 +0530 (IST)
-From: Basharath Hussain Khaja <basharath@couthit.com>
-To: horms <horms@kernel.org>
-Cc: basharath <basharath@couthit.com>, danishanwar <danishanwar@ti.com>, 
-	rogerq <rogerq@kernel.org>, andrew+netdev <andrew+netdev@lunn.ch>, 
-	davem <davem@davemloft.net>, edumazet <edumazet@google.com>, 
-	kuba <kuba@kernel.org>, pabeni <pabeni@redhat.com>, 
-	Rob Herring <robh@kernel.org>, krzk+dt <krzk+dt@kernel.org>, 
-	conor+dt <conor+dt@kernel.org>, nm <nm@ti.com>, 
-	ssantosh <ssantosh@kernel.org>, tony <tony@atomide.com>, 
-	richardcochran <richardcochran@gmail.com>, 
-	parvathi <parvathi@couthit.com>, schnelle <schnelle@linux.ibm.com>, 
-	rdunlap <rdunlap@infradead.org>, diogo ivo <diogo.ivo@siemens.com>, 
-	m-karicheri2 <m-karicheri2@ti.com>, 
-	jacob e keller <jacob.e.keller@intel.com>, 
-	m-malladi <m-malladi@ti.com>, 
-	javier carrasco cruz <javier.carrasco.cruz@gmail.com>, 
-	afd <afd@ti.com>, s-anna <s-anna@ti.com>, 
-	linux-arm-kernel <linux-arm-kernel@lists.infradead.org>, 
-	netdev <netdev@vger.kernel.org>, 
-	devicetree <devicetree@vger.kernel.org>, 
-	linux-kernel <linux-kernel@vger.kernel.org>, 
-	linux-omap <linux-omap@vger.kernel.org>, 
-	pratheesh <pratheesh@ti.com>, prajith <prajith@ti.com>, 
-	vigneshr <vigneshr@ti.com>, praneeth <praneeth@ti.com>, 
-	srk <srk@ti.com>, rogerq <rogerq@ti.com>, 
-	krishna <krishna@couthit.com>, pmohan <pmohan@couthit.com>, 
-	mohan <mohan@couthit.com>
-Message-ID: <1332280195.481828.1738417717332.JavaMail.zimbra@couthit.local>
-In-Reply-To: <20250130172304.GD13457@kernel.org>
-References: <20250124122353.1457174-1-basharath@couthit.com> <20250124134056.1459060-6-basharath@couthit.com> <20250130172304.GD13457@kernel.org>
-Subject: Re: [RFC v2 PATCH 05/10] net: ti: prueth: Adds ethtool support for
- ICSSM PRUETH Driver
+	s=arc-20240116; t=1738417937; c=relaxed/simple;
+	bh=2lB45wCFkz/1RaLDu8YXC1f1ezm8W1TvsQwqjQ7Lw2Q=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=JFcqQHgjYPCI+bxdFzL40Fz5SgWM7deQj9XcFyScptdFBommJnC5bEaeIwO7XbtQp+a/Xra7fE/3/sumuARF2Py9jvEwb0bPWdaxx/+xgAYEv68YyY278GUbsw6+T1ijv3KUkRuws+GFd19RJGGjLlFtTbUQAt5TG13fDGRzExw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=uliege.be; spf=pass smtp.mailfrom=uliege.be; dkim=pass (2048-bit key) header.d=uliege.be header.i=@uliege.be header.b=jHNJ1Pm4; arc=none smtp.client-ip=139.165.32.111
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=uliege.be
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=uliege.be
+Received: from [192.168.1.27] (220.24-245-81.adsl-dyn.isp.belgacom.be [81.245.24.220])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+	(No client certificate requested)
+	by serv108.segi.ulg.ac.be (Postfix) with ESMTPSA id 8A385200EEBF;
+	Sat,  1 Feb 2025 14:52:05 +0100 (CET)
+DKIM-Filter: OpenDKIM Filter v2.11.0 serv108.segi.ulg.ac.be 8A385200EEBF
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=uliege.be;
+	s=ulg20190529; t=1738417925;
+	bh=uCg4W4wdlI3EmD2bZ+nkMoLBYY03ne39c9o/duftHsc=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=jHNJ1Pm43C3gqad9e4PXIE8ujIJ6g8JD6DAZZb2nCtJ1nMzd9J/JMwNq9rHBRDN7v
+	 +JvfeNom5UJR5HTGGtNXV6h5rlOlnFIj2a9m511dymCWxwp9+C2MRU/Ge8te5oYo98
+	 UKed7pz9YPKyMCVOKs/0IaqIw+tIud2QJFrWiX6M/6xTOdfDpddjVV0KOnakJwmBNH
+	 xkh2U4UsmfUAFLry4BXhCHk9wKUOD1FiAWvE2a9SJz9IF7vHBS4dNuzIrR2alGbUfy
+	 LyfFTtgB7tXfrvl8sT07VxDAmFg9b/MuUFjtdfhkmb/30HLRoKc8AtahcCS/LMVBZV
+	 nWj5llw+uxyrg==
+Message-ID: <4b8d9c6e-cbe6-4c75-b709-c732db0cf331@uliege.be>
+Date: Sat, 1 Feb 2025 14:52:05 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net v2 2/2] net: ipv6: fix dst ref loops in rpl, seg6 and
+ ioam6 lwtunnels
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: Paolo Abeni <pabeni@redhat.com>, davem@davemloft.net,
+ netdev@vger.kernel.org, edumazet@google.com, andrew+netdev@lunn.ch,
+ horms@kernel.org, dsahern@kernel.org
+References: <20250130031519.2716843-1-kuba@kernel.org>
+ <20250130031519.2716843-2-kuba@kernel.org>
+ <21027e9a-60f1-4d4b-a09d-9d74f6a692e5@redhat.com>
+ <cc9dd246-e8f8-4d10-9ca1-c7fed44ecde6@uliege.be>
+ <20250130065518.5872bbfa@kernel.org>
+ <59f99151-b1ca-456f-9e87-85dcac5db797@uliege.be>
+ <20250130085341.3132a9c0@kernel.org>
+Content-Language: en-US
+From: Justin Iurman <justin.iurman@uliege.be>
+In-Reply-To: <20250130085341.3132a9c0@kernel.org>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
-X-Mailer: Zimbra 8.8.15_GA_3968 (ZimbraWebClient - FF113 (Linux)/8.8.15_GA_3968)
-Thread-Topic: prueth: Adds ethtool support for ICSSM PRUETH Driver
-Thread-Index: vgALNNkSnZlxeSVy7G7hiRfdp6aaZw==
-X-AntiAbuse: This header was added to track abuse, please include it with any abuse report
-X-AntiAbuse: Primary Hostname - server.wki.vra.mybluehostin.me
-X-AntiAbuse: Original Domain - vger.kernel.org
-X-AntiAbuse: Originator/Caller UID/GID - [47 12] / [47 12]
-X-AntiAbuse: Sender Address Domain - couthit.com
-X-Get-Message-Sender-Via: server.wki.vra.mybluehostin.me: authenticated_id: smtp@couthit.com
-X-Authenticated-Sender: server.wki.vra.mybluehostin.me: smtp@couthit.com
-X-Source: 
-X-Source-Args: 
-X-Source-Dir: 
 
+On 1/30/25 17:53, Jakub Kicinski wrote:
+> On Thu, 30 Jan 2025 16:12:23 +0100 Justin Iurman wrote:
+>>> And perhaps add a selftest at least for the looped cases?
+>>
+>> ioam6.sh already triggers the looped cases in both inline and encap
+>> tests. Not sure about seg6 though, and there is no selftest for rpl.
+> 
+> Right! To be clear I meant just for seg6 and rpl. The ioam6 test
+> is clearly paying off, thanks for putting in the work there! :)
 
-> On Fri, Jan 24, 2025 at 07:10:51PM +0530, Basharath Hussain Khaja wrote:
->> From: Roger Quadros <rogerq@ti.com>
->> 
->> Changes for enabling ethtool support for the newly added PRU Ethernet
->> interfaces. Extends the support for statistics collection from PRU internal
->> memory and displays it in the user space. Along with statistics,
->> enable/disable of features, configuring link speed etc.are now supported.
->> 
->> The firmware running on PRU maintains statistics in internal data memory.
->> When requested ethtool collects all the statistics for the specified
->> interface and displays it in the user space.
->> 
->> Makefile is updated to include ethtool support into PRUETH driver.
->> 
->> Signed-off-by: Roger Quadros <rogerq@ti.com>
->> Signed-off-by: Andrew F. Davis <afd@ti.com>
->> Signed-off-by: Parvathi Pudi <parvathi@couthit.com>
->> Signed-off-by: Basharath Hussain Khaja <basharath@couthit.com>
-> 
-> ...
-> 
->> diff --git a/drivers/net/ethernet/ti/icssm/icssm_ethtool.c
->> b/drivers/net/ethernet/ti/icssm/icssm_ethtool.c
-> 
-> ...
-> 
->> +static const struct {
->> +	char string[ETH_GSTRING_LEN];
->> +	u32 offset;
->> +} prueth_ethtool_stats[] = {
->> +	{"txBcast", PRUETH_STAT_OFFSET(tx_bcast)},
->> +	{"txMcast", PRUETH_STAT_OFFSET(tx_mcast)},
->> +	{"txUcast", PRUETH_STAT_OFFSET(tx_ucast)},
->> +	{"txOctets", PRUETH_STAT_OFFSET(tx_octets)},
->> +	{"rxBcast", PRUETH_STAT_OFFSET(rx_bcast)},
->> +	{"rxMcast", PRUETH_STAT_OFFSET(rx_mcast)},
->> +	{"rxUcast", PRUETH_STAT_OFFSET(rx_ucast)},
->> +	{"rxOctets", PRUETH_STAT_OFFSET(rx_octets)},
-> 
-> Hi Roger, Basharath, all,
-> 
-> There seems to be some overlap between the above and struct rtnl_link_stats64.
-> 
-> Please implement those stats which are present in struct rtnl_link_stats64
-> using ndo_get_stats64 and omit them from your implementation of
-> get_ethtool_stats.
-> 
-> IOW, get_ethtool_stats() is for extended stats, whereas is for standard
-> stats ndo_get_stats64().  And standard stats should not be presented to the
-> user as extended stats.
-> 
-> Link:
-> https://docs.kernel.org/networking/statistics.html#notes-for-driver-authors
-> 
-
-We will address this along with the changes that will be done by using 
-rtnl_link_stats64 instead of legacy net_device_stats. 
-
->> +	{"tx64byte", PRUETH_STAT_OFFSET(tx64byte)},
->> +	{"tx65_127byte", PRUETH_STAT_OFFSET(tx65_127byte)},
->> +	{"tx128_255byte", PRUETH_STAT_OFFSET(tx128_255byte)},
->> +	{"tx256_511byte", PRUETH_STAT_OFFSET(tx256_511byte)},
->> +	{"tx512_1023byte", PRUETH_STAT_OFFSET(tx512_1023byte)},
->> +	{"tx1024byte", PRUETH_STAT_OFFSET(tx1024byte)},
->> +	{"rx64byte", PRUETH_STAT_OFFSET(rx64byte)},
->> +	{"rx65_127byte", PRUETH_STAT_OFFSET(rx65_127byte)},
->> +	{"rx128_255byte", PRUETH_STAT_OFFSET(rx128_255byte)},
->> +	{"rx256_511byte", PRUETH_STAT_OFFSET(rx256_511byte)},
->> +	{"rx512_1023byte", PRUETH_STAT_OFFSET(rx512_1023byte)},
->> +	{"rx1024byte", PRUETH_STAT_OFFSET(rx1024byte)},
-> 
-> Similarly, the above, along with rxOverSizedFrames and rxUnderSizedFrames
-> below seem to be RMON (RFC 2819) statistics. So I think they should
-> be handled by implementing get_rmon_stats().
-> 
-
-Sure. We will add get_rmon_stats() function and update necessary statistics
-in that function.
-
->> +
->> +	{"lateColl", PRUETH_STAT_OFFSET(late_coll)},
->> +	{"singleColl", PRUETH_STAT_OFFSET(single_coll)},
->> +	{"multiColl", PRUETH_STAT_OFFSET(multi_coll)},
->> +	{"excessColl", PRUETH_STAT_OFFSET(excess_coll)},
-> 
-> And likewise, the section above and below seem to overlap
-> with Basic IEEE 802.3 MAC statistics which I believe
-> should be handled by implementing get_eth_mac_stats()
-> 
-
-For now we will remove these stats in the next version
-and address this in the next series of patches.
-
->> +
->> +	{"rxMisAlignmentFrames", PRUETH_STAT_OFFSET(rx_misalignment_frames)},
->> +	{"stormPrevCounterBC", PRUETH_STAT_OFFSET(stormprev_counter_bc)},
->> +	{"stormPrevCounterMC", PRUETH_STAT_OFFSET(stormprev_counter_mc)},
->> +	{"stormPrevCounterUC", PRUETH_STAT_OFFSET(stormprev_counter_uc)},
->> +	{"macRxError", PRUETH_STAT_OFFSET(mac_rxerror)},
->> +	{"SFDError", PRUETH_STAT_OFFSET(sfd_error)},
->> +	{"defTx", PRUETH_STAT_OFFSET(def_tx)},
->> +	{"macTxError", PRUETH_STAT_OFFSET(mac_txerror)},
->> +	{"rxOverSizedFrames", PRUETH_STAT_OFFSET(rx_oversized_frames)},
->> +	{"rxUnderSizedFrames", PRUETH_STAT_OFFSET(rx_undersized_frames)},
->> +	{"rxCRCFrames", PRUETH_STAT_OFFSET(rx_crc_frames)},
->> +	{"droppedPackets", PRUETH_STAT_OFFSET(dropped_packets)},
->> +
->> +	{"txHWQOverFlow", PRUETH_STAT_OFFSET(tx_hwq_overflow)},
->> +	{"txHWQUnderFlow", PRUETH_STAT_OFFSET(tx_hwq_underflow)},
->> +	{"vlanDropped", PRUETH_STAT_OFFSET(vlan_dropped)},
->> +	{"multicastDropped", PRUETH_STAT_OFFSET(multicast_dropped)},
->> +};
-> 
-> ...
-
-Thanks & Best Regards,
-Basharath
+Got it. Of course, I'll see what I can do. And glad the ioam6 selftest 
+helped :-) Not sure what the current SRv6 selftests are doing though, 
+but it looks like the "looped cases" were not caught. Probably because 
+the first segment makes it so that the new dst_entry is not the same as 
+the origin (I'll have to double check). I could just add a test with a 
+route matching on a subnet, so that the next segment matches too (i.e., 
+old dst == new dst). Overall, both seg6 and rpl selftests to detect the 
+looped cases would look like "dummy" tests, i.e., useless without 
+kmemleak. Does it sound OK?
 
