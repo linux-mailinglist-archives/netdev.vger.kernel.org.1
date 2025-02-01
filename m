@@ -1,117 +1,316 @@
-Return-Path: <netdev+bounces-161910-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-161911-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2C0C0A24919
-	for <lists+netdev@lfdr.de>; Sat,  1 Feb 2025 13:46:18 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id F0166A2495F
+	for <lists+netdev@lfdr.de>; Sat,  1 Feb 2025 14:26:19 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id A376618861DA
-	for <lists+netdev@lfdr.de>; Sat,  1 Feb 2025 12:46:22 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C3F323A7F54
+	for <lists+netdev@lfdr.de>; Sat,  1 Feb 2025 13:26:11 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D317A1ADC6C;
-	Sat,  1 Feb 2025 12:46:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CDDEF1B21B9;
+	Sat,  1 Feb 2025 13:26:14 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="EppRzHBu"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=couthit.com header.i=@couthit.com header.b="SkVy7t4i"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from server.wki.vra.mybluehostin.me (server.wki.vra.mybluehostin.me [162.240.238.73])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 95C634A3E;
-	Sat,  1 Feb 2025 12:46:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EEFA91ADC86;
+	Sat,  1 Feb 2025 13:26:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=162.240.238.73
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1738413971; cv=none; b=YTgos9kmLCWcOQIpRysHEiV3IrmaqSHnlB6+pnstUvQAGeJPcj0gKMiFzdUDJv7hq3ydZGxyAViCwPt3SNn5HGzyZ+7AxAmkUPZ0IiQo7+IBM8FVhE0lhKYaRESCdZF2bHWgyfK+WdW3VU96MZ7Qrwq0EtNWCMfy7oNzUbKsz0U=
+	t=1738416374; cv=none; b=h86Evzp++7cFWBe/28uL4L64EPvEUbqeur0uSrr4IFutaIOvSO2BBXkxLsRNtZyvBf4vU3k36j4V6r6vtBfv2IEKYIZnRTUIjd5f3qTAcUX0Hs2v3CgaHzwhc+9waTpITTDHduBnp1RAUni3uuLB/7HSdN366r/kbFIvq8WzWeQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1738413971; c=relaxed/simple;
-	bh=7ko/gQUGt0pizGv4D1amPrClqwB81WnRx5o5PwUX/x8=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=dztp0DPcwrJS1WG7DXYOVCcWQS43xl9dI5nKy9nDTU2oOt8Gpxr6ERAeXLa1iZF/lzkeBSra0XdjGgWQgLov25jwZUR5p72L62Yycg3WX/e/D87r4+G2vDvgGkOBHQAiBRfel+txE2U09OCSeguOGkB30RxTy0f4oCAavlkiW3Y=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=EppRzHBu; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id A6729C4CED3;
-	Sat,  1 Feb 2025 12:46:00 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1738413971;
-	bh=7ko/gQUGt0pizGv4D1amPrClqwB81WnRx5o5PwUX/x8=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=EppRzHBuNDbnUhTthJlTexKX37xf80XHABBRneVyeZM1cxBQORR7mVi+r/jBBMIaM
-	 c8sRXLMF41a635MSBk1QaAFGSd9J2kxPrwCDZH6VrTOM+2RFg7EcRSpar4VOW1yjKt
-	 Jd4MKZYnVXQr71prex5I3ZGdWAe/P/h3mOp93GmGuKOLsRWXWnoEeQOzZIEjKF39dU
-	 aQ9/bOi5qEsCBx8QZEknphdEfnCBgWbfZ6adjxMDFEUKv+WEi+Zyem093AhhzSaC9j
-	 b62gMYM+7dK9a8VwA6Klc0kHSOgIAk/q0U4Y9vBHAsS9wYzfJkbAMNRoDlbTGk6NZK
-	 eafamWqbrngLQ==
-Date: Sat, 1 Feb 2025 12:45:54 +0000
-From: Jonathan Cameron <jic23@kernel.org>
-To: David Lechner <dlechner@baylibre.com>
-Cc: Andrew Lunn <andrew@lunn.ch>, Linus Walleij <linus.walleij@linaro.org>,
- Bartosz Golaszewski <brgl@bgdev.pl>, Andy Shevchenko <andy@kernel.org>,
- Geert Uytterhoeven <geert@linux-m68k.org>, Lars-Peter Clausen
- <lars@metafoo.de>, Michael Hennerich <Michael.Hennerich@analog.com>, Ulf
- Hansson <ulf.hansson@linaro.org>, Peter Rosin <peda@axentia.se>, Heiner
- Kallweit <hkallweit1@gmail.com>, Russell King <linux@armlinux.org.uk>,
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet
- <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
- <pabeni@redhat.com>, Vinod Koul <vkoul@kernel.org>, Kishon Vijay Abraham I
- <kishon@kernel.org>, Nuno =?UTF-8?B?U8Oh?= <nuno.sa@analog.com>, Liam
- Girdwood <lgirdwood@gmail.com>, Mark Brown <broonie@kernel.org>, Jaroslav
- Kysela <perex@perex.cz>, Takashi Iwai <tiwai@suse.com>,
- linux-gpio@vger.kernel.org, linux-kernel@vger.kernel.org,
- linux-iio@vger.kernel.org, linux-mmc@vger.kernel.org,
- netdev@vger.kernel.org, linux-phy@lists.infradead.org,
- linux-sound@vger.kernel.org
-Subject: Re: [PATCH 00/13] gpiolib: add gpiods_set_array_value_cansleep
-Message-ID: <20250201124554.7e64d016@jic23-huawei>
-In-Reply-To: <2715ead8-cf6d-4b44-b6e3-343cb6489eca@baylibre.com>
-References: <20250131-gpio-set-array-helper-v1-0-991c8ccb4d6e@baylibre.com>
-	<4ad45123-134a-4544-ad0a-24371105d96f@lunn.ch>
-	<2715ead8-cf6d-4b44-b6e3-343cb6489eca@baylibre.com>
-X-Mailer: Claws Mail 4.3.0 (GTK 3.24.48; x86_64-pc-linux-gnu)
+	s=arc-20240116; t=1738416374; c=relaxed/simple;
+	bh=b3O/qSbqNNQ28t3nk7RjAgzIrSwggCwl7A5uBoO1iaY=;
+	h=Date:From:To:Cc:Message-ID:In-Reply-To:References:Subject:
+	 MIME-Version:Content-Type; b=aczAN1ekFkISO4QvCCNspVX1A1EzzKOiJwxJiqOpOfXHZwAaaFtAGghCC6ZPiqTz+fr9BYC7ESTT24olreEGZiqzio7UoVqn5BzoNSPw6u7/kwVvNc+wCcGpydJ0Vi6Upb9PJNeDV+VMTGCV24AfSmMBynsvfzNIlKEwhuTqjwg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=couthit.com; spf=pass smtp.mailfrom=couthit.com; dkim=pass (2048-bit key) header.d=couthit.com header.i=@couthit.com header.b=SkVy7t4i; arc=none smtp.client-ip=162.240.238.73
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=couthit.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=couthit.com
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=couthit.com
+	; s=default; h=Content-Transfer-Encoding:Content-Type:MIME-Version:Subject:
+	References:In-Reply-To:Message-ID:Cc:To:From:Date:Sender:Reply-To:Content-ID:
+	Content-Description:Resent-Date:Resent-From:Resent-Sender:Resent-To:Resent-Cc
+	:Resent-Message-ID:List-Id:List-Help:List-Unsubscribe:List-Subscribe:
+	List-Post:List-Owner:List-Archive;
+	bh=T7G3hSUc9bTIrJebJihtbB+qLlY0pl3Vs5vlzJrMpIE=; b=SkVy7t4imij8wKcsbqYb3ZTVaV
+	9cxy5eHu5FDYeZm1TR4XgWapoNjlIwZ8sSAw7vJ93fj2H7bdk5LkyXojq2Eimi1eBq6low1x4aaFS
+	y5s+YY+WOsRnssN7ApakP0rDbalVYdWBerukgeqb1ILe10CCQ7iM2+TmZxvm7zLQtx8Imcqc+OgtZ
+	JNmVTNedPgt90+eaQ6GR3C8PTxqRtKYbKI5DLb+8P+Y6e88SasGx0bSsI+TtO7TsUZw3wCv8NWN8C
+	edt2B+WFOZ01jf6wP/Ew9fBNOEC10DDambnM5cSS4TAfmjmuC64aTA1yC+1+l+avJFz3LGs9baf9v
+	k2RBrTZw==;
+Received: from [122.175.9.182] (port=63123 helo=zimbra.couthit.local)
+	by server.wki.vra.mybluehostin.me with esmtpsa  (TLS1.2) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.96.2)
+	(envelope-from <basharath@couthit.com>)
+	id 1teDVW-0003sY-2y;
+	Sat, 01 Feb 2025 18:55:59 +0530
+Received: from zimbra.couthit.local (localhost [127.0.0.1])
+	by zimbra.couthit.local (Postfix) with ESMTPS id 71F301781C56;
+	Sat,  1 Feb 2025 18:55:47 +0530 (IST)
+Received: from localhost (localhost [127.0.0.1])
+	by zimbra.couthit.local (Postfix) with ESMTP id 4A67A1782035;
+	Sat,  1 Feb 2025 18:55:47 +0530 (IST)
+Received: from zimbra.couthit.local ([127.0.0.1])
+	by localhost (zimbra.couthit.local [127.0.0.1]) (amavisd-new, port 10026)
+	with ESMTP id bv297qfT9IZd; Sat,  1 Feb 2025 18:55:47 +0530 (IST)
+Received: from zimbra.couthit.local (zimbra.couthit.local [10.10.10.103])
+	by zimbra.couthit.local (Postfix) with ESMTP id 02E011781C56;
+	Sat,  1 Feb 2025 18:55:47 +0530 (IST)
+Date: Sat, 1 Feb 2025 18:55:46 +0530 (IST)
+From: Basharath Hussain Khaja <basharath@couthit.com>
+To: horms <horms@kernel.org>
+Cc: basharath <basharath@couthit.com>, danishanwar <danishanwar@ti.com>, 
+	rogerq <rogerq@kernel.org>, andrew+netdev <andrew+netdev@lunn.ch>, 
+	davem <davem@davemloft.net>, edumazet <edumazet@google.com>, 
+	kuba <kuba@kernel.org>, pabeni <pabeni@redhat.com>, 
+	Rob Herring <robh@kernel.org>, krzk+dt <krzk+dt@kernel.org>, 
+	conor+dt <conor+dt@kernel.org>, nm <nm@ti.com>, 
+	ssantosh <ssantosh@kernel.org>, tony <tony@atomide.com>, 
+	richardcochran <richardcochran@gmail.com>, 
+	parvathi <parvathi@couthit.com>, schnelle <schnelle@linux.ibm.com>, 
+	rdunlap <rdunlap@infradead.org>, diogo ivo <diogo.ivo@siemens.com>, 
+	m-karicheri2 <m-karicheri2@ti.com>, 
+	jacob e keller <jacob.e.keller@intel.com>, 
+	m-malladi <m-malladi@ti.com>, 
+	javier carrasco cruz <javier.carrasco.cruz@gmail.com>, 
+	afd <afd@ti.com>, s-anna <s-anna@ti.com>, 
+	linux-arm-kernel <linux-arm-kernel@lists.infradead.org>, 
+	netdev <netdev@vger.kernel.org>, 
+	devicetree <devicetree@vger.kernel.org>, 
+	linux-kernel <linux-kernel@vger.kernel.org>, 
+	linux-omap <linux-omap@vger.kernel.org>, 
+	pratheesh <pratheesh@ti.com>, prajith <prajith@ti.com>, 
+	vigneshr <vigneshr@ti.com>, praneeth <praneeth@ti.com>, 
+	srk <srk@ti.com>, rogerq <rogerq@ti.com>, 
+	krishna <krishna@couthit.com>, pmohan <pmohan@couthit.com>, 
+	mohan <mohan@couthit.com>
+Message-ID: <269561652.481649.1738416346650.JavaMail.zimbra@couthit.local>
+In-Reply-To: <20250130114145.GM113107@kernel.org>
+References: <20250124122353.1457174-1-basharath@couthit.com> <20250124122353.1457174-3-basharath@couthit.com> <20250130114145.GM113107@kernel.org>
+Subject: Re: [RFC v2 PATCH 02/10] net: ti: prueth: Adds ICSSM Ethernet
+ driver
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: 7bit
+X-Mailer: Zimbra 8.8.15_GA_3968 (ZimbraWebClient - FF113 (Linux)/8.8.15_GA_3968)
+Thread-Topic: prueth: Adds ICSSM Ethernet driver
+Thread-Index: iTYs9GBoUdW9vbTht5x/pdwNyAgDdQ==
+X-AntiAbuse: This header was added to track abuse, please include it with any abuse report
+X-AntiAbuse: Primary Hostname - server.wki.vra.mybluehostin.me
+X-AntiAbuse: Original Domain - vger.kernel.org
+X-AntiAbuse: Originator/Caller UID/GID - [47 12] / [47 12]
+X-AntiAbuse: Sender Address Domain - couthit.com
+X-Get-Message-Sender-Via: server.wki.vra.mybluehostin.me: authenticated_id: smtp@couthit.com
+X-Authenticated-Sender: server.wki.vra.mybluehostin.me: smtp@couthit.com
+X-Source: 
+X-Source-Args: 
+X-Source-Dir: 
 
-On Fri, 31 Jan 2025 14:51:52 -0600
-David Lechner <dlechner@baylibre.com> wrote:
 
-> On 1/31/25 2:38 PM, Andrew Lunn wrote:
-> >> So I'm proposing that we add a gpiods_set_array_value_cansleep()
-> >> function that is a wrapper around gpiod_set_array_value_cansleep()
-> >> that has struct gpio_descs as the first parameter to make it a bit
-> >> easier to read the code and avoid the hard-coding temptation.  
-> >  
-> > This looks reasonable.
-> > 
-> > How do you plan to get it merged, since you cross a lot of subsystems
-> > here.
-> > 
-> > 	Andrew  
+> On Fri, Jan 24, 2025 at 05:53:45PM +0530, Basharath Hussain Khaja wrote:
+>> From: Roger Quadros <rogerq@ti.com>
+>> 
+>> Updates Kernel configuration to enable PRUETH driver and its dependencies
+>> along with makefile changes to add the new PRUETH driver.
+>> 
+>> Changes includes init and deinit of ICSSM PRU Ethernet driver including
+>> net dev registration and firmware loading for DUAL-MAC mode running on
+>> PRU-ICSS2 instance.
+>> 
+>> Changes also includes link handling, PRU booting, default firmware loading
+>> and PRU stopping using existing remoteproc driver APIs.
+>> 
+>> Signed-off-by: Roger Quadros <rogerq@ti.com>
+>> Signed-off-by: Andrew F. Davis <afd@ti.com>
+>> Signed-off-by: Parvathi Pudi <parvathi@couthit.com>
+>> Signed-off-by: Basharath Hussain Khaja <basharath@couthit.com>
 > 
-> Since these are mostly small changes and most of the touched drivers aren't
-> seeing much action, I think it would be OK for as much as possible to go through
-> the GPIO tree.
+> ...
 > 
-> We might need an immutable branch from that though since I know that iio: adc:
-> ad7606 is currently being actively worked on.
-Looks good to me (subject to requested name change from Bartosz)
-I'd suggest an immutable with patch 1 then up to each subsystem
-maintainer to pick that up or wait for next cycle.
-
-Always hard to predict what else will get worked on at this stage
-of a cycle.
-
-Jonathan
-
-
+>> diff --git a/drivers/net/ethernet/ti/icssm/icssm_prueth.c
+>> b/drivers/net/ethernet/ti/icssm/icssm_prueth.c
 > 
-> If there are any patches leftover that don't get acked to go through the GPIO
-> tree, I can resubmit them after the next kernel release cycle since none of
-> this is urgent anyway.
+> ...
+> 
+>> +static int icssm_emac_set_boot_pru(struct prueth_emac *emac,
+>> +				   struct net_device *ndev)
+>> +{
+>> +	const struct prueth_firmware *pru_firmwares;
+>> +	struct prueth *prueth = emac->prueth;
+>> +	const char *fw_name;
+>> +	int ret;
+>> +
+>> +	pru_firmwares = &prueth->fw_data->fw_pru[emac->port_id - 1];
+>> +	fw_name = pru_firmwares->fw_name[prueth->eth_type];
+>> +	if (!fw_name) {
+>> +		netdev_err(ndev, "eth_type %d not supported\n",
+>> +			   prueth->eth_type);
+>> +		return -ENODEV;
+>> +	}
+>> +
+>> +	ret = rproc_set_firmware(emac->pru, fw_name);
+>> +	if (ret) {
+>> +		netdev_err(ndev, "failed to set PRU0 firmware %s: %d\n",
+>> +			   fw_name, ret);
+>> +		return ret;
+>> +	}
+>> +
+>> +	ret = rproc_boot(emac->pru);
+>> +	if (ret) {
+>> +		netdev_err(ndev, "failed to boot PRU0: %d\n", ret);
+>> +		return ret;
+>> +	}
+>> +
+>> +	return ret;
+>> +}
+>> +
+>> +/**
+>> + * icssm_emac_ndo_open - EMAC device open
+>> + * @ndev: network adapter device
+>> + *
+>> + * Called when system wants to start the interface.
+>> + *
+>> + * Return: 0 for a successful open, or appropriate error code
+>> + */
+>> +static int icssm_emac_ndo_open(struct net_device *ndev)
+>> +{
+>> +	struct prueth_emac *emac = netdev_priv(ndev);
+>> +	int ret;
+>> +
+>> +	ret = icssm_emac_set_boot_pru(emac, ndev);
+>> +	if (ret)
+>> +		netdev_err(ndev, "failed to boot PRU: %d\n", ret);
+> 
+> Hi Roger, Basharath, all,
+> 
+> icssm_emac_set_boot_pru() already logs errors, including the one above.
+> So this log seems unnecessary to me.
+> 
+> Also, should an error be returned here?  If so, it looks like
+> icssm_emac_set_boot_pru() should release resources allocated by
+> rproc_set_firmware() if rproc_boot() fails.
 > 
 
+Agreed. We will remove the extra print and make sure allocated resources
+are released appropriately in the next version.
+
+>> +
+>> +	/* start PHY */
+>> +	phy_start(emac->phydev);
+>> +
+>> +	return 0;
+>> +}
+> 
+> ...
+> 
+>> +static int icssm_prueth_netdev_init(struct prueth *prueth,
+>> +				    struct device_node *eth_node)
+>> +{
+>> +	struct prueth_emac *emac;
+>> +	struct net_device *ndev;
+>> +	enum prueth_port port;
+>> +	enum prueth_mac mac;
+>> +	int ret;
+>> +
+>> +	port = icssm_prueth_node_port(eth_node);
+>> +	if (port == PRUETH_PORT_INVALID)
+>> +		return -EINVAL;
+>> +
+>> +	mac = icssm_prueth_node_mac(eth_node);
+>> +	if (mac == PRUETH_MAC_INVALID)
+>> +		return -EINVAL;
+>> +
+>> +	ndev = devm_alloc_etherdev(prueth->dev, sizeof(*emac));
+>> +	if (!ndev)
+>> +		return -ENOMEM;
+>> +
+>> +	SET_NETDEV_DEV(ndev, prueth->dev);
+>> +	emac = netdev_priv(ndev);
+>> +	prueth->emac[mac] = emac;
+>> +	emac->prueth = prueth;
+>> +	emac->ndev = ndev;
+>> +	emac->port_id = port;
+>> +
+>> +	/* by default eth_type is EMAC */
+>> +	switch (port) {
+>> +	case PRUETH_PORT_MII0:
+>> +		emac->pru = prueth->pru0;
+>> +		break;
+>> +	case PRUETH_PORT_MII1:
+>> +		emac->pru = prueth->pru1;
+>> +		break;
+>> +	default:
+>> +		return -EINVAL;
+>> +	}
+>> +	/* get mac address from DT and set private and netdev addr */
+>> +	ret = of_get_ethdev_address(eth_node, ndev);
+>> +	if (!is_valid_ether_addr(ndev->dev_addr)) {
+>> +		eth_hw_addr_random(ndev);
+>> +		dev_warn(prueth->dev, "port %d: using random MAC addr: %pM\n",
+>> +			 port, ndev->dev_addr);
+>> +	}
+>> +	ether_addr_copy(emac->mac_addr, ndev->dev_addr);
+>> +
+>> +	/* connect PHY */
+>> +	emac->phydev = of_phy_get_and_connect(ndev, eth_node,
+>> +					      icssm_emac_adjust_link);
+>> +	if (!emac->phydev) {
+>> +		dev_dbg(prueth->dev, "PHY connection failed\n");
+>> +		ret = -EPROBE_DEFER;
+> 
+> Perhaps I misunderstand things, but if this occurs then
+> presumably icssm_prueth_netdev_init() will be called again.
+> And for each time this occirs another ndev will be allocated
+> by devm_alloc_etherdev(), each of which will only be freed
+> once the device is eventually torn-down.
+> 
+> I wonder if it would be better to free ndev here.
+> Which I think would imply using a non-mdev allocation for symmetry.
+> 
+> Similarly for resources allocated in the caller icssm_prueth_probe().
+> 
+
+Agreed, we will address this error case and free the resources appropriately.
+
+>> +		goto free;
+>> +	}
+>> +
+>> +	/* remove unsupported modes */
+>> +	phy_remove_link_mode(emac->phydev, ETHTOOL_LINK_MODE_10baseT_Full_BIT);
+>> +
+>> +	phy_remove_link_mode(emac->phydev, ETHTOOL_LINK_MODE_10baseT_Half_BIT);
+>> +	phy_remove_link_mode(emac->phydev, ETHTOOL_LINK_MODE_100baseT_Half_BIT);
+>> +
+>> +	phy_remove_link_mode(emac->phydev, ETHTOOL_LINK_MODE_Pause_BIT);
+>> +	phy_remove_link_mode(emac->phydev, ETHTOOL_LINK_MODE_Asym_Pause_BIT);
+>> +
+>> +	ndev->netdev_ops = &emac_netdev_ops;
+>> +
+>> +	return 0;
+>> +free:
+> 
+> nit: This doesn't free anything.
+> 
+
+Sure. We will address in the next version.
+
+>> +	prueth->emac[mac] = NULL;
+>> +
+>> +	return ret;
+>> +}
+> 
+> ...
+
+Thanks & Best Regards,
+Basharath
 
