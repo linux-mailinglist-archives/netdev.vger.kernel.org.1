@@ -1,34 +1,34 @@
-Return-Path: <netdev+bounces-161937-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-161938-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id ADE85A24B72
-	for <lists+netdev@lfdr.de>; Sat,  1 Feb 2025 19:49:39 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7BE70A24B7B
+	for <lists+netdev@lfdr.de>; Sat,  1 Feb 2025 19:55:16 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id EA19F7A29C6
-	for <lists+netdev@lfdr.de>; Sat,  1 Feb 2025 18:48:44 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D61B3163978
+	for <lists+netdev@lfdr.de>; Sat,  1 Feb 2025 18:55:14 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0F5101CAA84;
-	Sat,  1 Feb 2025 18:49:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7696B1CAA8D;
+	Sat,  1 Feb 2025 18:55:07 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="GVVVRP8r"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="OpVjJuug"
 X-Original-To: netdev@vger.kernel.org
 Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5453A1C5D73
-	for <netdev@vger.kernel.org>; Sat,  1 Feb 2025 18:49:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8C80A1BD01D
+	for <netdev@vger.kernel.org>; Sat,  1 Feb 2025 18:55:05 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1738435774; cv=none; b=hKA/OsGtQMEI33WUcL9ncptDd/W6hzSbkXjNs8uGhqy9HTBr1l+bznyx7pCqIMazFRccDIFica1bm72VbFsvlwLjApBJhQNjqQznfK04InUj23hGD67L1Jwmf78cngQoeMHsx4dnoQI7Vjjuf2+OUN0+ACzd6OL2Zm/4UaXAnlM=
+	t=1738436107; cv=none; b=YuH7QKaA8ZyZqAidQyVXiZsVxMvPy+nm5yPjnGAHfV/P6a5EPXUM+y5YVy8c6TJPfNrqn4Lz5cIqeNRACixqTs8IXE07SuYKPv50/s8Ic+waEOQ6Ci4Khs3h0lT+vRG17rzPIRHhckl0ooMdO0FEtg72M48ANOEzRL+izQPpDMo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1738435774; c=relaxed/simple;
-	bh=RhSB4mWb6vQjS8yK5BDUzhBKzkheHvgWajj6Tnr3o6c=;
+	s=arc-20240116; t=1738436107; c=relaxed/simple;
+	bh=R7OS/MXFMUXwhvz7Kc4TGuoxR0IYMlfMZ9Ad1ajvLvA=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=o1KWaY7h/dCWIbwHJGbXvYID7hpAdfPnfnhTx4g1esLDaTuELxwI+hL5BXbY0pQr8ZexNsjMdKSL1CfO/4o9weO/wxEz28u1GvPcKRl+ZmwYXIFCeg4thM1//3fJXg7fSvRVrsq21JY5qAGZnvCxuTKzMDRVcMc3zEPZDnHAH3c=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=GVVVRP8r; arc=none smtp.client-ip=156.67.10.101
+	 Content-Type:Content-Disposition:In-Reply-To; b=lSV88LR15LH3UfplP6KypaLZqlGFyCE64eyNsouhXJTL8iQGabzW26Pfnq9sEusjlI3X2xjsLAS5fNC+/gzYMml/dh6eI1RyFJHc34cE97RLmgrWP7vrqn+AD6Wj4VEtOa6GuxLtsqeTIf5I8vc28QOU3JxowBetOcPhYSv+sLw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=OpVjJuug; arc=none smtp.client-ip=156.67.10.101
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
@@ -36,28 +36,29 @@ DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
 	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
 	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
 	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=xUK+Tb/0hF3U3LVeV95eC7vzx8DCuibgkgA8f89ayu8=; b=GVVVRP8r2GKMyDfgJ17fhcl0CE
-	aiUlVe+6C0XFkqvroMAzps4Kp+4cz4rA61n5GGqdnUizLHc3wxUlFLin4VEvpovnUhsJ8HRaJOA0j
-	eprjgQ9wYboj4y0pCT7vVuGMhHgABYyjq4sMPa8AjMoLgzoTYFD8pU/weU/tfDct1Nrg=;
+	bh=X5ZT/h+p89qeEa5RIXxfCBGj1xjBO6R4oKcKC+7A56I=; b=OpVjJuugpl1+0AnhDi9Ooogtcw
+	XOFTC9tsx5XeS2h9+DwnDU/FJCC1as2V9YZ8Jpjnx6+79jd3sGrTAMMhnafxsL6upLGxhrnXC928/
+	a9j/QIK5423Usqeej45tYqFrQkbDh5kP3FWKoV1G6JmLdW/Rtvi3wseRaF/fptNprNZU=;
 Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
 	(envelope-from <andrew@lunn.ch>)
-	id 1teIYV-00A2Ut-Cc; Sat, 01 Feb 2025 19:49:23 +0100
-Date: Sat, 1 Feb 2025 19:49:23 +0100
+	id 1teIdp-00A2ZF-Uq; Sat, 01 Feb 2025 19:54:53 +0100
+Date: Sat, 1 Feb 2025 19:54:53 +0100
 From: Andrew Lunn <andrew@lunn.ch>
 To: Biju Das <biju.das.jz@bp.renesas.com>
 Cc: Andrew Lunn <andrew+netdev@lunn.ch>,
 	"David S. Miller" <davem@davemloft.net>,
 	Eric Dumazet <edumazet@google.com>,
 	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Rosen Penev <rosenp@gmail.com>,
-	Shannon Nelson <shannon.nelson@amd.com>,
-	Uwe =?iso-8859-1?Q?Kleine-K=F6nig?= <u.kleine-koenig@baylibre.com>,
-	Simon Horman <horms@kernel.org>, netdev@vger.kernel.org,
+	Andreas =?iso-8859-1?Q?F=E4rber?= <afaerber@suse.de>,
+	Manivannan Sadhasivam <manivannan.sadhasivam@linaro.org>,
+	netdev@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+	linux-actions@lists.infradead.org,
 	Geert Uytterhoeven <geert+renesas@glider.be>,
 	Biju Das <biju.das.au@gmail.com>
-Subject: Re: [PATCH] net: ibm: emac: Use of_get_available_child_by_name()
-Message-ID: <1465223e-a9f9-4bdc-a2f9-067884080bb2@lunn.ch>
-References: <20250201165753.53043-1-biju.das.jz@bp.renesas.com>
+Subject: Re: [PATCH v2] net: ethernet: actions: Use
+ of_get_available_child_by_name()
+Message-ID: <278e8d0c-e4bd-4126-8617-be2b7134b307@lunn.ch>
+References: <20250201172745.56627-1-biju.das.jz@bp.renesas.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -66,36 +67,41 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20250201165753.53043-1-biju.das.jz@bp.renesas.com>
+In-Reply-To: <20250201172745.56627-1-biju.das.jz@bp.renesas.com>
 
-On Sat, Feb 01, 2025 at 04:57:51PM +0000, Biju Das wrote:
+On Sat, Feb 01, 2025 at 05:27:40PM +0000, Biju Das wrote:
 > Use the helper of_get_available_child_by_name() to simplify
-> emac_dt_mdio_probe().
+> owl_emac_mdio_init().
 > 
 > Signed-off-by: Biju Das <biju.das.jz@bp.renesas.com>
 > ---
-> This patch is only compile tested and depend upon[1]
-> [1] https://lore.kernel.org/all/20250201093126.7322-1-biju.das.jz@bp.renesas.com/
-> ---
->  drivers/net/ethernet/ibm/emac/core.c | 17 ++++-------------
->  1 file changed, 4 insertions(+), 13 deletions(-)
-> 
-> diff --git a/drivers/net/ethernet/ibm/emac/core.c b/drivers/net/ethernet/ibm/emac/core.c
-> index 25b8a3556004..079efc5ed9bc 100644
-> --- a/drivers/net/ethernet/ibm/emac/core.c
-> +++ b/drivers/net/ethernet/ibm/emac/core.c
-> @@ -2550,26 +2550,19 @@ static const struct mii_phy_ops emac_dt_mdio_phy_ops = {
->  
->  static int emac_dt_mdio_probe(struct emac_instance *dev)
->  {
-> -	struct device_node *mii_np;
-> +	struct device_node *mii_np _free(device_node) =
-> +		of_get_available_child_by_name(dev->ofdev->dev.of_node, "mdio");
+> v1->v3:
+>  * Dropped duplicate mdio_node declaration.
 
-When you are new to a subsystem, it is probably better to send a
-single patch to help figure out that subsystems way of doing thing. It
-looks like all you patches have the same problem.
+And version 2?
 
+https://www.kernel.org/doc/html/latest/process/maintainer-netdev.html
+
+Also
+
+1.6.7. Resending after review
+
+Allow at least 24 hours to pass between postings. This will ensure
+reviewers from all geographical locations have a chance to chime in.
+
+and section
+
+1.6.6. Clean-up patches
+
+Netdev discourages patches which perform simple clean-ups, which are
+not in the context of other work. For example:
+
+o Addressing checkpatch.pl warnings
+o Addressing Local variable ordering issues
+o Conversions to device-managed APIs (devm_ helpers)
+
+This is because it is felt that the churn that such changes produce
+comes at a greater cost than the value of such clean-ups.
 
     Andrew
 
