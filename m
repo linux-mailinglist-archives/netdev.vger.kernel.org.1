@@ -1,76 +1,76 @@
-Return-Path: <netdev+bounces-161904-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-161905-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9B56AA24887
-	for <lists+netdev@lfdr.de>; Sat,  1 Feb 2025 12:34:12 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5959FA2488F
+	for <lists+netdev@lfdr.de>; Sat,  1 Feb 2025 12:34:44 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id F11B7164FB6
-	for <lists+netdev@lfdr.de>; Sat,  1 Feb 2025 11:34:10 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 31AC61889140
+	for <lists+netdev@lfdr.de>; Sat,  1 Feb 2025 11:34:46 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 822B014AD38;
-	Sat,  1 Feb 2025 11:34:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E306E186E20;
+	Sat,  1 Feb 2025 11:34:19 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="AG9BjrJy"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="h18rCXa7"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-oo1-f47.google.com (mail-oo1-f47.google.com [209.85.161.47])
+Received: from mail-ot1-f44.google.com (mail-ot1-f44.google.com [209.85.210.44])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DA43D20318
-	for <netdev@vger.kernel.org>; Sat,  1 Feb 2025 11:34:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.161.47
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 54E3D15B111
+	for <netdev@vger.kernel.org>; Sat,  1 Feb 2025 11:34:16 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.44
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1738409648; cv=none; b=E8GAnoQY7m77xGrblLnQoYnJwpTQc2FWF3prGHKrX/DJUC80tXxJJ+JXxfv44CyOnATRdSHWQsiz+22lB04TeDKmZh4mGuwT0HP6tdJKIsz+iFrjxauh2QMfUchnRE+o13NepyyHNHhojAAfK6W61yVzAUpQtuNz3/srJ0p6wfY=
+	t=1738409659; cv=none; b=KSabVX9ixmF2/B2Tfhw6q+57zhSRypHJfig9pg377WCtFUkOjlQ8ccSQZ5MFwG8P2WABoz62e/5mS4DO69YkV2vydQ5RpHKIuk7JMIvmx0QbPluNNIm/MUFJSUdEBQkiNqn1MqKB+sMIkfLOKykufPrfu008nf2czzHLOolGBoQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1738409648; c=relaxed/simple;
-	bh=yGnyHCQuTpx8WEw3v+KjIpwR56gPbmp8NO5HU9ftjc8=;
+	s=arc-20240116; t=1738409659; c=relaxed/simple;
+	bh=ATj64J7ePinHmQnjCFg+/4O5OZQrh73VR2xWGYhDYuI=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=E/WphrIavUfHCS1VO+PwlN/wqg8B/Omly8aakwReTzH3WwMGHZGX5N6x3YnQ79w6qtIzHTnrFGNq3SvWgQzvsDUDfQmAwJ+H4OX8rcI/+NnLfazdriKZoWJIawEHzDHIbp3TnQydiE1dZYYPTD54mOc0guSTZCXbQuyHnRWf26E=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=AG9BjrJy; arc=none smtp.client-ip=209.85.161.47
+	 MIME-Version; b=mr5cleQio9oSGvqosF7v+8ZjWuWuRqqxqlMjrwugN0TXXrD0tGGS+qaN/2dKAt6S2OHPny/kTy0v9eHx5rEi4hV5oNx7gvHUPAdYJkw7tyZ3D7rtBiLfC1hAMPTg5u2+r3/7SQWAcMxPr+NkmnFtZxEfKdEL5MPwiORY3O88Qs4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=h18rCXa7; arc=none smtp.client-ip=209.85.210.44
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-oo1-f47.google.com with SMTP id 006d021491bc7-5f31b3db5ecso1196150eaf.0
-        for <netdev@vger.kernel.org>; Sat, 01 Feb 2025 03:34:06 -0800 (PST)
+Received: by mail-ot1-f44.google.com with SMTP id 46e09a7af769-71e2766994bso1466151a34.3
+        for <netdev@vger.kernel.org>; Sat, 01 Feb 2025 03:34:16 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1738409646; x=1739014446; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1738409655; x=1739014455; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=MoJiyaiT8zL1pH/96yxqbiCU0Z2RsXjlcsoQBn1gDO0=;
-        b=AG9BjrJyHwgo45bpCGX6vdQsazeUrCeL58KKglUx9K1O8f99rWH8S7/e28kzo4oB3E
-         5MrR3RNnqdzSnypy0RcFGm6mxSeOedr7jvke4H2rqSmDiUrNONxcWrDDmLgb2ZH0Z2Iz
-         sJt9kgd448lzrnrah4zE7A/WnSJ6PtnvJnXjKtR97yINes8LVEQVxIYFFKuDxho+1dOl
-         MP147WsrwHKO4ycgm1aYr82Pv3ZiVQXzpnajDLK4zjLO36KWrtYRc+D/yuJcqVTckOlE
-         I62+lOukpABDftRbae+heKOp8eLXHADsyp/HCQGv+vSHTi8AomcH8eQNk/f1K6b3K/Ey
-         bqZg==
+        bh=mYarXz+1rPX5MQ983eljbZkfUj12hCqEdtN2eWPVIGE=;
+        b=h18rCXa7zC4csZusZbepyLtKi3Z7b0tni/fY7jrEGexVjPfrpO3UiwJiPK231Lzd0J
+         UcsRb22cYcRDj+yW1YDxd50o+W8d4pjs4mckB9JJRLTNGglvoEL05zxkuza07bf8rbGb
+         mfwF7mJxQtMABFXFACbVxHwafrU15hGc45XJgBqPce1MdIyMsherGRYw9rhhG8Xnf4Yx
+         QXXw2pOKQMOrd1/gQTfdL8yRmGzx7KHzFfrcxS3ypi9Y7VNLdhNpz/pdFcB3r5QLNN8s
+         lyc1M6e/LoP8FcZBS9IB5PfHo5BjJa+sDb3fZk8TYkymvfSgLrdX5tcoBeU2aSrBSELl
+         U/SQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1738409646; x=1739014446;
+        d=1e100.net; s=20230601; t=1738409655; x=1739014455;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=MoJiyaiT8zL1pH/96yxqbiCU0Z2RsXjlcsoQBn1gDO0=;
-        b=Ak0dS1YxeQzNQsewqPl3G25q/eZ7IdG1WpNFGW9IiLcIKJsGDFcQ74HhXCqtlQ1oFI
-         WO3c4PsAZUI2/BgYYnoKLIM87AFfWXh+MEgni5uUuSjwY8W9W2w7+EmPZmt38zpRPH9+
-         2h2gH2DDeM00XKzsjrPdsDYFn+j6zCnSYNkub7S9kvBaB174PzBXFtKmTb4SIReANlQW
-         VURDaEeWYnD0OM6HU6gAoMJ2LofuPpEOzRdKvwMfBapQBzM67FGOO064TzTbWw5RIBEp
-         aINzabGH0ZcNsAMsesabifsNxSxXiPaQCrBib3ekAPicsKN5nK/XaYFLceNGzbsx8yhv
-         +LfA==
-X-Gm-Message-State: AOJu0Yx0MvPtaBALTg4Gbj9o54Cav6MSPp/bQz9DAxoLdcYl0OixnaA5
-	1jFwpNtcn9VH6NTuq36dCk8U1yjYf3Vjxfw+jqA9I7gGCblZLgA=
-X-Gm-Gg: ASbGncup82yodJ90CRHkjoPDxUrHTBRiFNF9sK40O0CcPWK3LIE0mKPV0rK4vYbv3oY
-	Ihd5Cr+gZBWW5esVpO6AxXct7uSvAIpN4Uq37lGJ9C5g67bT2bzFNptwyY39vJAfsSwhwp0SEle
-	aJxyK623Zd+f0eLS505WfMiN5Epqd3BUzVBtp+OMAVwITxqMqZFMgUX2yBdk08Tp43gGEhrcOvX
-	J9xY3dce2dnoDoiXUzCrK78v+2/zRqP4vBTs7QGe01QM31oHgRBGg8grFVho1287sKRzVIhiQ+h
-	SK2+I4hoEtBzOVtTXQ==
-X-Google-Smtp-Source: AGHT+IFDYNybLd2DtYz4Mw4fFBKYf3qjUGIhdKA64ghpVPrhGQpGa6BeQJnAfZJHFw1ganDDuHZnFQ==
-X-Received: by 2002:a05:6871:d30b:b0:297:28e3:db63 with SMTP id 586e51a60fabf-2b32f09982fmr8965341fac.19.1738409645622;
-        Sat, 01 Feb 2025 03:34:05 -0800 (PST)
+        bh=mYarXz+1rPX5MQ983eljbZkfUj12hCqEdtN2eWPVIGE=;
+        b=Xwwvnc8QPly++I6+Pk7it/inKciNwz3kuBKrfU2IrNIMMdQfDywhh6uY1NMJfPtiWS
+         75nyH0NTC4uUQEV/Duxp/ADIqufJYTkZL6VRNVpJfSbDRO2sNa54HxJmNRa9BFhicO1z
+         vLwGQHVkhbPWbgCfgcR/duJUXkGVLviRYKScBSqV2IgjOSTRaV2oKzCHMXfu6rw1zWeQ
+         Lfa+9NadoK/6h6H8NVouSJHen9g8A3EF69A/kXGI7WGMwW4RTuqacWKIwo3nrmuCHSlu
+         h3WJqiGsr1XLl61l9idSYMlqvho/iCKmTC46Zwzry9dhoUdGBXFk2b3PWK7QLIsUnEBN
+         6l/A==
+X-Gm-Message-State: AOJu0YyjJUTj9XD4lcGVNH/ClmXSO2uPoOLojioJ1ROppYaJqRjv9HGJ
+	2DSL/y5gHNp7cfmwM1bvOnRFFphqtBa64Tcve+wb0JJ3OK9FpBw=
+X-Gm-Gg: ASbGncsBzXCwUL467or+PUh5eCXDOW5oLqapTeDuy8UY3vRdtJTDIEAQgni0njzV9c2
+	4Zuaiz4YOrQza3W14widjKut771jQXpxRYdwN4CxobXCI4bhi8BX6NjpghKq1pisHqFd8i5bX2r
+	HsWTrE0GOgST+07Bx+skO+6bW9z+5MmxR6Jz1z+QSUf7ifSp8AfeZzItBon7bPwagYxv7xbMKGE
+	/xQQxYlF+v7GtTZSBxVKjoaeAFcLgRlxB5q1rO7gG3BNdbicDG6NyNEB58NugqR3X/3iQOOrzi7
+	ocaMA2bC0muZFfJ7NQ==
+X-Google-Smtp-Source: AGHT+IFSUaTIr8LCiItRi0dy93IEp9DMWvVOP8ffMiU+J4GhZfVFcLu56BLQ96mxFva53YLNYpIqmA==
+X-Received: by 2002:a05:6871:788c:b0:296:b0d8:9025 with SMTP id 586e51a60fabf-2b32f1f8dd2mr8892510fac.20.1738409655369;
+        Sat, 01 Feb 2025 03:34:15 -0800 (PST)
 Received: from ted-dallas.. ([2001:19f0:6401:18f2:5400:4ff:fe20:62f])
-        by smtp.gmail.com with ESMTPSA id 586e51a60fabf-2b356112310sm1820645fac.5.2025.02.01.03.34.04
+        by smtp.gmail.com with ESMTPSA id 586e51a60fabf-2b3565b8120sm1837174fac.34.2025.02.01.03.34.14
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sat, 01 Feb 2025 03:34:05 -0800 (PST)
+        Sat, 01 Feb 2025 03:34:14 -0800 (PST)
 From: Ted Chen <znscnchen@gmail.com>
 To: davem@davemloft.net,
 	edumazet@google.com,
@@ -79,9 +79,9 @@ To: davem@davemloft.net,
 	andrew+netdev@lunn.ch
 Cc: netdev@vger.kernel.org,
 	Ted Chen <znscnchen@gmail.com>
-Subject: [PATCH RFC net-next 1/3] vxlan: vxlan_vs_find_vni(): Find vxlan_dev according to vni and remote_ip
-Date: Sat,  1 Feb 2025 19:34:00 +0800
-Message-Id: <20250201113400.107815-1-znscnchen@gmail.com>
+Subject: [PATCH RFC net-next 2/3] vxlan: Do not treat vxlan dev as used when unicast remote_ip mismatches
+Date: Sat,  1 Feb 2025 19:34:12 +0800
+Message-Id: <20250201113412.107832-1-znscnchen@gmail.com>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20250201113207.107798-1-znscnchen@gmail.com>
 References: <20250201113207.107798-1-znscnchen@gmail.com>
@@ -93,113 +93,32 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-vxlan_vs_find_vni() currently searches the vni hash table in a vs and
-returns a vxlan_dev associated with the specified "vni". While this works
-when the remote_ips are stored in the vxlan fdb, it fails to handle the
-case where the remote_ip is just configured in the vxlan device outside of
-the vxlan fdb, because multiple vxlan devices with different remote_ip may
-share a single vni when the remote_ip is configured in the vxlan device
-(i.e., not stored in the vxlan fdb). In that case, further check of
-remote_ip to identify vxlan_dev more precisely.
+Do not treat a vxlan_dev as used if the vxlan to be configured shares the
+same vni as an existing vxlan_dev but has a different unicast remote_ip.
+
+This enables multiple vxlan devices with distinct unicast remote_ips to be
+bound to a single vni.
 
 Signed-off-by: Ted Chen <znscnchen@gmail.com>
 ---
- drivers/net/vxlan/vxlan_core.c | 32 ++++++++++++++++++++++++++------
- 1 file changed, 26 insertions(+), 6 deletions(-)
+ drivers/net/vxlan/vxlan_core.c | 4 ++++
+ 1 file changed, 4 insertions(+)
 
 diff --git a/drivers/net/vxlan/vxlan_core.c b/drivers/net/vxlan/vxlan_core.c
-index 05c10acb2a57..3ca74a97c44f 100644
+index 3ca74a97c44f..5ef40ac816cc 100644
 --- a/drivers/net/vxlan/vxlan_core.c
 +++ b/drivers/net/vxlan/vxlan_core.c
-@@ -94,8 +94,10 @@ static struct vxlan_sock *vxlan_find_sock(struct net *net, sa_family_t family,
- 
- static struct vxlan_dev *vxlan_vs_find_vni(struct vxlan_sock *vs,
- 					   int ifindex, __be32 vni,
-+					   const struct sk_buff *skb,
- 					   struct vxlan_vni_node **vninode)
- {
-+	union vxlan_addr saddr;
- 	struct vxlan_vni_node *vnode;
- 	struct vxlan_dev_node *node;
- 
-@@ -116,14 +118,31 @@ static struct vxlan_dev *vxlan_vs_find_vni(struct vxlan_sock *vs,
+@@ -3723,6 +3723,10 @@ int vxlan_vni_in_use(struct net *src_net, struct vxlan_dev *vxlan,
+ 		} else if (tmp->cfg.vni != vni) {
  			continue;
  		}
- 
--		if (IS_ENABLED(CONFIG_IPV6)) {
--			const struct vxlan_config *cfg = &node->vxlan->cfg;
-+		const struct vxlan_config *cfg = &node->vxlan->cfg;
- 
-+		if (IS_ENABLED(CONFIG_IPV6)) {
- 			if ((cfg->flags & VXLAN_F_IPV6_LINKLOCAL) &&
- 			    cfg->remote_ifindex != ifindex)
- 				continue;
- 		}
- 
-+		if (vni && !vxlan_addr_any(&cfg->remote_ip) &&
-+		    !vxlan_addr_multicast(&cfg->remote_ip)) {
-+			/* Get address from the outer IP header */
-+			if (vxlan_get_sk_family(vs) == AF_INET) {
-+				saddr.sin.sin_addr.s_addr = ip_hdr(skb)->saddr;
-+				saddr.sa.sa_family = AF_INET;
-+#if IS_ENABLED(CONFIG_IPV6)
-+			} else {
-+				saddr.sin6.sin6_addr = ipv6_hdr(skb)->saddr;
-+				saddr.sa.sa_family = AF_INET6;
-+#endif
-+			}
-+
-+			if (!vxlan_addr_equal(&cfg->remote_ip, &saddr))
-+				continue;
-+		}
-+
- 		if (vninode)
- 			*vninode = vnode;
- 		return node->vxlan;
-@@ -134,6 +153,7 @@ static struct vxlan_dev *vxlan_vs_find_vni(struct vxlan_sock *vs,
- 
- /* Look up VNI in a per net namespace table */
- static struct vxlan_dev *vxlan_find_vni(struct net *net, int ifindex,
-+					const struct sk_buff *skb,
- 					__be32 vni, sa_family_t family,
- 					__be16 port, u32 flags)
- {
-@@ -143,7 +163,7 @@ static struct vxlan_dev *vxlan_find_vni(struct net *net, int ifindex,
- 	if (!vs)
- 		return NULL;
- 
--	return vxlan_vs_find_vni(vs, ifindex, vni, NULL);
-+	return vxlan_vs_find_vni(vs, ifindex, vni, skb, NULL);
- }
- 
- /* Fill in neighbour message in skbuff. */
-@@ -1701,7 +1721,7 @@ static int vxlan_rcv(struct sock *sk, struct sk_buff *skb)
- 
- 	vni = vxlan_vni(vh->vx_vni);
- 
--	vxlan = vxlan_vs_find_vni(vs, skb->dev->ifindex, vni, &vninode);
-+	vxlan = vxlan_vs_find_vni(vs, skb->dev->ifindex, vni, skb, &vninode);
- 	if (!vxlan) {
- 		reason = SKB_DROP_REASON_VXLAN_VNI_NOT_FOUND;
- 		goto drop;
-@@ -1855,7 +1875,7 @@ static int vxlan_err_lookup(struct sock *sk, struct sk_buff *skb)
- 		return -ENOENT;
- 
- 	vni = vxlan_vni(hdr->vx_vni);
--	vxlan = vxlan_vs_find_vni(vs, skb->dev->ifindex, vni, NULL);
-+	vxlan = vxlan_vs_find_vni(vs, skb->dev->ifindex, vni, skb, NULL);
- 	if (!vxlan)
- 		return -ENOENT;
- 
-@@ -2330,7 +2350,7 @@ static int encap_bypass_if_local(struct sk_buff *skb, struct net_device *dev,
- 		struct vxlan_dev *dst_vxlan;
- 
- 		dst_release(dst);
--		dst_vxlan = vxlan_find_vni(vxlan->net, dst_ifindex, vni,
-+		dst_vxlan = vxlan_find_vni(vxlan->net, dst_ifindex, skb, vni,
- 					   addr_family, dst_port,
- 					   vxlan->cfg.flags);
- 		if (!dst_vxlan) {
++		if (!vxlan_addr_any(&conf->remote_ip) &&
++		    !vxlan_addr_multicast(&conf->remote_ip) &&
++		    !vxlan_addr_equal(&tmp->cfg.remote_ip, &conf->remote_ip))
++			continue;
+ 		if (tmp->cfg.dst_port != conf->dst_port)
+ 			continue;
+ 		if ((tmp->cfg.flags & (VXLAN_F_RCV_FLAGS | VXLAN_F_IPV6)) !=
 -- 
 2.39.2
 
