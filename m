@@ -1,207 +1,269 @@
-Return-Path: <netdev+bounces-161880-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-161881-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id C9F9EA245EC
-	for <lists+netdev@lfdr.de>; Sat,  1 Feb 2025 01:34:57 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id C2E13A245FA
+	for <lists+netdev@lfdr.de>; Sat,  1 Feb 2025 01:45:26 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 3C5601674B6
-	for <lists+netdev@lfdr.de>; Sat,  1 Feb 2025 00:34:56 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 308D91675FB
+	for <lists+netdev@lfdr.de>; Sat,  1 Feb 2025 00:45:25 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4DD58C125;
-	Sat,  1 Feb 2025 00:34:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 19D58AD21;
+	Sat,  1 Feb 2025 00:45:25 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=axentia.se header.i=@axentia.se header.b="OLhSgFu8"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Jx6b5QGU"
 X-Original-To: netdev@vger.kernel.org
-Received: from EUR05-VI1-obe.outbound.protection.outlook.com (mail-vi1eur05on2132.outbound.protection.outlook.com [40.107.21.132])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-yb1-f174.google.com (mail-yb1-f174.google.com [209.85.219.174])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4BD90A934;
-	Sat,  1 Feb 2025 00:34:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.21.132
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1738370091; cv=fail; b=H/n09CQD+RYmHgKw3Rg3wssTmU+eJFs+Np2n+hpfiiH3AipF009JRxS5TJxOFx/Ug3TA1nP/vi8bhKbPRGW0OirSTZ2WZNH+OTlHZiSF/QJoc5B/NNtrHFkSnRcKd3xi9BJO+n0rVgzE3bSIIx5CfxKt+Na9yOq/PjMxERu7St8=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1738370091; c=relaxed/simple;
-	bh=+tbBmg+mXQ1sIosRDOMeyzZCD8tuQ1Pr0ATw7x/ztY0=;
-	h=Message-ID:Date:Subject:To:Cc:References:From:In-Reply-To:
-	 Content-Type:MIME-Version; b=dwhA2l4dNlzoX3ZTcVrKnStZL6pYXfylwstLe8OkNH/z+qEtF0orn17qpyxQvxEuAb8DNH2yg6VLOtk8O0ffwNGnJWcQNuIrfmvQ+Rhyv6d3D5dVhRFLm6RO4AjQavmz4q7WpyUwhWNHLioOX2QNz+dGIO0sQ1huGVVgYZ7Gm8g=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=axentia.se; spf=pass smtp.mailfrom=axentia.se; dkim=pass (1024-bit key) header.d=axentia.se header.i=@axentia.se header.b=OLhSgFu8; arc=fail smtp.client-ip=40.107.21.132
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=axentia.se
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=axentia.se
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=bBYUVK0V3Il1eTg6jYJtlfJNooXNMr79o4aPuSr+90yNxsRqThycxq7b55M34P1uJ+fqxMmPiy3LWok88E44bHPIY5QAV5hPsynPzlYL5FnfxfHdTDWuDfq/LnBjtLhmSDcoXbuk8vBOm9OUxFfL8nNz2+dA0pcAk3jVsU22LBxlCY5EDUJfnXnSR6obNm5RUTeAWmkHeEJlgdGrP+K7nFNyc5ElUEeR5DnOzeYbgFsy2nRPpyCULm3CA3ESpzB+p1Wz+cdnLY7xdSxuAsLEab3dnGeRoj6nkOxdt+0urjYL7HE+3HRhCXkUefNlf3YAjC0aHzJeQGBPvdMjJqyj2Q==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=E6SRmMov27SAaOceCWcKkhxS/ZAIc/zmvHGHTvh2pFU=;
- b=nTVquyzqG1U34sEfocbjA6Ig2MV1tb7EDtcz5kEHHhwy/CO9xI9KjupIYfQe55Kl3x1GhSpbe6vv1ZC1hOhW6YW5TAzQ1i361M/6d7pHyx3AcbiLzMNdh7fQHqLsyrQSrB3C2QDNENPGPgv6GMsTYWC8gy/9OWpA/wEaN9q1kzJtnc6zRKwtJPaLs3EDec2C/R7K4nXp+DwPn1ciizeZrtje9Ot3C5+aekgA2f9YU6pPXlIhcRMq6dakCN7JRhz0gwWa7j57YTvjeORxxK8EzHthdzAPq7JC6WBzg21Kp5K013d0OjAmSnnLuQU9vxnplk7c1fYGZZ2yoJ5TwtU9FA==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=axentia.se; dmarc=pass action=none header.from=axentia.se;
- dkim=pass header.d=axentia.se; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=axentia.se;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=E6SRmMov27SAaOceCWcKkhxS/ZAIc/zmvHGHTvh2pFU=;
- b=OLhSgFu8jh7thLPcqwwwfpxMD89YyHWkC++grcCEIRrNHKkybpG9Z+bM4+9xv8xBQTs4GeOlM3ToShAguXEi6D5WWUiyJcydSO7d73ZxQSJLvujrQm99o3zBVnhVpmBM7hiNNM8is25ZQVzeyEx1g8yAA5EkS4Tdi2wUipsxBNk=
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=axentia.se;
-Received: from DU0PR02MB8500.eurprd02.prod.outlook.com (2603:10a6:10:3e3::8)
- by VI1PR02MB5839.eurprd02.prod.outlook.com (2603:10a6:803:134::24) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8398.21; Sat, 1 Feb
- 2025 00:34:42 +0000
-Received: from DU0PR02MB8500.eurprd02.prod.outlook.com
- ([fe80::aff4:cbc7:ff18:b827]) by DU0PR02MB8500.eurprd02.prod.outlook.com
- ([fe80::aff4:cbc7:ff18:b827%6]) with mapi id 15.20.8398.017; Sat, 1 Feb 2025
- 00:34:41 +0000
-Message-ID: <33c1524e-2b05-4d10-f15e-400b6195c46e@axentia.se>
-Date: Sat, 1 Feb 2025 01:34:38 +0100
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:102.0) Gecko/20100101
- Thunderbird/102.6.0
-Subject: Re: [PATCH 10/13] mux: gpio: use gpiods_set_array_value_cansleep
-Content-Language: sv-SE
-To: David Lechner <dlechner@baylibre.com>,
- Linus Walleij <linus.walleij@linaro.org>, Bartosz Golaszewski
- <brgl@bgdev.pl>, Andy Shevchenko <andy@kernel.org>,
- Geert Uytterhoeven <geert@linux-m68k.org>,
- Lars-Peter Clausen <lars@metafoo.de>,
- Michael Hennerich <Michael.Hennerich@analog.com>,
- Jonathan Cameron <jic23@kernel.org>, Ulf Hansson <ulf.hansson@linaro.org>,
- Andrew Lunn <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>,
- Russell King <linux@armlinux.org.uk>, "David S. Miller"
- <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- Vinod Koul <vkoul@kernel.org>, Kishon Vijay Abraham I <kishon@kernel.org>,
- =?UTF-8?Q?Nuno_S=c3=a1?= <nuno.sa@analog.com>,
- Liam Girdwood <lgirdwood@gmail.com>, Mark Brown <broonie@kernel.org>,
- Jaroslav Kysela <perex@perex.cz>, Takashi Iwai <tiwai@suse.com>
-Cc: linux-gpio@vger.kernel.org, linux-kernel@vger.kernel.org,
- linux-iio@vger.kernel.org, linux-mmc@vger.kernel.org,
- netdev@vger.kernel.org, linux-phy@lists.infradead.org,
- linux-sound@vger.kernel.org
-References: <20250131-gpio-set-array-helper-v1-0-991c8ccb4d6e@baylibre.com>
- <20250131-gpio-set-array-helper-v1-10-991c8ccb4d6e@baylibre.com>
-From: Peter Rosin <peda@axentia.se>
-In-Reply-To: <20250131-gpio-set-array-helper-v1-10-991c8ccb4d6e@baylibre.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: GV3PEPF00002E4C.SWEP280.PROD.OUTLOOK.COM
- (2603:10a6:158:401::1f) To DU0PR02MB8500.eurprd02.prod.outlook.com
- (2603:10a6:10:3e3::8)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5300F23CB;
+	Sat,  1 Feb 2025 00:45:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.174
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1738370725; cv=none; b=EL+b7dIO3ntBLd/cm2XcdpGuU1BntZqLQQekIqnLOB5F/6xS/HGqogrwFvjUlVqS8dNedVKpydb2MwWdmM1nAkW9ZJz7O1SV1YpMTEY1vh/aGILIglwi3gTlXJ10ao/pJBQc5sANZVRxyyS2YVdnWPNpnxxvxLY9t8QAaCSezOU=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1738370725; c=relaxed/simple;
+	bh=M8/HYVtz6zoqdrk8Bbgqmd93WlSx8vJVnxmF6wSVq3w=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=H4/azXdAst+2B+x8ImObZ2K59xZyHuAPBoHvlDsGDzYFTBuLVZHFzNWJdOvwFLjwRMjxm8e31wonPgObf/Xj0gNdIXYSLAUHevJctjtw3jG2x9my5yg1encoX10kPE1Q3JcUNQLBvAzKF6LE3hL1gb413/9d5leVT36cDNXGCf8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Jx6b5QGU; arc=none smtp.client-ip=209.85.219.174
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-yb1-f174.google.com with SMTP id 3f1490d57ef6-e549a71dd3dso3029333276.0;
+        Fri, 31 Jan 2025 16:45:23 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1738370722; x=1738975522; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=ciJHt/z1JFayiUPMBWhgXqEFfCdPvS6UdOyDyrwcJnc=;
+        b=Jx6b5QGUuuvDnloRvwQ3ncgvxFK6GFGQFpxCw5GW59oBVDwIzZBLBbNiA2+vMGRo02
+         CoKKF6dCYXZMyeAoPZPL/J8wG8G8w5bRjwC0se7UQtuoNjrHH1POMfXrF7Y1UxYYrWZu
+         UfwiqWqTtTJa5RvTiZkhP58Fod+ve7JTiy8GdpenuZeXoAM/XaqRI4YfN7fmMG6KKHwr
+         KVr0j40QlLBYfzOL6GOJTsdMPjlcy4GGUbfQeq0tn1Og82+F/zZDXapcKG/0zGJr4XPK
+         rbPFOi7zjqWchYxpESaFdtWG4hJoC3WtMJVFY13Q1SgbF9/fmUyZlC5W3VdKvXJ02byc
+         3t5A==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1738370722; x=1738975522;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=ciJHt/z1JFayiUPMBWhgXqEFfCdPvS6UdOyDyrwcJnc=;
+        b=SjGaFxnqxPYCr/WulPOqi0LmwpNqYh/CmD/P1T2XoaHY1sEtZhyhfSaPstUE9PYTEP
+         J4k4hvDDytY1pSsKgI2fcGiZfW1HB4uphz0pMa0Ybmq5IEIYd9QQa3fJgXHBmXfbUV8V
+         kxZQF8ob8Qk6h2+N2lLBl6ScYaH4WjmLTK7vSCfeMWrlonfYiRMAdM4lkCd0FdagWDXr
+         XY7P4S6ud1owBlvV/y2pF8Vopqc2IndlZ4hONAbEQFE0h9FnzNnAiG61m5VthK3tw4+7
+         58ZtjS86VZ/983ZrGIVjGriXuGr7jokyGrA5mq46b7sE1lQfrXgo0r64XN8Bm9JIpdAS
+         YP7A==
+X-Gm-Message-State: AOJu0YwuN//96lGVxTFJ2ylnbSqpHgWt/IaDDFWI0Mao5Eur9KLqJ8vc
+	2SbfCQe4b3XzYVhBoNTti7nPWVmz85Ur4EPzzT5BHgSZekLNO+7jqBqvXC5by12axQCsvFmtmdz
+	pmYz9ns0UWkl/NxZ2J3TY3lIxbDoRQI1j
+X-Gm-Gg: ASbGnct7Ry/NpyYTXgamX7xdjtuVKIYDcJIFDpIWxZY9NBzPgRNZGezcqFJPr30wP/Z
+	vtL/mGXJluKARa7S3ik6AvEH3qchgbmrw4u9gqp6mRbOmQ3wLYVzt+Tsp84+TdH+ed3lZMIbZ
+X-Google-Smtp-Source: AGHT+IGSNNM0Oybm73v6It1imZW0DNTVrI9RLdxpWcxBoY51sv9EQtKiiTyXeNfiH2Q5uj/FB6uZJPjkF2oqIKlqk4Q=
+X-Received: by 2002:a25:8a08:0:b0:e58:596:2811 with SMTP id
+ 3f1490d57ef6-e58a4bbe1aemr8234295276.34.1738370721923; Fri, 31 Jan 2025
+ 16:45:21 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: DU0PR02MB8500:EE_|VI1PR02MB5839:EE_
-X-MS-Office365-Filtering-Correlation-Id: 62bd5cc2-2716-49ef-0fd6-08dd42583799
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|7416014|376014|366016|1800799024|921020|7053199007;
-X-Microsoft-Antispam-Message-Info:
-	=?utf-8?B?dzRlT3JJMUw2bXpvZFFkMTFiVWFtcHhjbWJ0MTZBSkl0b0VTYlRrK1ZXOVpY?=
- =?utf-8?B?SEdOazFMQVRZbTFaM2IzOHdscEhFQmozejY2VXhNSWtHM3Y2a1o0eHdiQTNL?=
- =?utf-8?B?R3gyNnI0RkxEMEpOcnFMQUJqUkhuM2VBeU52czV1bUFLdFdmaWxXSFBjT0My?=
- =?utf-8?B?dHVsenYzNXpER1VuS01od0YwWGRhdThJdExaMjJtQmNVd0M3bHpYbGNWWWty?=
- =?utf-8?B?ZUk5aG9SNThVWkEzcHh0Y1drQjExK1NqWk9ldXU1ZjZCMHNLS1hCWHNVcEVm?=
- =?utf-8?B?U0ZpZ3g5endKVi81Y0tJUmtnSisyUzlJZVIxMjZJMXdPTmpKVlE5WUR3WUF0?=
- =?utf-8?B?NVVESitwbjFPcmdDS0YyR01PTjFZa1hib1N3eEVmWVMwVkoyMjJNb1RFRUdC?=
- =?utf-8?B?UzRwVDdKZjluL2YwUDZBYlFZRUUzN1lRdTI4QUdrUVRBMXdRT201VkE2SVdW?=
- =?utf-8?B?ZjdydmNGSGJjSGlOWEpqQ09ScWpEbmg3NWkrRnJFam9xdEQzUkNvVitiTkVs?=
- =?utf-8?B?ZUE0bjd3NTdURUFOZHJaUS9BODZlbzBZMUdOS2htSUNNVHVLaUFJTXEzN1lp?=
- =?utf-8?B?WURBaGxzMmNnczJUT0J3am5HV211MlVMeXg5dXRmbXFvOWFiL3MwdXI0dTM1?=
- =?utf-8?B?b2RsZ29lQVVWR0N6blFZUGxXTEVRMkk0aVUxZXlhZjVqZnBOcHE3Uk1mK2I4?=
- =?utf-8?B?b1JtM3RBT0ZtSjdOUFI5R29SZlF1NnVsSmZ1K0J0QmxmMDZ6a2hvOTA5bHlX?=
- =?utf-8?B?NGpxNFp0NnVJZVQ5R3lpY1hXNkxOckVzdkJVYWhEa2lqRDgvS2VNN1ppYzV3?=
- =?utf-8?B?QzZ2SUUrYys4MUsrd3ZaWnRTSGFTOGxnT1lUV3FNYUlSTXk1RXZTN1lIU0py?=
- =?utf-8?B?T3cydkdLeEk0VU9Ja3BHcUx3N0lBUmY3akVPdjdtWUNTUTUzaGsrMUsrTDRL?=
- =?utf-8?B?UEc3ZHdxZm5yQ05xOFo2TkVCZE5sdmpVbDByU0NJOU1Fck4zQzhvNWxmYk13?=
- =?utf-8?B?MTYwM1RsSVBLRlFtYy9JMkIyZUVpcUY0YkdZNi9IakVUYTFVall1YnJnR041?=
- =?utf-8?B?eUFNaCtRbjREcjlsVXY4cWlTNlMzNmw5c0tGakR1cEhNcUJmb1Vab0tlY1dB?=
- =?utf-8?B?N0UwbGRlbEJuSTNEWXFFMllsNys5bmg0aXczZ0NISWNRbVllQjhxVStOTVVS?=
- =?utf-8?B?WWh6V0U5NzhQd3oxSFo1UFBla2dkbksvTGw3cFBDY0hEa3RzTFhSc0duUVh5?=
- =?utf-8?B?R2EyYlFIR3grVU42dThmY0FmZGhpTHdCYjNtN2wwNGFRL3dMbXdNWExTMWlE?=
- =?utf-8?B?WkEvNU9TelhPMkJYK0VrQyt2LzRmTS9ld29PV0JwZDZLdTlPVGtjZW5BQTFV?=
- =?utf-8?B?KzBSbmpTL3FHRVgwTXJGcDdCQWJWWUIxM1ptK1Q0S3hQUk5uaHUyMEhkbGFl?=
- =?utf-8?B?cUQrNzdWRzdEeE1GQXY0ZytOS0VWT3pGKzdPQzE0ZzhjUlNGVkpoS2d3bW5N?=
- =?utf-8?B?ekphTEsvbUk2V0ZHN3BnS3RwQTEycVNuSVdnSGNsK1pXUjVqdkFtVGJRZ0FJ?=
- =?utf-8?B?NURweHZWek9WTmJuZXRtRHpPOFZ2RitSMDJXZ014U2wyelN6SlUwMVlzQU9U?=
- =?utf-8?B?YmNnM0hwQStQYTNxMFRiazdEMGZVcEIrMFlBYmFOckVqWmdzTVhsb1lLMEo3?=
- =?utf-8?B?d2JYOGZwSlFuU2NaN3ZIRmx4R2FEV0xoRDBJeFF2ZVlnSTh6a24ycXQxMkxT?=
- =?utf-8?B?REZMREJKc0lyR0FOZXdwbXhsSGJSOVlkZWZxemVXbnRuU3NWOFNHenNOcGZM?=
- =?utf-8?B?am94MkYxNk5oRy9IdGVHNmtNMXFsdkFDRlR3WlFoWVlPR0ZEMVN4SVl6d0sx?=
- =?utf-8?B?WlhkOUpNdVlMWTRzZkhDekoxcEJFNWx4SmdKbWlNNkpoeDVZTzdtOUtVQ01D?=
- =?utf-8?Q?adGOD9FU34s=3D?=
-X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DU0PR02MB8500.eurprd02.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(7416014)(376014)(366016)(1800799024)(921020)(7053199007);DIR:OUT;SFP:1102;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?utf-8?B?ZmpKcStQZTNJSDMyMEFnZUlGOHFUNUwxdUhxeWpNWUdVeVRGWGVEL0owdmVE?=
- =?utf-8?B?ajNwZ29jZ01Ma0luaUNLa21jc2RpZ3pPK2lIZzZJUkEva05yZ3RaVGRrN0pK?=
- =?utf-8?B?Q21tM1pEQmtkVEV5Z0xtK1UvS0hCb21FeU9UVmVpZUFmTkduV3czNGJQMFlH?=
- =?utf-8?B?VzdYczBITmcwQ2NlUG45WkI5akdYeE13b3A2Yk1mYkUxZ2wyQ0FnTmxJR1VT?=
- =?utf-8?B?MUcrWk9kK2ZuYWtrdzI0S0NXb1c0ZmtTWDlsdldrQmdhMHd4enJUMzJsTG1z?=
- =?utf-8?B?UFU2YXIzZ1ZOOGluaDUvQ2k0dzRFRUVQZ0xOQVRlTUZKM1JreXpKUEhTSnA2?=
- =?utf-8?B?MXNYZ3NhT2xFWVl6TEZZWW5VaGR0bVkwVmh1YlcyVm1TMUlOZE01V1g5RklL?=
- =?utf-8?B?ckN0ZHJMQzUxRUtXRXhTV0hwKzVidlJhSXlSdXY3WVJGTnliR1Q1S1JUZjZw?=
- =?utf-8?B?ejNRTFNtWUJSZW9Qb0podDNZdmlVT29CT3JVd25NZXhybEpIUDNGYUFmSlA3?=
- =?utf-8?B?dEZuRzlGWXQ4ME9QWFp0SGk3c2k3RXp3R21sZGZMU0JtNC9nS0NPQkxIcTV6?=
- =?utf-8?B?Zk94TDhIVXBpYWd5UnZSTExydjdPNXREZjhrV1lyWk9VOGpNTDI5QytSTHdC?=
- =?utf-8?B?ekhpV244YkdubmVvTGowdVpJb1hhTzdRQ1dWdWhaTWVJRzE3RnlwY2tpUnBx?=
- =?utf-8?B?V2dIOGFndnQ3ZnhLeFVWQTVwRDBBTTN0aFNFMVJhampnWmtqZ0tiVW9QdHRk?=
- =?utf-8?B?MmN1cFVoWHBGSWJpWTJiZEdabTlpT1gzNFVTZjErWVZld2VxSGRwaUhmYWsw?=
- =?utf-8?B?anZGWlFQNVc3VEM3ZlZGQ0syeUYyRExGT0VsWm5qUDNQcnN6OWJVdmdBdEx2?=
- =?utf-8?B?aGUxNExPSnJ5eGNIeU1IZ2NPNHpveDRvek02cDhKUVFzM1hGTEhpT3Z0TlVk?=
- =?utf-8?B?L3k3bDBod3NWNGdkZnZ4OU92TUdBZlYrR25rcHFNL2tuN0RSMjhDeVpjSU5H?=
- =?utf-8?B?SzZ6YUZ2d1g0UEpHVE83WFBvaTUvTTR3aXJlZUJIVVNGbkZkelhiSnAweWN6?=
- =?utf-8?B?bnFtUk5xc1BuZm1qbWNmdFdjSjJYVW1WQjgrOGF5UUxHZUJzTjFnYjNOcERG?=
- =?utf-8?B?cmFMMXlVbm1Ea0lXTUFjZHY0eFgzZUpSRWNjUDJrRUlrL2NVNThWcU5nK3Fh?=
- =?utf-8?B?NWtyR1BPeTdsQTJhMW1pQVkvWFUvcitqMjk2OHR0QW5kMlJFU1VQdCt4OTJq?=
- =?utf-8?B?czBPSVlRR2QxeWFKcGJjOWphSEg5a0dpdFlveFdVelBZM2dlY1FtSTFiMFpC?=
- =?utf-8?B?QUMwZnM5My80eXk2cG1WL0JZVjJhOWNoWkFGTEtIRjJ1MkFzb0w4RU9RMWlK?=
- =?utf-8?B?YzVZNUgzdi96WkRZT3F6S1dORTlXUEdVVEJjUnBTR0FLSVBnL3RFZFo2VFJZ?=
- =?utf-8?B?UlgwNnpiMWMyRUFqSUx1VUF6aVE3Znh5ZWl4cTVSVFJPM3MwNXJZaDMxVXVJ?=
- =?utf-8?B?cXp2MHZ5V0RoZEZVY2NXN3FHZjY2R081bEdEcG8zRE9Bdlp2SW5XaE1GV25R?=
- =?utf-8?B?dHZ6ZW14ZmlEekNKZzNLTDlSMUtXS1JkUVBrLzlFRWNvd2kyOGFoS003OHYw?=
- =?utf-8?B?Y2hSQk1SaFJwREZXYUVBa0VXQzZPcU5LLy9WMkFQQkMyc3JIdzFwM001TW9K?=
- =?utf-8?B?N2pGd2sxbDdxa3pYTlVYSi84enpzVFFpSXBOVzZBYXZHNG9sWnM4Q2ZTSEtv?=
- =?utf-8?B?ckFZM3lONENPbGFhaVZGdGY5RDRRZWlGYnhvSThVa3BLbnBvQklzbmlQeXVz?=
- =?utf-8?B?Zk9wL3lMMG5ZQzJGMVBpNnp6YlhsRy9qckdyNFFUMFBVOEZLNFdVQ2ZHOVZB?=
- =?utf-8?B?djZMWXkzVlVLc0VnRENRSnJYZG9BZW5PMDUxdUFSUVlkUzl4cUFBek1RS1M3?=
- =?utf-8?B?bjFDTCs0V2E1YlRmSDdab0JYZnZtMldFbHN2WWl1cGxnV0QvbldrM0ZqeExs?=
- =?utf-8?B?dG95bVIwSmhmb2xGclVFVG8rK0hwMmNUZ3o0S05DMUkva05NeWp6MDFVbzg5?=
- =?utf-8?B?dUY3R1dDVDljbGg0bGl5RHNTTml5OFdNcFFBQllDNmVlMWFXZERPZ3FHa1Fk?=
- =?utf-8?Q?UyE3UIp5f5xN+k2/1FaIvRPZ6?=
-X-OriginatorOrg: axentia.se
-X-MS-Exchange-CrossTenant-Network-Message-Id: 62bd5cc2-2716-49ef-0fd6-08dd42583799
-X-MS-Exchange-CrossTenant-AuthSource: DU0PR02MB8500.eurprd02.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 01 Feb 2025 00:34:41.5801
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 4ee68585-03e1-4785-942a-df9c1871a234
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: nNFZn2gChZ3e9bkwG+EOmatMUUoVdKehumpOp/RrJHiylHt7Gjy/2eJZMTBzcOtD
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: VI1PR02MB5839
+References: <20250131192912.133796-1-ameryhung@gmail.com> <20250131192912.133796-19-ameryhung@gmail.com>
+In-Reply-To: <20250131192912.133796-19-ameryhung@gmail.com>
+From: Amery Hung <ameryhung@gmail.com>
+Date: Fri, 31 Jan 2025 16:45:11 -0800
+X-Gm-Features: AWEUYZk4vrs47MlmcKqSXX5ntmJctK0Ty9NH7Z_cHdeOiZGScONwdXxGrrusY0c
+Message-ID: <CAMB2axPNe0MK-_T6Dw3ioCLJD3VcPEMiHnv9Kyp4RYFqngoz+w@mail.gmail.com>
+Subject: Re: [PATCH bpf-next v3 18/18] selftests/bpf: Test attaching bpf qdisc
+ to mq and non root
+To: netdev@vger.kernel.org
+Cc: bpf@vger.kernel.org, daniel@iogearbox.net, andrii@kernel.org, 
+	alexei.starovoitov@gmail.com, martin.lau@kernel.org, kuba@kernel.org, 
+	edumazet@google.com, xiyou.wangcong@gmail.com, cong.wang@bytedance.com, 
+	jhs@mojatatu.com, sinquersw@gmail.com, toke@redhat.com, jiri@resnulli.us, 
+	stfomichev@gmail.com, ekarani.silvestre@ccc.ufcg.edu.br, 
+	yangpeihao@sjtu.edu.cn, yepeilin.cs@gmail.com, ming.lei@redhat.com, 
+	kernel-team@meta.com
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Hi!
+On Fri, Jan 31, 2025 at 11:29=E2=80=AFAM Amery Hung <ameryhung@gmail.com> w=
+rote:
+>
+> Until we are certain that existing classful qdiscs work with bpf qdisc,
+> make sure we don't allow attaching a bpf qdisc to non root. Meanwhile,
+> attaching to mq is allowed.
+>
+> Signed-off-by: Amery Hung <ameryhung@gmail.com>
+> ---
+>  tools/testing/selftests/bpf/config            |   1 +
+>  .../selftests/bpf/prog_tests/bpf_qdisc.c      | 111 +++++++++++++++++-
+>  2 files changed, 110 insertions(+), 2 deletions(-)
+>
+> diff --git a/tools/testing/selftests/bpf/config b/tools/testing/selftests=
+/bpf/config
+> index 6b0cab55bd2d..3201a962b3dc 100644
+> --- a/tools/testing/selftests/bpf/config
+> +++ b/tools/testing/selftests/bpf/config
+> @@ -74,6 +74,7 @@ CONFIG_NET_MPLS_GSO=3Dy
+>  CONFIG_NET_SCH_BPF=3Dy
+>  CONFIG_NET_SCH_FQ=3Dy
+>  CONFIG_NET_SCH_INGRESS=3Dy
+> +CONFIG_NET_SCH_HTB=3Dy
+>  CONFIG_NET_SCHED=3Dy
+>  CONFIG_NETDEVSIM=3Dy
+>  CONFIG_NETFILTER=3Dy
+> diff --git a/tools/testing/selftests/bpf/prog_tests/bpf_qdisc.c b/tools/t=
+esting/selftests/bpf/prog_tests/bpf_qdisc.c
+> index 7e8e3170e6b6..f3158170edff 100644
+> --- a/tools/testing/selftests/bpf/prog_tests/bpf_qdisc.c
+> +++ b/tools/testing/selftests/bpf/prog_tests/bpf_qdisc.c
+> @@ -86,18 +86,125 @@ static void test_fq(void)
+>         bpf_qdisc_fq__destroy(fq_skel);
+>  }
+>
+> +static int netdevsim_write_cmd(const char *path, const char *cmd)
+> +{
+> +       FILE *fp;
+> +
+> +       fp =3D fopen(path, "w");
+> +       if (!ASSERT_OK_PTR(fp, "write_netdevsim_cmd"))
+> +               return -errno;
+> +
+> +       fprintf(fp, cmd);
+> +       fclose(fp);
+> +       return 0;
+> +}
+> +
 
-2025-01-31 at 21:24, David Lechner wrote:
-> Reduce verbosity by using gpiods_set_array_value_cansleep() instead of
-> gpiods_set_array_value_cansleep().
-> 
-> Signed-off-by: David Lechner <dlechner@baylibre.com>
+I will replace netdevsim with veth for attaching mq. The function
+above that failed to compile in CI will also go.
 
-Looks good to me.
 
-Acked-by: Peter Rosin <peda@axentia.se>
-
-Cheers,
-Peter
+> +static void test_qdisc_attach_to_mq(void)
+> +{
+> +       DECLARE_LIBBPF_OPTS(bpf_tc_hook, hook,
+> +                           .attach_point =3D BPF_TC_QDISC,
+> +                           .parent =3D 0x00010001,
+> +                           .handle =3D 0x8000000,
+> +                           .qdisc =3D "bpf_fifo");
+> +       struct bpf_qdisc_fifo *fifo_skel;
+> +       struct bpf_link *link;
+> +       int err;
+> +
+> +       hook.ifindex =3D if_nametoindex("eni1np1");
+> +       if (!ASSERT_NEQ(hook.ifindex, 0, "if_nametoindex"))
+> +               return;
+> +
+> +       fifo_skel =3D bpf_qdisc_fifo__open_and_load();
+> +       if (!ASSERT_OK_PTR(fifo_skel, "bpf_qdisc_fifo__open_and_load"))
+> +               return;
+> +
+> +       link =3D bpf_map__attach_struct_ops(fifo_skel->maps.fifo);
+> +       if (!ASSERT_OK_PTR(link, "bpf_map__attach_struct_ops")) {
+> +               bpf_qdisc_fifo__destroy(fifo_skel);
+> +               return;
+> +       }
+> +
+> +       ASSERT_OK(system("tc qdisc add dev eni1np1 root handle 1: mq"), "=
+create mq");
+> +
+> +       err =3D bpf_tc_hook_create(&hook);
+> +       ASSERT_OK(err, "attach qdisc");
+> +
+> +       bpf_tc_hook_destroy(&hook);
+> +
+> +       ASSERT_OK(system("tc qdisc delete dev eni1np1 root mq"), "delete =
+mq");
+> +
+> +       bpf_link__destroy(link);
+> +       bpf_qdisc_fifo__destroy(fifo_skel);
+> +}
+> +
+> +static void test_qdisc_attach_to_non_root(void)
+> +{
+> +       DECLARE_LIBBPF_OPTS(bpf_tc_hook, hook, .ifindex =3D LO_IFINDEX,
+> +                           .attach_point =3D BPF_TC_QDISC,
+> +                           .parent =3D 0x00010001,
+> +                           .handle =3D 0x8000000,
+> +                           .qdisc =3D "bpf_fifo");
+> +       struct bpf_qdisc_fifo *fifo_skel;
+> +       struct bpf_link *link;
+> +       int err;
+> +
+> +       fifo_skel =3D bpf_qdisc_fifo__open_and_load();
+> +       if (!ASSERT_OK_PTR(fifo_skel, "bpf_qdisc_fifo__open_and_load"))
+> +               return;
+> +
+> +       link =3D bpf_map__attach_struct_ops(fifo_skel->maps.fifo);
+> +       if (!ASSERT_OK_PTR(link, "bpf_map__attach_struct_ops")) {
+> +               bpf_qdisc_fifo__destroy(fifo_skel);
+> +               return;
+> +       }
+> +
+> +       ASSERT_OK(system("tc qdisc add dev lo root handle 1: htb"), "crea=
+te htb");
+> +       ASSERT_OK(system("tc class add dev lo parent 1: classid 1:1 htb r=
+ate 75Kbit"), "create htb class");
+> +
+> +       err =3D bpf_tc_hook_create(&hook);
+> +       ASSERT_ERR(err, "attach qdisc");
+> +
+> +       bpf_tc_hook_destroy(&hook);
+> +
+> +       ASSERT_OK(system("tc qdisc delete dev lo root htb"), "delete htb"=
+);
+> +
+> +       bpf_link__destroy(link);
+> +       bpf_qdisc_fifo__destroy(fifo_skel);
+> +}
+> +
+>  void test_bpf_qdisc(void)
+>  {
+> +       struct nstoken *nstoken =3D NULL;
+>         struct netns_obj *netns;
+> +       int err;
+>
+> -       netns =3D netns_new("bpf_qdisc_ns", true);
+> +       netns =3D netns_new("bpf_qdisc_ns", false);
+>         if (!ASSERT_OK_PTR(netns, "netns_new"))
+>                 return;
+>
+> +       err =3D netdevsim_write_cmd("/sys/bus/netdevsim/new_device", "1 1=
+ 4");
+> +       if (!ASSERT_OK(err, "create netdevsim")) {
+> +               netns_free(netns);
+> +               return;
+> +       }
+> +
+> +       ASSERT_OK(system("ip link set eni1np1 netns bpf_qdisc_ns"), "ip l=
+ink set netdevsim");
+> +
+> +       nstoken =3D open_netns("bpf_qdisc_ns");
+> +       if (!ASSERT_OK_PTR(nstoken, "open_netns"))
+> +               goto out;
+> +
+>         if (test__start_subtest("fifo"))
+>                 test_fifo();
+>         if (test__start_subtest("fq"))
+>                 test_fq();
+> -
+> +       if (test__start_subtest("attach to mq"))
+> +               test_qdisc_attach_to_mq();
+> +       if (test__start_subtest("attach to non root"))
+> +               test_qdisc_attach_to_non_root();
+> +
+> +out:
+> +       err =3D netdevsim_write_cmd("/sys/bus/netdevsim/del_device", "1")=
+;
+> +       ASSERT_OK(err, "delete netdevsim");
+>         netns_free(netns);
+>  }
+> --
+> 2.47.1
+>
 
