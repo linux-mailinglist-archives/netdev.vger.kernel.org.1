@@ -1,76 +1,76 @@
-Return-Path: <netdev+bounces-161905-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-161906-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5959FA2488F
-	for <lists+netdev@lfdr.de>; Sat,  1 Feb 2025 12:34:44 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1FC96A24890
+	for <lists+netdev@lfdr.de>; Sat,  1 Feb 2025 12:34:52 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 31AC61889140
-	for <lists+netdev@lfdr.de>; Sat,  1 Feb 2025 11:34:46 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 63CCF7A30FB
+	for <lists+netdev@lfdr.de>; Sat,  1 Feb 2025 11:33:57 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E306E186E20;
-	Sat,  1 Feb 2025 11:34:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7984914AD38;
+	Sat,  1 Feb 2025 11:34:28 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="h18rCXa7"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="d6/3ElUK"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ot1-f44.google.com (mail-ot1-f44.google.com [209.85.210.44])
+Received: from mail-ot1-f43.google.com (mail-ot1-f43.google.com [209.85.210.43])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 54E3D15B111
-	for <netdev@vger.kernel.org>; Sat,  1 Feb 2025 11:34:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.44
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DD14220318
+	for <netdev@vger.kernel.org>; Sat,  1 Feb 2025 11:34:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.43
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1738409659; cv=none; b=KSabVX9ixmF2/B2Tfhw6q+57zhSRypHJfig9pg377WCtFUkOjlQ8ccSQZ5MFwG8P2WABoz62e/5mS4DO69YkV2vydQ5RpHKIuk7JMIvmx0QbPluNNIm/MUFJSUdEBQkiNqn1MqKB+sMIkfLOKykufPrfu008nf2czzHLOolGBoQ=
+	t=1738409668; cv=none; b=Djr0ZrJJYcwZHjLglvGqaGdsBjYog+Z730lWBYzRf7e448SjjeNdA+GDWdBWQbhhBsO0IgBbmnz41dtBAhRazVQk4qWnCxs9EOSIjtVZnIoDgOHrv5YMVpBuUwD60BNmlVAc1TPfGI2OtxTmM9Aot4Viq48H8CitgYsXw4EoWMU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1738409659; c=relaxed/simple;
-	bh=ATj64J7ePinHmQnjCFg+/4O5OZQrh73VR2xWGYhDYuI=;
+	s=arc-20240116; t=1738409668; c=relaxed/simple;
+	bh=RzRsDIhH7hgOhLgeQJyIbaJx2sH1SuLVBC9YcSS6Mn0=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=mr5cleQio9oSGvqosF7v+8ZjWuWuRqqxqlMjrwugN0TXXrD0tGGS+qaN/2dKAt6S2OHPny/kTy0v9eHx5rEi4hV5oNx7gvHUPAdYJkw7tyZ3D7rtBiLfC1hAMPTg5u2+r3/7SQWAcMxPr+NkmnFtZxEfKdEL5MPwiORY3O88Qs4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=h18rCXa7; arc=none smtp.client-ip=209.85.210.44
+	 MIME-Version; b=IfKuDyijXgX1D+n7SxuWL4b6Y/NBw2sdipid9WQFHPI1+qR8UrAFpq8aMo6nShyiqL4PeQ44NPOPIQlqmJd0ivLTqeuUTys+NARF85NZ/EIznN5TnqGuZGuL2tDVpz6dYWrtDb3pCC6OfMyIIe6TmkDD9Df8kJX+oyIXLH0OLvQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=d6/3ElUK; arc=none smtp.client-ip=209.85.210.43
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ot1-f44.google.com with SMTP id 46e09a7af769-71e2766994bso1466151a34.3
-        for <netdev@vger.kernel.org>; Sat, 01 Feb 2025 03:34:16 -0800 (PST)
+Received: by mail-ot1-f43.google.com with SMTP id 46e09a7af769-71e181fb288so1617757a34.2
+        for <netdev@vger.kernel.org>; Sat, 01 Feb 2025 03:34:26 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1738409655; x=1739014455; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1738409666; x=1739014466; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=mYarXz+1rPX5MQ983eljbZkfUj12hCqEdtN2eWPVIGE=;
-        b=h18rCXa7zC4csZusZbepyLtKi3Z7b0tni/fY7jrEGexVjPfrpO3UiwJiPK231Lzd0J
-         UcsRb22cYcRDj+yW1YDxd50o+W8d4pjs4mckB9JJRLTNGglvoEL05zxkuza07bf8rbGb
-         mfwF7mJxQtMABFXFACbVxHwafrU15hGc45XJgBqPce1MdIyMsherGRYw9rhhG8Xnf4Yx
-         QXXw2pOKQMOrd1/gQTfdL8yRmGzx7KHzFfrcxS3ypi9Y7VNLdhNpz/pdFcB3r5QLNN8s
-         lyc1M6e/LoP8FcZBS9IB5PfHo5BjJa+sDb3fZk8TYkymvfSgLrdX5tcoBeU2aSrBSELl
-         U/SQ==
+        bh=9xTMuQRO/evTzf/IZeTCGlH4eG5HsRuLUAD3URYWiMQ=;
+        b=d6/3ElUKAsGQScuqircf775WqnvtHoK74muwyCxXP5pzExzrUP0Q0L4UhcdhIXCRF5
+         DwFZsTaJoHsZNHYyUMspC1GOH6fXnvGseyRP432MAaX1f1xm/oQmru3/udFnQxDyx34E
+         /yvQIgda4Y7EK6ZjX0o07/r2v2nTOcnJ7Gh4rFPAgobCjM/76/P+DxQStJgkTlxpcfLq
+         nRiBsKJe0K3tFOkRs3APIdc/9tAJHORTNCzpRB2x1xsKwEfKKH96gBPwIWz/QybA5zaV
+         cuKe/PI1M64OIhK8vsPRxRaBKtauUjbDHac07ATRmwFJcCXqoidCLdmDsXD6wd19NlY+
+         goQw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1738409655; x=1739014455;
+        d=1e100.net; s=20230601; t=1738409666; x=1739014466;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=mYarXz+1rPX5MQ983eljbZkfUj12hCqEdtN2eWPVIGE=;
-        b=Xwwvnc8QPly++I6+Pk7it/inKciNwz3kuBKrfU2IrNIMMdQfDywhh6uY1NMJfPtiWS
-         75nyH0NTC4uUQEV/Duxp/ADIqufJYTkZL6VRNVpJfSbDRO2sNa54HxJmNRa9BFhicO1z
-         vLwGQHVkhbPWbgCfgcR/duJUXkGVLviRYKScBSqV2IgjOSTRaV2oKzCHMXfu6rw1zWeQ
-         Lfa+9NadoK/6h6H8NVouSJHen9g8A3EF69A/kXGI7WGMwW4RTuqacWKIwo3nrmuCHSlu
-         h3WJqiGsr1XLl61l9idSYMlqvho/iCKmTC46Zwzry9dhoUdGBXFk2b3PWK7QLIsUnEBN
-         6l/A==
-X-Gm-Message-State: AOJu0YyjJUTj9XD4lcGVNH/ClmXSO2uPoOLojioJ1ROppYaJqRjv9HGJ
-	2DSL/y5gHNp7cfmwM1bvOnRFFphqtBa64Tcve+wb0JJ3OK9FpBw=
-X-Gm-Gg: ASbGncsBzXCwUL467or+PUh5eCXDOW5oLqapTeDuy8UY3vRdtJTDIEAQgni0njzV9c2
-	4Zuaiz4YOrQza3W14widjKut771jQXpxRYdwN4CxobXCI4bhi8BX6NjpghKq1pisHqFd8i5bX2r
-	HsWTrE0GOgST+07Bx+skO+6bW9z+5MmxR6Jz1z+QSUf7ifSp8AfeZzItBon7bPwagYxv7xbMKGE
-	/xQQxYlF+v7GtTZSBxVKjoaeAFcLgRlxB5q1rO7gG3BNdbicDG6NyNEB58NugqR3X/3iQOOrzi7
-	ocaMA2bC0muZFfJ7NQ==
-X-Google-Smtp-Source: AGHT+IFSUaTIr8LCiItRi0dy93IEp9DMWvVOP8ffMiU+J4GhZfVFcLu56BLQ96mxFva53YLNYpIqmA==
-X-Received: by 2002:a05:6871:788c:b0:296:b0d8:9025 with SMTP id 586e51a60fabf-2b32f1f8dd2mr8892510fac.20.1738409655369;
-        Sat, 01 Feb 2025 03:34:15 -0800 (PST)
+        bh=9xTMuQRO/evTzf/IZeTCGlH4eG5HsRuLUAD3URYWiMQ=;
+        b=e+Gsvz0qb/VjGf1/kZz/8k9A/wdz+fbVJdDidbvmjJwIB52AgGC8/cCvYrftq97lBW
+         QTgCuvHeXFDQrWK2oDFOsVZbIHEyZV59jqoQKqBlKC7Cz34OXPFfzKAOGSSD1vPe4Kz3
+         Fg/J4PbMyua7Gf/HOeDYxcfulztKO6kWxPUvMVEidjq0MM4s0BYzEQkOIYg90shldqVt
+         UBbb+zhtuFbM0mMy2rkOSwc2dtEiQtIIS517Tv0VW17CkJuHgJHuEwVoiV6NWJV3pkV9
+         1IbDiq76Gwd2ufNcMYKGckrz8MGzyzIYdugd7+mENeHikxrh3SevXbIFG91AQgvqochT
+         3hcw==
+X-Gm-Message-State: AOJu0Yw7zJ0kyBTMGxHLMTBjAE1fVlsm3HOpruGvYJ+RmjelXlFMkTiE
+	hrSieBmYJwq2SNqtGkWQs64thUzfExFOMl7XXBy5jdiSJCUbHSU=
+X-Gm-Gg: ASbGncsp+28EIzdCJOjZtbxNVcMsXRgPuaw3fOyMtjiKAnPd1Z+UKLyX+lJI7ku3Au4
+	CYeooGTGk2/LsCZ0Jso5QVVe87VNxXqtla3uwRPSLAoRG1SAuX8CQDVigdi87EtevAQ75qcGoZ4
+	9D7dtmAjXYWdMVTyvNlVNJlZSxu/fUkOhbUhfaWqkt+yQOV8BBLKhipEL6n4OYEEOR6FtEs0JQh
+	0HQ5UjonQDE3i2SvXQpA5ema5mydLhtGqWcwBYsQmWo5bg/gNERToVrMAHn+/WnUYeJdgB+kNMh
+	maO4eNdToXoQZRNmXg==
+X-Google-Smtp-Source: AGHT+IFNFPww7cAo+JfUIaKHTj5XwNNGs2rMdlcG7rPYL3wgpqfF4aOgQz+ZsIr4nUzpNeCYf145OA==
+X-Received: by 2002:a05:6830:90f:b0:71d:46e8:b30 with SMTP id 46e09a7af769-72656758bfamr9320419a34.1.1738409665779;
+        Sat, 01 Feb 2025 03:34:25 -0800 (PST)
 Received: from ted-dallas.. ([2001:19f0:6401:18f2:5400:4ff:fe20:62f])
-        by smtp.gmail.com with ESMTPSA id 586e51a60fabf-2b3565b8120sm1837174fac.34.2025.02.01.03.34.14
+        by smtp.gmail.com with ESMTPSA id 46e09a7af769-726617eb5dasm1506634a34.34.2025.02.01.03.34.25
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sat, 01 Feb 2025 03:34:14 -0800 (PST)
+        Sat, 01 Feb 2025 03:34:25 -0800 (PST)
 From: Ted Chen <znscnchen@gmail.com>
 To: davem@davemloft.net,
 	edumazet@google.com,
@@ -79,9 +79,9 @@ To: davem@davemloft.net,
 	andrew+netdev@lunn.ch
 Cc: netdev@vger.kernel.org,
 	Ted Chen <znscnchen@gmail.com>
-Subject: [PATCH RFC net-next 2/3] vxlan: Do not treat vxlan dev as used when unicast remote_ip mismatches
-Date: Sat,  1 Feb 2025 19:34:12 +0800
-Message-Id: <20250201113412.107832-1-znscnchen@gmail.com>
+Subject: [PATCH RFC net-next 3/3] vxlan: vxlan_rcv(): Update comment to inlucde ipv6
+Date: Sat,  1 Feb 2025 19:34:22 +0800
+Message-Id: <20250201113422.107849-1-znscnchen@gmail.com>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20250201113207.107798-1-znscnchen@gmail.com>
 References: <20250201113207.107798-1-znscnchen@gmail.com>
@@ -93,32 +93,27 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Do not treat a vxlan_dev as used if the vxlan to be configured shares the
-same vni as an existing vxlan_dev but has a different unicast remote_ip.
-
-This enables multiple vxlan devices with distinct unicast remote_ips to be
-bound to a single vni.
+Update the comment to indicate that both ipv4/udp.c and ipv6/udp.c invoke
+vxlan_rcv() to process packets.
 
 Signed-off-by: Ted Chen <znscnchen@gmail.com>
 ---
- drivers/net/vxlan/vxlan_core.c | 4 ++++
- 1 file changed, 4 insertions(+)
+ drivers/net/vxlan/vxlan_core.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
 diff --git a/drivers/net/vxlan/vxlan_core.c b/drivers/net/vxlan/vxlan_core.c
-index 3ca74a97c44f..5ef40ac816cc 100644
+index 5ef40ac816cc..8bdf91d1fdfe 100644
 --- a/drivers/net/vxlan/vxlan_core.c
 +++ b/drivers/net/vxlan/vxlan_core.c
-@@ -3723,6 +3723,10 @@ int vxlan_vni_in_use(struct net *src_net, struct vxlan_dev *vxlan,
- 		} else if (tmp->cfg.vni != vni) {
- 			continue;
- 		}
-+		if (!vxlan_addr_any(&conf->remote_ip) &&
-+		    !vxlan_addr_multicast(&conf->remote_ip) &&
-+		    !vxlan_addr_equal(&tmp->cfg.remote_ip, &conf->remote_ip))
-+			continue;
- 		if (tmp->cfg.dst_port != conf->dst_port)
- 			continue;
- 		if ((tmp->cfg.flags & (VXLAN_F_RCV_FLAGS | VXLAN_F_IPV6)) !=
+@@ -1684,7 +1684,7 @@ static bool vxlan_ecn_decapsulate(struct vxlan_sock *vs, void *oiph,
+ 	return err <= 1;
+ }
+ 
+-/* Callback from net/ipv4/udp.c to receive packets */
++/* Callback from net/ipv{4,6}/udp.c to receive packets */
+ static int vxlan_rcv(struct sock *sk, struct sk_buff *skb)
+ {
+ 	struct vxlan_vni_node *vninode = NULL;
 -- 
 2.39.2
 
