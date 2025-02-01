@@ -1,56 +1,54 @@
-Return-Path: <netdev+bounces-161919-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-161920-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7F6AEA24A0C
-	for <lists+netdev@lfdr.de>; Sat,  1 Feb 2025 16:50:18 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 78FB0A24A19
+	for <lists+netdev@lfdr.de>; Sat,  1 Feb 2025 17:02:47 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 06357165049
-	for <lists+netdev@lfdr.de>; Sat,  1 Feb 2025 15:50:17 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id A2F427A1D63
+	for <lists+netdev@lfdr.de>; Sat,  1 Feb 2025 16:01:52 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 03C751ADC95;
-	Sat,  1 Feb 2025 15:50:15 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6A6BF374EA;
+	Sat,  1 Feb 2025 16:02:41 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="NH4dx4t5"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="mvAVsmys"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D2777182
-	for <netdev@vger.kernel.org>; Sat,  1 Feb 2025 15:50:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 45AA22F56
+	for <netdev@vger.kernel.org>; Sat,  1 Feb 2025 16:02:40 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1738425014; cv=none; b=jGyh1EPS94wC2NUe3S3sEAyDswHJGfniIz2mjplV1B8cPJATVSBKZV+k5HY2s8QGIs5DxSfbKGt0hm4k5V8zrTn5HJWBE9E8JYGueC7Oa7+ADxL1CQu3J5NrtVe8yjs9vnHhCtjmzC8RKYhte3PawBZCVoqTkTXnL8mT28oWrng=
+	t=1738425761; cv=none; b=kmh33vzvLmaVPM4mlW/wkbIoCKZIuOQnWjD3maDXg7GaliutN4vir2O+IlH14RyAhZuUF5tUqkjqTXmNJbltLQFr+paQKVC897nMEufYtr5SM5OWUWQAj5xTLBMzdKSXAxehaRHn9URhkUqOuPeKf2fY9dtFCR/msxwFmojYSbk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1738425014; c=relaxed/simple;
-	bh=11RCtfiqbETzLPUsjPrZEi/zD02gS98aKiTtDQQEStk=;
+	s=arc-20240116; t=1738425761; c=relaxed/simple;
+	bh=V6xwWefxYKrAr3urRl591ej3lm08zf4FcfQltiimysk=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Fbwt/5UAgOafvMQ7CjFXYblRdSPGLGsh3br2zvpqnR9iK8bnO7KlBECabXkZnospxjmk1lEFVlDtsYvhuwLD+ZY3I8NsLOBV6QvlthRjAkbi9oBwyYI4/nwAkS5c3jg/RkAFqPo9jCkvkNd6sEGCpWg0/8sc5lJfN1QPCgZyjUE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=NH4dx4t5; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1E014C4CEE0;
-	Sat,  1 Feb 2025 15:50:11 +0000 (UTC)
+	 Content-Type:Content-Disposition:In-Reply-To; b=DgpquUjj7d76y/1iARe7TaNxtGeL9BUdivEY0Cri2J+oNqOIWs1QUsZwJxT5U14a+qHY8tm2LexnZ8inMpRATosEMFpbdmNKKQidU4IWcLSslnOiiWfnOkjiYo4jAzUyiTtPIzvbkZDHJSXfJNKIoF+EMZyANEcrbT/OfWsnb6Q=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=mvAVsmys; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id E3F87C4CED3;
+	Sat,  1 Feb 2025 16:02:39 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1738425014;
-	bh=11RCtfiqbETzLPUsjPrZEi/zD02gS98aKiTtDQQEStk=;
+	s=k20201202; t=1738425760;
+	bh=V6xwWefxYKrAr3urRl591ej3lm08zf4FcfQltiimysk=;
 	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=NH4dx4t5O/zKKGpN3YtgR4cyClkVoc5gBILLBLVRotKR6A+P95/sSTwDSR56Srefb
-	 PMIeLzB0ygTP1RW8tNgItA3wtN5uQeptQqP1uSTQa30xkafkJr/ASi4YTIYJYPmmE4
-	 6AgG+Xm6DVBFAXbRMhaW7oQ5blXkWIl61HzhNHz0MkgYKWCtuid9Hd9Gjuo4og7plk
-	 bXvIRNkMb1Zs5BsiVq6G4Iy8SkDlZuIlgCMQoMXlN5Dee8F6xHFmdbPfZT/d1eAChn
-	 S85/lsdfLAWeMvi3wqa79fyXh7TUayYpTxValkC6uLeLu/KmVJ8RfU6p+SoqMOuLAi
-	 xbSveHdTNEkog==
-Date: Sat, 1 Feb 2025 15:50:09 +0000
+	b=mvAVsmysg8RFDj8JDRSkgCpMf5B2Cda66pCDcyPaJ8OCF1I5TD05SyMbE7CEHyLS1
+	 cyxUaKTXFxxe+ez9ip96QeXOxDG/aJ0i1+iNVss4NQSH9i0DiEvRHG9opGegTtsJKa
+	 sAzVsCi4ysCjXXfI7Lo5D1BBOO0ghsh4wYpE2902nqNky375HVsE0UDww/AvuMddOy
+	 ziqDHTcjomVoFIniXIv6/+OwZoaknHk3URJ3riKvDBsVJp+Pe6tUAF60Cs47vjmR4H
+	 OmvAM6DvcmFaHJS/OYngc1brHhG5q9oesWEDmpm1lZY/Nny3XlxnM/1FfCINDpeVXG
+	 2AnqOjrgzW3Wg==
+Date: Sat, 1 Feb 2025 16:02:37 +0000
 From: Simon Horman <horms@kernel.org>
-To: Lorenzo Bianconi <lorenzo@kernel.org>
-Cc: netdev@vger.kernel.org, andrew+netdev@lunn.ch, davem@davemloft.net,
-	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
-	nbd@nbd.name, sean.wang@mediatek.com, ansuelsmth@gmail.com,
-	upstream@airoha.com
-Subject: Re: Move airoha in a dedicated folder
-Message-ID: <20250201155009.GA211663@kernel.org>
-References: <Z54XRR9DE7MIc0Sk@lore-desk>
+To: Wojtek Wasko <wwasko@nvidia.com>
+Cc: netdev@vger.kernel.org, Richard Cochran <richardcochran@gmail.com>
+Subject: Re: [PATCH RFC net-next] ptp: Add file permission checks on PHC
+ chardevs
+Message-ID: <20250201160237.GB211663@kernel.org>
+References: <DM4PR12MB8558AB3C0DEA666EE334D8BCBEE82@DM4PR12MB8558.namprd12.prod.outlook.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -59,31 +57,50 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <Z54XRR9DE7MIc0Sk@lore-desk>
+In-Reply-To: <DM4PR12MB8558AB3C0DEA666EE334D8BCBEE82@DM4PR12MB8558.namprd12.prod.outlook.com>
 
-On Sat, Feb 01, 2025 at 01:44:53PM +0100, Lorenzo Bianconi wrote:
-> Hi all,
+On Fri, Jan 31, 2025 at 06:29:23PM +0000, Wojtek Wasko wrote:
+> Udev sets strict 600 permissions on /dev/ptp* devices, preventing
+> unprivileged users from accessing the time [1]. This patch enables
+> more granular permissions and allows readonly access to the PTP clocks.
 > 
-> Since more features are on the way for airoha_eth driver (support for flowtable
-> hw offloading, 10g phy support, ..), I was wondering if it is neater to move
-> the driver in a dedicated folder (e.g. drivers/net/ethernet/airoha or
-> drivers/net/ethernet/mediatek/airoha) or if you prefer to keep current
-> approach. Thanks.
+> Add permission checking for ioctls which modify the state of device.
+> Notably, require WRITE for polling as it is only used for later reading
+> timestamps from the queue (there is no peek support). POSIX clock
+> operations (settime, adjtime) are checked in the POSIX layer.
+> 
+> [1] https://lists.nwtime.org/sympa/arc/linuxptp-users/2024-01/msg00036.html
+> 
+> Signed-off-by: Wojtek Wasko <wwasko@nvidia.com>
 
-<2c>
+...
 
-Hi Lorenzo,
+> @@ -516,9 +554,15 @@ __poll_t ptp_poll(struct posix_clock_context *pccontext, struct file *fp,
+>  {
+>  	struct ptp_clock *ptp =
+>  		container_of(pccontext->clk, struct ptp_clock, clock);
+> +	struct ptp_private_ctxdata *ctxdata;
+>  	struct timestamp_event_queue *queue;
+>  
+> -	queue = pccontext->private_clkdata;
+> +	ctxdata = pccontext->private_clkdata;
+> +	if (!ctxdata)
+> +		return EPOLLERR;
+> +	if ((ctxdata->fmode & FMODE_WRITE) == 0)
+> +		return EACCES;
 
-There already seem drivers to be drivers under drivers/net/ethernet/mediatek/
-which are built from more than once .c file. So I think it is fine
-to leave Airoha's source there. But, OTOH, I do think it would
-be neater to move it into it's own directory. Which is to say,
-I for one am happy either way.
+Hi Wojtek,
 
-If you do chose to go for a new directory, I would suggest
-drivers/net/ethernet/mediatek/airoha assuming as it is a Mediatek device.
+This is not a full review, but rather, something to take into account
+if this idea goes forwards:
 
-</2c>
+The return type of this function is __poll_t, not int.
+So I think this should be EPOLLERR rather than EACCESS.
 
+> +	queue = ctxdata->queue;
+>  	if (!queue)
+>  		return EPOLLERR;
+>  
 
+...
 
