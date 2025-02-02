@@ -1,96 +1,71 @@
-Return-Path: <netdev+bounces-161953-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-161954-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5239BA24C69
-	for <lists+netdev@lfdr.de>; Sun,  2 Feb 2025 02:20:16 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 64B91A24C6E
+	for <lists+netdev@lfdr.de>; Sun,  2 Feb 2025 02:23:53 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id BD36B163424
-	for <lists+netdev@lfdr.de>; Sun,  2 Feb 2025 01:20:14 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 312E73A516A
+	for <lists+netdev@lfdr.de>; Sun,  2 Feb 2025 01:23:45 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 484BA3C3C;
-	Sun,  2 Feb 2025 01:20:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5CBCA4A04;
+	Sun,  2 Feb 2025 01:23:49 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Q9bJBS28"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="BN1yrBpd"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1E4F6380;
-	Sun,  2 Feb 2025 01:20:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 38752C8DF
+	for <netdev@vger.kernel.org>; Sun,  2 Feb 2025 01:23:48 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1738459212; cv=none; b=hClb+St9S2sQ6BZVsVxfDE3EC4p9cFKrZRbJ8O5RH7p+UP2NHyuoBt55+jvEu78w88eJyM2p7rifUxLDRkfdHZP9bJbRwj85KdV7Ake9cP/JO0nQFWQ2N1jA+l234NvL0f5qRKkwqi0Al3N1x2P2wFg+ax3xy1J5J/V92qvfSf0=
+	t=1738459429; cv=none; b=AJ8yPu5dM/ns68AALcZj5pVOsBSiIT3tP1MhdEe2xPJztad65YYnNzXZL0WdBLjyJimbKDj42DHaJGkLP9M9DF2qvdZ5GQfdyKw3rai4LU1xHnOj2qvRFLLSEDopnLAR5pjZG9U+a9W8awUzUz8+uEhsTRdpPMR3wkyS5wSyrW8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1738459212; c=relaxed/simple;
-	bh=GbcQEQpjuXezmd6s4Xjo3yFPd81uZdTBhnNerQvz48Q=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=D2DVFXo3bYiSvEzybSFQi65PJlJ4fmUlfU28W/4UCEaYnY6ulQwMtIgNfOxE0DuDF8jZfvNtyAHW8/1Xy5TrTViaYevBJEtrihqSK90+dgqeLnu4jJ2GODosUkHcOjErvJz+ybNOtXaAvBkSDnaj0Oehgo//U5UyEXCnq8DRSx8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Q9bJBS28; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7EEEFC4CED3;
-	Sun,  2 Feb 2025 01:20:11 +0000 (UTC)
+	s=arc-20240116; t=1738459429; c=relaxed/simple;
+	bh=udEJWriXwcSRj1qPpx/ReotmbK0PpEqHIItlFRjEND8=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=gNQOvlnsr6lH2eIX4vF0BGFcEGxe5H9Aon9p/vTUfZm5Pc+Qwh9LUX7sUv7Lh5v13qFbzK8e2POgqulcDo1OXLQG5dl/czq+J11OZ3pcGsOeY5kzIaQem0XQT4ZSTca1+uJ95vWOP9P3B5WhXLM5KUYHkwhT6AC0TkR87wfGoWA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=BN1yrBpd; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 45AFBC4CED3;
+	Sun,  2 Feb 2025 01:23:48 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1738459211;
-	bh=GbcQEQpjuXezmd6s4Xjo3yFPd81uZdTBhnNerQvz48Q=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=Q9bJBS28WSd7V59JcFvaUX6ewy+nlyTzOqnjYBsemLu9etJMvQJRyKwk4whYKvMBm
-	 qOAB12WdTlU3+8myRS0EEg8L3+xNGjjjM4XQbsadsbI224Fo+d0uU7dm1VJGa1qGpE
-	 5iq9lTUBw0hTfI+1rrPf5Enh35b1sNYStyrm7ADPzmsUDGLeHbL9EB3OMzIXyUenHr
-	 vyeJ/Dil9bw+93l9wGs37zYzXcX+egHWNMAPE4Io2B12rVTM4crY2d2sdzHFSNGGMq
-	 tpfOTJmpjFynCzfBN7Pua4HNHmsNTs2mpHtuKCKS1TbXQxO3lxd/8TElvv2YM6K48V
-	 6qVVzTG1M+2KA==
-Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 722F9380AA68;
-	Sun,  2 Feb 2025 01:20:39 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=k20201202; t=1738459428;
+	bh=udEJWriXwcSRj1qPpx/ReotmbK0PpEqHIItlFRjEND8=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=BN1yrBpdfqxOI1vAROI8mT7/Wqz0JQRIXd9084uPiLAKLDVkNzmr55KRQq6aqEnX4
+	 ME7VF9XTUdxuRCpYSXiHKZVbBb6o7QbDMEGjdD8SwJpfjDk/U5OBoMYDHw4/8mwwBD
+	 VY6nAHLabWmTqhfBChud5l2+0neLS0Jk3/xi/ysfmMt7nXGhAK9SgbgcJmSvUqdQrR
+	 sladMbJ+f4hiYJ98iplxx3IvdqvCkXCFV48xQuUteZ+1IokQXATCfKsNz++oaWmy0u
+	 1pqzlgkgE1ZzGIH8Iv0+8eT8P6Fz8urdMzDJZSHlr8y7Xvlv+4sZjvNB7dOzifReJb
+	 UxxFC1O8T/wFQ==
+Date: Sat, 1 Feb 2025 17:23:47 -0800
+From: Jakub Kicinski <kuba@kernel.org>
+To: Paolo Abeni <pabeni@redhat.com>
+Cc: netdev@vger.kernel.org, "David S. Miller" <davem@davemloft.net>, Eric
+ Dumazet <edumazet@google.com>, Simon Horman <horms@kernel.org>, Andrew Lunn
+ <andrew+netdev@lunn.ch>, Guillaume Nault <gnault@redhat.com>
+Subject: Re: [PATCH net] net: armonize tstats and dstats
+Message-ID: <20250201172347.75497656@kernel.org>
+In-Reply-To: <2e1c444cf0f63ae472baff29862c4c869be17031.1738432804.git.pabeni@redhat.com>
+References: <2e1c444cf0f63ae472baff29862c4c869be17031.1738432804.git.pabeni@redhat.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH] ice: Add check for devm_kzalloc()
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <173845923827.2030588.8008436658888569180.git-patchwork-notify@kernel.org>
-Date: Sun, 02 Feb 2025 01:20:38 +0000
-References: <20250131013832.24805-1-jiashengjiangcool@gmail.com>
-In-Reply-To: <20250131013832.24805-1-jiashengjiangcool@gmail.com>
-To: Jiasheng Jiang <jiashengjiangcool@gmail.com>
-Cc: anthony.l.nguyen@intel.com, przemyslaw.kitszel@intel.com,
- andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com,
- kuba@kernel.org, pabeni@redhat.com, michal.swiatkowski@linux.intel.com,
- horms@kernel.org, wojciech.drewek@intel.com, piotr.raczynski@intel.com,
- mateusz.polchlopek@intel.com, pawel.kaminski@intel.com,
- michal.wilczynski@intel.com, intel-wired-lan@lists.osuosl.org,
- netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-Hello:
+On Sat,  1 Feb 2025 19:02:51 +0100 Paolo Abeni wrote:
+> Subject: [PATCH net] net: armonize tstats and dstats
 
-This patch was applied to netdev/net.git (main)
-by Jakub Kicinski <kuba@kernel.org>:
+How very French of you :)
 
-On Fri, 31 Jan 2025 01:38:32 +0000 you wrote:
-> Add check for the return value of devm_kzalloc() to guarantee the success
-> of allocation.
-> 
-> Fixes: 42c2eb6b1f43 ("ice: Implement devlink-rate API")
-> Signed-off-by: Jiasheng Jiang <jiashengjiangcool@gmail.com>
-> ---
->  drivers/net/ethernet/intel/ice/devlink/devlink.c | 3 +++
->  1 file changed, 3 insertions(+)
+Code looks good:
 
-Here is the summary with links:
-  - ice: Add check for devm_kzalloc()
-    https://git.kernel.org/netdev/net/c/a8aa6a6ddce9
-
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
-
-
+Reviewed-by: Jakub Kicinski <kuba@kernel.org>
 
