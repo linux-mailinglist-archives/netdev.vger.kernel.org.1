@@ -1,46 +1,46 @@
-Return-Path: <netdev+bounces-161957-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-161958-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id EF36FA24C75
-	for <lists+netdev@lfdr.de>; Sun,  2 Feb 2025 02:47:48 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6C121A24C74
+	for <lists+netdev@lfdr.de>; Sun,  2 Feb 2025 02:47:46 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id C09207A23B0
-	for <lists+netdev@lfdr.de>; Sun,  2 Feb 2025 01:46:51 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 63DC618846B1
+	for <lists+netdev@lfdr.de>; Sun,  2 Feb 2025 01:47:50 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CFFE3182D7;
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DA9E51BC58;
 	Sun,  2 Feb 2025 01:47:33 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="p3lmYqYN"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="HZMQZNv2"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AA5E31798F
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B4C9017BD9
 	for <netdev@vger.kernel.org>; Sun,  2 Feb 2025 01:47:33 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1738460853; cv=none; b=A8hxjJgeqQEB29GJ2hB/lO8giO4i82LlFWPvbhpiOMqD/NV2EMUJFcsTSGQP1YilliqSnN9tmRVqUr5FrBpPa+enEa3vlDUH1DnK+jaURfbYDHsxJjBasNyFnjrnj6HU44Mx0gX5/3INABlhfN8A+hU/sSFQvdWrpv2vy/2C8No=
+	t=1738460853; cv=none; b=sunl11UBHACYzZ51hNOx/8ksmqlRPl2vJOJ0KcqTTegyoFyF2I6moKA+Xhkykx2wVj3q6J64Q0hKRZR1fw6EB6SIHiSEy9X1c1SQlRZV6mEbGFVLa/SjL6Uak2WzsWRf11aOQEK5dBeafdINbfDzDbep5vS+W1iIYFWLerQ45dg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1738460853; c=relaxed/simple;
-	bh=klOsCPM0XywMAWQwqPdFP0d84MqHXOAKVodnOpclkXo=;
+	bh=0h9Gx4ZQjJ/3BvRXsub7+BgKB+0TK8UXH1OpxmEvyxc=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=rLr/6RvWNXKxooyLl+Ej87jrfall4R4Vpf2Bd9l25xVV12aKV/09cEQo8fO57wsiLoo1o3tNjSSnRWbVrwiKFaq7kyFT2RZRM/8mN8423vdtU4FPKtDqP2lIwKUkH7vXNCvMlnXvZUD+q2J17o7gGwhy+adseAjCemSHAqDj1t4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=p3lmYqYN; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id BDEF4C4CEE1;
-	Sun,  2 Feb 2025 01:47:32 +0000 (UTC)
+	 MIME-Version; b=bCsQBoDFMl0z12avlepdtlPr473oS/d+7jTW6N6QlfBi67oXWRaRzJBY433SgHryPy3qGqwMWdKEaHgnTuJ/45mURBZmF5xbQDPsl2oKASyclPZs3hKcyxWI3h08zk8iLuVT5GMtTAIR1dfn1PxubN1YMasxV6cbWAL8AfRtKl4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=HZMQZNv2; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 40D1EC4CEE5;
+	Sun,  2 Feb 2025 01:47:33 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
 	s=k20201202; t=1738460853;
-	bh=klOsCPM0XywMAWQwqPdFP0d84MqHXOAKVodnOpclkXo=;
+	bh=0h9Gx4ZQjJ/3BvRXsub7+BgKB+0TK8UXH1OpxmEvyxc=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=p3lmYqYNwqy3g+jtlJQAv5eokxj2UFS7GgForwlnYuSUttyA1cRXsRlhAVl09gXzD
-	 bPK9unNkd6D8rBcQbMhsD+qBi//QKVhDY2iH/IVGzIDNKDZ8k7vvvt2eVMvJqHE87s
-	 dCEHCDQ07lsGDaA7iJpnAzkvTPpXiYsZeycA/4Ma2N431CLrotYjvPkBid6TPuSI1A
-	 SEoO1Em0LKHS1GKW5YZ0lhVUu+x1jkztmfe+stjO7kNL/26WuF5XnMvhsBb7RN+8jZ
-	 JB7X4pdFximvZHlwM4XwUyPuairaA1ZFq3irzezHFwT4+4Scmn8DHy1ajRXGu7t5kU
-	 CAR8BHir9GtWA==
+	b=HZMQZNv2nZCHkL7k5gMcMRh6/Zc6ufR/kmo+Qm8bR8vazSXBYdaIvQO6gk2U7rudR
+	 3OqbtQ5+eaLEsrU2VlWYn8olLbwyXzi4QlxZWPgOpaQ51bOV7gYK2M4GQ0jZTgesG+
+	 T5vvNC6EmQ4+bbluKNQ4q1bZGCggz+Fo8TIZSFjv/LlPeNIfaafzFfhbC20eDMg1rc
+	 HxcT8CyKRmBAKSTd7EiDTxGEC9BgJWIyAUmmgCTQSvTlqX1GL7SXGXcBNWS8KNxJWR
+	 wv5xMqlgK2A8+Lv5+xILNsznFQgnTnR0ZBaKxMv7x+bSBKXU23sadxmgjGdRk9UYA0
+	 hBL1ip3LIKtKA==
 From: Jakub Kicinski <kuba@kernel.org>
 To: davem@davemloft.net
 Cc: netdev@vger.kernel.org,
@@ -51,9 +51,9 @@ Cc: netdev@vger.kernel.org,
 	kuniyu@amazon.com,
 	willemb@google.com,
 	Jakub Kicinski <kuba@kernel.org>
-Subject: [PATCH net 2/3] MAINTAINERS: add a general entry for BSD sockets
-Date: Sat,  1 Feb 2025 17:47:27 -0800
-Message-ID: <20250202014728.1005003-3-kuba@kernel.org>
+Subject: [PATCH net 3/3] MAINTAINERS: add entry for UNIX sockets
+Date: Sat,  1 Feb 2025 17:47:28 -0800
+Message-ID: <20250202014728.1005003-4-kuba@kernel.org>
 X-Mailer: git-send-email 2.48.1
 In-Reply-To: <20250202014728.1005003-1-kuba@kernel.org>
 References: <20250202014728.1005003-1-kuba@kernel.org>
@@ -65,39 +65,30 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Create a MAINTAINERS entry for BSD sockets. List the top 3
-reviewers as maintainers. The entry is meant to cover core
-socket code (of which there isn't much) but also reviews
-of any new socket families.
+Add a MAINTAINERS entry for UNIX socket, Kuniyuki has been
+the de-facto maintainer of this code for a while.
 
 Signed-off-by: Jakub Kicinski <kuba@kernel.org>
 ---
- MAINTAINERS | 16 ++++++++++++++++
- 1 file changed, 16 insertions(+)
+ MAINTAINERS | 9 +++++++++
+ 1 file changed, 9 insertions(+)
 
 diff --git a/MAINTAINERS b/MAINTAINERS
-index dd5c59ec5126..f61a8815fd28 100644
+index f61a8815fd28..ce92c8a3e3ce 100644
 --- a/MAINTAINERS
 +++ b/MAINTAINERS
-@@ -16647,6 +16647,22 @@ F:	include/net/tls.h
- F:	include/uapi/linux/tls.h
- F:	net/tls/*
+@@ -16663,6 +16663,15 @@ F:	net/core/*sock*
+ F:	net/core/scm.c
+ F:	net/socket.c
  
-+NETWORKING [SOCKETS]
-+M:	Eric Dumazet <edumazet@google.com>
++NETWORKING [UNIX SOCKETS]
 +M:	Kuniyuki Iwashima <kuniyu@amazon.com>
-+M:	Paolo Abeni <pabeni@redhat.com>
-+M:	Willem de Bruijn <willemb@google.com>
 +S:	Maintained
-+F:	include/linux/sock_diag.h
-+F:	include/linux/socket.h
-+F:	include/linux/sockptr.h
-+F:	include/net/sock.h
-+F:	include/net/sock_reuseport.h
-+F:	include/uapi/linux/socket.h
-+F:	net/core/*sock*
-+F:	net/core/scm.c
-+F:	net/socket.c
++F:	include/net/af_unix.h
++F:	include/net/netns/unix.h
++F:	include/uapi/linux/unix_diag.h
++F:	net/unix/
++F:	tools/testing/selftests/net/af_unix/
 +
  NETXEN (1/10) GbE SUPPORT
  M:	Manish Chopra <manishc@marvell.com>
