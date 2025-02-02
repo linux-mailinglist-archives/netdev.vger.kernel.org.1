@@ -1,151 +1,236 @@
-Return-Path: <netdev+bounces-161989-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-161990-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6E078A24FF6
-	for <lists+netdev@lfdr.de>; Sun,  2 Feb 2025 21:36:28 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id BA28BA24FF7
+	for <lists+netdev@lfdr.de>; Sun,  2 Feb 2025 21:45:01 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 2F9CD7A20D9
-	for <lists+netdev@lfdr.de>; Sun,  2 Feb 2025 20:35:33 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 21C8E1883D1A
+	for <lists+netdev@lfdr.de>; Sun,  2 Feb 2025 20:45:06 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 60DBF20B7ED;
-	Sun,  2 Feb 2025 20:36:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3DEBF20B814;
+	Sun,  2 Feb 2025 20:44:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Pw1lMt8M"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ej1-f66.google.com (mail-ej1-f66.google.com [209.85.218.66])
+Received: from mail-wm1-f42.google.com (mail-wm1-f42.google.com [209.85.128.42])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7DB8520B1F1
-	for <netdev@vger.kernel.org>; Sun,  2 Feb 2025 20:36:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.66
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4BE1C8F6C;
+	Sun,  2 Feb 2025 20:44:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.42
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1738528582; cv=none; b=eUA/CisnjiQzlCv8tSIC1GSCasSqnMT3bRlsW58FmF4YembPCzKc4WkzVBYbyY6y3WuvkchNlD0z3yHdLrrJpGDl0VC6s9yA87dheIZrpy+FcaFLgFNzGv122ZZEZeK2EaNvvSZ1iZBUJX3xTPTEKyqpCEhKXPXudwACAXiceaY=
+	t=1738529097; cv=none; b=eXa8eYv31cNvh6DS7qKQu4J3bw+t3a85kdF/7mwpxX1I8H/lGVdxyoRtRiQE6Il5bb1e4uUFbw5czc80GYmMWtlzEqxLtIalGfUFBtKB8KW8PFCtjxOEjOO5CrBh/pNgKfmhZKJ80wChDMzGipzZkYGjg+M0CULCaGLXT2CygtU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1738528582; c=relaxed/simple;
-	bh=QRVRLCKOuixN2sLYq5KTaz7aZufE15XA6hB6itiejqw=;
-	h=Message-ID:Date:MIME-Version:Cc:Subject:To:References:From:
-	 In-Reply-To:Content-Type; b=co2Y/0vMIGeLD8pOTQftymFvPEfj9CUtpzKN0vrEO0bjlOaOgddS3HfZzgsWHNoo9oVIQ0ASA5k7R3aDxv+/QZG+8dNwqIVBGmAwDojfTbkE35da3vf/hYnIJbm6+83LzgMpmuE4xBR95txU4zbYE7RjXjIEVWyfXIAL3A0hFTo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ovn.org; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.218.66
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ovn.org
+	s=arc-20240116; t=1738529097; c=relaxed/simple;
+	bh=ByIT6O2MQ8AeBF3aaiyNh/HTBIpkXFi2GmOxu/ewkjI=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=CRjPqBK52iAfNAJ9toSlnA/XbbHL2+b7uyWkvr5BF2NVFp6sUWxStdoHw8NBPXYeMr3wiCqAMQJX8awB6j7S1rc5sxVMt2UtCM/xrVPEm9d0TVB44PXYk9YD3m3jkmt8g07nig4Ddj6QsPPcY3Ay0RX6n6k8F8vS2nPDTO0HqNE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Pw1lMt8M; arc=none smtp.client-ip=209.85.128.42
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ej1-f66.google.com with SMTP id a640c23a62f3a-ab69bba49e2so565765066b.2
-        for <netdev@vger.kernel.org>; Sun, 02 Feb 2025 12:36:20 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1738528579; x=1739133379;
-        h=content-transfer-encoding:in-reply-to:autocrypt:from
-         :content-language:references:to:subject:cc:user-agent:mime-version
-         :date:message-id:x-gm-message-state:from:to:cc:subject:date
+Received: by mail-wm1-f42.google.com with SMTP id 5b1f17b1804b1-436345cc17bso27501185e9.0;
+        Sun, 02 Feb 2025 12:44:54 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1738529093; x=1739133893; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:subject:cc:to:from:date:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=lQvSkq52LcoxZyVYnDtOJIbKYi2+MbFjfPMdh4lqNQw=;
-        b=KCxmj4K7JrwHw1bD3RAIeKWW1B6aP9gzaoDvqpL/V8gjWFn7O+2V5m6KaW6wm6pwal
-         han+OehFLOb96BH6m938f4+VcpZ5oX1OugrfWmADjfjIK2cF8LXj7d3UvBibpOYxhqKE
-         EmTv38PRkvVLSHklUwx1P3yxKsCF4m/mqOQH1uMS9WRYz2q6SWDdW63JmKnaGtRqo/EH
-         yzCecQ73Uj8Cm1xHZOVsuedYbeNptVZrE/gcbT0cnKVrH3pvO3X2rHXhyako86p6ep8r
-         F+wJlIx9V1YeCzxw/gDA1ah5mLdXD2waQ+gMMdLiUXmbMlYrjUFDxYmVKl03vYmtEDx3
-         6o2w==
-X-Forwarded-Encrypted: i=1; AJvYcCVZOCqMYALBXK036iSYKhM1bs6jTWoKJQQQxLqjXwxdz/QkZ/EIZKfERb1Rcpv9NY1k+UsuW48=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yyxuz0THb1W7i1irWILQ2axS8jwWYSJI3UxauKr4XGknW3fAe5v
-	ZzGkeeZz+MS80gYiLncB4zozSKG8rv/3jgzh1MEO6So8pwV2TLHB
-X-Gm-Gg: ASbGncugQTtdCgi4gm23rHjJcqG8JrXGfqTJ2XhCEYMkonr9I9SMHxAWdIWctZrIehg
-	91aMmUibumZBxc19LZ7Jxf/HPnGribZmoDB9obW4dMP9QDb3Kj9QtxfuwehDm8io9Ukf5ZB57uu
-	YUFqNMKZIgUTACDv1jEVT/psbT7iv4WdmGEqNBF4yCaXsbhRxxwcrXtCEMPT3Ytw8MBYdlz3YUi
-	7pRZO5vUA2Ov83zeD4NA/ZveW6I3srn5m523oX7IUuUODLFXSNo/xYMMmnPPH4h8sxoQOWDQ4s8
-	Al3scMm9EYgYq/k=
-X-Google-Smtp-Source: AGHT+IH/GlmiiK2Gl9eoe7kA7hCIEXtDWG+Pn7+U8V9Bjy7JSlFy4w2NkuLJDBK1rYQRP8KwK6KlWQ==
-X-Received: by 2002:a05:6402:c4d:b0:5dc:74fd:abf1 with SMTP id 4fb4d7f45d1cf-5dc74fdad3emr37140246a12.15.1738528578405;
-        Sun, 02 Feb 2025 12:36:18 -0800 (PST)
-Received: from [192.168.0.13] ([86.49.44.151])
-        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-ab6e4a310dbsm634261466b.133.2025.02.02.12.36.17
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Sun, 02 Feb 2025 12:36:18 -0800 (PST)
-Message-ID: <300e12d8-ea4a-441c-8906-9eaa63a1bb55@ovn.org>
-Date: Sun, 2 Feb 2025 21:36:17 +0100
+        bh=cbSx/ISaCz+L+0YMvLHQK84mnVS9XArcMwXBbJKLocA=;
+        b=Pw1lMt8MBAg/XEOr0QY98X3tsMAmix8xhZ5oyFJCYppt/p/o11hnE45ZZEABNv+Uas
+         e8IJfhmRFemZHAvo9Iii3dTd6s4HlYbeLh/aaTldO8gD5oyyeIBsDMG+m1v3fjOnPSGO
+         KwoIC35kKnnPrgPUpq1WPLsmuSARqp3HazTiDmn+emCeCrtHFacZJHKK+N6IxQJpLLob
+         tHXQzYIigCXfIGIkAUiD0KSd1TRFoSn3R8WQxsfhtPRzkJOSApjD6hbxxKhpT8t2T8Es
+         5Rgy7s+IKSJEBMPDQPuoSRO6m3nD0L1y4Yf7TglbgWgcpGh+CHI9k74DG6ykVxcg3Ktb
+         48kw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1738529093; x=1739133893;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:subject:cc:to:from:date:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=cbSx/ISaCz+L+0YMvLHQK84mnVS9XArcMwXBbJKLocA=;
+        b=RmrekS4elt9eknXVLo/ThCRR27p6ac+H6RynLMUpCdeHLg3/5VfCjDBFmkYOeIB3uL
+         c00748FLBKKXUsmx82u8ptzp4ensBm+qxX7jF8MhllHZXgdWquKlnF6TUwAXMaE56VwP
+         BCG2B2fo0H+lEyDMMmji3Mt2y174Qk6wDxLi9cugTKmZCGjTThCu9Wand2BSICz/twqx
+         1WWFSjl7aT5X1tFUKRDgAh7et3k1coCHVjwtm2PLv7b0IcqvjiR868qUv85YJIUgdlDE
+         ZGP1RdaPWibtGR+e+3HxXannXSz8Gn/BcfeNBVPlKRuAg/MMi7TxBxsqgeriRZyuf5sc
+         VlNw==
+X-Forwarded-Encrypted: i=1; AJvYcCUKQKyXRDnxFTBx2+2gTyHseATzwGLEULONvo40yWoRg1CHAss/MSb600Dy4eqsaphc9jhuM/Z/vt+dNOg=@vger.kernel.org, AJvYcCW7RaRiRv4/Q/zlyLu95a/3BEjAHmDbVL8nq9FXYoJna5t67NqBhBYW7H4QVh1EZXj6LJ9RXzz5@vger.kernel.org
+X-Gm-Message-State: AOJu0YyInnQF/hIhLRZypiFY78RfjNQTLzJL5zZRv3jr1ao3VfPWX1WR
+	ZCaojyyk/BjcW85d9ypj/aulbRMh9aH+hEUEC6Oy2aXkIVFBeBmc
+X-Gm-Gg: ASbGncuI63JaPJFbI7oYXJHb9nq2EAA68o7AoxsQeGF0Jvt77No3GDbh91TiRXuRipn
+	4XiEvnBBshNw5riY1Poq3MM4tHV3Lzv0szcks1Xo0P7cKZ/9r1P9O78cgjtdsrgAqLdt6jVpR5S
+	ZJ2lKAITLKmrhPjpfosgPXQHQOIPArQPiG4D2j2lWtobzhAgI3ioZ47HyrCvEj2Cp9USmTpW7qM
+	67yuo8x3DbK+e46x40qsDW6/Hc/a9k1pXgvIAQL3Q/+WphxMmre4sU3sWgwKgfcAdl79FL0+qUc
+	lAjSwPP4OrPT8cQJhHJ56FJ/XB/Y2AVHky+Dea0LCmekYVXDEf/H6Q==
+X-Google-Smtp-Source: AGHT+IHLsWh/YGpljPw48TJZyadtyPAWHtbeX9ie2f3Bzm4IzJqabYq5/PboSRajCtTjNtqAWvC6/w==
+X-Received: by 2002:a05:6000:1561:b0:38c:5b52:3a47 with SMTP id ffacd0b85a97d-38c5b523e1dmr9683706f8f.4.1738529093086;
+        Sun, 02 Feb 2025 12:44:53 -0800 (PST)
+Received: from pumpkin (82-69-66-36.dsl.in-addr.zen.co.uk. [82.69.66.36])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-38c5c1b595asm10875448f8f.66.2025.02.02.12.44.52
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sun, 02 Feb 2025 12:44:52 -0800 (PST)
+Date: Sun, 2 Feb 2025 20:44:49 +0000
+From: David Laight <david.laight.linux@gmail.com>
+To: Mateusz Guzik <mjguzik@gmail.com>
+Cc: Matthew Wilcox <willy@infradead.org>, ebiederm@xmission.com,
+ oleg@redhat.com, brauner@kernel.org, akpm@linux-foundation.org,
+ linux-mm@kvack.org, linux-kernel@vger.kernel.org, netdev@vger.kernel.org
+Subject: Re: [PATCH v3 6/6] pid: drop irq disablement around pidmap_lock
+Message-ID: <20250202204449.77cab5e5@pumpkin>
+In-Reply-To: <CAGudoHED5-oPqb62embitG39P1Rf7EtEVODY38WB25G21-GGyQ@mail.gmail.com>
+References: <20250201163106.28912-1-mjguzik@gmail.com>
+	<20250201163106.28912-7-mjguzik@gmail.com>
+	<20250201181933.07a3e7e2@pumpkin>
+	<CAGudoHFHzEQhkaJCB3z6qCfDtSRq+zZew3fDkAKG-AEjpMq8Nw@mail.gmail.com>
+	<20250201215105.55c0319a@pumpkin>
+	<Z56ZZpmAbRCIeI7D@casper.infradead.org>
+	<20250202135503.4e377fb0@pumpkin>
+	<CAGudoHED5-oPqb62embitG39P1Rf7EtEVODY38WB25G21-GGyQ@mail.gmail.com>
+X-Mailer: Claws Mail 4.1.1 (GTK 3.24.38; arm-unknown-linux-gnueabihf)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Cc: dev@openvswitch.org, netdev@vger.kernel.org, andrew+netdev@lunn.ch,
- edumazet@google.com, horms@kernel.org, pabeni@redhat.com, i.maximets@ovn.org
-Subject: Re: [ovs-dev] [PATCH net] MAINTAINERS: list openvswitch docs under
- its entry
-To: Jakub Kicinski <kuba@kernel.org>, davem@davemloft.net
-References: <20250202005024.964262-1-kuba@kernel.org>
-Content-Language: en-US
-From: Ilya Maximets <i.maximets@ovn.org>
-Autocrypt: addr=i.maximets@ovn.org; keydata=
- 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
-In-Reply-To: <20250202005024.964262-1-kuba@kernel.org>
 Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: quoted-printable
 
-On 2/2/25 01:50, Jakub Kicinski via dev wrote:
-> Submissions to the docs seem to not get properly CCed.
-> 
-> Signed-off-by: Jakub Kicinski <kuba@kernel.org>
-> ---
-> CC: pshelar@ovn.org
-> CC: dev@openvswitch.org
-> ---
->  MAINTAINERS | 1 +
->  1 file changed, 1 insertion(+)
-> 
-> diff --git a/MAINTAINERS b/MAINTAINERS
-> index 5d7ac4dcf489..80df771df15a 100644
-> --- a/MAINTAINERS
-> +++ b/MAINTAINERS
-> @@ -17708,6 +17708,7 @@ L:	netdev@vger.kernel.org
->  L:	dev@openvswitch.org
->  S:	Maintained
->  W:	http://openvswitch.org
-> +F:	Documentation/networking/openvswitch.rst
->  F:	include/uapi/linux/openvswitch.h
->  F:	net/openvswitch/
->  F:	tools/testing/selftests/net/openvswitch/
+On Sun, 2 Feb 2025 20:34:48 +0100
+Mateusz Guzik <mjguzik@gmail.com> wrote:
 
-Acked-by: Ilya Maximets <i.maximets@ovn.org>
+> On Sun, Feb 2, 2025 at 2:55=E2=80=AFPM David Laight
+> <david.laight.linux@gmail.com> wrote:
+> >
+> > On Sat, 1 Feb 2025 22:00:06 +0000
+> > Matthew Wilcox <willy@infradead.org> wrote:
+> > =20
+> > > On Sat, Feb 01, 2025 at 09:51:05PM +0000, David Laight wrote: =20
+> > > > I'm not sure what you mean.
+> > > > Disabling interrupts isn't as cheap as it ought to be, but probably=
+ isn't
+> > > > that bad. =20
+> > >
+> > > Time it.  You'll see. =20
+> >
+> > The best scheme I've seen is to just increment a per-cpu value.
+> > Let the interrupt happen, notice it isn't allowed and return with
+> > interrupts disabled.
+> > Then re-issue the interrupt when the count is decremented to zero.
+> > Easy with level sensitive interrupts.
+> > But I don't think Linux ever uses that scheme.
+> > =20
+>=20
+> I presume you are talking about the splhigh/splx set of primivitives
+> from Unix kernels.
+>=20
+> While "entering" is indeed cheap, undoing the work still needs to be
+> atomic vs interrupts.
+>=20
+> I see NetBSD uses local cmpxchg8b on the interrupt level and interrupt
+> mask, while the rest takes the irq trip.
+>=20
+> The NetBSD solution is still going to be visibly slower than not
+> messing with any of it as spin_unlock on amd64 is merely a store of 0
+> and cmpxchg even without the lock prefix costs several clocks.
+>=20
+> Maybe there is other hackery which could be done, but see below.
+
+I was thinking it might be possible to merge an 'interrupts disabled' count
+with the existing 'pre-emption disabled' count.
+IIRC (on x86 at least) this is just a per-cpu variabled accessed from %fs/%=
+gs.
+So you add one to disable pre-emption and (say) 1<<16 to disable interrupts.
+If an interrupt happens while the count is 'big' the count value is changed
+so the last decrement of 1<<16 will set carry (or overflow), and a return
+from interrupt is done that leaves interrupts disabled (traditionally easy).
+The interrupt enable call just subtracts the 1<<16 and checks for carry (or
+overflow), if not set all is fine, it set it needs to call something to
+re-issue the interrupt - that is probably the hard bit.
+
+>=20
+> > =20
+> > > > > So while this is indeed a tradeoff, as I understand the sane defa=
+ult
+> > > > > is to *not* disable interrupts unless necessary. =20
+> > > >
+> > > > I bet to differ. =20
+> > >
+> > > You're wrong.  It is utterly standard to take spinlocks without
+> > > disabling IRQs.  We do it all over the kernel.  If you think that nee=
+ds
+> > > to change, then make your case, don't throw a driveby review.
+> > >
+> > > And I don't mean by arguing.  Make a change, measure the difference. =
+=20
+> >
+> > The analysis was done on some userspace code that basically does:
+> >         for (;;) {
+> >                 pthread_mutex_enter(lock);
+> >                 item =3D get_head(list);
+> >                 if (!item)
+> >                         break;
+> >                 pthead_mutex_exit(lock);
+> >                 process(item);
+> >         }
+> > For the test there were about 10000 items on the list and 30 threads
+> > processing it (that was the target of the tests).
+> > The entire list needs to be processed in 10ms (RTP audio).
+> > There was a bit more code with the mutex held, but only 100 or so
+> > instructions.
+> > Mostly it works fine, some threads get delayed by interrupts (etc) but
+> > the other threads carry on working and all the items get processed.
+> >
+> > However sometimes an interrupt happens while the mutex is held.
+> > In that case the other 29 threads get stuck waiting for the mutex.
+> > No progress is made until the interrupt completes and it overruns
+> > the 10ms period.
+> >
+> > While this is a userspace test, the same thing will happen with
+> > spin locks in the kernel.
+> >
+> > In userspace you can't disable interrupts, but for kernel spinlocks
+> > you can.
+> >
+> > The problem is likely to show up as unexpected latency affecting
+> > code with a hot mutex that is only held for short periods while
+> > running a lot of network traffic.
+> > That is also latency that affects all cpu at the same time.
+> > The interrupt itself will always cause latency to one cpu.
+> > =20
+>=20
+> Nobody is denying there is potential that lock hold time will get
+> significantly extended if you get unlucky enough vs interrupts. It is
+> questioned whether defaulting to irqs off around lock-protected areas
+> is the right call.
+
+I really commented because you were changing one lock which could
+easily be 'hot' enough for there to be side effects, without even
+a comment about any pitfalls.
+
+	David
+
+>=20
+> As I noted in my previous e-mail the spin_lock_irq stuff disables
+> interrupts upfront and does not touch them afterwards even when
+> waiting for the lock to become free. Patching that up with queued
+> locks may be non-trivial, if at all possible. Thus contention on
+> irq-disabled locks *will* add latency to their handling unless this
+> gets addressed. Note maintaining forward progress guarantee in the
+> locking mechanism is non-negotiable, so punting to TAS or similar
+> unfair locks does not cut it.
+>=20
+> This is on top of having to solve the overhead problem for taking the
+> trips (see earlier in the e-mail).
+>=20
+> I would argue if the network stuff specifically is known to add
+> visible latency, then perhaps that's something to investigate.
+>=20
+> Anyhow, as Willy said, you are welcome to code this up and demonstrate
+> it is better overall.
+>=20
+
 
