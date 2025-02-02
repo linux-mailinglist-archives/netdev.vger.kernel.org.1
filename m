@@ -1,92 +1,89 @@
-Return-Path: <netdev+bounces-161975-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-161976-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 273BDA24DB2
-	for <lists+netdev@lfdr.de>; Sun,  2 Feb 2025 12:44:47 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id E9BF4A24DB3
+	for <lists+netdev@lfdr.de>; Sun,  2 Feb 2025 12:56:47 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A507B163EC7
-	for <lists+netdev@lfdr.de>; Sun,  2 Feb 2025 11:44:45 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 54F5C1629E0
+	for <lists+netdev@lfdr.de>; Sun,  2 Feb 2025 11:56:46 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B992D1D54F2;
-	Sun,  2 Feb 2025 11:44:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3C8921D63CA;
+	Sun,  2 Feb 2025 11:56:44 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="gbVTU8FO"
+	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="p+O613uu"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from fhigh-b1-smtp.messagingengine.com (fhigh-b1-smtp.messagingengine.com [202.12.124.152])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D9DC01CAA80
-	for <netdev@vger.kernel.org>; Sun,  2 Feb 2025 11:44:41 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3389B1D5154
+	for <netdev@vger.kernel.org>; Sun,  2 Feb 2025 11:56:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=202.12.124.152
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1738496683; cv=none; b=li0G7cpkvN+ZwQ9rflJGYNKBcOi4Zzg0ubOWNfDKqaZjKSGiWjlo9i9BuPLAjKUueXRheA24bdGURs1fc2qpnLv9lMkUJJY4e6Xp0s2fDdOzi4qvicbDQbtvXcfmlakGYNoCw64kw6NoXwmwFk5FaQ2sHS2IBWrTxnkNz6JuDfI=
+	t=1738497404; cv=none; b=Td//6VtWTIcL1tTya6rg5AxUZwQEkJK4f/WiF8xPRcei/tUiofPe+3c8WDNb5Tzs+3xxf9S0kEOZ02Rrra39fxjAzPsacdQvztVWWtOCNk9JpoF4hhBHk1wSO63wsFPbxEnBSskEdBXcMJq5GwzDW8o32IogQCQ9MQSRH6R2irs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1738496683; c=relaxed/simple;
-	bh=oNeH9BdwbwyfhWKyj5b/JxTnO936ekgZaV6nswU0e1A=;
+	s=arc-20240116; t=1738497404; c=relaxed/simple;
+	bh=fRIUKn7OrTqxa7o+dvQk15KIpG2ZEFeu6muH7LJrp34=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=PeOs/vYT2R+eXkep/L/MPr4SJHvIcgGkimcukphYuHaohJy5c2ervHyWeA37Rjwt4nR++qujJ1WzsMnCinGOf+yIYUHdL3jhmJYgoEQXjQQeteDV72iaGETWcAN9osc9DY0TxC4WP8vhj8mmasCOm2E+XzMJncZujmmrIuIdcEU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=gbVTU8FO; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1738496680;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=oNeH9BdwbwyfhWKyj5b/JxTnO936ekgZaV6nswU0e1A=;
-	b=gbVTU8FOwHmVSYbFNRDCia7/yVML4Jk54k++wXY9LQi1pKkJRYLWYHeC08MbZNuEyLxtfu
-	KyBP8jxEKKK5vgR2a02D0fkT19uZEQ0+Q6BVjpeNShZetSNCD8TJRxrkU5NHriPYprZMXc
-	HY8yJonnuU7b3BIsYF7YxGxjBIttJh0=
-Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
- [209.85.128.70]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-15-QPqWZDwEOuiWgjQ5wnljvw-1; Sun, 02 Feb 2025 06:44:39 -0500
-X-MC-Unique: QPqWZDwEOuiWgjQ5wnljvw-1
-X-Mimecast-MFC-AGG-ID: QPqWZDwEOuiWgjQ5wnljvw
-Received: by mail-wm1-f70.google.com with SMTP id 5b1f17b1804b1-43621907030so29687935e9.1
-        for <netdev@vger.kernel.org>; Sun, 02 Feb 2025 03:44:39 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1738496678; x=1739101478;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=oNeH9BdwbwyfhWKyj5b/JxTnO936ekgZaV6nswU0e1A=;
-        b=MthsED/TIelYBE0YnCvJCrVh/kTBFiYFO3BMYDkxArL2NwVsFyib6JOWbv26R1O5mK
-         P2UmuJk/WKldobUEuwac8pq8ZP8tYw5zv94ffpNyz6eeHAc3NyeEJihMUBolck1+7OHw
-         tvr8XsNvuoaopG7DiAk0LczHLCdDnZw3f6DAZCCEHS8XSCTJFLho/izSNBkIi8MbdU0h
-         T3R2Hu8rS08pcUUzyHC2TxLi74Cruw8B71tmDU8eXJKe5GaBQ6idBABPnOqKaq2ySaXJ
-         WtVbbMtSGbrO58RxW69wNiyecXJ9gN9muKvNxfg93NT9C0UMt8xm+7b/ZVIdAlOvRL6T
-         r2WA==
-X-Gm-Message-State: AOJu0Yy0rPxExcOvOVa+j/9eZwaaTFw9em5CnLkffz2ck8wgrhB6oiV5
-	Fk1+YgokrvNMkPd5yCZEQifIZOF8wIqxHUCmsVbAl446OJU/tp5S84I4LJLTGuVXqkuuPneuOf8
-	jKGwJrAlfjXIMSNwb5Jy4hCdBMOza79lLLaS2mEMFCdSE3WKIXXmcOw==
-X-Gm-Gg: ASbGncv4bpix0qJ1JEwGF9gfmTKAG78dDkarbu6qDKoj3dDqL/4tylblpvurm0UIvDW
-	NKbbvk8L1CwCeyFAgC8E2MVWSKCg/dNJV1dUKevnJaAX4tHTf/vbxFsTxjgd3KwwZft8KInFsS8
-	XZJccZvNI4NvFIWBxZ214Pc1PtlR3bTy3P23Cbs/O2/pUsMCTQZ30dLSJCBSbtRVGqYIqkOfxiM
-	mi0u0R/hPtdZYFOAwQmX0BDcunJu9nBZu6VVVPmXcFodOQlGUpxvgN0NsSmELie4W6y/d+PK1nH
-	MWFFeIxfgGLeZ+7oMoE/B6fQByQJ5s33GKK8EDae+yq+ZuRLJ0oKV/5eTEQ=
-X-Received: by 2002:a05:600c:3b94:b0:434:ff45:cbbe with SMTP id 5b1f17b1804b1-438dc3cba35mr182492865e9.18.1738496678254;
-        Sun, 02 Feb 2025 03:44:38 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IHA1ZKj1nM5l+HK36Zn3sb3iqwRBnWFG5TnhWMwEi3I75R/qAJ33U44j4ipao7uJcW1pE1g7g==
-X-Received: by 2002:a05:600c:3b94:b0:434:ff45:cbbe with SMTP id 5b1f17b1804b1-438dc3cba35mr182492705e9.18.1738496677912;
-        Sun, 02 Feb 2025 03:44:37 -0800 (PST)
-Received: from debian (2a01cb058d23d6007ef1b63f0704f0b4.ipv6.abo.wanadoo.fr. [2a01:cb05:8d23:d600:7ef1:b63f:704:f0b4])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-438e23deedfsm119111425e9.16.2025.02.02.03.44.36
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sun, 02 Feb 2025 03:44:37 -0800 (PST)
-Date: Sun, 2 Feb 2025 12:44:35 +0100
-From: Guillaume Nault <gnault@redhat.com>
-To: Paolo Abeni <pabeni@redhat.com>
-Cc: netdev@vger.kernel.org, "David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Simon Horman <horms@kernel.org>,
-	Andrew Lunn <andrew+netdev@lunn.ch>
-Subject: Re: [PATCH net] net: armonize tstats and dstats
-Message-ID: <Z59ao8xud3Fw90ad@debian>
-References: <2e1c444cf0f63ae472baff29862c4c869be17031.1738432804.git.pabeni@redhat.com>
+	 Content-Type:Content-Disposition:In-Reply-To; b=cx0s+VUpXT0fphNhFGhcj0LBu0exRM5p5ILOAjnEqjxsyTHdMHIr336STXs8d8jRuvozGM3Xf3SXN7/nUGu0nDT6T+5LYeoS4DPnqF7PCVFHcUjExDAwpctjzjF3f6/rhuPsZ8Zrs88+RV6KkamsqPPpgUc7AR1Q0dOzXCmQrPg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=idosch.org; spf=none smtp.mailfrom=idosch.org; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=p+O613uu; arc=none smtp.client-ip=202.12.124.152
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=idosch.org
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=idosch.org
+Received: from phl-compute-01.internal (phl-compute-01.phl.internal [10.202.2.41])
+	by mailfhigh.stl.internal (Postfix) with ESMTP id C6E0825400D6;
+	Sun,  2 Feb 2025 06:56:40 -0500 (EST)
+Received: from phl-mailfrontend-01 ([10.202.2.162])
+  by phl-compute-01.internal (MEProxy); Sun, 02 Feb 2025 06:56:41 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
+	messagingengine.com; h=cc:cc:content-type:content-type:date:date
+	:feedback-id:feedback-id:from:from:in-reply-to:in-reply-to
+	:message-id:mime-version:references:reply-to:subject:subject:to
+	:to:x-me-proxy:x-me-sender:x-me-sender:x-sasl-enc; s=fm3; t=
+	1738497400; x=1738583800; bh=SWR9Td9xl2hHBybqQqYI9NIWC64LXbAh4sV
+	trWv8gd4=; b=p+O613uu8Kv2JR5eKxiFlWWn/gEBXXAUgk1mYtODngi/8PG7E9d
+	OXghtknaDDhPWpZqwqO2LY0zOWD6kZnL1n2m3yAa2r1/a/NwDJuwrSmYc5UUXx0N
+	PhhuIStL3WtJ/8voMBdvcdrluybqdTi3w1rkl7Yr1D9plVFvVIBX+dzQV+q/5lFq
+	n7TxgmElSGmAq2A806AQa37N4GybZIKDSvUfi6Ds0ncaUZ67LyFrCtMr1IISMpKb
+	k4ccbQei7QtqnUAkwwhjCOkcgYKT3A9k5TxYqjhfzqIDf0yOi3qFNxKe3dgE7mCl
+	Hl21WX+CVNJQgHn5KHunSi3o4FD+fwHTprQ==
+X-ME-Sender: <xms:eF2fZ3_z_vt8kuydbYyWnoIDDKIPgICO2XmPDsUxl29yqUlB8uuGvA>
+    <xme:eF2fZzvjWz11u7qoRspoMbK5SRlNCZs1p_yu07vhVd7sDBSzZDxUmIvGvcvU_fzRj
+    rdU7vWh7oL0LPA>
+X-ME-Received: <xmr:eF2fZ1AaC0ok1-S7XO_c4NyisXXXl3-b7V7tauFmAM6x7vghMSX6RYKnVDLDMBVFUNq97JniNDlPTRRkzMsPePN9MOWkVg>
+X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeefvddrtddtgddugeeiudcutefuodetggdotefrod
+    ftvfcurfhrohhfihhlvgemucfhrghsthforghilhdpggftfghnshhusghstghrihgsvgdp
+    uffrtefokffrpgfnqfghnecuuegrihhlohhuthemuceftddtnecusecvtfgvtghiphhivg
+    hnthhsucdlqddutddtmdenucfjughrpeffhffvvefukfhfgggtuggjsehttdertddttddv
+    necuhfhrohhmpefkughoucfutghhihhmmhgvlhcuoehiughoshgthhesihguohhstghhrd
+    horhhgqeenucggtffrrghtthgvrhhnpedvudefveekheeugeeftddvveefgfduieefudei
+    fefgleekheegleegjeejgeeghfenucevlhhushhtvghrufhiiigvpedtnecurfgrrhgrmh
+    epmhgrihhlfhhrohhmpehiughoshgthhesihguohhstghhrdhorhhgpdhnsggprhgtphht
+    thhopeejpdhmohguvgepshhmthhpohhuthdprhgtphhtthhopeiinhhstghntghhvghnse
+    hgmhgrihhlrdgtohhmpdhrtghpthhtohepuggrvhgvmhesuggrvhgvmhhlohhfthdrnhgv
+    thdprhgtphhtthhopegvughumhgriigvthesghhoohhglhgvrdgtohhmpdhrtghpthhtoh
+    epkhhusggrsehkvghrnhgvlhdrohhrghdprhgtphhtthhopehprggsvghnihesrhgvughh
+    rghtrdgtohhmpdhrtghpthhtoheprghnughrvgifodhnvghtuggvvheslhhunhhnrdgthh
+    dprhgtphhtthhopehnvghtuggvvhesvhhgvghrrdhkvghrnhgvlhdrohhrgh
+X-ME-Proxy: <xmx:eF2fZzeAAWf_jvfldOU82o8LtL2lQx1jRyrBd7nmGP91aExHV5NXrA>
+    <xmx:eF2fZ8PFzFWaoKsvvPxHFyew3vdXABkp_gtvv-jiP6ULRh84CZLO4g>
+    <xmx:eF2fZ1kCiGwc-GBJmfUe94fyns66BInWPwyEMj2WqAF4-ovdfVLI0w>
+    <xmx:eF2fZ2uHrjKwFSxp2wTXrWmvYgA9Sla3LwAk9TVcY5uP54sNig3D9Q>
+    <xmx:eF2fZ4A2nJrIZSQp0gE7dCjYQD62Js5mJywY8_YYHR8cvRcbmvX1jQG0>
+Feedback-ID: i494840e7:Fastmail
+Received: by mail.messagingengine.com (Postfix) with ESMTPA; Sun,
+ 2 Feb 2025 06:56:39 -0500 (EST)
+Date: Sun, 2 Feb 2025 13:56:36 +0200
+From: Ido Schimmel <idosch@idosch.org>
+To: Ted Chen <znscnchen@gmail.com>
+Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+	pabeni@redhat.com, andrew+netdev@lunn.ch, netdev@vger.kernel.org
+Subject: Re: [PATCH RFC net-next 1/3] vxlan: vxlan_vs_find_vni(): Find
+ vxlan_dev according to vni and remote_ip
+Message-ID: <Z59ddOmNCCIlFwm9@shredder>
+References: <20250201113207.107798-1-znscnchen@gmail.com>
+ <20250201113400.107815-1-znscnchen@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -95,15 +92,129 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <2e1c444cf0f63ae472baff29862c4c869be17031.1738432804.git.pabeni@redhat.com>
+In-Reply-To: <20250201113400.107815-1-znscnchen@gmail.com>
 
-On Sat, Feb 01, 2025 at 07:02:51PM +0100, Paolo Abeni wrote:
-> Address the issue ensuring the same binary layout for the overlapping
-> fields of dstats and tstats. While this solution is a bit hackish, is
-> smaller and with no performance pitfall compared to other alternatives
-> i.e. supporting both dstat and tstat in iptunnel_xmit_stats() or
-> reverting the blamed commit.
+On Sat, Feb 01, 2025 at 07:34:00PM +0800, Ted Chen wrote:
+> vxlan_vs_find_vni() currently searches the vni hash table in a vs and
+> returns a vxlan_dev associated with the specified "vni". While this works
+> when the remote_ips are stored in the vxlan fdb, it fails to handle the
+> case where the remote_ip is just configured in the vxlan device outside of
+> the vxlan fdb, because multiple vxlan devices with different remote_ip may
+> share a single vni when the remote_ip is configured in the vxlan device
+> (i.e., not stored in the vxlan fdb). In that case, further check of
+> remote_ip to identify vxlan_dev more precisely.
+> 
+> Signed-off-by: Ted Chen <znscnchen@gmail.com>
+> ---
+>  drivers/net/vxlan/vxlan_core.c | 32 ++++++++++++++++++++++++++------
+>  1 file changed, 26 insertions(+), 6 deletions(-)
+> 
+> diff --git a/drivers/net/vxlan/vxlan_core.c b/drivers/net/vxlan/vxlan_core.c
+> index 05c10acb2a57..3ca74a97c44f 100644
+> --- a/drivers/net/vxlan/vxlan_core.c
+> +++ b/drivers/net/vxlan/vxlan_core.c
+> @@ -94,8 +94,10 @@ static struct vxlan_sock *vxlan_find_sock(struct net *net, sa_family_t family,
+>  
+>  static struct vxlan_dev *vxlan_vs_find_vni(struct vxlan_sock *vs,
+>  					   int ifindex, __be32 vni,
+> +					   const struct sk_buff *skb,
+>  					   struct vxlan_vni_node **vninode)
+>  {
+> +	union vxlan_addr saddr;
+>  	struct vxlan_vni_node *vnode;
+>  	struct vxlan_dev_node *node;
+>  
+> @@ -116,14 +118,31 @@ static struct vxlan_dev *vxlan_vs_find_vni(struct vxlan_sock *vs,
+>  			continue;
+>  		}
+>  
+> -		if (IS_ENABLED(CONFIG_IPV6)) {
+> -			const struct vxlan_config *cfg = &node->vxlan->cfg;
+> +		const struct vxlan_config *cfg = &node->vxlan->cfg;
+>  
+> +		if (IS_ENABLED(CONFIG_IPV6)) {
+>  			if ((cfg->flags & VXLAN_F_IPV6_LINKLOCAL) &&
+>  			    cfg->remote_ifindex != ifindex)
+>  				continue;
+>  		}
+>  
+> +		if (vni && !vxlan_addr_any(&cfg->remote_ip) &&
+> +		    !vxlan_addr_multicast(&cfg->remote_ip)) {
+> +			/* Get address from the outer IP header */
+> +			if (vxlan_get_sk_family(vs) == AF_INET) {
+> +				saddr.sin.sin_addr.s_addr = ip_hdr(skb)->saddr;
+> +				saddr.sa.sa_family = AF_INET;
+> +#if IS_ENABLED(CONFIG_IPV6)
+> +			} else {
+> +				saddr.sin6.sin6_addr = ipv6_hdr(skb)->saddr;
+> +				saddr.sa.sa_family = AF_INET6;
+> +#endif
+> +			}
+> +
+> +			if (!vxlan_addr_equal(&cfg->remote_ip, &saddr))
+> +				continue;
 
-Reviewed-by: Guillaume Nault <gnault@redhat.com>
+This breaks existing behavior. Before this patch, a VXLAN device with a
+remote address could receive traffic from any VTEP (in the same
+broadcast domain).
 
+I think this patch misinterprets the "remote" keyword as P2P when it is
+not the case. It is merely the VTEP to which packets are sent when no
+other VTEP was found in the FDB. A VXLAN device that was configured with
+the "remote" keyword can still send packets to other VTEPs and it should
+therefore be able to receive packets from them.
+
+> +		}
+> +
+>  		if (vninode)
+>  			*vninode = vnode;
+>  		return node->vxlan;
+> @@ -134,6 +153,7 @@ static struct vxlan_dev *vxlan_vs_find_vni(struct vxlan_sock *vs,
+>  
+>  /* Look up VNI in a per net namespace table */
+>  static struct vxlan_dev *vxlan_find_vni(struct net *net, int ifindex,
+> +					const struct sk_buff *skb,
+>  					__be32 vni, sa_family_t family,
+>  					__be16 port, u32 flags)
+>  {
+> @@ -143,7 +163,7 @@ static struct vxlan_dev *vxlan_find_vni(struct net *net, int ifindex,
+>  	if (!vs)
+>  		return NULL;
+>  
+> -	return vxlan_vs_find_vni(vs, ifindex, vni, NULL);
+> +	return vxlan_vs_find_vni(vs, ifindex, vni, skb, NULL);
+>  }
+>  
+>  /* Fill in neighbour message in skbuff. */
+> @@ -1701,7 +1721,7 @@ static int vxlan_rcv(struct sock *sk, struct sk_buff *skb)
+>  
+>  	vni = vxlan_vni(vh->vx_vni);
+>  
+> -	vxlan = vxlan_vs_find_vni(vs, skb->dev->ifindex, vni, &vninode);
+> +	vxlan = vxlan_vs_find_vni(vs, skb->dev->ifindex, vni, skb, &vninode);
+>  	if (!vxlan) {
+>  		reason = SKB_DROP_REASON_VXLAN_VNI_NOT_FOUND;
+>  		goto drop;
+> @@ -1855,7 +1875,7 @@ static int vxlan_err_lookup(struct sock *sk, struct sk_buff *skb)
+>  		return -ENOENT;
+>  
+>  	vni = vxlan_vni(hdr->vx_vni);
+> -	vxlan = vxlan_vs_find_vni(vs, skb->dev->ifindex, vni, NULL);
+> +	vxlan = vxlan_vs_find_vni(vs, skb->dev->ifindex, vni, skb, NULL);
+>  	if (!vxlan)
+>  		return -ENOENT;
+>  
+> @@ -2330,7 +2350,7 @@ static int encap_bypass_if_local(struct sk_buff *skb, struct net_device *dev,
+>  		struct vxlan_dev *dst_vxlan;
+>  
+>  		dst_release(dst);
+> -		dst_vxlan = vxlan_find_vni(vxlan->net, dst_ifindex, vni,
+> +		dst_vxlan = vxlan_find_vni(vxlan->net, dst_ifindex, skb, vni,
+>  					   addr_family, dst_port,
+>  					   vxlan->cfg.flags);
+>  		if (!dst_vxlan) {
+> -- 
+> 2.39.2
+> 
+> 
 
