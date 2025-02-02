@@ -1,296 +1,170 @@
-Return-Path: <netdev+bounces-161978-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-161979-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id D3D23A24E52
-	for <lists+netdev@lfdr.de>; Sun,  2 Feb 2025 14:40:46 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 03612A24E6E
+	for <lists+netdev@lfdr.de>; Sun,  2 Feb 2025 14:55:12 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 8389D3A3608
-	for <lists+netdev@lfdr.de>; Sun,  2 Feb 2025 13:40:38 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 826AE18865D5
+	for <lists+netdev@lfdr.de>; Sun,  2 Feb 2025 13:55:16 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D73421DA632;
-	Sun,  2 Feb 2025 13:40:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8E1A71F4271;
+	Sun,  2 Feb 2025 13:55:08 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="Wt1PGGen"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="AAwfEIpl"
 X-Original-To: netdev@vger.kernel.org
-Received: from fhigh-b2-smtp.messagingengine.com (fhigh-b2-smtp.messagingengine.com [202.12.124.153])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wm1-f49.google.com (mail-wm1-f49.google.com [209.85.128.49])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BE5011D9A7D
-	for <netdev@vger.kernel.org>; Sun,  2 Feb 2025 13:40:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=202.12.124.153
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BBCAD1F3FC6;
+	Sun,  2 Feb 2025 13:55:06 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.49
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1738503642; cv=none; b=mJLcja/+gdoDvohKouNindC7ybFK0TDRekPN7Yr/Cllj2okFauQ7op4zH7WbmPSkJTFrq2tiEkvRqx2sRgjdYydwI0S8Y9Z3k2XkfMQqAwt9YE2Ce0lSxmoXIEoZYmxI1QXv9zsK26E06meswCRRD02zn5Rjdi4tkAkSoEyDYAQ=
+	t=1738504508; cv=none; b=aBZOuTvBF8zv5pTx+GLL9CDP3f2LOUOsKiMqS6UiO69HJzrvHGjeN5O6dDnIPOksFmMS0JJKbnFmtviHdZyPijesznfJWKOkEUeuJje+IVtgmHQQsYtSEBoVGI8xAGvDXhmkUtKiU3Vc0N9dQrrtI868kYMgbP3OHzjxpeXmsL0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1738503642; c=relaxed/simple;
-	bh=jYgqlta0oXMbC8o3EGmW2ZIsZrUWw4kdFTXtiMG3tRc=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Acy10Dz2nB7ODswnD1cZoRxxYzo83ZjoI19Wg29cERNyP93Em/lVaGpggNFvEr7EtK1mO6pg8UmhoNa7Vsfz0KGBTQWP5pqp1Ot4F7HKYHgprYCFWq7z+UvpXX8DQvDTGLlWKYZFO0ojWjMF74ElmaSxx5+ounUSyYKh5dsecvE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=idosch.org; spf=none smtp.mailfrom=idosch.org; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=Wt1PGGen; arc=none smtp.client-ip=202.12.124.153
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=idosch.org
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=idosch.org
-Received: from phl-compute-06.internal (phl-compute-06.phl.internal [10.202.2.46])
-	by mailfhigh.stl.internal (Postfix) with ESMTP id 793D42540127;
-	Sun,  2 Feb 2025 08:40:39 -0500 (EST)
-Received: from phl-mailfrontend-01 ([10.202.2.162])
-  by phl-compute-06.internal (MEProxy); Sun, 02 Feb 2025 08:40:39 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
-	messagingengine.com; h=cc:cc:content-transfer-encoding
-	:content-type:content-type:date:date:feedback-id:feedback-id
-	:from:from:in-reply-to:in-reply-to:message-id:mime-version
-	:references:reply-to:subject:subject:to:to:x-me-proxy
-	:x-me-sender:x-me-sender:x-sasl-enc; s=fm3; t=1738503639; x=
-	1738590039; bh=7kc2cRU9UlCykUHCU0+7CLRcRP7jvG9FgR4TP7xEyGo=; b=W
-	t1PGGenwAdPNCL8mPTZpR6MljPNnyRnbke+6MbJfnR364fMHfVo3uIZ7gL5NywTG
-	2jfddTFWrNukLOYY2RGzKOxX8YkFjDCTRnNE15HGTuytrwSUc6QlyPBOTw0P4YTQ
-	y+dcKQBOVmlHgvbA1feGGL1mLfgJ0UXLSbNwDagLAa7jbV2C40abKFYt5GwzYXGA
-	2Hasnv8zZRFZKyLDgf+YOwVrQbG7kW7y/+3mbP3UiF0ZXbYlW7HpqAQHkCcuFqp8
-	CacJB3PHu3ztOOupps4zwyfWWkzv5aD5G8LXTm/N70szx6EqPwaOI9mee29RqdON
-	x73730Qe10SKRX1oMowaQ==
-X-ME-Sender: <xms:1nWfZzcUKYzLBQHSykhzXaCeblNgvHcJVfh7eoJBCWJwo8xaK_q3Gw>
-    <xme:1nWfZ5MhUTJNJ3uqgRDwg5ccNJLUcVhXOtYsOx7o-VkuGUAUu9vqhk0St09ZoHnpG
-    _NVzWnF_7cgFi4>
-X-ME-Received: <xmr:1nWfZ8i1mbUkLD9kn-6Qf1LhbdJ1zUJepc-Nb2EZNVXBNMhd0_cf2tFhy5n2T43eir-MEzt81OkU8AFe0-MhOXKz2TIlDQ>
-X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeefvddrtddtgddugeekvdcutefuodetggdotefrod
-    ftvfcurfhrohhfihhlvgemucfhrghsthforghilhdpggftfghnshhusghstghrihgsvgdp
-    uffrtefokffrpgfnqfghnecuuegrihhlohhuthemuceftddtnecusecvtfgvtghiphhivg
-    hnthhsucdlqddutddtmdenucfjughrpeffhffvvefukfhfgggtugfgjgesthekredttddt
-    jeenucfhrhhomhepkfguohcuufgthhhimhhmvghluceoihguohhstghhsehiughoshgthh
-    drohhrgheqnecuggftrfgrthhtvghrnhepkeeggfeghfeuvdegtedtgedvuedvhfdujedv
-    vdejteelvdeutdehheellefhhfdunecuvehluhhsthgvrhfuihiivgeptdenucfrrghrrg
-    hmpehmrghilhhfrhhomhepihguohhstghhsehiughoshgthhdrohhrghdpnhgspghrtghp
-    thhtohepjedpmhhouggvpehsmhhtphhouhhtpdhrtghpthhtohepiihnshgtnhgthhgvnh
-    esghhmrghilhdrtghomhdprhgtphhtthhopegurghvvghmsegurghvvghmlhhofhhtrdhn
-    vghtpdhrtghpthhtohepvgguuhhmrgiivghtsehgohhoghhlvgdrtghomhdprhgtphhtth
-    hopehkuhgsrgeskhgvrhhnvghlrdhorhhgpdhrtghpthhtohepphgrsggvnhhisehrvggu
-    hhgrthdrtghomhdprhgtphhtthhopegrnhgurhgvfidonhgvthguvghvsehluhhnnhdrtg
-    hhpdhrtghpthhtohepnhgvthguvghvsehvghgvrhdrkhgvrhhnvghlrdhorhhg
-X-ME-Proxy: <xmx:1nWfZ0-CB7XkwuXZUg6p1MePIIHQnCjqauQmqEO8AOpOKw1Ek6Nn1A>
-    <xmx:1nWfZ_s5XbLgDYWlrh2Vlz5HA04iV1amddg2m4DDJL-coKUjvQReAA>
-    <xmx:1nWfZzHOE1LqQf7tf75eAU0txcaZWcUGtJB1fNBPsGmb_weEDgJIfg>
-    <xmx:1nWfZ2NieMNDtYyjQ7Wt2QQ-bcp_Sty08ZC31KjCF7yTZxbKmVnLTw>
-    <xmx:13WfZzj171wWJU9nfITgHcc-9RhkGtYf0_h2MJfXkiUPf5M6luiQlNrV>
-Feedback-ID: i494840e7:Fastmail
-Received: by mail.messagingengine.com (Postfix) with ESMTPA; Sun,
- 2 Feb 2025 08:40:38 -0500 (EST)
-Date: Sun, 2 Feb 2025 15:40:35 +0200
-From: Ido Schimmel <idosch@idosch.org>
-To: Ted Chen <znscnchen@gmail.com>
-Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
-	pabeni@redhat.com, andrew+netdev@lunn.ch, netdev@vger.kernel.org
-Subject: Re: [PATCH RFC net-next 0/3] vxlan: Support of Hub Spoke Network to
- use the same VNI
-Message-ID: <Z59109CGe8WmZVsJ@shredder>
-References: <20250201113207.107798-1-znscnchen@gmail.com>
+	s=arc-20240116; t=1738504508; c=relaxed/simple;
+	bh=19MrJwE2M63Hwc+dNYqRxXWzNQ/4w/DNGEmB3UG29zs=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=Fp5biyry7Zy/5S6oT/Lgj/lLQl+VkpTANYqzy3d/57vCQG6g0OJq/mdChCwT6Fcb1GhaLbwDcGKbVJN88sikMKNglryXMvINGe/gwrWdS5xm9rODd6sGYR0W3Wb7a47rWeVXu8s+LYxSHmTSEBF1UtqrTIvI2sr6QqmKsxzUUSk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=AAwfEIpl; arc=none smtp.client-ip=209.85.128.49
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-wm1-f49.google.com with SMTP id 5b1f17b1804b1-43625c4a50dso24110595e9.0;
+        Sun, 02 Feb 2025 05:55:06 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1738504505; x=1739109305; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:subject:cc:to:from:date:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=lNsfBeiHTtzxl6IYb/LvgDExYuDS/f8NcFRrBwdh198=;
+        b=AAwfEIplmHi8RH3tL0c5DBNyY6GDPs6cAp4CbOkuYz5vyNn5tF1D56g1+FFO8QCTFc
+         AtSzoIFHyen+YhDueplUms1DXM206bs+FvnDXHhHR7+vaxVN7Jak5NybDulgZ+B0Nbn/
+         eeNVkJTDQ9Cpq2sl39bo2clXfoJjsAdXMLvaVP9V8ZsbyS4t5YZ+bREf19REXpCdFAmd
+         asWJS4NT6Z8/vDOjlu60HXU93XVtWA96rqKs6az96C3sNVqEOPyCa3yYPeUXpg1PrEza
+         TDlk4djxMMCwVVzgAIPmrtwrOqaPaTe8GnMA803ZOagCoy1TxBmIawlwH2FrxoM5P+uZ
+         Rk3g==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1738504505; x=1739109305;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:subject:cc:to:from:date:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=lNsfBeiHTtzxl6IYb/LvgDExYuDS/f8NcFRrBwdh198=;
+        b=uc8kgoubNfH7mQtp0tPz3OAF7QyjMplY52f0BU5JZox0NKptvBPpow95ICrYKb3o6U
+         Byt53Jq83Kh5bBf3odztNGthte1y4A4Y4dKS0D1LjOlAqBem8xYxlyDj/hGl1qAs0Lu+
+         bmYrP2LC/7HQZ5HH1DBI0phXKVTgZqR5oV5CNf7h8+72e+hIY+2BCpkCXqO0TXpIVshf
+         SQh2e/HPKh24TFEfCXcQouO5fiCuyX5/aVq4tIMadv+EtZ50x/CwG+4C+GYTnVuDSUIr
+         +9WgRlNrRoF+uA3wLDAv3Jed7t+2ZRIrKt6dJN22he7gbI4q4a49lvYD7MgFZD+T6Gh6
+         p5WQ==
+X-Forwarded-Encrypted: i=1; AJvYcCVim1gXMn1UC+csrDLQYjjx4/ToQvnib5uXvzXQ+38Py/PvMgAu4NncHX5Es/u0+pDWBsaD/sXxtvYo3BM=@vger.kernel.org, AJvYcCVld74gXpTgmz7uoU7EKGoBsY1VRWni+j6/4Y5Ub0Oa8wOEzcLq3+Emd8VwvddQgiEUX3DAYpbv@vger.kernel.org
+X-Gm-Message-State: AOJu0YxW2L9CaoWYBhKIW1Uof1ZdFR8DgdhMXyzDpCbicylLIBeUhW0g
+	CUKCQLF7RFjLefveUgoRd+v+/UWq2tJ8uasGivQHGWndk2RpotZ9
+X-Gm-Gg: ASbGncs3aICMRI/PUL1bteIDEQn4nvLVxbDabQ3oPy2aOR2pKJev8iQDHlAaNzzT1Kk
+	Mg9ecJrGj9/C2H9jnIbcqJ3OX6gm26hThXrrIVCa6TT5HgxzfVL7p/VmkryxYc241Y0lWOensjX
+	Ajan+PEqMofvUW78em2fpo4t+KnSv554N2FyMKChUWlYIhydbY++xAwvzG1k77pKXN2OEakwjth
+	JN3181cK0U+1EGAod6BGHUQ/44d45PTxpYmKiP6PzGAWBFij71LSDvgL2IWnlGDN0EEC5sOeI4Q
+	I34bp+4EQl11r6x3OirKuLuH/SAJy1L/u1ZYOIlhbPWBQy/s5xVmJg==
+X-Google-Smtp-Source: AGHT+IEBNI/DwNheuqMMc3AK7zFn0rGRjMIyiwjKBnh/JppCyA6dLcUGmxYDuLRS1uLCifEG6CJEsw==
+X-Received: by 2002:a05:600c:45c5:b0:434:e2ea:fc94 with SMTP id 5b1f17b1804b1-438dc3c3292mr192346765e9.11.1738504504732;
+        Sun, 02 Feb 2025 05:55:04 -0800 (PST)
+Received: from pumpkin (82-69-66-36.dsl.in-addr.zen.co.uk. [82.69.66.36])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-438dcc6df36sm162294865e9.25.2025.02.02.05.55.03
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sun, 02 Feb 2025 05:55:04 -0800 (PST)
+Date: Sun, 2 Feb 2025 13:55:03 +0000
+From: David Laight <david.laight.linux@gmail.com>
+To: Matthew Wilcox <willy@infradead.org>
+Cc: Mateusz Guzik <mjguzik@gmail.com>, ebiederm@xmission.com,
+ oleg@redhat.com, brauner@kernel.org, akpm@linux-foundation.org,
+ linux-mm@kvack.org, linux-kernel@vger.kernel.org, netdev@vger.kernel.org
+Subject: Re: [PATCH v3 6/6] pid: drop irq disablement around pidmap_lock
+Message-ID: <20250202135503.4e377fb0@pumpkin>
+In-Reply-To: <Z56ZZpmAbRCIeI7D@casper.infradead.org>
+References: <20250201163106.28912-1-mjguzik@gmail.com>
+	<20250201163106.28912-7-mjguzik@gmail.com>
+	<20250201181933.07a3e7e2@pumpkin>
+	<CAGudoHFHzEQhkaJCB3z6qCfDtSRq+zZew3fDkAKG-AEjpMq8Nw@mail.gmail.com>
+	<20250201215105.55c0319a@pumpkin>
+	<Z56ZZpmAbRCIeI7D@casper.infradead.org>
+X-Mailer: Claws Mail 4.1.1 (GTK 3.24.38; arm-unknown-linux-gnueabihf)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <20250201113207.107798-1-znscnchen@gmail.com>
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-On Sat, Feb 01, 2025 at 07:32:07PM +0800, Ted Chen wrote:
-> This RFC series proposes an implementation to enable the configuration of vxlan
-> devices in a Hub-Spoke Network, allowing multiple vxlan devices to share the
-> same VNI while being associated with different remote IPs under the same UDP
-> port.
-> 
-> == Use case ==
-> In a Hub-Spoke Network, there is a central VTEP acting as the gateway, along
-> with multiple outer VTEPs. Each outer VTEP communicates exclusively with the
-> central VTEP and has no direct connection to other outer VTEPs. As a result,
-> data exchanged between outer VTEPs must traverse the central VTEP. This design
-> enhances security and enables centralized auditing and monitoring at the
-> central VTEP.
-> 
-> == Existing methods ==
-> Currently, there are three methods to implement the use case.
-> 
-> Method 1:
->          The central VTEP establishes a separate vxlan tunnel with each outer
->          VTEP, creating a vxlan device with a different VNI for each tunnel.
->          All vxlan devices are then added to the same Linux bridge to enable
->          forwarding.
-> 
->          Drawbacks: Complex configuration.
->          Each tenant requires multiple VNIs.
+On Sat, 1 Feb 2025 22:00:06 +0000
+Matthew Wilcox <willy@infradead.org> wrote:
 
-This looks like the most straightforward option to me.
+> On Sat, Feb 01, 2025 at 09:51:05PM +0000, David Laight wrote:
+> > I'm not sure what you mean.
+> > Disabling interrupts isn't as cheap as it ought to be, but probably isn't
+> > that bad.  
+> 
+> Time it.  You'll see.
 
-Why do you view it as complex? Why multiple VNIs per tenant are a
-problem when we have 16M of them?
+The best scheme I've seen is to just increment a per-cpu value.
+Let the interrupt happen, notice it isn't allowed and return with
+interrupts disabled.
+Then re-issue the interrupt when the count is decremented to zero.
+Easy with level sensitive interrupts.
+But I don't think Linux ever uses that scheme.
 
-> 
-> Method 2:
->         The central VTEP creates a single vxlan device using the same VNI,
->         without configuring a remote IP. The IP addresses of all outer VTEPs
->         are stored in the fdb. To enable forwarding, the vxlan device is added
->         to a Linux bridge with hairpin mode enabled.
-> 
->         Drawbacks: unnecessary overhead or network anomalies
->         The hairpin mode may broadcast packets to all outer VTEPs, causing the
->         source outer VTEP receiving packets it originally sent to the central
->         VTEP. If the packet from the source outer VTEP is a broadcast packet,
->         the broadcasting back of the packet can cause network anomalies.
-> 
-> Method 3:
->         The central VTEP uses the same VNI but different UDP ports to create a
->         vxlan device for each outer VTEP, each tunneling to its corresponding
->         outer VTEP. All the vxlan devices in the central VTEP are then added to
->         the same Linux bridge to enable forwarding.
-> 
->         Drawbacks: complex configuration and potential security issues.
->         Multiple UDP ports are required.
-> 
-> == Proposed implementation ==
-> In the central VTEP, each tenant only requires a single VNI, and all tenants
-> share the same UDP port. This can avoid the drawbacks of the above three
-> methods.
 
-This method also has drawbacks. It breaks existing behavior (see my
-comment on patch #1) and it also bloats the VXLAN receive path.
+> > > So while this is indeed a tradeoff, as I understand the sane default
+> > > is to *not* disable interrupts unless necessary.  
+> > 
+> > I bet to differ.  
+> 
+> You're wrong.  It is utterly standard to take spinlocks without
+> disabling IRQs.  We do it all over the kernel.  If you think that needs
+> to change, then make your case, don't throw a driveby review.
+> 
+> And I don't mean by arguing.  Make a change, measure the difference.
 
-I want to suggest an alternative which allows you to keep the existing
-topology (same VNI), but without kernel changes. The configuration of
-the outer VTEPs remains the same. The steps below are for the central
-VTEP.
+The analysis was done on some userspace code that basically does:
+	for (;;) {
+		pthread_mutex_enter(lock);
+		item = get_head(list);
+		if (!item)
+			break;
+		pthead_mutex_exit(lock);
+		process(item);
+	}
+For the test there were about 10000 items on the list and 30 threads
+processing it (that was the target of the tests).
+The entire list needs to be processed in 10ms (RTP audio).
+There was a bit more code with the mutex held, but only 100 or so
+instructions.
+Mostly it works fine, some threads get delayed by interrupts (etc) but
+the other threads carry on working and all the items get processed.
 
-First, create a VXLAN device in "external" mode. It will consume all the
-VNIs in a namespace, but you can limit it with the "vnifilter" keyword,
-if needed:
+However sometimes an interrupt happens while the mutex is held.
+In that case the other 29 threads get stuck waiting for the mutex.
+No progress is made until the interrupt completes and it overruns
+the 10ms period.
 
-# ip -n ns_c link add name vx0 type vxlan dstport 4789 nolearning external
-# tc -n ns_c qdisc add dev vx0 clsact
+While this is a userspace test, the same thing will happen with
+spin locks in the kernel.
 
-Then, for each outer VTEP, create a dummy device and enslave it to the
-bridge. Taking outer VTEP1 as an example:
+In userspace you can't disable interrupts, but for kernel spinlocks
+you can.
 
-# ip -n ns_c link add name dummy_vtep1 up master br0
-# tc -n ns_c qdisc add dev dummy_vtep1 clsact
+The problem is likely to show up as unexpected latency affecting
+code with a hot mutex that is only held for short periods while
+running a lot of network traffic.
+That is also latency that affects all cpu at the same time.
+The interrupt itself will always cause latency to one cpu.
 
-In order to demultiplex incoming VXLAN packets to the appropriate bridge
-member, use an ingress tc filter on the VXLAN device that matches on the
-encapsulating source IP (you can't do it w/o the "external" keyword) and
-redirects the traffic to the corresponding bridge member:
+Note that I also had to enable RFS, threaded NAPI and move the NAPI
+threads to RT priorities to avoid lost packets.
+The fix was to replace the linked list with an array and use atomic
+increment to get the index of the item to process.
 
-# tc -n ns_c filter add dev vx0 ingress pref 1 proto all \
-	flower enc_key_id 42 enc_src_ip 10.0.0.1 \
-	action mirred ingress redirect dev dummy_ns1
+	David
 
-(add filters for other VTEPs with "pref 1" to avoid unnecessary
-lookups).
-
-For Tx, on each bridge member, configure an egress tc filter that
-attaches tunnel metadata for the matching outer VTEP and redirects to
-the VXLAN device:
-
-# tc -n ns_c filter add dev dummy_vtep1 egress pref 1 proto all \
-	matchall \
-	action tunnel_key set src_ip 10.0.0.3 dst_ip 10.0.0.1 id 42 dst_port 4789 \
-	action mirred egress redirect dev vx0
-
-The end result should be that the bridge forwards known unicast traffic
-to the appropriate outer VTEP and floods BUM traffic to all the outer
-VTEPs but the one from which the traffic was received.
-
-> 
-> As in below example,
-> - a tunnel is established between vxlan42.1 in the central VTEP and vxlan42 in
->   the outer VTEP1:
->   ip link add vxlan42.1 type vxlan id 42 \
->           local 10.0.0.3 remote 10.0.0.1 dstport 4789
-> 
-> - a tunnel is established between vxlan42.2 in the central VTEP and vxlan42 in
->   the outer VTEP2:
->   ip link add vxlan42.2 type vxlan id 42 \
->   		  local 10.0.0.3 remote 10.0.0.2 dstport 4789
-> 
-> 
->     ┌────────────────────────────────────────────┐
->     │       ┌─────────────────────────┐  central │
->     │       │          br0            │    VTEP  │
->     │       └─┬────────────────────┬──┘          │
->     │   ┌─────┴───────┐      ┌─────┴───────┐     │          
->     │   │ vxlan42.1   │      │  vxlan42.2  │     │
->     │   └─────────────┘      └─────────────┘     │  
->     └───────────────────┬─┬──────────────────────┘
->                         │ │ eth0 10.0.0.3:4789
->                         │ │            
->                         │ │            
->        ┌────────────────┘ └───────────────┐
->        │eth0 10.0.0.1:4789                │eth0 10.0.0.2:4789
->  ┌─────┴───────┐                    ┌─────┴───────┐
->  │outer VTEP1  │                    │outer VTEP2  │
->  │     vxlan42 │                    │     vxlan42 │
->  └─────────────┘                    └─────────────┘
-> 
-> 
-> == Test scenario ==
-> ip netns add ns_1
-> ip link add veth1 type veth peer name veth1-peer
-> ip link set veth1 netns ns_1
-> ip netns exec ns_1 ip addr add 10.0.1.1/24 dev veth1
-> ip netns exec ns_1 ip link set veth1 up
-> ip netns exec ns_1 ip link add vxlan42 type vxlan id 42 \
->                    remote 10.0.1.3 dstport 4789
-> ip netns exec ns_1 ip addr add 192.168.0.1/24 dev vxlan42
-> ip netns exec ns_1 ip link set up dev vxlan42
-> 
-> ip netns add ns_2
-> ip link add veth2 type veth peer name veth2-peer
-> ip link set veth2 netns ns_2
-> ip netns exec ns_2 ip addr add 10.0.1.2/24 dev veth2
-> ip netns exec ns_2 ip link set veth2 up
-> ip netns exec ns_2 ip link add vxlan42 type vxlan id 42 \
->                    remote 10.0.1.3 dstport 4789
-> ip netns exec ns_2 ip addr add 192.168.0.2/24 dev vxlan42
-> ip netns exec ns_2 ip link set up dev vxlan42
-> 
-> ip netns add ns_c
-> ip link add veth3 type veth peer name veth3-peer
-> ip link set veth3 netns ns_c
-> ip netns exec ns_c ip addr add 10.0.1.3/24 dev veth3
-> ip netns exec ns_c ip link set veth3 up
-> ip netns exec ns_c ip link add vxlan42.1 type vxlan id 42 \
->                    local 10.0.1.3 remote 10.0.1.1 dstport 4789
-> ip netns exec ns_c ip link add vxlan42.2 type vxlan id 42 \
->                    local 10.0.1.3 remote 10.0.1.2 dstport 4789
-> ip netns exec ns_c ip link set up dev vxlan42.1
-> ip netns exec ns_c ip link set up dev vxlan42.2
-> ip netns exec ns_c ip link add name br0 type bridge
-> ip netns exec ns_c ip link set br0 up
-> ip netns exec ns_c ip link set vxlan42.1 master br0
-> ip netns exec ns_c ip link set vxlan42.2 master br0
-> 
-> ip link add name br1 type bridge
-> ip link set br1 up
-> ip link set veth1-peer up
-> ip link set veth2-peer up
-> ip link set veth3-peer up
-> ip link set veth1-peer master br1
-> ip link set veth2-peer master br1
-> ip link set veth3-peer master br1
-> 
-> ip netns exec ns_1 ping 192.168.0.2 -I 192.168.0.1
-> 
-> Ted Chen (3):
->   vxlan: vxlan_vs_find_vni(): Find vxlan_dev according to vni and
->     remote_ip
->   vxlan: Do not treat vxlan dev as used when unicast remote_ip
->     mismatches
->   vxlan: vxlan_rcv(): Update comment to inlucde ipv6
-> 
->  drivers/net/vxlan/vxlan_core.c | 38 +++++++++++++++++++++++++++-------
->  1 file changed, 31 insertions(+), 7 deletions(-)
-> 
-> -- 
-> 2.39.2
-> 
-> 
 
