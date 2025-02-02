@@ -1,49 +1,49 @@
-Return-Path: <netdev+bounces-161951-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-161952-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id CD1CAA24C5E
-	for <lists+netdev@lfdr.de>; Sun,  2 Feb 2025 02:00:13 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 24384A24C5F
+	for <lists+netdev@lfdr.de>; Sun,  2 Feb 2025 02:00:18 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 1BE8A7A287F
-	for <lists+netdev@lfdr.de>; Sun,  2 Feb 2025 00:59:19 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 52D8E3A5AC5
+	for <lists+netdev@lfdr.de>; Sun,  2 Feb 2025 01:00:09 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9426CBE6C;
-	Sun,  2 Feb 2025 01:00:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C0EEF11CA9;
+	Sun,  2 Feb 2025 01:00:11 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="aFikwgdg"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="kQRaCNe+"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6F2E8B665
-	for <netdev@vger.kernel.org>; Sun,  2 Feb 2025 01:00:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 98451EEB1;
+	Sun,  2 Feb 2025 01:00:09 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1738458008; cv=none; b=NclpC2vA+BzQ1gzp2tz+AbXqpoSeHvTtdUxdoedNBQevd3YggmBe9ukOV2KAijy2Fr1B4yk0FSmyOF04AeU1d/s0V+6mAzHJLrF8nzcPdhD83wgSRckCt2nuyPfH0WTNIn+SbZ/iD3n2HuyD8Of/5wroIyt96GA5bpvpbhVxbhQ=
+	t=1738458011; cv=none; b=lemNq7XxGi4v+EXOhXjZKdwVdpsPI8al1yIR+mPC17fYIKwn94rlz+wgfDSqRYPepsdIiIXI/+HXMAz5QEFlu+yzc7cuAb65ymPo9DJH4t9a/LhbhD+tVjYBW5JQn4Nkw6qqTqGoigftcL1QMu1J/1g0fFGBX/0SNgDRh/JKgpY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1738458008; c=relaxed/simple;
-	bh=9tXjQwQY6NWy/WXsAVVe6XYSe/GURHg8b/PVOtzup28=;
+	s=arc-20240116; t=1738458011; c=relaxed/simple;
+	bh=3wkYN2oan9I4+MUMfqZSWhjIhiO57sDGHNLvdltSUZw=;
 	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=Cg5xrs+jm/m9AvyRTJAeEakXfZmJ3i7TrNTOrBPln3i8/Rsi612lusqhuMPzpzO48hH84fGhq0wqs4Qgu5WiHrsQ1hBiQ399WuEGryln1tZnx2kodryOpA2FpBw1HQcQtNF7wR34MHOF2ahjhhC56SGqpIHog7sdbD1t5VZ2YHQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=aFikwgdg; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id CD3FBC4CED3;
-	Sun,  2 Feb 2025 01:00:07 +0000 (UTC)
+	 In-Reply-To:To:Cc; b=K/PAVuFTzdbk01T9eLa7sN63RA/1/M9Cza16hmy6wl3/JntxbFql0VHxi5FGJha6INb+x4LToog7yiSrlPwXgnSsjLmtR7u16TcZb4sJ28wWGHOfwrmuySUmIMLBytA73hI72lONpSCvMrYmqoIO7wEsLMoxD1A+RPA56HgxTU8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=kQRaCNe+; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id EDD7FC4CED3;
+	Sun,  2 Feb 2025 01:00:08 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1738458007;
-	bh=9tXjQwQY6NWy/WXsAVVe6XYSe/GURHg8b/PVOtzup28=;
+	s=k20201202; t=1738458009;
+	bh=3wkYN2oan9I4+MUMfqZSWhjIhiO57sDGHNLvdltSUZw=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=aFikwgdgAOKRpJnkbtQv9/Akyk6Pjcfjffz9ao9jpfUxbCAtfW/KK95/G1FrSGoDP
-	 wD8gCSI9j4NghMg8daZPIaHdUl+24gbJYviQtmGR6z2fdjCHatshb4hEcMCzSGhHIE
-	 eGUpDGPWI2yOABxrRd8+hwX1SM141c531NKzoZKtwWF94FhME5w8BZ1GMGyXL2A4lL
-	 Qzc6XtJoCcWQhQ1ZBUvy+Jg/M2C1r1AwD3EcCC/EL91ndwuhxEuMGsPo+oASq0YxwL
-	 FXrQ/cu2vHSJwlchuLiIM9N8DUwmarqI9T4W87fDsWWnjHpNvkIvFDYis7J335zMOg
-	 n53HtAh8vGitw==
+	b=kQRaCNe+oEedN/dpOzji9+TK05B7HuFpn658gtjAATFK5vnusFv/ryp1wFzElo/cm
+	 UV1tqy+tCmUgYsTD2qEZbwxPAQxA0FCmVlHuIWppVrSb2R+fRTS/au4Ws2d1sCI2QJ
+	 8UJkcKQayhhw7ikxuMJ3/NBguNvL36FUZZPVf1CnQwmjzqUv/kzeGU8kPrdY+GgHoJ
+	 Kzsz++GQlMJn27hYrc34kb7H/RuASZBHUjCgqjJ9g4q2sykXeUVY0GNZvryPOEK4rL
+	 bZ1GN6FAE3Xdq6HvKTTRJBu90e/agLyz4KIhmeykbBtm3R/xjKpsi/co6NNLZDNy44
+	 k9Cx/VukrZneA==
 Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id AE29C380AA68;
-	Sun,  2 Feb 2025 01:00:35 +0000 (UTC)
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id EB6B9380AA68;
+	Sun,  2 Feb 2025 01:00:36 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -52,43 +52,39 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net v2 1/2] net: ipv6: fix dst refleaks in rpl,
- seg6 and ioam6 lwtunnels
+Subject: Re: [PATCH net] net: bcmgenet: Correct overlaying of PHY and MAC
+ Wake-on-LAN
 From: patchwork-bot+netdevbpf@kernel.org
 Message-Id: 
- <173845803452.2027595.4967838744169965425.git-patchwork-notify@kernel.org>
-Date: Sun, 02 Feb 2025 01:00:34 +0000
-References: <20250130031519.2716843-1-kuba@kernel.org>
-In-Reply-To: <20250130031519.2716843-1-kuba@kernel.org>
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: davem@davemloft.net, netdev@vger.kernel.org, edumazet@google.com,
- pabeni@redhat.com, andrew+netdev@lunn.ch, horms@kernel.org,
- justin.iurman@uliege.be, dsahern@kernel.org
+ <173845803574.2027595.4585624838343864384.git-patchwork-notify@kernel.org>
+Date: Sun, 02 Feb 2025 01:00:35 +0000
+References: <20250129231342.35013-1-florian.fainelli@broadcom.com>
+In-Reply-To: <20250129231342.35013-1-florian.fainelli@broadcom.com>
+To: Florian Fainelli <florian.fainelli@broadcom.com>
+Cc: netdev@vger.kernel.org, opendmb@gmail.com,
+ bcm-kernel-feedback-list@broadcom.com, andrew+netdev@lunn.ch,
+ davem@davemloft.net, edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
+ horms@kernel.org, linux-kernel@vger.kernel.org
 
 Hello:
 
-This series was applied to netdev/net.git (main)
+This patch was applied to netdev/net.git (main)
 by Jakub Kicinski <kuba@kernel.org>:
 
-On Wed, 29 Jan 2025 19:15:18 -0800 you wrote:
-> dst_cache_get() gives us a reference, we need to release it.
+On Wed, 29 Jan 2025 15:13:42 -0800 you wrote:
+> Some Wake-on-LAN modes such as WAKE_FILTER may only be supported by the MAC,
+> while others might be only supported by the PHY. Make sure that the .get_wol()
+> returns the union of both rather than only that of the PHY if the PHY supports
+> Wake-on-LAN.
 > 
-> Discovered by the ioam6.sh test, kmemleak was recently fixed
-> to catch per-cpu memory leaks.
-> 
-> Fixes: 985ec6f5e623 ("net: ipv6: rpl_iptunnel: mitigate 2-realloc issue")
-> Fixes: 40475b63761a ("net: ipv6: seg6_iptunnel: mitigate 2-realloc issue")
-> Fixes: dce525185bc9 ("net: ipv6: ioam6_iptunnel: mitigate 2-realloc issue")
-> Reviewed-by: Justin Iurman <justin.iurman@uliege.be>
-> Signed-off-by: Jakub Kicinski <kuba@kernel.org>
+> When disabling Wake-on-LAN, make sure that this is done at both the PHY
+> and MAC level, rather than doing an early return from the PHY driver.
 > 
 > [...]
 
 Here is the summary with links:
-  - [net,v2,1/2] net: ipv6: fix dst refleaks in rpl, seg6 and ioam6 lwtunnels
-    https://git.kernel.org/netdev/net/c/c71a192976de
-  - [net,v2,2/2] net: ipv6: fix dst ref loops in rpl, seg6 and ioam6 lwtunnels
-    https://git.kernel.org/netdev/net/c/92191dd10730
+  - [net] net: bcmgenet: Correct overlaying of PHY and MAC Wake-on-LAN
+    https://git.kernel.org/netdev/net/c/46ded7092323
 
 You are awesome, thank you!
 -- 
