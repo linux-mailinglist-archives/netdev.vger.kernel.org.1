@@ -1,104 +1,71 @@
-Return-Path: <netdev+bounces-161960-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-161961-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4536FA24C7D
-	for <lists+netdev@lfdr.de>; Sun,  2 Feb 2025 03:12:05 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 692B1A24C81
+	for <lists+netdev@lfdr.de>; Sun,  2 Feb 2025 03:18:06 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 981171885829
-	for <lists+netdev@lfdr.de>; Sun,  2 Feb 2025 02:12:09 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 36B6E3A54E6
+	for <lists+netdev@lfdr.de>; Sun,  2 Feb 2025 02:17:58 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C079A1805E;
-	Sun,  2 Feb 2025 02:11:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E13838C07;
+	Sun,  2 Feb 2025 02:18:02 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="gBdfMnq1"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="hGOhwFu1"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9A49013AF2
-	for <netdev@vger.kernel.org>; Sun,  2 Feb 2025 02:11:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BB8285234
+	for <netdev@vger.kernel.org>; Sun,  2 Feb 2025 02:18:02 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1738462319; cv=none; b=b+6iDSnBNnrWVpHW+vyqUCDfPbNaaAbMPGY/gamLo1kkemNEDBrPwzTmTFyItiaOZQpPzzH5DOuwXgCsLIu2UvImm2qkpm+AI+TTDrOlFI26t9qN08kelPAhW9B7vA13iz7S7/G33BKJKXvgWQ3RMww1gGQmZUh2woGxHqz0Dfs=
+	t=1738462682; cv=none; b=ixEdXzvDrePZsdo0AT26NwMg2/WRfWON9UifJ6YqJ/kQ1LFtMpnLMd1ratuCHtPWLvsUl6qoX5pEYegQCSt1tXXK/KLrAaFp+k0ViLGqF8g1x61si4HIINWKl7M0ihON07Jn/kIHO5Jr8EAY4uBZ9xp+uSGseZtHVMU5urc5TVU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1738462319; c=relaxed/simple;
-	bh=DTSiIJ2XZjL1OjTPQKuFZ6eL9+GSCYb3zVNf86aycyo=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=hWO7/Uwl2XDv4IvS6S4fdSuZ1kWxEn5/0VAvrffkpMlFSG1s7zi2uVfbN7N3j4jbVoQRfi+VQQWWws16fjC5rXKbWdOGg9wKUFW12h7VU6F9YCDQqmt8j21f687l4Fp/Z7BWHCTrqdR2A/gTSGv+ov3YTEs9VuVWsd/B5WtINKc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=gBdfMnq1; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id CA665C4CEE3;
-	Sun,  2 Feb 2025 02:11:58 +0000 (UTC)
+	s=arc-20240116; t=1738462682; c=relaxed/simple;
+	bh=/3H5yf7FzrabJDmIibncpgkLHhFWj6duHGerXH8OZWA=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=f38wndD7INR28ocAKL93PJvAB8UuXFwXV8c7A3JVK/6ZoVhhBE2A9Dt6exOIBbUKskauMmiqY7UNK5oBF8HXpSJ8HFeE2W5hPaf2Ws6xnABspfTlUPZ5SyFKZqB/LLMyGX0xruC6ymHsnBmiPRXBBi26f62GyzJ0Za15ktDbqks=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=hGOhwFu1; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id CE397C4CED3;
+	Sun,  2 Feb 2025 02:18:01 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1738462319;
-	bh=DTSiIJ2XZjL1OjTPQKuFZ6eL9+GSCYb3zVNf86aycyo=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=gBdfMnq1IfxOKF+Q5Yq3ymw7uH0xXRgSPHZN4EhP9IiGIQnH/EwdgQIA3kulFiuOt
-	 ZBy7Ka8VCjIGFgKGjk4rD+foQ9gE1xrA2fbVHgdEzQSZa12K4VPIaPoI+tPSkdyx9K
-	 ZuamVdESOY8ZOLjIng20p1UcyE1UM94hPedxJs2Hk/sIZ/9d1D1xgVb0vIUlnp6BMQ
-	 J4hADsbCY1v7eaWc1p389+KrtppvA8sGENahZpDdBH7IWLWm9tuAKG2wa+bF5/u89k
-	 UnAWaheDVFjml6vG25NYYbOMxBP3hRhG8dRizLCCPOULSSmbIzGGCk6hIuhsSP/pmb
-	 +boESHyaYkGBg==
+	s=k20201202; t=1738462682;
+	bh=/3H5yf7FzrabJDmIibncpgkLHhFWj6duHGerXH8OZWA=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=hGOhwFu1SnrYzLWmn+5BeZFXO+3vghO+00RNVk9tCC6Lle7VciP0zmRaN8ndE/0Ud
+	 WdI4tR5BYLoc7aJMIKGFy/+aiG8Cz28u9zrn/zgD2Zbx/f6wahUH9Rg186cp5Bpsq4
+	 1DFoN09IDstlDvNKoxwF21FgbZsb03nAX6I8T4jEASirrEcnm/UqQmlgVTO+fPVAbc
+	 +iarGl2ol8Qd7Ui8sOoJgCS3pzrneM2HEZ0FQZ5wAHyD2iex/VMsCQFiubElSn9lql
+	 tuq3Rh2z44fTAqXd9Zd65ZDPF0+iW5zddeOhqiNy1xRFcigY/1E07h34fw2kEATHju
+	 gPai+dxdA9X7Q==
+Date: Sat, 1 Feb 2025 18:18:01 -0800
 From: Jakub Kicinski <kuba@kernel.org>
-To: davem@davemloft.net
-Cc: netdev@vger.kernel.org,
-	edumazet@google.com,
-	pabeni@redhat.com,
-	andrew+netdev@lunn.ch,
-	horms@kernel.org,
-	Jakub Kicinski <kuba@kernel.org>
-Subject: [PATCH net 2/2] MAINTAINERS: add a sample ethtool section entry
-Date: Sat,  1 Feb 2025 18:11:55 -0800
-Message-ID: <20250202021155.1019222-2-kuba@kernel.org>
-X-Mailer: git-send-email 2.48.1
-In-Reply-To: <20250202021155.1019222-1-kuba@kernel.org>
-References: <20250202021155.1019222-1-kuba@kernel.org>
+To: Eric Dumazet <edumazet@google.com>
+Cc: "David S . Miller" <davem@davemloft.net>, Paolo Abeni
+ <pabeni@redhat.com>, netdev@vger.kernel.org, Kuniyuki Iwashima
+ <kuniyu@amazon.com>, Simon Horman <horms@kernel.org>,
+ eric.dumazet@gmail.com
+Subject: Re: [PATCH net 00/16] net: first round to use dev_net_rcu()
+Message-ID: <20250201181801.4427248a@kernel.org>
+In-Reply-To: <20250131171334.1172661-1-edumazet@google.com>
+References: <20250131171334.1172661-1-edumazet@google.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-I feel like we don't do a good enough keeping authors of driver
-APIs around. The ethtool code base was very nicely compartmentalized
-by Michal. Establish a precedent of creating MAINTAINERS entries
-for "sections" of the ethtool API. Use Andrew and cable test as
-a sample entry. The entry should ideally cover 3 elements:
-a core file, test(s), and keywords. The last one is important
-because we intend the entries to cover core code *and* reviews
-of drivers implementing given API!
+On Fri, 31 Jan 2025 17:13:18 +0000 Eric Dumazet wrote:
+>   ipv4: use RCU protection in inet_select_addr()
 
-Signed-off-by: Jakub Kicinski <kuba@kernel.org>
----
-This patch is a nop from process perspective, since Andrew already
-is a maintainer and reviews all this code. Let's focus on discussing
-merits of the "section entries" in abstract?
----
- MAINTAINERS | 6 ++++++
- 1 file changed, 6 insertions(+)
-
-diff --git a/MAINTAINERS b/MAINTAINERS
-index 4e701b9a57e4..9bf31ba720b6 100644
---- a/MAINTAINERS
-+++ b/MAINTAINERS
-@@ -16469,6 +16469,12 @@ F:	include/uapi/linux/ethtool*
- F:	net/ethtool/
- F:	tools/testing/selftests/drivers/net/*/ethtool*
- 
-+NETWORKING [ETHTOOL CABLE TEST]
-+M:	Andrew Lunn <andrew@lunn.ch>
-+F:	net/ethtool/cabletest.c
-+F:	tools/testing/selftests/drivers/net/*/ethtool*
-+K:	start_cable_test
-+
- NETWORKING [GENERAL]
- M:	"David S. Miller" <davem@davemloft.net>
- M:	Eric Dumazet <edumazet@google.com>
+patchwork thinks it's an incomplete series due to lack of this patch 
+on the list. I'm afraid a repost will be needed :(
 -- 
-2.48.1
-
+pw-bot: cr
 
