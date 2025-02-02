@@ -1,137 +1,174 @@
-Return-Path: <netdev+bounces-161980-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-161981-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id A02F5A24ED5
-	for <lists+netdev@lfdr.de>; Sun,  2 Feb 2025 16:50:51 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 02C25A24ED7
+	for <lists+netdev@lfdr.de>; Sun,  2 Feb 2025 17:00:51 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 4771A3A4C30
-	for <lists+netdev@lfdr.de>; Sun,  2 Feb 2025 15:50:43 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 7D2F2162C28
+	for <lists+netdev@lfdr.de>; Sun,  2 Feb 2025 16:00:49 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CC7BC1D8A10;
-	Sun,  2 Feb 2025 15:50:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C9CC629D0D;
+	Sun,  2 Feb 2025 16:00:46 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="NHtnCroD"
+	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="S2UvkASs"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qv1-f47.google.com (mail-qv1-f47.google.com [209.85.219.47])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from fout-b3-smtp.messagingengine.com (fout-b3-smtp.messagingengine.com [202.12.124.146])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 314D0182D7
-	for <netdev@vger.kernel.org>; Sun,  2 Feb 2025 15:50:45 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.47
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BD7151FB3;
+	Sun,  2 Feb 2025 16:00:43 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=202.12.124.146
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1738511447; cv=none; b=VMLXpnrA4dgFkiON4vZZII71SD2dUzbFGFPHuhvzZjF7Tg7ubJVbjY9yuPiusjl3b/b2esmoJmj+BqEgtax6IZBj92AZS00vkU8HychfnOCmd1Tp0GxVVh4dC7Fm4h3QpsbaPyCHAmdslwYC8PUhHInc5H90t5rnnq4D28L6iSE=
+	t=1738512046; cv=none; b=t0TkRvGpwxIWgMdV4lFDHwBz6s9bnf4OVtbR5nJhdA/7GO5drzVwso2RGwm3CZk9bTuxisLwsaAnaWW2UucKiokgN3Un9YRlF4q1LkaDXJv89sVrvluYfvlIZa2ysB/BBlgeq6PFGgwMT3PsxkHDATh5jJ6YtZcwAMvoPi7nC5I=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1738511447; c=relaxed/simple;
-	bh=2FlktBqIItlRMsNVIoFZhMDgOWGiaAQp2bpCfqyFgQ0=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=UVoW+T0nGmvOi+nhdtWD/8zDeHrJRVx/iGX8IchCIgEXU/9cKoBHstVvhua6ppcM1j3YuhsEUTOm93HR11ZfzRkXBz+Y99QfM4KCSWORIsVqrXXj9S4tLnDu486vCMQjiZkAEbRDnJcZXZ8ht8zAoRZYnmITheL2fj9dJzj0zVM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=NHtnCroD; arc=none smtp.client-ip=209.85.219.47
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-qv1-f47.google.com with SMTP id 6a1803df08f44-6ddcff5a823so26413356d6.0
-        for <netdev@vger.kernel.org>; Sun, 02 Feb 2025 07:50:45 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1738511445; x=1739116245; darn=vger.kernel.org;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=2FlktBqIItlRMsNVIoFZhMDgOWGiaAQp2bpCfqyFgQ0=;
-        b=NHtnCroDJC7lYF9tOI1e4Ng4DTsDKOnTINiL3b2TOmPvJKDAxiGYHPYjDqzPGObExt
-         yAn4WweP/Y6ob5KUZxiVG8idgSmSBMY6PrLtMt1NQAchC+P9PRutrGb5/s8A4GQkP6yt
-         VM9IMnJoJ9WnSeFFOIVYFmEIXw9ek7BfV3cN/OUKGmNNTVpHCQj22VHESkXmhFUOTIhu
-         cWe8OyEgSjOQs1A51ChRq58WmTvBXqpfXkVG0FOXJlt8PIil7C933eONO3dfWqCcom1e
-         fpy9g6MUVNpfiZQvw9fXMuOZt58070u7Vusz6AUcfoni1MpDnsmS+YR7X+n/mYYRoCY7
-         cSng==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1738511445; x=1739116245;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=2FlktBqIItlRMsNVIoFZhMDgOWGiaAQp2bpCfqyFgQ0=;
-        b=RwYO6gFXsTxR0B6JmIjyVJqZF6adcI0FB7Ks+4nZiREaoD0y8nFvrRJh4XWLy5485Y
-         5XdYzUSk/0w3C+v0Uu9gsBPI9oEP++gQg8bTqDdXi2dTwttd2hsixJJTo6KDzkTOqcYB
-         +tkoE/mKbg4R8zKqdylTLj2wxHQ2JOM6bMQVGLkiDVonrbnJMrHFU4D7ktGBWMVNTuxD
-         AZrJhZghEeQQEv0u8PSnX6hbz61Tm6tJJLwVCNJDGYg7cjLibAOtc5B2/U7iSl7+WrsW
-         gTsEmpdUqnkz9Lmv7y8WzeQtWsqBOj1z7Q6b8ubngepgPbZoJPH36KmtaGst233JkPQ7
-         3pLA==
-X-Forwarded-Encrypted: i=1; AJvYcCVSFfRGXjwg7gGltHuQC3Yysfb9dnHAlnlU8UZZnz4yPE8awA9sqaxGF2IpNNfyAiStSWtUkT4=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwUVfDuXCmPcdbNezMlNayu6vZiH41MjtnPGyBAC7Yjwo58Vkns
-	40fWWnuSjB/QjU0hPUMInij3+4Fc6z4SCYpgz1kQNw2pmsqFWOKbwHD8ZsqLEtlxSEBlO6oW2qj
-	WFUVwXqIeE/pGz0jTJGFQyiUVlJE=
-X-Gm-Gg: ASbGncvhkfKQ+jOOjgs2wmIAaaFAXC0Pzlv6wo738tc6BhowsQWVjKe4SAzLPa4O7A/
-	wL2j2/NprB3tPS1mcOStcdceD3CYzxLEs8VuNg5+cwa52fakbKh7TIdrhZ92g3pLC6WwwHWk=
-X-Google-Smtp-Source: AGHT+IHiGMQEwhRtko4AXBdno5MhSrHIkrbgdMRT1lpvfgNgFIw4nzm3IcZCeCYNXX7HEZjWT9kZ/lHyOKA2bsq3yOM=
-X-Received: by 2002:ad4:5d66:0:b0:6e1:7223:19a8 with SMTP id
- 6a1803df08f44-6e243c9492bmr322935606d6.31.1738511444813; Sun, 02 Feb 2025
- 07:50:44 -0800 (PST)
+	s=arc-20240116; t=1738512046; c=relaxed/simple;
+	bh=JxvFZ/EK8z5JlSqPGMMbIAcJmK9vYXtwZQmyfI5VkJ4=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=dgyMUUN1w+92ZFNocVSr73it1djbG8QRIN6Oo9FcEiFJGQm0WvgiDgUwdMbkK4OONix6OUigI1e2sejTPEz6Ab+X/x6umzB8lAW96V8nriXGglBRXIwWlR1t55B0o+hiCKgvIP2NUJhNAhhD4vhVHA4ae/O9meTuHYAsNimjT9E=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=idosch.org; spf=none smtp.mailfrom=idosch.org; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=S2UvkASs; arc=none smtp.client-ip=202.12.124.146
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=idosch.org
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=idosch.org
+Received: from phl-compute-11.internal (phl-compute-11.phl.internal [10.202.2.51])
+	by mailfout.stl.internal (Postfix) with ESMTP id 6DA3411400FA;
+	Sun,  2 Feb 2025 11:00:42 -0500 (EST)
+Received: from phl-mailfrontend-02 ([10.202.2.163])
+  by phl-compute-11.internal (MEProxy); Sun, 02 Feb 2025 11:00:42 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
+	messagingengine.com; h=cc:cc:content-type:content-type:date:date
+	:feedback-id:feedback-id:from:from:in-reply-to:in-reply-to
+	:message-id:mime-version:references:reply-to:subject:subject:to
+	:to:x-me-proxy:x-me-sender:x-me-sender:x-sasl-enc; s=fm3; t=
+	1738512042; x=1738598442; bh=AeE79DlPUgKYrINviwyNykCRSBqnXfoGcmh
+	/Cn8nGhE=; b=S2UvkASsfcVRew9JXhBeyQ40/qU/t3u8638Ekrylnwhc+U7P2dX
+	0h4fFf22zTH6tAEdsh+whNEA5m6KNrxBn1hc5Y6DPRAH46gdtmkphu0fS+Z5w+AP
+	vRQHkfT2uZLsyh6r6K23msuaA22aXsagDiKg8jOfVL3vmOCuvh+ui4pH0d/rIAIM
+	RFsPG/wy0TsX2CD66m1wNoOPEsyLY58c/E7AHaAO5T9Q06Rd6w6EqMmnadUNNK0I
+	EmQpWalwlU5aF+yYDHev4OO/5j2PdW7/xlDoVpf6OYmYR52vyfy6fNBJAO/k4l0b
+	XK4risHSJbZc/cH/Kw0vIdF2CIt0BI0Mbgg==
+X-ME-Sender: <xms:qZafZ1UUW6YWbDGGzk3w6E-tZgpOuU19uU6vELlMV9WSbt11wR49vw>
+    <xme:qZafZ1kiXmXHsFLQKItgzg4a2SO7a0aeze1Q0z4gsW8lxPtU4r2tpKBy_lr0WJys5
+    LLhOY2-tSy7vTM>
+X-ME-Received: <xmr:qZafZxbuXIvEb5vq9HuVLp-rpWkIKnA61GFOm2FH8YYJtI4C8p10Uzd1T52De_ljI0KFWbSQBH5dMJ900UVyqMN3m9SgNw>
+X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeefvddrtddtgdduhedtlecutefuodetggdotefrod
+    ftvfcurfhrohhfihhlvgemucfhrghsthforghilhdpggftfghnshhusghstghrihgsvgdp
+    uffrtefokffrpgfnqfghnecuuegrihhlohhuthemuceftddtnecusecvtfgvtghiphhivg
+    hnthhsucdlqddutddtmdenucfjughrpeffhffvvefukfhfgggtuggjsehttdertddttddv
+    necuhfhrohhmpefkughoucfutghhihhmmhgvlhcuoehiughoshgthhesihguohhstghhrd
+    horhhgqeenucggtffrrghtthgvrhhnpedvudefveekheeugeeftddvveefgfduieefudei
+    fefgleekheegleegjeejgeeghfenucevlhhushhtvghrufhiiigvpedtnecurfgrrhgrmh
+    epmhgrihhlfhhrohhmpehiughoshgthhesihguohhstghhrdhorhhgpdhnsggprhgtphht
+    thhopeduuddpmhhouggvpehsmhhtphhouhhtpdhrtghpthhtoheprghnnhgrvghmvghsvg
+    hnhihirhhisehgmhgrihhlrdgtohhmpdhrtghpthhtohepnhgvthguvghvsehvghgvrhdr
+    khgvrhhnvghlrdhorhhgpdhrtghpthhtohepfhgvjhgvshesihhnfhdrvghlthgvrdhhuh
+    dprhgtphhtthhopegvughumhgriigvthesghhoohhglhgvrdgtohhmpdhrtghpthhtohep
+    khhusggrsehkvghrnhgvlhdrohhrghdprhgtphhtthhopehprggsvghnihesrhgvughhrg
+    htrdgtohhmpdhrtghpthhtohepfihilhhlvghmsgesghhoohhglhgvrdgtohhmpdhrtghp
+    thhtohepuggrvhgvmhesuggrvhgvmhhlohhfthdrnhgvthdprhgtphhtthhopehhohhrmh
+    hssehkvghrnhgvlhdrohhrgh
+X-ME-Proxy: <xmx:qZafZ4WPpKnFAK59MmGo27c-TkYbS_Oif6cQ3RUkoHX2LOfs2eplnw>
+    <xmx:qZafZ_ld4vSXu0oHqPa3qAUiVsBBlWrbzo7AJDHLI5e0wZeeoPAI8g>
+    <xmx:qZafZ1dVQrXAQvYo2S3s2M-sVdvx75hgnGFvkwBsdUBj6xC9IANYhw>
+    <xmx:qZafZ5ERvFbeD5eUCoIabKTrZZa5_79QRcdvWFstpv7E1sPvV_HF4w>
+    <xmx:qpafZ4dgcHdzzuIl-wXMqfylIOzRQP7Bm8p9o40h9ayJ5THdbCmCC0QG>
+Feedback-ID: i494840e7:Fastmail
+Received: by mail.messagingengine.com (Postfix) with ESMTPA; Sun,
+ 2 Feb 2025 11:00:41 -0500 (EST)
+Date: Sun, 2 Feb 2025 18:00:37 +0200
+From: Ido Schimmel <idosch@idosch.org>
+To: Anna Emese Nyiri <annaemesenyiri@gmail.com>
+Cc: netdev@vger.kernel.org, fejes@inf.elte.hu, edumazet@google.com,
+	kuba@kernel.org, pabeni@redhat.com, willemb@google.com,
+	davem@davemloft.net, horms@kernel.org, shuah@kernel.org,
+	linux-kselftest@vger.kernel.org
+Subject: Re: [PATCH net-next 1/1] selftests: net: Add support for testing
+ SO_RCVMARK and SO_RCVPRIORITY
+Message-ID: <Z5-WpRAnP40UsMOS@shredder>
+References: <20250129143601.16035-1-annaemesenyiri@gmail.com>
+ <20250129143601.16035-2-annaemesenyiri@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <Z54XRR9DE7MIc0Sk@lore-desk> <20250201155009.GA211663@kernel.org>
-In-Reply-To: <20250201155009.GA211663@kernel.org>
-From: "Christian Marangi (Ansuel)" <ansuelsmth@gmail.com>
-Date: Sun, 2 Feb 2025 16:50:33 +0100
-X-Gm-Features: AWEUYZkz05-oOrLyIPHlblslbnn0hOew45ZN-fgptb2aqXW83T4VZJlBvPZHNi8
-Message-ID: <CA+_ehUwFTa2VvfqeTPyedFDWBHj3PeUem=ASMrrh1h3++yLc_A@mail.gmail.com>
-Subject: Re: Move airoha in a dedicated folder
-To: Simon Horman <horms@kernel.org>
-Cc: Lorenzo Bianconi <lorenzo@kernel.org>, netdev@vger.kernel.org, andrew+netdev@lunn.ch, 
-	davem@davemloft.net, edumazet@google.com, kuba@kernel.org, pabeni@redhat.com, 
-	nbd@nbd.name, sean.wang@mediatek.com, upstream@airoha.com
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250129143601.16035-2-annaemesenyiri@gmail.com>
 
-Il giorno sab 1 feb 2025 alle ore 16:50 Simon Horman
-<horms@kernel.org> ha scritto:
->
-> On Sat, Feb 01, 2025 at 01:44:53PM +0100, Lorenzo Bianconi wrote:
-> > Hi all,
-> >
-> > Since more features are on the way for airoha_eth driver (support for flowtable
-> > hw offloading, 10g phy support, ..), I was wondering if it is neater to move
-> > the driver in a dedicated folder (e.g. drivers/net/ethernet/airoha or
-> > drivers/net/ethernet/mediatek/airoha) or if you prefer to keep current
-> > approach. Thanks.
->
-> <2c>
->
-> Hi Lorenzo,
->
-> There already seem drivers to be drivers under drivers/net/ethernet/mediatek/
-> which are built from more than once .c file. So I think it is fine
-> to leave Airoha's source there. But, OTOH, I do think it would
-> be neater to move it into it's own directory. Which is to say,
-> I for one am happy either way.
->
-> If you do chose to go for a new directory, I would suggest
-> drivers/net/ethernet/mediatek/airoha assuming as it is a Mediatek device.
->
+On Wed, Jan 29, 2025 at 03:36:01PM +0100, Anna Emese Nyiri wrote:
+> diff --git a/tools/testing/selftests/net/test_so_rcv.sh b/tools/testing/selftests/net/test_so_rcv.sh
+> new file mode 100755
+> index 000000000000..12d37f9ab905
+> --- /dev/null
+> +++ b/tools/testing/selftests/net/test_so_rcv.sh
+> @@ -0,0 +1,56 @@
+> +#!/bin/bash
+> +# SPDX-License-Identifier: GPL-2.0
+> +
+> +HOST=127.0.0.1
+> +PORT=1234
+> +TOTAL_TESTS=0
+> +FAILED_TESTS=0
+> +
+> +declare -A TESTS=(
+> +	["SO_RCVPRIORITY"]="-P 2"
+> +	["SO_RCVMARK"]="-M 3"
+> +)
+> +
+> +check_result() {
+> +	((TOTAL_TESTS++))
+> +	if [ "$1" -ne 0 ]; then
+> +		((FAILED_TESTS++))
+> +	fi
+> +}
+> +
+> +for test_name in "${!TESTS[@]}"; do
+> +	echo "Running $test_name test"
+> +	arg=${TESTS[$test_name]}
+> +
+> +	./so_rcv_listener $arg $HOST $PORT &
+> +	LISTENER_PID=$!
+> +
+> +	if ./cmsg_sender $arg $HOST $PORT; then
 
-Hi,
-may I push for a dedicated Airoha directory? (/net/ethernet/airoha ?)
+In addition to the other comments, please run both binaries in a
+namespace that the test creates at the beginning via setup_ns() (from
+lib.sh) and deletes at the end via cleanup_ns().
 
-With new SoC it seems Airoha is progressively detaching from Mediatek.
+Thanks for adding the test.
 
-There are some similarities but for example for the PPE only the logical entry
-table is similar but rest of the stuff is handled by a coprocessor
-with dedicated
-firmware. My big concern is that we will start to bloat the mediatek directory
-with very different kind of code.
-
-Putting stuff in ethernet/mediatek/airoha would imply starting to use
-format like
-#include "../stuff.h" and maybe we would start to import stuff from
-mediatek that
-should not be used by airoha.
-
-Keeping the 2 thing split might make the similarities even more
-evident and easier
-to handle as we will have to rework the header to use the generic include/linux.
-
-Hope all of this makes sense, it's really to prevent situation and keep things
-organized from the start.
+> +		echo "Sender succeeded for $test_name"
+> +	else
+> +		echo "Sender failed for $test_name"
+> +		kill "$LISTENER_PID" 2>/dev/null
+> +		wait "$LISTENER_PID"
+> +		check_result 1
+> +		continue
+> +	fi
+> +
+> +	wait "$LISTENER_PID"
+> +	LISTENER_EXIT_CODE=$?
+> +
+> +	if [ "$LISTENER_EXIT_CODE" -eq 0 ]; then
+> +		echo "Rcv test OK for $test_name"
+> +		check_result 0
+> +	else
+> +		echo "Rcv test FAILED for $test_name"
+> +		check_result 1
+> +	fi
+> +done
+> +
+> +if [ "$FAILED_TESTS" -ne 0 ]; then
+> +	echo "FAIL - $FAILED_TESTS/$TOTAL_TESTS tests failed"
+> +	exit 1
+> +else
+> +	echo "OK - All $TOTAL_TESTS tests passed"
+> +	exit 0
+> +fi
+> -- 
+> 2.43.0
+> 
 
