@@ -1,186 +1,146 @@
-Return-Path: <netdev+bounces-161996-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-161997-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4E647A25043
-	for <lists+netdev@lfdr.de>; Sun,  2 Feb 2025 23:10:49 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4FCC4A2506F
+	for <lists+netdev@lfdr.de>; Sun,  2 Feb 2025 23:57:11 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 07E217A1041
-	for <lists+netdev@lfdr.de>; Sun,  2 Feb 2025 22:09:54 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id BFED41636F4
+	for <lists+netdev@lfdr.de>; Sun,  2 Feb 2025 22:57:09 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 027EA2147E0;
-	Sun,  2 Feb 2025 22:10:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C83012144D6;
+	Sun,  2 Feb 2025 22:57:06 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=jakemoroni.com header.i=@jakemoroni.com header.b="TRONp/Gb";
-	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="xXde9CuZ"
+	dkim=pass (2048-bit key) header.d=queasysnail.net header.i=@queasysnail.net header.b="JpbuBqU+";
+	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="OWGYJVi8"
 X-Original-To: netdev@vger.kernel.org
-Received: from fhigh-a7-smtp.messagingengine.com (fhigh-a7-smtp.messagingengine.com [103.168.172.158])
+Received: from fout-b7-smtp.messagingengine.com (fout-b7-smtp.messagingengine.com [202.12.124.150])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9F753101E6;
-	Sun,  2 Feb 2025 22:10:39 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=103.168.172.158
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D16E61D5143;
+	Sun,  2 Feb 2025 22:57:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=202.12.124.150
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1738534241; cv=none; b=thJ2FdpGBiEot1c+RU3Tsjm2K3uK+5QfWQ/7IKNZ2DpoZPbB1bGHGUSyYxM6wLtYTqRRHlDLfQ9b7yzHotMcxuohUk8BcLXWMKrJPwqqXKbrSOdt/1Vvw+rmnahQx57YLTSPjik8dsDMeEf8MBgcQYndij537UBLEDSQKZayIss=
+	t=1738537026; cv=none; b=LUaaKUdIBrffm83W8gNwsw2GzcU837Ez40Gnji+z5+yfPTrNwgDr1vXuEZLx6ZPjyciuUllZv7vqSn/fYnsBXjT1Ve9t0D++9pvZhy9G7iP7pIqGeACzpLX8KXM6cOuEVhPYGQfdIV3M+0XaaFW/GGUC3FsGNOeq21C7kcERejQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1738534241; c=relaxed/simple;
-	bh=QUDDt7cmWM6JdhLuzuEAEAdcnvJxWBs6SuH1hwDfD7Y=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=ZNMqGGhC0UdgBWE+yjKrBxFx128ZwWQY2yBIBJo6QPl9frcXWsfSCaTjbqBTnig+QWyt17Pdoa+YOf4ih2T3EF5W8bRWcUKBTDZg16cbFwnYbMpbh1P/T2mIxJP9XGRaissDxfRyte+3k7CAb7FKszTu6UuQciv8S3eLL/F0svU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=jakemoroni.com; spf=pass smtp.mailfrom=jakemoroni.com; dkim=pass (2048-bit key) header.d=jakemoroni.com header.i=@jakemoroni.com header.b=TRONp/Gb; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=xXde9CuZ; arc=none smtp.client-ip=103.168.172.158
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=jakemoroni.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=jakemoroni.com
-Received: from phl-compute-01.internal (phl-compute-01.phl.internal [10.202.2.41])
-	by mailfhigh.phl.internal (Postfix) with ESMTP id 94DE71140102;
-	Sun,  2 Feb 2025 17:10:38 -0500 (EST)
+	s=arc-20240116; t=1738537026; c=relaxed/simple;
+	bh=OcXyK7bwwgI9h4bw6stcRM8pwNwW34UUhHFlf3wAQv4=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=jmfp77S0OlxEol+g0Yz5YAXa1twsCNyaG2kIpPXllFRqCTtCtv6q3IAHYZeXuCr426vS1/cVsVnj3LIc+83x30MS7AUM0MtZVVxQOVFQZE/FRbbDtNGh6sPxW+TNIgxF476K+v0fKBfbSoL2PeYMXSS6TSIAlzcD+Udx6+PPjcA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=queasysnail.net; spf=pass smtp.mailfrom=queasysnail.net; dkim=pass (2048-bit key) header.d=queasysnail.net header.i=@queasysnail.net header.b=JpbuBqU+; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=OWGYJVi8; arc=none smtp.client-ip=202.12.124.150
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=queasysnail.net
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=queasysnail.net
+Received: from phl-compute-11.internal (phl-compute-11.phl.internal [10.202.2.51])
+	by mailfout.stl.internal (Postfix) with ESMTP id 74C9B114009F;
+	Sun,  2 Feb 2025 17:57:01 -0500 (EST)
 Received: from phl-mailfrontend-02 ([10.202.2.163])
-  by phl-compute-01.internal (MEProxy); Sun, 02 Feb 2025 17:10:38 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=jakemoroni.com;
-	 h=cc:cc:content-transfer-encoding:content-type:date:date:from
-	:from:in-reply-to:message-id:mime-version:reply-to:subject
-	:subject:to:to; s=fm2; t=1738534238; x=1738620638; bh=pqqdKzGSHP
-	y/opA4pIlSJbFwZjddQqYW7yXI+rIj+M8=; b=TRONp/GbcBeaCQT3g+Meq9Bctq
-	eQ0tHuh3e+UeczohJ7ZfBp098v9V0OjN064z3UodtUbvU2v1dWQ9aat5GS4iLk7A
-	AC93cyfn9Mawhl2b4ntZrC9YxDWpJaK51JsrJ8VJBiUn8EZe4B7A7z0x1l4IGW+s
-	S/qcwZQFIJSRTkoRt77106sGyevYaU2X1fVkAhDHkJTQXArJuSE8VvT2uRSsCKxs
-	n4k8xIJtYIcClx/dLZeQQ7UsJfEconSWm+P9NEAfuK9Jl2doC6cWCYfMJjb510S5
-	B044zz1XqGZ3nAP2JgLPuAD9FtWTtyIACcyKff9B5hb0DaLD56WNSUs2HXtw==
+  by phl-compute-11.internal (MEProxy); Sun, 02 Feb 2025 17:57:01 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=queasysnail.net;
+	 h=cc:cc:content-type:content-type:date:date:from:from
+	:in-reply-to:in-reply-to:message-id:mime-version:references
+	:reply-to:subject:subject:to:to; s=fm1; t=1738537021; x=
+	1738623421; bh=VsVhn7TsWFkiGhBgMcGseU2C8V1FuoE6pCFZYwtMzzM=; b=J
+	pbuBqU+Qq05tsPCaTLyi8PkVthcjzyB0jYkpiIk5/wXO04Odk9dZcmDHzJOnRuIB
+	D5X1qR2J8CV6qPunaC3M3KjgJzf/mAJs6vlTcz6FAIfFc08Lt9m5xc7IgEtZX/Cf
+	C6Pv//38rhfCfhsgrSmjuE/ZkQj4Ruxtiz5XUVWI8pBCu9B7sV+EZ2juhcCaQg8/
+	b8fyBDcWcUaxSWNormj0Qie2LmCAKB9LVuIa+Yf/huUqT68dNgBLz5LnwtUmktyJ
+	m5R17rWb1eTTwrlTFS/QSumy5LoFn9tenP6kuQYu6Fm2TOUGdAmLkmibjFG0mWrV
+	cpNmgLJuWhO2hgxZ8iK7Q==
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
-	messagingengine.com; h=cc:cc:content-transfer-encoding
-	:content-type:date:date:feedback-id:feedback-id:from:from
-	:in-reply-to:message-id:mime-version:reply-to:subject:subject:to
+	messagingengine.com; h=cc:cc:content-type:content-type:date:date
+	:feedback-id:feedback-id:from:from:in-reply-to:in-reply-to
+	:message-id:mime-version:references:reply-to:subject:subject:to
 	:to:x-me-proxy:x-me-sender:x-me-sender:x-sasl-enc; s=fm3; t=
-	1738534238; x=1738620638; bh=pqqdKzGSHPy/opA4pIlSJbFwZjddQqYW7yX
-	I+rIj+M8=; b=xXde9CuZYSqklxhHugmr5d5yrLuYVOlDrcqZhDa+VjSZiga2XiK
-	rWO5jmBXryc4BypCo+UOf/JJ/q37vbb+2MXakb5EfCR/37nwEO8UvnoYqaX1EAnS
-	NJajc9ScT6HVXvpTfLYSxMirWfYif87Pz8JHJmdEha4A8Ml90vJXNpzEl8+RjgzF
-	9Jg7yq86HVLYJAcnue2Ege4HWEsW82OqhSQcWtTwBuF3n+Xkm+uJy+WSUqefcDY0
-	5RF9c/lL8lirwXoNMMr0stxymblqw4/Y9Bq5kwLnr3aq7tfa9M9s115KMLA1kdZK
-	kzFxH7d5ivJh6381jXqY+6AUbg2cFtUKrsg==
-X-ME-Sender: <xms:Xe2fZz1B1SLdKzYcBrWmslu_Cy8owdh6epTu3rcIHJHwF9APy5BsLA>
-    <xme:Xe2fZyGxm7_mPTdyE2-Zj33MDQfTia5mrbXGzzt7wMMcfDMOLnLzJY4v53b_CPlej
-    C2kqjhMVCGTpIwGOQ>
-X-ME-Received: <xmr:Xe2fZz5pOlZjNl9i6ffD9Ik2X5MoRPLcyPGHXpU6HrTVC6Cc-VHZvPscAHlKGt5FrXBpDm5T0CvHHsYkgikY7qaj_gvIl0u_8T8OfEjoN4dSwiPwn3ROBDWr>
-X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeefvddrtddtgdduheekhecutefuodetggdotefrod
+	1738537021; x=1738623421; bh=VsVhn7TsWFkiGhBgMcGseU2C8V1FuoE6pCF
+	ZYwtMzzM=; b=OWGYJVi8e4NGXqSnj2j3UVgYa0KWQ0dpUrwfZPPFXBrzpLV3qbw
+	lhlwq3+vbfda2/da2wwJ/8uoBsUV4PiuDAjlMV4P8OEX2sdLqt7Xuvv3CnSwGClA
+	Y5TXxUwH96CXwMxanh2F8tFKaGuuVXUjBfJpEtaQRoQuP4sZCorZpRBMcvgN1BPE
+	P4vSwGfjvQMtw+2GqwhefkRETwXtj1YaoQt/bmQ9qMZ2HzHWPlYQS7Pt/NAb95+I
+	k0CHDF/ys3a/4k8U6CGlphM9SnYbVmYZ2Awn7sZam4geDkslefw6sVWY8metnEUn
+	0wDKKdIbPIth62QgJYM52/rhimoVjlAsPzA==
+X-ME-Sender: <xms:PPifZ_m_OqW7SmIDl9Rncu5-zASjv2z34ZIYdX2dU3FQMfXZ0UXJEg>
+    <xme:PPifZy2P_1FrLD3rhJV-6v7mSrm5EY148Y2QBvvHhVCdjdXVWgipaCNgblpbXFyNG
+    FF1WVPnJbgjQzosbI8>
+X-ME-Received: <xmr:PPifZ1q8Tn9Zt4I6163Ubqkx9a5XkiiyMNEvWQUls5FogVOoTp8EgILNoeUF>
+X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeefvddrtddtgdduheelgecutefuodetggdotefrod
     ftvfcurfhrohhfihhlvgemucfhrghsthforghilhdpggftfghnshhusghstghrihgsvgdp
     uffrtefokffrpgfnqfghnecuuegrihhlohhuthemuceftddtnecusecvtfgvtghiphhivg
-    hnthhsucdlqddutddtmdenucfjughrpefhvfevufffkffoggfgsedtkeertdertddtnecu
-    hfhrohhmpeflrggtohgsucfoohhrohhnihcuoehmrghilhesjhgrkhgvmhhorhhonhhird
-    gtohhmqeenucggtffrrghtthgvrhhnpeehgeefveelhedvtedvveejhfellefgueetvdeh
-    heduieelffejtefgtdevtedttdenucevlhhushhtvghrufhiiigvpedtnecurfgrrhgrmh
-    epmhgrihhlfhhrohhmpehmrghilhesjhgrkhgvmhhorhhonhhirdgtohhmpdhnsggprhgt
-    phhtthhopeelpdhmohguvgepshhmthhpohhuthdprhgtphhtthhopehirhhushhskhhikh
-    hhsehmrghrvhgvlhhlrdgtohhmpdhrtghpthhtoheprghnughrvgifodhnvghtuggvvhes
-    lhhunhhnrdgthhdprhgtphhtthhopegurghvvghmsegurghvvghmlhhofhhtrdhnvghtpd
-    hrtghpthhtohepvgguuhhmrgiivghtsehgohhoghhlvgdrtghomhdprhgtphhtthhopehk
-    uhgsrgeskhgvrhhnvghlrdhorhhgpdhrtghpthhtohepphgrsggvnhhisehrvgguhhgrth
-    drtghomhdprhgtphhtthhopehmrghilhesjhgrkhgvmhhorhhonhhirdgtohhmpdhrtghp
-    thhtohepnhgvthguvghvsehvghgvrhdrkhgvrhhnvghlrdhorhhgpdhrtghpthhtoheplh
-    hinhhugidqkhgvrhhnvghlsehvghgvrhdrkhgvrhhnvghlrdhorhhg
-X-ME-Proxy: <xmx:Xe2fZ43vdz9VIAqYxAEc7IUB3mfsKhsAb2dK1hdjCcT7sQPLBAhXeA>
-    <xmx:Xe2fZ2FxiR-zFL1LZhPKrVLbTVA6vAZBQgYQgM5JtOT7-b2LpQvURA>
-    <xmx:Xe2fZ58ItQ0uz1536wGVCIKCFzUZao-yHrDuWSAb5QJ3-eXcU22V5A>
-    <xmx:Xe2fZzkXBcNUCGu_wu6--1ZknVtdoWpDbs3V7SEqCqFvdqORTHEVtQ>
-    <xmx:Xu2fZ5ANTJZLV0XmItBNXcU3IS_l7I-IF6Yn-u0AZyw9l7G-PvAxWMFR>
-Feedback-ID: i17014242:Fastmail
+    hnthhsucdlqddutddtmdenucfjughrpeffhffvvefukfhfgggtuggjsehttdertddttdej
+    necuhfhrohhmpefurggsrhhinhgrucffuhgsrhhotggruceoshgusehquhgvrghshihsnh
+    grihhlrdhnvghtqeenucggtffrrghtthgvrhhnpeeuhffhfffgfffhfeeuiedugedtfefh
+    keegteehgeehieffgfeuvdeuffefgfduffenucevlhhushhtvghrufhiiigvpedtnecurf
+    grrhgrmhepmhgrihhlfhhrohhmpehsugesqhhuvggrshihshhnrghilhdrnhgvthdpnhgs
+    pghrtghpthhtohepudefpdhmohguvgepshhmthhpohhuthdprhgtphhtthhopegrnhhtoh
+    hnihhosehophgvnhhvphhnrdhnvghtpdhrtghpthhtohepnhgvthguvghvsehvghgvrhdr
+    khgvrhhnvghlrdhorhhgpdhrtghpthhtohepvgguuhhmrgiivghtsehgohhoghhlvgdrtg
+    homhdprhgtphhtthhopehkuhgsrgeskhgvrhhnvghlrdhorhhgpdhrtghpthhtohepphgr
+    sggvnhhisehrvgguhhgrthdrtghomhdprhgtphhtthhopeguohhnrghlugdrhhhunhhtvg
+    hrsehgmhgrihhlrdgtohhmpdhrtghpthhtohepshhhuhgrhheskhgvrhhnvghlrdhorhhg
+    pdhrtghpthhtoheprhihrgiirghnohhvrdhsrdgrsehgmhgrihhlrdgtohhmpdhrtghpth
+    htoheprghnughrvgifodhnvghtuggvvheslhhunhhnrdgthh
+X-ME-Proxy: <xmx:PPifZ3l6muUv4RY8-GwzD9SWhbENRF074jdlNEiE7PUzIJZoL7pibw>
+    <xmx:PPifZ92fnp7Mvj-RPYxrlYN4tvmCl9w0OnDY5SRI9hQ-xUggfJc4fw>
+    <xmx:PPifZ2s7zZNIOiAMOYOIotAzlg1Y1PED__lG_YIoDZ2iEY-Xh1o87Q>
+    <xmx:PPifZxUABlW4LKYPYQ73IJPAQUkLtfwYFeOtAdqVrPvli1mAS2Qw2w>
+    <xmx:PfifZ82c0uPha1-qE69f5MlS33SVAAStrzM1gfZ3SnvEjlZTX0Dhtq0g>
+Feedback-ID: i934648bf:Fastmail
 Received: by mail.messagingengine.com (Postfix) with ESMTPA; Sun,
- 2 Feb 2025 17:10:37 -0500 (EST)
-From: Jacob Moroni <mail@jakemoroni.com>
-To: Igor Russkikh <irusskikh@marvell.com>,
+ 2 Feb 2025 17:57:00 -0500 (EST)
+Date: Sun, 2 Feb 2025 23:56:58 +0100
+From: Sabrina Dubroca <sd@queasysnail.net>
+To: Antonio Quartulli <antonio@openvpn.net>
+Cc: netdev@vger.kernel.org, Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Donald Hunter <donald.hunter@gmail.com>,
+	Shuah Khan <shuah@kernel.org>, ryazanov.s.a@gmail.com,
 	Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>
-Cc: Jacob Moroni <mail@jakemoroni.com>,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: [PATCH net] net: atlantic: fix warning during hot unplug
-Date: Sun,  2 Feb 2025 17:09:21 -0500
-Message-ID: <20250202220921.13384-2-mail@jakemoroni.com>
-X-Mailer: git-send-email 2.43.0
+	Simon Horman <horms@kernel.org>, linux-kernel@vger.kernel.org,
+	linux-kselftest@vger.kernel.org, Xiao Liang <shaw.leon@gmail.com>
+Subject: Re: [PATCH net-next v18 05/25] ovpn: introduce the ovpn_peer object
+Message-ID: <Z5_4OmdmKvHJ5P-_@hog>
+References: <20250113-b4-ovpn-v18-0-1f00db9c2bd6@openvpn.net>
+ <20250113-b4-ovpn-v18-5-1f00db9c2bd6@openvpn.net>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20250113-b4-ovpn-v18-5-1f00db9c2bd6@openvpn.net>
 
-Firmware deinitialization performs MMIO accesses which are not
-necessary if the device has already been removed. In some cases,
-these accesses happen via readx_poll_timeout_atomic which ends up
-timing out, resulting in a warning at hw_atl2_utils_fw.c:112:
+2025-01-13, 10:31:24 +0100, Antonio Quartulli wrote:
+> +static int ovpn_peer_del_p2p(struct ovpn_peer *peer,
+> +			     enum ovpn_del_peer_reason reason)
+> +{
+> +	struct ovpn_peer *tmp;
+> +
+> +	lockdep_assert_held(&peer->ovpn->lock);
+> +
+> +	tmp = rcu_dereference_protected(peer->ovpn->peer,
+> +					lockdep_is_held(&peer->ovpn->lock));
+> +	if (tmp != peer) {
+> +		DEBUG_NET_WARN_ON_ONCE(1);
 
-[  104.595913] Call Trace:
-[  104.595915]  <TASK>
-[  104.595918]  ? show_regs+0x6c/0x80
-[  104.595923]  ? __warn+0x8d/0x150
-[  104.595925]  ? aq_a2_fw_deinit+0xcf/0xe0 [atlantic]
-[  104.595934]  ? report_bug+0x182/0x1b0
-[  104.595938]  ? handle_bug+0x6e/0xb0
-[  104.595940]  ? exc_invalid_op+0x18/0x80
-[  104.595942]  ? asm_exc_invalid_op+0x1b/0x20
-[  104.595944]  ? aq_a2_fw_deinit+0xcf/0xe0 [atlantic]
-[  104.595952]  ? aq_a2_fw_deinit+0xcf/0xe0 [atlantic]
-[  104.595959]  aq_nic_deinit.part.0+0xbd/0xf0 [atlantic]
-[  104.595964]  aq_nic_deinit+0x17/0x30 [atlantic]
-[  104.595970]  aq_ndev_close+0x2b/0x40 [atlantic]
-[  104.595975]  __dev_close_many+0xad/0x160
-[  104.595978]  dev_close_many+0x99/0x170
-[  104.595979]  unregister_netdevice_many_notify+0x18b/0xb20
-[  104.595981]  ? __call_rcu_common+0xcd/0x700
-[  104.595984]  unregister_netdevice_queue+0xc6/0x110
-[  104.595986]  unregister_netdev+0x1c/0x30
-[  104.595988]  aq_pci_remove+0xb1/0xc0 [atlantic]
+I think this WARN should be removed. If 2 almost-simultanenous
+DEL_PEER manage to fetch the peer, the first will delete it and NULL
+peer->ovpn->peer, then when it releases ovpn->lock, the 2nd will find
+NULL != peer and hit this WARN.
 
-Fix this by skipping firmware deinitialization altogether if the
-PCI device is no longer present.
+(probably not happening in practical cases, but syzbot will manage to
+hit it)
 
-Tested with an AQC113 attached via Thunderbolt by performing
-repeated unplug cycles while traffic was running via iperf.
+> +		return -ENOENT;
+> +	}
+> +
+> +	ovpn_peer_remove(peer, reason);
+> +
+> +	return 0;
+> +}
 
-Signed-off-by: Jacob Moroni <mail@jakemoroni.com>
----
- drivers/net/ethernet/aquantia/atlantic/aq_nic.c | 15 ++++++++-------
- 1 file changed, 8 insertions(+), 7 deletions(-)
-
-diff --git a/drivers/net/ethernet/aquantia/atlantic/aq_nic.c b/drivers/net/ethernet/aquantia/atlantic/aq_nic.c
-index fe0e3e2a8117..e2ae95a01947 100644
---- a/drivers/net/ethernet/aquantia/atlantic/aq_nic.c
-+++ b/drivers/net/ethernet/aquantia/atlantic/aq_nic.c
-@@ -1428,7 +1428,7 @@ void aq_nic_deinit(struct aq_nic_s *self, bool link_down)
- 	unsigned int i = 0U;
- 
- 	if (!self)
--		goto err_exit;
-+		return;
- 
- 	for (i = 0U; i < self->aq_vecs; i++) {
- 		aq_vec = self->aq_vec[i];
-@@ -1441,13 +1441,14 @@ void aq_nic_deinit(struct aq_nic_s *self, bool link_down)
- 	aq_ptp_ring_free(self);
- 	aq_ptp_free(self);
- 
--	if (likely(self->aq_fw_ops->deinit) && link_down) {
--		mutex_lock(&self->fwreq_mutex);
--		self->aq_fw_ops->deinit(self->aq_hw);
--		mutex_unlock(&self->fwreq_mutex);
-+	/* May be invoked during hot unplug. */
-+	if (pci_device_is_present(self->pdev)) {
-+		if (likely(self->aq_fw_ops->deinit) && link_down) {
-+			mutex_lock(&self->fwreq_mutex);
-+			self->aq_fw_ops->deinit(self->aq_hw);
-+			mutex_unlock(&self->fwreq_mutex);
-+		}
- 	}
--
--err_exit:;
- }
- 
- void aq_nic_free_vectors(struct aq_nic_s *self)
 -- 
-2.43.0
-
+Sabrina
 
