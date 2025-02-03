@@ -1,103 +1,96 @@
-Return-Path: <netdev+bounces-162225-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-162226-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5D592A2641E
-	for <lists+netdev@lfdr.de>; Mon,  3 Feb 2025 20:54:36 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id D19ADA2642E
+	for <lists+netdev@lfdr.de>; Mon,  3 Feb 2025 21:01:22 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D6E293A1284
-	for <lists+netdev@lfdr.de>; Mon,  3 Feb 2025 19:54:27 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 99C2A7A2CD5
+	for <lists+netdev@lfdr.de>; Mon,  3 Feb 2025 20:00:27 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6CB4D1E7C03;
-	Mon,  3 Feb 2025 19:54:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6971C150980;
+	Mon,  3 Feb 2025 20:01:17 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="163YN5kA"
+	dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b="pUDkNLaZ"
 X-Original-To: netdev@vger.kernel.org
-Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
+Received: from smtp-fw-52005.amazon.com (smtp-fw-52005.amazon.com [52.119.213.156])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7C3D01DACB1
-	for <netdev@vger.kernel.org>; Mon,  3 Feb 2025 19:54:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 815D3522A
+	for <netdev@vger.kernel.org>; Mon,  3 Feb 2025 20:01:15 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=52.119.213.156
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1738612472; cv=none; b=HZ2mwD560MunnglZhSx1a+3w30/YNp+CkXrtDxX3TToCi7qJWPwd8+4X1VMmUj+J4/wZJ+LkR7QdhdDPigssdcERkTk/rEDyffpoZMm0ixzZ/+RjdGSFpUNxGYEEy8EG/LDAfjXcQ95ANYyZkJeS7Ovy96hnp88h+DovmsWTZng=
+	t=1738612877; cv=none; b=ka2Mfw2+fnyyDrbbjbXQtLutEYkld/Ibq5pUEABOl9U5zBmpGzqxBvRzd0pMjbNR3t1e8Evwj0p14T7lBegKFQujVTFyiNTpqSURpXPBYaXyiOimPH7U2RI0Pu9Y8kQDgmau6d/ZuNJYWYAtZXYbguD1x1jsghPt1LxDVYoQdvA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1738612472; c=relaxed/simple;
-	bh=ztKiG31Luh1lQwSgv6oCtkJJB7c+HoA8kcmgb/VJFW4=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=S97OjigUswrdusd+Ks0297WHxNk7s6QgbT8wgJjY/g1IH2sb9T+zLrJgf+6KEF5FPYPaG2T3miYj60E0HhEsRfcDGMVnW6vX9tNbKo9eGBYLpnXGHBHRhi00+elkbuy2tYSVv9FvjEMphQsYFXyHTxMkaWbFLZ2VftNUuxFIw1g=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=163YN5kA; arc=none smtp.client-ip=78.32.30.218
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
-	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
-	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
-	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=w6dYF4YrnPvWP9HtquT/UMp6zFz5bne6zTsmz2orqRI=; b=163YN5kAgGUvvBkTDFvDBbIamI
-	VG2n8xHb0xfUdFle47rh/SEfH63/204vzX5K+iJibtqq/aAsXM3AZFubcqLHYm1qzH3XieOdtBd11
-	wpItHTeEMNITD6WreoQfBjtzUNKc8G0pp779Z9SzJ9u8ygp8n7QEuN9p4M/iMn15KbDQOQTdRE8Aw
-	S7fd1pEDA8tAyjqN3qG8J7pTDyG0PI7fUGEIB2r/73l3uNeNk07ebLStqTHL0+Kl4NpabEZNhjVUq
-	0VjpP6nKc1PUzkTyW95rZpu2fEtASPnzBrbKT3SXMyWs7qgXJaiIUfh4pmiv8mLvls/c32FxVi48r
-	eqX0qlbQ==;
-Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:48796)
-	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.96)
-	(envelope-from <linux@armlinux.org.uk>)
-	id 1tf2WS-0001IC-0O;
-	Mon, 03 Feb 2025 19:54:20 +0000
-Received: from linux by shell.armlinux.org.uk with local (Exim 4.96)
-	(envelope-from <linux@shell.armlinux.org.uk>)
-	id 1tf2WP-0000e1-1P;
-	Mon, 03 Feb 2025 19:54:17 +0000
-Date: Mon, 3 Feb 2025 19:54:17 +0000
-From: "Russell King (Oracle)" <linux@armlinux.org.uk>
-To: Gerhard Engleder <gerhard@engleder-embedded.com>
-Cc: andrew@lunn.ch, hkallweit1@gmail.com, davem@davemloft.net,
-	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
-	netdev@vger.kernel.org
-Subject: Re: [PATCH net-next v4 3/7] net: phy: micrel: Add loopback support
-Message-ID: <Z6Ee6RDkaAeKw749@shell.armlinux.org.uk>
-References: <20250203191057.46351-1-gerhard@engleder-embedded.com>
- <20250203191057.46351-4-gerhard@engleder-embedded.com>
+	s=arc-20240116; t=1738612877; c=relaxed/simple;
+	bh=vFqoder34BNSoYS9d3W9VoijwcDBKUPC6iSfUkqXhjo=;
+	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=IdeBy6gBQwxsYe5pNtONZMONxafWNuCbqLRF0cJUlxmLF+JcBrfSntD00euvFudqyXyvXs63DHxXSzVCO8gjvsLTL356nIqQYsA+sWaVze5nSrLkLeUrignH29cpeg6SseH6hD7ib5ebIoWyJipDifsvhf7KVAJXdwsEROvr8io=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.co.jp; dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b=pUDkNLaZ; arc=none smtp.client-ip=52.119.213.156
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.co.jp
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
+  t=1738612876; x=1770148876;
+  h=from:to:cc:subject:date:message-id:in-reply-to:
+   references:mime-version:content-transfer-encoding;
+  bh=n/OS/rO6nDxwkqL/VY/Y5C6ulrraKeRpwB3HfCtML74=;
+  b=pUDkNLaZdiERENaEMKn7W92tw934Q4hfIf7BAfJ4AIzw33TysE7ZgjXd
+   zVhRDKrbO9b5V/S2VKoc6pECIU6mPhIyOkTK443lP7VCJf7p13h4VQD0+
+   7wEOscRKONMwz6RFMt0n4dxx9bMh8zx/QsJsDgfecCCxWFBbzihWHSE5f
+   I=;
+X-IronPort-AV: E=Sophos;i="6.13,256,1732579200"; 
+   d="scan'208";a="715706127"
+Received: from iad12-co-svc-p1-lb1-vlan3.amazon.com (HELO smtpout.prod.us-west-2.prod.farcaster.email.amazon.dev) ([10.43.8.6])
+  by smtp-border-fw-52005.iad7.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 03 Feb 2025 20:01:11 +0000
+Received: from EX19MTAUWA001.ant.amazon.com [10.0.21.151:25508]
+ by smtpin.naws.us-west-2.prod.farcaster.email.amazon.dev [10.0.24.236:2525] with esmtp (Farcaster)
+ id bf5abf61-2d7c-47f3-b656-5a20eb0cc5ce; Mon, 3 Feb 2025 20:01:10 +0000 (UTC)
+X-Farcaster-Flow-ID: bf5abf61-2d7c-47f3-b656-5a20eb0cc5ce
+Received: from EX19D004ANA001.ant.amazon.com (10.37.240.138) by
+ EX19MTAUWA001.ant.amazon.com (10.250.64.204) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1258.39;
+ Mon, 3 Feb 2025 20:01:03 +0000
+Received: from 6c7e67bfbae3.amazon.com (10.119.5.38) by
+ EX19D004ANA001.ant.amazon.com (10.37.240.138) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1258.39;
+ Mon, 3 Feb 2025 20:01:00 +0000
+From: Kuniyuki Iwashima <kuniyu@amazon.com>
+To: <kuba@kernel.org>
+CC: <andrew+netdev@lunn.ch>, <davem@davemloft.net>, <edumazet@google.com>,
+	<horms@kernel.org>, <kuniyu@amazon.com>, <netdev@vger.kernel.org>,
+	<pabeni@redhat.com>, <willemb@google.com>
+Subject: Re: [PATCH net 0/3] MAINTAINERS: recognize Kuniyuki Iwashima as a maintainer
+Date: Tue, 4 Feb 2025 05:00:49 +0900
+Message-ID: <20250203200049.49670-1-kuniyu@amazon.com>
+X-Mailer: git-send-email 2.39.5 (Apple Git-154)
+In-Reply-To: <20250202014728.1005003-1-kuba@kernel.org>
+References: <20250202014728.1005003-1-kuba@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250203191057.46351-4-gerhard@engleder-embedded.com>
-Sender: Russell King (Oracle) <linux@armlinux.org.uk>
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-ClientProxiedBy: EX19D046UWA002.ant.amazon.com (10.13.139.39) To
+ EX19D004ANA001.ant.amazon.com (10.37.240.138)
 
-On Mon, Feb 03, 2025 at 08:10:53PM +0100, Gerhard Engleder wrote:
-> +static int ksz9031_set_loopback(struct phy_device *phydev, bool enable,
-> +				int speed)
-> +{
-> +	u16 ctl = BMCR_LOOPBACK;
-> +	int ret, val;
-> +
-> +	if (!enable)
-> +		return genphy_loopback(phydev, enable, 0);
-> +
-> +	if (speed == SPEED_10 || speed == SPEED_100 || speed == SPEED_1000)
-> +		phydev->speed = speed;
-> +	else if (speed)
-> +		return -EINVAL;
-> +	phydev->duplex = DUPLEX_FULL;
-> +
-> +	ctl |= mii_bmcr_encode_fixed(phydev->speed, phydev->duplex);
-> +
-> +	phy_modify(phydev, MII_BMCR, ~0, ctl);
+From: Jakub Kicinski <kuba@kernel.org>
+Date: Sat,  1 Feb 2025 17:47:25 -0800
+> Kuniyuki Iwashima has been a prolific contributor and trusted reviewer
+> for some core portions of the networking stack for a couple of years now.
+> Formalize some obvious areas of his expertise and list him as a maintainer.
+> 
+> Jakub Kicinski (3):
+>   MAINTAINERS: add Kuniyuki Iwashima to TCP reviewers
+>   MAINTAINERS: add a general entry for BSD sockets
+>   MAINTAINERS: add entry for UNIX sockets
 
-Why do you use phy_modify() here rather than phy_write() which is
-effectively what this is.
+Reviewed-by: Kuniyuki Iwashima <kuniyu@amazon.com>
 
--- 
-RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
-FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
+Thank you so much !!!
 
