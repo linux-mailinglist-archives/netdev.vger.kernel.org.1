@@ -1,166 +1,159 @@
-Return-Path: <netdev+bounces-162024-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-162025-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9BDD8A255DA
-	for <lists+netdev@lfdr.de>; Mon,  3 Feb 2025 10:30:11 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4008EA255EC
+	for <lists+netdev@lfdr.de>; Mon,  3 Feb 2025 10:31:30 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 1DD65167575
-	for <lists+netdev@lfdr.de>; Mon,  3 Feb 2025 09:30:10 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id DFAAD3A8981
+	for <lists+netdev@lfdr.de>; Mon,  3 Feb 2025 09:31:21 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5B0EC1FF1DA;
-	Mon,  3 Feb 2025 09:30:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DD4581FF1DA;
+	Mon,  3 Feb 2025 09:31:26 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=queasysnail.net header.i=@queasysnail.net header.b="T/3RFYO7";
-	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="LqRJ97VC"
+	dkim=pass (2048-bit key) header.d=denx.de header.i=@denx.de header.b="S5JZV9EH"
 X-Original-To: netdev@vger.kernel.org
-Received: from fhigh-a6-smtp.messagingengine.com (fhigh-a6-smtp.messagingengine.com [103.168.172.157])
+Received: from mx.denx.de (mx.denx.de [89.58.32.78])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 78FA11FBEB9;
-	Mon,  3 Feb 2025 09:30:05 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=103.168.172.157
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BCEB41D798E
+	for <netdev@vger.kernel.org>; Mon,  3 Feb 2025 09:31:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=89.58.32.78
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1738575007; cv=none; b=TxBBQvCs71aQJeLzAr//xKq1y0vFmrscuIPjZmJzIYwtW7wach2EdrIIEmENKFeiPSFj6mQgXGdik9xrokmXHa/LRXcV57dS7P/JhyhoANs3Utcs6rSa8KSgzGbmVaot4PWuRqXZGbbyjUR5OVVCnWN0F/3pceOZ3bmF7jrfXNo=
+	t=1738575086; cv=none; b=E2HuhedGpKjPwkm8dnikwAf45i07rAU9D5GJ7SBXHyEVMLMR6gwuprw1MZ8a0i91kXes5GEx/hczFROzWfsIVtnUR8obYWehXc3/emmQLyvd0FKHegt2YpjFblGzP5iZDzIDqUvcL6RQSIs3+WYKLcbIsvjyr2gbifIPURRdAeY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1738575007; c=relaxed/simple;
-	bh=MFhOnjLBXPAwreWqtPn9AaCb1UTrwDZV2mnF/c2eUeI=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=ZxrXLMaCBCrpX/SA/VZJJbjEPiE+D2pa46qCy99gR0IFM3+ewPaGxfussrzntZkRbu9vK3s4wnVIgh40Wvjug6Ecp/qDwR1bprrgYcffQEwrAorf39qbqqISRQAlJt4FX66tPAC3xciSAuSTfUKluxSDVG5ISJx6keSJ5RkS2Qw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=queasysnail.net; spf=pass smtp.mailfrom=queasysnail.net; dkim=pass (2048-bit key) header.d=queasysnail.net header.i=@queasysnail.net header.b=T/3RFYO7; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=LqRJ97VC; arc=none smtp.client-ip=103.168.172.157
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=queasysnail.net
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=queasysnail.net
-Received: from phl-compute-08.internal (phl-compute-08.phl.internal [10.202.2.48])
-	by mailfhigh.phl.internal (Postfix) with ESMTP id C3AE21140173;
-	Mon,  3 Feb 2025 04:30:03 -0500 (EST)
-Received: from phl-mailfrontend-01 ([10.202.2.162])
-  by phl-compute-08.internal (MEProxy); Mon, 03 Feb 2025 04:30:03 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=queasysnail.net;
-	 h=cc:cc:content-type:content-type:date:date:from:from
-	:in-reply-to:in-reply-to:message-id:mime-version:references
-	:reply-to:subject:subject:to:to; s=fm1; t=1738575003; x=
-	1738661403; bh=Iu0c4P+pd0rwbChSBCxBM/nO9XHU1xVgF+psuWmP558=; b=T
-	/3RFYO7IzYIHRUsMkuttG7bza5Qd+HCi7z18653rI/QttfeSvgeAJ/cCsuWar4JQ
-	yM/kE9O+bWoxuwneDYNN2PP4hqvpLBmkFlZ+XO3XiOo1HrtT+9Ebg3q3GlTjZyjC
-	cXmbBCZsaQWQ4ajM8qOe8MDFaXADR3SSe2uZisq/Y3Wp5FLnUwD5WDx7fuKNr36l
-	gckyJbBlCoMLKrIy9nkGzDfx/1z2skfW73pqhOd1GU0lDe+MFwdHqP2nOhO+Rso/
-	NXZYKbcATGh6DE5sFQZge7eba7LsxGov0xpfd1lK3CCv1Lq3nII0eAYvwtfdZHRh
-	esnQInAcmOgUi34xvAOCw==
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
-	messagingengine.com; h=cc:cc:content-type:content-type:date:date
-	:feedback-id:feedback-id:from:from:in-reply-to:in-reply-to
-	:message-id:mime-version:references:reply-to:subject:subject:to
-	:to:x-me-proxy:x-me-sender:x-me-sender:x-sasl-enc; s=fm3; t=
-	1738575003; x=1738661403; bh=Iu0c4P+pd0rwbChSBCxBM/nO9XHU1xVgF+p
-	suWmP558=; b=LqRJ97VC9vUj/TdgDan1lt0TeuwVUuAVfmHCWczCC6XzaWkv51l
-	teByD8Q9fhuW1/3gTiisLvfiPxJlIYcJ+9Mvib0FAn0I+BWgoIExMEqwWcBuoK0N
-	p8tKOQE6sDbmeVzlutWY5mvRrIToBuOE5VcQBO2XozXKxRk0LppuEyH6foizU1eQ
-	Pf6p7OP0RaOOaTr3qvwQCmDQ74M3M8xH4NhVs6TRCIN6BfHB1irFiV8MCZ3ed4uP
-	FPzEod73/Rz/wSTTb+m+7dVl8Iek+47Gutep2IaAQFfWE4Ejru1j9C4T2lUSlpWg
-	suAFpxxxTPcgBGb3MoeTQ2OE+Kf0YwNQ7sw==
-X-ME-Sender: <xms:m4ygZzrfF2r8ZqmcYKHpMLon5-acHFLOdJtrJNndVsxqAz3B3slbLw>
-    <xme:m4ygZ9pDJvw_plz2q4f7OcJg6SK-tPB37EulnuhisYS8bM5cOrSqb6_Bkov4KqjAk
-    B1sO0VYDFYhv01a-Nw>
-X-ME-Received: <xmr:m4ygZwMYmU3KomBMVBMydMWeDbKIf2NuGwwTT_RpsZQzrtRyzkRBG-16leWC>
-X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeefvddrtddtgddujedvgecutefuodetggdotefrod
-    ftvfcurfhrohhfihhlvgemucfhrghsthforghilhdpggftfghnshhusghstghrihgsvgdp
-    uffrtefokffrpgfnqfghnecuuegrihhlohhuthemuceftddtnecusecvtfgvtghiphhivg
-    hnthhsucdlqddutddtmdenucfjughrpeffhffvvefukfhfgggtuggjsehttdertddttdej
-    necuhfhrohhmpefurggsrhhinhgrucffuhgsrhhotggruceoshgusehquhgvrghshihsnh
-    grihhlrdhnvghtqeenucggtffrrghtthgvrhhnpeeuhffhfffgfffhfeeuiedugedtfefh
-    keegteehgeehieffgfeuvdeuffefgfduffenucevlhhushhtvghrufhiiigvpedtnecurf
-    grrhgrmhepmhgrihhlfhhrohhmpehsugesqhhuvggrshihshhnrghilhdrnhgvthdpnhgs
-    pghrtghpthhtohepudefpdhmohguvgepshhmthhpohhuthdprhgtphhtthhopegrnhhtoh
-    hnihhosehophgvnhhvphhnrdhnvghtpdhrtghpthhtohepnhgvthguvghvsehvghgvrhdr
-    khgvrhhnvghlrdhorhhgpdhrtghpthhtohepvgguuhhmrgiivghtsehgohhoghhlvgdrtg
-    homhdprhgtphhtthhopehkuhgsrgeskhgvrhhnvghlrdhorhhgpdhrtghpthhtohepphgr
-    sggvnhhisehrvgguhhgrthdrtghomhdprhgtphhtthhopeguohhnrghlugdrhhhunhhtvg
-    hrsehgmhgrihhlrdgtohhmpdhrtghpthhtohepshhhuhgrhheskhgvrhhnvghlrdhorhhg
-    pdhrtghpthhtoheprhihrgiirghnohhvrdhsrdgrsehgmhgrihhlrdgtohhmpdhrtghpth
-    htoheprghnughrvgifodhnvghtuggvvheslhhunhhnrdgthh
-X-ME-Proxy: <xmx:m4ygZ25XaZdSACzb_Ie_LdK4x_8hWek7mXwBOV8VR_MNvhx_Z_V3Kg>
-    <xmx:m4ygZy7SElYzTtKhsHiFFQBJaS-7zedRNMEN6_5gvobjCYH-nkXQHw>
-    <xmx:m4ygZ-htJ7bWx8LtFiqBl5N9C8xCiVJOnq5b8lPoqfrkOGvPJtQ4Jw>
-    <xmx:m4ygZ07NBfCCDEEXGpoMqeSo2JUUZJUsaCLdWfqtZd1f71KD8L8Kvw>
-    <xmx:m4ygZ1KPAmQusdby0fIoJiAM3MQVsfSmHc0zFkyMxY8UIIWpQymgBCE5>
-Feedback-ID: i934648bf:Fastmail
-Received: by mail.messagingengine.com (Postfix) with ESMTPA; Mon,
- 3 Feb 2025 04:30:02 -0500 (EST)
-Date: Mon, 3 Feb 2025 10:30:00 +0100
-From: Sabrina Dubroca <sd@queasysnail.net>
-To: Antonio Quartulli <antonio@openvpn.net>
-Cc: netdev@vger.kernel.org, Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Donald Hunter <donald.hunter@gmail.com>,
-	Shuah Khan <shuah@kernel.org>, ryazanov.s.a@gmail.com,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	Simon Horman <horms@kernel.org>, linux-kernel@vger.kernel.org,
-	linux-kselftest@vger.kernel.org, Xiao Liang <shaw.leon@gmail.com>
-Subject: Re: [PATCH net-next v18 08/25] ovpn: implement basic RX path (UDP)
-Message-ID: <Z6CMmJyJwZBuV-lC@hog>
-References: <20250113-b4-ovpn-v18-0-1f00db9c2bd6@openvpn.net>
- <20250113-b4-ovpn-v18-8-1f00db9c2bd6@openvpn.net>
+	s=arc-20240116; t=1738575086; c=relaxed/simple;
+	bh=LKHvK8tBLWF3KqdmMSzxHrTGl32JspvsZEbQUfAQOrA=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=pwKsdSJ1TVGbNCUxmAXW3o7H6+0MKoKoBM8es5nCPlqeV4zjvDINrsOCjTTEnId9+IqKiv7n0yvy+VBXwQhhoCUrt/RUivRmBxtT59hd5se0XqKwwbyw8Ao2lEou7rQ+o5CYjciuxwEBAteTBFbUd19M7ewcrvHyGFJ2Pl6Yce8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=denx.de; spf=pass smtp.mailfrom=denx.de; dkim=pass (2048-bit key) header.d=denx.de header.i=@denx.de header.b=S5JZV9EH; arc=none smtp.client-ip=89.58.32.78
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=denx.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=denx.de
+Received: from [127.0.0.1] (localhost [127.0.0.1]) by localhost (Mailerdaemon) with ESMTPSA id CADBF10382D08;
+	Mon,  3 Feb 2025 10:31:14 +0100 (CET)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=denx.de; s=mx-20241105;
+	t=1738575076;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=87iK9BHPnpQs+19NyAfODppPvRIOhut4EuEMpBR4aXE=;
+	b=S5JZV9EH8hCsTrjV+C3HHny71/yKkt0FDC0BPa3LyJwH5nYDLtPh18olwCBEsukhybB9Tf
+	I++pWmouzECsow2reauMG4j0LGFi4MiXQYN2reVoFEetbgkacsR6FqMuVhiTOAJ1vrU0rS
+	wUIHx6EWQvpfvYoGS1fY+QJl4LaidddBlmvufkVV002m7k8ugzfRdVSjNY5A0fg8JgZQaR
+	pc0cCXtQQOCZASKlaL4GvrzYBMyaRbNv4dZ+Pq5mLKLQ68S1hztPjrTps1Pale1bXihbMi
+	SRKcu0hRePrM7d9GInTx2wgyJxGswSubgckIuCznh9G8h9x0SRNGnN8kZ/aYQA==
+Date: Mon, 3 Feb 2025 10:31:13 +0100
+From: Lukasz Majewski <lukma@denx.de>
+To: <Woojung.Huh@microchip.com>
+Cc: <frieder.schrempf@kontron.de>, <andrew@lunn.ch>,
+ <netdev@vger.kernel.org>, <Tristram.Ha@microchip.com>
+Subject: Re: KSZ9477 HSR Offloading
+Message-ID: <20250203103113.27e3060a@wsk>
+In-Reply-To: <BL0PR11MB29130BB177996C437F792106E7E92@BL0PR11MB2913.namprd11.prod.outlook.com>
+References: <05a6e63e-96c1-4d78-91b9-b00deed044b5@kontron.de>
+ <6d0e1f47-874e-42bf-9bc7-34856c1168d1@lunn.ch>
+ <1c140c92-3be6-4917-b600-fa5d1ef96404@kontron.de>
+ <6400e73a-b165-41a8-9fc9-e2226060a68c@kontron.de>
+ <20250129121733.1e99f29c@wsk>
+ <0383e3d9-b229-4218-a931-73185d393177@kontron.de>
+ <20250129145845.3988cf04@wsk>
+ <42a2f96f-34cd-4d95-99d5-3b4c4af226af@kontron.de>
+ <BL0PR11MB2913C7E1AE86A3A0EB12D0D7E7EE2@BL0PR11MB2913.namprd11.prod.outlook.com>
+ <1400a748-0de7-4093-a549-f07617e6ac51@kontron.de>
+ <BL0PR11MB29130BB177996C437F792106E7E92@BL0PR11MB2913.namprd11.prod.outlook.com>
+Organization: denx.de
+X-Mailer: Claws Mail 3.19.0 (GTK+ 2.24.33; x86_64-pc-linux-gnu)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20250113-b4-ovpn-v18-8-1f00db9c2bd6@openvpn.net>
+Content-Type: multipart/signed; boundary="Sig_/eFHq7k_Urgg_6hN.uzLOhvA";
+ protocol="application/pgp-signature"; micalg=pgp-sha512
+X-Last-TLS-Session-Version: TLSv1.3
 
-2025-01-13, 10:31:27 +0100, Antonio Quartulli wrote:
-> +/**
-> + * ovpn_opcode_from_skb - extract OP code from skb at specified offset
-> + * @skb: the packet to extract the OP code from
-> + * @offset: the offset in the data buffer where the OP code is located
-> + *
-> + * Note: this function assumes that the skb head was pulled enough
-> + * to access the first byte.
+--Sig_/eFHq7k_Urgg_6hN.uzLOhvA
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
 
-nit:
-                   "first byte"
+Hi Woojung,
 
-> + *
-> + * Return: the OP code
-> + */
-> +static inline u8 ovpn_opcode_from_skb(const struct sk_buff *skb, u16 offset)
-> +{
-> +	u32 opcode = be32_to_cpu(*(__be32 *)(skb->data + offset));
+> HI Frieder,
+>=20
+> Thanks for the link. I reminded the support team this ticket.
+> Please wait response in the ticket. Hope we can get the solution for
+> you.
+>=20
+> Thanks.
+> Woojung
+>=20
+> > -----Original Message-----
+> > From: Frieder Schrempf <frieder.schrempf@kontron.de>
+> > Sent: Thursday, January 30, 2025 3:44 AM
+> > To: Woojung Huh - C21699 <Woojung.Huh@microchip.com>
+> > Cc: andrew@lunn.ch; netdev@vger.kernel.org; lukma@denx.de; Tristram
+> > Ha - C24268 <Tristram.Ha@microchip.com>
+> > Subject: Re: KSZ9477 HSR Offloading
+> >=20
+> > EXTERNAL EMAIL: Do not click links or open attachments unless you
+> > know the content is safe
+> >=20
+> > Hi Woojung,
+> >=20
+> > On 29.01.25 7:57 PM, Woojung.Huh@microchip.com wrote: =20
+> > > [Sie erhalten nicht h=C3=A4ufig E-Mails von woojung.huh@microchip.com.
+> > > Weitere =20
+> > Informationen, warum dies wichtig ist, finden Sie unter
+> > https://aka.ms/LearnAboutSenderIdentification ] =20
+> > >
+> > > Hi Frieder,
+> > >
+> > > Can you please create a ticket at Microchip's site and share it
+> > > with me? =20
+> >=20
+> > Sure, here is the link:
+> > https://microchip.my.site.com/s/case/500V400000KQi1tIAD/
 
-vs 4 bytes actually read?
+Is the link correct?
 
-Also for ovpn_key_id_from_skb introduced in another patch. I guess
-that's a consequence of switching to those FIELD macros.
+When I login into microchip.my.site.com I don't see this "case" created
+for KSZ9477.
+
+> >=20
+> > Thanks
+> > Frieder =20
 
 
-> +/**
-> + * ovpn_udp_encap_recv - Start processing a received UDP packet.
-> + * @sk: socket over which the packet was received
-> + * @skb: the received packet
-> + *
-> + * If the first byte of the payload is DATA_V2, the packet is further processed,
-> + * otherwise it is forwarded to the UDP stack for delivery to user space.
 
-nit: not consistent with the implementation in the case of DATA_V1 packets
 
-> + * Return:
-> + *  0 if skb was consumed or dropped
-> + * >0 if skb should be passed up to userspace as UDP (packet not consumed)
-> + * <0 if skb should be resubmitted as proto -N (packet not consumed)
-> + */
-> +static int ovpn_udp_encap_recv(struct sock *sk, struct sk_buff *skb)
-> +{
-[...]
-> +	opcode = ovpn_opcode_from_skb(skb, sizeof(struct udphdr));
-> +	if (unlikely(opcode != OVPN_DATA_V2)) {
-> +		/* DATA_V1 is not supported */
-> +		if (opcode == OVPN_DATA_V1)
-> +			goto drop;
+Best regards,
 
--- 
-Sabrina
+Lukasz Majewski
+
+--
+
+DENX Software Engineering GmbH,      Managing Director: Erika Unter
+HRB 165235 Munich, Office: Kirchenstr.5, D-82194 Groebenzell, Germany
+Phone: (+49)-8142-66989-59 Fax: (+49)-8142-66989-80 Email: lukma@denx.de
+
+--Sig_/eFHq7k_Urgg_6hN.uzLOhvA
+Content-Type: application/pgp-signature
+Content-Description: OpenPGP digital signature
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCgAdFiEEgAyFJ+N6uu6+XupJAR8vZIA0zr0FAmegjOEACgkQAR8vZIA0
+zr3X2ggA4lLfyFvQ/2tFD5Mp1urmw1sAbQKReBzl19cIqT1p3rTrVL/WduJvxv3x
+Cyox8CnyR8q4s1XJ0aEoYDClAGvuUiyNsF4hRYBzwYqOfXnN5uHaMwWvPT6bRCsv
+El/3RFmT4WrBe1tH5qfZt1cJjyCdD0b5Ynbe2atbo8RKJaD/ZcSkFddcRU+ssZ53
+eJzT4sAP4IT4/b0MweGYZh/aagei6C+YYV7dIn33NpXpM9lDuVLXAr3rT9EHX31U
+rwzbKc9zUIbjadmYkrEPZVnOGti+ln9jJNTg/VyxSC/D55V86Wusecg4WovcmXjf
+lphfK2SJ3VmOAMQb29rtURt7bwu+iQ==
+=npFU
+-----END PGP SIGNATURE-----
+
+--Sig_/eFHq7k_Urgg_6hN.uzLOhvA--
 
