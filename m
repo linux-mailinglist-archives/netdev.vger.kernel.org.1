@@ -1,200 +1,101 @@
-Return-Path: <netdev+bounces-162303-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-162305-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 43ED5A2672D
-	for <lists+netdev@lfdr.de>; Mon,  3 Feb 2025 23:54:36 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id AA373A267A0
+	for <lists+netdev@lfdr.de>; Tue,  4 Feb 2025 00:10:13 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C9D331633A6
-	for <lists+netdev@lfdr.de>; Mon,  3 Feb 2025 22:54:34 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 3CD977A3682
+	for <lists+netdev@lfdr.de>; Mon,  3 Feb 2025 23:09:04 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7FFF42101B3;
-	Mon,  3 Feb 2025 22:54:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 051D921420F;
+	Mon,  3 Feb 2025 23:04:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="GtfvdOxC"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="JdOCnAte"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qk1-f173.google.com (mail-qk1-f173.google.com [209.85.222.173])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C97791D5CD4
-	for <netdev@vger.kernel.org>; Mon,  3 Feb 2025 22:54:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.173
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 43F4C214203
+	for <netdev@vger.kernel.org>; Mon,  3 Feb 2025 23:04:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1738623270; cv=none; b=XdBqDFbIjffowzUGD5+Qyuenh0cQj02sIdpUJ+KnP1wpY0MNpNZPZXaNKAUGhf/xTwkSZRJ5DDLZGyLOArhfB1z2k6zpUKO+D8WiC7Zgr+QYMZAAULpSjpSA4Yq/Q/hwSaM0GkLBecw3C69nagCPSBRVdO8oOx7X8ieeQqyZ5BM=
+	t=1738623869; cv=none; b=RxgdETqaN8CGc15XlwPL1c4slUPGzHsiOVKVdRVjUEadCjo5ISHA2wv6Kl858eUl9tdS15tEY6joqcY2+Wg2VBuceaYrsOxUuZBqrVJ8lPcoMytDl1qo2sU6GGh3RCfQsnHlb1yuIpuN502Ok6mYKieuYaz0ljzRz8pZU2zC2Ug=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1738623270; c=relaxed/simple;
-	bh=87Q5QWo5S6M1JMUSX97FyemoyI3irvNhF8Gua0Eh3z4=;
-	h=Date:From:To:Cc:Message-ID:In-Reply-To:References:Subject:
-	 Mime-Version:Content-Type; b=HbYUE0SIGup7naL6Wb6yyXiUTcoJ5rxe8REnAvR8++FLanZ/I6+uFTCTxuLQpSbn26iVlQByyLx/jaPiW/bcHNSltt24/MGWLbiebE0p/bMxt6U1sf1NFtZrJPEglanusaY0Kmqwm+KjlANK2j9hmP1umklFJ1ZOk7k/PRxmGxs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=GtfvdOxC; arc=none smtp.client-ip=209.85.222.173
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-qk1-f173.google.com with SMTP id af79cd13be357-7b6e5ee6ac7so447997785a.0
-        for <netdev@vger.kernel.org>; Mon, 03 Feb 2025 14:54:28 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1738623267; x=1739228067; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:subject:references
-         :in-reply-to:message-id:cc:to:from:date:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=87Q5QWo5S6M1JMUSX97FyemoyI3irvNhF8Gua0Eh3z4=;
-        b=GtfvdOxC5ndRe8fVSxXkrsAbdRM1XZV+l22imvHVENHenZQ3CNYVGFcPsIoHzK2Lsu
-         Fk6BTXWmzWB6Mc9TYeHm5ZdfDxQKkmUKATUW/CHeDRnU3pfPkwqqDnsgij+kB/DDp9WN
-         jwozIAHep+JW65jG3mUW5kUD4b5028uTSBbl/vtcGfAZIaZgsugGABb4/r4+vcnDkR5Z
-         18CiSVYRmyeMCnoNvOYp8NagjRXPPbdrt9KrJJHn8/5+GpCfogVsnoGOc/K/e2KVfN9D
-         VWcmTh0WbNDXEI6FhVyJ7hfdE5F+ZGqWKA1h0JrVk0wcgRQjrUUv5JwYQCsz1T2Ybsq+
-         ev6A==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1738623267; x=1739228067;
-        h=content-transfer-encoding:mime-version:subject:references
-         :in-reply-to:message-id:cc:to:from:date:x-gm-message-state:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=87Q5QWo5S6M1JMUSX97FyemoyI3irvNhF8Gua0Eh3z4=;
-        b=vU9IvbWq5z/FWclW+Ofar+sMPeWeMhbBB0hRcwI3GDBluaBN7mfyDrw0J8nOh2Rhhk
-         9owdttrDlwgQlq9AaevlJI9r9pfnfvaFR4Yzg5Dyu1TSjgEAQbZsIn+1AhFHt/0xHdh3
-         vuI4rAoa12CLWzczZF9/wgY+Ys3UY664CUhbXmeLF4tejqcdzsGwSWRntUAIjuKlxNEA
-         wRMyOL+LHo+WvGDaRVeUYuUXuQT2cw3RRFvwevx+SM7qF9UqAZfeICGkoFr9d5qu+dlZ
-         Tl6c3CCebYimlc1TD0t0ZROglEeOtgf+LN3816SmaHdS9X7P1Bs68wbCMsz7lHRsP/WG
-         rdNA==
-X-Forwarded-Encrypted: i=1; AJvYcCWmbNcm/DRgyzvJNkZKx+d3FHvcFcPed9hKhtBIJlmjg0KYPWwvTUJ/+9a5jH8rwcCjwzIZBjY=@vger.kernel.org
-X-Gm-Message-State: AOJu0YytoIFEyi24PasvMF+xWWF/FgJm5MxEgNwueZVqYEF9oKf8S/ir
-	WT/ncPpPQfvnjsgL8wY7p9yb6vEZVCtyvBW6pZ5elVcNVngVm91FmOBBDA==
-X-Gm-Gg: ASbGncv6yePLONoDC1ARxzvj+UMbTD30etDcyG7Is4prD2l8T9QiA9FHjqLALeZNbb7
-	BBwS/+ahjQFwrwawHGhDhIxro/KKh6yhz7J35KfzgbD6ZLQfvaCvLgCseTtfvootLdfyTlIbCh7
-	/cfW+bPRJ/r/kqxgIAkyos/0jfkPMeQ3oi3mDNuj0AKtVcd7m9AOvznS09LQbql2o/sMhmYbn8C
-	6pJh5/yzkW+vCGaz7Yd/g4D+UdeNCLxxaFmNx1G15ukWpQmcv1PpdeQx1543o1ShVumWLBOTO3N
-	TI6G5h4Mv+7jlzvIGwHFHQF5xlrbhg7WN3xiOC0HLwfX51w6XJY3LD5EkcoTHMI=
-X-Google-Smtp-Source: AGHT+IEphNaDaWqtgCaRtVSzRKWszRBlb0n7aM9bKG74/kCcR6CVZmQoTd0G476qAbdiLnA0dCS7+Q==
-X-Received: by 2002:a05:620a:2991:b0:7b6:5f2f:526b with SMTP id af79cd13be357-7bffcce85b5mr3236344985a.15.1738623267562;
-        Mon, 03 Feb 2025 14:54:27 -0800 (PST)
-Received: from localhost (15.60.86.34.bc.googleusercontent.com. [34.86.60.15])
-        by smtp.gmail.com with ESMTPSA id af79cd13be357-7c00a8bba69sm580190185a.8.2025.02.03.14.54.26
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 03 Feb 2025 14:54:26 -0800 (PST)
-Date: Mon, 03 Feb 2025 17:54:26 -0500
-From: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
-To: stsp <stsp2@yandex.ru>, 
- Willem de Bruijn <willemdebruijn.kernel@gmail.com>, 
- netdev@vger.kernel.org
-Cc: davem@davemloft.net, 
- kuba@kernel.org, 
- edumazet@google.com, 
- pabeni@redhat.com, 
- jasowang@redhat.com, 
- Willem de Bruijn <willemb@google.com>, 
- Ondrej Mosnacek <omosnace@redhat.com>
-Message-ID: <67a149227c100_46ecd29438@willemb.c.googlers.com.notmuch>
-In-Reply-To: <efceaa29-93d0-482a-95d9-28b176c1ffbc@yandex.ru>
-References: <20250203150615.96810-1-willemdebruijn.kernel@gmail.com>
- <48edf7d4-0c1f-4980-b22f-967d203a403d@yandex.ru>
- <67a114574eee7_2f0e52948e@willemb.c.googlers.com.notmuch>
- <efceaa29-93d0-482a-95d9-28b176c1ffbc@yandex.ru>
-Subject: Re: [PATCH net] tun: revert fix group permission check
+	s=arc-20240116; t=1738623869; c=relaxed/simple;
+	bh=HFQLMRrZg9NxekR+e95vKsdvpTOq91fRYa9iajbwHJI=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=GHHJ/J21tJrfyTSuzHWfIP5sf0rftV0Y3HL+19m0SifPXOioLbn3y2h+eScYAyRjZs2bPMaNshCKLVQzc/hs+r0dd7skh85RRqUvGzsl7LwkjzIWTtCrsKhcbSS1IOLiEOhCiAX/IQgvnAeEbgmz6XSmXcjWST07GTXCxJ7O73Q=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=JdOCnAte; arc=none smtp.client-ip=156.67.10.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Transfer-Encoding:Content-Disposition:
+	Content-Type:MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:From:
+	Sender:Reply-To:Subject:Date:Message-ID:To:Cc:MIME-Version:Content-Type:
+	Content-Transfer-Encoding:Content-ID:Content-Description:Content-Disposition:
+	In-Reply-To:References; bh=m348aVu8Wuh1HbmqBwF4oU+cnXMsf2WOFO+93ATmJB0=; b=Jd
+	OCnAteYfG8Vjbxt668arB6TftHC4pcQGX6A/FyTFdIm4S3nEVWdsjWkN4pzL9zaBDMFVXLTPcxfS0
+	a9bnPah7tR/Fl/WKmdUMtxaP4y+9xbNoxB+Wwr89CcSq11XOgdHH+hvwI9kvd52hunXote9O9inlF
+	cc1EjtFGCn2W4sA=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1tf5U9-00AfnT-AL; Tue, 04 Feb 2025 00:04:09 +0100
+Date: Tue, 4 Feb 2025 00:04:09 +0100
+From: Andrew Lunn <andrew@lunn.ch>
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: Toke =?iso-8859-1?Q?H=F8iland-J=F8rgensen?= <toke@redhat.com>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
+	netdev@vger.kernel.org
+Subject: Re: [PATCH net-next] net: netdevsim: Support setting dev->perm_addr
+Message-ID: <4b9a6e08-df15-44c1-accd-8f157c62849f@lunn.ch>
+References: <20250203-netdevsim-perm_addr-v1-1-10084bc93044@redhat.com>
+ <20250203143958.6172c5cd@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Content-Type: text/plain;
- charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+MIME-Version: 1.0
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <20250203143958.6172c5cd@kernel.org>
 
-stsp wrote:
-> 03.02.2025 22:09, Willem de Bruijn =D0=BF=D0=B8=D1=88=D0=B5=D1=82:
-> > stsp wrote:
-> >> 03.02.2025 18:05, Willem de Bruijn =D0=BF=D0=B8=D1=88=D0=B5=D1=82:
-> >>> From: Willem de Bruijn <willemb@google.com>
-> >>>
-> >>> This reverts commit 3ca459eaba1bf96a8c7878de84fa8872259a01e3.
-> >>>
-> >>> The blamed commit caused a regression when neither tun->owner nor
-> >>> tun->group is set. This is intended to be allowed, but now requires=
+On Mon, Feb 03, 2025 at 02:39:58PM -0800, Jakub Kicinski wrote:
+> On Mon, 03 Feb 2025 18:21:24 +0100 Toke Høiland-Jørgensen wrote:
+> > Network management daemons that match on the device permanent address
+> > currently have no virtual interface types to test against.
+> > NetworkManager, in particular, has carried an out of tree patch to set
+> > the permanent address on netdevsim devices to use in its CI for this
+> > purpose.
+> > 
+> > To support this use case, add a debugfs file for netdevsim to set the
+> > permanent address to an arbitrary value.
+> 
+> netdevsim is not for user space testing. We have gone down the path
+> of supporting random features in it already, and then wasted time trying
+> to maintain them thru various devlink related perturbations, just to
+> find out that the features weren't actually used any more.
+> 
+> NetworkManager can do the HW testing using virtme-ng.
+> 
+> If you want to go down the netdevsim path you must provide a meaningful 
+> in-tree test, but let's be clear that we will 100% delete both the test
+> and the netdevsim functionality if it causes any issues.
 
-> >>> CAP_NET_ADMIN.
-> >>>
-> >>> Discussion in the referenced thread pointed out that the original
-> >>> issue that prompted this patch can be resolved in userspace.
-> >> The point of the patch was
-> >> not to fix userspace, but this
-> >> bug: when you have owner set,
-> >> then adding group either changes
-> >> nothing at all, or removes all
-> >> access. I.e. there is no valid case
-> >> for adding group when owner
-> >> already set.
-> > As long as no existing users are affected, no need to relax this afte=
-r
-> > all these years.
-> =
+Hi Toke
 
-> I only mean the wording.
-> My patch initially says what
-> exactly does it fix, so the fact
-> that the problem can be fixed
-> in user-space, was likely obvious
-> from the very beginning.
-> =
+What are your actual requirements? A permanent address is not expected
+to change, it is by definition, permanent. Could it be hard coded in
+netdevsim that the first instance created gets the MAC address
+24:42:42:42:42:42? And maybe to make testing a bit more evil, keep the
+current behaviour that the actually used MAC is random, since that MAC
+address is not permanent.
 
-> >> During the discussion it became
-> >> obvious that simpler fixes may
-> >> exist (like eg either-or semantic),
-> >> so why not to revert based on
-> >> that?
-> > We did not define either-or in detail. Do you mean failing the
-> > TUNSETOWNER or TUNSETGROUP ioctl if the other is already set?
-> =
-
-> I mean, auto-removing group when
-> the owner is being set, for example.
-> Its not a functionality change: the
-> behaviour is essentially as before,
-> except no such case when no one
-> can access the device.
-> =
-
-> >>> The relaxed access control may now make a device accessible when it=
-
-> >>> previously wasn't, while existing users may depend on it to not be.=
-
-> >>>
-> >>> Since the fix is not critical and introduces security risk, revert,=
-
-> >> Well, I don't agree with that justification.
-> >> My patch introduced the usability
-> >> problem, but not a security risk.
-> >> I don't want to be attributed with
-> >> the security risk when this wasn't
-> >> the case (to the very least, you
-> >> still need the perms to open /dev/net/tun),
-> >> so could you please remove that part?
-> >> I don't think you need to exaggerate
-> >> anything: it introduces the usability
-> >> regression, which should be enough
-> >> for any instant revert.
-> > This is not intended to cast blame, of course.
-> >
-> > That said, I can adjust the wording.
-> =
-
-> Would be good.
-
-Will do.
- =
-
-> > The access control that we relaxed is when a process is not allowed
-> > to access a device until the administrator adds it to the right group=
-.
-> =
-
-> No-no, adding doesn't help.
-> The process have to die and
-> re-login. Besides, not only the
-> "process" can't access the device,
-> no. Everyone can't. And by the
-> mere fact of adding a group...
-
-A device can be created with owner/group constraints before the
-intended process (and session) exists.=
+	Andrew
 
