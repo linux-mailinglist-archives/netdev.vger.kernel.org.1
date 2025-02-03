@@ -1,95 +1,83 @@
-Return-Path: <netdev+bounces-162290-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-162291-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id EFE04A26642
-	for <lists+netdev@lfdr.de>; Mon,  3 Feb 2025 22:58:29 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 7BC5AA2665B
+	for <lists+netdev@lfdr.de>; Mon,  3 Feb 2025 23:06:20 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 86A85164CCA
-	for <lists+netdev@lfdr.de>; Mon,  3 Feb 2025 21:58:23 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 0F9C0164F74
+	for <lists+netdev@lfdr.de>; Mon,  3 Feb 2025 22:06:19 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7189E20FA80;
-	Mon,  3 Feb 2025 21:58:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 49F381FF615;
+	Mon,  3 Feb 2025 22:06:14 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="PuLNUJlH"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="DPdXEuIw"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4AFBA20F07C
-	for <netdev@vger.kernel.org>; Mon,  3 Feb 2025 21:58:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1AE3F182B4;
+	Mon,  3 Feb 2025 22:06:12 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1738619901; cv=none; b=m/sSBqpJReHH7u7rOxVL6AScYWdCHevblDS4Mv8qY+R7ef7zZE9Xc+wulTp9zmp4Qna8Xg3CWZ6ayaCpA8nAz0fUc0Tm3QPQbRRLexXPpyT49qT54k0kkZ8CWrUKA2g1VGPo4dw6aBHdRorS6/8cx7m9lneVj+KgBxhxBnSE5t8=
+	t=1738620374; cv=none; b=UUTGVKLT6s+OPxl6X01QwSLzWFErzhCxlxAOB4Vm9rMcocq5fHzNa51Rl3YM5TJJrbfmqYgiuUtn9wIYnWDJQQDZKRwqnZu+FTEtIryGXhaWV39U0OHdFy3xIU2vr6Rue+dBjdZkk+xSWF9xLKCCOIeJmj0LppICT35e5PAMpYg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1738619901; c=relaxed/simple;
-	bh=Qi9FRgHkkrnnXzQ6qTP6FBQ/+DAq2OsOWTdWS9sXlF8=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=hTEGqh86N7ONii2qUOA+cg9+3E1ln5NjJiicuWgQhTu9I2o8Kq3vyZjPk9pUJ1n7GH+3Tt1wYVL/K+VSXv7EicniQLWDlVt1tZ7HlWv5n728IAyC6U++7fqYT4SwNNA8ZwRC0Q+erdSDT3g0FxfrzOXKgWz2lmQyn8dTD+DdXIA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=PuLNUJlH; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6FE24C4CED2;
-	Mon,  3 Feb 2025 21:58:20 +0000 (UTC)
+	s=arc-20240116; t=1738620374; c=relaxed/simple;
+	bh=yzyPuuX2I9mlAd8wRAXfCiQT5z1CNGqnwskd/rkgtMo=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=mkhtAe+RQAyGpjE1D6S/pA5EBzZ66YygzwwmtsXOJkvpC341c2Dk06g3eqlOMkKnQ4mSSynhYGQprws/Q7FXogvwlUfU84oaiCUD9UZoojq+jDjscf/1+ovrub9aKUrW8PLO5Q5Fp8B+NB5D4ywWya0pW4ITUOsrCuYbPBt0sQw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=DPdXEuIw; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id ACF91C4CED2;
+	Mon,  3 Feb 2025 22:06:11 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1738619900;
-	bh=Qi9FRgHkkrnnXzQ6qTP6FBQ/+DAq2OsOWTdWS9sXlF8=;
-	h=From:To:Cc:Subject:Date:From;
-	b=PuLNUJlHhZYr2TZT5dZXp0VTsFfatMQCBNAgtlFp4VpW+2KyKLWRYBzjCxZEUU2O7
-	 q1Mx9lO+SYUjJenP4WFpuP2ztIi1/9/zQNCvjmF2maQIGZ3wD7pPQnWQOjMGZXgNm6
-	 gtCMF0ttW7P4yquNZTF3vgPetxoIgHZHzRrzcEuRgOXFFICaOPEdjnD2WVTnV0pRDs
-	 aarU1eB1XibmIovtwZld7bS+cWbZxWS97QpPad0wK29dNrX5/BZqJF7ophKB47GGho
-	 RvZCPUyJq2V/wLsxPB2n1r5gmsU9D5TThi2TLYsMPfEu1Qb4a4z59iLvkmY0CCLrBt
-	 iaCsnkYsgipww==
+	s=k20201202; t=1738620372;
+	bh=yzyPuuX2I9mlAd8wRAXfCiQT5z1CNGqnwskd/rkgtMo=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=DPdXEuIw9QSyalNNyNjvv0XnpXXT0IqYas4P/nhGlrVRWsP4nTb8KYoNaYGYSxUsl
+	 TeL7MI6sihNDnf2Az3fWZOkz28xm/43DHoKN/1xukR5ZkJ1QYiOGo9UodinK8o9Q4m
+	 mHgWYffCmXMrWCzQyxGA4qBgvsA6XA+r+Zsny+GIfc8HqrgIVjTJn5eifr0L66cOmJ
+	 dIG0GjgKiFTV7dwqSU+U93IwBfmT9VmtAfw9b6rfQCGPEw2WyzxXxKS5h4Shq5EKFp
+	 1BMIih6q+UVPnT/QekmCcjKzgjVwixFXRmZ9WQurhZKSMuEWd4oJhUa8DVATYeVRBs
+	 M0XTJmnfkqffg==
+Date: Mon, 3 Feb 2025 14:06:10 -0800
 From: Jakub Kicinski <kuba@kernel.org>
-To: davem@davemloft.net
-Cc: netdev@vger.kernel.org,
-	edumazet@google.com,
-	pabeni@redhat.com,
-	andrew+netdev@lunn.ch,
-	horms@kernel.org,
-	Jakub Kicinski <kuba@kernel.org>
-Subject: [PATCH net-next] net: warn if NAPI instance wasn't shut down
-Date: Mon,  3 Feb 2025 13:58:16 -0800
-Message-ID: <20250203215816.1294081-1-kuba@kernel.org>
-X-Mailer: git-send-email 2.48.1
+To: Joey Lu <a0987203069@gmail.com>
+Cc: andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com,
+ pabeni@redhat.com, robh@kernel.org, krzk+dt@kernel.org,
+ conor+dt@kernel.org, mcoquelin.stm32@gmail.com, richardcochran@gmail.com,
+ alexandre.torgue@foss.st.com, joabreu@synopsys.com, ychuang3@nuvoton.com,
+ schung@nuvoton.com, yclu4@nuvoton.com, peppe.cavallaro@st.com,
+ linux-arm-kernel@lists.infradead.org, netdev@vger.kernel.org,
+ devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
+ openbmc@lists.ozlabs.org, linux-stm32@st-md-mailman.stormreply.com
+Subject: Re: [PATCH net-next v8 0/3] Add support for Nuvoton MA35D1 GMAC
+Message-ID: <20250203140610.4a0bbad4@kernel.org>
+In-Reply-To: <20250203054200.21977-1-a0987203069@gmail.com>
+References: <20250203054200.21977-1-a0987203069@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-Drivers should always disable a NAPI instance before removing it.
-If they don't the instance may be queued for polling.
-Since commit 86e25f40aa1e ("net: napi: Add napi_config")
-we also remove the NAPI from the busy polling hash table
-in napi_disable(), so not disabling would leave a stale
-entry there.
+On Mon,  3 Feb 2025 13:41:57 +0800 Joey Lu wrote:
+> This patch series is submitted to add GMAC support for Nuvoton MA35D1
+> SoC platform. This work involves implementing a GMAC driver glue layer
+> based on Synopsys DWMAC driver framework to leverage MA35D1's dual GMAC
+> interface capabilities.
 
-Use of busy polling is relatively uncommon so bugs may be lurking
-in the drivers. Add an explicit warning.
+The tree is open when we say that it's open, you posted this 9 hours
+before the announcement:
 
-Signed-off-by: Jakub Kicinski <kuba@kernel.org>
----
- net/core/dev.c | 3 +++
- 1 file changed, 3 insertions(+)
+https://lore.kernel.org/all/20250203065423.03f4cec4@kernel.org/
 
-diff --git a/net/core/dev.c b/net/core/dev.c
-index c0021cbd28fc..2b141f20b13b 100644
---- a/net/core/dev.c
-+++ b/net/core/dev.c
-@@ -7071,6 +7071,9 @@ void __netif_napi_del_locked(struct napi_struct *napi)
- 	if (!test_and_clear_bit(NAPI_STATE_LISTED, &napi->state))
- 		return;
- 
-+	/* Make sure NAPI is disabled (or was never enabled). */
-+	WARN_ON(!test_bit(NAPI_STATE_SCHED, &napi->state));
-+
- 	if (napi->config) {
- 		napi->index = -1;
- 		napi->config = NULL;
+Sorry but keeping this in the queue would be unfair to people who
+follow the rules.
 -- 
-2.48.1
-
+pw-bot: defer
 
