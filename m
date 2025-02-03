@@ -1,125 +1,200 @@
-Return-Path: <netdev+bounces-162302-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-162303-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 410B1A26717
-	for <lists+netdev@lfdr.de>; Mon,  3 Feb 2025 23:48:04 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 43ED5A2672D
+	for <lists+netdev@lfdr.de>; Mon,  3 Feb 2025 23:54:36 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 16A131881BAC
-	for <lists+netdev@lfdr.de>; Mon,  3 Feb 2025 22:48:09 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C9D331633A6
+	for <lists+netdev@lfdr.de>; Mon,  3 Feb 2025 22:54:34 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A5CAE1EEA2D;
-	Mon,  3 Feb 2025 22:47:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7FFF42101B3;
+	Mon,  3 Feb 2025 22:54:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="DoFbihVm"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="GtfvdOxC"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f48.google.com (mail-wm1-f48.google.com [209.85.128.48])
+Received: from mail-qk1-f173.google.com (mail-qk1-f173.google.com [209.85.222.173])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E259C7D07D;
-	Mon,  3 Feb 2025 22:47:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.48
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C97791D5CD4
+	for <netdev@vger.kernel.org>; Mon,  3 Feb 2025 22:54:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.173
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1738622879; cv=none; b=QAzO7wcRJNMZNBgQg3Y5Jgy9sy0lIDQTndHdpDkeoG6T8ml0VbtWlQksta9A+Om8yQ4HmZPOEHvClmqZhzTZnWKFiU0QrrtKmaVZjOF8s/rX3Q46f0RYywlHCr7gyJvguZ09SbiM8rb9iS9f4SH0HyqTyxIXsTHr2O+X6IYkxvY=
+	t=1738623270; cv=none; b=XdBqDFbIjffowzUGD5+Qyuenh0cQj02sIdpUJ+KnP1wpY0MNpNZPZXaNKAUGhf/xTwkSZRJ5DDLZGyLOArhfB1z2k6zpUKO+D8WiC7Zgr+QYMZAAULpSjpSA4Yq/Q/hwSaM0GkLBecw3C69nagCPSBRVdO8oOx7X8ieeQqyZ5BM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1738622879; c=relaxed/simple;
-	bh=hHTSotaKXn6mqlfsuZRFL7mUlXbYedRwitXa3n7zsZ4=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=is8bmuqTNvJnTcmZZVmS2EYNqudnB7YpgZdypyPTwOMiqjhwcQHt7xiauLCsurLHbrkIPDMlzFavRtyzqq1xPclGZhLWguvfGdNvjkud55WV/Qe5z3kIxyUbu6JEGPILdX3udFbaa1icviySmREAopF/SO3z1T2LwYmQR0f2K5A=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=DoFbihVm; arc=none smtp.client-ip=209.85.128.48
+	s=arc-20240116; t=1738623270; c=relaxed/simple;
+	bh=87Q5QWo5S6M1JMUSX97FyemoyI3irvNhF8Gua0Eh3z4=;
+	h=Date:From:To:Cc:Message-ID:In-Reply-To:References:Subject:
+	 Mime-Version:Content-Type; b=HbYUE0SIGup7naL6Wb6yyXiUTcoJ5rxe8REnAvR8++FLanZ/I6+uFTCTxuLQpSbn26iVlQByyLx/jaPiW/bcHNSltt24/MGWLbiebE0p/bMxt6U1sf1NFtZrJPEglanusaY0Kmqwm+KjlANK2j9hmP1umklFJ1ZOk7k/PRxmGxs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=GtfvdOxC; arc=none smtp.client-ip=209.85.222.173
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wm1-f48.google.com with SMTP id 5b1f17b1804b1-4361f664af5so57747505e9.1;
-        Mon, 03 Feb 2025 14:47:56 -0800 (PST)
+Received: by mail-qk1-f173.google.com with SMTP id af79cd13be357-7b6e5ee6ac7so447997785a.0
+        for <netdev@vger.kernel.org>; Mon, 03 Feb 2025 14:54:28 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1738622875; x=1739227675; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=DNk8vcXhWS2lnex0vmdV4Bh3p7QN4YitPegQzBHEFfU=;
-        b=DoFbihVmVNRM88GV2daMdqjDrnEQWHVQUCC9vjxRsvivPBJWkBgcZ/EJpOd3G2CGMO
-         V5N68a6/ySKJQ4u/SprajcG4Bo0nf2y1691vRVoOnzTL69l76J0lOqS7/eN1z9Skch6C
-         gaCa8VuXvc4VoAlh7PXl1WNtaXaB7KlPqjXpb+CGDZusFu7dbyp31cSGdhq+vt3aTfzY
-         DQiQYorrk8rT3VKHeLBB2wvLGTftoYV4ETZhIMa9w4WKEB18/r5igwPctryfwkISe3Ut
-         mH1i522jk+xCW29SnmfN1YOuzukVyNOvn7uPWIdUkeiErcqR9PS71Mv4oCZmNV/QFIbl
-         fZPw==
+        d=gmail.com; s=20230601; t=1738623267; x=1739228067; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:subject:references
+         :in-reply-to:message-id:cc:to:from:date:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=87Q5QWo5S6M1JMUSX97FyemoyI3irvNhF8Gua0Eh3z4=;
+        b=GtfvdOxC5ndRe8fVSxXkrsAbdRM1XZV+l22imvHVENHenZQ3CNYVGFcPsIoHzK2Lsu
+         Fk6BTXWmzWB6Mc9TYeHm5ZdfDxQKkmUKATUW/CHeDRnU3pfPkwqqDnsgij+kB/DDp9WN
+         jwozIAHep+JW65jG3mUW5kUD4b5028uTSBbl/vtcGfAZIaZgsugGABb4/r4+vcnDkR5Z
+         18CiSVYRmyeMCnoNvOYp8NagjRXPPbdrt9KrJJHn8/5+GpCfogVsnoGOc/K/e2KVfN9D
+         VWcmTh0WbNDXEI6FhVyJ7hfdE5F+ZGqWKA1h0JrVk0wcgRQjrUUv5JwYQCsz1T2Ybsq+
+         ev6A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1738622875; x=1739227675;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=DNk8vcXhWS2lnex0vmdV4Bh3p7QN4YitPegQzBHEFfU=;
-        b=brryxdv2D9iuw+DfNg4rWv6FE7FbtYEq0tl0VS7zB6uhjDDZNWYyJXU+AY40Il37ms
-         O/BcyOwiYBNKxu5+dTbcmGawQ/GnhAy5FwQHdPsBzRuOzZMhsZYE/7cl6jPuiEVtvF2z
-         kKNfw85IfL0+hmUysfc5T1pGpjEydftQANIZ29TcbLANhXMP/0YLEP5Cv+3/3HMRsUzg
-         Ub8YPhwOAaxtCDbP3lJtXh6ANWD44xTq/OxsRMaUItgx+APKtujD+n1g8KNshbtH0WO6
-         AH68rU48PMZtplSb3YXO0rSqZgog/DcIYIoaNkaLp29KzPezjYc/QtdcMTJVXxx2QXI9
-         wjKQ==
-X-Forwarded-Encrypted: i=1; AJvYcCURKqRPM6e9HPrWg6YVCs2CtKB4Aspbo0PGFeqpEKgzzBmk/Q6MduUxlcPZuEwYMy6VqMd145tJ@vger.kernel.org, AJvYcCWgoKUHGDit6/RN2hV7PEkB8CAc7HLA0aU8jaIKMOcfB3/bNUayjsOOSKOKxh/jUqK9hD89pSDVLG0=@vger.kernel.org, AJvYcCXGwj0GvdgrNSEPcknWWaJPbciIz3cpC6vwA6CNv5cZMHErLcJL97etntlEdJhsoZWDzk86fT+G+Iu0@vger.kernel.org, AJvYcCXWwkiqBD1NGtJ2G8NIXmYgSfTAoy5XIrHAkBeQCMOfbR6MmeI8SUID7/Uqet1X90aAlu6p8M0tfhtgzAcj@vger.kernel.org
-X-Gm-Message-State: AOJu0YxG7kIL/mkNDwnoCLrQT/eM5uSrX9+FVmX2bDZL1MwyNL6/8pOb
-	8GH6uvc8KzhAS9mBn2s/V6nv58eoDuA1SIamjL277EFzx2smk8Tf
-X-Gm-Gg: ASbGnctrwv8LxmLbn+SKIcupgliBLNXRITFwHJocfU0nQt8yChzZX1US27WHSZigOhD
-	DGvUrWADJUfFKKKmTa/JejvxAZObeN0B7OXjwbyr8wDgon3MAqVM/3dutRdmNVmtZ7LX6CRp2zM
-	UFhT37YlKrnv6leIc3S2lSomRqCeqoCA7UihP69hePXUuS6ELfVKhbQY/KylzU2nGNAYi2PEL7h
-	Z+xYWprLmxI2YZjnebcCE7dMG0+znlHT97HKjh4r+Uw2s7MqhQ4favuP3b4ndR32MrxrtIOcDwP
-	zu0=
-X-Google-Smtp-Source: AGHT+IE/EFKa2c0I79aiOGpHh/J+3xdNGIulwoDYDqj1uGt8aSw1iorBtbN/fXpYftwxNNhOalmTpw==
-X-Received: by 2002:a05:600c:870a:b0:434:fff1:1ade with SMTP id 5b1f17b1804b1-438dc3cb7c8mr198340375e9.13.1738622874881;
-        Mon, 03 Feb 2025 14:47:54 -0800 (PST)
-Received: from ffc.. ([5.224.37.232])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-438dcc81911sm202559165e9.38.2025.02.03.14.47.51
+        d=1e100.net; s=20230601; t=1738623267; x=1739228067;
+        h=content-transfer-encoding:mime-version:subject:references
+         :in-reply-to:message-id:cc:to:from:date:x-gm-message-state:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=87Q5QWo5S6M1JMUSX97FyemoyI3irvNhF8Gua0Eh3z4=;
+        b=vU9IvbWq5z/FWclW+Ofar+sMPeWeMhbBB0hRcwI3GDBluaBN7mfyDrw0J8nOh2Rhhk
+         9owdttrDlwgQlq9AaevlJI9r9pfnfvaFR4Yzg5Dyu1TSjgEAQbZsIn+1AhFHt/0xHdh3
+         vuI4rAoa12CLWzczZF9/wgY+Ys3UY664CUhbXmeLF4tejqcdzsGwSWRntUAIjuKlxNEA
+         wRMyOL+LHo+WvGDaRVeUYuUXuQT2cw3RRFvwevx+SM7qF9UqAZfeICGkoFr9d5qu+dlZ
+         Tl6c3CCebYimlc1TD0t0ZROglEeOtgf+LN3816SmaHdS9X7P1Bs68wbCMsz7lHRsP/WG
+         rdNA==
+X-Forwarded-Encrypted: i=1; AJvYcCWmbNcm/DRgyzvJNkZKx+d3FHvcFcPed9hKhtBIJlmjg0KYPWwvTUJ/+9a5jH8rwcCjwzIZBjY=@vger.kernel.org
+X-Gm-Message-State: AOJu0YytoIFEyi24PasvMF+xWWF/FgJm5MxEgNwueZVqYEF9oKf8S/ir
+	WT/ncPpPQfvnjsgL8wY7p9yb6vEZVCtyvBW6pZ5elVcNVngVm91FmOBBDA==
+X-Gm-Gg: ASbGncv6yePLONoDC1ARxzvj+UMbTD30etDcyG7Is4prD2l8T9QiA9FHjqLALeZNbb7
+	BBwS/+ahjQFwrwawHGhDhIxro/KKh6yhz7J35KfzgbD6ZLQfvaCvLgCseTtfvootLdfyTlIbCh7
+	/cfW+bPRJ/r/kqxgIAkyos/0jfkPMeQ3oi3mDNuj0AKtVcd7m9AOvznS09LQbql2o/sMhmYbn8C
+	6pJh5/yzkW+vCGaz7Yd/g4D+UdeNCLxxaFmNx1G15ukWpQmcv1PpdeQx1543o1ShVumWLBOTO3N
+	TI6G5h4Mv+7jlzvIGwHFHQF5xlrbhg7WN3xiOC0HLwfX51w6XJY3LD5EkcoTHMI=
+X-Google-Smtp-Source: AGHT+IEphNaDaWqtgCaRtVSzRKWszRBlb0n7aM9bKG74/kCcR6CVZmQoTd0G476qAbdiLnA0dCS7+Q==
+X-Received: by 2002:a05:620a:2991:b0:7b6:5f2f:526b with SMTP id af79cd13be357-7bffcce85b5mr3236344985a.15.1738623267562;
+        Mon, 03 Feb 2025 14:54:27 -0800 (PST)
+Received: from localhost (15.60.86.34.bc.googleusercontent.com. [34.86.60.15])
+        by smtp.gmail.com with ESMTPSA id af79cd13be357-7c00a8bba69sm580190185a.8.2025.02.03.14.54.26
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 03 Feb 2025 14:47:53 -0800 (PST)
-From: Reyders Morales <reyders1@gmail.com>
-To: kuba@kernel.org
-Cc: Reyders Morales <reyders1@gmail.com>,
-	Oliver Hartkopp <socketcan@hartkopp.net>,
-	Marc Kleine-Budde <mkl@pengutronix.de>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Simon Horman <horms@kernel.org>,
-	Jonathan Corbet <corbet@lwn.net>,
-	linux-can@vger.kernel.org,
-	netdev@vger.kernel.org,
-	linux-doc@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: [PATCH] Documentation/networking: Fix basic node example document ISO 15765-2
-Date: Mon,  3 Feb 2025 23:47:20 +0100
-Message-ID: <20250203224720.42530-1-reyders1@gmail.com>
-X-Mailer: git-send-email 2.43.0
+        Mon, 03 Feb 2025 14:54:26 -0800 (PST)
+Date: Mon, 03 Feb 2025 17:54:26 -0500
+From: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
+To: stsp <stsp2@yandex.ru>, 
+ Willem de Bruijn <willemdebruijn.kernel@gmail.com>, 
+ netdev@vger.kernel.org
+Cc: davem@davemloft.net, 
+ kuba@kernel.org, 
+ edumazet@google.com, 
+ pabeni@redhat.com, 
+ jasowang@redhat.com, 
+ Willem de Bruijn <willemb@google.com>, 
+ Ondrej Mosnacek <omosnace@redhat.com>
+Message-ID: <67a149227c100_46ecd29438@willemb.c.googlers.com.notmuch>
+In-Reply-To: <efceaa29-93d0-482a-95d9-28b176c1ffbc@yandex.ru>
+References: <20250203150615.96810-1-willemdebruijn.kernel@gmail.com>
+ <48edf7d4-0c1f-4980-b22f-967d203a403d@yandex.ru>
+ <67a114574eee7_2f0e52948e@willemb.c.googlers.com.notmuch>
+ <efceaa29-93d0-482a-95d9-28b176c1ffbc@yandex.ru>
+Subject: Re: [PATCH net] tun: revert fix group permission check
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Mime-Version: 1.0
+Content-Type: text/plain;
+ charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-In the current struct sockaddr_can tp is member of can_addr.
-tp is not member of struct sockaddr_can.
+stsp wrote:
+> 03.02.2025 22:09, Willem de Bruijn =D0=BF=D0=B8=D1=88=D0=B5=D1=82:
+> > stsp wrote:
+> >> 03.02.2025 18:05, Willem de Bruijn =D0=BF=D0=B8=D1=88=D0=B5=D1=82:
+> >>> From: Willem de Bruijn <willemb@google.com>
+> >>>
+> >>> This reverts commit 3ca459eaba1bf96a8c7878de84fa8872259a01e3.
+> >>>
+> >>> The blamed commit caused a regression when neither tun->owner nor
+> >>> tun->group is set. This is intended to be allowed, but now requires=
 
-Signed-off-by: Reyders Morales <reyders1@gmail.com>
----
- Documentation/networking/iso15765-2.rst | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+> >>> CAP_NET_ADMIN.
+> >>>
+> >>> Discussion in the referenced thread pointed out that the original
+> >>> issue that prompted this patch can be resolved in userspace.
+> >> The point of the patch was
+> >> not to fix userspace, but this
+> >> bug: when you have owner set,
+> >> then adding group either changes
+> >> nothing at all, or removes all
+> >> access. I.e. there is no valid case
+> >> for adding group when owner
+> >> already set.
+> > As long as no existing users are affected, no need to relax this afte=
+r
+> > all these years.
+> =
 
-diff --git a/Documentation/networking/iso15765-2.rst b/Documentation/networking/iso15765-2.rst
-index 0e9d96074178..37ebb2c417cb 100644
---- a/Documentation/networking/iso15765-2.rst
-+++ b/Documentation/networking/iso15765-2.rst
-@@ -369,8 +369,8 @@ to their default.
- 
-   addr.can_family = AF_CAN;
-   addr.can_ifindex = if_nametoindex("can0");
--  addr.tp.tx_id = 0x18DA42F1 | CAN_EFF_FLAG;
--  addr.tp.rx_id = 0x18DAF142 | CAN_EFF_FLAG;
-+  addr.can_addr.tp.tx_id = 0x18DA42F1 | CAN_EFF_FLAG;
-+  addr.can_addr.tp.rx_id = 0x18DAF142 | CAN_EFF_FLAG;
- 
-   ret = bind(s, (struct sockaddr *)&addr, sizeof(addr));
-   if (ret < 0)
--- 
-2.43.0
+> I only mean the wording.
+> My patch initially says what
+> exactly does it fix, so the fact
+> that the problem can be fixed
+> in user-space, was likely obvious
+> from the very beginning.
+> =
 
+> >> During the discussion it became
+> >> obvious that simpler fixes may
+> >> exist (like eg either-or semantic),
+> >> so why not to revert based on
+> >> that?
+> > We did not define either-or in detail. Do you mean failing the
+> > TUNSETOWNER or TUNSETGROUP ioctl if the other is already set?
+> =
+
+> I mean, auto-removing group when
+> the owner is being set, for example.
+> Its not a functionality change: the
+> behaviour is essentially as before,
+> except no such case when no one
+> can access the device.
+> =
+
+> >>> The relaxed access control may now make a device accessible when it=
+
+> >>> previously wasn't, while existing users may depend on it to not be.=
+
+> >>>
+> >>> Since the fix is not critical and introduces security risk, revert,=
+
+> >> Well, I don't agree with that justification.
+> >> My patch introduced the usability
+> >> problem, but not a security risk.
+> >> I don't want to be attributed with
+> >> the security risk when this wasn't
+> >> the case (to the very least, you
+> >> still need the perms to open /dev/net/tun),
+> >> so could you please remove that part?
+> >> I don't think you need to exaggerate
+> >> anything: it introduces the usability
+> >> regression, which should be enough
+> >> for any instant revert.
+> > This is not intended to cast blame, of course.
+> >
+> > That said, I can adjust the wording.
+> =
+
+> Would be good.
+
+Will do.
+ =
+
+> > The access control that we relaxed is when a process is not allowed
+> > to access a device until the administrator adds it to the right group=
+.
+> =
+
+> No-no, adding doesn't help.
+> The process have to die and
+> re-login. Besides, not only the
+> "process" can't access the device,
+> no. Everyone can't. And by the
+> mere fact of adding a group...
+
+A device can be created with owner/group constraints before the
+intended process (and session) exists.=
 
