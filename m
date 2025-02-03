@@ -1,169 +1,139 @@
-Return-Path: <netdev+bounces-162210-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-162228-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3F118A2634D
-	for <lists+netdev@lfdr.de>; Mon,  3 Feb 2025 20:09:19 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8CE5CA26448
+	for <lists+netdev@lfdr.de>; Mon,  3 Feb 2025 21:14:33 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id D005318837A7
-	for <lists+netdev@lfdr.de>; Mon,  3 Feb 2025 19:09:23 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 2E9557A22D2
+	for <lists+netdev@lfdr.de>; Mon,  3 Feb 2025 20:13:38 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 783541D54E2;
-	Mon,  3 Feb 2025 19:09:15 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 879C920E028;
+	Mon,  3 Feb 2025 20:14:19 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="hsc3vGnU"
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=engleder-embedded.com header.i=@engleder-embedded.com header.b="gIoSLUEr"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-vk1-f180.google.com (mail-vk1-f180.google.com [209.85.221.180])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mx23lb.world4you.com (mx23lb.world4you.com [81.19.149.133])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CA8E1192B74
-	for <netdev@vger.kernel.org>; Mon,  3 Feb 2025 19:09:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.180
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7C897522A
+	for <netdev@vger.kernel.org>; Mon,  3 Feb 2025 20:14:17 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=81.19.149.133
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1738609755; cv=none; b=U73A0pq3v3r4Sh6H4Dp5i76GKBqPcAXqz/657EXr12+Uw11eqSKMFO7aYw2hcfWu49V7PdidQcLrdEVPzjP/c2QXUkYGL6G3QTU/JKRX/Tn1glAXsYITX6VTnJtxTpfEfmD+7Zk9AQNzRIlcqrLUOmBv3Ah3nEjuUJjJiORiR7c=
+	t=1738613659; cv=none; b=fEnaFKmjk/VOaMfJeB+dG5MiHIb1pxRCpok9WEMjC+buTtMuWP8PN2A/vM7ZZQJXLTRWXY6y04QB67UYat539844TPyIUusGfwHo7YPTTvfzL/MrkfZTbXhlPTAF3HE+Q/izytItct+T9Eirhuz7EMB5V5/5Ju5PHLfs6fm9tVQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1738609755; c=relaxed/simple;
-	bh=ZjK74YNbZOKeEc9DattBh/8nhipSihzWQ3Am6C3D2zo=;
-	h=Date:From:To:Cc:Message-ID:In-Reply-To:References:Subject:
-	 Mime-Version:Content-Type; b=hTHh3Qwy/2RU7iKRV1OifLOCx+oC345zdM8YT8CH+NQFuWL53XCeqOXs3gCkTj7GUkizB0imvtIT4GVUp2K/N2NkIxsuc8WbUMR2jXZ2hZK91PwISXVJYO4SqfGMmpnT+/Ln623I4/oOsREKirHC2HZff7JRd8Q7UUI3mzpgQ1w=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=hsc3vGnU; arc=none smtp.client-ip=209.85.221.180
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-vk1-f180.google.com with SMTP id 71dfb90a1353d-51873e55d27so2853564e0c.1
-        for <netdev@vger.kernel.org>; Mon, 03 Feb 2025 11:09:13 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1738609752; x=1739214552; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:subject:references
-         :in-reply-to:message-id:cc:to:from:date:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=ZjK74YNbZOKeEc9DattBh/8nhipSihzWQ3Am6C3D2zo=;
-        b=hsc3vGnU3h9NRruwMtLuh7mrTIxndged97RjDiIutr6VZfhgwcnYyrkAlG4Au4gawl
-         QDcR485IXeA2rGl5kNbKIxCJI31FZQTp3SLGAwG7ID6b7KKZAqzPUj8RgO+mROvm6D3w
-         MSXwdj6YBr3JeyVmWiBZGi5RvCtOfTCHJLwOvTcdOpSs6a8NRFr8BW9nfflVEdwsAaV3
-         jf0bLmrJhAzEzzjbmC0iWTMopTNd5MCVLzrvYnUcFxBw5iq0TkncUc46Y//RKKvY2oxU
-         9stcKLOMZR1F3QDwJhBM9qfHmfv9whZZ1ZU8l63bx03Uxrm0fjSYLy1FLVVva/HhGQLk
-         A+Rw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1738609752; x=1739214552;
-        h=content-transfer-encoding:mime-version:subject:references
-         :in-reply-to:message-id:cc:to:from:date:x-gm-message-state:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=ZjK74YNbZOKeEc9DattBh/8nhipSihzWQ3Am6C3D2zo=;
-        b=ITTcYsr8hRrMwpLYx16hhkG6H8iM3BxmrbM8f7ET0lf3McC8ae0YJcHiX5NsyEzYsX
-         rCQLqUOXiM2A5boxf12+u+HNNN/Ct8G8BuUv7w2YumXWHAloGa+l2e0IGqiSSaW4kU/C
-         lRE2DqDjSZPFdpSbmmdxVAZ3XH75Nai2ZOXnhCkPMBwiJKNEfRFh2fj+y5j2Ue2ctBQT
-         +vh11XvnywY0UaMgohr5s+xQ42yY+gQqIIk9XfKYI6wo3t7CTeCOKKTuBDnJO7mKR7p7
-         NVlN7h3Fm77B3VDo/8pzlYQ5xfvTbROYi29lnIV5F0ZSTGNo4DC4h4AyKk1csTj6XdK6
-         EnZA==
-X-Forwarded-Encrypted: i=1; AJvYcCVU/Im46F0vQCadfqNblmOgemoPetCyuBJUjZHmFOV++Q6URmzMjFJJ+8OQU8GICp75Z8y1Cg8=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyNDfnSv1tPod9ESNB/BByhsG+LnOz5G0hcxUzeRJ+vLEsYZqBS
-	Ia4KvYaHSANoaEenfOuFw+cHbqw4t6j15HllVrB2FJLWLTNm+uFR
-X-Gm-Gg: ASbGncumK2DIxNTyaQ68EJDghFiMJh2ho0D2TK7qQCmHBMZE3VUqK3mRshc7/X1ZIhL
-	3FDlhWSPU9SAUoO/YJnHFXr511TDBfoKxT/9Y0oFKADkrOnKGzUFzgH5EjlibShYoMRaFNRlUnA
-	Zq0U6fLqZaevjTMNKafakI0cMRVV/saurY5U4d57SUX1kgup36CBtBSk1bHvXkfzQLiM0v/Tc/A
-	WwodUDpG7KRbqYwAFDY7mOTdg+YkXKrOZIDB+1K3uc58qX7d0Gmf83bMAfyC8kH1hQs5PMeRsd+
-	s7oNyyjoBlIseGtKHjFJnPrTYcyVBhrOxfeqxjIJXn0/u/aFo5iP3lRO70zRNGE=
-X-Google-Smtp-Source: AGHT+IE23oWtqz0kTJ0f7I+X4OkxEevAZIVOQaTdJBW6WPvOQq8syqkwxoY0a8Sf5xd2K2vqwVKJqA==
-X-Received: by 2002:a05:6122:8c6:b0:515:20e6:7861 with SMTP id 71dfb90a1353d-51ef966291bmr724855e0c.2.1738609752521;
-        Mon, 03 Feb 2025 11:09:12 -0800 (PST)
-Received: from localhost (15.60.86.34.bc.googleusercontent.com. [34.86.60.15])
-        by smtp.gmail.com with ESMTPSA id 71dfb90a1353d-51eb1c3d0bfsm1446616e0c.27.2025.02.03.11.09.11
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 03 Feb 2025 11:09:11 -0800 (PST)
-Date: Mon, 03 Feb 2025 14:09:11 -0500
-From: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
-To: stsp <stsp2@yandex.ru>, 
- Willem de Bruijn <willemdebruijn.kernel@gmail.com>, 
- netdev@vger.kernel.org
-Cc: davem@davemloft.net, 
- kuba@kernel.org, 
- edumazet@google.com, 
- pabeni@redhat.com, 
- jasowang@redhat.com, 
- Willem de Bruijn <willemb@google.com>, 
- Ondrej Mosnacek <omosnace@redhat.com>
-Message-ID: <67a114574eee7_2f0e52948e@willemb.c.googlers.com.notmuch>
-In-Reply-To: <48edf7d4-0c1f-4980-b22f-967d203a403d@yandex.ru>
-References: <20250203150615.96810-1-willemdebruijn.kernel@gmail.com>
- <48edf7d4-0c1f-4980-b22f-967d203a403d@yandex.ru>
-Subject: Re: [PATCH net] tun: revert fix group permission check
+	s=arc-20240116; t=1738613659; c=relaxed/simple;
+	bh=bicH8DK/uOMHSnEzQNZjtPITXa0tVYs0SGxJP5vYX0A=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=cmeDtCPTh9ILqqbCzmr+nZuz8Oi7M0wHYt+UJNodPjVP0zCcBaihNk7sQCfE6efoCIsxb2O3tBnRxzniIMP8104DRLR4lW9VPL+YaJjIUkaJJ62LKryTcdzQr0H5aeC2JLpT3NzqIDxJe9WQoSZclarXgqAT376JBLf7c301jq4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=engleder-embedded.com; spf=pass smtp.mailfrom=engleder-embedded.com; dkim=pass (1024-bit key) header.d=engleder-embedded.com header.i=@engleder-embedded.com header.b=gIoSLUEr; arc=none smtp.client-ip=81.19.149.133
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=engleder-embedded.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=engleder-embedded.com
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=engleder-embedded.com; s=dkim11; h=Content-Transfer-Encoding:MIME-Version:
+	Message-Id:Date:Subject:Cc:To:From:Sender:Reply-To:Content-Type:Content-ID:
+	Content-Description:Resent-Date:Resent-From:Resent-Sender:Resent-To:Resent-Cc
+	:Resent-Message-ID:In-Reply-To:References:List-Id:List-Help:List-Unsubscribe:
+	List-Subscribe:List-Post:List-Owner:List-Archive;
+	bh=sRpmcy7X5YV3eSIs5Apx3e6diTDSx5AwSq8ZZyeQB1c=; b=gIoSLUErTlWQCobA7E0mM3Mb/G
+	i4/7B/VNVQWPQF8dhUf4DF/Enccb3GaOY01pI4mwXRLfC5nMc8bs2+tLGgA1rommEK7RpguKMA1/7
+	BpQJzSPK08oDfH5KDVTDVfMEQNSAeuwsWuez2GTj1UEkJus5PZOlkMRO1QdTfD86gfII=;
+Received: from [88.117.60.28] (helo=hornet.engleder.at)
+	by mx23lb.world4you.com with esmtpsa  (TLS1.2) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.97.1)
+	(envelope-from <gerhard@engleder-embedded.com>)
+	id 1tf1qZ-000000004RY-47PV;
+	Mon, 03 Feb 2025 20:11:04 +0100
+From: Gerhard Engleder <gerhard@engleder-embedded.com>
+To: andrew@lunn.ch,
+	hkallweit1@gmail.com,
+	linux@armlinux.org.uk,
+	davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com
+Cc: netdev@vger.kernel.org,
+	Gerhard Engleder <gerhard@engleder-embedded.com>
+Subject: [PATCH net-next v4 0/7] Support loopback mode speed selection
+Date: Mon,  3 Feb 2025 20:10:50 +0100
+Message-Id: <20250203191057.46351-1-gerhard@engleder-embedded.com>
+X-Mailer: git-send-email 2.39.5
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Content-Type: text/plain;
- charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
+X-AV-Do-Run: Yes
+X-ACL-Warn: X-W4Y-Internal
 
-stsp wrote:
-> 03.02.2025 18:05, Willem de Bruijn =D0=BF=D0=B8=D1=88=D0=B5=D1=82:
-> > From: Willem de Bruijn <willemb@google.com>
-> >
-> > This reverts commit 3ca459eaba1bf96a8c7878de84fa8872259a01e3.
-> >
-> > The blamed commit caused a regression when neither tun->owner nor
-> > tun->group is set. This is intended to be allowed, but now requires
-> > CAP_NET_ADMIN.
-> >
-> > Discussion in the referenced thread pointed out that the original
-> > issue that prompted this patch can be resolved in userspace.
-> =
+Previously to commit 6ff3cddc365b ("net: phylib: do not disable autoneg
+for fixed speeds >= 1G") it was possible to select the speed of the
+loopback mode by configuring a fixed speed before enabling the loopback
+mode. Now autoneg is always enabled for >= 1G and a fixed speed of >= 1G
+requires successful autoneg. Thus, the speed of the loopback mode depends
+on the link partner for >= 1G. There is no technical reason to depend on
+the link partner for loopback mode. With this behavior the loopback mode
+is less useful for testing.
 
-> The point of the patch was
-> not to fix userspace, but this
-> bug: when you have owner set,
-> then adding group either changes
-> nothing at all, or removes all
-> access. I.e. there is no valid case
-> for adding group when owner
-> already set.
+Allow PHYs to support optional speed selection for the loopback mode.
+This support is implemented for the generic loopback support and for PHY
+drivers, which obviously support speed selection for loopback mode.
+Additionally, loopback support according to the data sheet is added to
+the KSZ9031 PHY.
 
-As long as no existing users are affected, no need to relax this after
-all these years.
+Extend phy_loopback() to signal link up and down if speed changes,
+because a new link speed requires link up signalling.
 
-It is up to users to not choose an overly restrictive setting, similar
-to how they should not set chmod a-rwx on a file.
+Use this loopback speed selection in the tsnep driver to select the
+loopback mode speed depending the previously active speed. User space
+tests with 100 Mbps and 1 Gbps loopback are possible again.
 
-A user will immediately find out if they mess up this configuration,
-and it takes extra steps (ioctls) to reach it, so is unlikely to be
-reached by accident.
+v4:
+- resend without changed to RFC v3
 
-> During the discussion it became
-> obvious that simpler fixes may
-> exist (like eg either-or semantic),
-> so why not to revert based on
-> that?
+RFC v3:
+- align set_loopback() of Marvell to Micrel (Andrew Lunn)
+- transmit packets in loopback selftests (Andrew Lunn)
+- don't flush PHY statemachine in phy_loopback()
+- remove setting of carrier on and link mode after phy_loopback() in tsnep
 
-We did not define either-or in detail. Do you mean failing the
-TUNSETOWNER or TUNSETGROUP ioctl if the other is already set? That
-could break existing users that set both.
+v2:
+- signal link up to keep MAC and PHY in sync about speed (Andrew Lunn)
 
-> > The relaxed access control may now make a device accessible when it
-> > previously wasn't, while existing users may depend on it to not be.
-> >
-> > Since the fix is not critical and introduces security risk, revert,
-> Well, I don't agree with that justification.
-> My patch introduced the usability
-> problem, but not a security risk.
-> I don't want to be attributed with
-> the security risk when this wasn't
-> the case (to the very least, you
-> still need the perms to open /dev/net/tun),
-> so could you please remove that part?
-> I don't think you need to exaggerate
-> anything: it introduces the usability
-> regression, which should be enough
-> for any instant revert.
+Gerhard Engleder (7):
+  net: phy: Allow loopback speed selection for PHY drivers
+  net: phy: Support speed selection for PHY loopback
+  net: phy: micrel: Add loopback support
+  net: phy: marvell: Align set_loopback() implementation
+  tsnep: Select speed for loopback
+  net: selftests: Export net_test_phy_loopback_*
+  tsnep: Add PHY loopback selftests
 
-This is not intended to cast blame, of course.
+ drivers/net/ethernet/engleder/Kconfig         |   1 +
+ drivers/net/ethernet/engleder/tsnep_main.c    |  21 ++-
+ .../net/ethernet/engleder/tsnep_selftests.c   | 153 +++++++++++++++++-
+ .../net/ethernet/hisilicon/hns/hns_ethtool.c  |   4 +-
+ .../hisilicon/hns3/hns3pf/hclge_main.c        |   4 +-
+ .../hisilicon/hns3/hns3pf/hclge_mdio.c        |   2 +-
+ .../stmicro/stmmac/stmmac_selftests.c         |   8 +-
+ drivers/net/phy/adin1100.c                    |   5 +-
+ drivers/net/phy/dp83867.c                     |   5 +-
+ drivers/net/phy/marvell.c                     |  68 ++++----
+ drivers/net/phy/micrel.c                      |  28 ++++
+ drivers/net/phy/mxl-gpy.c                     |  11 +-
+ drivers/net/phy/phy-c45.c                     |   5 +-
+ drivers/net/phy/phy.c                         |  76 +++++++++
+ drivers/net/phy/phy_device.c                  |  43 +----
+ drivers/net/phy/xilinx_gmii2rgmii.c           |   7 +-
+ include/linux/phy.h                           |  18 ++-
+ include/net/selftests.h                       |  19 +++
+ net/core/selftests.c                          |  13 +-
+ 19 files changed, 377 insertions(+), 114 deletions(-)
 
-That said, I can adjust the wording.
+-- 
+2.39.5
 
-The access control that we relaxed is when a process is not allowed
-to access a device until the administrator adds it to the right group.
-Is this used? I doubt it. But we cannot be sure.
 
