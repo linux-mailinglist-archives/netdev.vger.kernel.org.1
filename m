@@ -1,145 +1,236 @@
-Return-Path: <netdev+bounces-162070-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-162069-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 06A68A25A7B
-	for <lists+netdev@lfdr.de>; Mon,  3 Feb 2025 14:13:27 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 20EA8A25A6D
+	for <lists+netdev@lfdr.de>; Mon,  3 Feb 2025 14:12:00 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id BAE3A3A8105
-	for <lists+netdev@lfdr.de>; Mon,  3 Feb 2025 13:12:41 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 2C0F93A6B00
+	for <lists+netdev@lfdr.de>; Mon,  3 Feb 2025 13:11:49 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 51C5D2A1A4;
-	Mon,  3 Feb 2025 13:12:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3534C204F7E;
+	Mon,  3 Feb 2025 13:11:49 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=openvpn.net header.i=@openvpn.net header.b="N90y90gQ"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-f52.google.com (mail-ed1-f52.google.com [209.85.208.52])
+Received: from mail-wm1-f54.google.com (mail-wm1-f54.google.com [209.85.128.54])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 687C9204C3D
-	for <netdev@vger.kernel.org>; Mon,  3 Feb 2025 13:12:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.52
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EC27E2036E1
+	for <netdev@vger.kernel.org>; Mon,  3 Feb 2025 13:11:46 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.54
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1738588364; cv=none; b=OWIzP7+uLW3T5/QY4E2mZkxnriO7jy0CRZ4EMTXK3sn56TJnbaRs6a1C96FrsR9IndIOzJO+Q+C+TSgBCEyFqMfXr62zJFdtJQU7DRqvYCW4U71eCuARSZu6NkZi+DF9yBI8ZjIk9pOw1C4rWm+FNfyUn+VE0eZQtwcJsxFXhYQ=
+	t=1738588309; cv=none; b=OQOYbvU63mHnTmYg24rjtjK36Qlo0WaDL5GJi+Osjm1lRPH/Zp/n8xu1cESAqi5yrxKVJTS+l01OWwqIiBfhpECSJWWH+Ykc8CcMrjeVwtPxmS180sU2EIMmmjXCTpLoFBgelshC3djBUJ5Bcfe4Z2d5Xvq4SOYMLECcZElTY+s=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1738588364; c=relaxed/simple;
-	bh=bl/VsZhd4GDU41uemUdBWY4YlWnCmFJSbM7+BNNjyZ4=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=DVS2dQrmYs5Q6TL4DznfNXTV/dAlLejyIBjfZL+CBFO0CH9bkxDBbsK/WK3ZO7s7FunaWY0NXTXVKHivc0FNA1hYuAvKB4fH5mEijzh9MgxsmAKVHNGGdaobKVvEsUzpYgg9+BCAS/0o/2ukiSCCGbs6sfsisqiL/xBl3Oj09FQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.208.52
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ed1-f52.google.com with SMTP id 4fb4d7f45d1cf-5dc89df7eccso4666564a12.3
-        for <netdev@vger.kernel.org>; Mon, 03 Feb 2025 05:12:42 -0800 (PST)
+	s=arc-20240116; t=1738588309; c=relaxed/simple;
+	bh=PDfO2TqiHOQOswp1r7MD60aF2gzSJU3JaaoTdmxlwEw=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=kf6cWRR3Nj692Kku1Dy6C+2M/pWef+eh5h74QquVMDE8Qajq+hCCb5zhzSTitwzwpxy8ywYvYI6k4sTB0AkOSlBVdB97nDrA7gQo3Z2VZVDixujNXRguYsGhh/Y2FxK4JMeraPXTuRLpQexjnNfxWEV5UHdjhtqIjHnrSflIT40=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=openvpn.net; spf=pass smtp.mailfrom=openvpn.com; dkim=pass (2048-bit key) header.d=openvpn.net header.i=@openvpn.net header.b=N90y90gQ; arc=none smtp.client-ip=209.85.128.54
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=openvpn.net
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=openvpn.com
+Received: by mail-wm1-f54.google.com with SMTP id 5b1f17b1804b1-43690d4605dso29818345e9.0
+        for <netdev@vger.kernel.org>; Mon, 03 Feb 2025 05:11:46 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=openvpn.net; s=google; t=1738588305; x=1739193105; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:organization:autocrypt:from
+         :content-language:references:cc:to:subject:user-agent:mime-version
+         :date:message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=W0RwX06YNoQDRCRmvfoCjGCfN9QTBGFckStparosZZg=;
+        b=N90y90gQnyZDbawzAUUwKAxucHfrEu5a9AXbCBVfIu7mSKWpVkOZDj1Ejd2JjCLpmK
+         LcAVowU/5XFa7TBVdHr4fNi/Pk3Fn/I3+zrtfeEPR2xb0660TU/UDpqqGyAjVS3CxVsg
+         yDww6964tbJa/JGjZ7q+9rkDtcpEJHXiwScwKHAm7ED0E1pQmIJUufV+YVelzGNDSF/y
+         bkp2Ji0wMec/YwJOAVTMaFzB96CCCwC/Ok8ttsTLVhM0WaQbZjMY/EByC13KsyykqsNq
+         0fv92vpmoJcfs1Jep0zZ2wu6vTL6IXMd1LWitpelrSyz/PClzyH6rt4tVygdg4WFODEF
+         OCQg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1738588360; x=1739193160;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+        d=1e100.net; s=20230601; t=1738588305; x=1739193105;
+        h=content-transfer-encoding:in-reply-to:organization:autocrypt:from
+         :content-language:references:cc:to:subject:user-agent:mime-version
+         :date:message-id:x-gm-message-state:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=NmO++Dj5YclSEoKZ+SbNGgyDOSbX9fIMMJINUFzxHVM=;
-        b=G4/zfiSiyAG9lijHOz6ww/Q7WzVfpCt55m30W2GvsnZY6g8jeQzHqRrcoOP2Nf3qiy
-         WMoH45MsCZ5NGa3FhhBPsd+wQo7jg4Do7A9uD9h+X82gGzK7xuGEMNXUJ7d+5IGXLhhi
-         rfY9lZqK70TCqALqFVoqpeenzSdVPiReIo36EuxTx4P6+S5bDqdcXfeAiZcFDaF/5d3O
-         X7s+NFbFQt43wRdrmYSwZe2thUpsWzpJtdIIletHXpGvUgRctwW8OPlH97EHBdJ0h3IK
-         v6e9ZmolH5NyQLWHVB6fM5yaFzCvAhirhH7sLFmwMuRxoNBIf3KDv9SMA5V1eQN7T/sh
-         Yp6g==
-X-Forwarded-Encrypted: i=1; AJvYcCUChdQ2R+9hLssLPaOnnQQmRgDisVPNz7bk6fcmXEC7YPzki5jez1DO5wk1iiVxZL2/X8NaxoQ=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwsISewHfQQPGP2ImDJ0BQfyDScT4KFurWVAhT4LcVFQ5ueW7yt
-	T+e76Xql8bNmM4RcsbCdGNXCWbQjjJSfJwiJg4rK8A8IyDBemqep
-X-Gm-Gg: ASbGncsRwHEJSkw/2vf2DRoHUqYoW2VGCD2EFwXo8xwc5eIY8X+wmsiX1Ny89p7k2HA
-	6PQV15p6RU2jm4DrvivAUGrCffFtAWHYoZQFXUli1vJ36g+BfS2EpMjF+Yzq0FFzLLIhNGlf0be
-	hUNxuiR6cpmonD6mkNehgiInNg/NUKOmwEdCisHtOKLWqoY7qh9eZzYPw0yWXQpmFkPAwo9sUIc
-	OshYEDOvhVbx+Fzd3Q+/We4cbb0bF4oy51gTz9cmU93wNV2mU7G03oFtRDlZI3Vd3mUljNTrpM1
-	EseslA==
-X-Google-Smtp-Source: AGHT+IEWKF+QiDVeJdsH8PK6F8uux9rFuNxvC+iEqMRMNJNgJGvuxz8HfmeE84fVYinTxgJgTGBkEg==
-X-Received: by 2002:a05:6402:2710:b0:5db:f26d:fff1 with SMTP id 4fb4d7f45d1cf-5dc5efe74b5mr21897380a12.21.1738588360240;
-        Mon, 03 Feb 2025 05:12:40 -0800 (PST)
-Received: from gmail.com ([2a03:2880:30ff:2::])
-        by smtp.gmail.com with ESMTPSA id 4fb4d7f45d1cf-5dc724be323sm7709910a12.65.2025.02.03.05.12.39
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 03 Feb 2025 05:12:39 -0800 (PST)
-Date: Mon, 3 Feb 2025 05:12:37 -0800
-From: Breno Leitao <leitao@debian.org>
-To: Uday Shankar <ushankar@purestorage.com>
-Cc: "David S . Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Simon Horman <horms@kernel.org>, netdev@vger.kernel.org
-Subject: Re: [PATCH] netconsole: allow selection of egress interface via MAC
- address
-Message-ID: <20250203-capable-manipulative-angelfish-bebe71@leitao>
-References: <20241211021851.1442842-1-ushankar@purestorage.com>
- <20250103-loutish-heavy-caracal-1dfb5d@leitao>
- <Z36TlACdNMwFD7wv@dev-ushankar.dev.purestorage.com>
- <20250109-nonchalant-oarfish-of-perception-7befae@leitao>
+        bh=W0RwX06YNoQDRCRmvfoCjGCfN9QTBGFckStparosZZg=;
+        b=tPgLsf9avj5GmJRP3rfEjATPfVEY1gAyFenQ3cV0RLLLN24cyKKuk3C/oSOzNhGqFz
+         AqhlleB42rFL63r3aTKjjdafNfKo4eUBYSXpQjxwV1I5RBUHbkc03eJBfWfRfGROhR0m
+         FNU35NH/G0Mqtw1fpg2Adu+Da2LswL6vjwfmTn2qubH5Yu7dOxES6D9tTgEBZK14BNVh
+         JGekAIx7SbzQJllB51Tf1r217jjcdXdVa6zcUHovSm9Zn3/VeGOB8UZQCFfuexCa7LA5
+         i2+7Y1x1u9tWBXGLCOeE27RB7Z+TJzFBl1iMVOREOWAR4UcZKGwHji/ITPnJJLXPY9wf
+         spEA==
+X-Gm-Message-State: AOJu0YyADgfeET+Ex3iLxF4K3OP6/EQJZUvmh4RUqQ4Nh4jagHCJOwzQ
+	RL+y/nzi/wwRknSkyLn2EWiuBoevEqTpcSGr80haidqPy8eanAGTFPDvqBG047M=
+X-Gm-Gg: ASbGncsDBYPP9jgvOA+INjp0cj2RWlvxsnmmU+JoW+/kVnhv4IDc2B6fBTOnJTrwpDq
+	FFPgZwh0IutsChMsQDh75AAUhDwgr0IaAFMW5Gu9KakfnAmGcwqne+Rthf1082m6l2snVLXPDzs
+	OHMvnRPS9MzPaoEoYk05HgBzsYnejgqDnAIB/fub0uVguqY0yMHgFGZ14cD7mLSHzIRBkiktQ9U
+	YJfV6xg6dHp8MWHOMr2eKjcraR0BzS5cCSrfvcnjxBG4eH29eng8JlijF8B973/etDOdl2WOWra
+	GSQ1PK+6U2Nm/NYFP0QY2BrpFOPCP/a62BWNx6kGnkMauAzcPT6tPg==
+X-Google-Smtp-Source: AGHT+IGix2KKhAS1u/WXZkqDrxDELKSomSjX0SZ+43f7IZjAxUu2W/Ytm+kXaqZ0WXxeZUkc/HDk8w==
+X-Received: by 2002:a05:600c:3b94:b0:434:a923:9310 with SMTP id 5b1f17b1804b1-438dc3cc3b1mr197184575e9.15.1738588305116;
+        Mon, 03 Feb 2025 05:11:45 -0800 (PST)
+Received: from ?IPV6:2001:67c:2fbc:1:b4fe:e6fa:32a0:6a72? ([2001:67c:2fbc:1:b4fe:e6fa:32a0:6a72])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-438dcc2e384sm194539245e9.19.2025.02.03.05.11.44
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 03 Feb 2025 05:11:44 -0800 (PST)
+Message-ID: <78e59cd0-332e-4a97-8060-ccdf023e8a91@openvpn.net>
+Date: Mon, 3 Feb 2025 14:12:52 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250109-nonchalant-oarfish-of-perception-7befae@leitao>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next v18 12/25] ovpn: implement TCP transport
+To: Sabrina Dubroca <sd@queasysnail.net>
+Cc: netdev@vger.kernel.org, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ Donald Hunter <donald.hunter@gmail.com>, Shuah Khan <shuah@kernel.org>,
+ ryazanov.s.a@gmail.com, Andrew Lunn <andrew+netdev@lunn.ch>,
+ Simon Horman <horms@kernel.org>, linux-kernel@vger.kernel.org,
+ linux-kselftest@vger.kernel.org, Xiao Liang <shaw.leon@gmail.com>
+References: <20250113-b4-ovpn-v18-0-1f00db9c2bd6@openvpn.net>
+ <20250113-b4-ovpn-v18-12-1f00db9c2bd6@openvpn.net> <Z6CU2emFGy1L3MDT@hog>
+Content-Language: en-US
+From: Antonio Quartulli <antonio@openvpn.net>
+Autocrypt: addr=antonio@openvpn.net; keydata=
+ xsFNBFN3k+ABEADEvXdJZVUfqxGOKByfkExNpKzFzAwHYjhOb3MTlzSLlVKLRIHxe/Etj13I
+ X6tcViNYiIiJxmeHAH7FUj/yAISW56lynAEt7OdkGpZf3HGXRQz1Xi0PWuUINa4QW+ipaKmv
+ voR4b1wZQ9cZ787KLmu10VF1duHW/IewDx9GUQIzChqQVI3lSHRCo90Z/NQ75ZL/rbR3UHB+
+ EWLIh8Lz1cdE47VaVyX6f0yr3Itx0ZuyIWPrctlHwV5bUdA4JnyY3QvJh4yJPYh9I69HZWsj
+ qplU2WxEfM6+OlaM9iKOUhVxjpkFXheD57EGdVkuG0YhizVF4p9MKGB42D70pfS3EiYdTaKf
+ WzbiFUunOHLJ4hyAi75d4ugxU02DsUjw/0t0kfHtj2V0x1169Hp/NTW1jkqgPWtIsjn+dkde
+ dG9mXk5QrvbpihgpcmNbtloSdkRZ02lsxkUzpG8U64X8WK6LuRz7BZ7p5t/WzaR/hCdOiQCG
+ RNup2UTNDrZpWxpwadXMnJsyJcVX4BAKaWGsm5IQyXXBUdguHVa7To/JIBlhjlKackKWoBnI
+ Ojl8VQhVLcD551iJ61w4aQH6bHxdTjz65MT2OrW/mFZbtIwWSeif6axrYpVCyERIDEKrX5AV
+ rOmGEaUGsCd16FueoaM2Hf96BH3SI3/q2w+g058RedLOZVZtyQARAQABzSdBbnRvbmlvIFF1
+ YXJ0dWxsaSA8YW50b25pb0BvcGVudnBuLm5ldD7Cwa0EEwEIAFcCGwMFCwkIBwMFFQoJCAsF
+ FgIDAQACHgECF4AFCRWQ2TIWIQTKvaEoIBfCZyGYhcdI8My2j1nRTAUCYRUquBgYaGtwczov
+ L2tleXMub3BlbnBncC5vcmcACgkQSPDMto9Z0UzmcxAAjzLeD47We0R4A/14oDKlZxXO0mKL
+ fCzaWFsdhQCDhZkgxoHkYRektK2cEOh4Vd+CnfDcPs/iZ1i2+Zl+va79s4fcUhRReuwi7VCg
+ 7nHiYSNC7qZo84Wzjz3RoGYyJ6MKLRn3zqAxUtFECoS074/JX1sLG0Z3hi19MBmJ/teM84GY
+ IbSvRwZu+VkJgIvZonFZjbwF7XyoSIiEJWQC+AKvwtEBNoVOMuH0tZsgqcgMqGs6lLn66RK4
+ tMV1aNeX6R+dGSiu11i+9pm7sw8tAmsfu3kQpyk4SB3AJ0jtXrQRESFa1+iemJtt+RaSE5LK
+ 5sGLAO+oN+DlE0mRNDQowS6q/GBhPCjjbTMcMfRoWPCpHZZfKpv5iefXnZ/xVj7ugYdV2T7z
+ r6VL2BRPNvvkgbLZgIlkWyfxRnGh683h4vTqRqTb1wka5pmyBNAv7vCgqrwfvaV1m7J9O4B5
+ PuRjYRelmCygQBTXFeJAVJvuh2efFknMh41R01PP2ulXAQuVYEztq3t3Ycw6+HeqjbeqTF8C
+ DboqYeIM18HgkOqRrn3VuwnKFNdzyBmgYh/zZx/dJ3yWQi/kfhR6TawAwz6GdbQGiu5fsx5t
+ u14WBxmzNf9tXK7hnXcI24Z1z6e5jG6U2Swtmi8sGSh6fqV4dBKmhobEoS7Xl496JN2NKuaX
+ jeWsF2rOwE0EZmhJFwEIAOAWiIj1EYkbikxXSSP3AazkI+Y/ICzdFDmiXXrYnf/mYEzORB0K
+ vqNRQOdLyjbLKPQwSjYEt1uqwKaD1LRLbA7FpktAShDK4yIljkxhvDI8semfQ5WE/1Jj/I/Q
+ U+4VXhkd6UvvpyQt/LiWvyAfvExPEvhiMnsg2zkQbBQ/M4Ns7ck0zQ4BTAVzW/GqoT2z03mg
+ p1FhxkfzHMKPQ6ImEpuY5cZTQwrBUgWif6HzCtQJL7Ipa2fFnDaIHQeiJG0RXl/g9x3YlwWG
+ sxOFrpWWsh6GI0Mo2W2nkinEIts48+wNDBCMcMlOaMYpyAI7fT5ziDuG2CBA060ZT7qqdl6b
+ aXUAEQEAAcLBfAQYAQgAJhYhBMq9oSggF8JnIZiFx0jwzLaPWdFMBQJmaEkXAhsMBQkB4TOA
+ AAoJEEjwzLaPWdFMbRUP/0t5FrjF8KY6uCU4Tx029NYKDN9zJr0CVwSGsNfC8WWonKs66QE1
+ pd6xBVoBzu5InFRWa2ed6d6vBw2BaJHC0aMg3iwwBbEgPn4Jx89QfczFMJvFm+MNc2DLDrqN
+ zaQSqBzQ5SvUjxh8lQ+iqAhi0MPv4e2YbXD0ROyO+ITRgQVZBVXoPm4IJGYWgmVmxP34oUQh
+ BM7ipfCVbcOFU5OPhd9/jn1BCHzir+/i0fY2Z/aexMYHwXUMha/itvsBHGcIEYKk7PL9FEfs
+ wlbq+vWoCtUTUc0AjDgB76AcUVxxJtxxpyvES9aFxWD7Qc+dnGJnfxVJI0zbN2b37fX138Bf
+ 27NuKpokv0sBnNEtsD7TY4gBz4QhvRNSBli0E5bGUbkM31rh4Iz21Qk0cCwR9D/vwQVsgPvG
+ ioRqhvFWtLsEt/xKolOmUWA/jP0p8wnQ+3jY6a/DJ+o5LnVFzFqbK3fSojKbfr3bY33iZTSj
+ DX9A4BcohRyqhnpNYyHL36gaOnNnOc+uXFCdoQkI531hXjzIsVs2OlfRufuDrWwAv+em2uOT
+ BnRX9nFx9kPSO42TkFK55Dr5EDeBO3v33recscuB8VVN5xvh0GV57Qre+9sJrEq7Es9W609a
+ +M0yRJWJEjFnMa/jsGZ+QyLD5QTL6SGuZ9gKI3W1SfFZOzV7hHsxPTZ6
+Organization: OpenVPN Inc.
+In-Reply-To: <Z6CU2emFGy1L3MDT@hog>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-Hello Uday,
+On 03/02/2025 11:05, Sabrina Dubroca wrote:
+> 2025-01-13, 10:31:31 +0100, Antonio Quartulli wrote:
+>> +static void ovpn_tcp_rcv(struct strparser *strp, struct sk_buff *skb)
+>> +{
+> [...]
+>> +	/* we need the first byte of data to be accessible
+>> +	 * to extract the opcode and the key ID later on
+>> +	 */
+>> +	if (!pskb_may_pull(skb, 1)) {
+> 
+> make sure we have 1B...
+> 
+>> +		net_warn_ratelimited("%s: packet too small to fetch opcode for peer %u\n",
+>> +				     netdev_name(peer->ovpn->dev), peer->id);
+>> +		goto err;
+>> +	}
+>> +
+>> +	/* DATA_V2 packets are handled in kernel, the rest goes to user space */
+>> +	opcode = ovpn_opcode_from_skb(skb, 0);
+> 
+> but this reads a u32 (4B) from skb->data
 
-On Thu, Jan 09, 2025 at 07:43:44AM -0800, Breno Leitao wrote:
-> On Wed, Jan 08, 2025 at 08:02:44AM -0700, Uday Shankar wrote:
-> > On Fri, Jan 03, 2025 at 03:41:17AM -0800, Breno Leitao wrote:
-> 
-> > > This will change slightly local_mac meaning. At the same time, I am not
-> > > sure local_mac is a very useful field as-is. The configuration might be
-> > > a bit confusing using `local_mac` to define the target interface. I am
-> > > wondering if creating a new field might be more appropriate. Maybe
-> > > `dev_mac`? (I am not super confident this approach is better TBH, but, it
-> > > seems easier to reason about).
-> > 
-> > Do you mean creating a new field called dev_mac which replaces
-> > local_mac? I do agree that naming is a bit better but I'd be worried
-> > about breaking programs which expect local_mac to exist. Having the
-> > field go read-only --> read-write via this change feels a lot less
-> > disruptive to preexisting programs than renaming the field.
-> > 
-> > Or do you mean creating a new field dev_mac which will live alongside
-> > local_mac, and letting local_mac keep its existing semantics? It feels
-> 
-> Right, that is what I meant originally.
-> 
-> > like that would lead to messier code, since dev_mac's semantics are kind
-> > of a superset of local_mac's semantics (e.g. after selecting and
-> > enabling a netconsole via dev_name, local_mac is populated with the mac
-> > address of the interface and we'd probably want the same for dev_mac as
-> > well).
-> > 
-> > A third option would be dropping the configfs changes altogether, which
-> > I'd be okay with - as I highlighted in the commit message, I suspect
-> > this interface is far less likely to see real use than the command-line
-> > parameter. 
-> 
-> I like this option better, in fact. I agree we don't need to expose it via
-> configfs (at least for now), since configfs configuration solves a
-> slightly different problem.
-> 
-> > A downside of this option though is that automated testing
-> > becomes difficult, as we can't write a variant of netcons_basic.sh
-> 
-> True. I _think_ it is better to optimize for simplicity in such case,
-> and skip the configfs changes (at least for now).
-> 
-> > without configfs support. We'd have to have a test which uses the
-> > parameter directly, and I'm not sure if we have a testing framework for
-> > the kernel which would support that.
->  
->  I am wondering if we can test it by turning netconsole into a module in
->  the test .config, and passing the netconsole parameters when loading
->  the module? 
+ACK, hand-in-hand with the comment not updated.
+Will fix this.
 
-I wanted to check in on the status of this patchset, as I haven't
-received any updates in the past two weeks. I remain enthusiastic about
-this feature and believe it would be a valuable addition to the next
-major merge window.
+> 
+> [...]
+>> +void ovpn_tcp_socket_detach(struct ovpn_socket *ovpn_sock)
+>> +{
+>> +	struct ovpn_peer *peer = ovpn_sock->peer;
+>> +	struct socket *sock = ovpn_sock->sock;
+>> +
+>> +	strp_stop(&peer->tcp.strp);
+>> +
+>> +	skb_queue_purge(&peer->tcp.user_queue);
+>>
+>> +	/* restore CBs that were saved in ovpn_sock_set_tcp_cb() */
+>> +	sock->sk->sk_data_ready = peer->tcp.sk_cb.sk_data_ready;
+>> +	sock->sk->sk_write_space = peer->tcp.sk_cb.sk_write_space;
+>> +	sock->sk->sk_prot = peer->tcp.sk_cb.prot;
+>> +	sock->sk->sk_socket->ops = peer->tcp.sk_cb.ops;
+>> +
+>> +	/* drop reference to peer */
+> 
+> nit: not really :)
 
-If you need any assistance or support, please don't hesitate to reach
-out. I'm more than happy to help.
+drop comment :)
+
+> 
+>> +	rcu_assign_sk_user_data(sock->sk, NULL);
+>> +
+>> +	/* before canceling any ongoing work we must ensure that CBs
+>> +	 * have been reset to prevent workers from being re-armed
+>> +	 */
+>> +	barrier();
+>> +
+>> +	cancel_work_sync(&peer->tcp.tx_work);
+>> +	strp_done(&peer->tcp.strp);
+>> +	skb_queue_purge(&peer->tcp.out_queue);
+> 
+> Also kfree_skb(peer->tcp.out_msg.skb)?
+
+hm yeah, it could be we allocated one but did not finish filling it.
+
+> 
+>> +	ovpn_peer_put(peer);
+>> +}
+> 
+> 
+> [...]
+>> +static int ovpn_tcp_sendmsg(struct sock *sk, struct msghdr *msg, size_t size)
+>> +{
+> [...]
+>> +	ret = skb_copy_datagram_from_iter(skb, 0, &msg->msg_iter, size);
+>> +	if (ret) {
+>> +		kfree_skb(skb);
+>> +		net_err_ratelimited("%s: skb copy from iter failed: %d\n",
+>> +				    netdev_name(sock->peer->ovpn->dev), ret);
+>> +		goto peer_free;
+>> +	}
+>> +
+>> +	ovpn_tcp_send_sock_skb(sock->peer, skb);
+> 
+> This isn't propagating MSG_DONTWAIT down to ovpn_tcp_send_sock?
+> 
+
+patch 14/25 will add a new member to ovpn_cb which will be filled right 
+before calling ovpn_tcp_send_sock_skb() and that gets picked later.
+
+Cheers,
+
+
+-- 
+Antonio Quartulli
+OpenVPN Inc.
+
 
