@@ -1,77 +1,76 @@
-Return-Path: <netdev+bounces-162227-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-162230-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id C739DA2643D
-	for <lists+netdev@lfdr.de>; Mon,  3 Feb 2025 21:10:59 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3347AA2644A
+	for <lists+netdev@lfdr.de>; Mon,  3 Feb 2025 21:15:58 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 720847A31B4
-	for <lists+netdev@lfdr.de>; Mon,  3 Feb 2025 20:10:04 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id CE7F33A1A0D
+	for <lists+netdev@lfdr.de>; Mon,  3 Feb 2025 20:15:49 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 31FA820B7F4;
-	Mon,  3 Feb 2025 20:07:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 23E9714037F;
+	Mon,  3 Feb 2025 20:15:56 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="kX+w+khU"
+	dkim=pass (1024-bit key) header.d=weissschuh.net header.i=@weissschuh.net header.b="hu2hN4MG"
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+Received: from todd.t-8ch.de (todd.t-8ch.de [159.69.126.157])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 45F4720AF96;
-	Mon,  3 Feb 2025 20:07:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5E3954414;
+	Mon,  3 Feb 2025 20:15:50 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=159.69.126.157
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1738613261; cv=none; b=HVlllV3W2rFbvQUeGi4lfhoJL0r08S8OTI+ptcMeIAHN0uxx/LgGLj/VBGqlrNGix/hXu3x0WtrKi/tOuj+bB9wzY3gaROTnoKsIsORZZzybP7xJ+7i4it4BIMBHl75u9/rPMJgX+Ca4DQSNyOt1J7SM18HjCG3jPSAlBppFrHg=
+	t=1738613756; cv=none; b=QXOunLZlUyCpLJOGao20DZuMupomHifCiHHLgo//YBY9caobxZKiMcZSQr4VuwQsDHU2QZndNG9LW/2TmRCrZP/FIW0u5TwQ2GLe0AQ4u74n64DFh+LQ8yK+9i6e42vv2PU6Rl7zSvWOTEv7M5DcrUi5SOeJVR6uFKhfNx77/nQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1738613261; c=relaxed/simple;
-	bh=g1TUYz8ik05AL78+32hVi0hU3xQaqP9CdIyOOhf96xI=;
+	s=arc-20240116; t=1738613756; c=relaxed/simple;
+	bh=CMsRxRRcOlSLQMjRd9+IVcchv0iPRBlXiJNkU4xsdlw=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=kxudhhMEYkhAqzmsDvn82VcHDmWe3jfy56XvL9O+p6gOO+SYRF9ZBzD1S2IwpObM+RLpRUTOIwmBCCPWqHrULPkyXbAr/1HwW1Gkd9MXs3y0RTP8LkrSXlXUvZBSz9xO9CyB7JiQuSKFZ4sLS7Pt+MPgDTj8RgFOwJ8gSVv08ng=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=kX+w+khU; arc=none smtp.client-ip=156.67.10.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Transfer-Encoding:Content-Disposition:
-	Content-Type:MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:From:
-	Sender:Reply-To:Subject:Date:Message-ID:To:Cc:MIME-Version:Content-Type:
-	Content-Transfer-Encoding:Content-ID:Content-Description:Content-Disposition:
-	In-Reply-To:References; bh=JJHTLSUarSwrkBkd8godphowSLUqNXXms9dJY8HP1UE=; b=kX
-	+w+khUuT+5KPPD8HTeyIgcJ/hwm/iGgksMWl/J4Wij1C/ZKnIQR63t9d5vB+qrXfvvNvB92z3e/Fx
-	5G+514rP3N+qeKdl1tAqQV8kNJnAjwxp/ojyjPgrjFDdqsxRKGsjjB8FIXMlKhpCHYgoFpsk09NbH
-	9PWADP9m1UVcy8M=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1tf2jB-00Ad0g-Gw; Mon, 03 Feb 2025 21:07:29 +0100
-Date: Mon, 3 Feb 2025 21:07:29 +0100
-From: Andrew Lunn <andrew@lunn.ch>
-To: Thomas =?iso-8859-1?Q?Wei=DFschuh?= <linux@weissschuh.net>
-Cc: Richard Cochran <richardcochran@gmail.com>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	linux-kernel@vger.kernel.org, netdev@vger.kernel.org
+	 Content-Type:Content-Disposition:In-Reply-To; b=EA7cEs7XC1yt4ChJOuu/Ljd6ylljYmBOX5nRNsnNiugyqH0WYmyh2UZNCtAK2hxdqvPz+yonQTr1qbU7VJBCCQk2XU8MjjxRT1qOAVNrEg4yENEfNjD3Q0kS7bMaIoYIFjWu+It/DngozGV3rCRYWPTST0F8XFpC4njyW0z+jpQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=weissschuh.net; spf=pass smtp.mailfrom=weissschuh.net; dkim=pass (1024-bit key) header.d=weissschuh.net header.i=@weissschuh.net header.b=hu2hN4MG; arc=none smtp.client-ip=159.69.126.157
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=weissschuh.net
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=weissschuh.net
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=weissschuh.net;
+	s=mail; t=1738613748;
+	bh=CMsRxRRcOlSLQMjRd9+IVcchv0iPRBlXiJNkU4xsdlw=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=hu2hN4MG65ZvEIzaeyNvxBvFN163dpSO/N26maMKZKCByl9gvNGLkwTSYY+Wl1ZDM
+	 9vPyznudwE4qIJsLpm0og8FDKzHIwNcv0YFayuUM41tFeC6tbxtF3MvHgo4AwejAGP
+	 t9UUpJyyMLpgvBgFBL5gKv9UODkeN+/FBllJpB24=
+Date: Mon, 3 Feb 2025 21:15:47 +0100
+From: Thomas =?utf-8?Q?Wei=C3=9Fschuh?= <linux@weissschuh.net>
+To: Andrew Lunn <andrew@lunn.ch>
+Cc: Richard Cochran <richardcochran@gmail.com>, 
+	Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller" <davem@davemloft.net>, 
+	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
+	Paolo Abeni <pabeni@redhat.com>, linux-kernel@vger.kernel.org, netdev@vger.kernel.org
 Subject: Re: [PATCH net] ptp: Add mock device
-Message-ID: <b383c0b2-42cc-4e40-a7b8-f2b393387043@lunn.ch>
+Message-ID: <8ea4c7d5-28bd-4ea4-ba43-3cd3e8a6162b@t-8ch.de>
 References: <20250203-ptp-mock-dev-v1-1-f84c56fd9e45@weissschuh.net>
+ <b383c0b2-42cc-4e40-a7b8-f2b393387043@lunn.ch>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <20250203-ptp-mock-dev-v1-1-f84c56fd9e45@weissschuh.net>
+In-Reply-To: <b383c0b2-42cc-4e40-a7b8-f2b393387043@lunn.ch>
 
-On Mon, Feb 03, 2025 at 08:50:46PM +0100, Thomas Weißschuh wrote:
-> While working on the PTP core or userspace components,
-> a real PTP device is not always available.
-> Introduce a tiny module which creates a mock PTP device.
+On 2025-02-03 21:07:29+0100, Andrew Lunn wrote:
+> On Mon, Feb 03, 2025 at 08:50:46PM +0100, Thomas WeiÃŸschuh wrote:
+> > While working on the PTP core or userspace components,
+> > a real PTP device is not always available.
+> > Introduce a tiny module which creates a mock PTP device.
+> 
+> What does this add which netdevsim does not provide?
 
-What does this add which netdevsim does not provide?
+Nothing. I did not know this existed.
+Thanks for the hint.
 
-     Andrew
+
+Thomas
 
