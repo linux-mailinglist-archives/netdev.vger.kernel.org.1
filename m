@@ -1,135 +1,145 @@
-Return-Path: <netdev+bounces-162050-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-162051-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 10B40A257A2
-	for <lists+netdev@lfdr.de>; Mon,  3 Feb 2025 12:00:55 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 58397A257AB
+	for <lists+netdev@lfdr.de>; Mon,  3 Feb 2025 12:02:06 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id D21A67A12C1
-	for <lists+netdev@lfdr.de>; Mon,  3 Feb 2025 10:59:59 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C18693A8539
+	for <lists+netdev@lfdr.de>; Mon,  3 Feb 2025 11:01:48 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 30C33201266;
-	Mon,  3 Feb 2025 11:00:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5844A202F79;
+	Mon,  3 Feb 2025 11:01:37 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ej1-f53.google.com (mail-ej1-f53.google.com [209.85.218.53])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 613402A1CF;
-	Mon,  3 Feb 2025 11:00:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.53
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 255A4202C2A;
+	Mon,  3 Feb 2025 11:01:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1738580448; cv=none; b=u1tpYb94WUr6xLZdIemq3ZKm3ZnHWgKwyKTRq6BSl4B8oesoH5yiG3k9OwdG135V4gL4sBr8b15ZVE9Mwi1c3AOoeqMjPGV2tvjKkISKVHoydPNkZHUWyHQ7K/sp9yh8K3/Qvt1eiXbqgy6idZ4F9fbD2pSNF1jUWGfv/ziPDbs=
+	t=1738580497; cv=none; b=oXoWf35a9QvPx/kO/v8Gg1kP3nFsBiPVDzAylZWgnNCvnPnXwosHJD6Uvdk9F4FBF/NtNWYzDo/E3O5KRAs9VRrnuYlhTJLLhHYsasYqupmvgXLAGD4IaIONneyU0bgO9NigGt8A2RhN/R5kx58egAlwmsBIl1Bq2a7bRmgg4WU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1738580448; c=relaxed/simple;
-	bh=RmBgRBXMjX74yrIGL98/IAnnRAeq6fYyIMWIK1KWRdA=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=ls84VDTn8h0pATX8JwyGSvW5ng9HyAkjS19bth1BeXKXXsJ6yey8qPKgGrKsQP/8rCiHspAYySDXa27xUcT2TTjtx92pQ1tnF8qfFSDXVJLfqbohW8Jee6DVKJ30A507VlsHrrK/4GxuMfIw3pUSzB8qDHHzEXFR2UKVO+2363E=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.218.53
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ej1-f53.google.com with SMTP id a640c23a62f3a-ab70043cd05so607560366b.0;
-        Mon, 03 Feb 2025 03:00:46 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1738580444; x=1739185244;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=VdjeNRG0qxmgOEy8hRguLgI2muoVRHpqj6bs+IISjqk=;
-        b=E9Ec1SK5sJXlYe+V4UKymeUIM7xFXk/RF9PpypgPMXXAVV/1CI7GQTEirvTzifS7zO
-         uzeTOiFYPHY4TXc9eDJTiyPo5vOgPCQukWS5l0dWPxig1xn576hOiYf8vVKUrJ/QtOFy
-         POjzXh5qxgKOZ+7/dTqL9FNP3qWTjzFulLd8zOFbpsniENwZLSm46Tj4UghTrohdGHCd
-         CnCr90vdUflsyjFwyuY8SpstyYyztkIcTy/dsUuGzEx1Rnvbv76TaY6sIJeS04fhMLFk
-         qkDuMGlg7X6lweEbXFnD375HYFhZl+w28602a8xKNH/Nv9fQa1Qit63Tn8HSy88Z9DyA
-         7lzw==
-X-Forwarded-Encrypted: i=1; AJvYcCWD371lmSqSlATQm5RKKzKsw9jc1HFCipwr526Bwa1KWSgrMTwIDKj8XlrZez/LJjDtRGaxK0NONJ+KCWRpC1be@vger.kernel.org, AJvYcCX5DjJx122efyN3J1oiH134ml5htno9aYCnljHQByrP2MUde7aSG7vklD9ZxnvJyENxj7OuC98p@vger.kernel.org, AJvYcCXzp9Ei3E8HrzRldsvnOef+8LFXVOghhowreI2fX0MfodIY1JaRyTqsd+VkppzQzVSiL4AbGVMZMnXX0fA=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxJN6iP7XKayzMOwr7d1rlam1HnKsb9sAKR6gx8PyYdSCN68L98
-	s+4ZouO3OnaIBckoquQS0CfQclaF8EbamwdXJ1sRJZxEUgC1aos4TSo2Jg==
-X-Gm-Gg: ASbGncuAEuygTf/IMYTABIB5hTqN4Xedbf7D8Wjo685EipBvq/WeUdpQcBmM0pgew/4
-	xCs01yFVCL+yAnTz+OpX9EqhT45doKe+6nujfcp1m/yDiuZ+WHwGn9lWBreCzqoEkUYdh9ANNkn
-	N+k1psmb4htGFFnjJKkXC3uoqgCPbJDM8vAOVLwoFOAGpZ3OMQO1M71JLPgQnwBRBPcOGefTT5V
-	30zG/ylSkK44pBxzYQULEEJxskIvQXTP9v2E8iq8FXTvqSn2pHAWfYX+4OTowm3p5bSY356cUZB
-	TcvqZps=
-X-Google-Smtp-Source: AGHT+IH32u0asjJRwd4Z2w5Z3r7JtXTZHW1NsOXgWp/H/IYZ0MXVJW2OR/xMU9wV8Aig9/WDROm4hA==
-X-Received: by 2002:a17:907:6d22:b0:aae:8841:2bba with SMTP id a640c23a62f3a-ab6cfceb427mr2299995066b.22.1738580442795;
-        Mon, 03 Feb 2025 03:00:42 -0800 (PST)
-Received: from gmail.com ([2a03:2880:30ff:73::])
-        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-ab6e47a83e3sm733074766b.29.2025.02.03.03.00.41
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 03 Feb 2025 03:00:42 -0800 (PST)
-Date: Mon, 3 Feb 2025 03:00:37 -0800
-From: Breno Leitao <leitao@debian.org>
-To: Simon Horman <horms@kernel.org>
-Cc: Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Shuah Khan <shuah@kernel.org>, linux-kernel@vger.kernel.org,
-	netdev@vger.kernel.org, linux-kselftest@vger.kernel.org,
-	matttbe@kernel.org
-Subject: Re: [PATCH RFC net-next] netconsole: selftest: Add test for
- fragmented messages
-Message-ID: <20250203-subtle-taipan-of-realization-1c3a3f@leitao>
-References: <20250131-netcons_frag_msgs-v1-1-0de83bf2a7e6@debian.org>
- <20250203104855.GC234677@kernel.org>
+	s=arc-20240116; t=1738580497; c=relaxed/simple;
+	bh=i8TuiKp63KwQmYHvZeyeU2ehTe/euGjJ+1y3V/bFTqk=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=i8uHZNGerYHGzZYbwYvHa2WJumls8cCkmtQGsSFOSUGCX0EQk4GTm1yUF/Pwcxgc20TDN0VLmSYqFmPoOSNBYGz9YHkLmsWLEljPpeOzx+OpkvciImEJ/EDpkZCDrlfzQg8PtkPW3f2M53pDTtB9e/+fzqWk++7FDaudIRXwSB0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 9B88211FB;
+	Mon,  3 Feb 2025 03:01:58 -0800 (PST)
+Received: from [10.1.34.25] (e122027.cambridge.arm.com [10.1.34.25])
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 973B43F5A1;
+	Mon,  3 Feb 2025 03:01:30 -0800 (PST)
+Message-ID: <811ea27c-c1c3-454a-b3d9-fa4cd6d57e44@arm.com>
+Date: Mon, 3 Feb 2025 11:01:28 +0000
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
-In-Reply-To: <20250203104855.GC234677@kernel.org>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH] net: stmmac: Allow zero for [tr]x_fifo_size
+To: "Russell King (Oracle)" <linux@armlinux.org.uk>,
+ Kunihiko Hayashi <hayashi.kunihiko@socionext.com>
+Cc: "David S. Miller" <davem@davemloft.net>,
+ Alexandre Torgue <alexandre.torgue@foss.st.com>,
+ Andrew Lunn <andrew+netdev@lunn.ch>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Maxime Coquelin
+ <mcoquelin.stm32@gmail.com>, Jose Abreu <joabreu@synopsys.com>,
+ Paolo Abeni <pabeni@redhat.com>, linux-arm-kernel@lists.infradead.org,
+ linux-kernel@vger.kernel.org, linux-stm32@st-md-mailman.stormreply.com,
+ netdev@vger.kernel.org, Furong Xu <0x1207@gmail.com>,
+ Petr Tesarik <petr@tesarici.cz>, Serge Semin <fancer.lancer@gmail.com>,
+ Yanteng Si <si.yanteng@linux.dev>, Xi Ruoyao <xry111@xry111.site>
+References: <20250203093419.25804-1-steven.price@arm.com>
+ <Z6CckJtOo-vMrGWy@shell.armlinux.org.uk>
+From: Steven Price <steven.price@arm.com>
+Content-Language: en-GB
+In-Reply-To: <Z6CckJtOo-vMrGWy@shell.armlinux.org.uk>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-Hello Simon,
+[Moved Kunihiko to the To: line]
 
-On Mon, Feb 03, 2025 at 10:48:55AM +0000, Simon Horman wrote:
-> On Fri, Jan 31, 2025 at 04:39:38AM -0800, Breno Leitao wrote:
+On 03/02/2025 10:38, Russell King (Oracle) wrote:
+> On Mon, Feb 03, 2025 at 09:34:18AM +0000, Steven Price wrote:
+>> Commit 8865d22656b4 ("net: stmmac: Specify hardware capability value
+>> when FIFO size isn't specified") modified the behaviour to bail out if
+>> both the FIFO size and the hardware capability were both set to zero.
+>> However devices where has_gmac4 and has_xgmac are both false don't use
+>> the fifo size and that commit breaks platforms for which these values
+>> were zero.
+>>
+>> Only warn and error out when (has_gmac4 || has_xgmac) where the values
+>> are used and zero would cause problems, otherwise continue with the zero
+>> values.
+>>
+>> Fixes: 8865d22656b4 ("net: stmmac: Specify hardware capability value when FIFO size isn't specified")
+>> Tested-by: Xi Ruoyao <xry111@xry111.site>
+>> Signed-off-by: Steven Price <steven.price@arm.com>
+> 
+> I'm still of the opinion that the original patch set was wrong, and
+> I was thinking at the time that it should _not_ have been submitted
+> for the "net" tree (it wasn't fixing a bug afaics, and was a risky
+> change.)
+> 
+> Yes, we had multiple places where we have code like:
+> 
+>         int rxfifosz = priv->plat->rx_fifo_size;
+>         int txfifosz = priv->plat->tx_fifo_size;
+> 
+>         if (rxfifosz == 0)
+>                 rxfifosz = priv->dma_cap.rx_fifo_size;
+>         if (txfifosz == 0)
+>                 txfifosz = priv->dma_cap.tx_fifo_size;
+> 
+>         /* Split up the shared Tx/Rx FIFO memory on DW QoS Eth and DW XGMAC */
+>         if (priv->plat->has_gmac4 || priv->plat->has_xgmac) {
+>                 rxfifosz /= rx_channels_count;
+>                 txfifosz /= tx_channels_count;
+>         }
+> 
+> and this is passed to stmmac_dma_rx_mode() and stmmac_dma_tx_mode().
+> 
+> We also have it in the stmmac_change_mtu() path for the transmit side,
+> which ensures that the MTU value is not larger than the transmit FIFO
+> size (which is going to fail as it's always done before or after the
+> original patch set, and whether or not your patch is applied.)
+> 
+> Now, as for the stmmac_dma_[tr]x_mode(), these are method functions
+> calling into the DMA code. dwmac4, dwmac1000, dwxgmac2, dwmac100 and
+> sun8i implement methods for this.
+> 
+> Of these, dwmac4, dwxgmac2 makes use of the value passed into
+> stmmac_dma_[tr]x_mode() - both of which initialise dma.[tr]x_fifo_size.
+> dwmac1000, dwmac100 and sun8i do not make use of it.
+> 
+> So, going back to the original patch series, I still question the value
+> of the changes there - and with your patch, it makes their value even
+> less because the justification seemed to be to ensure that
+> priv->plat->[tr]x_fifo_size contained a sensible value. With your patch
+> we're going back to a situation where we allow these to effectively be
+> "unset" or zero.
+> 
+> I'll ask the question straight out - with your patch applied, what is
+> the value of the original four patch series that caused the breakage?
+> 
 
-> > +# Validate the message, which has two messages glued together.
-> > +# unwrap them to make sure all the characters were transmitted.
-> > +# File will look like the following:
-> > +#   13,468,514729715,-,ncfrag=3D0/1135;MSG1=3DMSG2=3DMSG3=3DMSG4=3DMSG=
-5=3DMSG6=3DMSG7=3DMSG8=3DMSG9=3DMSG10=3DMSG11=3DMSG12=3DMSG13=3DMSG14=3DMSG=
-15=3DMSG16=3DMSG17=3DMSG18=3DMSG19=3DMSG20=3DMSG21=3DMSG22=3DMSG23=3DMSG24=
-=3DMSG25=3DMSG26=3DMSG27=3DMSG28=3DMSG29=3DMSG30=3DMSG31=3DMSG32=3DMSG33=3D=
-MSG34=3DMSG35=3DMSG36=3DMSG37=3DMSG38=3DMSG39=3DMSG40=3DMSG41=3DMSG42=3DMSG=
-43=3DMSG44=3DMSG45=3DMSG46=3DMSG47=3DMSG48=3DMSG49=3DMSG50=3DMSG51=3DMSG52=
-=3DMSG53=3DMSG54=3DMSG55=3DMSG56=3DMSG57=3DMSG58=3DMSG59=3DMSG60=3DMSG61=3D=
-MSG62=3DMSG63=3DMSG64=3DMSG65=3DMSG66=3DMSG67=3DMSG68=3DMSG69=3DMSG70=3DMSG=
-71=3DMSG72=3DMSG73=3DMSG74=3DMSG75=3DMSG76=3DMSG77=3DMSG78=3DMSG79=3DMSG80=
-=3DMSG81=3DMSG82=3DMSG83=3DMSG84=3DMSG85=3DMSG86=3DMSG87=3DMSG88=3DMSG89=3D=
-MSG90=3DMSG91=3DMSG92=3DMSG93=3DMSG94=3DMSG95=3DMSG96=3DMSG97=3DMSG98=3DMSG=
-99=3DMSG100=3DMSG101=3DMSG102=3DMSG103=3DMSG104=3DMSG105=3DMSG106=3DMSG107=
-=3DMSG108=3DMSG109=3DMSG110=3DMSG111=3DMSG112=3DMSG113=3DMSG114=3DMSG115=3D=
-MSG116=3DMSG117=3DMSG118=3DMSG119=3DMSG120=3DMSG121=3DMSG122=3DMSG123=3DMSG=
-124=3DMSG125=3DMSG126=3DMSG127=3DMSG128=3DMSG129=3DMSG130=3DMSG131=3DMSG132=
-=3DMSG133=3DMSG134=3DMSG135=3DMSG136=3DMSG137=3DMSG138=3DMSG139=3DMSG140=3D=
-MSG141=3DMSG142=3DMSG143=3DMSG144=3DMSG145=3DMSG146=3DMSG147=3DMSG148=3DMSG=
-149=3DMSG150=3D: netcons_nzmJQ
-> > +#    key=3D1-2-13,468,514729715,-,ncfrag=3D967/1135;3-4-5-6-7-8-9-10-1=
-1-12-13-14-15-16-17-18-19-20-21-22-23-24-25-26-27-28-29-30-31-32-33-34-35-3=
-6-37-38-39-40-41-42-43-44-45-46-47-48-49-50-51-52-53-54-55-56-57-58-59-60-
+I've no opinion whether the original series "had value" - I'm just 
+trying to fix the breakage that entailed. My first attempt at a patch 
+was indeed a (partial) revert, but Andrew was keen to find a better 
+solution[1].
 
-> I appreciate there is a value in providing the literal data.
-> But as the data is based mostly of arithmetic sequences
-> perhaps it would be nicer to express this in a more succinct way.
+I'd prefer we don't delay getting a fix merged arguing about the finer 
+details on this. Obviously once a fix is merged the code can be
+improved at leisure. If you want to propose a straight revert then
+by all means send the patch and I'll post a Tested-By.
 
-First of all, thanks for the review.
+Steve
 
-Do you mean I should simplify this comment above, to avoid the literal
-data, right?
-
-> Regardless, this patch looks good to me.
-
-Thanks, I was a bit surprised with the tests failing on our CI, but,
-after some investigation, it doesn't seem to be caused by this change.
-
-https://patchwork.kernel.org/project/netdevbpf/patch/20250131-netcons_frag_=
-msgs-v1-1-0de83bf2a7e6@debian.org/
-
---breno
+[1] https://lore.kernel.org/all/fc08926d-b9af-428f-8811-4bfe08acc5b7@lunn.ch/
 
