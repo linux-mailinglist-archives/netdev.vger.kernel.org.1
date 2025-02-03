@@ -1,194 +1,87 @@
-Return-Path: <netdev+bounces-162172-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-162173-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id DD3E7A25EF0
-	for <lists+netdev@lfdr.de>; Mon,  3 Feb 2025 16:37:38 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0E3CEA25F0A
+	for <lists+netdev@lfdr.de>; Mon,  3 Feb 2025 16:42:28 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 8533A161DB1
-	for <lists+netdev@lfdr.de>; Mon,  3 Feb 2025 15:37:31 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 97A933A2DEC
+	for <lists+netdev@lfdr.de>; Mon,  3 Feb 2025 15:42:18 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 705ED20ADCC;
-	Mon,  3 Feb 2025 15:37:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1F295209F2A;
+	Mon,  3 Feb 2025 15:42:24 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="IN275eiC"
+	dkim=pass (1024-bit key) header.d=sendgrid.net header.i=@sendgrid.net header.b="RC2Nwstw"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from xtrwqkpv.outbound-mail.sendgrid.net (xtrwqkpv.outbound-mail.sendgrid.net [167.89.65.56])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4329A208995;
-	Mon,  3 Feb 2025 15:37:10 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6DE7C2080E7
+	for <netdev@vger.kernel.org>; Mon,  3 Feb 2025 15:42:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=167.89.65.56
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1738597031; cv=none; b=l7ImUPm5RbBq2scRBpfbzz5lMjr56ywqe/gR09KNeQH4im3bp2roxNaIaLDQ7UwWjyfgzG6zi+Ne9PVMHG4xMSBJ30BZmMOKTAYRrnAEEsJUIdM9GhXz3JO83NKXOKrjkCq6dgubgleOXlpurOy+kQ0136mhRmz3Wi3zlC2W4OU=
+	t=1738597344; cv=none; b=flH+JUOfqY4ov2rPV8xYyDrqMQSJ3TYD04nsCulDuX1ATj4qOR8Hf3Q+VyawesRFBkKPP8x/PkcdthVMKTI/7p5Ta4SU+RgNq6dPFqsb9DhMhoW8FuxbimQIQJMrpXt/FWeeAABvBiGUP5n55iX6RLHTzvAhhqXm7uZ+BECAJds=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1738597031; c=relaxed/simple;
-	bh=zxuCVc3egPezHDqToqET5g5++zkJ6jbKo4UuMIaT+WQ=;
-	h=Date:Content-Type:MIME-Version:From:Cc:To:In-Reply-To:References:
-	 Message-Id:Subject; b=c1Wf49OnMFoI/eXEyONtTSSVEkZgw2y3+X0gxB/lj418//3HTq58uW/qGisOv/mfeMotNooOtZd5R9GvrCuf/kUXk23hI6t/jAnPJg0Iy5xOVMOQD6NN4rhQ+pJn3f5WJ26uNl253joQDXLgt5L36slEkSOZLTG3/Su0AXASmzc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=IN275eiC; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 91200C4CED2;
-	Mon,  3 Feb 2025 15:37:10 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1738597030;
-	bh=zxuCVc3egPezHDqToqET5g5++zkJ6jbKo4UuMIaT+WQ=;
-	h=Date:From:Cc:To:In-Reply-To:References:Subject:From;
-	b=IN275eiCLwwUJezABuTmgS/US0CW0NZ1G/NPDhDwL0OEXm9WFnsDHjXtv3CUH1K/m
-	 gnLsaN11HXs/h+hRoYeIBYDx5d1K2Muckr4/8MK7KYcKT8DNAvdxQ0lS673B9Q31af
-	 9mYoDVPwUB5n6Jpys8Ad5YoevQXO6zg+F95xCEN8lQKLfB+3/HtWXwTTybFP84jZQy
-	 SxDr1iRDQwF3ls3f/aDfoyvmQLMTSGnJZMxk6Iad3TjfBMmfinoCNHRLiGRL4aWrJ9
-	 CvpyxtkZg1F87bHwO+tHTkBibNedX7Mktf1+Qd/xhp+Gh3l/7/Ff1hsTZfdheqhila
-	 lxdB+s965rIEg==
-Date: Mon, 03 Feb 2025 09:37:09 -0600
-Content-Type: text/plain; charset="utf-8"
+	s=arc-20240116; t=1738597344; c=relaxed/simple;
+	bh=otDkNBvOqkRPd3VC+7NpUQnQkBxWpepfAIA7WoVlV6M=;
+	h=From:Subject:Content-Type:Date:Message-Id:To; b=QlfI2WCsMhglwxoKpCCnbOIKNCLQ7hdzGFfOkuKFkcTo6/dl9JZjo+WVuOHNXiSrCq8Lp70EGIsiHua5VRKmFdmsEPzmGx5OZ661/BTw8FzRAc16MsVOvgprh2JYNgO4ZsABGm+7NLnEPQ/DRoavOjHMpwcm/qZ1+dTz1C3xv9Y=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=novitera.com; spf=pass smtp.mailfrom=sendgrid.net; dkim=pass (1024-bit key) header.d=sendgrid.net header.i=@sendgrid.net header.b=RC2Nwstw; arc=none smtp.client-ip=167.89.65.56
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=novitera.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=sendgrid.net
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=sendgrid.net;
+	h=from:subject:content-type:content-transfer-encoding:reply-to:to:cc:
+	content-type:from:subject:to;
+	s=smtpapi; bh=52IJgE/0WJKWA1gfIQQLbgP1HE0qCqFA/mov68VNZRU=;
+	b=RC2NwstwpfbbGkCLJ0Jz7Fma8yx1zz08S034Qyvgi8M+9xUNsJsgdlv5IUOABnpQtzA6
+	eFLPczmMIEjZxPa6Mx1PN2/oGfGWN40XagiVLgO/bLbF9eujZ3G/zmybC6m6FBeIkXP3/T
+	eG+jZ3x7QeJurCyfQUJUPiNeEgnutydVY=
+Received: by recvd-68b5db6845-5fj58 with SMTP id recvd-68b5db6845-5fj58-1-67A0E3DC-30
+	2025-02-03 15:42:20.696336128 +0000 UTC m=+6977972.481107700
+Received: from vultr-guest (unknown)
+	by geopod-ismtpd-36 (SG) with ESMTP
+	id YEU0JVakTrespkQ0ZDzrmw
+	for <netdev@vger.kernel.org>;
+	Mon, 03 Feb 2025 15:42:20.570 +0000 (UTC)
+From: Sonia Anderson <info@novitera.com>
+Subject: Inquiry Regarding CPA Services
+Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: 8bit
+Date: Mon, 03 Feb 2025 15:42:20 +0000 (UTC)
+Message-Id: <03202025024215537F5B101E-62B1A77D08@novitera.com>
+Reply-To: ownernovitera@lycos.com
+X-SG-EID: 
+ =?us-ascii?Q?u001=2EnQyB9RseKhvfy648RbR7OJN72akifLCzElG4xAjb9k4hKRgLfS92jLSlr?=
+ =?us-ascii?Q?q4YihGRNBGx8O1hbzWCzcth1bP7loIjiiE5fMIh?=
+ =?us-ascii?Q?1CjnN0D+zKTJsUk3UxAIJ4diwU0wDkqCYiVY9cJ?=
+ =?us-ascii?Q?bgjMWyl1wo6mUf=2F6al6K0CNo490NH9ZcnVfVbUP?=
+ =?us-ascii?Q?t9cYbCu02+mTlCojohwSph5H+EfcikwSpjElXTK?=
+ =?us-ascii?Q?x6xGwzGBVVtEHjgRUqSCp70F4xU9TLsPFXM+I2N?= =?us-ascii?Q?eQ2Z?=
+To: netdev@vger.kernel.org
+X-Entity-ID: u001.CSU14D88zsBssrA83kd+Gg==
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-From: "Rob Herring (Arm)" <robh@kernel.org>
-Cc: linus.walleij@linaro.org, netdev@vger.kernel.org, 
- openipmi-developer@lists.sourceforge.net, minyard@acm.org, brgl@bgdev.pl, 
- linux-kernel@vger.kernel.org, andrew@codeconstruct.com.au, 
- edumazet@google.com, davem@davemloft.net, andrew+netdev@lunn.ch, 
- joel@jms.id.au, conor+dt@kernel.org, devicetree@vger.kernel.org, 
- linux-arm-kernel@lists.infradead.org, eajames@linux.ibm.com, 
- krzk+dt@kernel.org, kuba@kernel.org, pabeni@redhat.com, 
- linux-aspeed@lists.ozlabs.org
-To: Ninad Palsule <ninad@linux.ibm.com>
-In-Reply-To: <20250203144422.269948-1-ninad@linux.ibm.com>
-References: <20250203144422.269948-1-ninad@linux.ibm.com>
-Message-Id: <173859694889.2601726.10618336219726193824.robh@kernel.org>
-Subject: Re: [PATCH v7 0/9] DTS updates for system1 BMC
 
+Morning,
 
-On Mon, 03 Feb 2025 08:44:10 -0600, Ninad Palsule wrote:
-> Hello,
-> 
-> Please review the patch set version 7.
-> 
-> V7:
-> ---
->   - Updated pattern in the ast2400-gpio.yaml
->   - Dropped "dt-bindings: net: faraday,ftgmac100" patch sending it
->     separately.
-> 
-> V6:
-> ---
->   - Fixed dt_binding_check errors for ipmb-dev.yaml
->   - Changed the hog parsing pattern in ast2400-gpio
-> 
-> V5:
-> ---
->   - Improved IPBM device documentation.
->   - Added the hog parsing in ast2400-gpio
-> 
-> V4:
-> ---
->   - Removed "Add RGMII support" patch as it needs some work from the
->     driver side.
->   - Improved IPBM device documentation.
->   - There is a new warning in CHECK_DTBS which are false positive so
->     ignored them.
->     arch/arm/boot/dts/aspeed/aspeed-bmc-ibm-system1.dtb: gpio@1e780000: 'hog-0', 'hog-1', 'hog-2', 'hog-3' do not match any of the regexes: 'pinctrl-[0-9]+'
-> 
-> V3:
-> ---
->   - Fixed dt_binding_check warnings in ipmb-dev.yaml
->   - Updated title and description in ipmb-dev.yaml file.
->   - Updated i2c-protocol description in ipmb-dev.yaml file.
-> 
-> V2:
-> ---
->   Fixed CHECK_DTBS errors by
->     - Using generic node names
->     - Documenting phy-mode rgmii-rxid in ftgmac100.yaml
->     - Adding binding documentation for IPMB device interface
-> 
-> NINAD PALSULE (6):
->   ARM: dts: aspeed: system1: Add IPMB device
->   ARM: dts: aspeed: system1: Add GPIO line name
->   ARM: dts: aspeed: system1: Reduce sgpio speed
->   ARM: dts: aspeed: system1: Update LED gpio name
->   ARM: dts: aspeed: system1: Remove VRs max8952
->   ARM: dts: aspeed: system1: Mark GPIO line high/low
-> 
-> Ninad Palsule (3):
->   bindings: ipmi: Add binding for IPMB device intf
->   dt-bindings: gpio: ast2400-gpio: Add hogs parsing
->   ARM: dts: aspeed: system1: Disable gpio pull down
-> 
->  .../bindings/gpio/aspeed,ast2400-gpio.yaml    |   6 +
->  .../devicetree/bindings/ipmi/ipmb-dev.yaml    |  56 +++++++
->  .../dts/aspeed/aspeed-bmc-ibm-system1.dts     | 139 +++++++++++-------
->  3 files changed, 147 insertions(+), 54 deletions(-)
->  create mode 100644 Documentation/devicetree/bindings/ipmi/ipmb-dev.yaml
-> 
-> --
-> 2.43.0
-> 
-> 
-> 
+   I hope this message finds you well. I recently moved to this area 
+following my divorce and am in need of assistance with preparing my taxes. 
+Since this is my first time filing in this area, I’d appreciate your 
+guidance to ensure everything is handled correctly.
 
+Please let me know what information or documents you need from me to get 
+started. I’d also love to schedule a time to discuss any details necessary 
+to make the process as smooth as possible.
 
-My bot found new DTB warnings on the .dts files added or changed in this
-series.
+Looking forward to your response.
 
-Some warnings may be from an existing SoC .dtsi. Or perhaps the warnings
-are fixed by another series. Ultimately, it is up to the platform
-maintainer whether these warnings are acceptable or not. No need to reply
-unless the platform maintainer has comments.
-
-If you already ran DT checks and didn't see these error(s), then
-make sure dt-schema is up to date:
-
-  pip3 install dtschema --upgrade
-
-
-New warnings running 'make CHECK_DTBS=y for arch/arm/boot/dts/aspeed/' for 20250203144422.269948-1-ninad@linux.ibm.com:
-
-arch/arm/boot/dts/aspeed/aspeed-bmc-opp-palmetto.dtb: gpio@1e780000: 'pin_func_mode0', 'pin_func_mode1', 'pin_func_mode2', 'pin_gpio_a0', 'pin_gpio_a1', 'pin_gpio_b1', 'pin_gpio_b2', 'pin_gpio_b7', 'pin_gpio_d1', 'pin_gpio_f1', 'pin_gpio_f4', 'pin_gpio_f5', 'pin_gpio_f7', 'pin_gpio_g3', 'pin_gpio_g4', 'pin_gpio_g5', 'pin_gpio_h0', 'pin_gpio_h1', 'pin_gpio_h2', 'pin_gpio_h7' do not match any of the regexes: '-hog(-[0-9]+)?$', 'pinctrl-[0-9]+'
-	from schema $id: http://devicetree.org/schemas/gpio/aspeed,ast2400-gpio.yaml#
-arch/arm/boot/dts/aspeed/aspeed-bmc-opp-romulus.dtb: gpio@1e780000: 'nic_func_mode0', 'nic_func_mode1', 'seq_cont' do not match any of the regexes: '-hog(-[0-9]+)?$', 'pinctrl-[0-9]+'
-	from schema $id: http://devicetree.org/schemas/gpio/aspeed,ast2400-gpio.yaml#
-arch/arm/boot/dts/aspeed/aspeed-bmc-delta-ahe50dc.dtb: gpio@1e780000: 'doom-guardrail' does not match any of the regexes: '-hog(-[0-9]+)?$', 'pinctrl-[0-9]+'
-	from schema $id: http://devicetree.org/schemas/gpio/aspeed,ast2400-gpio.yaml#
-arch/arm/boot/dts/aspeed/aspeed-bmc-opp-lanyang.dtb: gpio@1e780000: 'pin_gpio_aa6', 'pin_gpio_aa7', 'pin_gpio_ab0', 'pin_gpio_b0', 'pin_gpio_b5', 'pin_gpio_h5', 'pin_gpio_z2' do not match any of the regexes: '-hog(-[0-9]+)?$', 'pinctrl-[0-9]+'
-	from schema $id: http://devicetree.org/schemas/gpio/aspeed,ast2400-gpio.yaml#
-arch/arm/boot/dts/aspeed/aspeed-bmc-bytedance-g220a.dtb: gpio@1e780000: 'pin_gpio_b6', 'pin_gpio_i3' do not match any of the regexes: '-hog(-[0-9]+)?$', 'pinctrl-[0-9]+'
-	from schema $id: http://devicetree.org/schemas/gpio/aspeed,ast2400-gpio.yaml#
-arch/arm/boot/dts/aspeed/aspeed-bmc-ibm-everest.dtb: gpio@1e780000: 'usb_power' does not match any of the regexes: '-hog(-[0-9]+)?$', 'pinctrl-[0-9]+'
-	from schema $id: http://devicetree.org/schemas/gpio/aspeed,ast2400-gpio.yaml#
-arch/arm/boot/dts/aspeed/aspeed-bmc-bytedance-g220a.dtb: /ahb/apb/bus@1e78a000/interrupt-controller@0: failed to match any schema with compatible: ['aspeed,ast2500-i2c-ic']
-arch/arm/boot/dts/aspeed/aspeed-bmc-asrock-e3c246d4i.dtb: gpio@1e780000: 'bmc-ready' does not match any of the regexes: '-hog(-[0-9]+)?$', 'pinctrl-[0-9]+'
-	from schema $id: http://devicetree.org/schemas/gpio/aspeed,ast2400-gpio.yaml#
-arch/arm/boot/dts/aspeed/aspeed-bmc-ampere-mtjade.dtb: gpio@1e780000: 'bmc-ready' does not match any of the regexes: '-hog(-[0-9]+)?$', 'pinctrl-[0-9]+'
-	from schema $id: http://devicetree.org/schemas/gpio/aspeed,ast2400-gpio.yaml#
-arch/arm/boot/dts/aspeed/aspeed-bmc-ibm-rainier.dtb: gpio@1e780000: 'i2c3_mux_oe_n', 'usb_power' do not match any of the regexes: '-hog(-[0-9]+)?$', 'pinctrl-[0-9]+'
-	from schema $id: http://devicetree.org/schemas/gpio/aspeed,ast2400-gpio.yaml#
-arch/arm/boot/dts/aspeed/aspeed-bmc-ibm-rainier-1s4u.dtb: gpio@1e780000: 'i2c3_mux_oe_n', 'usb_power' do not match any of the regexes: '-hog(-[0-9]+)?$', 'pinctrl-[0-9]+'
-	from schema $id: http://devicetree.org/schemas/gpio/aspeed,ast2400-gpio.yaml#
-arch/arm/boot/dts/aspeed/aspeed-bmc-ibm-rainier-4u.dtb: gpio@1e780000: 'i2c3_mux_oe_n', 'usb_power' do not match any of the regexes: '-hog(-[0-9]+)?$', 'pinctrl-[0-9]+'
-	from schema $id: http://devicetree.org/schemas/gpio/aspeed,ast2400-gpio.yaml#
-arch/arm/boot/dts/aspeed/aspeed-bmc-ibm-bonnell.dtb: gpio@1e780000: 'usb_power' does not match any of the regexes: '-hog(-[0-9]+)?$', 'pinctrl-[0-9]+'
-	from schema $id: http://devicetree.org/schemas/gpio/aspeed,ast2400-gpio.yaml#
-arch/arm/boot/dts/aspeed/aspeed-bmc-opp-nicole.dtb: gpio@1e780000: 'func_mode0', 'func_mode1', 'func_mode2', 'ncsi_cfg', 'seq_cont' do not match any of the regexes: '-hog(-[0-9]+)?$', 'pinctrl-[0-9]+'
-	from schema $id: http://devicetree.org/schemas/gpio/aspeed,ast2400-gpio.yaml#
-arch/arm/boot/dts/aspeed/aspeed-bmc-lenovo-hr855xg2.dtb: gpio@1e780000: 'pin_gpio_a1', 'pin_gpio_a3', 'pin_gpio_aa0', 'pin_gpio_aa4', 'pin_gpio_ab3', 'pin_gpio_ac6', 'pin_gpio_b5', 'pin_gpio_b7', 'pin_gpio_e0', 'pin_gpio_e2', 'pin_gpio_e5', 'pin_gpio_e6', 'pin_gpio_f0', 'pin_gpio_f1', 'pin_gpio_f2', 'pin_gpio_f3', 'pin_gpio_f4', 'pin_gpio_f6', 'pin_gpio_g7', 'pin_gpio_h6', 'pin_gpio_i3', 'pin_gpio_j1', 'pin_gpio_j2', 'pin_gpio_j3', 'pin_gpio_l0', 'pin_gpio_l1', 'pin_gpio_l4', 'pin_gpio_l5', 'pin_gpio_r6', 'pin_gpio_r7', 'pin_gpio_s1', 'pin_gpio_s2', 'pin_gpio_s6', 'pin_gpio_z3' do not match any of the regexes: '-hog(-[0-9]+)?$', 'pinctrl-[0-9]+'
-	from schema $id: http://devicetree.org/schemas/gpio/aspeed,ast2400-gpio.yaml#
-arch/arm/boot/dts/aspeed/aspeed-bmc-lenovo-hr630.dtb: gpio@1e780000: 'pin_gpio_aa0', 'pin_gpio_aa5', 'pin_gpio_b5', 'pin_gpio_f0', 'pin_gpio_f3', 'pin_gpio_f4', 'pin_gpio_f5', 'pin_gpio_g4', 'pin_gpio_g7', 'pin_gpio_h2', 'pin_gpio_h3', 'pin_gpio_i3', 'pin_gpio_j2', 'pin_gpio_j3', 'pin_gpio_s2', 'pin_gpio_s4', 'pin_gpio_s6', 'pin_gpio_y0', 'pin_gpio_y1', 'pin_gpio_z0', 'pin_gpio_z2', 'pin_gpio_z3', 'pin_gpio_z7' do not match any of the regexes: '-hog(-[0-9]+)?$', 'pinctrl-[0-9]+'
-	from schema $id: http://devicetree.org/schemas/gpio/aspeed,ast2400-gpio.yaml#
-arch/arm/boot/dts/aspeed/aspeed-bmc-opp-zaius.dtb: gpio@1e780000: 'line_bmc_i2c2_sw_rst_n', 'line_bmc_i2c5_sw_rst_n', 'line_iso_u146_en', 'ncsi_mux_en_n' do not match any of the regexes: '-hog(-[0-9]+)?$', 'pinctrl-[0-9]+'
-	from schema $id: http://devicetree.org/schemas/gpio/aspeed,ast2400-gpio.yaml#
-arch/arm/boot/dts/aspeed/aspeed-bmc-arm-stardragon4800-rep2.dtb: gpio@1e780000: 'pin_gpio_c7', 'pin_gpio_d1' do not match any of the regexes: '-hog(-[0-9]+)?$', 'pinctrl-[0-9]+'
-	from schema $id: http://devicetree.org/schemas/gpio/aspeed,ast2400-gpio.yaml#
-
-
-
-
+Best regards,
+Sonia Anderson
+Director/Producer/Writer
+331-7010
 
 
