@@ -1,300 +1,167 @@
-Return-Path: <netdev+bounces-162216-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-162217-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id EDE6FA26358
-	for <lists+netdev@lfdr.de>; Mon,  3 Feb 2025 20:12:18 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 66C9EA2638D
+	for <lists+netdev@lfdr.de>; Mon,  3 Feb 2025 20:18:32 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 48994163E9B
-	for <lists+netdev@lfdr.de>; Mon,  3 Feb 2025 19:12:17 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 0EC5A7A0F6E
+	for <lists+netdev@lfdr.de>; Mon,  3 Feb 2025 19:17:37 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 345E420A5CF;
-	Mon,  3 Feb 2025 19:11:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 376FF211A36;
+	Mon,  3 Feb 2025 19:15:34 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=engleder-embedded.com header.i=@engleder-embedded.com header.b="kHIEYBQT"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="bRwpoliA"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx23lb.world4you.com (mx23lb.world4you.com [81.19.149.133])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wr1-f43.google.com (mail-wr1-f43.google.com [209.85.221.43])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6603C20B20E
-	for <netdev@vger.kernel.org>; Mon,  3 Feb 2025 19:11:43 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=81.19.149.133
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 37233211711;
+	Mon,  3 Feb 2025 19:15:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.43
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1738609905; cv=none; b=K4G7+TPnc+2O9UOdm54KwV547k5A+pheYiVYyYezy10InmRSbA7w02S76VlK4R1dSS7xSE3QOG7Yp75B43cRBbhuPOSrv1TVzYlrWT6Is8J/QrmQvGlVxS/9s+9J7U1fCByooK811aswe8eOnhURSbtwj2C4GHoQ2Se0YbTs2uU=
+	t=1738610134; cv=none; b=Ev0Rj2o3tEaMUNN+Yj7U0cJZRXhkLz6vnRBF0Qc+MatfE9+gIKtIsNTJt6SyM8KgtnCc6tRkpU9n3DF/hokRzFRAEyIvVbCy15EUgoyO/dkpDAkLFdI/fnwBpOSAszT/qLhngxtlw+iLGYeZSs4I5qM2JAjdh8VQxCMv3IrtAF8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1738609905; c=relaxed/simple;
-	bh=vS4sQVfb16y9DLPEwlNhNIiEXXsLUpY2oHAQ+Oa7gG4=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=QSkc5jpykSiliep3LwfAnfCVVpffG7rLH/OhJ32tXqH5Kj7d1ihiBbqJdyitMgcUgtFwc7EMpPJmTZQTJAL4qiUGw9NQN9CH+JzTc25zDSfPxlx4u9kvrS/8oTtd7FusplqKuWAOjmreiP+oQKR2mKEMFT5L98Dax7g0Qyz1OwQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=engleder-embedded.com; spf=pass smtp.mailfrom=engleder-embedded.com; dkim=pass (1024-bit key) header.d=engleder-embedded.com header.i=@engleder-embedded.com header.b=kHIEYBQT; arc=none smtp.client-ip=81.19.149.133
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=engleder-embedded.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=engleder-embedded.com
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=engleder-embedded.com; s=dkim11; h=Content-Transfer-Encoding:MIME-Version:
-	References:In-Reply-To:Message-Id:Date:Subject:Cc:To:From:Sender:Reply-To:
-	Content-Type:Content-ID:Content-Description:Resent-Date:Resent-From:
-	Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:List-Help:
-	List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=2D5GiUUykY89hChn3aAP5ndnXdPq65QEBMcFLEpBzdc=; b=kHIEYBQTYK76+LvBCCe1xfoiGZ
-	ZcSdgGAiipD6fke9q7+iCPx0w+FlJ+k5OZgd5Lw75keBUoe+Ql9LNYpqwW+Ap+Ioc70rwuwWYTOtc
-	DjND3XW5uX06gLh8P8qH41eU0JWv7No2BcUWqcUlDVdIt7XoFvLRDfvA7oLRxFZqF0NQ=;
-Received: from 88-117-60-28.adsl.highway.telekom.at ([88.117.60.28] helo=hornet.engleder.at)
-	by mx23lb.world4you.com with esmtpsa  (TLS1.2) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.97.1)
-	(envelope-from <gerhard@engleder-embedded.com>)
-	id 1tf1r9-000000004RY-1oCF;
-	Mon, 03 Feb 2025 20:11:39 +0100
-From: Gerhard Engleder <gerhard@engleder-embedded.com>
-To: andrew@lunn.ch,
-	hkallweit1@gmail.com,
-	linux@armlinux.org.uk,
-	davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com
-Cc: netdev@vger.kernel.org,
-	Gerhard Engleder <gerhard@engleder-embedded.com>
-Subject: [PATCH net-next v4 7/7] tsnep: Add PHY loopback selftests
-Date: Mon,  3 Feb 2025 20:10:57 +0100
-Message-Id: <20250203191057.46351-8-gerhard@engleder-embedded.com>
-X-Mailer: git-send-email 2.39.5
-In-Reply-To: <20250203191057.46351-1-gerhard@engleder-embedded.com>
-References: <20250203191057.46351-1-gerhard@engleder-embedded.com>
+	s=arc-20240116; t=1738610134; c=relaxed/simple;
+	bh=yJLaDaJbvBCJ5deh7pOKRobdenJvk6Jb4hU6B4/8YW4=;
+	h=Subject:To:Cc:References:From:Message-ID:Date:MIME-Version:
+	 In-Reply-To:Content-Type; b=TCwU3kJQyRD4uQkxFH74yNhUT0vWStEshiIqAJIOFnfmcOmLI4FvCOxN0bo8o/4NVl+LBmEO+9+fz9oXuDd70B6mGa3pDkixPQCH+T4sWKF0cu8M9rsrPzPZsRIpdrrqeHGCqKTZVjnZ5VAeaWNtVOPDjGMOaOojjTnlCvCsU+k=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=bRwpoliA; arc=none smtp.client-ip=209.85.221.43
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-wr1-f43.google.com with SMTP id ffacd0b85a97d-385df53e559so3499280f8f.3;
+        Mon, 03 Feb 2025 11:15:31 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1738610130; x=1739214930; darn=vger.kernel.org;
+        h=content-transfer-encoding:content-language:in-reply-to:mime-version
+         :user-agent:date:message-id:from:references:cc:to:subject:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=W6LL5X5fvkK6jGtdywWodIwxp+6C6qkyq1s+zBLD+A0=;
+        b=bRwpoliA6TIM+YMk/DMT88g2USVZbbml8irSvqUsmux6FlAG5WhPzdifcJWQo/aSyr
+         MhE9jADxsqYAcXqnao+NspSvyvWtcqWkRF2+fJdTVOGijPbr0V/3LAXbIeaoDXDpfTmD
+         Z5D0WJBi0hSg4PLKkjaW+l7SNjyzbOR4Xi/W7DKluSAd5uP0jr+jS0/iqAAsA+XEUj2v
+         Ltku+aRjXrUEZNhfNIJUHK5irYkl9Iedy/hkKNV7lOa8S6cUJ4b3c9e4oO1BDH7JeybR
+         IvWWRYMq23DWToBy0wr93/PRZo5rivw6tmUfSYBT3u7adPxSqRQ6tGS0nauAAhkn6FJL
+         vZkA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1738610130; x=1739214930;
+        h=content-transfer-encoding:content-language:in-reply-to:mime-version
+         :user-agent:date:message-id:from:references:cc:to:subject
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=W6LL5X5fvkK6jGtdywWodIwxp+6C6qkyq1s+zBLD+A0=;
+        b=WIv6aQou2GIKy6tlXEJffS5ovoGwOEmhWfHVbkQkQ14HVeqJHWcFqxA+Z/VENDMiqz
+         5KCxsraL2eNV+Eu580EJt/EAuPMCTdMbpjiHdQ6jf3VHHZXF/SwQLZa/FgMLju5Me5RU
+         XMuhXUmWzRyYUc6y2/pWeJtPQm4Y4Vmn2SY7o6piB/9qJ3ncl3isdoLjrRQceGXV81tl
+         k7cxBpVpipY+oXIhQbPUzjGKZXkk8eDuWc3Fht9WfuFHem3EgdEdg7BaviZseR6Tyz5a
+         BFc1BEM09sK6eRQwSZsMjEV++j6X4TOyBtpZ7wkuT5hokQkx8wGCjLwlzeh/gh5jtiMR
+         dMwQ==
+X-Forwarded-Encrypted: i=1; AJvYcCWvyiInYcqTrqBy7Qefw25nC8sXBoh5TbU7ACsgZr4/DyIGMX43UDJO55HNh9vHqML2LsabMSo2tqI=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yxk66NliVM6MEqohbx1rGppqi3Du3BF80OvQ1dMdCOatNgB4hRz
+	KExicrCseyS3x+gaIx00F0cB2PplRYRnpgqGpECOVgsST+vgNi6P
+X-Gm-Gg: ASbGnct8XVdgXxPKouC0IdfwMaKy6bmVCt7rOGDLYrz/PashIJJGWgVQ95x/2Hs4aiS
+	l81zJX9o9JIDV/CXTsqfJs383kUMKAd7tyF1NJ3gYOwdJe3Ald2XnMlb/a7g6nEqTqlgI8jAJku
+	TKjupv/qAy5lCmKVq3V+pHf5P25LjYxCun7/QWGezPLFWZdkvxjJ3FavQSc9UuTNxAVD9jfvLu8
+	gWh5Bn513G/RehpupghM+1520Rh7o3zl/BWKyiM9in8hO5Nnb90p0GOhfKRwcTgSSF2zCmDtIKh
+	jJvSkq5G0pPC8sn1Jq59P9SrcI7xqCg9eR8PlS3vYB46nSvRUspj1Qs4V0EXDLH2MEmTp8H5FdP
+	eFtk=
+X-Google-Smtp-Source: AGHT+IELe33TOMTobFl2OBs6wvBGqwR2vFk2VZPKToAuO6yTZzITHfa6Lmk5tOvRSY9AfCqIMsbbBA==
+X-Received: by 2002:a05:6000:1365:b0:38a:888c:a727 with SMTP id ffacd0b85a97d-38c5195dd2amr16738009f8f.25.1738610130159;
+        Mon, 03 Feb 2025 11:15:30 -0800 (PST)
+Received: from [192.168.1.122] (cpc159313-cmbg20-2-0-cust161.5-4.cable.virginm.net. [82.0.78.162])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-438dcc27125sm197797275e9.15.2025.02.03.11.15.29
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 03 Feb 2025 11:15:29 -0800 (PST)
+Subject: Re: [PATCH net-next 1/2] ethtool: Symmetric OR-XOR RSS hash
+To: Gal Pressman <gal@nvidia.com>, "David S. Miller" <davem@davemloft.net>,
+ Jakub Kicinski <kuba@kernel.org>
+Cc: netdev@vger.kernel.org, Eric Dumazet <edumazet@google.com>,
+ Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>,
+ Jonathan Corbet <corbet@lwn.net>, Tony Nguyen <anthony.l.nguyen@intel.com>,
+ Przemek Kitszel <przemyslaw.kitszel@intel.com>,
+ Andrew Lunn <andrew+netdev@lunn.ch>, Tariq Toukan <tariqt@nvidia.com>,
+ Ahmed Zaki <ahmed.zaki@intel.com>, linux-doc@vger.kernel.org,
+ Cosmin Ratiu <cratiu@nvidia.com>
+References: <20250203150039.519301-1-gal@nvidia.com>
+ <20250203150039.519301-2-gal@nvidia.com>
+From: Edward Cree <ecree.xilinx@gmail.com>
+Message-ID: <08135b32-c516-7f6b-f7a1-e5179840281c@gmail.com>
+Date: Mon, 3 Feb 2025 19:15:28 +0000
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.14.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-AV-Do-Run: Yes
-X-ACL-Warn: X-W4Y-Internal
+In-Reply-To: <20250203150039.519301-2-gal@nvidia.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-GB
+Content-Transfer-Encoding: 7bit
 
-Add loopback selftests on PHY level. This enables quick testing of
-loopback functionality to ensure working loopback for testing.
+On 03/02/2025 15:00, Gal Pressman wrote:
+> Add an additional type of symmetric RSS hash type: OR-XOR.
+> The "Symmetric-OR-XOR" algorithm transforms the input as follows:
+> 
+> (SRC_IP | DST_IP, SRC_IP ^ DST_IP, SRC_PORT | DST_PORT, SRC_PORT ^ DST_PORT)
+> 
+> Change 'cap_rss_sym_xor_supported' to 'supported_input_xfrm', a bitmap
+> of supported RXH_XFRM_* types.
+> 
+> Reviewed-by: Cosmin Ratiu <cratiu@nvidia.com>
+> Reviewed-by: Tariq Toukan <tariqt@nvidia.com>
+> Signed-off-by: Gal Pressman <gal@nvidia.com>
+> ---
+>  Documentation/networking/ethtool-netlink.rst   |  2 +-
+>  Documentation/networking/scaling.rst           | 14 ++++++++++----
+>  drivers/net/ethernet/intel/iavf/iavf_ethtool.c |  2 +-
+>  drivers/net/ethernet/intel/ice/ice_ethtool.c   |  2 +-
+>  include/linux/ethtool.h                        |  5 ++---
+>  include/uapi/linux/ethtool.h                   |  7 ++++---
+>  net/ethtool/ioctl.c                            |  8 ++++----
+>  7 files changed, 23 insertions(+), 17 deletions(-)
+> 
+> diff --git a/Documentation/networking/ethtool-netlink.rst b/Documentation/networking/ethtool-netlink.rst
+> index 3770a2294509..aba83d97ff90 100644
+> --- a/Documentation/networking/ethtool-netlink.rst
+> +++ b/Documentation/networking/ethtool-netlink.rst
+> @@ -1934,7 +1934,7 @@ ETHTOOL_A_RSS_INDIR attribute returns RSS indirection table where each byte
+>  indicates queue number.
+>  ETHTOOL_A_RSS_INPUT_XFRM attribute is a bitmap indicating the type of
+>  transformation applied to the input protocol fields before given to the RSS
+> -hfunc. Current supported option is symmetric-xor.
+> +hfunc. Current supported option is symmetric-xor and symmetric-or-xor.
 
-Signed-off-by: Gerhard Engleder <gerhard@engleder-embedded.com>
----
- drivers/net/ethernet/engleder/Kconfig         |   1 +
- .../net/ethernet/engleder/tsnep_selftests.c   | 153 +++++++++++++++++-
- 2 files changed, 150 insertions(+), 4 deletions(-)
+"options are"?
 
-diff --git a/drivers/net/ethernet/engleder/Kconfig b/drivers/net/ethernet/engleder/Kconfig
-index 3df6bf476ae7..8245a9c4377d 100644
---- a/drivers/net/ethernet/engleder/Kconfig
-+++ b/drivers/net/ethernet/engleder/Kconfig
-@@ -32,6 +32,7 @@ config TSNEP_SELFTESTS
- 	bool "TSN endpoint self test support"
- 	default n
- 	depends on TSNEP
-+	imply NET_SELFTESTS
- 	help
- 	  This enables self test support within the TSN endpoint driver.
- 
-diff --git a/drivers/net/ethernet/engleder/tsnep_selftests.c b/drivers/net/ethernet/engleder/tsnep_selftests.c
-index 8a9145f93147..c9857e5a8033 100644
---- a/drivers/net/ethernet/engleder/tsnep_selftests.c
-+++ b/drivers/net/ethernet/engleder/tsnep_selftests.c
-@@ -4,12 +4,15 @@
- #include "tsnep.h"
- 
- #include <net/pkt_sched.h>
-+#include <net/selftests.h>
- 
- enum tsnep_test {
- 	TSNEP_TEST_ENABLE = 0,
- 	TSNEP_TEST_TAPRIO,
- 	TSNEP_TEST_TAPRIO_CHANGE,
- 	TSNEP_TEST_TAPRIO_EXTENSION,
-+	TSNEP_TEST_PHY_1000_LOOPBACK,
-+	TSNEP_TEST_PHY_100_LOOPBACK,
- };
- 
- static const char tsnep_test_strings[][ETH_GSTRING_LEN] = {
-@@ -17,6 +20,8 @@ static const char tsnep_test_strings[][ETH_GSTRING_LEN] = {
- 	"TAPRIO                (offline)",
- 	"TAPRIO change         (offline)",
- 	"TAPRIO extension      (offline)",
-+	"PHY 1000Mbps loopback (offline)",
-+	"PHY 100Mbps loopback  (offline)",
- };
- 
- #define TSNEP_TEST_COUNT (sizeof(tsnep_test_strings) / ETH_GSTRING_LEN)
-@@ -754,6 +759,133 @@ static bool tsnep_test_taprio_extension(struct tsnep_adapter *adapter)
- 	return false;
- }
- 
-+static bool test_loopback(struct tsnep_adapter *adapter, int speed)
-+{
-+	struct phy_device *phydev = adapter->phydev;
-+	int retval;
-+
-+	retval = phy_loopback(phydev, true, speed);
-+	if (retval || !phydev->loopback_enabled || !phydev->link ||
-+	    phydev->speed != speed)
-+		return false;
-+
-+	retval = net_test_phy_loopback_udp(adapter->netdev);
-+	if (retval)
-+		return false;
-+
-+	retval = net_test_phy_loopback_udp_mtu(adapter->netdev);
-+	if (retval)
-+		return false;
-+
-+	retval = net_test_phy_loopback_tcp(adapter->netdev);
-+	if (retval)
-+		return false;
-+
-+	retval = phy_loopback(phydev, false, 0);
-+	if (retval || phydev->loopback_enabled)
-+		return false;
-+
-+	return true;
-+}
-+
-+static bool set_speed(struct tsnep_adapter *adapter, int speed)
-+{
-+	struct ethtool_link_ksettings cmd;
-+	int retval;
-+
-+	retval = tsnep_ethtool_ops.get_link_ksettings(adapter->netdev, &cmd);
-+	if (retval)
-+		return false;
-+
-+	if (speed) {
-+		cmd.base.speed = speed;
-+		cmd.base.duplex = DUPLEX_FULL;
-+		cmd.base.autoneg = AUTONEG_DISABLE;
-+	} else {
-+		cmd.base.autoneg = AUTONEG_ENABLE;
-+	}
-+
-+	retval = tsnep_ethtool_ops.set_link_ksettings(adapter->netdev, &cmd);
-+	if (retval)
-+		return false;
-+
-+	return true;
-+}
-+
-+static bool tsnep_test_phy_1000_loopback(struct tsnep_adapter *adapter)
-+{
-+	if (!adapter->netdev->phydev)
-+		return false;
-+
-+	if (!test_loopback(adapter, 1000))
-+		goto failed;
-+
-+	/* after autonegotiation */
-+	if (!set_speed(adapter, 0))
-+		goto failed;
-+	if (!test_loopback(adapter, 1000))
-+		goto failed;
-+
-+	/* after 100Mbps fixed speed */
-+	if (!set_speed(adapter, 100))
-+		goto failed;
-+	if (!test_loopback(adapter, 1000))
-+		goto failed;
-+
-+	/* after 1000Mbps fixed speed */
-+	if (!set_speed(adapter, 1000))
-+		goto failed;
-+	if (!test_loopback(adapter, 1000))
-+		goto failed;
-+
-+	if (!set_speed(adapter, 0))
-+		goto failed;
-+
-+	return true;
-+
-+failed:
-+	phy_loopback(adapter->phydev, false, 0);
-+	set_speed(adapter, 0);
-+	return false;
-+}
-+
-+static bool tsnep_test_phy_100_loopback(struct tsnep_adapter *adapter)
-+{
-+	if (!adapter->netdev->phydev)
-+		return false;
-+
-+	if (!test_loopback(adapter, 100))
-+		goto failed;
-+
-+	/* after autonegotiation */
-+	if (!set_speed(adapter, 0))
-+		goto failed;
-+	if (!test_loopback(adapter, 100))
-+		goto failed;
-+
-+	/* 100Mbps fixed speed */
-+	if (!set_speed(adapter, 100))
-+		goto failed;
-+	if (!test_loopback(adapter, 100))
-+		goto failed;
-+
-+	/* 1000Mbps fixed speed */
-+	if (!set_speed(adapter, 1000))
-+		goto failed;
-+	if (!test_loopback(adapter, 100))
-+		goto failed;
-+
-+	if (!set_speed(adapter, 0))
-+		goto failed;
-+
-+	return true;
-+
-+failed:
-+	phy_loopback(adapter->phydev, false, 0);
-+	set_speed(adapter, 0);
-+	return false;
-+}
-+
- int tsnep_ethtool_get_test_count(void)
- {
- 	return TSNEP_TEST_COUNT;
-@@ -768,15 +900,14 @@ void tsnep_ethtool_self_test(struct net_device *netdev,
- 			     struct ethtool_test *eth_test, u64 *data)
- {
- 	struct tsnep_adapter *adapter = netdev_priv(netdev);
-+	int i;
- 
- 	eth_test->len = TSNEP_TEST_COUNT;
- 
- 	if (eth_test->flags != ETH_TEST_FL_OFFLINE) {
- 		/* no tests are done online */
--		data[TSNEP_TEST_ENABLE] = 0;
--		data[TSNEP_TEST_TAPRIO] = 0;
--		data[TSNEP_TEST_TAPRIO_CHANGE] = 0;
--		data[TSNEP_TEST_TAPRIO_EXTENSION] = 0;
-+		for (i = 0; i < TSNEP_TEST_COUNT; i++)
-+			data[i] = 0;
- 
- 		return;
- 	}
-@@ -808,4 +939,18 @@ void tsnep_ethtool_self_test(struct net_device *netdev,
- 		eth_test->flags |= ETH_TEST_FL_FAILED;
- 		data[TSNEP_TEST_TAPRIO_EXTENSION] = 1;
- 	}
-+
-+	if (tsnep_test_phy_1000_loopback(adapter)) {
-+		data[TSNEP_TEST_PHY_1000_LOOPBACK] = 0;
-+	} else {
-+		eth_test->flags |= ETH_TEST_FL_FAILED;
-+		data[TSNEP_TEST_PHY_1000_LOOPBACK] = 1;
-+	}
-+
-+	if (tsnep_test_phy_100_loopback(adapter)) {
-+		data[TSNEP_TEST_PHY_100_LOOPBACK] = 0;
-+	} else {
-+		eth_test->flags |= ETH_TEST_FL_FAILED;
-+		data[TSNEP_TEST_PHY_100_LOOPBACK] = 1;
-+	}
- }
--- 
-2.39.5
+> diff --git a/include/uapi/linux/ethtool.h b/include/uapi/linux/ethtool.h
+> index d1089b88efc7..b10ecc503b26 100644
+> --- a/include/uapi/linux/ethtool.h
+> +++ b/include/uapi/linux/ethtool.h
+> @@ -2263,12 +2263,13 @@ static inline int ethtool_validate_duplex(__u8 duplex)
+>  #define WOL_MODE_COUNT		8
+>  
+>  /* RSS hash function data
+> - * XOR the corresponding source and destination fields of each specified
+> - * protocol. Both copies of the XOR'ed fields are fed into the RSS and RXHASH
+> - * calculation. Note that this XORing reduces the input set entropy and could
+> + * XOR/OR the corresponding source and destination fields of each specified
+> + * protocol. Both copies of the XOR/OR'ed fields are fed into the RSS and RXHASH
+> + * calculation. Note that this operation reduces the input set entropy and could
+>   * be exploited to reduce the RSS queue spread.
+>   */
+>  #define	RXH_XFRM_SYM_XOR	(1 << 0)
+> +#define	RXH_XFRM_SYM_OR_XOR	(1 << 1)
+>  #define	RXH_XFRM_NO_CHANGE	0xff
 
+I think this should be two separate comments, one on RXH_XFRM_SYM_XOR and
+ one on RXH_XFRM_SYM_OR_XOR, so that you can untangle the phrasing a bit.
+E.g. there isn't such a thing as "Both copies of the XOR/OR'ed fields"; one
+ has two copies of XOR and the other has a XOR and an OR.
+Second comment could be something like "Similar to SYM_XOR except that one
+ copy of the XOR'ed fields is replaced by an OR of the same fields."
+
+Apart from this, patch LGTM.
 
