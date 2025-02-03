@@ -1,152 +1,267 @@
-Return-Path: <netdev+bounces-162237-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-162238-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id E61C2A2653F
-	for <lists+netdev@lfdr.de>; Mon,  3 Feb 2025 22:06:16 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id ACB2DA2654C
+	for <lists+netdev@lfdr.de>; Mon,  3 Feb 2025 22:09:55 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 2F7DC3A4B8F
-	for <lists+netdev@lfdr.de>; Mon,  3 Feb 2025 21:06:08 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 4461F3A4BB0
+	for <lists+netdev@lfdr.de>; Mon,  3 Feb 2025 21:09:47 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D4D1520F081;
-	Mon,  3 Feb 2025 21:06:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 49E6720F071;
+	Mon,  3 Feb 2025 21:09:50 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="lN0NurEP"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="cSl+hcvX"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.11])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8A9164414;
-	Mon,  3 Feb 2025 21:06:10 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 68DDD1DC745;
+	Mon,  3 Feb 2025 21:09:48 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.11
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1738616770; cv=none; b=M1xXb3UrWRwYNcFNY6RfdHGbt0V5ArkCbf9UvPlsjFo4+g+5RZbqld3yGWYfKZuYJZxW17b6t+8tDBV4OjknSutIMwfVjZBs5UxYVTLkIDYE+5Ti5TK20dnP97YocXyU5MOyR0pQJlqZqHccQaWlAuEkCW7yd2hk856PR9qNniw=
+	t=1738616990; cv=none; b=ChcJMGJMFKLjDWOzJ6+0OZhkh7hDLdEIsdz6ufoh2qmoA05wFOF/JAKJQFm/UidbYN1Yvb6RSOwcum2Kd+ENfjSG6SxgJIxBhF6hb6rI5lCDTQk/1tr5vfuQeksVjFHaihXPm75jO+ejoRiiqVdeIG5w2ZONvbZg5D3DtLxNSZk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1738616770; c=relaxed/simple;
-	bh=cBsOd6wcSiVV2e1fytZZdNGIp2DUe5yMg3BzjkT0Yr4=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=demNlWLLsvopTpcm3Qgv0YjpWAJX0+QRg//3wjZaMGa1+A5QDdMIkixFgK9wpgMerR/IS9eKgO3dDCl4AArhW7HhSb6ESP8xzytd1v6oiZibNS8o1+l1PGmA2uHfPcx+tbchrr3VwJ+LocChdu65GwfeM1RFUwGVwZetH/ZLplA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=lN0NurEP; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id EFE25C4CEEC;
-	Mon,  3 Feb 2025 21:06:09 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1738616770;
-	bh=cBsOd6wcSiVV2e1fytZZdNGIp2DUe5yMg3BzjkT0Yr4=;
-	h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
-	b=lN0NurEP59jw3KFihk3UbtTdOqxRtqK5UFsYGY46T/FDOIUUOGEXuY5wOgZrFnfyC
-	 Yop1IGJDUrXUuZnuQxWXBF4Ifxr+rq9ms58p7eR2x5lW7B/iKbbxc+OrpSpFmgBLIm
-	 b4JwC4pIQ1La+mgOAMowI85qTQxRlZZZo4lZb6+2d37uIZzmF8JCzQxaeMz77O0UWU
-	 n8Hms12AU1JnJvdBRI7G7USTCO5Y76axkwKwNKI2sklF42+2nos7xR2M5DbaIgn6p9
-	 m6NV+ESbC7j/m6FqLnkt0oc4P8WNGg/XAPoRIiBrgpRuPNdk9zHUwCLaeEoIYENAjI
-	 n/bxcXfFKO1oA==
-Received: by mail-ed1-f44.google.com with SMTP id 4fb4d7f45d1cf-5dc89df7eccso5570701a12.3;
-        Mon, 03 Feb 2025 13:06:09 -0800 (PST)
-X-Forwarded-Encrypted: i=1; AJvYcCUP67IpQRGhixHtym1uhNFP0kau58+UuIJ//vcZJe1aUHM0Ad/J2zeNx821YgfJW4JipMFsa+DDakQH@vger.kernel.org, AJvYcCUi6tildTRSFeqZw3M0fyLFsoO6TfjxHOC/DTFM5M7x/ljLupB8dXYmjU099JgYqnuBB3NSBzcu@vger.kernel.org, AJvYcCUqKq5DjHfVZoW82Nqbz6RmhqeJwfVHgrA5olg/LZ3J0qsvlKdBzX+7MhGE5bSDrL9eZDtRaS/F2XKW@vger.kernel.org, AJvYcCW/d5KCicNgnUq/e5bskUdTKg1zHgwKxve9uhkr+IJcpBGsfNcoifDhRL/aJ09+fEIqcYO5kThE16FL4bE=@vger.kernel.org, AJvYcCXDbppXb9yZlR3bCHJI2JVIz+rRoCyblkvO9Q6t5OwvLhCh6ZR1Wvz63cbKVgY7g1f8YnsAyXKnnoOtrU95V8GR6AU=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyJqfHSudn4nmhVaQgJoO6n0A78Fmn67cTatMQbf5QJYA9i7uVv
-	OzpMjpJDogsoBVMi4vbB1irK1PLgkUM5qim1EqS5TW+tVlcop9FxBE6GVex32rB1LWGB9NBbODy
-	np3oDli5bjGOQSwedBNb7xTxThg==
-X-Google-Smtp-Source: AGHT+IHeWZHdJjC4YN+OOJHAB8++nTLMgl7MUL+pvf+VvcXzFyBuc+YptThIQgLhGlBcwS62U/h/TbXO0dgmymUExPY=
-X-Received: by 2002:a05:6402:274a:b0:5d1:2535:84d7 with SMTP id
- 4fb4d7f45d1cf-5dc5effb1c0mr22570412a12.29.1738616768432; Mon, 03 Feb 2025
- 13:06:08 -0800 (PST)
+	s=arc-20240116; t=1738616990; c=relaxed/simple;
+	bh=74hXhxce5KCD8uT7SyA5u6sT67v2HOBXcFv868ZCXw8=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=ITVqWVKrl3+LZpJGHQvKUnk4WB6vnbCyuV1Qn+XHw7GnNiKV/aV5rOoMDpriCsmB2KJifJwJfn+VSpTem76zHhannIbxsPZU4mfJm87xdT57i5ztyNr09VDOXvkyICTG7lEzMiBiy+7Ldu1V0pznZIhvS/Yn7cOfjqExMbcKDZM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=cSl+hcvX; arc=none smtp.client-ip=192.198.163.11
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1738616988; x=1770152988;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=74hXhxce5KCD8uT7SyA5u6sT67v2HOBXcFv868ZCXw8=;
+  b=cSl+hcvXxHj2uT62fRfQE6apoJkN00nuYCBFbGp9ZyJtpOiGdfqFWDh0
+   g8ZZBsR9m7xIkZoA/l9/owwNJ3KljA0JwL161fSGlBO7Kw0LhXFBpPo9u
+   g62IyADdFMJnQfErKVbOwdebmkNyZMq5rn2aaEASjBObdV9r/D8wqhuQ/
+   gYQLZqEJobVZeI4bMTyyLulPiUEPW+ITkykzx94R1gJKiSEsmk0qZE7F1
+   I/tnO08gSj32h9OZrTUaMz0H5IRnws+k+zhQGD7SQajZZHAa7rQTq9CGs
+   u/0+Xk2mu2M4go9ZdKkTBpwMgLSHFNVRSQRBzSn4MmEYuF77YWO+Y3HVu
+   A==;
+X-CSE-ConnectionGUID: Js5EWjhkR3+CFptXmZ9pDQ==
+X-CSE-MsgGUID: +/kZLZHUT/m6Bv5EZ1/g/g==
+X-IronPort-AV: E=McAfee;i="6700,10204,11335"; a="49735550"
+X-IronPort-AV: E=Sophos;i="6.13,256,1732608000"; 
+   d="scan'208";a="49735550"
+Received: from orviesa002.jf.intel.com ([10.64.159.142])
+  by fmvoesa105.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 03 Feb 2025 13:09:47 -0800
+X-CSE-ConnectionGUID: ZlZcwFDNTHWcr/96Zdcq0g==
+X-CSE-MsgGUID: WYTn/IfMRF+EQh6eXkrX+g==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.13,256,1732608000"; 
+   d="scan'208";a="141273297"
+Received: from anguy11-upstream.jf.intel.com ([10.166.9.133])
+  by orviesa002.jf.intel.com with ESMTP; 03 Feb 2025 13:09:48 -0800
+From: Tony Nguyen <anthony.l.nguyen@intel.com>
+To: davem@davemloft.net,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	edumazet@google.com,
+	andrew+netdev@lunn.ch,
+	netdev@vger.kernel.org
+Cc: Tony Nguyen <anthony.l.nguyen@intel.com>,
+	michal.swiatkowski@linux.intel.com,
+	sridhar.samudrala@intel.com,
+	jacob.e.keller@intel.com,
+	pio.raczynski@gmail.com,
+	konrad.knitter@intel.com,
+	marcin.szycik@intel.com,
+	nex.sw.ncis.nat.hpm.dev@intel.com,
+	przemyslaw.kitszel@intel.com,
+	jiri@resnulli.us,
+	horms@kernel.org,
+	David.Laight@ACULAB.COM,
+	pmenzel@molgen.mpg.de,
+	mschmidt@redhat.com,
+	tatyana.e.nikolova@intel.com,
+	Jason Gunthorpe <jgg@ziepe.ca>,
+	Leon Romanovsky <leon@kernel.org>,
+	linux-rdma@vger.kernel.org
+Subject: [PATCH net-next 0/9][pull request] ice: managing MSI-X in driver
+Date: Mon,  3 Feb 2025 13:09:29 -0800
+Message-ID: <20250203210940.328608-1-anthony.l.nguyen@intel.com>
+X-Mailer: git-send-email 2.47.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250201093126.7322-1-biju.das.jz@bp.renesas.com>
- <CAL_Jsq+dn5wyEKbvAT8M2V=nM-vV_eHiRtwO_0h6EiJ=8OkHSw@mail.gmail.com> <TY3PR01MB11346E1FA592E731E0D32E96686F52@TY3PR01MB11346.jpnprd01.prod.outlook.com>
-In-Reply-To: <TY3PR01MB11346E1FA592E731E0D32E96686F52@TY3PR01MB11346.jpnprd01.prod.outlook.com>
-From: Rob Herring <robh@kernel.org>
-Date: Mon, 3 Feb 2025 15:05:57 -0600
-X-Gmail-Original-Message-ID: <CAL_JsqLo4uSGYMcLXN=0iSUMHdW8RaGCY+o8ThQHq3_eUTV9wQ@mail.gmail.com>
-X-Gm-Features: AWEUYZnrMYgeFmznny2afQJcB_ErB5ngAuWrI9ehgUSHGdkfF9dpCy3oKUhDEGQ
-Message-ID: <CAL_JsqLo4uSGYMcLXN=0iSUMHdW8RaGCY+o8ThQHq3_eUTV9wQ@mail.gmail.com>
-Subject: Re: [PATCH v2] of: base: Add of_get_available_child_by_name()
-To: Biju Das <biju.das.jz@bp.renesas.com>
-Cc: Andrew Lunn <andrew@lunn.ch>, "David S. Miller" <davem@davemloft.net>, 
-	Jakub Kicinski <kuba@kernel.org>, Krzysztof Kozlowski <krzk+dt@kernel.org>, 
-	Saravana Kannan <saravanak@google.com>, Matthias Brugger <matthias.bgg@gmail.com>, 
-	AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>, 
-	"devicetree@vger.kernel.org" <devicetree@vger.kernel.org>, 
-	"linux-arm-kernel@lists.infradead.org" <linux-arm-kernel@lists.infradead.org>, 
-	"linux-mediatek@lists.infradead.org" <linux-mediatek@lists.infradead.org>, 
-	Geert Uytterhoeven <geert+renesas@glider.be>, 
-	Prabhakar Mahadev Lad <prabhakar.mahadev-lad.rj@bp.renesas.com>, 
-	"biju.das.au" <biju.das.au@gmail.com>, 
-	"linux-renesas-soc@vger.kernel.org" <linux-renesas-soc@vger.kernel.org>, 
-	Network Development <netdev@vger.kernel.org>, 
-	"open list:COMMON CLK FRAMEWORK" <linux-clk@vger.kernel.org>, dri-devel <dri-devel@lists.freedesktop.org>, 
-	linux-media <linux-media@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
 
-On Mon, Feb 3, 2025 at 11:17=E2=80=AFAM Biju Das <biju.das.jz@bp.renesas.co=
-m> wrote:
->
-> Hi Rob,
->
-> +Cc relevant subsystems.
->
-> > -----Original Message-----
-> > From: Rob Herring <robh@kernel.org>
-> > Sent: 03 February 2025 16:53
-> > Subject: Re: [PATCH v2] of: base: Add of_get_available_child_by_name()
-> >
-> > On Sat, Feb 1, 2025 at 3:31=E2=80=AFAM Biju Das <biju.das.jz@bp.renesas=
-.com> wrote:
-> > >
-> > > There are lot of drivers using of_get_child_by_name() followed by
-> > > of_device_is_available() to find the available child node by name for
-> > > a given parent. Provide a helper for these users to simplify the code=
-.
-> > >
-> > > Suggested-by: Geert Uytterhoeven <geert+renesas@glider.be>
-> > > Signed-off-by: Biju Das <biju.das.jz@bp.renesas.com>
-> >
-> > Reviewed-by: Rob Herring <robh@kernel.org>
-> >
-> > > ---
-> > > v1->v2:
-> > >  * Updated commit description.
-> > >  * Updated kerneldoc comment block
-> > >  * Avoided code duplication by using of_get_child_by_name().
-> > >
-> > > Note:
-> > > grep showed the below files will be the users for this new API.
-> > > I will be updating these drivers once this patch is in mainline.
-> >
-> > No need to wait. Please convert all the net ones and send this patch wi=
-th them.
->
-> Thanks for the feedback.
->
-> Subsequently, I have send the patches. However, Andrew[1]/Krystoff[2]
-> mentioned me to wait till this patch appear in -rc ,
->
-> Can it be fast tracked to 6.14-rcX?? Otherwise, it needs to wait till 6.1=
-5-rc1
-> and other patches will then appear on 6.16-rc1.
+Michal Swiatkowski says:
 
-Most maintainer trees are based on rc1. So are you sure everyone is
-going to be fine with a rc2 dependency? Generally, new APIs don't go
-in without a user.
+It is another try to allow user to manage amount of MSI-X used for each
+feature in ice. First was via devlink resources API, it wasn't accepted
+in upstream. Also static MSI-X allocation using devlink resources isn't
+really user friendly.
 
-That being said, if this was 10s of different trees I'd reconsider,
-but since most of the callers are in net, I'm less willing to apply
-"not a fix" to fixes.
+This try is using more dynamic way. "Dynamic" across whole kernel when
+platform supports it and "dynamic" across the driver when not.
 
-> [1] https://lore.kernel.org/all/96fbccd3-fd79-4b2f-8f41-bd0e3fdb2c69@lunn=
-.ch/
->
-> [2] https://lore.kernel.org/all/7fe9dad9-85e2-4cf0-98bc-cca20ff62df5@kern=
-el.org/
+To achieve that reuse global devlink parameter pf_msix_max and
+pf_msix_min. It fits how ice hardware counts MSI-X. In case of ice amount
+of MSI-X reported on PCI is a whole MSI-X for the card (with MSI-X for
+VFs also). Having pf_msix_max allow user to statically set how many
+MSI-X he wants on PF and how many should be reserved for VFs.
 
-It's not like they are saying to do the opposite of what I said. If
-the dependency is not part of your series, then it needs to be in rc1.
+pf_msix_min is used to set minimum number of MSI-X with which ice driver
+should probe correctly.
 
-Rob
+Meaning of this field in case of dynamic vs static allocation:
+- on system with dynamic MSI-X allocation support
+ * alloc pf_msix_min as static, rest will be allocated dynamically
+- on system without dynamic MSI-X allocation support
+ * try alloc pf_msix_max as static, minimum acceptable result is
+ pf_msix_min
+
+As Jesse and Piotr suggested pf_msix_max and pf_msix_min can (an
+probably should) be stored in NVM. This patchset isn't implementing
+that.
+
+Dynamic (kernel or driver) way means that splitting MSI-X across the
+RDMA and eth in case there is a MSI-X shortage isn't correct. Can work
+when dynamic is only on driver site, but can't when dynamic is on kernel
+site.
+
+Let's remove this code and move to MSI-X allocation feature by feature.
+If there is no more MSI-X for a feature, a feature is working with less
+MSI-X or it is turned off.
+
+There is a regression here. With MSI-X splitting user can run RDMA and
+eth even on system with not enough MSI-X. Now only eth will work. RDMA
+can be turned on by changing number of PF queues (lowering) and reprobe
+RDMA driver.
+
+Example:
+72 CPU number, eth, RDMA and flow director (1 MSI-X), 1 MSI-X for OICR
+on PF, and 1 more for RDMA. Card is using 1 + 72 + 1 + 72 + 1 = 147.
+
+We set pf_msix_min = 2, pf_msix_max = 128
+
+OICR: 1
+eth: 72
+flow director: 1
+RDMA: 128 - 74 = 54
+
+We can change number of queues on pf to 36 and do devlink reinit
+
+OICR: 1
+eth: 36
+RDMA: 73
+flow director: 1
+
+We can also (implemented in "ice: enable_rdma devlink param") turned
+RDMA off.
+
+OICR: 1
+eth: 72
+RDMA: 0 (turned off)
+flow director: 1
+
+After this changes we have a static base vector for SRIOV (SIOV probably
+in the feature). Last patch from this series is simplifying managing VF
+MSI-X code based on static vector.
+
+Now changing queues using ethtool is also changing MSI-X. If there is
+enough MSI-X it is always one to one. When there is not enough there
+will be more queues than MSI-X. There is a lack of ability to set how
+many queues should be used per MSI-X. Maybe we should introduce another
+ethtool param for it? Sth like queues_per_vector?
+---
+IWL [9]:
+
+v8 --> v9: [8]
+ * add tested-by tags
+ * v8 was send incorrect, fix it here
+
+v7 --> v8: [7]
+ * fix unrolling in devlink parameters register function (patch 2)
+
+v6 --> v7: [6]
+ * use vu32 for devlink MSI-X parameters instead of u16 (patch 2)
+ * < instead of <= for MSI-X min parameter validation (patch 2)
+ * use u32 for MSI-X values (patch 2, 8)
+
+v5 --> v6: [5]
+ * set default MSI-X max value based on needs instead of const define
+   (patch 3)
+
+v4 --> v5: [4]
+ * count combined queues in ethtool for case the vectors aren't mapped
+   1:1 to queues (patch 1)
+ * change min_t to min where the casting isn't needed (and can hide
+   problems) (patch 4)
+ * load msix_max and msix_min value after devlink reload; it accidentally
+   wasn't added after removing loading in probe path to mitigate error
+   from devl_para_driverinit...() (patch 2)
+ * add documentation in develink/ice for new parameters (patch 2)
+
+v3 --> v4: [3]
+ * drop unnecessary text in devlink validation comments
+ * assume that devl_param_driverinit...() shouldn't return error in
+   normal execution path
+
+v2 --> v3: [2]
+ * move flow director init before RDMA init
+ * fix unrolling RDMA MSI-X allocation
+ * add comment in commit message about lowering control RDMA MSI-X
+   amount
+
+v1 --> v2: [1]
+ * change permanent MSI-X cmode parameters to driverinit
+ * remove locking during devlink parameter registration (it is now
+   locked for whole init/deinit part)
+
+[9] https://lore.kernel.org/netdev/20241203065817.13475-1-michal.swiatkowski@linux.intel.com/
+[8] https://lore.kernel.org/netdev/20241114122009.97416-1-michal.swiatkowski@linux.intel.com/
+[7] https://lore.kernel.org/netdev/20241104121337.129287-1-michal.swiatkowski@linux.intel.com/
+[6] https://lore.kernel.org/netdev/20241028100341.16631-1-michal.swiatkowski@linux.intel.com/
+[5] https://lore.kernel.org/netdev/20241024121230.5861-1-michal.swiatkowski@linux.intel.com/
+[4] https://lore.kernel.org/netdev/20240930120402.3468-1-michal.swiatkowski@linux.intel.com/
+[3] https://lore.kernel.org/netdev/20240808072016.10321-1-michal.swiatkowski@linux.intel.com/
+[2] https://lore.kernel.org/netdev/20240801093115.8553-1-michal.swiatkowski@linux.intel.com/
+[1] https://lore.kernel.org/netdev/20240213073509.77622-1-michal.swiatkowski@linux.intel.com/
+
+The following are changes since commit c2933b2befe25309f4c5cfbea0ca80909735fd76:
+  Merge tag 'net-6.14-rc1' of git://git.kernel.org/pub/scm/linux/kernel/git/netdev/net
+and are available in the git repository at:
+  git://git.kernel.org/pub/scm/linux/kernel/git/tnguy/next-queue 100GbE
+
+Michal Swiatkowski (9):
+  ice: count combined queues using Rx/Tx count
+  ice: devlink PF MSI-X max and min parameter
+  ice: remove splitting MSI-X between features
+  ice: get rid of num_lan_msix field
+  ice, irdma: move interrupts code to irdma
+  ice: treat dyn_allowed only as suggestion
+  ice: enable_rdma devlink param
+  ice: simplify VF MSI-X managing
+  ice: init flow director before RDMA
+
+ Documentation/networking/devlink/ice.rst      |  11 +
+ drivers/infiniband/hw/irdma/hw.c              |   2 -
+ drivers/infiniband/hw/irdma/main.c            |  46 ++-
+ drivers/infiniband/hw/irdma/main.h            |   3 +
+ .../net/ethernet/intel/ice/devlink/devlink.c  | 109 +++++++
+ drivers/net/ethernet/intel/ice/ice.h          |  21 +-
+ drivers/net/ethernet/intel/ice/ice_base.c     |  10 +-
+ drivers/net/ethernet/intel/ice/ice_ethtool.c  |   9 +-
+ drivers/net/ethernet/intel/ice/ice_idc.c      |  64 +---
+ drivers/net/ethernet/intel/ice/ice_irq.c      | 275 ++++++------------
+ drivers/net/ethernet/intel/ice/ice_irq.h      |  13 +-
+ drivers/net/ethernet/intel/ice/ice_lib.c      |  35 ++-
+ drivers/net/ethernet/intel/ice/ice_main.c     |   6 +-
+ drivers/net/ethernet/intel/ice/ice_sriov.c    | 154 +---------
+ include/linux/net/intel/iidc.h                |   2 +
+ 15 files changed, 336 insertions(+), 424 deletions(-)
+
+-- 
+2.47.1
+
 
