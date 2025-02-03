@@ -1,230 +1,157 @@
-Return-Path: <netdev+bounces-162299-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-162300-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9CB89A266FA
-	for <lists+netdev@lfdr.de>; Mon,  3 Feb 2025 23:42:16 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id B9385A266FC
+	for <lists+netdev@lfdr.de>; Mon,  3 Feb 2025 23:42:57 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 43ECB1885D7E
-	for <lists+netdev@lfdr.de>; Mon,  3 Feb 2025 22:42:21 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 523243A463F
+	for <lists+netdev@lfdr.de>; Mon,  3 Feb 2025 22:42:49 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4F08D2135A6;
-	Mon,  3 Feb 2025 22:39:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6C28B2139B0;
+	Mon,  3 Feb 2025 22:39:44 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="05SV4dk/"
+	dkim=pass (2048-bit key) header.d=baylibre-com.20230601.gappssmtp.com header.i=@baylibre-com.20230601.gappssmtp.com header.b="aPQPmJ15"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pj1-f73.google.com (mail-pj1-f73.google.com [209.85.216.73])
+Received: from mail-oa1-f42.google.com (mail-oa1-f42.google.com [209.85.160.42])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F2798212B27
-	for <netdev@vger.kernel.org>; Mon,  3 Feb 2025 22:39:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.73
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4887C211479
+	for <netdev@vger.kernel.org>; Mon,  3 Feb 2025 22:39:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.42
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1738622371; cv=none; b=pOZCHmGijJ/RH5cOV7KHSsloF7Pusw/sALQ118HY2ae8jtT8XZZJ5ZspyOgLiVNxQ5G99l0J85zsdPY0PmkcCOt28Ji7m4q7p8aaB0XQ814tWkXpTHo9ZIoZnqONVOfUMNfQ2UcGJPQVkP3HcogOspgoqCHBVG2bqaEbEGGOzyY=
+	t=1738622384; cv=none; b=BEYC8arAvYxSxr8OSgnpCwGkn2Q42rhz4QnjeD8dyAo4lGAlUQ8cowvrgTaIUcx8lTI2S+6D2s3sQSW50pkxG2+OJC4gdqNzIW6aPs1BDFGVfZysoVV07QHZqbYBo1GRkr4/WTFN8R1gVk0sMasbnr8ZKYKZemwKRiXbz5ZPE3g=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1738622371; c=relaxed/simple;
-	bh=97oOx4z9pCZ0Iq/ojWzrHOGygbt98r31tFw6EuDjFTc=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=O6gzPIW0N3DK9wfVZvDyopbJo1aatJF509IHCx0DbIXV9eCkFlxvt98WP4WJlBaNCl4ngvJlgvvt7qLGKM5gYS5RqL3bXG3wHxXqOwhP2kwtiDo7VlN95mWLffeiWVM/5Lc+NhW7ohhI5WCgobJ3uK9bOdjVAZVmF707UpXYod0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--almasrymina.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=05SV4dk/; arc=none smtp.client-ip=209.85.216.73
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--almasrymina.bounces.google.com
-Received: by mail-pj1-f73.google.com with SMTP id 98e67ed59e1d1-2ef79d9c692so13954990a91.0
-        for <netdev@vger.kernel.org>; Mon, 03 Feb 2025 14:39:27 -0800 (PST)
+	s=arc-20240116; t=1738622384; c=relaxed/simple;
+	bh=1Q81xARcDqJnn1HJ52uZiPtHrThD/Lg7LAxKl0LKqW4=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=EFvdBslBKOa6zznQxp+f+TfQJ3BoeQLkASHyi7B1DP1PzFZYGBLCYHiCj2dUlYVd2BcznB89DZwRe/hlyZDb4Wg0b5BptbKTOAmktdni3k1GeziNxZR4wgXV64dABYoYa1t5YNtPJFI9RK3J6X44SaLfOTm6c8zyghVRZmIewRY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=baylibre.com; spf=pass smtp.mailfrom=baylibre.com; dkim=pass (2048-bit key) header.d=baylibre-com.20230601.gappssmtp.com header.i=@baylibre-com.20230601.gappssmtp.com header.b=aPQPmJ15; arc=none smtp.client-ip=209.85.160.42
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=baylibre.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=baylibre.com
+Received: by mail-oa1-f42.google.com with SMTP id 586e51a60fabf-2b199bb8af9so2968391fac.1
+        for <netdev@vger.kernel.org>; Mon, 03 Feb 2025 14:39:41 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1738622367; x=1739227167; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=rc7c9JPXikCd8Iu9pgV4LRP9xA48AK8hD/MXmnBG3Aw=;
-        b=05SV4dk/x3eiSCMAWP53WrkfCM4kvDiUKWnfVIejbpBTPu3MKBzJyLKcfzO4poy/kX
-         Ke//cny2dUUax0s1K4eQ//i2ujZJqxVhxPPM4vaymmUYDxTv2yHJTfL8f/bLzyHDUq/L
-         eK6mBODC96qEPMTbBeQuIoGazj8vTj3Gw0hgv19EKGKT8VsuxRJuXxqieAetsRFDylf8
-         aM/+B0B/pz2BJBvSNC3ElMSL03uc2HI6LvkYg2XOG1ECF8y93gjQWN4ANXp4ZUT25g84
-         CqlCRx8Z+rKOnbILEyBTXkvmEJh9DLDEcpxnyzxeomAbW5qxb9WVUGeRssQ6Bpu5kD5W
-         0TOw==
+        d=baylibre-com.20230601.gappssmtp.com; s=20230601; t=1738622381; x=1739227181; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:content-language:from
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=7FuOTM/5uq/stUm6NdRcMUJvmEyi2R5GtNjpDeIV2Ho=;
+        b=aPQPmJ15Elz6EyybHgCejqIswr6xI/YwwhsV8o9hsaPsktE38IzMJsNBUtTxo0lHVJ
+         d5/bzL9Ol2TeAbPw4QQ+erQ9PXa4CCrjw0qexljVFSd6gW90iQ2ila46nIgpMRPkoTZB
+         pnczcpTCKki/Ohld+kjX4wDf7uVrNEY2kueUCJ7hSO/ig3iiyr3VUnU1LryALo2uOuFH
+         2lfdmn0wq1uG4fOasqrbW3QP9Fc5MbVxPu8iE8/OFd6/tTh2jjNviByNj91xjtMl3ypm
+         +r8dceFYWeC0RZhEsSs4hnqv/7Wn/9qivtGIHpVtMBlnW0bAoGhvCtMFN1oPY9ihyOmc
+         07DA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1738622367; x=1739227167;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=rc7c9JPXikCd8Iu9pgV4LRP9xA48AK8hD/MXmnBG3Aw=;
-        b=G9gxNNCYHYTj5ZTivXxzz63E72hewgfqDcG9+0KcPcRXgdXkbihvIvfSaqV34ct61f
-         rC/O96HWtand/1aWo9wXGLZ33hvwQOkCsBhLKHHDlCb/2fYD47ihJSO2+BeMLtBMxWtc
-         XbF2sUi+O+dBWR8f8HYmidikfQkRu0yEQKZ336DNzibiRDfGf7BDv8sC005obaE+cly3
-         cagCCNmd/b7Bn1v8KtkiPcOkEJ1poQvyGdqnW0fMfVnTiHZBy1Hj/OgPmD6/uDOhq1ZL
-         jyaAozD6GLqj5KyALEcHY3OJdJrNEIQv4I9NSu4onwUbO33mKk6WY5V/rVC1Jva2hTmN
-         XS4Q==
-X-Gm-Message-State: AOJu0YwdLLAWGzKFHHnbUlJNU3XvAmnyr9MZSxwdx4eawDLYxxwgsR7n
-	CjFtm3jgkA/sMxUU78lXWVPLWHwqBENEUaTEVBseI4MvNUX2UW8fheNg48pUmalrsp/h+okPoc4
-	WrW3KFlzLF4xz0Mfw4VILWS8w53Fmnd46yF61nXPxX99juI90ptEuYXbGbXGcRqqUNMB+TAB2tk
-	P+Esbiaki+u5XKWKItGbTket6SizyGpsdpVW55GLMT2gqon8+OkdfSSVwxB1o=
-X-Google-Smtp-Source: AGHT+IEVoq/odtPJGxLrrYEYPRP3ZsRO1cKfDMWv4+6BAejNJPoBnN+rujdSVvcz7HzR2bynurMrReZ/ogt/1YT+mg==
-X-Received: from pjbsx4.prod.google.com ([2002:a17:90b:2cc4:b0:2ea:aa56:49c])
- (user=almasrymina job=prod-delivery.src-stubby-dispatcher) by
- 2002:a17:90b:53c7:b0:2ee:7870:8835 with SMTP id 98e67ed59e1d1-2f83ac83791mr40443324a91.33.1738622367078;
- Mon, 03 Feb 2025 14:39:27 -0800 (PST)
-Date: Mon,  3 Feb 2025 22:39:16 +0000
-In-Reply-To: <20250203223916.1064540-1-almasrymina@google.com>
+        d=1e100.net; s=20230601; t=1738622381; x=1739227181;
+        h=content-transfer-encoding:in-reply-to:content-language:from
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=7FuOTM/5uq/stUm6NdRcMUJvmEyi2R5GtNjpDeIV2Ho=;
+        b=Ub51U+MvPFqZpFeuE11fVPK++R38zMsCMQMckqPR7HtRPtMR0qXbmoWXT057z4HypJ
+         R1Muyod7UnXn9TKd4et6E+Trv33kTs7UPoC1cK8E3/ikzemyPKClprHM1PO+rg9a9ZL6
+         6llI0WxTS3PMq+QOLiHGdPuPjvbXPcakPUlWmfVjAi1+8mhFfBNEuvfNIXh3m7kGDvtE
+         GIQSkMRNdi7uBB97oxS4/jsLKe+nOozbVZPwnsqMxPZsRx7MbUeHiHHH3HmL4W6QQskR
+         hbBoQWASbCwzh2J0oD3jGiV3eSuPlPdwjuMAROALVs+ZBYjyFULKuekeHu7v1A0I4szl
+         n+KA==
+X-Forwarded-Encrypted: i=1; AJvYcCVCNHp99oABQVGczFqmDAgEhaJM5PIIckAi51g2ju3JwJu5B+ty5Hc008U7DOt8EP1lPbyT4Ow=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxB8dqQyItkGueZFogWGakpT7UHPL+U0E2dav3i/YZEFUAFWSz4
+	offr9gIB5czJ0KDIoizezRkcApXvJNwlZasmFWJYgq4NHTt+pCnM/yEou+B0UC8=
+X-Gm-Gg: ASbGncvOU9kOSgyNkC0cuAbhyRf2CFkuwEEcQyY6goQXDT5MH1oUShvLjvLD+uAXYeA
+	UF/T5oGujduBTvRLoeFBkXxIxI9rfaGp9nnMjA2haD1ScGwaKA+lTOE2QP4p7yJdjziqQOC/AM9
+	A3krlyASe9BKVhaVQKEsRh6Gych8r6NmWRtq2W2BPSMDOgCWEmWuW8BNxYVsjElmcyq5xCTgMCT
+	wvfdKtEXkItD19uonhrnxvM/bRzkt3tcNm5VsmEuQgDHCxtZb1QiXVxZ9s9fJflbjSJRG/P9rpX
+	0fQeblbkFEuif4h0sr2pRSs3rx7v4iytWdJtx3wLjZsRe+3HJOab
+X-Google-Smtp-Source: AGHT+IGaQH53OWXI018UHR+o3pOTGmyURoCZWzCbG0RQLmUMPYxUrDO3psb2lp4Kuy+CvmoE1eZtzw==
+X-Received: by 2002:a05:6870:1b14:b0:29d:efe8:5a49 with SMTP id 586e51a60fabf-2b3e7450705mr688192fac.3.1738622381243;
+        Mon, 03 Feb 2025 14:39:41 -0800 (PST)
+Received: from [192.168.0.142] (ip98-183-112-25.ok.ok.cox.net. [98.183.112.25])
+        by smtp.gmail.com with ESMTPSA id 586e51a60fabf-2b35619ec30sm3589105fac.14.2025.02.03.14.39.39
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 03 Feb 2025 14:39:40 -0800 (PST)
+Message-ID: <b1c35782-f717-4fe5-8a00-7f13b341b5dd@baylibre.com>
+Date: Mon, 3 Feb 2025 16:39:38 -0600
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-References: <20250203223916.1064540-1-almasrymina@google.com>
-X-Mailer: git-send-email 2.48.1.362.g079036d154-goog
-Message-ID: <20250203223916.1064540-7-almasrymina@google.com>
-Subject: [PATCH net-next v3 6/6] net: devmem: make dmabuf unbinding scheduled work
-From: Mina Almasry <almasrymina@google.com>
-To: netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	linux-doc@vger.kernel.org, kvm@vger.kernel.org, 
-	virtualization@lists.linux.dev, linux-kselftest@vger.kernel.org
-Cc: Mina Almasry <almasrymina@google.com>, Donald Hunter <donald.hunter@gmail.com>, 
-	Jakub Kicinski <kuba@kernel.org>, "David S. Miller" <davem@davemloft.net>, 
-	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, 
-	Jonathan Corbet <corbet@lwn.net>, Andrew Lunn <andrew+netdev@lunn.ch>, 
-	Neal Cardwell <ncardwell@google.com>, David Ahern <dsahern@kernel.org>, 
-	"Michael S. Tsirkin" <mst@redhat.com>, Jason Wang <jasowang@redhat.com>, 
-	Xuan Zhuo <xuanzhuo@linux.alibaba.com>, 
-	"=?UTF-8?q?Eugenio=20P=C3=A9rez?=" <eperezma@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, 
-	Stefano Garzarella <sgarzare@redhat.com>, Shuah Khan <shuah@kernel.org>, sdf@fomichev.me, 
-	asml.silence@gmail.com, dw@davidwei.uk, Jamal Hadi Salim <jhs@mojatatu.com>, 
-	Victor Nogueira <victor@mojatatu.com>, Pedro Tammela <pctammela@mojatatu.com>, 
-	Samiullah Khawaja <skhawaja@google.com>
-Content-Type: text/plain; charset="UTF-8"
+MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH 00/13] gpiolib: add gpiods_set_array_value_cansleep
+To: Andy Shevchenko <andy.shevchenko@gmail.com>,
+ Bartosz Golaszewski <brgl@bgdev.pl>
+Cc: linux-gpio@vger.kernel.org, linux-kernel@vger.kernel.org,
+ linux-iio@vger.kernel.org, linux-mmc@vger.kernel.org,
+ netdev@vger.kernel.org, linux-phy@lists.infradead.org,
+ linux-sound@vger.kernel.org, Linus Walleij <linus.walleij@linaro.org>,
+ Andy Shevchenko <andy@kernel.org>, Geert Uytterhoeven
+ <geert@linux-m68k.org>, Lars-Peter Clausen <lars@metafoo.de>,
+ Michael Hennerich <Michael.Hennerich@analog.com>,
+ Jonathan Cameron <jic23@kernel.org>, Ulf Hansson <ulf.hansson@linaro.org>,
+ Peter Rosin <peda@axentia.se>, Andrew Lunn <andrew@lunn.ch>,
+ Heiner Kallweit <hkallweit1@gmail.com>, Russell King
+ <linux@armlinux.org.uk>, "David S. Miller" <davem@davemloft.net>,
+ Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+ Paolo Abeni <pabeni@redhat.com>, Vinod Koul <vkoul@kernel.org>,
+ Kishon Vijay Abraham I <kishon@kernel.org>, =?UTF-8?Q?Nuno_S=C3=A1?=
+ <nuno.sa@analog.com>, Liam Girdwood <lgirdwood@gmail.com>,
+ Mark Brown <broonie@kernel.org>, Jaroslav Kysela <perex@perex.cz>,
+ Takashi Iwai <tiwai@suse.com>
+References: <20250131-gpio-set-array-helper-v1-0-991c8ccb4d6e@baylibre.com>
+ <CAMRc=MdwQL8dWU5zF5fp+KUbC2RA2Q264by8HGXMg2k1rxhsTA@mail.gmail.com>
+ <9931433b-5cde-4819-ac96-eea4f1f0f1f2@baylibre.com>
+ <CAMRc=McEdcDs01BAKN5vg9POg_xxJBY1k8bfgiDN60C1-e_jow@mail.gmail.com>
+ <072be5a9-e0fb-4073-85b3-4a8efcafae09@baylibre.com>
+ <CAMRc=Meq_Gfhcjzx0vCL0JPzfnOcijFgB6AuqtsqgGn1eOTMVg@mail.gmail.com>
+ <CAHp75Ve+iwrm8dx49+6C7xFJgTQrh3XumKVzKvnYY=00J-j43A@mail.gmail.com>
+From: David Lechner <dlechner@baylibre.com>
+Content-Language: en-US
+In-Reply-To: <CAHp75Ve+iwrm8dx49+6C7xFJgTQrh3XumKVzKvnYY=00J-j43A@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 
-The TX path may release the dmabuf in a context where we cannot wait.
-This happens when the user unbinds a TX dmabuf while there are still
-references to its netmems in the TX path. In that case, the netmems will
-be put_netmem'd from a context where we can't unmap the dmabuf,
-resulting in a BUG like seen by Stan:
+On 2/1/25 1:47 PM, Andy Shevchenko wrote:
+> On Sat, Feb 1, 2025 at 6:22 PM Bartosz Golaszewski <brgl@bgdev.pl> wrote:
+>> On Sat, Feb 1, 2025 at 5:17 PM David Lechner <dlechner@baylibre.com> wrote:
+>>> On 2/1/25 10:14 AM, Bartosz Golaszewski wrote:
+>>>> On Sat, Feb 1, 2025 at 5:09 PM David Lechner <dlechner@baylibre.com> wrote:
+>>>>> On 2/1/25 4:36 AM, Bartosz Golaszewski wrote:
+> 
+> ...
+> 
+>>>>>> This looks good to me except for one thing: the function prefix. I would
+>>>>>> really appreciate it if we could stay within the existing gpiod_ namespace and
+>>>>>> not add a new one in the form of gpiods_.
+>>>>>>
+>>>>>> Maybe: gpiod_multiple_set_ or gpiod_collected_set...?
+>>>>>
+>>>>> I was waiting for someone to complain about the naming. ;-)
+>>>>>
+>>>>> I was going for as short as possible, but OK, the most obvious prefix to me
+>>>>> would be `gpio_descs_...` (to match the first parameter). Any objections to
+>>>>> that?
+>>>>
+>>>> Yes, objection! As far as any exported interfaces go: in my book
+>>>> "gpio_" is the prefix for legacy symbols we want to go away and
+>>>> "gpiod_" is the prefix for current, descriptor-based API. Anything
+>>>> else is a no-go. I prefer a longer name that starts with gpiod_ over
+>>>> anything that's shorter but doesn't.
+>>>
+>>> Oops, that was a typo. I meant to write gpiod_descs_.
+>>
+>> Eh... the D in gpioD already stands for "GPIO Descriptor" but if
+>> there's no better option in your opinion than I guess I can live with
+>> that.
+> 
+> gpiod_set_many_value_cansleep() ?
+> 
 
-[    1.548495] BUG: sleeping function called from invalid context at drivers/dma-buf/dma-buf.c:1255
-[    1.548741] in_atomic(): 1, irqs_disabled(): 0, non_block: 0, pid: 149, name: ncdevmem
-[    1.548926] preempt_count: 201, expected: 0
-[    1.549026] RCU nest depth: 0, expected: 0
-[    1.549197]
-[    1.549237] =============================
-[    1.549331] [ BUG: Invalid wait context ]
-[    1.549425] 6.13.0-rc3-00770-gbc9ef9606dc9-dirty #15 Tainted: G        W
-[    1.549609] -----------------------------
-[    1.549704] ncdevmem/149 is trying to lock:
-[    1.549801] ffff8880066701c0 (reservation_ww_class_mutex){+.+.}-{4:4}, at: dma_buf_unmap_attachment_unlocked+0x4b/0x90
-[    1.550051] other info that might help us debug this:
-[    1.550167] context-{5:5}
-[    1.550229] 3 locks held by ncdevmem/149:
-[    1.550322]  #0: ffff888005730208 (&sb->s_type->i_mutex_key#11){+.+.}-{4:4}, at: sock_close+0x40/0xf0
-[    1.550530]  #1: ffff88800b148f98 (sk_lock-AF_INET6){+.+.}-{0:0}, at: tcp_close+0x19/0x80
-[    1.550731]  #2: ffff88800b148f18 (slock-AF_INET6){+.-.}-{3:3}, at: __tcp_close+0x185/0x4b0
-[    1.550921] stack backtrace:
-[    1.550990] CPU: 0 UID: 0 PID: 149 Comm: ncdevmem Tainted: G        W          6.13.0-rc3-00770-gbc9ef9606dc9-dirty #15
-[    1.551233] Tainted: [W]=WARN
-[    1.551304] Hardware name: QEMU Standard PC (i440FX + PIIX, 1996), BIOS Arch Linux 1.16.3-1-1 04/01/2014
-[    1.551518] Call Trace:
-[    1.551584]  <TASK>
-[    1.551636]  dump_stack_lvl+0x86/0xc0
-[    1.551723]  __lock_acquire+0xb0f/0xc30
-[    1.551814]  ? dma_buf_unmap_attachment_unlocked+0x4b/0x90
-[    1.551941]  lock_acquire+0xf1/0x2a0
-[    1.552026]  ? dma_buf_unmap_attachment_unlocked+0x4b/0x90
-[    1.552152]  ? dma_buf_unmap_attachment_unlocked+0x4b/0x90
-[    1.552281]  ? dma_buf_unmap_attachment_unlocked+0x4b/0x90
-[    1.552408]  __ww_mutex_lock+0x121/0x1060
-[    1.552503]  ? dma_buf_unmap_attachment_unlocked+0x4b/0x90
-[    1.552648]  ww_mutex_lock+0x3d/0xa0
-[    1.552733]  dma_buf_unmap_attachment_unlocked+0x4b/0x90
-[    1.552857]  __net_devmem_dmabuf_binding_free+0x56/0xb0
-[    1.552979]  skb_release_data+0x120/0x1f0
-[    1.553074]  __kfree_skb+0x29/0xa0
-[    1.553156]  tcp_write_queue_purge+0x41/0x310
-[    1.553259]  tcp_v4_destroy_sock+0x127/0x320
-[    1.553363]  ? __tcp_close+0x169/0x4b0
-[    1.553452]  inet_csk_destroy_sock+0x53/0x130
-[    1.553560]  __tcp_close+0x421/0x4b0
-[    1.553646]  tcp_close+0x24/0x80
-[    1.553724]  inet_release+0x5d/0x90
-[    1.553806]  sock_close+0x4a/0xf0
-[    1.553886]  __fput+0x9c/0x2b0
-[    1.553960]  task_work_run+0x89/0xc0
-[    1.554046]  do_exit+0x27f/0x980
-[    1.554125]  do_group_exit+0xa4/0xb0
-[    1.554211]  __x64_sys_exit_group+0x17/0x20
-[    1.554309]  x64_sys_call+0x21a0/0x21a0
-[    1.554400]  do_syscall_64+0xec/0x1d0
-[    1.554487]  ? exc_page_fault+0x8a/0xf0
-[    1.554585]  entry_SYSCALL_64_after_hwframe+0x77/0x7f
-[    1.554703] RIP: 0033:0x7f2f8a27abcd
+OK, taking all these suggestions into consideration along with having recently
+come across regmap_multi_reg_write(), I think I'll go with:
 
-Resolve this by making __net_devmem_dmabuf_binding_free schedule_work'd.
-
-Suggested-by: Stanislav Fomichev <sdf@fomichev.me>
-Signed-off-by: Mina Almasry <almasrymina@google.com>
-
----
- net/core/devmem.c |  4 +++-
- net/core/devmem.h | 10 ++++++----
- 2 files changed, 9 insertions(+), 5 deletions(-)
-
-diff --git a/net/core/devmem.c b/net/core/devmem.c
-index 5de887545f5e..23463de19f50 100644
---- a/net/core/devmem.c
-+++ b/net/core/devmem.c
-@@ -46,8 +46,10 @@ static dma_addr_t net_devmem_get_dma_addr(const struct net_iov *niov)
- 	       ((dma_addr_t)net_iov_idx(niov) << PAGE_SHIFT);
- }
- 
--void __net_devmem_dmabuf_binding_free(struct net_devmem_dmabuf_binding *binding)
-+void __net_devmem_dmabuf_binding_free(struct work_struct *wq)
- {
-+	struct net_devmem_dmabuf_binding *binding = container_of(wq, typeof(*binding), unbind_w);
-+
- 	size_t size, avail;
- 
- 	gen_pool_for_each_chunk(binding->chunk_pool,
-diff --git a/net/core/devmem.h b/net/core/devmem.h
-index 874e891e70e0..63d16dbaca2d 100644
---- a/net/core/devmem.h
-+++ b/net/core/devmem.h
-@@ -52,6 +52,8 @@ struct net_devmem_dmabuf_binding {
- 	 * net_iovs in the TX path.
- 	 */
- 	struct net_iov **tx_vec;
-+
-+	struct work_struct unbind_w;
- };
- 
- #if defined(CONFIG_NET_DEVMEM)
-@@ -74,7 +76,7 @@ struct dmabuf_genpool_chunk_owner {
- 	struct net_devmem_dmabuf_binding *binding;
- };
- 
--void __net_devmem_dmabuf_binding_free(struct net_devmem_dmabuf_binding *binding);
-+void __net_devmem_dmabuf_binding_free(struct work_struct *wq);
- struct net_devmem_dmabuf_binding *
- net_devmem_bind_dmabuf(struct net_device *dev,
- 		       enum dma_data_direction direction,
-@@ -129,7 +131,8 @@ net_devmem_dmabuf_binding_put(struct net_devmem_dmabuf_binding *binding)
- 	if (!refcount_dec_and_test(&binding->ref))
- 		return;
- 
--	__net_devmem_dmabuf_binding_free(binding);
-+	INIT_WORK(&binding->unbind_w, __net_devmem_dmabuf_binding_free);
-+	schedule_work(&binding->unbind_w);
- }
- 
- void net_devmem_get_net_iov(struct net_iov *niov);
-@@ -161,8 +164,7 @@ static inline void net_devmem_put_net_iov(struct net_iov *niov)
- {
- }
- 
--static inline void
--__net_devmem_dmabuf_binding_free(struct net_devmem_dmabuf_binding *binding)
-+static inline void __net_devmem_dmabuf_binding_free(struct work_struct *wq)
- {
- }
- 
--- 
-2.48.1.362.g079036d154-goog
-
+gpiod_multi_set_value_cansleep()
 
