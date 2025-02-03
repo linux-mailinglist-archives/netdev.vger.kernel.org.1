@@ -1,134 +1,103 @@
-Return-Path: <netdev+bounces-162224-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-162225-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id D1824A26415
-	for <lists+netdev@lfdr.de>; Mon,  3 Feb 2025 20:53:21 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5D592A2641E
+	for <lists+netdev@lfdr.de>; Mon,  3 Feb 2025 20:54:36 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 126951668A8
-	for <lists+netdev@lfdr.de>; Mon,  3 Feb 2025 19:53:20 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D6E293A1284
+	for <lists+netdev@lfdr.de>; Mon,  3 Feb 2025 19:54:27 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AF056209F22;
-	Mon,  3 Feb 2025 19:53:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6CB4D1E7C03;
+	Mon,  3 Feb 2025 19:54:32 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="IY2xBCd+"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="163YN5kA"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 801001D47AD;
-	Mon,  3 Feb 2025 19:53:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7C3D01DACB1
+	for <netdev@vger.kernel.org>; Mon,  3 Feb 2025 19:54:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1738612399; cv=none; b=pzDA9NUEBgIw4p5zP1W2thF9jd+GQBDvOcebmDT1RT6hjpE+ewtOQXZjQ1BmHdEBozKYVwL8ktp2zy9DtvyuFlTdZWnt2Lxbec2IHHrB6SkI2SpvXc0agXKHYFsFl+u8RRa4S39+0bJ2i5cc6ZTu8ZN1kiRw5L0k7d6F6RCfDEg=
+	t=1738612472; cv=none; b=HZ2mwD560MunnglZhSx1a+3w30/YNp+CkXrtDxX3TToCi7qJWPwd8+4X1VMmUj+J4/wZJ+LkR7QdhdDPigssdcERkTk/rEDyffpoZMm0ixzZ/+RjdGSFpUNxGYEEy8EG/LDAfjXcQ95ANYyZkJeS7Ovy96hnp88h+DovmsWTZng=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1738612399; c=relaxed/simple;
-	bh=txxsPm2nXmynDqW7wkBqaMmMRBITIsKevGT/NX9df0Q=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=REF0n8gRu/zs0f+fSqGVsBMqmSIWJ10n5bz9/kQNtPvHo3YVMIH0sd1cidesDiSPD0ge4pgGeSeuaZphJtqmvFRV7o2kcnYnLKWwMXjiw/IqC6kv/DmoVY1pKCO+rn1SW8dpxYbHbvQ6w8zfry5WkdsCPcpQMaL7R3GJN6hWStk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=IY2xBCd+; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id AFD45C4CED2;
-	Mon,  3 Feb 2025 19:53:15 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1738612397;
-	bh=txxsPm2nXmynDqW7wkBqaMmMRBITIsKevGT/NX9df0Q=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=IY2xBCd+gBh411tPAi9ArCrwUIjzfc3+b2I/L0iyGE9JvvxKmcYVO6Nowcoa84fER
-	 0Sd5z3G3DHv6zd3fv6WTl696hudKy4clON6BrW03tElItiT/07MnqquWH3U6zwc/Bj
-	 99FN0Au1UqvuoEahKqLG1jugExYFcEj6+2HCLHz38KUii0FUuuR7zjQERdd1zYf8tt
-	 OMVlckfy1aIbwIuXeK84WIkNvAu7BBU8UZQuK7oaO325UVbAY0SofX5McnK1xjKqho
-	 nO3Qwzyg7ZvAhns3+tity636aVOlCepQH4Jg/hNNQEof0voEUmCS5acWo3Lh4pBP6/
-	 MHb22j8+TtD5w==
-Date: Mon, 3 Feb 2025 20:53:12 +0100
-From: Mauro Carvalho Chehab <mchehab+huawei@kernel.org>
-To: Jonathan Corbet <corbet@lwn.net>
-Cc: Simon Horman <horms@kernel.org>, "David S. Miller"
- <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Jakub Kicinski
- <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Alexandre Ferrieux
- <alexandre.ferrieux@gmail.com>, netdev@vger.kernel.org,
- workflows@vger.kernel.org, linux-doc@vger.kernel.org
-Subject: Re: [PATCH net] docs: netdev: Document guidance on inline functions
-Message-ID: <20250203205312.74339d30@foz.lan>
-In-Reply-To: <20250203205039.15964b2f@foz.lan>
-References: <20250203-inline-funk-v1-1-2f48418e5874@kernel.org>
-	<874j1bt6mv.fsf@trenco.lwn.net>
-	<20250203205039.15964b2f@foz.lan>
-X-Mailer: Claws Mail 4.3.0 (GTK 3.24.43; x86_64-redhat-linux-gnu)
+	s=arc-20240116; t=1738612472; c=relaxed/simple;
+	bh=ztKiG31Luh1lQwSgv6oCtkJJB7c+HoA8kcmgb/VJFW4=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=S97OjigUswrdusd+Ks0297WHxNk7s6QgbT8wgJjY/g1IH2sb9T+zLrJgf+6KEF5FPYPaG2T3miYj60E0HhEsRfcDGMVnW6vX9tNbKo9eGBYLpnXGHBHRhi00+elkbuy2tYSVv9FvjEMphQsYFXyHTxMkaWbFLZ2VftNUuxFIw1g=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=163YN5kA; arc=none smtp.client-ip=78.32.30.218
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
+	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
+	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
+	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
+	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
+	bh=w6dYF4YrnPvWP9HtquT/UMp6zFz5bne6zTsmz2orqRI=; b=163YN5kAgGUvvBkTDFvDBbIamI
+	VG2n8xHb0xfUdFle47rh/SEfH63/204vzX5K+iJibtqq/aAsXM3AZFubcqLHYm1qzH3XieOdtBd11
+	wpItHTeEMNITD6WreoQfBjtzUNKc8G0pp779Z9SzJ9u8ygp8n7QEuN9p4M/iMn15KbDQOQTdRE8Aw
+	S7fd1pEDA8tAyjqN3qG8J7pTDyG0PI7fUGEIB2r/73l3uNeNk07ebLStqTHL0+Kl4NpabEZNhjVUq
+	0VjpP6nKc1PUzkTyW95rZpu2fEtASPnzBrbKT3SXMyWs7qgXJaiIUfh4pmiv8mLvls/c32FxVi48r
+	eqX0qlbQ==;
+Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:48796)
+	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.96)
+	(envelope-from <linux@armlinux.org.uk>)
+	id 1tf2WS-0001IC-0O;
+	Mon, 03 Feb 2025 19:54:20 +0000
+Received: from linux by shell.armlinux.org.uk with local (Exim 4.96)
+	(envelope-from <linux@shell.armlinux.org.uk>)
+	id 1tf2WP-0000e1-1P;
+	Mon, 03 Feb 2025 19:54:17 +0000
+Date: Mon, 3 Feb 2025 19:54:17 +0000
+From: "Russell King (Oracle)" <linux@armlinux.org.uk>
+To: Gerhard Engleder <gerhard@engleder-embedded.com>
+Cc: andrew@lunn.ch, hkallweit1@gmail.com, davem@davemloft.net,
+	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
+	netdev@vger.kernel.org
+Subject: Re: [PATCH net-next v4 3/7] net: phy: micrel: Add loopback support
+Message-ID: <Z6Ee6RDkaAeKw749@shell.armlinux.org.uk>
+References: <20250203191057.46351-1-gerhard@engleder-embedded.com>
+ <20250203191057.46351-4-gerhard@engleder-embedded.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250203191057.46351-4-gerhard@engleder-embedded.com>
+Sender: Russell King (Oracle) <linux@armlinux.org.uk>
 
-Em Mon, 3 Feb 2025 20:50:39 +0100
-Mauro Carvalho Chehab <mchehab+huawei@kernel.org> escreveu:
+On Mon, Feb 03, 2025 at 08:10:53PM +0100, Gerhard Engleder wrote:
+> +static int ksz9031_set_loopback(struct phy_device *phydev, bool enable,
+> +				int speed)
+> +{
+> +	u16 ctl = BMCR_LOOPBACK;
+> +	int ret, val;
+> +
+> +	if (!enable)
+> +		return genphy_loopback(phydev, enable, 0);
+> +
+> +	if (speed == SPEED_10 || speed == SPEED_100 || speed == SPEED_1000)
+> +		phydev->speed = speed;
+> +	else if (speed)
+> +		return -EINVAL;
+> +	phydev->duplex = DUPLEX_FULL;
+> +
+> +	ctl |= mii_bmcr_encode_fixed(phydev->speed, phydev->duplex);
+> +
+> +	phy_modify(phydev, MII_BMCR, ~0, ctl);
 
-> Em Mon, 03 Feb 2025 08:00:56 -0700
-> Jonathan Corbet <corbet@lwn.net> escreveu:
-> 
-> > Simon Horman <horms@kernel.org> writes:
-> > 
-> > > Document preference for non inline functions in .c files.
-> > > This has been the preference for as long as I can recall
-> > > and I was recently surprised to discover that it is undocumented.
-> > >
-> > > Reported-by: Alexandre Ferrieux <alexandre.ferrieux@gmail.com>
-> > > Closes: https://lore.kernel.org/all/9662e6fe-cc91-4258-aba1-ab5b016a041a@orange.com/
-> > > Signed-off-by: Simon Horman <horms@kernel.org>
-> > > ---
-> > >  Documentation/process/maintainer-netdev.rst | 11 +++++++++++
-> > >  1 file changed, 11 insertions(+)
-> > >
-> > > diff --git a/Documentation/process/maintainer-netdev.rst b/Documentation/process/maintainer-netdev.rst
-> > > index e497729525d5..1fbb8178b8cd 100644
-> > > --- a/Documentation/process/maintainer-netdev.rst
-> > > +++ b/Documentation/process/maintainer-netdev.rst
-> > > @@ -408,6 +408,17 @@ at a greater cost than the value of such clean-ups.
-> > >  
-> > >  Conversely, spelling and grammar fixes are not discouraged.
-> > >  
-> > > +Inline functions
-> > > +----------------
-> > > +
-> > > +The use of static inline functions in .c file is strongly discouraged
-> > > +unless there is a demonstrable reason for them, usually performance
-> > > +related. Rather, it is preferred to omit the inline keyword and allow the
-> > > +compiler to inline them as it sees fit.
-> 
-> You should probably point to chapter (12) of Documentation/process/coding-style.rst
-> where it mentions that inline for function prototypes and as a way to
-> replace macros are OK.
+Why do you use phy_modify() here rather than phy_write() which is
+effectively what this is.
 
-Heh, I hit enter too quickly...
-
-I mean:
-	"inline for function prototypes and as a way to replace macros on
-	 header files (*.h) are OK."
-
-> 
-> > > +
-> > > +This is a stricter requirement than that of the general Linux Kernel
-> > > +:ref:`Coding Style<codingstyle>`  
-> > 
-> > I have no objection to this change, but I do wonder if it does indeed
-> > belong in the central coding-style document.  I don't think anybody
-> > encourages use of "inline" these days...?
-> 
-> Indeed IMO this belongs to the coding style. I would place it close
-> to chapter (12) at Documentation/process/coding-style.rst.
-> 
-> Regards,
-> 
-> Thanks,
-> Mauro
-
-
-
-Thanks,
-Mauro
+-- 
+RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
+FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
 
