@@ -1,180 +1,193 @@
-Return-Path: <netdev+bounces-162125-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-162126-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id B2399A25D53
-	for <lists+netdev@lfdr.de>; Mon,  3 Feb 2025 15:50:34 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 71F81A25DB8
+	for <lists+netdev@lfdr.de>; Mon,  3 Feb 2025 16:01:03 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 66E6F1675B4
-	for <lists+netdev@lfdr.de>; Mon,  3 Feb 2025 14:44:21 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 6C61C3AFC8C
+	for <lists+netdev@lfdr.de>; Mon,  3 Feb 2025 14:46:54 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C4CD2209F5B;
-	Mon,  3 Feb 2025 14:39:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1C59620967D;
+	Mon,  3 Feb 2025 14:43:21 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=jakemoroni.com header.i=@jakemoroni.com header.b="qsXeo3ax";
-	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="DFkHIKxQ"
+	dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b="pvgLNsqC"
 X-Original-To: netdev@vger.kernel.org
-Received: from fout-b1-smtp.messagingengine.com (fout-b1-smtp.messagingengine.com [202.12.124.144])
+Received: from NAM10-MW2-obe.outbound.protection.outlook.com (mail-mw2nam10on2044.outbound.protection.outlook.com [40.107.94.44])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F010817993;
-	Mon,  3 Feb 2025 14:39:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=202.12.124.144
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1738593551; cv=none; b=GaKYm+I08xjkUtULNANW2aZ/+ybrZ2pRTX5GELWEmryocg+q/QoZRvcNb3cEhPZBkpEMp58nCBlvrdpWgEUUfUrEwuwBw7YifVtEStsrdlHL5qDawZEwbg3tchOlKZIIKaCoHvgGGB2qxysALVAGeUqP562TA54LZmytlVtw/S8=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1738593551; c=relaxed/simple;
-	bh=b90PaZDxPp/ki9kXic/RjbO1DgE+6UZDZ2buzitcLGg=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=QMz7vkQLP2t2APwkn8i+TQeOYnVIdXW8qeLmY1kvt6s21Mxm/s5SAJy/kAi5S4wOckvojF6VtUi8nkS5wpGx1S4EoC1AywD7QS4IoTrM3o0mKooCHSaiFpuLFi9TgNem/+dkZ3pDdjiqhjmuXdr/8HQkYU1H5P1jRbOYT4ubuo0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=jakemoroni.com; spf=pass smtp.mailfrom=jakemoroni.com; dkim=pass (2048-bit key) header.d=jakemoroni.com header.i=@jakemoroni.com header.b=qsXeo3ax; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=DFkHIKxQ; arc=none smtp.client-ip=202.12.124.144
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=jakemoroni.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=jakemoroni.com
-Received: from phl-compute-09.internal (phl-compute-09.phl.internal [10.202.2.49])
-	by mailfout.stl.internal (Postfix) with ESMTP id 8CB95114011D;
-	Mon,  3 Feb 2025 09:39:08 -0500 (EST)
-Received: from phl-mailfrontend-02 ([10.202.2.163])
-  by phl-compute-09.internal (MEProxy); Mon, 03 Feb 2025 09:39:08 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=jakemoroni.com;
-	 h=cc:cc:content-transfer-encoding:content-type:date:date:from
-	:from:in-reply-to:in-reply-to:message-id:mime-version:references
-	:reply-to:subject:subject:to:to; s=fm2; t=1738593548; x=
-	1738679948; bh=KIDFoN5px6FR9kLVezjnk3p6g5EQ0iT1gdU0VPWNZ7w=; b=q
-	sXeo3axF3f0TvErkGhkXvg53yfXXSbNT3EKmjLofRovijK3X2SE9a1hlch+/8h4a
-	lsrRv8UYFO64vAc7vRrjTkIc+U8FCCiNPohDQlIogCEefnrO3DbVRMRGbpAxzo2C
-	Ws+MWlbVLCMxlHgLyuKw7PySG8teNwc0EpoPY5dZac3kJl9p0WJlhVY0g6bhX8PM
-	wvw2/x7OZ2QLi7N2vclxEOcs5MjPzFdIwcH4wh/sN4UWSRLQcBXx/SR5KHsiAVjO
-	abd4HGUgg/eDPebCn9gBABWyV0aKOgIcJwCfcex5gUyhMaSrDTV88pdr07U/Gde0
-	ugMo3CLH5w7NijNAk637w==
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
-	messagingengine.com; h=cc:cc:content-transfer-encoding
-	:content-type:date:date:feedback-id:feedback-id:from:from
-	:in-reply-to:in-reply-to:message-id:mime-version:references
-	:reply-to:subject:subject:to:to:x-me-proxy:x-me-sender
-	:x-me-sender:x-sasl-enc; s=fm3; t=1738593548; x=1738679948; bh=K
-	IDFoN5px6FR9kLVezjnk3p6g5EQ0iT1gdU0VPWNZ7w=; b=DFkHIKxQ23trOkRdR
-	1TwbWJle4CKpUpf7PQkOOKdAHjB8jOmwZGaEQbLmpmoVPwjP0bE6Wya6VlTGVTZV
-	ML5b54dV5iHuYbCVe/iOLZsyflkrtsr6morqElT0BjU3p3Urdto4srgxvNcFx+0o
-	YJ1H+guGJShsmYsEHombepy/C87UVx7t1dgfF6F6JfkrsdstgOmIZK2ntns616ak
-	z79tDDh4BpZu9aQNldqFOtMX0XBdBXw/lPIgpk+rgnufPcLy/nllTjkauUoOHM8z
-	oqIot/FR2A27rQxkk2mPjgnJxaGZvsLzc3tO2zjfOXh/D5jQdhwiiSrUEbR87muP
-	+0Drg==
-X-ME-Sender: <xms:CtWgZ9c3KntGTktRlyjc_av0R4nN36z8SDWJ-vrMKUUIqY6yICmGlA>
-    <xme:CtWgZ7MMT5O0NlCiz_H--qmMVZzfKi2b6hrBf3yKoCB8KuAgMBYSPMKZq7ELSyeE1
-    ls0yXMYjZZj7M63dQ>
-X-ME-Received: <xmr:CtWgZ2iSdaTYXjvPeeAFVYI7wnvnar7E1X85RjzmlH4OF0Ue389TQGEZ1fQJAUiDHpl3orl9DN5y2GKYr4ceXmfbhXbq3ajLViyXpU5HiF9sg7QPZEPra2Ao>
-X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeefvddrtddtgddujeekjecutefuodetggdotefrod
-    ftvfcurfhrohhfihhlvgemucfhrghsthforghilhdpggftfghnshhusghstghrihgsvgdp
-    uffrtefokffrpgfnqfghnecuuegrihhlohhuthemuceftddtnecusecvtfgvtghiphhivg
-    hnthhsucdlqddutddtmdenucfjughrpefhvfevufffkffojghfggfgsedtkeertdertddt
-    necuhfhrohhmpeflrggtohgsucfoohhrohhnihcuoehmrghilhesjhgrkhgvmhhorhhonh
-    hirdgtohhmqeenucggtffrrghtthgvrhhnpeeuieektedugeegteeftefhieekgfettdet
-    veetgffgkeetueegfedvgeeljeefudenucevlhhushhtvghrufhiiigvpedtnecurfgrrh
-    grmhepmhgrihhlfhhrohhmpehmrghilhesjhgrkhgvmhhorhhonhhirdgtohhmpdhnsggp
-    rhgtphhtthhopedugedpmhhouggvpehsmhhtphhouhhtpdhrtghpthhtohepihhruhhssh
-    hkihhkhhesmhgrrhhvvghllhdrtghomhdprhgtphhtthhopegrnhgurhgvfidonhgvthgu
-    vghvsehluhhnnhdrtghhpdhrtghpthhtohepuggrvhgvmhesuggrvhgvmhhlohhfthdrnh
-    gvthdprhgtphhtthhopegvughumhgriigvthesghhoohhglhgvrdgtohhmpdhrtghpthht
-    ohepkhhusggrsehkvghrnhgvlhdrohhrghdprhgtphhtthhopehprggsvghnihesrhgvug
-    hhrghtrdgtohhmpdhrtghpthhtohepphgrvhgvlhdrsggvlhhouhhssegrqhhurghnthhi
-    rgdrtghomhdprhgtphhtthhopegrlhgvgigrnhguvghrrdhlohhkthhiohhnohhvsegrqh
-    hurghnthhirgdrtghomhdprhgtphhtthhopegumhhithhrihhirdhtrghrrghkrghnohhv
-    segrqhhurghnthhirgdrtghomh
-X-ME-Proxy: <xmx:CtWgZ28yXBR8DiE3JwlKZMte74ROGl_bSUGPUKFuHppiLIEgZ7PTQA>
-    <xmx:CtWgZ5v3KH3BUy4tCKef-_lXt5bPaY7a7h6QbEeHQnc3CWNweHGwUw>
-    <xmx:CtWgZ1FLsUaThf6GDhZvrH5jR8aC-BwbyTKfo1VIUd3AWUrYJANgRQ>
-    <xmx:CtWgZwNpcYLQPAjXhA4RTgwMe1Qx13vUzpowNsyFNztFcnPzeXGu9g>
-    <xmx:DNWgZ5Frmg-JAisxXzucESHt9RTYvdLf8wuDKuVH_7SKXw8bwua108GA>
-Feedback-ID: i17014242:Fastmail
-Received: by mail.messagingengine.com (Postfix) with ESMTPA; Mon,
- 3 Feb 2025 09:39:06 -0500 (EST)
-From: Jacob Moroni <mail@jakemoroni.com>
-To: Igor Russkikh <irusskikh@marvell.com>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Pavel Belous <Pavel.Belous@aquantia.com>,
-	Alexander Loktionov <Alexander.Loktionov@aquantia.com>,
-	Dmitrii Tarakanov <Dmitrii.Tarakanov@aquantia.com>,
-	David VomLehn <vomlehn@texas.net>,
-	Dmitry Bezrukov <Dmitry.Bezrukov@aquantia.com>
-Cc: Jacob Moroni <mail@jakemoroni.com>,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: [PATCH net v2] net: atlantic: fix warning during hot unplug
-Date: Mon,  3 Feb 2025 09:36:05 -0500
-Message-ID: <20250203143604.24930-3-mail@jakemoroni.com>
-X-Mailer: git-send-email 2.43.0
-In-Reply-To: <20250203100236.GB234677@kernel.org>
-References: <20250203100236.GB234677@kernel.org>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C855920A5F6
+	for <netdev@vger.kernel.org>; Mon,  3 Feb 2025 14:43:17 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.94.44
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1738593801; cv=fail; b=P5KiXiLNfQIsJ3/1Ce63Kbe4qiWWE2Ts0g+ly7g+0GUFl8eGUot/KNaVAgsJH2Vi30+rhT/PKaasOzvwurGKSgv9PB/iFyvA/e6DFm/f68KS/F2gs1rRpOfnqfdNwrr5pPxxa0kIdbMo3GJc8szQJzg/mL5D0hwhtATNGgCUXe0=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1738593801; c=relaxed/simple;
+	bh=L3EaPWoxfKH+yBXMCmwMnSnJE9i/AOC9ahcAbD6/Eg0=;
+	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
+	 Content-Type:MIME-Version; b=kZSRKH8e5aA5q/1ouJ6XES9HOUoBQ+Bkwhy5SR6JDPy/W8NvaypIMRdB8IrCPB4xNwYbNY2aonlRWqYDKMVxiStlkIvsnrdIExrPhMF78xaaN5sRlOHpbxZfbjWRcDEl9ED8o9dq2U+t4qA3a9rqlx8P2jnyQbl+kevnlbPmm/8=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microchip.com; spf=pass smtp.mailfrom=microchip.com; dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b=pvgLNsqC; arc=fail smtp.client-ip=40.107.94.44
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microchip.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=microchip.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=Du9Z52xQhhzHOBtKaYCIa+sRClhOrThxolcre1+3oEj2paqmxYO+oTHBZmIWRz53EjRx/Ab2QSD2OE3DjZF+gwr4AF+2ZuwIUylHL3PHt2Buwhk6vFSAx1EKWqirr5NuPne+LPYMvrOUZM9tFBDe5zpA3YBLB6AlHKauhZuHdewEKMPKV5Uid35CKUbPRx21gztAMYjtmK8h2lPuaihAX7PtQ/GH4rbK8p8Qnc3n3cv+P9xvcXz6zQEy0jyh99R/2i8RFiRpMKUpYszXp5m/uUWU9YGUOXZA3Tq0kzM/UHz8wetpS38k7dv1VT6nQ4ytI2eM+LXU3TUjlgu11jZbuQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=L3EaPWoxfKH+yBXMCmwMnSnJE9i/AOC9ahcAbD6/Eg0=;
+ b=oQMIBnb3eopcl/lD7yGrHYNYdrBEX1li35rsyfT8MO2y6O0NXK/j9HQOi0SHBx4zyKwBlRvcjpZwEiPMl12vPaDnm3z8xOM7vnyjCbXzNobnod0pu39npy6v32R/Cd5Z/26BGS9KZm9bK0A4wHKmurwS5c160HgrQhUzeBFGvRrwsN+2aSfG/Bza0oArnT19cyyh/2HpPwIEpV3tzc/H59pCAVgeK4/7qG+o7AJ7l9H3E6GQLO1iQGslNwZN2Kum+6m7ZR3BbgUgXThBUT6fOSy7D5WfilKNVm2SBjU8HtdAUlYcN1PCDeiqNxKNOAh8ZnymOxbAjz/mTPf/Bax36Q==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=microchip.com; dmarc=pass action=none
+ header.from=microchip.com; dkim=pass header.d=microchip.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=microchip.com;
+ s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=L3EaPWoxfKH+yBXMCmwMnSnJE9i/AOC9ahcAbD6/Eg0=;
+ b=pvgLNsqCVOgJ0LjsGTpMPEb2LJ38070yK2jamLTmYuEOKJk6xjqbFGo8Nyxz9y3FKFjBB+QEhEc+cesW6mnRJkFR8CaiCs2SyVQ83IEeLkrHIMWPfCn7Dq4I/kVqQUdHRp01XJhOgfSCbZoL+C8kYp5CdVfc6PwhQmR2nDBMv3YIK/d4nSoCZOauE/WMMjs/ouEYPsLuAnG3xobSA3Z1u7Ud510u4hOcL7Lf0PTI4Jk6r1KW2x5iYi+DLUJLvsG2z0oSJEBD/QYJFqJuR52NmQxIQ0864oX8GSrTEis35AvVwiZjD8yJIJNqTMvTIJpwMgdP4+qquxTeJsaL4rDQWQ==
+Received: from BL0PR11MB2913.namprd11.prod.outlook.com (2603:10b6:208:79::29)
+ by PH0PR11MB7472.namprd11.prod.outlook.com (2603:10b6:510:28c::12) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8398.25; Mon, 3 Feb
+ 2025 14:43:13 +0000
+Received: from BL0PR11MB2913.namprd11.prod.outlook.com
+ ([fe80::3bc1:80d8:bfa5:e742]) by BL0PR11MB2913.namprd11.prod.outlook.com
+ ([fe80::3bc1:80d8:bfa5:e742%4]) with mapi id 15.20.8398.025; Mon, 3 Feb 2025
+ 14:43:13 +0000
+From: <Woojung.Huh@microchip.com>
+To: <lukma@denx.de>
+CC: <frieder.schrempf@kontron.de>, <andrew@lunn.ch>, <netdev@vger.kernel.org>,
+	<Tristram.Ha@microchip.com>
+Subject: RE: KSZ9477 HSR Offloading
+Thread-Topic: KSZ9477 HSR Offloading
+Thread-Index:
+ AQHbcZ/V7BrTHsAdqUafWk3/ZoT41LMsd0oAgADjJgCAAArSgIAANkeAgAAFAwCAACgGgIAANNSAgAAc85CAAOiAgIAAXJhwgAX6CoCAAFcuIA==
+Date: Mon, 3 Feb 2025 14:43:13 +0000
+Message-ID:
+ <BL0PR11MB29130DC3BD02197B1A26C944E7F52@BL0PR11MB2913.namprd11.prod.outlook.com>
+References: <05a6e63e-96c1-4d78-91b9-b00deed044b5@kontron.de>
+ <6d0e1f47-874e-42bf-9bc7-34856c1168d1@lunn.ch>
+ <1c140c92-3be6-4917-b600-fa5d1ef96404@kontron.de>
+ <6400e73a-b165-41a8-9fc9-e2226060a68c@kontron.de>
+ <20250129121733.1e99f29c@wsk>
+ <0383e3d9-b229-4218-a931-73185d393177@kontron.de>
+ <20250129145845.3988cf04@wsk>
+ <42a2f96f-34cd-4d95-99d5-3b4c4af226af@kontron.de>
+ <BL0PR11MB2913C7E1AE86A3A0EB12D0D7E7EE2@BL0PR11MB2913.namprd11.prod.outlook.com>
+ <1400a748-0de7-4093-a549-f07617e6ac51@kontron.de>
+ <BL0PR11MB29130BB177996C437F792106E7E92@BL0PR11MB2913.namprd11.prod.outlook.com>
+ <20250203103113.27e3060a@wsk>
+In-Reply-To: <20250203103113.27e3060a@wsk>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach:
+X-MS-TNEF-Correlator:
+authentication-results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=microchip.com;
+x-ms-publictraffictype: Email
+x-ms-traffictypediagnostic: BL0PR11MB2913:EE_|PH0PR11MB7472:EE_
+x-ms-office365-filtering-correlation-id: 44a47613-62c7-41f2-c250-08dd44611665
+x-forefront-antispam-report:
+ CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BL0PR11MB2913.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(366016)(376014)(1800799024)(38070700018);DIR:OUT;SFP:1101;
+x-ms-exchange-senderadcheck: 1
+x-ms-exchange-antispam-relay: 0
+x-microsoft-antispam: BCL:0;ARA:13230040|366016|376014|1800799024|38070700018;
+x-microsoft-antispam-message-info:
+ =?utf-8?B?UFFHY2FIS0pXNTdwQlRYSDNRRUp4L0RhLzkrUElCY1E4SjMxYXNicjFSRHcz?=
+ =?utf-8?B?Yi93Z2dpRkV4VjVFQXo4L1g1U2QzcU42Q1M5aDJsWnJCMmw1Y3pLZjB6TEhG?=
+ =?utf-8?B?YXV1NVRONnRaMU9qd2lTY0xITDcyait6bHIxVVBJc2dyZENFM0ZyRzBReVE5?=
+ =?utf-8?B?Wko0VUhWQTNBRjB5cnZqZzBKUG1wR1g3RGlkcURVM1BiV05IUEZDb2gxM08r?=
+ =?utf-8?B?YlZzcnJOVlR3V2Z2ckNLMU1aNmRVOTVSTlNFK3YzZzJYSURGdW85VW1SMWpx?=
+ =?utf-8?B?WVg2NVdlYXZTc3AwVXdHUDZpd3VwVnpKOUlVejZRZmxFZVU3dk03V2VzOEpl?=
+ =?utf-8?B?S3NORFFtN3JBU05kVHlvYXVpd3dZMHFXUTFMMm84a3BKNVVEcWVOOHE1b0c2?=
+ =?utf-8?B?dWlWKzh1U0lXaURwSlZjdG9KNlJjZnIreU04WWtZUE03SmdocC9XdmcwN2FO?=
+ =?utf-8?B?aUVpVkJxc01ERCsvM2N2a1ZGWkxXRi85US9ReFVWRGFTMEE0bHU4aVZVMy9z?=
+ =?utf-8?B?U2hKcTFocXppTkdlNFdhZXgwaFBGSXRobnhaT3BxbFU2NE0yYlJqZTk4N2lG?=
+ =?utf-8?B?ZWRlMmNrdEE4cUgvWFlSOElYNWh1eUd4UVlQa0tiS3A3WEhBcUhhdFNqZXFK?=
+ =?utf-8?B?alJ0eU1VbUk3RVNIRXF2NDFXZ2V3TU50Ly9XamMrQVM2ZDVXM3RWc0xxalRv?=
+ =?utf-8?B?eG82Yk9sZzJUNFdNYklqNmMyNHVMVnVwbW9mMHVEWWRUczVHRGFnWVpZZXZL?=
+ =?utf-8?B?QTVtWkhpNGNiQU8yWkNZMS9qa2hpOXlEQWJhVHBPSnljdDV5OTBQNm56M2sv?=
+ =?utf-8?B?VGhScEV4Tlk3UzRxYXNPNHhCTHpTajdBUFdEWE5IQ2d1ZWlFN1lXbkhCTkFn?=
+ =?utf-8?B?cHkzZlhpWkIrNnRla3NIejZjbUsxTm5oWHJ0M3BxRDROeU10UTd6QnVlcys1?=
+ =?utf-8?B?Y3Z4ZEdPRnpYWGxUUFlRcUxDd3hjL0t3U3VnWDM0TUpDcXJILzl5czJyUnB4?=
+ =?utf-8?B?NjlOS3FHbjBrbCtkUHNUR3hvRFJqbnVMdEZldGF0V3FFU2lJS3FJTUZubDMx?=
+ =?utf-8?B?bURIRUtBVHpiMzZ4OTlNeXFpbWRIN1BIMDhJb3g0WVd0OWhXcUpRaW9qRXhF?=
+ =?utf-8?B?Zitscm1xZFk5S2lveGVpT0NxMHhNclpHa3RxSkZxd1RQeWhtdUw2WlRkMVJv?=
+ =?utf-8?B?dm9RWWR0b2RsMW43K0RhRjVTQm9xK2t0cTZBSkdLeElkY3BzOStadkt2WTNv?=
+ =?utf-8?B?UGowNVhJM0tHbjg0RU5HRDFIYUI4RXU4ankyTjFJSE56MUxESzJFanZFS2pI?=
+ =?utf-8?B?STlrWWpmLzI4Wk5KMXpvY3BrdlpGZVgzeGxhbHZid3FOSXZuNWVyNGlqazhy?=
+ =?utf-8?B?aFA5eGszaXh2aCtlN3pTZmFNQjRiQTJQTXcxejd3SlB4UFA2SmZ3YmIyd1NU?=
+ =?utf-8?B?Q2ovZW1aOFB3OEFBZlNhNlpUMmRFZmRjZ3hKM2MvM3RieXIydGpZcC8vYkVS?=
+ =?utf-8?B?MnFwd0crRUdqdWZUNUNxVHE1UG1HWnJXQ0xZQ2FHMVdBaEhaT2Y5L1ZzaXJY?=
+ =?utf-8?B?V1lWdkZpQXlZQUZYOUMzS2Jlbjd1cGFCNDV0aHZPTlliZkRhcHNLSEdObHpj?=
+ =?utf-8?B?dWkvTmRoVnFmVHpTRVZrTHoyOTh6M0k5Q2ZaMW5nOGNxMUNsenFJTFIrejA0?=
+ =?utf-8?B?ZkI5M1VtQUtVOHh5OW9QZEtOZ2loSzI5em5jdFpLQzBuQjVjMlJJQXJtTHZY?=
+ =?utf-8?B?d2JWQUFIK3Njb21BVnhaUndBOXgvY0NtK0l4Z3Nkb1p4VmEwOXQ0N1NaV2tQ?=
+ =?utf-8?B?bndaNWNVOHJtZ1Uvblg5SnJqMm5RVnJJRGFxK0x5ZjViS1FHVVpJQTVTdjcv?=
+ =?utf-8?Q?XYIHqZpEogjT2?=
+x-ms-exchange-antispam-messagedata-chunkcount: 1
+x-ms-exchange-antispam-messagedata-0:
+ =?utf-8?B?TlJGTHRqQzl3OFE0STc3dERaYm96bnAxK1dncFZXbGlzcGwzL2c0TWxkbE8z?=
+ =?utf-8?B?VHF1QmhEd2IrZDBWSi9QZ2pKQWhWSEIvRHpGdkpNKzk2MGkwYVZJd2VJNnhO?=
+ =?utf-8?B?YU5Tb3F3ZUp1RHhrTkxtaFRTM2JrUjJodWZYbjJucUpnNDFKVEIzUkRvWFVp?=
+ =?utf-8?B?LzhVclAvamdiMkJFbk5KaFhBSzQxTXpPb0thVlVBd1F2VkZFekNuY2VKOEVK?=
+ =?utf-8?B?ck9HMmxWZW1YYVMxQjZkeVpJbWFEaS9lSmcvVkd5OWYzblJKcmdyc1VCaVUz?=
+ =?utf-8?B?Umc0bWNYTTJFRHM0UFJSbGRzNk1jaWFJQ0JUZHEyYnp2MWRuUDV1ZzZwczNq?=
+ =?utf-8?B?NEdnOUVEWlRGYllEUFRiNDBTTDJUMHkzdWY5elcwMWhtbTZHWFdiMFFOREty?=
+ =?utf-8?B?dy9nbGphRDRGMVZ6NUtQNUpjZDYwRmZNbWpSVlowSTZSaW5URHd6dEFSY2hD?=
+ =?utf-8?B?dmR3SkJEUXMxcUJaS3pCZ2lKS2c4ci9CcGk1Zi9QbndiVFRDUm1ha08reThw?=
+ =?utf-8?B?RmZzSEFWbHpnWFJvUnkvRnNONEQ2MkUrUXJBeDZNbDI1WHhRZTJwTVkvMW1y?=
+ =?utf-8?B?Y0Q4di9KWVF5dmhGT2NjSk54cEsyc2NBNUtCZXV1TWRya2JvT2FmYjVCUDdT?=
+ =?utf-8?B?RXltTUVmTkxUOU9TaVRhQVQzaU1TS3N1ZlNMNFNPM0oweE9Vb21oZUhETGJj?=
+ =?utf-8?B?V0pEbElWMU8xa1lYYXRZZExaZm5GNWhhQU1yVHJiWWw2bnVaV2g3ZEhYaXJO?=
+ =?utf-8?B?NEZlczZYSk5GMnZZcGtJNGFadXdPQnRrV1UvL0dmNHUzMXJ5aisvUzFIOEZa?=
+ =?utf-8?B?OXhiRk1zRzBaR3NUczBtNHRFU1RmQTZnUnRXOCtwSnJmS3RDeFAxUWhsbHV1?=
+ =?utf-8?B?a2x1NE94S3cvMDhYOS9OMWRlWUtmZXlTS1d1RS96Uk45Y3RCOGhaZFE4a1lX?=
+ =?utf-8?B?TkIxM0RQYjNia1hZU2FObGh3cWRGNG1YaGN0RWpKUHFJK1AwVnQ0enBOOWVD?=
+ =?utf-8?B?djFQRWQ3bDJ5RXFobWFjUzdwM0lBTGxXaG1jYnlwZmUxZE5QSzB5b2ZYd3U0?=
+ =?utf-8?B?UDhRaWFaSUdBaTdheTlBNzVkbHVFSzMzN3JZTmErZ2pUNzMva25wdGc0cW1R?=
+ =?utf-8?B?c3hYR3ltbDZ2dTdXZ2lUNm5uS0dyeGh3WjZNU2k5YTJmQ2E2Zi85L0ZSVmN6?=
+ =?utf-8?B?L1FLbUNPeHJOMVNBVDlnUUdRalhBMUJnRXlvUHNseXZBVnp0aGVkQzlWWkhK?=
+ =?utf-8?B?SVYvbUVHSFkyT3QrbFgvTzFGS1JLZEdaMXB1UU5yTW4xdHpkUnZZbVdQemRt?=
+ =?utf-8?B?dC9ZN3RLOUpvS2hMWFJHMUxDMkhBVzNYMkRlMVdqZis2cVBPNTliMEJ3U3hl?=
+ =?utf-8?B?Y09ISlFnNnFwcW42enlDSDRxaVZGS1NFVDR0ZVdRRitiY2d0Y1E4aDZETk5l?=
+ =?utf-8?B?VVRlWUNPMTdhQkxORVlZQUJUNEYyWkhFM250RVQ1RTZnanVabHB2elVIOG55?=
+ =?utf-8?B?MFlCMlYwSlV6SGlwOG1ieGplUlVCTGRQU09MY09HR2hlR1JVWnVWdXFsaEJo?=
+ =?utf-8?B?SEFLY0g0TTZPWmpRVERLRU8zUFBzdjdqTXU4UUVVcDJsRDYydGtvUU1UMlpF?=
+ =?utf-8?B?SlVUU3ByUkpmRjhvNXc1OGh0UXNHaGw4bEsvSXNVbTFVZkVOS3lQZHVwSFU0?=
+ =?utf-8?B?cDdsenVuZ2JlYTc3L21UYkJ5RmNiMXRnY3h4VUF0NnhIaldiRkxpV1ZiUXdL?=
+ =?utf-8?B?dzhhQ0d5MTBjOVd5a080dTdvb3Bkc1c1dVNkN25nZWl5WHRGWVFKRmgrNDRt?=
+ =?utf-8?B?ZnR2K0pFUEpHVmd1cC8wc1p6WFRkbm5LUmY4V0R0Vmg5Y0RHNEhnM1QvSWE1?=
+ =?utf-8?B?SlB6aHMrU3hHVk1GZE5XUFRxL3dpTytPYnp4a21kb292dXRRYnhUZ2JlRndO?=
+ =?utf-8?B?b0dCck5jUzRuRHlLNlM0WEdKeDgwVHd2NHprd1JnTDMrOEhMNWp6WUZsSkUw?=
+ =?utf-8?B?TytWUFVzdXlZU25SVDdKQlBtNytFTHF2eElucExha2l4azhnbjFEd3ZodXRQ?=
+ =?utf-8?B?Q2kxM1dSL3hVWjhNS3NyamJScVBlejNyUFFlUmZJVUIraDJvT2tEcVRrdUxO?=
+ =?utf-8?Q?0bESJ+Ve2QxpfYqb0hLIm3L1Q?=
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+X-OriginatorOrg: microchip.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: BL0PR11MB2913.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 44a47613-62c7-41f2-c250-08dd44611665
+X-MS-Exchange-CrossTenant-originalarrivaltime: 03 Feb 2025 14:43:13.4399
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 3f4057f3-b418-4d4e-ba84-d55b4e897d88
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: uyfLuxxtZgTakexzrE3RzlngMssn+GC9TpX/uKhWGMa17nXJJMUV2jP0+LlLt73naQYTaWGNbbqYE2TdmZ6paMC0NAHLxNQTina4Va1Y3Kg=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH0PR11MB7472
 
-Firmware deinitialization performs MMIO accesses which are not
-necessary if the device has already been removed. In some cases,
-these accesses happen via readx_poll_timeout_atomic which ends up
-timing out, resulting in a warning at hw_atl2_utils_fw.c:112:
-
-[  104.595913] Call Trace:
-[  104.595915]  <TASK>
-[  104.595918]  ? show_regs+0x6c/0x80
-[  104.595923]  ? __warn+0x8d/0x150
-[  104.595925]  ? aq_a2_fw_deinit+0xcf/0xe0 [atlantic]
-[  104.595934]  ? report_bug+0x182/0x1b0
-[  104.595938]  ? handle_bug+0x6e/0xb0
-[  104.595940]  ? exc_invalid_op+0x18/0x80
-[  104.595942]  ? asm_exc_invalid_op+0x1b/0x20
-[  104.595944]  ? aq_a2_fw_deinit+0xcf/0xe0 [atlantic]
-[  104.595952]  ? aq_a2_fw_deinit+0xcf/0xe0 [atlantic]
-[  104.595959]  aq_nic_deinit.part.0+0xbd/0xf0 [atlantic]
-[  104.595964]  aq_nic_deinit+0x17/0x30 [atlantic]
-[  104.595970]  aq_ndev_close+0x2b/0x40 [atlantic]
-[  104.595975]  __dev_close_many+0xad/0x160
-[  104.595978]  dev_close_many+0x99/0x170
-[  104.595979]  unregister_netdevice_many_notify+0x18b/0xb20
-[  104.595981]  ? __call_rcu_common+0xcd/0x700
-[  104.595984]  unregister_netdevice_queue+0xc6/0x110
-[  104.595986]  unregister_netdev+0x1c/0x30
-[  104.595988]  aq_pci_remove+0xb1/0xc0 [atlantic]
-
-Fix this by skipping firmware deinitialization altogether if the
-PCI device is no longer present.
-
-Tested with an AQC113 attached via Thunderbolt by performing
-repeated unplug cycles while traffic was running via iperf.
-
-Fixes: 97bde5c4f909 ("net: ethernet: aquantia: Support for NIC-specific code")
-Signed-off-by: Jacob Moroni <mail@jakemoroni.com>
-Reviewed-by: Igor Russkikh <irusskikh@marvell.com>
----
- drivers/net/ethernet/aquantia/atlantic/aq_nic.c | 4 +++-
- 1 file changed, 3 insertions(+), 1 deletion(-)
-
-diff --git a/drivers/net/ethernet/aquantia/atlantic/aq_nic.c b/drivers/net/ethernet/aquantia/atlantic/aq_nic.c
-index fe0e3e2a8117..71e50fc65c14 100644
---- a/drivers/net/ethernet/aquantia/atlantic/aq_nic.c
-+++ b/drivers/net/ethernet/aquantia/atlantic/aq_nic.c
-@@ -1441,7 +1441,9 @@ void aq_nic_deinit(struct aq_nic_s *self, bool link_down)
- 	aq_ptp_ring_free(self);
- 	aq_ptp_free(self);
- 
--	if (likely(self->aq_fw_ops->deinit) && link_down) {
-+	/* May be invoked during hot unplug. */
-+	if (pci_device_is_present(self->pdev) &&
-+	    likely(self->aq_fw_ops->deinit) && link_down) {
- 		mutex_lock(&self->fwreq_mutex);
- 		self->aq_fw_ops->deinit(self->aq_hw);
- 		mutex_unlock(&self->fwreq_mutex);
--- 
-2.43.0
-
+SGkgTHVrYXN6LA0KDQo+ID4gPiBTdXJlLCBoZXJlIGlzIHRoZSBsaW5rOg0KPiA+ID4gaHR0cHM6
+Ly9taWNyb2NoaXAubXkuc2l0ZS5jb20vcy9jYXNlLzUwMFY0MDAwMDBLUWkxdElBRC8NCj4gDQo+
+IElzIHRoZSBsaW5rIGNvcnJlY3Q/DQo+IA0KPiBXaGVuIEkgbG9naW4gaW50byBtaWNyb2NoaXAu
+bXkuc2l0ZS5jb20gSSBkb24ndCBzZWUgdGhpcyAiY2FzZSIgY3JlYXRlZA0KPiBmb3IgS1NaOTQ3
+Ny4NCj4gDQoNCkkgaGVhcmQgdGhhdCB5b3VyIHRpY2tldCB3YXMgYXNzaWduZWQuIExldCBtZSBj
+aGVjayBhbmQgZ2V0IGJhY2sgdG8geW91Lg0KDQpUaGFua3MNCldvb2p1bmcNCg==
 
