@@ -1,96 +1,77 @@
-Return-Path: <netdev+bounces-162226-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-162227-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id D19ADA2642E
-	for <lists+netdev@lfdr.de>; Mon,  3 Feb 2025 21:01:22 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id C739DA2643D
+	for <lists+netdev@lfdr.de>; Mon,  3 Feb 2025 21:10:59 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 99C2A7A2CD5
-	for <lists+netdev@lfdr.de>; Mon,  3 Feb 2025 20:00:27 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 720847A31B4
+	for <lists+netdev@lfdr.de>; Mon,  3 Feb 2025 20:10:04 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6971C150980;
-	Mon,  3 Feb 2025 20:01:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 31FA820B7F4;
+	Mon,  3 Feb 2025 20:07:41 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b="pUDkNLaZ"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="kX+w+khU"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp-fw-52005.amazon.com (smtp-fw-52005.amazon.com [52.119.213.156])
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 815D3522A
-	for <netdev@vger.kernel.org>; Mon,  3 Feb 2025 20:01:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=52.119.213.156
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 45F4720AF96;
+	Mon,  3 Feb 2025 20:07:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1738612877; cv=none; b=ka2Mfw2+fnyyDrbbjbXQtLutEYkld/Ibq5pUEABOl9U5zBmpGzqxBvRzd0pMjbNR3t1e8Evwj0p14T7lBegKFQujVTFyiNTpqSURpXPBYaXyiOimPH7U2RI0Pu9Y8kQDgmau6d/ZuNJYWYAtZXYbguD1x1jsghPt1LxDVYoQdvA=
+	t=1738613261; cv=none; b=HVlllV3W2rFbvQUeGi4lfhoJL0r08S8OTI+ptcMeIAHN0uxx/LgGLj/VBGqlrNGix/hXu3x0WtrKi/tOuj+bB9wzY3gaROTnoKsIsORZZzybP7xJ+7i4it4BIMBHl75u9/rPMJgX+Ca4DQSNyOt1J7SM18HjCG3jPSAlBppFrHg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1738612877; c=relaxed/simple;
-	bh=vFqoder34BNSoYS9d3W9VoijwcDBKUPC6iSfUkqXhjo=;
-	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=IdeBy6gBQwxsYe5pNtONZMONxafWNuCbqLRF0cJUlxmLF+JcBrfSntD00euvFudqyXyvXs63DHxXSzVCO8gjvsLTL356nIqQYsA+sWaVze5nSrLkLeUrignH29cpeg6SseH6hD7ib5ebIoWyJipDifsvhf7KVAJXdwsEROvr8io=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.co.jp; dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b=pUDkNLaZ; arc=none smtp.client-ip=52.119.213.156
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.co.jp
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
-  t=1738612876; x=1770148876;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=n/OS/rO6nDxwkqL/VY/Y5C6ulrraKeRpwB3HfCtML74=;
-  b=pUDkNLaZdiERENaEMKn7W92tw934Q4hfIf7BAfJ4AIzw33TysE7ZgjXd
-   zVhRDKrbO9b5V/S2VKoc6pECIU6mPhIyOkTK443lP7VCJf7p13h4VQD0+
-   7wEOscRKONMwz6RFMt0n4dxx9bMh8zx/QsJsDgfecCCxWFBbzihWHSE5f
-   I=;
-X-IronPort-AV: E=Sophos;i="6.13,256,1732579200"; 
-   d="scan'208";a="715706127"
-Received: from iad12-co-svc-p1-lb1-vlan3.amazon.com (HELO smtpout.prod.us-west-2.prod.farcaster.email.amazon.dev) ([10.43.8.6])
-  by smtp-border-fw-52005.iad7.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 03 Feb 2025 20:01:11 +0000
-Received: from EX19MTAUWA001.ant.amazon.com [10.0.21.151:25508]
- by smtpin.naws.us-west-2.prod.farcaster.email.amazon.dev [10.0.24.236:2525] with esmtp (Farcaster)
- id bf5abf61-2d7c-47f3-b656-5a20eb0cc5ce; Mon, 3 Feb 2025 20:01:10 +0000 (UTC)
-X-Farcaster-Flow-ID: bf5abf61-2d7c-47f3-b656-5a20eb0cc5ce
-Received: from EX19D004ANA001.ant.amazon.com (10.37.240.138) by
- EX19MTAUWA001.ant.amazon.com (10.250.64.204) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1258.39;
- Mon, 3 Feb 2025 20:01:03 +0000
-Received: from 6c7e67bfbae3.amazon.com (10.119.5.38) by
- EX19D004ANA001.ant.amazon.com (10.37.240.138) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1258.39;
- Mon, 3 Feb 2025 20:01:00 +0000
-From: Kuniyuki Iwashima <kuniyu@amazon.com>
-To: <kuba@kernel.org>
-CC: <andrew+netdev@lunn.ch>, <davem@davemloft.net>, <edumazet@google.com>,
-	<horms@kernel.org>, <kuniyu@amazon.com>, <netdev@vger.kernel.org>,
-	<pabeni@redhat.com>, <willemb@google.com>
-Subject: Re: [PATCH net 0/3] MAINTAINERS: recognize Kuniyuki Iwashima as a maintainer
-Date: Tue, 4 Feb 2025 05:00:49 +0900
-Message-ID: <20250203200049.49670-1-kuniyu@amazon.com>
-X-Mailer: git-send-email 2.39.5 (Apple Git-154)
-In-Reply-To: <20250202014728.1005003-1-kuba@kernel.org>
-References: <20250202014728.1005003-1-kuba@kernel.org>
+	s=arc-20240116; t=1738613261; c=relaxed/simple;
+	bh=g1TUYz8ik05AL78+32hVi0hU3xQaqP9CdIyOOhf96xI=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=kxudhhMEYkhAqzmsDvn82VcHDmWe3jfy56XvL9O+p6gOO+SYRF9ZBzD1S2IwpObM+RLpRUTOIwmBCCPWqHrULPkyXbAr/1HwW1Gkd9MXs3y0RTP8LkrSXlXUvZBSz9xO9CyB7JiQuSKFZ4sLS7Pt+MPgDTj8RgFOwJ8gSVv08ng=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=kX+w+khU; arc=none smtp.client-ip=156.67.10.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Transfer-Encoding:Content-Disposition:
+	Content-Type:MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:From:
+	Sender:Reply-To:Subject:Date:Message-ID:To:Cc:MIME-Version:Content-Type:
+	Content-Transfer-Encoding:Content-ID:Content-Description:Content-Disposition:
+	In-Reply-To:References; bh=JJHTLSUarSwrkBkd8godphowSLUqNXXms9dJY8HP1UE=; b=kX
+	+w+khUuT+5KPPD8HTeyIgcJ/hwm/iGgksMWl/J4Wij1C/ZKnIQR63t9d5vB+qrXfvvNvB92z3e/Fx
+	5G+514rP3N+qeKdl1tAqQV8kNJnAjwxp/ojyjPgrjFDdqsxRKGsjjB8FIXMlKhpCHYgoFpsk09NbH
+	9PWADP9m1UVcy8M=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1tf2jB-00Ad0g-Gw; Mon, 03 Feb 2025 21:07:29 +0100
+Date: Mon, 3 Feb 2025 21:07:29 +0100
+From: Andrew Lunn <andrew@lunn.ch>
+To: Thomas =?iso-8859-1?Q?Wei=DFschuh?= <linux@weissschuh.net>
+Cc: Richard Cochran <richardcochran@gmail.com>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	linux-kernel@vger.kernel.org, netdev@vger.kernel.org
+Subject: Re: [PATCH net] ptp: Add mock device
+Message-ID: <b383c0b2-42cc-4e40-a7b8-f2b393387043@lunn.ch>
+References: <20250203-ptp-mock-dev-v1-1-f84c56fd9e45@weissschuh.net>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: EX19D046UWA002.ant.amazon.com (10.13.139.39) To
- EX19D004ANA001.ant.amazon.com (10.37.240.138)
+In-Reply-To: <20250203-ptp-mock-dev-v1-1-f84c56fd9e45@weissschuh.net>
 
-From: Jakub Kicinski <kuba@kernel.org>
-Date: Sat,  1 Feb 2025 17:47:25 -0800
-> Kuniyuki Iwashima has been a prolific contributor and trusted reviewer
-> for some core portions of the networking stack for a couple of years now.
-> Formalize some obvious areas of his expertise and list him as a maintainer.
-> 
-> Jakub Kicinski (3):
->   MAINTAINERS: add Kuniyuki Iwashima to TCP reviewers
->   MAINTAINERS: add a general entry for BSD sockets
->   MAINTAINERS: add entry for UNIX sockets
+On Mon, Feb 03, 2025 at 08:50:46PM +0100, Thomas Weißschuh wrote:
+> While working on the PTP core or userspace components,
+> a real PTP device is not always available.
+> Introduce a tiny module which creates a mock PTP device.
 
-Reviewed-by: Kuniyuki Iwashima <kuniyu@amazon.com>
+What does this add which netdevsim does not provide?
 
-Thank you so much !!!
+     Andrew
 
