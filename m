@@ -1,152 +1,148 @@
-Return-Path: <netdev+bounces-162219-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-162220-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 67FE5A263AC
-	for <lists+netdev@lfdr.de>; Mon,  3 Feb 2025 20:21:12 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id D211AA263D7
+	for <lists+netdev@lfdr.de>; Mon,  3 Feb 2025 20:38:41 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 0330D1667B9
-	for <lists+netdev@lfdr.de>; Mon,  3 Feb 2025 19:21:01 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id A5953188316D
+	for <lists+netdev@lfdr.de>; Mon,  3 Feb 2025 19:38:46 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E789420F071;
-	Mon,  3 Feb 2025 19:17:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 24DB713212A;
+	Mon,  3 Feb 2025 19:38:38 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=fastly.com header.i=@fastly.com header.b="qszbztml"
+	dkim=pass (1024-bit key) header.d=yandex.ru header.i=@yandex.ru header.b="vpkqs0+l"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f170.google.com (mail-pl1-f170.google.com [209.85.214.170])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from forward502b.mail.yandex.net (forward502b.mail.yandex.net [178.154.239.146])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4C3AE20E71E
-	for <netdev@vger.kernel.org>; Mon,  3 Feb 2025 19:17:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.170
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1A34925A656
+	for <netdev@vger.kernel.org>; Mon,  3 Feb 2025 19:38:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=178.154.239.146
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1738610253; cv=none; b=kNmx2xbPmbWrHnbIEUw3mMSND+G0346FXMRD55v+knc+dXIm9ydJhJLKrBDSkknO/nwowxLLGg+PPYpA2nBqr25wYbBOE+0lE3Jja/OdKifvOKZIJLSzxk4LaOXw9fsi5Bik23OENLlhyUS6tFHe6qCz4EiDKWV4SGvq+YQhMGQ=
+	t=1738611518; cv=none; b=c+kpO2K0J7ditUgTcOvB5RYrgo/3kiKedJtxE7CB5lhkofaMmkFRH3fAdQ3P353cn8ltKWJg3car9B8mqwXIfDWLoekB1ktDoOuHy2LupscSoat3HaO3u/EAWJzwi8dGpUM+ezmfdyE0HLRuGTlnvcTfifbTH6Lnm1kMwfxrUaY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1738610253; c=relaxed/simple;
-	bh=UQ1+/UhYDCAc88I4jH9qhRA47laIsXE39uyV/T0ipVk=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=R3s5PvhrnKuqWZFM15GuvMwajlrDSta8kzOs+wYbRI7lTzPZUKdSa1MVuEMUmg6hDVFzahrLWfLsienfv0vccO/2kqKPklCy/2K5EEcDYEX2yQhaZN/x6trTPwfsBSEabFYO9fOOa84ghcvL2D6X/QGFzHVqcW924JzhXzUDhus=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fastly.com; spf=pass smtp.mailfrom=fastly.com; dkim=pass (1024-bit key) header.d=fastly.com header.i=@fastly.com header.b=qszbztml; arc=none smtp.client-ip=209.85.214.170
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fastly.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=fastly.com
-Received: by mail-pl1-f170.google.com with SMTP id d9443c01a7336-21bc1512a63so91768615ad.1
-        for <netdev@vger.kernel.org>; Mon, 03 Feb 2025 11:17:32 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=fastly.com; s=google; t=1738610251; x=1739215051; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=ma8oDYqKo7lDdjgaSZH7Zvfd+MYM+1MHiJpHOWnUAKY=;
-        b=qszbztmlNfYs65wZ1+iDR60XzrYiYb+SpivpCcd5wP4G8Lze9QrJRcB8crAIZJlsG+
-         78rzDzQhOA/3woKITISN9L2ZXNy6kB/BgfOfyJaeK8pSuy+N2kfSzQrzYn0uQ5Ea167T
-         R4Q3lgIVoGS2xRlpzv5Win/3jT34du/VfcH+s=
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1738610251; x=1739215051;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=ma8oDYqKo7lDdjgaSZH7Zvfd+MYM+1MHiJpHOWnUAKY=;
-        b=j4DcK1nTOtckSUVJIT+LTraJTxcNFzJXk+bO8eQC/oscpF7AE7aGmJmM6BEGZczAjF
-         skhsNrWM7an8mE2bv+ZVm2L2fPBvhTFxWudKex1q0olkyZ54lpeX5z/zUgpaJMuawEbM
-         ny/8plfOnqXNmM1cXERSFg84r2ChySB0SeK9EEb0cR/BoPo2GRkrbPKAd/YIRs9sacsq
-         c3T0XiQH2adcFQl5c/zJHm1wKtyMjTqkwzq58TYQy104zrdaUjEG8lfmGwUJ6E0TaaT5
-         BnreWoMb7Teg8Ri+3oswzB52aowsyuXXoAcOrFM1BXBxl8cRkzS1q5sS7xbuNKMJlMxl
-         UFSg==
-X-Gm-Message-State: AOJu0Yz+y9bdQVij5sUW+iqdWplQmLerdjCHisKq88aepzyCbSCW2Age
-	H581a1CcR656MnoK4itknY2IfO5ru8PShtq9feM9Qk6k2Ohg1Bjuv9wKSdW4Gcp1r9nBk0jg+EN
-	NLp30sMsBeF8OG4fptx7/3iE4IX8e567TEChLswnwZW/iwShBPkzmoQVLSIhowTFU6OYG+FVbDP
-	WePuu4QoLpIAuotAC+EPe4PWcTfiuM7Bb+9dg=
-X-Gm-Gg: ASbGncuLmA3o4dfCOKv5MsQxyVlWGU5IreGi+O//A8BUey7ufHaj8gMuGlCPvlZDDdt
-	7roF67mtitOwUahxsyCrLzVYxOUQBl5/e8fcVoxMxBAePL6NbkTdWfSomFNCHS+Mmj7gUvAU/Fp
-	ppm6LSf3nhf63JGwra+ohJrvruDYwSxgtGrkcY99XLj2KV/Mt60Rzt36bgyGdFru/cFPMjjr83E
-	kw/zAIYmK2npw71B06k6p7UQPP0hKwfMMnyVvdTyMmW+wUV+/kLCvKnx9E+6+tH4IpWj0m/gxJg
-	gsMI9Cv/JjXzAEtgELUEtXk=
-X-Google-Smtp-Source: AGHT+IHzG6PqWTcyGDPpk3jh1F2SSoETgcl5mCtn5/bNJ/NqYro/MRaiKmT8q6TwTBoZ+pejU4zr4A==
-X-Received: by 2002:a05:6a00:b95:b0:72a:a7a4:9c6d with SMTP id d2e1a72fcca58-72fd0c9da62mr38596585b3a.24.1738610251091;
-        Mon, 03 Feb 2025 11:17:31 -0800 (PST)
-Received: from localhost.localdomain ([2620:11a:c019:0:65e:3115:2f58:c5fd])
-        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-72fe69ba47esm9046550b3a.96.2025.02.03.11.17.30
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 03 Feb 2025 11:17:30 -0800 (PST)
-From: Joe Damato <jdamato@fastly.com>
-To: netdev@vger.kernel.org
-Cc: kuba@kernel.org,
-	Joe Damato <jdamato@fastly.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Simon Horman <horms@kernel.org>,
-	Amritha Nambiar <amritha.nambiar@intel.com>,
-	Mina Almasry <almasrymina@google.com>,
-	linux-kernel@vger.kernel.org (open list)
-Subject: [PATCH net-next v2] netdev-genl: Elide napi_id when not present
-Date: Mon,  3 Feb 2025 19:17:13 +0000
-Message-Id: <20250203191714.155526-1-jdamato@fastly.com>
-X-Mailer: git-send-email 2.25.1
+	s=arc-20240116; t=1738611518; c=relaxed/simple;
+	bh=GB8U3AhZ+GbQoohdTDDABlMCbBq8ilqvcQeYsPHBvR0=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=Xn9oJ1uhlQlzZyJXi6eGSlg2ciriGIUjqQit5ilGtWt4BPaFRdgaiN1lVBfBCNI5P+iHHS2rKFvwBsIZkCiVLVgfdOkB3scF6MROrG6ijNnCjML0QsM+dO/oexADjvUcQ1oAIHjsUt+Wqha9F9IvaTnixLmmCeyAfLPn0ZjTNE0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=yandex.ru; spf=pass smtp.mailfrom=yandex.ru; dkim=pass (1024-bit key) header.d=yandex.ru header.i=@yandex.ru header.b=vpkqs0+l; arc=none smtp.client-ip=178.154.239.146
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=yandex.ru
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=yandex.ru
+Received: from mail-nwsmtp-smtp-production-main-45.sas.yp-c.yandex.net (mail-nwsmtp-smtp-production-main-45.sas.yp-c.yandex.net [IPv6:2a02:6b8:c08:188a:0:640:98b0:0])
+	by forward502b.mail.yandex.net (Yandex) with ESMTPS id D91EC6129C;
+	Mon,  3 Feb 2025 22:30:25 +0300 (MSK)
+Received: by mail-nwsmtp-smtp-production-main-45.sas.yp-c.yandex.net (smtp/Yandex) with ESMTPSA id NUpgJxSOdmI0-G7M4GAEx;
+	Mon, 03 Feb 2025 22:30:24 +0300
+X-Yandex-Fwd: 1
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=yandex.ru; s=mail;
+	t=1738611024; bh=GB8U3AhZ+GbQoohdTDDABlMCbBq8ilqvcQeYsPHBvR0=;
+	h=From:In-Reply-To:Cc:Date:References:To:Subject:Message-ID;
+	b=vpkqs0+laBlBmdxpgZ5Zr3JJ51i+gKMGb9ghoACW2U88xuyszo/PwBUUXkZ0t78e7
+	 B1AZmWfUhPRDR0GKc/gDfr4qflqtHWujfte9kTg2u+HkRnGYDptZu1ES2Tqj5S1Yr6
+	 Gm8E3XXZEP7sJHGKT/+1nKVuom+iPCBMYOk0K604=
+Authentication-Results: mail-nwsmtp-smtp-production-main-45.sas.yp-c.yandex.net; dkim=pass header.i=@yandex.ru
+Message-ID: <efceaa29-93d0-482a-95d9-28b176c1ffbc@yandex.ru>
+Date: Mon, 3 Feb 2025 22:30:23 +0300
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net] tun: revert fix group permission check
+Content-Language: en-US
+To: Willem de Bruijn <willemdebruijn.kernel@gmail.com>, netdev@vger.kernel.org
+Cc: davem@davemloft.net, kuba@kernel.org, edumazet@google.com,
+ pabeni@redhat.com, jasowang@redhat.com, Willem de Bruijn
+ <willemb@google.com>, Ondrej Mosnacek <omosnace@redhat.com>
+References: <20250203150615.96810-1-willemdebruijn.kernel@gmail.com>
+ <48edf7d4-0c1f-4980-b22f-967d203a403d@yandex.ru>
+ <67a114574eee7_2f0e52948e@willemb.c.googlers.com.notmuch>
+From: stsp <stsp2@yandex.ru>
+In-Reply-To: <67a114574eee7_2f0e52948e@willemb.c.googlers.com.notmuch>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
 
-There are at least two cases where napi_id may not present and the
-napi_id should be elided:
+03.02.2025 22:09, Willem de Bruijn пишет:
+> stsp wrote:
+>> 03.02.2025 18:05, Willem de Bruijn пишет:
+>>> From: Willem de Bruijn <willemb@google.com>
+>>>
+>>> This reverts commit 3ca459eaba1bf96a8c7878de84fa8872259a01e3.
+>>>
+>>> The blamed commit caused a regression when neither tun->owner nor
+>>> tun->group is set. This is intended to be allowed, but now requires
+>>> CAP_NET_ADMIN.
+>>>
+>>> Discussion in the referenced thread pointed out that the original
+>>> issue that prompted this patch can be resolved in userspace.
+>> The point of the patch was
+>> not to fix userspace, but this
+>> bug: when you have owner set,
+>> then adding group either changes
+>> nothing at all, or removes all
+>> access. I.e. there is no valid case
+>> for adding group when owner
+>> already set.
+> As long as no existing users are affected, no need to relax this after
+> all these years.
 
-1. Queues could be created, but napi_enable may not have been called
-   yet. In this case, there may be a NAPI but it may not have an ID and
-   output of a napi_id should be elided.
+I only mean the wording.
+My patch initially says what
+exactly does it fix, so the fact
+that the problem can be fixed
+in user-space, was likely obvious
+from the very beginning.
 
-2. TX-only NAPIs currently do not have NAPI IDs. If a TX queue happens
-   to be linked with a TX-only NAPI, elide the NAPI ID from the netlink
-   output as a NAPI ID of 0 is not useful for users.
+>> During the discussion it became
+>> obvious that simpler fixes may
+>> exist (like eg either-or semantic),
+>> so why not to revert based on
+>> that?
+> We did not define either-or in detail. Do you mean failing the
+> TUNSETOWNER or TUNSETGROUP ioctl if the other is already set?
 
-Signed-off-by: Joe Damato <jdamato@fastly.com>
----
- v2:
-   - Updated to elide NAPI IDs for RX queues which may have not called
-     napi_enable yet.
+I mean, auto-removing group when
+the owner is being set, for example.
+Its not a functionality change: the
+behaviour is essentially as before,
+except no such case when no one
+can access the device.
 
- rfc: https://lore.kernel.org/lkml/20250128163038.429864-1-jdamato@fastly.com/
- net/core/netdev-genl.c | 14 ++++++++------
- 1 file changed, 8 insertions(+), 6 deletions(-)
+>>> The relaxed access control may now make a device accessible when it
+>>> previously wasn't, while existing users may depend on it to not be.
+>>>
+>>> Since the fix is not critical and introduces security risk, revert,
+>> Well, I don't agree with that justification.
+>> My patch introduced the usability
+>> problem, but not a security risk.
+>> I don't want to be attributed with
+>> the security risk when this wasn't
+>> the case (to the very least, you
+>> still need the perms to open /dev/net/tun),
+>> so could you please remove that part?
+>> I don't think you need to exaggerate
+>> anything: it introduces the usability
+>> regression, which should be enough
+>> for any instant revert.
+> This is not intended to cast blame, of course.
+>
+> That said, I can adjust the wording.
 
-diff --git a/net/core/netdev-genl.c b/net/core/netdev-genl.c
-index 715f85c6b62e..a97d3b99f6cd 100644
---- a/net/core/netdev-genl.c
-+++ b/net/core/netdev-genl.c
-@@ -385,9 +385,10 @@ netdev_nl_queue_fill_one(struct sk_buff *rsp, struct net_device *netdev,
- 	switch (q_type) {
- 	case NETDEV_QUEUE_TYPE_RX:
- 		rxq = __netif_get_rx_queue(netdev, q_idx);
--		if (rxq->napi && nla_put_u32(rsp, NETDEV_A_QUEUE_NAPI_ID,
--					     rxq->napi->napi_id))
--			goto nla_put_failure;
-+		if (rxq->napi && rxq->napi->napi_id >= MIN_NAPI_ID)
-+			if (nla_put_u32(rsp, NETDEV_A_QUEUE_NAPI_ID,
-+					rxq->napi->napi_id))
-+				goto nla_put_failure;
- 
- 		binding = rxq->mp_params.mp_priv;
- 		if (binding &&
-@@ -397,9 +398,10 @@ netdev_nl_queue_fill_one(struct sk_buff *rsp, struct net_device *netdev,
- 		break;
- 	case NETDEV_QUEUE_TYPE_TX:
- 		txq = netdev_get_tx_queue(netdev, q_idx);
--		if (txq->napi && nla_put_u32(rsp, NETDEV_A_QUEUE_NAPI_ID,
--					     txq->napi->napi_id))
--			goto nla_put_failure;
-+		if (txq->napi && txq->napi->napi_id >= MIN_NAPI_ID)
-+			if (nla_put_u32(rsp, NETDEV_A_QUEUE_NAPI_ID,
-+					txq->napi->napi_id))
-+				goto nla_put_failure;
- 	}
- 
- 	genlmsg_end(rsp, hdr);
+Would be good.
 
-base-commit: c2933b2befe25309f4c5cfbea0ca80909735fd76
--- 
-2.25.1
+> The access control that we relaxed is when a process is not allowed
+> to access a device until the administrator adds it to the right group.
+
+No-no, adding doesn't help.
+The process have to die and
+re-login. Besides, not only the
+"process" can't access the device,
+no. Everyone can't. And by the
+mere fact of adding a group...
 
 
