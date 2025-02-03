@@ -1,137 +1,209 @@
-Return-Path: <netdev+bounces-162001-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-162002-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0DFDBA25119
-	for <lists+netdev@lfdr.de>; Mon,  3 Feb 2025 02:39:55 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id EEE23A25133
+	for <lists+netdev@lfdr.de>; Mon,  3 Feb 2025 03:08:02 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A7F313A4E08
-	for <lists+netdev@lfdr.de>; Mon,  3 Feb 2025 01:39:46 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id AC5F2188497B
+	for <lists+netdev@lfdr.de>; Mon,  3 Feb 2025 02:08:07 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 60586FBF6;
-	Mon,  3 Feb 2025 01:39:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D0A9A12E7F;
+	Mon,  3 Feb 2025 02:07:57 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="gRAtWn+d"
+	dkim=pass (2048-bit key) header.d=treblig.org header.i=@treblig.org header.b="ASOfH7nX"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qk1-f170.google.com (mail-qk1-f170.google.com [209.85.222.170])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mx.treblig.org (mx.treblig.org [46.235.229.95])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C5A4C35944;
-	Mon,  3 Feb 2025 01:39:47 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.170
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BB3BC2A1C9;
+	Mon,  3 Feb 2025 02:07:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=46.235.229.95
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1738546789; cv=none; b=ETLaqen7cetnAEBpu45Wn+QmrRvsHWZr1Mdguaz0g/hqTJ7L4tg5rnDZJStV7lni66NjFEpfrzrW8+6BiG3nd+Nunhb8ad5rkdfN16hWAkR3cOlF5Yr7Mg2e3X2AhGAm+UYrIMZ/7vNtDQPD4oIaMNydw6HsTsGmgvwhpAdMbxw=
+	t=1738548477; cv=none; b=RuPPhb22UkA1LQJSeNtjHEQ5uJUScRSmrVGANfGxSonQPlvJmPIvBBx+PO8nspg5c4lbdu4Rk92gOMl1wsu+h/yzKxZRj9wv2msmtf+QXiynRST4ypuJa8jKhmIhtvzkfuEpp7yCTFGQ0cX/t2WZno4xar+JbfsHuxUlaJjm59U=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1738546789; c=relaxed/simple;
-	bh=/y6k81+zaNnSlojA9+tv0fGOmgCbPw3lTMpWbqBXuBc=;
-	h=Date:From:To:Cc:Message-ID:In-Reply-To:References:Subject:
-	 Mime-Version:Content-Type; b=Zhhi4rpKyv4Sxea41KvbSFdIzzJvVWmwEOCiW1mpSVryNB3kcJg+Ts/Zb44lkIQrX3poDgfBlCb/nIolxyGs6AWAluHzj3knAqJElp7hx1HRJtwq4t0Ndxtl7YO/oFgfvwNMvFRmHmECJ8aA4KHzvOw+XV30y39ovKvJo2JsTwE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=gRAtWn+d; arc=none smtp.client-ip=209.85.222.170
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-qk1-f170.google.com with SMTP id af79cd13be357-7be49f6b331so368070685a.1;
-        Sun, 02 Feb 2025 17:39:47 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1738546786; x=1739151586; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:subject:references
-         :in-reply-to:message-id:cc:to:from:date:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=rOWzjSFyTHIcf6LMOu1NrdiYYI4JP58h04qND62AjuQ=;
-        b=gRAtWn+d0QLBTVwqMWfJZBRy6MnuuWsqSeSmGd48DTU5BypVkiB02222u+Rs/Pjjvg
-         TDDiUfyI5G8FMaa73LOH3D1QOzAjPFteLT/rVI+3a+w6JeBbcGxQaAq+raQy8UOKT86m
-         LyAensybshkcBMrksGNV5yjqYknZbTquzr8V7NELRzArs+2cLkcUg650yRbcL3TPJiGd
-         Vm1u/9Q2r9IZD4w00Nf/e+UaakRqXHBbTQQAttgDTGBwvm65pEnzpISgc2Fftzooy4H2
-         koJjI+8M4cG4NFj0cGySXxWNP7bHbj3tY3aqZp21r1l+EHOKZbPlhwhUWbWCnakY/Ddl
-         n2+A==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1738546786; x=1739151586;
-        h=content-transfer-encoding:mime-version:subject:references
-         :in-reply-to:message-id:cc:to:from:date:x-gm-message-state:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=rOWzjSFyTHIcf6LMOu1NrdiYYI4JP58h04qND62AjuQ=;
-        b=gpQHJIJ53QhpIqkXvbAgJsL2I6zPVa5/n5tKmbENsQekKuVloRJ7Gsf5QeQd1Mr/h5
-         AaY/+jJAy4KBYQ3mqtB82gFcxiwc4qDaTtAlRCa/pux0xvV1DZRsDek3DlgPh+mwQi4w
-         lZQEj/SFjgahXX5B6gjcYzaCfifwpjFHCgqHdbOOkqbb0mz2wipWiNz1+4JAfQrRTfO+
-         6iexeanc8Ek6CTpibV70L4+qXKZqLyf1Kn0qMhJwqqeAfsMk+/SWlXXm0gpaXlGD5eDc
-         V2cRgVPDOJsgla7MZAqV6y7y7ehYipchTcpL8NUPAS7SamfKbBtSfvoxWSjsp/hgUMFt
-         LHRg==
-X-Forwarded-Encrypted: i=1; AJvYcCWUOeJ3dG8vmjdPbsMFYZTbQJIt31x2utcrXMOGz0+cK8bq8V1N86TWcMoe3VR0yBEe2yI=@vger.kernel.org, AJvYcCXBtkZItfDumpNMCHxENjC0WlDO7ugFu/oyd04yg3nOZUjK7cKvYeK3I5SxqJNSgso3f0A9BcYDCRLHR31d@vger.kernel.org
-X-Gm-Message-State: AOJu0YygrUKttzYishkOjpNgvZchUtrYMVRxmUW4FGlpLAPnFq+hLa/U
-	3i/hIR16sR4ReA0eACTXlhXug/ypFeRhpc4mdTQjK37za+thFbce
-X-Gm-Gg: ASbGncsOf+Ak+2fhsKLLu5sa8GgdqCZQskC6LYK/JQizVO3v4/U+QNHa2rIW2QG0wt6
-	prTtfohx8CBrnayUdnDFu/I3fhPBqOq9lvujZrEGYsjDg1BTQII582h8ymrkECJr421hL50aJ/I
-	NXhEtI05ZtEujsQCjvrO76wHLcLD9l947R099hHPecq+9rsqNbm37/Qjc7OlzhVLhKMoLd3iLnQ
-	ar6oan65UlhIeGWaHqX56KV8mbt8XDM9pAEJo4BzQh/jfSRxgDR5gHqdE8Q6dJpVRWgbN9QgF6D
-	LKIbx2ERZulEd0mTTFgulYkkvmOnI0JYhUij7fFK9CDIyNCZx0brFwCf75+eJaA=
-X-Google-Smtp-Source: AGHT+IGfoEhAbfzxVd2bQSUt84oOn6agnOvwoEG69chfiMNlVMXtcWns6kgBNh1e0mL2sr33I/qYbQ==
-X-Received: by 2002:a05:6214:1302:b0:6d8:a5f7:f116 with SMTP id 6a1803df08f44-6e243cc11acmr301853246d6.42.1738546786498;
-        Sun, 02 Feb 2025 17:39:46 -0800 (PST)
-Received: from localhost (15.60.86.34.bc.googleusercontent.com. [34.86.60.15])
-        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-6e254814405sm44826206d6.40.2025.02.02.17.39.45
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sun, 02 Feb 2025 17:39:45 -0800 (PST)
-Date: Sun, 02 Feb 2025 20:39:45 -0500
-From: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
-To: Willem de Bruijn <willemdebruijn.kernel@gmail.com>, 
- Marcus Wichelmann <marcus.wichelmann@hetzner-cloud.de>, 
- Stanislav Fomichev <stfomichev@gmail.com>
-Cc: netdev@vger.kernel.org, 
- linux-kernel@vger.kernel.org, 
- bpf@vger.kernel.org, 
- willemdebruijn.kernel@gmail.com, 
- jasowang@redhat.com, 
- andrew+netdev@lunn.ch, 
- davem@davemloft.net, 
- edumazet@google.com, 
- kuba@kernel.org, 
- pabeni@redhat.com, 
- ast@kernel.org, 
- daniel@iogearbox.net, 
- hawk@kernel.org, 
- john.fastabend@gmail.com
-Message-ID: <67a01e615bdb1_3c12af2942f@willemb.c.googlers.com.notmuch>
-In-Reply-To: <67a01caec79d1_3bbd8e29416@willemb.c.googlers.com.notmuch>
-References: <20250130171614.1657224-1-marcus.wichelmann@hetzner-cloud.de>
- <20250130171614.1657224-2-marcus.wichelmann@hetzner-cloud.de>
- <Z5wIZ2LAjz0wTWg5@mini-arch>
- <a1120039-b0a6-4882-be23-7ea1174f8ab7@hetzner-cloud.de>
- <67a01caec79d1_3bbd8e29416@willemb.c.googlers.com.notmuch>
-Subject: Re: [PATCH 1/1] net: tun: add XDP metadata support
+	s=arc-20240116; t=1738548477; c=relaxed/simple;
+	bh=wM5JKs2VrkY+2Ns9prRRGqSjkqtzOmYrYFesP1QwiKc=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=MA468LsomAgG5lRDEPKn95KVGwx9ES8JG4eQNwUZ7Ynvb4kg/spG5v+Khz8O1gR7ly3A6TJ04JHHTZoh/OL7fIu/uif6pR38f/C/3vnHXxMmrUQud2L4Hu0GprXmX6q1p/YvNlgilusIjRs+Wry9eoj3TnXZ7CRgI1lAsQHhNDU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=treblig.org; spf=pass smtp.mailfrom=treblig.org; dkim=pass (2048-bit key) header.d=treblig.org header.i=@treblig.org header.b=ASOfH7nX; arc=none smtp.client-ip=46.235.229.95
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=treblig.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=treblig.org
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=treblig.org
+	; s=bytemarkmx; h=MIME-Version:Message-ID:Date:Subject:From:Content-Type:From
+	:Subject; bh=Xzk/e1yuIM8mk0vycxZvqalEYX9nnB92dHj7/duvLM8=; b=ASOfH7nXcPUvWWpR
+	2qCUPrxh4Xbwtp+FVs+hcKzaSXGiPAVNe1bfpp1MWh61MaZ08rqOr6ziZf+bcLayWx9TeLaDMW7xM
+	5FPogiuld9bsiL1u3r0k8oq533jFbixq2bFNv9ZuOh7NHbxbDMaEK+/a/keRBPoqgtSTp7L8ExsSG
+	O1PmhMGhFlp1whYjW+YnAL9AJGbUvqvu4hYcmzjF8VMOfjfLAbSLPrK3NtLHwkoj9hNtrqxq4vp97
+	5r7BN6J6M2X4I8BzgVV9zvz8qn1KRkzPIpouwxv9UaNag7ttWsPqEWOJVbP7E/xhIDGncw+63Cjwd
+	Va0WXlhh7QRCFnBxNw==;
+Received: from localhost ([127.0.0.1] helo=dalek.home.treblig.org)
+	by mx.treblig.org with esmtp (Exim 4.96)
+	(envelope-from <linux@treblig.org>)
+	id 1telsG-00DAMr-0l;
+	Mon, 03 Feb 2025 02:07:44 +0000
+From: linux@treblig.org
+To: trondmy@kernel.org,
+	anna@kernel.org,
+	chuck.lever@oracle.com,
+	jlayton@kernel.org,
+	neilb@suse.de,
+	okorniev@redhat.com,
+	Dai.Ngo@oracle.com,
+	tom@talpey.com
+Cc: davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	horms@kernel.org,
+	linux-nfs@vger.kernel.org,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	"Dr. David Alan Gilbert" <linux@treblig.org>
+Subject: [PATCH] SUNRPC: Remove unused make_checksum
+Date: Mon,  3 Feb 2025 02:07:43 +0000
+Message-ID: <20250203020743.280722-1-linux@treblig.org>
+X-Mailer: git-send-email 2.48.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Content-Type: text/plain;
- charset=utf-8
-Content-Transfer-Encoding: 7bit
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
 
-> > >> +		metasize = metasize > 0 ? metasize : 0;
-> > > 
-> > > Why is this part needed?
-> > 
-> > When an xdp_buff was initialized withouth metadata support (meta_valid
-> > argument of xdp_prepare_buff is false), then data_meta == data + 1.
-> > So this check makes sure that metadata was supported for the given xdp_buff
-> > and metasize is not -1 (data - data_meta).
-> > 
-> > But you have a good point here: Because we have control over the
-> > initialization of xdp_buff in the tun_build_skb function (first code path),
-> > we know, that metadata is always supported for that buffer and metasize
-> > is never < 0. So this check is redundant and I'll remove it.
-> > 
-> > But in the tun_xdp_one function (second code path), I'd prefer to keep that
-> > check, as the xdp_buff is externally passed to tun_sendmsg and the tun driver
-> > should probably not make assumptions about the metadata support of buffers
-> > created by other drivers (e.g. vhost_net).
-> > 
-> > Thank you for taking a look, I hope things are more clear now.
-> 
-> Please use min()
-> 
+From: "Dr. David Alan Gilbert" <linux@treblig.org>
 
-Err.. max.
+Commit ec596aaf9b48 ("SUNRPC: Remove code behind
+CONFIG_RPCSEC_GSS_KRB5_SIMPLIFIED") was the last user of the
+make_checksum() function.
+
+Remove it.
+
+Signed-off-by: Dr. David Alan Gilbert <linux@treblig.org>
+---
+ net/sunrpc/auth_gss/gss_krb5_crypto.c   | 90 -------------------------
+ net/sunrpc/auth_gss/gss_krb5_internal.h |  4 --
+ 2 files changed, 94 deletions(-)
+
+diff --git a/net/sunrpc/auth_gss/gss_krb5_crypto.c b/net/sunrpc/auth_gss/gss_krb5_crypto.c
+index 7e09b15c5538..8f2d65c1e831 100644
+--- a/net/sunrpc/auth_gss/gss_krb5_crypto.c
++++ b/net/sunrpc/auth_gss/gss_krb5_crypto.c
+@@ -148,96 +148,6 @@ checksummer(struct scatterlist *sg, void *data)
+ 	return crypto_ahash_update(req);
+ }
+ 
+-/*
+- * checksum the plaintext data and hdrlen bytes of the token header
+- * The checksum is performed over the first 8 bytes of the
+- * gss token header and then over the data body
+- */
+-u32
+-make_checksum(struct krb5_ctx *kctx, char *header, int hdrlen,
+-	      struct xdr_buf *body, int body_offset, u8 *cksumkey,
+-	      unsigned int usage, struct xdr_netobj *cksumout)
+-{
+-	struct crypto_ahash *tfm;
+-	struct ahash_request *req;
+-	struct scatterlist              sg[1];
+-	int err = -1;
+-	u8 *checksumdata;
+-	unsigned int checksumlen;
+-
+-	if (cksumout->len < kctx->gk5e->cksumlength) {
+-		dprintk("%s: checksum buffer length, %u, too small for %s\n",
+-			__func__, cksumout->len, kctx->gk5e->name);
+-		return GSS_S_FAILURE;
+-	}
+-
+-	checksumdata = kmalloc(GSS_KRB5_MAX_CKSUM_LEN, GFP_KERNEL);
+-	if (checksumdata == NULL)
+-		return GSS_S_FAILURE;
+-
+-	tfm = crypto_alloc_ahash(kctx->gk5e->cksum_name, 0, CRYPTO_ALG_ASYNC);
+-	if (IS_ERR(tfm))
+-		goto out_free_cksum;
+-
+-	req = ahash_request_alloc(tfm, GFP_KERNEL);
+-	if (!req)
+-		goto out_free_ahash;
+-
+-	ahash_request_set_callback(req, CRYPTO_TFM_REQ_MAY_SLEEP, NULL, NULL);
+-
+-	checksumlen = crypto_ahash_digestsize(tfm);
+-
+-	if (cksumkey != NULL) {
+-		err = crypto_ahash_setkey(tfm, cksumkey,
+-					  kctx->gk5e->keylength);
+-		if (err)
+-			goto out;
+-	}
+-
+-	err = crypto_ahash_init(req);
+-	if (err)
+-		goto out;
+-	sg_init_one(sg, header, hdrlen);
+-	ahash_request_set_crypt(req, sg, NULL, hdrlen);
+-	err = crypto_ahash_update(req);
+-	if (err)
+-		goto out;
+-	err = xdr_process_buf(body, body_offset, body->len - body_offset,
+-			      checksummer, req);
+-	if (err)
+-		goto out;
+-	ahash_request_set_crypt(req, NULL, checksumdata, 0);
+-	err = crypto_ahash_final(req);
+-	if (err)
+-		goto out;
+-
+-	switch (kctx->gk5e->ctype) {
+-	case CKSUMTYPE_RSA_MD5:
+-		err = krb5_encrypt(kctx->seq, NULL, checksumdata,
+-				   checksumdata, checksumlen);
+-		if (err)
+-			goto out;
+-		memcpy(cksumout->data,
+-		       checksumdata + checksumlen - kctx->gk5e->cksumlength,
+-		       kctx->gk5e->cksumlength);
+-		break;
+-	case CKSUMTYPE_HMAC_SHA1_DES3:
+-		memcpy(cksumout->data, checksumdata, kctx->gk5e->cksumlength);
+-		break;
+-	default:
+-		BUG();
+-		break;
+-	}
+-	cksumout->len = kctx->gk5e->cksumlength;
+-out:
+-	ahash_request_free(req);
+-out_free_ahash:
+-	crypto_free_ahash(tfm);
+-out_free_cksum:
+-	kfree(checksumdata);
+-	return err ? GSS_S_FAILURE : 0;
+-}
+-
+ /**
+  * gss_krb5_checksum - Compute the MAC for a GSS Wrap or MIC token
+  * @tfm: an initialized hash transform
+diff --git a/net/sunrpc/auth_gss/gss_krb5_internal.h b/net/sunrpc/auth_gss/gss_krb5_internal.h
+index 0bda0078d7d8..8769e9e705bf 100644
+--- a/net/sunrpc/auth_gss/gss_krb5_internal.h
++++ b/net/sunrpc/auth_gss/gss_krb5_internal.h
+@@ -155,10 +155,6 @@ static inline int krb5_derive_key(struct krb5_ctx *kctx,
+ 
+ void krb5_make_confounder(u8 *p, int conflen);
+ 
+-u32 make_checksum(struct krb5_ctx *kctx, char *header, int hdrlen,
+-		  struct xdr_buf *body, int body_offset, u8 *cksumkey,
+-		  unsigned int usage, struct xdr_netobj *cksumout);
+-
+ u32 gss_krb5_checksum(struct crypto_ahash *tfm, char *header, int hdrlen,
+ 		      const struct xdr_buf *body, int body_offset,
+ 		      struct xdr_netobj *cksumout);
+-- 
+2.48.1
+
 
