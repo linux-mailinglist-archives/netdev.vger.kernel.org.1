@@ -1,97 +1,65 @@
-Return-Path: <netdev+bounces-162206-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-162207-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 65B8DA2632C
-	for <lists+netdev@lfdr.de>; Mon,  3 Feb 2025 19:59:27 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 12A6CA26333
+	for <lists+netdev@lfdr.de>; Mon,  3 Feb 2025 20:00:19 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E389A3A4CCF
-	for <lists+netdev@lfdr.de>; Mon,  3 Feb 2025 18:59:17 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A2E2E3A47E6
+	for <lists+netdev@lfdr.de>; Mon,  3 Feb 2025 19:00:10 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D79C220E31E;
-	Mon,  3 Feb 2025 18:58:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D07AE1D515A;
+	Mon,  3 Feb 2025 19:00:13 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=fastly.com header.i=@fastly.com header.b="CAd2IDCU"
+	dkim=pass (2048-bit key) header.d=treblig.org header.i=@treblig.org header.b="gfoTcEMX"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f180.google.com (mail-pl1-f180.google.com [209.85.214.180])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mx.treblig.org (mx.treblig.org [46.235.229.95])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 04DC320E02E
-	for <netdev@vger.kernel.org>; Mon,  3 Feb 2025 18:58:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.180
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7AF151552FA;
+	Mon,  3 Feb 2025 19:00:06 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=46.235.229.95
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1738609128; cv=none; b=oIRmMKMZM4RPzBfZ8haTf4dt7RYySV9e15osyIxnvuWpzaVY32vpXqvCBnRGMiDTVgowYvqZLlr4s28cGtjj8eAnHlKwQgpf0W/KB21Oy/8P72c0R31YRQSYuDSEp2hIWpKDgYNJgHx3x63n+RPUeDXEnPme7ax7wT+7e1GHByw=
+	t=1738609213; cv=none; b=j64eOSYsQVYs8Y6JtLOeY1OgahPpb4RiqhRwYX1Rlpp+DMr3VEv5n3IFZ4pYOih4Z1hEwb7uAnEJKGCMA3M+zt1WcWPOf6cTcyh7XdrjtnZj98q++tWVaR/RDBTpkezEhdQjo9QfJ/ewY4uFLvZRUXMomw6fRsxatitSkff8eNg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1738609128; c=relaxed/simple;
-	bh=SubsBxO+wPo2U2N9JqMCj8sJIfsKnaDJYSlq5P7NP9c=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=FYHZzEaBi6hha8RydS3j3MRlIyCmydwQUXhWx/E1XZHL11UT8oYMN4lRSjR6B9j1vElZnhKkZ+3DJ5EHJdBE8SidRjT60gCL/8vuKZS/viPg1WoIxQix8exM/IHHvhAlD3T2eDMtie7zZ/8AHkjmxJpciRS5MbRCndtuaatw9Mk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fastly.com; spf=pass smtp.mailfrom=fastly.com; dkim=pass (1024-bit key) header.d=fastly.com header.i=@fastly.com header.b=CAd2IDCU; arc=none smtp.client-ip=209.85.214.180
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fastly.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=fastly.com
-Received: by mail-pl1-f180.google.com with SMTP id d9443c01a7336-216728b1836so80176055ad.0
-        for <netdev@vger.kernel.org>; Mon, 03 Feb 2025 10:58:46 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=fastly.com; s=google; t=1738609126; x=1739213926; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=PSQY1DWiwqocS2rGuzYecaG3Krm/cgaXOXWiGWsi1xc=;
-        b=CAd2IDCUG/CthTTj/qCF9h39dNZmjaIr5M4vn7arfLn+PabWiaUugUL2n3xiXV05I3
-         8FNTuUp+5hUQr9nHSSPiZM7cUM5jHgzUx5I4xq3+xItemDkfnS5SUJjdlDClERBF4+XM
-         PAGEp4Em418U8QBGPyFI0iBjTMF/n+mq9BJQE=
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1738609126; x=1739213926;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=PSQY1DWiwqocS2rGuzYecaG3Krm/cgaXOXWiGWsi1xc=;
-        b=nAEybCgSuLrYcsIvNmKC5YBIlfnheojOVFLLu7TEXxSAkamqFtvsOY/onuOHVSI5XD
-         T/z46H+QqoVDgyRBiJeBD99JBeHtX+agxB8vZado96c9CY5XKvS2kayIFYRNC+lNoigd
-         QA/0ej8BeKHck5mgCGo3I42q0l5PB5bi6bFarhPUzvfiEpyrya6i479T4ijMxjsCHVR2
-         0aGTrRRGKT6O+K89Riw38v40Zl7TC6kRFBNzs2vdHwQ9aa6m+ZDqQloSpvM9tO33QEGM
-         DF2MH/HWXCuCIwgoB+2OUNUzTwTe/DOlnUd30nRWfFUhvwx2bgFNY4cuVq9BSuVrwmLb
-         09LQ==
-X-Gm-Message-State: AOJu0YyB8SnP2hWNI4GqgH5CPCapvUf5Vilw1zoCejJT4h/1FahZzm+X
-	k0OVzEciob0cglw1fqcLb4YI/T2QbBasgHdPyCM9LpUIVgh7Ruo8hPbzPIRceL7HG9yjYiE9vWi
-	zXJcbW5Qo+2WaVt1dzSibxtZG1AYK5tBl7aUCgnISg9y9EE5Ql0rYnUmHitUcxUCvkcwYRmhIeH
-	f4X2EdrrjlSaMwC34TJPSdHUpexZCNLAXbkCo=
-X-Gm-Gg: ASbGncsMnQY8lpPVqgBlfyb62n71gpv9ESQLxLd3IUI2DMPPREIM52pJ3zXJWQoruqV
-	k121ZgnXE/Ab7oYOzetHAfrjYU6qxfpsout/CfWdfQAwWrWVa8Yyvm/IJaBr7tR43YuGtqDFd5v
-	UBMohyW5DkrXfch5YwRNs3MTf28omnUdXIFDapmxizRf584I07xI/F1AjGkqgSil2Kb0Dh0Zypl
-	ovU39dWuJG0QqjehCxAoH7l7y+Ky/FRaxC23c+jiTVvaKkgSbyzBcYgU2J8au9ZeHPu77absNqe
-	gD1KQdJnXBycq5bqRQZNeek=
-X-Google-Smtp-Source: AGHT+IEpvdvsb3TNGzzr9Af3XmaFzZlAVMaujFKYN37yRsBYeeZq+GtYuFBSkVLVRomE1QGuGNuptA==
-X-Received: by 2002:a05:6a00:420e:b0:728:e382:5f14 with SMTP id d2e1a72fcca58-72fd0bec75bmr31828011b3a.9.1738609125600;
-        Mon, 03 Feb 2025 10:58:45 -0800 (PST)
-Received: from localhost.localdomain ([2620:11a:c019:0:65e:3115:2f58:c5fd])
-        by smtp.gmail.com with ESMTPSA id 41be03b00d2f7-acec0a666ddsm6899673a12.73.2025.02.03.10.58.44
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 03 Feb 2025 10:58:45 -0800 (PST)
-From: Joe Damato <jdamato@fastly.com>
-To: netdev@vger.kernel.org
-Cc: kuba@kernel.org,
-	Joe Damato <jdamato@fastly.com>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Shuah Khan <shuah@kernel.org>,
-	Alexei Starovoitov <ast@kernel.org>,
-	Daniel Borkmann <daniel@iogearbox.net>,
-	Jesper Dangaard Brouer <hawk@kernel.org>,
-	John Fastabend <john.fastabend@gmail.com>,
-	linux-kernel@vger.kernel.org (open list),
-	linux-kselftest@vger.kernel.org (open list:KERNEL SELFTEST FRAMEWORK),
-	bpf@vger.kernel.org (open list:XDP (eXpress Data Path):Keyword:(?:\b|_)xdp(?:\b|_))
-Subject: [PATCH net-next v2 2/2] selftests: drv-net: Test queue xsk attribute
-Date: Mon,  3 Feb 2025 18:58:23 +0000
-Message-Id: <20250203185828.19334-3-jdamato@fastly.com>
-X-Mailer: git-send-email 2.25.1
-In-Reply-To: <20250203185828.19334-1-jdamato@fastly.com>
-References: <20250203185828.19334-1-jdamato@fastly.com>
+	s=arc-20240116; t=1738609213; c=relaxed/simple;
+	bh=th+jmuLRTdg0eMmnU2szpdUNNk3XBFQArnJCcQynsWQ=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=i8ZquEgjPxoQxxCxFTl/YegRMfOcjFF4rWwxtGEZbvQyyin1dE4eKpzk26ble5VN8bVo8nveuM7ZiHsXyE8eSEI4guRCEKGfonmbH3RcarwYpmhXI6M2/dkTpJLdctk9KSgTHE+6pKs9zhQsgT5GSmdklSkhycuez1tM11TDGts=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=treblig.org; spf=pass smtp.mailfrom=treblig.org; dkim=pass (2048-bit key) header.d=treblig.org header.i=@treblig.org header.b=gfoTcEMX; arc=none smtp.client-ip=46.235.229.95
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=treblig.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=treblig.org
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=treblig.org
+	; s=bytemarkmx; h=MIME-Version:Message-ID:Date:Subject:From:Content-Type:From
+	:Subject; bh=TjppAuWd3XEkG6npc1wSulnYtx9dkF3mAxWmfa91O/o=; b=gfoTcEMXtxxGtd1c
+	Y1I7tciGp8bHoHJaWLi8ML2OggZ3f/yuw3pxXEj+cXqn75keAUC3/OYSlSmug1sxWTSs/q47JgcOf
+	sXwhCnxJBLf4uVondRveQNLUzgB9lnQsddLjPsimX1I9FYeXJdh2cyU8ZygYRyAxGUdNGdG+T3JLY
+	uQFdrOfrFIv1APpj17lwkrnHabk6xseL2tzNCGfjv2LVU30ltTZo9yQaPC8QWPduI0f8ar+LkEb0v
+	UIN6NJt7W85UilZNq+k8rT6tWBJIm6F/Tl3uLdRUYw2IkPxnYknMh0L9ZL5je9VW5LQp5mfBqJ+C5
+	HB6y495st1kMAYxd5w==;
+Received: from localhost ([127.0.0.1] helo=dalek.home.treblig.org)
+	by mx.treblig.org with esmtp (Exim 4.96)
+	(envelope-from <linux@treblig.org>)
+	id 1tf1fr-00DLzG-1z;
+	Mon, 03 Feb 2025 18:59:59 +0000
+From: linux@treblig.org
+To: leon@kernel.org,
+	saeedm@nvidia.com,
+	tariqt@nvidia.com,
+	andrew+netdev@lunn.ch,
+	davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com
+Cc: netdev@vger.kernel.org,
+	linux-rdma@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	"Dr. David Alan Gilbert" <linux@treblig.org>
+Subject: [PATCH net-next] net/mlx5: Remove unused mlx5dr_domain_sync
+Date: Mon,  3 Feb 2025 18:59:58 +0000
+Message-ID: <20250203185958.204794-1-linux@treblig.org>
+X-Mailer: git-send-email 2.48.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -100,209 +68,128 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Test that queues which are used for AF_XDP have the xsk nest attribute.
-The attribute is currently empty, but its existence means the AF_XDP is
-being used for the queue.
+From: "Dr. David Alan Gilbert" <linux@treblig.org>
 
-Signed-off-by: Joe Damato <jdamato@fastly.com>
-Suggested-by: Jakub Kicinski <kuba@kernel.org>
+mlx5dr_domain_sync() was added in 2019 by
+commit 70605ea545e8 ("net/mlx5: DR, Expose APIs for direct rule managing")
+but hasn't been used.
+
+Remove it.
+
+mlx5dr_domain_sync() was the only user of
+mlx5dr_send_ring_force_drain().
+Remove it.
+
+Signed-off-by: Dr. David Alan Gilbert <linux@treblig.org>
 ---
- v2:
-   - Updated the Python test after changes to patch 1 which expose an
-     empty nest
-   - Updated Python test with general Python coding feedback
+ .../mlx5/core/steering/sws/dr_domain.c        | 24 --------------
+ .../mellanox/mlx5/core/steering/sws/dr_send.c | 33 -------------------
+ .../mlx5/core/steering/sws/dr_types.h         |  1 -
+ .../mellanox/mlx5/core/steering/sws/mlx5dr.h  |  2 --
+ 4 files changed, 60 deletions(-)
 
- .../testing/selftests/drivers/net/.gitignore  |  2 +
- tools/testing/selftests/drivers/net/Makefile  |  3 +
- tools/testing/selftests/drivers/net/queues.py | 35 +++++++-
- .../selftests/drivers/net/xdp_helper.c        | 90 +++++++++++++++++++
- 4 files changed, 128 insertions(+), 2 deletions(-)
- create mode 100644 tools/testing/selftests/drivers/net/.gitignore
- create mode 100644 tools/testing/selftests/drivers/net/xdp_helper.c
-
-diff --git a/tools/testing/selftests/drivers/net/.gitignore b/tools/testing/selftests/drivers/net/.gitignore
-new file mode 100644
-index 000000000000..ec746f374e85
---- /dev/null
-+++ b/tools/testing/selftests/drivers/net/.gitignore
-@@ -0,0 +1,2 @@
-+# SPDX-License-Identifier: GPL-2.0-only
-+xdp_helper
-diff --git a/tools/testing/selftests/drivers/net/Makefile b/tools/testing/selftests/drivers/net/Makefile
-index 137470bdee0c..f6ec08680f48 100644
---- a/tools/testing/selftests/drivers/net/Makefile
-+++ b/tools/testing/selftests/drivers/net/Makefile
-@@ -1,10 +1,13 @@
- # SPDX-License-Identifier: GPL-2.0
-+CFLAGS += $(KHDR_INCLUDES)
+diff --git a/drivers/net/ethernet/mellanox/mlx5/core/steering/sws/dr_domain.c b/drivers/net/ethernet/mellanox/mlx5/core/steering/sws/dr_domain.c
+index 60cb4527588a..65740bb68b09 100644
+--- a/drivers/net/ethernet/mellanox/mlx5/core/steering/sws/dr_domain.c
++++ b/drivers/net/ethernet/mellanox/mlx5/core/steering/sws/dr_domain.c
+@@ -516,30 +516,6 @@ mlx5dr_domain_create(struct mlx5_core_dev *mdev, enum mlx5dr_domain_type type)
+ 	return NULL;
+ }
  
- TEST_INCLUDES := $(wildcard lib/py/*.py) \
- 		 $(wildcard lib/sh/*.sh) \
- 		 ../../net/net_helper.sh \
- 		 ../../net/lib.sh \
- 
-+TEST_GEN_PROGS := xdp_helper
-+
- TEST_PROGS := \
- 	netcons_basic.sh \
- 	netcons_overflow.sh \
-diff --git a/tools/testing/selftests/drivers/net/queues.py b/tools/testing/selftests/drivers/net/queues.py
-index 38303da957ee..55c2b296ad3c 100755
---- a/tools/testing/selftests/drivers/net/queues.py
-+++ b/tools/testing/selftests/drivers/net/queues.py
-@@ -8,7 +8,10 @@ from lib.py import NetDrvEnv
- from lib.py import cmd, defer, ip
- import errno
- import glob
+-/* Assure synchronization of the device steering tables with updates made by SW
+- * insertion.
+- */
+-int mlx5dr_domain_sync(struct mlx5dr_domain *dmn, u32 flags)
+-{
+-	int ret = 0;
 -
-+import os
-+import socket
-+import struct
-+import subprocess
+-	if (flags & MLX5DR_DOMAIN_SYNC_FLAGS_SW) {
+-		mlx5dr_domain_lock(dmn);
+-		ret = mlx5dr_send_ring_force_drain(dmn);
+-		mlx5dr_domain_unlock(dmn);
+-		if (ret) {
+-			mlx5dr_err(dmn, "Force drain failed flags: %d, ret: %d\n",
+-				   flags, ret);
+-			return ret;
+-		}
+-	}
+-
+-	if (flags & MLX5DR_DOMAIN_SYNC_FLAGS_HW)
+-		ret = mlx5dr_cmd_sync_steering(dmn->mdev);
+-
+-	return ret;
+-}
+-
+ int mlx5dr_domain_destroy(struct mlx5dr_domain *dmn)
+ {
+ 	if (WARN_ON_ONCE(refcount_read(&dmn->refcount) > 1))
+diff --git a/drivers/net/ethernet/mellanox/mlx5/core/steering/sws/dr_send.c b/drivers/net/ethernet/mellanox/mlx5/core/steering/sws/dr_send.c
+index f57c84e5128b..4fd4e8483382 100644
+--- a/drivers/net/ethernet/mellanox/mlx5/core/steering/sws/dr_send.c
++++ b/drivers/net/ethernet/mellanox/mlx5/core/steering/sws/dr_send.c
+@@ -1331,36 +1331,3 @@ void mlx5dr_send_ring_free(struct mlx5dr_domain *dmn,
+ 	kfree(send_ring->sync_buff);
+ 	kfree(send_ring);
+ }
+-
+-int mlx5dr_send_ring_force_drain(struct mlx5dr_domain *dmn)
+-{
+-	struct mlx5dr_send_ring *send_ring = dmn->send_ring;
+-	struct postsend_info send_info = {};
+-	u8 data[DR_STE_SIZE];
+-	int num_of_sends_req;
+-	int ret;
+-	int i;
+-
+-	/* Sending this amount of requests makes sure we will get drain */
+-	num_of_sends_req = send_ring->signal_th * TH_NUMS_TO_DRAIN / 2;
+-
+-	/* Send fake requests forcing the last to be signaled */
+-	send_info.write.addr = (uintptr_t)data;
+-	send_info.write.length = DR_STE_SIZE;
+-	send_info.write.lkey = 0;
+-	/* Using the sync_mr in order to write/read */
+-	send_info.remote_addr = (uintptr_t)send_ring->sync_mr->addr;
+-	send_info.rkey = send_ring->sync_mr->mkey;
+-
+-	for (i = 0; i < num_of_sends_req; i++) {
+-		ret = dr_postsend_icm_data(dmn, &send_info);
+-		if (ret)
+-			return ret;
+-	}
+-
+-	spin_lock(&send_ring->lock);
+-	ret = dr_handle_pending_wc(dmn, send_ring);
+-	spin_unlock(&send_ring->lock);
+-
+-	return ret;
+-}
+diff --git a/drivers/net/ethernet/mellanox/mlx5/core/steering/sws/dr_types.h b/drivers/net/ethernet/mellanox/mlx5/core/steering/sws/dr_types.h
+index 7618c6147f86..cc328292bf84 100644
+--- a/drivers/net/ethernet/mellanox/mlx5/core/steering/sws/dr_types.h
++++ b/drivers/net/ethernet/mellanox/mlx5/core/steering/sws/dr_types.h
+@@ -1473,7 +1473,6 @@ struct mlx5dr_send_ring {
+ int mlx5dr_send_ring_alloc(struct mlx5dr_domain *dmn);
+ void mlx5dr_send_ring_free(struct mlx5dr_domain *dmn,
+ 			   struct mlx5dr_send_ring *send_ring);
+-int mlx5dr_send_ring_force_drain(struct mlx5dr_domain *dmn);
+ int mlx5dr_send_postsend_ste(struct mlx5dr_domain *dmn,
+ 			     struct mlx5dr_ste *ste,
+ 			     u8 *data,
+diff --git a/drivers/net/ethernet/mellanox/mlx5/core/steering/sws/mlx5dr.h b/drivers/net/ethernet/mellanox/mlx5/core/steering/sws/mlx5dr.h
+index 0bb3724c10c2..fc8a2169d1a1 100644
+--- a/drivers/net/ethernet/mellanox/mlx5/core/steering/sws/mlx5dr.h
++++ b/drivers/net/ethernet/mellanox/mlx5/core/steering/sws/mlx5dr.h
+@@ -45,8 +45,6 @@ mlx5dr_domain_create(struct mlx5_core_dev *mdev, enum mlx5dr_domain_type type);
  
- def sys_get_queues(ifname, qtype='rx') -> int:
-     folders = glob.glob(f'/sys/class/net/{ifname}/queues/{qtype}-*')
-@@ -21,6 +24,34 @@ def nl_get_queues(cfg, nl, qtype='rx'):
-         return len([q for q in queues if q['type'] == qtype])
-     return None
+ int mlx5dr_domain_destroy(struct mlx5dr_domain *domain);
  
-+def check_xdp(cfg, nl, xdp_queue_id=0) -> None:
-+    test_dir = os.path.dirname(os.path.realpath(__file__))
-+    xdp = subprocess.Popen([f"{test_dir}/xdp_helper", f"{cfg.ifindex}", f"{xdp_queue_id}"],
-+                           stdin=subprocess.PIPE, stdout=subprocess.PIPE, bufsize=1,
-+                           text=True)
-+    defer(xdp.kill)
-+
-+    stdout, stderr = xdp.communicate(timeout=10)
-+    rx = tx = False
-+
-+    queues = nl.queue_get({'ifindex': cfg.ifindex}, dump=True)
-+    if not queues:
-+        raise KsftSkipEx("Netlink reports no queues")
-+
-+    for q in queues:
-+        if q['id'] == 0:
-+            if q['type'] == 'rx':
-+                rx = True
-+            if q['type'] == 'tx':
-+                tx = True
-+
-+            ksft_eq(q['xsk'], {})
-+        else:
-+            if 'xsk' in q:
-+                _fail("Check failed: xsk attribute set.")
-+
-+    ksft_eq(rx, True)
-+    ksft_eq(tx, True)
- 
- def get_queues(cfg, nl) -> None:
-     snl = NetdevFamily(recv_size=4096)
-@@ -81,7 +112,7 @@ def check_down(cfg, nl) -> None:
- 
- def main() -> None:
-     with NetDrvEnv(__file__, queue_count=100) as cfg:
--        ksft_run([get_queues, addremove_queues, check_down], args=(cfg, NetdevFamily()))
-+        ksft_run([get_queues, addremove_queues, check_down, check_xdp], args=(cfg, NetdevFamily()))
-     ksft_exit()
- 
- 
-diff --git a/tools/testing/selftests/drivers/net/xdp_helper.c b/tools/testing/selftests/drivers/net/xdp_helper.c
-new file mode 100644
-index 000000000000..8ed5f0e7233e
---- /dev/null
-+++ b/tools/testing/selftests/drivers/net/xdp_helper.c
-@@ -0,0 +1,90 @@
-+// SPDX-License-Identifier: GPL-2.0
-+#include <stdio.h>
-+#include <stdlib.h>
-+#include <string.h>
-+#include <unistd.h>
-+#include <sys/mman.h>
-+#include <sys/socket.h>
-+#include <linux/if_xdp.h>
-+#include <linux/if_link.h>
-+#include <net/if.h>
-+#include <inttypes.h>
-+
-+#define UMEM_SZ (1U << 16)
-+#define NUM_DESC (UMEM_SZ / 2048)
-+
-+/**
-+ * this is a simple helper program that creates an XDP socket and does the
-+ * minimum necessary to get bind() to succeed.
-+ *
-+ * this test program is not intended to actually process packets, but could be
-+ * extended in the future if that is actually needed.
-+ *
-+ * it is used by queues.py to ensure the xsk netlinux attribute is set
-+ * correctly.
-+ */
-+int main(int argc, char **argv)
-+{
-+	struct xdp_umem_reg umem_reg = { 0 };
-+	struct sockaddr_xdp sxdp = { 0 };
-+	int num_desc = NUM_DESC;
-+	void *umem_area;
-+	int ifindex;
-+	int sock_fd;
-+	int queue;
-+	char byte;
-+
-+	if (argc != 3) {
-+		fprintf(stderr, "Usage: %s ifindex queue_id", argv[0]);
-+		return 1;
-+	}
-+
-+	sock_fd = socket(AF_XDP, SOCK_RAW, 0);
-+	if (sock_fd < 0) {
-+		perror("socket creation failed");
-+		return 1;
-+	}
-+
-+	ifindex = atoi(argv[1]);
-+	queue = atoi(argv[2]);
-+
-+	umem_area = mmap(NULL, UMEM_SZ, PROT_READ | PROT_WRITE, MAP_PRIVATE |
-+			MAP_ANONYMOUS, -1, 0);
-+	if (umem_area == MAP_FAILED)
-+		return -1;
-+
-+	umem_reg.addr = (uintptr_t)umem_area;
-+	umem_reg.len = UMEM_SZ;
-+	umem_reg.chunk_size = 2048;
-+	umem_reg.headroom = 0;
-+
-+	setsockopt(sock_fd, SOL_XDP, XDP_UMEM_REG, &umem_reg,
-+		   sizeof(umem_reg));
-+	setsockopt(sock_fd, SOL_XDP, XDP_UMEM_FILL_RING, &num_desc,
-+		   sizeof(num_desc));
-+	setsockopt(sock_fd, SOL_XDP, XDP_UMEM_COMPLETION_RING, &num_desc,
-+		   sizeof(num_desc));
-+	setsockopt(sock_fd, SOL_XDP, XDP_RX_RING, &num_desc, sizeof(num_desc));
-+
-+	sxdp.sxdp_family = AF_XDP;
-+	sxdp.sxdp_ifindex = ifindex;
-+	sxdp.sxdp_queue_id = queue;
-+	sxdp.sxdp_flags = 0;
-+
-+	if (bind(sock_fd, (struct sockaddr *)&sxdp, sizeof(sxdp)) != 0) {
-+		perror("bind failed");
-+		close(sock_fd);
-+		return 1;
-+	}
-+
-+	/* give the parent program some data when the socket is ready*/
-+	fprintf(stdout, "%d\n", sock_fd);
-+
-+	/* parent program will write a byte to stdin when its ready for this
-+	 * helper to exit
-+	 */
-+	read(STDIN_FILENO, &byte, 1);
-+
-+	close(sock_fd);
-+	return 0;
-+}
+-int mlx5dr_domain_sync(struct mlx5dr_domain *domain, u32 flags);
+-
+ void mlx5dr_domain_set_peer(struct mlx5dr_domain *dmn,
+ 			    struct mlx5dr_domain *peer_dmn,
+ 			    u16 peer_vhca_id);
 -- 
-2.25.1
+2.48.1
 
 
