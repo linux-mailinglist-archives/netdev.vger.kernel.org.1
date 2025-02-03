@@ -1,209 +1,189 @@
-Return-Path: <netdev+bounces-162002-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-162003-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id EEE23A25133
-	for <lists+netdev@lfdr.de>; Mon,  3 Feb 2025 03:08:02 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6B6E9A2516C
+	for <lists+netdev@lfdr.de>; Mon,  3 Feb 2025 03:47:26 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id AC5F2188497B
-	for <lists+netdev@lfdr.de>; Mon,  3 Feb 2025 02:08:07 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 0ACAD1883CBB
+	for <lists+netdev@lfdr.de>; Mon,  3 Feb 2025 02:47:31 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D0A9A12E7F;
-	Mon,  3 Feb 2025 02:07:57 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=treblig.org header.i=@treblig.org header.b="ASOfH7nX"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6C52C7082B;
+	Mon,  3 Feb 2025 02:45:16 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mx.treblig.org (mx.treblig.org [46.235.229.95])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BB3BC2A1C9;
-	Mon,  3 Feb 2025 02:07:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=46.235.229.95
+Received: from mx.socionext.com (mx.socionext.com [202.248.49.38])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8AD0570803;
+	Mon,  3 Feb 2025 02:45:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=202.248.49.38
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1738548477; cv=none; b=RuPPhb22UkA1LQJSeNtjHEQ5uJUScRSmrVGANfGxSonQPlvJmPIvBBx+PO8nspg5c4lbdu4Rk92gOMl1wsu+h/yzKxZRj9wv2msmtf+QXiynRST4ypuJa8jKhmIhtvzkfuEpp7yCTFGQ0cX/t2WZno4xar+JbfsHuxUlaJjm59U=
+	t=1738550716; cv=none; b=Sq13JAosIAfxxqULO0eWB85vJGFlcJkS0i7S2mq2pabVGj3WYJNuDZFQuHyYNOiQpvYMzt2EDnnZmIImrVCaFIpKS4DIws4tVb2Nc+lyImOW0NhSpMHv9tNb6fZh3NDkNSm+TTvvG0AziXd9Pz3L8KxVUdP+a2kwK3eiWHPDrBI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1738548477; c=relaxed/simple;
-	bh=wM5JKs2VrkY+2Ns9prRRGqSjkqtzOmYrYFesP1QwiKc=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=MA468LsomAgG5lRDEPKn95KVGwx9ES8JG4eQNwUZ7Ynvb4kg/spG5v+Khz8O1gR7ly3A6TJ04JHHTZoh/OL7fIu/uif6pR38f/C/3vnHXxMmrUQud2L4Hu0GprXmX6q1p/YvNlgilusIjRs+Wry9eoj3TnXZ7CRgI1lAsQHhNDU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=treblig.org; spf=pass smtp.mailfrom=treblig.org; dkim=pass (2048-bit key) header.d=treblig.org header.i=@treblig.org header.b=ASOfH7nX; arc=none smtp.client-ip=46.235.229.95
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=treblig.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=treblig.org
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=treblig.org
-	; s=bytemarkmx; h=MIME-Version:Message-ID:Date:Subject:From:Content-Type:From
-	:Subject; bh=Xzk/e1yuIM8mk0vycxZvqalEYX9nnB92dHj7/duvLM8=; b=ASOfH7nXcPUvWWpR
-	2qCUPrxh4Xbwtp+FVs+hcKzaSXGiPAVNe1bfpp1MWh61MaZ08rqOr6ziZf+bcLayWx9TeLaDMW7xM
-	5FPogiuld9bsiL1u3r0k8oq533jFbixq2bFNv9ZuOh7NHbxbDMaEK+/a/keRBPoqgtSTp7L8ExsSG
-	O1PmhMGhFlp1whYjW+YnAL9AJGbUvqvu4hYcmzjF8VMOfjfLAbSLPrK3NtLHwkoj9hNtrqxq4vp97
-	5r7BN6J6M2X4I8BzgVV9zvz8qn1KRkzPIpouwxv9UaNag7ttWsPqEWOJVbP7E/xhIDGncw+63Cjwd
-	Va0WXlhh7QRCFnBxNw==;
-Received: from localhost ([127.0.0.1] helo=dalek.home.treblig.org)
-	by mx.treblig.org with esmtp (Exim 4.96)
-	(envelope-from <linux@treblig.org>)
-	id 1telsG-00DAMr-0l;
-	Mon, 03 Feb 2025 02:07:44 +0000
-From: linux@treblig.org
-To: trondmy@kernel.org,
-	anna@kernel.org,
-	chuck.lever@oracle.com,
-	jlayton@kernel.org,
-	neilb@suse.de,
-	okorniev@redhat.com,
-	Dai.Ngo@oracle.com,
-	tom@talpey.com
-Cc: davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	horms@kernel.org,
-	linux-nfs@vger.kernel.org,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	"Dr. David Alan Gilbert" <linux@treblig.org>
-Subject: [PATCH] SUNRPC: Remove unused make_checksum
-Date: Mon,  3 Feb 2025 02:07:43 +0000
-Message-ID: <20250203020743.280722-1-linux@treblig.org>
-X-Mailer: git-send-email 2.48.1
+	s=arc-20240116; t=1738550716; c=relaxed/simple;
+	bh=5RB+ANAI/sMP6FypfR/rEHg7UPsxBcpF3uvlCMQl0P0=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=Q7+5Ud33XVHyI3lcByWuyudzDSpHIFUUIb71vzFK+R95HR7yLqQpzGvJvfqYQrK/570GvMKzZp6XWpxuedDhCHjcnyRuzeKUdvqKvQIn5d68aGrtE1tZCvpaUhAhi1Ux4WuWw9xlH73U/mrATuHckVVdu8X1fSWVWXIUhpkHBRM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=socionext.com; spf=pass smtp.mailfrom=socionext.com; arc=none smtp.client-ip=202.248.49.38
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=socionext.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=socionext.com
+Received: from unknown (HELO iyokan2-ex.css.socionext.com) ([172.31.9.54])
+  by mx.socionext.com with ESMTP; 03 Feb 2025 11:45:06 +0900
+Received: from mail.mfilter.local (mail-arc01.css.socionext.com [10.213.46.36])
+	by iyokan2-ex.css.socionext.com (Postfix) with ESMTP id 86B522006FCC;
+	Mon,  3 Feb 2025 11:45:06 +0900 (JST)
+Received: from iyokan2.css.socionext.com ([172.31.9.53]) by m-FILTER with ESMTP; Mon, 3 Feb 2025 11:45:06 +0900
+Received: from [10.212.246.222] (unknown [10.212.246.222])
+	by iyokan2.css.socionext.com (Postfix) with ESMTP id EC03D388;
+	Mon,  3 Feb 2025 11:45:05 +0900 (JST)
+Message-ID: <905127b5-96c8-4866-8f69-d9d8a7091c99@socionext.com>
+Date: Mon, 3 Feb 2025 11:45:05 +0900
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net v4 3/3] net: stmmac: Specify hardware capability value
+ when FIFO size isn't specified
+To: "Russell King (Oracle)" <linux@armlinux.org.uk>,
+ Guenter Roeck <linux@roeck-us.net>
+Cc: Alexandre Torgue <alexandre.torgue@foss.st.com>,
+ Jose Abreu <joabreu@synopsys.com>, Andrew Lunn <andrew+netdev@lunn.ch>,
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ Maxime Coquelin <mcoquelin.stm32@gmail.com>,
+ Yanteng Si <si.yanteng@linux.dev>, Furong Xu <0x1207@gmail.com>,
+ Joao Pinto <Joao.Pinto@synopsys.com>, netdev@vger.kernel.org,
+ linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org
+References: <20250127013820.2941044-1-hayashi.kunihiko@socionext.com>
+ <20250127013820.2941044-4-hayashi.kunihiko@socionext.com>
+ <4e98f967-f636-46fb-9eca-d383b9495b86@roeck-us.net>
+ <Z56FmH968FUGkC5J@shell.armlinux.org.uk>
+Content-Language: en-US
+From: Kunihiko Hayashi <hayashi.kunihiko@socionext.com>
+In-Reply-To: <Z56FmH968FUGkC5J@shell.armlinux.org.uk>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-From: "Dr. David Alan Gilbert" <linux@treblig.org>
+Hi all,
 
-Commit ec596aaf9b48 ("SUNRPC: Remove code behind
-CONFIG_RPCSEC_GSS_KRB5_SIMPLIFIED") was the last user of the
-make_checksum() function.
+On 2025/02/02 5:35, Russell King (Oracle) wrote:
+> On Sat, Feb 01, 2025 at 11:14:41AM -0800, Guenter Roeck wrote:
+>> Hi,
+>>
+>> On Mon, Jan 27, 2025 at 10:38:20AM +0900, Kunihiko Hayashi wrote:
+>>> When Tx/Rx FIFO size is not specified in advance, the driver checks if
+>>> the value is zero and sets the hardware capability value in functions
+>>> where that value is used.
+>>>
+>>> Consolidate the check and settings into function stmmac_hw_init() and
+>>> remove redundant other statements.
+>>>
+>>> If FIFO size is zero and the hardware capability also doesn't have
+> upper
+>>> limit values, return with an error message.
+>>>
+>>> Signed-off-by: Kunihiko Hayashi <hayashi.kunihiko@socionext.com>
+>>
+>> This patch breaks qemu's stmmac emulation, for example for
+>> npcm750-evb. The error message is:
+>> 	stmmaceth f0804000.eth: Can't specify Rx FIFO size
 
-Remove it.
+Sorry for inconvenience.
 
-Signed-off-by: Dr. David Alan Gilbert <linux@treblig.org>
+> Interesting. I looked at QEMU to see whether anything in the Debian
+> stable version of QEMU might possibly have STMMAC emulation, but
+> drew a blank... Even trying to find where in QEMU it emulates the
+> STMMAC. I do see that it does include this, so maybe I can use that
+> to test some of my stmmac changes. Thanks!
+> 
+>> The setup function called for the emulated hardware is
+> dwmac1000_setup().
+>> That function does not set the DMA rx or tx fifo size.
+>>
+>> At the same time, the rx and tx fifo size is not provided in the
+>> devicetree file (nuvoton-npcm750.dtsi), so the failure is obvious.
+>>
+>> I understand that the real hardware may be based on a more recent
+>> version of the DWMAC IP which provides the DMA tx/rx fifo size, but
+>> I do wonder: Are the benefits of this patch so substantial that it
+>> warrants breaking the qemu emulation of this network interface > 
+> Please see my message sent a while back on an earlier revision of this
+> patch series. I reviewed the stmmac driver for the fifo sizes and
+> documented what I found.
+> 
+> https://lore.kernel.org/r/Z4_ZilVFKacuAUE8@shell.armlinux.org.uk
+> 
+> To save clicking on the link, I'll reproduce the relevant part below.
+> It appears that dwmac1000 has no way to specify the FIFO size, and
+> thus would have priv->dma_cap.rx_fifo_size and
+> priv->dma_cap.tx_fifo_size set to zero.
+> 
+> Given the responses, I'm now of the opinion that the patch series is
+> wrong, and probably should be reverted - I never really understood
+> the motivation why the series was necessary. It seemed to me to be a
+> "wouldn't it be nice if" series rather than something that is
+> functionally necessary.
+> 
+> 
+> Here's the extract from my previous email:
+> 
+> Now looking at the defintions:
+> 
+> drivers/net/ethernet/stmicro/stmmac/dwmac4.h:#define GMAC_HW_RXFIFOSIZE
+> GENMASK(4, 0)
+> drivers/net/ethernet/stmicro/stmmac/dwxgmac2.h:#define
+> XGMAC_HWFEAT_RXFIFOSIZE GENMASK(4, 0)
+> 
+> So there's a 5-bit bitfield that describes the receive FIFO size for
+> these two MACs. Then we have:
+> 
+> drivers/net/ethernet/stmicro/stmmac/common.h:#define
+> DMA_HW_FEAT_RXFIFOSIZE    0x00080000       /* Rx FIFO > 2048 Bytes */
+> 
+> which is used here:
+> 
+> drivers/net/ethernet/stmicro/stmmac/dwmac1000_dma.c:
+> dma_cap->rxfifo_over_2048 = (hw_cap & DMA_HW_FEAT_RXFIFOSIZE) >> 19;
+> 
+> which is only used to print a Y/N value in a debugfs file, otherwise
+> having no bearing on driver behaviour.
+> 
+> So, I suspect MACs other than xgmac2 or dwmac4 do not have the ability
+> to describe the hardware FIFO sizes in hardware, thus why there's the
+> override and no checking of what the platform provided - and doing so
+> would break the driver. This is my interpretation from the code alone.
+> 
+
+The {tx,rx}_queus_to_use are referenced in stmmac_ethtool.c, stmmac_tc.c,
+and stmmac_selftests.c as the number of queues, so I've thought that
+these variables should not be non-zero.
+
+However, currently the variables are allowed to be zero, so I understand
+this patch 3/3 breaks on the chips that hasn't hardware capabilities.
+
+In hwif.c, stmmac_hw[] defines four patterns of hardwares:
+
+"dwmac100"  .gmac=false, .gmac4=false, .xgmac=false, .get_hw_feature = NULL
+"dwmac1000" .gmac=true,  .gmac4=false, .xgmac=false, .get_hw_feature = dwmac1000_get_hw_feature()
+"dwmac4"    .gmac=false, .gmac4=true,  .xgmac=false, .get_hw_feature = dwmac4_get_hw_feature()
+"dwxgmac2"  .gmac=false, .gmac4=false, .xgmac=true , .get_hw_feature = dwxgmac2_get_hw_feature()
+
+As Russell said, the dwmac100 can't get the number of queues from the hardware
+capability. And some environments (at least QEMU device that Guenter said)
+seems the capability values are zero in spite of dwmac1000.
+
+Since I can't test all of the device patterns, so I appreciate checking each
+hardware and finding the issue.
+
+The patch 3/3 includes some cleanup and code reduction, though, I think
+it would be better to revert it once.
+
+Thank you,
+
 ---
- net/sunrpc/auth_gss/gss_krb5_crypto.c   | 90 -------------------------
- net/sunrpc/auth_gss/gss_krb5_internal.h |  4 --
- 2 files changed, 94 deletions(-)
-
-diff --git a/net/sunrpc/auth_gss/gss_krb5_crypto.c b/net/sunrpc/auth_gss/gss_krb5_crypto.c
-index 7e09b15c5538..8f2d65c1e831 100644
---- a/net/sunrpc/auth_gss/gss_krb5_crypto.c
-+++ b/net/sunrpc/auth_gss/gss_krb5_crypto.c
-@@ -148,96 +148,6 @@ checksummer(struct scatterlist *sg, void *data)
- 	return crypto_ahash_update(req);
- }
- 
--/*
-- * checksum the plaintext data and hdrlen bytes of the token header
-- * The checksum is performed over the first 8 bytes of the
-- * gss token header and then over the data body
-- */
--u32
--make_checksum(struct krb5_ctx *kctx, char *header, int hdrlen,
--	      struct xdr_buf *body, int body_offset, u8 *cksumkey,
--	      unsigned int usage, struct xdr_netobj *cksumout)
--{
--	struct crypto_ahash *tfm;
--	struct ahash_request *req;
--	struct scatterlist              sg[1];
--	int err = -1;
--	u8 *checksumdata;
--	unsigned int checksumlen;
--
--	if (cksumout->len < kctx->gk5e->cksumlength) {
--		dprintk("%s: checksum buffer length, %u, too small for %s\n",
--			__func__, cksumout->len, kctx->gk5e->name);
--		return GSS_S_FAILURE;
--	}
--
--	checksumdata = kmalloc(GSS_KRB5_MAX_CKSUM_LEN, GFP_KERNEL);
--	if (checksumdata == NULL)
--		return GSS_S_FAILURE;
--
--	tfm = crypto_alloc_ahash(kctx->gk5e->cksum_name, 0, CRYPTO_ALG_ASYNC);
--	if (IS_ERR(tfm))
--		goto out_free_cksum;
--
--	req = ahash_request_alloc(tfm, GFP_KERNEL);
--	if (!req)
--		goto out_free_ahash;
--
--	ahash_request_set_callback(req, CRYPTO_TFM_REQ_MAY_SLEEP, NULL, NULL);
--
--	checksumlen = crypto_ahash_digestsize(tfm);
--
--	if (cksumkey != NULL) {
--		err = crypto_ahash_setkey(tfm, cksumkey,
--					  kctx->gk5e->keylength);
--		if (err)
--			goto out;
--	}
--
--	err = crypto_ahash_init(req);
--	if (err)
--		goto out;
--	sg_init_one(sg, header, hdrlen);
--	ahash_request_set_crypt(req, sg, NULL, hdrlen);
--	err = crypto_ahash_update(req);
--	if (err)
--		goto out;
--	err = xdr_process_buf(body, body_offset, body->len - body_offset,
--			      checksummer, req);
--	if (err)
--		goto out;
--	ahash_request_set_crypt(req, NULL, checksumdata, 0);
--	err = crypto_ahash_final(req);
--	if (err)
--		goto out;
--
--	switch (kctx->gk5e->ctype) {
--	case CKSUMTYPE_RSA_MD5:
--		err = krb5_encrypt(kctx->seq, NULL, checksumdata,
--				   checksumdata, checksumlen);
--		if (err)
--			goto out;
--		memcpy(cksumout->data,
--		       checksumdata + checksumlen - kctx->gk5e->cksumlength,
--		       kctx->gk5e->cksumlength);
--		break;
--	case CKSUMTYPE_HMAC_SHA1_DES3:
--		memcpy(cksumout->data, checksumdata, kctx->gk5e->cksumlength);
--		break;
--	default:
--		BUG();
--		break;
--	}
--	cksumout->len = kctx->gk5e->cksumlength;
--out:
--	ahash_request_free(req);
--out_free_ahash:
--	crypto_free_ahash(tfm);
--out_free_cksum:
--	kfree(checksumdata);
--	return err ? GSS_S_FAILURE : 0;
--}
--
- /**
-  * gss_krb5_checksum - Compute the MAC for a GSS Wrap or MIC token
-  * @tfm: an initialized hash transform
-diff --git a/net/sunrpc/auth_gss/gss_krb5_internal.h b/net/sunrpc/auth_gss/gss_krb5_internal.h
-index 0bda0078d7d8..8769e9e705bf 100644
---- a/net/sunrpc/auth_gss/gss_krb5_internal.h
-+++ b/net/sunrpc/auth_gss/gss_krb5_internal.h
-@@ -155,10 +155,6 @@ static inline int krb5_derive_key(struct krb5_ctx *kctx,
- 
- void krb5_make_confounder(u8 *p, int conflen);
- 
--u32 make_checksum(struct krb5_ctx *kctx, char *header, int hdrlen,
--		  struct xdr_buf *body, int body_offset, u8 *cksumkey,
--		  unsigned int usage, struct xdr_netobj *cksumout);
--
- u32 gss_krb5_checksum(struct crypto_ahash *tfm, char *header, int hdrlen,
- 		      const struct xdr_buf *body, int body_offset,
- 		      struct xdr_netobj *cksumout);
--- 
-2.48.1
-
+Best Regards
+Kunihiko Hayashi
 
