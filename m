@@ -1,167 +1,192 @@
-Return-Path: <netdev+bounces-162035-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-162036-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id B8F3FA25693
-	for <lists+netdev@lfdr.de>; Mon,  3 Feb 2025 11:02:48 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id D55B4A2569A
+	for <lists+netdev@lfdr.de>; Mon,  3 Feb 2025 11:05:23 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 84839188315A
-	for <lists+netdev@lfdr.de>; Mon,  3 Feb 2025 10:02:53 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id A07F618825B3
+	for <lists+netdev@lfdr.de>; Mon,  3 Feb 2025 10:05:28 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D85A278F49;
-	Mon,  3 Feb 2025 10:02:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 713E920012B;
+	Mon,  3 Feb 2025 10:05:19 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="rE100XoE"
+	dkim=pass (2048-bit key) header.d=queasysnail.net header.i=@queasysnail.net header.b="UzAOEhaJ";
+	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="ncrkRvQ0"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from fhigh-a7-smtp.messagingengine.com (fhigh-a7-smtp.messagingengine.com [103.168.172.158])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A867218651;
-	Mon,  3 Feb 2025 10:02:41 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AB9DE1FBE89;
+	Mon,  3 Feb 2025 10:05:16 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=103.168.172.158
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1738576962; cv=none; b=RnJw18TBgA7S+CpmhnX360KiTizoMtNv334ZNobjGf7sO5TDEeechYM35RqcG4LlFK730kUJmzzXwB3JCsZuSpetG/NO0J8p49cak7wxqWtMussk7rjszpLye2t7Yz0RiyJbYsZoJ7RGRukYQBbvAW6AMdz3Lbu2tGPfpKRAyVY=
+	t=1738577119; cv=none; b=YmHeTJrI6sC/vK8xKfuBRh/EFI9HTZBLc47qirWrk2bJygzhVnB2aUQRXv0R7QgvzgwCPXP4cyrKlJqsfeC1+0se18//YeDT9ES0jTBWT3tzSZIBueuLZpf8QOC8vl5/Y3RJORUzFyWrDWYGqRyipeJa8iyDnjzQ4ugD7ptyd74=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1738576962; c=relaxed/simple;
-	bh=j64qVmWci3xBNkGE0mS2OOj0BR2pEsdKu6w5rANbRP4=;
+	s=arc-20240116; t=1738577119; c=relaxed/simple;
+	bh=3HHG+wimANz9PCn4LqlAg/P/yA1akIgyINNXDfylSfU=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=u50LuZgY8MsxniNRY42DhxaKEeQwC5YHuM8ka0HBu5OVM9ilt5/y8Przb+9TbSl/ijnK2FnbbyMdp+N76qS/YCU+HTHi0KFzLB7oIWN46Loo5cdXzDT5hS0wI1Mpm6G1kpfw1liaudfoBjsxyrAGDJROpBP09FMIW2zx5bBtPGE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=rE100XoE; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 61A8BC4CED2;
-	Mon,  3 Feb 2025 10:02:39 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1738576961;
-	bh=j64qVmWci3xBNkGE0mS2OOj0BR2pEsdKu6w5rANbRP4=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=rE100XoEQCDq/GAsA/kFJsCV1lURPiPFtj6MKbrKUU5SNDELwgYo3zmqtzFhOmi9Y
-	 xNgN4y0dRzaxjWTc5bvZD1fZYk0nhWkam/HxMmGz6MTsC7r8uJZZUz37pr79OXvAFX
-	 84gFWn4bWVo7iQ2nXiX9FfL9zEYY4Qd6PFTlEWA+ueXhrz7687HjBmAYJM4l+fxoeT
-	 ZVucXR5qfZT0yZmYjCApK3pwM43twtCrKiH/Kqmo6YAV6qSCQhmNtOFgUwImewlCqK
-	 oQN3um9/oF1nhPTSFbbA5DwmuWMzSmZhJV8pHn5MisZNDP9Lv1WyM+GT+ceZ+ksT1N
-	 iNf4litnb2bcA==
-Date: Mon, 3 Feb 2025 10:02:36 +0000
-From: Simon Horman <horms@kernel.org>
-To: Jacob Moroni <mail@jakemoroni.com>
-Cc: Igor Russkikh <irusskikh@marvell.com>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
+	 Content-Type:Content-Disposition:In-Reply-To; b=flkhaYHg795V0cRRzg8XJVzbJT87TD9JI23K3LIAz2SMByynoTKAQuNB1gKGhbMeN1j98rWreVKnvyHd+s0ySwYWVn2PDP8dFAC33FXFWeQKil2UGCSZ9Xcg/s+BkgJ+ZafAZhSGT/9m2xd9viZMDhGJ8RHqdfk2rxB9z+qazr4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=queasysnail.net; spf=pass smtp.mailfrom=queasysnail.net; dkim=pass (2048-bit key) header.d=queasysnail.net header.i=@queasysnail.net header.b=UzAOEhaJ; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=ncrkRvQ0; arc=none smtp.client-ip=103.168.172.158
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=queasysnail.net
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=queasysnail.net
+Received: from phl-compute-05.internal (phl-compute-05.phl.internal [10.202.2.45])
+	by mailfhigh.phl.internal (Postfix) with ESMTP id 88FC111400A2;
+	Mon,  3 Feb 2025 05:05:15 -0500 (EST)
+Received: from phl-mailfrontend-01 ([10.202.2.162])
+  by phl-compute-05.internal (MEProxy); Mon, 03 Feb 2025 05:05:15 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=queasysnail.net;
+	 h=cc:cc:content-type:content-type:date:date:from:from
+	:in-reply-to:in-reply-to:message-id:mime-version:references
+	:reply-to:subject:subject:to:to; s=fm1; t=1738577115; x=
+	1738663515; bh=wiAtp5B6f/uLxzPGB/aY07G4Vjh7/bji9bknfJtXxs0=; b=U
+	zAOEhaJRcQvSEB5oNhR79kQgGXPBh7qV3p/JB/GDI6SS6puuJPg6fLYCK+Qwz20q
+	nxQ17bsZIf7saqNKH7ZuNx2Up3jkFMf2VDcNqubo3ufWy4Ymd8oHB7eUj5gJFS1u
+	SBlWvcOGHl9AfJ2fRowZ9E0W4SDeSLc9npC6vHUe1cL20VbrR+l/vUCHFMfzTa0V
+	r92I7XL+S0CE3ZmFrIKfmuitxlVau8PnBU1BAs+wSvKKch02Xl7pJI+EDbS1K3jd
+	wvZIq+twClXNy7x1w6PfX5hWEWqYmhb+dBboIuWLJ1FC5J2qPVMxNoGzRnQR1Wbb
+	l5qXMTLkYSguly+/2jzCA==
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
+	messagingengine.com; h=cc:cc:content-type:content-type:date:date
+	:feedback-id:feedback-id:from:from:in-reply-to:in-reply-to
+	:message-id:mime-version:references:reply-to:subject:subject:to
+	:to:x-me-proxy:x-me-sender:x-me-sender:x-sasl-enc; s=fm3; t=
+	1738577115; x=1738663515; bh=wiAtp5B6f/uLxzPGB/aY07G4Vjh7/bji9bk
+	nfJtXxs0=; b=ncrkRvQ0xlD/YnkmsY7G2uZPfSj2igsDvJbchnY/Mfjdr+ZWLdH
+	PHm6HKn1i/9PPqfkJlsT66KIsGXjn3pTZE2OnSJzRSD2s+WMS6aC9kjzPdhnOldp
+	EagQPJpj9sB/OFgCpKEvYP1RBOD6g+Wb7Kxz8lnsy9W359fOkmSrhK6jYSdPJ88V
+	3+2YxAOSL+ecyf+pWc93LhdwVDKgfJ/P2cZw8TEQOPQ4v/327cR1ctxWbIxVcHyo
+	XJB3isS8xZkMOXc6hsxUEf5YELQFgs01dSWZhPq76QoI5glVHeUxdUdNzaziYDJk
+	bugUdbwt50+AquaR/xh+2tExXlinOJc+h6w==
+X-ME-Sender: <xms:2pSgZ01glIi_t20VkD7C6hltG5WUQcRnTvZbb_9CVN0klWq5ZpeyDA>
+    <xme:2pSgZ_FKpEpSKLNEePodAd8l8aGGW0KOoSfZLfGbhrNJev5cGJ6DwTtD2cKDm-1xa
+    mKqanLmXChwD1cwHd0>
+X-ME-Received: <xmr:2pSgZ87G1G7cT2zDNzdiqhm3m5qpzu2HJN07VMO5txhvSbuW5fTlh6V3K_7Y>
+X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeefvddrtddtgddujeeftdcutefuodetggdotefrod
+    ftvfcurfhrohhfihhlvgemucfhrghsthforghilhdpggftfghnshhusghstghrihgsvgdp
+    uffrtefokffrpgfnqfghnecuuegrihhlohhuthemuceftddtnecusecvtfgvtghiphhivg
+    hnthhsucdlqddutddtmdenucfjughrpeffhffvvefukfhfgggtuggjsehttdertddttdej
+    necuhfhrohhmpefurggsrhhinhgrucffuhgsrhhotggruceoshgusehquhgvrghshihsnh
+    grihhlrdhnvghtqeenucggtffrrghtthgvrhhnpeevjeehuefguedtudffgfegjeefleek
+    udehgedvjefhgfduhedtveeuvdejffefjeenucffohhmrghinhepshhkpggtsgdrshhkne
+    cuvehluhhsthgvrhfuihiivgeptdenucfrrghrrghmpehmrghilhhfrhhomhepshgusehq
+    uhgvrghshihsnhgrihhlrdhnvghtpdhnsggprhgtphhtthhopedufedpmhhouggvpehsmh
+    htphhouhhtpdhrtghpthhtoheprghnthhonhhiohesohhpvghnvhhpnhdrnhgvthdprhgt
+    phhtthhopehnvghtuggvvhesvhhgvghrrdhkvghrnhgvlhdrohhrghdprhgtphhtthhope
+    gvughumhgriigvthesghhoohhglhgvrdgtohhmpdhrtghpthhtohepkhhusggrsehkvghr
+    nhgvlhdrohhrghdprhgtphhtthhopehprggsvghnihesrhgvughhrghtrdgtohhmpdhrtg
+    hpthhtohepughonhgrlhgurdhhuhhnthgvrhesghhmrghilhdrtghomhdprhgtphhtthho
+    pehshhhurghhsehkvghrnhgvlhdrohhrghdprhgtphhtthhopehrhigriigrnhhovhdrsh
+    drrgesghhmrghilhdrtghomhdprhgtphhtthhopegrnhgurhgvfidonhgvthguvghvsehl
+    uhhnnhdrtghh
+X-ME-Proxy: <xmx:25SgZ90lAYpnraoO-U43dqA_YW3SVrFVU-PPjfH-wNB_AigTnbCV0w>
+    <xmx:25SgZ3FxgZTHd2tGKoC2Zph6RnOahxiBZBc38QffFWG0Qt3S1XJwTg>
+    <xmx:25SgZ29vG5oDfbk15UwNmKc-20A8WkyWtPLq8i1joQZ83UriDeQl0g>
+    <xmx:25SgZ8m9vbJCl6bIumXSjPXVCksJz9XwMV0I1jGHF0Hk6xnOut7p7w>
+    <xmx:25SgZ3HLmOXm8FWCqahYy5yRdgB3J8iUMs2QGqDZt6g3S6ayMBcprMiM>
+Feedback-ID: i934648bf:Fastmail
+Received: by mail.messagingengine.com (Postfix) with ESMTPA; Mon,
+ 3 Feb 2025 05:05:14 -0500 (EST)
+Date: Mon, 3 Feb 2025 11:05:13 +0100
+From: Sabrina Dubroca <sd@queasysnail.net>
+To: Antonio Quartulli <antonio@openvpn.net>
+Cc: netdev@vger.kernel.org, Eric Dumazet <edumazet@google.com>,
 	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH net] net: atlantic: fix warning during hot unplug
-Message-ID: <20250203100236.GB234677@kernel.org>
-References: <20250202220921.13384-2-mail@jakemoroni.com>
+	Donald Hunter <donald.hunter@gmail.com>,
+	Shuah Khan <shuah@kernel.org>, ryazanov.s.a@gmail.com,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	Simon Horman <horms@kernel.org>, linux-kernel@vger.kernel.org,
+	linux-kselftest@vger.kernel.org, Xiao Liang <shaw.leon@gmail.com>
+Subject: Re: [PATCH net-next v18 12/25] ovpn: implement TCP transport
+Message-ID: <Z6CU2emFGy1L3MDT@hog>
+References: <20250113-b4-ovpn-v18-0-1f00db9c2bd6@openvpn.net>
+ <20250113-b4-ovpn-v18-12-1f00db9c2bd6@openvpn.net>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <20250202220921.13384-2-mail@jakemoroni.com>
+In-Reply-To: <20250113-b4-ovpn-v18-12-1f00db9c2bd6@openvpn.net>
 
-On Sun, Feb 02, 2025 at 05:09:21PM -0500, Jacob Moroni wrote:
-> Firmware deinitialization performs MMIO accesses which are not
-> necessary if the device has already been removed. In some cases,
-> these accesses happen via readx_poll_timeout_atomic which ends up
-> timing out, resulting in a warning at hw_atl2_utils_fw.c:112:
-> 
-> [  104.595913] Call Trace:
-> [  104.595915]  <TASK>
-> [  104.595918]  ? show_regs+0x6c/0x80
-> [  104.595923]  ? __warn+0x8d/0x150
-> [  104.595925]  ? aq_a2_fw_deinit+0xcf/0xe0 [atlantic]
-> [  104.595934]  ? report_bug+0x182/0x1b0
-> [  104.595938]  ? handle_bug+0x6e/0xb0
-> [  104.595940]  ? exc_invalid_op+0x18/0x80
-> [  104.595942]  ? asm_exc_invalid_op+0x1b/0x20
-> [  104.595944]  ? aq_a2_fw_deinit+0xcf/0xe0 [atlantic]
-> [  104.595952]  ? aq_a2_fw_deinit+0xcf/0xe0 [atlantic]
-> [  104.595959]  aq_nic_deinit.part.0+0xbd/0xf0 [atlantic]
-> [  104.595964]  aq_nic_deinit+0x17/0x30 [atlantic]
-> [  104.595970]  aq_ndev_close+0x2b/0x40 [atlantic]
-> [  104.595975]  __dev_close_many+0xad/0x160
-> [  104.595978]  dev_close_many+0x99/0x170
-> [  104.595979]  unregister_netdevice_many_notify+0x18b/0xb20
-> [  104.595981]  ? __call_rcu_common+0xcd/0x700
-> [  104.595984]  unregister_netdevice_queue+0xc6/0x110
-> [  104.595986]  unregister_netdev+0x1c/0x30
-> [  104.595988]  aq_pci_remove+0xb1/0xc0 [atlantic]
-> 
-> Fix this by skipping firmware deinitialization altogether if the
-> PCI device is no longer present.
-> 
-> Tested with an AQC113 attached via Thunderbolt by performing
-> repeated unplug cycles while traffic was running via iperf.
-> 
+2025-01-13, 10:31:31 +0100, Antonio Quartulli wrote:
+> +static void ovpn_tcp_rcv(struct strparser *strp, struct sk_buff *skb)
+> +{
+[...]
+> +	/* we need the first byte of data to be accessible
+> +	 * to extract the opcode and the key ID later on
+> +	 */
+> +	if (!pskb_may_pull(skb, 1)) {
 
-Hi Jacob,
+make sure we have 1B...
 
-As a fix for net a Fixes tag should go here
-(immediately before your signed-off-by line, no blank line in between).
+> +		net_warn_ratelimited("%s: packet too small to fetch opcode for peer %u\n",
+> +				     netdev_name(peer->ovpn->dev), peer->id);
+> +		goto err;
+> +	}
+> +
+> +	/* DATA_V2 packets are handled in kernel, the rest goes to user space */
+> +	opcode = ovpn_opcode_from_skb(skb, 0);
 
-I'm wondering if this one is appropriate: the problem seems
-to go all the way back to here.
+but this reads a u32 (4B) from skb->data
 
-Fixes: 97bde5c4f909 ("net: ethernet: aquantia: Support for NIC-specific code")
+[...]
+> +void ovpn_tcp_socket_detach(struct ovpn_socket *ovpn_sock)
+> +{
+> +	struct ovpn_peer *peer = ovpn_sock->peer;
+> +	struct socket *sock = ovpn_sock->sock;
+> +
+> +	strp_stop(&peer->tcp.strp);
+> +
+> +	skb_queue_purge(&peer->tcp.user_queue);
+>
+> +	/* restore CBs that were saved in ovpn_sock_set_tcp_cb() */
+> +	sock->sk->sk_data_ready = peer->tcp.sk_cb.sk_data_ready;
+> +	sock->sk->sk_write_space = peer->tcp.sk_cb.sk_write_space;
+> +	sock->sk->sk_prot = peer->tcp.sk_cb.prot;
+> +	sock->sk->sk_socket->ops = peer->tcp.sk_cb.ops;
+> +
+> +	/* drop reference to peer */
 
-> Signed-off-by: Jacob Moroni <mail@jakemoroni.com>
-> ---
->  drivers/net/ethernet/aquantia/atlantic/aq_nic.c | 15 ++++++++-------
->  1 file changed, 8 insertions(+), 7 deletions(-)
-> 
-> diff --git a/drivers/net/ethernet/aquantia/atlantic/aq_nic.c b/drivers/net/ethernet/aquantia/atlantic/aq_nic.c
-> index fe0e3e2a8117..e2ae95a01947 100644
-> --- a/drivers/net/ethernet/aquantia/atlantic/aq_nic.c
-> +++ b/drivers/net/ethernet/aquantia/atlantic/aq_nic.c
-> @@ -1428,7 +1428,7 @@ void aq_nic_deinit(struct aq_nic_s *self, bool link_down)
->  	unsigned int i = 0U;
->  
->  	if (!self)
-> -		goto err_exit;
-> +		return;
->  
->  	for (i = 0U; i < self->aq_vecs; i++) {
->  		aq_vec = self->aq_vec[i];
+nit: not really :)
 
-This hunk, and the removal of the err_exit label, seem to be more
-clean-up than addressing the bug described in the patch description.
-I don't think they belong in this patch. But could be candidates for
-a follow-up patch targeted at net-next.
+> +	rcu_assign_sk_user_data(sock->sk, NULL);
+> +
+> +	/* before canceling any ongoing work we must ensure that CBs
+> +	 * have been reset to prevent workers from being re-armed
+> +	 */
+> +	barrier();
+> +
+> +	cancel_work_sync(&peer->tcp.tx_work);
+> +	strp_done(&peer->tcp.strp);
+> +	skb_queue_purge(&peer->tcp.out_queue);
 
-> @@ -1441,13 +1441,14 @@ void aq_nic_deinit(struct aq_nic_s *self, bool link_down)
->  	aq_ptp_ring_free(self);
->  	aq_ptp_free(self);
->  
-> -	if (likely(self->aq_fw_ops->deinit) && link_down) {
-> -		mutex_lock(&self->fwreq_mutex);
-> -		self->aq_fw_ops->deinit(self->aq_hw);
-> -		mutex_unlock(&self->fwreq_mutex);
-> +	/* May be invoked during hot unplug. */
-> +	if (pci_device_is_present(self->pdev)) {
-> +		if (likely(self->aq_fw_ops->deinit) && link_down) {
+Also kfree_skb(peer->tcp.out_msg.skb)?
 
-Maybe not important, but I would have written this as a single if
-condition rather than two.
+> +	ovpn_peer_put(peer);
+> +}
 
-Also, not really appropriate to change in this patch as it's not part
-of the bug, but I'm not sure that likely() is appropriate here:
-is this a fast path?
 
-> +			mutex_lock(&self->fwreq_mutex);
-> +			self->aq_fw_ops->deinit(self->aq_hw);
-> +			mutex_unlock(&self->fwreq_mutex);
-> +		}
->  	}
-> -
-> -err_exit:;
->  }
->  
->  void aq_nic_free_vectors(struct aq_nic_s *self)
+[...]
+> +static int ovpn_tcp_sendmsg(struct sock *sk, struct msghdr *msg, size_t size)
+> +{
+[...]
+> +	ret = skb_copy_datagram_from_iter(skb, 0, &msg->msg_iter, size);
+> +	if (ret) {
+> +		kfree_skb(skb);
+> +		net_err_ratelimited("%s: skb copy from iter failed: %d\n",
+> +				    netdev_name(sock->peer->ovpn->dev), ret);
+> +		goto peer_free;
+> +	}
+> +
+> +	ovpn_tcp_send_sock_skb(sock->peer, skb);
+
+This isn't propagating MSG_DONTWAIT down to ovpn_tcp_send_sock?
 
 -- 
-pw-bot: changes-requested
+Sabrina
 
