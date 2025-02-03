@@ -1,79 +1,79 @@
-Return-Path: <netdev+bounces-162232-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-162233-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 011C5A2647D
-	for <lists+netdev@lfdr.de>; Mon,  3 Feb 2025 21:33:56 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 47A1BA2649D
+	for <lists+netdev@lfdr.de>; Mon,  3 Feb 2025 21:36:22 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 0DA797A372F
-	for <lists+netdev@lfdr.de>; Mon,  3 Feb 2025 20:32:52 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 3F46A7A1E6B
+	for <lists+netdev@lfdr.de>; Mon,  3 Feb 2025 20:34:46 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D029920E302;
-	Mon,  3 Feb 2025 20:33:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D255B20E6E7;
+	Mon,  3 Feb 2025 20:35:12 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="O3YD64xi"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="m3PQHQYh"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ej1-f54.google.com (mail-ej1-f54.google.com [209.85.218.54])
+Received: from mail-ed1-f48.google.com (mail-ed1-f48.google.com [209.85.208.48])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 019A320E310
-	for <netdev@vger.kernel.org>; Mon,  3 Feb 2025 20:33:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.54
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0CAD420E02F
+	for <netdev@vger.kernel.org>; Mon,  3 Feb 2025 20:35:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.48
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1738614808; cv=none; b=hlBS42PmOuMe2rfrAewu5HOXOF9b2yquURvGS7dcRgaDjuQjI9az3nz3hr8PTc6mobXmAmVEuLLKNY5UFbOWUd3G/r6SJcfXNIL1/cDJMFKtwaResUZyqvGrpVFkIW39Tl4tNIQYAWBUo4zHAGZPNUCy8DgwH5g869Bl0obx/P8=
+	t=1738614912; cv=none; b=FWaXsVrzjIeS70z0FZihoil22ux/2qtqVqM81n7MX4MC8thylh/I6B9JBnUYyXm5QFP/O8bTmissZ4pX+j/xBltVzDj8pQMGijCerEbRBJ7F/ExBeXHqEG6ZgOu0Q9dZsqP0D3eWqcIyEIgE5L0GVl2UivinViMN33w3ynPcV30=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1738614808; c=relaxed/simple;
-	bh=qdGSp93PxoMRm5g8+B0EO5DiphfRFSpLcGi77I8FSok=;
-	h=Message-ID:Date:MIME-Version:From:Subject:To:Cc:Content-Type; b=B73UooYII5kvDZ+FoD4mQck+8iWGEYluWc5iP2b1wZ18k+e6ImhGy4/pyuyz7AW1dcm8emuAEYr1TyvTHPEori4vxm+Ar5qeP8xUvRUGs6xsMUEK8+93IRgtmJpHTBuQrT/ndnnB7R/oP6r285mdIJ+SNr8YhG4R/kbLDAGlTP8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=O3YD64xi; arc=none smtp.client-ip=209.85.218.54
+	s=arc-20240116; t=1738614912; c=relaxed/simple;
+	bh=zftbiS8Hfywf0TfWipInZ0lxKQgQqcHCaFGIYn3ViCE=;
+	h=Message-ID:Date:MIME-Version:From:Subject:To:Cc:Content-Type; b=lNNnQJ4SvRkU1mPiwJqSvwdlM2soio0xxABZEhkyCGe3sq/GRbc9GFKWs4DzAmWxjYRv3envnT559bQVgf0DcmxITV07zid+kXFrFAW4PpcXdzuxlqr9PQuun4uPBEBi0KupoogxgjRuT7iuWlpfuQ9IFYbWgsiz/qfMWIwatCM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=m3PQHQYh; arc=none smtp.client-ip=209.85.208.48
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ej1-f54.google.com with SMTP id a640c23a62f3a-ab744d5e567so106610766b.1
-        for <netdev@vger.kernel.org>; Mon, 03 Feb 2025 12:33:26 -0800 (PST)
+Received: by mail-ed1-f48.google.com with SMTP id 4fb4d7f45d1cf-5db6890b64eso9339968a12.3
+        for <netdev@vger.kernel.org>; Mon, 03 Feb 2025 12:35:10 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1738614805; x=1739219605; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1738614909; x=1739219709; darn=vger.kernel.org;
         h=content-transfer-encoding:autocrypt:content-language:cc:to:subject
          :from:user-agent:mime-version:date:message-id:from:to:cc:subject
          :date:message-id:reply-to;
-        bh=uCZN9Ji/na9rAvqB5PH0wiowJ2M7ukQii0p8pXqVJrc=;
-        b=O3YD64xi9rkAZZzhBq01C+8RuUv54ZjmDJ9Mr6ZnhQhqljUCxsd3TWszhC/AYyE6L6
-         V4CdiHnPQcoLNN7OOcW7D49ye2+u2GhYpA2w02NsP2BoCahITH8h28pI68L7qI+hInsG
-         ssVubJn417jkMOo8g3XdwU8XDy5cDL4yjsMs7qj/K/VXOEUH1z7g8W2cSUQkzpDmXHVy
-         FzZ7Yzo7ILQJA9WiqfzA3hhGDCAtTC29F69sGiVRUrpyV2ExLJqc+9pb9AFudfOiSxaD
-         ImPeLNKSt7LpLQ3eEvXz2JAjZnkr3gopTdRrfVQeBlMxrVH9PY6WM60M4yJVPzS+g4qO
-         qIwQ==
+        bh=u/q+jS0s3IQVWHRvBVw/r26vnYUdHi6TkFumGF6Z9Yo=;
+        b=m3PQHQYhc7wJyl6l28pEwDW9f6uJk6O4qFsqtROmKCs8yHedztTysqmVfpdC9SUnmG
+         WH+YlNsCEbmdfZwx1fl7k/1J5QBnhQbqfhGbvh1Ob7c/laJT2lgayYU4pQYhxJnmJR4l
+         l0od7zLbf1mupZhY0EOBgxZOVpR2X3r7SjdZiZ9W8OTlmbO6XvQJwvWr9GsoHx7okhXX
+         7NLe9Vr+KE8K93zxA5qkrv6vAnkPb8DQAOqtuaGWm1P7KPfKtWOpXpnlrCkz6Pg5ba13
+         ehgdb/obyOpvl/uEYCn8lveIrkL6BqjcE1OKp0YQY/7fvFhmE+85Svjwlw5H9pqWcoko
+         916g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1738614805; x=1739219605;
+        d=1e100.net; s=20230601; t=1738614909; x=1739219709;
         h=content-transfer-encoding:autocrypt:content-language:cc:to:subject
          :from:user-agent:mime-version:date:message-id:x-gm-message-state
          :from:to:cc:subject:date:message-id:reply-to;
-        bh=uCZN9Ji/na9rAvqB5PH0wiowJ2M7ukQii0p8pXqVJrc=;
-        b=hIJU4MrGKW0JD4li1LDTp2iwrOqnu0kgdRSknAXGufiZYK6t4LsP8hFFcI7M6u5Cbu
-         GHyCS+BlKM/sAcoCwRFy50ej15TbId6prUIS/LGlIst7V4/JT13PpAXg3nUlaiItQmMB
-         fDlsxxZPCx7TAYbjyWv35vk2aVekBzvbKNXgxG++V8qtCuwJyMmkoqIZkNfNww+bHRIK
-         egaH7HttLrQRfnWGgRFFXJubUA8PbSPy4ycBmZYCH9LOpgDmtIG6hMFNgmKZTQR+Zoh5
-         PJ+4MLXsZol9/waiH4Ut0sHjBkC47BKodVqC9NU8BQU/Hw4kmOVzzoYrVm+MtXvoq9JZ
-         W9tA==
-X-Gm-Message-State: AOJu0Yzx+ewv0UrMLyRReJEVg39OMQo22SOEjsYc9i8N/xsvZCE3uZh0
-	cPrSPXDgSQaHbZWLFSnJVAI2B3TwbcRxvDGbT+lESBcintfF5CBp
-X-Gm-Gg: ASbGncuJKxM3dZAC5QcAeyKGBWuXCiMAYaHHiHOHwM8xkcNrzrOrojbWdzos3P/GhvP
-	wiU1a1bIqKi9Pu6vJBS4TjCJWjem09z/TygVdOX6xJzmgPBiDjGhDF3snNnBo4nKzknzxxzcrp+
-	N9DqoJf/GL7yHJzQHy+I3apAxDGqj15Z/8Vz5OtgnrRYJuQMwXTDRGEMRolgpxQGwP+5cdDCdhx
-	R+cXqVJ2M23Or4ax0o927npa2FruCCcF/ruGyjsdG4Nla32NjraWC+9BXnHlcVhd6fQ9SlDItr7
-	G7DkKNsYzfV6m60xiSF4nl5HmLkkEKKxznqmp+Em7e+GHxw0Fmf1OCiVTlAkTrPOTqoGIoL97Gy
-	uGEd0wTimyGebQcz1hNjZMs+4tRurOHUek8Q6JlQ9oiPp3SfhuquvjCMxaVRl9udv5enyC8A3RF
-	XSWjWm/Hk=
-X-Google-Smtp-Source: AGHT+IGIzEm2nKCVAnUDNGKtHEMPvmJEchxzEz3zDaITNdmeX1NENJShlHH/A1BmwrzfvGmZchiM0Q==
-X-Received: by 2002:a17:907:c13:b0:ab6:726e:b14d with SMTP id a640c23a62f3a-ab74854568cmr81598666b.23.1738614804776;
-        Mon, 03 Feb 2025 12:33:24 -0800 (PST)
+        bh=u/q+jS0s3IQVWHRvBVw/r26vnYUdHi6TkFumGF6Z9Yo=;
+        b=XTyVikYKRbHf0IGDf1yPIWPp/gQvn6s+ra5IV+aLXMXcYqkgIfwl8aqWpAjnAYBu1R
+         i43rTUkBJ7cR3qSd2CwRZbgNGvkpiwR6HnGXtPPjsVBHWQzhppTyEAwwiNc1I3Bc4K6L
+         CbiJBxCJrrqLqC/7CZbih42FXirdk+Of7yQ14IdUkCCYPv3Ck5R7oGmFPpzxeWZG4GcJ
+         rjRwKTavws4Bwvw2bAnuVF4cetzyLqtTD6nmqy34qjyTy22RaOnaO8t8Pspgn6CKIZUj
+         ezQxPbWhEaq/yvixmp81RdA/QdbJdWVgFvI1YSJmQC9WXRHXOomeT0/yelsts8GdQ/YZ
+         SjQQ==
+X-Gm-Message-State: AOJu0YxeOhdD4pNla0rSfzEswsDP9EVXttIKpWqmdNRzeFEwgydw5PBA
+	Zt5Dy21rv1ApKIl2x34/egz0tDKKKrEu1LH9iWb16bEDdbCff6q70xYS78K+
+X-Gm-Gg: ASbGncsAvePtKWTzKZDWDPlI3wsvU70jAz1TPaEQZyCUG/JfNHvWiDRMdoyzi97uMXJ
+	7KntuP4iQVSvzCS3CZGs6hv90gUY1yCP59CGo8ziDFfQeMBrsdhn8mOGTNax7Z3EYMsjb2JNP10
+	cXqULPiQSkw5N/kwtvnCObwJWi6gJlFjZkI88k7wJ6UuEbChoECoNIsb5/j3ZVMP/OLaxcLF58G
+	Y+Kls0xy1t/nHf0v+waT+/+e1FQ+MjHr3QGJ7AL1CfxSCl4xxOD2cM5ZUXqaPPfE4mHWUZ48h8D
+	jSoMuAx5lMG7Gj8HrdWb+d0CW+97tiI+wKZx/jWG5+P8EPXudsUXjG/HhCBo19hZPDeWZmRzQf7
+	vuso9N0foysHn3ZQmWCS1PhYLiykIFXflu3PFMIDs1+29CpEIdzHiOtGRIzV/qIi2vT0allcvd2
+	maQkotBS8=
+X-Google-Smtp-Source: AGHT+IFEzKXfra1PqYt2xesNzUI+TuPFJ6Nl1AW8sAI//WQNvn2KCBTfTpIQSIqgVdeUqjJeHa0KzA==
+X-Received: by 2002:a17:907:72c1:b0:aa6:ab70:4a78 with SMTP id a640c23a62f3a-ab6cfda4254mr3078972866b.37.1738614909086;
+        Mon, 03 Feb 2025 12:35:09 -0800 (PST)
 Received: from ?IPV6:2a02:3100:ac6d:8e00:811e:2e8d:e68f:ec04? (dynamic-2a02-3100-ac6d-8e00-811e-2e8d-e68f-ec04.310.pool.telefonica.de. [2a02:3100:ac6d:8e00:811e:2e8d:e68f:ec04])
-        by smtp.googlemail.com with ESMTPSA id a640c23a62f3a-ab6e49ffd42sm821332266b.95.2025.02.03.12.33.22
+        by smtp.googlemail.com with ESMTPSA id a640c23a62f3a-ab6e4a59862sm814238466b.178.2025.02.03.12.35.07
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 03 Feb 2025 12:33:23 -0800 (PST)
-Message-ID: <3466ee92-166a-4b0f-9ae7-42b9e046f333@gmail.com>
-Date: Mon, 3 Feb 2025 21:33:39 +0100
+        Mon, 03 Feb 2025 12:35:08 -0800 (PST)
+Message-ID: <d29f0cdb-32bf-435f-b59d-dc96bca1e3ab@gmail.com>
+Date: Mon, 3 Feb 2025 21:35:24 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -82,14 +82,13 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
 From: Heiner Kallweit <hkallweit1@gmail.com>
-Subject: [PATCH net-next] net: phy: realtek: make HWMON support a user-visible
- Kconfig symbol
-To: Andrew Lunn <andrew+netdev@lunn.ch>, Paolo Abeni <pabeni@redhat.com>,
+Subject: [PATCH net-next] r8169: make Kconfig option for LED support
+ user-visible
+To: Realtek linux nic maintainers <nic_swsd@realtek.com>,
+ Andrew Lunn <andrew+netdev@lunn.ch>, Paolo Abeni <pabeni@redhat.com>,
  Jakub Kicinski <kuba@kernel.org>, David Miller <davem@davemloft.net>,
- Eric Dumazet <edumazet@google.com>,
- Russell King - ARM Linux <linux@armlinux.org.uk>
-Cc: "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
- Simon Horman <horms@kernel.org>, Geert Uytterhoeven <geert@linux-m68k.org>
+ Eric Dumazet <edumazet@google.com>, Simon Horman <horms@kernel.org>
+Cc: "netdev@vger.kernel.org" <netdev@vger.kernel.org>
 Content-Language: en-US
 Autocrypt: addr=hkallweit1@gmail.com; keydata=
  xsFNBF/0ZFUBEAC0eZyktSE7ZNO1SFXL6cQ4i4g6Ah3mOUIXSB4pCY5kQ6OLKHh0FlOD5/5/
@@ -137,34 +136,28 @@ Autocrypt: addr=hkallweit1@gmail.com; keydata=
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
 
-Make config symbol REALTEK_PHY_HWMON user-visible, so that users can
-remove support if not needed.
+Make config option R8169_LEDS user-visible, so that users can remove
+support if not needed.
 
-Suggested-by: Geert Uytterhoeven <geert@linux-m68k.org>
 Signed-off-by: Heiner Kallweit <hkallweit1@gmail.com>
 ---
- drivers/net/phy/realtek/Kconfig | 8 ++++++--
- 1 file changed, 6 insertions(+), 2 deletions(-)
+ drivers/net/ethernet/realtek/Kconfig | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
 
-diff --git a/drivers/net/phy/realtek/Kconfig b/drivers/net/phy/realtek/Kconfig
-index 31935f147..b05c2a1e9 100644
---- a/drivers/net/phy/realtek/Kconfig
-+++ b/drivers/net/phy/realtek/Kconfig
-@@ -4,8 +4,12 @@ config REALTEK_PHY
- 	help
- 	  Currently supports RTL821x/RTL822x and fast ethernet PHYs
+diff --git a/drivers/net/ethernet/realtek/Kconfig b/drivers/net/ethernet/realtek/Kconfig
+index 8a8ea51c6..fe136f615 100644
+--- a/drivers/net/ethernet/realtek/Kconfig
++++ b/drivers/net/ethernet/realtek/Kconfig
+@@ -114,7 +114,8 @@ config R8169
+ 	  will be called r8169.  This is recommended.
  
-+if REALTEK_PHY
-+
- config REALTEK_PHY_HWMON
--	def_bool REALTEK_PHY && HWMON
--	depends on !(REALTEK_PHY=y && HWMON=m)
-+	bool "HWMON support for Realtek PHYs"
-+	depends on HWMON && !(REALTEK_PHY=y && HWMON=m)
+ config R8169_LEDS
+-	def_bool R8169 && LEDS_TRIGGER_NETDEV
++	bool "Support for controlling the NIC LEDs"
++	depends on R8169 && LEDS_TRIGGER_NETDEV
+ 	depends on !(R8169=y && LEDS_CLASS=m)
  	help
- 	  Optional hwmon support for the temperature sensor
-+
-+endif # REALTEK_PHY
+ 	  Optional support for controlling the NIC LED's with the netdev
 -- 
 2.48.1
 
