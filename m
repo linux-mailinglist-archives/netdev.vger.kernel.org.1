@@ -1,79 +1,79 @@
-Return-Path: <netdev+bounces-162234-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-162235-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id A281DA26508
-	for <lists+netdev@lfdr.de>; Mon,  3 Feb 2025 21:43:48 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8488DA2651E
+	for <lists+netdev@lfdr.de>; Mon,  3 Feb 2025 21:48:21 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 287C6163CC6
-	for <lists+netdev@lfdr.de>; Mon,  3 Feb 2025 20:43:47 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 0CD1D7A43D9
+	for <lists+netdev@lfdr.de>; Mon,  3 Feb 2025 20:47:26 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 74B15211498;
-	Mon,  3 Feb 2025 20:41:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7999E20E70A;
+	Mon,  3 Feb 2025 20:47:49 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="NHv0aRVk"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="mlH8LReb"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-f44.google.com (mail-ed1-f44.google.com [209.85.208.44])
+Received: from mail-ej1-f52.google.com (mail-ej1-f52.google.com [209.85.218.52])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7FE57211296
-	for <netdev@vger.kernel.org>; Mon,  3 Feb 2025 20:41:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.44
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9329820E701
+	for <netdev@vger.kernel.org>; Mon,  3 Feb 2025 20:47:47 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.52
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1738615285; cv=none; b=FW8T0Ifjfb8TvP+NwBl00lIubC5sNgCAiWVudXI+/iEGiS3co3e7e99bLqRvGgnF7KvzlzW1q8ivt4tmR7MFOSu8GBg1vRI0CGhx2GGb9SiZvXiPrQOU7GRZYg/B3ZL4POOunl5e+njEteTXZZtCJXEEJrpC6fQF0KCBz5E8HcI=
+	t=1738615669; cv=none; b=WXN81wRd4dyv/moZtanKBZaH9LJjuFz6/7F6R7D91BQpGE3CVpR084XLdwb5ajG95375f+HsprVbawM72jEqYGeGKb54H42Lbdd5PljfHzNL7+fIxRM9IQyPg3uyNOlrsKl5OfDdAVzt5KWyTj5jy80QgYWHLqEjGoahgpP7ckI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1738615285; c=relaxed/simple;
-	bh=AM7okpuZaqR35imVzVh9Zg9dE6UdzrjHf4NQEfgiC9I=;
-	h=Message-ID:Date:MIME-Version:From:Subject:To:Cc:Content-Type; b=NKtWphgDU5tioOWF9OHCrj1Chx0v/rzXOyd9C+ACsWvRKDU7+oAjY69GYSZAMErLxq520TEs4FtXZd7M+uthPub7JmXlDVVcQjXOVfAww/eyD+nfI71FhrcofLv/7coPtfY/prsu3nHfC0OIhLBl7NtBKY/lPY15LQK0qaZoseM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=NHv0aRVk; arc=none smtp.client-ip=209.85.208.44
+	s=arc-20240116; t=1738615669; c=relaxed/simple;
+	bh=srEFEraNkrt+I2G6BUHQytSDu5aYR3ZThrzEJaHJ+5U=;
+	h=Message-ID:Date:MIME-Version:From:Subject:To:Cc:Content-Type; b=qmB77+SfWWLEz0NkGODTLZO0l1yatvTxk3dVh8pkUgBcKw7mFYTER3SKJcFkZLGpcGCUpzKTYnzGKg5+H9Kq6YqkQSIHi3zF3frJ7aHji+gBDrd8KKCPNrtBQ+Hj0RxBtiTU4Zget37EukBsH4m10PJCCLKzVCexyV+CET2j5K4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=mlH8LReb; arc=none smtp.client-ip=209.85.218.52
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ed1-f44.google.com with SMTP id 4fb4d7f45d1cf-5d3f57582a2so11640419a12.1
-        for <netdev@vger.kernel.org>; Mon, 03 Feb 2025 12:41:23 -0800 (PST)
+Received: by mail-ej1-f52.google.com with SMTP id a640c23a62f3a-ab2aea81cd8so874471266b.2
+        for <netdev@vger.kernel.org>; Mon, 03 Feb 2025 12:47:47 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1738615282; x=1739220082; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1738615666; x=1739220466; darn=vger.kernel.org;
         h=content-transfer-encoding:autocrypt:content-language:cc:to:subject
          :from:user-agent:mime-version:date:message-id:from:to:cc:subject
          :date:message-id:reply-to;
-        bh=UngWFGRdANluuqZOoURKTBjILJKhFH8Iga6NKZ0OVIo=;
-        b=NHv0aRVktfnpVPBL0dUI7dXN8gFXhMBhkdYJDvLWQaLdpbBEqAZ6P7eA/CySWST6ls
-         M0Ey9zizTMH/5RgSF3A+9+vWDkZqzkEmSjWKZIC/zATJaM3tez6q5PM77dOsdGHChPb5
-         onIzpI9KU3o2LGXhgqqb1wNnMNBE64olLYKxWPhMZmB1eMLitvYUt/ZzjLR/xXg2ERPe
-         wQXW65I6nPoYPg59iYzDhmk2NTO0TXFPll2s5r7wNkPyrMbOa8ETiM93NCQeIAu0uymU
-         WIvwjar4kUJjfb/9QDkqa1wHUqNha8L+WE65nTcV58HiXmhFGnoDXkOxqTF/Q1BiYwZk
-         JYuw==
+        bh=GBSCGtHOPIDBnrj/8l+PXAZQNzyGTu54FDa+QQLhoLA=;
+        b=mlH8LReba53zwjhwHg2PatfSX/0qypAdBPvZ4eyoqu3dR8T09+o8S+mSQkvXsguN6D
+         vKg8nZxIhFwuBMgY8UcT3K9P8Xa7KHylQwcyCje/RbqubOI88nX/hIMEegDmaJRbEv4l
+         KK2sS4y0fnebLfHQmC2eaCjYAXad0+NYrxhITyMLK563bHZ8MkwBSZY1K2d+E/e/600+
+         yvoaBkXjWL1k+Pvc7anxztarrCNh4VvoNDkR/FA3nm8J1JpqI70wm+/tQcX7JR+9FKTy
+         DzA3l+UiZKOxtIMD+02PvjQot+i/E4P8BKT3TjoBRbOqUieiGjehxOWlCtmdQ9QVRo/J
+         qxXw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1738615282; x=1739220082;
+        d=1e100.net; s=20230601; t=1738615666; x=1739220466;
         h=content-transfer-encoding:autocrypt:content-language:cc:to:subject
          :from:user-agent:mime-version:date:message-id:x-gm-message-state
          :from:to:cc:subject:date:message-id:reply-to;
-        bh=UngWFGRdANluuqZOoURKTBjILJKhFH8Iga6NKZ0OVIo=;
-        b=V1W8hcYa+IcfQe2901edPu/akO7dlFEKDfogW9SUJqEz2+Htw00tmral7OMwHI0ueO
-         RpBWOS6vVEgtOGGe19ZPnByTWPQSWlqjDHx5GDcpGRWbMyhtKjal5nOKiaLs52OsIk1f
-         t6x4cG0RprEwe5LrvI/TLR8Qpu66FRQG9AWUvxeRawUmL6ikF6uP1g2rpsywPUrUzNlr
-         gE94I3WOghwifWJsQAD/wvajqLnF4Q+obi/db6s4SlF1NaBreeosDlq5u+4j6/XjnC4g
-         hrn44TufZEybvbCIbwnnAAMeNDcoG+EX0ebtbsDZJiYZhkBq7n6QK3BhAKxgVC5hmIKw
-         Pd1w==
-X-Gm-Message-State: AOJu0Yxs232qztPzA+loxsMA5+A3NRby8x0oiz/gTGpcvVi+BLzSDZpY
-	griYO437x6iU625kY5zVQXjTvAx9+fd8ZazLT6dWA14+uhY/UIkv
-X-Gm-Gg: ASbGncsEcL9kI3ggUZavDCkMsfM6ISok8hlHq+PiOd9ZFaVDgGsK8TLXSVPKIMYwUPT
-	54fTb0NNpJ96yhVPUM0gjvMI3gPmzt+urUjASTJPOgvIDp7vZrZiW1m6DE0gCCym0VZlXnvpwkn
-	9lKxGd/p38eDmtbWIWbI4ao0HGKMIQ7/x0jWSjEzVnMFHiielu983d0JIJlDs2uC/X0dAZ7fNDw
-	IH1GeIjlv44zz1GrZjGBjy5rboSQN8pN4U/nxVncPBMCZBX8BkBmFWgW4A8tBgE/oHErRyd80DT
-	WGrQtZKA7usoAsGg8hmjG/CP6haPFnsf5Cob7o0ZST3k7pOM1qoSKT0kR8gQ0pNWTjbsJEl/4wE
-	FirSBMMfHlvsAjMEQhEt7LjmZ1sMlZQHugMA6Rpu9VYUD427S4oyO5eBbkDHaQgAPoAf4IVZ4n+
-	HJ8BxXSQk=
-X-Google-Smtp-Source: AGHT+IGaPfwqzfWP2Ift1peqvEGTzClEndhzZDCn861UhxFmBlGpuvDRhMwSdBALqCVjD4p2Hs2j2w==
-X-Received: by 2002:a17:907:7255:b0:aab:a02c:764e with SMTP id a640c23a62f3a-ab748435278mr80534466b.14.1738615281383;
-        Mon, 03 Feb 2025 12:41:21 -0800 (PST)
+        bh=GBSCGtHOPIDBnrj/8l+PXAZQNzyGTu54FDa+QQLhoLA=;
+        b=YaSMyVN34SAB8rYlQKRw41JpH8/QrA/zVPZzwVeZAVTtlbwrIAqnOB+X9Y8TwxirI/
+         q2K8ZbLhIPIbmZu2Zrad/pgesc/Q8DbGBW/LurPNHfASYYV8rTxZh0Lj9LK8ukpI0+sV
+         +CAFXw5xE+3sFFcGpN2PpA7EuEIRIxVBagBobCXPweGd3y7QOynEeyDwn+jhnzrR9bHK
+         OGYKtUZwzjIKEPCP/Yz67TzEauV2p3QBdSq5uqpc9rpOhb3xbEm1huB6eRJWPIJr85GW
+         K3iLObyrlSuAl3iDef3EYW4AYRV2Za8SKQZEYEqslzldOeRgk9yJZ19WQzCQIjd18ka3
+         WrgQ==
+X-Gm-Message-State: AOJu0YwD8MFJO8mj2ci3QB7pOgE4Q8+Puu7x6yh0W5oahFguhQ3R2oK9
+	4XBDbXywLkMZOPKmKqrDqzuIdDeWr2EY4kH1Dd1LiNL1A64Ta6J9
+X-Gm-Gg: ASbGncuFO+97sibTfFYW/AqaQ8opXbokul4hIZqniM2gYuaXenSO+zrJkIBt4FCcl1l
+	6/plOfvkT3X3mZyZPZygu/tkv/R584tHjoST26Fi8XnkP2iULz16raYPlWq+RhKZj3GZDYLxXzh
+	DleVA+pDoOMbGcG4gijjP3yTCip0UdjFKleVVLeefsk+9ZgvZoZfa3yvHicBlahcepUx/Y/txec
+	qa8wMytzsJT9er5sBqaING7LS/M7oCrmJkX5rSwUeD1g64aQJIn29UHFInN3XStOlbqIKZD0EBh
+	1jv0SuhiZ6f/F9l4B/hsf5f3uaC4NJVcVpwAVKhwSbsg9w8M6uJqLq5tLLvDMWY2WVI+veOkdhh
+	ju4LkO9Kw2KlfrKWT1NefdDdYG0Xj389EGJo9oBr1dQWfsXe5O3s/Uf8WFiuFG/GKr4tjnp3pRt
+	+lfOhuq1o=
+X-Google-Smtp-Source: AGHT+IF5/0upmNJFLZpVyx5dJu1P68Fvf37X0DRMFZ2DP50dV5bjFqC+vUr/89Z2HLou7AKs2UxnOg==
+X-Received: by 2002:a17:906:f5a4:b0:ab7:4884:c804 with SMTP id a640c23a62f3a-ab74884c871mr72332866b.36.1738615665527;
+        Mon, 03 Feb 2025 12:47:45 -0800 (PST)
 Received: from ?IPV6:2a02:3100:ac6d:8e00:811e:2e8d:e68f:ec04? (dynamic-2a02-3100-ac6d-8e00-811e-2e8d-e68f-ec04.310.pool.telefonica.de. [2a02:3100:ac6d:8e00:811e:2e8d:e68f:ec04])
-        by smtp.googlemail.com with ESMTPSA id a640c23a62f3a-ab6e4a59862sm814805066b.178.2025.02.03.12.41.19
+        by smtp.googlemail.com with ESMTPSA id a640c23a62f3a-ab6ffc9eb9dsm607641366b.27.2025.02.03.12.47.43
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 03 Feb 2025 12:41:20 -0800 (PST)
-Message-ID: <d01c4b60-7218-4c40-875e-c0cace910943@gmail.com>
-Date: Mon, 3 Feb 2025 21:41:36 +0100
+        Mon, 03 Feb 2025 12:47:44 -0800 (PST)
+Message-ID: <65a41b61-1122-49cb-805c-cf2cfe636b72@gmail.com>
+Date: Mon, 3 Feb 2025 21:48:00 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -82,11 +82,11 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
 From: Heiner Kallweit <hkallweit1@gmail.com>
-Subject: [PATCH net-next] net: phy: realtek: use string choices helpers
-To: Andrew Lunn <andrew+netdev@lunn.ch>, Paolo Abeni <pabeni@redhat.com>,
+Subject: [PATCH net-next] r8169: don't scan PHY addresses > 0
+To: Realtek linux nic maintainers <nic_swsd@realtek.com>,
+ Andrew Lunn <andrew+netdev@lunn.ch>, Paolo Abeni <pabeni@redhat.com>,
  Jakub Kicinski <kuba@kernel.org>, David Miller <davem@davemloft.net>,
- Eric Dumazet <edumazet@google.com>, Simon Horman <horms@kernel.org>,
- Andrew Lunn <andrew@lunn.ch>
+ Eric Dumazet <edumazet@google.com>, Simon Horman <horms@kernel.org>
 Cc: "netdev@vger.kernel.org" <netdev@vger.kernel.org>
 Content-Language: en-US
 Autocrypt: addr=hkallweit1@gmail.com; keydata=
@@ -135,55 +135,47 @@ Autocrypt: addr=hkallweit1@gmail.com; keydata=
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
 
-Use string choices helpers to simplify the code.
+The PHY address is a dummy anyway, because r8169 PHY access registers
+don't support a PHY address. Therefore scan address 0 only, this saves
+some cpu cycles and allows to remove two checks.
 
-Reported-by: kernel test robot <lkp@intel.com>
-Closes: https://lore.kernel.org/oe-kbuild-all/202501190707.qQS8PGHW-lkp@intel.com/
 Signed-off-by: Heiner Kallweit <hkallweit1@gmail.com>
 ---
- drivers/net/phy/realtek/realtek_main.c | 9 +++++----
- 1 file changed, 5 insertions(+), 4 deletions(-)
+ drivers/net/ethernet/realtek/r8169_main.c | 7 +------
+ 1 file changed, 1 insertion(+), 6 deletions(-)
 
-diff --git a/drivers/net/phy/realtek/realtek_main.c b/drivers/net/phy/realtek/realtek_main.c
-index 572a93363..210fefac4 100644
---- a/drivers/net/phy/realtek/realtek_main.c
-+++ b/drivers/net/phy/realtek/realtek_main.c
-@@ -13,6 +13,7 @@
- #include <linux/module.h>
- #include <linux/delay.h>
- #include <linux/clk.h>
-+#include <linux/string_choices.h>
+diff --git a/drivers/net/ethernet/realtek/r8169_main.c b/drivers/net/ethernet/realtek/r8169_main.c
+index 5a5eba49c..a65a6cbe9 100644
+--- a/drivers/net/ethernet/realtek/r8169_main.c
++++ b/drivers/net/ethernet/realtek/r8169_main.c
+@@ -5180,9 +5180,6 @@ static int r8169_mdio_read_reg(struct mii_bus *mii_bus, int phyaddr, int phyreg)
+ {
+ 	struct rtl8169_private *tp = mii_bus->priv;
  
- #include "realtek.h"
+-	if (phyaddr > 0)
+-		return -ENODEV;
+-
+ 	return rtl_readphy(tp, phyreg);
+ }
  
-@@ -422,11 +423,11 @@ static int rtl8211f_config_init(struct phy_device *phydev)
- 	} else if (ret) {
- 		dev_dbg(dev,
- 			"%s 2ns TX delay (and changing the value from pin-strapping RXD1 or the bootloader)\n",
--			val_txdly ? "Enabling" : "Disabling");
-+			str_enable_disable(val_txdly));
- 	} else {
- 		dev_dbg(dev,
- 			"2ns TX delay was already %s (by pin-strapping RXD1 or bootloader configuration)\n",
--			val_txdly ? "enabled" : "disabled");
-+			str_enabled_disabled(val_txdly));
- 	}
+@@ -5191,9 +5188,6 @@ static int r8169_mdio_write_reg(struct mii_bus *mii_bus, int phyaddr,
+ {
+ 	struct rtl8169_private *tp = mii_bus->priv;
  
- 	ret = phy_modify_paged_changed(phydev, 0xd08, 0x15, RTL8211F_RX_DELAY,
-@@ -437,11 +438,11 @@ static int rtl8211f_config_init(struct phy_device *phydev)
- 	} else if (ret) {
- 		dev_dbg(dev,
- 			"%s 2ns RX delay (and changing the value from pin-strapping RXD0 or the bootloader)\n",
--			val_rxdly ? "Enabling" : "Disabling");
-+			str_enable_disable(val_rxdly));
- 	} else {
- 		dev_dbg(dev,
- 			"2ns RX delay was already %s (by pin-strapping RXD0 or bootloader configuration)\n",
--			val_rxdly ? "enabled" : "disabled");
-+			str_enabled_disabled(val_rxdly));
- 	}
+-	if (phyaddr > 0)
+-		return -ENODEV;
+-
+ 	rtl_writephy(tp, phyreg, val);
  
- 	if (priv->has_phycr2) {
+ 	return 0;
+@@ -5222,6 +5216,7 @@ static int r8169_mdio_register(struct rtl8169_private *tp)
+ 	new_bus->priv = tp;
+ 	new_bus->parent = &pdev->dev;
+ 	new_bus->irq[0] = PHY_MAC_INTERRUPT;
++	new_bus->phy_mask = GENMASK(31, 1);
+ 	snprintf(new_bus->id, MII_BUS_ID_SIZE, "r8169-%x-%x",
+ 		 pci_domain_nr(pdev->bus), pci_dev_id(pdev));
+ 
 -- 
 2.48.1
 
