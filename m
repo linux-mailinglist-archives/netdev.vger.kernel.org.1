@@ -1,111 +1,353 @@
-Return-Path: <netdev+bounces-162027-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-162028-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 73D6AA255F1
-	for <lists+netdev@lfdr.de>; Mon,  3 Feb 2025 10:34:43 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 94CECA25633
+	for <lists+netdev@lfdr.de>; Mon,  3 Feb 2025 10:45:52 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 033A516495E
-	for <lists+netdev@lfdr.de>; Mon,  3 Feb 2025 09:34:42 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B95613A927A
+	for <lists+netdev@lfdr.de>; Mon,  3 Feb 2025 09:45:30 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4747B1FF1DA;
-	Mon,  3 Feb 2025 09:34:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 571A820010A;
+	Mon,  3 Feb 2025 09:45:17 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=openvpn.net header.i=@openvpn.net header.b="Bgk8e8cr"
 X-Original-To: netdev@vger.kernel.org
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 94F7F1D7E2F;
-	Mon,  3 Feb 2025 09:34:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
+Received: from mail-wr1-f49.google.com (mail-wr1-f49.google.com [209.85.221.49])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E6F3E1C3BEE
+	for <netdev@vger.kernel.org>; Mon,  3 Feb 2025 09:45:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.49
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1738575280; cv=none; b=nbr5vn8VUFQd0jPJD4t1fimcNNA7NrNNo38XJ9x1dwWxZrij9gIFgs5FDfJxk8gtdaHj9v7FwhkQ+bnGzkOFOF3IwwBoQ3A1BPn186UeGxhSxPaKhe6whHurbzJsfLfenNfJ3Y1wk2LVcLKr/EFvv84g0gq7sCIo/yZTmn/FZvg=
+	t=1738575917; cv=none; b=Zgn3BYOPB/6+X5P/5qGeCaUwp6W7tr9lqtm/+W77LpeFQLh6PnFxMEUCZuBgFno8JpXjgGeNNQIkadniicfHfCUA62SDYsVs0bzThDmylHcpguNPFUuIy+7TxXVUH5HrLPwvu41N+WG/uQ1d3emYBobZd2HsaVsHEcmv22DRpMY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1738575280; c=relaxed/simple;
-	bh=nkiHB6RasytsIQBmTBEy0ydOxCTy7fIAttbMb3muzt4=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=O7vxQHh6LT4bA7BKbgI14Zngcd6DbLDerbt3ilUZkidM18+g40iG5WnyewByaVbZQtxfL3A7/WLiq/k+KfcSrF9mD2lVqblxu06WLnY9PqKaYip3U+cl0A2zUMYTap3BZKKiqQgoJBzgcL5IVV1YjrBP4Lqzer7QNnmeBBMMhSw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 22B201063;
-	Mon,  3 Feb 2025 01:35:02 -0800 (PST)
-Received: from e122027.cambridge.arm.com (e122027.cambridge.arm.com [10.1.34.25])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 9CCE63F5A1;
-	Mon,  3 Feb 2025 01:34:33 -0800 (PST)
-From: Steven Price <steven.price@arm.com>
-To: "David S. Miller" <davem@davemloft.net>,
-	Kunihiko Hayashi <hayashi.kunihiko@socionext.com>,
-	Alexandre Torgue <alexandre.torgue@foss.st.com>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Maxime Coquelin <mcoquelin.stm32@gmail.com>,
-	Jose Abreu <joabreu@synopsys.com>,
-	Paolo Abeni <pabeni@redhat.com>
-Cc: Steven Price <steven.price@arm.com>,
-	linux-arm-kernel@lists.infradead.org,
-	linux-kernel@vger.kernel.org,
-	linux-stm32@st-md-mailman.stormreply.com,
-	netdev@vger.kernel.org,
-	"Russell King (Oracle)" <rmk+kernel@armlinux.org.uk>,
-	Furong Xu <0x1207@gmail.com>,
-	Petr Tesarik <petr@tesarici.cz>,
-	Serge Semin <fancer.lancer@gmail.com>,
-	Yanteng Si <si.yanteng@linux.dev>,
-	Xi Ruoyao <xry111@xry111.site>
-Subject: [PATCH] net: stmmac: Allow zero for [tr]x_fifo_size
-Date: Mon,  3 Feb 2025 09:34:18 +0000
-Message-ID: <20250203093419.25804-1-steven.price@arm.com>
-X-Mailer: git-send-email 2.43.0
+	s=arc-20240116; t=1738575917; c=relaxed/simple;
+	bh=DnAaTSWB9Ufq4j8GcgVdkYGxQaZHUSHEOIBDNJV/MC4=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=jth1F6YRA510kvDXl6OfRKHXh66dMfLSwNdTlDeoqLhnIqtzzahpZHmprJTU7dW1iCUDl3v99gP5xXmoyORCZR+0P5YhVFz6CEmED2FgV/jTqXaZsTJgNhPaDeMziwP3vAWyFfasSPt4u9mT6/4ewe2g/HBvAEsNlVUxAroAKFA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=openvpn.net; spf=pass smtp.mailfrom=openvpn.com; dkim=pass (2048-bit key) header.d=openvpn.net header.i=@openvpn.net header.b=Bgk8e8cr; arc=none smtp.client-ip=209.85.221.49
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=openvpn.net
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=openvpn.com
+Received: by mail-wr1-f49.google.com with SMTP id ffacd0b85a97d-3863c36a731so3238120f8f.1
+        for <netdev@vger.kernel.org>; Mon, 03 Feb 2025 01:45:13 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=openvpn.net; s=google; t=1738575912; x=1739180712; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:organization:autocrypt:from
+         :content-language:references:cc:to:subject:user-agent:mime-version
+         :date:message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=bWyq858Fdd6NVKF4yL/YP3TOhGbx7YHYk3DfUJZJrbk=;
+        b=Bgk8e8crVtsj1hi35slWNcRAcg2NxN4dzoJkW97RvY3+oXTvdcOMA1FFwiarvo+/uB
+         6o5mDHoXdM3Dk0sXTKfLHK/XNXdjvzV8Imt6UQqXEPbHJV/nQ85r9FRlNAqHYJAzETJS
+         HX47jHHH/CQVcaIeIpFsVfKaiKecgfegFYLssX7rYyK6UPNWfsTwWkh/6ghleONCW6Zn
+         UMikkfxddtd51Sthw9pxHmaJJhuj70gR0KJmrb6HoWDgeeejB5z0DUWKREYu25n1dBmH
+         Ezk0ToySH4l5CNOJ+pqpjBTw8Tr4ohWtCFZxMjlqH0a9aPKXBo55MudsUWdLWjiPVArO
+         GFIA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1738575912; x=1739180712;
+        h=content-transfer-encoding:in-reply-to:organization:autocrypt:from
+         :content-language:references:cc:to:subject:user-agent:mime-version
+         :date:message-id:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=bWyq858Fdd6NVKF4yL/YP3TOhGbx7YHYk3DfUJZJrbk=;
+        b=MKyo3T/LR8hLFO17c+OvPuduZNO1qfX6I0MbTngkUlgjVxeN/1Wxdgi9hWJNwc6u+i
+         bkuQnVz1jUwkyTI77Rhh3flO8t3XBaLysDaXtJH/oJsG8YZfP03LMPMFg7zb5vpAsNWw
+         gHTcTgqLAn9oAKurWvhpFloPN7vIAhflOVyWg5WmwKYCIYAP+gSu+G+FdVAL0vTwD8Ec
+         NZuFQiS2cqkulrwuxD7MxCku+eLf5dRRWotYOuavPriuad1LY9WrA6e55Mse42Tg5gUt
+         2yGWT077mF1tUWph7vmUTIVuVKpSc3bhJ53GW9qq4WUK/vxAH5PaiesPi7SwSNHvHPy0
+         cA2A==
+X-Gm-Message-State: AOJu0YwXChj/kIfKN0710bK14H71QyKu4dPKAcxGePgVymujrz7VNtgP
+	JE4eMyvtUoVhN70B19IrbXbYos6vOgYKanlymsR/ijn2gQSdLsJmS+pMwRB/EGU=
+X-Gm-Gg: ASbGncum9Z7x/C83vziGF8clEvZqE92KTszMFhFVEwyzSvNMBvmlFRe0Hu40ybw/iiu
+	qxjvamsz+oCAxzw99ERjk/oiS6H3yeMjQwVUvRMy1zNfuYGgerWFfBaNEQWtQP79p2xVEenBLtl
+	C4B5pKdabFm3vDv+sY1P0Eb+nyocNbwMqej15VeQXwnSGN5QAABTlz8BDvKn2RaNnYHzuT7/taj
+	JVWUcmkHm6XDpJu3BYBMFolg/909BT3x4i6v4UUwZVaVGRYDmeuk84q0aqH9FF4E8sxE5j3YaSa
+	z99KrH++kEB1JiJfvUTd4EKEHqokpdlhhCF9Hydv4x5/lzWnePuogQ==
+X-Google-Smtp-Source: AGHT+IEAyihP1x+9lWz+qA1pD0F07WlyGqWEKzFWo4Qx/8RNOunbW5iuc46GcTZGtV9TeGblCzFBHw==
+X-Received: by 2002:a5d:598c:0:b0:38c:5b62:9fb9 with SMTP id ffacd0b85a97d-38c5b62a1a6mr13709368f8f.43.1738575912014;
+        Mon, 03 Feb 2025 01:45:12 -0800 (PST)
+Received: from ?IPV6:2001:67c:2fbc:1:b4fe:e6fa:32a0:6a72? ([2001:67c:2fbc:1:b4fe:e6fa:32a0:6a72])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-438e23deedfsm150653445e9.16.2025.02.03.01.45.10
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 03 Feb 2025 01:45:11 -0800 (PST)
+Message-ID: <4a539c83-f436-4b1e-9707-64c05dcfdbd2@openvpn.net>
+Date: Mon, 3 Feb 2025 10:46:19 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next v18 20/25] ovpn: implement peer
+ add/get/dump/delete via netlink
+To: Sabrina Dubroca <sd@queasysnail.net>
+Cc: netdev@vger.kernel.org, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ Donald Hunter <donald.hunter@gmail.com>, Shuah Khan <shuah@kernel.org>,
+ ryazanov.s.a@gmail.com, Andrew Lunn <andrew+netdev@lunn.ch>,
+ Simon Horman <horms@kernel.org>, linux-kernel@vger.kernel.org,
+ linux-kselftest@vger.kernel.org, Xiao Liang <shaw.leon@gmail.com>
+References: <20250113-b4-ovpn-v18-0-1f00db9c2bd6@openvpn.net>
+ <20250113-b4-ovpn-v18-20-1f00db9c2bd6@openvpn.net> <Z5_6pC-zsVzukJs3@hog>
+Content-Language: en-US
+From: Antonio Quartulli <antonio@openvpn.net>
+Autocrypt: addr=antonio@openvpn.net; keydata=
+ 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
+Organization: OpenVPN Inc.
+In-Reply-To: <Z5_6pC-zsVzukJs3@hog>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-Commit 8865d22656b4 ("net: stmmac: Specify hardware capability value
-when FIFO size isn't specified") modified the behaviour to bail out if
-both the FIFO size and the hardware capability were both set to zero.
-However devices where has_gmac4 and has_xgmac are both false don't use
-the fifo size and that commit breaks platforms for which these values
-were zero.
+On 03/02/2025 00:07, Sabrina Dubroca wrote:
+> 2025-01-13, 10:31:39 +0100, Antonio Quartulli wrote:
+>> +static int ovpn_nl_attr_sockaddr_remote(struct nlattr **attrs,
+>> +					struct sockaddr_storage *ss)
+>> +{
+>> +	struct sockaddr_in6 *sin6;
+>> +	struct sockaddr_in *sin;
+>> +	struct in6_addr *in6;
+>> +	__be16 port = 0;
+>> +	__be32 *in;
+>> +	int af;
+>> +
+>> +	ss->ss_family = AF_UNSPEC;
+>> +
+>> +	if (attrs[OVPN_A_PEER_REMOTE_PORT])
+>> +		port = nla_get_be16(attrs[OVPN_A_PEER_REMOTE_PORT]);
+>> +
+>> +	if (attrs[OVPN_A_PEER_REMOTE_IPV4]) {
+>> +		af = AF_INET;
+>> +		ss->ss_family = AF_INET;
+>> +		in = nla_data(attrs[OVPN_A_PEER_REMOTE_IPV4]);
+>> +	} else if (attrs[OVPN_A_PEER_REMOTE_IPV6]) {
+>> +		af = AF_INET6;
+>> +		ss->ss_family = AF_INET6;
+>> +		in6 = nla_data(attrs[OVPN_A_PEER_REMOTE_IPV6]);
+>> +	} else {
+>> +		return AF_UNSPEC;
+>> +	}
+>> +
+>> +	switch (ss->ss_family) {
+>> +	case AF_INET6:
+>> +		/* If this is a regular IPv6 just break and move on,
+>> +		 * otherwise switch to AF_INET and extract the IPv4 accordingly
+>> +		 */
+>> +		if (!ipv6_addr_v4mapped(in6)) {
+>> +			sin6 = (struct sockaddr_in6 *)ss;
+>> +			sin6->sin6_port = port;
+>> +			memcpy(&sin6->sin6_addr, in6, sizeof(*in6));
+>> +			break;
+>> +		}
+>> +
+>> +		/* v4-mapped-v6 address */
+>> +		ss->ss_family = AF_INET;
+>> +		in = &in6->s6_addr32[3];
+>> +		fallthrough;
+>> +	case AF_INET:
+>> +		sin = (struct sockaddr_in *)ss;
+>> +		sin->sin_port = port;
+>> +		sin->sin_addr.s_addr = *in;
+>> +		break;
+>> +	}
+>> +
+>> +	/* don't return ss->ss_family as it may have changed in case of
+>> +	 * v4-mapped-v6 address
+>> +	 */
+> 
+> nit: I'm not sure that matters since the only thing the caller checks
+> is ret != AF_UNSPEC, and at this point, while ss_family could have
+> been changed, it would have changed from AF_INET6 to AF_INET, so it's
+> != AF_UNSPEC.
 
-Only warn and error out when (has_gmac4 || has_xgmac) where the values
-are used and zero would cause problems, otherwise continue with the zero
-values.
+I am pretty sure at some point the return value was used for some 
+reason, but now it is indeed useless.
 
-Fixes: 8865d22656b4 ("net: stmmac: Specify hardware capability value when FIFO size isn't specified")
-Tested-by: Xi Ruoyao <xry111@xry111.site>
-Signed-off-by: Steven Price <steven.price@arm.com>
----
- drivers/net/ethernet/stmicro/stmmac/stmmac_main.c | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+Well, I think I wiil just convert the return type to bool:
+true -> we have a remote
+false -> we don't
 
-diff --git a/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c b/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
-index d04543e5697b..821404beb629 100644
---- a/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
-+++ b/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
-@@ -7222,7 +7222,7 @@ static int stmmac_hw_init(struct stmmac_priv *priv)
- 	if (!priv->plat->rx_fifo_size) {
- 		if (priv->dma_cap.rx_fifo_size) {
- 			priv->plat->rx_fifo_size = priv->dma_cap.rx_fifo_size;
--		} else {
-+		} else if (priv->plat->has_gmac4 || priv->plat->has_xgmac) {
- 			dev_err(priv->device, "Can't specify Rx FIFO size\n");
- 			return -ENODEV;
- 		}
-@@ -7236,7 +7236,7 @@ static int stmmac_hw_init(struct stmmac_priv *priv)
- 	if (!priv->plat->tx_fifo_size) {
- 		if (priv->dma_cap.tx_fifo_size) {
- 			priv->plat->tx_fifo_size = priv->dma_cap.tx_fifo_size;
--		} else {
-+		} else if (priv->plat->has_gmac4 || priv->plat->has_xgmac) {
- 			dev_err(priv->device, "Can't specify Tx FIFO size\n");
- 			return -ENODEV;
- 		}
+> 
+>> +	return af;
+>> +}
+> 
+> [...]
+>> +static int ovpn_nl_peer_precheck(struct ovpn_priv *ovpn,
+>> +				 struct genl_info *info,
+>> +				 struct nlattr **attrs)
+>> +{
+> [...]
+>> +
+>> +	/* VPN IPs are needed only in MP mode for selecting the right peer */
+>> +	if (ovpn->mode == OVPN_MODE_P2P && (attrs[OVPN_A_PEER_VPN_IPV4] ||
+>> +					    attrs[OVPN_A_PEER_VPN_IPV6])) {
+> 
+> And in MP mode, at least one VPN_IP* is required?
+
+Yeah. I'll add a check for this requirement too.
+
+> 
+> 
+> [...]
+>>   int ovpn_nl_peer_new_doit(struct sk_buff *skb, struct genl_info *info)
+>>   {
+> [...]
+>> +	/* Only when using UDP as transport protocol the remote endpoint
+>> +	 * can be configured so that ovpn knows where to send packets to.
+>> +	 *
+>> +	 * In case of TCP, the socket is connected to the peer and ovpn
+>> +	 * will just send bytes over it, without the need to specify a
+>> +	 * destination.
+>> +	 */
+>> +	if (sock->sk->sk_protocol != IPPROTO_UDP &&
+>> +	    (attrs[OVPN_A_PEER_REMOTE_IPV4] ||
+>> +	     attrs[OVPN_A_PEER_REMOTE_IPV6])) {
+> 
+> Is a peer on a UDP socket without any remote (neither
+> OVPN_A_PEER_REMOTE_IPV4 nor OVPN_A_PEER_REMOTE_IPV6) valid? We just
+> wait until we get data from it to update the endpoint?
+> 
+> Or should there be a check to make sure that one was provided?
+
+Yeah, I'll add a check.
+
+> 
+>> +		NL_SET_ERR_MSG_FMT_MOD(info->extack,
+>> +				       "unexpected remote IP address for non UDP socket");
+>> +		sockfd_put(sock);
+>> +		return -EINVAL;
+>> +	}
+>> +
+>> +	ovpn_sock = ovpn_socket_new(sock, peer);
+>> +	if (IS_ERR(ovpn_sock)) {
+>> +		NL_SET_ERR_MSG_FMT_MOD(info->extack,
+>> +				       "cannot encapsulate socket: %ld",
+>> +				       PTR_ERR(ovpn_sock));
+>> +		sockfd_put(sock);
+>> +		return -ENOTSOCK;
+> 
+> Maybe s/-ENOTSOCK/PTR_ERR(ovpn_sock)/ ?
+> Overwriting ovpn_socket_new's -EBUSY etc with -ENOTSOCK is a bit
+> misleading to the caller.
+
+This is the error code that userspace will see.
+Returning -EBUSY/-EALREADY for a socket error from the PEER_NEW call 
+would be too vague IMHO (the user wouldn't know this is coming from the 
+socket processing subroutine).
+
+Hence the decision to explicitly return -ENOSOCK (something's wrong with 
+the socket you passed) and then send the underling error in the ERR_MSG 
+(which the user can inspect if he wants to learn more about what exactly 
+went wrong).
+Doesn't it make sense?
+
+> 
+>> +	}
+>> +
+>> +	peer->sock = ovpn_sock;
+>> +
+>> +	ret = ovpn_nl_peer_modify(peer, info, attrs);
+>> +	if (ret < 0)
+>> +		goto peer_release;
+>> +
+>> +	ret = ovpn_peer_add(ovpn, peer);
+>> +	if (ret < 0) {
+>> +		NL_SET_ERR_MSG_FMT_MOD(info->extack,
+>> +				       "cannot add new peer (id=%u) to hashtable: %d\n",
+>> +				       peer->id, ret);
+>> +		goto peer_release;
+>> +	}
+>> +
+>> +	return 0;
+>> +
+>> +peer_release:
+> 
+> I think you need to add:
+> 
+> 	ovpn_socket_release(peer);
+> 
+> If ovpn_socket_new succeeded, ovpn_peer_release only takes care of the
+> peer but not its socket.
+
+You're right, because now the socket is released only in ovpn_peer_remove().
+
+Will add a call to ovpn_socket_release(). Thanks!
+
+> 
+>> +	/* release right away because peer is not used in any context */
+>> +	ovpn_peer_release(peer);
+>> +
+>> +	return ret;
+>>   }
+>>   
+>>   int ovpn_nl_peer_set_doit(struct sk_buff *skb, struct genl_info *info)
+>>   {
+> [...]
+>> +	if (attrs[OVPN_A_PEER_SOCKET]) {
+>> +		NL_SET_ERR_MSG_FMT_MOD(info->extack,
+>> +				       "socket cannot be modified");
+>> +		return -EINVAL;
+>> +	}
+>> +
+>> +	peer_id = nla_get_u32(attrs[OVPN_A_PEER_ID]);
+>> +	peer = ovpn_peer_get_by_id(ovpn, peer_id);
+>> +	if (!peer) {
+>> +		NL_SET_ERR_MSG_FMT_MOD(info->extack,
+>> +				       "cannot find peer with id %u", peer_id);
+>> +		return -ENOENT;
+>> +	}
+> 
+> The check for non-UDP socket with a remote address configured should
+> be replicated here, no?
+
+ah, good catch! we may be adding a remote while using a TCP socket.
+Will add check here.
+
+Thanks!
+
+> 
+
 -- 
-2.43.0
+Antonio Quartulli
+OpenVPN Inc.
 
 
