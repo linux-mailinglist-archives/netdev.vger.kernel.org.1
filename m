@@ -1,126 +1,81 @@
-Return-Path: <netdev+bounces-162286-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-162287-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id E9409A2660A
-	for <lists+netdev@lfdr.de>; Mon,  3 Feb 2025 22:49:43 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3B1EFA2661B
+	for <lists+netdev@lfdr.de>; Mon,  3 Feb 2025 22:52:10 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id BE5081885575
-	for <lists+netdev@lfdr.de>; Mon,  3 Feb 2025 21:49:48 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C28EC164C6C
+	for <lists+netdev@lfdr.de>; Mon,  3 Feb 2025 21:52:08 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C281D20CCEB;
-	Mon,  3 Feb 2025 21:49:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6ADF520F06B;
+	Mon,  3 Feb 2025 21:51:58 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="LHA/tLpU"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="xKdkt2Ri"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f47.google.com (mail-wm1-f47.google.com [209.85.128.47])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0A15D78F54;
-	Mon,  3 Feb 2025 21:49:35 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.47
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 96A2378F54;
+	Mon,  3 Feb 2025 21:51:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1738619377; cv=none; b=qzabtnbcdI/sVMrktpms9P0vpZedHIgjpUxWkfDC18o2F+GQY73kap7RSMmMXdYW59hJUVc0oQHr5XI/b/I5UOTQjv2S/KTEY8DGDm2RgUm0eVXbCTCOJgd768fVCP4Y9eYUDZgqJrXTgvgQI7K6uLmTcbeSH18sq5rlWb+4gp8=
+	t=1738619518; cv=none; b=ITR1fYPhtsc63MpriBQrzE0Ts00s9eGQGROsL1ttLv49RKWQC8dQ5oVsFZxc5wmOZrt2HemBabtY6iMHv+lxi6GOhWbPAbZwuGTL+kj1lgkOe4pd9kCQXXkmLMb5/Vz1t4dId6/TAjqzqAImGjsNB5Q3pwcXW83FOiwDlSQzHps=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1738619377; c=relaxed/simple;
-	bh=giYmMvQGmodVIsBV2FyAzuHCM2XEumayECjAxk6wMks=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=Yt0L8UpMaAZk4pJEpAVQw0TG/9Xb/hF9AJcRQ6+xWoPng7IPsZDAIvKeBwOfOPxAEyZVX55/Amr71RFkqEOT9ez6OJ3EUtrHHDTTTA4UtUnt6cxPum/IKf/MHIOZ+GS2L7dB52X2eZ7iN7SjgptaWCxaFC87olytq8QCee2zMic=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=LHA/tLpU; arc=none smtp.client-ip=209.85.128.47
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wm1-f47.google.com with SMTP id 5b1f17b1804b1-4361e89b6daso34062875e9.3;
-        Mon, 03 Feb 2025 13:49:35 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1738619374; x=1739224174; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=uwrjox93lk/WUq0j2CCvg8TL+f+jeBTC8HvZULmrJqA=;
-        b=LHA/tLpUTGEaA3uEs/RXiVds+eKVH9Yjda9+kUSlH2EQJYmbBxdMK9TlFNZStJRFUM
-         jOKGL3zolvQAEUzoD9rOjlW++hi44YgKzWw67Rjxa56Tv2+7n7uvqGWGkxoVaR8zP8c7
-         18mdJ5wx7o9uVTcJOJNsOBTrjpVU7g74RGNtuwIEeUjByhR3H8Pqr0/+71VUAXBrO9AY
-         E09D7AS2wp+FB33fOe95N/U/Rft4Bd374uCVuKX+8ow5xfjSQR7ePmhlgMTz61zWe0mp
-         TXiHZo6Gpqbh3VfJyJEquiDsQUC9+GDcMWF1upL2Z/tVD9UceWp3Mz+wbmfGfn0FLRHQ
-         HUWQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1738619374; x=1739224174;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=uwrjox93lk/WUq0j2CCvg8TL+f+jeBTC8HvZULmrJqA=;
-        b=YBYhqwOy46rGPqMU9D8zyxPMD9u5d1PkV13QCmP1tr4B+dB1p4eawceRdhuVeiqJOq
-         lctZFbXY4/AAZRv/S7WYRX5rULBnnal4cPGKOPFeDFzNwenCcswDlFyDyloJBToQDFmR
-         HyxLD0yjXX8pJD+N52rksRrsK49dhd2dntQstqBKgRk94pLQ/dxbsr3G5iqrJXmkCPF5
-         jgu17/2gzpay/ydCUJcwumzibB323fFdaUpCKGjTPpfEydC+prRnPn9YwUkoXxkZYlpP
-         DM09JIpMM/aq1Yc6r7D3FqPIOhQtYCpeSOp84WCQMXAeFK5Biky1oSF++Cw/RCblTd3l
-         SdBQ==
-X-Forwarded-Encrypted: i=1; AJvYcCUsBY5M9YUW373xuchmphexUA/679XF2gYHV/hlmHNUZ0VJJ5t7u37KWvwbEfpHcZkNCi8tVAV5x6RjpBE=@vger.kernel.org, AJvYcCUvyGAMcxfbp6nz9XrN9JWT2ATMKaC5igANI+uJBKcE/sjjna0I+exM09COirgs1rOaUEOO5tjH1JUK0A==@vger.kernel.org
-X-Gm-Message-State: AOJu0YyJ1unnVNLx8Qywr8N0FvgiK9hhoF79jZnpqqVXoH9f1ZVIOyTF
-	yaVwqpT+c7jYZ5TvY/t4IFTd3UhtZVydmlKmuvgyqeQXBO54Wmto
-X-Gm-Gg: ASbGncumyQm7coxp+ja2mBWhZ1GZ2qWwOR7kI/IbPwlHaoJfhiaas0ckEN7ZHe+8CIz
-	lu2dbsSsjL5l9K6+WQ7iI7vfJnwQoZGxxwmlw0LmrM66KLLg734LROc8X30ShMg520anPDqZZGV
-	pUTI+U4cjJCU9MZ4y0ediNo8goEWP9j4z8KtjEJ21W1JfX7VS+5Im3vqexhMJsuTDSTpZoou1mh
-	N9Bf7OzLRqEq1y2mTBZZKPke7caMu6AYvTfNV8qIt74Al4L3eczcBXkob9+rMwgq6xBQR28Ov2F
-	fuNI84ni1dF8PSgkpTt9pe1r86y9CMzdnIs3
-X-Google-Smtp-Source: AGHT+IHigCdk9E3B1PblZOV5CluGEjbP+FByJtxOd06EfeqC8yMdoTWguI7Nxy/xEc3QX2T6/Qh3HQ==
-X-Received: by 2002:a05:600c:c87:b0:434:f1e9:afb3 with SMTP id 5b1f17b1804b1-438e0d879fdmr168579395e9.3.1738619373757;
-        Mon, 03 Feb 2025 13:49:33 -0800 (PST)
-Received: from [172.27.33.160] ([193.47.165.251])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-438dcc2f73asm205018125e9.24.2025.02.03.13.49.32
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 03 Feb 2025 13:49:33 -0800 (PST)
-Message-ID: <8dafbbcb-2d29-4c1a-8afe-1c5fad3db3f1@gmail.com>
-Date: Mon, 3 Feb 2025 23:49:31 +0200
+	s=arc-20240116; t=1738619518; c=relaxed/simple;
+	bh=728BrBv206yX7DgvBTDxxW1BhKgtOFRBXnffHS/zVtw=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=mZSfCM8zziwJG3dd7tZ14NOeEIS1VaT2WX+71c/fqNRb3Q1aCYIRR6f4YVT6O+J/BN9XuJuv6Hg/BY/hVfsenbBRAfiBtbrXGZs564oBa1uZTw/2EjTszFc3Yqwpdw+QVFgI23yyX7nWP7MQ/REvLxmhOUjmdEieXl9hwQbJQdM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=xKdkt2Ri; arc=none smtp.client-ip=156.67.10.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Transfer-Encoding:Content-Disposition:
+	Content-Type:MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:From:
+	Sender:Reply-To:Subject:Date:Message-ID:To:Cc:MIME-Version:Content-Type:
+	Content-Transfer-Encoding:Content-ID:Content-Description:Content-Disposition:
+	In-Reply-To:References; bh=NKIGVS9TsZAEjbJBcEBnZELE8gnbQlRrAdJ9mthvRmc=; b=xK
+	dkt2RiersZjg+SHtkRW4B1kKho3yC4vfB7CKHht9Z1WskfPB78q0/cR9VwG6KOpMqSz1u2iHI76m4
+	oN+vIpCzKvF3ReYV4Mv6mxpsBNuZlv3vKo4voVGVJd4Fwh4QBUCtfF4A5hHoZA3atGQSRzJnlwvs8
+	NfU//cmkVdSkO0E=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1tf4M9-00Aemq-N7; Mon, 03 Feb 2025 22:51:49 +0100
+Date: Mon, 3 Feb 2025 22:51:49 +0100
+From: Andrew Lunn <andrew@lunn.ch>
+To: Thomas =?iso-8859-1?Q?Wei=DFschuh?= <linux@weissschuh.net>
+Cc: Richard Cochran <richardcochran@gmail.com>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	linux-kernel@vger.kernel.org, netdev@vger.kernel.org
+Subject: Re: [PATCH net] ptp: Add mock device
+Message-ID: <1be7f0e7-b8d5-482d-9474-dfd252f94fed@lunn.ch>
+References: <20250203-ptp-mock-dev-v1-1-f84c56fd9e45@weissschuh.net>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next] net/mlx5: Remove unused mlx5dr_domain_sync
-To: linux@treblig.org, leon@kernel.org, saeedm@nvidia.com, tariqt@nvidia.com,
- andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com,
- kuba@kernel.org, pabeni@redhat.com
-Cc: netdev@vger.kernel.org, linux-rdma@vger.kernel.org,
- linux-kernel@vger.kernel.org
-References: <20250203185958.204794-1-linux@treblig.org>
-Content-Language: en-US
-From: Tariq Toukan <ttoukan.linux@gmail.com>
-In-Reply-To: <20250203185958.204794-1-linux@treblig.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <20250203-ptp-mock-dev-v1-1-f84c56fd9e45@weissschuh.net>
 
+On Mon, Feb 03, 2025 at 08:50:46PM +0100, Thomas Weißschuh wrote:
+> While working on the PTP core or userspace components,
+> a real PTP device is not always available.
+> Introduce a tiny module which creates a mock PTP device.
 
+Since netdevsim already has this functionality, lets drop this patch.
 
-On 03/02/2025 20:59, linux@treblig.org wrote:
-> From: "Dr. David Alan Gilbert" <linux@treblig.org>
-> 
-> mlx5dr_domain_sync() was added in 2019 by
-> commit 70605ea545e8 ("net/mlx5: DR, Expose APIs for direct rule managing")
-> but hasn't been used.
-> 
-> Remove it.
-> 
-> mlx5dr_domain_sync() was the only user of
-> mlx5dr_send_ring_force_drain().
-> Remove it.
-> 
-> Signed-off-by: Dr. David Alan Gilbert <linux@treblig.org>
-> ---
->   .../mlx5/core/steering/sws/dr_domain.c        | 24 --------------
->   .../mellanox/mlx5/core/steering/sws/dr_send.c | 33 -------------------
->   .../mlx5/core/steering/sws/dr_types.h         |  1 -
->   .../mellanox/mlx5/core/steering/sws/mlx5dr.h  |  2 --
->   4 files changed, 60 deletions(-)
-> 
+    Andrew
 
-Thanks for your patch.
+---
+pw-bot: rejected
 
-Reviewed-by: Tariq Toukan <tariqt@nvidia.com>
-
-Tariq.
 
