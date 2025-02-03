@@ -1,169 +1,141 @@
-Return-Path: <netdev+bounces-162308-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-162309-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 48CEBA267ED
-	for <lists+netdev@lfdr.de>; Tue,  4 Feb 2025 00:34:39 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id AB9A1A267F0
+	for <lists+netdev@lfdr.de>; Tue,  4 Feb 2025 00:36:43 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id C32791885186
-	for <lists+netdev@lfdr.de>; Mon,  3 Feb 2025 23:34:43 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 5CD2A3A1EEE
+	for <lists+netdev@lfdr.de>; Mon,  3 Feb 2025 23:36:30 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C90D61E7C19;
-	Mon,  3 Feb 2025 23:34:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D888620FA8E;
+	Mon,  3 Feb 2025 23:36:34 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=cs.stanford.edu header.i=@cs.stanford.edu header.b="LauHgtoA"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="rOgRIgcr"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp1.cs.Stanford.EDU (smtp1.cs.stanford.edu [171.64.64.25])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0EBE03597D
-	for <netdev@vger.kernel.org>; Mon,  3 Feb 2025 23:34:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=171.64.64.25
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B1E1B1E7C19
+	for <netdev@vger.kernel.org>; Mon,  3 Feb 2025 23:36:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1738625668; cv=none; b=QftWe+d6qGL2w5lQb5FFwVT0cAgSW6PVd6qPwr+eEmlUl9hufdyIiRdcysUs32+bp9T+WeDoJj5Kea1T6dKK4p3C9tp0sIMXQ7pLNvAhX02vF4peBC3sb2c6vIYdP6OOFar/3y3K8Gqvt69rI7TZEbeXxnOy7PdnbDOvRNuWSZQ=
+	t=1738625794; cv=none; b=X3oLglXDZ4V/V3Cs8TwRmfCFiNhhEu+MP+OmxNGEmfkDQQ4tAOWDG73LjdXJWdV/qcEE+mlykqsGiL7YAjt6V56iHj+sS80lcFHHxysdyeBVsQpjvLAPYW85V3oGVporEuQ0YTJBr+fbBUF8VEm1LhVyPDVXxk6vEqYhBwfUBuA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1738625668; c=relaxed/simple;
-	bh=O8xxJmvJLF1jhrXk/a4JoFHTRv2oe06hzo4CYs7NTXY=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=VOuRNnI+K5j8+P1nG8Cac6GR/7pe9+TVpr9TdcEZgR9PfTfoVzNJb1W3HRMBZMnQhn7G4ECUgTqRc2SvvWeGoq6Ytu9DJ/yKFg4XQ9W2v0yV8SsJgASSeXuMd+Zbuag0U7vaqILOF9jLyRx+1nlDY27Lgm+a3l+bXI3zZJI11wo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=cs.stanford.edu; spf=pass smtp.mailfrom=cs.stanford.edu; dkim=pass (2048-bit key) header.d=cs.stanford.edu header.i=@cs.stanford.edu header.b=LauHgtoA; arc=none smtp.client-ip=171.64.64.25
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=cs.stanford.edu
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=cs.stanford.edu
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=cs.stanford.edu; s=cs2308; h=Content-Transfer-Encoding:Content-Type:Cc:To:
-	Subject:Message-ID:Date:From:In-Reply-To:References:MIME-Version:Sender:
-	Reply-To:Content-ID:Content-Description:Resent-Date:Resent-From:Resent-Sender
-	:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:List-Help:List-Unsubscribe:
-	List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=O8xxJmvJLF1jhrXk/a4JoFHTRv2oe06hzo4CYs7NTXY=; t=1738625667; x=1739489667; 
-	b=LauHgtoA6CPUhRtdE+0h6Mh8/6EifzyW28pgs5JYC/0mPE1qkXLLBMAEf6JxN+NujpsZmyaur6E
-	u+OuT3JrbhhtweDJ2/t2zj9UqhbOEW+Z3gZpo6ZPQjPSDElVtwtXF1MojeyQ/dvM8PJlyj+6w+R52
-	jbTSlPC0CKLW1DEu1YSr2LYa3v7K/6MjtJ/XH4oJfsMxo1s4pRGwpBRzsM+PFEEdaw9cBP/FbxA41
-	dhnbo1BtLLbp3Friy/SRdiCvQ8f5YXBLDjNW+Tq6JfMpviK8E+vlUCs8BImPtvWHaagAEldO0U0iX
-	oB5hCellqU/8cx7uJQ5tNO5gqqJaJzTHSjag==;
-Received: from mail-oa1-f41.google.com ([209.85.160.41]:58837)
-	by smtp1.cs.Stanford.EDU with esmtpsa  (TLS1.2) tls TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256
-	(Exim 4.94.2)
-	(envelope-from <ouster@cs.stanford.edu>)
-	id 1tf5xR-0004y0-GE
-	for netdev@vger.kernel.org; Mon, 03 Feb 2025 15:34:26 -0800
-Received: by mail-oa1-f41.google.com with SMTP id 586e51a60fabf-29fad34bb62so2700117fac.1
-        for <netdev@vger.kernel.org>; Mon, 03 Feb 2025 15:34:25 -0800 (PST)
-X-Gm-Message-State: AOJu0YxYj9u4CI3bSEVzHypUcsyfwaOzrfPaPfXWdXo6iH+e5Jbbytrm
-	bxr7BfqIIGTz+7xWa8rmTMFu5IgKp/ufKp4p97SNkVjgyeae6RP6x3znx3b2R5z4OHMJ981n+8N
-	d8v76+L7GzYY/x6P3KcytLxS96fE=
-X-Google-Smtp-Source: AGHT+IH/S3k1MAY6Q9UkhXT3oHFdz5EokheetZXK9tf/ZZ/LCvGWHe7GX7cSM5BOLZ07dIXQ0tPMmgRAy9R/sqDoliE=
-X-Received: by 2002:a05:6870:638d:b0:29e:787f:b294 with SMTP id
- 586e51a60fabf-2b32f3078bamr14468056fac.38.1738625664948; Mon, 03 Feb 2025
- 15:34:24 -0800 (PST)
+	s=arc-20240116; t=1738625794; c=relaxed/simple;
+	bh=hVHMsnDJkVN4Y89zn9wdETNaL+MlpWPIdO11yhc81hQ=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=Tn2JMyEWwHlR1g7chCW5+IP+5T5RBjWUQjtDO3LfkIeWOwViC7vhzlXmrPZ33qt669mG/ZXWQdb7PrPrCa54agtBwo9iQ59f8dcDOQbNCnm54taDD+AoeGNzwA5R3aq9Dx/v7a4be8sjDC0N26Z/4hrd/qR/qtZKmHj/shniGqc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=rOgRIgcr; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id D2BEAC4CEE0;
+	Mon,  3 Feb 2025 23:36:33 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1738625794;
+	bh=hVHMsnDJkVN4Y89zn9wdETNaL+MlpWPIdO11yhc81hQ=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=rOgRIgcruVNjhMikgLwBI81Q9YiDUlc8Uob6HZxa1cPGO3V269VyGF01mSNWp0N6Q
+	 3D9C9z9itM3nMp4LHK6tdKrE7nBkJYm4VTjtdAC6lL6642Es9gC9Bi/2517lnRT6bU
+	 /St3Es+TlaDoJoOgjT7BUhQKN72sDqLrMndEZgydQlAXatTCoE/yy5K0gsj/iKcOql
+	 BFQl8nF8pmxTpwS4uHZwpx945fv4yAIfmys99ArX8ywzJ2issVSdqqNF11B7zzu79S
+	 MDxzzyPwcU4x94KW0B4rYcu8ly6CtvJvIh+hx9jx6ghGfz39Gs0EhV6EOUnawwDv39
+	 Uncr2llSApg5g==
+Date: Mon, 3 Feb 2025 15:36:33 -0800
+From: Jakub Kicinski <kuba@kernel.org>
+To: Eric Dumazet <edumazet@google.com>
+Cc: "David S . Miller" <davem@davemloft.net>, Paolo Abeni
+ <pabeni@redhat.com>, netdev@vger.kernel.org, Kuniyuki Iwashima
+ <kuniyu@amazon.com>, Simon Horman <horms@kernel.org>,
+ eric.dumazet@gmail.com
+Subject: Re: [PATCH v2 net 09/16] ipv4: icmp: convert to dev_net_rcu()
+Message-ID: <20250203153633.46ce0337@kernel.org>
+In-Reply-To: <20250203143046.3029343-10-edumazet@google.com>
+References: <20250203143046.3029343-1-edumazet@google.com>
+	<20250203143046.3029343-10-edumazet@google.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250115185937.1324-1-ouster@cs.stanford.edu> <20250115185937.1324-9-ouster@cs.stanford.edu>
- <530c3a8c-fa5b-4fbe-9200-6e62353ebeaf@redhat.com> <CAGXJAmya3xU69ghKO10SZz4sh48CyBgBsF7AaV1OOCRyVPr0Nw@mail.gmail.com>
- <991b5ad9-57cf-4e1d-8e01-9d0639fa4e49@redhat.com> <CAGXJAmxfkmKg4NqHd9eU94Y2hCd4F9WJ2sOyCU1pPnppVhju=A@mail.gmail.com>
- <7b05dc31-e00f-497e-945f-2964ff00969f@redhat.com>
-In-Reply-To: <7b05dc31-e00f-497e-945f-2964ff00969f@redhat.com>
-From: John Ousterhout <ouster@cs.stanford.edu>
-Date: Mon, 3 Feb 2025 15:33:49 -0800
-X-Gmail-Original-Message-ID: <CAGXJAmyNPhA-6L0jv8AT9_xaxM81k+8nD5H+wtj=UN84PB_KnA@mail.gmail.com>
-X-Gm-Features: AWEUYZkf1lGM4bpKkuLZG1pIHrtDfl8H0kqJ_oHx9eAn9ox9r_B6NnsrpfohdJA
-Message-ID: <CAGXJAmyNPhA-6L0jv8AT9_xaxM81k+8nD5H+wtj=UN84PB_KnA@mail.gmail.com>
-Subject: Re: [PATCH net-next v6 08/12] net: homa: create homa_incoming.c
-To: Paolo Abeni <pabeni@redhat.com>
-Cc: Netdev <netdev@vger.kernel.org>, Eric Dumazet <edumazet@google.com>, 
-	Simon Horman <horms@kernel.org>, Jakub Kicinski <kuba@kernel.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Spam-Score: -1.0
-X-Spam-Level: 
-X-Scan-Signature: ae7d61d5ad21aa0d569d6b6c8168eb46
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-On Mon, Feb 3, 2025 at 1:12=E2=80=AFAM Paolo Abeni <pabeni@redhat.com> wrot=
-e:
->
-> >>>> Also it looks like there is no memory accounting at all, and SO_RCVB=
-UF
-> >>>> setting are just ignored.
-> >>>
-> >>> Homa doesn't yet have comprehensive memory accounting, but there is a
-> >>> limit on buffer space for incoming messages. Instead of SO_RCVBUF,
-> >>> applications control the amount of receive buffer space by controllin=
-g
-> >>> the size of the buffer pool they provide to Homa with the
-> >>> SO_HOMA_RCVBUF socket option.
-> >>
-> >> Ignoring SO_RCVBUF (and net.core.rmem_* sysctls) is both unexpected an=
-d
-> >> dangerous (a single application may consume unbounded amount of system
-> >> memory). Also what about the TX side? I don't see any limit at all the=
-re.
-> >
-> > An application cannot consume unbounded system memory on the RX side
-> > (in fact it consumes almost none). When packets arrive, their data is
-> > immediately transferred to a buffer region in user memory provided by
-> > the application (using the facilities in homa_pool.c). Skb's are
-> > occupied only long enough to make this transfer, and it happens even
-> > if there is no pending recv* kernel call. The size of the buffer
-> > region is limited by the application, and the application must provide
-> > a region via SO_HOMA_RCVBUF.
->
-> I don't see where/how the SO_HOMA_RCVBUF max value is somehow bounded?!?
-> It looks like the user-space could pick an arbitrary large value for it.
+On Mon,  3 Feb 2025 14:30:39 +0000 Eric Dumazet wrote:
+> @@ -611,9 +611,9 @@ void __icmp_send(struct sk_buff *skb_in, int type, int code, __be32 info,
+>  		goto out;
+>  
+>  	if (rt->dst.dev)
+> -		net = dev_net(rt->dst.dev);
+> +		net = dev_net_rcu(rt->dst.dev);
+>  	else if (skb_in->dev)
+> -		net = dev_net(skb_in->dev);
+> +		net = dev_net_rcu(skb_in->dev);
+>  	else
+>  		goto out;
 
-That's right; is there anything to be gained by limiting it? This is
-simply mmapped memory in the user address space. Aren't applications
-allowed to allocate as much memory as they like? If so, why shouldn't
-they be able to use that memory for incoming buffers if they choose?
+Hm. Weird. NIPA says this one is not under RCU.
 
-> > Given this, there's no need for SO_RCVBUF
-> > (and I don't see why a different limit would be specified via
-> > SO_RCVBUF than the one already provided via SO_HOMA_RCVBUF).
-> > I agree that this is different from TCP, but Homa is different from TCP=
- in
-> > lots of ways.
-> >
-> > There is currently no accounting or control on the TX side. I agree
-> > that this needs to be implemented at some point, but if possible I'd
-> > prefer to defer this until more of Homa has been upstreamed. For
-> > example, this current patch doesn't include any sysctl support, which
-> > would be needed as part of accounting/control (the support is part of
-> > the GitHub repo, it's just not in this patch series).
->
-> SO_RCVBUF and SO_SNDBUF are expected to apply to any kind of socket,
-> see man 7 sockets. Exceptions should be at least documented, but we need
-> some way to limit memory usage in both directions.
+[  275.730657][    C1] ./include/net/net_namespace.h:404 suspicious rcu_dereference_check() usage!
+[  275.731033][    C1] 
+[  275.731033][    C1] other info that might help us debug this:
+[  275.731033][    C1] 
+[  275.731471][    C1] 
+[  275.731471][    C1] rcu_scheduler_active = 2, debug_locks = 1
+[  275.731799][    C1] 1 lock held by swapper/1/0:
+[  275.732000][    C1]  #0: ffffc900001e0ae8 ((&n->timer)){+.-.}-{0:0}, at: call_timer_fn+0xe8/0x230
+[  275.732354][    C1] 
+[  275.732354][    C1] stack backtrace:
+[  275.732638][    C1] CPU: 1 UID: 0 PID: 0 Comm: swapper/1 Not tainted 6.13.0-virtme #1
+[  275.732643][    C1] Hardware name: Bochs Bochs, BIOS Bochs 01/01/2011
+[  275.732646][    C1] Call Trace:
+[  275.732647][    C1]  <IRQ>
+[  275.732651][    C1]  dump_stack_lvl+0xb0/0xd0
+[  275.732663][    C1]  lockdep_rcu_suspicious+0x1ea/0x280
+[  275.732678][    C1]  __icmp_send+0xb0d/0x1580
+[  275.732695][    C1]  ? tcp_data_queue+0x8/0x22d0
+[  275.732701][    C1]  ? lockdep_hardirqs_on_prepare+0x12b/0x410
+[  275.732712][    C1]  ? __pfx___icmp_send+0x10/0x10
+[  275.732719][    C1]  ? tcp_check_space+0x3ce/0x5f0
+[  275.732742][    C1]  ? rcu_read_lock_any_held+0x43/0xb0
+[  275.732750][    C1]  ? validate_chain+0x1fe/0xae0
+[  275.732771][    C1]  ? __pfx_validate_chain+0x10/0x10
+[  275.732778][    C1]  ? hlock_class+0x4e/0x130
+[  275.732784][    C1]  ? mark_lock+0x38/0x3e0
+[  275.732788][    C1]  ? sock_put+0x1a/0x60
+[  275.732806][    C1]  ? __lock_acquire+0xb9a/0x1680
+[  275.732822][    C1]  ipv4_send_dest_unreach+0x3b4/0x800
+[  275.732829][    C1]  ? neigh_invalidate+0x1c7/0x540
+[  275.732837][    C1]  ? __pfx_ipv4_send_dest_unreach+0x10/0x10
+[  275.732850][    C1]  ipv4_link_failure+0x1b/0x190
+[  275.732856][    C1]  arp_error_report+0x96/0x170
+[  275.732862][    C1]  neigh_invalidate+0x209/0x540
+[  275.732873][    C1]  neigh_timer_handler+0x87a/0xdf0
+[  275.732883][    C1]  ? __pfx_neigh_timer_handler+0x10/0x10
+[  275.732886][    C1]  call_timer_fn+0x13b/0x230
+[  275.732891][    C1]  ? call_timer_fn+0xe8/0x230
+[  275.732894][    C1]  ? call_timer_fn+0xe8/0x230
+[  275.732899][    C1]  ? __pfx_call_timer_fn+0x10/0x10
+[  275.732902][    C1]  ? mark_lock+0x38/0x3e0
+[  275.732920][    C1]  __run_timers+0x545/0x810
+[  275.732925][    C1]  ? __pfx_neigh_timer_handler+0x10/0x10
+[  275.732936][    C1]  ? __pfx___run_timers+0x10/0x10
+[  275.732939][    C1]  ? __lock_release+0x103/0x460
+[  275.732947][    C1]  ? do_raw_spin_lock+0x131/0x270
+[  275.732952][    C1]  ? __pfx_do_raw_spin_lock+0x10/0x10
+[  275.732956][    C1]  ? lock_acquire+0x32/0xc0
+[  275.732958][    C1]  ? timer_expire_remote+0x96/0xf0
+[  275.732967][    C1]  timer_expire_remote+0x9e/0xf0
+[  275.732970][    C1]  tmigr_handle_remote_cpu+0x278/0x440
+[  275.732977][    C1]  ? __pfx_tmigr_handle_remote_cpu+0x10/0x10
+[  275.732981][    C1]  ? __pfx___lock_release+0x10/0x10
+[  275.732985][    C1]  ? __pfx_lock_acquire.part.0+0x10/0x10
+[  275.733015][    C1]  tmigr_handle_remote_up+0x1a6/0x270
+[  275.733027][    C1]  ? __pfx_tmigr_handle_remote_up+0x10/0x10
+[  275.733036][    C1]  __walk_groups.isra.0+0x44/0x160
+[  275.733051][    C1]  tmigr_handle_remote+0x20b/0x300
 
-The expectations around these limits are based on an unstated (and
-probably unconscious) assumption of a TCP-like streaming protocol.
-RPCs are different. For example, there is no one value of rmem_default
-or rmem_max that will work for both TCP and Homa. On my system, these
-values are both around 200 KB, which seems fine for TCP, but that's
-not even enough for a single full-size RPC in Homa, and Homa apps need
-to have several active RPCs at a time. Thus it doesn't make sense to
-use SO_RCVBUF and SO_SNDBUF for both Homa and TCP; their needs are too
-different.
-
-> Fine tuning controls and sysctls could land later, but the basic
-> constraints should IMHO be there from the beginning.
-
-OK. I think that SO_HOMA_RCVBUF takes care of RX buffer space. For TX,
-what's the simplest scheme that you would be comfortable with? For
-example, if I cap the number of outstanding RPCs per socket, will that
-be enough for now?
-
-> Side note: if you use per RPC lock, and you know that the later one is a
-> _different_ RPC, there will be no need for unlocking (and LOCKDEP will
-> be happy with a "_nested" annotation).
-
-This risks deadlock if some other thread decides to do things in the
-other order.
-
-
--John-
+Decoded:
+https://netdev-3.bots.linux.dev/vmksft-mptcp-dbg/results/976941/vm-crash-thr0-1
 
