@@ -1,110 +1,131 @@
-Return-Path: <netdev+bounces-162200-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-162201-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 72CB3A26203
-	for <lists+netdev@lfdr.de>; Mon,  3 Feb 2025 19:14:28 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 790BBA26295
+	for <lists+netdev@lfdr.de>; Mon,  3 Feb 2025 19:35:12 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 1BC2B7A1E9C
-	for <lists+netdev@lfdr.de>; Mon,  3 Feb 2025 18:13:33 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id A94C71884366
+	for <lists+netdev@lfdr.de>; Mon,  3 Feb 2025 18:35:16 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A714920550C;
-	Mon,  3 Feb 2025 18:14:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 769C51465BA;
+	Mon,  3 Feb 2025 18:33:55 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=yandex.ru header.i=@yandex.ru header.b="KVYnc9/M"
+	dkim=pass (2048-bit key) header.d=treblig.org header.i=@treblig.org header.b="n3LaZN3Z"
 X-Original-To: netdev@vger.kernel.org
-Received: from forward501d.mail.yandex.net (forward501d.mail.yandex.net [178.154.239.209])
+Received: from mx.treblig.org (mx.treblig.org [46.235.229.95])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9DA502C859
-	for <netdev@vger.kernel.org>; Mon,  3 Feb 2025 18:14:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=178.154.239.209
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1F77013212A;
+	Mon,  3 Feb 2025 18:33:52 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=46.235.229.95
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1738606462; cv=none; b=eACPhM8wgWo426WA19mj9zvIZyF2LxDMXNjAFAbTzzmcfaOiy0HTGNd12tKE1G056VH74iHCctqhliQksefQfylN60vuFezUUh9mbhHiN1VInlqCLmdqpUiGtfKbLpvTRCkLZmLDF4IhDO5+VlgS1fCojc//9R/TCsYFUNYaZRU=
+	t=1738607635; cv=none; b=SNEFKZ5k1cR27GGp/wDwKrHjiyLORYSM887LjUpqt0gbkVej4vzlTmQ4fSKall8IllgYWY9tA4AJbO/DerrjKVKeQ+ofm8GOpM5YnT+EGwvPQc/49KF838s7sAtyy8huyClF/sjRQebdUpF2+8Igy+9DfQ8cuzIR1pU/i4loQQc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1738606462; c=relaxed/simple;
-	bh=4H/1WMt6VMCtIZs9zCa0ttVpZohm7D2tzopVyWLjqDc=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=BE9f1Z5HS6iPvoOqSjk+ZoA3e3G/FyWlR0KZH5dvjDsLvauB28TknBR6NsyusgsXZZL7scmPxhUyGoBjV3ayYVDG7Z3dn3Y0WmjnvlTvdeOi16T1pB/b3CJP2hh7mrfIhH9NJ2okfKDPoH4bzjifRwv6ZPVILxghLRp6M1u7cxc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=yandex.ru; spf=pass smtp.mailfrom=yandex.ru; dkim=pass (1024-bit key) header.d=yandex.ru header.i=@yandex.ru header.b=KVYnc9/M; arc=none smtp.client-ip=178.154.239.209
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=yandex.ru
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=yandex.ru
-Received: from mail-nwsmtp-smtp-production-main-23.myt.yp-c.yandex.net (mail-nwsmtp-smtp-production-main-23.myt.yp-c.yandex.net [IPv6:2a02:6b8:c12:362e:0:640:4be2:0])
-	by forward501d.mail.yandex.net (Yandex) with ESMTPS id D2EE960F80;
-	Mon,  3 Feb 2025 21:14:08 +0300 (MSK)
-Received: by mail-nwsmtp-smtp-production-main-23.myt.yp-c.yandex.net (smtp/Yandex) with ESMTPSA id 6EoCWBKOo8c0-uaX7CA3Q;
-	Mon, 03 Feb 2025 21:14:08 +0300
-X-Yandex-Fwd: 1
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=yandex.ru; s=mail;
-	t=1738606448; bh=4H/1WMt6VMCtIZs9zCa0ttVpZohm7D2tzopVyWLjqDc=;
-	h=From:In-Reply-To:Cc:Date:References:To:Subject:Message-ID;
-	b=KVYnc9/MEnf07JpA4OLdVWYYnGWQTnJQZVupqLNd8LlgnR+8G6gpTsnb9gV7G2lAt
-	 +Q+UTUhy0skWsxwtw1RYFaSTheDyYrXD2aoYMMOxmxfOzy+yJWBR1UH+opKVISMm98
-	 wwSeplx72WaE5zaJg0er1I7eg5ZHdl0jjALmFztg=
-Authentication-Results: mail-nwsmtp-smtp-production-main-23.myt.yp-c.yandex.net; dkim=pass header.i=@yandex.ru
-Message-ID: <48edf7d4-0c1f-4980-b22f-967d203a403d@yandex.ru>
-Date: Mon, 3 Feb 2025 21:14:06 +0300
+	s=arc-20240116; t=1738607635; c=relaxed/simple;
+	bh=Qv/oA1NGqm3eNS3fmvEshfrAJP0CchhzemG1BbiJx+s=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=VpxA+zUnL1mLjnBNgGEyqVvt+VOr5sSVeCfxucRHPW6yYH2KyajqBf6r4zx1F0Xx8ag6sSot8Q6W+R+LGfhAqcG7ueQs99qLNs+M3NPRKhoS6fyHYyGKP4FLHMQ8cH+s248OWXvSoEbdkzcTFbixs3f7jNpLfHPpNqvEIyq+zfA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=treblig.org; spf=pass smtp.mailfrom=treblig.org; dkim=pass (2048-bit key) header.d=treblig.org header.i=@treblig.org header.b=n3LaZN3Z; arc=none smtp.client-ip=46.235.229.95
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=treblig.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=treblig.org
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=treblig.org
+	; s=bytemarkmx; h=MIME-Version:Message-ID:Date:Subject:From:Content-Type:From
+	:Subject; bh=1jgkRuEtsRrFHms0bbp4Vipk3ibC4Od1v2ikll/s3rM=; b=n3LaZN3ZhlpxdzX0
+	oazk7LTtlzI+nrDaU8GYyFBOm7AjuRhurj8v2LPgcif3kaLG1kmfb2Hpjpt+3OeuT6usBkDW2aNuC
+	97NDrQBEPD2CMNNOKov/49Nt++wf0GFMmwSYnnSWAp5sMzWhY9NmkYsFoB6yMQ+NwYQOxxFoydD1X
+	iTqtRQxkLX9ZeHE5ACldFS32cIlqmT+EPeVDEfqezuxzleZFB/2IX1WeBI4f0wFNlB4NI339eybYf
+	FRIDeP5FVxBp4IonBMiU+xta/TjVyP7nhR9QFnDlSPTOBsYKyDul6vO9oBar2LqUEI/1bJ1QcdbOp
+	ukWpicfPZH/bUgbFkg==;
+Received: from localhost ([127.0.0.1] helo=dalek.home.treblig.org)
+	by mx.treblig.org with esmtp (Exim 4.96)
+	(envelope-from <linux@treblig.org>)
+	id 1tf1GS-00DLY3-0Z;
+	Mon, 03 Feb 2025 18:33:44 +0000
+From: linux@treblig.org
+To: andrew+netdev@lunn.ch,
+	davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com
+Cc: horms@kernel.org,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	"Dr. David Alan Gilbert" <linux@treblig.org>
+Subject: [PATCH net-next] cavium/liquidio: Remove unused lio_get_device_id
+Date: Mon,  3 Feb 2025 18:33:43 +0000
+Message-ID: <20250203183343.193691-1-linux@treblig.org>
+X-Mailer: git-send-email 2.48.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net] tun: revert fix group permission check
-To: Willem de Bruijn <willemdebruijn.kernel@gmail.com>, netdev@vger.kernel.org
-Cc: davem@davemloft.net, kuba@kernel.org, edumazet@google.com,
- pabeni@redhat.com, jasowang@redhat.com, Willem de Bruijn
- <willemb@google.com>, Ondrej Mosnacek <omosnace@redhat.com>
-References: <20250203150615.96810-1-willemdebruijn.kernel@gmail.com>
-Content-Language: en-US
-From: stsp <stsp2@yandex.ru>
-In-Reply-To: <20250203150615.96810-1-willemdebruijn.kernel@gmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
 
-03.02.2025 18:05, Willem de Bruijn пишет:
-> From: Willem de Bruijn <willemb@google.com>
->
-> This reverts commit 3ca459eaba1bf96a8c7878de84fa8872259a01e3.
->
-> The blamed commit caused a regression when neither tun->owner nor
-> tun->group is set. This is intended to be allowed, but now requires
-> CAP_NET_ADMIN.
->
-> Discussion in the referenced thread pointed out that the original
-> issue that prompted this patch can be resolved in userspace.
+From: "Dr. David Alan Gilbert" <linux@treblig.org>
 
-The point of the patch was
-not to fix userspace, but this
-bug: when you have owner set,
-then adding group either changes
-nothing at all, or removes all
-access. I.e. there is no valid case
-for adding group when owner
-already set.
-During the discussion it became
-obvious that simpler fixes may
-exist (like eg either-or semantic),
-so why not to revert based on
-that?
+lio_get_device_id() has been unused since 2018's
+commit 64fecd3ec512 ("liquidio: remove obsolete functions and data
+structures")
 
-> The relaxed access control may now make a device accessible when it
-> previously wasn't, while existing users may depend on it to not be.
->
-> Since the fix is not critical and introduces security risk, revert,
-Well, I don't agree with that justification.
-My patch introduced the usability
-problem, but not a security risk.
-I don't want to be attributed with
-the security risk when this wasn't
-the case (to the very least, you
-still need the perms to open /dev/net/tun),
-so could you please remove that part?
-I don't think you need to exaggerate
-anything: it introduces the usability
-regression, which should be enough
-for any instant revert.
+Remove it.
+
+Signed-off-by: Dr. David Alan Gilbert <linux@treblig.org>
+Reviewed-by: Simon Horman <horms@kernel.org>
+---
+ .../net/ethernet/cavium/liquidio/octeon_device.c | 16 ----------------
+ .../net/ethernet/cavium/liquidio/octeon_device.h |  7 -------
+ 2 files changed, 23 deletions(-)
+
+diff --git a/drivers/net/ethernet/cavium/liquidio/octeon_device.c b/drivers/net/ethernet/cavium/liquidio/octeon_device.c
+index 6b6cb73482d7..1753bb87dfbd 100644
+--- a/drivers/net/ethernet/cavium/liquidio/octeon_device.c
++++ b/drivers/net/ethernet/cavium/liquidio/octeon_device.c
+@@ -1433,22 +1433,6 @@ int octeon_wait_for_ddr_init(struct octeon_device *oct, u32 *timeout)
+ }
+ EXPORT_SYMBOL_GPL(octeon_wait_for_ddr_init);
+ 
+-/* Get the octeon id assigned to the octeon device passed as argument.
+- *  This function is exported to other modules.
+- *  @param dev - octeon device pointer passed as a void *.
+- *  @return octeon device id
+- */
+-int lio_get_device_id(void *dev)
+-{
+-	struct octeon_device *octeon_dev = (struct octeon_device *)dev;
+-	u32 i;
+-
+-	for (i = 0; i < MAX_OCTEON_DEVICES; i++)
+-		if (octeon_device[i] == octeon_dev)
+-			return octeon_dev->octeon_id;
+-	return -1;
+-}
+-
+ void lio_enable_irq(struct octeon_droq *droq, struct octeon_instr_queue *iq)
+ {
+ 	u64 instr_cnt;
+diff --git a/drivers/net/ethernet/cavium/liquidio/octeon_device.h b/drivers/net/ethernet/cavium/liquidio/octeon_device.h
+index d26364c2ac81..19344b21f8fb 100644
+--- a/drivers/net/ethernet/cavium/liquidio/octeon_device.h
++++ b/drivers/net/ethernet/cavium/liquidio/octeon_device.h
+@@ -705,13 +705,6 @@ octeon_get_dispatch(struct octeon_device *octeon_dev, u16 opcode,
+  */
+ struct octeon_device *lio_get_device(u32 octeon_id);
+ 
+-/** Get the octeon id assigned to the octeon device passed as argument.
+- *  This function is exported to other modules.
+- *  @param dev - octeon device pointer passed as a void *.
+- *  @return octeon device id
+- */
+-int lio_get_device_id(void *dev);
+-
+ /** Read windowed register.
+  *  @param  oct   -  pointer to the Octeon device.
+  *  @param  addr  -  Address of the register to read.
+-- 
+2.48.1
+
 
