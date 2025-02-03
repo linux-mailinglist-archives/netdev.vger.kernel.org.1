@@ -1,203 +1,213 @@
-Return-Path: <netdev+bounces-162031-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-162032-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5FFC6A2566A
-	for <lists+netdev@lfdr.de>; Mon,  3 Feb 2025 10:55:30 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 42D89A2567D
+	for <lists+netdev@lfdr.de>; Mon,  3 Feb 2025 10:57:38 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E23873AAE65
-	for <lists+netdev@lfdr.de>; Mon,  3 Feb 2025 09:54:46 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id D68FD1889200
+	for <lists+netdev@lfdr.de>; Mon,  3 Feb 2025 09:57:42 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C5C5A200138;
-	Mon,  3 Feb 2025 09:54:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=openvpn.net header.i=@openvpn.net header.b="LCbfFJcO"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 56EB1200136;
+	Mon,  3 Feb 2025 09:57:23 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f45.google.com (mail-wm1-f45.google.com [209.85.128.45])
+Received: from mail-il1-f205.google.com (mail-il1-f205.google.com [209.85.166.205])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9343974BED
-	for <netdev@vger.kernel.org>; Mon,  3 Feb 2025 09:54:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.45
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7427E1FAC3D
+	for <netdev@vger.kernel.org>; Mon,  3 Feb 2025 09:57:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.205
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1738576467; cv=none; b=eQyhOFd/lullPwG2/1RQg2nVSk8rIt3gRBc0VCTddG3s0wsCCcJdaHB8tZiwrPudBZf5A+ZoIvWHmWk/SUtr2Xo2XAm/sPt8Jq6YyyQ3i1Cv3VsrOaQXo1/Jwb/pRZFTayyIZaUrOutfCOcF2AVOtbOQMWblHeWjHH88EZRtt0w=
+	t=1738576643; cv=none; b=JaAWOcWcQL2SeNrvKT1e+s0I26SJT0ioQ2qRINC/C9yfIsRZ+SDdbLxPelvvVgKsbjzATm2mt3PdC2bP3gfsTu9QjUl6WpYPXGoe1XSTNsiayk7hIbwH5PBI3ese1mASlCDtkoFLaDz1u3OjQ0sXTn/BOsEBX2C3r9jtaWP2hHc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1738576467; c=relaxed/simple;
-	bh=eSmxloYDYU8L7DSmQw+qJpOAKVq/lSAURecTBARj2aE=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=DdjElUxrgge0Ew8Je/dAMfVkV95Jrc45RlmJ3SAqMuyzeBj9eCOy68KH5sQ1GxrZPeRwrNoLiTQkklH8XNJyZVcBRgKatKOXt2FkuU0yvtXNTeJCKsKAue0nznV+we3iyNEq85Eq6bFjm4gD2uBh5jp7W4BLhGevkCACK4aLm0w=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=openvpn.net; spf=pass smtp.mailfrom=openvpn.com; dkim=pass (2048-bit key) header.d=openvpn.net header.i=@openvpn.net header.b=LCbfFJcO; arc=none smtp.client-ip=209.85.128.45
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=openvpn.net
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=openvpn.com
-Received: by mail-wm1-f45.google.com with SMTP id 5b1f17b1804b1-4362f61757fso43183385e9.2
-        for <netdev@vger.kernel.org>; Mon, 03 Feb 2025 01:54:25 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=openvpn.net; s=google; t=1738576464; x=1739181264; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:organization:autocrypt:from
-         :content-language:references:cc:to:subject:user-agent:mime-version
-         :date:message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=96711Zo9CR2XVG17Nter5UiX4vK8kBFFsAbRByM3Gl8=;
-        b=LCbfFJcOjseqbaie/9EPKxqNVz8GWV0SGSsJU9/9ALvKv3a6jgEI5gxaWP/sqkOizA
-         BnFA+tMQXuRbJNyrZvYklQNRKk7YigpFhN/ElPNnmhXz7BkqWQAXOL8vET0q/NI7VR3i
-         la7A+iv7/jyPE2ICOr6r9VQ73F+o9NuUE8hW/6ieSloUhrFoIvyHOJYfHqkOmpoA12cZ
-         LeV+lQ59EYArpQTM7wzII22ceEYuaHkL4iDpn897cv+epFCFaaMPZDZw1zixMsmjScNc
-         ASPvvmr4FHEduCM/aVbkS8i/x5aa+pnyXbIY9P9gCSZ8PnkQFjI5Fl0SqCxqPp0DWfio
-         mCWA==
+	s=arc-20240116; t=1738576643; c=relaxed/simple;
+	bh=7QPCZVm8uZsigVkzr7sQwFV5eYHQpG7HcOxYgpl/Db0=;
+	h=MIME-Version:Date:Message-ID:Subject:From:To:Content-Type; b=tRP+kH/M2s8lT3fJv20E8uZAbtKE3UVXP3jYjOnlsbTA0Y7dpcOVb6LVa6aPBQcAwiHGBU0lglp8CyY+018iAbhDnVyX/972ZJDPwL8d8ZrLWKYS8fy+FQjiBpv5CkQMNKZxbkFg3Hd7cADVkFbcoh8Bx64lhxIqSItm/UQ0FeM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.205
+Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
+Received: by mail-il1-f205.google.com with SMTP id e9e14a558f8ab-3ce7b6225aeso75025235ab.0
+        for <netdev@vger.kernel.org>; Mon, 03 Feb 2025 01:57:21 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1738576464; x=1739181264;
-        h=content-transfer-encoding:in-reply-to:organization:autocrypt:from
-         :content-language:references:cc:to:subject:user-agent:mime-version
-         :date:message-id:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=96711Zo9CR2XVG17Nter5UiX4vK8kBFFsAbRByM3Gl8=;
-        b=OT/wBDfkv5UDd3ec1sUitF1kCcizoYDcqzGxb45iVI0Qn/tLSlnQ9WPLmnveJ3+htZ
-         F32H44gKG/ho0HplpCp73X9eQWag7Z4bFuPDursNICweShQQ2JltsiDQclJbUF/aMMWJ
-         Xzmomi7ms+m/MZ3Z1mgjnf/4YPSZiMbwK2cSRvcQ9DdOTgWN0MUuZnOo7582truqY+1J
-         6imP3S9SaegZISGgRt8sI1k9f8CaaHD/Fi6KsC80num/KtRlOvyAv0+iFXdFS+Vwc4Fl
-         PEX9gOJNCIxnfKsEGNOSrhouOOZv5/h6Rpi+1wCPlX8yY6jnp5oIkrgBj7yUblyTyajH
-         L6Cg==
-X-Gm-Message-State: AOJu0YyjQPVhFzglrGsh0osMxA5QcTu483u4t+EcS5A/QwcuiIAv496S
-	v+Z85TdoTjCRF+DsW6wo00pu//AmwogYnn8lHNTaPpT99oFnS6s2aGEwhD/2M3c=
-X-Gm-Gg: ASbGncvsrNVq0i9n+L5G4Wa3r1D1kBm7LLanswYY8tWWPSeuwQRbnUYUX3bC28r9kdj
-	D3o0nvePB/EAhCBpXTHwJV/Dcculm1ITSRMMVrHZF2Xn4tDTl2rv+K+sfJhTkX4vfVFL/nJ8otQ
-	Qg2pZ7LGe0ulXe+YjLX3F3yOKzqhDc95vbPp9XxATNA07VyEYttOLJkNYjFs+Zm39Iw+KueMiu6
-	H+nW38am4h3NiV1fd29Qr7Y+L2H5A9oLiUT8Bi84NAUpbRpHaO44G/1J5pyadOl1wpthRu5acBz
-	PS11/S8wcRZVvFSXdTWrxgw4wrD9A83ylZSdmpj6ZqwDDdpLbAUhGA==
-X-Google-Smtp-Source: AGHT+IFAl7UbKfI1GKffJcPjedN1nuCRKvEEkQnMY9cXhghwcJTAvGfBl5nsP69ucOB3VdXDqNL09Q==
-X-Received: by 2002:a05:600c:4e0f:b0:431:93d8:e1a1 with SMTP id 5b1f17b1804b1-438dc421388mr154443835e9.27.1738576463796;
-        Mon, 03 Feb 2025 01:54:23 -0800 (PST)
-Received: from ?IPV6:2001:67c:2fbc:1:b4fe:e6fa:32a0:6a72? ([2001:67c:2fbc:1:b4fe:e6fa:32a0:6a72])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-38c5c11b58esm12003819f8f.42.2025.02.03.01.54.22
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 03 Feb 2025 01:54:23 -0800 (PST)
-Message-ID: <eb6bd31b-686b-4edc-bcdf-935cb452b271@openvpn.net>
-Date: Mon, 3 Feb 2025 10:55:31 +0100
+        d=1e100.net; s=20230601; t=1738576640; x=1739181440;
+        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=pohBAsk+VfWTs0qwofD5+fE+WCyA8aDvg+C1Zl4hi/g=;
+        b=ILAkHM0oV5YTcUycBg19b29w4CaL0gXrLXbu0rw2r8VNO+VVbCHKwbbDjFVo7ZX1Qg
+         HI4pSPlCG1PFhQLYB81v8AIZMoWeaYyKhdF5OBIoV01tu3w4GH1scVOwVGZRw7AqFXEk
+         JpgBCurU6C9yNVSnYNmlieu8XZDd/qHne792Oa5VKLt/o7JkWTaUGukLv09SmTL+zxrc
+         Re7z6QIYvWlfAxCAd08VWnrp4hCzhfLlE7wmJX4RonKQmjMnIRmYIOWghgi8jUO8dB3W
+         z9Uf2Vq9FY2Mg5hw0T56AT6QpWtLegWMVc1Y5VARBCt82QEh69bS3ho9hFdRtaJ3EDW2
+         8ZuQ==
+X-Forwarded-Encrypted: i=1; AJvYcCX0JCfFWFg736Vwlyl+dsB0VoElYffenqvNB0xQW1m1eAvlGKxvFj4BVnrHDb5NoIzv9g8k+rY=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyL986wYpYjhqWecIgj1EYl9wIApn29YJRKYhZi+eDsgpJjQHlM
+	HFDgHDRJx/DEPInxT22rJ19dsiTMWbpsIl7K1q+DwSNIu0+p2OessPyy8ZXzUMseFlLQZhNaC+k
+	OsBenIYApF9GSvBJWbo7OKCFjbR0My3k7roSmN7p6f4/bKU7MbpeKPNo=
+X-Google-Smtp-Source: AGHT+IFGjYu0PzVJbiJYn3l/HayCoiP6DVH3R1koA8FiVlkJ2t+WwOWB1EI1T6J/gLhOprq9VymUxq1o7Y8s1FMo+cPDcqtpgtyg
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next v18 17/25] ovpn: implement keepalive mechanism
-To: Sabrina Dubroca <sd@queasysnail.net>
-Cc: netdev@vger.kernel.org, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- Donald Hunter <donald.hunter@gmail.com>, Shuah Khan <shuah@kernel.org>,
- ryazanov.s.a@gmail.com, Andrew Lunn <andrew+netdev@lunn.ch>,
- Simon Horman <horms@kernel.org>, linux-kernel@vger.kernel.org,
- linux-kselftest@vger.kernel.org, Xiao Liang <shaw.leon@gmail.com>
-References: <20250113-b4-ovpn-v18-0-1f00db9c2bd6@openvpn.net>
- <20250113-b4-ovpn-v18-17-1f00db9c2bd6@openvpn.net> <Z6CKYA8ueI-ZGybN@hog>
-Content-Language: en-US
-From: Antonio Quartulli <antonio@openvpn.net>
-Autocrypt: addr=antonio@openvpn.net; keydata=
- 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
-Organization: OpenVPN Inc.
-In-Reply-To: <Z6CKYA8ueI-ZGybN@hog>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+X-Received: by 2002:a05:6e02:2483:b0:3cf:c8bf:3b8a with SMTP id
+ e9e14a558f8ab-3cffe3e5c91mr205309775ab.7.1738576640656; Mon, 03 Feb 2025
+ 01:57:20 -0800 (PST)
+Date: Mon, 03 Feb 2025 01:57:20 -0800
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <67a09300.050a0220.d7c5a.008b.GAE@google.com>
+Subject: [syzbot] [net?] general protection fault in add_wait_queue
+From: syzbot <syzbot+9d55b199192a4be7d02c@syzkaller.appspotmail.com>
+To: davem@davemloft.net, edumazet@google.com, eperezma@redhat.com, 
+	horms@kernel.org, jasowang@redhat.com, kuba@kernel.org, kvm@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, mhal@rbox.co, mst@redhat.com, 
+	netdev@vger.kernel.org, pabeni@redhat.com, sgarzare@redhat.com, 
+	stefanha@redhat.com, syzkaller-bugs@googlegroups.com, 
+	virtualization@lists.linux.dev, xuanzhuo@linux.alibaba.com
+Content-Type: text/plain; charset="UTF-8"
 
-On 03/02/2025 10:20, Sabrina Dubroca wrote:
-> 2025-01-13, 10:31:36 +0100, Antonio Quartulli wrote:
->> +void ovpn_xmit_special(struct ovpn_peer *peer, const void *data,
->> +		       const unsigned int len)
->> +{
->> +	struct ovpn_priv *ovpn;
->> +	struct sk_buff *skb;
->> +
->> +	ovpn = peer->ovpn;
->> +	if (unlikely(!ovpn))
->> +		return;
->> +
->> +	skb = alloc_skb(256 + len, GFP_ATOMIC);
->> +	if (unlikely(!skb))
->> +		return;
->> +
->> +	skb_reserve(skb, 128);
->> +	skb->priority = TC_PRIO_BESTEFFORT;
->> +	__skb_put_data(skb, data, len);
->> +
->> +	/* increase reference counter when passing peer to sending queue */
->> +	if (!ovpn_peer_hold(peer)) {
->> +		netdev_dbg(ovpn->dev,
->> +			   "cannot hold peer reference for sending special packet\n");
->> +		kfree_skb(skb);
->> +		return;
->> +	}
->> +
->> +	ovpn_send(ovpn, skb, peer);
->> +}
-> 
-> [...]
->> +static void ovpn_peer_keepalive_send(struct work_struct *work)
->> +{
->> +	struct ovpn_peer *peer = container_of(work, struct ovpn_peer,
->> +					      keepalive_work);
->> +
->> +	local_bh_disable();
->> +	ovpn_xmit_special(peer, ovpn_keepalive_message,
->> +			  sizeof(ovpn_keepalive_message));
->> +	local_bh_enable();
->> +	ovpn_peer_put(peer);
-> 
-> nit: could we simply drop this put and the hold in ovpn_xmit_special?
-> ovpn_peer_keepalive_send has a reference on the peer from the WQ, just
-> transfer it to ovpn_xmit_special and then ovpn_send. No need to
-> pretend to acquire one for ovpn_send's sake and drop the one we got
-> from the WQ? (ovpn_xmit_special would need to _put(peer) in case of
-> early return)
+Hello,
 
-Ok, will drop both and add a comment to remember the casual reader that 
-we already hold a reference (+ put() in error path).
+syzbot found the following issue on:
 
-Regards,
+HEAD commit:    c2933b2befe2 Merge tag 'net-6.14-rc1' of git://git.kernel...
+git tree:       net-next
+console output: https://syzkaller.appspot.com/x/log.txt?x=16f676b0580000
+kernel config:  https://syzkaller.appspot.com/x/.config?x=d033b14aeef39158
+dashboard link: https://syzkaller.appspot.com/bug?extid=9d55b199192a4be7d02c
+compiler:       Debian clang version 15.0.6, GNU ld (GNU Binutils for Debian) 2.40
+syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=13300b24580000
+C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=12418518580000
 
-> 
->> +}
-> 
+Downloadable assets:
+disk image: https://storage.googleapis.com/syzbot-assets/c7667ae12603/disk-c2933b2b.raw.xz
+vmlinux: https://storage.googleapis.com/syzbot-assets/944ca63002c1/vmlinux-c2933b2b.xz
+kernel image: https://storage.googleapis.com/syzbot-assets/30748115bf0b/bzImage-c2933b2b.xz
 
--- 
-Antonio Quartulli
-OpenVPN Inc.
+The issue was bisected to:
 
+commit fcdd2242c0231032fc84e1404315c245ae56322a
+Author: Michal Luczaj <mhal@rbox.co>
+Date:   Tue Jan 28 13:15:27 2025 +0000
+
+    vsock: Keep the binding until socket destruction
+
+bisection log:  https://syzkaller.appspot.com/x/bisect.txt?x=148f5ddf980000
+final oops:     https://syzkaller.appspot.com/x/report.txt?x=168f5ddf980000
+console output: https://syzkaller.appspot.com/x/log.txt?x=128f5ddf980000
+
+IMPORTANT: if you fix the issue, please add the following tag to the commit:
+Reported-by: syzbot+9d55b199192a4be7d02c@syzkaller.appspotmail.com
+Fixes: fcdd2242c023 ("vsock: Keep the binding until socket destruction")
+
+Oops: general protection fault, probably for non-canonical address 0xdffffc0000000003: 0000 [#1] PREEMPT SMP KASAN PTI
+KASAN: null-ptr-deref in range [0x0000000000000018-0x000000000000001f]
+CPU: 1 UID: 0 PID: 5845 Comm: syz-executor865 Not tainted 6.13.0-syzkaller-09685-gc2933b2befe2 #0
+Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 12/27/2024
+RIP: 0010:__lock_acquire+0x6a/0x2100 kernel/locking/lockdep.c:5091
+Code: b6 04 30 84 c0 0f 85 f8 16 00 00 45 31 f6 83 3d 2b 98 80 0e 00 0f 84 c8 13 00 00 89 54 24 60 89 5c 24 38 4c 89 f8 48 c1 e8 03 <80> 3c 30 00 74 12 4c 89 ff e8 88 26 8b 00 48 be 00 00 00 00 00 fc
+RSP: 0018:ffffc9000407f870 EFLAGS: 00010006
+RAX: 0000000000000003 RBX: 0000000000000000 RCX: 0000000000000000
+RDX: 0000000000000000 RSI: dffffc0000000000 RDI: 0000000000000018
+RBP: 0000000000000001 R08: 0000000000000001 R09: 0000000000000001
+R10: dffffc0000000000 R11: fffffbfff203680f R12: ffff888035760000
+R13: 0000000000000000 R14: 0000000000000000 R15: 0000000000000018
+FS:  000055555c9b3380(0000) GS:ffff8880b8700000(0000) knlGS:0000000000000000
+CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+CR2: 000000002000044c CR3: 00000000352c0000 CR4: 00000000003526f0
+DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
+DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
+Call Trace:
+ <TASK>
+ lock_acquire+0x1ed/0x550 kernel/locking/lockdep.c:5851
+ __raw_spin_lock_irqsave include/linux/spinlock_api_smp.h:110 [inline]
+ _raw_spin_lock_irqsave+0xd5/0x120 kernel/locking/spinlock.c:162
+ add_wait_queue+0x46/0x180 kernel/sched/wait.c:22
+ virtio_transport_wait_close net/vmw_vsock/virtio_transport_common.c:1200 [inline]
+ virtio_transport_close net/vmw_vsock/virtio_transport_common.c:1282 [inline]
+ virtio_transport_release+0x4c4/0xce0 net/vmw_vsock/virtio_transport_common.c:1302
+ __vsock_release+0xf1/0x4f0 net/vmw_vsock/af_vsock.c:830
+ vsock_release+0x97/0x100 net/vmw_vsock/af_vsock.c:941
+ __sock_release net/socket.c:642 [inline]
+ sock_close+0xbc/0x240 net/socket.c:1393
+ __fput+0x3e9/0x9f0 fs/file_table.c:450
+ __do_sys_close fs/open.c:1579 [inline]
+ __se_sys_close fs/open.c:1564 [inline]
+ __x64_sys_close+0x7f/0x110 fs/open.c:1564
+ do_syscall_x64 arch/x86/entry/common.c:52 [inline]
+ do_syscall_64+0xf3/0x230 arch/x86/entry/common.c:83
+ entry_SYSCALL_64_after_hwframe+0x77/0x7f
+RIP: 0033:0x7f2406c95400
+Code: ff f7 d8 64 89 02 48 c7 c0 ff ff ff ff c3 66 2e 0f 1f 84 00 00 00 00 00 66 90 80 3d 81 8c 07 00 00 74 17 b8 03 00 00 00 0f 05 <48> 3d 00 f0 ff ff 77 48 c3 0f 1f 80 00 00 00 00 48 83 ec 18 89 7c
+RSP: 002b:00007ffe044a2b28 EFLAGS: 00000202 ORIG_RAX: 0000000000000003
+RAX: ffffffffffffffda RBX: 0000000000000005 RCX: 00007f2406c95400
+RDX: 000000000000000d RSI: 0000000000000001 RDI: 0000000000000004
+RBP: 00000000000f4240 R08: 0000000000000008 R09: 000000005c9b4610
+R10: 0000000020000180 R11: 0000000000000202 R12: 000000000000e3ae
+R13: 00007ffe044a2b34 R14: 00007ffe044a2b50 R15: 00007ffe044a2b40
+ </TASK>
+Modules linked in:
+---[ end trace 0000000000000000 ]---
+RIP: 0010:__lock_acquire+0x6a/0x2100 kernel/locking/lockdep.c:5091
+Code: b6 04 30 84 c0 0f 85 f8 16 00 00 45 31 f6 83 3d 2b 98 80 0e 00 0f 84 c8 13 00 00 89 54 24 60 89 5c 24 38 4c 89 f8 48 c1 e8 03 <80> 3c 30 00 74 12 4c 89 ff e8 88 26 8b 00 48 be 00 00 00 00 00 fc
+RSP: 0018:ffffc9000407f870 EFLAGS: 00010006
+RAX: 0000000000000003 RBX: 0000000000000000 RCX: 0000000000000000
+RDX: 0000000000000000 RSI: dffffc0000000000 RDI: 0000000000000018
+RBP: 0000000000000001 R08: 0000000000000001 R09: 0000000000000001
+R10: dffffc0000000000 R11: fffffbfff203680f R12: ffff888035760000
+R13: 0000000000000000 R14: 0000000000000000 R15: 0000000000000018
+FS:  000055555c9b3380(0000) GS:ffff8880b8700000(0000) knlGS:0000000000000000
+CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+CR2: 000000002000044c CR3: 00000000352c0000 CR4: 00000000003526f0
+DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
+DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
+----------------
+Code disassembly (best guess):
+   0:	b6 04                	mov    $0x4,%dh
+   2:	30 84 c0 0f 85 f8 16 	xor    %al,0x16f8850f(%rax,%rax,8)
+   9:	00 00                	add    %al,(%rax)
+   b:	45 31 f6             	xor    %r14d,%r14d
+   e:	83 3d 2b 98 80 0e 00 	cmpl   $0x0,0xe80982b(%rip)        # 0xe809840
+  15:	0f 84 c8 13 00 00    	je     0x13e3
+  1b:	89 54 24 60          	mov    %edx,0x60(%rsp)
+  1f:	89 5c 24 38          	mov    %ebx,0x38(%rsp)
+  23:	4c 89 f8             	mov    %r15,%rax
+  26:	48 c1 e8 03          	shr    $0x3,%rax
+* 2a:	80 3c 30 00          	cmpb   $0x0,(%rax,%rsi,1) <-- trapping instruction
+  2e:	74 12                	je     0x42
+  30:	4c 89 ff             	mov    %r15,%rdi
+  33:	e8 88 26 8b 00       	call   0x8b26c0
+  38:	48                   	rex.W
+  39:	be 00 00 00 00       	mov    $0x0,%esi
+  3e:	00 fc                	add    %bh,%ah
+
+
+---
+This report is generated by a bot. It may contain errors.
+See https://goo.gl/tpsmEJ for more information about syzbot.
+syzbot engineers can be reached at syzkaller@googlegroups.com.
+
+syzbot will keep track of this issue. See:
+https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
+For information about bisection process see: https://goo.gl/tpsmEJ#bisection
+
+If the report is already addressed, let syzbot know by replying with:
+#syz fix: exact-commit-title
+
+If you want syzbot to run the reproducer, reply with:
+#syz test: git://repo/address.git branch-or-commit-hash
+If you attach or paste a git patch, syzbot will apply it before testing.
+
+If you want to overwrite report's subsystems, reply with:
+#syz set subsystems: new-subsystem
+(See the list of subsystem names on the web dashboard)
+
+If the report is a duplicate of another one, reply with:
+#syz dup: exact-subject-of-another-report
+
+If you want to undo deduplication, reply with:
+#syz undup
 
