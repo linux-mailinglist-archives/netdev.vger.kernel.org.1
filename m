@@ -1,85 +1,125 @@
-Return-Path: <netdev+bounces-162301-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-162302-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3A42CA26701
-	for <lists+netdev@lfdr.de>; Mon,  3 Feb 2025 23:43:20 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 410B1A26717
+	for <lists+netdev@lfdr.de>; Mon,  3 Feb 2025 23:48:04 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 966D4162DC8
-	for <lists+netdev@lfdr.de>; Mon,  3 Feb 2025 22:43:15 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 16A131881BAC
+	for <lists+netdev@lfdr.de>; Mon,  3 Feb 2025 22:48:09 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8130E2101B5;
-	Mon,  3 Feb 2025 22:40:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A5CAE1EEA2D;
+	Mon,  3 Feb 2025 22:47:59 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Q78kTbCp"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="DoFbihVm"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wm1-f48.google.com (mail-wm1-f48.google.com [209.85.128.48])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5B107210F44
-	for <netdev@vger.kernel.org>; Mon,  3 Feb 2025 22:39:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E259C7D07D;
+	Mon,  3 Feb 2025 22:47:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.48
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1738622400; cv=none; b=N2aUHrAH5k9BhKEVDk+XG1H5mPDDZJoksiZv4k6eXdRASSpsUoKkQjeicE3aWg9IVYEkksvPQkvM4jYSqou6HUJxxxheUwVex8c0ZYdB9FQlgwNtcoCRRJOCJ05qmHH17QRnTiMJfvSD7DMT0V+nuXGC4cgNog+wb9yVnvIeZrI=
+	t=1738622879; cv=none; b=QAzO7wcRJNMZNBgQg3Y5Jgy9sy0lIDQTndHdpDkeoG6T8ml0VbtWlQksta9A+Om8yQ4HmZPOEHvClmqZhzTZnWKFiU0QrrtKmaVZjOF8s/rX3Q46f0RYywlHCr7gyJvguZ09SbiM8rb9iS9f4SH0HyqTyxIXsTHr2O+X6IYkxvY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1738622400; c=relaxed/simple;
-	bh=qFB0wnvJqyGjzKgvicZUJcS1TXMYyYiBBPpI19uIBKo=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=HOFbURpnOJ4KgwsBpZ/2P8nTqm3IdKhJHkF8NThkVzw+5fKpiGm6QHpiHgg4hwEHfvk7QlDQiK52XkCJzHm+hXZKbx+7rlwmotqguYxbsICj6XIp8VwoPL0pMbIa42O77L0ksezBmVyg1AkrPmN6XRjVHwGlkkFFyjOP/cD4L3I=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Q78kTbCp; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7C1E2C4CED2;
-	Mon,  3 Feb 2025 22:39:59 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1738622399;
-	bh=qFB0wnvJqyGjzKgvicZUJcS1TXMYyYiBBPpI19uIBKo=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=Q78kTbCpur0Q2Zk7PMa6h+wOTXm5c+e0h0WzX4gVp39v/ArJpXxcKleKWcvD19Ohy
-	 Lc3Hd8ISiKyq/Z1NUod2WSB1Z40hsmUxBDJolizo56FFwjTdhB+UB239UcVycLf4wB
-	 8zowxu6veAp2kK/BJEl4cCNGZJ5mapPzLISpcyeaf7segqujeQyAgYL+ZQ/8e0z5En
-	 6boknTACHaLd6WHLAZ1ai1z7sSxRfiHof/YrpgkOP3fDjREuwHYi9muomqPSVAC7iT
-	 jFVUqPbG0vsBGpWBsOwKF+/9Pvy0vZNv9LmFVRUsqQEA+8AINzJ2Q6nXHCCfGwqzwS
-	 oW+kEGiyni0Jw==
-Date: Mon, 3 Feb 2025 14:39:58 -0800
-From: Jakub Kicinski <kuba@kernel.org>
-To: Toke =?UTF-8?B?SMO4aWxhbmQtSsO4cmdlbnNlbg==?= <toke@redhat.com>
-Cc: Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller"
- <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Paolo Abeni
- <pabeni@redhat.com>, netdev@vger.kernel.org
-Subject: Re: [PATCH net-next] net: netdevsim: Support setting dev->perm_addr
-Message-ID: <20250203143958.6172c5cd@kernel.org>
-In-Reply-To: <20250203-netdevsim-perm_addr-v1-1-10084bc93044@redhat.com>
-References: <20250203-netdevsim-perm_addr-v1-1-10084bc93044@redhat.com>
+	s=arc-20240116; t=1738622879; c=relaxed/simple;
+	bh=hHTSotaKXn6mqlfsuZRFL7mUlXbYedRwitXa3n7zsZ4=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=is8bmuqTNvJnTcmZZVmS2EYNqudnB7YpgZdypyPTwOMiqjhwcQHt7xiauLCsurLHbrkIPDMlzFavRtyzqq1xPclGZhLWguvfGdNvjkud55WV/Qe5z3kIxyUbu6JEGPILdX3udFbaa1icviySmREAopF/SO3z1T2LwYmQR0f2K5A=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=DoFbihVm; arc=none smtp.client-ip=209.85.128.48
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-wm1-f48.google.com with SMTP id 5b1f17b1804b1-4361f664af5so57747505e9.1;
+        Mon, 03 Feb 2025 14:47:56 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1738622875; x=1739227675; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=DNk8vcXhWS2lnex0vmdV4Bh3p7QN4YitPegQzBHEFfU=;
+        b=DoFbihVmVNRM88GV2daMdqjDrnEQWHVQUCC9vjxRsvivPBJWkBgcZ/EJpOd3G2CGMO
+         V5N68a6/ySKJQ4u/SprajcG4Bo0nf2y1691vRVoOnzTL69l76J0lOqS7/eN1z9Skch6C
+         gaCa8VuXvc4VoAlh7PXl1WNtaXaB7KlPqjXpb+CGDZusFu7dbyp31cSGdhq+vt3aTfzY
+         DQiQYorrk8rT3VKHeLBB2wvLGTftoYV4ETZhIMa9w4WKEB18/r5igwPctryfwkISe3Ut
+         mH1i522jk+xCW29SnmfN1YOuzukVyNOvn7uPWIdUkeiErcqR9PS71Mv4oCZmNV/QFIbl
+         fZPw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1738622875; x=1739227675;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=DNk8vcXhWS2lnex0vmdV4Bh3p7QN4YitPegQzBHEFfU=;
+        b=brryxdv2D9iuw+DfNg4rWv6FE7FbtYEq0tl0VS7zB6uhjDDZNWYyJXU+AY40Il37ms
+         O/BcyOwiYBNKxu5+dTbcmGawQ/GnhAy5FwQHdPsBzRuOzZMhsZYE/7cl6jPuiEVtvF2z
+         kKNfw85IfL0+hmUysfc5T1pGpjEydftQANIZ29TcbLANhXMP/0YLEP5Cv+3/3HMRsUzg
+         Ub8YPhwOAaxtCDbP3lJtXh6ANWD44xTq/OxsRMaUItgx+APKtujD+n1g8KNshbtH0WO6
+         AH68rU48PMZtplSb3YXO0rSqZgog/DcIYIoaNkaLp29KzPezjYc/QtdcMTJVXxx2QXI9
+         wjKQ==
+X-Forwarded-Encrypted: i=1; AJvYcCURKqRPM6e9HPrWg6YVCs2CtKB4Aspbo0PGFeqpEKgzzBmk/Q6MduUxlcPZuEwYMy6VqMd145tJ@vger.kernel.org, AJvYcCWgoKUHGDit6/RN2hV7PEkB8CAc7HLA0aU8jaIKMOcfB3/bNUayjsOOSKOKxh/jUqK9hD89pSDVLG0=@vger.kernel.org, AJvYcCXGwj0GvdgrNSEPcknWWaJPbciIz3cpC6vwA6CNv5cZMHErLcJL97etntlEdJhsoZWDzk86fT+G+Iu0@vger.kernel.org, AJvYcCXWwkiqBD1NGtJ2G8NIXmYgSfTAoy5XIrHAkBeQCMOfbR6MmeI8SUID7/Uqet1X90aAlu6p8M0tfhtgzAcj@vger.kernel.org
+X-Gm-Message-State: AOJu0YxG7kIL/mkNDwnoCLrQT/eM5uSrX9+FVmX2bDZL1MwyNL6/8pOb
+	8GH6uvc8KzhAS9mBn2s/V6nv58eoDuA1SIamjL277EFzx2smk8Tf
+X-Gm-Gg: ASbGnctrwv8LxmLbn+SKIcupgliBLNXRITFwHJocfU0nQt8yChzZX1US27WHSZigOhD
+	DGvUrWADJUfFKKKmTa/JejvxAZObeN0B7OXjwbyr8wDgon3MAqVM/3dutRdmNVmtZ7LX6CRp2zM
+	UFhT37YlKrnv6leIc3S2lSomRqCeqoCA7UihP69hePXUuS6ELfVKhbQY/KylzU2nGNAYi2PEL7h
+	Z+xYWprLmxI2YZjnebcCE7dMG0+znlHT97HKjh4r+Uw2s7MqhQ4favuP3b4ndR32MrxrtIOcDwP
+	zu0=
+X-Google-Smtp-Source: AGHT+IE/EFKa2c0I79aiOGpHh/J+3xdNGIulwoDYDqj1uGt8aSw1iorBtbN/fXpYftwxNNhOalmTpw==
+X-Received: by 2002:a05:600c:870a:b0:434:fff1:1ade with SMTP id 5b1f17b1804b1-438dc3cb7c8mr198340375e9.13.1738622874881;
+        Mon, 03 Feb 2025 14:47:54 -0800 (PST)
+Received: from ffc.. ([5.224.37.232])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-438dcc81911sm202559165e9.38.2025.02.03.14.47.51
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 03 Feb 2025 14:47:53 -0800 (PST)
+From: Reyders Morales <reyders1@gmail.com>
+To: kuba@kernel.org
+Cc: Reyders Morales <reyders1@gmail.com>,
+	Oliver Hartkopp <socketcan@hartkopp.net>,
+	Marc Kleine-Budde <mkl@pengutronix.de>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Simon Horman <horms@kernel.org>,
+	Jonathan Corbet <corbet@lwn.net>,
+	linux-can@vger.kernel.org,
+	netdev@vger.kernel.org,
+	linux-doc@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: [PATCH] Documentation/networking: Fix basic node example document ISO 15765-2
+Date: Mon,  3 Feb 2025 23:47:20 +0100
+Message-ID: <20250203224720.42530-1-reyders1@gmail.com>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
 
-On Mon, 03 Feb 2025 18:21:24 +0100 Toke H=C3=B8iland-J=C3=B8rgensen wrote:
-> Network management daemons that match on the device permanent address
-> currently have no virtual interface types to test against.
-> NetworkManager, in particular, has carried an out of tree patch to set
-> the permanent address on netdevsim devices to use in its CI for this
-> purpose.
->=20
-> To support this use case, add a debugfs file for netdevsim to set the
-> permanent address to an arbitrary value.
+In the current struct sockaddr_can tp is member of can_addr.
+tp is not member of struct sockaddr_can.
 
-netdevsim is not for user space testing. We have gone down the path
-of supporting random features in it already, and then wasted time trying
-to maintain them thru various devlink related perturbations, just to
-find out that the features weren't actually used any more.
+Signed-off-by: Reyders Morales <reyders1@gmail.com>
+---
+ Documentation/networking/iso15765-2.rst | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
-NetworkManager can do the HW testing using virtme-ng.
+diff --git a/Documentation/networking/iso15765-2.rst b/Documentation/networking/iso15765-2.rst
+index 0e9d96074178..37ebb2c417cb 100644
+--- a/Documentation/networking/iso15765-2.rst
++++ b/Documentation/networking/iso15765-2.rst
+@@ -369,8 +369,8 @@ to their default.
+ 
+   addr.can_family = AF_CAN;
+   addr.can_ifindex = if_nametoindex("can0");
+-  addr.tp.tx_id = 0x18DA42F1 | CAN_EFF_FLAG;
+-  addr.tp.rx_id = 0x18DAF142 | CAN_EFF_FLAG;
++  addr.can_addr.tp.tx_id = 0x18DA42F1 | CAN_EFF_FLAG;
++  addr.can_addr.tp.rx_id = 0x18DAF142 | CAN_EFF_FLAG;
+ 
+   ret = bind(s, (struct sockaddr *)&addr, sizeof(addr));
+   if (ret < 0)
+-- 
+2.43.0
 
-If you want to go down the netdevsim path you must provide a meaningful=20
-in-tree test, but let's be clear that we will 100% delete both the test
-and the netdevsim functionality if it causes any issues.
---=20
-pw-bot: cr
 
