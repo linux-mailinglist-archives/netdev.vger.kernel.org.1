@@ -1,152 +1,152 @@
-Return-Path: <netdev+bounces-162196-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-162197-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id AA351A26186
-	for <lists+netdev@lfdr.de>; Mon,  3 Feb 2025 18:34:48 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 078B8A261C2
+	for <lists+netdev@lfdr.de>; Mon,  3 Feb 2025 18:54:34 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 281C316648C
-	for <lists+netdev@lfdr.de>; Mon,  3 Feb 2025 17:34:47 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 883B4165C5F
+	for <lists+netdev@lfdr.de>; Mon,  3 Feb 2025 17:54:32 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6E29120A5EA;
-	Mon,  3 Feb 2025 17:34:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5EE1A20CCC2;
+	Mon,  3 Feb 2025 17:54:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=cs.stanford.edu header.i=@cs.stanford.edu header.b="YemeYtzJ"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="iY0Dbt7P"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp1.cs.Stanford.EDU (smtp1.cs.stanford.edu [171.64.64.25])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wr1-f41.google.com (mail-wr1-f41.google.com [209.85.221.41])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CAD1A3A8CB
-	for <netdev@vger.kernel.org>; Mon,  3 Feb 2025 17:34:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=171.64.64.25
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9870D25A65C;
+	Mon,  3 Feb 2025 17:54:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.41
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1738604084; cv=none; b=gZyjXDAqM5jJqzbBJz85mnU6IllSd3kH2X4TtC0vM+lyxknKi48TsXtNlqpnCDm36r04TFr65Reo44rz5Szk5hqTDyql1sF8t8kbu2Esh1ewcxpeGHZrQOQ+h5yiqblsUxxMFrYMJP5vT96W4b2VzSvNRe6a/xEAIi4Jow3J4Ok=
+	t=1738605269; cv=none; b=LaNHsnVd+jknl5OAgXhTIhlvfY00B2qTY4PDPgYm+beKQvFo0mAzw7YHhqBENMc3kjkV8R4HC8jIPb1PKFITqppfyJs2Gw58M0bUpkruhBK8cjDfKOkdX7TOmLtolX8Vii79cLTHCFNM8qaAlfI0VO0spA+NqTSMgOeGDKCPabw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1738604084; c=relaxed/simple;
-	bh=O/Pf0NLLE/MM5KEJWOmjEHZ9l5nWd44h+ljMqiofAm4=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=IDxWJcFgHnTpl0pfNOvY9xYnmOZpWim0CgQZyFN3ElV1nbpsdtN6vg1bs3QAUMnrTZ1STtFa4H31vjmTfpl0MeH5J8nuhacO2jXLU0w+1dAoZqGyqpwY/mCobF68J5slA2GTLAj1D9rxHnfQ4XcrDKmG+zIBGUSOugsjkQmGe+M=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=cs.stanford.edu; spf=pass smtp.mailfrom=cs.stanford.edu; dkim=pass (2048-bit key) header.d=cs.stanford.edu header.i=@cs.stanford.edu header.b=YemeYtzJ; arc=none smtp.client-ip=171.64.64.25
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=cs.stanford.edu
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=cs.stanford.edu
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=cs.stanford.edu; s=cs2308; h=Content-Transfer-Encoding:Content-Type:Cc:To:
-	Subject:Message-ID:Date:From:In-Reply-To:References:MIME-Version:Sender:
-	Reply-To:Content-ID:Content-Description:Resent-Date:Resent-From:Resent-Sender
-	:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:List-Help:List-Unsubscribe:
-	List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=iOYsq5nv6fzK48jEXvEuXNfqOw+ogfzooH908x/Y4j0=; t=1738604082; x=1739468082; 
-	b=YemeYtzJFWWsCokA95Mxht4oxH3gMlmnTDhJwIY9tFAHmyl4b3+tsKMZPNnIKeEiLgoCcAh0unX
-	MmzMS90DjLlHNsuX1H8SKkvyliqmSUZKITvTaIXmuHDYTfFSxZEJNp7ZnQU/+RxFnfMSW2WH4frMt
-	IJ7ENk7oEC9bLmWVSqMmJ9VBvLKgByesx+08WoE2C5uQDYwIpg7mtMJXshP6DRA52ZO0jtkI2bP0Q
-	OJeTJCsL0FAD5EiHGzCyvdWokAVcMQw/HyoW79XfLRBEFDzgB6WG6HU1NxeBJIXbUle1XLm4zaIVP
-	/2HxGniUBTPdwTdoCQ+dJQSgDuWWyPtOERtw==;
-Received: from mail-oa1-f53.google.com ([209.85.160.53]:55313)
-	by smtp1.cs.Stanford.EDU with esmtpsa  (TLS1.2) tls TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256
-	(Exim 4.94.2)
-	(envelope-from <ouster@cs.stanford.edu>)
-	id 1tf0LD-0001WR-I6
-	for netdev@vger.kernel.org; Mon, 03 Feb 2025 09:34:36 -0800
-Received: by mail-oa1-f53.google.com with SMTP id 586e51a60fabf-29fcbf3d709so1447745fac.2
-        for <netdev@vger.kernel.org>; Mon, 03 Feb 2025 09:34:35 -0800 (PST)
-X-Gm-Message-State: AOJu0YyxTOb5s/2AgMvCxNkf7im61juTMA54ddxvg6I+SKyvIbtZaXER
-	apB4EH/DlzxgVbnkhEbEzs9eZct5k+HOP9cQ9+oFFuCHzH+qVRMM37tn6SaQKGfeGeaw/L62oyF
-	lwifAa2cqhTNhIXmG2YGFmN61G6w=
-X-Google-Smtp-Source: AGHT+IHQgbFhbDjV7BGwpXzHwKExCmQ5X4qruddyv/1L4klWtSpyC4mMsjLQYIa0SFKlmqRywvYHeCw/Dj2Cwl7s1V4=
-X-Received: by 2002:a05:6870:2f01:b0:297:c04:9191 with SMTP id
- 586e51a60fabf-2b32efdc084mr13641053fac.3.1738604074844; Mon, 03 Feb 2025
- 09:34:34 -0800 (PST)
+	s=arc-20240116; t=1738605269; c=relaxed/simple;
+	bh=RskFGxgMXUxm/Kgxe7P4T6ZU5xeVlWHE0HPOMkYPP60=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=G/7mwnf7ikBD3ZmAud5EqB3zlUlQuyI4h1XSIxKaw4Dt6fbRrUMnjAd3dqXBn7HxJ3AsEXbj2K1krgWePSzxD5/p/R3LFEFN3JGf/2KotiZAMSTG62oAEZ37wj9SoGD6lrKhb2tuex5mdor+gjEPElbbmwSXoyGabHAzMW3yI70=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=iY0Dbt7P; arc=none smtp.client-ip=209.85.221.41
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-wr1-f41.google.com with SMTP id ffacd0b85a97d-3863c36a731so3636200f8f.1;
+        Mon, 03 Feb 2025 09:54:27 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1738605266; x=1739210066; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=YhHyUXmTx8Kjx+aIGTwDpZ5Q8Lg7Z71ESxIET7h6X74=;
+        b=iY0Dbt7PzfoUbBGpMK4X5KJ5DGkMICiuf/qAmeBBccyA5uuN+sXKQgq3e6DCeN5kam
+         lkoAEX7EjYAvjw5MDTqcleglGCqFW3xkhDvrOagmMCd9ADQehHe7ac94BrJzhWVkaPsz
+         CqEgaUX6j9IH0pTEqkVlzLh9VXm96B1slKhtjbNr1ahgsXWvBrdLilTl+FcQUQ5poxv2
+         Tmk+Msb4Nef6Mua6JmH87ryNhB+S5dDaWtDC8z51AVwnrUBkrGAb85+5VEOCAFBFzh7y
+         6N/VtOgvyJRisjxzlEKDDuENVWSSGjkeSbxfUJ+R538WXZ5KINjQOGi8D1Iw1Uv+8vAj
+         Mmlg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1738605266; x=1739210066;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=YhHyUXmTx8Kjx+aIGTwDpZ5Q8Lg7Z71ESxIET7h6X74=;
+        b=JiXnw1qfpnfC2vt+NHGkdQzQQ3pYl7W/Q/g68a/pqQECtTXKRT541WCDuKoMMUA+QN
+         x91Ts62kosOmVdY6f1DGCw44Ffu1fIzOMR/Y6P0dmFPsKVJ9TS8hfrTrHZLZq7i1c2N4
+         Z7Xp3rPk2VfbGGpHOgebi9Zf0Q/jOgcSogiQhk9g+D8+ueS9+CaNp4QcOviMcdrsxyLI
+         KpvNm0BGxs38SawDHyJfXog/UegaEq5y7Ik5SjbAoWO218gZ75qJAqgxDOHhs12ychhE
+         82kvMob9OtoiAzJyS0ZdNyku3rcYz+l/JuDjaP9C8oK5A1M4Vi0LZ8GV5Zh+2JQBn7rd
+         qGng==
+X-Forwarded-Encrypted: i=1; AJvYcCUGpuJF+xDaTYfdnchABU4JsaQUcX/gF2ICtePG8r38GtjXpY6fxIsaFNbOdvMHopz8swjv0J+eUWIs/y7Ok+4=@vger.kernel.org, AJvYcCUzFAWqo1YAuRNd8hTDRyFarM0zqqb170RGAUb3UjG481nA0J8ezrwazG14T+v809k/Un8m1zmVeBMkWbEV@vger.kernel.org
+X-Gm-Message-State: AOJu0Yxls7VyvONGEl/HjW/5U+38LLvagmqns8UBAQLe259CiBgh2Pyf
+	1KGZF941yoVslzX2sIFZskispLkAFWcAuTjZw6myycl2eYPPysmL
+X-Gm-Gg: ASbGncsxkgYFc5fivEAUWVZ0ZYCFz5A+3XdPY4L8P2m2u2nqLplMUFufdAGt+K/yldG
+	TV3zDvZoYK4SIXVvlEoVlc2eYSpDJUiSLyvuhOedFOuiUi+gs5rzi6KoY++7FL0B5QyYuYfWqCV
+	r3S/+Lbq3rj8HgEB/rOwHxvWSGUrPQY8H9fPHQKlwXy/uVzUsUtttHMnfomin8am3N0wJGV50Ge
+	TTGKtW+EdUAgFgg2SeAFrymyRMfxposNUlmf69+ETTRZG5kkErpiKixfa/NcbyJt68ZeFrE+y/A
+	mpnTFiVq+KnZV3cP
+X-Google-Smtp-Source: AGHT+IHdoed3XjN9J007P9D62DnvwBtD2Wey8LqfcdYMmsEr0qJT1fYybz7yCG3/8xH1JQo22zpcDg==
+X-Received: by 2002:a05:6000:2ac:b0:38c:5cd0:ece8 with SMTP id ffacd0b85a97d-38c5cd0f132mr13260317f8f.12.1738605265430;
+        Mon, 03 Feb 2025 09:54:25 -0800 (PST)
+Received: from void.cudy.net ([46.210.194.238])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-38da59470b2sm12276f8f.40.2025.02.03.09.54.23
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 03 Feb 2025 09:54:25 -0800 (PST)
+From: Andrew Kreimer <algonell@gmail.com>
+To: Manish Chopra <manishc@marvell.com>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S . Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>
+Cc: netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	kernel-janitors@vger.kernel.org,
+	Andrew Kreimer <algonell@gmail.com>
+Subject: [PATCH net-next] net: qed: fix typos
+Date: Mon,  3 Feb 2025 19:53:24 +0200
+Message-ID: <20250203175419.4146-1-algonell@gmail.com>
+X-Mailer: git-send-email 2.48.1.91.g5f8f7081f7
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250115185937.1324-1-ouster@cs.stanford.edu> <20250115185937.1324-9-ouster@cs.stanford.edu>
- <9083adf9-4e3f-47d9-8a79-d8fb052f99b5@redhat.com> <CAGXJAmxWOmPi-khSUugzOOjMSgVpWnn7QZ28jORK4sL9=vrA9A@mail.gmail.com>
- <82cdba95-83cb-4902-bb2a-a2ab880797a8@redhat.com> <CAGXJAmxLqnjnWr8sjooJRRyQ2-5BqPCQL8gnn0gzYoZ0MMoBSw@mail.gmail.com>
- <e7cdcca6-d0b2-4b59-a2ef-17834a8ffca3@redhat.com>
-In-Reply-To: <e7cdcca6-d0b2-4b59-a2ef-17834a8ffca3@redhat.com>
-From: John Ousterhout <ouster@cs.stanford.edu>
-Date: Mon, 3 Feb 2025 09:33:59 -0800
-X-Gmail-Original-Message-ID: <CAGXJAmx7ojpBmR7RiKm3umZ7QDaA8r-hgBTnxay11UCv42xWdA@mail.gmail.com>
-X-Gm-Features: AWEUYZmYLM3e5XmOaplZm-O0N3M5qZ8_P5lzdKtL61JSDdZuJcfnxZ995Wbwaok
-Message-ID: <CAGXJAmx7ojpBmR7RiKm3umZ7QDaA8r-hgBTnxay11UCv42xWdA@mail.gmail.com>
-Subject: Re: [PATCH net-next v6 08/12] net: homa: create homa_incoming.c
-To: Paolo Abeni <pabeni@redhat.com>
-Cc: netdev@vger.kernel.org, edumazet@google.com, horms@kernel.org, 
-	kuba@kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Spam-Score: -1.0
-X-Spam-Level: 
-X-Scan-Signature: 5c460fe7d3aaafaf78d72307c0bc7e10
+Content-Transfer-Encoding: 8bit
 
-On Mon, Feb 3, 2025 at 1:17=E2=80=AFAM Paolo Abeni <pabeni@redhat.com> wrot=
-e:
->
-> On 1/31/25 11:35 PM, John Ousterhout wrote:
-> > On Thu, Jan 30, 2025 at 1:57=E2=80=AFAM Paolo Abeni <pabeni@redhat.com>=
- wrote:
-> >> On 1/30/25 1:48 AM, John Ousterhout wrote:
-> >>> On Mon, Jan 27, 2025 at 2:19=E2=80=AFAM Paolo Abeni <pabeni@redhat.co=
-m> wrote:
-> >>>>
-> >>>> On 1/15/25 7:59 PM, John Ousterhout wrote:
-> >>>>> +     /* Each iteration through the following loop processes one
-> >> packet. */
-> >>>>> +     for (; skb; skb =3D next) {
-> >>>>> +             h =3D (struct homa_data_hdr *)skb->data;
-> >>>>> +             next =3D skb->next;
-> >>>>> +
-> >>>>> +             /* Relinquish the RPC lock temporarily if it's needed
-> >>>>> +              * elsewhere.
-> >>>>> +              */
-> >>>>> +             if (rpc) {
-> >>>>> +                     int flags =3D atomic_read(&rpc->flags);
-> >>>>> +
-> >>>>> +                     if (flags & APP_NEEDS_LOCK) {
-> >>>>> +                             homa_rpc_unlock(rpc);
-> >>>>> +                             homa_spin(200);
-> >>>>
-> >>>> Why spinning on the current CPU here? This is completely unexpected,=
- and
-> >>>> usually tolerated only to deal with H/W imposed delay while programm=
-ing
-> >>>> some device registers.
-> >>>
-> >>> This is done to pass the RPC lock off to another thread (the
-> >>> application); the spin is there to allow the other thread to acquire
-> >>> the lock before this thread tries to acquire it again (almost
-> >>> immediately). There's no performance impact from the spin because thi=
-s
-> >>> thread is going to turn around and try to acquire the RPC lock again
-> >>> (at which point it will spin until the other thread releases the
-> >>> lock). Thus it's either spin here or spin there. I've added a comment
-> >>> to explain this.
-> >>
-> >> What if another process is spinning on the RPC lock without setting
-> >> APP_NEEDS_LOCK? AFAICS incoming packets targeting the same RPC could
-> >> land on different RX queues.
-> >>
-> >
-> > If that happens then it could grab the lock instead of the desired
-> > application, which would defeat the performance optimization and delay =
-the
-> > application a bit. This would be no worse than if the APP_NEEDS_LOCK
-> > mechanism were not present.
->
-> Then I suggest using plain unlock/lock() with no additional spinning in
-> between.
+There are some typos in comments/messages:
+ - Valiate -> Validate
+ - acceptible -> acceptable
+ - acces -> access
+ - relased -> released
 
-My concern here is that the unlock/lock sequence will happen so fast
-that the other thread never actually has a chance to get the lock. I
-will do some measurements to see what actually happens; if lock
-ownership is successfully transferred in the common case without a
-spin, then I'll remove it.
+Fix them via codespell.
 
+Signed-off-by: Andrew Kreimer <algonell@gmail.com>
+---
+ drivers/net/ethernet/qlogic/qed/qed_sriov.c | 8 ++++----
+ 1 file changed, 4 insertions(+), 4 deletions(-)
 
--John-
+diff --git a/drivers/net/ethernet/qlogic/qed/qed_sriov.c b/drivers/net/ethernet/qlogic/qed/qed_sriov.c
+index fa167b1aa019..5222a035fd19 100644
+--- a/drivers/net/ethernet/qlogic/qed/qed_sriov.c
++++ b/drivers/net/ethernet/qlogic/qed/qed_sriov.c
+@@ -3033,7 +3033,7 @@ static void qed_iov_vf_mbx_vport_update(struct qed_hwfn *p_hwfn,
+ 	u16 length;
+ 	int rc;
+ 
+-	/* Valiate PF can send such a request */
++	/* Validate PF can send such a request */
+ 	if (!vf->vport_instance) {
+ 		DP_VERBOSE(p_hwfn,
+ 			   QED_MSG_IOV,
+@@ -3312,7 +3312,7 @@ static void qed_iov_vf_mbx_ucast_filter(struct qed_hwfn *p_hwfn,
+ 		goto out;
+ 	}
+ 
+-	/* Determine if the unicast filtering is acceptible by PF */
++	/* Determine if the unicast filtering is acceptable by PF */
+ 	if ((p_bulletin->valid_bitmap & BIT(VLAN_ADDR_FORCED)) &&
+ 	    (params.type == QED_FILTER_VLAN ||
+ 	     params.type == QED_FILTER_MAC_VLAN)) {
+@@ -3729,7 +3729,7 @@ qed_iov_execute_vf_flr_cleanup(struct qed_hwfn *p_hwfn,
+ 
+ 		rc = qed_iov_enable_vf_access(p_hwfn, p_ptt, p_vf);
+ 		if (rc) {
+-			DP_ERR(p_hwfn, "Failed to re-enable VF[%d] acces\n",
++			DP_ERR(p_hwfn, "Failed to re-enable VF[%d] access\n",
+ 			       vfid);
+ 			return rc;
+ 		}
+@@ -4480,7 +4480,7 @@ int qed_sriov_disable(struct qed_dev *cdev, bool pci_enabled)
+ 		struct qed_ptt *ptt = qed_ptt_acquire(hwfn);
+ 
+ 		/* Failure to acquire the ptt in 100g creates an odd error
+-		 * where the first engine has already relased IOV.
++		 * where the first engine has already released IOV.
+ 		 */
+ 		if (!ptt) {
+ 			DP_ERR(hwfn, "Failed to acquire ptt\n");
+-- 
+2.48.1.91.g5f8f7081f7
+
 
