@@ -1,69 +1,69 @@
-Return-Path: <netdev+bounces-162110-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-162111-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8D1F1A25CDA
-	for <lists+netdev@lfdr.de>; Mon,  3 Feb 2025 15:38:44 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3F3B9A25D3E
+	for <lists+netdev@lfdr.de>; Mon,  3 Feb 2025 15:48:07 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id DEE441885C6C
-	for <lists+netdev@lfdr.de>; Mon,  3 Feb 2025 14:38:08 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id DF8F83A9D79
+	for <lists+netdev@lfdr.de>; Mon,  3 Feb 2025 14:38:00 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F274020E307;
-	Mon,  3 Feb 2025 14:30:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3CD6620E315;
+	Mon,  3 Feb 2025 14:30:58 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="ORNt+o9z"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="NqKFCO0s"
 X-Original-To: netdev@vger.kernel.org
 Received: from mail-qt1-f202.google.com (mail-qt1-f202.google.com [209.85.160.202])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 532DB20E014
-	for <netdev@vger.kernel.org>; Mon,  3 Feb 2025 14:30:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A0EF520E03B
+	for <netdev@vger.kernel.org>; Mon,  3 Feb 2025 14:30:56 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.202
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1738593056; cv=none; b=PEtyrzmXtzwJzjzMitUEVuXr640FmDNAtTtZ4j9u9U5GfC1WOUD/7mKqKdUDEe/L5z3NGBSXsBwNnulgDITqCERL1RHYZRzrXfYMfS7QNyv68holCILlqafOZXScafLwN2lot4389gH2hC4p1d4rmoLrJyYLGErmzbJMZ8h7/Ws=
+	t=1738593058; cv=none; b=Z/Cty6KkvERTdYTFaTgqxMy9YjNtAJO9h+31MCWX44prdvcAu3KrDDdUthbFWaPqSedwKFxl5Fb1HCUJ4TbrLHq/BdTPni/+tmq0TclDBb6hrFe11aom+Xa03uJZUacNWICoaltNxcOCgLKgGN1PV2CB6wTD+ukVZRyeyO/4DOo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1738593056; c=relaxed/simple;
-	bh=H8JH/QPjFfGxbrJtRbDkCum9cREuE5YKVIPC//b1qCs=;
+	s=arc-20240116; t=1738593058; c=relaxed/simple;
+	bh=Y9lnsb8QeKEZFqBhSW8yGtosBM6Zj3i856YbOAw6C2w=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=LFyK+VQoL26URaE5ADff6Nw7pdbjmMuRg3zRJjhP2J+M0RqAvC+1L9LYwRsgy8PZYoqbm59I0aoML4QEV/7s9LxDxMKnvb9Xfb47Vt3JXuTuKqia+o7PfrMbWIPE062LxavX5MKvXZjqFPaT+L26Y61F+tb7W1DG9Xj6YJAicgE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=ORNt+o9z; arc=none smtp.client-ip=209.85.160.202
+	 To:Cc:Content-Type; b=Dqvcj8TzlubH1w9oHEW04AHIN6ZYGTJgthGpKlxQn5UM2IFgmcC13i4Oz+NioymMnxS6BHNOao5d615N2UgMDnTqytxZHXQJwLSeuwWV79aP/I8inXzAXP6QTIAWBrxqKT5Cjx0HhiZ6HqUY+FM1DSizFI/o+STQSfyK3d9mEVs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=NqKFCO0s; arc=none smtp.client-ip=209.85.160.202
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com
-Received: by mail-qt1-f202.google.com with SMTP id d75a77b69052e-46dd301a429so95543511cf.1
-        for <netdev@vger.kernel.org>; Mon, 03 Feb 2025 06:30:55 -0800 (PST)
+Received: by mail-qt1-f202.google.com with SMTP id d75a77b69052e-467bb8aad28so46818811cf.1
+        for <netdev@vger.kernel.org>; Mon, 03 Feb 2025 06:30:56 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1738593054; x=1739197854; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1738593055; x=1739197855; darn=vger.kernel.org;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=oummPnO89bchIzAktiowh3Jl3EZAt201EnCE7gdN6jc=;
-        b=ORNt+o9zNiB5qjfH6HEHOfKX3/EDhOXZ2UGkfz0q8va5LSkzUKi8KTuPyf3ZsI6iIR
-         ZkzJ2LOWzqFzSosOw/xrE6p64e81R6CGN2JpmMwE54J85m9oFqQMln7TgIi9He9T65ct
-         dK/3lN4voLfqJV9ih0cCmt0qqjqJRy5uA1FA/maTuFXv5dTy26fb+awHld5kRxoDBV1u
-         w07LRIxpR/+1QzwiG5vTQ6a603wUmFhezNAoZxPlV5krUK7WrDU0I+cYXv92AQMeViBs
-         uuWAi/wMizhZQhm9D492hby3vId2NGEz0wsxooBtxlUw1n/tdh0QfTE2m/emQBiXiMWh
-         bcnQ==
+        bh=YaNwdpwj0e4SW/9x+BMfHLkop9sD36jHDjUBDn3qdiI=;
+        b=NqKFCO0sjiAh0H47g6Ns16HTUFRUcugsfYA0FYAc7l8QrlmEDw/73k3SAH5R8K+s59
+         RAOc8TSls1Kfuc2tQAT5C8OvkGwWN7Xi2WmGs3Y3cubpdTyzTiihFSbqmuAY1+Xs2owh
+         05x45Dp8vuPoaLrrSnKtMcjokHoDeLBDd9u+bZlsS+zGhPdsMDoZNQuj+gdtdSdyip0m
+         CopTghXFA05uZzgEBeEfAmEZofDZVqsv9bObTDLPsmKaBdCvA6R9aVMeziyMefo3++Hh
+         +EGCONpudcPhDp28m6GB02mLTS9565XiOxlYxF265fxp+Cy30lBI15HpmzIsY3Ui0+4b
+         TgYg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1738593054; x=1739197854;
+        d=1e100.net; s=20230601; t=1738593055; x=1739197855;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=oummPnO89bchIzAktiowh3Jl3EZAt201EnCE7gdN6jc=;
-        b=X3uFdBIJTZBZATnAPWbd2j9uvoj4BHhJ9e5og7yEHAtPKBKoTQafJzMC2n7meVtKzS
-         ZxGQJUcQc90/3taEidw0qot8kmrjyw0Hn32V3az73mnzIKbgZcyKOoOMFMFwpncjNZXc
-         lZXDXqS0CWPiRNSGJKNYzmPA++3CezqxjpEm4ot/gg6ymvJZEe+JpPLMsFBUc29xFWV0
-         084YgjF+XDBK6VtFXBLUMu7C4g6LxJax7TLDR0riWpPp0ljMP/3Ultfr6RRm+G98Z1Jk
-         qotk5mmw29NDxD1vJm/jlEQc2aLUS4ewJkIRI8GRkhyPKahtngYa1oKKYV19ZUpU7zb9
-         1aVA==
-X-Gm-Message-State: AOJu0Yyn5e9oOJp1njwH6d2PLvB6linPHcsoNW9aHSoZnnMXtX1TNWo+
-	f4ZLyJZlEiCQUuuCNn0mh2B2kbbavtc8IQft1C0/OXUXI2HGoTRrS8OFq2tuegzB0CY8LT9oGer
-	57UUFZmjAIA==
-X-Google-Smtp-Source: AGHT+IFTe7ZfY4yWX2ICd+1ng3slGad8C5b2GR/bnJKwcPtGGj4cO3rk0SfNRTC0P2RjB2pPcKhR9q+H2bXOMw==
-X-Received: from qtbay26.prod.google.com ([2002:a05:622a:229a:b0:467:84a6:b744])
+        bh=YaNwdpwj0e4SW/9x+BMfHLkop9sD36jHDjUBDn3qdiI=;
+        b=VhmlJKgwOTrN4ktYgQVEwLbyWOpvCzRO2bDZe6g4uaYSRt1dBXgjjULzwxxykwc+/o
+         NF8dze+fmcBKRxBX7lIPLv5nJmZdeCWZYZV5t3VUsN76u/FoCtoGRE0VZfMWCZ4AOH9T
+         iTSlZo1afJft81HN8gtq48+UtJt2Btyu8HWo6vDmDPStzECsMO3HHu30Y2Rq5/2kghfB
+         3ycNc5Nc717S/tdLzhIrutrWN0YUwCTaSDt3Bv+SpK/TaWZukbRytHPT2nSPX70uedxK
+         Mo00D9lThC0FuFuCesFGMetKb+3rq+Eyayp+12lkGgCWjaMW7gjK4KWr4cmiPuG0j7Lf
+         2LCQ==
+X-Gm-Message-State: AOJu0YxP6XwRLkf5uFBeiB8FiLVmOVr/k8Q3Bmqh3FnjgwIwx8RyRZ7h
+	0x8DP+e4r38wvaLRdPw4gFvOdyCDpE5QOcBJcH9JvhHh+LFZMseX6QFhRVeRUSzcoKIcY+aIdyU
+	avXO6fBvt8Q==
+X-Google-Smtp-Source: AGHT+IEmBA6uy6sB/rbIMfbv+7lcIPwmKa0t5mGZC0SdBk+3OOjtdyKJJv4t2fbCxSC+F/ZH0g9y+OdbXPUnRg==
+X-Received: from qtbfz8.prod.google.com ([2002:a05:622a:5a88:b0:467:6227:451b])
  (user=edumazet job=prod-delivery.src-stubby-dispatcher) by
- 2002:ac8:5702:0:b0:46c:7188:e3c4 with SMTP id d75a77b69052e-46fd09e25aemr209240181cf.10.1738593054306;
- Mon, 03 Feb 2025 06:30:54 -0800 (PST)
-Date: Mon,  3 Feb 2025 14:30:34 +0000
+ 2002:ac8:584e:0:b0:467:79eb:4a16 with SMTP id d75a77b69052e-46fd0a114abmr336560961cf.4.1738593055664;
+ Mon, 03 Feb 2025 06:30:55 -0800 (PST)
+Date: Mon,  3 Feb 2025 14:30:35 +0000
 In-Reply-To: <20250203143046.3029343-1-edumazet@google.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -73,8 +73,8 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
 References: <20250203143046.3029343-1-edumazet@google.com>
 X-Mailer: git-send-email 2.48.1.362.g079036d154-goog
-Message-ID: <20250203143046.3029343-5-edumazet@google.com>
-Subject: [PATCH v2 net 04/16] ipv4: use RCU protection in ipv4_default_advmss()
+Message-ID: <20250203143046.3029343-6-edumazet@google.com>
+Subject: [PATCH v2 net 05/16] ipv4: use RCU protection in rt_is_expired()
 From: Eric Dumazet <edumazet@google.com>
 To: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
 	Paolo Abeni <pabeni@redhat.com>
@@ -83,39 +83,34 @@ Cc: netdev@vger.kernel.org, Kuniyuki Iwashima <kuniyu@amazon.com>,
 	Eric Dumazet <edumazet@google.com>
 Content-Type: text/plain; charset="UTF-8"
 
-ipv4_default_advmss() must use RCU protection to make
+rt_is_expired() must use RCU protection to make
 sure the net structure it reads does not disappear.
 
-Fixes: 2e9589ff809e ("ipv4: Namespaceify min_adv_mss sysctl knob")
 Signed-off-by: Eric Dumazet <edumazet@google.com>
 Reviewed-by: Kuniyuki Iwashima <kuniyu@amazon.com>
 ---
- net/ipv4/route.c | 11 ++++++++---
- 1 file changed, 8 insertions(+), 3 deletions(-)
+ net/ipv4/route.c | 8 +++++++-
+ 1 file changed, 7 insertions(+), 1 deletion(-)
 
 diff --git a/net/ipv4/route.c b/net/ipv4/route.c
-index 577b88a43293aa801c3ee736d7e5cc4d97917717..74c074f45758be5ae78a87edb31837481cc40278 100644
+index 74c074f45758be5ae78a87edb31837481cc40278..e959327c0ba8979ce5c7ca8c46ae41068824edc6 100644
 --- a/net/ipv4/route.c
 +++ b/net/ipv4/route.c
-@@ -1307,10 +1307,15 @@ static void set_class_tag(struct rtable *rt, u32 tag)
+@@ -390,7 +390,13 @@ static inline int ip_rt_proc_init(void)
  
- static unsigned int ipv4_default_advmss(const struct dst_entry *dst)
+ static inline bool rt_is_expired(const struct rtable *rth)
  {
--	struct net *net = dev_net(dst->dev);
- 	unsigned int header_size = sizeof(struct tcphdr) + sizeof(struct iphdr);
--	unsigned int advmss = max_t(unsigned int, ipv4_mtu(dst) - header_size,
--				    net->ipv4.ip_rt_min_advmss);
-+	unsigned int advmss;
-+	struct net *net;
+-	return rth->rt_genid != rt_genid_ipv4(dev_net(rth->dst.dev));
++	bool res;
 +
 +	rcu_read_lock();
-+	net = dev_net_rcu(dst->dev);
-+	advmss = max_t(unsigned int, ipv4_mtu(dst) - header_size,
-+				   net->ipv4.ip_rt_min_advmss);
++	res = rth->rt_genid != rt_genid_ipv4(dev_net_rcu(rth->dst.dev));
 +	rcu_read_unlock();
- 
- 	return min(advmss, IPV4_MAX_PMTU - header_size);
++
++	return res;
  }
+ 
+ void rt_cache_flush(struct net *net)
 -- 
 2.48.1.362.g079036d154-goog
 
