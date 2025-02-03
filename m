@@ -1,156 +1,168 @@
-Return-Path: <netdev+bounces-162021-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-162022-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 464C5A25598
-	for <lists+netdev@lfdr.de>; Mon,  3 Feb 2025 10:17:47 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4BB4DA255AE
+	for <lists+netdev@lfdr.de>; Mon,  3 Feb 2025 10:20:45 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 4242B1884386
-	for <lists+netdev@lfdr.de>; Mon,  3 Feb 2025 09:17:46 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D824C3A061E
+	for <lists+netdev@lfdr.de>; Mon,  3 Feb 2025 09:20:36 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3E0491FAC3D;
-	Mon,  3 Feb 2025 09:17:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B074C1FECB4;
+	Mon,  3 Feb 2025 09:20:40 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="XT79c94W"
+	dkim=pass (2048-bit key) header.d=queasysnail.net header.i=@queasysnail.net header.b="Vd9frdIm";
+	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="PwVTjJiB"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from fhigh-a6-smtp.messagingengine.com (fhigh-a6-smtp.messagingengine.com [103.168.172.157])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7A3E245016
-	for <netdev@vger.kernel.org>; Mon,  3 Feb 2025 09:17:36 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E3BC635966;
+	Mon,  3 Feb 2025 09:20:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=103.168.172.157
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1738574258; cv=none; b=CyQbn5pkoUcRMNH+3PJDq0iL8LaWFEAoDNsmNndpf1DVcvsC4D3we7KA1hDjgujhLN/hlFqYj5mTcnkM5zIMzBe3odSNF7msBmG3bGoO0IHJTg9IbXZAzQ9beOOPRjDZGmoi8VbAtwR/PvgNsoCTIjVWwzQHpjmR05s/4sxdYQ0=
+	t=1738574440; cv=none; b=sMRsBSfdw24NmRNm1uXF31zkoe1p9JdCknpxoN9Y9AGoLAQgGKHrOCZs1ZRRscrjGsESms7Sk/tH0rFJuvfNUPNj7npSFDUWNyBWNv0kPIU7TmD1DLjQHXl1fdC4EQ6IdnPJ3YoS+mKjvcauFspnINNWmeiPrDaEjADEMnBYBcE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1738574258; c=relaxed/simple;
-	bh=Q6WM9dyhofkBoVa+ZjYVee5tNttAayB023b0b7nSrT0=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=RsTONDsCdNnjXrbXky+dgkBlQtNxT3RlSfa9Gq79LEOQgbtNDaGT2BpoRv5YHqZmOgb38aN/wFRQMO8K7c9xvXLLJNo9EQj/t07/aZ937m1znlSO7qkiqsETrLf0kd87g4gdFihRprTZ1gQh9zxmULbAVFKfuPOqg+g4qf1agbA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=XT79c94W; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1738574255;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=AnppZd8pEry01iPJLVf/WOGk/OLH3G7jVAumR8PxtIg=;
-	b=XT79c94Wa3QSjz+QlKjEPOw39nmqYVA6xq4Z+j5cJrNZ8VWLf3dR7t2lSkT7/QzJ2yuR0J
-	s0dDC/n+CSzDCQQBCeApU0dQIOJWYHDONAGvYmyY2tAzl//JGTWo7a6Ndnmsbvr522yFP/
-	MNgMzZTauVYPHDK9DT1LHG3hgQKK5Vg=
-Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
- [209.85.221.71]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-187-fxW_2kbRNiW7QHFqhBcf5w-1; Mon, 03 Feb 2025 04:17:33 -0500
-X-MC-Unique: fxW_2kbRNiW7QHFqhBcf5w-1
-X-Mimecast-MFC-AGG-ID: fxW_2kbRNiW7QHFqhBcf5w
-Received: by mail-wr1-f71.google.com with SMTP id ffacd0b85a97d-3860bc1d4f1so2702665f8f.2
-        for <netdev@vger.kernel.org>; Mon, 03 Feb 2025 01:17:33 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1738574252; x=1739179052;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=AnppZd8pEry01iPJLVf/WOGk/OLH3G7jVAumR8PxtIg=;
-        b=ulCxcpX9ddb5K9+hlnsSiC86PoHHByET8vkHjWqKg5wzm3sp65XQfc0kOZ4vDU24JA
-         XNSrLrpAcWrhhX21wi4IyKzqAziEFSvuyGa+0Ow0S1h3unFYJP5vWYSToK6UjclmbPr3
-         UZp+KKptcQPldLC3lISSOZ+TgEFu8tSVLZDjjggdPt6SxC0+kFgY9GFhQYnPjYtbL4ZU
-         A5g7/CLyg3yG1vrH6hi3ks/zW21whr3EhZOLxy+RkBCozn8PRLk7VJqQwJ8Xo4GwZcRF
-         z3zmt4WR54isjlzFR0RNHLio+qxHT0IK2b0sf1GPYSKiiUwZX0YFckQFISGfoVn2S/da
-         ZDPA==
-X-Gm-Message-State: AOJu0Yzd2CgoL7ZIl5zh7WuVRIkyvtDqC2yvlSE5eUG9JABQnmvP0kBm
-	puJV1IZwiwxRkAkUdfai0Cz9FkMZUsDYERMuAL9bTK3wvwFCVzqXWyuzQl2/GnazYXILhNEUzU1
-	meCrvOgVFW4pqIu5tVSmaO7hUHTEe6caVWpZDn0GiCsAVM1XgRca4137ib4nN2Q==
-X-Gm-Gg: ASbGncv3gAcfyUtuIMwrcXHDmp9+l6KnT1Rpcz04UYfqiTdQ9C8fsVOeacaK77nATOU
-	EcOF78Hi9L0/wK8wN87KDg60ZM8hjpEnkJWHVnQddmNpL4jsvPR3SlrwvNDthGg9zyp/+vAIqKN
-	w2kQP0mK/adi5yDUlUHo9YgQGNe9qgR4dvL2kDfECBzj4gg8bkmNkdhZRGXnoELE9pfRvSWG3x8
-	vwvYbLhDAWorjFCwGhwDw9j9VESgH+grjBb+ZTebN/xiJkRjvk9mh4kjMT+TVWNNN1Pi6ULq5R+
-	gARjh59YpXx34QSPGh8bA5geKP6PAN1eaXU=
-X-Received: by 2002:a05:6000:1542:b0:38c:5c1d:2844 with SMTP id ffacd0b85a97d-38c5c1d2b13mr12572884f8f.11.1738574252136;
-        Mon, 03 Feb 2025 01:17:32 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IEcP88HgORUEV50MLq3mIWN0m8jZzQLOc/3KyPwvpXbsZchfwxjoaT9QN00mFvakAuvkNnNdw==
-X-Received: by 2002:a05:6000:1542:b0:38c:5c1d:2844 with SMTP id ffacd0b85a97d-38c5c1d2b13mr12572859f8f.11.1738574251749;
-        Mon, 03 Feb 2025 01:17:31 -0800 (PST)
-Received: from [192.168.88.253] (146-241-41-201.dyn.eolo.it. [146.241.41.201])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-38c5c0ec35asm12397314f8f.15.2025.02.03.01.17.30
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 03 Feb 2025 01:17:31 -0800 (PST)
-Message-ID: <e7cdcca6-d0b2-4b59-a2ef-17834a8ffca3@redhat.com>
-Date: Mon, 3 Feb 2025 10:17:30 +0100
+	s=arc-20240116; t=1738574440; c=relaxed/simple;
+	bh=eH8RTlzzHp4UeP8KiQIoY8gIaSQQAs8szmF27FWar1c=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=im5urJQGPGBkkh2GicJuWFjFq2aCuxPhakddrf7rA+nATCWLZHlb1z/6ds02w76uRXX+LWSuT2kiwsBgzUOQtog8K8/is2nD4FWB1Z7Se1KQznGZpIak+XrzqApRq4H2RyW3mQmacfep/bwufX7UYRuBXVtadejmexaBtZv3MIs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=queasysnail.net; spf=pass smtp.mailfrom=queasysnail.net; dkim=pass (2048-bit key) header.d=queasysnail.net header.i=@queasysnail.net header.b=Vd9frdIm; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=PwVTjJiB; arc=none smtp.client-ip=103.168.172.157
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=queasysnail.net
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=queasysnail.net
+Received: from phl-compute-06.internal (phl-compute-06.phl.internal [10.202.2.46])
+	by mailfhigh.phl.internal (Postfix) with ESMTP id B06D91140172;
+	Mon,  3 Feb 2025 04:20:35 -0500 (EST)
+Received: from phl-mailfrontend-02 ([10.202.2.163])
+  by phl-compute-06.internal (MEProxy); Mon, 03 Feb 2025 04:20:35 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=queasysnail.net;
+	 h=cc:cc:content-type:content-type:date:date:from:from
+	:in-reply-to:in-reply-to:message-id:mime-version:references
+	:reply-to:subject:subject:to:to; s=fm1; t=1738574435; x=
+	1738660835; bh=YlFWSO22bl8+fawPp6D8ReMiTZsYoX3fNRXYOkRD+pw=; b=V
+	d9frdImBGEGNN6HH2PlR+iCuevMDIBikfhw4bmf75WnKy+9Z7tbZ04hBVaY84Riu
+	Uph5qGx28t6hoVT2oryTI6NtMqQFvOA5bj/JLb1rAcQc5zQOAyrEVvokxYQDr/Dw
+	a/nYrtj4RdP+MaBKefxEADAAC9qLBIs9u9z5dBzOssEZVm/4wx78C5ZyyDySmVCf
+	A54zf6kamdGTQUDGTdzcwon1px8SPICo7zl5N88vDdyoliIxObIsTx+E4s9p8Y1M
+	BAy/4Y8FzMug6ogRBbATemrBr6F6RtzxRGFIDt+ahEbLLhzB7vl1OrdDWiqB8lJ0
+	rzCPNVlU30vqYC+MuUNIQ==
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
+	messagingengine.com; h=cc:cc:content-type:content-type:date:date
+	:feedback-id:feedback-id:from:from:in-reply-to:in-reply-to
+	:message-id:mime-version:references:reply-to:subject:subject:to
+	:to:x-me-proxy:x-me-sender:x-me-sender:x-sasl-enc; s=fm3; t=
+	1738574435; x=1738660835; bh=YlFWSO22bl8+fawPp6D8ReMiTZsYoX3fNRX
+	YOkRD+pw=; b=PwVTjJiBiXi7CTfXdINoIOd4rhsNSaUgd+VjZnANQkP6MtjXRyr
+	MWWOcx2YT9Fky0JpKDlM860arvHGo0ayBJjIAz9Zc3NWPFSjl6ufOfk1LBI7YSmr
+	5967oyQBaT5sp/ajyfZHt9LtTx/4QJz07YUrnJyPICKBbqsmmAruGqkoIXhSeVqe
+	qAr1FN0GH7Fmb+Wahw4JXkz2cKNWuHvjHYR/xdLrLaVmc1jat4vzFLwSTkppUrDA
+	SzsVF3kb3Eo4cfcKfeJZiqcy6QXNLoecHHeLyAjO9VhtwkxrGJpeQxuXAAov0Q4w
+	KLxsSOUEs430dKjjqWUkXXIngioMAARNmiw==
+X-ME-Sender: <xms:Y4qgZ0xiJL2pHo30aU6RUjj96V8IbO1-CPZliu8s8dvhxsZC-h01YA>
+    <xme:Y4qgZ4Q-1AYIZ9q984zLi_ufHU2-Lgro1CHVvu8nVEZmCcozYj-6OdJCUhH-UlNvU
+    wxIusuFsIqOg3gVm00>
+X-ME-Received: <xmr:Y4qgZ2WOmal_QazD6njrFgBxcz4JVy5tGdq87D4aek7nC0ZcGIdmy5kC0CyD>
+X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeefvddrtddtgddujedvvdcutefuodetggdotefrod
+    ftvfcurfhrohhfihhlvgemucfhrghsthforghilhdpggftfghnshhusghstghrihgsvgdp
+    uffrtefokffrpgfnqfghnecuuegrihhlohhuthemuceftddtnecusecvtfgvtghiphhivg
+    hnthhsucdlqddutddtmdenucfjughrpeffhffvvefukfhfgggtuggjsehttdertddttdej
+    necuhfhrohhmpefurggsrhhinhgrucffuhgsrhhotggruceoshgusehquhgvrghshihsnh
+    grihhlrdhnvghtqeenucggtffrrghtthgvrhhnpeeuhffhfffgfffhfeeuiedugedtfefh
+    keegteehgeehieffgfeuvdeuffefgfduffenucevlhhushhtvghrufhiiigvpedtnecurf
+    grrhgrmhepmhgrihhlfhhrohhmpehsugesqhhuvggrshihshhnrghilhdrnhgvthdpnhgs
+    pghrtghpthhtohepudefpdhmohguvgepshhmthhpohhuthdprhgtphhtthhopegrnhhtoh
+    hnihhosehophgvnhhvphhnrdhnvghtpdhrtghpthhtohepnhgvthguvghvsehvghgvrhdr
+    khgvrhhnvghlrdhorhhgpdhrtghpthhtohepvgguuhhmrgiivghtsehgohhoghhlvgdrtg
+    homhdprhgtphhtthhopehkuhgsrgeskhgvrhhnvghlrdhorhhgpdhrtghpthhtohepphgr
+    sggvnhhisehrvgguhhgrthdrtghomhdprhgtphhtthhopeguohhnrghlugdrhhhunhhtvg
+    hrsehgmhgrihhlrdgtohhmpdhrtghpthhtohepshhhuhgrhheskhgvrhhnvghlrdhorhhg
+    pdhrtghpthhtoheprhihrgiirghnohhvrdhsrdgrsehgmhgrihhlrdgtohhmpdhrtghpth
+    htoheprghnughrvgifodhnvghtuggvvheslhhunhhnrdgthh
+X-ME-Proxy: <xmx:Y4qgZyjLT0xB8dfB7DdEccyatt-wj7AG_zD9tkqFXRWPtF0vQeJhEw>
+    <xmx:Y4qgZ2A0o2M6tB16kz4-wmyPDnvjYK6heajikhBXcCrCKanJv9nFsA>
+    <xmx:Y4qgZzIp8hawpGgAcneq0QdkIRG64HRxGPX5sqISHEnFa5O-C5De6w>
+    <xmx:Y4qgZ9AH1B5tJ8pteapfOqSz4_CyrR1_kG92cTppsJnmeFl4xC0PXQ>
+    <xmx:Y4qgZyxPWjB6oEh6m5Rxs1fM623tW9bSHiMHva57f12qoQFffNCkjBK0>
+Feedback-ID: i934648bf:Fastmail
+Received: by mail.messagingengine.com (Postfix) with ESMTPA; Mon,
+ 3 Feb 2025 04:20:34 -0500 (EST)
+Date: Mon, 3 Feb 2025 10:20:32 +0100
+From: Sabrina Dubroca <sd@queasysnail.net>
+To: Antonio Quartulli <antonio@openvpn.net>
+Cc: netdev@vger.kernel.org, Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Donald Hunter <donald.hunter@gmail.com>,
+	Shuah Khan <shuah@kernel.org>, ryazanov.s.a@gmail.com,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	Simon Horman <horms@kernel.org>, linux-kernel@vger.kernel.org,
+	linux-kselftest@vger.kernel.org, Xiao Liang <shaw.leon@gmail.com>
+Subject: Re: [PATCH net-next v18 17/25] ovpn: implement keepalive mechanism
+Message-ID: <Z6CKYA8ueI-ZGybN@hog>
+References: <20250113-b4-ovpn-v18-0-1f00db9c2bd6@openvpn.net>
+ <20250113-b4-ovpn-v18-17-1f00db9c2bd6@openvpn.net>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next v6 08/12] net: homa: create homa_incoming.c
-To: John Ousterhout <ouster@cs.stanford.edu>
-Cc: netdev@vger.kernel.org, edumazet@google.com, horms@kernel.org,
- kuba@kernel.org
-References: <20250115185937.1324-1-ouster@cs.stanford.edu>
- <20250115185937.1324-9-ouster@cs.stanford.edu>
- <9083adf9-4e3f-47d9-8a79-d8fb052f99b5@redhat.com>
- <CAGXJAmxWOmPi-khSUugzOOjMSgVpWnn7QZ28jORK4sL9=vrA9A@mail.gmail.com>
- <82cdba95-83cb-4902-bb2a-a2ab880797a8@redhat.com>
- <CAGXJAmxLqnjnWr8sjooJRRyQ2-5BqPCQL8gnn0gzYoZ0MMoBSw@mail.gmail.com>
-Content-Language: en-US
-From: Paolo Abeni <pabeni@redhat.com>
-In-Reply-To: <CAGXJAmxLqnjnWr8sjooJRRyQ2-5BqPCQL8gnn0gzYoZ0MMoBSw@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20250113-b4-ovpn-v18-17-1f00db9c2bd6@openvpn.net>
 
-On 1/31/25 11:35 PM, John Ousterhout wrote:
-> On Thu, Jan 30, 2025 at 1:57 AM Paolo Abeni <pabeni@redhat.com> wrote:
->> On 1/30/25 1:48 AM, John Ousterhout wrote:
->>> On Mon, Jan 27, 2025 at 2:19 AM Paolo Abeni <pabeni@redhat.com> wrote:
->>>>
->>>> On 1/15/25 7:59 PM, John Ousterhout wrote:
->>>>> +     /* Each iteration through the following loop processes one
->> packet. */
->>>>> +     for (; skb; skb = next) {
->>>>> +             h = (struct homa_data_hdr *)skb->data;
->>>>> +             next = skb->next;
->>>>> +
->>>>> +             /* Relinquish the RPC lock temporarily if it's needed
->>>>> +              * elsewhere.
->>>>> +              */
->>>>> +             if (rpc) {
->>>>> +                     int flags = atomic_read(&rpc->flags);
->>>>> +
->>>>> +                     if (flags & APP_NEEDS_LOCK) {
->>>>> +                             homa_rpc_unlock(rpc);
->>>>> +                             homa_spin(200);
->>>>
->>>> Why spinning on the current CPU here? This is completely unexpected, and
->>>> usually tolerated only to deal with H/W imposed delay while programming
->>>> some device registers.
->>>
->>> This is done to pass the RPC lock off to another thread (the
->>> application); the spin is there to allow the other thread to acquire
->>> the lock before this thread tries to acquire it again (almost
->>> immediately). There's no performance impact from the spin because this
->>> thread is going to turn around and try to acquire the RPC lock again
->>> (at which point it will spin until the other thread releases the
->>> lock). Thus it's either spin here or spin there. I've added a comment
->>> to explain this.
->>
->> What if another process is spinning on the RPC lock without setting
->> APP_NEEDS_LOCK? AFAICS incoming packets targeting the same RPC could
->> land on different RX queues.
->>
-> 
-> If that happens then it could grab the lock instead of the desired
-> application, which would defeat the performance optimization and delay the
-> application a bit. This would be no worse than if the APP_NEEDS_LOCK
-> mechanism were not present.
+2025-01-13, 10:31:36 +0100, Antonio Quartulli wrote:
+> +void ovpn_xmit_special(struct ovpn_peer *peer, const void *data,
+> +		       const unsigned int len)
+> +{
+> +	struct ovpn_priv *ovpn;
+> +	struct sk_buff *skb;
+> +
+> +	ovpn = peer->ovpn;
+> +	if (unlikely(!ovpn))
+> +		return;
+> +
+> +	skb = alloc_skb(256 + len, GFP_ATOMIC);
+> +	if (unlikely(!skb))
+> +		return;
+> +
+> +	skb_reserve(skb, 128);
+> +	skb->priority = TC_PRIO_BESTEFFORT;
+> +	__skb_put_data(skb, data, len);
+> +
+> +	/* increase reference counter when passing peer to sending queue */
+> +	if (!ovpn_peer_hold(peer)) {
+> +		netdev_dbg(ovpn->dev,
+> +			   "cannot hold peer reference for sending special packet\n");
+> +		kfree_skb(skb);
+> +		return;
+> +	}
+> +
+> +	ovpn_send(ovpn, skb, peer);
+> +}
 
-Then I suggest using plain unlock/lock() with no additional spinning in
-between.
+[...]
+> +static void ovpn_peer_keepalive_send(struct work_struct *work)
+> +{
+> +	struct ovpn_peer *peer = container_of(work, struct ovpn_peer,
+> +					      keepalive_work);
+> +
+> +	local_bh_disable();
+> +	ovpn_xmit_special(peer, ovpn_keepalive_message,
+> +			  sizeof(ovpn_keepalive_message));
+> +	local_bh_enable();
+> +	ovpn_peer_put(peer);
 
-/P
+nit: could we simply drop this put and the hold in ovpn_xmit_special?
+ovpn_peer_keepalive_send has a reference on the peer from the WQ, just
+transfer it to ovpn_xmit_special and then ovpn_send. No need to
+pretend to acquire one for ovpn_send's sake and drop the one we got
+from the WQ? (ovpn_xmit_special would need to _put(peer) in case of
+early return)
 
+> +}
+
+-- 
+Sabrina
 
