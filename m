@@ -1,220 +1,156 @@
-Return-Path: <netdev+bounces-162191-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-162192-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id C0B44A260F2
-	for <lists+netdev@lfdr.de>; Mon,  3 Feb 2025 18:08:26 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6041AA260F5
+	for <lists+netdev@lfdr.de>; Mon,  3 Feb 2025 18:08:47 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 943D37A04DF
-	for <lists+netdev@lfdr.de>; Mon,  3 Feb 2025 17:07:12 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id F2D213A1345
+	for <lists+netdev@lfdr.de>; Mon,  3 Feb 2025 17:08:38 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B67EE20D4E8;
-	Mon,  3 Feb 2025 17:06:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B50A71D5159;
+	Mon,  3 Feb 2025 17:08:43 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="Oc8RcVuF"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-il1-f206.google.com (mail-il1-f206.google.com [209.85.166.206])
+Received: from mail-vs1-f73.google.com (mail-vs1-f73.google.com [209.85.217.73])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D2D7120B80C
-	for <netdev@vger.kernel.org>; Mon,  3 Feb 2025 17:06:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.206
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 20A5820967F
+	for <netdev@vger.kernel.org>; Mon,  3 Feb 2025 17:08:40 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.217.73
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1738602384; cv=none; b=HreKTNK2/Mgvum0cPpyuV3/gwZr/jikev9ORQ4ZFg3q8S6FE2MUl5AL0oZIp84O8oq+FODYAcK6stRHLuKNAqvt0OXliWJetUoyjqiGvD8lGEYtKGffHZxcTM2aqFLRCtN77NPUjfFMe/wHGmz2PplaObbVHNy6KahrjxixO/8c=
+	t=1738602523; cv=none; b=p3wIXLLhWyWMbzynAR9/9lPenCjSYkvSPqALgXO6tynxZuS2D+Z4iMYygnRIjni/XjQKFr7URmGeNleEBfrlc+Moz2cssy7fAXqHWgxQRUslYZI02g8qNoqo+bLmXFDkUPcxLie0TFJZG3LgR82fVwQo/xE+5GrP1eHTlx2tQ5o=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1738602384; c=relaxed/simple;
-	bh=BrCxbpYcd+JnXrPkcfr6lCs/aTPwdnfGgVrzCmZxKnQ=;
-	h=MIME-Version:Date:Message-ID:Subject:From:To:Content-Type; b=m7Vk/vLb2RGpEGd6fnR+ye6Ky+JA8iWdEAzxaSErenfnlMF/Pkv7guHl8xhK+PIzSkMHL90xkEvdhA1cTumdKiwx5ZpC5OsCITkDVLQtQ4AV8/yMsHDGOde0XnKpen+n0zBgJYlQCRaHPu87zxWTfr0W6UXj8VZZAQd4XAwbCNc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.206
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
-Received: by mail-il1-f206.google.com with SMTP id e9e14a558f8ab-3ce7c75cae9so35444285ab.1
-        for <netdev@vger.kernel.org>; Mon, 03 Feb 2025 09:06:22 -0800 (PST)
+	s=arc-20240116; t=1738602523; c=relaxed/simple;
+	bh=OvMdGiiMqtXJxpeP8aigdadenc+x5SCzzZ+wdLQFuLo=;
+	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=MIap4LoPI18JdWRCW1tHvi3umv/GuPPXBt6ZdVVpfJzrwR0Js6P8XN0kAIXNkFwf2J+pGJHATcWYLIUmo/5nkA0sAgAAltpyGLR08NHEtr0Dv19X55iWcUovYNterFs7FZc4whr77GOUmGLUlncLSLosEiKsm+Q5yF6utu0nVSg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=Oc8RcVuF; arc=none smtp.client-ip=209.85.217.73
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com
+Received: by mail-vs1-f73.google.com with SMTP id ada2fe7eead31-4b11463b42aso522430137.0
+        for <netdev@vger.kernel.org>; Mon, 03 Feb 2025 09:08:40 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1738602520; x=1739207320; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=me08butiSxHFI78MR+uQVHza+d6wwiZ+sBFW+rxvF00=;
+        b=Oc8RcVuFFJUl2507yRV1KYxB8XzErhjAm3IxHiGxkSYQV6EAlAu7kdHnzPREztVfhx
+         oSmdA8h4G+Z41SVIOYBVu7XHOEppMT49xrnuJ9Ucwe3yM0Z2HUiNFa8lPDRt2VF4oXOV
+         ZuNOMqcZKQiWrZyo6p+S7p9dfj2lUvD/iYLjwxYtgau/Y8vZb3j4sGFpDUjS7Gp3Mhk5
+         YQUXOQQjdYpjR++cCiXc5TaaUfpZF2zG/ols0x3pjtYbDgsToa2x7ZdBihDTHRelc/1A
+         vnEFnl9hgD+8qeMPiGDNQISf8ZWIELJNev06l9AuCN1IMkaTZZRrdjK0LU4V6HEn895v
+         ZKWw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1738602382; x=1739207182;
-        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
+        d=1e100.net; s=20230601; t=1738602520; x=1739207320;
+        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
          :from:to:cc:subject:date:message-id:reply-to;
-        bh=EvIJAMDztJTBQDqmwsIIAqNRRzmhnnKPFMl2MQnHWFs=;
-        b=G4wPnQ/7rx4gVg86JBHr9VNReDIXTgriBYfkvoDsFDJIVXTObl+xpPe48usPbQix+a
-         fkSfOi09WGarPeVnKxDCKWXDcAYJvbFaP+1W4INH8j/WJMh+j3e+lENJYxZC/trcDYmA
-         7pQXDHNv1Om9RTUYQvK03JzUE3R+XQKRfeutbwNrU4/OI5/MRD+Z+j4vC0w1gb+qOKqe
-         FXoOmm0NPytLCnds6Vq/D3bD21y039a0DayKGJJFgm3d+S/7NsPZoAa/UrvxYddPIwqu
-         Ih6JwztUjw1ja4bd90xEygvNy3SDrHL7KEr4sOtMiDtP42LtqDdRbuurKh1K8arQr2jy
-         Urqg==
-X-Forwarded-Encrypted: i=1; AJvYcCVpo3V5Sx3u0grQiS+bHZ2xhQgGwGaKkgBHVuNT/0xojlrp06xMPxu51uW1ibGpnv2WV4Nhngo=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yyh8ct18yokawLK/+JId+cQMDDn65z2oS+ph6Jt0/cS2qKFsxHx
-	06ov3IDCEZFaRi7kuAYFEDxFY3dd+BCAjrk4unduP5L5sKSG+Nr2zbssFouCZLoNFuJrwfmiF74
-	Hovgnpo62e3wJ757oGcfRb8sm0wB8oCZXGpEq3c777CvzdXe28wGW90g=
-X-Google-Smtp-Source: AGHT+IFK9hAgpJhY7Jr0yXxf8XJkawng8GwmfeYpkqFFGFi7+/+QAD3e0sWxk3BAQvw4z/PjcMzqIARG48F19gP7ndd1WRd81iLh
+        bh=me08butiSxHFI78MR+uQVHza+d6wwiZ+sBFW+rxvF00=;
+        b=SONpUP+kASFYPC96/9eKC2buQILEFhGOYyru/NuYM1Uwu2IR7T7MwioL30IVILV9wk
+         iIY5xh28nZHINAscaf/3GoQgxixfTqrd85rMk9a92W68SBv8iF4eJWQbBpmcSiSt1Kaa
+         tA1HlegLXnNxM0mSHPL0t4fmEW3hdPPbiJtlPJklHtWMmm283J3nEqBTEUTrQe6rqKnB
+         we9Pm6F34KqWIgZ10U2j/WoM+tS0wRv7rDrmXpSJRg4Cp/yjqSU4uP4Jrq68RRfLbnba
+         rKbz8bpjuy1mRt1I+VtQJ3VvrF5ZHalnoj0ySkp5ixm0Ex4oywdiZlDyXCupIlOcjiKY
+         LBwQ==
+X-Gm-Message-State: AOJu0Yx1bz133Koi8fxj0gKulFO8/ZF+HJrOou1vdU3V64S8mcHWXEo2
+	x8PvhHnVyVjDExMJbFR5vl7dfCuMQUEtrabxvR/r+KQycvqgZXonLTXNHFefqCR+tAZ+zxSLRok
+	OyyAo2ZjchQ==
+X-Google-Smtp-Source: AGHT+IGJfDdWlBwnAh25ty+kAl7DeVSKazdg6KfJfEDBefBXkNg3c1Af7EENhY148rZ/wIFYlOspXOgWM1qUKg==
+X-Received: from vsvf16.prod.google.com ([2002:a05:6102:1510:b0:4af:e21c:a8f3])
+ (user=edumazet job=prod-delivery.src-stubby-dispatcher) by
+ 2002:a05:6102:c8d:b0:4af:fca2:1b7 with SMTP id ada2fe7eead31-4b9a4f8cae6mr15414300137.14.1738602519954;
+ Mon, 03 Feb 2025 09:08:39 -0800 (PST)
+Date: Mon,  3 Feb 2025 17:08:38 +0000
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-X-Received: by 2002:a05:6e02:a0:b0:3cf:ba90:6ad9 with SMTP id
- e9e14a558f8ab-3d03f4fc490mr222185ab.9.1738602381964; Mon, 03 Feb 2025
- 09:06:21 -0800 (PST)
-Date: Mon, 03 Feb 2025 09:06:21 -0800
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <67a0f78d.050a0220.d7c5a.00a0.GAE@google.com>
-Subject: [syzbot] [hams?] BUG: soft lockup in rose_loopback_timer
-From: syzbot <syzbot+7ff41b5215f0c534534e@syzkaller.appspotmail.com>
-To: davem@davemloft.net, edumazet@google.com, horms@kernel.org, 
-	kuba@kernel.org, linux-hams@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	netdev@vger.kernel.org, pabeni@redhat.com, syzkaller-bugs@googlegroups.com
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.48.1.362.g079036d154-goog
+Message-ID: <20250203170838.3521361-1-edumazet@google.com>
+Subject: [PATCH net] net: rose: lock the socket in rose_bind()
+From: Eric Dumazet <edumazet@google.com>
+To: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
+	Paolo Abeni <pabeni@redhat.com>
+Cc: netdev@vger.kernel.org, Simon Horman <horms@kernel.org>, eric.dumazet@gmail.com, 
+	Eric Dumazet <edumazet@google.com>, syzbot+7ff41b5215f0c534534e@syzkaller.appspotmail.com
 Content-Type: text/plain; charset="UTF-8"
 
-Hello,
+syzbot reported a soft lockup in rose_loopback_timer(),
+with a repro calling bind() from multiple threads.
 
-syzbot found the following issue on:
+rose_bind() must lock the socket to avoid this issue.
 
-HEAD commit:    573067a5a685 Merge branch 'for-next/core' into for-kernelci
-git tree:       git://git.kernel.org/pub/scm/linux/kernel/git/arm64/linux.git for-kernelci
-console output: https://syzkaller.appspot.com/x/log.txt?x=1189ff30580000
-kernel config:  https://syzkaller.appspot.com/x/.config?x=cd7202b56d469648
-dashboard link: https://syzkaller.appspot.com/bug?extid=7ff41b5215f0c534534e
-compiler:       Debian clang version 15.0.6, GNU ld (GNU Binutils for Debian) 2.40
-userspace arch: arm64
-syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=15f4ffe8580000
-C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=1663aadf980000
-
-Downloadable assets:
-disk image: https://storage.googleapis.com/syzbot-assets/9d3b5c855aa0/disk-573067a5.raw.xz
-vmlinux: https://storage.googleapis.com/syzbot-assets/0c06fc1ead83/vmlinux-573067a5.xz
-kernel image: https://storage.googleapis.com/syzbot-assets/3390e59b9e4b/Image-573067a5.gz.xz
-
-IMPORTANT: if you fix the issue, please add the following tag to the commit:
+Fixes: 1da177e4c3f4 ("Linux-2.6.12-rc2")
 Reported-by: syzbot+7ff41b5215f0c534534e@syzkaller.appspotmail.com
-
-watchdog: BUG: soft lockup - CPU#0 stuck for 22s! [swapper/0:0]
-Modules linked in:
-irq event stamp: 232963
-hardirqs last  enabled at (232962): [<ffff80008b69c960>] __el1_irq arch/arm64/kernel/entry-common.c:565 [inline]
-hardirqs last  enabled at (232962): [<ffff80008b69c960>] el1_interrupt+0x58/0x68 arch/arm64/kernel/entry-common.c:575
-hardirqs last disabled at (232963): [<ffff80008b69c92c>] __el1_irq arch/arm64/kernel/entry-common.c:557 [inline]
-hardirqs last disabled at (232963): [<ffff80008b69c92c>] el1_interrupt+0x24/0x68 arch/arm64/kernel/entry-common.c:575
-softirqs last  enabled at (228290): [<ffff80008030e7b4>] softirq_handle_end kernel/softirq.c:407 [inline]
-softirqs last  enabled at (228290): [<ffff80008030e7b4>] handle_softirqs+0xb44/0xd34 kernel/softirq.c:589
-softirqs last disabled at (228401): [<ffff800080020db4>] __do_softirq+0x14/0x20 kernel/softirq.c:595
-CPU: 0 UID: 0 PID: 0 Comm: swapper/0 Not tainted 6.13.0-rc3-syzkaller-g573067a5a685 #0
-Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 09/13/2024
-pstate: 40400005 (nZcv daif +PAN -UAO -TCO -DIT -SSBS BTYPE=--)
-pc : preempt_count arch/arm64/include/asm/preempt.h:13 [inline]
-pc : in_softirq_really kernel/kcov.c:171 [inline]
-pc : check_kcov_mode kernel/kcov.c:183 [inline]
-pc : write_comp_data kernel/kcov.c:246 [inline]
-pc : __sanitizer_cov_trace_cmp4+0x38/0xa0 kernel/kcov.c:288
-lr : rose_find_socket+0x7c/0x130 net/rose/af_rose.c:309
-sp : ffff800080007b60
-x29: ffff800080007b70 x28: 1ffff00012f27be0 x27: 0000000000000000
-x26: 00000000000003e7 x25: dfff800000000000 x24: 0000000000000033
-x23: dfff800000000000 x22: 0000000000000000 x21: ffff0000c2c8e000
-x20: 0000000000000033 x19: ffff0000d2670400 x18: ffff800080007840
-x17: 0000000000015d97 x16: ffff80008069d55c x15: ffff700010000f54
-x14: 1ffff00010000f54 x13: 0000000000000004 x12: ffffffffffffffff
-x11: ffff700010000f54 x10: 0000000000ff0100 x9 : 0000000000000302
-x8 : ffff80008f9c67c0 x7 : 0000000000000000 x6 : 0000000000000000
-x5 : ffff8000935a9f90 x4 : 0000000000000008 x3 : ffff80008047cdcc
-x2 : 0000000000000001 x1 : 0000000000000033 x0 : 0000000000000000
-Call trace:
- in_softirq_really kernel/kcov.c:171 [inline] (P)
- check_kcov_mode kernel/kcov.c:183 [inline] (P)
- write_comp_data kernel/kcov.c:246 [inline] (P)
- __sanitizer_cov_trace_cmp4+0x38/0xa0 kernel/kcov.c:288 (P)
- rose_loopback_timer+0x1bc/0x4bc net/rose/rose_loopback.c:91
- call_timer_fn+0x1b4/0x8b8 kernel/time/timer.c:1793
- expire_timers kernel/time/timer.c:1844 [inline]
- __run_timers kernel/time/timer.c:2418 [inline]
- __run_timer_base+0x56c/0x7b4 kernel/time/timer.c:2430
- run_timer_base kernel/time/timer.c:2439 [inline]
- run_timer_softirq+0xcc/0x194 kernel/time/timer.c:2449
- handle_softirqs+0x320/0xd34 kernel/softirq.c:561
- __do_softirq+0x14/0x20 kernel/softirq.c:595
- ____do_softirq+0x14/0x20 arch/arm64/kernel/irq.c:81
- call_on_irq_stack+0x24/0x4c arch/arm64/kernel/entry.S:891
- do_softirq_own_stack+0x20/0x2c arch/arm64/kernel/irq.c:86
- invoke_softirq kernel/softirq.c:442 [inline]
- __irq_exit_rcu+0x1d8/0x544 kernel/softirq.c:662
- irq_exit_rcu+0x14/0x84 kernel/softirq.c:678
- __el1_irq arch/arm64/kernel/entry-common.c:561 [inline]
- el1_interrupt+0x38/0x68 arch/arm64/kernel/entry-common.c:575
- el1h_64_irq_handler+0x18/0x24 arch/arm64/kernel/entry-common.c:580
- el1h_64_irq+0x6c/0x70 arch/arm64/kernel/entry.S:596
- __daif_local_irq_enable arch/arm64/include/asm/irqflags.h:26 [inline] (P)
- arch_local_irq_enable+0x8/0xc arch/arm64/include/asm/irqflags.h:48 (P)
- cpuidle_idle_call kernel/sched/idle.c:185 [inline]
- do_idle+0x1ec/0x4e0 kernel/sched/idle.c:325
- cpu_startup_entry+0x5c/0x74 kernel/sched/idle.c:423
- rest_init+0x2dc/0x2f4 init/main.c:747
- start_kernel+0x3f4/0x4f4 init/main.c:1102
- __primary_switched+0x8c/0x94 arch/arm64/kernel/head.S:246
-Sending NMI from CPU 0 to CPUs 1:
-NMI backtrace for cpu 1
-CPU: 1 UID: 0 PID: 6586 Comm: syz-executor306 Not tainted 6.13.0-rc3-syzkaller-g573067a5a685 #0
-Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 09/13/2024
-pstate: 00400005 (nzcv daif +PAN -UAO -TCO -DIT -SSBS BTYPE=--)
-pc : queued_spin_lock_slowpath+0x15c/0xd04 kernel/locking/qspinlock.c:380
-lr : queued_spin_lock_slowpath+0x168/0xd04 kernel/locking/qspinlock.c:380
-sp : ffff8000a3887920
-x29: ffff8000a38879e0 x28: 1ffff00012545d44 x27: dfff800000000000
-x26: 1ffff00014710f50 x25: ffff8000a3887960 x24: dfff800000000000
-x23: ffff8000a38879a0 x22: ffff700014710f2c x21: 0000000000000001
-x20: 1ffff00014710f34 x19: ffff800092a2ea20 x18: 0000000000000000
-x17: 0000000000000000 x16: ffff800080bf1494 x15: 0000000000000001
-x14: 1ffff00012545d44 x13: 0000000000000000 x12: 0000000000000000
-x11: ffff700012545d45 x10: 1ffff00012545d44 x9 : 0000000000000000
-x8 : 0000000000000001 x7 : ffff80008a73b3a4 x6 : 0000000000000000
-x5 : 0000000000000000 x4 : 0000000000000001 x3 : ffff80008b6c1928
-x2 : 0000000000000000 x1 : 0000000000000001 x0 : 0000000000000001
-Call trace:
- __cmpwait_case_8 arch/arm64/include/asm/cmpxchg.h:229 [inline] (P)
- __cmpwait arch/arm64/include/asm/cmpxchg.h:257 [inline] (P)
- queued_spin_lock_slowpath+0x15c/0xd04 kernel/locking/qspinlock.c:380 (P)
- queued_spin_lock include/asm-generic/qspinlock.h:114 [inline]
- do_raw_spin_lock+0x2ec/0x334 kernel/locking/spinlock_debug.c:116
- __raw_spin_lock_bh include/linux/spinlock_api_smp.h:127 [inline]
- _raw_spin_lock_bh+0x50/0x60 kernel/locking/spinlock.c:178
- spin_lock_bh include/linux/spinlock.h:356 [inline]
- rose_insert_socket+0x2c/0x15c net/rose/af_rose.c:261
- rose_bind+0x490/0x640 net/rose/af_rose.c:753
- __sys_bind_socket net/socket.c:1827 [inline]
- __sys_bind+0x1ac/0x248 net/socket.c:1858
- __do_sys_bind net/socket.c:1863 [inline]
- __se_sys_bind net/socket.c:1861 [inline]
- __arm64_sys_bind+0x7c/0x94 net/socket.c:1861
- __invoke_syscall arch/arm64/kernel/syscall.c:35 [inline]
- invoke_syscall+0x98/0x2b8 arch/arm64/kernel/syscall.c:49
- el0_svc_common+0x130/0x23c arch/arm64/kernel/syscall.c:132
- do_el0_svc+0x48/0x58 arch/arm64/kernel/syscall.c:151
- el0_svc+0x54/0x168 arch/arm64/kernel/entry-common.c:744
- el0t_64_sync_handler+0x84/0x108 arch/arm64/kernel/entry-common.c:762
- el0t_64_sync+0x198/0x19c arch/arm64/kernel/entry.S:600
-
-
+Closes: https://lore.kernel.org/netdev/67a0f78d.050a0220.d7c5a.00a0.GAE@google.com/T/#u
+Signed-off-by: Eric Dumazet <edumazet@google.com>
 ---
-This report is generated by a bot. It may contain errors.
-See https://goo.gl/tpsmEJ for more information about syzbot.
-syzbot engineers can be reached at syzkaller@googlegroups.com.
+ net/rose/af_rose.c | 24 ++++++++++++++++--------
+ 1 file changed, 16 insertions(+), 8 deletions(-)
 
-syzbot will keep track of this issue. See:
-https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
+diff --git a/net/rose/af_rose.c b/net/rose/af_rose.c
+index 72c65d938a150e6794b1a769070843ec5c5fa32a..a4a668b88a8f27c77d2faa39ba9ad174e748966b 100644
+--- a/net/rose/af_rose.c
++++ b/net/rose/af_rose.c
+@@ -701,11 +701,9 @@ static int rose_bind(struct socket *sock, struct sockaddr *uaddr, int addr_len)
+ 	struct net_device *dev;
+ 	ax25_address *source;
+ 	ax25_uid_assoc *user;
++	int err = -EINVAL;
+ 	int n;
+ 
+-	if (!sock_flag(sk, SOCK_ZAPPED))
+-		return -EINVAL;
+-
+ 	if (addr_len != sizeof(struct sockaddr_rose) && addr_len != sizeof(struct full_sockaddr_rose))
+ 		return -EINVAL;
+ 
+@@ -718,8 +716,15 @@ static int rose_bind(struct socket *sock, struct sockaddr *uaddr, int addr_len)
+ 	if ((unsigned int) addr->srose_ndigis > ROSE_MAX_DIGIS)
+ 		return -EINVAL;
+ 
+-	if ((dev = rose_dev_get(&addr->srose_addr)) == NULL)
+-		return -EADDRNOTAVAIL;
++	lock_sock(sk);
++
++	if (!sock_flag(sk, SOCK_ZAPPED))
++		goto out_release;
++
++	err = -EADDRNOTAVAIL;
++	dev = rose_dev_get(&addr->srose_addr);
++	if (!dev)
++		goto out_release;
+ 
+ 	source = &addr->srose_call;
+ 
+@@ -730,7 +735,8 @@ static int rose_bind(struct socket *sock, struct sockaddr *uaddr, int addr_len)
+ 	} else {
+ 		if (ax25_uid_policy && !capable(CAP_NET_BIND_SERVICE)) {
+ 			dev_put(dev);
+-			return -EACCES;
++			err = -EACCES;
++			goto out_release;
+ 		}
+ 		rose->source_call   = *source;
+ 	}
+@@ -753,8 +759,10 @@ static int rose_bind(struct socket *sock, struct sockaddr *uaddr, int addr_len)
+ 	rose_insert_socket(sk);
+ 
+ 	sock_reset_flag(sk, SOCK_ZAPPED);
+-
+-	return 0;
++	err = 0;
++out_release:
++	release_sock(sk);
++	return err;
+ }
+ 
+ static int rose_connect(struct socket *sock, struct sockaddr *uaddr, int addr_len, int flags)
+-- 
+2.48.1.362.g079036d154-goog
 
-If the report is already addressed, let syzbot know by replying with:
-#syz fix: exact-commit-title
-
-If you want syzbot to run the reproducer, reply with:
-#syz test: git://repo/address.git branch-or-commit-hash
-If you attach or paste a git patch, syzbot will apply it before testing.
-
-If you want to overwrite report's subsystems, reply with:
-#syz set subsystems: new-subsystem
-(See the list of subsystem names on the web dashboard)
-
-If the report is a duplicate of another one, reply with:
-#syz dup: exact-subject-of-another-report
-
-If you want to undo deduplication, reply with:
-#syz undup
 
