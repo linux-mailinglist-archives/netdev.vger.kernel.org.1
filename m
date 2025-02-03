@@ -1,69 +1,69 @@
-Return-Path: <netdev+bounces-162107-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-162109-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3E0C8A25D00
-	for <lists+netdev@lfdr.de>; Mon,  3 Feb 2025 15:43:03 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9DD98A25D26
+	for <lists+netdev@lfdr.de>; Mon,  3 Feb 2025 15:45:14 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 2E4C3164B23
-	for <lists+netdev@lfdr.de>; Mon,  3 Feb 2025 14:37:46 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 8BDD73AD19C
+	for <lists+netdev@lfdr.de>; Mon,  3 Feb 2025 14:37:43 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E354520E006;
-	Mon,  3 Feb 2025 14:30:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C520920E01F;
+	Mon,  3 Feb 2025 14:30:55 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="aN9BUGVt"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="2ZJulzLN"
 X-Original-To: netdev@vger.kernel.org
 Received: from mail-qt1-f201.google.com (mail-qt1-f201.google.com [209.85.160.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4C48C20A5ED
-	for <netdev@vger.kernel.org>; Mon,  3 Feb 2025 14:30:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 037D020E005
+	for <netdev@vger.kernel.org>; Mon,  3 Feb 2025 14:30:53 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1738593054; cv=none; b=CBOVU+T4pxSqK8VoRMlSZb3aBGkyxtbR/zLGrIquNnFytAPjEe0+WeS9seTTDswI44GfQGrLbKA8dAQflec9CXD0DGbA+3paj7tlOzL4Nw4cKissH8sAtB9XkNAu8ogGRLlVli2xb49K6pRkJ0+mwF5d4qipoa49c5lnx0/ULRI=
+	t=1738593055; cv=none; b=leGMgFhj7zaT2pr9ngz5yG/IIsqSFK8uvKA+HIyPuotmzQW8v3P9//7MH9czEjJvsbHLTMGhCTTJZtCdVeCkgtumnGrXRXJZuFhqstdNCpjpdLchLvDLcNYz8oL9ZDfJdVqwTXnNq9/EMNjv7QSxj/pbNDgDpc7q+B5oLaZQgJ4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1738593054; c=relaxed/simple;
-	bh=BjDBT6Ld/KkPV9e18e0rFMjRoUhNxwx0+3f23tk62VA=;
+	s=arc-20240116; t=1738593055; c=relaxed/simple;
+	bh=Tv9lP/iKol3DOwtqFgPyYFOYlq/ggjrKRjQnoathmaA=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=Hhj2FlPcEj2gOuh2ulHne31eFPOiaMc5LezVZTsz3CT0BOcZFSZsjUGxBQrEanx5pfi6358sJfCdLp6lgWzKh8142phvXa7NUHlYSdu/fBH6Him/dzlU9j5Oi5tIgLZklEzWWoTh375zTglvNxT7og4clLAJRrkKy1e4yrygWg8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=aN9BUGVt; arc=none smtp.client-ip=209.85.160.201
+	 To:Cc:Content-Type; b=EvQ+vXWOcPTecSePuAVl54clymh28Z6KQnsAxSXk3yXOzqJOLjHowY31iv1/JxFxqOBcVXUSlLcVnzeQR44VizYMdpUK32gJyTnC9V/StdXOcErtVL/xsef9TWKhYpXMEW0KaD+WgmQjIGQLBgbaa4ORAOQ1qd+FdOkS3JRJVU4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=2ZJulzLN; arc=none smtp.client-ip=209.85.160.201
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com
-Received: by mail-qt1-f201.google.com with SMTP id d75a77b69052e-46909701869so99361001cf.0
-        for <netdev@vger.kernel.org>; Mon, 03 Feb 2025 06:30:51 -0800 (PST)
+Received: by mail-qt1-f201.google.com with SMTP id d75a77b69052e-467bbc77b05so89059961cf.0
+        for <netdev@vger.kernel.org>; Mon, 03 Feb 2025 06:30:53 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1738593051; x=1739197851; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1738593053; x=1739197853; darn=vger.kernel.org;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=wFUTWn43E87kH4WvQpJOMQwE5y357mjWskRk2Y0FDpo=;
-        b=aN9BUGVtij+kL9hX454yLyu9b59FS0OjI0g9GDzE6TuQPKJM53B7Pxh+/WuGuPb+Q1
-         JO4H7LcnuXT66ZjdZ+A49QuaesTa4uegkRf9VjFt5/OFIwlR1Xk7NTsa+a3IvxbKgnaa
-         n/FoBdYF694IU2QHutKh9p7zuxPwgAqeVop6oM6C2Mpdl458z4SwjTwVfEhNcud88C55
-         UipVaUH+Uu7e60JeY+T7OrfFpVgwrNX20/Dyx7uFoh2UmDLSeCdly8BMXjjfT8rvSF9B
-         tIJ/cjl3qw7rxiqjPz/JTOGgfMbqn8DMBWyas6ena4IYug1CWq347Amow8H4EV64J0iK
-         QjmA==
+        bh=8gzgfgZQZl+mi1a/sA+Jd+RkxpB2VmO3rTOvLw+ezUA=;
+        b=2ZJulzLNyBuHGCrXB2cgQL1O534r2GBu32icxmpvlvGFl9hmXiX+Isb+fHfrR3GqHl
+         mfhto8tmugdlIIZG9G90LySBrKfR6oxKFH8ibOwa7U/jNELtR8ptAILUxzaEEfxpvf46
+         Bflf4mgH+Dj+8vMrdt/v2ruZ5x5rmqZ/WBmoiFR84o6zJcv5k2uzh0pj+lLn94XEmUrR
+         Z7dufqmed105ThMvL1fzM1xY6i2YJJw0Q1+YLXWZ835xK8M7nqMDqaDdFDQM7xfubv9q
+         QN6l4uAhUq0TAGYvm+6eJxLr+QUeob8HotGllt6gX4zkv9xodpbLZ0pE5lMUUheTh+yx
+         b0PQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1738593051; x=1739197851;
+        d=1e100.net; s=20230601; t=1738593053; x=1739197853;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=wFUTWn43E87kH4WvQpJOMQwE5y357mjWskRk2Y0FDpo=;
-        b=tRERXR/h2qaKN8lHP3mvvqQI/J7jvJvFbrXQkbLRcqtIoCJSDjLt3duUmhLn5a95OP
-         Tvc/cPTcwJt1kNnIn4bvVo6LPDH8ufKTxUI0vI2QK4qcLvvUaQmWJOUtGMJ6dxkKIYip
-         Ae/PoYyDuvhyaD1gsfmlk22nf94+wnGebRdJvIkMboyhufwqOxZYFkCtBdGGmy+gPYXe
-         UroZ6gdoZKV5Df9ubk6g/EuerE+38heO3PelO+GP1hOctel6WgQlzYwgRDLoiSoDGcVI
-         Hm18ovBk84qUOx702WN4E3BQgEYwNxmfwy4Fmq7EGR+utUvepgJYGxVvk/VHbGLew8jj
-         7gvg==
-X-Gm-Message-State: AOJu0YzQIA25nJ2bVuZ6EsZnpoI9qD7Z7H58WZS3dwaVOKvd/0Uck2NF
-	EknDyJf2XpfoH6xzyceHRR90IowfbxT6cJJPOA2Fev7ai+2jVJhfv/SKzF+XQsZJIHFTJHHkSQz
-	ICwOAYU9Ajw==
-X-Google-Smtp-Source: AGHT+IGvYma/ATaRnFREOH+tvmRCOgKofawknl3O75OVXUcuXOjekwJUF7rPMvr5TPMXLsQWwTghwJmc7WQwaQ==
+        bh=8gzgfgZQZl+mi1a/sA+Jd+RkxpB2VmO3rTOvLw+ezUA=;
+        b=s04OFI2bbehmMy7pJ2YHnXaous6qCT/5PyYg6ddvGFIRgOGPdJQikLLIgqN09S+3fb
+         L5BkW3bllFJAXimZ6yiKrnThjVxiUlYI4jBDJimjVWjZAiHM61TdW2nhnpF9ukJtGrXR
+         eUWSRWAr7B2Mu3BTJfwdWjqmHEXNzdZ303fTgSd0nhMMJfKdo/007sIBISx5T2ZqvH2f
+         d43wyqOJAVIDJnriWuyFKxSkjY6GxpXlKkAMpFLFRX/vhJh9tP91HxraI0nxvsstamfv
+         o/Vqwi5UYSTF7V74tXOkpTtvE5JKYwO97pZB6Zdy5/gXfrj5sKfFtvMDcJJ4oDR5zLa/
+         E88w==
+X-Gm-Message-State: AOJu0Yyv4qk7d8gtHxAsdhMuQtNy/HwIYa8u4qmOEEFWO9QVZWKMvhlL
+	RR0uq3glpbQBip/JDXG87cNyNPFx+bQQiYRRmWpvO0dAGSc7fiyRXlQxmnUdbT4SAQSqV6m7wZz
+	/n0bTrnSJJw==
+X-Google-Smtp-Source: AGHT+IG/N60AqRx2cNDAYYvc4AAu5L9kUhCk2BVNvVat6spIh407EhrBaktSht8QTUTrysO/abd3kWkYCSpnPA==
 X-Received: from qtbfa8.prod.google.com ([2002:a05:622a:4cc8:b0:467:60a9:3317])
  (user=edumazet job=prod-delivery.src-stubby-dispatcher) by
- 2002:a05:622a:90:b0:467:6cce:44ba with SMTP id d75a77b69052e-46fd0bcb95bmr347270301cf.43.1738593051103;
- Mon, 03 Feb 2025 06:30:51 -0800 (PST)
-Date: Mon,  3 Feb 2025 14:30:32 +0000
+ 2002:a05:622a:8cb:b0:46a:65c:b589 with SMTP id d75a77b69052e-46fd0a81258mr318044321cf.6.1738593052745;
+ Mon, 03 Feb 2025 06:30:52 -0800 (PST)
+Date: Mon,  3 Feb 2025 14:30:33 +0000
 In-Reply-To: <20250203143046.3029343-1-edumazet@google.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -73,8 +73,8 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
 References: <20250203143046.3029343-1-edumazet@google.com>
 X-Mailer: git-send-email 2.48.1.362.g079036d154-goog
-Message-ID: <20250203143046.3029343-3-edumazet@google.com>
-Subject: [PATCH v2 net 02/16] ipv4: add RCU protection to ip4_dst_hoplimit()
+Message-ID: <20250203143046.3029343-4-edumazet@google.com>
+Subject: [PATCH v2 net 03/16] ipv4: use RCU protection in ip_dst_mtu_maybe_forward()
 From: Eric Dumazet <edumazet@google.com>
 To: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
 	Paolo Abeni <pabeni@redhat.com>
@@ -83,38 +83,48 @@ Cc: netdev@vger.kernel.org, Kuniyuki Iwashima <kuniyu@amazon.com>,
 	Eric Dumazet <edumazet@google.com>
 Content-Type: text/plain; charset="UTF-8"
 
-ip4_dst_hoplimit() must use RCU protection to make
+ip_dst_mtu_maybe_forward() must use RCU protection to make
 sure the net structure it reads does not disappear.
 
-Fixes: fa50d974d104 ("ipv4: Namespaceify ip_default_ttl sysctl knob")
+Fixes: f87c10a8aa1e8 ("ipv4: introduce ip_dst_mtu_maybe_forward and protect forwarding path against pmtu spoofing")
 Signed-off-by: Eric Dumazet <edumazet@google.com>
 Reviewed-by: Kuniyuki Iwashima <kuniyu@amazon.com>
 ---
- include/net/route.h | 9 +++++++--
- 1 file changed, 7 insertions(+), 2 deletions(-)
+ include/net/ip.h | 13 ++++++++++---
+ 1 file changed, 10 insertions(+), 3 deletions(-)
 
-diff --git a/include/net/route.h b/include/net/route.h
-index f86775be3e2934697533a61f566aca1ef196d74e..c605fd5ec0c08cc7658c3cf6aa6223790d463ede 100644
---- a/include/net/route.h
-+++ b/include/net/route.h
-@@ -382,10 +382,15 @@ static inline int inet_iif(const struct sk_buff *skb)
- static inline int ip4_dst_hoplimit(const struct dst_entry *dst)
+diff --git a/include/net/ip.h b/include/net/ip.h
+index 9f5e33e371fcdd8ea88c54584b8d4b6c50e7d0c9..ba7b43447775e51b3b9a8cbf5c3345d6308bb525 100644
+--- a/include/net/ip.h
++++ b/include/net/ip.h
+@@ -471,9 +471,12 @@ static inline unsigned int ip_dst_mtu_maybe_forward(const struct dst_entry *dst,
+ 						    bool forwarding)
  {
- 	int hoplimit = dst_metric_raw(dst, RTAX_HOPLIMIT);
+ 	const struct rtable *rt = dst_rtable(dst);
 -	struct net *net = dev_net(dst->dev);
- 
--	if (hoplimit == 0)
-+	if (hoplimit == 0) {
-+		const struct net *net;
+-	unsigned int mtu;
++	unsigned int mtu, res;
++	struct net *net;
 +
-+		rcu_read_lock();
-+		net = dev_net_rcu(dst->dev);
- 		hoplimit = READ_ONCE(net->ipv4.sysctl_ip_default_ttl);
-+		rcu_read_unlock();
-+	}
- 	return hoplimit;
++	rcu_read_lock();
+ 
++	net = dev_net_rcu(dst->dev);
+ 	if (READ_ONCE(net->ipv4.sysctl_ip_fwd_use_pmtu) ||
+ 	    ip_mtu_locked(dst) ||
+ 	    !forwarding) {
+@@ -497,7 +500,11 @@ static inline unsigned int ip_dst_mtu_maybe_forward(const struct dst_entry *dst,
+ out:
+ 	mtu = min_t(unsigned int, mtu, IP_MAX_MTU);
+ 
+-	return mtu - lwtunnel_headroom(dst->lwtstate, mtu);
++	res = mtu - lwtunnel_headroom(dst->lwtstate, mtu);
++
++	rcu_read_unlock();
++
++	return res;
  }
  
+ static inline unsigned int ip_skb_dst_mtu(struct sock *sk,
 -- 
 2.48.1.362.g079036d154-goog
 
