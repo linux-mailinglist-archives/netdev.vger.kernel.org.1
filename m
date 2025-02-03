@@ -1,34 +1,34 @@
-Return-Path: <netdev+bounces-162212-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-162213-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 952BEA26351
-	for <lists+netdev@lfdr.de>; Mon,  3 Feb 2025 20:11:36 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5091BA26352
+	for <lists+netdev@lfdr.de>; Mon,  3 Feb 2025 20:11:41 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id DE5CB1884CBE
-	for <lists+netdev@lfdr.de>; Mon,  3 Feb 2025 19:11:40 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id CE469163FDA
+	for <lists+netdev@lfdr.de>; Mon,  3 Feb 2025 19:11:38 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3CD2C2054E6;
-	Mon,  3 Feb 2025 19:11:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 873AA205E15;
+	Mon,  3 Feb 2025 19:11:33 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=engleder-embedded.com header.i=@engleder-embedded.com header.b="q45T4XXM"
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=engleder-embedded.com header.i=@engleder-embedded.com header.b="jhhrZF64"
 X-Original-To: netdev@vger.kernel.org
 Received: from mx23lb.world4you.com (mx23lb.world4you.com [81.19.149.133])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 741501DB12C
-	for <netdev@vger.kernel.org>; Mon,  3 Feb 2025 19:11:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BDEA320B7E6
+	for <netdev@vger.kernel.org>; Mon,  3 Feb 2025 19:11:31 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=81.19.149.133
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1738609890; cv=none; b=rCFOjg/uHO1++IsZ+lG0XSavCftGSxN8p8NFDy5hzuYQtdPLPuvylsK/B58qAwmfJCsBszG/uXnDWcBH/h3gic9B6LMZUinJsZGHy/grxaTYiT8qJFQYcg4nUk6WxiGY3ySQFeWtm81bVwZeDaok/8T9VjOQ5PL+7jfKjnpB4Vg=
+	t=1738609893; cv=none; b=b+0eG7YVWMCBQnbku3WiLGxEEGQ5CK7at7ObZVmHX4pivMWkS17htu4vVXURybFHXZGVGv2mDcr9FODAf4vK2xK3vN5qSRObaEmv4w61WvlUVXC2cqwNFtVFRypVzlZnTjKo7xfUqYvHsMmrua1W2yknGhxPuPEQQFOnls7nbA4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1738609890; c=relaxed/simple;
-	bh=QunuxMjW5Ydt490SFL68VMYXIJqmr7rmBnAwzwJfq/g=;
+	s=arc-20240116; t=1738609893; c=relaxed/simple;
+	bh=8ye0a9/fdhMZZ0ytbbI4m36+PkOdsLRg1d8Da9EOIe4=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=BN56I8tTqqm6JHzDuLpg7kWA6nGS9UjD1lQhOxbueTSE3dm9R2vmbrj/2el21gHEOXkz0C4UIhHMPN0vJpe8Ih5x3mEspw1fJ5WhpT7dsRHebdufM3lJ2LTQJCGK0TXpouKdq+ZlRdxvyQcwpI9Tjnq9YP5ctXnLMLFW34Q7RWk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=engleder-embedded.com; spf=pass smtp.mailfrom=engleder-embedded.com; dkim=pass (1024-bit key) header.d=engleder-embedded.com header.i=@engleder-embedded.com header.b=q45T4XXM; arc=none smtp.client-ip=81.19.149.133
+	 MIME-Version; b=enGYY95WHt8+sL1ICppC5Pv1Pail/ejfuoZNMBNQDf1myAtmqyVPzC1jcoDo2yQmB6lmipvnciFdlqGtfNNh/fQQDQM05hEl++/hajk7mhzvqoQzBrjNa4C2gU8XeQwCsOZKtiSevdGorcAafeIj1qinm0VzfwPFEf3x5vUsQH0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=engleder-embedded.com; spf=pass smtp.mailfrom=engleder-embedded.com; dkim=pass (1024-bit key) header.d=engleder-embedded.com header.i=@engleder-embedded.com header.b=jhhrZF64; arc=none smtp.client-ip=81.19.149.133
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=engleder-embedded.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=engleder-embedded.com
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
@@ -37,15 +37,15 @@ DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
 	Content-Type:Content-ID:Content-Description:Resent-Date:Resent-From:
 	Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:List-Help:
 	List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=hoa2uBgB0cK+6yFYS5AMqSXYocqmNE1Ym9X1PxGFp+A=; b=q45T4XXMEuaaMCu0eYcWfe2khe
-	VC6iUbdAoluAeHVhRUd25h7r1O+I09/YptRSq1WFFibsndE2a2AWmXObrxZ83Zg5t8oSKxtNDcT8M
-	BtLFeF1Gs0lQn4L8qmQVak5nROIf2sq2run/k1Ra4Lk8lS6tkPkbENduFj+FU5hhhWLU=;
+	bh=FI62flwppvBCl5cLI4ZTmqK7t8EmrqPHcCaIoTN1mBk=; b=jhhrZF64/5fwdbfTRxyMpWUw8E
+	RtF861fAdnFlMNfKm2ZxPpalbRs3BWBsWsv3gRDxRQFcPmk8kZMgVHck0oC6ykJRD7CRpQfsQPDlF
+	VqUy+Jvi7VUpH0SqcTQD0S4ebwEqdF8okRrXOLtKnutWmMIsqLKXzFdG5IZd/+DslCPM=;
 Received: from 88-117-60-28.adsl.highway.telekom.at ([88.117.60.28] helo=hornet.engleder.at)
 	by mx23lb.world4you.com with esmtpsa  (TLS1.2) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.97.1)
 	(envelope-from <gerhard@engleder-embedded.com>)
-	id 1tf1qu-000000004RY-2UUI;
-	Mon, 03 Feb 2025 20:11:24 +0100
+	id 1tf1qx-000000004RY-3Zlv;
+	Mon, 03 Feb 2025 20:11:28 +0100
 From: Gerhard Engleder <gerhard@engleder-embedded.com>
 To: andrew@lunn.ch,
 	hkallweit1@gmail.com,
@@ -56,9 +56,9 @@ To: andrew@lunn.ch,
 	pabeni@redhat.com
 Cc: netdev@vger.kernel.org,
 	Gerhard Engleder <gerhard@engleder-embedded.com>
-Subject: [PATCH net-next v4 3/7] net: phy: micrel: Add loopback support
-Date: Mon,  3 Feb 2025 20:10:53 +0100
-Message-Id: <20250203191057.46351-4-gerhard@engleder-embedded.com>
+Subject: [PATCH net-next v4 4/7] net: phy: marvell: Align set_loopback() implementation
+Date: Mon,  3 Feb 2025 20:10:54 +0100
+Message-Id: <20250203191057.46351-5-gerhard@engleder-embedded.com>
 X-Mailer: git-send-email 2.39.5
 In-Reply-To: <20250203191057.46351-1-gerhard@engleder-embedded.com>
 References: <20250203191057.46351-1-gerhard@engleder-embedded.com>
@@ -72,60 +72,113 @@ Content-Transfer-Encoding: 8bit
 X-AV-Do-Run: Yes
 X-ACL-Warn: X-W4Y-Internal
 
-The KSZ9031 PHYs requires full duplex for loopback mode. Add PHY
-specific set_loopback() to ensure this.
+Use genphy_loopback() to disable loopback like ksz9031_set_loopback().
+This way disable loopback is implemented only once within
+genphy_loopback() and the set_loopback() implementations look similar.
 
+Also fix comment about msleep() in the out-of loopback case which is not
+executed in the out-of loopback case.
+
+Suggested-by: Andrew Lunn <andrew@lunn.ch>
 Signed-off-by: Gerhard Engleder <gerhard@engleder-embedded.com>
 ---
- drivers/net/phy/micrel.c | 28 ++++++++++++++++++++++++++++
- 1 file changed, 28 insertions(+)
+ drivers/net/phy/marvell.c | 72 ++++++++++++++++++---------------------
+ 1 file changed, 33 insertions(+), 39 deletions(-)
 
-diff --git a/drivers/net/phy/micrel.c b/drivers/net/phy/micrel.c
-index 9c0b1c229af6..f0cecd898312 100644
---- a/drivers/net/phy/micrel.c
-+++ b/drivers/net/phy/micrel.c
-@@ -1030,6 +1030,33 @@ static int ksz9021_config_init(struct phy_device *phydev)
- #define MII_KSZ9031RN_EDPD		0x23
- #define MII_KSZ9031RN_EDPD_ENABLE	BIT(0)
+diff --git a/drivers/net/phy/marvell.c b/drivers/net/phy/marvell.c
+index 4ed7ec1be74f..ca8b7d97c964 100644
+--- a/drivers/net/phy/marvell.c
++++ b/drivers/net/phy/marvell.c
+@@ -2133,56 +2133,50 @@ static void marvell_get_stats_simple(struct phy_device *phydev,
  
-+static int ksz9031_set_loopback(struct phy_device *phydev, bool enable,
-+				int speed)
-+{
-+	u16 ctl = BMCR_LOOPBACK;
-+	int ret, val;
-+
+ static int m88e1510_loopback(struct phy_device *phydev, bool enable, int speed)
+ {
++	u16 bmcr_ctl, mscr2_ctl = 0;
+ 	int err;
+ 
+-	if (enable) {
+-		u16 bmcr_ctl, mscr2_ctl = 0;
 +	if (!enable)
 +		return genphy_loopback(phydev, enable, 0);
-+
+ 
+-		if (speed == SPEED_10 || speed == SPEED_100 ||
+-		    speed == SPEED_1000)
+-			phydev->speed = speed;
+-		else if (speed)
+-			return -EINVAL;
+-
+-		bmcr_ctl = mii_bmcr_encode_fixed(phydev->speed, phydev->duplex);
+-
+-		err = phy_write(phydev, MII_BMCR, bmcr_ctl);
+-		if (err < 0)
+-			return err;
 +	if (speed == SPEED_10 || speed == SPEED_100 || speed == SPEED_1000)
 +		phydev->speed = speed;
 +	else if (speed)
 +		return -EINVAL;
-+	phydev->duplex = DUPLEX_FULL;
+ 
+-		if (phydev->speed == SPEED_1000)
+-			mscr2_ctl = BMCR_SPEED1000;
+-		else if (phydev->speed == SPEED_100)
+-			mscr2_ctl = BMCR_SPEED100;
++	bmcr_ctl = mii_bmcr_encode_fixed(phydev->speed, phydev->duplex);
+ 
+-		err = phy_modify_paged(phydev, MII_MARVELL_MSCR_PAGE,
+-				       MII_88E1510_MSCR_2, BMCR_SPEED1000 |
+-				       BMCR_SPEED100, mscr2_ctl);
+-		if (err < 0)
+-			return err;
++	err = phy_write(phydev, MII_BMCR, bmcr_ctl);
++	if (err < 0)
++		return err;
+ 
+-		/* Need soft reset to have speed configuration takes effect */
+-		err = genphy_soft_reset(phydev);
+-		if (err < 0)
+-			return err;
++	if (phydev->speed == SPEED_1000)
++		mscr2_ctl = BMCR_SPEED1000;
++	else if (phydev->speed == SPEED_100)
++		mscr2_ctl = BMCR_SPEED100;
+ 
+-		err = phy_modify(phydev, MII_BMCR, BMCR_LOOPBACK,
+-				 BMCR_LOOPBACK);
++	err = phy_modify_paged(phydev, MII_MARVELL_MSCR_PAGE,
++			       MII_88E1510_MSCR_2, BMCR_SPEED1000 |
++			       BMCR_SPEED100, mscr2_ctl);
++	if (err < 0)
++		return err;
+ 
+-		if (!err) {
+-			/* It takes some time for PHY device to switch
+-			 * into/out-of loopback mode.
+-			 */
+-			msleep(1000);
+-		}
++	/* Need soft reset to have speed configuration takes effect */
++	err = genphy_soft_reset(phydev);
++	if (err < 0)
+ 		return err;
+-	} else {
+-		err = phy_modify(phydev, MII_BMCR, BMCR_LOOPBACK, 0);
+-		if (err < 0)
+-			return err;
+ 
+-		return phy_config_aneg(phydev);
++	err = phy_modify(phydev, MII_BMCR, BMCR_LOOPBACK,
++			 BMCR_LOOPBACK);
 +
-+	ctl |= mii_bmcr_encode_fixed(phydev->speed, phydev->duplex);
-+
-+	phy_modify(phydev, MII_BMCR, ~0, ctl);
-+
-+	ret = phy_read_poll_timeout(phydev, MII_BMSR, val, val & BMSR_LSTATUS,
-+				    5000, 500000, true);
-+	if (ret)
-+		return ret;
-+
-+	return 0;
-+}
-+
- static int ksz9031_of_load_skew_values(struct phy_device *phydev,
- 				       const struct device_node *of_node,
- 				       u16 reg, size_t field_sz,
-@@ -5564,6 +5591,7 @@ static struct phy_driver ksphy_driver[] = {
- 	.resume		= kszphy_resume,
- 	.cable_test_start	= ksz9x31_cable_test_start,
- 	.cable_test_get_status	= ksz9x31_cable_test_get_status,
-+	.set_loopback	= ksz9031_set_loopback,
- }, {
- 	.phy_id		= PHY_ID_LAN8814,
- 	.phy_id_mask	= MICREL_PHY_ID_MASK,
++	if (!err) {
++		/*
++		 * It takes some time for PHY device to switch into loopback
++		 * mode.
++		 */
++		msleep(1000);
+ 	}
++	return err;
+ }
+ 
+ static int marvell_vct5_wait_complete(struct phy_device *phydev)
 -- 
 2.39.5
 
