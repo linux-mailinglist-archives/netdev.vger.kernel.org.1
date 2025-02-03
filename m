@@ -1,129 +1,230 @@
-Return-Path: <netdev+bounces-162057-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-162058-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id BC97AA25834
-	for <lists+netdev@lfdr.de>; Mon,  3 Feb 2025 12:30:45 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id AF1D7A25838
+	for <lists+netdev@lfdr.de>; Mon,  3 Feb 2025 12:33:01 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 5AE423A984E
-	for <lists+netdev@lfdr.de>; Mon,  3 Feb 2025 11:30:36 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 0C3B9162A62
+	for <lists+netdev@lfdr.de>; Mon,  3 Feb 2025 11:33:00 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2ACD32010E8;
-	Mon,  3 Feb 2025 11:30:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="P6xWojiP"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 45544202C43;
+	Mon,  3 Feb 2025 11:32:58 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wr1-f54.google.com (mail-wr1-f54.google.com [209.85.221.54])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6B1E51D63F5;
-	Mon,  3 Feb 2025 11:30:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.54
+Received: from mx.socionext.com (mx.socionext.com [202.248.49.38])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 303C6200127;
+	Mon,  3 Feb 2025 11:32:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=202.248.49.38
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1738582242; cv=none; b=sfUkhctlneSqIkEjRkyy+L+6c5WlN28UH3L2APXz5TEu6Z6hUcyf1XfGllMpwmD4a+hXjVaXJYPqFN+DbWuUjSL58KMkTqqw6OrWJALOpNV+IcLgxBsiPmLvDr56Ct0TsDZDV7sr1O0hIyaosHS5vH2OlYotrXEi6JqtiX81M0Q=
+	t=1738582378; cv=none; b=b3Z+C7B740p6J35k7MKEEObN1YysQnOPmn4fFtGShdB2ZkL+SdElPRnYGIQaDcOBpoinoHIkby32SF98WsJtPRWDR7RRO+8UL/5U2YAWJSW6HRH6iYdLQs5hKXtus1VuBmRUcyizmNIsdhSZBDLIixMUiQXPZ8CXdehfkNJ+3Pc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1738582242; c=relaxed/simple;
-	bh=pDuRPkoKfqw6nq0A2p8YOlo6PxxkTi/ik44ZtSf4kRw=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=dFQl3/xO3uk9+IEUOAwmXTiYj2QhlvN4Ay/v4DAs2i9pmnOjTEYRediiRDczgWWuW7KF8YjFxRAy+PG2zw4rxbkPCl3vawdXRWDB2zjfovxnhPVjfZyWZWcmSl+HGTyLftyR5R83jSspHHrQMg4lzrJGWOGIZpoibBVSAcE1B68=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=P6xWojiP; arc=none smtp.client-ip=209.85.221.54
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wr1-f54.google.com with SMTP id ffacd0b85a97d-385deda28b3so2201153f8f.0;
-        Mon, 03 Feb 2025 03:30:40 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1738582238; x=1739187038; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=3xnI/TsHAocOuYHAYr9if7jEUms/tx4tWKMg4pTajBM=;
-        b=P6xWojiPQQxthc752Bk6ncGuyQpHQ/+OzvuVNCkLRW/JjcQP0Gnw43iUacqQOb10AH
-         R/7C+NM7PdL8GiroOC9NtqPJ1AQL9prFbchOzhap6AcApknI13I7q1dwvfnV1x+lO9Yd
-         suLP14WH0w/Jg4bi7+EvNc0LEILWr7vPWt5AHw8L3DtKBejeupzGfKjqAp+sc+hYihhQ
-         RwHxnbqD76EsaVj1/Z0B+PTrRPRtjlzu4efJfq0AkzaIwWO008a4EuF9kvgZTg313rib
-         NpSXwpwyf1l65jIukbg41kM1qgTo6cjlppfIZgii3gaHYpY49XqSGI1nVqma8fAF9ZIb
-         Kzkw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1738582238; x=1739187038;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=3xnI/TsHAocOuYHAYr9if7jEUms/tx4tWKMg4pTajBM=;
-        b=s3+TqwVbTPfurvKUGjKXA5OIiC++iWuddIzBObcL8Jw9KaErEEV4pqTlTG1PzRpdBb
-         SxfVe3zQlXec8so1mTF/ich7pc8uh0VWvJbhyEVfuaJCYxCb2aBESgtUutnx9o7SsWhP
-         QTleeEVTuUCl/31TZc9I56/1mi6erBMZhy9aOnQ07QTJN97DfcXkkmGkWzWobA9bkPdZ
-         k74mMj22KxfnCKgF7KAFRMgqzoEfPsvkFKbG4/v/TcXMKLGzNApJlcgdawOAT2ReDet6
-         jXiHG82OSAv69o358GH9jefPVHaMU9oii4DXk87GyQB6likh0t0ENIzB6TrBQ9v47fG3
-         ysvg==
-X-Forwarded-Encrypted: i=1; AJvYcCUTJwMaGZlzIaj1XAfL69mla2BbZuY++pbfNL3JHBfjKNW9Uc+JpKvaDd5DEPdzjD4CnjN0ZaX2@vger.kernel.org, AJvYcCXk26cthmR9p/r4gpi5Ta2rJQxfd3dXorb3+PpTrhaJWo2pJ/xY8oO2TvMzZCnuAOXzpkggSDP6d002kkM=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwIyqlNDJgvYbRYuGkPgL0eMcVp0tsPq2BX/u66BWvopvoWtdlM
-	SrbL84JG1QAxuIrWI0gT5xrVFHiL9qkbmR6KZtMtoiyxHwqVz7E0rkZFqSVC
-X-Gm-Gg: ASbGncsH2zE/yb2f9fOeB6Pl45rF54wrSH/OQNMhWJfxRTcH80bJ1/ALpcq0UqsLBW6
-	YEhJZWGY479Q9JyD8ClGPs/Act7+Jyxsq/SzdTKra1fsezWfhi/ySgilxbUh8lYLEOKDuTF4y2V
-	YHiFuR3WXQs7CjvU3Uog+gjKGR5bXs7zq8B93m7WSdGlKqekEXioFyfRlYXXF8vPdD9Sb235mtV
-	c5QyKcDWbP7ihv5Sv4006zElJ0U+xCNHV3TaPmmAUwR7KnKuOoOnYyqGc4AwN6kXeCIsuD4aPEl
-	+bNnI7h04ndmKyB9yqLjm/lkxSw=
-X-Google-Smtp-Source: AGHT+IEM2TgIFGGxtjZAzXPWgmjVsyAHG+HJRhpojwX5+mPNVmuMuoGnOU6WD/ikBik+NuNeGyCcjw==
-X-Received: by 2002:a5d:6c6e:0:b0:38c:5bc1:1ef5 with SMTP id ffacd0b85a97d-38c5bc120a4mr13657329f8f.3.1738582237856;
-        Mon, 03 Feb 2025 03:30:37 -0800 (PST)
-Received: from workstation.redhat.com ([90.168.92.125])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-38c5c1b5136sm12770210f8f.65.2025.02.03.03.30.36
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 03 Feb 2025 03:30:37 -0800 (PST)
-From: Andreas Karis <ak.karis@gmail.com>
-To: linux-doc@vger.kernel.org
-Cc: ak.karis@gmail.com,
-	linux-kernel@vger.kernel.org,
-	davem@davemloft.net,
-	netdev@vger.kernel.org,
-	corbet@lwn.net,
-	pshelar@ovn.org,
-	dev@openvswitch.org,
-	mirq-linux@rere.qmqm.pl,
-	i.maximets@ovn.org,
-	edumazet@google.com,
-	ovs-dev@openvswitch.org,
-	pabeni@redhat.com,
-	kuba@kernel.org
-Subject: [PATCH REPOST] docs: networking: Remove VLAN_TAG_PRESENT from openvswitch doc
-Date: Mon,  3 Feb 2025 12:30:12 +0100
-Message-ID: <20250203113012.14943-1-ak.karis@gmail.com>
-X-Mailer: git-send-email 2.48.1
+	s=arc-20240116; t=1738582378; c=relaxed/simple;
+	bh=22QUtcy+foS7GyLDydKRcJKf5mbsOwNZwAYUzLoPsDA=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=lhrtbMO2ZMao6Vtl9hzcsJ5brXAoa8u/m3vqLkcHSCoVucb2oswhkkasghA+zJ1/M/EHQBcZgeYP47m5cSwwgUm+QrfdV7tdB0p0UltFrCxKdjTIAdGKL+heJChC8YFs/hyUfQjkL9lQLTi1zpFi6vAyQ1SvM9/rfcWWHwN90lQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=socionext.com; spf=pass smtp.mailfrom=socionext.com; arc=none smtp.client-ip=202.248.49.38
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=socionext.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=socionext.com
+Received: from unknown (HELO kinkan2-ex.css.socionext.com) ([172.31.9.52])
+  by mx.socionext.com with ESMTP; 03 Feb 2025 20:32:54 +0900
+Received: from mail.mfilter.local (mail-arc01.css.socionext.com [10.213.46.36])
+	by kinkan2-ex.css.socionext.com (Postfix) with ESMTP id 0C72420AE2A2;
+	Mon,  3 Feb 2025 20:32:54 +0900 (JST)
+Received: from iyokan2.css.socionext.com ([172.31.9.53]) by m-FILTER with ESMTP; Mon, 3 Feb 2025 20:32:54 +0900
+Received: from [10.212.246.222] (unknown [10.212.246.222])
+	by iyokan2.css.socionext.com (Postfix) with ESMTP id 715A7A6B42;
+	Mon,  3 Feb 2025 20:32:53 +0900 (JST)
+Message-ID: <e1654cc9-a696-454c-a9c7-80a8e1a148ff@socionext.com>
+Date: Mon, 3 Feb 2025 20:32:53 +0900
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net v4 3/3] net: stmmac: Specify hardware capability value
+ when FIFO size isn't specified
+To: "Russell King (Oracle)" <linux@armlinux.org.uk>
+Cc: Guenter Roeck <linux@roeck-us.net>,
+ Alexandre Torgue <alexandre.torgue@foss.st.com>,
+ Jose Abreu <joabreu@synopsys.com>, Andrew Lunn <andrew+netdev@lunn.ch>,
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ Maxime Coquelin <mcoquelin.stm32@gmail.com>,
+ Yanteng Si <si.yanteng@linux.dev>, Furong Xu <0x1207@gmail.com>,
+ Joao Pinto <Joao.Pinto@synopsys.com>, netdev@vger.kernel.org,
+ linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org
+References: <20250127013820.2941044-1-hayashi.kunihiko@socionext.com>
+ <20250127013820.2941044-4-hayashi.kunihiko@socionext.com>
+ <4e98f967-f636-46fb-9eca-d383b9495b86@roeck-us.net>
+ <Z56FmH968FUGkC5J@shell.armlinux.org.uk>
+ <905127b5-96c8-4866-8f69-d9d8a7091c99@socionext.com>
+ <Z6CLDJJ21MMml3cD@shell.armlinux.org.uk>
+Content-Language: en-US
+From: Kunihiko Hayashi <hayashi.kunihiko@socionext.com>
+In-Reply-To: <Z6CLDJJ21MMml3cD@shell.armlinux.org.uk>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-Since commit 0c4b2d370514 ("net: remove VLAN_TAG_PRESENT"), the kernel
-no longer uses VLAN_TAG_PRESENT.
-Update the openvswitch documentation which still contained an outdated
-reference to VLAN_TAG_PRESENT.
+Hi,
 
-Signed-off-by: Andreas Karis <ak.karis@gmail.com>
+On 2025/02/03 18:23, Russell King (Oracle) wrote:
+> On Mon, Feb 03, 2025 at 11:45:05AM +0900, Kunihiko Hayashi wrote:
+>> Hi all,
+>>
+>> On 2025/02/02 5:35, Russell King (Oracle) wrote:
+>>> On Sat, Feb 01, 2025 at 11:14:41AM -0800, Guenter Roeck wrote:
+>>>> Hi,
+>>>>
+>>>> On Mon, Jan 27, 2025 at 10:38:20AM +0900, Kunihiko Hayashi wrote:
+>>>>> When Tx/Rx FIFO size is not specified in advance, the driver
+> checks if
+>>>>> the value is zero and sets the hardware capability value in
+> functions
+>>>>> where that value is used.
+>>>>>
+>>>>> Consolidate the check and settings into function stmmac_hw_init()
+> and
+>>>>> remove redundant other statements.
+>>>>>
+>>>>> If FIFO size is zero and the hardware capability also doesn't have
+>>> upper
+>>>>> limit values, return with an error message.
+>>>>>
+>>>>> Signed-off-by: Kunihiko Hayashi <hayashi.kunihiko@socionext.com>
+>>>>
+>>>> This patch breaks qemu's stmmac emulation, for example for
+>>>> npcm750-evb. The error message is:
+>>>> 	stmmaceth f0804000.eth: Can't specify Rx FIFO size
+>>
+>> Sorry for inconvenience.
+>>
+>>> Interesting. I looked at QEMU to see whether anything in the Debian
+>>> stable version of QEMU might possibly have STMMAC emulation, but
+>>> drew a blank... Even trying to find where in QEMU it emulates the
+>>> STMMAC. I do see that it does include this, so maybe I can use that
+>>> to test some of my stmmac changes. Thanks!
+>>>
+>>>> The setup function called for the emulated hardware is
+>>> dwmac1000_setup().
+>>>> That function does not set the DMA rx or tx fifo size.
+>>>>
+>>>> At the same time, the rx and tx fifo size is not provided in the
+>>>> devicetree file (nuvoton-npcm750.dtsi), so the failure is obvious.
+>>>>
+>>>> I understand that the real hardware may be based on a more recent
+>>>> version of the DWMAC IP which provides the DMA tx/rx fifo size, but
+>>>> I do wonder: Are the benefits of this patch so substantial that it
+>>>> warrants breaking the qemu emulation of this network interface >
+>>> Please see my message sent a while back on an earlier revision of this
+>>> patch series. I reviewed the stmmac driver for the fifo sizes and
+>>> documented what I found.
+>>>
+>>> https://lore.kernel.org/r/Z4_ZilVFKacuAUE8@shell.armlinux.org.uk
+>>>
+>>> To save clicking on the link, I'll reproduce the relevant part below.
+>>> It appears that dwmac1000 has no way to specify the FIFO size, and
+>>> thus would have priv->dma_cap.rx_fifo_size and
+>>> priv->dma_cap.tx_fifo_size set to zero.
+>>>
+>>> Given the responses, I'm now of the opinion that the patch series is
+>>> wrong, and probably should be reverted - I never really understood
+>>> the motivation why the series was necessary. It seemed to me to be a
+>>> "wouldn't it be nice if" series rather than something that is
+>>> functionally necessary.
+>>>
+>>>
+>>> Here's the extract from my previous email:
+>>>
+>>> Now looking at the defintions:
+>>>
+>>> drivers/net/ethernet/stmicro/stmmac/dwmac4.h:#define
+> GMAC_HW_RXFIFOSIZE
+>>> GENMASK(4, 0)
+>>> drivers/net/ethernet/stmicro/stmmac/dwxgmac2.h:#define
+>>> XGMAC_HWFEAT_RXFIFOSIZE GENMASK(4, 0)
+>>>
+>>> So there's a 5-bit bitfield that describes the receive FIFO size for
+>>> these two MACs. Then we have:
+>>>
+>>> drivers/net/ethernet/stmicro/stmmac/common.h:#define
+>>> DMA_HW_FEAT_RXFIFOSIZE    0x00080000       /* Rx FIFO > 2048 Bytes */
+>>>
+>>> which is used here:
+>>>
+>>> drivers/net/ethernet/stmicro/stmmac/dwmac1000_dma.c:
+>>> dma_cap->rxfifo_over_2048 = (hw_cap & DMA_HW_FEAT_RXFIFOSIZE) >> 19;
+>>>
+>>> which is only used to print a Y/N value in a debugfs file, otherwise
+>>> having no bearing on driver behaviour.
+>>>
+>>> So, I suspect MACs other than xgmac2 or dwmac4 do not have the ability
+>>> to describe the hardware FIFO sizes in hardware, thus why there's the
+>>> override and no checking of what the platform provided - and doing so
+>>> would break the driver. This is my interpretation from the code alone.
+>>>
+>>
+>> The {tx,rx}_queus_to_use are referenced in stmmac_ethtool.c,
+> stmmac_tc.c,
+>> and stmmac_selftests.c as the number of queues, so I've thought that
+>> these variables should not be non-zero.
+> 
+> Huh? We're talking about {tx,rx}_fifo_size, not _queues_to_use.
+
+Sorry, this topic is just about {tx,rx}_fifo_size.
+Above comments are not needed here.
+
+These value are only referenced in stmmac_main.c and stmmac_selftest.c.
+As far as I can see, there is no usage that requires the values to be non-zero.
+
+>> However, currently the variables are allowed to be zero, so I understand
+>> this patch 3/3 breaks on the chips that hasn't hardware capabilities.
+>>
+>> In hwif.c, stmmac_hw[] defines four patterns of hardwares:
+>>
+>> "dwmac100"  .gmac=false, .gmac4=false, .xgmac=false, .get_hw_feature =
+> NULL
+>> "dwmac1000" .gmac=true,  .gmac4=false, .xgmac=false, .get_hw_feature =
+> dwmac1000_get_hw_feature()
+>> "dwmac4"    .gmac=false, .gmac4=true,  .xgmac=false, .get_hw_feature =
+> dwmac4_get_hw_feature()
+>> "dwxgmac2"  .gmac=false, .gmac4=false, .xgmac=true , .get_hw_feature =
+> dwxgmac2_get_hw_feature()
+>>
+>> As Russell said, the dwmac100 can't get the number of queues from the
+> hardware
+>> capability. And some environments (at least QEMU device that Guenter
+> said)
+>> seems the capability values are zero in spite of dwmac1000.
+> 
+> Huh? I mentioned dwmac1000, not dwmac100.
+
+My above comment is missing the point.
+dwmac1000 doesn't have the field of the fifo size in the hardware capability
+even if dwmac1000 has get_hw_feature function as you said.
+Steven's diff is reasonable to check the feature.
+
+> 
+>> Since I can't test all of the device patterns, so I appreciate checking
+> each
+>> hardware and finding the issue.
+>>
+>> The patch 3/3 includes some cleanup and code reduction, though, I think
+>> it would be better to revert it once.
+> 
+> I'm not sure you're discussing the same issue as the rest of us.
+> You seem to be talking about a different pair of structure members
+> (queues_to_use) whereas your patches and the problem at hand is with
+> the changes made to {tx,rx}_fifo_size.
+
+Sorry for confusion. The patch 3/3 treats FIFO size as per the subject.
+
+Thank you,
+
 ---
- Documentation/networking/openvswitch.rst | 5 ++---
- 1 file changed, 2 insertions(+), 3 deletions(-)
-
-diff --git a/Documentation/networking/openvswitch.rst b/Documentation/networking/openvswitch.rst
-index 1a8353dbf1b6..8d2bbcb92286 100644
---- a/Documentation/networking/openvswitch.rst
-+++ b/Documentation/networking/openvswitch.rst
-@@ -230,9 +230,8 @@ an all-zero-bits vlan and an empty encap attribute, like this::
-     eth(...), eth_type(0x8100), vlan(0), encap()
- 
- Unlike a TCP packet with source and destination ports 0, an
--all-zero-bits VLAN TCI is not that rare, so the CFI bit (aka
--VLAN_TAG_PRESENT inside the kernel) is ordinarily set in a vlan
--attribute expressly to allow this situation to be distinguished.
-+all-zero-bits VLAN TCI is not that rare, so the CFI bit is ordinarily set
-+in a vlan attribute expressly to allow this situation to be distinguished.
- Thus, the flow key in this second example unambiguously indicates a
- missing or malformed VLAN TCI.
- 
--- 
-2.48.1
-
+Best Regards
+Kunihiko Hayashi
 
