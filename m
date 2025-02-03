@@ -1,101 +1,154 @@
-Return-Path: <netdev+bounces-162304-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-162306-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 45633A2679D
-	for <lists+netdev@lfdr.de>; Tue,  4 Feb 2025 00:09:01 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id C4D74A267B9
+	for <lists+netdev@lfdr.de>; Tue,  4 Feb 2025 00:17:37 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B460B3A5535
-	for <lists+netdev@lfdr.de>; Mon,  3 Feb 2025 23:08:52 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 5819A164F34
+	for <lists+netdev@lfdr.de>; Mon,  3 Feb 2025 23:17:36 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C1C96213E86;
-	Mon,  3 Feb 2025 23:04:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 54295202C34;
+	Mon,  3 Feb 2025 23:15:03 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Gg3cJprL"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="UUL9ZsPt"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from out-178.mta1.migadu.com (out-178.mta1.migadu.com [95.215.58.178])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5B2922139DC
-	for <netdev@vger.kernel.org>; Mon,  3 Feb 2025 23:04:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3ACD0202C44
+	for <netdev@vger.kernel.org>; Mon,  3 Feb 2025 23:14:59 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.178
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1738623860; cv=none; b=HzEIKmDTKIzUI4cvzhcjAmvz1FOxzZ/jvnE0vx5io8On6OkHK5v50Fr4YyaQHvOAcXoDFxTjUfoaVMs/E+aaUYWNHAbNcb/rWVGMMCsNLlCnhlN174RSlc2QyYyn4wyEjvFvQxezu0QuiVQyiWlwsDk+Z3loqHciEWLwK2ZFh4Y=
+	t=1738624503; cv=none; b=FHwlccfwq2lbL1bDZOHNm42dtQpS7gknSEP6cPm5XCfpjX2qmerXhTNu12apxSEhyuwSEw+sdPiW20fD/6DdTdRc0u5C0OjrlZQbiab6SQ8Mqq2iwU+z9b96Au8jwP4cyQi1aLzkYRSenmvpFcLyrIsdDZWrUhayBsG6aSFwi/w=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1738623860; c=relaxed/simple;
-	bh=fK3eyCLWlWbo3iwlQ+DuWVHWyEb8u1Cd+uACJiHEJ6o=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=ge5OTE08diEnMUoxRs5HrQgSevkeMCuGIdU74gNY/JSxNJnxA+NAh7U1jYiHkAR9l5sX1AKSGhSsiN/YD9NjCCzZ+6g2CwlwaLJJyDzyx3Lcu3Ksf/u3opLIOEyy+DdWLwh3CYq3zVhml7K7M4LjOjZpvfqltyYKPQfsv1imHgQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Gg3cJprL; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 39CC8C4CEE8;
-	Mon,  3 Feb 2025 23:04:19 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1738623859;
-	bh=fK3eyCLWlWbo3iwlQ+DuWVHWyEb8u1Cd+uACJiHEJ6o=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=Gg3cJprLeebzIOUJbT9s0M0P6/iffJYLTvpnGUN+6a2WDdmC2OQexyr2ielosW08U
-	 9SG2FlCZQUKHmRgbA5fgPpsxIs+dW2cc09CwEfs1YWHw+h/pNSyLyOSW16nD++qtpt
-	 UwVjwbBwh0RpUeZM/NplCli4JlB+WM6/mO8IHI4miPLINmMd1481n7qrpckypaS688
-	 mZNxqnpEUyZI94PE+Zzzdh4sxpPW061uEyH+lZRej/tvSw2/MNQYnXXv2L/zIT4zIb
-	 lWNTivR2fBYEicyuWEOfUeme9fVNeYxqTZDWtF88u+i2qMuFf1DByaWgBzYtGkYcvD
-	 JTyuPxTjHwnAQ==
-Date: Mon, 3 Feb 2025 15:04:18 -0800
-From: Jakub Kicinski <kuba@kernel.org>
-To: <Woojung.Huh@microchip.com>
-Cc: <frieder.schrempf@kontron.de>, <lukma@denx.de>, <andrew@lunn.ch>,
- <netdev@vger.kernel.org>, <Tristram.Ha@microchip.com>
-Subject: Re: KSZ9477 HSR Offloading
-Message-ID: <20250203150418.7f244827@kernel.org>
-In-Reply-To: <BL0PR11MB2913B949D05B9BB73108A5FFE7F52@BL0PR11MB2913.namprd11.prod.outlook.com>
-References: <05a6e63e-96c1-4d78-91b9-b00deed044b5@kontron.de>
-	<6d0e1f47-874e-42bf-9bc7-34856c1168d1@lunn.ch>
-	<1c140c92-3be6-4917-b600-fa5d1ef96404@kontron.de>
-	<6400e73a-b165-41a8-9fc9-e2226060a68c@kontron.de>
-	<20250129121733.1e99f29c@wsk>
-	<0383e3d9-b229-4218-a931-73185d393177@kontron.de>
-	<20250129145845.3988cf04@wsk>
-	<42a2f96f-34cd-4d95-99d5-3b4c4af226af@kontron.de>
-	<BL0PR11MB2913C7E1AE86A3A0EB12D0D7E7EE2@BL0PR11MB2913.namprd11.prod.outlook.com>
-	<1400a748-0de7-4093-a549-f07617e6ac51@kontron.de>
-	<BL0PR11MB29130BB177996C437F792106E7E92@BL0PR11MB2913.namprd11.prod.outlook.com>
-	<20250203103113.27e3060a@wsk>
-	<1edbe1e4-9491-4344-828d-4c3b73954e8a@kontron.de>
-	<BL0PR11MB2913B949D05B9BB73108A5FFE7F52@BL0PR11MB2913.namprd11.prod.outlook.com>
+	s=arc-20240116; t=1738624503; c=relaxed/simple;
+	bh=Ps2PoqAxD07pYevA0h9KDZKI7xrmfxmRhIPvcx08oFE=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=cUjLYHVAe07S6qh4PmXEdLLZcjICw4R0hbBAvbkMJFxy1OVft4zus0S10Hfqt1jpb4N1WXmSgj1XKtz1v7L0QqmRKgIsZQqqOxron0uolrU0kZidLJJLyO0uiwtpkep27TIZO3owal2vGhUjklug+4dVoo+LywbKKrEOleXcrDg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=UUL9ZsPt; arc=none smtp.client-ip=95.215.58.178
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+Message-ID: <3b3e0cdf-9c2b-4423-b638-0a79b238eb93@linux.dev>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1738624497;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=anNuJrUoZKOIBzp0YXKNGYgRPx+u+ceChV7XBbB+m7c=;
+	b=UUL9ZsPtZ6QzoN35VpQJIHAnyDkmQOKfw06XXVU+T2u5IMW+uJKEIfUIR9szQcPOgYfU8a
+	un46SK5EF9ejyG48LB/rfR4lrlb2oPfVmFHsCxwokC8G+DVZS4zGCOWAiulEkpftG17IWI
+	npwmVM2A9UkVBMeVr/7st63ZfHbrziA=
+Date: Mon, 3 Feb 2025 15:14:42 -0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+Subject: Re: [PATCH bpf-next v7 05/13] net-timestamp: prepare for isolating
+ two modes of SO_TIMESTAMPING
+To: Jason Xing <kerneljasonxing@gmail.com>
+Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+ pabeni@redhat.com, dsahern@kernel.org, willemdebruijn.kernel@gmail.com,
+ willemb@google.com, ast@kernel.org, daniel@iogearbox.net, andrii@kernel.org,
+ eddyz87@gmail.com, song@kernel.org, yonghong.song@linux.dev,
+ john.fastabend@gmail.com, kpsingh@kernel.org, sdf@fomichev.me,
+ haoluo@google.com, jolsa@kernel.org, horms@kernel.org, bpf@vger.kernel.org,
+ netdev@vger.kernel.org
+References: <20250128084620.57547-1-kerneljasonxing@gmail.com>
+ <20250128084620.57547-6-kerneljasonxing@gmail.com>
+Content-Language: en-US
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Martin KaFai Lau <martin.lau@linux.dev>
+In-Reply-To: <20250128084620.57547-6-kerneljasonxing@gmail.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
+X-Migadu-Flow: FLOW_OUT
 
-On Mon, 3 Feb 2025 14:58:12 +0000 Woojung.Huh@microchip.com wrote:
-> Hi Lukasz & Frieder,
+On 1/28/25 12:46 AM, Jason Xing wrote:
+> No functional changes here. I add skb_enable_app_tstamp() to test
+> if the orig_skb matches the usage of application SO_TIMESTAMPING
+> and skb_sw_tstamp_tx() to distinguish the software and hardware
+
+There is no skb_sw_tstamp_tx() in the code. An outdated commit message?
+
+> timestamp when tsflag is SCM_TSTAMP_SND.
 > 
-> Oops! My bad. I confused that Lukasz was filed a case originally. Monday brain-freeze. :(
+> Also, I deliberately distinguish the the software and hardware
+> SCM_TSTAMP_SND timestamp by passing 'sw' parameter in order to
+> avoid such a case where hardware may go wrong and pass a NULL
+> hwstamps, which is even though unlikely to happen. If it really
+> happens, bpf prog will finally consider it as a software timestamp.
+> It will be hardly recognized. Let's make the timestamping part
+> more robust.
 > 
-> Yes, it is not a public link and per-user case. So, only Frieder can see it.
-> It may be able for you when Frieder adds you as a team. (Not tested personally though)
+> After this patch, I will soon add checks about bpf SO_TIMESTAMPING.
 
-Woojung Huh, please make sure the mailing list is informed about 
-the outcomes. Taking discussion off list to a closed ticketing 
-system is against community rules. See below, thanks.
+This needs to be updated also. BPF does not use the SO_TIMESTAMPING socket option.
 
-Quoting documentation:
+> In this way, we can support two modes parallelly.
 
-  Open development
-  ----------------
-  
-  Discussions about user reported issues, and development of new code
-  should be conducted in a manner typical for the larger subsystem.
-  It is common for development within a single company to be conducted
-  behind closed doors. However, development and discussions initiated
-  by community members must not be redirected from public to closed forums
-  or to private email conversations. Reasonable exceptions to this guidance
-  include discussions about security related issues.
-  
-See: https://www.kernel.org/doc/html/next/maintainer/feature-and-driver-maintainers.html#open-development
+s/parallely/in parallel/
+
+> 
+> Signed-off-by: Jason Xing <kerneljasonxing@gmail.com>
+> ---
+>   include/linux/skbuff.h | 13 +++++++------
+>   net/core/dev.c         |  2 +-
+>   net/core/skbuff.c      | 32 ++++++++++++++++++++++++++++++--
+>   net/ipv4/tcp_input.c   |  3 ++-
+>   4 files changed, 40 insertions(+), 10 deletions(-)
+> 
+> diff --git a/include/linux/skbuff.h b/include/linux/skbuff.h
+> index bb2b751d274a..dfc419281cc9 100644
+> --- a/include/linux/skbuff.h
+> +++ b/include/linux/skbuff.h
+> @@ -39,6 +39,7 @@
+>   #include <net/net_debug.h>
+>   #include <net/dropreason-core.h>
+>   #include <net/netmem.h>
+> +#include <uapi/linux/errqueue.h>
+>   
+>   /**
+>    * DOC: skb checksums
+> @@ -4533,18 +4534,18 @@ void skb_complete_tx_timestamp(struct sk_buff *skb,
+>   
+>   void __skb_tstamp_tx(struct sk_buff *orig_skb, const struct sk_buff *ack_skb,
+>   		     struct skb_shared_hwtstamps *hwtstamps,
+> -		     struct sock *sk, int tstype);
+> +		     struct sock *sk, bool sw, int tstype);
+>   
+>   /**
+> - * skb_tstamp_tx - queue clone of skb with send time stamps
+> + * skb_tstamp_tx - queue clone of skb with send HARDWARE timestamps
+>    * @orig_skb:	the original outgoing packet
+>    * @hwtstamps:	hardware time stamps, may be NULL if not available
+>    *
+>    * If the skb has a socket associated, then this function clones the
+>    * skb (thus sharing the actual data and optional structures), stores
+> - * the optional hardware time stamping information (if non NULL) or
+> - * generates a software time stamp (otherwise), then queues the clone
+
+This line is removed. Does it mean no software timestamp now after this change?
+
+> - * to the error queue of the socket.  Errors are silently ignored.
+> + * the optional hardware time stamping information (if non NULL) then
+> + * queues the clone to the error queue of the socket.  Errors are
+> + * silently ignored.
+>    */
+>   void skb_tstamp_tx(struct sk_buff *orig_skb,
+>   		   struct skb_shared_hwtstamps *hwtstamps);
+> @@ -4565,7 +4566,7 @@ static inline void skb_tx_timestamp(struct sk_buff *skb)
+>   {
+>   	skb_clone_tx_timestamp(skb);
+>   	if (skb_shinfo(skb)->tx_flags & SKBTX_SW_TSTAMP)
+> -		skb_tstamp_tx(skb, NULL);
+> +		__skb_tstamp_tx(skb, NULL, NULL, skb->sk, true, SCM_TSTAMP_SND);
+>   }
+
+
 
