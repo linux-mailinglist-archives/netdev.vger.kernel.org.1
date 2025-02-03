@@ -1,151 +1,146 @@
-Return-Path: <netdev+bounces-162246-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-162248-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 13DEAA2655D
-	for <lists+netdev@lfdr.de>; Mon,  3 Feb 2025 22:10:55 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0E7CFA26565
+	for <lists+netdev@lfdr.de>; Mon,  3 Feb 2025 22:12:08 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id D125C1885FE2
-	for <lists+netdev@lfdr.de>; Mon,  3 Feb 2025 21:10:59 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A12513A030F
+	for <lists+netdev@lfdr.de>; Mon,  3 Feb 2025 21:11:59 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4117A2116E1;
-	Mon,  3 Feb 2025 21:09:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C006920F094;
+	Mon,  3 Feb 2025 21:12:03 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="XRnitu4J"
+	dkim=pass (1024-bit key) header.d=fastly.com header.i=@fastly.com header.b="cPAP32Ff"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.11])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f177.google.com (mail-pl1-f177.google.com [209.85.214.177])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7C29521146A;
-	Mon,  3 Feb 2025 21:09:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.11
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EFC0520E71F
+	for <netdev@vger.kernel.org>; Mon,  3 Feb 2025 21:12:01 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.177
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1738616997; cv=none; b=BQrujgpLq8cxnmGHaxXDjKhj7KChRPtnvBGFSfj6/8/m1VtLr36ySj87AtCpLb/jcZkdmnl+kq3WK2EUaGTjEN+z/eWCDzhdIywG4W+exlc73EzbfwTncaDq+4mCixllkkfcW4TWySoFexaQRYjQZ4bg6Iyzd0GIR9vxFxHhDLY=
+	t=1738617123; cv=none; b=L9ew7QMlbz/Ui1L97F3TP5KMq0A3U4ABaGXXAlXMEKRun/srUzlJUZ/CkMTb3h2ZAE3G3BNc+Zu02AYhPn635uB2G0JXj/SOPHDC1rI13hZietKAPAfHGn5b5Dl1cRcDxwDjp2wOJWCcx56P4ntBorSJMVZDLIYqGpHMUL1ksUQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1738616997; c=relaxed/simple;
-	bh=Tz4Uu1GFRmq/iuvhjAtIzndDgoDPbLjFRtkm5sTSE6U=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=IRqPcnufDjlm7o86FgYCR9vGC046jwFeMsoceQa1y4IfakKN3g3vt1hiXfvSvwsXza3u3wPr9mf4ubHc/CUQiGbJM9z7X83BN7ugD8w1DUGSVnrIomKMZdyc9yV+FSH3WljQvF67zVlNAdyfM3mHJiRwhR+f9vKPE3y9c/rII4U=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=XRnitu4J; arc=none smtp.client-ip=192.198.163.11
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1738616995; x=1770152995;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=Tz4Uu1GFRmq/iuvhjAtIzndDgoDPbLjFRtkm5sTSE6U=;
-  b=XRnitu4JI7Zak/QGPyn4oXtBoducLCORtKyYDvlG+oJa8aYFS6IloYs3
-   LVLQomDDOi9XWzAlU+vWUULdeRkq48+XvvE7mVx46MK0muvTRQJ8yFC1W
-   unuaYvqXT/gVWetJes8vDmsyG8IEccY+h8OBYhhk9huDsv7DBb0nDK9dj
-   w1PzywPsCddNJzX2my8fJ8eNhVZ+s2/KffqhosQTyMXr5d+LFuYoH1jwf
-   9tTFRAumsEdR+hpSsIyrSYHJdfdyPZGRZWZw+4O0pXjBHdiFm3z/iZl6P
-   Z5arrOYtFnt/jA7c3LBhgkuxQFbG7GqI98SxhHR0VdxXtxutmdxK25ktg
-   w==;
-X-CSE-ConnectionGUID: TlhsQSNzR9aVyVKFbgyBcw==
-X-CSE-MsgGUID: 6pGtj7mQQvGULemD3s/c5w==
-X-IronPort-AV: E=McAfee;i="6700,10204,11335"; a="49735653"
-X-IronPort-AV: E=Sophos;i="6.13,256,1732608000"; 
-   d="scan'208";a="49735653"
-Received: from orviesa002.jf.intel.com ([10.64.159.142])
-  by fmvoesa105.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 03 Feb 2025 13:09:50 -0800
-X-CSE-ConnectionGUID: IGdLCTLxRAq8tBcZ0LX16A==
-X-CSE-MsgGUID: zRX/zLC3Tf6CZF6mriaUSw==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.13,256,1732608000"; 
-   d="scan'208";a="141273329"
-Received: from anguy11-upstream.jf.intel.com ([10.166.9.133])
-  by orviesa002.jf.intel.com with ESMTP; 03 Feb 2025 13:09:50 -0800
-From: Tony Nguyen <anthony.l.nguyen@intel.com>
-To: davem@davemloft.net,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	edumazet@google.com,
-	andrew+netdev@lunn.ch,
-	netdev@vger.kernel.org
-Cc: Michal Swiatkowski <michal.swiatkowski@linux.intel.com>,
-	anthony.l.nguyen@intel.com,
-	sridhar.samudrala@intel.com,
-	jacob.e.keller@intel.com,
-	pio.raczynski@gmail.com,
-	konrad.knitter@intel.com,
-	marcin.szycik@intel.com,
-	nex.sw.ncis.nat.hpm.dev@intel.com,
-	przemyslaw.kitszel@intel.com,
-	jiri@resnulli.us,
-	horms@kernel.org,
-	David.Laight@ACULAB.COM,
-	pmenzel@molgen.mpg.de,
-	mschmidt@redhat.com,
-	tatyana.e.nikolova@intel.com,
-	Jason Gunthorpe <jgg@ziepe.ca>,
-	Leon Romanovsky <leon@kernel.org>,
-	linux-rdma@vger.kernel.org
-Subject: [PATCH net-next 9/9] ice: init flow director before RDMA
-Date: Mon,  3 Feb 2025 13:09:38 -0800
-Message-ID: <20250203210940.328608-10-anthony.l.nguyen@intel.com>
-X-Mailer: git-send-email 2.47.1
-In-Reply-To: <20250203210940.328608-1-anthony.l.nguyen@intel.com>
-References: <20250203210940.328608-1-anthony.l.nguyen@intel.com>
+	s=arc-20240116; t=1738617123; c=relaxed/simple;
+	bh=11Nvk3hzjdb/w1e/puQKMDia0KfRczpUGK8DoIy2fhY=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=r0CRR2ypXlb2b0YxmK8H2bhuIyd69fuQIhA+6AFj2kG8ZcT1mxrCZMcIpnu2RrnELNylcKDbnhk5yg/50K82eDAQiOeXFrCyZd77oINmCZUBQ/LJt6M8z4sciXhfzd7QQTpnl2fbHVg+njIEocVmc3hyKsCdyXM5h8F0c/CKFR4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fastly.com; spf=pass smtp.mailfrom=fastly.com; dkim=pass (1024-bit key) header.d=fastly.com header.i=@fastly.com header.b=cPAP32Ff; arc=none smtp.client-ip=209.85.214.177
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fastly.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=fastly.com
+Received: by mail-pl1-f177.google.com with SMTP id d9443c01a7336-21654fdd5daso84369125ad.1
+        for <netdev@vger.kernel.org>; Mon, 03 Feb 2025 13:12:01 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=fastly.com; s=google; t=1738617121; x=1739221921; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references
+         :mail-followup-to:message-id:subject:cc:to:from:date:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=igz1MzdVVMR+l9aG8qa3bIUBvAjHant1VpILPp28EC0=;
+        b=cPAP32Fff3/TtP2lqffQbywX9cZmtesJEZmAlV/ooPYYsP/AiNe14fcf+B1djq5fzE
+         PSrIbBbqIl2hFqeuXvwoSzK6+H65GRX8oxInD5F7sLflDajWtd5IxVFpLDmwkQbp+9OJ
+         xyuMtexPS7A+RdAoBqEuNWleyU438v7bDsw14=
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1738617121; x=1739221921;
+        h=in-reply-to:content-disposition:mime-version:references
+         :mail-followup-to:message-id:subject:cc:to:from:date
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=igz1MzdVVMR+l9aG8qa3bIUBvAjHant1VpILPp28EC0=;
+        b=urgNVw2YHvWI+xC9Fala+DcaPSXgGIPjDo8vvETRG+AvmYqxp5QEdDsOac046kEnmL
+         hM4+s6yTGW04U/II80NCSVpTaSNpda4OjVKhnzr8lw3we1G3ixnhPQzJVt2cg5patiyQ
+         cdntu5+3/w9VlxGrEmBgOsCSFMoLQbb3RtfHyVTX2RjZpmESK91Ej4ZwMCVnRYVtttep
+         fj31ZAdEJN5pGLxtEDh5n69b4ZNToce3XOSvNWPrWtcTGvB81oVBZRqh+yPamSjLEt7q
+         919bAk40F60P4kI7lkWdzYv6thUfSBMxZFjR9zCmVbNnnj+RJBgtMKHMFEvudusx7K/7
+         QkiA==
+X-Forwarded-Encrypted: i=1; AJvYcCW39tGezHOFxB8sSXX6Z6h0KfrdxxUuHxHyZlmGG/wC5p4J8TR10NBsNBjubK9UhxWSANQ4lN0=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyNB3rxN1KtWJxHHbmXOzwoDXLzIPLXlCliJbmQzGun0zoqOOos
+	j81udzroU6WjPS/Ktqic0fVpDbsCo5jb+CvM8ePBMLcpdHdNbgZ5isRXR9kbf3s=
+X-Gm-Gg: ASbGnctyEP+NMx6C1htpWFvfOtjG5Py7RXd7gAnCjv25LZEdZ70YTR7fbot0WDlnHoq
+	aPS2p1qD+MargVxb9cPhW0zYcaH9TIBjYU4n6WK9vO/NRtX1cPxbryynI81iYHQd2YYHQNiH/KH
+	mzt5vyofp+jPN74/006lk0sUw0uuqtXsd+9mchYOLfnG11nLAMMqYZgU6oG7TRsOkzsm2j0Jd+X
+	EZ21VRxyG0kbb3Aj26ulaHgHMGLqWXXdtZvWIuxexklhuJQw4pYBr1k6RhJBcY0arFq+as1P+KR
+	BTpzLh3P3N6KGX+5qSFbO7rZF7CRKBd/fsvbGzoje3ItN6u5Dd8eQGGFsQ==
+X-Google-Smtp-Source: AGHT+IHTUIocV6m3/NShsiLwSktbHiacpGHhtqsjuScTZ6E7PZnEMmn5ToFCIXiNMog1aAjyYCC4uw==
+X-Received: by 2002:a05:6a21:516:b0:1e1:9f57:eab4 with SMTP id adf61e73a8af0-1ed7a5f9036mr37881795637.16.1738617121136;
+        Mon, 03 Feb 2025 13:12:01 -0800 (PST)
+Received: from LQ3V64L9R2 (c-24-6-151-244.hsd1.ca.comcast.net. [24.6.151.244])
+        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-72fe69ceb1csm8771404b3a.151.2025.02.03.13.11.59
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 03 Feb 2025 13:12:00 -0800 (PST)
+Date: Mon, 3 Feb 2025 13:11:58 -0800
+From: Joe Damato <jdamato@fastly.com>
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: davem@davemloft.net, netdev@vger.kernel.org, edumazet@google.com,
+	pabeni@redhat.com, andrew+netdev@lunn.ch, horms@kernel.org,
+	shuah@kernel.org, ecree.xilinx@gmail.com, gal@nvidia.com,
+	przemyslaw.kitszel@intel.com
+Subject: Re: [PATCH net 1/4] ethtool: rss: fix hiding unsupported fields in
+ dumps
+Message-ID: <Z6ExHoXv2dR_Cu0a@LQ3V64L9R2>
+Mail-Followup-To: Joe Damato <jdamato@fastly.com>,
+	Jakub Kicinski <kuba@kernel.org>, davem@davemloft.net,
+	netdev@vger.kernel.org, edumazet@google.com, pabeni@redhat.com,
+	andrew+netdev@lunn.ch, horms@kernel.org, shuah@kernel.org,
+	ecree.xilinx@gmail.com, gal@nvidia.com,
+	przemyslaw.kitszel@intel.com
+References: <20250201013040.725123-1-kuba@kernel.org>
+ <20250201013040.725123-2-kuba@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250201013040.725123-2-kuba@kernel.org>
 
-From: Michal Swiatkowski <michal.swiatkowski@linux.intel.com>
+On Fri, Jan 31, 2025 at 05:30:37PM -0800, Jakub Kicinski wrote:
+> Commit ec6e57beaf8b ("ethtool: rss: don't report key if device
+> doesn't support it") intended to stop reporting key fields for
+> additional rss contexts if device has a global hashing key.
+> 
+> Later we added dump support and the filtering wasn't properly
+> added there. So we end up reporting the key fields in dumps
+> but not in dos:
+> 
+>   # ./pyynl/cli.py --spec netlink/specs/ethtool.yaml --do rss-get \
+> 		--json '{"header": {"dev-index":2}, "context": 1 }'
+>   {
+>      "header": { ... },
+>      "context": 1,
+>      "indir": [0, 1, 2, 3, ...]]
+>   }
+> 
+>   # ./pyynl/cli.py --spec netlink/specs/ethtool.yaml --dump rss-get
+>   [
+>      ... snip context 0 ...
+>      { "header": { ... },
+>        "context": 1,
+>        "indir": [0, 1, 2, 3, ...],
+>  ->    "input_xfrm": 255,
+>  ->    "hfunc": 1,
+>  ->    "hkey": "000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000"
+>      }
+>   ]
+> 
+> Hide these fields correctly.
+> 
+> The drivers/net/hw/rss_ctx.py selftest catches this when run on
+> a device with single key, already:
+> 
+>   # Check| At /root/./ksft-net-drv/drivers/net/hw/rss_ctx.py, line 381, in test_rss_context_dump:
+>   # Check|     ksft_ne(set(data.get('hkey', [1])), {0}, "key is all zero")
+>   # Check failed {0} == {0} key is all zero
+>   not ok 8 rss_ctx.test_rss_context_dump
+> 
+> Fixes: f6122900f4e2 ("ethtool: rss: support dumping RSS contexts")
+> Signed-off-by: Jakub Kicinski <kuba@kernel.org>
+> ---
+>  net/ethtool/rss.c | 3 ++-
+>  1 file changed, 2 insertions(+), 1 deletion(-)
 
-Flow director needs only one MSI-X. Load it before RDMA to save MSI-X
-for it.
-
-Reviewed-by: Jacob Keller <jacob.e.keller@intel.com>
-Tested-by: Pucha Himasekhar Reddy <himasekharx.reddy.pucha@intel.com>
-Signed-off-by: Michal Swiatkowski <michal.swiatkowski@linux.intel.com>
----
- drivers/net/ethernet/intel/ice/ice_main.c | 6 ++++--
- 1 file changed, 4 insertions(+), 2 deletions(-)
-
-diff --git a/drivers/net/ethernet/intel/ice/ice_main.c b/drivers/net/ethernet/intel/ice/ice_main.c
-index c3a0fb97c5ee..d7037de29545 100644
---- a/drivers/net/ethernet/intel/ice/ice_main.c
-+++ b/drivers/net/ethernet/intel/ice/ice_main.c
-@@ -5186,11 +5186,12 @@ int ice_load(struct ice_pf *pf)
- 
- 	ice_napi_add(vsi);
- 
-+	ice_init_features(pf);
-+
- 	err = ice_init_rdma(pf);
- 	if (err)
- 		goto err_init_rdma;
- 
--	ice_init_features(pf);
- 	ice_service_task_restart(pf);
- 
- 	clear_bit(ICE_DOWN, pf->state);
-@@ -5198,6 +5199,7 @@ int ice_load(struct ice_pf *pf)
- 	return 0;
- 
- err_init_rdma:
-+	ice_deinit_features(pf);
- 	ice_tc_indir_block_unregister(vsi);
- err_tc_indir_block_register:
- 	ice_unregister_netdev(vsi);
-@@ -5221,8 +5223,8 @@ void ice_unload(struct ice_pf *pf)
- 
- 	devl_assert_locked(priv_to_devlink(pf));
- 
--	ice_deinit_features(pf);
- 	ice_deinit_rdma(pf);
-+	ice_deinit_features(pf);
- 	ice_tc_indir_block_unregister(vsi);
- 	ice_unregister_netdev(vsi);
- 	ice_devlink_destroy_pf_port(pf);
--- 
-2.47.1
-
+Reviewed-by: Joe Damato <jdamato@fastly.com>
 
