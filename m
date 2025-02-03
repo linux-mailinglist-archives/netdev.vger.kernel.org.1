@@ -1,110 +1,136 @@
-Return-Path: <netdev+bounces-162037-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-162038-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4B26AA256AB
-	for <lists+netdev@lfdr.de>; Mon,  3 Feb 2025 11:10:31 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 442ECA256B0
+	for <lists+netdev@lfdr.de>; Mon,  3 Feb 2025 11:12:57 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 733273A9892
-	for <lists+netdev@lfdr.de>; Mon,  3 Feb 2025 10:10:08 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id DDC1A3A7A79
+	for <lists+netdev@lfdr.de>; Mon,  3 Feb 2025 10:12:48 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 42B44200BB4;
-	Mon,  3 Feb 2025 10:10:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id ADCA4200BA3;
+	Mon,  3 Feb 2025 10:12:53 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="lt4O1M8w"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="XhW2XFLb"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-f54.google.com (mail-ed1-f54.google.com [209.85.208.54])
+Received: from mail-ed1-f46.google.com (mail-ed1-f46.google.com [209.85.208.46])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7C555200B8C
-	for <netdev@vger.kernel.org>; Mon,  3 Feb 2025 10:10:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.54
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E44EC200118
+	for <netdev@vger.kernel.org>; Mon,  3 Feb 2025 10:12:51 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.46
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1738577411; cv=none; b=BY5hMXaSIWAU+U/dRoarcgf1hvNO4XjnJsdDT7pcBQbISZCW7d0Tkt3FrPLsSE1efs26H0dQUEyJ+XbmFp09VZu+GXMQOQhXb6LYDroMd9LFvaXu+Qkr+maUnsyml2At47k5IR9xM7clNe4FDxg0swiN9slRhOizR2ZMN0ZZTwE=
+	t=1738577573; cv=none; b=Rg3/BoMj0dlZyMed6jTul7Jq8vOy28Ka69ESzHvZSavASsJBNpXZzJ9FWOuk5z9FoGliS8RLMKDz+NcoqxsXkDKQ2gh9fWk7G6iDYTxuoj6kPGc5whuFmVAPOJW6ISYxlu9JpK+hW/SfYCDWgD1h6/gJy/glOAxUhtl9sOfefQg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1738577411; c=relaxed/simple;
-	bh=QY+adC7CRKaHfGkZyktnx1Z096et7HL8MtaXlJBz3QQ=;
+	s=arc-20240116; t=1738577573; c=relaxed/simple;
+	bh=ioKI1EIF98WVVO1J/m8mFBm2cnBvXmgzKU16tKfd6dM=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=fxQ+wNv9IYYImAaCqPNQI6NQQoZ5wMxLp501q0+ZklsRIizBiHMDkAtl8lW9sObPaEq2uIq+dVmyCwtCpactseNruOwjKF8nNAXjdd2WyXtMpmFV1IjezXyhETBP6v6hCEzFuzAO9689zK3ENFnhCwFab29jUAdldsceHnUDubI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=lt4O1M8w; arc=none smtp.client-ip=209.85.208.54
+	 To:Cc:Content-Type; b=ixfKTOakAa7W1gOMQUSmY/0vC4QKbXibBOU+FMT2xgy95pNCtOdh1hh2YRCsLfLWXnuwDihlli9+yTZQuXTLpt+/u2fWqwAjNGxXxvDqxdyziMtXwgwL08EPE9uSjQzyFtzj0aFE8DS2eVTLdJxNou6ojkl6aKQgnmnAdusLKDc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=XhW2XFLb; arc=none smtp.client-ip=209.85.208.46
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-ed1-f54.google.com with SMTP id 4fb4d7f45d1cf-5d96944401dso6806150a12.0
-        for <netdev@vger.kernel.org>; Mon, 03 Feb 2025 02:10:09 -0800 (PST)
+Received: by mail-ed1-f46.google.com with SMTP id 4fb4d7f45d1cf-5d96944401dso6811245a12.0
+        for <netdev@vger.kernel.org>; Mon, 03 Feb 2025 02:12:51 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1738577408; x=1739182208; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1738577570; x=1739182370; darn=vger.kernel.org;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=8E//xQg1sdr4osdEJWZhsDye0tENvBeQ5yKFQrKgSko=;
-        b=lt4O1M8w0aiZVa3B5JnTkuNq2ZHBAMWYYmeiHJ8u3rOp/Ikwko4J/qp5+E4PfW2kzq
-         0PiAyBQjXsn9YGRVDAEFbQS1KfYxG/MgtZIBS5kNPJVUOym8kUVeFMXxvOsM9XPbO2Kc
-         TPQfEBUKaCp6HzV1LTz3QEZHZiZ94zvajtZhYgAneR8vX3fCBDWqDy+H8N/TT6CAYGfN
-         W4SL9+EPgfjMVLRweSsF2IssmzRjpdfrSls5IgQikr8ShL7XJjCcgZKRnMkXuBWgj9nO
-         Vbs5G7XLYhwYqS/xQOfQKbvu+1/xzNe6OL7TUMMi6G2+CDu6S/0NC2JQR4tUY1vJ1crp
-         9/HA==
+        bh=NBJ0SoZygR0uCHqtVtRx1PW+FsIeGKu48cm9v0QtKJk=;
+        b=XhW2XFLb/CE9/YVrPsZ8jHpfnaa6YtiXwaznqevNRd4iCw1rmD6RK9WLOCyAPs03S9
+         guxiDdMdrmYTezxoWVSyizuRTvBziC48Vyhf2/dw9+YVxVzci0tDRCCIoyzZwWiaZ6oG
+         MoWP1XrJuvNoNOetMn+HknYTeAOlZA9m3mkpDxgriHAJFFAv1g9RgOg3yoSqnpXYbrUG
+         FsngKlExBtFUHqZ9Fe/AaVI9XguxWuyynVJ6U4685W1Dh4SwPRfYqcJFD4NhZ49Zdv6/
+         iMEg85Fg5j6lnZfCmgyEGUpKbPe2T30A23zmJmoGKnb4I+CbEFuZdaNYbXp8HjJvkL6g
+         lcdQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1738577408; x=1739182208;
+        d=1e100.net; s=20230601; t=1738577570; x=1739182370;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=8E//xQg1sdr4osdEJWZhsDye0tENvBeQ5yKFQrKgSko=;
-        b=fEIjpz1JAfsfdbQ/VxOj8kOFOY01Hw0XLcTouE18goY3ThkJgf0vadDZgIxYJW3U8U
-         optTIn3W4yQMSYTIa3mEEPR5719zi5OsOKu2mlu+mkFNaMgDo/VRKS9hHGfuCk3XW5yx
-         imI7bCBRdKQdWaGc9D2OzwigtL8PI5MhLuds8JrC4gTl5KpwHDFRKgw4Iuu1+D879aD0
-         FVtIxus2FMshrM6WLVSTfQbo/CfDkF9X0J+DiEVzWbDJfrip4o/mG89KXxfLt56r9KBl
-         TEKDqnIoI4Z4FKjKIS0u1P0j0e94mahFy+pbnTrhDhkW1Amtp1vyRYAw6JmE/sCb1CJX
-         fqwA==
-X-Forwarded-Encrypted: i=1; AJvYcCXdxv40WonvoviQiwmnpB+3EPgdL+y9OL8RyTIRdbdGRqhNPjMvllhK7h5IFbKGd+Y3h4P0+wI=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwMH4QquVUg1ppkeKQ5Rr6cA33CsBV0/6dIsqRGhCRuecpjAkT7
-	wpwx4xSc0JUiUm7RWdjauW4JSxyp0Mdz34ECeqpkmCvL25EZo1DZKs+baoUSBYj1ki0aOPjlUqI
-	qTIi9PDDZDBxkQujsqmmRYC2AS63p1ouBjjkQ6jxVfbTyRxO1owzk
-X-Gm-Gg: ASbGncspyBoMI6OowYytJuNbFnUr7EBSwRrf4fLtMi6gDd9HCG+9UP7mIZmyW0PKbov
-	GMUm0uvSflV06ahmqNEZdL1az4LiIds3FxUPa2s8UghrFQpbDSQ9itAZ+FgIYnb0EDS6ma6c0uw
+        bh=NBJ0SoZygR0uCHqtVtRx1PW+FsIeGKu48cm9v0QtKJk=;
+        b=PCKenuryVpR2v0cGdDgiW8CLeWuWfUHKScOWRWz2rIRy5xQWsCRuP5j9ORw07thNvI
+         xXu+vY96f9WACBZ0nvr+zHfZ3t/WIfKd1hYkJ6Dxh4s1YcpfEIWAiRBI24riqRYMaNby
+         dsjy32690ad/NCLwUx1Y3ULz4nrIGkCeAXqs8IpqQzYwpyqNKT2bRnN9bWcwT6glVWZO
+         gldKc4NC6S6Fcjf/+yDkt/xHc2dMVOvcLz4LKZzJtAsV05xcgN0/oUCGCWoABVT/Vm+1
+         /daOG/mz26u8+n+s9sCfA6sB7ZLv2XsrS2ioVnQi+r/YvZ2Kqhd7CE4XMAy15aRKu8DL
+         zsYw==
+X-Forwarded-Encrypted: i=1; AJvYcCViAduQDP0RLs7L3PajeCygV7VqH/POxMlss1ZaZrA5gk5Vbl341OhKEpo51+tQ/x4pOtET2bE=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzfPVYrTydoCAPTbeOGvAYl3PBB4N/pQcMvwS3BxjuWbCKljafl
+	ZNp86PSEgeJKXksRP4cn6+ErCsvUmAH4g/c++UnHYUc2LHv8AIuY5b7c3a3rb8Ew6afpPODh1gL
+	M55oFNh/y05YrSiARllZuP0n/kBQlvyp2MKON
+X-Gm-Gg: ASbGncvrapeZmKKjTcJKxd4kdawhTRcl03RonbnjNmIInDWf/mn98jSvunwWcYi2HLx
+	xaiGw37IdACUJp9awxQUQOdn9I+ghxtAc7viPkgdS7btMnOJW785Sop4gAZT+uNROmMkZzS7a9Q
 	==
-X-Google-Smtp-Source: AGHT+IGRDfFBtCgWcpUr0gzTCsCEb3fH9B4cWknG4gQZk5mFY9fQmhZeuaXEeTlpWdoUAKXNLSi2WKQuo3HuPvQXTwQ=
-X-Received: by 2002:a05:6402:2388:b0:5dc:7464:2239 with SMTP id
- 4fb4d7f45d1cf-5dc74642547mr14685571a12.7.1738577407633; Mon, 03 Feb 2025
- 02:10:07 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IGR5FDPBJAImGbztFhSP4FOGUN2aGNMrGsM9KO+juOcktIKIvvdtQ0TVnX+kK+2HmrHrCukN20zxCHHnAdxpd4=
+X-Received: by 2002:a05:6402:2111:b0:5dc:7eba:7832 with SMTP id
+ 4fb4d7f45d1cf-5dc7eba7910mr17511982a12.17.1738577570032; Mon, 03 Feb 2025
+ 02:12:50 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250131171334.1172661-16-edumazet@google.com> <20250131194623.187-1-kuniyu@amazon.com>
-In-Reply-To: <20250131194623.187-1-kuniyu@amazon.com>
+References: <20250131171334.1172661-1-edumazet@google.com> <20250201181801.4427248a@kernel.org>
+In-Reply-To: <20250201181801.4427248a@kernel.org>
 From: Eric Dumazet <edumazet@google.com>
-Date: Mon, 3 Feb 2025 11:09:56 +0100
-X-Gm-Features: AWEUYZkgkJ0fyRYoCPNee5JSuculV-bf3YrkodH1cj7h4a-hbRdNlP0jzfzjA08
-Message-ID: <CANn89iJCrshU6iqMUuPNuC6caqqw3E0YPLov5Zw2+jM00bKJig@mail.gmail.com>
-Subject: Re: [PATCH net 15/16] flow_dissector: use rcu protection to fetch dev_net()
-To: Kuniyuki Iwashima <kuniyu@amazon.com>
-Cc: davem@davemloft.net, eric.dumazet@gmail.com, horms@kernel.org, 
-	kuba@kernel.org, netdev@vger.kernel.org, pabeni@redhat.com
+Date: Mon, 3 Feb 2025 11:12:39 +0100
+X-Gm-Features: AWEUYZmg_xYfoYplEHiVf3EmcRNZeklqsZ01WHR9dbvSkzP-eudxIm2q_tDwe60
+Message-ID: <CANn89iLt6E-cSE3QWpg5GPjtNSm4A81EzAFh8YuG8Wkq+UqmeA@mail.gmail.com>
+Subject: Re: [PATCH net 00/16] net: first round to use dev_net_rcu()
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: "David S . Miller" <davem@davemloft.net>, Paolo Abeni <pabeni@redhat.com>, netdev@vger.kernel.org, 
+	Kuniyuki Iwashima <kuniyu@amazon.com>, Simon Horman <horms@kernel.org>, eric.dumazet@gmail.com
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-On Fri, Jan 31, 2025 at 8:46=E2=80=AFPM Kuniyuki Iwashima <kuniyu@amazon.co=
-m> wrote:
+On Sun, Feb 2, 2025 at 3:18=E2=80=AFAM Jakub Kicinski <kuba@kernel.org> wro=
+te:
 >
-> From: Eric Dumazet <edumazet@google.com>
-> Date: Fri, 31 Jan 2025 17:13:33 +0000
-> > __skb_flow_dissect() can be called from arbitrary contexts.
-> >
-> > It must extend its rcu protection section to include
-> > the call to dev_net(), which can become dev_net_rcu().
-> >
-> > This makes sure the net structure can not disappear under us.
-> >
-> > Fixes: 3cbf4ffba5ee ("net: plumb network namespace into __skb_flow_diss=
-ect")
+> On Fri, 31 Jan 2025 17:13:18 +0000 Eric Dumazet wrote:
+> >   ipv4: use RCU protection in inet_select_addr()
 >
-> The correct tag seems to be
->
->   Fixes: 9b52e3f267a6 ("flow_dissector: handle no-skb use case")
+> patchwork thinks it's an incomplete series due to lack of this patch
+> on the list. I'm afraid a repost will be needed :(
 
-Yes, you are correct, thanks !
+Interesting, I wonder what happened...
+
+I will send a v2, here what it looks like:
+
+commit 52a1dc65d01230876fbacc7f8fe63ee7a758603f (HEAD)
+Author: Eric Dumazet <edumazet@google.com>
+Date:   Fri Jan 31 16:47:50 2025 +0000
+
+    ipv4: use RCU protection in inet_select_addr()
+
+    inet_select_addr() must use RCU protection to make
+    sure the net structure it reads does not disappear.
+
+    Fixes: c4544c724322 ("[NETNS]: Process inet_select_addr inside a
+namespace.")
+    Signed-off-by: Eric Dumazet <edumazet@google.com>
+
+diff --git a/net/ipv4/devinet.c b/net/ipv4/devinet.c
+index c8b3cf5fba4c02941b919687a6a657cf68f5f99a..55b8151759bc9f76ebdbfae2754=
+4d6ee666a4809
+100644
+--- a/net/ipv4/devinet.c
++++ b/net/ipv4/devinet.c
+@@ -1371,10 +1371,11 @@ __be32 inet_select_addr(const struct
+net_device *dev, __be32 dst, int scope)
+        __be32 addr =3D 0;
+        unsigned char localnet_scope =3D RT_SCOPE_HOST;
+        struct in_device *in_dev;
+-       struct net *net =3D dev_net(dev);
++       struct net *net;
+        int master_idx;
+
+        rcu_read_lock();
++       net =3D dev_net_rcu(dev);
+        in_dev =3D __in_dev_get_rcu(dev);
+        if (!in_dev)
+                goto no_in_dev;
 
