@@ -1,159 +1,118 @@
-Return-Path: <netdev+bounces-162025-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-162026-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4008EA255EC
-	for <lists+netdev@lfdr.de>; Mon,  3 Feb 2025 10:31:30 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id BD31FA255F0
+	for <lists+netdev@lfdr.de>; Mon,  3 Feb 2025 10:33:53 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id DFAAD3A8981
-	for <lists+netdev@lfdr.de>; Mon,  3 Feb 2025 09:31:21 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 689263A5C45
+	for <lists+netdev@lfdr.de>; Mon,  3 Feb 2025 09:33:45 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DD4581FF1DA;
-	Mon,  3 Feb 2025 09:31:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BABD81FF1D1;
+	Mon,  3 Feb 2025 09:33:50 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=denx.de header.i=@denx.de header.b="S5JZV9EH"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="G0zjtAcv"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx.denx.de (mx.denx.de [89.58.32.78])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ed1-f43.google.com (mail-ed1-f43.google.com [209.85.208.43])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BCEB41D798E
-	for <netdev@vger.kernel.org>; Mon,  3 Feb 2025 09:31:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=89.58.32.78
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 118891DD9D1
+	for <netdev@vger.kernel.org>; Mon,  3 Feb 2025 09:33:48 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.43
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1738575086; cv=none; b=E2HuhedGpKjPwkm8dnikwAf45i07rAU9D5GJ7SBXHyEVMLMR6gwuprw1MZ8a0i91kXes5GEx/hczFROzWfsIVtnUR8obYWehXc3/emmQLyvd0FKHegt2YpjFblGzP5iZDzIDqUvcL6RQSIs3+WYKLcbIsvjyr2gbifIPURRdAeY=
+	t=1738575230; cv=none; b=SUTibcu4kJyCOXASbRnGjiy+EzrkR9RITBjXOOMgu7vyaBfzCSRCKB1nhe03URzC3HHsBmI1YJByRt3CNfsfqGplSDcMvZ0OtCHiDtpdjylsmsKUnLCvBN0aLQYosFyjV5EXGAel5mMAgrM2QsC4lepk+rwrCqGSwCKADfIb+Ck=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1738575086; c=relaxed/simple;
-	bh=LKHvK8tBLWF3KqdmMSzxHrTGl32JspvsZEbQUfAQOrA=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=pwKsdSJ1TVGbNCUxmAXW3o7H6+0MKoKoBM8es5nCPlqeV4zjvDINrsOCjTTEnId9+IqKiv7n0yvy+VBXwQhhoCUrt/RUivRmBxtT59hd5se0XqKwwbyw8Ao2lEou7rQ+o5CYjciuxwEBAteTBFbUd19M7ewcrvHyGFJ2Pl6Yce8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=denx.de; spf=pass smtp.mailfrom=denx.de; dkim=pass (2048-bit key) header.d=denx.de header.i=@denx.de header.b=S5JZV9EH; arc=none smtp.client-ip=89.58.32.78
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=denx.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=denx.de
-Received: from [127.0.0.1] (localhost [127.0.0.1]) by localhost (Mailerdaemon) with ESMTPSA id CADBF10382D08;
-	Mon,  3 Feb 2025 10:31:14 +0100 (CET)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=denx.de; s=mx-20241105;
-	t=1738575076;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=87iK9BHPnpQs+19NyAfODppPvRIOhut4EuEMpBR4aXE=;
-	b=S5JZV9EH8hCsTrjV+C3HHny71/yKkt0FDC0BPa3LyJwH5nYDLtPh18olwCBEsukhybB9Tf
-	I++pWmouzECsow2reauMG4j0LGFi4MiXQYN2reVoFEetbgkacsR6FqMuVhiTOAJ1vrU0rS
-	wUIHx6EWQvpfvYoGS1fY+QJl4LaidddBlmvufkVV002m7k8ugzfRdVSjNY5A0fg8JgZQaR
-	pc0cCXtQQOCZASKlaL4GvrzYBMyaRbNv4dZ+Pq5mLKLQ68S1hztPjrTps1Pale1bXihbMi
-	SRKcu0hRePrM7d9GInTx2wgyJxGswSubgckIuCznh9G8h9x0SRNGnN8kZ/aYQA==
-Date: Mon, 3 Feb 2025 10:31:13 +0100
-From: Lukasz Majewski <lukma@denx.de>
-To: <Woojung.Huh@microchip.com>
-Cc: <frieder.schrempf@kontron.de>, <andrew@lunn.ch>,
- <netdev@vger.kernel.org>, <Tristram.Ha@microchip.com>
-Subject: Re: KSZ9477 HSR Offloading
-Message-ID: <20250203103113.27e3060a@wsk>
-In-Reply-To: <BL0PR11MB29130BB177996C437F792106E7E92@BL0PR11MB2913.namprd11.prod.outlook.com>
-References: <05a6e63e-96c1-4d78-91b9-b00deed044b5@kontron.de>
- <6d0e1f47-874e-42bf-9bc7-34856c1168d1@lunn.ch>
- <1c140c92-3be6-4917-b600-fa5d1ef96404@kontron.de>
- <6400e73a-b165-41a8-9fc9-e2226060a68c@kontron.de>
- <20250129121733.1e99f29c@wsk>
- <0383e3d9-b229-4218-a931-73185d393177@kontron.de>
- <20250129145845.3988cf04@wsk>
- <42a2f96f-34cd-4d95-99d5-3b4c4af226af@kontron.de>
- <BL0PR11MB2913C7E1AE86A3A0EB12D0D7E7EE2@BL0PR11MB2913.namprd11.prod.outlook.com>
- <1400a748-0de7-4093-a549-f07617e6ac51@kontron.de>
- <BL0PR11MB29130BB177996C437F792106E7E92@BL0PR11MB2913.namprd11.prod.outlook.com>
-Organization: denx.de
-X-Mailer: Claws Mail 3.19.0 (GTK+ 2.24.33; x86_64-pc-linux-gnu)
+	s=arc-20240116; t=1738575230; c=relaxed/simple;
+	bh=JLvuYPrh5EOB6QFTE302/yGMZiejUgcLTIYl6bklXMk=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=H3cQN9U3Mj3zQjEFapGfqR8uRlKYkInqIwgipXOM77iz98EERCYQxOAvreKrStF+dRk+YfnkYPDoO1aUpYCREkcubu/Fml74m3VLzI9WpgRz7dxFC6urOoMdt+iEFUxv1uxMjYgwbiojORDytrUBlDNRXgHMiWi458BR7knPiwE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=G0zjtAcv; arc=none smtp.client-ip=209.85.208.43
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-ed1-f43.google.com with SMTP id 4fb4d7f45d1cf-5d7e3f1fc01so8672675a12.2
+        for <netdev@vger.kernel.org>; Mon, 03 Feb 2025 01:33:48 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1738575227; x=1739180027; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=YltISiHYM/SmOnP4M95rBXMWY+oifUt0r+dIxBU9/MI=;
+        b=G0zjtAcvxwCG1Fyewan6nGkeTr41hFHhsRQJKb/A/eAVmLDTAs8dnxO6mEGgLYxBoB
+         R5YVEKMg+LDmFU6NjGLabK6qV4PmTshCrrlDdA1euTeGIfYrkhRe1oWqn7iBPjFw9CzR
+         VuAkht7KUbxQElFWQhANTtK1unhFcWij6v/nMmPYGLPn76fywdnrIb6xbuJr5mslAofZ
+         8eFDLvmui6dGZPaGY6IPGJlkDLGjvgE1fYkSsm3CoQ0LbAj1lOFMbWZMMY9RGVGYtz2q
+         Q/eZCcOpo6DYjv6yleag0U9X+8trUelpNp7IC0qSZnw+0G2lCdfrUU+HxJ1aDB2+WZV1
+         13tQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1738575227; x=1739180027;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=YltISiHYM/SmOnP4M95rBXMWY+oifUt0r+dIxBU9/MI=;
+        b=qxL0NY64HkBFIzc40Xzn6LY5YRyYGjuvzLECaS5TakFJwbQK8PMrJTnaGf45jFMLna
+         +z9DODvmZW8PfaV5YlFzvMAuRbNqZ2lBnT1PFxXHmWZ5R/8bc8T2qr4QSLUvWk/Z+Bxz
+         SNtvHXCzZjpafH7Izn7sVA3DgAm4drWpsxfcHCZZlylR8vY0x8oSU+IOjTWcRiV9VJxv
+         2UqwIt9yFmvqKAChUu1q1fcIxFoyYR6miXeXOyK/nZ7NdXKN/w15oSFmlgs4nemdr5E8
+         4wjzZPEOnExyNx3YkR5x0wX1WXXALF767dCu1EkXNmI/ScD1hGoCMEVF47nAsPF/XUwb
+         Gokw==
+X-Forwarded-Encrypted: i=1; AJvYcCXwndAXH3EnDOVTlQw4OY9SKSoJz8PZNa2aC9tXoXhij+hyUW1WMXylS2dpiBtKgrvnpDtITB8=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzqbDw4XO9aWWD/FJPGRilHNiPrqeXvz5Ws+ZGLAmIK0sh6bVJJ
+	6fN4EfLEpKmSmv1LeQ3sOojPYvUO91Mb3ngC94umEuN5mPASRYdu5d+jBRdGwxJfClMFHJnE4O0
+	XRiSD6lG5a4mvA8evBseM6raaxtQBXX6oGV5+
+X-Gm-Gg: ASbGncukRoeAzGtz/YFhIPrzs4zk9tqP8sMABG0LDzJuyGpKh4GGhOFnt7QWeZhzqOX
+	5VVhut0LNSg5FtMnQahUddRm3O8I8rNy34frX7eJ1rKyCIN3jaP4Okd66JcryNJZ+EZaoZ/I3ug
+	==
+X-Google-Smtp-Source: AGHT+IG2NzOW7gmhMPR5bAakst4yKdwWcCMDGNS22U09LW51jnXMkgpnYxRlzobL0J+UCRK/99goUem3TPvyR5YUqJc=
+X-Received: by 2002:a05:6402:2491:b0:5dc:a463:aafd with SMTP id
+ 4fb4d7f45d1cf-5dca463ab11mr4170635a12.4.1738575227202; Mon, 03 Feb 2025
+ 01:33:47 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; boundary="Sig_/eFHq7k_Urgg_6hN.uzLOhvA";
- protocol="application/pgp-signature"; micalg=pgp-sha512
-X-Last-TLS-Session-Version: TLSv1.3
-
---Sig_/eFHq7k_Urgg_6hN.uzLOhvA
-Content-Type: text/plain; charset=UTF-8
+References: <20250131171334.1172661-9-edumazet@google.com> <20250131191004.95188-1-kuniyu@amazon.com>
+In-Reply-To: <20250131191004.95188-1-kuniyu@amazon.com>
+From: Eric Dumazet <edumazet@google.com>
+Date: Mon, 3 Feb 2025 10:33:36 +0100
+X-Gm-Features: AWEUYZlaj1WWuBpuvWplrXUJwPQ00tkVtnlZRrX5v-usOwdP5kuZwFBKrY3b_gY
+Message-ID: <CANn89iKKyT=j0us0LcYS_Avkz_qRLmWfW3kUxRPgDk0AWC2Pcw@mail.gmail.com>
+Subject: Re: [PATCH net 08/16] udp: convert to dev_net_rcu()
+To: Kuniyuki Iwashima <kuniyu@amazon.com>
+Cc: davem@davemloft.net, eric.dumazet@gmail.com, horms@kernel.org, 
+	kuba@kernel.org, netdev@vger.kernel.org, pabeni@redhat.com
+Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-Hi Woojung,
+On Fri, Jan 31, 2025 at 8:10=E2=80=AFPM Kuniyuki Iwashima <kuniyu@amazon.co=
+m> wrote:
+>
+> From: Eric Dumazet <edumazet@google.com>
+> Date: Fri, 31 Jan 2025 17:13:26 +0000
+> > TCP uses of dev_net() are safe, change them to dev_net_rcu()
+>
+> s/TCP/UDP/
+>
+> > to get LOCKDEP support.
+> >
+> > Signed-off-by: Eric Dumazet <edumazet@google.com>
+>
+> Reviewed-by: Kuniyuki Iwashima <kuniyu@amazon.com>
+>
+>
+> [...]
+> > @@ -1072,7 +1072,7 @@ int __udp6_lib_rcv(struct sk_buff *skb, struct ud=
+p_table *udptable,
+> >  {
+> >       enum skb_drop_reason reason =3D SKB_DROP_REASON_NOT_SPECIFIED;
+> >       const struct in6_addr *saddr, *daddr;
+> > -     struct net *net =3D dev_net(skb->dev);
+> > +     struct net *net =3D dev_net_rcu(skb->dev);
+>
+> if v2 is needed for chagelog, this line is longer than saddr/daddr one.
 
-> HI Frieder,
->=20
-> Thanks for the link. I reminded the support team this ticket.
-> Please wait response in the ticket. Hope we can get the solution for
-> you.
->=20
-> Thanks.
-> Woojung
->=20
-> > -----Original Message-----
-> > From: Frieder Schrempf <frieder.schrempf@kontron.de>
-> > Sent: Thursday, January 30, 2025 3:44 AM
-> > To: Woojung Huh - C21699 <Woojung.Huh@microchip.com>
-> > Cc: andrew@lunn.ch; netdev@vger.kernel.org; lukma@denx.de; Tristram
-> > Ha - C24268 <Tristram.Ha@microchip.com>
-> > Subject: Re: KSZ9477 HSR Offloading
-> >=20
-> > EXTERNAL EMAIL: Do not click links or open attachments unless you
-> > know the content is safe
-> >=20
-> > Hi Woojung,
-> >=20
-> > On 29.01.25 7:57 PM, Woojung.Huh@microchip.com wrote: =20
-> > > [Sie erhalten nicht h=C3=A4ufig E-Mails von woojung.huh@microchip.com.
-> > > Weitere =20
-> > Informationen, warum dies wichtig ist, finden Sie unter
-> > https://aka.ms/LearnAboutSenderIdentification ] =20
-> > >
-> > > Hi Frieder,
-> > >
-> > > Can you please create a ticket at Microchip's site and share it
-> > > with me? =20
-> >=20
-> > Sure, here is the link:
-> > https://microchip.my.site.com/s/case/500V400000KQi1tIAD/
-
-Is the link correct?
-
-When I login into microchip.my.site.com I don't see this "case" created
-for KSZ9477.
-
-> >=20
-> > Thanks
-> > Frieder =20
-
-
-
-
-Best regards,
-
-Lukasz Majewski
-
---
-
-DENX Software Engineering GmbH,      Managing Director: Erika Unter
-HRB 165235 Munich, Office: Kirchenstr.5, D-82194 Groebenzell, Germany
-Phone: (+49)-8142-66989-59 Fax: (+49)-8142-66989-80 Email: lukma@denx.de
-
---Sig_/eFHq7k_Urgg_6hN.uzLOhvA
-Content-Type: application/pgp-signature
-Content-Description: OpenPGP digital signature
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAEBCgAdFiEEgAyFJ+N6uu6+XupJAR8vZIA0zr0FAmegjOEACgkQAR8vZIA0
-zr3X2ggA4lLfyFvQ/2tFD5Mp1urmw1sAbQKReBzl19cIqT1p3rTrVL/WduJvxv3x
-Cyox8CnyR8q4s1XJ0aEoYDClAGvuUiyNsF4hRYBzwYqOfXnN5uHaMwWvPT6bRCsv
-El/3RFmT4WrBe1tH5qfZt1cJjyCdD0b5Ynbe2atbo8RKJaD/ZcSkFddcRU+ssZ53
-eJzT4sAP4IT4/b0MweGYZh/aagei6C+YYV7dIn33NpXpM9lDuVLXAr3rT9EHX31U
-rwzbKc9zUIbjadmYkrEPZVnOGti+ln9jJNTg/VyxSC/D55V86Wusecg4WovcmXjf
-lphfK2SJ3VmOAMQb29rtURt7bwu+iQ==
-=npFU
------END PGP SIGNATURE-----
-
---Sig_/eFHq7k_Urgg_6hN.uzLOhvA--
+ACK, I will change this in v2.
 
