@@ -1,230 +1,206 @@
-Return-Path: <netdev+bounces-162034-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-162033-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1DF17A25687
-	for <lists+netdev@lfdr.de>; Mon,  3 Feb 2025 10:58:44 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id F0746A25683
+	for <lists+netdev@lfdr.de>; Mon,  3 Feb 2025 10:58:05 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 42FFF7A580B
-	for <lists+netdev@lfdr.de>; Mon,  3 Feb 2025 09:57:48 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 84AB618891D5
+	for <lists+netdev@lfdr.de>; Mon,  3 Feb 2025 09:58:10 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2BC981FBCBD;
-	Mon,  3 Feb 2025 09:58:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E60BD200B85;
+	Mon,  3 Feb 2025 09:57:51 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="HNVYQNKB"
+	dkim=pass (2048-bit key) header.d=openvpn.net header.i=@openvpn.net header.b="A1lxCtBy"
 X-Original-To: netdev@vger.kernel.org
-Received: from NAM02-DM3-obe.outbound.protection.outlook.com (mail-dm3nam02on2050.outbound.protection.outlook.com [40.107.95.50])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wr1-f42.google.com (mail-wr1-f42.google.com [209.85.221.42])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6FE5C20013E
-	for <netdev@vger.kernel.org>; Mon,  3 Feb 2025 09:58:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.95.50
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1738576712; cv=fail; b=cqRlELuBBuIH993266uNCDx3/KDNsJ49jA52m5l1XNoZ7Xu7SeynWnxY1hAR0DxxTDHB8/Fod1UV0l6QZsMC16jiVZfuXw3aIkVtuktiJIajezYqcakgk7MqD+kYU6S7B+z5wYchtDz4zcIySWDxb0WRtDLFt/rw9xxjcF5QTCU=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1738576712; c=relaxed/simple;
-	bh=39RV+8Uk3byYLCI5D8Tpag2npiC/WblC2X1eytZQdsU=;
-	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
-	 Content-Type:MIME-Version; b=EntZeBHLTiNF+bVrguW4CsF4kVuIo/DjYrYIYudQpTcPKcyjcsqAvKvyXb89yTOLzHuaJDDZi/Ugg3SWN5TlyGAw2mNJkEt5fT4K5xwBjVRJ4FjCGBB7eTOlJ3aSA2s1ETd8wociQt/iFG8zAZUGvVYze68L2XBkg6K0n2LJa4k=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=HNVYQNKB; arc=fail smtp.client-ip=40.107.95.50
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=gulySiNSzVVxoxovaB7aZZkLznv0mwtl5QpISeE15oZKiTnxyHARrzOmTXMeiC/36A4LKJ6EiyJ5gNaj48ttdH2vPt9tgvcm1Xc7ARCd98ZrckD/zwmpzrm/bDUm/DzTGVCTYTyGLL+jwgDqx+fAMm87c8TrrnvQSnrIjcnzrALVqnO6ktZngHa0df+T8A2JfIinxNqYn4O0Qq1avH9QXZy08gBvymwLZnM1buQzpz4/crGBdeCeFoEzciVJKX2lFY5yIXQniZIIky2Dqdax/L/hPtYyudQhRcBR8GpjdSm9nMTmlNFhfZLSTVKHADpj3kN3lh3zi7GTOhfVZaaaXA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=39RV+8Uk3byYLCI5D8Tpag2npiC/WblC2X1eytZQdsU=;
- b=SS8jORZMXiJzzxKwiwSQn0uWV5Us1fo6V25dIxeGiKwSaJxhCcnR4oKIFzp5AUhnbubc45nMtEQBmLaTE6WbVM3Y4TxOx9+wmizDNk51c8nIyL6XKoAdu9f3z9JHWwP3OEu3vZ0ESEIR0jOc2HIMMAhpSFBbCdHeP5HHXAKZqSXxM5Ll9+wvtF3UBxE6bayt9om7P+IvdBAeSL+yC2u6HZ7xA1DmX2dNEBCR2cXjosgQRDU/U6Wfo6M+MlE6K/EBxREttd4v7X+64R1bVMnR4Wl1KUX07PNuW2JwEq5c/FsO3Xxd0BAmSGQedl+7jO0L0YwaoSEaPo9n8K1t0lTuWA==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
- dkim=pass header.d=nvidia.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=39RV+8Uk3byYLCI5D8Tpag2npiC/WblC2X1eytZQdsU=;
- b=HNVYQNKBdPpwsKJgfv9a9cF6tV8o2YwlB+GwjVSrIVfc+INC0ZR1K2OHrFrFZai9GCdr0/+wv9iST4Cj+8tL/Q+EIqWFrUd9iyAbmYDCgK+zTatYvODQAXPgQgOECZVXI10EEggQqqZLiEQR47CFmMd6QTH0UtjouRxR10nrZpvLG2wJxoGgF5WDeoKUvmZW0RN6gebneMYbtZGH8uTeqSJQ8Pz8UkolQ2gwKQ0EINijfxbiUVmJf2Qdv2QimI7jiR+dmI+zxT9xmaAmTBQbsjJ2m6hSm/cVBI+LjYTZ8uL/LMAx6mA997ruenY9cQf+8mxRCRSEvEFkftyBFnyRUQ==
-Received: from DM6PR12MB4516.namprd12.prod.outlook.com (2603:10b6:5:2ac::20)
- by DS7PR12MB9527.namprd12.prod.outlook.com (2603:10b6:8:251::16) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8398.25; Mon, 3 Feb
- 2025 09:58:28 +0000
-Received: from DM6PR12MB4516.namprd12.prod.outlook.com
- ([fe80::43e9:7b19:9e11:d6bd]) by DM6PR12MB4516.namprd12.prod.outlook.com
- ([fe80::43e9:7b19:9e11:d6bd%3]) with mapi id 15.20.8398.025; Mon, 3 Feb 2025
- 09:58:27 +0000
-From: Danielle Ratson <danieller@nvidia.com>
-To: Andrew Lunn <andrew@lunn.ch>
-CC: Jakub Kicinski <kuba@kernel.org>, "netdev@vger.kernel.org"
-	<netdev@vger.kernel.org>, "mkubecek@suse.cz" <mkubecek@suse.cz>,
-	"matt@traverse.com.au" <matt@traverse.com.au>, "daniel.zahka@gmail.com"
-	<daniel.zahka@gmail.com>, Amit Cohen <amcohen@nvidia.com>, NBU-mlxsw
-	<NBU-mlxsw@exchange.nvidia.com>
-Subject: RE: [PATCH ethtool-next 08/14] cmis: Enable JSON output support in
- CMIS modules
-Thread-Topic: [PATCH ethtool-next 08/14] cmis: Enable JSON output support in
- CMIS modules
-Thread-Index:
- AQHbb+l4mmigAbpb8kyWjZyRHuAtqrMrD+QAgAEebmCAAJRtgIAAlESAgAEyngCAALvScIAAQaCAgARP8PCAAJ3sgIAAv2+Q
-Date: Mon, 3 Feb 2025 09:58:27 +0000
-Message-ID:
- <DM6PR12MB45166DC5A99EC820E02FDF08D8F52@DM6PR12MB4516.namprd12.prod.outlook.com>
-References: <20250126115635.801935-1-danieller@nvidia.com>
- <20250126115635.801935-9-danieller@nvidia.com>
- <20250127121258.63f79e53@kernel.org>
- <DM6PR12MB45169E557CE078AB5C7CB116D8EF2@DM6PR12MB4516.namprd12.prod.outlook.com>
- <20250128140923.144412cf@kernel.org>
- <DM6PR12MB4516FF124D760E1D3A826161D8EE2@DM6PR12MB4516.namprd12.prod.outlook.com>
- <20250129171728.1ad90a87@kernel.org>
- <DM6PR12MB451613256BB4FB8227F3D971D8E92@DM6PR12MB4516.namprd12.prod.outlook.com>
- <20250130082435.0a3a7922@kernel.org>
- <DM6PR12MB4516414BC58997DB247287CAD8EA2@DM6PR12MB4516.namprd12.prod.outlook.com>
- <bb6268d7-d467-40a8-8980-c707a20d6a45@lunn.ch>
-In-Reply-To: <bb6268d7-d467-40a8-8980-c707a20d6a45@lunn.ch>
-Accept-Language: he-IL, en-US
-Content-Language: en-US
-X-MS-Has-Attach:
-X-MS-TNEF-Correlator:
-authentication-results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=nvidia.com;
-x-ms-publictraffictype: Email
-x-ms-traffictypediagnostic: DM6PR12MB4516:EE_|DS7PR12MB9527:EE_
-x-ms-office365-filtering-correlation-id: d289ac56-6a9e-4839-7d17-08dd44394e81
-x-ms-exchange-senderadcheck: 1
-x-ms-exchange-antispam-relay: 0
-x-microsoft-antispam: BCL:0;ARA:13230040|366016|1800799024|376014|38070700018;
-x-microsoft-antispam-message-info:
- =?utf-8?B?aFZhU1FqNE5rU2NoS0oyYmp5K1dmVjRteDRSV1N5VUQvWHNvcHBKWm8zRlFX?=
- =?utf-8?B?bGx4VUQrUmRUM1VDRHE3ZDVBcjI5SFQvVVUrbDE3MWx1Ym40V20za1hTZldB?=
- =?utf-8?B?V0toNitVVE1HYk92eTVGR0hEdGtDMzdxSWtLVnpxbkFGTEtGMi9EOTlUeGpo?=
- =?utf-8?B?R21JemtsekI5emM2Mk1VSlN0MXg5em9iMzJzeW1KSTJJNzlWZHM4MUNzajRF?=
- =?utf-8?B?MHU5RElLa3NtN3RjbzN4bVdtb1d4dTE2bCtVTDhNL1BCWWpyWUpPakE3RmZN?=
- =?utf-8?B?LzJWY0xGbXJtdURXb01SODV2S09uYmZRMXo0MjRiM0ZpNVJRUGczSU1uOFBB?=
- =?utf-8?B?b01VYmJRTnBqRUxzNWdzd2U3QTVobWdlTExsdW5URDVxZVgyaWRvMURDT1FO?=
- =?utf-8?B?bFdVazFEbzNtZWRBclpuZ0c5QmpROXdjV1BKbTNoaWdWWjF3R1ZLMTA4VzRK?=
- =?utf-8?B?dE5BdTQvY2FrdjhEekZvTGtZclgvWGNYZFhwN3NzZEVYeUlibklMUG44enVq?=
- =?utf-8?B?czZXN1g3cmhWaUU0cUdUN05wY3UrTnR6RVMxeVM2QnRjY21kNWZub2EybXEx?=
- =?utf-8?B?SWorZkJ3ZzhrTHlNSGZqekc2WWJlbHFndDY3NTZMaTl4cnVEcVdhY0piZXFL?=
- =?utf-8?B?MzJhN0ltS3Rxd1FYSkFqMFl6L01jcVBnVUtLQlN6TXRHamNGSEg1RXVSaTFR?=
- =?utf-8?B?bjFJMTRLZkFWeW9neUlxT0crUHN0N3l6dGNLU1U4WC9ESHNVOFMrWkxTS2pS?=
- =?utf-8?B?cHNTbDI1cy9ubnR2SGNpT051SXRZam1kb0NSU2EvVjJ4TUZFME9hdXdpbEh5?=
- =?utf-8?B?MzdRU21yL24vWTQyVkdsOE9kT0VRWjhtRmM5RURjY0duM2VyaFl5alpSUitB?=
- =?utf-8?B?Q0tsMGRKRjY5SmFPZ0tqdDM1dDFLUmxlMTF4SU5qMjZ0Si9HSG54dnVPSmkr?=
- =?utf-8?B?bjUwdFcrVUpQTW9OZVg3WTNhNXU4c09yTFhHOUk1Nlk2ckV4MFJjekh5WDcy?=
- =?utf-8?B?aHQzMXBoN1NHUU8zWWhGTFVXRHg0aCs5UHF0ODNLQVZId3g3UURmZXpiSnI2?=
- =?utf-8?B?blVWdXZ2K3pyZSttbGQyeXJTdXl0SmZZUkpqN0o5c2pFdENDWlZPOWxIUFg1?=
- =?utf-8?B?MzA5NUYzY2xwWFdFUVRYTDN1L2hxR29BWlRPOWwzSEpMNGF3QVJ1T0JoVDBC?=
- =?utf-8?B?RW1aaXJXem92QWJIcmRnWlpPSHdXL0pGYlNFMi93Ynl5U1YzWk1IdWxkZjlY?=
- =?utf-8?B?L0xaaG1uaFROMVczcjZrM2lQOVh2cS9yelNJZTNJUzhETWptKzJMUTNMTmVO?=
- =?utf-8?B?RU9rNkI0Ny9GZmUycTV4azhpSXU2bEVRSU1LV3FmTkd6MlhTTnllYWlGYWdM?=
- =?utf-8?B?WXpSc3dmKys3TzJzTHJFeEVZc1NvT3R4TitsV2tROE9FOXVyMXcvQk81T0Vw?=
- =?utf-8?B?Um84dzRsUksrMmJZeVRrQVdUb2tSMzZ5NmFkWFBFWkdCdFVPeEJVOXpEd1ZH?=
- =?utf-8?B?SnphY01MRnZtYUtkY21PZnlxSnFBalRxQ0dIWUU3bFczK2M2R055OUZaalVy?=
- =?utf-8?B?OXBNNFhXV21OOUU0V3AxUnM2Y0N4N3lUam9Sak80NWFMd0ZnSVJCbmlpTVE5?=
- =?utf-8?B?U1hEbVN5dW9Beml1K094enpERWE2bWFmOGhJbWV3a1dYWnVxS2dOWHhISTNa?=
- =?utf-8?B?cGhoZ3NwVk13cUF6eWdLNzRLVlNuMkFsWHdFT0dEb21LTVc3OWUwWnpaNjZM?=
- =?utf-8?B?MmhQSjlhZW5kdmRXWnIvRGIzSnZaTmFtMmtTM3dFNEZrT1BSU1JXU0tzajF4?=
- =?utf-8?B?YTcrMVBNVHV3RFJZb05TNFp6OUpGb3BQWENkanBNcVpodUhoUDF0UXFPU0gz?=
- =?utf-8?B?UEF4S3c2Y3ppNHFmV3JSN1diU3FYcDdlR2gyZnM4NTlLbkJ2RXJZUk5GV1ZF?=
- =?utf-8?Q?+iphGWdzdPhRF2KVZlKmjNB6w9VZY0pL?=
-x-forefront-antispam-report:
- CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DM6PR12MB4516.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(366016)(1800799024)(376014)(38070700018);DIR:OUT;SFP:1101;
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0:
- =?utf-8?B?dnN1UndmUTcxL3FpcGNQMWo5NDEyQWJOQjRrMHdZaU8yaHBpem0yQWpYbCts?=
- =?utf-8?B?cUtMYnN3WlJyakgyalZhZ0xCenNOVlp2NC9wQWkrcUhDWWcvMzNTRXZya29H?=
- =?utf-8?B?VWE4ci9haFlTVGVsTDlQdjA0UURsY0NzSzBKaThBYWU1bEExaEU5M2ZvOW9J?=
- =?utf-8?B?UnJBT09RSmZ6L20yTnEzTlZOZGlmajF6M1ZIUGtDYjMzSHhDZ21FSjQwTXcw?=
- =?utf-8?B?b0NQOXB3M1hPSDVBUDQxVDR3SXNFM2d5WG5rMkRZZmppMlVsdlREbEROODcx?=
- =?utf-8?B?T0p3UXVpSkQ4MzFXOWVzMm1VUkNLcGNqREtoTFZsN1Z2cVMxaFZnWUk5R00z?=
- =?utf-8?B?cGdGSTlsSjZQRVZ1d3ByYTJTaGwwYmlTdlMvb2daUXRxTzA1UlRZQlBMRVhy?=
- =?utf-8?B?R0cyNzh6a1RVVlZNc3pLang1ZkZPVjE4b09CclZwdUF2VkMwVXNxQjk1SHRM?=
- =?utf-8?B?VitYci9CalJhaVZINHZpZnNuR3dqcWpLek9LLzcrSHpxUzRzUit6VzJrSmpE?=
- =?utf-8?B?SmJlTTVkc0l5b1ZBMjc1UFVXcFNoR1ZMRkNvRERnMm0waEwybU1CNWF2QnRo?=
- =?utf-8?B?bFpLSmU1d2NjL2p1QnhyZ0U4aHR4ZkxBU2NDaUdnNjBEK3I1dFRXZjVoQ0tq?=
- =?utf-8?B?MVF0ZU42S0UrRlk1NXYzQVNqUy91WW1kNGtRcXlXa0xzT0cxOE95amJNVGhI?=
- =?utf-8?B?Q1pqV0FYVnZrU0pKZXdZU1V6UjQreTRwMFRTdk0wdXl5M1VaVVMrR2xLOWtV?=
- =?utf-8?B?bGh2ODI0UDJtVEpLdTdRcTFXaGQxdmFkTE9MZ05YSDVNMm5yc2VFTGI2UStL?=
- =?utf-8?B?bGwvdEh2dEk5SmZJOHRSdGVhWWROSzVYSXRlTDQ4cHUrdnBXcFJuNVNmMGRP?=
- =?utf-8?B?YnZsMEtJeXZlc1MxcVdiZVY2UUhsMHkzeVVYWHR3UkFYUjlFV09MeXc5MEYv?=
- =?utf-8?B?cWI1VEtRL051KzhoSUZobkZxNkptait1NGowMHp0TVI3bzIzWEpzSmYvQzA0?=
- =?utf-8?B?dXVubEI3MWRYQUtTeTlHbEI4LzY4a0ZvZlZrZWwrMW41bVRkUGhDbXBLdVpl?=
- =?utf-8?B?ay9ydVVMQTh0djhyZHlZYlF2aW8xL2xpQThHTGFLaVgrbTUvQUtJYW1MQWVh?=
- =?utf-8?B?UFZYRzRBcGJLLytLODJMSndCSFA4Z2EyZmluSVhLY2c1RGhuMitFV0RjanpJ?=
- =?utf-8?B?RFRvSmd5VUl4YmtNUTV0aE9KejM1WW0vNSs0VFhKcFExSDZFTlN5b0hZbTlW?=
- =?utf-8?B?TVF3V0VGajYvcGp2SFRYaXF0ZUlCdGhCcHFrMUxLaExLdDRCZ2tOZ2pHYVpV?=
- =?utf-8?B?V1Q1QldtanlyU3J3aE01VkMzelllWGhiYTJVRVZCdXdpT2Z0US9ZYWoycURE?=
- =?utf-8?B?MVlUQ09iVWxlVkhMK0dNVndiTDRHZGp3anZNTlFKRjBpcTFNMDJWSjhzOVFz?=
- =?utf-8?B?bENDMlZXU245akd2aXVUY1VTaDhLSFcyL1o3b3ZRQ0dKTjZCUzFCblovNGV1?=
- =?utf-8?B?cTZ6UlZJcVBNQWx6STF5dWNTTVU0RnYwT2EvRmNQWHpxQkZHUFJLdFB0VHp3?=
- =?utf-8?B?L2hCV2E5RU5QK1psS2tkditNNnBPOElDaSttQW1TM1c2WjhGamRicWh5bGky?=
- =?utf-8?B?SSt2ZW01NG9jT0V1d3NJRXg4a1NLTUZlOEttdTZ1VXFCNW1yV2xVb3N0eXlF?=
- =?utf-8?B?WDlNSjRGUkluR1RueFQwM3FaWDhRMStVQTBOMnVaM0d6U1dQUGRqejNTOUVF?=
- =?utf-8?B?VHU5ek5vMzdNWWVVQ0ttWUVMUWFjK05BNDM4ZExuVUFIMFFPOXhMbzNsRFRl?=
- =?utf-8?B?VjZkbjdjVEl2dG5idUY1TzY0Z0hyazMxSXB4L0w1U2MvTU92LzlEYlZ6QXJF?=
- =?utf-8?B?RWV5bjBwY0ZDS2RRcTJUeXR1K2RLcEY2UkQ0VkMrNGxmSHhNMW9YeHBFd3BG?=
- =?utf-8?B?blg2dnJGalBZQy9WVmxocE1PRWlybHpBYko5bjFCc0IvZXhacjdTSW1ML0Zt?=
- =?utf-8?B?UndSODhCdEpFTXdUb3libVoxSEdzVklENUEvQ1ZtdGMyVmlRZzZJZW1pQjZU?=
- =?utf-8?B?bEV4TFBycVgxRXhZMm5OSWhrSmM0L0dwSjhlNmR1YTB1cHVUaDVYWUs2L2k3?=
- =?utf-8?Q?IdSnyECnwNrAAfbttpM8bTMc3?=
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AF106200118
+	for <netdev@vger.kernel.org>; Mon,  3 Feb 2025 09:57:49 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.42
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1738576671; cv=none; b=RK5b+3ABoqkfeLVCrRFoNQRLYYQatu2aCtDhMYjsgGTSYECiHp6p6MJoAgHXPd/y3KN4bAq12DQ0tP6BI3VLVzaQQqJYzBrsCDffSDONVjSapB1Bz9XTvrwRmOSjqNZgG4h+7sQXaVuqIvSBiW+prJ4Ej0V2YsvCac6PhHgTBzc=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1738576671; c=relaxed/simple;
+	bh=3J9JPFbKZAcnsJjiLASnNkOV9pbMine+fJn/Vh57Yd8=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=KwN+ckTS7qsTXRFuyhFcZ3hv4LYeGOtVyqkTWOxFNuuyqgddy54Ein7D63aaG5VcFUxdAt8x2GQC2r4ZfP11mpyLzkr4QsXWuH0fJWj8MfVUdgQ1CCVB8b01rm85mlXFJwddc4hubQk68+QqvZxiJES6H0Vq8jQhtGmoCevCkZQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=openvpn.net; spf=pass smtp.mailfrom=openvpn.com; dkim=pass (2048-bit key) header.d=openvpn.net header.i=@openvpn.net header.b=A1lxCtBy; arc=none smtp.client-ip=209.85.221.42
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=openvpn.net
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=openvpn.com
+Received: by mail-wr1-f42.google.com with SMTP id ffacd0b85a97d-388cae9eb9fso2350905f8f.3
+        for <netdev@vger.kernel.org>; Mon, 03 Feb 2025 01:57:49 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=openvpn.net; s=google; t=1738576668; x=1739181468; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:organization:autocrypt:from
+         :content-language:references:cc:to:subject:user-agent:mime-version
+         :date:message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=xCekcWD5QVOQ/qX+k0IgYcb8XegbhQ9qzP12xPRWLzE=;
+        b=A1lxCtBy4/ORz+JHL50X2VuWFnrsiyKdMRGHd/Xk2AtNTBDcQOpeJr1wZt2oKK4yQ2
+         qMM8hjrWq9isV7Cv9rgP4hPBdWBLG3WxztLyUx4+WwqyxmBWwdpM2mUlEDwnOr18c+OR
+         5iXKwKe6k0u9cXQ6WVlL1ZqZLbZxeTeR1sr8nFlssqbb0j/BG57NcEKs9s2xCsnUV+yF
+         StLw5vgS8wO/QFRzL8L2pAEnnEnkGd5VQ8VhbclWHTkMeZEbn0xm+vnR66vVK1rmdawA
+         jb9JffTM1lFBPnwAeLYEy5JvOvQuVQaWPTWmQ9qsNZ0O0NW6UlirLK55OzeiK9V3mkqu
+         S0ZQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1738576668; x=1739181468;
+        h=content-transfer-encoding:in-reply-to:organization:autocrypt:from
+         :content-language:references:cc:to:subject:user-agent:mime-version
+         :date:message-id:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=xCekcWD5QVOQ/qX+k0IgYcb8XegbhQ9qzP12xPRWLzE=;
+        b=U2Ac6l5SomdfxHmWSeu1wRZlfl3rjDuif5jzJap5ZL+XnV3KBMaifo0nfr/WyxUwke
+         yFzqdCi54G4HEPqTVb+ioYKRPryJ9DNmv/pZv0fAi8ZgmE6nAAaGBJJlYCL/f0Li9B2a
+         EmEuYuhiwOdusqmhe3qfwInMJ3q6uNAPfvgzWlTmJNuy14wME50oMTUeaF4s4I2qE/Tm
+         T/Ac43wCMu0BKSSCJf1fkDc8+rM2AcWcudRsBJo12Q4/TRBimweznOCGVMnDo8f+Q2QD
+         MU8YQVHeqSOyly5Mn9gDeMuJu5TLF9TzogHBaO4sbum0PB0UyL6D7AHSd0bKPwaDIkK7
+         3zqw==
+X-Gm-Message-State: AOJu0YykhQUDtZ0W/ZwIvUfNvvYhY3eiWp9NErtejvpoCP75lRA94QtQ
+	yk5evukD9uCWCtE8vUODsQcxCAyQuTYqDypUO9UBp+vHSmfJMApgRFaNgXMPBnE=
+X-Gm-Gg: ASbGnctYiF1wS2yCeciUPRc1r4+QDCm9oSEgBgJmcN1wAVJjCtIsxzrmFxrS9V9Qfha
+	LHY3LuWNlAGweR5zb97/EkJkjJ9OMv8J3cGmsSWCbs1nnCut3M0ouwEiZTMmsYyAzpV6bWwI9lq
+	d3ZzPGCssyj+ViAnos3qRBPC1ogFpsKg1QYKGZ/v5shXn+Acd+NZbY4hKIzttpAXvhbd6J1+zp3
+	nAZOlp5z0E37gq/jk6PMnJHtpvbE8jw3jlRt8TKN8cn3HB0iWbk5n4vLxcravmmESwzJKv0dRnm
+	gL2JQ8jvE09zKEeaj2Be7ZkkUy3ydWWesPfu767XaesfHfiWDwkk8w==
+X-Google-Smtp-Source: AGHT+IGOhzqTSZM1gbvEpAzQbJ5R33devHozuArV3fQ0GpQu7T3Tj7/+HxdAYzOpsyGWp2I3dm+7mA==
+X-Received: by 2002:a5d:6c63:0:b0:38b:ef2b:422 with SMTP id ffacd0b85a97d-38c52096052mr16730087f8f.36.1738576668015;
+        Mon, 03 Feb 2025 01:57:48 -0800 (PST)
+Received: from ?IPV6:2001:67c:2fbc:1:b4fe:e6fa:32a0:6a72? ([2001:67c:2fbc:1:b4fe:e6fa:32a0:6a72])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-38c5c1cf364sm12135348f8f.88.2025.02.03.01.57.46
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 03 Feb 2025 01:57:47 -0800 (PST)
+Message-ID: <2c22945a-1906-43a6-9339-d097242ac5fd@openvpn.net>
+Date: Mon, 3 Feb 2025 10:58:55 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: DM6PR12MB4516.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: d289ac56-6a9e-4839-7d17-08dd44394e81
-X-MS-Exchange-CrossTenant-originalarrivaltime: 03 Feb 2025 09:58:27.7182
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: P1eqMzPQU+T6kzyBg3e5i54qa0I0sofJ6yhWAO3B/+5Grw2U2rCh/zTBtropnruR7t8RqAaDeUr1r+yiOD+gZQ==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DS7PR12MB9527
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next v18 08/25] ovpn: implement basic RX path (UDP)
+To: Sabrina Dubroca <sd@queasysnail.net>
+Cc: netdev@vger.kernel.org, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ Donald Hunter <donald.hunter@gmail.com>, Shuah Khan <shuah@kernel.org>,
+ ryazanov.s.a@gmail.com, Andrew Lunn <andrew+netdev@lunn.ch>,
+ Simon Horman <horms@kernel.org>, linux-kernel@vger.kernel.org,
+ linux-kselftest@vger.kernel.org, Xiao Liang <shaw.leon@gmail.com>
+References: <20250113-b4-ovpn-v18-0-1f00db9c2bd6@openvpn.net>
+ <20250113-b4-ovpn-v18-8-1f00db9c2bd6@openvpn.net> <Z6CMmJyJwZBuV-lC@hog>
+Content-Language: en-US
+From: Antonio Quartulli <antonio@openvpn.net>
+Autocrypt: addr=antonio@openvpn.net; keydata=
+ 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
+Organization: OpenVPN Inc.
+In-Reply-To: <Z6CMmJyJwZBuV-lC@hog>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-PiBGcm9tOiBBbmRyZXcgTHVubiA8YW5kcmV3QGx1bm4uY2g+DQo+IFNlbnQ6IFN1bmRheSwgMiBG
-ZWJydWFyeSAyMDI1IDIxOjQxDQo+IFRvOiBEYW5pZWxsZSBSYXRzb24gPGRhbmllbGxlckBudmlk
-aWEuY29tPg0KPiBDYzogSmFrdWIgS2ljaW5za2kgPGt1YmFAa2VybmVsLm9yZz47IG5ldGRldkB2
-Z2VyLmtlcm5lbC5vcmc7DQo+IG1rdWJlY2VrQHN1c2UuY3o7IG1hdHRAdHJhdmVyc2UuY29tLmF1
-OyBkYW5pZWwuemFoa2FAZ21haWwuY29tOyBBbWl0DQo+IENvaGVuIDxhbWNvaGVuQG52aWRpYS5j
-b20+OyBOQlUtbWx4c3cgPE5CVS0NCj4gbWx4c3dAZXhjaGFuZ2UubnZpZGlhLmNvbT4NCj4gU3Vi
-amVjdDogUmU6IFtQQVRDSCBldGh0b29sLW5leHQgMDgvMTRdIGNtaXM6IEVuYWJsZSBKU09OIG91
-dHB1dCBzdXBwb3J0IGluDQo+IENNSVMgbW9kdWxlcw0KPiANCj4gPiAgICAgICAgICJtb2R1bGVf
-dGVtcGVyYXR1cmUiOiAzNy4zNDc3LA0KPiA+ICAgICAgICAgIm1vZHVsZV92b2x0YWdlIjogMy4z
-NDA2LA0KPiANCj4gRGV2aWNlIHRyZWUgb2Z0ZW4gcHV0cyB0aGUgdW5pdHMgaW4gdGhlIHByb3Bl
-cnR5IG5hbWUuDQo+IG1vZHVsZV90ZW1wZXJhdHVyZV9DLCBtb2R1bGVfdm9sdGFnZV92LA0KPiAN
-Cj4gPiAgICAgICAgICJsYXNlcl9iaWFzX2N1cnJlbnQiOiB7DQo+ID4gICAgICAgICAgICAgImhp
-Z2hfYWxhcm1fdGhyZXNob2xkIjogMTMsDQo+ID4gICAgICAgICAgICAgImxvd19hbGFybV90aHJl
-c2hvbGQiOiAzLA0KPiA+ICAgICAgICAgICAgICJoaWdoX3dhcm5pbmdfdGhyZXNob2xkIjogMTEs
-DQo+ID4gICAgICAgICAgICAgImxvd193YXJuaW5nX3RocmVzaG9sZCI6IDUNCj4gDQo+ICAgICAg
-ICAgICAgICAiaGlnaF9hbGFybV90aHJlc2hvbGRfbUEiOiAxMywNCj4gDQo+IA0KPiA+ICAgICAg
-ICAgfSwNCj4gPiAgICAgICAgICJsYXNlcl9vdXRwdXRfcG93ZXIiOiB7DQo+ID4gICAgICAgICAg
-ICAgImhpZ2hfYWxhcm1fdGhyZXNob2xkIjogMy4xNjIzLA0KPiA+ICAgICAgICAgICAgICJsb3df
-YWxhcm1fdGhyZXNob2xkIjogMC4xLA0KPiA+ICAgICAgICAgICAgICJoaWdoX3dhcm5pbmdfdGhy
-ZXNob2xkIjogMS45OTUzLA0KPiA+ICAgICAgICAgICAgICJsb3dfd2FybmluZ190aHJlc2hvbGQi
-OiAwLjE1ODUNCj4gPiAgICAgICAgIH0sDQo+IA0KPiAgICAgICAgICAgICAgImhpZ2hfYWxhcm1f
-dGhyZXNob2xkX1ciOiAzLjE2MjMsDQo+IA0KPiANCj4gPiAgICAgICAgICJtb2R1bGVfdGVtcGVy
-YXR1cmUiOiB7DQo+ID4gICAgICAgICAgICAgImhpZ2hfYWxhcm1fdGhyZXNob2xkIjogNzUsDQo+
-ID4gICAgICAgICAgICAgImxvd19hbGFybV90aHJlc2hvbGQiOiAtNSwNCj4gPiAgICAgICAgICAg
-ICAiaGlnaF93YXJuaW5nX3RocmVzaG9sZCI6IDcwLA0KPiA+ICAgICAgICAgICAgICJsb3dfd2Fy
-bmluZ190aHJlc2hvbGQiOiAwDQo+ID4gICAgICAgICB9LA0KPiANCj4gICAgICAgICAgICAgICJo
-aWdoX2FsYXJtX3RocmVzaG9sZF9DIjogNzUsDQo+IA0KPiBldGMuIFRoaXMgbWFrZXMgaXQgbW9y
-ZSBzZWxmIGNvbnRhaW5lZC4NCj4gDQo+IAlBbmRyZXcNCg0KSSBzdWdnZXN0ZWQgdG8gaGF2ZSBh
-IHNlcGFyYXRlIGZpZWxkIGZvciB1bml0cyBpbiB0aGUganNvbiBvdXRwdXQuIEl0IG1ha2VzIHNl
-bnNlIHNpbmNlIGl0IGNhbiBiZSBlYXNpbHkgdHJhY2tlZCBieSBhIG1hY2hpbmUgYW5kIGFsc28g
-aXQgaXMgYWxpZ25lZCB3aXRoIHRoZSByZWd1bGFyIG91dHB1dC4NCkpha3ViIG9mZmVyZWQgdG8g
-cmVtb3ZlIHRob3NlIGZpZWxkcyBmcm9tIHRoZSBvdXRwdXQgYXQgYWxsLiBBbmQgdXNlIGEgc2Vw
-YXJhdGUgZmlsZSBmb3IgZG9jdW1lbnRpbmcgdGhvc2UgZmllbGRzLiBJbiB0aGF0IGNhc2Ugd2Ug
-YXJlIHN0aWxsIGFsaWduZWQgd2l0aCByZWd1bGFyIG91dHB1dC4NCkJ1dCBpbiB5b3VyIHN1Z2dl
-c3Rpb24sIHdlIHNob3VsZCB1c2UgYSBkaWZmZXJlbnQgbmFtaW5nIGNvbnZlbnRpb24gaW4gdGhl
-IEpTT04gb3V0cHV0LCB3aGljaCBub3Qgb25seSBjb21wbGljYXRlcyB0aGUgY29kZSBidXQgaXMg
-YWxzbyBjb25mdXNpbmcuDQoNCkkgdGhpbmsgd2Ugc2hvdWxkIHN0aWNrIHRvIHRoZSBmaXJzdCAy
-IG9wdGlvbnMuDQoNClRoYW5rcy4NCiANCg==
+
+
+On 03/02/2025 10:30, Sabrina Dubroca wrote:
+> 2025-01-13, 10:31:27 +0100, Antonio Quartulli wrote:
+>> +/**
+>> + * ovpn_opcode_from_skb - extract OP code from skb at specified offset
+>> + * @skb: the packet to extract the OP code from
+>> + * @offset: the offset in the data buffer where the OP code is located
+>> + *
+>> + * Note: this function assumes that the skb head was pulled enough
+>> + * to access the first byte.
+> 
+> nit:
+>                     "first byte"
+> 
+>> + *
+>> + * Return: the OP code
+>> + */
+>> +static inline u8 ovpn_opcode_from_skb(const struct sk_buff *skb, u16 offset)
+>> +{
+>> +	u32 opcode = be32_to_cpu(*(__be32 *)(skb->data + offset));
+> 
+> vs 4 bytes actually read?
+> 
+> Also for ovpn_key_id_from_skb introduced in another patch. I guess
+> that's a consequence of switching to those FIELD macros.
+
+Your guess is right. I'll fix the comment.
+
+> 
+> 
+>> +/**
+>> + * ovpn_udp_encap_recv - Start processing a received UDP packet.
+>> + * @sk: socket over which the packet was received
+>> + * @skb: the received packet
+>> + *
+>> + * If the first byte of the payload is DATA_V2, the packet is further processed,
+>> + * otherwise it is forwarded to the UDP stack for delivery to user space.
+> 
+> nit: not consistent with the implementation in the case of DATA_V1 packets
+
+Right, I'll extend the comment.
+
+> 
+>> + * Return:
+>> + *  0 if skb was consumed or dropped
+>> + * >0 if skb should be passed up to userspace as UDP (packet not consumed)
+>> + * <0 if skb should be resubmitted as proto -N (packet not consumed)
+>> + */
+>> +static int ovpn_udp_encap_recv(struct sock *sk, struct sk_buff *skb)
+>> +{
+> [...]
+>> +	opcode = ovpn_opcode_from_skb(skb, sizeof(struct udphdr));
+>> +	if (unlikely(opcode != OVPN_DATA_V2)) {
+>> +		/* DATA_V1 is not supported */
+>> +		if (opcode == OVPN_DATA_V1)
+>> +			goto drop;
+> 
+
+Thanks!
+
+
+-- 
+Antonio Quartulli
+OpenVPN Inc.
+
 
