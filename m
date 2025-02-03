@@ -1,206 +1,167 @@
-Return-Path: <netdev+bounces-162033-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-162035-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id F0746A25683
-	for <lists+netdev@lfdr.de>; Mon,  3 Feb 2025 10:58:05 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id B8F3FA25693
+	for <lists+netdev@lfdr.de>; Mon,  3 Feb 2025 11:02:48 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 84AB618891D5
-	for <lists+netdev@lfdr.de>; Mon,  3 Feb 2025 09:58:10 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 84839188315A
+	for <lists+netdev@lfdr.de>; Mon,  3 Feb 2025 10:02:53 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E60BD200B85;
-	Mon,  3 Feb 2025 09:57:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D85A278F49;
+	Mon,  3 Feb 2025 10:02:42 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=openvpn.net header.i=@openvpn.net header.b="A1lxCtBy"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="rE100XoE"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wr1-f42.google.com (mail-wr1-f42.google.com [209.85.221.42])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AF106200118
-	for <netdev@vger.kernel.org>; Mon,  3 Feb 2025 09:57:49 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.42
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A867218651;
+	Mon,  3 Feb 2025 10:02:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1738576671; cv=none; b=RK5b+3ABoqkfeLVCrRFoNQRLYYQatu2aCtDhMYjsgGTSYECiHp6p6MJoAgHXPd/y3KN4bAq12DQ0tP6BI3VLVzaQQqJYzBrsCDffSDONVjSapB1Bz9XTvrwRmOSjqNZgG4h+7sQXaVuqIvSBiW+prJ4Ej0V2YsvCac6PhHgTBzc=
+	t=1738576962; cv=none; b=RnJw18TBgA7S+CpmhnX360KiTizoMtNv334ZNobjGf7sO5TDEeechYM35RqcG4LlFK730kUJmzzXwB3JCsZuSpetG/NO0J8p49cak7wxqWtMussk7rjszpLye2t7Yz0RiyJbYsZoJ7RGRukYQBbvAW6AMdz3Lbu2tGPfpKRAyVY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1738576671; c=relaxed/simple;
-	bh=3J9JPFbKZAcnsJjiLASnNkOV9pbMine+fJn/Vh57Yd8=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=KwN+ckTS7qsTXRFuyhFcZ3hv4LYeGOtVyqkTWOxFNuuyqgddy54Ein7D63aaG5VcFUxdAt8x2GQC2r4ZfP11mpyLzkr4QsXWuH0fJWj8MfVUdgQ1CCVB8b01rm85mlXFJwddc4hubQk68+QqvZxiJES6H0Vq8jQhtGmoCevCkZQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=openvpn.net; spf=pass smtp.mailfrom=openvpn.com; dkim=pass (2048-bit key) header.d=openvpn.net header.i=@openvpn.net header.b=A1lxCtBy; arc=none smtp.client-ip=209.85.221.42
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=openvpn.net
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=openvpn.com
-Received: by mail-wr1-f42.google.com with SMTP id ffacd0b85a97d-388cae9eb9fso2350905f8f.3
-        for <netdev@vger.kernel.org>; Mon, 03 Feb 2025 01:57:49 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=openvpn.net; s=google; t=1738576668; x=1739181468; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:organization:autocrypt:from
-         :content-language:references:cc:to:subject:user-agent:mime-version
-         :date:message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=xCekcWD5QVOQ/qX+k0IgYcb8XegbhQ9qzP12xPRWLzE=;
-        b=A1lxCtBy4/ORz+JHL50X2VuWFnrsiyKdMRGHd/Xk2AtNTBDcQOpeJr1wZt2oKK4yQ2
-         qMM8hjrWq9isV7Cv9rgP4hPBdWBLG3WxztLyUx4+WwqyxmBWwdpM2mUlEDwnOr18c+OR
-         5iXKwKe6k0u9cXQ6WVlL1ZqZLbZxeTeR1sr8nFlssqbb0j/BG57NcEKs9s2xCsnUV+yF
-         StLw5vgS8wO/QFRzL8L2pAEnnEnkGd5VQ8VhbclWHTkMeZEbn0xm+vnR66vVK1rmdawA
-         jb9JffTM1lFBPnwAeLYEy5JvOvQuVQaWPTWmQ9qsNZ0O0NW6UlirLK55OzeiK9V3mkqu
-         S0ZQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1738576668; x=1739181468;
-        h=content-transfer-encoding:in-reply-to:organization:autocrypt:from
-         :content-language:references:cc:to:subject:user-agent:mime-version
-         :date:message-id:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=xCekcWD5QVOQ/qX+k0IgYcb8XegbhQ9qzP12xPRWLzE=;
-        b=U2Ac6l5SomdfxHmWSeu1wRZlfl3rjDuif5jzJap5ZL+XnV3KBMaifo0nfr/WyxUwke
-         yFzqdCi54G4HEPqTVb+ioYKRPryJ9DNmv/pZv0fAi8ZgmE6nAAaGBJJlYCL/f0Li9B2a
-         EmEuYuhiwOdusqmhe3qfwInMJ3q6uNAPfvgzWlTmJNuy14wME50oMTUeaF4s4I2qE/Tm
-         T/Ac43wCMu0BKSSCJf1fkDc8+rM2AcWcudRsBJo12Q4/TRBimweznOCGVMnDo8f+Q2QD
-         MU8YQVHeqSOyly5Mn9gDeMuJu5TLF9TzogHBaO4sbum0PB0UyL6D7AHSd0bKPwaDIkK7
-         3zqw==
-X-Gm-Message-State: AOJu0YykhQUDtZ0W/ZwIvUfNvvYhY3eiWp9NErtejvpoCP75lRA94QtQ
-	yk5evukD9uCWCtE8vUODsQcxCAyQuTYqDypUO9UBp+vHSmfJMApgRFaNgXMPBnE=
-X-Gm-Gg: ASbGnctYiF1wS2yCeciUPRc1r4+QDCm9oSEgBgJmcN1wAVJjCtIsxzrmFxrS9V9Qfha
-	LHY3LuWNlAGweR5zb97/EkJkjJ9OMv8J3cGmsSWCbs1nnCut3M0ouwEiZTMmsYyAzpV6bWwI9lq
-	d3ZzPGCssyj+ViAnos3qRBPC1ogFpsKg1QYKGZ/v5shXn+Acd+NZbY4hKIzttpAXvhbd6J1+zp3
-	nAZOlp5z0E37gq/jk6PMnJHtpvbE8jw3jlRt8TKN8cn3HB0iWbk5n4vLxcravmmESwzJKv0dRnm
-	gL2JQ8jvE09zKEeaj2Be7ZkkUy3ydWWesPfu767XaesfHfiWDwkk8w==
-X-Google-Smtp-Source: AGHT+IGOhzqTSZM1gbvEpAzQbJ5R33devHozuArV3fQ0GpQu7T3Tj7/+HxdAYzOpsyGWp2I3dm+7mA==
-X-Received: by 2002:a5d:6c63:0:b0:38b:ef2b:422 with SMTP id ffacd0b85a97d-38c52096052mr16730087f8f.36.1738576668015;
-        Mon, 03 Feb 2025 01:57:48 -0800 (PST)
-Received: from ?IPV6:2001:67c:2fbc:1:b4fe:e6fa:32a0:6a72? ([2001:67c:2fbc:1:b4fe:e6fa:32a0:6a72])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-38c5c1cf364sm12135348f8f.88.2025.02.03.01.57.46
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 03 Feb 2025 01:57:47 -0800 (PST)
-Message-ID: <2c22945a-1906-43a6-9339-d097242ac5fd@openvpn.net>
-Date: Mon, 3 Feb 2025 10:58:55 +0100
+	s=arc-20240116; t=1738576962; c=relaxed/simple;
+	bh=j64qVmWci3xBNkGE0mS2OOj0BR2pEsdKu6w5rANbRP4=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=u50LuZgY8MsxniNRY42DhxaKEeQwC5YHuM8ka0HBu5OVM9ilt5/y8Przb+9TbSl/ijnK2FnbbyMdp+N76qS/YCU+HTHi0KFzLB7oIWN46Loo5cdXzDT5hS0wI1Mpm6G1kpfw1liaudfoBjsxyrAGDJROpBP09FMIW2zx5bBtPGE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=rE100XoE; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 61A8BC4CED2;
+	Mon,  3 Feb 2025 10:02:39 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1738576961;
+	bh=j64qVmWci3xBNkGE0mS2OOj0BR2pEsdKu6w5rANbRP4=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=rE100XoEQCDq/GAsA/kFJsCV1lURPiPFtj6MKbrKUU5SNDELwgYo3zmqtzFhOmi9Y
+	 xNgN4y0dRzaxjWTc5bvZD1fZYk0nhWkam/HxMmGz6MTsC7r8uJZZUz37pr79OXvAFX
+	 84gFWn4bWVo7iQ2nXiX9FfL9zEYY4Qd6PFTlEWA+ueXhrz7687HjBmAYJM4l+fxoeT
+	 ZVucXR5qfZT0yZmYjCApK3pwM43twtCrKiH/Kqmo6YAV6qSCQhmNtOFgUwImewlCqK
+	 oQN3um9/oF1nhPTSFbbA5DwmuWMzSmZhJV8pHn5MisZNDP9Lv1WyM+GT+ceZ+ksT1N
+	 iNf4litnb2bcA==
+Date: Mon, 3 Feb 2025 10:02:36 +0000
+From: Simon Horman <horms@kernel.org>
+To: Jacob Moroni <mail@jakemoroni.com>
+Cc: Igor Russkikh <irusskikh@marvell.com>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH net] net: atlantic: fix warning during hot unplug
+Message-ID: <20250203100236.GB234677@kernel.org>
+References: <20250202220921.13384-2-mail@jakemoroni.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next v18 08/25] ovpn: implement basic RX path (UDP)
-To: Sabrina Dubroca <sd@queasysnail.net>
-Cc: netdev@vger.kernel.org, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- Donald Hunter <donald.hunter@gmail.com>, Shuah Khan <shuah@kernel.org>,
- ryazanov.s.a@gmail.com, Andrew Lunn <andrew+netdev@lunn.ch>,
- Simon Horman <horms@kernel.org>, linux-kernel@vger.kernel.org,
- linux-kselftest@vger.kernel.org, Xiao Liang <shaw.leon@gmail.com>
-References: <20250113-b4-ovpn-v18-0-1f00db9c2bd6@openvpn.net>
- <20250113-b4-ovpn-v18-8-1f00db9c2bd6@openvpn.net> <Z6CMmJyJwZBuV-lC@hog>
-Content-Language: en-US
-From: Antonio Quartulli <antonio@openvpn.net>
-Autocrypt: addr=antonio@openvpn.net; keydata=
- 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
-Organization: OpenVPN Inc.
-In-Reply-To: <Z6CMmJyJwZBuV-lC@hog>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250202220921.13384-2-mail@jakemoroni.com>
 
-
-
-On 03/02/2025 10:30, Sabrina Dubroca wrote:
-> 2025-01-13, 10:31:27 +0100, Antonio Quartulli wrote:
->> +/**
->> + * ovpn_opcode_from_skb - extract OP code from skb at specified offset
->> + * @skb: the packet to extract the OP code from
->> + * @offset: the offset in the data buffer where the OP code is located
->> + *
->> + * Note: this function assumes that the skb head was pulled enough
->> + * to access the first byte.
+On Sun, Feb 02, 2025 at 05:09:21PM -0500, Jacob Moroni wrote:
+> Firmware deinitialization performs MMIO accesses which are not
+> necessary if the device has already been removed. In some cases,
+> these accesses happen via readx_poll_timeout_atomic which ends up
+> timing out, resulting in a warning at hw_atl2_utils_fw.c:112:
 > 
-> nit:
->                     "first byte"
+> [  104.595913] Call Trace:
+> [  104.595915]  <TASK>
+> [  104.595918]  ? show_regs+0x6c/0x80
+> [  104.595923]  ? __warn+0x8d/0x150
+> [  104.595925]  ? aq_a2_fw_deinit+0xcf/0xe0 [atlantic]
+> [  104.595934]  ? report_bug+0x182/0x1b0
+> [  104.595938]  ? handle_bug+0x6e/0xb0
+> [  104.595940]  ? exc_invalid_op+0x18/0x80
+> [  104.595942]  ? asm_exc_invalid_op+0x1b/0x20
+> [  104.595944]  ? aq_a2_fw_deinit+0xcf/0xe0 [atlantic]
+> [  104.595952]  ? aq_a2_fw_deinit+0xcf/0xe0 [atlantic]
+> [  104.595959]  aq_nic_deinit.part.0+0xbd/0xf0 [atlantic]
+> [  104.595964]  aq_nic_deinit+0x17/0x30 [atlantic]
+> [  104.595970]  aq_ndev_close+0x2b/0x40 [atlantic]
+> [  104.595975]  __dev_close_many+0xad/0x160
+> [  104.595978]  dev_close_many+0x99/0x170
+> [  104.595979]  unregister_netdevice_many_notify+0x18b/0xb20
+> [  104.595981]  ? __call_rcu_common+0xcd/0x700
+> [  104.595984]  unregister_netdevice_queue+0xc6/0x110
+> [  104.595986]  unregister_netdev+0x1c/0x30
+> [  104.595988]  aq_pci_remove+0xb1/0xc0 [atlantic]
 > 
->> + *
->> + * Return: the OP code
->> + */
->> +static inline u8 ovpn_opcode_from_skb(const struct sk_buff *skb, u16 offset)
->> +{
->> +	u32 opcode = be32_to_cpu(*(__be32 *)(skb->data + offset));
+> Fix this by skipping firmware deinitialization altogether if the
+> PCI device is no longer present.
 > 
-> vs 4 bytes actually read?
-> 
-> Also for ovpn_key_id_from_skb introduced in another patch. I guess
-> that's a consequence of switching to those FIELD macros.
-
-Your guess is right. I'll fix the comment.
-
-> 
-> 
->> +/**
->> + * ovpn_udp_encap_recv - Start processing a received UDP packet.
->> + * @sk: socket over which the packet was received
->> + * @skb: the received packet
->> + *
->> + * If the first byte of the payload is DATA_V2, the packet is further processed,
->> + * otherwise it is forwarded to the UDP stack for delivery to user space.
-> 
-> nit: not consistent with the implementation in the case of DATA_V1 packets
-
-Right, I'll extend the comment.
-
-> 
->> + * Return:
->> + *  0 if skb was consumed or dropped
->> + * >0 if skb should be passed up to userspace as UDP (packet not consumed)
->> + * <0 if skb should be resubmitted as proto -N (packet not consumed)
->> + */
->> +static int ovpn_udp_encap_recv(struct sock *sk, struct sk_buff *skb)
->> +{
-> [...]
->> +	opcode = ovpn_opcode_from_skb(skb, sizeof(struct udphdr));
->> +	if (unlikely(opcode != OVPN_DATA_V2)) {
->> +		/* DATA_V1 is not supported */
->> +		if (opcode == OVPN_DATA_V1)
->> +			goto drop;
+> Tested with an AQC113 attached via Thunderbolt by performing
+> repeated unplug cycles while traffic was running via iperf.
 > 
 
-Thanks!
+Hi Jacob,
 
+As a fix for net a Fixes tag should go here
+(immediately before your signed-off-by line, no blank line in between).
+
+I'm wondering if this one is appropriate: the problem seems
+to go all the way back to here.
+
+Fixes: 97bde5c4f909 ("net: ethernet: aquantia: Support for NIC-specific code")
+
+> Signed-off-by: Jacob Moroni <mail@jakemoroni.com>
+> ---
+>  drivers/net/ethernet/aquantia/atlantic/aq_nic.c | 15 ++++++++-------
+>  1 file changed, 8 insertions(+), 7 deletions(-)
+> 
+> diff --git a/drivers/net/ethernet/aquantia/atlantic/aq_nic.c b/drivers/net/ethernet/aquantia/atlantic/aq_nic.c
+> index fe0e3e2a8117..e2ae95a01947 100644
+> --- a/drivers/net/ethernet/aquantia/atlantic/aq_nic.c
+> +++ b/drivers/net/ethernet/aquantia/atlantic/aq_nic.c
+> @@ -1428,7 +1428,7 @@ void aq_nic_deinit(struct aq_nic_s *self, bool link_down)
+>  	unsigned int i = 0U;
+>  
+>  	if (!self)
+> -		goto err_exit;
+> +		return;
+>  
+>  	for (i = 0U; i < self->aq_vecs; i++) {
+>  		aq_vec = self->aq_vec[i];
+
+This hunk, and the removal of the err_exit label, seem to be more
+clean-up than addressing the bug described in the patch description.
+I don't think they belong in this patch. But could be candidates for
+a follow-up patch targeted at net-next.
+
+> @@ -1441,13 +1441,14 @@ void aq_nic_deinit(struct aq_nic_s *self, bool link_down)
+>  	aq_ptp_ring_free(self);
+>  	aq_ptp_free(self);
+>  
+> -	if (likely(self->aq_fw_ops->deinit) && link_down) {
+> -		mutex_lock(&self->fwreq_mutex);
+> -		self->aq_fw_ops->deinit(self->aq_hw);
+> -		mutex_unlock(&self->fwreq_mutex);
+> +	/* May be invoked during hot unplug. */
+> +	if (pci_device_is_present(self->pdev)) {
+> +		if (likely(self->aq_fw_ops->deinit) && link_down) {
+
+Maybe not important, but I would have written this as a single if
+condition rather than two.
+
+Also, not really appropriate to change in this patch as it's not part
+of the bug, but I'm not sure that likely() is appropriate here:
+is this a fast path?
+
+> +			mutex_lock(&self->fwreq_mutex);
+> +			self->aq_fw_ops->deinit(self->aq_hw);
+> +			mutex_unlock(&self->fwreq_mutex);
+> +		}
+>  	}
+> -
+> -err_exit:;
+>  }
+>  
+>  void aq_nic_free_vectors(struct aq_nic_s *self)
 
 -- 
-Antonio Quartulli
-OpenVPN Inc.
-
+pw-bot: changes-requested
 
