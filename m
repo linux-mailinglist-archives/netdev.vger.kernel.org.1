@@ -1,181 +1,164 @@
-Return-Path: <netdev+bounces-162707-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-162709-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 47B95A27B38
-	for <lists+netdev@lfdr.de>; Tue,  4 Feb 2025 20:27:52 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 948C2A27B77
+	for <lists+netdev@lfdr.de>; Tue,  4 Feb 2025 20:40:56 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 26E121885FA9
-	for <lists+netdev@lfdr.de>; Tue,  4 Feb 2025 19:27:57 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 1CE3C1617C3
+	for <lists+netdev@lfdr.de>; Tue,  4 Feb 2025 19:40:55 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 85D3A217703;
-	Tue,  4 Feb 2025 19:27:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1DDFF218ABD;
+	Tue,  4 Feb 2025 19:40:42 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=fastly.com header.i=@fastly.com header.b="YT6TKoqJ"
+	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="PwrUb4y3"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f175.google.com (mail-pl1-f175.google.com [209.85.214.175])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DC39E217647
-	for <netdev@vger.kernel.org>; Tue,  4 Feb 2025 19:27:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.175
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7E7BB2163BA;
+	Tue,  4 Feb 2025 19:40:40 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.156.1
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1738697266; cv=none; b=tOhEOJloXSkTkTrlT6xG2x2xqrU7yoyT3JBRC3s5055Os4AtZMnrRfp/koiSDyE+GSXVR/YuZfL+BvjZEBuUC6ao7D7VHWeSYExL5Q/mHdMRKbQYtRozAWrEy9TrNDHBYvGTBf8Bvn4Rcdt1S88UI/JdIVUhZT6vz4Hfhqd9UkA=
+	t=1738698042; cv=none; b=pZ5Pz8sCM5okbRlSNDyos6Z4OoinrT5jxRfaBQrzhqxRf0GLUNLySapUzXXyCdxqvvPxArvSHIeVS1aV80PrAw1KIkmt2r648xI+sjpvm1pw00tPgCZ5E28i6iMDXnlRK0aDAi7cU6SYIS4HqeEw9SY1TX5wYuyafsihFocXWKg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1738697266; c=relaxed/simple;
-	bh=CvYBgsQQ2sB2qTH/ispwYnc1GT/UJnN//HUW4OU8uMM=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=WcjLTesvOzWSbQ7mCJDTlWj4w6JKJZjA5ru/Fi9YSTngdcEBg2kkxShhGAR6lIR9IDqWoFBTm91xH94EtaIXQJFZ2Q543lBWuSny9T/RQMTtsYQ8Y9F5aaP27cxvgyp9AWupxuXVkFwnkeg75jOezmAk1npyZHWEnQCo/ThqdzE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fastly.com; spf=pass smtp.mailfrom=fastly.com; dkim=pass (1024-bit key) header.d=fastly.com header.i=@fastly.com header.b=YT6TKoqJ; arc=none smtp.client-ip=209.85.214.175
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fastly.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=fastly.com
-Received: by mail-pl1-f175.google.com with SMTP id d9443c01a7336-219f8263ae0so113002645ad.0
-        for <netdev@vger.kernel.org>; Tue, 04 Feb 2025 11:27:44 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=fastly.com; s=google; t=1738697264; x=1739302064; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=8iOEoCrXIGW4Q927eer0s+nYHhVWh5aiFKVXEGf2lEo=;
-        b=YT6TKoqJ7WsNaU+ANvUyl/P7tTsIpeZaq9xNB6t7fFXo8U4f/ivhuojjWKtYtUZTkY
-         9SUfuxys4+rnRJ9KFDTJBsIWkjCZ1vdpJPGJ8RC2TPjIBNZ5zmluauJHRELBK4ePGuOl
-         kvuoU1APaQ2N+lGzVexTIPtQeL966q2z29lys=
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1738697264; x=1739302064;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=8iOEoCrXIGW4Q927eer0s+nYHhVWh5aiFKVXEGf2lEo=;
-        b=pVjKyawP5/iKLxKwcz8YWT2aPcTRR15nru2rck5o6nSJDDkqU6HNwKQWj+3PENWqir
-         Ns24BGFs+KYwYqa3dUvEExKeuFi01/KjJGLCCdnKQ1LqeQMk6MYFSInx3dv+6OvBr0Y3
-         JVP3hueWz7miNL91RpLBD+siNHwhVH4EF34Mb3Y23Sf1RKptkxB6IulKti8ln4Auy4TV
-         qJT/xY2DNFyqufULX8O+GeYL3EIA+Y6W8KM+XYw2TglavwlNWyMZXqMVoon+uRqEekwr
-         dbmpjg89OKW8Zbt2wZVkkReu8aRIW/4SZWQUSYYDtBIvgCvSZgx4eiiW6Aq8wJhYdg8+
-         2DRA==
-X-Gm-Message-State: AOJu0YyKy78swAmnsnp2D+Ek8zjJGzCY2PygNF83f6yH5ACWc1FPeniK
-	uU17Xtx61JeRrqu0UUffl6Ec+2edV7P5IoxGVWeudYd1ySjRaTD3uasY+hKK9EPKpeMJjbNyRQI
-	01MojshuzfUG9lIUsHWt0B5ONQsAdm9ivH/Cgdv14UCoTuBb57LwfBbVFq616dV2KuzSlSsqmPh
-	+0hMhXncW2rVbGNl5i6+Bk5T2A8S3PZJmwAhs=
-X-Gm-Gg: ASbGnctxIqBd1Vf+ZZYqobpM1lekdDOGAh6YLDGhPrbE6ypD2c2H5/X/1UlQ6h82Y2H
-	FKk2hsoAUjTLbhegR9Uh3FR/UH0hFlT/VJoJEDhXwTk4Xeq0/lH09JwEFyvJFq69WcQbT+w+NkJ
-	QvHVItw2uKdbE2aE8ezkx4g8t4CXDeY+5NxJ5ugDyftjSBuVyWT4RNJQaLLyVdTRHUzlkk8+B0q
-	ZLACnH/I+23vyskxDSLLRK/A52OfN70rkahuo79/S5CWmDkcSVsIwoRiMpiwvutfLqlZNs9amRB
-	onmcBwVRGX88meauXVcLJSM=
-X-Google-Smtp-Source: AGHT+IE+7dWcfNLhQTOMhd0Vsf5ukouIeilZjFgIDC26Ks2ade1xUAcue6WYJyYElM16Cq1HmnYHfA==
-X-Received: by 2002:a17:903:2406:b0:215:8dd3:536a with SMTP id d9443c01a7336-21f17e2a49fmr393235ad.4.1738697263622;
-        Tue, 04 Feb 2025 11:27:43 -0800 (PST)
-Received: from localhost.localdomain ([2620:11a:c019:0:65e:3115:2f58:c5fd])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-21de331ddfdsm99261345ad.210.2025.02.04.11.27.42
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 04 Feb 2025 11:27:43 -0800 (PST)
-From: Joe Damato <jdamato@fastly.com>
-To: netdev@vger.kernel.org
-Cc: pabeni@redhat.com,
-	edumazet@google.com,
-	sridhar.samudrala@intel.com,
-	Joe Damato <jdamato@fastly.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Simon Horman <horms@kernel.org>,
-	Stanislav Fomichev <sdf@fomichev.me>,
-	Mina Almasry <almasrymina@google.com>,
-	linux-kernel@vger.kernel.org (open list)
-Subject: [PATCH net-next v3] netdev-genl: Elide napi_id when not present
-Date: Tue,  4 Feb 2025 19:27:21 +0000
-Message-ID: <20250204192724.199209-1-jdamato@fastly.com>
-X-Mailer: git-send-email 2.43.0
+	s=arc-20240116; t=1738698042; c=relaxed/simple;
+	bh=935j198xxMOYZli3ZMj/non5C9e9cHIycLV8pKfOP8Q=;
+	h=Message-ID:Date:MIME-Version:Subject:To:References:From:
+	 In-Reply-To:Content-Type; b=VOzzCh1NIECVCtti1Zz/tmKBWi9eVPEiYMn7kGoVYt1nwKjbJF38T+s+zmv4VnVIyjaq35GcM+QRscZJTJAPXYlUoK2V30J40brKjYdROlcDH8mTXQ9mLdjYHoUxZFncVVZp54TEOyxK1sR1qMMW7SptQ+gllPXKWQz2//FXd+Q=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=PwrUb4y3; arc=none smtp.client-ip=148.163.156.1
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
+Received: from pps.filterd (m0360083.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 514GEoDk029325;
+	Tue, 4 Feb 2025 19:40:08 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=
+	content-transfer-encoding:content-type:date:from:in-reply-to
+	:message-id:mime-version:references:subject:to; s=pp1; bh=L0+ep8
+	JKH1qnWrvTGJ8l/LlGnrRt9fPRrJ/gx5Vk9ZE=; b=PwrUb4y3MmwnbtPg+ZzKUr
+	+/8JqqtwjhhBk3mEKl0dmG8JHNmk3j4mjOgFhiCoGSqB0BSDM4zUnZoxqSPOcPiw
+	8nlNFh+GDjKEKMBusvQZrDCYKzDHGh2Ylq2nC6ymV35pBYeDbCsjYmjNnsF6MELa
+	2hmKFbN9QHOBSsfmbC5S6edM+YStnJyPAvtle8tg9x2Eq1P3mRTZx3rjaoVi1lb0
+	gvIjQwtdwjSOSLRTP/su3jjdBeRFZspIag88OXEd4a+4vXh29uKJPoVZn8vUkDu2
+	O6e9xEbDnatuWQ6ZACzjkrw6DWqrk//B9eIKZGooug3jErrfn754cG7JZ7uIOusQ
+	==
+Received: from pps.reinject (localhost [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 44k8y9n2fk-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Tue, 04 Feb 2025 19:40:07 +0000 (GMT)
+Received: from m0360083.ppops.net (m0360083.ppops.net [127.0.0.1])
+	by pps.reinject (8.18.0.8/8.18.0.8) with ESMTP id 514JRPbB010902;
+	Tue, 4 Feb 2025 19:40:07 GMT
+Received: from ppma21.wdc07v.mail.ibm.com (5b.69.3da9.ip4.static.sl-reverse.com [169.61.105.91])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 44k8y9n2ff-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Tue, 04 Feb 2025 19:40:07 +0000 (GMT)
+Received: from pps.filterd (ppma21.wdc07v.mail.ibm.com [127.0.0.1])
+	by ppma21.wdc07v.mail.ibm.com (8.18.1.2/8.18.1.2) with ESMTP id 514JXoDo024540;
+	Tue, 4 Feb 2025 19:40:05 GMT
+Received: from smtprelay06.dal12v.mail.ibm.com ([172.16.1.8])
+	by ppma21.wdc07v.mail.ibm.com (PPS) with ESMTPS id 44hxxn55q4-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Tue, 04 Feb 2025 19:40:05 +0000
+Received: from smtpav03.wdc07v.mail.ibm.com (smtpav03.wdc07v.mail.ibm.com [10.39.53.230])
+	by smtprelay06.dal12v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 514Je4OI26739230
+	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Tue, 4 Feb 2025 19:40:05 GMT
+Received: from smtpav03.wdc07v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id D765F58054;
+	Tue,  4 Feb 2025 19:40:04 +0000 (GMT)
+Received: from smtpav03.wdc07v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 95E905805F;
+	Tue,  4 Feb 2025 19:40:02 +0000 (GMT)
+Received: from [9.67.69.251] (unknown [9.67.69.251])
+	by smtpav03.wdc07v.mail.ibm.com (Postfix) with ESMTP;
+	Tue,  4 Feb 2025 19:40:02 +0000 (GMT)
+Message-ID: <66e2e5e4-5ce5-442c-ba0f-d12cbe79e868@linux.ibm.com>
+Date: Tue, 4 Feb 2025 13:40:01 -0600
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v7 0/9] DTS updates for system1 BMC
+To: Andrew Jeffery <andrew@codeconstruct.com.au>, brgl@bgdev.pl,
+        linus.walleij@linaro.org, minyard@acm.org, robh@kernel.org,
+        krzk+dt@kernel.org, conor+dt@kernel.org, andrew+netdev@lunn.ch,
+        davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+        pabeni@redhat.com, openipmi-developer@lists.sourceforge.net,
+        netdev@vger.kernel.org, joel@jms.id.au, devicetree@vger.kernel.org,
+        eajames@linux.ibm.com, linux-arm-kernel@lists.infradead.org,
+        linux-aspeed@lists.ozlabs.org, linux-kernel@vger.kernel.org
+References: <20250203144422.269948-1-ninad@linux.ibm.com>
+ <79b819b6d06e3be0aa7e7f6872353f103294710c.camel@codeconstruct.com.au>
+Content-Language: en-US
+From: Ninad Palsule <ninad@linux.ibm.com>
+In-Reply-To: <79b819b6d06e3be0aa7e7f6872353f103294710c.camel@codeconstruct.com.au>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-GUID: BhN8vCZp0wt20C1zuEMO0Dx_nRHE2XX9
+X-Proofpoint-ORIG-GUID: WZwPJdOGC93lfCtccZ-FJMqUiy-K5W1k
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1057,Hydra:6.0.680,FMLib:17.12.68.34
+ definitions=2025-02-04_09,2025-02-04_01,2024-11-22_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 malwarescore=0 bulkscore=0
+ mlxlogscore=965 suspectscore=0 lowpriorityscore=0 clxscore=1015
+ spamscore=0 mlxscore=0 adultscore=0 impostorscore=0 phishscore=0
+ priorityscore=1501 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.19.0-2501170000 definitions=main-2502040145
 
-There are at least two cases where napi_id may not present and the
-napi_id should be elided:
+Hi Andrew,
 
-1. Queues could be created, but napi_enable may not have been called
-   yet. In this case, there may be a NAPI but it may not have an ID and
-   output of a napi_id should be elided.
+Thank you for the review.
 
-2. TX-only NAPIs currently do not have NAPI IDs. If a TX queue happens
-   to be linked with a TX-only NAPI, elide the NAPI ID from the netlink
-   output as a NAPI ID of 0 is not useful for users.
+>>
+>> NINAD PALSULE (6):
+> 
+> Why is your name all in caps here but not for the binding patches
+> below? Can you fix that up?
 
-Signed-off-by: Joe Damato <jdamato@fastly.com>
----
- v3:
-  - Took Eric's suggested patch to refactor the code to use helpers,
-    which improves the code quality significantly.
+Fixed in the version 9
 
- v2: https://lore.kernel.org/netdev/20250203191714.155526-1-jdamato@fastly.com/
-   - Updated to elide NAPI IDs for RX queues which may have not called
-     napi_enable yet.
 
- rfc: https://lore.kernel.org/lkml/20250128163038.429864-1-jdamato@fastly.com/
+>> Ninad Palsule (3):
+>>    bindings: ipmi: Add binding for IPMB device intf
+> 
+> This one needs an ack from Corey if I'm to take it.
+> 
+>>    dt-bindings: gpio: ast2400-gpio: Add hogs parsing
+> 
+> This one needs an ack from Linus W or Bartosz if I'm to take it.
+> However, it's also causing some grief from Rob's bot:
+> 
+> https://lore.kernel.org/all/173859694889.2601726.10618336219726193824.robh@kernel.org/
+> 
+> As the reported nodes should all be hogs the name shouldn't matter
+> anywhere else (as far as I'm aware). It would be nice if all the
+> warnings were cleaned up before we merged the binding update. That way
+> we don't cause everyone else looking at the CHECK_DTBS=y output more
+> grief than they already get for the Aspeed devicetrees.
+> 
+> In order to not get bogged down it might be worth splitting out both
+> the IPMB- and GPIO- related patches like you did the FTGMAC100 patch,
+> and then I can merge what remains (from a quick look they seem
+> relatively uncontroversial).
+> 
 
- include/net/busy_poll.h |  5 +++++
- net/core/netdev-genl.c  | 13 +++++++++----
- 2 files changed, 14 insertions(+), 4 deletions(-)
+The warnings are fixed by different patch by Krzysztof. As there are no 
+more changes then I will wait for other responses. If I don't get those 
+response in couple of days then I will split it.
+https://lore.kernel.org/linux-kernel/20250116085947.87241-1-krzysztof.kozlowski@linaro.org/
 
-diff --git a/include/net/busy_poll.h b/include/net/busy_poll.h
-index c39a426ebf52..741fa7754700 100644
---- a/include/net/busy_poll.h
-+++ b/include/net/busy_poll.h
-@@ -24,6 +24,11 @@
-  */
- #define MIN_NAPI_ID ((unsigned int)(NR_CPUS + 1))
- 
-+static inline bool napi_id_valid(unsigned int napi_id)
-+{
-+	return napi_id >= MIN_NAPI_ID;
-+}
-+
- #define BUSY_POLL_BUDGET 8
- 
- #ifdef CONFIG_NET_RX_BUSY_POLL
-diff --git a/net/core/netdev-genl.c b/net/core/netdev-genl.c
-index 715f85c6b62e..5aa3ed870b2c 100644
---- a/net/core/netdev-genl.c
-+++ b/net/core/netdev-genl.c
-@@ -364,6 +364,13 @@ int netdev_nl_napi_set_doit(struct sk_buff *skb, struct genl_info *info)
- 	return err;
- }
- 
-+static int nla_put_napi_id(struct sk_buff *skb, const struct napi_struct *napi)
-+{
-+	if (napi && napi_id_valid(napi->napi_id))
-+		return nla_put_u32(skb, NETDEV_A_QUEUE_NAPI_ID, napi->napi_id);
-+	return 0;
-+}
-+
- static int
- netdev_nl_queue_fill_one(struct sk_buff *rsp, struct net_device *netdev,
- 			 u32 q_idx, u32 q_type, const struct genl_info *info)
-@@ -385,8 +392,7 @@ netdev_nl_queue_fill_one(struct sk_buff *rsp, struct net_device *netdev,
- 	switch (q_type) {
- 	case NETDEV_QUEUE_TYPE_RX:
- 		rxq = __netif_get_rx_queue(netdev, q_idx);
--		if (rxq->napi && nla_put_u32(rsp, NETDEV_A_QUEUE_NAPI_ID,
--					     rxq->napi->napi_id))
-+		if (nla_put_napi_id(rsp, rxq->napi))
- 			goto nla_put_failure;
- 
- 		binding = rxq->mp_params.mp_priv;
-@@ -397,8 +403,7 @@ netdev_nl_queue_fill_one(struct sk_buff *rsp, struct net_device *netdev,
- 		break;
- 	case NETDEV_QUEUE_TYPE_TX:
- 		txq = netdev_get_tx_queue(netdev, q_idx);
--		if (txq->napi && nla_put_u32(rsp, NETDEV_A_QUEUE_NAPI_ID,
--					     txq->napi->napi_id))
-+		if (nla_put_napi_id(rsp, rxq->napi))
- 			goto nla_put_failure;
- 	}
- 
+I am also planning to fix old warnings in the system1 dts in separate patch.
 
-base-commit: c2933b2befe25309f4c5cfbea0ca80909735fd76
+
 -- 
-2.43.0
+Thanks & Regards,
+Ninad
 
 
