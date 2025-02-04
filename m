@@ -1,133 +1,87 @@
-Return-Path: <netdev+bounces-162615-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-162614-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 92293A2762D
-	for <lists+netdev@lfdr.de>; Tue,  4 Feb 2025 16:39:35 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5FC84A2762B
+	for <lists+netdev@lfdr.de>; Tue,  4 Feb 2025 16:39:27 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C2897161533
-	for <lists+netdev@lfdr.de>; Tue,  4 Feb 2025 15:39:29 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 0D2D97A12EC
+	for <lists+netdev@lfdr.de>; Tue,  4 Feb 2025 15:38:32 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 64EAE21578C;
-	Tue,  4 Feb 2025 15:38:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 283232144BE;
+	Tue,  4 Feb 2025 15:38:02 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="NN5UQJkz"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="QETjqWaX"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-yb1-f174.google.com (mail-yb1-f174.google.com [209.85.219.174])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6EFF9215177
-	for <netdev@vger.kernel.org>; Tue,  4 Feb 2025 15:38:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.174
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 02DCE2144A6
+	for <netdev@vger.kernel.org>; Tue,  4 Feb 2025 15:38:01 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1738683484; cv=none; b=KfTL+6ahSECS92WKlTuGUMUDrCP+yJoc4MG17s5lRW/cI9U1AnsbUzQHi7BXKNIXO0Ws8sb2Z/qteS8tKSWJQMzVkAYKTMTN0YTHdL9bd6Qr62nUF5gOHsC3jVTu+OmKnlNzEHDXu2DSK0GVrm8fM0IPzGKHNTFZEzp5xCFVlu8=
+	t=1738683482; cv=none; b=COVmZJcvLVnRIV6h7CxUmm5TbUPE5nKXF/RVj/nZVuvnD5g8KJ36dFxqICJ3Fh+iEBW0Ct9pA5rdzAkEfAkMk20esa7QHZTgPmr3p9kVqYa0yNaQV4ShA63S4LrG9Tjz9KWDu7ZO9g2nCdBUctc7FxL1AG9ps0k5LjY/maxaHaU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1738683484; c=relaxed/simple;
-	bh=ltZ949oM+lMRV7UBAxtOUIjP4ivNHQ9d0hi0WriRce8=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=Y3OBbViOkSl43eIcw5lbHkikd8Bpn2mYs14zP/7hiH3xZ6QiJkm7R1dxgnYcFxHNP9z3OZFLUKmEdI1ZGPCbrmzYy7ghwVG62wyVig786KX+E8oFHTqo7bPFFKJ5jz/Vyqe5FY+vcoIoyuiAPk3OCgILuLBkl2+pvL22ikUG8t0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=NN5UQJkz; arc=none smtp.client-ip=209.85.219.174
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
-Received: by mail-yb1-f174.google.com with SMTP id 3f1490d57ef6-e549b0f8d57so5420407276.3
-        for <netdev@vger.kernel.org>; Tue, 04 Feb 2025 07:38:02 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1738683481; x=1739288281; darn=vger.kernel.org;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=jVMfm8ZhSAvtr5Dot2F5GueOESbiJOB9RRL5JCbpZyU=;
-        b=NN5UQJkzSiz6IcxyAbcgc8IiV5ZkupT6U310HuXW4brkLUc5nDuzAipx5IP46ct4gd
-         EpyHisjAgdO+AnSGAlHo3RPO4wV1QEVBMkSNP0oxEpCNirBeuLGQ2ydqn5gsJLyNGYpf
-         KinFAh3wjqvzfw+ndKa/L2JOouFYVOzOG6qf099WTnigAqNL1KIvo8y7IZ5l8otHJsST
-         L0wNbuojoah+F5eaDOn3wOkbTF0VluC7NSMO1Ncv9IrkJVkWiyUR/plsL88NnZ01XA/z
-         SYRlRtV9lS5ABP/W6POaMQ2TIJQMGuBeAY04VpokBgral376cUrNsjvBdy9/shF7fsd9
-         KkDw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1738683481; x=1739288281;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=jVMfm8ZhSAvtr5Dot2F5GueOESbiJOB9RRL5JCbpZyU=;
-        b=asjXanyLjTgbGDSBSCDIBDlXRGFx2QuEkzQoATOgN2WqeAaqF0+dSzz3N+rvWtthDG
-         w3bYkF5Kh6FY7L9qpeISlkKPTM1RZM6MmRix0H05L+GC9v5267zZSbU305+0CRnmt4tj
-         gqETbplD3Sq8wi7wc/bwbylGBFizCHw1+9hZN9LWPkxj1KLcuKNWrvn2pP6H7X6eOens
-         uom1pMBXNC+xP8NNaph4H+nHajueM7ITonAcfDYT31cpI3d62VgDVeqUsGBQ8VUUuWU0
-         6+AEiXbY7yuTvPMAFT63iWfcv3RpZA/HIOR46nuqv4T7qewzDDw9RGZPda0sYlrgM8Qn
-         0VYw==
-X-Forwarded-Encrypted: i=1; AJvYcCUk1E158X3nUZSypnblxRIYo2TQg3qVy3QKisQgXDeWMt0JkUGnRA3uUqeHzylNcx7JL6nB/GU=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yxzr7E507fwojA/i/lH3a0/JvHLb/NL7FtXA+RdorZ2dO6/TrNr
-	L196KZXcktbFfv689JW9EBaXp0MeMYB6uXKtnyE0fDCA2llZ4eRUnQ6uqZOs3/SL0OBjRQgowDY
-	jUcndA1sipJkKwOCFLaKBXgNwvL9SXA7mHKwYgA==
-X-Gm-Gg: ASbGncvBtEWQ+K59HdD1loJupDjJQUvrKA5LrOv5XPbn6vJF1jF+ErMpSXk0fsW/Rcc
-	NZT8iPqxRIgXCV3rKAnXM4U4jH6LFo/tyhTAEp883JcPoNqK2957uWMh6H/QdOMu/v6HRTBV4CA
-	==
-X-Google-Smtp-Source: AGHT+IHvgaaPpDS+6zz+NW+qWTxfxKZ5xGI5mBb28CNf8euDfNNskCLrVmo+9LeT8cifH6u3mLCbOQvZ3PdCNlYInak=
-X-Received: by 2002:a05:6902:2409:b0:e5b:22a9:fd44 with SMTP id
- 3f1490d57ef6-e5b22a9fedamr351835276.27.1738683481129; Tue, 04 Feb 2025
- 07:38:01 -0800 (PST)
+	s=arc-20240116; t=1738683482; c=relaxed/simple;
+	bh=ELj0jFYoWwL5sfslYQB0IZBs6s55AOGymmsQ7gzepBY=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=aDvCQ57uNORwxb9RRdXFITEZWioqtqgBDKpwAcDf4muy6zC+MN7Zc5Ntr/u+9G+o6OfrgPijOLAl7DU0iwGVd54sqDKtuk/U/89tZ2Nd6lje4j+Jq8AVyMpKmaOSVt56XnrPpFHmU6/Fbg1is0JFKsrNGzQF1D7bKa+fs7MyBqg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=QETjqWaX; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 15AB6C4CEDF;
+	Tue,  4 Feb 2025 15:38:01 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1738683481;
+	bh=ELj0jFYoWwL5sfslYQB0IZBs6s55AOGymmsQ7gzepBY=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=QETjqWaX/cMI4pEve5BnKc0XDo1iRHW9XuYTZrBRmGYqpnCeSsXPznkaTyHX8ad//
+	 5DEYT4U77w2g0nccpoUvd3YSgQbd0bXmlzING/cGCyb3eSCtROity374/va3FfcOut
+	 4HWKpeYkznAYrDOzOZMKRgETmjt1SqS6VqDLLu8Xg/WgbRxNccUCxzi581Mp9nDjxe
+	 W435d7odC2jVs76Il5sOuMLR/X5IC96xcc7dt9Ee6Vme6vQZB4TPBn0srcVIHJ8HbK
+	 mXSAlDOsK6sIRuniYvxzqGNVYiVApR6q/Jg3FGez7f54Vjg/dydDQRjNMtiOsTRmat
+	 QDmtb/DKWStEw==
+Date: Tue, 4 Feb 2025 07:37:59 -0800
+From: Jakub Kicinski <kuba@kernel.org>
+To: Paolo Abeni <pabeni@redhat.com>
+Cc: davem@davemloft.net, netdev@vger.kernel.org, edumazet@google.com,
+ andrew+netdev@lunn.ch, horms@kernel.org
+Subject: Re: [PATCH net 2/2] MAINTAINERS: add a sample ethtool section entry
+Message-ID: <20250204073759.536531d3@kernel.org>
+In-Reply-To: <8ef9275a-b5f9-45e2-a99c-096fb3213ed8@redhat.com>
+References: <20250202021155.1019222-1-kuba@kernel.org>
+	<20250202021155.1019222-2-kuba@kernel.org>
+	<8ef9275a-b5f9-45e2-a99c-096fb3213ed8@redhat.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250131-gpio-set-array-helper-v1-0-991c8ccb4d6e@baylibre.com> <20250131-gpio-set-array-helper-v1-9-991c8ccb4d6e@baylibre.com>
-In-Reply-To: <20250131-gpio-set-array-helper-v1-9-991c8ccb4d6e@baylibre.com>
-From: Ulf Hansson <ulf.hansson@linaro.org>
-Date: Tue, 4 Feb 2025 16:37:25 +0100
-X-Gm-Features: AWEUYZk_FOEufbv4XIOWWo19tqsP-vJZAmqSGiOD8X2-D-NUV7n8lB7W5hF96hc
-Message-ID: <CAPDyKFqnEtnCRcu963t1cBqjHvz2nV+Ymahtpef+ZoCD9-C2Ew@mail.gmail.com>
-Subject: Re: [PATCH 09/13] mmc: pwrseq_simple: use gpiods_set_array_value_cansleep
-To: David Lechner <dlechner@baylibre.com>
-Cc: Linus Walleij <linus.walleij@linaro.org>, Bartosz Golaszewski <brgl@bgdev.pl>, 
-	Andy Shevchenko <andy@kernel.org>, Geert Uytterhoeven <geert@linux-m68k.org>, 
-	Lars-Peter Clausen <lars@metafoo.de>, Michael Hennerich <Michael.Hennerich@analog.com>, 
-	Jonathan Cameron <jic23@kernel.org>, Peter Rosin <peda@axentia.se>, Andrew Lunn <andrew@lunn.ch>, 
-	Heiner Kallweit <hkallweit1@gmail.com>, Russell King <linux@armlinux.org.uk>, 
-	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Vinod Koul <vkoul@kernel.org>, 
-	Kishon Vijay Abraham I <kishon@kernel.org>, =?UTF-8?B?TnVubyBTw6E=?= <nuno.sa@analog.com>, 
-	Liam Girdwood <lgirdwood@gmail.com>, Mark Brown <broonie@kernel.org>, 
-	Jaroslav Kysela <perex@perex.cz>, Takashi Iwai <tiwai@suse.com>, linux-gpio@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, linux-iio@vger.kernel.org, 
-	linux-mmc@vger.kernel.org, netdev@vger.kernel.org, 
-	linux-phy@lists.infradead.org, linux-sound@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-On Fri, 31 Jan 2025 at 21:25, David Lechner <dlechner@baylibre.com> wrote:
->
-> Reduce verbosity by using gpiods_set_array_value_cansleep() instead of
-> gpiods_set_array_value_cansleep().
->
-> Signed-off-by: David Lechner <dlechner@baylibre.com>
+On Tue, 4 Feb 2025 10:26:40 +0100 Paolo Abeni wrote:
+> On 2/2/25 3:11 AM, Jakub Kicinski wrote:
+> > This patch is a nop from process perspective, since Andrew already
+> > is a maintainer and reviews all this code. Let's focus on discussing
+> > merits of the "section entries" in abstract?  
+> 
+> Should the keyword be a little more generic, i.e. just 'cable_test'?
+> AFAICS the current one doesn't catch the device drivers,
+> 
+> I agree encouraging more driver API reviewer would be great, but I
+> personally have a slight preference to add/maintain entries only they
+> actually affect the process.
 
-Acked-by: Ulf Hansson <ulf.hansson@linaro.org>
+You're right, I was going after the op name. Seems like a good default
+keyword. But it appears that there are two layers of ops, one called
+start_cable_test and the next cable_test_start, so this isn't catching
+actual drivers.
 
-Kind regards
-Uffe
+> What about tying the creation of the entry to some specific contribution?
 
-> ---
->  drivers/mmc/core/pwrseq_simple.c | 3 +--
->  1 file changed, 1 insertion(+), 2 deletions(-)
->
-> diff --git a/drivers/mmc/core/pwrseq_simple.c b/drivers/mmc/core/pwrseq_simple.c
-> index 37cd858df0f4d7123683e1fe23a4c3fcd7817d13..b3a6d053c826741005f1484ad81df30b6bf75bbc 100644
-> --- a/drivers/mmc/core/pwrseq_simple.c
-> +++ b/drivers/mmc/core/pwrseq_simple.c
-> @@ -54,8 +54,7 @@ static void mmc_pwrseq_simple_set_gpios_value(struct mmc_pwrseq_simple *pwrseq,
->                 else
->                         bitmap_zero(values, nvalues);
->
-> -               gpiod_set_array_value_cansleep(nvalues, reset_gpios->desc,
-> -                                              reset_gpios->info, values);
-> +               gpiods_set_array_value_cansleep(reset_gpios, values);
->
->                 bitmap_free(values);
->         }
->
-> --
-> 2.43.0
->
+Sure. I'm adding this so that we have a commit to point people at 
+as an example when they contribute what should be a new section.
+Maybe I don't understand the question..
 
