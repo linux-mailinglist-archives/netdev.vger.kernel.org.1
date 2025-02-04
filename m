@@ -1,146 +1,181 @@
-Return-Path: <netdev+bounces-162631-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-162632-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5D114A276FA
-	for <lists+netdev@lfdr.de>; Tue,  4 Feb 2025 17:18:31 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 99EA1A276FD
+	for <lists+netdev@lfdr.de>; Tue,  4 Feb 2025 17:19:21 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 3B71B1885985
-	for <lists+netdev@lfdr.de>; Tue,  4 Feb 2025 16:18:36 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 4EE541883ED4
+	for <lists+netdev@lfdr.de>; Tue,  4 Feb 2025 16:19:26 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 850C3215073;
-	Tue,  4 Feb 2025 16:18:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2C638215196;
+	Tue,  4 Feb 2025 16:19:17 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=queasysnail.net header.i=@queasysnail.net header.b="Qo6/z2r2";
-	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="Ed0z7Tqn"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="buTzQyCq"
 X-Original-To: netdev@vger.kernel.org
-Received: from fout-b1-smtp.messagingengine.com (fout-b1-smtp.messagingengine.com [202.12.124.144])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D4E2B3232;
-	Tue,  4 Feb 2025 16:18:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=202.12.124.144
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 180C63232
+	for <netdev@vger.kernel.org>; Tue,  4 Feb 2025 16:19:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1738685906; cv=none; b=IGyapO0KiSeLvZAfFoXeEEEAqylTszgTfV3dqUldzXBBqsUceu3xs51Mu/U+iE99sm9T6oshD2rBPwvx6mO7Tj2HV1Aul82Hjh3dwEXucV0WQxvLGvBr5L6fkHZ093Hu/Pzdm2nCPwsmxmmY0uH51NcFQzYfWDyOzNf4YQIg7so=
+	t=1738685957; cv=none; b=Zjb8a7YTEpx6ZTgWLAExxSVxwSDI1HeQTNTEnGHKcg1qwRJgjvagE/WTn1QYfdhew1CDqgGJ/1URHl556NUA8iLnXb8YT9o8lnd0r0RXSZNvWKHeSD7mxyn9ctIewm0cK3eQg47f38vTsRlfItg4Ud5VUEfEmiDzZSj6SlDMeKU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1738685906; c=relaxed/simple;
-	bh=DKTIL9GERuc5VnQAC6xaTgLBDniJCbeGoOMmXtCvH5k=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=XG0PiMqeaxVfyLMxIca3UFv0On5+13UsvJRb6bzNOXyqURU16UjyGSDB49repKk64NiXyVR1Jy7dacjCajBHLZRL9yAavRbXC+4wgDr1MWd6KrX4ExqGiluBJTXR0lo8/h9GDnzaXDKhaOvaEXp/z1hl2oDoULXbfWrkbLUfXNI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=queasysnail.net; spf=pass smtp.mailfrom=queasysnail.net; dkim=pass (2048-bit key) header.d=queasysnail.net header.i=@queasysnail.net header.b=Qo6/z2r2; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=Ed0z7Tqn; arc=none smtp.client-ip=202.12.124.144
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=queasysnail.net
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=queasysnail.net
-Received: from phl-compute-01.internal (phl-compute-01.phl.internal [10.202.2.41])
-	by mailfout.stl.internal (Postfix) with ESMTP id 7D85C11400DD;
-	Tue,  4 Feb 2025 11:18:21 -0500 (EST)
-Received: from phl-mailfrontend-02 ([10.202.2.163])
-  by phl-compute-01.internal (MEProxy); Tue, 04 Feb 2025 11:18:21 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=queasysnail.net;
-	 h=cc:cc:content-type:content-type:date:date:from:from
-	:in-reply-to:in-reply-to:message-id:mime-version:references
-	:reply-to:subject:subject:to:to; s=fm1; t=1738685901; x=
-	1738772301; bh=Hstw0ccrll9JlVqF+ADPlMurrFIjkYXqn+Q5Hs2OIUM=; b=Q
-	o6/z2r2cVTp/1eWT6xSJUGvmj4ocZkuWBpjK4tcAI6RWbYK0qdbJq1hjSNxluVIG
-	2ZkdyVW0h5kFqLDnbJBSMOaOf6VBLai2iL0qtPvzBRdC1clfG30/elsRLGAHMWDo
-	UD1iO6FCUp71ls0qlrmmg0R5n9sIZZokZu512AUDKxVfXeJkQbWtuuEfQY4vMOoK
-	/DOhLPsCLWHC/WNNaowT5S/kyuR4U0GanIKM8bx9HWqHoA41cSrZbS/u1yCzh9Xs
-	NDTWFzUh/233fES4EpnxVCD2aHWeoztg2N44S7bdI+QF+ajObfE4wENhWDYT7tm+
-	0Q+5jmtP6QBaysnliRAUg==
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
-	messagingengine.com; h=cc:cc:content-type:content-type:date:date
-	:feedback-id:feedback-id:from:from:in-reply-to:in-reply-to
-	:message-id:mime-version:references:reply-to:subject:subject:to
-	:to:x-me-proxy:x-me-sender:x-me-sender:x-sasl-enc; s=fm3; t=
-	1738685901; x=1738772301; bh=Hstw0ccrll9JlVqF+ADPlMurrFIjkYXqn+Q
-	5Hs2OIUM=; b=Ed0z7Tqni7+xPwM1mHFVV/8woWiulLl56mCOloGBn1YcRMCjeBz
-	N3TbRvSkOqC+JoLnsl/KPqqys61u3UfVaD8kHPPFsjoejdW+SE3mhFS+5WYcIKkt
-	JZo6zCy8leZA6z002/o/zv0Z9cQQEp4+Bn0q7nwz6K5+2Voh6anVXKgPNQoPAd4F
-	PgWQw8K2Y954JikOE4upbCfZbXkhlKLIwi1VRXnWpBk4TcFYG6/BqX15oQvyhOz7
-	nYBROioJVxq2pGimrE6oS7KNHEigDGfTOPGnDKRcmWLpwC/Ya2tEyJuLYJwbumZh
-	jBji/NZQn6XEYseEBgjNqJqkQaP9DbTomGQ==
-X-ME-Sender: <xms:zD2iZ1TXI5TLj3xLqLiwpeLaRHMOs2VQ_73_7XX8H_TQkdCdVkRSKg>
-    <xme:zD2iZ-xCHuiiE-ASzJr3HN_a3UlmkepkwcgiFSheixCShuE5dY5286Qfie5lF8p4W
-    CD6oCyHcz2ss5VW9oA>
-X-ME-Received: <xmr:zD2iZ63e8lXi6Ifcv86aQVqQYeYnagGvi-FwHx1BQ_sIDkXUeUnwYztFZq-N>
-X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeefvddrtddtgddvtdelkecutefuodetggdotefrod
-    ftvfcurfhrohhfihhlvgemucfhrghsthforghilhdpggftfghnshhusghstghrihgsvgdp
-    uffrtefokffrpgfnqfghnecuuegrihhlohhuthemuceftddtnecusecvtfgvtghiphhivg
-    hnthhsucdlqddutddtmdenucfjughrpeffhffvvefukfhfgggtuggjsehttdertddttdej
-    necuhfhrohhmpefurggsrhhinhgrucffuhgsrhhotggruceoshgusehquhgvrghshihsnh
-    grihhlrdhnvghtqeenucggtffrrghtthgvrhhnpeeuhffhfffgfffhfeeuiedugedtfefh
-    keegteehgeehieffgfeuvdeuffefgfduffenucevlhhushhtvghrufhiiigvpedtnecurf
-    grrhgrmhepmhgrihhlfhhrohhmpehsugesqhhuvggrshihshhnrghilhdrnhgvthdpnhgs
-    pghrtghpthhtohepudefpdhmohguvgepshhmthhpohhuthdprhgtphhtthhopegrnhhtoh
-    hnihhosehophgvnhhvphhnrdhnvghtpdhrtghpthhtohepnhgvthguvghvsehvghgvrhdr
-    khgvrhhnvghlrdhorhhgpdhrtghpthhtohepvgguuhhmrgiivghtsehgohhoghhlvgdrtg
-    homhdprhgtphhtthhopehkuhgsrgeskhgvrhhnvghlrdhorhhgpdhrtghpthhtohepphgr
-    sggvnhhisehrvgguhhgrthdrtghomhdprhgtphhtthhopeguohhnrghlugdrhhhunhhtvg
-    hrsehgmhgrihhlrdgtohhmpdhrtghpthhtohepshhhuhgrhheskhgvrhhnvghlrdhorhhg
-    pdhrtghpthhtoheprhihrgiirghnohhvrdhsrdgrsehgmhgrihhlrdgtohhmpdhrtghpth
-    htoheprghnughrvgifodhnvghtuggvvheslhhunhhnrdgthh
-X-ME-Proxy: <xmx:zD2iZ9Cp115umxV5rSRkBw4Wmk_iuM_5-cYBvc3Nd8AcQlPd8ADB5w>
-    <xmx:zD2iZ-jxZ0zlJK5o7kkEytQorPI7oRaXX0L6RBrXQgZHkFy_-fWuVA>
-    <xmx:zD2iZxoMX57E1EvgvZ_dYicmJLkP1HPNl08MePG8K8w2aai-1JAt5g>
-    <xmx:zD2iZ5gU7fmrHZaKLn48hBmDeZpNSXgrmMmqI6JbwFjrod6p_SjDnA>
-    <xmx:zT2iZ1QKyyeHNi_akJQPrHBcBIRNIV12AUKOROKZFvt1pzJvxZTz4w25>
-Feedback-ID: i934648bf:Fastmail
-Received: by mail.messagingengine.com (Postfix) with ESMTPA; Tue,
- 4 Feb 2025 11:18:20 -0500 (EST)
-Date: Tue, 4 Feb 2025 17:18:18 +0100
-From: Sabrina Dubroca <sd@queasysnail.net>
-To: Antonio Quartulli <antonio@openvpn.net>
-Cc: netdev@vger.kernel.org, Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Donald Hunter <donald.hunter@gmail.com>,
-	Shuah Khan <shuah@kernel.org>, ryazanov.s.a@gmail.com,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	Simon Horman <horms@kernel.org>, linux-kernel@vger.kernel.org,
-	linux-kselftest@vger.kernel.org, Xiao Liang <shaw.leon@gmail.com>
-Subject: Re: [PATCH net-next v18 07/25] ovpn: implement basic TX path (UDP)
-Message-ID: <Z6I9yn3Nh-9Ebvv9@hog>
-References: <20250113-b4-ovpn-v18-0-1f00db9c2bd6@openvpn.net>
- <20250113-b4-ovpn-v18-7-1f00db9c2bd6@openvpn.net>
- <Z6CR6QGVrMqauP2H@hog>
+	s=arc-20240116; t=1738685957; c=relaxed/simple;
+	bh=74T0US/o9kjlBij28lGopeWdzH++KQNYK++WmLFe1uQ=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=QGo3vl4Ph4YeFaW7cYbTsJF/8YxGDy/wZ1mZ80GIdeThpVF3tDjV1Bd0I9mfHzGBTu/GMey52m1ykLjkFduGQ4vTJDj/GKiNkvrZMbXPIbsoQkzxnefyD3FI1mrvTLtAhNtNMSfByTO6GFoldBdVsne09qGsvvIpjd7F+G+XD/8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=buTzQyCq; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1738685953;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=74T0US/o9kjlBij28lGopeWdzH++KQNYK++WmLFe1uQ=;
+	b=buTzQyCqftY/ZZLH4fp+nL7TWMW1gQeLMc/jV1f7t2KdEScrSttA/F7EuHfpYJwRAAV/JX
+	QLUpZA8FJSf8s03jQwBAj05YCls3VLBcgR5guahqM83Yuz60ZoyIsoFPNGMr5mJb+KGr0w
+	604ImhWPp3D9l02Kura/8ZK+vs3rx9g=
+Received: from mail-pj1-f70.google.com (mail-pj1-f70.google.com
+ [209.85.216.70]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-48-YVGbYjgfPcyAztHtZFQiEA-1; Tue, 04 Feb 2025 11:19:12 -0500
+X-MC-Unique: YVGbYjgfPcyAztHtZFQiEA-1
+X-Mimecast-MFC-AGG-ID: YVGbYjgfPcyAztHtZFQiEA
+Received: by mail-pj1-f70.google.com with SMTP id 98e67ed59e1d1-2f9cf77911eso956247a91.1
+        for <netdev@vger.kernel.org>; Tue, 04 Feb 2025 08:19:12 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1738685951; x=1739290751;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=74T0US/o9kjlBij28lGopeWdzH++KQNYK++WmLFe1uQ=;
+        b=Ey4IZ/27Q3T4ADe0gM30Djp3tJ2752hWzCcp7xjd5nes3Q7SNUOCoPAutXZSzRjByd
+         IqIK6bt71De2bEBpV8GEfohAK9Vm8GTTrhcIqOvR6y48MdYRxxVVYayQ6E8lUppf2/ye
+         M+gGu5je/9V/E1POafeBFFAr9a2MVM6vxl9Cd+TZ1fJJYieGTWWpEKO0yGCk2HeEjTfs
+         qVkCBaQW/QdIYO8YoSHEt+xl0xEpvoJ09Ngu2DEx9y81GUC8E/D2YGAr23DhhZaP3Jj/
+         COgrADGcDcE959cMXYjggKAN7MJfFE5iQiSfIpsTtiFAs+JuklPnwEFzRF37yGIbp2m3
+         xTQw==
+X-Forwarded-Encrypted: i=1; AJvYcCUinm9Sh2kRo+78BUHzu167wrX5xlbekkLP19dXEXLFS9icEgt1W3zLPKodprQcuNOE6WFit2Q=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyVFgf8aUBGKq5ORap5SB4Or9OkXCJYfJCLuzwpQ1uQqXUHPC1q
+	KMSKFvklYuadc34lEK19Yfr65gN9jwfpMENXLXCPBbOqf8H97gJoXQV5ilPB4dEihjCxN/v5grz
+	OlWET8MIIfBisr4b/QufI2kJo/Sk/06JAKka8goLFcOsE6BcKL68KTSdzvWSJPmWtJ5B9q/3OFD
+	Np4rHTL1hjMZN9/XaQ/+xMpy1C8cLB
+X-Gm-Gg: ASbGncthl5CKz3lg8tDrGo56w3vAsBiOKtxYnf9xF7l7LvJY+BRm182p6IPjfykgWi5
+	n/Y4LjyUsDsxl2OcATTroUMV13VXSRSDvc15jRajA8UFENwP8bsBC9tAcFgzkIg==
+X-Received: by 2002:a17:90b:2884:b0:2f9:9c3a:ed3 with SMTP id 98e67ed59e1d1-2f9ba73e992mr5850937a91.16.1738685951025;
+        Tue, 04 Feb 2025 08:19:11 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IF3tNzqy+EU7XvxQi+cg7fICk2NlmjtW/FLHsyarEoa9g32uMgqKoDLiZihP/6mbIUzBrFaPLZ4sIHN3Vf+DyA=
+X-Received: by 2002:a17:90b:2884:b0:2f9:9c3a:ed3 with SMTP id
+ 98e67ed59e1d1-2f9ba73e992mr5850904a91.16.1738685950735; Tue, 04 Feb 2025
+ 08:19:10 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <Z6CR6QGVrMqauP2H@hog>
+References: <CAFqZXNtkCBT4f+PwyVRmQGoT3p1eVa01fCG_aNtpt6dakXncUg@mail.gmail.com>
+ <e8b6c6f9-9647-4ab6-8bbb-ccc94b04ade4@yandex.ru> <67979d24d21bc_3f1a29434@willemb.c.googlers.com.notmuch>
+ <CAFqZXNscJnX2VF-TyZaEC5nBtUUXdWPM2ejXTWBL8=5UyakssA@mail.gmail.com>
+ <6798f1fb5e1ba_987d9294dc@willemb.c.googlers.com.notmuch> <c4413e16-d04f-4370-8edc-e4db21cc25f6@yandex.ru>
+ <67996154e30ce_d9324294c4@willemb.c.googlers.com.notmuch> <8b81a534-9c30-4123-bd7d-bf3a9d89dfcb@yandex.ru>
+ <679a376739b99_132e08294f3@willemb.c.googlers.com.notmuch>
+ <04879909-72e5-4ab6-8c28-5d3cb551feb5@yandex.ru> <679bace3a753f_1d35f32942d@willemb.c.googlers.com.notmuch>
+ <CAHC9VhS-uSaVmy65oA8p6tCzMZxMsuzdmxO-vf7L0p44ZKO=_A@mail.gmail.com>
+In-Reply-To: <CAHC9VhS-uSaVmy65oA8p6tCzMZxMsuzdmxO-vf7L0p44ZKO=_A@mail.gmail.com>
+From: Ondrej Mosnacek <omosnace@redhat.com>
+Date: Tue, 4 Feb 2025 17:18:58 +0100
+X-Gm-Features: AWEUYZmXehgyVPBBQTLARAnAWlLsy16wrENGnIjpxFiM8a4vwAAtZ0X_3p-nmQw
+Message-ID: <CAFqZXNtq7SZSu_JyY5yaiOQy89c=5jG+vqdg3_RSUWm4JNN00w@mail.gmail.com>
+Subject: Re: Possible mistake in commit 3ca459eaba1b ("tun: fix group
+ permission check")
+To: Paul Moore <paul@paul-moore.com>
+Cc: Willem de Bruijn <willemdebruijn.kernel@gmail.com>, stsp <stsp2@yandex.ru>, 
+	Willem de Bruijn <willemb@google.com>, Jason Wang <jasowang@redhat.com>, 
+	Jakub Kicinski <kuba@kernel.org>, network dev <netdev@vger.kernel.org>, 
+	Linux Security Module list <linux-security-module@vger.kernel.org>, 
+	SElinux list <selinux@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-2025-02-03, 10:52:41 +0100, Sabrina Dubroca wrote:
-> 2025-01-13, 10:31:26 +0100, Antonio Quartulli wrote:
-> > +static void ovpn_encrypt_post(struct sk_buff *skb, int ret)
-> > +{
-> > +	struct ovpn_peer *peer = ovpn_skb_cb(skb)->peer;
-> > +
-> > +	if (unlikely(ret < 0))
-> > +		goto err;
-> > +
-> > +	skb_mark_not_on_list(skb);
-> > +
-> > +	switch (peer->sock->sock->sk->sk_protocol) {
-> 
-> We have a ref on the peer, but not on the ovpn_sock. DEL_PEER could
-> have detached the sock by the time the crypto completes.
-> 
-> (unfortunately I don't have any idea to fix this yet)
+On Tue, Feb 4, 2025 at 1:30=E2=80=AFAM Paul Moore <paul@paul-moore.com> wro=
+te:
+>
+> On Thu, Jan 30, 2025 at 11:48=E2=80=AFAM Willem de Bruijn
+> <willemdebruijn.kernel@gmail.com> wrote:
+> > stsp wrote:
+> > > 29.01.2025 17:12, Willem de Bruijn =D0=BF=D0=B8=D1=88=D0=B5=D1=82:
+> > > > stsp wrote:
+> > > >> 29.01.2025 01:59, Willem de Bruijn =D0=BF=D0=B8=D1=88=D0=B5=D1=82:
+> > > >>> stsp wrote:
+> > > >>>> By doing that you indeed avoid
+> > > >>>> the problem of "completely
+> > > >>>> inaccessible tap". However, that
+> > > >>>> breaks my setup, as I really
+> > > >>>> intended to provide tap to the
+> > > >>>> owner and the unrelated group.
+> > > >>>> This is because, eg when setting
+> > > >>>> a CI job, you can add the needed
+> > > >>>> user to the needed group, but
+> > > >>>> you also need to re-login, which
+> > > >>>> is not always possible. :(
+> > > >>> Could you leave tun->owner unset?
+> > > >> That's exactly the problem: when
+> > > >> the user is not in the needed group,
+> > > >> then you need to unset _both_.
+> > > >> Unsetting only owner is not enough.
+> > > >> Adding the user to the group is not
+> > > >> enough because then you need to
+> > > >> re-login (bad for CI jobs).
+> > > > At some point we can question whether the issue is with the setup,
+> > > > rather than the kernel mechanism.
+> > > >
+> > > > Why does your setup have an initial user that lacks the group
+> > > > permissions of the later processes, and a tun instance that has bot=
+h
+> > > > owner and group constraints set?
+> > > >
+> > > > Can this be fixed in userspace, rather than allow this odd case in =
+the
+> > > > kernel. Is it baked deeply into common containerization tools, say?
+> > >
+> > > No-no, its not a real or unfixible
+> > > problem. At the end, I can just
+> > > drop both group and user ownership
+> > > of the TAP, and simply not to care.
+> >
+> > In that case the safest course of action is to revert the patch.
+> >
+> > It relaxes some access control restrictions that other users may have
+> > come to depend on.
+> >
+> > Say, someone expects that no process can use the device until it
+> > adds the user to one of the groups.
+> >
+> > It's farfetched, but in cases of access control, err on the side of
+> > caution. Especially retroactively.
+>
+> If a revert is the best path forward for v6.14, do you think it would
+> be possible to get this fixed this week, or do you expect it to take
+> longer?
 
-Maybe an idea:
+Willem has already posted patches on netdev [1][2] (thanks!), so I
+expect it will be fixed soon.
 
-Since ovpn_sock itself lives under RCU (because of sk_user_data),
-peer->sock should be an RCU pointer and also follow RCU rules. For
-most parts (io.c, netlink.c) the conversion is not too
-problematic. TCP is more difficult.
+[1] https://lore.kernel.org/netdev/20250204161015.739430-1-willemdebruijn.k=
+ernel@gmail.com/
+[2] https://lore.kernel.org/netdev/20250203150615.96810-1-willemdebruijn.ke=
+rnel@gmail.com/
 
-I still need to think about whether this works, and whether this is
-worth the complexity, or if we could solve this in another way.
+--=20
+Ondrej Mosnacek
+Senior Software Engineer, Linux Security - SELinux kernel
+Red Hat, Inc.
 
--- 
-Sabrina
 
