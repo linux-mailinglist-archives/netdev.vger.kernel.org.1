@@ -1,87 +1,105 @@
-Return-Path: <netdev+bounces-162614-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-162616-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5FC84A2762B
-	for <lists+netdev@lfdr.de>; Tue,  4 Feb 2025 16:39:27 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3A834A2763D
+	for <lists+netdev@lfdr.de>; Tue,  4 Feb 2025 16:42:08 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 0D2D97A12EC
-	for <lists+netdev@lfdr.de>; Tue,  4 Feb 2025 15:38:32 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 1ABC93A1D4B
+	for <lists+netdev@lfdr.de>; Tue,  4 Feb 2025 15:41:59 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 283232144BE;
-	Tue,  4 Feb 2025 15:38:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C1F53214217;
+	Tue,  4 Feb 2025 15:42:03 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="QETjqWaX"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="WkUINHil"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ed1-f44.google.com (mail-ed1-f44.google.com [209.85.208.44])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 02DCE2144A6
-	for <netdev@vger.kernel.org>; Tue,  4 Feb 2025 15:38:01 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0870C25A659
+	for <netdev@vger.kernel.org>; Tue,  4 Feb 2025 15:42:01 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.44
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1738683482; cv=none; b=COVmZJcvLVnRIV6h7CxUmm5TbUPE5nKXF/RVj/nZVuvnD5g8KJ36dFxqICJ3Fh+iEBW0Ct9pA5rdzAkEfAkMk20esa7QHZTgPmr3p9kVqYa0yNaQV4ShA63S4LrG9Tjz9KWDu7ZO9g2nCdBUctc7FxL1AG9ps0k5LjY/maxaHaU=
+	t=1738683723; cv=none; b=C+SyzdMcmrhpnv0RyEohX0Bov5g1pEaGURHiz+53+529PEWUZVJp1JQMHGOxNVVTAVrAi+9v25wmIVYSIDPbcGIpYpWlaZcqDZ3WZnLwS6QeAiaG4AA5mNh4b5ToZG88ptlZs5zo6ezJncjpqikIMJMA2M2cnDikHH09FduVwkc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1738683482; c=relaxed/simple;
-	bh=ELj0jFYoWwL5sfslYQB0IZBs6s55AOGymmsQ7gzepBY=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=aDvCQ57uNORwxb9RRdXFITEZWioqtqgBDKpwAcDf4muy6zC+MN7Zc5Ntr/u+9G+o6OfrgPijOLAl7DU0iwGVd54sqDKtuk/U/89tZ2Nd6lje4j+Jq8AVyMpKmaOSVt56XnrPpFHmU6/Fbg1is0JFKsrNGzQF1D7bKa+fs7MyBqg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=QETjqWaX; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 15AB6C4CEDF;
-	Tue,  4 Feb 2025 15:38:01 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1738683481;
-	bh=ELj0jFYoWwL5sfslYQB0IZBs6s55AOGymmsQ7gzepBY=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=QETjqWaX/cMI4pEve5BnKc0XDo1iRHW9XuYTZrBRmGYqpnCeSsXPznkaTyHX8ad//
-	 5DEYT4U77w2g0nccpoUvd3YSgQbd0bXmlzING/cGCyb3eSCtROity374/va3FfcOut
-	 4HWKpeYkznAYrDOzOZMKRgETmjt1SqS6VqDLLu8Xg/WgbRxNccUCxzi581Mp9nDjxe
-	 W435d7odC2jVs76Il5sOuMLR/X5IC96xcc7dt9Ee6Vme6vQZB4TPBn0srcVIHJ8HbK
-	 mXSAlDOsK6sIRuniYvxzqGNVYiVApR6q/Jg3FGez7f54Vjg/dydDQRjNMtiOsTRmat
-	 QDmtb/DKWStEw==
-Date: Tue, 4 Feb 2025 07:37:59 -0800
-From: Jakub Kicinski <kuba@kernel.org>
-To: Paolo Abeni <pabeni@redhat.com>
-Cc: davem@davemloft.net, netdev@vger.kernel.org, edumazet@google.com,
- andrew+netdev@lunn.ch, horms@kernel.org
-Subject: Re: [PATCH net 2/2] MAINTAINERS: add a sample ethtool section entry
-Message-ID: <20250204073759.536531d3@kernel.org>
-In-Reply-To: <8ef9275a-b5f9-45e2-a99c-096fb3213ed8@redhat.com>
-References: <20250202021155.1019222-1-kuba@kernel.org>
-	<20250202021155.1019222-2-kuba@kernel.org>
-	<8ef9275a-b5f9-45e2-a99c-096fb3213ed8@redhat.com>
+	s=arc-20240116; t=1738683723; c=relaxed/simple;
+	bh=pznf7y+6TBfYJKYfjaZEPMGCIaASsTIg8FeHb/sUrUo=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=qiATk0NMqMsBSlu5BxC41757FRi/aXTEdE54w8jWz8Jp1ND3S95P1XfiRvgksOGrcl6pIXAcKpsRgTKKDnrRmoEYkW8InKwhb+lBqjLw3JsaWNJRK88JDd4PeWZ9dHEsM7LZWXdvF1D9QlaMjx6Cj4lbM0HaNwmOhVpTjDzLDWE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=WkUINHil; arc=none smtp.client-ip=209.85.208.44
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-ed1-f44.google.com with SMTP id 4fb4d7f45d1cf-5dc89df7eccso7107712a12.3
+        for <netdev@vger.kernel.org>; Tue, 04 Feb 2025 07:42:01 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1738683720; x=1739288520; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=pznf7y+6TBfYJKYfjaZEPMGCIaASsTIg8FeHb/sUrUo=;
+        b=WkUINHil+5QIJs0GE18+A/pWaxCyWo9pP9m1TfRfm8RZof0ViVFHTrbUr+30yQ/Ne+
+         oyrB5/DpYvGRpoov/Huj3Zl5s1F6r5BMG9HNHWPNmJNzHui4qhUiJPQYT52XijeSW0vJ
+         PA8XGINPHPf8rFEIKH/RddpzMQzFdWTUhKFqF2zxTO6fYJY/HF7q9glLGTznffxJf1mU
+         szIiJQxs/Y8tCcnrswD54AYL5f1RCsMJ5nh2Rm9prhq0jBUqo3IaMnrgoOOFeZM8b8R+
+         QtMRxrY3EqnDwaHEz26J7hz/XRSj/gxJZSlzu1JrQ9dGAxhAa8/PBo56WKdoZnAOskah
+         EmBQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1738683720; x=1739288520;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=pznf7y+6TBfYJKYfjaZEPMGCIaASsTIg8FeHb/sUrUo=;
+        b=su1W0ce3LVWhOKlovKQFr1ow+HkrcDrg5bR7moq2eYi50vGIxl081HhhPsvUles8pb
+         H1YTUQj5JIAoABwXPqiNfZEiWG3OYkaYfVNIYzPS/aRlJYVIYuJi+0EG7/BMBs629kLz
+         YzLdAvumxObvaOM2pZF5jYNojI8uCfUWAdf4QV1L8p2VZeEHM8ZSdzT2MSnpEyM85zuI
+         C154ewTf4Kn85HNx0zJ3EmMAvVtcFLWXD0mST5NXV5F6JOjPz2Asq/kD4tWhBLSttoFe
+         qNAkensOc/wLqHGa4q/RCVOwLoZs7WaTAjFQv0BnDnAO6hNifn0iaMSj2pNnlJg7SXKL
+         H0ug==
+X-Gm-Message-State: AOJu0YwjmBnBe8ShNusDT3cEYAEnI0lWulZhim2PDT7VcbZjg3aSMaL1
+	UoRXDJnlrMhXaBPD62foV/73unNUDZwTbPj2lxMh+9oAyj6ar545SpCaYpwRmwvyt8XXwnIyM3Z
+	YCz7yTa/wpSldd9yval2gzExyeysxIK3Oj2C5
+X-Gm-Gg: ASbGncvLebrOJXI7IiTNv9CuoowdzPpf0qYkzH4ChIEXj/VGH7yFte70Dzg8Vw1JI5d
+	nCWPW8Vw7CO2ZM5YThIYqR3IyMJsWSv7oYwgY6wCfnhDfr4JyHJJFRF3tzzhFDzkG85t9Cgk=
+X-Google-Smtp-Source: AGHT+IGBYYosawA+JL9Y08qex6Gus99Y2FRU7BSzVPGVY240m2TatGr5loJvkzpu/vgwMg+o8hBvR0BN4OhXoWmVl/c=
+X-Received: by 2002:a05:6402:51d4:b0:5dc:cf9b:b043 with SMTP id
+ 4fb4d7f45d1cf-5dccf9bb32cmr1704740a12.11.1738683720015; Tue, 04 Feb 2025
+ 07:42:00 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+References: <20250204145549.1216254-1-idosch@nvidia.com> <20250204145549.1216254-2-idosch@nvidia.com>
+In-Reply-To: <20250204145549.1216254-2-idosch@nvidia.com>
+From: Eric Dumazet <edumazet@google.com>
+Date: Tue, 4 Feb 2025 16:41:48 +0100
+X-Gm-Features: AWEUYZltbg0fgww7OKcOLyQZXKvlEW833D9Ht2NfdSXEwT3bgaQHYPIMyLNLoPQ
+Message-ID: <CANn89iJfdyUAmuDPoR8B5Bobb3bj_Fs=Jdnh79ewQ=cbVVDAZQ@mail.gmail.com>
+Subject: Re: [PATCH net-next 1/8] vxlan: Annotate FDB data races
+To: Ido Schimmel <idosch@nvidia.com>
+Cc: netdev@vger.kernel.org, davem@davemloft.net, kuba@kernel.org, 
+	pabeni@redhat.com, andrew+netdev@lunn.ch, horms@kernel.org, petrm@nvidia.com, 
+	razor@blackwall.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Tue, 4 Feb 2025 10:26:40 +0100 Paolo Abeni wrote:
-> On 2/2/25 3:11 AM, Jakub Kicinski wrote:
-> > This patch is a nop from process perspective, since Andrew already
-> > is a maintainer and reviews all this code. Let's focus on discussing
-> > merits of the "section entries" in abstract?  
-> 
-> Should the keyword be a little more generic, i.e. just 'cable_test'?
-> AFAICS the current one doesn't catch the device drivers,
-> 
-> I agree encouraging more driver API reviewer would be great, but I
-> personally have a slight preference to add/maintain entries only they
-> actually affect the process.
+On Tue, Feb 4, 2025 at 3:56=E2=80=AFPM Ido Schimmel <idosch@nvidia.com> wro=
+te:
+>
+> The 'used' and 'updated' fields in the FDB entry structure can be
+> accessed concurrently by multiple threads, leading to reports such as
+> [1]. Can be reproduced using [2].
+>
+> Suppress these reports by annotating these accesses using
+> READ_ONCE() / WRITE_ONCE().
+>
+>
+> Reviewed-by: Petr Machata <petrm@nvidia.com>
+> Signed-off-by: Ido Schimmel <idosch@nvidia.com>
+>
 
-You're right, I was going after the op name. Seems like a good default
-keyword. But it appears that there are two layers of ops, one called
-start_cable_test and the next cable_test_start, so this isn't catching
-actual drivers.
-
-> What about tying the creation of the entry to some specific contribution?
-
-Sure. I'm adding this so that we have a commit to point people at 
-as an example when they contribute what should be a new section.
-Maybe I don't understand the question..
+Reviewed-by: Eric Dumazet <edumazet@google.com>
 
