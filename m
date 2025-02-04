@@ -1,184 +1,115 @@
-Return-Path: <netdev+bounces-162350-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-162351-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 41DD4A269DF
-	for <lists+netdev@lfdr.de>; Tue,  4 Feb 2025 02:34:44 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 19F09A269E8
+	for <lists+netdev@lfdr.de>; Tue,  4 Feb 2025 02:48:45 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id D54B71886239
-	for <lists+netdev@lfdr.de>; Tue,  4 Feb 2025 01:34:48 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A6F8D3A569E
+	for <lists+netdev@lfdr.de>; Tue,  4 Feb 2025 01:48:36 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9586278F26;
-	Tue,  4 Feb 2025 01:34:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1F4965588F;
+	Tue,  4 Feb 2025 01:48:42 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="ke09ZpVk"
+	dkim=pass (1024-bit key) header.d=fastly.com header.i=@fastly.com header.b="QDa0KeIb"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.9])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f173.google.com (mail-pl1-f173.google.com [209.85.214.173])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2B00AEC4;
-	Tue,  4 Feb 2025 01:34:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.9
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 63EA623BE
+	for <netdev@vger.kernel.org>; Tue,  4 Feb 2025 01:48:40 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.173
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1738632877; cv=none; b=nCCJe7+NHlsME22FRBwZVWw2tmbh5nkjU5aPoQrKHBEuNpg6FcE6CamlOzE0JFUUzNDAW1f6tg298/8C9OR4VS1Kgc+ogd+6TuCGHT5ztSqv/UoI0EcbKcSkY88EuRDCURgz2JlbmNpT14YbTUXk9hBiAYPD7Tc58YbdlSIw4Tw=
+	t=1738633722; cv=none; b=EyAdhX8ioPhRpVMpInaTIc2BMDvA9LoNDJpPhRx0qE9FVCn3A0gF2o7FdMFzvKQD5UToXUklCXYKEYSSRdWwrocg+JY+WFnCBdqfbHOHbQgQAJschn6uRmcizC0tGayRmflLnPsgY9F7w6eEixiJT6wnu/HE9bTpJvvCwzq34z4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1738632877; c=relaxed/simple;
-	bh=cTqZc7KMQfir834dyF7dto20NWb+pLw52qL9bC6G4tA=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=i2YTTv1W+h2YCof0qVPoQ/fmEUKHGR0C/Uudw4xL8o+rq5GiSr+1f8UV3BQGKUCYhALaC57/kkTUJSHlHbB8W3lEkRkfEdq8bdEvbH8P+Rn2yKXENx1eG6apIG0UftTnx3pv+zeobTq7K5cA+0niFSmsbKoPUq/3772V/eg30aE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=ke09ZpVk; arc=none smtp.client-ip=192.198.163.9
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1738632876; x=1770168876;
-  h=message-id:date:mime-version:subject:to:cc:references:
-   from:in-reply-to:content-transfer-encoding;
-  bh=cTqZc7KMQfir834dyF7dto20NWb+pLw52qL9bC6G4tA=;
-  b=ke09ZpVkdy1U6DPZo1SL0b5+e/FMq/Am8+KXiU3vo5WDMx42rYdf4RZG
-   SUcsllelXGG1HCHKD3j1YD6LcHtPdmBb7LACDvNgtNyQikfK51GYh4+PB
-   3TLIaFOTc6m3g3mcyfkQmMscwggqYwugRGyxkdxACJSpPWZKxOiPmuW68
-   NOa9azDdaXNfw6nARYfUTj5fBx+H0HOEBOuroAyXFQBKUNqw6bmaaSZ/y
-   rpBxqOZj/Ys+LXaKRA/4PDKaWVlDbFklQbv8thbJvVojUe7ry+RiJ1/Kg
-   reZ17PUPr+1yHYP6gdklhu6NiDskD6c/rxYw66ZdRQadQchc1imYIVioM
-   A==;
-X-CSE-ConnectionGUID: Tag1N2hORI2+DE2n+rR1yg==
-X-CSE-MsgGUID: P87jdiaMTjKPjnq1PtVJGg==
-X-IronPort-AV: E=McAfee;i="6700,10204,11335"; a="49795734"
-X-IronPort-AV: E=Sophos;i="6.13,257,1732608000"; 
-   d="scan'208";a="49795734"
-Received: from orviesa003.jf.intel.com ([10.64.159.143])
-  by fmvoesa103.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 03 Feb 2025 17:34:18 -0800
-X-CSE-ConnectionGUID: 4tSta66CTFq8So3/FmHf2g==
-X-CSE-MsgGUID: 907kdKGuTAyI/dVJbUURBQ==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.11,199,1725346800"; 
-   d="scan'208";a="115441422"
-Received: from choongyo-mobl.gar.corp.intel.com (HELO [10.247.124.71]) ([10.247.124.71])
-  by ORVIESA003-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 03 Feb 2025 17:34:06 -0800
-Message-ID: <e0d34c88-dd8d-402d-bc67-6b9c4f8effaf@linux.intel.com>
-Date: Tue, 4 Feb 2025 09:34:03 +0800
+	s=arc-20240116; t=1738633722; c=relaxed/simple;
+	bh=x/OIKJRfGoHJKiEG/ZgGGRzS5wgA4E0d1g0wi30cVDU=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=XcayLnOn9mb+ZebKXsfKoLwZh7UBpYAR2TWA+0yVMRP14GBhMMA2VYhLDV9C3kiAPBL1t66qmKO1sm5vcRIXs1zm4f7toRVFILAH+wVA8cjN5NkvtVbr25EXmjSuy6NXoBk+0/IglBmJtYfjK8nwk9rX8hRnTcOeF518bRytVzQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fastly.com; spf=pass smtp.mailfrom=fastly.com; dkim=pass (1024-bit key) header.d=fastly.com header.i=@fastly.com header.b=QDa0KeIb; arc=none smtp.client-ip=209.85.214.173
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fastly.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=fastly.com
+Received: by mail-pl1-f173.google.com with SMTP id d9443c01a7336-21bc1512a63so96974505ad.1
+        for <netdev@vger.kernel.org>; Mon, 03 Feb 2025 17:48:40 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=fastly.com; s=google; t=1738633719; x=1739238519; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references
+         :mail-followup-to:message-id:subject:cc:to:from:date:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=N9PMsVjSdOLj614fOvI/y33lqQJtjqVvfONyLRXysDo=;
+        b=QDa0KeIbaTJ+dY/GYoVbJs82iEJGSxwQfe/fTKxVWQnK1ykNkk8IHjy3FS5I0Byhiv
+         j7bfv5C1LEOxJpSA/QjY8lrFIbA9TvA+u3AaYViwHjvOQ/KY8HwgL+yamapirzzZ+qqO
+         LsjHM7aEvI/eHDQ784Lwh/HO32H8dYzt7LsYE=
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1738633719; x=1739238519;
+        h=in-reply-to:content-disposition:mime-version:references
+         :mail-followup-to:message-id:subject:cc:to:from:date
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=N9PMsVjSdOLj614fOvI/y33lqQJtjqVvfONyLRXysDo=;
+        b=S0oaJld2TQC4KF+CPiVX+wjC+T4U2z4igjEJjQ3Rat9J/4S2TUH9s/CqBXBvfeIpeb
+         cP+JniyexNRMafw5/HVdMs22TclNFtoo56JiSCaj5Jm9YZYkopDT4CEerWzzHa1MjxQb
+         d40GxBiK35Wq+dHcdTjLrkyP3Ntl+xTNNYBrdIj8q8qwwlXDqh28YynUHegtKnbz6j2b
+         UnSqNVP8L50wwPi8s2Vzq5d/W82LTE5xBctdBqCV5iP2/Kr54EP49gafGxzgphnnGg5p
+         8Hk5WHf7Svsni6SAWPggraX/zazUNCW6gazkovhcAMGJsJ41xVb6cixuDcpG1GjKgSl1
+         +9zw==
+X-Forwarded-Encrypted: i=1; AJvYcCWUBEbSTRM1ZfmMkKOC0DFYvcQz+caXnqrnytgKjHi+oNjwtkQ1nC/KuKk+USkv22pKdNiYPSM=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yw6DJ2zHxvBH7Q6NZqAuexCs3RrrKcRDFW9I0kY9xe6bv0KCTIr
+	H4glV4OAbQsdUxFbDfF5yq3Atj2zI2gUiZVJkHxgWYTOLaKUnV5474yImio17A9EYBfO/0QRpph
+	O
+X-Gm-Gg: ASbGnct0J6IKI0xp5jqgNvKfglEp4MKBGao5UB3+zK2d4WEnNLCDwVTAAP1Y2E7fK/q
+	i20GwHg7PLnoORylcRxJK3L9M8ikhcwGjN6QsFmXQ/xRWJRcJzld/Fdsarr/htUTxH5VJf96CeY
+	oRpxpF0mpKmhLl16WQQakQ/3X1skSwczdCHoTfTAog/ilC8Thg6NI8pxiULNtr+DxnDMc3ZlhT3
+	xyzAwOFbwiYkQEz9g49MlTrBsDnRDZkHXtAAL+sIZdI3+mPdzs6KkLD2hfJFHujC4IGRcpX+gfh
+	K8789KfzQehchkUiNWjBHgy9C4tjt8xqlWjbhkN0LjHvsezgLnfDGXSm0DxXEHs=
+X-Google-Smtp-Source: AGHT+IH+YlFS/HGPHIcdKOd9X0q+iUCXqabwJHbf1864R2wClY8SSV5WWThU/9kYAkkhwx8gURU0oA==
+X-Received: by 2002:a17:902:c40f:b0:216:281f:820d with SMTP id d9443c01a7336-21eddbf3371mr263415235ad.11.1738633719540;
+        Mon, 03 Feb 2025 17:48:39 -0800 (PST)
+Received: from LQ3V64L9R2 (c-24-6-151-244.hsd1.ca.comcast.net. [24.6.151.244])
+        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-2f83bccd590sm12169855a91.12.2025.02.03.17.48.38
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 03 Feb 2025 17:48:39 -0800 (PST)
+Date: Mon, 3 Feb 2025 17:48:36 -0800
+From: Joe Damato <jdamato@fastly.com>
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: davem@davemloft.net, netdev@vger.kernel.org, edumazet@google.com,
+	pabeni@redhat.com, andrew+netdev@lunn.ch, horms@kernel.org
+Subject: Re: [PATCH net-next] net: warn if NAPI instance wasn't shut down
+Message-ID: <Z6Fx9ElQJz1ql7zF@LQ3V64L9R2>
+Mail-Followup-To: Joe Damato <jdamato@fastly.com>,
+	Jakub Kicinski <kuba@kernel.org>, davem@davemloft.net,
+	netdev@vger.kernel.org, edumazet@google.com, pabeni@redhat.com,
+	andrew+netdev@lunn.ch, horms@kernel.org
+References: <20250203215816.1294081-1-kuba@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH bpf-next v7 3/5] net: stmmac: Add launch time support to
- XDP ZC
-To: Song Yoong Siang <yoong.siang.song@intel.com>,
- "David S . Miller" <davem@davemloft.net>, Eric Dumazet
- <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
- Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>,
- Willem de Bruijn <willemb@google.com>,
- Florian Bezdeka <florian.bezdeka@siemens.com>,
- Donald Hunter <donald.hunter@gmail.com>, Jonathan Corbet <corbet@lwn.net>,
- Bjorn Topel <bjorn@kernel.org>, Magnus Karlsson <magnus.karlsson@intel.com>,
- Maciej Fijalkowski <maciej.fijalkowski@intel.com>,
- Jonathan Lemon <jonathan.lemon@gmail.com>,
- Andrew Lunn <andrew+netdev@lunn.ch>, Alexei Starovoitov <ast@kernel.org>,
- Daniel Borkmann <daniel@iogearbox.net>,
- Jesper Dangaard Brouer <hawk@kernel.org>,
- John Fastabend <john.fastabend@gmail.com>, Joe Damato <jdamato@fastly.com>,
- Stanislav Fomichev <sdf@fomichev.me>, Xuan Zhuo
- <xuanzhuo@linux.alibaba.com>, Mina Almasry <almasrymina@google.com>,
- Daniel Jurgens <danielj@nvidia.com>, Andrii Nakryiko <andrii@kernel.org>,
- Eduard Zingerman <eddyz87@gmail.com>, Mykola Lysenko <mykolal@fb.com>,
- Martin KaFai Lau <martin.lau@linux.dev>, Song Liu <song@kernel.org>,
- Yonghong Song <yonghong.song@linux.dev>, KP Singh <kpsingh@kernel.org>,
- Hao Luo <haoluo@google.com>, Jiri Olsa <jolsa@kernel.org>,
- Shuah Khan <shuah@kernel.org>,
- Alexandre Torgue <alexandre.torgue@foss.st.com>,
- Jose Abreu <joabreu@synopsys.com>,
- Maxime Coquelin <mcoquelin.stm32@gmail.com>,
- Tony Nguyen <anthony.l.nguyen@intel.com>,
- Przemek Kitszel <przemyslaw.kitszel@intel.com>,
- Faizal Rahim <faizal.abdul.rahim@linux.intel.com>,
- Bouska Zdenek <zdenek.bouska@siemens.com>
-Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
- linux-doc@vger.kernel.org, bpf@vger.kernel.org,
- linux-kselftest@vger.kernel.org, linux-stm32@st-md-mailman.stormreply.com,
- linux-arm-kernel@lists.infradead.org, intel-wired-lan@lists.osuosl.org,
- xdp-hints@xdp-project.net
-References: <20250204004907.789330-1-yoong.siang.song@intel.com>
- <20250204004907.789330-4-yoong.siang.song@intel.com>
-Content-Language: en-US
-From: Choong Yong Liang <yong.liang.choong@linux.intel.com>
-In-Reply-To: <20250204004907.789330-4-yoong.siang.song@intel.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250203215816.1294081-1-kuba@kernel.org>
 
+On Mon, Feb 03, 2025 at 01:58:16PM -0800, Jakub Kicinski wrote:
+> Drivers should always disable a NAPI instance before removing it.
+> If they don't the instance may be queued for polling.
+> Since commit 86e25f40aa1e ("net: napi: Add napi_config")
+> we also remove the NAPI from the busy polling hash table
+> in napi_disable(), so not disabling would leave a stale
+> entry there.
+> 
+> Use of busy polling is relatively uncommon so bugs may be lurking
+> in the drivers. Add an explicit warning.
+> 
+> Signed-off-by: Jakub Kicinski <kuba@kernel.org>
+> ---
+>  net/core/dev.c | 3 +++
+>  1 file changed, 3 insertions(+)
+> 
 
+Let's find out how many bugs are lurking:
 
-On 4/2/2025 8:49 am, Song Yoong Siang wrote:
-> Enable launch time (Time-Based Scheduling) support for XDP zero copy via
-> the XDP Tx metadata framework.
-> 
-> This patch has been tested with tools/testing/selftests/bpf/xdp_hw_metadata
-> on Intel Tiger Lake platform. Below are the test steps and result.
-> 
-> Test 1: Send a single packet with the launch time set to 1 s in the future.
-> 
-> Test steps:
-> 1. On the DUT, start the xdp_hw_metadata selftest application:
->     $ sudo ./xdp_hw_metadata enp0s30f4 -l 1000000000 -L 1
-> 
-> 2. On the Link Partner, send a UDP packet with VLAN priority 1 to port 9091
->     of the DUT.
-> 
-> Result:
-> When the launch time is set to 1 s in the future, the delta between the
-> launch time and the transmit hardware timestamp is 16.963 us, as shown in
-> printout of the xdp_hw_metadata application below.
->    0x55b5864717a8: rx_desc[4]->addr=88100 addr=88100 comp_addr=88100 EoP
->    No rx_hash, err=-95
->    HW RX-time:   1734579065767717328 (sec:1734579065.7677)
->                  delta to User RX-time sec:0.0004 (375.624 usec)
->    XDP RX-time:   1734579065768004454 (sec:1734579065.7680)
->                   delta to User RX-time sec:0.0001 (88.498 usec)
->    No rx_vlan_tci or rx_vlan_proto, err=-95
->    0x55b5864717a8: ping-pong with csum=5619 (want 0000)
->                    csum_start=34 csum_offset=6
->    HW RX-time:   1734579065767717328 (sec:1734579065.7677)
->                  delta to HW Launch-time sec:1.0000 (1000000.000 usec)
->    0x55b5864717a8: complete tx idx=4 addr=4018
->    HW Launch-time:   1734579066767717328 (sec:1734579066.7677)
->                      delta to HW TX-complete-time sec:0.0000 (16.963 usec)
->    HW TX-complete-time:   1734579066767734291 (sec:1734579066.7677)
->                           delta to User TX-complete-time sec:0.0001
->                           (130.408 usec)
->    XDP RX-time:   1734579065768004454 (sec:1734579065.7680)
->                   delta to User TX-complete-time sec:0.9999
->                  (999860.245 usec)
->    HW RX-time:   1734579065767717328 (sec:1734579065.7677)
->                  delta to HW TX-complete-time sec:1.0000 (1000016.963 usec)
->    0x55b5864717a8: complete rx idx=132 addr=88100
-> 
-> Test 2: Send 1000 packets with a 10 ms interval and the launch time set to
->          500 us in the future.
-> 
-> Test steps:
-> 1. On the DUT, start the xdp_hw_metadata selftest application:
->     $ sudo chrt -f 99 ./xdp_hw_metadata enp0s30f4 -l 500000 -L 1 > \
->       /dev/shm/result.log
-> 
-> 2. On the Link Partner, send 1000 UDP packets with a 10 ms interval and
->     VLAN priority 1 to port 9091 of the DUT.
-> 
-> Result:
-> When the launch time is set to 500 us in the future, the average delta
-> between the launch time and the transmit hardware timestamp is 13.854 us,
-> as shown in the analysis of /dev/shm/result.log below. The XDP launch time
-> works correctly in sending 1000 packets continuously.
->    Min delta: 08.410 us
->    Avr delta: 13.854 us
->    Max delta: 17.076 us
->    Total packets forwarded: 1000
-> 
-> Signed-off-by: Song Yoong Siang <yoong.siang.song@intel.com>
-
-Reviewed-by: Choong Yong Liang <yong.liang.choong@linux.intel.com>
+Reviewed-by: Joe Damato <jdamato@fastly.com>
 
