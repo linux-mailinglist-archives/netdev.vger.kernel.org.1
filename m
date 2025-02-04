@@ -1,158 +1,103 @@
-Return-Path: <netdev+bounces-162577-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-162575-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1965BA27436
-	for <lists+netdev@lfdr.de>; Tue,  4 Feb 2025 15:19:04 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id EECDEA27428
+	for <lists+netdev@lfdr.de>; Tue,  4 Feb 2025 15:12:09 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 93D183A2998
-	for <lists+netdev@lfdr.de>; Tue,  4 Feb 2025 14:18:55 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 0AD203A8B8B
+	for <lists+netdev@lfdr.de>; Tue,  4 Feb 2025 14:09:37 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1654A211A24;
-	Tue,  4 Feb 2025 14:18:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 27794211A1E;
+	Tue,  4 Feb 2025 14:09:40 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=wanadoo.fr header.i=@wanadoo.fr header.b="stm50rGq"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="fvnHT2kI"
 X-Original-To: netdev@vger.kernel.org
-Received: from out.smtpout.orange.fr (out-65.smtpout.orange.fr [193.252.22.65])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7D0DA20C029;
-	Tue,  4 Feb 2025 14:18:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=193.252.22.65
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7C0C1211490
+	for <netdev@vger.kernel.org>; Tue,  4 Feb 2025 14:09:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1738678738; cv=none; b=uutKAiPN/kq2UolKzYKjQ3v5C3gHvvDMaj0UV6DXmL2cEEGIGTngQ8klFJCiFkjIdAxnlwDACcMmzePfVAooSXJiDmh57wPLzFSvbsFme5DCoQU4sRhlzdhIOobI2YJNuI9KTOfgAshjCHx0KdvkjfLlRNjgeoIfRgmPFKWfNxw=
+	t=1738678180; cv=none; b=RMMZclr6r+GqaRsy20X4+S1IvPAeIjF+AEZbmYdZc8YZto6AM4NhNEIJxTKYbN1ObpD6ExyQEG/S15OsfVOGEON3fPqVLbS9yyamHZPW5MuksXNnxUqSkFZKxQMQtCjw5R8UGAnLmG9yTITZZ5neah/souP8t/51Pv0RBg2oXdU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1738678738; c=relaxed/simple;
-	bh=nvNHt7cwQmDcJEtj+2bHSw5+iiQ9a5ScOXgH8QpHeWc=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=K79jc+kS7uOvEiZ+ILMEAB39mr5V5O6b1d543ZgiPhrG8gA1GnGk8Rg3i9DPMf5BhsnavYft7FntFrpfJG1dtl85z4qNsbe+HZl9H8YHSiz15qYCl7Z/bZfsLQ0fW1aTm/Iv8a98x8i8upzG9IvTGhOcpAQORJzOGZb+6+HZ4Js=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=wanadoo.fr; spf=pass smtp.mailfrom=wanadoo.fr; dkim=pass (2048-bit key) header.d=wanadoo.fr header.i=@wanadoo.fr header.b=stm50rGq; arc=none smtp.client-ip=193.252.22.65
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=wanadoo.fr
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=wanadoo.fr
-Received: from [172.16.82.72] ([124.33.176.97])
-	by smtp.orange.fr with ESMTPA
-	id fJc6tfzAathYvfJcBtDPQV; Tue, 04 Feb 2025 15:09:28 +0100
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=wanadoo.fr;
-	s=t20230301; t=1738678168;
-	bh=tUcBiUpcHUfI6arbSS7myC+Gqdvvs9Qfr5JLm5sdhwk=;
-	h=Message-ID:Date:MIME-Version:Subject:To:From;
-	b=stm50rGq3KIg8byMh5Ql5KS8pcLbdesu1KN2un/jypmXff+cANo+hyFBEHKmC5AwT
-	 bDdB7xLc0EmUPWljpSx22kJ4LeH7OERsR9tbcNgHJuep+Gfck6xoxGrx+pbfxJazR7
-	 4q6HYgOjHqoKr6m/95A1qKijGrgDolwqfQ8fanCDn0u8qu3hLfxzAEKwTARVJH9KBa
-	 OOkMt4oBoNYym7X2A42r8Fzg7/qpYIQ6azTv/9h8AAGdEcscm/rVqF/68AxkFBIxTF
-	 c/ugwzgobylldjyVcq5CG9gsOul6R29iI+VGEynRtLnk9mzwn6z+7eMHwdeEYDwbeL
-	 Bxs5hING+DHxQ==
-X-ME-Helo: [172.16.82.72]
-X-ME-Auth: bWFpbGhvbC52aW5jZW50QHdhbmFkb28uZnI=
-X-ME-Date: Tue, 04 Feb 2025 15:09:28 +0100
-X-ME-IP: 124.33.176.97
-Message-ID: <b25b21b2-c999-4f21-9ad0-30113b4c655d@wanadoo.fr>
-Date: Tue, 4 Feb 2025 23:09:17 +0900
+	s=arc-20240116; t=1738678180; c=relaxed/simple;
+	bh=FdRV7dJVnVj1j/AEXGwiRQUI1WfYKxSdSx4eOKpjjX0=;
+	h=From:In-Reply-To:References:To:Cc:Subject:MIME-Version:
+	 Content-Type:Date:Message-ID; b=o6DvNyVKZoJFBoXFz+NEqEGe5TJtYz8rM+9YIGyJtoJdEDR7AyBaz8Q2YP9DNRx0x2ZLQpDObO5fYmkXPkzT/7J/Pz/Jj41RJuwXXBno3MXxhFAO/tkdSfcU8Ce1Sn+mAz0UaC3bZy13gPgqUscSWs2lrbjqw2HxND1lY453pok=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=fvnHT2kI; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1738678177;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=FdRV7dJVnVj1j/AEXGwiRQUI1WfYKxSdSx4eOKpjjX0=;
+	b=fvnHT2kI8othpa/kVvAW9R8TSGRjoQ6TWV8Dls7mdNQT9enOSnInU7f86/6mwj8J06BC4n
+	WUx+uJG7tOSo9POTiiauubKUQ4WbLBRU+7cdLjLtf1D7lSqwQKB16P28RbbyIvPmoSdicf
+	0HYMa3z+Ke2FhhtAC6Tgvqp8sH5Yb/s=
+Received: from mx-prod-mc-06.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-35-165-154-97.us-west-2.compute.amazonaws.com [35.165.154.97]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-37-ZEO8It7fMQSrt_rjSIZfwg-1; Tue,
+ 04 Feb 2025 09:09:32 -0500
+X-MC-Unique: ZEO8It7fMQSrt_rjSIZfwg-1
+X-Mimecast-MFC-AGG-ID: ZEO8It7fMQSrt_rjSIZfwg
+Received: from mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.93])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mx-prod-mc-06.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id F1B2818009C1;
+	Tue,  4 Feb 2025 14:09:29 +0000 (UTC)
+Received: from warthog.procyon.org.uk (unknown [10.42.28.92])
+	by mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 342A118008C8;
+	Tue,  4 Feb 2025 14:09:27 +0000 (UTC)
+Organization: Red Hat UK Ltd. Registered Address: Red Hat UK Ltd, Amberley
+	Place, 107-111 Peascod Street, Windsor, Berkshire, SI4 1TE, United
+	Kingdom.
+	Registered in England and Wales under Company Registration No. 3798903
+From: David Howells <dhowells@redhat.com>
+In-Reply-To: <716751b5-6907-4fbb-bb07-0223f5761299@redhat.com>
+References: <716751b5-6907-4fbb-bb07-0223f5761299@redhat.com> <20250203110307.7265-1-dhowells@redhat.com> <20250203110307.7265-3-dhowells@redhat.com>
+To: Paolo Abeni <pabeni@redhat.com>
+Cc: dhowells@redhat.com, netdev@vger.kernel.org,
+    Marc Dionne <marc.dionne@auristor.com>,
+    Jakub Kicinski <kuba@kernel.org>,
+    "David S. Miller" <davem@davemloft.net>,
+    Eric Dumazet <edumazet@google.com>, linux-afs@lists.infradead.org,
+    linux-kernel@vger.kernel.org, Simon Horman <horms@kernel.org>
+Subject: Re: [PATCH net 2/2] rxrpc: Fix the rxrpc_connection attend queue handling
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: general protection fault in devlink_info_serial_number_put
-To: YAN KANG <kangyan91@outlook.com>, Jiri Pirko <jiri@resnulli.us>,
- Jakub Kicinski <kuba@kernel.org>
-Cc: "syzkaller@googlegroups.com" <syzkaller@googlegroups.com>,
- "David S. Miller\"" <davem@davemloft.net>, Eric Dumazet
- <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
- Simon Horman <horms@kernel.org>, netdev@vger.kernel.org,
- "linux-can@vger.kernel.org" <linux-can@vger.kernel.org>,
- Marc Kleine-Budde <mkl@pengutronix.de>,
- "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
-References: <SY8P300MB0421E0013C0EBD2AA46BA709A1F42@SY8P300MB0421.AUSP300.PROD.OUTLOOK.COM>
-Content-Language: en-US
-From: Vincent Mailhol <mailhol.vincent@wanadoo.fr>
-Autocrypt: addr=mailhol.vincent@wanadoo.fr; keydata=
- xjMEZluomRYJKwYBBAHaRw8BAQdAf+/PnQvy9LCWNSJLbhc+AOUsR2cNVonvxhDk/KcW7FvN
- LFZpbmNlbnQgTWFpbGhvbCA8bWFpbGhvbC52aW5jZW50QHdhbmFkb28uZnI+wrIEExYKAFoC
- GwMFCQp/CJcFCwkIBwICIgIGFQoJCAsCBBYCAwECHgcCF4AWIQTtj3AFdOZ/IOV06OKrX+uI
- bbuZwgUCZx41XhgYaGtwczovL2tleXMub3BlbnBncC5vcmcACgkQq1/riG27mcIYiwEAkgKK
- BJ+ANKwhTAAvL1XeApQ+2NNNEwFWzipVAGvTRigA+wUeyB3UQwZrwb7jsQuBXxhk3lL45HF5
- 8+y4bQCUCqYGzjgEZx4y8xIKKwYBBAGXVQEFAQEHQJrbYZzu0JG5w8gxE6EtQe6LmxKMqP6E
- yR33sA+BR9pLAwEIB8J+BBgWCgAmFiEE7Y9wBXTmfyDldOjiq1/riG27mcIFAmceMvMCGwwF
- CQPCZwAACgkQq1/riG27mcJU7QEA+LmpFhfQ1aij/L8VzsZwr/S44HCzcz5+jkxnVVQ5LZ4B
- ANOCpYEY+CYrld5XZvM8h2EntNnzxHHuhjfDOQ3MAkEK
-In-Reply-To: <SY8P300MB0421E0013C0EBD2AA46BA709A1F42@SY8P300MB0421.AUSP300.PROD.OUTLOOK.COM>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset="us-ascii"
+Content-ID: <549952.1738678165.1@warthog.procyon.org.uk>
+Content-Transfer-Encoding: quoted-printable
+Date: Tue, 04 Feb 2025 14:09:25 +0000
+Message-ID: <549953.1738678165@warthog.procyon.org.uk>
+X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.93
 
-+To: Jiri Pirko
-+To: Jakub Kicinski
-+CC: David S. Miller
-+CC: Eric Dumazet
-+CC: Paolo Abeni
-+CC: Simon Horman
-+CC: netdev@vger.kernel.org
+Paolo Abeni <pabeni@redhat.com> wrote:
 
-On 04/02/2025 at 16:44, YAN KANG wrote:
-> Dear developers and maintainers,
-> 
-> I found a new kernel  NULL-Pointer-Dereference bug titiled "general protection fault in devlink_info_serial_number_put" while using modified syzkaller fuzzing tool. I Itested it on the latest Linux upstream version (6.13.0-rc7)related to ETAS ES58X CAN/USB DRIVER, and it was able to be triggered.
-> 
-> The bug info is:
-> 
-> kernel revision: v6.13-rc7
-> OOPS message: general protection fault in devlink_info_serial_number_put
-> reproducer:YES
-> 
-> After preliminary analysis,  The root casue may be :
-> in the function:  es58x_devlink_info_get drivers/net/can/usb/etas_es58x/es58x_devlink.c
-> es58x_dev->udev->serial   == NULL ,but no check for it.
-> 
->  devlink_info_serial_number_put(req, es58x_dev->udev->serial) triggers NPD .
-> 
-> Fix suggestion: Check es58x_dev->udev->serial before deference pointer.
+> A couple of minor nits: I think this deserves a 'Fixes' tag,
 
-Thanks for the report. I acknowledge the issue: the serial number of a
-USB device may be NULL and I forget to check this condition.
+Fixes: f2cce89a074e ("rxrpc: Implement a mechanism to send an event notifi=
+cation to a connection")
 
-@netdev and devlink maintainers
+> and possibly split into separate patches to address the reported problem=
+s
+> individually.
 
-I can of course fix this locally, but this that this kind of issue looks
-like some nasty pitfall to me. So, I was wondering if it wouldn't be
-safer to add the NULL check in the framework instead of in the device.
-The netlink is not part of the hot path, so a NULL check should not have
-performance impacts.
+I can do that if you really want.
 
-I am thinking of:
-
-diff --git a/include/net/netlink.h b/include/net/netlink.h
-index e015ffbed819..eaee9a1aa91f 100644
---- a/include/net/netlink.h
-+++ b/include/net/netlink.h
-@@ -1617,6 +1617,8 @@ static inline int nla_put_sint(struct sk_buff
-*skb, int attrtype, s64 value)
- static inline int nla_put_string(struct sk_buff *skb, int attrtype,
-                                 const char *str)
- {
-+       if (!str)
-+               return 0;
-        return nla_put(skb, attrtype, strlen(str) + 1, str);
- }
-
-Of course, it is also possible to do the check in
-devlink_info_serial_number_put().
-
-What do you think?
-
-> If you fix this issue, please add the following tag to the commit:
-> Reported-by: yan kang <kangyan91@outlook.com>
-> Reported-by: yue sun <samsun1006219@gmail.com
-> 
-> I hope it helps.
-> Best regards
-> yan kang
-
-
-Yours sincerely,
-Vincent Mailhol
+David
 
 
