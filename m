@@ -1,79 +1,79 @@
-Return-Path: <netdev+bounces-162643-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-162644-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 42D0CA2775C
-	for <lists+netdev@lfdr.de>; Tue,  4 Feb 2025 17:39:32 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 0D1F5A27764
+	for <lists+netdev@lfdr.de>; Tue,  4 Feb 2025 17:40:11 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 35B6C1882A49
-	for <lists+netdev@lfdr.de>; Tue,  4 Feb 2025 16:39:31 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 939511882259
+	for <lists+netdev@lfdr.de>; Tue,  4 Feb 2025 16:40:07 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2587E2165E8;
-	Tue,  4 Feb 2025 16:38:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 07F8B216383;
+	Tue,  4 Feb 2025 16:38:46 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=blackwall-org.20230601.gappssmtp.com header.i=@blackwall-org.20230601.gappssmtp.com header.b="T8mDouel"
+	dkim=pass (2048-bit key) header.d=blackwall-org.20230601.gappssmtp.com header.i=@blackwall-org.20230601.gappssmtp.com header.b="mVtuRQLT"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-f50.google.com (mail-ed1-f50.google.com [209.85.208.50])
+Received: from mail-ed1-f45.google.com (mail-ed1-f45.google.com [209.85.208.45])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 636902153CE
-	for <netdev@vger.kernel.org>; Tue,  4 Feb 2025 16:38:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.50
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5DA05216612
+	for <netdev@vger.kernel.org>; Tue,  4 Feb 2025 16:38:44 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.45
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1738687113; cv=none; b=XVzVmR4vKHIl5mggn21/nYwIwXnntyUsdXIafrKXUgbR6jkmPtMRm4oMdMS1GzIA64kT4KD/nKvXPSJv3QSDgasdMtrmW4VjiKLWdl+lSxQYZovWCR0unz821TkJuyGMXfMQDYH8uPB/BgFDRgJs5Mt3oLWWrormKztL9e3DvoE=
+	t=1738687125; cv=none; b=BDmS+ajvsXejGXMjV0GSqTTfTl+nwEcyVGb2SGfNvcn3i8/eMj4SbZJT5LoDP4ly4kXPMkyhXV+n8UDZ/jyBUGmRDXqEJ3M3h0GtcgCoknfJ5wfVixxi0kGlAgGVGaiLRa+zexHG6onKoNANM+4R8Z2BLrE6AFGOEPpizzKI0IA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1738687113; c=relaxed/simple;
-	bh=EQbL0Sdt+XkmvZiR8nil4Iqbr37XXySmc0QAczpAAew=;
+	s=arc-20240116; t=1738687125; c=relaxed/simple;
+	bh=h4YtJRWFxGc+VBOsFApiyqh1XqNP7DcCZBALFYqdrck=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=qbxWI3AbURXGb1sZ6vZn/Ihv9/RtGDqtCirLaRCQRuvPkIxofVX1z8h5oHRWMUUUlXAT5pXDU/JQk+V4/tlN0ENfGnT958yXcIPJsjuUpsA0oV75MJG6YzaZdnqYP7MIJthh8JTHvRWg7ykJn0h1kqvduS42YkegZnd2fMb4vHQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=blackwall.org; spf=none smtp.mailfrom=blackwall.org; dkim=pass (2048-bit key) header.d=blackwall-org.20230601.gappssmtp.com header.i=@blackwall-org.20230601.gappssmtp.com header.b=T8mDouel; arc=none smtp.client-ip=209.85.208.50
+	 In-Reply-To:Content-Type; b=Z9e46Pu8QJupfyG7rKSQ460EWmMeakQ1cePJgZ9WZ88mM/ZkvalgoXHh1PBUTRfGAjsNxD/A+NUqrJpkVAl259PYzAfpm/fML1bNQsNOuikYBSOPYxSVleeQEQQZqMLahZ2uRoRapieCUTobkkioUMfZdKwCBsPVxILnlrWgDuE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=blackwall.org; spf=none smtp.mailfrom=blackwall.org; dkim=pass (2048-bit key) header.d=blackwall-org.20230601.gappssmtp.com header.i=@blackwall-org.20230601.gappssmtp.com header.b=mVtuRQLT; arc=none smtp.client-ip=209.85.208.45
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=blackwall.org
 Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=blackwall.org
-Received: by mail-ed1-f50.google.com with SMTP id 4fb4d7f45d1cf-5dc7eba78e6so11036997a12.3
-        for <netdev@vger.kernel.org>; Tue, 04 Feb 2025 08:38:31 -0800 (PST)
+Received: by mail-ed1-f45.google.com with SMTP id 4fb4d7f45d1cf-5d90a5581fcso10599463a12.1
+        for <netdev@vger.kernel.org>; Tue, 04 Feb 2025 08:38:43 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=blackwall-org.20230601.gappssmtp.com; s=20230601; t=1738687109; x=1739291909; darn=vger.kernel.org;
+        d=blackwall-org.20230601.gappssmtp.com; s=20230601; t=1738687122; x=1739291922; darn=vger.kernel.org;
         h=content-transfer-encoding:in-reply-to:from:content-language
          :references:cc:to:subject:user-agent:mime-version:date:message-id
          :from:to:cc:subject:date:message-id:reply-to;
-        bh=WdaPZc9CONkf4+pakm9O+8SJ7d8OZWZ0KmwGKhUgrys=;
-        b=T8mDouelFqEyl336HHp0oqhrYaAm8YuiwfSqnL9WlEhgsxx6+lS17MaPIMcnz80Iie
-         G65LqrYsQCZz6bqb367w95ogLV5tPrnEM0xpDD1fHyyWEdwK+cQuXTB8uwMit9dF6L6n
-         wCyt+jUibl6OS/yeC9wnszZp/WgdFDNVqygO3BMAPYhrjtQaYPoWhnEpXbAjXJwC6PJf
-         OaAcGlZOKjf3P4t92JGg8CiKhy4GoySUnb/CbyPFeO+mSCOOiWmziQ/14RXD2qpcym3T
-         AKZogGaxaQ7siTVlNdAcxZmhWtT1IcII3F93Q0OJcHtEGEjB9Ci7YTqhWjhZ6Crp1HHq
-         xU1w==
+        bh=s/oi6vLJrFpwJXucCGnRk+gKcQxcv8eGViephUTtud0=;
+        b=mVtuRQLTa3kioQO0fetRU3olp9fMOxtzTht03qnYS3D5iWx7VuqSI9K87+oflWiydj
+         6PRThyHVsTDhTijOwA3me3ePjVCootApaQrb1iElTT2+yGiuqwbokreEMY35loVIW9gu
+         jEc2JBIFQJ5SP4HQrTmwk6PvB1OAJF/SW7P1E6ikNIyQXAu73U5d41uTfOI0BWwGYhUl
+         UmNEGFxKCvRTi3i3hNRQTdApHUdTzVlkzGbTGESd7wOs1u+VyVpTmRvM8OT+hlP1xpwj
+         ebROfLNpVOtQu0X8Wrct0nQyq8YiFnStoL7238fcLZRnzlX0IknUQR5/6roNrLY/Wvgg
+         8s/g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1738687109; x=1739291909;
+        d=1e100.net; s=20230601; t=1738687122; x=1739291922;
         h=content-transfer-encoding:in-reply-to:from:content-language
          :references:cc:to:subject:user-agent:mime-version:date:message-id
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=WdaPZc9CONkf4+pakm9O+8SJ7d8OZWZ0KmwGKhUgrys=;
-        b=NQAZrfjsdqr4A7vR8BlqFb8SLCB3AoBKHhaPeseahDaDqFBw4WgxFWMy1sscg9HitQ
-         GT8NmRZebB6ezg58xjg4pLTTBDmHfQompOACiuX0qce9qqeFao8vgBdHJvpEWVdnSJ3k
-         hqn4jSlSZkdXwQSMG6reVjipEpoXIT5VrH8WUxP9XY8ZljU2vZE6ijCb5pkBqmqtSFUX
-         Ny48fx9mYht4d2lnt2CheCAUYICeFEfEFytPnDzWlxGTdplSjk0kBTSM9WmX6FddLpUA
-         nfwEaix6VEbKS/TOXnvwEsacjyOY2oSJezhaRXkhNcST+P9+fN9c5ZnF6xwubHznZHRX
-         XfWw==
-X-Forwarded-Encrypted: i=1; AJvYcCVQZMx0e2R5+a8IFcRDcX6zgySQe7JDaubqULefizgpFZf9rViwVj2s1iU9PatgGNKFdcpvBY8=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxxskyxKXSOsleill/6RE7Y1T/BLskS5q3ShruujyjECD9EbUL3
-	BWLc/f2RSItfUGMv3uDKrt1YvY+Oi/Simtg5+BGZ5umXj/NsVDCCx7E92llUG0A=
-X-Gm-Gg: ASbGncubwQaq5YODKIcNt7GctX5InC7mY4Y7zikUVxxTiSuVrVliIZudf5TTmzUBuKz
-	mf7962sq+wD1fCADHeWn5yom0MgP2yUd/Vdo8FnK+94R7/LlvDvHJvFCQoqe6fMbg5rExZCJlEI
-	o0xNRar1YAPs/kwCvvHVb7QULMpj2DySB2O+KQiv31CGQRMZzhuVgOiNAm8FLwDgkR6Nerjvcfh
-	F+1TP+F4TyvQlfIls52eyX6s9X0bYQkgIoxtauyWc7jOucGKswrQelXg4vUiOhcHyCwHAdTplCt
-	eLU0wkJwuAMzi9YjuALr8GkfPl4RZljW06vElX+ec2hh4zs=
-X-Google-Smtp-Source: AGHT+IGLocIbdb78F2HWWcNPuMfjMt24zZiSg9sDpJIkeGt7oO0IU+daxxESk6ArnPhnluLGe+Jjpw==
-X-Received: by 2002:a17:907:970e:b0:ab7:ac1:5c37 with SMTP id a640c23a62f3a-ab70ac15ca5mr1430041066b.47.1738687109480;
-        Tue, 04 Feb 2025 08:38:29 -0800 (PST)
+        bh=s/oi6vLJrFpwJXucCGnRk+gKcQxcv8eGViephUTtud0=;
+        b=NKldiZZ8AOnnfBIq4KQQQ8G/Ci/OrBA4/Q2gnnF5oggs63Tn3WZ6+OZwvZJpG/QnlF
+         2ZeEyCMFzQHUIaOui2jkU6f7zUbJwtHpux9DVOMpIGB33Ohf951enjoCN1J33nKqd6U3
+         VwnWUbAzqB1nzRw5PXSJyCM0CGjhH+5XyJHh65s6RWvu8qpud3054Y5qrnDz84ZYTQgQ
+         7yfk1MgWhd83MjaM3WPr1K8rBkXtJyMVLDOFpGgq4DpjCul6PrWzkPhS4g2C+8uC0YiZ
+         eZMYQFuHGSgpbgwBDoICJt2xDpUnqw6n2wSPovVSqpPRxHwlOlU2nr4vxnI2Ynpyeoxc
+         /1DA==
+X-Forwarded-Encrypted: i=1; AJvYcCXeoPApB0aIxZcYd1BqRrcMSJ78wDMomYZsz6NHM52CPmKCqTjYGxZXIsdejeGWig5lwHvLHYI=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyD/6/TlSKZmifAEEWb5PLphJe9zaXZ/yMH0oIi7X/EP7dUbbnT
+	Tv9icXVxJS6J6BzRHSPIFWu+zDUQBvkOGMsOvxFJhoxja77ugRWdTSLEHqUaFzM=
+X-Gm-Gg: ASbGncvjaxIJ05IklfyVvys02c3XI6pHeLrYM/nRjARNEf/DcTGtAcc067lp8WFiCNu
+	9rytKkLLwqbMfjycFXDJiXb+r2ZCSpE9L/dlQxAn/h92Gqln4uirJZnk2A7cUfrT5//S/ipeTNh
+	JNeMK3CL90AEKna25IFlJGTTCdw7Ij0BSqv+hCJWlkORyd5Gx6W8XqA8/2vogzJFKEZJlhPquGg
+	TulMR0umZHPR2yE5awXl5fBx8cBxQ7UcshjSzzqnAWTqSIg5fPxPzwKCNtDGe3zfaghVSseEiw7
+	r7pGveHDRApMOuts9CDh78xnoEOmUoo8CD+91KBAPW2xLfA=
+X-Google-Smtp-Source: AGHT+IE8U1dg9PgxcBKhgIjNnWQN8FwnuJRnSab0/bBNkHB4i+a1p/Q8RRNfGMYfFbU+ri63Ll1QMw==
+X-Received: by 2002:a05:6402:248a:b0:5dc:796f:fc89 with SMTP id 4fb4d7f45d1cf-5dc7970050bmr22077414a12.2.1738687122585;
+        Tue, 04 Feb 2025 08:38:42 -0800 (PST)
 Received: from [192.168.0.123] (78-154-15-142.ip.btc-net.bg. [78.154.15.142])
-        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-ab7106178ccsm596142066b.9.2025.02.04.08.38.28
+        by smtp.gmail.com with ESMTPSA id 4fb4d7f45d1cf-5dcc28a4c29sm1585372a12.23.2025.02.04.08.38.41
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 04 Feb 2025 08:38:28 -0800 (PST)
-Message-ID: <9c7c34e0-0c46-4ea3-9e01-738b92302532@blackwall.org>
-Date: Tue, 4 Feb 2025 18:38:28 +0200
+        Tue, 04 Feb 2025 08:38:42 -0800 (PST)
+Message-ID: <fc78aa59-ea9e-4d56-8ff7-ce304dc76e9b@blackwall.org>
+Date: Tue, 4 Feb 2025 18:38:41 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -81,31 +81,49 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next 7/8] vxlan: Avoid unnecessary updates to FDB
- 'used' time
+Subject: Re: [PATCH net-next 8/8] selftests: forwarding: vxlan_bridge_1d:
+ Check aging while forwarding
 To: Ido Schimmel <idosch@nvidia.com>, netdev@vger.kernel.org
 Cc: davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com,
  edumazet@google.com, andrew+netdev@lunn.ch, horms@kernel.org,
  petrm@nvidia.com
 References: <20250204145549.1216254-1-idosch@nvidia.com>
- <20250204145549.1216254-8-idosch@nvidia.com>
+ <20250204145549.1216254-9-idosch@nvidia.com>
 Content-Language: en-US
 From: Nikolay Aleksandrov <razor@blackwall.org>
-In-Reply-To: <20250204145549.1216254-8-idosch@nvidia.com>
+In-Reply-To: <20250204145549.1216254-9-idosch@nvidia.com>
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
 
 On 2/4/25 16:55, Ido Schimmel wrote:
-> Now that the VXLAN driver ages out FDB entries based on their 'updated'
-> time we can remove unnecessary updates of the 'used' time from the Rx
-> path and the control path, so that the 'used' time is only updated by
-> the Tx path.
+> Extend the VXLAN FDB aging test case to verify that FDB entries are aged
+> out when they only forward traffic and not refreshed by received
+> traffic.
+> 
+> The test fails before "vxlan: Age out FDB entries based on 'updated'
+> time":
+> 
+>  # ./vxlan_bridge_1d.sh
+>  [...]
+>  TEST: VXLAN: Ageing of learned FDB entry                            [FAIL]
+>  [...]
+>  # echo $?
+>  1
+> 
+> And passes after it:
+> 
+>  # ./vxlan_bridge_1d.sh
+>  [...]
+>  TEST: VXLAN: Ageing of learned FDB entry                            [ OK ]
+>  [...]
+>  # echo $?
+>  0
 > 
 > Reviewed-by: Petr Machata <petrm@nvidia.com>
 > Signed-off-by: Ido Schimmel <idosch@nvidia.com>
 > ---
->  drivers/net/vxlan/vxlan_core.c | 12 +++++-------
->  1 file changed, 5 insertions(+), 7 deletions(-)
+>  tools/testing/selftests/net/forwarding/vxlan_bridge_1d.sh | 2 ++
+>  1 file changed, 2 insertions(+)
 > 
 
 Reviewed-by: Nikolay Aleksandrov <razor@blackwall.org>
