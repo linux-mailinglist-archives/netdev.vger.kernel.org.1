@@ -1,60 +1,61 @@
-Return-Path: <netdev+bounces-162663-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-162662-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id E7AD3A27900
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0B594A278FF
 	for <lists+netdev@lfdr.de>; Tue,  4 Feb 2025 18:53:00 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id D154A18876AE
-	for <lists+netdev@lfdr.de>; Tue,  4 Feb 2025 17:53:05 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id DD2E41886D3A
+	for <lists+netdev@lfdr.de>; Tue,  4 Feb 2025 17:53:04 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 488682163BD;
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 32676215F74;
 	Tue,  4 Feb 2025 17:52:56 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="fE4ozeCL"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="e3h9Tiez"
 X-Original-To: netdev@vger.kernel.org
 Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.16])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 64047216384
-	for <netdev@vger.kernel.org>; Tue,  4 Feb 2025 17:52:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7B6D421638B
+	for <netdev@vger.kernel.org>; Tue,  4 Feb 2025 17:52:54 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.16
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1738691576; cv=none; b=R6YVSfsU5OfKyH4P8051Vw+KYNRDojzRrdYME+o8JgwRCXnRe8khGFcl2G49jJ1EENbh0II0R0Q8HS4Mxidf6aEb7g/kLMLp3z5bHwg48HBBaO/D1HzOxm4unRjjax5RWtj5VeotzNFYy5kk9juRo5UIaS+qYIzyb8Ck+D3PN1w=
+	t=1738691576; cv=none; b=THGbLekABDr52s5BPp8A/lw9EWxpUBGBiJZhhyJhGdPnIXE9cpYZzBrey8+y56lJvzpAGltO+df8qpzojgShcSZK+kn8rN9OcI2H6SdKdKjeOvCMJj7vGPpuHXhUFZbhhlKBwK8WY+BVdB4/984QOSr/zUE2XQhAYu92ZIUXmzo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1738691576; c=relaxed/simple;
-	bh=R3ULIwP/uCyeb6P741G4EHVcpHj9peJZ1S1cKIQ1gG4=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=bqFR+v5lQETsb9AWRn7jsrzJhmxEwK8Q1AvWEf74GTMYAlrcQPYx8gnrWbI5kFsur2bT6mhC43WDtrJ40RVq8d1a5ciRxCZqzdaAItFh5UZ8HicmiETwtE0Ayn/uVBTrcEtR4/rFBhRrUcGVEqb4KiUVEH16HvlVeZOkEXmf7ns=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=fE4ozeCL; arc=none smtp.client-ip=198.175.65.16
+	bh=DjRRCNPcLPWjuJq1XFZ/jGqru4FOEvkn8qDPdjG7ZKE=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=kistiFfZ7XG9XAQ+Kt5mbjcphDUBqSW7En+lrTf2gKVajxD6CwPVOkT+YEzgO4N2AtggiGKRDPyrJtM8dDZjPwFXq6lPNO7RnlSHukBPLy/xY0BOcRq82/muzH+sCeT7ChR5SBFQ0kqay/+1UrBSQiYYG0QS6YRw5HxxwOaFSGw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=e3h9Tiez; arc=none smtp.client-ip=198.175.65.16
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1738691574; x=1770227574;
-  h=from:to:cc:subject:date:message-id:mime-version:
-   content-transfer-encoding;
-  bh=R3ULIwP/uCyeb6P741G4EHVcpHj9peJZ1S1cKIQ1gG4=;
-  b=fE4ozeCLdZGYAwLSRc/wPuZngaOVm9RgKWqkq3AcLnQK8umWEuvanknp
-   up6w/1dzdEuORvIWbC6X3kUBYyjwA2cGyNge90OUtgQTfg2+DDuk05w3X
-   mZsGsz5gW8sz++3S/DmzFkEDY/WVa7Uo6ct+7vmO+e/VlZk3YChonaRmg
-   ehzIjqXq1TjbMoFcA6K2vqjWMajyrX8jRntoaiyArECwU3mKWQU1qTczb
-   vM9fvw5fu77RIlBD44NI9qCj79aSVGbAKTqirL6UKvzFuTzVmE2UTKRaD
-   KJpzFpsBK7ycG9M5/5Ehrt2b40awyxXbKrs5o0iLzWfKstF7UVnqEuJTf
-   w==;
-X-CSE-ConnectionGUID: wYFrc4g2QEqLOMOY01MYAQ==
-X-CSE-MsgGUID: eIPWFQYoR62mldPCuw2XaQ==
-X-IronPort-AV: E=McAfee;i="6700,10204,11336"; a="39371861"
+  t=1738691575; x=1770227575;
+  h=from:to:cc:subject:date:message-id:in-reply-to:
+   references:mime-version:content-transfer-encoding;
+  bh=DjRRCNPcLPWjuJq1XFZ/jGqru4FOEvkn8qDPdjG7ZKE=;
+  b=e3h9TiezhLCXAS6Bl3K1stMFQjUHilOnd4vu1T2Vc0MVFRd1wYoOPKVU
+   fUq3A+jzHmZGw3Xxhtg9+UAe8uJlmEghgNLIXemfBLAwW+UBw3uD9KwS+
+   gszXKO57Ww4Y0Hwjzsvv/LxmaqbPkcACsFyrP0h0Y9cMe9vAnTcg5RSVY
+   9lJ/LOJ5e1CLDVv7jGhddFBdorbxyL7acDYg3Nb9oDFniRsRyy+/gkADm
+   vRX+mVWBxmxDrqAGqytYgQeo+CSxkuI+7x9n+hAh7EleAN9SqrAxEFZzz
+   ga+53NeT7zLaYfBvZvtrc0OVXdHCezCpK2/CKl+b/pJ+I6o1erkbAfMRa
+   g==;
+X-CSE-ConnectionGUID: Bb9ZqvNMQN6dXi+pnvB+mg==
+X-CSE-MsgGUID: OAiR3utOQc+HcDkhtm4HOA==
+X-IronPort-AV: E=McAfee;i="6700,10204,11336"; a="39371875"
 X-IronPort-AV: E=Sophos;i="6.13,259,1732608000"; 
-   d="scan'208";a="39371861"
+   d="scan'208";a="39371875"
 Received: from orviesa006.jf.intel.com ([10.64.159.146])
-  by orvoesa108.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 04 Feb 2025 09:52:53 -0800
-X-CSE-ConnectionGUID: ogTViO/gTVePo8VBMouD8g==
-X-CSE-MsgGUID: PKb/aCafQ9ecy7C/sRsk6Q==
+  by orvoesa108.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 04 Feb 2025 09:52:54 -0800
+X-CSE-ConnectionGUID: 7mdMjiabSVS+VCPErw1DRw==
+X-CSE-MsgGUID: +MHDgjemSuqPDMEu8JTX+w==
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="6.13,259,1732608000"; 
-   d="scan'208";a="110652384"
+   d="scan'208";a="110652387"
 Received: from anguy11-upstream.jf.intel.com ([10.166.9.133])
   by orviesa006.jf.intel.com with ESMTP; 04 Feb 2025 09:52:53 -0800
 From: Tony Nguyen <anthony.l.nguyen@intel.com>
@@ -64,18 +65,21 @@ To: davem@davemloft.net,
 	edumazet@google.com,
 	andrew+netdev@lunn.ch,
 	netdev@vger.kernel.org
-Cc: Tony Nguyen <anthony.l.nguyen@intel.com>,
-	wander@redhat.com,
+Cc: Wander Lairson Costa <wander@redhat.com>,
+	anthony.l.nguyen@intel.com,
 	rostedt@goodmis.org,
 	clrkwllms@kernel.org,
 	bigeasy@linutronix.de,
 	jgarzik@redhat.com,
 	yuma@redhat.com,
-	linux-rt-devel@lists.linux.dev
-Subject: [PATCH net 0/4][pull request] igb: fix igb_msix_other() handling for PREEMPT_RT
-Date: Tue,  4 Feb 2025 09:52:36 -0800
-Message-ID: <20250204175243.810189-1-anthony.l.nguyen@intel.com>
+	linux-rt-devel@lists.linux.dev,
+	Rafal Romanowski <rafal.romanowski@intel.com>
+Subject: [PATCH net 1/4] igb: narrow scope of vfs_lock in SR-IOV cleanup
+Date: Tue,  4 Feb 2025 09:52:37 -0800
+Message-ID: <20250204175243.810189-2-anthony.l.nguyen@intel.com>
 X-Mailer: git-send-email 2.47.1
+In-Reply-To: <20250204175243.810189-1-anthony.l.nguyen@intel.com>
+References: <20250204175243.810189-1-anthony.l.nguyen@intel.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -84,59 +88,47 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Wander Lairson Costa says:
+From: Wander Lairson Costa <wander@redhat.com>
 
-This is the second attempt at fixing the behavior of igb_msix_other()
-for PREEMPT_RT. The previous attempt [1] was reverted [2] following
-concerns raised by Sebastian [3].
+The adapter->vfs_lock currently protects critical sections shared between
+igb_disable_sriov() and igb_msg_task(). Since igb_msg_task() - which is
+invoked solely by the igb_msix_other() ISR-only proceeds when
+adapter->vfs_allocated_count > 0, we can reduce the lock scope further.
 
-The initial approach proposed converting vfs_lock to a raw_spinlock,
-a minor change intended to make it safe. However, it became evident
-that igb_rcv_msg_from_vf() invokes kcalloc with GFP_ATOMIC,
-which is unsafe in interrupt context on PREEMPT_RT systems.
+By moving the assignment adapter->vfs_allocated_count = 0 to the start of the
+cleanup code in igb_disable_sriov(), we can restrict the spinlock protection
+solely to this assignment. This change removes kfree() calls from within the
+locked section, simplifying lock management.
 
-To address this, the solution involves splitting igb_msg_task()
-into two parts:
+Once kfree() is outside the vfs_lock scope, it becomes possible to safely
+convert vfs_lock to a raw_spin_lock.
 
-    * One part invoked from the IRQ context.
-    * Another part called from the threaded interrupt handler.
-
-To accommodate this, vfs_lock has been restructured into a double
-lock: a spinlock_t and a raw_spinlock_t. In the revised design:
-
-    * igb_disable_sriov() locks both spinlocks.
-    * Each part of igb_msg_task() locks the appropriate spinlock for
-    its execution context.
-
-It is worth noting that the double lock mechanism is only active under
-PREEMPT_RT. For non-PREEMPT_RT builds, the additional raw_spinlock_t
-field is omitted.
-
-If the extra raw_spinlock_t field can be tolerated under
-!PREEMPT_RT (even though it remains unused), we can eliminate the
-need for #ifdefs and simplify the code structure.
-
-[1] https://lore.kernel.org/all/20240920185918.616302-2-wander@redhat.com/
-[2] https://lore.kernel.org/all/20241104124050.22290-1-wander@redhat.com/
-[3] https://lore.kernel.org/all/20241104110708.gFyxRFlC@linutronix.de/
+Signed-off-by: Wander Lairson Costa <wander@redhat.com>
+Tested-by: Rafal Romanowski <rafal.romanowski@intel.com>
+Signed-off-by: Tony Nguyen <anthony.l.nguyen@intel.com>
 ---
-IWL: https://lore.kernel.org/intel-wired-lan/20241204114229.21452-1-wander@redhat.com/
+ drivers/net/ethernet/intel/igb/igb_main.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
-The following are changes since commit 4241a702e0d0c2ca9364cfac08dbf134264962de:
-  rxrpc: Fix the rxrpc_connection attend queue handling
-and are available in the git repository at:
-  git://git.kernel.org/pub/scm/linux/kernel/git/tnguy/net-queue 1GbE
-
-Wander Lairson Costa (4):
-  igb: narrow scope of vfs_lock in SR-IOV cleanup
-  igb: introduce raw vfs_lock to igb_adapter
-  igb: split igb_msg_task()
-  igb: fix igb_msix_other() handling for PREEMPT_RT
-
- drivers/net/ethernet/intel/igb/igb.h      |   4 +
- drivers/net/ethernet/intel/igb/igb_main.c | 160 +++++++++++++++++++---
- 2 files changed, 148 insertions(+), 16 deletions(-)
-
+diff --git a/drivers/net/ethernet/intel/igb/igb_main.c b/drivers/net/ethernet/intel/igb/igb_main.c
+index d368b753a467..77571f6fdbfd 100644
+--- a/drivers/net/ethernet/intel/igb/igb_main.c
++++ b/drivers/net/ethernet/intel/igb/igb_main.c
+@@ -3708,12 +3708,12 @@ static int igb_disable_sriov(struct pci_dev *pdev, bool reinit)
+ 			msleep(500);
+ 		}
+ 		spin_lock_irqsave(&adapter->vfs_lock, flags);
++		adapter->vfs_allocated_count = 0;
++		spin_unlock_irqrestore(&adapter->vfs_lock, flags);
+ 		kfree(adapter->vf_mac_list);
+ 		adapter->vf_mac_list = NULL;
+ 		kfree(adapter->vf_data);
+ 		adapter->vf_data = NULL;
+-		adapter->vfs_allocated_count = 0;
+-		spin_unlock_irqrestore(&adapter->vfs_lock, flags);
+ 		wr32(E1000_IOVCTL, E1000_IOVCTL_REUSE_VFQ);
+ 		wrfl();
+ 		msleep(100);
 -- 
 2.47.1
 
