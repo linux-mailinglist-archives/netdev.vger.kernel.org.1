@@ -1,58 +1,55 @@
-Return-Path: <netdev+bounces-162441-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-162443-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 345FBA26EAE
-	for <lists+netdev@lfdr.de>; Tue,  4 Feb 2025 10:39:54 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 99887A26EBB
+	for <lists+netdev@lfdr.de>; Tue,  4 Feb 2025 10:47:23 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 0CC141882A37
-	for <lists+netdev@lfdr.de>; Tue,  4 Feb 2025 09:39:59 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 6122018871CF
+	for <lists+netdev@lfdr.de>; Tue,  4 Feb 2025 09:47:28 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B4A24207DE0;
-	Tue,  4 Feb 2025 09:39:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id F2EAD2066E5;
+	Tue,  4 Feb 2025 09:47:19 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="HE3s1T5B"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="On/zLR7q"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8FBE9207676
-	for <netdev@vger.kernel.org>; Tue,  4 Feb 2025 09:39:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CDADC20125D
+	for <netdev@vger.kernel.org>; Tue,  4 Feb 2025 09:47:18 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1738661990; cv=none; b=CmN4o4aLzQoVX9jUPHHOetZnxlPUcaBfyVARgoA4hNM4E40giqSUIYOotd3Z9TVX9qy6ZctVyX3+PqSNtQafpKsBOURE8StFmQbQKwvU5Q0JKE1jSzo1BDvkXyiAJORph6JE5oTgwTDCswEM0rvzSb2DPksaDjyQQdT7CZXPxvA=
+	t=1738662439; cv=none; b=eSAw1nTIUrhEmCTcCgYK2bpJRcWiFGA3t9wOYjdDP0OPfM8AC5ula0bl8EnmmUW9PlJ1/1ULE+gjTLdlHCuVwTYZwZ4AsETojde0v27V7aqA/ESgo3XQqI+i+pmBbZG4dsH/zhTmlfneHdlByyTMwTT1gBMPLH3wwperH2jAsWI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1738661990; c=relaxed/simple;
-	bh=A3HRjbEOJaU2P11eRHH6Suppazg1Uw6ciFV/wddELVU=;
+	s=arc-20240116; t=1738662439; c=relaxed/simple;
+	bh=C2zZvBFQfi/llnSqpQRqG2mTn3t73PX0K/Zh+rjZvJc=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=g+oQtVd7BjlDtY4Fu6LgqeGgET/LMh9FfwbC1Q8OPwRhlpO6vwDnPIznf8QBYlNtQYq/iDuy9EjMbVf0m7U92ghB0auPK+R5pbVogy1YRz8DGTp2mob4lABkarfFQ88DINf6662czh/iCJvYC2OXXP5A7oHLzBUscUrYwhXT4vY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=HE3s1T5B; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1BE5BC4CEDF;
-	Tue,  4 Feb 2025 09:39:47 +0000 (UTC)
+	 Content-Type:Content-Disposition:In-Reply-To; b=ZCQDKzAZW7jpFTtGOC4I4aORCukGzI5dadvGFj7MmW1xYmUTgMZfzaxigCucSROYbLLUXRSGCpHGQerUr6HeWUDTE9OxB64xPMM+/Pzyqd1h3SfBtLbSD0ZqMWGfzm0UJwTkINxTJ0W/z51bPQY0xAccgXlm62XLgw1d+ZWfAGo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=On/zLR7q; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 92C58C4CEDF;
+	Tue,  4 Feb 2025 09:47:16 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1738661989;
-	bh=A3HRjbEOJaU2P11eRHH6Suppazg1Uw6ciFV/wddELVU=;
+	s=k20201202; t=1738662438;
+	bh=C2zZvBFQfi/llnSqpQRqG2mTn3t73PX0K/Zh+rjZvJc=;
 	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=HE3s1T5B5DGuSDxVNqHIt9XS89Bkb2J53ruK7gFTpNpBGPLTghlQXljWgvggELxoc
-	 kNxsfHHDFkdfmlt09VA8WV9FNqqFW5PXOnXukpH/YnLWacyIDWbulxALAYQQOqOkf/
-	 2CVvz1O/bBdpfJUy8BSzEowaANwXnBQY0hb6ZcWMB0TtEKe0zaTn95YLhCi08e2Jon
-	 /Au3Wka6Zj7tgxipA585L7bcWHqZUWBSexDjJ913Ac35WIJGkLHiNKHNli56cQLfgN
-	 UB14BHV92gJzlwjSiQmZviiYzHvH0kuYb9g+mikHKR9Vv7+4Kv2ELw6p5jkHWDbcnI
-	 a3FhUQkY+8vJw==
-Date: Tue, 4 Feb 2025 09:39:45 +0000
+	b=On/zLR7quK6qTiyoBkZD8d910QkAfjx3YlmqdVWNSGHFXMv+r+ntn7Z6UhbPk33My
+	 BnWNVFpYXOe9P2ZaGA3RoiVsfGiG+u47EZCQ5TBoJCcXkN3Jy5O7NZlhvULG/JGZZD
+	 z9uu5Eh36aQl5mznu5EfPCOvPQJpIgk9jF1QpuYRCeYSbVbUHpc/onbuUBsmVWa6hU
+	 K1Hss7CoXSd4fvzpc0ai/PcnmKVtwpz1dJJDsKCZ04ioPnQqvQBNxMmTEcMV/5NxUH
+	 +BjBE1CAItK1fVVz4eMudbN1vMbikkg3j50ZtzjsrxMUNlYAhsof1IW5cDGRXCz//a
+	 X6eekuo/p2ZNA==
+Date: Tue, 4 Feb 2025 09:47:14 +0000
 From: Simon Horman <horms@kernel.org>
-To: Andrew Lunn <andrew@lunn.ch>
-Cc: Jakub Kicinski <kuba@kernel.org>, davem@davemloft.net,
-	netdev@vger.kernel.org, edumazet@google.com, pabeni@redhat.com,
-	andrew+netdev@lunn.ch
-Subject: Re: [PATCH net 2/2] MAINTAINERS: add a sample ethtool section entry
-Message-ID: <20250204093945.GM234677@kernel.org>
-References: <20250202021155.1019222-1-kuba@kernel.org>
- <20250202021155.1019222-2-kuba@kernel.org>
- <20250203105647.GG234677@kernel.org>
- <9f6c2d87-bb45-4c95-af93-7d2ca5f1dcc3@lunn.ch>
+To: Eric Dumazet <edumazet@google.com>
+Cc: "David S . Miller" <davem@davemloft.net>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	netdev@vger.kernel.org, eric.dumazet@gmail.com
+Subject: Re: [PATCH net-next] neighbour: remove neigh_parms_destroy()
+Message-ID: <20250204094714.GN234677@kernel.org>
+References: <20250203151152.3163876-1-edumazet@google.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -61,42 +58,21 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <9f6c2d87-bb45-4c95-af93-7d2ca5f1dcc3@lunn.ch>
+In-Reply-To: <20250203151152.3163876-1-edumazet@google.com>
 
-On Mon, Feb 03, 2025 at 02:29:23PM +0100, Andrew Lunn wrote:
-> On Mon, Feb 03, 2025 at 10:56:47AM +0000, Simon Horman wrote:
-> > On Sat, Feb 01, 2025 at 06:11:55PM -0800, Jakub Kicinski wrote:
-> > > I feel like we don't do a good enough keeping authors of driver
-> > > APIs around. The ethtool code base was very nicely compartmentalized
-> > > by Michal. Establish a precedent of creating MAINTAINERS entries
-> > > for "sections" of the ethtool API. Use Andrew and cable test as
-> > > a sample entry. The entry should ideally cover 3 elements:
-> > > a core file, test(s), and keywords. The last one is important
-> > > because we intend the entries to cover core code *and* reviews
-> > > of drivers implementing given API!
-> > > 
-> > > Signed-off-by: Jakub Kicinski <kuba@kernel.org>
-> > > ---
-> > > This patch is a nop from process perspective, since Andrew already
-> > > is a maintainer and reviews all this code. Let's focus on discussing
-> > > merits of the "section entries" in abstract?
-> > 
-> > In the first instance this seems like a good direction to go in to me.
-> > My only slight concern is that we might see an explosion in entries.
+On Mon, Feb 03, 2025 at 03:11:52PM +0000, Eric Dumazet wrote:
+> neigh_parms_destroy() is a simple kfree(), no need for
+> a forward declaration.
 > 
-> I don't think that will happen. I don't think we really have many
-> sections of ethtool which people personally care about, always try to
-> review across all drivers.
+> neigh_parms_put() can instead call kfree() directly.
 > 
-> Even if it does explode, so what. Is ./scripts/get_maintainer.pl the
-> bottleneck in any workflows?
+> Signed-off-by: Eric Dumazet <edumazet@google.com>
 
-Thanks Andrew,
+Thanks Eric,
 
-I'm not overly concerned by the points I raised either, but I did think
-they were worth raising.  And given that doing so didn't raise any alarm
-bells (so far), I'm happy for this patch to proceed.
+I agree that this is the case. And I think it has been so since
+commit efd7ef1c1929 ("net: Kill hold_net release_net").
+Or, IOW, for about 10 years by now.
 
 Reviewed-by: Simon Horman <horms@kernel.org>
-
 
