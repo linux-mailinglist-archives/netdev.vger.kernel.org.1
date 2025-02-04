@@ -1,59 +1,71 @@
-Return-Path: <netdev+bounces-162646-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-162647-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id E3141A27782
-	for <lists+netdev@lfdr.de>; Tue,  4 Feb 2025 17:46:52 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 7089DA2778A
+	for <lists+netdev@lfdr.de>; Tue,  4 Feb 2025 17:50:23 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 78DF01653E1
-	for <lists+netdev@lfdr.de>; Tue,  4 Feb 2025 16:46:51 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 05305165384
+	for <lists+netdev@lfdr.de>; Tue,  4 Feb 2025 16:50:22 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0C4B0214A61;
-	Tue,  4 Feb 2025 16:46:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 392F1215F4A;
+	Tue,  4 Feb 2025 16:50:12 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="P0nUfAQB"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="YCKSvpgv"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DB88086324
-	for <netdev@vger.kernel.org>; Tue,  4 Feb 2025 16:46:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EF9DD86324;
+	Tue,  4 Feb 2025 16:50:11 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1738687608; cv=none; b=pvBb30ZEqZn00TlppNm17w4wTYUXVy3MTAGGflKsIdnxSGvc9DDXejluFADWB1ybgXv4jlZlZwfbvSw3ZJl7pRJpiO1lv9PPjThG2cX0W/ngQGSiiaonXejUXUK86QUKpOYiGsIgwQ8w4guxCRQJwqSZgDJQ3dNxk+ztTuZy+HI=
+	t=1738687812; cv=none; b=mc5noCZ5hN1RoCaMO7C7vg4pfITzfzjW4Y0xJbkx0p5EAduC9D8NLR85YfUXzmcKL4Rxy8xwEQ0J+blV87CPRkK+Wc4m1s7F7XeLNSeBtwskACKmg2dj8NeGyA8g8eFE4KOB0UgSaq6w03FN0yJsfdkDiId7g4NM85lPOjYHGjs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1738687608; c=relaxed/simple;
-	bh=V8yQqj5EjGalPW31THbi5+RCQhCjgmiHk3K5nhps6TY=;
+	s=arc-20240116; t=1738687812; c=relaxed/simple;
+	bh=BkfYd3pmYoLUvBzp6+/u6N/oMS5/8X5zZnqyN2RPmV0=;
 	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=CA4Ay4FC2Zk8SabaQwBZYdeztvtgu9hEf4378GWfgL1Lseta2V3dz5U+39R1k1LvJdjfPe/zRVpDrNHtQQLHdTGJlHkHCiXSoJpTdbZgbJmoZvhaquVsQ4zi43pEO6ErNyQE9n970+oyQA/8b+goGrFcHHOY9h/uCtx52g3rVik=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=P0nUfAQB; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id C7DF6C4CEDF;
-	Tue,  4 Feb 2025 16:46:47 +0000 (UTC)
+	 MIME-Version:Content-Type; b=X9IINVT39kEQygfHA3w2rv62E/e3RAL8cLOy0CTCACITob+OTgpP1yq9GDiN6LfbIgk/X3uR9aO4O5cvJRwjSebzoSKajdPsCQZ9qViDoNuImF/JCj66EL4/jCCmOpRjfl6uR8xO3DKeSaWdMiWnWUWxAlmW44vd58R4IoIzwks=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=YCKSvpgv; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id C3EE2C4CEDF;
+	Tue,  4 Feb 2025 16:50:09 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1738687608;
-	bh=V8yQqj5EjGalPW31THbi5+RCQhCjgmiHk3K5nhps6TY=;
+	s=k20201202; t=1738687811;
+	bh=BkfYd3pmYoLUvBzp6+/u6N/oMS5/8X5zZnqyN2RPmV0=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=P0nUfAQB/EaauJMBRP+UutqFfbFSchjZjUcG8xjqgghB0i1nXe6fS9MAZX7BBbunB
-	 SSGNInAWaZnE+PHLgaLhJVL1I/pMEG676Fo2DYGcX+kRIs6X4mvpbAeCyo1nVWzlpy
-	 blUjxkrzwh+SRhSsV9j0Z5RbIx4g1+qjBCSwkJVMHR3u354znql2J92xQOgGRrFUhV
-	 zhh0pw04y/0hi5rZlTJ1R8DaZ22bYFw7hHdBKkxmIHdLjlv3KiZCNUw0Dhpagd/C2Q
-	 yUK8Ye8ib7AbeXtuOfWILnswkHPTl+dBN6uFUkNO8xPJZj7+UQuKkynNTpUsGg/fAd
-	 CcjQHy7JLfipA==
-Date: Tue, 4 Feb 2025 08:46:46 -0800
+	b=YCKSvpgvIUqCcTGoRbh7u2+tiVMkkY3DihyAOBu8YNyOYuZ/rwJWIeeg7OL6dEiRN
+	 vpY4EQS3mc8diT8ZQsgudL68v28aWPiVsoHM2AHrutJOBu1C0+OneL/+qgBAgjwso2
+	 VDVc6B9wT3hK4hS+4XH/XlnTw0Ivqirs+YCMfCEIRNQCEbDS50y5zhHF0Uxwi+3Mtx
+	 R3eupjl5iXLpKZg4sy54Ml7aFLOY6wdbnnA8nZ2SJNSMMzWL9hbpdYJuFnaXcqjMF6
+	 d08dO9VLGxqASNH5IR360DaFGB/6raWHmg2CuONKYL/IgieFWvZrFo64MarTf7KyVE
+	 iaccKtSTOJQPg==
+Date: Tue, 4 Feb 2025 08:50:08 -0800
 From: Jakub Kicinski <kuba@kernel.org>
-To: pctammela@mojatatu.com
-Cc: Simon Horman <horms@kernel.org>, Cong Wang <xiyou.wangcong@gmail.com>,
- netdev@vger.kernel.org, jhs@mojatatu.com, jiri@resnulli.us,
- mincho@theori.io, quanglex97@gmail.com, Cong Wang <cong.wang@bytedance.com>
-Subject: Re: [Patch net v3 2/4] selftests/tc-testing: Add a test case for
- pfifo_head_drop qdisc when limit==0
-Message-ID: <20250204084646.59b5fdb6@kernel.org>
-In-Reply-To: <20250204113703.GV234677@kernel.org>
-References: <20250204005841.223511-1-xiyou.wangcong@gmail.com>
-	<20250204005841.223511-3-xiyou.wangcong@gmail.com>
-	<20250204113703.GV234677@kernel.org>
+To: Paolo Abeni <pabeni@redhat.com>
+Cc: Mina Almasry <almasrymina@google.com>, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org, linux-doc@vger.kernel.org,
+ kvm@vger.kernel.org, virtualization@lists.linux.dev,
+ linux-kselftest@vger.kernel.org, Donald Hunter <donald.hunter@gmail.com>,
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet
+ <edumazet@google.com>, Simon Horman <horms@kernel.org>, Jonathan Corbet
+ <corbet@lwn.net>, Andrew Lunn <andrew+netdev@lunn.ch>, Neal Cardwell
+ <ncardwell@google.com>, David Ahern <dsahern@kernel.org>, "Michael S.
+ Tsirkin" <mst@redhat.com>, Jason Wang <jasowang@redhat.com>, Xuan Zhuo
+ <xuanzhuo@linux.alibaba.com>, Eugenio =?UTF-8?B?UMOpcmV6?=
+ <eperezma@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, Stefano
+ Garzarella <sgarzare@redhat.com>, Shuah Khan <shuah@kernel.org>,
+ sdf@fomichev.me, asml.silence@gmail.com, dw@davidwei.uk, Jamal Hadi Salim
+ <jhs@mojatatu.com>, Victor Nogueira <victor@mojatatu.com>, Pedro Tammela
+ <pctammela@mojatatu.com>, Samiullah Khawaja <skhawaja@google.com>
+Subject: Re: [PATCH net-next v3 2/6] selftests: ncdevmem: Implement devmem
+ TCP TX
+Message-ID: <20250204085008.1adf89ea@kernel.org>
+In-Reply-To: <c8dd0458-b0a9-4342-a022-487e73542381@redhat.com>
+References: <20250203223916.1064540-1-almasrymina@google.com>
+	<20250203223916.1064540-3-almasrymina@google.com>
+	<c8dd0458-b0a9-4342-a022-487e73542381@redhat.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -63,49 +75,22 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
 
-On Tue, 4 Feb 2025 11:37:03 +0000 Simon Horman wrote:
-> On Mon, Feb 03, 2025 at 04:58:39PM -0800, Cong Wang wrote:
-> > From: Quang Le <quanglex97@gmail.com>
+On Tue, 4 Feb 2025 13:29:18 +0100 Paolo Abeni wrote:
+> On 2/3/25 11:39 PM, Mina Almasry wrote:
+> > Add support for devmem TX in ncdevmem.
 > > 
-> > When limit == 0, pfifo_tail_enqueue() must drop new packet and
-> > increase dropped packets count of the qdisc.
+> > This is a combination of the ncdevmem from the devmem TCP series RFCv1
+> > which included the TX path, and work by Stan to include the netlink API
+> > and refactored on top of his generic memory_provider support.
 > > 
-> > All test results:
-> > 
-> > 1..16
-> > ok 1 a519 - Add bfifo qdisc with system default parameters on egress
-> > ok 2 585c - Add pfifo qdisc with system default parameters on egress
-> > ok 3 a86e - Add bfifo qdisc with system default parameters on egress with handle of maximum value
-> > ok 4 9ac8 - Add bfifo qdisc on egress with queue size of 3000 bytes
-> > ok 5 f4e6 - Add pfifo qdisc on egress with queue size of 3000 packets
-> > ok 6 b1b1 - Add bfifo qdisc with system default parameters on egress with invalid handle exceeding maximum value
-> > ok 7 8d5e - Add bfifo qdisc on egress with unsupported argument
-> > ok 8 7787 - Add pfifo qdisc on egress with unsupported argument
-> > ok 9 c4b6 - Replace bfifo qdisc on egress with new queue size
-> > ok 10 3df6 - Replace pfifo qdisc on egress with new queue size
-> > ok 11 7a67 - Add bfifo qdisc on egress with queue size in invalid format
-> > ok 12 1298 - Add duplicate bfifo qdisc on egress
-> > ok 13 45a0 - Delete nonexistent bfifo qdisc
-> > ok 14 972b - Add prio qdisc on egress with invalid format for handles
-> > ok 15 4d39 - Delete bfifo qdisc twice
-> > ok 16 d774 - Check pfifo_head_drop qdisc enqueue behaviour when limit == 0
-> > 
-> > Signed-off-by: Quang Le <quanglex97@gmail.com>
-> > Signed-off-by: Cong Wang <cong.wang@bytedance.com>  
+> > Signed-off-by: Mina Almasry <almasrymina@google.com>
+> > Signed-off-by: Stanislav Fomichev <sdf@fomichev.me>  
 > 
-> Hi Cong,
-> 
-> Unfortunately this test still seems to be failing in the CI.
-> 
-> # not ok 577 d774 - Check pfifo_head_drop qdisc enqueue behaviour when limit == 0
-> # Could not match regex pattern. Verify command output:
-> # qdisc pfifo_head_drop 1: root refcnt 2 limit 0p
-> #  Sent 0 bytes 0 pkt (dropped 0, overlimits 0 requeues 0)
-> #  backlog 0b 0p requeues 0
-> 
-> https://github.com/p4tc-dev/tc-executor/blob/storage/artifacts/977485/1-tdc-sh/stdout
+> Usually the self-tests are included towards the end of the series, to
+> help reviewers building-up on previous patches knowledge.
 
-This is starting to feel too much like a setup issue.
-Pedro, would you be able to take this series and investigate
-why it fails on the TDC runner?
+I had the same reaction, but in cases where uAPI is simpler than 
+the core code it may actually help the understanding to start with
+the selftest. Dunno. Only concern would be that the test won't work
+if someone bisects to this commit, but that's not very practical?
 
