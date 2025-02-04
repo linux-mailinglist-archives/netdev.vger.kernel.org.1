@@ -1,147 +1,158 @@
-Return-Path: <netdev+bounces-162316-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-162313-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id D182DA26894
-	for <lists+netdev@lfdr.de>; Tue,  4 Feb 2025 01:31:21 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 85478A2688E
+	for <lists+netdev@lfdr.de>; Tue,  4 Feb 2025 01:30:31 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 042E318865ED
-	for <lists+netdev@lfdr.de>; Tue,  4 Feb 2025 00:31:24 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 1AC703A3041
+	for <lists+netdev@lfdr.de>; Tue,  4 Feb 2025 00:30:23 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A09A178C9C;
-	Tue,  4 Feb 2025 00:30:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B66A84964F;
+	Tue,  4 Feb 2025 00:30:07 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=rbox.co header.i=@rbox.co header.b="g6bp5K4C"
+	dkim=pass (2048-bit key) header.d=paul-moore.com header.i=@paul-moore.com header.b="AcOX3u0C"
 X-Original-To: netdev@vger.kernel.org
-Received: from mailtransmit04.runbox.com (mailtransmit04.runbox.com [185.226.149.37])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-yw1-f179.google.com (mail-yw1-f179.google.com [209.85.128.179])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 34E6B4879B
-	for <netdev@vger.kernel.org>; Tue,  4 Feb 2025 00:30:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.226.149.37
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D6F314120B
+	for <netdev@vger.kernel.org>; Tue,  4 Feb 2025 00:30:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.179
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1738629049; cv=none; b=owGBcvlBQrm6nY9IEgFp69JxJT631iHvWEzfUtq5wbw7kFkni+IOdKc4Ura1AoFGM4n/D3t7bxs4J4OJeFWtbBT3rS5KFh7AqobwXqA/VumPtBNuh5nxvcdRGhdmVC1RmKPX1fxGtmeH29fLk5tAENAC478Sbc2AgZ6JcVXHAc8=
+	t=1738629007; cv=none; b=YGa8JfVvI2MgnEqIYCDH2/LmQk2OY9rAT8Wze+3W7Z1BzPQWKJ/4cVJ2RaEZUWsTIYz+wwxhou0woOh2I2vk2M3yEcuPQ/Mpt8B9kHVlrWgj6lA6Rb6PmcXIcZPtch5pZDOgrdTd3zzYcLfJYmdcHxJ2sqAwtP1bXV4NX2j2KS4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1738629049; c=relaxed/simple;
-	bh=KFmeFmnqbrJ7uwigw3ARkNhUE5dqs8Qdlr5i52M3O7w=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=Y+hvxZdeiQS1TJ8fCFVFmqwPav5n4/oOc4rYuuBMyUDiZwLGMBhv2IK11TD17/jrJa/b0yvt6Qp4ZgdeaH02dk5d0J1DQ8hUU2Oh7s4C5uFpb4yv6Zk0CVKKigze6F/qX//wFTTDzQ6fdWkEwAvJ4woh89yZ3UNUEHDVKWcWdls=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=rbox.co; spf=pass smtp.mailfrom=rbox.co; dkim=pass (2048-bit key) header.d=rbox.co header.i=@rbox.co header.b=g6bp5K4C; arc=none smtp.client-ip=185.226.149.37
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=rbox.co
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=rbox.co
-Received: from mailtransmit03.runbox ([10.9.9.163] helo=aibo.runbox.com)
-	by mailtransmit04.runbox.com with esmtps  (TLS1.2) tls TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256
-	(Exim 4.93)
-	(envelope-from <mhal@rbox.co>)
-	id 1tf6pr-0035La-6Q; Tue, 04 Feb 2025 01:30:39 +0100
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=rbox.co;
-	s=selector1; h=Cc:To:In-Reply-To:References:Message-Id:
-	Content-Transfer-Encoding:Content-Type:MIME-Version:Subject:Date:From;
-	bh=HLHHwK3KlipEI/wInfgJ29VkRsH8Ic65of+MuS8I38A=; b=g6bp5K4Ceeo6yBl7WOCAQIPAwr
-	WBGOnRdEKsZuDzC7iCwAe4rJ1weTdOL8Ao1/XWhY+2HbbGWpRre4JmfSQqu6gO1CAKWNidiWgj09L
-	4K9Uu9mf213E9feZB+EGOLV6f6iTNeMycuDIuz5zHSC10jAdX7HWAVhsD9dxhm6WQ1/+cqhF2tLyL
-	3V5QiEFVwiookDaf70QpoGGJ/YlCm8lOATdMrK9julGG82muFEQtCgSGYgJGhxUBd58JlEirSEOyb
-	6ev17wZH65RgBFFeY6LHVZAPWEe/PP8fqf3lSL6cdj44+R23C0K6gLGl0Vm9UWuDcK1c3cnseIh7t
-	Y2M89JQQ==;
-Received: from [10.9.9.73] (helo=submission02.runbox)
-	by mailtransmit03.runbox with esmtp (Exim 4.86_2)
-	(envelope-from <mhal@rbox.co>)
-	id 1tf6pq-0003s3-MS; Tue, 04 Feb 2025 01:30:39 +0100
-Received: by submission02.runbox with esmtpsa  [Authenticated ID (604044)]  (TLS1.2:ECDHE_SECP256R1__RSA_PSS_RSAE_SHA256__AES_256_GCM:256)
-	(Exim 4.93)
-	id 1tf6pY-006aWc-EG; Tue, 04 Feb 2025 01:30:20 +0100
-From: Michal Luczaj <mhal@rbox.co>
-Date: Tue, 04 Feb 2025 01:29:53 +0100
-Subject: [PATCH net 2/2] vsock/test: Add test for SO_LINGER null ptr deref
+	s=arc-20240116; t=1738629007; c=relaxed/simple;
+	bh=NrOjKgLQr3QfAne2gG2ROs8/SBnGodNEd1uyXzcB0Qo=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=VURPhKEa+WMjltfkT7TR8dXmtskcuVub9BOC3w0Q2wGz4/bWAmqlVigT9roxAKBi5G0k/XOiQ//J/2MdQNbr+IBONtffNsCeVCwQGBYJbqm8MxoES41QswoNzh8lHdfnyqJ2yBnCu5nrEwHXzbdRAidr7ztFvRZqXoN6PAu3Exw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=paul-moore.com; spf=pass smtp.mailfrom=paul-moore.com; dkim=pass (2048-bit key) header.d=paul-moore.com header.i=@paul-moore.com header.b=AcOX3u0C; arc=none smtp.client-ip=209.85.128.179
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=paul-moore.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=paul-moore.com
+Received: by mail-yw1-f179.google.com with SMTP id 00721157ae682-6f975a19f4fso4974587b3.1
+        for <netdev@vger.kernel.org>; Mon, 03 Feb 2025 16:30:05 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=paul-moore.com; s=google; t=1738629005; x=1739233805; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=NrOjKgLQr3QfAne2gG2ROs8/SBnGodNEd1uyXzcB0Qo=;
+        b=AcOX3u0CE8uA7DeD5MPddVECOozCU1QSyO17jqn5/GUixgkVaAXBQUiMNVzVCxMS9x
+         4mDjmn9tqsPMasGp/j+f2kZrGNas8X+mWTdhU2+rx2ZRDMtFb+QARHLxCwxV9uRn4POi
+         Lw5H6FM34Jq/+xWV7ZHCCti4vdThpZU4SxTY0CmPg81GKwEV78QcCtGVfkYzO6O5O1az
+         L5Xkx7Kn8bZ6WLR54p/1heCupZRtxj0RTSIqdUFKjtaFSGRb3b3ygaeHZmRaRY5lvW4r
+         iL180QOPEhI1oyoVHJkz0txXrAFp+nX8dw+mYQBL7cQ9faAGrW/Xy7wq7eJvJHyEZVGc
+         iOJg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1738629005; x=1739233805;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=NrOjKgLQr3QfAne2gG2ROs8/SBnGodNEd1uyXzcB0Qo=;
+        b=JOPdMapw+eCzTnob51Q1HHkHhV95gghejtksygPMuXz9tt/mhit34cH2TpOAAru510
+         CVbK5GFvRNzX7Wkr2dxcz5VcsI5CCQPpArTpKd4McEvn/Ud7nEWcJNgItV/nx0C6nUlz
+         y5SvpE2DivdWJNn4/mPQ1tTY9+e6nBLFPtON5ioUgOv0UJOqgJqWEOfJ4pXTIVkMO+Wd
+         q2L6UKhQSFTDqikn0WVEOHWw4ZfRGiWvCMoM/hv7HG386tsjn+7oAzPQv+1DyZ5zuZ/1
+         T6kUgwoGMbYkBc+R8zjmrWeo1Rui754o4ubO5SKXIg5CuGUcy0XzosrAc8D5oRCahCG0
+         XTGQ==
+X-Forwarded-Encrypted: i=1; AJvYcCXyFMJYCIAp3aPws7N7VjED0CNdUHuNsaT5aXg7/9VWNk9XkX32Cn8NBNZJtsB97Xzar/LNkrs=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yw5CVGQw5XdKaG1C7mR4jD/B5whtU0H/oLkLbcBKwvcq1UqIHC/
+	Z+1mY9TqTQ0F4lTJW0YS1F5K7svL7WKoNI0+wvjLZl29S2HC0udQ1RXZrgcAs0daz50fWrRSs5L
+	tMGAC/ROOqMOEx2m92JsFzjVaT5zrUWqMbGo5
+X-Gm-Gg: ASbGncurkWEY352if9sCbA/xdyaGpvd3K/4ggLjaoaP7Qv7IsgoHC2Dv9H+W4J31E8Q
+	2JuDkNRzP+uzXkIoNep8zO7ZCdO4lR3Bj4MObblHDPVGSAty9O9eM3WbZ488NbzthbvEzOr8=
+X-Google-Smtp-Source: AGHT+IEVbwtz+5w3Q/0H35+gEOBvf9lHbFARWTV19VmX2LqAuhVy8RS03DnQT9OFtbiSGhWCOlD2FbmJsxoDJGFVn2U=
+X-Received: by 2002:a05:690c:7445:b0:6f8:cedc:570d with SMTP id
+ 00721157ae682-6f8cedc5710mr129600047b3.6.1738629004567; Mon, 03 Feb 2025
+ 16:30:04 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Message-Id: <20250204-vsock-linger-nullderef-v1-2-6eb1760fa93e@rbox.co>
-References: <20250204-vsock-linger-nullderef-v1-0-6eb1760fa93e@rbox.co>
-In-Reply-To: <20250204-vsock-linger-nullderef-v1-0-6eb1760fa93e@rbox.co>
-To: Stefano Garzarella <sgarzare@redhat.com>, 
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
- Simon Horman <horms@kernel.org>
-Cc: netdev@vger.kernel.org, Michal Luczaj <mhal@rbox.co>
-X-Mailer: b4 0.14.2
+References: <CAFqZXNtkCBT4f+PwyVRmQGoT3p1eVa01fCG_aNtpt6dakXncUg@mail.gmail.com>
+ <e8b6c6f9-9647-4ab6-8bbb-ccc94b04ade4@yandex.ru> <67979d24d21bc_3f1a29434@willemb.c.googlers.com.notmuch>
+ <CAFqZXNscJnX2VF-TyZaEC5nBtUUXdWPM2ejXTWBL8=5UyakssA@mail.gmail.com>
+ <6798f1fb5e1ba_987d9294dc@willemb.c.googlers.com.notmuch> <c4413e16-d04f-4370-8edc-e4db21cc25f6@yandex.ru>
+ <67996154e30ce_d9324294c4@willemb.c.googlers.com.notmuch> <8b81a534-9c30-4123-bd7d-bf3a9d89dfcb@yandex.ru>
+ <679a376739b99_132e08294f3@willemb.c.googlers.com.notmuch>
+ <04879909-72e5-4ab6-8c28-5d3cb551feb5@yandex.ru> <679bace3a753f_1d35f32942d@willemb.c.googlers.com.notmuch>
+In-Reply-To: <679bace3a753f_1d35f32942d@willemb.c.googlers.com.notmuch>
+From: Paul Moore <paul@paul-moore.com>
+Date: Mon, 3 Feb 2025 19:29:53 -0500
+X-Gm-Features: AWEUYZmUsmD5zCo4hDfd3nWC-dGlKyR6ryMJMAzMHvcapPBgUl5n85uHWuFs7UY
+Message-ID: <CAHC9VhS-uSaVmy65oA8p6tCzMZxMsuzdmxO-vf7L0p44ZKO=_A@mail.gmail.com>
+Subject: Re: Possible mistake in commit 3ca459eaba1b ("tun: fix group
+ permission check")
+To: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
+Cc: stsp <stsp2@yandex.ru>, Ondrej Mosnacek <omosnace@redhat.com>, 
+	Willem de Bruijn <willemb@google.com>, Jason Wang <jasowang@redhat.com>, 
+	Jakub Kicinski <kuba@kernel.org>, network dev <netdev@vger.kernel.org>, 
+	Linux Security Module list <linux-security-module@vger.kernel.org>, 
+	SElinux list <selinux@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Explicitly close() a TCP_ESTABLISHED (connectible) socket with SO_LINGER
-enabled. May trigger a null pointer dereference.
+On Thu, Jan 30, 2025 at 11:48=E2=80=AFAM Willem de Bruijn
+<willemdebruijn.kernel@gmail.com> wrote:
+> stsp wrote:
+> > 29.01.2025 17:12, Willem de Bruijn =D0=BF=D0=B8=D1=88=D0=B5=D1=82:
+> > > stsp wrote:
+> > >> 29.01.2025 01:59, Willem de Bruijn =D0=BF=D0=B8=D1=88=D0=B5=D1=82:
+> > >>> stsp wrote:
+> > >>>> By doing that you indeed avoid
+> > >>>> the problem of "completely
+> > >>>> inaccessible tap". However, that
+> > >>>> breaks my setup, as I really
+> > >>>> intended to provide tap to the
+> > >>>> owner and the unrelated group.
+> > >>>> This is because, eg when setting
+> > >>>> a CI job, you can add the needed
+> > >>>> user to the needed group, but
+> > >>>> you also need to re-login, which
+> > >>>> is not always possible. :(
+> > >>> Could you leave tun->owner unset?
+> > >> That's exactly the problem: when
+> > >> the user is not in the needed group,
+> > >> then you need to unset _both_.
+> > >> Unsetting only owner is not enough.
+> > >> Adding the user to the group is not
+> > >> enough because then you need to
+> > >> re-login (bad for CI jobs).
+> > > At some point we can question whether the issue is with the setup,
+> > > rather than the kernel mechanism.
+> > >
+> > > Why does your setup have an initial user that lacks the group
+> > > permissions of the later processes, and a tun instance that has both
+> > > owner and group constraints set?
+> > >
+> > > Can this be fixed in userspace, rather than allow this odd case in th=
+e
+> > > kernel. Is it baked deeply into common containerization tools, say?
+> >
+> > No-no, its not a real or unfixible
+> > problem. At the end, I can just
+> > drop both group and user ownership
+> > of the TAP, and simply not to care.
+>
+> In that case the safest course of action is to revert the patch.
+>
+> It relaxes some access control restrictions that other users may have
+> come to depend on.
+>
+> Say, someone expects that no process can use the device until it
+> adds the user to one of the groups.
+>
+> It's farfetched, but in cases of access control, err on the side of
+> caution. Especially retroactively.
 
-Signed-off-by: Michal Luczaj <mhal@rbox.co>
----
- tools/testing/vsock/vsock_test.c | 41 ++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 41 insertions(+)
+If a revert is the best path forward for v6.14, do you think it would
+be possible to get this fixed this week, or do you expect it to take
+longer?
 
-diff --git a/tools/testing/vsock/vsock_test.c b/tools/testing/vsock/vsock_test.c
-index dfff8b288265f96b602cb1bfa0e6dce02f114222..d0f6d253ac72d08a957cb81a3c38fcc72bec5a53 100644
---- a/tools/testing/vsock/vsock_test.c
-+++ b/tools/testing/vsock/vsock_test.c
-@@ -1788,6 +1788,42 @@ static void test_stream_connect_retry_server(const struct test_opts *opts)
- 	close(fd);
- }
- 
-+static void test_stream_linger_client(const struct test_opts *opts)
-+{
-+	struct linger optval = {
-+		.l_onoff = 1,
-+		.l_linger = 1
-+	};
-+	int fd;
-+
-+	fd = vsock_stream_connect(opts->peer_cid, opts->peer_port);
-+	if (fd < 0) {
-+		perror("connect");
-+		exit(EXIT_FAILURE);
-+	}
-+
-+	if (setsockopt(fd, SOL_SOCKET, SO_LINGER, &optval, sizeof(optval))) {
-+		perror("setsockopt(SO_LINGER)");
-+		exit(EXIT_FAILURE);
-+	}
-+
-+	close(fd);
-+}
-+
-+static void test_stream_linger_server(const struct test_opts *opts)
-+{
-+	int fd;
-+
-+	fd = vsock_stream_accept(VMADDR_CID_ANY, opts->peer_port, NULL);
-+	if (fd < 0) {
-+		perror("accept");
-+		exit(EXIT_FAILURE);
-+	}
-+
-+	vsock_wait_remote_close(fd);
-+	close(fd);
-+}
-+
- static struct test_case test_cases[] = {
- 	{
- 		.name = "SOCK_STREAM connection reset",
-@@ -1943,6 +1979,11 @@ static struct test_case test_cases[] = {
- 		.run_client = test_stream_connect_retry_client,
- 		.run_server = test_stream_connect_retry_server,
- 	},
-+	{
-+		.name = "SOCK_STREAM SO_LINGER null-ptr-deref",
-+		.run_client = test_stream_linger_client,
-+		.run_server = test_stream_linger_server,
-+	},
- 	{},
- };
- 
-
--- 
-2.48.1
-
+--
+paul-moore.com
 
