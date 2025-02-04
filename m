@@ -1,62 +1,63 @@
-Return-Path: <netdev+bounces-162396-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-162397-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id B6702A26BE7
-	for <lists+netdev@lfdr.de>; Tue,  4 Feb 2025 07:11:17 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id E7B82A26BEF
+	for <lists+netdev@lfdr.de>; Tue,  4 Feb 2025 07:11:37 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 66E5218876AA
-	for <lists+netdev@lfdr.de>; Tue,  4 Feb 2025 06:11:22 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id CA06D3A7FDD
+	for <lists+netdev@lfdr.de>; Tue,  4 Feb 2025 06:11:25 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D73631FF7B0;
-	Tue,  4 Feb 2025 06:11:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B0F121FFC75;
+	Tue,  4 Feb 2025 06:11:21 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="DuwyASxf"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="gN7EDLaV"
 X-Original-To: netdev@vger.kernel.org
 Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.10])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 073E925A624;
-	Tue,  4 Feb 2025 06:11:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EB4C125A624;
+	Tue,  4 Feb 2025 06:11:19 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.10
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1738649472; cv=none; b=MrRx9CnOmetqSmAFMM5FNOr7WVWJpsf1NKmuSUXwPJv5Zk+7CxHAHBl3gc8J7Y6e75o1w2FosQDJFRJRxmqzlgphQMCVbodNvhL/Aol2i9NZTsJIIpxPFztjkq8+rmFybj+ZmRwdQhQtHPsjKJEjSqJAALx4eldOPqpZHdfp+L4=
+	t=1738649481; cv=none; b=mdg1fMdEBMowFbI5Lwqvrn+q+hE2Co/B2CMXkYcg2UrNQtuti1w+4gsa2FnmcKz9vNn6hkH7XJUnsTcWc85Gh46EmEd2a3xR1wgyP3e0dFU1s6IltiF/Pf8Yw/Vfp/cb6VLqjL0d1Ndi7HM3RZNWTBbm9Fg0EnkVxvV0OSbCrYk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1738649472; c=relaxed/simple;
-	bh=wFcpLZeR+9puSZ3enjCz0fy9g9uHT+CQiy08Uu+Q6Ec=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=Ucv3lRpiKTlygoJPj4QBX1UnIAWe9ZHqbKFPlFbkAsmZxsgRA7enhN3NoKpssfHJboyEHcSUrSvJuo6mJSI2nEmHqSX+Irg+e0V2RKmkfJvUnBYV+XgDtVOl7n6DZ2QLxVAHFEnyUqgVjW2QZpv+OetRTwtEsov1Hj0MgI4dSxY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=DuwyASxf; arc=none smtp.client-ip=192.198.163.10
+	s=arc-20240116; t=1738649481; c=relaxed/simple;
+	bh=7n0vam23Uf784ublbhVBP5AsWpQxp+3QLHvPVC2Ki4w=;
+	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
+	 MIME-Version; b=BXbMMeN6ooxSfVPWcW1d3fUIAcRTN9j3pGtg4VG2bxs73I8CsiXnPQrkzqa6NMSPmGioEXw/yleVFjIOlLXE2OPW7Yvy3MF0ZdfgeJzLJWyZ4PVZVwvETh54f433fukFID2OBKimqgixrHmUgpmIFbJ5n7VXHAqfUI1oUxZmqJA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=gN7EDLaV; arc=none smtp.client-ip=192.198.163.10
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
 Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1738649471; x=1770185471;
-  h=from:to:cc:subject:date:message-id:mime-version:
-   content-transfer-encoding;
-  bh=wFcpLZeR+9puSZ3enjCz0fy9g9uHT+CQiy08Uu+Q6Ec=;
-  b=DuwyASxf1kzPoxNiZ1QVWsrnAgJTbROWXG9KHqES/K5f924br59YnbLb
-   Iy/mW3fLuPH81F6Uljo4A2VN7Z3/EKYwi7cXN6Q1u1cl76pYJYpPl1MEU
-   MzYTMl11eZv1uyxtVghqsqJVKX420kBiI9//QCQ8g6W+SfZ6NidRm0a0N
-   N+vGTudktWjdHOJ3ft4Olc2l8SPOku2gsB/Y/l+9/N7ZgpGsy61BRv4WF
-   MA8ERQBTHCxtq3PFd+zSAQRwHUTMOdJqGTaTm618ycwYmpjPiczrdW2pz
-   wBPT7rX1t3PD/Tv56aRX0KyoeUrNjAInZUnDWCQkOaBJToIuvLI3jmlMe
-   Q==;
-X-CSE-ConnectionGUID: zMdiALWVR3CBtIC+gzorEw==
-X-CSE-MsgGUID: ZmhCpRxHR7iPxbF8fPsSAw==
-X-IronPort-AV: E=McAfee;i="6700,10204,11314"; a="50579582"
+  t=1738649480; x=1770185480;
+  h=from:to:cc:subject:date:message-id:in-reply-to:
+   references:mime-version:content-transfer-encoding;
+  bh=7n0vam23Uf784ublbhVBP5AsWpQxp+3QLHvPVC2Ki4w=;
+  b=gN7EDLaVd5nvMlmWD1a5Pjby7SNPLnGFmNPamKfOrV789u7aAmFwaCH7
+   rAgGXzkDSNH79V4D40TZsJWEBFMSqHwzlc+uIGlkHrnR71hNmnDwb4eqW
+   fVtJyBqRen52/MqIhUhlGurFo/WnvGPoQf15FFU+osj+Tkibjrrn6Uy3e
+   PIMmeICAWoVXUW7DXKQBNnf5/EZCNtF4EHa/Wkd3zqo8einJWlCgZ/GD1
+   fsNF5+K8c3wax2AOpAZThTjMs2BGE5Q03obiME+UYa/WAouf+kq2UK9pM
+   6zQj7CVGct/zfr7MRawStEJMJsoUP9W+J0ABv2VJOGVhyNxdN/nXsmRKe
+   A==;
+X-CSE-ConnectionGUID: xDQDcwSjQBCjsu2KzfdHoA==
+X-CSE-MsgGUID: Fr4aKB0VQ/u1Y92AKBiwww==
+X-IronPort-AV: E=McAfee;i="6700,10204,11314"; a="50579608"
 X-IronPort-AV: E=Sophos;i="6.12,310,1728975600"; 
-   d="scan'208";a="50579582"
+   d="scan'208";a="50579608"
 Received: from orviesa009.jf.intel.com ([10.64.159.149])
-  by fmvoesa104.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 03 Feb 2025 22:11:10 -0800
-X-CSE-ConnectionGUID: 6jwsG0/7QO+8MjZY2BO8oQ==
-X-CSE-MsgGUID: qq7r9d+hTXaVNxJRjccM7w==
+  by fmvoesa104.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 03 Feb 2025 22:11:19 -0800
+X-CSE-ConnectionGUID: YinZviaxTTyrV7MlNpzCpw==
+X-CSE-MsgGUID: sbOtTjAqTG2arJW7fGx7uw==
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="6.13,258,1732608000"; 
-   d="scan'208";a="110279139"
+   d="scan'208";a="110279153"
 Received: from yongliang-ubuntu20-ilbpg12.png.intel.com ([10.88.227.39])
-  by orviesa009.jf.intel.com with ESMTP; 03 Feb 2025 22:11:02 -0800
+  by orviesa009.jf.intel.com with ESMTP; 03 Feb 2025 22:11:12 -0800
 From: Choong Yong Liang <yong.liang.choong@linux.intel.com>
 To: Simon Horman <horms@kernel.org>,
 	Jose Abreu <joabreu@synopsys.com>,
@@ -91,10 +92,12 @@ Cc: x86@kernel.org,
 	platform-driver-x86@vger.kernel.org,
 	linux-stm32@st-md-mailman.stormreply.com,
 	linux-arm-kernel@lists.infradead.org
-Subject: [PATCH net-next v6 0/7] Enable SGMII and 2500BASEX interface mode switching for Intel platforms
-Date: Tue,  4 Feb 2025 14:10:13 +0800
-Message-Id: <20250204061020.1199124-1-yong.liang.choong@linux.intel.com>
+Subject: [PATCH net-next v6 1/7] net: phylink: use act_link_an_mode to determine PHY
+Date: Tue,  4 Feb 2025 14:10:14 +0800
+Message-Id: <20250204061020.1199124-2-yong.liang.choong@linux.intel.com>
 X-Mailer: git-send-email 2.34.1
+In-Reply-To: <20250204061020.1199124-1-yong.liang.choong@linux.intel.com>
+References: <20250204061020.1199124-1-yong.liang.choong@linux.intel.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -103,97 +106,67 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-During the interface mode change, the 'phylink_major_config' function will
-be triggered in phylink. The modification of the following functions will
-support the switching between SGMII and 2500BASE-X interface modes for
-the Intel platform:
+When the interface mode is SGMII and act_link_an_mode is MLO_AN_INBAND,
+switching to the 2500BASE-X interface mode will trigger
+phylink_major_config, and act_link_an_mode will be updated to MLO_AN_PHY
+in phylink_pcs_neg_mode when the PCS does not support in-band mode.
+The MAC and PCS will configure according to the interface mode
+and act_link_an_mode.
 
-- xpcs_switch_interface_mode: Re-initiates clause 37 auto-negotiation for
-  the SGMII interface mode to perform auto-negotiation.
-- mac_finish: Configures the SerDes according to the interface mode.
+However, when the interface goes link down and then link up again, the MAC
+will attempt to attach the PHY. The interface mode remains as 2500BASE-X,
+but cfg_link_an_mode still holds MLO_AN_INBAND. This causes a failure to
+attach the PHY.
 
-With the above changes, the code will work as follows during the interface
-mode change. The PCS will reconfigure according to the pcs_neg_mode and the
-selected interface mode. Then, the MAC driver will perform SerDes
-configuration in 'mac_finish' based on the selected interface mode. During
-the SerDes configuration, the selected interface mode will identify TSN
-lane registers from FIA and then send IPC commands to the Power Management
-Controller (PMC) through the PMC driver/API. The PMC will act as a proxy to
-program the PLL registers.
+This patch uses act_link_an_mode to determine if there is a PHY to attach.
 
-Change log:
-v1 -> v2: 
- - Add static to pmc_lpm_modes declaration
- - Add cur_link_an_mode to the kernel doc
- - Combine 2 commits i.e. "stmmac: intel: Separate driver_data of ADL-N
- from TGL" and "net: stmmac: Add 1G/2.5G auto-negotiation
- support for ADL-N" into 1 commit.
+Signed-off-by: Choong Yong Liang <yong.liang.choong@linux.intel.com>
+---
+ drivers/net/phy/phylink.c | 10 ++++++----
+ 1 file changed, 6 insertions(+), 4 deletions(-)
 
-v2 -> v3:
- - Create `pmc_ipc.c` file for `intel_pmc_ipc()` function and 
- allocate the file in `arch/x86/platform/intel/` directory.
- - Update phylink's AN mode during phy interface change and 
- not exposing phylink's AN mode into phylib.
+diff --git a/drivers/net/phy/phylink.c b/drivers/net/phy/phylink.c
+index 214b62fba991..b0f9725e0494 100644
+--- a/drivers/net/phy/phylink.c
++++ b/drivers/net/phy/phylink.c
+@@ -1903,6 +1903,7 @@ int phylink_set_fixed_link(struct phylink *pl,
  
- v3 -> v4:
- - Introduce `allow_switch_interface` flag to have all ethtool 
- link modes that are supported and advertised will be published.
- - Introduce `mac_get_pcs_neg_mode` function that selects the PCS 
- negotiation mode according to the interface mode.
- - Remove pcs-xpcs.c changes and handle pcs during `mac_select_pcs`
- function
- - Configure SerDes base on the interface on `mac_finish` function.
+ 	pl->cfg_link_an_mode = MLO_AN_FIXED;
+ 	pl->req_link_an_mode = pl->cfg_link_an_mode;
++	pl->act_link_an_mode = pl->cfg_link_an_mode;
  
- v4 -> v5:
- - remove 'allow_switch_interface' related patches.
- - remove 'mac_select_pcs' related patches.
- - add a soft reset according to XPCS datasheet for re-initiate Clause 37
- auto-negotiation when switching to SGMII interface mode.
-
-v5 -> v6:
-- Remove 'mac_get_pcs_neg_mode' related patches. 
-  The pcs_neg_mode is properly handled by the
-  'net: add negotiation of in-band capabilities' patch series:
-  https://patchwork.kernel.org/project/netdevbpf/cover/Z08kCwxdkU4n2V6x@shell.armlinux.org.uk/
-- Using act_link_an_mode to determine PHY, as cfg_link_an_mode was not
-  updated for the 2500BASE-X interface mode, caused a failure to link up.
-- Clean up and standardize the interface mode switch for xpcs.
-
-v1: https://patchwork.kernel.org/project/netdevbpf/cover/20230622041905.629430-1-yong.liang.choong@linux.intel.com/
-v2: https://patchwork.kernel.org/project/netdevbpf/cover/20230804084527.2082302-1-yong.liang.choong@linux.intel.com/
-v3: https://patchwork.kernel.org/project/netdevbpf/cover/20230921121946.3025771-1-yong.liang.choong@linux.intel.com/
-v4: https://patchwork.kernel.org/project/netdevbpf/cover/20240129130253.1400707-1-yong.liang.choong@linux.intel.com/
-v5: https://patchwork.kernel.org/project/netdevbpf/cover/20240215030500.3067426-1-yong.liang.choong@linux.intel.com/
-
-Choong Yong Liang (6):
-  net: phylink: use act_link_an_mode to determine PHY
-  net: pcs: xpcs: re-initiate clause 37 Auto-negotiation
-  stmmac: intel: configure SerDes according to the interface mode
-  net: stmmac: configure SerDes on mac_finish
-  stmmac: intel: interface switching support for EHL platform
-  stmmac: intel: interface switching support for ADL-N platform
-
-David E. Box (1):
-  arch: x86: add IPC mailbox accessor function and add SoC register
-    access
-
- MAINTAINERS                                   |   2 +
- arch/x86/Kconfig                              |   9 +
- arch/x86/platform/intel/Makefile              |   1 +
- arch/x86/platform/intel/pmc_ipc.c             |  75 ++++++++
- drivers/net/ethernet/stmicro/stmmac/Kconfig   |   2 +
- .../net/ethernet/stmicro/stmmac/dwmac-intel.c | 173 +++++++++++++++++-
- .../net/ethernet/stmicro/stmmac/dwmac-intel.h |  81 ++++++++
- .../net/ethernet/stmicro/stmmac/stmmac_main.c |  13 ++
- drivers/net/pcs/pcs-xpcs-wx.c                 |   4 +-
- drivers/net/pcs/pcs-xpcs.c                    |  60 +++++-
- drivers/net/phy/phylink.c                     |  10 +-
- .../linux/platform_data/x86/intel_pmc_ipc.h   |  34 ++++
- include/linux/stmmac.h                        |   3 +
- 13 files changed, 450 insertions(+), 17 deletions(-)
- create mode 100644 arch/x86/platform/intel/pmc_ipc.c
- create mode 100644 include/linux/platform_data/x86/intel_pmc_ipc.h
-
+ 	return 0;
+ }
+@@ -2002,6 +2003,7 @@ struct phylink *phylink_create(struct phylink_config *config,
+ 	}
+ 
+ 	pl->req_link_an_mode = pl->cfg_link_an_mode;
++	pl->act_link_an_mode = pl->cfg_link_an_mode;
+ 
+ 	ret = phylink_register_sfp(pl, fwnode);
+ 	if (ret < 0) {
+@@ -2044,8 +2046,8 @@ EXPORT_SYMBOL_GPL(phylink_destroy);
+  */
+ bool phylink_expects_phy(struct phylink *pl)
+ {
+-	if (pl->cfg_link_an_mode == MLO_AN_FIXED ||
+-	    (pl->cfg_link_an_mode == MLO_AN_INBAND &&
++	if (pl->act_link_an_mode == MLO_AN_FIXED ||
++	    (pl->act_link_an_mode == MLO_AN_INBAND &&
+ 	     phy_interface_mode_is_8023z(pl->link_config.interface)))
+ 		return false;
+ 	return true;
+@@ -2280,8 +2282,8 @@ static int phylink_attach_phy(struct phylink *pl, struct phy_device *phy,
+ {
+ 	u32 flags = 0;
+ 
+-	if (WARN_ON(pl->cfg_link_an_mode == MLO_AN_FIXED ||
+-		    (pl->cfg_link_an_mode == MLO_AN_INBAND &&
++	if (WARN_ON(pl->act_link_an_mode == MLO_AN_FIXED ||
++		    (pl->act_link_an_mode == MLO_AN_INBAND &&
+ 		     phy_interface_mode_is_8023z(interface) && !pl->sfp_bus)))
+ 		return -EINVAL;
+ 
 -- 
 2.34.1
 
