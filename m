@@ -1,87 +1,93 @@
-Return-Path: <netdev+bounces-162360-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-162362-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0CFD1A26A32
-	for <lists+netdev@lfdr.de>; Tue,  4 Feb 2025 03:45:31 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 72ADAA26A3E
+	for <lists+netdev@lfdr.de>; Tue,  4 Feb 2025 03:50:12 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id CC50118874FB
-	for <lists+netdev@lfdr.de>; Tue,  4 Feb 2025 02:45:35 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 2BBBA7A2FE0
+	for <lists+netdev@lfdr.de>; Tue,  4 Feb 2025 02:49:17 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C5C6F13E02D;
-	Tue,  4 Feb 2025 02:45:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3729E142E7C;
+	Tue,  4 Feb 2025 02:50:07 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ZqTz8KL3"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="lxL3gCTR"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8BB7DEC4;
-	Tue,  4 Feb 2025 02:45:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1136B25A634
+	for <netdev@vger.kernel.org>; Tue,  4 Feb 2025 02:50:06 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1738637125; cv=none; b=PPb7uNweq/LerSFtk7HNe88teCe0g62S60hAOMhyA0zjEVT8QJKzmhPq+Iz4yzs8tvMQ15XOHqCScnA2O7qlqBxFvFTYOcF2IZw3A7kPhJJbtbqJVHeTg429+xw97SD/ykk1TL3mtv3b5KhD8e89+gHZ82pPJzcHROL+WJzdg78=
+	t=1738637407; cv=none; b=LshqOV35RecMFcfMVLlJGwUvNWw52bRIfPYvlLdh5/aFigfFq/p5Rc/CaygSg+VNPgpXtOwDvL4jLdsFa3Ghqs/mZa1LIh4a3KdzGVqYN2xfUrNDRIfrVRFniVuvD920CdSCCk1OMAYEuYWAuq0BpaloLsT1Q7xB+lTIi1saXZ4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1738637125; c=relaxed/simple;
-	bh=m1RF4XomatnHgBjWRolxSQEe+b9UxVhiLunv8jNDikg=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=TStLOroHaHkUHlpUX1qr/VyuL6TnfCOkCapOssyjyN+G7ZYVerE9aVKR8aeQJ3He61CpdG87/XHpuNnSUojFysOisyNGDKkE4yjIW5hKsXo5sHDqWfpRCrwHrb3IOLwWZgC3S1FrX/W0zkTyHty2XmPOofx+Q0/5XIiZSTqu7Ng=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ZqTz8KL3; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 84801C4CEE0;
-	Tue,  4 Feb 2025 02:45:24 +0000 (UTC)
+	s=arc-20240116; t=1738637407; c=relaxed/simple;
+	bh=3nW+gL2OJzhamvUDQ3NVRjubbFHJOfzHepSSb2tWQlA=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=ZxIm+16PLnvufQp44eMSJy9qNIeqNc1tMcvrDJG3XZC+op0KBPSXnf/gCqKBErBACeoBPUOErxkEXFdntpu05AoWbb+2+5hXP7JZSrtQxc/h/RtxUsvEvpD+8gaXRRqsxAOnf6knnBhSsqtRmYalaCYUCyC1i6TkLpfp+pIVM0Y=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=lxL3gCTR; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4C3FBC4CEE0;
+	Tue,  4 Feb 2025 02:50:06 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1738637125;
-	bh=m1RF4XomatnHgBjWRolxSQEe+b9UxVhiLunv8jNDikg=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=ZqTz8KL3istERH4xwphDzrfoZYgWr9C5/vynap/0hC3pIYpCfmWtYuZoF81jC371M
-	 Sz6ZlD8FHJi6zB0fMdfeCyqkdrU5L0fWrCAi4/19OX/VxUymYI8DzsyyFKDKwbmAzp
-	 g1YGLvGFsUewcLX05TjNepbo4+a60+nqCVtNoL0ZP6mo++LWhvsM4S08vT1OR401WF
-	 60+fj4Zy0k/RTQC1CmPNs+QvQIEepUlwW8lSS78xpF3UhmKeOhCnRUYCLM7wfgjnr+
-	 aM+HEwQSfrP9sJS5WpgfcOrnRSSostqQ5dkkTKHEcTfsfuCuSV90dk5nj+nhBaVzMQ
-	 r4SVzsRGphPPg==
-Date: Mon, 3 Feb 2025 18:45:23 -0800
-From: Jakub Kicinski <kuba@kernel.org>
-To: Joe Damato <jdamato@fastly.com>
-Cc: netdev@vger.kernel.org, Andrew Lunn <andrew+netdev@lunn.ch>, "David S.
- Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Paolo
- Abeni <pabeni@redhat.com>, Shuah Khan <shuah@kernel.org>, Alexei
- Starovoitov <ast@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>,
- Jesper Dangaard Brouer <hawk@kernel.org>, John Fastabend
- <john.fastabend@gmail.com>, linux-kernel@vger.kernel.org (open list),
- linux-kselftest@vger.kernel.org (open list:KERNEL SELFTEST FRAMEWORK),
- bpf@vger.kernel.org (open list:XDP (eXpress Data
- Path):Keyword:(?:\b|_)xdp(?:\b|_))
-Subject: Re: [PATCH net-next v2 2/2] selftests: drv-net: Test queue xsk
- attribute
-Message-ID: <20250203184523.5676eae6@kernel.org>
-In-Reply-To: <20250203185828.19334-3-jdamato@fastly.com>
-References: <20250203185828.19334-1-jdamato@fastly.com>
-	<20250203185828.19334-3-jdamato@fastly.com>
+	s=k20201202; t=1738637406;
+	bh=3nW+gL2OJzhamvUDQ3NVRjubbFHJOfzHepSSb2tWQlA=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=lxL3gCTRyipvzJMsdHJhNPm8/LTnoRSMv3HqGGEYgXaDgiTgvY+Dq7HTrFHM4ouEZ
+	 QNwBUn9XqymjE49Or6pZbh09Rl0nEka+sAixjxqZawuhxZfsA5nN8BWFFzH5GP7ORd
+	 xndD8raI+eDcY4UyXNDwXA2UoVCtZ0rlBuO70C5OpNtCQtYJwRi0sHLm1+IfxeKiMK
+	 CXgZ5SidLHc0UjWUn4PsZe2mKMAFIHk8VaIbHwxHqqnFkwRr1o0xkRZzAGOXRxBy5M
+	 M6frZaYHLbyZdRfhSIM7gyNGPL5rLdaZqevm9hpK/XAq3w1eAIVMnlYKRgRs148yya
+	 NYC8hnbjltRKQ==
+Received: from [10.30.226.235] (localhost [IPv6:::1])
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id ADFFA380AA67;
+	Tue,  4 Feb 2025 02:50:34 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH net] net: armonize tstats and dstats
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <173863743353.3581294.5552119952119307159.git-patchwork-notify@kernel.org>
+Date: Tue, 04 Feb 2025 02:50:33 +0000
+References: <2e1c444cf0f63ae472baff29862c4c869be17031.1738432804.git.pabeni@redhat.com>
+In-Reply-To: <2e1c444cf0f63ae472baff29862c4c869be17031.1738432804.git.pabeni@redhat.com>
+To: Paolo Abeni <pabeni@redhat.com>
+Cc: netdev@vger.kernel.org, davem@davemloft.net, edumazet@google.com,
+ kuba@kernel.org, horms@kernel.org, andrew+netdev@lunn.ch, gnault@redhat.com
 
-On Mon,  3 Feb 2025 18:58:23 +0000 Joe Damato wrote:
-> +/**
-> + * this is a simple helper program that creates an XDP socket and does the
-> + * minimum necessary to get bind() to succeed.
-> + *
-> + * this test program is not intended to actually process packets, but could be
-> + * extended in the future if that is actually needed.
-> + *
-> + * it is used by queues.py to ensure the xsk netlinux attribute is set
-> + * correctly.
-> + */
+Hello:
 
-code lgtm, one more nit: could you replace /** -> /*
-Our scripts thinks this is kdoc and complain.
+This patch was applied to netdev/net.git (main)
+by Jakub Kicinski <kuba@kernel.org>:
+
+On Sat,  1 Feb 2025 19:02:51 +0100 you wrote:
+> After the blamed commits below, some UDP tunnel use dstats for
+> accounting. On the xmit path, all the UDP-base tunnels ends up
+> using iptunnel_xmit_stats() for stats accounting, and the latter
+> assumes the relevant (tunnel) network device uses tstats.
+> 
+> The end result is some 'funny' stat report for the mentioned UDP
+> tunnel, e.g. when no packet is actually dropped and a bunch of
+> packets are transmitted:
+> 
+> [...]
+
+Here is the summary with links:
+  - [net] net: armonize tstats and dstats
+    https://git.kernel.org/netdev/net/c/d3ed6dee73c5
+
+You are awesome, thank you!
 -- 
-pw-bot: cr
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
+
+
 
