@@ -1,138 +1,158 @@
-Return-Path: <netdev+bounces-162636-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-162637-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 367A7A27731
-	for <lists+netdev@lfdr.de>; Tue,  4 Feb 2025 17:31:17 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id CA654A27740
+	for <lists+netdev@lfdr.de>; Tue,  4 Feb 2025 17:36:15 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 15C6E1883708
-	for <lists+netdev@lfdr.de>; Tue,  4 Feb 2025 16:31:22 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 8250C1884C88
+	for <lists+netdev@lfdr.de>; Tue,  4 Feb 2025 16:36:20 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2A55820D4F2;
-	Tue,  4 Feb 2025 16:31:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D202F2153DC;
+	Tue,  4 Feb 2025 16:36:08 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=cs.stanford.edu header.i=@cs.stanford.edu header.b="mHXKJ88Q"
+	dkim=pass (2048-bit key) header.d=blackwall-org.20230601.gappssmtp.com header.i=@blackwall-org.20230601.gappssmtp.com header.b="FcVW4pkC"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp1.cs.Stanford.EDU (smtp1.cs.stanford.edu [171.64.64.25])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wm1-f42.google.com (mail-wm1-f42.google.com [209.85.128.42])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8CD3B2C181
-	for <netdev@vger.kernel.org>; Tue,  4 Feb 2025 16:31:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=171.64.64.25
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EEB5C2C181
+	for <netdev@vger.kernel.org>; Tue,  4 Feb 2025 16:36:06 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.42
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1738686673; cv=none; b=d+DGNjWYK2+RXq5BkjAVC6JSwqXvwAkoDm5Ac758b728qAaV9P8Lbs8zjyqqHh7uLZdnmmX/ad8NlPvYW0IEbUUqtQv6B2g2usYjTkXZgtia/9RgQeDQ820AU11zifziC/Jq628sQCcRzWERO3JGA1VPxVRY9g9Z8RSIbYnnHVY=
+	t=1738686968; cv=none; b=tbLUMKbrvfwW114qppEl0HHv4s5qDhwrFHCAYADWdl96Y+prrt454hX2yURiqfpsyq8rEKPZ4RNgZHhspBlJs1pxZduDDMlQPQydbMC2jnaE2DFIDAgVDlXgKMMlHxcNKTNTkTh4F4jzxYJoqRggd35vbow+3AU7bYOKuZDK0y0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1738686673; c=relaxed/simple;
-	bh=CtAA7LWYT6zJvtipRuZeqBk/XlfSDT+KZ36VX35CXho=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=SNaKxjkdHBEdjlCrBsPPYkiLg3cJ/aTnWgHFkgRDicKGlG+xUiO5CAthq/eQ8IR7cBVw5sNgK4jCuEbrMz1l4Amc4/dylhVcL6r9oGo34fak0AvOTmSYIp8uANyplUxs/fZ2xMiAM006hys00hN0A7+/i9hiMZZEOleAIRSWM04=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=cs.stanford.edu; spf=pass smtp.mailfrom=cs.stanford.edu; dkim=pass (2048-bit key) header.d=cs.stanford.edu header.i=@cs.stanford.edu header.b=mHXKJ88Q; arc=none smtp.client-ip=171.64.64.25
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=cs.stanford.edu
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=cs.stanford.edu
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=cs.stanford.edu; s=cs2308; h=Content-Transfer-Encoding:Content-Type:Cc:To:
-	Subject:Message-ID:Date:From:In-Reply-To:References:MIME-Version:Sender:
-	Reply-To:Content-ID:Content-Description:Resent-Date:Resent-From:Resent-Sender
-	:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:List-Help:List-Unsubscribe:
-	List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=CtAA7LWYT6zJvtipRuZeqBk/XlfSDT+KZ36VX35CXho=; t=1738686671; x=1739550671; 
-	b=mHXKJ88Qq30cdX8Fj1+53vnQVuKlAPoMcWBQWabojfFp/6o2RquoNLuVyp4zgc58zOXeg/EwtXg
-	GSklhCJ1dZJ9vk2BOLKpVHVw3kJq3Xr7RT01kHNDiu4Y0HB24QVbU7KxtY5fHTDVSFsqq3TIolzmj
-	n82EF617SpLQ1p3A38m9cPF64OQJdxzXjlI4I5XGNxWQoiL7/3FMPG8f1NpinBaqu60ioWbZtHpMe
-	KJ2KiEzxqiAEg2DFNEgLir0gLy/QHhE0v3y15d02sKpVtHYAdyVzVtr0qgNA38QzJHbSV4S0zA8zQ
-	qC2e9/mYf4huiYI+4nme5czSDCiLpo+zDPtA==;
-Received: from mail-ot1-f41.google.com ([209.85.210.41]:56568)
-	by smtp1.cs.Stanford.EDU with esmtpsa  (TLS1.2) tls TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256
-	(Exim 4.94.2)
-	(envelope-from <ouster@cs.stanford.edu>)
-	id 1tfLpN-0004IQ-UT
-	for netdev@vger.kernel.org; Tue, 04 Feb 2025 08:31:10 -0800
-Received: by mail-ot1-f41.google.com with SMTP id 46e09a7af769-71e3f291ad6so3506099a34.0
-        for <netdev@vger.kernel.org>; Tue, 04 Feb 2025 08:31:09 -0800 (PST)
-X-Gm-Message-State: AOJu0Yw/WcP/blvqtoOeciaCKkCKGHcgwGcro0WmNNFTpgM2iyNSIcdo
-	a0e1MLjpWyffMcX+NdxT9gaPRU6l7y36Wg0pI3BivQS2/2bPRXqlHTY2x7fk5mEzLjBeisuZidA
-	fe3GRI0Uyol0sCOqWGIzAvsB8Ev4=
-X-Google-Smtp-Source: AGHT+IE6fjsFPvkB2tDeNLkStxDarOgUPzPnRUTjUaLxYr0vD+HQr/iU0bMCfRl+3Dn1paRK2Q12s6By0P4muFCKsGg=
-X-Received: by 2002:a05:6870:c69c:b0:2a0:d2d:e606 with SMTP id
- 586e51a60fabf-2b32f2f8538mr15165940fac.38.1738686669366; Tue, 04 Feb 2025
- 08:31:09 -0800 (PST)
+	s=arc-20240116; t=1738686968; c=relaxed/simple;
+	bh=bI5dvEhjIyy61ioP0MayYlcLx8z6UqsSCzaKJXhIJhQ=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=utX7/dXl/7eDmxvh7jCvuopB6dhtde9PhYyFoU74Gw0KOyESDvoD9dHUOroUFDq7m5JSgu0b9MMGBjntYkeSdWa9sjkvI027zvhdx/isqLHglHRoZYjsuFxuF7gE9kHUrpm2UMpVsgW1u7Lw8erAjs67v1M8f1dXSqL0EPFl8ns=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=blackwall.org; spf=none smtp.mailfrom=blackwall.org; dkim=pass (2048-bit key) header.d=blackwall-org.20230601.gappssmtp.com header.i=@blackwall-org.20230601.gappssmtp.com header.b=FcVW4pkC; arc=none smtp.client-ip=209.85.128.42
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=blackwall.org
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=blackwall.org
+Received: by mail-wm1-f42.google.com with SMTP id 5b1f17b1804b1-436341f575fso68742235e9.1
+        for <netdev@vger.kernel.org>; Tue, 04 Feb 2025 08:36:06 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=blackwall-org.20230601.gappssmtp.com; s=20230601; t=1738686965; x=1739291765; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=RDunVLcwW1zuR0NReRHj7nS9HRHJPnTZQ6+6UCKJLEQ=;
+        b=FcVW4pkCFiUcciq7RY4xmr9SHbIfXOSy9PLxM69I7uM0KITVrKl6N1ZLK9r34GZVtS
+         xxI1MZK06Oz1Tl+qSr7/yK0uREMEFEWo2I408qho8yL5VavpQTmAk6JGeMQ7N3Mluv5w
+         inv5yNMA6qJeb+hcFAl7NqIj7Qtva25aSkI0cbkrPXYgpj8VQGe2p/uF5Q0fl68LC2Wh
+         H/WrsAENKEIJIvjqVDGyjs6EYLLXQFjd2DaUg716nMQq94HUbihwb+HLtkR0ME7gSqOB
+         aeqrFaAxypqmHQYSFxzOfQnRrBMuy05wfUNHeRWWkvEphXa6KpiIvWhhrihyjIYflrPx
+         nLVA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1738686965; x=1739291765;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=RDunVLcwW1zuR0NReRHj7nS9HRHJPnTZQ6+6UCKJLEQ=;
+        b=LpwzbV76J45TQcEwKjxKH2Y7jHsOjKpKJRoKvv0OIuaVPBvfqI1Gn7W9ahywLqIZ/c
+         ZhLCEKX1lvGnRXKc0lRo8MKFuny93iEH97RPGXVcz6cDiBe6I1WmX80tCr0pvFvWe8AC
+         UsO6TLqNOPkK8qRsDBWWhNUXcOxx18Hv6sQVsFXmLlwRrpvwbpvkHhFICnSpuF6684b9
+         gmYrMdDprwEI69IRiDDItE7adpdKOqtH+NAo89pq3vz81kWOy7Z4ZkaS/XLgvYh0kuID
+         DJPiomKNHFz0nWDNK9KD2BXzUUPrz+gsq3XQa4L89uwCJ4H/9cQaxfB7n4C+I8m2YKQK
+         jAQg==
+X-Forwarded-Encrypted: i=1; AJvYcCU0VWkkcGi4JGOrxApz6dXC77+sDal+ypzLDjiupgci/5aqXBHkgxtIshhIryhSwQhRJfkhkpA=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzvADQuHcG1TzY8rHim6BunOoz/3HuQSnsCqGydaWbusueqBR/q
+	BQmzD9FZoAfHhU7Ykv6JoRreQRStir7WDJNA+QXqWnVEmmg2tyAdV6KdJMvb2aM=
+X-Gm-Gg: ASbGncsr88Wa4sJp15gp1eYHbZ2yxVneyWthqPTyOuhFNwK5qHgXRO7teU4AtIEf/N8
+	PRufKixlRZS/dAvp/NA1Hwg5QbGo5uC+zEb6YX8Xri/6kf5BB9AEMeZn0nDRttmRwVGlT5HSWcM
+	QdA8plPClaFbJE5jA0K83CDzwi8SZAsoH9rnKz+Ny1F/JjCzNlsrPYkpf1JFU6Oqk/m/6BeKtDd
+	7rXeDealZsu3WxT9qE5xut8Y6dCs7125WSdo9s+N551DIOFuD36dGOHW6TIlc84SJHyU3ZVk5/4
+	547qC3hZzVUa9eBkzbjOWjWuKXYLDjoYgmoVPGTt0Tx9Qus=
+X-Google-Smtp-Source: AGHT+IG+BJvA7XHtSm+ZFB0urLAnB/Y3aTRtbVHRqGxt9kZO0zXne3OI/ba5+Wee/gUa3KszQwocpA==
+X-Received: by 2002:a5d:4f90:0:b0:385:ee3f:5cbf with SMTP id ffacd0b85a97d-38c519526edmr19400554f8f.20.1738686964837;
+        Tue, 04 Feb 2025 08:36:04 -0800 (PST)
+Received: from [192.168.0.123] (78-154-15-142.ip.btc-net.bg. [78.154.15.142])
+        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-ab705f83e1dsm707185066b.185.2025.02.04.08.36.03
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 04 Feb 2025 08:36:04 -0800 (PST)
+Message-ID: <e4e9b6a4-ea61-4b98-b948-04ca3caa5f0b@blackwall.org>
+Date: Tue, 4 Feb 2025 18:36:03 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250115185937.1324-1-ouster@cs.stanford.edu> <20250115185937.1324-9-ouster@cs.stanford.edu>
- <530c3a8c-fa5b-4fbe-9200-6e62353ebeaf@redhat.com> <CAGXJAmya3xU69ghKO10SZz4sh48CyBgBsF7AaV1OOCRyVPr0Nw@mail.gmail.com>
- <991b5ad9-57cf-4e1d-8e01-9d0639fa4e49@redhat.com> <CAGXJAmxfkmKg4NqHd9eU94Y2hCd4F9WJ2sOyCU1pPnppVhju=A@mail.gmail.com>
- <7b05dc31-e00f-497e-945f-2964ff00969f@redhat.com> <CAGXJAmyNPhA-6L0jv8AT9_xaxM81k+8nD5H+wtj=UN84PB_KnA@mail.gmail.com>
- <52365045-c771-412a-9232-70e80e26c34f@redhat.com>
-In-Reply-To: <52365045-c771-412a-9232-70e80e26c34f@redhat.com>
-From: John Ousterhout <ouster@cs.stanford.edu>
-Date: Tue, 4 Feb 2025 08:30:32 -0800
-X-Gmail-Original-Message-ID: <CAGXJAmzL39XZ-tcDRrLs-hiAXi3W79cAoVe18hHkD7iGDKe7yQ@mail.gmail.com>
-X-Gm-Features: AWEUYZm5Y-AfBSGjbhHNw-Fze6qttyfmnKq0f-S3SxazeGQq-SGh5-lR8H25zMY
-Message-ID: <CAGXJAmzL39XZ-tcDRrLs-hiAXi3W79cAoVe18hHkD7iGDKe7yQ@mail.gmail.com>
-Subject: Re: [PATCH net-next v6 08/12] net: homa: create homa_incoming.c
-To: Paolo Abeni <pabeni@redhat.com>
-Cc: Netdev <netdev@vger.kernel.org>, Eric Dumazet <edumazet@google.com>, 
-	Simon Horman <horms@kernel.org>, Jakub Kicinski <kuba@kernel.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Spam-Score: -1.0
-X-Spam-Level: 
-X-Scan-Signature: 127ff6e1eac6b45a32dc112250ed777d
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next 1/8] vxlan: Annotate FDB data races
+To: Ido Schimmel <idosch@nvidia.com>, netdev@vger.kernel.org
+Cc: davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com,
+ edumazet@google.com, andrew+netdev@lunn.ch, horms@kernel.org,
+ petrm@nvidia.com
+References: <20250204145549.1216254-1-idosch@nvidia.com>
+ <20250204145549.1216254-2-idosch@nvidia.com>
+Content-Language: en-US
+From: Nikolay Aleksandrov <razor@blackwall.org>
+In-Reply-To: <20250204145549.1216254-2-idosch@nvidia.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-On Tue, Feb 4, 2025 at 12:50=E2=80=AFAM Paolo Abeni <pabeni@redhat.com> wro=
-te:
->
-> On 2/4/25 12:33 AM, John Ousterhout wrote:
-> > On Mon, Feb 3, 2025 at 1:12=E2=80=AFAM Paolo Abeni <pabeni@redhat.com> =
-wrote:
-> >> I don't see where/how the SO_HOMA_RCVBUF max value is somehow bounded?=
-!?
-> >> It looks like the user-space could pick an arbitrary large value for i=
-t.
-> >
-> > That's right; is there anything to be gained by limiting it? This is
-> > simply mmapped memory in the user address space. Aren't applications
-> > allowed to allocate as much memory as they like? If so, why shouldn't
-> > they be able to use that memory for incoming buffers if they choose?
->
-> If unprivileged applications could use unlimited amount of kernel
-> memory, they could hurt the whole system stability, possibly causing
-> functional issue of core kernel due to ENOMEM.
->
-> The we always try to bound/put limits on amount of kernel memory
-> user-space application can use.
+On 2/4/25 16:55, Ido Schimmel wrote:
+> The 'used' and 'updated' fields in the FDB entry structure can be
+> accessed concurrently by multiple threads, leading to reports such as
+> [1]. Can be reproduced using [2].
+> 
+> Suppress these reports by annotating these accesses using
+> READ_ONCE() / WRITE_ONCE().
+> 
+> [1]
+> BUG: KCSAN: data-race in vxlan_xmit / vxlan_xmit
+> 
+> write to 0xffff942604d263a8 of 8 bytes by task 286 on cpu 0:
+>  vxlan_xmit+0xb29/0x2380
+>  dev_hard_start_xmit+0x84/0x2f0
+>  __dev_queue_xmit+0x45a/0x1650
+>  packet_xmit+0x100/0x150
+>  packet_sendmsg+0x2114/0x2ac0
+>  __sys_sendto+0x318/0x330
+>  __x64_sys_sendto+0x76/0x90
+>  x64_sys_call+0x14e8/0x1c00
+>  do_syscall_64+0x9e/0x1a0
+>  entry_SYSCALL_64_after_hwframe+0x77/0x7f
+> 
+> read to 0xffff942604d263a8 of 8 bytes by task 287 on cpu 2:
+>  vxlan_xmit+0xadf/0x2380
+>  dev_hard_start_xmit+0x84/0x2f0
+>  __dev_queue_xmit+0x45a/0x1650
+>  packet_xmit+0x100/0x150
+>  packet_sendmsg+0x2114/0x2ac0
+>  __sys_sendto+0x318/0x330
+>  __x64_sys_sendto+0x76/0x90
+>  x64_sys_call+0x14e8/0x1c00
+>  do_syscall_64+0x9e/0x1a0
+>  entry_SYSCALL_64_after_hwframe+0x77/0x7f
+> 
+> value changed: 0x00000000fffbac6e -> 0x00000000fffbac6f
+> 
+> Reported by Kernel Concurrency Sanitizer on:
+> CPU: 2 UID: 0 PID: 287 Comm: mausezahn Not tainted 6.13.0-rc7-01544-gb4b270f11a02 #5
+> Hardware name: QEMU Standard PC (i440FX + PIIX, 1996), BIOS 1.16.3-3.fc41 04/01/2014
+> 
+> [2]
+>  #!/bin/bash
+> 
+>  set +H
+>  echo whitelist > /sys/kernel/debug/kcsan
+>  echo !vxlan_xmit > /sys/kernel/debug/kcsan
+> 
+>  ip link add name vx0 up type vxlan id 10010 dstport 4789 local 192.0.2.1
+>  bridge fdb add 00:11:22:33:44:55 dev vx0 self static dst 198.51.100.1
+>  taskset -c 0 mausezahn vx0 -a own -b 00:11:22:33:44:55 -c 0 -q &
+>  taskset -c 2 mausezahn vx0 -a own -b 00:11:22:33:44:55 -c 0 -q &
+> 
+> Reviewed-by: Petr Machata <petrm@nvidia.com>
+> Signed-off-by: Ido Schimmel <idosch@nvidia.com>
+> ---
+>  drivers/net/vxlan/vxlan_core.c | 18 +++++++++---------
+>  1 file changed, 9 insertions(+), 9 deletions(-)
+> 
 
-Homa's receive buffer space is *not kernel memory*; it's just a large
-mmapped region created by the application., no different from an
-application allocating a large region of memory for its internal
-computation.
-
-> >> Fine tuning controls and sysctls could land later, but the basic
-> >> constraints should IMHO be there from the beginning.
-> >
-> > OK. I think that SO_HOMA_RCVBUF takes care of RX buffer space.
->
-> We need some way to allow the admin to bound the SO_HOMA_RCVBUF max value=
-.
-
-Even if this memory is entirely user memory (we seem to be
-miscommunicating over this)?
-
-> > For TX, what's the simplest scheme that you would be comfortable with? =
-For
-> > example, if I cap the number of outstanding RPCs per socket, will that
-> > be enough for now?
->
-> Usually the bounds are expressed in bytes. How complex would be adding
-> wmem accounting?
-
-I'll see what I can do.
-
--John-
+Reviewed-by: Nikolay Aleksandrov <razor@blackwall.org>
 
