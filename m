@@ -1,196 +1,118 @@
-Return-Path: <netdev+bounces-162364-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-162365-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0F705A26A49
-	for <lists+netdev@lfdr.de>; Tue,  4 Feb 2025 03:53:20 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 894B3A26A51
+	for <lists+netdev@lfdr.de>; Tue,  4 Feb 2025 03:54:51 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 966CF3A57A3
-	for <lists+netdev@lfdr.de>; Tue,  4 Feb 2025 02:53:11 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 1842D16236D
+	for <lists+netdev@lfdr.de>; Tue,  4 Feb 2025 02:54:50 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A10CA14AD2B;
-	Tue,  4 Feb 2025 02:53:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B8F611448E3;
+	Tue,  4 Feb 2025 02:54:39 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="dni9JViy"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Gs5S3CSX"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-yw1-f182.google.com (mail-yw1-f182.google.com [209.85.128.182])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D5B2E25A634;
-	Tue,  4 Feb 2025 02:53:08 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.182
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 86327EC4;
+	Tue,  4 Feb 2025 02:54:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1738637590; cv=none; b=OoQY9+wGDgbs+LugOes8N0CYqxyO77yn0WjB17z3cZo6sRHWPjNLlT6CMja3ZOcIVXGuPrbZdeu0VChBzR0YbdKTzK+aOhEwKEpcrNWoS8bR2HfCxzfkORlbaErokOAwBpAcmYBhUmblt2p+XDeuzpc7Ht+n22cWG0InMOkVOvM=
+	t=1738637679; cv=none; b=s/3/jU8w1nxB8x68a6vR+Fd7ROT7c/HiBcBtfARPNoC4ZlgEcOEduSqt0II3QpG6UvvLl6aUuMdRt/jVcuOuvbqPe1qrqSkyrJeesAPpnNUyf8gQkeuK8WSg555H2QiJ84qvlIWaUYmp+clMsG5sQ2oRCElVrUBCVf4bpJzXwxg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1738637590; c=relaxed/simple;
-	bh=VpcxOzYvc2EtxPfddOr62rkD1DZYmRv94X79g3nNc1Y=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=Pl/5un2JIr8MpzwgR7ub6T3h7iTYWmOLGf9CSjFuAbHwQzo55716XoOeneauIGIR1P32EkXHGByp6IwL1t2Loe720+SUi0PtNYX7tA4wpbH1cj/MCg2hLapRZq5zi4HNdFYspY9PxUV6+CKa/eXi4XAqJUAycfGVCk7V2bgKQuc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=dni9JViy; arc=none smtp.client-ip=209.85.128.182
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-yw1-f182.google.com with SMTP id 00721157ae682-6f47ed1f40dso31466077b3.1;
-        Mon, 03 Feb 2025 18:53:08 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1738637587; x=1739242387; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=rLVUd6QfeA3M7Ges1AvVcKvNEAAOPuaos5MsyGuWTQk=;
-        b=dni9JViyOe3l3tId6BsbvfKbGXBxkCZzQBznelKo2nyb7nwUJh/F1zrIGvsVbJyKqm
-         DrjvLKI1V2sc7lUfLz9SS6b/n23xyIVET4EtRWwajw8QZtd97nATfQ2Vhp5+ibMGwmRw
-         MrPI8ZDolPy4L6JO5gr/yZAN1rdomTmeQNr35lsAKpYlQdYz0qIsRKn3O3vgGDZ7YOAD
-         YIrSmT/PDFtWeVLgGoXI6y+0C1elH47gwz7m7RPcyJJUuLtGFUdbkl+8kAvGBqeIij2d
-         URm4P64NDZORYI1tWoqjIVRGjGZmHPjD08g2idxcyeBp01ri/aL0b2u/WRHX4JC5pfva
-         A+Sw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1738637587; x=1739242387;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=rLVUd6QfeA3M7Ges1AvVcKvNEAAOPuaos5MsyGuWTQk=;
-        b=jFd0Zvot66od/khObIQk/F0yoenn6cQSJvHtnYSmyM2OIZWgQmDsf/28G61zVtkplw
-         /RVbnx8rpJb1+FTiGGwJ635MhGj/HhHFOTe2qz6rKk88viHXQe/D5fr1eGbx6bIECkw3
-         9rvw3EKtJXYBALo/U8DGu1bgxN2nULUJEtrgp1f71NLGc44gFlGHqPfyvTIQVMVHCMIa
-         5b66BWKDfZzaH+SNVdQ3sneudzRry65s3945IAWU6rD5fDorkbf4r5fD55hYdwLmFJgp
-         i5cwg9NJrde61zI3/qTaaS/tcEtyzgoqQg11T099ZGzjmPaS8/K7H2D5cQ5EmFw1XyNZ
-         jw8g==
-X-Forwarded-Encrypted: i=1; AJvYcCUs5vS6p+LmD+VzL8TxAHY6YlYf35XJUd10ZoAGjg+foNqqcnUyHprP4rqjYB694bpRK9o4x+PFx7M=@vger.kernel.org, AJvYcCUyF4u41d6pfUWaUDa3fo1CDZWp1RgPyQqu4QCn8E1xP7fU2hkMpQ26oP052rIaWtlNi2QnnF85Gw3weSVf@vger.kernel.org, AJvYcCVsDLcBeoGeSG8uEPjSugW73SnuTX6PlTC28eU2mbr7hDH4OvF/YvZOszuRXqX6z8vIZhE9x8TpFXpj@vger.kernel.org, AJvYcCVth79viUHlHVjsif+o7yLQhH9MEShZEaHWv58roHbSX3/PKkqQ7aG9tPhxz59ArgOflw6lufP9ca6e@vger.kernel.org, AJvYcCW788IStS01O+EqTAJVkHYLIhw5hTVk8INy7TM1Owkl6QBPk0P8QlcYLWGPf4gYZTsupJV8Jt+7L7fotQ==@vger.kernel.org, AJvYcCWVsZQi4pNlMFIlqiHouLWFYcqyb4HH/6yEawajy3XqqN9Jkt0QHofj3G23qkbS9TVWnKsgU9iOx74b@vger.kernel.org, AJvYcCWYG86JcuVKxJgsRDfN0QRN/a+8Jx3Aswcj/Q/Nbn37lRSKvi0omn9Aiejo3EE/1qXaRBBaTTtJN0MKQRG0z/Y=@vger.kernel.org, AJvYcCXMF4STseyl+mjm2tOCHbld0DSkFKLL6BkTP7i/0DcJwLQpDMN6MmfO4NOJnSWejHGrDF6htQba@vger.kernel.org, AJvYcCXtIV2e9v8AoYKBMnqOS/kR0ie1KJbOQFxIzkPeAU2gMdRcD5MtbNcdkxo9q3C2D309ZocDHxZ+B6efYT4=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwkGCV5seRemnOC8jF869ZVPIq+FC2bZFgRiItfZ3P/qBaJ6lIs
-	UkKQY4QXHiwf2yF1APg2hGvMyKO5deAWfZenzI2bJDCz2QMLliW0J3cxCW3FmxRRt16YQ7kseNO
-	UIp2pXwktzhVgu/zS0xKADcl37AY=
-X-Gm-Gg: ASbGnctJ+3SwCt+OPpaWleb5gF2T39NqMr74zlyVn2/DomNA3H3XoAXq8SOi5R8PHP4
-	r22uscbeeF6om2yqXN/G1rZ8Q/RQ5nHDTHsiTFNL4ae+AMIXAr8rDDgqdHCc6xXoAznZwZ3AjPp
-	QiOQAHCU8LXUp/qn0aYunFwubnhkK5ojw=
-X-Google-Smtp-Source: AGHT+IFeDZU0dSd3LyKNE4SOHHZmjs/OWkO8WJYeqvdBv7r4EkCLwBFisJ9ZEKAYuz3qhthIDYgpoGZBY/0QIu6VXhk=
-X-Received: by 2002:a81:b813:0:b0:6f4:2b4b:358e with SMTP id
- 00721157ae682-6f7a8334490mr140033547b3.7.1738637587601; Mon, 03 Feb 2025
- 18:53:07 -0800 (PST)
+	s=arc-20240116; t=1738637679; c=relaxed/simple;
+	bh=Hr6eeyE9E3euEHL6VQuoN3igwKmYR486ysCJziX04tw=;
+	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:
+	 Content-Disposition; b=ajOnOeaWuWBzhLvG+GRUFV6wyIK8Z7yKfi3poe12byd9TmZqA5dMEODOUlfMaMApuwtmJQwdGcYyBbNU1pzU9Qn8xyR5A/x48KBefMDvs+ANfMCQcKkDTWnM/Xk3iT88aDhu1V9RwHm3keGUc6+ULluTZsoMtntZRTZnw/WAzdo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Gs5S3CSX; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 311DEC4CEE2;
+	Tue,  4 Feb 2025 02:54:34 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1738637679;
+	bh=Hr6eeyE9E3euEHL6VQuoN3igwKmYR486ysCJziX04tw=;
+	h=Date:From:To:Cc:Subject:From;
+	b=Gs5S3CSXcuLJ5Iuf2f5yaE4zMN4Z00DFYdT8QkkukJEwRcCkoKLnhCGyfP2906Zle
+	 aWyrds+y4TQSC4wxEZVfScVgW0mw7hm2uMAgBHM5jaYj8E84pJ5NYLbdpSL6PcsKg6
+	 Yk/FQs/xHbZT5nl6N0/G5I2J9ovOU3vFKiDcZx8hJMmZ/8P+psJ5wCkXDjha+TFbyV
+	 JY/5On5vOnX/RiFWDy5AvBrcOXvWEgSgaFy3giq4hJspINKDgbkG9FRTIz+Nzt7Ayo
+	 UuZA1DD+RTCTvmX9m81LpwT+/rLJNBJsxaHkcT4oqv+s7U74bMfYzlth18UuAXJ6ch
+	 n9Q41nTvZUowQ==
+Date: Tue, 4 Feb 2025 13:24:31 +1030
+From: "Gustavo A. R. Silva" <gustavoars@kernel.org>
+To: Potnuri Bharat Teja <bharat@chelsio.com>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Simon Horman <horms@kernel.org>
+Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+	"Gustavo A. R. Silva" <gustavoars@kernel.org>,
+	linux-hardening@vger.kernel.org
+Subject: [PATCH v2][next] cxgb4: Avoid a -Wflex-array-member-not-at-end
+ warning
+Message-ID: <Z6GBZ4brXYffLkt_@kspp>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250123091115.2079802-1-a0282524688@gmail.com>
- <20250123091115.2079802-7-a0282524688@gmail.com> <c1cbb337-9ca5-4071-b05a-a97ab451f358@wanadoo.fr>
- <685ce5ff-127a-4f8b-b058-d36d3adb1c0d@roeck-us.net>
-In-Reply-To: <685ce5ff-127a-4f8b-b058-d36d3adb1c0d@roeck-us.net>
-From: Ming Yu <a0282524688@gmail.com>
-Date: Tue, 4 Feb 2025 10:52:56 +0800
-X-Gm-Features: AWEUYZkf53oBhkYM5RpWbSZEAayYxQcwszOFunFOYIl2jXoioDHsY_4Pifefhjs
-Message-ID: <CAOoeyxVPgJAa_LQxjXtLpL04pwpGL57W1St3j7nEVqZd_rXbXg@mail.gmail.com>
-Subject: Re: [PATCH v6 6/7] hwmon: Add Nuvoton NCT6694 HWMON support
-To: Guenter Roeck <linux@roeck-us.net>, Vincent Mailhol <mailhol.vincent@wanadoo.fr>
-Cc: tmyu0@nuvoton.com, lee@kernel.org, linus.walleij@linaro.org, brgl@bgdev.pl, 
-	andi.shyti@kernel.org, mkl@pengutronix.de, andrew+netdev@lunn.ch, 
-	davem@davemloft.net, edumazet@google.com, kuba@kernel.org, pabeni@redhat.com, 
-	wim@linux-watchdog.org, jdelvare@suse.com, alexandre.belloni@bootlin.com, 
-	linux-kernel@vger.kernel.org, linux-gpio@vger.kernel.org, 
-	linux-i2c@vger.kernel.org, linux-can@vger.kernel.org, netdev@vger.kernel.org, 
-	linux-watchdog@vger.kernel.org, linux-hwmon@vger.kernel.org, 
-	linux-rtc@vger.kernel.org, linux-usb@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
 
-Dear Vincent and Guenter,
+-Wflex-array-member-not-at-end was introduced in GCC-14, and we are
+getting ready to enable it, globally.
 
-Thank you for reviewing,
-I will change the temp_hyst to a signed variable in the next patch.
+Move the conflicting declaration to the end of the structure. Notice
+that `struct ethtool_dump` is a flexible structure --a structure that
+contains a flexible-array member.
 
+Fix the following warning:
+./drivers/net/ethernet/chelsio/cxgb4/cxgb4.h:1215:29: warning: structure containing a flexible array member is not at the end of another structure [-Wflex-array-member-not-at-end]
 
-Thanks,
-Ming
+Reviewed-by: Simon Horman <horms@kernel.org>
+Signed-off-by: Gustavo A. R. Silva <gustavoars@kernel.org>
+---
+Changes in v2:
+ - Update subject and prefix.
+ - Add RB tag.
 
-Guenter Roeck <linux@roeck-us.net> =E6=96=BC 2025=E5=B9=B41=E6=9C=8826=E6=
-=97=A5 =E9=80=B1=E6=97=A5 =E4=B8=8B=E5=8D=889:18=E5=AF=AB=E9=81=93=EF=BC=9A
->
-> On 1/25/25 23:42, Vincent Mailhol wrote:
-> > On 23/01/2025 at 18:11, Ming Yu wrote:
-> >> This driver supports Hardware monitor functionality for NCT6694 MFD
-> >> device based on USB interface.
-> >>
-> >> Signed-off-by: Ming Yu <a0282524688@gmail.com>
-> >> ---
-> >
-> > (...)
-> >
-> >> +static int nct6694_temp_write(struct device *dev, u32 attr, int chann=
-el,
-> >> +                          long val)
-> >> +{
-> >> +    struct nct6694_hwmon_data *data =3D dev_get_drvdata(dev);
-> >> +    struct nct6694_cmd_header cmd_hd;
-> >> +    unsigned char temp_hyst;
-> >> +    signed char temp_max;
-> >> +    int ret;
-> >> +
-> >> +    guard(mutex)(&data->lock);
-> >> +
-> >> +    switch (attr) {
-> >> +    case hwmon_temp_enable:
-> >> +            if (val =3D=3D 0)
-> >> +                    data->hwmon_en.tin_en[channel / 8] &=3D ~BIT(chan=
-nel % 8);
-> >> +            else if (val =3D=3D 1)
-> >> +                    data->hwmon_en.tin_en[channel / 8] |=3D BIT(chann=
-el % 8);
-> >> +            else
-> >> +                    return -EINVAL;
-> >> +
-> >> +            cmd_hd =3D (struct nct6694_cmd_header) {
-> >> +                    .mod =3D NCT6694_HWMON_MOD,
-> >> +                    .cmd =3D NCT6694_HWMON_CONTROL,
-> >> +                    .sel =3D NCT6694_HWMON_CONTROL_SEL,
-> >> +                    .len =3D cpu_to_le16(sizeof(data->hwmon_en))
-> >> +            };
-> >> +
-> >> +            return nct6694_write_msg(data->nct6694, &cmd_hd,
-> >> +                                     &data->hwmon_en);
-> >> +    case hwmon_temp_max:
-> >> +            cmd_hd =3D (struct nct6694_cmd_header) {
-> >> +                    .mod =3D NCT6694_HWMON_MOD,
-> >> +                    .cmd =3D NCT6694_HWMON_ALARM,
-> >> +                    .sel =3D NCT6694_HWMON_ALARM_SEL,
-> >> +                    .len =3D cpu_to_le16(sizeof(data->msg->hwmon_alar=
-m))
-> >> +            };
-> >> +            ret =3D nct6694_read_msg(data->nct6694, &cmd_hd,
-> >> +                                   &data->msg->hwmon_alarm);
-> >> +            if (ret)
-> >> +                    return ret;
-> >> +
-> >> +            val =3D clamp_val(val, -127000, 127000);
-> >> +            data->msg->hwmon_alarm.tin_cfg[channel].hl =3D temp_to_re=
-g(val);
-> >> +
-> >> +            return nct6694_write_msg(data->nct6694, &cmd_hd,
-> >> +                                     &data->msg->hwmon_alarm);
-> >> +    case hwmon_temp_max_hyst:
-> >> +            cmd_hd =3D (struct nct6694_cmd_header) {
-> >> +                    .mod =3D NCT6694_HWMON_MOD,
-> >> +                    .cmd =3D NCT6694_HWMON_ALARM,
-> >> +                    .sel =3D NCT6694_HWMON_ALARM_SEL,
-> >> +                    .len =3D cpu_to_le16(sizeof(data->msg->hwmon_alar=
-m))
-> >> +            };
-> >> +            ret =3D nct6694_read_msg(data->nct6694, &cmd_hd,
-> >> +                                   &data->msg->hwmon_alarm);
-> >> +
-> >> +            val =3D clamp_val(val, -127000, 127000);
-> >> +            temp_max =3D data->msg->hwmon_alarm.tin_cfg[channel].hl;
-> >> +            temp_hyst =3D temp_max - temp_to_reg(val);
-> >> +            temp_hyst =3D clamp_val(temp_hyst, 0, 7);
-> >
-> > temp_hyst is unsigned. It can not be smaller than zero. No need for
-> > clamp(), using min here is sufficient.
-> >
->
-> Wrong conclusion. It needs to be declared as signed variable because
-> "temp_max - temp_to_reg(val)" could be negative.
->
-> Guenter
->
+v1:
+ - Link: https://lore.kernel.org/linux-hardening/ZrDx4Jii7XfuOPfC@cute/
+
+ drivers/net/ethernet/chelsio/cxgb4/cxgb4.h | 7 ++++---
+ 1 file changed, 4 insertions(+), 3 deletions(-)
+
+diff --git a/drivers/net/ethernet/chelsio/cxgb4/cxgb4.h b/drivers/net/ethernet/chelsio/cxgb4/cxgb4.h
+index c7c2c15a1815..95e6f015a6af 100644
+--- a/drivers/net/ethernet/chelsio/cxgb4/cxgb4.h
++++ b/drivers/net/ethernet/chelsio/cxgb4/cxgb4.h
+@@ -1211,9 +1211,6 @@ struct adapter {
+ 	struct timer_list flower_stats_timer;
+ 	struct work_struct flower_stats_work;
+ 
+-	/* Ethtool Dump */
+-	struct ethtool_dump eth_dump;
+-
+ 	/* HMA */
+ 	struct hma_data hma;
+ 
+@@ -1233,6 +1230,10 @@ struct adapter {
+ 
+ 	/* Ethtool n-tuple */
+ 	struct cxgb4_ethtool_filter *ethtool_filters;
++
++	/* Ethtool Dump */
++	/* Must be last - ends in a flex-array member. */
++	struct ethtool_dump eth_dump;
+ };
+ 
+ /* Support for "sched-class" command to allow a TX Scheduling Class to be
+-- 
+2.43.0
+
 
