@@ -1,528 +1,169 @@
-Return-Path: <netdev+bounces-162694-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-162695-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id BB746A279DD
-	for <lists+netdev@lfdr.de>; Tue,  4 Feb 2025 19:32:19 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 662EEA279E2
+	for <lists+netdev@lfdr.de>; Tue,  4 Feb 2025 19:32:42 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 6C6C018803BC
-	for <lists+netdev@lfdr.de>; Tue,  4 Feb 2025 18:32:24 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D8A751678D6
+	for <lists+netdev@lfdr.de>; Tue,  4 Feb 2025 18:32:40 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 25B4021772F;
-	Tue,  4 Feb 2025 18:31:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4D26C217737;
+	Tue,  4 Feb 2025 18:32:36 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="WcSZ2OEx"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="OTpmoKMI"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f171.google.com (mail-pl1-f171.google.com [209.85.214.171])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 365E1216E2C;
-	Tue,  4 Feb 2025 18:31:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.171
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 646BE21770C
+	for <netdev@vger.kernel.org>; Tue,  4 Feb 2025 18:32:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1738693904; cv=none; b=Hr9L6D4UuHBUOdkghFp7OFeUFkCRYLCigY1bE7gszcFM/mUu7AHgfIrMetOBgBsAMQXSx2+yF9L4gxaxCj/WFqburLyqZIu46C0B2dM9ki2P43Wen4Y8hL4N6Hj9E1hdTixLbBsk5LtrFcc9h5O/WsrmgeQj3WLh54aJenAVWGc=
+	t=1738693956; cv=none; b=tkSCV27TT6w5r/quNKJDGoSD9GZLgNT8D2JX4+tQibvUbgAIXcaHrgK4qD/mdMlnmfBEfhP/ELLfCEKIC9BqLovR0CkFbZgqFnucdATnw6pHaBLJjLuAoN6DcgQPU6/J7EHsFHgS/WVzv9dl94TQdGz866zQgutdDaA3LCO1WmY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1738693904; c=relaxed/simple;
-	bh=PEkCAvKkwZMHFwnW0IRzODxvbKz765Ze0Wjp1RscKIs=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=Oqpj/jUK9Dl0bkGKA873nZSuzTrkOCDdAe36uvkLGjLkUcqsA+S6SuOk9wn8Su5Q+4rXIuYwDPB250pNBzcopWh7NipJ6nEfoFBxYNAElBMYZ6UgtKU9Ge1b+OwT30V2S46GJwWjBgFt7BeHl/j7CIQpOgQUY9nZTNXPgR2ZuHI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=WcSZ2OEx; arc=none smtp.client-ip=209.85.214.171
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pl1-f171.google.com with SMTP id d9443c01a7336-21644aca3a0so138970305ad.3;
-        Tue, 04 Feb 2025 10:31:42 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1738693901; x=1739298701; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=7c4fIDjfzhYg9xW5oO4dMMiKBgmgZpT+f0c/dW19Gbk=;
-        b=WcSZ2OExKiIAg+wu94W4++nltDx6camwOMTUWW1NiKcslbEsXxnaGRMLm3moT2EY+M
-         YjkVYvFOSWS/Q2fAI0u6KE9bEtZjoYMinrRAc9RUYUk7H5Wz0Ip6nd8oURq9XyCVbImm
-         I8I4eszaid+JT4kM9J4Qjy0ETKH8j+0t9r1DHkCqOyomxQ3QOiS94ONJsEVXYoUbiMbS
-         Pn5OETdD81E8UzO/onXr7cqrzNT+UhX4Lu1EgeXPL+s0KwUMi8D0vaQYLic/M43tWCeQ
-         ev2TDEplxOyuYyDkiSoNVrSGWMCuwpgzlaHaaqhWyItBYI4X24jTuHXwV6Xa51dzgksR
-         5pag==
+	s=arc-20240116; t=1738693956; c=relaxed/simple;
+	bh=xODQit6uCyf4BHOUHzlpnmvPH+m6KEWI7kEV2tYKTKA=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=hIb8eKOJk8NMlxRFFcZHKWvEuCUcmxFXzEMf6DSnNelQydWnf6de34shRrRjJvZFn/kfQkpfCET9D6qELey/dCOkDSmCY9RlO/zVzYjOl9jw/LSyorIc3puOOl/bVAlk+BRXLAGS4m82WQl4Su276UI8r0guyHJWaaWHD0H5aVA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=OTpmoKMI; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1738693953;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=/wOAl5xAh2GGBxVsErS9v9Tjb+O3mJNAwDX/dH5vXFY=;
+	b=OTpmoKMIol1+ywmE50EZtdpNWexEiW45iv8qw38uvG1IqOsBq7AbkK+S6kxyF9YPDn909U
+	GT1UCjWVEj34kyRiat9qTBXsW5pCvoc9tCdyRdA8tKb5BoLvJlPuILajmPeRou+5pG7YCA
+	W4+a394pbdHjhNws/L3B5ULKhGAnp8k=
+Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
+ [209.85.221.71]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-290-Rf6zfTmeNGS1I9HfcUG6lQ-1; Tue, 04 Feb 2025 13:32:32 -0500
+X-MC-Unique: Rf6zfTmeNGS1I9HfcUG6lQ-1
+X-Mimecast-MFC-AGG-ID: Rf6zfTmeNGS1I9HfcUG6lQ
+Received: by mail-wr1-f71.google.com with SMTP id ffacd0b85a97d-38c5dcb33a5so3913805f8f.2
+        for <netdev@vger.kernel.org>; Tue, 04 Feb 2025 10:32:32 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1738693901; x=1739298701;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=7c4fIDjfzhYg9xW5oO4dMMiKBgmgZpT+f0c/dW19Gbk=;
-        b=ZuCKRKXywsYOF+TPWq0iiDvhDfouetxsyn50Ji8mQ4DCb1kirlNlNg+VywUxeiHQoy
-         haD4mfii470mzoxIaGMQhvBvNHXkK3lTGJIaXru0P/iR/E2MynijoYaVAxWapw8/ygOh
-         MuixUyqrYg3wkvP95FaC02ZJXieLoUT01yyhyhrU1zWFLoh9FA4MPIlfY7Ea9OUXhvEk
-         8hvqvGcYm82K66QHMMvrUfH73/afG0LKfg/AYpdCGcFCAz63dk9xdzSpJgywcbO9o4Qr
-         kwmd7KXxAtEQI4dOeE91bCr+5gn7jLVenoOS8gm/aAgGIyi6pv6MAbvW83S8juS/Podc
-         eCZw==
-X-Forwarded-Encrypted: i=1; AJvYcCWH7ZtlwJRigeY4D9p2uuuQKXNZc9DT363FZdG5RZWwGg7b7hbSj4gx8LRknDmZkNUp5kdmdgE=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxKc9iCemahbhzqx18QcshqQy5QUCirgLX3FbpNY/3MXpk0dWMx
-	iAb0z/s1Up4MdCj5U/rmZ21QZ30+Dd0ocnJvA3LvrZETHXUFlat2
-X-Gm-Gg: ASbGncuzXGBmdf0F0Q/4T2EJi/TssGo1Lu/TKtab2pJBnKwLR/+XAUGkZ47CG1EGxzv
-	IATlbVJAGKH3aJGMj+h6U/Z5gIiVrdF/GFJ7VuRz5Q0LkxsOYSCXyS4TgE4mFXcZyci72CGgQ4O
-	lnHKht4PVWnUX/fA6Lyzg6H1GyjzqurH8sjeNQ3vSKxVfjZALrpjdybSZZYUQqHbyTcJUpBW4Nd
-	glSeRbcbMNuzWF2XRFRRPvLuEEiSDGQ52Nq7PxjZNfmGUURT6aKcwOCRbps5XpY/s0zXoh4im/Q
-	ZcmrcKM/0pUNRP1KjPnV+jsKnwB8O5XF/fHJcNhf57xBNSgI4fqlhA==
-X-Google-Smtp-Source: AGHT+IH/tPUN7YZLjQLsVdaN9RdQndECxz0nEN+h5bjlyKilwuB7Ry5m8Dz4WV8OkpOXFkTuKRWREg==
-X-Received: by 2002:a17:902:d543:b0:21f:f3d:d533 with SMTP id d9443c01a7336-21f0f3dd8afmr26059515ad.2.1738693901298;
-        Tue, 04 Feb 2025 10:31:41 -0800 (PST)
-Received: from KERNELXING-MC1.tencent.com ([111.201.25.167])
-        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-2f848a99a45sm11590591a91.38.2025.02.04.10.31.35
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 04 Feb 2025 10:31:40 -0800 (PST)
-From: Jason Xing <kerneljasonxing@gmail.com>
-To: davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	dsahern@kernel.org,
-	willemdebruijn.kernel@gmail.com,
-	willemb@google.com,
-	ast@kernel.org,
-	daniel@iogearbox.net,
-	andrii@kernel.org,
-	martin.lau@linux.dev,
-	eddyz87@gmail.com,
-	song@kernel.org,
-	yonghong.song@linux.dev,
-	john.fastabend@gmail.com,
-	kpsingh@kernel.org,
-	sdf@fomichev.me,
-	haoluo@google.com,
-	jolsa@kernel.org,
-	horms@kernel.org
-Cc: bpf@vger.kernel.org,
-	netdev@vger.kernel.org,
-	Jason Xing <kerneljasonxing@gmail.com>
-Subject: [PATCH bpf-next v8 12/12] selftests/bpf: add simple bpf tests in the tx path for timestamping feature
-Date: Wed,  5 Feb 2025 02:30:24 +0800
-Message-Id: <20250204183024.87508-13-kerneljasonxing@gmail.com>
-X-Mailer: git-send-email 2.33.0
-In-Reply-To: <20250204183024.87508-1-kerneljasonxing@gmail.com>
-References: <20250204183024.87508-1-kerneljasonxing@gmail.com>
+        d=1e100.net; s=20230601; t=1738693951; x=1739298751;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=/wOAl5xAh2GGBxVsErS9v9Tjb+O3mJNAwDX/dH5vXFY=;
+        b=PkTWiEHk5HkTxPqWt2dYeU+yMEOxkU0w/9ewhdKjfZWf5lneYbIiV2CRckyvFLptqo
+         K5mnXslwUIi3/TX0y6x1RM0Q5m3Ku+8kn+nT4y67zEqDSTqDUnSUi502tC2Bd4hlfdPd
+         hq2vIgHxRLnYnBjW/A1zNrtCC0YZol8LR2wx9Zy4SHwmFuWTU4okOGJknpdcBz54cWz/
+         UgVxCKUrdrkDwxbNYyTUmNjlblyvc9jk9tgr1GyqZj1sSDCuqJQV+9J1TqXoxsfQsUpg
+         pdjWv8tjVobiKyi6rB77Vupi/CWlA6nvlcfQjHxtMH1m3KyP4UxvpsUO3o664W/T6V4M
+         aJvA==
+X-Gm-Message-State: AOJu0Yw9uAL6SxyvnHe+YqRZtgCXSEjq+n4qH2y5OK5tsmemgSHrMl2E
+	RL9HVZIC1TCX2WbD4DpZ8DiUUjtWxwD9vy//HYd+DTWqBc5wrgrUp+PDrs+plqqOhDNEVskIvl8
+	iFvH5kmwXdYn2M9MDnHnpNhbPLrcxHVDIVUwjLsxBqP6Y4Tfg3JGllA==
+X-Gm-Gg: ASbGncs3OEpnPfp0gFQRDW+zjcbtDREwisM/FkXSaW4OxNOruBIgaOlosJLdlWCgK4M
+	Dtml06yD0bGLzD9ATQeiM6v0GrEj+xIA/IYDCIe8VqrYmPC5I0bwVs0YEebwnWpl+VAHVioIqTw
+	1MqH00LxD7NO8HV2YbPL5JUOK+YXbYoP3bXSIGzOUW0v+fNnkzIfET4YqKVrXKlBFTWQW9s8fUW
+	EEyxiwVAac7w8GRxKYmlbEc3Gh/vTTj9geRf3uW4wx4zpzdTwsveJeh0nYJNuYyfbEgMKAUooVO
+	XR3IGIqDEa+oM7Wc9Ta1Jtk+HR6g3rGUnk4=
+X-Received: by 2002:a5d:584e:0:b0:38a:8b00:6908 with SMTP id ffacd0b85a97d-38c520b0b23mr23613458f8f.54.1738693950891;
+        Tue, 04 Feb 2025 10:32:30 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IFD/Vu5xJexoTki9KN1frdyawMdJlGIYRVOCgdaZ1pwR1o9hVUkrti8bPAifEmhLPHuA8ZQBg==
+X-Received: by 2002:a5d:584e:0:b0:38a:8b00:6908 with SMTP id ffacd0b85a97d-38c520b0b23mr23613436f8f.54.1738693950460;
+        Tue, 04 Feb 2025 10:32:30 -0800 (PST)
+Received: from [192.168.88.253] (146-241-41-201.dyn.eolo.it. [146.241.41.201])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-38c5c12247esm17079089f8f.53.2025.02.04.10.32.28
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 04 Feb 2025 10:32:29 -0800 (PST)
+Message-ID: <60550f27-ea6a-4165-8eaa-a730d02a5ddc@redhat.com>
+Date: Tue, 4 Feb 2025 19:32:27 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next v3 0/6] Device memory TCP TX
+To: Stanislav Fomichev <stfomichev@gmail.com>,
+ Mina Almasry <almasrymina@google.com>
+Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+ linux-doc@vger.kernel.org, kvm@vger.kernel.org,
+ virtualization@lists.linux.dev, linux-kselftest@vger.kernel.org,
+ Donald Hunter <donald.hunter@gmail.com>, Jakub Kicinski <kuba@kernel.org>,
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Simon Horman <horms@kernel.org>, Jonathan Corbet <corbet@lwn.net>,
+ Andrew Lunn <andrew+netdev@lunn.ch>, Neal Cardwell <ncardwell@google.com>,
+ David Ahern <dsahern@kernel.org>, "Michael S. Tsirkin" <mst@redhat.com>,
+ Jason Wang <jasowang@redhat.com>, Xuan Zhuo <xuanzhuo@linux.alibaba.com>,
+ =?UTF-8?Q?Eugenio_P=C3=A9rez?= <eperezma@redhat.com>,
+ Stefan Hajnoczi <stefanha@redhat.com>,
+ Stefano Garzarella <sgarzare@redhat.com>, Shuah Khan <shuah@kernel.org>,
+ sdf@fomichev.me, asml.silence@gmail.com, dw@davidwei.uk,
+ Jamal Hadi Salim <jhs@mojatatu.com>, Victor Nogueira <victor@mojatatu.com>,
+ Pedro Tammela <pctammela@mojatatu.com>,
+ Samiullah Khawaja <skhawaja@google.com>
+References: <20250203223916.1064540-1-almasrymina@google.com>
+ <a97c4278-ea08-4693-a394-8654f1168fea@redhat.com>
+ <CAHS8izNZrKVXSXxL3JG3BuZdho2OQZp=nhLuVCrLZjJD1R0EPg@mail.gmail.com>
+ <Z6JXFRUobi-w73D0@mini-arch>
+Content-Language: en-US
+From: Paolo Abeni <pabeni@redhat.com>
+In-Reply-To: <Z6JXFRUobi-w73D0@mini-arch>
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 
-Bpf prog calculates a couple of latency delta between each tx points
-which SO_TIMESTAMPING feature has already implemented. It can be used
-in the real world to diagnose the behaviour in the tx path.
+On 2/4/25 7:06 PM, Stanislav Fomichev wrote:
+> On 02/04, Mina Almasry wrote:
+>> On Tue, Feb 4, 2025 at 4:32 AM Paolo Abeni <pabeni@redhat.com> wrote:
+>>>
+>>> On 2/3/25 11:39 PM, Mina Almasry wrote:
+>>>> The TX path had been dropped from the Device Memory TCP patch series
+>>>> post RFCv1 [1], to make that series slightly easier to review. This
+>>>> series rebases the implementation of the TX path on top of the
+>>>> net_iov/netmem framework agreed upon and merged. The motivation for
+>>>> the feature is thoroughly described in the docs & cover letter of the
+>>>> original proposal, so I don't repeat the lengthy descriptions here, but
+>>>> they are available in [1].
+>>>>
+>>>> Sending this series as RFC as the winder closure is immenient. I plan on
+>>>> reposting as non-RFC once the tree re-opens, addressing any feedback
+>>>> I receive in the meantime.
+>>>
+>>> I guess you should drop this paragraph.
+>>>
+>>>> Full outline on usage of the TX path is detailed in the documentation
+>>>> added in the first patch.
+>>>>
+>>>> Test example is available via the kselftest included in the series as well.
+>>>>
+>>>> The series is relatively small, as the TX path for this feature largely
+>>>> piggybacks on the existing MSG_ZEROCOPY implementation.
+>>>
+>>> It looks like no additional device level support is required. That is
+>>> IMHO so good up to suspicious level :)
+>>>
+>>
+>> It is correct no additional device level support is required. I don't
+>> have any local changes to my driver to make this work. I think Stan
+>> on-list was able to run the TX path (he commented on fixes to the test
+>> but didn't say it doesn't work :D) and one other person was able to
+>> run it offlist.
+> 
+> For BRCM I had shared this: https://lore.kernel.org/netdev/ZxAfWHk3aRWl-F31@mini-arch/
+> I have similar internal patch for mlx5 (will share after RX part gets
+> in). I agree that it seems like gve_unmap_packet needs some work to be more
+> careful to not unmap NIOVs (if you were testing against gve).
 
-Also, check the safety issues by accessing a few bpf calls in
-bpf_test_access_bpf_calls().
+What happen if an user try to use devmem TX on a device not really
+supporting it? Silent data corruption?
 
-Signed-off-by: Jason Xing <kerneljasonxing@gmail.com>
----
- .../bpf/prog_tests/so_timestamping.c          |  79 +++++
- .../selftests/bpf/progs/so_timestamping.c     | 306 ++++++++++++++++++
- 2 files changed, 385 insertions(+)
- create mode 100644 tools/testing/selftests/bpf/prog_tests/so_timestamping.c
- create mode 100644 tools/testing/selftests/bpf/progs/so_timestamping.c
+Don't we need some way for the device to opt-in (or opt-out) and avoid
+such issues?
 
-diff --git a/tools/testing/selftests/bpf/prog_tests/so_timestamping.c b/tools/testing/selftests/bpf/prog_tests/so_timestamping.c
-new file mode 100644
-index 000000000000..1829f93bc52e
---- /dev/null
-+++ b/tools/testing/selftests/bpf/prog_tests/so_timestamping.c
-@@ -0,0 +1,79 @@
-+#include "test_progs.h"
-+#include "network_helpers.h"
-+
-+#include "so_timestamping.skel.h"
-+
-+#define CG_NAME "/so-timestamping-test"
-+
-+static const char addr4_str[] = "127.0.0.1";
-+static const char addr6_str[] = "::1";
-+static struct so_timestamping *skel;
-+
-+static void test_tcp(int family)
-+{
-+	struct so_timestamping__bss *bss = skel->bss;
-+	char buf[] = "testing testing";
-+	int sfd = -1, cfd = -1;
-+	int n;
-+
-+	memset(bss, 0, sizeof(*bss));
-+
-+	sfd = start_server(family, SOCK_STREAM,
-+			   family == AF_INET6 ? addr6_str : addr4_str, 0, 0);
-+	if (!ASSERT_OK_FD(sfd, "start_server"))
-+		goto out;
-+
-+	cfd = connect_to_fd(sfd, 0);
-+	if (!ASSERT_OK_FD(cfd, "connect_to_fd_server"))
-+		goto out;
-+
-+	n = write(cfd, buf, sizeof(buf));
-+	if (!ASSERT_EQ(n, sizeof(buf), "send to server"))
-+		goto out;
-+
-+	ASSERT_EQ(bss->nr_active, 1, "nr_active");
-+	ASSERT_EQ(bss->nr_snd, 2, "nr_snd");
-+	ASSERT_EQ(bss->nr_sched, 1, "nr_sched");
-+	ASSERT_EQ(bss->nr_txsw, 1, "nr_txsw");
-+	ASSERT_EQ(bss->nr_ack, 1, "nr_ack");
-+
-+out:
-+	if (sfd >= 0)
-+		close(sfd);
-+	if (cfd >= 0)
-+		close(cfd);
-+}
-+
-+void test_so_timestamping(void)
-+{
-+	struct netns_obj *ns;
-+	int cg_fd;
-+
-+	cg_fd = test__join_cgroup(CG_NAME);
-+	if (!ASSERT_OK_FD(cg_fd, "join cgroup"))
-+		return;
-+
-+	ns = netns_new("so_timestamping_ns", true);
-+	if (!ASSERT_OK_PTR(ns, "create ns"))
-+		goto done;
-+
-+	skel = so_timestamping__open_and_load();
-+	if (!ASSERT_OK_PTR(skel, "open and load skel"))
-+		goto done;
-+
-+	if (!ASSERT_OK(so_timestamping__attach(skel), "attach skel"))
-+		goto done;
-+
-+	skel->links.skops_sockopt =
-+		bpf_program__attach_cgroup(skel->progs.skops_sockopt, cg_fd);
-+	if (!ASSERT_OK_PTR(skel->links.skops_sockopt, "attach cgroup"))
-+		goto done;
-+
-+	test_tcp(AF_INET6);
-+	test_tcp(AF_INET);
-+
-+done:
-+	so_timestamping__destroy(skel);
-+	netns_free(ns);
-+	close(cg_fd);
-+}
-diff --git a/tools/testing/selftests/bpf/progs/so_timestamping.c b/tools/testing/selftests/bpf/progs/so_timestamping.c
-new file mode 100644
-index 000000000000..dc8bbcfd9eb5
---- /dev/null
-+++ b/tools/testing/selftests/bpf/progs/so_timestamping.c
-@@ -0,0 +1,306 @@
-+#include "vmlinux.h"
-+#include "bpf_tracing_net.h"
-+#include <bpf/bpf_helpers.h>
-+#include <bpf/bpf_tracing.h>
-+#include "bpf_misc.h"
-+#include "bpf_kfuncs.h"
-+#define BPF_PROG_TEST_TCP_HDR_OPTIONS
-+#include "test_tcp_hdr_options.h"
-+#include <errno.h>
-+
-+#define SK_BPF_CB_FLAGS 1009
-+#define SK_BPF_CB_TX_TIMESTAMPING 1
-+
-+int nr_active;
-+int nr_snd;
-+int nr_passive;
-+int nr_sched;
-+int nr_txsw;
-+int nr_ack;
-+
-+struct sockopt_test {
-+	int opt;
-+	int new;
-+};
-+
-+static const struct sockopt_test sol_socket_tests[] = {
-+	{ .opt = SK_BPF_CB_FLAGS, .new = SK_BPF_CB_TX_TIMESTAMPING, },
-+	{ .opt = 0, },
-+};
-+
-+struct loop_ctx {
-+	void *ctx;
-+	const struct sock *sk;
-+};
-+
-+struct sk_stg {
-+	__u64 sendmsg_ns;	/* record ts when sendmsg is called */
-+};
-+
-+struct sk_tskey {
-+	u64 cookie;
-+	u32 tskey;
-+};
-+
-+struct delay_info {
-+	u64 sendmsg_ns;		/* record ts when sendmsg is called */
-+	u32 sched_delay;	/* SCHED_OPT_CB - sendmsg_ns */
-+	u32 sw_snd_delay;	/* SW_OPT_CB - SCHED_OPT_CB */
-+	u32 ack_delay;		/* ACK_OPT_CB - SW_OPT_CB */
-+};
-+
-+struct {
-+	__uint(type, BPF_MAP_TYPE_SK_STORAGE);
-+	__uint(map_flags, BPF_F_NO_PREALLOC);
-+	__type(key, int);
-+	__type(value, struct sk_stg);
-+} sk_stg_map SEC(".maps");
-+
-+struct {
-+	__uint(type, BPF_MAP_TYPE_HASH);
-+	__type(key, struct sk_tskey);
-+	__type(value, struct delay_info);
-+	__uint(max_entries, 1024);
-+} time_map SEC(".maps");
-+
-+static u64 delay_tolerance_nsec = 10000000000; /* 10 second as an example */
-+
-+static int bpf_test_sockopt_int(void *ctx, const struct sock *sk,
-+				const struct sockopt_test *t,
-+				int level)
-+{
-+	int new, opt, tmp;
-+
-+	opt = t->opt;
-+	new = t->new;
-+
-+	if (bpf_setsockopt(ctx, level, opt, &new, sizeof(new)))
-+		return 1;
-+
-+	if (bpf_getsockopt(ctx, level, opt, &tmp, sizeof(tmp)) ||
-+	    tmp != new)
-+		return 1;
-+
-+	return 0;
-+}
-+
-+static int bpf_test_socket_sockopt(__u32 i, struct loop_ctx *lc)
-+{
-+	const struct sockopt_test *t;
-+
-+	if (i >= ARRAY_SIZE(sol_socket_tests))
-+		return 1;
-+
-+	t = &sol_socket_tests[i];
-+	if (!t->opt)
-+		return 1;
-+
-+	return bpf_test_sockopt_int(lc->ctx, lc->sk, t, SOL_SOCKET);
-+}
-+
-+static int bpf_test_sockopt(void *ctx, const struct sock *sk)
-+{
-+	struct loop_ctx lc = { .ctx = ctx, .sk = sk, };
-+	int n;
-+
-+	n = bpf_loop(ARRAY_SIZE(sol_socket_tests), bpf_test_socket_sockopt, &lc, 0);
-+	if (n != ARRAY_SIZE(sol_socket_tests))
-+		return -1;
-+
-+	return 0;
-+}
-+
-+static bool bpf_test_access_sockopt(void *ctx)
-+{
-+	const struct sockopt_test *t;
-+	int tmp, ret, i = 0;
-+	int level = SOL_SOCKET;
-+
-+	t = &sol_socket_tests[i];
-+
-+	for (; t->opt;) {
-+		ret = bpf_setsockopt(ctx, level, t->opt, (void *)&t->new, sizeof(t->new));
-+		if (ret != -EOPNOTSUPP)
-+			return true;
-+
-+		ret = bpf_getsockopt(ctx, level, t->opt, &tmp, sizeof(tmp));
-+		if (ret != -EOPNOTSUPP)
-+			return true;
-+
-+		if (++i >= ARRAY_SIZE(sol_socket_tests))
-+			break;
-+	}
-+
-+	return false;
-+}
-+
-+/* Adding a simple test to see if we can get an expected value */
-+static bool bpf_test_access_load_hdr_opt(struct bpf_sock_ops *skops)
-+{
-+	struct tcp_opt reg_opt;
-+	int load_flags = 0;
-+	int ret;
-+
-+	reg_opt.kind = TCPOPT_EXP;
-+	reg_opt.len = 0;
-+	reg_opt.data32 = 0;
-+	ret = bpf_load_hdr_opt(skops, &reg_opt, sizeof(reg_opt), load_flags);
-+	if (ret != -EOPNOTSUPP)
-+		return true;
-+
-+	return false;
-+}
-+
-+/* Adding a simple test to see if we can get an expected value */
-+static bool bpf_test_access_cb_flags_set(struct bpf_sock_ops *skops)
-+{
-+	int ret;
-+
-+	ret = bpf_sock_ops_cb_flags_set(skops, 0);
-+	if (ret != -EOPNOTSUPP)
-+		return true;
-+
-+	return false;
-+}
-+
-+/* In the timestamping callbacks, we're not allowed to call the following
-+ * BPF CALLs for the safety concern. Return false if expected.
-+ */
-+static bool bpf_test_access_bpf_calls(struct bpf_sock_ops *skops,
-+				     const struct sock *sk)
-+{
-+	if (bpf_test_access_sockopt(skops))
-+		return true;
-+
-+	if (bpf_test_access_load_hdr_opt(skops))
-+		return true;
-+
-+	if (bpf_test_access_cb_flags_set(skops))
-+		return true;
-+
-+	return false;
-+}
-+
-+static bool bpf_test_delay(struct bpf_sock_ops *skops, const struct sock *sk)
-+{
-+	struct bpf_sock_ops_kern *skops_kern;
-+	u64 timestamp = bpf_ktime_get_ns();
-+	struct skb_shared_info *shinfo;
-+	struct delay_info dinfo = {0};
-+	struct sk_tskey key = {0};
-+	struct delay_info *val;
-+	struct sk_buff *skb;
-+	struct sk_stg *stg;
-+	u64 prior_ts, delay;
-+
-+	if (bpf_test_access_bpf_calls(skops, sk))
-+		return false;
-+
-+	skops_kern = bpf_cast_to_kern_ctx(skops);
-+	skb = skops_kern->skb;
-+	shinfo = bpf_core_cast(skb->head + skb->end, struct skb_shared_info);
-+	key.tskey = shinfo->tskey;
-+	if (!key.tskey)
-+		return false;
-+
-+	key.cookie = bpf_get_socket_cookie(skops);
-+	if (!key.cookie)
-+		return false;
-+
-+	if (skops->op == BPF_SOCK_OPS_TS_SND_CB) {
-+		stg = bpf_sk_storage_get(&sk_stg_map, (void *)sk, 0, 0);
-+		if (!stg)
-+			return false;
-+		dinfo.sendmsg_ns = stg->sendmsg_ns;
-+		bpf_map_update_elem(&time_map, &key, &dinfo, BPF_ANY);
-+		goto out;
-+	}
-+
-+	val = bpf_map_lookup_elem(&time_map, &key);
-+	if (!val)
-+		return false;
-+
-+	switch (skops->op) {
-+	case BPF_SOCK_OPS_TS_SCHED_OPT_CB:
-+		delay = val->sched_delay = timestamp - val->sendmsg_ns;
-+		break;
-+	case BPF_SOCK_OPS_TS_SW_OPT_CB:
-+		prior_ts = val->sched_delay + val->sendmsg_ns;
-+		delay = val->sw_snd_delay = timestamp - prior_ts;
-+		break;
-+	case BPF_SOCK_OPS_TS_ACK_OPT_CB:
-+		prior_ts = val->sw_snd_delay + val->sched_delay + val->sendmsg_ns;
-+		delay = val->ack_delay = timestamp - prior_ts;
-+		break;
-+	}
-+
-+	if (delay >= delay_tolerance_nsec)
-+		return false;
-+
-+	/* Since it's the last one, remove from the map after latency check */
-+	if (skops->op == BPF_SOCK_OPS_TS_ACK_OPT_CB)
-+		bpf_map_delete_elem(&time_map, &key);
-+
-+out:
-+	return true;
-+}
-+
-+SEC("fentry/tcp_sendmsg_locked")
-+int BPF_PROG(trace_tcp_sendmsg_locked, struct sock *sk, struct msghdr *msg, size_t size)
-+{
-+	u64 timestamp = bpf_ktime_get_ns();
-+	u32 flag = sk->sk_bpf_cb_flags;
-+	struct sk_stg *stg;
-+
-+	if (!flag)
-+		return 0;
-+
-+	stg = bpf_sk_storage_get(&sk_stg_map, sk, 0,
-+				 BPF_SK_STORAGE_GET_F_CREATE);
-+	if (!stg)
-+		return 0;
-+
-+	stg->sendmsg_ns = timestamp;
-+	nr_snd += 1;
-+	return 0;
-+}
-+
-+SEC("sockops")
-+int skops_sockopt(struct bpf_sock_ops *skops)
-+{
-+	struct bpf_sock *bpf_sk = skops->sk;
-+	const struct sock *sk;
-+
-+	if (!bpf_sk)
-+		return 1;
-+
-+	sk = (struct sock *)bpf_skc_to_tcp_sock(bpf_sk);
-+	if (!sk)
-+		return 1;
-+
-+	switch (skops->op) {
-+	case BPF_SOCK_OPS_ACTIVE_ESTABLISHED_CB:
-+		nr_active += !bpf_test_sockopt(skops, sk);
-+		break;
-+	case BPF_SOCK_OPS_TS_SND_CB:
-+		if (bpf_test_delay(skops, sk))
-+			nr_snd += 1;
-+		break;
-+	case BPF_SOCK_OPS_TS_SCHED_OPT_CB:
-+		if (bpf_test_delay(skops, sk))
-+			nr_sched += 1;
-+		break;
-+	case BPF_SOCK_OPS_TS_SW_OPT_CB:
-+		if (bpf_test_delay(skops, sk))
-+			nr_txsw += 1;
-+		break;
-+	case BPF_SOCK_OPS_TS_ACK_OPT_CB:
-+		if (bpf_test_delay(skops, sk))
-+			nr_ack += 1;
-+		break;
-+	}
-+
-+	return 1;
-+}
-+
-+char _license[] SEC("license") = "GPL";
--- 
-2.43.5
+/P
 
 
