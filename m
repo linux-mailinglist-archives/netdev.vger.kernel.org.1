@@ -1,169 +1,141 @@
-Return-Path: <netdev+bounces-162367-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-162368-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 883ACA26A5F
-	for <lists+netdev@lfdr.de>; Tue,  4 Feb 2025 03:57:58 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id EFCC5A26A66
+	for <lists+netdev@lfdr.de>; Tue,  4 Feb 2025 04:03:07 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 146043A3BE9
-	for <lists+netdev@lfdr.de>; Tue,  4 Feb 2025 02:57:50 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id AD6131884326
+	for <lists+netdev@lfdr.de>; Tue,  4 Feb 2025 03:03:12 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 94FA414A60F;
-	Tue,  4 Feb 2025 02:57:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CF19E14F9D6;
+	Tue,  4 Feb 2025 03:03:01 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="uIAInkUL"
+	dkim=pass (2048-bit key) header.d=alliedtelesis.co.nz header.i=@alliedtelesis.co.nz header.b="uO754Zj5"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from gate2.alliedtelesis.co.nz (gate2.alliedtelesis.co.nz [202.36.163.20])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 63A5F25A634;
-	Tue,  4 Feb 2025 02:57:49 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 11F0149652
+	for <netdev@vger.kernel.org>; Tue,  4 Feb 2025 03:02:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=202.36.163.20
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1738637870; cv=none; b=sHgulA2r+FIinQpgdULOKAL73XIbphZ2jfUfLeMksvvWRvwUATlGN53/Ty5SUTParhuvjnt0vuzwlan7xZSdhu79iySV/SWUpJDFJ2ohTb3PSZi1rHQlxB2xLqbZUfps2sb6XGyEj8YflQ5t767p7ETY+eEQTNlIURAhEYVJnKs=
+	t=1738638181; cv=none; b=Rub5D0LRob66vikAW3Gg61Wtb5s4HGp3IeEIJzphDBd3VkuXY1LjaLS8s/UU1tpS7KCxOd1xQKj2N6lyka+DKJTMdt0V0wlofsDddzlGGalED3K0QP46+jIH6QHGIDaRCxfbZTF4T8FMQOrFSQRB/3WgsBJmGy3pOOcIyaRmSgw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1738637870; c=relaxed/simple;
-	bh=CszYs/LJUcQ5jw0qlgHashLCbJKeipVq4nzLbBwNyjI=;
-	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:
-	 Content-Disposition; b=NgJhY1tr5dM159JojGI+xSBnk4Q7EUhjPIkVxFK/75hvqCmmwBh3vD/YsIgtxtbgdExbsUuEmvDBZHB7d6ghlyuW9xoUpTr8mdRqgYorfdi0g2d7nlqzukatz/8uTTEPimP80IdaAuotzXvXf/uazu1kXfnswbH6L7pk0Es6pYg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=uIAInkUL; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2A02FC4CEE0;
-	Tue,  4 Feb 2025 02:57:44 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1738637869;
-	bh=CszYs/LJUcQ5jw0qlgHashLCbJKeipVq4nzLbBwNyjI=;
-	h=Date:From:To:Cc:Subject:From;
-	b=uIAInkULcB4ZqT8id7Ve+pfC1Pl5mWRvTOFpU49bVYCyvw92i2y0379QVAUT0Sm8W
-	 mqi5FMzB+qCUC3cI1ETkFuXT+wlTxPqXFrv0t8+JphZBkAoQkkNQ7QZ9yBqauo00Ee
-	 cFXzvjl1YfcOH/NQxIeR9TBuvvu2WgJpVwRlFzaleJfJEnQzoI3WEWecNQTjVH2/+7
-	 7AfmCxBQxA81E9e+0+QXdbmmZ3Y0rSw6ij45vxOGn4yFUyrUjJ6v3PhwSxCqWQj3wq
-	 p7myqBrCs8t8xYNA1mwCrccLMkGhk2XIh3YdwiAwl3Iwsm326k4lDpvNGxgnSVwH13
-	 c9uqJkQNKTtnA==
-Date: Tue, 4 Feb 2025 13:27:41 +1030
-From: "Gustavo A. R. Silva" <gustavoars@kernel.org>
-To: Saeed Mahameed <saeedm@nvidia.com>, Leon Romanovsky <leon@kernel.org>,
-	Tariq Toukan <tariqt@nvidia.com>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>
-Cc: netdev@vger.kernel.org, linux-rdma@vger.kernel.org,
+	s=arc-20240116; t=1738638181; c=relaxed/simple;
+	bh=AljLlpBgRQjQAfgQN6eKucpPl/dPKCNkhE58V6Yjsck=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=pU/WIA2iC3n3S19TI9M+pKAwezMQUsGHEjOwb5d0DWzUrpL4LhNCpTLvyayR1oWCOTd8Uh3+tKZLfvd3ynMAD8PZ/i/vCwZNp53wwIBpqD7oJDuK6TQLvgQGQAxyEbvdzXA9449crewGa0ELYE9sY4Ki1wOdUJMbWbAW7dzR/uk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=alliedtelesis.co.nz; spf=pass smtp.mailfrom=alliedtelesis.co.nz; dkim=pass (2048-bit key) header.d=alliedtelesis.co.nz header.i=@alliedtelesis.co.nz header.b=uO754Zj5; arc=none smtp.client-ip=202.36.163.20
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=alliedtelesis.co.nz
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=alliedtelesis.co.nz
+Received: from svr-chch-seg1.atlnz.lc (mmarshal3.atlnz.lc [10.32.18.43])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(Client did not present a certificate)
+	by gate2.alliedtelesis.co.nz (Postfix) with ESMTPS id 7B0762C022F;
+	Tue,  4 Feb 2025 16:02:55 +1300 (NZDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=alliedtelesis.co.nz;
+	s=mail181024; t=1738638175;
+	bh=HqWCWRRdDyMbbXsv5hMVrTkG8PiypX6mT+KFCWzynx4=;
+	h=From:To:Cc:Subject:Date:From;
+	b=uO754Zj5/KgoOr+unZAlS/Zag7tSGnMpzkRzLbVDd+pVSes1jVmMj6I5yw0Si9zf0
+	 DdJ2MmRR/UOJoPXc/pTb+oSo9qgNcwI49hbIPrlWZeIZf2D8Z6UrwKGGuqxLgaISnS
+	 lba8xS0UEyzg6ZK8w+A9fiI+gP1OqR+StE0WQYYZrBjNE9F4odScLdSuXp7V7gxusE
+	 CPyrOpwzjr2yKH7RoNvYUiyTGSI9draKQFNP+S0b9bmcfwNdp7CsmK409YrGJnuYMJ
+	 Bs9y9Pm1P6cm9Tf68LMfTcqCJirmT/nAWmvxYsFtOqzEQU0C8WZ+U0wX3/796HTYM1
+	 B1JqIjCuxAVDw==
+Received: from pat.atlnz.lc (Not Verified[10.32.16.33]) by svr-chch-seg1.atlnz.lc with Trustwave SEG (v8,2,6,11305)
+	id <B67a1835f0000>; Tue, 04 Feb 2025 16:02:55 +1300
+Received: from chrisp-dl.ws.atlnz.lc (chrisp-dl.ws.atlnz.lc [10.33.22.30])
+	by pat.atlnz.lc (Postfix) with ESMTP id 46C0513EE36;
+	Tue,  4 Feb 2025 16:02:55 +1300 (NZDT)
+Received: by chrisp-dl.ws.atlnz.lc (Postfix, from userid 1030)
+	id 412532804B6; Tue,  4 Feb 2025 16:02:55 +1300 (NZDT)
+From: Chris Packham <chris.packham@alliedtelesis.co.nz>
+To: lee@kernel.org,
+	robh@kernel.org,
+	krzk+dt@kernel.org,
+	conor+dt@kernel.org,
+	andrew+netdev@lunn.ch,
+	davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	tsbogend@alpha.franken.de,
+	hkallweit1@gmail.com,
+	linux@armlinux.org.uk,
+	sander@svanheule.net,
+	daniel@makrotopia.org,
+	markus.stockhausen@gmx.de
+Cc: devicetree@vger.kernel.org,
 	linux-kernel@vger.kernel.org,
-	"Gustavo A. R. Silva" <gustavoars@kernel.org>,
-	linux-hardening@vger.kernel.org
-Subject: [PATCH][next] net/mlx5e: Avoid a hundred
- -Wflex-array-member-not-at-end warnings
-Message-ID: <Z6GCJY8G9EzASrwQ@kspp>
+	netdev@vger.kernel.org,
+	linux-mips@vger.kernel.org,
+	Chris Packham <chris.packham@alliedtelesis.co.nz>
+Subject: [PATCH net-next v6 0/6] RTL9300 MDIO driver
+Date: Tue,  4 Feb 2025 16:02:43 +1300
+Message-ID: <20250204030249.1965444-1-chris.packham@alliedtelesis.co.nz>
+X-Mailer: git-send-email 2.48.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
+X-SEG-SpamProfiler-Analysis: v=2.4 cv=QNvLRRLL c=1 sm=1 tr=0 ts=67a1835f a=KLBiSEs5mFS1a/PbTCJxuA==:117 a=T2h4t0Lz3GQA:10 a=2fb9Dq4sOb5bA3HnAgEA:9 a=3ZKOabzyN94A:10
+X-SEG-SpamProfiler-Score: 0
+x-atlnz-ls: pat
 
--Wflex-array-member-not-at-end was introduced in GCC-14, and we are
-getting ready to enable it, globally.
+This series adds a driver for the MDIO controller on the RTL9300 family
+of devices. The controller is a little unique in that we can't access the=
+ SMI
+interfaces directly. This means we need to use the hardware description f=
+rom
+the DTS to compute a mapping of switch port to mdio bus/address.
 
-So, in order to avoid ending up with a flexible-array member in the
-middle of other structs, we use the `struct_group_tagged()` helper
-to create a new tagged `struct mlx5e_umr_wqe_hdr`. This structure
-groups together all the members of the flexible `struct mlx5e_umr_wqe`
-except the flexible array.
+Note that the dt-bindings: mfd patch is dependent on the dt-bindings: net=
+ patch.
 
-As a result, the array is effectively separated from the rest of the
-members without modifying the memory layout of the flexible structure.
-We then change the type of the middle struct member currently causing
-trouble from `struct mlx5e_umr_wqe` to `struct mlx5e_umr_wqe_hdr`.
+It looks as if we're off Google's naughty list. It's kind of hard to tell=
+.
 
-We also want to ensure that when new members need to be added to the
-flexible structure, they are always included within the newly created
-tagged struct. For this, we use `static_assert()`. This ensures that the
-memory layout for both the flexible structure and the new tagged struct
-is the same after any changes.
+This iteration makes use of the ethernet-ports property to figure out the
+mapping from port to PHY which removes the need for any extar vendor spec=
+ific
+properties.
 
-This approach avoids having to implement `struct mlx5e_umr_wqe_hdr` as
-a completely separate structure, thus preventing having to maintain two
-independent but basically identical structures, closing the door to
-potential bugs in the future.
+I've sent this as net-next. The first 4 patches could probably come in vi=
+a
+net-next if the mfd maintainers are happy with that. Not sure about the m=
+ips
+ones. I've included them because the updated bindings will start complain=
+ing
+about missing properties on the one in-tree dts file.
 
-We also use `container_of()` whenever we need to retrieve a pointer to
-the flexible structure, through which we can access the flexible-array
-member, if necessary.
+Chris Packham (6):
+  dt-bindings: mfd: Add switch to RTL9300
+  dt-bindings: net: Add Realtek MDIO controller
+  dt-bindings: mfd: Add MDIO interface to rtl9301-switch
+  net: mdio: Add RTL9300 MDIO driver
+  mips: dts: realtek: Add MDIO controller
+  mips: dts: cameo-rtl9302c: Add switch block
 
-So, with these changes, fix 124 of the following warnings:
+ .../bindings/mfd/realtek,rtl9301-switch.yaml  |  47 +-
+ .../bindings/net/realtek,rtl9301-mdio.yaml    |  86 ++++
+ .../cameo-rtl9302c-2x-rtl8224-2xge.dts        |  96 ++++
+ arch/mips/boot/dts/realtek/rtl930x.dtsi       |  33 ++
+ drivers/net/mdio/Kconfig                      |   7 +
+ drivers/net/mdio/Makefile                     |   1 +
+ drivers/net/mdio/mdio-realtek-rtl9300.c       | 472 ++++++++++++++++++
+ 7 files changed, 741 insertions(+), 1 deletion(-)
+ create mode 100644 Documentation/devicetree/bindings/net/realtek,rtl9301=
+-mdio.yaml
+ create mode 100644 drivers/net/mdio/mdio-realtek-rtl9300.c
 
-drivers/net/ethernet/mellanox/mlx5/core/en.h:664:48: warning: structure containing a flexible array member is not at the end of another structure [-Wflex-array-member-not-at-end]
-
-Signed-off-by: Gustavo A. R. Silva <gustavoars@kernel.org>
----
- drivers/net/ethernet/mellanox/mlx5/core/en.h      | 13 +++++++++----
- drivers/net/ethernet/mellanox/mlx5/core/en_main.c |  4 +++-
- 2 files changed, 12 insertions(+), 5 deletions(-)
-
-diff --git a/drivers/net/ethernet/mellanox/mlx5/core/en.h b/drivers/net/ethernet/mellanox/mlx5/core/en.h
-index 979fc56205e1..c30c64eb346f 100644
---- a/drivers/net/ethernet/mellanox/mlx5/core/en.h
-+++ b/drivers/net/ethernet/mellanox/mlx5/core/en.h
-@@ -233,15 +233,20 @@ struct mlx5e_rx_wqe_cyc {
- };
- 
- struct mlx5e_umr_wqe {
--	struct mlx5_wqe_ctrl_seg       ctrl;
--	struct mlx5_wqe_umr_ctrl_seg   uctrl;
--	struct mlx5_mkey_seg           mkc;
-+	/* New members MUST be added within the struct_group() macro below. */
-+	struct_group_tagged(mlx5e_umr_wqe_hdr, hdr,
-+		struct mlx5_wqe_ctrl_seg       ctrl;
-+		struct mlx5_wqe_umr_ctrl_seg   uctrl;
-+		struct mlx5_mkey_seg           mkc;
-+	);
- 	union {
- 		DECLARE_FLEX_ARRAY(struct mlx5_mtt, inline_mtts);
- 		DECLARE_FLEX_ARRAY(struct mlx5_klm, inline_klms);
- 		DECLARE_FLEX_ARRAY(struct mlx5_ksm, inline_ksms);
- 	};
- };
-+static_assert(offsetof(struct mlx5e_umr_wqe, inline_mtts) == sizeof(struct mlx5e_umr_wqe_hdr),
-+	      "struct member likely outside of struct_group_tagged()");
- 
- enum mlx5e_priv_flag {
- 	MLX5E_PFLAG_RX_CQE_BASED_MODER,
-@@ -660,7 +665,7 @@ struct mlx5e_rq {
- 		} wqe;
- 		struct {
- 			struct mlx5_wq_ll      wq;
--			struct mlx5e_umr_wqe   umr_wqe;
-+			struct mlx5e_umr_wqe_hdr umr_wqe;
- 			struct mlx5e_mpw_info *info;
- 			mlx5e_fp_skb_from_cqe_mpwrq skb_from_cqe_mpwrq;
- 			__be32                 umr_mkey_be;
-diff --git a/drivers/net/ethernet/mellanox/mlx5/core/en_main.c b/drivers/net/ethernet/mellanox/mlx5/core/en_main.c
-index bd41b75d246e..4ff4ff2342cf 100644
---- a/drivers/net/ethernet/mellanox/mlx5/core/en_main.c
-+++ b/drivers/net/ethernet/mellanox/mlx5/core/en_main.c
-@@ -373,6 +373,8 @@ static void mlx5e_rq_shampo_hd_info_free(struct mlx5e_rq *rq)
- 
- static int mlx5e_rq_alloc_mpwqe_info(struct mlx5e_rq *rq, int node)
- {
-+	struct mlx5e_umr_wqe *umr_wqe =
-+		container_of(&rq->mpwqe.umr_wqe, struct mlx5e_umr_wqe, hdr);
- 	int wq_sz = mlx5_wq_ll_get_size(&rq->mpwqe.wq);
- 	size_t alloc_size;
- 
-@@ -393,7 +395,7 @@ static int mlx5e_rq_alloc_mpwqe_info(struct mlx5e_rq *rq, int node)
- 		bitmap_fill(wi->skip_release_bitmap, rq->mpwqe.pages_per_wqe);
- 	}
- 
--	mlx5e_build_umr_wqe(rq, rq->icosq, &rq->mpwqe.umr_wqe);
-+	mlx5e_build_umr_wqe(rq, rq->icosq, umr_wqe);
- 
- 	return 0;
- }
--- 
-2.43.0
+--=20
+2.48.1
 
 
