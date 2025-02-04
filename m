@@ -1,187 +1,108 @@
-Return-Path: <netdev+bounces-162488-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-162489-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3E258A2706F
-	for <lists+netdev@lfdr.de>; Tue,  4 Feb 2025 12:38:16 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id CBA45A27080
+	for <lists+netdev@lfdr.de>; Tue,  4 Feb 2025 12:39:19 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 70BAD3A8EBD
-	for <lists+netdev@lfdr.de>; Tue,  4 Feb 2025 11:37:59 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id C691E7A5A92
+	for <lists+netdev@lfdr.de>; Tue,  4 Feb 2025 11:38:05 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0FB8E212B16;
-	Tue,  4 Feb 2025 11:35:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4A4B520DD42;
+	Tue,  4 Feb 2025 11:37:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="bNdXia6m"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ej1-f43.google.com (mail-ej1-f43.google.com [209.85.218.43])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 78FBD211A31;
-	Tue,  4 Feb 2025 11:35:43 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.43
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 24F9720C03C
+	for <netdev@vger.kernel.org>; Tue,  4 Feb 2025 11:37:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1738668948; cv=none; b=R2QxxnreBGVTKjXQPJjx0WGwvgastTbG1Hs2jVVEtkrrg+Q01B7WWTXvD8KAzf7v+2XZRatH86PlXrf9V4uGcpHzPehR6j+7yBLfqNAPdp5PN5EGz4bZ4JmR7dSqq33oFCppCjOFkr8+YYDn1P/b2kbcCS1dHyhJoRboJ0qQAcY=
+	t=1738669028; cv=none; b=HtVEqjfRv0D0aevep3fDZbxY6VzDFoHoVcog54r+981LrgOza7QKdvb/NgVQLDuSaGXiiA0nZq5GQ7vCNUj+/0jeP1gTZa72rFn3WI7cJ4Abzou6ikRtTmDZ97Dw7/J+BXJqmGdL1l2NAV6GAaWtUYehUsweBmWt3yBSf9WvABQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1738668948; c=relaxed/simple;
-	bh=2pUaLVwLHOwxMYDPKEmqQLY0Bgk29Kn0tTJ8gIKafis=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=RrCeVChsvKzOBjWv6Kp3ZlRwyNIJilv8Q3WEhq79CxEiSSBCYyFXz4ydhic3Ldgfia6YJ9OuVEXVQFe1LdWn1Lx0CxqXS90H0GFJNrQD0s630HKqf8szpH/dx6XJX6+iD4ebRsI9pVqhJZnWaSEo9Z8N1biq+nT+66IyXfTVP8U=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.218.43
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ej1-f43.google.com with SMTP id a640c23a62f3a-ab70043cd05so847517166b.0;
-        Tue, 04 Feb 2025 03:35:43 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1738668941; x=1739273741;
-        h=cc:to:in-reply-to:references:message-id:content-transfer-encoding
-         :mime-version:subject:date:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=8PPqcIXQzYEFsqNlbLKuHZEq4XrZtJwQTMEp1c3me10=;
-        b=NrNTyVXTMMz/Z4on3YxpLZdDHnlvK5egX9Fix244TFZ44itUygaXJmR9KgpmmEXSd6
-         uZ1fy8Dl4GFSzALhP6Ji550SqNP2ZgzouiFqhXwyiRShY4j6/k7wSDE//CTe3y2E+V6p
-         J/RLgrdkWWrVT1gPkw0kb9dlwo02NAybjcHlbb4WGr4NEg7lrPTAGMHzt+LEdGLrVJ66
-         ubFm/yR2H0yhdZi0R5oKtgdTZU7qvJVoYYTSMQYz2i84tsned5NJyUz6VcrnJ2aRWi6F
-         K7IBXhbIyf7jgVec0912flzxaVHgpOJj4UA5KMAV9NbmP5Z515bxzcUHtb0nygVRqluL
-         E1tw==
-X-Forwarded-Encrypted: i=1; AJvYcCUaBmveCwcrTzh2dDGw6IvKUItUQsbjyh8OT3eIVfRwkMyFN8p8XWvFoyn4lFpV+zobqbfq9FvcxLluPOuN@vger.kernel.org, AJvYcCX371YXP+y5XqKoCyrIu7b4cf3nqown3Pxut580OH77jraCIpLbNbZuNgGN/sd4Hv4K4YI5alz6Zrs+IyyzCvFg@vger.kernel.org, AJvYcCXuAjz/nz9nBaDUlhDFyzd4u5ZY4Q91/ehhZ67IJrEIO8jiQLBMEefVnFYp2wK2kFizd7MbS6empDo=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxCBYXeCbRMPcZfMZx/pNE3EghEJJsJzbh8YZyIdhA0/rMOnPXc
-	vkdaQV+hm27MvInZQ5n5ed02UX6+gJM6JSmBhTMuLfiGJLqLvwJY7i3prA==
-X-Gm-Gg: ASbGncs649lptlPxVtPU9mncbEEtpukOMnqSQrEXiFIqQYoRhIrNvtlAh7GZsrq+pvu
-	vCNFJDR5UPp7NYKpbqVLRy0s/NFaXH8uaP4MprEPDcGB2/IfmxdCd7Bu1/t+LVFuOgsYXN8/zqH
-	/r5zWDutNtwJlfoKIqLStS716ZQ4YUEamTEGpPlrtXhdGqj745abzmvUM5Q4apF88k7AjlxvY77
-	JtDL8IVITgoisy/hNcoq3cFZa3vaLBqDfC0hQOmlp2ujqvSsx+r/5BGQPlOJAZQkxbj5L623+J3
-	USKXhcs=
-X-Google-Smtp-Source: AGHT+IHCyfaueKIUNYUPir9gO/xg7NSDPC0F+tsupVOVvkWrV6oAN6co9B3Ale6w9VUTWBCuMyZH6w==
-X-Received: by 2002:a17:907:7255:b0:ab7:e71:adb5 with SMTP id a640c23a62f3a-ab70e71b1bcmr1353777066b.35.1738668941218;
-        Tue, 04 Feb 2025 03:35:41 -0800 (PST)
-Received: from localhost ([2a03:2880:30ff:70::])
-        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-ab71166a8e0sm545657466b.158.2025.02.04.03.35.40
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 04 Feb 2025 03:35:40 -0800 (PST)
-From: Breno Leitao <leitao@debian.org>
-Date: Tue, 04 Feb 2025 03:35:16 -0800
-Subject: [PATCH net-next v4 8/8] netconsole: docs: Add documentation for
- CPU number auto-population
+	s=arc-20240116; t=1738669028; c=relaxed/simple;
+	bh=ZdUSE4z9RynIxTEihC8Iydf5vdo/mkMPBIcizQElhgI=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=kTFISu3mCieC9floq5zJKUi8EA92mrb3WgDo9zwPuZo/sy1J003SMBCpKPiWwAbFQJdQ+nbO5kt78gaoY/H73jsQEwBxwmYn3ojlyebj4hY6eVoODx5/n9lYSEkp/tF6IJPcIBt4J4Ytiul1d8xweqf3ceGoWpbSfckiLIZKykc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=bNdXia6m; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id EE141C4CEDF;
+	Tue,  4 Feb 2025 11:37:05 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1738669027;
+	bh=ZdUSE4z9RynIxTEihC8Iydf5vdo/mkMPBIcizQElhgI=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=bNdXia6mgB2pwmLYKdhJZJbvEMwf9qRZkak8+h4yNxZ/fxPNGdkWNcsHLpDTaWGZK
+	 DjXyHEDUHb7RLrGgGW33CyCAgFrixqLhZXyBCu+ZAWcLRV1+ZTZWsxE80JXOmNBs9Y
+	 i3AQeDHLPvi+N0S1vcMrR2V95ArhREiwGxJtY6B7IIRhmBJ1iEtnT9Au8ATgjlpFfQ
+	 ipfX4yLGjHRH/7nKmoMimIx3xPhOx3jJ6s2yVwPbpNAtMHZ0yJNMKHAozYxi43ongm
+	 nkjUw7tqxh6ZkJ1x33wmRQf/DhVjTh+BHG7LCdZQ+IDgq47/BgBnlKlyPMornFzV7e
+	 Fu94IywV2Zbhw==
+Date: Tue, 4 Feb 2025 11:37:03 +0000
+From: Simon Horman <horms@kernel.org>
+To: Cong Wang <xiyou.wangcong@gmail.com>
+Cc: netdev@vger.kernel.org, jhs@mojatatu.com, jiri@resnulli.us,
+	pctammela@mojatatu.com, mincho@theori.io, quanglex97@gmail.com,
+	Cong Wang <cong.wang@bytedance.com>
+Subject: Re: [Patch net v3 2/4] selftests/tc-testing: Add a test case for
+ pfifo_head_drop qdisc when limit==0
+Message-ID: <20250204113703.GV234677@kernel.org>
+References: <20250204005841.223511-1-xiyou.wangcong@gmail.com>
+ <20250204005841.223511-3-xiyou.wangcong@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Message-Id: <20250204-netcon_cpu-v4-8-9480266ef556@debian.org>
-References: <20250204-netcon_cpu-v4-0-9480266ef556@debian.org>
-In-Reply-To: <20250204-netcon_cpu-v4-0-9480266ef556@debian.org>
-To: Andrew Lunn <andrew+netdev@lunn.ch>, 
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
- Simon Horman <horms@kernel.org>, Jonathan Corbet <corbet@lwn.net>, 
- Shuah Khan <shuah@kernel.org>
-Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
- linux-doc@vger.kernel.org, linux-kselftest@vger.kernel.org, 
- rdunlap@infradead.org, Breno Leitao <leitao@debian.org>, 
- kernel-team@meta.com
-X-Mailer: b4 0.14.2
-X-Developer-Signature: v=1; a=openpgp-sha256; l=3164; i=leitao@debian.org;
- h=from:subject:message-id; bh=2pUaLVwLHOwxMYDPKEmqQLY0Bgk29Kn0tTJ8gIKafis=;
- b=owEBbQKS/ZANAwAIATWjk5/8eHdtAcsmYgBnoft+8Sx5tY+XOi3a1CcmSvKXupO1Hflji0JvP
- kGtZ1lphD+JAjMEAAEIAB0WIQSshTmm6PRnAspKQ5s1o5Of/Hh3bQUCZ6H7fgAKCRA1o5Of/Hh3
- bQ4nEACZUwIqUq8eeC7HBNxcADsyp9IxDLdVgHJp1/faFHA5nEda5PJE2Rgxf2enEQTh7yr49x3
- Y8CW7ZSk4uK8NFjVVmnWAvBOFe9FVLvP7SWswe5cU5yvBMuMAZZEsBZ6ZbwPDHv1PZylN/QQvMZ
- /nEyieCeWDFOBV0YVmX7gXPxkdjh1BWrxkIcevek/fb7K4WdWMI3bSMhVsnbaiPFKdgw9OUuxr8
- MbC0ooUwRUGUmorSCNbCF7EMbSvmqSb9RJQh+pdmEatxP0kY2NKfjZ54+Y7Gnqlu8VBALieepKq
- 1OSFUAKrJQpRlv4BcSzEXghk7Eh1hxaoBw0RlvBeguyiK8GUev+cnsokATcwdr7QBCkUhibYpM/
- gSd1+mU/55+P8r2HiZ3JWyVIsp7F1Z7xAji2keN+uqySeMFi3WfpZkwzQlQ4cZ7EgS7X+E+uTil
- UcE26rjnDjIuMivbikAcIXNKAC9N3nZuUWONSLtrkhniHYDCf1rtDdpCRXQouqvIWD/ZaDJN5Xe
- mbHBDf7p4kHLg1lmpiNxDhsQzExojGkuBJU+0sdVa7Zn0sEWb6dtJTI7U5s3lSnrl+ONmqJ4jUf
- 4HzSSbmvwhRIxk5RuQNnXgd74sT5ms6rc0voDB3eZnMdr3eJs/hgVgOMH+1k2vd27ETGGUTJkb/
- ItbN1bm9VVncpVw==
-X-Developer-Key: i=leitao@debian.org; a=openpgp;
- fpr=AC8539A6E8F46702CA4A439B35A3939FFC78776D
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250204005841.223511-3-xiyou.wangcong@gmail.com>
 
-Update the netconsole documentation to explain the new feature that
-allows automatic population of the CPU number.
+On Mon, Feb 03, 2025 at 04:58:39PM -0800, Cong Wang wrote:
+> From: Quang Le <quanglex97@gmail.com>
+> 
+> When limit == 0, pfifo_tail_enqueue() must drop new packet and
+> increase dropped packets count of the qdisc.
+> 
+> All test results:
+> 
+> 1..16
+> ok 1 a519 - Add bfifo qdisc with system default parameters on egress
+> ok 2 585c - Add pfifo qdisc with system default parameters on egress
+> ok 3 a86e - Add bfifo qdisc with system default parameters on egress with handle of maximum value
+> ok 4 9ac8 - Add bfifo qdisc on egress with queue size of 3000 bytes
+> ok 5 f4e6 - Add pfifo qdisc on egress with queue size of 3000 packets
+> ok 6 b1b1 - Add bfifo qdisc with system default parameters on egress with invalid handle exceeding maximum value
+> ok 7 8d5e - Add bfifo qdisc on egress with unsupported argument
+> ok 8 7787 - Add pfifo qdisc on egress with unsupported argument
+> ok 9 c4b6 - Replace bfifo qdisc on egress with new queue size
+> ok 10 3df6 - Replace pfifo qdisc on egress with new queue size
+> ok 11 7a67 - Add bfifo qdisc on egress with queue size in invalid format
+> ok 12 1298 - Add duplicate bfifo qdisc on egress
+> ok 13 45a0 - Delete nonexistent bfifo qdisc
+> ok 14 972b - Add prio qdisc on egress with invalid format for handles
+> ok 15 4d39 - Delete bfifo qdisc twice
+> ok 16 d774 - Check pfifo_head_drop qdisc enqueue behaviour when limit == 0
+> 
+> Signed-off-by: Quang Le <quanglex97@gmail.com>
+> Signed-off-by: Cong Wang <cong.wang@bytedance.com>
 
-The key changes include introducing a new section titled "CPU number
-auto population in userdata", explaining how to enable the CPU number
-auto-population feature by writing to the "populate_cpu_nr" file in the
-netconsole configfs hierarchy.
+Hi Cong,
 
-This documentation update ensures users are aware of the new CPU number
-auto-population functionality and how to leverage it for better
-demultiplexing and visibility of parallel netconsole output.
+Unfortunately this test still seems to be failing in the CI.
 
-Signed-off-by: Breno Leitao <leitao@debian.org>
----
- Documentation/networking/netconsole.rst | 45 +++++++++++++++++++++++++++++++++
- 1 file changed, 45 insertions(+)
+# not ok 577 d774 - Check pfifo_head_drop qdisc enqueue behaviour when limit == 0
+# Could not match regex pattern. Verify command output:
+# qdisc pfifo_head_drop 1: root refcnt 2 limit 0p
+#  Sent 0 bytes 0 pkt (dropped 0, overlimits 0 requeues 0)
+#  backlog 0b 0p requeues 0
 
-diff --git a/Documentation/networking/netconsole.rst b/Documentation/networking/netconsole.rst
-index 94c4680fdf3e7e1a0020d11b44547acfd68072a5..84803c59968a3237012fab821f432eb531aba45c 100644
---- a/Documentation/networking/netconsole.rst
-+++ b/Documentation/networking/netconsole.rst
-@@ -17,6 +17,8 @@ Release prepend support by Breno Leitao <leitao@debian.org>, Jul 7 2023
- 
- Userdata append support by Matthew Wood <thepacketgeek@gmail.com>, Jan 22 2024
- 
-+Sysdata append support by Breno Leitao <leitao@debian.org>, Jan 15 2025
-+
- Please send bug reports to Matt Mackall <mpm@selenic.com>
- Satyam Sharma <satyam.sharma@gmail.com>, and Cong Wang <xiyou.wangcong@gmail.com>
- 
-@@ -238,6 +240,49 @@ Delete `userdata` entries with `rmdir`::
- 
-    It is recommended to not write user data values with newlines.
- 
-+CPU number auto population in userdata
-+--------------------------------------
-+
-+Inside the netconsole configfs hierarchy, there is a file called
-+`cpu_nr` under the `userdata` directory. This file is used to enable or disable
-+the automatic CPU number population feature. This feature automatically
-+populates the CPU number that is sending the message.
-+
-+To enable the CPU number auto-population::
-+
-+  echo 1 > /sys/kernel/config/netconsole/target1/userdata/cpu_nr
-+
-+When this option is enabled, the netconsole messages will include an additional
-+line in the userdata field with the format `cpu=<cpu_number>`. This allows the
-+receiver of the netconsole messages to easily differentiate and demultiplex
-+messages originating from different CPUs, which is particularly useful when
-+dealing with parallel log output.
-+
-+Example::
-+
-+  echo "This is a message" > /dev/kmsg
-+  12,607,22085407756,-;This is a message
-+   cpu=42
-+
-+In this example, the message was sent by CPU 42.
-+
-+.. note::
-+
-+   If the user has set a conflicting `cpu` key in the userdata dictionary,
-+   both keys will be reported, with the kernel-populated entry appearing after
-+   the user one. For example::
-+
-+     # User-defined CPU entry
-+     mkdir -p /sys/kernel/config/netconsole/target1/userdata/cpu
-+     echo "1" > /sys/kernel/config/netconsole/target1/userdata/cpu/value
-+
-+   Output might look like::
-+
-+     12,607,22085407756,-;This is a message
-+      cpu=1
-+      cpu=42    # kernel-populated value
-+
-+
- Extended console:
- =================
- 
+https://github.com/p4tc-dev/tc-executor/blob/storage/artifacts/977485/1-tdc-sh/stdout
 
 -- 
-2.43.5
-
+pw-bot: cr
 
