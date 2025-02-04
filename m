@@ -1,88 +1,88 @@
-Return-Path: <netdev+bounces-162550-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-162553-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id F0CB9A27383
-	for <lists+netdev@lfdr.de>; Tue,  4 Feb 2025 14:56:11 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 39EA8A27395
+	for <lists+netdev@lfdr.de>; Tue,  4 Feb 2025 14:58:49 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B26AE3A8785
-	for <lists+netdev@lfdr.de>; Tue,  4 Feb 2025 13:55:39 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 4DCA57A469E
+	for <lists+netdev@lfdr.de>; Tue,  4 Feb 2025 13:55:21 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2E9F121638A;
-	Tue,  4 Feb 2025 13:40:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0C6552165EE;
+	Tue,  4 Feb 2025 13:40:52 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="Z/mH5LZ8"
+	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="ueqHn5Ma"
 X-Original-To: netdev@vger.kernel.org
-Received: from NAM04-MW2-obe.outbound.protection.outlook.com (mail-mw2nam04on2062.outbound.protection.outlook.com [40.107.101.62])
+Received: from NAM12-BN8-obe.outbound.protection.outlook.com (mail-bn8nam12on2084.outbound.protection.outlook.com [40.107.237.84])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6E830216382
-	for <netdev@vger.kernel.org>; Tue,  4 Feb 2025 13:40:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.101.62
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DDB342163B8
+	for <netdev@vger.kernel.org>; Tue,  4 Feb 2025 13:40:49 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.237.84
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1738676446; cv=fail; b=KHSIzFFC/2JujZVa4k6Tt3VppQZewEChpRiVxS5wQdiOKZLbN2tYtK97g66T1w6D3ZXmeYEdhcXpfODEZATRjO0aTJVbBsC6MsOvBdIqfaQCENzlj81mloY5ayQAMzNhpy2wT7Y1u4axPn4qkiE/wAVmBzzAoNT2NVVTDOHdtwo=
+	t=1738676451; cv=fail; b=k0s9OvVDExrWlLYhv5Yd/8SZTWR/leInyFQh8/5vrPKCwd27G1Y3NPhS0C65zqE92eU7UHQQ2/NjVREqEsoUZPBPlWjUNSOoEI5VZ7E5B21LGvlEU8PSqnTkedab9hC2YkiYcUDv5Se0aZtli+E+56Px/Oo5vLgU6pFzvbCAqgU=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1738676446; c=relaxed/simple;
-	bh=MzpXSbqC5UPxASFUn6KUT1qdkyquXbebv930ApObQMg=;
+	s=arc-20240116; t=1738676451; c=relaxed/simple;
+	bh=ZHSSEtEeuHoIju1YAj1fdObzJg6neqk5rEqhD3FYP18=;
 	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=UURotzd5Dr3W11B70yB9SyMsNGSvx+6xPZS932SR0G1m7bw5CHvSLzo357zLpuixv6gPibevutAVDvifg5+Nzr0O2fVfa+N4JIQOFQer4odhv0JctJwJ99r11Usb31SiIWSksomkG1b+WDcHgsw0vVuOd7JqjPGUSqyIpDubsFw=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=Z/mH5LZ8; arc=fail smtp.client-ip=40.107.101.62
+	 MIME-Version:Content-Type; b=ijbXUk1/Uy7eQS0URJwQvcY2JrgW/SWB4WW9YuRED9wHbNo+3W36fYPYjOSxkP/KDuCLSZY3BZmgN1FlNdI1riXGPJv9+6prQKtiIfKY/HxVwLV51rLzbQBddX3qDCnvWmhKHsmCk2Pj1aUOH6LRrFtqxVBpsPPlq7RkdIjxZ28=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=ueqHn5Ma; arc=fail smtp.client-ip=40.107.237.84
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
 Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=fuRBJthcAIXi8KmEkAqR769L0eH+sQqdmgTzpYGtmSjpN7/C5WbDaV4VgYysKlIp+ajHdp3YgdzCN5Wcc8iFGtV1dGrDndzbMdpbstE5vEYZ29QlRatlhz+YDlv/ldnFgw5yZSAMwYOJnVt0HrlAtcotU0oExTG1JBzCA2HN/HYHeuf5VJ2fPuFO5u7Auz3POB9qNdbQVlbb76ofU7VGQURHqNhrqIOkOkhaCx9a9Vxq7+jqA52/KRVvftZbDQjgDNwIwv64/VAygVrh3scyu13irKB/vTn2jHfnKfBdzfHV+fdVmrkZ7fPJzlNZNtN9Jb4dKXBSz0zkxn2ReBtKEA==
+ b=tr7uEBDOec8TZktp9CWYypijXyacO1SRGiJ+tn5kMxQtjMGjwgAPTTHYSwt0WfcX5blGMA+n2buSBwkCHFcRgK/phaHXoA35mdXcyjpHgZGnn1cRIHnz2+IJfa+w+irODgkKe49+R7FMkeG4C5NSjd0HcqUCFCCgqjwVRGhrSWLaOdAPuqE4CNS6Ar68AA/bP8nqBfU4s9pZTgtJbk2JKHYP9vcy9+jKGMONPy9LoDyY21+N4+o1YYq0t98Auzvd/pLE/8SX8h2DW2guAvgmp2sM7FkySdUS+QCjrfcy1TGs11miqpSK0jO3XSo6K6eAem/zzbuZEibd2t54Fk2uUQ==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector10001;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=ljX8gXziGoMsXZKu85LIjoaKbBevQTXUMj8edZJK+VY=;
- b=ut4DRczSyqRZEFihqM7YeaiQcQOwSg6BKe9Ke58Y+ILABpcRBlVLFMA+Fmum87IJZLr//JafHjjqJpx4QHCaja3jU4snUpYSdLaJeTV47ZkXWCRLQJ7bQLO+0i4BO4kCZ6IfZeJD4ZUSBVnppFf2M9RCNBS8BFln+O91EqyeYjNTyKzJrRvjv0tPjxUyO5kJOE2v/DEHFb9kN4StPqMpTxDtO1tUlCOmWxvBtZbG5YryIPfOc8+8lxn8rGduz+6M9Wi/AvGROJLGd9eaeQvabZi7OOWbxBCr/S3CLVjcxCP3lDa0w9CPwtSfO0dmFukLComgfw1wBkT6dwGWGLqgrw==
+ bh=CMd7JNSG1MXZURwkEpUYq6oSlRvrTzhriiIBmJssAWc=;
+ b=o2ofO441b13m3qA/rIxjIepUkymN6AvVBU5YAPrEJ1R9kJBCh0pLt3eDs/bNCPfaW5aED75C/ZcX/RV7/haHseFSKy1jTLK77pzBBKqQtz/bZovUitI6KfG1oDOwS6ErNHip1eUYwtKQQvKt5uCTgpr8vAhI/oVrfz/CnwClxMbRXlyBYFoIkI3HFqGW2c7iGE1J8L0mETvqDhDYQ9GNJ8oeMCRdC5YsbnDsEDo11ethx7q8ll89OJxGrGx0vTwbkRUT3aIEjb9B16qBAIrOM0IWB2wpkhLT65xd9xgWIfJpd441whgQl8OapqfKuPPfewQQRhno9RD8odEZm2V9Jw==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
- 216.228.117.161) smtp.rcpttodomain=vger.kernel.org smtp.mailfrom=nvidia.com;
+ 216.228.117.160) smtp.rcpttodomain=vger.kernel.org smtp.mailfrom=nvidia.com;
  dmarc=pass (p=reject sp=reject pct=100) action=none header.from=nvidia.com;
  dkim=none (message not signed); arc=none (0)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
  s=selector2;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=ljX8gXziGoMsXZKu85LIjoaKbBevQTXUMj8edZJK+VY=;
- b=Z/mH5LZ81JKCqnqD4mPIAB2dNzEkpVYbMsxeDMw6xL2crwJ9jdMXXm5X1Cyr312gJoa44Ju8CysKyE9w4GgNzpr2T/EXS3zSLQiIkntphBC/1ZTYjf5qfSnRRYHcL9THIb9o249CaTMQdWGRRfZGi2wLpyvEpUZu/tTBBjo36yVv1KK7OZOyyWiRgQmQrFH1ei/wcNUGytu2GIwWaNkToqeutJernKQENqPV7HsNDRYf87qEU//rBBJdv1K3Uq3vwIRmeY8bxAtzhl2+GqGe8aUeJIoszOlmxZSCT60SltZPGIS/in2+/39Xrmq5V85jAnwmp551Jg9FebMPsrbAvg==
-Received: from SA1PR04CA0001.namprd04.prod.outlook.com (2603:10b6:806:2ce::8)
- by IA1PR12MB9062.namprd12.prod.outlook.com (2603:10b6:208:3aa::14) with
+ bh=CMd7JNSG1MXZURwkEpUYq6oSlRvrTzhriiIBmJssAWc=;
+ b=ueqHn5MaLFWQ8SOdwbdT8vCtBv295K6BzbC9jsF8hEcZWxmqwlIf1jVkPEfabh1So8gIDTI0YbD6Qf36SCcMB9W05EV3VfVDIFPzbnFokD8+CaUmG2R6RJ8hlt+Qz1JqnlTHgG63Miz9yH9fsBtmxkaMBdpHQpWAqlvKuCxEvF2KcEulZCi7WSxBqmHTcn8lfuNrR124M/tOyzbK87NOPGwJkzm4+EqZuU2lQalvbc6fpBFuwQ2H5BXn+pYNmKJSaA2xNVBJIX5JFpZEZiiLAOvkKJzgmFiPolGIQ4w3NkRhSdvrgHN31Cr1Zkb1BVLX5FO7+DOsZF4PtOwT2mAneQ==
+Received: from MN2PR14CA0007.namprd14.prod.outlook.com (2603:10b6:208:23e::12)
+ by DS7PR12MB5933.namprd12.prod.outlook.com (2603:10b6:8:7c::14) with
  Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8398.24; Tue, 4 Feb
- 2025 13:40:39 +0000
-Received: from SA2PEPF00003F64.namprd04.prod.outlook.com
- (2603:10b6:806:2ce:cafe::38) by SA1PR04CA0001.outlook.office365.com
- (2603:10b6:806:2ce::8) with Microsoft SMTP Server (version=TLS1_3,
- cipher=TLS_AES_256_GCM_SHA384) id 15.20.8398.24 via Frontend Transport; Tue,
- 4 Feb 2025 13:40:38 +0000
-X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 216.228.117.161)
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8398.25; Tue, 4 Feb
+ 2025 13:40:47 +0000
+Received: from MN1PEPF0000F0E0.namprd04.prod.outlook.com
+ (2603:10b6:208:23e:cafe::50) by MN2PR14CA0007.outlook.office365.com
+ (2603:10b6:208:23e::12) with Microsoft SMTP Server (version=TLS1_3,
+ cipher=TLS_AES_256_GCM_SHA384) id 15.20.8398.26 via Frontend Transport; Tue,
+ 4 Feb 2025 13:40:46 +0000
+X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 216.228.117.160)
  smtp.mailfrom=nvidia.com; dkim=none (message not signed)
  header.d=none;dmarc=pass action=none header.from=nvidia.com;
 Received-SPF: Pass (protection.outlook.com: domain of nvidia.com designates
- 216.228.117.161 as permitted sender) receiver=protection.outlook.com;
- client-ip=216.228.117.161; helo=mail.nvidia.com; pr=C
-Received: from mail.nvidia.com (216.228.117.161) by
- SA2PEPF00003F64.mail.protection.outlook.com (10.167.248.39) with Microsoft
+ 216.228.117.160 as permitted sender) receiver=protection.outlook.com;
+ client-ip=216.228.117.160; helo=mail.nvidia.com; pr=C
+Received: from mail.nvidia.com (216.228.117.160) by
+ MN1PEPF0000F0E0.mail.protection.outlook.com (10.167.242.38) with Microsoft
  SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.8398.14 via Frontend Transport; Tue, 4 Feb 2025 13:40:38 +0000
+ 15.20.8398.14 via Frontend Transport; Tue, 4 Feb 2025 13:40:46 +0000
 Received: from rnnvmail201.nvidia.com (10.129.68.8) by mail.nvidia.com
- (10.129.200.67) with Microsoft SMTP Server (version=TLS1_2,
+ (10.129.200.66) with Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.4; Tue, 4 Feb 2025
- 05:40:22 -0800
+ 05:40:25 -0800
 Received: from dev-r-vrt-155.mtr.labs.mlnx (10.126.230.35) by
  rnnvmail201.nvidia.com (10.129.68.8) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.14; Tue, 4 Feb 2025 05:40:20 -0800
+ 15.2.1544.14; Tue, 4 Feb 2025 05:40:22 -0800
 From: Danielle Ratson <danieller@nvidia.com>
 To: <netdev@vger.kernel.org>
 CC: <mkubecek@suse.cz>, <matt@traverse.com.au>, <daniel.zahka@gmail.com>,
 	<amcohen@nvidia.com>, <nbu-mlxsw@exchange.nvidia.com>, Danielle Ratson
 	<danieller@nvidia.com>
-Subject: [PATCH ethtool-next v3 04/16] cmis: Change loop order in cmis_show_dom_chan_lvl_flags()
-Date: Tue, 4 Feb 2025 15:39:45 +0200
-Message-ID: <20250204133957.1140677-5-danieller@nvidia.com>
+Subject: [PATCH ethtool-next v3 05/16] qsfp: Reorder the channel-level flags list for SFF8636 module type
+Date: Tue, 4 Feb 2025 15:39:46 +0200
+Message-ID: <20250204133957.1140677-6-danieller@nvidia.com>
 X-Mailer: git-send-email 2.47.0
 In-Reply-To: <20250204133957.1140677-1-danieller@nvidia.com>
 References: <20250204133957.1140677-1-danieller@nvidia.com>
@@ -98,123 +98,305 @@ X-ClientProxiedBy: rnnvmail202.nvidia.com (10.129.68.7) To
  rnnvmail201.nvidia.com (10.129.68.8)
 X-EOPAttributedMessage: 0
 X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: SA2PEPF00003F64:EE_|IA1PR12MB9062:EE_
-X-MS-Office365-Filtering-Correlation-Id: 625a326d-6c1f-4767-0118-08dd452182f1
+X-MS-TrafficTypeDiagnostic: MN1PEPF0000F0E0:EE_|DS7PR12MB5933:EE_
+X-MS-Office365-Filtering-Correlation-Id: 3b1563e8-32d7-4fe1-7eab-08dd452187a3
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
 X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|376014|82310400026|36860700013|1800799024;
+	BCL:0;ARA:13230040|1800799024|376014|36860700013|82310400026;
 X-Microsoft-Antispam-Message-Info:
-	=?us-ascii?Q?4htxfDIeJtJoP7GkvDuh7mRp3KFy3yCJrYXhpeSdI28HICfr/a9mtc7jFN+M?=
- =?us-ascii?Q?zP4uo4lxaYA7vsdK/lUJkplOkaGwOkjmnUl7Q3y2NTw8NY16pFkU3tfiSsaZ?=
- =?us-ascii?Q?Sh4WKHl0rcaZ/vwb0qL8uKuO/1CAGlmwDb+M4PF634B0mqJ0KiDmww04SfOf?=
- =?us-ascii?Q?asH8e+Gbg5CKpNZRBcNHsNPoiATwOo105Rm3tMbMN3Zh9xxYkWhiIv9RH+UX?=
- =?us-ascii?Q?ixLu0VPBM7QcnPBckJy/Xyz/hP3HGQXdGYLY9WJDE80EyUd+vSXt5MuDqueH?=
- =?us-ascii?Q?K49drRPe0CgpFZ21uwiCY8Flqg9ePJW1T/MHrNaNjvzHnL1/Ng/TYr0NrQeT?=
- =?us-ascii?Q?PrVS7F60Wi6wyy/kJ+mA39XIx6cBkBENn/cIeVNRH1Ny+J70Frzhrl6jBlSk?=
- =?us-ascii?Q?zz02lS+KChkFYE4GxozJK/JfhyWe5mKUywnMRAGPE0PeVCfeHzTGgTKscNc3?=
- =?us-ascii?Q?6KGAd9cVP2iUhCrU2q6OTCK+Di1tec7OvnJ//1pt20yZcJRO9E2JYSxaMjy0?=
- =?us-ascii?Q?m5beS6XBnfz0xXRMq6wVyfknJeqFZ6vWBqCQ6pVT3wT7cbfLORfeiVzrSWki?=
- =?us-ascii?Q?lwYRuiUOIytpBSllz8J+HoCfxvm5r/C1IZqHNn66bypcUiuDmxLhmikY56xZ?=
- =?us-ascii?Q?6WAQzgfe9RPgUudP4V23tGZnC1ePNzVrLNpj3eMjZQtB46h2T02xUHjN44JL?=
- =?us-ascii?Q?9mfaSkxO1GUqIifJli9PdGqNhmTRCpLRdbL+e2597vXqe/LulwZwqtJeNQda?=
- =?us-ascii?Q?RUcqoJ7cxDZYMCGtbiQ9qQPw98kwqVF2K3Ofh/V1x4C1e23lqyt6halCNfWe?=
- =?us-ascii?Q?vxLk3kotDJlbIfcP0E/h6A9dkTwX5vbKViLuFzfIUCHdUAK+LgJS2McSPQFT?=
- =?us-ascii?Q?bRPuKFob/gh823nvsgP/fKtvZY9GvkmgoMvcCdbX8s5y1gYev6/a2l/xbCWx?=
- =?us-ascii?Q?5Yd759Bz66ajZ2L9uFnoKeB3lZqNxzBNUi3jKvW3x5ZtxwJiHBXpNuOmBQbb?=
- =?us-ascii?Q?poljtxuS5LyVOBPb61uffYyTSvKGxi8WHQA9SrR37nWzy6XrtZK42LFKQLOc?=
- =?us-ascii?Q?AJ20w+wf5m67DImnaU3UD1bU/P2Opf7Ef07DJk7knLvYnBK3QODyiluW/SCq?=
- =?us-ascii?Q?RlhABEiuVkZzjzjSYADRcUTSKW69clSY7NqOHllvGjYycqPVK62TBl6rvT3G?=
- =?us-ascii?Q?Cf7wj4hf55FRpKNORlPUKvjObgndLu81k9D5Xbxb9jHhQMosoKaEUaqXYCuJ?=
- =?us-ascii?Q?jsfaZOjeewjbchLXcUr+q+boo6yqpk8rWR81yeE5U38iHFlreUiBpmM8Wkru?=
- =?us-ascii?Q?XjWoV8DyiCLZh20NzDTvdtjDvSQuWao0JTuZa1XGdujOW+T+xMRbZxj+O9FI?=
- =?us-ascii?Q?ArhG7UPWjXRziphc39/wKomrXa805SGDNG/D/9XpOQ/+d+Pj8wkb3IBGr3UR?=
- =?us-ascii?Q?1F6sn+RSwtBKLiZKIrKbfbyg2+vOnzZyYAJWTsBp1bxVuhww8w6fn40KVJzf?=
- =?us-ascii?Q?I/7KAWOWIJo2V3s=3D?=
+	=?us-ascii?Q?vDk8kgo3aM4//yV0NxuTdED9zFwkHkLMuAdo8tpsGV71NBligtkMq4hDJghZ?=
+ =?us-ascii?Q?ZQDHQVYLHYwissxJCXqJnd5rgPUcxzNV/YrQn7XN2GAUWxnYuVWhWD3dRPuL?=
+ =?us-ascii?Q?KYFyzBNXieUt2LsKkuhsu5WEVz4Gq4R+3Nwt7CUZYmkINxdBqFbp+JRorZx1?=
+ =?us-ascii?Q?HJOBOiyK8XO5rrE+yrnsDDf3DeMRWWJAJDxWQSzHxAXSawbOiFSrXXUkB4T0?=
+ =?us-ascii?Q?G1Gm1m62Csu17+efnTrlJAKBuot37cPQpniOH8o61Vue2WFdNg3EummEIu73?=
+ =?us-ascii?Q?1QHYIVKgxrbug59w7S1JEhOdx06XgrTrt8JztMD9t0cKRt6ITscq26xEQ7mP?=
+ =?us-ascii?Q?ZoHb8RhF7Pv+RsKC04mi4mRaT33d4rvea135XmV9qFCE8yjXEMocSXSrc/FJ?=
+ =?us-ascii?Q?nriY/Tx14crULAUmDgZOyqBSpys/E7Yl9RtPtu93oBeiSoh54bKQhXtTUKQm?=
+ =?us-ascii?Q?8V1msWxDoFHqoXguRSc7hvxz6kHkOg3V7pvVKzWXXQDgHn0GMsjL+EJ4swy5?=
+ =?us-ascii?Q?GFtr6X8nSbyhpMh43cYAnpheDvVOJXw/bIbYQH5KafgGgWgTzdxDQZRPKIdU?=
+ =?us-ascii?Q?oR3xWGFULJyiOQxTt+1O4eW1DKZsCBPvSBhjxw0qa9cGl1FMlOW9Th7in0LQ?=
+ =?us-ascii?Q?3fdgjaF9v/vsFT4ANGeeGI+PeUmRYjdSCO6DwZzQWjLqUJSOl75CGR03PeYm?=
+ =?us-ascii?Q?h+v25h/nARKv6U0qVml8H/CZ1u/j7lOyy+fbAICFk0WdB4y4i9nAIX4pbGX6?=
+ =?us-ascii?Q?5Fjg6yLcxQoz5JQG96zLFKPtQoqrDvkS6oXLYL+ROPiN0OLP/uFXOa2dqhBl?=
+ =?us-ascii?Q?2Q0EXR3NG9pkR2mh9cs9zU2rJ2viCTNdleBnJJ+RozY/B4OblXXKVQOt4CG5?=
+ =?us-ascii?Q?wimf+AMla7kUQTMqYtelU4btltu10F1zxjp5uz9u26DJ/j1/DBwgOu6QpMTv?=
+ =?us-ascii?Q?JQfHTpmU+SdwJeBqHLET2LpWwS0o3ggSNsJaQ+XwbmV6XTVBF0GexUyH8jgJ?=
+ =?us-ascii?Q?i4L7Lt5PIfaRC6qDX9YniW64PjluZrcsYD2JtfMICOg0+EZPQoxa8QSOFjmY?=
+ =?us-ascii?Q?3hHxP3Y03ORKhtLBuxqUG2+gkMDOLP3Dshm7mT2uOqEjN5e5ERj+YqH1LBps?=
+ =?us-ascii?Q?jx9wYbTVWKnMFrD7pNmwdIMMpVsLYPfmoKn6R9nMBV2tmNaghz84NpHATDE5?=
+ =?us-ascii?Q?qzLHGZhJvwUeOlYCYewr7zUPIjQG9jPXsJLdr296Ec1QdczSq7AmkkeI96e9?=
+ =?us-ascii?Q?nZ+iMMTbgjVBg60T9ATyG0/PxNYa5J0rhthXp1qDmVJGJzRnTYdc5KDw3yWR?=
+ =?us-ascii?Q?v9NOkAH5GsZiOFZ6kf6C0uFF0wQSRsbFrn/HV44VobkIWJRBGiiJArNalBNY?=
+ =?us-ascii?Q?ADt+emZ9eQf2usgR8VKNkm+pNdP+j0ZOEYwi2s/SKzRAsNxLOIel/9cm9OWI?=
+ =?us-ascii?Q?BxpJ+Ge4aiuKmv3bKUfRoRmTzHaswy2glRA5MqDv4ZpDs7kth+iHTQ=3D=3D?=
 X-Forefront-Antispam-Report:
-	CIP:216.228.117.161;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:dc6edge2.nvidia.com;CAT:NONE;SFS:(13230040)(376014)(82310400026)(36860700013)(1800799024);DIR:OUT;SFP:1101;
+	CIP:216.228.117.160;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:dc6edge1.nvidia.com;CAT:NONE;SFS:(13230040)(1800799024)(376014)(36860700013)(82310400026);DIR:OUT;SFP:1101;
 X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 04 Feb 2025 13:40:38.8142
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 04 Feb 2025 13:40:46.6324
  (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: 625a326d-6c1f-4767-0118-08dd452182f1
+X-MS-Exchange-CrossTenant-Network-Message-Id: 3b1563e8-32d7-4fe1-7eab-08dd452187a3
 X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[216.228.117.161];Helo=[mail.nvidia.com]
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[216.228.117.160];Helo=[mail.nvidia.com]
 X-MS-Exchange-CrossTenant-AuthSource:
-	SA2PEPF00003F64.namprd04.prod.outlook.com
+	MN1PEPF0000F0E0.namprd04.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Anonymous
 X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: IA1PR12MB9062
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DS7PR12MB5933
 
-Currently, when printing channel-level flags in ethtool dump, we are
-going over the banks, and for each bank, we are printing all the flags.
+Currently, when printing channel-level flags in the ethtool dump, we
+iterate over a list where each element represents a flag and a channel.
 
-When JSON support will be added, in per-channel fields we would like to
-have an array that each of its elements represents a channel.
+The list is structured such that, for each channel, all elements with
+the same flag are grouped together.
 
-Therefore, change the loop order so first we loop over the flags, and
-for each one, we print all its channels.
+To accommodate future JSON support, where per-channel fields will be
+represented as an array (with each element corresponding to a specific
+channel), the presentation order needs to change.
+Additionally, the hard-coded channel numbers in the flag names should
+be removed.
 
 Signed-off-by: Danielle Ratson <danieller@nvidia.com>
-Reviewed-by: Amit Cohen <amcohen@nvidia.com>
 ---
- cmis.c | 25 ++++++++++++-------------
- 1 file changed, 12 insertions(+), 13 deletions(-)
 
-diff --git a/cmis.c b/cmis.c
-index 5efafca..9cd2bb1 100644
---- a/cmis.c
-+++ b/cmis.c
-@@ -683,22 +683,19 @@ static void cmis_show_dom_mod_lvl_flags(const struct cmis_memory_map *map)
-  * [1] CMIS Rev. 5, page 162, section 8.9.3, Table 8-77
-  * [1] CMIS Rev. 5, page 164, section 8.9.3, Table 8-78
-  */
--static void cmis_show_dom_chan_lvl_flags_chan(const struct cmis_memory_map *map,
--					      int bank, int chan)
-+static void cmis_show_dom_chan_lvl_flag(const struct cmis_memory_map *map,
-+					int bank, int flag)
- {
- 	const __u8 *page_11h = map->upper_memory[bank][0x11];
- 	int i;
+Notes:
+    v2:
+    	* Simplify sff8636_show_dom().
+
+ module-common.c | 168 ++++++++++++++++++++++++------------------------
+ qsfp.c          |  17 +++--
+ 2 files changed, 95 insertions(+), 90 deletions(-)
+
+diff --git a/module-common.c b/module-common.c
+index ec61b1e..4146a84 100644
+--- a/module-common.c
++++ b/module-common.c
+@@ -87,112 +87,112 @@ const struct module_aw_chan module_aw_chan_flags[] = {
+ 	  CMIS_RX_PWR_AW_LWARN_OFFSET, CMIS_DIAG_CHAN_ADVER_OFFSET,
+ 	  CMIS_RX_PWR_MON_MASK },
  
--	for (i = 0; module_aw_chan_flags[i].fmt_str; i++) {
-+	for (i = 0; i < CMIS_CHANNELS_PER_BANK; i++) {
-+		int chan = bank * CMIS_CHANNELS_PER_BANK + i;
- 		char str[80];
- 
--		if (!(map->page_01h[module_aw_chan_flags[i].adver_offset] &
--		      module_aw_chan_flags[i].adver_value))
--			continue;
+-	{ MODULE_TYPE_SFF8636, "Laser bias current high alarm   (Chan 1)",
++	{ MODULE_TYPE_SFF8636, "Laser bias current high alarm",
+ 	  SFF8636_TX_BIAS_12_AW_OFFSET, 0, (SFF8636_TX_BIAS_1_HALARM) },
+-	{ MODULE_TYPE_SFF8636, "Laser bias current low alarm    (Chan 1)",
+-	  SFF8636_TX_BIAS_12_AW_OFFSET, 0,(SFF8636_TX_BIAS_1_LALARM) },
+-	{ MODULE_TYPE_SFF8636, "Laser bias current high warning (Chan 1)",
+-	  SFF8636_TX_BIAS_12_AW_OFFSET, 0, (SFF8636_TX_BIAS_1_HWARN) },
+-	{ MODULE_TYPE_SFF8636, "Laser bias current low warning  (Chan 1)",
+-	  SFF8636_TX_BIAS_12_AW_OFFSET, 0, (SFF8636_TX_BIAS_1_LWARN) },
 -
--		snprintf(str, 80, module_aw_chan_flags[i].fmt_str, chan + 1);
-+		snprintf(str, 80, module_aw_chan_flags[flag].fmt_str, chan + 1);
- 		printf("\t%-41s : %s\n", str,
--		       page_11h[module_aw_chan_flags[i].offset] & chan ?
-+		       page_11h[module_aw_chan_flags[flag].offset] & chan ?
- 		       "On" : "Off");
+-	{ MODULE_TYPE_SFF8636, "Laser bias current high alarm   (Chan 2)",
++	{ MODULE_TYPE_SFF8636, "Laser bias current high alarm",
+ 	  SFF8636_TX_BIAS_12_AW_OFFSET, 0, (SFF8636_TX_BIAS_2_HALARM) },
+-	{ MODULE_TYPE_SFF8636, "Laser bias current low alarm    (Chan 2)",
+-	  SFF8636_TX_BIAS_12_AW_OFFSET, 0, (SFF8636_TX_BIAS_2_LALARM) },
+-	{ MODULE_TYPE_SFF8636, "Laser bias current high warning (Chan 2)",
+-	  SFF8636_TX_BIAS_12_AW_OFFSET, 0, (SFF8636_TX_BIAS_2_HWARN) },
+-	{ MODULE_TYPE_SFF8636, "Laser bias current low warning  (Chan 2)",
+-	  SFF8636_TX_BIAS_12_AW_OFFSET, 0, (SFF8636_TX_BIAS_2_LWARN) },
+-
+-	{ MODULE_TYPE_SFF8636, "Laser bias current high alarm   (Chan 3)",
++	{ MODULE_TYPE_SFF8636, "Laser bias current high alarm",
+ 	  SFF8636_TX_BIAS_34_AW_OFFSET, 0, (SFF8636_TX_BIAS_3_HALARM) },
+-	{ MODULE_TYPE_SFF8636, "Laser bias current low alarm    (Chan 3)",
+-	  SFF8636_TX_BIAS_34_AW_OFFSET, 0, (SFF8636_TX_BIAS_3_LALARM) },
+-	{ MODULE_TYPE_SFF8636, "Laser bias current high warning (Chan 3)",
+-	  SFF8636_TX_BIAS_34_AW_OFFSET, 0, (SFF8636_TX_BIAS_3_HWARN) },
+-	{ MODULE_TYPE_SFF8636, "Laser bias current low warning  (Chan 3)",
+-	  SFF8636_TX_BIAS_34_AW_OFFSET, 0, (SFF8636_TX_BIAS_3_LWARN) },
+-
+-	{ MODULE_TYPE_SFF8636, "Laser bias current high alarm   (Chan 4)",
++	{ MODULE_TYPE_SFF8636, "Laser bias current high alarm",
+ 	  SFF8636_TX_BIAS_34_AW_OFFSET, 0, (SFF8636_TX_BIAS_4_HALARM) },
+-	{ MODULE_TYPE_SFF8636, "Laser bias current low alarm    (Chan 4)",
++
++	{ MODULE_TYPE_SFF8636, "Laser bias current low alarm",
++	  SFF8636_TX_BIAS_12_AW_OFFSET, 0,(SFF8636_TX_BIAS_1_LALARM) },
++	{ MODULE_TYPE_SFF8636, "Laser bias current low alarm",
++	  SFF8636_TX_BIAS_12_AW_OFFSET, 0, (SFF8636_TX_BIAS_2_LALARM) },
++	{ MODULE_TYPE_SFF8636, "Laser bias current low alarm",
++	  SFF8636_TX_BIAS_34_AW_OFFSET, 0, (SFF8636_TX_BIAS_3_LALARM) },
++	{ MODULE_TYPE_SFF8636, "Laser bias current low alarm",
+ 	  SFF8636_TX_BIAS_34_AW_OFFSET, 0, (SFF8636_TX_BIAS_4_LALARM) },
+-	{ MODULE_TYPE_SFF8636, "Laser bias current high warning (Chan 4)",
++
++	{ MODULE_TYPE_SFF8636, "Laser bias current high warning",
++	  SFF8636_TX_BIAS_12_AW_OFFSET, 0, (SFF8636_TX_BIAS_1_HWARN) },
++	{ MODULE_TYPE_SFF8636, "Laser bias current high warning",
++	  SFF8636_TX_BIAS_12_AW_OFFSET, 0, (SFF8636_TX_BIAS_2_HWARN) },
++	{ MODULE_TYPE_SFF8636, "Laser bias current high warning",
++	  SFF8636_TX_BIAS_34_AW_OFFSET, 0, (SFF8636_TX_BIAS_3_HWARN) },
++	{ MODULE_TYPE_SFF8636, "Laser bias current high warning",
+ 	  SFF8636_TX_BIAS_34_AW_OFFSET, 0, (SFF8636_TX_BIAS_4_HWARN) },
+-	{ MODULE_TYPE_SFF8636, "Laser bias current low warning  (Chan 4)",
++
++	{ MODULE_TYPE_SFF8636, "Laser bias current low warning",
++	  SFF8636_TX_BIAS_12_AW_OFFSET, 0, (SFF8636_TX_BIAS_1_LWARN) },
++	{ MODULE_TYPE_SFF8636, "Laser bias current low warning",
++	  SFF8636_TX_BIAS_12_AW_OFFSET, 0, (SFF8636_TX_BIAS_2_LWARN) },
++	{ MODULE_TYPE_SFF8636, "Laser bias current low warning",
++	  SFF8636_TX_BIAS_34_AW_OFFSET, 0, (SFF8636_TX_BIAS_3_LWARN) },
++	{ MODULE_TYPE_SFF8636, "Laser bias current low warning",
+ 	  SFF8636_TX_BIAS_34_AW_OFFSET, 0, (SFF8636_TX_BIAS_4_LWARN) },
+ 
+-	{ MODULE_TYPE_SFF8636, "Laser tx power high alarm   (Channel 1)",
++	{ MODULE_TYPE_SFF8636, "Laser tx power high alarm",
+ 	  SFF8636_TX_PWR_12_AW_OFFSET, 0, (SFF8636_TX_PWR_1_HALARM) },
+-	{ MODULE_TYPE_SFF8636, "Laser tx power low alarm    (Channel 1)",
+-	  SFF8636_TX_PWR_12_AW_OFFSET, 0, (SFF8636_TX_PWR_1_LALARM) },
+-	{ MODULE_TYPE_SFF8636, "Laser tx power high warning (Channel 1)",
+-	  SFF8636_TX_PWR_12_AW_OFFSET, 0, (SFF8636_TX_PWR_1_HWARN) },
+-	{ MODULE_TYPE_SFF8636, "Laser tx power low warning  (Channel 1)",
+-	  SFF8636_TX_PWR_12_AW_OFFSET, 0, (SFF8636_TX_PWR_1_LWARN) },
+-
+-	{ MODULE_TYPE_SFF8636, "Laser tx power high alarm   (Channel 2)",
++	{ MODULE_TYPE_SFF8636, "Laser tx power high alarm",
+ 	  SFF8636_TX_PWR_12_AW_OFFSET, 0, (SFF8636_TX_PWR_2_HALARM) },
+-	{ MODULE_TYPE_SFF8636, "Laser tx power low alarm    (Channel 2)",
+-	  SFF8636_TX_PWR_12_AW_OFFSET, 0, (SFF8636_TX_PWR_2_LALARM) },
+-	{ MODULE_TYPE_SFF8636, "Laser tx power high warning (Channel 2)",
+-	  SFF8636_TX_PWR_12_AW_OFFSET, 0, (SFF8636_TX_PWR_2_HWARN) },
+-	{ MODULE_TYPE_SFF8636, "Laser tx power low warning  (Channel 2)",
+-	  SFF8636_TX_PWR_12_AW_OFFSET, 0, (SFF8636_TX_PWR_2_LWARN) },
+-
+-	{ MODULE_TYPE_SFF8636, "Laser tx power high alarm   (Channel 3)",
++	{ MODULE_TYPE_SFF8636, "Laser tx power high alarm",
+ 	  SFF8636_TX_PWR_34_AW_OFFSET, 0, (SFF8636_TX_PWR_3_HALARM) },
+-	{ MODULE_TYPE_SFF8636, "Laser tx power low alarm    (Channel 3)",
+-	  SFF8636_TX_PWR_34_AW_OFFSET, 0, (SFF8636_TX_PWR_3_LALARM) },
+-	{ MODULE_TYPE_SFF8636, "Laser tx power high warning (Channel 3)",
+-	  SFF8636_TX_PWR_34_AW_OFFSET, 0, (SFF8636_TX_PWR_3_HWARN) },
+-	{ MODULE_TYPE_SFF8636, "Laser tx power low warning  (Channel 3)",
+-	  SFF8636_TX_PWR_34_AW_OFFSET, 0, (SFF8636_TX_PWR_3_LWARN) },
+-
+-	{ MODULE_TYPE_SFF8636, "Laser tx power high alarm   (Channel 4)",
++	{ MODULE_TYPE_SFF8636, "Laser tx power high alarm",
+ 	  SFF8636_TX_PWR_34_AW_OFFSET, 0, (SFF8636_TX_PWR_4_HALARM) },
+-	{ MODULE_TYPE_SFF8636, "Laser tx power low alarm    (Channel 4)",
++
++	{ MODULE_TYPE_SFF8636, "Laser tx power low alarm",
++	  SFF8636_TX_PWR_12_AW_OFFSET, 0, (SFF8636_TX_PWR_1_LALARM) },
++	{ MODULE_TYPE_SFF8636, "Laser tx power low alarm",
++	  SFF8636_TX_PWR_12_AW_OFFSET, 0, (SFF8636_TX_PWR_2_LALARM) },
++	{ MODULE_TYPE_SFF8636, "Laser tx power low alarm",
++	  SFF8636_TX_PWR_34_AW_OFFSET, 0, (SFF8636_TX_PWR_3_LALARM) },
++	{ MODULE_TYPE_SFF8636, "Laser tx power low alarm",
+ 	  SFF8636_TX_PWR_34_AW_OFFSET, 0, (SFF8636_TX_PWR_4_LALARM) },
+-	{ MODULE_TYPE_SFF8636, "Laser tx power high warning (Channel 4)",
++
++	{ MODULE_TYPE_SFF8636, "Laser tx power high warning",
++	  SFF8636_TX_PWR_12_AW_OFFSET, 0, (SFF8636_TX_PWR_1_HWARN) },
++	{ MODULE_TYPE_SFF8636, "Laser tx power high warning",
++	  SFF8636_TX_PWR_12_AW_OFFSET, 0, (SFF8636_TX_PWR_2_HWARN) },
++	{ MODULE_TYPE_SFF8636, "Laser tx power high warning",
++	  SFF8636_TX_PWR_34_AW_OFFSET, 0, (SFF8636_TX_PWR_3_HWARN) },
++	{ MODULE_TYPE_SFF8636, "Laser tx power high warning",
+ 	  SFF8636_TX_PWR_34_AW_OFFSET, 0, (SFF8636_TX_PWR_4_HWARN) },
+-	{ MODULE_TYPE_SFF8636, "Laser tx power low warning  (Channel 4)",
++
++	{ MODULE_TYPE_SFF8636, "Laser tx power low warning",
++	  SFF8636_TX_PWR_12_AW_OFFSET, 0, (SFF8636_TX_PWR_1_LWARN) },
++	{ MODULE_TYPE_SFF8636, "Laser tx power low warning",
++	  SFF8636_TX_PWR_12_AW_OFFSET, 0, (SFF8636_TX_PWR_2_LWARN) },
++	{ MODULE_TYPE_SFF8636, "Laser tx power low warning",
++	  SFF8636_TX_PWR_34_AW_OFFSET, 0, (SFF8636_TX_PWR_3_LWARN) },
++	{ MODULE_TYPE_SFF8636, "Laser tx power low warning",
+ 	  SFF8636_TX_PWR_34_AW_OFFSET, 0, (SFF8636_TX_PWR_4_LWARN) },
+ 
+-	{ MODULE_TYPE_SFF8636, "Laser rx power high alarm   (Channel 1)",
++	{ MODULE_TYPE_SFF8636, "Laser rx power high alarm",
+ 	  SFF8636_RX_PWR_12_AW_OFFSET, 0, (SFF8636_RX_PWR_1_HALARM) },
+-	{ MODULE_TYPE_SFF8636, "Laser rx power low alarm    (Channel 1)",
+-	  SFF8636_RX_PWR_12_AW_OFFSET, 0, (SFF8636_RX_PWR_1_LALARM) },
+-	{ MODULE_TYPE_SFF8636, "Laser rx power high warning (Channel 1)",
+-	  SFF8636_RX_PWR_12_AW_OFFSET, 0, (SFF8636_RX_PWR_1_HWARN) },
+-	{ MODULE_TYPE_SFF8636, "Laser rx power low warning  (Channel 1)",
+-	  SFF8636_RX_PWR_12_AW_OFFSET, 0, (SFF8636_RX_PWR_1_LWARN) },
+-
+-	{ MODULE_TYPE_SFF8636, "Laser rx power high alarm   (Channel 2)",
++	{ MODULE_TYPE_SFF8636, "Laser rx power high alarm",
+ 	  SFF8636_RX_PWR_12_AW_OFFSET, 0, (SFF8636_RX_PWR_2_HALARM) },
+-	{ MODULE_TYPE_SFF8636, "Laser rx power low alarm    (Channel 2)",
+-	  SFF8636_RX_PWR_12_AW_OFFSET, 0, (SFF8636_RX_PWR_2_LALARM) },
+-	{ MODULE_TYPE_SFF8636, "Laser rx power high warning (Channel 2)",
+-	  SFF8636_RX_PWR_12_AW_OFFSET, 0, (SFF8636_RX_PWR_2_HWARN) },
+-	{ MODULE_TYPE_SFF8636, "Laser rx power low warning  (Channel 2)",
+-	  SFF8636_RX_PWR_12_AW_OFFSET, 0, (SFF8636_RX_PWR_2_LWARN) },
+-
+-	{ MODULE_TYPE_SFF8636, "Laser rx power high alarm   (Channel 3)",
++	{ MODULE_TYPE_SFF8636, "Laser rx power high alarm",
+ 	  SFF8636_RX_PWR_34_AW_OFFSET, 0, (SFF8636_RX_PWR_3_HALARM) },
+-	{ MODULE_TYPE_SFF8636, "Laser rx power low alarm    (Channel 3)",
+-	  SFF8636_RX_PWR_34_AW_OFFSET, 0, (SFF8636_RX_PWR_3_LALARM) },
+-	{ MODULE_TYPE_SFF8636, "Laser rx power high warning (Channel 3)",
+-	  SFF8636_RX_PWR_34_AW_OFFSET, 0, (SFF8636_RX_PWR_3_HWARN) },
+-	{ MODULE_TYPE_SFF8636, "Laser rx power low warning  (Channel 3)",
+-	  SFF8636_RX_PWR_34_AW_OFFSET, 0, (SFF8636_RX_PWR_3_LWARN) },
+-
+-	{ MODULE_TYPE_SFF8636, "Laser rx power high alarm   (Channel 4)",
++	{ MODULE_TYPE_SFF8636, "Laser rx power high alarm",
+ 	  SFF8636_RX_PWR_34_AW_OFFSET, 0, (SFF8636_RX_PWR_4_HALARM) },
+-	{ MODULE_TYPE_SFF8636, "Laser rx power low alarm    (Channel 4)",
++
++	{ MODULE_TYPE_SFF8636, "Laser rx power low alarm",
++	  SFF8636_RX_PWR_12_AW_OFFSET, 0, (SFF8636_RX_PWR_1_LALARM) },
++	{ MODULE_TYPE_SFF8636, "Laser rx power low alarm",
++	  SFF8636_RX_PWR_12_AW_OFFSET, 0, (SFF8636_RX_PWR_2_LALARM) },
++	{ MODULE_TYPE_SFF8636, "Laser rx power low alarm",
++	  SFF8636_RX_PWR_34_AW_OFFSET, 0, (SFF8636_RX_PWR_3_LALARM) },
++	{ MODULE_TYPE_SFF8636, "Laser rx power low alarm",
+ 	  SFF8636_RX_PWR_34_AW_OFFSET, 0, (SFF8636_RX_PWR_4_LALARM) },
+-	{ MODULE_TYPE_SFF8636, "Laser rx power high warning (Channel 4)",
++
++	{ MODULE_TYPE_SFF8636, "Laser rx power high warning",
++	  SFF8636_RX_PWR_12_AW_OFFSET, 0, (SFF8636_RX_PWR_1_HWARN) },
++	{ MODULE_TYPE_SFF8636, "Laser rx power high warning",
++	  SFF8636_RX_PWR_12_AW_OFFSET, 0, (SFF8636_RX_PWR_2_HWARN) },
++	{ MODULE_TYPE_SFF8636, "Laser rx power high warning",
++	  SFF8636_RX_PWR_34_AW_OFFSET, 0, (SFF8636_RX_PWR_3_HWARN) },
++	{ MODULE_TYPE_SFF8636, "Laser rx power high warning",
+ 	  SFF8636_RX_PWR_34_AW_OFFSET, 0, (SFF8636_RX_PWR_4_HWARN) },
+-	{ MODULE_TYPE_SFF8636, "Laser rx power low warning  (Channel 4)",
++
++	{ MODULE_TYPE_SFF8636, "Laser rx power low warning",
++	  SFF8636_RX_PWR_12_AW_OFFSET, 0, (SFF8636_RX_PWR_1_LWARN) },
++	{ MODULE_TYPE_SFF8636, "Laser rx power low warning",
++	  SFF8636_RX_PWR_12_AW_OFFSET, 0, (SFF8636_RX_PWR_2_LWARN) },
++	{ MODULE_TYPE_SFF8636, "Laser rx power low warning",
++	  SFF8636_RX_PWR_34_AW_OFFSET, 0, (SFF8636_RX_PWR_3_LWARN) },
++	{ MODULE_TYPE_SFF8636, "Laser rx power low warning",
+ 	  SFF8636_RX_PWR_34_AW_OFFSET, 0, (SFF8636_RX_PWR_4_LWARN) },
+ 
+ 	{ 0, NULL, 0, 0, 0 },
+diff --git a/qsfp.c b/qsfp.c
+index 5baf3fa..c44f045 100644
+--- a/qsfp.c
++++ b/qsfp.c
+@@ -711,13 +711,18 @@ static void sff8636_show_dom(const struct sff8636_memory_map *map)
  	}
- }
-@@ -708,15 +705,17 @@ cmis_show_dom_chan_lvl_flags_bank(const struct cmis_memory_map *map,
- 				  int bank)
- {
- 	const __u8 *page_11h = map->upper_memory[bank][0x11];
--	int i;
-+	int flag;
  
- 	if (!page_11h)
- 		return;
- 
--	for (i = 0; i < CMIS_CHANNELS_PER_BANK; i++) {
--		int chan = bank * CMIS_CHANNELS_PER_BANK + i;
-+	for (flag = 0; module_aw_chan_flags[flag].fmt_str; flag++) {
-+		if (!(map->page_01h[module_aw_chan_flags[flag].adver_offset] &
-+		      module_aw_chan_flags[flag].adver_value))
-+			continue;
- 
--		cmis_show_dom_chan_lvl_flags_chan(map, bank, chan);
-+		cmis_show_dom_chan_lvl_flag(map, bank, flag);
- 	}
- }
- 
+ 	if (sd.supports_alarms) {
++		bool value;
++
+ 		for (i = 0; module_aw_chan_flags[i].fmt_str; ++i) {
+-			if (module_aw_chan_flags[i].type == MODULE_TYPE_SFF8636)
+-				printf("\t%-41s : %s\n",
+-				       module_aw_chan_flags[i].fmt_str,
+-				       (map->lower_memory[module_aw_chan_flags[i].offset]
+-				        & module_aw_chan_flags[i].adver_value) ?
+-				       "On" : "Off");
++			if (module_aw_chan_flags[i].type != MODULE_TYPE_SFF8636)
++				continue;
++
++			value = map->lower_memory[module_aw_chan_flags[i].offset] &
++				module_aw_chan_flags[i].adver_value;
++			printf("\t%-41s (Chan %d) : %s\n",
++			       module_aw_chan_flags[i].fmt_str,
++			       (i % SFF8636_MAX_CHANNEL_NUM) + 1,
++			       value ? "On" : "Off");
+ 		}
+ 		for (i = 0; module_aw_mod_flags[i].str; ++i) {
+ 			if (module_aw_mod_flags[i].type == MODULE_TYPE_SFF8636)
 -- 
 2.47.0
 
