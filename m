@@ -1,110 +1,184 @@
-Return-Path: <netdev+bounces-162714-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-162715-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id CAB0BA27BCF
-	for <lists+netdev@lfdr.de>; Tue,  4 Feb 2025 20:46:42 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id C8FA7A27BD6
+	for <lists+netdev@lfdr.de>; Tue,  4 Feb 2025 20:47:21 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 637FC162436
-	for <lists+netdev@lfdr.de>; Tue,  4 Feb 2025 19:46:41 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 469007A1EE6
+	for <lists+netdev@lfdr.de>; Tue,  4 Feb 2025 19:46:26 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8990A219A78;
-	Tue,  4 Feb 2025 19:46:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 25E282054EF;
+	Tue,  4 Feb 2025 19:47:05 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="3buDB5fG"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="nC3vRE15"
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ej1-f49.google.com (mail-ej1-f49.google.com [209.85.218.49])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 694AD219A72;
-	Tue,  4 Feb 2025 19:46:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3CD8B20370B;
+	Tue,  4 Feb 2025 19:47:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.49
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1738698374; cv=none; b=XlisrkMeFwjQpG6qDBNYz35v5sH3z4LzMt1P9WPNuIeR2mE8z7iWAju+SBC3w4fUZ8bb6QfBFuaEBLicmfQbJY+K4PEBWPqPjlfmxEgjv+L5EmicS/m84VpifwKMNoVGQ8/P7Y7YKEotsm3XM8JIKUUJdFMHotlcla2XOUa5+U0=
+	t=1738698425; cv=none; b=MvZ3lJ0g+txgndv5EDJsgnJZ0f9QNHWt9G2OkGRyxBPuZeX6YpqRTbj7M/8O5AL4wixwdjXBis4re2FBQXgu37uuHRKxPkA/nWIdI+GU1O7Lrs4BFv885+2lVHOQY/HcZpcWSFsU3V/sOY3WoEVu8YyBzWlkPOJKEVk+7VGvF6c=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1738698374; c=relaxed/simple;
-	bh=r06Ys/KsS4X0Vszu9md9b4R25aJZJCzPxRdr0nQj3y4=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Zk+/qAYjM25ITy4svkh/THwwL41UYLKlX6amnazRQyhvBfNM/BuBwr7pTXGIBRb41MNR2JJy8f9zFjnclyeKWsKDOBMmIao2sM7I4SUbOWa6ZIp0eoNcvg7ndiJxGPnF6Bjc1saq/p8+Gd1KjYfNEq98ngvJsbjQ3tUg/RmwMTc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=3buDB5fG; arc=none smtp.client-ip=156.67.10.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=ouyIGRoRHutzUz66Y2cHQcMvqZJWhjqRJ8fahRg0FpI=; b=3buDB5fGFmO2PF9Z2zP1t/uh4G
-	hEEbKntHnP7+fUZcZt1zxz1yOjr7WwWBjGaq/sKNZ3hq+keI5t9mh5LkNKu7fN8lO0ebNgldJmmr1
-	7b21bZoJOjYuheY/s2UaY74VMsQjY9rWxUeVbKatxBifYOayRrSN4s/PMbD6q1YeEbng=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1tfOrm-00AxD1-Vs; Tue, 04 Feb 2025 20:45:50 +0100
-Date: Tue, 4 Feb 2025 20:45:50 +0100
-From: Andrew Lunn <andrew@lunn.ch>
-To: Chen-Yu Tsai <wens@kernel.org>
-Cc: Andrew Lunn <andrew+netdev@lunn.ch>,
+	s=arc-20240116; t=1738698425; c=relaxed/simple;
+	bh=HoUT6LeQGZhQlYzF3JQ5jjZVjEl9IHiJOmwH5EKCMGU=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=QWDZs7+ttXdbHVUgHdPILi85cHYWcQdGUZ+cwJn7EV1UufAXVa7NxZo6aDOXlM9ZUq18zmoE+wTg2qzFODXsu/rfCpP/SS4uTgZ0/9iBG+eU5DWRCXdeD/072ksbMgIAIOZhv5+dFEqFPO9ggBpMlw4C5Eyk06qT0qujY4zI/Bk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=nC3vRE15; arc=none smtp.client-ip=209.85.218.49
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-ej1-f49.google.com with SMTP id a640c23a62f3a-ab7483b9bf7so248076466b.3;
+        Tue, 04 Feb 2025 11:47:02 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1738698421; x=1739303221; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=yOviihCd4OWzkU4ZWy+QayOXt7VAoSjwQrUlx7gxEjI=;
+        b=nC3vRE15qmDqX4F1wQKgcd68wVxoC81+IKigZbNCajRrLA3tdET+Fs3IrQTY+eGe55
+         g4o2HPUv5nza4pLCopN6iU76rLZzZhmi3b/JUAFE23G8KYf19om66eQOkd78HT0Zl2AI
+         ycqKSC4l0xCbF72hGb0CRRgEuBZ2LiFxJQiZDAJAZCkbHIIQJpjxei3Cdezx6uL7YSs2
+         K22kaiodprYkkS3qJyn07aKl8+a36N9SxhzVgu9+DTSXNDA6b0LZLt76iEPEPCYEh7oR
+         T1Kfr9rlfMWnjsEfatpEEmh+8zxjDHF9TZSmuVbLQyP1gQdOFJvyzOLRueCQDKgHEeOV
+         urig==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1738698421; x=1739303221;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=yOviihCd4OWzkU4ZWy+QayOXt7VAoSjwQrUlx7gxEjI=;
+        b=iDopOMn3OIcOdfGbaK36uRltLWzI/DZ6Cx5FdegfO75MB0hLk6IxG/YmjUhnTAQtjg
+         GEbTVgScqDXmtpZZDq0P7gtr4ZZn2oqaN9+Hq3cYctCLFnBucMIuNipOs7c6rbIkmQHe
+         kkQ9LmBhKkgq2vMZNOnwgVAQDld2OSZVuNo58PbiG18P+bPexoOaTWYjrCgb9s+cpUnA
+         tcWboQRitoZEYv3jjaAqjMeZst/3etz1vgekO0f2I6Wl58CUEJ+y8e7aNA7DGrwwwrbD
+         zRqKA4ZeViA390C3hOSmITBqnBlk2UzqKaIykCeZ+tt+8SXS2ro/Y5T+JppAvAAL7Zy4
+         M6sQ==
+X-Forwarded-Encrypted: i=1; AJvYcCVYDbVwKA9QgUhZFIM9D9KQxOokA2L1BTkrzZI0H9wRGRLSennRH5bNbIGgdtXzIjpn2II3gWmEuXjzelI=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwZiHds4KC5fE8wWKey12UUHP5KoESjLEUDaMB4QxV9YEYJlJ2D
+	OkZ1wl0ZQodOpJEiEHJSCaZnVQzzwQgFLSsmS2b9fbeNOGE7wolU
+X-Gm-Gg: ASbGnct0Xld9hHGpkxVD+OmNRpAKFkoEiBue5HVmbKBOoezf+6BV+Lt+Ns1ZHEQIh8F
+	3oqU8DaJcBVKj9cY+whNFUS4btaVDQMxCyp2kJbNfcE7vV03n7xqusN8gdqPDXedTP87H6ReFZq
+	ay7sTvwhRsmKM8v99DxgwIsJMv/6TtGn6pfa8aZ4+ffOuo37f0ArdmGeZwDMrLN6ktFf8cOJh/D
+	plu1a1o10OqjPBN8sFw3uzJdAriNosgg9CqGLvdEcK2ezLosuxAxDH+TS/vGSHYkMjupy/Rz6Aj
+	oY1NXwqK/SjouxqA2dyIE7n0rFdFXu/61P1khLeU+KgBNHbeDY4gew82sCeWecM0mMLApRyCmlh
+	WhcLTBbNGnbssz8TSXL+tN7syPjXRsMjL
+X-Google-Smtp-Source: AGHT+IHeWXuSOX8ugXi7KX2sQvDZA51J6pn9rqEUJAKyCLo9RjU0qJQZ+hTlul88ONSzO+JY3LViIg==
+X-Received: by 2002:a17:907:2cc5:b0:aa6:9eac:4b8e with SMTP id a640c23a62f3a-ab6cfdbf7e2mr3456200366b.41.1738698421177;
+        Tue, 04 Feb 2025 11:47:01 -0800 (PST)
+Received: from corebook.localdomain (2001-1c00-020d-1300-1b1c-4449-176a-89ea.cable.dynamic.v6.ziggo.nl. [2001:1c00:20d:1300:1b1c:4449:176a:89ea])
+        by smtp.gmail.com with ESMTPSA id 4fb4d7f45d1cf-5dc8838d5a1sm7644954a12.42.2025.02.04.11.46.59
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 04 Feb 2025 11:47:00 -0800 (PST)
+From: Eric Woudstra <ericwouds@gmail.com>
+To: Felix Fietkau <nbd@nbd.name>,
+	Sean Wang <sean.wang@mediatek.com>,
+	Lorenzo Bianconi <lorenzo@kernel.org>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
 	"David S. Miller" <davem@davemloft.net>,
 	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Heiko Stuebner <heiko@sntech.de>,
-	"Russell King (Oracle)" <rmk+kernel@armlinux.org.uk>,
-	Steven Price <steven.price@arm.com>, Chen-Yu Tsai <wens@csie.org>,
-	Kunihiko Hayashi <hayashi.kunihiko@socionext.com>,
-	netdev@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
-	linux-kernel@vger.kernel.org, linux-rockchip@lists.infradead.org,
-	stable@vger.kernel.org
-Subject: Re: [PATCH netdev] net: stmmac: dwmac-rk: Provide FIFO sizes for
- DWMAC 1000
-Message-ID: <ed89be56-b616-4a14-aab2-294fddd89dae@lunn.ch>
-References: <20250204161359.3335241-1-wens@kernel.org>
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Matthias Brugger <matthias.bgg@gmail.com>,
+	AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>,
+	"Frank Wunderlich" <frank-w@public-files.de>,
+	Daniel Golle <daniel@makrotopia.org>
+Cc: netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	linux-arm-kernel@lists.infradead.org,
+	linux-mediatek@lists.infradead.org,
+	Eric Woudstra <ericwouds@gmail.com>
+Subject: [PATCH v2 net-next] net: ethernet: mtk_ppe_offload: Allow QinQ
+Date: Tue,  4 Feb 2025 20:46:24 +0100
+Message-ID: <20250204194624.46560-1-ericwouds@gmail.com>
+X-Mailer: git-send-email 2.47.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250204161359.3335241-1-wens@kernel.org>
+Content-Transfer-Encoding: 8bit
 
-On Wed, Feb 05, 2025 at 12:13:59AM +0800, Chen-Yu Tsai wrote:
-> From: Chen-Yu Tsai <wens@csie.org>
-> 
-> The DWMAC 1000 DMA capabilities register does not provide actual
-> FIFO sizes, nor does the driver really care. If they are not
-> provided via some other means, the driver will work fine, only
-> disallowing changing the MTU setting.
-> 
-> The recent commit 8865d22656b4 ("net: stmmac: Specify hardware
-> capability value when FIFO size isn't specified") changed this by
-> requiring the FIFO sizes to be provided, breaking devices that were
-> working just fine.
-> 
-> Provide the FIFO sizes through the driver's platform data, to not
-> only fix the breakage, but also enable MTU changes. The FIFO sizes
-> are confirmed to be the same across RK3288, RK3328, RK3399 and PX30,
-> based on their respective manuals. It is likely that Rockchip
-> synthesized their DWMAC 1000 with the same parameters on all their
-> chips that have it.
-> 
-> Fixes: eaf4fac47807 ("net: stmmac: Do not accept invalid MTU values")
-> Fixes: 8865d22656b4 ("net: stmmac: Specify hardware capability value when FIFO size isn't specified")
-> Cc: <stable@vger.kernel.org>
-> Signed-off-by: Chen-Yu Tsai <wens@csie.org>
-> ---
-> The reason for stable inclusion is not to fix the device breakage
-> (which only broke in v6.14-rc1), but to provide the values so that MTU
-> changes can work in older kernels.
+mtk_foe_entry_set_vlan() in mtk_ppe.c already seems to support
+double vlan tagging, but mtk_flow_offload_replace() in
+mtk_ppe_offload.c only allows for 1 vlan tag, optionally in
+combination with pppoe and dsa tags.
 
-Allowing the MTU to be changed is probably classed as a new feature,
-not bug fix.
+This patch adds QinQ support to mtk_flow_offload_replace().
 
-I _think_ this also allows flow control, which again is a new feature.
+Only PPPoE-in-Q (as before) and Q-in-Q are allowed. A combination
+of PPPoE and Q-in-Q is not allowed.
 
-Please submit to net-next.
+Signed-off-by: Eric Woudstra <ericwouds@gmail.com>
+---
 
-	Andrew
+Since the RFC v1 did not recieve any comments, I'm sending v2 as PATCH
+unchanged.
+
+Tested on the BPI-R3(mini), on non-dsa-ports and dsa-ports.
+
+ .../net/ethernet/mediatek/mtk_ppe_offload.c   | 21 +++++++++++--------
+ 1 file changed, 12 insertions(+), 9 deletions(-)
+
+diff --git a/drivers/net/ethernet/mediatek/mtk_ppe_offload.c b/drivers/net/ethernet/mediatek/mtk_ppe_offload.c
+index f20bb390df3a..c19789883a9d 100644
+--- a/drivers/net/ethernet/mediatek/mtk_ppe_offload.c
++++ b/drivers/net/ethernet/mediatek/mtk_ppe_offload.c
+@@ -34,8 +34,10 @@ struct mtk_flow_data {
+ 	u16 vlan_in;
+ 
+ 	struct {
+-		u16 id;
+-		__be16 proto;
++		struct {
++			u16 id;
++			__be16 proto;
++		} vlans[2];
+ 		u8 num;
+ 	} vlan;
+ 	struct {
+@@ -349,18 +351,19 @@ mtk_flow_offload_replace(struct mtk_eth *eth, struct flow_cls_offload *f,
+ 		case FLOW_ACTION_CSUM:
+ 			break;
+ 		case FLOW_ACTION_VLAN_PUSH:
+-			if (data.vlan.num == 1 ||
++			if (data.vlan.num + data.pppoe.num == 2 ||
+ 			    act->vlan.proto != htons(ETH_P_8021Q))
+ 				return -EOPNOTSUPP;
+ 
+-			data.vlan.id = act->vlan.vid;
+-			data.vlan.proto = act->vlan.proto;
++			data.vlan.vlans[data.vlan.num].id = act->vlan.vid;
++			data.vlan.vlans[data.vlan.num].proto = act->vlan.proto;
+ 			data.vlan.num++;
+ 			break;
+ 		case FLOW_ACTION_VLAN_POP:
+ 			break;
+ 		case FLOW_ACTION_PPPOE_PUSH:
+-			if (data.pppoe.num == 1)
++			if (data.pppoe.num == 1 ||
++			    data.vlan.num == 2)
+ 				return -EOPNOTSUPP;
+ 
+ 			data.pppoe.sid = act->pppoe.sid;
+@@ -450,11 +453,11 @@ mtk_flow_offload_replace(struct mtk_eth *eth, struct flow_cls_offload *f,
+ 	if (offload_type == MTK_PPE_PKT_TYPE_BRIDGE)
+ 		foe.bridge.vlan = data.vlan_in;
+ 
+-	if (data.vlan.num == 1) {
+-		if (data.vlan.proto != htons(ETH_P_8021Q))
++	for (i = 0; i < data.vlan.num; i++) {
++		if (data.vlan.vlans[i].proto != htons(ETH_P_8021Q))
+ 			return -EOPNOTSUPP;
+ 
+-		mtk_foe_entry_set_vlan(eth, &foe, data.vlan.id);
++		mtk_foe_entry_set_vlan(eth, &foe, data.vlan.vlans[i].id);
+ 	}
+ 	if (data.pppoe.num == 1)
+ 		mtk_foe_entry_set_pppoe(eth, &foe, data.pppoe.sid);
+-- 
+2.47.1
+
 
