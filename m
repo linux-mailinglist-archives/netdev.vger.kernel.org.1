@@ -1,229 +1,177 @@
-Return-Path: <netdev+bounces-162432-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-162433-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id D2643A26E0B
-	for <lists+netdev@lfdr.de>; Tue,  4 Feb 2025 10:19:35 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3662AA26E33
+	for <lists+netdev@lfdr.de>; Tue,  4 Feb 2025 10:24:31 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 12CCA166324
-	for <lists+netdev@lfdr.de>; Tue,  4 Feb 2025 09:19:33 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id E49EF1886C99
+	for <lists+netdev@lfdr.de>; Tue,  4 Feb 2025 09:24:35 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 79C56207A37;
-	Tue,  4 Feb 2025 09:19:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8242F207A00;
+	Tue,  4 Feb 2025 09:24:27 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="NyAFoNZE"
+	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="hQ1rqnsH"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pj1-f74.google.com (mail-pj1-f74.google.com [209.85.216.74])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from NAM02-BN1-obe.outbound.protection.outlook.com (mail-bn1nam02on2040.outbound.protection.outlook.com [40.107.212.40])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BB9BC207A3A
-	for <netdev@vger.kernel.org>; Tue,  4 Feb 2025 09:19:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.74
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1738660769; cv=none; b=r3gjgvoJRMR81M6uVOosrLUI97Og8CEd33MwrNcda9Ts7aZMv3OEx7ftX2xgO/wVj+7JFFzYKyuzz/CIzteZATczD1cNLBQYRSaikf+hPpCBvbgZS1TtlqQRDnvn8UQEcEmMiWe6rogLOwvWPK6Gik8lrQOlrLWK3zK86223FwY=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1738660769; c=relaxed/simple;
-	bh=+2Uwn1dlReU+p25WQX1k/dHw7cKSwopnEmrxDwBmxnQ=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=PDW6Vu+o9oC6hwGnb0GCNyFP/Le1CPyER8lekQQ1RH0wZtNo3nJMBtS3liCUJNFmY9PKAjgIwWpjufZrQTsAHmT65SoJ5LCs7R3RA5U/XePgoLFocv2JhynzB0r3gnVQQtr1k98HlYk66llABMZSf+fcWSm6NZmuQ5IinQmai0Y=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--yuyanghuang.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=NyAFoNZE; arc=none smtp.client-ip=209.85.216.74
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--yuyanghuang.bounces.google.com
-Received: by mail-pj1-f74.google.com with SMTP id 98e67ed59e1d1-2f9c34c0048so1470378a91.3
-        for <netdev@vger.kernel.org>; Tue, 04 Feb 2025 01:19:27 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1738660767; x=1739265567; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:from:subject:message-id:references
-         :mime-version:in-reply-to:date:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=lfosGC18V72Sx7nmApv3fJtv3M6FvNlLvFgvaD2d+1s=;
-        b=NyAFoNZELOMkQXPb5m7/bLjUFK9fDbh6zw+Xy4jJ6Etsu0Lf00xa7AbW7FPSZ0313G
-         W9bODi6HNb9nAIf24SUTeLag1ODzpxFyEtaOHnLaHtvSj/JGhNMdeu3eHn8VGTyQ0uvp
-         auYDSuAVTpTgNTl6WhC4tp2NhBsSeGwtwZOxg2sOsIP+Aza/IAX4aQs1Y+v6Nz7Pcjio
-         IbQaOgPmDImHUb3Ne827RgB8p6puyXFzD5SQLvsWwIInQ+2hWKL6o9QDy7jd194RnjGJ
-         y1T20Wbl9JYDftbQfLb1Yc0ozmWlZpp/PQaPcIx5RI04YyeJk2tBYTqUngplF7xXTocr
-         lXOg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1738660767; x=1739265567;
-        h=content-transfer-encoding:cc:to:from:subject:message-id:references
-         :mime-version:in-reply-to:date:x-gm-message-state:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=lfosGC18V72Sx7nmApv3fJtv3M6FvNlLvFgvaD2d+1s=;
-        b=QpwiaAy0w38osKiP+4VHOuJAis39pVVu2DzfAyNE9kugSQdDbFmMmoyQESffjW1+gX
-         iOkqTTcVfLlZO2LA7YgyRAnhhrRlcFBQWt6m0BwhbDzekb4F5EBxjvqsxW9LlHG7L7wJ
-         y/5KREHd+WsBwAY7AoFOet0gp1fGveQzOTrPLeVf08s9zcmK9U64GLlGBVi++71UZqmt
-         npjbUTSV5FurvjDjuMLNJ/bptCKb1a06I86/Kz2EFyonPc/592Aw9kDRRf/AnVq3JfRG
-         jbPYgaxZ38STWoRNxpFN/00aQxysJFHDo01v2G0/tz17/6gfeDMX5ARXbpAQqkcCACmR
-         6ORg==
-X-Forwarded-Encrypted: i=1; AJvYcCVp+LuW8oLzxeqN4PRHNi/MJjrpifOuHNQoztquHr21k7H/6gDEpznLxjDI6mAfeVZjN+tTGQU=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyYY8xAzYTJqQ+G7gNJfVEa+/sD+knJch4BlkWf5pHfJ4/+qGXe
-	dfzT7YjDTROAh+tyl1DYgvxyx5nMcXECdmHMxEB4w6ebtGc9mn/RV6v2DHBlYu7bIVw6HUn02G8
-	nmGOGPLPgPUQvNVmgQT/jwg==
-X-Google-Smtp-Source: AGHT+IFYIQIFD/gK0d6v3SZwEHcXfXXpG8Mg55A3HITfVJNPw9tDzBqUAqo8T545lDmVO+CfUMNbBrUEkot1nYcHsw==
-X-Received: from pfbil12.prod.google.com ([2002:a05:6a00:8d4c:b0:72f:f8ad:8649])
- (user=yuyanghuang job=prod-delivery.src-stubby-dispatcher) by
- 2002:a05:6a00:2443:b0:71d:f4ef:6b3a with SMTP id d2e1a72fcca58-72fd0c97f99mr36855779b3a.21.1738660766861;
- Tue, 04 Feb 2025 01:19:26 -0800 (PST)
-Date: Tue,  4 Feb 2025 18:19:17 +0900
-In-Reply-To: <20250204091918.2652604-1-yuyanghuang@google.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AE576205E26;
+	Tue,  4 Feb 2025 09:24:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.212.40
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1738661067; cv=fail; b=jFDTF7Q4oU/OPvrljtJ/xgsKt8aV8lCVUbWd5/TSolAuvKuJClUY26V/XCKMpcbEOqpUCvuyxZjmqnUvSayYjLpEoIUejRbDS6ujD7YFCMSx58q2qJsyfk7uJCzIQVjyP73DY/DjfQeVYUrjgDofpun8jy8vl4Foz88+nYHr9zc=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1738661067; c=relaxed/simple;
+	bh=6MkKkRioUn5WRnWFyDOFDmP9efdnWY/Rxr5xTGUSia8=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:Content-Type:
+	 Content-Disposition:In-Reply-To:MIME-Version; b=o0LHdW31stLXFNF+rK2dVgE7BvQrAXl4qDNVO7d7KUDoU+prTNNnKrw6mcZijWUyj8C5CjwvPD8KAyjio9/aKS1ZBAbXvVvl/EnoaeqWc69fdQhu6QEStH9vsWbYv2S3NjRj9OcjeojCmOsLftGc91aFyqSYyCF0Ht3GoUPDHTY=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=hQ1rqnsH; arc=fail smtp.client-ip=40.107.212.40
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=mZA4XhVCd6v7h6321j9YrWuc4lwPCWGw5Gq5TKiu4vHtNHWyT20jAObA4PzSbXSisP6s5MTvGkOxgP5Uw5Oi5jz6EuKVMT/YZPlybyzCEL8b7TyRfVh89MyMyOI9BmMf9PNqDq99fIr4ZsJDwFWeJwFa5P0rGXPGNST5XhTiVhEmYJ0jHixn8ZY0WAmrNH7Cxsb61t9E8/Q9uQGJayk9JLrkYOhm8/UAN8Pem52qnTIQSJSuW5Q1Q8ziy6Sju8MLtEDzPhKrIiY4BZznIzjz92FTRAFZ17ecU0b68fc7JkpycuDAeDmbfEDmVO4uOWqwvHN4EW98JjTw01Ja5DrUig==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=ifQbiIm1cCHj1WbAwQKRihPbrgfFdXQmaGoUO6kfV6M=;
+ b=F0faWhY2uEFIyPR4z/4fVXFDL4tWezG33SOkLzL3mWc4zr5yJIj3ZP9GMHMXxJQBmMxCNxzN8JJjuJ1JEtRNffFHNerB2eQ7LJrDzMR5CdiWpn//PV6RGlEKhsUdp+q/zTrVhIlkHlr780tZjLn/wplnBzR7T6aqT9sMYSmHopfjxEBBt+vGpOvnHsllzraZMM6OQk+9Nx+T4U6Sr6b9NXsfZl5nXIHUdTUaAO+hD3hOSxdld7kGw070mQp2iUmJu9Qheo0InJy/VRAGgX7MeMKlLtKWrcJ68R4umUZ7nUlXUH9DVgmBVIdSC+pGRRqybhpAPCRjF1XT/r8C3CVHdQ==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
+ dkim=pass header.d=nvidia.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=ifQbiIm1cCHj1WbAwQKRihPbrgfFdXQmaGoUO6kfV6M=;
+ b=hQ1rqnsH08J2qWyOSekIjyf1O6Pt6HBiaGthNodu0LhvZ4MOURa4UbGB+bY+nJrQoCcOr7TnxU4usr842ciIuGRZPen4H666zEm/XHXiuALpZnc8xx8RTG1de0eSbZntKoAhltomg+oooR+M/OoMg5aFd79MifxDglZR3WrOsD2HCPctWy6/uruZWlL6t2sVQ5WAOk4RC+jth0ZwLTrp9JrkCjrx8+SiDjXbxthhFw1ifTRZ3HT6iKhJKtbjAWW0EJMABKGzJkawaU7csgUGKsjxQK2CnF/1hsM7vLNXviK3Yfb/SzB9mPX8Nc1PgFf+peJHXn+utc3hy0W+tbNYBg==
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=nvidia.com;
+Received: from SA3PR12MB7901.namprd12.prod.outlook.com (2603:10b6:806:306::12)
+ by MW4PR12MB8612.namprd12.prod.outlook.com (2603:10b6:303:1ec::13) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8398.21; Tue, 4 Feb
+ 2025 09:24:22 +0000
+Received: from SA3PR12MB7901.namprd12.prod.outlook.com
+ ([fe80::66fc:f8a2:1bfb:6de8]) by SA3PR12MB7901.namprd12.prod.outlook.com
+ ([fe80::66fc:f8a2:1bfb:6de8%6]) with mapi id 15.20.8398.020; Tue, 4 Feb 2025
+ 09:24:23 +0000
+Date: Tue, 4 Feb 2025 11:24:11 +0200
+From: Ido Schimmel <idosch@nvidia.com>
+To: linux@treblig.org
+Cc: petrm@nvidia.com, andrew+netdev@lunn.ch, davem@davemloft.net,
+	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH net-next] mlxsw: spectrum_router: Remove unused functions
+Message-ID: <Z6Hcu4RgM53fS0rr@shredder>
+References: <20250203190141.204951-1-linux@treblig.org>
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250203190141.204951-1-linux@treblig.org>
+X-ClientProxiedBy: FR2P281CA0039.DEUP281.PROD.OUTLOOK.COM
+ (2603:10a6:d10:92::10) To SA3PR12MB7901.namprd12.prod.outlook.com
+ (2603:10b6:806:306::12)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-References: <20250204091918.2652604-1-yuyanghuang@google.com>
-X-Mailer: git-send-email 2.48.1.362.g079036d154-goog
-Message-ID: <20250204091918.2652604-2-yuyanghuang@google.com>
-Subject: [PATCH net-next, v7 2/2] selftests/net: Add selftest for IPv4
- RTM_GETMULTICAST support
-From: Yuyang Huang <yuyanghuang@google.com>
-To: Yuyang Huang <yuyanghuang@google.com>
-Cc: "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, 
-	David Ahern <dsahern@kernel.org>, netdev@vger.kernel.org, 
-	Donald Hunter <donald.hunter@gmail.com>, Shuah Khan <shuah@kernel.org>, 
-	Nikolay Aleksandrov <razor@blackwall.org>, Hangbin Liu <liuhangbin@gmail.com>, 
-	Daniel Borkmann <daniel@iogearbox.net>, linux-kselftest@vger.kernel.org, 
-	"=?UTF-8?q?Maciej=20=C5=BBenczykowski?=" <maze@google.com>, Lorenzo Colitti <lorenzo@google.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+MIME-Version: 1.0
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: SA3PR12MB7901:EE_|MW4PR12MB8612:EE_
+X-MS-Office365-Filtering-Correlation-Id: b755a513-8363-40d0-8a0c-08dd44fdb617
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;ARA:13230040|1800799024|376014|366016|7053199007;
+X-Microsoft-Antispam-Message-Info:
+	=?us-ascii?Q?oC6aR3QzcEDIuAG434/cIojE0neTYMb7cr1AIKgEZ8/MQq+Mgf8TLsNXEMAk?=
+ =?us-ascii?Q?MqguFUW+/ucngGwX6OOelD2MABfkLgNKkHhGWWfujIP+tAN3zgRjxAYdonGb?=
+ =?us-ascii?Q?qhM33FYU5HogfDFKKmiGi8uT1K9gm4voxhdnd65U7MVe0Wgrd5daKuh0+VZF?=
+ =?us-ascii?Q?3B02YzUnrwvQZewcUVqlx0WfUGGdsRs4+Ka/tYvV3KLOchGB+HTtSO9GfvjM?=
+ =?us-ascii?Q?qlxX1FqFsI2S5u0KLKtY6EFQ7qwQ0qvt7pI7U50zQKi638LgTTOM9e9d5Qlo?=
+ =?us-ascii?Q?L4sySeJkVjIWiBOjeYHV1HABEupn1WxOWQIS2ifddLVo9ft2nsBSPUDwDc+j?=
+ =?us-ascii?Q?tco0s6He9Xv1xSSSNU5F+zT+pR9UBUjchfbWNegN/fUJVfarpwF6SlPsUHdS?=
+ =?us-ascii?Q?w7JQoRWcFAblmMA9AFBMXZrBh234ez7aotrTWDP20+kzwJ/BnW/yaCDlzywc?=
+ =?us-ascii?Q?2ryrIMiTjHoC9fRZa1pSNXRFbqh6B9z+fd6gIe1FgCauq95Q6pn6qSE1F6HI?=
+ =?us-ascii?Q?TfX0v8xzGahPPylh968vIq3EUC/HqEDoZ4bof0uG6RDnlD+5lY+P9muUdlsV?=
+ =?us-ascii?Q?t8ntLHYV84a7wJdAZpClFqWGAO8z6p8Y6mI1Mnbn1DBymdSKv1pjKz10PI8A?=
+ =?us-ascii?Q?JgSrKjl7Kmid1iY+y3MFIZi2FAPg5+VJK+luv9aENzsmkkU/kl3js/MG2Vdo?=
+ =?us-ascii?Q?gqsDfkTQ/5NKJ7XBcPyDtCQ6lhZ/YDGFlfRS/wz6QTggSONnOavDLGWSDA2l?=
+ =?us-ascii?Q?4AaPExprnh14Rh3tkalHePITTzAaLwwkIgNBEp7xlBi51OPUCJrU1Ii3mfqJ?=
+ =?us-ascii?Q?2ZP8+0+V6mC7WJ+tHURcWSzxGOaA9Hy3e2hM7anuY2w95EUQs4E+cMFA/wtN?=
+ =?us-ascii?Q?MlCvreKyprpD7wABUo+0yJBm74kjn3rDA0HNZFIzItrlzMUWfUR/7F6gTm0h?=
+ =?us-ascii?Q?AwUzraPMqnL8e57JDP/oBOIu7WunguLyVdQz0Cj5sP8ou5dSbcVYtmrUXV8G?=
+ =?us-ascii?Q?+fE5XXUpR99urgpDVhVQzhOpN8BOxeLS1Hen9YoEnv/NkDvwGk4/46m4f7Y+?=
+ =?us-ascii?Q?UjXWJnh514UTJfe611tBJMtZs03lH2t4Pvdnn+lwMyZVrzfj9tUkBW+MqxVm?=
+ =?us-ascii?Q?2ILHto4xIYU7vKe5TXCzrfs6+GZbC9SzUKrTdQkO5ukPtIarrjq1uXYNEunL?=
+ =?us-ascii?Q?WtvPDa4pBxLQxabhIvD0IGvz07AhIeR0BOMTwHfT4yNg0l6WQypoSIbZZFOw?=
+ =?us-ascii?Q?ayVEe9RCgiYs52qruQ2dTi8JNbAvDZ4uCuPZYPLQMOnK7tFMxNSga0VNfccR?=
+ =?us-ascii?Q?rxMz8v6AJXVqEzmCpt2jk8ss4k6KSORsVw1TiHxq8M8xiuUh+DUoD1/1ehna?=
+ =?us-ascii?Q?NVWbOXOMUadXwQ47iUh7TbhQvVZE?=
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SA3PR12MB7901.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(1800799024)(376014)(366016)(7053199007);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?us-ascii?Q?Q4ymuDhcgdAuwdR6ucst4VJNU6r2AELjtuQZd99GHa4bGQ9q2IyOEMaZjlh2?=
+ =?us-ascii?Q?hDtNoj3NAYW/Z6MRVgmSr5JKsPK8EIxFit4X4PIr4iEogQuqignpboiuxdtE?=
+ =?us-ascii?Q?3bDwprffkdsnBB0ewMRMwLXtvPy2v0N+qHZCEKN2kH0Y++Su4NxKwGFWQTkI?=
+ =?us-ascii?Q?KQbCbs8qJBSt8U+I78B8+pc+gfcijWGz/ob4y6Jar5WT4tlcoAJK9dy0t/6S?=
+ =?us-ascii?Q?xOiMtKgmpEAP/ChKy+RVAXcpjniZoIP1GvmAvYfpr2ijoip+uh29hlIs/DiG?=
+ =?us-ascii?Q?Bfi5YKl8+IxruIylgKPHk9+ksQO8gcFk6QB7h04iZJJ6kQtWvf1g5sqgWwVP?=
+ =?us-ascii?Q?II5ymCdToyeVDgn9qVwrdUxWAIlrAsS4IccF8T+bivOFcSW06UnX26QmdRRQ?=
+ =?us-ascii?Q?cfaiDCV7ArVXiRml4eNhKt7Dt1Tw7AVV130DDfD4eV0zpP1Z0gZROJz5Ui0Z?=
+ =?us-ascii?Q?ebf3UrhhA/6xG2yzObiE92Q4GSWMtaKDDbsGmTr+r6JvCdPrGDENZP3iinn8?=
+ =?us-ascii?Q?+SsCHwpsAOqrkg5rIOkvUXuA13yQk5T4056YHX0346HJsJKN67ZUw4n/K7+V?=
+ =?us-ascii?Q?egCnd9iq6mvU1HUCsJbpI7Ay5xSrHzblqCTVxl5Lxv2IKg9bI5YfFwCvm3XC?=
+ =?us-ascii?Q?rwA4SWc39UvL3REQknTF9TuAiZOAbVA5yi4nd+idEZRvFBroznBedp0hypuH?=
+ =?us-ascii?Q?Iz1C4Y8WR/b3xtRMXh8H28/CB7W9a14Pg6h6jXYxkbmc0KkIHrwwgT2ldnHl?=
+ =?us-ascii?Q?7EKDuu4933jYD9vugxud/f2wIP8bXMDryL1w8gueM6DlIHa9jyRzld2ozdKA?=
+ =?us-ascii?Q?sjd/hX5QhYsWz77z7a5A2VCh60TJACUV2KuutO5MlEyzPaQGIE58ppv8FRz3?=
+ =?us-ascii?Q?t6pRu3RaWcSBhMweMiFdqphnlcxSOKqnKFKVF7I74TT28I0LYOQPjii02/T4?=
+ =?us-ascii?Q?TSxIbXlkSbIcCjOkouyvU9CU8ZMXLgXyu5UMoIed122rv4fZpBGbZkO+skSo?=
+ =?us-ascii?Q?sm85WO7pZHKYd2YHzbURzOLI0r5wMNxGGx/IDre3doCRW3+eF5nv1hfGup4m?=
+ =?us-ascii?Q?CgT9lWb7ARLyFZXxtKq/ySSvamrcKrWiYZItcEKdC2CxjS3e/lFRmGq1IaGH?=
+ =?us-ascii?Q?/89HoJxDZW+BZjCTPyq5eX7BEH43/JogInYzDrMJiGKtCLvGRJLffOFgKie2?=
+ =?us-ascii?Q?BzD+yQ/eIBWkQfohSAUMhcUUqu8y0mFzmWbiIn0Ks+Cz9QXlNXWzsCwVKn6U?=
+ =?us-ascii?Q?ako1x7qrCgwJAwgAg0L+/UPaDhBuOxzrH58E2Up9zABf0Z1RWCRvDHrfEFtU?=
+ =?us-ascii?Q?ODgNewybNcE950ILFiZ1MPe9jYbxXHENoEJoa5K07I9OoZhASM/DYmjTcoX2?=
+ =?us-ascii?Q?ybvW2q28mcl0iOx1tIINsXKvrSEcs77m1jaaJR9R9drgqqUAISUT2evEi+bS?=
+ =?us-ascii?Q?lSObA8+mIX0sR1AmjSBldYIHWHnFwzakio207/hepUlZfJwpbWA6awr3YeYQ?=
+ =?us-ascii?Q?B38lamdGMavkQLzx6GaKzr5Njbvd+v2eU9QCqh92VFfXTYZivCNzjXJM3HJz?=
+ =?us-ascii?Q?vEFTVT/kybGb2aJP7UU9MBY2KqQT7YZZHAqKE6RR?=
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: b755a513-8363-40d0-8a0c-08dd44fdb617
+X-MS-Exchange-CrossTenant-AuthSource: SA3PR12MB7901.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 04 Feb 2025 09:24:23.0275
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: a0uoigQrpzX5ktnBUcgcMZQGcU/ehjlAPLf8ucs9GL4MhWGSM00bRq9la/1bBXJqQnPiPNiJjzwpTs7/wxk7GQ==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: MW4PR12MB8612
 
-This change introduces a new selftest case to verify the functionality
-of dumping IPv4 multicast addresses using the RTM_GETMULTICAST netlink
-message. The test utilizes the ynl library to interact with the
-netlink interface and validate that the kernel correctly reports the
-joined IPv4 multicast addresses.
+On Mon, Feb 03, 2025 at 07:01:41PM +0000, linux@treblig.org wrote:
+> From: "Dr. David Alan Gilbert" <linux@treblig.org>
+> 
+> mlxsw_sp_ipip_lb_ul_vr_id() has been unused since 2020's
+> commit acde33bf7319 ("mlxsw: spectrum_router: Reduce
+> mlxsw_sp_ipip_fib_entry_op_gre4()")
+> 
+> mlxsw_sp_rif_exists() has been unused since 2023's
+> commit 49c3a615d382 ("mlxsw: spectrum_router: Replay MACVLANs when RIF is
+> made")
+> 
+> mlxsw_sp_rif_vid() has been unused since 2023's
+> commit a5b52692e693 ("mlxsw: spectrum_switchdev: Manage RIFs on PVID
+> change")
+> 
+> Remove them.
+> 
+> Signed-off-by: Dr. David Alan Gilbert <linux@treblig.org>
 
-To run the test, execute the following command:
+Reviewed-by: Ido Schimmel <idosch@nvidia.com>
 
-$ vng -v --user root --cpus 16 -- \
-    make -C tools/testing/selftests TARGETS=3Dnet \
-    TEST_PROGS=3Drtnetlink.py TEST_GEN_PROGS=3D"" run_tests
-
-Cc: Maciej =C5=BBenczykowski <maze@google.com>
-Cc: Lorenzo Colitti <lorenzo@google.com>
-Signed-off-by: Yuyang Huang <yuyanghuang@google.com>
----
-
-Changelog since v6:
-- Move `getmaddrs` definition to rt_addr.yaml.
-
- Documentation/netlink/specs/rt_addr.yaml  | 23 +++++++++++++++++
- tools/testing/selftests/net/Makefile      |  1 +
- tools/testing/selftests/net/lib/py/ynl.py |  4 +--
- tools/testing/selftests/net/rtnetlink.py  | 30 +++++++++++++++++++++++
- 4 files changed, 56 insertions(+), 2 deletions(-)
- create mode 100755 tools/testing/selftests/net/rtnetlink.py
-
-diff --git a/Documentation/netlink/specs/rt_addr.yaml b/Documentation/netli=
-nk/specs/rt_addr.yaml
-index cbee1cedb177..5dd5469044c7 100644
---- a/Documentation/netlink/specs/rt_addr.yaml
-+++ b/Documentation/netlink/specs/rt_addr.yaml
-@@ -168,6 +168,29 @@ operations:
-         reply:
-           value: 20
-           attributes: *ifaddr-all
-+    -
-+      name: getmaddrs
-+      doc: Get / dump IPv4/IPv6 multicast addresses.
-+      attribute-set: addr-attrs
-+      fixed-header: ifaddrmsg
-+      do:
-+        request:
-+          value: 58
-+          attributes:
-+            - ifa-family
-+            - ifa-index
-+        reply:
-+          value: 58
-+          attributes: &mcaddr-attrs
-+            - ifa-multicast
-+            - ifa-cacheinfo
-+      dump:
-+        request:
-+          value: 58
-+            - ifa-family
-+        reply:
-+          value: 58
-+          attributes: *mcaddr-attrs
-=20
- mcast-groups:
-   list:
-diff --git a/tools/testing/selftests/net/Makefile b/tools/testing/selftests=
-/net/Makefile
-index 73ee88d6b043..e2f03211f9b3 100644
---- a/tools/testing/selftests/net/Makefile
-+++ b/tools/testing/selftests/net/Makefile
-@@ -36,6 +36,7 @@ TEST_PROGS +=3D cmsg_so_priority.sh
- TEST_PROGS +=3D cmsg_time.sh cmsg_ipv6.sh
- TEST_PROGS +=3D netns-name.sh
- TEST_PROGS +=3D nl_netdev.py
-+TEST_PROGS +=3D rtnetlink.py
- TEST_PROGS +=3D srv6_end_dt46_l3vpn_test.sh
- TEST_PROGS +=3D srv6_end_dt4_l3vpn_test.sh
- TEST_PROGS +=3D srv6_end_dt6_l3vpn_test.sh
-diff --git a/tools/testing/selftests/net/lib/py/ynl.py b/tools/testing/self=
-tests/net/lib/py/ynl.py
-index ad1e36baee2a..7b1e29467e46 100644
---- a/tools/testing/selftests/net/lib/py/ynl.py
-+++ b/tools/testing/selftests/net/lib/py/ynl.py
-@@ -38,8 +38,8 @@ class EthtoolFamily(YnlFamily):
-=20
-=20
- class RtnlFamily(YnlFamily):
--    def __init__(self, recv_size=3D0):
--        super().__init__((SPEC_PATH / Path('rt_link.yaml')).as_posix(),
-+    def __init__(self, recv_size=3D0, spec=3D'rt_link.yaml'):
-+        super().__init__((SPEC_PATH / Path(spec)).as_posix(),
-                          schema=3D'', recv_size=3Drecv_size)
-=20
-=20
-diff --git a/tools/testing/selftests/net/rtnetlink.py b/tools/testing/selft=
-ests/net/rtnetlink.py
-new file mode 100755
-index 000000000000..b12e12827219
---- /dev/null
-+++ b/tools/testing/selftests/net/rtnetlink.py
-@@ -0,0 +1,30 @@
-+#!/usr/bin/env python3
-+# SPDX-License-Identifier: GPL-2.0
-+
-+from lib.py import ksft_exit, ksft_run, ksft_ge, RtnlFamily
-+import socket
-+
-+IPV4_ALL_HOSTS_MULTICAST =3D b'\xe0\x00\x00\x01'
-+
-+def dump_mcaddr_check(rtnl: RtnlFamily) -> None:
-+    """
-+    Verify that at least one interface has the IPv4 all-hosts multicast ad=
-dress.
-+    At least the loopback interface should have this address.
-+    """
-+
-+    addresses =3D rtnl.getmaddrs({"ifa-family": socket.AF_INET}, dump=3DTr=
-ue)
-+
-+    all_host_multicasts =3D [
-+        addr for addr in addresses if addr['ifa-multicast'] =3D=3D IPV4_AL=
-L_HOSTS_MULTICAST
-+    ]
-+
-+    ksft_ge(len(all_host_multicasts), 1,
-+            "No interface found with the IPv4 all-hosts multicast address"=
-)
-+
-+def main() -> None:
-+    rtnl =3D RtnlFamily(spec=3D'rt_addr.yaml')
-+    ksft_run([dump_mcaddr_check], args=3D(rtnl, ))
-+    ksft_exit()
-+
-+if __name__ =3D=3D "__main__":
-+    main()
---=20
-2.48.1.362.g079036d154-goog
-
+Thanks
 
