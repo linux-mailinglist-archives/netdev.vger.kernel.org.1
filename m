@@ -1,143 +1,143 @@
-Return-Path: <netdev+bounces-162741-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-162744-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 004AEA27C97
-	for <lists+netdev@lfdr.de>; Tue,  4 Feb 2025 21:15:10 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 79AE6A27CD8
+	for <lists+netdev@lfdr.de>; Tue,  4 Feb 2025 21:34:55 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 754A93A3E99
-	for <lists+netdev@lfdr.de>; Tue,  4 Feb 2025 20:15:02 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 5B548188682E
+	for <lists+netdev@lfdr.de>; Tue,  4 Feb 2025 20:35:00 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B8418219A80;
-	Tue,  4 Feb 2025 20:14:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6470F219A9D;
+	Tue,  4 Feb 2025 20:34:50 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=alliedtelesis.co.nz header.i=@alliedtelesis.co.nz header.b="j+bv7sTF"
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=engleder-embedded.com header.i=@engleder-embedded.com header.b="wH/g5+st"
 X-Original-To: netdev@vger.kernel.org
-Received: from gate2.alliedtelesis.co.nz (gate2.alliedtelesis.co.nz [202.36.163.20])
+Received: from mx05lb.world4you.com (mx05lb.world4you.com [81.19.149.115])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1D19A218AAC
-	for <netdev@vger.kernel.org>; Tue,  4 Feb 2025 20:14:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=202.36.163.20
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 91D38203710;
+	Tue,  4 Feb 2025 20:34:48 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=81.19.149.115
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1738700096; cv=none; b=euQmHFjEU4eUHyqVFS2cwDyUbDKWPf3NPgwPF9z8uKyOQocJ9hJjQumpzy+tUkzAqiVxVx+ck9vceh3ktDAvMthizCNxzPODOjw9w1bif75p4yKpdYPFQ3UHbPvY2UgxUn9GytkTmG5unjtmb65Uvx8KyKdrzIAbs6L1sTcrjCI=
+	t=1738701290; cv=none; b=qGoWoqRU1VOpM/1eroaB/8mzMdcX55DEljpdnI2a3PI1itPYryJKijUmtqxF9A5JBt9UzesBY1FeQ9Hb7vk+Pn0huf68XjvDva7+jjz4o2xpsf9vDho/9zJJZDGd29B+ltVJ/VwBRcHX3Uji/yStejxUdfW3KdLXBQ9ro7IXuz0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1738700096; c=relaxed/simple;
-	bh=nurUDXp2o4MyvC3A0GkMdYpyppUckZpuZWdZNoV48dk=;
-	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
-	 Content-Type:MIME-Version; b=fhSIVm8yYH+A+uAKQvMSYLa8OCWLr/IgewLshfYYpeWWXfypZbmBvPj6GuLYD8PJwBUMljBDZa9V9IjG1Wnx9GMETn/dkcvW0eaeZprhtLMPWukIMJdwrsLy5MCbx0q3O6lCy8F1cc5QrYv3WZN7o7Qva/7Zm/8AStna3+rjymk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=alliedtelesis.co.nz; spf=pass smtp.mailfrom=alliedtelesis.co.nz; dkim=pass (2048-bit key) header.d=alliedtelesis.co.nz header.i=@alliedtelesis.co.nz header.b=j+bv7sTF; arc=none smtp.client-ip=202.36.163.20
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=alliedtelesis.co.nz
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=alliedtelesis.co.nz
-Received: from svr-chch-seg1.atlnz.lc (mmarshal3.atlnz.lc [10.32.18.43])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(Client did not present a certificate)
-	by gate2.alliedtelesis.co.nz (Postfix) with ESMTPS id 97F032C0504;
-	Wed,  5 Feb 2025 09:14:50 +1300 (NZDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=alliedtelesis.co.nz;
-	s=mail181024; t=1738700090;
-	bh=nurUDXp2o4MyvC3A0GkMdYpyppUckZpuZWdZNoV48dk=;
-	h=From:To:CC:Subject:Date:References:In-Reply-To:From;
-	b=j+bv7sTFl3xyS2iPOJ7LZgGQavE8W4YOZZ2LwjJH7D7kFAI/WWY1ktWFn6VSJk/6q
-	 RcUAiOjKwH6gmtF0R9lxPOtmRP3+eFnVdZP5FxmJSnPQYZP4sjtIIvULwefJuB6Dv3
-	 zOTGDYxbDZMPfYtnqq4DDJw2wSbYGJ6zyGumXzOErgPIxVDNOHRoNU4F1DrIyMcQbe
-	 EsClpNdJKP5d5wT1Rexjy1jLrh6/UN29vqDpTzcM+xo8/R7W3PPfimtp2ojX+e5dkR
-	 JbOGjSxfLf6px3NwLcs82dS6B1tWgWqXfp3Qrd1kRDeU1SxxaPoFqdd1R+AI39MXvE
-	 hQa1gv8hU5xcA==
-Received: from svr-chch-ex2.atlnz.lc (Not Verified[2001:df5:b000:bc8::76]) by svr-chch-seg1.atlnz.lc with Trustwave SEG (v8,2,6,11305)
-	id <B67a2753a0001>; Wed, 05 Feb 2025 09:14:50 +1300
-Received: from svr-chch-ex2.atlnz.lc (2001:df5:b000:bc8::76) by
- svr-chch-ex2.atlnz.lc (2001:df5:b000:bc8::76) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.14; Wed, 5 Feb 2025 09:14:50 +1300
-Received: from svr-chch-ex2.atlnz.lc ([fe80::a9eb:c9b7:8b52:9567]) by
- svr-chch-ex2.atlnz.lc ([fe80::a9eb:c9b7:8b52:9567%15]) with mapi id
- 15.02.1544.014; Wed, 5 Feb 2025 09:14:50 +1300
-From: Chris Packham <Chris.Packham@alliedtelesis.co.nz>
-To: Krzysztof Kozlowski <krzk@kernel.org>
-CC: "lee@kernel.org" <lee@kernel.org>, "robh@kernel.org" <robh@kernel.org>,
-	"krzk+dt@kernel.org" <krzk+dt@kernel.org>, "conor+dt@kernel.org"
-	<conor+dt@kernel.org>, "andrew+netdev@lunn.ch" <andrew+netdev@lunn.ch>,
-	"davem@davemloft.net" <davem@davemloft.net>, "edumazet@google.com"
-	<edumazet@google.com>, "kuba@kernel.org" <kuba@kernel.org>,
-	"pabeni@redhat.com" <pabeni@redhat.com>, "tsbogend@alpha.franken.de"
-	<tsbogend@alpha.franken.de>, "hkallweit1@gmail.com" <hkallweit1@gmail.com>,
-	"linux@armlinux.org.uk" <linux@armlinux.org.uk>, "sander@svanheule.net"
-	<sander@svanheule.net>, "daniel@makrotopia.org" <daniel@makrotopia.org>,
-	"markus.stockhausen@gmx.de" <markus.stockhausen@gmx.de>,
-	"devicetree@vger.kernel.org" <devicetree@vger.kernel.org>,
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-	"netdev@vger.kernel.org" <netdev@vger.kernel.org>,
-	"linux-mips@vger.kernel.org" <linux-mips@vger.kernel.org>
-Subject: Re: [PATCH net-next v6 1/6] dt-bindings: mfd: Add switch to RTL9300
-Thread-Topic: [PATCH net-next v6 1/6] dt-bindings: mfd: Add switch to RTL9300
-Thread-Index: AQHbdrFNdM+zCo+02kyxGj8ZSMB8nrM18P+AgADKkoA=
-Date: Tue, 4 Feb 2025 20:14:50 +0000
-Message-ID: <3087ea19-8c2a-47c8-adbe-d05009c6f07b@alliedtelesis.co.nz>
-References: <20250204030249.1965444-1-chris.packham@alliedtelesis.co.nz>
- <20250204030249.1965444-2-chris.packham@alliedtelesis.co.nz>
- <20250204-eccentric-deer-of-felicity-02b7ee@krzk-bin>
-In-Reply-To: <20250204-eccentric-deer-of-felicity-02b7ee@krzk-bin>
-Accept-Language: en-NZ, en-US
-Content-Language: en-US
-X-MS-Has-Attach:
-X-MS-TNEF-Correlator:
-Content-Type: text/plain; charset="utf-8"
-Content-ID: <FF262CAB6F67264C92EB4994F80E6A84@alliedtelesis.co.nz>
-Content-Transfer-Encoding: base64
+	s=arc-20240116; t=1738701290; c=relaxed/simple;
+	bh=iu18eYYQR4fLthqgNOhu/VAmwYelaQmKNYCEv86pKn4=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=u4CXL+rqF+zaFMnwGA7hnG0ztzdMjb+U5Umf1PIIm9h0gc5J5th5j/GjfaH3O2LGVp3PWjEGk3SLOgRlmUqlwMlksCVKKEpEKGD5VSAbNWYtCbS4tb5J7xcAXBxikxqxUztiXnsl4tVkzaxcGEEgnmgrS5Fvq21mx9FKeiHYolU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=engleder-embedded.com; spf=pass smtp.mailfrom=engleder-embedded.com; dkim=pass (1024-bit key) header.d=engleder-embedded.com header.i=@engleder-embedded.com header.b=wH/g5+st; arc=none smtp.client-ip=81.19.149.115
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=engleder-embedded.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=engleder-embedded.com
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=engleder-embedded.com; s=dkim11; h=Content-Transfer-Encoding:Content-Type:
+	In-Reply-To:From:References:Cc:To:Subject:MIME-Version:Date:Message-ID:Sender
+	:Reply-To:Content-ID:Content-Description:Resent-Date:Resent-From:
+	Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:List-Help:
+	List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
+	bh=Dso1EsGyxnhW5FWhayp/zMY4aUV2+LaYO3ijOICijXI=; b=wH/g5+strem6Fjbax6JIGuA4jI
+	zAz+g1rjHx2TLNWIJccj9GLm/xwcXe9FkCI5BIZFy3yXAWoaU1WMs4Zn7YjJLn7dKfMhLeavUdNJh
+	/pjcw3iMEz4nrkA+a8xScAmUKmcEE2XhzLwCPfjRK+kna7A46CgYgiZ/bdZ8qkKkDPPs=;
+Received: from [88.117.60.28] (helo=[10.0.0.160])
+	by mx05lb.world4you.com with esmtpsa  (TLS1.2) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.97.1)
+	(envelope-from <gerhard@engleder-embedded.com>)
+	id 1tfPNK-000000005UN-3Y68;
+	Tue, 04 Feb 2025 21:18:27 +0100
+Message-ID: <bd604c16-0f5c-479c-aa13-932f1570e5b5@engleder-embedded.com>
+Date: Tue, 4 Feb 2025 21:18:25 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-SEG-SpamProfiler-Analysis: v=2.4 cv=QNvLRRLL c=1 sm=1 tr=0 ts=67a2753a a=Xf/6aR1Nyvzi7BryhOrcLQ==:117 a=xqWC_Br6kY4A:10 a=75chYTbOgJ0A:10 a=IkcTkHD0fZMA:10 a=T2h4t0Lz3GQA:10 a=0d4TXYnWXBS5P1Ol6EEA:9 a=3ZKOabzyN94A:10 a=QEXdDO2ut3YA:10
-X-SEG-SpamProfiler-Score: 0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH iwl-next v4] e1000e: Fix real-time violations on link up
+To: anthony.l.nguyen@intel.com
+Cc: intel-wired-lan@lists.osuosl.org, netdev@vger.kernel.org,
+ linux-pci@vger.kernel.org, przemyslaw.kitszel@intel.com,
+ andrew+netdev@lunn.ch, davem@davemloft.net, kuba@kernel.org,
+ edumazet@google.com, pabeni@redhat.com, bhelgaas@google.com,
+ pmenzel@molgen.mpg.de, aleksander.lobakin@intel.com,
+ Gerhard Engleder <eg@keba.com>, Vitaly Lifshits <vitaly.lifshits@intel.com>,
+ Avigail Dahan <avigailx.dahan@intel.com>, Simon Horman <horms@kernel.org>
+References: <20241219192743.4499-1-gerhard@engleder-embedded.com>
+ <20250106111752.GC4068@kernel.org>
+Content-Language: en-US
+From: Gerhard Engleder <gerhard@engleder-embedded.com>
+In-Reply-To: <20250106111752.GC4068@kernel.org>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-AV-Do-Run: Yes
 
-SGkgS3J6eXN6dG9mLA0KDQpPbiAwNC8wMi8yMDI1IDIxOjA5LCBLcnp5c3p0b2YgS296bG93c2tp
-IHdyb3RlOg0KPiBPbiBUdWUsIEZlYiAwNCwgMjAyNSBhdCAwNDowMjo0NFBNICsxMzAwLCBDaHJp
-cyBQYWNraGFtIHdyb3RlOg0KPj4gQWRkIGJpbmRpbmdzIGZvciB0aGUgZXRoZXJuZXQtc3dpdGNo
-IHBvcnRpb24gb2YgdGhlIFJUTDkzMDAuDQo+Pg0KPj4gU2lnbmVkLW9mZi1ieTogQ2hyaXMgUGFj
-a2hhbSA8Y2hyaXMucGFja2hhbUBhbGxpZWR0ZWxlc2lzLmNvLm56Pg0KPj4gLS0tDQo+Pg0KPj4g
-Tm90ZXM6DQo+PiAgICAgIENoYW5nZXMgaW4gdjY6DQo+PiAgICAgIC0gTmV3DQo+PiAgICAgIC0g
-SSdkIGxpa2UgdG8gZW5mb3JjZSB0aGUgcHJvcGVydHkgYmVpbmcgImV0aGVybmV0LXBvcnRzIiBi
-dXQgSSBzZWUgdGhlDQo+PiAgICAgICAgZ2VuZXJpYyBiaW5kaW5nIGFsbG93cyAicG9ydHMiIGFz
-IHdlbGwuIENhbiBJIGp1c3QgYWRkIGV0aGVybmV0LXBvcnRzOg0KPj4gICAgICAgIHR5cGU6IG9i
-amVjdCBoZXJlIG9yIGRvZXMgYnkgZHJpdmVyIG5lZWQgdG8gaGFuZGxlIGJvdGggInBvcnRzIiBh
-bmQNCj4+ICAgICAgICAiZXRoZXJuZXQtcG9ydHMiIChJIHNlZSBzb21lIGRvIGFuZCBzb21lIGRv
-bid0KS4NCj4+DQo+PiAgIC4uLi9iaW5kaW5ncy9tZmQvcmVhbHRlayxydGw5MzAxLXN3aXRjaC55
-YW1sICAgICB8IDE2ICsrKysrKysrKysrKysrKy0NCj4+ICAgMSBmaWxlIGNoYW5nZWQsIDE1IGlu
-c2VydGlvbnMoKyksIDEgZGVsZXRpb24oLSkNCj4+DQo+PiBkaWZmIC0tZ2l0IGEvRG9jdW1lbnRh
-dGlvbi9kZXZpY2V0cmVlL2JpbmRpbmdzL21mZC9yZWFsdGVrLHJ0bDkzMDEtc3dpdGNoLnlhbWwg
-Yi9Eb2N1bWVudGF0aW9uL2RldmljZXRyZWUvYmluZGluZ3MvbWZkL3JlYWx0ZWsscnRsOTMwMS1z
-d2l0Y2gueWFtbA0KPj4gaW5kZXggZjA1MzMwM2FiMWU2Li5jYjU0YWJkYTVlNmEgMTAwNjQ0DQo+
-PiAtLS0gYS9Eb2N1bWVudGF0aW9uL2RldmljZXRyZWUvYmluZGluZ3MvbWZkL3JlYWx0ZWsscnRs
-OTMwMS1zd2l0Y2gueWFtbA0KPj4gKysrIGIvRG9jdW1lbnRhdGlvbi9kZXZpY2V0cmVlL2JpbmRp
-bmdzL21mZC9yZWFsdGVrLHJ0bDkzMDEtc3dpdGNoLnlhbWwNCj4+IEBAIC0xNCw2ICsxNCw4IEBA
-IGRlc2NyaXB0aW9uOg0KPj4gICAgIG51bWJlciBvZiBkaWZmZXJlbnQgcGVyaXBoZXJhbHMgYXJl
-IGFjY2Vzc2VkIHRocm91Z2ggYSBjb21tb24gcmVnaXN0ZXIgYmxvY2ssDQo+PiAgICAgcmVwcmVz
-ZW50ZWQgaGVyZSBhcyBhIHN5c2NvbiBub2RlLg0KPj4gICANCj4+ICskcmVmOiAvc2NoZW1hcy9u
-ZXQvZXRoZXJuZXQtc3dpdGNoLnlhbWwjDQo+PiArDQo+PiAgIHByb3BlcnRpZXM6DQo+PiAgICAg
-Y29tcGF0aWJsZToNCj4+ICAgICAgIGl0ZW1zOg0KPj4gQEAgLTQ1LDcgKzQ3LDcgQEAgcmVxdWly
-ZWQ6DQo+PiAgICAgLSBjb21wYXRpYmxlDQo+PiAgICAgLSByZWcNCj4+ICAgDQo+IEkgZG9uJ3Qg
-Z2V0IHdoeSB0aGlzIGRldmljZSByZWNlaXZlcyBub3cgY2hpbGRyZW4gd2l0aG91dCBhZGRyZXNz
-ZXMuDQo+IEVpdGhlciB5b3VyIGNoaWxkcmVuIGhhdmUgJ3JlZycgb3IgdGhleSBkbyBub3QuIE1p
-eGluZyBpcyBhIHNpZ24gb2YgYQ0KPiBtZXNzLCBsaWtlIHRoaXMgd2FzIG5ldmVyIGFjdHVhbGx5
-IHNpbXBsZS1tZmQuDQo+DQo+IFlvdSB3b3VsZCBnZXQgdGhpcyBjb21tZW50IGlmIHlvdSBwb3N0
-ZWQgY29tcGxldGUgc2NoZW1hIHRoZSBmaXJzdCB0aW1lLg0KDQpZZXMgZmFpciBlbm91Z2guIEkg
-dGhpbmsgSSBlcnJlZCB0b28gZmFyIG9uIHRoZSBzaWRlIG9mIHRyeWluZyB0byBzZW5kIA0Kc21h
-bGwgY2h1bmtzIChhbmQgYWxzbyBub3Qgd2FudGluZyB0byBjb21taXQgdG8gYSBiaW5kaW5nIGJl
-Zm9yZSBJIGhhZCANCndvcmtpbmcgZHJpdmVycykuDQoNClNvIGhvdyBkbyB3ZSBtb3ZlIGZvcndh
-cmQ/IFRoZXJlJ3Mgb25lIG1vcmUgcGF0Y2ggSSBoYXZlbid0IHNlbnQgeWV0IA0KdGhhdCBhZGRz
-IGludGVycnVwdHMgZm9yIHRoZSBzd2l0Y2ggYmxvY2suIEJ1dCBvdGhlciB0aGFuIHRoYXQgSSB0
-aGluayANCndoYXQgSSBoYXZlIG5vdyBjb3ZlcnMgYWxsIG9mIHRoZSBtYWpvciBjb21wb25lbnRz
-IGluIHRoaXMgY2hpcC4NCg0KVGhlcmUncyBvbmx5IG9uZSBpbi10cmVlIGJvYXJkIHRoYXQgdXNl
-cyB0aGlzIGFuZCBJJ20gdGhlIG1haW50YWluZXIgb2YgDQppdCBzbyB3aXRoZHJhd2luZyB0aGUg
-bWZkIGJpbmRpbmcgYW5kIHJlcGxhY2luZyBpdCB3aXRoIHNvbWV0aGluZyBlbHNlIA0KaXMgbm90
-IG91dCBvZiB0aGUgcXVlc3Rpb24uIFRoZXJlIG1heSBiZSBzb21lIGNvbXBsYWludHMgZnJvbSBt
-YWtlIA0KZHRic19jaGVjayB3aGlsZSB3ZSBnZXQgdGhpcyBzb3J0ZWQgYnV0IGhvcGVmdWxseSB3
-ZSBjYW4gZ2V0IHRoYXQgZG9uZSBzb29uLg0KDQo=
+On 06.01.25 12:17, Simon Horman wrote:
+> On Thu, Dec 19, 2024 at 08:27:43PM +0100, Gerhard Engleder wrote:
+>> From: Gerhard Engleder <eg@keba.com>
+>>
+>> Link down and up triggers update of MTA table. This update executes many
+>> PCIe writes and a final flush. Thus, PCIe will be blocked until all
+>> writes are flushed. As a result, DMA transfers of other targets suffer
+>> from delay in the range of 50us. This results in timing violations on
+>> real-time systems during link down and up of e1000e in combination with
+>> an Intel i3-2310E Sandy Bridge CPU.
+>>
+>> The i3-2310E is quite old. Launched 2011 by Intel but still in use as
+>> robot controller. The exact root cause of the problem is unclear and
+>> this situation won't change as Intel support for this CPU has ended
+>> years ago. Our experience is that the number of posted PCIe writes needs
+>> to be limited at least for real-time systems. With posted PCIe writes a
+>> much higher throughput can be generated than with PCIe reads which
+>> cannot be posted. Thus, the load on the interconnect is much higher.
+>> Additionally, a PCIe read waits until all posted PCIe writes are done.
+>> Therefore, the PCIe read can block the CPU for much more than 10us if a
+>> lot of PCIe writes were posted before. Both issues are the reason why we
+>> are limiting the number of posted PCIe writes in row in general for our
+>> real-time systems, not only for this driver.
+>>
+>> A flush after a low enough number of posted PCIe writes eliminates the
+>> delay but also increases the time needed for MTA table update. The
+>> following measurements were done on i3-2310E with e1000e for 128 MTA
+>> table entries:
+>>
+>> Single flush after all writes: 106us
+>> Flush after every write:       429us
+>> Flush after every 2nd write:   266us
+>> Flush after every 4th write:   180us
+>> Flush after every 8th write:   141us
+>> Flush after every 16th write:  121us
+>>
+>> A flush after every 8th write delays the link up by 35us and the
+>> negative impact to DMA transfers of other targets is still tolerable.
+>>
+>> Execute a flush after every 8th write. This prevents overloading the
+>> interconnect with posted writes.
+>>
+>> Signed-off-by: Gerhard Engleder <eg@keba.com>
+>> Link: https://lore.kernel.org/netdev/f8fe665a-5e6c-4f95-b47a-2f3281aa0e6c@lunn.ch/T/
+>> CC: Vitaly Lifshits <vitaly.lifshits@intel.com>
+>> Reviewed-by: Przemek Kitszel <przemyslaw.kitszel@intel.com>
+>> Tested-by: Avigail Dahan <avigailx.dahan@intel.com>
+>> ---
+>> v4:
+>> - add PREEMPT_RT dependency again (Vitaly Lifshits)
+>> - fix comment styple (Alexander Lobakin)
+>> - add to comment each 8th and explain why (Alexander Lobakin)
+>> - simplify check for every 8th write (Alexander Lobakin)
+>>
+>> v3:
+>> - mention problematic platform explicitly (Bjorn Helgaas)
+>> - improve comment (Paul Menzel)
+>>
+>> v2:
+>> - remove PREEMPT_RT dependency (Andrew Lunn, Przemek Kitszel)
+> 
+> Reviewed-by: Simon Horman <horms@kernel.org>
+
+Is there anything left from my side to get this change over iwl-next
+into net-next?
+
+Gerhard
 
