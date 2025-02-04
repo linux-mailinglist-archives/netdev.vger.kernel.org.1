@@ -1,103 +1,86 @@
-Return-Path: <netdev+bounces-162743-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-162745-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 81608A27CC3
-	for <lists+netdev@lfdr.de>; Tue,  4 Feb 2025 21:27:19 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id A571AA27CFB
+	for <lists+netdev@lfdr.de>; Tue,  4 Feb 2025 22:00:32 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 6C1EB18867FD
-	for <lists+netdev@lfdr.de>; Tue,  4 Feb 2025 20:27:24 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 7C66F1885C8E
+	for <lists+netdev@lfdr.de>; Tue,  4 Feb 2025 21:00:37 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id ADF3321A435;
-	Tue,  4 Feb 2025 20:27:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 029132054E3;
+	Tue,  4 Feb 2025 21:00:28 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=engleder-embedded.com header.i=@engleder-embedded.com header.b="qXxX0OHR"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Zbp+ElhJ"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx05lb.world4you.com (mx05lb.world4you.com [81.19.149.115])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E715F21A425
-	for <netdev@vger.kernel.org>; Tue,  4 Feb 2025 20:27:01 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=81.19.149.115
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CC3CE25A62C;
+	Tue,  4 Feb 2025 21:00:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1738700823; cv=none; b=K6iT4hcPzaoLdyB9+2CDCO0ohBjdpE7H71IkWVAbkxZdPzqhQfjmrnINu5hbzhj5mgmtZ8gfbwevoDg8P+UqQFlv8c5OG7RXQOlVLw0dSQP2MzMovY6/BWjoUCkpvlg2mbNcSfpnj077X6V1wvewVcEsHQ0/0bJabEbXd0XlQY4=
+	t=1738702827; cv=none; b=mP8lW5Oj7KZ3OkoeLWzjRxL6FNGR7GoISG5xJ61MC7gnz9V7woOS0IprUZ/OIxPOmuomXhx+wkEjEjbPPOJHR4T8aWwqXKmvheJghUJKv2ya9Hems/G4Jf+CK91aEEVI6XhhEge8VYVRlgmjCk5U55YQeCXNoVIIxu3VM4pPcJI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1738700823; c=relaxed/simple;
-	bh=7D/n3uwNh6NdbLVsMaz5GQ+eqY0CGENTcBm9zoOj7TI=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=bXyEyIQ0kH7UEJuSTrdsmjqUph+Q5IUB6NE6VjLPSmEHwh08yZlvtL07MW9Nxesrt1ialSZBnuwIyokx1/sL1xpTdOjSdkZswreGuXwiPKh9WkRBq/APb6XCh/NoAUf/dS4ROcNs7dUOj/GTY7Atlr1jLPZxbegGyQZZuXeu5pY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=engleder-embedded.com; spf=pass smtp.mailfrom=engleder-embedded.com; dkim=pass (1024-bit key) header.d=engleder-embedded.com header.i=@engleder-embedded.com header.b=qXxX0OHR; arc=none smtp.client-ip=81.19.149.115
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=engleder-embedded.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=engleder-embedded.com
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=engleder-embedded.com; s=dkim11; h=Content-Transfer-Encoding:Content-Type:
-	In-Reply-To:From:References:Cc:To:Subject:MIME-Version:Date:Message-ID:Sender
-	:Reply-To:Content-ID:Content-Description:Resent-Date:Resent-From:
-	Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:List-Help:
-	List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=wfcO5ER+r2plevl8a9nLgRnJivX33DVlif9Ls4pxgSM=; b=qXxX0OHR4MU0roZ/1TmFXcR7x5
-	V6Z92fYEsJYkD63ih6nL4JWU4ny/uEOsLss7NQyG7D9E4kIy59g6K7+cyFRHCuaNHkCul/4Ab3THj
-	y46gd+naGyiSww1ih2TSfIWYts7oeXLtvjHkUKTPiOZU7EmAfhD6gJkd/0JyDre4PK0k=;
-Received: from [88.117.60.28] (helo=[10.0.0.160])
-	by mx05lb.world4you.com with esmtpsa  (TLS1.2) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.97.1)
-	(envelope-from <gerhard@engleder-embedded.com>)
-	id 1tfPVZ-000000007UF-3At9;
-	Tue, 04 Feb 2025 21:26:57 +0100
-Message-ID: <282f56e2-8acd-4298-bd48-bf036f74362f@engleder-embedded.com>
-Date: Tue, 4 Feb 2025 21:26:56 +0100
+	s=arc-20240116; t=1738702827; c=relaxed/simple;
+	bh=W3IUp80uPm8G9kvSFtyK/LEkA+g/UOfW+rNQmYJ1D5k=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=Mkhr7gqBPN8IoSvguf0c4VBGAppPIsk7A+JxKT3H3a/iXpfuoW2vY5PLZWLZr6z+FUZaYuxPYYbguBZOCJ720u+lMkYNb9jSy0XX71bfbgGvLFlnQyVqJk6EL6LfJ40yTGjK6+Ybo+q+mM6JXzkxyeqFLWBEj1X9YPC1i+5fWlQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Zbp+ElhJ; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id B1787C4CEDF;
+	Tue,  4 Feb 2025 21:00:26 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1738702827;
+	bh=W3IUp80uPm8G9kvSFtyK/LEkA+g/UOfW+rNQmYJ1D5k=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=Zbp+ElhJ51fTx9UNtLXKEo3gtVIOMX7vulziTrxYpYa5ImkVs/pmNpYo63zuuOO6X
+	 s9GYZRmh838dP54uC6thBFKlECADIbDLVyaV+IRg7XAh/7no7LaGfOkPPtU17WXoMZ
+	 FUSmGP52A4GStL3biJaZfg3JFKFrRza7EPS5W6y9QG6niHkXA6ILWNuOGReIVhGCMW
+	 rVnx86Z59f5M0GO1r4VXaAyBhzRW09nWtMbzZi1FwHvpsflc28+kX373rcMmuZFhy1
+	 3lPuQVXJoopSkWfd8KQWztO/S2oN6j+SdPrQeae8vakn9WTa7kEil8krVPikHpEf55
+	 /WkL0SPAF67gA==
+Date: Tue, 4 Feb 2025 13:00:25 -0800
+From: Jakub Kicinski <kuba@kernel.org>
+To: Eric Dumazet <edumazet@google.com>
+Cc: "David S . Miller" <davem@davemloft.net>, Paolo Abeni
+ <pabeni@redhat.com>, netdev@vger.kernel.org, Kuniyuki Iwashima
+ <kuniyu@amazon.com>, Simon Horman <horms@kernel.org>,
+ eric.dumazet@gmail.com, rcu@vger.kernel.org
+Subject: Re: [PATCH v3 net 11/16] ipv6: input: convert to dev_net_rcu()
+Message-ID: <20250204130025.33682a8d@kernel.org>
+In-Reply-To: <CANn89i+2TrrYYXr7RFX2ZwtYfUwWQS6Qg9GNL6FGt8cdWR1dhQ@mail.gmail.com>
+References: <20250204132357.102354-1-edumazet@google.com>
+	<20250204132357.102354-12-edumazet@google.com>
+	<20250204120903.6c616fc8@kernel.org>
+	<CANn89i+2TrrYYXr7RFX2ZwtYfUwWQS6Qg9GNL6FGt8cdWR1dhQ@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next v4 3/7] net: phy: micrel: Add loopback support
-To: "Russell King (Oracle)" <linux@armlinux.org.uk>
-Cc: andrew@lunn.ch, hkallweit1@gmail.com, davem@davemloft.net,
- edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
- netdev@vger.kernel.org
-References: <20250203191057.46351-1-gerhard@engleder-embedded.com>
- <20250203191057.46351-4-gerhard@engleder-embedded.com>
- <Z6Ee6RDkaAeKw749@shell.armlinux.org.uk>
-Content-Language: en-US
-From: Gerhard Engleder <gerhard@engleder-embedded.com>
-In-Reply-To: <Z6Ee6RDkaAeKw749@shell.armlinux.org.uk>
-Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
-X-AV-Do-Run: Yes
 
-On 03.02.25 20:54, Russell King (Oracle) wrote:
-> On Mon, Feb 03, 2025 at 08:10:53PM +0100, Gerhard Engleder wrote:
->> +static int ksz9031_set_loopback(struct phy_device *phydev, bool enable,
->> +				int speed)
->> +{
->> +	u16 ctl = BMCR_LOOPBACK;
->> +	int ret, val;
->> +
->> +	if (!enable)
->> +		return genphy_loopback(phydev, enable, 0);
->> +
->> +	if (speed == SPEED_10 || speed == SPEED_100 || speed == SPEED_1000)
->> +		phydev->speed = speed;
->> +	else if (speed)
->> +		return -EINVAL;
->> +	phydev->duplex = DUPLEX_FULL;
->> +
->> +	ctl |= mii_bmcr_encode_fixed(phydev->speed, phydev->duplex);
->> +
->> +	phy_modify(phydev, MII_BMCR, ~0, ctl);
+On Tue, 4 Feb 2025 21:10:59 +0100 Eric Dumazet wrote:
+> > Test output:
+> > https://netdev-3.bots.linux.dev/vmksft-net-dbg/results/978202/61-l2tp-sh/
+> > Decoded:
+> > https://netdev-3.bots.linux.dev/vmksft-net-dbg/results/978202/vm-crash-thr2-0  
 > 
-> Why do you use phy_modify() here rather than phy_write() which is
-> effectively what this is.
+> Oh well. So many bugs.
 
-I copied that from genphy_loopback(). You are right, phy_modify() makes
-no sense with mask 0xffff. I will change it.
+TBH I'm slightly confused by this, and the previous warnings.
 
-Thanks!
+The previous one was from a timer callback.
 
-Gerhard
+This one is with BH disabled.
+
+I thought BH implies RCU protection. We certainly depend on that 
+in NAPI for XDP. And threaded NAPI does the exact same thing as
+xfrm_trans_reinject(), a bare local_bh_disable().
+
+RCU folks, did something change or is just holes in my brain again?
 
