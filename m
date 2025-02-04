@@ -1,155 +1,176 @@
-Return-Path: <netdev+bounces-162375-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-162376-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 81396A26A9A
-	for <lists+netdev@lfdr.de>; Tue,  4 Feb 2025 04:25:00 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 9F8A1A26AF3
+	for <lists+netdev@lfdr.de>; Tue,  4 Feb 2025 05:14:56 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 1713E188770E
-	for <lists+netdev@lfdr.de>; Tue,  4 Feb 2025 03:25:05 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 42D3D1887194
+	for <lists+netdev@lfdr.de>; Tue,  4 Feb 2025 04:15:01 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5355A15697B;
-	Tue,  4 Feb 2025 03:24:52 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E7BA516FF44;
+	Tue,  4 Feb 2025 04:14:51 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="B7D4eArb"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="TzBzc1CK"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-yw1-f170.google.com (mail-yw1-f170.google.com [209.85.128.170])
+Received: from mail-ed1-f45.google.com (mail-ed1-f45.google.com [209.85.208.45])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 97A6025A642;
-	Tue,  4 Feb 2025 03:24:50 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.170
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 065D015B0EF
+	for <netdev@vger.kernel.org>; Tue,  4 Feb 2025 04:14:49 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.45
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1738639492; cv=none; b=Oq39AWsoZEoW8w+XwDNl3HgkPyqzoE/sNrD2X4cg+L7xvQHAvHCSRDg0NKTVwN8fKYPUm01fCg4XuFLmQqgNMIcuT1pzDVVBAUnAmF0UofUO2S8YVWimzj1N4zcJgWVwNYAA2VRbmBkikNiwx4PsnF0iCH83GZXYV2LnLxjqkEQ=
+	t=1738642491; cv=none; b=Or0SOqGK/ZCLGzJW+sG5XpNgE+HcWYv5yWwLYKqQjyKyw5Gr+/d6A0NyTxTrerF9xIbIbYFIWyVToTmxEwWQKJINj6Wm5Qdy4RFOQ5GwON9VCM/TFDDkOehRbJDGUptoB1TYBu7czciLdLSvjGgloqkmY797vjmq3FQUb7jCjTs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1738639492; c=relaxed/simple;
-	bh=MK/kgsCB755tLqGEF2PsD/FjDQbJHiEt+PB8jn3xK+w=;
+	s=arc-20240116; t=1738642491; c=relaxed/simple;
+	bh=cAOpa129YJP8Je9/8rKl3jmHp+NiRYrxQtD2icdDXwc=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=NXImFRL86+BWHjEIDME7E6XLKIVWUDH1XLDKY1lmDcPe0rOhq6QkfF5gsprLRb5hZWlolNjHJ/VuBvBu7oHb7l9vvkpopmxoMKvJtIgRcUH3Gs2uzZhLBrE/0FbI/d+gEVUw2X4IGrMz7TpopcUzfhTKMf3LTZAWUrbydXhga0U=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=B7D4eArb; arc=none smtp.client-ip=209.85.128.170
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-yw1-f170.google.com with SMTP id 00721157ae682-6f4bc408e49so28857227b3.1;
-        Mon, 03 Feb 2025 19:24:50 -0800 (PST)
+	 To:Cc:Content-Type; b=pWVswSM5Xi8ztOyr7AqjEsYpqz0B7bApRbjWotrc1OwqQRsg6kE8kD5RDUiFkRZYOLcUbpEwpiMP9WBWha950spcba3KdgBSJJ0sI6SMR8A+QVUd7KK60CW2DodXvdz8oLu0gvTHwoEfFMnguvBnyYDnPo7kfzV8GMLv0RLEGWc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=TzBzc1CK; arc=none smtp.client-ip=209.85.208.45
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-ed1-f45.google.com with SMTP id 4fb4d7f45d1cf-5d9837f201aso11496747a12.0
+        for <netdev@vger.kernel.org>; Mon, 03 Feb 2025 20:14:49 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1738639489; x=1739244289; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1738642488; x=1739247288; darn=vger.kernel.org;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=SHZf3qPAJPMI6pvNtjlUfKmiEdCpztmVl3vR7/P9M6c=;
-        b=B7D4eArbXfOxZU8C+CHgDHl3JJoPAdVlfGB+vVdj/RzCaV/j1UvRwbwsbHVxaVUdrS
-         jz89ojtaZR7de3GPnQ1L0b4ITHIdb24WG56T9DXrs/r00jFjsVcurKxaSC2VW6lw0zJY
-         AGqFBh6/7IpQo5nRxU0TD6HaS562P+wt0Fy5hHiJl03lONT3MTqbhrCEhtEbHWB4TKP9
-         Q7ZBUzAVdkgxIaXFx+iIwQPuAWUBSFJT0IE2y7Qa6gfKDocSEo+wk89t7gYcjKj5j8RS
-         g0xxfGYre2EYzSuobwk03ilgh2MTiQoSjj3HgFg9xeJwtW76w4V8kh/Qv2jEIQj64bkT
-         Ag7g==
+        bh=ljhxLISVhNcbEPOg0SH7yzGI29Ks0eJLCMe+yIOr9gU=;
+        b=TzBzc1CKb59x1BNYmvVCCqNW5bH3ocMj1mUdZDEm9MGK5zdC07duoJYBVfZgvQBay4
+         Bel4dsBOSvAJ2ARwkTrkevyayRYnrDa7TEqmCHzq9NWFP8RlJyb/lvdDR5CGqPQ1cszI
+         DHHdyeTptEawyq0s3SF6DDOxz3hAoDMdF5X2wS1gxY1iCY1EusNo03HVO2ExHmhdzhQR
+         v59R5j0MLro+qEQdyKROVUWFxmuanOmWVsGX/Z3FlD8ag3l6MQar4caOUlGmGsrGPOcI
+         RqfjIxdWsorB3hF5wsZAZPGmGo1miH5XUOYPqn7w+sAvrRRWU7P7qVBdSnUmim+exohL
+         sa5w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1738639489; x=1739244289;
+        d=1e100.net; s=20230601; t=1738642488; x=1739247288;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=SHZf3qPAJPMI6pvNtjlUfKmiEdCpztmVl3vR7/P9M6c=;
-        b=i0aO6V7XceNT3aAAmW40Ryo1jjN3a0ZLQpwgm9pYjrM8PmWwA51CVfRFzENzi9i95h
-         Fwe77ah9Ki9+rmSAP829HfPrVCEx5L36MbKNnA/xDPY1NhlxJvz4Z0mir3slpZCiAdMN
-         PWboxMwLcbPHLLZf+qKE/RxBsHb73+fq+i7Rk85+TsmkexGVYG4hmhC3jgrGMDiF8HjN
-         6ttiRk0qXHDWB/cjiGoL+wTsrjoYJ7ch5YPZWgLR5JUxdbf+8gZnWz7ZmW6Tj5yraJ6E
-         fJNXPW7hCu995obho8DZjoPHKrVbcVl0dswmfYJGvTA0J42oszy2K2ySCs6QoBHxiTcF
-         Bk6A==
-X-Forwarded-Encrypted: i=1; AJvYcCU7AHH5+IpM+tdMyIR4D1PgjJsSmPzvxVQfsgh0rTFVa8KeerOo1WzzcovJbg9ryy2pDEbPxCHipd7h@vger.kernel.org, AJvYcCUjd77M3ubtblhkaEDb3/fts6d9UbNdWTmB1KAhaJFYWoVDTBYUtkUVM4PGk/QvjYAnguAIByUc@vger.kernel.org, AJvYcCVJVySjIEhbWnHGIU4QjJYgKwevDRNph7GNwQW3FgmjOPoZqaHFNuz+5Fx0VAowaqxRrGYK9PUNZcks@vger.kernel.org, AJvYcCVb0R5xL6FPl4m8n+MiKimaMgmhaR/Unjw2zXSdc+Glzb/ysQX9AAdx0T/5zXhcQ6Go4JwO3Qd3uBELdWTj78U=@vger.kernel.org, AJvYcCVkMyaJb9pHPeVjXd75d1eR29LHaO9cSUcZmo9rZO3fiODsWCWTcWlHJi+Krh4/lchHQT6M2nxC9QU=@vger.kernel.org, AJvYcCVqzfC4k2jMuequD/M332EE8roEQ5I1EDDvwSR46GW1tNWLvOx7gtiwOXGdkKDtYZya00Ibz7/v4Wax@vger.kernel.org, AJvYcCVup5E7FeRvg1XERLlllN2r5htZMuK6nBw8+mD+GqxEf0IBflNntEhuILMHCh4ROoY4ZCDgnTnL9KMcOQ==@vger.kernel.org, AJvYcCWWI6KfGnOAXS6GD6OjonhNS0t5vLLhg74gmRfyhpE0TNSTPoO9YyYq1DUhuoenlrAYrzNNCq5UZueMW3M=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzCYXpX+rTuUwAhXUjWjbKJ7GSqYCfV5LqhQXXW/g+eFWTQLsvE
-	abOncGk23Gwu/1kCOMsZsCHogxxTYNSmaqxvCQFyoj3dHdymuTU7n6DHT69+Fp7XNQ/ePpJwb9l
-	gGv1XtIwsiB+qIDMWJE6QZk8gxk0=
-X-Gm-Gg: ASbGnctYMnVwqjwbaMkr+s8ay0TFIheHjkRuFQ135q+iGg4A+EsDOWj8lcK88Tzw0CS
-	9TYsXgXQCfHKirlihGROF1Gpug9uNnQhQ1S8BRkpdEG65rmVfAdtZUJ7I9u3wHFRNMon751W0gV
-	9ukpnsBKnUNt7WzB0VXdw6UW38yMQhd14=
-X-Google-Smtp-Source: AGHT+IE09Gi3ca8JBdhccV2nmsb+G7Mxn8icbzfNE/93+HrK2OFTG29wJWw2U9CAVzfm42NsDopJBH4rbrMUflKWcRM=
-X-Received: by 2002:a05:690c:9a03:b0:6f7:64a8:e23 with SMTP id
- 00721157ae682-6f7a84246cdmr211542487b3.37.1738639489487; Mon, 03 Feb 2025
- 19:24:49 -0800 (PST)
+        bh=ljhxLISVhNcbEPOg0SH7yzGI29Ks0eJLCMe+yIOr9gU=;
+        b=qXzIPE3FKUe/ED9/hZmcQE4E4Bg6nfFhQ6c/0iXT6hVUKURzknSc2VOXQlfID3Z2eb
+         T3TtjsTWQf0vJygHvi/EorcEBnmA1cpF+1a55G2vd9CLWILLw1OL7AMp1U6bEi1LqvAT
+         H8otmOjIrAOCLY6uG18upg/C3FUQIuANmx+00KOCnSVt6lArWuU5uEHmqTCN4czLkVUW
+         2yJoHnIkRMsivOy/sL1TWlrQfiW6iRq4vW0Hvnx3CSUJu1AUeJdgsNz1tnG3YraQxvnB
+         6E0QWJp/sgMJ5RivPrm5s354Mm4bRMr/AXQUeA+0S9LR1+u4y37QIknRK1PpMS1zcMAJ
+         rBdQ==
+X-Forwarded-Encrypted: i=1; AJvYcCXhmdxjQ1XoalbSbh0osyhtgnwkubxLisjRpBkRVIlD9m6hh36P3STyQ0knvReisVzKjkjOW/o=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yx0h3hTC7oeX4F46JL8gm6kSvObW7oUOs+WGY7jBvGg+gjPFNLG
+	tRNZ8Eqze7Zy45neLEBkhbiwQw47B6hR5EtHh7TUkp4q3X/2TsfX6ELPE1qBaapKNJvQ5N4ji0l
+	nqpVI4Fd3DuUKQn9rLdKLexDNWQIB4KYOy33F
+X-Gm-Gg: ASbGncuu30zDs7sz7dIz6INYq2eS8ok1C3G/mxxTvqMNAQfGg/FsHAKqN/HyKZCMWSj
+	APRpVKG3fWiKH3/WBwhLc/r/1hV9bIjtrFkli3AXyZeC8O07Wox04E+m7QmQr/KqNtfiUdQ==
+X-Google-Smtp-Source: AGHT+IFUJcHm6Fgx+J2SBSoIxCAepiW/7z2VOgV+yyY17V3hWN71g/VSj+8pBHM9OWczzENdVDYNwrWBoUVvkmTQM5Q=
+X-Received: by 2002:a05:6402:4581:b0:5dc:92a9:8a5 with SMTP id
+ 4fb4d7f45d1cf-5dcc14bccb5mr1727389a12.6.1738642487978; Mon, 03 Feb 2025
+ 20:14:47 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250123091115.2079802-1-a0282524688@gmail.com>
- <20250123091115.2079802-5-a0282524688@gmail.com> <fc927b75-5862-4ead-a355-a40c27d8307b@wanadoo.fr>
-In-Reply-To: <fc927b75-5862-4ead-a355-a40c27d8307b@wanadoo.fr>
-From: Ming Yu <a0282524688@gmail.com>
-Date: Tue, 4 Feb 2025 11:24:38 +0800
-X-Gm-Features: AWEUYZnEhI9JNxJOh_LDE0_r1vETpiCuUcVdrotMrjh4ge4F6zvwefLgocld9G4
-Message-ID: <CAOoeyxWivAZmZPe92+_LrL-HvMn7Lqs7M4B__JULKqHeJMTioA@mail.gmail.com>
-Subject: Re: [PATCH v6 4/7] can: Add Nuvoton NCT6694 CANFD support
-To: Vincent Mailhol <mailhol.vincent@wanadoo.fr>
-Cc: linux-kernel@vger.kernel.org, linux-gpio@vger.kernel.org, 
-	linux-i2c@vger.kernel.org, linux-can@vger.kernel.org, netdev@vger.kernel.org, 
-	linux-watchdog@vger.kernel.org, linux-hwmon@vger.kernel.org, 
-	linux-rtc@vger.kernel.org, linux-usb@vger.kernel.org, tmyu0@nuvoton.com, 
-	lee@kernel.org, linus.walleij@linaro.org, brgl@bgdev.pl, 
-	andi.shyti@kernel.org, mkl@pengutronix.de, andrew+netdev@lunn.ch, 
-	davem@davemloft.net, edumazet@google.com, kuba@kernel.org, pabeni@redhat.com, 
-	wim@linux-watchdog.org, linux@roeck-us.net, jdelvare@suse.com, 
-	alexandre.belloni@bootlin.com
+References: <20250203143046.3029343-1-edumazet@google.com> <20250203143046.3029343-10-edumazet@google.com>
+ <20250203153633.46ce0337@kernel.org>
+In-Reply-To: <20250203153633.46ce0337@kernel.org>
+From: Eric Dumazet <edumazet@google.com>
+Date: Tue, 4 Feb 2025 05:14:37 +0100
+X-Gm-Features: AWEUYZmWCVz8la7lgEypA23dMkvgi9RM9dw2GsjbvFTs-hY6FwZWR3ogop2n3aU
+Message-ID: <CANn89i+-Jifwyjhif1jPXcoXU7n2n4Hyk13k7XoTRCeeAJV1uA@mail.gmail.com>
+Subject: Re: [PATCH v2 net 09/16] ipv4: icmp: convert to dev_net_rcu()
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: "David S . Miller" <davem@davemloft.net>, Paolo Abeni <pabeni@redhat.com>, netdev@vger.kernel.org, 
+	Kuniyuki Iwashima <kuniyu@amazon.com>, Simon Horman <horms@kernel.org>, eric.dumazet@gmail.com
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-Dear Vincent,
-
-Thank you for reviewing,
-I will address the issues you mentioned in the next patch.
-
-Vincent Mailhol <mailhol.vincent@wanadoo.fr> =E6=96=BC 2025=E5=B9=B41=E6=9C=
-=8826=E6=97=A5 =E9=80=B1=E6=97=A5 =E4=B8=8B=E5=8D=884:47=E5=AF=AB=E9=81=93=
-=EF=BC=9A
+On Tue, Feb 4, 2025 at 12:36=E2=80=AFAM Jakub Kicinski <kuba@kernel.org> wr=
+ote:
 >
-...
-> > +static int nct6694_can_get_clock(struct nct6694_can_priv *priv)
-> > +{
-> > +     struct nct6694_can_information *info;
-> > +     struct nct6694_cmd_header cmd_hd =3D {
+> On Mon,  3 Feb 2025 14:30:39 +0000 Eric Dumazet wrote:
+> > @@ -611,9 +611,9 @@ void __icmp_send(struct sk_buff *skb_in, int type, =
+int code, __be32 info,
+> >               goto out;
+> >
+> >       if (rt->dst.dev)
+> > -             net =3D dev_net(rt->dst.dev);
+> > +             net =3D dev_net_rcu(rt->dst.dev);
+> >       else if (skb_in->dev)
+> > -             net =3D dev_net(skb_in->dev);
+> > +             net =3D dev_net_rcu(skb_in->dev);
+> >       else
+> >               goto out;
 >
-> If the variable only has constant initializer, make it static const:
+> Hm. Weird. NIPA says this one is not under RCU.
 >
->         static const struct nct6694_cmd_header cmd_hd =3D {
+> [  275.730657][    C1] ./include/net/net_namespace.h:404 suspicious rcu_d=
+ereference_check() usage!
+> [  275.731033][    C1]
+> [  275.731033][    C1] other info that might help us debug this:
+> [  275.731033][    C1]
+> [  275.731471][    C1]
+> [  275.731471][    C1] rcu_scheduler_active =3D 2, debug_locks =3D 1
+> [  275.731799][    C1] 1 lock held by swapper/1/0:
+> [  275.732000][    C1]  #0: ffffc900001e0ae8 ((&n->timer)){+.-.}-{0:0}, a=
+t: call_timer_fn+0xe8/0x230
+> [  275.732354][    C1]
+> [  275.732354][    C1] stack backtrace:
+> [  275.732638][    C1] CPU: 1 UID: 0 PID: 0 Comm: swapper/1 Not tainted 6=
+.13.0-virtme #1
+> [  275.732643][    C1] Hardware name: Bochs Bochs, BIOS Bochs 01/01/2011
+> [  275.732646][    C1] Call Trace:
+> [  275.732647][    C1]  <IRQ>
+> [  275.732651][    C1]  dump_stack_lvl+0xb0/0xd0
+> [  275.732663][    C1]  lockdep_rcu_suspicious+0x1ea/0x280
+> [  275.732678][    C1]  __icmp_send+0xb0d/0x1580
+> [  275.732695][    C1]  ? tcp_data_queue+0x8/0x22d0
+> [  275.732701][    C1]  ? lockdep_hardirqs_on_prepare+0x12b/0x410
+> [  275.732712][    C1]  ? __pfx___icmp_send+0x10/0x10
+> [  275.732719][    C1]  ? tcp_check_space+0x3ce/0x5f0
+> [  275.732742][    C1]  ? rcu_read_lock_any_held+0x43/0xb0
+> [  275.732750][    C1]  ? validate_chain+0x1fe/0xae0
+> [  275.732771][    C1]  ? __pfx_validate_chain+0x10/0x10
+> [  275.732778][    C1]  ? hlock_class+0x4e/0x130
+> [  275.732784][    C1]  ? mark_lock+0x38/0x3e0
+> [  275.732788][    C1]  ? sock_put+0x1a/0x60
+> [  275.732806][    C1]  ? __lock_acquire+0xb9a/0x1680
+> [  275.732822][    C1]  ipv4_send_dest_unreach+0x3b4/0x800
+> [  275.732829][    C1]  ? neigh_invalidate+0x1c7/0x540
+> [  275.732837][    C1]  ? __pfx_ipv4_send_dest_unreach+0x10/0x10
+> [  275.732850][    C1]  ipv4_link_failure+0x1b/0x190
+> [  275.732856][    C1]  arp_error_report+0x96/0x170
+> [  275.732862][    C1]  neigh_invalidate+0x209/0x540
+> [  275.732873][    C1]  neigh_timer_handler+0x87a/0xdf0
+> [  275.732883][    C1]  ? __pfx_neigh_timer_handler+0x10/0x10
+> [  275.732886][    C1]  call_timer_fn+0x13b/0x230
+> [  275.732891][    C1]  ? call_timer_fn+0xe8/0x230
+> [  275.732894][    C1]  ? call_timer_fn+0xe8/0x230
+> [  275.732899][    C1]  ? __pfx_call_timer_fn+0x10/0x10
+> [  275.732902][    C1]  ? mark_lock+0x38/0x3e0
+> [  275.732920][    C1]  __run_timers+0x545/0x810
+> [  275.732925][    C1]  ? __pfx_neigh_timer_handler+0x10/0x10
+> [  275.732936][    C1]  ? __pfx___run_timers+0x10/0x10
+> [  275.732939][    C1]  ? __lock_release+0x103/0x460
+> [  275.732947][    C1]  ? do_raw_spin_lock+0x131/0x270
+> [  275.732952][    C1]  ? __pfx_do_raw_spin_lock+0x10/0x10
+> [  275.732956][    C1]  ? lock_acquire+0x32/0xc0
+> [  275.732958][    C1]  ? timer_expire_remote+0x96/0xf0
+> [  275.732967][    C1]  timer_expire_remote+0x9e/0xf0
+> [  275.732970][    C1]  tmigr_handle_remote_cpu+0x278/0x440
+> [  275.732977][    C1]  ? __pfx_tmigr_handle_remote_cpu+0x10/0x10
+> [  275.732981][    C1]  ? __pfx___lock_release+0x10/0x10
+> [  275.732985][    C1]  ? __pfx_lock_acquire.part.0+0x10/0x10
+> [  275.733015][    C1]  tmigr_handle_remote_up+0x1a6/0x270
+> [  275.733027][    C1]  ? __pfx_tmigr_handle_remote_up+0x10/0x10
+> [  275.733036][    C1]  __walk_groups.isra.0+0x44/0x160
+> [  275.733051][    C1]  tmigr_handle_remote+0x20b/0x300
 >
-> Apply this at other locations in your different modules.
->
-> > +             .mod =3D NCT6694_CAN_MOD,
-> > +             .cmd =3D NCT6694_CAN_INFORMATION,
-> > +             .sel =3D NCT6694_CAN_INFORMATION_SEL,
-> > +             .len =3D cpu_to_le16(sizeof(*info))
-> > +     };
-> > +     int ret, can_clk;
-> > +
-> > +     info =3D kzalloc(sizeof(*info), GFP_KERNEL);
-> > +     if (!info)
-> > +             return -ENOMEM;
-> > +
+> Decoded:
+> https://netdev-3.bots.linux.dev/vmksft-mptcp-dbg/results/976941/vm-crash-=
+thr0-1
 
-Excuse me, I would like to confirm, if the variable is constant
-initializer, should the declaration be written as:
-static const struct nct6694_cmd_header cmd_hd =3D {
-    .mod =3D NCT6694_CAN_MOD,
-    .cmd =3D NCT6694_CAN_INFORMATION,
-    .sel =3D NCT6694_CAN_INFORMATION_SEL,
-    .len =3D cpu_to_le16(sizeof(struct nct6694_can_information))
-};
-instead of:
-static const struct nct6694_cmd_header cmd_hd =3D {
-    .mod =3D NCT6694_CAN_MOD,
-    .cmd =3D NCT6694_CAN_INFORMATION,
-    .sel =3D NCT6694_CAN_INFORMATION_SEL,
-    .len =3D cpu_to_le16(sizeof(*info))
-};
-, correct?
-
-In addition, does this mean that the parameter in nct6694_read_msg()
-and nct6694_write_msg() should be changed to const struct
-nct6694_cmd_header *cmd_hd?
-
-
-Best regards,
-Ming
+Oops, I thought I ran the tests on the whole series. I missed this one.
 
