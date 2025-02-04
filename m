@@ -1,136 +1,139 @@
-Return-Path: <netdev+bounces-162626-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-162625-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 57524A276B8
-	for <lists+netdev@lfdr.de>; Tue,  4 Feb 2025 17:02:40 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id E276BA276B6
+	for <lists+netdev@lfdr.de>; Tue,  4 Feb 2025 17:02:20 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 78FB01887910
-	for <lists+netdev@lfdr.de>; Tue,  4 Feb 2025 16:02:41 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 6875C3A299E
+	for <lists+netdev@lfdr.de>; Tue,  4 Feb 2025 16:02:12 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E786521517D;
-	Tue,  4 Feb 2025 16:02:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8FB6121516A;
+	Tue,  4 Feb 2025 16:02:15 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="HFNPYCz9"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="PPEZWnKw"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wr1-f52.google.com (mail-wr1-f52.google.com [209.85.221.52])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2E04A2147F6;
-	Tue,  4 Feb 2025 16:02:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.52
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5D287AD2D;
+	Tue,  4 Feb 2025 16:02:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1738684946; cv=none; b=EoZRwZaa41WQldoGmvyM7osBO/7XuLLvrag8fVKDX+oOnT8LIWAVujygpTo3LVAgA9RA73jmREOn+jgIJtY9Zv4NO8uaowdONcaWtW4nBiOfnXvY/M3Bpi1BZLtzXRG3zJusTS08qxD28qxbGbp2QVFWnx6vmFUilN5eJUqUDM0=
+	t=1738684935; cv=none; b=PEVRtIIgbD0Gk+kBe+XmxNJzd6KHlXxCx5VugkVRkSA4IZ3DqWe7Hu/IQLU6OLcdHwWrBibeP9fVa/CgECRNzDkOrRlO/B7WFowd4bqW7sbZCQfVSUZor6TnVbbFZ57FkxhXItYFFBz9cahQ5Arvx+eqvKdS9v1ULNXeGLVZJZI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1738684946; c=relaxed/simple;
-	bh=If8coQdhF5Nd+vwH+6qeES812n9PDmFQAtpVc1rdr7g=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=RwwzVm80dOilTmmBiH6qFtlxy13xogYOMyAa6ONdP22xJgNRVQ4QaahDkvY29CwIleafpFWo64pYugCXO8aidoDmQLo8iwlXLhgbSAw2LzMf96nDnIGcTRmVfzEfL7Zqs0k7/e3AQbqWV/3ugFQXNRCIKafEn3cC81oyVHtOjP4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=HFNPYCz9; arc=none smtp.client-ip=209.85.221.52
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wr1-f52.google.com with SMTP id ffacd0b85a97d-38da88e6db0so465684f8f.2;
-        Tue, 04 Feb 2025 08:02:24 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1738684943; x=1739289743; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=If8coQdhF5Nd+vwH+6qeES812n9PDmFQAtpVc1rdr7g=;
-        b=HFNPYCz9T9jVryZqJPgQO0FkL3BB7GNs5vFJTnTPf1StX1I4yBrwvlW7fMgUQJFkY5
-         nVWYj3b7P7yYGuXEQq+2Ap5ZrLyB7Hu/z0WpxitYAyOmg4M7jQcjlIR1dNgQPi6SX/77
-         KkYs8meGgONaGooIQlReV7Dr/1HNMC9w6WMnrcmof7KF0lpEFQfuGnfC8VLmjqaH9OsG
-         G0Gi3XlSH8kHJ3vzCiDTha7ldIs0PvQ8FgD5WZ8vDciSOY8IFrV/7Pn8IyYMeYShpEKK
-         4kQCswLm5YFN1hZS93GUS3CERhArpVH9f0vB9ZXPYMNKnYKQlbNSWKP5T0WOF21oM9+X
-         7XJw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1738684943; x=1739289743;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=If8coQdhF5Nd+vwH+6qeES812n9PDmFQAtpVc1rdr7g=;
-        b=ulpohp/PtzYMcT46j1R9efWbkOP6zYJp+OJ49I96Mh3SejuEtCjvAL2gaMz60e648Q
-         ddUZ+mzcQRfuYOUJGagJyx/oCtdrVmMgtMeGSD1Sz+z/pvMD49pI60B2WmJRS+2y1F9Z
-         Z8vVKUbPmG7gu4+J+9raih6VjyqqcDjGbJWRJMW7AWoDx/HktvaIaBIdbWltGOpbAsWd
-         AMP+wAfdiqgssmuCMLA12fv/Z26K8kJIzPEMQuS7HxLwU6B0I2b5mgJzcS0XJV9otU2z
-         ZpIvFatrtTGq0M9C6FaWomG0p6DUGTOnFJ+vmnQe+BqSv71Dkunlnl0kDAPPsaCbJOzc
-         19iQ==
-X-Forwarded-Encrypted: i=1; AJvYcCUKywhIOqJ9ht2L0lQSB4yaQQrYHdNUSavSmAmGTrVjxTNaQILuaV+Jf1mOSMILweld0so=@vger.kernel.org, AJvYcCXeEYGMXwrUiGCCQa+oFZMP4o7thSIVChxGdeWyDjPX3DwblIwz+H8cglD4uJk8NjPxmlLElzHx@vger.kernel.org
-X-Gm-Message-State: AOJu0YzEVIpK9b2PsbwFUHYGDUMsHTXntTlMBgbPgAZZFgh7+MWeI8hc
-	pqnainZXSue4qpPGtiohR9ovNeCrqwcwSyOPhS5yaN3A1cWUhIDurhs8KSJ5k2T2AUoDQ8xQBj9
-	P0+BQPmYMvaiZEyK9XbJsXszMbm8=
-X-Gm-Gg: ASbGncvxOZwSi0zxkM1uhHpBGaslpw949yg/t6v2d7HgesVh3/zz1uh7gEb9q+tltsg
-	ouyndrC47A5R/9tpjCUhjmePKD2Tscx/vzapjYVrA2Z0sPO1HJQi7+pchnCGJV8gr7QkkFRxYYt
-	FWk9eAW7OAyZF5
-X-Google-Smtp-Source: AGHT+IHeN97gerTQvzADmizTaOUdKrsOPcpv4a+weyZuEv2JCgTjbx35ZkJM0XcK3avJjhtGXI0gbgiqRC+ZlCTBpNg=
-X-Received: by 2002:a5d:64a1:0:b0:385:f220:f798 with SMTP id
- ffacd0b85a97d-38c5194ca80mr20871753f8f.6.1738684943008; Tue, 04 Feb 2025
- 08:02:23 -0800 (PST)
+	s=arc-20240116; t=1738684935; c=relaxed/simple;
+	bh=tBFoh4bKuNPwzCz/k+QiDR73rgFsF8KTCFH49JQoGQ4=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=edDrvzocp4fg6GRTr2FrgDPfjRIYN/UTwaHHAhJax98f5sk+r6orAkk5SC9IDr/pxfLUQCSwcR3QbnC+pHT8SiCYp/OAw+di3K6hGyDVAQvcBAsvIZCEFeOCGQp7BEpDbW9MHPT5I60ES/S7M1C+nVb16DTJZYKakP/phPDGJYs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=PPEZWnKw; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7D4BCC4CEDF;
+	Tue,  4 Feb 2025 16:02:14 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1738684934;
+	bh=tBFoh4bKuNPwzCz/k+QiDR73rgFsF8KTCFH49JQoGQ4=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=PPEZWnKwGtyQB4uGrgs23wzo/FUCs58JGxbrtKTfFWS7D3reqAq68Tag6S2/WGlce
+	 5c8nUcafvJjxBKHIT2dQBIgO2LP8EMHvPdXcw5Z+KQ9F+Qk9jP2M21Flyr+mkaMkW0
+	 yZjb8I0Q9HUKvkGUcUo/CK2lLgDIRehUYOPT+d1AE5jILIGGKVuMt+fCOnSYbM4m1l
+	 T4U1lT0VjstNZDrWjajLwrJLqsV3pmtm8tk4fVlGcxpbN3vVO7K0PRxIglrvw/uQ2q
+	 L8M+5ctckpTfxtGYYZyeVrV5MIUQQPPtVobCUL+KBASvgIpv3afcNXNw6KTt2l4ygi
+	 CEahpNzrrNbZg==
+Date: Tue, 4 Feb 2025 10:02:13 -0600
+From: Rob Herring <robh@kernel.org>
+To: Chris Packham <chris.packham@alliedtelesis.co.nz>
+Cc: lee@kernel.org, krzk+dt@kernel.org, conor+dt@kernel.org,
+	andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com,
+	kuba@kernel.org, pabeni@redhat.com, tsbogend@alpha.franken.de,
+	hkallweit1@gmail.com, linux@armlinux.org.uk, sander@svanheule.net,
+	daniel@makrotopia.org, markus.stockhausen@gmx.de,
+	devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
+	netdev@vger.kernel.org, linux-mips@vger.kernel.org
+Subject: Re: [PATCH net-next v6 1/6] dt-bindings: mfd: Add switch to RTL9300
+Message-ID: <20250204160213.GA2811393-robh@kernel.org>
+References: <20250204030249.1965444-1-chris.packham@alliedtelesis.co.nz>
+ <20250204030249.1965444-2-chris.packham@alliedtelesis.co.nz>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <cover.1738665783.git.petrm@nvidia.com> <CAADnVQKMN4+Zg9ZG4FpH9pJw4KdmwWmT2d4BiJgHUUQ-Hd7OkQ@mail.gmail.com>
- <BL1PR12MB59225F7D902ACBC6A91511C3CBF42@BL1PR12MB5922.namprd12.prod.outlook.com>
-In-Reply-To: <BL1PR12MB59225F7D902ACBC6A91511C3CBF42@BL1PR12MB5922.namprd12.prod.outlook.com>
-From: Alexei Starovoitov <alexei.starovoitov@gmail.com>
-Date: Tue, 4 Feb 2025 16:02:12 +0000
-X-Gm-Features: AWEUYZmfN46xxQRo3nRVY9d3svhIhjNTxveJyvu3-bNeq5DbAeH4VL7q771GjKs
-Message-ID: <CAADnVQLJfd201t_-bgWHRJRDHm4FQDNapbmAQhPd18OEFq_QdA@mail.gmail.com>
-Subject: Re: [PATCH net-next 00/12] mlxsw: Preparations for XDP support
-To: Amit Cohen <amcohen@nvidia.com>
-Cc: Petr Machata <petrm@nvidia.com>, "David S. Miller" <davem@davemloft.net>, 
-	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
-	Andrew Lunn <andrew+netdev@lunn.ch>, Network Development <netdev@vger.kernel.org>, 
-	Ido Schimmel <idosch@nvidia.com>, Alexei Starovoitov <ast@kernel.org>, 
-	Daniel Borkmann <daniel@iogearbox.net>, Jesper Dangaard Brouer <hawk@kernel.org>, 
-	John Fastabend <john.fastabend@gmail.com>, bpf <bpf@vger.kernel.org>, mlxsw <mlxsw@nvidia.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250204030249.1965444-2-chris.packham@alliedtelesis.co.nz>
 
-On Tue, Feb 4, 2025 at 3:59=E2=80=AFPM Amit Cohen <amcohen@nvidia.com> wrot=
-e:
->
->
->
-> > -----Original Message-----
-> > From: Alexei Starovoitov <alexei.starovoitov@gmail.com>
-> > Sent: Tuesday, 4 February 2025 17:56
-> > To: Petr Machata <petrm@nvidia.com>
-> > Cc: David S. Miller <davem@davemloft.net>; Eric Dumazet <edumazet@googl=
-e.com>; Jakub Kicinski <kuba@kernel.org>; Paolo Abeni
-> > <pabeni@redhat.com>; Andrew Lunn <andrew+netdev@lunn.ch>; Network Devel=
-opment <netdev@vger.kernel.org>; Amit Cohen
-> > <amcohen@nvidia.com>; Ido Schimmel <idosch@nvidia.com>; Alexei Starovoi=
-tov <ast@kernel.org>; Daniel Borkmann
-> > <daniel@iogearbox.net>; Jesper Dangaard Brouer <hawk@kernel.org>; John =
-Fastabend <john.fastabend@gmail.com>; bpf
-> > <bpf@vger.kernel.org>; mlxsw <mlxsw@nvidia.com>
-> > Subject: Re: [PATCH net-next 00/12] mlxsw: Preparations for XDP support
-> >
-> > On Tue, Feb 4, 2025 at 11:06=E2=80=AFAM Petr Machata <petrm@nvidia.com>=
- wrote:
-> > >
-> > > Amit Cohen writes:
-> > >
-> > > A future patch set will add support for XDP in mlxsw driver. This set=
- adds
-> > > some preparations.
-> >
-> > Why?
-> > What is the goal here?
-> > My understanding is that mlxsw is a hw switch and skb-s are used to
-> > implement tap functionality for few listeners.
-> > The volume of such packets is supposed to be small.
-> > Even if XDP is added there is a huge mismatch in packet rates.
-> > Hence the question. Why bother?
->
-> You're right, most of packets should be handled by HW, XDP is mainly usef=
-ul for telemetry.
+On Tue, Feb 04, 2025 at 04:02:44PM +1300, Chris Packham wrote:
+> Add bindings for the ethernet-switch portion of the RTL9300.
+> 
+> Signed-off-by: Chris Packham <chris.packham@alliedtelesis.co.nz>
+> ---
+> 
+> Notes:
+>     Changes in v6:
+>     - New
+>     - I'd like to enforce the property being "ethernet-ports" but I see the
+>       generic binding allows "ports" as well. Can I just add ethernet-ports:
+>       type: object here
 
-Why skb path is not enough?
+Yes. And keep 'additionalProperties'.
+
+>  or does by driver need to handle both "ports" and
+>       "ethernet-ports" (I see some do and some don't).
+
+No, it doesn't.
+
+> 
+>  .../bindings/mfd/realtek,rtl9301-switch.yaml     | 16 +++++++++++++++-
+>  1 file changed, 15 insertions(+), 1 deletion(-)
+> 
+> diff --git a/Documentation/devicetree/bindings/mfd/realtek,rtl9301-switch.yaml b/Documentation/devicetree/bindings/mfd/realtek,rtl9301-switch.yaml
+> index f053303ab1e6..cb54abda5e6a 100644
+> --- a/Documentation/devicetree/bindings/mfd/realtek,rtl9301-switch.yaml
+> +++ b/Documentation/devicetree/bindings/mfd/realtek,rtl9301-switch.yaml
+> @@ -14,6 +14,8 @@ description:
+>    number of different peripherals are accessed through a common register block,
+>    represented here as a syscon node.
+>  
+> +$ref: /schemas/net/ethernet-switch.yaml#
+
+If you don't have any device specific per port properties, then this 
+needs to be: ethernet-switch.yaml#/$defs/ethernet-ports
+
+> +
+>  properties:
+>    compatible:
+>      items:
+> @@ -45,7 +47,7 @@ required:
+>    - compatible
+>    - reg
+>  
+> -additionalProperties: false
+> +unevaluatedProperties: false
+>  
+>  examples:
+>    - |
+> @@ -110,5 +112,17 @@ examples:
+>            };
+>          };
+>        };
+> +
+> +      ethernet-ports {
+> +        #address-cells = <1>;
+> +        #size-cells = <0>;
+> +
+> +        port@0 {
+> +          reg = <0>;
+> +        };
+> +        port@1 {
+> +          reg = <1>;
+> +        };
+> +      };
+>      };
+>  
+> -- 
+> 2.48.1
+> 
 
