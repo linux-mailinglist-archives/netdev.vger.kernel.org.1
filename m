@@ -1,130 +1,146 @@
-Return-Path: <netdev+bounces-162630-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-162631-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id B4FDAA276E2
-	for <lists+netdev@lfdr.de>; Tue,  4 Feb 2025 17:14:39 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5D114A276FA
+	for <lists+netdev@lfdr.de>; Tue,  4 Feb 2025 17:18:31 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 9C8201885853
-	for <lists+netdev@lfdr.de>; Tue,  4 Feb 2025 16:14:44 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 3B71B1885985
+	for <lists+netdev@lfdr.de>; Tue,  4 Feb 2025 16:18:36 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E55A2215194;
-	Tue,  4 Feb 2025 16:14:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 850C3215073;
+	Tue,  4 Feb 2025 16:18:26 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="opORp5jE"
+	dkim=pass (2048-bit key) header.d=queasysnail.net header.i=@queasysnail.net header.b="Qo6/z2r2";
+	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="Ed0z7Tqn"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from fout-b1-smtp.messagingengine.com (fout-b1-smtp.messagingengine.com [202.12.124.144])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B81DB21516C;
-	Tue,  4 Feb 2025 16:14:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D4E2B3232;
+	Tue,  4 Feb 2025 16:18:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=202.12.124.144
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1738685673; cv=none; b=awHw6LBaeLqEjR7Wc+JyhxKToIv/FBDLbW7d4f+1XMlGKkMdE9VahV2KXC6HkIb/Y5roKs1N6p5uR7sfu6oyJw5Dw/wwYyKtbYPX6IMaj6Eer2joG8Zu5VK+HdpzPyE8fH4m3RUVSp3c8IDC75RkRITNRGVMibuMdC8yF2p8eoo=
+	t=1738685906; cv=none; b=IGyapO0KiSeLvZAfFoXeEEEAqylTszgTfV3dqUldzXBBqsUceu3xs51Mu/U+iE99sm9T6oshD2rBPwvx6mO7Tj2HV1Aul82Hjh3dwEXucV0WQxvLGvBr5L6fkHZ093Hu/Pzdm2nCPwsmxmmY0uH51NcFQzYfWDyOzNf4YQIg7so=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1738685673; c=relaxed/simple;
-	bh=GBcXB5AV6YtR0BMwlaL9meSZs1urR7n3hkq4NxMztr0=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=JB6ttRO2QVZIavFR3PNoZTnyA6O/r9PBAB2MIIpIK930wczARbzV1E8mUHPIuNC9c56XovvNFo7jNBStHxMAYWcyK/F+XKd/yNnXGcS4fn4/MG92/8NruAv1UpUCW+J6I5YJhuXN3ESQwpAF7MJlTJeFtPkDm5WUX4snrH+LL8Q=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=opORp5jE; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id EC0B5C4CEDF;
-	Tue,  4 Feb 2025 16:14:32 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1738685673;
-	bh=GBcXB5AV6YtR0BMwlaL9meSZs1urR7n3hkq4NxMztr0=;
-	h=From:To:Cc:Subject:Date:From;
-	b=opORp5jEQEYA6NkXiV8/hFMEVuSB7q/VlDuVWp8REJ4ZjfSqvZb5l0Upl5IXfCCH7
-	 h7Uh5Zz1M0YBxtxPhmYaXKeQQj5+Llifb0K7gMlMG72jyHp8XIvlXiqr4xN2N983Dn
-	 DHUwmyW9VzkYX84vEAazeN/kDbkU3wYQ377Q4ezuEXltPpPRbrnIgWG1o5KG0Ipo+d
-	 KaqI/DfCDrCYTBVyLFIJqM5Jh3fjME/d78qO5yhohJC9OIdEAfeFafK9jbjxberwTO
-	 smfveWlyGMOoZwN9FhcS5j6QO7NePSUHonJk7qx9WRZP31Lb/x1WJ4UDRgRAzBtY4h
-	 nx+co3ay1oe0A==
-Received: by wens.tw (Postfix, from userid 1000)
-	id 1F16D5FB49; Wed,  5 Feb 2025 00:14:29 +0800 (CST)
-From: Chen-Yu Tsai <wens@kernel.org>
-To: Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Heiko Stuebner <heiko@sntech.de>
-Cc: "Russell King (Oracle)" <rmk+kernel@armlinux.org.uk>,
-	Steven Price <steven.price@arm.com>,
-	Chen-Yu Tsai <wens@csie.org>,
-	Kunihiko Hayashi <hayashi.kunihiko@socionext.com>,
-	netdev@vger.kernel.org,
-	linux-arm-kernel@lists.infradead.org,
-	linux-kernel@vger.kernel.org,
-	linux-rockchip@lists.infradead.org,
-	stable@vger.kernel.org
-Subject: [PATCH netdev] net: stmmac: dwmac-rk: Provide FIFO sizes for DWMAC 1000
-Date: Wed,  5 Feb 2025 00:13:59 +0800
-Message-Id: <20250204161359.3335241-1-wens@kernel.org>
-X-Mailer: git-send-email 2.39.5
+	s=arc-20240116; t=1738685906; c=relaxed/simple;
+	bh=DKTIL9GERuc5VnQAC6xaTgLBDniJCbeGoOMmXtCvH5k=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=XG0PiMqeaxVfyLMxIca3UFv0On5+13UsvJRb6bzNOXyqURU16UjyGSDB49repKk64NiXyVR1Jy7dacjCajBHLZRL9yAavRbXC+4wgDr1MWd6KrX4ExqGiluBJTXR0lo8/h9GDnzaXDKhaOvaEXp/z1hl2oDoULXbfWrkbLUfXNI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=queasysnail.net; spf=pass smtp.mailfrom=queasysnail.net; dkim=pass (2048-bit key) header.d=queasysnail.net header.i=@queasysnail.net header.b=Qo6/z2r2; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=Ed0z7Tqn; arc=none smtp.client-ip=202.12.124.144
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=queasysnail.net
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=queasysnail.net
+Received: from phl-compute-01.internal (phl-compute-01.phl.internal [10.202.2.41])
+	by mailfout.stl.internal (Postfix) with ESMTP id 7D85C11400DD;
+	Tue,  4 Feb 2025 11:18:21 -0500 (EST)
+Received: from phl-mailfrontend-02 ([10.202.2.163])
+  by phl-compute-01.internal (MEProxy); Tue, 04 Feb 2025 11:18:21 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=queasysnail.net;
+	 h=cc:cc:content-type:content-type:date:date:from:from
+	:in-reply-to:in-reply-to:message-id:mime-version:references
+	:reply-to:subject:subject:to:to; s=fm1; t=1738685901; x=
+	1738772301; bh=Hstw0ccrll9JlVqF+ADPlMurrFIjkYXqn+Q5Hs2OIUM=; b=Q
+	o6/z2r2cVTp/1eWT6xSJUGvmj4ocZkuWBpjK4tcAI6RWbYK0qdbJq1hjSNxluVIG
+	2ZkdyVW0h5kFqLDnbJBSMOaOf6VBLai2iL0qtPvzBRdC1clfG30/elsRLGAHMWDo
+	UD1iO6FCUp71ls0qlrmmg0R5n9sIZZokZu512AUDKxVfXeJkQbWtuuEfQY4vMOoK
+	/DOhLPsCLWHC/WNNaowT5S/kyuR4U0GanIKM8bx9HWqHoA41cSrZbS/u1yCzh9Xs
+	NDTWFzUh/233fES4EpnxVCD2aHWeoztg2N44S7bdI+QF+ajObfE4wENhWDYT7tm+
+	0Q+5jmtP6QBaysnliRAUg==
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
+	messagingengine.com; h=cc:cc:content-type:content-type:date:date
+	:feedback-id:feedback-id:from:from:in-reply-to:in-reply-to
+	:message-id:mime-version:references:reply-to:subject:subject:to
+	:to:x-me-proxy:x-me-sender:x-me-sender:x-sasl-enc; s=fm3; t=
+	1738685901; x=1738772301; bh=Hstw0ccrll9JlVqF+ADPlMurrFIjkYXqn+Q
+	5Hs2OIUM=; b=Ed0z7Tqni7+xPwM1mHFVV/8woWiulLl56mCOloGBn1YcRMCjeBz
+	N3TbRvSkOqC+JoLnsl/KPqqys61u3UfVaD8kHPPFsjoejdW+SE3mhFS+5WYcIKkt
+	JZo6zCy8leZA6z002/o/zv0Z9cQQEp4+Bn0q7nwz6K5+2Voh6anVXKgPNQoPAd4F
+	PgWQw8K2Y954JikOE4upbCfZbXkhlKLIwi1VRXnWpBk4TcFYG6/BqX15oQvyhOz7
+	nYBROioJVxq2pGimrE6oS7KNHEigDGfTOPGnDKRcmWLpwC/Ya2tEyJuLYJwbumZh
+	jBji/NZQn6XEYseEBgjNqJqkQaP9DbTomGQ==
+X-ME-Sender: <xms:zD2iZ1TXI5TLj3xLqLiwpeLaRHMOs2VQ_73_7XX8H_TQkdCdVkRSKg>
+    <xme:zD2iZ-xCHuiiE-ASzJr3HN_a3UlmkepkwcgiFSheixCShuE5dY5286Qfie5lF8p4W
+    CD6oCyHcz2ss5VW9oA>
+X-ME-Received: <xmr:zD2iZ63e8lXi6Ifcv86aQVqQYeYnagGvi-FwHx1BQ_sIDkXUeUnwYztFZq-N>
+X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeefvddrtddtgddvtdelkecutefuodetggdotefrod
+    ftvfcurfhrohhfihhlvgemucfhrghsthforghilhdpggftfghnshhusghstghrihgsvgdp
+    uffrtefokffrpgfnqfghnecuuegrihhlohhuthemuceftddtnecusecvtfgvtghiphhivg
+    hnthhsucdlqddutddtmdenucfjughrpeffhffvvefukfhfgggtuggjsehttdertddttdej
+    necuhfhrohhmpefurggsrhhinhgrucffuhgsrhhotggruceoshgusehquhgvrghshihsnh
+    grihhlrdhnvghtqeenucggtffrrghtthgvrhhnpeeuhffhfffgfffhfeeuiedugedtfefh
+    keegteehgeehieffgfeuvdeuffefgfduffenucevlhhushhtvghrufhiiigvpedtnecurf
+    grrhgrmhepmhgrihhlfhhrohhmpehsugesqhhuvggrshihshhnrghilhdrnhgvthdpnhgs
+    pghrtghpthhtohepudefpdhmohguvgepshhmthhpohhuthdprhgtphhtthhopegrnhhtoh
+    hnihhosehophgvnhhvphhnrdhnvghtpdhrtghpthhtohepnhgvthguvghvsehvghgvrhdr
+    khgvrhhnvghlrdhorhhgpdhrtghpthhtohepvgguuhhmrgiivghtsehgohhoghhlvgdrtg
+    homhdprhgtphhtthhopehkuhgsrgeskhgvrhhnvghlrdhorhhgpdhrtghpthhtohepphgr
+    sggvnhhisehrvgguhhgrthdrtghomhdprhgtphhtthhopeguohhnrghlugdrhhhunhhtvg
+    hrsehgmhgrihhlrdgtohhmpdhrtghpthhtohepshhhuhgrhheskhgvrhhnvghlrdhorhhg
+    pdhrtghpthhtoheprhihrgiirghnohhvrdhsrdgrsehgmhgrihhlrdgtohhmpdhrtghpth
+    htoheprghnughrvgifodhnvghtuggvvheslhhunhhnrdgthh
+X-ME-Proxy: <xmx:zD2iZ9Cp115umxV5rSRkBw4Wmk_iuM_5-cYBvc3Nd8AcQlPd8ADB5w>
+    <xmx:zD2iZ-jxZ0zlJK5o7kkEytQorPI7oRaXX0L6RBrXQgZHkFy_-fWuVA>
+    <xmx:zD2iZxoMX57E1EvgvZ_dYicmJLkP1HPNl08MePG8K8w2aai-1JAt5g>
+    <xmx:zD2iZ5gU7fmrHZaKLn48hBmDeZpNSXgrmMmqI6JbwFjrod6p_SjDnA>
+    <xmx:zT2iZ1QKyyeHNi_akJQPrHBcBIRNIV12AUKOROKZFvt1pzJvxZTz4w25>
+Feedback-ID: i934648bf:Fastmail
+Received: by mail.messagingengine.com (Postfix) with ESMTPA; Tue,
+ 4 Feb 2025 11:18:20 -0500 (EST)
+Date: Tue, 4 Feb 2025 17:18:18 +0100
+From: Sabrina Dubroca <sd@queasysnail.net>
+To: Antonio Quartulli <antonio@openvpn.net>
+Cc: netdev@vger.kernel.org, Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Donald Hunter <donald.hunter@gmail.com>,
+	Shuah Khan <shuah@kernel.org>, ryazanov.s.a@gmail.com,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	Simon Horman <horms@kernel.org>, linux-kernel@vger.kernel.org,
+	linux-kselftest@vger.kernel.org, Xiao Liang <shaw.leon@gmail.com>
+Subject: Re: [PATCH net-next v18 07/25] ovpn: implement basic TX path (UDP)
+Message-ID: <Z6I9yn3Nh-9Ebvv9@hog>
+References: <20250113-b4-ovpn-v18-0-1f00db9c2bd6@openvpn.net>
+ <20250113-b4-ovpn-v18-7-1f00db9c2bd6@openvpn.net>
+ <Z6CR6QGVrMqauP2H@hog>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <Z6CR6QGVrMqauP2H@hog>
 
-From: Chen-Yu Tsai <wens@csie.org>
+2025-02-03, 10:52:41 +0100, Sabrina Dubroca wrote:
+> 2025-01-13, 10:31:26 +0100, Antonio Quartulli wrote:
+> > +static void ovpn_encrypt_post(struct sk_buff *skb, int ret)
+> > +{
+> > +	struct ovpn_peer *peer = ovpn_skb_cb(skb)->peer;
+> > +
+> > +	if (unlikely(ret < 0))
+> > +		goto err;
+> > +
+> > +	skb_mark_not_on_list(skb);
+> > +
+> > +	switch (peer->sock->sock->sk->sk_protocol) {
+> 
+> We have a ref on the peer, but not on the ovpn_sock. DEL_PEER could
+> have detached the sock by the time the crypto completes.
+> 
+> (unfortunately I don't have any idea to fix this yet)
 
-The DWMAC 1000 DMA capabilities register does not provide actual
-FIFO sizes, nor does the driver really care. If they are not
-provided via some other means, the driver will work fine, only
-disallowing changing the MTU setting.
+Maybe an idea:
 
-The recent commit 8865d22656b4 ("net: stmmac: Specify hardware
-capability value when FIFO size isn't specified") changed this by
-requiring the FIFO sizes to be provided, breaking devices that were
-working just fine.
+Since ovpn_sock itself lives under RCU (because of sk_user_data),
+peer->sock should be an RCU pointer and also follow RCU rules. For
+most parts (io.c, netlink.c) the conversion is not too
+problematic. TCP is more difficult.
 
-Provide the FIFO sizes through the driver's platform data, to not
-only fix the breakage, but also enable MTU changes. The FIFO sizes
-are confirmed to be the same across RK3288, RK3328, RK3399 and PX30,
-based on their respective manuals. It is likely that Rockchip
-synthesized their DWMAC 1000 with the same parameters on all their
-chips that have it.
+I still need to think about whether this works, and whether this is
+worth the complexity, or if we could solve this in another way.
 
-Fixes: eaf4fac47807 ("net: stmmac: Do not accept invalid MTU values")
-Fixes: 8865d22656b4 ("net: stmmac: Specify hardware capability value when FIFO size isn't specified")
-Cc: <stable@vger.kernel.org>
-Signed-off-by: Chen-Yu Tsai <wens@csie.org>
----
-The reason for stable inclusion is not to fix the device breakage
-(which only broke in v6.14-rc1), but to provide the values so that MTU
-changes can work in older kernels.
-
-Since a fix for stmmac in general has already been sent [1] and a revert
-was also proposed [2], I'll refrain from sending mine.
-
-[1] https://lore.kernel.org/all/20250203093419.25804-1-steven.price@arm.com/
-[2] https://lore.kernel.org/all/Z6Clkh44QgdNJu_O@shell.armlinux.org.uk/
-
- drivers/net/ethernet/stmicro/stmmac/dwmac-rk.c | 5 ++++-
- 1 file changed, 4 insertions(+), 1 deletion(-)
-
-diff --git a/drivers/net/ethernet/stmicro/stmmac/dwmac-rk.c b/drivers/net/ethernet/stmicro/stmmac/dwmac-rk.c
-index a4dc89e23a68..71a4c4967467 100644
---- a/drivers/net/ethernet/stmicro/stmmac/dwmac-rk.c
-+++ b/drivers/net/ethernet/stmicro/stmmac/dwmac-rk.c
-@@ -1966,8 +1966,11 @@ static int rk_gmac_probe(struct platform_device *pdev)
- 	/* If the stmmac is not already selected as gmac4,
- 	 * then make sure we fallback to gmac.
- 	 */
--	if (!plat_dat->has_gmac4)
-+	if (!plat_dat->has_gmac4) {
- 		plat_dat->has_gmac = true;
-+		plat_dat->rx_fifo_size = 4096;
-+		plat_dat->tx_fifo_size = 2048;
-+	}
- 	plat_dat->fix_mac_speed = rk_fix_speed;
- 
- 	plat_dat->bsp_priv = rk_gmac_setup(pdev, plat_dat, data);
 -- 
-2.39.5
-
+Sabrina
 
