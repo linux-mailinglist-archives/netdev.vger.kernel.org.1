@@ -1,166 +1,183 @@
-Return-Path: <netdev+bounces-162407-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-162409-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 22C71A26C4C
-	for <lists+netdev@lfdr.de>; Tue,  4 Feb 2025 07:58:09 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2D6F7A26C7E
+	for <lists+netdev@lfdr.de>; Tue,  4 Feb 2025 08:13:12 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 95D4D1634D5
-	for <lists+netdev@lfdr.de>; Tue,  4 Feb 2025 06:58:07 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id ABBCC18873E2
+	for <lists+netdev@lfdr.de>; Tue,  4 Feb 2025 07:13:16 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 410721F8AD3;
-	Tue,  4 Feb 2025 06:58:05 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id F0B50204C1F;
+	Tue,  4 Feb 2025 07:13:06 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="MghnXmPY"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="N9FAZ8on"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-f46.google.com (mail-ed1-f46.google.com [209.85.208.46])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.12])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 69B96158524
-	for <netdev@vger.kernel.org>; Tue,  4 Feb 2025 06:58:03 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.46
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 78B1C204C1D
+	for <netdev@vger.kernel.org>; Tue,  4 Feb 2025 07:13:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.12
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1738652285; cv=none; b=pKcQr9f3szn1ZJrMC0mHzsk2gcmUHOYlgNLVCpbJ9doV+9DY8ENY9hPNbCbnZcR8BpvElItL9TPREKE4/r99IxkW6tp07yllbVtAOc4b1vnMuYN4C4v2xl1v7hsnBseCBtKq+33TMewCSmUA2friuaJysPDCn6kI8CI09xZbsJ0=
+	t=1738653186; cv=none; b=uchXm4PYtZtbmAdYYpu9d5NVUNpj1duhCxPGCH1eljAWGZcN02BXRVxGb2ntWgaDd+x/fQWg+6oUmZUH2B9Hb2mNkqO8UR543wFgUoVZdM/RmNB0L+1pAWSEwpRDJ7KUXxoadLl0ieNhLJ27u9qbM3XgJdSSWX9f/LrDxIPGG/c=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1738652285; c=relaxed/simple;
-	bh=pO9DbMo9hC6+E1aFWzx3Ium/nHWkaE/QMJrHCC7fTKQ=;
-	h=Message-ID:Date:MIME-Version:From:Subject:To:Cc:Content-Type; b=odCoKjLs7Y7havdjomLolYTqta1y4qBalEE2YN9hqYleG25rPXBygnSQ1eNJcmaMhBljPOYx6wIbW/44XE+97KDWZU315ffLPHd+zbo/6E1q5KIrcc5Kd8RUMrRadm5rMKp3g8dj7RB8lOeQLLWjZrr+KvyaYHIkO0kvfUGdFgc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=MghnXmPY; arc=none smtp.client-ip=209.85.208.46
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ed1-f46.google.com with SMTP id 4fb4d7f45d1cf-5d3ecae02beso7159264a12.0
-        for <netdev@vger.kernel.org>; Mon, 03 Feb 2025 22:58:03 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1738652282; x=1739257082; darn=vger.kernel.org;
-        h=content-transfer-encoding:autocrypt:content-language:cc:to:subject
-         :from:user-agent:mime-version:date:message-id:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=Ds6iWwU42aTPR6GW1S+LAxwBWTnIp1aFnf20q13ycmY=;
-        b=MghnXmPYwxULxMg1SR5l+RDKWBXk9+yjSqNYTkP1reCW1+CU6N/N60veB2VqiILtwU
-         OdrAqxsqaVES5fGyf4NVLd7kf51KyHeETIy+pag30Iiry231oVnQ7A9GfBKiq9lATmq3
-         vzTshP3p3LljQut4C5Fe2rKV7dW8SkXDJbjxQ17DerW//ev2c44wwfmJ2jYqIPv/G290
-         rjbk/d6QELsjRPtVDVfLTTgQy7woRstzrnEeh17Jjuh/E3lFNdXX6DuOSpWS3T5rZjmQ
-         RORJT37cPSjWGnKjKhgTKD0mKbxyNB99GN3DPDTHfdCHFqJNlAX+ol1c2ZycPN8DH1ht
-         IHcg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1738652282; x=1739257082;
-        h=content-transfer-encoding:autocrypt:content-language:cc:to:subject
-         :from:user-agent:mime-version:date:message-id:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=Ds6iWwU42aTPR6GW1S+LAxwBWTnIp1aFnf20q13ycmY=;
-        b=qZsMTiTYUo15XKa/2ybmUvIiLRFOnoGC3kybGKUVsfS2hfqky6Pva9pFWMrsbccbcJ
-         e/I9CDGU5GaZ7oRMk+xRVCl2Vot6kdCwPyHEuWZsDXsqAOPfK1KIreCP+OwzSLZ8Q9lU
-         /asrx1tOQXxPA4OvldlUmPNBbiRltNySaS5x0amJkBU5g1wo5yNOQJfPXoivmJ5riuA9
-         0ZIgM4PtNbQP2uAqWaIE3ohloxsNGOoKsA9cfL+9dA3m8BTfTJCTdLBXvWfkutimqG8w
-         KhPk5ylJbsYMO1JNu1TZRcUoHcW36E9u58EjakGNysz2eYaB3JGP19BVCsgKvNe9Duzq
-         oJiw==
-X-Gm-Message-State: AOJu0YySuNA9hJdNnZk0KkPG42lH+h3MWKj/wH1Q1CeDLIyFavNorBBn
-	6PCLCggVL/DmGuWOWpvKyRE/z8GQ3zDkPZac0aqPIqn5cB1lSNvl
-X-Gm-Gg: ASbGncsKY1j45QQof+cXwj3SIex9SvmcqH4E8GRRx9VQkyG93lUEXCwyTEr+LApUWtJ
-	xRoZu7xwp41etjx5+L1uWzRmej+mxtYjz6AiaJSPnRjRIoamGnZES7peYnD220kINsq7+NnaLsK
-	2PGBP3XXgb1j8fUgDIg+h8M7BZNPZ7HfQaXuOah2u+zB3AEOzWTSNUBotaVts+lpVs3P781BBz0
-	GtPCl1XqLYp1YJaX6GT8S2njLhQt9e8d1iCWchieS7J/nmv0Wic8xtouYWJYy+uhEpFCgk2Iv4s
-	tS8SnytWbrKiDrFiYIlR28PNekiHBjMD7bbcNiNUIwDypJi9mqaEcHU6evxoXzNRJ4oPjeH7e7g
-	8VE2BZC8ci8A9gKdkMgU+2pIxDaDKaqm2IWEdXxrVuBcQKB7EhQNxmiRG2zgBdeSUL5NMNvU9ml
-	lXVNcvR3E=
-X-Google-Smtp-Source: AGHT+IHhP/Ykt4riJ36peq+TtWjjdNFink9cKnKwt6femji3HSO6LbzGmO9C/4+Wld/XRuxBZ6IPgQ==
-X-Received: by 2002:a05:6402:2706:b0:5db:e6da:5ed3 with SMTP id 4fb4d7f45d1cf-5dc5eff42bamr23862513a12.21.1738652281375;
-        Mon, 03 Feb 2025 22:58:01 -0800 (PST)
-Received: from ?IPV6:2a02:3100:b3d9:8600:3060:df41:4ad7:b58a? (dynamic-2a02-3100-b3d9-8600-3060-df41-4ad7-b58a.310.pool.telefonica.de. [2a02:3100:b3d9:8600:3060:df41:4ad7:b58a])
-        by smtp.googlemail.com with ESMTPSA id 4fb4d7f45d1cf-5dc724c9d0asm8901832a12.77.2025.02.03.22.57.59
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 03 Feb 2025 22:58:00 -0800 (PST)
-Message-ID: <830637dd-4016-4a68-92b3-618fcac6589d@gmail.com>
-Date: Tue, 4 Feb 2025 07:58:17 +0100
+	s=arc-20240116; t=1738653186; c=relaxed/simple;
+	bh=QfFPqspbaf7ExJBkf27J8R5NIKhkrUJF1PxNFpOI15o=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=b4NaSljq+HS8Wby3UH7pPxQuX9zipxSfBnrFj1LJFJrUBT0JcLyJZUfbRDmL4P5sHC3W5J1XxSdJXaC97/amtV5uRaEVxH5rHwEkIZLNexHv/BNKpd+YIYk9/zfcwdmaA/xuf/TIXtKcAjxA/0L6+xvbDz5nOuw/ZIDfhOIKRbQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=N9FAZ8on; arc=none smtp.client-ip=192.198.163.12
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1738653185; x=1770189185;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=QfFPqspbaf7ExJBkf27J8R5NIKhkrUJF1PxNFpOI15o=;
+  b=N9FAZ8onwCA6DZWfmuUauXf9dQjiAEM9IM/0qFMJKFtshktrZWoSMONY
+   LkNGWLeHtwRdBkcXMv5554LtiJEWh+Cz1v6ECalWghbExPX596CeM8lGS
+   6o+d9DT5wicqhU529b1X7eD/VG8Y2MJoqS2W9+8PGP1eHidj97wc3ZAKU
+   OUjt5hRSpyzad1HqHIivVo1j7F/8xXsZvOoFxYlja3D/wkEAX3lgIPlsn
+   uYUrB8gp09WSQp4iVbvx12hrASSnCAYckL4vEgAYOxKtras/KkKpMVIEv
+   Z9XLO2uzlBgNwZOx6os4x983u6CeZf1X93OcdlqYboJmCDlxAcU9sQF2P
+   A==;
+X-CSE-ConnectionGUID: P20BCcgaQfOg4gQltURjuA==
+X-CSE-MsgGUID: uQBcQ9A+Qm++YrsU8CogwA==
+X-IronPort-AV: E=McAfee;i="6700,10204,11335"; a="43089169"
+X-IronPort-AV: E=Sophos;i="6.13,258,1732608000"; 
+   d="scan'208";a="43089169"
+Received: from fmviesa001.fm.intel.com ([10.60.135.141])
+  by fmvoesa106.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 03 Feb 2025 23:13:04 -0800
+X-CSE-ConnectionGUID: yz4bl+uSRUG5EnW0awHZLQ==
+X-CSE-MsgGUID: nzNvQnPtRRm1JI70EINpKQ==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.12,224,1728975600"; 
+   d="scan'208";a="141361157"
+Received: from pkwapuli-mobl1.ger.corp.intel.com (HELO vbox-pkwap.ger.corp.intel.com) ([10.245.87.141])
+  by fmviesa001.fm.intel.com with ESMTP; 03 Feb 2025 23:13:02 -0800
+From: Piotr Kwapulinski <piotr.kwapulinski@intel.com>
+To: intel-wired-lan@lists.osuosl.org
+Cc: netdev@vger.kernel.org,
+	richardcochran@gmail.com,
+	Piotr Kwapulinski <piotr.kwapulinski@intel.com>,
+	Milena Olech <milena.olech@intel.com>,
+	Przemek Kitszel <przemyslaw.kitszel@intel.com>
+Subject: [PATCH iwl-next] ixgbe: add PTP support for E610 device
+Date: Tue,  4 Feb 2025 08:12:59 +0100
+Message-ID: <20250204071259.15510-1-piotr.kwapulinski@intel.com>
+X-Mailer: git-send-email 2.43.5
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-From: Heiner Kallweit <hkallweit1@gmail.com>
-Subject: [PATCH v2 net-next] r8169: don't scan PHY addresses > 0
-To: Realtek linux nic maintainers <nic_swsd@realtek.com>,
- Andrew Lunn <andrew+netdev@lunn.ch>, Paolo Abeni <pabeni@redhat.com>,
- Jakub Kicinski <kuba@kernel.org>, David Miller <davem@davemloft.net>,
- Eric Dumazet <edumazet@google.com>, Simon Horman <horms@kernel.org>
-Cc: "netdev@vger.kernel.org" <netdev@vger.kernel.org>
-Content-Language: en-US
-Autocrypt: addr=hkallweit1@gmail.com; keydata=
- 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
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 
-The PHY address is a dummy, because r8169 PHY access registers
-don't support a PHY address. Therefore scan address 0 only.
+Add PTP support for E610 adapter. The E610 is based on X550 and adds
+firmware managed link, enhanced security capabilities and support for
+updated server manageability. It does not introduce any new PTP features
+compared to X550.
 
-Signed-off-by: Heiner Kallweit <hkallweit1@gmail.com>
+Reviewed-by: Milena Olech <milena.olech@intel.com>
+Reviewed-by: Przemek Kitszel <przemyslaw.kitszel@intel.com>
+Signed-off-by: Piotr Kwapulinski <piotr.kwapulinski@intel.com>
 ---
-v2:
-- Because of the IOCTL interface, don't remove the phyaddr > 0 checks.
----
- drivers/net/ethernet/realtek/r8169_main.c | 1 +
- 1 file changed, 1 insertion(+)
+ drivers/net/ethernet/intel/ixgbe/ixgbe_ethtool.c |  1 +
+ drivers/net/ethernet/intel/ixgbe/ixgbe_ptp.c     | 13 +++++++++++--
+ 2 files changed, 12 insertions(+), 2 deletions(-)
 
-diff --git a/drivers/net/ethernet/realtek/r8169_main.c b/drivers/net/ethernet/realtek/r8169_main.c
-index 5a5eba49c..7306c8e32 100644
---- a/drivers/net/ethernet/realtek/r8169_main.c
-+++ b/drivers/net/ethernet/realtek/r8169_main.c
-@@ -5222,6 +5222,7 @@ static int r8169_mdio_register(struct rtl8169_private *tp)
- 	new_bus->priv = tp;
- 	new_bus->parent = &pdev->dev;
- 	new_bus->irq[0] = PHY_MAC_INTERRUPT;
-+	new_bus->phy_mask = GENMASK(31, 1);
- 	snprintf(new_bus->id, MII_BUS_ID_SIZE, "r8169-%x-%x",
- 		 pci_domain_nr(pdev->bus), pci_dev_id(pdev));
+diff --git a/drivers/net/ethernet/intel/ixgbe/ixgbe_ethtool.c b/drivers/net/ethernet/intel/ixgbe/ixgbe_ethtool.c
+index da91c58..f03925c 100644
+--- a/drivers/net/ethernet/intel/ixgbe/ixgbe_ethtool.c
++++ b/drivers/net/ethernet/intel/ixgbe/ixgbe_ethtool.c
+@@ -3185,6 +3185,7 @@ static int ixgbe_get_ts_info(struct net_device *dev,
+ 	case ixgbe_mac_X550:
+ 	case ixgbe_mac_X550EM_x:
+ 	case ixgbe_mac_x550em_a:
++	case ixgbe_mac_e610:
+ 		info->rx_filters |= BIT(HWTSTAMP_FILTER_ALL);
+ 		break;
+ 	case ixgbe_mac_X540:
+diff --git a/drivers/net/ethernet/intel/ixgbe/ixgbe_ptp.c b/drivers/net/ethernet/intel/ixgbe/ixgbe_ptp.c
+index 9339edb..eef25e1 100644
+--- a/drivers/net/ethernet/intel/ixgbe/ixgbe_ptp.c
++++ b/drivers/net/ethernet/intel/ixgbe/ixgbe_ptp.c
+@@ -140,6 +140,7 @@
+  * proper mult and shift to convert the cycles into nanoseconds of time.
+  */
+ #define IXGBE_X550_BASE_PERIOD 0xC80000000ULL
++#define IXGBE_E610_BASE_PERIOD 0x333333333ULL
+ #define INCVALUE_MASK	0x7FFFFFFF
+ #define ISGN		0x80000000
  
+@@ -415,6 +416,7 @@ static void ixgbe_ptp_convert_to_hwtstamp(struct ixgbe_adapter *adapter,
+ 	case ixgbe_mac_X550:
+ 	case ixgbe_mac_X550EM_x:
+ 	case ixgbe_mac_x550em_a:
++	case ixgbe_mac_e610:
+ 		/* Upper 32 bits represent billions of cycles, lower 32 bits
+ 		 * represent cycles. However, we use timespec64_to_ns for the
+ 		 * correct math even though the units haven't been corrected
+@@ -492,11 +494,13 @@ static int ixgbe_ptp_adjfine_X550(struct ptp_clock_info *ptp, long scaled_ppm)
+ 	struct ixgbe_adapter *adapter =
+ 			container_of(ptp, struct ixgbe_adapter, ptp_caps);
+ 	struct ixgbe_hw *hw = &adapter->hw;
++	u64 rate, base;
+ 	bool neg_adj;
+-	u64 rate;
+ 	u32 inca;
+ 
+-	neg_adj = diff_by_scaled_ppm(IXGBE_X550_BASE_PERIOD, scaled_ppm, &rate);
++	base = hw->mac.type == ixgbe_mac_e610 ? IXGBE_E610_BASE_PERIOD :
++						IXGBE_X550_BASE_PERIOD;
++	neg_adj = diff_by_scaled_ppm(base, scaled_ppm, &rate);
+ 
+ 	/* warn if rate is too large */
+ 	if (rate >= INCVALUE_MASK)
+@@ -559,6 +563,7 @@ static int ixgbe_ptp_gettimex(struct ptp_clock_info *ptp,
+ 	case ixgbe_mac_X550:
+ 	case ixgbe_mac_X550EM_x:
+ 	case ixgbe_mac_x550em_a:
++	case ixgbe_mac_e610:
+ 		/* Upper 32 bits represent billions of cycles, lower 32 bits
+ 		 * represent cycles. However, we use timespec64_to_ns for the
+ 		 * correct math even though the units haven't been corrected
+@@ -1067,6 +1072,7 @@ static int ixgbe_ptp_set_timestamp_mode(struct ixgbe_adapter *adapter,
+ 	case ixgbe_mac_X550:
+ 	case ixgbe_mac_X550EM_x:
+ 	case ixgbe_mac_x550em_a:
++	case ixgbe_mac_e610:
+ 		/* enable timestamping all packets only if at least some
+ 		 * packets were requested. Otherwise, play nice and disable
+ 		 * timestamping
+@@ -1233,6 +1239,7 @@ void ixgbe_ptp_start_cyclecounter(struct ixgbe_adapter *adapter)
+ 		fallthrough;
+ 	case ixgbe_mac_x550em_a:
+ 	case ixgbe_mac_X550:
++	case ixgbe_mac_e610:
+ 		cc.read = ixgbe_ptp_read_X550;
+ 		break;
+ 	case ixgbe_mac_X540:
+@@ -1280,6 +1287,7 @@ static void ixgbe_ptp_init_systime(struct ixgbe_adapter *adapter)
+ 	case ixgbe_mac_X550EM_x:
+ 	case ixgbe_mac_x550em_a:
+ 	case ixgbe_mac_X550:
++	case ixgbe_mac_e610:
+ 		tsauxc = IXGBE_READ_REG(hw, IXGBE_TSAUXC);
+ 
+ 		/* Reset SYSTIME registers to 0 */
+@@ -1407,6 +1415,7 @@ static long ixgbe_ptp_create_clock(struct ixgbe_adapter *adapter)
+ 	case ixgbe_mac_X550:
+ 	case ixgbe_mac_X550EM_x:
+ 	case ixgbe_mac_x550em_a:
++	case ixgbe_mac_e610:
+ 		snprintf(adapter->ptp_caps.name, 16, "%s", netdev->name);
+ 		adapter->ptp_caps.owner = THIS_MODULE;
+ 		adapter->ptp_caps.max_adj = 30000000;
 -- 
-2.48.1
-
-
+2.43.0
 
 
