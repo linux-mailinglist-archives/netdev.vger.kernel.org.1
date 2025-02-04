@@ -1,139 +1,340 @@
-Return-Path: <netdev+bounces-162394-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-162395-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 394FEA26BA6
-	for <lists+netdev@lfdr.de>; Tue,  4 Feb 2025 06:59:35 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 64126A26BE4
+	for <lists+netdev@lfdr.de>; Tue,  4 Feb 2025 07:09:40 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C1EE516153D
-	for <lists+netdev@lfdr.de>; Tue,  4 Feb 2025 05:59:33 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id DF332165BBE
+	for <lists+netdev@lfdr.de>; Tue,  4 Feb 2025 06:09:38 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 256661FF7A5;
-	Tue,  4 Feb 2025 05:59:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 71FB41FFC6E;
+	Tue,  4 Feb 2025 06:09:35 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Werf05iR"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="DTvTh1+h"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f173.google.com (mail-pl1-f173.google.com [209.85.214.173])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.12])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A5A081FC118;
-	Tue,  4 Feb 2025 05:59:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.173
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2990C25A626;
+	Tue,  4 Feb 2025 06:09:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.12
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1738648772; cv=none; b=k2mt013Bl6D69EftukDI5P3eOW27zjCdqSYjdR1/pHNalHAjrqOfp67zh5swmTyKwJEril24kD53eoHSMZZYA84B41qkwkujZB0I30bXRcaQ6EQk0Gn/WYNrwZVAaJp0OwPbFPHemRP1i9nGopM2vLjnmTxJd7utgagh3dueqBM=
+	t=1738649375; cv=none; b=GcsEArWkKQg9+A8RcfhmfYCevraHZp9ZMniLH9gRCLiRiaalO4XbgkDfmJES8yfvmGG1W+/yg9o02MVB/vectzhFpnU3VZrcpPlyU+quHRtV+blEFhlfpNdReUi2v1C2zjg04dtrCFvA1l9x8/fjyomD4+vh0yxc58IYbfrAjD0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1738648772; c=relaxed/simple;
-	bh=YvJJqW7TaKi0eSKa8wnMpxSCNLJ8GlEcpP/9lwDvTiU=;
-	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=izD6bNyuv3ZMi+b2oIylLWFouD7eAATbQ2VjPCOk/FjVTAzuPHOKedkUfF39HmM4cNmhP2NHXIItkwNtupRy2lPxunr8WU1bIywVudHkNjrMBBG7Mgna3VVXs9v4PEavRPa0cng1159ORv2dTrVxahFe22w5+faeSR8/e0vu8Q0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Werf05iR; arc=none smtp.client-ip=209.85.214.173
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pl1-f173.google.com with SMTP id d9443c01a7336-21628b3fe7dso94727845ad.3;
-        Mon, 03 Feb 2025 21:59:30 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1738648770; x=1739253570; darn=vger.kernel.org;
-        h=mime-version:user-agent:content-transfer-encoding:references
-         :in-reply-to:date:cc:to:from:subject:message-id:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=Zyy7tXzVYMEK0fqrjp3PFLwkjg6kJJKmOr7DrNL1OSg=;
-        b=Werf05iRBQxChkzBdNG97erqh3aiZWoj2feMboquXFyqZTM1Y9FR0gu/mwssH4ripS
-         mPrFZnL9TdjNtVf5gs+f0X8n++dBj0seOUQPcRH1cvIGniD5M5qnZEv2XUOVCOUieMJg
-         nf+/tKN9NIrvar0R/Ez4nG0EWxbPa3zORLL+pvDxWwcLY86mZjrthWCXor3XhBNfZkLf
-         Cdvn0DpXVqwUiH8AaqdSbljfCDaW55hwRh8Ji8yU1y9Hc5dC9L1wpi5Smeduolftf0n0
-         jcnpOyx+9UbBx4gHA/E4G6BGYgwmQ7OV+yYZzUGh1V1RBuU9m1g1Gc7Y/HbCad3iHQzT
-         55/g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1738648770; x=1739253570;
-        h=mime-version:user-agent:content-transfer-encoding:references
-         :in-reply-to:date:cc:to:from:subject:message-id:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=Zyy7tXzVYMEK0fqrjp3PFLwkjg6kJJKmOr7DrNL1OSg=;
-        b=B/Q7QF7aj3rd84/wwjwX+hWqPjilnmDhfsxFMf48Ukw/Y1oczz9/siKkRI4sDqP1JG
-         M9rpL3T/OYBdyekr6c+auiMgEcdCBLfo0Anbrafvo8Gmw+r6z10o2sPQiGn4xMcCHvqP
-         VhvrDe5/2EsOaWTzRVzyi4/F2sF4CiO9Wlv36UT67BRZ/odFKILg5BAHQm4MMm7h6SEz
-         ji6zCpGHPtuo3r3LesMHZpyK19grXGwVFui0AXygA3l1lgaYgIDk2YB48Wj3jqqF3vu6
-         0lqGhYFiqhfypYVI0c5CoMgat3LxxUKWjCiyg5X8NZnMi44gC6H0f59KJr0gbxCYl4/w
-         pGhw==
-X-Forwarded-Encrypted: i=1; AJvYcCWh4nwsqlUB43VFTWHftJNqT9Rqlf+y/tQtJNvoSLHc/dvZuBJt3DFGypQ/fZmx6vxDy33AQq8=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzqIOdNBqG/5ggdNqEpAUtTk0jsGMPBPMCJCTtIsw+OZICP/QvU
-	A8iCfR5LvJIKEcNg0mAzGs8mJtcFxzrIEOh9vZb84gHwHIrj+U15
-X-Gm-Gg: ASbGncvTazJGGF4+4Rr3btjhON0pft+jLbyil3hmRG13xY6X5G+Wt+cF+MfPQmR6SMv
-	DonJ32yfF2HaS4JG87sgE86MbXqTe0SeHZ5WZnJhEXZD/MqiACNOC7lUnxyq69ZEVfwCeQSU18V
-	vzQL6drItInWqM6qCFEaJFcrhQ4adAedVaA7Bthe+6yZ5V3YSyt5K7C85C8FD6sGSnPbgZuRZNO
-	iosKV2tj1DTTogNTXmurYg+wLv+E7j+VkJ51vjmTYOJMGK68EXU7I+X2I6V49RvQw1zuOzgJkC9
-	2YBvfgrWJjYW
-X-Google-Smtp-Source: AGHT+IF2KtlghTD8uA7j8gYT76ijkv4nqYL12itEmuqyBpE4/RPk1cO+cTvPehMFpz7ZnKqilL1noA==
-X-Received: by 2002:a17:902:f607:b0:216:410d:4c67 with SMTP id d9443c01a7336-21dd7ddde7emr422037375ad.41.1738648769839;
-        Mon, 03 Feb 2025 21:59:29 -0800 (PST)
-Received: from [192.168.0.235] ([38.34.87.7])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-21de31ee753sm86578255ad.3.2025.02.03.21.59.28
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 03 Feb 2025 21:59:29 -0800 (PST)
-Message-ID: <f0f90bdb8ddc66b05f9f4fa0fb56464d57178526.camel@gmail.com>
-Subject: Re: [PATCH bpf-next v3 10/18] bpf: Search and add kfuncs in
- struct_ops prologue and epilogue
-From: Eduard Zingerman <eddyz87@gmail.com>
-To: Amery Hung <ameryhung@gmail.com>, netdev@vger.kernel.org
-Cc: bpf@vger.kernel.org, daniel@iogearbox.net, andrii@kernel.org, 
-	alexei.starovoitov@gmail.com, martin.lau@kernel.org, kuba@kernel.org, 
-	edumazet@google.com, xiyou.wangcong@gmail.com, cong.wang@bytedance.com, 
-	jhs@mojatatu.com, sinquersw@gmail.com, toke@redhat.com, jiri@resnulli.us, 
-	stfomichev@gmail.com, ekarani.silvestre@ccc.ufcg.edu.br,
- yangpeihao@sjtu.edu.cn, 	yepeilin.cs@gmail.com, ming.lei@redhat.com,
- kernel-team@meta.com
-Date: Mon, 03 Feb 2025 21:59:24 -0800
-In-Reply-To: <20250131192912.133796-11-ameryhung@gmail.com>
-References: <20250131192912.133796-1-ameryhung@gmail.com>
-		 <20250131192912.133796-11-ameryhung@gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-User-Agent: Evolution 3.54.3 (3.54.3-1.fc41) 
+	s=arc-20240116; t=1738649375; c=relaxed/simple;
+	bh=Xv7yRxda8mvX0Xb6hAMlYFE629tMjcSXGJ5Ls/bRo9Q=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=ltzqEMydhExpAM1KUQ/wZ2l2O+Jg9yq9f8m6CKRe6bW1wj91iLzzEim0GbvJOmg74xVuat1u/PfXO0EdBKm02lTKofugkLdCvXljeiEn6AmAZwkDva/pyUi3YeJZmz6WNP97m7hdBGf62G1M26/XImmXfzioqubdZMQrokXpHmc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=DTvTh1+h; arc=none smtp.client-ip=192.198.163.12
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1738649373; x=1770185373;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=Xv7yRxda8mvX0Xb6hAMlYFE629tMjcSXGJ5Ls/bRo9Q=;
+  b=DTvTh1+h7BBZFFPfJhbF4IYoXaPo/KIPPVs3CiTQVlfGP4aYZ5o4LzL2
+   8tm5584/PwVFpgLlVzh20juhemhk3evoPQy+ztgaho5n2nL9+Jsx+ycXA
+   pH+jEiDI2FFaYJc31e+ACZ54HO5xe8xswH0fgx212V/B2/Cgg9aClXqD2
+   xxN9YXwjyKNbKmGz9IZmS+YxiYQMkzUHoJmawFzzkqPZB15DmWtH5q7rs
+   UhwLkvOW0rXHW5cq+rSsX8rhFm3YiF8IHwT9bCQ+Px4iSaVGkJUhg1giz
+   /cSDZR048a66FZvETfmK0qqgmMC6MtKpVq29msUBi8Fxe22XWLhJLTsOZ
+   Q==;
+X-CSE-ConnectionGUID: dPMV1AOlT9qA4/l7KXhB4Q==
+X-CSE-MsgGUID: U68RCC06Qb6qLPWsW2jtxg==
+X-IronPort-AV: E=McAfee;i="6700,10204,11335"; a="43084796"
+X-IronPort-AV: E=Sophos;i="6.13,258,1732608000"; 
+   d="scan'208";a="43084796"
+Received: from fmviesa007.fm.intel.com ([10.60.135.147])
+  by fmvoesa106.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 03 Feb 2025 22:09:32 -0800
+X-CSE-ConnectionGUID: BvI8MDn1Sy2jP23F+Hn1OQ==
+X-CSE-MsgGUID: 2Gy12VTJRSqG4If49Rr6Rw==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.13,258,1732608000"; 
+   d="scan'208";a="110385750"
+Received: from mev-dev.igk.intel.com ([10.237.112.144])
+  by fmviesa007-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 03 Feb 2025 22:09:27 -0800
+Date: Tue, 4 Feb 2025 07:06:00 +0100
+From: Michal Swiatkowski <michal.swiatkowski@linux.intel.com>
+To: David Laight <david.laight.linux@gmail.com>
+Cc: Tony Nguyen <anthony.l.nguyen@intel.com>, davem@davemloft.net,
+	kuba@kernel.org, pabeni@redhat.com, edumazet@google.com,
+	andrew+netdev@lunn.ch, netdev@vger.kernel.org,
+	sridhar.samudrala@intel.com, jacob.e.keller@intel.com,
+	pio.raczynski@gmail.com, konrad.knitter@intel.com,
+	marcin.szycik@intel.com, nex.sw.ncis.nat.hpm.dev@intel.com,
+	przemyslaw.kitszel@intel.com, jiri@resnulli.us, horms@kernel.org,
+	David.Laight@aculab.com, pmenzel@molgen.mpg.de, mschmidt@redhat.com,
+	tatyana.e.nikolova@intel.com, Jason Gunthorpe <jgg@ziepe.ca>,
+	Leon Romanovsky <leon@kernel.org>, linux-rdma@vger.kernel.org,
+	corbet@lwn.net, linux-doc@vger.kernel.org
+Subject: Re: [PATCH net-next 2/9] ice: devlink PF MSI-X max and min parameter
+Message-ID: <Z6GuSJCshbWlkiLu@mev-dev.igk.intel.com>
+References: <20250203210940.328608-1-anthony.l.nguyen@intel.com>
+ <20250203210940.328608-3-anthony.l.nguyen@intel.com>
+ <20250203214808.129b75e5@pumpkin>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250203214808.129b75e5@pumpkin>
 
-On Fri, 2025-01-31 at 11:28 -0800, Amery Hung wrote:
-> From: Amery Hung <amery.hung@bytedance.com>
->=20
-> Currently, add_kfunc_call() is only invoked once before the main
-> verification loop. Therefore, the verifier could not find the
-> bpf_kfunc_btf_tab of a new kfunc call which is not seen in user defined
-> struct_ops operators but introduced in gen_prologue or gen_epilogue
-> during do_misc_fixup(). Fix this by searching kfuncs in the patching
-> instruction buffer and add them to prog->aux->kfunc_tab.
->=20
-> Signed-off-by: Amery Hung <amery.hung@bytedance.com>
-> ---
+On Mon, Feb 03, 2025 at 09:48:08PM +0000, David Laight wrote:
+> On Mon,  3 Feb 2025 13:09:31 -0800
+> Tony Nguyen <anthony.l.nguyen@intel.com> wrote:
+> 
+> > From: Michal Swiatkowski <michal.swiatkowski@linux.intel.com>
+> > 
+> > Use generic devlink PF MSI-X parameter to allow user to change MSI-X
+> > range.
+> > 
+> > Add notes about this parameters into ice devlink documentation.
+> > 
+> > Tested-by: Pucha Himasekhar Reddy <himasekharx.reddy.pucha@intel.com>
+> > Signed-off-by: Michal Swiatkowski <michal.swiatkowski@linux.intel.com>
+> > ---
+> >  Documentation/networking/devlink/ice.rst      | 11 +++
+> >  .../net/ethernet/intel/ice/devlink/devlink.c  | 88 +++++++++++++++++++
+> >  drivers/net/ethernet/intel/ice/ice.h          |  7 ++
+> >  drivers/net/ethernet/intel/ice/ice_irq.c      |  7 ++
+> >  4 files changed, 113 insertions(+)
+> > 
+> > diff --git a/Documentation/networking/devlink/ice.rst b/Documentation/networking/devlink/ice.rst
+> > index e3972d03cea0..792e9f8c846a 100644
+> > --- a/Documentation/networking/devlink/ice.rst
+> > +++ b/Documentation/networking/devlink/ice.rst
+> > @@ -69,6 +69,17 @@ Parameters
+> >  
+> >         To verify that value has been set:
+> >         $ devlink dev param show pci/0000:16:00.0 name tx_scheduling_layers
+> > +   * - ``msix_vec_per_pf_max``
+> > +     - driverinit
+> > +     - Set the max MSI-X that can be used by the PF, rest can be utilized for
+> > +       SRIOV. The range is from min value set in msix_vec_per_pf_min to
+> > +       2k/number of ports.
+> > +   * - ``msix_vec_per_pf_min``
+> > +     - driverinit
+> > +     - Set the min MSI-X that will be used by the PF. This value inform how many
+> > +       MSI-X will be allocated statically. The range is from 2 to value set
+> > +       in msix_vec_per_pf_max.
+> > +
+> >  .. list-table:: Driver specific parameters implemented
+> >      :widths: 5 5 90
+> >  
+> > diff --git a/drivers/net/ethernet/intel/ice/devlink/devlink.c b/drivers/net/ethernet/intel/ice/devlink/devlink.c
+> > index d116e2b10bce..c53baecf8a90 100644
+> > --- a/drivers/net/ethernet/intel/ice/devlink/devlink.c
+> > +++ b/drivers/net/ethernet/intel/ice/devlink/devlink.c
+> > @@ -1202,6 +1202,25 @@ static int ice_devlink_set_parent(struct devlink_rate *devlink_rate,
+> >  	return status;
+> >  }
+> >  
+> > +static void ice_set_min_max_msix(struct ice_pf *pf)
+> > +{
+> > +	struct devlink *devlink = priv_to_devlink(pf);
+> > +	union devlink_param_value val;
+> > +	int err;
+> > +
+> > +	err = devl_param_driverinit_value_get(devlink,
+> > +					      DEVLINK_PARAM_GENERIC_ID_MSIX_VEC_PER_PF_MIN,
+> > +					      &val);
+> > +	if (!err)
+> > +		pf->msix.min = val.vu32;
+> > +
+> > +	err = devl_param_driverinit_value_get(devlink,
+> > +					      DEVLINK_PARAM_GENERIC_ID_MSIX_VEC_PER_PF_MAX,
+> > +					      &val);
+> > +	if (!err)
+> > +		pf->msix.max = val.vu32;
+> > +}
+> > +
+> >  /**
+> >   * ice_devlink_reinit_up - do reinit of the given PF
+> >   * @pf: pointer to the PF struct
+> > @@ -1217,6 +1236,9 @@ static int ice_devlink_reinit_up(struct ice_pf *pf)
+> >  		return err;
+> >  	}
+> >  
+> > +	/* load MSI-X values */
+> > +	ice_set_min_max_msix(pf);
+> > +
+> >  	err = ice_init_dev(pf);
+> >  	if (err)
+> >  		goto unroll_hw_init;
+> > @@ -1530,6 +1552,37 @@ static int ice_devlink_local_fwd_validate(struct devlink *devlink, u32 id,
+> >  	return 0;
+> >  }
+> >  
+> > +static int
+> > +ice_devlink_msix_max_pf_validate(struct devlink *devlink, u32 id,
+> > +				 union devlink_param_value val,
+> > +				 struct netlink_ext_ack *extack)
+> > +{
+> > +	struct ice_pf *pf = devlink_priv(devlink);
+> > +
+> > +	if (val.vu32 > pf->hw.func_caps.common_cap.num_msix_vectors ||
+> > +	    val.vu32 < pf->msix.min) {
+> > +		NL_SET_ERR_MSG_MOD(extack, "Value is invalid");
+> > +		return -EINVAL;
+> > +	}
+> > +
+> > +	return 0;
+> > +}
+> > +
+> > +static int
+> > +ice_devlink_msix_min_pf_validate(struct devlink *devlink, u32 id,
+> > +				 union devlink_param_value val,
+> > +				 struct netlink_ext_ack *extack)
+> > +{
+> > +	struct ice_pf *pf = devlink_priv(devlink);
+> > +
+> > +	if (val.vu32 < ICE_MIN_MSIX || val.vu32 > pf->msix.max) {
+> > +		NL_SET_ERR_MSG_MOD(extack, "Value is invalid");
+> > +		return -EINVAL;
+> > +	}
+> > +
+> > +	return 0;
+> > +}
+> 
+> Don't those checks make it difficult to set the min and max together?
+> I think you need to create the new min/max pair and check they are
+> valid together.
+> Which probably requires one parameter with two values.
+> 
 
-Acked-by: Eduard Zingerman <eddyz87@gmail.com>
+I wanted to reuse exsisting parameter. The other user of it is bnxt
+driver. In it there is a separate check for min "max" and max "max".
+It is also problematic, because min can be set to value greater than
+max (here it can happen when setting together to specific values).
+I can do a follow up to this series and change this parameter as you
+suggested. What do you think?
 
-[...]
+Thanks,
+Michal
 
-> @@ -20397,6 +20412,10 @@ static int convert_ctx_accesses(struct bpf_verif=
-ier_env *env)
->  				return -ENOMEM;
->  			env->prog =3D new_prog;
->  			delta +=3D cnt - 1;
-> +
-> +			ret =3D add_kfunc_in_insns(env, epilogue_buf, epilogue_cnt - 1);
-
-Rant: the -1 here is a bit confusing, it is second time I forget that
-      last instruction of the epilogue has to be some kind of control flow,
-      and last instruction of the prologue has to be first instruction
-      of the program.
-
-> +			if (ret < 0)
-> +				return ret;
->  		}
->  	}
-> =20
-
-[...]
-
+> 	David
+> 
+> > +
+> >  enum ice_param_id {
+> >  	ICE_DEVLINK_PARAM_ID_BASE = DEVLINK_PARAM_GENERIC_ID_MAX,
+> >  	ICE_DEVLINK_PARAM_ID_TX_SCHED_LAYERS,
+> > @@ -1547,6 +1600,15 @@ static const struct devlink_param ice_dvl_rdma_params[] = {
+> >  			      ice_devlink_enable_iw_validate),
+> >  };
+> >  
+> > +static const struct devlink_param ice_dvl_msix_params[] = {
+> > +	DEVLINK_PARAM_GENERIC(MSIX_VEC_PER_PF_MAX,
+> > +			      BIT(DEVLINK_PARAM_CMODE_DRIVERINIT),
+> > +			      NULL, NULL, ice_devlink_msix_max_pf_validate),
+> > +	DEVLINK_PARAM_GENERIC(MSIX_VEC_PER_PF_MIN,
+> > +			      BIT(DEVLINK_PARAM_CMODE_DRIVERINIT),
+> > +			      NULL, NULL, ice_devlink_msix_min_pf_validate),
+> > +};
+> > +
+> >  static const struct devlink_param ice_dvl_sched_params[] = {
+> >  	DEVLINK_PARAM_DRIVER(ICE_DEVLINK_PARAM_ID_TX_SCHED_LAYERS,
+> >  			     "tx_scheduling_layers",
+> > @@ -1648,6 +1710,7 @@ void ice_devlink_unregister(struct ice_pf *pf)
+> >  int ice_devlink_register_params(struct ice_pf *pf)
+> >  {
+> >  	struct devlink *devlink = priv_to_devlink(pf);
+> > +	union devlink_param_value value;
+> >  	struct ice_hw *hw = &pf->hw;
+> >  	int status;
+> >  
+> > @@ -1656,10 +1719,33 @@ int ice_devlink_register_params(struct ice_pf *pf)
+> >  	if (status)
+> >  		return status;
+> >  
+> > +	status = devl_params_register(devlink, ice_dvl_msix_params,
+> > +				      ARRAY_SIZE(ice_dvl_msix_params));
+> > +	if (status)
+> > +		goto unregister_rdma_params;
+> > +
+> >  	if (hw->func_caps.common_cap.tx_sched_topo_comp_mode_en)
+> >  		status = devl_params_register(devlink, ice_dvl_sched_params,
+> >  					      ARRAY_SIZE(ice_dvl_sched_params));
+> > +	if (status)
+> > +		goto unregister_msix_params;
+> > +
+> > +	value.vu32 = pf->msix.max;
+> > +	devl_param_driverinit_value_set(devlink,
+> > +					DEVLINK_PARAM_GENERIC_ID_MSIX_VEC_PER_PF_MAX,
+> > +					value);
+> > +	value.vu32 = pf->msix.min;
+> > +	devl_param_driverinit_value_set(devlink,
+> > +					DEVLINK_PARAM_GENERIC_ID_MSIX_VEC_PER_PF_MIN,
+> > +					value);
+> > +	return 0;
+> >  
+> > +unregister_msix_params:
+> > +	devl_params_unregister(devlink, ice_dvl_msix_params,
+> > +			       ARRAY_SIZE(ice_dvl_msix_params));
+> > +unregister_rdma_params:
+> > +	devl_params_unregister(devlink, ice_dvl_rdma_params,
+> > +			       ARRAY_SIZE(ice_dvl_rdma_params));
+> >  	return status;
+> >  }
+> >  
+> > @@ -1670,6 +1756,8 @@ void ice_devlink_unregister_params(struct ice_pf *pf)
+> >  
+> >  	devl_params_unregister(devlink, ice_dvl_rdma_params,
+> >  			       ARRAY_SIZE(ice_dvl_rdma_params));
+> > +	devl_params_unregister(devlink, ice_dvl_msix_params,
+> > +			       ARRAY_SIZE(ice_dvl_msix_params));
+> >  
+> >  	if (hw->func_caps.common_cap.tx_sched_topo_comp_mode_en)
+> >  		devl_params_unregister(devlink, ice_dvl_sched_params,
+> > diff --git a/drivers/net/ethernet/intel/ice/ice.h b/drivers/net/ethernet/intel/ice/ice.h
+> > index 71e05d30f0fd..d041b04ff324 100644
+> > --- a/drivers/net/ethernet/intel/ice/ice.h
+> > +++ b/drivers/net/ethernet/intel/ice/ice.h
+> > @@ -542,6 +542,12 @@ struct ice_agg_node {
+> >  	u8 valid;
+> >  };
+> >  
+> > +struct ice_pf_msix {
+> > +	u32 cur;
+> > +	u32 min;
+> > +	u32 max;
+> > +};
+> > +
+> >  struct ice_pf {
+> >  	struct pci_dev *pdev;
+> >  	struct ice_adapter *adapter;
+> > @@ -612,6 +618,7 @@ struct ice_pf {
+> >  	struct msi_map ll_ts_irq;	/* LL_TS interrupt MSIX vector */
+> >  	u16 max_pf_txqs;	/* Total Tx queues PF wide */
+> >  	u16 max_pf_rxqs;	/* Total Rx queues PF wide */
+> > +	struct ice_pf_msix msix;
+> >  	u16 num_lan_msix;	/* Total MSIX vectors for base driver */
+> >  	u16 num_lan_tx;		/* num LAN Tx queues setup */
+> >  	u16 num_lan_rx;		/* num LAN Rx queues setup */
+> > diff --git a/drivers/net/ethernet/intel/ice/ice_irq.c b/drivers/net/ethernet/intel/ice/ice_irq.c
+> > index ad82ff7d1995..0659b96b9b8c 100644
+> > --- a/drivers/net/ethernet/intel/ice/ice_irq.c
+> > +++ b/drivers/net/ethernet/intel/ice/ice_irq.c
+> > @@ -254,6 +254,13 @@ int ice_init_interrupt_scheme(struct ice_pf *pf)
+> >  	int total_vectors = pf->hw.func_caps.common_cap.num_msix_vectors;
+> >  	int vectors, max_vectors;
+> >  
+> > +	/* load default PF MSI-X range */
+> > +	if (!pf->msix.min)
+> > +		pf->msix.min = ICE_MIN_MSIX;
+> > +
+> > +	if (!pf->msix.max)
+> > +		pf->msix.max = total_vectors / 2;
+> > +
+> >  	vectors = ice_ena_msix_range(pf);
+> >  
+> >  	if (vectors < 0)
+> 
 
