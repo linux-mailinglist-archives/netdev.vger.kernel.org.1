@@ -1,161 +1,138 @@
-Return-Path: <netdev+bounces-162678-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-162679-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id C0A83A27985
-	for <lists+netdev@lfdr.de>; Tue,  4 Feb 2025 19:14:11 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 29875A2798B
+	for <lists+netdev@lfdr.de>; Tue,  4 Feb 2025 19:16:32 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 1D4781886F5C
-	for <lists+netdev@lfdr.de>; Tue,  4 Feb 2025 18:14:12 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 0EFE51886C2C
+	for <lists+netdev@lfdr.de>; Tue,  4 Feb 2025 18:16:37 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 547F021765F;
-	Tue,  4 Feb 2025 18:13:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 284EB217666;
+	Tue,  4 Feb 2025 18:16:27 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="fPf68PZs"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="b2rbyC2b"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 25198217658;
-	Tue,  4 Feb 2025 18:13:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E653C78F4A;
+	Tue,  4 Feb 2025 18:16:26 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1738692828; cv=none; b=kSGaTO1JGtM3W3Ach/zUioIeqbnROvITBqPG1UeVgWQv5otG5rnUdCyZJkMa1NcvIX5+Vue/W40mdw66Zn6ZNOe8zM8Idb54u2WFpc2Skp9RI8vfuRTJFA4gXJLSzYqoEEMp1fr6G9r1hNSy+GJm57NMI9DUU80NN3qSWwV7ehs=
+	t=1738692987; cv=none; b=GOBZze1WZI3PIzEbFbFM/DYs5wS918Ag0bphjsUIegPU2cRWGXF7QZLYA16T0OOvVdijAIqVAg9TXogc24RSrloiAJPdvX5yuJZHIZtUEiZqVda9waJSj3SpnvwQJosn0FhWIPq/4eEedUmmbNJ3ioMlSD8YjWREMJZQAAjO/Aw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1738692828; c=relaxed/simple;
-	bh=Dj4jkBKmFAE3YgshnrDJ3jVrrrueVT1kGYUMcy1Yj58=;
+	s=arc-20240116; t=1738692987; c=relaxed/simple;
+	bh=dmGkjt2zNEiAgl6N9re2M4LE4xSbtASeqzfY0ChaYqQ=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=VG0TWpj41HnPHx5O0cIpAT8BOg2txBkHH4i3JpucG8ZYnH5f9crWerKXkQltgZug99vpb5EO9m5VwW2KEEnERdJK7MAdna1n/HU5yn7JYzus/F+BWctKgupyQwImfJdE0EnIJqBaWDQ/crcM9IwhmK4fkNi5llpOFbsylTMtJEQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=fPf68PZs; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9007BC4CEDF;
-	Tue,  4 Feb 2025 18:13:41 +0000 (UTC)
+	 Content-Type:Content-Disposition:In-Reply-To; b=FUQK+nUX6aEnjMMY4J51O8TOFIYacoo+TEOPWIyD0q9bIZ2g25L9Gpv//iP2MKZwhVaERF5hpfx9ktfbq/MYrmrfhVzIddEB+MhBRkB0pbSUJAzsDxnKce1buonurc8f1bVQRWgZdHa7k84C4jZiZuyOwlQlY4YINQRVf2QxP98=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=b2rbyC2b; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 64F21C4CEDF;
+	Tue,  4 Feb 2025 18:16:19 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1738692827;
-	bh=Dj4jkBKmFAE3YgshnrDJ3jVrrrueVT1kGYUMcy1Yj58=;
+	s=k20201202; t=1738692986;
+	bh=dmGkjt2zNEiAgl6N9re2M4LE4xSbtASeqzfY0ChaYqQ=;
 	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=fPf68PZsXMszTHlDPMN4gJh22izWzBAeDTVr+R75uw5SpOCE7nyP7DSBMSD8VBoug
-	 xyGPevgIj6fO7uivU6QaxLaepHYCFRk1Ch9w6yIwioDcspIQO7q5BjCe3EVylSpmcQ
-	 sr+MfO9gZl2/My2GFjNVU5js/P2aKsmgQxTaKkfRJO4BoeDkDEjgm0vVfUuepplqRg
-	 SjR2l9LABZOGAKgfquPBx80QqoSWYfqgWb6oFkD5Dia0KL9HiQqKt0LhVro3k2/B3c
-	 b1tDqHuxFaBByQxrJKFuw7o2oIUmYFCigfn6mrJO+YYuIeXBfkGUwhqugC9G4h/bxi
-	 4AqqyVo3Yjb/g==
-Date: Tue, 4 Feb 2025 18:13:39 +0000
-From: Simon Horman <horms@kernel.org>
-To: Choong Yong Liang <yong.liang.choong@linux.intel.com>
-Cc: Jose Abreu <joabreu@synopsys.com>, Jose Abreu <Jose.Abreu@synopsys.com>,
-	David E Box <david.e.box@linux.intel.com>,
-	Thomas Gleixner <tglx@linutronix.de>,
-	Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
-	Dave Hansen <dave.hansen@linux.intel.com>,
-	"H . Peter Anvin" <hpa@zytor.com>,
-	Rajneesh Bhardwaj <irenic.rajneesh@gmail.com>,
-	David E Box <david.e.box@intel.com>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S . Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Maxime Coquelin <mcoquelin.stm32@gmail.com>,
-	Alexandre Torgue <alexandre.torgue@foss.st.com>,
-	Jiawen Wu <jiawenwu@trustnetic.com>,
-	Mengyuan Lou <mengyuanlou@net-swift.com>,
-	Heiner Kallweit <hkallweit1@gmail.com>,
-	Russell King <linux@armlinux.org.uk>,
-	Hans de Goede <hdegoede@redhat.com>,
-	Ilpo =?utf-8?B?SsOkcnZpbmVu?= <ilpo.jarvinen@linux.intel.com>,
-	Richard Cochran <richardcochran@gmail.com>,
-	Andrew Halaney <ahalaney@redhat.com>,
-	Serge Semin <fancer.lancer@gmail.com>, x86@kernel.org,
-	linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
-	platform-driver-x86@vger.kernel.org,
-	linux-stm32@st-md-mailman.stormreply.com,
-	linux-arm-kernel@lists.infradead.org
-Subject: Re: [PATCH net-next v6 4/7] stmmac: intel: configure SerDes
- according to the interface mode
-Message-ID: <20250204181339.GM234677@kernel.org>
-References: <20250204061020.1199124-1-yong.liang.choong@linux.intel.com>
- <20250204061020.1199124-5-yong.liang.choong@linux.intel.com>
+	b=b2rbyC2bZq476y9HKzgTYiM2Xc1LS8wT5IY0iDXZoAcPwDZPvoNEugkvA6mcOCNB8
+	 RJ4fLX4BkO4ZhXkOnsLWZHSLB0yjPddBnC9mywKlMKda6THJ8ZdKfZi/oM++vwZVnL
+	 VaWoSxz4foT3b68sy1qtAGjpHbIQ5SvKXVCF7DaTj/lse75FmzkkpeTvevyfIQUxE0
+	 LNQ3hxtMUS+OBadhM+AAsSQlmOSexS0z5ykGzKQ+ryp1F2bdWVJVlS2+gZcfTr7Z+1
+	 24MRpJZw0YgOCJh25zJ9zH0Ya2wtFhzIqaLkuDAX6wXjCcCN6jVaC7IUod/8hn8ZyK
+	 5JoNKYf4VU/cQ==
+Date: Tue, 4 Feb 2025 18:16:17 +0000
+From: Conor Dooley <conor@kernel.org>
+To: Basharath Hussain Khaja <basharath@couthit.com>
+Cc: danishanwar <danishanwar@ti.com>, rogerq <rogerq@kernel.org>,
+	andrew+netdev <andrew+netdev@lunn.ch>, davem <davem@davemloft.net>,
+	edumazet <edumazet@google.com>, kuba <kuba@kernel.org>,
+	pabeni <pabeni@redhat.com>, Rob Herring <robh@kernel.org>,
+	krzk+dt <krzk+dt@kernel.org>, conor+dt <conor+dt@kernel.org>,
+	nm <nm@ti.com>, ssantosh <ssantosh@kernel.org>,
+	tony <tony@atomide.com>, richardcochran <richardcochran@gmail.com>,
+	parvathi <parvathi@couthit.com>, schnelle <schnelle@linux.ibm.com>,
+	rdunlap <rdunlap@infradead.org>, diogo ivo <diogo.ivo@siemens.com>,
+	m-karicheri2 <m-karicheri2@ti.com>, horms <horms@kernel.org>,
+	jacob e keller <jacob.e.keller@intel.com>,
+	m-malladi <m-malladi@ti.com>,
+	javier carrasco cruz <javier.carrasco.cruz@gmail.com>,
+	afd <afd@ti.com>, s-anna <s-anna@ti.com>,
+	linux-arm-kernel <linux-arm-kernel@lists.infradead.org>,
+	netdev <netdev@vger.kernel.org>,
+	devicetree <devicetree@vger.kernel.org>,
+	linux-kernel <linux-kernel@vger.kernel.org>,
+	linux-omap <linux-omap@vger.kernel.org>,
+	pratheesh <pratheesh@ti.com>, prajith <prajith@ti.com>,
+	vigneshr <vigneshr@ti.com>, praneeth <praneeth@ti.com>,
+	srk <srk@ti.com>, rogerq <rogerq@ti.com>,
+	krishna <krishna@couthit.com>, pmohan <pmohan@couthit.com>,
+	mohan <mohan@couthit.com>
+Subject: Re: [RFC v2 PATCH 01/10] dt-bindings: net: ti: Adds DUAL-EMAC mode
+ support on PRU-ICSS2 for AM57xx SOCs
+Message-ID: <20250204-mutilated-throwing-59cabf18f187@spud>
+References: <20250124122353.1457174-1-basharath@couthit.com>
+ <20250124122353.1457174-2-basharath@couthit.com>
+ <20250124-reoccupy-music-3803c753f8af@spud>
+ <504387436.449923.1738127812232.JavaMail.zimbra@couthit.local>
+ <20250129-vowed-dingbat-cfb5c5b8ede4@spud>
+ <2028988664.494856.1738585795471.JavaMail.zimbra@couthit.local>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature"; boundary="K8COnd4nDaIlA8yU"
+Content-Disposition: inline
+In-Reply-To: <2028988664.494856.1738585795471.JavaMail.zimbra@couthit.local>
+
+
+--K8COnd4nDaIlA8yU
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20250204061020.1199124-5-yong.liang.choong@linux.intel.com>
+Content-Transfer-Encoding: quoted-printable
 
-On Tue, Feb 04, 2025 at 02:10:17PM +0800, Choong Yong Liang wrote:
-> Intel platform will configure the SerDes through PMC api based on the
-> provided interface mode.
-> 
-> This patch adds several new functions below:-
-> - intel_tsn_lane_is_available(): This new function reads FIA lane
->   ownership registers and common lane registers through IPC commands
->   to know which lane the mGbE port is assigned to.
-> - intel_config_serdes(): To configure the SerDes based on the assigned
->   lane and latest interface mode, it sends IPC command to the PMC through
->   PMC driver/API. The PMC acts as a proxy for R/W on behalf of the driver.
-> - intel_set_reg_access(): Set the register access to the available TSN
->   interface.
-> 
-> Signed-off-by: Choong Yong Liang <yong.liang.choong@linux.intel.com>
+On Mon, Feb 03, 2025 at 05:59:55PM +0530, Basharath Hussain Khaja wrote:
+> >> >> +    $ref: /schemas/types.yaml#/definitions/phandle
+> >> >> +    description:
+> >> >> +      phandle to Enhanced Capture (eCAP) event for ICSS
+> >> >=20
+> >> > Why do you need phandles for these things, can they not be looked up=
+ by
+> >> > compatible? (e.g. multiple devices on one SoC).
+> >> >=20
+> >>=20
+> >> ecap is another peripheral similar to IEP in ICSSM/ICSSG. We have crea=
+ted a
+> >> separate driver for possible reuse with ICSSG in future.
+> >=20
+> > That's not an answer to my question.
+> >=20
+>=20
+> We can use compatible if we have only one instance of a peripheral in the=
+ SOC.=20
+> On the AM57x SOC we have two identical ICSS instances(ICSS1 and ICSS2). S=
+o we=20
+> use phandles to differentiate between the two instances. Currently this p=
+atch=20
+> series adds support for ICSS2 instance on the AM57x SOC. Support for ICSS=
+1 instance=20
+> will be added in subsequent patches.
 
-...
+Cool, that's an acceptance answer, thanks.
 
-> +static int intel_config_serdes(struct net_device *ndev,
-> +			       void *intel_data,
-> +			       phy_interface_t interface)
-> +{
-> +	struct intel_priv_data *intel_priv = intel_data;
-> +	struct stmmac_priv *priv = netdev_priv(ndev);
-> +	int ret = 0;
-> +
-> +	if (!intel_tsn_lane_is_available(ndev, intel_priv)) {
-> +		netdev_info(priv->dev,
-> +			    "No TSN lane available to set the registers.\n");
-> +		goto pmc_read_error;
-> +	}
-> +
-> +	if (intel_priv->pid_modphy == PID_MODPHY1) {
-> +		if (interface == PHY_INTERFACE_MODE_2500BASEX) {
-> +			ret = intel_set_reg_access(pid_modphy1_2p5g_regs,
-> +						   ARRAY_SIZE(pid_modphy1_2p5g_regs));
-> +		} else {
-> +			ret = intel_set_reg_access(pid_modphy1_1g_regs,
-> +						   ARRAY_SIZE(pid_modphy1_1g_regs));
-> +		}
-> +	} else {
-> +		if (interface == PHY_INTERFACE_MODE_2500BASEX) {
-> +			ret = intel_set_reg_access(pid_modphy3_2p5g_regs,
-> +						   ARRAY_SIZE(pid_modphy3_2p5g_regs));
-> +		} else {
-> +			ret = intel_set_reg_access(pid_modphy3_1g_regs,
-> +						   ARRAY_SIZE(pid_modphy3_1g_regs));
-> +		}
-> +	}
-> +
-> +	priv->plat->phy_interface = interface;
-> +
-> +	if (ret < 0)
-> +		goto pmc_read_error;
+--K8COnd4nDaIlA8yU
+Content-Type: application/pgp-signature; name="signature.asc"
 
-Perhaps this is an artifact of earlier refactoring,
-but the condition above seems to be without meaning
-as in either case the code goes directly to pmc_read_error.
+-----BEGIN PGP SIGNATURE-----
 
-> +
-> +pmc_read_error:
-> +	intel_serdes_powerdown(ndev, intel_priv);
-> +	intel_serdes_powerup(ndev, intel_priv);
-> +
-> +	return ret;
-> +}
-> +
->  static void common_default_data(struct plat_stmmacenet_data *plat)
->  {
->  	plat->clk_csr = 2;	/* clk_csr_i = 20-35MHz & MDC = clk_csr_i/16 */
+iHUEABYIAB0WIQRh246EGq/8RLhDjO14tDGHoIJi0gUCZ6JZcQAKCRB4tDGHoIJi
+0gnAAQC1oGfhZbnFSM/mPgMlsOYSL9Jy1uxEojT2QLRGkF15CQEA9H2GXROw3Fk2
+eXUwUknLlmzd/8uguMbvTucbVOMokgs=
+=3zMy
+-----END PGP SIGNATURE-----
 
-...
+--K8COnd4nDaIlA8yU--
 
