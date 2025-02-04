@@ -1,278 +1,286 @@
-Return-Path: <netdev+bounces-162569-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-162570-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id ECC15A273B4
-	for <lists+netdev@lfdr.de>; Tue,  4 Feb 2025 15:01:06 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id DC334A273E1
+	for <lists+netdev@lfdr.de>; Tue,  4 Feb 2025 15:04:47 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B8F8E165231
-	for <lists+netdev@lfdr.de>; Tue,  4 Feb 2025 14:00:39 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 79BAD3A80CE
+	for <lists+netdev@lfdr.de>; Tue,  4 Feb 2025 14:02:10 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 02DC9215184;
-	Tue,  4 Feb 2025 13:47:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B0825212F91;
+	Tue,  4 Feb 2025 13:51:32 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=outlook.com header.i=@outlook.com header.b="aQBz+OAr"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="UHUoDwel"
 X-Original-To: netdev@vger.kernel.org
-Received: from AUS01-SY4-obe.outbound.protection.outlook.com (mail-sy4aus01olkn2107.outbound.protection.outlook.com [40.92.62.107])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f196.google.com (mail-pl1-f196.google.com [209.85.214.196])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B66DE21516F;
-	Tue,  4 Feb 2025 13:47:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.92.62.107
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1738676831; cv=fail; b=WIQBfINXJbnlbSqfTT8kHnu0do8ODpW9ygPZHQ9szrOLYb4PK1BW4E9A2XsfN6HUMmhjv/pXNIflhDIT3dhFu2yKs6I7npO50s4NTc+x0sZGOwO5g8gPYE9xZCscbwSLZec/A+KDzKciL3VoHO0TX4SJtq+V+RltCFxexlmr8Js=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1738676831; c=relaxed/simple;
-	bh=CLd1Lno2DQgpSNIecMDdDA+rReL9iYXSlcxT5ugnfro=;
-	h=From:To:Subject:Date:Message-ID:Content-Type:MIME-Version; b=NpBD825okhUnNAA3hRmtL2S2sgX9tlcr5G/0Ic8pwuDD4zRKe/uSUbP8L7nAwevPHCBTA+wLUudd8XCjx8OcwxDXZ2mElohWmJ0TSdfa7v0i1TQjwbCLqSyyzQr5l8UWpcM1Z4RP31r/ApxBRv6qbZX4LKsVAtBfUoUKuZM1kaY=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=outlook.com; spf=pass smtp.mailfrom=outlook.com; dkim=pass (2048-bit key) header.d=outlook.com header.i=@outlook.com header.b=aQBz+OAr; arc=fail smtp.client-ip=40.92.62.107
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=outlook.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=outlook.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=ksDukU30qUAWo9ybR8f66+IasPdKw8ydbVSN0i9lxqi1uW+1z3FS8ijGPd7iOkhZa4bVxbORMfaYHgy+WlwTSaVqONcvlVu+n9JGDEtjr8SGzVVMpYC31wEvX42w6J9a77GJxxRJt7yJ9XMGRf2b1XvKb3lLx2YWgrevBArUGoh23oRp3WtlFGAJPbwKAYiN5UGdAVPEyZSCFfxR7b4/tPJwE9hRnVxRTiRRWhBaINm5l8IFlCEYnzhBYdiB8MveChBi/aG9tqBjRL3cmJ8IXIoKBYDpCEO5yub11xRgyaJ+yCRDlWx+YtLBwn4SnypGA7Oy+5o1ZR/IX2F3e4vAOA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=CLd1Lno2DQgpSNIecMDdDA+rReL9iYXSlcxT5ugnfro=;
- b=x5K58Zy3w0K8vvG3kQWxrfFEn5aVB/FlUON8TGVmOsIqXK6NcRCGpos5sh+1SSs+y7JKeFl/no1QuRKuV8cQjFOFFNoMFRcIaPmMR+FPXDGuS/aB9uANGiATFBqErbPTRn2t14STRtpd00QAMhnHGu8hwGfXhj9FJlVz6tAQ65sKa/Q0691+G+U76Kmsodgwhy40D6zGruD5GqW2S9Iq07ke2jlZD3uDt1pijevaAj8o+zERo9rdtotNEFthsx6mAbvl3f5uAdMZPqfc0d5TvAXjMvvrQ1T/P+4i+8eRS7RLr78kpfMhMPgGP0REeF+6vQwj+6rCpga4LeAnZdnOyA==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=none; dmarc=none;
- dkim=none; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=outlook.com;
- s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=CLd1Lno2DQgpSNIecMDdDA+rReL9iYXSlcxT5ugnfro=;
- b=aQBz+OAr5lTiUySkIOTNoHo5ER5fNNhD4PcUdWmGK1qdRe0ET3qzoLV/YUVwYg3K93vGZLPWXjoFaCoCAkoiTA42iWqKyrUp7E3tESVpP5fQj8m9QGjJXgsNmBsAhsUmc7fcWqWmfdvXdn9oHmbwP2lYkHfhCbQaXFsEDJmDJqdLgXtmEeOG1FsCqDCBLnrPiWComz13INErOlVlkRLLpggSRbA/RF9/CV6aMenPsRqe3Yzgj7HPdCwaUJtfcG5Ks1+aYFZNNTT4Opf+IVHPf6cBFPP3CjHsSoCl+3/2cTYmdfGyX5JYqFvbahwkgrjTYWyFCfugGNvEeDvsLtLV3Q==
-Received: from SY8P300MB0421.AUSP300.PROD.OUTLOOK.COM (2603:10c6:10:293::17)
- by SY7P300MB0473.AUSP300.PROD.OUTLOOK.COM (2603:10c6:10:28e::20) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8398.25; Tue, 4 Feb
- 2025 13:47:04 +0000
-Received: from SY8P300MB0421.AUSP300.PROD.OUTLOOK.COM
- ([fe80::c7a9:a687:779f:a9cc]) by SY8P300MB0421.AUSP300.PROD.OUTLOOK.COM
- ([fe80::c7a9:a687:779f:a9cc%5]) with mapi id 15.20.8422.010; Tue, 4 Feb 2025
- 13:47:04 +0000
-From: YAN KANG <kangyan91@outlook.com>
-To: Eric Dumazet <edumazet@google.com>, "David S. Miller"
-	<davem@davemloft.net>, David Ahern <dsahern@kernel.org>, Jakub Kicinski
-	<kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Simon Horman
-	<horms@kernel.org>, "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
-Subject: general protection fault in ip6_pol_route
-Thread-Topic: general protection fault in ip6_pol_route
-Thread-Index: AQHbdwQeTAs1lgsdF0+R0FIWOCNX0w==
-Date: Tue, 4 Feb 2025 13:47:04 +0000
-Message-ID:
- <SY7P300MB04319CA459D5B313D33AF259A1F42@SY7P300MB0431.AUSP300.PROD.OUTLOOK.COM>
-Accept-Language: zh-CN, en-US
-Content-Language: zh-CN
-X-MS-Has-Attach:
-X-MS-TNEF-Correlator:
-msip_labels:
-x-ms-publictraffictype: Email
-x-ms-traffictypediagnostic: SY8P300MB0421:EE_|SY7P300MB0473:EE_
-x-ms-office365-filtering-correlation-id: 7e34228d-765e-4517-cf36-08dd452268c0
-x-microsoft-antispam:
- BCL:0;ARA:14566002|15030799003|15080799006|461199028|7092599003|8062599003|8060799006|19110799003|102099032|440099028|3412199025|41001999003;
-x-microsoft-antispam-message-info:
- =?gb2312?B?ZXN5TitYTmViYXBvaTRETFQ2L2hhb29vdW5ONXNLNGtNOWxaMk55bTFJNzRz?=
- =?gb2312?B?UTZxbkNIcWpDTUY1ZkRvVmJONE1nS25aWFJGdzlKWEsvQlc0UmtUU3R0YTBo?=
- =?gb2312?B?aHhLbnMyRktyZE1hTThlKys4bk5GZGZra0dXYXA0NmNuZWs3YUdOR3MvVVRa?=
- =?gb2312?B?ZWdoMFhqK1pTL0JWekNDL2lUdWdVeTNpaXJwR1Q2cjRjL3VFWEw0V1lRSlRr?=
- =?gb2312?B?REhDV3R1SHU5eWpmTVJrMmV0aDlROENWd3NuNGJhNGdna1pOcVE0UWpBSEFa?=
- =?gb2312?B?NTNDNFJHNEhERS9nck1sQXB3Mkw4ZGhEOU51NlBaY1krRFdERUNveVBPbzFh?=
- =?gb2312?B?eDJzRkJDMUd0SERtWHBVbXpkd0dacXNxT0tvOFo4aVlJTTRieEEzMnd6b1dp?=
- =?gb2312?B?K1oreHRoaGhDbFhBUVdtbk1GazJaWmJFenMraDZEdlprSXRXNms1MmtzMGR5?=
- =?gb2312?B?Z2E4b3VvOUs0c2dybVdFMWhob2E0dkhmZjF4b0tOaitFblMvOUljVlNweElD?=
- =?gb2312?B?Y3A1TnNnM0Z4eXRsaG9hRy9zRnBaYnpxbVU4SU1tZWVZSWhlRGFNUkRrcTky?=
- =?gb2312?B?SUZud2g5QmtJaWJSMzVWWHNhUURmeXI1UFJ4TWFPWDFRdWtOQ2MwSFpsZExD?=
- =?gb2312?B?T2g3S3BlY010ZmE4cmxWeUNZdHdPK3M5c3REVWZESjdvYUROKzlCTVFxVXBm?=
- =?gb2312?B?UTBPRGRBUVJXMXFVL1lYZmN5YnRXejhtenRqS285TnpIajRHbGVyK2MvVHAx?=
- =?gb2312?B?UjFTMFZSZkpsV1pSV0M0L2hmaTdySTBoM2s0c044VmlpSVZ6MUVIMzBjSUZs?=
- =?gb2312?B?Uk9IVjI0SDNySVVZOENPS3U0dlBOSitTeVkrTnlHRHZreGt6MW9GVUNiU2lZ?=
- =?gb2312?B?cnJwK3BpeHdoU2IyYVE0N2t4cEhqN0syZUpuMzVTME4yNExibUtjMmlyV2pV?=
- =?gb2312?B?cDBpckFwU2dZK0hpSW9EWGJvMDRDK1lRTkkvYmZzQWgveitpUmU5R3JpYVVR?=
- =?gb2312?B?ZjFRMmVBZDZoSTJHRFlvd3MvWWw2NEhLenRyaDlobmFSY2lyaTRVaWZodW4z?=
- =?gb2312?B?SGtWUlFFVUM2S1VzVUV1WVZOTGtJa0U2cThhYXhCdE5TajVYN3lVOUxyVGJU?=
- =?gb2312?B?QW5oS2RDdFkxL284aTZ6bi9FRWdET3JKL29BOTlKTk9hdTRSVVFWaDMwSTZw?=
- =?gb2312?B?SjNRKzVXQUFyV0daUWJJMmJQdk83bGMwTHRHbmZhOHdaTmdqRm5nYVBpM3RB?=
- =?gb2312?B?TWZXYWcxaTNsWEpZQy9nWkFMcWhQNjJsUVZRRnRQQW9weDA2TTE4eEVsZUpB?=
- =?gb2312?B?cS9USG5UK2tkVmJrekVveDVkZXlKdjFjN0dlcUJHUmRsRU0xdk5FNUUweWJQ?=
- =?gb2312?B?ekEzSmdOeTltRVl2REprdTkvZm5WQTk5K045OXhyMlNZMGlqN3RSYS85TzdT?=
- =?gb2312?B?cHY4blVvOWZoNVBnYzBocXZMOStPMUR1ZFYyMTI1bnpBZWRyZytDeXhDWTd5?=
- =?gb2312?B?OXBFaWNrQ3BUendmK2d3MERORlp3QzRxT3N5a3Job0ZIK3Y0YldDK2VpTm5q?=
- =?gb2312?B?TzJ1QT09?=
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0:
- =?gb2312?B?Nm51RjI5cUFJVmh4cEUwVy9zYitQL2xYendzNUw2L2RaZmJvT1pxeUFVOVdj?=
- =?gb2312?B?S3RFdG1BY0p2ejNyY0llRHo1ODZBMlJ0NHFidTBzbURYTzJhdHIvSWpYY1Ny?=
- =?gb2312?B?WTFEdmtrVEc4WmM0YWZFQzhPQWFVa0hBemtQLytEcHdsTEhmdy8wRzF0S3Ft?=
- =?gb2312?B?cm80eTIwUFBrQ0dEajdCb0xUZ2pCVFZ3dHJwYVlIRUhTYmlaMHJRcmNYT1Y3?=
- =?gb2312?B?cnRjTHBpaHJIUnYxY2xFMmoxQ2U3bHJBRjZBQ0lGSkFubGlQbiszMkNsQW1C?=
- =?gb2312?B?OEJjWFJJZ2g0VVNsR0lTd3djS1Y3a3ZHR3Z2c0hIR3luSUlUaXdkNFI1b0Vi?=
- =?gb2312?B?elZqSjhoQklUalBQZURncFpqa2IwNU1oYk9CNzNNSndIckhJZE9WclhZb1M3?=
- =?gb2312?B?cU5hMXNMNjlzNWVzdXB1Mk1xQzUrTEtOMTNoR3R2dnEyeVptaXREK0ZJNGVT?=
- =?gb2312?B?OWJnc0QyQk9LR0VXaElXNzY1aElxMFZkUFZrUjkrUFhJMmhxeWFZa0lYY1RM?=
- =?gb2312?B?VVUveDFTUW0yaWs5S0xlSiswdkM5cnNEcnB0RDRkSjhKMURQaTFRckRUZm1H?=
- =?gb2312?B?aUdweVA3MkhiWFExSFUwRnV5eE02UVZ3bVM0ZWltVUw2b2hTeVJoc2VocG9v?=
- =?gb2312?B?dU4vY2xDUkQxckdkQ29zYjdSQkJIdUxmTElPc0VreWRtTVNaYk9VODY2S2JC?=
- =?gb2312?B?enFCUi9JcVVQMmQvS3JYODZjTzhCN3dSSVJRcTgwa2x5NTRBOXF4NHlJYnFC?=
- =?gb2312?B?NTNrUnREUEFod21CL0FYUjd4NzMzQ3hCMXYwdHVXTERPVXZPc3NPcW9id1d4?=
- =?gb2312?B?UGYzKzhTdFpHUFhtVCtma1lJbXY0eFRzdC8yVkdCMXlIMXo4Z3NLbXluc1d6?=
- =?gb2312?B?SW9weUsvUGhzMy8yTExhSGFOOGhnQThVWUV5M0pLcmQyMVBJV2RKNWsvTHpp?=
- =?gb2312?B?YWxZKzRZTzJBTXkrckVISnBKQ20rYkpRTGZuYWtjRjZacGJvN2ZQZUcvUk1V?=
- =?gb2312?B?Z1VHM2pjcnhQbCtNU2FZNVpNQXVPR3QxVGRpQ2MzY01jeHIrN0gyYXlOQUtC?=
- =?gb2312?B?cVBQbG5lYmNPNHByK2ZPNklJWGJFQTNIK1I2dm9vL3Jmb0cwMHlDOGIwK1c1?=
- =?gb2312?B?NGZXZTMxUkpzQU0rRUhBMFVGVTdCOEFlb0taRXkrQzdvOTN0Wk9HSmM5N0d4?=
- =?gb2312?B?SkF6NXIrSTRPOStWYkliaHIzYXgzRWhJd2dJR1J6RmlFaDRqNU5GODRNd2hQ?=
- =?gb2312?B?NVVIMHJLa25XdlJCeHBTbG5JQkZ6Z1V2djMxV3Q1ZGZsTlpJUExmRlpiWng2?=
- =?gb2312?B?dlJ4eE15TmprNk5sNjZTSTBSWTNxYVhjNDRNMWNaV2I1TEprS1VyV2cxMjJw?=
- =?gb2312?B?QUJWNEdaVmc0TGI5bGdzbWx1OThZTnFBVFhrQXcrYTF5cTlHTXA3YXlxZjRR?=
- =?gb2312?B?MlM3TkUwUGVaclczQ2ZGMjFrblB2M25ZUnZhYnB1YmZwLzZLM2t3OUJQT0hC?=
- =?gb2312?B?aVhaYm9CdFhwblNXT3pIZ0x1R0xKTlVaVWJmWFZRTkIzMCtWS1g5dUZ6WkVM?=
- =?gb2312?B?cC9Bd0pRU0JLNWFSMmRvN0dpbFQrbm95NFhuM09sU0tkc01EUDduSXZ0WjRk?=
- =?gb2312?B?NmJ5ZUpRWDZscGFjUDRYTFdyeHR2MDZZbHpLYmREcU8yOTZjRVhzcUVxVlRK?=
- =?gb2312?B?QjdGOXpKMC9XSlMzcUYwcWF3cGhyOWU3QXNjM0cyVjk5bWVqSENHTm5qSUlU?=
- =?gb2312?Q?/Vw1Z/AVa1ihrkXEk4=3D?=
-Content-Type: text/plain; charset="gb2312"
-Content-Transfer-Encoding: base64
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CAA2B212D9C;
+	Tue,  4 Feb 2025 13:51:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.196
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1738677092; cv=none; b=QKf6WVsWD2SZq9LQYktA8AUe75ZTMiNRc8UbeJw7IE+Sd+RKNIuret93pueIhY1uMotzD6bISLy3GiLF4EzHnnkG3nrD/8zv8hhumrWjmSCBwJUv+hV4fbYN0HpEQvEcGRxmTrW8C5HcFZGk9HqyR/aT756COaZL7flc1m5v2us=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1738677092; c=relaxed/simple;
+	bh=EdqK4dOG44KVkikAD2uMFzkLSnKvEM9Ta4/c9MzsVM0=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=GuwxPLgZLKStXkuIJYS1z4ahPDsiZDdR40E2zdpq/YTDUYlO5EfFDloLznYQn+A6IaMuoR5L+ZwDxrLu1gXmsCGPEBl83RSy5ahsQ62xed46sDakKkoYbz0EBRfwVs3lerv0ivmP7KD36JGSn6b/TRfcxKXsVeDHP+tLZORpEgE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=UHUoDwel; arc=none smtp.client-ip=209.85.214.196
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pl1-f196.google.com with SMTP id d9443c01a7336-2161eb94cceso69564565ad.2;
+        Tue, 04 Feb 2025 05:51:30 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1738677090; x=1739281890; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=9Mrwk9eioiRgkG7loHAuR4qrjcX/aCvJsTaZ/T9ZIX8=;
+        b=UHUoDwelIXDvNc50fedWYyTX+h6nQ1Rs8hO9s1LKxlebZLK8TGuwSBgVBO4v7zYy7Z
+         A6kWlkB5ksl/HPMEGbm0mpAqJN6DjXWc4FjFBiczQtGmGrNUV+hUTgFGxrgz4jraDHfI
+         rvmfMuqcxhBkJDQ+ADRSgulBNw5cUGElctDnbn+K9kuquO/3kL6qw6mBVC0nEOo8ne/9
+         le2KuyrdzAkC4TT7EghsiPxqIMdsTPFEVvj/ncx/c2lZZ+zTX/DvJnRbV+JkHjsQ60P6
+         7n5teOCU5TizmR8nweQgXEghUl7hsw6kV9TtnHebplZ11LZxgSCufOsH9frtecNFMom6
+         J8AA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1738677090; x=1739281890;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=9Mrwk9eioiRgkG7loHAuR4qrjcX/aCvJsTaZ/T9ZIX8=;
+        b=X93TBynRUT56wlWcUgHpVxq8qzd5KBSRhvE22TjmwHPNAXn43Qv2JqqxKlP0VPKGrX
+         7IxvfMCUrMEDv09qyOUv5jdGs8+h8yUopzAmBDmkoVRo/qDAijoIkOr5wYpKTOb2pdbZ
+         FyYl77Q4P6hMyZ3fAp/hG9ECPsCv5WrUCC6xo0IfMPjB/GDCgsc3u1bmSlO+ytYuNe2n
+         9/ITuounRSAfsDArCEuWHD1jITkjcN/AJHLajYZoQmvNDctosawmYhP5Ff4np9ps27wj
+         fw0E86TfajIIc3tdR1ZPCZKFy8RbtdzRaKOFD8vJxkrwhxZsvbAe0XaVq0jk2mxe4ogr
+         FhTQ==
+X-Forwarded-Encrypted: i=1; AJvYcCU6pSjBdPF64nkFG3xHwlPeLttCRhYifXmsHsr6k1m5znQRTepPokOQtuydXkG+3lIR5Eev27IizLUqdx8=@vger.kernel.org, AJvYcCUNvil1moEiuCUSJVnOy15PBy0ToW9xQglPjCXYE/H3qzqhE91QTQS37d3C99P/q/LgPwKIf8hB@vger.kernel.org
+X-Gm-Message-State: AOJu0YyPizQxHPQuD6bBkKrSQnsH/FLxUjshMPJTn2L0dObfpgkw0YNm
+	UBlhgI/wIpFFoH9eReRvgEWvgZ710xPqGpuxew3Oq41ypGHX/3RQ
+X-Gm-Gg: ASbGnctM21WUOfm4J/4+DsOBo+Ho08CN05dR7K+knGmxsZSRSmq4+KNS1a/CeSYixqq
+	4aVJOSJvFjttNF+v6N542tmR8P9mP8c3n6Q/O4PiF1H5nXhTvvJdAJHXFAo6ka2myfYS7xfnjBV
+	bJWxc8RY6dXz4eJWGvLubXvtoZ3SdKk4F4NiGSbf5YJpqUoVuwDxTTjjJ4PtKY9f0wEaurF+bdx
+	ntV+ZESBX5hPClTQYxpo6VBZV1/AljzkXsYpmC/5gzfYOOXfV+41INoJpExNJyrmpsrnhT9LD0z
+	NNLYzGJ5tHH45D6F5bBO2Rp6+Zy3EokOYWP7zN88uf6iGZuLU7OVUjAG5JKyGbu8YA9WrUHDOay
+	ZaC8=
+X-Google-Smtp-Source: AGHT+IGvL8j5c0FdSCQXSFe1hSU7qHBctpcOZKZDQ5a5qQlBPy8PmY+fTSKGr+v9njBvTp7goQB5mw==
+X-Received: by 2002:a17:903:2444:b0:212:1ebf:9a03 with SMTP id d9443c01a7336-21dd7c3c86amr410177335ad.2.1738677089668;
+        Tue, 04 Feb 2025 05:51:29 -0800 (PST)
+Received: from ?IPV6:2409:8a55:301b:e120:3936:dcf4:dc64:c1b9? ([2409:8a55:301b:e120:3936:dcf4:dc64:c1b9])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-21de33000ebsm96266855ad.159.2025.02.04.05.51.23
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 04 Feb 2025 05:51:29 -0800 (PST)
+Message-ID: <72f388e8-adef-4ecc-812d-a1d19c801df5@gmail.com>
+Date: Tue, 4 Feb 2025 21:51:18 +0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-OriginatorOrg: outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: SY8P300MB0421.AUSP300.PROD.OUTLOOK.COM
-X-MS-Exchange-CrossTenant-RMS-PersistedConsumerOrg: 00000000-0000-0000-0000-000000000000
-X-MS-Exchange-CrossTenant-Network-Message-Id: 7e34228d-765e-4517-cf36-08dd452268c0
-X-MS-Exchange-CrossTenant-originalarrivaltime: 04 Feb 2025 13:47:04.4768
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 84df9e7f-e9f6-40af-b435-aaaaaaaaaaaa
-X-MS-Exchange-CrossTenant-rms-persistedconsumerorg: 00000000-0000-0000-0000-000000000000
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: SY7P300MB0473
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next v7 2/8] page_pool: fix timing for checking and
+ disabling napi_local
+To: =?UTF-8?Q?Toke_H=C3=B8iland-J=C3=B8rgensen?= <toke@redhat.com>,
+ Yunsheng Lin <linyunsheng@huawei.com>, davem@davemloft.net, kuba@kernel.org,
+ pabeni@redhat.com
+Cc: zhangkun09@huawei.com, liuyonglong@huawei.com, fanghaiqing@huawei.com,
+ Alexander Lobakin <aleksander.lobakin@intel.com>,
+ Xuan Zhuo <xuanzhuo@linux.alibaba.com>,
+ Jesper Dangaard Brouer <hawk@kernel.org>,
+ Ilias Apalodimas <ilias.apalodimas@linaro.org>,
+ Eric Dumazet <edumazet@google.com>, Simon Horman <horms@kernel.org>,
+ netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+References: <20250110130703.3814407-1-linyunsheng@huawei.com>
+ <20250110130703.3814407-3-linyunsheng@huawei.com> <87sepqhe3n.fsf@toke.dk>
+ <5059df11-a85b-4404-8c24-a9ccd76924f3@gmail.com> <87plkhn2x7.fsf@toke.dk>
+ <2aa84c61-6531-4f17-89e5-101f46ef00d0@huawei.com> <8734h8qgmz.fsf@toke.dk>
+ <84282526-6229-41c7-8f6b-5f2c500dcd8e@gmail.com> <874j1kpdwo.fsf@toke.dk>
+Content-Language: en-US
+From: Yunsheng Lin <yunshenglin0825@gmail.com>
+In-Reply-To: <874j1kpdwo.fsf@toke.dk>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
 
-RGVhciBtYWludGFpbmVycywKCkkgZm91bmQgYSBrZXJuZWwgIGJ1ZyB0aXRpbGVkICJnZW5lcmFs
-IHByb3RlY3Rpb24gZmF1bHQgaW4gaXA2X3BvbF9yb3V0ZSIgd2hpbGUgdXNpbmcgbW9kaWZpZWQg
-c3l6a2FsbGVyIGZ1enppbmcgdG9vbC4gSSBJdGVzdGVkIGl0IG9uIHRoZSBsYXRlc3QgTGludXgg
-dXBzdHJlYW0gdmVyc2lvbiAoNi4xMy4wLXJjNykgLgoKCkFmdGVyIHByZWxpbWluYXJ5IGFuYWx5
-c2lzLCB0aGUgcm9vdGNhdXNlIG1heSBiZSBpbiBpcDZfcG9sX3JvdXRlIGZ1bmN0aW9uICBuZXQv
-aXB2Ni9yb3V0ZS5jCiAgICByZXMgaXMgYSBzdGFjayBvYmplY3QuICAgIFsxXQogICAgZmliNl9z
-ZWxlY3RfcGF0aChuZXQsICZyZXMsIGZsNiwgb2lmLCBmYWxzZSwgc2tiLCBzdHJpY3QpICBjYWxs
-ICBtYXkgaW5pdGlhbGl6ZSByZXMtPm5oLlsyXQogICAgcnQgPSBydDZfZ2V0X3BjcHVfcm91dGUo
-ICZyZXMpOyAgIFszXQogICAgICAgICAgIHBjcHVfcnQgPSB0aGlzX2NwdV9yZWFkKCpyZXMtPm5o
-LT5ydDZpX3BjcHUpOyAvLyAqcmVzLT5uaCBpcyBOVUxMLCBjcmFzaAoKICAgaW4gWzJdLCByZXMt
-Pm5oIGNhbiBiZSBpbml0aWFsaXplZCBpbiBzZXZlcmFsIHdheXMscG9zc2libHkgb25lIG9mIHdo
-aWNoIGluaXRpYWxpemVzIGl0IHRvIE5VTEwuCgogVW5mb3J0dW5hdGVseSwgSSBkb24ndCBoYXZl
-IGFueSByZXByb2R1Y2VyIGZvciB0aGlzIGJ1ZyB5ZXQuIAoKSWYgeW91IGZpeCB0aGlzIGlzc3Vl
-LCBwbGVhc2UgYWRkIHRoZSBmb2xsb3dpbmcgdGFnIHRvIHRoZSBjb21taXQ6ClJlcG9ydGVkLWJ5
-OiB5YW4ga2FuZyA8a2FuZ3lhbjkxQG91dGxvb2suY29tPgpSZXBvcnRlZC1ieTogeXVlIHN1biA8
-c2Ftc3VuMTAwNjIxOUBnbWFpbC5jb20KCgpJIGhvcGUgaXQgaGVscHMuCkJlc3QgcmVnYXJkcwp5
-YW4ga2FuZwoKS2VybmVsIGNyYXNoIGxvZyBpcyBsaXN0ZWQgYmVsb3cuCgo9PT09PT09PT09PT09
-PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT0KY3Jh
-c2ggbG9nCj09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09PT09
-PT09PT09PT09PT09PT09PQoKT29wczogZ2VuZXJhbCBwcm90ZWN0aW9uIGZhdWx0LCBwcm9iYWJs
-eSBmb3Igbm9uLWNhbm9uaWNhbCBhZGRyZXNzIDB4ZGZmZmZjMDAwMDAwMDAxMzogMDAwMCBbIzFd
-IFBSRUVNUFQgU01QIEtBU0FOIE5PUFRJCktBU0FOOiBudWxsLXB0ci1kZXJlZiBpbiByYW5nZSBb
-MHgwMDAwMDAwMDAwMDAwMDk4LTB4MDAwMDAwMDAwMDAwMDA5Zl0KQ1BVOiAxIFVJRDogMCBQSUQ6
-IDEyIENvbW06IGt3b3JrZXIvdTg6MSBOb3QgdGFpbnRlZCA2LjEzLjAtcmM3LTAwMDAzLWdkNDc3
-NDc1OWUxNWItZGlydHkgIzg3CkhhcmR3YXJlIG5hbWU6IFFFTVUgU3RhbmRhcmQgUEMgKGk0NDBG
-WCArIFBJSVgsIDE5OTYpLCBCSU9TIDEuMTUuMC0xIDA0LzAxLzIwMTQKV29ya3F1ZXVlOiBpcHY2
-X2FkZHJjb25mIGFkZHJjb25mX2RhZF93b3JrClJJUDogMDAxMDpydDZfZ2V0X3BjcHVfcm91dGUg
-bmV0L2lwdjYvcm91dGUuYzoxNDExIFtpbmxpbmVdClJJUDogMDAxMDppcDZfcG9sX3JvdXRlKzB4
-M2JlLzB4MTIxMCBuZXQvaXB2Ni9yb3V0ZS5jOjIyNjQKQ29kZTogZjcgNGQgODUgZjYgMGYgODQg
-NDAgMDMgMDAgMDAgZTggM2QgOGYgY2IgZjcgNDkgOGQgYmUgOTggMDAgMDAgMDAgNGMgODkgZjMg
-NDggYjggMDAgMDAgMDAgMDAgMDAgZmMgZmYgZGYgNDggODkgZmEgNDggYzEgZWEgMDMgPDBmPiBi
-NiAwNCAwMiA4NCBjMCA3NCAwOCAzYyAwMyAwZiA4ZSAxYSAwZCAwMCAwMCA0NSA4YiBhZSA5OCAw
-MCAwMApSU1A6IDAwMTg6ZmZmZmM5MDAwMDFlODdkMCBFRkxBR1M6IDAwMDEwMjAzClJBWDogZGZm
-ZmZjMDAwMDAwMDAwMCBSQlg6IDAwMDAwMDAwMDAwMDAwMDQgUkNYOiBmZmZmZmZmZjg5Y2QzMTk1
-ClJEWDogMDAwMDAwMDAwMDAwMDAxMyBSU0k6IGZmZmZmZmZmODljZDMxYTMgUkRJOiAwMDAwMDAw
-MDAwMDAwMDljClJCUDogZmZmZjg4ODEyYTAxMDAwMCBSMDg6IDAwMDAwMDAwMDAwMDAwMDEgUjA5
-OiBmZmZmODg4MTEwMjg4MDAwClIxMDogMDAwMDAwMDAwMDAwMDAwNCBSMTE6IDAwMDAwMDAwMDAw
-MDAwMDAgUjEyOiAwMDAwMDAwMDAwMDAwMDgwClIxMzogZmZmZmM5MDAwMDFlOGIyMCBSMTQ6IDAw
-MDAwMDAwMDAwMDAwMDQgUjE1OiBmZmZmYzkwMDAwMWU4ODYwCkZTOiAgMDAwMDAwMDAwMDAwMDAw
-MCgwMDAwKSBHUzpmZmZmODg4MTM1ZTAwMDAwKDAwMDApIGtubEdTOjAwMDAwMDAwMDAwMDAwMDAK
-Q1M6ICAwMDEwIERTOiAwMDAwIEVTOiAwMDAwIENSMDogMDAwMDAwMDA4MDA1MDAzMwpDUjI6IDAw
-MDA3ZmMyM2QzNWIzNDQgQ1IzOiAwMDAwMDAwMTA1NzBlMDAwIENSNDogMDAwMDAwMDAwMDc1MmVm
-MApEUjA6IDAwMDAwMDAwMDAwMDAwMDAgRFIxOiAwMDAwMDAwMDAwMDAwMDAwIERSMjogMDAwMDAw
-MDAwMDAwMDAwMApEUjM6IDAwMDAwMDAwMDAwMDAwMDAgRFI2OiAwMDAwMDAwMGZmZmUwN2YwIERS
-NzogMDAwMDAwMDAwMDAwMDQwMApQS1JVOiA1NTU1NTU1NApDYWxsIFRyYWNlOgogPElSUT4KIHBv
-bF9sb29rdXBfZnVuYyBpbmNsdWRlL25ldC9pcDZfZmliLmg6NjE2IFtpbmxpbmVdCiBmaWI2X3J1
-bGVfbG9va3VwKzB4NTM4LzB4NzIwIG5ldC9pcHY2L2ZpYjZfcnVsZXMuYzoxMTcKIGlwNl9yb3V0
-ZV9pbnB1dF9sb29rdXAgbmV0L2lwdjYvcm91dGUuYzoyMzAwIFtpbmxpbmVdCiBpcDZfcm91dGVf
-aW5wdXQrMHg2NmUvMHhjMjAgbmV0L2lwdjYvcm91dGUuYzoyNTk2CiBpcDZfcmN2X2ZpbmlzaF9j
-b3JlLmNvbnN0cHJvcC4wKzB4MWFhLzB4NWUwIG5ldC9pcHY2L2lwNl9pbnB1dC5jOjY2CiBpcDZf
-cmN2X2ZpbmlzaCBuZXQvaXB2Ni9pcDZfaW5wdXQuYzo3NyBbaW5saW5lXQogTkZfSE9PSyBpbmNs
-dWRlL2xpbnV4L25ldGZpbHRlci5oOjMxNCBbaW5saW5lXQogTkZfSE9PSyBpbmNsdWRlL2xpbnV4
-L25ldGZpbHRlci5oOjMwOCBbaW5saW5lXQogaXB2Nl9yY3YrMHgxZTcvMHg2OTAgbmV0L2lwdjYv
-aXA2X2lucHV0LmM6MzA5CiBfX25ldGlmX3JlY2VpdmVfc2tiX29uZV9jb3JlKzB4MTJlLzB4MWYw
-IG5ldC9jb3JlL2Rldi5jOjU2NzIKIF9fbmV0aWZfcmVjZWl2ZV9za2IrMHgxZC8weDE1MCBuZXQv
-Y29yZS9kZXYuYzo1Nzg1CiBwcm9jZXNzX2JhY2tsb2crMHgzMTkvMHgxNDYwIG5ldC9jb3JlL2Rl
-di5jOjYxMTcKIF9fbmFwaV9wb2xsLmNvbnN0cHJvcC4wKzB4YjYvMHg1NDAgbmV0L2NvcmUvZGV2
-LmM6Njg3NwogbmFwaV9wb2xsIG5ldC9jb3JlL2Rldi5jOjY5NDYgW2lubGluZV0KIG5ldF9yeF9h
-Y3Rpb24rMHg5ZDIvMHhlMzAgbmV0L2NvcmUvZGV2LmM6NzA2OAogaGFuZGxlX3NvZnRpcnFzKzB4
-MWJmLzB4ODUwIGtlcm5lbC9zb2Z0aXJxLmM6NTU0CiBkb19zb2Z0aXJxIGtlcm5lbC9zb2Z0aXJx
-LmM6NDU1IFtpbmxpbmVdCiBkb19zb2Z0aXJxKzB4YWMvMHhlMCBrZXJuZWwvc29mdGlycS5jOjQ0
-MgogPC9JUlE+CiA8VEFTSz4KIF9fbG9jYWxfYmhfZW5hYmxlX2lwKzB4MTAwLzB4MTIwIGtlcm5l
-bC9zb2Z0aXJxLmM6MzgyCiBsb2NhbF9iaF9lbmFibGUgaW5jbHVkZS9saW51eC9ib3R0b21faGFs
-Zi5oOjMzIFtpbmxpbmVdCiByY3VfcmVhZF91bmxvY2tfYmggaW5jbHVkZS9saW51eC9yY3VwZGF0
-ZS5oOjkxOSBbaW5saW5lXQogX19kZXZfcXVldWVfeG1pdCsweDFiOTgvMHg0MTYwIG5ldC9jb3Jl
-L2Rldi5jOjQ0NjEKIGRldl9xdWV1ZV94bWl0IGluY2x1ZGUvbGludXgvbmV0ZGV2aWNlLmg6MzE2
-OCBbaW5saW5lXQogbmVpZ2hfcmVzb2x2ZV9vdXRwdXQgbmV0L2NvcmUvbmVpZ2hib3VyLmM6MTUx
-NCBbaW5saW5lXQogbmVpZ2hfcmVzb2x2ZV9vdXRwdXQrMHg1OGUvMHg5MDAgbmV0L2NvcmUvbmVp
-Z2hib3VyLmM6MTQ5NAogbmVpZ2hfb3V0cHV0IGluY2x1ZGUvbmV0L25laWdoYm91ci5oOjUzOSBb
-aW5saW5lXQogaXA2X2ZpbmlzaF9vdXRwdXQyKzB4YWU1LzB4MWVjMCBuZXQvaXB2Ni9pcDZfb3V0
-cHV0LmM6MTQxCiBfX2lwNl9maW5pc2hfb3V0cHV0IG5ldC9pcHY2L2lwNl9vdXRwdXQuYzoyMTUg
-W2lubGluZV0KIGlwNl9maW5pc2hfb3V0cHV0KzB4NzEzLzB4MTIzMCBuZXQvaXB2Ni9pcDZfb3V0
-cHV0LmM6MjI2CiBORl9IT09LX0NPTkQgaW5jbHVkZS9saW51eC9uZXRmaWx0ZXIuaDozMDMgW2lu
-bGluZV0KIGlwNl9vdXRwdXQrMHgyMDMvMHg1NTAgbmV0L2lwdjYvaXA2X291dHB1dC5jOjI0Nwog
-ZHN0X291dHB1dCBpbmNsdWRlL25ldC9kc3QuaDo0NTAgW2lubGluZV0KIE5GX0hPT0sgaW5jbHVk
-ZS9saW51eC9uZXRmaWx0ZXIuaDozMTQgW2lubGluZV0KIG5kaXNjX3NlbmRfc2tiKzB4YTY1LzB4
-MWM3MCBuZXQvaXB2Ni9uZGlzYy5jOjUxMQogbmRpc2Nfc2VuZF9ucysweGI1LzB4MTMwIG5ldC9p
-cHY2L25kaXNjLmM6NjY5CiBhZGRyY29uZl9kYWRfd29yaysweGQzYS8weDE2MTAgbmV0L2lwdjYv
-YWRkcmNvbmYuYzo0MzAzCiBwcm9jZXNzX29uZV93b3JrKzB4OTlmLzB4MWJiMCBrZXJuZWwvd29y
-a3F1ZXVlLmM6MzIyOQogcHJvY2Vzc19zY2hlZHVsZWRfd29ya3Mga2VybmVsL3dvcmtxdWV1ZS5j
-OjMzMTAgW2lubGluZV0KIHdvcmtlcl90aHJlYWQrMHg2NmUvMHhlODAga2VybmVsL3dvcmtxdWV1
-ZS5jOjMzOTEKIGt0aHJlYWQrMHgyYzcvMHgzYjAga2VybmVsL2t0aHJlYWQuYzozODkKIHJldF9m
-cm9tX2ZvcmsrMHg0NS8weDgwIGFyY2gveDg2L2tlcm5lbC9wcm9jZXNzLmM6MTQ3CiByZXRfZnJv
-bV9mb3JrX2FzbSsweDFhLzB4MzAgYXJjaC94ODYvZW50cnkvZW50cnlfNjQuUzoyNDQKIDwvVEFT
-Sz4KTW9kdWxlcyBsaW5rZWQgaW46Ci0tLVsgZW5kIHRyYWNlIDAwMDAwMDAwMDAwMDAwMDAgXS0t
-LQpSSVA6IDAwMTA6cnQ2X2dldF9wY3B1X3JvdXRlIG5ldC9pcHY2L3JvdXRlLmM6MTQxMSBbaW5s
-aW5lXQpSSVA6IDAwMTA6aXA2X3BvbF9yb3V0ZSsweDNiZS8weDEyMTAgbmV0L2lwdjYvcm91dGUu
-YzoyMjY0CkNvZGU6IGY3IDRkIDg1IGY2IDBmIDg0IDQwIDAzIDAwIDAwIGU4IDNkIDhmIGNiIGY3
-IDQ5IDhkIGJlIDk4IDAwIDAwIDAwIDRjIDg5IGYzIDQ4IGI4IDAwIDAwIDAwIDAwIDAwIGZjIGZm
-IGRmIDQ4IDg5IGZhIDQ4IGMxIGVhIDAzIDwwZj4gYjYgMDQgMDIgODQgYzAgNzQgMDggM2MgMDMg
-MGYgOGUgMWEgMGQgMDAgMDAgNDUgOGIgYWUgOTggMDAgMDAKUlNQOiAwMDE4OmZmZmZjOTAwMDAx
-ZTg3ZDAgRUZMQUdTOiAwMDAxMDIwMwpSQVg6IGRmZmZmYzAwMDAwMDAwMDAgUkJYOiAwMDAwMDAw
-MDAwMDAwMDA0IFJDWDogZmZmZmZmZmY4OWNkMzE5NQpSRFg6IDAwMDAwMDAwMDAwMDAwMTMgUlNJ
-OiBmZmZmZmZmZjg5Y2QzMWEzIFJESTogMDAwMDAwMDAwMDAwMDA5YwpSQlA6IGZmZmY4ODgxMmEw
-MTAwMDAgUjA4OiAwMDAwMDAwMDAwMDAwMDAxIFIwOTogZmZmZjg4ODExMDI4ODAwMApSMTA6IDAw
-MDAwMDAwMDAwMDAwMDQgUjExOiAwMDAwMDAwMDAwMDAwMDAwIFIxMjogMDAwMDAwMDAwMDAwMDA4
-MApSMTM6IGZmZmZjOTAwMDAxZThiMjAgUjE0OiAwMDAwMDAwMDAwMDAwMDA0IFIxNTogZmZmZmM5
-MDAwMDFlODg2MApGUzogIDAwMDAwMDAwMDAwMDAwMDAoMDAwMCkgR1M6ZmZmZjg4ODEzNWUwMDAw
-MCgwMDAwKSBrbmxHUzowMDAwMDAwMDAwMDAwMDAwCkNTOiAgMDAxMCBEUzogMDAwMCBFUzogMDAw
-MCBDUjA6IDAwMDAwMDAwODAwNTAwMzMKQ1IyOiAwMDAwN2ZjMjNkMzViMzQ0IENSMzogMDAwMDAw
-MDEwNTcwZTAwMCBDUjQ6IDAwMDAwMDAwMDA3NTJlZjAKRFIwOiAwMDAwMDAwMDAwMDAwMDAwIERS
-MTogMDAwMDAwMDAwMDAwMDAwMCBEUjI6IDAwMDAwMDAwMDAwMDAwMDAKRFIzOiAwMDAwMDAwMDAw
-MDAwMDAwIERSNjogMDAwMDAwMDBmZmZlMDdmMCBEUjc6IDAwMDAwMDAwMDAwMDA0MDAKUEtSVTog
-NTU1NTU1NTQKLS0tLS0tLS0tLS0tLS0tLQpDb2RlIGRpc2Fzc2VtYmx5IChiZXN0IGd1ZXNzKToK
-ICAgMDoJZjcgNGQgODUgZjYgMGYgODQgNDAgCXRlc3RsICAkMHg0MDg0MGZmNiwtMHg3YiglcmJw
-KQogICA3OgkwMyAwMCAgICAgICAgICAgICAgICAJYWRkICAgICglcmF4KSwlZWF4CiAgIDk6CTAw
-IGU4ICAgICAgICAgICAgICAgIAlhZGQgICAgJWNoLCVhbAogICBiOgkzZCA4ZiBjYiBmNyA0OSAg
-ICAgICAJY21wICAgICQweDQ5ZjdjYjhmLCVlYXgKICAxMDoJOGQgYmUgOTggMDAgMDAgMDAgICAg
-CWxlYSAgICAweDk4KCVyc2kpLCVlZGkKICAxNjoJNGMgODkgZjMgICAgICAgICAgICAgCW1vdiAg
-ICAlcjE0LCVyYngKICAxOToJNDggYjggMDAgMDAgMDAgMDAgMDAgCW1vdmFicyAkMHhkZmZmZmMw
-MDAwMDAwMDAwLCVyYXgKICAyMDoJZmMgZmYgZGYKICAyMzoJNDggODkgZmEgICAgICAgICAgICAg
-CW1vdiAgICAlcmRpLCVyZHgKICAyNjoJNDggYzEgZWEgMDMgICAgICAgICAgCXNociAgICAkMHgz
-LCVyZHgKKiAyYToJMGYgYjYgMDQgMDIgICAgICAgICAgCW1vdnpibCAoJXJkeCwlcmF4LDEpLCVl
-YXggPC0tIHRyYXBwaW5nIGluc3RydWN0aW9uCiAgMmU6CTg0IGMwICAgICAgICAgICAgICAgIAl0
-ZXN0ICAgJWFsLCVhbAogIDMwOgk3NCAwOCAgICAgICAgICAgICAgICAJamUgICAgIDB4M2EKICAz
-MjoJM2MgMDMgICAgICAgICAgICAgICAgCWNtcCAgICAkMHgzLCVhbAogIDM0OgkwZiA4ZSAxYSAw
-ZCAwMCAwMCAgICAJamxlICAgIDB4ZDU0CiAgM2E6CTQ1ICAgICAgICAgICAgICAgICAgIAlyZXgu
-UkIKICAzYjoJOGIgICAgICAgICAgICAgICAgICAgCS5ieXRlIDB4OGIKICAzYzoJYWUgICAgICAg
-ICAgICAgICAgICAgCXNjYXMgICAlZXM6KCVyZGkpLCVhbAogIDNkOgk5OCAgICAgICAgICAgICAg
-ICAgICAJY3d0bA==
+On 1/27/2025 9:47 PM, Toke Høiland-Jørgensen wrote:
+> Yunsheng Lin <yunshenglin0825@gmail.com> writes:
+> 
+>> On 1/25/2025 1:13 AM, Toke Høiland-Jørgensen wrote:
+>>> Yunsheng Lin <linyunsheng@huawei.com> writes:
+>>>
+>>>>> So I really don't see a way for this race to happen with correct usage
+>>>>> of the page_pool and NAPI APIs, which means there's no reason to make
+>>>>> the change you are proposing here.
+>>>>
+>>>> I looked at one driver setting pp->napi, it seems the bnxt driver doesn't
+>>>> seems to call page_pool_disable_direct_recycling() when unloading, see
+>>>> bnxt_half_close_nic(), page_pool_disable_direct_recycling() seems to be
+>>>> only called for the new queue_mgmt API:
+>>>>
+>>>> /* rtnl_lock held, this call can only be made after a previous successful
+>>>>    * call to bnxt_half_open_nic().
+>>>>    */
+>>>> void bnxt_half_close_nic(struct bnxt *bp)
+>>>> {
+>>>> 	bnxt_hwrm_resource_free(bp, false, true);
+>>>> 	bnxt_del_napi(bp);       *----call napi del and rcu sync----*
+>>>> 	bnxt_free_skbs(bp);
+>>>> 	bnxt_free_mem(bp, true); *------call page_pool_destroy()----*
+>>>> 	clear_bit(BNXT_STATE_HALF_OPEN, &bp->state);
+>>>> }
+>>>>
+>>>> Even if there is a page_pool_disable_direct_recycling() called between
+>>>> bnxt_del_napi() and bnxt_free_mem(), the timing window still exist as
+>>>> rcu sync need to be called after page_pool_disable_direct_recycling(),
+>>>> it seems some refactor is needed for bnxt driver to reuse the rcu sync
+>>>> from the NAPI API, in order to avoid calling the rcu sync for
+>>>> page_pool_destroy().
+>>>
+>>> Well, I would consider that usage buggy. A page pool object is created
+>>> with a reference to the napi struct; so the page pool should also be
+>>> destroyed (clearing its reference) before the napi memory is freed. I
+>>> guess this is not really documented anywhere, but it's pretty standard
+>>> practice to free objects in the opposite order of their creation.
+>>
+>> I am not so familiar with rule about the creation API of NAPI, but the
+>> implementation of bnxt driver can have reference of 'struct napi' before
+>> calling netif_napi_add(), see below:
+>>
+>> static int __bnxt_open_nic(struct bnxt *bp, bool irq_re_init, bool
+>> link_re_init)
+>> {
+>> 	.......
+>> 	rc = bnxt_alloc_mem(bp, irq_re_init);     *create page_pool*
+>> 	if (rc) {
+>> 		netdev_err(bp->dev, "bnxt_alloc_mem err: %x\n", rc);
+>> 		goto open_err_free_mem;
+>> 	}
+>>
+>> 	if (irq_re_init) {
+>> 		bnxt_init_napi(bp);                *netif_napi_add*
+>> 		rc = bnxt_request_irq(bp);
+>> 		if (rc) {
+>> 			netdev_err(bp->dev, "bnxt_request_irq err: %x\n", rc);
+>> 			goto open_err_irq;
+>> 		}
+>> 	}
+>>
+>> 	.....
+>> }
+> 
+> Regardless of the initialisation error, the fact that bnxt frees the
+> NAPI memory before calling page_pool_destroy() is a driver bug. Mina has
+> a suggestion for a warning to catch such bugs over in this thread:
+> 
+> https://lore.kernel.org/r/CAHS8izOv=tUiuzha6NFq1-ZurLGz9Jdi78jb3ey4ExVJirMprA@mail.gmail.com
+
+Thanks for the reminder.
+As the main problem is about adding a rcu sync between
+page_pool_disable_direct_recycling() and page_pool_destroy(), I am
+really doubtful that a warning can be added to catch such bugs if
+page_pool_destroy() does not use an explicit rcu sync and rely on
+the rcu sync from napi del API.
+
+> 
+>>> So no, I don't think this is something that should be fixed on the page
+>>> pool side (and certainly not by adding another synchronize_rcu() call
+>>> per queue!); rather, we should fix the drivers that get this wrong (and
+>>> probably document the requirement a bit better).
+>>
+>> Even if timing problem of checking and disabling napi_local should not
+>> be fixed on the page_pool side, do we have some common understanding
+>> about fixing the DMA API misuse problem on the page_pool side?
+>> If yes, do we have some common understanding about some mechanism
+>> like synchronize_rcu() might be still needed on the page_pool side?
+> 
+> I have not reviewed the rest of your patch set, I only looked at this
+> patch. I see you posted v8 without addressing Jesper's ask for a
+> conceptual description of your design. I am not going to review a
+> 600-something line patch series without such a description to go by, so
+> please address that first.
+
+I thought what Jesper'ask was mainly about why hijacking the page->pp
+pointer.
+I summarized the discussion in [1] as below, please let me know if that
+addresses your concern too.
+
+"By using the 'struct page_pool_item' referenced by page->pp_item,
+page_pool is not only able to keep track of the inflight page to do dma
+unmmaping when page_pool_destroy() is called if some pages are still
+handled in networking stack, and networking stack is also able to find
+the page_pool owning the page when returning pages back into page_pool.
+
+struct page_pool_item {
+	unsigned long state;
+	
+	union {
+		netmem_ref pp_netmem;
+		struct llist_node lentry;
+	};
+};
+
+When a page is added to the page_pool, an item is deleted from
+pool->hold_items and set the 'pp_netmem' pointing to that page and set
+'state' accordingly in order to keep track of that page, refill from
+pool->release_items when pool->hold_items is empty or use the item from
+pool->slow_items when fast items run out.
+
+When a page is released from the page_pool, it is able to tell which
+page_pool this page belongs to by using the below functions:
+
+static inline struct page_pool_item_block *
+page_pool_item_to_block(struct page_pool_item *item)
+{
+	return (struct page_pool_item_block *)((unsigned long)item & PAGE_MASK);
+}
+
+static inline struct page_pool *page_pool_get_pp(struct page *page)
+{
+	/* The size of item_block is always PAGE_SIZE, the address of item_block
+	 * for a specific item can be calculated using 'item & PAGE_MASK', so
+	 * that we can find the page_pool object it belongs to.
+	 */
+	return page_pool_item_to_block(page->pp_item)->pp;
+  }
+
+and after clearing the pp_item->state', the item for the released page
+is added back to pool->release_items so that it can be reused for new
+pages or just free it when it is from the pool->slow_items.
+
+When page_pool_destroy() is called, pp_item->state is used to tell if a 
+specific item is being used/dma mapped or not by scanning all the item 
+blocks in pool->item_blocks, then pp_item->netmem can be used to do the
+dma unmmaping if the corresponding inflight page is dma mapped."
+
+1. 
+https://lore.kernel.org/all/2b5a58f3-d67a-4bf7-921a-033326958ac6@huawei.com/
+
+> 
+>> If yes, it may be better to focus on discussing how to avoid calling rcu
+>> sync for each queue mentioned in [1].
+> 
+> Regardless of whether a synchronize_rcu() is needed in the final design
+> (and again, note that I don't have an opinion on this before reviewing
+> the whole series), this patch should be dropped from the series. The bug
+> it is purporting to fix is a driver API misuse and should be fixed in
+> the drivers, cf the above.
+
+I am still a little doubltful it is a driver API misuse problem yet as
+I am not true if page_pool_destroy() can depend on the rcu sync from
+napi del API for all cases. Even if it is, this driver API misuse
+problem seems to only exist after page_pool NAPI recycling feature/API
+is added, which might mean some refactoring needed from the driver side
+to support page_pool NAPI recycling.
+
+Anyway, it seems to make sense to drop this patch from the series for
+better forward progressing for the dma misuse problem as they are not
+really related.
+
+> 
+> -Toke
+> 
+
 
