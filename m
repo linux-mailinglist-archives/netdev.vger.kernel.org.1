@@ -1,182 +1,127 @@
-Return-Path: <netdev+bounces-162791-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-162792-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9A045A27E66
-	for <lists+netdev@lfdr.de>; Tue,  4 Feb 2025 23:43:36 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6E3C0A27E6A
+	for <lists+netdev@lfdr.de>; Tue,  4 Feb 2025 23:46:26 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 23F9F164885
-	for <lists+netdev@lfdr.de>; Tue,  4 Feb 2025 22:43:35 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id D73E77A1766
+	for <lists+netdev@lfdr.de>; Tue,  4 Feb 2025 22:45:30 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7E17F218EA2;
-	Tue,  4 Feb 2025 22:43:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E854921A446;
+	Tue,  4 Feb 2025 22:46:19 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=fastly.com header.i=@fastly.com header.b="gSTVVN/q"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="cLB5g6Me"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f174.google.com (mail-pl1-f174.google.com [209.85.214.174])
+Received: from mail-wr1-f43.google.com (mail-wr1-f43.google.com [209.85.221.43])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B57E91FF7A5
-	for <netdev@vger.kernel.org>; Tue,  4 Feb 2025 22:43:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.174
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2FC62204F94;
+	Tue,  4 Feb 2025 22:46:17 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.43
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1738709012; cv=none; b=D5/ZQebbJJJtGecgpnieUNGwO1KEs4o6prrpSLURwHkzij5DE0bc9XbEwz7dFg/I43M/RU4GLkb2IjFlW7WNXUaONKnBCZEY3zvG3eG7BewtrpkkSGzHcKtMz4kG1ZTjm/y5tBquaR2fsJdV/9xzE3Tt5N+xKF4wGYi4D75TzE0=
+	t=1738709179; cv=none; b=XD+abgZfb9CUCbj+HMuBhAe5Vzm1kAUhVMCA+Oi2nipa8CpIqDxiF6rJfnv/xn5RjizuPqxtr6fXhGTJtOZd9imgPlIFHVqw+kaQvsNWjNS4adiY7tJ8amjZvf4PpHUfMeHbgaTO2H6KRBCtVrQnEoEUEV9eRkVHfp+a52T4uv4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1738709012; c=relaxed/simple;
-	bh=Gtl8Igi4WlywiA+dzXoZ25GBSfMTXE8y4Y2SGZ8Egrs=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=k/dbZJsUaV/6AskTWD4xQFsIAvCYgQXGHogQMu+D6Ozqzqy/c3L0NOzi+lt3inDn7cy14KUvyGh20IU9MBNr5dC40c1D1dRN+9tawqzO92MCLNpOGnPt7vMXqtKLQQWL9D1XSKFhvtLkvDOszFzKXUerCHiExxbWIBdbXUXBFdM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fastly.com; spf=pass smtp.mailfrom=fastly.com; dkim=pass (1024-bit key) header.d=fastly.com header.i=@fastly.com header.b=gSTVVN/q; arc=none smtp.client-ip=209.85.214.174
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fastly.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=fastly.com
-Received: by mail-pl1-f174.google.com with SMTP id d9443c01a7336-21f0bc811dbso3675045ad.1
-        for <netdev@vger.kernel.org>; Tue, 04 Feb 2025 14:43:30 -0800 (PST)
+	s=arc-20240116; t=1738709179; c=relaxed/simple;
+	bh=4l5qtFI+5r2dhzj/k6xDjkZqRF/xI07K8S1Gcvh1Q+c=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=fcqOMUJlletps40QR7OOHCVuahEVQeVBCGsmiV76cE9sAmA8yz6eWc5Y2xOH6Ga4SBV+hLVI/mW3s6nX4dNUwDQD/PFM08pyYkkHPLJ6LzWJWrmnSk/KPdR8XvE7exV4JG3TzoGXNyDM/DzPlR5dYV/HNxOnxjlngR+PBeK1cMo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=cLB5g6Me; arc=none smtp.client-ip=209.85.221.43
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-wr1-f43.google.com with SMTP id ffacd0b85a97d-38dae70f5d9so635948f8f.1;
+        Tue, 04 Feb 2025 14:46:17 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=fastly.com; s=google; t=1738709010; x=1739313810; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references
-         :mail-followup-to:message-id:subject:cc:to:from:date:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=zj+FrDqAZ6eREnqkCMCmvMCbAqmY9GTn137zHVuvgyU=;
-        b=gSTVVN/qynLstwMpUKdCEcAjwdf1pC2pDz9/m4zoD4gdgyFASMAH9cp6l9sKVea94+
-         TmhouBGbXuRKL4olrCVohQ0UAZuUwHMtw9Ffjbwzt++B8NJXrwHp+SCiEz7y8ZuAtJ6C
-         r61i9zGGAXXX5srg6AHIKDJXqjPkUOvde44vs=
+        d=gmail.com; s=20230601; t=1738709176; x=1739313976; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:subject:cc:to:from:date:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=Tt+CBW2LvYos3Mcns35PKRqc8bckhvK9KyHON/qBnYU=;
+        b=cLB5g6MecrYfTl6DIAj+2gy+vao/kbm39SfjfbZzZENLyATHjBTwVmbH3FqrQHG/be
+         CzCZrdU1r2tmbkpALC3F0womxZNpDc8KOvDZ5ToIAkLBmEVieY7Bwlt+ogmclomVsDeM
+         URG1+Ngnk0GmmlLbU8M6Spyc1nK+knTG6N1GvxyeSiR1Y2J5Vy8mTIv2/psxSxdL4mh9
+         I34VGjgrWqnnGDnwWhkj8Am/R+A3apjYw0th2zvdnzV1VYDIAO2PIRHj+WvEW/4uyiVc
+         F4cG6zxiufmuy1FdDs0REVLC11IukkgwxBXQGxNLQFypsTFCgfMvC1P4W0FGcmZUT+nu
+         JzCA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1738709010; x=1739313810;
-        h=in-reply-to:content-disposition:mime-version:references
-         :mail-followup-to:message-id:subject:cc:to:from:date
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=zj+FrDqAZ6eREnqkCMCmvMCbAqmY9GTn137zHVuvgyU=;
-        b=d8GilefD8NhVK6avciwjqvQ6N8JZKTMQRKZlVcmXhn4wIsHmQv1Psp9z614tkBg1EZ
-         l2wa2T90LhNPCdDi3l/MwRJvZ793Z3EICaDBYUvJ1Nfi/Xw4wxgn5eHHf2dIAZjduEIS
-         D6odSN5roPjZW+Atmu9mkFWGixITP+AgGMOu78IFhyt2Hd43zcgoXg9xsKJiL/QMY9gJ
-         0faVZ5tkYKA4hGEW0shRbryU0aP8lA9CZTRyUiXZkjP36AwpAktkAQp8qkve1QUsuHY7
-         bcKx0Y+10c3ZTgKm0cUDQFU4JOzsa453L2IZCaYImwnan/lxhy2PydHuWQQV/+5bMzdO
-         NleA==
-X-Gm-Message-State: AOJu0Yzttsfbr1t/CJUz0X4RniiQPCv1d8SaaQuFYJ34nMCmjBHuomdb
-	PnKK93k0TeXi8Zln2CDnOdWyRo08X2wjtG3QV0HXxwfOWnHWKPpExv2u/VZIYlklfAbAwFwtlxu
-	z
-X-Gm-Gg: ASbGncsn03jJh/8O3LNvhLK4GOKDfa3cewvLQQMKneZPbUEsz/9w5y1iwcUEwttmlMv
-	l6RsWURBJWii7h7Zq6xNtUwzNwS2bzaibAIsBnk/TX28tnkJeHY209cpIk8HbZtlriut1Ur5yXh
-	IX7yJwLigtyWM6v3MZMhv7xPUP4vwpVO+matb3QE8rB43b+6VpSYZXH5ysm6n3IwHCMEIxmS4bR
-	BT9t5f2dWzR3MJsQp3RgVp+orwTxQX0vRa29mQd6Avwze1VCBQApT1fJb7JXn1JmM97AHjh+IlI
-	NDMn8e0PbG/Hd/S3LKtAIrqYa+OcGBiVkQVQzGXLMyL8SYVB2nLNHRJepQ==
-X-Google-Smtp-Source: AGHT+IHLvX1dDdiS2RfLnxL7zTZTGdoNfW2b0QcJx6cyMgrRNPER1Nn1XvyIVU1RrBXU5JhG4RklBw==
-X-Received: by 2002:a05:6a20:d818:b0:1e1:ad90:dda6 with SMTP id adf61e73a8af0-1ede832f594mr1163714637.20.1738709009758;
-        Tue, 04 Feb 2025 14:43:29 -0800 (PST)
-Received: from LQ3V64L9R2 (c-24-6-151-244.hsd1.ca.comcast.net. [24.6.151.244])
-        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-72fe631bfdasm11286156b3a.16.2025.02.04.14.43.28
+        d=1e100.net; s=20230601; t=1738709176; x=1739313976;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:subject:cc:to:from:date:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=Tt+CBW2LvYos3Mcns35PKRqc8bckhvK9KyHON/qBnYU=;
+        b=SiLnuSa1W3EEtb/JWLrmfvVWoFuwuntJSr6SjtLkCfZJmLMaqv8UFmzEfK5Y4iFHht
+         zUJzuO8vW5EWc8NYr7wCPwP86jYwcsbpQYC1Mrl4qR0M7IhzVbctSsGWoX5U0WSPA+pl
+         W3pQuDCgW3N1mQ1sbbtSUlO9a/kKBaJQr7D/3Gm/SKpTTIlpQf8Evg8K5nSyTh7f3rhy
+         NIt9vPWCEl0uC6iBztOZz5jFaF75bze8lhp628K095HgvyIYttQdLNtFz+2VjVDX9Shf
+         0c9uHtQcEFPUARlTiYlTWzthgBTJZqGWs4Gn6gJKuI6VCyrNILWXZHmzosgY6eEJaY/v
+         jwDA==
+X-Forwarded-Encrypted: i=1; AJvYcCUZqAT+EcoFrbfCnfpfh0efwkdRtD5kmUFRSCdpCN8peIkauoxUcT2N6rnS3wBaUsZdeZmHB9jVbQcR@vger.kernel.org, AJvYcCUeNgDsja40S+A8I+iSlXodyozo+gzY2+5KeRd/VY1zCOqoMc97yzao89pqTR8C5HQaW4Q5InPa@vger.kernel.org, AJvYcCXJUvQyF0WuUArSKhOqLwqRGxnoOecmM8bzU6f2b8QkOpdznRjoJEhrbfTOg9mwhcnOtNugCgwyQI4=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwXRmDUtt7pSatOFE5ukdbXyK1+XVT7MR72Nal0raRxvkyrRzB2
+	xPFKkcJTDnQFNmtNqR+5oc/EvJAYRCpZWJDsE4Hz7eDfheXKG1jW
+X-Gm-Gg: ASbGnct5DNHtPibV6BuxhC5z1CSXIKNexQdu+aOiMccTZtZK59FFl85uq6Q1oAft9Kc
+	CJpVrrC760IBDV4SqLbIz0JUnWIV7Qn8gkBvBiVcjZGpszI0QojvDcYDLMZtg0hB37JIyqaNPOX
+	JIq5+HqrntoTITKK74tE9uHaXnTuMHwOpWj22v3D4CLdkSnbYkLcaMa/DPh3SAInKQsQehbqi98
+	gFKLv8Dqy4X3vuBhmJ1TFv3PDXByi9a4Whshn462iNu+X5tQWYF5d+DhPAhikGtk3t13HsYmbTn
+	M7NUsKiryGLm0BN2G1RSfF3OIHvsaOFfa10jtNNNpY2oPDkJy+fBuQ==
+X-Google-Smtp-Source: AGHT+IGHQr0UqcWS1oxDPytTjqk1W2koAW8DrAz2ZmlNnUgGZv5GOxgxgtgrSisiG6PNWZt+uxbP8w==
+X-Received: by 2002:a5d:5f41:0:b0:385:e8dd:b143 with SMTP id ffacd0b85a97d-38db487375amr321169f8f.19.1738709176171;
+        Tue, 04 Feb 2025 14:46:16 -0800 (PST)
+Received: from pumpkin (82-69-66-36.dsl.in-addr.zen.co.uk. [82.69.66.36])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-38c5c1cee41sm16775035f8f.81.2025.02.04.14.46.13
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 04 Feb 2025 14:43:29 -0800 (PST)
-Date: Tue, 4 Feb 2025 14:43:26 -0800
-From: Joe Damato <jdamato@fastly.com>
-To: Ahmed Zaki <ahmed.zaki@intel.com>
-Cc: netdev@vger.kernel.org, intel-wired-lan@lists.osuosl.org,
-	andrew+netdev@lunn.ch, edumazet@google.com, kuba@kernel.org,
-	horms@kernel.org, pabeni@redhat.com, davem@davemloft.net,
-	michael.chan@broadcom.com, tariqt@nvidia.com,
-	anthony.l.nguyen@intel.com, przemyslaw.kitszel@intel.com,
-	shayd@nvidia.com, akpm@linux-foundation.org, shayagr@amazon.com,
-	kalesh-anakkur.purayil@broadcom.com
-Subject: Re: [PATCH net-next v7 2/5] net: napi: add CPU affinity to
- napi_config
-Message-ID: <Z6KYDs0os_DizhMa@LQ3V64L9R2>
-Mail-Followup-To: Joe Damato <jdamato@fastly.com>,
-	Ahmed Zaki <ahmed.zaki@intel.com>, netdev@vger.kernel.org,
-	intel-wired-lan@lists.osuosl.org, andrew+netdev@lunn.ch,
-	edumazet@google.com, kuba@kernel.org, horms@kernel.org,
-	pabeni@redhat.com, davem@davemloft.net, michael.chan@broadcom.com,
-	tariqt@nvidia.com, anthony.l.nguyen@intel.com,
-	przemyslaw.kitszel@intel.com, shayd@nvidia.com,
-	akpm@linux-foundation.org, shayagr@amazon.com,
-	kalesh-anakkur.purayil@broadcom.com
-References: <20250204220622.156061-1-ahmed.zaki@intel.com>
- <20250204220622.156061-3-ahmed.zaki@intel.com>
+        Tue, 04 Feb 2025 14:46:15 -0800 (PST)
+Date: Tue, 4 Feb 2025 22:46:12 +0000
+From: David Laight <david.laight.linux@gmail.com>
+To: Jonathan Corbet <corbet@lwn.net>
+Cc: Simon Horman <horms@kernel.org>, "David S. Miller"
+ <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Jakub Kicinski
+ <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Alexandre Ferrieux
+ <alexandre.ferrieux@gmail.com>, netdev@vger.kernel.org,
+ workflows@vger.kernel.org, linux-doc@vger.kernel.org
+Subject: Re: [PATCH net] docs: netdev: Document guidance on inline functions
+Message-ID: <20250204224612.766689a1@pumpkin>
+In-Reply-To: <874j1bt6mv.fsf@trenco.lwn.net>
+References: <20250203-inline-funk-v1-1-2f48418e5874@kernel.org>
+	<874j1bt6mv.fsf@trenco.lwn.net>
+X-Mailer: Claws Mail 4.1.1 (GTK 3.24.38; arm-unknown-linux-gnueabihf)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250204220622.156061-3-ahmed.zaki@intel.com>
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-On Tue, Feb 04, 2025 at 03:06:19PM -0700, Ahmed Zaki wrote:
-> A common task for most drivers is to remember the user-set CPU affinity
-> to its IRQs. On each netdev reset, the driver should re-assign the
-> user's settings to the IRQs.
+... 
+> > +Inline functions
+> > +----------------
+> > +
+> > +The use of static inline functions in .c file is strongly discouraged
+> > +unless there is a demonstrable reason for them, usually performance
+> > +related. Rather, it is preferred to omit the inline keyword and allow the
+> > +compiler to inline them as it sees fit.
+> > +
+> > +This is a stricter requirement than that of the general Linux Kernel
+> > +:ref:`Coding Style<codingstyle>`  
 > 
-> Add CPU affinity mask to napi_config. To delegate the CPU affinity
-> management to the core, drivers must:
->  1 - set the new netdev flag "irq_affinity_auto":
->                                        netif_enable_irq_affinity(netdev)
->  2 - create the napi with persistent config:
->                                        netif_napi_add_config()
->  3 - bind an IRQ to the napi instance: netif_napi_set_irq()
-> 
-> the core will then make sure to use re-assign affinity to the napi's
-> IRQ.
-> 
-> The default IRQ mask is set to one cpu starting from the closest NUMA.
+> I have no objection to this change, but I do wonder if it does indeed
+> belong in the central coding-style document.  I don't think anybody
+> encourages use of "inline" these days...?
 
-Not sure, but maybe the above should be documented somewhere like
-Documentation/networking/napi.rst or similar?
 
-Maybe that's too nit-picky, though, since the per-NAPI config stuff
-never made it into the docs (I'll propose a patch to fix that).
+Apart from the cases where the compiler really ought to inline something
+but fails to do so because it doesn't notice just how much code collapses
+out.
+But in that case you need always_inline.
 
-> Signed-off-by: Ahmed Zaki <ahmed.zaki@intel.com>
-> ---
->  include/linux/netdevice.h | 14 +++++++--
->  net/core/dev.c            | 62 +++++++++++++++++++++++++++++++--------
->  2 files changed, 61 insertions(+), 15 deletions(-)
+For instance get_sigset_argpack (fs/select.c) is marked inline but isn't
+being inlined by gcc 12.2 (clang 18 is inlining it).
 
-[...]
- 
-> diff --git a/net/core/dev.c b/net/core/dev.c
-> index 33e84477c9c2..4cde7ac31e74 100644
-> --- a/net/core/dev.c
-> +++ b/net/core/dev.c
+I've also seen places where #defines generate much better code than
+inline functions because they get processed much earlier.
 
-[...]
-
-> @@ -6968,17 +6983,28 @@ void netif_napi_set_irq_locked(struct napi_struct *napi, int irq)
->  {
->  	int rc;
->  
-> -	/* Remove existing rmap entries */
-> -	if (napi->dev->rx_cpu_rmap_auto &&
-> +	/* Remove existing resources */
-> +	if ((napi->dev->rx_cpu_rmap_auto || napi->dev->irq_affinity_auto) &&
->  	    napi->irq != irq && napi->irq > 0)
->  		irq_set_affinity_notifier(napi->irq, NULL);
->  
->  	napi->irq = irq;
-> -	if (irq > 0) {
-> +	if (irq < 0)
-> +		return;
-> +
-> +	if (napi->dev->rx_cpu_rmap_auto) {
->  		rc = napi_irq_cpu_rmap_add(napi, irq);
->  		if (rc)
->  			netdev_warn(napi->dev, "Unable to update ARFS map (%d)\n",
->  				    rc);
-> +	} else if (napi->config && napi->dev->irq_affinity_auto) {
-> +		napi->notify.notify = netif_napi_irq_notify;
-> +		napi->notify.release = netif_napi_affinity_release;
-> +
-> +		rc = irq_set_affinity_notifier(irq, &napi->notify);
-> +		if (rc)
-> +			netdev_warn(napi->dev, "Unable to set IRQ notifier (%d)\n",
-> +				    rc);
->  	}
-
-Should there be a WARN_ON or WARN_ON_ONCE in here somewhere if the
-driver calls netif_napi_set_irq_locked but did not link NAPI config
-with a call to netif_napi_add_config?
-
-It seems like in that case the driver is buggy and a warning might
-be helpful.
+	David
 
