@@ -1,138 +1,149 @@
-Return-Path: <netdev+bounces-162679-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-162680-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 29875A2798B
-	for <lists+netdev@lfdr.de>; Tue,  4 Feb 2025 19:16:32 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id DC5B4A27995
+	for <lists+netdev@lfdr.de>; Tue,  4 Feb 2025 19:17:58 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 0EFE51886C2C
-	for <lists+netdev@lfdr.de>; Tue,  4 Feb 2025 18:16:37 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id C32131886E75
+	for <lists+netdev@lfdr.de>; Tue,  4 Feb 2025 18:18:03 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 284EB217666;
-	Tue,  4 Feb 2025 18:16:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 98F5721767B;
+	Tue,  4 Feb 2025 18:17:47 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="b2rbyC2b"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="TEtyCEKj"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-yb1-f177.google.com (mail-yb1-f177.google.com [209.85.219.177])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E653C78F4A;
-	Tue,  4 Feb 2025 18:16:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 02B7821767A;
+	Tue,  4 Feb 2025 18:17:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.177
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1738692987; cv=none; b=GOBZze1WZI3PIzEbFbFM/DYs5wS918Ag0bphjsUIegPU2cRWGXF7QZLYA16T0OOvVdijAIqVAg9TXogc24RSrloiAJPdvX5yuJZHIZtUEiZqVda9waJSj3SpnvwQJosn0FhWIPq/4eEedUmmbNJ3ioMlSD8YjWREMJZQAAjO/Aw=
+	t=1738693067; cv=none; b=iWXPRHBJsJL+te37oq8coOpUfK3FfDeHDc8C0g0Ypfym9WxhzL5lan3wGp2rGunqJSJLd/WIJLKZ357ZtK/JrLmSjGd6IZskOI+Ye370ibGAy2TzLwdvk0lf7dadyPbuf6GLbL+rO7AsTytuSFEYph+QEMsiD9RyTZ1OYXYULRU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1738692987; c=relaxed/simple;
-	bh=dmGkjt2zNEiAgl6N9re2M4LE4xSbtASeqzfY0ChaYqQ=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=FUQK+nUX6aEnjMMY4J51O8TOFIYacoo+TEOPWIyD0q9bIZ2g25L9Gpv//iP2MKZwhVaERF5hpfx9ktfbq/MYrmrfhVzIddEB+MhBRkB0pbSUJAzsDxnKce1buonurc8f1bVQRWgZdHa7k84C4jZiZuyOwlQlY4YINQRVf2QxP98=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=b2rbyC2b; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 64F21C4CEDF;
-	Tue,  4 Feb 2025 18:16:19 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1738692986;
-	bh=dmGkjt2zNEiAgl6N9re2M4LE4xSbtASeqzfY0ChaYqQ=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=b2rbyC2bZq476y9HKzgTYiM2Xc1LS8wT5IY0iDXZoAcPwDZPvoNEugkvA6mcOCNB8
-	 RJ4fLX4BkO4ZhXkOnsLWZHSLB0yjPddBnC9mywKlMKda6THJ8ZdKfZi/oM++vwZVnL
-	 VaWoSxz4foT3b68sy1qtAGjpHbIQ5SvKXVCF7DaTj/lse75FmzkkpeTvevyfIQUxE0
-	 LNQ3hxtMUS+OBadhM+AAsSQlmOSexS0z5ykGzKQ+ryp1F2bdWVJVlS2+gZcfTr7Z+1
-	 24MRpJZw0YgOCJh25zJ9zH0Ya2wtFhzIqaLkuDAX6wXjCcCN6jVaC7IUod/8hn8ZyK
-	 5JoNKYf4VU/cQ==
-Date: Tue, 4 Feb 2025 18:16:17 +0000
-From: Conor Dooley <conor@kernel.org>
-To: Basharath Hussain Khaja <basharath@couthit.com>
-Cc: danishanwar <danishanwar@ti.com>, rogerq <rogerq@kernel.org>,
-	andrew+netdev <andrew+netdev@lunn.ch>, davem <davem@davemloft.net>,
-	edumazet <edumazet@google.com>, kuba <kuba@kernel.org>,
-	pabeni <pabeni@redhat.com>, Rob Herring <robh@kernel.org>,
-	krzk+dt <krzk+dt@kernel.org>, conor+dt <conor+dt@kernel.org>,
-	nm <nm@ti.com>, ssantosh <ssantosh@kernel.org>,
-	tony <tony@atomide.com>, richardcochran <richardcochran@gmail.com>,
-	parvathi <parvathi@couthit.com>, schnelle <schnelle@linux.ibm.com>,
-	rdunlap <rdunlap@infradead.org>, diogo ivo <diogo.ivo@siemens.com>,
-	m-karicheri2 <m-karicheri2@ti.com>, horms <horms@kernel.org>,
-	jacob e keller <jacob.e.keller@intel.com>,
-	m-malladi <m-malladi@ti.com>,
-	javier carrasco cruz <javier.carrasco.cruz@gmail.com>,
-	afd <afd@ti.com>, s-anna <s-anna@ti.com>,
-	linux-arm-kernel <linux-arm-kernel@lists.infradead.org>,
-	netdev <netdev@vger.kernel.org>,
-	devicetree <devicetree@vger.kernel.org>,
-	linux-kernel <linux-kernel@vger.kernel.org>,
-	linux-omap <linux-omap@vger.kernel.org>,
-	pratheesh <pratheesh@ti.com>, prajith <prajith@ti.com>,
-	vigneshr <vigneshr@ti.com>, praneeth <praneeth@ti.com>,
-	srk <srk@ti.com>, rogerq <rogerq@ti.com>,
-	krishna <krishna@couthit.com>, pmohan <pmohan@couthit.com>,
-	mohan <mohan@couthit.com>
-Subject: Re: [RFC v2 PATCH 01/10] dt-bindings: net: ti: Adds DUAL-EMAC mode
- support on PRU-ICSS2 for AM57xx SOCs
-Message-ID: <20250204-mutilated-throwing-59cabf18f187@spud>
-References: <20250124122353.1457174-1-basharath@couthit.com>
- <20250124122353.1457174-2-basharath@couthit.com>
- <20250124-reoccupy-music-3803c753f8af@spud>
- <504387436.449923.1738127812232.JavaMail.zimbra@couthit.local>
- <20250129-vowed-dingbat-cfb5c5b8ede4@spud>
- <2028988664.494856.1738585795471.JavaMail.zimbra@couthit.local>
+	s=arc-20240116; t=1738693067; c=relaxed/simple;
+	bh=KPVeBz0SWa6qjwv7eHWyY+fjdV93kp8SSrgjv9BPOuc=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=DhBaFCBwN1Xb1jqsv/+V8eN71HF7leJpRqEPtPUojGgMECidl7ELEcuwDYd4J+rH/Lo5SMa9Ky4HFagqTDpfciM28PI0PtHjRCwsZbFVsoyKk5W8RcOOJ/S63OdYUawm1KbkrUOBUHY22DSsEkO1qCQO94aAWfoba/X04Q2MFdY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=TEtyCEKj; arc=none smtp.client-ip=209.85.219.177
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-yb1-f177.google.com with SMTP id 3f1490d57ef6-e4930eca0d4so5053370276.3;
+        Tue, 04 Feb 2025 10:17:45 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1738693065; x=1739297865; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=hh1ZvtbHsl2Y+EOTOMjwX7uyQ0eyt9YhGECmUVxcQvU=;
+        b=TEtyCEKjwZzAzzBgRbzn8+rPc3DglbGYzepclKeyyTRIvN/txEVjW4EAfVrc+L6Td2
+         DxLEl9OV8ZmCkQ67hCCA1TIh2k9B9OvwOv8loZSG1bX+N/JgnqFAN3QbBLU34pcz10W+
+         nCDXr0+wkceTQLfQfaE+0Iim1PDsiZS82ZmA+pTUw/JQ8x/lT6P/jVdZKcDqZy80KT8R
+         SbuvbOUSLZlCrraCHmXZBEv2yFHI5ZI/8ZC332WscVM5Zzm/r+ff6TjQJ2y0rJr3VPSZ
+         vlBm+GhjnSam0Tin71cgrWnyJiBpEMYWs0TJDQs/uLVevbkgr9hgjbe8lo4AmI/v5w0x
+         VMeg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1738693065; x=1739297865;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=hh1ZvtbHsl2Y+EOTOMjwX7uyQ0eyt9YhGECmUVxcQvU=;
+        b=jUqxXmPwwubm+gTKlyzNFIQ+p+bu8T44uB5iCGeHtDvPXWDd7ANx05lZyRNm4bkFME
+         23KNVjftpajYeKPxeLTTiZR/Vi9ye7puCAnw8asJrg/DK3PtCkVm/hB3vgmPwJK3+nvj
+         dCC2dM76jgEod8O8P092UkU2HCdUG4EtmMOLdJ5xsTmi1Du+AHWfcezXbthxwAZwiwsn
+         Asc5S3jjU00yDoPMdHsYCMgoaJZgrjKaTxsRCjxmdKXm1PDzTBrlltgmiKnFwLN+d3mq
+         qP5wrrfuJzNSpKKF1oX141CCjUJYR6CfTVlazFdJQ18X3r3EZfBpFcRJa65uqVwHRBYN
+         afpw==
+X-Forwarded-Encrypted: i=1; AJvYcCVzw3c32UgMrow0pNtb8shQWZmFxaSiqphV053YJfsiloTi887FH/uoBr1cr7FRDoPTyAc=@vger.kernel.org
+X-Gm-Message-State: AOJu0Ywz2ClcW0DqgrAwuJrTVaUTGb42mkzhzY7o6J+iBa/5GbCheeKA
+	PaiZ1M2DbUSL/pjgGpT0ZHVIz7LapvwKSmow35eNQAF7oYoNj6RZLLXQhuBCbyMYpbCJbyoNyNB
+	xAyOVj4hYOZInDUAnwSC5+qopvr4=
+X-Gm-Gg: ASbGncvAY34VsV84tnDk5eyQQ+Z1socTD4ZOFuuJZso56huesREcuSctQvCGNSZvwuf
+	ikjCjXPMKsFRuNR56ZsQIpwSIWSePDhaoCkqJmRENLq7IvNF2ZzEpJsG0I/Qz/4yv57fmLyz9Cw
+	fdAl0U4PJinXGm
+X-Google-Smtp-Source: AGHT+IHscn+73qeGvOlZ36mYTUosmtaEFvS1sTch5qV8+DqR84ESMWl65Ji/acjcqIXOHuYWZljmKnYiAd6ioUNFw1w=
+X-Received: by 2002:a05:6902:2d03:b0:e48:5b35:af2e with SMTP id
+ 3f1490d57ef6-e58a4bbe7damr22139992276.33.1738693064763; Tue, 04 Feb 2025
+ 10:17:44 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature"; boundary="K8COnd4nDaIlA8yU"
-Content-Disposition: inline
-In-Reply-To: <2028988664.494856.1738585795471.JavaMail.zimbra@couthit.local>
-
-
---K8COnd4nDaIlA8yU
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
+References: <20250131192912.133796-1-ameryhung@gmail.com> <20250131192912.133796-19-ameryhung@gmail.com>
+ <857a9d504cccaf046d869c34a85e970513a403af.camel@gmail.com>
+In-Reply-To: <857a9d504cccaf046d869c34a85e970513a403af.camel@gmail.com>
+From: Amery Hung <ameryhung@gmail.com>
+Date: Tue, 4 Feb 2025 10:17:31 -0800
+X-Gm-Features: AWEUYZlXKrUQUPPBN9OKUleD1ykIWzsqs_swK3rGk9YOAkM7-vRlX1LqsNwBelU
+Message-ID: <CAMB2axPYaEMkv8W9MWNTYsr=+1w9xUUs6FUcW6zJDMyg=giJ7g@mail.gmail.com>
+Subject: Re: [PATCH bpf-next v3 18/18] selftests/bpf: Test attaching bpf qdisc
+ to mq and non root
+To: Eduard Zingerman <eddyz87@gmail.com>
+Cc: netdev@vger.kernel.org, bpf@vger.kernel.org, daniel@iogearbox.net, 
+	andrii@kernel.org, alexei.starovoitov@gmail.com, martin.lau@kernel.org, 
+	kuba@kernel.org, edumazet@google.com, xiyou.wangcong@gmail.com, 
+	cong.wang@bytedance.com, jhs@mojatatu.com, sinquersw@gmail.com, 
+	toke@redhat.com, jiri@resnulli.us, stfomichev@gmail.com, 
+	ekarani.silvestre@ccc.ufcg.edu.br, yangpeihao@sjtu.edu.cn, 
+	yepeilin.cs@gmail.com, ming.lei@redhat.com, kernel-team@meta.com
+Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-On Mon, Feb 03, 2025 at 05:59:55PM +0530, Basharath Hussain Khaja wrote:
-> >> >> +    $ref: /schemas/types.yaml#/definitions/phandle
-> >> >> +    description:
-> >> >> +      phandle to Enhanced Capture (eCAP) event for ICSS
-> >> >=20
-> >> > Why do you need phandles for these things, can they not be looked up=
- by
-> >> > compatible? (e.g. multiple devices on one SoC).
-> >> >=20
-> >>=20
-> >> ecap is another peripheral similar to IEP in ICSSM/ICSSG. We have crea=
-ted a
-> >> separate driver for possible reuse with ICSSG in future.
-> >=20
-> > That's not an answer to my question.
-> >=20
->=20
-> We can use compatible if we have only one instance of a peripheral in the=
- SOC.=20
-> On the AM57x SOC we have two identical ICSS instances(ICSS1 and ICSS2). S=
-o we=20
-> use phandles to differentiate between the two instances. Currently this p=
-atch=20
-> series adds support for ICSS2 instance on the AM57x SOC. Support for ICSS=
-1 instance=20
-> will be added in subsequent patches.
+On Mon, Feb 3, 2025 at 9:58=E2=80=AFPM Eduard Zingerman <eddyz87@gmail.com>=
+ wrote:
+>
+> On Fri, 2025-01-31 at 11:28 -0800, Amery Hung wrote:
+>
+> [...]
+>
+> > diff --git a/tools/testing/selftests/bpf/prog_tests/bpf_qdisc.c b/tools=
+/testing/selftests/bpf/prog_tests/bpf_qdisc.c
+> > index 7e8e3170e6b6..f3158170edff 100644
+> > --- a/tools/testing/selftests/bpf/prog_tests/bpf_qdisc.c
+> > +++ b/tools/testing/selftests/bpf/prog_tests/bpf_qdisc.c
+> > @@ -86,18 +86,125 @@ static void test_fq(void)
+> >       bpf_qdisc_fq__destroy(fq_skel);
+> >  }
+> >
+> > +static int netdevsim_write_cmd(const char *path, const char *cmd)
+> > +{
+> > +     FILE *fp;
+> > +
+> > +     fp =3D fopen(path, "w");
+> > +     if (!ASSERT_OK_PTR(fp, "write_netdevsim_cmd"))
+> > +             return -errno;
+> > +
+> > +     fprintf(fp, cmd);
+>
+> I get the following error message when compiling these tests using
+> clang 19.1.7:
+>
+> <kernel>/tools/testing/selftests/bpf/prog_tests/bpf_qdisc.c:97:14: error:=
+ format string is not a string literal (potentially insecure) [-Werror,-Wfo=
+rmat-security]
+>    97 |         fprintf(fp, cmd);
+>       |                     ^~~
+> <kernel>/tools/testing/selftests/bpf/prog_tests/bpf_qdisc.c:97:14: note: =
+treat the string as an argument to avoid this
+>    97 |         fprintf(fp, cmd);
+>       |                     ^
+>       |
+>
 
-Cool, that's an acceptance answer, thanks.
+I am removing the use of netdevsim and along with this function in the
+next version. The warning should also disappear. Thanks for the
+review!
 
---K8COnd4nDaIlA8yU
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iHUEABYIAB0WIQRh246EGq/8RLhDjO14tDGHoIJi0gUCZ6JZcQAKCRB4tDGHoIJi
-0gnAAQC1oGfhZbnFSM/mPgMlsOYSL9Jy1uxEojT2QLRGkF15CQEA9H2GXROw3Fk2
-eXUwUknLlmzd/8uguMbvTucbVOMokgs=
-=3zMy
------END PGP SIGNATURE-----
-
---K8COnd4nDaIlA8yU--
+> > +     fclose(fp);
+> > +     return 0;
+> > +}
+> > +
+>
+> [...]
+>
 
