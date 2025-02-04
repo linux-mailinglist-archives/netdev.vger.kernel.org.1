@@ -1,65 +1,66 @@
-Return-Path: <netdev+bounces-162496-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-162497-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0A09CA27115
-	for <lists+netdev@lfdr.de>; Tue,  4 Feb 2025 13:08:03 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 99C35A2711C
+	for <lists+netdev@lfdr.de>; Tue,  4 Feb 2025 13:08:29 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id BB4CB7A4188
-	for <lists+netdev@lfdr.de>; Tue,  4 Feb 2025 12:07:07 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A402C165E4D
+	for <lists+netdev@lfdr.de>; Tue,  4 Feb 2025 12:08:14 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 99A6A20D4F3;
-	Tue,  4 Feb 2025 12:05:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 04D30210F58;
+	Tue,  4 Feb 2025 12:05:52 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="fkKc9eVU"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="Zn2/5zhN"
 X-Original-To: netdev@vger.kernel.org
 Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8A39720CCFB;
-	Tue,  4 Feb 2025 12:05:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7869D210F5A;
+	Tue,  4 Feb 2025 12:05:49 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1738670747; cv=none; b=djSv0q8s/Z0k3zFvb01B6i9bV6y6J8dxCxgM1vW50V7E4UVe8F2Yl5M8oXpWQiemkNgxxfx2WQ4H4HWlNYMBnyG89v+jr+OaXHuIZFLipBrUsnE+aYod0SL6kFZ2PXXji/aNWJj8sQzg6+8Tf38ICxzp52UY1ZCGd6mhQdtjiMQ=
+	t=1738670751; cv=none; b=o/lOc0pzhEV/iYZqIIqQy0QrNEGnk3lCi5ulv+30dVSJjBuNHEe8r7EjDDAD67uK6dhsPfKlZBbkqfT6nmjFRgLnWoZ9261Of1jNhtsIAJAUdNlgzxdxzifKyo0OqoGPfqpdnp4LhvwztpLrOEsxoKcaZFdvSnAthbTP8h2opd8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1738670747; c=relaxed/simple;
-	bh=xi4sBUQvDSLZfwfFDQG/hOsrvWDhJfv7KlrwKAUi3XA=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=LXVzrKti/Uht+5+8V9DEKrjLoytHWFqBNNwQO80jWVsTrFhW1j7pZLqdbmCQVOBK/Lo7SkksvG0W8ySV3pCAZFTg+JKSVREICZBvdBUm5BGL5MLqqTsIqWznnYokslrzDZoe/0gek7I5g73z3NSE+/03xnVIjQArFQbo5SkrnTs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=fkKc9eVU; arc=none smtp.client-ip=192.198.163.18
+	s=arc-20240116; t=1738670751; c=relaxed/simple;
+	bh=M2eCGgxLh5c6cE335IWn+xf91G0/3FE3wsl1N+36ZVc=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=nqtYTHDDFzSCnd2AdtKXpEpYbyhPo+JNfJANphXberxVV4aXvFqMywkD6yxIsEBpMttKWqHw+RjyZDEdvKI8NXWj7G+baLyKYRsQSdC9k/ceuYnjOPDbGS5StsXLrBMfrfqVwE15azF2gqaQ0Fn5uoWb+VMAeNzeWjKOkXBpgME=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=Zn2/5zhN; arc=none smtp.client-ip=192.198.163.18
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1738670745; x=1770206745;
-  h=from:to:cc:subject:date:message-id:mime-version:
-   content-transfer-encoding;
-  bh=xi4sBUQvDSLZfwfFDQG/hOsrvWDhJfv7KlrwKAUi3XA=;
-  b=fkKc9eVUEoAwBbobLXUMESW4Vk1NUijT855Lbl4knWoKDW7K6BkOc+/Z
-   i0f3iRZTEowko7ibXTxbP+4HkWjzMatOFMcHcmwksth8ou+K5hSnmKi0A
-   D/IJxuSrYD1g8hACi2/g2TbRbi48J/usWVZ3Y5dDj7QpesVzm9sJKVFZG
-   cvFKCFO63Gbh1+kSPR5NL7a5OYauYD7oLmbPzRqj0JjVqe1FmXwy3hMZc
-   7IWkXN2myI0uNQKTIfgA0V5C2J1ZEIz1T+jtSxF6Q/Mwe/4V/ke5yFoxW
-   XIvTbyduQc0/bJ0CmatvkWrXYYql+VJ6LLMmb4fG+cM7fIQOnqRNM/GEQ
-   g==;
-X-CSE-ConnectionGUID: htBkYZmSRpiyMbCuO+mLnA==
-X-CSE-MsgGUID: 1Ymso1AURpu07AR/8dUBIA==
-X-IronPort-AV: E=McAfee;i="6700,10204,11335"; a="38424788"
+  t=1738670749; x=1770206749;
+  h=from:to:cc:subject:date:message-id:in-reply-to:
+   references:mime-version:content-transfer-encoding;
+  bh=M2eCGgxLh5c6cE335IWn+xf91G0/3FE3wsl1N+36ZVc=;
+  b=Zn2/5zhNRulESdCSWLPxa16skCArJOGlUXA+r00aBRx1QpZ1wZaLiLHB
+   mSeOgwFyp+BqGNZGEajI6IbQ1Q76LoWxLsG7+6EGCl0OM0NObY4qDXPTl
+   L0vhcMMyW9dl1lfPwXh+Dd8dWckva4krA9s7e4GXUH7nVIcMH2N41NVYB
+   smaGdSM7BOuDtRFKUFfu3zRAzZOU2/wkzPEqhGcTP+yydexV9W4xOTf62
+   NKwEmjTmyrcN08Eqm8LTzy/FXl+IkwjknRbRZbzi2jJBSfPO8lDBLFggo
+   e7GhORXFGx8pCOasQ57XEmCPDK4/p0tQ5qbmRM+W3g6IM+LOTIdcOIXLw
+   Q==;
+X-CSE-ConnectionGUID: 4OG9wb0YTmekxAMJ+nDkVQ==
+X-CSE-MsgGUID: dNF4pN4iTlSaB0gHqY8OVg==
+X-IronPort-AV: E=McAfee;i="6700,10204,11335"; a="38424800"
 X-IronPort-AV: E=Sophos;i="6.13,258,1732608000"; 
-   d="scan'208";a="38424788"
+   d="scan'208";a="38424800"
 Received: from orviesa001.jf.intel.com ([10.64.159.141])
-  by fmvoesa112.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 04 Feb 2025 04:05:44 -0800
-X-CSE-ConnectionGUID: 9Xc4lbrtTCKZ/HZJSQpMnQ==
-X-CSE-MsgGUID: v+LQwvfBRMO6e7lCadO8Ww==
+  by fmvoesa112.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 04 Feb 2025 04:05:49 -0800
+X-CSE-ConnectionGUID: y/ziNlRhRFW6OLQaIDoGBw==
+X-CSE-MsgGUID: +NvJNivaQvuK8yuad4IN2w==
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="6.12,224,1728975600"; 
-   d="scan'208";a="147783203"
+   d="scan'208";a="147783219"
 Received: from irvmail002.ir.intel.com ([10.43.11.120])
-  by orviesa001.jf.intel.com with ESMTP; 04 Feb 2025 04:05:41 -0800
+  by orviesa001.jf.intel.com with ESMTP; 04 Feb 2025 04:05:45 -0800
 Received: from lincoln.igk.intel.com (lincoln.igk.intel.com [10.102.21.235])
-	by irvmail002.ir.intel.com (Postfix) with ESMTP id 22A3932CA9;
-	Tue,  4 Feb 2025 12:05:40 +0000 (GMT)
+	by irvmail002.ir.intel.com (Postfix) with ESMTP id 8D37A32CA9;
+	Tue,  4 Feb 2025 12:05:44 +0000 (GMT)
 From: Larysa Zaremba <larysa.zaremba@intel.com>
 To: Tony Nguyen <anthony.l.nguyen@intel.com>,
 	intel-wired-lan@lists.osuosl.org
@@ -74,10 +75,12 @@ Cc: Larysa Zaremba <larysa.zaremba@intel.com>,
 	linux-kernel@vger.kernel.org,
 	Michal Swiatkowski <michal.swiatkowski@linux.intel.com>,
 	Mateusz Pacuszka <mateuszx.pacuszka@intel.com>
-Subject: [PATCH iwl-next v2 0/6] ice: LLDP support for VFs
-Date: Tue,  4 Feb 2025 12:50:50 +0100
-Message-ID: <20250204115111.1652453-1-larysa.zaremba@intel.com>
+Subject: [PATCH iwl-next v2 1/6] ice: fix check for existing switch rule
+Date: Tue,  4 Feb 2025 12:50:51 +0100
+Message-ID: <20250204115111.1652453-2-larysa.zaremba@intel.com>
 X-Mailer: git-send-email 2.43.0
+In-Reply-To: <20250204115111.1652453-1-larysa.zaremba@intel.com>
+References: <20250204115111.1652453-1-larysa.zaremba@intel.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -86,79 +89,48 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Allow to:
-* receive LLDP packets on a VF in legacy mode
-* receive LLDP packets on a VF in switchdev mode
-* transmit LLDP from a VF in switchdev mode
+From: Mateusz Pacuszka <mateuszx.pacuszka@intel.com>
 
-Many VSIs can receive LLDP packets, but only one VSI
-per port can transmit LLDP, therefore LLDP TX from VF
-requires adding an egress drop rule to the PF, this is
-implemented in these series too.
+In case the rule already exists and another VSI wants to subscribe to it
+new VSI list is being created and both VSIs are moved to it.
+Currently, the check for already existing VSI with the same rule is done
+based on fdw_id.hw_vsi_id, which applies only to LOOKUP_RX flag.
+Change it to vsi_handle. This is software VSI ID, but it can be applied
+here, because vsi_map itself is also based on it.
 
-There are no patches that explicitly address LLDP RX in
-switchdev mode, because it just works after adding support
-in legacy mode.
+Additionally change return status in case the VSI already exists in the
+VSI map to "Already exists". Such case should be handled by the caller.
 
-Usage
+Signed-off-by: Mateusz Pacuszka <mateuszx.pacuszka@intel.com>
+Reviewed-by: Przemek Kitszel <przemyslaw.kitszel@intel.com>
+Reviewed-by: Michal Swiatkowski <michal.swiatkowski@linux.intel.com>
+Signed-off-by: Larysa Zaremba <larysa.zaremba@intel.com>
+---
+ drivers/net/ethernet/intel/ice/ice_switch.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
-To receive LLDP packets on VF in legacy mode:
-On host:
-ip link set dev <pf_ifname> vf <n> trust on
-On VM:
-service lldpd restart
-
-To receive LLDP packets on VF in switchdev mode (host config):
-tc qdisc add dev <pf_ifname> clsact
-tc filter add dev <pf_ifname> protocol lldp ingress \\
-   flower skip_sw action mirred egress mirror dev <repr_ifname>
-
-To transmit LLDP packets from VF (host config):
-tc qdisc add dev <pf_ifname> clsact
-tc qdisc add dev <repr_ifname> clsact
-tc filter add dev <pf_ifname> egress protocol lldp \\
-   flower skip_sw action drop
-tc filter add dev <repr_ifname> ingress protocol lldp \\
-   flower skip_sw action mirred egress redirect dev <pf_ifname>
-
-For all abovementioned functionalities to work, private flag
-fw-lldp-agent must be off.
-
-v1->v2:
-* get rid of sysfs control
-* require switchdev for VF LLDP Tx
-* in legacy mode, for VF LLDP Rx rely on configured MAC addresses
-
-Larysa Zaremba (4):
-  ice: do not add LLDP-specific filter if not necessary
-  ice: remove headers argument from ice_tc_count_lkups
-  ice: support egress drop rules on PF
-  ice: enable LLDP TX for VFs through tc
-
-Mateusz Pacuszka (2):
-  ice: fix check for existing switch rule
-  ice: receive LLDP on trusted VFs
-
- drivers/net/ethernet/intel/ice/ice.h          |   1 +
- drivers/net/ethernet/intel/ice/ice_common.c   |  10 +-
- drivers/net/ethernet/intel/ice/ice_common.h   |   3 +-
- drivers/net/ethernet/intel/ice/ice_dcb_lib.c  |   2 +-
- drivers/net/ethernet/intel/ice/ice_eswitch.c  |   6 +
- drivers/net/ethernet/intel/ice/ice_ethtool.c  |   2 +-
- drivers/net/ethernet/intel/ice/ice_lib.c      |  71 ++++-
- drivers/net/ethernet/intel/ice/ice_lib.h      |   3 +-
- drivers/net/ethernet/intel/ice/ice_main.c     |  56 +++-
- drivers/net/ethernet/intel/ice/ice_repr.c     |  10 +-
- drivers/net/ethernet/intel/ice/ice_sriov.c    |   4 +
- drivers/net/ethernet/intel/ice/ice_switch.c   |   4 +-
- drivers/net/ethernet/intel/ice/ice_tc_lib.c   | 243 ++++++++++++++++--
- drivers/net/ethernet/intel/ice/ice_tc_lib.h   |   4 +-
- drivers/net/ethernet/intel/ice/ice_txrx.c     |  17 +-
- drivers/net/ethernet/intel/ice/ice_vf_lib.c   |  26 ++
- drivers/net/ethernet/intel/ice/ice_vf_lib.h   |  12 +
- drivers/net/ethernet/intel/ice/ice_virtchnl.c |  48 +++-
- 18 files changed, 449 insertions(+), 73 deletions(-)
-
+diff --git a/drivers/net/ethernet/intel/ice/ice_switch.c b/drivers/net/ethernet/intel/ice/ice_switch.c
+index 4a91e0aaf0a5..9d9a7edd3618 100644
+--- a/drivers/net/ethernet/intel/ice/ice_switch.c
++++ b/drivers/net/ethernet/intel/ice/ice_switch.c
+@@ -3146,7 +3146,7 @@ ice_add_update_vsi_list(struct ice_hw *hw,
+ 		u16 vsi_handle_arr[2];
+ 
+ 		/* A rule already exists with the new VSI being added */
+-		if (cur_fltr->fwd_id.hw_vsi_id == new_fltr->fwd_id.hw_vsi_id)
++		if (cur_fltr->vsi_handle == new_fltr->vsi_handle)
+ 			return -EEXIST;
+ 
+ 		vsi_handle_arr[0] = cur_fltr->vsi_handle;
+@@ -5978,7 +5978,7 @@ ice_adv_add_update_vsi_list(struct ice_hw *hw,
+ 
+ 		/* A rule already exists with the new VSI being added */
+ 		if (test_bit(vsi_handle, m_entry->vsi_list_info->vsi_map))
+-			return 0;
++			return -EEXIST;
+ 
+ 		/* Update the previously created VSI list set with
+ 		 * the new VSI ID passed in
 -- 
 2.43.0
 
