@@ -1,434 +1,161 @@
-Return-Path: <netdev+bounces-162654-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-162655-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5C00AA277C6
-	for <lists+netdev@lfdr.de>; Tue,  4 Feb 2025 18:04:12 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id B2094A277E1
+	for <lists+netdev@lfdr.de>; Tue,  4 Feb 2025 18:07:51 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 2B1CF3A849D
-	for <lists+netdev@lfdr.de>; Tue,  4 Feb 2025 17:03:47 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 5EF1B1882C13
+	for <lists+netdev@lfdr.de>; Tue,  4 Feb 2025 17:07:56 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B75DD21639F;
-	Tue,  4 Feb 2025 17:03:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 86D0321578C;
+	Tue,  4 Feb 2025 17:06:28 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="hXlfXtjY"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="KuI8osmD"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qt1-f180.google.com (mail-qt1-f180.google.com [209.85.160.180])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9295621639B
-	for <netdev@vger.kernel.org>; Tue,  4 Feb 2025 17:03:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CA56C215F4A;
+	Tue,  4 Feb 2025 17:06:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.180
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1738688613; cv=none; b=eHEz/I/LjH8gyK/3WAM9fpf6xY6+Dw/pkuQAAZ0+wSdN1VF4Oen5CfcoezsVGBrKRYXWR94fJX2UV4M3KOUxm6NKXOc6bPfok1OAyPQc8gl02nTOyizKz00KnXAS0qrRcNW8u37/gt//ttfo7g2/o0PsSPunsAgsDTm+4hlvUEo=
+	t=1738688788; cv=none; b=BozMWOuW1u2YJtnvFVTH7nmT+ELBI06qYeEGTKz/0nu2lwsMFh9uebI7Ro3llPfE47bBEgstbOa7T7hF8AxanF8N6wUbRFUgE3OUZTrdEIJQMbV0ALrXNYqV7S9IOBuurllsGLi8UeGAYfXA2LL7zy8aABb+RCs3cBl/qiwzKic=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1738688613; c=relaxed/simple;
-	bh=Djsqh69Z7pgmV4ptpurN29HxZrX1GMDuwPe3a5AhwhY=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=Rx96K9AMlmCKmXng0fFboTSlwfy8ZVd6vlAAmQEPCCSn5W5UVesel3lltv9J90IKKdzDZF1AXfIFxUk8Wa1MSuuLTHm3Oe2Y3WtomQf5DxiL3zBnuWURbvccvoc49E4QtC51LARg00CU8o6yHNGDIemyCNjs+wOa0iqGtdk5kvU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=hXlfXtjY; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 97EF1C4CEDF;
-	Tue,  4 Feb 2025 17:03:32 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1738688613;
-	bh=Djsqh69Z7pgmV4ptpurN29HxZrX1GMDuwPe3a5AhwhY=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=hXlfXtjYTR3py0XSYL7rQKO/Eb+cgWADURw1f2QbB3vDDFO68tWuFZEFToPmwIkVy
-	 Ev38XNFePMIm6FFHLksjMQKTaqELN/Wt0znf4jVfGpe1nnVa2CYQWq8lHwk+NxLP1p
-	 Pr9iitJwte8+brwZSlZvlj/yKU3rfX3hwupNNPXCzYDlsWvZ6mFsCgTn0zqVG9gPt2
-	 IpTj/qZ5kCSyZSXJetoYE/AT3zPXIlQf4E+JYXb8XM8nVdni6Pqehg6waQKKUsuA4u
-	 D6aY8eAHWWoCXQJje9QjXQdUN9u2fboDWYSdnHDUDL/MqZk4VCUDHp2ANtUHOoO75d
-	 wMESOmZwPLKtg==
-From: Antoine Tenart <atenart@kernel.org>
-To: davem@davemloft.net,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	edumazet@google.com
-Cc: Antoine Tenart <atenart@kernel.org>,
-	stephen@networkplumber.org,
-	gregkh@linuxfoundation.org,
-	maxime.chevallier@bootlin.com,
-	christophe.leroy@csgroup.eu,
-	netdev@vger.kernel.org
-Subject: [PATCH net-next v2 4/4] net-sysfs: remove rtnl_trylock from queue attributes
-Date: Tue,  4 Feb 2025 18:03:13 +0100
-Message-ID: <20250204170314.146022-5-atenart@kernel.org>
-X-Mailer: git-send-email 2.48.1
-In-Reply-To: <20250204170314.146022-1-atenart@kernel.org>
-References: <20250204170314.146022-1-atenart@kernel.org>
+	s=arc-20240116; t=1738688788; c=relaxed/simple;
+	bh=WDK8lnctxaTiLWbUYtoRCHoX+u18i83cVZibWk6TBGk=;
+	h=Date:From:To:Cc:Message-ID:In-Reply-To:References:Subject:
+	 Mime-Version:Content-Type; b=Bf0m3LfpoJzvopSkq5wIawM64kH8wfisFMPBKWvxKrIspabaCYUm3bc82Sn3N3YfrV4ti0EqGbpYl+o19CZARHqg3zJ78C0Qa0BiNnS73FaXoJo0dAw3G3Dcay/7OTrcJCGeXiUCVwJxb20ihgeUID8byT7vzmN3wxae2abX8eQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=KuI8osmD; arc=none smtp.client-ip=209.85.160.180
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-qt1-f180.google.com with SMTP id d75a77b69052e-467918c35easo86653611cf.2;
+        Tue, 04 Feb 2025 09:06:26 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1738688785; x=1739293585; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:subject:references
+         :in-reply-to:message-id:cc:to:from:date:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=vcHlrhVoZdvwnoHCyGjHi+G6dJq+nu0Bln5b/gbIIRU=;
+        b=KuI8osmDRtX0+l6POm9jwunOPRdldr1YQyaBVv52AWH5JxZ8DWyxPp8m/lxomaecae
+         g/WPAt1EPc1BTKwrxDg/TST5KbF1Ru1dktaQ4tn6geS6tUxsDbDNrdEQIVsQdyZM/Oms
+         sV+Y/YWkEwdo6YF0dyd7esCJrd5gZKeGRD2tTK3Y6w7Ka2cx4f55h11rSC0Uag+HcUMh
+         etQdnZ3ylf/kD4/i3AsYy4zFhEnkIzizpOaLFrk1paIP8x9jQv6lgDbVdT+nfEe1ld4W
+         8IfervENMqLbcddGacwZeH73E8cOLSs4S7nLIQKes+YNeG7sufDnlcatbiiBawA8kh2q
+         Lpzg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1738688785; x=1739293585;
+        h=content-transfer-encoding:mime-version:subject:references
+         :in-reply-to:message-id:cc:to:from:date:x-gm-message-state:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=vcHlrhVoZdvwnoHCyGjHi+G6dJq+nu0Bln5b/gbIIRU=;
+        b=dE1EHokCceAE55WDu/EJgOZd/B5YtuxWBFVhIat6Xdho/enQg07qKophd6iLXBz9xQ
+         q4JeEylSadzM4sPUAfPk6O/S6eYjNZQEVRBHTPf5mk3ncrp893Ub/J96SDa9bBKgnyWV
+         bxOlu+oitVBcrMrm5ezHC7pqA1fT5fDkD8F6cgYSlZkM6jfoLwwNwJcYU56tIIEeR393
+         GseHK0JD8R3CM+MVTvrKyca65/wRnmDgvtXURiQ6qBToivMGfKnhz6QotU/fid2V3+C3
+         3P4MJTlTz0Uc2qAnHP7etYPMgPrQVf0uTitRl69Gjj+3PHwKPoKAS3utZdGhph4YDWz1
+         8A9g==
+X-Forwarded-Encrypted: i=1; AJvYcCUIxuUyBT3+OcvHduykx3iFh7S8fUyJ1q1RQ0bLRWkBg3Fh080OaeSWo59bJJUBgRhXSjAq02wC@vger.kernel.org, AJvYcCV30a03Zuh1mGy1G4cwfZBbRbMLkequ3AoLpMtNHQ9yCjzzSdE4sDXEYhakqEp66jsOUWg=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzAhceaUaVuYIR28m0Ahzz1wLouOQ88iKV+StpbgUOSibgb7GSC
+	xxV3qGT7SriM/ofApQK10E5yBKoZVEXx90nPDgtGgUDYYC+FTmip
+X-Gm-Gg: ASbGncssXJXI56bOdUC1Aad0ucd9fiBuHZw/LcbUAg5zqviixG3mVaDeZsjoM0IWrGZ
+	yuEayp1Vuy4kp3P6pDllaiz+RTzk0vAi/zlp+mdMtx6Qz6gnzBa4u1JndAMAxV3byz/UCbtPWEG
+	y3euy2NjAdLHe5VE4QGL93PMeOY/aKPALJP3+av22x8bPpmTNAkSx6ZBJNhWGEFP42rgp/s4k4i
+	OAGutWVOg9jqUfL6z+vDXDi5kp19bs9cZfjwwF6MxW1Soe/kioRzqUtO7jSNYC0KFhkzJCHVI3C
+	7kivTHjxvvXP7Fbsx2OPHeQnn6JBdOCFlIBoMpNhULGEoC68sKwoMwxRBGizdTk=
+X-Google-Smtp-Source: AGHT+IEl552cRcs13jB1RubNcoQM+r9x0ANH7FdbAlVsDm9ShWr+Z58OUfXZ4LfL+IWqs9AMukJEeg==
+X-Received: by 2002:a05:622a:12:b0:46c:7197:7001 with SMTP id d75a77b69052e-46fd0b6ce4cmr406737171cf.34.1738688785535;
+        Tue, 04 Feb 2025 09:06:25 -0800 (PST)
+Received: from localhost (15.60.86.34.bc.googleusercontent.com. [34.86.60.15])
+        by smtp.gmail.com with ESMTPSA id d75a77b69052e-46fdf18a67dsm60939451cf.72.2025.02.04.09.06.24
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 04 Feb 2025 09:06:25 -0800 (PST)
+Date: Tue, 04 Feb 2025 12:06:24 -0500
+From: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
+To: Martin KaFai Lau <martin.lau@linux.dev>, 
+ Jason Xing <kerneljasonxing@gmail.com>
+Cc: davem@davemloft.net, 
+ edumazet@google.com, 
+ kuba@kernel.org, 
+ pabeni@redhat.com, 
+ dsahern@kernel.org, 
+ willemdebruijn.kernel@gmail.com, 
+ willemb@google.com, 
+ ast@kernel.org, 
+ daniel@iogearbox.net, 
+ andrii@kernel.org, 
+ eddyz87@gmail.com, 
+ song@kernel.org, 
+ yonghong.song@linux.dev, 
+ john.fastabend@gmail.com, 
+ kpsingh@kernel.org, 
+ sdf@fomichev.me, 
+ haoluo@google.com, 
+ jolsa@kernel.org, 
+ horms@kernel.org, 
+ bpf@vger.kernel.org, 
+ netdev@vger.kernel.org
+Message-ID: <67a2491090b3c_bb56629464@willemb.c.googlers.com.notmuch>
+In-Reply-To: <2706706c-3d85-4f43-ad91-d04bbb4f2b92@linux.dev>
+References: <20250128084620.57547-1-kerneljasonxing@gmail.com>
+ <2706706c-3d85-4f43-ad91-d04bbb4f2b92@linux.dev>
+Subject: Re: [PATCH bpf-next v7 00/13] net-timestamp: bpf extension to equip
+ applications transparently
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Mime-Version: 1.0
+Content-Type: text/plain;
+ charset=utf-8
+Content-Transfer-Encoding: 7bit
 
-Similar to the commit removing remove rtnl_trylock from device
-attributes we here apply the same technique to networking queues.
+Martin KaFai Lau wrote:
+> On 1/28/25 12:46 AM, Jason Xing wrote:
+> > "Timestamping is key to debugging network stack latency. With
+> > SO_TIMESTAMPING, bugs that are otherwise incorrectly assumed to be
+> > network issues can be attributed to the kernel." This is extracted
+> > from the talk "SO_TIMESTAMPING: Powering Fleetwide RPC Monitoring"
+> > addressed by Willem de Bruijn at netdevconf 0x17).
+> > 
+> > There are a few areas that need optimization with the consideration of
+> > easier use and less performance impact, which I highlighted and mainly
+> > discussed at netconf 2024 with Willem de Bruijn and John Fastabend:
+> > uAPI compatibility, extra system call overhead, and the need for
+> > application modification. I initially managed to solve these issues
+> > by writing a kernel module that hooks various key functions. However,
+> > this approach is not suitable for the next kernel release. Therefore,
+> > a BPF extension was proposed. During recent period, Martin KaFai Lau
+> > provides invaluable suggestions about BPF along the way. Many thanks
+> > here!
+> > 
+> > In this series, I only support foundamental codes and tx for TCP.
+> 
+> *fundamental*.
+> 
+> May be just "only tx time stamping for TCP is supported..."
+> 
+> > This approach mostly relies on existing SO_TIMESTAMPING feature, users
+> > only needs to pass certain flags through bpf_setsocktopt() to a separate
+> > tsflags. Please see the last selftest patch in this series.
+> > 
+> > After this series, we could step by step implement more advanced
+> > functions/flags already in SO_TIMESTAMPING feature for bpf extension.
+> 
+> Patch 1-4 and 6-11 can use an extra "bpf:" tag in the subject line. Patch 13 
+> should be "selftests/bpf:" instead of "bpf:" in the subject.
+> 
+> Please revisit the commit messages of this patch set to check for outdated 
+> comments from the earlier revisions. I may have missed some of them.
+> 
+> Overall, it looks close. I will review at your replies later.
+> 
+> Willem, could you also take a look? Thanks.
 
-Signed-off-by: Antoine Tenart <atenart@kernel.org>
----
- net/core/net-sysfs.c | 147 ++++++++++++++++++++++++++-----------------
- 1 file changed, 89 insertions(+), 58 deletions(-)
+Will do. Traveling, but took a first quick skim. 
 
-diff --git a/net/core/net-sysfs.c b/net/core/net-sysfs.c
-index 027af27517fa..3fe2c521e574 100644
---- a/net/core/net-sysfs.c
-+++ b/net/core/net-sysfs.c
-@@ -1348,9 +1348,11 @@ static int net_rx_queue_change_owner(struct net_device *dev, int num,
-  */
- struct netdev_queue_attribute {
- 	struct attribute attr;
--	ssize_t (*show)(struct netdev_queue *queue, char *buf);
--	ssize_t (*store)(struct netdev_queue *queue,
--			 const char *buf, size_t len);
-+	ssize_t (*show)(struct kobject *kobj, struct attribute *attr,
-+			struct netdev_queue *queue, char *buf);
-+	ssize_t (*store)(struct kobject *kobj, struct attribute *attr,
-+			 struct netdev_queue *queue, const char *buf,
-+			 size_t len);
- };
- #define to_netdev_queue_attr(_attr) \
- 	container_of(_attr, struct netdev_queue_attribute, attr)
-@@ -1367,7 +1369,7 @@ static ssize_t netdev_queue_attr_show(struct kobject *kobj,
- 	if (!attribute->show)
- 		return -EIO;
- 
--	return attribute->show(queue, buf);
-+	return attribute->show(kobj, attr, queue, buf);
- }
- 
- static ssize_t netdev_queue_attr_store(struct kobject *kobj,
-@@ -1381,7 +1383,7 @@ static ssize_t netdev_queue_attr_store(struct kobject *kobj,
- 	if (!attribute->store)
- 		return -EIO;
- 
--	return attribute->store(queue, buf, count);
-+	return attribute->store(kobj, attr, queue, buf, count);
- }
- 
- static const struct sysfs_ops netdev_queue_sysfs_ops = {
-@@ -1389,7 +1391,8 @@ static const struct sysfs_ops netdev_queue_sysfs_ops = {
- 	.store = netdev_queue_attr_store,
- };
- 
--static ssize_t tx_timeout_show(struct netdev_queue *queue, char *buf)
-+static ssize_t tx_timeout_show(struct kobject *kobj, struct attribute *attr,
-+			       struct netdev_queue *queue, char *buf)
- {
- 	unsigned long trans_timeout = atomic_long_read(&queue->trans_timeout);
- 
-@@ -1407,18 +1410,18 @@ static unsigned int get_netdev_queue_index(struct netdev_queue *queue)
- 	return i;
- }
- 
--static ssize_t traffic_class_show(struct netdev_queue *queue,
--				  char *buf)
-+static ssize_t traffic_class_show(struct kobject *kobj, struct attribute *attr,
-+				  struct netdev_queue *queue, char *buf)
- {
- 	struct net_device *dev = queue->dev;
--	int num_tc, tc;
--	int index;
-+	int num_tc, tc, index, ret;
- 
- 	if (!netif_is_multiqueue(dev))
- 		return -ENOENT;
- 
--	if (!rtnl_trylock())
--		return restart_syscall();
-+	ret = sysfs_rtnl_lock(kobj, attr, queue->dev);
-+	if (ret)
-+		return ret;
- 
- 	index = get_netdev_queue_index(queue);
- 
-@@ -1445,24 +1448,25 @@ static ssize_t traffic_class_show(struct netdev_queue *queue,
- }
- 
- #ifdef CONFIG_XPS
--static ssize_t tx_maxrate_show(struct netdev_queue *queue,
--			       char *buf)
-+static ssize_t tx_maxrate_show(struct kobject *kobj, struct attribute *attr,
-+			       struct netdev_queue *queue, char *buf)
- {
- 	return sysfs_emit(buf, "%lu\n", queue->tx_maxrate);
- }
- 
--static ssize_t tx_maxrate_store(struct netdev_queue *queue,
--				const char *buf, size_t len)
-+static ssize_t tx_maxrate_store(struct kobject *kobj, struct attribute *attr,
-+				struct netdev_queue *queue, const char *buf,
-+				size_t len)
- {
--	struct net_device *dev = queue->dev;
- 	int err, index = get_netdev_queue_index(queue);
-+	struct net_device *dev = queue->dev;
- 	u32 rate = 0;
- 
- 	if (!capable(CAP_NET_ADMIN))
- 		return -EPERM;
- 
- 	/* The check is also done later; this helps returning early without
--	 * hitting the trylock/restart below.
-+	 * hitting the locking section below.
- 	 */
- 	if (!dev->netdev_ops->ndo_set_tx_maxrate)
- 		return -EOPNOTSUPP;
-@@ -1471,18 +1475,21 @@ static ssize_t tx_maxrate_store(struct netdev_queue *queue,
- 	if (err < 0)
- 		return err;
- 
--	if (!rtnl_trylock())
--		return restart_syscall();
-+	err = sysfs_rtnl_lock(kobj, attr, dev);
-+	if (err)
-+		return err;
- 
- 	err = -EOPNOTSUPP;
- 	if (dev->netdev_ops->ndo_set_tx_maxrate)
- 		err = dev->netdev_ops->ndo_set_tx_maxrate(dev, index, rate);
- 
--	rtnl_unlock();
- 	if (!err) {
- 		queue->tx_maxrate = rate;
-+		rtnl_unlock();
- 		return len;
- 	}
-+
-+	rtnl_unlock();
- 	return err;
- }
- 
-@@ -1526,16 +1533,17 @@ static ssize_t bql_set(const char *buf, const size_t count,
- 	return count;
- }
- 
--static ssize_t bql_show_hold_time(struct netdev_queue *queue,
--				  char *buf)
-+static ssize_t bql_show_hold_time(struct kobject *kobj, struct attribute *attr,
-+				  struct netdev_queue *queue, char *buf)
- {
- 	struct dql *dql = &queue->dql;
- 
- 	return sysfs_emit(buf, "%u\n", jiffies_to_msecs(dql->slack_hold_time));
- }
- 
--static ssize_t bql_set_hold_time(struct netdev_queue *queue,
--				 const char *buf, size_t len)
-+static ssize_t bql_set_hold_time(struct kobject *kobj, struct attribute *attr,
-+				 struct netdev_queue *queue, const char *buf,
-+				 size_t len)
- {
- 	struct dql *dql = &queue->dql;
- 	unsigned int value;
-@@ -1554,15 +1562,17 @@ static struct netdev_queue_attribute bql_hold_time_attribute __ro_after_init
- 	= __ATTR(hold_time, 0644,
- 		 bql_show_hold_time, bql_set_hold_time);
- 
--static ssize_t bql_show_stall_thrs(struct netdev_queue *queue, char *buf)
-+static ssize_t bql_show_stall_thrs(struct kobject *kobj, struct attribute *attr,
-+				   struct netdev_queue *queue, char *buf)
- {
- 	struct dql *dql = &queue->dql;
- 
- 	return sysfs_emit(buf, "%u\n", jiffies_to_msecs(dql->stall_thrs));
- }
- 
--static ssize_t bql_set_stall_thrs(struct netdev_queue *queue,
--				  const char *buf, size_t len)
-+static ssize_t bql_set_stall_thrs(struct kobject *kobj, struct attribute *attr,
-+				  struct netdev_queue *queue, const char *buf,
-+				  size_t len)
- {
- 	struct dql *dql = &queue->dql;
- 	unsigned int value;
-@@ -1588,13 +1598,15 @@ static ssize_t bql_set_stall_thrs(struct netdev_queue *queue,
- static struct netdev_queue_attribute bql_stall_thrs_attribute __ro_after_init =
- 	__ATTR(stall_thrs, 0644, bql_show_stall_thrs, bql_set_stall_thrs);
- 
--static ssize_t bql_show_stall_max(struct netdev_queue *queue, char *buf)
-+static ssize_t bql_show_stall_max(struct kobject *kobj, struct attribute *attr,
-+				  struct netdev_queue *queue, char *buf)
- {
- 	return sysfs_emit(buf, "%u\n", READ_ONCE(queue->dql.stall_max));
- }
- 
--static ssize_t bql_set_stall_max(struct netdev_queue *queue,
--				 const char *buf, size_t len)
-+static ssize_t bql_set_stall_max(struct kobject *kobj, struct attribute *attr,
-+				 struct netdev_queue *queue, const char *buf,
-+				 size_t len)
- {
- 	WRITE_ONCE(queue->dql.stall_max, 0);
- 	return len;
-@@ -1603,7 +1615,8 @@ static ssize_t bql_set_stall_max(struct netdev_queue *queue,
- static struct netdev_queue_attribute bql_stall_max_attribute __ro_after_init =
- 	__ATTR(stall_max, 0644, bql_show_stall_max, bql_set_stall_max);
- 
--static ssize_t bql_show_stall_cnt(struct netdev_queue *queue, char *buf)
-+static ssize_t bql_show_stall_cnt(struct kobject *kobj, struct attribute *attr,
-+				  struct netdev_queue *queue, char *buf)
- {
- 	struct dql *dql = &queue->dql;
- 
-@@ -1613,8 +1626,8 @@ static ssize_t bql_show_stall_cnt(struct netdev_queue *queue, char *buf)
- static struct netdev_queue_attribute bql_stall_cnt_attribute __ro_after_init =
- 	__ATTR(stall_cnt, 0444, bql_show_stall_cnt, NULL);
- 
--static ssize_t bql_show_inflight(struct netdev_queue *queue,
--				 char *buf)
-+static ssize_t bql_show_inflight(struct kobject *kobj, struct attribute *attr,
-+				 struct netdev_queue *queue, char *buf)
- {
- 	struct dql *dql = &queue->dql;
- 
-@@ -1625,13 +1638,16 @@ static struct netdev_queue_attribute bql_inflight_attribute __ro_after_init =
- 	__ATTR(inflight, 0444, bql_show_inflight, NULL);
- 
- #define BQL_ATTR(NAME, FIELD)						\
--static ssize_t bql_show_ ## NAME(struct netdev_queue *queue,		\
--				 char *buf)				\
-+static ssize_t bql_show_ ## NAME(struct kobject *kobj,			\
-+				 struct attribute *attr,		\
-+				 struct netdev_queue *queue, char *buf)	\
- {									\
- 	return bql_show(buf, queue->dql.FIELD);				\
- }									\
- 									\
--static ssize_t bql_set_ ## NAME(struct netdev_queue *queue,		\
-+static ssize_t bql_set_ ## NAME(struct kobject *kobj,			\
-+				struct attribute *attr,			\
-+				struct netdev_queue *queue,		\
- 				const char *buf, size_t len)		\
- {									\
- 	return bql_set(buf, len, &queue->dql.FIELD);			\
-@@ -1717,19 +1733,21 @@ static ssize_t xps_queue_show(struct net_device *dev, unsigned int index,
- 	return len < PAGE_SIZE ? len : -EINVAL;
- }
- 
--static ssize_t xps_cpus_show(struct netdev_queue *queue, char *buf)
-+static ssize_t xps_cpus_show(struct kobject *kobj, struct attribute *attr,
-+			     struct netdev_queue *queue, char *buf)
- {
- 	struct net_device *dev = queue->dev;
- 	unsigned int index;
--	int len, tc;
-+	int len, tc, ret;
- 
- 	if (!netif_is_multiqueue(dev))
- 		return -ENOENT;
- 
- 	index = get_netdev_queue_index(queue);
- 
--	if (!rtnl_trylock())
--		return restart_syscall();
-+	ret = sysfs_rtnl_lock(kobj, attr, queue->dev);
-+	if (ret)
-+		return ret;
- 
- 	/* If queue belongs to subordinate dev use its map */
- 	dev = netdev_get_tx_queue(dev, index)->sb_dev ? : dev;
-@@ -1740,18 +1758,21 @@ static ssize_t xps_cpus_show(struct netdev_queue *queue, char *buf)
- 		return -EINVAL;
- 	}
- 
--	/* Make sure the subordinate device can't be freed */
--	get_device(&dev->dev);
-+	/* Increase the net device refcnt to make sure it won't be freed while
-+	 * xps_queue_show is running.
-+	 */
-+	dev_hold(dev);
- 	rtnl_unlock();
- 
- 	len = xps_queue_show(dev, index, tc, buf, XPS_CPUS);
- 
--	put_device(&dev->dev);
-+	dev_put(dev);
- 	return len;
- }
- 
--static ssize_t xps_cpus_store(struct netdev_queue *queue,
--			      const char *buf, size_t len)
-+static ssize_t xps_cpus_store(struct kobject *kobj, struct attribute *attr,
-+			      struct netdev_queue *queue, const char *buf,
-+			      size_t len)
- {
- 	struct net_device *dev = queue->dev;
- 	unsigned int index;
-@@ -1775,9 +1796,10 @@ static ssize_t xps_cpus_store(struct netdev_queue *queue,
- 		return err;
- 	}
- 
--	if (!rtnl_trylock()) {
-+	err = sysfs_rtnl_lock(kobj, attr, dev);
-+	if (err) {
- 		free_cpumask_var(mask);
--		return restart_syscall();
-+		return err;
- 	}
- 
- 	err = netif_set_xps_queue(dev, mask, index);
-@@ -1791,26 +1813,34 @@ static ssize_t xps_cpus_store(struct netdev_queue *queue,
- static struct netdev_queue_attribute xps_cpus_attribute __ro_after_init
- 	= __ATTR_RW(xps_cpus);
- 
--static ssize_t xps_rxqs_show(struct netdev_queue *queue, char *buf)
-+static ssize_t xps_rxqs_show(struct kobject *kobj, struct attribute *attr,
-+			     struct netdev_queue *queue, char *buf)
- {
- 	struct net_device *dev = queue->dev;
- 	unsigned int index;
--	int tc;
-+	int tc, ret;
- 
- 	index = get_netdev_queue_index(queue);
- 
--	if (!rtnl_trylock())
--		return restart_syscall();
-+	ret = sysfs_rtnl_lock(kobj, attr, dev);
-+	if (ret)
-+		return ret;
- 
- 	tc = netdev_txq_to_tc(dev, index);
-+
-+	/* Increase the net device refcnt to make sure it won't be freed while
-+	 * xps_queue_show is running.
-+	 */
-+	dev_hold(dev);
- 	rtnl_unlock();
--	if (tc < 0)
--		return -EINVAL;
- 
--	return xps_queue_show(dev, index, tc, buf, XPS_RXQS);
-+	ret = tc >= 0 ? xps_queue_show(dev, index, tc, buf, XPS_RXQS) : -EINVAL;
-+	dev_put(dev);
-+	return ret;
- }
- 
--static ssize_t xps_rxqs_store(struct netdev_queue *queue, const char *buf,
-+static ssize_t xps_rxqs_store(struct kobject *kobj, struct attribute *attr,
-+			      struct netdev_queue *queue, const char *buf,
- 			      size_t len)
- {
- 	struct net_device *dev = queue->dev;
-@@ -1834,9 +1864,10 @@ static ssize_t xps_rxqs_store(struct netdev_queue *queue, const char *buf,
- 		return err;
- 	}
- 
--	if (!rtnl_trylock()) {
-+	err = sysfs_rtnl_lock(kobj, attr, dev);
-+	if (err) {
- 		bitmap_free(mask);
--		return restart_syscall();
-+		return err;
- 	}
- 
- 	cpus_read_lock();
--- 
-2.48.1
 
 
