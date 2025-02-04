@@ -1,136 +1,115 @@
-Return-Path: <netdev+bounces-162515-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-162516-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8825DA27279
-	for <lists+netdev@lfdr.de>; Tue,  4 Feb 2025 14:10:31 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id B5305A27280
+	for <lists+netdev@lfdr.de>; Tue,  4 Feb 2025 14:12:41 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id BFFAA1660D4
-	for <lists+netdev@lfdr.de>; Tue,  4 Feb 2025 13:10:29 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 17D453A1920
+	for <lists+netdev@lfdr.de>; Tue,  4 Feb 2025 13:12:33 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 202D120FA9C;
-	Tue,  4 Feb 2025 12:50:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7CF1020DD45;
+	Tue,  4 Feb 2025 12:53:10 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="RtO+sQmg"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="iZJmGA67"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f43.google.com (mail-wm1-f43.google.com [209.85.128.43])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 54E4A20DD79
-	for <netdev@vger.kernel.org>; Tue,  4 Feb 2025 12:50:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.43
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CC10820DD79
+	for <netdev@vger.kernel.org>; Tue,  4 Feb 2025 12:53:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1738673457; cv=none; b=slXKORt6PbSzH4jPXRv2mEikInYmP6cd7TzJ0LNLwiGjlRPDk3k0yVbg7BHuo3jokDyKh7jJAwJWUHNUvvHz8DQoz8Otfo3gyyM0bLyp1g6DUWO8VMLN+FVgIIqlbxc4LuIWG98/zcbcMqowb5nW7twT+8LD/FHC/BxoiyYkMyA=
+	t=1738673590; cv=none; b=Hzh4GP34AJF7Bb6hV1+cR3ipO8yzee3O7aEA+STbO1t13uuD5G+8isD5dADzhMSzrrePMdjIMz7zDIai3v8y+IRm2k7Ry1jQ769paaYqmfRqez2wk5g+ZDAVaJ2C0phxFF1MGhkxR+vmfwr0zXBtjK5mc2D36QyaYl7hlCt1Xh8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1738673457; c=relaxed/simple;
-	bh=o0pZF95c3eQVMxFpSfGyBlaFMnlh66Oow+2st4B1qMY=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Bgrh851zN9wyKfkdISRZ1TUW+FJdUKnZEKitWU3UUZ9fAK4brahsSWF/8dMGCjezdBDPNH9caVFnpQ0maWPoT9Fxr6skH3qmZe2VmNvLST0RnN7+mJCxaVeO85E+NkhgQaQJoDgcq8HxxX84fOtThMsKn0QqOuDvMGJ51FgJR3g=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=RtO+sQmg; arc=none smtp.client-ip=209.85.128.43
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wm1-f43.google.com with SMTP id 5b1f17b1804b1-43658c452f5so7331695e9.0
-        for <netdev@vger.kernel.org>; Tue, 04 Feb 2025 04:50:55 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1738673453; x=1739278253; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=Z6i8m47zZLnIhTCRayjNJf7P3F95rlcL8kITVf7it4s=;
-        b=RtO+sQmgz3vANPhkf/lBG1Xz8uyloeInen3E5dYZhY988p1scOlG2V7tz5jglT5mpa
-         R9Mi83vAd+48mzGbPL9B+KF9ehOCcLIbeBLyH8MQKGVuEnaOOWFJGiqko7N/tHKNT+Fc
-         LLv6HcU0JSgtXohS+o9Qba3I2GUkODwgBjfvyu+twmvjKtu/1tF7FyIqvW844Bw39lxK
-         0BDryim2Od6UdN+HFDLo7i8iFqJuPaPSJmlrMs9BPPUvPUfuTbpUKgXF4vOFXS8BW6ZU
-         eBteEoC4yD3lZSRoYV4m5S6eeb8LSuWSVtJ3UdzmvgwuiHjwGa1AXX6G7aQ0KDAXbysV
-         rBnQ==
+	s=arc-20240116; t=1738673590; c=relaxed/simple;
+	bh=E2XOKaKCPe4d0VXjuMdn3z7hPrsYbPCbKGNXONoomO0=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=PgogTJSRtDsXo/8dfZj3UeuuyU/COumKY4nAfvxDVuq9ZhL1ciS1cHVMka7SFDW32aWmdUUvZi5jzxadTvs77R9OPyaadNxL8lZxHD7UcI0IxCTnPpR0SUwi3JCbvu0ePz+tsQTDgCD6zBowK8oeWP5nxh9QXb2wCmnPG6X3z0w=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=iZJmGA67; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1738673587;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=W9lGb6ArVNAnC84Dm4Ix0Qfrp4oELB1vI8ob2VTGfsk=;
+	b=iZJmGA67IYPWS/xtSbPc7Q9GLH/kXMPWSwivPiNG2/mtHtj/K4W0epuHzL8zxJNxafxHjh
+	yfgNvGiAjTKXch/zzz+Lb9A0B0QnKjak7T95XvHJ7ob20WbxC5sQIhCW6Un2SO3PufEtC1
+	8j7ISM1ka391mHNCwsXlP1szGFPhxKk=
+Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
+ [209.85.128.71]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-551-x5Ti19JZMB2uf0Nj5WFA1Q-1; Tue, 04 Feb 2025 07:53:06 -0500
+X-MC-Unique: x5Ti19JZMB2uf0Nj5WFA1Q-1
+X-Mimecast-MFC-AGG-ID: x5Ti19JZMB2uf0Nj5WFA1Q
+Received: by mail-wm1-f71.google.com with SMTP id 5b1f17b1804b1-4361f371908so39925555e9.0
+        for <netdev@vger.kernel.org>; Tue, 04 Feb 2025 04:53:06 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1738673453; x=1739278253;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=Z6i8m47zZLnIhTCRayjNJf7P3F95rlcL8kITVf7it4s=;
-        b=M4gZnyyRrM0Y1mNxHLwloAYwNaraUqNHgJNI+LhM9Rf1BJF2DcgJGxW2lmfN3lo2T0
-         9zzh2ZSEgFO/7YpXIPftzbjf1smZiFuooFZB8GGtAJGQTcrpcGjJPSabuKIAS+TpSjWr
-         keChJ3X2uWT0xXLYAbc9bcGR573n0C8RJQa5wGwmYNrGktQWGlxiBa81252EZh+7f/T/
-         ZmvRUPX+CrOimyrkx+XWRXqciREXoyYiRyxpoI2g2Ya5Frz+mCUMeqsknxpI+YZpaDwG
-         0FRry4dDT/RSMVw/+VL+R7scxEMCLwJg4/Q5xfZ76ZupgoK3YDc8kJDYDH8TbNu68/66
-         iaTw==
-X-Gm-Message-State: AOJu0Yx1go26p4qpewe6y2MFjG3nccJr9s7GHzGPSOg/+MaLUPuTZmcY
-	fTv7Wkt/y6XB51oLlDKykKvrc//AnHRhIkrSNmFpUFdqaXLqdW0FkVgcJw==
-X-Gm-Gg: ASbGncuitEnHxqzjCo7dD8aulUIfMKPbhv36OWfz2+/9gpqWe+BVqNHSVB/5Qmj+Dfr
-	KcXyrExsBJcwzRD2NlD6u/x/POV5JHKKRz3krG9aTzJk8dsAlN77J4tpGpnkQRZkMIwg6/PpbBl
-	zspGb70XRbBFpSoJZB5zpacq6x2UQkgHzHnrKTwlcb8D0G5cDMss6PNfw8CunqNx96Ex3PzVZq4
-	UitHidFxWkLvtMPbCmW9QLaJVvt3bpYL1baOwxLeNp8OGyPeiiP10UOuNeH62uKB2EwcElRt2GI
-	Dns=
-X-Google-Smtp-Source: AGHT+IHihMJUOfRD2xrDfFtYt0BG/Aj6WTc8kjACmL9qp6WE5z7Bu0TF0+7j0LAc1fIrmeKX0Drzdg==
-X-Received: by 2002:a05:6000:270f:b0:38d:a726:d5ba with SMTP id ffacd0b85a97d-38da726d7acmr515621f8f.12.1738673453273;
-        Tue, 04 Feb 2025 04:50:53 -0800 (PST)
-Received: from skbuf ([86.127.124.81])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-38da59470b2sm2272412f8f.40.2025.02.04.04.50.52
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 04 Feb 2025 04:50:52 -0800 (PST)
-Date: Tue, 4 Feb 2025 14:50:50 +0200
-From: Vladimir Oltean <olteanv@gmail.com>
-To: Frieder Schrempf <frieder.schrempf@kontron.de>
-Cc: "netdev@vger.kernel.org" <netdev@vger.kernel.org>
-Subject: Re: DT options for DSA user port with internal PHY
-Message-ID: <20250204125050.lny3ldp7wwc3g3km@skbuf>
-References: <d1243bdc-3c88-4e15-b955-309d1917a599@kontron.de>
+        d=1e100.net; s=20230601; t=1738673585; x=1739278385;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=W9lGb6ArVNAnC84Dm4Ix0Qfrp4oELB1vI8ob2VTGfsk=;
+        b=i5EWuO2QDRItuA9xf8YIqb/klBnv5YVSKfcDbGZAbH/vOYzhcfOWhf5xWfxv5vHXZ6
+         6B3SUJHjHRUe/VY+uYLL6gvAc3NTz5dMvQAoU3AN/ARP1yUhPZpHB0VXBGypNBisRtBM
+         o8gnmSlrFurk21UXo6z+l05HfIJBM+b4R1O6/H68O+aRPvujMAFJON6daIL0iiIEx6v6
+         wnVFGzd9+a47tupkhck7G4N+/Tw+94fOO2WMD71KgbPtaP8yXX+5OVPlZsuXRG15qq/Z
+         kutAHGhHcbwdZ3xMrX/2B6VqR/QRqc5OPb2t+09Roe6pee2o920ZY8E3oRUufS7lj9Ul
+         q1kw==
+X-Gm-Message-State: AOJu0Ywp3+VkuJrS2y5rII1gh+2xkCBmn8Nf7bXEqmQwVezUuaezNLWu
+	ci0smmO4hBaUDAySvo1VHBah/ZAq3exu+O7tRf5O2jVhKOdKxqJGkWOt8zW0XFx6m7BotjYdLup
+	UjZ/BIozWT+qHKbocG1+7Osd2uPiKURjvlMstMGumEE9tVeQG+tLGlg==
+X-Gm-Gg: ASbGnctmCOE7Bh1nRdLMEGv8ODH6MdAzV2Z9CD7qzuRGUU/2OCAe7PazbC22RlXAvNv
+	VuyvJQF+tXvFGO5vdCUKZK2ALJ6b9O7Cz+VXpaZw7r2ncenJcB6mOF6M0eYoEaZ6g74gH+PTdqj
+	uQLzxtlUmR0DsHx/e4zbk5cDUQFmDWu9S976kD+bu39GVKtyVXcMcd048I5NIVdZEA1soe/I0Il
+	A26lwZU1GencrbKbGf1vTyBXnuQ/L7WHR4CJEo9AxkM2I2xaPquHzy06xK/U9dUoihOD5fifYEk
+	a6Pd+/sXJS19Kmb6sFYMvikqVCetd7Sqqh0=
+X-Received: by 2002:a05:600c:b89:b0:432:cbe5:4f09 with SMTP id 5b1f17b1804b1-438dc3bb62fmr211869695e9.4.1738673585396;
+        Tue, 04 Feb 2025 04:53:05 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IE0ebWy/v6G4LkxINcqvwhARvH23QsWGEzmKN6/2zftb7x+PQKmee4ZP53mN3AbmSaDP8Q1Rg==
+X-Received: by 2002:a05:600c:b89:b0:432:cbe5:4f09 with SMTP id 5b1f17b1804b1-438dc3bb62fmr211869505e9.4.1738673585046;
+        Tue, 04 Feb 2025 04:53:05 -0800 (PST)
+Received: from [192.168.88.253] (146-241-41-201.dyn.eolo.it. [146.241.41.201])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-438e236f9bfsm195113395e9.0.2025.02.04.04.53.04
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 04 Feb 2025 04:53:04 -0800 (PST)
+Message-ID: <a2154fb1-95ce-42d1-8cdd-ae955b850a29@redhat.com>
+Date: Tue, 4 Feb 2025 13:53:03 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <d1243bdc-3c88-4e15-b955-309d1917a599@kontron.de>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net] net: rose: lock the socket in rose_bind()
+To: Eric Dumazet <edumazet@google.com>, "David S . Miller"
+ <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>
+Cc: netdev@vger.kernel.org, Simon Horman <horms@kernel.org>,
+ eric.dumazet@gmail.com, syzbot+7ff41b5215f0c534534e@syzkaller.appspotmail.com
+References: <20250203170838.3521361-1-edumazet@google.com>
+Content-Language: en-US
+From: Paolo Abeni <pabeni@redhat.com>
+In-Reply-To: <20250203170838.3521361-1-edumazet@google.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-On Tue, Feb 04, 2025 at 09:30:23AM +0100, Frieder Schrempf wrote:
-> Hi,
+On 2/3/25 6:08 PM, Eric Dumazet wrote:
+> syzbot reported a soft lockup in rose_loopback_timer(),
+> with a repro calling bind() from multiple threads.
 > 
-> I'm using a KSZ9477 and I'm configuring the DSA user ports in the
-> devicetree.
+> rose_bind() must lock the socket to avoid this issue.
 > 
-> Due to the hardware implementation I need to use some options that
-> currently seem to be unsupported by the driver.
-> 
-> First the user ports are physically limited to a maximum speed of
-> 100MBit/s. As the MAC and the PHYs are capable of 1G, this also what
-> gets advertised during autoneg.
-> 
-> Second the LEDs controlled by the PHY need to be handled in "Single
-> Mode" instead of "Dual Mode".
-> 
-> Usually on an external PHY that gets probed separately, I could use
-> "max-speed" and "micrel,led-mode" to achieve this.
-> 
-> But for the KSZ9477 the PHYs are not probed but instead hooked into the
-> switch driver and from the PHY driver I don't seem to have any way to
-> access the DT node for the DSA user port.
-> 
-> What would be the proper way to implement this? Any ideas?
-> 
-> Thanks
-> Frieder
-> 
+> Fixes: 1da177e4c3f4 ("Linux-2.6.12-rc2")
+> Reported-by: syzbot+7ff41b5215f0c534534e@syzkaller.appspotmail.com
+> Closes: https://lore.kernel.org/netdev/67a0f78d.050a0220.d7c5a.00a0.GAE@google.com/T/#u
+> Signed-off-by: Eric Dumazet <edumazet@google.com>
 
-I don't believe your assessment your correct. The internal KSZ9477 PHYs
-are probed either way using the standard device model and phylib, it's
-just that their MDIO bus is not backed by an OF node. Looking at
-/sys/bus/mdio_bus/devices/ will show that this is the case.
+Acked-by: Paolo Abeni <pabeni@redhat.com>
 
-DSA has that shorthand way of describing user ports connected to
-internal copper PHYs, but it is for compatibility with legacy drivers
-and device trees. For all new device trees is recommended to describe
-the "mdio" subnode of the switch, the "ethernet-phy" nodes for the
-internal PHYs, and create "phy-handle" references from each user port to
-an internal PHY, as you normally would with any other Ethernet PHY.
-The schema at
-Documentation/devicetree/bindings/net/dsa/microchip/microchip,ksz.yaml
-clearly says that an "mdio" child node of the switch is supported.
-
-Also see previous discussions where the same thing has been said:
-https://lore.kernel.org/netdev/20241219173805.503900-1-alexander.sverdlin@siemens.com/
 
