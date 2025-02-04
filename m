@@ -1,184 +1,136 @@
-Return-Path: <netdev+bounces-162624-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-162626-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 51B28A276A9
-	for <lists+netdev@lfdr.de>; Tue,  4 Feb 2025 17:00:48 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 57524A276B8
+	for <lists+netdev@lfdr.de>; Tue,  4 Feb 2025 17:02:40 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 424901886775
-	for <lists+netdev@lfdr.de>; Tue,  4 Feb 2025 16:00:51 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 78FB01887910
+	for <lists+netdev@lfdr.de>; Tue,  4 Feb 2025 16:02:41 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 936852153C3;
-	Tue,  4 Feb 2025 16:00:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E786521517D;
+	Tue,  4 Feb 2025 16:02:26 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="GbBolB2/"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="HFNPYCz9"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wr1-f52.google.com (mail-wr1-f52.google.com [209.85.221.52])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BDFB6215190
-	for <netdev@vger.kernel.org>; Tue,  4 Feb 2025 16:00:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2E04A2147F6;
+	Tue,  4 Feb 2025 16:02:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.52
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1738684830; cv=none; b=k/BEwH9vSYvdmx0ht9d9ZdEeiBV77R5GbzeYb59n5wKgAHvGSU/KCqOcFxbc0mJFJCFpN6pIfwcvxPntGtLdpRaIesEWmz459jvvumnbhQTNJ+eYmA4cdd/H9JLB/47eVbJPRDh/BR01updSuIcfzFJVOvFUdM99grdI++Hb6QE=
+	t=1738684946; cv=none; b=EoZRwZaa41WQldoGmvyM7osBO/7XuLLvrag8fVKDX+oOnT8LIWAVujygpTo3LVAgA9RA73jmREOn+jgIJtY9Zv4NO8uaowdONcaWtW4nBiOfnXvY/M3Bpi1BZLtzXRG3zJusTS08qxD28qxbGbp2QVFWnx6vmFUilN5eJUqUDM0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1738684830; c=relaxed/simple;
-	bh=1O/wP9rvmPeZrRl625NzZqbNnLbiuhYCS1deBIYhZQo=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=VFHsXk/6xu3YPE7qf52Fakzd2TY00zDhOp4QQasFjvXDkgnC8p12d/xfRsEpysXiaojYxWFFmvG5agOM81+bnco19/eQ+5z/nGDpcOgrM/Vg6vSyeaBJaslgJ0KunXlz8yhXN4Ft51lc5t7AjOmfF7znq18Abiweq/DHF9lBwow=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=GbBolB2/; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1738684827;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=VQeQVNRtN3YgkmOYd3AaFO1X0gu38baF3CR9tNQKQyQ=;
-	b=GbBolB2/Jq3GWfV6ZtpsJ179EEP79X7GMWoHYr6qq+92xbNhXdeHuavSI3n8cGO7ThqEbC
-	a9CjZRU487BjG7vxq1VlUd/XaDTvTktKLYqfcd29i5IWy3KgYJCwjfpI6f82sDZNrJpYcl
-	3HK9W4zTK9dLSNBzLWDmV3TKZATWPZ4=
-Received: from mail-qk1-f198.google.com (mail-qk1-f198.google.com
- [209.85.222.198]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-663-Qh81uh31PK6cLAX4qTkThw-1; Tue, 04 Feb 2025 11:00:25 -0500
-X-MC-Unique: Qh81uh31PK6cLAX4qTkThw-1
-X-Mimecast-MFC-AGG-ID: Qh81uh31PK6cLAX4qTkThw
-Received: by mail-qk1-f198.google.com with SMTP id af79cd13be357-7bcf4d3c1c1so869578085a.2
-        for <netdev@vger.kernel.org>; Tue, 04 Feb 2025 08:00:25 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1738684825; x=1739289625;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+	s=arc-20240116; t=1738684946; c=relaxed/simple;
+	bh=If8coQdhF5Nd+vwH+6qeES812n9PDmFQAtpVc1rdr7g=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=RwwzVm80dOilTmmBiH6qFtlxy13xogYOMyAa6ONdP22xJgNRVQ4QaahDkvY29CwIleafpFWo64pYugCXO8aidoDmQLo8iwlXLhgbSAw2LzMf96nDnIGcTRmVfzEfL7Zqs0k7/e3AQbqWV/3ugFQXNRCIKafEn3cC81oyVHtOjP4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=HFNPYCz9; arc=none smtp.client-ip=209.85.221.52
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-wr1-f52.google.com with SMTP id ffacd0b85a97d-38da88e6db0so465684f8f.2;
+        Tue, 04 Feb 2025 08:02:24 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1738684943; x=1739289743; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=VQeQVNRtN3YgkmOYd3AaFO1X0gu38baF3CR9tNQKQyQ=;
-        b=s0shmTLUEDJyTaiEALLThItBlf7/2043BfI4w5S5BhondWnrAtws5oySzB2cZeS+Dx
-         RC/iDLQhXu4+xLQxKqRGxxsbdPHsCmAb9fWbEnb3lCzdOF3AHRykwxjVj74YC8DQGT1k
-         g2BI8iKQpEOHJvLCdR/rHOXJGlfhwRWVTSnve75azMyNo0znex0Hzwnkx4gy2aAl+S2b
-         TXO2ERAAM0lFyB5z/33oZutWS6qd3/PynT45pRIwGHIJ9f4IeJLlyi7LYCTKO2r/EkeO
-         tgTYAE6uY3dyiinCBBegBgzt5rDTSPQkdKmPatpduQ8gq6bs+lBgAcn6m7tfTAf/qxT2
-         LQhA==
-X-Forwarded-Encrypted: i=1; AJvYcCVjRi8jDyMPR/515tbU02pKiimohZ48wHE/4I+doFTIb42XA8v7PzFt7N7+kHHeZY6cIIHV4qI=@vger.kernel.org
-X-Gm-Message-State: AOJu0YweaFTPpfnF0NVIaXgKyRNIlYRPm2Yare9d7D8Iqlx4xjY6PpOM
-	kqcHbY0/eOFluigIEebaLzvihStLbNgvNTQ9AmZueBeW2MxsSe3xp0CsimnGBuo+XqhLv4vs2AI
-	m7bqmeWKrZJZ+QuUjyqUslyrkcmBhkojNUTXRc3elQ2PBjKN2NTfZBg==
-X-Gm-Gg: ASbGncsrlooADQPiEEcFtzQna9nsRoU3xarm+h7GOfWMI1TI1BhaSXcdF14DZWJ82aC
-	LyqHFY2bgYFY2k4t+EJqm9zEiwIBHdS0QDqYQsvAb/9wHE9BDcXuiwEjMx+u7al1zJO7ZVdAzwW
-	UoJ8d3DYOoCk19H1cQqoKc8axXe2XlLH3BHY7f+XwB9iSn548P+tn/EoytDhJ0/54bHwoncOWqd
-	ojVyAy/Pr35OW+SHvmH4fOZXM7NqVR8v1oK8kcJFRS7RvXpua/tAQiU9bWNv++pgvAXXqagMidI
-	V1jcUZvJ6g==
-X-Received: by 2002:a05:620a:2609:b0:7b6:efd0:3d1e with SMTP id af79cd13be357-7bffcda534bmr4587392985a.53.1738684824375;
-        Tue, 04 Feb 2025 08:00:24 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IFAzo8YaZRMK8ajt6OxqGDW+Sj15Mdkt2eLhS8DtBinrVor/FEjWi7axlukvj1WQmCBNIR2Cw==
-X-Received: by 2002:a05:620a:2609:b0:7b6:efd0:3d1e with SMTP id af79cd13be357-7bffcda534bmr4587364685a.53.1738684823018;
-        Tue, 04 Feb 2025 08:00:23 -0800 (PST)
-Received: from sgarzare-redhat ([185.121.209.52])
-        by smtp.gmail.com with ESMTPSA id af79cd13be357-7c00a90558csm656228185a.74.2025.02.04.08.00.20
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 04 Feb 2025 08:00:22 -0800 (PST)
-Date: Tue, 4 Feb 2025 17:00:14 +0100
-From: Stefano Garzarella <sgarzare@redhat.com>
-To: Luigi Leonardi <leonardi@redhat.com>
-Cc: Michal Luczaj <mhal@rbox.co>, "David S. Miller" <davem@davemloft.net>, 
-	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
-	Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, netdev@vger.kernel.org, 
-	syzbot+9d55b199192a4be7d02c@syzkaller.appspotmail.com, fstornio@redhat.com
-Subject: Re: [PATCH net 1/2] vsock: Orphan socket after transport release
-Message-ID: <huosgcp4y7rr4ppagt7232oexydso6nxv3hzk5qi2euqqqyp6f@mfggrtjrzjdu>
-References: <20250204-vsock-linger-nullderef-v1-0-6eb1760fa93e@rbox.co>
- <20250204-vsock-linger-nullderef-v1-1-6eb1760fa93e@rbox.co>
- <jj6xlb2udt2khosipoi4m6iwjc6g5hau3jnzbf6dg2aredfykp@y7j4jlgd4tpr>
- <jfkqsbbq5um6nmlhnxxgx3eg7aopnwaddqvcj7s6svmpujswub@42sq2pawnsxn>
+        bh=If8coQdhF5Nd+vwH+6qeES812n9PDmFQAtpVc1rdr7g=;
+        b=HFNPYCz9T9jVryZqJPgQO0FkL3BB7GNs5vFJTnTPf1StX1I4yBrwvlW7fMgUQJFkY5
+         nVWYj3b7P7yYGuXEQq+2Ap5ZrLyB7Hu/z0WpxitYAyOmg4M7jQcjlIR1dNgQPi6SX/77
+         KkYs8meGgONaGooIQlReV7Dr/1HNMC9w6WMnrcmof7KF0lpEFQfuGnfC8VLmjqaH9OsG
+         G0Gi3XlSH8kHJ3vzCiDTha7ldIs0PvQ8FgD5WZ8vDciSOY8IFrV/7Pn8IyYMeYShpEKK
+         4kQCswLm5YFN1hZS93GUS3CERhArpVH9f0vB9ZXPYMNKnYKQlbNSWKP5T0WOF21oM9+X
+         7XJw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1738684943; x=1739289743;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=If8coQdhF5Nd+vwH+6qeES812n9PDmFQAtpVc1rdr7g=;
+        b=ulpohp/PtzYMcT46j1R9efWbkOP6zYJp+OJ49I96Mh3SejuEtCjvAL2gaMz60e648Q
+         ddUZ+mzcQRfuYOUJGagJyx/oCtdrVmMgtMeGSD1Sz+z/pvMD49pI60B2WmJRS+2y1F9Z
+         Z8vVKUbPmG7gu4+J+9raih6VjyqqcDjGbJWRJMW7AWoDx/HktvaIaBIdbWltGOpbAsWd
+         AMP+wAfdiqgssmuCMLA12fv/Z26K8kJIzPEMQuS7HxLwU6B0I2b5mgJzcS0XJV9otU2z
+         ZpIvFatrtTGq0M9C6FaWomG0p6DUGTOnFJ+vmnQe+BqSv71Dkunlnl0kDAPPsaCbJOzc
+         19iQ==
+X-Forwarded-Encrypted: i=1; AJvYcCUKywhIOqJ9ht2L0lQSB4yaQQrYHdNUSavSmAmGTrVjxTNaQILuaV+Jf1mOSMILweld0so=@vger.kernel.org, AJvYcCXeEYGMXwrUiGCCQa+oFZMP4o7thSIVChxGdeWyDjPX3DwblIwz+H8cglD4uJk8NjPxmlLElzHx@vger.kernel.org
+X-Gm-Message-State: AOJu0YzEVIpK9b2PsbwFUHYGDUMsHTXntTlMBgbPgAZZFgh7+MWeI8hc
+	pqnainZXSue4qpPGtiohR9ovNeCrqwcwSyOPhS5yaN3A1cWUhIDurhs8KSJ5k2T2AUoDQ8xQBj9
+	P0+BQPmYMvaiZEyK9XbJsXszMbm8=
+X-Gm-Gg: ASbGncvxOZwSi0zxkM1uhHpBGaslpw949yg/t6v2d7HgesVh3/zz1uh7gEb9q+tltsg
+	ouyndrC47A5R/9tpjCUhjmePKD2Tscx/vzapjYVrA2Z0sPO1HJQi7+pchnCGJV8gr7QkkFRxYYt
+	FWk9eAW7OAyZF5
+X-Google-Smtp-Source: AGHT+IHeN97gerTQvzADmizTaOUdKrsOPcpv4a+weyZuEv2JCgTjbx35ZkJM0XcK3avJjhtGXI0gbgiqRC+ZlCTBpNg=
+X-Received: by 2002:a5d:64a1:0:b0:385:f220:f798 with SMTP id
+ ffacd0b85a97d-38c5194ca80mr20871753f8f.6.1738684943008; Tue, 04 Feb 2025
+ 08:02:23 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii; format=flowed
-Content-Disposition: inline
-In-Reply-To: <jfkqsbbq5um6nmlhnxxgx3eg7aopnwaddqvcj7s6svmpujswub@42sq2pawnsxn>
+References: <cover.1738665783.git.petrm@nvidia.com> <CAADnVQKMN4+Zg9ZG4FpH9pJw4KdmwWmT2d4BiJgHUUQ-Hd7OkQ@mail.gmail.com>
+ <BL1PR12MB59225F7D902ACBC6A91511C3CBF42@BL1PR12MB5922.namprd12.prod.outlook.com>
+In-Reply-To: <BL1PR12MB59225F7D902ACBC6A91511C3CBF42@BL1PR12MB5922.namprd12.prod.outlook.com>
+From: Alexei Starovoitov <alexei.starovoitov@gmail.com>
+Date: Tue, 4 Feb 2025 16:02:12 +0000
+X-Gm-Features: AWEUYZmfN46xxQRo3nRVY9d3svhIhjNTxveJyvu3-bNeq5DbAeH4VL7q771GjKs
+Message-ID: <CAADnVQLJfd201t_-bgWHRJRDHm4FQDNapbmAQhPd18OEFq_QdA@mail.gmail.com>
+Subject: Re: [PATCH net-next 00/12] mlxsw: Preparations for XDP support
+To: Amit Cohen <amcohen@nvidia.com>
+Cc: Petr Machata <petrm@nvidia.com>, "David S. Miller" <davem@davemloft.net>, 
+	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+	Andrew Lunn <andrew+netdev@lunn.ch>, Network Development <netdev@vger.kernel.org>, 
+	Ido Schimmel <idosch@nvidia.com>, Alexei Starovoitov <ast@kernel.org>, 
+	Daniel Borkmann <daniel@iogearbox.net>, Jesper Dangaard Brouer <hawk@kernel.org>, 
+	John Fastabend <john.fastabend@gmail.com>, bpf <bpf@vger.kernel.org>, mlxsw <mlxsw@nvidia.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Tue, Feb 04, 2025 at 04:44:13PM +0100, Luigi Leonardi wrote:
->On Tue, Feb 04, 2025 at 11:32:54AM +0100, Stefano Garzarella wrote:
->>On Tue, Feb 04, 2025 at 01:29:52AM +0100, Michal Luczaj wrote:
->>>During socket release, sock_orphan() is called without considering that it
->>>sets sk->sk_wq to NULL. Later, if SO_LINGER is enabled, this leads to a
->>>null pointer dereferenced in virtio_transport_wait_close().
->>>
->>>Orphan the socket only after transport release.
->>>
->>>Partially reverts the 'Fixes:' commit.
->>>
->>>KASAN: null-ptr-deref in range [0x0000000000000018-0x000000000000001f]
->>>lock_acquire+0x19e/0x500
->>>_raw_spin_lock_irqsave+0x47/0x70
->>>add_wait_queue+0x46/0x230
->>>virtio_transport_release+0x4e7/0x7f0
->>>__vsock_release+0xfd/0x490
->>>vsock_release+0x90/0x120
->>>__sock_release+0xa3/0x250
->>>sock_close+0x14/0x20
->>>__fput+0x35e/0xa90
->>>__x64_sys_close+0x78/0xd0
->>>do_syscall_64+0x93/0x1b0
->>>entry_SYSCALL_64_after_hwframe+0x76/0x7e
->>>
->>>Reported-by: syzbot+9d55b199192a4be7d02c@syzkaller.appspotmail.com
->>>Closes: https://syzkaller.appspot.com/bug?extid=9d55b199192a4be7d02c
->>>Fixes: fcdd2242c023 ("vsock: Keep the binding until socket destruction")
->>
->>Looking better at that patch, can you check if we break commit
->>3a5cc90a4d17 ("vsock/virtio: remove socket from connected/bound list 
->>on shutdown")
->>
->>https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/commit/?id=3a5cc90a4d1756072619fe511d07621bdef7f120
->>
->I worked with Filippo (+CC) on this patch.
+On Tue, Feb 4, 2025 at 3:59=E2=80=AFPM Amit Cohen <amcohen@nvidia.com> wrot=
+e:
 >
->IMHO it shouldn't do any harm. `sock_orphan` sets sk->sk_socket and 
->sk_wq to NULL, and sets the SOCK_DEAD flag.
 >
->This patch sets the latter in the same place. All the other fields are 
->not used by the transport->release() (at least in virtio-based 
->transports), so from my perspective there is no real change.
 >
->What was your concern?
+> > -----Original Message-----
+> > From: Alexei Starovoitov <alexei.starovoitov@gmail.com>
+> > Sent: Tuesday, 4 February 2025 17:56
+> > To: Petr Machata <petrm@nvidia.com>
+> > Cc: David S. Miller <davem@davemloft.net>; Eric Dumazet <edumazet@googl=
+e.com>; Jakub Kicinski <kuba@kernel.org>; Paolo Abeni
+> > <pabeni@redhat.com>; Andrew Lunn <andrew+netdev@lunn.ch>; Network Devel=
+opment <netdev@vger.kernel.org>; Amit Cohen
+> > <amcohen@nvidia.com>; Ido Schimmel <idosch@nvidia.com>; Alexei Starovoi=
+tov <ast@kernel.org>; Daniel Borkmann
+> > <daniel@iogearbox.net>; Jesper Dangaard Brouer <hawk@kernel.org>; John =
+Fastabend <john.fastabend@gmail.com>; bpf
+> > <bpf@vger.kernel.org>; mlxsw <mlxsw@nvidia.com>
+> > Subject: Re: [PATCH net-next 00/12] mlxsw: Preparations for XDP support
+> >
+> > On Tue, Feb 4, 2025 at 11:06=E2=80=AFAM Petr Machata <petrm@nvidia.com>=
+ wrote:
+> > >
+> > > Amit Cohen writes:
+> > >
+> > > A future patch set will add support for XDP in mlxsw driver. This set=
+ adds
+> > > some preparations.
+> >
+> > Why?
+> > What is the goal here?
+> > My understanding is that mlxsw is a hw switch and skb-s are used to
+> > implement tap functionality for few listeners.
+> > The volume of such packets is supposed to be small.
+> > Even if XDP is added there is a huge mismatch in packet rates.
+> > Hence the question. Why bother?
+>
+> You're right, most of packets should be handled by HW, XDP is mainly usef=
+ul for telemetry.
 
-My concern was more about calling `vsock_remove_sock()` in 
-virtio_transport_recv_connected:
-
-I mean this block:
-	case VIRTIO_VSOCK_OP_SHUTDOWN:
-		if (le32_to_cpu(hdr->flags) & VIRTIO_VSOCK_SHUTDOWN_RCV)
-			vsk->peer_shutdown |= RCV_SHUTDOWN;
-		if (le32_to_cpu(hdr->flags) & VIRTIO_VSOCK_SHUTDOWN_SEND)
-			vsk->peer_shutdown |= SEND_SHUTDOWN;
-		if (vsk->peer_shutdown == SHUTDOWN_MASK) {
-			if (vsock_stream_has_data(vsk) <= 0 && !sock_flag(sk, SOCK_DONE)) {
-				(void)virtio_transport_reset(vsk, NULL);
-				virtio_transport_do_close(vsk, true);
-			}
-			/* Remove this socket anyway because the remote peer sent
-			 * the shutdown. This way a new connection will succeed
-			 * if the remote peer uses the same source port,
-			 * even if the old socket is still unreleased, but now disconnected.
-			 */
-			vsock_remove_sock(vsk);
-		}
-
-After commit fcdd2242c023 ("vsock: Keep the binding until socket 
-destruction") calling `vsock_remove_sock` without SOCK_DEAD set, removes 
-the socket only from the connected list.
-
-So, IMHO there is a real change, but I'm not sure if it's an issue or 
-not, since the issue fixed by commit 3a5cc90a4d17 ("vsock/virtio: remove 
-socket from connected/bound list on shutdown") was more about the remote 
-port IIRC, so that should only be affected by the connected list, which 
-is stll touched now.
-
-Stefano
-
+Why skb path is not enough?
 
