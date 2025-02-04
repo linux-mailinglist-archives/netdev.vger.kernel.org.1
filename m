@@ -1,182 +1,164 @@
-Return-Path: <netdev+bounces-162676-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-162677-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id CABD2A2797B
-	for <lists+netdev@lfdr.de>; Tue,  4 Feb 2025 19:13:15 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 14FAEA27981
+	for <lists+netdev@lfdr.de>; Tue,  4 Feb 2025 19:13:56 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 456863A5DA2
-	for <lists+netdev@lfdr.de>; Tue,  4 Feb 2025 18:13:07 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 0171218823C4
+	for <lists+netdev@lfdr.de>; Tue,  4 Feb 2025 18:13:57 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3999D217652;
-	Tue,  4 Feb 2025 18:12:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DB51921770C;
+	Tue,  4 Feb 2025 18:13:35 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="dqW31Xwq"
+	dkim=pass (1024-bit key) header.d=fastly.com header.i=@fastly.com header.b="DN1Y8Q+O"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-il1-f176.google.com (mail-il1-f176.google.com [209.85.166.176])
+Received: from mail-pj1-f48.google.com (mail-pj1-f48.google.com [209.85.216.48])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 846A221323A;
-	Tue,  4 Feb 2025 18:12:57 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.176
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 58CDE21766E
+	for <netdev@vger.kernel.org>; Tue,  4 Feb 2025 18:13:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.48
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1738692779; cv=none; b=BjfeIiFXbxt9F79bghhel7XMN4THS8iec9fCfpxYnzdULOo3n493zA3brk2nxyRMSDeVAkg/QkQqhgiHt3E9xPgGaijufl+K7hX3SyuIP7w5AnDPRqGp6qfSELjPIxSdUs/cvXnCxT7F0ynS469Q+1PbiCy9KewB3ZxZ3XES2F0=
+	t=1738692815; cv=none; b=KMb72MRnhcmnI1l86ZY4QjkagHMBS4LYaBq+vzcRh9xsTS4YC6lg02A16/rhujf1VLRtqeO//EMbjRsXGNIADclcebwZ3NnZq8DiU+UGESP9BaFSniiCb9bDTSQwcKRznkoPxq1S4wtQpSoB0New74+nflGpVFNgDiE1QvSy2U0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1738692779; c=relaxed/simple;
-	bh=CYz20IyBdL4tx0KlOWGbshrZwaiBf8bN31w6HGh0JTE=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=Q2ni0WpJPehaGU9Kkl6TwCWa7Pkp48nxqtNGXhCAPDIPUxt/ueEpm6C91G9ak0Q/EShJhN5QWVGFQHUYAyfiUK4sS+bDrNAe5qejQIxOvXVQHcT5O6Z3DKMZugQxXDKrUaYlEeWOjeDG6Y/voDhZKHL6iiDkGcRABoIslYBU+wU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=dqW31Xwq; arc=none smtp.client-ip=209.85.166.176
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-il1-f176.google.com with SMTP id e9e14a558f8ab-3cf880d90bdso19839495ab.3;
-        Tue, 04 Feb 2025 10:12:57 -0800 (PST)
+	s=arc-20240116; t=1738692815; c=relaxed/simple;
+	bh=ABeCt5RQl/OtYqxEp27acHnOBV6LCKQEjwGGJd4EmN0=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=q1wTbMZ8KRmvfAzNa+amCl7BDMP8R8KQ5YPjeSDQJ45Ab3Upx82o8cKyXcoaXocUQW9GcPYTlGpwvC1jd0lp3pxXN63yqmmD41cHEHvYKnKYzOlNFeEs5zB/Cydm1UxHdEftMtGqrzxI2WD9UUFyEbeU1TkJLEVAu2GYUN90HpI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fastly.com; spf=pass smtp.mailfrom=fastly.com; dkim=pass (1024-bit key) header.d=fastly.com header.i=@fastly.com header.b=DN1Y8Q+O; arc=none smtp.client-ip=209.85.216.48
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fastly.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=fastly.com
+Received: by mail-pj1-f48.google.com with SMTP id 98e67ed59e1d1-2f4448bf96fso7631155a91.0
+        for <netdev@vger.kernel.org>; Tue, 04 Feb 2025 10:13:33 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1738692776; x=1739297576; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=CYz20IyBdL4tx0KlOWGbshrZwaiBf8bN31w6HGh0JTE=;
-        b=dqW31Xwq381+GeettufxoZmZHLXg69YLHHFGqIpYM5p8gwWDiSefDV/ngUksDqa2Qr
-         HXL83vySyPQjdhZ667LS7Ucq9YwecZ5HttFxyUdoFdABcIJ7lOb1GbdplHeK5/sDfwdb
-         i5hdl9m5BnUTQER/0VFg+BBNaMBHfakyEwhx80W4HBlVb5bfRDkBrcVwm3MjDm7IrEON
-         tuMEEwNc2JtEQ25oBuLYOOMM+ezpDV2HKBHg7qkMhlr+Sh5KdEqIvoUX23QD/StRXK+g
-         CBowGxlGYrasRiir053y1XC+ZBRJuU1YGyACU+yJgm9ZAIuu2xxlLiaD8aVrRCh03r/Y
-         MVrQ==
+        d=fastly.com; s=google; t=1738692812; x=1739297612; darn=vger.kernel.org;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:mail-followup-to:message-id:subject:cc:to
+         :from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=+jOlwUXhleVpVW96ZqZRH18mvt7irgV17WG7W+qTWSs=;
+        b=DN1Y8Q+O1fBxmpn2nOOamIDNIcD6G+DsWo5nA+DbgO4KnE2LvOLLZ3Fa1374qdc7re
+         /3e92a1lkjqwbN0wFCribyEIGO8AgcXLJHmwY+SVVZoh3iePV7xWtl5TvvL32q4e9aJE
+         s/Xsm427ly0+CjokCSAfSqA/Qdy7F/K+Txomc=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1738692776; x=1739297576;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=CYz20IyBdL4tx0KlOWGbshrZwaiBf8bN31w6HGh0JTE=;
-        b=gphKvwUM/bASSOLxduxXZPq0TRcl+evDmOor6/HfvJxxEGg+DjK3zoFNa6lTPgyjTF
-         VrmuL3GHMguyT972urJ0uiWhjz3iWP1UftB3hITGvHkMTuH/xArR/VfkCFhQFjMw/JRl
-         uC2LUm47LnfokdVf8xloD4fXXsp3TUcGEtFWY1VDUuoNUqv3wYoK/tZ+f0JFzh2s+t0R
-         psHaUpysrUvCJMDbNdIn0XrMe54guHdVoXerKyNlBdIWeRUHWln9+Uf3f/fha5zVXmaW
-         w/l3Nb0shxSuMHKrj55FJZwmlUsZ2MPp/ZrnWrh++yReL+ORyhFwMtbclifenXGFm+Nh
-         DG5Q==
-X-Forwarded-Encrypted: i=1; AJvYcCULJmrrlCSMNg+eluzWGy9CGEpqUvYLxuDUVZIs2Cp9ZDfI8uTFbR+b7WGeG3Cl4w8tXnI=@vger.kernel.org, AJvYcCUs/Xgk/GpJaHWqejw2a8aTLR3wvllTZyBTj8984DT+/7VlhRQWnh4+yWfLWDwmI8vb7Ls+UlsG@vger.kernel.org
-X-Gm-Message-State: AOJu0Yx/nTYNyWTj/3e4vGSvgCQ/n2g4AWjjjA/GCtmTOFLnveFJOODy
-	2ZtZvkO7R2VVjpGtv8BiCIRjSXB15nV9taysaazuxqyAPKd+xsX2VSfgkCtIc3O6+xIVKdjUnpD
-	5oKG1+uwXHgBL/iGDSem3uD5V3y8=
-X-Gm-Gg: ASbGncst9sVzB465R6he9C1JvuPlYTv7rKWOc3QUbRwiIxFmm4HSZNYzQvVMz5405YC
-	BeY2efK5yEJQDD0u/rzIhyfsdNNZhXrPL/YKKCzOWNY/VUGVGaVR8xFQ1cbHFxWI2MDjObpI=
-X-Google-Smtp-Source: AGHT+IE9Zk1ylTm7CfFOdgB4WGBylyDh4Xr37dJnRaU1T1MqTAuNF3elTkgltrftpxCxvR53xK5bj4hsVvzWmHgTRJI=
-X-Received: by 2002:a92:c547:0:b0:3a7:87f2:b010 with SMTP id
- e9e14a558f8ab-3cffe3d1bd8mr221526295ab.5.1738692776529; Tue, 04 Feb 2025
- 10:12:56 -0800 (PST)
+        d=1e100.net; s=20230601; t=1738692812; x=1739297612;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:mail-followup-to:message-id:subject:cc:to
+         :from:date:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=+jOlwUXhleVpVW96ZqZRH18mvt7irgV17WG7W+qTWSs=;
+        b=HIxmjUtidTdbZ1F5hYiDmRD3OHDQMXUCJNIrTZQkXF8/YW9JFgO4W1l68z8x3cGG17
+         /nRyIowmmYiPdXT4tSs5ZZ7YlVuO4HcAfLvqZBPnRVvgS9x63opPWH2x/bsNVFHM0vF9
+         ZewGgztqvYSsoJnHJ6zKcM8iEPcJKz3I81nLf0J8A0Dr7aeJVvgM31VwrHg/AlWisJyS
+         Talmta7C751wI4QAsPCuXu5wgepOcq5o6OGOuflY8pykY/9ZG7k/MnMQQluNZOBqcaCM
+         4z6Lba/vpBUUDTdk3K0XwPUrQoFm0FcbQl5/iG78UAi6wj2agZit4+iex/T6WXlozLz/
+         v0HA==
+X-Gm-Message-State: AOJu0Yydxj+G2bUIlT4c+r9aFb2nM0KA8WO1SfaRh6Y1qn3u5AvYBrLn
+	pKlGFIhNqnTKnD7avDrVZP1T1MoEZJ6Y+kqkur5h7f7Ft3x72IJpBJiTyplGNkA=
+X-Gm-Gg: ASbGncsF31Xxx4Kxe863S0aVeYIBr//A3ieVjGLOlLdU2zal7iYrqZC9FkaqRtjd5vV
+	vC3vqTBSwct6wzEOfxwZrr2gsQl8klw7lmts3yElV01Pe8xq5SijbppamZiYtukmCmxU26xJOMu
+	rDR+Xl4UnYjELzKn+Edrby8Fx6n8OmhvKtZdrRMTsEAHpMLV7pJtf05A1hGmvsIRu/Fi8PRcAXZ
+	Ijnkddm933Q8SgQB/cQDJ0vd5FwwvHoZx/z71qjRMrQ2AktLpUl3UBRPM7yXHrnUI1zMQnkG6t8
+	yXpHA2c6rcskIH/oUdBcJFYul1CCqoZ9PopP73gFb0Xg830/k91CfjGuuQ==
+X-Google-Smtp-Source: AGHT+IFtjkOAfwfYO8hVjlh+QcCog+25LHHkluPpKbr5sJcAhRMEZztXzq6nUMVz1VaTaoEequ5dZw==
+X-Received: by 2002:a17:90b:2c84:b0:2ee:b2e6:4275 with SMTP id 98e67ed59e1d1-2f83ac65958mr33338939a91.26.1738692812469;
+        Tue, 04 Feb 2025 10:13:32 -0800 (PST)
+Received: from LQ3V64L9R2 (c-24-6-151-244.hsd1.ca.comcast.net. [24.6.151.244])
+        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-2f83bc97d25sm13987346a91.5.2025.02.04.10.13.31
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 04 Feb 2025 10:13:32 -0800 (PST)
+Date: Tue, 4 Feb 2025 10:13:29 -0800
+From: Joe Damato <jdamato@fastly.com>
+To: Eric Dumazet <edumazet@google.com>
+Cc: netdev@vger.kernel.org, kuba@kernel.org,
+	"David S. Miller" <davem@davemloft.net>,
+	Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>,
+	Amritha Nambiar <amritha.nambiar@intel.com>,
+	Mina Almasry <almasrymina@google.com>,
+	open list <linux-kernel@vger.kernel.org>
+Subject: Re: [PATCH net-next v2] netdev-genl: Elide napi_id when not present
+Message-ID: <Z6JYyak3nuQaJNgJ@LQ3V64L9R2>
+Mail-Followup-To: Joe Damato <jdamato@fastly.com>,
+	Eric Dumazet <edumazet@google.com>, netdev@vger.kernel.org,
+	kuba@kernel.org, "David S. Miller" <davem@davemloft.net>,
+	Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>,
+	Amritha Nambiar <amritha.nambiar@intel.com>,
+	Mina Almasry <almasrymina@google.com>,
+	open list <linux-kernel@vger.kernel.org>
+References: <20250203191714.155526-1-jdamato@fastly.com>
+ <CANn89i+vf5=6f8kuZKCmP66P1LWGmAj06i+NhgqpFLVR8K5bEA@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250128084620.57547-1-kerneljasonxing@gmail.com>
- <2706706c-3d85-4f43-ad91-d04bbb4f2b92@linux.dev> <CAL+tcoAXcDuAsy6rqGBh3Sb1dkdZ0xn6YFCQec-K6QSPyaVwEA@mail.gmail.com>
- <67a24a4f8af27_bb566294bd@willemb.c.googlers.com.notmuch>
-In-Reply-To: <67a24a4f8af27_bb566294bd@willemb.c.googlers.com.notmuch>
-From: Jason Xing <kerneljasonxing@gmail.com>
-Date: Wed, 5 Feb 2025 02:12:19 +0800
-X-Gm-Features: AWEUYZlVxc_iy5Q7A4DbFKD-24NyCtpKGeKlsqSkA38EcadyYPZR5CCPL5j2q50
-Message-ID: <CAL+tcoBiRrB+_p=W-EwRL-Dqa2kWY-yAWTNurbpF10DG96=Q6Q@mail.gmail.com>
-Subject: Re: [PATCH bpf-next v7 00/13] net-timestamp: bpf extension to equip
- applications transparently
-To: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
-Cc: Martin KaFai Lau <martin.lau@linux.dev>, davem@davemloft.net, edumazet@google.com, 
-	kuba@kernel.org, pabeni@redhat.com, dsahern@kernel.org, willemb@google.com, 
-	ast@kernel.org, daniel@iogearbox.net, andrii@kernel.org, eddyz87@gmail.com, 
-	song@kernel.org, yonghong.song@linux.dev, john.fastabend@gmail.com, 
-	kpsingh@kernel.org, sdf@fomichev.me, haoluo@google.com, jolsa@kernel.org, 
-	horms@kernel.org, bpf@vger.kernel.org, netdev@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <CANn89i+vf5=6f8kuZKCmP66P1LWGmAj06i+NhgqpFLVR8K5bEA@mail.gmail.com>
 
-On Wed, Feb 5, 2025 at 1:11=E2=80=AFAM Willem de Bruijn
-<willemdebruijn.kernel@gmail.com> wrote:
->
-> Jason Xing wrote:
-> > On Tue, Feb 4, 2025 at 10:27=E2=80=AFAM Martin KaFai Lau <martin.lau@li=
-nux.dev> wrote:
-> > >
-> > > On 1/28/25 12:46 AM, Jason Xing wrote:
-> > > > "Timestamping is key to debugging network stack latency. With
-> > > > SO_TIMESTAMPING, bugs that are otherwise incorrectly assumed to be
-> > > > network issues can be attributed to the kernel." This is extracted
-> > > > from the talk "SO_TIMESTAMPING: Powering Fleetwide RPC Monitoring"
-> > > > addressed by Willem de Bruijn at netdevconf 0x17).
-> > > >
-> > > > There are a few areas that need optimization with the consideration=
- of
-> > > > easier use and less performance impact, which I highlighted and mai=
-nly
-> > > > discussed at netconf 2024 with Willem de Bruijn and John Fastabend:
-> > > > uAPI compatibility, extra system call overhead, and the need for
-> > > > application modification. I initially managed to solve these issues
-> > > > by writing a kernel module that hooks various key functions. Howeve=
-r,
-> > > > this approach is not suitable for the next kernel release. Therefor=
-e,
-> > > > a BPF extension was proposed. During recent period, Martin KaFai La=
-u
-> > > > provides invaluable suggestions about BPF along the way. Many thank=
-s
-> > > > here!
-> > > >
-> > > > In this series, I only support foundamental codes and tx for TCP.
-> > >
-> > > *fundamental*.
-> > >
-> > > May be just "only tx time stamping for TCP is supported..."
-> > >
-> > > > This approach mostly relies on existing SO_TIMESTAMPING feature, us=
-ers
-> > > > only needs to pass certain flags through bpf_setsocktopt() to a sep=
-arate
-> > > > tsflags. Please see the last selftest patch in this series.
-> > > >
-> > > > After this series, we could step by step implement more advanced
-> > > > functions/flags already in SO_TIMESTAMPING feature for bpf extensio=
-n.
-> > >
-> > > Patch 1-4 and 6-11 can use an extra "bpf:" tag in the subject line. P=
-atch 13
-> > > should be "selftests/bpf:" instead of "bpf:" in the subject.
-> > >
-> > > Please revisit the commit messages of this patch set to check for out=
-dated
-> > > comments from the earlier revisions. I may have missed some of them.
+On Tue, Feb 04, 2025 at 06:41:34AM +0100, Eric Dumazet wrote:
+> On Mon, Feb 3, 2025 at 8:17 PM Joe Damato <jdamato@fastly.com> wrote:
 > >
-> > Roger that, sir. Thanks for your help!
+> > There are at least two cases where napi_id may not present and the
+> > napi_id should be elided:
 > >
-> > >
-> > > Overall, it looks close. I will review at your replies later.
-> > >
-> > > Willem, could you also take a look? Thanks.
+> > 1. Queues could be created, but napi_enable may not have been called
+> >    yet. In this case, there may be a NAPI but it may not have an ID and
+> >    output of a napi_id should be elided.
 > >
-> > Right, some related parts need reviews from netdev experts as well.
+> > 2. TX-only NAPIs currently do not have NAPI IDs. If a TX queue happens
+> >    to be linked with a TX-only NAPI, elide the NAPI ID from the netlink
+> >    output as a NAPI ID of 0 is not useful for users.
 > >
-> > Willem, please help me review this when you're available. No rush :)
->
-> I won't have much to add for the BPF side, to be clear.
->
-> One small high level commit message point: as submitting-patches
-> suggests, use imperative mood: "adds X" when the patch introduces a
-> feature, not "I add". And "caller gets" rather than "we get".
->
-> Specific case, with capitalization issue: "we need to Introduce".
+> > Signed-off-by: Joe Damato <jdamato@fastly.com>
+> > ---
+> >  v2:
+> >    - Updated to elide NAPI IDs for RX queues which may have not called
+> >      napi_enable yet.
+> >
+> >  rfc: https://lore.kernel.org/lkml/20250128163038.429864-1-jdamato@fastly.com/
+> >  net/core/netdev-genl.c | 14 ++++++++------
+> >  1 file changed, 8 insertions(+), 6 deletions(-)
+> >
+> > diff --git a/net/core/netdev-genl.c b/net/core/netdev-genl.c
+> > index 715f85c6b62e..a97d3b99f6cd 100644
+> > --- a/net/core/netdev-genl.c
+> > +++ b/net/core/netdev-genl.c
+> > @@ -385,9 +385,10 @@ netdev_nl_queue_fill_one(struct sk_buff *rsp, struct net_device *netdev,
+> >         switch (q_type) {
+> >         case NETDEV_QUEUE_TYPE_RX:
+> >                 rxq = __netif_get_rx_queue(netdev, q_idx);
+> > -               if (rxq->napi && nla_put_u32(rsp, NETDEV_A_QUEUE_NAPI_ID,
+> > -                                            rxq->napi->napi_id))
+> > -                       goto nla_put_failure;
+> > +               if (rxq->napi && rxq->napi->napi_id >= MIN_NAPI_ID)
+> > +                       if (nla_put_u32(rsp, NETDEV_A_QUEUE_NAPI_ID,
+> > +                                       rxq->napi->napi_id))
+> > +                               goto nla_put_failure;
+> >
+> >                 binding = rxq->mp_params.mp_priv;
+> >                 if (binding &&
+> > @@ -397,9 +398,10 @@ netdev_nl_queue_fill_one(struct sk_buff *rsp, struct net_device *netdev,
+> >                 break;
+> >         case NETDEV_QUEUE_TYPE_TX:
+> >                 txq = netdev_get_tx_queue(netdev, q_idx);
+> > -               if (txq->napi && nla_put_u32(rsp, NETDEV_A_QUEUE_NAPI_ID,
+> > -                                            txq->napi->napi_id))
+> > -                       goto nla_put_failure;
+> > +               if (txq->napi && txq->napi->napi_id >= MIN_NAPI_ID)
+> > +                       if (nla_put_u32(rsp, NETDEV_A_QUEUE_NAPI_ID,
+> > +                                       txq->napi->napi_id))
+> > +                               goto nla_put_failure;
+> >         }
+> 
+> Hi Joe
+> 
+> This might be time to add helpers, we now have these checks about
+> MIN_NAPI_ID all around the places.
 
-Thanks for learning a new lesson. I will adjust them.
-
->
-> I'll respond to a few inline code elements later. Nothing huge.
-> Also feel free to post the next version and I'll respond to that, if
-> you prefer.
-
-I will post v8 soon. Thanks for your precious time. Have fun with your trip=
- :p
-
-Thanks,
-Jason
+Thanks that's a good idea. I'll add that for the v3.
 
