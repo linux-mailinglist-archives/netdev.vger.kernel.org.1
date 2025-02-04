@@ -1,34 +1,34 @@
-Return-Path: <netdev+bounces-162666-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-162664-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 011E6A27903
-	for <lists+netdev@lfdr.de>; Tue,  4 Feb 2025 18:53:25 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 00580A27901
+	for <lists+netdev@lfdr.de>; Tue,  4 Feb 2025 18:53:14 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 78F6A1887FA0
-	for <lists+netdev@lfdr.de>; Tue,  4 Feb 2025 17:53:25 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 8DB231887E83
+	for <lists+netdev@lfdr.de>; Tue,  4 Feb 2025 17:53:16 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4FADF216E09;
-	Tue,  4 Feb 2025 17:52:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1D90A21660A;
+	Tue,  4 Feb 2025 17:52:58 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="G+H5aNWt"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="GQJ1HVjM"
 X-Original-To: netdev@vger.kernel.org
 Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.16])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 548F22165E4
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 548542165E0
 	for <netdev@vger.kernel.org>; Tue,  4 Feb 2025 17:52:56 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.16
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1738691579; cv=none; b=N2ouyhO4fQ4WDVADLmJ/IloRCMScsr3KbGZOOVd0hlI9vvFrvbAJuUGqVdj8LNuMDiInW5d0Gl9AACvU81kQdIYBvFapx5N0nqKxQ6PxYeUuDw7gsN9dpYlOLuW1wkSKczjPuuKUowJaFz3xkKc4gkHWGrf5cV8gYr9TsbfalHY=
+	t=1738691578; cv=none; b=eekFE5Igt7e4BjIKuT+2BJyZAn5NGnG6Z5wpBCv7QksGZgWMI9l5slrcFRdvR6zaI44qahALC6RC3zPueiE1a3of0uLcwJA0YBaBFwOxD18xqk75ksX4jPICwvusSySal9V9D8PG6P4KmM9KEhruQtGjixM60YJ0YxIGbpJ7Nh8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1738691579; c=relaxed/simple;
-	bh=Ij5+AAvOEp0oI4NlaPmZaEL3V4o/dX6CD6vtMOaL+9M=;
+	s=arc-20240116; t=1738691578; c=relaxed/simple;
+	bh=FYdWzTpcxPkf0D2vrnuywRxJdpODKh0DW9jB4ZCwYoY=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=bgQ0XciEPL1opko2By/FLuKjTPO+Nla0yvQPeYkz0KiHZ7PmPhKZICFTsPGu+DZ6drnlD+KtftqfEtjPN2uzKRGsPUXrzv/RoaZR1LqYO7SZ2vetxmhbWIioM0s2oyRKmuWB2XFaW/5KusdQ3SxyL7bQ8urcOComw7IJTQJywac=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=G+H5aNWt; arc=none smtp.client-ip=198.175.65.16
+	 MIME-Version; b=tnPRST8Toh6S2AdoGd8T2AqLNQH7WbBKvb8FFqv/4PV8KduST3i5yZZ/MdYV1IsJbdiiOxGW6yPz9JB9x04V7tRY1nXb7aPwk0s+Fxb+OzO70iaEKzVoiWJ+fb0ukh9xXs3GKWMDrUHrGbL6vZPDQRd06AWkwajfdNFHB6tbvf0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=GQJ1HVjM; arc=none smtp.client-ip=198.175.65.16
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
@@ -36,26 +36,26 @@ DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   t=1738691577; x=1770227577;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=Ij5+AAvOEp0oI4NlaPmZaEL3V4o/dX6CD6vtMOaL+9M=;
-  b=G+H5aNWtcgsHXbWrOJeZvpwplWkkTuVIxMwk/JSRklXbd0EuMeFj4PXP
-   LBPKX0Yz8Y6Pm6+4hoUe5VKSehG4elyKOFVfSxRH26P1ZCDE01N854IHv
-   drSgCWIlm4GW3bEDF106SjJknDJOtnBzAqspmyPlZWnEVKTxElLNGWMEj
-   WlhGS8+pIpg+H3v6d6BlmJM8f0hpdvV4EQoTkOnQEhvSNvJT4kCRv7kUJ
-   4WPqQ9mAs7sQ7pEdA7u3igFSQ/GUhHbBh9xPcOcnRCeGZRPFv6mXu9NYL
-   s8s5ELGVoDrVs3TduLUTc9ceSOx6yoAdoF/QT+Q3O7KoWsVtY+j2Qj/8b
-   A==;
-X-CSE-ConnectionGUID: X1fFGUzkT/C8MapDN73oZA==
-X-CSE-MsgGUID: WedJB6wHS1i6FT8kzPdPeQ==
-X-IronPort-AV: E=McAfee;i="6700,10204,11336"; a="39371886"
+  bh=FYdWzTpcxPkf0D2vrnuywRxJdpODKh0DW9jB4ZCwYoY=;
+  b=GQJ1HVjM5IKxgVrSFCrqg1SSqnsZB0zSlSQu/b4GlN2u1dJzQG4xTdDm
+   696LJVOSu19qtH7sb12G04qhr8jx28hnRSnVoQKk0yWRcZ9S5yqi2UyBV
+   MA8JVmu+InHjhzdMVGyDU9JlHWCEL2dzlcutHT/RlS2p6luc6CI7Ynk4C
+   mUD4obFSkNMrfDy8TBOX6FDSe2hpjnu6BF12HwpGUtRWUjgYnV6Vw7XCB
+   CtBWfRfUfiJXz+SqGrNUjh720nHV9mzy+298sfKaC0x5inHAzZUeykzqv
+   DJCNJQIzvIe6SD+rNgHSPBD8YJLpavvCkhBGtHxdJK+aReYrDuo7M6O4c
+   Q==;
+X-CSE-ConnectionGUID: P54LWji2QauNo8bfcrFodQ==
+X-CSE-MsgGUID: g2s8Nc5cRdekB7qqztlHBQ==
+X-IronPort-AV: E=McAfee;i="6700,10204,11336"; a="39371896"
 X-IronPort-AV: E=Sophos;i="6.13,259,1732608000"; 
-   d="scan'208";a="39371886"
+   d="scan'208";a="39371896"
 Received: from orviesa006.jf.intel.com ([10.64.159.146])
   by orvoesa108.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 04 Feb 2025 09:52:54 -0800
-X-CSE-ConnectionGUID: wKHizxhkSN24MAHp/mtT9g==
-X-CSE-MsgGUID: rypIaQFbQb67jBu8T0tSfA==
+X-CSE-ConnectionGUID: 3W+/JMlsRw+s2Dj99EDLPQ==
+X-CSE-MsgGUID: 2IRSlQ1hSWGEeO+Ja6xtuw==
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="6.13,259,1732608000"; 
-   d="scan'208";a="110652390"
+   d="scan'208";a="110652396"
 Received: from anguy11-upstream.jf.intel.com ([10.166.9.133])
   by orviesa006.jf.intel.com with ESMTP; 04 Feb 2025 09:52:53 -0800
 From: Tony Nguyen <anthony.l.nguyen@intel.com>
@@ -73,11 +73,10 @@ Cc: Wander Lairson Costa <wander@redhat.com>,
 	jgarzik@redhat.com,
 	yuma@redhat.com,
 	linux-rt-devel@lists.linux.dev,
-	Clark Williams <williams@redhat.com>,
 	Rafal Romanowski <rafal.romanowski@intel.com>
-Subject: [PATCH net 2/4] igb: introduce raw vfs_lock to igb_adapter
-Date: Tue,  4 Feb 2025 09:52:38 -0800
-Message-ID: <20250204175243.810189-3-anthony.l.nguyen@intel.com>
+Subject: [PATCH net 3/4] igb: split igb_msg_task()
+Date: Tue,  4 Feb 2025 09:52:39 -0800
+Message-ID: <20250204175243.810189-4-anthony.l.nguyen@intel.com>
 X-Mailer: git-send-email 2.47.1
 In-Reply-To: <20250204175243.810189-1-anthony.l.nguyen@intel.com>
 References: <20250204175243.810189-1-anthony.l.nguyen@intel.com>
@@ -91,133 +90,153 @@ Content-Transfer-Encoding: 8bit
 
 From: Wander Lairson Costa <wander@redhat.com>
 
-This change adds a raw_spinlock for the vfs_lock to the
-igb_adapter structure, enabling its use in both interrupt and
-preemptible contexts. This is essential for upcoming modifications
-to split igb_msg_task() into interrupt-safe and preemptible-safe
-parts.
+From the perspective of PREEMPT_RT, igb_msg_task() invokes functions
+that are a mix of IRQ-safe and non-IRQ-safe operations.
 
-The motivation for this change stems from the need to modify
-igb_msix_other() to run in interrupt context under PREEMPT_RT.
-Currently, igb_msg_task() contains a code path that invokes
-kcalloc() with the GFP_ATOMIC flag. However, on PREEMPT_RT,
-GFP_ATOMIC is not honored, making it unsafe to call allocation
-functions in interrupt context. By introducing this raw spinlock,
-we can safely acquire the lock in both contexts, paving the way for
-the necessary restructuring of igb_msg_task().
+To address this, we separate igb_msg_task() into distinct IRQ-safe and
+preemptible-safe components. This is a preparatory step for upcoming
+commits, where the igb_msix_other interrupt handler will be split into
+IRQ and threaded handlers, each invoking the appropriate part of the
+newly divided igb_msg_task().
 
 Signed-off-by: Wander Lairson Costa <wander@redhat.com>
-Suggested-by: Clark Williams <williams@redhat.com>
 Tested-by: Rafal Romanowski <rafal.romanowski@intel.com>
 Signed-off-by: Tony Nguyen <anthony.l.nguyen@intel.com>
 ---
- drivers/net/ethernet/intel/igb/igb.h      |  4 ++
- drivers/net/ethernet/intel/igb/igb_main.c | 51 ++++++++++++++++++++---
- 2 files changed, 50 insertions(+), 5 deletions(-)
+ drivers/net/ethernet/intel/igb/igb_main.c | 88 +++++++++++++++++++++--
+ 1 file changed, 81 insertions(+), 7 deletions(-)
 
-diff --git a/drivers/net/ethernet/intel/igb/igb.h b/drivers/net/ethernet/intel/igb/igb.h
-index 02f340280d20..30a188c5710e 100644
---- a/drivers/net/ethernet/intel/igb/igb.h
-+++ b/drivers/net/ethernet/intel/igb/igb.h
-@@ -673,6 +673,10 @@ struct igb_adapter {
- 	struct vf_mac_filter *vf_mac_list;
- 	/* lock for VF resources */
- 	spinlock_t vfs_lock;
-+#ifdef CONFIG_PREEMPT_RT
-+	/* Used to lock VFS in interrupt context under PREEMPT_RT */
-+	raw_spinlock_t raw_vfs_lock;
-+#endif
- };
- 
- /* flags controlling PTP/1588 function */
 diff --git a/drivers/net/ethernet/intel/igb/igb_main.c b/drivers/net/ethernet/intel/igb/igb_main.c
-index 77571f6fdbfd..4e75c88f6214 100644
+index 4e75c88f6214..6d590192c27f 100644
 --- a/drivers/net/ethernet/intel/igb/igb_main.c
 +++ b/drivers/net/ethernet/intel/igb/igb_main.c
-@@ -3657,6 +3657,47 @@ static int igb_probe(struct pci_dev *pdev, const struct pci_device_id *ent)
- 	return err;
+@@ -146,6 +146,8 @@ static int igb_vlan_rx_kill_vid(struct net_device *, __be16, u16);
+ static void igb_restore_vlan(struct igb_adapter *);
+ static void igb_rar_set_index(struct igb_adapter *, u32);
+ static void igb_ping_all_vfs(struct igb_adapter *);
++static void igb_msg_task_irq_safe(struct igb_adapter *adapter);
++static void igb_msg_task_preemptible_safe(struct igb_adapter *adapter);
+ static void igb_msg_task(struct igb_adapter *);
+ static void igb_vmm_control(struct igb_adapter *);
+ static int igb_set_vf_mac(struct igb_adapter *, int, unsigned char *);
+@@ -3681,6 +3683,30 @@ static __always_inline void vfs_unlock_irqrestore(struct igb_adapter *adapter,
+ 	raw_spin_unlock_irqrestore(&adapter->raw_vfs_lock, flags);
+ 	spin_unlock_irqrestore(&adapter->vfs_lock, flags);
  }
- 
-+#ifdef CONFIG_PREEMPT_RT
-+static __always_inline void vfs_lock_init(struct igb_adapter *adapter)
++
++static __always_inline void vfs_spin_lock_irqsave(struct igb_adapter *adapter,
++						  unsigned long *flags)
 +{
-+	spin_lock_init(&adapter->vfs_lock);
-+	raw_spin_lock_init(&adapter->raw_vfs_lock);
++	spin_lock_irqsave(&adapter->vfs_lock, *flags);
 +}
 +
-+static __always_inline void vfs_lock_irqsave(struct igb_adapter *adapter,
-+					     unsigned long *flags)
++static __always_inline void vfs_spin_unlock_irqrestore(struct igb_adapter *adapter,
++						       unsigned long flags)
 +{
-+	/*
-+	 * Remember that under PREEMPT_RT spin_lock_irqsave
-+	 * ignores the flags parameter
-+	 */
-+	spin_lock_irqsave(&adapter->vfs_lock, *flags);
++	spin_unlock_irqrestore(&adapter->vfs_lock, flags);
++}
++
++static __always_inline void vfs_raw_spin_lock_irqsave(struct igb_adapter *adapter,
++						      unsigned long *flags)
++{
 +	raw_spin_lock_irqsave(&adapter->raw_vfs_lock, *flags);
 +}
 +
-+static __always_inline void vfs_unlock_irqrestore(struct igb_adapter *adapter,
-+						  unsigned long flags)
++static __always_inline void vfs_raw_spin_unlock_irqrestore(struct igb_adapter *adapter,
++							   unsigned long flags)
 +{
 +	raw_spin_unlock_irqrestore(&adapter->raw_vfs_lock, flags);
-+	spin_unlock_irqrestore(&adapter->vfs_lock, flags);
 +}
-+#else
-+static __always_inline void vfs_lock_init(struct igb_adapter *adapter)
-+{
-+	spin_lock_init(&adapter->vfs_lock);
-+}
+ #else
+ static __always_inline void vfs_lock_init(struct igb_adapter *adapter)
+ {
+@@ -3696,6 +3722,30 @@ static __always_inline void vfs_unlock_irqrestore(struct igb_adapter *adapter, u
+ {
+ 	spin_unlock_irqrestore(&adapter->vfs_lock, flags);
+ }
 +
-+static __always_inline void vfs_lock_irqsave(struct igb_adapter *adapter, unsigned long *flags)
++static __always_inline void vfs_spin_lock_irqsave(struct igb_adapter *adapter,
++						  unsigned long *flags)
 +{
 +	spin_lock_irqsave(&adapter->vfs_lock, *flags);
 +}
 +
-+static __always_inline void vfs_unlock_irqrestore(struct igb_adapter *adapter, unsigned long flags)
++static __always_inline void vfs_spin_unlock_irqrestore(struct igb_adapter *adapter,
++						       unsigned long flags)
 +{
 +	spin_unlock_irqrestore(&adapter->vfs_lock, flags);
 +}
-+#endif
 +
- #ifdef CONFIG_PCI_IOV
- static int igb_sriov_reinit(struct pci_dev *dev)
- {
-@@ -3707,9 +3748,9 @@ static int igb_disable_sriov(struct pci_dev *pdev, bool reinit)
- 			pci_disable_sriov(pdev);
- 			msleep(500);
- 		}
--		spin_lock_irqsave(&adapter->vfs_lock, flags);
-+		vfs_lock_irqsave(adapter, &flags);
- 		adapter->vfs_allocated_count = 0;
--		spin_unlock_irqrestore(&adapter->vfs_lock, flags);
-+		vfs_unlock_irqrestore(adapter, flags);
- 		kfree(adapter->vf_mac_list);
- 		adapter->vf_mac_list = NULL;
- 		kfree(adapter->vf_data);
-@@ -4042,7 +4083,7 @@ static int igb_sw_init(struct igb_adapter *adapter)
- 	spin_lock_init(&adapter->stats64_lock);
++static __always_inline void vfs_raw_spin_lock_irqsave(struct igb_adapter *adapter,
++						      unsigned long *flags)
++{
++	spin_lock_irqsave(&adapter->vfs_lock, *flags);
++}
++
++static __always_inline void vfs_raw_spin_unlock_irqrestore(struct igb_adapter *adapter,
++							   unsigned long flags)
++{
++	spin_unlock_irqrestore(&adapter->vfs_lock, flags);
++}
+ #endif
  
- 	/* init spinlock to avoid concurrency of VF resources */
--	spin_lock_init(&adapter->vfs_lock);
-+	vfs_lock_init(adapter);
  #ifdef CONFIG_PCI_IOV
- 	switch (hw->mac.type) {
- 	case e1000_82576:
-@@ -8078,7 +8119,7 @@ static void igb_msg_task(struct igb_adapter *adapter)
+@@ -8113,27 +8163,51 @@ static void igb_rcv_msg_from_vf(struct igb_adapter *adapter, u32 vf)
+ 	igb_unlock_mbx(hw, vf);
+ }
+ 
+-static void igb_msg_task(struct igb_adapter *adapter)
++/*
++ * Note: the split of irq and preempible safe parts of igb_msg_task()
++ * only makes sense under PREEMPT_RT.
++ * The root cause of igb_rcv_msg_from_vf() is not IRQ safe is because
++ * it calls kcalloc with GFP_ATOMIC, but GFP_ATOMIC is not IRQ safe
++ * in PREEMPT_RT.
++ */
++static void igb_msg_task_irq_safe(struct igb_adapter *adapter)
+ {
+ 	struct e1000_hw *hw = &adapter->hw;
  	unsigned long flags;
  	u32 vf;
  
--	spin_lock_irqsave(&adapter->vfs_lock, flags);
-+	vfs_lock_irqsave(adapter, &flags);
+-	vfs_lock_irqsave(adapter, &flags);
++	vfs_raw_spin_lock_irqsave(adapter, &flags);
  	for (vf = 0; vf < adapter->vfs_allocated_count; vf++) {
  		/* process any reset requests */
  		if (!igb_check_for_rst(hw, vf))
-@@ -8092,7 +8133,7 @@ static void igb_msg_task(struct igb_adapter *adapter)
+ 			igb_vf_reset_event(adapter, vf);
+ 
+-		/* process any messages pending */
+-		if (!igb_check_for_msg(hw, vf))
+-			igb_rcv_msg_from_vf(adapter, vf);
+-
+ 		/* process any acks */
  		if (!igb_check_for_ack(hw, vf))
  			igb_rcv_ack_from_vf(adapter, vf);
  	}
--	spin_unlock_irqrestore(&adapter->vfs_lock, flags);
-+	vfs_unlock_irqrestore(adapter, flags);
+-	vfs_unlock_irqrestore(adapter, flags);
++	vfs_raw_spin_unlock_irqrestore(adapter, flags);
++}
++
++static void igb_msg_task_preemptible_safe(struct igb_adapter *adapter)
++{
++	struct e1000_hw *hw = &adapter->hw;
++	unsigned long flags;
++	u32 vf;
++
++	vfs_spin_lock_irqsave(adapter, &flags);
++	for (vf = 0; vf < adapter->vfs_allocated_count; vf++) {
++		/* process any messages pending */
++		if (!igb_check_for_msg(hw, vf))
++			igb_rcv_msg_from_vf(adapter, vf);
++	}
++	vfs_spin_unlock_irqrestore(adapter, flags);
++}
++
++static __always_inline void igb_msg_task(struct igb_adapter *adapter)
++{
++	igb_msg_task_irq_safe(adapter);
++	igb_msg_task_preemptible_safe(adapter);
  }
  
  /**
