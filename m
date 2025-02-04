@@ -1,134 +1,174 @@
-Return-Path: <netdev+bounces-162701-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-162702-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id A8A23A27A8E
-	for <lists+netdev@lfdr.de>; Tue,  4 Feb 2025 19:52:00 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 57A4BA27AA3
+	for <lists+netdev@lfdr.de>; Tue,  4 Feb 2025 19:54:11 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 40D0A1657CF
-	for <lists+netdev@lfdr.de>; Tue,  4 Feb 2025 18:51:59 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D4B62161D90
+	for <lists+netdev@lfdr.de>; Tue,  4 Feb 2025 18:54:09 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B74EC216E33;
-	Tue,  4 Feb 2025 18:51:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E206221884A;
+	Tue,  4 Feb 2025 18:54:06 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="JIEE3XJ6"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="Uuk3vdhJ"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.17])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ed1-f46.google.com (mail-ed1-f46.google.com [209.85.208.46])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AD0DD218AA3
-	for <netdev@vger.kernel.org>; Tue,  4 Feb 2025 18:51:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.17
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1AE47212FA5
+	for <netdev@vger.kernel.org>; Tue,  4 Feb 2025 18:54:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.46
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1738695115; cv=none; b=ipwlTZaq6iawmlbIIPkqzm1H/S6V6C6M29e9y4pIUiFsT1xKeGiaspQmVQMJIakmLeKXPzqQcr+jP3JhCP04ienn7lWEgrNxOaTSwsc0yZtGm1sJlSN4N/BbpE5nsAikfQn+PcvSm35Kz+rhhZRXbNLkEum0D6fTIzqvBeYa7DI=
+	t=1738695246; cv=none; b=ToYbIB79XElys1HNTqxeYfQhSO1l3pUc+V8ykkfwn8SpIG1KkzP992eYLvvqaMS5XrrKOgMsPNguXtw+Xk7akhtCekdfv93NCZ6bA4tP9MyTbup3np2RGDk1STjdj/3KO4/Nzl/qvHIdMGZYjEZYu8+02jJFAk+dDxEfYYJTNT0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1738695115; c=relaxed/simple;
-	bh=k7HIN2/4JNPmmW9EOwz5dmbwnDmMoY6rJ767bWiH8kM=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=SZCqxRhcNR0GyiG90wEOuX1rPDWKItGF0sq9/TMpp6GJ+wiFvoBAvbqxqpLA0YspKjccqffS4Kn8oC6foAtkLgGpLOVVGiwXEGrdM4lyMvZLuNtP3yPxy46uInh0xWIFr6G9l0UbRY4gHb55QsaQPtGExkxvjA/HqIIRTmHpwpY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=JIEE3XJ6; arc=none smtp.client-ip=198.175.65.17
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1738695114; x=1770231114;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=k7HIN2/4JNPmmW9EOwz5dmbwnDmMoY6rJ767bWiH8kM=;
-  b=JIEE3XJ6Ctbtk2yoXEHpvJhHXsLtWQZOwg8MeQFef+x5G/o2Phcyl5V8
-   44fw3UhNOiWg3uMaXTiH0yPrGGwcKAOzovoLMAbyim3b8CcCXJpUetc3N
-   f9DMfiudj/ZjjyMU3d8BrVFzVir5xx8pLpZo3g78xEOjq3+RtkO/W3r6F
-   ICQcSi/OeZ282n0eY6a93JonsoqZi8dgsA8tyLWnW0ATEQyNsotAAM04n
-   8Z5BJl5e6Zl670YpB4Rp9UYZ/vmZE4TXkYFk/dpkhoVEFfaQCbxzwEhg8
-   jZv+1YL4/5N2hypN2o5vAcxzzYaGtoPJMbAxswnLLqo1q9hH4p99iMKsw
-   Q==;
-X-CSE-ConnectionGUID: hwEmJJ46Rx2hMrWCN/ZJGg==
-X-CSE-MsgGUID: SNFNfrCBTdqQETACcaGvZg==
-X-IronPort-AV: E=McAfee;i="6700,10204,11336"; a="39268962"
-X-IronPort-AV: E=Sophos;i="6.13,259,1732608000"; 
-   d="scan'208";a="39268962"
-Received: from fmviesa007.fm.intel.com ([10.60.135.147])
-  by orvoesa109.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 04 Feb 2025 10:51:48 -0800
-X-CSE-ConnectionGUID: mqLlYBAXRg647PCZwOhXag==
-X-CSE-MsgGUID: qyQyePwGS0WtlynkG1GLBQ==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.13,259,1732608000"; 
-   d="scan'208";a="110559274"
-Received: from lkp-server01.sh.intel.com (HELO d63d4d77d921) ([10.239.97.150])
-  by fmviesa007.fm.intel.com with ESMTP; 04 Feb 2025 10:51:42 -0800
-Received: from kbuild by d63d4d77d921 with local (Exim 4.96)
-	(envelope-from <lkp@intel.com>)
-	id 1tfO1M-000ssZ-04;
-	Tue, 04 Feb 2025 18:51:40 +0000
-Date: Wed, 5 Feb 2025 02:50:42 +0800
-From: kernel test robot <lkp@intel.com>
-To: Gerhard Engleder <gerhard@engleder-embedded.com>, andrew@lunn.ch,
-	hkallweit1@gmail.com, linux@armlinux.org.uk, davem@davemloft.net,
-	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com
-Cc: oe-kbuild-all@lists.linux.dev, netdev@vger.kernel.org,
-	Gerhard Engleder <gerhard@engleder-embedded.com>,
-	Oleksij Rempel <o.rempel@pengutronix.de>
-Subject: Re: [PATCH net-next v4 6/7] net: selftests: Export
- net_test_phy_loopback_*
-Message-ID: <202502050234.kRVRQjkS-lkp@intel.com>
-References: <20250203191057.46351-7-gerhard@engleder-embedded.com>
+	s=arc-20240116; t=1738695246; c=relaxed/simple;
+	bh=jwhuV4VujjeHaEU10MpN8I73flvGkYDTvOrAWozkCbI=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Content-Type; b=YurSwQC7SHQzv5gtDOhFqASWj9MHeC1o4WwSIA9mEC05Ai3FKvwBbAazWk451MBeL1+yf3q93bX42xpJDUzDvlFucAY87ZZVQW3K96Ud/WhGXd0Cu3VvJJ3ycfID9bzACTZhuu1RaX5kLD+136L+w6Ptm8ificn281W8Eu2VRKg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=Uuk3vdhJ; arc=none smtp.client-ip=209.85.208.46
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-ed1-f46.google.com with SMTP id 4fb4d7f45d1cf-5dccaaca646so179522a12.0
+        for <netdev@vger.kernel.org>; Tue, 04 Feb 2025 10:54:04 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1738695243; x=1739300043; darn=vger.kernel.org;
+        h=content-transfer-encoding:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=NnZr0TzU6EBAKAi2OeYRTWSvDyVVdEmro7wQjoBWxCc=;
+        b=Uuk3vdhJHLnIFdAQUzCIqIJjawI8A8rYdgLrk0rrM1MsPRwdCntAA0umnnNvl4kaUW
+         yFLlyodEgN8zEcjb6g+RtQ604uWv3sdblCRaUSnTrqWIpoT9jObGm7nChbEooOvDE0e3
+         9zByP+I+qzpJ8zSMQwmqxW2e8WtULUsJFMJ26EHxazdrNInTxQrt8J0NGe4ruQGxlkvV
+         frgOlLcN4oWFzV8ydGOU2fVsAwPK3fqqh4XtEEYRYUM/usqjBX6C2O4PtMLWKZmZlq9q
+         3CPOY7zjRislWV+UWY3Jmq6M6REZMVePvRVQ4BqHgm9hoR0dZlIL5P7s0vS2WQsDxYVf
+         VSHw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1738695243; x=1739300043;
+        h=content-transfer-encoding:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=NnZr0TzU6EBAKAi2OeYRTWSvDyVVdEmro7wQjoBWxCc=;
+        b=f7YkjsZfqNQsQi44GmHcvhWtOZ9Yh2YtP37mtykQ1G4HntmDo6wq+bgIRWzRZH2buY
+         GkwHJgLNGsSBKng1UtvESw3SDXkWbDtSfV0znOXxQFXf0f6Z3e3zosPb9/Zqi5KZtNd+
+         O4XyVCMKIqdm2jyWpRQ44Wd66CCa55r/ASDqam/sRK0E16IlhUpiEtA4I0Zb3ZjpJCJm
+         HSPHYvFSh2L8UnL19kdEKEEmiJEvuvx7OfiLZDrRBcjFUyXLv+tvZrjqKLkX7EXDgXj6
+         UFiAfFyI4ozD+vX3vJ7LY45w7qADPU+QHZZSsdk+DETCiU9WduFEV5TrvfGHyRBtuunw
+         sCnA==
+X-Forwarded-Encrypted: i=1; AJvYcCXtHDp3ZA5RU+t0G0s25e8ffSq8tudRc5vkwDwuP0IjZ7QMXLK5Q+JEth7hoKqY8nYFHSrJd8c=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yzr6CCkKtcz3nw34wBjeLZijDI7UFLyMLFuvvoG/zEt/ghDFBsw
+	JA9QsAswDQ37w0mJ8In0zT5EV6igtuqzBtFTT7XQiq0LQlsivolDCxmEQF501wsexzdPU0xdjhR
+	zHtBeqzfoVXxDN3zwAsagQo/f0K66vBXDGqm1
+X-Gm-Gg: ASbGncsqpDw4J/+3GMXuCdN/o5D+R5cWXvRH8SiqvxgoKjesrCpnxQ3qxBnH+2r59zB
+	u/5g7mV3MNeTpMRywsAdchDtbJ9L8XjULp3WQihi1DKq1ImKKD53WER2HR8nPhq3SBgnU3qc=
+X-Google-Smtp-Source: AGHT+IHUpYduRAW29pLm2cXnvQ7KYNVfpBYDv5RSd4yHMpeKVIVeQaC83fH3Rm3ysM7sUjvOcuSGPBYKlpMK7JSYogQ=
+X-Received: by 2002:a05:6402:34c4:b0:5dc:80ba:ddb1 with SMTP id
+ 4fb4d7f45d1cf-5dcdc0b91d5mr17440a12.14.1738695243076; Tue, 04 Feb 2025
+ 10:54:03 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250203191057.46351-7-gerhard@engleder-embedded.com>
+References: <20250203191714.155526-1-jdamato@fastly.com> <CANn89i+vf5=6f8kuZKCmP66P1LWGmAj06i+NhgqpFLVR8K5bEA@mail.gmail.com>
+ <Z6JcR5IH8WzH1lP9@LQ3V64L9R2>
+In-Reply-To: <Z6JcR5IH8WzH1lP9@LQ3V64L9R2>
+From: Eric Dumazet <edumazet@google.com>
+Date: Tue, 4 Feb 2025 19:53:51 +0100
+X-Gm-Features: AWEUYZlr2Up0uWZIpX0zIGqhtd3i2LpMYVfI_w2MPUlUydUqCVHzfWoEWw2OUCc
+Message-ID: <CANn89iJ=8inHbr+qQKifcX=m5=TfN8+MELDM_Ho8-mdA156UPw@mail.gmail.com>
+Subject: Re: [PATCH net-next v2] netdev-genl: Elide napi_id when not present
+To: Joe Damato <jdamato@fastly.com>, Eric Dumazet <edumazet@google.com>, netdev@vger.kernel.org, 
+	kuba@kernel.org, "David S. Miller" <davem@davemloft.net>, Paolo Abeni <pabeni@redhat.com>, 
+	Simon Horman <horms@kernel.org>, Amritha Nambiar <amritha.nambiar@intel.com>, 
+	Mina Almasry <almasrymina@google.com>, open list <linux-kernel@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Hi Gerhard,
+On Tue, Feb 4, 2025 at 7:28=E2=80=AFPM Joe Damato <jdamato@fastly.com> wrot=
+e:
+>
+> On Tue, Feb 04, 2025 at 06:41:34AM +0100, Eric Dumazet wrote:
+> > On Mon, Feb 3, 2025 at 8:17=E2=80=AFPM Joe Damato <jdamato@fastly.com> =
+wrote:
+> > >
+> > > There are at least two cases where napi_id may not present and the
+> > > napi_id should be elided:
+> > >
+> > > 1. Queues could be created, but napi_enable may not have been called
+> > >    yet. In this case, there may be a NAPI but it may not have an ID a=
+nd
+> > >    output of a napi_id should be elided.
+> > >
+> > > 2. TX-only NAPIs currently do not have NAPI IDs. If a TX queue happen=
+s
+> > >    to be linked with a TX-only NAPI, elide the NAPI ID from the netli=
+nk
+> > >    output as a NAPI ID of 0 is not useful for users.
+> > >
+> > > Signed-off-by: Joe Damato <jdamato@fastly.com>
+> > > ---
+> > >  v2:
+> > >    - Updated to elide NAPI IDs for RX queues which may have not calle=
+d
+> > >      napi_enable yet.
+> > >
+> > >  rfc: https://lore.kernel.org/lkml/20250128163038.429864-1-jdamato@fa=
+stly.com/
+> > >  net/core/netdev-genl.c | 14 ++++++++------
+> > >  1 file changed, 8 insertions(+), 6 deletions(-)
+> > >
+> > > diff --git a/net/core/netdev-genl.c b/net/core/netdev-genl.c
+> > > index 715f85c6b62e..a97d3b99f6cd 100644
+> > > --- a/net/core/netdev-genl.c
+> > > +++ b/net/core/netdev-genl.c
+> > > @@ -385,9 +385,10 @@ netdev_nl_queue_fill_one(struct sk_buff *rsp, st=
+ruct net_device *netdev,
+> > >         switch (q_type) {
+> > >         case NETDEV_QUEUE_TYPE_RX:
+> > >                 rxq =3D __netif_get_rx_queue(netdev, q_idx);
+> > > -               if (rxq->napi && nla_put_u32(rsp, NETDEV_A_QUEUE_NAPI=
+_ID,
+> > > -                                            rxq->napi->napi_id))
+> > > -                       goto nla_put_failure;
+> > > +               if (rxq->napi && rxq->napi->napi_id >=3D MIN_NAPI_ID)
+> > > +                       if (nla_put_u32(rsp, NETDEV_A_QUEUE_NAPI_ID,
+> > > +                                       rxq->napi->napi_id))
+> > > +                               goto nla_put_failure;
+> > >
+> > >                 binding =3D rxq->mp_params.mp_priv;
+> > >                 if (binding &&
+> > > @@ -397,9 +398,10 @@ netdev_nl_queue_fill_one(struct sk_buff *rsp, st=
+ruct net_device *netdev,
+> > >                 break;
+> > >         case NETDEV_QUEUE_TYPE_TX:
+> > >                 txq =3D netdev_get_tx_queue(netdev, q_idx);
+> > > -               if (txq->napi && nla_put_u32(rsp, NETDEV_A_QUEUE_NAPI=
+_ID,
+> > > -                                            txq->napi->napi_id))
+> > > -                       goto nla_put_failure;
+> > > +               if (txq->napi && txq->napi->napi_id >=3D MIN_NAPI_ID)
+> > > +                       if (nla_put_u32(rsp, NETDEV_A_QUEUE_NAPI_ID,
+> > > +                                       txq->napi->napi_id))
+> > > +                               goto nla_put_failure;
+> > >         }
+> >
+> > Hi Joe
+> >
+> > This might be time to add helpers, we now have these checks about
+> > MIN_NAPI_ID all around the places.
+>
+> I'm not sure what the right etiquette is; I was thinking of just
+> taking the patch you proposed below and submitting it with you as
+> the author with my Reviewed-by.
+>
+> Is that OK and if so, are you OK with the commit message?
 
-kernel test robot noticed the following build warnings:
+Oh no worries, please grab the patch completely, I will add my usual
+'Reviewed-by' tag.
 
-[auto build test WARNING on net-next/main]
-
-url:    https://github.com/intel-lab-lkp/linux/commits/Gerhard-Engleder/net-phy-Allow-loopback-speed-selection-for-PHY-drivers/20250204-041619
-base:   net-next/main
-patch link:    https://lore.kernel.org/r/20250203191057.46351-7-gerhard%40engleder-embedded.com
-patch subject: [PATCH net-next v4 6/7] net: selftests: Export net_test_phy_loopback_*
-config: s390-randconfig-001-20250204 (https://download.01.org/0day-ci/archive/20250205/202502050234.kRVRQjkS-lkp@intel.com/config)
-compiler: s390-linux-gcc (GCC) 14.2.0
-reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20250205/202502050234.kRVRQjkS-lkp@intel.com/reproduce)
-
-If you fix the issue in a separate patch/commit (i.e. not just a new version of
-the same patch/commit), kindly add following tags
-| Reported-by: kernel test robot <lkp@intel.com>
-| Closes: https://lore.kernel.org/oe-kbuild-all/202502050234.kRVRQjkS-lkp@intel.com/
-
-All warnings (new ones prefixed by >>):
-
-   In file included from drivers/net/ethernet/freescale/fec_main.c:42:
->> include/net/selftests.h:30:12: warning: 'net_test_phy_loopback_tcp' defined but not used [-Wunused-function]
-      30 | static int net_test_phy_loopback_tcp(struct net_device *ndev)
-         |            ^~~~~~~~~~~~~~~~~~~~~~~~~
->> include/net/selftests.h:25:12: warning: 'net_test_phy_loopback_udp_mtu' defined but not used [-Wunused-function]
-      25 | static int net_test_phy_loopback_udp_mtu(struct net_device *ndev)
-         |            ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-
-vim +/net_test_phy_loopback_tcp +30 include/net/selftests.h
-
-    24	
-  > 25	static int net_test_phy_loopback_udp_mtu(struct net_device *ndev)
-    26	{
-    27		return 0;
-    28	}
-    29	
-  > 30	static int net_test_phy_loopback_tcp(struct net_device *ndev)
-    31	{
-    32		return 0;
-    33	}
-    34	
-
--- 
-0-DAY CI Kernel Test Service
-https://github.com/intel/lkp-tests/wiki
+Thanks
 
