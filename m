@@ -1,313 +1,161 @@
-Return-Path: <netdev+bounces-162428-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-162429-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 25EF8A26DBA
-	for <lists+netdev@lfdr.de>; Tue,  4 Feb 2025 09:52:15 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 17C81A26DCC
+	for <lists+netdev@lfdr.de>; Tue,  4 Feb 2025 09:53:22 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id D61031885A69
-	for <lists+netdev@lfdr.de>; Tue,  4 Feb 2025 08:52:19 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 9AFB33A5C6D
+	for <lists+netdev@lfdr.de>; Tue,  4 Feb 2025 08:52:40 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 54E5C207640;
-	Tue,  4 Feb 2025 08:52:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E8892207676;
+	Tue,  4 Feb 2025 08:52:35 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="PISbRPSu"
+	dkim=pass (2048-bit key) header.d=bgdev-pl.20230601.gappssmtp.com header.i=@bgdev-pl.20230601.gappssmtp.com header.b="QhySt0hM"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.18])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-lj1-f169.google.com (mail-lj1-f169.google.com [209.85.208.169])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1B829206F18
-	for <netdev@vger.kernel.org>; Tue,  4 Feb 2025 08:52:08 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=198.175.65.18
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1738659131; cv=fail; b=DgRCs44Dba7uD+rea1yKsKvZzw50ufkFIQBSiy6/cZZebqR4EPRdzfojQf/FhpK4ZvWfpiPf7O7VmwsF+0QLsBsh/f/8Bt0R9H2a7wIvUtMuOqXUyGv0M8wAkeo/K+pyu7XJqnkLglFdL+iqxTzRuPrYYK/NcphokjqumGdrDWM=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1738659131; c=relaxed/simple;
-	bh=JMIPudo7gxmZ1r1DDdv3MKfF2hnjykubSse7AVI1MFg=;
-	h=Message-ID:Date:Subject:To:CC:References:From:In-Reply-To:
-	 Content-Type:MIME-Version; b=mRL6arlW/yusgeziNcOXspDHJALepIQzT/JaDP8F1N424+/Fi7fMCnEGhV3QcMVVyTS0gJX2dwPSrMNmzB1fD2kCHf7k8xodDrgCmkr6j1qPLBhX59KU/mR6sMTGtNWeZNRcDr6vEAjENwjG1AmeSRPTH1wTIM3WwEsOLCcZbZw=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=PISbRPSu; arc=fail smtp.client-ip=198.175.65.18
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1738659129; x=1770195129;
-  h=message-id:date:subject:to:cc:references:from:
-   in-reply-to:content-transfer-encoding:mime-version;
-  bh=JMIPudo7gxmZ1r1DDdv3MKfF2hnjykubSse7AVI1MFg=;
-  b=PISbRPSuXFnPuApg1Fmx53x3+gPDwU4BjJCLdPROdZ6hKOFcuZgPKYtJ
-   RlQ1NaTjnHUD1wjDmPe1JCMIpf9sOuqXRSwvD8VgnbEz8545xPZvRoUSE
-   dFCROYBPgq0ABJjVJzpQey/ir5vzeWEwzykk+cZ/olOA6EDgCz7AiaQB1
-   9HAup1a398rqSPMBc0V2/fShIXeu9d7YO6Y0KVuh9llraYjJSvTMjIg8h
-   cEhLpvtot5PYt0kWy2iaspLEYEftC8V3rea+FuNMsXDI2Jve9MGC40TSr
-   cpvRlcZh9u0nqgM+eHJDzd4bB8meqoCuKJNUnEM+7rskrPPKOHmYAn0cz
-   g==;
-X-CSE-ConnectionGUID: Ivm7NeKgTpqAG3Tva8BUxg==
-X-CSE-MsgGUID: erhlAoujTqWBwZs9voKVJw==
-X-IronPort-AV: E=McAfee;i="6700,10204,11314"; a="39276349"
-X-IronPort-AV: E=Sophos;i="6.12,310,1728975600"; 
-   d="scan'208";a="39276349"
-Received: from orviesa003.jf.intel.com ([10.64.159.143])
-  by orvoesa110.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 04 Feb 2025 00:52:09 -0800
-X-CSE-ConnectionGUID: PDy7bIHPQRuvf7e/1qyrOA==
-X-CSE-MsgGUID: avmdHbuwT1e+yxJM7GcAKw==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.11,199,1725346800"; 
-   d="scan'208";a="115535186"
-Received: from orsmsx603.amr.corp.intel.com ([10.22.229.16])
-  by orviesa003.jf.intel.com with ESMTP/TLS/AES256-GCM-SHA384; 04 Feb 2025 00:52:08 -0800
-Received: from orsmsx603.amr.corp.intel.com (10.22.229.16) by
- ORSMSX603.amr.corp.intel.com (10.22.229.16) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.44; Tue, 4 Feb 2025 00:52:08 -0800
-Received: from ORSEDG602.ED.cps.intel.com (10.7.248.7) by
- orsmsx603.amr.corp.intel.com (10.22.229.16) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.44 via Frontend Transport; Tue, 4 Feb 2025 00:52:08 -0800
-Received: from NAM10-MW2-obe.outbound.protection.outlook.com (104.47.55.41) by
- edgegateway.intel.com (134.134.137.103) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.1.2507.44; Tue, 4 Feb 2025 00:52:07 -0800
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=ckyOc8G+dGCXAlnaj0Cp088T0sRTHmtIMPVpPFv0fCH+qglf3ITH0Szihw4SC9AJDAxzxdx3Ov8TnqQyzR6+d15UNyxdXLmN57efYzAWs5hY1G729ex5LivK38NUDegRtTlxH94eeTWdOuQM8MwWb9f75wKvWsYH7ZbsKos5P28s+2lBoNdnTEQP82prAvi43aH5Y2HQ+m58evGVydBsBIVwaMgqklM3LmOJkt1W7zIqnfdoeXkqOdHp89rAubro7E2401jLVjYxF7/rP9tUGQEHTck7cPNeFVan2XETtmDGGgj4N66ph+DdTneR9WM+RxKsiJmBgWNkCTPqjGLzHw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=0MqwAXqhw4qHCBHOInCfrg7tQpZaVBu2RIybhxcgcOY=;
- b=rx8JuBwIOPRt2c1PNjPQRwzXJ8SY9QhgLIbyngPNHaQjHGBBUGqZNKiO1FY0LbqVWJSrz8zJ8+SWJUWkrivX0sv+D37hngPf8xTXcolNzOdVaTWnFAAnR8KK2JXYLiSXVLKTIm3rlnYznw+pZPbPHZhBeXqcg7WyivyVx7osaDrcxgHns4B79F8kWIE+hRpucv5N10gBJ7nqZhf81hPEz8U0S3E7/RqCwRvs6sqtS0LHWFEV03eUzmegbOGJOVmjpk/Bzi3a4+2Ulf+tL16BZuBhDdP7L1QIapT/tHciVvfTCIbsivNllwWSMO0tKo4R43Jaa+ti3yZgYkDqowIZow==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
- dkim=pass header.d=intel.com; arc=none
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=intel.com;
-Received: from PH8PR11MB6682.namprd11.prod.outlook.com (2603:10b6:510:1c5::7)
- by MN2PR11MB4662.namprd11.prod.outlook.com (2603:10b6:208:263::10) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8398.25; Tue, 4 Feb
- 2025 08:52:01 +0000
-Received: from PH8PR11MB6682.namprd11.prod.outlook.com
- ([fe80::cfa7:43ed:66:fd51]) by PH8PR11MB6682.namprd11.prod.outlook.com
- ([fe80::cfa7:43ed:66:fd51%3]) with mapi id 15.20.8398.021; Tue, 4 Feb 2025
- 08:52:01 +0000
-Message-ID: <fcac69dd-d579-4f8b-bd0d-30cb6c2455eb@intel.com>
-Date: Tue, 4 Feb 2025 09:51:53 +0100
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next 02/15] net/mlx5: Change parameters for PTP
- internal functions
-To: Tariq Toukan <tariqt@nvidia.com>, "David S. Miller" <davem@davemloft.net>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, "Eric
- Dumazet" <edumazet@google.com>, Andrew Lunn <andrew+netdev@lunn.ch>
-CC: <netdev@vger.kernel.org>, Saeed Mahameed <saeedm@nvidia.com>, Gal Pressman
-	<gal@nvidia.com>, Jianbo Liu <jianbol@nvidia.com>, Moshe Shemesh
-	<moshe@nvidia.com>, Leon Romanovsky <leonro@nvidia.com>, Mark Bloch
-	<mbloch@nvidia.com>, Carolina Jubran <cjubran@nvidia.com>, Dragos Tatulea
-	<dtatulea@nvidia.com>
-References: <20250203213516.227902-1-tariqt@nvidia.com>
- <20250203213516.227902-3-tariqt@nvidia.com>
-Content-Language: pl
-From: Mateusz Polchlopek <mateusz.polchlopek@intel.com>
-Organization: Intel
-In-Reply-To: <20250203213516.227902-3-tariqt@nvidia.com>
-Content-Type: text/plain; charset="UTF-8"; format=flowed
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: ZR0P278CA0178.CHEP278.PROD.OUTLOOK.COM
- (2603:10a6:910:45::22) To PH8PR11MB6682.namprd11.prod.outlook.com
- (2603:10b6:510:1c5::7)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D0A3E206F1B
+	for <netdev@vger.kernel.org>; Tue,  4 Feb 2025 08:52:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.169
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1738659155; cv=none; b=RSn1GfhXHpSDcwP+A0ULcGKFUhgsBNWwdBHRWMHiLi0eRpOAfmFI12wJnsIOGuruv0yWRmMv7Wy8rxCOUcKPQ6npukUpvNWoM4EgnEFMlopXcDAOnMv6GFanulPTuN0RpR+aAYWcsf3IwgpnFmtevUGFO+B4OmuirbRCds29VCc=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1738659155; c=relaxed/simple;
+	bh=HutRJSMeJRnt/VeA6fBVfyfIzPoRWNej7hPpS/LJnd8=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=BgPoThFH+RgpLYQiNfyMSX7AnwpE3BTsGAAfAsqBDjhSt77SF9JU/lZ1PrRTTcpFdCbcSfDmp6jG8RMVkuOo1lH6zHeCPZgZySekY0qNZIIL2pCZ2BM6HY9jvvfybUzkzWrjp2AoNGDvX6d/hoGn2Ylz2aDWEKuSppDAINNgbsM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=bgdev.pl; spf=none smtp.mailfrom=bgdev.pl; dkim=pass (2048-bit key) header.d=bgdev-pl.20230601.gappssmtp.com header.i=@bgdev-pl.20230601.gappssmtp.com header.b=QhySt0hM; arc=none smtp.client-ip=209.85.208.169
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=bgdev.pl
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=bgdev.pl
+Received: by mail-lj1-f169.google.com with SMTP id 38308e7fff4ca-3061f1e534bso53739241fa.1
+        for <netdev@vger.kernel.org>; Tue, 04 Feb 2025 00:52:33 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=bgdev-pl.20230601.gappssmtp.com; s=20230601; t=1738659152; x=1739263952; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=HutRJSMeJRnt/VeA6fBVfyfIzPoRWNej7hPpS/LJnd8=;
+        b=QhySt0hMEJ0xvBA2+3D7NGwSBvsVzp33uDy7u2SBmZWVPuA/oVJKLlEyrFPUaMBEfa
+         xYGbBZCPgniM2k7OgdysO0kkVCgiDDElacQMcmi3VTrEeYZiKVOj9RfKjIdxJzv3gtUB
+         hQi4DbDpbG7I9V70l+ZxsMvRk8z02OtAnKx2vhIUnTY7UUkXtO1Oa3boVysr3xybcyqH
+         KRZ5lG8b8oRI4vacsT1F1TCtFwLEs8E67a9NHol6nqP6Z3bH7y2U2bbd6L5GOs7Kt/JA
+         ZaodQoPoTB4qzCaFPqSXjysyyU3lLuulcf2gyMHqDtVlVWhpFYG5+8SCJO9soFJeHpBP
+         wQFA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1738659152; x=1739263952;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=HutRJSMeJRnt/VeA6fBVfyfIzPoRWNej7hPpS/LJnd8=;
+        b=gUqNx6wdODvLgB7LivmJ2h6jNXY6KvRFWXp8LZsiLew2g1A27ip5KhzQv+uroql0wO
+         pHQwFGAXUl6wgUx4DBQwnwxmC8EJybVVhkgy916sGpUwbJK5LEQQgEZzAPijz6yHnf/p
+         40Nlmd2h/oMT5KTxsWzzjzzTFuVIr4rq81bDgdqIpyItrbN+fH2DswYnziwd0xTmsBvN
+         DnbQfXj7xv+Z7N/xO0+pPzrUQ3dMlVRQRVqcUh2vkgq8ssdZzClXDNqzxKEuJBfKNWRG
+         /t4ZfoYn1DXudbRsENjxASe1RwPZgHBv29xDTH25L3ZINSf8FmdfY2dy7y/6Fek8UxzY
+         2OvQ==
+X-Forwarded-Encrypted: i=1; AJvYcCWbV896LsIOnM1p628dYvJpWBNB5Wy5/icbJq+C32DR9IV+3/mT1ZgBtV4fEfnvR1wBzpIEVcY=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxZ4rNr7v/QR7h4yOxHikeb4+zNk/u87+iDo4dFHyq+zmBtd6g6
+	qMtuQA/gxHfjBV2clVEJw0/Xza4dVv0QiDDAD6NelI9/RBBwGhv+eCTCatCtLJWVK6eS4RHM2Al
+	zF9BIiliGE29NcYeF8GB3GvIVtzxufnUxyDCReQ==
+X-Gm-Gg: ASbGncsS/0F/jQtrqSDyND164uzzgZxSL4z/1mZupkvo5or+tCn5zUWb3UG8HzO03t5
+	feJCO9KtmRuXwpYH+dI7rbvdonnD56HKHIPXPZunB9jlIT8tfyR/PL5hiVLhbOzGJfhxwzG5PSN
+	Fr0vqpOcnB7tFbfx8QXa/N5bbisVV0
+X-Google-Smtp-Source: AGHT+IF3lsa7S5YwWpfcQVRJJ5PSQIykvInkMIj9GBvAH9xqe0CZdk0yaxGhiayetNv5EouQr4rP2NIVzzgLrFTtrHU=
+X-Received: by 2002:a2e:a90d:0:b0:300:15d9:c625 with SMTP id
+ 38308e7fff4ca-3079684af3emr90981231fa.14.1738659151822; Tue, 04 Feb 2025
+ 00:52:31 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: PH8PR11MB6682:EE_|MN2PR11MB4662:EE_
-X-MS-Office365-Filtering-Correlation-Id: 6c080a83-dbd0-47ad-f558-08dd44f93076
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;ARA:13230040|366016|7416014|376014|1800799024|7053199007;
-X-Microsoft-Antispam-Message-Info: =?utf-8?B?NGdxcEVPUTBZREIzMzUxNXQrUkdJNGxEOWVBSmRLbkZLR0pyblVvNWdlc3RJ?=
- =?utf-8?B?Tzk3TEF4cnd1MngwR1loU2ZtSGJKR29tNnZGSGNidThNbGJHTGtYUVJpOUdB?=
- =?utf-8?B?OWZ6RGVsTk9ydzBRN3czMFprakxpaTZZVlo4eXpVOUhObEk3NVVhRFdEaFd1?=
- =?utf-8?B?N2NNSG43SjJ4TmFoaURTRlplRHM4VlFTdUpQRVYwNlF4R3IzQ1ZycThjemNR?=
- =?utf-8?B?SmZtbUhrdGRpc2QvWkVXQVZOT28wZUZGaGpiazZHQ1dlSU5SN1htR1c3dE5B?=
- =?utf-8?B?ZjJ3YzZjYzFnYkNsYVhxaDFtbzMzaXdrdy9Seit4eWFaZTdsaktRSnkzeGNN?=
- =?utf-8?B?K1MwZjAyNEV4TzBVWFhlYjlIOG13ekZ4MkFIR2dBR1Bsd2NKQ3A4MlJIbytk?=
- =?utf-8?B?NHZKWGNkL2JRM1MvWi9zOVltMmo3MGNLemtpK3haaUYyWWllOHJoMWNaOEFr?=
- =?utf-8?B?L21aZmRvejliS3A0ZFlpSmlIYUNmcjNTb213U25SdlNVRUNKRDZRbFFxVXM3?=
- =?utf-8?B?Q1VialRTZ1FGeVRoOHJLMGE2UEFYVjllNVlQYWpIM3crem5xWFRYdjFyQ0I4?=
- =?utf-8?B?cDNDTWxPejN2V1F3aVo5ZjRITjFxWXc2ME1MSkVtSnBLMzR4NXFWNm16Q0JG?=
- =?utf-8?B?OGR1TmIycEJDOHdkSkpYNlR3WXB6dXMwR2xvT3ZkYitmcHp6OUhhdmcxR240?=
- =?utf-8?B?RVppOEJteU11U3pmT0lmalJ1cllyaENwbm1sRW1zWGt5VjQzOHV6QjhZUlN0?=
- =?utf-8?B?RWFkbnorRTBnRW0yeHFiZ1ppQ3ZjYXV6WTh6cXhxeVlKYnhmWCs5UEdhbVBh?=
- =?utf-8?B?Z2o0OEI4S0htcy9hMkZ3ZGs3TW8yZmhCRzNNQnlLOUVORG9CbGUrR2RwRnVx?=
- =?utf-8?B?Y0twcUpJcUc4ZUpCQzZvYTd2SkNWT2k4YnNLaE1qV0ozdUdySi9MNDZkbEVq?=
- =?utf-8?B?N2FZVnhWME1iOEF6bWVHNVdSZU13K1R6eW10NnpNQVMvZ3R2MUo0QTNGK3N4?=
- =?utf-8?B?elhmT3JmMHdCRlhrcy9ReXNsbU9VMWJwVlV4b3RMd0JmY3M1Z3RQdGZCYmpJ?=
- =?utf-8?B?U252N2pvUm1oL3pqSXdlR2hidmNxNS84MFIwa1ZOS1h1dXFzMFNMeEh4QXRG?=
- =?utf-8?B?TkwwYllHQ3VycG0vdkpaMUQ1N1lETTJ6LzBSK2Q1ODdmR2pCZU84QkNsTGs5?=
- =?utf-8?B?SDNCVXVqUGdHYXlORkVnYm4zdnBxTUt1NWJ1TzBhOWVSL1M3ajNDNGFYUElB?=
- =?utf-8?B?eHdqakxnTXEzMlNPN1JhZ2ZoTGd4VWRodFIrTkh6WmdFSVlJWW9ILy93NWtG?=
- =?utf-8?B?MjNMNTNmc3NZd2FrdUV4Rkp2eUNTWGU2QVF5Yi9DLzkzTjQyYnJ1eG9WRHli?=
- =?utf-8?B?WTR3amNVakRuRTBJS2xtdnFlYUxUaCs3RVRCaW5YMDRKTnFMQWFtYVBiYUpP?=
- =?utf-8?B?V0crMzlEV1d4YmpqNnIxaU1ocURUV3Q2bW5zRXl5bk05WjUvK2dpeXdjZm5o?=
- =?utf-8?B?b1d5V0xRRE9qWVVpYTZkNWtCcExFMkFmOVlSQktibW9BMzBYeTRpcGlZNG5O?=
- =?utf-8?B?Ry9YQUsxM1ovYThjOGo3NkdZRGNQNnB2ZHk4RGQwb2xwdmYrZUxQbThYbG02?=
- =?utf-8?B?bFU3Uzc1SWRTZVdOc0RFeVM3dGdrYlRCRjlPT3JGMysvVUtCZ29OREtCNkJi?=
- =?utf-8?B?V0gwRDE2aisvK3hYSjlMWkZBNm0zOGFYc0VrL2s1NGMyeitZT3FRNCs3SU9a?=
- =?utf-8?B?Z1lNV01hSGs5ZWZ2TUxwOHJHTTZMN3F0VG8rTjFuTTFqdjJ4Zzgva3FoN2xm?=
- =?utf-8?B?R1lpVWMyNzZCNjk2cFdQTUVnazYwNTdmUVBMQS9pdTdMcm1UY0F6OE11dXhl?=
- =?utf-8?Q?PUgVUjatgZeo1?=
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:PH8PR11MB6682.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(366016)(7416014)(376014)(1800799024)(7053199007);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?OWtadlBYUHZhOVkxb1k4U2NiTDJ3VjRzcTZXUDk0RWExOEh5cGk2ajlja0ZU?=
- =?utf-8?B?cFhtcHc2SjdNTGMzY1ltUWhRdUw0Q3JwNk9FcVc0MU82VUdBZ2dsdEtUKzdQ?=
- =?utf-8?B?b1lUTFg5eGtOeElkMmpuWVZUYjZGM2RJenZGYThFN1FKbnFaMVVrQTBRVkJE?=
- =?utf-8?B?dkJpazBuU3p4Zkg4bzFLNTJDa05lZXFhODNrQWZWbW5uRG82R00yWnRUT1kw?=
- =?utf-8?B?SkxRUFdaVVBkOFEyUVRuTmFxY2RPd3RGUVJmZFFaK3VZRFR5Nng3VVRhTlQ0?=
- =?utf-8?B?eSsxQU1rM2FrRUpMaHFzclRQelBISC9KRjNZUGxObFpoUFlxc0h3QTBSU2Y1?=
- =?utf-8?B?YXhnZ1N4UHg3YnYxU21FbStEL1pwUUFmN2J1elF4U0NqenhYT1UrK0VEVnNS?=
- =?utf-8?B?YW1FSVRzRVlkL0psZnpXbWtoalhQWStmNjR2K1h3UmpKNzBlc3JaeDJza3Fr?=
- =?utf-8?B?ZnpIZU8yRFAySHQyS0VFNmRScjM3VGFHWDdsbWwxbTRGUlhyakRDQXFuTEZu?=
- =?utf-8?B?MEUrWnZEN3pTRXZxUUxUOUlORG1LVjlRT3FRdWgrS2plaHVveENSNkZidFh4?=
- =?utf-8?B?dHlHRUxUNEdpQXBNS0ZYdW1jRlpEK0JodEt0dEoxak9iUlZRZzliTDdpY1po?=
- =?utf-8?B?MGRXdU00VXNRNVAzK2gva2FhNkR1UTNEZzg2T1VsK3R5VHNQZWdBSFZmQXpY?=
- =?utf-8?B?U2Q5K0hZdHJuVWw2SzdCV2lxRUJ6QlY5MW0vdW5UY1NJMGkrcExLMndKaG9u?=
- =?utf-8?B?RGpHaTYwYW9lK0ZXcnpqSGgwcjExVXJqMG84U2IwWHlab0lFUE9SUkU0Znk1?=
- =?utf-8?B?Z1IwUVJvc2ZKYjVrUTgyWG5vQWk3Y3VvbTAwOGl1aldyWVNSc3Q5aWpYSldt?=
- =?utf-8?B?VlJqcFJHRk84VFB6cndsdG5Ndk1mdHk3ajJVUllPRjdRVFNTWWFxNVA4d3Zm?=
- =?utf-8?B?V0VSWFRuZWRVcXBnZXRLQ1cwcGUvSEVuNmg5NVEzS2I0TmIxaTRVNFJYSlNI?=
- =?utf-8?B?MWhXQUJEYmEzWEwra0NlRGdjRHp0OHU5MEQ0RkVzR3h2TlI5VXEyMk5mRGRa?=
- =?utf-8?B?UXpycWR3MUxUNGNHdEtGSjJZWGV5Y0lsMThHRmJpU1dGZ20zL2ZDYUVwaVR1?=
- =?utf-8?B?Rm1KRmsyS29wSUVUdER1MjNUcEgvTmMzUVFhQ1hUMzJtQzNsY0E5aTFmNmdV?=
- =?utf-8?B?NVBMTTVrRnl0UEhERk9zYnlPV1VaclhBdzdvR2szSDJYdkFLcFlsOUkwekJ2?=
- =?utf-8?B?MGVvLzZuR1NnWHlwKzFqK3h4OHRDWlhveEdCbE9XMXlrT2syYW0zOHo1b2tm?=
- =?utf-8?B?OFdzZmhqb1dRYkRmZmU2dE13Si95Y2lialZuWlR4RTNISWg4endEZHdoZDdL?=
- =?utf-8?B?akQwSTNaUTdBV09DRmllcGpQQVlydTNhNVN5SjFTNkRXR0U1MUJYTVN0S3E4?=
- =?utf-8?B?ZW14U21QdUIycjcwbHZOZ0tSZGsrQTE3WlJPSHhkYXRLUkFVZVNXeGtSQ20w?=
- =?utf-8?B?akc2dWhpbkViTUkxTTc1Sk5yYzRyOFd5S2lJL1Zlb3VRK1VsL1dIZzBmV3Nz?=
- =?utf-8?B?T0ZwWDZyaUl2L0h4cjc4SWZENnh0RzVGa3FPVGRBc2QzNE9Cc1ppZFdpZWN6?=
- =?utf-8?B?QjE3NEVoZ2JsaXl0OUNmNExpWjYzT21VRG9FMDY1TXRDRVZtclU0ejQ1YzBw?=
- =?utf-8?B?a0tlQmtTUU1HVHNHcHQ1eEhIbkRYRHQrWlYzSkhnK1dseFpSTGxJTzJKRVR2?=
- =?utf-8?B?K2R0K1FPNWY3NzFyVnFOVk5nL2E4eEk5Mm8rMDJNa1U2VWFXMmNWQVNDS3g0?=
- =?utf-8?B?MTVvV3RYbCs5VDk3WG9udE55ZlkwcVZHNmVMTEE0d2FkVUo5N3pTVkVEUkJY?=
- =?utf-8?B?WVVhRURuU1F0T0lLOGtlUFZpSE1mM2JNeHg1aGRNZE9CMWovT0lDbUJiN1pZ?=
- =?utf-8?B?bVEvbmxxcE10M2d2MDlzQXRFKzRaMStUMmNrVHREckhaSFo3TUwyclRNUUpQ?=
- =?utf-8?B?YWpia3dBVHplTUR4SERkZjBCbEU5QnRyLzYwSHZVdC8xY2FUZG9lUW9rNjlU?=
- =?utf-8?B?Mmt5M0ZaQWhCNysxVTdCWjc4dUJpTHRZNFcyZXhZcnN4U3JhMXBBSmowbm45?=
- =?utf-8?B?VG9rZ1pKQmRIanRnajZwaEFXc3duRFVvVENiNFE2OFdOaXhpWnlweU9WenVJ?=
- =?utf-8?B?VHc9PQ==?=
-X-MS-Exchange-CrossTenant-Network-Message-Id: 6c080a83-dbd0-47ad-f558-08dd44f93076
-X-MS-Exchange-CrossTenant-AuthSource: PH8PR11MB6682.namprd11.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 04 Feb 2025 08:52:00.9639
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: c+ZOIIbDzYnaNUp4dpRYu7QB7WmzbFHHt863J4ErcK2OG79uFrU9UxSrrmrW9OUklxu4TwsZFHYfy0nygizaJM6CZJYEeehg1s53nENyJOg=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: MN2PR11MB4662
-X-OriginatorOrg: intel.com
+References: <20250131-gpio-set-array-helper-v1-0-991c8ccb4d6e@baylibre.com>
+ <CAMRc=MdwQL8dWU5zF5fp+KUbC2RA2Q264by8HGXMg2k1rxhsTA@mail.gmail.com>
+ <9931433b-5cde-4819-ac96-eea4f1f0f1f2@baylibre.com> <CAMRc=McEdcDs01BAKN5vg9POg_xxJBY1k8bfgiDN60C1-e_jow@mail.gmail.com>
+ <072be5a9-e0fb-4073-85b3-4a8efcafae09@baylibre.com> <CAMRc=Meq_Gfhcjzx0vCL0JPzfnOcijFgB6AuqtsqgGn1eOTMVg@mail.gmail.com>
+ <CAHp75Ve+iwrm8dx49+6C7xFJgTQrh3XumKVzKvnYY=00J-j43A@mail.gmail.com> <b1c35782-f717-4fe5-8a00-7f13b341b5dd@baylibre.com>
+In-Reply-To: <b1c35782-f717-4fe5-8a00-7f13b341b5dd@baylibre.com>
+From: Bartosz Golaszewski <brgl@bgdev.pl>
+Date: Tue, 4 Feb 2025 09:52:20 +0100
+X-Gm-Features: AWEUYZkoSkw9yp224bcw4kgu34MNb3lBM2F-Kpo3dstTt1XbKUZR_n5bPczpQE0
+Message-ID: <CAMRc=MdzeY7p8O2ovJ-Z9u-KzqfeEG7BxRvKHBHPrsFYDFAryA@mail.gmail.com>
+Subject: Re: [PATCH 00/13] gpiolib: add gpiods_set_array_value_cansleep
+To: David Lechner <dlechner@baylibre.com>
+Cc: Andy Shevchenko <andy.shevchenko@gmail.com>, linux-gpio@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, linux-iio@vger.kernel.org, 
+	linux-mmc@vger.kernel.org, netdev@vger.kernel.org, 
+	linux-phy@lists.infradead.org, linux-sound@vger.kernel.org, 
+	Linus Walleij <linus.walleij@linaro.org>, Andy Shevchenko <andy@kernel.org>, 
+	Geert Uytterhoeven <geert@linux-m68k.org>, Lars-Peter Clausen <lars@metafoo.de>, 
+	Michael Hennerich <Michael.Hennerich@analog.com>, Jonathan Cameron <jic23@kernel.org>, 
+	Ulf Hansson <ulf.hansson@linaro.org>, Peter Rosin <peda@axentia.se>, Andrew Lunn <andrew@lunn.ch>, 
+	Heiner Kallweit <hkallweit1@gmail.com>, Russell King <linux@armlinux.org.uk>, 
+	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Vinod Koul <vkoul@kernel.org>, 
+	Kishon Vijay Abraham I <kishon@kernel.org>, =?UTF-8?B?TnVubyBTw6E=?= <nuno.sa@analog.com>, 
+	Liam Girdwood <lgirdwood@gmail.com>, Mark Brown <broonie@kernel.org>, 
+	Jaroslav Kysela <perex@perex.cz>, Takashi Iwai <tiwai@suse.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
+On Mon, Feb 3, 2025 at 11:39=E2=80=AFPM David Lechner <dlechner@baylibre.co=
+m> wrote:
+>
+> On 2/1/25 1:47 PM, Andy Shevchenko wrote:
+> > On Sat, Feb 1, 2025 at 6:22=E2=80=AFPM Bartosz Golaszewski <brgl@bgdev.=
+pl> wrote:
+> >> On Sat, Feb 1, 2025 at 5:17=E2=80=AFPM David Lechner <dlechner@baylibr=
+e.com> wrote:
+> >>> On 2/1/25 10:14 AM, Bartosz Golaszewski wrote:
+> >>>> On Sat, Feb 1, 2025 at 5:09=E2=80=AFPM David Lechner <dlechner@bayli=
+bre.com> wrote:
+> >>>>> On 2/1/25 4:36 AM, Bartosz Golaszewski wrote:
+> >
+> > ...
+> >
+> >>>>>> This looks good to me except for one thing: the function prefix. I=
+ would
+> >>>>>> really appreciate it if we could stay within the existing gpiod_ n=
+amespace and
+> >>>>>> not add a new one in the form of gpiods_.
+> >>>>>>
+> >>>>>> Maybe: gpiod_multiple_set_ or gpiod_collected_set...?
+> >>>>>
+> >>>>> I was waiting for someone to complain about the naming. ;-)
+> >>>>>
+> >>>>> I was going for as short as possible, but OK, the most obvious pref=
+ix to me
+> >>>>> would be `gpio_descs_...` (to match the first parameter). Any objec=
+tions to
+> >>>>> that?
+> >>>>
+> >>>> Yes, objection! As far as any exported interfaces go: in my book
+> >>>> "gpio_" is the prefix for legacy symbols we want to go away and
+> >>>> "gpiod_" is the prefix for current, descriptor-based API. Anything
+> >>>> else is a no-go. I prefer a longer name that starts with gpiod_ over
+> >>>> anything that's shorter but doesn't.
+> >>>
+> >>> Oops, that was a typo. I meant to write gpiod_descs_.
+> >>
+> >> Eh... the D in gpioD already stands for "GPIO Descriptor" but if
+> >> there's no better option in your opinion than I guess I can live with
+> >> that.
+> >
+> > gpiod_set_many_value_cansleep() ?
+> >
+>
+> OK, taking all these suggestions into consideration along with having rec=
+ently
+> come across regmap_multi_reg_write(), I think I'll go with:
+>
+> gpiod_multi_set_value_cansleep()
 
+Sounds good.
 
-On 2/3/2025 10:35 PM, Tariq Toukan wrote:
-> From: Jianbo Liu <jianbol@nvidia.com>
-> 
-> In later patch, the mlx5_clock will be allocated dynamically, its
-> address can be obtained from mlx5_core_dev struct, but mdev can't be
-> obtained from mlx5_clock because it can be shared by multiple
-> interfaces. So change the parameter for such internal functions, only
-> mdev is passed down from the callers.
-> 
-> Signed-off-by: Jianbo Liu <jianbol@nvidia.com>
-> Reviewed-by: Carolina Jubran <cjubran@nvidia.com>
-> Reviewed-by: Dragos Tatulea <dtatulea@nvidia.com>
-> Signed-off-by: Tariq Toukan <tariqt@nvidia.com>
-> ---
->   .../ethernet/mellanox/mlx5/core/lib/clock.c   | 19 ++++++++-----------
->   1 file changed, 8 insertions(+), 11 deletions(-)
-> 
-> diff --git a/drivers/net/ethernet/mellanox/mlx5/core/lib/clock.c b/drivers/net/ethernet/mellanox/mlx5/core/lib/clock.c
-> index eaf343756026..e7e4bdba02a3 100644
-> --- a/drivers/net/ethernet/mellanox/mlx5/core/lib/clock.c
-> +++ b/drivers/net/ethernet/mellanox/mlx5/core/lib/clock.c
-> @@ -878,10 +878,8 @@ static int mlx5_query_mtpps_pin_mode(struct mlx5_core_dev *mdev, u8 pin,
->   				    mtpps_size, MLX5_REG_MTPPS, 0, 0);
->   }
->   
-> -static int mlx5_get_pps_pin_mode(struct mlx5_clock *clock, u8 pin)
-> +static int mlx5_get_pps_pin_mode(struct mlx5_core_dev *mdev, u8 pin)
->   {
-> -	struct mlx5_core_dev *mdev = container_of(clock, struct mlx5_core_dev, clock);
-> -
->   	u32 out[MLX5_ST_SZ_DW(mtpps_reg)] = {};
->   	u8 mode;
->   	int err;
-> @@ -900,8 +898,9 @@ static int mlx5_get_pps_pin_mode(struct mlx5_clock *clock, u8 pin)
->   	return PTP_PF_NONE;
->   }
->   
-> -static void mlx5_init_pin_config(struct mlx5_clock *clock)
-> +static void mlx5_init_pin_config(struct mlx5_core_dev *mdev)
->   {
-> +	struct mlx5_clock *clock = &mdev->clock;
->   	int i;
->   
->   	if (!clock->ptp_info.n_pins)
-> @@ -922,7 +921,7 @@ static void mlx5_init_pin_config(struct mlx5_clock *clock)
->   			 sizeof(clock->ptp_info.pin_config[i].name),
->   			 "mlx5_pps%d", i);
->   		clock->ptp_info.pin_config[i].index = i;
-> -		clock->ptp_info.pin_config[i].func = mlx5_get_pps_pin_mode(clock, i);
-> +		clock->ptp_info.pin_config[i].func = mlx5_get_pps_pin_mode(mdev, i);
->   		clock->ptp_info.pin_config[i].chan = 0;
->   	}
->   }
-> @@ -1041,10 +1040,10 @@ static void mlx5_timecounter_init(struct mlx5_core_dev *mdev)
->   			 ktime_to_ns(ktime_get_real()));
->   }
->   
-> -static void mlx5_init_overflow_period(struct mlx5_clock *clock)
-> +static void mlx5_init_overflow_period(struct mlx5_core_dev *mdev)
->   {
-> -	struct mlx5_core_dev *mdev = container_of(clock, struct mlx5_core_dev, clock);
->   	struct mlx5_ib_clock_info *clock_info = mdev->clock_info;
-> +	struct mlx5_clock *clock = &mdev->clock;
->   	struct mlx5_timer *timer = &clock->timer;
-
-It seems that because of the refactor the RCT rule has been violated.
-I think you have to split *timer into two lines.
-
->   	u64 overflow_cycles;
->   	u64 frac = 0;
-> @@ -1135,7 +1134,7 @@ static void mlx5_init_timer_clock(struct mlx5_core_dev *mdev)
->   
->   	mlx5_timecounter_init(mdev);
->   	mlx5_init_clock_info(mdev);
-> -	mlx5_init_overflow_period(clock);
-> +	mlx5_init_overflow_period(mdev);
->   
->   	if (mlx5_real_time_mode(mdev)) {
->   		struct timespec64 ts;
-> @@ -1147,13 +1146,11 @@ static void mlx5_init_timer_clock(struct mlx5_core_dev *mdev)
->   
->   static void mlx5_init_pps(struct mlx5_core_dev *mdev)
->   {
-> -	struct mlx5_clock *clock = &mdev->clock;
-> -
->   	if (!MLX5_PPS_CAP(mdev))
->   		return;
->   
->   	mlx5_get_pps_caps(mdev);
-> -	mlx5_init_pin_config(clock);
-> +	mlx5_init_pin_config(mdev);
->   }
->   
->   void mlx5_init_clock(struct mlx5_core_dev *mdev)
-
-Overall if you fix that RCT issue then feel free to add my RB tag,
-thanks.
-
+Bart
 
