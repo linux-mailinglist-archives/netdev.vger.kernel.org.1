@@ -1,88 +1,88 @@
-Return-Path: <netdev+bounces-162560-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-162563-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 62F4FA2738E
-	for <lists+netdev@lfdr.de>; Tue,  4 Feb 2025 14:58:20 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 49767A27391
+	for <lists+netdev@lfdr.de>; Tue,  4 Feb 2025 14:58:33 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 3A0D03A7FC2
-	for <lists+netdev@lfdr.de>; Tue,  4 Feb 2025 13:57:10 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 635581888C06
+	for <lists+netdev@lfdr.de>; Tue,  4 Feb 2025 13:57:42 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AB97E217646;
-	Tue,  4 Feb 2025 13:41:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BF0E421770A;
+	Tue,  4 Feb 2025 13:41:17 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="pnQzL4Mh"
+	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="QRthne5M"
 X-Original-To: netdev@vger.kernel.org
-Received: from NAM10-MW2-obe.outbound.protection.outlook.com (mail-mw2nam10on2043.outbound.protection.outlook.com [40.107.94.43])
+Received: from NAM04-DM6-obe.outbound.protection.outlook.com (mail-dm6nam04on2084.outbound.protection.outlook.com [40.107.102.84])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 128F214037F
-	for <netdev@vger.kernel.org>; Tue,  4 Feb 2025 13:41:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.94.43
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0A911217678
+	for <netdev@vger.kernel.org>; Tue,  4 Feb 2025 13:41:15 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.102.84
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1738676468; cv=fail; b=T4cRr35ZoLkIetqbJOdi05eWjn5y/vb63FAsGEjCfKJu9LSox+DR1UzU2GiV1MFM+0nHBmcHIqSCLqQVs7fivucviZp+M1gvdTbVWSKhPO2HM+UXuh+pliyUBc0h+zbDrPU+mfjlc2uNJi1ejaTI8WolUgj7ghZveoJMzqZ+jzQ=
+	t=1738676477; cv=fail; b=HUwLv2j+lVAiI8S2PDqH6ghI5kpYzR5wM7v47Rpo4N5KYis8AwxeRTFBLDF/4V2wZMuUDEcCeqYZ5TRkVYhB8Dqgfe0GK4L+tQy6bpbjdIELUXWPdgOo2r/kxJTxCr3k4jLBHF7z9CjfOIacaIqS/eCplYb5M4tXKSg+hF1y0IA=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1738676468; c=relaxed/simple;
-	bh=vsRo+Z1XitNlYDclhx+v75Vz03TetQjnchs5IY8Svb8=;
+	s=arc-20240116; t=1738676477; c=relaxed/simple;
+	bh=39aB2TOQKfY7Rx/mxsvpVXnx/inCi9Xz/0jWK81uqc4=;
 	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=efUScPZ5XJsOK7bYWXxoiq3DRfHqa3FkiyMufpTQu73rwLgQvwvgDArY2kUzE6q7c1968MTF11D90g58FGvL91Ed0zHknQCobC7F7QzEb9EPb/4g8LAgh+nTuZrjT18OkEi35Z+GczTjKmARhnFYGOUrg+XUxXOknfjHBjZ8lSA=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=pnQzL4Mh; arc=fail smtp.client-ip=40.107.94.43
+	 MIME-Version:Content-Type; b=GkihVK9lPbeuAfYnLsI+OszsPfqBS9OHe7COrLvvDvG8yX8tyFlatgjPjmcFB5L/YZ0ySq19tPt3njAF+jctj4YhwxPrrP7mQuiG5Zqjs8x0G9QVXZ9BTXb0aPBSfKfsR2BP7QA87+Vz+1IRNNx4gaV5figfhV6NYKM1hA1733U=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=QRthne5M; arc=fail smtp.client-ip=40.107.102.84
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
 Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=PPnaxqWNr19Lcj1cHeoOipDokfYMSi+rRYX72rIpJGH85yfRv4/atVeUUJREaIcX+AjPPJJmPyY/prlv+4Nd8wHCSi+l9nglCnSgUtO0i4b11lSlRcQU22Ocfh892qTjpQQ7zDvmzZ3IM2jSUDEs4+NId5l7EUyPx2dfeduV5E4Cs6O0lAf1O3JZEEh50Dr7HQxkFb46+klwK23kqr75EU90sguaikSPGB8IPnL3AaYmKdvraWsvIYRf7oaTtdO+l2pXTsxp36eLD9K3rHTFYSBMqoFpL2oX2+WKiv6LHvW7uGYTTaqFAIW7spWHSGRMbj421HsoEQUhmUEQLWZ3BA==
+ b=RysrdluBDlZDja6GXTIgLDonj7GV+31IzllRyVxC5PQK6g8ZvFJjnDQTJB7zD7/vKN9QpL9bng2PLQaHex6BG5DeDUNgjOtqaeCl9Wz1tm2ZEV37f30o0pEDF04d8sP+FNPyPfzekJ7IYI6b+yx8maQ98Ni5+xr0CStRyGABc4y7pAOqLW8PGsVaoU6Q8mEbUSVS7VcuHcHqmZAakRufPzVs7cw01odJEyallQXFqu1Kh7xKqvfRFyoa9RiV4+dE/7tHqyH29iyOSmdYxVCuqWQRaHWmtwrXzE4DpdnQHF4hwq6GEHtq4gmPzVVWOCLtcfKaddO4hX5tnO31k4qC9g==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector10001;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=Qk9ZBXs6e1APGRRmxpRsTHmUYslKDWpIIp1+TKR/WoQ=;
- b=BzG2TV7m7/CXQ4vPYcFRRIthfnB2aU4ADq+fcJ8M3GFs+/87V0GIX0CTTFe8H2fjzGjfV5gOrlycG+2Ga+SLSoxS/duvpp3upq/KJ8UMZxhsd50BBzE1twVXNcZ/eCGFakMeyqL9StQ0A0gos+J8PLY4BxWT0notbNCfW5pOWwwL5ZmfsQppveZCVaRx31VQY4wQbdq/B8u9fKH+uAxnjRRCM/28f83m3tPMTQev55NAQlFnGjeIMfyh2kLpYw5TTKfgKKlAlJ/YMlz1pyTocqzkB6bJS50h7yhj4FgcFOJyzdghiGcA7FwrM/o/OEF085WQfjdZ7pHlzAU3C3A23w==
+ bh=qmI623Fq+zNnzpiWLb/3AhLk9N0T+63PY+4AlO9w/kc=;
+ b=gqFSOvfylEvJD1T+/CAvuujpQwVZt1vUO42DhSLRw7tD9L2W/J9XP9oOGDM3YMBwENggO++/2m+rB56+k7h9jHO3WEPfweGktFS3F7+oEeAZmDuaCcfaw2S5Hujzj9MDGN9gQ6H8Sk4MCbONJPZQfpYNplu55Npi005TL2JBQuD1wPJ1miOR0z8QnCCxiXqFxkCuJAYHi5tVmlD5scoD43Ew8GXQBnkeyZshOPJih9esBR5FlhdqADevMCbFj+gWWmJCGUkdlvtKOfzCckZs03nfLBr/YoNFoiydm7JvIyM+eIfOvK+bOu0aa+G6xOmN7lLIW3xNrpnDVmqUwdvDCQ==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
- 216.228.117.161) smtp.rcpttodomain=vger.kernel.org smtp.mailfrom=nvidia.com;
+ 216.228.117.160) smtp.rcpttodomain=vger.kernel.org smtp.mailfrom=nvidia.com;
  dmarc=pass (p=reject sp=reject pct=100) action=none header.from=nvidia.com;
  dkim=none (message not signed); arc=none (0)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
  s=selector2;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=Qk9ZBXs6e1APGRRmxpRsTHmUYslKDWpIIp1+TKR/WoQ=;
- b=pnQzL4MhSJvV9uVdPrDqs68VFkGe6lD0HODp/6i3rNBk27HWaGqpCDhOy7F5VXpwk0996wnrY84eN3ysm127MbmGQDMJL0utkyumDkErbGG1A28JjBoPtFRruxXKoV8zgAgXuK8UZjx3wA1ilGDdyCK7zsbX9nI+gqThUCfliiOlr8Dx0s/IVgvL88lrngvly0ziHv0luR7qOh6b8eQLFcolvkeWZMKOgD2M27NK1uPgyq+q89ApOvFuPnXmlMV0QdN6bX776mq80VJ1g2hjAvC50dJt2dzmgMgppM/DjD/RstrB/R5m0SeWWSfaCCqeOTxzqnOMy0mY78ALwMUSSw==
-Received: from SA1P222CA0056.NAMP222.PROD.OUTLOOK.COM (2603:10b6:806:2c1::8)
- by PH8PR12MB6915.namprd12.prod.outlook.com (2603:10b6:510:1bc::21) with
+ bh=qmI623Fq+zNnzpiWLb/3AhLk9N0T+63PY+4AlO9w/kc=;
+ b=QRthne5MULQeijbCSaYQ1m0r4IDM3uTWVo+FS/7JRJux9EngVvEW40ByfX9jL9wS2fULDusx3nYJNmQJQsjrWP791Zc98DQSpHWDPdoVHxoU5xhEzGtZ5/A/5vcjCzWy/GYpleHmulKpNMKLz7WYTIEWWEu0RUt9vYFRRupgxolndLw/D6poKBN4fcO/T8bYjVXAKPUOdmqHV5kt3JK1pGSvAcJmvhK+jaKJZuwVKmsYHCorNmD4nnhE/GU+0sz8B/AFF3sGoXYAP0xrKnDYaMTLY49upE1e/U4QrROULs5wMZnrzcGkk5N1omOwD7/8PyJtMN5hkFOPj0BFXyd5pg==
+Received: from BN9PR03CA0681.namprd03.prod.outlook.com (2603:10b6:408:10e::26)
+ by DM6PR12MB4234.namprd12.prod.outlook.com (2603:10b6:5:213::18) with
  Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8398.23; Tue, 4 Feb
- 2025 13:41:02 +0000
-Received: from SA2PEPF00003F67.namprd04.prod.outlook.com
- (2603:10b6:806:2c1:cafe::4d) by SA1P222CA0056.outlook.office365.com
- (2603:10b6:806:2c1::8) with Microsoft SMTP Server (version=TLS1_3,
- cipher=TLS_AES_256_GCM_SHA384) id 15.20.8398.24 via Frontend Transport; Tue,
- 4 Feb 2025 13:41:02 +0000
-X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 216.228.117.161)
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8398.24; Tue, 4 Feb
+ 2025 13:41:11 +0000
+Received: from MN1PEPF0000F0E4.namprd04.prod.outlook.com
+ (2603:10b6:408:10e:cafe::64) by BN9PR03CA0681.outlook.office365.com
+ (2603:10b6:408:10e::26) with Microsoft SMTP Server (version=TLS1_3,
+ cipher=TLS_AES_256_GCM_SHA384) id 15.20.8398.20 via Frontend Transport; Tue,
+ 4 Feb 2025 13:41:11 +0000
+X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 216.228.117.160)
  smtp.mailfrom=nvidia.com; dkim=none (message not signed)
  header.d=none;dmarc=pass action=none header.from=nvidia.com;
 Received-SPF: Pass (protection.outlook.com: domain of nvidia.com designates
- 216.228.117.161 as permitted sender) receiver=protection.outlook.com;
- client-ip=216.228.117.161; helo=mail.nvidia.com; pr=C
-Received: from mail.nvidia.com (216.228.117.161) by
- SA2PEPF00003F67.mail.protection.outlook.com (10.167.248.42) with Microsoft
+ 216.228.117.160 as permitted sender) receiver=protection.outlook.com;
+ client-ip=216.228.117.160; helo=mail.nvidia.com; pr=C
+Received: from mail.nvidia.com (216.228.117.160) by
+ MN1PEPF0000F0E4.mail.protection.outlook.com (10.167.242.42) with Microsoft
  SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.8398.14 via Frontend Transport; Tue, 4 Feb 2025 13:41:02 +0000
+ 15.20.8398.14 via Frontend Transport; Tue, 4 Feb 2025 13:41:11 +0000
 Received: from rnnvmail201.nvidia.com (10.129.68.8) by mail.nvidia.com
- (10.129.200.67) with Microsoft SMTP Server (version=TLS1_2,
+ (10.129.200.66) with Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.4; Tue, 4 Feb 2025
- 05:40:45 -0800
+ 05:40:47 -0800
 Received: from dev-r-vrt-155.mtr.labs.mlnx (10.126.230.35) by
  rnnvmail201.nvidia.com (10.129.68.8) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.14; Tue, 4 Feb 2025 05:40:43 -0800
+ 15.2.1544.14; Tue, 4 Feb 2025 05:40:45 -0800
 From: Danielle Ratson <danieller@nvidia.com>
 To: <netdev@vger.kernel.org>
 CC: <mkubecek@suse.cz>, <matt@traverse.com.au>, <daniel.zahka@gmail.com>,
 	<amcohen@nvidia.com>, <nbu-mlxsw@exchange.nvidia.com>, Danielle Ratson
 	<danieller@nvidia.com>
-Subject: [PATCH ethtool-next v3 14/16] ethtool: Enable JSON output support for SFF8079 and SFF8472 modules
-Date: Tue, 4 Feb 2025 15:39:55 +0200
-Message-ID: <20250204133957.1140677-15-danieller@nvidia.com>
+Subject: [PATCH ethtool-next v3 15/16] module_info: Add a new JSON file for units documentation
+Date: Tue, 4 Feb 2025 15:39:56 +0200
+Message-ID: <20250204133957.1140677-16-danieller@nvidia.com>
 X-Mailer: git-send-email 2.47.0
 In-Reply-To: <20250204133957.1140677-1-danieller@nvidia.com>
 References: <20250204133957.1140677-1-danieller@nvidia.com>
@@ -98,140 +98,267 @@ X-ClientProxiedBy: rnnvmail202.nvidia.com (10.129.68.7) To
  rnnvmail201.nvidia.com (10.129.68.8)
 X-EOPAttributedMessage: 0
 X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: SA2PEPF00003F67:EE_|PH8PR12MB6915:EE_
-X-MS-Office365-Filtering-Correlation-Id: f3d2b6d5-c8f7-4d24-4a4f-08dd45219122
+X-MS-TrafficTypeDiagnostic: MN1PEPF0000F0E4:EE_|DM6PR12MB4234:EE_
+X-MS-Office365-Filtering-Correlation-Id: f210b623-c02f-420b-f8da-08dd45219683
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
 X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|1800799024|376014|36860700013|82310400026;
+	BCL:0;ARA:13230040|36860700013|376014|82310400026|1800799024|13003099007;
 X-Microsoft-Antispam-Message-Info:
-	=?us-ascii?Q?Qx+tBDkkhZAo4GKoXNRnl6voZ3nH/eSWHDNV097SB9msMa2u2VQ6kjhfm0eM?=
- =?us-ascii?Q?6j+H7fhr1R/vI1cDSNSSvOEGfyhURR0bmErHL+d/o810ZAeSdysf4vb5dv3b?=
- =?us-ascii?Q?2UZg3cNea960k/imoL2fcdpZ5x/58DRQFZGfNhd0zeOyjQN3iDueKtH1/SKT?=
- =?us-ascii?Q?thoyGoC1yh2EQX+1KsCxwgqvgGhDJmySdcHi7kHeR1nuELwFiVJw9HReL2Bl?=
- =?us-ascii?Q?TIYpMqrfKoL2Bz7Lomdr1dAQy1DhhNz6EEnz1V/ooKUKEuFxOq0hdNvFOVrZ?=
- =?us-ascii?Q?5JGcjxBINMRH/NXt2+mAgnRtQS6uxj0ITySolhusHeGXj9ZA7KUBrKiuRK7W?=
- =?us-ascii?Q?cEs2ygHgRmEVbnsiINK3C7FamNKERxsxJvFrGYf/2ubbz9NcZswO0AKzG6DC?=
- =?us-ascii?Q?DWWh8dpF9YxOl8f8x4fBfiy39Wv1KgrFn3llKiJFXbKht7iXlnEnotHCbbE0?=
- =?us-ascii?Q?6+PzMjA3hVexxqYCSmxFQD5OGr58UYZ1F8eO00A857Bd0ziHEckEz8X1Geeq?=
- =?us-ascii?Q?sBggDXSlvaFNLRLSv+n9pnEGd0k03KbAZv+VKAyTmKPD3bduBc2fTNYKFi2t?=
- =?us-ascii?Q?ajl68DEVarg37rwHFzfy1Xu/tdpYQSKgyttorOxLZ/BkcdEcz9iP/ffrHYx4?=
- =?us-ascii?Q?C976ita/9mwuuWoaJoJrBNLDHYORK5jNQBltx447KGyjGKJ39crz6phopBP3?=
- =?us-ascii?Q?KM2l7mpH4idIvjrxctSk5HG63sfyXnavVPhlVYhExNWc1ZSUwUXdow1nK7Zf?=
- =?us-ascii?Q?XAqrf7z4i+WsXeHRLYTLdfpaqli3FRoA+Q7bSggvI3UyGkCefcxmcBjUFGT7?=
- =?us-ascii?Q?gRJNGh/S4yDp4TQs0ODVJL/WJSV9MoyDcfM6LlHkf51cm5ph4+tJZwH1vsSd?=
- =?us-ascii?Q?lwCwZ+ye0S0o/njal3fmAjGPoMHqiNwM9v9yttLSpwIfVNJ4VKSgFlqHcIPA?=
- =?us-ascii?Q?8q7JIMsa8IM3N9srIYOhWcnIiK8UB5GFKYetcOe+32Q5KIh7QGAZWib4defF?=
- =?us-ascii?Q?dw54zJcLVItBPyaydYetY6IsuSfQzckcs+xqT/sfnU/2Ui+hVl1iod9ps6SL?=
- =?us-ascii?Q?6G/+XOr9dZ0MMOCnPnxn47ObnC5EFpaylC+enTzFNLZ+SvMy8L/SPJ5GSWzc?=
- =?us-ascii?Q?6xqEDSzcyKsFgdbYxQ5nersBdKqXVuzIqt8YGukNsXb/r8iEeqOkKYHm49Sy?=
- =?us-ascii?Q?MX8QQaXRbxsgW3ezQYSf2vQup+XMybj0bX0ehiGBf62WPwWe98Ko8s+TmiMO?=
- =?us-ascii?Q?av49pPJdXFV4bVaL3xMVSbOON5LhNwtez/WXrSc/AqDLLIl+LhOpQvMGIiXM?=
- =?us-ascii?Q?kYWvubyuHi33ycZmOOWjWVe8lhJYhzj4x+Yn4TSE+P/Dq8wBOOwu2DZXD3kH?=
- =?us-ascii?Q?JeEjSYVaRhC/sYmA7k3EpqhwTUuiJ7gM/KkfwVpJTSv/xeaQp8DD3uwmvKN1?=
- =?us-ascii?Q?Y9O5ITL7vT1oH1oeH82clKQCWDsxAbhi7Jt9FzQfnBX0Nnlmh7EVcjFPi/N7?=
- =?us-ascii?Q?VjZZ93+CpJ1oGVA=3D?=
+	=?us-ascii?Q?lB21FFdmFekmpyIb7Vl86slo7JmcXVAb7k1pasV4qOyIDTp3/bhTjfLG2pIj?=
+ =?us-ascii?Q?6JHVGXfrvC72l3CCwVHDiYP9ZQFnJkZCoGcJD9JLXwUDV62TwBc93G+21MA8?=
+ =?us-ascii?Q?fN/84/HTY5wJDHmBK4PjT6Y08gF0ij2w2uYNgEryeVhpjhNoTG+FRZeWmOTD?=
+ =?us-ascii?Q?AYyGtAmRxeYY4a6wKLEJRUu1qCKKl3xWQFxn9HfqkbWU7ylOoH+LB9/zmCaI?=
+ =?us-ascii?Q?tnWw7te1Bj7PFovvfnkM/HOcoWbCoV0ZwJ+UrdQIqCEuDVID3kJJV5OQrVVC?=
+ =?us-ascii?Q?Rhi5k3x8AGAQkxSMG+lI95kkKxa3REFcY2w2+6umnVTzuUzN78ymMTBQWTuQ?=
+ =?us-ascii?Q?t9yV4SV/aoj413PBPlohIklj0z+0fY4HLk7OztPiQZi8yl/1i2gef/KVs05s?=
+ =?us-ascii?Q?82KNB0jgd0xcXsilb7pwMGjsDhy/Alnha9KTB8BpkI14hggmMB9T2ZrO8SrD?=
+ =?us-ascii?Q?fBcT/STcuGYtuT0qAnOLgWmwGN1vViLJ5uUYib+QpB4Ch1j02MkGImTZ9lBf?=
+ =?us-ascii?Q?oXa/7ibY68AnWQIirwFPvKlXekJ95cGzAEWCX6ALqSFz3tUrrJHPn5+pX2xb?=
+ =?us-ascii?Q?Iz+rL32JbqDxiRQD6M5y+8cEksT3S0Gchu/ut/5t69ZBt71ccSTzFty+v+X5?=
+ =?us-ascii?Q?Ka1t1ogtCeDEMj/9QYvsPUnldIp3bjlx3Ey7kVpAmiuQ95KcyvbE0rV1Ql68?=
+ =?us-ascii?Q?i8TVmg1mihKP//++ooxpkGH30BvmAOu8Sl5MzxuDIQ2XvqnJDF33FtApl02E?=
+ =?us-ascii?Q?97NnZTa8zSZ4H3350kKXKJnIgUs9uJzmTJiY8SCfeh2Q3pTSvBnqZ3Uc6oUT?=
+ =?us-ascii?Q?dHRn+DcuNaG5rWIpj73BauF5iJE0oE8B68kbOyz7abUIx1EUzcIZ97IRfS4V?=
+ =?us-ascii?Q?X5/bV4x8oVy0s77VpqTuU6qMmW7sAq8TVOsXfSJLnjSbaefSwDH/PzRXDjR9?=
+ =?us-ascii?Q?fMiT78v3mE1fUc9cBvrg2skDOWUHLguf/9CCBqmWQnjhlN+W3lcjKvWOr7Vm?=
+ =?us-ascii?Q?Z2cFKX8+QDYQYgNArodB9Qr3fsrcQ6moXdb9DAEbiz0xP3gTeZzavp027qhY?=
+ =?us-ascii?Q?lRVZk8uNhd5TyggTQwHPgAraLpTdyAZyxLr6F2bHK5INPVvjdOC+IZILak0L?=
+ =?us-ascii?Q?s03i1nSiL4URsecvvkATtbKVdi9pya+gCSb04gZwoQnPJ/jZ/6UaG5zBxEre?=
+ =?us-ascii?Q?KPjrt/RPwSt+Z1KSwLtXsd4LBkQxMsjaGhK91BF2grDrYXXoojtcH3RSTIdx?=
+ =?us-ascii?Q?9QAd+2L1RTuCfT5K8HmYjzDhb7R3zUM7iYFe/dYi6rL24TjxVX0buORlNWhY?=
+ =?us-ascii?Q?KMxVyOj66o3meMt5AxV42acaSvkeMuh9b9ynRuyOWXnPCY3lpRBKVcqQKfKj?=
+ =?us-ascii?Q?FQIl2kO04apN4AZZF4/kKVUvekXd9uuIlMUOBeXKuhvrdjTGAIvSG9YBTCyU?=
+ =?us-ascii?Q?8UjyZg/B04/k+H/Bz/yJMvsQgOf0torBvZ+ssU/yi++GiHVbtfx5Zf6JdNws?=
+ =?us-ascii?Q?6gCQEHKsplw5Sn0=3D?=
 X-Forefront-Antispam-Report:
-	CIP:216.228.117.161;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:dc6edge2.nvidia.com;CAT:NONE;SFS:(13230040)(1800799024)(376014)(36860700013)(82310400026);DIR:OUT;SFP:1101;
+	CIP:216.228.117.160;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:dc6edge1.nvidia.com;CAT:NONE;SFS:(13230040)(36860700013)(376014)(82310400026)(1800799024)(13003099007);DIR:OUT;SFP:1101;
 X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 04 Feb 2025 13:41:02.6253
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 04 Feb 2025 13:41:11.5915
  (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: f3d2b6d5-c8f7-4d24-4a4f-08dd45219122
+X-MS-Exchange-CrossTenant-Network-Message-Id: f210b623-c02f-420b-f8da-08dd45219683
 X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[216.228.117.161];Helo=[mail.nvidia.com]
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[216.228.117.160];Helo=[mail.nvidia.com]
 X-MS-Exchange-CrossTenant-AuthSource:
-	SA2PEPF00003F67.namprd04.prod.outlook.com
+	MN1PEPF0000F0E4.namprd04.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Anonymous
 X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH8PR12MB6915
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM6PR12MB4234
 
- A sample output:
+The JSON output dump will not contain explicit unit indicators in the
+output fields.
 
-$ ethtool --json -m swp1
-[ {
-        "identifier": 3,
-        "identifier_description": "SFP",
-        "extended_identifier": 4,
-        "extended_identifier_description": "GBIC/SFP defined by 2-wire
-interface ID",
-        "connector": 33,
-        "connector_description": "Copper pigtail",
-        "transceiver_codes": [ 1,0,0,4,0,4,128,213,0 ],
-        "transceiver_type": "FC: 100 MBytes/sec",
-        "encoding": 0,
-        "encoding_description": "unspecified",
-        "br_nominal": 10300,
-        "rate_identifier": 0,
-        "rate_identifier_description": "unspecified",
-        "length_(smf)": 0,
-        "length_(om2)": 0,
-        "length_(om1)": 0,
-        "length_(copper_or_active_cable)": 2,
-        "length_(om3)": 0,
-        "passive_cu_cmplnce.": 1,
-        "passive_cu_cmplnce._description": "SFF-8431 appendix E
-[SFF-8472 rev10.4 only]",
-        "vendor_name": "Mellanox",
-        "vendor_oui": [ 0,2,201 ],
-        "vendor_pn": "MC2309130-002",
-        "vendor_rev": "A2",
-        "option_values": [ 0,0 ],
-        "br_margin_max": 0,
-        "br_margin_min": 0,
-        "vendor_sn": "MT1146VS00060",
-        "date_code": "111110"
-} ]
+Instead, document those units in a separate schema JSON file so a JSON consumer
+will be able to track this information.
 
 Signed-off-by: Danielle Ratson <danieller@nvidia.com>
 ---
 
 Notes:
     v3:
-    	* Enable JSON output support for SFF8079.
-    	* Reword commit message.
+    	* New patch.
 
- ethtool.c | 4 ++++
- sfpid.c   | 4 ++++
- 2 files changed, 8 insertions(+)
+ module_info.json | 191 +++++++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 191 insertions(+)
+ create mode 100644 module_info.json
 
-diff --git a/ethtool.c b/ethtool.c
-index 0b876e8..8a81001 100644
---- a/ethtool.c
-+++ b/ethtool.c
-@@ -5007,6 +5007,8 @@ static int do_getmodule(struct cmd_context *ctx)
- 		    (eeprom->len != modinfo.eeprom_len)) {
- 			geeprom_dump_hex = 1;
- 		} else if (!geeprom_dump_hex) {
-+			new_json_obj(ctx->json);
-+			open_json_object(NULL);
- 			switch (modinfo.type) {
- #ifdef ETHTOOL_ENABLE_PRETTY_DUMP
- 			case ETH_MODULE_SFF_8079:
-@@ -5026,6 +5028,8 @@ static int do_getmodule(struct cmd_context *ctx)
- 				geeprom_dump_hex = 1;
- 				break;
- 			}
-+			close_json_object();
-+			delete_json_obj();
- 		}
- 		if (geeprom_dump_hex)
- 			dump_hex(stdout, eeprom->data,
-diff --git a/sfpid.c b/sfpid.c
-index 0ccf9ad..62acb4f 100644
---- a/sfpid.c
-+++ b/sfpid.c
-@@ -517,7 +517,11 @@ int sff8079_show_all_nl(struct cmd_context *ctx)
- 	if (ret)
- 		goto out;
- 
-+	new_json_obj(ctx->json);
-+	open_json_object(NULL);
- 	sff8079_show_all_common(buf);
-+	close_json_object();
-+	delete_json_obj();
- 
- 	/* Finish if A2h page is not present */
- 	if (!(buf[92] & (1 << 6)))
+diff --git a/module_info.json b/module_info.json
+new file mode 100644
+index 0000000..1ef214b
+--- /dev/null
++++ b/module_info.json
+@@ -0,0 +1,191 @@
++{
++	"$schema": "https://json-schema.org/draft/2020-12/schema",
++	"title": "Ethtool module-info JSON Output",
++	"description": "Units documentation for various fields in the output.",
++	"type": "array",
++	"items": {
++		"type": "object",
++		"properties": {
++			"br_nominal": {
++				"type": "integer",
++				"description": "Unit: Mbps"
++			},
++			"length_(smf)": {
++				"type": "integer",
++				"description": "Unit: km"
++			},
++			"length_(om5)": {
++				"type": "integer",
++				"description": "Unit: m"
++			},
++			"length_(om4)": {
++				"type": "integer",
++				"description": "Unit: m"
++			},
++			"length_(om3)": {
++				"type": "integer",
++				"description": "Unit: m"
++			},
++			"length_(om2)": {
++				"type": "integer",
++				"description": "Unit: m"
++			},
++			"length_(om1)": {
++				"type": "integer",
++				"description": "Unit: m"
++			},
++			"length_(copper_or_active_cable)":
++			{
++				"type": "integer",
++				"description": "Unit: m"
++			},
++			"laser_wavelength": {
++				"type": "integer",
++				"description": "Unit: nm"
++			},
++			"laser_wavelength_tolerance": {
++				"type": "integer",
++				"description": "Unit: nm"
++			},
++			"module_temperature": {
++				"type": "number",
++				"description": "Unit: degrees C"
++			},
++			"module_voltage": {
++				"type": "number",
++				"description": "Unit: V"
++			},
++			"laser_tx_bias_current": {
++				"type": "array",
++				"items": {
++					"type": "number"
++				},
++				"description": "Unit: mA"
++			},
++			"transmit_avg_optical_power": {
++				"type": "array",
++				"items": {
++					"type": "number"
++				},
++				"description": "Unit: mW"
++			},
++			"rx_power": {
++				"type": "object",
++				"properties": {
++					"values": {
++						"type": "array",
++						"items": {
++							"type": "number"
++						},
++						"description": "Unit: mW"
++					}
++				}
++			},
++			"laser_bias_current": {
++				"type": "object",
++				"properties": {
++					"high_alarm_threshold": {
++						"type": "number",
++						"description": "Unit: mA"
++					},
++					"low_alarm_threshold": {
++						"type": "number",
++						"description": "Unit: mA"
++					},
++					"high_warning_threshold": {
++						"type": "number",
++						"description": "Unit: mA"
++					},
++					"low_warning_threshold": {
++						"type": "number",
++						"description": "Unit: mA"
++					}
++				}
++			},
++			"laser_output_power": {
++				"type": "object",
++				"properties": {
++					"high_alarm_threshold": {
++						"type": "number",
++						"description": "Unit: mW"
++					},
++					"low_alarm_threshold": {
++						"type": "number",
++						"description": "Unit: mW"
++					},
++					"high_warning_threshold": {
++						"type": "number",
++						"description": "Unit: mW"
++					},
++					"low_warning_threshold": {
++						"type": "number",
++						"description": "Unit: mW"
++					}
++				}
++			},
++			"module_temperature": {
++				"type": "object",
++				"properties": {
++					"high_alarm_threshold": {
++						"type": "number",
++						"description": "Unit: degrees C"
++					},
++					"low_alarm_threshold": {
++						"type": "number",
++						"description": "Unit: degrees C"
++					},
++					"high_warning_threshold": {
++						"type": "number",
++						"description": "Unit: degrees C"
++					},
++					"low_warning_threshold": {
++						"type": "number",
++						"description": "Unit: degrees C"
++					}
++				}
++			},
++			"module_voltage": {
++				"type": "object",
++				"properties": {
++					"high_alarm_threshold": {
++						"type": "number",
++						"description": "Unit: V"
++					},
++					"low_alarm_threshold": {
++						"type": "number",
++						"description": "Unit: V"
++					},
++					"high_warning_threshold": {
++						"type": "number",
++						"description": "Unit: V"
++					},
++					"low_warning_threshold": {
++						"type": "number",
++						"description": "Unit: V"
++					}
++				}
++			},
++			"laser_rx_power": {
++				"type": "object",
++				"properties": {
++					"high_alarm_threshold": {
++						"type": "number",
++						"description": "Unit: mW"
++					},
++					"low_alarm_threshold": {
++						"type": "number",
++						"description": "Unit: mW"
++					},
++					"high_warning_threshold": {
++						"type": "number",
++						"description": "Unit: mW"
++					},
++					"low_warning_threshold": {
++						"type": "number",
++						"description": "Unit: mW"
++					}
++				}
++			}
++		}
++	}
++}
 -- 
 2.47.0
 
