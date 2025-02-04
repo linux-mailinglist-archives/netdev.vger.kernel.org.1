@@ -1,91 +1,64 @@
-Return-Path: <netdev+bounces-162581-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-162582-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id E9CEBA2747F
-	for <lists+netdev@lfdr.de>; Tue,  4 Feb 2025 15:38:44 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 125EDA2748A
+	for <lists+netdev@lfdr.de>; Tue,  4 Feb 2025 15:40:12 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id D33B61885E29
-	for <lists+netdev@lfdr.de>; Tue,  4 Feb 2025 14:38:47 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 601337A2E5D
+	for <lists+netdev@lfdr.de>; Tue,  4 Feb 2025 14:39:14 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7C2E92139C7;
-	Tue,  4 Feb 2025 14:38:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 56739213E76;
+	Tue,  4 Feb 2025 14:39:45 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="Vzg/txQ4"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="QOlIVxya"
 X-Original-To: netdev@vger.kernel.org
-Received: from fhigh-b8-smtp.messagingengine.com (fhigh-b8-smtp.messagingengine.com [202.12.124.159])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B364C213E60
-	for <netdev@vger.kernel.org>; Tue,  4 Feb 2025 14:38:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=202.12.124.159
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2B675213E6D;
+	Tue,  4 Feb 2025 14:39:44 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1738679909; cv=none; b=W7t4G67mCiyAU3xH2w61NkD2yLasEtgLTFqLJFKk8m5xd7psB91p4Gl2opu058lyXdY26wGyVweAuIf6DbtnzUcgvxsbRhZbJA+6/v6e+NfeDMrisH8pSo5VfTFGNaOEomg7mzuqCdFbwpcFaj6HSy7uFhJWudrvmxtE8ARdB18=
+	t=1738679985; cv=none; b=iG/XgdoPxJXjB8uUUbFCykD+KcRx9x7BmnUticJhflVJG3RkA6sPQ6EDQ9pyNwGNY02db8WNiea7EXoUem0wUXA8aETw3Rb/8hn2rHh5atgh2HW6FmyGVkU3CJg0/+3UMK53Wujqapffs8VovWw1pgYLOdk/fA51Cp9yWBqdKd0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1738679909; c=relaxed/simple;
-	bh=vfX8+mFcQ4UC2Df2hYwgNUEPhP70RqTr+bN6o6OeM0A=;
+	s=arc-20240116; t=1738679985; c=relaxed/simple;
+	bh=5GlRqCCgL38eGq3w5B1EVvtJfT68wKhuqhLDhkNIORY=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=fU0AZihVQD6rU0IMgPNguhLW/K15gakVLbJxU10yiojCPK0FTxXEW7Ccw+nRo85IlnrWPu10R7E23X3CW6ZY5FgnjjWPj7XE/2q5RlIUipp8RmgMquX+QQdTtpplYXoIc6UIorNG6u23yvZWh/ICnPHWl6k9Jb/7Ux4iRSfVjUY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=idosch.org; spf=none smtp.mailfrom=idosch.org; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=Vzg/txQ4; arc=none smtp.client-ip=202.12.124.159
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=idosch.org
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=idosch.org
-Received: from phl-compute-11.internal (phl-compute-11.phl.internal [10.202.2.51])
-	by mailfhigh.stl.internal (Postfix) with ESMTP id A25BF254016F;
-	Tue,  4 Feb 2025 09:38:26 -0500 (EST)
-Received: from phl-mailfrontend-01 ([10.202.2.162])
-  by phl-compute-11.internal (MEProxy); Tue, 04 Feb 2025 09:38:26 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
-	messagingengine.com; h=cc:cc:content-type:content-type:date:date
-	:feedback-id:feedback-id:from:from:in-reply-to:in-reply-to
-	:message-id:mime-version:references:reply-to:subject:subject:to
-	:to:x-me-proxy:x-me-sender:x-me-sender:x-sasl-enc; s=fm3; t=
-	1738679906; x=1738766306; bh=vfX8+mFcQ4UC2Df2hYwgNUEPhP70RqTr+bN
-	6o6OeM0A=; b=Vzg/txQ49t3OEf8OXmQMvvFRmnwCByeuqpvFxUJVIgVAN9YqQe2
-	aNIHsyG9p4AlUa5FvDTAXUPEo4ISuITqsg17Va8f3C1YhsyCsc18xxXOVeMMHSMk
-	ExeQuvM837Xv5hSaizllQdahvwHiMbxNtQh1qUUHWf4PxtgbfUR6DbRPXnYusYe6
-	lk+Qwir1HUgLKYazrs52m+7UDE7CU60NUsyZMuzpJDfWVMq7xSwrhW9DJt04pZLJ
-	839ncrLBVQgTbfjo1vPsR4pDVmKdR6BDxQo+Dh0t4xz5oXENzzeUvu5w/quNSAQb
-	GPM1O5nKdNB1YO1JETSoj0u7e/QX1hVPe8w==
-X-ME-Sender: <xms:YiaiZwYskJums9Pm3JPNa256foTT262dk3U3OS8g4DTw2b46H98O_g>
-    <xme:YiaiZ7Y-btXa5BuS6voEFIOfcy14PJB6asU-1lNoIIUYFx70iIkQ7ptJCs6jEiLrK
-    YH0TVcv11iiwq4>
-X-ME-Received: <xmr:YiaiZ6-PcIeW8w678n5MbF5FszyUekpPL3Hs_D7bnMYAc-SiuEiaN8rGHaWQ>
-X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeefvddrtddtgddvtdejkecutefuodetggdotefrod
-    ftvfcurfhrohhfihhlvgemucfhrghsthforghilhdpggftfghnshhusghstghrihgsvgdp
-    uffrtefokffrpgfnqfghnecuuegrihhlohhuthemuceftddtnecusecvtfgvtghiphhivg
-    hnthhsucdlqddutddtmdenucfjughrpeffhffvvefukfhfgggtuggjsehttdertddttddv
-    necuhfhrohhmpefkughoucfutghhihhmmhgvlhcuoehiughoshgthhesihguohhstghhrd
-    horhhgqeenucggtffrrghtthgvrhhnpedvudefveekheeugeeftddvveefgfduieefudei
-    fefgleekheegleegjeejgeeghfenucevlhhushhtvghrufhiiigvpedtnecurfgrrhgrmh
-    epmhgrihhlfhhrohhmpehiughoshgthhesihguohhstghhrdhorhhgpdhnsggprhgtphht
-    thhopeejpdhmohguvgepshhmthhpohhuthdprhgtphhtthhopeiinhhstghntghhvghnse
-    hgmhgrihhlrdgtohhmpdhrtghpthhtohepuggrvhgvmhesuggrvhgvmhhlohhfthdrnhgv
-    thdprhgtphhtthhopegvughumhgriigvthesghhoohhglhgvrdgtohhmpdhrtghpthhtoh
-    epkhhusggrsehkvghrnhgvlhdrohhrghdprhgtphhtthhopehprggsvghnihesrhgvughh
-    rghtrdgtohhmpdhrtghpthhtoheprghnughrvgifodhnvghtuggvvheslhhunhhnrdgthh
-    dprhgtphhtthhopehnvghtuggvvhesvhhgvghrrdhkvghrnhgvlhdrohhrgh
-X-ME-Proxy: <xmx:YiaiZ6rTO0iY_U8XBiUzlFEPwJlq0eYb0oMREDEhcyzTDrzPx95hkg>
-    <xmx:YiaiZ7qfn0r9d3Nf29Yr87dYHGMDdNLh78M2HfYtnB4ke6SnmVpN8g>
-    <xmx:YiaiZ4S61jvF8cMhRzeSDQl4-h_xxW2vdqy0Y_QAN5T-p4iXWH-_VA>
-    <xmx:YiaiZ7qTTUI9S6Jh_frBEIQcH1GSJ7YwmDYpszuo1oTiHdgYTiS1Sw>
-    <xmx:YiaiZ8eeGH4VXXYNjUkGUEmbAogm2aiat7vKnfh3dDKuRsqp_7jZC3xH>
-Feedback-ID: i494840e7:Fastmail
-Received: by mail.messagingengine.com (Postfix) with ESMTPA; Tue,
- 4 Feb 2025 09:38:25 -0500 (EST)
-Date: Tue, 4 Feb 2025 16:38:23 +0200
-From: Ido Schimmel <idosch@idosch.org>
-To: Ted Chen <znscnchen@gmail.com>
-Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
-	pabeni@redhat.com, andrew+netdev@lunn.ch, netdev@vger.kernel.org
-Subject: Re: [PATCH RFC net-next 3/3] vxlan: vxlan_rcv(): Update comment to
- inlucde ipv6
-Message-ID: <Z6ImX7hAB44uUrI0@shredder>
-References: <20250201113207.107798-1-znscnchen@gmail.com>
- <20250201113422.107849-1-znscnchen@gmail.com>
- <Z59gc6--yjT6nLCE@shredder>
- <Z6ISkVTHtknDTPGn@t-dallas>
+	 Content-Type:Content-Disposition:In-Reply-To; b=SLE8O43N/UzNPRaOa/YTE3zsChEPhHPZv5vDPYdlRRJJBna+1GmOfjF0dOy5bQexxWMYYJeoj0YfsUWLxN4BqqZG5rznvOqaRI/Am6+Fp0IoEc0969jFeGypbE1r0pdTnkdRrT0YjydIEQ4BwCzvM9bFgaHOoIBBFy/O9vpPz+M=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=QOlIVxya; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 76C15C4CEDF;
+	Tue,  4 Feb 2025 14:39:40 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1738679984;
+	bh=5GlRqCCgL38eGq3w5B1EVvtJfT68wKhuqhLDhkNIORY=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=QOlIVxyaBLo+lHYsH10tybJKfOnt5svziBQJzF1nxY03A7XXA8vsvp5Vo5t9w67eD
+	 zpZZce1FAgN6VAkh7/zWZAWmDNvzJRIvJTD+ew0LnIN5GuSygaXPcVNgyJXYHjLl2d
+	 d6KsSI04BUt4Am9PXlyp1XfnC7rtYBX8JSjKhbirAtuvgqEiFtQdhSqh2DulXdz5Zo
+	 6roYft+8AQlBd7nCImtST0+fGVRXiUHvuibaR9Yndql5XPGYQLXR8l6PFbbs+1a4fv
+	 5RB1BXPXOOpyOUccUlkfIRgjtoo99XTBiYSAVkwFpeGbn6fJHdZ2VrDT5KHcz5RByP
+	 1w0bWdrXdVBZg==
+Date: Tue, 4 Feb 2025 14:39:38 +0000
+From: Simon Horman <horms@kernel.org>
+To: Alexandra Winter <wintera@linux.ibm.com>
+Cc: David Miller <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>, Eric Dumazet <edumazet@google.com>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	Aswin Karuvally <aswin@linux.ibm.com>, netdev@vger.kernel.org,
+	linux-s390@vger.kernel.org, Heiko Carstens <hca@linux.ibm.com>,
+	Vasily Gorbik <gor@linux.ibm.com>,
+	Alexander Gordeev <agordeev@linux.ibm.com>,
+	Christian Borntraeger <borntraeger@linux.ibm.com>,
+	Sven Schnelle <svens@linux.ibm.com>,
+	Thorsten Winkler <twinkler@linux.ibm.com>,
+	Jonathan Corbet <corbet@lwn.net>,
+	Peter Oberparleiter <oberpar@linux.ibm.com>
+Subject: Re: [PATCH net-next] s390/net: Remove LCS driver
+Message-ID: <20250204143938.GE234677@kernel.org>
+References: <20250204103135.1619097-1-wintera@linux.ibm.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -94,20 +67,47 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <Z6ISkVTHtknDTPGn@t-dallas>
+In-Reply-To: <20250204103135.1619097-1-wintera@linux.ibm.com>
 
-On Tue, Feb 04, 2025 at 09:13:53PM +0800, Ted Chen wrote:
-> I'm ok with either way.
-> Please let me know if I need to send a separate one or the current one
-> is fine.
+On Tue, Feb 04, 2025 at 11:31:35AM +0100, Alexandra Winter wrote:
+> From: Aswin Karuvally <aswin@linux.ibm.com>
+> 
+> The original Open Systems Adapter (OSA) was introduced by IBM in the
+> mid-90s. These were then superseded by OSA-Express in 1999 which used
+> Queued Direct IO to greatly improve throughput. The newer cards
+> retained the older, slower non-QDIO (OSE) modes for compatibility with
+> older systems. In Linux, the lcs driver was responsible for cards
+> operating in the older OSE mode and the qeth driver was introduced to
+> allow the OSA-Express cards to operate in the newer QDIO (OSD) mode.
+> 
+> For an S390 machine from 1998 or later, there is no reason to use the
+> OSE mode and lcs driver as all OSA cards since 1999 provide the faster
+> OSD mode. As a result, it's been years since we have heard of a
+> customer configuration involving the lcs driver.
+> 
+> This patch removes the lcs driver. The technology it supports has been
+> obsolete for past 25+ years and is irrelevant for current use cases.
+> 
+> Reviewed-by: Alexandra Winter <wintera@linux.ibm.com>
+> Acked-by: Heiko Carstens <hca@linux.ibm.com>
+> Acked-by: Peter Oberparleiter <oberpar@linux.ibm.com>
+> Signed-off-by: Aswin Karuvally <aswin@linux.ibm.com>
+> Signed-off-by: Alexandra Winter <wintera@linux.ibm.com>
+> ---
+>  Documentation/arch/s390/driver-model.rst |    2 +-
+>  arch/s390/include/asm/irq.h              |    1 -
+>  arch/s390/kernel/irq.c                   |    1 -
+>  drivers/s390/net/Kconfig                 |   11 +-
+>  drivers/s390/net/Makefile                |    1 -
+>  drivers/s390/net/lcs.c                   | 2385 ----------------------
+>  drivers/s390/net/lcs.h                   |  342 ----
+>  7 files changed, 2 insertions(+), 2741 deletions(-)
+>  delete mode 100644 drivers/s390/net/lcs.c
+>  delete mode 100644 drivers/s390/net/lcs.h
 
-Yes, need to resend as a standalone patch.
+Less is more :)
 
-> > Regardless, please submit this patch separately as it's not related to
-> > the other patches in the series.
-> I came across this comment when I wrote this series as I found vxlan_rcv()
-> is called for both IPV4 and IPV6. Besides, I saw vxlan_err_lookup() has a
-> similar comment.
+Reviewed-by: Simon Horman <horms@kernel.org>
 
-OK, so it makes sense to adjust the comment like you did.
+
 
