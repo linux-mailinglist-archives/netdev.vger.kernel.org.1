@@ -1,145 +1,121 @@
-Return-Path: <netdev+bounces-162734-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-162735-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1DA7EA27C3C
-	for <lists+netdev@lfdr.de>; Tue,  4 Feb 2025 20:56:23 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 89EB3A27C5A
+	for <lists+netdev@lfdr.de>; Tue,  4 Feb 2025 21:03:49 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A9F8316436B
-	for <lists+netdev@lfdr.de>; Tue,  4 Feb 2025 19:56:21 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 7473C188323B
+	for <lists+netdev@lfdr.de>; Tue,  4 Feb 2025 20:03:54 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 218B0224AFB;
-	Tue,  4 Feb 2025 19:51:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8A9532063C9;
+	Tue,  4 Feb 2025 20:03:46 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="hhSBazyO"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="OARTj0DF"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-f51.google.com (mail-ed1-f51.google.com [209.85.208.51])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4DE7E224AE0;
-	Tue,  4 Feb 2025 19:51:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.51
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 66EFA205505
+	for <netdev@vger.kernel.org>; Tue,  4 Feb 2025 20:03:46 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1738698678; cv=none; b=Y5RRiaDTccy8zPQfmcPx782jtXhyfksor1NccW8q9mVkSpNk/+FOM7UZPeJimE64IDAC+cRJrURDKYoj/tOtdyYwAQyu4BdeJ/im9jgOzDGZvsJv7sjPK6fpcUx9PXrZ85UFSUWsMSiyRTILmZN4N5fAVgjnMEV7ehXNYEqM+6o=
+	t=1738699426; cv=none; b=ghiNTquoMewRoWSnZcdPN8zNNjin1WtimZfH8ghasJwe05r2e0XaCT8aVBRR7OdpS6kVfKuJPUmHEwqHH59tj6lTnO9ktHHHnxVdlJCOPurFlFljdj3psqOKe8dG+lHKZ6v00ljnJPXr3FFJGbpalKRT/Lo0vJZRSQlZAb50WR4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1738698678; c=relaxed/simple;
-	bh=2PoSot17IPgvGrwZQaLK7OB047ZHzlEQm5SMVbwJSC0=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=PWUQBEgzgg6uD8oyadomEF+2EEbdlt7qPq2P034JaPFyIo/lDCGbpNEDnGkA9PD0ut+e+qvCa0IoRLrsyGrTv2SJFXxqB/dMe4VZRQsY/OUUkzjBK5i1hYF7L9F3lMTejE3nHhJgNGS2FxnWBS8x7MaRsVL1DdVrjc5kpTEQ9sY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=hhSBazyO; arc=none smtp.client-ip=209.85.208.51
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ed1-f51.google.com with SMTP id 4fb4d7f45d1cf-5dc7eba78e6so11473618a12.3;
-        Tue, 04 Feb 2025 11:51:14 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1738698673; x=1739303473; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=x3zGgQftF1kIqFcOzW0oJY2LAeldvT+ZF1lgB5sAD0U=;
-        b=hhSBazyOqacEijGUxAe0LCr3W0LKITkxiNlQcSfU7e9PMoNXu+nIXpkiXpRH4xiufT
-         Wr4Nl1gKmG4BszZ3lnr95YCW8s3WFg65rzRp+/YQYWfy1ic94WxJMwkE0R0PnzywwVEN
-         40lOdaIY+IUbSbkIXPhcHt2sH4t2c5A1iOWIn6yBHULDm/Y3KWzstaKbqfSz9dEIaPRP
-         CuxbYIydiud2nVte59j6agVOpx2ORRyQIuB2Z+Tbp7/80R5GKjVkcbhgUcUCv5h1dNQs
-         u9iLiL9qDCHAzRV7nbhYYzG9sPFg9daKNdUSQBj/QBL0P8sb14cmzVhSOtHOiQI7CzYm
-         1RBQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1738698673; x=1739303473;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=x3zGgQftF1kIqFcOzW0oJY2LAeldvT+ZF1lgB5sAD0U=;
-        b=Rm0xpYsPcOY7Gu/zGYxjobJQc1eAWSLvtqOWMUknIq1u47q4o6oM4wPhJn/J94HDoQ
-         PYdUWV4yH2GN5O8938wYPwyzMzpepxHkOR93f0C70c8WU2dysi1xGFpPnmO1TG5ngJ8O
-         /3Ni9KBUpBcQVs1gt16+OG56WjK5bdbXw2qnMqJJ0tdzXCTj5WCfYW49OTphSnZhaf9b
-         4v6bhSNO0Jpd7vufzfAON9peQvZaf4qjh0bkQxh/8RrZAl6VxAFGrrwOZJxeLml9VAum
-         X/Pdbf+drPSB1h4DOfS5/J68NqURPT9vc89+9fXJKssG/3yj9+9c8mBc+IR/S/yHWuoI
-         uZeQ==
-X-Forwarded-Encrypted: i=1; AJvYcCUsAaX1Mir3cZzEBd4mIIek8rNMTP1gpNJwnyWl8Ms+18o26NcT79/DuE8q5rZXVChgfhQnGYzq@vger.kernel.org, AJvYcCXtkV4BToMuvkzSMymtoFT8VQfH+RDzGN2R8OiSecd2Dnn24BpQwOLMZxsH6dR4blJIBPGqZBfUIkADVCI=@vger.kernel.org
-X-Gm-Message-State: AOJu0YygWjprDd65WvRqMrlhhxQP/ibg+f9uGEQ5VXpsOeidhdq1jGYW
-	drj7YeV3Ef6luHYh3hB5frJdrReaoSfmclOmxm274cbOIHKrR4ta
-X-Gm-Gg: ASbGncs3ueRImFZ1mz4VXz533ID9/7OcQLm0674zVFmrOEs9EULTQajuNs5omS3vCET
-	Y9HGsrB3nkgeeFU4M3Mh7fp6lXL/algqxW04iCgDoOwWgIYtd4B6oaGWzvQU5ucvs/MNrtNt9ZJ
-	akmKSUpiE8rErhs/yYM6LR3GGuAZLEcuIWJGV+IxWTcM7zI60uUTwy/T2NMCDibH6XufiQ2c814
-	PenKP0wyjUcsmGMBNqBHqzmBLOkNrNgUSrhn0soN4o6rpVXWNR1vXzw4LMEANhoxoTL7xJK+Wte
-	Cca5VFOpIuhdlOeNivL+dF2n8llY3YJbg/NzY2i2kwysYDCfxYOLSmSTtp+t1diUCLiNRio0jDo
-	vfkJVhvNKSuu0QKr0iLf+9Y3JihItU0rK
-X-Google-Smtp-Source: AGHT+IE1cdz3QZi6aI+tu6CPKVmHIyjStvTV0f6+YD4twlTG6cziZ2eM+8EllzapzGBoL/nwwCR35w==
-X-Received: by 2002:a05:6402:234d:b0:5dc:4f4:74c3 with SMTP id 4fb4d7f45d1cf-5dcdb71ff84mr262477a12.4.1738698673469;
-        Tue, 04 Feb 2025 11:51:13 -0800 (PST)
-Received: from corebook.localdomain (2001-1c00-020d-1300-1b1c-4449-176a-89ea.cable.dynamic.v6.ziggo.nl. [2001:1c00:20d:1300:1b1c:4449:176a:89ea])
-        by smtp.gmail.com with ESMTPSA id 4fb4d7f45d1cf-5dc724d9de2sm10074894a12.81.2025.02.04.11.51.12
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 04 Feb 2025 11:51:13 -0800 (PST)
-From: Eric Woudstra <ericwouds@gmail.com>
-To: Pablo Neira Ayuso <pablo@netfilter.org>,
-	Jozsef Kadlecsik <kadlec@netfilter.org>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Simon Horman <horms@kernel.org>,
-	Vladimir Oltean <olteanv@gmail.com>,
-	Nikolay Aleksandrov <razor@blackwall.org>,
-	"Frank Wunderlich" <frank-w@public-files.de>,
-	Daniel Golle <daniel@makrotopia.org>
-Cc: netfilter-devel@vger.kernel.org,
-	coreteam@netfilter.org,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	Eric Woudstra <ericwouds@gmail.com>
-Subject: [RFC PATCH v1 net-next 3/3] netfilter: nf_flow_table_ip: don't follow fastpath when marked teardown
-Date: Tue,  4 Feb 2025 20:50:30 +0100
-Message-ID: <20250204195030.46765-4-ericwouds@gmail.com>
-X-Mailer: git-send-email 2.47.1
-In-Reply-To: <20250204195030.46765-1-ericwouds@gmail.com>
-References: <20250204195030.46765-1-ericwouds@gmail.com>
+	s=arc-20240116; t=1738699426; c=relaxed/simple;
+	bh=PlNZhCVigeJkNYhsqXkNNaJXewI0vLEfVqC4jKBkxGY=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=smH4ZoFXS/WCNLpsKL3D7iHEW0SPkcuIOplhEAENHM519Kg/qcmVgg+zJoLA6KtijJXuov751l0MYDJP687RGGmoa8GaOnMhT72b4lKzV4qdF/vfZ3tIHOmSIXomexv4EAk5ETYobFNSGGutoRtPiYUNdUk8Sn2PP+KT5/+RqT0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=OARTj0DF; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5B87BC4CEDF;
+	Tue,  4 Feb 2025 20:03:44 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1738699426;
+	bh=PlNZhCVigeJkNYhsqXkNNaJXewI0vLEfVqC4jKBkxGY=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=OARTj0DFbHYFhXwIPRKAtVTs0QZYeNoaPf35miEzGXL5CpSNfhk/z8GPHNtm0ARiU
+	 bjXzfFqB17oA3jmsr+5e6P+omY8mTDtjdjpmHvUnWYcLa+dAbTcXnQPIrXS6RnPwrY
+	 yEKs9lF/oMZCWFXI9q2sQQoOJuyJh3oFrgRFLJxl1E1DpFE+nV/J7tono7pgTVnrvM
+	 dC332yxOVQKB7OcCfDCToS/5rg1wEnHluy/2l0F7nYVZmvQlbguHdTqE0TnfDfP1lj
+	 HrpQc8xIbfz3WmohO3x8gObdwobbAK1LlgmYvJV97X4LhK1YprY518Q9Aa9FVbuiG+
+	 xdy6TSEZoKoTA==
+Date: Tue, 4 Feb 2025 20:03:41 +0000
+From: Simon Horman <horms@kernel.org>
+To: Ido Schimmel <idosch@nvidia.com>
+Cc: netdev@vger.kernel.org, davem@davemloft.net, kuba@kernel.org,
+	pabeni@redhat.com, edumazet@google.com, amirva@mellanox.com,
+	petrm@nvidia.com, joe@atomic.ac
+Subject: Re: [PATCH net] net: sched: Fix truncation of offloaded action
+ statistics
+Message-ID: <20250204200341.GN234677@kernel.org>
+References: <20250204123839.1151804-1-idosch@nvidia.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250204123839.1151804-1-idosch@nvidia.com>
 
-When a flow is marked for teardown, because the destination is not valid
-any more, the software fastpath may still be in effect and traffic is
-still send to the wrong destination. Change the ip/ipv6 hooks to not use
-the software fastpath for a flow that is marked to be teared down and let
-the packet continue along the normal path.
+On Tue, Feb 04, 2025 at 02:38:39PM +0200, Ido Schimmel wrote:
+> In case of tc offload, when user space queries the kernel for tc action
+> statistics, tc will query the offloaded statistics from device drivers.
+> Among other statistics, drivers are expected to pass the number of
+> packets that hit the action since the last query as a 64-bit number.
+> 
+> Unfortunately, tc treats the number of packets as a 32-bit number,
+> leading to truncation and incorrect statistics when the number of
+> packets since the last query exceeds 0xffffffff:
+> 
+> $ tc -s filter show dev swp2 ingress
+> filter protocol all pref 1 flower chain 0
+> filter protocol all pref 1 flower chain 0 handle 0x1
+>   skip_sw
+>   in_hw in_hw_count 1
+>         action order 1: mirred (Egress Redirect to device swp1) stolen
+>         index 1 ref 1 bind 1 installed 58 sec used 0 sec
+>         Action statistics:
+>         Sent 1133877034176 bytes 536959475 pkt (dropped 0, overlimits 0 requeues 0)
+> [...]
+> 
+> According to the above, 2111-byte packets were redirected which is
+> impossible as only 64-byte packets were transmitted and the MTU was
+> 1500.
+> 
+> Fix by treating packets as a 64-bit number:
+> 
+> $ tc -s filter show dev swp2 ingress
+> filter protocol all pref 1 flower chain 0
+> filter protocol all pref 1 flower chain 0 handle 0x1
+>   skip_sw
+>   in_hw in_hw_count 1
+>         action order 1: mirred (Egress Redirect to device swp1) stolen
+>         index 1 ref 1 bind 1 installed 61 sec used 0 sec
+>         Action statistics:
+>         Sent 1370624380864 bytes 21416005951 pkt (dropped 0, overlimits 0 requeues 0)
+> [...]
+> 
+> Which shows that only 64-byte packets were redirected (1370624380864 /
+> 21416005951 = 64).
+> 
+> Fixes: 380407023526 ("net/sched: Enable netdev drivers to update statistics of offloaded actions")
+> Reported-by: Joe Botha <joe@atomic.ac>
+> Signed-off-by: Ido Schimmel <idosch@nvidia.com>
+> Reviewed-by: Petr Machata <petrm@nvidia.com>
 
-Signed-off-by: Eric Woudstra <ericwouds@gmail.com>
----
- net/netfilter/nf_flow_table_ip.c | 6 ++++++
- 1 file changed, 6 insertions(+)
+Thanks Ido, all,
 
-diff --git a/net/netfilter/nf_flow_table_ip.c b/net/netfilter/nf_flow_table_ip.c
-index b9292eb40907..84a8fe7b7b5d 100644
---- a/net/netfilter/nf_flow_table_ip.c
-+++ b/net/netfilter/nf_flow_table_ip.c
-@@ -543,6 +543,9 @@ nf_flow_offload_ip_hook(void *priv, struct sk_buff *skb,
- 	dir = tuplehash->tuple.dir;
- 	flow = container_of(tuplehash, struct flow_offload, tuplehash[dir]);
- 
-+	if (test_bit(NF_FLOW_TEARDOWN, &flow->flags))
-+		return NF_ACCEPT;
-+
- 	switch (tuplehash->tuple.xmit_type) {
- 	case FLOW_OFFLOAD_XMIT_NEIGH:
- 		rt = dst_rtable(tuplehash->tuple.dst_cache);
-@@ -841,6 +844,9 @@ nf_flow_offload_ipv6_hook(void *priv, struct sk_buff *skb,
- 	dir = tuplehash->tuple.dir;
- 	flow = container_of(tuplehash, struct flow_offload, tuplehash[dir]);
- 
-+	if (test_bit(NF_FLOW_TEARDOWN, &flow->flags))
-+		return NF_ACCEPT;
-+
- 	switch (tuplehash->tuple.xmit_type) {
- 	case FLOW_OFFLOAD_XMIT_NEIGH:
- 		rt = dst_rt6_info(tuplehash->tuple.dst_cache);
--- 
-2.47.1
+I agree that this function operates on packets as if it was 64-bit.  And in
+a quick audit it seems that all callers, except qfq_enqueue() pass a 64-bit
+rather than 32-bit integer (I did not check if the values passed can indeed
+exceed 0xffffffff).
+
+I also agree that the problem was introduced by the cited commit.
+
+Reviewed-by: Simon Horman <horms@kernel.org>
 
 
