@@ -1,49 +1,49 @@
-Return-Path: <netdev+bounces-162782-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-162783-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3DE96A27E37
-	for <lists+netdev@lfdr.de>; Tue,  4 Feb 2025 23:21:26 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id BC2ECA27E38
+	for <lists+netdev@lfdr.de>; Tue,  4 Feb 2025 23:21:30 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id AA7331885233
-	for <lists+netdev@lfdr.de>; Tue,  4 Feb 2025 22:21:19 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 54CC2166B89
+	for <lists+netdev@lfdr.de>; Tue,  4 Feb 2025 22:21:29 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1671421D00B;
-	Tue,  4 Feb 2025 22:20:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9D50D220682;
+	Tue,  4 Feb 2025 22:20:24 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="LQAKQAf9"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="nPoD25bS"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DF7B621C160;
-	Tue,  4 Feb 2025 22:20:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7944B21E0BE
+	for <netdev@vger.kernel.org>; Tue,  4 Feb 2025 22:20:24 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1738707623; cv=none; b=h0TpkIXBq8uWtsCKRnTQRNsZKga3P4ot4Yh2WTHAZXvy817zYrSeS+fBDXW3dLhXl1R1VASSVIuPN0pWbuI4wdqG9KVyQE1jo+qUnOmDFcW24MVV9PsbdVwMPBsFxtqOLYCCTo2CDvb6EbUPHbBwVjEull4yoMRwaLKJVWqk0Lw=
+	t=1738707624; cv=none; b=o5D/nafEGcFoQ8Kyz1XTzOdn48YmKEvCiNd1ZKL3MxqTV/ExOXpTTf+WyHfHLCXrS/eB94e57BEuVW29Yw9kDazfrTaJuX+Of0hBZR44G38MwGt60+WzIGVWNJEhZPoJghHIaS+Ri0MTIJ+Z9/kPN+uLRn5y1bHXlmjMVg2l63k=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1738707623; c=relaxed/simple;
-	bh=qU1SbJ9YmsXpzwJANU5KW+WfW5ZX0AyQzMbNExK2LV8=;
+	s=arc-20240116; t=1738707624; c=relaxed/simple;
+	bh=uzeKsElD9xMDCduelylW8N6IK5XRKJ5Bb3zvFXuA7Pg=;
 	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=shsOY8aWym6Y2sZ3mrQCfipLFjHm5VhNyBBOMbOp+Ol/ynfiImXHgP8GHoMKipEFyGww98C7jOpiYLvUkvHtZi0CNDpNfGv5L678zfs3XLxoYGeQL9G7rTINnRPbApiQt9QD8rLAfZAmK39McSX2yn/UbDDgUZx8IdHwhxKE3mA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=LQAKQAf9; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5FD6BC4AF0B;
-	Tue,  4 Feb 2025 22:20:22 +0000 (UTC)
+	 In-Reply-To:To:Cc; b=KpSx+Tg4zM9zucK4gKTcignmMRp61tVdA2L+9wBIx0ZSWwGTmpl2YwwOPIpkivN2Cq8IpVQ/y4HFLPKkaCcedvWZZuBxAjMa6vLGXlwLiEjcjY1rU7AfSboMHskHB+CERR9m/Mw1TECrfURORMemtf+JOH57rTk8h8dbmQsEvBg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=nPoD25bS; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id E2B53C4CEE3;
+	Tue,  4 Feb 2025 22:20:23 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1738707622;
-	bh=qU1SbJ9YmsXpzwJANU5KW+WfW5ZX0AyQzMbNExK2LV8=;
+	s=k20201202; t=1738707623;
+	bh=uzeKsElD9xMDCduelylW8N6IK5XRKJ5Bb3zvFXuA7Pg=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=LQAKQAf904dPgUV8WHXrSUPhKaKlu4FR8imYxFpxHXZSdrFDnjQZw0u7YnpvoUu/l
-	 XVT8cQ8KLLF9b9Urw/lsBLqHJAG2Hey348uu/NDnXiCivNPu0LYQkEOuLg39cAn9Se
-	 JhNIHrKDzLKSxHhdFeiFBBh1oTOa9p0PSApHxIw6t7yfJ3rFpA14TwV1A51aC/Mu1+
-	 ub5IqWGSoBfBvvgtDKKwNd39hHEtEQ0aobgKMGgnUvI801LQplM6+bw7nINP32d0cB
-	 w+v69ZuLTfIm/xuOjUwsYkOsPNM7Dotxp+kAoDHTti+C19TSHVwx3K8t+b1/fMkCPf
-	 Ft/7A/NVAyqnA==
+	b=nPoD25bSUE8CGU3O60us4M3q1e9CubpS3hMXre5n866hS7IpS/qejjJqmDyrM6S4H
+	 TQjM4VTUaQYM3pgRPeuMnruSkkUMzkxjG6nKyKJ4ELYxO6cx4ZuMMbkPqcyYWNKu2y
+	 +ENDB/WREJIlYZYGEXwCfRSVkw3Qut5quCbd9HhmTVYFNIGo7OZSwTGZ1cR//LjhCM
+	 Yn+ij15IC+ioh6Kbw2Hxj2/8WXWZIqH8VNE5e7XjouRVx6cXJ0P6ig+pFMQHB9JQ0P
+	 tavv7vBO+Xvw8YlYZii4LGbm6/FcTywGr3/VJVhpERwLZ0+hJ0rHGYBRIzUBJzbmGr
+	 l17zTy2ikfVgA==
 Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id EAEA8380AA7E;
-	Tue,  4 Feb 2025 22:20:50 +0000 (UTC)
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 715B1380AA7E;
+	Tue,  4 Feb 2025 22:20:52 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -52,39 +52,35 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net-next] mlx4: Remove unused functions
+Subject: Re: [PATCH net-next] neighbour: remove neigh_parms_destroy()
 From: patchwork-bot+netdevbpf@kernel.org
 Message-Id: 
- <173870764975.165851.12570827408207755201.git-patchwork-notify@kernel.org>
-Date: Tue, 04 Feb 2025 22:20:49 +0000
-References: <20250203185229.204279-1-linux@treblig.org>
-In-Reply-To: <20250203185229.204279-1-linux@treblig.org>
-To: Dr. David Alan Gilbert <linux@treblig.org>
-Cc: tariqt@nvidia.com, andrew+netdev@lunn.ch, davem@davemloft.net,
- edumazet@google.com, kuba@kernel.org, pabeni@redhat.com, yishaih@nvidia.com,
- netdev@vger.kernel.org, linux-rdma@vger.kernel.org,
- linux-kernel@vger.kernel.org, horms@kernel.org
+ <173870765100.165851.4543574134975596565.git-patchwork-notify@kernel.org>
+Date: Tue, 04 Feb 2025 22:20:51 +0000
+References: <20250203151152.3163876-1-edumazet@google.com>
+In-Reply-To: <20250203151152.3163876-1-edumazet@google.com>
+To: Eric Dumazet <edumazet@google.com>
+Cc: davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com,
+ netdev@vger.kernel.org, horms@kernel.org, eric.dumazet@gmail.com
 
 Hello:
 
 This patch was applied to netdev/net-next.git (main)
 by Jakub Kicinski <kuba@kernel.org>:
 
-On Mon,  3 Feb 2025 18:52:29 +0000 you wrote:
-> From: "Dr. David Alan Gilbert" <linux@treblig.org>
+On Mon,  3 Feb 2025 15:11:52 +0000 you wrote:
+> neigh_parms_destroy() is a simple kfree(), no need for
+> a forward declaration.
 > 
-> The last use of mlx4_find_cached_mac() was removed in 2014 by
-> commit 2f5bb473681b ("mlx4: Add ref counting to port MAC table for RoCE")
+> neigh_parms_put() can instead call kfree() directly.
 > 
-> mlx4_zone_free_entries() was added in 2014 by
-> commit 7a89399ffad7 ("net/mlx4: Add mlx4_bitmap zone allocator")
-> but hasn't been used. (The _unique version is used)
+> Signed-off-by: Eric Dumazet <edumazet@google.com>
 > 
 > [...]
 
 Here is the summary with links:
-  - [net-next] mlx4: Remove unused functions
-    https://git.kernel.org/netdev/net-next/c/2cf424f5ac01
+  - [net-next] neighbour: remove neigh_parms_destroy()
+    https://git.kernel.org/netdev/net-next/c/a064068bb6be
 
 You are awesome, thank you!
 -- 
