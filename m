@@ -1,248 +1,365 @@
-Return-Path: <netdev+bounces-162430-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-162431-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1AB9EA26DDC
-	for <lists+netdev@lfdr.de>; Tue,  4 Feb 2025 09:59:21 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id AD775A26E08
+	for <lists+netdev@lfdr.de>; Tue,  4 Feb 2025 10:19:28 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id BED6F1886175
-	for <lists+netdev@lfdr.de>; Tue,  4 Feb 2025 08:59:25 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 34AF6165844
+	for <lists+netdev@lfdr.de>; Tue,  4 Feb 2025 09:19:27 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CF9E2207669;
-	Tue,  4 Feb 2025 08:59:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 302C5207A14;
+	Tue,  4 Feb 2025 09:19:25 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=bp.renesas.com header.i=@bp.renesas.com header.b="pvIsdHHj"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="34qWsJ33"
 X-Original-To: netdev@vger.kernel.org
-Received: from OS0P286CU011.outbound.protection.outlook.com (mail-japanwestazon11010010.outbound.protection.outlook.com [52.101.228.10])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pj1-f74.google.com (mail-pj1-f74.google.com [209.85.216.74])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D2C6F206F37;
-	Tue,  4 Feb 2025 08:59:10 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.228.10
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1738659554; cv=fail; b=CKkptM4xmfNG1z7jHYvXg8e42DAeA7CTiuDX7azQwE3vC2sb+0uIIRvmS9uxttGh5EhAfLMdaHYR9h9biFwpDcaSknS0P+Cuaok/NANBkctzrx3qZXn4Ivye6n0zKPXr0L0ECm115IPaG39e7I8WlRQPTitdzziuE82MjMgnV2g=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1738659554; c=relaxed/simple;
-	bh=5dtLwUX9INaaEJXhqwBYykIke7f06e6J1u/aJHtB5gg=;
-	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
-	 Content-Type:MIME-Version; b=rmvvntuHkOJiApIx0KnUYpetCGkxbL7eulpAdyDCF+Oh9D0vXZtO4hns2pbe2b0B0bLVBArm4z6MmBNgDN/30QWshNm37c3saKjv1CbhG50zkHA/XHGumK7i5tNiWPru9+eQVfWWBrWIObvZ5C5tR0JWlzpv7Rvlblty856mnM4=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=bp.renesas.com; spf=pass smtp.mailfrom=bp.renesas.com; dkim=pass (1024-bit key) header.d=bp.renesas.com header.i=@bp.renesas.com header.b=pvIsdHHj; arc=fail smtp.client-ip=52.101.228.10
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=bp.renesas.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bp.renesas.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=H4XmHDwP/vpaTClg9esXSjWJP19EQaHRIIbIwLjlUX4hSVlCyrDwtF28tevvJVIs4bbe8SU+LyrmGVaD1X4uY3bE6b4DCDZVqVbKSiNWrCEHA0s5LUTb3gU1ext3Gh8GmOGXT2OtbKLjhShqMXypBKlrF4H8iSAfcNUazuvPYf0XepGG8wS8jZXtJyoIM6TgSQqDBqyurK1pszVNFCySKjJpqKu5Z59iOI7I8LW1IpcbIkkHSnrsUXepkX5Fu4ag/8HZ6oBnVtsi6ky3xgvDCcvgi/SbLDltAlo/d9xHiYwSesXIe0cF3CS7v9AUY8q3svbVJ7nWfDO1lJ5kGB/jYg==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=5dtLwUX9INaaEJXhqwBYykIke7f06e6J1u/aJHtB5gg=;
- b=dedfe1uHx5sP14QkJ5+Cu7vhjbsbGU4T3C1khpl07GCXv9TZKRlWKpN3ZVt6XNwTp7lh1HtxqUGSJxDYVJu9iMvLUB+agT1nDlWwYzIfBrrJx3M2A5PcGYjI5eWgmxkp7M0zlFECd9nHCYA2Tjefyns03uS1hm/W91QLH913Jrs1Ay/iwYLXiOR9WA3Kr5uPp7enqPNXnwTNtN+vYWnOGpWz+A0LV1f1kaRLG7Hy1y+E4fW4dA6Em5E6iSiSpXP0xUkVGMWO9EfaUQIh1hM3mI2qMz77i3tIJfq28F/yISoVaJBH19aIs8I6O95LRHSJKXBJyGeGuQJKYficQvSC3A==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=bp.renesas.com; dmarc=pass action=none
- header.from=bp.renesas.com; dkim=pass header.d=bp.renesas.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bp.renesas.com;
- s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=5dtLwUX9INaaEJXhqwBYykIke7f06e6J1u/aJHtB5gg=;
- b=pvIsdHHjZrTkozW9jXa6Lxm29ovjcz+U9tQ1k1IkpTGJHwf0LIJkW+cSpWENoYRBvqakUU1XrWeP7LNE3VMhm21vT9NdbM/zYDCcs9o4JWWfKmxqFihOqLvaJCrKT6mecoBnnWlpdt+ZITiZvZL7Z1Y3hWHkyG9+j9RliOVGwis=
-Received: from TY3PR01MB11346.jpnprd01.prod.outlook.com (2603:1096:400:3d0::7)
- by TYCPR01MB11070.jpnprd01.prod.outlook.com (2603:1096:400:3a7::13) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8398.25; Tue, 4 Feb
- 2025 08:59:06 +0000
-Received: from TY3PR01MB11346.jpnprd01.prod.outlook.com
- ([fe80::86ef:ca98:234d:60e1]) by TY3PR01MB11346.jpnprd01.prod.outlook.com
- ([fe80::86ef:ca98:234d:60e1%2]) with mapi id 15.20.8398.021; Tue, 4 Feb 2025
- 08:59:06 +0000
-From: Biju Das <biju.das.jz@bp.renesas.com>
-To: Rob Herring <robh@kernel.org>
-CC: Andrew Lunn <andrew@lunn.ch>, "David S. Miller" <davem@davemloft.net>,
-	Jakub Kicinski <kuba@kernel.org>, Krzysztof Kozlowski <krzk+dt@kernel.org>,
-	Saravana Kannan <saravanak@google.com>, Matthias Brugger
-	<matthias.bgg@gmail.com>, AngeloGioacchino Del Regno
-	<angelogioacchino.delregno@collabora.com>, "devicetree@vger.kernel.org"
-	<devicetree@vger.kernel.org>, "linux-arm-kernel@lists.infradead.org"
-	<linux-arm-kernel@lists.infradead.org>, "linux-mediatek@lists.infradead.org"
-	<linux-mediatek@lists.infradead.org>, Geert Uytterhoeven
-	<geert+renesas@glider.be>, Prabhakar Mahadev Lad
-	<prabhakar.mahadev-lad.rj@bp.renesas.com>, biju.das.au
-	<biju.das.au@gmail.com>, "linux-renesas-soc@vger.kernel.org"
-	<linux-renesas-soc@vger.kernel.org>, Network Development
-	<netdev@vger.kernel.org>, "open list:COMMON CLK FRAMEWORK"
-	<linux-clk@vger.kernel.org>, dri-devel <dri-devel@lists.freedesktop.org>,
-	linux-media <linux-media@vger.kernel.org>
-Subject: RE: [PATCH v2] of: base: Add of_get_available_child_by_name()
-Thread-Topic: [PATCH v2] of: base: Add of_get_available_child_by_name()
-Thread-Index: AQHbdIwcOx1+V0CX+UGSZ6o9QaMC3bM1zvSAgAAD2HCAAELygIAAxH4A
-Date: Tue, 4 Feb 2025 08:59:06 +0000
-Message-ID:
- <TY3PR01MB1134656CBDAF5FFCEB6C8D20F86F42@TY3PR01MB11346.jpnprd01.prod.outlook.com>
-References: <20250201093126.7322-1-biju.das.jz@bp.renesas.com>
- <CAL_Jsq+dn5wyEKbvAT8M2V=nM-vV_eHiRtwO_0h6EiJ=8OkHSw@mail.gmail.com>
- <TY3PR01MB11346E1FA592E731E0D32E96686F52@TY3PR01MB11346.jpnprd01.prod.outlook.com>
- <CAL_JsqLo4uSGYMcLXN=0iSUMHdW8RaGCY+o8ThQHq3_eUTV9wQ@mail.gmail.com>
-In-Reply-To:
- <CAL_JsqLo4uSGYMcLXN=0iSUMHdW8RaGCY+o8ThQHq3_eUTV9wQ@mail.gmail.com>
-Accept-Language: en-GB, en-US
-Content-Language: en-US
-X-MS-Has-Attach:
-X-MS-TNEF-Correlator:
-authentication-results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=bp.renesas.com;
-x-ms-publictraffictype: Email
-x-ms-traffictypediagnostic: TY3PR01MB11346:EE_|TYCPR01MB11070:EE_
-x-ms-office365-filtering-correlation-id: 7604e979-3f1c-48dc-6e7d-08dd44fa2e30
-x-ld-processed: 53d82571-da19-47e4-9cb4-625a166a4a2a,ExtAddr
-x-ms-exchange-senderadcheck: 1
-x-ms-exchange-antispam-relay: 0
-x-microsoft-antispam:
- BCL:0;ARA:13230040|366016|1800799024|376014|7416014|38070700018;
-x-microsoft-antispam-message-info:
- =?utf-8?B?dEJYTlVCYmZsZS82ZmNxcEdVVHFnSXlSY0RYLzFicFlvbmhJNXhIeUpkWklX?=
- =?utf-8?B?bXZWamQ4bGdpUysybi9ZMWFUQUM0T2Q3YzFhZ1ZzcEk4dWpvOGNGUEVrMFh2?=
- =?utf-8?B?YU5kL2xXMUoxdThCT2JJdWFpTTQzMnFYSlhVYStSVDh4eWdhLzJOcGxEYnNW?=
- =?utf-8?B?Nkc3eGhkc214S3BoWjd6eFJURGtGSUZYUUN2VWpsdktLMlB0bUtXRHlUU2pL?=
- =?utf-8?B?RUlnTVJNL3NyQzBGYWxva3FHTGVmN3hhSHJUZ283NnBBZjB6bzU2dWg4eU1U?=
- =?utf-8?B?MFZTcGV4NWViWDhQNmgydFY4NitmQ0dCSXBUdHg4QnB6MDRzS1FZL0RkdFh3?=
- =?utf-8?B?anJHTTh6NVRGV1FWMXRjOTdxK2VTUEFLQVNqT2toSjdHLzdGc0x5cWRjV1Vx?=
- =?utf-8?B?QTBqcnhpOGVXV1RhcUxxWXRuc0hGclhkeExiWWhpRDczVVFYMnBKRXlhVDg3?=
- =?utf-8?B?WGo5cVBPZzUzeTRJMjRLQ0RkWjVCZzByOVdrVEs0NGZsUnRnMFlxRytjVUxN?=
- =?utf-8?B?OHoyMmFBRVhrcUozdW1PVEZtK2VmakMwVDRYRUFmbkJnSjhLWHdFNzlIZ3J6?=
- =?utf-8?B?dHhTTkVlc1JKV0pHdFBSblpBTzUveUMzUTZ5UEtRMmJudmNvRjR1QWdEOEZv?=
- =?utf-8?B?TlhYcEhQenpkbmdMMmNDVVh6YlhVRGltcmJBM1FZSmtYTkpaY2REUUd4QTdD?=
- =?utf-8?B?MjJwZ3VzY0hOZUgrWTlOR3hEdTRnZWJWNmlLRy8rUkJiWlBYTk5IYUd0K1Ay?=
- =?utf-8?B?OHdyTktqc29YR3ZUWnN6dDNqZHl2ekhEckJoT2R1QW9xODRhdWVRS2lOQ0Yw?=
- =?utf-8?B?dTQ3aVd5QWl4T0NvUU5peEtVWm0rSm5aUFZYYTBSZEZnT0NOTWV2bllBVXVk?=
- =?utf-8?B?K2hOY05lZlZ1RHVsWUpBK2p1YTQ3cVhManhZOUlhdDVyVTRTaC9JRXQrVDFY?=
- =?utf-8?B?MW52MG41S3VmVk1YZldxaC84blQrZ3d4Y2FoTXlkQmdqbXlnK0w4UFVSSUk4?=
- =?utf-8?B?NkxYbHpENk9VMFBNeWRwT0FxNVlQRjc2dzZCRUNSU2ordnFRUWJPMnJjbjVm?=
- =?utf-8?B?dnF1VHAxcFYyYTQ4VGowRUpoTTBuVnV5cnY0QjYzWTFPdmlIQm1aQ0I5cjlt?=
- =?utf-8?B?OFVLazRQaWFRT2R2R1FsRmRUZUxHS0VjMVFPNVZWLzFwOE9xWmxOZlc2T2VN?=
- =?utf-8?B?K2YvWGg3MzhCd3Ryd3FMWWppOUhEdlVwM0NCR0NYNUJpb1VMSXZuSzk4TlFB?=
- =?utf-8?B?WTh2cDZmRzV3eFlrZ1h2ZzJiTXpjUWlzeEFXYURHclc5dWwvbHZwRUo0Z3dj?=
- =?utf-8?B?UUNvaEhGNzlhditoWVdpb1BVQUdCd09ndnB1T3F5MWVFVjlEU0d2WkV4QXVY?=
- =?utf-8?B?ZndSRTFhUXJhbnFENEZ5USs5di91U05zd3RWZTdtaWxXc0V1VjhQOUJGUzBk?=
- =?utf-8?B?WTlGUit0em5OM1U2NFVJclhhVUNuNDkybitEYmlpTUtlVTdDaWZ0T3ErcWZC?=
- =?utf-8?B?RVJFVHdmN3g4T0tnei9pQXNaZFNoNkd2VkdhUkEySWVNeG5oemNNWmVOVytx?=
- =?utf-8?B?NHdNMHNRK2NkZjFjQ1dqdldpazBFQThnbUVjR3BIbVdqcmw1V0RqN2pEYjBG?=
- =?utf-8?B?YUtVZkpneFFFYW9RdXYwaUxHMzdZSXlRcGZWREhkUHVtN042OHdpU0VXbUxt?=
- =?utf-8?B?N2h3WEVVTlRKanRIQkVyT091TmFDa1BzRjZpeHpPOHVYck1GU08xSjJadnFB?=
- =?utf-8?B?TkJNbkV0eFM4R3B5bzVZYkVNekFSYWpvcVRNU0ZBZGM1aGRXcUUxSGwrY0x3?=
- =?utf-8?B?WmFOd2c4M3ZEYnZYNDRVenVSMTdoSERJS1JmcDZ2dzNuSnpZblJGdnQ1WXor?=
- =?utf-8?B?NGw3aS95c1RaZXlsMkE5L1d3aHhhYmxSa0xrYWF2eU50M3MwOVhYMTJ2NGs4?=
- =?utf-8?B?WDV3R2NUc0h6OHJiR3FBUWdjb29Ya3VPWlF5eTFvL3lubzJRSlR4ZlhPWU1w?=
- =?utf-8?B?NFhwRVYzcEVBPT0=?=
-x-forefront-antispam-report:
- CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:TY3PR01MB11346.jpnprd01.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(366016)(1800799024)(376014)(7416014)(38070700018);DIR:OUT;SFP:1101;
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0:
- =?utf-8?B?eDYrYS9MU09ETHFjWVdNUHN3NWpiNjRwR2RiLzZHNkZuZDNDTDgzVXc5Wjdr?=
- =?utf-8?B?eENYeUlHVW9RSHE2anlpSUJzS3lHTHRZVEhNWVNWenhUSnlsREIzYlBOcVRV?=
- =?utf-8?B?bm9yQUNKNXdkQ3MwQ3RDTzh4dlpnaXBhbnFvZ2Rxa2dwb3hxZlNNN0pVT1lV?=
- =?utf-8?B?R0xLdVhSOHluaXYyR00yZllzNUh1N09XYkoyU2hiQlZEZElyQWNFaTJEZTlm?=
- =?utf-8?B?YytRSkpLTWdPc1BYbEVZSStrazE2bW1yRzZaVC9pa3JWS24yVmxZV09vYmdj?=
- =?utf-8?B?ZVJHOGRCL1FYRmhEMmRnSDBsWWZ3L1NSQ3JnQmhwSjRmYkNxUXpKc3BsR3Jx?=
- =?utf-8?B?L0JHUFVPcmR3czBtYytNM0RxR2w5aHo3TEp3N0xtNVYvYVpNdnBZcnhjNXRt?=
- =?utf-8?B?WTdFL0VrZnhtaysvbStjdHN3YkkwMDJQaWxHc2lLUGEwVlo1L1FNQnlyQmZu?=
- =?utf-8?B?VkhMa1dQbmdvQnEvblJ4L0VGNTVRSzhreHptREFYUUNzOUVHZHl0SGNWa0JV?=
- =?utf-8?B?dk1wNStPMkJ1R3pJbFZyTXdvd2pzY2V4ODRYeXNZQXBvM1dYa2hJbmhFUHJU?=
- =?utf-8?B?Rlp3R3lEWmlBTE9UdW9mVGw2QjFrSUhZN0tWR2JRdXkrYzYyUEhabTVtVTRM?=
- =?utf-8?B?Q3gvRzVaa0N1cjZWNGtxV2taV0VpNG9Qb3loK2lOczZXZFNqZnhhVG9pclFP?=
- =?utf-8?B?T0FIby9OR001cmtpa21xOFNFN2RqZWFYMGZ1SGtHUEx5NFNueHkzYlY0Tkcv?=
- =?utf-8?B?L055SjR5MFk1NWd1dEdmM2FGd2QwRC8wSG9HeWM2Y2ZqY0REWTMyS3hqQkRk?=
- =?utf-8?B?R0ZwNldxV05OOWJnV014bzlVV1p3UkpBakZYbzhpQWRrUkpYNnZOa2JpZE1D?=
- =?utf-8?B?eUJ2UHV3VkZHYUFUNXU4QVVrMkZET1Y3TWJ6RlpyMG9BVCs3Wm5jdldOOE1x?=
- =?utf-8?B?VEk0UWFoSGVFTzZWRkg1RmdnR1kyNXhIR3NTV3ZGejRMV1VWN0Frdkh3L3Rr?=
- =?utf-8?B?UWM0U1U5YTFueG1NVmxDTFhIeU0zalJwSVZ3NzhOY2NPOGF0andwNHpqSW9v?=
- =?utf-8?B?ZXkzLzJnV0V5T1ZvMHlMa0ZHYlg3ckZlcjU0M1FpdmVpdXpPWTJSVGxpNDRB?=
- =?utf-8?B?Z3M1dmRTUmVuNUxjNGJsUWRkcmxHSHVRbDJkR1dEekZhejRlMHdscThybm1B?=
- =?utf-8?B?V2hZb2s2ZnpUSC95SUMzRXUyUkV3STZyRFJGSGMxTHVCbVY1czV1bnNFcFBi?=
- =?utf-8?B?bzZwTkg1VG1qLzhWSDF2enVBcTRzK1NvZjhLemJWSnh4ckpHTjFscENUZ0Z6?=
- =?utf-8?B?aWRLcjdjSVRjVVJuQ2JsMXdpS0Y5STR5YVZnMjJ5RnhkV1hTWXRwL0N6VDZE?=
- =?utf-8?B?dlUzMDJGYTNOQ2xkWUduUmpOVWNYclFqYVNXWSt0SG1XZ2hEWnBzazRUMGZU?=
- =?utf-8?B?aGZmZExCeXhxVFFUYTZGbkE0WldvQ2FDcG90cG4vR3hRekxQcC80SU1YQ0pv?=
- =?utf-8?B?dHRuZEdwRmhzMVFNc0VTbm5LZ0V5VExjWDYrZWhiemJGTldmUnVHMUtUdFNh?=
- =?utf-8?B?QllHL0FDcG0wUTQvSzZtYXVhWGtHd1VYRGFUUzArcmhxbklQT3d0Vm1PWTdh?=
- =?utf-8?B?Z0p0OE5BSVIyODVzc1U5dWlDSkhNM1ovYk9qUi9ZTUVlSzh0VWxWTE5mZFMz?=
- =?utf-8?B?SU1jeU5KVWRyaUhwYlBBRXN2NjM5elppMkd6eGdlY0x4ZU0yUEgyQWFoMVpY?=
- =?utf-8?B?UHk5TjlLZHZDZVVneW9HcFp6MUdnRHJPRHJWOGVEMGpDZVlPQ3lwK0V6TmtC?=
- =?utf-8?B?b2pyVTU3SlYyMXJRNzIyVGE3ekc5dCtsUi9GaFlCWWJGenJYZlBFcklWSlRn?=
- =?utf-8?B?dlZjVW5SSTFxZkFlaXljQnV5S21nUHZnMFBoSXNsVW9ZZUlsY2VqR01NbExv?=
- =?utf-8?B?aU4vN3phenNRWkIxWW44anpqbFNZQk9SUG9WN2hzNmxLUlE3ak5HVGFwUHlw?=
- =?utf-8?B?YlRFZERUMU0rdFlWb2w1Q1M2eVluNHN2cTVieHBjMDQ3UkVSa0s3ZUY4aTlD?=
- =?utf-8?B?NytzOUZONHp2cHpsa2Zra01tN1dYOFl5cm1DM1dlR1c5dFkrZEd5dWQybTNW?=
- =?utf-8?B?KzB6UnppSzY3TzVUeWZmNGVjMWNIWHZ3c1hQOE1Lcm84WWF3UVNkS2RUSi9r?=
- =?utf-8?B?VlE9PQ==?=
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6A640207675
+	for <netdev@vger.kernel.org>; Tue,  4 Feb 2025 09:19:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.74
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1738660765; cv=none; b=n5RH8gvTCSBCsXDtFPMudvLNSf72rmER6Gvxefh2CwuvYGltLMDUBWQfFKIksR8tgfqZo88/FoIdddIhd/L0dz3vFs/jsBtUtm3cDDpWsJH6+0JlGXKxmDjCy2N7NQRviufldbPUJhD5vlmc9Dzn/xqTpJJM80YzV4mMDumUGE0=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1738660765; c=relaxed/simple;
+	bh=Q0csqwcaAZvXvGkec2secZyCHiH9SuopKsrodWcOXLQ=;
+	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=lY8tS9Fpe2n/avUBuW9RnqnBdlMuOa7r5grkNBpLfJ8NWl6xRH0HWVnRqA+pj4bPFfc8QZeuAk0CSApXT1QQawPlbQQJmkwzI3dmfJg8Zo+Api0FDRNu4BFTPz97DnVkFqJQhALVfcq+pmewmL2f/d38g151yJyQGTrBtlVU8/Y=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--yuyanghuang.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=34qWsJ33; arc=none smtp.client-ip=209.85.216.74
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--yuyanghuang.bounces.google.com
+Received: by mail-pj1-f74.google.com with SMTP id 98e67ed59e1d1-2efa0eb9cfeso10775962a91.0
+        for <netdev@vger.kernel.org>; Tue, 04 Feb 2025 01:19:23 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1738660762; x=1739265562; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:from:subject:message-id
+         :mime-version:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=tVxBz59z7pqKnTBxuV0shTK7UcH01DA8x0aIV3kZsoQ=;
+        b=34qWsJ33HwXyG0JIcBsiva/usO+iVPdz4GubYzme2pDlAHxcOFtYJ+NGwhQTuC3G4O
+         tMwVpOWlPhLFS83RZ9XRvQhIan936MwBs1l3yRYgPxR1A7lqRbCHc+jvqjBgzjnWxHD5
+         lfe+FbHSGEM1h6S1yM/1tAgKMjAdGMMr5+tdX+U4g+W7GbYATjwJ8MNNLUsKwTaJ1dX1
+         qA3JnSq2E7sV1lQH0SkTFf/swV7Q13RCV86kzBW9P+c6Y/xDYGn6519G7jXH0NcZJh0a
+         KbBf+4doZxXSxSa8A/jdx9neGPUKJB0x0K3iGQArxpmt0gDZjJXYpDuvoTc/cWedgB7E
+         M84A==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1738660762; x=1739265562;
+        h=content-transfer-encoding:cc:to:from:subject:message-id
+         :mime-version:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=tVxBz59z7pqKnTBxuV0shTK7UcH01DA8x0aIV3kZsoQ=;
+        b=DRAlcOYV70WpLePYBSqUBZPkVHaSQBAWBFyEOid4YqfHmDDXdF0ex+Xa/xUAgz8cKt
+         1Ym4MHMuR0lCnIcXXrSi30QL7/sPyhfrqGOKjtxNMpuSe19Uz9kosjbZX6V+iDL0iQD9
+         GDr3JT2KaVi9ZZGY07Lc5rKLRwGtSDo3ZtO7wW+3zUJGASN795+lYQK8DO16+B0vFPsE
+         FeOwu4hTGban1UhV9ux+HP+Csh5YUfSAvTWFYnTKwuIllAzQYfKTQaWNDA9T513XWDdZ
+         Yq/DhI2bYzh66eTIU4G00p/x2lyWX011crbCZ0k7JsoNQpFNLlygTQQosJmfZCH5CqE6
+         yFIA==
+X-Forwarded-Encrypted: i=1; AJvYcCUZ6LWRiwub1HzMNPZ/k48Cd61wUOtYWFwtcieyaCstDVRZb8QpW9YBG+18ZPjV5YG313UC23g=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwoUAGcEhni+C3ZBcas1TNfWqosaM2cdn2AX4slrBW+CxrT1Pj7
+	THQN8YyCXhrAul85vk8+f30uVkEFzn+vIOKRXeu8ASNyRs+yIDHTL5WjhIM78Riqzqlxv7uTG+J
+	JLRwgZ+S6RT3CrtphBVWvAA==
+X-Google-Smtp-Source: AGHT+IE7FccB31ZXH4/igHscrm+DfiEF+hX/6ZOe4XoCQHbhzfrdNlCEYbOqF9XHDtGhHJ4I8c+rpBygRNJs13F5JA==
+X-Received: from pjbov11.prod.google.com ([2002:a17:90b:258b:b0:2ef:7352:9e97])
+ (user=yuyanghuang job=prod-delivery.src-stubby-dispatcher) by
+ 2002:a17:90b:5550:b0:2f6:e47c:1750 with SMTP id 98e67ed59e1d1-2f9ba2c59dbmr4120079a91.13.1738660762626;
+ Tue, 04 Feb 2025 01:19:22 -0800 (PST)
+Date: Tue,  4 Feb 2025 18:19:16 +0900
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-X-OriginatorOrg: bp.renesas.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: TY3PR01MB11346.jpnprd01.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 7604e979-3f1c-48dc-6e7d-08dd44fa2e30
-X-MS-Exchange-CrossTenant-originalarrivaltime: 04 Feb 2025 08:59:06.3864
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 53d82571-da19-47e4-9cb4-625a166a4a2a
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: vp5fymgDIWXgNSYkXpjC5LnufI6WYCAhhWWros1V5s99tgeP5y7fKK09gAOXZo7a8sNTdpng35NQcMtz/mS4YbYEZmMSo3LLy2UEWgSNOns=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: TYCPR01MB11070
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.48.1.362.g079036d154-goog
+Message-ID: <20250204091918.2652604-1-yuyanghuang@google.com>
+Subject: [PATCH net-next, v7 1/2] netlink: support dumping IPv4 multicast addresses
+From: Yuyang Huang <yuyanghuang@google.com>
+To: Yuyang Huang <yuyanghuang@google.com>
+Cc: "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, 
+	David Ahern <dsahern@kernel.org>, netdev@vger.kernel.org, 
+	Donald Hunter <donald.hunter@gmail.com>, Shuah Khan <shuah@kernel.org>, 
+	Nikolay Aleksandrov <razor@blackwall.org>, Hangbin Liu <liuhangbin@gmail.com>, 
+	Daniel Borkmann <daniel@iogearbox.net>, linux-kselftest@vger.kernel.org, 
+	"=?UTF-8?q?Maciej=20=C5=BBenczykowski?=" <maze@google.com>, Lorenzo Colitti <lorenzo@google.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-SGkgUm9iLA0KDQo+IC0tLS0tT3JpZ2luYWwgTWVzc2FnZS0tLS0tDQo+IEZyb206IFJvYiBIZXJy
-aW5nIDxyb2JoQGtlcm5lbC5vcmc+DQo+IFNlbnQ6IDAzIEZlYnJ1YXJ5IDIwMjUgMjE6MDYNCj4g
-U3ViamVjdDogUmU6IFtQQVRDSCB2Ml0gb2Y6IGJhc2U6IEFkZCBvZl9nZXRfYXZhaWxhYmxlX2No
-aWxkX2J5X25hbWUoKQ0KPiANCj4gT24gTW9uLCBGZWIgMywgMjAyNSBhdCAxMToxN+KAr0FNIEJp
-anUgRGFzIDxiaWp1LmRhcy5qekBicC5yZW5lc2FzLmNvbT4gd3JvdGU6DQo+ID4NCj4gPiBIaSBS
-b2IsDQo+ID4NCj4gPiArQ2MgcmVsZXZhbnQgc3Vic3lzdGVtcy4NCj4gPg0KPiA+ID4gLS0tLS1P
-cmlnaW5hbCBNZXNzYWdlLS0tLS0NCj4gPiA+IEZyb206IFJvYiBIZXJyaW5nIDxyb2JoQGtlcm5l
-bC5vcmc+DQo+ID4gPiBTZW50OiAwMyBGZWJydWFyeSAyMDI1IDE2OjUzDQo+ID4gPiBTdWJqZWN0
-OiBSZTogW1BBVENIIHYyXSBvZjogYmFzZTogQWRkDQo+ID4gPiBvZl9nZXRfYXZhaWxhYmxlX2No
-aWxkX2J5X25hbWUoKQ0KPiA+ID4NCj4gPiA+IE9uIFNhdCwgRmViIDEsIDIwMjUgYXQgMzozMeKA
-r0FNIEJpanUgRGFzIDxiaWp1LmRhcy5qekBicC5yZW5lc2FzLmNvbT4gd3JvdGU6DQo+ID4gPiA+
-DQo+ID4gPiA+IFRoZXJlIGFyZSBsb3Qgb2YgZHJpdmVycyB1c2luZyBvZl9nZXRfY2hpbGRfYnlf
-bmFtZSgpIGZvbGxvd2VkIGJ5DQo+ID4gPiA+IG9mX2RldmljZV9pc19hdmFpbGFibGUoKSB0byBm
-aW5kIHRoZSBhdmFpbGFibGUgY2hpbGQgbm9kZSBieSBuYW1lDQo+ID4gPiA+IGZvciBhIGdpdmVu
-IHBhcmVudC4gUHJvdmlkZSBhIGhlbHBlciBmb3IgdGhlc2UgdXNlcnMgdG8gc2ltcGxpZnkgdGhl
-IGNvZGUuDQo+ID4gPiA+DQo+ID4gPiA+IFN1Z2dlc3RlZC1ieTogR2VlcnQgVXl0dGVyaG9ldmVu
-IDxnZWVydCtyZW5lc2FzQGdsaWRlci5iZT4NCj4gPiA+ID4gU2lnbmVkLW9mZi1ieTogQmlqdSBE
-YXMgPGJpanUuZGFzLmp6QGJwLnJlbmVzYXMuY29tPg0KPiA+ID4NCj4gPiA+IFJldmlld2VkLWJ5
-OiBSb2IgSGVycmluZyA8cm9iaEBrZXJuZWwub3JnPg0KPiA+ID4NCj4gPiA+ID4gLS0tDQo+ID4g
-PiA+IHYxLT52MjoNCj4gPiA+ID4gICogVXBkYXRlZCBjb21taXQgZGVzY3JpcHRpb24uDQo+ID4g
-PiA+ICAqIFVwZGF0ZWQga2VybmVsZG9jIGNvbW1lbnQgYmxvY2sNCj4gPiA+ID4gICogQXZvaWRl
-ZCBjb2RlIGR1cGxpY2F0aW9uIGJ5IHVzaW5nIG9mX2dldF9jaGlsZF9ieV9uYW1lKCkuDQo+ID4g
-PiA+DQo+ID4gPiA+IE5vdGU6DQo+ID4gPiA+IGdyZXAgc2hvd2VkIHRoZSBiZWxvdyBmaWxlcyB3
-aWxsIGJlIHRoZSB1c2VycyBmb3IgdGhpcyBuZXcgQVBJLg0KPiA+ID4gPiBJIHdpbGwgYmUgdXBk
-YXRpbmcgdGhlc2UgZHJpdmVycyBvbmNlIHRoaXMgcGF0Y2ggaXMgaW4gbWFpbmxpbmUuDQo+ID4g
-Pg0KPiA+ID4gTm8gbmVlZCB0byB3YWl0LiBQbGVhc2UgY29udmVydCBhbGwgdGhlIG5ldCBvbmVz
-IGFuZCBzZW5kIHRoaXMgcGF0Y2ggd2l0aCB0aGVtLg0KPiA+DQo+ID4gVGhhbmtzIGZvciB0aGUg
-ZmVlZGJhY2suDQo+ID4NCj4gPiBTdWJzZXF1ZW50bHksIEkgaGF2ZSBzZW5kIHRoZSBwYXRjaGVz
-LiBIb3dldmVyLCBBbmRyZXdbMV0vS3J5c3RvZmZbMl0NCj4gPiBtZW50aW9uZWQgbWUgdG8gd2Fp
-dCB0aWxsIHRoaXMgcGF0Y2ggYXBwZWFyIGluIC1yYyAsDQo+ID4NCj4gPiBDYW4gaXQgYmUgZmFz
-dCB0cmFja2VkIHRvIDYuMTQtcmNYPz8gT3RoZXJ3aXNlLCBpdCBuZWVkcyB0byB3YWl0IHRpbGwN
-Cj4gPiA2LjE1LXJjMSBhbmQgb3RoZXIgcGF0Y2hlcyB3aWxsIHRoZW4gYXBwZWFyIG9uIDYuMTYt
-cmMxLg0KPiANCj4gTW9zdCBtYWludGFpbmVyIHRyZWVzIGFyZSBiYXNlZCBvbiByYzEuIFNvIGFy
-ZSB5b3Ugc3VyZSBldmVyeW9uZSBpcyBnb2luZyB0byBiZSBmaW5lIHdpdGggYSByYzINCj4gZGVw
-ZW5kZW5jeT8gR2VuZXJhbGx5LCBuZXcgQVBJcyBkb24ndCBnbyBpbiB3aXRob3V0IGEgdXNlci4N
-Cg0KDQpGcm9tIFsxXSwgbG9va3MgbGlrZSAnbmV0JyByZWJhc2Ugb24gcmNYIGZvciBmaXhlcyBh
-bmQgJ25ldC1uZXh0JyByZWJhc2Ugb24gJ25ldCc/DQoNClsxXQ0KaHR0cHM6Ly93d3cua2VybmVs
-Lm9yZy9kb2MvRG9jdW1lbnRhdGlvbi9uZXR3b3JraW5nL25ldGRldi1GQVEudHh0DQoNCj4gDQo+
-IFRoYXQgYmVpbmcgc2FpZCwgaWYgdGhpcyB3YXMgMTBzIG9mIGRpZmZlcmVudCB0cmVlcyBJJ2Qg
-cmVjb25zaWRlciwgYnV0IHNpbmNlIG1vc3Qgb2YgdGhlIGNhbGxlcnMgYXJlDQo+IGluIG5ldCwg
-SSdtIGxlc3Mgd2lsbGluZyB0byBhcHBseSAibm90IGEgZml4IiB0byBmaXhlcy4NCj4gDQo+ID4g
-WzFdDQo+ID4gaHR0cHM6Ly9sb3JlLmtlcm5lbC5vcmcvYWxsLzk2ZmJjY2QzLWZkNzktNGIyZi04
-ZjQxLWJkMGUzZmRiMmM2OUBsdW5uLg0KPiA+IGNoLw0KPiA+DQo+ID4gWzJdDQo+ID4gaHR0cHM6
-Ly9sb3JlLmtlcm5lbC5vcmcvYWxsLzdmZTlkYWQ5LTg1ZTItNGNmMC05OGJjLWNjYTIwZmY2MmRm
-NUBrZXJuZQ0KPiA+IGwub3JnLw0KPiANCj4gSXQncyBub3QgbGlrZSB0aGV5IGFyZSBzYXlpbmcg
-dG8gZG8gdGhlIG9wcG9zaXRlIG9mIHdoYXQgSSBzYWlkLiBJZiB0aGUgZGVwZW5kZW5jeSBpcyBu
-b3QgcGFydCBvZiB5b3VyDQo+IHNlcmllcywgdGhlbiBpdCBuZWVkcyB0byBiZSBpbiByYzEuDQoN
-Ck9LLiBBcyB5b3Ugc3VnZ2VzdGVkLCBzaW5jZSAnbmV0JyBpcyB0aGUgbWFpbiB1c2VyIG9mIHRo
-aXMgQVBJLCBJIHdpbGwgc2VuZCB0aGlzIHBhdGNoIGFsb25nIHdpdGggb3RoZXIgbmV0IHBhdGNo
-ZXMsDQp0byBuZXQgc3Vic3lzdGVtIGFzIG5ldC1uZXh0IGlzIG9wZW4gbm93Lg0KDQpDaGVlcnMs
-DQpCaWp1DQoNCg0K
+Extended RTM_GETMULTICAST to support dumping joined IPv4 multicast
+addresses, in addition to the existing IPv6 functionality. This allows
+userspace applications to retrieve both IPv4 and IPv6 multicast
+addresses through similar netlink command and then monitor future
+changes by registering to RTNLGRP_IPV4_MCADDR and RTNLGRP_IPV6_MCADDR.
+
+Cc: Maciej =C5=BBenczykowski <maze@google.com>
+Cc: Lorenzo Colitti <lorenzo@google.com>
+Reviewed-by: Eric Dumazet <edumazet@google.com>
+Signed-off-by: Yuyang Huang <yuyanghuang@google.com>
+---
+
+Changelog since v6:
+- Move `inet_fill_args` and `inet_fill_ifmcaddr` from igmp.h to igmp_intern=
+al.h to avoid exposing these two definitions kernel wide.
+
+Changelog since v5:
+- Move the test case to a separate patch.
+- Refactor the code to remove the dependency on `enum addr_type_t type`.
+- Return error if `fillargs->event` is not set properly.=20
+- Return -EINVAL in an unreachable code path.
+
+Changelog since v4:
+- Fixes a bug where fillargs->event was not initialized in the code path fo=
+r dumping ifaddr.
+- Fixes a bug where reply messages contain the wrong sequence number.
+- Minor style fixes.
+- Adds a ynl selftest.
+
+Changelog since v3:
+- Refactor in_dev_dump_addr() to break down the logic into two separate fun=
+ctions to simplify the logic.
+
+Changelog since v2:
+- Fix checkpatch.pl warnings.
+- Remove one redundant EXPORT_SYMBOL().
+
+Changelog since v1:
+- Minor style fixes.
+- Use for_each_pmc_rcu() instead of for_each_pmc_rtnl().
+
+ include/linux/igmp_internal.h | 17 ++++++++
+ net/ipv4/devinet.c            | 77 ++++++++++++++++++++++++++++-------
+ net/ipv4/igmp.c               | 14 +++++--
+ 3 files changed, 90 insertions(+), 18 deletions(-)
+ create mode 100644 include/linux/igmp_internal.h
+
+diff --git a/include/linux/igmp_internal.h b/include/linux/igmp_internal.h
+new file mode 100644
+index 000000000000..0a1bcc8ec8e1
+--- /dev/null
++++ b/include/linux/igmp_internal.h
+@@ -0,0 +1,17 @@
++/* SPDX-License-Identifier: GPL-2.0-or-later */
++#ifndef _LINUX_IGMP_INTERNAL_H
++#define _LINUX_IGMP_INTERNAL_H
++
++struct inet_fill_args {
++	u32 portid;
++	u32 seq;
++	int event;
++	unsigned int flags;
++	int netnsid;
++	int ifindex;
++};
++
++int inet_fill_ifmcaddr(struct sk_buff *skb, struct net_device *dev,
++		       const struct ip_mc_list *im,
++		       struct inet_fill_args *args);
++#endif
+diff --git a/net/ipv4/devinet.c b/net/ipv4/devinet.c
+index c8b3cf5fba4c..5292202fd1ea 100644
+--- a/net/ipv4/devinet.c
++++ b/net/ipv4/devinet.c
+@@ -46,6 +46,7 @@
+ #include <linux/notifier.h>
+ #include <linux/inetdevice.h>
+ #include <linux/igmp.h>
++#include <linux/igmp_internal.h>
+ #include <linux/slab.h>
+ #include <linux/hash.h>
+ #ifdef CONFIG_SYSCTL
+@@ -107,15 +108,6 @@ static const struct nla_policy ifa_ipv4_policy[IFA_MAX=
++1] =3D {
+ 	[IFA_PROTO]		=3D { .type =3D NLA_U8 },
+ };
+=20
+-struct inet_fill_args {
+-	u32 portid;
+-	u32 seq;
+-	int event;
+-	unsigned int flags;
+-	int netnsid;
+-	int ifindex;
+-};
+-
+ #define IN4_ADDR_HSIZE_SHIFT	8
+ #define IN4_ADDR_HSIZE		(1U << IN4_ADDR_HSIZE_SHIFT)
+=20
+@@ -1846,9 +1838,38 @@ static int inet_valid_dump_ifaddr_req(const struct n=
+lmsghdr *nlh,
+ 	return 0;
+ }
+=20
+-static int in_dev_dump_addr(struct in_device *in_dev, struct sk_buff *skb,
+-			    struct netlink_callback *cb, int *s_ip_idx,
+-			    struct inet_fill_args *fillargs)
++static int in_dev_dump_ifmcaddr(struct in_device *in_dev, struct sk_buff *=
+skb,
++				struct netlink_callback *cb, int *s_ip_idx,
++				struct inet_fill_args *fillargs)
++{
++	struct ip_mc_list *im;
++	int ip_idx =3D 0;
++	int err;
++
++	for (im =3D rcu_dereference(in_dev->mc_list);
++	     im;
++	     im =3D rcu_dereference(im->next_rcu)) {
++		if (ip_idx < *s_ip_idx) {
++			ip_idx++;
++			continue;
++		}
++		err =3D inet_fill_ifmcaddr(skb, in_dev->dev, im, fillargs);
++		if (err < 0)
++			goto done;
++
++		nl_dump_check_consistent(cb, nlmsg_hdr(skb));
++		ip_idx++;
++	}
++	err =3D 0;
++	ip_idx =3D 0;
++done:
++	*s_ip_idx =3D ip_idx;
++	return err;
++}
++
++static int in_dev_dump_ifaddr(struct in_device *in_dev, struct sk_buff *sk=
+b,
++			      struct netlink_callback *cb, int *s_ip_idx,
++			      struct inet_fill_args *fillargs)
+ {
+ 	struct in_ifaddr *ifa;
+ 	int ip_idx =3D 0;
+@@ -1874,6 +1895,21 @@ static int in_dev_dump_addr(struct in_device *in_dev=
+, struct sk_buff *skb,
+ 	return err;
+ }
+=20
++static int in_dev_dump_addr(struct in_device *in_dev, struct sk_buff *skb,
++			    struct netlink_callback *cb, int *s_ip_idx,
++			    struct inet_fill_args *fillargs)
++{
++	switch (fillargs->event) {
++	case RTM_NEWADDR:
++		return in_dev_dump_ifaddr(in_dev, skb, cb, s_ip_idx, fillargs);
++	case RTM_GETMULTICAST:
++		return in_dev_dump_ifmcaddr(in_dev, skb, cb, s_ip_idx,
++					    fillargs);
++	default:
++		return -EINVAL;
++	}
++}
++
+ /* Combine dev_addr_genid and dev_base_seq to detect changes.
+  */
+ static u32 inet_base_seq(const struct net *net)
+@@ -1889,13 +1925,14 @@ static u32 inet_base_seq(const struct net *net)
+ 	return res;
+ }
+=20
+-static int inet_dump_ifaddr(struct sk_buff *skb, struct netlink_callback *=
+cb)
++static int inet_dump_addr(struct sk_buff *skb, struct netlink_callback *cb=
+,
++			  int event)
+ {
+ 	const struct nlmsghdr *nlh =3D cb->nlh;
+ 	struct inet_fill_args fillargs =3D {
+ 		.portid =3D NETLINK_CB(cb->skb).portid,
+ 		.seq =3D nlh->nlmsg_seq,
+-		.event =3D RTM_NEWADDR,
++		.event =3D event,
+ 		.flags =3D NLM_F_MULTI,
+ 		.netnsid =3D -1,
+ 	};
+@@ -1949,6 +1986,16 @@ static int inet_dump_ifaddr(struct sk_buff *skb, str=
+uct netlink_callback *cb)
+ 	return err;
+ }
+=20
++static int inet_dump_ifaddr(struct sk_buff *skb, struct netlink_callback *=
+cb)
++{
++	return inet_dump_addr(skb, cb, RTM_NEWADDR);
++}
++
++static int inet_dump_ifmcaddr(struct sk_buff *skb, struct netlink_callback=
+ *cb)
++{
++	return inet_dump_addr(skb, cb, RTM_GETMULTICAST);
++}
++
+ static void rtmsg_ifa(int event, struct in_ifaddr *ifa, struct nlmsghdr *n=
+lh,
+ 		      u32 portid)
+ {
+@@ -2845,6 +2892,8 @@ static const struct rtnl_msg_handler devinet_rtnl_msg=
+_handlers[] __initconst =3D {
+ 	{.protocol =3D PF_INET, .msgtype =3D RTM_GETNETCONF,
+ 	 .doit =3D inet_netconf_get_devconf, .dumpit =3D inet_netconf_dump_devcon=
+f,
+ 	 .flags =3D RTNL_FLAG_DOIT_UNLOCKED | RTNL_FLAG_DUMP_UNLOCKED},
++	{.owner =3D THIS_MODULE, .protocol =3D PF_INET, .msgtype =3D RTM_GETMULTI=
+CAST,
++	 .dumpit =3D inet_dump_ifmcaddr, .flags =3D RTNL_FLAG_DUMP_UNLOCKED},
+ };
+=20
+ void __init devinet_init(void)
+diff --git a/net/ipv4/igmp.c b/net/ipv4/igmp.c
+index 3da126cea884..ac3c45bdbdf0 100644
+--- a/net/ipv4/igmp.c
++++ b/net/ipv4/igmp.c
+@@ -81,6 +81,7 @@
+ #include <linux/skbuff.h>
+ #include <linux/inetdevice.h>
+ #include <linux/igmp.h>
++#include <linux/igmp_internal.h>
+ #include <linux/if_arp.h>
+ #include <linux/rtnetlink.h>
+ #include <linux/times.h>
+@@ -1432,14 +1433,16 @@ static void ip_mc_hash_remove(struct in_device *in_=
+dev,
+ 	*mc_hash =3D im->next_hash;
+ }
+=20
+-static int inet_fill_ifmcaddr(struct sk_buff *skb, struct net_device *dev,
+-			      const struct ip_mc_list *im, int event)
++int inet_fill_ifmcaddr(struct sk_buff *skb, struct net_device *dev,
++		       const struct ip_mc_list *im,
++		       struct inet_fill_args *args)
+ {
+ 	struct ifa_cacheinfo ci;
+ 	struct ifaddrmsg *ifm;
+ 	struct nlmsghdr *nlh;
+=20
+-	nlh =3D nlmsg_put(skb, 0, 0, event, sizeof(struct ifaddrmsg), 0);
++	nlh =3D nlmsg_put(skb, args->portid, args->seq, args->event,
++			sizeof(struct ifaddrmsg), args->flags);
+ 	if (!nlh)
+ 		return -EMSGSIZE;
+=20
+@@ -1468,6 +1471,9 @@ static int inet_fill_ifmcaddr(struct sk_buff *skb, st=
+ruct net_device *dev,
+ static void inet_ifmcaddr_notify(struct net_device *dev,
+ 				 const struct ip_mc_list *im, int event)
+ {
++	struct inet_fill_args fillargs =3D {
++		.event =3D event,
++	};
+ 	struct net *net =3D dev_net(dev);
+ 	struct sk_buff *skb;
+ 	int err =3D -ENOMEM;
+@@ -1479,7 +1485,7 @@ static void inet_ifmcaddr_notify(struct net_device *d=
+ev,
+ 	if (!skb)
+ 		goto error;
+=20
+-	err =3D inet_fill_ifmcaddr(skb, dev, im, event);
++	err =3D inet_fill_ifmcaddr(skb, dev, im, &fillargs);
+ 	if (err < 0) {
+ 		WARN_ON_ONCE(err =3D=3D -EMSGSIZE);
+ 		nlmsg_free(skb);
+--=20
+2.48.1.362.g079036d154-goog
+
 
