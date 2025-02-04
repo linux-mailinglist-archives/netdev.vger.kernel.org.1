@@ -1,178 +1,152 @@
-Return-Path: <netdev+bounces-162697-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-162698-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 48077A27A20
-	for <lists+netdev@lfdr.de>; Tue,  4 Feb 2025 19:38:26 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 42131A27A3B
+	for <lists+netdev@lfdr.de>; Tue,  4 Feb 2025 19:41:32 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C4EA11658DE
-	for <lists+netdev@lfdr.de>; Tue,  4 Feb 2025 18:38:24 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id BEF1216686E
+	for <lists+netdev@lfdr.de>; Tue,  4 Feb 2025 18:41:30 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3AD7F2185A8;
-	Tue,  4 Feb 2025 18:38:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EE19D217F5C;
+	Tue,  4 Feb 2025 18:41:26 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="SQAyxdNv"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="fgby/CT1"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f176.google.com (mail-pl1-f176.google.com [209.85.214.176])
+Received: from mail-wr1-f44.google.com (mail-wr1-f44.google.com [209.85.221.44])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 94516218580
-	for <netdev@vger.kernel.org>; Tue,  4 Feb 2025 18:38:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.176
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3667120DD4B;
+	Tue,  4 Feb 2025 18:41:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.44
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1738694301; cv=none; b=DWNj08LAbOKQqAohVosydjHlQc3v6PiMBnanoNVp/ejtQoXU2IothnBZWtqPP/aMnZvyGTQtUSMX0KSlSI/puOye+V0gRi0/Cw6Vg7XMmbHXloBcAIyYwRaOcC9FV0/0+Dbp75OJ0E8s10pOb5+fmpsSBUhsNfaAmaTUCYNjDt0=
+	t=1738694486; cv=none; b=O6Xzx9G1FG7uFG8ohPgvIfDFRey0yAJInDQlp0Mx6BjvhUgz3zXvYGgmt2TWRkCswmOLKbI0MmULsMJgP/pySYM5IUf7cdT6q9WS8CPdaiDNkK4UOilzurKaypc7KaU96//8jnVMa8bS+qg9tLoKqOVE4ALDlkqb9EdSDcV8Nlw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1738694301; c=relaxed/simple;
-	bh=VWpYyC5BU37vNckaIcwdTn1dk75YBwDKTVHbH1aG/+U=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=vCrXp8bbQ/WldNIsJ1bXeUAk7s2/Yvn0i5rRxZfSC+Wmng2pcECs8mhCxE2Wv/jbdaerXkAfp9owg1qWvgJUeWVkV8ez77AUtL2NUo8abWf297NGVsBcmMB5rc4BwE9hkRcw4aOcfN1Tdmlitx5sr4HhPpWM054zll1SeHuT/ZI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=SQAyxdNv; arc=none smtp.client-ip=209.85.214.176
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-pl1-f176.google.com with SMTP id d9443c01a7336-21f032484d4so169345ad.0
-        for <netdev@vger.kernel.org>; Tue, 04 Feb 2025 10:38:19 -0800 (PST)
+	s=arc-20240116; t=1738694486; c=relaxed/simple;
+	bh=BykhNrU5yb/xqnxH478PuhsPI4enRJ10a8mBBuIAm+k=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=iF2QwJ3n3NzlQ1JtomV8a2f+NfkTuWNFkGkN2jbEktMEqcuXe2DoarzfDbmQmvPVB1YVWDSu7XnwddIJ4yLkukrxxHoEjsyi4plIQkTyT3YIeq3h1xKUXdlteG3SZKXzfhfQbiJP/qtU3KDrY/dlL9fErtMcgDiPRLzIZtIkexk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=fgby/CT1; arc=none smtp.client-ip=209.85.221.44
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-wr1-f44.google.com with SMTP id ffacd0b85a97d-38db104d35eso584863f8f.1;
+        Tue, 04 Feb 2025 10:41:24 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1738694299; x=1739299099; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
+        d=gmail.com; s=20230601; t=1738694483; x=1739299283; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:subject:cc:to:from:date:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=VWpYyC5BU37vNckaIcwdTn1dk75YBwDKTVHbH1aG/+U=;
-        b=SQAyxdNvX/9D3n6s0aJHETIxGi0qlQMfYCRxYwzqiHmBg19camk4s3iXBnVJV1E/iR
-         aU0pUHnI1L+8hXq7YgBKpt9Q2St8x15ii8wpoFhkeYBr0vdMuPi8x4JZywoBuIZ6YClh
-         fxriK0tdk16fnLH+88RRvuLyc6AVrgG9psqu+KcbyuRBAQ9C3iT8p/z2akhnQOUYsXdv
-         DjcDDfF/7iIxZzOMDXyNvWqDF1XraOQfOzOxlWtGrn4MWa+qj70VWQzfmxHh3Wb5ilcz
-         SAdl4EOB7AROczUTHODS5yEkK519sxe7mMd8dzD8deFHEQip1VYy3R9kd3dPtEyji319
-         GwCA==
+        bh=4898qSs9PnK6sao1kkrPVANsRxsn9Ys1yqup6ircsYk=;
+        b=fgby/CT1b6JuWCtd2as9m6qwhamkt3IfJO/hXlbfYIDm+QiKrOpEnpLJ0onkB3+YGG
+         R9a1GJol6oFczaGEIQsZuSj/Lx2LoJqCOEU1E3kuAbBSsFmFD0eajAA4L49KoNZ9pmwD
+         50GYN0GzZ+Utl/T5jlR6aJtvtVKrwhTE0C9W/+IC2P2LM3ZbleaBUdpluiCenaiZ2Evm
+         dH5tYexTX9hL60fKaoZcim6Qg7gqx4IakgZaWHIi7/SnHEFAaD/Ge9Ut8UyFrSZondzO
+         qoXDYe8yL1Wz2+/nXiuvvw4KVCwcA8CFtmqSBR76m19eKBeuqW8OF6u6A2F9Vg1AIhX2
+         O85g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1738694299; x=1739299099;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+        d=1e100.net; s=20230601; t=1738694483; x=1739299283;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:subject:cc:to:from:date:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=VWpYyC5BU37vNckaIcwdTn1dk75YBwDKTVHbH1aG/+U=;
-        b=Jvw9cyhwTFgXrC1QBBWxAj/nKoSOqxiS5FWFEYkKOUMfQZdMUL2T8k9gAln/rBx7eq
-         5lJL406qif920qPGBIbiknOJp9vFQtQ4yYOoByN821rpHdADGlVmwj+nJSNb9ZUonwUe
-         Tvd3KUG1DTsRYcsClgb5VhVUjVQCWDYW5Tefjii7TU59tRs2L2/e0LCmJLP+kEvmQcTn
-         Ptlj4Aa8quHR2y04i9FdvN2mLn604GF+S6JMq82WILzoPBu6IKyWYrD9p5js2rTDGueg
-         46RkLzskOrVQQ241tqUJ9+o1OBATKkVBduF+R5IiTj111swV1pi+L7R7/oWQnEN07M9N
-         FwNw==
-X-Forwarded-Encrypted: i=1; AJvYcCVdW5cwK4GxzzTERIxRWAcg494twqUtTD15BvdGgHQqq9SP4Xh7gSrMwiltOASdAOy332XiT6c=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwtVB5qPUxmzPU/YxTm8i5zQ9aYSN/PMm9Stiq3X+lwNVI2sp4o
-	N9vhC4M7/dZUdLqstEGtGi1nj2/8LHTVKBAe9br3XVTPtIPEIpOs9Ppm/yj6ouasVpXcAb4HP+X
-	/kQrvr+L7xxNjHy+Z8wxPMhSfo2potExm9F1f
-X-Gm-Gg: ASbGncvwmukVOSdVNaZPHMTD7eGVYnJAKkrbzOb0G2RXBnmbz619+GQusu6nkrJhI2E
-	3u0hYXPRWaosvBJpQsTwQhJdqxATuhUofKxgefB4qzKL1eoCe0yVnX1KonS9ftktvnyecRob2
-X-Google-Smtp-Source: AGHT+IFMTGKEbMUy5X/wrxqKuhiOwxvTYxxRi6wgw8OFhexTlZ37aXHNFfZcZ7HGBbaPcBnhWuc/sZRQ9XK6HaeH87U=
-X-Received: by 2002:a17:902:b7c2:b0:216:201e:1b4c with SMTP id
- d9443c01a7336-21f03b3c699mr3066345ad.9.1738694298421; Tue, 04 Feb 2025
- 10:38:18 -0800 (PST)
+        bh=4898qSs9PnK6sao1kkrPVANsRxsn9Ys1yqup6ircsYk=;
+        b=Rs+SteLk4xgvzxEzH9w6qWGYPr8Uwo4hXE3NZNkntxCZF4BySZ5u5vqIft0tT7LAc8
+         OMPa3z29BHoo4V/K0vme8a2MQUXcPwYsj9pvbJe0FEcwqPzhGjsold0o3AmQ4b8NvVkh
+         UU6F2b+by+PktQkuuheWYxTDh2OInzQ4f1De110esPYxqUdBp4kxAu1S1xacrqeCt62N
+         rUJPtM3npp1Af0rlv0DCbS/wyeovV+tAJknK94BogLl+YUARWdyd2qBBwTheyCGT8Nd/
+         3QBZPyAoBhjs+/xJ3+qOR7nCP6RfbkTQUydiG819Gx/UkF8+ZIKx7FrqffZgK9wfbh2e
+         X2wg==
+X-Forwarded-Encrypted: i=1; AJvYcCU0nc4aHfnHiomsLuf4G9omM7q8cFdoTyr2f3opvIxbMv9PqMyte6LKjHnOtfr8nBqY/qkre//iWlao+A==@vger.kernel.org, AJvYcCVT7nPA5CkI76GyGA6sxw3q/uWbtGgzSpxm0a34FU+HZbWvexMSLGo1JJYTqeaw9sgl8DwFLjoq@vger.kernel.org, AJvYcCX9Shxq0TdA7F7L/57P7wtTc0lvn91Z/knfTgWyurACisrzIjU/7tY0x1EBavSj6W5jFsD2t0cySDg=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzmFI6T8kwKWa4ES6Np4CSU37WOaNmomvSP+lNu67g5r3VP/kWB
+	g3F+t60Kv7+3y5g8DgbHqlIBAvikZgF0oYfGUw8DDucNKZxSO7+U
+X-Gm-Gg: ASbGncvpAbtxRBGYzhJy8NdZj2nDilsR4KX3JWqy/n9oUPim1TL5dffLwuD3uBo5Og3
+	U3L+2kUtESOBBNpzOZ+1Q0YXutsprCPmdbD7WcBuzVC2zWhwUVr01GsYkGZ1lD+Q722gNaVn1k8
+	IXXKyHSnLb3eBvXtX0J9a52494WnssmfxKs7HqVir/Ru/S0N+JABOMq0qgu58N9N93w8xPDK7ez
+	aTbXkXvUrC6xGk4bzIE+/7KlrkqD/x6CufPmP9amnDCThzrKnW10YQOLC9YXTTvD5dhoZWZTK9U
+	bzIWz8QViInNtWrVCTb9v+5UdRrlv931wRcQhlF1dtJ0NBd6aH3JSA==
+X-Google-Smtp-Source: AGHT+IGMukZOMOoqMJBYdI9wFhFfAKlkZp4ajbkSfhODZBJb/b8M/hgpAVxedM8x8xtUfaPTkcI0pQ==
+X-Received: by 2002:a05:6000:1fac:b0:38d:af14:cb1 with SMTP id ffacd0b85a97d-38daf140ef5mr3130992f8f.54.1738694483262;
+        Tue, 04 Feb 2025 10:41:23 -0800 (PST)
+Received: from pumpkin (82-69-66-36.dsl.in-addr.zen.co.uk. [82.69.66.36])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-38c5c1d1d03sm16776348f8f.99.2025.02.04.10.41.22
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 04 Feb 2025 10:41:22 -0800 (PST)
+Date: Tue, 4 Feb 2025 18:41:21 +0000
+From: David Laight <david.laight.linux@gmail.com>
+To: Michal Swiatkowski <michal.swiatkowski@linux.intel.com>
+Cc: Tony Nguyen <anthony.l.nguyen@intel.com>, davem@davemloft.net,
+ kuba@kernel.org, pabeni@redhat.com, edumazet@google.com,
+ andrew+netdev@lunn.ch, netdev@vger.kernel.org, sridhar.samudrala@intel.com,
+ jacob.e.keller@intel.com, pio.raczynski@gmail.com,
+ konrad.knitter@intel.com, marcin.szycik@intel.com,
+ nex.sw.ncis.nat.hpm.dev@intel.com, przemyslaw.kitszel@intel.com,
+ jiri@resnulli.us, horms@kernel.org, David.Laight@aculab.com,
+ pmenzel@molgen.mpg.de, mschmidt@redhat.com, tatyana.e.nikolova@intel.com,
+ Jason Gunthorpe <jgg@ziepe.ca>, Leon Romanovsky <leon@kernel.org>,
+ linux-rdma@vger.kernel.org, corbet@lwn.net, linux-doc@vger.kernel.org
+Subject: Re: [PATCH net-next 2/9] ice: devlink PF MSI-X max and min
+ parameter
+Message-ID: <20250204184121.168eaba2@pumpkin>
+In-Reply-To: <Z6GuSJCshbWlkiLu@mev-dev.igk.intel.com>
+References: <20250203210940.328608-1-anthony.l.nguyen@intel.com>
+	<20250203210940.328608-3-anthony.l.nguyen@intel.com>
+	<20250203214808.129b75e5@pumpkin>
+	<Z6GuSJCshbWlkiLu@mev-dev.igk.intel.com>
+X-Mailer: Claws Mail 4.1.1 (GTK 3.24.38; arm-unknown-linux-gnueabihf)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250203223916.1064540-1-almasrymina@google.com>
- <a97c4278-ea08-4693-a394-8654f1168fea@redhat.com> <CAHS8izNZrKVXSXxL3JG3BuZdho2OQZp=nhLuVCrLZjJD1R0EPg@mail.gmail.com>
- <Z6JXFRUobi-w73D0@mini-arch>
-In-Reply-To: <Z6JXFRUobi-w73D0@mini-arch>
-From: Mina Almasry <almasrymina@google.com>
-Date: Tue, 4 Feb 2025 10:38:05 -0800
-X-Gm-Features: AWEUYZkWWji_vJg7EQ7KO6_P-US-dmF1BLoKiALNV67hc1IBmcJTgjtC3Y2cAtM
-Message-ID: <CAHS8izNXo1cQmA5GijE-UW2X1OU6irMV9FRevL5tZW3B5NQ8rA@mail.gmail.com>
-Subject: Re: [PATCH net-next v3 0/6] Device memory TCP TX
-To: Stanislav Fomichev <stfomichev@gmail.com>
-Cc: Paolo Abeni <pabeni@redhat.com>, netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	linux-doc@vger.kernel.org, kvm@vger.kernel.org, 
-	virtualization@lists.linux.dev, linux-kselftest@vger.kernel.org, 
-	Donald Hunter <donald.hunter@gmail.com>, Jakub Kicinski <kuba@kernel.org>, 
-	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
-	Simon Horman <horms@kernel.org>, Jonathan Corbet <corbet@lwn.net>, Andrew Lunn <andrew+netdev@lunn.ch>, 
-	Neal Cardwell <ncardwell@google.com>, David Ahern <dsahern@kernel.org>, 
-	"Michael S. Tsirkin" <mst@redhat.com>, Jason Wang <jasowang@redhat.com>, 
-	Xuan Zhuo <xuanzhuo@linux.alibaba.com>, =?UTF-8?Q?Eugenio_P=C3=A9rez?= <eperezma@redhat.com>, 
-	Stefan Hajnoczi <stefanha@redhat.com>, Stefano Garzarella <sgarzare@redhat.com>, Shuah Khan <shuah@kernel.org>, 
-	sdf@fomichev.me, asml.silence@gmail.com, dw@davidwei.uk, 
-	Jamal Hadi Salim <jhs@mojatatu.com>, Victor Nogueira <victor@mojatatu.com>, 
-	Pedro Tammela <pctammela@mojatatu.com>, Samiullah Khawaja <skhawaja@google.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-On Tue, Feb 4, 2025 at 10:06=E2=80=AFAM Stanislav Fomichev <stfomichev@gmai=
-l.com> wrote:
->
-> On 02/04, Mina Almasry wrote:
-> > On Tue, Feb 4, 2025 at 4:32=E2=80=AFAM Paolo Abeni <pabeni@redhat.com> =
-wrote:
-> > >
-> > > On 2/3/25 11:39 PM, Mina Almasry wrote:
-> > > > The TX path had been dropped from the Device Memory TCP patch serie=
-s
-> > > > post RFCv1 [1], to make that series slightly easier to review. This
-> > > > series rebases the implementation of the TX path on top of the
-> > > > net_iov/netmem framework agreed upon and merged. The motivation for
-> > > > the feature is thoroughly described in the docs & cover letter of t=
-he
-> > > > original proposal, so I don't repeat the lengthy descriptions here,=
- but
-> > > > they are available in [1].
-> > > >
-> > > > Sending this series as RFC as the winder closure is immenient. I pl=
-an on
-> > > > reposting as non-RFC once the tree re-opens, addressing any feedbac=
-k
-> > > > I receive in the meantime.
-> > >
-> > > I guess you should drop this paragraph.
-> > >
-> > > > Full outline on usage of the TX path is detailed in the documentati=
-on
-> > > > added in the first patch.
-> > > >
-> > > > Test example is available via the kselftest included in the series =
-as well.
-> > > >
-> > > > The series is relatively small, as the TX path for this feature lar=
-gely
-> > > > piggybacks on the existing MSG_ZEROCOPY implementation.
-> > >
-> > > It looks like no additional device level support is required. That is
-> > > IMHO so good up to suspicious level :)
-> > >
-> >
-> > It is correct no additional device level support is required. I don't
-> > have any local changes to my driver to make this work. I think Stan
-> > on-list was able to run the TX path (he commented on fixes to the test
-> > but didn't say it doesn't work :D) and one other person was able to
-> > run it offlist.
->
-> For BRCM I had shared this: https://lore.kernel.org/netdev/ZxAfWHk3aRWl-F=
-31@mini-arch/
-> I have similar internal patch for mlx5 (will share after RX part gets
-> in). I agree that it seems like gve_unmap_packet needs some work to be mo=
-re
-> careful to not unmap NIOVs (if you were testing against gve).
+On Tue, 4 Feb 2025 07:06:00 +0100
+Michal Swiatkowski <michal.swiatkowski@linux.intel.com> wrote:
 
-Hmm. I think you're right. We ran into a similar issue with the RX
-path. The RX path worked 'fine' on initial merge, but it was passing
-dmabuf dma-addrs to the dma-mapping API which Jason later called out
-to be unsafe. The dma-mapping API calls with dmabuf dma-addrs will
-boil down into no-ops for a lot of setups I think which is why I'm not
-running into any issues in testing, but upon closer look, I think yes,
-we need to make sure the driver doesn't end up passing these niov
-dma-addrs to functions like dma_unmap_*() and dma_sync_*().
+> On Mon, Feb 03, 2025 at 09:48:08PM +0000, David Laight wrote:
+> > On Mon,  3 Feb 2025 13:09:31 -0800
+> > Tony Nguyen <anthony.l.nguyen@intel.com> wrote:
+> >   
+> > > From: Michal Swiatkowski <michal.swiatkowski@linux.intel.com>
+> > > 
+> > > Use generic devlink PF MSI-X parameter to allow user to change MSI-X
+> > > range.
+> > > 
+> > > Add notes about this parameters into ice devlink documentation.
+....
+> > Don't those checks make it difficult to set the min and max together?
+> > I think you need to create the new min/max pair and check they are
+> > valid together.
+> > Which probably requires one parameter with two values.
+> >   
+> 
+> I wanted to reuse exsisting parameter. The other user of it is bnxt
+> driver. In it there is a separate check for min "max" and max "max".
+> It is also problematic, because min can be set to value greater than
+> max (here it can happen when setting together to specific values).
+> I can do a follow up to this series and change this parameter as you
+> suggested. What do you think?
 
-Stan, do you run into issues (crashes/warnings/bugs) in your setup
-when the driver tries to unmap niovs? Or did you implement these
-changes purely for safety?
+Changing the way a parameter is used will break API compatibility.
+Perhaps you can get the generic parameter validation function to
+update a 'pending' copy, and then do the final min < max check after
+all the parameters have been processed before actually updating
+the live limits.
 
-Let me take a deeper look here and suggest something for the next
-version. I think we may indeed need the driver to declare that it can
-handle niovs in the TX path correctly (i.e. not accidentally pass niov
-dma-addrs to the dma-mapping API).
+The other option is just not to check whether min < max and just
+document which takes precedence (and not use clamp()).
 
---
-Thanks,
-Mina
+It may even be worth saving the 'live limits' as 'hi << 16 | lo' so
+that then can be accessed atomically (with READ/WRITE_ONCE) to avoid
+anything looking at the limits getting confused.
+(Although maybe that doesn't matter here?)
+
+	David
+
+> 
+> Thanks,
+> Michal
 
