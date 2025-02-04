@@ -1,165 +1,313 @@
-Return-Path: <netdev+bounces-162427-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-162428-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3C309A26DA2
-	for <lists+netdev@lfdr.de>; Tue,  4 Feb 2025 09:50:35 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 25EF8A26DBA
+	for <lists+netdev@lfdr.de>; Tue,  4 Feb 2025 09:52:15 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B7E6616437D
-	for <lists+netdev@lfdr.de>; Tue,  4 Feb 2025 08:50:33 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id D61031885A69
+	for <lists+netdev@lfdr.de>; Tue,  4 Feb 2025 08:52:19 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4A3EA206F33;
-	Tue,  4 Feb 2025 08:50:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 54E5C207640;
+	Tue,  4 Feb 2025 08:52:11 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="RoNJ699N"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="PISbRPSu"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 19D92206F25
-	for <netdev@vger.kernel.org>; Tue,  4 Feb 2025 08:50:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1738659032; cv=none; b=oJ2ihsHeh7mULIscE7fHdK6raFitbclAUdfdIWSHQ18d6Qo2aCDibgo22MGENdaeJUDLfXCpveVb83vJwW+afjsc9Rx6+0oClWXOU+94/ZwEBSTERm+ML8ybWLpLHeSjZZBdi7TSIudMnGCY625AD5cBBu4nlgzo1KFCo0VFsYA=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1738659032; c=relaxed/simple;
-	bh=jgvVPlfXUEAKaQyZrjA7TsK+YgKqxZGhAZT8/h8jrKo=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=Pf5zsk1cdOxydFB5EcaWQW744xorKgoorOZUqfedONYnjJ2sfahSHPrUb7LLq4PDRZlnJ4yNRKwYaJmzwUt2kYUFwW4sqLUhELZw9BvdEoSrGLLXT2Tnt0/Xy4rOWtbEwNGZgAsCnx4CqFIhb7g9GhHW5zJl36/zL5hS91oySZs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=RoNJ699N; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1738659028;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=g9qSL7NML3EuPhQpp+mef2GPR5n5qsRvGZBkWAGX7H4=;
-	b=RoNJ699NbUFz5+mZAvD1k/wpkuC0/w5N8aPEQ6dsroytIO8TmqRN6HkAFMi9pnpRtcQCvl
-	RpJqXGJSmPsdpliMs4cBztiacwgfpqYULxMkSuJscaHzfXGlG177Me+Zx8DcWa22P9HonP
-	gKn9c1pyif7fO0TO5DdcomJ5/x38hMM=
-Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
- [209.85.128.70]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-509-B-BhhOSwMgSLCUdFVO0Rdg-1; Tue, 04 Feb 2025 03:50:27 -0500
-X-MC-Unique: B-BhhOSwMgSLCUdFVO0Rdg-1
-X-Mimecast-MFC-AGG-ID: B-BhhOSwMgSLCUdFVO0Rdg
-Received: by mail-wm1-f70.google.com with SMTP id 5b1f17b1804b1-4361ac8b25fso273715e9.2
-        for <netdev@vger.kernel.org>; Tue, 04 Feb 2025 00:50:27 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1738659026; x=1739263826;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=g9qSL7NML3EuPhQpp+mef2GPR5n5qsRvGZBkWAGX7H4=;
-        b=j0wgXcVEGBLZyIdxTlR9w6X3yesGz00DieJZHwRudhLt6KEQSl+tUsK0uChtseNry4
-         VHavgS1K8OAbrEC1W+P/EAIDFwGZVbABWohP1J/AbMxvAJDhsxJM/MIjmfLgkWkOjdl8
-         12juiaQSEOHrIf44vJuBzFOR1CgXQ4BambpBK+jYg/1OqzLT95ra+gf+qJJXoz6U9dHV
-         LfM1iTQrthOSBJfSQ7o8siaehQ6ymUeaVfomKnKkM4umZDoMtX1jBssx/WcWpMo3ryR0
-         3fCVCQQD5nw8Ox7A0WLwE7JWtGGr1Z7TkS0GsAJIrKfOKbhEpfUsNtOA8w2fpin9APxD
-         FBLg==
-X-Gm-Message-State: AOJu0Yy4jzMc7ieJGcL/JIWeOIcopzx3FxsYeGmuhlmSH8GHncZd4P3S
-	pTubUmQg15RKwj7iZL+IBp04LFNbCTaoqSYARDoMHqcmLz0E06/Dfz9DukZU9L3jNmXZZvyWh1y
-	/Vv/0dgnG9ArLhN+UyGqfMQNq3F5ubNpPJMj4bdbFjI+gz5KyeZXblA==
-X-Gm-Gg: ASbGncsBJhmyaV3XlUGYaDcCvRmbkJAhRX9TbRFFtt5j1KsiOcQJAGwh+u+DW5rKW3l
-	YKMDgSkDRx3XoD6zoZep/lOml8AwLDxeDHBNxs0sMmI07QFmBrK5EO6ij/xxjxxLsDvsTBTkLFT
-	s6i35WWYEMK8VxZqf8fg5YY09nh2OKLFZuRiCCqe/iCd3N2mMVGUDJNe0JtoUXVvuE0cVMCHasr
-	yhpsD5uSi5DdgTKN1OLt8o5qjkQYtfZoP1AssMRt1SYZcFOuUiysvIuK1LaAvcZ6jKT2ajyU5jr
-	K3A4sL6CllWdZ2zbyQJ0XiuauL7RfLtnmd4=
-X-Received: by 2002:a05:600c:4e01:b0:434:f3d8:62d0 with SMTP id 5b1f17b1804b1-438dc3a3e77mr213802985e9.3.1738659026020;
-        Tue, 04 Feb 2025 00:50:26 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IE7SLQ1sK3vW3NXrtreUu9kV0H6fv+SAMXCCiDkFW3k5TO3AN47pYDXfvJPk2ktnhV2Ks0ceQ==
-X-Received: by 2002:a05:600c:4e01:b0:434:f3d8:62d0 with SMTP id 5b1f17b1804b1-438dc3a3e77mr213802825e9.3.1738659025696;
-        Tue, 04 Feb 2025 00:50:25 -0800 (PST)
-Received: from [192.168.88.253] (146-241-41-201.dyn.eolo.it. [146.241.41.201])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-438dcc1315esm213997235e9.6.2025.02.04.00.50.24
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 04 Feb 2025 00:50:25 -0800 (PST)
-Message-ID: <52365045-c771-412a-9232-70e80e26c34f@redhat.com>
-Date: Tue, 4 Feb 2025 09:50:23 +0100
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1B829206F18
+	for <netdev@vger.kernel.org>; Tue,  4 Feb 2025 08:52:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=198.175.65.18
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1738659131; cv=fail; b=DgRCs44Dba7uD+rea1yKsKvZzw50ufkFIQBSiy6/cZZebqR4EPRdzfojQf/FhpK4ZvWfpiPf7O7VmwsF+0QLsBsh/f/8Bt0R9H2a7wIvUtMuOqXUyGv0M8wAkeo/K+pyu7XJqnkLglFdL+iqxTzRuPrYYK/NcphokjqumGdrDWM=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1738659131; c=relaxed/simple;
+	bh=JMIPudo7gxmZ1r1DDdv3MKfF2hnjykubSse7AVI1MFg=;
+	h=Message-ID:Date:Subject:To:CC:References:From:In-Reply-To:
+	 Content-Type:MIME-Version; b=mRL6arlW/yusgeziNcOXspDHJALepIQzT/JaDP8F1N424+/Fi7fMCnEGhV3QcMVVyTS0gJX2dwPSrMNmzB1fD2kCHf7k8xodDrgCmkr6j1qPLBhX59KU/mR6sMTGtNWeZNRcDr6vEAjENwjG1AmeSRPTH1wTIM3WwEsOLCcZbZw=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=PISbRPSu; arc=fail smtp.client-ip=198.175.65.18
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1738659129; x=1770195129;
+  h=message-id:date:subject:to:cc:references:from:
+   in-reply-to:content-transfer-encoding:mime-version;
+  bh=JMIPudo7gxmZ1r1DDdv3MKfF2hnjykubSse7AVI1MFg=;
+  b=PISbRPSuXFnPuApg1Fmx53x3+gPDwU4BjJCLdPROdZ6hKOFcuZgPKYtJ
+   RlQ1NaTjnHUD1wjDmPe1JCMIpf9sOuqXRSwvD8VgnbEz8545xPZvRoUSE
+   dFCROYBPgq0ABJjVJzpQey/ir5vzeWEwzykk+cZ/olOA6EDgCz7AiaQB1
+   9HAup1a398rqSPMBc0V2/fShIXeu9d7YO6Y0KVuh9llraYjJSvTMjIg8h
+   cEhLpvtot5PYt0kWy2iaspLEYEftC8V3rea+FuNMsXDI2Jve9MGC40TSr
+   cpvRlcZh9u0nqgM+eHJDzd4bB8meqoCuKJNUnEM+7rskrPPKOHmYAn0cz
+   g==;
+X-CSE-ConnectionGUID: Ivm7NeKgTpqAG3Tva8BUxg==
+X-CSE-MsgGUID: erhlAoujTqWBwZs9voKVJw==
+X-IronPort-AV: E=McAfee;i="6700,10204,11314"; a="39276349"
+X-IronPort-AV: E=Sophos;i="6.12,310,1728975600"; 
+   d="scan'208";a="39276349"
+Received: from orviesa003.jf.intel.com ([10.64.159.143])
+  by orvoesa110.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 04 Feb 2025 00:52:09 -0800
+X-CSE-ConnectionGUID: PDy7bIHPQRuvf7e/1qyrOA==
+X-CSE-MsgGUID: avmdHbuwT1e+yxJM7GcAKw==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.11,199,1725346800"; 
+   d="scan'208";a="115535186"
+Received: from orsmsx603.amr.corp.intel.com ([10.22.229.16])
+  by orviesa003.jf.intel.com with ESMTP/TLS/AES256-GCM-SHA384; 04 Feb 2025 00:52:08 -0800
+Received: from orsmsx603.amr.corp.intel.com (10.22.229.16) by
+ ORSMSX603.amr.corp.intel.com (10.22.229.16) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.44; Tue, 4 Feb 2025 00:52:08 -0800
+Received: from ORSEDG602.ED.cps.intel.com (10.7.248.7) by
+ orsmsx603.amr.corp.intel.com (10.22.229.16) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.44 via Frontend Transport; Tue, 4 Feb 2025 00:52:08 -0800
+Received: from NAM10-MW2-obe.outbound.protection.outlook.com (104.47.55.41) by
+ edgegateway.intel.com (134.134.137.103) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.1.2507.44; Tue, 4 Feb 2025 00:52:07 -0800
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=ckyOc8G+dGCXAlnaj0Cp088T0sRTHmtIMPVpPFv0fCH+qglf3ITH0Szihw4SC9AJDAxzxdx3Ov8TnqQyzR6+d15UNyxdXLmN57efYzAWs5hY1G729ex5LivK38NUDegRtTlxH94eeTWdOuQM8MwWb9f75wKvWsYH7ZbsKos5P28s+2lBoNdnTEQP82prAvi43aH5Y2HQ+m58evGVydBsBIVwaMgqklM3LmOJkt1W7zIqnfdoeXkqOdHp89rAubro7E2401jLVjYxF7/rP9tUGQEHTck7cPNeFVan2XETtmDGGgj4N66ph+DdTneR9WM+RxKsiJmBgWNkCTPqjGLzHw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=0MqwAXqhw4qHCBHOInCfrg7tQpZaVBu2RIybhxcgcOY=;
+ b=rx8JuBwIOPRt2c1PNjPQRwzXJ8SY9QhgLIbyngPNHaQjHGBBUGqZNKiO1FY0LbqVWJSrz8zJ8+SWJUWkrivX0sv+D37hngPf8xTXcolNzOdVaTWnFAAnR8KK2JXYLiSXVLKTIm3rlnYznw+pZPbPHZhBeXqcg7WyivyVx7osaDrcxgHns4B79F8kWIE+hRpucv5N10gBJ7nqZhf81hPEz8U0S3E7/RqCwRvs6sqtS0LHWFEV03eUzmegbOGJOVmjpk/Bzi3a4+2Ulf+tL16BZuBhDdP7L1QIapT/tHciVvfTCIbsivNllwWSMO0tKo4R43Jaa+ti3yZgYkDqowIZow==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=intel.com;
+Received: from PH8PR11MB6682.namprd11.prod.outlook.com (2603:10b6:510:1c5::7)
+ by MN2PR11MB4662.namprd11.prod.outlook.com (2603:10b6:208:263::10) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8398.25; Tue, 4 Feb
+ 2025 08:52:01 +0000
+Received: from PH8PR11MB6682.namprd11.prod.outlook.com
+ ([fe80::cfa7:43ed:66:fd51]) by PH8PR11MB6682.namprd11.prod.outlook.com
+ ([fe80::cfa7:43ed:66:fd51%3]) with mapi id 15.20.8398.021; Tue, 4 Feb 2025
+ 08:52:01 +0000
+Message-ID: <fcac69dd-d579-4f8b-bd0d-30cb6c2455eb@intel.com>
+Date: Tue, 4 Feb 2025 09:51:53 +0100
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next 02/15] net/mlx5: Change parameters for PTP
+ internal functions
+To: Tariq Toukan <tariqt@nvidia.com>, "David S. Miller" <davem@davemloft.net>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, "Eric
+ Dumazet" <edumazet@google.com>, Andrew Lunn <andrew+netdev@lunn.ch>
+CC: <netdev@vger.kernel.org>, Saeed Mahameed <saeedm@nvidia.com>, Gal Pressman
+	<gal@nvidia.com>, Jianbo Liu <jianbol@nvidia.com>, Moshe Shemesh
+	<moshe@nvidia.com>, Leon Romanovsky <leonro@nvidia.com>, Mark Bloch
+	<mbloch@nvidia.com>, Carolina Jubran <cjubran@nvidia.com>, Dragos Tatulea
+	<dtatulea@nvidia.com>
+References: <20250203213516.227902-1-tariqt@nvidia.com>
+ <20250203213516.227902-3-tariqt@nvidia.com>
+Content-Language: pl
+From: Mateusz Polchlopek <mateusz.polchlopek@intel.com>
+Organization: Intel
+In-Reply-To: <20250203213516.227902-3-tariqt@nvidia.com>
+Content-Type: text/plain; charset="UTF-8"; format=flowed
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: ZR0P278CA0178.CHEP278.PROD.OUTLOOK.COM
+ (2603:10a6:910:45::22) To PH8PR11MB6682.namprd11.prod.outlook.com
+ (2603:10b6:510:1c5::7)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next v6 08/12] net: homa: create homa_incoming.c
-To: John Ousterhout <ouster@cs.stanford.edu>
-Cc: Netdev <netdev@vger.kernel.org>, Eric Dumazet <edumazet@google.com>,
- Simon Horman <horms@kernel.org>, Jakub Kicinski <kuba@kernel.org>
-References: <20250115185937.1324-1-ouster@cs.stanford.edu>
- <20250115185937.1324-9-ouster@cs.stanford.edu>
- <530c3a8c-fa5b-4fbe-9200-6e62353ebeaf@redhat.com>
- <CAGXJAmya3xU69ghKO10SZz4sh48CyBgBsF7AaV1OOCRyVPr0Nw@mail.gmail.com>
- <991b5ad9-57cf-4e1d-8e01-9d0639fa4e49@redhat.com>
- <CAGXJAmxfkmKg4NqHd9eU94Y2hCd4F9WJ2sOyCU1pPnppVhju=A@mail.gmail.com>
- <7b05dc31-e00f-497e-945f-2964ff00969f@redhat.com>
- <CAGXJAmyNPhA-6L0jv8AT9_xaxM81k+8nD5H+wtj=UN84PB_KnA@mail.gmail.com>
-Content-Language: en-US
-From: Paolo Abeni <pabeni@redhat.com>
-In-Reply-To: <CAGXJAmyNPhA-6L0jv8AT9_xaxM81k+8nD5H+wtj=UN84PB_KnA@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: PH8PR11MB6682:EE_|MN2PR11MB4662:EE_
+X-MS-Office365-Filtering-Correlation-Id: 6c080a83-dbd0-47ad-f558-08dd44f93076
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;ARA:13230040|366016|7416014|376014|1800799024|7053199007;
+X-Microsoft-Antispam-Message-Info: =?utf-8?B?NGdxcEVPUTBZREIzMzUxNXQrUkdJNGxEOWVBSmRLbkZLR0pyblVvNWdlc3RJ?=
+ =?utf-8?B?Tzk3TEF4cnd1MngwR1loU2ZtSGJKR29tNnZGSGNidThNbGJHTGtYUVJpOUdB?=
+ =?utf-8?B?OWZ6RGVsTk9ydzBRN3czMFprakxpaTZZVlo4eXpVOUhObEk3NVVhRFdEaFd1?=
+ =?utf-8?B?N2NNSG43SjJ4TmFoaURTRlplRHM4VlFTdUpQRVYwNlF4R3IzQ1ZycThjemNR?=
+ =?utf-8?B?SmZtbUhrdGRpc2QvWkVXQVZOT28wZUZGaGpiazZHQ1dlSU5SN1htR1c3dE5B?=
+ =?utf-8?B?ZjJ3YzZjYzFnYkNsYVhxaDFtbzMzaXdrdy9Seit4eWFaZTdsaktRSnkzeGNN?=
+ =?utf-8?B?K1MwZjAyNEV4TzBVWFhlYjlIOG13ekZ4MkFIR2dBR1Bsd2NKQ3A4MlJIbytk?=
+ =?utf-8?B?NHZKWGNkL2JRM1MvWi9zOVltMmo3MGNLemtpK3haaUYyWWllOHJoMWNaOEFr?=
+ =?utf-8?B?L21aZmRvejliS3A0ZFlpSmlIYUNmcjNTb213U25SdlNVRUNKRDZRbFFxVXM3?=
+ =?utf-8?B?Q1VialRTZ1FGeVRoOHJLMGE2UEFYVjllNVlQYWpIM3crem5xWFRYdjFyQ0I4?=
+ =?utf-8?B?cDNDTWxPejN2V1F3aVo5ZjRITjFxWXc2ME1MSkVtSnBLMzR4NXFWNm16Q0JG?=
+ =?utf-8?B?OGR1TmIycEJDOHdkSkpYNlR3WXB6dXMwR2xvT3ZkYitmcHp6OUhhdmcxR240?=
+ =?utf-8?B?RVppOEJteU11U3pmT0lmalJ1cllyaENwbm1sRW1zWGt5VjQzOHV6QjhZUlN0?=
+ =?utf-8?B?RWFkbnorRTBnRW0yeHFiZ1ppQ3ZjYXV6WTh6cXhxeVlKYnhmWCs5UEdhbVBh?=
+ =?utf-8?B?Z2o0OEI4S0htcy9hMkZ3ZGs3TW8yZmhCRzNNQnlLOUVORG9CbGUrR2RwRnVx?=
+ =?utf-8?B?Y0twcUpJcUc4ZUpCQzZvYTd2SkNWT2k4YnNLaE1qV0ozdUdySi9MNDZkbEVq?=
+ =?utf-8?B?N2FZVnhWME1iOEF6bWVHNVdSZU13K1R6eW10NnpNQVMvZ3R2MUo0QTNGK3N4?=
+ =?utf-8?B?elhmT3JmMHdCRlhrcy9ReXNsbU9VMWJwVlV4b3RMd0JmY3M1Z3RQdGZCYmpJ?=
+ =?utf-8?B?U252N2pvUm1oL3pqSXdlR2hidmNxNS84MFIwa1ZOS1h1dXFzMFNMeEh4QXRG?=
+ =?utf-8?B?TkwwYllHQ3VycG0vdkpaMUQ1N1lETTJ6LzBSK2Q1ODdmR2pCZU84QkNsTGs5?=
+ =?utf-8?B?SDNCVXVqUGdHYXlORkVnYm4zdnBxTUt1NWJ1TzBhOWVSL1M3ajNDNGFYUElB?=
+ =?utf-8?B?eHdqakxnTXEzMlNPN1JhZ2ZoTGd4VWRodFIrTkh6WmdFSVlJWW9ILy93NWtG?=
+ =?utf-8?B?MjNMNTNmc3NZd2FrdUV4Rkp2eUNTWGU2QVF5Yi9DLzkzTjQyYnJ1eG9WRHli?=
+ =?utf-8?B?WTR3amNVakRuRTBJS2xtdnFlYUxUaCs3RVRCaW5YMDRKTnFMQWFtYVBiYUpP?=
+ =?utf-8?B?V0crMzlEV1d4YmpqNnIxaU1ocURUV3Q2bW5zRXl5bk05WjUvK2dpeXdjZm5o?=
+ =?utf-8?B?b1d5V0xRRE9qWVVpYTZkNWtCcExFMkFmOVlSQktibW9BMzBYeTRpcGlZNG5O?=
+ =?utf-8?B?Ry9YQUsxM1ovYThjOGo3NkdZRGNQNnB2ZHk4RGQwb2xwdmYrZUxQbThYbG02?=
+ =?utf-8?B?bFU3Uzc1SWRTZVdOc0RFeVM3dGdrYlRCRjlPT3JGMysvVUtCZ29OREtCNkJi?=
+ =?utf-8?B?V0gwRDE2aisvK3hYSjlMWkZBNm0zOGFYc0VrL2s1NGMyeitZT3FRNCs3SU9a?=
+ =?utf-8?B?Z1lNV01hSGs5ZWZ2TUxwOHJHTTZMN3F0VG8rTjFuTTFqdjJ4Zzgva3FoN2xm?=
+ =?utf-8?B?R1lpVWMyNzZCNjk2cFdQTUVnazYwNTdmUVBMQS9pdTdMcm1UY0F6OE11dXhl?=
+ =?utf-8?Q?PUgVUjatgZeo1?=
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:PH8PR11MB6682.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(366016)(7416014)(376014)(1800799024)(7053199007);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?OWtadlBYUHZhOVkxb1k4U2NiTDJ3VjRzcTZXUDk0RWExOEh5cGk2ajlja0ZU?=
+ =?utf-8?B?cFhtcHc2SjdNTGMzY1ltUWhRdUw0Q3JwNk9FcVc0MU82VUdBZ2dsdEtUKzdQ?=
+ =?utf-8?B?b1lUTFg5eGtOeElkMmpuWVZUYjZGM2RJenZGYThFN1FKbnFaMVVrQTBRVkJE?=
+ =?utf-8?B?dkJpazBuU3p4Zkg4bzFLNTJDa05lZXFhODNrQWZWbW5uRG82R00yWnRUT1kw?=
+ =?utf-8?B?SkxRUFdaVVBkOFEyUVRuTmFxY2RPd3RGUVJmZFFaK3VZRFR5Nng3VVRhTlQ0?=
+ =?utf-8?B?eSsxQU1rM2FrRUpMaHFzclRQelBISC9KRjNZUGxObFpoUFlxc0h3QTBSU2Y1?=
+ =?utf-8?B?YXhnZ1N4UHg3YnYxU21FbStEL1pwUUFmN2J1elF4U0NqenhYT1UrK0VEVnNS?=
+ =?utf-8?B?YW1FSVRzRVlkL0psZnpXbWtoalhQWStmNjR2K1h3UmpKNzBlc3JaeDJza3Fr?=
+ =?utf-8?B?ZnpIZU8yRFAySHQyS0VFNmRScjM3VGFHWDdsbWwxbTRGUlhyakRDQXFuTEZu?=
+ =?utf-8?B?MEUrWnZEN3pTRXZxUUxUOUlORG1LVjlRT3FRdWgrS2plaHVveENSNkZidFh4?=
+ =?utf-8?B?dHlHRUxUNEdpQXBNS0ZYdW1jRlpEK0JodEt0dEoxak9iUlZRZzliTDdpY1po?=
+ =?utf-8?B?MGRXdU00VXNRNVAzK2gva2FhNkR1UTNEZzg2T1VsK3R5VHNQZWdBSFZmQXpY?=
+ =?utf-8?B?U2Q5K0hZdHJuVWw2SzdCV2lxRUJ6QlY5MW0vdW5UY1NJMGkrcExLMndKaG9u?=
+ =?utf-8?B?RGpHaTYwYW9lK0ZXcnpqSGgwcjExVXJqMG84U2IwWHlab0lFUE9SUkU0Znk1?=
+ =?utf-8?B?Z1IwUVJvc2ZKYjVrUTgyWG5vQWk3Y3VvbTAwOGl1aldyWVNSc3Q5aWpYSldt?=
+ =?utf-8?B?VlJqcFJHRk84VFB6cndsdG5Ndk1mdHk3ajJVUllPRjdRVFNTWWFxNVA4d3Zm?=
+ =?utf-8?B?V0VSWFRuZWRVcXBnZXRLQ1cwcGUvSEVuNmg5NVEzS2I0TmIxaTRVNFJYSlNI?=
+ =?utf-8?B?MWhXQUJEYmEzWEwra0NlRGdjRHp0OHU5MEQ0RkVzR3h2TlI5VXEyMk5mRGRa?=
+ =?utf-8?B?UXpycWR3MUxUNGNHdEtGSjJZWGV5Y0lsMThHRmJpU1dGZ20zL2ZDYUVwaVR1?=
+ =?utf-8?B?Rm1KRmsyS29wSUVUdER1MjNUcEgvTmMzUVFhQ1hUMzJtQzNsY0E5aTFmNmdV?=
+ =?utf-8?B?NVBMTTVrRnl0UEhERk9zYnlPV1VaclhBdzdvR2szSDJYdkFLcFlsOUkwekJ2?=
+ =?utf-8?B?MGVvLzZuR1NnWHlwKzFqK3h4OHRDWlhveEdCbE9XMXlrT2syYW0zOHo1b2tm?=
+ =?utf-8?B?OFdzZmhqb1dRYkRmZmU2dE13Si95Y2lialZuWlR4RTNISWg4endEZHdoZDdL?=
+ =?utf-8?B?akQwSTNaUTdBV09DRmllcGpQQVlydTNhNVN5SjFTNkRXR0U1MUJYTVN0S3E4?=
+ =?utf-8?B?ZW14U21QdUIycjcwbHZOZ0tSZGsrQTE3WlJPSHhkYXRLUkFVZVNXeGtSQ20w?=
+ =?utf-8?B?akc2dWhpbkViTUkxTTc1Sk5yYzRyOFd5S2lJL1Zlb3VRK1VsL1dIZzBmV3Nz?=
+ =?utf-8?B?T0ZwWDZyaUl2L0h4cjc4SWZENnh0RzVGa3FPVGRBc2QzNE9Cc1ppZFdpZWN6?=
+ =?utf-8?B?QjE3NEVoZ2JsaXl0OUNmNExpWjYzT21VRG9FMDY1TXRDRVZtclU0ejQ1YzBw?=
+ =?utf-8?B?a0tlQmtTUU1HVHNHcHQ1eEhIbkRYRHQrWlYzSkhnK1dseFpSTGxJTzJKRVR2?=
+ =?utf-8?B?K2R0K1FPNWY3NzFyVnFOVk5nL2E4eEk5Mm8rMDJNa1U2VWFXMmNWQVNDS3g0?=
+ =?utf-8?B?MTVvV3RYbCs5VDk3WG9udE55ZlkwcVZHNmVMTEE0d2FkVUo5N3pTVkVEUkJY?=
+ =?utf-8?B?WVVhRURuU1F0T0lLOGtlUFZpSE1mM2JNeHg1aGRNZE9CMWovT0lDbUJiN1pZ?=
+ =?utf-8?B?bVEvbmxxcE10M2d2MDlzQXRFKzRaMStUMmNrVHREckhaSFo3TUwyclRNUUpQ?=
+ =?utf-8?B?YWpia3dBVHplTUR4SERkZjBCbEU5QnRyLzYwSHZVdC8xY2FUZG9lUW9rNjlU?=
+ =?utf-8?B?Mmt5M0ZaQWhCNysxVTdCWjc4dUJpTHRZNFcyZXhZcnN4U3JhMXBBSmowbm45?=
+ =?utf-8?B?VG9rZ1pKQmRIanRnajZwaEFXc3duRFVvVENiNFE2OFdOaXhpWnlweU9WenVJ?=
+ =?utf-8?B?VHc9PQ==?=
+X-MS-Exchange-CrossTenant-Network-Message-Id: 6c080a83-dbd0-47ad-f558-08dd44f93076
+X-MS-Exchange-CrossTenant-AuthSource: PH8PR11MB6682.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 04 Feb 2025 08:52:00.9639
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: c+ZOIIbDzYnaNUp4dpRYu7QB7WmzbFHHt863J4ErcK2OG79uFrU9UxSrrmrW9OUklxu4TwsZFHYfy0nygizaJM6CZJYEeehg1s53nENyJOg=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: MN2PR11MB4662
+X-OriginatorOrg: intel.com
 
-On 2/4/25 12:33 AM, John Ousterhout wrote:
-> On Mon, Feb 3, 2025 at 1:12 AM Paolo Abeni <pabeni@redhat.com> wrote:
->> I don't see where/how the SO_HOMA_RCVBUF max value is somehow bounded?!?
->> It looks like the user-space could pick an arbitrary large value for it.
+
+
+On 2/3/2025 10:35 PM, Tariq Toukan wrote:
+> From: Jianbo Liu <jianbol@nvidia.com>
 > 
-> That's right; is there anything to be gained by limiting it? This is
-> simply mmapped memory in the user address space. Aren't applications
-> allowed to allocate as much memory as they like? If so, why shouldn't
-> they be able to use that memory for incoming buffers if they choose?
-
-If unprivileged applications could use unlimited amount of kernel
-memory, they could hurt the whole system stability, possibly causing
-functional issue of core kernel due to ENOMEM.
-
-The we always try to bound/put limits on amount of kernel memory
-user-space application can use.
-
->> SO_RCVBUF and SO_SNDBUF are expected to apply to any kind of socket,
->> see man 7 sockets. Exceptions should be at least documented, but we need
->> some way to limit memory usage in both directions.
+> In later patch, the mlx5_clock will be allocated dynamically, its
+> address can be obtained from mlx5_core_dev struct, but mdev can't be
+> obtained from mlx5_clock because it can be shared by multiple
+> interfaces. So change the parameter for such internal functions, only
+> mdev is passed down from the callers.
 > 
-> The expectations around these limits are based on an unstated (and
-> probably unconscious) assumption of a TCP-like streaming protocol.
-
-Actually TCP can use it's own, separated, limits, see:
-net.ipv4.tcp_rmem, net.ipv4.tcp_wmem:
-
-https://elixir.bootlin.com/linux/v6.13.1/source/Documentation/networking/ip-sysctl.rst#L719
-https://elixir.bootlin.com/linux/v6.13.1/source/Documentation/networking/ip-sysctl.rst#L719
-
-> RPCs are different. For example, there is no one value of rmem_default
-> or rmem_max that will work for both TCP and Homa. On my system, these
-> values are both around 200 KB, which seems fine for TCP, but that's
-> not even enough for a single full-size RPC in Homa, and Homa apps need
-> to have several active RPCs at a time. Thus it doesn't make sense to
-> use SO_RCVBUF and SO_SNDBUF for both Homa and TCP; their needs are too
-> different.
-
-Specific, per protocols limits are allowed, but should be there and
-documented.
-
->> Fine tuning controls and sysctls could land later, but the basic
->> constraints should IMHO be there from the beginning.
+> Signed-off-by: Jianbo Liu <jianbol@nvidia.com>
+> Reviewed-by: Carolina Jubran <cjubran@nvidia.com>
+> Reviewed-by: Dragos Tatulea <dtatulea@nvidia.com>
+> Signed-off-by: Tariq Toukan <tariqt@nvidia.com>
+> ---
+>   .../ethernet/mellanox/mlx5/core/lib/clock.c   | 19 ++++++++-----------
+>   1 file changed, 8 insertions(+), 11 deletions(-)
 > 
-> OK. I think that SO_HOMA_RCVBUF takes care of RX buffer space. 
+> diff --git a/drivers/net/ethernet/mellanox/mlx5/core/lib/clock.c b/drivers/net/ethernet/mellanox/mlx5/core/lib/clock.c
+> index eaf343756026..e7e4bdba02a3 100644
+> --- a/drivers/net/ethernet/mellanox/mlx5/core/lib/clock.c
+> +++ b/drivers/net/ethernet/mellanox/mlx5/core/lib/clock.c
+> @@ -878,10 +878,8 @@ static int mlx5_query_mtpps_pin_mode(struct mlx5_core_dev *mdev, u8 pin,
+>   				    mtpps_size, MLX5_REG_MTPPS, 0, 0);
+>   }
+>   
+> -static int mlx5_get_pps_pin_mode(struct mlx5_clock *clock, u8 pin)
+> +static int mlx5_get_pps_pin_mode(struct mlx5_core_dev *mdev, u8 pin)
+>   {
+> -	struct mlx5_core_dev *mdev = container_of(clock, struct mlx5_core_dev, clock);
+> -
+>   	u32 out[MLX5_ST_SZ_DW(mtpps_reg)] = {};
+>   	u8 mode;
+>   	int err;
+> @@ -900,8 +898,9 @@ static int mlx5_get_pps_pin_mode(struct mlx5_clock *clock, u8 pin)
+>   	return PTP_PF_NONE;
+>   }
+>   
+> -static void mlx5_init_pin_config(struct mlx5_clock *clock)
+> +static void mlx5_init_pin_config(struct mlx5_core_dev *mdev)
+>   {
+> +	struct mlx5_clock *clock = &mdev->clock;
+>   	int i;
+>   
+>   	if (!clock->ptp_info.n_pins)
+> @@ -922,7 +921,7 @@ static void mlx5_init_pin_config(struct mlx5_clock *clock)
+>   			 sizeof(clock->ptp_info.pin_config[i].name),
+>   			 "mlx5_pps%d", i);
+>   		clock->ptp_info.pin_config[i].index = i;
+> -		clock->ptp_info.pin_config[i].func = mlx5_get_pps_pin_mode(clock, i);
+> +		clock->ptp_info.pin_config[i].func = mlx5_get_pps_pin_mode(mdev, i);
+>   		clock->ptp_info.pin_config[i].chan = 0;
+>   	}
+>   }
+> @@ -1041,10 +1040,10 @@ static void mlx5_timecounter_init(struct mlx5_core_dev *mdev)
+>   			 ktime_to_ns(ktime_get_real()));
+>   }
+>   
+> -static void mlx5_init_overflow_period(struct mlx5_clock *clock)
+> +static void mlx5_init_overflow_period(struct mlx5_core_dev *mdev)
+>   {
+> -	struct mlx5_core_dev *mdev = container_of(clock, struct mlx5_core_dev, clock);
+>   	struct mlx5_ib_clock_info *clock_info = mdev->clock_info;
+> +	struct mlx5_clock *clock = &mdev->clock;
+>   	struct mlx5_timer *timer = &clock->timer;
 
-We need some way to allow the admin to bound the SO_HOMA_RCVBUF max value.
+It seems that because of the refactor the RCT rule has been violated.
+I think you have to split *timer into two lines.
 
-> For TX, what's the simplest scheme that you would be comfortable with? For
-> example, if I cap the number of outstanding RPCs per socket, will that
-> be enough for now?
+>   	u64 overflow_cycles;
+>   	u64 frac = 0;
+> @@ -1135,7 +1134,7 @@ static void mlx5_init_timer_clock(struct mlx5_core_dev *mdev)
+>   
+>   	mlx5_timecounter_init(mdev);
+>   	mlx5_init_clock_info(mdev);
+> -	mlx5_init_overflow_period(clock);
+> +	mlx5_init_overflow_period(mdev);
+>   
+>   	if (mlx5_real_time_mode(mdev)) {
+>   		struct timespec64 ts;
+> @@ -1147,13 +1146,11 @@ static void mlx5_init_timer_clock(struct mlx5_core_dev *mdev)
+>   
+>   static void mlx5_init_pps(struct mlx5_core_dev *mdev)
+>   {
+> -	struct mlx5_clock *clock = &mdev->clock;
+> -
+>   	if (!MLX5_PPS_CAP(mdev))
+>   		return;
+>   
+>   	mlx5_get_pps_caps(mdev);
+> -	mlx5_init_pin_config(clock);
+> +	mlx5_init_pin_config(mdev);
+>   }
+>   
+>   void mlx5_init_clock(struct mlx5_core_dev *mdev)
 
-Usually the bounds are expressed in bytes. How complex would be adding
-wmem accounting?
-
-/P
+Overall if you fix that RCT issue then feel free to add my RB tag,
+thanks.
 
 
