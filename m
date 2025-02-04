@@ -1,31 +1,31 @@
-Return-Path: <netdev+bounces-162436-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-162435-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 478D6A26E89
-	for <lists+netdev@lfdr.de>; Tue,  4 Feb 2025 10:33:51 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id D58A8A26E88
+	for <lists+netdev@lfdr.de>; Tue,  4 Feb 2025 10:33:50 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id AFDF7166B83
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 53348161E02
 	for <lists+netdev@lfdr.de>; Tue,  4 Feb 2025 09:33:49 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6C18020A5F1;
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6C122209695;
 	Tue,  4 Feb 2025 09:33:15 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from metis.whiteo.stw.pengutronix.de (metis.whiteo.stw.pengutronix.de [185.203.201.7])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7B17F208990
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7B1E2209679
 	for <netdev@vger.kernel.org>; Tue,  4 Feb 2025 09:33:13 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.203.201.7
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1738661595; cv=none; b=ewHfIlQMov9OQSgFq4IumDo1Lig1D3xYB0gGsZy0Itaa3JF3NMoLWbMNWG9zsXMBZmJu/dsSaYCjIietL9/+yb5ZRcVdMsQfOd0buWK/PttepvkkyvsexzpdvaJu+8iSsIKLLbcYoCRLkEbexTNgtEYAY1pF3z62h7Rt23s3tuQ=
+	t=1738661595; cv=none; b=nTtyQEkuLxUkdUP1a+NMUzZDS4any+YhRjXHGPIgLLlFRxTbp/kwFmsBw4MrXkkXLeetF92o2MZnzJPZkgEGP+yr/WLQHZ4uyiMBAZdXia8v2WlOX93aUDAx3KD75SMXMAagT7dqVFTnHKfLipaH3AgxtZ+ANS9egPVAYCqJ3KU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1738661595; c=relaxed/simple;
-	bh=FkpyYK4m3ip0KNgZFopQBk/J2GYGeLgznE9PS5/pdHA=;
+	bh=92qfpD71gNQMGZZnMwyLr7xXSzduU0c/YqctgGUjj7s=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=GRZHRMoiw8lyFojYUTihAyALlaOb1IeF8wWhjGBLI1tFGYYrawYv5uPiEljbCejpJW6OkgKox4Y+OgY/eiJnenoyx3+vCNobWXngxDxUic0do+Nzo+aBMBYTRp65gUsAy0b+prjDkEwr6yd+n2kdoYjIRK+PD0fN+OUkdmH9r64=
+	 MIME-Version; b=NOkuyvSNn18JFh4w9+1S0Mn4FUiy/ocq2W7xNssYFyPgn6mNPr2Ke3IjNut6sBVy0CtGG4ESI6bxpKjbpX+RItTzX+iCeL8fdwp88kwUX+GH01JCbQlcg8ktDI+AYel1z45f26ZCkQjHzTjFKiuchK1fbt7B9mZYf/gNFmjUYD8=
 ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de; spf=pass smtp.mailfrom=pengutronix.de; arc=none smtp.client-ip=185.203.201.7
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=pengutronix.de
@@ -33,16 +33,16 @@ Received: from drehscheibe.grey.stw.pengutronix.de ([2a0a:edc0:0:c01:1d::a2])
 	by metis.whiteo.stw.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
 	(Exim 4.92)
 	(envelope-from <ore@pengutronix.de>)
-	id 1tfFIR-0002hU-5O; Tue, 04 Feb 2025 10:32:43 +0100
+	id 1tfFIR-0002hV-5N; Tue, 04 Feb 2025 10:32:43 +0100
 Received: from dude04.red.stw.pengutronix.de ([2a0a:edc0:0:1101:1d::ac])
 	by drehscheibe.grey.stw.pengutronix.de with esmtps  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.96)
 	(envelope-from <ore@pengutronix.de>)
-	id 1tfFIP-003RRn-2x;
+	id 1tfFIP-003RRo-31;
 	Tue, 04 Feb 2025 10:32:41 +0100
 Received: from ore by dude04.red.stw.pengutronix.de with local (Exim 4.96)
 	(envelope-from <ore@pengutronix.de>)
-	id 1tfFIP-00ABS6-2j;
+	id 1tfFIP-00ABSG-2n;
 	Tue, 04 Feb 2025 10:32:41 +0100
 From: Oleksij Rempel <o.rempel@pengutronix.de>
 To: Andrew Lunn <andrew@lunn.ch>,
@@ -56,9 +56,9 @@ Cc: Oleksij Rempel <o.rempel@pengutronix.de>,
 	kernel@pengutronix.de,
 	linux-kernel@vger.kernel.org,
 	netdev@vger.kernel.org
-Subject: [PATCH net-next v1 1/2] net: phy: Add support for driver-specific next update time
-Date: Tue,  4 Feb 2025 10:32:38 +0100
-Message-Id: <20250204093239.2427263-2-o.rempel@pengutronix.de>
+Subject: [PATCH net-next v1 2/2] net: phy: dp83tg720: Add randomized polling intervals for unstable link detection
+Date: Tue,  4 Feb 2025 10:32:39 +0100
+Message-Id: <20250204093239.2427263-3-o.rempel@pengutronix.de>
 X-Mailer: git-send-email 2.39.5
 In-Reply-To: <20250204093239.2427263-1-o.rempel@pengutronix.de>
 References: <20250204093239.2427263-1-o.rempel@pengutronix.de>
@@ -74,87 +74,136 @@ X-SA-Exim-Mail-From: ore@pengutronix.de
 X-SA-Exim-Scanned: No (on metis.whiteo.stw.pengutronix.de); SAEximRunCond expanded to false
 X-PTX-Original-Recipient: netdev@vger.kernel.org
 
-Introduce the `phy_get_next_update_time` function to allow PHY drivers
-to dynamically determine the time (in milliseconds) until the next state
-update event. This enables more flexible and adaptive polling intervals
-based on the link state or other conditions.
+Address the limitations of the DP83TG720 PHY, which cannot reliably detect or
+report a stable link state. To handle this, the PHY must be periodically reset
+when the link is down. However, synchronized reset intervals between the PHY
+and its link partner can result in a deadlock, preventing the link from
+re-establishing.
+
+This change introduces a randomized polling interval when the link is down to
+desynchronize resets between link partners.
 
 Signed-off-by: Oleksij Rempel <o.rempel@pengutronix.de>
 ---
- drivers/net/phy/phy.c | 28 ++++++++++++++++++++++++++--
- include/linux/phy.h   | 13 +++++++++++++
- 2 files changed, 39 insertions(+), 2 deletions(-)
+ drivers/net/phy/dp83tg720.c | 78 +++++++++++++++++++++++++++++++++++++
+ 1 file changed, 78 insertions(+)
 
-diff --git a/drivers/net/phy/phy.c b/drivers/net/phy/phy.c
-index d0c1718e2b16..77ed7bfdf200 100644
---- a/drivers/net/phy/phy.c
-+++ b/drivers/net/phy/phy.c
-@@ -1501,6 +1501,25 @@ void phy_free_interrupt(struct phy_device *phydev)
+diff --git a/drivers/net/phy/dp83tg720.c b/drivers/net/phy/dp83tg720.c
+index 050f4537d140..0599807de5c7 100644
+--- a/drivers/net/phy/dp83tg720.c
++++ b/drivers/net/phy/dp83tg720.c
+@@ -4,12 +4,31 @@
+  */
+ #include <linux/bitfield.h>
+ #include <linux/ethtool_netlink.h>
++#include <linux/jiffies.h>
+ #include <linux/kernel.h>
+ #include <linux/module.h>
+ #include <linux/phy.h>
++#include <linux/random.h>
+ 
+ #include "open_alliance_helpers.h"
+ 
++/*
++ * DP83TG720S_POLL_ACTIVE_LINK - Polling interval in milliseconds when the link
++ *				 is active.
++ * DP83TG720S_POLL_NO_LINK_MIN - Minimum polling interval in milliseconds when
++ *				 the link is down.
++ * DP83TG720S_POLL_NO_LINK_MAX - Maximum polling interval in milliseconds when
++ *				 the link is down.
++ *
++ * These values are not documented or officially recommended by the vendor but
++ * were determined through empirical testing. They achieve a good balance in
++ * minimizing the number of reset retries while ensuring reliable link recovery
++ * within a reasonable timeframe.
++ */
++#define DP83TG720S_POLL_ACTIVE_LINK		1000
++#define DP83TG720S_POLL_NO_LINK_MIN		100
++#define DP83TG720S_POLL_NO_LINK_MAX		1000
++
+ #define DP83TG720S_PHY_ID			0x2000a284
+ 
+ /* MDIO_MMD_VEND2 registers */
+@@ -371,6 +390,13 @@ static int dp83tg720_read_status(struct phy_device *phydev)
+ 		if (ret)
+ 			return ret;
+ 
++		/* Sleep 600ms for PHY stabilization post-reset.
++		 * Empirically chosen value (not documented).
++		 * Helps reduce reset bounces with link partners having similar
++		 * issues.
++		 */
++		msleep(600);
++
+ 		/* After HW reset we need to restore master/slave configuration.
+ 		 * genphy_c45_pma_baset1_read_master_slave() call will be done
+ 		 * by the dp83tg720_config_aneg() function.
+@@ -498,6 +524,57 @@ static int dp83tg720_probe(struct phy_device *phydev)
+ 	return 0;
  }
- EXPORT_SYMBOL(phy_free_interrupt);
  
 +/**
-+ * phy_get_next_update_time - Determine the next PHY update time
++ * dp83tg720_phy_get_next_update_time - Determine the next update time for PHY
++ *                                      state
 + * @phydev: Pointer to the phy_device structure
 + *
-+ * This function queries the PHY driver to get the time for the next polling
-+ * event. If the driver does not implement the callback, a default value is used.
++ * This function addresses a limitation of the DP83TG720 PHY, which cannot
++ * reliably detect or report a stable link state. To recover from such
++ * scenarios, the PHY must be periodically reset when the link is down. However,
++ * if the link partner also runs Linux with the same driver, synchronized reset
++ * intervals can lead to a deadlock where the link never establishes due to
++ * simultaneous resets on both sides.
 + *
-+ * Return: The time for the next polling event in milliseconds
++ * To avoid this, the function implements randomized polling intervals when the
++ * link is down. It ensures that reset intervals are desynchronized by
++ * introducing a random delay between a configured minimum and maximum range.
++ * When the link is up, a fixed polling interval is used to minimize overhead.
++ *
++ * This mechanism guarantees that the link will reestablish within 10 seconds
++ * in the worst-case scenario.
++ *
++ * Return: Time (in milliseconds) until the next update event for the PHY state
++ * machine.
 + */
-+static unsigned int phy_get_next_update_time(struct phy_device *phydev)
++static unsigned int dp83tg720_phy_get_next_update_time(struct phy_device *phydev)
 +{
-+	const unsigned int default_time = PHY_STATE_TIME;
++	unsigned int jiffy_ms = jiffies_to_msecs(1); /* Jiffy granularity in ms */
++	unsigned int next_time_ms;
 +
-+	if (phydev->drv && phydev->drv->get_next_update_time)
-+		return phydev->drv->get_next_update_time(phydev);
++	if (phydev->link) {
++		/* When the link is up, use a fixed 1000ms interval */
++		next_time_ms = DP83TG720S_POLL_ACTIVE_LINK;
++	} else {
++		unsigned int min_jiffies, max_jiffies, rand_jiffies;
++		/* When the link is down, randomize interval between
++		 * configured min/max
++		 */
 +
-+	return default_time;
++		/* Convert min and max to jiffies */
++		min_jiffies = msecs_to_jiffies(DP83TG720S_POLL_NO_LINK_MIN);
++		max_jiffies = msecs_to_jiffies(DP83TG720S_POLL_NO_LINK_MAX);
++
++		/* Randomize in the jiffie range and convert back to ms */
++		rand_jiffies = min_jiffies +
++			get_random_u32_below(max_jiffies - min_jiffies + 1);
++		next_time_ms = jiffies_to_msecs(rand_jiffies);
++	}
++
++	/* Ensure the polling time is at least one jiffy */
++	return max(next_time_ms, jiffy_ms);
 +}
 +
- enum phy_state_work {
- 	PHY_STATE_WORK_NONE,
- 	PHY_STATE_WORK_ANEG,
-@@ -1579,8 +1598,13 @@ static enum phy_state_work _phy_state_machine(struct phy_device *phydev)
- 	 * state machine would be pointless and possibly error prone when
- 	 * called from phy_disconnect() synchronously.
- 	 */
--	if (phy_polling_mode(phydev) && phy_is_started(phydev))
--		phy_queue_state_machine(phydev, PHY_STATE_TIME);
-+	if (phy_polling_mode(phydev) && phy_is_started(phydev)) {
-+		unsigned int next_update_time =
-+			phy_get_next_update_time(phydev);
-+
-+		phy_queue_state_machine(phydev,
-+					msecs_to_jiffies(next_update_time));
-+	}
+ static struct phy_driver dp83tg720_driver[] = {
+ {
+ 	PHY_ID_MATCH_MODEL(DP83TG720S_PHY_ID),
+@@ -516,6 +593,7 @@ static struct phy_driver dp83tg720_driver[] = {
+ 	.get_link_stats	= dp83tg720_get_link_stats,
+ 	.get_phy_stats	= dp83tg720_get_phy_stats,
+ 	.update_stats	= dp83tg720_update_stats,
++	.get_next_update_time = dp83tg720_phy_get_next_update_time,
  
- 	return state_work;
- }
-diff --git a/include/linux/phy.h b/include/linux/phy.h
-index 19f076a71f94..d5cf979f4a6b 100644
---- a/include/linux/phy.h
-+++ b/include/linux/phy.h
-@@ -1273,6 +1273,19 @@ struct phy_driver {
- 	 */
- 	int (*led_polarity_set)(struct phy_device *dev, int index,
- 				unsigned long modes);
-+
-+	/**
-+	 * @get_next_update_time: Get the time until the next update event
-+	 * @dev: PHY device which has the LED
-+	 *
-+	 * Callback to determine the time (in milliseconds) until the next
-+	 * update event for the PHY state  machine. Allows PHY drivers to
-+	 * dynamically adjust polling intervals based on link state or other
-+	 * conditions.
-+	 *
-+	 * Returns the time in milliseconds until the next update event.
-+	 */
-+	unsigned int (*get_next_update_time)(struct phy_device *dev);
- };
- #define to_phy_driver(d) container_of_const(to_mdio_common_driver(d),		\
- 				      struct phy_driver, mdiodrv)
+ 	.suspend	= genphy_suspend,
+ 	.resume		= genphy_resume,
 -- 
 2.39.5
 
