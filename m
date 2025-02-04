@@ -1,221 +1,201 @@
-Return-Path: <netdev+bounces-162609-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-162610-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id CE8A8A275A7
-	for <lists+netdev@lfdr.de>; Tue,  4 Feb 2025 16:20:38 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 630B5A275B9
+	for <lists+netdev@lfdr.de>; Tue,  4 Feb 2025 16:22:26 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 8424A188533A
-	for <lists+netdev@lfdr.de>; Tue,  4 Feb 2025 15:20:43 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 3C47E3A6721
+	for <lists+netdev@lfdr.de>; Tue,  4 Feb 2025 15:22:13 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 12DBD214205;
-	Tue,  4 Feb 2025 15:20:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="ZL+vdiLp"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 55B92213E97;
+	Tue,  4 Feb 2025 15:22:19 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from out-177.mta0.migadu.com (out-177.mta0.migadu.com [91.218.175.177])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-il1-f207.google.com (mail-il1-f207.google.com [209.85.166.207])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A7FF1207E1D
-	for <netdev@vger.kernel.org>; Tue,  4 Feb 2025 15:20:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.177
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 795F0213E81
+	for <netdev@vger.kernel.org>; Tue,  4 Feb 2025 15:22:17 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.207
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1738682432; cv=none; b=Bfly4/9bqfV57hGuZP6mcFyUFZ0jSec1hhdR/bHgtTPvTO8I5Xqx/1pgrkhPHZd9zyINma16w7czDi32qGqkD6sWW7SKKYPf00YzeBviGc7p7iS0D342HTFB1AGi8eIxD/+OtrdS68AXBRpXuACQz0QTGWTCZVKibRDpDjzCFEU=
+	t=1738682539; cv=none; b=KnGNlDILPVoUl6d4NyD+Gc9Ta1RKPt4YpQEhTh0PTnXcvSKeI0xMEE5sNx5qhS4o0eG/dUfPT+KPaNTh4UI7IKw0oAYAFVGrUACKS+6sZLnA21YToDrEyTFxMsrpUJfboUWqVSbKwZj0VlrvQy5C0c3U/o+7X+b7yOKonZBR9AQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1738682432; c=relaxed/simple;
-	bh=XN2zIQ/qSTlrLGMHasf9KFBP82CB5Qxd4jFmsQWkasM=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=sjiepK8xAN8gU9iYnes9uh5g1e2g4XpGWARNcpvkUOQwa7JQ1gEQj8UL7iRVmuRcKqumaldCGR2aSibaSWhhkjHGEy1AseJYSYOqPxjC4Xvkoq/p5Ekcd7Bx/zRdb2dTlFI9XhzRJPXEV2zx7xC5HErG/at54S00xhccjj2ja+Y=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=ZL+vdiLp; arc=none smtp.client-ip=91.218.175.177
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
-Message-ID: <0bf5e1db-8707-4039-81d7-2fe4530d705b@linux.dev>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1738682417;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=1eRSq+ezqI1pr3KEhVACx6xjJT9U2rvI4zSK1LxxtI0=;
-	b=ZL+vdiLpXlpvURCzNoMMtSlAicSh38yluEhKVmPV9+qPj72JFUDpR5jWXyOOtn8HJWECUJ
-	LYJRHuIdIY6bbS9nzMDM1rqgyE/XVj4MHxTfn/QSZldliQUpR7Hj8t7896xUMf0pwM1LhD
-	AZWwOtFKOf9IO4fqmHFL/wvhrMSIR7s=
-Date: Tue, 4 Feb 2025 15:20:13 +0000
+	s=arc-20240116; t=1738682539; c=relaxed/simple;
+	bh=2vXrDXIaNLJV8dw2lCHlrfrmA4H2Rlh03vvxp6UINsU=;
+	h=MIME-Version:Date:Message-ID:Subject:From:To:Content-Type; b=Vb5jhMveuXqiIXVMdzZoYeNrgKy+D1bt5F3TzbEiR9qeLhNozpB562tKhwUYd1jlFnsaU97Fhe/oIqCSjffSTpz5j0XYYB0DL4cchntu502yoIJdqd6PeXsJXH2LQFd2NmkEgiOTkjVuG5Wbkn86Qnl8D47tS/Jav5/yI+inEwE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.207
+Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
+Received: by mail-il1-f207.google.com with SMTP id e9e14a558f8ab-3d04b390e9cso1791015ab.3
+        for <netdev@vger.kernel.org>; Tue, 04 Feb 2025 07:22:17 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1738682536; x=1739287336;
+        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=ZB9a/jpSevfqYoda9DEyRndCIaWpKHT1O1m+rdGRDDU=;
+        b=chpfZI5qmr7eRH6RaECdP6UVxtAe/bd2gPwIoMZ3mG6GDde+iGAkWd5yMwglV0qV3h
+         hC4v25MFxGEAFQoti4qXpSAIbJCpQhVzlo9X7LoDo2E25uG6HNqkOaemR4Kqf37UagI9
+         KBa4nIuzmBaFVhxhNuBOSkAAl+N1NtwnOiNPn2Y9ndKa9/tu1uoPJAvCs8hLFgHxEGP2
+         iqL+hqaeSKfW6k+YvBkPet23q/KYv0d3i8KRCfqsa+RzJ6uai+/ypmZBnxCBTaY7t+cD
+         dF6u5LZSSw1Q7cI7GMjkkqyt2bYKlANLNC9aWfpQVCLODmnE3yWIud+mOSKu5Ih6+zdC
+         kiwA==
+X-Forwarded-Encrypted: i=1; AJvYcCWMqaislnrBBNg06MzLAtvt5zTuG07Ob+Tj9f3jGJ/9r4VW4Zr6GnkInq7iptLM7FUklzGC7OU=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxouphiSWwTMa349tTqsECJTosyZTzFVuZrn3afqRleNOvUwx6s
+	HEkxRhyLnE6tQorxCz8LIVRrgx/HsM6wNj5IV3xYNMimvCGHVsf562JuBcdraSZvFapf8Pl6rC4
+	grps+oMoUJbkIHbvRIin44QQNBARt5o4I/eMnzdN+qzf1ied47fzhzlE=
+X-Google-Smtp-Source: AGHT+IFBhLy3sqUuaR+jJRhF5gJj5QyQdAQcZTtSDxscMMNuBeiRLMMiOpCtL1yGBymCQu7hscISWK5zqMV6wjplVg+mv2gt3+Pv
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Subject: Re: [PATCH] net: e1000e: convert to ndo_hwtstamp_get() and
- ndo_hwtstamp_set()
-To: Piotr Wejman <piotrwejman90@gmail.com>
-Cc: Tony Nguyen <anthony.l.nguyen@intel.com>,
- Przemek Kitszel <przemyslaw.kitszel@intel.com>,
- Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller"
- <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- intel-wired-lan@lists.osuosl.org, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org
-References: <20250202170839.47375-1-piotrwejman90@gmail.com>
-Content-Language: en-US
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Vadim Fedorenko <vadim.fedorenko@linux.dev>
-In-Reply-To: <20250202170839.47375-1-piotrwejman90@gmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Migadu-Flow: FLOW_OUT
+X-Received: by 2002:a05:6e02:3789:b0:3d0:124d:99e8 with SMTP id
+ e9e14a558f8ab-3d0124da53emr141067535ab.13.1738682536490; Tue, 04 Feb 2025
+ 07:22:16 -0800 (PST)
+Date: Tue, 04 Feb 2025 07:22:16 -0800
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <67a230a8.050a0220.d7c5a.00ba.GAE@google.com>
+Subject: [syzbot] [net?] general protection fault in generic_hwtstamp_ioctl_lower
+ (2)
+From: syzbot <syzbot+86a8ab09a0f655f1ff19@syzkaller.appspotmail.com>
+To: davem@davemloft.net, edumazet@google.com, horms@kernel.org, 
+	kuba@kernel.org, linux-kernel@vger.kernel.org, netdev@vger.kernel.org, 
+	pabeni@redhat.com, syzkaller-bugs@googlegroups.com
+Content-Type: text/plain; charset="UTF-8"
 
-On 02/02/2025 17:08, Piotr Wejman wrote:
-> Update the driver to the new hw timestamping API.
-> 
-> Signed-off-by: Piotr Wejman <piotrwejman90@gmail.com>
-> ---
->   drivers/net/ethernet/intel/e1000e/e1000.h  |  2 +-
->   drivers/net/ethernet/intel/e1000e/netdev.c | 52 ++++++++--------------
->   2 files changed, 20 insertions(+), 34 deletions(-)
-> 
-> diff --git a/drivers/net/ethernet/intel/e1000e/e1000.h b/drivers/net/ethernet/intel/e1000e/e1000.h
-> index ba9c19e6994c..952898151565 100644
-> --- a/drivers/net/ethernet/intel/e1000e/e1000.h
-> +++ b/drivers/net/ethernet/intel/e1000e/e1000.h
-> @@ -319,7 +319,7 @@ struct e1000_adapter {
->   	u16 tx_ring_count;
->   	u16 rx_ring_count;
->   
-> -	struct hwtstamp_config hwtstamp_config;
-> +	struct kernel_hwtstamp_config hwtstamp_config;
->   	struct delayed_work systim_overflow_work;
->   	struct sk_buff *tx_hwtstamp_skb;
->   	unsigned long tx_hwtstamp_start;
-> diff --git a/drivers/net/ethernet/intel/e1000e/netdev.c b/drivers/net/ethernet/intel/e1000e/netdev.c
-> index 286155efcedf..15f0794afddd 100644
-> --- a/drivers/net/ethernet/intel/e1000e/netdev.c
-> +++ b/drivers/net/ethernet/intel/e1000e/netdev.c
-> @@ -3587,7 +3587,7 @@ s32 e1000e_get_base_timinca(struct e1000_adapter *adapter, u32 *timinca)
->    * exception of "all V2 events regardless of level 2 or 4".
->    **/
->   static int e1000e_config_hwtstamp(struct e1000_adapter *adapter,
-> -				  struct hwtstamp_config *config)
-> +				  struct kernel_hwtstamp_config *config)
->   {
->   	struct e1000_hw *hw = &adapter->hw;
->   	u32 tsync_tx_ctl = E1000_TSYNCTXCTL_ENABLED;
-> @@ -6140,7 +6140,8 @@ static int e1000_mii_ioctl(struct net_device *netdev, struct ifreq *ifr,
->   /**
->    * e1000e_hwtstamp_set - control hardware time stamping
->    * @netdev: network interface device structure
-> - * @ifr: interface request
-> + * @config: timestamp configuration
-> + * @extack: netlink extended ACK report
->    *
->    * Outgoing time stamping can be enabled and disabled. Play nice and
->    * disable it when requested, although it shouldn't cause any overhead
-> @@ -6153,20 +6154,18 @@ static int e1000_mii_ioctl(struct net_device *netdev, struct ifreq *ifr,
->    * specified. Matching the kind of event packet is not supported, with the
->    * exception of "all V2 events regardless of level 2 or 4".
->    **/
-> -static int e1000e_hwtstamp_set(struct net_device *netdev, struct ifreq *ifr)
-> +static int e1000e_hwtstamp_set(struct net_device *netdev,
-> +			       struct kernel_hwtstamp_config *config,
-> +			       struct netlink_ext_ack *extack)
->   {
->   	struct e1000_adapter *adapter = netdev_priv(netdev);
-> -	struct hwtstamp_config config;
->   	int ret_val;
->   
-> -	if (copy_from_user(&config, ifr->ifr_data, sizeof(config)))
-> -		return -EFAULT;
-> -
-> -	ret_val = e1000e_config_hwtstamp(adapter, &config);
-> +	ret_val = e1000e_config_hwtstamp(adapter, config);
->   	if (ret_val)
->   		return ret_val;
+Hello,
 
-it would be great to extend e1000e_config_hwtstamp() to provide some
-information regarding error to extack - that's one of the benefits of
-these new ndo's.
+syzbot found the following issue on:
 
->   
-> -	switch (config.rx_filter) {
-> +	switch (config->rx_filter) {
->   	case HWTSTAMP_FILTER_PTP_V2_L4_SYNC:
->   	case HWTSTAMP_FILTER_PTP_V2_L2_SYNC:
->   	case HWTSTAMP_FILTER_PTP_V2_SYNC:
-> @@ -6178,38 +6177,23 @@ static int e1000e_hwtstamp_set(struct net_device *netdev, struct ifreq *ifr)
->   		 * by hardware so notify the caller the requested packets plus
->   		 * some others are time stamped.
->   		 */
-> -		config.rx_filter = HWTSTAMP_FILTER_SOME;
-> +		config->rx_filter = HWTSTAMP_FILTER_SOME;
->   		break;
->   	default:
->   		break;
->   	}
->   
-> -	return copy_to_user(ifr->ifr_data, &config,
-> -			    sizeof(config)) ? -EFAULT : 0;
-> +	return 0;
->   }
->   
-> -static int e1000e_hwtstamp_get(struct net_device *netdev, struct ifreq *ifr)
-> +static int e1000e_hwtstamp_get(struct net_device *netdev,
-> +			       struct kernel_hwtstamp_config *kernel_config)
->   {
->   	struct e1000_adapter *adapter = netdev_priv(netdev);
->   
-> -	return copy_to_user(ifr->ifr_data, &adapter->hwtstamp_config,
-> -			    sizeof(adapter->hwtstamp_config)) ? -EFAULT : 0;
-> -}
-> +	*kernel_config = adapter->hwtstamp_config;
->   
-> -static int e1000_ioctl(struct net_device *netdev, struct ifreq *ifr, int cmd)
-> -{
-> -	switch (cmd) {
-> -	case SIOCGMIIPHY:
-> -	case SIOCGMIIREG:
-> -	case SIOCSMIIREG:
-> -		return e1000_mii_ioctl(netdev, ifr, cmd);
-> -	case SIOCSHWTSTAMP:
-> -		return e1000e_hwtstamp_set(netdev, ifr);
-> -	case SIOCGHWTSTAMP:
-> -		return e1000e_hwtstamp_get(netdev, ifr);
-> -	default:
-> -		return -EOPNOTSUPP;
-> -	}
-> +	return 0;
->   }
->   
->   static int e1000_init_phy_wakeup(struct e1000_adapter *adapter, u32 wufc)
-> @@ -7337,7 +7321,7 @@ static const struct net_device_ops e1000e_netdev_ops = {
->   	.ndo_set_rx_mode	= e1000e_set_rx_mode,
->   	.ndo_set_mac_address	= e1000_set_mac,
->   	.ndo_change_mtu		= e1000_change_mtu,
-> -	.ndo_eth_ioctl		= e1000_ioctl,
-> +	.ndo_eth_ioctl		= e1000_mii_ioctl,
->   	.ndo_tx_timeout		= e1000_tx_timeout,
->   	.ndo_validate_addr	= eth_validate_addr,
->   
-> @@ -7346,9 +7330,11 @@ static const struct net_device_ops e1000e_netdev_ops = {
->   #ifdef CONFIG_NET_POLL_CONTROLLER
->   	.ndo_poll_controller	= e1000_netpoll,
->   #endif
-> -	.ndo_set_features = e1000_set_features,
-> -	.ndo_fix_features = e1000_fix_features,
-> +	.ndo_set_features	= e1000_set_features,
-> +	.ndo_fix_features	= e1000_fix_features,
+HEAD commit:    69e858e0b8b2 Merge tag 'uml-for-linus-6.14-rc1' of git://g..
+git tree:       upstream
+console output: https://syzkaller.appspot.com/x/log.txt?x=13324b24580000
+kernel config:  https://syzkaller.appspot.com/x/.config?x=98d83cc1742b7377
+dashboard link: https://syzkaller.appspot.com/bug?extid=86a8ab09a0f655f1ff19
+compiler:       gcc (Debian 12.2.0-14) 12.2.0, GNU ld (GNU Binutils for Debian) 2.40
+syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=17324b24580000
+C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=161595f8580000
 
-nit: If this alignment piece is intended then it worth mentioning in the
-commit message.
+Downloadable assets:
+disk image: https://storage.googleapis.com/syzbot-assets/3d07b0558b0e/disk-69e858e0.raw.xz
+vmlinux: https://storage.googleapis.com/syzbot-assets/e5e2250eb3b1/vmlinux-69e858e0.xz
+kernel image: https://storage.googleapis.com/syzbot-assets/3e676d17effc/bzImage-69e858e0.xz
 
->   	.ndo_features_check	= passthru_features_check,
-> +	.ndo_hwtstamp_get	= e1000e_hwtstamp_get,
-> +	.ndo_hwtstamp_set	= e1000e_hwtstamp_set,
->   };
->   
->   /**
+IMPORTANT: if you fix the issue, please add the following tag to the commit:
+Reported-by: syzbot+86a8ab09a0f655f1ff19@syzkaller.appspotmail.com
+
+netdevsim netdevsim0 netdevsim1: set [1, 0] type 2 family 0 port 6081 - 0
+netdevsim netdevsim0 netdevsim2: set [1, 0] type 2 family 0 port 6081 - 0
+netdevsim netdevsim0 netdevsim3: set [1, 0] type 2 family 0 port 6081 - 0
+Oops: general protection fault, probably for non-canonical address 0xdffffc0000000002: 0000 [#1] PREEMPT SMP KASAN PTI
+KASAN: null-ptr-deref in range [0x0000000000000010-0x0000000000000017]
+CPU: 0 UID: 0 PID: 5827 Comm: syz-executor976 Not tainted 6.13.0-syzkaller-09760-g69e858e0b8b2 #0
+Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 12/27/2024
+RIP: 0010:generic_hwtstamp_ioctl_lower+0x125/0x420 net/core/dev_ioctl.c:456
+Code: fc ff df 48 c1 ea 03 80 3c 02 00 0f 85 b7 02 00 00 48 ba 00 00 00 00 00 fc ff df 4d 8b 75 10 49 8d 7e 10 48 89 f8 48 c1 e8 03 <0f> b6 0c 10 49 8d 46 27 48 89 c6 83 e0 07 48 c1 ee 03 0f b6 14 16
+RSP: 0018:ffffc90003e4f250 EFLAGS: 00010202
+RAX: 0000000000000002 RBX: ffff88807c788000 RCX: 0000000000000000
+RDX: dffffc0000000000 RSI: ffffffff893547b8 RDI: 0000000000000010
+RBP: ffffc90003e4f338 R08: 0000000000000007 R09: 0000000000000003
+R10: ffffc90003e4f2ab R11: 0000000000000001 R12: 1ffff920007c9e4e
+R13: ffffc90003e4f410 R14: 0000000000000000 R15: 1ffff920007c9e9b
+FS:  0000555562e35380(0000) GS:ffff8880b8600000(0000) knlGS:0000000000000000
+CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+CR2: 0000000020000180 CR3: 0000000078b1a000 CR4: 00000000003526f0
+DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
+DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
+Call Trace:
+ <TASK>
+ generic_hwtstamp_get_lower net/core/dev_ioctl.c:480 [inline]
+ generic_hwtstamp_get_lower+0xe8/0x130 net/core/dev_ioctl.c:468
+ dev_get_hwtstamp_phylib+0x181/0x610 net/core/dev_ioctl.c:291
+ tsconfig_prepare_data+0x15f/0x650 net/ethtool/tsconfig.c:51
+ ethnl_default_doit+0x31a/0xbd0 net/ethtool/netlink.c:493
+ genl_family_rcv_msg_doit+0x202/0x2f0 net/netlink/genetlink.c:1115
+ genl_family_rcv_msg net/netlink/genetlink.c:1195 [inline]
+ genl_rcv_msg+0x565/0x800 net/netlink/genetlink.c:1210
+ netlink_rcv_skb+0x165/0x410 net/netlink/af_netlink.c:2543
+ genl_rcv+0x28/0x40 net/netlink/genetlink.c:1219
+ netlink_unicast_kernel net/netlink/af_netlink.c:1322 [inline]
+ netlink_unicast+0x53c/0x7f0 net/netlink/af_netlink.c:1348
+ netlink_sendmsg+0x8b8/0xd70 net/netlink/af_netlink.c:1892
+ sock_sendmsg_nosec net/socket.c:713 [inline]
+ __sock_sendmsg net/socket.c:728 [inline]
+ ____sys_sendmsg+0x9ae/0xb40 net/socket.c:2568
+ ___sys_sendmsg+0x135/0x1e0 net/socket.c:2622
+ __sys_sendmsg+0x16e/0x220 net/socket.c:2654
+ do_syscall_x64 arch/x86/entry/common.c:52 [inline]
+ do_syscall_64+0xcd/0x250 arch/x86/entry/common.c:83
+ entry_SYSCALL_64_after_hwframe+0x77/0x7f
+RIP: 0033:0x7f098155c919
+Code: ff c3 66 2e 0f 1f 84 00 00 00 00 00 0f 1f 44 00 00 48 89 f8 48 89 f7 48 89 d6 48 89 ca 4d 89 c2 4d 89 c8 4c 8b 4c 24 08 0f 05 <48> 3d 01 f0 ff ff 73 01 c3 48 c7 c1 b8 ff ff ff f7 d8 64 89 01 48
+RSP: 002b:00007ffca30ea5f8 EFLAGS: 00000246 ORIG_RAX: 000000000000002e
+RAX: ffffffffffffffda RBX: 00007f09815aa4ad RCX: 00007f098155c919
+RDX: 0000000000000000 RSI: 0000000020000280 RDI: 0000000000000003
+RBP: 00007f09815aa47d R08: 0000000000000000 R09: 0000555500000000
+R10: 0000000000000000 R11: 0000000000000246 R12: 00007f09815aa3e5
+R13: 0000000000000001 R14: 00007ffca30ea640 R15: 0000000000000003
+ </TASK>
+Modules linked in:
+---[ end trace 0000000000000000 ]---
+RIP: 0010:generic_hwtstamp_ioctl_lower+0x125/0x420 net/core/dev_ioctl.c:456
+Code: fc ff df 48 c1 ea 03 80 3c 02 00 0f 85 b7 02 00 00 48 ba 00 00 00 00 00 fc ff df 4d 8b 75 10 49 8d 7e 10 48 89 f8 48 c1 e8 03 <0f> b6 0c 10 49 8d 46 27 48 89 c6 83 e0 07 48 c1 ee 03 0f b6 14 16
+RSP: 0018:ffffc90003e4f250 EFLAGS: 00010202
+RAX: 0000000000000002 RBX: ffff88807c788000 RCX: 0000000000000000
+RDX: dffffc0000000000 RSI: ffffffff893547b8 RDI: 0000000000000010
+RBP: ffffc90003e4f338 R08: 0000000000000007 R09: 0000000000000003
+R10: ffffc90003e4f2ab R11: 0000000000000001 R12: 1ffff920007c9e4e
+R13: ffffc90003e4f410 R14: 0000000000000000 R15: 1ffff920007c9e9b
+FS:  0000555562e35380(0000) GS:ffff8880b8600000(0000) knlGS:0000000000000000
+CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+CR2: 0000000020000180 CR3: 0000000078b1a000 CR4: 00000000003526f0
+DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
+DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
+----------------
+Code disassembly (best guess), 3 bytes skipped:
+   0:	48 c1 ea 03          	shr    $0x3,%rdx
+   4:	80 3c 02 00          	cmpb   $0x0,(%rdx,%rax,1)
+   8:	0f 85 b7 02 00 00    	jne    0x2c5
+   e:	48 ba 00 00 00 00 00 	movabs $0xdffffc0000000000,%rdx
+  15:	fc ff df
+  18:	4d 8b 75 10          	mov    0x10(%r13),%r14
+  1c:	49 8d 7e 10          	lea    0x10(%r14),%rdi
+  20:	48 89 f8             	mov    %rdi,%rax
+  23:	48 c1 e8 03          	shr    $0x3,%rax
+* 27:	0f b6 0c 10          	movzbl (%rax,%rdx,1),%ecx <-- trapping instruction
+  2b:	49 8d 46 27          	lea    0x27(%r14),%rax
+  2f:	48 89 c6             	mov    %rax,%rsi
+  32:	83 e0 07             	and    $0x7,%eax
+  35:	48 c1 ee 03          	shr    $0x3,%rsi
+  39:	0f b6 14 16          	movzbl (%rsi,%rdx,1),%edx
 
 
+---
+This report is generated by a bot. It may contain errors.
+See https://goo.gl/tpsmEJ for more information about syzbot.
+syzbot engineers can be reached at syzkaller@googlegroups.com.
+
+syzbot will keep track of this issue. See:
+https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
+
+If the report is already addressed, let syzbot know by replying with:
+#syz fix: exact-commit-title
+
+If you want syzbot to run the reproducer, reply with:
+#syz test: git://repo/address.git branch-or-commit-hash
+If you attach or paste a git patch, syzbot will apply it before testing.
+
+If you want to overwrite report's subsystems, reply with:
+#syz set subsystems: new-subsystem
+(See the list of subsystem names on the web dashboard)
+
+If the report is a duplicate of another one, reply with:
+#syz dup: exact-subject-of-another-report
+
+If you want to undo deduplication, reply with:
+#syz undup
 
