@@ -1,84 +1,98 @@
-Return-Path: <netdev+bounces-162619-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-162620-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5A311A2764E
-	for <lists+netdev@lfdr.de>; Tue,  4 Feb 2025 16:45:18 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id C210CA2765A
+	for <lists+netdev@lfdr.de>; Tue,  4 Feb 2025 16:47:31 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id AE31D161DB4
-	for <lists+netdev@lfdr.de>; Tue,  4 Feb 2025 15:45:16 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 542CD163EF3
+	for <lists+netdev@lfdr.de>; Tue,  4 Feb 2025 15:47:30 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 27C7A208977;
-	Tue,  4 Feb 2025 15:45:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 64163215175;
+	Tue,  4 Feb 2025 15:46:49 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="S2d3eqqW"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="iyw8077I"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EEC0B2144BF;
-	Tue,  4 Feb 2025 15:45:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 903CA21507F
+	for <netdev@vger.kernel.org>; Tue,  4 Feb 2025 15:46:47 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1738683907; cv=none; b=lEd3dz2qu+Aq5gk6yuW/e3rn0PGGfT8rKEdB3PSQW8mFLoATzbXPVUYvBUsKXuIkUX/Jt3Jzppt/Ny4GiZIE/h+ORBT/v7IMR82IaSm5jSz+jtfOMJ5Mmjjrn+DWSVq9Es+bNcvJKjzjw/kQAaeaD/0z2+/ARIw3QenDPeKVXiY=
+	t=1738684009; cv=none; b=K5JA6/gAj55PnRqVl9gd6PG7Oju5WB4HCvn0Ie7K671cyJkBE2h2lSxF2fg0mrtw/UPRD6ofMLmqkRrFre94WaGujR4nT+aJPwwr/yw4Pi4J7HhNVHxUtrOXnlT1kjWynQ2/4CC4EhYhho8WsSREHompHgqgU3G2uzsIqo0/RTA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1738683907; c=relaxed/simple;
-	bh=k59Pucx7IO1kZ1ZApcZ/pGjKHb3nO0inGP7xta2Ya7c=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=jn6OwymwFT8tw1E6B1crYSKKiHVs3fnflhNhWYqdjra+kaKY4XKqzAZ3XKAZqZ4KrSon6KIJdCM5hx5ZMU4vxyka7yorE9LJxJPzy8WvBwyWFtzEK9yNCymyww8191p46riiuyXZ9mblfVT+gCsaXULxGuCO63PfTGOiv8Rqb54=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=S2d3eqqW; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 86E1FC4CEDF;
-	Tue,  4 Feb 2025 15:45:05 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1738683906;
-	bh=k59Pucx7IO1kZ1ZApcZ/pGjKHb3nO0inGP7xta2Ya7c=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=S2d3eqqWOYSC/iQNunwQhq9/m1sZnqUv+85VH1M/dqITUzIHsdRlvGy5fz3/aBHNn
-	 WjGx5aHyXkw6L8iUb077zn7FhAK0urRIXEq/3jVuhLeAM7JKZDQshmOt7gizF/7r4a
-	 /sg8dz4yaGTWy5++yiZeqQw8aWvkrxYwPOYval12vvIY1EKGC2xQr3gXzvdPwtcrIF
-	 rv72rXYcFm43pXJMH1z2y7d067k33xCydXL8t37hsn5Mm9wlFo9rgJu8wMnqHo6IQZ
-	 /D5cTtzlBWlvrApwi3W3B2qe7Av6xosLjuR3D8s2SuO1Eqpax3Liz4Ag3MoO5dAAT0
-	 1Smypf/0ZpiTw==
-Date: Tue, 4 Feb 2025 07:45:04 -0800
-From: Jakub Kicinski <kuba@kernel.org>
-To: "=?UTF-8?B?Q3PDs2vDoXMs?= Bence" <csokas.bence@prolan.hu>
-Cc: Laurent Badel <laurentbadel@eaton.com>, Andrew Lunn <andrew@lunn.ch>,
- <imx@lists.linux.dev>, <netdev@vger.kernel.org>,
- <linux-kernel@vger.kernel.org>, Ahmad Fatoum <a.fatoum@pengutronix.de>,
- Simon Horman <horms@kernel.org>, Michal Swiatkowski
- <michal.swiatkowski@linux.intel.com>, Jacob Keller
- <jacob.e.keller@intel.com>, Wei Fang <wei.fang@nxp.com>, Shenwei Wang
- <shenwei.wang@nxp.com>, Clark Wang <xiaoning.wang@nxp.com>, Andrew Lunn
- <andrew+netdev@lunn.ch>, "David S. Miller" <davem@davemloft.net>, "Eric
- Dumazet" <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>
-Subject: Re: [PATCH net v3] net: fec: Refactor MAC reset to function
-Message-ID: <20250204074504.523c794c@kernel.org>
-In-Reply-To: <20250204093756.253642-2-csokas.bence@prolan.hu>
-References: <20250122163935.213313-2-csokas.bence@prolan.hu>
-	<20250204093756.253642-2-csokas.bence@prolan.hu>
+	s=arc-20240116; t=1738684009; c=relaxed/simple;
+	bh=nqEa8osaLWkh1DMpIcJVwzd8GoEpQFsMuDLO7B4jjoM=;
+	h=From:In-Reply-To:References:To:Cc:Subject:MIME-Version:
+	 Content-Type:Date:Message-ID; b=CCPd0vAHwhywJUf9qAcv4hyhvOJC94islEk1BFwGbL6FE6j4vou/BgNQN1lzJJc1koIe3Afl6fKwFoJv8NHeusn5Zv3URmSbay9K/oTLTuQOqfDGRawCGTvK+eMB1rSQ4mMA7jHT7dNq5/igmHM3SSiwnyBI3m8YajADFpdLLJ0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=iyw8077I; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1738684006;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=nqEa8osaLWkh1DMpIcJVwzd8GoEpQFsMuDLO7B4jjoM=;
+	b=iyw8077ILjgRy7y/OnE8Rdn3HtT3ylxaxjw/O1xsI0jWFtmAbrXksaHM45QqmAHuYKZBh5
+	Q6pj6vX6GMyWHPP4pzZTmIQ8ow5m2hqdgGSsMkVLeWTTGFtLPawtRBOn484DG8Lmc/ZYpB
+	KRwRMWa2q/Ufcbb1ms83mqIs/Rq2w0k=
+Received: from mx-prod-mc-08.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-35-165-154-97.us-west-2.compute.amazonaws.com [35.165.154.97]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-686-HL0SllHwMDKy3yEHRKsyQA-1; Tue,
+ 04 Feb 2025 10:46:43 -0500
+X-MC-Unique: HL0SllHwMDKy3yEHRKsyQA-1
+X-Mimecast-MFC-AGG-ID: HL0SllHwMDKy3yEHRKsyQA
+Received: from mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.93])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mx-prod-mc-08.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 4ACFC18333F0;
+	Tue,  4 Feb 2025 15:46:38 +0000 (UTC)
+Received: from warthog.procyon.org.uk (unknown [10.42.28.92])
+	by mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 987F2180035E;
+	Tue,  4 Feb 2025 15:46:34 +0000 (UTC)
+Organization: Red Hat UK Ltd. Registered Address: Red Hat UK Ltd, Amberley
+	Place, 107-111 Peascod Street, Windsor, Berkshire, SI4 1TE, United
+	Kingdom.
+	Registered in England and Wales under Company Registration No. 3798903
+From: David Howells <dhowells@redhat.com>
+In-Reply-To: <aa464cc9-7259-4745-bc9a-45b34cf66a60@redhat.com>
+References: <aa464cc9-7259-4745-bc9a-45b34cf66a60@redhat.com> <716751b5-6907-4fbb-bb07-0223f5761299@redhat.com> <20250203110307.7265-1-dhowells@redhat.com> <20250203110307.7265-3-dhowells@redhat.com> <549953.1738678165@warthog.procyon.org.uk>
+To: Paolo Abeni <pabeni@redhat.com>
+Cc: dhowells@redhat.com, netdev@vger.kernel.org,
+    Marc Dionne <marc.dionne@auristor.com>,
+    Jakub Kicinski <kuba@kernel.org>,
+    "David S. Miller" <davem@davemloft.net>,
+    Eric Dumazet <edumazet@google.com>, linux-afs@lists.infradead.org,
+    linux-kernel@vger.kernel.org, Simon Horman <horms@kernel.org>
+Subject: Re: [PATCH net 2/2] rxrpc: Fix the rxrpc_connection attend queue handling
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset="us-ascii"
+Content-ID: <562628.1738683993.1@warthog.procyon.org.uk>
+Date: Tue, 04 Feb 2025 15:46:33 +0000
+Message-ID: <562629.1738683993@warthog.procyon.org.uk>
+X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.93
 
-On Tue, 4 Feb 2025 10:37:54 +0100 Cs=C3=B3k=C3=A1s, Bence wrote:
-> For instance, as of now, `fec_stop()` does not check for
-> `FEC_QUIRK_NO_HARD_RESET`, meaning the MII/RMII mode is cleared on eg.
-> a PM power-down event; and `fec_restart()` missed the refactor renaming
-> the "magic" constant `1` to `FEC_ECR_RESET`.
+Paolo Abeni <pabeni@redhat.com> wrote:
 
-Laurent responded to v1 saying this was intentional. Please give more
-details on how problem you're seeing and on what platforms. Otherwise
-this is not a fix but refactoring.
+> I guess we are all better off without the need for a repost. I'm
+> applying it as-is.
 
-Please don't post new versions in-reply-to, and add lore links to
-the previous version in the changelog.
---=20
-pw-bot: cr
+Thanks :-)
+
+I think that patch 1 (that I dropped) is probably correct, but that it brings
+a further bug to the fore, so I'll track that down before resubmitting.
+
+David
+
 
