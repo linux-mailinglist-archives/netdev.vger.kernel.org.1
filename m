@@ -1,63 +1,63 @@
-Return-Path: <netdev+bounces-162397-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-162398-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id E7B82A26BEF
-	for <lists+netdev@lfdr.de>; Tue,  4 Feb 2025 07:11:37 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2A091A26BF4
+	for <lists+netdev@lfdr.de>; Tue,  4 Feb 2025 07:11:52 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id CA06D3A7FDD
-	for <lists+netdev@lfdr.de>; Tue,  4 Feb 2025 06:11:25 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id ED91A167CA6
+	for <lists+netdev@lfdr.de>; Tue,  4 Feb 2025 06:11:47 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B0F121FFC75;
-	Tue,  4 Feb 2025 06:11:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E846B201267;
+	Tue,  4 Feb 2025 06:11:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="gN7EDLaV"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="TDavNKB0"
 X-Original-To: netdev@vger.kernel.org
 Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.10])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EB4C125A624;
-	Tue,  4 Feb 2025 06:11:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 090D725A655;
+	Tue,  4 Feb 2025 06:11:28 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.10
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1738649481; cv=none; b=mdg1fMdEBMowFbI5Lwqvrn+q+hE2Co/B2CMXkYcg2UrNQtuti1w+4gsa2FnmcKz9vNn6hkH7XJUnsTcWc85Gh46EmEd2a3xR1wgyP3e0dFU1s6IltiF/Pf8Yw/Vfp/cb6VLqjL0d1Ndi7HM3RZNWTBbm9Fg0EnkVxvV0OSbCrYk=
+	t=1738649490; cv=none; b=LQlMp6XRtVSEUd+LkzKbROFmEmVDq3J52yRw4mqzQ2/rZuOAtS6+NvRYFj97QmxSkQTySYfLMFW/qeSgQ6Zv6IZH5Akpw9xDYKMmm3D4Xlgp9UiLChrvNQaDQvbvvy/YaWYVJHPBPxf7TWJ8jvc4qrkJSWmCD3m7vEExYDoSWoU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1738649481; c=relaxed/simple;
-	bh=7n0vam23Uf784ublbhVBP5AsWpQxp+3QLHvPVC2Ki4w=;
+	s=arc-20240116; t=1738649490; c=relaxed/simple;
+	bh=5bkc6SzUBfdWPSB7gExlTFthIkT/D4tk+mfb1mANDSw=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=BXbMMeN6ooxSfVPWcW1d3fUIAcRTN9j3pGtg4VG2bxs73I8CsiXnPQrkzqa6NMSPmGioEXw/yleVFjIOlLXE2OPW7Yvy3MF0ZdfgeJzLJWyZ4PVZVwvETh54f433fukFID2OBKimqgixrHmUgpmIFbJ5n7VXHAqfUI1oUxZmqJA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=gN7EDLaV; arc=none smtp.client-ip=192.198.163.10
+	 MIME-Version; b=VlEHFs6Lbrb55bnE8jPK5yU0bSo3/pbmZUQTvB/ssN3vX7DcDMG+gtlF/mvP35giqWdw6Lfn1R2k213CKalzXNi+9hGxSJpFE/xTM4vPwI1UqgreOSVj5klxbuHWmhJUw2ThOguhha0mPeR+azNhcI/6XXvpX5zZiufgScS/Dxo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=TDavNKB0; arc=none smtp.client-ip=192.198.163.10
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
 Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1738649480; x=1770185480;
+  t=1738649489; x=1770185489;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=7n0vam23Uf784ublbhVBP5AsWpQxp+3QLHvPVC2Ki4w=;
-  b=gN7EDLaVd5nvMlmWD1a5Pjby7SNPLnGFmNPamKfOrV789u7aAmFwaCH7
-   rAgGXzkDSNH79V4D40TZsJWEBFMSqHwzlc+uIGlkHrnR71hNmnDwb4eqW
-   fVtJyBqRen52/MqIhUhlGurFo/WnvGPoQf15FFU+osj+Tkibjrrn6Uy3e
-   PIMmeICAWoVXUW7DXKQBNnf5/EZCNtF4EHa/Wkd3zqo8einJWlCgZ/GD1
-   fsNF5+K8c3wax2AOpAZThTjMs2BGE5Q03obiME+UYa/WAouf+kq2UK9pM
-   6zQj7CVGct/zfr7MRawStEJMJsoUP9W+J0ABv2VJOGVhyNxdN/nXsmRKe
+  bh=5bkc6SzUBfdWPSB7gExlTFthIkT/D4tk+mfb1mANDSw=;
+  b=TDavNKB0rEbAy9dzaPq3nbZ3LB2bADvHGza0FXHSwIlxvkAAB1TYwVSn
+   wD2lBbuikdnLu56HWH783N2y0CAYVbLfNIBDNZX0lclLqnmJ3t5k+9o7q
+   vQ+6AzNrFdv7rFShfjxj3KwjoBKBG6HJs9vETw6EUt44ANIZBPKS7jRRH
+   Q5K2THN04hXJzSRXsMs+kEpdrR8IooocBz7XDs/s1jTBaxh/x1+Mo8kgd
+   /CE/t6zq+jlUA9+GTTF7WuOpiRJ7rQ4yebFAqjtllMJTdp7T3xz+FBi6S
+   55hdRhCivx7HEvivD3IM6rlKLP8DeRGRolGYc89t16JRcz1juAV9XPC3A
    A==;
-X-CSE-ConnectionGUID: xDQDcwSjQBCjsu2KzfdHoA==
-X-CSE-MsgGUID: Fr4aKB0VQ/u1Y92AKBiwww==
-X-IronPort-AV: E=McAfee;i="6700,10204,11314"; a="50579608"
+X-CSE-ConnectionGUID: l4iJNY5qQP6n7ZO3yZ25Ow==
+X-CSE-MsgGUID: Omid1IApRHi5ev0UQ0y8xg==
+X-IronPort-AV: E=McAfee;i="6700,10204,11314"; a="50579618"
 X-IronPort-AV: E=Sophos;i="6.12,310,1728975600"; 
-   d="scan'208";a="50579608"
+   d="scan'208";a="50579618"
 Received: from orviesa009.jf.intel.com ([10.64.159.149])
-  by fmvoesa104.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 03 Feb 2025 22:11:19 -0800
-X-CSE-ConnectionGUID: YinZviaxTTyrV7MlNpzCpw==
-X-CSE-MsgGUID: sbOtTjAqTG2arJW7fGx7uw==
+  by fmvoesa104.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 03 Feb 2025 22:11:28 -0800
+X-CSE-ConnectionGUID: E7pjPBh+SXql8izvLDPYnA==
+X-CSE-MsgGUID: W0QC9zuwTHOMThr5y0eVlw==
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="6.13,258,1732608000"; 
-   d="scan'208";a="110279153"
+   d="scan'208";a="110279173"
 Received: from yongliang-ubuntu20-ilbpg12.png.intel.com ([10.88.227.39])
-  by orviesa009.jf.intel.com with ESMTP; 03 Feb 2025 22:11:12 -0800
+  by orviesa009.jf.intel.com with ESMTP; 03 Feb 2025 22:11:20 -0800
 From: Choong Yong Liang <yong.liang.choong@linux.intel.com>
 To: Simon Horman <horms@kernel.org>,
 	Jose Abreu <joabreu@synopsys.com>,
@@ -92,9 +92,9 @@ Cc: x86@kernel.org,
 	platform-driver-x86@vger.kernel.org,
 	linux-stm32@st-md-mailman.stormreply.com,
 	linux-arm-kernel@lists.infradead.org
-Subject: [PATCH net-next v6 1/7] net: phylink: use act_link_an_mode to determine PHY
-Date: Tue,  4 Feb 2025 14:10:14 +0800
-Message-Id: <20250204061020.1199124-2-yong.liang.choong@linux.intel.com>
+Subject: [PATCH net-next v6 2/7] net: pcs: xpcs: re-initiate clause 37 Auto-negotiation
+Date: Tue,  4 Feb 2025 14:10:15 +0800
+Message-Id: <20250204061020.1199124-3-yong.liang.choong@linux.intel.com>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20250204061020.1199124-1-yong.liang.choong@linux.intel.com>
 References: <20250204061020.1199124-1-yong.liang.choong@linux.intel.com>
@@ -106,67 +106,121 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-When the interface mode is SGMII and act_link_an_mode is MLO_AN_INBAND,
-switching to the 2500BASE-X interface mode will trigger
-phylink_major_config, and act_link_an_mode will be updated to MLO_AN_PHY
-in phylink_pcs_neg_mode when the PCS does not support in-band mode.
-The MAC and PCS will configure according to the interface mode
-and act_link_an_mode.
+The xpcs_switch_interface_mode function was introduced to handle
+interface switching.
 
-However, when the interface goes link down and then link up again, the MAC
-will attempt to attach the PHY. The interface mode remains as 2500BASE-X,
-but cfg_link_an_mode still holds MLO_AN_INBAND. This causes a failure to
-attach the PHY.
+According to the XPCS datasheet, a soft reset is required to initiate
+Clause 37 auto-negotiation when the XPCS switches interface modes.
 
-This patch uses act_link_an_mode to determine if there is a PHY to attach.
+When the interface mode is set to 2500BASE-X, Clause 37 auto-negotiation
+is turned off.
+
+Subsequently, when the interface mode switches from 2500BASE-X to SGMII,
+re-initiating Clause 37 auto-negotiation is required for the SGMII
+interface mode to function properly.
 
 Signed-off-by: Choong Yong Liang <yong.liang.choong@linux.intel.com>
 ---
- drivers/net/phy/phylink.c | 10 ++++++----
- 1 file changed, 6 insertions(+), 4 deletions(-)
+ drivers/net/pcs/pcs-xpcs-wx.c |  4 +--
+ drivers/net/pcs/pcs-xpcs.c    | 60 ++++++++++++++++++++++++++++++++---
+ 2 files changed, 57 insertions(+), 7 deletions(-)
 
-diff --git a/drivers/net/phy/phylink.c b/drivers/net/phy/phylink.c
-index 214b62fba991..b0f9725e0494 100644
---- a/drivers/net/phy/phylink.c
-+++ b/drivers/net/phy/phylink.c
-@@ -1903,6 +1903,7 @@ int phylink_set_fixed_link(struct phylink *pl,
- 
- 	pl->cfg_link_an_mode = MLO_AN_FIXED;
- 	pl->req_link_an_mode = pl->cfg_link_an_mode;
-+	pl->act_link_an_mode = pl->cfg_link_an_mode;
- 
- 	return 0;
- }
-@@ -2002,6 +2003,7 @@ struct phylink *phylink_create(struct phylink_config *config,
+diff --git a/drivers/net/pcs/pcs-xpcs-wx.c b/drivers/net/pcs/pcs-xpcs-wx.c
+index fc52f7aa5f59..f73ab04d09f0 100644
+--- a/drivers/net/pcs/pcs-xpcs-wx.c
++++ b/drivers/net/pcs/pcs-xpcs-wx.c
+@@ -172,11 +172,9 @@ int txgbe_xpcs_switch_mode(struct dw_xpcs *xpcs, phy_interface_t interface)
+ 		return 0;
  	}
  
- 	pl->req_link_an_mode = pl->cfg_link_an_mode;
-+	pl->act_link_an_mode = pl->cfg_link_an_mode;
+-	if (xpcs->interface == interface && !txgbe_xpcs_mode_quirk(xpcs))
++	if (!txgbe_xpcs_mode_quirk(xpcs))
+ 		return 0;
  
- 	ret = phylink_register_sfp(pl, fwnode);
- 	if (ret < 0) {
-@@ -2044,8 +2046,8 @@ EXPORT_SYMBOL_GPL(phylink_destroy);
-  */
- bool phylink_expects_phy(struct phylink *pl)
- {
--	if (pl->cfg_link_an_mode == MLO_AN_FIXED ||
--	    (pl->cfg_link_an_mode == MLO_AN_INBAND &&
-+	if (pl->act_link_an_mode == MLO_AN_FIXED ||
-+	    (pl->act_link_an_mode == MLO_AN_INBAND &&
- 	     phy_interface_mode_is_8023z(pl->link_config.interface)))
- 		return false;
- 	return true;
-@@ -2280,8 +2282,8 @@ static int phylink_attach_phy(struct phylink *pl, struct phy_device *phy,
- {
- 	u32 flags = 0;
+-	xpcs->interface = interface;
+-
+ 	ret = txgbe_pcs_poll_power_up(xpcs);
+ 	if (ret < 0)
+ 		return ret;
+diff --git a/drivers/net/pcs/pcs-xpcs.c b/drivers/net/pcs/pcs-xpcs.c
+index 1faa37f0e7b9..fb3d1548a8e0 100644
+--- a/drivers/net/pcs/pcs-xpcs.c
++++ b/drivers/net/pcs/pcs-xpcs.c
+@@ -817,6 +817,58 @@ static int xpcs_config_2500basex(struct dw_xpcs *xpcs)
+ 			   BMCR_SPEED1000);
+ }
  
--	if (WARN_ON(pl->cfg_link_an_mode == MLO_AN_FIXED ||
--		    (pl->cfg_link_an_mode == MLO_AN_INBAND &&
-+	if (WARN_ON(pl->act_link_an_mode == MLO_AN_FIXED ||
-+		    (pl->act_link_an_mode == MLO_AN_INBAND &&
- 		     phy_interface_mode_is_8023z(interface) && !pl->sfp_bus)))
- 		return -EINVAL;
++static int xpcs_switch_to_aneg_c37_sgmii(const struct dw_xpcs_compat *compat,
++					 struct dw_xpcs *xpcs,
++					 unsigned int neg_mode)
++{
++	bool an_c37_enabled;
++	int ret, mdio_ctrl;
++
++	if (neg_mode == PHYLINK_PCS_NEG_INBAND_ENABLED) {
++		mdio_ctrl = xpcs_read(xpcs, MDIO_MMD_VEND2, MII_BMCR);
++		if (mdio_ctrl < 0)
++			return mdio_ctrl;
++
++		an_c37_enabled = mdio_ctrl & BMCR_ANENABLE;
++		if (!an_c37_enabled) {
++			//Perform soft reset to initiate C37 auto-negotiation
++			ret = xpcs_soft_reset(xpcs, compat);
++			if (ret)
++				return ret;
++		}
++	}
++	return 0;
++}
++
++static int xpcs_switch_interface_mode(const struct dw_xpcs_compat *compat,
++				      struct dw_xpcs *xpcs,
++				      phy_interface_t interface,
++				      unsigned int neg_mode)
++{
++	int ret = 0;
++
++	if (xpcs->interface != interface) {
++		if (xpcs->info.pma == WX_TXGBE_XPCS_PMA_10G_ID) {
++			ret = txgbe_xpcs_switch_mode(xpcs, interface);
++		} else {
++			switch (compat->an_mode) {
++			case DW_AN_C37_SGMII:
++				ret = xpcs_switch_to_aneg_c37_sgmii(compat, xpcs, neg_mode);
++				break;
++			default:
++				break;
++			}
++		}
++
++		if (ret)
++			return ret;
++
++		xpcs->interface = interface;
++	}
++
++	return 0;
++}
++
+ static int xpcs_do_config(struct dw_xpcs *xpcs, phy_interface_t interface,
+ 			  const unsigned long *advertising,
+ 			  unsigned int neg_mode)
+@@ -828,11 +880,11 @@ static int xpcs_do_config(struct dw_xpcs *xpcs, phy_interface_t interface,
+ 	if (!compat)
+ 		return -ENODEV;
  
+-	if (xpcs->info.pma == WX_TXGBE_XPCS_PMA_10G_ID) {
+-		ret = txgbe_xpcs_switch_mode(xpcs, interface);
+-		if (ret)
+-			return ret;
++	ret = xpcs_switch_interface_mode(compat, xpcs, interface, neg_mode);
++	if (ret)
++		return ret;
+ 
++	if (xpcs->info.pma == WX_TXGBE_XPCS_PMA_10G_ID) {
+ 		/* Wangxun devices need backplane CL37 AN enabled for
+ 		 * SGMII and 1000base-X
+ 		 */
 -- 
 2.34.1
 
