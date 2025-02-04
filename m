@@ -1,166 +1,357 @@
-Return-Path: <netdev+bounces-162606-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-162607-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 42F50A27516
-	for <lists+netdev@lfdr.de>; Tue,  4 Feb 2025 15:59:43 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0B65CA27584
+	for <lists+netdev@lfdr.de>; Tue,  4 Feb 2025 16:16:23 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 1FCD718825B4
-	for <lists+netdev@lfdr.de>; Tue,  4 Feb 2025 14:59:48 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 770BB3A3385
+	for <lists+netdev@lfdr.de>; Tue,  4 Feb 2025 15:16:14 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0F5C1214819;
-	Tue,  4 Feb 2025 14:58:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D1CE1212D7A;
+	Tue,  4 Feb 2025 15:16:18 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=wanadoo.fr header.i=@wanadoo.fr header.b="ecd+IuGO"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="glb1J8+d"
 X-Original-To: netdev@vger.kernel.org
-Received: from out.smtpout.orange.fr (out-65.smtpout.orange.fr [193.252.22.65])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.13])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0B19D213E69;
-	Tue,  4 Feb 2025 14:58:39 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=193.252.22.65
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1738681122; cv=none; b=SQDY8e0s8I+Jt+y0VxZc9il9lVcVgeURTgXjts/hEhV5lLyI274KDu8d+4W0+ddaeEupKHIxdBDG0Ki1jn2B1MH6xUDUzA+A1FjWwDsGnSc1J76QO7dkj7JhzIgk/41KCSmRUfdVpuskjk5H0h9m4260lWmLkmYRJU1NPqa9KRA=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1738681122; c=relaxed/simple;
-	bh=7yYEgosSuGQS04DK22FDVdylENH/vspSA1rlbVclZNY=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=nQXZqWZ5oBcKM8BFwZt3MRi3DsCqUMMCMju5xrQcGtZroR+zeY2wzkZdlLcJZKbIHmHIn0FFwnWgHQdem8qv3So6oUt+sddCi04kYtWdXNrcSOqGOzOJ5IKcWwKcZs1MIMQ+xP09+Gw6hgfAZPvOIHm4KMPEM303wXe0aeI5Glc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=wanadoo.fr; spf=pass smtp.mailfrom=wanadoo.fr; dkim=pass (2048-bit key) header.d=wanadoo.fr header.i=@wanadoo.fr header.b=ecd+IuGO; arc=none smtp.client-ip=193.252.22.65
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=wanadoo.fr
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=wanadoo.fr
-Received: from [172.16.82.72] ([124.33.176.97])
-	by smtp.orange.fr with ESMTPA
-	id fKNgtUW8BfnFWfKNktvMWZ; Tue, 04 Feb 2025 15:58:37 +0100
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=wanadoo.fr;
-	s=t20230301; t=1738681118;
-	bh=AM67isIJk9nfgVyB6frkgirMeIWbDKwVPdpN4g+IeIw=;
-	h=Message-ID:Date:MIME-Version:Subject:To:From;
-	b=ecd+IuGOIJajkQN9Hp9B4JdRlaj4cnx4zTYS+VigF7+V2j084daNRbwO51Iv6utZ+
-	 o3wfs90G7rtxHI+Nuwk3wRwlEbzail6TXTaaL4idJXUi84l7MG2cursc2d6yedC5xi
-	 vYqQKLAxPd4IvshgAut4V68qd+eP7VuIpf6zCK0tTyRqd8BFItNF+fxm/zmg0uu7Eh
-	 YPVZDZW0yOhLENRbQazkt3RIdZtv+kSINYEkULd6e+P5R5KOHmdeAn3FHJB+WEoIAa
-	 LDA1k4PKFqeDScB9tvSid9u7TnZevO6zFeJIWRgUTUwSdzKY3R7ktnVIcKr4XTgfqV
-	 1dUjZaUQPg50g==
-X-ME-Helo: [172.16.82.72]
-X-ME-Auth: bWFpbGhvbC52aW5jZW50QHdhbmFkb28uZnI=
-X-ME-Date: Tue, 04 Feb 2025 15:58:38 +0100
-X-ME-IP: 124.33.176.97
-Message-ID: <4c116f00-009a-491f-aeb5-6193578a603c@wanadoo.fr>
-Date: Tue, 4 Feb 2025 23:58:27 +0900
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B8B1318EB0;
+	Tue,  4 Feb 2025 15:16:16 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=192.198.163.13
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1738682178; cv=fail; b=GD//385NJ7CSdPRx4rFlopizwJmqAvDej0gHGCjcvR/99YYpSY8NxfDROyTkX6FHQ5wm+cVC7G0m2G8vCs6eM2tv2wYszW7Y2TA/ernuoo1UVgtM2YAYiOHdnAeKdLEonrbLDdFKuLHcCNrarPxHd8AY9hOVvEtrIiEC/nI04TA=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1738682178; c=relaxed/simple;
+	bh=omtGwBDWeP3AaZqMcqlCF0QXj4oH8vXLjbxyl+EfNLE=;
+	h=Subject:To:CC:References:From:Message-ID:Date:In-Reply-To:
+	 Content-Type:MIME-Version; b=EMphO/xxPnXAGDuBVSLttxvBmysl1rxFPFhM5HmtPL+nO6w/1Wk7ebQyxtIvPHrgVAgDs/dQp3CedvzgLHXwnDOBs32hYUCydF5xOpj4DjX+dwSiY2Kpb61aWPGUWH5FY36AxS4guK53jDbXqdU6Ssw+tTiIuZDuYXvbOCcLz48=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=glb1J8+d; arc=fail smtp.client-ip=192.198.163.13
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1738682177; x=1770218177;
+  h=subject:to:cc:references:from:message-id:date:
+   in-reply-to:content-transfer-encoding:mime-version;
+  bh=omtGwBDWeP3AaZqMcqlCF0QXj4oH8vXLjbxyl+EfNLE=;
+  b=glb1J8+d5xxLwWXjwJvr0e1CQqB4576X8B9OlFqOuUp/leXYZwGXd08K
+   3SB9nea7yD264wWNevnB6MlTjdzfqcjrl3HF3n3nZfNPTY8Yw57HmhnTg
+   zwGFYy02m4n11mV5JW0EWUHcBomggqMqrtajOqxwDjhNIGGbQCWNjQ0iN
+   E8Mnpu3zglaIMH+pKeq37FsAR2ofKLuK/erFcSFosy0YjOzxlyS6AZHzZ
+   3TGiLs4yAP0D6JR4zG1Y105Z52KQHt1GcCtm+3iHBVAwV0JyYQw2M+/Ob
+   6l1FnUqVc75fdfc/sWwB+5dshOI8Ew9/lBfK8HBpK7vDM5ljPK4r9SRuq
+   A==;
+X-CSE-ConnectionGUID: mUq6JjGqRYeqgohZjxLX8w==
+X-CSE-MsgGUID: v55S/WLURkS52OahEvEAzQ==
+X-IronPort-AV: E=McAfee;i="6700,10204,11336"; a="42050749"
+X-IronPort-AV: E=Sophos;i="6.13,258,1732608000"; 
+   d="scan'208";a="42050749"
+Received: from orviesa007.jf.intel.com ([10.64.159.147])
+  by fmvoesa107.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 04 Feb 2025 07:16:16 -0800
+X-CSE-ConnectionGUID: dqTpBsktQ96+Fr7P5FCdwA==
+X-CSE-MsgGUID: /Rlp7qjERouEwj4edDyL3A==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.12,224,1728975600"; 
+   d="scan'208";a="111069295"
+Received: from orsmsx603.amr.corp.intel.com ([10.22.229.16])
+  by orviesa007.jf.intel.com with ESMTP/TLS/AES256-GCM-SHA384; 04 Feb 2025 07:16:12 -0800
+Received: from orsmsx601.amr.corp.intel.com (10.22.229.14) by
+ ORSMSX603.amr.corp.intel.com (10.22.229.16) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.44; Tue, 4 Feb 2025 07:16:11 -0800
+Received: from orsedg603.ED.cps.intel.com (10.7.248.4) by
+ orsmsx601.amr.corp.intel.com (10.22.229.14) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.44 via Frontend Transport; Tue, 4 Feb 2025 07:16:11 -0800
+Received: from NAM12-DM6-obe.outbound.protection.outlook.com (104.47.59.171)
+ by edgegateway.intel.com (134.134.137.100) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.1.2507.44; Tue, 4 Feb 2025 07:16:11 -0800
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=u+tChFORYfLkbm9hyYMO+0oZDjBNVUwz91Gu5e2lwl1mXTnNHgzujz4jPa8NCi7fuaIDBvZKsJxb2Q8uYLbZrYkwBrqlXv/qiEm1m43rOQl5RsJ14ERy7vV1MkaMXaoCSaMcePBPu/t6CX34X/3ReIkvfZf1+kRaUI2QUShekBUsx++9/pV8Yn/opQnau0YFgC1ojalncQXsvTyZIcSfGaINnWz9abO5IZrFOyZveBFsNSIWuAO86SF1kGKjGK2A7tcZkaptvw1NbFV9qaRxwFVKnykWbEkpfRpa7hZoWycpUAQzuwOqllqHP1k4Dfwo9ALyYBsSe39FG7rAdTphNg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=OEqb3ApmF9NkMkCGO+ONVMgksURf7KAouFAug1CmJRE=;
+ b=GVaR3eu3M3/eXuN67r+8csvZ2X62B4yvScejT0v7GCGBug7XDQrTpTyMhAmwq5XWmtktkfNYavakdw+XG/qActbL5B1JapEy1Th77NETO3DCA6nzA9LtvdDqrYcfVCOy3Ttxgsu9Ipn//cUBdo3ovzG3Jz19HNyA9fHavGyL0ym3PM02qIIAwbEiHOA7NhJdIKicTMCOVyiWKMtXGgKZBAwSJwd0zx4U9JHvLk3HPWvYwRpBZxPXSJrxzkNFcY133dKRoGDcZBB5hsOY5rKQ/ntZ5lxFOLehIpzAEGeCZW4AIHZvoSdKDYl2Z8pPL6CtdyXiYthtBckb/GkrqsFWQw==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=intel.com;
+Received: from PH0PR11MB5949.namprd11.prod.outlook.com (2603:10b6:510:144::6)
+ by SJ0PR11MB5939.namprd11.prod.outlook.com (2603:10b6:a03:42e::21) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8398.24; Tue, 4 Feb
+ 2025 15:16:09 +0000
+Received: from PH0PR11MB5949.namprd11.prod.outlook.com
+ ([fe80::1c5d:e556:f779:e861]) by PH0PR11MB5949.namprd11.prod.outlook.com
+ ([fe80::1c5d:e556:f779:e861%3]) with mapi id 15.20.8398.021; Tue, 4 Feb 2025
+ 15:16:08 +0000
+Subject: Re: [Intel-wired-lan] [PATCH] net: e1000e: convert to
+ ndo_hwtstamp_get() and ndo_hwtstamp_set()
+To: Piotr Wejman <piotrwejman90@gmail.com>
+CC: Tony Nguyen <anthony.l.nguyen@intel.com>, Przemek Kitszel
+	<przemyslaw.kitszel@intel.com>, Andrew Lunn <andrew+netdev@lunn.ch>, "David
+ S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, "Jakub
+ Kicinski" <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	<intel-wired-lan@lists.osuosl.org>, <netdev@vger.kernel.org>,
+	<linux-kernel@vger.kernel.org>
+References: <20250202170839.47375-1-piotrwejman90@gmail.com>
+From: "Lifshits, Vitaly" <vitaly.lifshits@intel.com>
+Message-ID: <efd253a9-c630-654a-dfed-bd1094a8c380@intel.com>
+Date: Tue, 4 Feb 2025 17:16:02 +0200
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:78.0) Gecko/20100101
+ Thunderbird/78.7.1
+In-Reply-To: <20250202170839.47375-1-piotrwejman90@gmail.com>
+Content-Type: text/plain; charset="utf-8"; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: TL2P290CA0010.ISRP290.PROD.OUTLOOK.COM (2603:1096:950:2::8)
+ To PH0PR11MB5949.namprd11.prod.outlook.com (2603:10b6:510:144::6)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: general protection fault in devlink_info_serial_number_put
-To: Eric Dumazet <edumazet@google.com>
-Cc: YAN KANG <kangyan91@outlook.com>, Jiri Pirko <jiri@resnulli.us>,
- Jakub Kicinski <kuba@kernel.org>,
- "syzkaller@googlegroups.com" <syzkaller@googlegroups.com>,
- "David S. Miller" <davem@davemloft.net>, Paolo Abeni <pabeni@redhat.com>,
- Simon Horman <horms@kernel.org>, netdev@vger.kernel.org,
- "linux-can@vger.kernel.org" <linux-can@vger.kernel.org>,
- Marc Kleine-Budde <mkl@pengutronix.de>,
- "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
-References: <SY8P300MB0421E0013C0EBD2AA46BA709A1F42@SY8P300MB0421.AUSP300.PROD.OUTLOOK.COM>
- <b25b21b2-c999-4f21-9ad0-30113b4c655d@wanadoo.fr>
- <CANn89iKVKx8CMz_H65U+HzsY=ef8k=8T6a9dpQ7nHHv0+Cxwfw@mail.gmail.com>
-Content-Language: en-US
-From: Vincent Mailhol <mailhol.vincent@wanadoo.fr>
-Autocrypt: addr=mailhol.vincent@wanadoo.fr; keydata=
- xjMEZluomRYJKwYBBAHaRw8BAQdAf+/PnQvy9LCWNSJLbhc+AOUsR2cNVonvxhDk/KcW7FvN
- LFZpbmNlbnQgTWFpbGhvbCA8bWFpbGhvbC52aW5jZW50QHdhbmFkb28uZnI+wrIEExYKAFoC
- GwMFCQp/CJcFCwkIBwICIgIGFQoJCAsCBBYCAwECHgcCF4AWIQTtj3AFdOZ/IOV06OKrX+uI
- bbuZwgUCZx41XhgYaGtwczovL2tleXMub3BlbnBncC5vcmcACgkQq1/riG27mcIYiwEAkgKK
- BJ+ANKwhTAAvL1XeApQ+2NNNEwFWzipVAGvTRigA+wUeyB3UQwZrwb7jsQuBXxhk3lL45HF5
- 8+y4bQCUCqYGzjgEZx4y8xIKKwYBBAGXVQEFAQEHQJrbYZzu0JG5w8gxE6EtQe6LmxKMqP6E
- yR33sA+BR9pLAwEIB8J+BBgWCgAmFiEE7Y9wBXTmfyDldOjiq1/riG27mcIFAmceMvMCGwwF
- CQPCZwAACgkQq1/riG27mcJU7QEA+LmpFhfQ1aij/L8VzsZwr/S44HCzcz5+jkxnVVQ5LZ4B
- ANOCpYEY+CYrld5XZvM8h2EntNnzxHHuhjfDOQ3MAkEK
-In-Reply-To: <CANn89iKVKx8CMz_H65U+HzsY=ef8k=8T6a9dpQ7nHHv0+Cxwfw@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: PH0PR11MB5949:EE_|SJ0PR11MB5939:EE_
+X-MS-Office365-Filtering-Correlation-Id: 3b5be28f-f840-457f-141a-08dd452eda1d
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;ARA:13230040|1800799024|376014|366016;
+X-Microsoft-Antispam-Message-Info: =?utf-8?B?aGN5eDlROEpjSTkzcFlCSmZueE0vN3hvM25IWGtnakhwUjloSlFuanU1WXZY?=
+ =?utf-8?B?MTdibWJJNEk5ZDg3ck1rM3hTeVR4ODRxZDVwb2V6cTV3M0xidjlGVzFpckMw?=
+ =?utf-8?B?Y2Q2U21GbVoycVJiNDI5TVV3ZEIyME12dm8vV2pZcjBJbUtvL1RFN2kwMmtE?=
+ =?utf-8?B?dVZpVVFVUUR3Mm1pQ25pZ1ZIMGxLWlRPdkF1TjJVLzNXemlveTd4dkhnNkNy?=
+ =?utf-8?B?Uy81cVZlUWcwdXBtejVMM1UrNmtoQVFHUEptM2puT0dDeCtkKzJKUmNkK0VF?=
+ =?utf-8?B?Mm1lbGxzb2Eva3lPeWZ0TkE3d2dtd0hGYkxBcFRKTmJEUm1pWEMxYU13V2Ny?=
+ =?utf-8?B?bzEvNVo4a0pBaW1vc0QzTUZaUkZlbFFna0thZlcvT1daUU11OGVzVDlWakRa?=
+ =?utf-8?B?WUlrRXY0Y3NFd2FMb2RxZTRyeldFbVJ6T2tGN1MyNnQ3UzNLc254M3ZTQzQ4?=
+ =?utf-8?B?eE9aYUxZK2ZnaDgvckJrSm56dkJDU1IxN3FuQ3RjVFRacjVxTTZPa1NLQ2py?=
+ =?utf-8?B?SmwwaEUrTnQzSUxpTjlvUmlsMDJmeUtscFFTeW9kbkl2N29ydlllYmVUdHUz?=
+ =?utf-8?B?QXVxRGduajVWZ0ZEY0J1cGs2N2VXdlg3b094eEJEQ1pNWkp5Lzl2MzdUcE01?=
+ =?utf-8?B?enNGaERvSzlsUGdZcWs2K05wbG4wWkFJaU0raE00N2JzWFJkRmVWQTJUN25n?=
+ =?utf-8?B?Y1dPQ3NBdkI1RlM5UVB2eU1xSEdJeHE3Zm9pTGlaUjJXQVVtTHBwTm1jZGNs?=
+ =?utf-8?B?eGpqL3EwdFF3eWIvK2FFTjBUYjNHUnZWbXNGUGFVNlhkTGJkQktOL0tOVmVu?=
+ =?utf-8?B?RmxkM0JhazRZVmROUHNBTklkbG85azFMR2FTZkY1MGFHNDNlZTZvcHBJUlJ0?=
+ =?utf-8?B?WDh1YkJqU0p3WCtsblRLTmRLbXJOTllLNDQ4OHQ4WEdYR0JIc2JQbUNjZ25t?=
+ =?utf-8?B?Q05jVEVtd2Q3dlNuYkZNNVltSU9EZEQ0VmFOY3NrZ3NnbnB0OERWSC9YLzFR?=
+ =?utf-8?B?ZjlVSDFTa2dHVHpaMGR1bFNVbXE2N0tQYm5FTjdJUldpSTdtZjdCSk9TNTFr?=
+ =?utf-8?B?U0lRQ2ltNEk4aVgzTElCUHBxc1BCdjhWbGdqNWFEVm9UaGVzU3pMVFRsVGFK?=
+ =?utf-8?B?Y1RwRytjSWI4cmQ4WDhsQlQ1OVpLalpxdHhEakx1bmlvNWcxV1FpQmY2U0xj?=
+ =?utf-8?B?OXJLYkNXTW91VmsyWkFUMm9lYWVWcGFsWTh3ZkplMW1URG9NNStXQW01eUFD?=
+ =?utf-8?B?Yitkb3dIczdtWHF6NXRrSGVMWkdtV2RoWFlSUU55Q3lRd0IxMmhpM3IzYzQ1?=
+ =?utf-8?B?aU15RWhoMUtobkpZcXpJTG9LVlhzb1FkSEp2cUI4RDU2UDRhMjh0cUUwc3pn?=
+ =?utf-8?B?Q3lwZmp3ZlVYMVlBUXNUZzFsRk51OWxyUDBNcFZvWHZqdjFUcWJLbjY3dTlZ?=
+ =?utf-8?B?V0FTVFV3Y2tpdmlyTXBYazQ0em1zWGhiSUdnMGE1ek1OemZkdkxNUGVoc1NG?=
+ =?utf-8?B?eE4zS3BRd0p1Rng5Rlh0dkRDMlBPck0wNWt5aGJjQUM5cWE5ZVlaK21JS3Jj?=
+ =?utf-8?B?eVQ1end5QTV0VnpOUzlUNHBJWVRlbkNjMUhqNEF4STE1MUROV2c4WUJybWJG?=
+ =?utf-8?B?U2J2Wloya2Q3aEpBR0VKdW5vYmFheU1TeW5BTUZnUVIweHRVQkpBZU5CRDQ2?=
+ =?utf-8?B?dEYwMGp0emJncmpqcGxiL0FSMGlwcmV2V0dwOGpvdDQxT1A4enZiM2c0bDAw?=
+ =?utf-8?B?QUJVQ2dscG9rVWNwekZ6WGhqVUU2ZU0wOHdIZndqcVFzb0FOU21kd3dEK1ZW?=
+ =?utf-8?B?VnpPY092eWwxYU9FL1JzRjd6ekZpUHA2OE02WkdXQlNDdUNkV3RwQ04xb0ZO?=
+ =?utf-8?Q?WnfW/GV6pQ9p4?=
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:PH0PR11MB5949.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(1800799024)(376014)(366016);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?dU5VUjRGaFRRTlZqZ3ZwUi9SLzVqcFJXM3pZVmlIeWFRb3JwMEhkZWowQWhm?=
+ =?utf-8?B?QzFubHl5OCtHaDlUSjNnNmtvbTFYazZBZE9SWU1VSUJnYURyNnJNclp3VkFn?=
+ =?utf-8?B?Q3dxMDdmQkJMTDdlWDdxdUZ1MWJEeXZmT0F5MytXeWY4YSs3b0lXd0Y1YmY2?=
+ =?utf-8?B?V2FyL3J3THdwMGdtdnpZemgralFqSDQxeXhBZ0I5RlRnbHJ4WTFGaC9kM3FH?=
+ =?utf-8?B?UUovdm5rQ29hNkdXY1hKY1d0bm8zWVBKdkRleEYzZGp1N1VZNUI0eDZYZGUv?=
+ =?utf-8?B?a094K2dydFdtcmFjcUR4Z1VxUVd3b21iRFhrZFBybXllaUFpVUpHb2RqN1h2?=
+ =?utf-8?B?UlRhcDZjQzlwMVNaWGdVZThlcG9nNS9VMXdpMnRzRTRXUTROZURuUlNqWWQy?=
+ =?utf-8?B?VXczS2xDdnY4bkl0TDV3R3pXUXFZeFpyMzBZSWx4YW15dEVzSkNjbE1BQXhF?=
+ =?utf-8?B?d04za0ZYVzZwcldsZ3hNbWQzNHdDTmRhUC9kRWlaS0tkWnk1TmRzN0hRdVg2?=
+ =?utf-8?B?Z2krM0Vxb0pJN2hHdVhZajVwOEFFT2d3Q0R6bDBiRTU4Zkxrd2k4TkF5T2dP?=
+ =?utf-8?B?cWR0djZWdmZkQmpTYUx0cEFsaCt0TG14ZzJYNk55NHg0UXRpaldoS1F5Q3BD?=
+ =?utf-8?B?Q0pzSWNHYld1NDdrb2Z4YkNQN3hPbThVTnMvaHFmR3VuMmZpQmpZTm9iU3pB?=
+ =?utf-8?B?ZStLZ0tWa1YvVWxveW92WFQwZFdmTlpuUDNNVHNJSWdRVzZoRHJnQmw2eGxM?=
+ =?utf-8?B?ODN1OFkzS2s5V3VXS1p2bzZJaitCUHhObU52ZnhyNXR3dXByN2IzYmE4cXRa?=
+ =?utf-8?B?Z2NUSnQybDBsTjlndEZjdmVHYit0eWlscUIrdnM0bHpoRTFISVkyaFM0aDdI?=
+ =?utf-8?B?VnRPOXhwWjZRU0VhOVkyNE1PM1gyUEtWTElPSXY3TjhMTW1uamVFK1JmeFFu?=
+ =?utf-8?B?SU55K3ZSYXlmT05WdnNrSlVBS0oxMmxpSVo1VmRoaHpKVkN5eTVDSDM3UG0r?=
+ =?utf-8?B?M0JLMjRFV3NHTmFLNjZhelkrVHQ4dEJ4eXpGbk9sS0s0dmxuS0h3MklWZmVr?=
+ =?utf-8?B?QU43TnJ6Q1VUNEFJZFBWMmFGdHQvYXMzcnVRMjN6RmtWdHBvOEJUODdBRkdI?=
+ =?utf-8?B?RXozOVNabjNSYk5jT3Q5NVhhNDE1Kyt0dkJiQnc2dXVxNHpGd3ZHeUJ6cmk3?=
+ =?utf-8?B?NXZYWmZhUk9HbW9QUnlwRnROb29QNk1jSTFxRnAraWZpdFE3KzNrL2srVDND?=
+ =?utf-8?B?enloWTFFY05HblRUaVFGejRzeFhqZjZkZDdCZjFrWklhelRQN1UwT1BzSWFu?=
+ =?utf-8?B?TUI3SUtZL0JxUG55WkJkOVMxVjN0Skw1MzdCemRnZnI0MEJ0ZGFpQ0NlZTlt?=
+ =?utf-8?B?c0FLN1FVQ2FrNGt5L3o2SDNQL3NYWFRkVGYvVDR1ZkZrV09HbzdEMWMvK1Fq?=
+ =?utf-8?B?VVh3cFRjZHEwSC9WRVlBTDhWKzlMYmNlYjcwSkprTExhMXFEYjNoQ3NlUWM4?=
+ =?utf-8?B?Z0tZYTVjeFN0QWRISG1lQWJ6cy9hcFBzRWd6UlZkM09tdzhjSDNGY3NRVUdp?=
+ =?utf-8?B?a1EzQ3VNbSt4NkNSRlpkU3ppOXpUWW1WZUY1bmp0UkdPbzRxcE1jQkxNNXpw?=
+ =?utf-8?B?cjJVVE92aUdrY0JidTVsZjkzZnc0U2QveWdjbTBLVU5YQzIrdE5JMk1pQnc2?=
+ =?utf-8?B?U25zZXM1T2VlNm0xakQ4SDFEbjBXRHBHYjVLT3EwNEFiN0NCUnhzR00yMXlJ?=
+ =?utf-8?B?b0Jyb3lkUkhTbGJwSGFiOTJmZEIrbm9qNTl6emk1OGhjZlcyT3lLL0xYcXR3?=
+ =?utf-8?B?eWJiTEJ2Z0NKektvcEFNTUFSSDhJa2lsMVBRZjlGdVRRSnpsQVlhV0dzc0pB?=
+ =?utf-8?B?aUJSUmtsQXg0bENnT3pKMG1jOVNnOS9kNDBsR0VQaDFIcUtwVUE1b1ZEdzkw?=
+ =?utf-8?B?Y1BMREU5UTRlS0dMZitDSDhEd3V5K0x1VjA0MjFXcjFOYkRxQVNVUE9sMjcr?=
+ =?utf-8?B?UmxwWjZac1BQQUN4NkdpYW9JNFNHb3oydUljNUNoQldqeG91ZWcybjFMUVd3?=
+ =?utf-8?B?K29uUmplRW03WWRkTmFXeWRtU1RlbkpMeVlEZU9jWEp0d0tSU2VaZzRMMzQy?=
+ =?utf-8?B?K3d4RDlFZUJGQ3BTZVFMZ01PdzNtOHZSM2FpT0hTTWtYTVFBYzdXVjBDWGJn?=
+ =?utf-8?B?VEE9PQ==?=
+X-MS-Exchange-CrossTenant-Network-Message-Id: 3b5be28f-f840-457f-141a-08dd452eda1d
+X-MS-Exchange-CrossTenant-AuthSource: PH0PR11MB5949.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 04 Feb 2025 15:16:08.8240
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: YgDs2DlfXHjYUV6SLtqoraqWr8RjInLoy8reXu2nmo1OFH1zhG5cZHvNWajhLGPNwFV4iH+cE1IaE4AdogTGtsPLErCLZNkC/y79RpWVr7o=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SJ0PR11MB5939
+X-OriginatorOrg: intel.com
 
-On 04/02/2025 at 23:41, Eric Dumazet wrote:
-> On Tue, Feb 4, 2025 at 3:09 PM Vincent Mailhol
-> <mailhol.vincent@wanadoo.fr> wrote:
->>
->> +To: Jiri Pirko
->> +To: Jakub Kicinski
->> +CC: David S. Miller
->> +CC: Eric Dumazet
->> +CC: Paolo Abeni
->> +CC: Simon Horman
->> +CC: netdev@vger.kernel.org
->>
->> On 04/02/2025 at 16:44, YAN KANG wrote:
->>> Dear developers and maintainers,
->>>
->>> I found a new kernel  NULL-Pointer-Dereference bug titiled "general protection fault in devlink_info_serial_number_put" while using modified syzkaller fuzzing tool. I Itested it on the latest Linux upstream version (6.13.0-rc7)related to ETAS ES58X CAN/USB DRIVER, and it was able to be triggered.
->>>
->>> The bug info is:
->>>
->>> kernel revision: v6.13-rc7
->>> OOPS message: general protection fault in devlink_info_serial_number_put
->>> reproducer:YES
->>>
->>> After preliminary analysis,  The root casue may be :
->>> in the function:  es58x_devlink_info_get drivers/net/can/usb/etas_es58x/es58x_devlink.c
->>> es58x_dev->udev->serial   == NULL ,but no check for it.
->>>
->>>  devlink_info_serial_number_put(req, es58x_dev->udev->serial) triggers NPD .
->>>
->>> Fix suggestion: Check es58x_dev->udev->serial before deference pointer.
->>
->> Thanks for the report. I acknowledge the issue: the serial number of a
->> USB device may be NULL and I forget to check this condition.
->>
->> @netdev and devlink maintainers
->>
->> I can of course fix this locally, but this that this kind of issue looks
->> like some nasty pitfall to me. So, I was wondering if it wouldn't be
->> safer to add the NULL check in the framework instead of in the device.
->> The netlink is not part of the hot path, so a NULL check should not have
->> performance impacts.
->>
->> I am thinking of:
->>
->> diff --git a/include/net/netlink.h b/include/net/netlink.h
->> index e015ffbed819..eaee9a1aa91f 100644
->> --- a/include/net/netlink.h
->> +++ b/include/net/netlink.h
->> @@ -1617,6 +1617,8 @@ static inline int nla_put_sint(struct sk_buff
->> *skb, int attrtype, s64 value)
->>  static inline int nla_put_string(struct sk_buff *skb, int attrtype,
->>                                  const char *str)
->>  {
->> +       if (!str)
->> +               return 0;
->>         return nla_put(skb, attrtype, strlen(str) + 1, str);
->>  }
->>
->> Of course, it is also possible to do the check in
->> devlink_info_serial_number_put().
->>
->> What do you think?
+
+
+On 2/2/2025 7:08 PM, Piotr Wejman wrote:
+> Update the driver to the new hw timestamping API. >
+> Signed-off-by: Piotr Wejman <piotrwejman90@gmail.com>
+> ---
+>   drivers/net/ethernet/intel/e1000e/e1000.h  |  2 +-
+>   drivers/net/ethernet/intel/e1000e/netdev.c | 52 ++++++++--------------
+>   2 files changed, 20 insertions(+), 34 deletions(-)
 > 
-> Please fix the caller.
+> diff --git a/drivers/net/ethernet/intel/e1000e/e1000.h b/drivers/net/ethernet/intel/e1000e/e1000.h
+> index ba9c19e6994c..952898151565 100644
+> --- a/drivers/net/ethernet/intel/e1000e/e1000.h
+> +++ b/drivers/net/ethernet/intel/e1000e/e1000.h
+> @@ -319,7 +319,7 @@ struct e1000_adapter {
+>   	u16 tx_ring_count;
+>   	u16 rx_ring_count;
+>   
+> -	struct hwtstamp_config hwtstamp_config;
+> +	struct kernel_hwtstamp_config hwtstamp_config;
+>   	struct delayed_work systim_overflow_work;
+>   	struct sk_buff *tx_hwtstamp_skb;
+>   	unsigned long tx_hwtstamp_start;
+> diff --git a/drivers/net/ethernet/intel/e1000e/netdev.c b/drivers/net/ethernet/intel/e1000e/netdev.c
+> index 286155efcedf..15f0794afddd 100644
+> --- a/drivers/net/ethernet/intel/e1000e/netdev.c
+> +++ b/drivers/net/ethernet/intel/e1000e/netdev.c
+> @@ -3587,7 +3587,7 @@ s32 e1000e_get_base_timinca(struct e1000_adapter *adapter, u32 *timinca)
+>    * exception of "all V2 events regardless of level 2 or 4".
+>    **/
+>   static int e1000e_config_hwtstamp(struct e1000_adapter *adapter,
+> -				  struct hwtstamp_config *config)
+> +				  struct kernel_hwtstamp_config *config)
+>   {
+>   	struct e1000_hw *hw = &adapter->hw;
+>   	u32 tsync_tx_ctl = E1000_TSYNCTXCTL_ENABLED;
+> @@ -6140,7 +6140,8 @@ static int e1000_mii_ioctl(struct net_device *netdev, struct ifreq *ifr,
+>   /**
+>    * e1000e_hwtstamp_set - control hardware time stamping
+>    * @netdev: network interface device structure
+> - * @ifr: interface request
+> + * @config: timestamp configuration
+> + * @extack: netlink extended ACK report
+>    *
+>    * Outgoing time stamping can be enabled and disabled. Play nice and
+>    * disable it when requested, although it shouldn't cause any overhead
+> @@ -6153,20 +6154,18 @@ static int e1000_mii_ioctl(struct net_device *netdev, struct ifreq *ifr,
+>    * specified. Matching the kind of event packet is not supported, with the
+>    * exception of "all V2 events regardless of level 2 or 4".
+>    **/
+> -static int e1000e_hwtstamp_set(struct net_device *netdev, struct ifreq *ifr)
+> +static int e1000e_hwtstamp_set(struct net_device *netdev,
+> +			       struct kernel_hwtstamp_config *config,
+> +			       struct netlink_ext_ack *extack)
+>   {
+>   	struct e1000_adapter *adapter = netdev_priv(netdev);
+> -	struct hwtstamp_config config;
+>   	int ret_val;
+>   
+> -	if (copy_from_user(&config, ifr->ifr_data, sizeof(config)))
+> -		return -EFAULT;
+> -
+> -	ret_val = e1000e_config_hwtstamp(adapter, &config);
+> +	ret_val = e1000e_config_hwtstamp(adapter, config);
+>   	if (ret_val)
+>   		return ret_val;
+>   
+> -	switch (config.rx_filter) {
+> +	switch (config->rx_filter) {
+>   	case HWTSTAMP_FILTER_PTP_V2_L4_SYNC:
+>   	case HWTSTAMP_FILTER_PTP_V2_L2_SYNC:
+>   	case HWTSTAMP_FILTER_PTP_V2_SYNC:
+> @@ -6178,38 +6177,23 @@ static int e1000e_hwtstamp_set(struct net_device *netdev, struct ifreq *ifr)
+>   		 * by hardware so notify the caller the requested packets plus
+>   		 * some others are time stamped.
+>   		 */
+> -		config.rx_filter = HWTSTAMP_FILTER_SOME;
+> +		config->rx_filter = HWTSTAMP_FILTER_SOME;
+>   		break;
+>   	default:
+>   		break;
+>   	}
+>   
+> -	return copy_to_user(ifr->ifr_data, &config,
+> -			    sizeof(config)) ? -EFAULT : 0;
+> +	return 0;
+>   }
+>   
+> -static int e1000e_hwtstamp_get(struct net_device *netdev, struct ifreq *ifr)
+> +static int e1000e_hwtstamp_get(struct net_device *netdev,
+> +			       struct kernel_hwtstamp_config *kernel_config)
+>   {
+>   	struct e1000_adapter *adapter = netdev_priv(netdev);
+>   
+> -	return copy_to_user(ifr->ifr_data, &adapter->hwtstamp_config,
+> -			    sizeof(adapter->hwtstamp_config)) ? -EFAULT : 0;
+> -}
+> +	*kernel_config = adapter->hwtstamp_config;
+>   
+> -static int e1000_ioctl(struct net_device *netdev, struct ifreq *ifr, int cmd)
+> -{
+> -	switch (cmd) {
+> -	case SIOCGMIIPHY:
+> -	case SIOCGMIIREG:
+> -	case SIOCSMIIREG:
+> -		return e1000_mii_ioctl(netdev, ifr, cmd);
+> -	case SIOCSHWTSTAMP:
+> -		return e1000e_hwtstamp_set(netdev, ifr);
+> -	case SIOCGHWTSTAMP:
+> -		return e1000e_hwtstamp_get(netdev, ifr);
+> -	default:
+> -		return -EOPNOTSUPP;
+> -	}
+> +	return 0;
+>   }
+>   
+>   static int e1000_init_phy_wakeup(struct e1000_adapter *adapter, u32 wufc)
+> @@ -7337,7 +7321,7 @@ static const struct net_device_ops e1000e_netdev_ops = {
+>   	.ndo_set_rx_mode	= e1000e_set_rx_mode,
+>   	.ndo_set_mac_address	= e1000_set_mac,
+>   	.ndo_change_mtu		= e1000_change_mtu,
+> -	.ndo_eth_ioctl		= e1000_ioctl,
+> +	.ndo_eth_ioctl		= e1000_mii_ioctl,
+
+Now that you removed e1000_ioctl there is no reason to call this 
+function e1000_mii_ioctl.
+
+Please rename it to e1000_ioctl.
+
+>   	.ndo_tx_timeout		= e1000_tx_timeout,
+>   	.ndo_validate_addr	= eth_validate_addr,
+>   
+> @@ -7346,9 +7330,11 @@ static const struct net_device_ops e1000e_netdev_ops = {
+>   #ifdef CONFIG_NET_POLL_CONTROLLER
+>   	.ndo_poll_controller	= e1000_netpoll,
+>   #endif
+> -	.ndo_set_features = e1000_set_features,
+> -	.ndo_fix_features = e1000_fix_features,
+> +	.ndo_set_features	= e1000_set_features,
+> +	.ndo_fix_features	= e1000_fix_features,
+>   	.ndo_features_check	= passthru_features_check,
+> +	.ndo_hwtstamp_get	= e1000e_hwtstamp_get,
+> +	.ndo_hwtstamp_set	= e1000e_hwtstamp_set,
+>   };
+>   
+>   /**
 > 
-> nla_put_string() is not supposed to be called with a NULL str.
-> 
-> Next time, we will have someone adding a test about a NULL skb.
-> 
-> Adding such tests could hide real bugs.
-
-Understood. Thanks for the quick feedback, I will fix it locally.
-
-
-Yours sincerely,
-Vincent Mailhol
-
 
