@@ -1,346 +1,209 @@
-Return-Path: <netdev+bounces-162509-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-162510-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4FB5FA271F1
-	for <lists+netdev@lfdr.de>; Tue,  4 Feb 2025 13:41:11 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 584D2A271FC
+	for <lists+netdev@lfdr.de>; Tue,  4 Feb 2025 13:44:40 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 9F10E3A3C24
-	for <lists+netdev@lfdr.de>; Tue,  4 Feb 2025 12:41:02 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B517B3A3A60
+	for <lists+netdev@lfdr.de>; Tue,  4 Feb 2025 12:44:31 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7851C20D506;
-	Tue,  4 Feb 2025 12:36:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7C50420DD49;
+	Tue,  4 Feb 2025 12:40:16 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="PPQeBm1p"
+	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="SspTjdSx"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.14])
+Received: from NAM04-DM6-obe.outbound.protection.outlook.com (mail-dm6nam04on2073.outbound.protection.outlook.com [40.107.102.73])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DEEEB25A620;
-	Tue,  4 Feb 2025 12:36:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=198.175.65.14
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B5AD425A620
+	for <netdev@vger.kernel.org>; Tue,  4 Feb 2025 12:40:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.102.73
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1738672609; cv=fail; b=pInFESTrNRSJfvazJdZW36vZgfbujt2VZKhAa6pLx898txbErm/5wKcBNwK2ISoF+KPhPu3TO0/8WjfqLXIk7byXsFgcrKOAI4wx3eNTAOGsRSwbWO765CcLGdvTStkfTgNFg3oaCPSxlIvSdGFNf2ubdWKB+Zwo/QG9mk/akmo=
+	t=1738672816; cv=fail; b=ZNhbx6xiQFe9wRi07+m+wHLd4+Enl/elXWaS7bXfP+7NLKX8uPu+pwrIwDr8L0vQwJRp5EER81YeqgX7ZoerfxExTPo1K0utjwh21k8hHJryRVNf+66JuRV5xWiqOhmfD0p2QV+JX8o0159mDvS4R7oYUjGs3aYX9J0hnRASFXo=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1738672609; c=relaxed/simple;
-	bh=iDCQdpBiiCn8mqOsf+Br4X6kx0WzbjCtCfKdqKBSIaA=;
-	h=Date:From:To:CC:Subject:Message-ID:References:Content-Type:
-	 Content-Disposition:In-Reply-To:MIME-Version; b=Y0n0Vklch5hsKP6dNv1vjxY1aasPzsqylrtoNOA1Ww0A2py76QyPfSQ6f5qlSpE2BdWEGn53rpU/+bPvU9qjmwOdcWicCO6oX9sAMhH+Wh5c1N+e5//4igbqj9p0mRiOJHm0QrdXiJQJbOBFD/qg/F4rKBNeMHnEcJBwtsM8J8I=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=PPQeBm1p; arc=fail smtp.client-ip=198.175.65.14
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1738672607; x=1770208607;
-  h=date:from:to:cc:subject:message-id:references:
-   in-reply-to:mime-version;
-  bh=iDCQdpBiiCn8mqOsf+Br4X6kx0WzbjCtCfKdqKBSIaA=;
-  b=PPQeBm1pV4/wU4Xd4NhD3kwlWEyoE9ZEZ5jOqCx/GQRRN5OTMnRwlp9X
-   ydICfC89VhZUhUWzilACzoxGPAdBlIVlKIUfzHs+IVglJ9/zM2Xf5oLDK
-   wRTvau/txeMC1YLX6tPMo3EZScV1GwCDzWi2dhkW3lUCKJ0TNosl5F9Zs
-   DWS8Iuhtj0Bl7xFTZxMAjHBoyW0R43F/5Mdyw7F4n9LaFsEPU7ncKEa+q
-   ygVwnrj9YUUGsBm9/wByl68qdLGvF2XgwFZ7N013JxZRdLX3MA8qpsuQj
-   YXYgZoyiQBu+BF+SQCoYnm5SCOhXDRg6ZJl0/ZMwkt0FckBQKuIisqjv6
-   w==;
-X-CSE-ConnectionGUID: EBdLhY2hTuGlZpmi6+q/KA==
-X-CSE-MsgGUID: O9ZcyopRTlCcm+JQDeChvA==
-X-IronPort-AV: E=McAfee;i="6700,10204,11336"; a="42944733"
-X-IronPort-AV: E=Sophos;i="6.13,258,1732608000"; 
-   d="scan'208";a="42944733"
-Received: from fmviesa003.fm.intel.com ([10.60.135.143])
-  by orvoesa106.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 04 Feb 2025 04:36:46 -0800
-X-CSE-ConnectionGUID: 8fXdphAERX2bmMsvNKwj/A==
-X-CSE-MsgGUID: 13xTsSTyTEm9+m3PrSJGVw==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.12,224,1728975600"; 
-   d="scan'208";a="114640679"
-Received: from orsmsx603.amr.corp.intel.com ([10.22.229.16])
-  by fmviesa003.fm.intel.com with ESMTP/TLS/AES256-GCM-SHA384; 04 Feb 2025 04:36:45 -0800
-Received: from orsmsx601.amr.corp.intel.com (10.22.229.14) by
- ORSMSX603.amr.corp.intel.com (10.22.229.16) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.44; Tue, 4 Feb 2025 04:36:43 -0800
-Received: from ORSEDG601.ED.cps.intel.com (10.7.248.6) by
- orsmsx601.amr.corp.intel.com (10.22.229.14) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.44 via Frontend Transport; Tue, 4 Feb 2025 04:36:43 -0800
-Received: from NAM10-DM6-obe.outbound.protection.outlook.com (104.47.58.40) by
- edgegateway.intel.com (134.134.137.102) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.1.2507.44; Tue, 4 Feb 2025 04:36:43 -0800
+	s=arc-20240116; t=1738672816; c=relaxed/simple;
+	bh=IuTTxGjmfl/ooa6kIfUFrqzfs6cYmdRUdEMtHIkNPWM=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=Gq4ZiF0mGA7QnK1eovFmcLpTU/kEKO7U3DMFKMEfktcL7MqJ0XxtseCwneEhxnTcS/pWUN3SoQ7VXg+waz8kHBXmhrLSe7Tq/fHbEWF5IvkSh5wUzzMep8Jy5pMZPGjnDNttyJv39x2mr0uVCPML9vdGVWNZdevThJXPxyH2SgY=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=SspTjdSx; arc=fail smtp.client-ip=40.107.102.73
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=ffK+yJHkoDfGGHVE+u6/XAOysPKRQBfnBLzsiaHvblrS4sIKsm0NDe+UCbs4G1kinjsIaUl4QSnN8dYalG7kUUXI+Jdx2VBZz64jhopApipNlIlu0rd4ci6v4BIG6lzaIenJbUnkapvt15f+AsuciMBk7l8PjfBNU1C0kEidPFswvNjfZHdyG2Gls/GqNkQI3lMur9z/eY1D9FGprU+5y5RYMmzINhykyKmZCRMlJ/5pVo9PAxyWVlz7CsS3Oyg5Amc49UZRYozMYsJ6bEeF9FYCCxkD0HLked+p9rp6uls7swoCc+0cijJHZYqCgbhMc93crhNjBG1QI39bzaTRSA==
+ b=Pmmt1NZmXsKRbBAQyYza9EBUDH7U+a2YIhBUmG4rz0oxq0dybLdyPfXq+bXUbceVAAyBkBTPwEW16Qp3Bmb85je4RUQBcDVTKkyEsEj0k+bZHfV2akcu0tFntx16/VKZ/4v/n5FzV17tch47Lzc/LCUapxEJOuqsWbVgh9hKDDqjN1HtfXBdCT5crPSftoG2ykv2DhF0mZSVO6NvHpd4eRrRr5p0jODdW0e0pWPAawfnHGuxL3f+M+ocKQvj0/tmb24/fdpndqwl1vw1CfYf2BzpXvDrbI80LAtSSQ43xo/eJk/8mnaZX8EHw9FRjkKSH3Q+MkadjdssH+We0RuTTA==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector10001;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=bNlS5M3fzPl3P0X6NvEZsY0b7VVDvEC6HeaAYe6z1Fw=;
- b=p50MD4DCKvcB4UetJE3Ww9RFkDahE6Ty53fLTUPSaNX1p/1YwFYsyTPq0G/XoF9dmaw7SaXDgN1dhv1V+HyTLtcjYCCCWYjzAf0wosuOXNaidErX3SW+iq2DYNRNmnby0cLrggqypYBBRFtXL98cbJMxO4tHDD3NkkCa09a6SGiQ3iqg4xb74Kr7ilWUiJ9X3ewrZ1el9q/ggssYEovDeNqpLMXFuhBPEAHDXNI3q1q1a84+W30nGBjwjSZX4YiFBPUYdytZGlqlbyUIUuHBsyDtTO2zskJ26IeiATiPFU6qEMYURFUhST3kjRc875itQKnyiFgkHhMFWrpH/J2k/g==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
- dkim=pass header.d=intel.com; arc=none
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=intel.com;
-Received: from DM4PR11MB6117.namprd11.prod.outlook.com (2603:10b6:8:b3::19) by
- MN0PR11MB6278.namprd11.prod.outlook.com (2603:10b6:208:3c2::8) with Microsoft
+ bh=+0G6CvyJEpjOTYioHJFFjh+EtAA1uSfWOUinalJ7Ess=;
+ b=ccx7rFeSYg6U5sgLCLiNxHpv2lNVMHM2lddAdR8B4qfaCk8JTRE1YgaZb5FJDVfanfjBCDL6TDgPrzdtwDfZufkyqEID7qRc/UOgrm851a22gFnaUM+kVkxpQ2mxvphvg1LuPwZ0MtDZBva2FV8cOD24KMKWGNR6uJ2Inztx+HtmMR8GNyLIgCqZT6cxL97WXnuFXNpdPIGB7BksQ3Uzh5/jGOg21AqNW8FpqTDt9xnCEMMNgAgZuW4ip8JY6r0I0bsCdJ7P/UpNKovKbvck5ir/WxdEmeyy4WFoyqL0Kl4bzvoxFaD77DbyEMH6ZFKRkjcRIfTD8F1wd4IJK4MBVg==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
+ 216.228.117.160) smtp.rcpttodomain=vger.kernel.org smtp.mailfrom=nvidia.com;
+ dmarc=pass (p=reject sp=reject pct=100) action=none header.from=nvidia.com;
+ dkim=none (message not signed); arc=none (0)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=+0G6CvyJEpjOTYioHJFFjh+EtAA1uSfWOUinalJ7Ess=;
+ b=SspTjdSx1RKl2pPAd9jZ6mfklaGvAKN09vCWWT7tJRPeNpmz4jH2QDZ8Xt9cTTkhE/JQV7bNgLzsxyVNyvgvCZRWlVJdwmn0789Xw3jtcGFk/TaTJLCfvEWPF2QaxIlxA27v0CJMOLQuEwh0jLwYz6C9r3AUQ13rffWDNdBg48+vtLITpT7pIE5sdPMtPZtuk6A/NGe2uUZt34YNmpD5BBuYNqiYs0e6kRXDkYp/aL/JuwNB9jrVoUu5EJnjXHEcykzdf4aCwVAyP+tUtj9yyRgcZxfhlr677IB10tMoHy2ZVB9OuZ/OmcADBem9qdnUIh2j2wyivlAvFBu7nsL2RA==
+Received: from CH2PR14CA0030.namprd14.prod.outlook.com (2603:10b6:610:60::40)
+ by PH7PR12MB5879.namprd12.prod.outlook.com (2603:10b6:510:1d7::5) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8398.25; Tue, 4 Feb
+ 2025 12:40:11 +0000
+Received: from CH3PEPF00000016.namprd21.prod.outlook.com
+ (2603:10b6:610:60:cafe::61) by CH2PR14CA0030.outlook.office365.com
+ (2603:10b6:610:60::40) with Microsoft SMTP Server (version=TLS1_3,
+ cipher=TLS_AES_256_GCM_SHA384) id 15.20.8398.24 via Frontend Transport; Tue,
+ 4 Feb 2025 12:40:11 +0000
+X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 216.228.117.160)
+ smtp.mailfrom=nvidia.com; dkim=none (message not signed)
+ header.d=none;dmarc=pass action=none header.from=nvidia.com;
+Received-SPF: Pass (protection.outlook.com: domain of nvidia.com designates
+ 216.228.117.160 as permitted sender) receiver=protection.outlook.com;
+ client-ip=216.228.117.160; helo=mail.nvidia.com; pr=C
+Received: from mail.nvidia.com (216.228.117.160) by
+ CH3PEPF00000016.mail.protection.outlook.com (10.167.244.121) with Microsoft
  SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.8398.24; Tue, 4 Feb 2025 12:36:01 +0000
-Received: from DM4PR11MB6117.namprd11.prod.outlook.com
- ([fe80::d19:56fe:5841:77ca]) by DM4PR11MB6117.namprd11.prod.outlook.com
- ([fe80::d19:56fe:5841:77ca%5]) with mapi id 15.20.8398.021; Tue, 4 Feb 2025
- 12:36:01 +0000
-Date: Tue, 4 Feb 2025 13:35:50 +0100
-From: Maciej Fijalkowski <maciej.fijalkowski@intel.com>
-To: "Song, Yoong Siang" <yoong.siang.song@intel.com>
-CC: "David S . Miller" <davem@davemloft.net>, Eric Dumazet
-	<edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
-	<pabeni@redhat.com>, Simon Horman <horms@kernel.org>, Willem de Bruijn
-	<willemb@google.com>, "Bezdeka, Florian" <florian.bezdeka@siemens.com>,
-	Donald Hunter <donald.hunter@gmail.com>, Jonathan Corbet <corbet@lwn.net>,
-	Bjorn Topel <bjorn@kernel.org>, "Karlsson, Magnus"
-	<magnus.karlsson@intel.com>, Jonathan Lemon <jonathan.lemon@gmail.com>,
-	Andrew Lunn <andrew+netdev@lunn.ch>, Alexei Starovoitov <ast@kernel.org>,
-	Daniel Borkmann <daniel@iogearbox.net>, Jesper Dangaard Brouer
-	<hawk@kernel.org>, John Fastabend <john.fastabend@gmail.com>, "Damato, Joe"
-	<jdamato@fastly.com>, Stanislav Fomichev <sdf@fomichev.me>, Xuan Zhuo
-	<xuanzhuo@linux.alibaba.com>, Mina Almasry <almasrymina@google.com>, "Daniel
- Jurgens" <danielj@nvidia.com>, Andrii Nakryiko <andrii@kernel.org>, "Eduard
- Zingerman" <eddyz87@gmail.com>, Mykola Lysenko <mykolal@fb.com>, "Martin
- KaFai Lau" <martin.lau@linux.dev>, Song Liu <song@kernel.org>, Yonghong Song
-	<yonghong.song@linux.dev>, KP Singh <kpsingh@kernel.org>, Hao Luo
-	<haoluo@google.com>, Jiri Olsa <jolsa@kernel.org>, Shuah Khan
-	<shuah@kernel.org>, Alexandre Torgue <alexandre.torgue@foss.st.com>, "Jose
- Abreu" <joabreu@synopsys.com>, Maxime Coquelin <mcoquelin.stm32@gmail.com>,
-	"Nguyen, Anthony L" <anthony.l.nguyen@intel.com>, "Kitszel, Przemyslaw"
-	<przemyslaw.kitszel@intel.com>, Faizal Rahim
-	<faizal.abdul.rahim@linux.intel.com>, Choong Yong Liang
-	<yong.liang.choong@linux.intel.com>, "Bouska, Zdenek"
-	<zdenek.bouska@siemens.com>, "netdev@vger.kernel.org"
-	<netdev@vger.kernel.org>, "linux-kernel@vger.kernel.org"
-	<linux-kernel@vger.kernel.org>, "linux-doc@vger.kernel.org"
-	<linux-doc@vger.kernel.org>, "bpf@vger.kernel.org" <bpf@vger.kernel.org>,
-	"linux-kselftest@vger.kernel.org" <linux-kselftest@vger.kernel.org>,
-	"linux-stm32@st-md-mailman.stormreply.com"
-	<linux-stm32@st-md-mailman.stormreply.com>,
-	"linux-arm-kernel@lists.infradead.org"
-	<linux-arm-kernel@lists.infradead.org>, "intel-wired-lan@lists.osuosl.org"
-	<intel-wired-lan@lists.osuosl.org>, "xdp-hints@xdp-project.net"
-	<xdp-hints@xdp-project.net>
-Subject: Re: [PATCH bpf-next v7 4/5] igc: Refactor empty packet insertion
- into a reusable function
-Message-ID: <Z6IJppEFhSzMbmi9@boxer>
-References: <20250204004907.789330-1-yoong.siang.song@intel.com>
- <20250204004907.789330-5-yoong.siang.song@intel.com>
- <Z6Hi5G0ngTnb7lb/@boxer>
- <PH0PR11MB58306CEAFF46FD493030943BD8F42@PH0PR11MB5830.namprd11.prod.outlook.com>
-Content-Type: text/plain; charset="us-ascii"
-Content-Disposition: inline
-In-Reply-To: <PH0PR11MB58306CEAFF46FD493030943BD8F42@PH0PR11MB5830.namprd11.prod.outlook.com>
-X-ClientProxiedBy: DUZP191CA0035.EURP191.PROD.OUTLOOK.COM
- (2603:10a6:10:4f8::27) To DM4PR11MB6117.namprd11.prod.outlook.com
- (2603:10b6:8:b3::19)
+ 15.20.8445.2 via Frontend Transport; Tue, 4 Feb 2025 12:40:10 +0000
+Received: from rnnvmail201.nvidia.com (10.129.68.8) by mail.nvidia.com
+ (10.129.200.66) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.4; Tue, 4 Feb 2025
+ 04:39:58 -0800
+Received: from shredder.mtl.com (10.126.231.35) by rnnvmail201.nvidia.com
+ (10.129.68.8) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.14; Tue, 4 Feb
+ 2025 04:39:54 -0800
+From: Ido Schimmel <idosch@nvidia.com>
+To: <netdev@vger.kernel.org>
+CC: <davem@davemloft.net>, <kuba@kernel.org>, <pabeni@redhat.com>,
+	<edumazet@google.com>, <horms@kernel.org>, <amirva@mellanox.com>,
+	<petrm@nvidia.com>, <joe@atomic.ac>, Ido Schimmel <idosch@nvidia.com>
+Subject: [PATCH net] net: sched: Fix truncation of offloaded action statistics
+Date: Tue, 4 Feb 2025 14:38:39 +0200
+Message-ID: <20250204123839.1151804-1-idosch@nvidia.com>
+X-Mailer: git-send-email 2.48.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-ClientProxiedBy: rnnvmail201.nvidia.com (10.129.68.8) To
+ rnnvmail201.nvidia.com (10.129.68.8)
+X-EOPAttributedMessage: 0
 X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: DM4PR11MB6117:EE_|MN0PR11MB6278:EE_
-X-MS-Office365-Filtering-Correlation-Id: c10a7034-2bdd-4db4-be1e-08dd45187b64
-X-LD-Processed: 46c98d88-e344-4ed4-8496-4ed7712e255d,ExtAddr
+X-MS-TrafficTypeDiagnostic: CH3PEPF00000016:EE_|PH7PR12MB5879:EE_
+X-MS-Office365-Filtering-Correlation-Id: f7c93ac4-8832-4fef-c6ef-08dd4519108f
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;ARA:13230040|1800799024|7416014|376014|366016;
-X-Microsoft-Antispam-Message-Info: =?us-ascii?Q?igZwTfs0vLtZkKP217Iwc8wLWa1oS7Qb0IpuEwdzbOqL/cKEGT3uxil7QhdZ?=
- =?us-ascii?Q?PEIOaxOydWePSe4va92hQnyJRWM2FWw05iRL3seDsGVfGVjIeoTgRSULMwBF?=
- =?us-ascii?Q?epTEP3iEXSfd7Wjoh46ftQcb3iyuaaGpPQKzISa9LvVTI/DqdsppQEDJBgvK?=
- =?us-ascii?Q?RJUokTfETJSAFI3GOkhvgSTXDvmta6I/4siw7t0M8nP15mTLgGdAwJ/awgAl?=
- =?us-ascii?Q?7chEfXNeyBaLuIXeSJM39RY7VYGWg4aBE7ZshTiVx7zpOEdkdmhqrGLIerBX?=
- =?us-ascii?Q?S+XMor5hmdseoQoxn4ZfzSR5fOmu3n1jYkVso2NLU+q+yxHUzQtMJf3cTdDe?=
- =?us-ascii?Q?c8jsIF3Jcg/YYBG7kA0o/QXeZ0bDEVFktO4nGWtENSA3BRUsZcC/N0cX2T/m?=
- =?us-ascii?Q?ShxnWXJ0Z+XzyqdmMoT+QUWO3yFXFeyJfhNVWajoIe8t9Wtc2LUHXtsTl+wB?=
- =?us-ascii?Q?i9tMLSbI0CqSn6GFrM1GcaRwn+N1mwJpX88R2mAcMl6a82n4H5iHnyn3VlV6?=
- =?us-ascii?Q?UsAwmYnECA/UAuis7hV1V02Ro1/0/F+Nw2a/lQkr9+DwrEjI4dMMkUQ3PQnh?=
- =?us-ascii?Q?fEP5ULw13gUnsvI++XYa/xI1/UbYdc3sQtqWaRSACEyBIVraAmpfWilVeLfN?=
- =?us-ascii?Q?fb7y4Ri4Fp5O91X5wAUtM2i1aIbGz4RQ3/k830fmgIr6pLW5udqiP2AEZjfJ?=
- =?us-ascii?Q?fwOj5xupfp7zFl4JdjG3AAf792ONhM+OQxc5yZ1KIhY/YxHj8eSPRcXCAaPP?=
- =?us-ascii?Q?/5+jp4cufEN+PP36+3FVlEmjmGd111DsJYSDmXuEOMSTSc9HP2D8w7Q7HxAT?=
- =?us-ascii?Q?eB4lYLU823x7w3Aw3lfj3GUj7EkNgXJ/8S0OpWHMoKTxTGYWUteW6GHo7Y2u?=
- =?us-ascii?Q?V24rq5RW9NNfqtbHjuWl2AU4MeKsLNbgV7UKafZAxkvT2HB1eb/AflX0kcAo?=
- =?us-ascii?Q?918zOXpw9fAjeepDX2RtxHORKGJJ9p5EO7Rd4elEvyvnKcOFpdpG1/9+s+pP?=
- =?us-ascii?Q?a3RiBGoHpwiVBhwFLgnQhaoY7bSxn+v3BBcM3IoLcPwPd6SadI8QFltDKcmD?=
- =?us-ascii?Q?O3x9Knex2jMLwsdsAS0OrpI5NPGvTcd5GYlGpvBnDbKADJJw7etD0Sssfn2d?=
- =?us-ascii?Q?O5lWegSarV9zpN2VOofqByBSGG7rW6JuDugTnsTWU89mVfIX2Cv0BiH+289c?=
- =?us-ascii?Q?4eYCYunVJS/sBKVxykHioAS+HQKxHVNmeyM1yIt7qXdeY+A05Qw7pfIb/4KW?=
- =?us-ascii?Q?+9mTt/oB6/o2Kina8gwuWugd/1Il9BpVZaOn6QbR16fzOYp22xIcF4PAlwyP?=
- =?us-ascii?Q?cVmqKxNSlZ3tbPQwVChVAgeeV8sFA6fBpPSYdkwn7mZo7zT1X9o+Z90ORvk6?=
- =?us-ascii?Q?SK4G0J7uODOJFsxL6G9pZR9GZkW3?=
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DM4PR11MB6117.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(1800799024)(7416014)(376014)(366016);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?LuJ1qH4Ze9FMAZkr3pIniT0ySlGSPFbJKzAoDyg5esotrh0hNcPrHZDfmGDK?=
- =?us-ascii?Q?v3utsjtU/SWKyZYlZZrfm5unot7nTMoK/il39GLTAKqn0efIl+GWqBDWt1mk?=
- =?us-ascii?Q?BLARNsHPGkurm8AItl+aGIWTuCuB80o2KIpmbeVgOh7lgmK+ldnr3mmbMg5/?=
- =?us-ascii?Q?Ds17aBFWfQFcfRzgFpiPtCtvsQKugHWR3soCjk0ybxwBkFjamxkJUO6RQCdH?=
- =?us-ascii?Q?5ur9R9fu8EDmKiYnnrsw8hPts3zeNT+mvb/PRP5KECy8Zrxs4b0YWOW3Gw38?=
- =?us-ascii?Q?QNUmlRue7oi0fi4jpBjIcb8y86OOGBhTq77MzXXX0XwCN+kbcb9uxGYnj29h?=
- =?us-ascii?Q?W/6dNdjserylo4HdPP2yPn0vWdy495dFyWCMCWp+W/wN59quUfUo2l6sbhVn?=
- =?us-ascii?Q?AzHOcDlRLgP19Sqo/qbokPQyUtTeczERFIoPezCRpkMTi4TawyctUQx+tFTx?=
- =?us-ascii?Q?aCoc/30EaLguA7IM/3qo5DjdpGAS5E7Uw+waJBWjZXTKvr7WTU4zvl7lg18u?=
- =?us-ascii?Q?pRcD+A5DuDLOdOuXiYpq0d0ZU2USA+n2eEc3FSls3TQp0EyJAXfKqINReCzp?=
- =?us-ascii?Q?tIUwEaar+8U2/3V8YNBoHrTzi+pD/OQoVH8Z4/o9+nFKMxdwunDcusTsEkDs?=
- =?us-ascii?Q?hGca+PIckhfk0x1Juy4j0067O6QaeqHFhdoEYPjiZVjnBqyy+K8Jp9gXLQ9A?=
- =?us-ascii?Q?cm3eR7RM+QNoE7gwEVU8IRAjYp4dRoHdMC/Dm+gM4qsYN//5Cy8XOj3JAEEQ?=
- =?us-ascii?Q?RMit+iY1UWkfcVAFzSll25x3ZPacXGVQMqP4prx9pEhpIBivv9yiV6YVdqK/?=
- =?us-ascii?Q?BQFqWbrZVF9fXdjk4mcz9lOOnTpJ1zv6gC0auBAHEtTO91EK9G3KgH8q4p0x?=
- =?us-ascii?Q?MvAAj1GEQT0ie6V+zqlgqyhPAdiUTlWq3v3drhRS6xRE4hD/G5g/REU5qB3k?=
- =?us-ascii?Q?S39Y4XDNnMXmUyhX5tsgwk1ftM8hKoZBhb4FqicfPrMkaq0n2k9QJy/UKTU2?=
- =?us-ascii?Q?71MCyh0E4ENdyYPrZfpffvMvZbq8+yXra8ur9V/e35yFe7r/mA0nq997THPr?=
- =?us-ascii?Q?4JlzdrbbkibcyZEnheYZQzS7Np5xUjiekLr1ZOhvEbj+KZNoawKVVkAikD8e?=
- =?us-ascii?Q?w3kxJHcJd7f2jiZfidNzWn7yjh9LG1mM0wR5JcjIuwWuJYF6IbivvUDuxsH9?=
- =?us-ascii?Q?65SS6GTZBvP0VoU1soFfXQcrMuYFP3vZwNa+ziajLyl1ul9Aa0yLB6wHnUVQ?=
- =?us-ascii?Q?2xCBteLvORShNVAmLzENk3pVpDzoK4YtaIRD+mX7SlaA6dNr1MQjOygtUz+K?=
- =?us-ascii?Q?DVIPWTd4cQGKHKvMN/ERpzIVN8XlkggfqjtUBM8niccBXYsaOl9+98iOsv1U?=
- =?us-ascii?Q?vd8FpXeAgpgN91d6Irz4fc8jNlIpT9ewxC6Z2uZC5l92LQ2Uj7PcZRjYnhwo?=
- =?us-ascii?Q?AH6qcaDmgETdrzPVQioPTXjhLJBmtcX6bu1byJrQP5aF1WM0XbdRZX9FRDzO?=
- =?us-ascii?Q?7paTOpdDhWIJhBcvyytzkRMRyuuDoTRmWwel96Ms+T5eok4hJT2LxO7gQY6U?=
- =?us-ascii?Q?k6GlrvRxI05z9BgwtHqm4E2cpXD3TyUAVg5+C2ihygbYyEr4K0pvRGwGvXvt?=
- =?us-ascii?Q?JA=3D=3D?=
-X-MS-Exchange-CrossTenant-Network-Message-Id: c10a7034-2bdd-4db4-be1e-08dd45187b64
-X-MS-Exchange-CrossTenant-AuthSource: DM4PR11MB6117.namprd11.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 04 Feb 2025 12:36:00.9520
+X-Microsoft-Antispam:
+	BCL:0;ARA:13230040|36860700013|82310400026|376014|1800799024;
+X-Microsoft-Antispam-Message-Info:
+	=?us-ascii?Q?YgJfocfFglu9RDCw4GExiGlU/rgBv+9f5+m7XdnTu/tQExK8DeKr+an6pPCj?=
+ =?us-ascii?Q?X0vrmrntLVhVKRhmnxrfLaGNViMx/vHhJGzyCe6wxnTMul1eqCSgBdCwB6XW?=
+ =?us-ascii?Q?0Dgqj5yBpWR/ApAn33Iq5WgnDsUp33EGpeOEvJPxHu7ipjAczGmzpru6XdXE?=
+ =?us-ascii?Q?QQyMr4MLjnOTX/Xco3MSC2fs2QGZIanIzoqD7NCYh4Ids1cDD6z3qs1amG3s?=
+ =?us-ascii?Q?9VywnEQ7tzvSMSaWkkUwVwA28l3RBRYXcX5vYy0FJCvGFFMNCJULGG90jPZT?=
+ =?us-ascii?Q?/hzR5vNm/u0tz6DWdcXAZxBWon6gSGrQfML6aZ0pwzFUsXx93CfGp6hNkUxk?=
+ =?us-ascii?Q?zrJhPXCbq+9ju1hBXz6d7HtgwB59fvUxjpCt/vikKimrHPRz7JjxA8imY3HI?=
+ =?us-ascii?Q?3iMN/WH/I4yQztrmSjcSVGgDKo/CyyK0irgL7Za2karafXDSyeL8Ph4vNUnr?=
+ =?us-ascii?Q?XL08KOxvx+lLx5K4zI5vaHdbTgAumrjMxoGMUh5L1m0BHxAvV0/+W5yaZagU?=
+ =?us-ascii?Q?yF+COXdtQfU1woqyHtPU+/XZNefpEGi4LZE4lQqpGjUclvvdMKwDbmFNWNaV?=
+ =?us-ascii?Q?MyD0kaotYkglfIfptp3X1LPRTcEx+o6ctL3fB+IsZajto5VRM2FlCbJyok9k?=
+ =?us-ascii?Q?SXDddvI9N27Xu3lTehwLljFVpBMnyFTFLU7nHABHxhbX4cjEG5Pa1lAdIRY0?=
+ =?us-ascii?Q?+8nOTCe8rtxjzzXYUfmgjOVpq7XRCZz6ghV/2AchQOkKwSpU2+yaZrmE4/gD?=
+ =?us-ascii?Q?cZNBvIOZ5QuVi1dV1HDV1RqLHMkuHdwABxPxkV600Z7WElz2RFGZPXJZ04MG?=
+ =?us-ascii?Q?RWvywAfzXTaViRkAMYshSUvyTPxXnOmvhNrEtqJp200k5u6S3mjBbdCvT2Ai?=
+ =?us-ascii?Q?lsi6it/xDX5AeR71HXOEJs/c7L6qVDaDZIFIYmZbnIk+dj3FL8ame3eHFsVt?=
+ =?us-ascii?Q?aXS87/sjfpQ3LF7xyoE3xfYX0mYCF5gfkKg7Wt5uUMOndzlTyYDAxu8jmtER?=
+ =?us-ascii?Q?D5yUyCjOACDhJfBXE5cgc+fIddHL/Psr2HNRxIPiFTEIqjnkrJtTeniLWLuJ?=
+ =?us-ascii?Q?ZH4RtWlaP9a5CDM8CYygzWUmFm9Z2USupWnpyfaVZhUwuICQgzQbZ1x7U458?=
+ =?us-ascii?Q?/fs52TO2dhuhJ1Mr7FyzZOUkvHTKETxNoAwuqvIgOiNHCm7BtEgVlRzPQ2iL?=
+ =?us-ascii?Q?ki8/vECCpL5K+Ftu44sX6QUv7qea2GSjHOV3IBi2Lab6WkpPvdZfmQjXK7f1?=
+ =?us-ascii?Q?rAZiJNHh9Pol7TcucMwBR78HSl5h2bRR7L1/b5oyPwdWWn8DfxPizWivsPpX?=
+ =?us-ascii?Q?HSCgnFUerwMwZ1kA/HMtrRAGt9tpDE4WQsiB/oyDVQnCZKkbkngfw+ueU870?=
+ =?us-ascii?Q?MuTBfN/iwDWPuwyhFJqyl/HnQUIZFQxV9+wIGGa2hNMDiZEinWus09P4lku9?=
+ =?us-ascii?Q?XWWy1icf6X+O/YWtRkWfrcHs/MlPCI7sb90ADr9pbhktBEFj6d77gAaflKK9?=
+ =?us-ascii?Q?FhtJypi0ILFJnyI=3D?=
+X-Forefront-Antispam-Report:
+	CIP:216.228.117.160;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:dc6edge1.nvidia.com;CAT:NONE;SFS:(13230040)(36860700013)(82310400026)(376014)(1800799024);DIR:OUT;SFP:1101;
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 04 Feb 2025 12:40:10.9429
  (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: PSBdPB9+MU3pploiVaeSrZXgfT7cu1IZZjSAldxMp8SoSQHoamAAb6IDNRyf3nMmpDk3NAefq4q0iPnetfY7UnfBd/2FH3ydJbNdqub6obU=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: MN0PR11MB6278
-X-OriginatorOrg: intel.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: f7c93ac4-8832-4fef-c6ef-08dd4519108f
+X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[216.228.117.160];Helo=[mail.nvidia.com]
+X-MS-Exchange-CrossTenant-AuthSource:
+	CH3PEPF00000016.namprd21.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Anonymous
+X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH7PR12MB5879
 
-On Tue, Feb 04, 2025 at 12:07:21PM +0100, Song, Yoong Siang wrote:
-> On Tuesday, February 4, 2025 5:50 PM, Fijalkowski, Maciej <maciej.fijalkowski@intel.com> wrote:
-> >On Tue, Feb 04, 2025 at 08:49:06AM +0800, Song Yoong Siang wrote:
-> >> Refactor the code for inserting an empty packet into a new function
-> >> igc_insert_empty_packet(). This change extracts the logic for inserting
-> >> an empty packet from igc_xmit_frame_ring() into a separate function,
-> >> allowing it to be reused in future implementations, such as the XDP
-> >> zero copy transmit function.
-> >>
-> >> This patch introduces no functional changes.
-> >>
-> >> Signed-off-by: Song Yoong Siang <yoong.siang.song@intel.com>
-> >> ---
-> >>  drivers/net/ethernet/intel/igc/igc_main.c | 42 ++++++++++++-----------
-> >>  1 file changed, 22 insertions(+), 20 deletions(-)
-> >>
-> >> diff --git a/drivers/net/ethernet/intel/igc/igc_main.c
-> >b/drivers/net/ethernet/intel/igc/igc_main.c
-> >> index 56a35d58e7a6..c3edd8bcf633 100644
-> >> --- a/drivers/net/ethernet/intel/igc/igc_main.c
-> >> +++ b/drivers/net/ethernet/intel/igc/igc_main.c
-> >> @@ -1566,6 +1566,26 @@ static bool igc_request_tx_tstamp(struct igc_adapter
-> >*adapter, struct sk_buff *s
-> >>  	return false;
-> >>  }
-> >>
-> >> +static void igc_insert_empty_packet(struct igc_ring *tx_ring)
-> >> +{
-> >> +	struct igc_tx_buffer *empty_info;
-> >> +	struct sk_buff *empty;
-> >> +	void *data;
-> >> +
-> >> +	empty_info = &tx_ring->tx_buffer_info[tx_ring->next_to_use];
-> >> +	empty = alloc_skb(IGC_EMPTY_FRAME_SIZE, GFP_ATOMIC);
-> >> +	if (!empty)
-> >> +		return;
-> >> +
-> >> +	data = skb_put(empty, IGC_EMPTY_FRAME_SIZE);
-> >> +	memset(data, 0, IGC_EMPTY_FRAME_SIZE);
-> >> +
-> >> +	igc_tx_ctxtdesc(tx_ring, 0, false, 0, 0, 0);
-> >> +
-> >> +	if (igc_init_tx_empty_descriptor(tx_ring, empty, empty_info) < 0)
-> >> +		dev_kfree_skb_any(empty);
-> >> +}
-> >> +
-> >>  static netdev_tx_t igc_xmit_frame_ring(struct sk_buff *skb,
-> >>  				       struct igc_ring *tx_ring)
-> >>  {
-> >> @@ -1603,26 +1623,8 @@ static netdev_tx_t igc_xmit_frame_ring(struct
-> >sk_buff *skb,
-> >>  	skb->tstamp = ktime_set(0, 0);
-> >>  	launch_time = igc_tx_launchtime(tx_ring, txtime, &first_flag,
-> >&insert_empty);
-> >>
-> >> -	if (insert_empty) {
-> >> -		struct igc_tx_buffer *empty_info;
-> >> -		struct sk_buff *empty;
-> >> -		void *data;
-> >> -
-> >> -		empty_info = &tx_ring->tx_buffer_info[tx_ring->next_to_use];
-> >> -		empty = alloc_skb(IGC_EMPTY_FRAME_SIZE, GFP_ATOMIC);
-> >> -		if (!empty)
-> >> -			goto done;
-> >
-> >shouldn't this be 'goto drop' from day 1? pretty weird to silently ignore
-> >allocation error.
-> >
-> 
-> Hi Fijalkowski Maciej,
-> 
-> Thanks for your comments.
-> 
-> "insert an empty packet" is a launch time trick to send a packet in
-> next Qbv cycle. The design is, the driver will still sending the
-> packet, even the empty packet insertion trick is fail (unable to
-> allocate). The intention of this patch set is to enable launch time
-> on XDP zero-copy data path, so I try not to change the original
-> behavior of launch time.
-> 
-> btw, do you think driver should drop the packet if something went
-> wrong with the launch time, like launch time offload not enabled,
-> launch time over horizon, empty packet insertion fail, etc?
-> If yes, then maybe i can submit another patch to change the behavior
-> of launch time and we can continue to discuss there.
+In case of tc offload, when user space queries the kernel for tc action
+statistics, tc will query the offloaded statistics from device drivers.
+Among other statistics, drivers are expected to pass the number of
+packets that hit the action since the last query as a 64-bit number.
 
-That's rather a question to you since I am no TSN expert here :P
-the alloc skbs failures would rather be a minor thing but anyways it
-didn't look correct from a first glance to silently ignore this behavior
-if rest of the logic relies on this. I won't be insisting on any changes
-here but it's something you could consider to change maybe.
+Unfortunately, tc treats the number of packets as a 32-bit number,
+leading to truncation and incorrect statistics when the number of
+packets since the last query exceeds 0xffffffff:
 
-The real question is in 5/5, regarding the cleaning of these empty descs
-from ZC path.
+$ tc -s filter show dev swp2 ingress
+filter protocol all pref 1 flower chain 0
+filter protocol all pref 1 flower chain 0 handle 0x1
+  skip_sw
+  in_hw in_hw_count 1
+        action order 1: mirred (Egress Redirect to device swp1) stolen
+        index 1 ref 1 bind 1 installed 58 sec used 0 sec
+        Action statistics:
+        Sent 1133877034176 bytes 536959475 pkt (dropped 0, overlimits 0 requeues 0)
+[...]
 
-> 
-> >> -
-> >> -		data = skb_put(empty, IGC_EMPTY_FRAME_SIZE);
-> >> -		memset(data, 0, IGC_EMPTY_FRAME_SIZE);
-> >> -
-> >> -		igc_tx_ctxtdesc(tx_ring, 0, false, 0, 0, 0);
-> >> -
-> >> -		if (igc_init_tx_empty_descriptor(tx_ring,
-> >> -						 empty,
-> >> -						 empty_info) < 0)
-> >> -			dev_kfree_skb_any(empty);
-> >
-> >ditto
-> >
-> 
-> ditto
-> 
-> >> -	}
-> >> +	if (insert_empty)
-> >> +		igc_insert_empty_packet(tx_ring);
-> >>
-> >>  done:
-> >>  	/* record the location of the first descriptor for this packet */
-> >> --
-> >> 2.34.1
-> >>
-> 
-> Thanks & Regards
-> Siang
+According to the above, 2111-byte packets were redirected which is
+impossible as only 64-byte packets were transmitted and the MTU was
+1500.
+
+Fix by treating packets as a 64-bit number:
+
+$ tc -s filter show dev swp2 ingress
+filter protocol all pref 1 flower chain 0
+filter protocol all pref 1 flower chain 0 handle 0x1
+  skip_sw
+  in_hw in_hw_count 1
+        action order 1: mirred (Egress Redirect to device swp1) stolen
+        index 1 ref 1 bind 1 installed 61 sec used 0 sec
+        Action statistics:
+        Sent 1370624380864 bytes 21416005951 pkt (dropped 0, overlimits 0 requeues 0)
+[...]
+
+Which shows that only 64-byte packets were redirected (1370624380864 /
+21416005951 = 64).
+
+Fixes: 380407023526 ("net/sched: Enable netdev drivers to update statistics of offloaded actions")
+Reported-by: Joe Botha <joe@atomic.ac>
+Signed-off-by: Ido Schimmel <idosch@nvidia.com>
+Reviewed-by: Petr Machata <petrm@nvidia.com>
+---
+ include/net/sch_generic.h | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/include/net/sch_generic.h b/include/net/sch_generic.h
+index d635c5b47eba..d48c657191cd 100644
+--- a/include/net/sch_generic.h
++++ b/include/net/sch_generic.h
+@@ -851,7 +851,7 @@ static inline int qdisc_enqueue(struct sk_buff *skb, struct Qdisc *sch,
+ }
+ 
+ static inline void _bstats_update(struct gnet_stats_basic_sync *bstats,
+-				  __u64 bytes, __u32 packets)
++				  __u64 bytes, __u64 packets)
+ {
+ 	u64_stats_update_begin(&bstats->syncp);
+ 	u64_stats_add(&bstats->bytes, bytes);
+-- 
+2.48.1
+
 
