@@ -1,121 +1,110 @@
-Return-Path: <netdev+bounces-162621-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-162622-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id B0209A27666
-	for <lists+netdev@lfdr.de>; Tue,  4 Feb 2025 16:48:26 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id C9B90A27692
+	for <lists+netdev@lfdr.de>; Tue,  4 Feb 2025 16:56:50 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 78BD91884E82
-	for <lists+netdev@lfdr.de>; Tue,  4 Feb 2025 15:48:26 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 5906F1661FA
+	for <lists+netdev@lfdr.de>; Tue,  4 Feb 2025 15:56:49 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EDB152144D5;
-	Tue,  4 Feb 2025 15:48:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 53305215067;
+	Tue,  4 Feb 2025 15:56:25 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="gXMK+lMW"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="jtWWdq/C"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wr1-f46.google.com (mail-wr1-f46.google.com [209.85.221.46])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 31F2C1D7985
-	for <netdev@vger.kernel.org>; Tue,  4 Feb 2025 15:48:10 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 899C521422A;
+	Tue,  4 Feb 2025 15:56:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.46
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1738684092; cv=none; b=Z3oTsjrwMmKxv1hfZMz740/j5zcdnwQjGCjW2nmemQjfPB3LLwu681IifBQQT6xMtvQr8TWwcK0Q7Q5zJfREgsAmQ5VUOPQeQthvoSEfsozTzr+EiVY71ayF8AQ9UR8r1kTkqQkREKF4Z0j78XXgmJrDsjCWTdeotBpj5L02ArY=
+	t=1738684585; cv=none; b=bTEkXV+cwEq6Rb1PeMPuRn2DoDWm4SAK9OulbnPFxWIbVI49qoRu8ax+3N/8z1/3rL+A9RV9ke2OB1nCCtClKV/OGNQRlu+gOqZEexKk7IhkQxpavBvUDxcAKMyGTh0wL1kR560Bi+QSGkSlVxrJ8ad7bZeOl2KSRxGKka9Xbpk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1738684092; c=relaxed/simple;
-	bh=l5UpGSk0PncT3wUvfexG3N64B/AGWb+EB2VeOyFb3Hk=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=X576ap8R95sggmB+Ad24f+2zSJBJRKGZh2R5UOxEFIRLXXto7HPGzcVp7AkN2vvE7FEsDjmqJ44y4bIUSbUQVI6IF5AIpqSQtng/iyK+tkxWiJ4VaYWWelvgZsMuOJylFfQJ7cFA8rYKTsfbAgNWOrsMKrvhZCjUMzsmv93jq88=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=gXMK+lMW; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1738684089;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=MhEwMtTJZmwbLWz5lbGdgRchfAWadiHGqAUa1uhiTQc=;
-	b=gXMK+lMWY4ZgnySLhC8p2AdBHC7/KJWEQPpGiLVvTJRWA4+LKwnw0nDRWT30yKYdi46zTA
-	fPhZ+Xoo7+hBohFWrDlOQrmbDTyXKdkptgzwm5USqVCA4qZlKg8jwINijelEXHDBhkLVsq
-	mwGs5H195ITIDPMAQDooiRKKERINcj4=
-Received: from mail-wm1-f69.google.com (mail-wm1-f69.google.com
- [209.85.128.69]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-301-6Cvc9_VKNQygsBIi381ULQ-1; Tue, 04 Feb 2025 10:48:08 -0500
-X-MC-Unique: 6Cvc9_VKNQygsBIi381ULQ-1
-X-Mimecast-MFC-AGG-ID: 6Cvc9_VKNQygsBIi381ULQ
-Received: by mail-wm1-f69.google.com with SMTP id 5b1f17b1804b1-4361a8fc3bdso29082595e9.2
-        for <netdev@vger.kernel.org>; Tue, 04 Feb 2025 07:48:08 -0800 (PST)
+	s=arc-20240116; t=1738684585; c=relaxed/simple;
+	bh=ZRZGMcls0L0IUxLjtGWCAK6sueHWf782aRTQf9r6r/A=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=a0qrVNjbcgSPFTomu/QYkJxCYEvnj7xDvJ2bhhXCQ4whF94HSF+Jy3EmQ27s0MXIPI5Kqn7r2msdq5QMkgEahs5YV2P/j2lHP4wMMZZQAFIZjLk/BaWTWpuQ/2OJfjaOSNpvFbDbwAm4NCGj8mcKwF2KKlNvg+T/e3V5r/T+L9A=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=jtWWdq/C; arc=none smtp.client-ip=209.85.221.46
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-wr1-f46.google.com with SMTP id ffacd0b85a97d-385f06d0c8eso3164225f8f.0;
+        Tue, 04 Feb 2025 07:56:23 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1738684582; x=1739289382; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=ZRZGMcls0L0IUxLjtGWCAK6sueHWf782aRTQf9r6r/A=;
+        b=jtWWdq/C8UZKECux9w3ccw2MdPtsthDGmtcNwTx54Y5N9aJEkTHVZB0KSYMANA0uj4
+         WC174oGVPCaB484b7dhFDGReros6BXWdXZfKCyP0yZQgazfWYdtcVfXmi74TTIpOPE5C
+         CNAwq/hYDxd2enYZ6dqTdUJG5aCLQibC4tYViapYrdMiv7GC7r04dGv/W11Q+PAgKCB+
+         wXPZOjSWSOVaHizTh7HupuyWeWKQtDvo65sIBUHY+PwpgPV4BG46/nAgMveLyBbQDg/E
+         qaRNe+a68xFbqIf5LyoL620VVDprkl/j322jJLXrOQHvL9CGz00niCG6uhmz6p7/9vaP
+         PM8w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1738684087; x=1739288887;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=MhEwMtTJZmwbLWz5lbGdgRchfAWadiHGqAUa1uhiTQc=;
-        b=h8TaWvpL6zwLiPinv2SXt1lFGwSNMwSXXx9t2dt5fMM41CpvfnUekrOzEasBKEOXa9
-         0rz3VvZ0+TQNT4GoulQR18EGm6YHmRaurQ0TROYTHu9jEg2J4v6UQWKvLm5sBuvU+jOX
-         yYj8Q4KHPpZwJCXpQBkB9JBOnrtpUj3LfWNx/NPyZTYDiWIGL/uwMbeCpAZ+Tzaeo8km
-         SwNTrGV9+5a5vUj1Ky6K99IZNer2Ly3J6elW5zapxbtZIqQMcLuBp3EYom5k7i2zqwii
-         +9NmYjShMpEoITksYMYPw1b8cv7sKCTS59FtCoA9tww8Ds9DURlTUKyL9Geb+I+dssCp
-         RoDQ==
-X-Forwarded-Encrypted: i=1; AJvYcCVF8X/jqiF2dAo5u36kiiiSIXeU483i83GK16chGG8Y7Xpj/4cDNEabcUq/QmM9jVXy5/De0ms=@vger.kernel.org
-X-Gm-Message-State: AOJu0YztpXmCHYBUXAudQkb/6HOg/Sg4o1/IXaAnGEj9TgyVPx2lVqoh
-	ejLsd4ZG9fV9n/rpiKJgab9WT3j1pDFAZC4S/Lgn+kyY6jsp/TEs1D68B5VvYu86TLACDC6/nY8
-	lZh21zJSuFOfXIYrf7/n/Y6JadCi4JCAwGhoj0hnwXVVP63AoMq+kVg==
-X-Gm-Gg: ASbGncsmBUPNk80mQCb8pl80an6vD/jcv7LE2PJaQfP/yDwXnJCXOeIq7l7WaKeefV/
-	KQNUJar8Gq1qHB3b64xnGnu7IbHb7z1UbwD9MKHfVpneaOHVWWU+FN28rHQ2dzFjIuaHiB+ixan
-	TqlueFgXOY7qElyUVUhTrtPAT1txUU4Bxp69uFBsiiUJx0zVlRXFI9aYFKYrrQuHlqeqDVwCI/v
-	G0W+kF7r+L614NSYfdpSNf0CP5Dwb2djLmG+nld+e+zz9x/YeKfCsoP+2+M4Badb2t7fgbvoB0y
-	CgTPd0AJR8OZhCqqfZnR3xa69HCT2zgDwdk=
-X-Received: by 2002:a05:600c:5250:b0:438:ad4d:cf01 with SMTP id 5b1f17b1804b1-438dc3c2393mr248924405e9.7.1738684087020;
-        Tue, 04 Feb 2025 07:48:07 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IES1CojhwxGJ5X/gNODfndtMKujAhLqwIQegIm6kWQkj5jnLeKjbuWFYX7dO3y1PF7nyQ/5Iw==
-X-Received: by 2002:a05:600c:5250:b0:438:ad4d:cf01 with SMTP id 5b1f17b1804b1-438dc3c2393mr248924185e9.7.1738684086686;
-        Tue, 04 Feb 2025 07:48:06 -0800 (PST)
-Received: from [192.168.88.253] (146-241-41-201.dyn.eolo.it. [146.241.41.201])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-439069290c7sm20693315e9.0.2025.02.04.07.48.05
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 04 Feb 2025 07:48:06 -0800 (PST)
-Message-ID: <1d20d912-3c9a-4718-b4c9-6f5e83d2da70@redhat.com>
-Date: Tue, 4 Feb 2025 16:48:05 +0100
+        d=1e100.net; s=20230601; t=1738684582; x=1739289382;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=ZRZGMcls0L0IUxLjtGWCAK6sueHWf782aRTQf9r6r/A=;
+        b=rs5BBMRyjSGn/P7uwxRE8HdN87CUsz1R1RETE0krkAb2274NJE31sH4sJO+Z3TJeGc
+         6bAGiftHmh1tEU1RxPEXJLpg5NJHEu/SIlZ5Vq8lNkagR+39MO5A6aN3F3jD1+l2hMNE
+         8rJqIwlDP/QLT2/N3rxc3gFI9Z40YHfKxbXhjZZzzroBAoH2y6VuZrxKB4rnAkOApSWd
+         Q8cVbbht10D1RvzaAh8/5Oiakxpt57nLmdF5ZboeVEk0xrXuFnfHUd1cu2QKW0OpLV4W
+         hQ3I7sPe6unlCA0GN8Bg3mn5wX49qrXteCWYiaxG/121GkGedtKTJpk2OKqWEZQzghmL
+         PFLw==
+X-Forwarded-Encrypted: i=1; AJvYcCX5yu0G/kaUQyZZPKLDiohQE0wC1lY16Pyh8Vv82eBNUVxXR9KYr+lg11hQl0qOHSzOEmIZreYu@vger.kernel.org, AJvYcCXhqn+igVo5LbhL4HTRcJ1c89EVEU2/UiRx0ya57CpkFA+FlvJMEegjwOpwF2iJleJsngE=@vger.kernel.org
+X-Gm-Message-State: AOJu0YycjVdixNyTrhPhk2NqNnl8OsdIBsIQoSZsHhCQhkbOEFkCyqVr
+	pr4Ch7WM9x0aR3G+gn6FLDl1+YjfImcW8uJQyu7gWHX8Bp2mOVBH8m+D7V9M3BEXrhJW9vTxMFP
+	DXOHTinC5mtvHtR/qHkOyqXRWrCs=
+X-Gm-Gg: ASbGncv0YxrVCXiEG1Fcjo2YKUUQSGsMaPL3xTbsGFtWwKvLDikcWrHMY6w32vR0g+K
+	zhzsCJPDZ7mRiml/k+ZkwmqLfo47YG1ln487CR5haOKnzdkSCwywhmXIrqx8eAvtIg7dfc+mAy1
+	6WK004xmtuP5nj
+X-Google-Smtp-Source: AGHT+IE+nh1GBf5QXxdXSLzn2q9Z/hIEJiXX+A7plmiyVJIO65pdIKeG8KZ9NiD5EeM8+UWjnOIimeYEYhCw9LMmf+Y=
+X-Received: by 2002:a05:6000:1faa:b0:385:e38f:8cc with SMTP id
+ ffacd0b85a97d-38c520a32ccmr24464323f8f.38.1738684581584; Tue, 04 Feb 2025
+ 07:56:21 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net 2/2] MAINTAINERS: add a sample ethtool section entry
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: davem@davemloft.net, netdev@vger.kernel.org, edumazet@google.com,
- andrew+netdev@lunn.ch, horms@kernel.org
-References: <20250202021155.1019222-1-kuba@kernel.org>
- <20250202021155.1019222-2-kuba@kernel.org>
- <8ef9275a-b5f9-45e2-a99c-096fb3213ed8@redhat.com>
- <20250204073759.536531d3@kernel.org>
-Content-Language: en-US
-From: Paolo Abeni <pabeni@redhat.com>
-In-Reply-To: <20250204073759.536531d3@kernel.org>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+References: <cover.1738665783.git.petrm@nvidia.com>
+In-Reply-To: <cover.1738665783.git.petrm@nvidia.com>
+From: Alexei Starovoitov <alexei.starovoitov@gmail.com>
+Date: Tue, 4 Feb 2025 15:56:10 +0000
+X-Gm-Features: AWEUYZmTgIT-vAB_mwBtSuKt_flosroFj04cBVtAAKyb2KTj1TuddYvphOQgRbM
+Message-ID: <CAADnVQKMN4+Zg9ZG4FpH9pJw4KdmwWmT2d4BiJgHUUQ-Hd7OkQ@mail.gmail.com>
+Subject: Re: [PATCH net-next 00/12] mlxsw: Preparations for XDP support
+To: Petr Machata <petrm@nvidia.com>
+Cc: "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Andrew Lunn <andrew+netdev@lunn.ch>, 
+	Network Development <netdev@vger.kernel.org>, Amit Cohen <amcohen@nvidia.com>, 
+	Ido Schimmel <idosch@nvidia.com>, Alexei Starovoitov <ast@kernel.org>, 
+	Daniel Borkmann <daniel@iogearbox.net>, Jesper Dangaard Brouer <hawk@kernel.org>, 
+	John Fastabend <john.fastabend@gmail.com>, bpf <bpf@vger.kernel.org>, mlxsw@nvidia.com
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On 2/4/25 4:37 PM, Jakub Kicinski wrote:
-> On Tue, 4 Feb 2025 10:26:40 +0100 Paolo Abeni wrote:
->> What about tying the creation of the entry to some specific contribution?
-> 
-> Sure. I'm adding this so that we have a commit to point people at 
-> as an example when they contribute what should be a new section.
-> Maybe I don't understand the question..
+On Tue, Feb 4, 2025 at 11:06=E2=80=AFAM Petr Machata <petrm@nvidia.com> wro=
+te:
+>
+> Amit Cohen writes:
+>
+> A future patch set will add support for XDP in mlxsw driver. This set add=
+s
+> some preparations.
 
-I meant that this section could be added together with a new associated
-name when a suitable person will pop-up.
-
-Or course that would not help as an example, and I initially did see
-there was such a goal. I'm fine with adding new entry even now.
-
-/P
-
+Why?
+What is the goal here?
+My understanding is that mlxsw is a hw switch and skb-s are used to
+implement tap functionality for few listeners.
+The volume of such packets is supposed to be small.
+Even if XDP is added there is a huge mismatch in packet rates.
+Hence the question. Why bother?
 
