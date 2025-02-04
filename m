@@ -1,173 +1,186 @@
-Return-Path: <netdev+bounces-162699-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-162700-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 85AEAA27A3F
-	for <lists+netdev@lfdr.de>; Tue,  4 Feb 2025 19:43:06 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9BD73A27A7F
+	for <lists+netdev@lfdr.de>; Tue,  4 Feb 2025 19:47:40 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 536921884807
-	for <lists+netdev@lfdr.de>; Tue,  4 Feb 2025 18:43:08 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 196711654DC
+	for <lists+netdev@lfdr.de>; Tue,  4 Feb 2025 18:47:39 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AE16B218AB7;
-	Tue,  4 Feb 2025 18:42:52 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 61742218858;
+	Tue,  4 Feb 2025 18:47:34 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="pViV9I+1"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="rDWYIKMo"
 X-Original-To: netdev@vger.kernel.org
-Received: from out-183.mta1.migadu.com (out-183.mta1.migadu.com [95.215.58.183])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f177.google.com (mail-pl1-f177.google.com [209.85.214.177])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7B338212FA5
-	for <netdev@vger.kernel.org>; Tue,  4 Feb 2025 18:42:49 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.183
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 954E721639B
+	for <netdev@vger.kernel.org>; Tue,  4 Feb 2025 18:47:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.177
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1738694572; cv=none; b=Tp6oFHDvYUiuJuAQ7SS0P+b6QYUi8djHESBEIPxnGN9QD/4n8YSzlx+OcZBBfUi92BpGv+EIN4CARVtR//qKMATTLJnMTXj3Oi1UZhkjiMlmaZwSajgu6sxTkXMaMZ9ctQHVdCbTiqiPcwhwRGmyGWJWaoOqQs54qU2eJjMv/uc=
+	t=1738694854; cv=none; b=iLugndFDXUP12KteM+SW3Q1gU8VOBCxZ0WFffCmtp4UDry4Npf45Cxt0ywcRXb5WAlQPxj60gJ+EBY0vUyMMUiY4pUeCwlbe1RdV9JLwenw+uNZApTWQg5fExtkIaLKtMhd4p//SxzebIQYKA6C4Zln/0wYQJWJCv8BJT/mjyAc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1738694572; c=relaxed/simple;
-	bh=yyiTFThxN5TnisQEfGmySCPMmJhMaXS2UTYNZg9n3zc=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=FYugUkOTmKVh5dJfZq6DwLAHOF7x2RlwEr/ER9xDQNhn4uY5tDi7EBL/SidVeh3BtFN+uaYbLBz988I8Ijbd2OovG7qoXLXSsoPfFNBxkHTAuW1VAu91390Kt1ufrXNa7AI9JoY/jtwDcmjo4fbBCnvRfBw03Uhsqfc3z9FhIlE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=pViV9I+1; arc=none smtp.client-ip=95.215.58.183
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
-Message-ID: <3f0b9a34-db37-4cd5-ae4a-bdc2855dfb72@linux.dev>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1738694567;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=ulPFD5Sl2hWxEFSYpdVtQHzXB1h6+CKjPaNObdy2iH8=;
-	b=pViV9I+1nagKdYEVjF9QGC9RerkReSNr8eXuTVWekPijFVFDC9th8HKL+zB0woLARgsdbs
-	S1cziL8t42DYRQrMkrqNE+KRw4WYEcO77rK6OJVJzVwEJ3VQUk4N2DAvYxxqydL+vos+YE
-	FobphY14/xj4Oc3QKKtpDYtyRTEC5g4=
-Date: Tue, 4 Feb 2025 18:42:37 +0000
+	s=arc-20240116; t=1738694854; c=relaxed/simple;
+	bh=v4IGltEbXVCP4a94OCouiBWhgi6qNWTf6k50EQqiHBU=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=HwPM5C5vtF+X0/2nuJpXDFpRQeiNAcRk2/Fq9qEJagRWhBu/e9ZPUkYc4/p9KpaW5/oTzpNkXL+6jA3695OkX3SX0my3ZqriMChbSTQTFVe1mQhsPIj268rZ8yoGm7OGylFDwT0gm4gsVAO02Nv3bRFsiwFWEflpLqg7xKz8IG4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=rDWYIKMo; arc=none smtp.client-ip=209.85.214.177
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-pl1-f177.google.com with SMTP id d9443c01a7336-21f032484d4so171215ad.0
+        for <netdev@vger.kernel.org>; Tue, 04 Feb 2025 10:47:32 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1738694852; x=1739299652; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=v4IGltEbXVCP4a94OCouiBWhgi6qNWTf6k50EQqiHBU=;
+        b=rDWYIKMoZCzlJCwCdBIMg3sLU7PfZEOkLIabj6tvxuxyoOxIRjVsGojF6ICqpim5Pq
+         gAMzEBrgeQ8RfwCtC5xqruDtllhCdZJP9rwTrk+izmTufLQ9ZHTDhU0PkljoXoLxlYrE
+         3zDm4SgkOi+gqeSxP+SLQV6hypjUxStvMWtc1v9CQeshj8Z4dk9v3AqJxwRl3q1ZdH/6
+         oO0wFSxwB0fSgp9ragfDcowwIu64Zc1uMM/a7/9t1DYVg+H1KheXwnX0N6vOJcX0LxXP
+         dDac/cHmuJap+PchRZhyC5TqsMFWvn6rV3PF+UHu4E5h30ObqDEzhmDNNVrJnhblFnfD
+         +RQg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1738694852; x=1739299652;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=v4IGltEbXVCP4a94OCouiBWhgi6qNWTf6k50EQqiHBU=;
+        b=tG4rzn+BceLNQGhOsERSr5PDUk+M7hCOa1DqRLnukYJpFjBIkzCr6kl9qDBJjfQEYN
+         lac6KDHlVlGjKJc9T/7KDZ0/F7X+NvO5auL0akEydnfschLRqafb2RSuFeFqGW0/GSL+
+         TMG2+Q8isV3AuVs2DyfYvMRfKbi+LOrGD/RF1fkpMpCA3JYYG+gHC90zxDvsefo6rq6A
+         aVcoHOUI3vjeWVPSdpZGpbqwyII3Bi2IJ2Ecj8KP1RVFhRgLe3C5+E5uQI5NR7XkcHcs
+         HErPMP4rLLWebWtdC3l4xra1cqTCDs6RON8TCSswjMqJe5j3RBM2jkay07CsZJhVgmN+
+         2REQ==
+X-Forwarded-Encrypted: i=1; AJvYcCVnlTUji1yqhGr6kXh6UuvMTng/sde54Dr4t8Q92eNIVPeIlkPUADEBRrU2LZiJLSxAO0O08sI=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwLZIqFisEkvZbCSYaQODZUClQCr0NUa1zU2CCNN5R/NHKuwfTC
+	PAGQ3lZAZ8sUiwPrt4lRXsr8YRA71YXWX6EVh15Zqg/r8BPUwg2o2kR5PBCVmhyj+PW7pOuSwct
+	tUtP0a5bSWqZlBFjEUPjjL0pv70649G5sUqh7
+X-Gm-Gg: ASbGncsp69iz0VcF753F5dk5L4KKeSitucOFZytnMnLExDbYRJ5mtnB1T55oHxYof2I
+	8vnf7jGlW/i4dRCTGFFpTLc9jT660a5rXYadkTnFC3m5X5Zb7NXOol6MJl7A5eb34IgbRcva8
+X-Google-Smtp-Source: AGHT+IFJdXh8ck83n4rc4Do2Ogq6GGTLEe+osME5dG/SgCsLyieOBoQ0D2ALRntzLsFX8hi9y9QT4/yUf821Olkgy8I=
+X-Received: by 2002:a17:903:2a88:b0:20c:f40e:6ec3 with SMTP id
+ d9443c01a7336-21f005bbe24mr3646635ad.22.1738694851632; Tue, 04 Feb 2025
+ 10:47:31 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Subject: Re: [PATCH iwl-next] ixgbe: add PTP support for E610 device
-To: Piotr Kwapulinski <piotr.kwapulinski@intel.com>,
- intel-wired-lan@lists.osuosl.org
-Cc: netdev@vger.kernel.org, richardcochran@gmail.com,
- Milena Olech <milena.olech@intel.com>,
- Przemek Kitszel <przemyslaw.kitszel@intel.com>
-References: <20250204071259.15510-1-piotr.kwapulinski@intel.com>
-Content-Language: en-US
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Vadim Fedorenko <vadim.fedorenko@linux.dev>
-In-Reply-To: <20250204071259.15510-1-piotr.kwapulinski@intel.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Migadu-Flow: FLOW_OUT
+References: <20250203223916.1064540-1-almasrymina@google.com>
+ <a97c4278-ea08-4693-a394-8654f1168fea@redhat.com> <CAHS8izNZrKVXSXxL3JG3BuZdho2OQZp=nhLuVCrLZjJD1R0EPg@mail.gmail.com>
+ <Z6JXFRUobi-w73D0@mini-arch> <60550f27-ea6a-4165-8eaa-a730d02a5ddc@redhat.com>
+In-Reply-To: <60550f27-ea6a-4165-8eaa-a730d02a5ddc@redhat.com>
+From: Mina Almasry <almasrymina@google.com>
+Date: Tue, 4 Feb 2025 10:47:18 -0800
+X-Gm-Features: AWEUYZl2dMuyJ4mkkA_bd8Ob9-LshOFjdqNfCtl85nK7UgZnTkQrQ8j9xNndrX8
+Message-ID: <CAHS8izMkfQpUQQLAkyfn8=YkGS1MhPN4DXbxFM6jzCKLAVhM2A@mail.gmail.com>
+Subject: Re: [PATCH net-next v3 0/6] Device memory TCP TX
+To: Paolo Abeni <pabeni@redhat.com>
+Cc: Stanislav Fomichev <stfomichev@gmail.com>, netdev@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, linux-doc@vger.kernel.org, kvm@vger.kernel.org, 
+	virtualization@lists.linux.dev, linux-kselftest@vger.kernel.org, 
+	Donald Hunter <donald.hunter@gmail.com>, Jakub Kicinski <kuba@kernel.org>, 
+	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+	Simon Horman <horms@kernel.org>, Jonathan Corbet <corbet@lwn.net>, Andrew Lunn <andrew+netdev@lunn.ch>, 
+	Neal Cardwell <ncardwell@google.com>, David Ahern <dsahern@kernel.org>, 
+	"Michael S. Tsirkin" <mst@redhat.com>, Jason Wang <jasowang@redhat.com>, 
+	Xuan Zhuo <xuanzhuo@linux.alibaba.com>, =?UTF-8?Q?Eugenio_P=C3=A9rez?= <eperezma@redhat.com>, 
+	Stefan Hajnoczi <stefanha@redhat.com>, Stefano Garzarella <sgarzare@redhat.com>, Shuah Khan <shuah@kernel.org>, 
+	sdf@fomichev.me, asml.silence@gmail.com, dw@davidwei.uk, 
+	Jamal Hadi Salim <jhs@mojatatu.com>, Victor Nogueira <victor@mojatatu.com>, 
+	Pedro Tammela <pctammela@mojatatu.com>, Samiullah Khawaja <skhawaja@google.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On 04/02/2025 07:12, Piotr Kwapulinski wrote:
-> Add PTP support for E610 adapter. The E610 is based on X550 and adds
-> firmware managed link, enhanced security capabilities and support for
-> updated server manageability. It does not introduce any new PTP features
-> compared to X550.
-> 
-> Reviewed-by: Milena Olech <milena.olech@intel.com>
-> Reviewed-by: Przemek Kitszel <przemyslaw.kitszel@intel.com>
-> Signed-off-by: Piotr Kwapulinski <piotr.kwapulinski@intel.com>
-> ---
->   drivers/net/ethernet/intel/ixgbe/ixgbe_ethtool.c |  1 +
->   drivers/net/ethernet/intel/ixgbe/ixgbe_ptp.c     | 13 +++++++++++--
->   2 files changed, 12 insertions(+), 2 deletions(-)
-> 
-> diff --git a/drivers/net/ethernet/intel/ixgbe/ixgbe_ethtool.c b/drivers/net/ethernet/intel/ixgbe/ixgbe_ethtool.c
-> index da91c58..f03925c 100644
-> --- a/drivers/net/ethernet/intel/ixgbe/ixgbe_ethtool.c
-> +++ b/drivers/net/ethernet/intel/ixgbe/ixgbe_ethtool.c
-> @@ -3185,6 +3185,7 @@ static int ixgbe_get_ts_info(struct net_device *dev,
->   	case ixgbe_mac_X550:
->   	case ixgbe_mac_X550EM_x:
->   	case ixgbe_mac_x550em_a:
-> +	case ixgbe_mac_e610:
->   		info->rx_filters |= BIT(HWTSTAMP_FILTER_ALL);
->   		break;
->   	case ixgbe_mac_X540:
-> diff --git a/drivers/net/ethernet/intel/ixgbe/ixgbe_ptp.c b/drivers/net/ethernet/intel/ixgbe/ixgbe_ptp.c
-> index 9339edb..eef25e1 100644
-> --- a/drivers/net/ethernet/intel/ixgbe/ixgbe_ptp.c
-> +++ b/drivers/net/ethernet/intel/ixgbe/ixgbe_ptp.c
-> @@ -140,6 +140,7 @@
->    * proper mult and shift to convert the cycles into nanoseconds of time.
->    */
->   #define IXGBE_X550_BASE_PERIOD 0xC80000000ULL
-> +#define IXGBE_E610_BASE_PERIOD 0x333333333ULL
->   #define INCVALUE_MASK	0x7FFFFFFF
->   #define ISGN		0x80000000
->   
-> @@ -415,6 +416,7 @@ static void ixgbe_ptp_convert_to_hwtstamp(struct ixgbe_adapter *adapter,
->   	case ixgbe_mac_X550:
->   	case ixgbe_mac_X550EM_x:
->   	case ixgbe_mac_x550em_a:
-> +	case ixgbe_mac_e610:
->   		/* Upper 32 bits represent billions of cycles, lower 32 bits
->   		 * represent cycles. However, we use timespec64_to_ns for the
->   		 * correct math even though the units haven't been corrected
-> @@ -492,11 +494,13 @@ static int ixgbe_ptp_adjfine_X550(struct ptp_clock_info *ptp, long scaled_ppm)
->   	struct ixgbe_adapter *adapter =
->   			container_of(ptp, struct ixgbe_adapter, ptp_caps);
->   	struct ixgbe_hw *hw = &adapter->hw;
-> +	u64 rate, base;
->   	bool neg_adj;
-> -	u64 rate;
->   	u32 inca;
->   
-> -	neg_adj = diff_by_scaled_ppm(IXGBE_X550_BASE_PERIOD, scaled_ppm, &rate);
-> +	base = hw->mac.type == ixgbe_mac_e610 ? IXGBE_E610_BASE_PERIOD :
-> +						IXGBE_X550_BASE_PERIOD;
-> +	neg_adj = diff_by_scaled_ppm(base, scaled_ppm, &rate);
->   
->   	/* warn if rate is too large */
->   	if (rate >= INCVALUE_MASK)
-> @@ -559,6 +563,7 @@ static int ixgbe_ptp_gettimex(struct ptp_clock_info *ptp,
->   	case ixgbe_mac_X550:
->   	case ixgbe_mac_X550EM_x:
->   	case ixgbe_mac_x550em_a:
-> +	case ixgbe_mac_e610:
->   		/* Upper 32 bits represent billions of cycles, lower 32 bits
->   		 * represent cycles. However, we use timespec64_to_ns for the
->   		 * correct math even though the units haven't been corrected
-> @@ -1067,6 +1072,7 @@ static int ixgbe_ptp_set_timestamp_mode(struct ixgbe_adapter *adapter,
->   	case ixgbe_mac_X550:
->   	case ixgbe_mac_X550EM_x:
->   	case ixgbe_mac_x550em_a:
-> +	case ixgbe_mac_e610:
->   		/* enable timestamping all packets only if at least some
->   		 * packets were requested. Otherwise, play nice and disable
->   		 * timestamping
-> @@ -1233,6 +1239,7 @@ void ixgbe_ptp_start_cyclecounter(struct ixgbe_adapter *adapter)
->   		fallthrough;
->   	case ixgbe_mac_x550em_a:
->   	case ixgbe_mac_X550:
-> +	case ixgbe_mac_e610:
->   		cc.read = ixgbe_ptp_read_X550;
->   		break;
->   	case ixgbe_mac_X540:
-> @@ -1280,6 +1287,7 @@ static void ixgbe_ptp_init_systime(struct ixgbe_adapter *adapter)
->   	case ixgbe_mac_X550EM_x:
->   	case ixgbe_mac_x550em_a:
->   	case ixgbe_mac_X550:
-> +	case ixgbe_mac_e610:
->   		tsauxc = IXGBE_READ_REG(hw, IXGBE_TSAUXC);
->   
->   		/* Reset SYSTIME registers to 0 */
-> @@ -1407,6 +1415,7 @@ static long ixgbe_ptp_create_clock(struct ixgbe_adapter *adapter)
->   	case ixgbe_mac_X550:
->   	case ixgbe_mac_X550EM_x:
->   	case ixgbe_mac_x550em_a:
-> +	case ixgbe_mac_e610:
->   		snprintf(adapter->ptp_caps.name, 16, "%s", netdev->name);
->   		adapter->ptp_caps.owner = THIS_MODULE;
->   		adapter->ptp_caps.max_adj = 30000000;
+On Tue, Feb 4, 2025 at 10:32=E2=80=AFAM Paolo Abeni <pabeni@redhat.com> wro=
+te:
+>
+> On 2/4/25 7:06 PM, Stanislav Fomichev wrote:
+> > On 02/04, Mina Almasry wrote:
+> >> On Tue, Feb 4, 2025 at 4:32=E2=80=AFAM Paolo Abeni <pabeni@redhat.com>=
+ wrote:
+> >>>
+> >>> On 2/3/25 11:39 PM, Mina Almasry wrote:
+> >>>> The TX path had been dropped from the Device Memory TCP patch series
+> >>>> post RFCv1 [1], to make that series slightly easier to review. This
+> >>>> series rebases the implementation of the TX path on top of the
+> >>>> net_iov/netmem framework agreed upon and merged. The motivation for
+> >>>> the feature is thoroughly described in the docs & cover letter of th=
+e
+> >>>> original proposal, so I don't repeat the lengthy descriptions here, =
+but
+> >>>> they are available in [1].
+> >>>>
+> >>>> Sending this series as RFC as the winder closure is immenient. I pla=
+n on
+> >>>> reposting as non-RFC once the tree re-opens, addressing any feedback
+> >>>> I receive in the meantime.
+> >>>
+> >>> I guess you should drop this paragraph.
+> >>>
+> >>>> Full outline on usage of the TX path is detailed in the documentatio=
+n
+> >>>> added in the first patch.
+> >>>>
+> >>>> Test example is available via the kselftest included in the series a=
+s well.
+> >>>>
+> >>>> The series is relatively small, as the TX path for this feature larg=
+ely
+> >>>> piggybacks on the existing MSG_ZEROCOPY implementation.
+> >>>
+> >>> It looks like no additional device level support is required. That is
+> >>> IMHO so good up to suspicious level :)
+> >>>
+> >>
+> >> It is correct no additional device level support is required. I don't
+> >> have any local changes to my driver to make this work. I think Stan
+> >> on-list was able to run the TX path (he commented on fixes to the test
+> >> but didn't say it doesn't work :D) and one other person was able to
+> >> run it offlist.
+> >
+> > For BRCM I had shared this: https://lore.kernel.org/netdev/ZxAfWHk3aRWl=
+-F31@mini-arch/
+> > I have similar internal patch for mlx5 (will share after RX part gets
+> > in). I agree that it seems like gve_unmap_packet needs some work to be =
+more
+> > careful to not unmap NIOVs (if you were testing against gve).
+>
+> What happen if an user try to use devmem TX on a device not really
+> supporting it? Silent data corruption?
+>
 
+So the tx dma-buf binding netlink API will bind the dma-buf to the
+netdevice. If that fails, the uapi will return failure and devmem tx
+will not be enabled.
 
-LGTM,
-Reviewed-by: Vadim Fedorenko <vadim.fedorenko@linux.dev>
+If the dma-binding succeeds, then the device can indeed DMA into the
+dma-addrs in the device. The TX path will dma from the dma-addrs in
+the device just fine and it need not be aware that the dma-addrs are
+coming from a device and not from host memory.
+
+The only issue that Stan's patches is pointing to, is that the driver
+will likely be passing these dma-buf addresses into dma-mapping APIs
+like dma_unmap_*() and dma_sync_*() functions. Those, AFAIU, will be
+no-ops with dma-buf addresses in most setups, but it's not 100% safe
+to pass those dma-buf addresses to these dma-mapping APIs, so we
+should avoid these calls entirely.
+
+> Don't we need some way for the device to opt-in (or opt-out) and avoid
+> such issues?
+>
+
+Yeah, I think likely the driver needs to declare support (i.e. it's
+not using dma-mapping API with dma-buf addresses).
+
+--
+Thanks,
+Mina
 
