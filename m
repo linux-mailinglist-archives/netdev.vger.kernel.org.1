@@ -1,117 +1,132 @@
-Return-Path: <netdev+bounces-162803-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-162804-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 44849A27F7F
-	for <lists+netdev@lfdr.de>; Wed,  5 Feb 2025 00:22:03 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 29BE9A27F8E
+	for <lists+netdev@lfdr.de>; Wed,  5 Feb 2025 00:25:24 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 210E51887981
-	for <lists+netdev@lfdr.de>; Tue,  4 Feb 2025 23:22:08 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A7EA31661AB
+	for <lists+netdev@lfdr.de>; Tue,  4 Feb 2025 23:25:22 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5E0A321C9FF;
-	Tue,  4 Feb 2025 23:21:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 92FFB2163BA;
+	Tue,  4 Feb 2025 23:25:18 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="GT3lOBFO"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="N05CaSok"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-yb1-f173.google.com (mail-yb1-f173.google.com [209.85.219.173])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BF35421C19F;
-	Tue,  4 Feb 2025 23:21:39 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.173
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6851E207DED;
+	Tue,  4 Feb 2025 23:25:15 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1738711301; cv=none; b=Wuztdcwj9ueXUQIiSZVZtT4MmzpTXiB8kSe2ePpfX3g6GI35zWO89rC2Grlg0tsG5BBbxj8NCuSLkSJuep633f+OQTGoYXtmacJqYrFb7AqE7UVq7kZnIULilrgBeKHvJ3AygMd6renLTU/fCcOkMiAKqeOeZ7giyEQuVlLPELk=
+	t=1738711518; cv=none; b=hB7U2yDwNeyFnaMfBabK750PtmpK4wM4yU7z0fEQbLUqtA3rco5y43rQfFe4E42hlkC2wLkSil8tnCEbtMMBis3lrwouPc/AsOWPfG2dg5e79W4NJzUZ+s60lGUSSUFIQ0t2CJNSHm4k5HR4GiTnUHu9E3OhLgJUDLLHXD5G4gA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1738711301; c=relaxed/simple;
-	bh=8C+r43R7t8CBhPQ/4RIA6QmD58GvsuWFa2/7vu4xtvY=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=rl2JMJfdZCUb3gzjUzB8Ju2RAWFpQhTQJtXjI5vlfcjNbqHRswTg8ignXVUoiy9JDAXn+fGuiy62zmJgHPMzC2+fUm7/zyw4AgW1m4ibJn9JzkKjLeAXs1ke4x/xMuByMSEZ7bRk+cBc0itBDOAr+Z27DEnMDBKjCkZWCHw11MQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=GT3lOBFO; arc=none smtp.client-ip=209.85.219.173
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-yb1-f173.google.com with SMTP id 3f1490d57ef6-e3978c00a5aso5500303276.1;
-        Tue, 04 Feb 2025 15:21:39 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1738711298; x=1739316098; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=jmmbI8fOb7I3HXItfhRdYRDqI5AHl5BtIJfv0JJtPAg=;
-        b=GT3lOBFOSvx71NgLxBqCsLjl9qpW7CCx3XNbYa4fAnWleumyDwFts2C4NUu9SVxnaf
-         DbBO168MqNH8ZgDTSOSvOCFe2hvxMpnVc6S4kQjgfXAJdd/ILk2q30Ba6PsAFUikepTk
-         PWstFvTBZG0dXjkzFXHyKx/ywwFGqlt83zbL+NEytAzbxevs5hd2nQGtfQ0pblc8Ft+n
-         Qt4FXl/8RcW8xR9hjTfs2xIi8dhAhmpOo46VGYU8+0wTNjElz3updH0HhvG+Q+QY1+s0
-         FilNm5GyKCXDYkCSN0cX2VYYT1oT9Sbcd8hEn7d1bJNOaXjZ6xip9dELFzK80IIjleO8
-         QrQg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1738711298; x=1739316098;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=jmmbI8fOb7I3HXItfhRdYRDqI5AHl5BtIJfv0JJtPAg=;
-        b=LuBqbgabpwZQ86kAhfO+5CzU5YGafwHbAMYbNEJPIH1L5CSMjdPq+U8fIYmTcHKADA
-         7fMW/VlI33IxyPe2pSp8R2WwJEPCRsry0fdkkVzQoh2xi1a4JPfMRdUW5cw+MedB5qFZ
-         vv2L50xEHWZIUOWK4kzZKQJCDiueBqqq3RhzQuvCIV+fAiPNYjKB6mf5kokmbBCw3ewx
-         bZG9xxZEB+Nf39Xj+b8FLja0eZo0fDw+rK11irCsxY799HNkNpLzTxEL5RXeQlrCzUV9
-         AsbSIUeuACi3axXkNKk970+HS+Oq+ITV8+i0/hOUKrqdy7h95jYMOPdeKQUr9CZVSCOJ
-         V14g==
-X-Forwarded-Encrypted: i=1; AJvYcCXu8wErwTS1V00mJsL+8GsVqVf4kRzSX6eKGFt9/jKkCjxjHYUSRplu5jmfR51sLT11mBE=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyEVcYdXPV+Gl6pBLjyIDVDCn3dNH5gK1wIbajw8LYlMe1hHjWa
-	2xuEqXWZAc07RdNyIHScqfn3F69Vsxl2Gzmxfg5mGKyjcJeH8fo+IyZ5mMNvC/7DQdmjBptl6Q0
-	3LPBjTPytuvDgiWo7qNloDvWEciA=
-X-Gm-Gg: ASbGncvLoynDoS7S4Euglg4QtAFHSCjEMV3imFQG8J5xmPUqXKEztBi2/7VI6gNgKZV
-	4BYBXOEPnYrR1rKtV2vF6hx0BtSdDff/JeykNP8U09/LPtgS2YLyCwGFvdA8kIDQTMy4l1P+Gus
-	B5OxP9QJcRNSuV
-X-Google-Smtp-Source: AGHT+IHG5JUWWSAuddklveIAvU6BhMIF7BPwTIDPY7rYI3oFFJ+7oOUd2e0ZIZYlMy23SK7IMR758JkevzYV0KbeZ1Y=
-X-Received: by 2002:a05:6902:2204:b0:e5b:12f7:cdb9 with SMTP id
- 3f1490d57ef6-e5b25a05d84mr808526276.14.1738711298538; Tue, 04 Feb 2025
- 15:21:38 -0800 (PST)
+	s=arc-20240116; t=1738711518; c=relaxed/simple;
+	bh=SYn9QTxw4vAqiSN7u2YiwRtdvovqaEiCf8EY7REoNKw=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=gobJNd9gs+zPQ2qYCk3C9akBidUMjwQZ8HunaGhKqsE4qR+P9IecqzJSWRL07zzk615d5dSDM1tWdtePZ3DcbOCTbUj5g5pvY/neDcqbFFMs8FI5IBOqHpK8utpIBSQlIvdfhs16E0lULxpqEsTxfCp3VLxSbRMSCZ3RvcFnY9M=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=N05CaSok; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id C0E12C4CEDF;
+	Tue,  4 Feb 2025 23:25:15 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1738711515;
+	bh=SYn9QTxw4vAqiSN7u2YiwRtdvovqaEiCf8EY7REoNKw=;
+	h=Date:From:To:Cc:Subject:Reply-To:References:In-Reply-To:From;
+	b=N05CaSokfnWauihUSqmNHHca4KEFMc6GcJ7hju6WpGduFJMv8MjxTwp+nnQ5cqQx2
+	 Naf7K3bfVOxlarsXnh72oNKzYDhrTruTAX5FmCgaqqZl9oc80T0udvkgmIEP9sHZBv
+	 zswmjTEHTwno7IihnEGAb9sqRf306CHDS1MIMdL+VpOENed4Fc8++JO2nyAbhfNilk
+	 PlVoSncKnLYewuMGDFefSRaokgXg7dF5wM+SbGlUHWU1qob4bjpBWWfxKiezp/7D6k
+	 HOuFYQC7BAjmC6uIBEZrlnNKezzzeFv1xIT0y7xQzxkRvYV7r7aqNTemyt3rdW25UV
+	 JuoSjejsy52vg==
+Received: by paulmck-ThinkPad-P17-Gen-1.home (Postfix, from userid 1000)
+	id 51D35CE028A; Tue,  4 Feb 2025 15:25:15 -0800 (PST)
+Date: Tue, 4 Feb 2025 15:25:15 -0800
+From: "Paul E. McKenney" <paulmck@kernel.org>
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: Eric Dumazet <edumazet@google.com>,
+	"David S . Miller" <davem@davemloft.net>,
+	Paolo Abeni <pabeni@redhat.com>, netdev@vger.kernel.org,
+	Kuniyuki Iwashima <kuniyu@amazon.com>,
+	Simon Horman <horms@kernel.org>, eric.dumazet@gmail.com,
+	rcu@vger.kernel.org
+Subject: Re: [PATCH v3 net 11/16] ipv6: input: convert to dev_net_rcu()
+Message-ID: <85496569-9ecc-447d-8b76-659c68aee3ea@paulmck-laptop>
+Reply-To: paulmck@kernel.org
+References: <20250204132357.102354-1-edumazet@google.com>
+ <20250204132357.102354-12-edumazet@google.com>
+ <20250204120903.6c616fc8@kernel.org>
+ <CANn89i+2TrrYYXr7RFX2ZwtYfUwWQS6Qg9GNL6FGt8cdWR1dhQ@mail.gmail.com>
+ <20250204130025.33682a8d@kernel.org>
+ <CANn89iJf0K39xMpzmdWd4r_u+3xFA3B6Ep3raTBms6Z8S76Zyg@mail.gmail.com>
+ <39a1fde2-63f7-4092-870f-ae20156fbb9e@paulmck-laptop>
+ <20250204133025.78c466ec@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250131192912.133796-1-ameryhung@gmail.com> <20250131192912.133796-9-ameryhung@gmail.com>
- <20250204141851.522ae938@kernel.org>
-In-Reply-To: <20250204141851.522ae938@kernel.org>
-From: Amery Hung <ameryhung@gmail.com>
-Date: Tue, 4 Feb 2025 15:21:27 -0800
-X-Gm-Features: AWEUYZkEqMm4fApu029xrlYMo6iZXKs4m_ilS_dw_-LAaNmhcr2lDd5B8qK88jg
-Message-ID: <CAMB2axNNvNMy1o6m2DKFwF7O2AkgxZXUW+6rwhhc=788v_KM+Q@mail.gmail.com>
-Subject: Re: [PATCH bpf-next v3 08/18] bpf: net_sched: Support implementation
- of Qdisc_ops in bpf
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: netdev@vger.kernel.org, bpf@vger.kernel.org, daniel@iogearbox.net, 
-	andrii@kernel.org, alexei.starovoitov@gmail.com, martin.lau@kernel.org, 
-	edumazet@google.com, xiyou.wangcong@gmail.com, cong.wang@bytedance.com, 
-	jhs@mojatatu.com, sinquersw@gmail.com, toke@redhat.com, jiri@resnulli.us, 
-	stfomichev@gmail.com, ekarani.silvestre@ccc.ufcg.edu.br, 
-	yangpeihao@sjtu.edu.cn, yepeilin.cs@gmail.com, ming.lei@redhat.com, 
-	kernel-team@meta.com
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250204133025.78c466ec@kernel.org>
 
-On Tue, Feb 4, 2025 at 2:18=E2=80=AFPM Jakub Kicinski <kuba@kernel.org> wro=
-te:
->
-> On Fri, 31 Jan 2025 11:28:47 -0800 Amery Hung wrote:
-> > +             if (new &&
-> > +                 !(parent->flags & TCQ_F_MQROOT) &&
-> > +                 new->ops->owner =3D=3D BPF_MODULE_OWNER) {
-> > +                     NL_SET_ERR_MSG(extack, "BPF qdisc not supported o=
-n a non root");
-> > +                     return -EINVAL;
-> > +             }
->
-> This check should live in bpf_qdisc.c
+On Tue, Feb 04, 2025 at 01:30:25PM -0800, Jakub Kicinski wrote:
+> On Tue, 4 Feb 2025 13:17:08 -0800 Paul E. McKenney wrote:
+> > > > TBH I'm slightly confused by this, and the previous warnings.
+> > > >
+> > > > The previous one was from a timer callback.
+> > > >
+> > > > This one is with BH disabled.
+> > > >
+> > > > I thought BH implies RCU protection. We certainly depend on that
+> > > > in NAPI for XDP. And threaded NAPI does the exact same thing as
+> > > > xfrm_trans_reinject(), a bare local_bh_disable().
+> > > >
+> > > > RCU folks, did something change or is just holes in my brain again?  
+> > > 
+> > > Nope, BH does not imply rcu_read_lock()  
+> > 
+> > You are both right?  ;-)
+> > 
+> > The synchronize_rcu() function will wait for all types of RCU readers,
+> > including BH-disabled regions of code.  However, lockdep can distinguish
+> > between the various sorts of readers.  So for example
+> > 
+> > 	lockdep_assert_in_rcu_read_lock_bh();
+> > 
+> > will complain unless you did rcu_read_lock_bh(), even if you did something
+> > like disable_bh().  If you don't want to distinguish and are happy with
+> > any type of RCU reader, you can use
+> > 
+> > 	lockdep_assert_in_rcu_reader();
+> > 
+> > I have been expecting that CONFIG_PREEMPT_RT=y kernels will break this
+> > any day now, but so far so good.  ;-)
+> 
+> Thanks Paul! So IIUC in this case we could:
+> 
+> diff --git a/include/net/net_namespace.h b/include/net/net_namespace.h
+> index 0f5eb9db0c62..58ec1eb9ae6a 100644
+> --- a/include/net/net_namespace.h
+> +++ b/include/net/net_namespace.h
+> @@ -401,7 +401,7 @@ static inline struct net *read_pnet(const possible_net_t *pnet)
+>  static inline struct net *read_pnet_rcu(possible_net_t *pnet)
+>  {
+>  #ifdef CONFIG_NET_NS
+> -	return rcu_dereference(pnet->net);
+> +	return rcu_dereference_check(pnet->net, rcu_read_lock_bh_held());
 
-Might be a dumb question, but could you explain why this is preferred?
+That should do it!
 
-I can certainly do the check in Qdisc_ops::init instead though.
+							Thanx, Paul
 
-Thanks,
-Amery
+>  #else
+>  	return &init_net;
+>  #endif
+> 
+> Sorry for the sideline, Eric, up to you how to proceed..
+> I'll try to remember the details better next time :)
 
