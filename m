@@ -1,142 +1,202 @@
-Return-Path: <netdev+bounces-162660-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-162661-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id BC13CA2788E
-	for <lists+netdev@lfdr.de>; Tue,  4 Feb 2025 18:35:53 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id CDC11A278BE
+	for <lists+netdev@lfdr.de>; Tue,  4 Feb 2025 18:39:45 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 53C7016555D
-	for <lists+netdev@lfdr.de>; Tue,  4 Feb 2025 17:35:52 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 9165318871A7
+	for <lists+netdev@lfdr.de>; Tue,  4 Feb 2025 17:39:50 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8A0EC21661F;
-	Tue,  4 Feb 2025 17:35:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2281721639D;
+	Tue,  4 Feb 2025 17:38:03 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="d4+rhr9N"
+	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="G698hjjY"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f175.google.com (mail-pl1-f175.google.com [209.85.214.175])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from NAM11-DM6-obe.outbound.protection.outlook.com (mail-dm6nam11on2046.outbound.protection.outlook.com [40.107.223.46])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D8FDC216388
-	for <netdev@vger.kernel.org>; Tue,  4 Feb 2025 17:35:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.175
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1738690527; cv=none; b=f1TPG/IK65HEeMwXkL8OWhxFNKyfn9OECMScfQ8fKtHBBuvu4O+hDxlvkPQqSrgAcuzM7vK9HQrWtgbpLMjHN9/3SHxOeWFJogLm3QPotSZIb5QmMjrG/rIGAniUmPTD+MNozpfHPW9Zy5vVPRyFNr9Q4IrrgpqAW9KxrLYiMEA=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1738690527; c=relaxed/simple;
-	bh=zCHNKGA6MIC6IBXzZGco0x6H0vkuSlEA7G+5gjB5WwU=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=QkggQFklhHxue/v02sI0xj0Bhm3F7qkZlpCS+xpUlSZklRZbLgrwFCo2LUPyssfTXZ79otZgbdwtky9672wTLAKxhUC1Epai4VbHBVxfnS9Zp4ZAOtRDz5XNgIe4Giw8n94l6I16zyzxst3QRKc5808U5KAulPwFeszvkM9HPlI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=d4+rhr9N; arc=none smtp.client-ip=209.85.214.175
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-pl1-f175.google.com with SMTP id d9443c01a7336-21f032484d4so156155ad.0
-        for <netdev@vger.kernel.org>; Tue, 04 Feb 2025 09:35:25 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1738690525; x=1739295325; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=84XRGI+7lwmGL6GUPwbtH7AhjEYYUVi2GeiyJJ7VXBw=;
-        b=d4+rhr9N7zikIW+KEMZg+mcQTPWn3C3oVbh7IFjp/+E3N9ZO0Vz+GYDjAEb5GoVIDe
-         MzagfKV8ddXD5kBdfbj6vBRUbchPhacBWeKxTQL5c9FamSDkBny5X9kPdpOwBzVsvpNS
-         wvOzTCnf3rKtYIMtnZbmEbKcZMM7/x6kcTtBWXUbFPSV0zS1pjqmaDthXOzCpqfwp0kT
-         3fSZzjsGH1j+XMtop7Q9oBvGHDEv3xBzkZJSLiYAXylwl+UCktgVt/UcHaPDP6AmId3d
-         RaXsirVOZLD96J21TOH5q6jPlGIhOPCwhr04nxwfou3hBJKUgJ+PkZjv3MPSv45GRiT9
-         6WSA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1738690525; x=1739295325;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=84XRGI+7lwmGL6GUPwbtH7AhjEYYUVi2GeiyJJ7VXBw=;
-        b=RCflAbKeLXHwD6WiKepsJm4z75JKDFT+KYux0XELXck3DalNYiWFk7gFWoTFV36n2F
-         qpFwpmMDr1BCciqgfKamYX52t/K+zECLVljNwYBAKKP0b/aaeXD4/1DQgGvXBbxJSQCe
-         pNYbeMr1K77OQrjKbKiX++sFSzoCebFYMhTMModS/vzMlJ+VuHxrch7dlFk9kVd4UX85
-         0sxg759exLnuM5rfCh2cmHdDuaipx+WcoXOmVZJNf7QY4jpVAvUHGlMXLzHzJGqRGMfb
-         dvpFgaVfpyU7xPit3UffQgmTaBtquKOx3yBFy8vSSKfcKpDKoakHb0x/OiWzNxulnHSr
-         t+AQ==
-X-Gm-Message-State: AOJu0Yz9qyH8/E/w0FaeCguwtsEHeWHEB1cByOE18cJGItDoMdhMqsiN
-	vqZojK65VnfOs9wFakXCmBNUGTQquhJ3ghFcDnGiPjzlEqyp/9elxzrtAjnRAAaXW8kxmfeOm3W
-	LJzVb4kGsSg/798MVDkUwUVf873u00f9m1Zp9
-X-Gm-Gg: ASbGncv0v4Z9txs08sIdpKECOd+I8MaSu6wFEQ6QgxTYM0AZFzmPAJpkcNLtHnzvZYj
-	gLu4QCBC0JCsAy8Fn/yFa0GFmASawzbUXu+19q9Q+MuJJ8IKYDQIxiwzjjhVfKt/KV9pbW2yH
-X-Google-Smtp-Source: AGHT+IHg8SF867Yy+z2GXbKry2r0iDmWlZunHewA79883dWtyyKDj6PGknuUr+EeJwHqGa1SQwzcF0gj8w2TziRSjaE=
-X-Received: by 2002:a17:902:d9ce:b0:215:7ced:9d67 with SMTP id
- d9443c01a7336-21f005bbe36mr3250755ad.24.1738690524517; Tue, 04 Feb 2025
- 09:35:24 -0800 (PST)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5ACC3215F7A
+	for <netdev@vger.kernel.org>; Tue,  4 Feb 2025 17:38:00 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.223.46
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1738690683; cv=fail; b=GAAnwJfplb+UMqMe3HXhm6g/LFqmGEt5g2ad8iR5E8cGZtWCvyOqVubzltKBARVgGbXuHhv/dPNpmfMuIt26F3KwATbTpOfaas00BfZqm0+MtUvvYu36EtOAXhoCUbsDe+sMcH9a9B3DcfxvYftg7dH+YB9iDjPV6KoifHyPzXQ=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1738690683; c=relaxed/simple;
+	bh=h29hso7LjtJqm7twdQWuYiokaCjmH4NpaXgL1nyHi8M=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=dWnWXd393ioNy0AEPoot4GXhWNBKDCmbGiOPRDMwOc2UjdN4eKvxIxIBMIT88TzVMtNpz7SCcirH0YbEqZPXhQP5rfXmiHBI4C+HLpY8l5k3TRshMtupetXoknnZo1zrvU9LZDK8eA+UO3bEJAC6XMScEWkYEeTGychxSqwAJug=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=G698hjjY; arc=fail smtp.client-ip=40.107.223.46
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=XdxBEfw2kx9G1BkYvJK40fibXCLYh9+uxR5AkVxevpi/t0Lor+UGjHQGr1LUKp+u8KUrZeBBGiqN2bQbTr5d3194sDhGQ+pXl5szCQrZT17L3lTde0WmTd/RdNUBUzvYkOKjQoN/H41brL1+qxIJBc6a3c1sfU+3nsVvTjwkYS94BE3AmZM8kwgtSp3JWr2haB2nEtWx2pI48EOcTIZKZYWALKctX0Z4QvMudnCY6a52GvcGVFgGtdPpv+oC8D3klphpJ6SaEI6be53jYOSqxBY5Ht6B0KDTZMtg46U6VCQVyNZiAoyM8R8p7tAz1xMoRgLgSH2IovmYLcBKTGOsuA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=1yPWitqygITVi0DG06q79cfPdCY0BrhYVZWvhuZ4lss=;
+ b=cOBsTr8eCZDeZM5X4t2rxhrtzfPN9Lwx1L+L9kjzpZRb1fGJliWNw7t14NzmHES0GteSzapvYbVGTWZge3ODd6FDozq6e1UeXvjiG3AQ17X3WNfcc2tlN5OqH3EibVsVtBcLEFPlW2hBA08jBovekxn9FrRVceVlLs32czf2GNGnn3IwQjGj7nTVu5ah/mhKQuEaggvJ8acWvIH1l+IbdKiMkHTUI0MEU0FZ1HEcAqBuTby7dGtvTpEZ4oWFHGt1y28hvVliHtvFN9cuiwie/EVDJG1r17LgOeOovxnLRpFxo4E1/6xuprP0+0G8wnCoz35sSIYrNyoeKrt4Bh+IUQ==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
+ 216.228.117.160) smtp.rcpttodomain=davemloft.net smtp.mailfrom=nvidia.com;
+ dmarc=pass (p=reject sp=reject pct=100) action=none header.from=nvidia.com;
+ dkim=none (message not signed); arc=none (0)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=1yPWitqygITVi0DG06q79cfPdCY0BrhYVZWvhuZ4lss=;
+ b=G698hjjYOd+fPZLtER67uRz+fwfV/Zz861EfihZqClotRR34PtF+4W9FO8vOjWN3ZSen6BejIwNRtDe0fky00iNU1onMTeVfWOS5JAsE7hEoSYn9kDThKeFTMm3FpWS/ekHf/JMrokEBGM4sZvfrkGwFAhvCt9iUPH30cK7Vn1d9j2K3ljVzHAeds/cl4wycA5d80FXZRHVuvBDvig1uH4/tbdUOXr/KwfYdVx5VGl9OgZndQjFKLy67NVLQxPUgfid9Kmaed3rpNic7lvjyf9rVOw0uc+EmJd0aI3v7V5baSySAHwjd9uJWyS78dk3afXDm8HbYT4S59gYtMuTLeQ==
+Received: from PH7P222CA0006.NAMP222.PROD.OUTLOOK.COM (2603:10b6:510:33a::26)
+ by MN6PR12MB8567.namprd12.prod.outlook.com (2603:10b6:208:478::12) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8398.24; Tue, 4 Feb
+ 2025 17:37:58 +0000
+Received: from CY4PEPF0000EE31.namprd05.prod.outlook.com
+ (2603:10b6:510:33a:cafe::61) by PH7P222CA0006.outlook.office365.com
+ (2603:10b6:510:33a::26) with Microsoft SMTP Server (version=TLS1_3,
+ cipher=TLS_AES_256_GCM_SHA384) id 15.20.8398.27 via Frontend Transport; Tue,
+ 4 Feb 2025 17:37:58 +0000
+X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 216.228.117.160)
+ smtp.mailfrom=nvidia.com; dkim=none (message not signed)
+ header.d=none;dmarc=pass action=none header.from=nvidia.com;
+Received-SPF: Pass (protection.outlook.com: domain of nvidia.com designates
+ 216.228.117.160 as permitted sender) receiver=protection.outlook.com;
+ client-ip=216.228.117.160; helo=mail.nvidia.com; pr=C
+Received: from mail.nvidia.com (216.228.117.160) by
+ CY4PEPF0000EE31.mail.protection.outlook.com (10.167.242.37) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.8398.14 via Frontend Transport; Tue, 4 Feb 2025 17:37:57 +0000
+Received: from rnnvmail201.nvidia.com (10.129.68.8) by mail.nvidia.com
+ (10.129.200.66) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.4; Tue, 4 Feb 2025
+ 09:37:42 -0800
+Received: from fedora.mtl.com (10.126.231.35) by rnnvmail201.nvidia.com
+ (10.129.68.8) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.14; Tue, 4 Feb
+ 2025 09:37:37 -0800
+From: Petr Machata <petrm@nvidia.com>
+To: "David S. Miller" <davem@davemloft.net>, Eric Dumazet
+	<edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
+	<pabeni@redhat.com>, Simon Horman <horms@kernel.org>,
+	<netdev@vger.kernel.org>
+CC: Roopa Prabhu <roopa@nvidia.com>, Nikolay Aleksandrov
+	<razor@blackwall.org>, Ido Schimmel <idosch@nvidia.com>, Petr Machata
+	<petrm@nvidia.com>, <bridge@lists.linux.dev>, <mlxsw@nvidia.com>
+Subject: [PATCH net-next] bridge: mdb: Allow replace of a host-joined group
+Date: Tue, 4 Feb 2025 18:37:15 +0100
+Message-ID: <e5c5188b9787ae806609e7ca3aa2a0a501b9b5c4.1738685648.git.petrm@nvidia.com>
+X-Mailer: git-send-email 2.48.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250203223916.1064540-1-almasrymina@google.com>
- <20250203223916.1064540-3-almasrymina@google.com> <c8dd0458-b0a9-4342-a022-487e73542381@redhat.com>
-In-Reply-To: <c8dd0458-b0a9-4342-a022-487e73542381@redhat.com>
-From: Mina Almasry <almasrymina@google.com>
-Date: Tue, 4 Feb 2025 09:35:11 -0800
-X-Gm-Features: AWEUYZn1moYHmrXoVYPPn5psMSRlqxODAnsNkR2q6mSq4IS5EB-8iProLqujYec
-Message-ID: <CAHS8izOnrWdPPhVaCFT4f3Vz=YkHyJ5KgnAbuxfR5u-ffkbUxA@mail.gmail.com>
-Subject: Re: [PATCH net-next v3 2/6] selftests: ncdevmem: Implement devmem TCP TX
-To: Paolo Abeni <pabeni@redhat.com>
-Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	linux-doc@vger.kernel.org, kvm@vger.kernel.org, 
-	virtualization@lists.linux.dev, linux-kselftest@vger.kernel.org, 
-	Donald Hunter <donald.hunter@gmail.com>, Jakub Kicinski <kuba@kernel.org>, 
-	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
-	Simon Horman <horms@kernel.org>, Jonathan Corbet <corbet@lwn.net>, Andrew Lunn <andrew+netdev@lunn.ch>, 
-	Neal Cardwell <ncardwell@google.com>, David Ahern <dsahern@kernel.org>, 
-	"Michael S. Tsirkin" <mst@redhat.com>, Jason Wang <jasowang@redhat.com>, 
-	Xuan Zhuo <xuanzhuo@linux.alibaba.com>, =?UTF-8?Q?Eugenio_P=C3=A9rez?= <eperezma@redhat.com>, 
-	Stefan Hajnoczi <stefanha@redhat.com>, Stefano Garzarella <sgarzare@redhat.com>, Shuah Khan <shuah@kernel.org>, 
-	sdf@fomichev.me, asml.silence@gmail.com, dw@davidwei.uk, 
-	Jamal Hadi Salim <jhs@mojatatu.com>, Victor Nogueira <victor@mojatatu.com>, 
-	Pedro Tammela <pctammela@mojatatu.com>, Samiullah Khawaja <skhawaja@google.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-ClientProxiedBy: rnnvmail201.nvidia.com (10.129.68.8) To
+ rnnvmail201.nvidia.com (10.129.68.8)
+X-EOPAttributedMessage: 0
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: CY4PEPF0000EE31:EE_|MN6PR12MB8567:EE_
+X-MS-Office365-Filtering-Correlation-Id: 13bbcc45-9724-4b84-a393-08dd4542a9ea
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam:
+	BCL:0;ARA:13230040|36860700013|82310400026|1800799024|376014;
+X-Microsoft-Antispam-Message-Info:
+	=?us-ascii?Q?7ed1XvIUx5x4ipj4sChWeDR8hV3hdAvCrL6/NsnS78A/1gTPyJrpUa4lYS92?=
+ =?us-ascii?Q?eYfc0X2eG4N4sSY7C7tKcJ5f5Q0K0T2t6vz3bHldyyP5gMdGZJLZA3fptXgr?=
+ =?us-ascii?Q?oTqCRswUg79oQKwdmHTae/9Ng9Y2PP8czRkNjmGrL1IPp5//CIC4VJqSLqpm?=
+ =?us-ascii?Q?zL7DnsSuvc/2ALSP2ANcOkbHpkDoMFD+apgEvBrXTmi11grariCRbw5w4/Zy?=
+ =?us-ascii?Q?mezFRa+g4u/a7C05mkcWhG+uy8E8rMzqPEAnQo+/b0a4aEM32AE/IxUlfjZh?=
+ =?us-ascii?Q?jor5HogSbxFZ1mODidT2wT8wSlixFSPHpCOkN7VniwiuttuuZQqWxzV/h9u/?=
+ =?us-ascii?Q?Eq+Jlkgrb8ItesHlMl22lXbY159TeDGg6d8co5KZijxzldrUEiYmSfkWe0Wf?=
+ =?us-ascii?Q?j+MtOblNWDQ5iTrdSJwQvR6UkBO2a/t2ZVzTKNrNQ1AfchN7u7F5ppxpWGSj?=
+ =?us-ascii?Q?ZJkVbzpFDljf6bTbEZrLm1UQuylfMhML4jdGDu/4ZSLrQU6yq6c79kUZqDZr?=
+ =?us-ascii?Q?jqSbjq4I+4syNUkryMxGKvAEm8Y0rwth5mGxjafPPgvPEb3yjbxbG18f5pTi?=
+ =?us-ascii?Q?oC6Y2DUZmwlbAfMDwn7ciI7hNLzLhzEv7UcQfYPpLkMPBWbdMtHA/ekzTFbO?=
+ =?us-ascii?Q?TofiQ2iwoVtHA/2FZEj0U0ABDWtBW3z8r/WF6G/ote06tAHaL6fqwjh2G2FR?=
+ =?us-ascii?Q?MnTFL3haOiNUtpJXH3mXKMGnzGrpM1571Y0VFAO2zWuM4FroFERhSdg2zRyW?=
+ =?us-ascii?Q?UI7KsKkBwUZQISy1VPT0ioAqoLyzuewcRPxCtqOABRh1nC7WiDhxp/53TRrR?=
+ =?us-ascii?Q?g8RIuvMR0A08PHK1qiBQGMKWXaZWuiahJE3lmccrk9lbRZzYe09z68v4VqJI?=
+ =?us-ascii?Q?6KVmobyUN+7ybuTRR9N/Mr7Muy1xChk0bfjp/xiQElc/t7b8+E0/eO/OQLrW?=
+ =?us-ascii?Q?w4Yk+VvVEsT+a6hHU5pGP7/Diih47K/MENvrpM+7wjlOpXSrFqDeLCKBBh4q?=
+ =?us-ascii?Q?OW6PZkWGf3GmkPLQSA/oaV2V+cVGxWJv+ax2NdmaC2GEA2FSH4pffT4ccgoC?=
+ =?us-ascii?Q?gN82GYb+kIfbQaGD91dIpyRtPm2S/DeLCNinIjp6EYuq7JI4ZSOyepM/CR/h?=
+ =?us-ascii?Q?2QiVDQYJKkQPku9JcYUm5Y5lhHXFHq0awL9lFpeNOfdeq5rC47W6Ni8Lu3cv?=
+ =?us-ascii?Q?zo92nSuFKsNhge/v+f3XhMbRGq+ZVqM6uBGDiL5kiIHvW3xDymcg/9giFhb2?=
+ =?us-ascii?Q?p3Vw4dPlaXfShlmstYQkdQp2vLZUBlZ6aJBPu+ASQqgnYVTZQtyxYrud1B+t?=
+ =?us-ascii?Q?fq470PCxhf6BPKv/koA2ZqiSFxaoLq/EXn5e2/NDhjYKW459j8Q/k0MwsuW8?=
+ =?us-ascii?Q?xRJjS/frT6iHwXgRa6YdBkHoOnnzhOwoFt7yGz/GKVrzj95PAeeJBIhdH16s?=
+ =?us-ascii?Q?TNYSk1BdRJAlKn7SiJH3jcnpCYzCIs5ipl01HYiRk545vCKrkh8eFq7ZBFlL?=
+ =?us-ascii?Q?vs8vs802gZBdXbU=3D?=
+X-Forefront-Antispam-Report:
+	CIP:216.228.117.160;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:dc6edge1.nvidia.com;CAT:NONE;SFS:(13230040)(36860700013)(82310400026)(1800799024)(376014);DIR:OUT;SFP:1101;
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 04 Feb 2025 17:37:57.6113
+ (UTC)
+X-MS-Exchange-CrossTenant-Network-Message-Id: 13bbcc45-9724-4b84-a393-08dd4542a9ea
+X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[216.228.117.160];Helo=[mail.nvidia.com]
+X-MS-Exchange-CrossTenant-AuthSource:
+	CY4PEPF0000EE31.namprd05.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Anonymous
+X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: MN6PR12MB8567
 
-On Tue, Feb 4, 2025 at 4:29=E2=80=AFAM Paolo Abeni <pabeni@redhat.com> wrot=
-e:
->
-> On 2/3/25 11:39 PM, Mina Almasry wrote:
-> > Add support for devmem TX in ncdevmem.
-> >
-> > This is a combination of the ncdevmem from the devmem TCP series RFCv1
-> > which included the TX path, and work by Stan to include the netlink API
-> > and refactored on top of his generic memory_provider support.
-> >
-> > Signed-off-by: Mina Almasry <almasrymina@google.com>
-> > Signed-off-by: Stanislav Fomichev <sdf@fomichev.me>
->
-> Usually the self-tests are included towards the end of the series, to
-> help reviewers building-up on previous patches knowledge.
->
+Attempts to replace an MDB group membership of the host itself are
+currently bounced:
 
-I noticed reviewers like to go over docs + selftests in my previous
-series so I thought I'd put them in the beginning. Looks like the
-gambit was not welcome. I'll move the selftests to the end. May also
-move the docs to the end as is customary as well.
+ # ip link add name br up type bridge vlan_filtering 1
+ # bridge mdb replace dev br port br grp 239.0.0.1 vid 2
+ # bridge mdb replace dev br port br grp 239.0.0.1 vid 2
+ Error: bridge: Group is already joined by host.
 
-> >  .../selftests/drivers/net/hw/ncdevmem.c       | 300 +++++++++++++++++-
-> >  1 file changed, 289 insertions(+), 11 deletions(-)
->
-> Why devmem.py is not touched? AFAICS the test currently run ncdevmem
-> only in server (rx) mode, so the tx path is not actually exercised ?!?
->
+A similar operation done on a member port would succeed. Ignore the check
+for replacement of host group memberships as well.
 
-Yeah, to be honest I have a collection of local bash scripts that
-invoke ncdevmem in different ways for my testing, and I have docs on
-top of ncdevmem.c of how to test; I don't use devmem.py. I was going
-to look at adding test cases to devmem.py as a follow up, if it's OK
-with you, and Stan offered as well on an earlier revision. If not no
-problem, I can address in this series. The only issue is that I have
-some legwork to enable devmem.py on my test setup/distro, but the meat
-of the tests is already included and passing in this series (when
-invoked manually).
+The bit of code that this enables is br_multicast_host_join(), which, for
+already-joined groups only refreshes the MC group expiration timer, which
+is desirable; and a userspace notification, also desirable.
 
---
-Thanks,
-Mina
+Change a selftest that exercises this code path from expecting a rejection
+to expecting a pass. The rest of MDB selftests pass without modification.
+
+Signed-off-by: Petr Machata <petrm@nvidia.com>
+Reviewed-by: Ido Schimmel <idosch@nvidia.com>
+---
+ net/bridge/br_mdb.c                                  | 2 +-
+ tools/testing/selftests/net/forwarding/bridge_mdb.sh | 2 +-
+ 2 files changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/net/bridge/br_mdb.c b/net/bridge/br_mdb.c
+index 1a52a0bca086..7e1ad229e133 100644
+--- a/net/bridge/br_mdb.c
++++ b/net/bridge/br_mdb.c
+@@ -1040,7 +1040,7 @@ static int br_mdb_add_group(const struct br_mdb_config *cfg,
+ 
+ 	/* host join */
+ 	if (!port) {
+-		if (mp->host_joined) {
++		if (mp->host_joined && !(cfg->nlflags & NLM_F_REPLACE)) {
+ 			NL_SET_ERR_MSG_MOD(extack, "Group is already joined by host");
+ 			return -EEXIST;
+ 		}
+diff --git a/tools/testing/selftests/net/forwarding/bridge_mdb.sh b/tools/testing/selftests/net/forwarding/bridge_mdb.sh
+index d9d587454d20..8c1597ebc2d3 100755
+--- a/tools/testing/selftests/net/forwarding/bridge_mdb.sh
++++ b/tools/testing/selftests/net/forwarding/bridge_mdb.sh
+@@ -149,7 +149,7 @@ cfg_test_host_common()
+ 	check_err $? "Failed to add $name host entry"
+ 
+ 	bridge mdb replace dev br0 port br0 grp $grp $state vid 10 &> /dev/null
+-	check_fail $? "Managed to replace $name host entry"
++	check_err $? "Failed to replace $name host entry"
+ 
+ 	bridge mdb del dev br0 port br0 grp $grp $state vid 10
+ 	bridge mdb get dev br0 grp $grp vid 10 &> /dev/null
+-- 
+2.47.0
+
 
