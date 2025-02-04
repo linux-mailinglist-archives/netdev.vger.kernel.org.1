@@ -1,60 +1,60 @@
-Return-Path: <netdev+bounces-162565-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-162566-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8A952A27390
-	for <lists+netdev@lfdr.de>; Tue,  4 Feb 2025 14:58:30 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 34319A273B3
+	for <lists+netdev@lfdr.de>; Tue,  4 Feb 2025 15:01:04 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 7925C164ABA
-	for <lists+netdev@lfdr.de>; Tue,  4 Feb 2025 13:58:14 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 9A0A61889311
+	for <lists+netdev@lfdr.de>; Tue,  4 Feb 2025 13:59:37 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D147C215058;
-	Tue,  4 Feb 2025 13:42:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 783C8218851;
+	Tue,  4 Feb 2025 13:45:33 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="d3IFFMyU"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="YZpMs3J0"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A0B00215045;
-	Tue,  4 Feb 2025 13:42:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3D823211A38;
+	Tue,  4 Feb 2025 13:45:32 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1738676578; cv=none; b=dvuu+WmqNh5vSmITZ8sM0an1ZAOnbqMgG2cc+f6m+APE04I/AaSJf4OeD0PpBpkuHgkJ0VRLBd3cZSPcSEXbnGfC68SOt/vQX02C6lCcU27SxZ8Q+DlxE+xeP02ooABwkotTANSS0ySgxrtoBA7u55O2PPamvvdrBVGBtdfVLsc=
+	t=1738676733; cv=none; b=GOwpXta8CIwWMQoULK1mYyJz3+DpLGJEDfLFHrJeGdmjwdsRq7cKd/88XUsnyZJC+6Gn9aNn/piajYn6TRpI5ng9MkLFYUVLiqbLatwl8PMj6v2YDG6JoR0Ryj70qAbTAfcTxM/Wj79n0XTvaV/vJ349mtF4qbE37tJJqIXXD3k=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1738676578; c=relaxed/simple;
-	bh=lQrEUhXHQzlD1oThlVXaIwT5NyT0Y7eL+hQ2kQGzbWA=;
+	s=arc-20240116; t=1738676733; c=relaxed/simple;
+	bh=d0lrcRneNPYnFy4fVXFs02h42lMTK8IUJg6ExdNXu/8=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=ojTY+st/086dmX1Dh+p5lCVySqtyt+0y4rdewpR1EP2uH2dfA1s8bnpbNrOu7gdtVtE4of9mHC0vpXi6GKALh7g3eCe1/zzdDz8Jj0u2H+f0oYLunVX9pHW7HFDAQv+dnzc99JHSXF/m7Y/HQRDK0t7PXcxroXOmPt/ALYsfW/8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=d3IFFMyU; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id A3EEEC4CEDF;
-	Tue,  4 Feb 2025 13:42:55 +0000 (UTC)
+	 Content-Type:Content-Disposition:In-Reply-To; b=U/5QGF1zFZ/nfKfyX8un1LqsLDRXgcpVq3Cizhi30iAvIJ928FkTrIdGaLPCFie4XjczzaKVheYIaHMmcTa9cKcOu2IjJ+99De5xISohp/tP1AzN3oDuDBPQ6SfuvejVYgg6QwDPCvNKMSXxBia89Um2qhoXP44op6wQOQ/+nFs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=YZpMs3J0; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id BA0B8C4CEE4;
+	Tue,  4 Feb 2025 13:45:29 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1738676578;
-	bh=lQrEUhXHQzlD1oThlVXaIwT5NyT0Y7eL+hQ2kQGzbWA=;
+	s=k20201202; t=1738676732;
+	bh=d0lrcRneNPYnFy4fVXFs02h42lMTK8IUJg6ExdNXu/8=;
 	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=d3IFFMyUIvFvbrrzoyV2QuaGzVm9pA69TbUloMTZ7sPHCgFKoU+4/XbkzroyDqBkg
-	 gmRFYXDVK75h2JBNxvSiYv2vm3/qMFsFIxHWCYDCDEfIJdwL74znuuv2pd71bBmWIO
-	 TQ1ctf+r9OuusHj0AtQW1ZCnElVFnnoh5rCRYjU9efKDYFj39wYsObLtqR/8BHhRDk
-	 2P2SKikItNdSIifI21Aw020wbxsTWQTi3FygDmG7BDJPyMAi6nqDnnp4zC9lukAjdm
-	 AYwwPHiRAq1va4wKe6VxdtGXs0RuEO8pLYTminJMUwYv9wVI9xDo6YubkIOPOGYKiP
-	 w8kmW7N/5Z7Tg==
-Date: Tue, 4 Feb 2025 13:42:53 +0000
+	b=YZpMs3J0f+l0bK+EgdXM34laO/O2rEUVkfenJjEwUkpmyhQAHOyF5qv2JDM75zcs2
+	 nkTnyJ28rPnhqo5U5R5l1Bu1BCaejBqz4NgF6HeOE2kXzkmD+pyOW1YMcqRIvOLe5L
+	 Co32d6CHTq6HDlLGp3gPVnFthGIImy50rmtfXwZrkf6pbNq9s5e3oo284fPJCXtWKc
+	 lZ8rSwD08xh3KrfF6SFn0APK1X39BgVSo7cghaS7fo0oJ7sJlu7SpkgD73VPjxWjPS
+	 CRPfbkuLIEoLwOXuA8Q2lGzn1wP54d8WZ3fw/COgUKPZozDYqu3wHpNQs8lAIVjkAM
+	 MVqqYDS+UQgsA==
+Date: Tue, 4 Feb 2025 13:45:27 +0000
 From: Simon Horman <horms@kernel.org>
-To: "Gustavo A. R. Silva" <gustavoars@kernel.org>
-Cc: Igor Russkikh <irusskikh@marvell.com>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
+To: Reyders Morales <reyders1@gmail.com>
+Cc: kuba@kernel.org, Oliver Hartkopp <socketcan@hartkopp.net>,
+	Marc Kleine-Budde <mkl@pengutronix.de>,
 	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
-	linux-hardening@vger.kernel.org
-Subject: Re: [PATCH v2][next] net: atlantic: Avoid
- -Wflex-array-member-not-at-end warnings
-Message-ID: <20250204134253.GC234677@kernel.org>
-References: <Z6F3KZVfnAZ2FoJm@kspp>
+	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
+	Jonathan Corbet <corbet@lwn.net>, linux-can@vger.kernel.org,
+	netdev@vger.kernel.org, linux-doc@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: Re: [PATCH] Documentation/networking: Fix basic node example
+ document ISO 15765-2
+Message-ID: <20250204134527.GD234677@kernel.org>
+References: <20250203224720.42530-1-reyders1@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -63,25 +63,13 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <Z6F3KZVfnAZ2FoJm@kspp>
+In-Reply-To: <20250203224720.42530-1-reyders1@gmail.com>
 
-On Tue, Feb 04, 2025 at 12:40:49PM +1030, Gustavo A. R. Silva wrote:
-> -Wflex-array-member-not-at-end was introduced in GCC-14, and we are
-> getting ready to enable it, globally.
+On Mon, Feb 03, 2025 at 11:47:20PM +0100, Reyders Morales wrote:
+> In the current struct sockaddr_can tp is member of can_addr.
+> tp is not member of struct sockaddr_can.
 > 
-> Remove unused flexible-array member `buf` and, with this, fix the following
-> warnings:
-> drivers/net/ethernet/aquantia/atlantic/aq_hw.h:197:36: warning: structure containing a flexible array member is not at the end of another structure [-Wflex-array-member-not-at-end]
-> drivers/net/ethernet/aquantia/atlantic/hw_atl/../aq_hw.h:197:36: warning: structure containing a flexible array member is not at the end of another structure [-Wflex-array-member-not-at-end]
-> 
-> Suggested-by: Igor Russkikh <irusskikh@marvell.com>
-> Signed-off-by: Gustavo A. R. Silva <gustavoars@kernel.org>
-> ---
-> Changes in v2:
->  - Remove unused flex-array member. (Igor)
-> 
-> v1:
->  - Link: https://lore.kernel.org/linux-hardening/ZrDwoVKH8d6TdVxn@cute/
+> Signed-off-by: Reyders Morales <reyders1@gmail.com>
 
 Reviewed-by: Simon Horman <horms@kernel.org>
 
