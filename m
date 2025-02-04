@@ -1,210 +1,88 @@
-Return-Path: <netdev+bounces-162435-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-162438-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id D58A8A26E88
-	for <lists+netdev@lfdr.de>; Tue,  4 Feb 2025 10:33:50 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 94308A26E93
+	for <lists+netdev@lfdr.de>; Tue,  4 Feb 2025 10:35:35 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 53348161E02
-	for <lists+netdev@lfdr.de>; Tue,  4 Feb 2025 09:33:49 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 2A143166534
+	for <lists+netdev@lfdr.de>; Tue,  4 Feb 2025 09:35:34 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6C122209695;
-	Tue,  4 Feb 2025 09:33:15 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 35749207676;
+	Tue,  4 Feb 2025 09:35:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="I2s9RH5y"
 X-Original-To: netdev@vger.kernel.org
-Received: from metis.whiteo.stw.pengutronix.de (metis.whiteo.stw.pengutronix.de [185.203.201.7])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7B1E2209679
-	for <netdev@vger.kernel.org>; Tue,  4 Feb 2025 09:33:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.203.201.7
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0566E19C54B;
+	Tue,  4 Feb 2025 09:35:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1738661595; cv=none; b=nTtyQEkuLxUkdUP1a+NMUzZDS4any+YhRjXHGPIgLLlFRxTbp/kwFmsBw4MrXkkXLeetF92o2MZnzJPZkgEGP+yr/WLQHZ4uyiMBAZdXia8v2WlOX93aUDAx3KD75SMXMAagT7dqVFTnHKfLipaH3AgxtZ+ANS9egPVAYCqJ3KU=
+	t=1738661732; cv=none; b=MhjY+ekjqzIoLOyZly9fxuAcqUZ1nhOgfYhkdP62ZBTRPYW99/TFcHy+WqN+AavOOEUxwui4Syvzd/p2S2R+JAQ84yDyooTuwcj8rspPdCQrOXe9EkJ+D006e9MYUg0OGZXQC/xmb0LLgh7lNA9g5RUsAvX7uy8uOsqMBOfmhsA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1738661595; c=relaxed/simple;
-	bh=92qfpD71gNQMGZZnMwyLr7xXSzduU0c/YqctgGUjj7s=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=NOkuyvSNn18JFh4w9+1S0Mn4FUiy/ocq2W7xNssYFyPgn6mNPr2Ke3IjNut6sBVy0CtGG4ESI6bxpKjbpX+RItTzX+iCeL8fdwp88kwUX+GH01JCbQlcg8ktDI+AYel1z45f26ZCkQjHzTjFKiuchK1fbt7B9mZYf/gNFmjUYD8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de; spf=pass smtp.mailfrom=pengutronix.de; arc=none smtp.client-ip=185.203.201.7
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=pengutronix.de
-Received: from drehscheibe.grey.stw.pengutronix.de ([2a0a:edc0:0:c01:1d::a2])
-	by metis.whiteo.stw.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
-	(Exim 4.92)
-	(envelope-from <ore@pengutronix.de>)
-	id 1tfFIR-0002hV-5N; Tue, 04 Feb 2025 10:32:43 +0100
-Received: from dude04.red.stw.pengutronix.de ([2a0a:edc0:0:1101:1d::ac])
-	by drehscheibe.grey.stw.pengutronix.de with esmtps  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.96)
-	(envelope-from <ore@pengutronix.de>)
-	id 1tfFIP-003RRo-31;
-	Tue, 04 Feb 2025 10:32:41 +0100
-Received: from ore by dude04.red.stw.pengutronix.de with local (Exim 4.96)
-	(envelope-from <ore@pengutronix.de>)
-	id 1tfFIP-00ABSG-2n;
-	Tue, 04 Feb 2025 10:32:41 +0100
-From: Oleksij Rempel <o.rempel@pengutronix.de>
-To: Andrew Lunn <andrew@lunn.ch>,
-	Heiner Kallweit <hkallweit1@gmail.com>,
-	Russell King <linux@armlinux.org.uk>,
-	"David S. Miller" <davem@davemloft.net>,
+	s=arc-20240116; t=1738661732; c=relaxed/simple;
+	bh=XsdL0HyKzrkFPB8QhC4PtBlbmqD9wYUifbbufUXba/c=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=joSV/tiiWIxPdST+hb7AS2uWIrAf89wBHLVMqypKj87gxW4XalYaBjUA5M+uq4csAtzU7Cv0shG+PDn5mF7B3ToQghdzuHA7bF7aNodQZIuNdc9IX2gMH2oshTlnuoiZFGmSAbIOp8WunwtDBStPvPgvIYujfxurbEx2FK3lDUw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=I2s9RH5y; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 05744C4CEDF;
+	Tue,  4 Feb 2025 09:35:28 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1738661731;
+	bh=XsdL0HyKzrkFPB8QhC4PtBlbmqD9wYUifbbufUXba/c=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=I2s9RH5yZFpv1QBN20aPw2+outg8LNoMSK7WLSyvS99Tf+wZvHpW1D79nuqzCnR4x
+	 v8aBVzyK97Z0T5TD8rQCAtyWDrpyiaV9TXaCImvytpqvyMtxt9/WEzRYTfJdKQrfzu
+	 am96RSoYSZqVP8bjndCnoY5F67szg+8AYhaE59iWo/1MZ/w+ktbGgLbKaCAfAN3usD
+	 KpftbGirkiv4ESOQECdFdH/x2+ofBFR3ipHo4+0hG30ZhxBMnsQwgLSXQNdvIjoKfa
+	 ffwC3cg6OrEYbZOs2Z+NbTjPCmjaNhhNjWtBB/EjF0w5TOp5ffpYRP5fkClmvVv74n
+	 Ln/+1w9FG7piQ==
+Date: Tue, 4 Feb 2025 09:35:26 +0000
+From: Simon Horman <horms@kernel.org>
+To: Andrew Lunn <andrew@lunn.ch>
+Cc: "David S. Miller" <davem@davemloft.net>,
 	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>
-Cc: Oleksij Rempel <o.rempel@pengutronix.de>,
-	kernel@pengutronix.de,
-	linux-kernel@vger.kernel.org,
-	netdev@vger.kernel.org
-Subject: [PATCH net-next v1 2/2] net: phy: dp83tg720: Add randomized polling intervals for unstable link detection
-Date: Tue,  4 Feb 2025 10:32:39 +0100
-Message-Id: <20250204093239.2427263-3-o.rempel@pengutronix.de>
-X-Mailer: git-send-email 2.39.5
-In-Reply-To: <20250204093239.2427263-1-o.rempel@pengutronix.de>
-References: <20250204093239.2427263-1-o.rempel@pengutronix.de>
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Jonathan Corbet <corbet@lwn.net>,
+	Alexandre Ferrieux <alexandre.ferrieux@gmail.com>,
+	netdev@vger.kernel.org, workflows@vger.kernel.org,
+	linux-doc@vger.kernel.org
+Subject: Re: [PATCH net] docs: netdev: Document guidance on inline functions
+Message-ID: <20250204093526.GK234677@kernel.org>
+References: <20250203-inline-funk-v1-1-2f48418e5874@kernel.org>
+ <a2ae1cda-8210-4e6c-86ea-0ee864e13b23@lunn.ch>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-SA-Exim-Connect-IP: 2a0a:edc0:0:c01:1d::a2
-X-SA-Exim-Mail-From: ore@pengutronix.de
-X-SA-Exim-Scanned: No (on metis.whiteo.stw.pengutronix.de); SAEximRunCond expanded to false
-X-PTX-Original-Recipient: netdev@vger.kernel.org
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <a2ae1cda-8210-4e6c-86ea-0ee864e13b23@lunn.ch>
 
-Address the limitations of the DP83TG720 PHY, which cannot reliably detect or
-report a stable link state. To handle this, the PHY must be periodically reset
-when the link is down. However, synchronized reset intervals between the PHY
-and its link partner can result in a deadlock, preventing the link from
-re-establishing.
+On Mon, Feb 03, 2025 at 04:10:24PM +0100, Andrew Lunn wrote:
+> >  Conversely, spelling and grammar fixes are not discouraged.
+> >  
+> > +Inline functions
+> > +----------------
+> > +
+> > +The use of static inline functions in .c file is strongly discouraged
+> 
+> I don't think 'static' is relevant here. They probably are static, if
+> they are inline, and to avoid warnings about missing declarations. But
+> we just prefer not to have any sort of inline functions without good
+> justifications within a .c file.
+> 
+> A nit pick, so:
+> 
+> Reviewed-by: Andrew Lunn <andrew@lunn.ch>
 
-This change introduces a randomized polling interval when the link is down to
-desynchronize resets between link partners.
+Thanks Andrew,
 
-Signed-off-by: Oleksij Rempel <o.rempel@pengutronix.de>
----
- drivers/net/phy/dp83tg720.c | 78 +++++++++++++++++++++++++++++++++++++
- 1 file changed, 78 insertions(+)
-
-diff --git a/drivers/net/phy/dp83tg720.c b/drivers/net/phy/dp83tg720.c
-index 050f4537d140..0599807de5c7 100644
---- a/drivers/net/phy/dp83tg720.c
-+++ b/drivers/net/phy/dp83tg720.c
-@@ -4,12 +4,31 @@
-  */
- #include <linux/bitfield.h>
- #include <linux/ethtool_netlink.h>
-+#include <linux/jiffies.h>
- #include <linux/kernel.h>
- #include <linux/module.h>
- #include <linux/phy.h>
-+#include <linux/random.h>
- 
- #include "open_alliance_helpers.h"
- 
-+/*
-+ * DP83TG720S_POLL_ACTIVE_LINK - Polling interval in milliseconds when the link
-+ *				 is active.
-+ * DP83TG720S_POLL_NO_LINK_MIN - Minimum polling interval in milliseconds when
-+ *				 the link is down.
-+ * DP83TG720S_POLL_NO_LINK_MAX - Maximum polling interval in milliseconds when
-+ *				 the link is down.
-+ *
-+ * These values are not documented or officially recommended by the vendor but
-+ * were determined through empirical testing. They achieve a good balance in
-+ * minimizing the number of reset retries while ensuring reliable link recovery
-+ * within a reasonable timeframe.
-+ */
-+#define DP83TG720S_POLL_ACTIVE_LINK		1000
-+#define DP83TG720S_POLL_NO_LINK_MIN		100
-+#define DP83TG720S_POLL_NO_LINK_MAX		1000
-+
- #define DP83TG720S_PHY_ID			0x2000a284
- 
- /* MDIO_MMD_VEND2 registers */
-@@ -371,6 +390,13 @@ static int dp83tg720_read_status(struct phy_device *phydev)
- 		if (ret)
- 			return ret;
- 
-+		/* Sleep 600ms for PHY stabilization post-reset.
-+		 * Empirically chosen value (not documented).
-+		 * Helps reduce reset bounces with link partners having similar
-+		 * issues.
-+		 */
-+		msleep(600);
-+
- 		/* After HW reset we need to restore master/slave configuration.
- 		 * genphy_c45_pma_baset1_read_master_slave() call will be done
- 		 * by the dp83tg720_config_aneg() function.
-@@ -498,6 +524,57 @@ static int dp83tg720_probe(struct phy_device *phydev)
- 	return 0;
- }
- 
-+/**
-+ * dp83tg720_phy_get_next_update_time - Determine the next update time for PHY
-+ *                                      state
-+ * @phydev: Pointer to the phy_device structure
-+ *
-+ * This function addresses a limitation of the DP83TG720 PHY, which cannot
-+ * reliably detect or report a stable link state. To recover from such
-+ * scenarios, the PHY must be periodically reset when the link is down. However,
-+ * if the link partner also runs Linux with the same driver, synchronized reset
-+ * intervals can lead to a deadlock where the link never establishes due to
-+ * simultaneous resets on both sides.
-+ *
-+ * To avoid this, the function implements randomized polling intervals when the
-+ * link is down. It ensures that reset intervals are desynchronized by
-+ * introducing a random delay between a configured minimum and maximum range.
-+ * When the link is up, a fixed polling interval is used to minimize overhead.
-+ *
-+ * This mechanism guarantees that the link will reestablish within 10 seconds
-+ * in the worst-case scenario.
-+ *
-+ * Return: Time (in milliseconds) until the next update event for the PHY state
-+ * machine.
-+ */
-+static unsigned int dp83tg720_phy_get_next_update_time(struct phy_device *phydev)
-+{
-+	unsigned int jiffy_ms = jiffies_to_msecs(1); /* Jiffy granularity in ms */
-+	unsigned int next_time_ms;
-+
-+	if (phydev->link) {
-+		/* When the link is up, use a fixed 1000ms interval */
-+		next_time_ms = DP83TG720S_POLL_ACTIVE_LINK;
-+	} else {
-+		unsigned int min_jiffies, max_jiffies, rand_jiffies;
-+		/* When the link is down, randomize interval between
-+		 * configured min/max
-+		 */
-+
-+		/* Convert min and max to jiffies */
-+		min_jiffies = msecs_to_jiffies(DP83TG720S_POLL_NO_LINK_MIN);
-+		max_jiffies = msecs_to_jiffies(DP83TG720S_POLL_NO_LINK_MAX);
-+
-+		/* Randomize in the jiffie range and convert back to ms */
-+		rand_jiffies = min_jiffies +
-+			get_random_u32_below(max_jiffies - min_jiffies + 1);
-+		next_time_ms = jiffies_to_msecs(rand_jiffies);
-+	}
-+
-+	/* Ensure the polling time is at least one jiffy */
-+	return max(next_time_ms, jiffy_ms);
-+}
-+
- static struct phy_driver dp83tg720_driver[] = {
- {
- 	PHY_ID_MATCH_MODEL(DP83TG720S_PHY_ID),
-@@ -516,6 +593,7 @@ static struct phy_driver dp83tg720_driver[] = {
- 	.get_link_stats	= dp83tg720_get_link_stats,
- 	.get_phy_stats	= dp83tg720_get_phy_stats,
- 	.update_stats	= dp83tg720_update_stats,
-+	.get_next_update_time = dp83tg720_phy_get_next_update_time,
- 
- 	.suspend	= genphy_suspend,
- 	.resume		= genphy_resume,
--- 
-2.39.5
-
+I agree that static is not helpful here, I'll drop that in a v2.
 
