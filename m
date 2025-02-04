@@ -1,113 +1,95 @@
-Return-Path: <netdev+bounces-162582-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-162583-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 125EDA2748A
-	for <lists+netdev@lfdr.de>; Tue,  4 Feb 2025 15:40:12 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 682C0A2748D
+	for <lists+netdev@lfdr.de>; Tue,  4 Feb 2025 15:40:32 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 601337A2E5D
-	for <lists+netdev@lfdr.de>; Tue,  4 Feb 2025 14:39:14 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 6A7267A2DD5
+	for <lists+netdev@lfdr.de>; Tue,  4 Feb 2025 14:39:31 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 56739213E76;
-	Tue,  4 Feb 2025 14:39:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 743192135D8;
+	Tue,  4 Feb 2025 14:40:05 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="QOlIVxya"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="LRxai0j9"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2B675213E6D;
-	Tue,  4 Feb 2025 14:39:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4C4B12135D1;
+	Tue,  4 Feb 2025 14:40:04 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1738679985; cv=none; b=iG/XgdoPxJXjB8uUUbFCykD+KcRx9x7BmnUticJhflVJG3RkA6sPQ6EDQ9pyNwGNY02db8WNiea7EXoUem0wUXA8aETw3Rb/8hn2rHh5atgh2HW6FmyGVkU3CJg0/+3UMK53Wujqapffs8VovWw1pgYLOdk/fA51Cp9yWBqdKd0=
+	t=1738680005; cv=none; b=H71telvy+imi1qGbAAD6nAZK7xEyK0q8EUAW0MXEQ6+5Auo9TxfRnNxmlIL8ASmCJ4j58+w0qVscAzUqbDefiU2NtY6DZSHwfc/Slr2qdnAfN99DS2eZXO1zh+Q6Yz47e+z1+qECfabm+lqiHqTI6cNmdh40izNRmbUjQYgv42Q=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1738679985; c=relaxed/simple;
-	bh=5GlRqCCgL38eGq3w5B1EVvtJfT68wKhuqhLDhkNIORY=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=SLE8O43N/UzNPRaOa/YTE3zsChEPhHPZv5vDPYdlRRJJBna+1GmOfjF0dOy5bQexxWMYYJeoj0YfsUWLxN4BqqZG5rznvOqaRI/Am6+Fp0IoEc0969jFeGypbE1r0pdTnkdRrT0YjydIEQ4BwCzvM9bFgaHOoIBBFy/O9vpPz+M=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=QOlIVxya; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 76C15C4CEDF;
-	Tue,  4 Feb 2025 14:39:40 +0000 (UTC)
+	s=arc-20240116; t=1738680005; c=relaxed/simple;
+	bh=Q0G+QZjAQCmK/nyuKiESdoITFbg0qLCV4bnWYjs/ZUA=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=X4fd9IGp7cjKy4QnQBCja0/TQa4YFNeVFLxeIrIlcOts2JV8PTKOdYYeHyF2F/hBg9IAbnAqA4n9J/91MddFPO2UwBdGXQPGEjbkLitb9Ts1ujCrZOeGm14EL26cxQjH3FuXq5etggP9cunFerwrXQMUwHJzFpB5yiP5DXyZvdc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=LRxai0j9; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id AF47DC4CEDF;
+	Tue,  4 Feb 2025 14:40:04 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1738679984;
-	bh=5GlRqCCgL38eGq3w5B1EVvtJfT68wKhuqhLDhkNIORY=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=QOlIVxyaBLo+lHYsH10tybJKfOnt5svziBQJzF1nxY03A7XXA8vsvp5Vo5t9w67eD
-	 zpZZce1FAgN6VAkh7/zWZAWmDNvzJRIvJTD+ew0LnIN5GuSygaXPcVNgyJXYHjLl2d
-	 d6KsSI04BUt4Am9PXlyp1XfnC7rtYBX8JSjKhbirAtuvgqEiFtQdhSqh2DulXdz5Zo
-	 6roYft+8AQlBd7nCImtST0+fGVRXiUHvuibaR9Yndql5XPGYQLXR8l6PFbbs+1a4fv
-	 5RB1BXPXOOpyOUccUlkfIRgjtoo99XTBiYSAVkwFpeGbn6fJHdZ2VrDT5KHcz5RByP
-	 1w0bWdrXdVBZg==
-Date: Tue, 4 Feb 2025 14:39:38 +0000
-From: Simon Horman <horms@kernel.org>
-To: Alexandra Winter <wintera@linux.ibm.com>
-Cc: David Miller <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>, Eric Dumazet <edumazet@google.com>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	Aswin Karuvally <aswin@linux.ibm.com>, netdev@vger.kernel.org,
-	linux-s390@vger.kernel.org, Heiko Carstens <hca@linux.ibm.com>,
-	Vasily Gorbik <gor@linux.ibm.com>,
-	Alexander Gordeev <agordeev@linux.ibm.com>,
-	Christian Borntraeger <borntraeger@linux.ibm.com>,
-	Sven Schnelle <svens@linux.ibm.com>,
-	Thorsten Winkler <twinkler@linux.ibm.com>,
-	Jonathan Corbet <corbet@lwn.net>,
-	Peter Oberparleiter <oberpar@linux.ibm.com>
-Subject: Re: [PATCH net-next] s390/net: Remove LCS driver
-Message-ID: <20250204143938.GE234677@kernel.org>
-References: <20250204103135.1619097-1-wintera@linux.ibm.com>
+	s=k20201202; t=1738680004;
+	bh=Q0G+QZjAQCmK/nyuKiESdoITFbg0qLCV4bnWYjs/ZUA=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=LRxai0j9JraCEnKk85O84sJoDnCps0EwkNeBVSiOBY6teginJ02bGyExCB80cx4Qw
+	 v/GgysNZpQpgcFnmVplzQXcCtNw3ztoRPSyfNXUqxBo1gJEQ52Np4QM73SQjlL99kL
+	 fmXgh1ytxnCOMN0r/uw9Jr83hCKJ+F6Cj8gNl2Sgl+h/59coKZcz0AoBUsfFhs1s1S
+	 /2rffHC2kofMTuL/4QebWWqw/NSKxqDzsjGt3RvT2Eh70JUbzJxlK5cE9Cg+UUCvTh
+	 CvNchucdzkP7XK3KJiCcigOHAhu9BOZkPtHM1q2ttc2AtC/ob89DgPbpnDyihazz1g
+	 7OJqfeKCLsYqg==
+Received: from [10.30.226.235] (localhost [IPv6:::1])
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 34F04380AA67;
+	Tue,  4 Feb 2025 14:40:33 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250204103135.1619097-1-wintera@linux.ibm.com>
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH net 0/2] rxrpc: Miscellaneous fixes
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <173868003201.17912.9717325856767438818.git-patchwork-notify@kernel.org>
+Date: Tue, 04 Feb 2025 14:40:32 +0000
+References: <20250203110307.7265-1-dhowells@redhat.com>
+In-Reply-To: <20250203110307.7265-1-dhowells@redhat.com>
+To: David Howells <dhowells@redhat.com>
+Cc: netdev@vger.kernel.org, marc.dionne@auristor.com, kuba@kernel.org,
+ davem@davemloft.net, edumazet@google.com, pabeni@redhat.com,
+ linux-afs@lists.infradead.org, linux-kernel@vger.kernel.org
 
-On Tue, Feb 04, 2025 at 11:31:35AM +0100, Alexandra Winter wrote:
-> From: Aswin Karuvally <aswin@linux.ibm.com>
-> 
-> The original Open Systems Adapter (OSA) was introduced by IBM in the
-> mid-90s. These were then superseded by OSA-Express in 1999 which used
-> Queued Direct IO to greatly improve throughput. The newer cards
-> retained the older, slower non-QDIO (OSE) modes for compatibility with
-> older systems. In Linux, the lcs driver was responsible for cards
-> operating in the older OSE mode and the qeth driver was introduced to
-> allow the OSA-Express cards to operate in the newer QDIO (OSD) mode.
-> 
-> For an S390 machine from 1998 or later, there is no reason to use the
-> OSE mode and lcs driver as all OSA cards since 1999 provide the faster
-> OSD mode. As a result, it's been years since we have heard of a
-> customer configuration involving the lcs driver.
-> 
-> This patch removes the lcs driver. The technology it supports has been
-> obsolete for past 25+ years and is irrelevant for current use cases.
-> 
-> Reviewed-by: Alexandra Winter <wintera@linux.ibm.com>
-> Acked-by: Heiko Carstens <hca@linux.ibm.com>
-> Acked-by: Peter Oberparleiter <oberpar@linux.ibm.com>
-> Signed-off-by: Aswin Karuvally <aswin@linux.ibm.com>
-> Signed-off-by: Alexandra Winter <wintera@linux.ibm.com>
-> ---
->  Documentation/arch/s390/driver-model.rst |    2 +-
->  arch/s390/include/asm/irq.h              |    1 -
->  arch/s390/kernel/irq.c                   |    1 -
->  drivers/s390/net/Kconfig                 |   11 +-
->  drivers/s390/net/Makefile                |    1 -
->  drivers/s390/net/lcs.c                   | 2385 ----------------------
->  drivers/s390/net/lcs.h                   |  342 ----
->  7 files changed, 2 insertions(+), 2741 deletions(-)
->  delete mode 100644 drivers/s390/net/lcs.c
->  delete mode 100644 drivers/s390/net/lcs.h
+Hello:
 
-Less is more :)
+This series was applied to netdev/net.git (main)
+by Paolo Abeni <pabeni@redhat.com>:
 
-Reviewed-by: Simon Horman <horms@kernel.org>
+On Mon,  3 Feb 2025 11:03:02 +0000 you wrote:
+> Here some miscellaneous fixes for AF_RXRPC:
+> 
+>  (1) Fix the state of a call to not treat the challenge-response cycle as
+>      part of an incoming call's state set.  The problem is that it makes
+>      handling received of the final packet in the receive phase difficult
+>      as that wants to change the call state - but security negotiations may
+>      not yet be complete.
+> 
+> [...]
+
+Here is the summary with links:
+  - [net,1/2] rxrpc: Fix call state set to not include the SERVER_SECURING state
+    (no matching commit)
+  - [net,2/2] rxrpc: Fix the rxrpc_connection attend queue handling
+    https://git.kernel.org/netdev/net/c/4241a702e0d0
+
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
 
 
 
