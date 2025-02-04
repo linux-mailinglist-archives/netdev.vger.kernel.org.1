@@ -1,210 +1,184 @@
-Return-Path: <netdev+bounces-162623-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-162624-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 86822A276A0
-	for <lists+netdev@lfdr.de>; Tue,  4 Feb 2025 16:59:38 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 51B28A276A9
+	for <lists+netdev@lfdr.de>; Tue,  4 Feb 2025 17:00:48 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 047673A0371
-	for <lists+netdev@lfdr.de>; Tue,  4 Feb 2025 15:59:30 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 424901886775
+	for <lists+netdev@lfdr.de>; Tue,  4 Feb 2025 16:00:51 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B738D2147F4;
-	Tue,  4 Feb 2025 15:59:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 936852153C3;
+	Tue,  4 Feb 2025 16:00:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="dYEPRsrk"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="GbBolB2/"
 X-Original-To: netdev@vger.kernel.org
-Received: from NAM12-MW2-obe.outbound.protection.outlook.com (mail-mw2nam12on2065.outbound.protection.outlook.com [40.107.244.65])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E76231D7985;
-	Tue,  4 Feb 2025 15:59:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.244.65
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1738684774; cv=fail; b=ZpZhaCqMQINpLZV61Suf+y8HyypOgC586monvgS4FPg0uxMaDoF0t1o59/caX5rl2NFPUjYYlKZABkOxQevw358VFdS9zkRBXh3KlylMKxhPYZ8Qb+Dsm8fdQAPpU4esUVctXOFTiYBRl2vmnah6t3oMg1kToJklsFcfpvIp7Qw=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1738684774; c=relaxed/simple;
-	bh=hsjOlHtB9fqOkjramd5+IsH54X+++wnIHDiChSyLwBE=;
-	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
-	 Content-Type:MIME-Version; b=IitGal5eB+sPxIaCuy6dFdbKi9h/E+ElZy/hkYYLAB3ADlkq9uW0fAs5aTIk0URWzbO7Mb5XEDiHP90ipP5cS5jLUMe0DT3nBipsAvzI6f9O/njlyaFbgq/l6K4f37jOjUQTAi4ix5lkZOoMKMIkFKEFtXTxhZsJhwrwZm04ezY=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=dYEPRsrk; arc=fail smtp.client-ip=40.107.244.65
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=dldUJKixPtN9dUhgy8+0ZOOCjCfEjmerIAkoYmDd5Te/5oT4oz5kDJCAwulScUQ1ift+3x+ntFlhNSQuXuoT331Et/O1covQWMBVOGBYtZ1jRuOCgHkdpgjDIyxymLAlGI/Glugcc9On+UTGf25oB05DY939Lz1r81aqTc4wYCYP7ZHYS+/OpzNJk7+4KBHcEDIKkkfdCPmrA368UDZiXLElYbcH3EwE7FEZPQYCYWA+pcUf6YHrjiHldguwS3DZK7Mwn6Y9HXwrj+3xElqeaDTBKZf4h3AUmZ5qWjBEmM9SpHP5wt2UsPrsRjoNZGjtvJd4WxfwR+tpBv630ZDgRg==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=hsjOlHtB9fqOkjramd5+IsH54X+++wnIHDiChSyLwBE=;
- b=cIE8fPufYeB5RMYJYegW62SpA2kuPrGBXEwUlbBL+NQKS/T3VLHKTVGgVPXD4yezQp+YjKfKOQnxmf5yx4lkFHGYgiLtbHT20F27jqTP+6hMqljRUuhulJuwlUhnYirspJi5DsrJmC0I9Gcweuf07t1phm9VT+cezf/koy4EzLvWSAlI6B9xUFEhNoO8GHOKQvwfAcoJV6npFL1WXYR+UfQQnH5vgq/i125PpwfVeoZdOrWrd1ediTIs3CJ7bPh2MpwaLN2nLc7rm2LD+2gnXmRN+Ry+wBdEbl4QJtzt/bp55OspmEPmJiyZ+8ZQudi3zHz7y72faEUAAy011hSqUg==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
- dkim=pass header.d=nvidia.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=hsjOlHtB9fqOkjramd5+IsH54X+++wnIHDiChSyLwBE=;
- b=dYEPRsrkJNGYm9JDJIE2zpItyu5rGVT0aepsPVcwfcctqMbp2iUMDZzbi78rAFMKA0nrwjc/BBTEmU0UGSnI9kLmc0zS28v/uDz3TB0MqEABLu2ozY7g3C31f5xXANw9rIu5iffQmUsYOOU7TVjvP+rThzRVkv0tGRzWjzpboNhCG53G1+jGpyiZg94HIldnRtDxfbaDb/f5DA14JQbdCxKCFB2/MPLFAxcdoD2nbIkYgSk4aKGmyeqRi2ojbbCseU+PSyRJAnT6wHq64RtuNnO4NmwtkUZS/MDBd9OEzgAsSKR9nc7Ol9TGWcez6m1swKDSGhM8YxcVAsmg6Qz1kw==
-Received: from BL1PR12MB5922.namprd12.prod.outlook.com (2603:10b6:208:399::5)
- by DM4PR12MB6011.namprd12.prod.outlook.com (2603:10b6:8:6b::14) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8422.11; Tue, 4 Feb
- 2025 15:59:30 +0000
-Received: from BL1PR12MB5922.namprd12.prod.outlook.com
- ([fe80::5851:fa86:f137:1858]) by BL1PR12MB5922.namprd12.prod.outlook.com
- ([fe80::5851:fa86:f137:1858%7]) with mapi id 15.20.8398.021; Tue, 4 Feb 2025
- 15:59:30 +0000
-From: Amit Cohen <amcohen@nvidia.com>
-To: Alexei Starovoitov <alexei.starovoitov@gmail.com>, Petr Machata
-	<petrm@nvidia.com>
-CC: "David S. Miller" <davem@davemloft.net>, Eric Dumazet
-	<edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
-	<pabeni@redhat.com>, Andrew Lunn <andrew+netdev@lunn.ch>, Network Development
-	<netdev@vger.kernel.org>, Ido Schimmel <idosch@nvidia.com>, Alexei
- Starovoitov <ast@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>, Jesper
- Dangaard Brouer <hawk@kernel.org>, John Fastabend <john.fastabend@gmail.com>,
-	bpf <bpf@vger.kernel.org>, mlxsw <mlxsw@nvidia.com>
-Subject: RE: [PATCH net-next 00/12] mlxsw: Preparations for XDP support
-Thread-Topic: [PATCH net-next 00/12] mlxsw: Preparations for XDP support
-Thread-Index: AQHbdvTSSF23zIgvCUCVpF8bzJYgQ7M3TLQAgAAAhaA=
-Date: Tue, 4 Feb 2025 15:59:30 +0000
-Message-ID:
- <BL1PR12MB59225F7D902ACBC6A91511C3CBF42@BL1PR12MB5922.namprd12.prod.outlook.com>
-References: <cover.1738665783.git.petrm@nvidia.com>
- <CAADnVQKMN4+Zg9ZG4FpH9pJw4KdmwWmT2d4BiJgHUUQ-Hd7OkQ@mail.gmail.com>
-In-Reply-To:
- <CAADnVQKMN4+Zg9ZG4FpH9pJw4KdmwWmT2d4BiJgHUUQ-Hd7OkQ@mail.gmail.com>
-Accept-Language: he-IL, en-US
-Content-Language: en-US
-X-MS-Has-Attach:
-X-MS-TNEF-Correlator:
-authentication-results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=nvidia.com;
-x-ms-publictraffictype: Email
-x-ms-traffictypediagnostic: BL1PR12MB5922:EE_|DM4PR12MB6011:EE_
-x-ms-office365-filtering-correlation-id: e04a61c2-87c9-4f89-cb75-08dd4534e8af
-x-ms-exchange-senderadcheck: 1
-x-ms-exchange-antispam-relay: 0
-x-microsoft-antispam:
- BCL:0;ARA:13230040|366016|1800799024|7416014|376014|38070700018;
-x-microsoft-antispam-message-info:
- =?utf-8?B?MVNWWWtHTFdTUDN4ZnJVZ2xxeVNpa3Fock5CbTVaa3RRUjZsb1JCQjM4TWl5?=
- =?utf-8?B?RFdlaFVNOFNTUWR3dCtmeTgvWS9zV29LUTM4QUJNMlZjOEgxU05CQWlYaGtN?=
- =?utf-8?B?TWpDVHdRRER6L3hLN2NwTzR6UnNwZmQwclpCbEcySkQrdmdzakw2aWJQNjdo?=
- =?utf-8?B?aXFWQXNrQ0JPeWJvbnVaQTluY3A4cVE0YUpXRVRWWURHYVpicnBxdDhCY3pi?=
- =?utf-8?B?RjViaFgwRzVJV2Y2VlVKYXV3TUtUblM1QlVDZ3EwQ0x4dS9Ia3A4UXF6aldB?=
- =?utf-8?B?Ny91S09ZU0t2SXpHRlh2eU5UaEJjdGlBWVZjc01GMTErYzBYZFo5SldTZHRT?=
- =?utf-8?B?Mm44bW5Jd1ZteVl1aTE5S2Nmdzk0bTVtVTBZNjdyWGhZOUNkMGhoL2pWMHI1?=
- =?utf-8?B?Vnc3Zk8vODlVak5aSHRnOGZydDFWYlp3blNYS21NMlZmaWNyaFRGcjRNbEds?=
- =?utf-8?B?WFE5RjZISUVvamRpZXBKQUxJeGI2UkxoRmhqUGpFM25XM0wrZjhNWG1lam5x?=
- =?utf-8?B?ckNaRGJXclhaMTNYYkU4UWRXbzkza0FwYWhvVXRsL01TdVduRk8rZ1lhT1l2?=
- =?utf-8?B?Y1FVZUc1Ly9EK04rYUlKUWZ4eDFSenJqQWFWOGg2QW5oOTNJTEtkdWxvUXJW?=
- =?utf-8?B?NHFoR1dYdW1UcjNHWFVFNlBrZXRoOWtEd1o3cVU4WGYxek44VG1JWUYyK21M?=
- =?utf-8?B?OGc1dHFCbEZFRWlGRVV1dzNpSEJlcVNST3RSbHpjeXpSWXpzMmVjSjA2MXJj?=
- =?utf-8?B?OEdvVzdjVVlUTmQ0M29oYzV4cEFFcG04ZUdxRUhCUVZLQUE0YXB0NTloeDlt?=
- =?utf-8?B?aU1ZVFBYUnByTklIT2g4TGNWUnptdEhqUTBGSzhteDBlemRlNWpYV0E3S2FM?=
- =?utf-8?B?V0xxMHZYYnE4MTE2N1BxWUtCRnlMWUVQcVVjNXNOQzVjbmViTTZiMUkzcnBm?=
- =?utf-8?B?RVlkR0VLZjlqdWZvSTZGNlVJZTVZWEs2K3Z4eXd6aW9DL2lrUytRaWl2Y01G?=
- =?utf-8?B?YjNUOUNwUzdhSFptZ20zTFlzSWVKWXlYeGZSL2M1NnRXODF1V2RDMFpYMEdo?=
- =?utf-8?B?c0FweGRiRGowMlZpZjMzaHVPc3NCWDN5QmVFWjNBQjJqNWVveVVGSW9xY2dC?=
- =?utf-8?B?UERNVG9BZ21XcUFkRmhSSFF4dnZUSGovSEZ4NE5OTmR1d3N1SGFiUTZ1UEtE?=
- =?utf-8?B?UVdMQkZwc2xrNVBVRjlaUTJ3SnVZbVlIQU9uMWs5OENaSDdiMHFYRzlQcGVu?=
- =?utf-8?B?OFdKSDNHdkhBLy9wMmdhQWtBR2lZR1NKNlVTMWp0WmFoMklLVHZvYU0zVzg2?=
- =?utf-8?B?T3NoQ0haUlVvS3dpOEZpVkd0QnZZaWNYWE1ybEVuU1FLZ0U5cXRpTXJEeExB?=
- =?utf-8?B?RlhDcGszdStCTkllSk8yQ0JzL21lRTFhend4WllHZWZCNHYrZlhRSVBoV1pl?=
- =?utf-8?B?YUhiYzlza0lpb3l4TjloYUI5bnkxVHZiTVFRSnhqY2dsYkZEM1kzTjRlMXlm?=
- =?utf-8?B?Z21DTVg0Q1VBNURkZm5ZUzVKRFgwVFFoZGNFck1nemJLSTFRSWVxMGdxWWV5?=
- =?utf-8?B?eVFZSDk5bElibjU0bDFmeFJnZ2NWYTRualNTYmhrbnpUZVVHQ0k2dk1qVlp6?=
- =?utf-8?B?UnhrdWlVdDU5KzhROFNRQ2J2b3B6ZzZpYnhWeGZlZ3VuSStXK2JvTjZiNit0?=
- =?utf-8?B?c2NzeVpKeTFSeWRab2NMNUoyblpQSURvNTVXcVk2KzFsTndOdDR0ajFoN21i?=
- =?utf-8?B?VGxBMUl2WnlGMTY3K1Q0a2tvaUFCSUVNbE1TdS9WaUVYaWQ1Y1BqeXlwZjZK?=
- =?utf-8?B?SXkrc09LTWZvbGVEbVNMOU1iVkFBdzN4cWpmeUJuTWV1L29VMlZaQlltRkxB?=
- =?utf-8?B?MW9CSHcwS3pvV0I0ZUxKWFR2bjVmdmVsWVY2RGo4MklWWXQxZFExU0pxMzUw?=
- =?utf-8?Q?Ysf15S+KIhkZjcFEvLNt7auTznPpdlbH?=
-x-forefront-antispam-report:
- CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BL1PR12MB5922.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(366016)(1800799024)(7416014)(376014)(38070700018);DIR:OUT;SFP:1101;
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0:
- =?utf-8?B?eXVlSVRDV3NzZTZrcjZmeWhnVmdNNlVUYkpmaTJOc0JxaWtob1FzVHZtaVV6?=
- =?utf-8?B?NTYvSmZoK1c0b283TW1QZjR3Y3ZTSjg2dk0xbVo5QXBPTzN4Y1c0NTRrOFFO?=
- =?utf-8?B?NlZCcE1ob2hybmZvQUlLUVNicVJUTEpHY2J0MXNUOWhqNGxDYkR1OGU4S1Jm?=
- =?utf-8?B?dCtPVEpEQWFMZDJZQ1pOUWdoNllHZkFNRmUzWFFBbTRmcmpRanFDOCtrS2pz?=
- =?utf-8?B?OE1iZ2RrK0RFYU4vMlFVQTZaQjZ1ZHU4dFgwSVpwSFR1ZEhjblhFY1kwckJ0?=
- =?utf-8?B?YnBCeE1BLzVCbE9yZjY2QmNxVGY4ZVFoVTF1SENWVm80SnRvaFlhbUE0TzNw?=
- =?utf-8?B?dklNVmNBT01xa0tQWDNPU2NMMkFoYjBwRGFGbVZmbHBXZCtRWWxTdnNQWlky?=
- =?utf-8?B?OXo1anZSUlV0b3hFTUwxWnZiM2NsU2hHY3NpUzBrelcwakNVQWxvNmpSdS9z?=
- =?utf-8?B?QmFudjcrMmdaeUlnY1hEZGF2UUtCalA0SjNNQ0RKbVZELzJ2bFJMd2NrZDJk?=
- =?utf-8?B?T3hOTjNIUExocldXNG8yYVIrQmI4VU1yelByeHMxZE5lRXhiN0xIQVFkV2Q0?=
- =?utf-8?B?T2UzN2paOWRpOHdFSllNOGNhd3BpSkJndnRaRERxL00xQzRoVktVTTZOT1lJ?=
- =?utf-8?B?d1hBVnRsczYyUjBHSVE1NmFETnlMRDdHcms1aFN0Snp0VjBnKzAyVUplWWhY?=
- =?utf-8?B?Q2Qra2NPdi9kckNITnZDVlpKdjg5WGNpUW8vTEUwU00ydExsMDJwbzZjNm90?=
- =?utf-8?B?Q2tML3hOZGE4UVpzbUVVYmt2YS9MbDU3alpxbVo0RjAvMGtjTjJGNGZ0TmEz?=
- =?utf-8?B?OG12ZnNiV25xYXZQVSt6NFBYZVpod3grY3dFTkdVelRvaGtqQytVcm9SaUJi?=
- =?utf-8?B?QXZBb3hjTFFodDRZdm5vQ0kzQXIxWXJPQVNnOWVUVDVQaTlsK3VWNXFJUXho?=
- =?utf-8?B?c3FPOXBaVmt4bkdjczFHdE82U05XOWw3LzNYa0ZlTkRLT2s4L3JvekRYc003?=
- =?utf-8?B?NklWV2NKOEFzRjBrQytVRFZ6YUxLcm9yS2Q2MVI3aFBjZ0xuQkZJdjBEQlpQ?=
- =?utf-8?B?SXpoSVBLSmJmdUhyc2xvakY0emU1UFNlYWhyVk83VlQxU0tXUFh4T3JaN1Vt?=
- =?utf-8?B?a3g1SlZyUjVoSE5FbWxjL1JIY0ZmREs1Sk9zSXJxeThQR3BBS0pURjBCMXNO?=
- =?utf-8?B?RUlONUR2UDI3MWZtUk9HeklXejdlQXRxUURjYzhLUVcvenR3cWNUWTFlclRp?=
- =?utf-8?B?WG5GUENnSHIyL01iaFRWcysxYUd3SHNyc0U1aENXaS9QK2Jvdmt6MXJUU3Bl?=
- =?utf-8?B?Q0JqSEhyODhSTzgzdUQydTlYTjhnckN2clI3ZERIRjhWOGZpc1pVV0t5aGVl?=
- =?utf-8?B?WWhQMVQvOGdGTmR2cTkweDFDRk10NGx3L2FPOFBUaUtweHl4RTJ2UFBYZTRr?=
- =?utf-8?B?Njd1YmF5bkxMR2VCQ1cvRFFxQmtCb2JTdzhCQWE4YzBaMjNqOEM4TUUyK3FP?=
- =?utf-8?B?eU9lK3pQTkpSRE1rT1VlenJXVVRjRGdHV1dDamNiNGQxREkvMHpNUmh1bTZa?=
- =?utf-8?B?ejAwSThwZXl6M1BWMHROcWg5dWNxSVFaZUF5b3R0dENjaE81c0tuZGh3VDd1?=
- =?utf-8?B?SzljTWpPRXpYdjV1TmNzZ3lYL1plUysxb3F6TzQxdFNublZKTlpMeWZLZnht?=
- =?utf-8?B?NzBzVDFpWFBlZkU0Z0xUMXhia09pbk45TGdEU0gvVXNOSjlIanBOQ3ZkN0ZB?=
- =?utf-8?B?OWc3TTJTSWVpOXJsbVljZkV4dHFvOW1pZjhoU3lENHQ1bGlpRlNZbTVrMmZU?=
- =?utf-8?B?WklHWk1EV0hJL1MwMVUyMFVZeFlEank0VURvRndGQS9JS2tFb2pHWEIyK0ln?=
- =?utf-8?B?bEZaQVh2MzU2MmtoRDBqSzIwR0RKOFYyRUY1RkZrS1NDYkpmSS9mVTRaNFpV?=
- =?utf-8?B?OElyaDVuRVVBd0hYZXJoT1AyMTcyOG44YWZrQmNVNXNRa3MrMXkxUzlMaDZW?=
- =?utf-8?B?cjYwbkRBM0F3T05rNkdKSnRsTjJ0M2ErUy9DZHVrZjJDd0hGV2IrN3EvTjBj?=
- =?utf-8?B?ZCs5MmlmVUZPU3JMQUFCWUtxQ3ZRYm9ybndJRDVrTjArYlJRc3hlWWtJakZu?=
- =?utf-8?Q?Wy3QxnJEiUhkmvEdnXE3weJHy?=
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BDFB6215190
+	for <netdev@vger.kernel.org>; Tue,  4 Feb 2025 16:00:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1738684830; cv=none; b=k/BEwH9vSYvdmx0ht9d9ZdEeiBV77R5GbzeYb59n5wKgAHvGSU/KCqOcFxbc0mJFJCFpN6pIfwcvxPntGtLdpRaIesEWmz459jvvumnbhQTNJ+eYmA4cdd/H9JLB/47eVbJPRDh/BR01updSuIcfzFJVOvFUdM99grdI++Hb6QE=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1738684830; c=relaxed/simple;
+	bh=1O/wP9rvmPeZrRl625NzZqbNnLbiuhYCS1deBIYhZQo=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=VFHsXk/6xu3YPE7qf52Fakzd2TY00zDhOp4QQasFjvXDkgnC8p12d/xfRsEpysXiaojYxWFFmvG5agOM81+bnco19/eQ+5z/nGDpcOgrM/Vg6vSyeaBJaslgJ0KunXlz8yhXN4Ft51lc5t7AjOmfF7znq18Abiweq/DHF9lBwow=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=GbBolB2/; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1738684827;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=VQeQVNRtN3YgkmOYd3AaFO1X0gu38baF3CR9tNQKQyQ=;
+	b=GbBolB2/Jq3GWfV6ZtpsJ179EEP79X7GMWoHYr6qq+92xbNhXdeHuavSI3n8cGO7ThqEbC
+	a9CjZRU487BjG7vxq1VlUd/XaDTvTktKLYqfcd29i5IWy3KgYJCwjfpI6f82sDZNrJpYcl
+	3HK9W4zTK9dLSNBzLWDmV3TKZATWPZ4=
+Received: from mail-qk1-f198.google.com (mail-qk1-f198.google.com
+ [209.85.222.198]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-663-Qh81uh31PK6cLAX4qTkThw-1; Tue, 04 Feb 2025 11:00:25 -0500
+X-MC-Unique: Qh81uh31PK6cLAX4qTkThw-1
+X-Mimecast-MFC-AGG-ID: Qh81uh31PK6cLAX4qTkThw
+Received: by mail-qk1-f198.google.com with SMTP id af79cd13be357-7bcf4d3c1c1so869578085a.2
+        for <netdev@vger.kernel.org>; Tue, 04 Feb 2025 08:00:25 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1738684825; x=1739289625;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=VQeQVNRtN3YgkmOYd3AaFO1X0gu38baF3CR9tNQKQyQ=;
+        b=s0shmTLUEDJyTaiEALLThItBlf7/2043BfI4w5S5BhondWnrAtws5oySzB2cZeS+Dx
+         RC/iDLQhXu4+xLQxKqRGxxsbdPHsCmAb9fWbEnb3lCzdOF3AHRykwxjVj74YC8DQGT1k
+         g2BI8iKQpEOHJvLCdR/rHOXJGlfhwRWVTSnve75azMyNo0znex0Hzwnkx4gy2aAl+S2b
+         TXO2ERAAM0lFyB5z/33oZutWS6qd3/PynT45pRIwGHIJ9f4IeJLlyi7LYCTKO2r/EkeO
+         tgTYAE6uY3dyiinCBBegBgzt5rDTSPQkdKmPatpduQ8gq6bs+lBgAcn6m7tfTAf/qxT2
+         LQhA==
+X-Forwarded-Encrypted: i=1; AJvYcCVjRi8jDyMPR/515tbU02pKiimohZ48wHE/4I+doFTIb42XA8v7PzFt7N7+kHHeZY6cIIHV4qI=@vger.kernel.org
+X-Gm-Message-State: AOJu0YweaFTPpfnF0NVIaXgKyRNIlYRPm2Yare9d7D8Iqlx4xjY6PpOM
+	kqcHbY0/eOFluigIEebaLzvihStLbNgvNTQ9AmZueBeW2MxsSe3xp0CsimnGBuo+XqhLv4vs2AI
+	m7bqmeWKrZJZ+QuUjyqUslyrkcmBhkojNUTXRc3elQ2PBjKN2NTfZBg==
+X-Gm-Gg: ASbGncsrlooADQPiEEcFtzQna9nsRoU3xarm+h7GOfWMI1TI1BhaSXcdF14DZWJ82aC
+	LyqHFY2bgYFY2k4t+EJqm9zEiwIBHdS0QDqYQsvAb/9wHE9BDcXuiwEjMx+u7al1zJO7ZVdAzwW
+	UoJ8d3DYOoCk19H1cQqoKc8axXe2XlLH3BHY7f+XwB9iSn548P+tn/EoytDhJ0/54bHwoncOWqd
+	ojVyAy/Pr35OW+SHvmH4fOZXM7NqVR8v1oK8kcJFRS7RvXpua/tAQiU9bWNv++pgvAXXqagMidI
+	V1jcUZvJ6g==
+X-Received: by 2002:a05:620a:2609:b0:7b6:efd0:3d1e with SMTP id af79cd13be357-7bffcda534bmr4587392985a.53.1738684824375;
+        Tue, 04 Feb 2025 08:00:24 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IFAzo8YaZRMK8ajt6OxqGDW+Sj15Mdkt2eLhS8DtBinrVor/FEjWi7axlukvj1WQmCBNIR2Cw==
+X-Received: by 2002:a05:620a:2609:b0:7b6:efd0:3d1e with SMTP id af79cd13be357-7bffcda534bmr4587364685a.53.1738684823018;
+        Tue, 04 Feb 2025 08:00:23 -0800 (PST)
+Received: from sgarzare-redhat ([185.121.209.52])
+        by smtp.gmail.com with ESMTPSA id af79cd13be357-7c00a90558csm656228185a.74.2025.02.04.08.00.20
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 04 Feb 2025 08:00:22 -0800 (PST)
+Date: Tue, 4 Feb 2025 17:00:14 +0100
+From: Stefano Garzarella <sgarzare@redhat.com>
+To: Luigi Leonardi <leonardi@redhat.com>
+Cc: Michal Luczaj <mhal@rbox.co>, "David S. Miller" <davem@davemloft.net>, 
+	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
+	Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, netdev@vger.kernel.org, 
+	syzbot+9d55b199192a4be7d02c@syzkaller.appspotmail.com, fstornio@redhat.com
+Subject: Re: [PATCH net 1/2] vsock: Orphan socket after transport release
+Message-ID: <huosgcp4y7rr4ppagt7232oexydso6nxv3hzk5qi2euqqqyp6f@mfggrtjrzjdu>
+References: <20250204-vsock-linger-nullderef-v1-0-6eb1760fa93e@rbox.co>
+ <20250204-vsock-linger-nullderef-v1-1-6eb1760fa93e@rbox.co>
+ <jj6xlb2udt2khosipoi4m6iwjc6g5hau3jnzbf6dg2aredfykp@y7j4jlgd4tpr>
+ <jfkqsbbq5um6nmlhnxxgx3eg7aopnwaddqvcj7s6svmpujswub@42sq2pawnsxn>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: BL1PR12MB5922.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: e04a61c2-87c9-4f89-cb75-08dd4534e8af
-X-MS-Exchange-CrossTenant-originalarrivaltime: 04 Feb 2025 15:59:30.0497
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: 48hv0QzBBvF9IwNfd1E1CHkRY0HfVi1ncUcVfcIPtZFgbYykOlUx1Uic0Q8zb2Q0hUOLkpL/VsEGadpc/bnSUw==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM4PR12MB6011
+Content-Type: text/plain; charset=us-ascii; format=flowed
+Content-Disposition: inline
+In-Reply-To: <jfkqsbbq5um6nmlhnxxgx3eg7aopnwaddqvcj7s6svmpujswub@42sq2pawnsxn>
 
-DQoNCj4gLS0tLS1PcmlnaW5hbCBNZXNzYWdlLS0tLS0NCj4gRnJvbTogQWxleGVpIFN0YXJvdm9p
-dG92IDxhbGV4ZWkuc3Rhcm92b2l0b3ZAZ21haWwuY29tPg0KPiBTZW50OiBUdWVzZGF5LCA0IEZl
-YnJ1YXJ5IDIwMjUgMTc6NTYNCj4gVG86IFBldHIgTWFjaGF0YSA8cGV0cm1AbnZpZGlhLmNvbT4N
-Cj4gQ2M6IERhdmlkIFMuIE1pbGxlciA8ZGF2ZW1AZGF2ZW1sb2Z0Lm5ldD47IEVyaWMgRHVtYXpl
-dCA8ZWR1bWF6ZXRAZ29vZ2xlLmNvbT47IEpha3ViIEtpY2luc2tpIDxrdWJhQGtlcm5lbC5vcmc+
-OyBQYW9sbyBBYmVuaQ0KPiA8cGFiZW5pQHJlZGhhdC5jb20+OyBBbmRyZXcgTHVubiA8YW5kcmV3
-K25ldGRldkBsdW5uLmNoPjsgTmV0d29yayBEZXZlbG9wbWVudCA8bmV0ZGV2QHZnZXIua2VybmVs
-Lm9yZz47IEFtaXQgQ29oZW4NCj4gPGFtY29oZW5AbnZpZGlhLmNvbT47IElkbyBTY2hpbW1lbCA8
-aWRvc2NoQG52aWRpYS5jb20+OyBBbGV4ZWkgU3Rhcm92b2l0b3YgPGFzdEBrZXJuZWwub3JnPjsg
-RGFuaWVsIEJvcmttYW5uDQo+IDxkYW5pZWxAaW9nZWFyYm94Lm5ldD47IEplc3BlciBEYW5nYWFy
-ZCBCcm91ZXIgPGhhd2tAa2VybmVsLm9yZz47IEpvaG4gRmFzdGFiZW5kIDxqb2huLmZhc3RhYmVu
-ZEBnbWFpbC5jb20+OyBicGYNCj4gPGJwZkB2Z2VyLmtlcm5lbC5vcmc+OyBtbHhzdyA8bWx4c3dA
-bnZpZGlhLmNvbT4NCj4gU3ViamVjdDogUmU6IFtQQVRDSCBuZXQtbmV4dCAwMC8xMl0gbWx4c3c6
-IFByZXBhcmF0aW9ucyBmb3IgWERQIHN1cHBvcnQNCj4gDQo+IE9uIFR1ZSwgRmViIDQsIDIwMjUg
-YXQgMTE6MDbigK9BTSBQZXRyIE1hY2hhdGEgPHBldHJtQG52aWRpYS5jb20+IHdyb3RlOg0KPiA+
-DQo+ID4gQW1pdCBDb2hlbiB3cml0ZXM6DQo+ID4NCj4gPiBBIGZ1dHVyZSBwYXRjaCBzZXQgd2ls
-bCBhZGQgc3VwcG9ydCBmb3IgWERQIGluIG1seHN3IGRyaXZlci4gVGhpcyBzZXQgYWRkcw0KPiA+
-IHNvbWUgcHJlcGFyYXRpb25zLg0KPiANCj4gV2h5Pw0KPiBXaGF0IGlzIHRoZSBnb2FsIGhlcmU/
-DQo+IE15IHVuZGVyc3RhbmRpbmcgaXMgdGhhdCBtbHhzdyBpcyBhIGh3IHN3aXRjaCBhbmQgc2ti
-LXMgYXJlIHVzZWQgdG8NCj4gaW1wbGVtZW50IHRhcCBmdW5jdGlvbmFsaXR5IGZvciBmZXcgbGlz
-dGVuZXJzLg0KPiBUaGUgdm9sdW1lIG9mIHN1Y2ggcGFja2V0cyBpcyBzdXBwb3NlZCB0byBiZSBz
-bWFsbC4NCj4gRXZlbiBpZiBYRFAgaXMgYWRkZWQgdGhlcmUgaXMgYSBodWdlIG1pc21hdGNoIGlu
-IHBhY2tldCByYXRlcy4NCj4gSGVuY2UgdGhlIHF1ZXN0aW9uLiBXaHkgYm90aGVyPw0KDQpZb3Un
-cmUgcmlnaHQsIG1vc3Qgb2YgcGFja2V0cyBzaG91bGQgYmUgaGFuZGxlZCBieSBIVywgWERQIGlz
-IG1haW5seSB1c2VmdWwgZm9yIHRlbGVtZXRyeS4gDQo=
+On Tue, Feb 04, 2025 at 04:44:13PM +0100, Luigi Leonardi wrote:
+>On Tue, Feb 04, 2025 at 11:32:54AM +0100, Stefano Garzarella wrote:
+>>On Tue, Feb 04, 2025 at 01:29:52AM +0100, Michal Luczaj wrote:
+>>>During socket release, sock_orphan() is called without considering that it
+>>>sets sk->sk_wq to NULL. Later, if SO_LINGER is enabled, this leads to a
+>>>null pointer dereferenced in virtio_transport_wait_close().
+>>>
+>>>Orphan the socket only after transport release.
+>>>
+>>>Partially reverts the 'Fixes:' commit.
+>>>
+>>>KASAN: null-ptr-deref in range [0x0000000000000018-0x000000000000001f]
+>>>lock_acquire+0x19e/0x500
+>>>_raw_spin_lock_irqsave+0x47/0x70
+>>>add_wait_queue+0x46/0x230
+>>>virtio_transport_release+0x4e7/0x7f0
+>>>__vsock_release+0xfd/0x490
+>>>vsock_release+0x90/0x120
+>>>__sock_release+0xa3/0x250
+>>>sock_close+0x14/0x20
+>>>__fput+0x35e/0xa90
+>>>__x64_sys_close+0x78/0xd0
+>>>do_syscall_64+0x93/0x1b0
+>>>entry_SYSCALL_64_after_hwframe+0x76/0x7e
+>>>
+>>>Reported-by: syzbot+9d55b199192a4be7d02c@syzkaller.appspotmail.com
+>>>Closes: https://syzkaller.appspot.com/bug?extid=9d55b199192a4be7d02c
+>>>Fixes: fcdd2242c023 ("vsock: Keep the binding until socket destruction")
+>>
+>>Looking better at that patch, can you check if we break commit
+>>3a5cc90a4d17 ("vsock/virtio: remove socket from connected/bound list 
+>>on shutdown")
+>>
+>>https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/commit/?id=3a5cc90a4d1756072619fe511d07621bdef7f120
+>>
+>I worked with Filippo (+CC) on this patch.
+>
+>IMHO it shouldn't do any harm. `sock_orphan` sets sk->sk_socket and 
+>sk_wq to NULL, and sets the SOCK_DEAD flag.
+>
+>This patch sets the latter in the same place. All the other fields are 
+>not used by the transport->release() (at least in virtio-based 
+>transports), so from my perspective there is no real change.
+>
+>What was your concern?
+
+My concern was more about calling `vsock_remove_sock()` in 
+virtio_transport_recv_connected:
+
+I mean this block:
+	case VIRTIO_VSOCK_OP_SHUTDOWN:
+		if (le32_to_cpu(hdr->flags) & VIRTIO_VSOCK_SHUTDOWN_RCV)
+			vsk->peer_shutdown |= RCV_SHUTDOWN;
+		if (le32_to_cpu(hdr->flags) & VIRTIO_VSOCK_SHUTDOWN_SEND)
+			vsk->peer_shutdown |= SEND_SHUTDOWN;
+		if (vsk->peer_shutdown == SHUTDOWN_MASK) {
+			if (vsock_stream_has_data(vsk) <= 0 && !sock_flag(sk, SOCK_DONE)) {
+				(void)virtio_transport_reset(vsk, NULL);
+				virtio_transport_do_close(vsk, true);
+			}
+			/* Remove this socket anyway because the remote peer sent
+			 * the shutdown. This way a new connection will succeed
+			 * if the remote peer uses the same source port,
+			 * even if the old socket is still unreleased, but now disconnected.
+			 */
+			vsock_remove_sock(vsk);
+		}
+
+After commit fcdd2242c023 ("vsock: Keep the binding until socket 
+destruction") calling `vsock_remove_sock` without SOCK_DEAD set, removes 
+the socket only from the connected list.
+
+So, IMHO there is a real change, but I'm not sure if it's an issue or 
+not, since the issue fixed by commit 3a5cc90a4d17 ("vsock/virtio: remove 
+socket from connected/bound list on shutdown") was more about the remote 
+port IIRC, so that should only be affected by the connected list, which 
+is stll touched now.
+
+Stefano
+
 
