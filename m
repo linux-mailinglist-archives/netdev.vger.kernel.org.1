@@ -1,168 +1,230 @@
-Return-Path: <netdev+bounces-162813-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-162814-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id DBB3DA28003
-	for <lists+netdev@lfdr.de>; Wed,  5 Feb 2025 01:12:03 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 859EAA28009
+	for <lists+netdev@lfdr.de>; Wed,  5 Feb 2025 01:15:01 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 4EEB53A2B5C
-	for <lists+netdev@lfdr.de>; Wed,  5 Feb 2025 00:11:55 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id ECA2F3A0677
+	for <lists+netdev@lfdr.de>; Wed,  5 Feb 2025 00:14:52 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3CE79163;
-	Wed,  5 Feb 2025 00:12:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 72969163;
+	Wed,  5 Feb 2025 00:14:56 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=rbox.co header.i=@rbox.co header.b="lvoIj73f"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="i91vReRL"
 X-Original-To: netdev@vger.kernel.org
-Received: from mailtransmit05.runbox.com (mailtransmit05.runbox.com [185.226.149.38])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wm1-f48.google.com (mail-wm1-f48.google.com [209.85.128.48])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CA1F9802
-	for <netdev@vger.kernel.org>; Wed,  5 Feb 2025 00:11:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.226.149.38
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 794A710E3
+	for <netdev@vger.kernel.org>; Wed,  5 Feb 2025 00:14:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.48
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1738714320; cv=none; b=OsKF3FHpz+t5vEcoWtGhAQlnwr9MlkhKtsbM+qqYvMdnRIq7vQmroWLUFZFOnrAaQkHhLgVatde8kkdi+pNGdI0YoxwlgQby8BVGFMPZQVa1/5w3wsHfC7osDu7wHMhrnwqWSasQf4lmdrakDgGt4EgcYpNPdtLv1m7+rOQYe0U=
+	t=1738714496; cv=none; b=UlYk16Z1YmUyKNIN4bJDlHX4NzqYU+r8Gp0EyjeBU7BjbVcEgQUNhjRpX/Ho2vgwfuoITgYpJUn+1xX09Fvgu99J8TMaN9GxbkUcf1ESPogZx9KC2R6Ygg3/ThtRfn49MNAKb5AjpLrQJx5+5byzjYdG9D0FWhtlHDDOWeyRTJM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1738714320; c=relaxed/simple;
-	bh=2aThuqXjD26rFcT60UJzU5YqD8mFeRffsShdAudJ4P0=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=XsD00Nk/37yMmjR+nxSh3qb17Vsp7Uw7wEJL3Bpju2FkSdAIMGTZ0qedzqCZfBPFMHBolvsc0FzHMX4KUnxNq6OyV/wKoBStrbpGLDcyciPDY1Iea9PgeIGeCuTjFMlowBF7woMJtv19U1Mwh4TTvWonFQxls0nlfND95WPsE3c=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=rbox.co; spf=pass smtp.mailfrom=rbox.co; dkim=pass (2048-bit key) header.d=rbox.co header.i=@rbox.co header.b=lvoIj73f; arc=none smtp.client-ip=185.226.149.38
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=rbox.co
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=rbox.co
-Received: from mailtransmit03.runbox ([10.9.9.163] helo=aibo.runbox.com)
-	by mailtransmit05.runbox.com with esmtps  (TLS1.2) tls TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256
-	(Exim 4.93)
-	(envelope-from <mhal@rbox.co>)
-	id 1tfT1D-00605F-D3; Wed, 05 Feb 2025 01:11:51 +0100
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=rbox.co;
-	s=selector1; h=Content-Transfer-Encoding:Content-Type:In-Reply-To:From:
-	References:Cc:To:Subject:MIME-Version:Date:Message-ID;
-	bh=fqnPEqb0npCwgOMe8eMS+WgvesQGL3/eDCx7rcm8DxA=; b=lvoIj73f1U6GgEhitfx5HyHaIe
-	AfWkMAKm11W4MjGRO9C1D0UmXeAi/+GRzUOtykjye8C7t4yN/yqfz+IRjrO/5hulxMyOxcShnDYEM
-	2/GLlkObDW7J8ZgyUSc2hXsZ3yDv5kpR5V+n+p3Ystpk/dfIa0vn9SWT03J04lsZq84ScvvDE511o
-	vcpO1/grhOriyfnWP/RVN5Aw/ToeBUiyekjwsGf7RxJx1fu4GQ4f7iHRbG9JUuJgPfflPK8JyJcWo
-	pOStP2WpcJcb8jEDJ+TVkYvPfs8mZRFumqogjwFEG+GxgitiZFfk1VLTuwxV8oltzyoIzhw2Ee3FW
-	LBaEwfDw==;
-Received: from [10.9.9.74] (helo=submission03.runbox)
-	by mailtransmit03.runbox with esmtp (Exim 4.86_2)
-	(envelope-from <mhal@rbox.co>)
-	id 1tfT1C-0003M2-Lr; Wed, 05 Feb 2025 01:11:50 +0100
-Received: by submission03.runbox with esmtpsa  [Authenticated ID (604044)]  (TLS1.2:ECDHE_SECP256R1__RSA_PSS_RSAE_SHA256__AES_256_GCM:256)
-	(Exim 4.93)
-	id 1tfT0y-009bhV-EO; Wed, 05 Feb 2025 01:11:36 +0100
-Message-ID: <142e66e5-7080-41d9-ac5c-c392dfa68d2a@rbox.co>
-Date: Wed, 5 Feb 2025 01:11:35 +0100
+	s=arc-20240116; t=1738714496; c=relaxed/simple;
+	bh=5ohN7qNU0Gz54tyhjly9LZTyiMzstKdMUjuh7YfKIas=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=CSjWH/6xOuz9SYZ+IQpUdh/MWgwSNMvjhYE/FXzYGPDq/3SZlT3AiA9yUp2NWgJucUAftxg4VrpQKFl+ksW9YTqVqgRWFXNOZMx833rnsH7gwYim+7TkZlx/4vNgRHUln2IQofeYsmo8kI8ntpp2OxvvNlPgUmDcJG5FHLXk9Kg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=i91vReRL; arc=none smtp.client-ip=209.85.128.48
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-wm1-f48.google.com with SMTP id 5b1f17b1804b1-435b0df5dbdso91835e9.0
+        for <netdev@vger.kernel.org>; Tue, 04 Feb 2025 16:14:54 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1738714493; x=1739319293; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=sjBUSgWbZKwpdnR8hSWMUwkZ0R7eozBzf220bdTjfvU=;
+        b=i91vReRLzTDzDXmeCONYk5eNS/PiYmJZ5+qfoF0DNiIPWoALMvgUuxY1q7wc/qIR5t
+         52sVf/cNX2EHMUsVtHF7zM2hSXDZvHXR86fftfOfDJq/LMivo8olKxjRBiV5qLqh6+kO
+         0asvnr3NyyYcMg17Lxz2AwrFbsqv4S0kzduppkjnisHoG1AlUzK6bTtLr7aneBWQNIwu
+         c6tmUSCg32w6rzlBzwbZZOP11l+xp5WlVWuxnavhIefuPehTvKmYHYImHeighlrCbZhl
+         Q2hej2BXGOAYYswRRMLHWhXhN56qKamCik9li9wEosw28eUTPkzGOW3zUj8p7xzGSqPF
+         MegQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1738714493; x=1739319293;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=sjBUSgWbZKwpdnR8hSWMUwkZ0R7eozBzf220bdTjfvU=;
+        b=bLuOT9V2vxjbIrn6US1/hMgaMF/g75UNGTJpiMGZ4VMZr405xy0CzbEvg14S4vqvtx
+         ++xZY4jYfVBggiW2Ey4FyqGAVvvlviP/es7EHXnwARfAHNN2X6OcMhvfqICJ6Sv4W+g3
+         Mx/A7ZW1G2j97UUZ85jrGgazeF9Y/df+cg+IxXN+YVfm2W2fmUIwPvlJF6yZY8Gjy5l5
+         qLItror5jBmJNPssSgaQAyZMfqBOpvAmo7NNl2b5Umjm0+1xbK0iQR9vexC4vwcl8kjN
+         q8nW/GrmJijm/iP8whEU8n3ssJQQCc/3/k5S5KEAQ43vaVy9gwhlPSB+7H4gcz2AATf9
+         GxTw==
+X-Gm-Message-State: AOJu0YzzNClocwhn8OF6GKonqTq7N4JmBg1zw0P5VhKBcnFhoOu/Sp1Z
+	fY2wVB/WwG5XlhZ32FkhEGREG0URUA4IYxDVZ5bAf8xT7rXuCNoz37KL3vTqAuXaiEMdRShMctE
+	cNaVPPhUlehvBnYtS7yBdubDDWot2OMDG9mSTmUUy2+soxzfBTQ==
+X-Gm-Gg: ASbGncvkDaMfDx9IyE4dSkiyZciuM+dVrE/VuIpNxMldljl89ug5V0bKN2cnwm8wbXA
+	2W7MQNaOagw6DaYUzBq6dI5eWEdYZsLvH4nV1ZCTTxU2ghb/hsOHBLkOUpB3zeMYUCmvcbYh9B7
+	Ah+Y/9dr1lF1wi+P91IPNjPInQV38=
+X-Google-Smtp-Source: AGHT+IGn3rsUVeWQ8UTsDyXx2is0rVT/fpIp1FoiEMoPWxqVcmkgkoipXdpMZTue7tac5GEnlB75KAmL0qizhYv7Owc=
+X-Received: by 2002:a05:600c:1f86:b0:434:c967:e4b5 with SMTP id
+ 5b1f17b1804b1-43907572b24mr1692205e9.1.1738714492458; Tue, 04 Feb 2025
+ 16:14:52 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net 1/2] vsock: Orphan socket after transport release
-To: Stefano Garzarella <sgarzare@redhat.com>,
- Luigi Leonardi <leonardi@redhat.com>
-Cc: "David S. Miller" <davem@davemloft.net>,
- Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
- Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>,
- netdev@vger.kernel.org,
- syzbot+9d55b199192a4be7d02c@syzkaller.appspotmail.com, fstornio@redhat.com
-References: <20250204-vsock-linger-nullderef-v1-0-6eb1760fa93e@rbox.co>
- <20250204-vsock-linger-nullderef-v1-1-6eb1760fa93e@rbox.co>
- <jj6xlb2udt2khosipoi4m6iwjc6g5hau3jnzbf6dg2aredfykp@y7j4jlgd4tpr>
- <jfkqsbbq5um6nmlhnxxgx3eg7aopnwaddqvcj7s6svmpujswub@42sq2pawnsxn>
- <huosgcp4y7rr4ppagt7232oexydso6nxv3hzk5qi2euqqqyp6f@mfggrtjrzjdu>
-Content-Language: pl-PL, en-GB
-From: Michal Luczaj <mhal@rbox.co>
-In-Reply-To: <huosgcp4y7rr4ppagt7232oexydso6nxv3hzk5qi2euqqqyp6f@mfggrtjrzjdu>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+References: <20250205001052.2590140-1-skhawaja@google.com>
+In-Reply-To: <20250205001052.2590140-1-skhawaja@google.com>
+From: Samiullah Khawaja <skhawaja@google.com>
+Date: Tue, 4 Feb 2025 16:14:41 -0800
+X-Gm-Features: AWEUYZkBlvMg_S5dz14Y6JNwRw1lFrit4S3xG50BJ5yjf0VFRUNmy3FYs8JXLMQ
+Message-ID: <CAAywjhT6p9hGNC+VurGvi=jHq+7saKeEMpdxVuQvpFAUosx4=A@mail.gmail.com>
+Subject: Re: [PATCH net-next v3 0/4] Add support to do threaded napi busy poll
+To: Jakub Kicinski <kuba@kernel.org>, "David S . Miller" <davem@davemloft.net>, 
+	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, almasrymina@google.com
+Cc: netdev@vger.kernel.org, Joe Damato <jdamato@fastly.com>, 
+	Martin Karsten <mkarsten@uwaterloo.ca>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On 2/4/25 17:00, Stefano Garzarella wrote:
-> On Tue, Feb 04, 2025 at 04:44:13PM +0100, Luigi Leonardi wrote:
->> On Tue, Feb 04, 2025 at 11:32:54AM +0100, Stefano Garzarella wrote:
->>> On Tue, Feb 04, 2025 at 01:29:52AM +0100, Michal Luczaj wrote:
->>>> During socket release, sock_orphan() is called without considering that it
->>>> sets sk->sk_wq to NULL. Later, if SO_LINGER is enabled, this leads to a
->>>> null pointer dereferenced in virtio_transport_wait_close().
->>>>
->>>> Orphan the socket only after transport release.
->>>>
->>>> Partially reverts the 'Fixes:' commit.
->>>>
->>>> KASAN: null-ptr-deref in range [0x0000000000000018-0x000000000000001f]
->>>> lock_acquire+0x19e/0x500
->>>> _raw_spin_lock_irqsave+0x47/0x70
->>>> add_wait_queue+0x46/0x230
->>>> virtio_transport_release+0x4e7/0x7f0
->>>> __vsock_release+0xfd/0x490
->>>> vsock_release+0x90/0x120
->>>> __sock_release+0xa3/0x250
->>>> sock_close+0x14/0x20
->>>> __fput+0x35e/0xa90
->>>> __x64_sys_close+0x78/0xd0
->>>> do_syscall_64+0x93/0x1b0
->>>> entry_SYSCALL_64_after_hwframe+0x76/0x7e
->>>>
->>>> Reported-by: syzbot+9d55b199192a4be7d02c@syzkaller.appspotmail.com
->>>> Closes: https://syzkaller.appspot.com/bug?extid=9d55b199192a4be7d02c
->>>> Fixes: fcdd2242c023 ("vsock: Keep the binding until socket destruction")
->>>
->>> Looking better at that patch, can you check if we break commit
->>> 3a5cc90a4d17 ("vsock/virtio: remove socket from connected/bound list 
->>> on shutdown")
->>>
->>> https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/commit/?id=3a5cc90a4d1756072619fe511d07621bdef7f120
->>>
->> I worked with Filippo (+CC) on this patch.
->>
->> IMHO it shouldn't do any harm. `sock_orphan` sets sk->sk_socket and 
->> sk_wq to NULL, and sets the SOCK_DEAD flag.
->>
->> This patch sets the latter in the same place. All the other fields are 
->> not used by the transport->release() (at least in virtio-based 
->> transports), so from my perspective there is no real change.
->>
->> What was your concern?
-> 
-> My concern was more about calling `vsock_remove_sock()` in 
-> virtio_transport_recv_connected:
-> 
-> I mean this block:
-> 	case VIRTIO_VSOCK_OP_SHUTDOWN:
-> 		if (le32_to_cpu(hdr->flags) & VIRTIO_VSOCK_SHUTDOWN_RCV)
-> 			vsk->peer_shutdown |= RCV_SHUTDOWN;
-> 		if (le32_to_cpu(hdr->flags) & VIRTIO_VSOCK_SHUTDOWN_SEND)
-> 			vsk->peer_shutdown |= SEND_SHUTDOWN;
-> 		if (vsk->peer_shutdown == SHUTDOWN_MASK) {
-> 			if (vsock_stream_has_data(vsk) <= 0 && !sock_flag(sk, SOCK_DONE)) {
-> 				(void)virtio_transport_reset(vsk, NULL);
-> 				virtio_transport_do_close(vsk, true);
-> 			}
-> 			/* Remove this socket anyway because the remote peer sent
-> 			 * the shutdown. This way a new connection will succeed
-> 			 * if the remote peer uses the same source port,
-> 			 * even if the old socket is still unreleased, but now disconnected.
-> 			 */
-> 			vsock_remove_sock(vsk);
-> 		}
-> 
-> After commit fcdd2242c023 ("vsock: Keep the binding until socket 
-> destruction") calling `vsock_remove_sock` without SOCK_DEAD set, removes 
-> the socket only from the connected list.
-> 
-> So, IMHO there is a real change, but I'm not sure if it's an issue or 
-> not, since the issue fixed by commit 3a5cc90a4d17 ("vsock/virtio: remove 
-> socket from connected/bound list on shutdown") was more about the remote 
-> port IIRC, so that should only be affected by the connected list, which 
-> is stll touched now.
-
-I agree, not an issue. But maybe it's worth replacing
-vsock_remove_sock(vsk) with vsock_remove_connected(vsk) to better convey
-what kind of removal we're talking about here?
-
-Michal
-
+On Tue, Feb 4, 2025 at 4:10=E2=80=AFPM Samiullah Khawaja <skhawaja@google.c=
+om> wrote:
+>
+> Extend the already existing support of threaded napi poll to do continuou=
+s
+> busy polling.
+>
+> This is used for doing continuous polling of napi to fetch descriptors
+> from backing RX/TX queues for low latency applications. Allow enabling
+> of threaded busypoll using netlink so this can be enabled on a set of
+> dedicated napis for low latency applications.
+>
+> It allows enabling NAPI busy poll for any userspace application
+> indepdendent of userspace API being used for packet and event processing
+> (epoll, io_uring, raw socket APIs). Once enabled user can fetch the PID
+> of the kthread doing NAPI polling and set affinity, priority and
+> scheduler for it depending on the low-latency requirements.
+>
+> Currently threaded napi is only enabled at device level using sysfs. Add
+> support to enable/disable threaded mode for a napi individually. This
+> can be done using the netlink interface. Extend `napi-set` op in netlink
+> spec that allows setting the `threaded` attribute of a napi.
+>
+> Extend the threaded attribute in napi struct to add an option to enable
+> continuous busy polling. Extend the netlink and sysfs interface to allow
+> enabled/disabling threaded busypolling at device or individual napi
+> level.
+>
+> We use this for our AF_XDP based hard low-latency usecase using onload
+> stack (https://github.com/Xilinx-CNS/onload) that runs in userspace. Our
+> usecase is a fixed frequency RPC style traffic with fixed
+> request/response size. We simulated this using neper by only starting
+> next transaction when last one has completed. The experiment results are
+> listed below,
+>
+> Setup:
+>
+> - Running on Google C3 VMs with idpf driver with following configurations=
+.
+> - IRQ affinity and coalascing is common for both experiments.
+> - There is only 1 RX/TX queue configured.
+> - First experiment enables busy poll using sysctl for both epoll and
+>   socket APIs.
+> - Second experiment enables NAPI threaded busy poll for the full device
+>   using sysctl.
+>
+> Non threaded NAPI busy poll enabled using sysctl.
+> ```
+> echo 400 | sudo tee /proc/sys/net/core/busy_poll
+> echo 400 | sudo tee /proc/sys/net/core/busy_read
+> echo 2 | sudo tee /sys/class/net/eth0/napi_defer_hard_irqs
+> echo 15000  | sudo tee /sys/class/net/eth0/gro_flush_timeout
+> ```
+>
+> Results using following command,
+> ```
+> sudo EF_NO_FAIL=3D0 EF_POLL_USEC=3D100000 taskset -c 3-10 onload -v \
+>                 --profile=3Dlatency ./neper/tcp_rr -Q 200 -R 400 -T 1 -F =
+50 \
+>                 -p 50,90,99,999 -H <IP> -l 10
+>
+> ...
+> ...
+>
+> num_transactions=3D2835
+> latency_min=3D0.000018976
+> latency_max=3D0.049642100
+> latency_mean=3D0.003243618
+> latency_stddev=3D0.010636847
+> latency_p50=3D0.000025270
+> latency_p90=3D0.005406710
+> latency_p99=3D0.049807350
+> latency_p99.9=3D0.049807350
+> ```
+>
+> Results with napi threaded busy poll using following command,
+> ```
+> sudo EF_NO_FAIL=3D0 EF_POLL_USEC=3D100000 taskset -c 3-10 onload -v \
+>                 --profile=3Dlatency ./neper/tcp_rr -Q 200 -R 400 -T 1 -F =
+50 \
+>                 -p 50,90,99,999 -H <IP> -l 10
+>
+> ...
+> ...
+>
+> num_transactions=3D460163
+> latency_min=3D0.000015707
+> latency_max=3D0.200182942
+> latency_mean=3D0.000019453
+> latency_stddev=3D0.000720727
+> latency_p50=3D0.000016950
+> latency_p90=3D0.000017270
+> latency_p99=3D0.000018710
+> latency_p99.9=3D0.000020150
+> ```
+>
+> Here with NAPI threaded busy poll in a separate core, we are able to
+> consistently poll the NAPI to keep latency to absolute minimum. And also
+> we are able to do this without any major changes to the onload stack and
+> threading model.
+>
+> v3:
+>  - Fixed calls to dev_set_threaded in drivers
+>
+> v2:
+>  - Add documentation in napi.rst.
+>  - Provide experiment data and usecase details.
+>  - Update busy_poller selftest to include napi threaded poll testcase.
+>  - Define threaded mode enum in netlink interface.
+>  - Included NAPI threaded state in napi config to save/restore.
+>
+> Samiullah Khawaja (4):
+>   Add support to set napi threaded for individual napi
+>   net: Create separate gro_flush helper function
+>   Extend napi threaded polling to allow kthread based busy polling
+>   selftests: Add napi threaded busy poll test in `busy_poller`
+>
+>  Documentation/ABI/testing/sysfs-class-net     |   3 +-
+>  Documentation/netlink/specs/netdev.yaml       |  14 ++
+>  Documentation/networking/napi.rst             |  80 ++++++++++-
+>  .../net/ethernet/atheros/atl1c/atl1c_main.c   |   2 +-
+>  drivers/net/ethernet/mellanox/mlxsw/pci.c     |   2 +-
+>  drivers/net/ethernet/renesas/ravb_main.c      |   2 +-
+>  drivers/net/wireless/ath/ath10k/snoc.c        |   2 +-
+>  include/linux/netdevice.h                     |  24 +++-
+>  include/uapi/linux/netdev.h                   |   7 +
+>  net/core/dev.c                                | 127 ++++++++++++++----
+>  net/core/net-sysfs.c                          |   2 +-
+>  net/core/netdev-genl-gen.c                    |   5 +-
+>  net/core/netdev-genl.c                        |   9 ++
+>  tools/include/uapi/linux/netdev.h             |   7 +
+>  tools/testing/selftests/net/busy_poll_test.sh |  25 +++-
+>  tools/testing/selftests/net/busy_poller.c     |  14 +-
+>  16 files changed, 285 insertions(+), 40 deletions(-)
+>
+> --
+> 2.48.1.362.g079036d154-goog
+>
+Adding Joe and Martin as they requested to be CC'd in the next
+revision. It seems I missed them when sending this out :(.
 
