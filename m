@@ -1,77 +1,77 @@
-Return-Path: <netdev+bounces-163158-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-163159-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id D20ACA2970E
-	for <lists+netdev@lfdr.de>; Wed,  5 Feb 2025 18:17:15 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 58F03A29710
+	for <lists+netdev@lfdr.de>; Wed,  5 Feb 2025 18:17:26 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id C1315188628A
-	for <lists+netdev@lfdr.de>; Wed,  5 Feb 2025 17:17:20 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 57C38167915
+	for <lists+netdev@lfdr.de>; Wed,  5 Feb 2025 17:17:23 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 55972193436;
-	Wed,  5 Feb 2025 17:16:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8555B1FC7F7;
+	Wed,  5 Feb 2025 17:16:59 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="cBV8HWb/"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="L/q2r/Yz"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f50.google.com (mail-wm1-f50.google.com [209.85.128.50])
+Received: from mail-wm1-f46.google.com (mail-wm1-f46.google.com [209.85.128.46])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 702BA2E64A;
-	Wed,  5 Feb 2025 17:16:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.50
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ABFB21FC112;
+	Wed,  5 Feb 2025 17:16:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.46
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1738775818; cv=none; b=MCVAwq3mLlp8KbIhyX/eKrOMCOCS+317TdsAwVXhkMOFeazDqRonLA8SeNwwdipJ342ZuVZqY5Br+V44xMK68EmmdQLWo79Tl1kUx165SLLt3Qr2+G8+kGSN2O2J8Hs4pzmmPGAu1hIk5qjP+fboTbSwQ/ALRtNBodgVWJh9Q4o=
+	t=1738775819; cv=none; b=OQgJcSqBkyfyimzm42eZx0R1LUE3pdtH6Il7tMLtPWRz5cH+oARJzQOQCkJFFqkSC+b0dK8f6o3PJ8jJvDdI1SpjqvFQN9jEvhi9VYUjZ3qc7ps+0RtpEAwoowtVr9n6zPH+/Z7cmJBiDN2UnXoN8jn4nkoZ6yuqbQNECDHn6xM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1738775818; c=relaxed/simple;
-	bh=E/hRNJtuqtMXNGvoVGdIomguAq0eLAENGGI5vNfV3ZM=;
+	s=arc-20240116; t=1738775819; c=relaxed/simple;
+	bh=JNM+xJCaItR02fuhdJjaI5OW53diysJABbpIdanaGOU=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=PKidH9qfClKTNMWW+e956mtFKEj0weZMASqhTYayjCcJMl9lugNbW7I5CJKtAi0rAO0OXlWgsO1wmKAScU5wNZryog4MsskpQSxit6lxC/jRhNkEPaVcumebE4gpKsrt21ymEFoFqPAjCLBVzbTW5gNVuWwB7V1eX+l9onELy/M=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=cBV8HWb/; arc=none smtp.client-ip=209.85.128.50
+	 MIME-Version; b=Qhc4LtsplBKnNNQn9C312lW/WOcBlDxd/9x0IGg4JEp5kx5QjTTltHmvHvvdKb2E2ZnpC1BNoxaE1AaOv39avIKHIoLYsLqKPvAu8nTkhRjUuIGnt6PvCTnIenUZ7fT6O5ml/OzVyqrWM0fabFzBcnlJzbJz3ujZhjlJSrv6AHU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=L/q2r/Yz; arc=none smtp.client-ip=209.85.128.46
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wm1-f50.google.com with SMTP id 5b1f17b1804b1-43625c4a50dso161305e9.0;
-        Wed, 05 Feb 2025 09:16:56 -0800 (PST)
+Received: by mail-wm1-f46.google.com with SMTP id 5b1f17b1804b1-436202dd7f6so227695e9.0;
+        Wed, 05 Feb 2025 09:16:57 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1738775815; x=1739380615; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1738775816; x=1739380616; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=rYCfTbmKlTJiaL0ZiUMYD0efLC2XV52Kcudlo3pKSOY=;
-        b=cBV8HWb/MfeK8Jky0TwakdZqW17xM147n4Nu0ddjyMFNX+X++CBFl9MtnOLG2XgYqh
-         149MZRxFicBIwSeNz9J/mG7axg9jpCSM9oex9SyHQCh4i8XWweMtr/av64zDEjBXrK48
-         jwwQtDZ7BCIDRQB1IU/3TCJgNHhzDZI41G/63O2IstpxCH3+wCJk+jhxzJloPLbEKhGC
-         VJRPwSfdEf+U48K/sCw7ZjtDeYaPQ1UdNxbrz1xXUqtVRcS4d9Kys480WbpdmrV6jJQf
-         FZCLHvCpDmC9U5P202D3jK3rCM+p7RCRo9t43s9WIO9MPp2tDoQby5pPGm57kLVQ+zDe
-         lqbg==
+        bh=Q560iUflz9C+1XE8KBgcw0eVXI/n7mkGqzaVgKvz5w0=;
+        b=L/q2r/YzY7dP6ZQGR6SAW6f26+Fl8Rb0mZ0TZM/0LWk5TpSavVNiXQUOwiVsLzxz5G
+         pnlF1LncVnGbdH0p9zlgmOHZ2Fvg6DTw8syGuJSIXJkToskVM60+kJs6iOiXCinwBMLG
+         1AfHQHy3H12EUIt76Z4YEexZB8x/nBVyc09j2/5f60A0n6UM2ndU+xbz2/9P11a0Kdq0
+         f26uhn2nhfMNZmQy7LnCcrJ0eIjLBeCO6DAKqNRQW6Jg0fo0JSd72odnwO5Stau1OhUL
+         61bZU4wa1nm9Ryj4agwq/DyDJxhWrOpaNaQkKYd2nyIlnUf8DL2qgKjJQJhMnqOK/bzF
+         NP3Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1738775815; x=1739380615;
+        d=1e100.net; s=20230601; t=1738775816; x=1739380616;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=rYCfTbmKlTJiaL0ZiUMYD0efLC2XV52Kcudlo3pKSOY=;
-        b=BEQLaupv3fdJTaVF7o3v175OuY15F1ikdZbe169HRAOKNdGuV+J6Y6optB/zHCuSE8
-         F3EDkhHq+E76OayzmPN716ndvazjWgIA48hbvbeFwBz81UJIY/fVYlmYz+yoJ7F4zIE+
-         vyLQ9NHWgNvZZoZiPMw9fcGPOqML/s+il0FLRn1RaO6BKk8s/RMtZ7xavEGuF+vYTpKK
-         sQg/01vYU7WpQbT844/WLYMzupdLHC9cAiV6UdJpGKL0dmXBcBbhG/HWbhSut4wpUuW2
-         fwZDyB3UqFIcR5Z2yC3B5QBTvS3fYI+ZKYuah9NnIX2SnWGZCeIYQ2CVayfghvcO11AL
-         Db3w==
-X-Forwarded-Encrypted: i=1; AJvYcCUw7puGt2PVg35SQ6VomRq1+HOP+AHIPFAwJcvlhhIVgbiFKn0WZKp4wmG5s5Yrf4lyYQk0y5lR@vger.kernel.org, AJvYcCX1dB4H06rRpqjo8IxrFkSyCCwMn5RgfD1LmEI87Q6C/iPSFSjVjozA7k+AoH6aLf45iQFURp0=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxOUiwHZeJZMW849glZQ/9Ahe2dpESj/rxpjHwQQcWZPN1WDDZZ
-	I2cNWa7PUiOAXj5Kct+Oh4p4OFvq3SyYoY8YSw8brs5YveyDl8I9
-X-Gm-Gg: ASbGnct3giYvhiE5cxuqiA8pSdUjuCcIMMStxYK74xCXx5OV3yy/CYFECwyKL3ZJs8M
-	K7DAOByD1kRRT8dBNJQKvpN8esXygE9QWcNUET9vuwKYFMRQSDnihQApUQq45RUJQyCOIzVC6Tp
-	C1BzRfRGSP9/v40Qej/e5MxN+UUPTXud7Icv3Q0sJrYiIP+giUcgb+9HTmn0XzOucIuXuirNLzR
-	bezWkjC4iFItbqVFMk1wEuz6RPAgJB1zGub0XBDv8Oy4IOuSxjftiu9De5Be4OPW39pQA/GesAC
-	uukuNYjLS3LHNqGrWRFMc0GeYLrtnmTqcDf9JUPHMIhEGQ==
-X-Google-Smtp-Source: AGHT+IG4LmeiGSnhtR301szGZvrRrj5gNVVv5pwvYPtBamzvQr9VJ3r4Avwp1be5HJDO8GNHaKzRNg==
-X-Received: by 2002:a05:600c:46c9:b0:434:ff08:202b with SMTP id 5b1f17b1804b1-4390d436322mr32758115e9.12.1738775814376;
-        Wed, 05 Feb 2025 09:16:54 -0800 (PST)
+        bh=Q560iUflz9C+1XE8KBgcw0eVXI/n7mkGqzaVgKvz5w0=;
+        b=Uipq7KtdwBex5Qzvp086NuZo85re/IlQ1xVycVRJhMkjBF6hM+13IL5ZkW9Su8OrFJ
+         emrl/HqWPaGaT0kLxHOwq+VLR9Zkl9XcBEklICQAa7vqR3ZP/F4JjMldC97EYxaNlowP
+         kd7uVh7vXO64a46P17r7m5Msbrbf/ekKhuUf1wJDtTu1CeiQrJFUoRkmVNcf6DqSLUOg
+         qOFV3qUN3IvPk2/+JEQSEFgC7Xzd6PmorX7PSDVXdpLNuhpr9e7qQqq12OXD4W9VbGNO
+         BHBYbkftqSS+nyHPfrFpTHeYaOwnjZUl/e4ZY3E2nVxMUTQYOn9pi7ASUnW4FJms06yg
+         VHsQ==
+X-Forwarded-Encrypted: i=1; AJvYcCW5d7l1a9gNr6fZOFrPXi6oYKiSeFhdr4+s5G6re3ZvyhmH/0+OkV3pNffnCQsHA4V/1vOvSM8=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yyh/nfly4iCs9hdt8qQBuO/ayqGU99CFirEGYcj6GOMWsCyyY4u
+	f9DDj37W0a+7SS4e0nQIUYY+2/bQb/9+hK7RZmxauL3Dh52n+llA
+X-Gm-Gg: ASbGncvUY0dZgZDrEQOLF+ELAJTYM8Zk6Hjq5JtWlLOq6FrFQFu2HaT7ue9+lVedXcS
+	jMq+l25OLur0Jo9EwWWWymh8DpyGbwzG48Rww+yS9tTmv17vfNeDRCa+h4pACDnL4yKny5KEYvO
+	LvdRMAUy//X3l8legyKL/VzHlxS/svqzrL6F6xu9H0Ssyo6uG8Y/IfBKfdLAHz5eWNmIYEfgFHd
+	tKA7bADwU+cicwcISWQaPkRoDLA3AjaibmPjde0wH+XhaYvPy8VyBe5nvHDPZnRjiHn1LZzZQzy
+	rZ6+KQrZmdrJ25vXn2lzbRdSo1Z6t4RE+c4PeRkRP7NKPQ==
+X-Google-Smtp-Source: AGHT+IHMB3fg22IzIJLhEQCjY975z2jCxrV33MmGgePRsw5efnIW+BFXH2OR6PNKKfqSgZvv8zW87w==
+X-Received: by 2002:a05:600c:5127:b0:436:1b81:b65c with SMTP id 5b1f17b1804b1-4390d43e2a7mr32846695e9.15.1738775815618;
+        Wed, 05 Feb 2025 09:16:55 -0800 (PST)
 Received: from labdl-itc-sw06.tmt.telital.com ([2a01:7d0:4800:a:8eec:4bff:febd:98b9])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-4390daf4480sm27185705e9.27.2025.02.05.09.16.52
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-4390daf4480sm27185705e9.27.2025.02.05.09.16.54
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 05 Feb 2025 09:16:53 -0800 (PST)
+        Wed, 05 Feb 2025 09:16:55 -0800 (PST)
 From: Fabio Porcedda <fabio.porcedda@gmail.com>
 To: Oliver Neukum <oliver@neukum.org>,
 	Andrew Lunn <andrew+netdev@lunn.ch>,
@@ -84,11 +84,10 @@ To: Oliver Neukum <oliver@neukum.org>,
 	Greg Kroah-Hartman <gregkh@linuxfoundation.org>
 Cc: linux-usb@vger.kernel.org,
 	netdev@vger.kernel.org,
-	Daniele Palmas <dnlplm@gmail.com>,
-	stable@vger.kernel.org
-Subject: [PATCH 2/5] net: usb: qmi_wwan: add Telit Cinterion FN990B composition
-Date: Wed,  5 Feb 2025 18:16:46 +0100
-Message-ID: <20250205171649.618162-3-fabio.porcedda@gmail.com>
+	Daniele Palmas <dnlplm@gmail.com>
+Subject: [PATCH 3/5] USB: serial: option: fix Telit Cinterion FN990A name
+Date: Wed,  5 Feb 2025 18:16:47 +0100
+Message-ID: <20250205171649.618162-4-fabio.porcedda@gmail.com>
 X-Mailer: git-send-email 2.48.1
 In-Reply-To: <20250205171649.618162-1-fabio.porcedda@gmail.com>
 References: <20250205171649.618162-1-fabio.porcedda@gmail.com>
@@ -100,66 +99,39 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Add the following Telit Cinterion FN990B composition:
+The correct name for FN990 is FN990A so use it in order to avoid
+confusion with FN990B.
 
-0x10d0: rmnet + tty (AT/NMEA) + tty (AT) + tty (AT) + tty (AT) +
-        tty (diag) + DPL + QDSS (Qualcomm Debug SubSystem) + adb
-T:  Bus=01 Lev=01 Prnt=01 Port=01 Cnt=01 Dev#= 17 Spd=480  MxCh= 0
-D:  Ver= 2.10 Cls=00(>ifc ) Sub=00 Prot=00 MxPS=64 #Cfgs=  1
-P:  Vendor=1bc7 ProdID=10d0 Rev=05.15
-S:  Manufacturer=Telit Cinterion
-S:  Product=FN990
-S:  SerialNumber=43b38f19
-C:  #Ifs= 9 Cfg#= 1 Atr=e0 MxPwr=500mA
-I:  If#= 0 Alt= 0 #EPs= 3 Cls=ff(vend.) Sub=ff Prot=50 Driver=qmi_wwan
-E:  Ad=01(O) Atr=02(Bulk) MxPS= 512 Ivl=0ms
-E:  Ad=81(I) Atr=02(Bulk) MxPS= 512 Ivl=0ms
-E:  Ad=82(I) Atr=03(Int.) MxPS=   8 Ivl=32ms
-I:  If#= 1 Alt= 0 #EPs= 3 Cls=ff(vend.) Sub=ff Prot=60 Driver=option
-E:  Ad=02(O) Atr=02(Bulk) MxPS= 512 Ivl=0ms
-E:  Ad=83(I) Atr=02(Bulk) MxPS= 512 Ivl=0ms
-E:  Ad=84(I) Atr=03(Int.) MxPS=  10 Ivl=32ms
-I:  If#= 2 Alt= 0 #EPs= 3 Cls=ff(vend.) Sub=ff Prot=40 Driver=option
-E:  Ad=03(O) Atr=02(Bulk) MxPS= 512 Ivl=0ms
-E:  Ad=85(I) Atr=02(Bulk) MxPS= 512 Ivl=0ms
-E:  Ad=86(I) Atr=03(Int.) MxPS=  10 Ivl=32ms
-I:  If#= 3 Alt= 0 #EPs= 3 Cls=ff(vend.) Sub=ff Prot=40 Driver=option
-E:  Ad=04(O) Atr=02(Bulk) MxPS= 512 Ivl=0ms
-E:  Ad=87(I) Atr=02(Bulk) MxPS= 512 Ivl=0ms
-E:  Ad=88(I) Atr=03(Int.) MxPS=  10 Ivl=32ms
-I:  If#= 4 Alt= 0 #EPs= 3 Cls=ff(vend.) Sub=ff Prot=40 Driver=option
-E:  Ad=05(O) Atr=02(Bulk) MxPS= 512 Ivl=0ms
-E:  Ad=89(I) Atr=02(Bulk) MxPS= 512 Ivl=0ms
-E:  Ad=8a(I) Atr=03(Int.) MxPS=  10 Ivl=32ms
-I:  If#= 5 Alt= 0 #EPs= 2 Cls=ff(vend.) Sub=ff Prot=30 Driver=option
-E:  Ad=06(O) Atr=02(Bulk) MxPS= 512 Ivl=0ms
-E:  Ad=8b(I) Atr=02(Bulk) MxPS= 512 Ivl=0ms
-I:  If#= 6 Alt= 0 #EPs= 1 Cls=ff(vend.) Sub=ff Prot=80 Driver=(none)
-E:  Ad=8c(I) Atr=02(Bulk) MxPS= 512 Ivl=0ms
-I:  If#= 7 Alt= 0 #EPs= 1 Cls=ff(vend.) Sub=ff Prot=70 Driver=(none)
-E:  Ad=8d(I) Atr=02(Bulk) MxPS= 512 Ivl=0ms
-I:  If#= 8 Alt= 0 #EPs= 2 Cls=ff(vend.) Sub=42 Prot=01 Driver=usbfs
-E:  Ad=07(O) Atr=02(Bulk) MxPS= 512 Ivl=0ms
-E:  Ad=8e(I) Atr=02(Bulk) MxPS= 512 Ivl=0ms
-
-Cc: stable@vger.kernel.org
 Signed-off-by: Fabio Porcedda <fabio.porcedda@gmail.com>
 ---
- drivers/net/usb/qmi_wwan.c | 1 +
- 1 file changed, 1 insertion(+)
+ drivers/usb/serial/option.c | 10 +++++-----
+ 1 file changed, 5 insertions(+), 5 deletions(-)
 
-diff --git a/drivers/net/usb/qmi_wwan.c b/drivers/net/usb/qmi_wwan.c
-index e9208a8d2bfa..7548ac187c26 100644
---- a/drivers/net/usb/qmi_wwan.c
-+++ b/drivers/net/usb/qmi_wwan.c
-@@ -1368,6 +1368,7 @@ static const struct usb_device_id products[] = {
- 	{QMI_QUIRK_SET_DTR(0x1bc7, 0x10c0, 0)}, /* Telit FE910C04 */
- 	{QMI_QUIRK_SET_DTR(0x1bc7, 0x10c4, 0)}, /* Telit FE910C04 */
- 	{QMI_QUIRK_SET_DTR(0x1bc7, 0x10c8, 0)}, /* Telit FE910C04 */
-+	{QMI_QUIRK_SET_DTR(0x1bc7, 0x10d0, 0)}, /* Telit FN990B */
- 	{QMI_FIXED_INTF(0x1bc7, 0x1100, 3)},	/* Telit ME910 */
- 	{QMI_FIXED_INTF(0x1bc7, 0x1101, 3)},	/* Telit ME910 dual modem */
- 	{QMI_FIXED_INTF(0x1bc7, 0x1200, 5)},	/* Telit LE920 */
+diff --git a/drivers/usb/serial/option.c b/drivers/usb/serial/option.c
+index 1f3c05ed5236..2e493041c3bf 100644
+--- a/drivers/usb/serial/option.c
++++ b/drivers/usb/serial/option.c
+@@ -1367,15 +1367,15 @@ static const struct usb_device_id option_ids[] = {
+ 	  .driver_info = NCTRL(2) | RSVD(3) },
+ 	{ USB_DEVICE_INTERFACE_CLASS(TELIT_VENDOR_ID, 0x1063, 0xff),	/* Telit LN920 (ECM) */
+ 	  .driver_info = NCTRL(0) | RSVD(1) },
+-	{ USB_DEVICE_INTERFACE_CLASS(TELIT_VENDOR_ID, 0x1070, 0xff),	/* Telit FN990 (rmnet) */
++	{ USB_DEVICE_INTERFACE_CLASS(TELIT_VENDOR_ID, 0x1070, 0xff),	/* Telit FN990A (rmnet) */
+ 	  .driver_info = NCTRL(0) | RSVD(1) | RSVD(2) },
+-	{ USB_DEVICE_INTERFACE_CLASS(TELIT_VENDOR_ID, 0x1071, 0xff),	/* Telit FN990 (MBIM) */
++	{ USB_DEVICE_INTERFACE_CLASS(TELIT_VENDOR_ID, 0x1071, 0xff),	/* Telit FN990A (MBIM) */
+ 	  .driver_info = NCTRL(0) | RSVD(1) },
+-	{ USB_DEVICE_INTERFACE_CLASS(TELIT_VENDOR_ID, 0x1072, 0xff),	/* Telit FN990 (RNDIS) */
++	{ USB_DEVICE_INTERFACE_CLASS(TELIT_VENDOR_ID, 0x1072, 0xff),	/* Telit FN990A (RNDIS) */
+ 	  .driver_info = NCTRL(2) | RSVD(3) },
+-	{ USB_DEVICE_INTERFACE_CLASS(TELIT_VENDOR_ID, 0x1073, 0xff),	/* Telit FN990 (ECM) */
++	{ USB_DEVICE_INTERFACE_CLASS(TELIT_VENDOR_ID, 0x1073, 0xff),	/* Telit FN990A (ECM) */
+ 	  .driver_info = NCTRL(0) | RSVD(1) },
+-	{ USB_DEVICE_INTERFACE_CLASS(TELIT_VENDOR_ID, 0x1075, 0xff),	/* Telit FN990 (PCIe) */
++	{ USB_DEVICE_INTERFACE_CLASS(TELIT_VENDOR_ID, 0x1075, 0xff),	/* Telit FN990A (PCIe) */
+ 	  .driver_info = RSVD(0) },
+ 	{ USB_DEVICE_INTERFACE_CLASS(TELIT_VENDOR_ID, 0x1080, 0xff),	/* Telit FE990 (rmnet) */
+ 	  .driver_info = NCTRL(0) | RSVD(1) | RSVD(2) },
 -- 
 2.48.1
 
