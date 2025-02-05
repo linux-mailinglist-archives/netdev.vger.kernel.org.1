@@ -1,105 +1,154 @@
-Return-Path: <netdev+bounces-163169-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-163170-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id E814AA297CC
-	for <lists+netdev@lfdr.de>; Wed,  5 Feb 2025 18:46:11 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id B4132A297D1
+	for <lists+netdev@lfdr.de>; Wed,  5 Feb 2025 18:46:30 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id DC4091885A02
-	for <lists+netdev@lfdr.de>; Wed,  5 Feb 2025 17:46:16 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 5CD881885C36
+	for <lists+netdev@lfdr.de>; Wed,  5 Feb 2025 17:46:31 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1A1D41FCF5B;
-	Wed,  5 Feb 2025 17:40:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E9CDE1FE457;
+	Wed,  5 Feb 2025 17:41:07 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="M+DXVKsq"
+	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="ZEKOlpeI"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from fhigh-b8-smtp.messagingengine.com (fhigh-b8-smtp.messagingengine.com [202.12.124.159])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DE19E1FC108;
-	Wed,  5 Feb 2025 17:40:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 251181922C4;
+	Wed,  5 Feb 2025 17:41:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=202.12.124.159
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1738777233; cv=none; b=Gbq0CEob8MLDCWQfnGRmoIi7N003Y8YRECnFY3nV+mTLEooaoSLtSW55eSd4tdjZOZUzIuHl31YDJkfwEnRdmIYYg9Q4z7A5qI35oNudEFRuS+FDEk+xDhPVprG34Tb5mAuf7hDMJpGXS2GOYSFlmEZ9a/nhK3Yq9skEYVeVzy8=
+	t=1738777267; cv=none; b=eTC9r2f2GTXeMVPSjiWK+Lk/T3lgPFz4s+EBCu/w58BVvTIt0t3Wv1uKFIn3WWPyHFI/gU5LScjDZQGD8QPYjccSKncF3p8kvMH/NK+MFI5II0kNZAJh4aPNWuyAIZRUglvOl76YD5XGwVSxBh+KIfEw/xPiIjmU4Ge9AElGjTA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1738777233; c=relaxed/simple;
-	bh=I4jW9o/4B+Z8UC6sywEnjRYy1f2QJpfv+cAZ+qa4pnw=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=I6jO4fF0NW92lL06wZMIaGaxLuFrbzYc6Ic9WPHgUZtJ7P9IxKUet9vx1DXCo+ZxrWLRcOypFGh7rZGa1xGtJsoD1E4gP2kWXPEEa2+kjE88txkbgcXoXr8VesO8xjCLVdJmAW09kWObI/0XDfXEWEs78xrIMMk3KUSPdewgE1g=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=M+DXVKsq; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 53C9CC4CEE2;
-	Wed,  5 Feb 2025 17:40:32 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1738777232;
-	bh=I4jW9o/4B+Z8UC6sywEnjRYy1f2QJpfv+cAZ+qa4pnw=;
-	h=References:In-Reply-To:Reply-To:From:Date:Subject:To:Cc:From;
-	b=M+DXVKsqzuEqwi8PgguM2uouwIcSnsgTqEJs/U/Ab4o/wHhEsrjT3DkDeTfRsLxKF
-	 UKf+bY9qowD5PyJTJakWcXUQNxDljxBAF0iSYLe21Y+d+0ZAqcPJix4TT/6hWvloMm
-	 KQeZ4MpJai34ciLaaMamAn1Y8Kgg02hgH3DIlZdyxaP1EmXnisBBOGNpDHQJcRW3W5
-	 uGXV0xZTbILmebKO+XcZXeW7G5hRbHDsNsdgMpu+M8N3qiTeztV9hI4I/GqsL+HBjH
-	 tpKbyYHTdMD5GqZwtf3bp/bUy2fcmaTs4T5x90Pp4HsxkLRIFe4qLACrQghtHCDAHK
-	 xOTA1hogj174Q==
-Received: by mail-lf1-f45.google.com with SMTP id 2adb3069b0e04-543e49a10f5so11551e87.1;
-        Wed, 05 Feb 2025 09:40:32 -0800 (PST)
-X-Forwarded-Encrypted: i=1; AJvYcCUOjjMLcE1nMuhpArRFnZP5GgyhTwnFrgW96wx3NvPQvs3wsT2M4Iqm5RVAOFxK0wxQE+/jdyE/@vger.kernel.org, AJvYcCVzHSV7lgLPV5UwssHKzaqlRzu5M32SzIE5hTx8mvL3SzmyDifgX+xk6YQ4Gem5Ml9NovHzRzCnSym0v74=@vger.kernel.org, AJvYcCXyS2J/J8Wayadjcf0snmt4UKb49vNuwkANC/dcAGvRLs4BVkwOUG5jv8yphFSfCLpcN0LFHwQB@vger.kernel.org
-X-Gm-Message-State: AOJu0YwaG8mygbF5L0nm4lXnlb2FE065pe5a4ZDN81yH+g800jVLTof3
-	Kt5+pULgbp54J2Oua5zHVIrRrSwgwrpytI8f5IBJPA7wfLJkinWtKAQUAwoFTxaCn3ToH346r3X
-	KxnrDJQnLIAqS0WTeebFsN3SXlAI=
-X-Google-Smtp-Source: AGHT+IG8lhakou025la5Jappucv8WLtdehhFKE96djLZ79QU2Y1TtjR/MkLvLzNVVS5NW5nvfFdoY99dvlkSP3I4BEQ=
-X-Received: by 2002:a05:6512:3e03:b0:543:e3e2:879e with SMTP id
- 2adb3069b0e04-54405a7b6c1mr1242587e87.51.1738777230659; Wed, 05 Feb 2025
- 09:40:30 -0800 (PST)
+	s=arc-20240116; t=1738777267; c=relaxed/simple;
+	bh=JviheAOfcGY+fam4/mBliU2Kfgw+lI2qsF7LU6cAtEk=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=n+pu9zfQDpn4K3Vt5AMxZrnBbCtmCpJGhasP7iJ3PxOQZzrQC62JIU3P69NTE2II1Q0GfhHh1MTty49P3ceU1n25mF6i71utP1mWxlZQ03UMzQjP2N+J2Ld5j79AaSnwPHz5N90U9+nY5LWo1I9PmSO/lB9O0c3sijVcDeYTRbY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=idosch.org; spf=none smtp.mailfrom=idosch.org; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=ZEKOlpeI; arc=none smtp.client-ip=202.12.124.159
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=idosch.org
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=idosch.org
+Received: from phl-compute-01.internal (phl-compute-01.phl.internal [10.202.2.41])
+	by mailfhigh.stl.internal (Postfix) with ESMTP id 822C0254016F;
+	Wed,  5 Feb 2025 12:41:04 -0500 (EST)
+Received: from phl-mailfrontend-02 ([10.202.2.163])
+  by phl-compute-01.internal (MEProxy); Wed, 05 Feb 2025 12:41:05 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
+	messagingengine.com; h=cc:cc:content-type:content-type:date:date
+	:feedback-id:feedback-id:from:from:in-reply-to:in-reply-to
+	:message-id:mime-version:references:reply-to:subject:subject:to
+	:to:x-me-proxy:x-me-sender:x-me-sender:x-sasl-enc; s=fm3; t=
+	1738777264; x=1738863664; bh=JviheAOfcGY+fam4/mBliU2Kfgw+lI2qsF7
+	LU6cAtEk=; b=ZEKOlpeIY1hKtAp2dj02SWmILkEsLYGoHFBIhdaBULcWMVoyQpu
+	KzfAjF8pvjtTF4lN4dnc+yfrdQ3gu5VmdclWrtk+RRblOTrTs+RV/ySBTzhYrIhs
+	We0em8144KiF7E+I59c4mxMgbxGf905v7Sj55jV6FVhrGpOQ3gjipVswyXq/jPQJ
+	U5aUj0w2Vc9yCU+OcHLM3WVcEppDYlKD7L5S9IqaEo2pLfRrVcYtAZWqrThiZFx+
+	tAGxot3+aNI0zc1jcVV0hAMD+p1ttK0t6u3P/C/MsUJJOKio/tQ8rD+1e6MA/1IP
+	4hF07xGbvjG1PH3qhB/QuswNLbOzdldpHkQ==
+X-ME-Sender: <xms:r6KjZ7s7MsnLlVFwDXTvWOa1kjYpINM-exd9-U2Mn05ci8nQd6r87w>
+    <xme:r6KjZ8eMZ05c9ssWZuaZ48i2jNVhIGMTzfwk88dv3Hq_gRidwDIAHTnzR7ouXzEcX
+    ddkZG1IksiVExY>
+X-ME-Received: <xmr:r6KjZ-wSZrt9SGKDgAQk8cUrFe9ZeODH2xbU9scCMJso-3E-rggZonmspkZq>
+X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeefvddrtddtgddvgedtlecutefuodetggdotefrod
+    ftvfcurfhrohhfihhlvgemucfhrghsthforghilhdpggftfghnshhusghstghrihgsvgdp
+    uffrtefokffrpgfnqfghnecuuegrihhlohhuthemuceftddtnecusecvtfgvtghiphhivg
+    hnthhsucdlqddutddtmdenucfjughrpeffhffvvefukfhfgggtuggjsehttdertddttddv
+    necuhfhrohhmpefkughoucfutghhihhmmhgvlhcuoehiughoshgthhesihguohhstghhrd
+    horhhgqeenucggtffrrghtthgvrhhnpeetudfghfelieetjedvhfevfeduvdetgffgudel
+    uefgkeffueeltdejvdettedufeenucffohhmrghinhepihhurdgvughupdhkvghrnhgvlh
+    drohhrghenucevlhhushhtvghrufhiiigvpedtnecurfgrrhgrmhepmhgrihhlfhhrohhm
+    pehiughoshgthhesihguohhstghhrdhorhhgpdhnsggprhgtphhtthhopedvhedpmhhoug
+    gvpehsmhhtphhouhhtpdhrtghpthhtohepmhdqmhgrlhhlrgguihesthhirdgtohhmpdhr
+    tghpthhtoheprhhoghgvrhhqsehkvghrnhgvlhdrohhrghdprhgtphhtthhopegurghnih
+    hshhgrnhifrghrsehtihdrtghomhdprhgtphhtthhopehprggsvghnihesrhgvughhrght
+    rdgtohhmpdhrtghpthhtohepkhhusggrsehkvghrnhgvlhdrohhrghdprhgtphhtthhope
+    gvughumhgriigvthesghhoohhglhgvrdgtohhmpdhrtghpthhtohepuggrvhgvmhesuggr
+    vhgvmhhlohhfthdrnhgvthdprhgtphhtthhopegrnhgurhgvfidonhgvthguvghvsehluh
+    hnnhdrtghhpdhrtghpthhtohepsghpfhesvhhgvghrrdhkvghrnhgvlhdrohhrgh
+X-ME-Proxy: <xmx:r6KjZ6OC6d3nrGjKvfHfIHaG7SURZuoKgzNUQ3ICfgDIzAEcRrQ67w>
+    <xmx:r6KjZ7_VUkzrSRTTwpmM_8MYcyk4CA4pzZxMHqSJs75nyLleEP2aLg>
+    <xmx:r6KjZ6U4SRoztKmYfzJCF1g0Osm-g593CwyW0FLZ9MPOZ_Khp2xNOw>
+    <xmx:r6KjZ8ftyrqq_5yaaFlEazqMapXDZAQ71v9J3gxNSe2pyx39exlAmA>
+    <xmx:sKKjZxPbTGyNchIvuM930pj-PPoTOhF2PZ47K3Ks0DY0owW0elyqGulr>
+Feedback-ID: i494840e7:Fastmail
+Received: by mail.messagingengine.com (Postfix) with ESMTPA; Wed,
+ 5 Feb 2025 12:41:02 -0500 (EST)
+Date: Wed, 5 Feb 2025 19:41:00 +0200
+From: Ido Schimmel <idosch@idosch.org>
+To: "Malladi, Meghana" <m-malladi@ti.com>
+Cc: rogerq@kernel.org, danishanwar@ti.com, pabeni@redhat.com,
+	kuba@kernel.org, edumazet@google.com, davem@davemloft.net,
+	andrew+netdev@lunn.ch, bpf@vger.kernel.org,
+	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
+	netdev@vger.kernel.org, robh@kernel.org,
+	matthias.schiffer@ew.tq-group.com, dan.carpenter@linaro.org,
+	rdunlap@infradead.org, diogo.ivo@siemens.com,
+	schnelle@linux.ibm.com, glaroque@baylibre.com,
+	john.fastabend@gmail.com, hawk@kernel.org, daniel@iogearbox.net,
+	ast@kernel.org, srk@ti.com, Vignesh Raghavendra <vigneshr@ti.com>
+Subject: Re: [EXTERNAL] Re: [PATCH net 1/3] net: ti: icssg-prueth: Use
+ page_pool API for RX buffer allocation
+Message-ID: <Z6OirBmdSLuY5YkI@shredder>
+References: <20250122124951.3072410-1-m-malladi@ti.com>
+ <20250122124951.3072410-2-m-malladi@ti.com>
+ <Z5J4jjJ4_arvfF9E@shredder>
+ <9287a623-5663-4705-b61a-3ab5f5cb2424@ti.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250204161359.3335241-1-wens@kernel.org> <20250204134331.270d5c4e@kernel.org>
- <CAGb2v641vvtVKv8QbiEfHnMWngcKYTJZAgfH5k+G_nOvZcbC9g@mail.gmail.com> <20250205173824.GJ554665@kernel.org>
-In-Reply-To: <20250205173824.GJ554665@kernel.org>
-Reply-To: wens@kernel.org
-From: Chen-Yu Tsai <wens@kernel.org>
-Date: Thu, 6 Feb 2025 01:40:17 +0800
-X-Gmail-Original-Message-ID: <CAGb2v64CZWZwC7T9NNN7Re8pkCLQZEh3bcraYjcQRyVxtJgS5w@mail.gmail.com>
-X-Gm-Features: AWEUYZksuSbRuZZAzWd77ituAitD1pgvI4pAn_LVLBqoUUFzO5mWdzzigczPLts
-Message-ID: <CAGb2v64CZWZwC7T9NNN7Re8pkCLQZEh3bcraYjcQRyVxtJgS5w@mail.gmail.com>
-Subject: Re: [PATCH netdev] net: stmmac: dwmac-rk: Provide FIFO sizes for
- DWMAC 1000
-To: Simon Horman <horms@kernel.org>
-Cc: Jakub Kicinski <kuba@kernel.org>, Andrew Lunn <andrew+netdev@lunn.ch>, 
-	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
-	Paolo Abeni <pabeni@redhat.com>, Heiko Stuebner <heiko@sntech.de>, 
-	"Russell King (Oracle)" <rmk+kernel@armlinux.org.uk>, Steven Price <steven.price@arm.com>, 
-	Kunihiko Hayashi <hayashi.kunihiko@socionext.com>, netdev@vger.kernel.org, 
-	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org, 
-	linux-rockchip@lists.infradead.org, stable@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <9287a623-5663-4705-b61a-3ab5f5cb2424@ti.com>
 
-On Thu, Feb 6, 2025 at 1:38=E2=80=AFAM Simon Horman <horms@kernel.org> wrot=
-e:
->
-> On Wed, Feb 05, 2025 at 11:45:17AM +0800, Chen-Yu Tsai wrote:
-> > On Wed, Feb 5, 2025 at 5:43=E2=80=AFAM Jakub Kicinski <kuba@kernel.org>=
- wrote:
-> > >
-> > > On Wed,  5 Feb 2025 00:13:59 +0800 Chen-Yu Tsai wrote:
-> > > > Since a fix for stmmac in general has already been sent [1] and a r=
-evert
-> > > > was also proposed [2], I'll refrain from sending mine.
-> > >
-> > > No, no, please do. You need to _submit_ the revert like a normal patc=
-h.
-> > > With all the usual details in the commit message.
-> >
-> > Mine isn't a revert, but simply downgrading the error to a warning.
-> > So... yet another workaround approach.
->
-> I think the point is that someone needs to formally
-> submit the revert. And I assume it should target the net tree.
+On Tue, Feb 04, 2025 at 11:25:02PM +0530, Malladi, Meghana wrote:
+> Seems like none of the pages which have been allocated aren't getting
+> recycled in the rx path after being used unless its some error case. Will
+> try to fix this.
 
-Russell sent one a couple hours ago, so I think we're covered.
+skb_mark_for_recycle() should help with page recycling when an skb that
+uses them is freed.
+
+Anyway, I believe that I don't see put call when tearing down the Rx
+ring because prueth_rx_cleanup() is using page_pool_recycle_direct()
+when it shouldn't. AFAICT, prueth_rx_cleanup() is only called from the
+control path (upon ndo_stop()) and not in NAPI context.
+
+> Also I have noticed, in prueth_prepare_rx_chan() pages are allocated per
+> number of descriptors for a channel, but they are not being used when a
+> packet is being recieved (in emac_rx_packet()) and rather new page is
+> allocated for the next upcoming packet. Is this a valid design, what are
+> your thoughts on this ?
+
+The new page is possibly a page that was recycled into the pool when a
+previous packet was freed / dropped.
+
+[...]
+
+> Yes I will add PP_FLAG_DMA_SYNC_DEV as well.
+> I believe page_pool_dma_sync_for_cpu() needs to be called sync Rx page for
+> CPU, am I right ? If so can you tell me, in what all cases should I call
+> this function.
+
+Before accessing the packet data.
+
+> https://lkml.iu.edu/hypermail/linux/kernel/2312.1/06353.html
+> In the above link it is quoted - "Note that this version performs DMA sync
+> unconditionally, even if the associated PP doesn't perform sync-for-device"
+> for the page_pool_dma_sync_for_cpu() function. So does that mean if I am
+> using this function I don't need explicily sync for device call?
+
+It's explained in the page pool documentation:
+
+"Driver is always responsible for syncing the pages for the CPU. Drivers
+may choose to take care of syncing for the device as well or set the
+PP_FLAG_DMA_SYNC_DEV flag to request that pages allocated from the page
+pool are already synced for the device."
+
+https://docs.kernel.org/networking/page_pool.html#dma-sync
 
