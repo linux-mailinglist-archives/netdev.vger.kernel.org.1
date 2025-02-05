@@ -1,128 +1,186 @@
-Return-Path: <netdev+bounces-163277-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-163278-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 018A3A29C53
-	for <lists+netdev@lfdr.de>; Wed,  5 Feb 2025 23:11:01 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5B246A29C78
+	for <lists+netdev@lfdr.de>; Wed,  5 Feb 2025 23:16:23 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 4624B3A2ECC
-	for <lists+netdev@lfdr.de>; Wed,  5 Feb 2025 22:10:52 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 3D2811880577
+	for <lists+netdev@lfdr.de>; Wed,  5 Feb 2025 22:16:28 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A8E4D21505F;
-	Wed,  5 Feb 2025 22:10:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8B01B214A90;
+	Wed,  5 Feb 2025 22:16:19 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=6wind.com header.i=@6wind.com header.b="ZjI2/d29"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="XwfN7NTj"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-lf1-f99.google.com (mail-lf1-f99.google.com [209.85.167.99])
+Received: from mail-wm1-f50.google.com (mail-wm1-f50.google.com [209.85.128.50])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B5C301FFC4B
-	for <netdev@vger.kernel.org>; Wed,  5 Feb 2025 22:10:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.99
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A8647207A18;
+	Wed,  5 Feb 2025 22:16:15 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.50
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1738793455; cv=none; b=oAZYPFyTPYMVeVy0qEvIoa2SpSkXZlba/9QHyWmYJGHkbTTF/Q1Zwfm3AHkcabHaRqooghm0ATP+oXxjbmUPnuwdn269uE/x5YqhezBZ0Xrf7Jc/H0D1A84WQ7B22qLZFPPG+GXyFG/rilWM2b670lTcCIDKIK72WIqa+3acOS4=
+	t=1738793779; cv=none; b=fUy/iHFQSM3SzjKmVu+lO+glqasLuwFv380Fe11EbDJJbDARD/2jTHdKwOM0I0/8ZK+Tnokv3JpS6jy4KEPNRFzrmy/VEyyB9WaDQbLRJOglgjTmiLNZ6FZQ8EVDlHBWsEYMvI2EqESYqWS9qLMECtF3a3wmWzvyYtSWeatKSSk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1738793455; c=relaxed/simple;
-	bh=tevJpiW23QX5vNawBC3V5mVwwjc+cyWAooyXhBIKf1Q=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=pMUIxquBqXh2xhzt7l+4feHAh/ybxhWHYjt27VpMCvZPoeo6O8NRBrtC49g+VJep6Nb0RWzSdczK3peiiRaZ0ZBkbdLGYUXZqmecjBHGdGTK1O8kmYAZZw5933MMkUk1FD9Xe2cxCXNRRF0rGkW2m9jAackl32IzS7zfps7Zkww=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=6wind.com; spf=pass smtp.mailfrom=6wind.com; dkim=pass (2048-bit key) header.d=6wind.com header.i=@6wind.com header.b=ZjI2/d29; arc=none smtp.client-ip=209.85.167.99
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=6wind.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=6wind.com
-Received: by mail-lf1-f99.google.com with SMTP id 2adb3069b0e04-543f33ff283so33177e87.1
-        for <netdev@vger.kernel.org>; Wed, 05 Feb 2025 14:10:52 -0800 (PST)
+	s=arc-20240116; t=1738793779; c=relaxed/simple;
+	bh=55U68o/HXEWOrqm9K4AOTOcQCPWE93DnNhIT8Ds+a4g=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=ks/VPt07+QaAPFxaN6rDKBnZGSweUMBHySmzCY9cZkdDAKA0tb1L1tFwlB3C8b9JyWiZk1HoR4IWtep7qM5muE8lWOV296bEaA5l5+/uua2hit/yTQvBukj9ajAcTc6nLFnpjJ2MnOfBZDwsUcOW8CUrs1j5G1uoZMqwfPtz1p8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=XwfN7NTj; arc=none smtp.client-ip=209.85.128.50
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-wm1-f50.google.com with SMTP id 5b1f17b1804b1-43626213fffso8470465e9.1;
+        Wed, 05 Feb 2025 14:16:15 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=6wind.com; s=google; t=1738793451; x=1739398251; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=f1kUn0CXtkEyI0HmOYkgChrezfUURGEbEEqQNfXB1bI=;
-        b=ZjI2/d29TlAdhIbF3Ua8iyk0W8HWxsmcOMOjv2fDniTNR63JtmUsnwlSVues1a2+Br
-         W8OihfQeyRyTrjVIOfrMWJ2f5xuSS+ORaHDqVmzeG5K/+e+Xpnp1AFCz3plnFGscWLMX
-         2UC3OcyXWbXClU5alLoXkIhbZnfcXGPUsubPO1UxSYoRZC1KNyRO2JcuuZa/x/FdIXAt
-         HUyZ2FZmRUtm/s67oF07h5cM+xZQM2gB88u5KYVZlQ4ptU5XasTbfgWwJiB+5P9EfKy0
-         kZ4IuYzan6tXwU0Ro29DBpObE/afQvjQCUE2tP/KMh5u80yKyQfjjWOQJq2hOy2V6Wag
-         e9bQ==
+        d=gmail.com; s=20230601; t=1738793774; x=1739398574; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=vdDVNZ5dZQ4AB4CLiIP63HC/J89SDxWWeBPv4iIwUpQ=;
+        b=XwfN7NTjgPzWl0Ng6DY8vuT7ybpfzyF7OBBMUQ9ppIhaVw+EN2VjZwaXT5KZ2w4d/O
+         kaRiiThn96VlQO0At8/w1Gm3C9q9JPDctxNGqhQ41q4gtfZbMQVHLNaFJG8s9fMeONLM
+         Wv+C1652BGCR5OwjGCV6B8zximMWjIDZ3yO1wn2UFY1zw7ihQI6TrEBlGTr1v0uniIse
+         kxZmRfz9HYk2H823423cDnB8/8wAcDLmaMmv3TChcpvsGgrooDiJEzbCOuD9hs/+uuuT
+         1RuW/COjFXBpRV8h/hTd30rmfbMk+boPLnBH8WkTS9mBTUY22VmDHWGb7/tRlGKh1SZA
+         RfWA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1738793451; x=1739398251;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=f1kUn0CXtkEyI0HmOYkgChrezfUURGEbEEqQNfXB1bI=;
-        b=OfsXJTSg6+F/I7A9PEzTzqSmfCPsTJd2Z2HKGDvxXqF07HBQ1iKS4M9yygKuvEUvSL
-         nPjh0FrfxgvTRwD4nIpWVycHE7+GUSvZ63XGGLby0VVCq8qqbgQpGfScByMlIzKe5zuz
-         jytTiIGKWlNalnE6JBf6dC9eNV7E3EBlfVZ6rZQaLF6tXaeVBcafXjHyruMmHLForRAU
-         tJmh1NlofEbUAcQtBBlCKZmv8p6ZA29RD34qYDEE2LI7iOUGeTQHu/blmKJ5McQ8gM/C
-         HuoMon4TKdItJPn8FTj2y/uepODXNLeNu2br8s7L7cAxBUeTEhkSG4N20+BqT8+ILaXS
-         aYSw==
-X-Forwarded-Encrypted: i=1; AJvYcCVdp2Clwi0yZgyxEn3Fbo6IqiyLlT0rVs/JhZfO1u7jeCX+L5+6tzSRYzSMIZdszHBrvC6W+RM=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyjH16zxioJzjMjMvfQKdzZe61y5wSHofOWa2Gn+ORCQR7AJ5Xn
-	Fckmozclwq9c3xDZnDMBtKp1yZNKkK5gw88pPmFemvLioWX8QlWZZAD2/569NQchChNszZaKPe1
-	jEv4Jtnvc5PAkP7uW5ntTG7RqRKEH7k86
-X-Gm-Gg: ASbGncv++QlT1yGjSAQMG8+Qg/wFxNbep453M4iW2/M0VEfr/HKaxQZ1dW3objTpVtC
-	D2Ohe4ZzYY4xKrtVypqLABce+wm8wqvAanIFryE38Z894jl6tBVB1WlP+B92MpTZs6vAnS1I0Jk
-	E9Mog3lEpdJdAZ9Ozmmd/eVjI8RH6V7kFRXrXWMpXER80sMjiPHNur8SyOBcl3BUlPPpR+Z9cl4
-	yUWYD2PAPa1/8m44qWCT3ohDsSbhGrfP3Lb2R+ybFWE8fJDDQYKlU3scrD50ZZhbGKjXVtMZD83
-	DC4mWVbeqr9ZqHx/OR9uTXpD1jby84Bf4ZBJi1fC6Z64BRtf73UBVLXIr1va
-X-Google-Smtp-Source: AGHT+IG0nuS0C/f8nx0E9P6dDMS0951lyYJUO3COjUsbinUq5Tt+K35UzFhNOFOrJL4Z7Fn3p5m3+3tWtWI9
-X-Received: by 2002:a05:6512:1598:b0:540:1c9f:ff0c with SMTP id 2adb3069b0e04-54405a6baacmr536916e87.13.1738793450501;
-        Wed, 05 Feb 2025 14:10:50 -0800 (PST)
-Received: from smtpservice.6wind.com ([185.13.181.2])
-        by smtp-relay.gmail.com with ESMTP id 2adb3069b0e04-543ebdf095bsm598328e87.15.2025.02.05.14.10.50;
-        Wed, 05 Feb 2025 14:10:50 -0800 (PST)
-X-Relaying-Domain: 6wind.com
-Received: from bretzel (bretzel.dev.6wind.com [10.17.1.57])
-	by smtpservice.6wind.com (Postfix) with ESMTPS id 1A8C11C431;
-	Wed,  5 Feb 2025 23:10:50 +0100 (CET)
-Received: from dichtel by bretzel with local (Exim 4.94.2)
-	(envelope-from <nicolas.dichtel@6wind.com>)
-	id 1tfnbd-00ANiL-Re; Wed, 05 Feb 2025 23:10:49 +0100
-From: Nicolas Dichtel <nicolas.dichtel@6wind.com>
-To: "David S . Miller" <davem@davemloft.net>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Eric Dumazet <edumazet@google.com>,
-	Kuniyuki Iwashima <kuniyu@amazon.com>
-Cc: Simon Horman <horms@kernel.org>,
-	Nikolay Aleksandrov <razor@blackwall.org>,
-	netdev@vger.kernel.org,
-	Nicolas Dichtel <nicolas.dichtel@6wind.com>,
-	stable@vger.kernel.org
-Subject: [PATCH net] rtnetlink: fix netns leak with rtnl_setlink()
-Date: Wed,  5 Feb 2025 23:10:37 +0100
-Message-ID: <20250205221037.2474426-1-nicolas.dichtel@6wind.com>
-X-Mailer: git-send-email 2.47.1
+        d=1e100.net; s=20230601; t=1738793774; x=1739398574;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=vdDVNZ5dZQ4AB4CLiIP63HC/J89SDxWWeBPv4iIwUpQ=;
+        b=Vd5sIeOjvhWueQA9QMVQ8wwDDZwp5Ot7e85WU/8GTvGIqoxtb/XFC4hy/9k2Ob9V3c
+         NgCVOjCms3ELFYcSRUpWY0LuDmGY9Rgeuujz0rLyaU1tV+a+DVaYm0haPRPwRok78BPA
+         BtgMC47X2LOPQHXIc0fxDT7S4MvqPCJuYe8ieZcDBEFxJEqKKls+jkpBf2nniMYcaIVX
+         oj8mczk++wEEC/TDJpqfB4dt5A4MP1AOsLOPFAZa4d6onRf2B/iaksfafNX2BFlJLtT8
+         T3e9vnL7hjUUM5AHGm7zw9LMtLsxTI97fxKUqfW+Vhsx7q/HjyAoPTUmnHh4jHInZ/DK
+         dP0w==
+X-Forwarded-Encrypted: i=1; AJvYcCUCaA6vWwqM/HSSrJe9GUCFLSzcEoq30i8zO60zCGlnTjLcSIZe5N9j08RV5HQl39ZAZrkH741TNsWMbucJU5eg@vger.kernel.org, AJvYcCUkeYDWRXugom+64T70OIXaZf7klIkWs59NvPCunzrP3qxjN32KgskPGnTm/mX5HiG7Shdd54LN@vger.kernel.org, AJvYcCUrNEoo2VRq2/iydD+AgCi/4inwo5JQfrbmQNmjnh5nS3mrhpY7/rjNUbBmeRHnHJVhJzY=@vger.kernel.org, AJvYcCUuJD48a0YAxpJcIrnaHqpIj/gZ+ERo7U4dR7h2Nd1gLRkINuCON3XXx5mz8k375yBUR20z/ZZk44fb@vger.kernel.org, AJvYcCX7t3J3bnVNDcs5Jbcse53Ny/aW7wlO0g9iFZrUXZW4ff6x9Kl2TEYMDxIkTy67VggpGO6T7AKQhvli81xe@vger.kernel.org
+X-Gm-Message-State: AOJu0Yydd5FvYFSBEdpH8tWS5lUiy9OBOMrk/Q9+FJB82H3ELZe2bIzG
+	eIw4Y31xCupLspSFyq5YiDNw2w4zcRqWQQJgFnmyn60NTBlVjkPZ
+X-Gm-Gg: ASbGncvRrB+AyGNAi7mrs7cFRQfuMyRwOiPMa5i/7h+S+eKkG2aKLAOf6hT70rEjNFx
+	ZG8f81V1bvv6BvOuK17pe0B5wioXaGisQxJ4qq6D6dDAclU4POqIshLObS0Rpq4hlw8Ig4izAb2
+	1o2aMohALWBPCrYeFBNX11gAdMiLeftB2QC71W5M7HizxnLpgLc+jFi17oYnnrAsA94MGBSDUsc
+	4NXh+uSZ+fSX3VALE3EWULsUXWgb6nf9i4aAhF2/PgZxksN/ENPnioKjbPWvq+SGt0pMsVBdcA/
+	6MpBeGy6VRPBYeLJeUnMAeU=
+X-Google-Smtp-Source: AGHT+IEdwD8+gf+P54b0oq9+6IB9SKMe1dPj4BWvNK0K6VPumKorBNlE9GpHAOH2VL8CKukBAjBygw==
+X-Received: by 2002:a05:6000:4009:b0:38c:24f0:fc28 with SMTP id ffacd0b85a97d-38dbb20b3d7mr501077f8f.3.1738793773653;
+        Wed, 05 Feb 2025 14:16:13 -0800 (PST)
+Received: from [192.168.8.100] ([148.252.128.4])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-38c5c122465sm20046771f8f.47.2025.02.05.14.16.09
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 05 Feb 2025 14:16:11 -0800 (PST)
+Message-ID: <88cb8f03-7976-4846-a74d-e2d234c5cf8d@gmail.com>
+Date: Wed, 5 Feb 2025 22:16:18 +0000
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH RFC net-next v1 5/5] net: devmem: Implement TX path
+To: Mina Almasry <almasrymina@google.com>
+Cc: Willem de Bruijn <willemdebruijn.kernel@gmail.com>,
+ netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+ linux-doc@vger.kernel.org, virtualization@lists.linux.dev,
+ kvm@vger.kernel.org, linux-kselftest@vger.kernel.org,
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ Simon Horman <horms@kernel.org>, Donald Hunter <donald.hunter@gmail.com>,
+ Jonathan Corbet <corbet@lwn.net>, Andrew Lunn <andrew+netdev@lunn.ch>,
+ David Ahern <dsahern@kernel.org>, "Michael S. Tsirkin" <mst@redhat.com>,
+ Jason Wang <jasowang@redhat.com>, Xuan Zhuo <xuanzhuo@linux.alibaba.com>,
+ =?UTF-8?Q?Eugenio_P=C3=A9rez?= <eperezma@redhat.com>,
+ Stefan Hajnoczi <stefanha@redhat.com>,
+ Stefano Garzarella <sgarzare@redhat.com>, Shuah Khan <shuah@kernel.org>,
+ Kaiyuan Zhang <kaiyuanz@google.com>, Willem de Bruijn <willemb@google.com>,
+ Samiullah Khawaja <skhawaja@google.com>, Stanislav Fomichev
+ <sdf@fomichev.me>, Joe Damato <jdamato@fastly.com>, dw@davidwei.uk
+References: <20241221004236.2629280-1-almasrymina@google.com>
+ <20241221004236.2629280-6-almasrymina@google.com>
+ <676dd022d1388_1d346b2947@willemb.c.googlers.com.notmuch>
+ <CAHS8izNzbEi_Dn+hDohF9Go=et7kts-BnmEpq=Znpot7o7B5wA@mail.gmail.com>
+ <6798ee97c73e1_987d9294d6@willemb.c.googlers.com.notmuch>
+ <53192c45-df3c-4a65-9047-bbd59d4aee47@gmail.com>
+ <CAHS8izMcs=3qo1jhZSM499mxHh10-oBL6Fhb2W0eKWhJGax4Bg@mail.gmail.com>
+Content-Language: en-US
+From: Pavel Begunkov <asml.silence@gmail.com>
+In-Reply-To: <CAHS8izMcs=3qo1jhZSM499mxHh10-oBL6Fhb2W0eKWhJGax4Bg@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
 
-A call to rtnl_nets_destroy() is needed to release references taken on
-netns put in rtnl_nets.
+On 2/5/25 20:22, Mina Almasry wrote:
+> On Wed, Feb 5, 2025 at 4:41 AM Pavel Begunkov <asml.silence@gmail.com> wrote:
+>>
+>> On 1/28/25 14:49, Willem de Bruijn wrote:
+>>>>>> +struct net_devmem_dmabuf_binding *
+>>>>>> +net_devmem_get_sockc_binding(struct sock *sk, struct sockcm_cookie *sockc)
+>>>>>> +{
+>>>>>> +     struct net_devmem_dmabuf_binding *binding;
+>>>>>> +     int err = 0;
+>>>>>> +
+>>>>>> +     binding = net_devmem_lookup_dmabuf(sockc->dmabuf_id);
+>>>>>
+>>>>> This lookup is from global xarray net_devmem_dmabuf_bindings.
+>>>>>
+>>>>> Is there a check that the socket is sending out through the device
+>>>>> to which this dmabuf was bound with netlink? Should there be?
+>>>>> (e.g., SO_BINDTODEVICE).
+>>>>>
+>>>>
+>>>> Yes, I think it may be an issue if the user triggers a send from a
+>>>> different netdevice, because indeed when we bind a dmabuf we bind it
+>>>> to a specific netdevice.
+>>>>
+>>>> One option is as you say to require TX sockets to be bound and to
+>>>> check that we're bound to the correct netdev. I also wonder if I can
+>>>> make this work without SO_BINDTODEVICE, by querying the netdev the
+>>>> sock is currently trying to send out on and doing a check in the
+>>>> tcp_sendmsg. I'm not sure if this is possible but I'll give it a look.
+>>>
+>>> I was a bit quick on mentioning SO_BINDTODEVICE. Agreed that it is
+>>> vastly preferable to not require that, but infer the device from
+>>> the connected TCP sock.
+>>
+>> I wonder why so? I'd imagine something like SO_BINDTODEVICE is a
+>> better way to go. The user has to do it anyway, otherwise packets
+>> might go to a different device and the user would suddenly start
+>> getting errors with no good way to alleviate them (apart from
+>> likes of SO_BINDTODEVICE). It's even worse if it works for a while
+>> but starts to unpredictably fail as time passes. With binding at
+>> least it'd fail fast if the setup is not done correctly.
+>>
+> 
+> I think there may be a misunderstanding. There is nothing preventing
+> the user from SO_BINDTODEVICE to make sure the socket is bound to the
 
-CC: stable@vger.kernel.org
-Fixes: 636af13f213b ("rtnetlink: Register rtnl_dellink() and rtnl_setlink() with RTNL_FLAG_DOIT_PERNET_WIP.")
-Signed-off-by: Nicolas Dichtel <nicolas.dichtel@6wind.com>
----
- net/core/rtnetlink.c | 1 +
- 1 file changed, 1 insertion(+)
+Right, not arguing otherwise
 
-diff --git a/net/core/rtnetlink.c b/net/core/rtnetlink.c
-index 1f4d4b5570ab..d1e559fce918 100644
---- a/net/core/rtnetlink.c
-+++ b/net/core/rtnetlink.c
-@@ -3432,6 +3432,7 @@ static int rtnl_setlink(struct sk_buff *skb, struct nlmsghdr *nlh,
- 		err = -ENODEV;
- 
- 	rtnl_nets_unlock(&rtnl_nets);
-+	rtnl_nets_destroy(&rtnl_nets);
- errout:
- 	return err;
- }
+> ifindex, and the test changes in the latest series actually do this
+> binding.
+> 
+> It's just that on TX, we check what device we happen to be going out
+> over, and fail if we're going out of a different device.
+> 
+> There are setups where the device will always be correct even without
+> SO_BINDTODEVICE. Like if the host has only 1 interface or if the
+> egress IP is only reachable over 1 interface. I don't see much reason
+> to require the user to SO_BINDTODEVICE in these cases.
+
+That's exactly the problem. People would test their code with one setup
+where it works just fine, but then there will be a rare user of a
+library used by some other framework or a lonely server where it starts
+to fails for no apparent reason while "it worked before and nothing has
+changed". It's more predictable if enforced.
+
+I don't think we'd care about setup overhead one extra ioctl() here(?),
+but with this option we'd need to be careful about not racing with
+rebinding, if it's allowed.
+
 -- 
-2.47.1
+Pavel Begunkov
 
 
