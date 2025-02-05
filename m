@@ -1,162 +1,109 @@
-Return-Path: <netdev+bounces-163245-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-163246-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 52AEFA29B10
-	for <lists+netdev@lfdr.de>; Wed,  5 Feb 2025 21:22:33 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id E26E6A29B21
+	for <lists+netdev@lfdr.de>; Wed,  5 Feb 2025 21:26:18 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 998EE3A8965
-	for <lists+netdev@lfdr.de>; Wed,  5 Feb 2025 20:22:24 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 3A5523A8965
+	for <lists+netdev@lfdr.de>; Wed,  5 Feb 2025 20:26:10 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 79BA6212B3E;
-	Wed,  5 Feb 2025 20:22:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B379E20CCF4;
+	Wed,  5 Feb 2025 20:26:15 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="aEqR4OUj"
+	dkim=pass (2048-bit key) header.d=cogentembedded-com.20230601.gappssmtp.com header.i=@cogentembedded-com.20230601.gappssmtp.com header.b="TFJY8Pnh"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f182.google.com (mail-pl1-f182.google.com [209.85.214.182])
+Received: from mail-ej1-f42.google.com (mail-ej1-f42.google.com [209.85.218.42])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B97C71D6DD4
-	for <netdev@vger.kernel.org>; Wed,  5 Feb 2025 20:22:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.182
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E67651FFC61
+	for <netdev@vger.kernel.org>; Wed,  5 Feb 2025 20:26:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.42
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1738786947; cv=none; b=a2y5v1tbcmmlBmFYi+AEr85XBiPCUsjliO0N2uYEQfXjzm42dtdPrYoLQQuPDpaCnX3LTdDU8SK+uOMxzSlyj7Uu4/KKL8sQjwV9cZPyAsNHxByp6T4mLgWKmiza342+b9JeFa1Si9UAz11vDDF8r2bu9nhGWPcPC2de/ZWUm1U=
+	t=1738787175; cv=none; b=AuGDo+x9qHdZ3pIC0ZLCnrJuroFOS+O3iw3a3X1/pA5YvkvaNI0XK7xMKTxbz+OKOXLagvQiMMp+MEbcRa2BPtrudPARp3IlIfuuimrKDwZo0eVcAX4RDckLEYCyHVwRU/+JmtIE1W2ZFZlh+jtgQfBfpFHPLWIrpyaDb3diXQc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1738786947; c=relaxed/simple;
-	bh=W/BDzfS0731XNlp5uGEgPUbjHeZNHpyjqCYetUqQRxQ=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=T2fQSl+dxNZrKzYCpeUkOoddZ2Wnw8LjwPYYZdM97ChNmwDJExK5vytTlXKIGv+h6ScJ+fWC5mXzMtaZxdYk0T1h5xzjY/Z057LehUBU/Vm/vDx/rWQ61W06IvDQmjm9YpGln0KbIaRXE1a5uvrag8NNdNK19b76KHxcTzObP0s=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=aEqR4OUj; arc=none smtp.client-ip=209.85.214.182
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-pl1-f182.google.com with SMTP id d9443c01a7336-21f032484d4so32345ad.0
-        for <netdev@vger.kernel.org>; Wed, 05 Feb 2025 12:22:25 -0800 (PST)
+	s=arc-20240116; t=1738787175; c=relaxed/simple;
+	bh=hWcjkVvv6KY7K+i5MOmOpjaDm9yKh5mFFQCnW/jf3uI=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=q+bjb14+PIzKs9/JZ2A7wFNB4s46r00BVeeTKzqs+FVp9EDmyvdRFcp/gkEc6EB1lUaP5f1xcR+uIQ5B4xFw0P2zubDnFKkI+e6SeEQg/p524w3R5P0jY3TlnH4RxCVAri7eD2vQ1aZe3UZNq2PFhsubkvA+svZ4xIT5C3Kij0M=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=cogentembedded.com; spf=pass smtp.mailfrom=cogentembedded.com; dkim=pass (2048-bit key) header.d=cogentembedded-com.20230601.gappssmtp.com header.i=@cogentembedded-com.20230601.gappssmtp.com header.b=TFJY8Pnh; arc=none smtp.client-ip=209.85.218.42
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=cogentembedded.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=cogentembedded.com
+Received: by mail-ej1-f42.google.com with SMTP id a640c23a62f3a-aaf3c3c104fso42351066b.1
+        for <netdev@vger.kernel.org>; Wed, 05 Feb 2025 12:26:13 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1738786945; x=1739391745; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=qkxLeSmqP0bYGjmD83E3Y/4YIZD5CnHUYSNEP7lCym8=;
-        b=aEqR4OUjEXOk+Plcx0PsYOho51wcq4oRNSX2zvM5RE6Sgc079JRIortawJIyNHH5Vp
-         CO3NiFzoe4fKwfJTSNFib38UdXSni6DjIpCZkcZNzFn9EmY5MiTxviY3ZjgnMitFSaVI
-         b1dzui4HIIGfHIXl9v9akFiWxSC7IvI964ax1384+5jK2rjGJKiX+Es/VGFDAuAZ+ly1
-         D+p3ZP6yz6AOUhVc3G/EKMM4Z1EHQCgIurhcqIxORO9D77owYm+rY/vBiZmxO61s+Zul
-         eKEbCvw+iD9vZUwR6a90JJwEHkOkh/htlDbjgRjmiBAuca54U71HXMya9cTuHJF7Z88S
-         CsfA==
+        d=cogentembedded-com.20230601.gappssmtp.com; s=20230601; t=1738787172; x=1739391972; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=hWcjkVvv6KY7K+i5MOmOpjaDm9yKh5mFFQCnW/jf3uI=;
+        b=TFJY8PnhtYQY/EbyFjVANJJjS9ShjElv9GBzaKut/LDmIOePLfb2L+elGjot2Nxwyt
+         grfA2+4KJcbHLossN3dUgdIdE6ODsVo99t3TWUStjAKGl+kXLjPlnZtEvMUSnWmF4hAJ
+         xFm+lfRb3ZAw9OwMtVEOHE7vJa1BcmlnmqWsS9fPM2Vn1kPdfy8F6XbvnYtO8Qt+4/3L
+         My9SV359eVsMwcNPd8ESPEolaPpyTf9+HzsNZ/zXOGUMLGw4nGHGquwtSMUmf4+NlrbW
+         7NQlwDePw9ldumYLLAvzj3c3H5fyuV0u2YQX5zMV1jBlDHLA0rErOD+BLpvCfo7wF15n
+         7EHw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1738786945; x=1739391745;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=qkxLeSmqP0bYGjmD83E3Y/4YIZD5CnHUYSNEP7lCym8=;
-        b=ilDDBr5dr46v1zorjSfOclPE5xJWb6L5kgICsq56pI/4v6PqZjLZxb9nR5z9wiy5Y6
-         LuB9zHgU50uRA5Eio5RvqQGPn1mPH+ufmhqQHLnMVcZjz70jNfBwCAWe1aL8AYCOa++i
-         VAgTYcTgBj6ab5yuLcxOm0tpPBqV4yLSNSr9geQv0oa5IkAoIw8QbMpcs4xy82sg9Cpl
-         eV8gAlqop9l0wr4H9f7FcyNllfZV0Xieq9bqXcEQG3ItAVGHI/xy1dBX4gQ8P7jXXQJe
-         9qwR25UBY9g27skAZRjOusYQ9tQvPtmtiIgupM1XkjaMvhYiCmyn6HJFG5MYsCkbjE3Q
-         6GeQ==
-X-Forwarded-Encrypted: i=1; AJvYcCWyEZah/0vHkj42pPe77DDLKk4I2NNHA7+RMEJTcwjXRO0rMrWAkJxOA+fO49HQDpnOOVPYkU8=@vger.kernel.org
-X-Gm-Message-State: AOJu0YygY2LWf+6U9BcSFG5mJ9Z7r6Z5Jog7BLdTm4mq7ayeOHT9tWAd
-	0IKNetYDwaLZJ6D7eloeSYPkj+7FVZUyfBqtET3mMYzR1SwSR1azoiJem1hJjVCwS0zZRt/GJu7
-	zxqd3csw72yv2WaLDKSOBLqQFx2PyctBaLwbF
-X-Gm-Gg: ASbGncvc9W8AjyhJRm7+7LlsaDFZYx7d4yK3fkUe1Zem/zGUw2yauZ+ibohzR5MhkvH
-	WDaZekPi73ncuSMj3oH3nMg5tV9p59pDtufa4yAgvz44sZ32qgZDZSRwjDa+m0DGd2RDQYjiN
-X-Google-Smtp-Source: AGHT+IHe8klwDgJSKEW2jpBdb9Qr5QEYUblXIVK5qhpQjddp07M20x9TqO2J5WfJ10zWsmr9wDdoAZ9pqxtBzG8aw9E=
-X-Received: by 2002:a17:902:d582:b0:215:4bdd:9919 with SMTP id
- d9443c01a7336-21f311f9d6fmr275545ad.17.1738786944775; Wed, 05 Feb 2025
- 12:22:24 -0800 (PST)
+        d=1e100.net; s=20230601; t=1738787172; x=1739391972;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=hWcjkVvv6KY7K+i5MOmOpjaDm9yKh5mFFQCnW/jf3uI=;
+        b=ViEZkEcfjXpdJ5IXJ75bZkzPhya+D8XtKrAGzYOd2LFbP05N/acD3HBAyv/iawq1Id
+         /oqEVRsOsmgsCELIjZN+Ka3FUzGHnUVSyU1dYJDnZQykXREv8IDsrqEeJEvaGSjo3AuK
+         SAjOEeG02W5ET6J9tO8Azzf2pK7DnKvzLLM6mIJOekHgb5g6l3rO7IoipZSw48nL8225
+         nIAW+TwOHUe4CoabiZjfkQzwlNBnHo+DEv0SXkQ8y/YTpL1aXGBfzsENtK2nBTolUBaP
+         dV6JMIWjQNRwU3uNgkAS1VHpo6+6/Tya0GEyi2g8O+7C+ZbUn0TNmdQLq/qCzxqh1FvG
+         gaAA==
+X-Forwarded-Encrypted: i=1; AJvYcCUZfno/cXsBvbUdHqf/5m/kTbyHktr8U0D5Hhm/WHU9iCl6BR/Z/PaiC3ftpuWzNzfGCzrIxoQ=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwVvczvPeE9yAVE6lffljMkYOk5qI+arhsY/exGkSKc0AqZSdJi
+	wTsomOmOD1SL5V8lY4eNQtkCLxpbE/0+HQ249gfFGti1OR8gHtbiXwzrB3Fr/D4=
+X-Gm-Gg: ASbGncuDPtqVA4fAmJqDs5C6agEiXkuiWVPVKpnGjdM/hjpjtxD2f9EdkF6gouvkm5O
+	PoXnsbB8IWBohgJNtrKNpnRFbPXNIGCl3zWAFxzvMXDcNdoFK5rYPjJPQMiB3aBybI4m7LUEbJz
+	ZN8SW1gbqVav4Xp5nyj6r02TnlxvZdXbgB+1quqmJ+jm+8NsP623nnjCVNfjRyD9FPShOp4MdHN
+	IYp1G6OrS66wbsTCKCdAAsVR9Mejmv/4cqFwk7yrUV8mO1vDvr1nGfe4Y6/3ukOOT7rLBeoyr2G
+	TZsoLPobMYQzh8Y/j4G6QrMsed+49tMzz3p6EbCtxA==
+X-Google-Smtp-Source: AGHT+IFaywZdRalBVpVVP5TmbF1T5HAAaPMMuKHq8rwyEDyE+qrnaJZq8qLnDjIR22e45iPw8kWcCg==
+X-Received: by 2002:a17:907:d8b:b0:aa6:b63a:4521 with SMTP id a640c23a62f3a-ab75e23a4ebmr414280166b.15.1738787171974;
+        Wed, 05 Feb 2025 12:26:11 -0800 (PST)
+Received: from ?IPV6:2a02:810a:b83:a100::2e88? ([2a02:810a:b83:a100::2e88])
+        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-ab70e4e3b5esm818932366b.138.2025.02.05.12.26.11
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 05 Feb 2025 12:26:11 -0800 (PST)
+Message-ID: <93856925-b451-408c-8dee-bfd8dc2d56b3@cogentembedded.com>
+Date: Wed, 5 Feb 2025 21:26:10 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20241221004236.2629280-1-almasrymina@google.com>
- <20241221004236.2629280-6-almasrymina@google.com> <676dd022d1388_1d346b2947@willemb.c.googlers.com.notmuch>
- <CAHS8izNzbEi_Dn+hDohF9Go=et7kts-BnmEpq=Znpot7o7B5wA@mail.gmail.com>
- <6798ee97c73e1_987d9294d6@willemb.c.googlers.com.notmuch> <53192c45-df3c-4a65-9047-bbd59d4aee47@gmail.com>
-In-Reply-To: <53192c45-df3c-4a65-9047-bbd59d4aee47@gmail.com>
-From: Mina Almasry <almasrymina@google.com>
-Date: Wed, 5 Feb 2025 12:22:10 -0800
-X-Gm-Features: AWEUYZmi_S38KTdRcwjGkZKd5Xr1UKSuxDipsps1bDEi3RA74FXERhOLWF6TuhY
-Message-ID: <CAHS8izMcs=3qo1jhZSM499mxHh10-oBL6Fhb2W0eKWhJGax4Bg@mail.gmail.com>
-Subject: Re: [PATCH RFC net-next v1 5/5] net: devmem: Implement TX path
-To: Pavel Begunkov <asml.silence@gmail.com>
-Cc: Willem de Bruijn <willemdebruijn.kernel@gmail.com>, netdev@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, linux-doc@vger.kernel.org, 
-	virtualization@lists.linux.dev, kvm@vger.kernel.org, 
-	linux-kselftest@vger.kernel.org, "David S. Miller" <davem@davemloft.net>, 
-	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
-	Simon Horman <horms@kernel.org>, Donald Hunter <donald.hunter@gmail.com>, 
-	Jonathan Corbet <corbet@lwn.net>, Andrew Lunn <andrew+netdev@lunn.ch>, David Ahern <dsahern@kernel.org>, 
-	"Michael S. Tsirkin" <mst@redhat.com>, Jason Wang <jasowang@redhat.com>, 
-	Xuan Zhuo <xuanzhuo@linux.alibaba.com>, =?UTF-8?Q?Eugenio_P=C3=A9rez?= <eperezma@redhat.com>, 
-	Stefan Hajnoczi <stefanha@redhat.com>, Stefano Garzarella <sgarzare@redhat.com>, Shuah Khan <shuah@kernel.org>, 
-	Kaiyuan Zhang <kaiyuanz@google.com>, Willem de Bruijn <willemb@google.com>, 
-	Samiullah Khawaja <skhawaja@google.com>, Stanislav Fomichev <sdf@fomichev.me>, Joe Damato <jdamato@fastly.com>, 
-	dw@davidwei.uk
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next] net: renesas: rswitch: cleanup max_speed setting
+To: Andrew Lunn <andrew@lunn.ch>
+Cc: Yoshihiro Shimoda <yoshihiro.shimoda.uh@renesas.com>,
+ Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller"
+ <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ Geert Uytterhoeven <geert+renesas@glider.be>, netdev@vger.kernel.org,
+ linux-renesas-soc@vger.kernel.org, linux-kernel@vger.kernel.org,
+ Michael Dege <michael.dege@renesas.com>,
+ Christian Mardmoeller <christian.mardmoeller@renesas.com>,
+ Dennis Ostermann <dennis.ostermann@renesas.com>
+References: <20250203170941.2491964-1-nikita.yoush@cogentembedded.com>
+ <18a72981-9896-4725-8f5b-5783224de300@lunn.ch>
+Content-Language: en-US, ru-RU
+From: Nikita Yushchenko <nikita.yoush@cogentembedded.com>
+In-Reply-To: <18a72981-9896-4725-8f5b-5783224de300@lunn.ch>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-On Wed, Feb 5, 2025 at 4:41=E2=80=AFAM Pavel Begunkov <asml.silence@gmail.c=
-om> wrote:
->
-> On 1/28/25 14:49, Willem de Bruijn wrote:
-> >>>> +struct net_devmem_dmabuf_binding *
-> >>>> +net_devmem_get_sockc_binding(struct sock *sk, struct sockcm_cookie =
-*sockc)
-> >>>> +{
-> >>>> +     struct net_devmem_dmabuf_binding *binding;
-> >>>> +     int err =3D 0;
-> >>>> +
-> >>>> +     binding =3D net_devmem_lookup_dmabuf(sockc->dmabuf_id);
-> >>>
-> >>> This lookup is from global xarray net_devmem_dmabuf_bindings.
-> >>>
-> >>> Is there a check that the socket is sending out through the device
-> >>> to which this dmabuf was bound with netlink? Should there be?
-> >>> (e.g., SO_BINDTODEVICE).
-> >>>
-> >>
-> >> Yes, I think it may be an issue if the user triggers a send from a
-> >> different netdevice, because indeed when we bind a dmabuf we bind it
-> >> to a specific netdevice.
-> >>
-> >> One option is as you say to require TX sockets to be bound and to
-> >> check that we're bound to the correct netdev. I also wonder if I can
-> >> make this work without SO_BINDTODEVICE, by querying the netdev the
-> >> sock is currently trying to send out on and doing a check in the
-> >> tcp_sendmsg. I'm not sure if this is possible but I'll give it a look.
-> >
-> > I was a bit quick on mentioning SO_BINDTODEVICE. Agreed that it is
-> > vastly preferable to not require that, but infer the device from
-> > the connected TCP sock.
->
-> I wonder why so? I'd imagine something like SO_BINDTODEVICE is a
-> better way to go. The user has to do it anyway, otherwise packets
-> might go to a different device and the user would suddenly start
-> getting errors with no good way to alleviate them (apart from
-> likes of SO_BINDTODEVICE). It's even worse if it works for a while
-> but starts to unpredictably fail as time passes. With binding at
-> least it'd fail fast if the setup is not done correctly.
->
+> If the interface mode is 5GBASER why set the speed to SPEED_2500?
+> Also, USXGMII allows up to 10G. So this all looks a bit odd.
 
-I think there may be a misunderstanding. There is nothing preventing
-the user from SO_BINDTODEVICE to make sure the socket is bound to the
-ifindex, and the test changes in the latest series actually do this
-binding.
+2500 is hardware limit (or at least the datasheet states so).
 
-It's just that on TX, we check what device we happen to be going out
-over, and fail if we're going out of a different device.
-
-There are setups where the device will always be correct even without
-SO_BINDTODEVICE. Like if the host has only 1 interface or if the
-egress IP is only reachable over 1 interface. I don't see much reason
-to require the user to SO_BINDTODEVICE in these cases.
-
---=20
-Thanks,
-Mina
+Nikita
 
