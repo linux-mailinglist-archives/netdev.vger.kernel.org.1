@@ -1,196 +1,145 @@
-Return-Path: <netdev+bounces-163176-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-163175-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id C22B7A297F5
-	for <lists+netdev@lfdr.de>; Wed,  5 Feb 2025 18:50:40 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id A1659A297ED
+	for <lists+netdev@lfdr.de>; Wed,  5 Feb 2025 18:49:40 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 28125162575
-	for <lists+netdev@lfdr.de>; Wed,  5 Feb 2025 17:49:39 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 6537318870BE
+	for <lists+netdev@lfdr.de>; Wed,  5 Feb 2025 17:49:31 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2E3891FDA93;
-	Wed,  5 Feb 2025 17:49:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 863661FC7F9;
+	Wed,  5 Feb 2025 17:49:01 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="uqpTAfY7"
+	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="cXI8jDyz"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ej1-f43.google.com (mail-ej1-f43.google.com [209.85.218.43])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from fhigh-b1-smtp.messagingengine.com (fhigh-b1-smtp.messagingengine.com [202.12.124.152])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 881CF1FC7FC
-	for <netdev@vger.kernel.org>; Wed,  5 Feb 2025 17:49:03 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.43
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D7DA31DDC2E
+	for <netdev@vger.kernel.org>; Wed,  5 Feb 2025 17:48:59 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=202.12.124.152
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1738777746; cv=none; b=O5vNCIY6IsRjEN64kVbA27U67Ic0otzNEEHoGT+2r/569LrL4YYgPtA5jLgx88hlQatReRtMy4B62/mEVfHRjEuYVUSE2GK08wdUR5L/2dfDdQhj5KePe5+nv2H6UNCv4AsrAhIi+7LN4xOMAkCZ8muWk04/4PBfTbFtE8TgQD0=
+	t=1738777741; cv=none; b=IFjAkv/LYFsV8M0+nj5ayprEOeFkjyTalkbvV2I6f0au0+UV6Nqf/ZWSzl7XtPBiewgdtkfy5HcKsgOTPdeC9b5M3IrbwKGkTYVdJGr3+oP66ygzuCh69M92h8mibHFCfykg3ldJ0yOLpJywJv+rZeiak68zlYUxI5kPKx4GKac=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1738777746; c=relaxed/simple;
-	bh=/u62dmBR/ElLvSnF0c2PDOI2w0kdMLqx8LmycyWZfzE=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=iQHAUQ1z9vp9hs9tCUiaBLMwb4ImpVc3CzSppgnnyizbNltL2bEfwbk5204uPQ96stWrX8lRH98YxlQ7qo1eUSwFIP2PZY+Pd7c62n9Oo//BAOH2udd1hcrw+PmgOoeUuHAItX1MWWtKuYifXac0/557jjAsVrog7tgMB0fqF+0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=uqpTAfY7; arc=none smtp.client-ip=209.85.218.43
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-ej1-f43.google.com with SMTP id a640c23a62f3a-ab7157cf352so236898166b.0
-        for <netdev@vger.kernel.org>; Wed, 05 Feb 2025 09:49:03 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1738777742; x=1739382542; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=zQSBOXqhcCachV8zft/ScV1fAUdaea+WUZiYV/mWDWA=;
-        b=uqpTAfY72ChwJxTgZzIEtB5RyCziQaK4TMUTFBYYzG8ALRiJI7YiWT3leZb/0EKebT
-         7baWKcC7je1Jy9aqd3Y4dMCgHlaH44ZmVJXlQtw82wDOA7b2YxbDjjr2T6rc4HuJBscp
-         rm2sXXR7VuJUj0kiSiN0OHhJF9G1X1uHmRHi5OWS9QokobsfrJF/KSGF8F9gH3pG720f
-         3m9+hu6UOlVgwNLvLhGXtoHwffmpT7T711s23ZZll9A778BCLgsVdBR6ANVN6iFK5ATv
-         2B6uB/jWkqBRZW07kyst+atf0lbcgAYcrgW2OSHcgiaLkz2u5F6WbvxxThGAkhAZZSxH
-         NiYQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1738777742; x=1739382542;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=zQSBOXqhcCachV8zft/ScV1fAUdaea+WUZiYV/mWDWA=;
-        b=Z7pT1l8VBydaPMX2LGEJ+tujDUUEj56vOcM8hMGT32iEIMSpoT562/r84OlsQQ39DR
-         VGu6jtNU2+cMwuP11EHeO9UuZHSQp9JDk2S/Aq8TeiIiXWE05rNkrkPNnQn58MPfsOI+
-         +5zegUj9oqY24Ui4WxEXFZvPsFPY9An40uvAokC6HT8ArtIrdHyC7jbmKDJ/0L/0mbv8
-         IcVsehnKJvqAaMZ3a4lyLw+bjjP9wCwqyILZSvAcrZV7BODfXwLw0HbNh1cq6D73O1MG
-         eM5R2wTEo6EvlIV0Sg4dghf/1mTM3GopL/0DWPy40R9a+FgYzu+dliB5pYbDnaw79cIf
-         k9iA==
-X-Forwarded-Encrypted: i=1; AJvYcCWH0LZG3TzDH0brjcizlrVpkKDA7zIIu+bmGtZabHSD4o6gOnBt0grxhTwHIFmH/kCCGpTzebk=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwbgPFtq30gHRHUVJSX70maYhhSny7iO8v/EJkzeRlpOqrtQKg6
-	85zc9EhrJj+kUoN0WvdD9e8UlsBJQaknxsdpHDBSWsIqdDtkze1tZ8v6bUZ1X979tQoEW/KjEaG
-	dOTspMztplB1dcsZdJmJd4SLWN+XtL8uvGK+c
-X-Gm-Gg: ASbGncu1lyGgInJMvtFxR0NdTFRdJp9sULMhO03TQbWY4qVWZntf3RYfkzHAU5f9p6s
-	KlNLhc40RcAqLbCITy5WMRXsZ41wJlpOwUbG/CRzTV9mjH+g8xNXNz9gxxPvhjHf/uFQO1z+F
-X-Google-Smtp-Source: AGHT+IHJ8jmvk2vlvaC+lS/sj7o4RSpBTPngYU6t0we792og/hqSw+9hG/n7P/6UGVrDc5IFt2nzYS57fa68T5dlKVI=
-X-Received: by 2002:a17:907:7fa3:b0:ab6:e04e:b29 with SMTP id
- a640c23a62f3a-ab76e84c376mr17529966b.3.1738777741553; Wed, 05 Feb 2025
- 09:49:01 -0800 (PST)
+	s=arc-20240116; t=1738777741; c=relaxed/simple;
+	bh=1MWoRg5t72EEoZQoeULR1gql2L5PlTz0JTIEbJlUGRc=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=sHwXkW3kFfcieqjHFkSodwA/qOqfCYyzZ2k+qllL51/tHuV54YH24VMq0NutzGiz1ie9OYXtvdqEBrw0828ZUibIy7HMhJjbnsqs4JPX/BLLYHPSHsUe97KNii21NPPEDzKhTJ22WB3jxkROpKHNJ6DWrK9ZI0gKNJHnM9/K+lk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=idosch.org; spf=none smtp.mailfrom=idosch.org; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=cXI8jDyz; arc=none smtp.client-ip=202.12.124.152
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=idosch.org
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=idosch.org
+Received: from phl-compute-02.internal (phl-compute-02.phl.internal [10.202.2.42])
+	by mailfhigh.stl.internal (Postfix) with ESMTP id C248A2540196;
+	Wed,  5 Feb 2025 12:48:58 -0500 (EST)
+Received: from phl-mailfrontend-02 ([10.202.2.163])
+  by phl-compute-02.internal (MEProxy); Wed, 05 Feb 2025 12:48:59 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
+	messagingengine.com; h=cc:cc:content-type:content-type:date:date
+	:feedback-id:feedback-id:from:from:in-reply-to:in-reply-to
+	:message-id:mime-version:references:reply-to:subject:subject:to
+	:to:x-me-proxy:x-me-sender:x-me-sender:x-sasl-enc; s=fm3; t=
+	1738777738; x=1738864138; bh=ZQJH3Vgzpez4pytmAYWHVpi708BSsvjDUOy
+	VGmyJR/0=; b=cXI8jDyzT9KXRChegvtDSwGFvK7fN+K3S5sEeKvkbz5LmgDW1da
+	PvtclhVYWO7ymggBTRoEZ4fyG9azuLmHZ08BZrotv4kQFZdP5YvKBdASxZ5X2UPO
+	qcizLEnTYZaAbbUG45pJCc+pO+ybHYTWVD1lus1m8220wCyRXM9Wq8/8+x++e8j2
+	eNt7sbqcZhyfDHR1HHNPctSccI20pV/I7gM7psBdtObSiMSl4onV6PtUxlP5CVoy
+	K090QKWPusM8NvecrXX0IvjweUOBIUAzubp7ozzvitQJqJm3ohKoF+imCfl51ePZ
+	qeAe1VUlbk+/AIOovMukQgOD+WpyE8EZrFA==
+X-ME-Sender: <xms:iqSjZ_Xdh5yI4iaTHXZ3vVf1S0Pd0jBmCNBCMhSiaN-M4UvYZox_DA>
+    <xme:iqSjZ3m7FRPZSTWfYeAGi4bwKj3XlrEA80DXzMEq5kHa7_SauTKCPIrHILhvp9APf
+    3TFl-g1jvSx6NQ>
+X-ME-Received: <xmr:iqSjZ7bgm18nZaCAQDkrjIGbJ1XBwuS_sgISsGpGP8BUFph_a2XpwybGfRrj>
+X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeefvddrtddtgddvgeduudcutefuodetggdotefrod
+    ftvfcurfhrohhfihhlvgemucfhrghsthforghilhdpggftfghnshhusghstghrihgsvgdp
+    uffrtefokffrpgfnqfghnecuuegrihhlohhuthemuceftddtnecusecvtfgvtghiphhivg
+    hnthhsucdlqddutddtmdenucfjughrpeffhffvvefukfhfgggtuggjsehttdertddttddv
+    necuhfhrohhmpefkughoucfutghhihhmmhgvlhcuoehiughoshgthhesihguohhstghhrd
+    horhhgqeenucggtffrrghtthgvrhhnpedvudefveekheeugeeftddvveefgfduieefudei
+    fefgleekheegleegjeejgeeghfenucevlhhushhtvghrufhiiigvpedtnecurfgrrhgrmh
+    epmhgrihhlfhhrohhmpehiughoshgthhesihguohhstghhrdhorhhgpdhnsggprhgtphht
+    thhopeekpdhmohguvgepshhmthhpohhuthdprhgtphhtthhopehrrgiiohhrsegslhgrtg
+    hkfigrlhhlrdhorhhgpdhrtghpthhtohepiihnshgtnhgthhgvnhesghhmrghilhdrtgho
+    mhdprhgtphhtthhopegurghvvghmsegurghvvghmlhhofhhtrdhnvghtpdhrtghpthhtoh
+    epvgguuhhmrgiivghtsehgohhoghhlvgdrtghomhdprhgtphhtthhopehkuhgsrgeskhgv
+    rhhnvghlrdhorhhgpdhrtghpthhtohepphgrsggvnhhisehrvgguhhgrthdrtghomhdprh
+    gtphhtthhopegrnhgurhgvfidonhgvthguvghvsehluhhnnhdrtghhpdhrtghpthhtohep
+    nhgvthguvghvsehvghgvrhdrkhgvrhhnvghlrdhorhhg
+X-ME-Proxy: <xmx:iqSjZ6Wd7QFUJdD5i8ygjENu5-9gDrDUTqSSnzjzz4uh8yw-iiupvA>
+    <xmx:iqSjZ5khLvTTmvw4ht7XoT0N1fouvHj571KITO8esguK_Qi6tjwBhQ>
+    <xmx:iqSjZ3dgxpGLgyKp82YbZ8g8D7C3o0AknEcIMPVx8TbKUTwD5rbORg>
+    <xmx:iqSjZzGOc94UjgkT16BNrl-SDE-13_P-_r-34IFRx1Lx4kXB8JX4XQ>
+    <xmx:iqSjZ_UVOUk2gRJLVK0PCHwpF9foGq69t0_vPfMB2r5T5ijJCCj2AbLE>
+Feedback-ID: i494840e7:Fastmail
+Received: by mail.messagingengine.com (Postfix) with ESMTPA; Wed,
+ 5 Feb 2025 12:48:57 -0500 (EST)
+Date: Wed, 5 Feb 2025 19:48:55 +0200
+From: Ido Schimmel <idosch@idosch.org>
+To: Nikolay Aleksandrov <razor@blackwall.org>
+Cc: Ted Chen <znscnchen@gmail.com>, davem@davemloft.net,
+	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
+	andrew+netdev@lunn.ch, netdev@vger.kernel.org
+Subject: Re: [PATCH net-next] vxlan: vxlan_rcv(): Update comment to inlucde
+ ipv6
+Message-ID: <Z6OkhzUHMPuSD6YM@shredder>
+References: <20250205114448.113966-1-znscnchen@gmail.com>
+ <7fcca70c-9bfe-4fd7-b82d-e21f765b8b87@blackwall.org>
+ <Z6NcWfVbqDJJ4c11@t-dallas>
+ <e5373a02-959b-4609-8a3f-7e25c69d97b8@blackwall.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250205163609.3208829-1-aleksander.lobakin@intel.com> <20250205163609.3208829-2-aleksander.lobakin@intel.com>
-In-Reply-To: <20250205163609.3208829-2-aleksander.lobakin@intel.com>
-From: Eric Dumazet <edumazet@google.com>
-Date: Wed, 5 Feb 2025 18:48:50 +0100
-X-Gm-Features: AWEUYZkuOxhIaitZ5J2JCfpt9TDbTEs11u0nOVrp_WhyR-akpJsCIQE0mTy2wI0
-Message-ID: <CANn89iJjCOThDqwsK4v2O8LfcwAB55YohNZ8T2sR40uM2ZoX5w@mail.gmail.com>
-Subject: Re: [PATCH net-next v4 1/8] net: gro: decouple GRO from the NAPI layer
-To: Alexander Lobakin <aleksander.lobakin@intel.com>
-Cc: Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller" <davem@davemloft.net>, 
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
-	Lorenzo Bianconi <lorenzo@kernel.org>, Daniel Xu <dxu@dxuuu.xyz>, Alexei Starovoitov <ast@kernel.org>, 
-	Daniel Borkmann <daniel@iogearbox.net>, Andrii Nakryiko <andrii@kernel.org>, 
-	John Fastabend <john.fastabend@gmail.com>, =?UTF-8?B?VG9rZSBIw7hpbGFuZC1Kw7hyZ2Vuc2Vu?= <toke@kernel.org>, 
-	Jesper Dangaard Brouer <hawk@kernel.org>, Martin KaFai Lau <martin.lau@linux.dev>, netdev@vger.kernel.org, 
-	bpf@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	=?UTF-8?B?VG9rZSBIw7hpbGFuZC1Kw7hyZ2Vuc2Vu?= <toke@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <e5373a02-959b-4609-8a3f-7e25c69d97b8@blackwall.org>
 
-On Wed, Feb 5, 2025 at 5:46=E2=80=AFPM Alexander Lobakin
-<aleksander.lobakin@intel.com> wrote:
->
-> In fact, these two are not tied closely to each other. The only
-> requirements to GRO are to use it in the BH context and have some
-> sane limits on the packet batches, e.g. NAPI has a limit of its
-> budget (64/8/etc.).
-> Move purely GRO fields into a new tagged group, &gro_node. Embed it
-> into &napi_struct and adjust all the references. napi_id doesn't
-> really belong to GRO, but:
->
-> 1. struct gro_node has a 4-byte padding at the end anyway. If you
->    leave napi_id outside, struct napi_struct takes additional 8 bytes
->    (u32 napi_id + another 4-byte padding).
-> 2. gro_receive_skb() uses it to mark skbs. We don't want to split it
->    into two functions or add an `if`, as this would be less efficient,
->    but we need it to be NAPI-independent. The current approach doesn't
->    change anything for NAPI-backed GROs; for standalone ones (which
->    are less important currently), the embedded napi_id will be just
->    zero =3D> no-op.
->
-> Three Ethernet drivers use napi_gro_flush() not really meant to be
-> exported, so move it to <net/gro.h> and add that include there.
-> napi_gro_receive() is used in more than 100 drivers, keep it
-> in <linux/netdevice.h>.
-> This does not make GRO ready to use outside of the NAPI context
-> yet.
->
-> Tested-by: Daniel Xu <dxu@dxuuu.xyz>
-> Acked-by: Jakub Kicinski <kuba@kernel.org>
-> Reviewed-by: Toke H=C3=B8iland-J=C3=B8rgensen <toke@redhat.com>
-> Signed-off-by: Alexander Lobakin <aleksander.lobakin@intel.com>
-> ---
->  include/linux/netdevice.h                  | 26 +++++---
->  include/net/busy_poll.h                    | 11 +++-
->  include/net/gro.h                          | 35 +++++++----
->  drivers/net/ethernet/brocade/bna/bnad.c    |  1 +
->  drivers/net/ethernet/cortina/gemini.c      |  1 +
->  drivers/net/wwan/t7xx/t7xx_hif_dpmaif_rx.c |  1 +
->  net/core/dev.c                             | 60 ++++++++-----------
->  net/core/gro.c                             | 69 +++++++++++-----------
->  8 files changed, 112 insertions(+), 92 deletions(-)
->
-> diff --git a/include/linux/netdevice.h b/include/linux/netdevice.h
-> index 2a59034a5fa2..d29b6ebde73f 100644
-> --- a/include/linux/netdevice.h
-> +++ b/include/linux/netdevice.h
-> @@ -340,8 +340,8 @@ struct gro_list {
->  };
->
->  /*
-> - * size of gro hash buckets, must less than bit number of
-> - * napi_struct::gro_bitmask
-> + * size of gro hash buckets, must be <=3D the number of bits in
-> + * gro_node::bitmask
->   */
->  #define GRO_HASH_BUCKETS       8
->
-> @@ -370,7 +370,6 @@ struct napi_struct {
->         unsigned long           state;
->         int                     weight;
->         u32                     defer_hard_irqs_count;
-> -       unsigned long           gro_bitmask;
->         int                     (*poll)(struct napi_struct *, int);
->  #ifdef CONFIG_NETPOLL
->         /* CPU actively polling if netpoll is configured */
-> @@ -379,11 +378,14 @@ struct napi_struct {
->         /* CPU on which NAPI has been scheduled for processing */
->         int                     list_owner;
->         struct net_device       *dev;
-> -       struct gro_list         gro_hash[GRO_HASH_BUCKETS];
->         struct sk_buff          *skb;
-> -       struct list_head        rx_list; /* Pending GRO_NORMAL skbs */
-> -       int                     rx_count; /* length of rx_list */
-> -       unsigned int            napi_id; /* protected by netdev_lock */
-> +       struct_group_tagged(gro_node, gro,
-> +               unsigned long           bitmask;
-> +               struct gro_list         hash[GRO_HASH_BUCKETS];
-> +               struct list_head        rx_list; /* Pending GRO_NORMAL sk=
-bs */
-> +               int                     rx_count; /* length of rx_list */
-> +               u32                     napi_id; /* protected by netdev_l=
-ock */
-> +
+On Wed, Feb 05, 2025 at 02:48:36PM +0200, Nikolay Aleksandrov wrote:
+> On 2/5/25 14:40, Ted Chen wrote:
+> > On Wed, Feb 05, 2025 at 02:12:50PM +0200, Nikolay Aleksandrov wrote:
+> >> On 2/5/25 13:44, Ted Chen wrote:
+> >>> Update the comment to indicate that both net/ipv4/udp.c and net/ipv6/udp.c
+> >>> invoke vxlan_rcv() to process packets.
+> >>>
+> >>> The comment aligns with that for vxlan_err_lookup().
+> >>>
+> >>> Cc: Ido Schimmel <idosch@idosch.org>
+> >>> Signed-off-by: Ted Chen <znscnchen@gmail.com>
+> >>> ---
+> >>>  drivers/net/vxlan/vxlan_core.c | 2 +-
+> >>>  1 file changed, 1 insertion(+), 1 deletion(-)
+> >>>
+> >>> diff --git a/drivers/net/vxlan/vxlan_core.c b/drivers/net/vxlan/vxlan_core.c
+> >>> index 5ef40ac816cc..8bdf91d1fdfe 100644
+> >>> --- a/drivers/net/vxlan/vxlan_core.c
+> >>> +++ b/drivers/net/vxlan/vxlan_core.c
+> >>> @@ -1684,7 +1684,7 @@ static bool vxlan_ecn_decapsulate(struct vxlan_sock *vs, void *oiph,
+> >>>  	return err <= 1;
+> >>>  }
+> >>>  
+> >>> -/* Callback from net/ipv4/udp.c to receive packets */
+> >>> +/* Callback from net/ipv{4,6}/udp.c to receive packets */
+> >>>  static int vxlan_rcv(struct sock *sk, struct sk_buff *skb)
+> >>>  {
+> >>>  	struct vxlan_vni_node *vninode = NULL;
+> >>
+> >> Your subject has a typo
+> >> s/inlucde/include
+> > Oops. Sorry for that.
+> >  
+> >> IMO these comments are unnecessary, encap_rcv callers are trivial to find.
+> > I'm fine with either way. No comment is better than a wrong comment.
+> > Please let me know if I need to send a new version to correct the subject or
+> > remove the comments for both vxlan_rcv() and vxlan_err_lookup().
+> > 
+> 
+> Up to you, I don't have a strong preference. You have to wait 24 hours
+> before posting another version anyway, so you have time to decide. :)
 
-I am old school, I would prefer a proper/standalone old C construct.
-
-struct gro_node  {
-                unsigned long           bitmask;
-               struct gro_list         hash[GRO_HASH_BUCKETS];
-               struct list_head        rx_list; /* Pending GRO_NORMAL skbs =
-*/
-               int                     rx_count; /* length of rx_list */
-               u32                     napi_id; /* protected by netdev_lock=
- */
-};
-
-Really, what struct_group_tagged() can possibly bring here, other than
-obfuscation ?
-
-Less than 30 uses in the whole kernel tree...
+Looks like nobody will miss these comments, so I think they can be
+safely removed in v2 :)
 
