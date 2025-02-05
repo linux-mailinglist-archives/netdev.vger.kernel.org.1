@@ -1,68 +1,62 @@
-Return-Path: <netdev+bounces-163162-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-163163-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1651DA29733
-	for <lists+netdev@lfdr.de>; Wed,  5 Feb 2025 18:21:16 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0DA66A2974B
+	for <lists+netdev@lfdr.de>; Wed,  5 Feb 2025 18:23:39 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id F22393A91D8
-	for <lists+netdev@lfdr.de>; Wed,  5 Feb 2025 17:20:37 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 066FF168D9B
+	for <lists+netdev@lfdr.de>; Wed,  5 Feb 2025 17:23:22 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4E81A1FE46A;
-	Wed,  5 Feb 2025 17:19:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 19F421FDA9D;
+	Wed,  5 Feb 2025 17:20:26 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="pgmqVB/Z"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="DWRfRO3j"
 X-Original-To: netdev@vger.kernel.org
-Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C4FAF1FDE1A;
-	Wed,  5 Feb 2025 17:19:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E8D641FC7DB
+	for <netdev@vger.kernel.org>; Wed,  5 Feb 2025 17:20:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1738775969; cv=none; b=UugemeMQ8odS2eU7NkTpPw+LyiLgzSGhgQGZKKFEtK97zXgdBvsDdF8QXNpgP2lBXY+fcNG+69NqsQzpX8VwoW7R0nNGhcy2xAqH1PONIGZQDMkKk+XrqWZdc/87L1aWNx/IMMFCUQAG3q7++geRkQBLWHaqywMa0CD77ZPF9MM=
+	t=1738776026; cv=none; b=ObT2CIMS7XCkuyTVukKP7j5PzxRrQ5ThkM/rDAnI/tdFZNoHUx7/v5I8SrbX3xULElo7xYPwLStIPNmux/WBLRlD0lO/5rw3YCCJGZaOrB4L+N9gf1PxrTI0uK5tBKkFbJchDX57LqwMgt7WiHCH+45ipePMK6E5Vl3m/u+37GE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1738775969; c=relaxed/simple;
-	bh=X6ZZtEEzGbsZyJHzn8XWujTaW2SL9LiXtco1lmTFlps=;
+	s=arc-20240116; t=1738776026; c=relaxed/simple;
+	bh=ylZCtrYwDLg4pt2U6QXAZsBDiDJ/r6FMr2FXNj7Er8k=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=MdFNwNJjNIFthVXBFAYZB7rIhCKyInGYxoLLmzLB1z1hJKK2qOzrXr0tB8BS5zpAJzIrQZa0rA5dALPD/uhXhUxf/d0Gz4cst6g/p1M4LQvv3hh9EQUT9l5ZcRnbavLxh0BCvQR81cMmCFrbXU8qw502V6Cp0v+JojOb2P/dZ6k=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=pgmqVB/Z; arc=none smtp.client-ip=78.32.30.218
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
-	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
-	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
-	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=Xzxj+9Kifo30L/NU1Tdw9PE4UUuu1WfcX58E05d3vJk=; b=pgmqVB/ZuHIMgwVi0jNCFJ/Bc1
-	0K3UQ07i4Men1G2g713jF15OrcimNF+d1E3LgJgIF6wNFFhVquZURz1ihjMxHDdkieeHpn3WilX7D
-	+JwQGkMMy707USbo4CVYnvzv22d+VUmg/JoBApJwOYVV3VIuguP7TXyj/fXof3OzOi6Y+aiRbQQoq
-	dHxEdS1s/nM2j2kxssPLACMR3a+6NLyGX8NwqKD3OvEu/k5dXvvpodRdFueOLmU2vnIyuFwSDDVko
-	pKXTSwGVBMJUHvpoR2Uy3T7a8AzYHDlTqBO8dDbk9j1IkD64wdDJiKj1oC5qiUeX+0Tm6gZaQ7O/A
-	9D3UFDjQ==;
-Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:57364)
-	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.96)
-	(envelope-from <linux@armlinux.org.uk>)
-	id 1tfj3U-0007oq-1H;
-	Wed, 05 Feb 2025 17:19:16 +0000
-Received: from linux by shell.armlinux.org.uk with local (Exim 4.96)
-	(envelope-from <linux@shell.armlinux.org.uk>)
-	id 1tfj3R-0002ak-1Y;
-	Wed, 05 Feb 2025 17:19:13 +0000
-Date: Wed, 5 Feb 2025 17:19:13 +0000
-From: "Russell King (Oracle)" <linux@armlinux.org.uk>
-To: kernel test robot <oliver.sang@intel.com>
-Cc: Andrew Lunn <andrew@lunn.ch>, oe-lkp@lists.linux.dev, lkp@intel.com,
-	linux-kernel@vger.kernel.org, Jakub Kicinski <kuba@kernel.org>,
-	Jacob Keller <jacob.e.keller@intel.com>, netdev@vger.kernel.org,
-	Kory Maincent <kory.maincent@bootlin.com>
-Subject: Re: [linus:master] [net]  03abf2a7c6: WARNING:suspicious_RCU_usage
-Message-ID: <Z6OdkdI2ss19FyVT@shell.armlinux.org.uk>
-References: <202502051331.7587ac82-lkp@intel.com>
+	 Content-Type:Content-Disposition:In-Reply-To; b=dMTvL3EjdAwKpVsEmwuXpx5B0X+fK/B1u5XL39tWJp8uBxCf7k0IC+0Buqh2ny9obnx+P9yuyceRL69uD1jnRQAUgixnBnPvFpCPPWEdfrF1MJZxagNd0pd5x0p4lccAeDbbtI/SqUV5sWhtKKsoRy4DD8/AmwTg+TL9p+wwOgg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=DWRfRO3j; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 86C55C4CEDD;
+	Wed,  5 Feb 2025 17:20:23 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1738776025;
+	bh=ylZCtrYwDLg4pt2U6QXAZsBDiDJ/r6FMr2FXNj7Er8k=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=DWRfRO3jwywaGrKsSrTD/2cMBA6JaMj+U7KFIyx5upnbGX1lCkcj1mH4a7nAk8i9k
+	 ALNrp7A/1dj7Lyn/P02PMhFX7yNgsEFDBATZeSd8FaQ9KTxJkEWWqssMaTO5RC8fLo
+	 X35kDF/UpYjGRGnv625rFQnfQ+HTrvzCTSmMrXr+NMikRzJY0e5iPSx+aY+NSOilVY
+	 3bBCsoY4uu9XIR7it7LdSwfmHSX87Yyb2H2yoXBQgd0ZIdLuzptHKGJvB/bjQWHCph
+	 vSKW3TYz8zxYOqmdsANtn/tZGM7pTV291KyRLb42Ot86bxxiJvbupY9s92HHxbtML8
+	 URMFrCOdSF+pg==
+Date: Wed, 5 Feb 2025 17:20:21 +0000
+From: Simon Horman <horms@kernel.org>
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: Pedro Tammela <pctammela@mojatatu.com>,
+	Cong Wang <xiyou.wangcong@gmail.com>, netdev@vger.kernel.org,
+	jhs@mojatatu.com, jiri@resnulli.us, mincho@theori.io,
+	quanglex97@gmail.com, Cong Wang <cong.wang@bytedance.com>
+Subject: Re: [Patch net v3 2/4] selftests/tc-testing: Add a test case for
+ pfifo_head_drop qdisc when limit==0
+Message-ID: <20250205172021.GI554665@kernel.org>
+References: <20250204005841.223511-1-xiyou.wangcong@gmail.com>
+ <20250204005841.223511-3-xiyou.wangcong@gmail.com>
+ <20250204113703.GV234677@kernel.org>
+ <20250204084646.59b5fdb6@kernel.org>
+ <b06cc0bb-167d-4cac-b5df-83884b274613@mojatatu.com>
+ <20250204183851.55ec662e@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -71,75 +65,19 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <202502051331.7587ac82-lkp@intel.com>
-Sender: Russell King (Oracle) <linux@armlinux.org.uk>
+In-Reply-To: <20250204183851.55ec662e@kernel.org>
 
-On Wed, Feb 05, 2025 at 02:08:04PM +0800, kernel test robot wrote:
-> kernel test robot noticed "WARNING:suspicious_RCU_usage" on:
+On Tue, Feb 04, 2025 at 06:38:51PM -0800, Jakub Kicinski wrote:
+> On Tue, 4 Feb 2025 23:21:07 -0300 Pedro Tammela wrote:
+> > > This is starting to feel too much like a setup issue.
+> > > Pedro, would you be able to take this series and investigate
+> > > why it fails on the TDC runner?  
+> > 
+> > It should be OK now
 > 
-> commit: 03abf2a7c65451e663b078b0ed1bfa648cd9380f ("net: phylink: add EEE management")
-> https://git.kernel.org/cgit/linux/kernel/git/torvalds/linux.git master
+> Thank you!
+> 
+> Revived in PW, should get into the run 22 min from now.
 
-I think there's multiple issues here that need addressing:
-
-1) calling phy_detach() in a context that phy_attach() is allowed
-   causes this warning, which seems absurd (being able to attach but
-   not detach on error is a problem.)
-
-This is the root cause of the issue, and others have run into this same
-problem. There's already been an effort to address this:
-   https://lore.kernel.org/r/20250117141446.1076951-1-kory.maincent@bootlin.com
-   https://lore.kernel.org/r/20250117173645.1107460-1-kory.maincent@bootlin.com
-   https://lore.kernel.org/r/20250120141926.1290763-1-kory.maincent@bootlin.com
-and I think the conclusion is that the RTNL had to be held while calling
-phy_detach().
-
-2) phy_modify_mmd() returning -EPERM. Having traced through the code,
-   this comes from my swphy.c which returns -1 (eww). However, as this
-   code was extracted from fixed_phy.c, and the emulation is provided
-   for userspace, this is part of the uAPI of the kernel and can't be
-   changed.
-
-3) the blamed commit introduces a call to phy_modify_mmd() to set the
-   clock-stop bit, which ought not be done unless phylink managed EEE
-   is being used.
-
-(2) and (3) together is what ends up causing:
-
-> [   19.646149][   T22] dsa-loop fixed-0:1f lan1 (uninitialized): failed to connect to PHY: -EPERM
-> [   19.647542][   T22] dsa-loop fixed-0:1f lan1 (uninitialized): error -1 setting up PHY for tree 0, switch 0, port 0
-> [   19.649283][   T22] dsa-loop fixed-0:1f lan2 (uninitialized): PHY [dsa-0.0:01] driver [Generic PHY] (irq=POLL)
-> [   19.650853][   T22] dsa-loop fixed-0:1f lan2 (uninitialized): failed to connect to PHY: -EPERM
-> [   19.652238][   T22] dsa-loop fixed-0:1f lan2 (uninitialized): error -1 setting up PHY for tree 0, switch 0, port 1
-> [   19.653856][   T22] dsa-loop fixed-0:1f lan3 (uninitialized): PHY [dsa-0.0:02] driver [Generic PHY] (irq=POLL)
-> [   19.655392][   T22] dsa-loop fixed-0:1f lan3 (uninitialized): failed to connect to PHY: -EPERM
-> [   19.656689][   T22] dsa-loop fixed-0:1f lan3 (uninitialized): error -1 setting up PHY for tree 0, switch 0, port 2
-> [   19.658308][   T22] dsa-loop fixed-0:1f lan4 (uninitialized): PHY [dsa-0.0:03] driver [Generic PHY] (irq=POLL)
-> [   19.659841][   T22] dsa-loop fixed-0:1f lan4 (uninitialized): failed to connect to PHY: -EPERM
-> [   19.661168][   T22] dsa-loop fixed-0:1f lan4 (uninitialized): error -1 setting up PHY for tree 0, switch 0, port 3
-> [   19.663018][   T22] DSA: tree 0 setup
-> [   19.663591][   T22] dsa-loop fixed-0:1f: DSA mockup driver: 0x1f
-
-which then causes phy_detach() to be called, which then triggers the
-"suspicious RCU" warning.
-
-This has merely revealed a problem in the error handling since Kory's
-commit on the 12th December, and actually has nothing to do with the
-blamed commit, other than it revealing the latent problem.
-
-The "hold RTNL" solution isn't trivial to implement here - phylink's
-PHY connection functions can be called with RTNL already held, so it
-isn't a simple case of throwing locking at phylink (which will cause
-a deadlock) - it needs every phylink user to be audited and individual
-patches to take the RTNL in the driver generated as necessary. I'm not
-sure when I'll be able to do that. It's also a locking change for this
-API - going from not needing the RTNL to requiring it.
-
-This is probably going to result in more kernel warnings being
-generated when I throw in ASSERT_RTNL() into phylink paths that could
-call phy_detach(). Sounds joyful.
-
--- 
-RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
-FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
+TDC and all other tests appear to be passing now :)
 
