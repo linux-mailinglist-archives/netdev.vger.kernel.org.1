@@ -1,69 +1,69 @@
-Return-Path: <netdev+bounces-163092-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-163093-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 14F0CA29547
-	for <lists+netdev@lfdr.de>; Wed,  5 Feb 2025 16:52:42 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 226E9A29548
+	for <lists+netdev@lfdr.de>; Wed,  5 Feb 2025 16:52:49 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 050F01885BA2
-	for <lists+netdev@lfdr.de>; Wed,  5 Feb 2025 15:52:14 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id CF833168451
+	for <lists+netdev@lfdr.de>; Wed,  5 Feb 2025 15:52:12 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 319341C8FBA;
-	Wed,  5 Feb 2025 15:51:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id F319D1D8E07;
+	Wed,  5 Feb 2025 15:51:33 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="ztKPalBJ"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="1/Q4FOLS"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qv1-f73.google.com (mail-qv1-f73.google.com [209.85.219.73])
+Received: from mail-vk1-f201.google.com (mail-vk1-f201.google.com [209.85.221.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9CB3C1A7AFD
-	for <netdev@vger.kernel.org>; Wed,  5 Feb 2025 15:51:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.73
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5B1781D86C6
+	for <netdev@vger.kernel.org>; Wed,  5 Feb 2025 15:51:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1738770692; cv=none; b=XWz2TRpAmbx7LJ/g3xFGswBM5vWwfGaopHH5igv5oZlXBwXQgUjvAfLUbxST2t2I3utTWAXR/j5e2u+rwG6eAsslt4ja0v7P4L78CJw0qxvqhcM4Jl/yldiSY0do91tgOt1kA6bDO7lCmtsDsIK0cb/i75orIJlI10GP6zbgkPc=
+	t=1738770693; cv=none; b=U3ASKSAnAl/Sf9azXNsnKg0WpYq1Ztxjw9fSEm1+zRFjB147Wp6jjKR0F9BuBYJnBOD/kpNC/92mK2IAgIKtf+tOknHq08rglrM75SDPsO8a6YyzI0kfLa9Oib3dWcrI5McsNsAsdkcMrwyHepP+c69iefpOkwaTI+2F3vfgFCk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1738770692; c=relaxed/simple;
-	bh=IjoS0wZAHK91Jak8vmBaki/M3ogZdNysqnPdn+F/nUU=;
+	s=arc-20240116; t=1738770693; c=relaxed/simple;
+	bh=lloKHtDl/tPsHuM5V2tqfCv3EJggBESTK/ainZtC6ZM=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=Z2lb/M6Se88U0hCeRnDp0kdhlUNs8AVGywlOTFR7hz61BxfMGOP+ztrHEbYcZ79mB0rR3pys1qWawJrG8lxQqjOfTsf7PHa3UvRGqYnA9geOqkR6qRk+VIeuPcRgf4vAJKsSbSqCjt8fZqHEt1tMyBthv2BFcQgmlVnH6bMZY3s=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=ztKPalBJ; arc=none smtp.client-ip=209.85.219.73
+	 To:Cc:Content-Type; b=MiyFG6g81Ux8H8X58/J8QodzycLPhpur+WS3y/cPB82c4ZhEodDbP7wTkPItE8wjPTNeneP71oBfEubKz8F2hQOxFP4BhbhKUr68RJfgaIV+NSnlN+DUDevZ0BEg1uRRzyCL59oi98NpHpgNbrgPbFjNA/A22ukzRnn5d+9+2fk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=1/Q4FOLS; arc=none smtp.client-ip=209.85.221.201
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com
-Received: by mail-qv1-f73.google.com with SMTP id 6a1803df08f44-6e4244f9de8so44159946d6.1
-        for <netdev@vger.kernel.org>; Wed, 05 Feb 2025 07:51:30 -0800 (PST)
+Received: by mail-vk1-f201.google.com with SMTP id 71dfb90a1353d-5174d5ad373so1460610e0c.1
+        for <netdev@vger.kernel.org>; Wed, 05 Feb 2025 07:51:32 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1738770690; x=1739375490; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1738770691; x=1739375491; darn=vger.kernel.org;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=W7cOpAiJ3jNVE76pwOVOdST2btjk2f5QzQeM6NMvd44=;
-        b=ztKPalBJ5gyfRJ5jqNXFMBVmJkllMec9mpJ0PwvAGzHhsz3h5/g339x5m7ARB4Qf/L
-         CS3spk/AnkPIgStDm0o6mm+eY8TwK9jZcuBANRfThRG6QOiSFFIxmroVRjN6SssYJvJ7
-         A59xG/R7Rw12FhMRZTqJ528yvxjnzl2pKWP1yRUsofUAhPOrO5t+JTNM/kXtUWyKKX23
-         BJ9Cby/B64hTE4E60Ufel6HIae7CzrHlTll1EDPfT/Pakdgqvb9dATx/khcY0+Pk9S8y
-         HMucd5phFDcSgZ/kqmCAKSNfX4NJGjWz6hUxpvVBm8I54CoHH2rQSxWc9W8MFRKUQqwx
-         12Mw==
+        bh=S+6z75ZBLIdNGYoGaeip7gqrPtogtnUcuG9JIWxEt9s=;
+        b=1/Q4FOLSEKteFftbEtbGypI3feXVfcjIIA2ZRb3B8EcTHkrTIAbCiqUctVRdD2Flxf
+         eGYNl6Acuxaqj22VJVNCXbCv0MH8WIZl0fSpZMmfzBW8Vhb8LbCv7SLEszsnic7CVxAA
+         D/REw17mJYHHcPaExGIBSQz8ZgEwEFah3TgjXqUJ/P0ZVtI34+Ek2q6DjK9ses7V3kTC
+         1eBE9HCHCHOY+tI9uZer+VeFgpwoq2UPTj05yqdwCJ5URIh9e4VEGnUsQNKJXEJynAUF
+         EroUxOEiGPxec1Olj+OHSvKfMs0z9Mu1qVijHWLu/QczjgdOInabnMdMrCEr/FRD6Qoh
+         kG3g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1738770690; x=1739375490;
+        d=1e100.net; s=20230601; t=1738770691; x=1739375491;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=W7cOpAiJ3jNVE76pwOVOdST2btjk2f5QzQeM6NMvd44=;
-        b=jLDXJWa5iM3mjrk/IzswZ2atSLaDko2lckr3fJluNAHoRJ4yqXTEV4C9+dcKkOcvIa
-         9gQU3JXZOgrCqJNIuHm9SBbY6GAaEk8K7K54MlAtlYAaPjTscwea1swPnOe9jMrDpelA
-         5fd5pNHdfGIR9EjEcdMnor/uLT/9Mqxvw3UOLEt2Hn+CyJi/TeI3SwbnbmjCc53LzqFv
-         Xe2r3nDRARzWJ4e5Yb/+mvbkJnaw3CVVun01wSZ4wya1kLQM3B9/1Retx0w8PvMV5m/P
-         Q4vG4goMQASATvsdpkxwhCS/5HZf+WE/kk3BPvUdGG3Ec228btQHSo3guThUq5vtiXjk
-         c+Pg==
-X-Gm-Message-State: AOJu0YzJQUeJgsvHKmXthvw44DffGu9U2EE4fXL1jVKqacUDJacuMKSn
-	diNUd3/lYj2SqBm9QIH/lxYgW0FWMmFYbCycFmdtLtoJrrtjuVGC2M10bry+AKx3qJkN79OLAD4
-	ytUwtUUI6WA==
-X-Google-Smtp-Source: AGHT+IEnHVCGbyVE46EL2MLk+lE/S3ZwV7TvsyZSKm0+Mnf454fsTzdIJlkZu3o7HbyJzUDkYvXjuSoRhzgJbg==
-X-Received: from qvbof6.prod.google.com ([2002:a05:6214:4346:b0:6e4:3725:e7a0])
+        bh=S+6z75ZBLIdNGYoGaeip7gqrPtogtnUcuG9JIWxEt9s=;
+        b=jXluaZrXSdERnmKJlcppiY7cXyoRj8/EDKXfeHpHlVcnzUG3v6KHIpOEsyWQcBcAZ4
+         Myujin7E6ZpA083+tlpUJ+jER80mPIwqzErDcy1m/P5sds9b32AkGfblPWzjkvwHPkEJ
+         WwuDxPNNpg2Bq8Y3vIvqdoApvQYCQxqGZQeqIyEZFwJhiqYTC57FF0wM9qVkrTE5CrD6
+         HrKjU1IDakW7aKMRJnnHdnq1sgvfd2x/cgJXcO6Ew9bCGeawQyR4G9x7vl3IroBRs0vC
+         TQ5tAi+LIIKfpQiH8tkCbVNEb70e2WL6gXOVcKzw6/OUD1hCWlcXYhrncgls9pQOdQJx
+         /nqw==
+X-Gm-Message-State: AOJu0YwmjQWgl2J9/rOUZcZF5ZNxLjDU+1yFeZjFI4YXP4K/33pK6WcE
+	bLewSI4canXxp2zXAUOMzNamJ4pw+05B+xwZBk313lLaxxhQijwdNsl7SnZyUsnqV7Ha0Sb54x9
+	rgHaF14cB4A==
+X-Google-Smtp-Source: AGHT+IHx8b7c5rUKa2+cCXQnilAczzNxas3R2E8mhxf9yJ0O+bnvNXQtWOTUN8pUAE9VLywW12m2eHC37zC7rA==
+X-Received: from vsbdd1.prod.google.com ([2002:a05:6102:5681:b0:4b6:3e49:b1b3])
  (user=edumazet job=prod-delivery.src-stubby-dispatcher) by
- 2002:ad4:5ec6:0:b0:6d8:8cb0:b40d with SMTP id 6a1803df08f44-6e42fc70219mr42473856d6.39.1738770689824;
- Wed, 05 Feb 2025 07:51:29 -0800 (PST)
-Date: Wed,  5 Feb 2025 15:51:14 +0000
+ 2002:a05:6102:2c11:b0:4b4:e5c6:4c66 with SMTP id ada2fe7eead31-4ba478b45c5mr2335037137.6.1738770691220;
+ Wed, 05 Feb 2025 07:51:31 -0800 (PST)
+Date: Wed,  5 Feb 2025 15:51:15 +0000
 In-Reply-To: <20250205155120.1676781-1-edumazet@google.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -73,8 +73,8 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
 References: <20250205155120.1676781-1-edumazet@google.com>
 X-Mailer: git-send-email 2.48.1.362.g079036d154-goog
-Message-ID: <20250205155120.1676781-7-edumazet@google.com>
-Subject: [PATCH v4 net 06/12] ipv4: use RCU protection in inet_select_addr()
+Message-ID: <20250205155120.1676781-8-edumazet@google.com>
+Subject: [PATCH v4 net 07/12] ipv4: use RCU protection in __ip_rt_update_pmtu()
 From: Eric Dumazet <edumazet@google.com>
 To: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
 	Paolo Abeni <pabeni@redhat.com>
@@ -83,32 +83,68 @@ Cc: netdev@vger.kernel.org, Kuniyuki Iwashima <kuniyu@amazon.com>,
 	Eric Dumazet <edumazet@google.com>
 Content-Type: text/plain; charset="UTF-8"
 
-inet_select_addr() must use RCU protection to make
+__ip_rt_update_pmtu() must use RCU protection to make
 sure the net structure it reads does not disappear.
 
-Fixes: c4544c724322 ("[NETNS]: Process inet_select_addr inside a namespace.")
+Fixes: 2fbc6e89b2f1 ("ipv4: Update exception handling for multipath routes via same device")
+Fixes: 1de6b15a434c ("Namespaceify min_pmtu sysctl")
 Signed-off-by: Eric Dumazet <edumazet@google.com>
 ---
- net/ipv4/devinet.c | 3 ++-
- 1 file changed, 2 insertions(+), 1 deletion(-)
+ net/ipv4/route.c | 11 ++++++-----
+ 1 file changed, 6 insertions(+), 5 deletions(-)
 
-diff --git a/net/ipv4/devinet.c b/net/ipv4/devinet.c
-index c8b3cf5fba4c02941b919687a6a657cf68f5f99a..55b8151759bc9f76ebdbfae27544d6ee666a4809 100644
---- a/net/ipv4/devinet.c
-+++ b/net/ipv4/devinet.c
-@@ -1371,10 +1371,11 @@ __be32 inet_select_addr(const struct net_device *dev, __be32 dst, int scope)
- 	__be32 addr = 0;
- 	unsigned char localnet_scope = RT_SCOPE_HOST;
- 	struct in_device *in_dev;
--	struct net *net = dev_net(dev);
+diff --git a/net/ipv4/route.c b/net/ipv4/route.c
+index e959327c0ba8979ce5c7ca8c46ae41068824edc6..753704f75b2c65d79c9c4dc19a329de5cdbd8514 100644
+--- a/net/ipv4/route.c
++++ b/net/ipv4/route.c
+@@ -1008,9 +1008,9 @@ out:	kfree_skb_reason(skb, reason);
+ static void __ip_rt_update_pmtu(struct rtable *rt, struct flowi4 *fl4, u32 mtu)
+ {
+ 	struct dst_entry *dst = &rt->dst;
+-	struct net *net = dev_net(dst->dev);
+ 	struct fib_result res;
+ 	bool lock = false;
 +	struct net *net;
- 	int master_idx;
+ 	u32 old_mtu;
  
- 	rcu_read_lock();
-+	net = dev_net_rcu(dev);
- 	in_dev = __in_dev_get_rcu(dev);
- 	if (!in_dev)
- 		goto no_in_dev;
+ 	if (ip_mtu_locked(dst))
+@@ -1020,6 +1020,8 @@ static void __ip_rt_update_pmtu(struct rtable *rt, struct flowi4 *fl4, u32 mtu)
+ 	if (old_mtu < mtu)
+ 		return;
+ 
++	rcu_read_lock();
++	net = dev_net_rcu(dst->dev);
+ 	if (mtu < net->ipv4.ip_rt_min_pmtu) {
+ 		lock = true;
+ 		mtu = min(old_mtu, net->ipv4.ip_rt_min_pmtu);
+@@ -1027,9 +1029,8 @@ static void __ip_rt_update_pmtu(struct rtable *rt, struct flowi4 *fl4, u32 mtu)
+ 
+ 	if (rt->rt_pmtu == mtu && !lock &&
+ 	    time_before(jiffies, dst->expires - net->ipv4.ip_rt_mtu_expires / 2))
+-		return;
++		goto out;
+ 
+-	rcu_read_lock();
+ 	if (fib_lookup(net, fl4, &res, 0) == 0) {
+ 		struct fib_nh_common *nhc;
+ 
+@@ -1043,14 +1044,14 @@ static void __ip_rt_update_pmtu(struct rtable *rt, struct flowi4 *fl4, u32 mtu)
+ 				update_or_create_fnhe(nhc, fl4->daddr, 0, mtu, lock,
+ 						      jiffies + net->ipv4.ip_rt_mtu_expires);
+ 			}
+-			rcu_read_unlock();
+-			return;
++			goto out;
+ 		}
+ #endif /* CONFIG_IP_ROUTE_MULTIPATH */
+ 		nhc = FIB_RES_NHC(res);
+ 		update_or_create_fnhe(nhc, fl4->daddr, 0, mtu, lock,
+ 				      jiffies + net->ipv4.ip_rt_mtu_expires);
+ 	}
++out:
+ 	rcu_read_unlock();
+ }
+ 
 -- 
 2.48.1.362.g079036d154-goog
 
