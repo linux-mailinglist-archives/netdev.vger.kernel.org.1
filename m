@@ -1,79 +1,65 @@
-Return-Path: <netdev+bounces-162883-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-162890-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id CCB6BA28456
-	for <lists+netdev@lfdr.de>; Wed,  5 Feb 2025 07:23:59 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 94139A2849C
+	for <lists+netdev@lfdr.de>; Wed,  5 Feb 2025 07:50:52 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 66DBC161C34
-	for <lists+netdev@lfdr.de>; Wed,  5 Feb 2025 06:23:58 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id F2F8B3A6189
+	for <lists+netdev@lfdr.de>; Wed,  5 Feb 2025 06:50:43 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D2A2022A1CB;
-	Wed,  5 Feb 2025 06:22:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B862721D5AA;
+	Wed,  5 Feb 2025 06:50:46 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="LIQAlN5A"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="nhPqipja"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f45.google.com (mail-wm1-f45.google.com [209.85.128.45])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.19])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 15BB622A1C0;
-	Wed,  5 Feb 2025 06:22:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.45
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B6C1781ACA;
+	Wed,  5 Feb 2025 06:50:44 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.19
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1738736574; cv=none; b=d4thyuPEY5H2zFsrLkAAkbxfZ+f+Eb/MTzab6X3KCtmOILirtlMSEtra1oKi/B8SSjcEKFqmn7a5dY6s0CsALVHItZKL7v3dHUlYR5s/DFM3dnLMomBCEjsrdNNRaMY1k17+TdvAO23UpAJIcSkn3APyP/xu6WGVXzkN2XE/hEo=
+	t=1738738246; cv=none; b=H9/i2u+6qoiQAiBJPLBewl9NxZf5yUzp3gHI9wgqLo2QIvH7QILzriPysVepQTVjcvlz3+5PAYZDQHNMCotpuUV+pvaKpOgLplqsaZ0M6uMHkZOTttrUpq7ZTlrtRaI/5xZIUyaIZEhgw9oVM7ML/L0gI2QpwLjblC34v0MTUwA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1738736574; c=relaxed/simple;
-	bh=2FwMGYOk8g/lmGNTCCDHr8s4TgW11+7c9hjPFP6vTEk=;
+	s=arc-20240116; t=1738738246; c=relaxed/simple;
+	bh=55hxtyx4DMhF2qYY+kBeRk1DqvJKGJ9IUbKzhKO8vbg=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=T7THFiPTfDD6B7Fnh6gjGLrdTKfgbHg8g1jzfLmLwTPNuIX+a7jLKnskXEmn02SF32EXaBrlvYxbnljupPB9OhNhzqVcKiE7Ys2G2mdv+00S9VKJQyr9F9JhQiVxmZILoRXkE2cACLSEZ7YWQ8Es9G//aV321466tM/zsqjDFu4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=LIQAlN5A; arc=none smtp.client-ip=209.85.128.45
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wm1-f45.google.com with SMTP id 5b1f17b1804b1-438a39e659cso43523635e9.2;
-        Tue, 04 Feb 2025 22:22:52 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1738736571; x=1739341371; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=Zgadaiki1GffcemlaJzJ1O0JT9RvcSk5B1GXHuZV+P4=;
-        b=LIQAlN5AXsLe7fPJ5s8hZR3vYjnfHaWp0iQDfsAzvSSRwbX3H3sxxPysAfurSe+Cb3
-         of06E5PsRHJSjBw/GrHltafVDtcfUKHvfzNggPbbuIqxvxQ3SIuJBUy5Ifrs8A0jQIWD
-         f1UxfXwvAOLBK7ebsoff5Zg3xRbGwwpyxb0mVfdfTgwNj8mcmGsho3i3ZCaPjQsq2onc
-         t5cbk9lUxemJ385mJDAytg7wBt+NMM2FDjrBOXF10Z5txTZypZ7wLaplX1+FSpbKN8tT
-         V+wb7efe7Ac4lJSGKh8zyCpUd/slyMzQqliPOMe6nxSVYYxJp25L38Y9dHJbMeAhZ5cK
-         YRUQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1738736571; x=1739341371;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=Zgadaiki1GffcemlaJzJ1O0JT9RvcSk5B1GXHuZV+P4=;
-        b=LZhWwUefJ9bRm06giZh8xrlOOk9Uk9RT+4ps3IPvNXCNHA4ChqmJrLfU7ryp+M0xfV
-         fwJnVBKzVYnb73o/AblgZswZGC1Rd8FeJ6vKvv5jwpQdHnptVU/89id3vfGw6oGhQyPz
-         I/c3RbL7jA5pXercqm+WwVUvvY2PcfrT9K2YNDi0xtA+NbDQO/bF3+K2iZnD3xm7glLZ
-         M4cxbq/n2V3+5z2ggyiWIDTOAnv1rVWb89ytxvyFHENvRQ0Slq/Cpbi4vhTT/pjXiByF
-         13MSQY3IiRqV7JI+HzI8QKkU6al+i/hlt7Cg7B/a0Px6qBDMWnyPLzgQXqUwsI0aPCTg
-         qq0A==
-X-Forwarded-Encrypted: i=1; AJvYcCUdLN9+meiILIaAMbVNCrVoxuqyCQ0HKmoRhDZhmoGdFlPdyxDgOaML6aTC9JjnsOzeVGrdHl6hUS2L@vger.kernel.org, AJvYcCXZqUmrVSzTIYjJaJQU423PRmyiSKjmxMninG8Jq8CHUgpQ/6iMIKi/JQsRXAjEd59YagTrMH5Z@vger.kernel.org
-X-Gm-Message-State: AOJu0YwP34LgtBDQaVZ2tvDGkN9Dq0Vl71HZdyaj8O9aKG1MjvBmqbiP
-	bVhZP7oSMJJVT+EPUCNoxbNc46wK0UF14yabLEOc/nzShC+EVSTEXep0YA==
-X-Gm-Gg: ASbGncsieCNzavld92qRdiemHFGquWMmKyMM9bj4JAunKCGwN5pg2JAydbn88iwgV3Q
-	ij/U3Pmy+hGT3EKFHcTZNZ6Geh2KQ9Dyt9BSNeUyFX9Fj2BDTfmhkRpP/r9HFNV7aZzLF2qwRut
-	ihU9a3ropv548ZmiUl292iXovuOdDgupZaqVgxehu4/QRGSvSIEVWmX+8D65ofSh2VPhqNy79kp
-	yV3LTi1hHsc5gHfCX8y9Lp+7uzgJlkNZSeFXtTPYsDgfz4fa/3dAOsy+AoHOoj8xV/nJBzwEX/A
-	zzLGSy+xM5u9B3qEbBDBE68RkFHKbrxU1zpc
-X-Google-Smtp-Source: AGHT+IE4kc75mBchz+3cmEtMGpUmvdAv7a2W/KBHq87O0SGq6n2GfSGkUIn9NrZ1DWwop5WIBfwRsw==
-X-Received: by 2002:a5d:6d0f:0:b0:38b:e32a:10ab with SMTP id ffacd0b85a97d-38db4857d3amr758956f8f.9.1738736571032;
-        Tue, 04 Feb 2025 22:22:51 -0800 (PST)
-Received: from [172.27.21.225] ([193.47.165.251])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-38db1deeabesm1977401f8f.22.2025.02.04.22.22.49
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 04 Feb 2025 22:22:50 -0800 (PST)
-Message-ID: <0f3ac6e2-80be-4df2-9b4d-61433549cc2d@gmail.com>
-Date: Wed, 5 Feb 2025 08:22:49 +0200
+	 In-Reply-To:Content-Type; b=e/EhxuY1VQiw0nvJF3TLZHpji+7makHByp2jbmjKgQFuMCoTmMEnNrRyTQ+5tvoyJ2ntJ/vhpV0UjfF/IzuwusTd+fXBvy9HWEI5ig48oIkCgcPAdofyQaXWY6CP4dOx9NXbSYKhTw+iOFJDlG1isczb4t+6KTagyHRt/N0XbyE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=nhPqipja; arc=none smtp.client-ip=198.175.65.19
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1738738245; x=1770274245;
+  h=message-id:date:mime-version:subject:to:cc:references:
+   from:in-reply-to:content-transfer-encoding;
+  bh=55hxtyx4DMhF2qYY+kBeRk1DqvJKGJ9IUbKzhKO8vbg=;
+  b=nhPqipjarUlvAQgFPw0DZquSzEriwI7ib5RgFAzJdk267ojoBmHAK8Cy
+   tHcEyJtyYY78etwxTeKwx7b7qP2fTdNVKSjDjO+6/dO9zY2OOYH2bJset
+   8AJI1Rbg0ihZ3Aouhib5q0cbPUK4t2RBfHRh8TVGgQdmaJAexL7Z/HBJG
+   c1EgAtctSooBTjxZ6Y5Xb6Ua+vr2agnxh/k2EFmtrmWSeT8aT2vlCWQi4
+   UO+Igk8as8CqNoYLXyk772FCOBE7tZXbBOx4F8eWYL6g/SLyUkfJ5LDcM
+   yrSzfV/plUwaPp+0EbbvrRgxnwF2zL8tz/Kn7j2icxVHoSRL9nqLaZm8A
+   A==;
+X-CSE-ConnectionGUID: n1DyovVeSVm4N8O9bareYg==
+X-CSE-MsgGUID: vES0pDkRRKabU9xeLDhYaw==
+X-IronPort-AV: E=McAfee;i="6700,10204,11336"; a="39175591"
+X-IronPort-AV: E=Sophos;i="6.13,260,1732608000"; 
+   d="scan'208";a="39175591"
+Received: from fmviesa009.fm.intel.com ([10.60.135.149])
+  by orvoesa111.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 04 Feb 2025 22:50:44 -0800
+X-CSE-ConnectionGUID: oo32QqH1QrmHW2tYAHIDrw==
+X-CSE-MsgGUID: W8AT1xq9Tz+DU8R6MpUXgA==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.13,260,1732608000"; 
+   d="scan'208";a="111400846"
+Received: from choongyo-mobl.gar.corp.intel.com (HELO [10.247.100.100]) ([10.247.100.100])
+  by fmviesa009-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 04 Feb 2025 22:50:35 -0800
+Message-ID: <c25c2da7-18fa-46b7-b992-fb5b17a01749@linux.intel.com>
+Date: Wed, 5 Feb 2025 14:50:31 +0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -81,49 +67,106 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next V5 07/11] devlink: Extend devlink rate API with
- traffic classes bandwidth management
-To: Jakub Kicinski <kuba@kernel.org>, Carolina Jubran <cjubran@nvidia.com>
-Cc: Tariq Toukan <tariqt@nvidia.com>, "David S. Miller"
- <davem@davemloft.net>, Paolo Abeni <pabeni@redhat.com>,
- Eric Dumazet <edumazet@google.com>, Andrew Lunn <andrew+netdev@lunn.ch>,
- Leon Romanovsky <leonro@nvidia.com>, netdev@vger.kernel.org,
- Saeed Mahameed <saeedm@nvidia.com>, Gal Pressman <gal@nvidia.com>,
- linux-rdma@vger.kernel.org, Cosmin Ratiu <cratiu@nvidia.com>,
- Jiri Pirko <jiri@nvidia.com>
-References: <20241204220931.254964-1-tariqt@nvidia.com>
- <20241204220931.254964-8-tariqt@nvidia.com>
- <20241206181056.3d323c0e@kernel.org>
- <89652b98-65a8-4a97-a2e2-6c36acf7c663@gmail.com>
- <20241209132734.2039dead@kernel.org>
- <1e886aaf-e1eb-4f1a-b7ef-f63b350a3320@nvidia.com>
- <20250120101447.1711b641@kernel.org>
- <a76be788-a0ae-456a-9450-686e03209e84@nvidia.com>
- <8dbc731c-2cff-4995-b579-badfc32584a1@nvidia.com>
- <20250122063037.1f0b794a@kernel.org>
+Subject: Re: [PATCH net-next v6 1/7] net: phylink: use act_link_an_mode to
+ determine PHY
+To: "Russell King (Oracle)" <linux@armlinux.org.uk>
+Cc: Simon Horman <horms@kernel.org>, Jose Abreu <joabreu@synopsys.com>,
+ Jose Abreu <Jose.Abreu@synopsys.com>,
+ David E Box <david.e.box@linux.intel.com>,
+ Thomas Gleixner <tglx@linutronix.de>, Ingo Molnar <mingo@redhat.com>,
+ Borislav Petkov <bp@alien8.de>, Dave Hansen <dave.hansen@linux.intel.com>,
+ "H . Peter Anvin" <hpa@zytor.com>,
+ Rajneesh Bhardwaj <irenic.rajneesh@gmail.com>,
+ David E Box <david.e.box@intel.com>, Andrew Lunn <andrew+netdev@lunn.ch>,
+ "David S . Miller" <davem@davemloft.net>, Eric Dumazet
+ <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+ Paolo Abeni <pabeni@redhat.com>, Maxime Coquelin
+ <mcoquelin.stm32@gmail.com>, Alexandre Torgue
+ <alexandre.torgue@foss.st.com>, Jiawen Wu <jiawenwu@trustnetic.com>,
+ Mengyuan Lou <mengyuanlou@net-swift.com>,
+ Heiner Kallweit <hkallweit1@gmail.com>, Hans de Goede <hdegoede@redhat.com>,
+ =?UTF-8?Q?Ilpo_J=C3=A4rvinen?= <ilpo.jarvinen@linux.intel.com>,
+ Richard Cochran <richardcochran@gmail.com>,
+ Andrew Halaney <ahalaney@redhat.com>, Serge Semin <fancer.lancer@gmail.com>,
+ x86@kernel.org, linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
+ platform-driver-x86@vger.kernel.org,
+ linux-stm32@st-md-mailman.stormreply.com,
+ linux-arm-kernel@lists.infradead.org
+References: <20250204061020.1199124-1-yong.liang.choong@linux.intel.com>
+ <20250204061020.1199124-2-yong.liang.choong@linux.intel.com>
+ <Z6ICO06RbJ1ulDh1@shell.armlinux.org.uk>
 Content-Language: en-US
-From: Tariq Toukan <ttoukan.linux@gmail.com>
-In-Reply-To: <20250122063037.1f0b794a@kernel.org>
+From: Choong Yong Liang <yong.liang.choong@linux.intel.com>
+In-Reply-To: <Z6ICO06RbJ1ulDh1@shell.armlinux.org.uk>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 
 
 
-On 22/01/2025 16:30, Jakub Kicinski wrote:
-> On Wed, 22 Jan 2025 14:48:55 +0200 Carolina Jubran wrote:
->> Since this worked and the devlink patch now depends on it, would it be
->> possible to include the top two patches
->> https://github.com/kuba-moo/linux/tree/ynl-limits in the next submission
->> of the devlink and mlx5 patches?
+On 4/2/2025 8:04 pm, Russell King (Oracle) wrote:
+> On Tue, Feb 04, 2025 at 02:10:14PM +0800, Choong Yong Liang wrote:
+>> When the interface mode is SGMII and act_link_an_mode is MLO_AN_INBAND,
+>> switching to the 2500BASE-X interface mode will trigger
+>> phylink_major_config, and act_link_an_mode will be updated to MLO_AN_PHY
+>> in phylink_pcs_neg_mode when the PCS does not support in-band mode.
+>> The MAC and PCS will configure according to the interface mode
+>> and act_link_an_mode.
 > 
-> I'll post the two patches right after the merge window.
-> They stand on their own, and we can keep your series short-ish.
+> act_link_an_mode must only ever be updated by phylink_major_config()
+> since it defines state for the currently configured mode, and must
+> stay in sync with how the hardware has been programmed at all times.
+> 
+>> However, when the interface goes link down and then link up again, the MAC
+>> will attempt to attach the PHY.
+> 
+> Why is the MAC trying to disconnect and reconnect the PHY on link
+> changes? Do you really mean "link down" and "link up" as in "connection
+> with the link partner" or do you mean administratively taking the
+> interface down and up (which is a completely different thing.)
+> 
 
-Hi Jakub,
+The "link down" and "link up" I mention in this part refer to using the 
+command:
+ifconfig <interface> down/up
 
-A kind reminder, as we have dependency on these.
+>> The interface mode remains as 2500BASE-X,
+>> but cfg_link_an_mode still holds MLO_AN_INBAND. This causes a failure to
+>> attach the PHY.
+> 
+> Hmm.
+> 
+> pl->link_interface is the configured setting from firmware etc and doesn't
+> change.
+> 
+> pl->cfg_link_an_mode is the configured mode from firmware etc which was
+> passed to phylink_create(), and again doesn't change.
+> 
+> So there should be no difference unless something weird is going on,
+> which as you're talking about stmmac, could be the case.
+> 
 
-Regards,
-Tariq
+Thank you for pointing that out.
+
+I think I was confused between pl->link_interface and
+pl->link_config.interface. The function phylink_attach_phy() uses
+pl->link_interface, whereas phylink_expects_phy() uses
+pl->link_config.interface.
+
+When the interface switches from SGMII to 2500BASE-X,
+pl->link_config.interface is updated by phylink_major_config().
+So, when the STMMAC link goes down and comes up again,
+it is blocked by phylink_expects_phy().
+At this point, pl->cfg_link_an_mode is MLO_AN_INBAND and 
+pl->link_config.interface is 2500BASE-X.
+
+Since phylink_expects_phy() is trying to achieve the same checking 
+condition as phylink_attach_phy(), it should use pl->link_interface for the 
+check as well.
+
+Does that make sense to you?
+
+> More information needed, but as this patch currently stands, I deem it
+> to be incorrect, sorry.
+> 
 
 
