@@ -1,97 +1,295 @@
-Return-Path: <netdev+bounces-162935-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-162937-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id A38CFA287DB
-	for <lists+netdev@lfdr.de>; Wed,  5 Feb 2025 11:24:00 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id B2AABA2882B
+	for <lists+netdev@lfdr.de>; Wed,  5 Feb 2025 11:39:22 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 7B4493A5220
-	for <lists+netdev@lfdr.de>; Wed,  5 Feb 2025 10:23:51 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 406301679BE
+	for <lists+netdev@lfdr.de>; Wed,  5 Feb 2025 10:39:21 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5BAFB22AE59;
-	Wed,  5 Feb 2025 10:23:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="pXUBfIoL"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4DC5822AE65;
+	Wed,  5 Feb 2025 10:39:12 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from relay3-d.mail.gandi.net (relay3-d.mail.gandi.net [217.70.183.195])
+Received: from metis.whiteo.stw.pengutronix.de (metis.whiteo.stw.pengutronix.de [185.203.201.7])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 906392063D8;
-	Wed,  5 Feb 2025 10:23:49 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.195
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5D78622B5A3
+	for <netdev@vger.kernel.org>; Wed,  5 Feb 2025 10:39:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.203.201.7
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1738751033; cv=none; b=uCQg2HzfL1TL+DtEpaXtf1vVpJzNWZEV3ExaefmVvMPepn/TBjUte5v/37D+ZtCwuQZOK+KidIZCpiScK9gpqoupcXg260JlTBBFLaU12O7gBA+0a1slG4j62mRi8Bj4HIK7l8U2RmvhV0WtO8gZbFj2tL/Zx/ssZjNoVr9yjks=
+	t=1738751952; cv=none; b=Y1IoGEvJ0eDC1O2h5bsDxSJmwlKk3Z/Y3lsUh4ZTDtt1oc0PIkxQBNsOs0B1VAIc3ay9NU4aGtDdXBGoCkWjzr5VHUpihOaCj7OdeWWG5V39XZOW1BRw6t+6RLTkSplxry+XQnq9K/6cwzqwyXfVfJ1InUrG8Ym+2ajll3ycylE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1738751033; c=relaxed/simple;
-	bh=l8WUMCh4/bacxntxMeJpQkFivTbCQf82Fd87xLkpqaI=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=eyedkiCT/O4K+Zw9NGYvQ2ok744E19GFjC1dEr48Fmmbqdk9bwWwQfygu6BmXd/KFCCNIjDOWIxNQ/4ZxAldWhgWq+a3gEeDnUD99YlUCabM9foiWldjeytPV82Bglv3JnugraYsgbh1u7KZhDmP3Jkv1E5rBBX+TeJG4RhSMPE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=pXUBfIoL; arc=none smtp.client-ip=217.70.183.195
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
-Received: by mail.gandi.net (Postfix) with ESMTPSA id B591520479;
-	Wed,  5 Feb 2025 10:23:46 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
-	t=1738751027;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=OCgPDTwzHkVl8WwhlQzvIZcaXBEvz3BrPQEMI8PN0Po=;
-	b=pXUBfIoL9X29WYaV553bYN5PrfgONgLKE0knP7SlKPqVv8uGlYh9Bxe9QxV2k630fFi61g
-	8JRtqr1lglESNL4ldKtcPtWvovVbwaqyMR0Us/3eYh/dt/ecKtai3h5N+oQ8dALkZieMF8
-	NrQ3XW6n0EHwPolG4QhWEa3bXAy4FEXlyvt8LHrEMEFJiqeryImqpOCzfjOAb0QT1kXH+F
-	DVNnx+VR7FjW5+Y2NHaNxyO6fm+lRrj3Rg/HHOI5nfMjUf1aM4xPM0l6EYBbkGv9e/xKt4
-	mntXL3TnTl67ISClR5aS1I3sPi67Gh/ZwRD0iAkDtq2PmS/01ZNjbIl8GXJEMQ==
-Date: Wed, 5 Feb 2025 11:23:46 +0100
-From: Alexandre Belloni <alexandre.belloni@bootlin.com>
-To: Ming Yu <a0282524688@gmail.com>
-Cc: tmyu0@nuvoton.com, lee@kernel.org, linus.walleij@linaro.org,
-	brgl@bgdev.pl, andi.shyti@kernel.org, mkl@pengutronix.de,
-	mailhol.vincent@wanadoo.fr, andrew+netdev@lunn.ch,
-	davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
-	pabeni@redhat.com, wqlinux@roeck-us.net, jdelvare@suse.com,
-	linux-kernel@vger.kernel.org, linux-gpio@vger.kernel.org,
-	linux-i2c@vger.kernel.org, linux-can@vger.kernel.org,
-	netdev@vger.kernel.org, linux-watchdog@vger.kernel.org,
-	linux-hwmon@vger.kernel.org, linux-rtc@vger.kernel.org,
-	linux-usb@vger.kernel.org
-Subject: Re: [PATCH v6 7/7] rtc: Add Nuvoton NCT6694 RTC support
-Message-ID: <20250205102214a6357365@mail.local>
-References: <20250123091115.2079802-1-a0282524688@gmail.com>
- <20250123091115.2079802-8-a0282524688@gmail.com>
+	s=arc-20240116; t=1738751952; c=relaxed/simple;
+	bh=P0VU7UMU1X2gguhoQwApVSnZes7wcczyANucJcp6haI=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=XlH7Ciq3VrxsnFUgVfxk3WhYLEFujk7b0SIQDXrGsMZBD/DKjB63W/07RQErZRcXtrF0Rz3SirZA/UwaMIqEzKqAPgesxj4G7vRIfo0Opnov3Xg4Q3ume4CJWlEROeiB6IkwaqoqG5A8ErbVLED5TTz/1T56FUiQZWpUIY1sHME=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de; spf=pass smtp.mailfrom=pengutronix.de; arc=none smtp.client-ip=185.203.201.7
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=pengutronix.de
+Received: from drehscheibe.grey.stw.pengutronix.de ([2a0a:edc0:0:c01:1d::a2])
+	by metis.whiteo.stw.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
+	(Exim 4.92)
+	(envelope-from <ore@pengutronix.de>)
+	id 1tfcnx-0003EZ-3I; Wed, 05 Feb 2025 11:38:49 +0100
+Received: from dude04.red.stw.pengutronix.de ([2a0a:edc0:0:1101:1d::ac])
+	by drehscheibe.grey.stw.pengutronix.de with esmtps  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.96)
+	(envelope-from <ore@pengutronix.de>)
+	id 1tfcnv-003cUo-1b;
+	Wed, 05 Feb 2025 11:38:47 +0100
+Received: from ore by dude04.red.stw.pengutronix.de with local (Exim 4.96)
+	(envelope-from <ore@pengutronix.de>)
+	id 1tfcnv-009XYV-1O;
+	Wed, 05 Feb 2025 11:38:47 +0100
+From: Oleksij Rempel <o.rempel@pengutronix.de>
+To: Andrew Lunn <andrew@lunn.ch>,
+	Heiner Kallweit <hkallweit1@gmail.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Jonathan Corbet <corbet@lwn.net>
+Cc: Oleksij Rempel <o.rempel@pengutronix.de>,
+	kernel@pengutronix.de,
+	linux-kernel@vger.kernel.org,
+	netdev@vger.kernel.org,
+	Russell King <linux@armlinux.org.uk>
+Subject: [PATCH net-next v1 1/1] net: phy: dp83td510: introduce LED framework support
+Date: Wed,  5 Feb 2025 11:38:46 +0100
+Message-Id: <20250205103846.2273833-1-o.rempel@pengutronix.de>
+X-Mailer: git-send-email 2.39.5
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250123091115.2079802-8-a0282524688@gmail.com>
-X-GND-State: clean
-X-GND-Score: 0
-X-GND-Cause: gggruggvucftvghtrhhoucdtuddrgeefvddrtddtgddvfedvtdcutefuodetggdotefrodftvfcurfhrohhfihhlvgemucfitefpfffkpdcuggftfghnshhusghstghrihgsvgenuceurghilhhouhhtmecufedtudenucenucfjughrpeffhffvvefukfhfgggtuggjsehttdertddttddvnecuhfhrohhmpeetlhgvgigrnhgurhgvuceuvghllhhonhhiuceorghlvgigrghnughrvgdrsggvlhhlohhnihessghoohhtlhhinhdrtghomheqnecuggftrfgrthhtvghrnhepgeeiudeuteehhfekgeejveefhfeiudejuefhgfeljefgjeegkeeujeeugfehgefgnecuffhomhgrihhnpegsohhothhlihhnrdgtohhmnecukfhppedvrgdtudemtggsudegmeehheeimeejrgdttdemrggutdefmeegfheltgemfeefjehfmehffeefugenucevlhhushhtvghrufhiiigvpedtnecurfgrrhgrmhepihhnvghtpedvrgdtudemtggsudegmeehheeimeejrgdttdemrggutdefmeegfheltgemfeefjehfmehffeefugdphhgvlhhopehlohgtrghlhhhoshhtpdhmrghilhhfrhhomheprghlvgigrghnughrvgdrsggvlhhlohhnihessghoohhtlhhinhdrtghomhdpnhgspghrtghpthhtohepvdegpdhrtghpthhtoheprgdtvdekvdehvdegieekkeesghhmrghilhdrtghomhdprhgtphhtthhopehtmhihuhdtsehnuhhvohhtohhnrdgtohhmpdhrtghpthhtoheplhgvvgeskhgvrhhnvghlrdhorhhgpdhrtghpthhtoheplhhinhhus
- hdrfigrlhhlvghijheslhhinhgrrhhordhorhhgpdhrtghpthhtohepsghrghhlsegsghguvghvrdhplhdprhgtphhtthhopegrnhguihdrshhhhihtiheskhgvrhhnvghlrdhorhhgpdhrtghpthhtohepmhhklhesphgvnhhguhhtrhhonhhigidruggvpdhrtghpthhtohepmhgrihhlhhholhdrvhhinhgtvghnthesfigrnhgrughoohdrfhhr
-X-GND-Sasl: alexandre.belloni@bootlin.com
+Content-Transfer-Encoding: 8bit
+X-SA-Exim-Connect-IP: 2a0a:edc0:0:c01:1d::a2
+X-SA-Exim-Mail-From: ore@pengutronix.de
+X-SA-Exim-Scanned: No (on metis.whiteo.stw.pengutronix.de); SAEximRunCond expanded to false
+X-PTX-Original-Recipient: netdev@vger.kernel.org
 
-On 23/01/2025 17:11:15+0800, Ming Yu wrote:
-> +	ret = devm_request_threaded_irq(&pdev->dev, irq, NULL,
-> +					nct6694_irq, IRQF_ONESHOT,
-> +					"rtc-nct6694", data);
-> +	if (ret < 0)
-> +		return dev_err_probe(&pdev->dev, ret, "Failed to request irq\n");
-> +
-> +	ret = devm_rtc_register_device(data->rtc);
-> +	if (ret)
-> +		return dev_err_probe(&pdev->dev, ret, "Failed to register rtc\n");
+Add LED brightness, mode, HW control and polarity functions to enable
+external LED control in the TI DP83TD510 PHY.
 
-This message is not necessary, all the error paths of
-devm_rtc_register_device already print a message
+Signed-off-by: Oleksij Rempel <o.rempel@pengutronix.de>
+---
+ drivers/net/phy/dp83td510.c | 187 ++++++++++++++++++++++++++++++++++++
+ 1 file changed, 187 insertions(+)
 
+diff --git a/drivers/net/phy/dp83td510.c b/drivers/net/phy/dp83td510.c
+index a42af9c168ec..23af1ac194fa 100644
+--- a/drivers/net/phy/dp83td510.c
++++ b/drivers/net/phy/dp83td510.c
+@@ -204,10 +204,191 @@ struct dp83td510_priv {
+ #define DP83TD510E_UNKN_030E				0x30e
+ #define DP83TD510E_030E_VAL				0x2520
+ 
++#define DP83TD510E_LEDS_CFG_1				0x460
++#define DP83TD510E_LED_FN(idx, val)		(((val) & 0xf) << ((idx) * 4))
++#define DP83TD510E_LED_FN_MASK(idx)			(0xf << ((idx) * 4))
++/* link OK */
++#define DP83TD510E_LED_MODE_LINK_OK			0x0
++/* TX/RX activity */
++#define DP83TD510E_LED_MODE_TX_RX_ACTIVITY		0x1
++/* TX activity */
++#define DP83TD510E_LED_MODE_TX_ACTIVITY			0x2
++/* RX activity */
++#define DP83TD510E_LED_MODE_RX_ACTIVITY			0x3
++/* LR */
++#define DP83TD510E_LED_MODE_LR				0x4
++/* SR */
++#define DP83TD510E_LED_MODE_SR				0x5
++/* LED SPEED: High for 10Base-T */
++#define DP83TD510E_LED_MODE_LED_SPEED			0x6
++/* Duplex mode */
++#define DP83TD510E_LED_MODE_DUPLEX			0x7
++/* link + blink on activity with stretch option */
++#define DP83TD510E_LED_MODE_LINK_BLINK			0x8
++/* blink on activity with stretch option */
++#define DP83TD510E_LED_MODE_BLINK_ACTIVITY		0x9
++/* blink on tx activity with stretch option */
++#define DP83TD510E_LED_MODE_BLINK_TX			0xa
++/* blink on rx activity with stretch option */
++#define DP83TD510E_LED_MODE_BLINK_RX			0xb
++/* link_lost */
++#define DP83TD510E_LED_MODE_LINK_LOST			0xc
++/* PRBS error: toggles on error */
++#define DP83TD510E_LED_MODE_PRBS_ERROR			0xd
++/* XMII TX/RX Error with stretch option */
++#define DP83TD510E_LED_MODE_XMII_ERR			0xe
++
++#define DP83TD510E_LED_COUNT				4
++
++#define DP83TD510E_LEDS_CFG_2				0x469
++#define DP83TD510E_LED_POLARITY(idx)			BIT((idx) * 4 + 2)
++#define DP83TD510E_LED_DRV_VAL(idx)			BIT((idx) * 4 + 1)
++#define DP83TD510E_LED_DRV_EN(idx)			BIT((idx) * 4)
++
+ #define DP83TD510E_ALCD_STAT				0xa9f
+ #define DP83TD510E_ALCD_COMPLETE			BIT(15)
+ #define DP83TD510E_ALCD_CABLE_LENGTH			GENMASK(10, 0)
+ 
++static int dp83td510_led_brightness_set(struct phy_device *phydev, u8 index,
++					enum led_brightness brightness)
++{
++	u32 val;
++
++	if (index >= DP83TD510E_LED_COUNT)
++		return -EINVAL;
++
++	val = DP83TD510E_LED_DRV_EN(index);
++
++	if (brightness)
++		val |= DP83TD510E_LED_DRV_VAL(index);
++
++	return phy_modify_mmd(phydev, MDIO_MMD_VEND2, DP83TD510E_LEDS_CFG_2,
++			      DP83TD510E_LED_DRV_VAL(index) |
++			      DP83TD510E_LED_DRV_EN(index), val);
++}
++
++static int dp83td510_led_mode(u8 index, unsigned long rules)
++{
++	if (index >= DP83TD510E_LED_COUNT)
++		return -EINVAL;
++
++	switch (rules) {
++	case BIT(TRIGGER_NETDEV_LINK):
++		return DP83TD510E_LED_MODE_LINK_OK;
++	case BIT(TRIGGER_NETDEV_LINK_10):
++		return DP83TD510E_LED_MODE_LED_SPEED;
++	case BIT(TRIGGER_NETDEV_FULL_DUPLEX):
++		return DP83TD510E_LED_MODE_DUPLEX;
++	case BIT(TRIGGER_NETDEV_TX):
++		return DP83TD510E_LED_MODE_TX_ACTIVITY;
++	case BIT(TRIGGER_NETDEV_RX):
++		return DP83TD510E_LED_MODE_RX_ACTIVITY;
++	case BIT(TRIGGER_NETDEV_TX) | BIT(TRIGGER_NETDEV_RX):
++		return DP83TD510E_LED_MODE_TX_RX_ACTIVITY;
++	case BIT(TRIGGER_NETDEV_LINK) | BIT(TRIGGER_NETDEV_TX) |
++			BIT(TRIGGER_NETDEV_RX):
++		return DP83TD510E_LED_MODE_LINK_BLINK;
++	default:
++		return -EOPNOTSUPP;
++	}
++}
++
++static int dp83td510_led_hw_is_supported(struct phy_device *phydev, u8 index,
++					 unsigned long rules)
++{
++	int ret;
++
++	ret = dp83td510_led_mode(index, rules);
++	if (ret < 0)
++		return ret;
++
++	return 0;
++}
++
++static int dp83td510_led_hw_control_set(struct phy_device *phydev, u8 index,
++					unsigned long rules)
++{
++	int mode, ret;
++
++	mode = dp83td510_led_mode(index, rules);
++	if (mode < 0)
++		return mode;
++
++	ret = phy_modify_mmd(phydev, MDIO_MMD_VEND2, DP83TD510E_LEDS_CFG_1,
++			     DP83TD510E_LED_FN_MASK(index),
++			     DP83TD510E_LED_FN(index, mode));
++	if (ret)
++		return ret;
++
++	return phy_modify_mmd(phydev, MDIO_MMD_VEND2, DP83TD510E_LEDS_CFG_2,
++				DP83TD510E_LED_DRV_EN(index), 0);
++}
++
++static int dp83td510_led_hw_control_get(struct phy_device *phydev,
++					u8 index, unsigned long *rules)
++{
++	int val;
++
++	val = phy_read_mmd(phydev, MDIO_MMD_VEND2, DP83TD510E_LEDS_CFG_1);
++	if (val < 0)
++		return val;
++
++	val &= DP83TD510E_LED_FN_MASK(index);
++	val >>= index * 4;
++
++	switch (val) {
++	case DP83TD510E_LED_MODE_LINK_OK:
++		*rules = BIT(TRIGGER_NETDEV_LINK);
++		break;
++	/* LED mode: LED SPEED (10BaseT1L indicator) */
++	case DP83TD510E_LED_MODE_LED_SPEED:
++		*rules = BIT(TRIGGER_NETDEV_LINK_10);
++		break;
++	case DP83TD510E_LED_MODE_DUPLEX:
++		*rules = BIT(TRIGGER_NETDEV_FULL_DUPLEX);
++		break;
++	case DP83TD510E_LED_MODE_TX_ACTIVITY:
++		*rules = BIT(TRIGGER_NETDEV_TX);
++		break;
++	case DP83TD510E_LED_MODE_RX_ACTIVITY:
++		*rules = BIT(TRIGGER_NETDEV_RX);
++		break;
++	case DP83TD510E_LED_MODE_TX_RX_ACTIVITY:
++		*rules = BIT(TRIGGER_NETDEV_TX) | BIT(TRIGGER_NETDEV_RX);
++		break;
++	case DP83TD510E_LED_MODE_LINK_BLINK:
++		*rules = BIT(TRIGGER_NETDEV_LINK) |
++			 BIT(TRIGGER_NETDEV_TX) |
++			 BIT(TRIGGER_NETDEV_RX);
++		break;
++	default:
++		*rules = 0;
++		break;
++	}
++
++	return 0;
++}
++
++static int dp83td510_led_polarity_set(struct phy_device *phydev, int index,
++				      unsigned long modes)
++{
++	u16 polarity = DP83TD510E_LED_POLARITY(index);
++	u32 mode;
++
++	for_each_set_bit(mode, &modes, __PHY_LED_MODES_NUM) {
++		switch (mode) {
++		case PHY_LED_ACTIVE_LOW:
++			polarity = 0;
++			break;
++		default:
++			return -EINVAL;
++		}
++	}
++
++	return phy_modify_mmd(phydev, MDIO_MMD_VEND2, DP83TD510E_LEDS_CFG_2,
++			      DP83TD510E_LED_POLARITY(index), polarity);
++}
++
+ /**
+  * dp83td510_update_stats - Update the PHY statistics for the DP83TD510 PHY.
+  * @phydev: Pointer to the phy_device structure.
+@@ -712,6 +893,12 @@ static struct phy_driver dp83td510_driver[] = {
+ 	.get_phy_stats	= dp83td510_get_phy_stats,
+ 	.update_stats	= dp83td510_update_stats,
+ 
++	.led_brightness_set = dp83td510_led_brightness_set,
++	.led_hw_is_supported = dp83td510_led_hw_is_supported,
++	.led_hw_control_set = dp83td510_led_hw_control_set,
++	.led_hw_control_get = dp83td510_led_hw_control_get,
++	.led_polarity_set = dp83td510_led_polarity_set,
++
+ 	.suspend	= genphy_suspend,
+ 	.resume		= genphy_resume,
+ } };
 -- 
-Alexandre Belloni, co-owner and COO, Bootlin
-Embedded Linux and Kernel engineering
-https://bootlin.com
+2.39.5
+
 
