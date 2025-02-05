@@ -1,101 +1,111 @@
-Return-Path: <netdev+bounces-162806-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-162807-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 613B3A27FD5
-	for <lists+netdev@lfdr.de>; Wed,  5 Feb 2025 00:59:59 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id E80EDA27FF3
+	for <lists+netdev@lfdr.de>; Wed,  5 Feb 2025 01:05:56 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id EE27A165B9D
-	for <lists+netdev@lfdr.de>; Tue,  4 Feb 2025 23:59:57 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 815BB166490
+	for <lists+netdev@lfdr.de>; Wed,  5 Feb 2025 00:05:55 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9C55421CA12;
-	Tue,  4 Feb 2025 23:59:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7E03817E;
+	Wed,  5 Feb 2025 00:05:52 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=rbox.co header.i=@rbox.co header.b="bm2g2bNy"
+	dkim=pass (2048-bit key) header.d=codeconstruct.com.au header.i=@codeconstruct.com.au header.b="LRIFxGFF"
 X-Original-To: netdev@vger.kernel.org
-Received: from mailtransmit05.runbox.com (mailtransmit05.runbox.com [185.226.149.38])
+Received: from codeconstruct.com.au (pi.codeconstruct.com.au [203.29.241.158])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 63FC321C161
-	for <netdev@vger.kernel.org>; Tue,  4 Feb 2025 23:59:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.226.149.38
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BF76C173;
+	Wed,  5 Feb 2025 00:05:50 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=203.29.241.158
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1738713597; cv=none; b=Ym1lI3CQF4tP5yvaV3fpgn6y6W+qFDA5glUKQZ4y42UVIIApgIJHVHlrt63YSR951/Ig2ZcsO5j36gvT7Ukzwn0mhQjSBtL1LBf8g6vuf7F0uY+p9cg0BBvtAOQwo4HeDam7mUh17eGEXx7x0v5ZtbcePQfJbbQVTIPbkJt2Su8=
+	t=1738713952; cv=none; b=l0KtU4PtmlvCeexRbED7p/gytGAsCez7BAl4d0KJ6dqwE4eY87C0wi7/CsCf0+FEJAjLIFIaFz6iCdw5L68XNvWoNCuvHeh0E4NkrYoeRauhXFno51RYUCR3sG7nmLMhmdFKKaV+odJoXXZN/zq1mrC1kGUb424iwqSKLZhnDXo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1738713597; c=relaxed/simple;
-	bh=khXAhefL7fQ5LtOLUfh09A9W0Qte7PHize619rzd90A=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=oudco+MGMlV4YRZJ48qDDjX2MsZXdLRIfk+obix/UGtHwyPSL9pMeujwnW9+bhxnsSc9sQYpkhYd5yiiDxz11SWbkc3ypBVVKFsMamgsd9q75LoDP4gIKohW0omxfRcPEthrRF7AqWi8tOcWVaAjErE4Rxp6m9Xl1/i5/kUn2Ak=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=rbox.co; spf=pass smtp.mailfrom=rbox.co; dkim=pass (2048-bit key) header.d=rbox.co header.i=@rbox.co header.b=bm2g2bNy; arc=none smtp.client-ip=185.226.149.38
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=rbox.co
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=rbox.co
-Received: from mailtransmit03.runbox ([10.9.9.163] helo=aibo.runbox.com)
-	by mailtransmit05.runbox.com with esmtps  (TLS1.2) tls TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256
-	(Exim 4.93)
-	(envelope-from <mhal@rbox.co>)
-	id 1tfSpc-005ylr-Aa
-	for netdev@vger.kernel.org; Wed, 05 Feb 2025 00:59:52 +0100
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=rbox.co;
-	s=selector1; h=Content-Transfer-Encoding:Content-Type:In-Reply-To:From:
-	References:Cc:To:Subject:MIME-Version:Date:Message-ID;
-	bh=VpRZmV1c6hxxIVMLvNepADjWHDMr6G70vRzw5UrHl4c=; b=bm2g2bNy78jQc4LpHLntVcaA0c
-	76jKj/b1nKp4Lr7ewD2bCfih+WrObW8nakhe/4fDblWzcJ7J2hsE3S47EMDfDfab4WPQvzGB6mL6i
-	VverzaTZOl0lPILPWJPF0EhNu+3zIKmDcE3pNA3hmyE8pkWBojV8ptM5RuvH1XfEiPawqMMPf75nQ
-	VRkJfc0AFRTK6REwNqR3qmgN26Jea3684WOpQveqi5+fDbnqdtbmvfpcQGs4+JxDFdTfi+ba5bCgP
-	vZfNTL4KC+0BmSVylUGZqzeIkhm9vlo5OH5EbzW8wJvpK/mZQXvYv8xFlzhHXWyydFC3M+Y3tqhL5
-	bhpnjbEQ==;
-Received: from [10.9.9.74] (helo=submission03.runbox)
-	by mailtransmit03.runbox with esmtp (Exim 4.86_2)
-	(envelope-from <mhal@rbox.co>)
-	id 1tfSpb-0002MG-JY; Wed, 05 Feb 2025 00:59:51 +0100
-Received: by submission03.runbox with esmtpsa  [Authenticated ID (604044)]  (TLS1.2:ECDHE_SECP256R1__RSA_PSS_RSAE_SHA256__AES_256_GCM:256)
-	(Exim 4.93)
-	id 1tfSpG-009YTm-LZ; Wed, 05 Feb 2025 00:59:30 +0100
-Message-ID: <3dcc1801-a256-4a72-8371-1f06b57cef86@rbox.co>
-Date: Wed, 5 Feb 2025 00:59:29 +0100
+	s=arc-20240116; t=1738713952; c=relaxed/simple;
+	bh=aMffe2cuyieFMT/ZvHdJ4Q+mva2yTWC26VFHFOFlKeI=;
+	h=Message-ID:Subject:From:To:Date:In-Reply-To:References:
+	 Content-Type:MIME-Version; b=WZF5SQkxafObSkaYRkbDUIoKzBRMA+d8NBAPj7VTPt0Om+jN0/Fw2IcdnP/vTmpys2qqSU/7ulHyks6yn85gS4wGZYI6unrw02YM4mED5Dvc0g+tFD7axALM4MZovtqkc5fUriDwM5z4aD9EOn86ef0xLK0xp9GrfpZJjZnZmJY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=codeconstruct.com.au; spf=pass smtp.mailfrom=codeconstruct.com.au; dkim=pass (2048-bit key) header.d=codeconstruct.com.au header.i=@codeconstruct.com.au header.b=LRIFxGFF; arc=none smtp.client-ip=203.29.241.158
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=codeconstruct.com.au
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=codeconstruct.com.au
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+	d=codeconstruct.com.au; s=2022a; t=1738713948;
+	bh=aMffe2cuyieFMT/ZvHdJ4Q+mva2yTWC26VFHFOFlKeI=;
+	h=Subject:From:To:Date:In-Reply-To:References;
+	b=LRIFxGFFHQUulv7+gJaJmDaWZ/PPEQJVmMZGlxQsy7SG15tOvvOCxT6hHwupywBAO
+	 bFTs9JIdo0/N5USrIdXdMxDqzfYs4LDT+w+9d2V2E6DVvPhUXbKta2mrcRSWADjZjJ
+	 IFHRP+OSir09zKCOJGmq5BNwhrDamJW5HcnePqwfJgdo1JUjcRR3AruwfHcdOG7cnG
+	 qKxX8ddUePxs12+jcVYZTdNBiXM3WMdrbFtjW2Xca+mLz/lRWd4bOXsBk568jKtjeo
+	 SrzUlAatdu22ie+tuIF/MRU3W8Vf34yIuNph5y4IBwrSBZ+EBo8i/jo1WRRyHZfnjV
+	 O7vCiBEdMjeRA==
+Received: from [192.168.68.112] (ppp118-210-185-209.adl-adc-lon-bras34.tpg.internode.on.net [118.210.185.209])
+	by mail.codeconstruct.com.au (Postfix) with ESMTPSA id 941067104E;
+	Wed,  5 Feb 2025 08:05:46 +0800 (AWST)
+Message-ID: <acf79ff017d7648d4d502b7031b88c4853bf724c.camel@codeconstruct.com.au>
+Subject: Re: [PATCH v7 0/9] DTS updates for system1 BMC
+From: Andrew Jeffery <andrew@codeconstruct.com.au>
+To: Ninad Palsule <ninad@linux.ibm.com>, brgl@bgdev.pl, 
+ linus.walleij@linaro.org, minyard@acm.org, robh@kernel.org,
+ krzk+dt@kernel.org,  conor+dt@kernel.org, andrew+netdev@lunn.ch,
+ davem@davemloft.net,  edumazet@google.com, kuba@kernel.org,
+ pabeni@redhat.com,  openipmi-developer@lists.sourceforge.net,
+ netdev@vger.kernel.org, joel@jms.id.au,  devicetree@vger.kernel.org,
+ eajames@linux.ibm.com,  linux-arm-kernel@lists.infradead.org,
+ linux-aspeed@lists.ozlabs.org,  linux-kernel@vger.kernel.org
+Date: Wed, 05 Feb 2025 10:35:46 +1030
+In-Reply-To: <66e2e5e4-5ce5-442c-ba0f-d12cbe79e868@linux.ibm.com>
+References: <20250203144422.269948-1-ninad@linux.ibm.com>
+	 <79b819b6d06e3be0aa7e7f6872353f103294710c.camel@codeconstruct.com.au>
+	 <66e2e5e4-5ce5-442c-ba0f-d12cbe79e868@linux.ibm.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+User-Agent: Evolution 3.46.4-2 
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net 1/2] vsock: Orphan socket after transport release
-To: Stefano Garzarella <sgarzare@redhat.com>
-Cc: "David S. Miller" <davem@davemloft.net>,
- Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
- Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>,
- netdev@vger.kernel.org, syzbot+9d55b199192a4be7d02c@syzkaller.appspotmail.com
-References: <20250204-vsock-linger-nullderef-v1-0-6eb1760fa93e@rbox.co>
- <20250204-vsock-linger-nullderef-v1-1-6eb1760fa93e@rbox.co>
- <jj6xlb2udt2khosipoi4m6iwjc6g5hau3jnzbf6dg2aredfykp@y7j4jlgd4tpr>
-From: Michal Luczaj <mhal@rbox.co>
-Content-Language: pl-PL, en-GB
-In-Reply-To: <jj6xlb2udt2khosipoi4m6iwjc6g5hau3jnzbf6dg2aredfykp@y7j4jlgd4tpr>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
 
-On 2/4/25 11:32, Stefano Garzarella wrote:
-> On Tue, Feb 04, 2025 at 01:29:52AM +0100, Michal Luczaj wrote:
->> @@ -824,13 +824,14 @@ static void __vsock_release(struct sock *sk, int level)
->> 	 */
->> 	lock_sock_nested(sk, level);
->>
-> 
-> I would add a comment here to explain that we need to set it, so 
-> vsock_remove_sock() called here some lines above, or by transports in 
-> the release() callback (maybe in the future we can refactor it, and call 
-> it only here) will remove the binding only if it's set, since the 
-> release() is also called when de-assigning the transport.
-> 
->> -	sock_orphan(sk);
->> +	sock_set_flag(sk, SOCK_DEAD);
+On Tue, 2025-02-04 at 13:40 -0600, Ninad Palsule wrote:
+> > This one needs an ack from Linus W or Bartosz if I'm to take it.
+> > However, it's also causing some grief from Rob's bot:
+> >=20
+> > https://lore.kernel.org/all/173859694889.2601726.10618336219726193824.r=
+obh@kernel.org/
+> >=20
+> > As the reported nodes should all be hogs the name shouldn't matter
+> > anywhere else (as far as I'm aware). It would be nice if all the
+> > warnings were cleaned up before we merged the binding update. That way
+> > we don't cause everyone else looking at the CHECK_DTBS=3Dy output more
+> > grief than they already get for the Aspeed devicetrees.
+> >=20
+> > In order to not get bogged down it might be worth splitting out both
+> > the IPMB- and GPIO- related patches like you did the FTGMAC100 patch,
+> > and then I can merge what remains (from a quick look they seem
+> > relatively uncontroversial).
+> >=20
+>=20
+> The warnings are fixed by different patch by Krzysztof. As there are no=
+=20
+> more changes then I will wait for other responses. If I don't get those=
+=20
+> response in couple of days then I will split it.
+> https://lore.kernel.org/linux-kernel/20250116085947.87241-1-krzysztof.koz=
+lowski@linaro.org/
 
-OK, will do.
+That patch fixes a couple of Marvell systems. I think you might have
+meant this:
+
+https://lore.kernel.org/all/20250116090009.87338-1-krzysztof.kozlowski@lina=
+ro.org/
+
+In which case, I've applied it.
 
 Thanks,
-Michal
 
+Andrew
 
