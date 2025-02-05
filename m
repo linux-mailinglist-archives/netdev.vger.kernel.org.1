@@ -1,51 +1,51 @@
-Return-Path: <netdev+bounces-163027-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-163028-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7628CA28DD6
-	for <lists+netdev@lfdr.de>; Wed,  5 Feb 2025 15:05:55 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id B10FFA28EE1
+	for <lists+netdev@lfdr.de>; Wed,  5 Feb 2025 15:18:41 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D95131650C4
-	for <lists+netdev@lfdr.de>; Wed,  5 Feb 2025 14:05:53 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 0005D7A18CC
+	for <lists+netdev@lfdr.de>; Wed,  5 Feb 2025 14:17:45 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 36BEF155333;
-	Wed,  5 Feb 2025 14:05:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D3CC714A088;
+	Wed,  5 Feb 2025 14:18:35 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="EIKNio7h"
+	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="YP3L5Ao7"
 X-Original-To: netdev@vger.kernel.org
-Received: from relay2-d.mail.gandi.net (relay2-d.mail.gandi.net [217.70.183.194])
+Received: from relay3-d.mail.gandi.net (relay3-d.mail.gandi.net [217.70.183.195])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 233711519AA;
-	Wed,  5 Feb 2025 14:05:47 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.194
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E7D014A28;
+	Wed,  5 Feb 2025 14:18:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.195
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1738764351; cv=none; b=Vyj/TuNKHkV6fy4WkFvQ/IQp0MwcDiUrQ3Kh2sR4wJPH9iT0R9ElG4Q9OSNvZI2q6A7umyDxaVeekMo0lg2bs0zvv4LHFZ9dgLbi6k8GiizsWyn+m3p9yU2ZmyFJ0blUryyK8gpp+c3iJzanc0ZeGq+5CdAWiKB5TmoELup43ew=
+	t=1738765115; cv=none; b=gMCes+1+h5LqR4JjYnpnEyjTBvCdUpKxjZfJb9kGc8GHHZVoPCnwD+ogsayKqoXv1EhmQO92cTzLEp99dXud1II/QQgB/sRJ4FhYZLaDpe+07QbCqXWgxnIsZFK9Z0gJMtKvG7LV26Fb8o7cSH7MkdetH8UVcPuqcSYyUSlX+IU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1738764351; c=relaxed/simple;
-	bh=zK4I8a/Y4mpy9XKso8C5wpxuU2XVKbVEC233IlFK+5U=;
+	s=arc-20240116; t=1738765115; c=relaxed/simple;
+	bh=aZBMMyaxCDfhJnnHsdLjPCpzBvuSsrTgVOQZffpvq5s=;
 	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=TumWNeBzJYg4k06jhKqB8nr1gRQOB5MS7ZQQVQtHbcLayMhzIBxgAoV0Eeyq362l9fQIZjpBVu/P8FiDFK/oxKyijHoKMNlSL9OrzDAZ+QkvrQxyDR6PhpRGA2FxWPgbsOA9gk1quzIIsqUTEH8lnot5zgKX45SNcKXqXMTRp5Q=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=EIKNio7h; arc=none smtp.client-ip=217.70.183.194
+	 MIME-Version:Content-Type; b=ucNAP91Up7vvHShqoIW4nF7qRBI6foqiFIl5nP6MXRzedwHsEBTzndaMrKpdOzy7d6VqEBnkFX15/fm6lYhdzY5+oB/IdtuIHYonttBVrrtlXhZljlSVpWUPm+AIo2v97fzN0g+hcryhUcKL8vsy3Pc3ePG6GLvjnI3M6bL23Gk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=YP3L5Ao7; arc=none smtp.client-ip=217.70.183.195
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
-Received: by mail.gandi.net (Postfix) with ESMTPSA id 24E81440EC;
-	Wed,  5 Feb 2025 14:05:44 +0000 (UTC)
+Received: by mail.gandi.net (Postfix) with ESMTPSA id A812520457;
+	Wed,  5 Feb 2025 14:18:23 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
-	t=1738764346;
+	t=1738765105;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=ZYwn+oUNBIEmYxC3PFxocPoMODj85DdyaB/6dKEjRn8=;
-	b=EIKNio7hdZ8vnqBZNmjLN/k7KMiMV4Vz+dlCMGu1bd7PrtxErJZ8dsDzxmIsrQI33ybtRi
-	z3kZgtle+04vHPyxMmJ9aKiMYxp9GMA7zgEjOpINxkdcz2mbjWGiny0jzZBCo/FY3l7psi
-	NV+AmX/MKuydZLpJOOCCAdumICywkt3mzpfMkBbSwv/DgW/KAcxketWNDFdtVqILvB9cQM
-	6OcHPTwJLkpvSnHzUt49jQ1QTxIP4OQcDV5FuYQVdaboEpZdXKxSQzTMfPS1AVV2tBDV7m
-	Xk/7FX/9HXmgszuGMEbp7of7x+tuXibFFL6d0fQq9HLPZq++9JpUpOrBXxgPjA==
-Date: Wed, 5 Feb 2025 15:05:42 +0100
+	bh=+jcjhIK6Qww9CRS3+S8VD/DtB2JrJ0nIx9XhierQplY=;
+	b=YP3L5Ao7Wf+re27gX/s4xqtwPqGfwk0ZmMDq3SrxFJbv8S67S8OyiVelQI1GgnaTwCi8ya
+	l9NTD+q/gkOPvaXXcmPExY07nPGGV4HinqGGk0bAl89qrnczltvNOhFhg3iMaFbh6E6Dee
+	mF6GzumW2IcsqsWXg2ro3erjxBfabBGSofGcZuJ0DfU4q/wMW9SLz4SYMSgYApjUmTswVf
+	BysAd0P1WbsAPXmQ8uEOyAlhDUH9aFB/3fZDPJ+WdmvmYwZM38dLBVaTUD8jb/L/tMr0QJ
+	pK+yq+nzyVmVzDt9rybYqejy+8QtH8gQatx4TIYxJpAnmA4NGmMDz94e7wjntg==
+Date: Wed, 5 Feb 2025 15:18:22 +0100
 From: Kory Maincent <kory.maincent@bootlin.com>
 To: Krzysztof Kozlowski <krzk@kernel.org>
 Cc: Andrew Lunn <andrew@lunn.ch>, Oleksij Rempel <o.rempel@pengutronix.de>,
@@ -62,13 +62,13 @@ Cc: Andrew Lunn <andrew@lunn.ch>, Oleksij Rempel <o.rempel@pengutronix.de>,
  <kyle.swenson@est.tech>, Dent Project <dentproject@linuxfoundation.org>,
  kernel@pengutronix.de, Maxime Chevallier <maxime.chevallier@bootlin.com>,
  devicetree@vger.kernel.org
-Subject: Re: [PATCH net-next v4 25/27] dt-bindings: net: pse-pd:
- microchip,pd692x0: Add manager regulator supply
-Message-ID: <20250205150542.46733638@kmaincent-XPS-13-7390>
-In-Reply-To: <rva5vyuksnw64j7hbgdjp2n4qw22a7niw4oc66dyaz5ndaa7ja@u6z4mavekjsw>
+Subject: Re: [PATCH net-next v4 27/27] dt-bindings: net: pse-pd:
+ ti,tps23881: Add interrupt description
+Message-ID: <20250205151822.06f60e8d@kmaincent-XPS-13-7390>
+In-Reply-To: <uv2grnchczucf4vxxzaprfkc6ap56z6uqzaew3qtjqpvmtaqbb@kuv62yntqyfr>
 References: <20250103-feature_poe_port_prio-v4-0-dc91a3c0c187@bootlin.com>
-	<20250103-feature_poe_port_prio-v4-25-dc91a3c0c187@bootlin.com>
-	<rva5vyuksnw64j7hbgdjp2n4qw22a7niw4oc66dyaz5ndaa7ja@u6z4mavekjsw>
+ <20250103-feature_poe_port_prio-v4-27-dc91a3c0c187@bootlin.com>
+ <uv2grnchczucf4vxxzaprfkc6ap56z6uqzaew3qtjqpvmtaqbb@kuv62yntqyfr>
 Organization: bootlin
 X-Mailer: Claws Mail 4.0.0 (GTK+ 3.24.33; x86_64-pc-linux-gnu)
 Precedence: bulk
@@ -81,36 +81,39 @@ Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
 X-GND-State: clean
 X-GND-Score: -100
-X-GND-Cause: gggruggvucftvghtrhhoucdtuddrgeefvddrtddtgddvfeeigecutefuodetggdotefrodftvfcurfhrohhfihhlvgemucfitefpfffkpdcuggftfghnshhusghstghrihgsvgenuceurghilhhouhhtmecufedtudenucesvcftvggtihhpihgvnhhtshculddquddttddmnecujfgurhepfffhvfevuffkjghfohfogggtgfesthhqfedtredtjeenucfhrhhomhepmfhorhihucforghinhgtvghnthcuoehkohhrhidrmhgrihhntggvnhhtsegsohhothhlihhnrdgtohhmqeenucggtffrrghtthgvrhhnpefhjeevfeeggeeghffgudfhhedvvedvueekleevjeduvddutefhvddugedtfeeludenucffohhmrghinhepsghoohhtlhhinhdrtghomhenucfkphepledtrdekledrudeifedruddvjeenucevlhhushhtvghrufhiiigvpedtnecurfgrrhgrmhepihhnvghtpeeltddrkeelrdduieefrdduvdejpdhhvghlohepkhhmrghinhgtvghnthdqigfrufdqudefqdejfeeltddpmhgrihhlfhhrohhmpehkohhrhidrmhgrihhntggvnhhtsegsohhothhlihhnrdgtohhmpdhnsggprhgtphhtthhopedvjedprhgtphhtthhopehkrhiikheskhgvrhhnvghlrdhorhhgpdhrtghpthhtoheprghnughrvgifsehluhhnnhdrtghhpdhrtghpthhtohepohdrrhgvmhhpvghlsehpvghnghhuthhrohhnihigrdguvgdprhgtphhtthhopegurghvvghmsegurghvvghmlhhofhhtrdhnvghtpdhrtghpthhtohepvgguuhhmrgiiv
+X-GND-Cause: gggruggvucftvghtrhhoucdtuddrgeefvddrtddtgddvfeeikecutefuodetggdotefrodftvfcurfhrohhfihhlvgemucfitefpfffkpdcuggftfghnshhusghstghrihgsvgenuceurghilhhouhhtmecufedtudenucesvcftvggtihhpihgvnhhtshculddquddttddmnecujfgurhepfffhvfevuffkjghfohfogggtgfesthhqredtredtjeenucfhrhhomhepmfhorhihucforghinhgtvghnthcuoehkohhrhidrmhgrihhntggvnhhtsegsohhothhlihhnrdgtohhmqeenucggtffrrghtthgvrhhnpefguddtfeevtddugeevgfevtdfgvdfhtdeuleetffefffffhffgteekvdefudeiieenucffohhmrghinhepsghoohhtlhhinhdrtghomhenucfkphepledtrdekledrudeifedruddvjeenucevlhhushhtvghrufhiiigvpedtnecurfgrrhgrmhepihhnvghtpeeltddrkeelrdduieefrdduvdejpdhhvghlohepkhhmrghinhgtvghnthdqigfrufdqudefqdejfeeltddpmhgrihhlfhhrohhmpehkohhrhidrmhgrihhntggvnhhtsegsohhothhlihhnrdgtohhmpdhnsggprhgtphhtthhopedvjedprhgtphhtthhopehkrhiikheskhgvrhhnvghlrdhorhhgpdhrtghpthhtoheprghnughrvgifsehluhhnnhdrtghhpdhrtghpthhtohepohdrrhgvmhhpvghlsehpvghnghhuthhrohhnihigrdguvgdprhgtphhtthhopegurghvvghmsegurghvvghmlhhofhhtrdhnvghtpdhrtghpthhtohepvgguuhhmrgiiv
  ghtsehgohhoghhlvgdrtghomhdprhgtphhtthhopehkuhgsrgeskhgvrhhnvghlrdhorhhgpdhrtghpthhtohepphgrsggvnhhisehrvgguhhgrthdrtghomhdprhgtphhtthhopegtohhrsggvtheslhifnhdrnhgvth
 X-GND-Sasl: kory.maincent@bootlin.com
 
 Hello Krzysztof,
 
-On Sat, 4 Jan 2025 10:52:55 +0100
+On Sat, 4 Jan 2025 10:44:49 +0100
 Krzysztof Kozlowski <krzk@kernel.org> wrote:
 
-> On Fri, Jan 03, 2025 at 10:13:14PM +0100, Kory Maincent wrote:
+> On Fri, Jan 03, 2025 at 10:13:16PM +0100, Kory Maincent wrote:
 > > From: Kory Maincent (Dent Project) <kory.maincent@bootlin.com>
 > >=20
-> > This patch adds the regulator supply parameter of the managers. =20
+> > Add an interrupt property to the device tree bindings for the TI TPS238=
+81
+> > PSE controller. The interrupt is primarily used to detect classification
+> > and disconnection events, which are essential for managing the PSE
+> > controller in compliance with the PoE standard.
+> > =20
+> > @@ -62,6 +65,7 @@ unevaluatedProperties: false
+> >  required:
+> >    - compatible
+> >    - reg
+> > +  - interrupts =20
 >=20
-> > +          vmain-supply:
-> > +            description: Regulator power supply for the PD69208X manag=
-er. =20
->=20
-> s/Regulator//
-> Keep it simple, no need to state obvious. What is not obvious here is
-> why there are no main device supplies (VDD, VDDA).
->=20
-> And what about VAUX5 and VAUX3P3? So basically the description is not
-> only redundant but actually incorrect because it suggests it is entire
-> supply, while there are others.
+> Why? That's an ABI change. Commit msg mentions something like "essential
+> for standard" so are you saying nothing here was working according to
+> standard before?
 
-VMAIN can be the only power supply, with VAUX5 and VAUX3P3 derived internal=
-ly
-from VMAIN. However having the descriptions of all the regulator supplies is
-indeed maybe better. I will update the patch accordingly.
+Yes indeed, the disconnection management did not follow the standard. Witho=
+ut
+this series, the power on the ports of this controller is not shut down aft=
+er a
+Powered Device disconnection. Unfortunately, I did not noticed this before.
 
 Regards,
 --=20
