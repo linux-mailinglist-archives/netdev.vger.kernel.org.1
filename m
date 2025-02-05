@@ -1,176 +1,143 @@
-Return-Path: <netdev+bounces-163230-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-163222-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 57A73A29A2D
-	for <lists+netdev@lfdr.de>; Wed,  5 Feb 2025 20:34:58 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 96A46A299CD
+	for <lists+netdev@lfdr.de>; Wed,  5 Feb 2025 20:10:39 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id A673818836BD
-	for <lists+netdev@lfdr.de>; Wed,  5 Feb 2025 19:35:02 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 8A948188121C
+	for <lists+netdev@lfdr.de>; Wed,  5 Feb 2025 19:10:44 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 96C741FFC42;
-	Wed,  5 Feb 2025 19:34:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 258421FF1BA;
+	Wed,  5 Feb 2025 19:10:35 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=engleder-embedded.com header.i=@engleder-embedded.com header.b="v3/npVPq"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="IW9+39AI"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx14lb.world4you.com (mx14lb.world4you.com [81.19.149.124])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D6F95155335
-	for <netdev@vger.kernel.org>; Wed,  5 Feb 2025 19:34:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=81.19.149.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F0F421FECD4;
+	Wed,  5 Feb 2025 19:10:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1738784093; cv=none; b=JxtSfz97F4g88E16OdUgzeLPNUlc2tUZKYwUp6mrDhUOxPsmUmZO8NayCRVGmHCIzbX2YMTemz0JbM2q03uZ+Dir+tJWUjf9n7VtgOYEZrEsfMiD4n+UtO35Fdzsrkk6ArvXjb7kujDLDihoWv2RH0QHu7mwr8uNYltFKvUuHgw=
+	t=1738782635; cv=none; b=LSZUKBEDb4hfNPSSq7Mc6EZNxH3ALq2Tbb4BS2FQLR8ODXZgdEYlinT1R8oHOxoYCnlCVj7YNXhsIsQ4CPl5cDER1IlTVi2ojqQJhjuHrKiPegVh+Y0q1EGMFa9LKQiCpQrsTyPbnO8Bjp+hePa2wRlnubXG6VxinHatxodieqg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1738784093; c=relaxed/simple;
-	bh=Vf6MgmQ+cAB6pVE6LuQE1Hci2f1mTFwxqKsctMTF6Vo=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=J0G/TMT2eNh7V4p+cErGqLuEoi9j4SOd0SuXckmzr5r+34QHyrLCDqZdBsU7liPLggUmkOZoQQZZk3lAk0uB5zmr1R+yhrSD31sp3kX6fKosZN7FjPVSYOJ3o4IBM1dD5uRCih8opARBP9XIXTzTcLiFQPXwGvWE+CTeuCzFAEE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=engleder-embedded.com; spf=pass smtp.mailfrom=engleder-embedded.com; dkim=pass (1024-bit key) header.d=engleder-embedded.com header.i=@engleder-embedded.com header.b=v3/npVPq; arc=none smtp.client-ip=81.19.149.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=engleder-embedded.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=engleder-embedded.com
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=engleder-embedded.com; s=dkim11; h=Content-Transfer-Encoding:MIME-Version:
-	References:In-Reply-To:Message-Id:Date:Subject:Cc:To:From:Sender:Reply-To:
-	Content-Type:Content-ID:Content-Description:Resent-Date:Resent-From:
-	Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:List-Help:
-	List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=d00kdXkxGzpJFasIUHuiHU8O5NvLGRgMg5n39bdQfn4=; b=v3/npVPqTpDoGhOUsW3Cr3eyGa
-	EDPgdk3bJwLYOKUrYgw9bfpdZOQggpCZir80/gah7mBGWlxbTc/LnJ7X1aA20jAgT2nRjJRCiMkvP
-	GBPB9eEEfBe5WrDvm+/ONo4ZP7nvBBO7etiUWwLuNYE9ayb1pwWZMnaZ9FrwkeAMBQ2k=;
-Received: from 88-117-60-28.adsl.highway.telekom.at ([88.117.60.28] helo=hornet.engleder.at)
-	by mx14lb.world4you.com with esmtpsa  (TLS1.2) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.97.1)
-	(envelope-from <gerhard@engleder-embedded.com>)
-	id 1tfklH-0000000017b-0Gmq;
-	Wed, 05 Feb 2025 20:08:36 +0100
-From: Gerhard Engleder <gerhard@engleder-embedded.com>
-To: andrew@lunn.ch,
-	hkallweit1@gmail.com,
-	linux@armlinux.org.uk,
-	davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com
-Cc: netdev@vger.kernel.org,
-	Gerhard Engleder <gerhard@engleder-embedded.com>,
-	Oleksij Rempel <o.rempel@pengutronix.de>
-Subject: [PATCH net-next v5 6/7] net: selftests: Export net_test_phy_loopback_*
-Date: Wed,  5 Feb 2025 20:08:22 +0100
-Message-Id: <20250205190823.23528-7-gerhard@engleder-embedded.com>
-X-Mailer: git-send-email 2.39.5
-In-Reply-To: <20250205190823.23528-1-gerhard@engleder-embedded.com>
-References: <20250205190823.23528-1-gerhard@engleder-embedded.com>
+	s=arc-20240116; t=1738782635; c=relaxed/simple;
+	bh=ETdqFpdQWKnBh+I298fz06UxdSXFr90lIy6URSg4kaA=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=FC4Pxiyw5DkyypyqsKULrC+m4btDmTjQdMvSLsU5kaJ2VfcSP+FZAEk1WpJmxFQYZmTzRZ8UiOZAY3jnK9kEGB1GyJ0XxKaoxHZBdVSjHkMbHsCBNil8QqKOoUH1tgej32MA556udqWyrhkcq0EGg0PQPlLKtGX5s00lCmDAegE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=IW9+39AI; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 19032C4CED1;
+	Wed,  5 Feb 2025 19:10:30 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1738782634;
+	bh=ETdqFpdQWKnBh+I298fz06UxdSXFr90lIy6URSg4kaA=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=IW9+39AID1lcEbXaiCKZIk7Cm+9fGecb98BRFaRHhP9a1Iyi3q9gmTF0VE+8Gqdz6
+	 6Gn3MD174LfUMy2NeBzeXsMH66CTU4yWmleh54TGTdYvywqkeSWFULL3UeTmJ4UmpO
+	 EhrA66XdJDnwXnJCUSt/+6KbgSDUsy97XJflygurMKjb6jH27FBAJR2IcqHGqzBuQ0
+	 rXCqaRMa4d8QxePE6ZYQl2vTvHym5SKVhHHeF/vFQsAe8f+2rML9WgboYcBcubtXzq
+	 9gyiIdc5MukId3ZAjg6yjOEwoXCW92eam1wc3FM9/L0LUxgr//JEP52TxjR7MzWPtu
+	 IzvlMlC6Gb90g==
+Date: Wed, 5 Feb 2025 19:10:28 +0000
+From: Conor Dooley <conor@kernel.org>
+To: Lorenzo Bianconi <lorenzo@kernel.org>
+Cc: Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Felix Fietkau <nbd@nbd.name>, Sean Wang <sean.wang@mediatek.com>,
+	Matthias Brugger <matthias.bgg@gmail.com>,
+	AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>,
+	Philipp Zabel <p.zabel@pengutronix.de>,
+	Rob Herring <robh@kernel.org>,
+	Krzysztof Kozlowski <krzk+dt@kernel.org>,
+	Conor Dooley <conor+dt@kernel.org>, netdev@vger.kernel.org,
+	linux-arm-kernel@lists.infradead.org,
+	linux-mediatek@lists.infradead.org, devicetree@vger.kernel.org,
+	upstream@airoha.com
+Subject: Re: [PATCH net-next 09/13] dt-bindings: net: airoha: Add airoha,npu
+ phandle property
+Message-ID: <20250205-cleaver-evaluator-648c8f0b99bb@spud>
+References: <20250205-airoha-en7581-flowtable-offload-v1-0-d362cfa97b01@kernel.org>
+ <20250205-airoha-en7581-flowtable-offload-v1-9-d362cfa97b01@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-AV-Do-Run: Yes
-X-ACL-Warn: X-W4Y-Internal
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature"; boundary="JnOj/fdaK/Kw9pqY"
+Content-Disposition: inline
+In-Reply-To: <20250205-airoha-en7581-flowtable-offload-v1-9-d362cfa97b01@kernel.org>
 
-net_selftests() provides a generic set of selftests for netdevs with
-PHY. Those selftests rely on an existing link to inherit the speed for
-the loopback mode.
 
-net_selftests() is not designed to extend existing selftests of drivers,
-but with net_test_phy_loopback_* it contains useful test infrastructure.
+--JnOj/fdaK/Kw9pqY
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-Export net_test_phy_loopback_* to enable reuse in existing selftests of
-other drivers. This also enables driver specific loopback modes, which
-don't rely on an existing link.
+On Wed, Feb 05, 2025 at 07:21:28PM +0100, Lorenzo Bianconi wrote:
+> Introduce the airoha,npu property for the npu syscon node available on
+> EN7581 SoC. The airoha Network Processor Unit (NPU) is used to offload
+> network traffic forwarded between Packet Switch Engine (PSE) ports.
+>=20
+> Signed-off-by: Lorenzo Bianconi <lorenzo@kernel.org>
+> ---
+>  Documentation/devicetree/bindings/net/airoha,en7581-eth.yaml | 8 ++++++++
+>  1 file changed, 8 insertions(+)
+>=20
+> diff --git a/Documentation/devicetree/bindings/net/airoha,en7581-eth.yaml=
+ b/Documentation/devicetree/bindings/net/airoha,en7581-eth.yaml
+> index c578637c5826db4bf470a4d01ac6f3133976ae1a..6388afff64e990a20230b0c4e=
+58534aa61f984da 100644
+> --- a/Documentation/devicetree/bindings/net/airoha,en7581-eth.yaml
+> +++ b/Documentation/devicetree/bindings/net/airoha,en7581-eth.yaml
+> @@ -63,6 +63,12 @@ properties:
+>    "#size-cells":
+>      const: 0
+> =20
+> +  airoha,npu:
+> +    $ref: /schemas/types.yaml#/definitions/phandle
+> +    description:
+> +      Phandle to the syscon node used to configure the NPU module
+> +      used for traffic offloading.
 
-Signed-off-by: Gerhard Engleder <gerhard@engleder-embedded.com>
-CC: Oleksij Rempel <o.rempel@pengutronix.de>
----
- include/net/selftests.h | 19 +++++++++++++++++++
- net/core/selftests.c    |  9 ++++++---
- 2 files changed, 25 insertions(+), 3 deletions(-)
+Why do you need a phandle for this, instead of a lookup by compatible?
+Do you have multiple instances of this ethernet controller on the
+device, that each need to look up a different npu?
 
-diff --git a/include/net/selftests.h b/include/net/selftests.h
-index e65e8d230d33..a13237c33e58 100644
---- a/include/net/selftests.h
-+++ b/include/net/selftests.h
-@@ -6,6 +6,10 @@
- 
- #if IS_ENABLED(CONFIG_NET_SELFTESTS)
- 
-+int net_test_phy_loopback_udp(struct net_device *ndev);
-+int net_test_phy_loopback_udp_mtu(struct net_device *ndev);
-+int net_test_phy_loopback_tcp(struct net_device *ndev);
-+
- void net_selftest(struct net_device *ndev, struct ethtool_test *etest,
- 		  u64 *buf);
- int net_selftest_get_count(void);
-@@ -13,6 +17,21 @@ void net_selftest_get_strings(u8 *data);
- 
- #else
- 
-+static inline int net_test_phy_loopback_udp(struct net_device *ndev)
-+{
-+	return 0;
-+}
-+
-+static inline int net_test_phy_loopback_udp_mtu(struct net_device *ndev)
-+{
-+	return 0;
-+}
-+
-+static inline int net_test_phy_loopback_tcp(struct net_device *ndev)
-+{
-+	return 0;
-+}
-+
- static inline void net_selftest(struct net_device *ndev, struct ethtool_test *etest,
- 				u64 *buf)
- {
-diff --git a/net/core/selftests.c b/net/core/selftests.c
-index e99ae983fca9..d4e0e2eff991 100644
---- a/net/core/selftests.c
-+++ b/net/core/selftests.c
-@@ -310,15 +310,16 @@ static int net_test_phy_loopback_disable(struct net_device *ndev)
- 	return phy_loopback(ndev->phydev, false, 0);
- }
- 
--static int net_test_phy_loopback_udp(struct net_device *ndev)
-+int net_test_phy_loopback_udp(struct net_device *ndev)
- {
- 	struct net_packet_attrs attr = { };
- 
- 	attr.dst = ndev->dev_addr;
- 	return __net_test_loopback(ndev, &attr);
- }
-+EXPORT_SYMBOL_GPL(net_test_phy_loopback_udp);
- 
--static int net_test_phy_loopback_udp_mtu(struct net_device *ndev)
-+int net_test_phy_loopback_udp_mtu(struct net_device *ndev)
- {
- 	struct net_packet_attrs attr = { };
- 
-@@ -326,8 +327,9 @@ static int net_test_phy_loopback_udp_mtu(struct net_device *ndev)
- 	attr.max_size = ndev->mtu;
- 	return __net_test_loopback(ndev, &attr);
- }
-+EXPORT_SYMBOL_GPL(net_test_phy_loopback_udp_mtu);
- 
--static int net_test_phy_loopback_tcp(struct net_device *ndev)
-+int net_test_phy_loopback_tcp(struct net_device *ndev)
- {
- 	struct net_packet_attrs attr = { };
- 
-@@ -335,6 +337,7 @@ static int net_test_phy_loopback_tcp(struct net_device *ndev)
- 	attr.tcp = true;
- 	return __net_test_loopback(ndev, &attr);
- }
-+EXPORT_SYMBOL_GPL(net_test_phy_loopback_tcp);
- 
- static const struct net_test {
- 	char name[ETH_GSTRING_LEN];
--- 
-2.39.5
+> +
+>  patternProperties:
+>    "^ethernet@[1-4]$":
+>      type: object
+> @@ -132,6 +138,8 @@ examples:
+>                       <GIC_SPI 49 IRQ_TYPE_LEVEL_HIGH>,
+>                       <GIC_SPI 64 IRQ_TYPE_LEVEL_HIGH>;
+> =20
+> +        airoha,npu =3D <&npu>;
+> +
+>          #address-cells =3D <1>;
+>          #size-cells =3D <0>;
+> =20
+>=20
+> --=20
+> 2.48.1
+>=20
 
+--JnOj/fdaK/Kw9pqY
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iHUEABYIAB0WIQRh246EGq/8RLhDjO14tDGHoIJi0gUCZ6O3pAAKCRB4tDGHoIJi
+0r90AQCPFWieY3rJFPgYre/U5p5JhiHPBES11cYsO6z7cPd7JgD+LbhWNBtMLabp
+sVw4Vk5SnTfpxAWmdYRThF4q2n8QHAU=
+=ee/X
+-----END PGP SIGNATURE-----
+
+--JnOj/fdaK/Kw9pqY--
 
