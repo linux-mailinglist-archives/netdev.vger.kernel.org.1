@@ -1,128 +1,174 @@
-Return-Path: <netdev+bounces-163219-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-163220-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id AA3A1A299AB
-	for <lists+netdev@lfdr.de>; Wed,  5 Feb 2025 20:04:05 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 68F3CA299C0
+	for <lists+netdev@lfdr.de>; Wed,  5 Feb 2025 20:08:32 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 16BEF3A7B01
-	for <lists+netdev@lfdr.de>; Wed,  5 Feb 2025 19:03:57 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 86F1E188971D
+	for <lists+netdev@lfdr.de>; Wed,  5 Feb 2025 19:08:36 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5D87C1FCFDA;
-	Wed,  5 Feb 2025 19:04:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="VwYeZ5po"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 18EDB200111;
+	Wed,  5 Feb 2025 19:07:53 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f44.google.com (mail-wm1-f44.google.com [209.85.128.44])
+Received: from mail-ej1-f53.google.com (mail-ej1-f53.google.com [209.85.218.53])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A8509944F
-	for <netdev@vger.kernel.org>; Wed,  5 Feb 2025 19:04:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.44
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 204C821170D;
+	Wed,  5 Feb 2025 19:07:50 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.53
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1738782242; cv=none; b=V+eGsu6uBSbZYBh2TAAnu8MUTPGFmN9xB0AEFql1Az0V3K2vLoF3hV5VhiapjjMnlA8DGuL6FmJN0jG1tdQ+/CdbuogTi3MlKuxAwoQF4yCasWVPNAgHbG4261cTYgzIZ9T0ogJACqDc0iTOgREo9ZDZJxHQuNaPRrc7kXb9ql4=
+	t=1738782473; cv=none; b=T8y2X8Y7V7U1AVp4SiUWAACITQRAOzKVMkBw/FX+nLtOHiIS91+0CEaunOnujgOk9sWeumYxCPGyBAtTTY8BXA59Xo/oLuIDMZhus/lQ06J/Lf8qSe/pVyh9l7jArnDL24Y86sI4iGx3GFxAKzeHYh3OwUtUFiH57rY+7jJS6/w=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1738782242; c=relaxed/simple;
-	bh=tHqW9k0HN16gSK1mBbfJ6bSvAd2A3JDgncQsbOQFJDA=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=c3V8D4oFAAou0bH5WLHCY4awHqo2wTLdRoLaw7I4VVWQFj747OQsb1AHEe6rVK2FFZDSv/8a7i7Ag8xYVmTSCT7XpFHF01cay3fweXN8kx7CUKlfKU94+f7x1de98nNyW0iGBXSYYJbV8Snh2AU2KZws1zzvAuc0WJj2ZC0os4c=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=VwYeZ5po; arc=none smtp.client-ip=209.85.128.44
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+	s=arc-20240116; t=1738782473; c=relaxed/simple;
+	bh=LMG5gaWBYIK0JshQ6NVs4SIGayzcLVCUhGxss8oB55Q=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=UiS9Kt2YO6LEyLO/ZFhRzzFPSXEsD/ArAfpfuHUw4pHPN2ZqIDvzaelzPzc9M31cekZlQqfdwQ5Yae4x7afbwNW550ho+MmlzwT6YmBnve19sYMMiiin4byShosQcE84ccZ1X0PFt70PBGQBEmZlGCsA5+u4ZDCyHANQQYVC6QE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.218.53
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wm1-f44.google.com with SMTP id 5b1f17b1804b1-4361b0ec57aso1239525e9.0
-        for <netdev@vger.kernel.org>; Wed, 05 Feb 2025 11:04:00 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1738782239; x=1739387039; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=ZvhhUh7Ci18MKX6LrPQGedGn/obrrdH0PLQeGUPiTL4=;
-        b=VwYeZ5pokymaF0jOUR7xarUlTMpHDakfDVgWAT9lLaqMn57fp0zLRm+D6kO+TxR30A
-         ZGfJBl7TKmoclGegnjNlEj6KY2Xjul6L4787/Z6qpZgK8gyLzHJ+MK+7Fi+3umr2ROkD
-         aCnY5h/D4wF2rBXhrrM7onYz1QoVla1TPn4Feq5eO9IDZRGxcMEgDX9Ew+1MxzyTcJIq
-         Fi2MLxxCZtghLxrDFf+CpCjtgw9lsjnoCNzL1Ug8cE2Rt6PmRANr8PadsquNHwT98jhu
-         h3qsS+dk4cxYOkMl0Tol+0C2A+lpLVQ2MsBrEghI8UUQZVCEyHA8Pq5o5TFhua476iOt
-         Aqig==
+Received: by mail-ej1-f53.google.com with SMTP id a640c23a62f3a-ab7483b9bf7so19970866b.3;
+        Wed, 05 Feb 2025 11:07:50 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1738782239; x=1739387039;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=ZvhhUh7Ci18MKX6LrPQGedGn/obrrdH0PLQeGUPiTL4=;
-        b=X4aky2tDF0btVSI3JIZnEojX3y9LcK4ZHIDj9d67XjNTrVBPukCLLSNFE6FZQlkqo3
-         nS/4WVHhc6DB+CxLisR1aq1IVEqPJjRpaeLNZU5Iz8Np0GH/SjjWF6cZcFC2Ys0nHjqy
-         Oyke7of8XFyCt1V6ZBe3mHH9Zl2DScVejXmKOKzeAxp+ktJjw7p2Ut1COu+cxeEIU1zj
-         7Y2yBYxO5hEpg8n9J7mJMjjRcs7qShaOpMHnQHKMIcEqstyAzbYNCqNB/pbesUHcgnc7
-         /dozw6ZX92gnOyreKAcuTwEtHI7PVyjWeNWXaaVV9GP8Et0c4lIjIlf76zSVUFORr7i7
-         yyyA==
-X-Forwarded-Encrypted: i=1; AJvYcCVoxg8vueSY/LnJ8hSQiC5Qdi30rTDEaxmNcW+manSSaa9/HjAKNHLP8zrzC/Mtx3vgPUS8eJg=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzyxtLw/MYIg1guPwy68EzsF0SuceeMOeG4v9bPwZj6GKKKl+0J
-	V2kUbG8VDdbKohSzDU3KUInvUaN2uLY4c1QOYXBvezIXJwgquFc+
-X-Gm-Gg: ASbGncseMlF4VwmI9oDy47sgFhdU5C6S2r0tstGg00Z+op2WqT+6xeETpHFABW4ybky
-	iHvHlh3Anq8zDKTxbCXaoz3DwoLOxnMlDSqt6QqKWnVH8BIPOHPMyhXRD+NGHS3AX3k7nkZJNgV
-	Q0EUD7OmbJ5z+fhbomRTbJ/fUbKokLXSlVZuuMn/jBy7nFjfwjkAGM0lVnDczOuIA/Db9uKKeWa
-	ossWjNn0r8jQ7RKschaAY2UQQ6z1/fcJ4aI7rnGMSYlqyYFcW+bgaHiQSCKbm6zB7UaVNZOlkjY
-	/GUq3E053Vw6WpuKrbOnTKc=
-X-Google-Smtp-Source: AGHT+IG4G0GQJlkEfsMIsRg4jfgycE+6J8dZbSAf6zR+hOF//SQoau3kNS+YfWPtbNei4GkAh5nbFQ==
-X-Received: by 2002:a05:600c:1f83:b0:435:d22:9c9e with SMTP id 5b1f17b1804b1-4390d55fda2mr28684875e9.19.1738782238640;
-        Wed, 05 Feb 2025 11:03:58 -0800 (PST)
-Received: from [192.168.8.100] ([148.252.128.4])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-38dab853236sm5664979f8f.54.2025.02.05.11.03.57
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 05 Feb 2025 11:03:57 -0800 (PST)
-Message-ID: <7cdf38e2-640d-4399-974f-fb27183ebe47@gmail.com>
-Date: Wed, 5 Feb 2025 19:04:05 +0000
+        d=1e100.net; s=20230601; t=1738782469; x=1739387269;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=sY6dYGVe6ovMP6LmJErKZtQSspIX6gQ/V/P/706krPo=;
+        b=k1Yh97gqK+28H97pNUOW6Uush9rIfj87Ss1CTElOV554J8ZX807bDcFmy1gemrPNos
+         A4df4Ou6tx0Sh+t6LG6SG16nQ2ZUQKv8sNvTN8+c564f0MyoygJ81Ei5tdModzc5mjvU
+         AmGNszhII0EWqgSuzQ615fmqexAC6PnkPi4o/1mR61f2iU1Ph7mqG2uBO+uRFntN/cVl
+         FdxdfiCJtDIMDLbWBlpXdvP8YIU9antStxgIdlHtcXfKMNZAiUBvgUyqWXak5LbD7xic
+         Hw4Hpcoz5pw6qyijd/lXqNdutWgVz4cp2s48pnLA8XYArW8z/TDbmae1jnJA0wM5mHRQ
+         fyYA==
+X-Forwarded-Encrypted: i=1; AJvYcCUDGZ3Cjs1iLCR3MgAphD3Yx4o8eEAU626hmlvhNylQofkKH8F2ADUTmx/q5xrmDZRFfog5K4KG@vger.kernel.org, AJvYcCUMOnbr1vOj7XPJ9hSPw1pmLMY2TF4BBvGo/VfaoQADRR661Cpf5nF2VRPA1io66MIKuNEJ7exV0BXGHs52ESE=@vger.kernel.org, AJvYcCWCdOFZVfK+KYm6KzT9t0rZCRvi7az1mgVTG6Olpm3klnP1egUYc8U0uckR1h5k6i2r1+BIugqQ1oc=@vger.kernel.org, AJvYcCXiTYAUVuqhzEV55CLV+AYpNuIGWmTQjqlvu0GAI4/1zP66t/GIsWF3z82D5GSn3SqI0ZriukJeJBSh6oND@vger.kernel.org
+X-Gm-Message-State: AOJu0YxD4C3BV3XhvQXpVRX1oeAhLESuvH+5K1OVehJo1Smoh480h/BZ
+	FLJxKxh+ueXefqG1txFzAju5uCWVkqczKEjcPfAjK1qT9EXx1d1e
+X-Gm-Gg: ASbGncuncSHD9nJJuADIuhfqLj5TVOVqmxkN5RQCRdEHbCZ7MiCXgauEuW7URaYjpAI
+	L13cCLBXLqjttw1Db9IgDE4MLAIArVv0lUCQNc9P4/RNI6kNggwIDL0L/B176wajPopezgp/jD2
+	XRcxZiGgrgbEWzXAEeF9CL//aGOEeuEmDCn3/9EPBwVK+M8ICkYmAhZwMK/Xr+E6rOqnTWObZ3G
+	TZv9DEHy0gIfO66CASaINz9zMCQiJB0GZZP4Oy9iHw4PpzQUJ6xrV5Lw2XEasMLUAcez2FRncii
+	mkAfo9c=
+X-Google-Smtp-Source: AGHT+IHPrkNV+54hDGaQFdYYeo3xJb2BJPMEFvC8tH4N4HRnkWu5xzHXdcDFw2aQOq4OJd0wfKsYEg==
+X-Received: by 2002:a17:907:7f8d:b0:ab6:f59f:5427 with SMTP id a640c23a62f3a-ab75e21dd2emr420699366b.11.1738782468433;
+        Wed, 05 Feb 2025 11:07:48 -0800 (PST)
+Received: from gmail.com ([2a03:2880:30ff:72::])
+        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-ab6e4a2fa50sm1139487266b.128.2025.02.05.11.07.47
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 05 Feb 2025 11:07:47 -0800 (PST)
+Date: Wed, 5 Feb 2025 11:07:45 -0800
+From: Breno Leitao <leitao@debian.org>
+To: Uday Shankar <ushankar@purestorage.com>
+Cc: Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Srinivas Kandagatla <srinivas.kandagatla@linaro.org>,
+	=?utf-8?B?UmFmYcWCIE1pxYJlY2tp?= <rafal@milecki.pl>,
+	Simon Horman <horms@kernel.org>,
+	Andrew Morton <akpm@linux-foundation.org>,
+	Johannes Berg <johannes@sipsolutions.net>,
+	Jonathan Corbet <corbet@lwn.net>, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org, linux-wireless@vger.kernel.org,
+	linux-doc@vger.kernel.org
+Subject: Re: [PATCH v2 2/2] netconsole: allow selection of egress interface
+ via MAC address
+Message-ID: <20250205-flying-coucal-of-influence-0dcbc3@leitao>
+References: <20250204-netconsole-v2-0-5ef5eb5f6056@purestorage.com>
+ <20250204-netconsole-v2-2-5ef5eb5f6056@purestorage.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next v13 00/10] io_uring zero copy rx
-To: David Ahern <dsahern@kernel.org>, David Wei <dw@davidwei.uk>,
- netdev@vger.kernel.org
-Cc: Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jesper Dangaard Brouer <hawk@kernel.org>,
- Mina Almasry <almasrymina@google.com>,
- Stanislav Fomichev <stfomichev@gmail.com>, Joe Damato <jdamato@fastly.com>,
- Pedro Tammela <pctammela@mojatatu.com>
-References: <20250204215622.695511-1-dw@davidwei.uk>
- <aa3f85be-a7d9-4f41-9fe3-d7d711697079@kernel.org>
- <da6b478a-065a-4f02-acd2-03c6d6dea9fa@davidwei.uk>
- <807a8915-6c3b-495b-8b6b-529e696dff00@kernel.org>
-Content-Language: en-US
-From: Pavel Begunkov <asml.silence@gmail.com>
-In-Reply-To: <807a8915-6c3b-495b-8b6b-529e696dff00@kernel.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250204-netconsole-v2-2-5ef5eb5f6056@purestorage.com>
 
-On 2/5/25 18:43, David Ahern wrote:
-> On 2/5/25 11:00 AM, David Wei wrote:
->> On 2025-02-05 09:44, David Ahern wrote:
->>> On 2/4/25 2:56 PM, David Wei wrote:
->>>> We share netdev core infra with devmem TCP. The main difference is that
->>>> io_uring is used for the uAPI and the lifetime of all objects are bound
->>>> to an io_uring instance. Data is 'read' using a new io_uring request
->>>> type. When done, data is returned via a new shared refill queue. A zero
->>>> copy page pool refills a hw rx queue from this refill queue directly. Of
->>>> course, the lifetime of these data buffers are managed by io_uring
->>>> rather than the networking stack, with different refcounting rules.
->>>
->>> just to make sure I understand, working with GPU memory as well as host
->>> memory is not a goal of this patch set?
->>
->> Yes, this patchset is only for host memory.
+On Tue, Feb 04, 2025 at 02:41:45PM -0700, Uday Shankar wrote:
+> Currently, netconsole has two methods of configuration - module
+> parameter and configfs. The former interface allows for netconsole
+> activation earlier during boot (by specifying the module parameter on
+> the kernel command line), so it is preferred for debugging issues which
+> arise before userspace is up/the configfs interface can be used. The
+> module parameter syntax requires specifying the egress interface name.
+> This requirement makes it hard to use for a couple reasons:
+> - The egress interface name can be hard or impossible to predict. For
+>   example, installing a new network card in a system can change the
+>   interface names assigned by the kernel.
+> - When constructing the module parameter, one may have trouble
+>   determining the original (kernel-assigned) name of the interface
+>   (which is the name that should be given to netconsole) if some stable
+>   interface naming scheme is in effect. A human can usually look at
+>   kernel logs to determine the original name, but this is very painful
+>   if automation is constructing the parameter.
 > 
-> And is GPU memory on the near term to-do list?
+> For these reasons, allow selection of the egress interface via MAC
+> address when configuring netconsole using the module parameter. Update
+> the netconsole documentation with an example of the new syntax.
+> Selection of egress interface by MAC address via configfs is far less
+> interesting (since when this interface can be used, one should be able
+> to easily convert between MAC address and interface name), so it is left
+> unimplemented.
+> 
+> Signed-off-by: Uday Shankar <ushankar@purestorage.com>
 
-Not a priority, but yes, and it's fairly easy to add as it'd
-only need changes in setup disregard the fallback path.
+Reviewed-by: Breno Leitao <leitao@debian.org>
+Tested-by: Breno Leitao <leitao@debian.org>
 
--- 
-Pavel Begunkov
+>  int netpoll_setup(struct netpoll *np)
+>  {
+> +	struct net *net = current->nsproxy->net_ns;
+>  	struct net_device *ndev = NULL;
+>  	bool ip_overwritten = false;
+> +	char buf[MAC_ADDR_LEN + 1];
+>  	struct in_device *in_dev;
+>  	int err;
+>  
+>  	rtnl_lock();
+> -	if (np->dev_name[0]) {
+> -		struct net *net = current->nsproxy->net_ns;
+> +	if (np->dev_name[0])
+>  		ndev = __dev_get_by_name(net, np->dev_name);
+> -	}
+> +	else if (is_valid_ether_addr(np->dev_mac))
+> +		ndev = dev_getbyhwaddr_rcu(net, ARPHRD_ETHER, np->dev_mac);
 
+You do not have the RCU read lock here. You have the rtnl(), which is
+sufficient, but, CONFIG_PROVE_RCU_LIST will show something as:
+
+	WARNING: suspicious RCU usage
+	6.13.0-09701-g6610c7be45bb-dirty #18 Not tainted
+	-----------------------------
+	net/core/dev.c:1143 RCU-list traversed in non-reader section!!
+	other info that might help us debug this:
+	rcu_scheduler_active = 2, debug_locks = 1
+	1 lock held by swapper/0/1:
+	 #0: ffffffff832795b8 (rtnl_mutex){+.+.}-{4:4}, at: netpoll_setup+0x48/0x540
+	stack backtrace:
+	CPU: 1 UID: 0 PID: 1 Comm: swapper/0 Not tainted 6.13.0-virtme-09701-g6610c7be45bb-dirty #18
+	Hardware name: QEMU Standard PC (i440FX + PIIX, 1996), BIOS rel-1.16.3-0-ga6ed6b701f0a-prebuilt.qemu.org 04/01/2014
+	Call Trace:
+	 <TASK>
+	 dump_stack_lvl+0x9f/0xf0
+	 lockdep_rcu_suspicious+0x11a/0x150
+	 dev_getbyhwaddr_rcu+0xb6/0xc0
+	 netpoll_setup+0x8a/0x540
+	 ? netpoll_parse_options+0x2bd/0x310
+
+This is not a problem per-se, since you have RTNL. We probably need to
+tell for_each_netdev_rcu() to not comply about "RCU-list traversed in
+non-reader section" if RTNL is held. Not sure why we didn't hit in the
+test infrastructure, tho:
+
+	https://patchwork.kernel.org/project/netdevbpf/patch/20250204-netconsole-v2-2-5ef5eb5f6056@purestorage.com/
+
+Anyway, no action item for you here. I am talking to Jakub on a way to
+solve it, and I should send a fix soon.
+
+Thanks for the patch,
+--breno
 
