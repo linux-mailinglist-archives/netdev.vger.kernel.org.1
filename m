@@ -1,45 +1,46 @@
-Return-Path: <netdev+bounces-162849-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-162850-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id E9C89A2826C
-	for <lists+netdev@lfdr.de>; Wed,  5 Feb 2025 04:12:50 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 93E0EA2826D
+	for <lists+netdev@lfdr.de>; Wed,  5 Feb 2025 04:12:51 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id C50881881A1A
-	for <lists+netdev@lfdr.de>; Wed,  5 Feb 2025 03:12:55 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 08D3B3A5F92
+	for <lists+netdev@lfdr.de>; Wed,  5 Feb 2025 03:12:43 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A7AC4213224;
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A920A213237;
 	Wed,  5 Feb 2025 03:12:46 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="YsK2dsIJ"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="udq+gqUO"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 82ED020C028
-	for <netdev@vger.kernel.org>; Wed,  5 Feb 2025 03:12:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 82F3B212FB9
+	for <netdev@vger.kernel.org>; Wed,  5 Feb 2025 03:12:46 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1738725166; cv=none; b=qG3o+RqfIlC7VVktdIDnaAtp9vB1UctDaLMzlaHHLjvQVDW/BM5qTnckQrONSUoPLEtxEBvKRo927lwgsqxlw5xWAZGQGQejJl9zt6LAGdDwKy8QOqawD1Cy3uB/bI9T6A/L+aTMWcjoZqvIjavWpw4pnO/JfiMNk+4cdx/Qmv4=
+	t=1738725166; cv=none; b=QH7UgK2Ru6NNw8eLOqVwnGAue5+6oxpFbEnopfgnDKECBfZ9QC8zOt1U551aTLkVpd6mAIiybZW/F7KAPuxxzwpj/2FLOfAMSz3xyrIlIQyUmBvn0bGbF7SnMjDsU3B6mDKdwEhGBsHCrnnWvJ5wGwTfbmpVGXUcAqq2Kigpx8Y=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1738725166; c=relaxed/simple;
-	bh=b02ZAWqLEKm+QZms/E3sBnaEOWr5mXrETzRS+LRzrZc=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=ZQ2oYzq1oNuK4H3fWmQr3+PanfsuP7OxOPXYTbemJldJdyQDQhinLC5Wca09Z0zVqVU4025EWnkSMx2wSd1Uv5mOgIvdemgBerHSjUSyBZAl4IBNe4VmHineYemcXtnVYRgqQCMV4+FF0Svs+rGcEH7u3oj0cjW/undTlNCKH7s=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=YsK2dsIJ; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id C6616C4CEDF;
-	Wed,  5 Feb 2025 03:12:44 +0000 (UTC)
+	bh=21PdyqdVZaQwS6A74Dvn9/fchNwQCpV6x0EdY8s6XGM=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=pJFsTbZZLTyITBe+TN79RMP/1fIdsMdQKxQu/c+1IYlVvSg2lxwiqK7J5M/zrqlGhdl0fJhd/LlJR7RKNdDO+JG2w5eeN0hKHQxoPoDSUPWH9LrYdfcSAE6bzJYx8hQKPPuBuIRsvPKL9lHABUKNfEZYQmEV2mJfNlo1J+keD3Q=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=udq+gqUO; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 828B4C4CEE8;
+	Wed,  5 Feb 2025 03:12:45 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1738725165;
-	bh=b02ZAWqLEKm+QZms/E3sBnaEOWr5mXrETzRS+LRzrZc=;
-	h=From:To:Cc:Subject:Date:From;
-	b=YsK2dsIJiVDwjxe7/1dKL4g2GyAPtODwYHxvAKl+zIRYhY5wsMdnrX8txJTWntpxk
-	 BcMbqMsj6sOV0IbyXiDqW/aWCyie7t6LRJhXffjCsTjKXeb2JQS4hDS3r/RRp/VJm4
-	 +Kuuh59vGPn3nJ4v83Gu8eBYc6TlauU4Js3stlbqZe2PeMyVt/XkmbUnFCDjGaLyae
-	 xnx0bVagq9/ngYih9BuoZSW5ncBiFriDhRFR4mk3N7HsCiJ8QuUzePcQnZjUjRihiO
-	 zuLSQZSxG8piZHEEl7lx8EXGkDtfBSQQYAwN8DU0pqwUqVfi20vEZ5/vN5dpV9XJzL
-	 couXoD4gOYeEA==
+	s=k20201202; t=1738725166;
+	bh=21PdyqdVZaQwS6A74Dvn9/fchNwQCpV6x0EdY8s6XGM=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+	b=udq+gqUOkt+oJEF9TL4XjHCuWTmc1pV1Cx4Zy5Y8x+wmzZn6EgTy2ofEewsdFYjO4
+	 pi5U4049EzS9dcbD+y79PBuimRPIchbSmJ5/0lIiv4ZPbkugh5+5sw2kHYQaGlaKZm
+	 uyi3MiTsvo9mAsrcsclmWyYk7Sfd/BoUAGmTwtQU3mI28Ivx1svf8GS0PIpOs0RS+e
+	 tfEvNE5vDvGhvjrU/lZ9kzMxgWkybAK0OOLtEh/iHrzrQ5L0/l4T5Kn4e2Kg5tcYG1
+	 MyEvrP2Wa6G1I09HEQrgD/hS5V09c+cL9oYxh0003OwUlQS3TOGf9VkrZjNozcQwGc
+	 5swjX6lTcfwdA==
 From: Jakub Kicinski <kuba@kernel.org>
 To: davem@davemloft.net
 Cc: netdev@vger.kernel.org,
@@ -50,10 +51,12 @@ Cc: netdev@vger.kernel.org,
 	tariqt@nvidia.com,
 	hawk@kernel.org,
 	Jakub Kicinski <kuba@kernel.org>
-Subject: [PATCH net-next 0/4] eth: mlx4: use the page pool for Rx buffers
-Date: Tue,  4 Feb 2025 19:12:09 -0800
-Message-ID: <20250205031213.358973-1-kuba@kernel.org>
+Subject: [PATCH net-next 1/4] eth: mlx4: create a page pool for Rx
+Date: Tue,  4 Feb 2025 19:12:10 -0800
+Message-ID: <20250205031213.358973-2-kuba@kernel.org>
 X-Mailer: git-send-email 2.48.1
+In-Reply-To: <20250205031213.358973-1-kuba@kernel.org>
+References: <20250205031213.358973-1-kuba@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -62,36 +65,98 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Convert mlx4 to page pool. I've been sitting on these patches for
-over a year, and Jonathan Lemon had a similar series years before.
-We never deployed it or sent upstream because it didn't really show
-much perf win under normal load (admittedly I think the real testing
-was done before Ilias's work on recycling).
+Create a pool per rx queue. Subsequent patches will make use of it.
 
-During the v6.9 kernel rollout Meta's CDN team noticed that machines
-with CX3 Pro (mlx4) are prone to overloads (double digit % of CPU time
-spent mapping buffers in the IOMMU). The problem does not occur with
-modern NICs, so I dusted off this series and reportedly it still works.
-And it makes the problem go away, no overloads, perf back in line with
-older kernels. Something must have changed in IOMMU code, I guess.
+Move fcs_del to a hole to make space for the pointer.
 
-This series is very simple, and can very likely be optimized further.
-Thing is, I don't have access to any CX3 Pro NICs. They only exist
-in CDN locations which haven't had a HW refresh for a while. So I can
-say this series survives a week under traffic w/ XDP enabled, but
-my ability to iterate and improve is a bit limited.
+Signed-off-by: Jakub Kicinski <kuba@kernel.org>
+---
+ drivers/net/ethernet/mellanox/mlx4/mlx4_en.h |  3 ++-
+ drivers/net/ethernet/mellanox/mlx4/en_rx.c   | 24 +++++++++++++++++++-
+ 2 files changed, 25 insertions(+), 2 deletions(-)
 
-Jakub Kicinski (4):
-  eth: mlx4: create a page pool for Rx
-  eth: mlx4: don't try to complete XDP frames in netpoll
-  eth: mlx4: remove the local XDP fast-recycling ring
-  eth: mlx4: use the page pool for Rx buffers
-
- drivers/net/ethernet/mellanox/mlx4/mlx4_en.h |  15 +--
- drivers/net/ethernet/mellanox/mlx4/en_rx.c   | 120 +++++++------------
- drivers/net/ethernet/mellanox/mlx4/en_tx.c   |  17 ++-
- 3 files changed, 53 insertions(+), 99 deletions(-)
-
+diff --git a/drivers/net/ethernet/mellanox/mlx4/mlx4_en.h b/drivers/net/ethernet/mellanox/mlx4/mlx4_en.h
+index 28b70dcc652e..29f48e63081b 100644
+--- a/drivers/net/ethernet/mellanox/mlx4/mlx4_en.h
++++ b/drivers/net/ethernet/mellanox/mlx4/mlx4_en.h
+@@ -335,10 +335,11 @@ struct mlx4_en_rx_ring {
+ 	u16 stride;
+ 	u16 log_stride;
+ 	u16 cqn;	/* index of port CQ associated with this ring */
++	u8  fcs_del;
+ 	u32 prod;
+ 	u32 cons;
+ 	u32 buf_size;
+-	u8  fcs_del;
++	struct page_pool *pp;
+ 	void *buf;
+ 	void *rx_info;
+ 	struct bpf_prog __rcu *xdp_prog;
+diff --git a/drivers/net/ethernet/mellanox/mlx4/en_rx.c b/drivers/net/ethernet/mellanox/mlx4/en_rx.c
+index 15c57e9517e9..2c23d75baf14 100644
+--- a/drivers/net/ethernet/mellanox/mlx4/en_rx.c
++++ b/drivers/net/ethernet/mellanox/mlx4/en_rx.c
+@@ -48,6 +48,7 @@
+ #if IS_ENABLED(CONFIG_IPV6)
+ #include <net/ip6_checksum.h>
+ #endif
++#include <net/page_pool/helpers.h>
+ 
+ #include "mlx4_en.h"
+ 
+@@ -268,6 +269,7 @@ int mlx4_en_create_rx_ring(struct mlx4_en_priv *priv,
+ 			   u32 size, u16 stride, int node, int queue_index)
+ {
+ 	struct mlx4_en_dev *mdev = priv->mdev;
++	struct page_pool_params pp = {};
+ 	struct mlx4_en_rx_ring *ring;
+ 	int err = -ENOMEM;
+ 	int tmp;
+@@ -286,9 +288,26 @@ int mlx4_en_create_rx_ring(struct mlx4_en_priv *priv,
+ 	ring->log_stride = ffs(ring->stride) - 1;
+ 	ring->buf_size = ring->size * ring->stride + TXBB_SIZE;
+ 
+-	if (xdp_rxq_info_reg(&ring->xdp_rxq, priv->dev, queue_index, 0) < 0)
++	pp.flags = PP_FLAG_DMA_MAP;
++	pp.pool_size = MLX4_EN_MAX_RX_SIZE;
++	pp.nid = node;
++	pp.napi = &priv->rx_cq[queue_index]->napi;
++	pp.netdev = priv->dev;
++	pp.dev = &mdev->dev->persist->pdev->dev;
++	pp.dma_dir = DMA_BIDIRECTIONAL;
++
++	ring->pp = page_pool_create(&pp);
++	if (!ring->pp)
+ 		goto err_ring;
+ 
++	if (xdp_rxq_info_reg(&ring->xdp_rxq, priv->dev, queue_index, 0) < 0)
++		goto err_pp;
++
++	err = xdp_rxq_info_reg_mem_model(&ring->xdp_rxq, MEM_TYPE_PAGE_POOL,
++					 ring->pp);
++	if (err)
++		goto err_xdp_info;
++
+ 	tmp = size * roundup_pow_of_two(MLX4_EN_MAX_RX_FRAGS *
+ 					sizeof(struct mlx4_en_rx_alloc));
+ 	ring->rx_info = kvzalloc_node(tmp, GFP_KERNEL, node);
+@@ -319,6 +338,8 @@ int mlx4_en_create_rx_ring(struct mlx4_en_priv *priv,
+ 	ring->rx_info = NULL;
+ err_xdp_info:
+ 	xdp_rxq_info_unreg(&ring->xdp_rxq);
++err_pp:
++	page_pool_destroy(ring->pp);
+ err_ring:
+ 	kfree(ring);
+ 	*pring = NULL;
+@@ -445,6 +466,7 @@ void mlx4_en_destroy_rx_ring(struct mlx4_en_priv *priv,
+ 	xdp_rxq_info_unreg(&ring->xdp_rxq);
+ 	mlx4_free_hwq_res(mdev->dev, &ring->wqres, size * stride + TXBB_SIZE);
+ 	kvfree(ring->rx_info);
++	page_pool_destroy(ring->pp);
+ 	ring->rx_info = NULL;
+ 	kfree(ring);
+ 	*pring = NULL;
 -- 
 2.48.1
 
