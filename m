@@ -1,122 +1,125 @@
-Return-Path: <netdev+bounces-162860-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-162861-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id C26FEA28344
-	for <lists+netdev@lfdr.de>; Wed,  5 Feb 2025 05:13:27 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4FC72A28350
+	for <lists+netdev@lfdr.de>; Wed,  5 Feb 2025 05:20:21 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 25CAB3A5F3E
-	for <lists+netdev@lfdr.de>; Wed,  5 Feb 2025 04:13:19 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 410891887565
+	for <lists+netdev@lfdr.de>; Wed,  5 Feb 2025 04:20:26 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AC2232116F9;
-	Wed,  5 Feb 2025 04:13:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 929D82139D7;
+	Wed,  5 Feb 2025 04:20:14 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="SAVFLDhR"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=montleon.com header.i=@montleon.com header.b="GzfIYBeD"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-yb1-f176.google.com (mail-yb1-f176.google.com [209.85.219.176])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mail-10627.protonmail.ch (mail-10627.protonmail.ch [79.135.106.27])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1455125A650;
-	Wed,  5 Feb 2025 04:13:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.176
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0075520C00C
+	for <netdev@vger.kernel.org>; Wed,  5 Feb 2025 04:20:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=79.135.106.27
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1738728801; cv=none; b=s1o2V+sZX3aua9S9p2Lxu8Aw2mbo1w8U4VJv6VZP7bFMrGq+TuX13Xex28EqetEzc+KsMMdFfvvpH+YYJHX00WC1d1GWCtUnk5aFq7DzTI+uzMxcN2TbTxrGttjM5V93Ic60CiGQeBI1l8/nUIXxUHW0xkW0cQMGPtjfXocfrKM=
+	t=1738729214; cv=none; b=FtcZrfbJC18YES4UNV3shHZU3cVyU8iIObWPNdW+f99wrCn0TcP9Hz6Ez9PViqwdZpPV47yA98l5aLZBlYW6EvBgj29HyoYmUK96oG2+znCnREvQvd4Milt9wTlw5BYLBnDiNrMhiAyCTgdka6cyNQUBBqtViLyMnEKJZSSMjiY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1738728801; c=relaxed/simple;
-	bh=+s3LefXLlNCA5fl0feJyjjZcXtEDfoG3n55IuudFF3c=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=SRKgNX+0bq0hP5XEDXVyQtMm7AzagKXAWNcBkLIgIiGTuHAFzYQO2oOsrky4EDdjno/lg4NgHoOCVzcrpeNJrsn6ErvyrMy/0EyzM1NVqZJFllL250JaWuKFIgCIM82TP0lsbUYWeLfKpFjOKPUJR/VpHoVyuX5xOmyaehiL2o8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=SAVFLDhR; arc=none smtp.client-ip=209.85.219.176
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-yb1-f176.google.com with SMTP id 3f1490d57ef6-e46ac799015so5823263276.0;
-        Tue, 04 Feb 2025 20:13:19 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1738728799; x=1739333599; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=u0huHE4UuIu4kQSf4E6Kmw+nnapeq5bzkpfgwJLnTVo=;
-        b=SAVFLDhRQonRlGIH5aXFUfLpdo1ox+qK2eBQvS4L9UhMnZZVnfPvGm7Kkxx8YjiOvx
-         El0fCYb7AKkruQ7e24dHEEx6R2l+ZUC5JtHAip09qz7W4U0z41L1bEXfhEL4V/xsBFuQ
-         lC7V1sHcOlyfJcCnPYeXB7MOIR+a/7Fg9oyV6FrRpgKwITuOo+iX5b57xA74QAjxE43C
-         TvR9Hlj6PLfzNJmQa/bycUonGctfjRlggHzLRz6nWUZ/Bzhq+lNBuyNxpW0NznzwnKJo
-         Yu/IJQ+2jD+30aTPf40uYjR40FW6vVWjIcVGdxGRST3xaX6XPeTow7Fsxo3N0L3C7rlr
-         q1jw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1738728799; x=1739333599;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=u0huHE4UuIu4kQSf4E6Kmw+nnapeq5bzkpfgwJLnTVo=;
-        b=Wq4IXPK+AvJZDY+aU/0XQ+dZe1ckwfRNFRYEFaZ/TR4kVWkNigl7sLrTCiAlA9x9tp
-         B1MPdjtNzRHUUKh7PGCHQpxO2ahEof8S0g9OecQ7OeNHQWWlql9RrIcrJfScHWNFT+Ex
-         Z5oTT5uZpD27LXSbVQ0Rn4ThiIWW3GB/H7NX7phmJxeTVU8QLx5iWloNpKCuljHndbWp
-         aRlLfYi4io+TAM7Q02tGxULYbE/tIM+As4OsDr/XsrsUX8tKoqmDo0rowVOUsZtL742R
-         vMWH8X3dgvO4shnaLpMVG+DOzF9bGGfjKcbLi9URXss27R+uTMgDXZrUBmEd9K1+d6tX
-         6gzg==
-X-Forwarded-Encrypted: i=1; AJvYcCUfAqG007vl6HzydoZd2wDflZl/18eygaYhvrkPJ4/nnfQcrDAkPseHjNYPUJbKAcSKN8w=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyJO5P6pgwoBdKuRn0U5Et1vxgrWdr0s2by+sCh/Ls2CKOQxvxW
-	OOoy93qbpm32kQo9IpRM37GaQ43XQFlN1uQ53+kGhagxUWe+5wRXIZZFYgCMMyGJKPP24uXVavt
-	GQaXO4ECF3aGhlOqujYS9MeSfHLU=
-X-Gm-Gg: ASbGncvlKxTBD5bsK3xxoydZnoKWKZTZ9AT8AjfCIzF4E0rBEkmh+5S13C3Qe9CbNsD
-	iVWYgaSosOXyTowgQ+fn/1/5gEQGRSAPHO3e3/Dd8Rrtv8sGFtgRPj0X3eYA33dBF3Spn3FVC
-X-Google-Smtp-Source: AGHT+IFXbfDYOlB7D31OOenhm1lyp6fuPx18c2ttepMxOx+jPV4HSTDQUishUk59fWMgDAxk/CgMftwARgGACC2Pfok=
-X-Received: by 2002:a05:6902:2687:b0:e58:33d2:6a12 with SMTP id
- 3f1490d57ef6-e5b25bd9037mr1150161276.31.1738728798671; Tue, 04 Feb 2025
- 20:13:18 -0800 (PST)
+	s=arc-20240116; t=1738729214; c=relaxed/simple;
+	bh=diuf4Q6Qz1Ac77ejlgBsdm102NX+oVHubnbGNjCevZc=;
+	h=Date:To:From:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=MNnGXuIkA1o4reDY8hG3MFXggTZdAekcNd7YFQswoWlo6f6MGFRBYqaQFsebKvYBi1EgMrveipX+Xnj3qw1WYrKmhnlUw2kebyEtfKW/fLE9uFHpIpiMvdUkn37SypmIvnjKJJBvVYi+BesF8GM1mwv8ltXfBU2J7Jv7y5EyXYc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=montleon.com; spf=pass smtp.mailfrom=montleon.com; dkim=pass (2048-bit key) header.d=montleon.com header.i=@montleon.com header.b=GzfIYBeD; arc=none smtp.client-ip=79.135.106.27
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=montleon.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=montleon.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=montleon.com;
+	s=protonmail2; t=1738729202; x=1738988402;
+	bh=diuf4Q6Qz1Ac77ejlgBsdm102NX+oVHubnbGNjCevZc=;
+	h=Date:To:From:Cc:Subject:Message-ID:In-Reply-To:References:
+	 Feedback-ID:From:To:Cc:Date:Subject:Reply-To:Feedback-ID:
+	 Message-ID:BIMI-Selector:List-Unsubscribe:List-Unsubscribe-Post;
+	b=GzfIYBeDbxiwtT9P9AhqKrOEQWPqebRn1RC+8DgxW3bNL98oBUItDP2SMI8zPmJOs
+	 lttBADT9wC8D/updemPL6obJ2ZwiEDb5UVRFowGoNMJ/Bkg43kTnr/aGj9pM/JX6iH
+	 jYR50NQOUrNTPPPIYwhj0DpIjVsxG1DAhnQdqMAW33L1s+YTobyctWGSlR5fKljGcC
+	 Q11EfD/woNXYOu0WR/QFg5bcKxUsoPvgxi5Bp38RU00jgAvsrJoHNKIN2hp46yJ3kt
+	 HSOHosxW+99aePWoiS9c2GKXvueQwivAkfsvL4SWM54G4xIbPuf0R65Wu2pmHIXY4E
+	 BBQ/hCRveLeNg==
+Date: Wed, 05 Feb 2025 04:19:58 +0000
+To: Domenico Andreoli <domenico.andreoli@linux.com>
+From: Jason Montleon <jason@montleon.com>
+Cc: netdev@vger.kernel.org, linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org, "regressions@lists.linux.dev" <regressions@lists.linux.dev>, "hayashi.kunihiko@socionext.com" <hayashi.kunihiko@socionext.com>, "si.yanteng@linux.dev" <si.yanteng@linux.dev>, "pabeni@redhat.com" <pabeni@redhat.com>
+Subject: Re: [REGRESSION,6.14.0-rc1]: rk_gmac-dwmac: no ethernet device shows up (NanoPi M4)
+Message-ID: <INKEBRCGF47MsjO5WHpLcf1OTcQHw2KG6_Ez-K9QiTwAnb4MRVErnxoUT1euX_o9oRrxUILDRDvlOZ7ezguCU4maUyvkk-UqU52l6xLsF8U=@montleon.com>
+In-Reply-To: <Z6CfoZtq7CBgc393@localhost>
+References: <Z6CfoZtq7CBgc393@localhost>
+Feedback-ID: 31263673:user:proton
+X-Pm-Message-ID: 91cf9ed08671796c68fcff7b4943b9d063c50cc0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250131192912.133796-1-ameryhung@gmail.com> <20250131192912.133796-9-ameryhung@gmail.com>
- <20250204141851.522ae938@kernel.org> <CAMB2axNNvNMy1o6m2DKFwF7O2AkgxZXUW+6rwhhc=788v_KM+Q@mail.gmail.com>
- <20250204172725.30068497@kernel.org>
-In-Reply-To: <20250204172725.30068497@kernel.org>
-From: Amery Hung <ameryhung@gmail.com>
-Date: Tue, 4 Feb 2025 20:13:07 -0800
-X-Gm-Features: AWEUYZmmzrg-u-JLu5ZtUk-OCT-fpH5QLflcq46tS4caEJmQ14QYZ8JDlWqSrAs
-Message-ID: <CAMB2axMrKN_2=o+SRAvh_cBkc347JVhZE4OgojH=vUyV_cBGOA@mail.gmail.com>
-Subject: Re: [PATCH bpf-next v3 08/18] bpf: net_sched: Support implementation
- of Qdisc_ops in bpf
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: netdev@vger.kernel.org, bpf@vger.kernel.org, daniel@iogearbox.net, 
-	andrii@kernel.org, alexei.starovoitov@gmail.com, martin.lau@kernel.org, 
-	edumazet@google.com, xiyou.wangcong@gmail.com, cong.wang@bytedance.com, 
-	jhs@mojatatu.com, sinquersw@gmail.com, toke@redhat.com, jiri@resnulli.us, 
-	stfomichev@gmail.com, ekarani.silvestre@ccc.ufcg.edu.br, 
-	yangpeihao@sjtu.edu.cn, yepeilin.cs@gmail.com, ming.lei@redhat.com, 
-	kernel-team@meta.com
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: quoted-printable
 
-On Tue, Feb 4, 2025 at 5:27=E2=80=AFPM Jakub Kicinski <kuba@kernel.org> wro=
-te:
->
-> On Tue, 4 Feb 2025 15:21:27 -0800 Amery Hung wrote:
-> > On Tue, Feb 4, 2025 at 2:18=E2=80=AFPM Jakub Kicinski <kuba@kernel.org>=
- wrote:
-> > > On Fri, 31 Jan 2025 11:28:47 -0800 Amery Hung wrote:
-> > > > +             if (new &&
-> > > > +                 !(parent->flags & TCQ_F_MQROOT) &&
-> > > > +                 new->ops->owner =3D=3D BPF_MODULE_OWNER) {
-> > > > +                     NL_SET_ERR_MSG(extack, "BPF qdisc not support=
-ed on a non root");
-> > > > +                     return -EINVAL;
-> > > > +             }
-> > >
-> > > This check should live in bpf_qdisc.c
-> >
-> > Might be a dumb question, but could you explain why this is preferred?
-> >
-> > I can certainly do the check in Qdisc_ops::init instead though.
->
-> Basic SW abstractions, this is the generic layer, bpf_qdisc is just
-> one implementation that plugs into it.
+On Monday, February 3rd, 2025 at 5:51 AM, Domenico Andreoli <domenico.andre=
+oli@linux.com> wrote:
 
-Got it. Thanks for the clarification.
+>
+>
+> Hi,
+>
+> This morning I tried 6.14.0-rc1 on my NanoPi M4, the ethernet does not
+> show up.
+
+I am experiencing similar behavior on the Lichee Pi 4A with thead-dwmac. It=
+ works fine on 6.12.12 and 6.13.1, but with 6.14-rc1 I don't see these last=
+ several lines of output as in your case. I did also see the same new error=
+:
++stmmaceth ffe7070000.ethernet: Can't specify Rx FIFO size
+
+It looks like this message was introduced in the following commit and if I =
+build with it reverted my ethernet interfaces work again.
+
+https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/commit/d=
+rivers/net/ethernet/stmicro?h=3Dv6.14-rc1&id=3D8865d22656b442b8d0fb019e6acb=
+2292b99a9c3c
+
+Thanks,
+Jason
+
+> This is the diff of the output of `dmesg | grep rk_gmac-dwmac` on 6.13.0
+> and 6.14.0-rc1:
+>
+> --- m4.ok.log 2025-02-03 11:37:03.991757775 +0100
+> +++ m4.nok.log 2025-02-03 11:37:17.249455484 +0100
+> @@ -15,4 +15,13 @@
+> rk_gmac-dwmac fe300000.ethernet: COE Type 2
+> rk_gmac-dwmac fe300000.ethernet: TX Checksum insertion supported
+> rk_gmac-dwmac fe300000.ethernet: Wake-Up On Lan supported
+> -rk_gmac-dwmac fe300000.ethernet: Normal descriptors
+> -rk_gmac-dwmac fe300000.ethernet: Ring mode enabled
+> -rk_gmac-dwmac fe300000.ethernet: Enable RX Mitigation via HW Watchdog Ti=
+mer
+> -rk_gmac-dwmac fe300000.ethernet end0: renamed from eth0
+> -rk_gmac-dwmac fe300000.ethernet end0: Register MEM_TYPE_PAGE_POOL RxQ-0
+> -rk_gmac-dwmac fe300000.ethernet end0: PHY [stmmac-0:01] driver [Generic =
+PHY] (irq=3DPOLL)
+> -rk_gmac-dwmac fe300000.ethernet end0: No Safety Features support found
+> -rk_gmac-dwmac fe300000.ethernet end0: PTP not supported by HW
+> -rk_gmac-dwmac fe300000.ethernet end0: configuring for phy/rgmii link mod=
+e
+> -rk_gmac-dwmac fe300000.ethernet end0: Link is Up - 1Gbps/Full - flow con=
+trol rx/tx
+> +rk_gmac-dwmac fe300000.ethernet: Can't specify Rx FIFO size
+>
+> The configration was updated with `make olddefconfig`, as usual. I
+> could not find any new option that I might need to enable, if that is
+> what went wrong.
+>
+> Is there anything I can do to help diagnose this?
+>
+> Thanks,
+> Dom
+
 
