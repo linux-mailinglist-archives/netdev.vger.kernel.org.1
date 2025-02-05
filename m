@@ -1,154 +1,270 @@
-Return-Path: <netdev+bounces-162940-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-162941-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id AE6C6A288E8
-	for <lists+netdev@lfdr.de>; Wed,  5 Feb 2025 12:10:47 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id B2716A288D1
+	for <lists+netdev@lfdr.de>; Wed,  5 Feb 2025 12:07:05 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 44B693AE9EA
-	for <lists+netdev@lfdr.de>; Wed,  5 Feb 2025 11:05:24 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 369A9165453
+	for <lists+netdev@lfdr.de>; Wed,  5 Feb 2025 11:06:35 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CEC98151998;
-	Wed,  5 Feb 2025 11:00:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id ACD0E22CBFD;
+	Wed,  5 Feb 2025 11:05:02 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="RvO4xMe5"
+	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="A4PaMW7h"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ej1-f44.google.com (mail-ej1-f44.google.com [209.85.218.44])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mslow3.mail.gandi.net (mslow3.mail.gandi.net [217.70.178.249])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D33B0151996;
-	Wed,  5 Feb 2025 11:00:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.44
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6698115198E;
+	Wed,  5 Feb 2025 11:04:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.178.249
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1738753231; cv=none; b=QXvGnGfVfcn4memHEf/nG3Lao6xs8Spq3+6VuP+Z4tx+xgIlZBB4nIqwubQVoMcF58ZmlU4S08OAEeAb9rssJEvObv3kCb6IZO+eAGowpH3DiPfzr2fUBeVdguDyxzEF3svECeW1piJMjaQD/sskcpQyuBPjtyheRv6abAoENyM=
+	t=1738753502; cv=none; b=tp7v7jr0tTbahxafG0/d9oM4/oK1SDz/wSc0pLrfVpPxO4r6h1HZStBYmCppTR2SdYvOw3rWqMFie5UMAwH0AZSSx1DepJsMDL7y2dwSRowYvN1LkC7MP4SDzMfouyo/PQlZgoyMBae5mKVdJIDUg6/VXVVh0xzThkb4v9c69cY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1738753231; c=relaxed/simple;
-	bh=ggnuHh5JOOSCJ6LLQ0zuX0132brvaETBrjf3g3m+GmY=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=MKDHrXehcXo39VoTS/S4k14Yjr8QPXVHCIfk9xi7yvfwFoDCyP/SRpxitQCMndikzCzMQOxe0aMtzrYP+D5GsTW0sDUyqHYyHxPIca+21JKqwpKWMiQk78vX2dm0K/zcB0hmgeoVMMY8qrWbIaoJCaKf3ZYSqqY0izt9/yHpqNQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=linux.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=RvO4xMe5; arc=none smtp.client-ip=209.85.218.44
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=linux.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ej1-f44.google.com with SMTP id a640c23a62f3a-ab6fb1851d4so132766766b.0;
-        Wed, 05 Feb 2025 03:00:29 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1738753228; x=1739358028; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:sender:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=DSjdJz/xDA8mb42ayTcwdNMNuepVYnt3TrZB/pvMUoI=;
-        b=RvO4xMe5WjxZzGTC1pf1axeLdTV617XE8F087deLMx3HaHzChky7sh5Aye/StlXHUq
-         M+im9pOYozpXRYV5saTxIFatoz9WY2tp7IZ+B1ktG1ybQ2XpTQzpEmv+5iQMgnGO3OB0
-         VR8njr52sV6NgdIHCbeSaqA7inF7NJSTMryTzKnbZd4kTkrgccemGFinU25/WNP1bCGe
-         GofHPm3jalZ4Wfllo6wDxs9GM08e4m3+Ns65G/yaQrMtqjxj478YFGGdrJpqwfTZLQWV
-         74H9Di0DRhE2hKb6hmy3bKV/Th5f5ycoj61O3k69GxDkR3egZ2AdQvScaOY/iI/XNKLN
-         n+vQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1738753228; x=1739358028;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:sender:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=DSjdJz/xDA8mb42ayTcwdNMNuepVYnt3TrZB/pvMUoI=;
-        b=OWE2Oqo/+rMmNclfbAmjQ6h3ZgjzJdMP8YS74mpyVKVUl6FDceF+W1Tz2RDcyRwsRz
-         hOBpo4H/onhELdMzUKybbzOnGHM5i0PftkIUq2cJm5hkJZDxSrB4JJNk3izkbHJzEDCX
-         Hi/YxBtxCa6CkQ8fgmYuu7a77Uk597IzdzQDsyVFAGRy9/F/bguCWxr/khGfutG+ufJX
-         rnhHzb+uOSJMpeGGjDzIZKjZUF+RU2CEWwVHm4FPfg6eW+jXuvKPvMej8aV/umM4G+fQ
-         pJpMZq7DPJgx3JGoS8W+dJavK9exth013FqKw9a0JL31OltLQH+BFJlq2Qr910SiieZ0
-         jtSw==
-X-Forwarded-Encrypted: i=1; AJvYcCW0GCUPbU6QJp2Qd2Ioz54NGw/DN2aWFxMMeMmRgW90PEcQ12BSGcc8vUf2nN4U0bNQ3m6Q2ITpPuUmdAM=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yzw2Fc+1s+A0vkmuDAKiRa69gufbN5fMlnwnu2es8NjezBNfUkN
-	MgrqYu6i9Rz7GxbljYGnjmehGN+kawJt/7M259MVndfR5k6LPk6KEt4pHq8oMpHvZ5yR
-X-Gm-Gg: ASbGncsPcbydoXo+IEPw+5b2KSumnJeEnQkz+WEzEodv6TWTX84N/m+Hq+qRiLyeiAI
-	f8k7GS1gOQKSW+e0hpea4LoMYhbdzd3peH27rKTeS7jYVCIVcRHEjgYpD5ufu4U1UkdBcGIl/o5
-	T47L60z1NdznLVdN78RtIgF5LrS4WiVYJIv9IKnLxNIXHtH/+MRfq3bHdzm2O+SrKBy05Wh1dwU
-	Q595wtfbw3RmzmMhZA30HutRo8zguW8RaTidNoDLLn1xsMffd7awt3wYKlGIXKE
-X-Google-Smtp-Source: AGHT+IEVVg0kE39/wjtj8sTo6fT9WkDtB7UWVHKKZ58CONt1w8Vq3ELLHVci1DsLegASlf42WxQH4w==
-X-Received: by 2002:a17:907:d90:b0:ab2:f255:59f5 with SMTP id a640c23a62f3a-ab75d2a9fe2mr249002866b.16.1738753227771;
-        Wed, 05 Feb 2025 03:00:27 -0800 (PST)
-Received: from m4.lan ([2a0b:f4c2:3::65])
-        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-ab6e47a818csm1077061666b.6.2025.02.05.03.00.27
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 05 Feb 2025 03:00:27 -0800 (PST)
-Sender: Domenico Andreoli <domenico.andreoli.it@gmail.com>
-Received: from cavok by m4.lan with local (Exim 4.96)
-	(envelope-from <cavok@localhost>)
-	id 1tfd8q-0000bq-17;
-	Wed, 05 Feb 2025 12:00:24 +0100
-Date: Wed, 5 Feb 2025 12:00:24 +0100
-From: Domenico Andreoli <domenico.andreoli@linux.com>
-To: Jason Montleon <jason@montleon.com>
-Cc: netdev@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
-	linux-kernel@vger.kernel.org,
-	"regressions@lists.linux.dev" <regressions@lists.linux.dev>,
-	"hayashi.kunihiko@socionext.com" <hayashi.kunihiko@socionext.com>,
-	"si.yanteng@linux.dev" <si.yanteng@linux.dev>,
-	"pabeni@redhat.com" <pabeni@redhat.com>
-Subject: Re: [REGRESSION,6.14.0-rc1]: rk_gmac-dwmac: no ethernet device shows
- up (NanoPi M4)
-Message-ID: <Z6NEyCRHTVfnM1vf@localhost>
-References: <Z6CfoZtq7CBgc393@localhost>
- <INKEBRCGF47MsjO5WHpLcf1OTcQHw2KG6_Ez-K9QiTwAnb4MRVErnxoUT1euX_o9oRrxUILDRDvlOZ7ezguCU4maUyvkk-UqU52l6xLsF8U=@montleon.com>
+	s=arc-20240116; t=1738753502; c=relaxed/simple;
+	bh=DGVXjVg8RAwsP/Dp4kA//P6vgnifP8xK1RUISsmVgw8=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=g7jsQWd6F96NkFmpZkYEVWB72RIU5ICumcgft0AJTgwHGjTDnhjCHxTCjCYG0vDbOT6G/0ru6GrXmBONrwgoVA1pG+2jXhU/Vi3Zpa8hzTUeULCseYbWBC1nCi8Nqu7dszPxDEOmqQtmjSsaj+YZdxKa7KJ7PgXjsUAcd0awtmU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=A4PaMW7h; arc=none smtp.client-ip=217.70.178.249
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
+Received: from relay1-d.mail.gandi.net (relay1-d.mail.gandi.net [IPv6:2001:4b98:dc4:8::221])
+	by mslow3.mail.gandi.net (Postfix) with ESMTP id 9155458138C;
+	Wed,  5 Feb 2025 11:04:17 +0000 (UTC)
+Received: by mail.gandi.net (Postfix) with ESMTPSA id C0C4244288;
+	Wed,  5 Feb 2025 11:04:09 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
+	t=1738753450;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=BDAAAVZpKpGbZtkiC8xflhp3Jt0i1JP80IfRh8Sb2K4=;
+	b=A4PaMW7htn4bjEm98FrhExYlgzm78vmUoUiuUNGNaWeI0d6M/1OsgbzEGBH3un0KYAJXQC
+	Wve6tc+Z419wg9Glr478MyQ64/otu550p2DBvFt2rebyZ+q7sXlIgru4o9wxkesGn+2ZgG
+	c+Xw8eVK6lv6XPl/QolWLSl373f0dqbP2pTCyEm2P6AuT3U8RTcMvvpn08QhM6VuK4/uDv
+	onvck0pvUd2x5WvHy8TUgneFzcXwEFKd1vZ1jhf7leABxlLwKxx9nv4LQBcAYIxGsjvsrA
+	kvAmCjV9RcU+B1qF3hE8Z18S42rE2u66vwprOH/Yq95Cm0RO36nTwxLhNYQrEg==
+From: Kory Maincent <kory.maincent@bootlin.com>
+To: Kory Maincent <kory.maincent@bootlin.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Cc: thomas.petazzoni@bootlin.com,
+	Donald Hunter <donald.hunter@gmail.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Eric Dumazet <edumazet@google.com>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Simon Horman <horms@kernel.org>
+Subject: [PATCH net v2] net: ethtool: tsconfig: Fix netlink type of hwtstamp flags
+Date: Wed,  5 Feb 2025 12:03:01 +0100
+Message-Id: <20250205110304.375086-1-kory.maincent@bootlin.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <INKEBRCGF47MsjO5WHpLcf1OTcQHw2KG6_Ez-K9QiTwAnb4MRVErnxoUT1euX_o9oRrxUILDRDvlOZ7ezguCU4maUyvkk-UqU52l6xLsF8U=@montleon.com>
+Content-Transfer-Encoding: 8bit
+X-GND-State: clean
+X-GND-Score: -100
+X-GND-Cause: gggruggvucftvghtrhhoucdtuddrgeefvddrtddtgddvfedvjecutefuodetggdotefrodftvfcurfhrohhfihhlvgemucfitefpfffkpdcuggftfghnshhusghstghrihgsvgenuceurghilhhouhhtmecufedtudenucesvcftvggtihhpihgvnhhtshculddquddttddmnecujfgurhephffvvefufffkofgggfestdekredtredttdenucfhrhhomhepmfhorhihucforghinhgtvghnthcuoehkohhrhidrmhgrihhntggvnhhtsegsohhothhlihhnrdgtohhmqeenucggtffrrghtthgvrhhnpeegudegvdeklefhheefueeiieegteegteeuudegteduvdevffeikefgjeekgfdukeenucfkphepledtrdekledrudeifedruddvjeenucevlhhushhtvghrufhiiigvpedtnecurfgrrhgrmhepihhnvghtpeeltddrkeelrdduieefrdduvdejpdhhvghlohepkhhmrghinhgtvghnthdqigfrufdqudefqdejfeeltddrrddpmhgrihhlfhhrohhmpehkohhrhidrmhgrihhntggvnhhtsegsohhothhlihhnrdgtohhmpdhnsggprhgtphhtthhopedutddprhgtphhtthhopehkohhrhidrmhgrihhntggvnhhtsegsohhothhlihhnrdgtohhmpdhrtghpthhtohepuggrvhgvmhesuggrvhgvmhhlohhfthdrnhgvthdprhgtphhtthhopehnvghtuggvvhesvhhgvghrrdhkvghrnhgvlhdrohhrghdprhgtphhtthhopehlihhnuhigqdhkvghrnhgvlhesvhhgvghrrdhkvghrnhgvlhdrohhrghdprhgtphhtthhopehthhhomhgrs
+ hdrphgvthgriiiiohhnihessghoohhtlhhinhdrtghomhdprhgtphhtthhopeguohhnrghlugdrhhhunhhtvghrsehgmhgrihhlrdgtohhmpdhrtghpthhtohepkhhusggrsehkvghrnhgvlhdrohhrghdprhgtphhtthhopegvughumhgriigvthesghhoohhglhgvrdgtohhm
+X-GND-Sasl: kory.maincent@bootlin.com
 
-On Wed, Feb 05, 2025 at 04:19:58AM +0000, Jason Montleon wrote:
-> On Monday, February 3rd, 2025 at 5:51 AM, Domenico Andreoli <domenico.andreoli@linux.com> wrote:
-> > Hi,
-> >
-> > This morning I tried 6.14.0-rc1 on my NanoPi M4, the ethernet does not
-> > show up.
-> 
-> I am experiencing similar behavior on the Lichee Pi 4A with thead-dwmac. It works fine on 6.12.12 and 6.13.1, but with 6.14-rc1 I don't see these last several lines of output as in your case. I did also see the same new error:
-> +stmmaceth ffe7070000.ethernet: Can't specify Rx FIFO size
-> 
-> It looks like this message was introduced in the following commit and if I build with it reverted my ethernet interfaces work again.
-> 
-> https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/commit/drivers/net/ethernet/stmicro?h=v6.14-rc1&id=8865d22656b442b8d0fb019e6acb2292b99a9c3c
+Fix the netlink type for hardware timestamp flags, which are represented
+as a bitset of flags. Although only one flag is supported currently, the
+correct netlink bitset type should be used instead of u32 to keep
+consistency with other fields. Address this by adding a new named string
+set description for the hwtstamp flag structure.
 
-Confirmed, reverting it resurrects the ethernet also for me.
+The code has been introduced in the current release so the uAPI change is
+still okay.
 
-Thanks!
-dom
+Signed-off-by: Kory Maincent <kory.maincent@bootlin.com>
+Fixes: 6e9e2eed4f39 ("net: ethtool: Add support for tsconfig command to get/set hwtstamp config")
+---
 
-> 
-> Thanks,
-> Jason
-> 
-> > This is the diff of the output of `dmesg | grep rk_gmac-dwmac` on 6.13.0
-> > and 6.14.0-rc1:
-> >
-> > --- m4.ok.log 2025-02-03 11:37:03.991757775 +0100
-> > +++ m4.nok.log 2025-02-03 11:37:17.249455484 +0100
-> > @@ -15,4 +15,13 @@
-> > rk_gmac-dwmac fe300000.ethernet: COE Type 2
-> > rk_gmac-dwmac fe300000.ethernet: TX Checksum insertion supported
-> > rk_gmac-dwmac fe300000.ethernet: Wake-Up On Lan supported
-> > -rk_gmac-dwmac fe300000.ethernet: Normal descriptors
-> > -rk_gmac-dwmac fe300000.ethernet: Ring mode enabled
-> > -rk_gmac-dwmac fe300000.ethernet: Enable RX Mitigation via HW Watchdog Timer
-> > -rk_gmac-dwmac fe300000.ethernet end0: renamed from eth0
-> > -rk_gmac-dwmac fe300000.ethernet end0: Register MEM_TYPE_PAGE_POOL RxQ-0
-> > -rk_gmac-dwmac fe300000.ethernet end0: PHY [stmmac-0:01] driver [Generic PHY] (irq=POLL)
-> > -rk_gmac-dwmac fe300000.ethernet end0: No Safety Features support found
-> > -rk_gmac-dwmac fe300000.ethernet end0: PTP not supported by HW
-> > -rk_gmac-dwmac fe300000.ethernet end0: configuring for phy/rgmii link mode
-> > -rk_gmac-dwmac fe300000.ethernet end0: Link is Up - 1Gbps/Full - flow control rx/tx
-> > +rk_gmac-dwmac fe300000.ethernet: Can't specify Rx FIFO size
-> >
-> > The configration was updated with `make olddefconfig`, as usual. I
-> > could not find any new option that I might need to enable, if that is
-> > what went wrong.
+Changes in v2:
+- Update commit message.
+---
+ Documentation/netlink/specs/ethtool.yaml |  3 ++-
+ include/uapi/linux/ethtool.h             |  2 ++
+ net/ethtool/common.c                     |  5 ++++
+ net/ethtool/common.h                     |  2 ++
+ net/ethtool/strset.c                     |  5 ++++
+ net/ethtool/tsconfig.c                   | 33 +++++++++++++++++-------
+ 6 files changed, 39 insertions(+), 11 deletions(-)
 
+diff --git a/Documentation/netlink/specs/ethtool.yaml b/Documentation/netlink/specs/ethtool.yaml
+index 259cb211a338..655d8d10fe24 100644
+--- a/Documentation/netlink/specs/ethtool.yaml
++++ b/Documentation/netlink/specs/ethtool.yaml
+@@ -1524,7 +1524,8 @@ attribute-sets:
+         nested-attributes: bitset
+       -
+         name: hwtstamp-flags
+-        type: u32
++        type: nest
++        nested-attributes: bitset
+ 
+ operations:
+   enum-model: directional
+diff --git a/include/uapi/linux/ethtool.h b/include/uapi/linux/ethtool.h
+index d1089b88efc7..9b18c4cfe56f 100644
+--- a/include/uapi/linux/ethtool.h
++++ b/include/uapi/linux/ethtool.h
+@@ -682,6 +682,7 @@ enum ethtool_link_ext_substate_module {
+  * @ETH_SS_STATS_ETH_CTRL: names of IEEE 802.3 MAC Control statistics
+  * @ETH_SS_STATS_RMON: names of RMON statistics
+  * @ETH_SS_STATS_PHY: names of PHY(dev) statistics
++ * @ETH_SS_TS_FLAGS: hardware timestamping flags
+  *
+  * @ETH_SS_COUNT: number of defined string sets
+  */
+@@ -708,6 +709,7 @@ enum ethtool_stringset {
+ 	ETH_SS_STATS_ETH_CTRL,
+ 	ETH_SS_STATS_RMON,
+ 	ETH_SS_STATS_PHY,
++	ETH_SS_TS_FLAGS,
+ 
+ 	/* add new constants above here */
+ 	ETH_SS_COUNT
+diff --git a/net/ethtool/common.c b/net/ethtool/common.c
+index 2bd77c94f9f1..d88e9080643b 100644
+--- a/net/ethtool/common.c
++++ b/net/ethtool/common.c
+@@ -462,6 +462,11 @@ const char ts_rx_filter_names[][ETH_GSTRING_LEN] = {
+ };
+ static_assert(ARRAY_SIZE(ts_rx_filter_names) == __HWTSTAMP_FILTER_CNT);
+ 
++const char ts_flags_names[][ETH_GSTRING_LEN] = {
++	[const_ilog2(HWTSTAMP_FLAG_BONDED_PHC_INDEX)] = "bonded-phc-index",
++};
++static_assert(ARRAY_SIZE(ts_flags_names) == __HWTSTAMP_FLAG_CNT);
++
+ const char udp_tunnel_type_names[][ETH_GSTRING_LEN] = {
+ 	[ETHTOOL_UDP_TUNNEL_TYPE_VXLAN]		= "vxlan",
+ 	[ETHTOOL_UDP_TUNNEL_TYPE_GENEVE]	= "geneve",
+diff --git a/net/ethtool/common.h b/net/ethtool/common.h
+index 850eadde4bfc..58e9e7db06f9 100644
+--- a/net/ethtool/common.h
++++ b/net/ethtool/common.h
+@@ -13,6 +13,7 @@
+ 	ETHTOOL_LINK_MODE_ ## speed ## base ## type ## _ ## duplex ## _BIT
+ 
+ #define __SOF_TIMESTAMPING_CNT (const_ilog2(SOF_TIMESTAMPING_LAST) + 1)
++#define __HWTSTAMP_FLAG_CNT (const_ilog2(HWTSTAMP_FLAG_LAST) + 1)
+ 
+ struct link_mode_info {
+ 	int				speed;
+@@ -38,6 +39,7 @@ extern const char wol_mode_names[][ETH_GSTRING_LEN];
+ extern const char sof_timestamping_names[][ETH_GSTRING_LEN];
+ extern const char ts_tx_type_names[][ETH_GSTRING_LEN];
+ extern const char ts_rx_filter_names[][ETH_GSTRING_LEN];
++extern const char ts_flags_names[][ETH_GSTRING_LEN];
+ extern const char udp_tunnel_type_names[][ETH_GSTRING_LEN];
+ 
+ int __ethtool_get_link(struct net_device *dev);
+diff --git a/net/ethtool/strset.c b/net/ethtool/strset.c
+index 818cf01f0911..6b76c05caba4 100644
+--- a/net/ethtool/strset.c
++++ b/net/ethtool/strset.c
+@@ -75,6 +75,11 @@ static const struct strset_info info_template[] = {
+ 		.count		= __HWTSTAMP_FILTER_CNT,
+ 		.strings	= ts_rx_filter_names,
+ 	},
++	[ETH_SS_TS_FLAGS] = {
++		.per_dev	= false,
++		.count		= __HWTSTAMP_FLAG_CNT,
++		.strings	= ts_flags_names,
++	},
+ 	[ETH_SS_UDP_TUNNEL_TYPES] = {
+ 		.per_dev	= false,
+ 		.count		= __ETHTOOL_UDP_TUNNEL_TYPE_CNT,
+diff --git a/net/ethtool/tsconfig.c b/net/ethtool/tsconfig.c
+index 9188e088fb2f..2be356bdfe87 100644
+--- a/net/ethtool/tsconfig.c
++++ b/net/ethtool/tsconfig.c
+@@ -54,7 +54,7 @@ static int tsconfig_prepare_data(const struct ethnl_req_info *req_base,
+ 
+ 	data->hwtst_config.tx_type = BIT(cfg.tx_type);
+ 	data->hwtst_config.rx_filter = BIT(cfg.rx_filter);
+-	data->hwtst_config.flags = BIT(cfg.flags);
++	data->hwtst_config.flags = cfg.flags;
+ 
+ 	data->hwprov_desc.index = -1;
+ 	hwprov = rtnl_dereference(dev->hwprov);
+@@ -91,10 +91,16 @@ static int tsconfig_reply_size(const struct ethnl_req_info *req_base,
+ 
+ 	BUILD_BUG_ON(__HWTSTAMP_TX_CNT > 32);
+ 	BUILD_BUG_ON(__HWTSTAMP_FILTER_CNT > 32);
++	BUILD_BUG_ON(__HWTSTAMP_FLAG_CNT > 32);
+ 
+-	if (data->hwtst_config.flags)
+-		/* _TSCONFIG_HWTSTAMP_FLAGS */
+-		len += nla_total_size(sizeof(u32));
++	if (data->hwtst_config.flags) {
++		ret = ethnl_bitset32_size(&data->hwtst_config.flags,
++					  NULL, __HWTSTAMP_FLAG_CNT,
++					  ts_flags_names, compact);
++		if (ret < 0)
++			return ret;
++		len += ret;	/* _TSCONFIG_HWTSTAMP_FLAGS */
++	}
+ 
+ 	if (data->hwtst_config.tx_type) {
+ 		ret = ethnl_bitset32_size(&data->hwtst_config.tx_type,
+@@ -130,8 +136,10 @@ static int tsconfig_fill_reply(struct sk_buff *skb,
+ 	int ret;
+ 
+ 	if (data->hwtst_config.flags) {
+-		ret = nla_put_u32(skb, ETHTOOL_A_TSCONFIG_HWTSTAMP_FLAGS,
+-				  data->hwtst_config.flags);
++		ret = ethnl_put_bitset32(skb, ETHTOOL_A_TSCONFIG_HWTSTAMP_FLAGS,
++					 &data->hwtst_config.flags, NULL,
++					 __HWTSTAMP_FLAG_CNT,
++					 ts_flags_names, compact);
+ 		if (ret < 0)
+ 			return ret;
+ 	}
+@@ -180,7 +188,7 @@ const struct nla_policy ethnl_tsconfig_set_policy[ETHTOOL_A_TSCONFIG_MAX + 1] =
+ 	[ETHTOOL_A_TSCONFIG_HEADER] = NLA_POLICY_NESTED(ethnl_header_policy),
+ 	[ETHTOOL_A_TSCONFIG_HWTSTAMP_PROVIDER] =
+ 		NLA_POLICY_NESTED(ethnl_ts_hwtst_prov_policy),
+-	[ETHTOOL_A_TSCONFIG_HWTSTAMP_FLAGS] = { .type = NLA_U32 },
++	[ETHTOOL_A_TSCONFIG_HWTSTAMP_FLAGS] = { .type = NLA_NESTED },
+ 	[ETHTOOL_A_TSCONFIG_RX_FILTERS] = { .type = NLA_NESTED },
+ 	[ETHTOOL_A_TSCONFIG_TX_TYPES] = { .type = NLA_NESTED },
+ };
+@@ -296,6 +304,7 @@ static int ethnl_set_tsconfig(struct ethnl_req_info *req_base,
+ 
+ 	BUILD_BUG_ON(__HWTSTAMP_TX_CNT >= 32);
+ 	BUILD_BUG_ON(__HWTSTAMP_FILTER_CNT >= 32);
++	BUILD_BUG_ON(__HWTSTAMP_FLAG_CNT > 32);
+ 
+ 	if (!netif_device_present(dev))
+ 		return -ENODEV;
+@@ -377,9 +386,13 @@ static int ethnl_set_tsconfig(struct ethnl_req_info *req_base,
+ 	}
+ 
+ 	if (tb[ETHTOOL_A_TSCONFIG_HWTSTAMP_FLAGS]) {
+-		ethnl_update_u32(&hwtst_config.flags,
+-				 tb[ETHTOOL_A_TSCONFIG_HWTSTAMP_FLAGS],
+-				 &config_mod);
++		ret = ethnl_update_bitset32(&hwtst_config.flags,
++					    __HWTSTAMP_FLAG_CNT,
++					    tb[ETHTOOL_A_TSCONFIG_HWTSTAMP_FLAGS],
++					    ts_flags_names, info->extack,
++					    &config_mod);
++		if (ret < 0)
++			goto err_free_hwprov;
+ 	}
+ 
+ 	ret = net_hwtstamp_validate(&hwtst_config);
 -- 
-rsa4096: 3B10 0CA1 8674 ACBA B4FE  FCD2 CE5B CF17 9960 DE13
-ed25519: FFB4 0CC3 7F2E 091D F7DA  356E CC79 2832 ED38 CB05
+2.34.1
+
 
