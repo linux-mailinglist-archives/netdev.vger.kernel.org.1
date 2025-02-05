@@ -1,179 +1,149 @@
-Return-Path: <netdev+bounces-162864-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-162865-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9AFC0A28358
-	for <lists+netdev@lfdr.de>; Wed,  5 Feb 2025 05:22:21 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 65FC6A2836C
+	for <lists+netdev@lfdr.de>; Wed,  5 Feb 2025 05:44:04 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 35B14166331
-	for <lists+netdev@lfdr.de>; Wed,  5 Feb 2025 04:22:20 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E36261641D5
+	for <lists+netdev@lfdr.de>; Wed,  5 Feb 2025 04:44:02 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C30C0215178;
-	Wed,  5 Feb 2025 04:22:15 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A6F58217F23;
+	Wed,  5 Feb 2025 04:43:58 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.microsoft.com header.i=@linux.microsoft.com header.b="bTuuOo8k"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="YvxmL/kz"
 X-Original-To: netdev@vger.kernel.org
-Received: from linux.microsoft.com (linux.microsoft.com [13.77.154.182])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4D3AF2144B1;
-	Wed,  5 Feb 2025 04:22:14 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=13.77.154.182
+Received: from mail-wm1-f43.google.com (mail-wm1-f43.google.com [209.85.128.43])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B58F420FAA0;
+	Wed,  5 Feb 2025 04:43:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.43
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1738729335; cv=none; b=UmoFfjEpgFd3EGxEtWfa5HGwK/Gbrr9zXF8iowq56Pzu1+g6bKygUBJpg9TUONyl7C/t+xT3Csfxf5yMim5raAQGgMZ6BeYGWsJtGfS9Guoo8qSoPlGv7rIbdRRLo+eB3IG1h6XmktgwmNn4QcVTymm4SLoV0YpdOgnl3E5QKP8=
+	t=1738730638; cv=none; b=TF3j9TSSKS3cpMC+8zhYx3hBXAuE5wWYyodVnJkNUUU3++QYTx3et+hOxh5XxQezENuoS+6NB1Chu/ISgfgi28wqYHI7wMRCAyx4d7lywHwEi9pkiw0d8IIsf7gtkS2A0OgY42WElQ+plK9Dvt2qic5+OKN96hzglxB4l4gmoPY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1738729335; c=relaxed/simple;
-	bh=rXaSMbKjSWt+UrNXUk/ubns1wy2+K2yOFEWy+B10Wrg=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References; b=F80upLSA4cVFes6XupDMTAvGsof7Qyo1TqakKtnmr9BMAUXGgXtr5ot9PKSvAjvCvSG0lSb8zK69jTO/6BL+K5s4kPqLZWoRX/cgIiRFW7F7bW2MalQDnzZHzV3mSeC3V11Uv3VRzrfRHspW83lpjIwxmkMZSuhRosPOgFh7XBI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.microsoft.com; spf=pass smtp.mailfrom=linux.microsoft.com; dkim=pass (1024-bit key) header.d=linux.microsoft.com header.i=@linux.microsoft.com header.b=bTuuOo8k; arc=none smtp.client-ip=13.77.154.182
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.microsoft.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.microsoft.com
-Received: by linux.microsoft.com (Postfix, from userid 1134)
-	id 06867203F584; Tue,  4 Feb 2025 20:22:14 -0800 (PST)
-DKIM-Filter: OpenDKIM Filter v2.11.0 linux.microsoft.com 06867203F584
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.microsoft.com;
-	s=default; t=1738729334;
-	bh=4vP4GJGC4U3rGoXjZTk01loKFV6lKxkjch22Z/SsroM=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=bTuuOo8kPrSkxo+Z42WcIEOyhzlmidHr9+OrBcJGZxoquGdu1bxwFyP4ezQi7N2J4
-	 iMbMoJeZVtOx/gRfeNp5SphlfBrq8FT+TXArDUaSvstbK8/HvK6zSyM89IG7WwAyHT
-	 U0GeOSwtQBggPBlL6oHbSsJEzPvowEcsVtZZhSDg=
-From: Shradha Gupta <shradhagupta@linux.microsoft.com>
-To: linux-hyperv@vger.kernel.org,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Cc: Shradha Gupta <shradhagupta@linux.microsoft.com>,
-	"K. Y. Srinivasan" <kys@microsoft.com>,
-	Haiyang Zhang <haiyangz@microsoft.com>,
-	Wei Liu <wei.liu@kernel.org>,
-	Dexuan Cui <decui@microsoft.com>,
+	s=arc-20240116; t=1738730638; c=relaxed/simple;
+	bh=FCeGUPKsvvCyKeFqox4OE6RFUhrCVn+hS26N19D9xAE=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=kVrATZ5JirYjXz0dwXuLBDOy/4m0Adn0DobfUehmf1ugasZ6Lz/cb7a3kEr0kj9VZl6bIacwv0Ma2PqUcq5slALiGrS2TJUVTwVf/p4W5YhpIXBt4L4UCusxPSsqzF/y9OxwS+tvre5w1Wh0ea9WltDSeZn/HsH+kxeNZ3QsH6o=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=YvxmL/kz; arc=none smtp.client-ip=209.85.128.43
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-wm1-f43.google.com with SMTP id 5b1f17b1804b1-43634b570c1so44710995e9.0;
+        Tue, 04 Feb 2025 20:43:56 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1738730635; x=1739335435; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=MeueWQH2gkF6PFSsIyc1iKuZuH/4fSL+B6k2prNZ2+w=;
+        b=YvxmL/kzgMIar9F7tXs7c+Enjt6/s1dipF31qgZ/sSml5+DlVj0YWEFU8omp9MuA14
+         nNgm6Rm3Q8ttrkupvFUcTkDNH3pyh8Wa68aR6CfiWEJdT+JDm2AjDpKNBV1C80NIbeZy
+         CLvdZLBWCG1Xu2sPCIW2B12lfHgEisNtLXHTTG0FFOR5UCoDjsotvEBWViEI/UprXIbU
+         /QTHFY/wcAv/2YHwjCbnRKVBD+Tpn/pX/v8ynTqItVozQBtydRA7hsjPJX/2APtToaEv
+         9PvdizbGYAmCzx4VX8Wm5RYVvzFQsVS/Jqi8N27unbUhamSGY+QODVsdJEqQhbzc1HxC
+         oJiQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1738730635; x=1739335435;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=MeueWQH2gkF6PFSsIyc1iKuZuH/4fSL+B6k2prNZ2+w=;
+        b=wlKBWkWyaWamtmFDd/Enim/L/MQpIfAHUU1J/vb3nTEK4oF0/lTKnpLjDlH0h/6jef
+         cGL6FQ8iJdTCgILw7oDOLdwArG+My3d2swGiN/BpE7mwPXxTZpR6fiASsSzudPvUP/sV
+         nDLn8JpmeDi3yWsFsr8KVvSgEqSZyBBfYsjrQAgX8JU80UhrHYl2mXYXSrxwGJAB5idn
+         x5MEUpn9YNcYu6aPS1vWh0WPB+e/XaUQZ2Cfb7jWZPDy2KSIuznMKJReDXBCNg+ixMY7
+         DfuYikfU5rtZO010l/FxprV+ipDDGZVOXYpbHJjsiPjiOWmqGqVijEcomor91hQ0eWPc
+         bdtg==
+X-Forwarded-Encrypted: i=1; AJvYcCUKOlPFiwtSK6zKZXIovRK5YA1siQUg3y9MfXT6a0FIGgFh8NbuGvS4uIgWdc5TfG/E37GsLoJGu0IC@vger.kernel.org, AJvYcCWAuorW4xbVbJFbD8DcOnAq28xF7iuVRl8t/bMOR6DQh6hDJ2BLgdK6w92uYtgevOb95niamU/+NxfrSCcp@vger.kernel.org, AJvYcCXZx180l2s5HouA0qskPMQi+M+WIeVTYSzceLUSaBFpwC2aPcvLrYz+uoJLOqa6sQMsdyjU3yGl@vger.kernel.org
+X-Gm-Message-State: AOJu0Yz57iAOc1hK05P8cYXGBE2wPJXfpaFOtW+m63rLEXuN7gYhWVfW
+	X9ntPCiWxrOsz0yWxvms/O6v/jkX568+lnmNI8K0rxi0Rc8DI6df
+X-Gm-Gg: ASbGnctjOXwVOpNy/ZLAf7ynZ50E8881lTby/nMc4zEjQjq1QkzUhjEeFg5bA1UPNrt
+	BVGnHDT0zcxSy/tErc0IwSKOouo9etOWDNUCTRRoCMzYO3+4mSyrInEjjv/DnfsS21hOMsCYwdr
+	jEMcEch6W+LcPRlX8CjnZurPgs+m5DvXmqOFazGTUalPhuFFKhpopT2rVpOBj8uurCYIzrRR8EE
+	L0nQx22Ue47ApG4ed4BDiUyG7o1ux58G9eBkcsPTQT1P4nsUOJ65VsYcGzycJ5MMkTVesUjt3uk
+	E8wX9aclSbeC
+X-Google-Smtp-Source: AGHT+IHim/qQSXAp2trAKetGQxzqxN/o9+n5pBcBGfwYnNtjzFKGFwpRx5LFDGnn1oQq2RDf6KAWng==
+X-Received: by 2002:a05:6000:1445:b0:38d:b114:4be4 with SMTP id ffacd0b85a97d-38db490f4fbmr629649f8f.47.1738730634562;
+        Tue, 04 Feb 2025 20:43:54 -0800 (PST)
+Received: from debian ([2a00:79c0:661:ad00:45fb:7d1a:5e4d:9727])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-38dac89b519sm3390949f8f.100.2025.02.04.20.43.51
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 04 Feb 2025 20:43:52 -0800 (PST)
+Date: Wed, 5 Feb 2025 05:43:49 +0100
+From: Dimitri Fedrau <dima.fedrau@gmail.com>
+To: "Rob Herring (Arm)" <robh@kernel.org>
+Cc: Dimitri Fedrau <dimitri.fedrau@liebherr.com>,
+	Florian Fainelli <f.fainelli@gmail.com>,
+	Conor Dooley <conor+dt@kernel.org>,
+	Heiner Kallweit <hkallweit1@gmail.com>,
 	Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Long Li <longli@microsoft.com>,
-	Konstantin Taranov <kotaranov@microsoft.com>,
-	Souradeep Chakrabarti <schakrabarti@linux.microsoft.com>,
-	Erick Archer <erick.archer@outlook.com>,
-	Shradha Gupta <shradhagupta@microsoft.com>
-Subject: [PATCH 2/2] hv_netvsc: Use VF's tso_max_size value when data path is VF
-Date: Tue,  4 Feb 2025 20:21:55 -0800
-Message-Id: <1738729316-25922-1-git-send-email-shradhagupta@linux.microsoft.com>
-X-Mailer: git-send-email 1.8.3.1
-In-Reply-To: <1738729257-25510-1-git-send-email-shradhagupta@linux.microsoft.com>
-References: <1738729257-25510-1-git-send-email-shradhagupta@linux.microsoft.com>
+	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
+	Andrew Davis <afd@ti.com>, Andrew Lunn <andrew@lunn.ch>,
+	linux-kernel@vger.kernel.org, Russell King <linux@armlinux.org.uk>,
+	netdev@vger.kernel.org, Jakub Kicinski <kuba@kernel.org>,
+	devicetree@vger.kernel.org,
+	Krzysztof Kozlowski <krzk+dt@kernel.org>,
+	"David S. Miller" <davem@davemloft.net>
+Subject: Re: [PATCH net-next v3 1/3] dt-bindings: net: ethernet-phy: add
+ property tx-amplitude-100base-tx-percent
+Message-ID: <20250205044349.GA3831@debian>
+References: <20250204-dp83822-tx-swing-v3-0-9798e96500d9@liebherr.com>
+ <20250204-dp83822-tx-swing-v3-1-9798e96500d9@liebherr.com>
+ <173867928985.2681882.12579959912610885418.robh@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <173867928985.2681882.12579959912610885418.robh@kernel.org>
 
-On Azure, increasing VF's TCP segment size to up-to GSO_MAX_SIZE
-is not possible without allowing the same for netvsc NIC
-(as the NICs are bonded together). For bonded NICs, the min of the max
-segment size of the members is propagated in the stack.
+Am Tue, Feb 04, 2025 at 08:28:09AM -0600 schrieb Rob Herring (Arm):
+> 
+> On Tue, 04 Feb 2025 14:09:15 +0100, Dimitri Fedrau wrote:
+> > Add property tx-amplitude-100base-tx-percent in the device tree bindings
+> > for configuring the tx amplitude of 100BASE-TX PHYs. Modifying it can be
+> > necessary to compensate losses on the PCB and connector, so the voltages
+> > measured on the RJ45 pins are conforming.
+> > 
+> > Signed-off-by: Dimitri Fedrau <dimitri.fedrau@liebherr.com>
+> > ---
+> >  Documentation/devicetree/bindings/net/ethernet-phy.yaml | 7 +++++++
+> >  1 file changed, 7 insertions(+)
+> > 
+> 
+> My bot found errors running 'make dt_binding_check' on your patch:
+> 
+> yamllint warnings/errors:
+> 
+> dtschema/dtc warnings/errors:
+> /builds/robherring/dt-review-ci/linux/Documentation/devicetree/bindings/net/ethernet-phy.yaml: properties:tx-amplitude-100base-tx-percent: '$ref' should not be valid under {'const': '$ref'}
+> 	hint: Standard unit suffix properties don't need a type $ref
+> 	from schema $id: http://devicetree.org/meta-schemas/core.yaml#
+> 
+> doc reference errors (make refcheckdocs):
+> 
+> See https://patchwork.ozlabs.org/project/devicetree-bindings/patch/20250204-dp83822-tx-swing-v3-1-9798e96500d9@liebherr.com
+> 
+> The base for the series is generally the latest rc1. A different dependency
+> should be noted in *this* patch.
+> 
+> If you already ran 'make dt_binding_check' and didn't see the above
+> error(s), then make sure 'yamllint' is installed and dt-schema is up to
+> date:
+> 
+> pip3 install dtschema --upgrade
+> 
+> Please check and re-submit after running the above command yourself. Note
+> that DT_SCHEMA_FILES can be set to your schema file to speed up checking
+> your schema. However, it must be unset to test all examples with your schema.
+>
+Thanks, missed to check. Will fix it.
 
-Therefore, we use netif_set_tso_max_size() to set max segment size
-to VF's segment size for netvsc too, when the data path is switched over
-to the VF
-Tested on azure env with Accelerated Networking enabled and disabled.
-
-Signed-off-by: Shradha Gupta <shradhagupta@linux.microsoft.com>
-Reviewed-by: Haiyang Zhang <haiyangz@microsoft.com>
----
- drivers/net/hyperv/hyperv_net.h   |  2 ++
- drivers/net/hyperv/netvsc_drv.c   | 15 +++++++++++++++
- drivers/net/hyperv/rndis_filter.c | 13 +++++++------
- 3 files changed, 24 insertions(+), 6 deletions(-)
-
-diff --git a/drivers/net/hyperv/hyperv_net.h b/drivers/net/hyperv/hyperv_net.h
-index e690b95b1bbb..def41067ea3f 100644
---- a/drivers/net/hyperv/hyperv_net.h
-+++ b/drivers/net/hyperv/hyperv_net.h
-@@ -1166,6 +1166,8 @@ struct netvsc_device {
- 	u32 max_chn;
- 	u32 num_chn;
- 
-+	u32 netvsc_gso_max_size;
-+
- 	atomic_t open_chn;
- 	struct work_struct subchan_work;
- 	wait_queue_head_t subchan_open;
-diff --git a/drivers/net/hyperv/netvsc_drv.c b/drivers/net/hyperv/netvsc_drv.c
-index d6c4abfc3a28..4696939f08a0 100644
---- a/drivers/net/hyperv/netvsc_drv.c
-+++ b/drivers/net/hyperv/netvsc_drv.c
-@@ -2461,6 +2461,21 @@ static int netvsc_vf_changed(struct net_device *vf_netdev, unsigned long event)
- 	} else {
- 		netdev_info(ndev, "Data path switched %s VF: %s\n",
- 			    vf_is_up ? "to" : "from", vf_netdev->name);
-+
-+		/* In Azure, when accelerated networking in enabled, other NICs
-+		 * like MANA, MLX, are configured as a bonded nic with
-+		 * netvsc(failover) NIC. For bonded NICs, the min of the max
-+		 * segment size of the members is propagated in the stack.
-+		 * In order to allow these NICs (MANA/MLX) to use up to
-+		 * GSO_MAX_SIZE segment size, we need to allow netvsc NIC to
-+		 * also support this in the guest.
-+		 * This value is only increased for netvsc NIC when datapath is
-+		 * switched over to the VF
-+		 */
-+		if (vf_is_up)
-+			netif_set_tso_max_size(ndev, vf_netdev->tso_max_size);
-+		else
-+			netif_set_tso_max_size(ndev, netvsc_dev->netvsc_gso_max_size);
- 	}
- 
- 	return NOTIFY_OK;
-diff --git a/drivers/net/hyperv/rndis_filter.c b/drivers/net/hyperv/rndis_filter.c
-index c0ceeef4fcd8..82747dfacd70 100644
---- a/drivers/net/hyperv/rndis_filter.c
-+++ b/drivers/net/hyperv/rndis_filter.c
-@@ -1356,9 +1356,10 @@ static int rndis_netdev_set_hwcaps(struct rndis_device *rndis_device,
- 	struct net_device_context *net_device_ctx = netdev_priv(net);
- 	struct ndis_offload hwcaps;
- 	struct ndis_offload_params offloads;
--	unsigned int gso_max_size = GSO_LEGACY_MAX_SIZE;
- 	int ret;
- 
-+	nvdev->netvsc_gso_max_size = GSO_LEGACY_MAX_SIZE;
-+
- 	/* Find HW offload capabilities */
- 	ret = rndis_query_hwcaps(rndis_device, nvdev, &hwcaps);
- 	if (ret != 0)
-@@ -1390,8 +1391,8 @@ static int rndis_netdev_set_hwcaps(struct rndis_device *rndis_device,
- 			offloads.lso_v2_ipv4 = NDIS_OFFLOAD_PARAMETERS_LSOV2_ENABLED;
- 			net->hw_features |= NETIF_F_TSO;
- 
--			if (hwcaps.lsov2.ip4_maxsz < gso_max_size)
--				gso_max_size = hwcaps.lsov2.ip4_maxsz;
-+			if (hwcaps.lsov2.ip4_maxsz < nvdev->netvsc_gso_max_size)
-+				nvdev->netvsc_gso_max_size = hwcaps.lsov2.ip4_maxsz;
- 		}
- 
- 		if (hwcaps.csum.ip4_txcsum & NDIS_TXCSUM_CAP_UDP4) {
-@@ -1411,8 +1412,8 @@ static int rndis_netdev_set_hwcaps(struct rndis_device *rndis_device,
- 			offloads.lso_v2_ipv6 = NDIS_OFFLOAD_PARAMETERS_LSOV2_ENABLED;
- 			net->hw_features |= NETIF_F_TSO6;
- 
--			if (hwcaps.lsov2.ip6_maxsz < gso_max_size)
--				gso_max_size = hwcaps.lsov2.ip6_maxsz;
-+			if (hwcaps.lsov2.ip6_maxsz < nvdev->netvsc_gso_max_size)
-+				nvdev->netvsc_gso_max_size = hwcaps.lsov2.ip6_maxsz;
- 		}
- 
- 		if (hwcaps.csum.ip6_txcsum & NDIS_TXCSUM_CAP_UDP6) {
-@@ -1438,7 +1439,7 @@ static int rndis_netdev_set_hwcaps(struct rndis_device *rndis_device,
- 	 */
- 	net->features &= ~NETVSC_SUPPORTED_HW_FEATURES | net->hw_features;
- 
--	netif_set_tso_max_size(net, gso_max_size);
-+	netif_set_tso_max_size(net, nvdev->netvsc_gso_max_size);
- 
- 	ret = rndis_filter_set_offload_params(net, nvdev, &offloads);
- 
--- 
-2.34.1
-
+Best regards,
+Dimitri Fedrau
 
