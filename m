@@ -1,95 +1,92 @@
-Return-Path: <netdev+bounces-162893-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-162892-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3ED14A28500
-	for <lists+netdev@lfdr.de>; Wed,  5 Feb 2025 08:37:14 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5F0FCA284EE
+	for <lists+netdev@lfdr.de>; Wed,  5 Feb 2025 08:26:33 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 921777A1D60
-	for <lists+netdev@lfdr.de>; Wed,  5 Feb 2025 07:36:18 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E6815166CBA
+	for <lists+netdev@lfdr.de>; Wed,  5 Feb 2025 07:26:31 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9A63E21773C;
-	Wed,  5 Feb 2025 07:37:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 727AE2288E9;
+	Wed,  5 Feb 2025 07:26:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=sipsolutions.net header.i=@sipsolutions.net header.b="hgpyXItA"
 X-Original-To: netdev@vger.kernel.org
-Received: from chinatelecom.cn (smtpnm6-09.21cn.com [182.42.152.55])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 24BDA25A649
-	for <netdev@vger.kernel.org>; Wed,  5 Feb 2025 07:37:03 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=182.42.152.55
+Received: from sipsolutions.net (s3.sipsolutions.net [168.119.38.16])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9F362228387;
+	Wed,  5 Feb 2025 07:26:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=168.119.38.16
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1738741028; cv=none; b=YfARlhMk4ZJbiEBVAJc0KSwltUGGEXbrxBSZJZwBx/pGU26DQq+POwndjwcSQ8VTwfNhQSCWK1GgZTW0kfBT6XO3HeKUsL5PwUEyiNS8wr0jwCPlla0KMGnlb493F49BVbOXwH8MNsFb7SG4hLo7CwAziw+4dHmZJehZVTPrH48=
+	t=1738740386; cv=none; b=nEoYccG6U6Qz5KHsyjbU6Un5HlgwCc0CovSEsiF1gQ67TzS/xftatWGavhFbQKFfXWusDnmv1+lY4h9KxBvFMrepgrsLXD2PMM7bT59p27gjxDX1VbXRGshcN9//J4vqoFp/FzFJk8WahRCVD6RpxukLPI52fX8HJxdHZBbn7kE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1738741028; c=relaxed/simple;
-	bh=ho0NXURDL77T+dgu2a0+uk7wR4lwCiwMAWQcxWGSGVg=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=ITXMUlXzi8UgksX4x4sjymbUP/AC8XIyL9o/eOTq89U47NRgC4ALma6nmhKZHDTemtOdzJ/T+e2vYjOf/ldC7u9uqshOqsNc6WWthBJTdoiBssknyvOwTs0K+FWc6TN0QoLLzJPQlknWzspdaZINbKcFEVaC1X6OJ/dmL4Tkfn4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=chinatelecom.cn; spf=pass smtp.mailfrom=chinatelecom.cn; arc=none smtp.client-ip=182.42.152.55
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=chinatelecom.cn
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=chinatelecom.cn
-HMM_SOURCE_IP:192.168.139.44:0.461118916
-HMM_ATTACHE_NUM:0000
-HMM_SOURCE_TYPE:SMTP
-Received: from clientip-27.148.194.71 (unknown [192.168.139.44])
-	by chinatelecom.cn (HERMES) with SMTP id 679C81100019C;
-	Wed,  5 Feb 2025 15:25:22 +0800 (CST)
-X-189-SAVE-TO-SEND: liyonglong@chinatelecom.cn
-Received: from  ([27.148.194.71])
-	by gateway-ssl-dep-84dfd8c7d7-g6c8d with ESMTP id 976b27694c1244948071f19fd834903e for kuba@kernel.org;
-	Wed, 05 Feb 2025 15:25:29 CST
-X-Transaction-ID: 976b27694c1244948071f19fd834903e
-X-Real-From: liyonglong@chinatelecom.cn
-X-Receive-IP: 27.148.194.71
-X-MEDUSA-Status: 0
-Sender: liyonglong@chinatelecom.cn
-Message-ID: <c0ccfff2-3995-430b-b762-e055861c4247@chinatelecom.cn>
-Date: Wed, 5 Feb 2025 15:25:21 +0800
+	s=arc-20240116; t=1738740386; c=relaxed/simple;
+	bh=ZXw3cZSH5PWK8y3e8y6gpVJYCFx9eZq4tClHzqdTihU=;
+	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
+	 Content-Type:MIME-Version; b=ZKtDmHvf2uwXXZR+sm1tV1oDXL+aPgyOJ78hTE2EX9tc0UprKNRJwodWwggjWVZX41rrxwXD2eAAyFMP1E/4wBwp4eCPMSEl80jOBWRgAmxMXveAyQuTXpuUj4yIlYsRXEBv1MwOo0QHLC5scz3bFCCJWeQ9227pLO19IN4JGso=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=sipsolutions.net; spf=pass smtp.mailfrom=sipsolutions.net; dkim=pass (2048-bit key) header.d=sipsolutions.net header.i=@sipsolutions.net header.b=hgpyXItA; arc=none smtp.client-ip=168.119.38.16
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=sipsolutions.net
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=sipsolutions.net
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=sipsolutions.net; s=mail; h=MIME-Version:Content-Transfer-Encoding:
+	Content-Type:References:In-Reply-To:Date:Cc:To:From:Subject:Message-ID:Sender
+	:Reply-To:Content-ID:Content-Description:Resent-Date:Resent-From:Resent-To:
+	Resent-Cc:Resent-Message-ID; bh=ZXw3cZSH5PWK8y3e8y6gpVJYCFx9eZq4tClHzqdTihU=;
+	t=1738740384; x=1739949984; b=hgpyXItACWjLpf3R3ZkeMdepWGNWTsrdbficyuv3Ss9gCws
+	tXUipL++mYakGcWMMdpGJRXfypSVTs1qID+O74hRLytMgzD+CmRPtbLmaGbRZItp3wyS/pNGyTI9P
+	npee74JC1AQrqhURLWdxFsHdrzsNsGcGz8FkgtgdsBHketCYY5ohbSmQnZNZ6jaETzEkUu1YmlMyI
+	PrILUKkCZthX2fvkTyJAmcmm5Pdjb8kyQlOtQW3JwiaFTqWTy2deYaCkqEU8dGZsnRwixNAuJL/Qj
+	F67nW0AwcKrP/LiX/Aep8oipCpkboLajQP8r4wf0ujHky8Fosj/ihNF/PFfroPuA==;
+Received: by sipsolutions.net with esmtpsa (TLS1.3:ECDHE_X25519__RSA_PSS_RSAE_SHA256__AES_256_GCM:256)
+	(Exim 4.98)
+	(envelope-from <johannes@sipsolutions.net>)
+	id 1tfZnA-00000003gM4-0j6f;
+	Wed, 05 Feb 2025 08:25:50 +0100
+Message-ID: <5d70ec0708ec351efb530a53f0a2c6ad0503bcbb.camel@sipsolutions.net>
+Subject: Re: [PATCH v2 1/2] net, treewide: define and use MAC_ADDR_LEN
+From: Johannes Berg <johannes@sipsolutions.net>
+To: Uday Shankar <ushankar@purestorage.com>, Breno Leitao
+ <leitao@debian.org>,  Andrew Lunn <andrew+netdev@lunn.ch>, "David S.
+ Miller" <davem@davemloft.net>, Eric Dumazet	 <edumazet@google.com>, Jakub
+ Kicinski <kuba@kernel.org>, Paolo Abeni	 <pabeni@redhat.com>, Srinivas
+ Kandagatla <srinivas.kandagatla@linaro.org>, 
+ =?UTF-8?Q?Rafa=C5=82_Mi=C5=82ecki?=	 <rafal@milecki.pl>, Simon Horman
+ <horms@kernel.org>, Andrew Morton	 <akpm@linux-foundation.org>, Jonathan
+ Corbet <corbet@lwn.net>
+Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	linux-wireless@vger.kernel.org, linux-doc@vger.kernel.org
+Date: Wed, 05 Feb 2025 08:25:46 +0100
+In-Reply-To: <20250204-netconsole-v2-1-5ef5eb5f6056@purestorage.com>
+References: <20250204-netconsole-v2-0-5ef5eb5f6056@purestorage.com>
+	 <20250204-netconsole-v2-1-5ef5eb5f6056@purestorage.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+User-Agent: Evolution 3.54.3 (3.54.3-1.fc41) 
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH] seg6: inherit inner IPv4 TTL on ip4ip6 encapsulation
-Content-Language: en-US
-To: Jakub Kicinski <kuba@kernel.org>,
- Ahmed Abdelsalam <ahabdels.dev@gmail.com>
-Cc: netdev@vger.kernel.org, davem@davemloft.net, dsahern@kernel.org,
- edumazet@google.com, liyonglong@chiantelecom.cn
-References: <1736995236-23063-1-git-send-email-liyonglong@chinatelecom.cn>
- <20250120145144.3e072efe@kernel.org>
- <CAAvhMUmdse_8GJtn_dD0psRmSA_BCy-fv6eYj9CorpaeVm-H3g@mail.gmail.com>
- <20250123074824.5c3567e9@kernel.org>
-From: YonglongLi <liyonglong@chinatelecom.cn>
-In-Reply-To: <20250123074824.5c3567e9@kernel.org>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+X-malware-bazaar: not-scanned
 
+On Tue, 2025-02-04 at 14:41 -0700, Uday Shankar wrote:
+> There are a few places in the tree which compute the length of the
+> string representation of a MAC address as 3 * ETH_ALEN - 1. Define a
+> constant for this and use it where relevant. No functionality changes
+> are expected.
 
+True ... but is "MAC_ADDR_LEN" really an appropriate name for that? Just
+plain reading the subject, my first thought was why you weren't going to
+use ETH_ALEN.
 
-On 1/23/2025 23:48, 【外部账号】 Jakub Kicinski wrote:
-> On Wed, 22 Jan 2025 11:20:05 +0100 Ahmed Abdelsalam wrote:
->> This patch is not RFC complaint. Section 6.3 of RFC 2473 (Generic Packet
->> Tunneling in IPv6 Specification) discussed IPv6 Tunnel Hop Limit.
->> The hop limit field of the tunnel IPv6 header of each packet encapsulated
->> is set to the hop limit default value of the tunnel entry-point ode.
->> The SRv6 RFC (RFC 8986) inherits the tunnel behavior from RFC2473l
-> 
-> I see. I think this information would be good to have in the commit
-> message. IIRC we do inherit already in other tunnel implementations, 
-> ideally we should elaborate on precedents in Linux behavior in the
-> commit message, too.
-> 
-> reminder: please don't top post on the list
-> 
+Would seem nicer to me, at least, to have something indicating a
+*string* in there, e.g. MAC_ADDR_STR_LEN or so.
 
-Sorry for the late relay. And thanks for your review.
+johannes
 
-Is it ok that copying inner hop limit(TTL) on SRv6 encapsulation just
-like what ip/ip6 tunnel does in Linux implementation?
-if it is ok, I will send v2 which will add more detailed commit message.
-
--- 
-Li YongLong
 
