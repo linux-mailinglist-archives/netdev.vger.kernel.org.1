@@ -1,79 +1,40 @@
-Return-Path: <netdev+bounces-162973-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-162974-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id AA8B6A28AAE
-	for <lists+netdev@lfdr.de>; Wed,  5 Feb 2025 13:48:48 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id C2394A28B11
+	for <lists+netdev@lfdr.de>; Wed,  5 Feb 2025 13:58:11 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 46581163AF1
-	for <lists+netdev@lfdr.de>; Wed,  5 Feb 2025 12:48:47 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 61BE31880307
+	for <lists+netdev@lfdr.de>; Wed,  5 Feb 2025 12:58:16 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id ED374195;
-	Wed,  5 Feb 2025 12:48:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=blackwall-org.20230601.gappssmtp.com header.i=@blackwall-org.20230601.gappssmtp.com header.b="ThMTKZrl"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2C57060B8A;
+	Wed,  5 Feb 2025 12:57:30 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ej1-f53.google.com (mail-ej1-f53.google.com [209.85.218.53])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8266D17E
-	for <netdev@vger.kernel.org>; Wed,  5 Feb 2025 12:48:39 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.53
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0F510F507;
+	Wed,  5 Feb 2025 12:57:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1738759724; cv=none; b=RsFNFliYLlbHbQgCE9wHuF1/uidUJRFLX/4ijZSRJ4EGNOqZFcGPaGo5D5Esc36wmdENV0TaE9JYSW1dH03RCTJ4QLdSvwpmfrXR/E8dq78fCP2FciX/8NHMGlKr7yXm7A7WblTiA9lKzVHkxtq7cdVBkezbB4W5d61L1iKFWuU=
+	t=1738760250; cv=none; b=tIhXt9ur00hY/luXx1Gyx8Iddj4bzxgJe+Cq2FuVCBJFk+cU8OeeqZLpwpQoOV/Fu8ixKJiRwts/jrUqz8ueQTun16xTW7lbgngxmfEt0KWOw+kXUdGFoPVZgaDNpQ6tnTNzFNgOkPTq/D2YkeZiBEFLf8UTFH4XOTp7/JImKss=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1738759724; c=relaxed/simple;
-	bh=xgwz5ySDnjqz7zMFBl/JwA9S9l/TWH8KcZ+sIJ1Cf48=;
+	s=arc-20240116; t=1738760250; c=relaxed/simple;
+	bh=gx24NkCwpwV9AcPPbFrtwlbx9niJwvD4f0qfvasEhoU=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=RIjObGGTbEdmY3jMfXNuqV7DXhEOFjXeuUIMfd8+jN9y6/P28iUoDxmldFTvJR1oURCJSj0FaHOZMH599iUJ2WrCMf2zySfMfAP5R+b0++SnRJ8JskFlklhFXQmF47KTPIWlQa5J3W0jrr8mf/xYG995zyw9zh+hLZ2PS9nfSIU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=blackwall.org; spf=none smtp.mailfrom=blackwall.org; dkim=pass (2048-bit key) header.d=blackwall-org.20230601.gappssmtp.com header.i=@blackwall-org.20230601.gappssmtp.com header.b=ThMTKZrl; arc=none smtp.client-ip=209.85.218.53
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=blackwall.org
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=blackwall.org
-Received: by mail-ej1-f53.google.com with SMTP id a640c23a62f3a-ab7483b9bf7so362839866b.3
-        for <netdev@vger.kernel.org>; Wed, 05 Feb 2025 04:48:39 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=blackwall-org.20230601.gappssmtp.com; s=20230601; t=1738759718; x=1739364518; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=j2rHnh+yAkmQSzzxK5RyiLTSgASQBQ742SO4R1jYfIU=;
-        b=ThMTKZrlGets83sU5dg4nTHWQrWus3+dVZBD1QXI1k7dFYmgEIQusgJEnV9db78Zdo
-         kN6Mvz4rWVTL6iMb4q5Xr+haAg0jwRmktSxoXax0YjmR9Phct1mriZcbr6KdwUMDBwKv
-         MLBzaqFb3l5ySWxFsi1/fwqnt4mrqHkILGNkS9aibV3di788u3GKykDB4erlXur2usmg
-         9/5GpN7oO453NIdFk8mcU1jFzlS2tKN+rTDvZ3odFYjETQPHDcZ4qT5eLd1x5YDWGEMA
-         3FgvTYbgmpBXRJsk3Wu0kIFvg1J+Gy4uQVDfgMM1GUhyxJDGeysD9Tk6J4gvE0E1s5ew
-         eXkg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1738759718; x=1739364518;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=j2rHnh+yAkmQSzzxK5RyiLTSgASQBQ742SO4R1jYfIU=;
-        b=a5tiJWbzwV0on7IeQyHDQMvGA7tHOnO7MdtbyU8wxteElqEr+jjfD0Yalj/0fSTDbg
-         TqyPiQ0IWZHI6pFz4999wkE0pZSb/3JOOKkCxV0RRX5XV9Q/9/5vpCrXpmmG7j42sXx9
-         4APLaH98pUBoeV6SO0noAge3H19eAHqUHCICpylK2PlJ6iK1dJ1X61SHChy6KZVVrT53
-         O2vuRSRuW8JIR5xN/owk7f7MDjBQ+gbVA6pMcpRcZ+oJcu2joeUJ3ZfmlXlJSzTai7kp
-         DUVcsKdhfm6cYH3aIZSwhU+vDmtGEZiMfWmixTI3XVeuzwymxmIeTFy4HwDpgfoY9lPe
-         nBfA==
-X-Forwarded-Encrypted: i=1; AJvYcCW/Eo8p4WW7c/OZ0BhfS20LyRafb8kh4efOkmxgjP652iTujW1XaIsBUDCeOAkPkYLfZl5iWmY=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwNvS6M3wHnjZTTPQFhWDXfWQ8Y0YVluP2SDBfp7z9v5SudW6YB
-	jIDymtoRMofpoUOmH3K9rNDv/mM7kZ+zdfAsKuNaSg+Uard+nEY044DzCSgLwUk=
-X-Gm-Gg: ASbGncvC4RlWI9ZN0qPIkakJ1uiwQ/sALC7BTieTixEoV7Ak/KJtdPed7gdb6W2QYy4
-	p68taKWkXS1aAmoxWNQKmP2HX7HBD4qlkNb9UpbEJWL/gBH4Vc9VHeOjSInjJxk9Jyh3UeHiVGn
-	A+6TSrCHDR/IcU+8fKhJ2BoIxNU2WMlRZW9Ux23Gr5BIOoR5+LU6YXWUcvT5mCWnAVDIg5AgLUm
-	rK4aVqZ/+NH5HV1w14Yz53WepvYzs1lgXY9flKawGNAvhZif7GEnBokGYHeStZr/yGx8OemQWmf
-	0E60O19dPKN2ZarFinhmuIB3GGpzzC8oI+Fw1UwdiUn3ii8=
-X-Google-Smtp-Source: AGHT+IGswvqC0DJo4N9WDGG7KlPK8WPMfL4WNKB01Aq8+lNuY1QIwDotwftexOq+uQkBbb3p/fXCJg==
-X-Received: by 2002:a17:907:2d28:b0:ab3:76fb:96ab with SMTP id a640c23a62f3a-ab75e3403dfmr244747366b.57.1738759717452;
-        Wed, 05 Feb 2025 04:48:37 -0800 (PST)
-Received: from [192.168.0.205] (78-154-15-142.ip.btc-net.bg. [78.154.15.142])
-        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-ab6e47cf88esm1086462766b.46.2025.02.05.04.48.36
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 05 Feb 2025 04:48:36 -0800 (PST)
-Message-ID: <e5373a02-959b-4609-8a3f-7e25c69d97b8@blackwall.org>
-Date: Wed, 5 Feb 2025 14:48:36 +0200
+	 In-Reply-To:Content-Type; b=lWGFsPj09tkbIbsvMNIZ0ZF+3bbpMKJOeamTng0xMBq5vi2OU/2n1FbHhLmBsElrwqgINwc+V0f0RmUKUs/St1v0qq6X9h/s1T3Pl5ZwX9UyhDX0BZi6mfZvWEGABgsCMcJRbI4+r+enCMCthmsIa4Hhg5nVV1Uf9tesIRjy05o=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id D01471007;
+	Wed,  5 Feb 2025 04:57:50 -0800 (PST)
+Received: from [10.57.35.21] (unknown [10.57.35.21])
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 01ABF3F63F;
+	Wed,  5 Feb 2025 04:57:22 -0800 (PST)
+Message-ID: <4294edaf-8621-41b2-9009-7f5f3bb6c7f8@arm.com>
+Date: Wed, 5 Feb 2025 12:57:21 +0000
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -81,60 +42,66 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next] vxlan: vxlan_rcv(): Update comment to inlucde
- ipv6
-To: Ted Chen <znscnchen@gmail.com>
-Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
- pabeni@redhat.com, andrew+netdev@lunn.ch, netdev@vger.kernel.org,
- Ido Schimmel <idosch@idosch.org>
-References: <20250205114448.113966-1-znscnchen@gmail.com>
- <7fcca70c-9bfe-4fd7-b82d-e21f765b8b87@blackwall.org>
- <Z6NcWfVbqDJJ4c11@t-dallas>
-Content-Language: en-US
-From: Nikolay Aleksandrov <razor@blackwall.org>
-In-Reply-To: <Z6NcWfVbqDJJ4c11@t-dallas>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Subject: Re: [PATCH V7 2/5] PCI/TPH: Add Steering Tag support
+To: Wei Huang <wei.huang2@amd.com>, linux-pci@vger.kernel.org,
+ linux-kernel@vger.kernel.org, linux-doc@vger.kernel.org,
+ netdev@vger.kernel.org
+Cc: Jonathan.Cameron@Huawei.com, helgaas@kernel.org, corbet@lwn.net,
+ davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+ pabeni@redhat.com, alex.williamson@redhat.com, gospo@broadcom.com,
+ michael.chan@broadcom.com, ajit.khaparde@broadcom.com,
+ somnath.kotur@broadcom.com, andrew.gospodarek@broadcom.com,
+ manoj.panicker2@amd.com, Eric.VanTassell@amd.com, vadim.fedorenko@linux.dev,
+ horms@kernel.org, bagasdotme@gmail.com, bhelgaas@google.com,
+ lukas@wunner.de, paul.e.luse@intel.com, jing2.liu@intel.com
+References: <20241002165954.128085-1-wei.huang2@amd.com>
+ <20241002165954.128085-3-wei.huang2@amd.com>
+ <a373416b-bf00-4cf7-9b46-bd95599d114c@arm.com>
+ <f6b34f2e-31c9-4997-abfe-38d7e774b4fa@amd.com>
+From: Robin Murphy <robin.murphy@arm.com>
+Content-Language: en-GB
+In-Reply-To: <f6b34f2e-31c9-4997-abfe-38d7e774b4fa@amd.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
 
-On 2/5/25 14:40, Ted Chen wrote:
-> On Wed, Feb 05, 2025 at 02:12:50PM +0200, Nikolay Aleksandrov wrote:
->> On 2/5/25 13:44, Ted Chen wrote:
->>> Update the comment to indicate that both net/ipv4/udp.c and net/ipv6/udp.c
->>> invoke vxlan_rcv() to process packets.
->>>
->>> The comment aligns with that for vxlan_err_lookup().
->>>
->>> Cc: Ido Schimmel <idosch@idosch.org>
->>> Signed-off-by: Ted Chen <znscnchen@gmail.com>
->>> ---
->>>  drivers/net/vxlan/vxlan_core.c | 2 +-
->>>  1 file changed, 1 insertion(+), 1 deletion(-)
->>>
->>> diff --git a/drivers/net/vxlan/vxlan_core.c b/drivers/net/vxlan/vxlan_core.c
->>> index 5ef40ac816cc..8bdf91d1fdfe 100644
->>> --- a/drivers/net/vxlan/vxlan_core.c
->>> +++ b/drivers/net/vxlan/vxlan_core.c
->>> @@ -1684,7 +1684,7 @@ static bool vxlan_ecn_decapsulate(struct vxlan_sock *vs, void *oiph,
->>>  	return err <= 1;
->>>  }
->>>  
->>> -/* Callback from net/ipv4/udp.c to receive packets */
->>> +/* Callback from net/ipv{4,6}/udp.c to receive packets */
->>>  static int vxlan_rcv(struct sock *sk, struct sk_buff *skb)
->>>  {
->>>  	struct vxlan_vni_node *vninode = NULL;
->>
->> Your subject has a typo
->> s/inlucde/include
-> Oops. Sorry for that.
->  
->> IMO these comments are unnecessary, encap_rcv callers are trivial to find.
-> I'm fine with either way. No comment is better than a wrong comment.
-> Please let me know if I need to send a new version to correct the subject or
-> remove the comments for both vxlan_rcv() and vxlan_err_lookup().
+On 2025-02-04 8:18 pm, Wei Huang wrote:
 > 
+> 
+> On 2/4/25 12:33 PM, Robin Murphy wrote:
+>> On 2024-10-02 5:59 pm, Wei Huang wrote:
+>> [...]
+>>> +
+>>> +    if (err) {
+>>> +        pcie_disable_tph(pdev);
+>>> +        return err;
+>>> +    }
+>>> +
+>>> +    set_ctrl_reg_req_en(pdev, pdev->tph_mode);
+>>
+>> Just looking at this code in mainline, and I don't trust my
+>> understanding quite enough to send a patch myself, but doesn't this want
+>> to be pdev->tph_req_type, rather than tph_mode?
+> 
+> Yeah, you are right - this is supposed to be pdev->tph_req_type instead 
+> of tph_mode. We disable TPH first by clearing (zero) the "TPH Requester 
+> Enable" field and needs to set it back using tph_req_type.
+> 
+> Do you want to send in a fix? I can ACK it. Thanks for spotting it.
 
-Up to you, I don't have a strong preference. You have to wait 24 hours
-before posting another version anyway, so you have time to decide. :)
+Done[1] - cheers for confirming!
+
+Robin.
+
+
+[1] 
+https://lore.kernel.org/linux-pci/13118098116d7bce07aa20b8c52e28c7d1847246.1738759933.git.robin.murphy@arm.com/
+
+> 
+> -Wei
+> 
+>>
+>> Thanks,
+>> Robin.
+>>
 
 
