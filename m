@@ -1,101 +1,62 @@
-Return-Path: <netdev+bounces-163170-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-163171-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id B4132A297D1
-	for <lists+netdev@lfdr.de>; Wed,  5 Feb 2025 18:46:30 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3E308A297E6
+	for <lists+netdev@lfdr.de>; Wed,  5 Feb 2025 18:48:49 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 5CD881885C36
-	for <lists+netdev@lfdr.de>; Wed,  5 Feb 2025 17:46:31 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 22A9D3A5574
+	for <lists+netdev@lfdr.de>; Wed,  5 Feb 2025 17:47:01 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E9CDE1FE457;
-	Wed,  5 Feb 2025 17:41:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 354001FCFF1;
+	Wed,  5 Feb 2025 17:42:41 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="ZEKOlpeI"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="Lmg6D3HU"
 X-Original-To: netdev@vger.kernel.org
-Received: from fhigh-b8-smtp.messagingengine.com (fhigh-b8-smtp.messagingengine.com [202.12.124.159])
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 251181922C4;
-	Wed,  5 Feb 2025 17:41:05 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=202.12.124.159
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 90B5E1FC7F9;
+	Wed,  5 Feb 2025 17:42:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1738777267; cv=none; b=eTC9r2f2GTXeMVPSjiWK+Lk/T3lgPFz4s+EBCu/w58BVvTIt0t3Wv1uKFIn3WWPyHFI/gU5LScjDZQGD8QPYjccSKncF3p8kvMH/NK+MFI5II0kNZAJh4aPNWuyAIZRUglvOl76YD5XGwVSxBh+KIfEw/xPiIjmU4Ge9AElGjTA=
+	t=1738777361; cv=none; b=Y5mXtidN+k8LgHx9Dd85irtwKS7kbSbGvXUTwYDE8SPZ5uTBDd8GyqG+uujQBDXwxzjZ2LiLidmvhE5FMZwvdgK1krnRMBXQPlTeiGZpCWdT3mdMDsZ246IRblQM7OhpccgLn1vF3FxmVWAKOT7AsaIUxTSPZ6PxplnpfyT+gto=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1738777267; c=relaxed/simple;
-	bh=JviheAOfcGY+fam4/mBliU2Kfgw+lI2qsF7LU6cAtEk=;
+	s=arc-20240116; t=1738777361; c=relaxed/simple;
+	bh=FM4bTy2fIxKJY4YL884gR/k8wuHai1SuESQfqjTjdyc=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=n+pu9zfQDpn4K3Vt5AMxZrnBbCtmCpJGhasP7iJ3PxOQZzrQC62JIU3P69NTE2II1Q0GfhHh1MTty49P3ceU1n25mF6i71utP1mWxlZQ03UMzQjP2N+J2Ld5j79AaSnwPHz5N90U9+nY5LWo1I9PmSO/lB9O0c3sijVcDeYTRbY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=idosch.org; spf=none smtp.mailfrom=idosch.org; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=ZEKOlpeI; arc=none smtp.client-ip=202.12.124.159
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=idosch.org
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=idosch.org
-Received: from phl-compute-01.internal (phl-compute-01.phl.internal [10.202.2.41])
-	by mailfhigh.stl.internal (Postfix) with ESMTP id 822C0254016F;
-	Wed,  5 Feb 2025 12:41:04 -0500 (EST)
-Received: from phl-mailfrontend-02 ([10.202.2.163])
-  by phl-compute-01.internal (MEProxy); Wed, 05 Feb 2025 12:41:05 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
-	messagingengine.com; h=cc:cc:content-type:content-type:date:date
-	:feedback-id:feedback-id:from:from:in-reply-to:in-reply-to
-	:message-id:mime-version:references:reply-to:subject:subject:to
-	:to:x-me-proxy:x-me-sender:x-me-sender:x-sasl-enc; s=fm3; t=
-	1738777264; x=1738863664; bh=JviheAOfcGY+fam4/mBliU2Kfgw+lI2qsF7
-	LU6cAtEk=; b=ZEKOlpeIY1hKtAp2dj02SWmILkEsLYGoHFBIhdaBULcWMVoyQpu
-	KzfAjF8pvjtTF4lN4dnc+yfrdQ3gu5VmdclWrtk+RRblOTrTs+RV/ySBTzhYrIhs
-	We0em8144KiF7E+I59c4mxMgbxGf905v7Sj55jV6FVhrGpOQ3gjipVswyXq/jPQJ
-	U5aUj0w2Vc9yCU+OcHLM3WVcEppDYlKD7L5S9IqaEo2pLfRrVcYtAZWqrThiZFx+
-	tAGxot3+aNI0zc1jcVV0hAMD+p1ttK0t6u3P/C/MsUJJOKio/tQ8rD+1e6MA/1IP
-	4hF07xGbvjG1PH3qhB/QuswNLbOzdldpHkQ==
-X-ME-Sender: <xms:r6KjZ7s7MsnLlVFwDXTvWOa1kjYpINM-exd9-U2Mn05ci8nQd6r87w>
-    <xme:r6KjZ8eMZ05c9ssWZuaZ48i2jNVhIGMTzfwk88dv3Hq_gRidwDIAHTnzR7ouXzEcX
-    ddkZG1IksiVExY>
-X-ME-Received: <xmr:r6KjZ-wSZrt9SGKDgAQk8cUrFe9ZeODH2xbU9scCMJso-3E-rggZonmspkZq>
-X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeefvddrtddtgddvgedtlecutefuodetggdotefrod
-    ftvfcurfhrohhfihhlvgemucfhrghsthforghilhdpggftfghnshhusghstghrihgsvgdp
-    uffrtefokffrpgfnqfghnecuuegrihhlohhuthemuceftddtnecusecvtfgvtghiphhivg
-    hnthhsucdlqddutddtmdenucfjughrpeffhffvvefukfhfgggtuggjsehttdertddttddv
-    necuhfhrohhmpefkughoucfutghhihhmmhgvlhcuoehiughoshgthhesihguohhstghhrd
-    horhhgqeenucggtffrrghtthgvrhhnpeetudfghfelieetjedvhfevfeduvdetgffgudel
-    uefgkeffueeltdejvdettedufeenucffohhmrghinhepihhurdgvughupdhkvghrnhgvlh
-    drohhrghenucevlhhushhtvghrufhiiigvpedtnecurfgrrhgrmhepmhgrihhlfhhrohhm
-    pehiughoshgthhesihguohhstghhrdhorhhgpdhnsggprhgtphhtthhopedvhedpmhhoug
-    gvpehsmhhtphhouhhtpdhrtghpthhtohepmhdqmhgrlhhlrgguihesthhirdgtohhmpdhr
-    tghpthhtoheprhhoghgvrhhqsehkvghrnhgvlhdrohhrghdprhgtphhtthhopegurghnih
-    hshhgrnhifrghrsehtihdrtghomhdprhgtphhtthhopehprggsvghnihesrhgvughhrght
-    rdgtohhmpdhrtghpthhtohepkhhusggrsehkvghrnhgvlhdrohhrghdprhgtphhtthhope
-    gvughumhgriigvthesghhoohhglhgvrdgtohhmpdhrtghpthhtohepuggrvhgvmhesuggr
-    vhgvmhhlohhfthdrnhgvthdprhgtphhtthhopegrnhgurhgvfidonhgvthguvghvsehluh
-    hnnhdrtghhpdhrtghpthhtohepsghpfhesvhhgvghrrdhkvghrnhgvlhdrohhrgh
-X-ME-Proxy: <xmx:r6KjZ6OC6d3nrGjKvfHfIHaG7SURZuoKgzNUQ3ICfgDIzAEcRrQ67w>
-    <xmx:r6KjZ7_VUkzrSRTTwpmM_8MYcyk4CA4pzZxMHqSJs75nyLleEP2aLg>
-    <xmx:r6KjZ6U4SRoztKmYfzJCF1g0Osm-g593CwyW0FLZ9MPOZ_Khp2xNOw>
-    <xmx:r6KjZ8ftyrqq_5yaaFlEazqMapXDZAQ71v9J3gxNSe2pyx39exlAmA>
-    <xmx:sKKjZxPbTGyNchIvuM930pj-PPoTOhF2PZ47K3Ks0DY0owW0elyqGulr>
-Feedback-ID: i494840e7:Fastmail
-Received: by mail.messagingengine.com (Postfix) with ESMTPA; Wed,
- 5 Feb 2025 12:41:02 -0500 (EST)
-Date: Wed, 5 Feb 2025 19:41:00 +0200
-From: Ido Schimmel <idosch@idosch.org>
-To: "Malladi, Meghana" <m-malladi@ti.com>
-Cc: rogerq@kernel.org, danishanwar@ti.com, pabeni@redhat.com,
-	kuba@kernel.org, edumazet@google.com, davem@davemloft.net,
-	andrew+netdev@lunn.ch, bpf@vger.kernel.org,
-	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
-	netdev@vger.kernel.org, robh@kernel.org,
-	matthias.schiffer@ew.tq-group.com, dan.carpenter@linaro.org,
-	rdunlap@infradead.org, diogo.ivo@siemens.com,
-	schnelle@linux.ibm.com, glaroque@baylibre.com,
-	john.fastabend@gmail.com, hawk@kernel.org, daniel@iogearbox.net,
-	ast@kernel.org, srk@ti.com, Vignesh Raghavendra <vigneshr@ti.com>
-Subject: Re: [EXTERNAL] Re: [PATCH net 1/3] net: ti: icssg-prueth: Use
- page_pool API for RX buffer allocation
-Message-ID: <Z6OirBmdSLuY5YkI@shredder>
-References: <20250122124951.3072410-1-m-malladi@ti.com>
- <20250122124951.3072410-2-m-malladi@ti.com>
- <Z5J4jjJ4_arvfF9E@shredder>
- <9287a623-5663-4705-b61a-3ab5f5cb2424@ti.com>
+	 Content-Type:Content-Disposition:In-Reply-To; b=hxJ6GE6D7/D/XTKReMvurYcJIW8ayH/1qhaXUewzdQgDCFTb3vBopFcC8oFIYOuI7poz/rQAEvZW8W1Ux+OnwZxo4Pl96v/gGc5aTfZaiZVjqM+AL/WHk3918+zZVrY/NMDjmtPPAkW+boH+ZfqWB3VcBwBZbzxfLUUSZr47PwU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=Lmg6D3HU; arc=none smtp.client-ip=156.67.10.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=rdd/MEW/P3uHV2EnNuTrQYWSfyS/TwvFxMMuVJeRWHQ=; b=Lmg6D3HUaIPokEWuZLhONeCeGg
+	qgd2hOYcbWwXf9MO9KbU8Dt++GyE5KOIVLQDJ9b/91+wMCHc7XMBCNBjyGvDWPjUazUezJo+NEsbi
+	o/Vyhw+n93/UhfX/SlolsJxrAf6flZmptpVUNuLXpYpYzUWTJs3DHjtpLUkqQdRX+VBc=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1tfjPz-00BFwU-7g; Wed, 05 Feb 2025 18:42:31 +0100
+Date: Wed, 5 Feb 2025 18:42:31 +0100
+From: Andrew Lunn <andrew@lunn.ch>
+To: Oleksij Rempel <o.rempel@pengutronix.de>
+Cc: Heiner Kallweit <hkallweit1@gmail.com>,
+	Russell King <linux@armlinux.org.uk>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	kernel@pengutronix.de, linux-kernel@vger.kernel.org,
+	netdev@vger.kernel.org
+Subject: Re: [PATCH net-next v2 1/2] net: phy: Add support for
+ driver-specific next update time
+Message-ID: <2e316ec4-8f5b-4dbd-96d2-aabc29bfae17@lunn.ch>
+References: <20250205091151.2165678-1-o.rempel@pengutronix.de>
+ <20250205091151.2165678-2-o.rempel@pengutronix.de>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -104,51 +65,22 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <9287a623-5663-4705-b61a-3ab5f5cb2424@ti.com>
+In-Reply-To: <20250205091151.2165678-2-o.rempel@pengutronix.de>
 
-On Tue, Feb 04, 2025 at 11:25:02PM +0530, Malladi, Meghana wrote:
-> Seems like none of the pages which have been allocated aren't getting
-> recycled in the rx path after being used unless its some error case. Will
-> try to fix this.
+> +	if (phy_polling_mode(phydev) && phy_is_started(phydev)) {
+> +		unsigned int next_update_time =
+> +			phy_get_next_update_time(phydev);
+> +
+> +		phy_queue_state_machine(phydev,
+> +					msecs_to_jiffies(next_update_time));
 
-skb_mark_for_recycle() should help with page recycling when an skb that
-uses them is freed.
+Ah, i missed the msecs_to_jiffies() call. But the driver change now
+looks wrong. I think to keep things simple, the API should use
+jiffies, since that is what phy_queue_state_machine() and
+mod_delayed_work() expect.
 
-Anyway, I believe that I don't see put call when tearing down the Rx
-ring because prueth_rx_cleanup() is using page_pool_recycle_direct()
-when it shouldn't. AFAICT, prueth_rx_cleanup() is only called from the
-control path (upon ndo_stop()) and not in NAPI context.
+Did you test with Timer frequency = 100, that should make errors more
+obvious.
 
-> Also I have noticed, in prueth_prepare_rx_chan() pages are allocated per
-> number of descriptors for a channel, but they are not being used when a
-> packet is being recieved (in emac_rx_packet()) and rather new page is
-> allocated for the next upcoming packet. Is this a valid design, what are
-> your thoughts on this ?
-
-The new page is possibly a page that was recycled into the pool when a
-previous packet was freed / dropped.
-
-[...]
-
-> Yes I will add PP_FLAG_DMA_SYNC_DEV as well.
-> I believe page_pool_dma_sync_for_cpu() needs to be called sync Rx page for
-> CPU, am I right ? If so can you tell me, in what all cases should I call
-> this function.
-
-Before accessing the packet data.
-
-> https://lkml.iu.edu/hypermail/linux/kernel/2312.1/06353.html
-> In the above link it is quoted - "Note that this version performs DMA sync
-> unconditionally, even if the associated PP doesn't perform sync-for-device"
-> for the page_pool_dma_sync_for_cpu() function. So does that mean if I am
-> using this function I don't need explicily sync for device call?
-
-It's explained in the page pool documentation:
-
-"Driver is always responsible for syncing the pages for the CPU. Drivers
-may choose to take care of syncing for the device as well or set the
-PP_FLAG_DMA_SYNC_DEV flag to request that pages allocated from the page
-pool are already synced for the device."
-
-https://docs.kernel.org/networking/page_pool.html#dma-sync
+	Andrew
 
