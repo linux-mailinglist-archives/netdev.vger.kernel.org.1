@@ -1,79 +1,89 @@
-Return-Path: <netdev+bounces-163167-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-163168-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9F778A2979A
-	for <lists+netdev@lfdr.de>; Wed,  5 Feb 2025 18:42:14 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 73977A297BC
+	for <lists+netdev@lfdr.de>; Wed,  5 Feb 2025 18:44:53 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 7D0BB1882EB0
-	for <lists+netdev@lfdr.de>; Wed,  5 Feb 2025 17:42:19 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 67A8D1884502
+	for <lists+netdev@lfdr.de>; Wed,  5 Feb 2025 17:44:58 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4FF561FDE0B;
-	Wed,  5 Feb 2025 17:35:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 26B821FC10F;
+	Wed,  5 Feb 2025 17:38:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="5bCldwEu"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="MsLyFODU"
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 918641FBEB5;
-	Wed,  5 Feb 2025 17:35:35 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EBF381FC0EE;
+	Wed,  5 Feb 2025 17:38:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1738776937; cv=none; b=qtTkEsXMeLUcLM/mnkhYgCCTrAPzDS/XcoABLyWDLEmMdEXvUm6sjjMcS24AT2cuTqmBkIx2LyZfYNOkYuRQFDBiDJ4f1NWfeskJJhr3qmWW2WQbQ5sbb/QqM2gUWgsKU7jdhMmcjoPbweix+8aOBxRnErdEG24RWdx8TcVZYdk=
+	t=1738777110; cv=none; b=IHQxqtlxG0DEUx02c5iz1DiuKknSDlyskRTxmOecBloK8f0ySxccEbPZTCTx8h5+TfDYCLRm4Vewig0Ol5cLNE5bB4d297aK8boT0y2Z/T5DDEBi/6zBXLBM+Uf+fetT1u3Q+H0ySx48Z44JNaMc4ynoEgOKAtRvRXeqG6Umias=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1738776937; c=relaxed/simple;
-	bh=RF230ajZK9ScZgY4DNLI12feMN+aiLBGq4A8PJWSIPo=;
+	s=arc-20240116; t=1738777110; c=relaxed/simple;
+	bh=6QJJPtO3WlYPPGSP0H8aWwAJg0ctvHWUXT0e2WNEeHE=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=V4wdsBe6BYlAM8JL8cA5weX7bUyXZt7i0iEIJJu1CZvJP4kSCWnfgNb/OV3GT9aCnKn7ND5PX26P7oPj9zrHyPNJHhKsOxBWUpDU8DtN1+Sroq+yLDB+42niJNkwbJnSezNZQF6LZ2zugTk7KFEVnQS5Ch9NMCuAEwxLvREAHS8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=5bCldwEu; arc=none smtp.client-ip=156.67.10.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=WguZZNGkDfEvvyuO31rjTnIRBf9fhn5uKj5NRs7jMd0=; b=5bCldwEuBaYraPFQB6jSOeP9nB
-	B5ssN2zbZ+WI0SHSK4cQItK18bcfexGKYAXKJZKGWyUDkK8Y/2CNyfm8wMCKB2VEgxNeoqpl7iLBL
-	XcApr933Fcq3ARYnxjmAYSB14BSjQxCtel6rJYd59hTnETtv5CwMMZc/9mhGT6mglRZk=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1tfjJ9-00BFpE-AT; Wed, 05 Feb 2025 18:35:27 +0100
-Date: Wed, 5 Feb 2025 18:35:27 +0100
-From: Andrew Lunn <andrew@lunn.ch>
-To: Oleksij Rempel <o.rempel@pengutronix.de>
-Cc: Heiner Kallweit <hkallweit1@gmail.com>,
-	Russell King <linux@armlinux.org.uk>,
+	 Content-Type:Content-Disposition:In-Reply-To; b=FIiiJNwxpbEbFANDnYGl/pBzMjVvVeKENRVcJhLIj4Asrwvu9taCzwdnVjs0a1SNxHymOWyAjo0z5+7baHFkCsa1oQ7WWi9aXw1BuOHJ/YhY3UVOV3HZgyeNTHBO4OPmCUQRZHJJM/XPgs6AGj/lylamEZaT3b+49eyl5b9ffT0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=MsLyFODU; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9547EC4CEE2;
+	Wed,  5 Feb 2025 17:38:26 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1738777109;
+	bh=6QJJPtO3WlYPPGSP0H8aWwAJg0ctvHWUXT0e2WNEeHE=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=MsLyFODUcEFb8uO9sgi4xZpO9PYRDdZOES/lZgiqBuN8wK0rpYCZyyFUZPsRV/815
+	 eVszkZ84dPOVH3oi7rt+AbIWKXy03058S4pFxx7l5DQ6Z1/aI1g+IVpQn6g+cxDIl9
+	 QOWiN0BSBHDQPpDQV2dp7S8V+JJQ0tqEreVR/ejFgVrEBi2Hq+i8UV5e3i8elKKxMy
+	 3Qgndet8XKwPQTJJutsYvw441+bty+yDxo5KIBzoW3wbIaIspA/f+NL7dZuOf89MPr
+	 a6l+h/rNIdMjTWZXDTh2TVMGC4DGBrLzpraW+eHCTJqhl6aVLcGhtxSEM1mV8dmDyy
+	 1VNweqr9a9gzA==
+Date: Wed, 5 Feb 2025 17:38:24 +0000
+From: Simon Horman <horms@kernel.org>
+To: Chen-Yu Tsai <wens@kernel.org>
+Cc: Jakub Kicinski <kuba@kernel.org>, Andrew Lunn <andrew+netdev@lunn.ch>,
 	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	kernel@pengutronix.de, linux-kernel@vger.kernel.org,
-	netdev@vger.kernel.org
-Subject: Re: [PATCH net-next v2 2/2] net: phy: dp83tg720: Add randomized
- polling intervals for unstable link detection
-Message-ID: <f609893a-aa26-4a6c-86cd-c944fdf9ff4a@lunn.ch>
-References: <20250205091151.2165678-1-o.rempel@pengutronix.de>
- <20250205091151.2165678-3-o.rempel@pengutronix.de>
+	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
+	Heiko Stuebner <heiko@sntech.de>,
+	"Russell King (Oracle)" <rmk+kernel@armlinux.org.uk>,
+	Steven Price <steven.price@arm.com>,
+	Kunihiko Hayashi <hayashi.kunihiko@socionext.com>,
+	netdev@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+	linux-kernel@vger.kernel.org, linux-rockchip@lists.infradead.org,
+	stable@vger.kernel.org
+Subject: Re: [PATCH netdev] net: stmmac: dwmac-rk: Provide FIFO sizes for
+ DWMAC 1000
+Message-ID: <20250205173824.GJ554665@kernel.org>
+References: <20250204161359.3335241-1-wens@kernel.org>
+ <20250204134331.270d5c4e@kernel.org>
+ <CAGb2v641vvtVKv8QbiEfHnMWngcKYTJZAgfH5k+G_nOvZcbC9g@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <20250205091151.2165678-3-o.rempel@pengutronix.de>
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <CAGb2v641vvtVKv8QbiEfHnMWngcKYTJZAgfH5k+G_nOvZcbC9g@mail.gmail.com>
 
-> + * Return: Time (in milliseconds) until the next update event for the PHY state
-> + * machine.
+On Wed, Feb 05, 2025 at 11:45:17AM +0800, Chen-Yu Tsai wrote:
+> On Wed, Feb 5, 2025 at 5:43 AM Jakub Kicinski <kuba@kernel.org> wrote:
+> >
+> > On Wed,  5 Feb 2025 00:13:59 +0800 Chen-Yu Tsai wrote:
+> > > Since a fix for stmmac in general has already been sent [1] and a revert
+> > > was also proposed [2], I'll refrain from sending mine.
+> >
+> > No, no, please do. You need to _submit_ the revert like a normal patch.
+> > With all the usual details in the commit message.
+> 
+> Mine isn't a revert, but simply downgrading the error to a warning.
+> So... yet another workaround approach.
 
-Same here.
-
-    Andrew
-
----
-pw-bot: cr
+I think the point is that someone needs to formally
+submit the revert. And I assume it should target the net tree.
 
