@@ -1,222 +1,183 @@
-Return-Path: <netdev+bounces-163282-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-163283-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5A456A29CCD
-	for <lists+netdev@lfdr.de>; Wed,  5 Feb 2025 23:47:30 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id B6075A29CF4
+	for <lists+netdev@lfdr.de>; Wed,  5 Feb 2025 23:56:28 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A51F03A6979
-	for <lists+netdev@lfdr.de>; Wed,  5 Feb 2025 22:47:21 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 3781F16993D
+	for <lists+netdev@lfdr.de>; Wed,  5 Feb 2025 22:56:27 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 24CC2217645;
-	Wed,  5 Feb 2025 22:47:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1A68C218E99;
+	Wed,  5 Feb 2025 22:56:25 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="ec+G/b5b"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="emukgLRS"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.10])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wm1-f53.google.com (mail-wm1-f53.google.com [209.85.128.53])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E8E8A215179;
-	Wed,  5 Feb 2025 22:47:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=192.198.163.10
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1738795647; cv=fail; b=M9IoyaBQC/QqhxRcRw/fULFjRzWsCfxsqWDg5tVX0aUmjQuIA6ipGRXHMhg96s90edgVLMCHTN0ZkrfGCW/csbyyLdRPsTEKgZ/Uc5uSo61s2XwAZkK9UdZAM+Zj51q3V1UvXtoxv1IZ2j33F9dDBSEHSj/73ktWvXxzGGjKFk8=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1738795647; c=relaxed/simple;
-	bh=kkYhEx2TQMs4YQSJXfUVC1efEU1Nt01xnuX7JeMYzk4=;
-	h=Date:From:To:CC:Subject:Message-ID:References:Content-Type:
-	 Content-Disposition:In-Reply-To:MIME-Version; b=A6j3OHGFu9kW6s+xWGQYFB+8aJZjIrS2c/BwgCwy8edE/KoV+H9y9rjdEILn8Sa0+4nJX5akrctT5LCOZLE2D4GB+akoG2i25aTcvFBkM86w6lXYDvXPcCzCDLSHQkEO/6ll9LfJy9TVeYXqFtlHqXtmgPQt4TN/RWbfYLZFs8A=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=ec+G/b5b; arc=fail smtp.client-ip=192.198.163.10
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1738795645; x=1770331645;
-  h=date:from:to:cc:subject:message-id:references:
-   in-reply-to:mime-version;
-  bh=kkYhEx2TQMs4YQSJXfUVC1efEU1Nt01xnuX7JeMYzk4=;
-  b=ec+G/b5b2Jm8phcxAhyeksrydXZfbc53if1W6qk/F9/L9kvq8k9pvZgd
-   xR/GBFJoXCLLxl6c82K9KIlODR244A9TUj6Gt6D6V228Ccuh3uUNku+YB
-   Ur92pQBzQs55l4fxHatqSWp31cch1sgM0TY5Jb4sEGcsKvQDd4iScDgNw
-   g5lQN+eyuQJIkvS2zaUkgizfS30rx8F4FQ/+cXSSyVKN5+qVY8fLOxIUY
-   YTMvRtEKfElg4ABkg/+IPGjY69uZ6bcxFIyAD1+1WQVxLW3iUGxNs2C86
-   s/zNrPu9JhGS/hh8QgNSyy/DyOKm5phUvUD0gM/to3dED5aqYjq9kBfDT
-   w==;
-X-CSE-ConnectionGUID: zPRRip3aTGyHiiD4XQ6ziQ==
-X-CSE-MsgGUID: zXT6+ezpQYugnIIwHn6jqA==
-X-IronPort-AV: E=McAfee;i="6700,10204,11314"; a="50804776"
-X-IronPort-AV: E=Sophos;i="6.12,310,1728975600"; 
-   d="scan'208";a="50804776"
-Received: from fmviesa007.fm.intel.com ([10.60.135.147])
-  by fmvoesa104.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 05 Feb 2025 14:47:24 -0800
-X-CSE-ConnectionGUID: L7GoTkbJRHCfaPeiqihXZw==
-X-CSE-MsgGUID: 2+tSe06+QBGmi+hqsAojhA==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.13,262,1732608000"; 
-   d="scan'208";a="110933162"
-Received: from orsmsx601.amr.corp.intel.com ([10.22.229.14])
-  by fmviesa007.fm.intel.com with ESMTP/TLS/AES256-GCM-SHA384; 05 Feb 2025 14:47:24 -0800
-Received: from orsmsx603.amr.corp.intel.com (10.22.229.16) by
- ORSMSX601.amr.corp.intel.com (10.22.229.14) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.44; Wed, 5 Feb 2025 14:47:23 -0800
-Received: from orsedg603.ED.cps.intel.com (10.7.248.4) by
- orsmsx603.amr.corp.intel.com (10.22.229.16) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.44 via Frontend Transport; Wed, 5 Feb 2025 14:47:23 -0800
-Received: from NAM04-MW2-obe.outbound.protection.outlook.com (104.47.73.177)
- by edgegateway.intel.com (134.134.137.100) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.1.2507.44; Wed, 5 Feb 2025 14:47:23 -0800
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=MlxqUp2tfHF+8YdSbIOwoKtGuLgMjkqmv0Zp5/E5mhlOYnumwl+Vnu6OY/qOqI4It4hJdQ6vTkZvsWh6v0S07//YeuqCUrRJQoNCVMSvynXbQwQVayJ97fUSNbGpkWHOV+P5LpcMv0AMYGN8q53Fs0nREEFV/qtIoC6bYZfti4SDWuENJfDaSMPlHkjhaKpcb1FD5MJwo+KFB8ysWP0b1Cf7CABl6j6bTOv5MTtOyIcHKotIzz0LGM2m/50+BfjZhqn6Dqv3eRkxGi2Xhxoz82sFPn1J2mpN/BLGgiwmM7Hl9cf5P7UPONtYlikfBNXYlQ5xvQSRTZWJdPTRCkIj8Q==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=H5dYQ5vHoE70SM9wXEtMlbHpn6mMR7ZYPhz0yYI79Rw=;
- b=j9+dOR3Lkt1xwSCQj9ZwYiIOkC8BIKSZHX8Y9ILLiL98dHxZiQyerOCl8RjYA1Rqn//eyMw6+ZB11a6KW4woc5+PuhUEQhhzezrjtTvDnHYIRD4xPNQaIT/KbpvF8fsSvot/zBjKmNLe/RO46QYn2WMLNrEEFF4/+Y98Y7/ed6uZIpJ7PcLoDye+ZMS6ICdTQ2BHL4pBc2Cid0kP8xmkZcJ6IFkL7x73/Iw/z7AXRD09sY9jufkVGzzRMJlu4Yy6CC83yhhDMBXmmajCsbPzWjcD2MAZ2vQJ2JWrO5QvV1gV1TiKOPdrnCfdluVP23bjrEZMLk08eSEgcOx5FXxehw==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
- dkim=pass header.d=intel.com; arc=none
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=intel.com;
-Received: from SA1PR11MB6733.namprd11.prod.outlook.com (2603:10b6:806:25c::17)
- by PH7PR11MB7097.namprd11.prod.outlook.com (2603:10b6:510:20c::6) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8398.24; Wed, 5 Feb
- 2025 22:47:18 +0000
-Received: from SA1PR11MB6733.namprd11.prod.outlook.com
- ([fe80::cf7d:9363:38f4:8c57]) by SA1PR11MB6733.namprd11.prod.outlook.com
- ([fe80::cf7d:9363:38f4:8c57%6]) with mapi id 15.20.8398.020; Wed, 5 Feb 2025
- 22:47:18 +0000
-Date: Wed, 5 Feb 2025 16:47:09 -0600
-From: Ira Weiny <ira.weiny@intel.com>
-To: <alucerop@amd.com>, <linux-cxl@vger.kernel.org>, <netdev@vger.kernel.org>,
-	<dan.j.williams@intel.com>, <edward.cree@amd.com>, <davem@davemloft.net>,
-	<kuba@kernel.org>, <pabeni@redhat.com>, <edumazet@google.com>,
-	<dave.jiang@intel.com>
-CC: Alejandro Lucero <alucerop@amd.com>
-Subject: Re: [PATCH v10 15/26] sfc: obtain root decoder with enough HPA free
- space
-Message-ID: <67a3ea6d8432e_2ee27529434@iweiny-mobl.notmuch>
-References: <20250205151950.25268-1-alucerop@amd.com>
- <20250205151950.25268-16-alucerop@amd.com>
-Content-Type: text/plain; charset="us-ascii"
-Content-Disposition: inline
-In-Reply-To: <20250205151950.25268-16-alucerop@amd.com>
-X-ClientProxiedBy: MW4P220CA0011.NAMP220.PROD.OUTLOOK.COM
- (2603:10b6:303:115::16) To SA1PR11MB6733.namprd11.prod.outlook.com
- (2603:10b6:806:25c::17)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3B66021772B
+	for <netdev@vger.kernel.org>; Wed,  5 Feb 2025 22:56:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.53
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1738796185; cv=none; b=JNZUNkfMWoaY68Z8viESlGTKnm89ZcusvlLW//OZIfHuMWGkjlhCmv4fJZb1sbc+lK7P5MSX9wLQK7o0d25QUuWX81Cv7Am9NToeLL+ljKPba+FOtfN8rLqm6V23IORceuHu4dQHb+5PXu3qUNEGmuBbmNHglcVsoiP5RaeHAR0=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1738796185; c=relaxed/simple;
+	bh=iNZSz3AjheIgxJ3lywk6jo8Fdlzw1iEuDEJBOx4M+VY=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=PpY9AuHLKqGvqGomntDDV2TV24dodnpKOY5S82zIxMIRG8FR5QJIV4bVwoD2nQW+n86XxWUsH6q6oVeKQhxJZnP+BpPQG1YW+y9OakFMFyptljFV3NvxRWXOKDoOLB2ooaLTFkKy5DBavuUbAt8jnDM/A3Ty6ucjhb4UzzaVmrk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=emukgLRS; arc=none smtp.client-ip=209.85.128.53
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-wm1-f53.google.com with SMTP id 5b1f17b1804b1-436202dd7f6so3289045e9.0
+        for <netdev@vger.kernel.org>; Wed, 05 Feb 2025 14:56:22 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1738796181; x=1739400981; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:subject:cc:to:from:date:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=goFHG8ttUyK2DIwKn/61AgjnHRGyVIbJtnRdtWRi+M0=;
+        b=emukgLRSLFvM2dFJRNoi5ost2TOSXPwyEQi2CHjJn0Wu60iO3HhgDqmfhBG10/CF8j
+         YbFaoH7E5DYEw39OLqTNGvQyig0H85mQO+LU3u02Ec9q5IDPk/iF4jnVuJF0+Fiv40ZL
+         Loo4Q+CxcOHgprjNxjEGjfDVZuYDSGLD9HbR4BBPIbeMN6agl7US45HnGs19k0Sr5OLp
+         J8jPav4CpWhghTbIX/CqCfYx4LksHwqc13VIOoeKvj+H1APFemgurEliPCbF7XbEXD1l
+         0rQBwHPf1yENvWg5jgzZsctRkmFaL1HqIMNwnc/7WPpze/Z7B1JB2LymPXRZEyr8ovem
+         wK0Q==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1738796181; x=1739400981;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:subject:cc:to:from:date:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=goFHG8ttUyK2DIwKn/61AgjnHRGyVIbJtnRdtWRi+M0=;
+        b=GPKJR0SlXjBFiq9cACvkDTKdmuYXpjw3m73B+ncOKFhUhNnEoAL2g56dwHTqvapi8h
+         TWKe8bBR54BQ3MGjunPFv5aqogDh97TPvXSPTGYfqUT+vGeflRcjNhQ4oa8rVMIMgADD
+         G7w/nDk9SfLCkI6+rrMZM+0h3MV2fVaqrwJojUe9BBSTN0uK9lxjjl9r0B4cs6N6pkb2
+         5o+T+WcDWKzUzMAwsUdwQKzykb+YnEJniyq0rPz9+/SmjC6X/pCdUPs58g3Kou5D1xq9
+         2B+OXIx3QpO2ApHp6tPMvLX+cWFzRMR0KHmiLfnTZtHaOb/BrGSc1kkON8julgK/bgpW
+         /U7Q==
+X-Forwarded-Encrypted: i=1; AJvYcCXzHhpRXYLpwqhGvKuq9d6OHpkRmwq8s8KZySjk+Dmh0PpwwYWtb/jHUh9I+ybkWAI9TllCuKE=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzIPdMo2fN7lA1mY0HlVMwCQuL/+8EmDjamnbYqQ9fOVF3ieseh
+	xnLlhHNxQURH5IrjJXHHvElwZHpEtpmyRSOAm5AgUTid8yIEHdpiU4v19g==
+X-Gm-Gg: ASbGncts6A+9PdNMCj0mJF5EuLbHZQ3nZdFowfGptk3P7oPDq2MApUrU8I68SJ4UfIa
+	0yfnFBxJMmwBuRiScfbQ1X8l9cK5gPoXu9lQhrV+Q3xJNitZVMdLfyf5ftZwQAjlAqI51V2b1cL
+	a3R2Wyi924D7nAseXqYWcj/3MM6+okI//g3uq+Us6MXdiQtxg88AKV4wch8Fw2m1JFBuKFrhvK6
+	+6pIfLesOMwo2yCv+6OMPQQSQu1ZFkCfxfp/hpdTOwOkJ0F1bE9EFkLw4JrZs8FYhCRmHbeER3G
+	vHx4Q6JRD0lPvL+BG7FVfyw53hudpTSwfnR6rzmCQw6S7s0wEspgWw==
+X-Google-Smtp-Source: AGHT+IEm5cdECDcC075T2ciC+EHG/aGnVIfVUqsgpYBy81rbSVo6Q7McubPYJvFBi3u7SRszziz9Bg==
+X-Received: by 2002:a05:6000:4020:b0:38c:5bc1:1ef5 with SMTP id ffacd0b85a97d-38db4857e36mr3935634f8f.3.1738796181166;
+        Wed, 05 Feb 2025 14:56:21 -0800 (PST)
+Received: from pumpkin (82-69-66-36.dsl.in-addr.zen.co.uk. [82.69.66.36])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-38dbde0fbeesm23160f8f.66.2025.02.05.14.56.20
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 05 Feb 2025 14:56:20 -0800 (PST)
+Date: Wed, 5 Feb 2025 22:56:19 +0000
+From: David Laight <david.laight.linux@gmail.com>
+To: Simon Horman <horms@kernel.org>
+Cc: Przemek Kitszel <przemyslaw.kitszel@intel.com>,
+ intel-wired-lan@lists.osuosl.org, Tony Nguyen <anthony.l.nguyen@intel.com>,
+ netdev@vger.kernel.org, Konrad Knitter <konrad.knitter@intel.com>, Michal
+ Swiatkowski <michal.swiatkowski@linux.intel.com>, Qiuxu Zhuo
+ <qiuxu.zhuo@intel.com>, Linus Torvalds <torvalds@linux-foundation.org>,
+ Kees Cook <kees@kernel.org>, Nick Desaulniers <nick.desaulniers@gmail.com>,
+ Jiri Slaby <jirislaby@kernel.org>
+Subject: Re: [PATCH iwl-net] ice: health.c: fix compilation on gcc 7.5
+Message-ID: <20250205225619.31af041c@pumpkin>
+In-Reply-To: <20250205204546.GM554665@kernel.org>
+References: <20250205104252.30464-2-przemyslaw.kitszel@intel.com>
+	<20250205204546.GM554665@kernel.org>
+X-Mailer: Claws Mail 4.1.1 (GTK 3.24.38; arm-unknown-linux-gnueabihf)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: SA1PR11MB6733:EE_|PH7PR11MB7097:EE_
-X-MS-Office365-Filtering-Correlation-Id: d85249b0-603f-4e3a-7029-08dd46370b4b
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;ARA:13230040|1800799024|366016|376014|7053199007|921020;
-X-Microsoft-Antispam-Message-Info: =?us-ascii?Q?GRnxnlk+he4+iz2WQ0j0XCG1unA3QdvR2qvQRMUa/o0vsX2aT6qOs5DTEJ7Z?=
- =?us-ascii?Q?sKUtZi16vL6ZGcfHpqCPhFETNX4iVXwWTZHcG77yygLw5QAGzeEbC3b9B/Dr?=
- =?us-ascii?Q?0gRvCebCuhuC9Vf2XcJ/A94jU5QMeuFE7Bnh1OrzbHk4aTJ7q8qgh83ynIla?=
- =?us-ascii?Q?beGOeEaoZSXQdk+uANLSG+SCupTLLxHwHqhngesqNGETLxP4fUmqWENBZslW?=
- =?us-ascii?Q?MtoickSK32+dHVpd4KmtyyQXsAU5q1nlOdIezeeCsYp+KEgvBuenJnQhEeoQ?=
- =?us-ascii?Q?kaOv4GrvDTwAOGWQMVb+U2ddNomF8DasSU8Mtlb6WXtefNecmi8RfvE86ewt?=
- =?us-ascii?Q?F0IS8W9b55CUnbDMSuURDVCeEw9UOIDuHogWcdToWvi/wFDNqGlvlZ4oORBs?=
- =?us-ascii?Q?O8ajgQ1N+NkqjVP9NY+6uBEfrFbZI2/HJE/zzbJajtl4X7Zej/GU7M9sO34A?=
- =?us-ascii?Q?zMoQcCOTN5AxvdrGOq+Rs1z0r9GNE095vPsA7tqyuPEkaq+AjJycquo51en+?=
- =?us-ascii?Q?CQFN/amJl6KsTdRgD0DPrvvn4xqS1pphJXniV8e5cI5jqCPj/lxvtVUduBUf?=
- =?us-ascii?Q?OXjACdojMKiHdeciJeTCMsBoklsOob/sZcDm6oj0oaN7X34fUDe5nqVuuLsJ?=
- =?us-ascii?Q?SRSfyIufs+OJH6djND+Y8KLFXHtPl43nWp7XQNvcV6Q/1JBVQHWq+QU/iYK/?=
- =?us-ascii?Q?IVWnOxnnWzB1NAqban1k28Lt3lKxPrIlyet5mWQt/DEdT/VGzc+bK/rh5ayi?=
- =?us-ascii?Q?dKJG5jDPbHLEtXCeL7umLFZgPrKaJydlxDDLSetoCRDYs50OS/piwwOGvcWH?=
- =?us-ascii?Q?1lmOJP0SlyS9/NwBklHH6bT6+H4P5kj3XMqTaH3YKkPsc0c709sNaqUYPAp+?=
- =?us-ascii?Q?wBaR0lUYivdNLRGpkodAm/zfMeyI29sRZpup40Dy2BzkGvBnvA2efrsgAtb2?=
- =?us-ascii?Q?1CK1uZwwTWENEU9mt9Oqs7y0M8Bqm9r78VwJkeqDaM+csQ9tn4nE7w9kefUC?=
- =?us-ascii?Q?P1MxUqk1EhKLHh6ozlTZvflT/kz8QyWEW/Hm7pPm1VeD9bmABGn7AtnHG17i?=
- =?us-ascii?Q?YWyviYQ9vCz+SiGo9Exolq53hg9+TzFSXovPlYPq7xYA2QAI9AVugS+/pwwn?=
- =?us-ascii?Q?wpCWaYQx1VzrtzeNWDGJmMmmp1L06dO2VT5CeSlJygddoUs0fR2+l23J0B6m?=
- =?us-ascii?Q?2WTfjwgN/UKWuRj4MkYXRVOjGQZ/RU2zVexzrRKUV5vQCQm5rSpykjSRVxzy?=
- =?us-ascii?Q?QRfY4OnAO3JT9Ekt/hTgOl0ouMk4DZJ0D/p1Qa+AKBUplKLMJB6cPvgwwQrK?=
- =?us-ascii?Q?QUjNE8E0FOUORCP/4/jRP5iNcuzSqIfd9zIJb0jmwZR5a0Mp7RR+WVx7ita6?=
- =?us-ascii?Q?2k81h/90TrxkH58kGIm895fYSrHtKas9NrHmE1aaSJgJgauPBSZreN3fVwaj?=
- =?us-ascii?Q?0J3+92nz6YY=3D?=
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SA1PR11MB6733.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(1800799024)(366016)(376014)(7053199007)(921020);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?40z65gLLujEaLlUQosi1guVUTQbMalADdqLNmrXdmrTOWNXIQpKl9qjB6xBm?=
- =?us-ascii?Q?6xGnTH3ywwp57da6CPr1FT2aAK1/zIwxzwJSe1M7n8yML0YmAubO6mcods4I?=
- =?us-ascii?Q?HAWJ4+XkKhP0+zS7BTEMP5gZW1Z4TZ9CXZrSyAJ8blgsbStrw+lLdnXBQkdi?=
- =?us-ascii?Q?S6VaLd3thBHNcAhSeykqi36TWJLJ1Q6QoXfpR8v3BV174sZ8o7vWe8J2HzoV?=
- =?us-ascii?Q?/gHvAMAMVQ9YsnWy00gYXHbg2yzB/XfSczOmoWpruL3ovCgFf3eyLwDZspJa?=
- =?us-ascii?Q?q8xligKzJnQ2NlyWYXp/F2ZsCC/IPDHztbZ3VMNhkvyVvkQRuqq6+0VNpRgD?=
- =?us-ascii?Q?IwRk4xgSC7HvGPLNrlw7xCmFzd+84sy/2q1f1JmCcUmnIgepF+T9YtII47Ke?=
- =?us-ascii?Q?s5b1/32M/5YHAX2YmVejySd4drK1MmpCdAHSVDru3qeb/3gKieigPmi2ZYnt?=
- =?us-ascii?Q?7uMrozmnoR0Mgo6uK3JsE227w9wPAYwH2InIf0Kg5NnCXWQW48rrOU0sTLvW?=
- =?us-ascii?Q?v9wXKC1ynaZz245UY4d74VMRdNJuHBMo9n7FvzI2oweyYFES5q6zUvgVA/9K?=
- =?us-ascii?Q?XlNGu+9S0QKnDqda65VJDv+2/UJ+kITkbMwDZ1rQx31xo8Ag91fmc4tdwx7a?=
- =?us-ascii?Q?AN9d+L85SCK1KVsYCcV6lbYI2YiI+tqRIIsye/w6NiUi4s4rsh+rSRGnC4+9?=
- =?us-ascii?Q?/Ksa4n7Ku8VcRp5XBhT/Xf5zRtjYnJKvs1HEEGEntDhl4COdPaMrfR6JvpXB?=
- =?us-ascii?Q?l/bd1qcjiyP0pfz3Zpui5O21DEYLt6N6ltY5/w3VeH9kZbARDcu3GqU4WGoo?=
- =?us-ascii?Q?jRTm1kSG58WJpeNBGAsWKVe0xsa0S2MmxUSlqGHruknnm8Ltqkh9zzND8orM?=
- =?us-ascii?Q?1VR1AaDRgrJ79fWVbFs7o9phrJe5s+qDCr2zS1u/KgEI50fs/5Xg3ZQCTbFo?=
- =?us-ascii?Q?52iNYgDCvxSALPST+DDcqc7ocmz4lSwsEW80kkid8mhjJ/qQAfKrqPfRpKgh?=
- =?us-ascii?Q?llMgqoXPaRlD7kO+o9EtBAyF/OTOh3coJhx9nLdvQC6tCpx4l3E4EaE5HeZf?=
- =?us-ascii?Q?NGPhWKdFTyxLKfChtOUIaAb8Ws7bFbyr6O+7GTiMXuFJCAegAZ9B+V6EFEJe?=
- =?us-ascii?Q?g7+uxSlTuBpILrz04/V/v1dLLgOIzl+JTA6RneMozrlsTJfrQhd7VLivL965?=
- =?us-ascii?Q?9gactt6M4+0NIGJ4SFYqOM7zSddkTz2CzBGgLJNbJTgEi8SVRjyzXB2EyN5H?=
- =?us-ascii?Q?m6h212qVdNFvmjzKGio4djOuNdoqsjMkmgs3c6RHn6qMBM2bVbNywpxNHgay?=
- =?us-ascii?Q?PqlblCoqhJhlszv4S5p8c7m1Idmb511KvzX4JK36Oz2zIjNmgXRH6Sr6YX4k?=
- =?us-ascii?Q?79OWeP1nulpr1OvI1VzpNHwjzTKbbkBPw2OBzieddCJMUUFsFoTNfClELBh7?=
- =?us-ascii?Q?TuRHmWO8e4+mvh4FhnGmPhS2y3UWbzLi5vepMRtbOgmJnF83Nn4MwXM57TGZ?=
- =?us-ascii?Q?zUdVxmvmTT6DRqG5DLCozokSpzpJIcyBWjQOPEOLQe7hAGcEilrzd2SWQK2m?=
- =?us-ascii?Q?drF1CwmP8fPQB5xdJQI67XeQu+vYlxI+uVTeB0nV?=
-X-MS-Exchange-CrossTenant-Network-Message-Id: d85249b0-603f-4e3a-7029-08dd46370b4b
-X-MS-Exchange-CrossTenant-AuthSource: SA1PR11MB6733.namprd11.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 05 Feb 2025 22:47:18.5701
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: iBGADTtLNcummWRZTfNZDTYGNExaNWsK8lUZbKb5NvMqGPfGP8mnvadaPnFK+Na/tsmYsmQ2tJ300RCSQwmVHg==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH7PR11MB7097
-X-OriginatorOrg: intel.com
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-alucerop@ wrote:
-> From: Alejandro Lucero <alucerop@amd.com>
+On Wed, 5 Feb 2025 20:45:46 +0000
+Simon Horman <horms@kernel.org> wrote:
 
-[snip]
+> + Jiri
+> 
+> On Wed, Feb 05, 2025 at 11:42:12AM +0100, Przemek Kitszel wrote:
+> > GCC 7 is not as good as GCC 8+ in telling what is a compile-time const,
+> > and thus could be used for static storage. So we could not use variables
+> > for that, no matter how much "const" keyword is sprinkled around.
+> > 
+> > Excerpt from the report:
+> > My GCC is: gcc (Ubuntu 7.5.0-3ubuntu1~18.04) 7.5.0.
+> > 
+> >   CC [M]  drivers/net/ethernet/stmicro/stmmac/stmmac_mdio.o
+> > drivers/net/ethernet/intel/ice/devlink/health.c:35:3: error: initializer element is not constant
+> >    ice_common_port_solutions, {ice_port_number_label}},
+> >    ^~~~~~~~~~~~~~~~~~~~~~~~~
+> > drivers/net/ethernet/intel/ice/devlink/health.c:35:3: note: (near initialization for 'ice_health_status_lookup[0].solution')
+> > drivers/net/ethernet/intel/ice/devlink/health.c:35:31: error: initializer element is not constant
+> >    ice_common_port_solutions, {ice_port_number_label}},
+> >                                ^~~~~~~~~~~~~~~~~~~~~
+> > drivers/net/ethernet/intel/ice/devlink/health.c:35:31: note: (near initialization for 'ice_health_status_lookup[0].data_label[0]')
+> > drivers/net/ethernet/intel/ice/devlink/health.c:37:46: error: initializer element is not constant
+> >    "Change or replace the module or cable.", {ice_port_number_label}},
+> >                                               ^~~~~~~~~~~~~~~~~~~~~
+> > drivers/net/ethernet/intel/ice/devlink/health.c:37:46: note: (near initialization for 'ice_health_status_lookup[1].data_label[0]')
+> > drivers/net/ethernet/intel/ice/devlink/health.c:39:3: error: initializer element is not constant
+> >    ice_common_port_solutions, {ice_port_number_label}},
+> >    ^~~~~~~~~~~~~~~~~~~~~~~~~
+> > 
+> > Fixes: 85d6164ec56d ("ice: add fw and port health reporters")
+> > Reported-by: Qiuxu Zhuo <qiuxu.zhuo@intel.com>
+> > Closes: https://lore.kernel.org/netdev/CY8PR11MB7134BF7A46D71E50D25FA7A989F72@CY8PR11MB7134.namprd11.prod.outlook.com
+> > Signed-off-by: Przemek Kitszel <przemyslaw.kitszel@intel.com>
+> > ---
+> > I would really like to bump min gcc to 8.5 (RH 8 family),
+> > instead of supporting old Ubuntu. However SLES 15 is also stuck with gcc 7.5 :(
+> > 
+> > CC: Linus Torvalds <torvalds@linux-foundation.org>
+> > CC: Kees Cook <kees@kernel.org>
+> > CC: Nick Desaulniers <nick.desaulniers@gmail.com>  
+> 
+> Hi Prezemek,
+> 
+> I ran into a similar problem not so long ago and I'm wondering if
+> the following, based on a suggestion by Jiri Slaby, resolves your
+> problem.
 
-> diff --git a/drivers/net/ethernet/sfc/efx_cxl.c b/drivers/net/ethernet/sfc/efx_cxl.c
-> index 774e1cb4b1cb..a9ff84143e5d 100644
-> --- a/drivers/net/ethernet/sfc/efx_cxl.c
-> +++ b/drivers/net/ethernet/sfc/efx_cxl.c
-> @@ -25,6 +25,7 @@ int efx_cxl_init(struct efx_probe_data *probe_data)
->  	struct pci_dev *pci_dev = efx->pci_dev;
->  	DECLARE_BITMAP(expected, CXL_MAX_CAPS);
->  	DECLARE_BITMAP(found, CXL_MAX_CAPS);
-> +	resource_size_t max_size;
->  	struct mds_info sfc_mds_info;
->  	struct efx_cxl *cxl;
+I'm sure I remember from somewhere that although the variables are
+'static const' they have to be real variables because they can still
+be patched.
+
+Which stops you using their contents as initialisers.
+
+Maybe I'm mis-remembering it.
+
+	David
+
+> 
+> diff --git a/drivers/net/ethernet/intel/ice/devlink/health.c b/drivers/net/ethernet/intel/ice/devlink/health.c
+> index ea40f7941259..19c3d37aa768 100644
+> --- a/drivers/net/ethernet/intel/ice/devlink/health.c
+> +++ b/drivers/net/ethernet/intel/ice/devlink/health.c
+> @@ -25,10 +25,10 @@ struct ice_health_status {
+>   * The below lookup requires to be sorted by code.
+>   */
 >  
-> @@ -102,6 +103,24 @@ int efx_cxl_init(struct efx_probe_data *probe_data)
->  		goto err_regs;
->  	}
+> -static const char *const ice_common_port_solutions =
+> +static const char ice_common_port_solutions[] =
+>  	"Check your cable connection. Change or replace the module or cable. Manually set speed and duplex.";
+> -static const char *const ice_port_number_label = "Port Number";
+> -static const char *const ice_update_nvm_solution = "Update to the latest NVM image.";
+> +static const char ice_port_number_label[] = "Port Number";
+> +static const char ice_update_nvm_solution[] = "Update to the latest NVM image.";
 >  
-> +	cxl->cxlrd = cxl_get_hpa_freespace(cxl->cxlmd, 1,
-> +					   CXL_DECODER_F_RAM | CXL_DECODER_F_TYPE2,
+>  static const struct ice_health_status ice_health_status_lookup[] = {
+>  	{ICE_AQC_HEALTH_STATUS_ERR_UNKNOWN_MOD_STRICT, "An unsupported module was detected.",
+> 
+> 
+> Link: https://lore.kernel.org/netdev/485dbc5a-a04b-40c2-9481-955eaa5ce2e2@kernel.org/
+> Link: https://git.kernel.org/netdev/net-next/c/36fb51479e3c
+> 
 
-Won't the addition of CXL_DECODER_F_TYPE2 cause this to fail?  I'm not
-seeing CXL_DECODER_F_TYPE2 set on a decoder in any of the patches.  So
-won't that make the flags check fail?  Why is CXL_DECODER_F_RAM not
-enough?
-
-Ira
-
-[snip]
 
