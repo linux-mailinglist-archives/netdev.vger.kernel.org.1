@@ -1,109 +1,92 @@
-Return-Path: <netdev+bounces-162822-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-162823-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5A784A2818C
-	for <lists+netdev@lfdr.de>; Wed,  5 Feb 2025 03:05:57 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 48CBEA28190
+	for <lists+netdev@lfdr.de>; Wed,  5 Feb 2025 03:06:17 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id DECDF162789
-	for <lists+netdev@lfdr.de>; Wed,  5 Feb 2025 02:05:55 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id ABCAA3A13B3
+	for <lists+netdev@lfdr.de>; Wed,  5 Feb 2025 02:06:08 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 44580212B0C;
-	Wed,  5 Feb 2025 02:05:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 81C41212D62;
+	Wed,  5 Feb 2025 02:06:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="f5nDGIfb"
 X-Original-To: netdev@vger.kernel.org
-Received: from szxga04-in.huawei.com (szxga04-in.huawei.com [45.249.212.190])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 938DF13B280;
-	Wed,  5 Feb 2025 02:05:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.190
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 41818212B1F;
+	Wed,  5 Feb 2025 02:06:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1738721151; cv=none; b=usozRnVYIKTfYBlbYiGFsUjyuOThz+CFApvoeVG54xiBzKdzktVG6xu83Vj3sCcuFpIieTuTDJaj5fG0md3+LwRNNHy2ye5C1EUAag5/HaiomVhtpkZ1mVlISaL/vDM+BfYqLT4o9/c++y8cW7lpWWgBqA0ApY0unjfS+00RZFk=
+	t=1738721168; cv=none; b=QKV/6k3dAfN5EK79b1vhgXlT8dFy/k+8J5ChdzXxUz/3taMrIuJFI6K5ayklkcTkftX+Zsn73RFhxbwolWpuuHRxjtocILX6iStgPTLDm8pWMscMn1WZ00z9PO9URVsePLptHSplhul8xnejdVW8beq+CS92ti0jPe9Z76WL+qM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1738721151; c=relaxed/simple;
-	bh=IlZQBea16DaPKe4dix0OXj6Acx1xWi+omT+MmAlB39w=;
-	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
-	 In-Reply-To:Content-Type; b=l35aiWkG/leKXGa4zNzPvAPWDukFjHPiMYJckWzWflnVc7gckU04QH8IqisYrps2tBByoJgcsl6o/slKhY6lmH4PpAokhe9cUX8Er0S2kVPzX3iN+AiO6mDfp4qCde0RDoiHAA21XQSV3I2Y8BlVzzqMwXbJJgswN2aoF8cpJt8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.190
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
-Received: from mail.maildlp.com (unknown [172.19.88.214])
-	by szxga04-in.huawei.com (SkyGuard) with ESMTP id 4Ynk5w5fftz22mKF;
-	Wed,  5 Feb 2025 10:03:00 +0800 (CST)
-Received: from dggemv705-chm.china.huawei.com (unknown [10.3.19.32])
-	by mail.maildlp.com (Postfix) with ESMTPS id AC45E1A016C;
-	Wed,  5 Feb 2025 10:05:45 +0800 (CST)
-Received: from kwepemn100009.china.huawei.com (7.202.194.112) by
- dggemv705-chm.china.huawei.com (10.3.19.32) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.11; Wed, 5 Feb 2025 10:05:45 +0800
-Received: from [10.67.121.59] (10.67.121.59) by kwepemn100009.china.huawei.com
- (7.202.194.112) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.11; Wed, 5 Feb
- 2025 10:05:44 +0800
-Message-ID: <0af59f13-7b88-3ede-ef90-00457d105c3c@huawei.com>
-Date: Wed, 5 Feb 2025 10:05:43 +0800
+	s=arc-20240116; t=1738721168; c=relaxed/simple;
+	bh=g/MZNgeG47rEDHzwtuKkaPDvwcYnBFmBeL4Dnw2TTwQ=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=TgBVsXjZs863dt4TgoSvTUMf49bodNBGM/Gd95Ly6PFTaEXegCAdPz3oqdWtOUjDPjnowwoI2VT/PimSfkSMqYXSSrR7W/u8Uyq0ieW17B7Q0WVMgoN5pNRuCdaJh9D4UKpYuUB+5v/OaSnCnMwJhs+835fw8+zBpC7IapjXDdM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=f5nDGIfb; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6171BC4CEDF;
+	Wed,  5 Feb 2025 02:06:06 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1738721168;
+	bh=g/MZNgeG47rEDHzwtuKkaPDvwcYnBFmBeL4Dnw2TTwQ=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=f5nDGIfbkYWYtpJTxIXjgqSOpvUVgjXcNyoLY4kBNZqYhrWBhgHshE0CocdnbP8qW
+	 NusCCF/whBR1MMPCuEHEEuMVtmWQaejCi0hILMO8zuh5IEHye3hMMo9JHfpb0Dt2Ob
+	 88buMz7DMWFN6fUDEJHB3q0bN5/3UmAOoDfVtZYXoaHPX2iCQtfOmX11KwEO9r590x
+	 1Dxl3fwauA5YO4lyGOJ1A6SB84KvqL+KY8hJhuGAG8X7gb0668kzHwJmMxAmQTYMdH
+	 owE7Qc+1W+JjXOM0X2yerYHm+Vnlfk/ECWyuraJNBZMIMTPfRRToETAP6Cu0nudK6X
+	 pfa2LOjYB+VSw==
+Date: Tue, 4 Feb 2025 18:06:05 -0800
+From: Jakub Kicinski <kuba@kernel.org>
+To: Stanislav Fomichev <stfomichev@gmail.com>
+Cc: Mina Almasry <almasrymina@google.com>, Paolo Abeni <pabeni@redhat.com>,
+ netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+ linux-doc@vger.kernel.org, kvm@vger.kernel.org,
+ virtualization@lists.linux.dev, linux-kselftest@vger.kernel.org, Donald
+ Hunter <donald.hunter@gmail.com>, "David S. Miller" <davem@davemloft.net>,
+ Eric Dumazet <edumazet@google.com>, Simon Horman <horms@kernel.org>,
+ Jonathan Corbet <corbet@lwn.net>, Andrew Lunn <andrew+netdev@lunn.ch>, Neal
+ Cardwell <ncardwell@google.com>, David Ahern <dsahern@kernel.org>, "Michael
+ S. Tsirkin" <mst@redhat.com>, Jason Wang <jasowang@redhat.com>, Xuan Zhuo
+ <xuanzhuo@linux.alibaba.com>, Eugenio =?UTF-8?B?UMOpcmV6?=
+ <eperezma@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>, Stefano
+ Garzarella <sgarzare@redhat.com>, Shuah Khan <shuah@kernel.org>,
+ sdf@fomichev.me, asml.silence@gmail.com, dw@davidwei.uk, Jamal Hadi Salim
+ <jhs@mojatatu.com>, Victor Nogueira <victor@mojatatu.com>, Pedro Tammela
+ <pctammela@mojatatu.com>, Samiullah Khawaja <skhawaja@google.com>
+Subject: Re: [PATCH net-next v3 0/6] Device memory TCP TX
+Message-ID: <20250204180605.268609c9@kernel.org>
+In-Reply-To: <Z6JtVUtsZL6cxsTO@mini-arch>
+References: <20250203223916.1064540-1-almasrymina@google.com>
+	<a97c4278-ea08-4693-a394-8654f1168fea@redhat.com>
+	<CAHS8izNZrKVXSXxL3JG3BuZdho2OQZp=nhLuVCrLZjJD1R0EPg@mail.gmail.com>
+	<Z6JXFRUobi-w73D0@mini-arch>
+	<60550f27-ea6a-4165-8eaa-a730d02a5ddc@redhat.com>
+	<CAHS8izMkfQpUQQLAkyfn8=YkGS1MhPN4DXbxFM6jzCKLAVhM2A@mail.gmail.com>
+	<Z6JtVUtsZL6cxsTO@mini-arch>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:91.0) Gecko/20100101
- Thunderbird/91.2.0
-Subject: Re: [PATCH v1 0/9] Use HWMON_CHANNEL_INFO macro to simplify code
-To: Andrew Lunn <andrew@lunn.ch>
-CC: <linux-hwmon@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
-	<linux-media@vger.kernel.org>, <netdev@vger.kernel.org>,
-	<linux-rtc@vger.kernel.org>, <oss-drivers@corigine.com>, <matt@ranostay.sg>,
-	<mchehab@kernel.org>, <irusskikh@marvell.com>, <andrew+netdev@lunn.ch>,
-	<davem@davemloft.net>, <edumazet@google.com>, <kuba@kernel.org>,
-	<pabeni@redhat.com>, <louis.peens@corigine.com>, <hkallweit1@gmail.com>,
-	<linux@armlinux.org.uk>, <kabel@kernel.org>, <alexandre.belloni@bootlin.com>,
-	<krzk@kernel.org>, <zhanjie9@hisilicon.com>, <zhenglifeng1@huawei.com>,
-	<liuyonglong@huawei.com>
-References: <20250124022635.16647-1-lihuisong@huawei.com>
- <fca9ca93-16e4-44db-8fbb-90bc6af952e7@lunn.ch>
-From: "lihuisong (C)" <lihuisong@huawei.com>
-In-Reply-To: <fca9ca93-16e4-44db-8fbb-90bc6af952e7@lunn.ch>
-Content-Type: text/plain; charset="UTF-8"; format=flowed
-Content-Transfer-Encoding: 8bit
-X-ClientProxiedBy: dggems702-chm.china.huawei.com (10.3.19.179) To
- kwepemn100009.china.huawei.com (7.202.194.112)
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-Hi Andrew,
+On Tue, 4 Feb 2025 11:41:09 -0800 Stanislav Fomichev wrote:
+> > > Don't we need some way for the device to opt-in (or opt-out) and avoid
+> > > such issues?
+> > >  
+> > 
+> > Yeah, I think likely the driver needs to declare support (i.e. it's
+> > not using dma-mapping API with dma-buf addresses).  
+> 
+> netif_skb_features/ndo_features_check seems like a good fit?
 
-在 2025/1/24 23:08, Andrew Lunn 写道:
-> On Fri, Jan 24, 2025 at 10:26:26AM +0800, Huisong Li wrote:
->> The HWMON_CHANNEL_INFO macro is provided by hwmon.h and used widely by many
->> other drivers. This series use HWMON_CHANNEL_INFO macro to simplify code.
->>
->> Huisong Li (9):
->>    media: video-i2c: Use HWMON_CHANNEL_INFO macro to simplify code
->>    net: aquantia: Use HWMON_CHANNEL_INFO macro to simplify code
->>    net: nfp: Use HWMON_CHANNEL_INFO macro to simplify code
->>    net: phy: marvell: Use HWMON_CHANNEL_INFO macro to simplify code
->>    net: phy: marvell10g: Use HWMON_CHANNEL_INFO macro to simplify code
->>    rtc: ab-eoz9: Use HWMON_CHANNEL_INFO macro to simplify code
->>    rtc: ds3232: Use HWMON_CHANNEL_INFO macro to simplify code
->>    w1: w1_therm: w1: Use HWMON_CHANNEL_INFO macro to simplify code
->>    net: phy: aquantia: Use HWMON_CHANNEL_INFO macro to simplify code
-> Please split these patches per subsystem. Maintainers generally have
-> scripts to accept patches, and those scripts don't work when there are
-> patches for other Maintainers mixed in. So you need 4 patchsets,
-> media, net, rtc and w1.
-Many thanks for your reply and good suggestion.
-I will split them.
->
-> I would also like to see the HWMON Maintainers opinion on these. A
-> patchset containing these have already been NACKed once. These patches
-> do however look like valid cleanups. But are they just so you can do
-> something bad in your vendor tree, which will never make it to
-> mainline?
->
-> 	Andrew
->
-> .
+validate_xmit_skb()
 
