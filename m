@@ -1,113 +1,124 @@
-Return-Path: <netdev+bounces-163173-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-163174-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id C4A1CA297EB
-	for <lists+netdev@lfdr.de>; Wed,  5 Feb 2025 18:49:31 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 8708AA297F7
+	for <lists+netdev@lfdr.de>; Wed,  5 Feb 2025 18:50:47 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id AB7E73A7904
-	for <lists+netdev@lfdr.de>; Wed,  5 Feb 2025 17:47:31 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 42EDD3ABBAE
+	for <lists+netdev@lfdr.de>; Wed,  5 Feb 2025 17:48:29 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0A0F19443;
-	Wed,  5 Feb 2025 17:45:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 923EB1FCF47;
+	Wed,  5 Feb 2025 17:46:28 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="YFke/Ib8"
+	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="r2luspiz"
 X-Original-To: netdev@vger.kernel.org
-Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
+Received: from fhigh-b1-smtp.messagingengine.com (fhigh-b1-smtp.messagingengine.com [202.12.124.152])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 28D161FDA96;
-	Wed,  5 Feb 2025 17:45:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D0A451FC7F6;
+	Wed,  5 Feb 2025 17:46:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=202.12.124.152
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1738777517; cv=none; b=vAs5P6PeG5Hd3h4Limjxy642saz0g1zeG3AyV9LH3lY997v7V3BYSZLkaexnL97GWtkGjmIiZAuBERFVo30F6UaPb2WoLHPtuBDhk0hFqAyhUvU6jdmKp/OsQNNJpcEVjZ9KF2EyLkUpF5+RG0RygQzg2T/l8rNdpYYXhW7dwpc=
+	t=1738777588; cv=none; b=muJGiBOI2dm/4U0qd0PssKEjinpAPuX+z7GMqWcwMWQET5X28Jr63+TZkZkqgrvKfwIyVMoI4RX4J9fKpz3rnQCWirmKqcbE4oKcqIsUUApKmX56SpCbojS2m8XDyCAkl6FJUfNYUHR5UH7fAnhYoEA7bG6baGmu8PUQhWyvGSI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1738777517; c=relaxed/simple;
-	bh=Y8aAjOf3AT4BufOpk3zqdSx3kA3F965v0KtHpTlTJW0=;
+	s=arc-20240116; t=1738777588; c=relaxed/simple;
+	bh=8C1HNH4qVUSwKDMJatvHx29Le0IdvOg84YisPyZytOo=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=qkKibm6opgz9160uQqZkLUPlu5fvPZQjQiTxZllnRrolvGTAr5fgu4HE6tmDTizhmGMdpCNCiKovTMkD/c5bltxkPMr2VxFXsjrGHKZVeE49SFicLy313SQNH5Ngz5xJxCS+riAZNtDgZ2yg63QNCs+aOLiF4Df1EjrDGt8JKpI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=YFke/Ib8; arc=none smtp.client-ip=78.32.30.218
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:
-	Content-Transfer-Encoding:Content-Type:MIME-Version:References:Message-ID:
-	Subject:Cc:To:From:Date:Reply-To:Content-ID:Content-Description:Resent-Date:
-	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
-	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=a51LPLjOt3wwZB6mg+Y3S9/fHKpsOrF0RHXl8dP5K9o=; b=YFke/Ib8EU5hGyNz5OI18D/jXb
-	LgKzeb6g4CeABgLgLmj3yzRSwdQnFVfTrNyBnLB5+V6yIz8fDaBI2KMVhjMYTVO2Tc92tOL4IFXtM
-	myCRnncf5o8lh85f8iYKOTArbHfFqFTA3wgxnkFM9Ws3L2Zxg8WwpPPZ66uOiIhNTkwou8AEj0yQG
-	Xx7m1YTkkBfv+9n80iYQ3U+/s9B9mBadOs6h5bTqCmNqY8QA+fk9zw6p2xOkO6U0a4ctamQHzFlOM
-	KxyMPIqjLiaq9/7m6gfVLlVIU/wQ3V6JLsRlheTDy89eWAL5MsvXtiHAIwcbkIpv++7MN0a7plBaA
-	3XSQWG0w==;
-Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:52386)
-	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.96)
-	(envelope-from <linux@armlinux.org.uk>)
-	id 1tfjSR-0007tq-0B;
-	Wed, 05 Feb 2025 17:45:03 +0000
-Received: from linux by shell.armlinux.org.uk with local (Exim 4.96)
-	(envelope-from <linux@shell.armlinux.org.uk>)
-	id 1tfjSN-0002bu-08;
-	Wed, 05 Feb 2025 17:44:59 +0000
-Date: Wed, 5 Feb 2025 17:44:58 +0000
-From: "Russell King (Oracle)" <linux@armlinux.org.uk>
-To: Simon Horman <horms@kernel.org>
-Cc: Chen-Yu Tsai <wens@kernel.org>, Jakub Kicinski <kuba@kernel.org>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
-	Heiko Stuebner <heiko@sntech.de>,
-	Steven Price <steven.price@arm.com>,
-	Kunihiko Hayashi <hayashi.kunihiko@socionext.com>,
-	netdev@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
-	linux-kernel@vger.kernel.org, linux-rockchip@lists.infradead.org,
-	stable@vger.kernel.org
-Subject: Re: [PATCH netdev] net: stmmac: dwmac-rk: Provide FIFO sizes for
- DWMAC 1000
-Message-ID: <Z6OjmtiZ4A8BzvsP@shell.armlinux.org.uk>
-References: <20250204161359.3335241-1-wens@kernel.org>
- <20250204134331.270d5c4e@kernel.org>
- <CAGb2v641vvtVKv8QbiEfHnMWngcKYTJZAgfH5k+G_nOvZcbC9g@mail.gmail.com>
- <20250205173824.GJ554665@kernel.org>
+	 Content-Type:Content-Disposition:In-Reply-To; b=nUxpHfaIIlh3kzTOP2TE1TPp+lRi2mfsb8pP7qq/K0MluGCCbnzBRqnk89qUztShLEcJc3dqd9raVsn305xRDYUeMyWmnr0iAIfFyr/7aF08sUDFHHNxivbq2EDzWENVthW1pC7AG6NbpYeG/doNggs5DYirTW+7zdLhCCwuEhw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=idosch.org; spf=none smtp.mailfrom=idosch.org; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=r2luspiz; arc=none smtp.client-ip=202.12.124.152
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=idosch.org
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=idosch.org
+Received: from phl-compute-02.internal (phl-compute-02.phl.internal [10.202.2.42])
+	by mailfhigh.stl.internal (Postfix) with ESMTP id 243E12540196;
+	Wed,  5 Feb 2025 12:46:25 -0500 (EST)
+Received: from phl-mailfrontend-02 ([10.202.2.163])
+  by phl-compute-02.internal (MEProxy); Wed, 05 Feb 2025 12:46:25 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
+	messagingengine.com; h=cc:cc:content-type:content-type:date:date
+	:feedback-id:feedback-id:from:from:in-reply-to:in-reply-to
+	:message-id:mime-version:references:reply-to:subject:subject:to
+	:to:x-me-proxy:x-me-sender:x-me-sender:x-sasl-enc; s=fm3; t=
+	1738777584; x=1738863984; bh=HEskk/2SpuLO/Xrp6JjdV4QHbWz2DrijKvj
+	/WGpMo98=; b=r2luspizoix2AEF4EaO2ehJhs7Fw4jAPTtpliuS8JBSUfGJyPua
+	qLdsjnxyl17PnEZrM4NHbR0U+29fas76j99i19IxBZURQBifLWxhbBqW55hLySrx
+	HAVXCsRLmha2HcqHknDjkL9Xeidf4rObORpsZyMfh5Sh3d027iSyZfBz4EzQqP+g
+	m01JL38qT4d+2xoffTqqVpTOqa0+KIuGWPiDNHhSa5VLQhJe1yIQwKQapH1D+A2w
+	MrEUldAKDRixrRe9FXa1hGt0oYIx1AP3k/BxL5lJIGHjq+LNbgWNgo19+fF9B1a2
+	7z4uNy2MiJ6gkm/dGMNt19qfUpvbLRREaDw==
+X-ME-Sender: <xms:76OjZxlYzksRscRa_qX5S04h1IkoM8bn-hTsZOcJs7JyXwTEf9lRwA>
+    <xme:76OjZ80UBNf8ydUkrTr-5DJ_vaOkIknryww7-2SJIuyzqEUoknba85E7p97tABPvO
+    HqhNu5PCTaAYnk>
+X-ME-Received: <xmr:76OjZ3phySEI9zZFX2fLzlWk0i1_zAvHzDKe_9rYPI_Jp7XAtN684i8eLv1I>
+X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeefvddrtddtgddvgedutdcutefuodetggdotefrod
+    ftvfcurfhrohhfihhlvgemucfhrghsthforghilhdpggftfghnshhusghstghrihgsvgdp
+    uffrtefokffrpgfnqfghnecuuegrihhlohhuthemuceftddtnecusecvtfgvtghiphhivg
+    hnthhsucdlqddutddtmdenucfjughrpeffhffvvefukfhfgggtuggjsehttdertddttddv
+    necuhfhrohhmpefkughoucfutghhihhmmhgvlhcuoehiughoshgthhesihguohhstghhrd
+    horhhgqeenucggtffrrghtthgvrhhnpedvudefveekheeugeeftddvveefgfduieefudei
+    fefgleekheegleegjeejgeeghfenucevlhhushhtvghrufhiiigvpedtnecurfgrrhgrmh
+    epmhgrihhlfhhrohhmpehiughoshgthhesihguohhstghhrdhorhhgpdhnsggprhgtphht
+    thhopedvhedpmhhouggvpehsmhhtphhouhhtpdhrtghpthhtohepmhdqmhgrlhhlrgguih
+    esthhirdgtohhmpdhrtghpthhtoheprhhoghgvrhhqsehkvghrnhgvlhdrohhrghdprhgt
+    phhtthhopegurghnihhshhgrnhifrghrsehtihdrtghomhdprhgtphhtthhopehprggsvg
+    hnihesrhgvughhrghtrdgtohhmpdhrtghpthhtohepkhhusggrsehkvghrnhgvlhdrohhr
+    ghdprhgtphhtthhopegvughumhgriigvthesghhoohhglhgvrdgtohhmpdhrtghpthhtoh
+    epuggrvhgvmhesuggrvhgvmhhlohhfthdrnhgvthdprhgtphhtthhopegrnhgurhgvfido
+    nhgvthguvghvsehluhhnnhdrtghhpdhrtghpthhtohepsghpfhesvhhgvghrrdhkvghrnh
+    gvlhdrohhrgh
+X-ME-Proxy: <xmx:76OjZxmJrT1mw4cGC5Z3PVwsGehnoRCjZxYdJ_ABfe7RSiEUpwplPA>
+    <xmx:76OjZ_2ZX3nJ9G-5vJnVR0qR9wI4381VmwucynYbHX0TQW3fcgNk8w>
+    <xmx:76OjZwt7MG6j-mRcytoklvUnMHVjIFGoXdLvzheatidojseNs3d1tA>
+    <xmx:76OjZzXX8eMbKVIFytFckbC4ddt2sHqyb_DKlX_qbpoIeIP9ViJf-Q>
+    <xmx:8KOjZ6GI8IvEawqZnrxSUKqmofGTrPSXj8dpIMcsPw-APgDOhhVJr7tK>
+Feedback-ID: i494840e7:Fastmail
+Received: by mail.messagingengine.com (Postfix) with ESMTPA; Wed,
+ 5 Feb 2025 12:46:22 -0500 (EST)
+Date: Wed, 5 Feb 2025 19:46:21 +0200
+From: Ido Schimmel <idosch@idosch.org>
+To: "Malladi, Meghana" <m-malladi@ti.com>
+Cc: rogerq@kernel.org, danishanwar@ti.com, pabeni@redhat.com,
+	kuba@kernel.org, edumazet@google.com, davem@davemloft.net,
+	andrew+netdev@lunn.ch, bpf@vger.kernel.org,
+	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
+	netdev@vger.kernel.org, robh@kernel.org,
+	matthias.schiffer@ew.tq-group.com, dan.carpenter@linaro.org,
+	rdunlap@infradead.org, diogo.ivo@siemens.com,
+	schnelle@linux.ibm.com, glaroque@baylibre.com,
+	john.fastabend@gmail.com, hawk@kernel.org, daniel@iogearbox.net,
+	ast@kernel.org, srk@ti.com, Vignesh Raghavendra <vigneshr@ti.com>
+Subject: Re: [EXTERNAL] Re: [PATCH net 3/3] net: ti: icssg-prueth: Add AF_XDP
+ support
+Message-ID: <Z6Oj7eMRV9z9lF2I@shredder>
+References: <20250122124951.3072410-1-m-malladi@ti.com>
+ <20250122124951.3072410-4-m-malladi@ti.com>
+ <Z5J7kGFU_ZgneFAF@shredder>
+ <f1cf5bfc-e767-4ced-9aad-76a578c53706@ti.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <20250205173824.GJ554665@kernel.org>
-Sender: Russell King (Oracle) <linux@armlinux.org.uk>
+In-Reply-To: <f1cf5bfc-e767-4ced-9aad-76a578c53706@ti.com>
 
-On Wed, Feb 05, 2025 at 05:38:24PM +0000, Simon Horman wrote:
-> On Wed, Feb 05, 2025 at 11:45:17AM +0800, Chen-Yu Tsai wrote:
-> > On Wed, Feb 5, 2025 at 5:43 AM Jakub Kicinski <kuba@kernel.org> wrote:
-> > >
-> > > On Wed,  5 Feb 2025 00:13:59 +0800 Chen-Yu Tsai wrote:
-> > > > Since a fix for stmmac in general has already been sent [1] and a revert
-> > > > was also proposed [2], I'll refrain from sending mine.
-> > >
-> > > No, no, please do. You need to _submit_ the revert like a normal patch.
-> > > With all the usual details in the commit message.
-> > 
-> > Mine isn't a revert, but simply downgrading the error to a warning.
-> > So... yet another workaround approach.
+On Tue, Feb 04, 2025 at 11:25:39PM +0530, Malladi, Meghana wrote:
+> On 1/23/2025 10:55 PM, Ido Schimmel wrote:
+> > XDP program could have changed the packet length, but driver seems to be
 > 
-> I think the point is that someone needs to formally
-> submit the revert. And I assume it should target the net tree.
+> This will be true given, emac->xdp_prog is not NULL. What about when XDP is
+> not enabled ?
 
-For what I think is the third time today (fourth if you include the
-actual patch...)
+I don't understand the question. My point is that the packet doesn't
+necessarily look the same after XDP ran.
 
-https://lore.kernel.org/r/E1tfeyR-003YGJ-Gb@rmk-PC.armlinux.org.uk
-
--- 
-RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
-FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
+> 
+> > building the skb using original length read from the descriptor.
+> > Consider using xdp_build_skb_from_buff()
+> > 
+> 
 
