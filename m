@@ -1,147 +1,201 @@
-Return-Path: <netdev+bounces-163138-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-163140-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 706AAA29671
-	for <lists+netdev@lfdr.de>; Wed,  5 Feb 2025 17:35:17 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 12535A2968C
+	for <lists+netdev@lfdr.de>; Wed,  5 Feb 2025 17:46:45 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id ED61116A611
-	for <lists+netdev@lfdr.de>; Wed,  5 Feb 2025 16:35:15 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 8E4D916A011
+	for <lists+netdev@lfdr.de>; Wed,  5 Feb 2025 16:46:43 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BD5EE191F7A;
-	Wed,  5 Feb 2025 16:35:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 23FA6193086;
+	Wed,  5 Feb 2025 16:46:41 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Ef2oW7TT"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="Oj/DoVm9"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.12])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8B791157465;
-	Wed,  5 Feb 2025 16:35:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B7AA71519AB;
+	Wed,  5 Feb 2025 16:46:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.12
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1738773312; cv=none; b=iZfj5BYwW0/FALWf7s4zs8RjypH8Vo1IuxYUwBzajNNb/GmU4NdHhWGKVfh/dAfN3+0GDc47xycrtwmHXVsgZzU2/t8EmhPVh+1DlAf+OaingY95MJzFkJYl19Dv4K8qnGrnWYdpeI6kLXBtQ6rGUTApY1zm/+aLmgP8/0egRUE=
+	t=1738774001; cv=none; b=eHLCECsW5dsDKoy9KaVNVMbyjeB7bsicRI6+ImSkOOEXrfawqvFqPWhBLyi9icqYKM676ry9nf2sCAsUY05Dc6ypljLKdSjozE/NEIoiQgvdGZszufvDhrArRG0jpSMt/bHUhjdSslZsjroN/fBP3c7DXBxkYcJ5BKlB0D6us0A=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1738773312; c=relaxed/simple;
-	bh=poca9uM9KJpZdizcMGkf7+o6KyB/m+kgE3lsAIBam7k=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=COLAWQEXlImD87UlJOqWqCfPcduzC3Av0fOsK8Aw63ItqlGpowpCyToS8AeUcHR0ApKmN2Ee3mEmR7dFJrNaJyh2srsTrDd6nW9/S1FXRCvLoDQ9qBQ9JRcsWrQ+4HHHBTZwtnRWaGZxP3EIu5IO0amK6vZ3KCBvyy4V8Wxufio=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Ef2oW7TT; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 229DFC4CED1;
-	Wed,  5 Feb 2025 16:35:03 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1738773312;
-	bh=poca9uM9KJpZdizcMGkf7+o6KyB/m+kgE3lsAIBam7k=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=Ef2oW7TTJWrSf2Ve/wzhV28PC5O0QqOYounibJQBYzLZOOTPburvta9Gr04vQTb67
-	 aXiJ49pFgFnSeu1fSgV+lBORCLC4MMuy/N2VhD+pZv54TzwhCiGSl1W7zXxuVtPyCl
-	 nZCq0jocPLauM2me+zmaKbbvxgq14IOmpgUJ1j8HStchKI5YT+B1pb8lC/ZBNz2uJA
-	 OcDmh5Hknaun6p8EJeS4SEFiQJK05z6MniHMR1/nlJqFclQsatwsrq1Xl8peCN8NrS
-	 7N50a6LPVorTdRrMUyLXWNbM4ele+9P5AfIsLTZ8jqTIQejsQT5jgC5Ova/lBoHPov
-	 iZ7XztwStjYwA==
-Message-ID: <25f61085-defa-4c5d-b243-6d51e72aee76@kernel.org>
-Date: Wed, 5 Feb 2025 17:35:01 +0100
+	s=arc-20240116; t=1738774001; c=relaxed/simple;
+	bh=lNl3cMZ49Ye+khNV6iGbebkzq5dSCQpcGg6AmHDeBYE=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version:Content-Type; b=pqQKYPXU2qMiDMUpBOBR3mqUWNMXEditNJu4DGpGRiFgAVjfA6dIz/FxtOuuZD+pcyZ6bdtnL9sQAoXFxDgr3aua6dj2qoCziLOR98a8urwUUKH8ASvi4hOet4txs0SGeS8GwgIUglZt5xbF0NZivnbEQQLdDVfCQYXRC2GfzHQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=Oj/DoVm9; arc=none smtp.client-ip=198.175.65.12
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1738773999; x=1770309999;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=lNl3cMZ49Ye+khNV6iGbebkzq5dSCQpcGg6AmHDeBYE=;
+  b=Oj/DoVm9yiqFbyVck1PDWarl2UEYgQS3fJg/9jtfH8rzfmTd1FMjsb8k
+   yJlmMzW3sKAdWEeK/Gw5DFMuCQkgqq+g9iFeDtDydIVqSrVm0CZhtMc0m
+   Z9j5aRsZAIqMx4ZItNHyKQQWNch+p1r9wKUZW0VS6ekD1ay+ypE+Q8ZGv
+   6ekC4FaGmn3GCs8k2evaG19yGgsEJSPAHJS0DrotgwGABPqf/+PLGaYhR
+   MURfDsqIl1H/OyiBlB3N8Kjuq+0b0OcmfZT4iIo/uS/92xDUumDQtS/+A
+   tnk3n/P72IdOIsBSn9aG5enuarn/4zzWEAfKTcuhlLGByj19ai6bCX8jM
+   A==;
+X-CSE-ConnectionGUID: tOmld9sQTcKCj112/FMrJQ==
+X-CSE-MsgGUID: n+vEhrOGTQe5sUa2sAe2oA==
+X-IronPort-AV: E=McAfee;i="6700,10204,11336"; a="50741059"
+X-IronPort-AV: E=Sophos;i="6.13,262,1732608000"; 
+   d="scan'208";a="50741059"
+Received: from orviesa009.jf.intel.com ([10.64.159.149])
+  by orvoesa104.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 05 Feb 2025 08:39:39 -0800
+X-CSE-ConnectionGUID: vq9J6RJwQ7mbwTzjqOddHA==
+X-CSE-MsgGUID: SxZ/5j0WQAeRMUyP9PRAAQ==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.13,262,1732608000"; 
+   d="scan'208";a="110741549"
+Received: from newjersey.igk.intel.com ([10.102.20.203])
+  by orviesa009.jf.intel.com with ESMTP; 05 Feb 2025 08:39:35 -0800
+From: Alexander Lobakin <aleksander.lobakin@intel.com>
+To: Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>
+Cc: Alexander Lobakin <aleksander.lobakin@intel.com>,
+	Lorenzo Bianconi <lorenzo@kernel.org>,
+	Daniel Xu <dxu@dxuuu.xyz>,
+	Alexei Starovoitov <ast@kernel.org>,
+	Daniel Borkmann <daniel@iogearbox.net>,
+	Andrii Nakryiko <andrii@kernel.org>,
+	John Fastabend <john.fastabend@gmail.com>,
+	=?UTF-8?q?Toke=20H=C3=B8iland-J=C3=B8rgensen?= <toke@kernel.org>,
+	Jesper Dangaard Brouer <hawk@kernel.org>,
+	Martin KaFai Lau <martin.lau@linux.dev>,
+	netdev@vger.kernel.org,
+	bpf@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: [PATCH net-next v4 0/8] bpf: cpumap: enable GRO for XDP_PASS frames
+Date: Wed,  5 Feb 2025 17:36:01 +0100
+Message-ID: <20250205163609.3208829-1-aleksander.lobakin@intel.com>
+X-Mailer: git-send-email 2.48.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next v4 27/27] dt-bindings: net: pse-pd: ti,tps23881:
- Add interrupt description
-To: Kory Maincent <kory.maincent@bootlin.com>
-Cc: Andrew Lunn <andrew@lunn.ch>, Oleksij Rempel <o.rempel@pengutronix.de>,
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- Jonathan Corbet <corbet@lwn.net>, Donald Hunter <donald.hunter@gmail.com>,
- Rob Herring <robh@kernel.org>, Andrew Lunn <andrew+netdev@lunn.ch>,
- Simon Horman <horms@kernel.org>, Heiner Kallweit <hkallweit1@gmail.com>,
- Russell King <linux@armlinux.org.uk>, Liam Girdwood <lgirdwood@gmail.com>,
- Mark Brown <broonie@kernel.org>, Krzysztof Kozlowski <krzk+dt@kernel.org>,
- Conor Dooley <conor+dt@kernel.org>,
- Thomas Petazzoni <thomas.petazzoni@bootlin.com>,
- linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
- linux-doc@vger.kernel.org, Kyle Swenson <kyle.swenson@est.tech>,
- Dent Project <dentproject@linuxfoundation.org>, kernel@pengutronix.de,
- Maxime Chevallier <maxime.chevallier@bootlin.com>, devicetree@vger.kernel.org
-References: <20250103-feature_poe_port_prio-v4-0-dc91a3c0c187@bootlin.com>
- <20250103-feature_poe_port_prio-v4-27-dc91a3c0c187@bootlin.com>
- <uv2grnchczucf4vxxzaprfkc6ap56z6uqzaew3qtjqpvmtaqbb@kuv62yntqyfr>
- <20250205151822.06f60e8d@kmaincent-XPS-13-7390>
-From: Krzysztof Kozlowski <krzk@kernel.org>
-Content-Language: en-US
-Autocrypt: addr=krzk@kernel.org; keydata=
- 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 fv0=
-In-Reply-To: <20250205151822.06f60e8d@kmaincent-XPS-13-7390>
 Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 
-On 05/02/2025 15:18, Kory Maincent wrote:
->>> Add an interrupt property to the device tree bindings for the TI TPS23881
->>> PSE controller. The interrupt is primarily used to detect classification
->>> and disconnection events, which are essential for managing the PSE
->>> controller in compliance with the PoE standard.
->>>  
->>> @@ -62,6 +65,7 @@ unevaluatedProperties: false
->>>  required:
->>>    - compatible
->>>    - reg
->>> +  - interrupts  
->>
->> Why? That's an ABI change. Commit msg mentions something like "essential
->> for standard" so are you saying nothing here was working according to
->> standard before?
-> 
-> Yes indeed, the disconnection management did not follow the standard. Without
-> this series, the power on the ports of this controller is not shut down after a
-> Powered Device disconnection. Unfortunately, I did not noticed this before.
+Several months ago, I had been looking through my old XDP hints tree[0]
+to check whether some patches not directly related to hints can be sent
+standalone. Roughly at the same time, Daniel appeared and asked[1] about
+GRO for cpumap from that tree.
 
-This would be useful part of commit msg.
+Currently, cpumap uses its own kthread which processes cpumap-redirected
+frames by batches of 8, without any weighting (but with rescheduling
+points). The resulting skbs get passed to the stack via
+netif_receive_skb_list(), which means no GRO happens.
+Even though we can't currently pass checksum status from the drivers,
+in many cases GRO performs better than the listified Rx without the
+aggregation, confirmed by tests.
 
-Best regards,
-Krzysztof
+In order to enable GRO in cpumap, we need to do the following:
+
+* patches 1-2: decouple the GRO struct from the NAPI struct and allow
+  using it out of a NAPI entity within the kernel core code;
+* patch 3: switch cpumap from netif_receive_skb_list() to
+  gro_receive_skb().
+
+Additional improvements:
+
+* patch 4: optimize XDP_PASS in cpumap by using arrays instead of linked
+  lists;
+* patch 5-6: introduce and use function do get skbs from the NAPI percpu
+  caches by bulks, not one at a time;
+* patch 7-8: use that function in veth as well and remove the one that
+  was now superseded by it.
+
+My trafficgen UDP GRO tests, small frame sizes:
+
+                GRO off    GRO on
+baseline        2.7        N/A       Mpps
+patch 3         2.3        4         Mpps
+patch 8         2.4        4.7       Mpps
+
+1...3 diff      -17        +48       %
+1...8 diff      -11        +74       %
+
+Daniel reported from +14%[2] to +18%[3] of throughput in neper's TCP RR
+tests. On my system however, the same test gave me up to +100%.
+
+Note that there's a series from Lorenzo[4] which achieves the same, but
+in a different way. During the discussions, the approach using a
+standalone GRO instance was preferred over the threaded NAPI.
+
+[0] https://github.com/alobakin/linux/tree/xdp_hints
+[1] https://lore.kernel.org/bpf/cadda351-6e93-4568-ba26-21a760bf9a57@app.fastmail.com
+[2] https://lore.kernel.org/bpf/merfatcdvwpx2lj4j2pahhwp4vihstpidws3jwljwazhh76xkd@t5vsh4gvk4mh
+[3] https://lore.kernel.org/bpf/yzda66wro5twmzpmjoxvy4si5zvkehlmgtpi6brheek3sj73tj@o7kd6nurr3o6
+[4] https://lore.kernel.org/bpf/20241130-cpumap-gro-v1-0-c1180b1b5758@kernel.org
+
+Alexander Lobakin (8):
+  net: gro: decouple GRO from the NAPI layer
+  net: gro: expose GRO init/cleanup to use outside of NAPI
+  bpf: cpumap: switch to GRO from netif_receive_skb_list()
+  bpf: cpumap: reuse skb array instead of a linked list to chain skbs
+  net: skbuff: introduce napi_skb_cache_get_bulk()
+  bpf: cpumap: switch to napi_skb_cache_get_bulk()
+  veth: use napi_skb_cache_get_bulk() instead of xdp_alloc_skb_bulk()
+  xdp: remove xdp_alloc_skb_bulk()
+
+ include/linux/netdevice.h                  |  26 ++--
+ include/linux/skbuff.h                     |   1 +
+ include/net/busy_poll.h                    |  11 +-
+ include/net/gro.h                          |  38 ++++--
+ include/net/xdp.h                          |   1 -
+ drivers/net/ethernet/brocade/bna/bnad.c    |   1 +
+ drivers/net/ethernet/cortina/gemini.c      |   1 +
+ drivers/net/veth.c                         |   3 +-
+ drivers/net/wwan/t7xx/t7xx_hif_dpmaif_rx.c |   1 +
+ kernel/bpf/cpumap.c                        | 146 +++++++++++++--------
+ net/core/dev.c                             |  77 +++--------
+ net/core/gro.c                             | 101 +++++++++-----
+ net/core/skbuff.c                          |  62 +++++++++
+ net/core/xdp.c                             |  10 --
+ 14 files changed, 299 insertions(+), 180 deletions(-)
+
+---
+From v3[5]:
+* series:
+  * rebase on top of the latest net-next;
+  * pick RBs from Toke;
+* 1:
+  * reduce possible false sharing of napi_struct (now gro_node is
+    placed precisely at 64 byte offset, was 56);
+  * pick Acked-by from Jakub;
+* 2: RB from Jakub;
+* 3: move the assignment out of the condition check :p (Jakub).
+
+From v2[6]:
+* 1: remove napi_id duplication in both &gro_node and &napi_struct by
+     using a tagged struct group. The most efficient approach I've
+     found so far: no additional branches, no inline expansion, no tail
+     calls / double calls, saves 8 bytes of &napi_struct in comparison
+     with v2 (Jakub, Paolo, me);
+* 4: improve and streamline skb allocation fails (-1 branch per frame),
+     skip more code for skb-only batches.
+
+From v1[7]:
+* use a standalone GRO instance instead of the threaded NAPI (Jakub);
+* rebase and send to net-next as it's now more networking than BPF.
+
+[5] https://lore.kernel.org/netdev/20250115151901.2063909-1-aleksander.lobakin@intel.com
+[6] https://lore.kernel.org/netdev/20250107152940.26530-1-aleksander.lobakin@intel.com
+[7] https://lore.kernel.org/bpf/20240830162508.1009458-1-aleksander.lobakin@intel.com
+-- 
+2.48.1
+
 
