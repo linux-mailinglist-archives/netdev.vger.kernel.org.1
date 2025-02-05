@@ -1,72 +1,87 @@
-Return-Path: <netdev+bounces-162961-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-162962-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4DB65A28A6B
-	for <lists+netdev@lfdr.de>; Wed,  5 Feb 2025 13:39:28 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id DA3D6A28A71
+	for <lists+netdev@lfdr.de>; Wed,  5 Feb 2025 13:41:07 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 64F1E3A431B
-	for <lists+netdev@lfdr.de>; Wed,  5 Feb 2025 12:39:19 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 36B1D7A2000
+	for <lists+netdev@lfdr.de>; Wed,  5 Feb 2025 12:40:12 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9C6D522A4D1;
-	Wed,  5 Feb 2025 12:39:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C10762288ED;
+	Wed,  5 Feb 2025 12:41:01 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="FirndxN8"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="eY08CLzQ"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-oa1-f50.google.com (mail-oa1-f50.google.com [209.85.160.50])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5F73C151987;
-	Wed,  5 Feb 2025 12:39:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2181E1EA91
+	for <netdev@vger.kernel.org>; Wed,  5 Feb 2025 12:40:59 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.50
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1738759162; cv=none; b=Rn0QqgSjcBuv4uiWjEGRXBPHzGjd2AvddbpvWAgSQ5+kNDyCyHWVKaMV5d2PQZgOFmNwC68iwXKyNhJvKjcDrQSIYDhDem46U4VwuUf3iqvep7PspHTNH/sMi8F+icKhC3i/6BnKpxOVirheDwt/DJoczGhMYUkvZbeN86PJx/k=
+	t=1738759261; cv=none; b=VIZAM+OAMiZFnoyEzh8zoCOnrCe14rgUBZShcqoq/8M/RiPfe9Y/njNDi10I/+YKSrVILsRmHdFjhJukkASHi16M0qEepBcKASeWUfrgKozlfUwhcQpZrT599H+PncxLJPNzCbNuXUxEtNO2yqECLFCKuhNBoiWlRZvCWPmYAoU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1738759162; c=relaxed/simple;
-	bh=gjnkul5ze2O0TEqEsn7OrVw4FMjwajJjo6S7dUZaW4o=;
+	s=arc-20240116; t=1738759261; c=relaxed/simple;
+	bh=XB0TbEAWYaqLaDvdnz52EcjgZ3eUVtltEze7CAqEMiA=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=R3fW8TFv3BV+7rSqZowxaFELEDHoio5gpWYb7aq13sFMkKiH0HMWq4+MF4l7cACfXcFGfty0dYlzsqjxF3BxMWnZg3NqgYCN5IFWGRUwTr5MnqeR0CfmGq/7nbfeq4mDJyesS3VqXLNFzAE+HzQHOXRI6p1gkD1iMSdHBDk5Xkg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=FirndxN8; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 44319C4CED1;
-	Wed,  5 Feb 2025 12:39:21 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1738759161;
-	bh=gjnkul5ze2O0TEqEsn7OrVw4FMjwajJjo6S7dUZaW4o=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=FirndxN80c8BwhrQKHqUA3H3IyK6Z35QESZV0Q/tHAAfdtmgm96CtwtBwTpXyqLOq
-	 jXvQdKIydOOavEq6cyQBtqcRsZUt2WpPgU1W1k5TE1oGi9lz0ip7i60lA86Lo90/JL
-	 Hw77WHEsSxMVS/PKd0SV1ruEi+NsVMZBZUqXCYuQyq+ntHobO8bzuspDxpsocD2vxu
-	 R2xBOJXR7zex9YourhtUnlriMOg90vsjLVQtojJop1XXxs7dNvmKx/VSKrVgkx+aYq
-	 SJfUou2wMAcowi7UPUTr+odb0fM9fyNIET6DHzD3wl2cAYBuBp3ytpoaAkwtKQUA/8
-	 ORK2DMl1+xAGg==
-Date: Wed, 5 Feb 2025 13:39:16 +0100
-From: Joel Granados <joel.granados@kernel.org>
-To: Kaixiong Yu <yukaixiong@huawei.com>
-Cc: akpm@linux-foundation.org, mcgrof@kernel.org, 
-	ysato@users.sourceforge.jp, dalias@libc.org, glaubitz@physik.fu-berlin.de, luto@kernel.org, 
-	tglx@linutronix.de, mingo@redhat.com, bp@alien8.de, dave.hansen@linux.intel.com, 
-	hpa@zytor.com, viro@zeniv.linux.org.uk, brauner@kernel.org, jack@suse.cz, 
-	kees@kernel.org, j.granados@samsung.com, willy@infradead.org, 
-	Liam.Howlett@oracle.com, vbabka@suse.cz, lorenzo.stoakes@oracle.com, trondmy@kernel.org, 
-	anna@kernel.org, chuck.lever@oracle.com, jlayton@kernel.org, neilb@suse.de, 
-	okorniev@redhat.com, Dai.Ngo@oracle.com, tom@talpey.com, davem@davemloft.net, 
-	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com, paul@paul-moore.com, 
-	jmorris@namei.org, linux-sh@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	linux-fsdevel@vger.kernel.org, linux-mm@kvack.org, linux-nfs@vger.kernel.org, 
-	netdev@vger.kernel.org, linux-security-module@vger.kernel.org, dhowells@redhat.com, 
-	haifeng.xu@shopee.com, baolin.wang@linux.alibaba.com, shikemeng@huaweicloud.com, 
-	dchinner@redhat.com, bfoster@redhat.com, souravpanda@google.com, hannes@cmpxchg.org, 
-	rientjes@google.com, pasha.tatashin@soleen.com, david@redhat.com, 
-	ryan.roberts@arm.com, ying.huang@intel.com, yang@os.amperecomputing.com, 
-	zev@bewilderbeest.net, serge@hallyn.com, vegard.nossum@oracle.com, 
-	wangkefeng.wang@huawei.com
-Subject: Re: [PATCH v5 -next 00/16] sysctl: move sysctls from vm_table into
- its own files
-Message-ID: <lmfy2wd6ke6pa7pfxwohmb4r5krvwcau4ybu6snkunpgod452b@24edzgbtf4ru>
-References: <20250111070751.2588654-1-yukaixiong@huawei.com>
- <2asuqwd4rpml6ylxce7mpz2vpvlm2gpdtwpp4lwuf4mdlylig2@dxdj4a73x2sb>
+	 Content-Type:Content-Disposition:In-Reply-To; b=AtYK68/49MdRoDxDcpPsn3hfbuY2jK2M2G4kK8D1iy6kqtpU1wIxjq1Q5lHExxVrlf/IIl8Sn5W2UJqGS2D/+xvV8J+ThXSKwpWSeo0agBuspVAAExFCA0UUPb7qmRGyZmGXKhhBBbnZHOUDrA4g56sx5Z7O6mky02Tb1kM2KFU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=eY08CLzQ; arc=none smtp.client-ip=209.85.160.50
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-oa1-f50.google.com with SMTP id 586e51a60fabf-2a3d8857a2bso3556358fac.1
+        for <netdev@vger.kernel.org>; Wed, 05 Feb 2025 04:40:59 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1738759259; x=1739364059; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=AWGCe7oDXZkN1GVfhM/JtWit7bKQDEW5EGEb2h9qmcM=;
+        b=eY08CLzQjh02R7aXruzGWYppF81vvkxuQK0O6IVgOwV5qD5eDtkPBjB9GGXGjej0wl
+         1uWYtu1hOAVURjednmrkZ/U/LyxPTjjt0byPtLqtP8jbmXszwI5Qbb9miF4rzOEkniSd
+         GFldtqeUFscerEiNmKvdjUR/TEhy62ZhkWrmVPeSpEMxa93jhzkOAfIbeWHTGKqnLNC1
+         tezpJhhKFg/IexSG+82+f9ThaBFE7S8lFb32azN0saw+j3T/Jx7NNUIDAJBTbIBX9X0G
+         AJ9p8CKwD3OdJ+EqSzPWj+w7ZNnwE9Rsc1/65mKXdAavs9/vAVwrJ3hc24MGjMdzqA7f
+         e+og==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1738759259; x=1739364059;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=AWGCe7oDXZkN1GVfhM/JtWit7bKQDEW5EGEb2h9qmcM=;
+        b=U+FO5gEeaP/rL93TQdEw+cQFZDO7CJEgzFzK/fKp5DFSmE+UrRKaq7qAWtWy2uZ7tU
+         jkheohdWeArszsYQd9wCWEtB6FCpLSPcDBScYVP/ThOTwJ5SkEVDH7oH9Q8W8Exp/zIE
+         JcOimanSXv5XwWiGxnWf8oCdcNZEuK/6GvUELDxVq8tQUh8jA9dQWOQ1+k7Vi7wX2HXT
+         BOX26AX5+CmefBxfgRa92vNsortwp4vkOWU8spBa+HQrpNz+UlcfKHN8G2S5NntksWwn
+         /urTZTUj9IneMmJjhJzbLn9xJAXs2JVAFEfXOtXpi+Rf+ClJS5s7qCBXdawnWNzc/OWH
+         4SgA==
+X-Forwarded-Encrypted: i=1; AJvYcCXvdQCMFqu2wdQo0TeLwmWN4c0LCxdl5NEottbkpUZTFxOozBWUKR5xozQaDq9LIVo94TDeBtw=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyMryadPcz1H+6sxdHLKbg64yASTzlzZuCISaHyCW5MR4IKxD8t
+	fg/NZnW1Cap6KxuonLSR6DPVuTkVIvR9ymjP6TS8Qeomd92VIG0=
+X-Gm-Gg: ASbGncueUvDAe20WjIx/s5oqrInZBYzm+FfIGZyX/t/3p7Jvm+mvrHXcMsIfuH9tKg9
+	ATY175CjQoadZvA4XgbcdAjlDZEOOmxGl+sRZKYX4vfiEbUgdorJawUpBp7Z24qUliSkqWqO2zp
+	2XjzWNwwkkyO+B+oEdlI/ZIAJux+p2e/XXZSzvqAodoWPw07YQ9e1x2GCgOSNqUbCMFKhOtc6rr
+	ClUiol2ge8pKk85+U0XIY0rQ25mrUF3nChvMypaUzpZDju1YnDWQBQRRrpBKDag4NFPRZ+K5xf0
+	I0dP005IVSkg
+X-Google-Smtp-Source: AGHT+IGIzxVUkmjAQkmdZLHp1k0kZaNXwSWqv+0Vhl1UizYpyDM0Vr36MqIah+eCT4vOYcNTIQ57Aw==
+X-Received: by 2002:a05:6870:9f84:b0:288:18a0:e169 with SMTP id 586e51a60fabf-2b804fa4899mr1411813fac.19.1738759259070;
+        Wed, 05 Feb 2025 04:40:59 -0800 (PST)
+Received: from t-dallas ([2001:19f0:6401:18f2:5400:4ff:fe20:62f])
+        by smtp.gmail.com with ESMTPSA id 586e51a60fabf-2b812c22c69sm92651fac.19.2025.02.05.04.40.58
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 05 Feb 2025 04:40:58 -0800 (PST)
+Date: Wed, 5 Feb 2025 20:40:57 +0800
+From: Ted Chen <znscnchen@gmail.com>
+To: Nikolay Aleksandrov <razor@blackwall.org>
+Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+	pabeni@redhat.com, andrew+netdev@lunn.ch, netdev@vger.kernel.org,
+	Ido Schimmel <idosch@idosch.org>
+Subject: Re: [PATCH net-next] vxlan: vxlan_rcv(): Update comment to inlucde
+ ipv6
+Message-ID: <Z6NcWfVbqDJJ4c11@t-dallas>
+References: <20250205114448.113966-1-znscnchen@gmail.com>
+ <7fcca70c-9bfe-4fd7-b82d-e21f765b8b87@blackwall.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -75,66 +90,42 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <2asuqwd4rpml6ylxce7mpz2vpvlm2gpdtwpp4lwuf4mdlylig2@dxdj4a73x2sb>
+In-Reply-To: <7fcca70c-9bfe-4fd7-b82d-e21f765b8b87@blackwall.org>
 
-On Tue, Jan 14, 2025 at 02:50:12PM +0100, Joel Granados wrote:
-> On Sat, Jan 11, 2025 at 03:07:35PM +0800, Kaixiong Yu wrote:
-> > This patch series moves sysctls of vm_table in kernel/sysctl.c to
-> > places where they actually belong, and do some related code clean-ups.
-> > After this patch series, all sysctls in vm_table have been moved into its
-> > own files, meanwhile, delete vm_table.
+On Wed, Feb 05, 2025 at 02:12:50PM +0200, Nikolay Aleksandrov wrote:
+> On 2/5/25 13:44, Ted Chen wrote:
+> > Update the comment to indicate that both net/ipv4/udp.c and net/ipv6/udp.c
+> > invoke vxlan_rcv() to process packets.
 > > 
-> > All the modifications of this patch series base on
-> > linux-next(tags/next-20250110). To test this patch series, the code was
-> > compiled with both the CONFIG_SYSCTL enabled and disabled on arm64 and
-> > x86_64 architectures. After this patch series is applied, all files
-> > under /proc/sys/vm can be read or written normally.
+> > The comment aligns with that for vxlan_err_lookup().
+> > 
+> > Cc: Ido Schimmel <idosch@idosch.org>
+> > Signed-off-by: Ted Chen <znscnchen@gmail.com>
+> > ---
+> >  drivers/net/vxlan/vxlan_core.c | 2 +-
+> >  1 file changed, 1 insertion(+), 1 deletion(-)
+> > 
+> > diff --git a/drivers/net/vxlan/vxlan_core.c b/drivers/net/vxlan/vxlan_core.c
+> > index 5ef40ac816cc..8bdf91d1fdfe 100644
+> > --- a/drivers/net/vxlan/vxlan_core.c
+> > +++ b/drivers/net/vxlan/vxlan_core.c
+> > @@ -1684,7 +1684,7 @@ static bool vxlan_ecn_decapsulate(struct vxlan_sock *vs, void *oiph,
+> >  	return err <= 1;
+> >  }
+> >  
+> > -/* Callback from net/ipv4/udp.c to receive packets */
+> > +/* Callback from net/ipv{4,6}/udp.c to receive packets */
+> >  static int vxlan_rcv(struct sock *sk, struct sk_buff *skb)
+> >  {
+> >  	struct vxlan_vni_node *vninode = NULL;
 > 
-> It is looking good! Here is how I think we should move it upstream:
-> 
-> 1. These should queued in for 6.15 instead of the next merge window.
->    It is too late in the current cycle and if we put it in now, it will
->    not properly tested in linux-next.
-> 
-> 2. I am putting this in sysctl-testing with the expectation of pushing this
->    up for the 6.15 merge window. Please tell me if you want this to go
->    through some other tree.
-I have rebased on top of 6.14-rc1 and sent it out for sysctl-testing
-once more. I'll add it to sysctl-next by the end of the week (unless we
-see something pop-up in the testing).
+> Your subject has a typo
+> s/inlucde/include
+Oops. Sorry for that.
+ 
+> IMO these comments are unnecessary, encap_rcv callers are trivial to find.
+I'm fine with either way. No comment is better than a wrong comment.
+Please let me know if I need to send a new version to correct the subject or
+remove the comments for both vxlan_rcv() and vxlan_err_lookup().
 
-Best
-
-> 
-> Thx for the contribution
-> 
-> Best
-> > 
-> > my test steps as below listed:
-> > 
-> > Step 1: Set CONFIG_SYSCTL to 'n' and compile the Linux kernel on the
-> > arm64 architecture. The kernel compiles successfully without any errors
-> > or warnings.
-> > 
-> ...
-> >  mm/swap.c                          |  16 ++-
-> >  mm/swap.h                          |   1 +
-> >  mm/util.c                          |  67 +++++++--
-> >  mm/vmscan.c                        |  23 +++
-> >  mm/vmstat.c                        |  44 +++++-
-> >  net/sunrpc/auth.c                  |   2 +-
-> >  security/min_addr.c                |  11 ++
-> >  23 files changed, 336 insertions(+), 312 deletions(-)
-> > 
-> > -- 
-> > 2.34.1
-> > 
-> 
-> -- 
-> 
-> Joel Granados
-
--- 
-
-Joel Granados
 
