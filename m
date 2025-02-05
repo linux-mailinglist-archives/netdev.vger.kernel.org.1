@@ -1,34 +1,34 @@
-Return-Path: <netdev+bounces-163237-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-163230-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 185E0A29A50
-	for <lists+netdev@lfdr.de>; Wed,  5 Feb 2025 20:41:58 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 57A73A29A2D
+	for <lists+netdev@lfdr.de>; Wed,  5 Feb 2025 20:34:58 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 6EAD83A7002
-	for <lists+netdev@lfdr.de>; Wed,  5 Feb 2025 19:41:49 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id A673818836BD
+	for <lists+netdev@lfdr.de>; Wed,  5 Feb 2025 19:35:02 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 56AAD204F66;
-	Wed,  5 Feb 2025 19:41:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 96C741FFC42;
+	Wed,  5 Feb 2025 19:34:53 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=engleder-embedded.com header.i=@engleder-embedded.com header.b="DtyLteaN"
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=engleder-embedded.com header.i=@engleder-embedded.com header.b="v3/npVPq"
 X-Original-To: netdev@vger.kernel.org
 Received: from mx14lb.world4you.com (mx14lb.world4you.com [81.19.149.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B6D751FF1B3
-	for <netdev@vger.kernel.org>; Wed,  5 Feb 2025 19:41:52 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D6F95155335
+	for <netdev@vger.kernel.org>; Wed,  5 Feb 2025 19:34:51 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=81.19.149.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1738784514; cv=none; b=STdTgPtxQ3Ra9+8TzV2neb/V4WV3zvSYxQsoRnZeJHEfgx3sJT43LJo+ff4gGK7HEzWkzD0AMrTP/6aXidCsd0ScjNR4a/oLd3BDROV99rdqTjAweMHwBitAf/AZ+FxJB1PqzSOyK5SlTVGbqofQeinYqD9kdaGR8MSXdLuyoqk=
+	t=1738784093; cv=none; b=JxtSfz97F4g88E16OdUgzeLPNUlc2tUZKYwUp6mrDhUOxPsmUmZO8NayCRVGmHCIzbX2YMTemz0JbM2q03uZ+Dir+tJWUjf9n7VtgOYEZrEsfMiD4n+UtO35Fdzsrkk6ArvXjb7kujDLDihoWv2RH0QHu7mwr8uNYltFKvUuHgw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1738784514; c=relaxed/simple;
-	bh=3o17YmOzA7WR7Cr0v92ZJBUQStTL8kr2ScupHii+TQo=;
+	s=arc-20240116; t=1738784093; c=relaxed/simple;
+	bh=Vf6MgmQ+cAB6pVE6LuQE1Hci2f1mTFwxqKsctMTF6Vo=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=XD53ppQpCvWwcvqzAftsQ6omAHFmFyzLHp2zpjCgqcSJfLRjAdqAkmSrZ+cGZIsKA5JdQgXwjnTAm9zxsKLxP7XQn9RXIfZXt5l50Pit7eg2+I+2jLDAM5OHUrQZW95YiiPbpWgmpospI7f8phOhD8LxvO+bqYbp5S2j6Pgy6MY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=engleder-embedded.com; spf=pass smtp.mailfrom=engleder-embedded.com; dkim=pass (1024-bit key) header.d=engleder-embedded.com header.i=@engleder-embedded.com header.b=DtyLteaN; arc=none smtp.client-ip=81.19.149.124
+	 MIME-Version; b=J0G/TMT2eNh7V4p+cErGqLuEoi9j4SOd0SuXckmzr5r+34QHyrLCDqZdBsU7liPLggUmkOZoQQZZk3lAk0uB5zmr1R+yhrSD31sp3kX6fKosZN7FjPVSYOJ3o4IBM1dD5uRCih8opARBP9XIXTzTcLiFQPXwGvWE+CTeuCzFAEE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=engleder-embedded.com; spf=pass smtp.mailfrom=engleder-embedded.com; dkim=pass (1024-bit key) header.d=engleder-embedded.com header.i=@engleder-embedded.com header.b=v3/npVPq; arc=none smtp.client-ip=81.19.149.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=engleder-embedded.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=engleder-embedded.com
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
@@ -37,15 +37,15 @@ DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
 	Content-Type:Content-ID:Content-Description:Resent-Date:Resent-From:
 	Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:List-Help:
 	List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=ze69fUJSKANAoIvDAXRHBxnEpe6Ys/LNFmN7SGuZ7B8=; b=DtyLteaNjUHBis1MXh0D7ww68T
-	9wHiksxuV90jeaFiwhC0oMaG4w/0UtydQMlJETqe4PvZbZ+Q0RBG+1sPGdw7faA2NPHslEsk4Qpro
-	dfsgUmyrXyZtNl8MTYrAdiPGmukuApPHUueXc5D7d1XcHuQgjanFKExpgmuys0nKI8MU=;
+	bh=d00kdXkxGzpJFasIUHuiHU8O5NvLGRgMg5n39bdQfn4=; b=v3/npVPqTpDoGhOUsW3Cr3eyGa
+	EDPgdk3bJwLYOKUrYgw9bfpdZOQggpCZir80/gah7mBGWlxbTc/LnJ7X1aA20jAgT2nRjJRCiMkvP
+	GBPB9eEEfBe5WrDvm+/ONo4ZP7nvBBO7etiUWwLuNYE9ayb1pwWZMnaZ9FrwkeAMBQ2k=;
 Received: from 88-117-60-28.adsl.highway.telekom.at ([88.117.60.28] helo=hornet.engleder.at)
 	by mx14lb.world4you.com with esmtpsa  (TLS1.2) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.97.1)
 	(envelope-from <gerhard@engleder-embedded.com>)
-	id 1tfklF-0000000017b-10aM;
-	Wed, 05 Feb 2025 20:08:34 +0100
+	id 1tfklH-0000000017b-0Gmq;
+	Wed, 05 Feb 2025 20:08:36 +0100
 From: Gerhard Engleder <gerhard@engleder-embedded.com>
 To: andrew@lunn.ch,
 	hkallweit1@gmail.com,
@@ -55,10 +55,11 @@ To: andrew@lunn.ch,
 	kuba@kernel.org,
 	pabeni@redhat.com
 Cc: netdev@vger.kernel.org,
-	Gerhard Engleder <gerhard@engleder-embedded.com>
-Subject: [PATCH net-next v5 5/7] tsnep: Select speed for loopback
-Date: Wed,  5 Feb 2025 20:08:21 +0100
-Message-Id: <20250205190823.23528-6-gerhard@engleder-embedded.com>
+	Gerhard Engleder <gerhard@engleder-embedded.com>,
+	Oleksij Rempel <o.rempel@pengutronix.de>
+Subject: [PATCH net-next v5 6/7] net: selftests: Export net_test_phy_loopback_*
+Date: Wed,  5 Feb 2025 20:08:22 +0100
+Message-Id: <20250205190823.23528-7-gerhard@engleder-embedded.com>
 X-Mailer: git-send-email 2.39.5
 In-Reply-To: <20250205190823.23528-1-gerhard@engleder-embedded.com>
 References: <20250205190823.23528-1-gerhard@engleder-embedded.com>
@@ -72,53 +73,103 @@ Content-Transfer-Encoding: 8bit
 X-AV-Do-Run: Yes
 X-ACL-Warn: X-W4Y-Internal
 
-Use 100 Mbps only if the PHY is configured to this speed. Otherwise use
-always the maximum speed of 1000 Mbps.
+net_selftests() provides a generic set of selftests for netdevs with
+PHY. Those selftests rely on an existing link to inherit the speed for
+the loopback mode.
 
-Also remove explicit setting of carrier on and link mode after loopback.
-This is not needed anymore, because phy_loopback() with selected speed
-signals the link and the speed to the MAC.
+net_selftests() is not designed to extend existing selftests of drivers,
+but with net_test_phy_loopback_* it contains useful test infrastructure.
+
+Export net_test_phy_loopback_* to enable reuse in existing selftests of
+other drivers. This also enables driver specific loopback modes, which
+don't rely on an existing link.
 
 Signed-off-by: Gerhard Engleder <gerhard@engleder-embedded.com>
+CC: Oleksij Rempel <o.rempel@pengutronix.de>
 ---
- drivers/net/ethernet/engleder/tsnep_main.c | 21 ++++++++++-----------
- 1 file changed, 10 insertions(+), 11 deletions(-)
+ include/net/selftests.h | 19 +++++++++++++++++++
+ net/core/selftests.c    |  9 ++++++---
+ 2 files changed, 25 insertions(+), 3 deletions(-)
 
-diff --git a/drivers/net/ethernet/engleder/tsnep_main.c b/drivers/net/ethernet/engleder/tsnep_main.c
-index a16b12137edb..d77a5b423c4c 100644
---- a/drivers/net/ethernet/engleder/tsnep_main.c
-+++ b/drivers/net/ethernet/engleder/tsnep_main.c
-@@ -228,20 +228,19 @@ static void tsnep_phy_link_status_change(struct net_device *netdev)
+diff --git a/include/net/selftests.h b/include/net/selftests.h
+index e65e8d230d33..a13237c33e58 100644
+--- a/include/net/selftests.h
++++ b/include/net/selftests.h
+@@ -6,6 +6,10 @@
  
- static int tsnep_phy_loopback(struct tsnep_adapter *adapter, bool enable)
+ #if IS_ENABLED(CONFIG_NET_SELFTESTS)
+ 
++int net_test_phy_loopback_udp(struct net_device *ndev);
++int net_test_phy_loopback_udp_mtu(struct net_device *ndev);
++int net_test_phy_loopback_tcp(struct net_device *ndev);
++
+ void net_selftest(struct net_device *ndev, struct ethtool_test *etest,
+ 		  u64 *buf);
+ int net_selftest_get_count(void);
+@@ -13,6 +17,21 @@ void net_selftest_get_strings(u8 *data);
+ 
+ #else
+ 
++static inline int net_test_phy_loopback_udp(struct net_device *ndev)
++{
++	return 0;
++}
++
++static inline int net_test_phy_loopback_udp_mtu(struct net_device *ndev)
++{
++	return 0;
++}
++
++static inline int net_test_phy_loopback_tcp(struct net_device *ndev)
++{
++	return 0;
++}
++
+ static inline void net_selftest(struct net_device *ndev, struct ethtool_test *etest,
+ 				u64 *buf)
  {
--	int retval;
--
--	retval = phy_loopback(adapter->phydev, enable, 0);
-+	int speed;
- 
--	/* PHY link state change is not signaled if loopback is enabled, it
--	 * would delay a working loopback anyway, let's ensure that loopback
--	 * is working immediately by setting link mode directly
--	 */
--	if (!retval && enable) {
--		netif_carrier_on(adapter->netdev);
--		tsnep_set_link_mode(adapter);
-+	if (enable) {
-+		if (adapter->phydev->autoneg == AUTONEG_DISABLE &&
-+		    adapter->phydev->speed == SPEED_100)
-+			speed = SPEED_100;
-+		else
-+			speed = SPEED_1000;
-+	} else {
-+		speed = 0;
- 	}
- 
--	return retval;
-+	return phy_loopback(adapter->phydev, enable, speed);
+diff --git a/net/core/selftests.c b/net/core/selftests.c
+index e99ae983fca9..d4e0e2eff991 100644
+--- a/net/core/selftests.c
++++ b/net/core/selftests.c
+@@ -310,15 +310,16 @@ static int net_test_phy_loopback_disable(struct net_device *ndev)
+ 	return phy_loopback(ndev->phydev, false, 0);
  }
  
- static int tsnep_phy_open(struct tsnep_adapter *adapter)
+-static int net_test_phy_loopback_udp(struct net_device *ndev)
++int net_test_phy_loopback_udp(struct net_device *ndev)
+ {
+ 	struct net_packet_attrs attr = { };
+ 
+ 	attr.dst = ndev->dev_addr;
+ 	return __net_test_loopback(ndev, &attr);
+ }
++EXPORT_SYMBOL_GPL(net_test_phy_loopback_udp);
+ 
+-static int net_test_phy_loopback_udp_mtu(struct net_device *ndev)
++int net_test_phy_loopback_udp_mtu(struct net_device *ndev)
+ {
+ 	struct net_packet_attrs attr = { };
+ 
+@@ -326,8 +327,9 @@ static int net_test_phy_loopback_udp_mtu(struct net_device *ndev)
+ 	attr.max_size = ndev->mtu;
+ 	return __net_test_loopback(ndev, &attr);
+ }
++EXPORT_SYMBOL_GPL(net_test_phy_loopback_udp_mtu);
+ 
+-static int net_test_phy_loopback_tcp(struct net_device *ndev)
++int net_test_phy_loopback_tcp(struct net_device *ndev)
+ {
+ 	struct net_packet_attrs attr = { };
+ 
+@@ -335,6 +337,7 @@ static int net_test_phy_loopback_tcp(struct net_device *ndev)
+ 	attr.tcp = true;
+ 	return __net_test_loopback(ndev, &attr);
+ }
++EXPORT_SYMBOL_GPL(net_test_phy_loopback_tcp);
+ 
+ static const struct net_test {
+ 	char name[ETH_GSTRING_LEN];
 -- 
 2.39.5
 
