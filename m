@@ -1,113 +1,140 @@
-Return-Path: <netdev+bounces-162972-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-162973-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 121EBA28A9C
-	for <lists+netdev@lfdr.de>; Wed,  5 Feb 2025 13:45:10 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id AA8B6A28AAE
+	for <lists+netdev@lfdr.de>; Wed,  5 Feb 2025 13:48:48 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 030E3188173E
-	for <lists+netdev@lfdr.de>; Wed,  5 Feb 2025 12:45:15 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 46581163AF1
+	for <lists+netdev@lfdr.de>; Wed,  5 Feb 2025 12:48:47 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3644F22E3E8;
-	Wed,  5 Feb 2025 12:44:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id ED374195;
+	Wed,  5 Feb 2025 12:48:44 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=blackwall-org.20230601.gappssmtp.com header.i=@blackwall-org.20230601.gappssmtp.com header.b="ThMTKZrl"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-il1-f198.google.com (mail-il1-f198.google.com [209.85.166.198])
+Received: from mail-ej1-f53.google.com (mail-ej1-f53.google.com [209.85.218.53])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6F60322E3F3
-	for <netdev@vger.kernel.org>; Wed,  5 Feb 2025 12:44:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.198
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8266D17E
+	for <netdev@vger.kernel.org>; Wed,  5 Feb 2025 12:48:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.53
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1738759472; cv=none; b=dV7vCyUqMd73JqWemEu9Jca4jdTcIZfFBE0NftFZhciMebaqMaxSOLlkbXHR5GYwJL8GegqvLlU77Rf84QRWFYGSWY/k0E7EAcg4KKPN4rDlAvOeWzbd1MoGx0RCNP4ZYCOlxEV8OMt4UyMyENBqMhYaCIOrAXbRekKobsHswTw=
+	t=1738759724; cv=none; b=RsFNFliYLlbHbQgCE9wHuF1/uidUJRFLX/4ijZSRJ4EGNOqZFcGPaGo5D5Esc36wmdENV0TaE9JYSW1dH03RCTJ4QLdSvwpmfrXR/E8dq78fCP2FciX/8NHMGlKr7yXm7A7WblTiA9lKzVHkxtq7cdVBkezbB4W5d61L1iKFWuU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1738759472; c=relaxed/simple;
-	bh=E+Chp3s8bUKJbJTwjy0HsljKNa1akEZPbSJwFVSx0U4=;
-	h=MIME-Version:Date:Message-ID:Subject:From:To:Content-Type; b=OUQ1rusLGqpj/EMMFGC8pKIxcxOWUSaEPm+g+n3iW2Zyy2xlojYBAOff0xCSn53Cc2DpFe9TH7qV+AWhyy1ryFoLowwXsDWhMDbqjcKTlIGTdBsfnFCDiTcYd1u3Azb4E1tAoNMgKW0Ct6aMflY6BELeUzSm3Us6IFWj5Nf8m+M=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.198
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
-Received: by mail-il1-f198.google.com with SMTP id e9e14a558f8ab-3ce7b6225aeso117726975ab.0
-        for <netdev@vger.kernel.org>; Wed, 05 Feb 2025 04:44:30 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1738759469; x=1739364269;
-        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
+	s=arc-20240116; t=1738759724; c=relaxed/simple;
+	bh=xgwz5ySDnjqz7zMFBl/JwA9S9l/TWH8KcZ+sIJ1Cf48=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=RIjObGGTbEdmY3jMfXNuqV7DXhEOFjXeuUIMfd8+jN9y6/P28iUoDxmldFTvJR1oURCJSj0FaHOZMH599iUJ2WrCMf2zySfMfAP5R+b0++SnRJ8JskFlklhFXQmF47KTPIWlQa5J3W0jrr8mf/xYG995zyw9zh+hLZ2PS9nfSIU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=blackwall.org; spf=none smtp.mailfrom=blackwall.org; dkim=pass (2048-bit key) header.d=blackwall-org.20230601.gappssmtp.com header.i=@blackwall-org.20230601.gappssmtp.com header.b=ThMTKZrl; arc=none smtp.client-ip=209.85.218.53
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=blackwall.org
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=blackwall.org
+Received: by mail-ej1-f53.google.com with SMTP id a640c23a62f3a-ab7483b9bf7so362839866b.3
+        for <netdev@vger.kernel.org>; Wed, 05 Feb 2025 04:48:39 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=blackwall-org.20230601.gappssmtp.com; s=20230601; t=1738759718; x=1739364518; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
          :from:to:cc:subject:date:message-id:reply-to;
-        bh=Ge22AivEZoY/4Tv/E+lBQ1CqAf41hkW39t6YWMYZZRk=;
-        b=TpJhY/PAmWk+yBzskmcdwth5IKhvafslTe8affOJT13uvYSWo1AJ2oZ4ymA8nPmY0H
-         F8KweS4j5k+juA4OYSQUr4w+0kLHhfD+03drOQjA3MMiDwYovitck2VjWVjbLimBjoQL
-         kmz+J7T1H/IDadhko3IoIYN00rra2TQm/+O0BZLZy/kjklhAB3SNU4lXu53N8Yhfjg9n
-         nmA+XQavqSzd6gSDIxV3AO6IFkJtHQp1LfdMJQ/hn5esqhil0Ri4yl+mQfopxf4LCFFf
-         SuRX2lCrti/6TAj8g9Q2gCOxAxYoT1NeT59V/hxmK65ZlrIFWuVEWChh6wp4jNULtELS
-         j/2w==
-X-Forwarded-Encrypted: i=1; AJvYcCUQ92hPl0lGW4hz6LidFbQQLWWQfMJNfNG1uVPwGbbbCtH2AVeF4YyVqg5ay/eU0U62diroG3A=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyBzI2gIkXwJQENfIa6aKZ4crbR9WIUqz178+k6EdJBQBxf5YFJ
-	Rn4hlN2BAsIwAGCQ+bg1JyPqyTk7XCg4rUHau7kBRNqZPpsFT3lksLn5o+YtUjT2DLjMo7sAHu+
-	Wu/0RmriLpz56dKo3YRfcVGHWE3pVTFHQPo2LTVuzoGejbI2NWPjuQJk=
-X-Google-Smtp-Source: AGHT+IEpRMR4/QWV3lJbVI70WEuPYeZmtAsmp7udihbvd3N1hnfw2jaJ5AE9gCojOSkyOYWw4yvLtYr1nPYogFm6xoFJIHtIvvJ+
+        bh=j2rHnh+yAkmQSzzxK5RyiLTSgASQBQ742SO4R1jYfIU=;
+        b=ThMTKZrlGets83sU5dg4nTHWQrWus3+dVZBD1QXI1k7dFYmgEIQusgJEnV9db78Zdo
+         kN6Mvz4rWVTL6iMb4q5Xr+haAg0jwRmktSxoXax0YjmR9Phct1mriZcbr6KdwUMDBwKv
+         MLBzaqFb3l5ySWxFsi1/fwqnt4mrqHkILGNkS9aibV3di788u3GKykDB4erlXur2usmg
+         9/5GpN7oO453NIdFk8mcU1jFzlS2tKN+rTDvZ3odFYjETQPHDcZ4qT5eLd1x5YDWGEMA
+         3FgvTYbgmpBXRJsk3Wu0kIFvg1J+Gy4uQVDfgMM1GUhyxJDGeysD9Tk6J4gvE0E1s5ew
+         eXkg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1738759718; x=1739364518;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=j2rHnh+yAkmQSzzxK5RyiLTSgASQBQ742SO4R1jYfIU=;
+        b=a5tiJWbzwV0on7IeQyHDQMvGA7tHOnO7MdtbyU8wxteElqEr+jjfD0Yalj/0fSTDbg
+         TqyPiQ0IWZHI6pFz4999wkE0pZSb/3JOOKkCxV0RRX5XV9Q/9/5vpCrXpmmG7j42sXx9
+         4APLaH98pUBoeV6SO0noAge3H19eAHqUHCICpylK2PlJ6iK1dJ1X61SHChy6KZVVrT53
+         O2vuRSRuW8JIR5xN/owk7f7MDjBQ+gbVA6pMcpRcZ+oJcu2joeUJ3ZfmlXlJSzTai7kp
+         DUVcsKdhfm6cYH3aIZSwhU+vDmtGEZiMfWmixTI3XVeuzwymxmIeTFy4HwDpgfoY9lPe
+         nBfA==
+X-Forwarded-Encrypted: i=1; AJvYcCW/Eo8p4WW7c/OZ0BhfS20LyRafb8kh4efOkmxgjP652iTujW1XaIsBUDCeOAkPkYLfZl5iWmY=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwNvS6M3wHnjZTTPQFhWDXfWQ8Y0YVluP2SDBfp7z9v5SudW6YB
+	jIDymtoRMofpoUOmH3K9rNDv/mM7kZ+zdfAsKuNaSg+Uard+nEY044DzCSgLwUk=
+X-Gm-Gg: ASbGncvC4RlWI9ZN0qPIkakJ1uiwQ/sALC7BTieTixEoV7Ak/KJtdPed7gdb6W2QYy4
+	p68taKWkXS1aAmoxWNQKmP2HX7HBD4qlkNb9UpbEJWL/gBH4Vc9VHeOjSInjJxk9Jyh3UeHiVGn
+	A+6TSrCHDR/IcU+8fKhJ2BoIxNU2WMlRZW9Ux23Gr5BIOoR5+LU6YXWUcvT5mCWnAVDIg5AgLUm
+	rK4aVqZ/+NH5HV1w14Yz53WepvYzs1lgXY9flKawGNAvhZif7GEnBokGYHeStZr/yGx8OemQWmf
+	0E60O19dPKN2ZarFinhmuIB3GGpzzC8oI+Fw1UwdiUn3ii8=
+X-Google-Smtp-Source: AGHT+IGswvqC0DJo4N9WDGG7KlPK8WPMfL4WNKB01Aq8+lNuY1QIwDotwftexOq+uQkBbb3p/fXCJg==
+X-Received: by 2002:a17:907:2d28:b0:ab3:76fb:96ab with SMTP id a640c23a62f3a-ab75e3403dfmr244747366b.57.1738759717452;
+        Wed, 05 Feb 2025 04:48:37 -0800 (PST)
+Received: from [192.168.0.205] (78-154-15-142.ip.btc-net.bg. [78.154.15.142])
+        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-ab6e47cf88esm1086462766b.46.2025.02.05.04.48.36
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 05 Feb 2025 04:48:36 -0800 (PST)
+Message-ID: <e5373a02-959b-4609-8a3f-7e25c69d97b8@blackwall.org>
+Date: Wed, 5 Feb 2025 14:48:36 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Received: by 2002:a05:6e02:1b0c:b0:3cf:c8bf:3b8a with SMTP id
- e9e14a558f8ab-3d04f419163mr27575035ab.7.1738759469649; Wed, 05 Feb 2025
- 04:44:29 -0800 (PST)
-Date: Wed, 05 Feb 2025 04:44:29 -0800
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <67a35d2d.050a0220.50516.0054.GAE@google.com>
-Subject: [syzbot] Monthly net report (Feb 2025)
-From: syzbot <syzbot+list0b88770b4dd3d4e4c89e@syzkaller.appspotmail.com>
-To: linux-kernel@vger.kernel.org, netdev@vger.kernel.org, 
-	syzkaller-bugs@googlegroups.com
-Content-Type: text/plain; charset="UTF-8"
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next] vxlan: vxlan_rcv(): Update comment to inlucde
+ ipv6
+To: Ted Chen <znscnchen@gmail.com>
+Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+ pabeni@redhat.com, andrew+netdev@lunn.ch, netdev@vger.kernel.org,
+ Ido Schimmel <idosch@idosch.org>
+References: <20250205114448.113966-1-znscnchen@gmail.com>
+ <7fcca70c-9bfe-4fd7-b82d-e21f765b8b87@blackwall.org>
+ <Z6NcWfVbqDJJ4c11@t-dallas>
+Content-Language: en-US
+From: Nikolay Aleksandrov <razor@blackwall.org>
+In-Reply-To: <Z6NcWfVbqDJJ4c11@t-dallas>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-Hello net maintainers/developers,
+On 2/5/25 14:40, Ted Chen wrote:
+> On Wed, Feb 05, 2025 at 02:12:50PM +0200, Nikolay Aleksandrov wrote:
+>> On 2/5/25 13:44, Ted Chen wrote:
+>>> Update the comment to indicate that both net/ipv4/udp.c and net/ipv6/udp.c
+>>> invoke vxlan_rcv() to process packets.
+>>>
+>>> The comment aligns with that for vxlan_err_lookup().
+>>>
+>>> Cc: Ido Schimmel <idosch@idosch.org>
+>>> Signed-off-by: Ted Chen <znscnchen@gmail.com>
+>>> ---
+>>>  drivers/net/vxlan/vxlan_core.c | 2 +-
+>>>  1 file changed, 1 insertion(+), 1 deletion(-)
+>>>
+>>> diff --git a/drivers/net/vxlan/vxlan_core.c b/drivers/net/vxlan/vxlan_core.c
+>>> index 5ef40ac816cc..8bdf91d1fdfe 100644
+>>> --- a/drivers/net/vxlan/vxlan_core.c
+>>> +++ b/drivers/net/vxlan/vxlan_core.c
+>>> @@ -1684,7 +1684,7 @@ static bool vxlan_ecn_decapsulate(struct vxlan_sock *vs, void *oiph,
+>>>  	return err <= 1;
+>>>  }
+>>>  
+>>> -/* Callback from net/ipv4/udp.c to receive packets */
+>>> +/* Callback from net/ipv{4,6}/udp.c to receive packets */
+>>>  static int vxlan_rcv(struct sock *sk, struct sk_buff *skb)
+>>>  {
+>>>  	struct vxlan_vni_node *vninode = NULL;
+>>
+>> Your subject has a typo
+>> s/inlucde/include
+> Oops. Sorry for that.
+>  
+>> IMO these comments are unnecessary, encap_rcv callers are trivial to find.
+> I'm fine with either way. No comment is better than a wrong comment.
+> Please let me know if I need to send a new version to correct the subject or
+> remove the comments for both vxlan_rcv() and vxlan_err_lookup().
+> 
 
-This is a 31-day syzbot report for the net subsystem.
-All related reports/information can be found at:
-https://syzkaller.appspot.com/upstream/s/net
+Up to you, I don't have a strong preference. You have to wait 24 hours
+before posting another version anyway, so you have time to decide. :)
 
-During the period, 10 new issues were detected and 7 were fixed.
-In total, 138 issues are still open and 1579 have already been fixed.
-
-Some of the still happening issues:
-
-Ref  Crashes Repro Title
-<1>  257940  Yes   possible deadlock in team_del_slave (3)
-                   https://syzkaller.appspot.com/bug?extid=705c61d60b091ef42c04
-<2>  46041   Yes   unregister_netdevice: waiting for DEV to become free (8)
-                   https://syzkaller.appspot.com/bug?extid=881d65229ca4f9ae8c84
-<3>  20019   Yes   possible deadlock in smc_switch_to_fallback (2)
-                   https://syzkaller.appspot.com/bug?extid=bef85a6996d1737c1a2f
-<4>  10645   Yes   possible deadlock in do_ip_setsockopt (4)
-                   https://syzkaller.appspot.com/bug?extid=e4c27043b9315839452d
-<5>  7383    Yes   WARNING: suspicious RCU usage in dev_deactivate_queue
-                   https://syzkaller.appspot.com/bug?extid=ca9ad1d31885c81155b6
-<6>  6432    Yes   KMSAN: uninit-value in eth_type_trans (2)
-                   https://syzkaller.appspot.com/bug?extid=0901d0cc75c3d716a3a3
-<7>  6150    Yes   WARNING in inet_sock_destruct (4)
-                   https://syzkaller.appspot.com/bug?extid=de6565462ab540f50e47
-<8>  4524    Yes   KASAN: slab-use-after-free Read in __ethtool_get_link_ksettings
-                   https://syzkaller.appspot.com/bug?extid=5fe14f2ff4ccbace9a26
-<9>  3096    Yes   INFO: task hung in linkwatch_event (4)
-                   https://syzkaller.appspot.com/bug?extid=2ba2d70f288cf61174e4
-<10> 2826    Yes   possible deadlock in sockopt_lock_sock
-                   https://syzkaller.appspot.com/bug?extid=819a360379cf16b5f0d3
-
----
-This report is generated by a bot. It may contain errors.
-See https://goo.gl/tpsmEJ for more information about syzbot.
-syzbot engineers can be reached at syzkaller@googlegroups.com.
-
-To disable reminders for individual bugs, reply with the following command:
-#syz set <Ref> no-reminders
-
-To change bug's subsystems, reply with:
-#syz set <Ref> subsystems: new-subsystem
-
-You may send multiple commands in a single email message.
 
