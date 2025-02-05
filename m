@@ -1,49 +1,49 @@
-Return-Path: <netdev+bounces-162829-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-162830-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4A178A281B2
-	for <lists+netdev@lfdr.de>; Wed,  5 Feb 2025 03:20:34 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 65FC7A281B4
+	for <lists+netdev@lfdr.de>; Wed,  5 Feb 2025 03:20:45 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 67FD0164240
-	for <lists+netdev@lfdr.de>; Wed,  5 Feb 2025 02:20:30 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 55EF816472B
+	for <lists+netdev@lfdr.de>; Wed,  5 Feb 2025 02:20:41 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C59B4213243;
-	Wed,  5 Feb 2025 02:20:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 600CE214215;
+	Wed,  5 Feb 2025 02:20:14 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="b3VnEFcO"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="sIXhF2bO"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A170A213228
-	for <netdev@vger.kernel.org>; Wed,  5 Feb 2025 02:20:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3341425A65D;
+	Wed,  5 Feb 2025 02:20:13 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1738722012; cv=none; b=tKngzjX1gxV712LLhbi5foN6jt/cyugroUDj02n9upY4gNoFuiVWSdAOWPKCmPYKhChAQFpIou3q1z2Sf7tO2tYyE9Uoi/1vzf2jUAjaqnIobEeyznpNnEn/mUN2rAF05Yfalq+EauaKGjo8UYtbgmpphV+X8bRa+uJ3T7PIiyg=
+	t=1738722014; cv=none; b=CgkeQWGEOgEaZPEm+xFT7pM8Iszixfhuik0eMrByVIc9/as/iE20ia/GKn31JwLtRkse8ijpyLqJCIZXDVOXrMpU8v7JHwypc14kM36l1OfsrXYNR6Xd+aY+sYi0ymnMD5Ht5unXDzdS4VXjZRN9gp2dvZUyyxa8UUFmKbRAi1c=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1738722012; c=relaxed/simple;
-	bh=yK4ghLqomOmEeO0WYfvEWlbMUtizFewl2XhFOyo58DA=;
+	s=arc-20240116; t=1738722014; c=relaxed/simple;
+	bh=zhOY3YomWCvmtaCgrNkjWnKNT5JYyt5HT88X3JfjTGI=;
 	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=uQYxLs54zTTMhStoRATsMhS0IrkInL6u5b4zSEIDiSO4dCy95r79/JgU3EXGMu7yUuZPBGFZS03Bq1pRS2Ulih7Oij90KhReCF8Xg5LDw+S8Jxs0YVgD/Q2kvJAnseFkhspVm8fW7oUF4MGVUYwukEXbSfX4IUmmoX+XgLK3utU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=b3VnEFcO; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1EB7DC4CEE4;
-	Wed,  5 Feb 2025 02:20:12 +0000 (UTC)
+	 In-Reply-To:To:Cc; b=N4J3wK2ua3ZvdddlnxZgN4NM16M+z+iRgTiCjTyK2+aX53QvyoycNpsRHq+AzeY9XuawsQK9UXUCAAJ8vS1gcU35DXud8w9VOA4mIE2gSPcWsj+x+jXkIYVRoTYWriO/G9BHhLZ/eOOoMuQ5RGB7A/5Md9/npnIRjJBdcOJ0vT4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=sIXhF2bO; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9E3DBC4CEE5;
+	Wed,  5 Feb 2025 02:20:13 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1738722012;
-	bh=yK4ghLqomOmEeO0WYfvEWlbMUtizFewl2XhFOyo58DA=;
+	s=k20201202; t=1738722013;
+	bh=zhOY3YomWCvmtaCgrNkjWnKNT5JYyt5HT88X3JfjTGI=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=b3VnEFcORu3u/7XQH0sYZVPQeVl4F27pySc8Fw1675kS16muGSOU/XFPkpyr7Hhnq
-	 nHujzQ1cX6iuyTZCTE9t23r+TLbZPFXvegPp+J+ZqeQzhkS7BPoqnUMBRFqkU8ZANt
-	 Ss42dhyYBwdEr8FbVz4ZG/n/5cgwrjvdN+wPeOdp+vXzcXLrQXHjjwcRwsua3GAlQ1
-	 7/6/NXgh1pWrk6B0viJM4iNlcq/DfWHBYfd5F/7C0HGIL16gmAW1d4ARHfq2WG8Tzj
-	 lABzAL9ATnJ9n4r6g/TM7K2OaV441UB2f8a62Tc1aSextpcfqp993HLO0SAogonTlL
-	 KXQgXMb2Lkd4w==
+	b=sIXhF2bO5sBgw3d3Bfs0bcQzAbh9rsSsMplZDebJjekVHXXaRMj2NqeM+eDk/BgfU
+	 OC3c5isc3u/dwZLvZkdO8JNaAgWAwtNQO32hXpl185kIucHeMASiqeuntc0yuHnZTr
+	 ZXXgqWMLdMppWGfbkfCwV7JJd/D7nVGAS5m64ysbNK7K+P+budDLJcqxEn7zVvea0i
+	 Uiy1XtVX4ptRARxkXZ1YKgZCGEKXIeEXR3nRTcq9X9gEGHh+7MYWmDtnT0tWjcZWSV
+	 35V6gVxqZhAN0mVm926RJb+t5PbT0s1mH05EldhtDRtDlGMnRVNTAG11oqZIBLHqU7
+	 BNPRp16Ljcspw==
 Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id AE547380AA7E;
-	Wed,  5 Feb 2025 02:20:40 +0000 (UTC)
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 34310380AA7E;
+	Wed,  5 Feb 2025 02:20:42 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -52,37 +52,40 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net-next] net: phy: realtek: make HWMON support a user-visible
- Kconfig symbol
+Subject: Re: [PATCH net-next] netconsole: selftest: Add test for fragmented
+ messages
 From: patchwork-bot+netdevbpf@kernel.org
 Message-Id: 
- <173872203950.246239.2948687782961371745.git-patchwork-notify@kernel.org>
-Date: Wed, 05 Feb 2025 02:20:39 +0000
-References: <3466ee92-166a-4b0f-9ae7-42b9e046f333@gmail.com>
-In-Reply-To: <3466ee92-166a-4b0f-9ae7-42b9e046f333@gmail.com>
-To: Heiner Kallweit <hkallweit1@gmail.com>
-Cc: andrew+netdev@lunn.ch, pabeni@redhat.com, kuba@kernel.org,
- davem@davemloft.net, edumazet@google.com, linux@armlinux.org.uk,
- netdev@vger.kernel.org, horms@kernel.org, geert@linux-m68k.org
+ <173872204075.246239.3683457761866734624.git-patchwork-notify@kernel.org>
+Date: Wed, 05 Feb 2025 02:20:40 +0000
+References: <20250203-netcons_frag_msgs-v1-1-5bc6bedf2ac0@debian.org>
+In-Reply-To: <20250203-netcons_frag_msgs-v1-1-5bc6bedf2ac0@debian.org>
+To: Breno Leitao <leitao@debian.org>
+Cc: andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com,
+ kuba@kernel.org, pabeni@redhat.com, shuah@kernel.org,
+ linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
+ linux-kselftest@vger.kernel.org, kernel-team@meta.com, horms@kernel.org
 
 Hello:
 
 This patch was applied to netdev/net-next.git (main)
 by Jakub Kicinski <kuba@kernel.org>:
 
-On Mon, 3 Feb 2025 21:33:39 +0100 you wrote:
-> Make config symbol REALTEK_PHY_HWMON user-visible, so that users can
-> remove support if not needed.
+On Mon, 03 Feb 2025 11:04:15 -0800 you wrote:
+> Add a new selftest to verify netconsole's handling of messages that
+> exceed the packet size limit and require fragmentation. The test sends
+> messages with varying sizes and userdata, validating that:
 > 
-> Suggested-by: Geert Uytterhoeven <geert@linux-m68k.org>
-> Signed-off-by: Heiner Kallweit <hkallweit1@gmail.com>
-> ---
->  drivers/net/phy/realtek/Kconfig | 8 ++++++--
->  1 file changed, 6 insertions(+), 2 deletions(-)
+> 1. Large messages are correctly fragmented and reassembled
+> 2. Userdata fields are properly preserved across fragments
+> 3. Messages work correctly with and without kernel release version
+>    appending
+> 
+> [...]
 
 Here is the summary with links:
-  - [net-next] net: phy: realtek: make HWMON support a user-visible Kconfig symbol
-    https://git.kernel.org/netdev/net-next/c/51773846fab2
+  - [net-next] netconsole: selftest: Add test for fragmented messages
+    https://git.kernel.org/netdev/net-next/c/d5fdfe480c79
 
 You are awesome, thank you!
 -- 
