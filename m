@@ -1,123 +1,111 @@
-Return-Path: <netdev+bounces-163028-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-163029-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id B10FFA28EE1
-	for <lists+netdev@lfdr.de>; Wed,  5 Feb 2025 15:18:41 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1212AA28F4B
+	for <lists+netdev@lfdr.de>; Wed,  5 Feb 2025 15:23:50 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 0005D7A18CC
-	for <lists+netdev@lfdr.de>; Wed,  5 Feb 2025 14:17:45 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id CBDDD18822F4
+	for <lists+netdev@lfdr.de>; Wed,  5 Feb 2025 14:23:23 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D3CC714A088;
-	Wed,  5 Feb 2025 14:18:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E8AD81553AB;
+	Wed,  5 Feb 2025 14:23:03 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="YP3L5Ao7"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="eg4nZJbO"
 X-Original-To: netdev@vger.kernel.org
-Received: from relay3-d.mail.gandi.net (relay3-d.mail.gandi.net [217.70.183.195])
+Received: from out-171.mta0.migadu.com (out-171.mta0.migadu.com [91.218.175.171])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E7D014A28;
-	Wed,  5 Feb 2025 14:18:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.195
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1A769158536
+	for <netdev@vger.kernel.org>; Wed,  5 Feb 2025 14:23:00 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.171
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1738765115; cv=none; b=gMCes+1+h5LqR4JjYnpnEyjTBvCdUpKxjZfJb9kGc8GHHZVoPCnwD+ogsayKqoXv1EhmQO92cTzLEp99dXud1II/QQgB/sRJ4FhYZLaDpe+07QbCqXWgxnIsZFK9Z0gJMtKvG7LV26Fb8o7cSH7MkdetH8UVcPuqcSYyUSlX+IU=
+	t=1738765383; cv=none; b=aUhrUk7Y6paX1Yk/rD5kSPGQFkKLcPfscEDzaHhQb4G2D8nkthU1d31OJFw/SUb1MPitX2YxXKt9o93iTGaczycUhS4q/Er3LpiQVfL7AYLzYiWigK6pOxbLr9UWYjMLy2edjQ8tCCzrxX16RMXaFTCYnExrcv0u6dz4VVgFzrQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1738765115; c=relaxed/simple;
-	bh=aZBMMyaxCDfhJnnHsdLjPCpzBvuSsrTgVOQZffpvq5s=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=ucNAP91Up7vvHShqoIW4nF7qRBI6foqiFIl5nP6MXRzedwHsEBTzndaMrKpdOzy7d6VqEBnkFX15/fm6lYhdzY5+oB/IdtuIHYonttBVrrtlXhZljlSVpWUPm+AIo2v97fzN0g+hcryhUcKL8vsy3Pc3ePG6GLvjnI3M6bL23Gk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=YP3L5Ao7; arc=none smtp.client-ip=217.70.183.195
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
-Received: by mail.gandi.net (Postfix) with ESMTPSA id A812520457;
-	Wed,  5 Feb 2025 14:18:23 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
-	t=1738765105;
+	s=arc-20240116; t=1738765383; c=relaxed/simple;
+	bh=zn1OZ0/xC5hWSYyFfGAzueY2AGtYBGt8AuLFCHG10t8=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=NJprI4IuhFYN8JfuGmEz7AcoeIhNHHys7QQWRHKB7vm0jYix+DrAqHUGMvklbyGzgocVj+d9AxhGeaokdGCFgNd38GfsVtqCFgII1cJ85Mk6JOcyoN7LdCmQT1aosTvVfE8kNooL9j9pRRgHpQsMmn679qIek2yYC7QmGMTum1Q=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=eg4nZJbO; arc=none smtp.client-ip=91.218.175.171
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+Message-ID: <f728a006-e588-4eab-b667-b1ff7dfd66c5@linux.dev>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1738765376;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=+jcjhIK6Qww9CRS3+S8VD/DtB2JrJ0nIx9XhierQplY=;
-	b=YP3L5Ao7Wf+re27gX/s4xqtwPqGfwk0ZmMDq3SrxFJbv8S67S8OyiVelQI1GgnaTwCi8ya
-	l9NTD+q/gkOPvaXXcmPExY07nPGGV4HinqGGk0bAl89qrnczltvNOhFhg3iMaFbh6E6Dee
-	mF6GzumW2IcsqsWXg2ro3erjxBfabBGSofGcZuJ0DfU4q/wMW9SLz4SYMSgYApjUmTswVf
-	BysAd0P1WbsAPXmQ8uEOyAlhDUH9aFB/3fZDPJ+WdmvmYwZM38dLBVaTUD8jb/L/tMr0QJ
-	pK+yq+nzyVmVzDt9rybYqejy+8QtH8gQatx4TIYxJpAnmA4NGmMDz94e7wjntg==
-Date: Wed, 5 Feb 2025 15:18:22 +0100
-From: Kory Maincent <kory.maincent@bootlin.com>
-To: Krzysztof Kozlowski <krzk@kernel.org>
-Cc: Andrew Lunn <andrew@lunn.ch>, Oleksij Rempel <o.rempel@pengutronix.de>,
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet
- <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
- <pabeni@redhat.com>, Jonathan Corbet <corbet@lwn.net>, Donald Hunter
- <donald.hunter@gmail.com>, Rob Herring <robh@kernel.org>, Andrew Lunn
- <andrew+netdev@lunn.ch>, Simon Horman <horms@kernel.org>, Heiner Kallweit
- <hkallweit1@gmail.com>, Russell King <linux@armlinux.org.uk>, Liam Girdwood
- <lgirdwood@gmail.com>, Mark Brown <broonie@kernel.org>, Krzysztof Kozlowski
- <krzk+dt@kernel.org>, Conor Dooley <conor+dt@kernel.org>, Thomas Petazzoni
- <thomas.petazzoni@bootlin.com>, linux-kernel@vger.kernel.org,
- netdev@vger.kernel.org, linux-doc@vger.kernel.org, Kyle Swenson
- <kyle.swenson@est.tech>, Dent Project <dentproject@linuxfoundation.org>,
- kernel@pengutronix.de, Maxime Chevallier <maxime.chevallier@bootlin.com>,
- devicetree@vger.kernel.org
-Subject: Re: [PATCH net-next v4 27/27] dt-bindings: net: pse-pd:
- ti,tps23881: Add interrupt description
-Message-ID: <20250205151822.06f60e8d@kmaincent-XPS-13-7390>
-In-Reply-To: <uv2grnchczucf4vxxzaprfkc6ap56z6uqzaew3qtjqpvmtaqbb@kuv62yntqyfr>
-References: <20250103-feature_poe_port_prio-v4-0-dc91a3c0c187@bootlin.com>
- <20250103-feature_poe_port_prio-v4-27-dc91a3c0c187@bootlin.com>
- <uv2grnchczucf4vxxzaprfkc6ap56z6uqzaew3qtjqpvmtaqbb@kuv62yntqyfr>
-Organization: bootlin
-X-Mailer: Claws Mail 4.0.0 (GTK+ 3.24.33; x86_64-pc-linux-gnu)
+	bh=zn1OZ0/xC5hWSYyFfGAzueY2AGtYBGt8AuLFCHG10t8=;
+	b=eg4nZJbO0xpeG0pLWlbhMOe6AYAiwdcu4kYoQMdLWO+eZdJ3lFgi+Jpg3kpYb/i14hvLjJ
+	/+NqrmVuZeacszL66SFSgoFSCyY+PoN4hFtdoc0HT7vGRqjXutkQ+JV8tyyG3jBtPypA32
+	7MoUOedOYpMYKM+fZ/PdUpF9Kz9lHl0=
+Date: Wed, 5 Feb 2025 22:22:00 +0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-X-GND-State: clean
-X-GND-Score: -100
-X-GND-Cause: gggruggvucftvghtrhhoucdtuddrgeefvddrtddtgddvfeeikecutefuodetggdotefrodftvfcurfhrohhfihhlvgemucfitefpfffkpdcuggftfghnshhusghstghrihgsvgenuceurghilhhouhhtmecufedtudenucesvcftvggtihhpihgvnhhtshculddquddttddmnecujfgurhepfffhvfevuffkjghfohfogggtgfesthhqredtredtjeenucfhrhhomhepmfhorhihucforghinhgtvghnthcuoehkohhrhidrmhgrihhntggvnhhtsegsohhothhlihhnrdgtohhmqeenucggtffrrghtthgvrhhnpefguddtfeevtddugeevgfevtdfgvdfhtdeuleetffefffffhffgteekvdefudeiieenucffohhmrghinhepsghoohhtlhhinhdrtghomhenucfkphepledtrdekledrudeifedruddvjeenucevlhhushhtvghrufhiiigvpedtnecurfgrrhgrmhepihhnvghtpeeltddrkeelrdduieefrdduvdejpdhhvghlohepkhhmrghinhgtvghnthdqigfrufdqudefqdejfeeltddpmhgrihhlfhhrohhmpehkohhrhidrmhgrihhntggvnhhtsegsohhothhlihhnrdgtohhmpdhnsggprhgtphhtthhopedvjedprhgtphhtthhopehkrhiikheskhgvrhhnvghlrdhorhhgpdhrtghpthhtoheprghnughrvgifsehluhhnnhdrtghhpdhrtghpthhtohepohdrrhgvmhhpvghlsehpvghnghhuthhrohhnihigrdguvgdprhgtphhtthhopegurghvvghmsegurghvvghmlhhofhhtrdhnvghtpdhrtghpthhtohepvgguuhhmrgiiv
- ghtsehgohhoghhlvgdrtghomhdprhgtphhtthhopehkuhgsrgeskhgvrhhnvghlrdhorhhgpdhrtghpthhtohepphgrsggvnhhisehrvgguhhgrthdrtghomhdprhgtphhtthhopegtohhrsggvtheslhifnhdrnhgvth
-X-GND-Sasl: kory.maincent@bootlin.com
+Subject: Re: [PATCH] net: stmmac: Allow zero for [tr]x_fifo_size
+To: Jakub Kicinski <kuba@kernel.org>,
+ "Russell King (Oracle)" <linux@armlinux.org.uk>,
+ Steven Price <steven.price@arm.com>
+Cc: Kunihiko Hayashi <hayashi.kunihiko@socionext.com>,
+ "David S. Miller" <davem@davemloft.net>,
+ Alexandre Torgue <alexandre.torgue@foss.st.com>,
+ Andrew Lunn <andrew+netdev@lunn.ch>, Eric Dumazet <edumazet@google.com>,
+ Maxime Coquelin <mcoquelin.stm32@gmail.com>,
+ Jose Abreu <joabreu@synopsys.com>, Paolo Abeni <pabeni@redhat.com>,
+ linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
+ linux-stm32@st-md-mailman.stormreply.com, netdev@vger.kernel.org,
+ Furong Xu <0x1207@gmail.com>, Petr Tesarik <petr@tesarici.cz>,
+ Serge Semin <fancer.lancer@gmail.com>, Xi Ruoyao <xry111@xry111.site>
+References: <20250203093419.25804-1-steven.price@arm.com>
+ <Z6CckJtOo-vMrGWy@shell.armlinux.org.uk>
+ <811ea27c-c1c3-454a-b3d9-fa4cd6d57e44@arm.com>
+ <Z6Clkh44QgdNJu_O@shell.armlinux.org.uk> <20250203142342.145af901@kernel.org>
+Content-Language: en-US
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Yanteng Si <si.yanteng@linux.dev>
+In-Reply-To: <20250203142342.145af901@kernel.org>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
+X-Migadu-Flow: FLOW_OUT
 
-Hello Krzysztof,
 
-On Sat, 4 Jan 2025 10:44:49 +0100
-Krzysztof Kozlowski <krzk@kernel.org> wrote:
+在 2/4/25 06:23, Jakub Kicinski 写道:
+> On Mon, 3 Feb 2025 11:16:34 +0000 Russell King (Oracle) wrote:
+>>> I've no opinion whether the original series "had value" - I'm just
+>>> trying to fix the breakage that entailed. My first attempt at a patch
+>>> was indeed a (partial) revert, but Andrew was keen to find a better
+>>> solution[1].
+>> There are two ways to fix the breakage - either revert the original
+>> patches (which if they have little value now would be the sensible
+>> approach IMHO)
+> +1, I also vote revert FWIW
 
-> On Fri, Jan 03, 2025 at 10:13:16PM +0100, Kory Maincent wrote:
-> > From: Kory Maincent (Dent Project) <kory.maincent@bootlin.com>
-> >=20
-> > Add an interrupt property to the device tree bindings for the TI TPS238=
-81
-> > PSE controller. The interrupt is primarily used to detect classification
-> > and disconnection events, which are essential for managing the PSE
-> > controller in compliance with the PoE standard.
-> > =20
-> > @@ -62,6 +65,7 @@ unevaluatedProperties: false
-> >  required:
-> >    - compatible
-> >    - reg
-> > +  - interrupts =20
->=20
-> Why? That's an ABI change. Commit msg mentions something like "essential
-> for standard" so are you saying nothing here was working according to
-> standard before?
++1, same here.
 
-Yes indeed, the disconnection management did not follow the standard. Witho=
-ut
-this series, the power on the ports of this controller is not shut down aft=
-er a
-Powered Device disconnection. Unfortunately, I did not noticed this before.
 
-Regards,
---=20
-K=C3=B6ry Maincent, Bootlin
-Embedded Linux and kernel engineering
-https://bootlin.com
+For a driver that runs on so much hardware, we need to act
+
+cautiously. A crucial prerequisite is that code changes must
+
+never cause some hardware to malfunction. I was too simplistic
+
+in my thinking when reviewing this before, and I sincerely
+
+apologize for that.
+
+
+Steven, thank you for your tests, Let's revert it.
+
+
+Thanks,
+
+Yanteng
+
 
