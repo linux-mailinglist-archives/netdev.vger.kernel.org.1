@@ -1,108 +1,79 @@
-Return-Path: <netdev+bounces-163166-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-163167-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 75C4EA29796
-	for <lists+netdev@lfdr.de>; Wed,  5 Feb 2025 18:38:44 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9F778A2979A
+	for <lists+netdev@lfdr.de>; Wed,  5 Feb 2025 18:42:14 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id E9D807A1E0A
-	for <lists+netdev@lfdr.de>; Wed,  5 Feb 2025 17:37:48 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 7D0BB1882EB0
+	for <lists+netdev@lfdr.de>; Wed,  5 Feb 2025 17:42:19 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3532C1FBEB0;
-	Wed,  5 Feb 2025 17:33:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4FF561FDE0B;
+	Wed,  5 Feb 2025 17:35:37 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="gRixJsZj"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="5bCldwEu"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D061F2144C2
-	for <netdev@vger.kernel.org>; Wed,  5 Feb 2025 17:33:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 918641FBEB5;
+	Wed,  5 Feb 2025 17:35:35 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1738776836; cv=none; b=LDdwt//kYtcxshDvBsRlCfT1lBIo9CzzmaHFK7HRHiOYX0g3JljkDsTyptLEt3oityC+OZ1CEJthYCEcJQNwOL7GmFFlszExmpRAGZ6NiedQ07RXQtZCjnOD6BMOwqvtXCfmU/1Brx9Ne5S09CBB9VvlsXDJwlDVNHu3JoksVFY=
+	t=1738776937; cv=none; b=qtTkEsXMeLUcLM/mnkhYgCCTrAPzDS/XcoABLyWDLEmMdEXvUm6sjjMcS24AT2cuTqmBkIx2LyZfYNOkYuRQFDBiDJ4f1NWfeskJJhr3qmWW2WQbQ5sbb/QqM2gUWgsKU7jdhMmcjoPbweix+8aOBxRnErdEG24RWdx8TcVZYdk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1738776836; c=relaxed/simple;
-	bh=IfpJK02M8PpCBmiyDNrmerCDEHgKQW0BtTgUNmg/iYI=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=sOsQCyYfOHQstTFzvHk8ekBtscxtH+n9SEgBDWiOxG3UOYqhtRsbVKpF50tKPncE1W5Z2WobuFcEgxp3BSXeWpRtYNvra70QAtDJOubkWk3at535iNZM9N63izsMGe8NzTWjiUPDC7NjIb4RvXrBkVx066FMJBhs/+UkabGj2QE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=gRixJsZj; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 29426C2BCC7;
-	Wed,  5 Feb 2025 17:33:53 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1738776834;
-	bh=IfpJK02M8PpCBmiyDNrmerCDEHgKQW0BtTgUNmg/iYI=;
-	h=From:To:Cc:Subject:Date:From;
-	b=gRixJsZjrqkd5mAd3cCNz5L7RbpIqIOyLv/X+XMxCbxeiUmDq0KUp7D7f2apXHds/
-	 28A+iDSA60D9WQZqj1CHd4BTiSYzlPztMcmxBr/WzLdeHQDPaaX9MbaoQ9BOfaQG56
-	 Ni4JtWmoic2+0gEc+vJ3voeHzaNBoSecI5LdbcrRtZCNr87YOKtWpKqVdkyJk7cNy+
-	 2nfCEa0xadrXCIWdOmO2Ho7kfnPt2a8GP7L1pVKucAC8jXyRzHNsnJUlRTafdgk6ck
-	 SMoBul3+hW7+rWNGKWkaAVxC11STbySKWrY6uWCCnCIQ43Jh/6dGE/fpOOb9oGS+98
-	 WT5ZBCZCDvHKg==
-From: Jakub Kicinski <kuba@kernel.org>
-To: davem@davemloft.net
-Cc: netdev@vger.kernel.org,
-	edumazet@google.com,
-	pabeni@redhat.com,
-	andrew+netdev@lunn.ch,
-	horms@kernel.org,
-	Jakub Kicinski <kuba@kernel.org>,
-	donald.hunter@gmail.com,
-	danieller@nvidia.com,
-	sdf@fomichev.me
-Subject: [PATCH net-next] tools: ynl: add all headers to makefile deps
-Date: Wed,  5 Feb 2025 09:33:52 -0800
-Message-ID: <20250205173352.446704-1-kuba@kernel.org>
-X-Mailer: git-send-email 2.48.1
+	s=arc-20240116; t=1738776937; c=relaxed/simple;
+	bh=RF230ajZK9ScZgY4DNLI12feMN+aiLBGq4A8PJWSIPo=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=V4wdsBe6BYlAM8JL8cA5weX7bUyXZt7i0iEIJJu1CZvJP4kSCWnfgNb/OV3GT9aCnKn7ND5PX26P7oPj9zrHyPNJHhKsOxBWUpDU8DtN1+Sroq+yLDB+42niJNkwbJnSezNZQF6LZ2zugTk7KFEVnQS5Ch9NMCuAEwxLvREAHS8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=5bCldwEu; arc=none smtp.client-ip=156.67.10.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=WguZZNGkDfEvvyuO31rjTnIRBf9fhn5uKj5NRs7jMd0=; b=5bCldwEuBaYraPFQB6jSOeP9nB
+	B5ssN2zbZ+WI0SHSK4cQItK18bcfexGKYAXKJZKGWyUDkK8Y/2CNyfm8wMCKB2VEgxNeoqpl7iLBL
+	XcApr933Fcq3ARYnxjmAYSB14BSjQxCtel6rJYd59hTnETtv5CwMMZc/9mhGT6mglRZk=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1tfjJ9-00BFpE-AT; Wed, 05 Feb 2025 18:35:27 +0100
+Date: Wed, 5 Feb 2025 18:35:27 +0100
+From: Andrew Lunn <andrew@lunn.ch>
+To: Oleksij Rempel <o.rempel@pengutronix.de>
+Cc: Heiner Kallweit <hkallweit1@gmail.com>,
+	Russell King <linux@armlinux.org.uk>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	kernel@pengutronix.de, linux-kernel@vger.kernel.org,
+	netdev@vger.kernel.org
+Subject: Re: [PATCH net-next v2 2/2] net: phy: dp83tg720: Add randomized
+ polling intervals for unstable link detection
+Message-ID: <f609893a-aa26-4a6c-86cd-c944fdf9ff4a@lunn.ch>
+References: <20250205091151.2165678-1-o.rempel@pengutronix.de>
+ <20250205091151.2165678-3-o.rempel@pengutronix.de>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250205091151.2165678-3-o.rempel@pengutronix.de>
 
-The Makefile.deps lists uAPI headers to make the build work when
-system headers are older than in-tree headers. The problem doesn't
-occur for new headers, because system headers are not there at all.
-But out-of-tree YNL clone on GH also uses this header to identify
-header dependencies, and one day the system headers will exist,
-and will get out of date. So let's add the headers we missed.
+> + * Return: Time (in milliseconds) until the next update event for the PHY state
+> + * machine.
 
-I don't think this is a fix, but FWIW the commits which added
-the missing headers are:
+Same here.
 
-commit 04e65df94b31 ("netlink: spec: add shaper YAML spec")
-commit 49922401c219 ("ethtool: separate definitions that are gonna be generated")
+    Andrew
 
-Signed-off-by: Jakub Kicinski <kuba@kernel.org>
 ---
-CC: donald.hunter@gmail.com
-CC: danieller@nvidia.com
-CC: sdf@fomichev.me
----
- tools/net/ynl/Makefile.deps | 4 +++-
- 1 file changed, 3 insertions(+), 1 deletion(-)
-
-diff --git a/tools/net/ynl/Makefile.deps b/tools/net/ynl/Makefile.deps
-index 0712b5e82eb7..d027a07c1e2c 100644
---- a/tools/net/ynl/Makefile.deps
-+++ b/tools/net/ynl/Makefile.deps
-@@ -17,9 +17,11 @@ get_hdr_inc=-D$(1) -include $(UAPI_PATH)/linux/$(2)
- CFLAGS_devlink:=$(call get_hdr_inc,_LINUX_DEVLINK_H_,devlink.h)
- CFLAGS_dpll:=$(call get_hdr_inc,_LINUX_DPLL_H,dpll.h)
- CFLAGS_ethtool:=$(call get_hdr_inc,_LINUX_ETHTOOL_H,ethtool.h) \
--		$(call get_hdr_inc,_LINUX_ETHTOOL_NETLINK_H_,ethtool_netlink.h)
-+	$(call get_hdr_inc,_LINUX_ETHTOOL_NETLINK_H_,ethtool_netlink.h) \
-+	$(call get_hdr_inc,_LINUX_ETHTOOL_NETLINK_GENERATED_H,ethtool_netlink_generated.h)
- CFLAGS_handshake:=$(call get_hdr_inc,_LINUX_HANDSHAKE_H,handshake.h)
- CFLAGS_mptcp_pm:=$(call get_hdr_inc,_LINUX_MPTCP_PM_H,mptcp_pm.h)
-+CFLAGS_net_shaper:=$(call get_hdr_inc,_LINUX_NET_SHAPER_H,net_shaper.h)
- CFLAGS_netdev:=$(call get_hdr_inc,_LINUX_NETDEV_H,netdev.h)
- CFLAGS_nlctrl:=$(call get_hdr_inc,__LINUX_GENERIC_NETLINK_H,genetlink.h)
- CFLAGS_nfsd:=$(call get_hdr_inc,_LINUX_NFSD_NETLINK_H,nfsd_netlink.h)
--- 
-2.48.1
-
+pw-bot: cr
 
