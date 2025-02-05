@@ -1,183 +1,200 @@
-Return-Path: <netdev+bounces-163283-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-163284-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id B6075A29CF4
-	for <lists+netdev@lfdr.de>; Wed,  5 Feb 2025 23:56:28 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id B088AA29D07
+	for <lists+netdev@lfdr.de>; Thu,  6 Feb 2025 00:00:43 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 3781F16993D
-	for <lists+netdev@lfdr.de>; Wed,  5 Feb 2025 22:56:27 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 0809D3A1CBC
+	for <lists+netdev@lfdr.de>; Wed,  5 Feb 2025 23:00:35 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1A68C218E99;
-	Wed,  5 Feb 2025 22:56:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5E8C421505E;
+	Wed,  5 Feb 2025 23:00:39 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="emukgLRS"
+	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="EpL72wEA"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f53.google.com (mail-wm1-f53.google.com [209.85.128.53])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3B66021772B
-	for <netdev@vger.kernel.org>; Wed,  5 Feb 2025 22:56:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.53
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C1C8C1519B4;
+	Wed,  5 Feb 2025 23:00:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.156.1
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1738796185; cv=none; b=JNZUNkfMWoaY68Z8viESlGTKnm89ZcusvlLW//OZIfHuMWGkjlhCmv4fJZb1sbc+lK7P5MSX9wLQK7o0d25QUuWX81Cv7Am9NToeLL+ljKPba+FOtfN8rLqm6V23IORceuHu4dQHb+5PXu3qUNEGmuBbmNHglcVsoiP5RaeHAR0=
+	t=1738796439; cv=none; b=XnurpE2cjIRVovQ9Qjg05MPHhuqOGiXHmAI9CdEiIhWuRSDYeZXAn/n8WtPCL/4oO7MOOUfsGL6luwaGDLpiUEqql709lmTpoFH+zDxkaxlmA50zBhdjyaCNg7gc88U/uoX2fSiwfftZNsQf39cO3ZF1m1Wv8D1p8PjRYAWxGoE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1738796185; c=relaxed/simple;
-	bh=iNZSz3AjheIgxJ3lywk6jo8Fdlzw1iEuDEJBOx4M+VY=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=PpY9AuHLKqGvqGomntDDV2TV24dodnpKOY5S82zIxMIRG8FR5QJIV4bVwoD2nQW+n86XxWUsH6q6oVeKQhxJZnP+BpPQG1YW+y9OakFMFyptljFV3NvxRWXOKDoOLB2ooaLTFkKy5DBavuUbAt8jnDM/A3Ty6ucjhb4UzzaVmrk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=emukgLRS; arc=none smtp.client-ip=209.85.128.53
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wm1-f53.google.com with SMTP id 5b1f17b1804b1-436202dd7f6so3289045e9.0
-        for <netdev@vger.kernel.org>; Wed, 05 Feb 2025 14:56:22 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1738796181; x=1739400981; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:subject:cc:to:from:date:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=goFHG8ttUyK2DIwKn/61AgjnHRGyVIbJtnRdtWRi+M0=;
-        b=emukgLRSLFvM2dFJRNoi5ost2TOSXPwyEQi2CHjJn0Wu60iO3HhgDqmfhBG10/CF8j
-         YbFaoH7E5DYEw39OLqTNGvQyig0H85mQO+LU3u02Ec9q5IDPk/iF4jnVuJF0+Fiv40ZL
-         Loo4Q+CxcOHgprjNxjEGjfDVZuYDSGLD9HbR4BBPIbeMN6agl7US45HnGs19k0Sr5OLp
-         J8jPav4CpWhghTbIX/CqCfYx4LksHwqc13VIOoeKvj+H1APFemgurEliPCbF7XbEXD1l
-         0rQBwHPf1yENvWg5jgzZsctRkmFaL1HqIMNwnc/7WPpze/Z7B1JB2LymPXRZEyr8ovem
-         wK0Q==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1738796181; x=1739400981;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:subject:cc:to:from:date:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=goFHG8ttUyK2DIwKn/61AgjnHRGyVIbJtnRdtWRi+M0=;
-        b=GPKJR0SlXjBFiq9cACvkDTKdmuYXpjw3m73B+ncOKFhUhNnEoAL2g56dwHTqvapi8h
-         TWKe8bBR54BQ3MGjunPFv5aqogDh97TPvXSPTGYfqUT+vGeflRcjNhQ4oa8rVMIMgADD
-         G7w/nDk9SfLCkI6+rrMZM+0h3MV2fVaqrwJojUe9BBSTN0uK9lxjjl9r0B4cs6N6pkb2
-         5o+T+WcDWKzUzMAwsUdwQKzykb+YnEJniyq0rPz9+/SmjC6X/pCdUPs58g3Kou5D1xq9
-         2B+OXIx3QpO2ApHp6tPMvLX+cWFzRMR0KHmiLfnTZtHaOb/BrGSc1kkON8julgK/bgpW
-         /U7Q==
-X-Forwarded-Encrypted: i=1; AJvYcCXzHhpRXYLpwqhGvKuq9d6OHpkRmwq8s8KZySjk+Dmh0PpwwYWtb/jHUh9I+ybkWAI9TllCuKE=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzIPdMo2fN7lA1mY0HlVMwCQuL/+8EmDjamnbYqQ9fOVF3ieseh
-	xnLlhHNxQURH5IrjJXHHvElwZHpEtpmyRSOAm5AgUTid8yIEHdpiU4v19g==
-X-Gm-Gg: ASbGncts6A+9PdNMCj0mJF5EuLbHZQ3nZdFowfGptk3P7oPDq2MApUrU8I68SJ4UfIa
-	0yfnFBxJMmwBuRiScfbQ1X8l9cK5gPoXu9lQhrV+Q3xJNitZVMdLfyf5ftZwQAjlAqI51V2b1cL
-	a3R2Wyi924D7nAseXqYWcj/3MM6+okI//g3uq+Us6MXdiQtxg88AKV4wch8Fw2m1JFBuKFrhvK6
-	+6pIfLesOMwo2yCv+6OMPQQSQu1ZFkCfxfp/hpdTOwOkJ0F1bE9EFkLw4JrZs8FYhCRmHbeER3G
-	vHx4Q6JRD0lPvL+BG7FVfyw53hudpTSwfnR6rzmCQw6S7s0wEspgWw==
-X-Google-Smtp-Source: AGHT+IEm5cdECDcC075T2ciC+EHG/aGnVIfVUqsgpYBy81rbSVo6Q7McubPYJvFBi3u7SRszziz9Bg==
-X-Received: by 2002:a05:6000:4020:b0:38c:5bc1:1ef5 with SMTP id ffacd0b85a97d-38db4857e36mr3935634f8f.3.1738796181166;
-        Wed, 05 Feb 2025 14:56:21 -0800 (PST)
-Received: from pumpkin (82-69-66-36.dsl.in-addr.zen.co.uk. [82.69.66.36])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-38dbde0fbeesm23160f8f.66.2025.02.05.14.56.20
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 05 Feb 2025 14:56:20 -0800 (PST)
-Date: Wed, 5 Feb 2025 22:56:19 +0000
-From: David Laight <david.laight.linux@gmail.com>
-To: Simon Horman <horms@kernel.org>
-Cc: Przemek Kitszel <przemyslaw.kitszel@intel.com>,
- intel-wired-lan@lists.osuosl.org, Tony Nguyen <anthony.l.nguyen@intel.com>,
- netdev@vger.kernel.org, Konrad Knitter <konrad.knitter@intel.com>, Michal
- Swiatkowski <michal.swiatkowski@linux.intel.com>, Qiuxu Zhuo
- <qiuxu.zhuo@intel.com>, Linus Torvalds <torvalds@linux-foundation.org>,
- Kees Cook <kees@kernel.org>, Nick Desaulniers <nick.desaulniers@gmail.com>,
- Jiri Slaby <jirislaby@kernel.org>
-Subject: Re: [PATCH iwl-net] ice: health.c: fix compilation on gcc 7.5
-Message-ID: <20250205225619.31af041c@pumpkin>
-In-Reply-To: <20250205204546.GM554665@kernel.org>
-References: <20250205104252.30464-2-przemyslaw.kitszel@intel.com>
-	<20250205204546.GM554665@kernel.org>
-X-Mailer: Claws Mail 4.1.1 (GTK 3.24.38; arm-unknown-linux-gnueabihf)
+	s=arc-20240116; t=1738796439; c=relaxed/simple;
+	bh=LaTI9Ovfik3rTkSpQhtpIz4SEx0LeILc9RAC6ekVtHg=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=kFfdcashOUDahu6HlHK8AXpJNVO8ZXcsDPiN29Tp9k3qBfYtfIerh4Z8i6DQAbr8qtd3RC55x8aAKNSXAcv7HuI0edkpqLljaDfq8GiTNJvgnASz6FwzdbWDt747GMbwLIVodbZT/bgWLDitu7u4O+fnRGfso6OeDIKU8hzKZNI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=EpL72wEA; arc=none smtp.client-ip=148.163.156.1
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
+Received: from pps.filterd (m0360083.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 515MWUX5011361;
+	Wed, 5 Feb 2025 23:00:26 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
+	:content-type:date:from:in-reply-to:message-id:mime-version
+	:references:subject:to; s=pp1; bh=Kyj4592/Vdaiqvqm+X1lwa8g7u23mB
+	IpzdJ84G1p7Lc=; b=EpL72wEAV2RCdpHNpIUMY5FRwchEr9BO8bLwc6tWB4nLux
+	n6Tqs7mdVK4NYBYvKJKRCkAEE7RSTjqtPB/6lzYOlaQykFg4T/WKZ5uWqvUvMLDA
+	GIJmC1aJNJvjEf6WVTWEKuQtfebLNKqjKblE1R+pGtoZ4hejLSWF9NvMttagWlsJ
+	KVGBhTdwGJa7sHREk/zFlVbGwv3WFfcuW0Vsu51M2bWzgv+3JbvbQF3OOkDT5ZbF
+	efns7zVnoS/JreYpTzGFZTsnYcZ1gZ84V0CJj+4VddaF6kemECV4dqQyb4sb63pl
+	RBKUJbGmUnWvivx4HZtQCXkkYHED1b+rl61v9YeQ==
+Received: from pps.reinject (localhost [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 44kx29p39m-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Wed, 05 Feb 2025 23:00:25 +0000 (GMT)
+Received: from m0360083.ppops.net (m0360083.ppops.net [127.0.0.1])
+	by pps.reinject (8.18.0.8/8.18.0.8) with ESMTP id 515Mx37w032396;
+	Wed, 5 Feb 2025 23:00:25 GMT
+Received: from ppma13.dal12v.mail.ibm.com (dd.9e.1632.ip4.static.sl-reverse.com [50.22.158.221])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 44kx29p39k-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Wed, 05 Feb 2025 23:00:25 +0000 (GMT)
+Received: from pps.filterd (ppma13.dal12v.mail.ibm.com [127.0.0.1])
+	by ppma13.dal12v.mail.ibm.com (8.18.1.2/8.18.1.2) with ESMTP id 515KTrqk005251;
+	Wed, 5 Feb 2025 23:00:24 GMT
+Received: from smtprelay02.dal12v.mail.ibm.com ([172.16.1.4])
+	by ppma13.dal12v.mail.ibm.com (PPS) with ESMTPS id 44j05k31te-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Wed, 05 Feb 2025 23:00:24 +0000
+Received: from smtpav03.wdc07v.mail.ibm.com (smtpav03.wdc07v.mail.ibm.com [10.39.53.230])
+	by smtprelay02.dal12v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 515N0N8D16450056
+	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Wed, 5 Feb 2025 23:00:23 GMT
+Received: from smtpav03.wdc07v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 8DE705806A;
+	Wed,  5 Feb 2025 23:00:23 +0000 (GMT)
+Received: from smtpav03.wdc07v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 6D93E58064;
+	Wed,  5 Feb 2025 23:00:23 +0000 (GMT)
+Received: from localhost (unknown [9.61.82.89])
+	by smtpav03.wdc07v.mail.ibm.com (Postfix) with ESMTP;
+	Wed,  5 Feb 2025 23:00:23 +0000 (GMT)
+Date: Wed, 5 Feb 2025 17:00:23 -0600
+From: Nick Child <nnac123@linux.ibm.com>
+To: Yury Norov <yury.norov@gmail.com>
+Cc: linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
+        virtualization@lists.linux.dev, "Michael S. Tsirkin" <mst@redhat.com>,
+        Jason Wang <jasowang@redhat.com>,
+        Xuan Zhuo <xuanzhuo@linux.alibaba.com>,
+        Eugenio =?iso-8859-1?Q?P=E9rez?= <eperezma@redhat.com>,
+        "David S. Miller" <davem@davemloft.net>,
+        Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+        Paolo Abeni <pabeni@redhat.com>, Christoph Hellwig <hch@lst.de>,
+        Rasmus Villemoes <linux@rasmusvillemoes.dk>
+Subject: Re: [PATCH v2 02/13] virtio_net: simplify virtnet_set_affinity()
+Message-ID: <Z6PthznH5Tp-ZdHw@li-4c4c4544-0047-5210-804b-b8c04f323634.ibm.com>
+References: <20250128164646.4009-1-yury.norov@gmail.com>
+ <20250128164646.4009-3-yury.norov@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250128164646.4009-3-yury.norov@gmail.com>
+X-TM-AS-GCONF: 00
+X-Proofpoint-GUID: K7D4TPrZFEYxpz2AL0sWv287fg2oxywf
+X-Proofpoint-ORIG-GUID: eJfy_3KbPsJRzD60u06T4ivUF-ntf4ce
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1057,Hydra:6.0.680,FMLib:17.12.68.34
+ definitions=2025-02-05_08,2025-02-05_03,2024-11-22_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 malwarescore=0 mlxscore=0
+ bulkscore=0 priorityscore=1501 impostorscore=0 spamscore=0 phishscore=0
+ suspectscore=0 adultscore=0 mlxlogscore=999 clxscore=1011
+ lowpriorityscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.19.0-2501170000 definitions=main-2502050176
 
-On Wed, 5 Feb 2025 20:45:46 +0000
-Simon Horman <horms@kernel.org> wrote:
+On Tue, Jan 28, 2025 at 11:46:31AM -0500, Yury Norov wrote:
+> The inner loop may be replaced with the dedicated for_each_online_cpu_wrap.
+> It helps to avoid setting the same bits in the @mask more than once, in
+> case of group_size is greater than number of online CPUs.
 
-> + Jiri
-> 
-> On Wed, Feb 05, 2025 at 11:42:12AM +0100, Przemek Kitszel wrote:
-> > GCC 7 is not as good as GCC 8+ in telling what is a compile-time const,
-> > and thus could be used for static storage. So we could not use variables
-> > for that, no matter how much "const" keyword is sprinkled around.
-> > 
-> > Excerpt from the report:
-> > My GCC is: gcc (Ubuntu 7.5.0-3ubuntu1~18.04) 7.5.0.
-> > 
-> >   CC [M]  drivers/net/ethernet/stmicro/stmmac/stmmac_mdio.o
-> > drivers/net/ethernet/intel/ice/devlink/health.c:35:3: error: initializer element is not constant
-> >    ice_common_port_solutions, {ice_port_number_label}},
-> >    ^~~~~~~~~~~~~~~~~~~~~~~~~
-> > drivers/net/ethernet/intel/ice/devlink/health.c:35:3: note: (near initialization for 'ice_health_status_lookup[0].solution')
-> > drivers/net/ethernet/intel/ice/devlink/health.c:35:31: error: initializer element is not constant
-> >    ice_common_port_solutions, {ice_port_number_label}},
-> >                                ^~~~~~~~~~~~~~~~~~~~~
-> > drivers/net/ethernet/intel/ice/devlink/health.c:35:31: note: (near initialization for 'ice_health_status_lookup[0].data_label[0]')
-> > drivers/net/ethernet/intel/ice/devlink/health.c:37:46: error: initializer element is not constant
-> >    "Change or replace the module or cable.", {ice_port_number_label}},
-> >                                               ^~~~~~~~~~~~~~~~~~~~~
-> > drivers/net/ethernet/intel/ice/devlink/health.c:37:46: note: (near initialization for 'ice_health_status_lookup[1].data_label[0]')
-> > drivers/net/ethernet/intel/ice/devlink/health.c:39:3: error: initializer element is not constant
-> >    ice_common_port_solutions, {ice_port_number_label}},
-> >    ^~~~~~~~~~~~~~~~~~~~~~~~~
-> > 
-> > Fixes: 85d6164ec56d ("ice: add fw and port health reporters")
-> > Reported-by: Qiuxu Zhuo <qiuxu.zhuo@intel.com>
-> > Closes: https://lore.kernel.org/netdev/CY8PR11MB7134BF7A46D71E50D25FA7A989F72@CY8PR11MB7134.namprd11.prod.outlook.com
-> > Signed-off-by: Przemek Kitszel <przemyslaw.kitszel@intel.com>
-> > ---
-> > I would really like to bump min gcc to 8.5 (RH 8 family),
-> > instead of supporting old Ubuntu. However SLES 15 is also stuck with gcc 7.5 :(
-> > 
-> > CC: Linus Torvalds <torvalds@linux-foundation.org>
-> > CC: Kees Cook <kees@kernel.org>
-> > CC: Nick Desaulniers <nick.desaulniers@gmail.com>  
-> 
-> Hi Prezemek,
-> 
-> I ran into a similar problem not so long ago and I'm wondering if
-> the following, based on a suggestion by Jiri Slaby, resolves your
-> problem.
+nit: Looking at the previous logic of how group_stride is calculated, I don't
+think there is possibility of "setting the same bits in the @mask more
+than once". group_stride = n_cpu / n_queues
 
-I'm sure I remember from somewhere that although the variables are
-'static const' they have to be real variables because they can still
-be patched.
-
-Which stops you using their contents as initialisers.
-
-Maybe I'm mis-remembering it.
-
-	David
+nit: I see this more as 2 patches. The introduction of a new core
+helper function is a bit buried.
 
 > 
-> diff --git a/drivers/net/ethernet/intel/ice/devlink/health.c b/drivers/net/ethernet/intel/ice/devlink/health.c
-> index ea40f7941259..19c3d37aa768 100644
-> --- a/drivers/net/ethernet/intel/ice/devlink/health.c
-> +++ b/drivers/net/ethernet/intel/ice/devlink/health.c
-> @@ -25,10 +25,10 @@ struct ice_health_status {
->   * The below lookup requires to be sorted by code.
->   */
+> CC: Nick Child <nnac123@linux.ibm.com>
+> Signed-off-by: Yury Norov <yury.norov@gmail.com>
+
+Don't know if my comments alone merit a v3 and I think the patch
+does simplify the codebase so:
+Reviewed-by: Nick Child <nnac123@linux.ibm.com>
+
+> ---
+>  drivers/net/virtio_net.c | 12 +++++++-----
+>  include/linux/cpumask.h  |  4 ++++
+>  2 files changed, 11 insertions(+), 5 deletions(-)
+> 
+> diff --git a/drivers/net/virtio_net.c b/drivers/net/virtio_net.c
+> index 7646ddd9bef7..9d7c37e968b5 100644
+> --- a/drivers/net/virtio_net.c
+> +++ b/drivers/net/virtio_net.c
+> @@ -3826,7 +3826,7 @@ static void virtnet_set_affinity(struct virtnet_info *vi)
+>  	cpumask_var_t mask;
+>  	int stragglers;
+>  	int group_size;
+> -	int i, j, cpu;
+> +	int i, start = 0, cpu;
+>  	int num_cpu;
+>  	int stride;
 >  
-> -static const char *const ice_common_port_solutions =
-> +static const char ice_common_port_solutions[] =
->  	"Check your cable connection. Change or replace the module or cable. Manually set speed and duplex.";
-> -static const char *const ice_port_number_label = "Port Number";
-> -static const char *const ice_update_nvm_solution = "Update to the latest NVM image.";
-> +static const char ice_port_number_label[] = "Port Number";
-> +static const char ice_update_nvm_solution[] = "Update to the latest NVM image.";
+> @@ -3840,16 +3840,18 @@ static void virtnet_set_affinity(struct virtnet_info *vi)
+>  	stragglers = num_cpu >= vi->curr_queue_pairs ?
+>  			num_cpu % vi->curr_queue_pairs :
+>  			0;
+> -	cpu = cpumask_first(cpu_online_mask);
 >  
->  static const struct ice_health_status ice_health_status_lookup[] = {
->  	{ICE_AQC_HEALTH_STATUS_ERR_UNKNOWN_MOD_STRICT, "An unsupported module was detected.",
+>  	for (i = 0; i < vi->curr_queue_pairs; i++) {
+>  		group_size = stride + (i < stragglers ? 1 : 0);
+>  
+> -		for (j = 0; j < group_size; j++) {
+> +		for_each_online_cpu_wrap(cpu, start) {
+> +			if (!group_size--) {
+> +				start = cpu;
+> +				break;
+> +			}
+>  			cpumask_set_cpu(cpu, mask);
+> -			cpu = cpumask_next_wrap(cpu, cpu_online_mask,
+> -						nr_cpu_ids, false);
+>  		}
+> +
+>  		virtqueue_set_affinity(vi->rq[i].vq, mask);
+>  		virtqueue_set_affinity(vi->sq[i].vq, mask);
+>  		__netif_set_xps_queue(vi->dev, cpumask_bits(mask), i, XPS_CPUS);
+> diff --git a/include/linux/cpumask.h b/include/linux/cpumask.h
+> index 5cf69a110c1c..30042351f15f 100644
+> --- a/include/linux/cpumask.h
+> +++ b/include/linux/cpumask.h
+> @@ -1036,6 +1036,8 @@ extern const DECLARE_BITMAP(cpu_all_bits, NR_CPUS);
+>  
+>  #define for_each_possible_cpu_wrap(cpu, start)	\
+>  	for ((void)(start), (cpu) = 0; (cpu) < 1; (cpu)++)
+> +#define for_each_online_cpu_wrap(cpu, start)	\
+> +	for ((void)(start), (cpu) = 0; (cpu) < 1; (cpu)++)
+>  #else
+>  #define for_each_possible_cpu(cpu) for_each_cpu((cpu), cpu_possible_mask)
+>  #define for_each_online_cpu(cpu)   for_each_cpu((cpu), cpu_online_mask)
+> @@ -1044,6 +1046,8 @@ extern const DECLARE_BITMAP(cpu_all_bits, NR_CPUS);
+>  
+>  #define for_each_possible_cpu_wrap(cpu, start)	\
+>  	for_each_cpu_wrap((cpu), cpu_possible_mask, (start))
+> +#define for_each_online_cpu_wrap(cpu, start)	\
+> +	for_each_cpu_wrap((cpu), cpu_online_mask, (start))
+>  #endif
+>  
+>  /* Wrappers for arch boot code to manipulate normally-constant masks */
+> -- 
+> 2.43.0
 > 
-> 
-> Link: https://lore.kernel.org/netdev/485dbc5a-a04b-40c2-9481-955eaa5ce2e2@kernel.org/
-> Link: https://git.kernel.org/netdev/net-next/c/36fb51479e3c
-> 
-
 
