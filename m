@@ -1,84 +1,84 @@
-Return-Path: <netdev+bounces-163254-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-163255-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id B3760A29B73
-	for <lists+netdev@lfdr.de>; Wed,  5 Feb 2025 21:52:27 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 66FA3A29B7F
+	for <lists+netdev@lfdr.de>; Wed,  5 Feb 2025 21:55:47 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 274E81629F4
-	for <lists+netdev@lfdr.de>; Wed,  5 Feb 2025 20:52:26 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 354351885535
+	for <lists+netdev@lfdr.de>; Wed,  5 Feb 2025 20:55:52 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F164621423A;
-	Wed,  5 Feb 2025 20:52:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 798C821A42B;
+	Wed,  5 Feb 2025 20:54:51 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="XF4SnmOj"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="W/qPpydq"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 47FD321420E
-	for <netdev@vger.kernel.org>; Wed,  5 Feb 2025 20:52:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 65AFC21772B
+	for <netdev@vger.kernel.org>; Wed,  5 Feb 2025 20:54:49 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1738788743; cv=none; b=eZtERcW4Y6dchULejps4xaAWw7EbSUErWk3VcHTWT7qofmahS1lixxRxGA08SyulZBoxqfG6AUwojl1pSDhDIb0L/sra84yxfIeVGPMMEcuTf99mBFpmJWSt+0xC0pWrUvOdaYnP303CzFSf0dnZ75l4+HG6Sseb6ca9yMPkVC0=
+	t=1738788891; cv=none; b=XZpRkrK+kjL4bmxtUQOw6PMr+tmRZthgaWD/U7s2RT4Z6DWFSuR/lQuBS9mdtsDlHgfqS0cLGEbuFVXRwTzssrHOy7VfwPCPQXUw0B/SHH5sleyuAmLMPWpfnCsQ/Dg6O4AEAQORn4sSicgI20Mu7ljv7fF3Ab+yb7nXIVnMBmU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1738788743; c=relaxed/simple;
-	bh=2p5iqQbFFHwdIoUxP8vTGSY8kb0UxKvU34sou0nq2G8=;
+	s=arc-20240116; t=1738788891; c=relaxed/simple;
+	bh=i/w1cEGC36ogQof8pFCgKEYbTLjR2GIWiZHyACWkKIw=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=A2pbNEGBQe6sarmEQra6yZ8Wf6hnNtyZIT+mF+AA++RX6wIRHXzuLGrdfL0FIPcGceOYMw6jG0bFIPpJ/DSp5EtvscYQj+Kmgtg7aX1c8sVSn6vi90Sem/k/4BCiWFNXcmrJvRp1dm0GS1arYXTQyfLEFdC+Qg+OXJbHZODT/L4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=XF4SnmOj; arc=none smtp.client-ip=170.10.129.124
+	 Content-Type:Content-Disposition:In-Reply-To; b=s8SmHhHVDYPvuy1MmyBAkGsk/NgMKxoUP2bsTjQWohomm+JwlRkyY0vRP2EwefPsUTJ1cHSeq/PUWDFrD3szB6FIyHlLM4LfODQ0o/keCA8jd5eV6h3sR4oCPRoPdNvCvoW2WiPGwazge7vlhTg0/VkKfReF0JfuhC4WcDjUr0M=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=W/qPpydq; arc=none smtp.client-ip=170.10.133.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1738788741;
+	s=mimecast20190719; t=1738788888;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 in-reply-to:in-reply-to:references:references;
-	bh=XTbIzhwV3ZjAl5OwLbJohLrJDizqbdTCfNzNYP89Ar4=;
-	b=XF4SnmOj9vC8CnVJJsLcLpngmwOUWtsLlV1zbZYLN6yORsDDo0vtp8LnkUwciwHeMppAmH
-	WYeLnVyrg01avWEhQMF1p01REFFOePnOCTkMqYkMPxGEQguvLfJBIsJjQFcRt791rl5uE9
-	26uXAT6fooiAikdXwzDhuaB3J9E5gbQ=
-Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
- [209.85.221.70]) by relay.mimecast.com with ESMTP with STARTTLS
+	bh=b2E6EqCjJdTc9pXlLAPxEAvaCluiUsLvN+c2bM+BtDc=;
+	b=W/qPpydq4G6wkKcVdp9Szbm0PWP+pJ3ewA3QrHuV02wsHrog2/54PN2SVJoh3UDf8OINp/
+	pM1zyfc60+dx2LhRxDPXfYjGNJSxhbCStbs1MyKvrSqzlHqZMsk8XjtJBqEdTozv1Vw/7g
+	yrkUYSrc15ueYuNuFmgIIb6b87Fa378=
+Received: from mail-qk1-f198.google.com (mail-qk1-f198.google.com
+ [209.85.222.198]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-653-RMILSWoIMuG3n5bFb6ExwQ-1; Wed, 05 Feb 2025 15:52:17 -0500
-X-MC-Unique: RMILSWoIMuG3n5bFb6ExwQ-1
-X-Mimecast-MFC-AGG-ID: RMILSWoIMuG3n5bFb6ExwQ
-Received: by mail-wr1-f70.google.com with SMTP id ffacd0b85a97d-38dafe1699cso84039f8f.3
-        for <netdev@vger.kernel.org>; Wed, 05 Feb 2025 12:52:17 -0800 (PST)
+ us-mta-440-Os3oA7OGO5eZB38lKhvJHA-1; Wed, 05 Feb 2025 15:54:46 -0500
+X-MC-Unique: Os3oA7OGO5eZB38lKhvJHA-1
+X-Mimecast-MFC-AGG-ID: Os3oA7OGO5eZB38lKhvJHA
+Received: by mail-qk1-f198.google.com with SMTP id af79cd13be357-7c034838f39so34095685a.0
+        for <netdev@vger.kernel.org>; Wed, 05 Feb 2025 12:54:46 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1738788736; x=1739393536;
+        d=1e100.net; s=20230601; t=1738788886; x=1739393686;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=XTbIzhwV3ZjAl5OwLbJohLrJDizqbdTCfNzNYP89Ar4=;
-        b=YlXDc7Jbhv5+f4eUH3fdunlXMrE9z3IwBY1cKlTdeTUc8d8Dy/MqGkdgVBHwU2Xbs5
-         O9T6uTkl16WRw3fAGc9YWYeTvnmrsQSZV/qnVYE+s70A7vNy24DzmE7PaVvKSZ69MOb5
-         9Ru7u/1q0L/z7sMBINksmVp3Inb6KTXYgcXpA1NK86LXDzHmM5k/JIw7lxbsC1scKwZj
-         oYSrmA4fyM7JxgB9BZ42OK9Wlec3+dvgtHNE/nt/uixowueMhIKbAHXTFlsrD4j1ySLP
-         78Wx1NhY+cir5RT7GBl60JbR7GNqwcs1Ekqa2J//EqUuAjUwn5OSwn30qy+BZ82qJIjO
-         Ocsg==
-X-Forwarded-Encrypted: i=1; AJvYcCWQQgEZzL+VU7fQIJET0npzZ+67/EaaBfzxl7zGYHJ9bvBSkxbx5llJAD87RxNoq/3Jf/ZpsmY=@vger.kernel.org
-X-Gm-Message-State: AOJu0YypQ1Ph51vP6IS8hEzqYxOuJfrLw2gHffFH0I6QJ+7d33/Er63+
-	44Ni95BFUhubpuiUxk/QtVoWD9Nrxpm7gm4c8u1xqWuWZ6aTQ9OCl+NBxu57MTuGw4+zDTp9m9H
-	MIZHUVN0+gBUGwuUso/TKRRV2+TzZnuDFKqHPBuHU0DC4cmUkMHMimA==
-X-Gm-Gg: ASbGncsxqjJV/QGqcanJlvDG+0b3EWOqb/nF/Dww7F3oH+oOjF84ZI7mXfyqHRHTlFH
-	QzxZ5UPQeV97KfsM7hxY0bPn2cItC2VttRGZHENp9hCGYnHxDlygz4S0HcVAUmCQ18KG4WqKk6H
-	JGPkMRGTQeoduWgoPY9qU8bZyT9W3Dx9kUGoHFoex0Fwlcs57OBEtAAAx9cXpcv1x26OUu0Ggkl
-	1tDyfNQsywfZwYouWgkAdGeTWd0mZNdKawrS6L0guCvapOHjP5SLF93jONFCQ2wGVCWx31Y7G9h
-	rmME9w3WIxzxBpAqyOy5swwKLetM9bmxE+nSOW71++Xb2ZjG7hMn
-X-Received: by 2002:a5d:47cb:0:b0:38d:adcd:a083 with SMTP id ffacd0b85a97d-38db49004bamr3522258f8f.42.1738788736433;
-        Wed, 05 Feb 2025 12:52:16 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IFM8eo/awV4xrN7DNOWWlAj/RbtCWXcBZTqZRKq5/GMKRr+GILL69JKkMFHkF5J39xi9HCwvA==
-X-Received: by 2002:a5d:47cb:0:b0:38d:adcd:a083 with SMTP id ffacd0b85a97d-38db49004bamr3522229f8f.42.1738788735924;
-        Wed, 05 Feb 2025 12:52:15 -0800 (PST)
+        bh=b2E6EqCjJdTc9pXlLAPxEAvaCluiUsLvN+c2bM+BtDc=;
+        b=Zg7njrygTnHKZJgvYUTWgT2d8VnaHNzoWeWFATJZJ3SuSp04og/0iBD6q54SLw5Cmb
+         3+TROLl/2P7moVkc3zbVVqiy/3s/7JJWQmUYLtZ17d4wOR/VVIF1RoTrPvOQ0ymE+DlJ
+         ok7Aok0A6yZ8gA7PrWzsMYQ7H724763KcOWQy/2STcPKN7HC5qP63YnitPDzSGuPTN6U
+         rp8S54zZHKIWheJMxE8yfxAerSqlWlmQn1AK55mgtfbctelWzYTM9WBVeHWmy9SjrSFt
+         I2U8do8nK3cK7awsW/ciXde9GocgG49MxdYT5SG/sFb+zMmEcnK6YPfsRedLqCEL/ths
+         tg+Q==
+X-Forwarded-Encrypted: i=1; AJvYcCUjQIZ6FCR4xxOf3nMwQ9VIQb2uGY913nObZ62CNsSw3HPSnJeofL2QBJof5UdDqNJ8eMqZyjs=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwuwzivuDSzfjK62lngKM8BX6GoWjX4TZjnUTm7/BpnEhhdbkwT
+	qDekbQbVWc2XHuOJbf7F/ARuPuXhppjKbTXS/relHdVknnzRT8qcN24ve2YrnWemY1CAvuA+GHg
+	q+3ntiWhyGIRzZessIEMDrqfCZxXVujIAm/D/JaAm31uRZf1AjK5P8A==
+X-Gm-Gg: ASbGncsmF0CFYozyYj5C1r3qCJoYmcJ2CRaP3C2ov8gzEjjgBg0kiS4c9EzVPSzN6yg
+	qAwCl6IwiVKccaYEDXG+i3A+WlznvRfA5oulhVo0N7l0o+KosGL//Q3Vqi2/gxYCLfkACe+bOMp
+	rroU5WTkrmJt90dnqf0MotB75WW10Y5co7RZxN5wK/IlsrrxfCsfX2+sbdmp1ApuJn3Le2Cj3Bl
+	6nHMXu0OyJxlyYEOz3Xbx5J39yklt10kDnKeAieUKaeGdL/FnRMJT2agZNPR1mCMp0+3txo/go9
+	RwqWeFFEyD5KKAN2lIpIno07OriRcKB8onVTOCXXo7/nxUlgnbBK
+X-Received: by 2002:a05:620a:480d:b0:7b6:ece3:827f with SMTP id af79cd13be357-7c039f98778mr611212985a.2.1738788885696;
+        Wed, 05 Feb 2025 12:54:45 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IFqvgtKVpsc+rS7SVSnttPiL04IrBDNEZqrwmOlro+8yw3ItpHBVE54BhNmqAJuuXIVYJEoqg==
+X-Received: by 2002:a05:620a:480d:b0:7b6:ece3:827f with SMTP id af79cd13be357-7c039f98778mr611209185a.2.1738788885351;
+        Wed, 05 Feb 2025 12:54:45 -0800 (PST)
 Received: from localhost (net-93-146-37-148.cust.vodafonedsl.it. [93.146.37.148])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-38c5c102f7dsm20073668f8f.30.2025.02.05.12.52.15
+        by smtp.gmail.com with ESMTPSA id af79cd13be357-7c00a90cbe0sm789268385a.102.2025.02.05.12.54.44
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 05 Feb 2025 12:52:15 -0800 (PST)
-Date: Wed, 5 Feb 2025 21:52:14 +0100
+        Wed, 05 Feb 2025 12:54:44 -0800 (PST)
+Date: Wed, 5 Feb 2025 21:54:43 +0100
 From: Lorenzo Bianconi <lorenzo.bianconi@redhat.com>
 To: Conor Dooley <conor@kernel.org>
 Cc: Lorenzo Bianconi <lorenzo@kernel.org>,
@@ -98,12 +98,13 @@ Cc: Lorenzo Bianconi <lorenzo@kernel.org>,
 	upstream@airoha.com
 Subject: Re: [PATCH net-next 09/13] dt-bindings: net: airoha: Add airoha,npu
  phandle property
-Message-ID: <Z6PPfnYV57NmWV6N@lore-desk>
+Message-ID: <Z6PQEzvvCdDKQSnl@lore-desk>
 References: <20250205-airoha-en7581-flowtable-offload-v1-0-d362cfa97b01@kernel.org>
  <20250205-airoha-en7581-flowtable-offload-v1-9-d362cfa97b01@kernel.org>
  <20250205-cleaver-evaluator-648c8f0b99bb@spud>
  <Z6O8-dUrLNmvnW1u@lore-desk>
  <20250205-disagree-motive-517efca2b90c@spud>
+ <20250205-patronage-finisher-bbfbdb5b7dbc@spud>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -111,97 +112,105 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: multipart/signed; micalg=pgp-sha512;
-	protocol="application/pgp-signature"; boundary="TdZwv0UXFrq47/Kl"
+	protocol="application/pgp-signature"; boundary="nVc7ncatnUQ3E5G5"
 Content-Disposition: inline
-In-Reply-To: <20250205-disagree-motive-517efca2b90c@spud>
+In-Reply-To: <20250205-patronage-finisher-bbfbdb5b7dbc@spud>
 
 
---TdZwv0UXFrq47/Kl
+--nVc7ncatnUQ3E5G5
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
 Content-Transfer-Encoding: quoted-printable
 
-> On Wed, Feb 05, 2025 at 08:33:13PM +0100, Lorenzo Bianconi wrote:
-> > > On Wed, Feb 05, 2025 at 07:21:28PM +0100, Lorenzo Bianconi wrote:
-> > > > Introduce the airoha,npu property for the npu syscon node available=
- on
-> > > > EN7581 SoC. The airoha Network Processor Unit (NPU) is used to offl=
-oad
-> > > > network traffic forwarded between Packet Switch Engine (PSE) ports.
+> On Wed, Feb 05, 2025 at 08:01:26PM +0000, Conor Dooley wrote:
+> > On Wed, Feb 05, 2025 at 08:33:13PM +0100, Lorenzo Bianconi wrote:
+> > > > On Wed, Feb 05, 2025 at 07:21:28PM +0100, Lorenzo Bianconi wrote:
+> > > > > Introduce the airoha,npu property for the npu syscon node availab=
+le on
+> > > > > EN7581 SoC. The airoha Network Processor Unit (NPU) is used to of=
+fload
+> > > > > network traffic forwarded between Packet Switch Engine (PSE) port=
+s.
+> > > > >=20
+> > > > > Signed-off-by: Lorenzo Bianconi <lorenzo@kernel.org>
+> > > > > ---
+> > > > >  Documentation/devicetree/bindings/net/airoha,en7581-eth.yaml | 8=
+ ++++++++
+> > > > >  1 file changed, 8 insertions(+)
+> > > > >=20
+> > > > > diff --git a/Documentation/devicetree/bindings/net/airoha,en7581-=
+eth.yaml b/Documentation/devicetree/bindings/net/airoha,en7581-eth.yaml
+> > > > > index c578637c5826db4bf470a4d01ac6f3133976ae1a..6388afff64e990a20=
+230b0c4e58534aa61f984da 100644
+> > > > > --- a/Documentation/devicetree/bindings/net/airoha,en7581-eth.yaml
+> > > > > +++ b/Documentation/devicetree/bindings/net/airoha,en7581-eth.yaml
+> > > > > @@ -63,6 +63,12 @@ properties:
+> > > > >    "#size-cells":
+> > > > >      const: 0
+> > > > > =20
+> > > > > +  airoha,npu:
+> > > > > +    $ref: /schemas/types.yaml#/definitions/phandle
+> > > > > +    description:
+> > > > > +      Phandle to the syscon node used to configure the NPU module
+> > > > > +      used for traffic offloading.
 > > > >=20
-> > > > Signed-off-by: Lorenzo Bianconi <lorenzo@kernel.org>
-> > > > ---
-> > > >  Documentation/devicetree/bindings/net/airoha,en7581-eth.yaml | 8 +=
-+++++++
-> > > >  1 file changed, 8 insertions(+)
-> > > >=20
-> > > > diff --git a/Documentation/devicetree/bindings/net/airoha,en7581-et=
-h.yaml b/Documentation/devicetree/bindings/net/airoha,en7581-eth.yaml
-> > > > index c578637c5826db4bf470a4d01ac6f3133976ae1a..6388afff64e990a2023=
-0b0c4e58534aa61f984da 100644
-> > > > --- a/Documentation/devicetree/bindings/net/airoha,en7581-eth.yaml
-> > > > +++ b/Documentation/devicetree/bindings/net/airoha,en7581-eth.yaml
-> > > > @@ -63,6 +63,12 @@ properties:
-> > > >    "#size-cells":
-> > > >      const: 0
-> > > > =20
-> > > > +  airoha,npu:
-> > > > +    $ref: /schemas/types.yaml#/definitions/phandle
-> > > > +    description:
-> > > > +      Phandle to the syscon node used to configure the NPU module
-> > > > +      used for traffic offloading.
+> > > > Why do you need a phandle for this, instead of a lookup by compatib=
+le?
+> > > > Do you have multiple instances of this ethernet controller on the
+> > > > device, that each need to look up a different npu?
 > > >=20
-> > > Why do you need a phandle for this, instead of a lookup by compatible?
-> > > Do you have multiple instances of this ethernet controller on the
-> > > device, that each need to look up a different npu?
+> > > actually not, but looking up via the compatible string has been naked=
+ by
+> > > Krzysztof on a different series [0].
 > >=20
-> > actually not, but looking up via the compatible string has been naked by
-> > Krzysztof on a different series [0].
+> > Hmm, I disagree with adding phandles that are not needed. I don't agree
+> > that there's no reuse, if you can treat the phandle identically on a new
+> > device, in all likelihood, that node should have a fallback to the
+> > existing one.
 >=20
-> Hmm, I disagree with adding phandles that are not needed. I don't agree
-> that there's no reuse, if you can treat the phandle identically on a new
-> device, in all likelihood, that node should have a fallback to the
-> existing one.
+> Also, where is the binding for this npu? It looks like a brand-new
+> module that you're adding a driver for in this series and a phandle to
+> the node for here but I see no binding for it.
 
-honestly I do not have a strong opinion about it, I am fine both ways.
-
->=20
-> That said, the bigger problem in what you link is the ABI break caused by
-> requiring the presence of a new node. I'd NAK that patch too.
-
-there is no PCIe support in dts for this device upstream yet, so I guess th=
-ere
-is no ABI break, right?
+The driver loads the NPU node just as syscon so I have not added the binding
+for it to the series. I will add it in v2.
 
 Regards,
 Lorenzo
 
 >=20
 > >=20
-> > Regards,
-> > Lorenzo
-> >=20
-> > [0] https://patchwork.kernel.org/project/linux-pci/patch/20250115-en758=
-1-pcie-pbus-csr-v1-2-40d8fcb9360f@kernel.org/
+> > That said, the bigger problem in what you link is the ABI break caused =
+by
+> > requiring the presence of a new node. I'd NAK that patch too.
 > >=20
 > > >=20
-> > > > +
-> > > >  patternProperties:
-> > > >    "^ethernet@[1-4]$":
-> > > >      type: object
-> > > > @@ -132,6 +138,8 @@ examples:
-> > > >                       <GIC_SPI 49 IRQ_TYPE_LEVEL_HIGH>,
-> > > >                       <GIC_SPI 64 IRQ_TYPE_LEVEL_HIGH>;
-> > > > =20
-> > > > +        airoha,npu =3D <&npu>;
-> > > > +
-> > > >          #address-cells =3D <1>;
-> > > >          #size-cells =3D <0>;
-> > > > =20
+> > > Regards,
+> > > Lorenzo
+> > >=20
+> > > [0] https://patchwork.kernel.org/project/linux-pci/patch/20250115-en7=
+581-pcie-pbus-csr-v1-2-40d8fcb9360f@kernel.org/
+> > >=20
 > > > >=20
-> > > > --=20
-> > > > 2.48.1
-> > > >=20
+> > > > > +
+> > > > >  patternProperties:
+> > > > >    "^ethernet@[1-4]$":
+> > > > >      type: object
+> > > > > @@ -132,6 +138,8 @@ examples:
+> > > > >                       <GIC_SPI 49 IRQ_TYPE_LEVEL_HIGH>,
+> > > > >                       <GIC_SPI 64 IRQ_TYPE_LEVEL_HIGH>;
+> > > > > =20
+> > > > > +        airoha,npu =3D <&npu>;
+> > > > > +
+> > > > >          #address-cells =3D <1>;
+> > > > >          #size-cells =3D <0>;
+> > > > > =20
+> > > > >=20
+> > > > > --=20
+> > > > > 2.48.1
+> > > > >=20
+> > >=20
+> > >=20
 > >=20
 > >=20
 >=20
@@ -209,17 +218,17 @@ Lorenzo
 
 
 
---TdZwv0UXFrq47/Kl
+--nVc7ncatnUQ3E5G5
 Content-Type: application/pgp-signature; name="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iHUEABYKAB0WIQTquNwa3Txd3rGGn7Y6cBh0uS2trAUCZ6PPfgAKCRA6cBh0uS2t
-rK1jAQCoE/zFHyySfuiJYIFTCuCPIfmrdKBiqfqc+4K/Y8PULQD/Wjs5AX8by6zR
-MX1/3RRgW7eVpvl15xDcvLxNAoGm9w0=
-=dcMi
+iHUEABYKAB0WIQTquNwa3Txd3rGGn7Y6cBh0uS2trAUCZ6PQEwAKCRA6cBh0uS2t
+rIFNAQDYK7XMZyacl2c7uItRM6rmAPpzk3U9AIBiEJn5pKJd0AEAl5e/LTt29oKb
+lI44AdZkjYncKBrhc7jzCjrBpodudwo=
+=GbHn
 -----END PGP SIGNATURE-----
 
---TdZwv0UXFrq47/Kl--
+--nVc7ncatnUQ3E5G5--
 
 
