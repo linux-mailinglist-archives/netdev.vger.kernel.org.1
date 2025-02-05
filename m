@@ -1,151 +1,88 @@
-Return-Path: <netdev+bounces-163203-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-163204-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 047B5A2994B
-	for <lists+netdev@lfdr.de>; Wed,  5 Feb 2025 19:41:41 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1BB20A2995D
+	for <lists+netdev@lfdr.de>; Wed,  5 Feb 2025 19:43:41 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 875361676B1
-	for <lists+netdev@lfdr.de>; Wed,  5 Feb 2025 18:41:39 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 0F8611883AC2
+	for <lists+netdev@lfdr.de>; Wed,  5 Feb 2025 18:43:46 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E5ED51FECBB;
-	Wed,  5 Feb 2025 18:41:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EAFAD1FDA8A;
+	Wed,  5 Feb 2025 18:43:37 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="oTXwOWIL"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="cW3L8Akq"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C10D413D897
-	for <netdev@vger.kernel.org>; Wed,  5 Feb 2025 18:41:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C6E701FCFDA
+	for <netdev@vger.kernel.org>; Wed,  5 Feb 2025 18:43:37 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1738780870; cv=none; b=lJDRzr3wQV6B3QesDHkf/5o3crw7fXOCpkDvNjZHQ5dI/2PJMUf2CAPHdp0Uj7Iby6vjAM4tfexyiJt6Z1ENJkJzngYzvoe6eeOnNEZRinSD7cKfs7dnehg9TM5H+ObJnF5Ji+6JtFY0uskgYKSwqR9+9j61PfLnzGaRX9nWTPk=
+	t=1738781017; cv=none; b=E+xW4FgUa0sPfDL0M6ucIU0XkP8GOVJJWJuO+YRIAD/a4rzuH3/oKYPhgtLE3fPGDrl6L9ZIRwxuF+qBcTlFjYNAbl3aeN/AHEC7HiaWsDL7MfuJK5bRSOCGuR5Z2x/93M+t181upwFuFcLHKtfQ8+m4R5O4w8ToyPQj8/58/WE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1738780870; c=relaxed/simple;
-	bh=6lMf0zoLlB09uUbUW9vG38BMKlYidJYNY10xkDco/CY=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=bD/zhTYubybjiLyvGorWo2TrFs6HVYwMCFzjG0Qqs7DQ0g5yPNh9rW0T9yVufExmnP0atLtv/SE+vIi1xQnU8lD7uNu/PPebdcPgCc62yDId/CHzY/1zDlNjCSq+NG7z4MLDXtSVwItLUCUrcWfGUthYVm6cnk4qUPxSSzJk/h0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=oTXwOWIL; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8F17EC4CED1;
-	Wed,  5 Feb 2025 18:41:08 +0000 (UTC)
+	s=arc-20240116; t=1738781017; c=relaxed/simple;
+	bh=zp9osJNoZyypSjqHQjKLAb37/Ztk3mYlSTKRNcbY4YM=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=ryBf9uN5llBJ2U3vzzZpt5+u6NY8U8XxF6ZTKu35YV0wr7OwRHT7j2pYy5jHALNt0VeT8abI5+PqANQhAYZCBaUoUYIA0DogtNaCA13iSijllPMuhV8kRjDvlduczymHJaQiYpxz021NZncQQaQBk4qBhi7FPGgGdpJ94P9K3sU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=cW3L8Akq; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id AEE53C4CED1;
+	Wed,  5 Feb 2025 18:43:36 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1738780869;
-	bh=6lMf0zoLlB09uUbUW9vG38BMKlYidJYNY10xkDco/CY=;
-	h=From:To:Cc:Subject:Date:From;
-	b=oTXwOWILyW4M6RRuZGFLofAB/52ES2QD9I1RiuE7fLzMgWdNJc/p2xo7E6CMZ1t4b
-	 nJgV0oPSHpzarU1xry9YRiUhTb+e45/Y1VeytFklp2pwj3LGFQURY7cEfoO2lqxKb+
-	 1LTlSjerKXhyNCLWN/RxxzinZ1HXJjuzBxp38qcdawDhNYjLEwm1YIsGH2zVBu3qY1
-	 3FPKP052Xmx/D1Yz/4C7WCe0pO/aveBwJGSLOwrLJcccY1P2a+9WoGAyR7W6OFXV1D
-	 hVYwXKajXH2zWZgF162vRvgEOJcEgGGiKNOiGuvPNPyyV23KgGk4Tp+nucOd/hZLzK
-	 9mOemeX59GBBw==
-From: Leon Romanovsky <leon@kernel.org>
-To: Steffen Klassert <steffen.klassert@secunet.com>
-Cc: Alexandre Cassen <acassen@corp.free.fr>,
-	netdev@vger.kernel.org
-Subject: [RFC ipsec-next] xfrm: fix tunnel mode TX datapath in packet offload mode
-Date: Wed,  5 Feb 2025 20:41:02 +0200
-Message-ID: <af1b9df0b22d7a9f208e093356412f8976cc1bc2.1738780166.git.leon@kernel.org>
-X-Mailer: git-send-email 2.48.1
+	s=k20201202; t=1738781017;
+	bh=zp9osJNoZyypSjqHQjKLAb37/Ztk3mYlSTKRNcbY4YM=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=cW3L8AkqUcoeANkp50hHNdSU58tvekUXiDG8GH0FLHNHcfUYWD/nYtRXxgC50vR4n
+	 hPpHNwohQQot4XxgdBC94VLvDavIaZYqIAbf2IjRa6l9wrfFYN4RasLWRj2iTrp4fe
+	 UXCt4eXUIcf2zCaQdevZBGbE7iMzihr0r/DVXimkFrteKwMHGSu/KBWcVpX09lgDOq
+	 ZO8/u3d11ohbBGXSxOtUL8NngWwxiKr99lRX4h2hi/DD7XCqkb8WcnHig6oKGUAgyx
+	 xivAOxhIOShrgEsC5S/0EL4rP2tRpMzbPPZag4ybldv+uVaD248jf4aG6GbrQ7h/gQ
+	 xfWLL7zVr+5Wg==
+Message-ID: <807a8915-6c3b-495b-8b6b-529e696dff00@kernel.org>
+Date: Wed, 5 Feb 2025 11:43:35 -0700
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next v13 00/10] io_uring zero copy rx
+Content-Language: en-US
+To: David Wei <dw@davidwei.uk>, netdev@vger.kernel.org
+Cc: Pavel Begunkov <asml.silence@gmail.com>, Jakub Kicinski
+ <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jesper Dangaard Brouer <hawk@kernel.org>,
+ Mina Almasry <almasrymina@google.com>,
+ Stanislav Fomichev <stfomichev@gmail.com>, Joe Damato <jdamato@fastly.com>,
+ Pedro Tammela <pctammela@mojatatu.com>
+References: <20250204215622.695511-1-dw@davidwei.uk>
+ <aa3f85be-a7d9-4f41-9fe3-d7d711697079@kernel.org>
+ <da6b478a-065a-4f02-acd2-03c6d6dea9fa@davidwei.uk>
+From: David Ahern <dsahern@kernel.org>
+In-Reply-To: <da6b478a-065a-4f02-acd2-03c6d6dea9fa@davidwei.uk>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-From: Alexandre Cassen <acassen@corp.free.fr>
+On 2/5/25 11:00 AM, David Wei wrote:
+> On 2025-02-05 09:44, David Ahern wrote:
+>> On 2/4/25 2:56 PM, David Wei wrote:
+>>> We share netdev core infra with devmem TCP. The main difference is that
+>>> io_uring is used for the uAPI and the lifetime of all objects are bound
+>>> to an io_uring instance. Data is 'read' using a new io_uring request
+>>> type. When done, data is returned via a new shared refill queue. A zero
+>>> copy page pool refills a hw rx queue from this refill queue directly. Of
+>>> course, the lifetime of these data buffers are managed by io_uring
+>>> rather than the networking stack, with different refcounting rules.
+>>
+>> just to make sure I understand, working with GPU memory as well as host
+>> memory is not a goal of this patch set?
+> 
+> Yes, this patchset is only for host memory.
 
-Packets that match the output xfrm policy are delivered to the netstack.
-In IPsec packet mode for tunnel mode, the HW is responsible for building the
-hard header and outer IP header. In such a situation, the inner header may
-refer to a network that is not directly reachable by the host, resulting in
-a failed neighbor resolution. The packet is then dropped. xfrm policy defines
-the netdevice to use for xmit so we can send packets directly to it.
-
-This fix also provides a performance improvement for transport mode, since
-there is no need to perform neighbor resolution if the HW is already configured
-to do so.
-
-Fixes: f8a70afafc17 ("xfrm: add TX datapath support for IPsec packet offload mode")
-Signed-off-by: Alexandre Cassen <acassen@corp.free.fr>
-Signed-off-by: Leon Romanovsky <leonro@nvidia.com>
----
-Steffen,
-
-I'm sending this patch AS IS to get feedback if it is right approach.
-
-Thanks
----
- net/xfrm/xfrm_output.c | 38 ++++++++++++++++++++++++++++++++++++--
- 1 file changed, 36 insertions(+), 2 deletions(-)
-
-diff --git a/net/xfrm/xfrm_output.c b/net/xfrm/xfrm_output.c
-index 34c8e266641c..4ad83b9ea0e9 100644
---- a/net/xfrm/xfrm_output.c
-+++ b/net/xfrm/xfrm_output.c
-@@ -495,7 +495,7 @@ static int xfrm_output_one(struct sk_buff *skb, int err)
- 	struct xfrm_state *x = dst->xfrm;
- 	struct net *net = xs_net(x);
- 
--	if (err <= 0 || x->xso.type == XFRM_DEV_OFFLOAD_PACKET)
-+	if (err <= 0)
- 		goto resume;
- 
- 	do {
-@@ -612,6 +612,40 @@ int xfrm_output_resume(struct sock *sk, struct sk_buff *skb, int err)
- }
- EXPORT_SYMBOL_GPL(xfrm_output_resume);
- 
-+static int xfrm_dev_direct_output(struct sock *sk, struct xfrm_state *x,
-+				  struct sk_buff *skb)
-+{
-+	struct dst_entry *dst = skb_dst(skb);
-+	struct net *net = xs_net(x);
-+	int err;
-+
-+	dst = skb_dst_pop(skb);
-+	if (!dst) {
-+		XFRM_INC_STATS(net, LINUX_MIB_XFRMOUTERROR);
-+		kfree_skb(skb);
-+		return -EHOSTUNREACH;
-+	}
-+	skb_dst_set(skb, dst);
-+	nf_reset_ct(skb);
-+
-+	err = skb_dst(skb)->ops->local_out(net, sk, skb);
-+	if (unlikely(err != 1)) {
-+		kfree_skb(skb);
-+		return err;
-+	}
-+
-+	/* In transport mode, network destination is
-+	 * directly reachable, while in tunnel mode,
-+	 * inner packet network may not be. In packet
-+	 * offload type, HW is responsible for hard
-+	 * header packet mangling so directly xmit skb
-+	 * to netdevice.
-+	 */
-+	skb->dev = x->xso.dev;
-+	__skb_push(skb, skb->dev->hard_header_len);
-+	return dev_queue_xmit(skb);
-+}
-+
- static int xfrm_output2(struct net *net, struct sock *sk, struct sk_buff *skb)
- {
- 	return xfrm_output_resume(sk, skb, 1);
-@@ -735,7 +769,7 @@ int xfrm_output(struct sock *sk, struct sk_buff *skb)
- 			return -EHOSTUNREACH;
- 		}
- 
--		return xfrm_output_resume(sk, skb, 0);
-+		return xfrm_dev_direct_output(sk, x, skb);
- 	}
- 
- 	secpath_reset(skb);
--- 
-2.48.1
-
+And is GPU memory on the near term to-do list?
 
