@@ -1,143 +1,93 @@
-Return-Path: <netdev+bounces-163153-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-163154-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1060AA296F6
-	for <lists+netdev@lfdr.de>; Wed,  5 Feb 2025 18:09:12 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 607E3A296F9
+	for <lists+netdev@lfdr.de>; Wed,  5 Feb 2025 18:10:03 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 5BA0E3A5A94
-	for <lists+netdev@lfdr.de>; Wed,  5 Feb 2025 17:09:03 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B00B03A5BA0
+	for <lists+netdev@lfdr.de>; Wed,  5 Feb 2025 17:09:54 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9D3571DDA18;
-	Wed,  5 Feb 2025 17:09:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1FDE61DDA18;
+	Wed,  5 Feb 2025 17:10:00 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="HHcL0D7e"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="lfsMBNo5"
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2733B4C76;
-	Wed,  5 Feb 2025 17:09:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E83A24C76;
+	Wed,  5 Feb 2025 17:09:59 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1738775347; cv=none; b=WFGmJ2w9xrSIwznLOswfJnOmriLkG5AEQ5G5i5dds8imQ42+D3L/EmHqBgh4o4A+8sCFRxEd3GLY0WUxTEYXJwNxsYqjU3KMKC61qlcqOUXVdj6aHdfPyv14fu7kxjoVsTL0iJQ9wbwVFPbGWb+e84FAAr6wIcZtvm1TE6J4EK4=
+	t=1738775400; cv=none; b=EybbwPNAtbfJ3bqHsjc+RH9n4Jobp90modmniduEnA7lnH1xxidahREvZGq6vILSIiCQlmTpRgHieyOh/sOJC8fayeAwN/Jo6R9jc+hWmUYfDl78/WaiJE61aejDBo6fRmOyE+WxbJxew+5qgxq6IMB5XBZU0FMxl7GRsM3OWP0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1738775347; c=relaxed/simple;
-	bh=CbXagtJhrSGSS95bINrZ5cWssD3AwQsuc3B6gL6u2k4=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=TXeUk0WolvQbXuiq+foW5mDXwRWHLEsQJPHCLNo2HXjMbXA7A8rdDJRnfisXhbDpw4DuFvMFXDsss3klEi+Ch682tTK2Qdm+0neMSMcLQ4DCwhEq4Lm7YoLr3obvDbgCKqxGTIpadA/IL6lw1c4yOvdthrtkTerLoWmF2veQVb4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=HHcL0D7e; arc=none smtp.client-ip=156.67.10.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=5wOT3p+XzV1SocAEzl8vME7EDx+B302N3XwBDJwQTAw=; b=HHcL0D7eVudx5sZ9hoN8wpNrbI
-	t4b0+DaMY/lTfTeq+vCdBwadnnwopZA99yGVHx3/OGzYQOnTmxaG1p3NKzw/esjxyrB9ydYL7ovmV
-	MdI1fUeGPecHwBzGWYuWLR6PLvr2ovWboTs8+J/Urym3vnDNzAGn4QZ3CowwSyCtnRlQ=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1tfitL-00BFNQ-QE; Wed, 05 Feb 2025 18:08:47 +0100
-Date: Wed, 5 Feb 2025 18:08:47 +0100
-From: Andrew Lunn <andrew@lunn.ch>
-To: Dimitri Fedrau <dima.fedrau@gmail.com>
-Cc: "Russell King (Oracle)" <linux@armlinux.org.uk>,
-	dimitri.fedrau@liebherr.com, Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Rob Herring <robh@kernel.org>,
-	Krzysztof Kozlowski <krzk+dt@kernel.org>,
-	Conor Dooley <conor+dt@kernel.org>, Andrew Davis <afd@ti.com>,
-	Heiner Kallweit <hkallweit1@gmail.com>,
-	Florian Fainelli <f.fainelli@gmail.com>, netdev@vger.kernel.org,
-	devicetree@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH net-next v3 2/3] net: phy: Add helper for getting tx
- amplitude gain
-Message-ID: <b28755b0-9104-4295-8cd3-508818445a4b@lunn.ch>
-References: <20250204-dp83822-tx-swing-v3-0-9798e96500d9@liebherr.com>
- <20250204-dp83822-tx-swing-v3-2-9798e96500d9@liebherr.com>
- <Z6JUbW72_CqCY9Zq@shell.armlinux.org.uk>
- <20250205052218.GC3831@debian>
+	s=arc-20240116; t=1738775400; c=relaxed/simple;
+	bh=5b2MkPkMbbj3UTEjR7NeO1U4/9xMA9aB79imAaglNAA=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=bJF08f/dRfo5YvyAqucoGgNarureneE9uZhGCMQX4bPPXUAaP9FYmJViSVcl6Odta9toPROe18d3ryXy+0iNAzsmrkkK3p6C6j4EqDiToSIU+JByjOUeURFpnmmrKTfgBWEH/4gy7zVtba7fU46k30SJYEsTmMhrGDosIfIu8uM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=lfsMBNo5; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id D6551C4CED1;
+	Wed,  5 Feb 2025 17:09:58 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1738775399;
+	bh=5b2MkPkMbbj3UTEjR7NeO1U4/9xMA9aB79imAaglNAA=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=lfsMBNo5hrfuPqTd3FAELItcIVojV0ZTHXMNQLPcvpImVTf9M7BTlQpiR+aUbM95p
+	 pC3IlaJ4JtNqUTxV2aF0Pg5e8Y3USgPi+0YJ2v/gYLG5kos5/vmG50ic5CXyDy9o6I
+	 jahOGqCGvaA2Gs41RlUqhIdIqz9d4xp2c4VQIRszWQfVvtTz7+M3A3M8p41+VtBb2z
+	 jgVFeabYdkDIhEloOiPumtv6mP7f3/o79++4srMEDtYUtkFrx5r6vwDDFgULOHzeuo
+	 Douy+8U6efDkSxw/t4OPbbE2OBa5TfuZKwgg27RAv4Kkp7npn7ekgToESs72j7Wp7a
+	 KprVhvT38VC4g==
+Date: Wed, 5 Feb 2025 09:09:58 -0800
+From: Jakub Kicinski <kuba@kernel.org>
+To: Amit Cohen <amcohen@nvidia.com>
+Cc: Alexei Starovoitov <alexei.starovoitov@gmail.com>, Petr Machata
+ <petrm@nvidia.com>, "David S. Miller" <davem@davemloft.net>, Eric Dumazet
+ <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, Andrew Lunn
+ <andrew+netdev@lunn.ch>, Network Development <netdev@vger.kernel.org>, Ido
+ Schimmel <idosch@nvidia.com>, Alexei Starovoitov <ast@kernel.org>, Daniel
+ Borkmann <daniel@iogearbox.net>, Jesper Dangaard Brouer <hawk@kernel.org>,
+ John Fastabend <john.fastabend@gmail.com>, bpf <bpf@vger.kernel.org>, mlxsw
+ <mlxsw@nvidia.com>
+Subject: Re: [PATCH net-next 00/12] mlxsw: Preparations for XDP support
+Message-ID: <20250205090958.278ffaff@kernel.org>
+In-Reply-To: <BL1PR12MB5922564282DA2C2C5CA671C1CBF42@BL1PR12MB5922.namprd12.prod.outlook.com>
+References: <cover.1738665783.git.petrm@nvidia.com>
+	<CAADnVQKMN4+Zg9ZG4FpH9pJw4KdmwWmT2d4BiJgHUUQ-Hd7OkQ@mail.gmail.com>
+	<BL1PR12MB59225F7D902ACBC6A91511C3CBF42@BL1PR12MB5922.namprd12.prod.outlook.com>
+	<CAADnVQLJfd201t_-bgWHRJRDHm4FQDNapbmAQhPd18OEFq_QdA@mail.gmail.com>
+	<BL1PR12MB5922564282DA2C2C5CA671C1CBF42@BL1PR12MB5922.namprd12.prod.outlook.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250205052218.GC3831@debian>
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-On Wed, Feb 05, 2025 at 06:22:18AM +0100, Dimitri Fedrau wrote:
-> Am Tue, Feb 04, 2025 at 05:54:53PM +0000 schrieb Russell King (Oracle):
-> > On Tue, Feb 04, 2025 at 02:09:16PM +0100, Dimitri Fedrau via B4 Relay wrote:
-> > >  #if IS_ENABLED(CONFIG_OF_MDIO)
-> > > -static int phy_get_int_delay_property(struct device *dev, const char *name)
-> > > +static int phy_get_u32_property(struct device *dev, const char *name)
-> > >  {
-> > >  	s32 int_delay;
-> > >  	int ret;
-> > > @@ -3108,7 +3108,7 @@ static int phy_get_int_delay_property(struct device *dev, const char *name)
-> > >  	return int_delay;
+On Tue, 4 Feb 2025 17:26:43 +0000 Amit Cohen wrote:
+> > > You're right, most of packets should be handled by HW, XDP is
+> > > mainly useful for telemetry.  
 > > 
-> > Hmm. You're changing the name of this function from "int" to "u32", yet
-> > it still returns "int".
-> >
+> > Why skb path is not enough?  
 > 
-> I just wanted to reuse code for retrieving the u32, I found
-> phy_get_int_delay_property and renamed it. But the renaming from "int"
-> to "u32" is wrong as you outlined.
-> 
-> > What range of values are you expecting to be returned by this function?
-> > If it's the full range of u32 values, then that overlaps with the error
-> > range returned by device_property_read_u32().
-> >
-> 
-> Values are in percent, u8 would already be enough, so it wouldn't
-> overlap with the error range.
-> 
-> > I'm wondering whether it would be better to follow the example set by
-> > these device_* functions, and pass a pointer for the value to them, and
-> > just have the return value indicating success/failure.
-> >
-> 
-> I would prefer this, but this would mean changes in phy_get_internal_delay
-> if we don't want to duplicate code, as phy_get_internal_delay relies on
-> phy_get_int_delay_property and we change function parameters of
-> phy_get_int_delay_property as you described. I would switch from
-> static int phy_get_int_delay_property(struct device *dev, const char *name)
-> to
-> static int phy_get_u32_property(struct device *dev, const char *name, u32 *val)
-> 
-> Do you agree ?
+> We get better packet rates using XDP, this can be useful to redirect
+> packets to a server for analysis for example.
 
-This looks O.K. You should also rename the local variable int_delay.
+TBH I also feel a little ambivalent about adding advanced software
+features to mlxsw. You have a dummy device off which you hang the NAPIs,
+the page pools, and now the RXQ objects. That already works poorly with
+our APIs. How are you going to handle the XDP side? Program per port, 
+I hope? But the basic fact remains that only fallback traffic goes thru
+the XDP program which is not the normal Linux model, routing is after
+XDP.
 
-Humm, that function has other issues.
-
-static int phy_get_int_delay_property(struct device *dev, const char *name)
-{
-	s32 int_delay;
-	int ret;
-
-	ret = device_property_read_u32(dev, name, &int_delay);
-	if (ret)
-		return ret;
-
-	return int_delay;
-}
-
-int_delay should really be a u32. if ret is not an error, there should
-be a range check to ensure int_long actually fits in an s32, otherwise
--EINVAL, or maybe -ERANGE.
-
-For delays, we never expect too much more than 2000ps, so no valid DT
-blob should trigger issues here.
-
-     Andrew
+On one hand it'd be great if upstream switch drivers could benefit from
+the advanced features. On the other the HW is clearly not capable of
+delivering in line with how NICs work, so we're signing up for a stream
+of corner cases, bugs and incompatibility. Dunno.
 
