@@ -1,61 +1,104 @@
-Return-Path: <netdev+bounces-163252-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-163253-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2EE73A29B61
-	for <lists+netdev@lfdr.de>; Wed,  5 Feb 2025 21:45:55 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 603B0A29B67
+	for <lists+netdev@lfdr.de>; Wed,  5 Feb 2025 21:46:39 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id BBAB916487B
-	for <lists+netdev@lfdr.de>; Wed,  5 Feb 2025 20:45:53 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 0DF733A1A79
+	for <lists+netdev@lfdr.de>; Wed,  5 Feb 2025 20:46:28 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2158D1FFC4B;
-	Wed,  5 Feb 2025 20:45:52 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 54E31214A61;
+	Wed,  5 Feb 2025 20:46:26 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="hjFBUq7V"
+	dkim=pass (2048-bit key) header.d=purestorage.com header.i=@purestorage.com header.b="PdM4Sv9M"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-lj1-f229.google.com (mail-lj1-f229.google.com [209.85.208.229])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F05171EE7B3
-	for <netdev@vger.kernel.org>; Wed,  5 Feb 2025 20:45:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 03A57211A11
+	for <netdev@vger.kernel.org>; Wed,  5 Feb 2025 20:46:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.229
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1738788352; cv=none; b=Cji6Zl7UlHJXMt3x0iYJcEjdwW78VTB2pTv44hJk4XF0T1/YxoVaSoLuT8XW36urtzXYga7iGc67YNf2v7ptb3fjN1//VL+crbAq160hBRPzGruTjSaKPXukt9tDK6Jv8VLtwbtuGr13EvmiC7ptTdXqrsJwrB7Hkh3tXTlhf0s=
+	t=1738788386; cv=none; b=msyHw9zsdsKZ1omc7l1WwRU1ATDB5n3ctURMBSgaTxQoGC1G1gbo52wXwiH/yqenY3wdpNnX2x5jYNwGY7arX9HPyZU3s+YyTgv1gVf30gmZE+kLvuvsYfVjPS1QrvQ3eL6ORYaZRYHeQBPUyCv+FRoLCSMqZoFFizj0zcy70LI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1738788352; c=relaxed/simple;
-	bh=//uWnG9TvWTqr2If/A6gaUTJzjuhsAIXJ4fNcNm4KVk=;
+	s=arc-20240116; t=1738788386; c=relaxed/simple;
+	bh=eJJq5QNRi14jFadz/bxG36Zo3CHW1uI2JqLwh8zP4ow=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=CkqUFAchDD73fZ2cxH1meYQ9jzlrayYBJ5n+wlel9CbsINXbnKhJtHMpVLYSDrEbyib4LB3B/+x64tZXW0e8UpWpYMLs1XJqiO5+oVkYKLl3PxceuG2tNckXSoTpF2nBEeuElPVVKuIVHANkGtq3NsSC4TxDgPM5ZfiWxydZxXc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=hjFBUq7V; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 444A6C4CED1;
-	Wed,  5 Feb 2025 20:45:49 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1738788351;
-	bh=//uWnG9TvWTqr2If/A6gaUTJzjuhsAIXJ4fNcNm4KVk=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=hjFBUq7VFNjKcOh3q8bv7cM+lBMXZ13OVGeDcO2cEJ/16hEp6qVfyqxXmKqNfe/l+
-	 BhJ1SLQteA0knGw1GNvhF5f8D24CpV/+/8XmJPYrroM8XpSLOOU4GQw8OiWR86VVV2
-	 8ffsfCVo96sy1CHvwTNjnp5S14MxxZKi6icCwZnze73eOY6HL1H4e4Jw4iJpIq2kN2
-	 7lMKazDsC4RWvJrGLRZoMmdgJ8lRJjobIIhTASt+2bfbRLuCuan+ajhbXmlwX1xtFI
-	 oA7Lwz8O4T42FKwlROkHwSAI5pGQARs5gMzROlCra+q7OKKZYeylWscnci+y4hg1cR
-	 5e8SxhRla2nfQ==
-Date: Wed, 5 Feb 2025 20:45:46 +0000
-From: Simon Horman <horms@kernel.org>
-To: Przemek Kitszel <przemyslaw.kitszel@intel.com>
-Cc: intel-wired-lan@lists.osuosl.org,
-	Tony Nguyen <anthony.l.nguyen@intel.com>, netdev@vger.kernel.org,
-	Konrad Knitter <konrad.knitter@intel.com>,
-	Michal Swiatkowski <michal.swiatkowski@linux.intel.com>,
-	Qiuxu Zhuo <qiuxu.zhuo@intel.com>,
-	Linus Torvalds <torvalds@linux-foundation.org>,
-	Kees Cook <kees@kernel.org>,
-	Nick Desaulniers <nick.desaulniers@gmail.com>,
-	Jiri Slaby <jirislaby@kernel.org>
-Subject: Re: [PATCH iwl-net] ice: health.c: fix compilation on gcc 7.5
-Message-ID: <20250205204546.GM554665@kernel.org>
-References: <20250205104252.30464-2-przemyslaw.kitszel@intel.com>
+	 Content-Type:Content-Disposition:In-Reply-To; b=ZQigiUOfj4gEPcvWk5K/mddVwf574fpnKTEAM5OaQFcaXgAruRnIspY3BTmsRsVHtBgXgPpMvuU7LFYYXdIx95MQN7WYHsIhAe9qLqB42XZ9pcanukpinVpFA9+ABkUySlgEbaMhKTRJGpN0yTHFQMXHsdruBdQ6YzyvutdvW6c=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=purestorage.com; spf=fail smtp.mailfrom=purestorage.com; dkim=pass (2048-bit key) header.d=purestorage.com header.i=@purestorage.com header.b=PdM4Sv9M; arc=none smtp.client-ip=209.85.208.229
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=purestorage.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=purestorage.com
+Received: by mail-lj1-f229.google.com with SMTP id 38308e7fff4ca-30219437e63so14174861fa.1
+        for <netdev@vger.kernel.org>; Wed, 05 Feb 2025 12:46:22 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=purestorage.com; s=google2022; t=1738788381; x=1739393181; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=YZgLBFelzHCvaOXDScSFVXg2HFnlFG4aCVoHAFEQ/jY=;
+        b=PdM4Sv9M6stuMyPtdaLpFpp472IHI9AgjtrIzt0TeOU9NSHNmKpXWoULvACCm2bcj5
+         GDef7Po0mJ6DkQCgZJ+eaEoJImfknWK42DVBoo5CEVpyOG7LanGFVBhtlnv0IUUg04Zn
+         v/kBlHTOA6kRDqfkNN7nwaxbG2tDUj3AGwT9AQgmv56rmWp9fe57fCL1/5uCwg+sGsbt
+         IP8wHXkkvGGiOuszZuR2Cshp8f5EMmmED+awWIdHWByhCME/xTEZIO9TNs6jXoH95/zS
+         ZQJgPlojwFNo3ZBtVyibERgLNsPsJ+FxxH6GuhzlCLt62bw+Cr/h9aSUPFAIZW+MbUIF
+         ilug==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1738788381; x=1739393181;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=YZgLBFelzHCvaOXDScSFVXg2HFnlFG4aCVoHAFEQ/jY=;
+        b=cZ5P1cZYfXDCEAwNyxaVjiPZQP72MZyxR/zUGDaeo6krlsVMZJX3r4/0Kjf/yIs3uv
+         8SITyCpS7zwPIzkRpqW/Ax5af0IA49+setIQuzzgmAATn8ijGIihxNBdWeToPCsHeMe0
+         Wqj7Np4cc83VXIXotcgrbT6iP/DiLxy4BC4qNC+pr09Hwaps8N484zsvdP0sM/8qgIFq
+         ZHBkyhdrDeXcbJqP527gwuegElSvVX4AUzGLkehQQ+T4AWGcN5YYYpOBp4Zr6s8RRuN4
+         Hs9RyPgX5DivE+en1hRqZ/ytE7LVOfIwQMbyWGbFLoF64K2hx+bou3zgaN0juDctbWf7
+         6KHg==
+X-Forwarded-Encrypted: i=1; AJvYcCXIChY4oywCKN8kRha6o7ZwMNFXsdkKCBup+qyywEtuHKUvpUTmDvUZuiGzfI1Nf6GwfHCQRHc=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyaU5ncq7BMNbR8/a151486UATUUAFR31WEm2HjmwAkRvHvv/iJ
+	Q5/2LDw/IaRw+wrh0GaXgByVPbinBzZHqIiWk15nArdxltbJ+Xr4Eo02NsZCtWKfHbWELx8z/AH
+	2OBC3qBTIxkx3L4XDq6drWyYZ3WFc3G++UUVCfJ4JEA25EyC5
+X-Gm-Gg: ASbGncvyLkmGXuePf+ZkJYp83fWEMF25pejGoQV0ZtFlrluONgWvAbN5kJSfLg6Giix
+	vUnC71RzRQzu6y9Iz5DSpEH3xTfczOGsoKvH3lnxiBZZA06EKioVf4r8oZAMf3i9NJaFNAa/lBc
+	Rvd/61BP2kuUKxZb4B40bOjBibvHKAK2Sn0Tb3CFnh0OeNkXiHCaY77H5xcS2jV4gEy8P8FNNqY
+	ZFCTXL14RPEcqvDC0mAEwdaZpMmluppmZTqnJMSdQfs4b3E8UHLOuCw4BtaKvEdYdvG0leHYMEs
+	gjaTGmNis/opItz7IuiP5JP1
+X-Google-Smtp-Source: AGHT+IHGwIKRNNFxj2aI2pB1MRsUTu9sF3y4BpuFpcUwXFlSdrpcxN6BtNkK74LQkEMWM1Ky2ABB1PoPqWjB
+X-Received: by 2002:a2e:874d:0:b0:2ff:c167:a965 with SMTP id 38308e7fff4ca-307da514932mr2475291fa.8.1738788380245;
+        Wed, 05 Feb 2025 12:46:20 -0800 (PST)
+Received: from c7-smtp-2023.dev.purestorage.com ([2620:125:9017:12:36:3:5:0])
+        by smtp-relay.gmail.com with ESMTPS id 38308e7fff4ca-307a3069cc3sm4133931fa.4.2025.02.05.12.46.19
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 05 Feb 2025 12:46:20 -0800 (PST)
+X-Relaying-Domain: purestorage.com
+Received: from dev-ushankar.dev.purestorage.com (dev-ushankar.dev.purestorage.com [IPv6:2620:125:9007:640:7:70:36:0])
+	by c7-smtp-2023.dev.purestorage.com (Postfix) with ESMTP id 6981F3401BB;
+	Wed,  5 Feb 2025 13:46:18 -0700 (MST)
+Received: by dev-ushankar.dev.purestorage.com (Postfix, from userid 1557716368)
+	id 5B895E41340; Wed,  5 Feb 2025 13:46:18 -0700 (MST)
+Date: Wed, 5 Feb 2025 13:46:18 -0700
+From: Uday Shankar <ushankar@purestorage.com>
+To: Breno Leitao <leitao@debian.org>
+Cc: Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Srinivas Kandagatla <srinivas.kandagatla@linaro.org>,
+	=?utf-8?B?UmFmYcWCIE1pxYJlY2tp?= <rafal@milecki.pl>,
+	Simon Horman <horms@kernel.org>,
+	Andrew Morton <akpm@linux-foundation.org>,
+	Johannes Berg <johannes@sipsolutions.net>,
+	Jonathan Corbet <corbet@lwn.net>, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org, linux-wireless@vger.kernel.org,
+	linux-doc@vger.kernel.org
+Subject: Re: [PATCH v2 2/2] netconsole: allow selection of egress interface
+ via MAC address
+Message-ID: <Z6POGmAEEixKV5/O@dev-ushankar.dev.purestorage.com>
+References: <20250204-netconsole-v2-0-5ef5eb5f6056@purestorage.com>
+ <20250204-netconsole-v2-2-5ef5eb5f6056@purestorage.com>
+ <20250205-flying-coucal-of-influence-0dcbc3@leitao>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -64,73 +107,71 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20250205104252.30464-2-przemyslaw.kitszel@intel.com>
+In-Reply-To: <20250205-flying-coucal-of-influence-0dcbc3@leitao>
 
-+ Jiri
-
-On Wed, Feb 05, 2025 at 11:42:12AM +0100, Przemek Kitszel wrote:
-> GCC 7 is not as good as GCC 8+ in telling what is a compile-time const,
-> and thus could be used for static storage. So we could not use variables
-> for that, no matter how much "const" keyword is sprinkled around.
+On Wed, Feb 05, 2025 at 11:07:45AM -0800, Breno Leitao wrote:
+> > +	else if (is_valid_ether_addr(np->dev_mac))
+> > +		ndev = dev_getbyhwaddr_rcu(net, ARPHRD_ETHER, np->dev_mac);
 > 
-> Excerpt from the report:
-> My GCC is: gcc (Ubuntu 7.5.0-3ubuntu1~18.04) 7.5.0.
+> You do not have the RCU read lock here. You have the rtnl(), which is
+> sufficient, but, CONFIG_PROVE_RCU_LIST will show something as:
 > 
->   CC [M]  drivers/net/ethernet/stmicro/stmmac/stmmac_mdio.o
-> drivers/net/ethernet/intel/ice/devlink/health.c:35:3: error: initializer element is not constant
->    ice_common_port_solutions, {ice_port_number_label}},
->    ^~~~~~~~~~~~~~~~~~~~~~~~~
-> drivers/net/ethernet/intel/ice/devlink/health.c:35:3: note: (near initialization for 'ice_health_status_lookup[0].solution')
-> drivers/net/ethernet/intel/ice/devlink/health.c:35:31: error: initializer element is not constant
->    ice_common_port_solutions, {ice_port_number_label}},
->                                ^~~~~~~~~~~~~~~~~~~~~
-> drivers/net/ethernet/intel/ice/devlink/health.c:35:31: note: (near initialization for 'ice_health_status_lookup[0].data_label[0]')
-> drivers/net/ethernet/intel/ice/devlink/health.c:37:46: error: initializer element is not constant
->    "Change or replace the module or cable.", {ice_port_number_label}},
->                                               ^~~~~~~~~~~~~~~~~~~~~
-> drivers/net/ethernet/intel/ice/devlink/health.c:37:46: note: (near initialization for 'ice_health_status_lookup[1].data_label[0]')
-> drivers/net/ethernet/intel/ice/devlink/health.c:39:3: error: initializer element is not constant
->    ice_common_port_solutions, {ice_port_number_label}},
->    ^~~~~~~~~~~~~~~~~~~~~~~~~
+> 	WARNING: suspicious RCU usage
+> 	6.13.0-09701-g6610c7be45bb-dirty #18 Not tainted
+> 	-----------------------------
+> 	net/core/dev.c:1143 RCU-list traversed in non-reader section!!
+> 	other info that might help us debug this:
+> 	rcu_scheduler_active = 2, debug_locks = 1
+> 	1 lock held by swapper/0/1:
+> 	 #0: ffffffff832795b8 (rtnl_mutex){+.+.}-{4:4}, at: netpoll_setup+0x48/0x540
+> 	stack backtrace:
+> 	CPU: 1 UID: 0 PID: 1 Comm: swapper/0 Not tainted 6.13.0-virtme-09701-g6610c7be45bb-dirty #18
+> 	Hardware name: QEMU Standard PC (i440FX + PIIX, 1996), BIOS rel-1.16.3-0-ga6ed6b701f0a-prebuilt.qemu.org 04/01/2014
+> 	Call Trace:
+> 	 <TASK>
+> 	 dump_stack_lvl+0x9f/0xf0
+> 	 lockdep_rcu_suspicious+0x11a/0x150
+> 	 dev_getbyhwaddr_rcu+0xb6/0xc0
+> 	 netpoll_setup+0x8a/0x540
+> 	 ? netpoll_parse_options+0x2bd/0x310
 > 
-> Fixes: 85d6164ec56d ("ice: add fw and port health reporters")
-> Reported-by: Qiuxu Zhuo <qiuxu.zhuo@intel.com>
-> Closes: https://lore.kernel.org/netdev/CY8PR11MB7134BF7A46D71E50D25FA7A989F72@CY8PR11MB7134.namprd11.prod.outlook.com
-> Signed-off-by: Przemek Kitszel <przemyslaw.kitszel@intel.com>
-> ---
-> I would really like to bump min gcc to 8.5 (RH 8 family),
-> instead of supporting old Ubuntu. However SLES 15 is also stuck with gcc 7.5 :(
+> This is not a problem per-se, since you have RTNL. We probably need to
+> tell for_each_netdev_rcu() to not comply about "RCU-list traversed in
+> non-reader section" if RTNL is held. Not sure why we didn't hit in the
+> test infrastructure, tho:
 > 
-> CC: Linus Torvalds <torvalds@linux-foundation.org>
-> CC: Kees Cook <kees@kernel.org>
-> CC: Nick Desaulniers <nick.desaulniers@gmail.com>
+> 	https://patchwork.kernel.org/project/netdevbpf/patch/20250204-netconsole-v2-2-5ef5eb5f6056@purestorage.com/
 
-Hi Prezemek,
+I don't think there is an automated test that will hit this path yet. I
+guess you got this trace from your manual testing?
 
-I ran into a similar problem not so long ago and I'm wondering if
-the following, based on a suggestion by Jiri Slaby, resolves your
-problem.
+> 
+> Anyway, no action item for you here. I am talking to Jakub on a way to
+> solve it, and I should send a fix soon.
 
-diff --git a/drivers/net/ethernet/intel/ice/devlink/health.c b/drivers/net/ethernet/intel/ice/devlink/health.c
-index ea40f7941259..19c3d37aa768 100644
---- a/drivers/net/ethernet/intel/ice/devlink/health.c
-+++ b/drivers/net/ethernet/intel/ice/devlink/health.c
-@@ -25,10 +25,10 @@ struct ice_health_status {
-  * The below lookup requires to be sorted by code.
-  */
- 
--static const char *const ice_common_port_solutions =
-+static const char ice_common_port_solutions[] =
- 	"Check your cable connection. Change or replace the module or cable. Manually set speed and duplex.";
--static const char *const ice_port_number_label = "Port Number";
--static const char *const ice_update_nvm_solution = "Update to the latest NVM image.";
-+static const char ice_port_number_label[] = "Port Number";
-+static const char ice_update_nvm_solution[] = "Update to the latest NVM image.";
- 
- static const struct ice_health_status ice_health_status_lookup[] = {
- 	{ICE_AQC_HEALTH_STATUS_ERR_UNKNOWN_MOD_STRICT, "An unsupported module was detected.",
+/**
+ * list_for_each_entry_rcu	-	iterate over rcu list of given type
+ * @pos:	the type * to use as a loop cursor.
+ * @head:	the head for your list.
+ * @member:	the name of the list_head within the struct.
+ * @cond:	optional lockdep expression if called from non-RCU protection.
+ *
+ * This list-traversal primitive may safely run concurrently with
+ * the _rcu list-mutation primitives such as list_add_rcu()
+ * as long as the traversal is guarded by rcu_read_lock().
+ */
+#define list_for_each_entry_rcu(pos, head, member, cond...)		\
+	for (__list_check_rcu(dummy, ## cond, 0),			\
+	     pos = list_entry_rcu((head)->next, typeof(*pos), member);	\
+		&pos->member != (head);					\
+		pos = list_entry_rcu(pos->member.next, typeof(*pos), member))
 
+If we do something like
 
-Link: https://lore.kernel.org/netdev/485dbc5a-a04b-40c2-9481-955eaa5ce2e2@kernel.org/
-Link: https://git.kernel.org/netdev/net-next/c/36fb51479e3c
+list_for_each_entry_rcu(..., lockdep_rtnl_is_held())
+	...
+
+I think that code will be okay with being called with either rcu or rtnl
+held. Of course, we need to plumb it through the net-specific helpers.
+
 
