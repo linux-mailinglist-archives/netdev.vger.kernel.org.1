@@ -1,174 +1,300 @@
-Return-Path: <netdev+bounces-163220-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-163221-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 68F3CA299C0
-	for <lists+netdev@lfdr.de>; Wed,  5 Feb 2025 20:08:32 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id D8BA0A299C6
+	for <lists+netdev@lfdr.de>; Wed,  5 Feb 2025 20:09:20 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 86F1E188971D
-	for <lists+netdev@lfdr.de>; Wed,  5 Feb 2025 19:08:36 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 1396A16A2D2
+	for <lists+netdev@lfdr.de>; Wed,  5 Feb 2025 19:09:02 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 18EDB200111;
-	Wed,  5 Feb 2025 19:07:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3F98F200111;
+	Wed,  5 Feb 2025 19:08:43 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=engleder-embedded.com header.i=@engleder-embedded.com header.b="ofqufMZ1"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ej1-f53.google.com (mail-ej1-f53.google.com [209.85.218.53])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mx14lb.world4you.com (mx14lb.world4you.com [81.19.149.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 204C821170D;
-	Wed,  5 Feb 2025 19:07:50 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.53
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 42AAA1FF7BB
+	for <netdev@vger.kernel.org>; Wed,  5 Feb 2025 19:08:40 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=81.19.149.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1738782473; cv=none; b=T8y2X8Y7V7U1AVp4SiUWAACITQRAOzKVMkBw/FX+nLtOHiIS91+0CEaunOnujgOk9sWeumYxCPGyBAtTTY8BXA59Xo/oLuIDMZhus/lQ06J/Lf8qSe/pVyh9l7jArnDL24Y86sI4iGx3GFxAKzeHYh3OwUtUFiH57rY+7jJS6/w=
+	t=1738782523; cv=none; b=inXTw/3Eb2IZvMc07ftiYz0ufgyQRX4Q6Q3Gy5W/dDMP/860E4J93vBohfUAS8BLohKRowDrECmgJCwJ7QdUvNMNdH49bRBu0XAck7cbQjbMdgReKk6uWbi5QiYp1ZmaHbZ8rTJLTyWoDnllu2o/zFyP5QEmTXe7XRdYB10UjPA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1738782473; c=relaxed/simple;
-	bh=LMG5gaWBYIK0JshQ6NVs4SIGayzcLVCUhGxss8oB55Q=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=UiS9Kt2YO6LEyLO/ZFhRzzFPSXEsD/ArAfpfuHUw4pHPN2ZqIDvzaelzPzc9M31cekZlQqfdwQ5Yae4x7afbwNW550ho+MmlzwT6YmBnve19sYMMiiin4byShosQcE84ccZ1X0PFt70PBGQBEmZlGCsA5+u4ZDCyHANQQYVC6QE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.218.53
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ej1-f53.google.com with SMTP id a640c23a62f3a-ab7483b9bf7so19970866b.3;
-        Wed, 05 Feb 2025 11:07:50 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1738782469; x=1739387269;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=sY6dYGVe6ovMP6LmJErKZtQSspIX6gQ/V/P/706krPo=;
-        b=k1Yh97gqK+28H97pNUOW6Uush9rIfj87Ss1CTElOV554J8ZX807bDcFmy1gemrPNos
-         A4df4Ou6tx0Sh+t6LG6SG16nQ2ZUQKv8sNvTN8+c564f0MyoygJ81Ei5tdModzc5mjvU
-         AmGNszhII0EWqgSuzQ615fmqexAC6PnkPi4o/1mR61f2iU1Ph7mqG2uBO+uRFntN/cVl
-         FdxdfiCJtDIMDLbWBlpXdvP8YIU9antStxgIdlHtcXfKMNZAiUBvgUyqWXak5LbD7xic
-         Hw4Hpcoz5pw6qyijd/lXqNdutWgVz4cp2s48pnLA8XYArW8z/TDbmae1jnJA0wM5mHRQ
-         fyYA==
-X-Forwarded-Encrypted: i=1; AJvYcCUDGZ3Cjs1iLCR3MgAphD3Yx4o8eEAU626hmlvhNylQofkKH8F2ADUTmx/q5xrmDZRFfog5K4KG@vger.kernel.org, AJvYcCUMOnbr1vOj7XPJ9hSPw1pmLMY2TF4BBvGo/VfaoQADRR661Cpf5nF2VRPA1io66MIKuNEJ7exV0BXGHs52ESE=@vger.kernel.org, AJvYcCWCdOFZVfK+KYm6KzT9t0rZCRvi7az1mgVTG6Olpm3klnP1egUYc8U0uckR1h5k6i2r1+BIugqQ1oc=@vger.kernel.org, AJvYcCXiTYAUVuqhzEV55CLV+AYpNuIGWmTQjqlvu0GAI4/1zP66t/GIsWF3z82D5GSn3SqI0ZriukJeJBSh6oND@vger.kernel.org
-X-Gm-Message-State: AOJu0YxD4C3BV3XhvQXpVRX1oeAhLESuvH+5K1OVehJo1Smoh480h/BZ
-	FLJxKxh+ueXefqG1txFzAju5uCWVkqczKEjcPfAjK1qT9EXx1d1e
-X-Gm-Gg: ASbGncuncSHD9nJJuADIuhfqLj5TVOVqmxkN5RQCRdEHbCZ7MiCXgauEuW7URaYjpAI
-	L13cCLBXLqjttw1Db9IgDE4MLAIArVv0lUCQNc9P4/RNI6kNggwIDL0L/B176wajPopezgp/jD2
-	XRcxZiGgrgbEWzXAEeF9CL//aGOEeuEmDCn3/9EPBwVK+M8ICkYmAhZwMK/Xr+E6rOqnTWObZ3G
-	TZv9DEHy0gIfO66CASaINz9zMCQiJB0GZZP4Oy9iHw4PpzQUJ6xrV5Lw2XEasMLUAcez2FRncii
-	mkAfo9c=
-X-Google-Smtp-Source: AGHT+IHPrkNV+54hDGaQFdYYeo3xJb2BJPMEFvC8tH4N4HRnkWu5xzHXdcDFw2aQOq4OJd0wfKsYEg==
-X-Received: by 2002:a17:907:7f8d:b0:ab6:f59f:5427 with SMTP id a640c23a62f3a-ab75e21dd2emr420699366b.11.1738782468433;
-        Wed, 05 Feb 2025 11:07:48 -0800 (PST)
-Received: from gmail.com ([2a03:2880:30ff:72::])
-        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-ab6e4a2fa50sm1139487266b.128.2025.02.05.11.07.47
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 05 Feb 2025 11:07:47 -0800 (PST)
-Date: Wed, 5 Feb 2025 11:07:45 -0800
-From: Breno Leitao <leitao@debian.org>
-To: Uday Shankar <ushankar@purestorage.com>
-Cc: Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Srinivas Kandagatla <srinivas.kandagatla@linaro.org>,
-	=?utf-8?B?UmFmYcWCIE1pxYJlY2tp?= <rafal@milecki.pl>,
-	Simon Horman <horms@kernel.org>,
-	Andrew Morton <akpm@linux-foundation.org>,
-	Johannes Berg <johannes@sipsolutions.net>,
-	Jonathan Corbet <corbet@lwn.net>, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org, linux-wireless@vger.kernel.org,
-	linux-doc@vger.kernel.org
-Subject: Re: [PATCH v2 2/2] netconsole: allow selection of egress interface
- via MAC address
-Message-ID: <20250205-flying-coucal-of-influence-0dcbc3@leitao>
-References: <20250204-netconsole-v2-0-5ef5eb5f6056@purestorage.com>
- <20250204-netconsole-v2-2-5ef5eb5f6056@purestorage.com>
+	s=arc-20240116; t=1738782523; c=relaxed/simple;
+	bh=vS4sQVfb16y9DLPEwlNhNIiEXXsLUpY2oHAQ+Oa7gG4=;
+	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
+	 MIME-Version; b=Tv5jDFMbscwjr67StwYRBMUz5wFd7qi+FBitCRgKjUqx6oJxItsT0hm928OgIb70GirxGasgYPhcZHT5mUwWlx75dJ3h2CwLvHLGA3/LXebLlZi2jDxcE2fzvPgS2MKuGEDqKtZc71os9dJnYUBIqeRdp6641veDNs30Xke8Tvg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=engleder-embedded.com; spf=pass smtp.mailfrom=engleder-embedded.com; dkim=pass (1024-bit key) header.d=engleder-embedded.com header.i=@engleder-embedded.com header.b=ofqufMZ1; arc=none smtp.client-ip=81.19.149.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=engleder-embedded.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=engleder-embedded.com
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=engleder-embedded.com; s=dkim11; h=Content-Transfer-Encoding:MIME-Version:
+	References:In-Reply-To:Message-Id:Date:Subject:Cc:To:From:Sender:Reply-To:
+	Content-Type:Content-ID:Content-Description:Resent-Date:Resent-From:
+	Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:List-Help:
+	List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
+	bh=2D5GiUUykY89hChn3aAP5ndnXdPq65QEBMcFLEpBzdc=; b=ofqufMZ11KevFH/Awbfy3pvCdN
+	On9rTjlvwIQq9Ge+aKcJKMlpRoMpZ5gJCbw0sIdKipGyOMzrIoYL7VqwrxIT/dAXfM+PZnhiR2nu6
+	Cx7RmD2KsfcfHQM9hmfhFzihbXjiUrA1FXtW7QOctuQgjdT1UDAXWCm/bYP2fX8ncA3I=;
+Received: from 88-117-60-28.adsl.highway.telekom.at ([88.117.60.28] helo=hornet.engleder.at)
+	by mx14lb.world4you.com with esmtpsa  (TLS1.2) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.97.1)
+	(envelope-from <gerhard@engleder-embedded.com>)
+	id 1tfklI-0000000017b-1rUC;
+	Wed, 05 Feb 2025 20:08:37 +0100
+From: Gerhard Engleder <gerhard@engleder-embedded.com>
+To: andrew@lunn.ch,
+	hkallweit1@gmail.com,
+	linux@armlinux.org.uk,
+	davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com
+Cc: netdev@vger.kernel.org,
+	Gerhard Engleder <gerhard@engleder-embedded.com>
+Subject: [PATCH net-next v5 7/7] tsnep: Add PHY loopback selftests
+Date: Wed,  5 Feb 2025 20:08:23 +0100
+Message-Id: <20250205190823.23528-8-gerhard@engleder-embedded.com>
+X-Mailer: git-send-email 2.39.5
+In-Reply-To: <20250205190823.23528-1-gerhard@engleder-embedded.com>
+References: <20250205190823.23528-1-gerhard@engleder-embedded.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250204-netconsole-v2-2-5ef5eb5f6056@purestorage.com>
+Content-Transfer-Encoding: 8bit
+X-AV-Do-Run: Yes
+X-ACL-Warn: X-W4Y-Internal
 
-On Tue, Feb 04, 2025 at 02:41:45PM -0700, Uday Shankar wrote:
-> Currently, netconsole has two methods of configuration - module
-> parameter and configfs. The former interface allows for netconsole
-> activation earlier during boot (by specifying the module parameter on
-> the kernel command line), so it is preferred for debugging issues which
-> arise before userspace is up/the configfs interface can be used. The
-> module parameter syntax requires specifying the egress interface name.
-> This requirement makes it hard to use for a couple reasons:
-> - The egress interface name can be hard or impossible to predict. For
->   example, installing a new network card in a system can change the
->   interface names assigned by the kernel.
-> - When constructing the module parameter, one may have trouble
->   determining the original (kernel-assigned) name of the interface
->   (which is the name that should be given to netconsole) if some stable
->   interface naming scheme is in effect. A human can usually look at
->   kernel logs to determine the original name, but this is very painful
->   if automation is constructing the parameter.
-> 
-> For these reasons, allow selection of the egress interface via MAC
-> address when configuring netconsole using the module parameter. Update
-> the netconsole documentation with an example of the new syntax.
-> Selection of egress interface by MAC address via configfs is far less
-> interesting (since when this interface can be used, one should be able
-> to easily convert between MAC address and interface name), so it is left
-> unimplemented.
-> 
-> Signed-off-by: Uday Shankar <ushankar@purestorage.com>
+Add loopback selftests on PHY level. This enables quick testing of
+loopback functionality to ensure working loopback for testing.
 
-Reviewed-by: Breno Leitao <leitao@debian.org>
-Tested-by: Breno Leitao <leitao@debian.org>
+Signed-off-by: Gerhard Engleder <gerhard@engleder-embedded.com>
+---
+ drivers/net/ethernet/engleder/Kconfig         |   1 +
+ .../net/ethernet/engleder/tsnep_selftests.c   | 153 +++++++++++++++++-
+ 2 files changed, 150 insertions(+), 4 deletions(-)
 
->  int netpoll_setup(struct netpoll *np)
->  {
-> +	struct net *net = current->nsproxy->net_ns;
->  	struct net_device *ndev = NULL;
->  	bool ip_overwritten = false;
-> +	char buf[MAC_ADDR_LEN + 1];
->  	struct in_device *in_dev;
->  	int err;
->  
->  	rtnl_lock();
-> -	if (np->dev_name[0]) {
-> -		struct net *net = current->nsproxy->net_ns;
-> +	if (np->dev_name[0])
->  		ndev = __dev_get_by_name(net, np->dev_name);
-> -	}
-> +	else if (is_valid_ether_addr(np->dev_mac))
-> +		ndev = dev_getbyhwaddr_rcu(net, ARPHRD_ETHER, np->dev_mac);
+diff --git a/drivers/net/ethernet/engleder/Kconfig b/drivers/net/ethernet/engleder/Kconfig
+index 3df6bf476ae7..8245a9c4377d 100644
+--- a/drivers/net/ethernet/engleder/Kconfig
++++ b/drivers/net/ethernet/engleder/Kconfig
+@@ -32,6 +32,7 @@ config TSNEP_SELFTESTS
+ 	bool "TSN endpoint self test support"
+ 	default n
+ 	depends on TSNEP
++	imply NET_SELFTESTS
+ 	help
+ 	  This enables self test support within the TSN endpoint driver.
+ 
+diff --git a/drivers/net/ethernet/engleder/tsnep_selftests.c b/drivers/net/ethernet/engleder/tsnep_selftests.c
+index 8a9145f93147..c9857e5a8033 100644
+--- a/drivers/net/ethernet/engleder/tsnep_selftests.c
++++ b/drivers/net/ethernet/engleder/tsnep_selftests.c
+@@ -4,12 +4,15 @@
+ #include "tsnep.h"
+ 
+ #include <net/pkt_sched.h>
++#include <net/selftests.h>
+ 
+ enum tsnep_test {
+ 	TSNEP_TEST_ENABLE = 0,
+ 	TSNEP_TEST_TAPRIO,
+ 	TSNEP_TEST_TAPRIO_CHANGE,
+ 	TSNEP_TEST_TAPRIO_EXTENSION,
++	TSNEP_TEST_PHY_1000_LOOPBACK,
++	TSNEP_TEST_PHY_100_LOOPBACK,
+ };
+ 
+ static const char tsnep_test_strings[][ETH_GSTRING_LEN] = {
+@@ -17,6 +20,8 @@ static const char tsnep_test_strings[][ETH_GSTRING_LEN] = {
+ 	"TAPRIO                (offline)",
+ 	"TAPRIO change         (offline)",
+ 	"TAPRIO extension      (offline)",
++	"PHY 1000Mbps loopback (offline)",
++	"PHY 100Mbps loopback  (offline)",
+ };
+ 
+ #define TSNEP_TEST_COUNT (sizeof(tsnep_test_strings) / ETH_GSTRING_LEN)
+@@ -754,6 +759,133 @@ static bool tsnep_test_taprio_extension(struct tsnep_adapter *adapter)
+ 	return false;
+ }
+ 
++static bool test_loopback(struct tsnep_adapter *adapter, int speed)
++{
++	struct phy_device *phydev = adapter->phydev;
++	int retval;
++
++	retval = phy_loopback(phydev, true, speed);
++	if (retval || !phydev->loopback_enabled || !phydev->link ||
++	    phydev->speed != speed)
++		return false;
++
++	retval = net_test_phy_loopback_udp(adapter->netdev);
++	if (retval)
++		return false;
++
++	retval = net_test_phy_loopback_udp_mtu(adapter->netdev);
++	if (retval)
++		return false;
++
++	retval = net_test_phy_loopback_tcp(adapter->netdev);
++	if (retval)
++		return false;
++
++	retval = phy_loopback(phydev, false, 0);
++	if (retval || phydev->loopback_enabled)
++		return false;
++
++	return true;
++}
++
++static bool set_speed(struct tsnep_adapter *adapter, int speed)
++{
++	struct ethtool_link_ksettings cmd;
++	int retval;
++
++	retval = tsnep_ethtool_ops.get_link_ksettings(adapter->netdev, &cmd);
++	if (retval)
++		return false;
++
++	if (speed) {
++		cmd.base.speed = speed;
++		cmd.base.duplex = DUPLEX_FULL;
++		cmd.base.autoneg = AUTONEG_DISABLE;
++	} else {
++		cmd.base.autoneg = AUTONEG_ENABLE;
++	}
++
++	retval = tsnep_ethtool_ops.set_link_ksettings(adapter->netdev, &cmd);
++	if (retval)
++		return false;
++
++	return true;
++}
++
++static bool tsnep_test_phy_1000_loopback(struct tsnep_adapter *adapter)
++{
++	if (!adapter->netdev->phydev)
++		return false;
++
++	if (!test_loopback(adapter, 1000))
++		goto failed;
++
++	/* after autonegotiation */
++	if (!set_speed(adapter, 0))
++		goto failed;
++	if (!test_loopback(adapter, 1000))
++		goto failed;
++
++	/* after 100Mbps fixed speed */
++	if (!set_speed(adapter, 100))
++		goto failed;
++	if (!test_loopback(adapter, 1000))
++		goto failed;
++
++	/* after 1000Mbps fixed speed */
++	if (!set_speed(adapter, 1000))
++		goto failed;
++	if (!test_loopback(adapter, 1000))
++		goto failed;
++
++	if (!set_speed(adapter, 0))
++		goto failed;
++
++	return true;
++
++failed:
++	phy_loopback(adapter->phydev, false, 0);
++	set_speed(adapter, 0);
++	return false;
++}
++
++static bool tsnep_test_phy_100_loopback(struct tsnep_adapter *adapter)
++{
++	if (!adapter->netdev->phydev)
++		return false;
++
++	if (!test_loopback(adapter, 100))
++		goto failed;
++
++	/* after autonegotiation */
++	if (!set_speed(adapter, 0))
++		goto failed;
++	if (!test_loopback(adapter, 100))
++		goto failed;
++
++	/* 100Mbps fixed speed */
++	if (!set_speed(adapter, 100))
++		goto failed;
++	if (!test_loopback(adapter, 100))
++		goto failed;
++
++	/* 1000Mbps fixed speed */
++	if (!set_speed(adapter, 1000))
++		goto failed;
++	if (!test_loopback(adapter, 100))
++		goto failed;
++
++	if (!set_speed(adapter, 0))
++		goto failed;
++
++	return true;
++
++failed:
++	phy_loopback(adapter->phydev, false, 0);
++	set_speed(adapter, 0);
++	return false;
++}
++
+ int tsnep_ethtool_get_test_count(void)
+ {
+ 	return TSNEP_TEST_COUNT;
+@@ -768,15 +900,14 @@ void tsnep_ethtool_self_test(struct net_device *netdev,
+ 			     struct ethtool_test *eth_test, u64 *data)
+ {
+ 	struct tsnep_adapter *adapter = netdev_priv(netdev);
++	int i;
+ 
+ 	eth_test->len = TSNEP_TEST_COUNT;
+ 
+ 	if (eth_test->flags != ETH_TEST_FL_OFFLINE) {
+ 		/* no tests are done online */
+-		data[TSNEP_TEST_ENABLE] = 0;
+-		data[TSNEP_TEST_TAPRIO] = 0;
+-		data[TSNEP_TEST_TAPRIO_CHANGE] = 0;
+-		data[TSNEP_TEST_TAPRIO_EXTENSION] = 0;
++		for (i = 0; i < TSNEP_TEST_COUNT; i++)
++			data[i] = 0;
+ 
+ 		return;
+ 	}
+@@ -808,4 +939,18 @@ void tsnep_ethtool_self_test(struct net_device *netdev,
+ 		eth_test->flags |= ETH_TEST_FL_FAILED;
+ 		data[TSNEP_TEST_TAPRIO_EXTENSION] = 1;
+ 	}
++
++	if (tsnep_test_phy_1000_loopback(adapter)) {
++		data[TSNEP_TEST_PHY_1000_LOOPBACK] = 0;
++	} else {
++		eth_test->flags |= ETH_TEST_FL_FAILED;
++		data[TSNEP_TEST_PHY_1000_LOOPBACK] = 1;
++	}
++
++	if (tsnep_test_phy_100_loopback(adapter)) {
++		data[TSNEP_TEST_PHY_100_LOOPBACK] = 0;
++	} else {
++		eth_test->flags |= ETH_TEST_FL_FAILED;
++		data[TSNEP_TEST_PHY_100_LOOPBACK] = 1;
++	}
+ }
+-- 
+2.39.5
 
-You do not have the RCU read lock here. You have the rtnl(), which is
-sufficient, but, CONFIG_PROVE_RCU_LIST will show something as:
-
-	WARNING: suspicious RCU usage
-	6.13.0-09701-g6610c7be45bb-dirty #18 Not tainted
-	-----------------------------
-	net/core/dev.c:1143 RCU-list traversed in non-reader section!!
-	other info that might help us debug this:
-	rcu_scheduler_active = 2, debug_locks = 1
-	1 lock held by swapper/0/1:
-	 #0: ffffffff832795b8 (rtnl_mutex){+.+.}-{4:4}, at: netpoll_setup+0x48/0x540
-	stack backtrace:
-	CPU: 1 UID: 0 PID: 1 Comm: swapper/0 Not tainted 6.13.0-virtme-09701-g6610c7be45bb-dirty #18
-	Hardware name: QEMU Standard PC (i440FX + PIIX, 1996), BIOS rel-1.16.3-0-ga6ed6b701f0a-prebuilt.qemu.org 04/01/2014
-	Call Trace:
-	 <TASK>
-	 dump_stack_lvl+0x9f/0xf0
-	 lockdep_rcu_suspicious+0x11a/0x150
-	 dev_getbyhwaddr_rcu+0xb6/0xc0
-	 netpoll_setup+0x8a/0x540
-	 ? netpoll_parse_options+0x2bd/0x310
-
-This is not a problem per-se, since you have RTNL. We probably need to
-tell for_each_netdev_rcu() to not comply about "RCU-list traversed in
-non-reader section" if RTNL is held. Not sure why we didn't hit in the
-test infrastructure, tho:
-
-	https://patchwork.kernel.org/project/netdevbpf/patch/20250204-netconsole-v2-2-5ef5eb5f6056@purestorage.com/
-
-Anyway, no action item for you here. I am talking to Jakub on a way to
-solve it, and I should send a fix soon.
-
-Thanks for the patch,
---breno
 
