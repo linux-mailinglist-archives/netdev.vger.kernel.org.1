@@ -1,111 +1,212 @@
-Return-Path: <netdev+bounces-162807-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-162808-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id E80EDA27FF3
-	for <lists+netdev@lfdr.de>; Wed,  5 Feb 2025 01:05:56 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 237D5A27FFC
+	for <lists+netdev@lfdr.de>; Wed,  5 Feb 2025 01:11:02 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 815BB166490
-	for <lists+netdev@lfdr.de>; Wed,  5 Feb 2025 00:05:55 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id A700D188785E
+	for <lists+netdev@lfdr.de>; Wed,  5 Feb 2025 00:11:06 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7E03817E;
-	Wed,  5 Feb 2025 00:05:52 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D384717E;
+	Wed,  5 Feb 2025 00:10:56 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=codeconstruct.com.au header.i=@codeconstruct.com.au header.b="LRIFxGFF"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="AOdE4gUH"
 X-Original-To: netdev@vger.kernel.org
-Received: from codeconstruct.com.au (pi.codeconstruct.com.au [203.29.241.158])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pj1-f74.google.com (mail-pj1-f74.google.com [209.85.216.74])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BF76C173;
-	Wed,  5 Feb 2025 00:05:50 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=203.29.241.158
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 31DB7163
+	for <netdev@vger.kernel.org>; Wed,  5 Feb 2025 00:10:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.74
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1738713952; cv=none; b=l0KtU4PtmlvCeexRbED7p/gytGAsCez7BAl4d0KJ6dqwE4eY87C0wi7/CsCf0+FEJAjLIFIaFz6iCdw5L68XNvWoNCuvHeh0E4NkrYoeRauhXFno51RYUCR3sG7nmLMhmdFKKaV+odJoXXZN/zq1mrC1kGUb424iwqSKLZhnDXo=
+	t=1738714256; cv=none; b=cfdgaQqrlR7v6543QOHepVbPFzjNiCf0C75z5axLqNqSRKZbDs0ptRzOYoUSy79g+CbKmqsMLzldTXon7+B1mZrPf20qpzjMq5miWITfPcxKSx0qgAoYKlOTzoSPMU4cdUNY67pPQXUFJ2WwyeN/9e1+0itJU1lJ4GdnPH0x+rU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1738713952; c=relaxed/simple;
-	bh=aMffe2cuyieFMT/ZvHdJ4Q+mva2yTWC26VFHFOFlKeI=;
-	h=Message-ID:Subject:From:To:Date:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=WZF5SQkxafObSkaYRkbDUIoKzBRMA+d8NBAPj7VTPt0Om+jN0/Fw2IcdnP/vTmpys2qqSU/7ulHyks6yn85gS4wGZYI6unrw02YM4mED5Dvc0g+tFD7axALM4MZovtqkc5fUriDwM5z4aD9EOn86ef0xLK0xp9GrfpZJjZnZmJY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=codeconstruct.com.au; spf=pass smtp.mailfrom=codeconstruct.com.au; dkim=pass (2048-bit key) header.d=codeconstruct.com.au header.i=@codeconstruct.com.au header.b=LRIFxGFF; arc=none smtp.client-ip=203.29.241.158
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=codeconstruct.com.au
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=codeconstruct.com.au
+	s=arc-20240116; t=1738714256; c=relaxed/simple;
+	bh=P67J+o0dUvFrAftXGM3eI2FIBpyFumR+6r0E8tVhVv8=;
+	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=qRQ/cEp0kGXy7Q6I8dw0eSIDUc036kOyUS9u1FMe4CdVcfmWXwbr0fYBQ12M9EXgvMc13KsQ+PpyNFWAEaMHWBeqfmulYMi/HBOMtGpRolWBJvqbzliIHWDOVRny8REH744QYYGDGoyneboyfri7RR/FDogLyMk50KzDEVeqfNY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--skhawaja.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=AOdE4gUH; arc=none smtp.client-ip=209.85.216.74
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--skhawaja.bounces.google.com
+Received: by mail-pj1-f74.google.com with SMTP id 98e67ed59e1d1-2f550d28f7dso11417266a91.3
+        for <netdev@vger.kernel.org>; Tue, 04 Feb 2025 16:10:54 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-	d=codeconstruct.com.au; s=2022a; t=1738713948;
-	bh=aMffe2cuyieFMT/ZvHdJ4Q+mva2yTWC26VFHFOFlKeI=;
-	h=Subject:From:To:Date:In-Reply-To:References;
-	b=LRIFxGFFHQUulv7+gJaJmDaWZ/PPEQJVmMZGlxQsy7SG15tOvvOCxT6hHwupywBAO
-	 bFTs9JIdo0/N5USrIdXdMxDqzfYs4LDT+w+9d2V2E6DVvPhUXbKta2mrcRSWADjZjJ
-	 IFHRP+OSir09zKCOJGmq5BNwhrDamJW5HcnePqwfJgdo1JUjcRR3AruwfHcdOG7cnG
-	 qKxX8ddUePxs12+jcVYZTdNBiXM3WMdrbFtjW2Xca+mLz/lRWd4bOXsBk568jKtjeo
-	 SrzUlAatdu22ie+tuIF/MRU3W8Vf34yIuNph5y4IBwrSBZ+EBo8i/jo1WRRyHZfnjV
-	 O7vCiBEdMjeRA==
-Received: from [192.168.68.112] (ppp118-210-185-209.adl-adc-lon-bras34.tpg.internode.on.net [118.210.185.209])
-	by mail.codeconstruct.com.au (Postfix) with ESMTPSA id 941067104E;
-	Wed,  5 Feb 2025 08:05:46 +0800 (AWST)
-Message-ID: <acf79ff017d7648d4d502b7031b88c4853bf724c.camel@codeconstruct.com.au>
-Subject: Re: [PATCH v7 0/9] DTS updates for system1 BMC
-From: Andrew Jeffery <andrew@codeconstruct.com.au>
-To: Ninad Palsule <ninad@linux.ibm.com>, brgl@bgdev.pl, 
- linus.walleij@linaro.org, minyard@acm.org, robh@kernel.org,
- krzk+dt@kernel.org,  conor+dt@kernel.org, andrew+netdev@lunn.ch,
- davem@davemloft.net,  edumazet@google.com, kuba@kernel.org,
- pabeni@redhat.com,  openipmi-developer@lists.sourceforge.net,
- netdev@vger.kernel.org, joel@jms.id.au,  devicetree@vger.kernel.org,
- eajames@linux.ibm.com,  linux-arm-kernel@lists.infradead.org,
- linux-aspeed@lists.ozlabs.org,  linux-kernel@vger.kernel.org
-Date: Wed, 05 Feb 2025 10:35:46 +1030
-In-Reply-To: <66e2e5e4-5ce5-442c-ba0f-d12cbe79e868@linux.ibm.com>
-References: <20250203144422.269948-1-ninad@linux.ibm.com>
-	 <79b819b6d06e3be0aa7e7f6872353f103294710c.camel@codeconstruct.com.au>
-	 <66e2e5e4-5ce5-442c-ba0f-d12cbe79e868@linux.ibm.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-User-Agent: Evolution 3.46.4-2 
+        d=google.com; s=20230601; t=1738714254; x=1739319054; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=99owKJMXXPohLPpPqkbFc5/lnyoU+wH/eLDU3gYl2Bk=;
+        b=AOdE4gUHzGVG5gnh16+DExNEj88LaE+bRGvPgMdBXtp7c9KEpGuUxYffIO78JeRg1z
+         QW3s23A4mYZbCrtEAAMwvXfrTQ/apGDe+8+rq6P4kNyaPDJ8CxPpZm54zPj63Cp3I4u+
+         yQPn5nmZjtlfwiGca+OfuR45mYRrKHnp70HaI2t7V8AOiJr0Qp40CKaMntUyQBNT6Xc5
+         MszOLxtkae7nkpc1efDwsXv5gGfr0VO8jIqpbLVgalucPJEXEPzeKr6Ff7UIp0oWAwuZ
+         s8fdfDwpFapDtwxM/BhzBPe7SNFXa/fCOYnostE8RPZoUOed+zneI84UGOwXN3gn7cS3
+         Pqzg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1738714254; x=1739319054;
+        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=99owKJMXXPohLPpPqkbFc5/lnyoU+wH/eLDU3gYl2Bk=;
+        b=mSryHiGDeuLq4TIxmt1ZZ2+hHAEqbbvEo1lGYtyM9HUEOoDPuqSNZ9sMCIbE3EDPfc
+         xhJiiI5WB8udvonl12Indp7j9qosB0aTWKoC0ceyCXFpr8TC9DVulQNaR/XE4Zi2plEJ
+         3/Z/b8M1O2RhxLECAIoAxbjQAbVuZ/MmOG4HDuBUMvMpbmAGip19496GyDhDtbECoyxb
+         Dr77AawgHaB2TRdWdnAmhlnsJF7dQKnAg3PYoAkMdhvmSSS4DjrPuRBAB4v3QxGwfm9D
+         uGHgK81JCfqdZk1EcK1X+FJ+LzKv+bioQtHegUWohNUEl9D8OPkqGqfLI3XisxdDE07/
+         hhRg==
+X-Gm-Message-State: AOJu0YxW+eY2HlSP6CZNJEqGrvDRNPFNJ8+oqvsB/uAoHlTKyz1mtiwI
+	PFEyE1fdOaLrQsHOB5sDRDNWRxmrGBrR9QpMdCFNO3hHpXP9KAMd2YAvpY7ltabvKNCy9EtYfO0
+	afwPkyg1Z3A==
+X-Google-Smtp-Source: AGHT+IGiDJVMyBVqnNaC8Rtmuo8GXRBP3fCEHNRgFYVYRaZ4Ffi4ig4R8oPwCKdKbsY7j78BRCSxeDDqka8eoA==
+X-Received: from pjbee7.prod.google.com ([2002:a17:90a:fc47:b0:2ea:9d23:79a0])
+ (user=skhawaja job=prod-delivery.src-stubby-dispatcher) by
+ 2002:a17:90b:4d04:b0:2f7:7680:51a6 with SMTP id 98e67ed59e1d1-2f9e0753d2emr1071380a91.6.1738714254331;
+ Tue, 04 Feb 2025 16:10:54 -0800 (PST)
+Date: Wed,  5 Feb 2025 00:10:48 +0000
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.48.1.362.g079036d154-goog
+Message-ID: <20250205001052.2590140-1-skhawaja@google.com>
+Subject: [PATCH net-next v3 0/4] Add support to do threaded napi busy poll
+From: Samiullah Khawaja <skhawaja@google.com>
+To: Jakub Kicinski <kuba@kernel.org>, "David S . Miller " <davem@davemloft.net>, 
+	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, almasrymina@google.com
+Cc: netdev@vger.kernel.org, skhawaja@google.com
+Content-Type: text/plain; charset="UTF-8"
 
-On Tue, 2025-02-04 at 13:40 -0600, Ninad Palsule wrote:
-> > This one needs an ack from Linus W or Bartosz if I'm to take it.
-> > However, it's also causing some grief from Rob's bot:
-> >=20
-> > https://lore.kernel.org/all/173859694889.2601726.10618336219726193824.r=
-obh@kernel.org/
-> >=20
-> > As the reported nodes should all be hogs the name shouldn't matter
-> > anywhere else (as far as I'm aware). It would be nice if all the
-> > warnings were cleaned up before we merged the binding update. That way
-> > we don't cause everyone else looking at the CHECK_DTBS=3Dy output more
-> > grief than they already get for the Aspeed devicetrees.
-> >=20
-> > In order to not get bogged down it might be worth splitting out both
-> > the IPMB- and GPIO- related patches like you did the FTGMAC100 patch,
-> > and then I can merge what remains (from a quick look they seem
-> > relatively uncontroversial).
-> >=20
->=20
-> The warnings are fixed by different patch by Krzysztof. As there are no=
-=20
-> more changes then I will wait for other responses. If I don't get those=
-=20
-> response in couple of days then I will split it.
-> https://lore.kernel.org/linux-kernel/20250116085947.87241-1-krzysztof.koz=
-lowski@linaro.org/
+Extend the already existing support of threaded napi poll to do continuous
+busy polling.
 
-That patch fixes a couple of Marvell systems. I think you might have
-meant this:
+This is used for doing continuous polling of napi to fetch descriptors
+from backing RX/TX queues for low latency applications. Allow enabling
+of threaded busypoll using netlink so this can be enabled on a set of
+dedicated napis for low latency applications.
 
-https://lore.kernel.org/all/20250116090009.87338-1-krzysztof.kozlowski@lina=
-ro.org/
+It allows enabling NAPI busy poll for any userspace application
+indepdendent of userspace API being used for packet and event processing
+(epoll, io_uring, raw socket APIs). Once enabled user can fetch the PID
+of the kthread doing NAPI polling and set affinity, priority and
+scheduler for it depending on the low-latency requirements.
 
-In which case, I've applied it.
+Currently threaded napi is only enabled at device level using sysfs. Add
+support to enable/disable threaded mode for a napi individually. This
+can be done using the netlink interface. Extend `napi-set` op in netlink
+spec that allows setting the `threaded` attribute of a napi.
 
-Thanks,
+Extend the threaded attribute in napi struct to add an option to enable
+continuous busy polling. Extend the netlink and sysfs interface to allow
+enabled/disabling threaded busypolling at device or individual napi
+level.
 
-Andrew
+We use this for our AF_XDP based hard low-latency usecase using onload
+stack (https://github.com/Xilinx-CNS/onload) that runs in userspace. Our
+usecase is a fixed frequency RPC style traffic with fixed
+request/response size. We simulated this using neper by only starting
+next transaction when last one has completed. The experiment results are
+listed below,
+
+Setup:
+
+- Running on Google C3 VMs with idpf driver with following configurations.
+- IRQ affinity and coalascing is common for both experiments.
+- There is only 1 RX/TX queue configured.
+- First experiment enables busy poll using sysctl for both epoll and
+  socket APIs.
+- Second experiment enables NAPI threaded busy poll for the full device
+  using sysctl.
+
+Non threaded NAPI busy poll enabled using sysctl.
+```
+echo 400 | sudo tee /proc/sys/net/core/busy_poll
+echo 400 | sudo tee /proc/sys/net/core/busy_read
+echo 2 | sudo tee /sys/class/net/eth0/napi_defer_hard_irqs
+echo 15000  | sudo tee /sys/class/net/eth0/gro_flush_timeout
+```
+
+Results using following command,
+```
+sudo EF_NO_FAIL=0 EF_POLL_USEC=100000 taskset -c 3-10 onload -v \
+		--profile=latency ./neper/tcp_rr -Q 200 -R 400 -T 1 -F 50 \
+		-p 50,90,99,999 -H <IP> -l 10
+
+...
+...
+
+num_transactions=2835
+latency_min=0.000018976
+latency_max=0.049642100
+latency_mean=0.003243618
+latency_stddev=0.010636847
+latency_p50=0.000025270
+latency_p90=0.005406710
+latency_p99=0.049807350
+latency_p99.9=0.049807350
+```
+
+Results with napi threaded busy poll using following command,
+```
+sudo EF_NO_FAIL=0 EF_POLL_USEC=100000 taskset -c 3-10 onload -v \
+                --profile=latency ./neper/tcp_rr -Q 200 -R 400 -T 1 -F 50 \
+                -p 50,90,99,999 -H <IP> -l 10
+
+...
+...
+
+num_transactions=460163
+latency_min=0.000015707
+latency_max=0.200182942
+latency_mean=0.000019453
+latency_stddev=0.000720727
+latency_p50=0.000016950
+latency_p90=0.000017270
+latency_p99=0.000018710
+latency_p99.9=0.000020150
+```
+
+Here with NAPI threaded busy poll in a separate core, we are able to
+consistently poll the NAPI to keep latency to absolute minimum. And also
+we are able to do this without any major changes to the onload stack and
+threading model.
+
+v3:
+ - Fixed calls to dev_set_threaded in drivers
+
+v2:
+ - Add documentation in napi.rst.
+ - Provide experiment data and usecase details.
+ - Update busy_poller selftest to include napi threaded poll testcase.
+ - Define threaded mode enum in netlink interface.
+ - Included NAPI threaded state in napi config to save/restore.
+
+Samiullah Khawaja (4):
+  Add support to set napi threaded for individual napi
+  net: Create separate gro_flush helper function
+  Extend napi threaded polling to allow kthread based busy polling
+  selftests: Add napi threaded busy poll test in `busy_poller`
+
+ Documentation/ABI/testing/sysfs-class-net     |   3 +-
+ Documentation/netlink/specs/netdev.yaml       |  14 ++
+ Documentation/networking/napi.rst             |  80 ++++++++++-
+ .../net/ethernet/atheros/atl1c/atl1c_main.c   |   2 +-
+ drivers/net/ethernet/mellanox/mlxsw/pci.c     |   2 +-
+ drivers/net/ethernet/renesas/ravb_main.c      |   2 +-
+ drivers/net/wireless/ath/ath10k/snoc.c        |   2 +-
+ include/linux/netdevice.h                     |  24 +++-
+ include/uapi/linux/netdev.h                   |   7 +
+ net/core/dev.c                                | 127 ++++++++++++++----
+ net/core/net-sysfs.c                          |   2 +-
+ net/core/netdev-genl-gen.c                    |   5 +-
+ net/core/netdev-genl.c                        |   9 ++
+ tools/include/uapi/linux/netdev.h             |   7 +
+ tools/testing/selftests/net/busy_poll_test.sh |  25 +++-
+ tools/testing/selftests/net/busy_poller.c     |  14 +-
+ 16 files changed, 285 insertions(+), 40 deletions(-)
+
+-- 
+2.48.1.362.g079036d154-goog
+
 
