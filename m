@@ -1,141 +1,96 @@
-Return-Path: <netdev+bounces-163002-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-163003-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1E9D7A28BA7
-	for <lists+netdev@lfdr.de>; Wed,  5 Feb 2025 14:28:31 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 44363A28BA8
+	for <lists+netdev@lfdr.de>; Wed,  5 Feb 2025 14:28:46 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 4610B1887547
-	for <lists+netdev@lfdr.de>; Wed,  5 Feb 2025 13:28:32 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 38BE63A894F
+	for <lists+netdev@lfdr.de>; Wed,  5 Feb 2025 13:28:34 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 745D4136326;
-	Wed,  5 Feb 2025 13:28:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5293086328;
+	Wed,  5 Feb 2025 13:28:38 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="ZsTVMC6/"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="HqZqVUj1"
 X-Original-To: netdev@vger.kernel.org
-Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D8CA7127E18
-	for <netdev@vger.kernel.org>; Wed,  5 Feb 2025 13:28:14 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 231937FBA2;
+	Wed,  5 Feb 2025 13:28:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1738762096; cv=none; b=pQka0Fxjgj1fkl++Ezd575zeSYw7+76ZLad2aShjmZKRAnRhfwvFdi4FzyIDulrULjH2nEEiJhKRCfWLbwOy0uBEJFls4nJVF+RBYyOTYpaSnnyF4806rIj3k0DYPw9W4qB8sMS6/uc445Adk/E8mAdkacYCG/cKyA+hN7bWh/g=
+	t=1738762118; cv=none; b=HxDobiNlyFOeFj685F7BLg2CCCQ5g+/marakfhuCeM7d/qWYyKEPxsawSfUmxmtnuQJTsm1zGPTVm2nY5gO9zH3VJFqkN8OKwJyvDyM+8bIexC9RICtah3ZVpmcN2U4dnL6gE2k0ShP/NjmG4F/SEEe534Pi62ZysqjAhoGVmPM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1738762096; c=relaxed/simple;
-	bh=s4FRzLkdbDAVdmpko115M+dWhUuMIPAQFvO2jZlQMvI=;
-	h=In-Reply-To:References:From:To:Cc:Subject:MIME-Version:
-	 Content-Disposition:Content-Type:Message-Id:Date; b=uz1O5PxydlRuc1gVyHFvpkqgvGYm3WEYOMS8a36fklWt0SKJGTnYzvwlizLZK1H5VTITwncKLDtpBjd34alCS8ql05gdniwYWVPZl8MS3If3AZlILlf+c5uhGa8kfVV/vhxYJFwf6u6qsVx92aeh589Ehh9sDboh8Sd/bfimWak=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=ZsTVMC6/; arc=none smtp.client-ip=78.32.30.218
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=armlinux.org.uk; s=pandora-2019; h=Date:Sender:Message-Id:Content-Type:
-	Content-Transfer-Encoding:MIME-Version:Subject:Cc:To:From:References:
-	In-Reply-To:Reply-To:Content-ID:Content-Description:Resent-Date:Resent-From:
-	Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:List-Help:
-	List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=Js/PGKYXmZWwi4mSKiZuKnNk6qnIeCvWDO0obIBgBwk=; b=ZsTVMC6/Nb9Z7WCEf3+VZJkGer
-	ho/OMg8jbETgc+EFNyrzm9K2XyVb4yik+opRYnFzfS9Vewlm1AFVNiCT4ZMcNxKe7GTUc+h7PaNJR
-	3eeZZ8CV9f6xvzhuOds4+IKUPQyj0/MF7VJBMbwJSogAoCqLB1Iwl/emOLDFXeioS8HkWz9/6N91S
-	mg1mSK9TGeosY03bqePQ3H7hvOtdsjFDNeAaxZCdkyrzqif/skY8i8VLo1y1muP6vF9LIKp6X0E20
-	Md05WYFokv7Uou0HzqdV5YUjop/VGBbgzUvLtEqb/DdOo0NFWq/USR3zQlKXrF/Knm/VSQ94DRsvv
-	kIEPlsKg==;
-Received: from e0022681537dd.dyn.armlinux.org.uk ([fd8f:7570:feb6:1:222:68ff:fe15:37dd]:57974 helo=rmk-PC.armlinux.org.uk)
-	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.96)
-	(envelope-from <rmk@armlinux.org.uk>)
-	id 1tffRn-00077N-0A;
-	Wed, 05 Feb 2025 13:28:07 +0000
-Received: from rmk by rmk-PC.armlinux.org.uk with local (Exim 4.94.2)
-	(envelope-from <rmk@rmk-PC.armlinux.org.uk>)
-	id 1tffRT-003Z5u-CY; Wed, 05 Feb 2025 13:27:47 +0000
-In-Reply-To: <Z6NnPm13D1n5-Qlw@shell.armlinux.org.uk>
-References: <Z6NnPm13D1n5-Qlw@shell.armlinux.org.uk>
-From: "Russell King (Oracle)" <rmk+kernel@armlinux.org.uk>
-To: Tristram.Ha@microchip.com
-Cc: Vladimir Oltean <olteanv@gmail.com>,
-	 UNGLinuxDriver@microchip.com,
-	 Woojung Huh <woojung.huh@microchip.com>,
-	Andrew Lunn <andrew@lunn.ch>,
-	Heiner Kallweit <hkallweit1@gmail.com>,
+	s=arc-20240116; t=1738762118; c=relaxed/simple;
+	bh=EJfYr9VPPROrpKyvvsXKomKL0zPZ75XOGiybaCRJ5J0=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=QS+INZi5dtsIKtemdPcBO6FQa9a83MdbiCgXgkFrLSApwxph6w4CfEB3VDYkjYpPCJrGAout6nx+5rZX54GYK9qXlm/ivKs+Q9lcqdbamp212E26xgKHmSV8/boLu8qqaaINT4dci3QmhEieDLQLDNc140N1EYxluE5mnoneB8E=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=HqZqVUj1; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 07CB4C4CED1;
+	Wed,  5 Feb 2025 13:28:34 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1738762118;
+	bh=EJfYr9VPPROrpKyvvsXKomKL0zPZ75XOGiybaCRJ5J0=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=HqZqVUj1urhFmxfS7BZaGcVlHiD+B3a8phvTlc3h6SuZUgQ9q6lCSZCVRhzmm0fIN
+	 IG3BXFEDM4SFyqfvIMNZjaScWgkMDWyjY3ao51GKPnNtOtYOUqEPwLSItUyvQB258H
+	 Ni8jznOsiG6eSi14La95ih4q1Dh0Ndc2BNfedS+BnJc+4idYaR4g9iVTvAPO0IqJ1u
+	 2jLPxfqez+qNon6F81IgxWQRQKMTameMFSHqbV38ma3b4lJB0AjVixKqb9xACw2phL
+	 5E9h539vI0Mhwq+BZgmkHpJyxuMAI/LMlrYWIz+XxeuqZ8PW8stQhTHeONAYCJI2Zm
+	 rxOSjOG7HVA6Q==
+Date: Wed, 5 Feb 2025 13:28:32 +0000
+From: Simon Horman <horms@kernel.org>
+To: =?utf-8?B?Q3PDs2vDoXMs?= Bence <csokas.bence@prolan.hu>
+Cc: Laurent Badel <laurentbadel@eaton.com>,
+	Jakub Kicinski <kuba@kernel.org>, Andrew Lunn <andrew@lunn.ch>,
+	imx@lists.linux.dev, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	Michal Swiatkowski <michal.swiatkowski@linux.intel.com>,
+	Jacob Keller <jacob.e.keller@intel.com>,
+	Wei Fang <wei.fang@nxp.com>, Shenwei Wang <shenwei.wang@nxp.com>,
+	Clark Wang <xiaoning.wang@nxp.com>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
 	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	netdev@vger.kernel.org
-Subject: [PATCH RFC net-next 4/4] net: xpcs: allow 1000BASE-X to work with
- older XPCS IP
+	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>
+Subject: Re: [PATCH] net: fec: Refactor MAC reset to function
+Message-ID: <20250205132832.GC554665@kernel.org>
+References: <20250204093604.253436-2-csokas.bence@prolan.hu>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-Content-Type: text/plain; charset="utf-8"
-Message-Id: <E1tffRT-003Z5u-CY@rmk-PC.armlinux.org.uk>
-Sender: Russell King <rmk@armlinux.org.uk>
-Date: Wed, 05 Feb 2025 13:27:47 +0000
+In-Reply-To: <20250204093604.253436-2-csokas.bence@prolan.hu>
 
-Older XPCS IP requires SGMII_LINK and PHY_SIDE_SGMII to be set when
-operating in 1000BASE-X mode even though the XPCS is not configured for
-SGMII. An example of a device with older XPCS IP is KSZ9477.
+On Tue, Feb 04, 2025 at 10:36:03AM +0100, Csókás, Bence wrote:
+> The core is reset both in `fec_restart()` (called on link-up) and
+> `fec_stop()` (going to sleep, driver remove etc.). These two functions
+> had their separate implementations, which was at first only a register
+> write and a `udelay()` (and the accompanying block comment). However,
+> since then we got soft-reset (MAC disable) and Wake-on-LAN support, which
+> meant that these implementations diverged, often causing bugs.
+> 
+> For instance, as of now, `fec_stop()` does not check for
+> `FEC_QUIRK_NO_HARD_RESET`, meaning the MII/RMII mode is cleared on eg.
+> a PM power-down event; and `fec_restart()` missed the refactor renaming
+> the "magic" constant `1` to `FEC_ECR_RESET`.
+> 
+> To harmonize current implementations, and eliminate this source of
+> potential future bugs, refactor implementation to a common function.
+> 
+> Reviewed-by: Michal Swiatkowski <michal.swiatkowski@linux.intel.com>
+> Reviewed-by: Jacob Keller <jacob.e.keller@intel.com>
+> Fixes: c730ab423bfa ("net: fec: Fix temporary RMII clock reset on link up")
+> Fixes: ff049886671c ("net: fec: Refactor: #define magic constants")
+> Signed-off-by: Csókás, Bence <csokas.bence@prolan.hu>
 
-We already don't clear these bits if we switch from SGMII to 1000BASE-X
-on TXGBE - which would result in 1000BASE-X with the PHY_SIDE_SGMII bit
-left set.
-
-It is currently believed to be safe to set both bits on newer IP
-without side-effects.
-
-Signed-off-by: Russell King (Oracle) <rmk+kernel@armlinux.org.uk>
----
- drivers/net/pcs/pcs-xpcs.c | 13 +++++++++++--
- drivers/net/pcs/pcs-xpcs.h |  1 +
- 2 files changed, 12 insertions(+), 2 deletions(-)
-
-diff --git a/drivers/net/pcs/pcs-xpcs.c b/drivers/net/pcs/pcs-xpcs.c
-index 1eba0c583f16..d522e4a5a138 100644
---- a/drivers/net/pcs/pcs-xpcs.c
-+++ b/drivers/net/pcs/pcs-xpcs.c
-@@ -774,9 +774,18 @@ static int xpcs_config_aneg_c37_1000basex(struct dw_xpcs *xpcs,
- 			return ret;
- 	}
- 
--	mask = DW_VR_MII_PCS_MODE_MASK;
-+	/* Older XPCS IP requires PHY_MODE (bit 3) and SGMII_LINK (but 4) to
-+	 * be set when operating in 1000BASE-X mode. See page 233
-+	 * https://ww1.microchip.com/downloads/aemDocuments/documents/OTH/ProductDocuments/DataSheets/KSZ9477S-Data-Sheet-DS00002392C.pdf
-+	 * "5.5.9 SGMII AUTO-NEGOTIATION CONTROL REGISTER"
-+	 */
-+	mask = DW_VR_MII_PCS_MODE_MASK | DW_VR_MII_AN_CTRL_SGMII_LINK |
-+	       DW_VR_MII_TX_CONFIG_MASK;
- 	val = FIELD_PREP(DW_VR_MII_PCS_MODE_MASK,
--			 DW_VR_MII_PCS_MODE_C37_1000BASEX);
-+			 DW_VR_MII_PCS_MODE_C37_1000BASEX) |
-+	      FIELD_PREP(DW_VR_MII_TX_CONFIG_MASK,
-+			 DW_VR_MII_TX_CONFIG_PHY_SIDE_SGMII) |
-+	      DW_VR_MII_AN_CTRL_SGMII_LINK;
- 
- 	if (!xpcs->pcs.poll) {
- 		mask |= DW_VR_MII_AN_INTR_EN;
-diff --git a/drivers/net/pcs/pcs-xpcs.h b/drivers/net/pcs/pcs-xpcs.h
-index 96117bd9e2b6..f0ddd93c7a22 100644
---- a/drivers/net/pcs/pcs-xpcs.h
-+++ b/drivers/net/pcs/pcs-xpcs.h
-@@ -73,6 +73,7 @@
- 
- /* VR_MII_AN_CTRL */
- #define DW_VR_MII_AN_CTRL_8BIT			BIT(8)
-+#define DW_VR_MII_AN_CTRL_SGMII_LINK		BIT(4)
- #define DW_VR_MII_TX_CONFIG_MASK		BIT(3)
- #define DW_VR_MII_TX_CONFIG_PHY_SIDE_SGMII	0x1
- #define DW_VR_MII_TX_CONFIG_MAC_SIDE_SGMII	0x0
--- 
-2.30.2
+Reviewed-by: Simon Horman <horms@kernel.org>
 
 
