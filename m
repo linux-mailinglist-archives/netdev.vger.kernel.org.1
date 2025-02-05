@@ -1,142 +1,157 @@
-Return-Path: <netdev+bounces-163227-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-163228-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id C3BB7A29A1C
-	for <lists+netdev@lfdr.de>; Wed,  5 Feb 2025 20:32:16 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id DE45CA29A26
+	for <lists+netdev@lfdr.de>; Wed,  5 Feb 2025 20:34:01 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id BB9CA18847F3
-	for <lists+netdev@lfdr.de>; Wed,  5 Feb 2025 19:32:21 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 583DD167D06
+	for <lists+netdev@lfdr.de>; Wed,  5 Feb 2025 19:33:58 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 237161FF7BB;
-	Wed,  5 Feb 2025 19:32:15 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D83F620CCD8;
+	Wed,  5 Feb 2025 19:33:16 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=fastly.com header.i=@fastly.com header.b="LKBvOqkL"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="j0LatF6S"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f176.google.com (mail-pl1-f176.google.com [209.85.214.176])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 856541FDA7C
-	for <netdev@vger.kernel.org>; Wed,  5 Feb 2025 19:32:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.176
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AE8FB20C026;
+	Wed,  5 Feb 2025 19:33:16 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1738783935; cv=none; b=i4Qc4Oa8v36Hc5h6RGpJF4mKro1I++GkSeqZdPH8BF49/1ORstZSWjVIOYKSez8xRAdi2msNpSKhkTZ3LggjzeTBDODT3gdfeTUM2qas3u1EvF4+722i72FlcJnX3Vhgg7sfe2134CKYpOO0DYXYbtAzsUkCDVG8qHrfCatLmoA=
+	t=1738783996; cv=none; b=ThIw9/63pdPzXbr5PEPY8y6ZY8/DdoTpruGe1js9kxdjoCDdWzn6rXOQuDw7MZgdAZo9cHrM3yZwHoIEaYuXIrdBMOqeq9VV42vtPEWJ2tGj9BjsTPSWFUAp6cXf9PAzcUfhUBWUcQN90t0Bko6WEKLsaf4N3DXZ1mAh8jVvy34=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1738783935; c=relaxed/simple;
-	bh=zFY53rhWZjDovUO3pMADVV+87cxtjfPB8PzweU29wXM=;
+	s=arc-20240116; t=1738783996; c=relaxed/simple;
+	bh=B/kqz7BMCRcXcNkULlXWbe8rQqpjmskiXpQUTOkxG2A=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=ZT7ukKnVm+MadWT/+SdebYvSpEhTKB8iCrfJ/uTd49gonuBRyBc9aR19zQ+XS/HVCPtVE/1tHCZSMJAA0k8ETbbC3iJxJmYzN8OqoBOI1b9h/6dEGKuO3IpGbua5tneY+SjdtBLeHdnFlCsZ/3JwSfkqMPWnICvksAQtttHIVj8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fastly.com; spf=pass smtp.mailfrom=fastly.com; dkim=pass (1024-bit key) header.d=fastly.com header.i=@fastly.com header.b=LKBvOqkL; arc=none smtp.client-ip=209.85.214.176
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fastly.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=fastly.com
-Received: by mail-pl1-f176.google.com with SMTP id d9443c01a7336-2165cb60719so3634105ad.0
-        for <netdev@vger.kernel.org>; Wed, 05 Feb 2025 11:32:13 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=fastly.com; s=google; t=1738783933; x=1739388733; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references
-         :mail-followup-to:message-id:subject:cc:to:from:date:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=RGvh9VMlqnQHm4Qfuuo1H2FVlRFz8yiqu6n4EsMzRTE=;
-        b=LKBvOqkL9AjHOeYKVWF8CA9sxGkJPThdoBcG8krV8cQBDT2PbnTI1IS2humnozIURZ
-         V1yLN624mHRe5OOV6ATti0/zD1efHDLFxUNt3wHKo1OmXdnZnnrpH/53HyzXj2HwOT56
-         2XHMEc1OYvAEHGg0XOALJrMmQ/FUTgfmGiuGg=
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1738783933; x=1739388733;
-        h=in-reply-to:content-disposition:mime-version:references
-         :mail-followup-to:message-id:subject:cc:to:from:date
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=RGvh9VMlqnQHm4Qfuuo1H2FVlRFz8yiqu6n4EsMzRTE=;
-        b=WgWiqWKKvoqeN2gekVNwvvbpzpaCPjVcAJjCtc6Ur9WCZAQeCsSuTORrkAdP02LveW
-         iAdQozkT+9yqdIFtH+Ik7FxRfAIgTQq6qjg/WquIo9UOMYZ17sEOUNuSO1S4mcwywLmq
-         4btvZGdc1JH+NzF/5kip40Y3X6az8ZE6XBtwMjFcp0iP4SYz7xnqN1F7UPzblW7QiOTc
-         +QaXLfzUjVqCCV1Yj+FXR9AFEknbLmu1zMToZURys46x5uNhbMAkyPvtkDYTe/d07TsH
-         pAmIw9IIR2epwoyrURnfeew9QfKq+zh79VV6nOjNzFY4ZZOIfWfTXSn7gqwX1wOgO2dx
-         rn6Q==
-X-Gm-Message-State: AOJu0YzG/KsYHQA07zrWCW8ZddtA79bNSL/1Ow1GGBAaaICvBMnIZ4Ij
-	T2Lx1dMk1t8E9F4l6V7ddS+DJ0hLKuHAtVGVp7qLVyIKcF5hq8QLrqQqD1NJmrc=
-X-Gm-Gg: ASbGncscOZLmXGDhy9j5FUga5jKFtCPPdbLyKCi8O/2nRV2U64l8oL9g7weZgTDB3cK
-	lK2PB3r3LhA8GedS2mfyuB94Zn8un2RtS49yR/spFw6mAig+O0TZVrFO8jccckvrrshdPSsaFWW
-	aMX1iIotZdFf1DWW/5KBhl169cHmM3ag7/IvR1sncoJzZLCoIFuneixGJOxT95y1br1c5f1yjIB
-	Z4s8/E5UcfLv9Bq0O18pJRb7YFglywnuWD1+yNwTP3nGw55QcbAGgMfv36qU/btMIWDIpfzBufw
-	dnG7w4NNuUCUWXN3BKhr6ubbLblTZdN3nXG9tlaghU3OoeaXg6GzOvDq2A==
-X-Google-Smtp-Source: AGHT+IGcmQrJcOpjvdMfdRZKIHScDqRse2+Ikyvq6exdHvc4gODpeQjCTEVW4+fXOIvprlWcuuDFXg==
-X-Received: by 2002:a05:6a00:3002:b0:725:b201:2362 with SMTP id d2e1a72fcca58-7303511e562mr5790315b3a.11.1738783932772;
-        Wed, 05 Feb 2025 11:32:12 -0800 (PST)
-Received: from LQ3V64L9R2 (c-24-6-151-244.hsd1.ca.comcast.net. [24.6.151.244])
-        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-72fe6a1a89csm12777869b3a.158.2025.02.05.11.32.11
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 05 Feb 2025 11:32:12 -0800 (PST)
-Date: Wed, 5 Feb 2025 11:32:10 -0800
-From: Joe Damato <jdamato@fastly.com>
-To: Stanislav Fomichev <sdf@fomichev.me>
-Cc: netdev@vger.kernel.org, davem@davemloft.net, edumazet@google.com,
-	kuba@kernel.org, pabeni@redhat.com,
-	Saeed Mahameed <saeed@kernel.org>
-Subject: Re: [RFC net-next 1/4] net: Hold netdev instance lock during
- ndo_open/ndo_stop
-Message-ID: <Z6O8ujq-gYVG4sjw@LQ3V64L9R2>
-Mail-Followup-To: Joe Damato <jdamato@fastly.com>,
-	Stanislav Fomichev <sdf@fomichev.me>, netdev@vger.kernel.org,
-	davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
-	pabeni@redhat.com, Saeed Mahameed <saeed@kernel.org>
-References: <20250204230057.1270362-1-sdf@fomichev.me>
- <20250204230057.1270362-2-sdf@fomichev.me>
+	 Content-Type:Content-Disposition:In-Reply-To; b=MH4sbamfwb8Cej/sKJe5tA8z0uQokrLxstThqNB3w4N6/OPklrVZ80GHLkGW8ZEFPfxFthk6VRoEiyzcdaeNJzVU1Zrc7t33XaE8mFlf+oaMs7IIFAjAntMeo4CyUfqBloBm6ktIinDkXzhTxNid5ed43e9KnycVRhblcBb1vz8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=j0LatF6S; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9931DC4CED1;
+	Wed,  5 Feb 2025 19:33:15 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1738783996;
+	bh=B/kqz7BMCRcXcNkULlXWbe8rQqpjmskiXpQUTOkxG2A=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=j0LatF6SvEfeeYJE9BNmmmeizE1IeFzFC658QJrATwfK6HNFvVLtJrAkMQtMMNUTj
+	 okszOcVt1KpVOzZieCzo1NLZRZflHzBEm2hCN4KoYXqhRSDywgacluxdY7BMG5db3x
+	 EteR5UMxvyv3meUlTb+w/IxDbB+Dj/eO5qHxpvLYsEGTgLwsgYIa9O7r0ymes11/2r
+	 /ceQUFUrMPdni1DrgeYEGvQQ/f9YSwBCaVz0r7y9OEwT7A5hWkASoGSzEAJcMXQ1PO
+	 4E7IgS/cU0UERNM5gFeBk2mPdGvROfdLIox5FUZ76UkNhPj3qJTgYRFHAQbp2nadRb
+	 vQmPlv5stGGBw==
+Date: Wed, 5 Feb 2025 20:33:13 +0100
+From: Lorenzo Bianconi <lorenzo@kernel.org>
+To: Conor Dooley <conor@kernel.org>
+Cc: Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Felix Fietkau <nbd@nbd.name>, Sean Wang <sean.wang@mediatek.com>,
+	Matthias Brugger <matthias.bgg@gmail.com>,
+	AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>,
+	Philipp Zabel <p.zabel@pengutronix.de>,
+	Rob Herring <robh@kernel.org>,
+	Krzysztof Kozlowski <krzk+dt@kernel.org>,
+	Conor Dooley <conor+dt@kernel.org>, netdev@vger.kernel.org,
+	linux-arm-kernel@lists.infradead.org,
+	linux-mediatek@lists.infradead.org, devicetree@vger.kernel.org,
+	upstream@airoha.com
+Subject: Re: [PATCH net-next 09/13] dt-bindings: net: airoha: Add airoha,npu
+ phandle property
+Message-ID: <Z6O8-dUrLNmvnW1u@lore-desk>
+References: <20250205-airoha-en7581-flowtable-offload-v1-0-d362cfa97b01@kernel.org>
+ <20250205-airoha-en7581-flowtable-offload-v1-9-d362cfa97b01@kernel.org>
+ <20250205-cleaver-evaluator-648c8f0b99bb@spud>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: multipart/signed; micalg=pgp-sha512;
+	protocol="application/pgp-signature"; boundary="OLRYiDtnqR+Ktbpf"
+Content-Disposition: inline
+In-Reply-To: <20250205-cleaver-evaluator-648c8f0b99bb@spud>
+
+
+--OLRYiDtnqR+Ktbpf
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20250204230057.1270362-2-sdf@fomichev.me>
+Content-Transfer-Encoding: quoted-printable
 
-On Tue, Feb 04, 2025 at 03:00:54PM -0800, Stanislav Fomichev wrote:
-> For the drivers that use shaper API, switch to the mode where
-> core stack holds the netdev lock. This affects two drivers:
-> 
-> * iavf - already grabs netdev lock in ndo_open/ndo_stop, so mostly
->          remove these
-> * netdevsim - switch to _locked APIs to avoid deadlock
-> 
-> Cc: Saeed Mahameed <saeed@kernel.org>
-> Signed-off-by: Stanislav Fomichev <sdf@fomichev.me>
-> ---
->  Documentation/networking/netdevices.rst     |  6 ++++--
->  drivers/net/ethernet/intel/iavf/iavf_main.c | 14 ++++++-------
->  drivers/net/netdevsim/netdev.c              | 14 ++++++++-----
->  include/linux/netdevice.h                   | 23 +++++++++++++++++++++
->  net/core/dev.c                              | 12 +++++++++++
->  net/core/dev.h                              |  6 ++++--
->  6 files changed, 58 insertions(+), 17 deletions(-)
+> On Wed, Feb 05, 2025 at 07:21:28PM +0100, Lorenzo Bianconi wrote:
+> > Introduce the airoha,npu property for the npu syscon node available on
+> > EN7581 SoC. The airoha Network Processor Unit (NPU) is used to offload
+> > network traffic forwarded between Packet Switch Engine (PSE) ports.
+> >=20
+> > Signed-off-by: Lorenzo Bianconi <lorenzo@kernel.org>
+> > ---
+> >  Documentation/devicetree/bindings/net/airoha,en7581-eth.yaml | 8 +++++=
++++
+> >  1 file changed, 8 insertions(+)
+> >=20
+> > diff --git a/Documentation/devicetree/bindings/net/airoha,en7581-eth.ya=
+ml b/Documentation/devicetree/bindings/net/airoha,en7581-eth.yaml
+> > index c578637c5826db4bf470a4d01ac6f3133976ae1a..6388afff64e990a20230b0c=
+4e58534aa61f984da 100644
+> > --- a/Documentation/devicetree/bindings/net/airoha,en7581-eth.yaml
+> > +++ b/Documentation/devicetree/bindings/net/airoha,en7581-eth.yaml
+> > @@ -63,6 +63,12 @@ properties:
+> >    "#size-cells":
+> >      const: 0
+> > =20
+> > +  airoha,npu:
+> > +    $ref: /schemas/types.yaml#/definitions/phandle
+> > +    description:
+> > +      Phandle to the syscon node used to configure the NPU module
+> > +      used for traffic offloading.
+>=20
+> Why do you need a phandle for this, instead of a lookup by compatible?
+> Do you have multiple instances of this ethernet controller on the
+> device, that each need to look up a different npu?
 
-[...]
+actually not, but looking up via the compatible string has been naked by
+Krzysztof on a different series [0].
 
-> @@ -4474,12 +4471,12 @@ static int iavf_close(struct net_device *netdev)
->  	u64 aq_to_restore;
->  	int status;
->  
-> -	netdev_lock(netdev);
-> +	netdev_assert_locked(netdev);
-> +
->  	mutex_lock(&adapter->crit_lock);
->  
->  	if (adapter->state <= __IAVF_DOWN_PENDING) {
->  		mutex_unlock(&adapter->crit_lock);
-> -		netdev_unlock(netdev);
->  		return 0;
->  	}
->  
-> @@ -4532,6 +4529,7 @@ static int iavf_close(struct net_device *netdev)
->  	if (!status)
->  		netdev_warn(netdev, "Device resources not yet released\n");
->  
-> +	netdev_lock(netdev);
+Regards,
+Lorenzo
 
-I'm probably just misreading the rest of the patch, but I was just
-wondering: is this netdev_lock call here intentional? I am asking
-because I thought the lock was taken in ndo_stop before this is
-called?
+[0] https://patchwork.kernel.org/project/linux-pci/patch/20250115-en7581-pc=
+ie-pbus-csr-v1-2-40d8fcb9360f@kernel.org/
+
+>=20
+> > +
+> >  patternProperties:
+> >    "^ethernet@[1-4]$":
+> >      type: object
+> > @@ -132,6 +138,8 @@ examples:
+> >                       <GIC_SPI 49 IRQ_TYPE_LEVEL_HIGH>,
+> >                       <GIC_SPI 64 IRQ_TYPE_LEVEL_HIGH>;
+> > =20
+> > +        airoha,npu =3D <&npu>;
+> > +
+> >          #address-cells =3D <1>;
+> >          #size-cells =3D <0>;
+> > =20
+> >=20
+> > --=20
+> > 2.48.1
+> >=20
+
+
+
+--OLRYiDtnqR+Ktbpf
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iHUEABYKAB0WIQTquNwa3Txd3rGGn7Y6cBh0uS2trAUCZ6O8+QAKCRA6cBh0uS2t
+rBuDAQC8IfaonQoR+OsBNVLR3QqRP2V9u+fgOgmLkd8nLqxJXgD+LlNv2zJCpRM4
+mPz3craYS9w8t05bFQju9tmeKJ0FSQ4=
+=7CSn
+-----END PGP SIGNATURE-----
+
+--OLRYiDtnqR+Ktbpf--
 
