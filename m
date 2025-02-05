@@ -1,86 +1,80 @@
-Return-Path: <netdev+bounces-163171-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-163172-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3E308A297E6
-	for <lists+netdev@lfdr.de>; Wed,  5 Feb 2025 18:48:49 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id C7EE3A297DD
+	for <lists+netdev@lfdr.de>; Wed,  5 Feb 2025 18:47:38 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 22A9D3A5574
-	for <lists+netdev@lfdr.de>; Wed,  5 Feb 2025 17:47:01 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 268AC7A3E63
+	for <lists+netdev@lfdr.de>; Wed,  5 Feb 2025 17:46:43 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 354001FCFF1;
-	Wed,  5 Feb 2025 17:42:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A92991FF60B;
+	Wed,  5 Feb 2025 17:44:36 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="Lmg6D3HU"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="RiwCSjny"
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 90B5E1FC7F9;
-	Wed,  5 Feb 2025 17:42:39 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 857A01FC0E6
+	for <netdev@vger.kernel.org>; Wed,  5 Feb 2025 17:44:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1738777361; cv=none; b=Y5mXtidN+k8LgHx9Dd85irtwKS7kbSbGvXUTwYDE8SPZ5uTBDd8GyqG+uujQBDXwxzjZ2LiLidmvhE5FMZwvdgK1krnRMBXQPlTeiGZpCWdT3mdMDsZ246IRblQM7OhpccgLn1vF3FxmVWAKOT7AsaIUxTSPZ6PxplnpfyT+gto=
+	t=1738777476; cv=none; b=BZ37daaL1U2axWb1fBpVLg3v8bnruEPScHgrbFBZcc1s9YyrZosTYVE3BnPfPDp3YqiAfbZe9FmAus+6bUcdkOhuyK/pZS3eEk5TrmJ7Bp/+LOlyRBmwj8qya4VapcrFl7Lx1hIeJ/g9PAgr+m7i1Jv3J5wxfO3zGe6olgwIsF0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1738777361; c=relaxed/simple;
-	bh=FM4bTy2fIxKJY4YL884gR/k8wuHai1SuESQfqjTjdyc=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=hxJ6GE6D7/D/XTKReMvurYcJIW8ayH/1qhaXUewzdQgDCFTb3vBopFcC8oFIYOuI7poz/rQAEvZW8W1Ux+OnwZxo4Pl96v/gGc5aTfZaiZVjqM+AL/WHk3918+zZVrY/NMDjmtPPAkW+boH+ZfqWB3VcBwBZbzxfLUUSZr47PwU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=Lmg6D3HU; arc=none smtp.client-ip=156.67.10.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=rdd/MEW/P3uHV2EnNuTrQYWSfyS/TwvFxMMuVJeRWHQ=; b=Lmg6D3HUaIPokEWuZLhONeCeGg
-	qgd2hOYcbWwXf9MO9KbU8Dt++GyE5KOIVLQDJ9b/91+wMCHc7XMBCNBjyGvDWPjUazUezJo+NEsbi
-	o/Vyhw+n93/UhfX/SlolsJxrAf6flZmptpVUNuLXpYpYzUWTJs3DHjtpLUkqQdRX+VBc=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1tfjPz-00BFwU-7g; Wed, 05 Feb 2025 18:42:31 +0100
-Date: Wed, 5 Feb 2025 18:42:31 +0100
-From: Andrew Lunn <andrew@lunn.ch>
-To: Oleksij Rempel <o.rempel@pengutronix.de>
-Cc: Heiner Kallweit <hkallweit1@gmail.com>,
-	Russell King <linux@armlinux.org.uk>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	kernel@pengutronix.de, linux-kernel@vger.kernel.org,
-	netdev@vger.kernel.org
-Subject: Re: [PATCH net-next v2 1/2] net: phy: Add support for
- driver-specific next update time
-Message-ID: <2e316ec4-8f5b-4dbd-96d2-aabc29bfae17@lunn.ch>
-References: <20250205091151.2165678-1-o.rempel@pengutronix.de>
- <20250205091151.2165678-2-o.rempel@pengutronix.de>
+	s=arc-20240116; t=1738777476; c=relaxed/simple;
+	bh=AJlFXAp9wetxr5kXWWMcm3XEwnpXQubgj5onMg+4dVQ=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=S75WGFIaUvDVqj/uRivYAXw6D9Zj4taknZgKkkhyFQ7lqzvWr9PhVqA+70p9WuYbrElE/jEXRbUGantrtzl7IdLR7N5oXM7p4Y9r9rP/Gj4DI+Cx6jbCvKU6WOnC7IRmIMzmd0d5OE9GBEGvJAes4Q2pcJoQpPKLgH4i6Yw8CAY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=RiwCSjny; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 74A1FC4CED1;
+	Wed,  5 Feb 2025 17:44:35 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1738777476;
+	bh=AJlFXAp9wetxr5kXWWMcm3XEwnpXQubgj5onMg+4dVQ=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=RiwCSjny2rRnzHMCxuaZkTtbGPvO/z4z93rIEllf2bKBYQIVUf8I2rXyr712YD8VO
+	 TKCBC/Qbsp1DO54y0KA+pItk0EbVG9L+Bxz4Nvm7QIrCa6Edg4Z+tQ0Or+vZO9OJmx
+	 3W3vPlG+UrLi7AS1Jwoc2YuFgIBd4U7emUmSlPW/O0iVU+kwA9UANgdYDYMtulvvko
+	 qR5FUmCjy+LzPLphBzcakffk+EOOlNCtli+WkV7x24+xMdf34rMbAWbtvt0jT+RL3u
+	 PAwlVL/oPC7eDUzMP8h0JoR0LbzhQ0Eg40IUtpyCJP6rnqdJpuf2+K/MAu+3eQRvOA
+	 Y0IUds1x5ZVYg==
+Message-ID: <aa3f85be-a7d9-4f41-9fe3-d7d711697079@kernel.org>
+Date: Wed, 5 Feb 2025 10:44:34 -0700
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250205091151.2165678-2-o.rempel@pengutronix.de>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next v13 00/10] io_uring zero copy rx
+Content-Language: en-US
+To: David Wei <dw@davidwei.uk>, netdev@vger.kernel.org
+Cc: Pavel Begunkov <asml.silence@gmail.com>, Jakub Kicinski
+ <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jesper Dangaard Brouer <hawk@kernel.org>,
+ Mina Almasry <almasrymina@google.com>,
+ Stanislav Fomichev <stfomichev@gmail.com>, Joe Damato <jdamato@fastly.com>,
+ Pedro Tammela <pctammela@mojatatu.com>
+References: <20250204215622.695511-1-dw@davidwei.uk>
+From: David Ahern <dsahern@kernel.org>
+In-Reply-To: <20250204215622.695511-1-dw@davidwei.uk>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-> +	if (phy_polling_mode(phydev) && phy_is_started(phydev)) {
-> +		unsigned int next_update_time =
-> +			phy_get_next_update_time(phydev);
-> +
-> +		phy_queue_state_machine(phydev,
-> +					msecs_to_jiffies(next_update_time));
+On 2/4/25 2:56 PM, David Wei wrote:
+> We share netdev core infra with devmem TCP. The main difference is that
+> io_uring is used for the uAPI and the lifetime of all objects are bound
+> to an io_uring instance. Data is 'read' using a new io_uring request
+> type. When done, data is returned via a new shared refill queue. A zero
+> copy page pool refills a hw rx queue from this refill queue directly. Of
+> course, the lifetime of these data buffers are managed by io_uring
+> rather than the networking stack, with different refcounting rules.
 
-Ah, i missed the msecs_to_jiffies() call. But the driver change now
-looks wrong. I think to keep things simple, the API should use
-jiffies, since that is what phy_queue_state_machine() and
-mod_delayed_work() expect.
-
-Did you test with Timer frequency = 100, that should make errors more
-obvious.
-
-	Andrew
+just to make sure I understand, working with GPU memory as well as host
+memory is not a goal of this patch set?
 
