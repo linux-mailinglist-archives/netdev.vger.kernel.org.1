@@ -1,88 +1,170 @@
-Return-Path: <netdev+bounces-163266-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-163267-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 27E03A29BDE
-	for <lists+netdev@lfdr.de>; Wed,  5 Feb 2025 22:28:33 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id AF744A29BE3
+	for <lists+netdev@lfdr.de>; Wed,  5 Feb 2025 22:31:53 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 7EC9D3A699B
-	for <lists+netdev@lfdr.de>; Wed,  5 Feb 2025 21:28:24 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C079E169137
+	for <lists+netdev@lfdr.de>; Wed,  5 Feb 2025 21:31:46 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E6853214A93;
-	Wed,  5 Feb 2025 21:28:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2ACDD14F9FD;
+	Wed,  5 Feb 2025 21:31:44 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="pHccHxv+"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="SYo29rfD"
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f171.google.com (mail-pl1-f171.google.com [209.85.214.171])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B54AA208989;
-	Wed,  5 Feb 2025 21:28:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A25171519AD
+	for <netdev@vger.kernel.org>; Wed,  5 Feb 2025 21:31:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.171
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1738790908; cv=none; b=Qbgqa2TAVSVkgICkwyhz9As+cOtrU71CTWnppfLuApR5CLwrp/7R9rIjwkNMRtrvfbmT/xOLHp/7VA3YXudGGTCipqS13M9mjSCPDon7YuRAS7Y9TFDLwTyZnZxKEajA46fN/nBBtTDHZz9GKt9ylRxsn9iIz4lBA3Oojs/M8gk=
+	t=1738791104; cv=none; b=NciKgmRLm5rrVox2ceHVaZPzWrgf3TTXVN1PLVktBds0/eZwVr9u62ePfR6gLrUAmFhB5GujHkwuXeP/QoavJsrD267gJR5FRNPbkmUNkWTaZaCfLkg0frnVoSMWsgKeBcuR2vjvmHDIYKTwVVQ8mkx0fRxuhYXJom57jZPtZoU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1738790908; c=relaxed/simple;
-	bh=gOkfrYqL7w8l55M5OlrVyygWCxWRJtwdTuF7Ge7wl2A=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=oteaXV8/1ZeZUt95SW2Q8GR8AK2ORgxG2nH8gFcc1wvP3wVBp4AA/cJoLWRk8YMB4NfumUaBhAAldLYuYavPqFvqaD2PRgOss5vjwKwVeXwEgTtV3NEZ7Qxv0cXNlCfjp681Vi84JKoyd4XeADrdM4cVbFCwnv1lkcfvodzoKeE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=pHccHxv+; arc=none smtp.client-ip=156.67.10.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=py0hkrfL9mowZAkyiO6n2iutyc+zdodl2pydFVt894I=; b=pHccHxv+o0N1JXp+atykEsyqak
-	7vB4EXU9NU7BuDQ7RsYwRFZli2uwjDariB58UL9RlOySGtAxR8sptAxyp4Kk+hGlkLCRcrfHQLgF7
-	03Ipn4btSTKc0XVJYaVp1cpxFQnfmEBd6ME4lQ1lkD3/gwPtOdOdKQmrMatJOb20cJDA=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1tfmwM-00BJES-LG; Wed, 05 Feb 2025 22:28:10 +0100
-Date: Wed, 5 Feb 2025 22:28:10 +0100
-From: Andrew Lunn <andrew@lunn.ch>
-To: Nikita Yushchenko <nikita.yoush@cogentembedded.com>
-Cc: Yoshihiro Shimoda <yoshihiro.shimoda.uh@renesas.com>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Geert Uytterhoeven <geert+renesas@glider.be>,
-	netdev@vger.kernel.org, linux-renesas-soc@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	Michael Dege <michael.dege@renesas.com>,
-	Christian Mardmoeller <christian.mardmoeller@renesas.com>,
-	Dennis Ostermann <dennis.ostermann@renesas.com>
-Subject: Re: [PATCH net-next] net: renesas: rswitch: cleanup max_speed setting
-Message-ID: <04f35c2f-f6ab-4fec-b282-e04c9008e47b@lunn.ch>
-References: <20250203170941.2491964-1-nikita.yoush@cogentembedded.com>
- <18a72981-9896-4725-8f5b-5783224de300@lunn.ch>
- <93856925-b451-408c-8dee-bfd8dc2d56b3@cogentembedded.com>
+	s=arc-20240116; t=1738791104; c=relaxed/simple;
+	bh=BQTJ0tsZJr+UdARG8ZHB44WS1DWpTikhoJL/IkDFU7g=;
+	h=Date:From:To:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=C5GGUhbrq+eyCsRyFdy0fsOB8G3/5ERcVs6H5EYgSDLLIe5eYT6cjnMuvA+Xjf06U6ObiIS/BE2PNMvfIZGd9r3+WnRwIB3GMEMYt44zPlBYy2sex7ixMdMLikdTYfWYrJgFeo6drcmhhVmrwN/15OuQpFrsm3lp54HsmGTvt7s=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=SYo29rfD; arc=none smtp.client-ip=209.85.214.171
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pl1-f171.google.com with SMTP id d9443c01a7336-21f05693a27so3867015ad.2
+        for <netdev@vger.kernel.org>; Wed, 05 Feb 2025 13:31:42 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1738791102; x=1739395902; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=K1u+FoVmiH3HlH3e3ZhLv5dqfpqnEYp17kc4FXVCfE0=;
+        b=SYo29rfDod0hWeImlh3y0IqgKwuD/lMfcW7Ao/mq/kclnk+Qwy1yrQzw562Q4R4J92
+         AhraPRcMxer+8vhFzF+AIxDyhHEi+qSP1AagYI5513FKA0fgScszW8jJRx3vDAQnxGOd
+         FGlf8nCbAFmiadgzZZQHQJlruyjgwZBO87Ywwg51cxh7da5yUXRxEC1ysbp/IitQlhBj
+         3vjHN75t3zpdKb33tfNxIoHVHmHGNub22PhEipcpuZg8JhCynKs77Ifef/AA8sVMyGKw
+         OD+DvqZMdZT+HhMf16UJawQj6IgsyxGOslSbiYZyPWgRNsd07VE21qQ98izG4ocHITIp
+         UrQg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1738791102; x=1739395902;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=K1u+FoVmiH3HlH3e3ZhLv5dqfpqnEYp17kc4FXVCfE0=;
+        b=XiEYtD21A9Trr8bz9H3eaF9k9ekAKJ7rK8u8vaDl/Yz+gypDJwCbKTT2pM4HuBvjHm
+         fahUIk2d4B6tvHWooWGhXfgdBbkXG7Q2ON85EQKmzs1nl5Qmqwk9cFwAYeMckY6uu485
+         rpq0VCrsA1X/vLGCFCVelBRdKGt7eSgobrJi3/CmOX7DLOEv/tuhAWJVeOgt1tla0V5f
+         TpC7fsiDFcYIfffezcJVDEHOn4hjmGELLiz94bKkeFqE20Wi7eRv1ZxK1Afk2483wEuM
+         GDH2zpLEnMGG837HI2YU9qUKxRaFHbzHrTBgyOre833Oj4jeDoiI+aK7pGLbEZvuyBJb
+         Mjbg==
+X-Forwarded-Encrypted: i=1; AJvYcCXGwh6GT14H8JCTSJPN3/zC2dgc4TTWRIav5k85KwRSZFZ85BxU1j7XIJW8IfI3CCPZJ0K006E=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzTAGozZJtgb/FTNbbSPrTbaEEFGewGJOyIzsQJOiE7eQYZFJgm
+	d5zcW4chY1Z6s9wlGjm/+ggjXhKB1A75yLpBXVQ9WhGQUDpAqOQ=
+X-Gm-Gg: ASbGncsxalBUWhCQ9Vrwo8/l7TKNQhG28r+7xnG24XiVJVw0pZR83wy3kUzbAbm0twI
+	YVJHnmGdrHipY4YL91kyIlrHYbNBYfLRhKtn16Q1oZmUs/6Al21SC05Zgib+RJLqrFyeZTYgsj/
+	fZdHawgdG2jiHzkVU4CQ9w4WphCyrDDM9lJ1t4WdBBPklapl4ZDVLgZPnXbt/N+9duJbXMBWq2+
+	M/3ygmJm8dpXv8Vuvl7rsDw8eIxCAzm0m8iGrnEOCmnV9m95wScgvvc3fghjmsD05viLwkNwVIF
+	8EK2qCy/XhSwfC8=
+X-Google-Smtp-Source: AGHT+IEU/sfluQ5BJMhZh9OWN58YIHtydVJCcwcmHvqaUPCTF0SFm13GOnM8D12CzVbvaRQfJN5y/A==
+X-Received: by 2002:aa7:930d:0:b0:725:b347:c3cc with SMTP id d2e1a72fcca58-7303521f9camr7672483b3a.23.1738791101731;
+        Wed, 05 Feb 2025 13:31:41 -0800 (PST)
+Received: from localhost ([2601:646:9e00:f56e:2844:3d8f:bf3e:12cc])
+        by smtp.gmail.com with UTF8SMTPSA id d2e1a72fcca58-72fe69ba4a0sm13444953b3a.102.2025.02.05.13.31.41
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 05 Feb 2025 13:31:41 -0800 (PST)
+Date: Wed, 5 Feb 2025 13:31:40 -0800
+From: Stanislav Fomichev <stfomichev@gmail.com>
+To: Joe Damato <jdamato@fastly.com>, Stanislav Fomichev <sdf@fomichev.me>,
+	netdev@vger.kernel.org, davem@davemloft.net, edumazet@google.com,
+	kuba@kernel.org, pabeni@redhat.com,
+	Saeed Mahameed <saeed@kernel.org>
+Subject: Re: [RFC net-next 1/4] net: Hold netdev instance lock during
+ ndo_open/ndo_stop
+Message-ID: <Z6PYvNeBE2_dpRDG@mini-arch>
+References: <20250204230057.1270362-1-sdf@fomichev.me>
+ <20250204230057.1270362-2-sdf@fomichev.me>
+ <Z6O8ujq-gYVG4sjw@LQ3V64L9R2>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <93856925-b451-408c-8dee-bfd8dc2d56b3@cogentembedded.com>
+In-Reply-To: <Z6O8ujq-gYVG4sjw@LQ3V64L9R2>
 
-On Wed, Feb 05, 2025 at 09:26:10PM +0100, Nikita Yushchenko wrote:
-> > If the interface mode is 5GBASER why set the speed to SPEED_2500?
-> > Also, USXGMII allows up to 10G. So this all looks a bit odd.
+On 02/05, Joe Damato wrote:
+> On Tue, Feb 04, 2025 at 03:00:54PM -0800, Stanislav Fomichev wrote:
+> > For the drivers that use shaper API, switch to the mode where
+> > core stack holds the netdev lock. This affects two drivers:
+> > 
+> > * iavf - already grabs netdev lock in ndo_open/ndo_stop, so mostly
+> >          remove these
+> > * netdevsim - switch to _locked APIs to avoid deadlock
+> > 
+> > Cc: Saeed Mahameed <saeed@kernel.org>
+> > Signed-off-by: Stanislav Fomichev <sdf@fomichev.me>
+> > ---
+> >  Documentation/networking/netdevices.rst     |  6 ++++--
+> >  drivers/net/ethernet/intel/iavf/iavf_main.c | 14 ++++++-------
+> >  drivers/net/netdevsim/netdev.c              | 14 ++++++++-----
+> >  include/linux/netdevice.h                   | 23 +++++++++++++++++++++
+> >  net/core/dev.c                              | 12 +++++++++++
+> >  net/core/dev.h                              |  6 ++++--
+> >  6 files changed, 58 insertions(+), 17 deletions(-)
 > 
-> 2500 is hardware limit (or at least the datasheet states so).
+> [...]
+> 
+> > @@ -4474,12 +4471,12 @@ static int iavf_close(struct net_device *netdev)
+> >  	u64 aq_to_restore;
+> >  	int status;
+> >  
+> > -	netdev_lock(netdev);
+> > +	netdev_assert_locked(netdev);
+> > +
+> >  	mutex_lock(&adapter->crit_lock);
+> >  
+> >  	if (adapter->state <= __IAVF_DOWN_PENDING) {
+> >  		mutex_unlock(&adapter->crit_lock);
+> > -		netdev_unlock(netdev);
+> >  		return 0;
+> >  	}
+> >  
+> > @@ -4532,6 +4529,7 @@ static int iavf_close(struct net_device *netdev)
+> >  	if (!status)
+> >  		netdev_warn(netdev, "Device resources not yet released\n");
+> >  
+> > +	netdev_lock(netdev);
+> 
+> I'm probably just misreading the rest of the patch, but I was just
+> wondering: is this netdev_lock call here intentional? I am asking
+> because I thought the lock was taken in ndo_stop before this is
+> called?
 
-Then it should return -EINVAL if the device tree has a phy-mode the
-hardware does not support.
+Yes, this part is a bit confusing. Existing iavf_close looks like
+this:
 
-USXGMII is maybe a bit harder, since i don't know if the higher speeds
-are optional, but my understanding is that USXGMII allows up to
-10G. Is it really using USXGMII, or 2500BaseX?
+iavf_close() {
+  netdev_lock()
+  .. 
+  netdev_unlock()
+  wait_event_timeout(down_waitqueue)
+}
 
-	Andrew
+I change it to the following:
+
+netdev_lock()
+iavf_close() {
+  .. 
+  netdev_unlock()
+  wait_event_timeout(down_waitqueue)
+  netdev_lock()
+}
+netdev_unlock()
+
+And the diff is confusing because I reuse existing netdev_lock call,
+so it looks like I only add netdev_unlock...
+
+I don't think I can hold instance lock during wait_event_timeout because
+the wake_up(down_waitqueue) callers grab netdev instance lock as well.
 
