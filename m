@@ -1,126 +1,116 @@
-Return-Path: <netdev+bounces-162898-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-162899-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1138DA28537
-	for <lists+netdev@lfdr.de>; Wed,  5 Feb 2025 09:03:03 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 36657A2853E
+	for <lists+netdev@lfdr.de>; Wed,  5 Feb 2025 09:04:15 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 765773A75D8
-	for <lists+netdev@lfdr.de>; Wed,  5 Feb 2025 08:02:54 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 884C5163417
+	for <lists+netdev@lfdr.de>; Wed,  5 Feb 2025 08:04:04 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 083A0228CB2;
-	Wed,  5 Feb 2025 08:02:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 87FDA229B20;
+	Wed,  5 Feb 2025 08:03:49 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b="A5M+Vvr4"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ZYiX6ShX"
 X-Original-To: netdev@vger.kernel.org
-Received: from out199-16.us.a.mail.aliyun.com (out199-16.us.a.mail.aliyun.com [47.90.199.16])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f171.google.com (mail-pl1-f171.google.com [209.85.214.171])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 03F8320F09B;
-	Wed,  5 Feb 2025 08:02:50 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=47.90.199.16
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EA014229B0A;
+	Wed,  5 Feb 2025 08:03:47 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.171
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1738742576; cv=none; b=nAkfMoX1rIBY8oWS1WlFQlQ4u7PpkffPzTWMJV5EfIrxG5NvdcTfBzQRp6h0gFMpKeZemPIIg8tEd7L8PAge3p/tvn0v7YXloZNc/daQ2+dhyAPMnqliMCS4d79DHcEiLxr1GVkokybYP/3jMrjF5KLbcZI0FI/K84MUks1vMQM=
+	t=1738742629; cv=none; b=U8Ajxx2+Mf4BxevFOeQlJV0vkboUSYGlf1ZWWyyKj5PmGDZYunkVDXr+cTja+wlv7xwnP58AYwnMslthhwbDNgZbNn5IVUNca/EAH9npCSwXGAiS+PkHXsRxyx0qKJkAsKt18wAy1mU4T/CWBdJ+Xoj98CpLbTbthD+tm0urKww=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1738742576; c=relaxed/simple;
-	bh=u08HtmoR3gjyR8lSKU9dYPRmR+YL7GM5wtJ6j/Ioiac=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=nAFGruo0GQ9mTP3mMoVkL1y4rjtKasCwiRGueMkVBC+Dmfg+LL3SbG2uqEgUzwo9dNtsS/IWqz4z3GuFdRgNlmRcjWrzj9YmTWfqDIupkRo4gy8twGpLTYpnFb9i+ZxWg7qC1HfV70Rl2wa04DwGB/F4iTR2FeLdDinWtfb6qQ0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com; spf=pass smtp.mailfrom=linux.alibaba.com; dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b=A5M+Vvr4; arc=none smtp.client-ip=47.90.199.16
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.alibaba.com
-DKIM-Signature:v=1; a=rsa-sha256; c=relaxed/relaxed;
-	d=linux.alibaba.com; s=default;
-	t=1738742551; h=Date:From:To:Subject:Message-ID:MIME-Version:Content-Type;
-	bh=7GaEyfI7UicQBv1sg4JfW3DT68PYKPedGIl8mINzZOI=;
-	b=A5M+Vvr4LhZzusgoy/CzI657NkVXqlFPRS0/8N87W4jY4FvUopy/MqDOSp8jRUhJ62Y7fVG7h721LxbLjrCeGygLWHXdkT/eix259S4g9p+2gLSkAwgJOE4yoDrOqEXRlwfdgskKmffAba8XXmc0O5jjh9ftgqwIjoR1XxOkXHI=
-Received: from localhost(mailfrom:alibuda@linux.alibaba.com fp:SMTPD_---0WOoxC9D_1738742548 cluster:ay36)
-          by smtp.aliyun-inc.com;
-          Wed, 05 Feb 2025 16:02:29 +0800
-Date: Wed, 5 Feb 2025 16:02:28 +0800
-From: "D. Wythe" <alibuda@linux.alibaba.com    >
-To: Gerd Bayer <gbayer@linux.ibm.com>
-Cc: dust.li@linux.alibaba.com, "D. Wythe" <alibuda@linux.alibaba.com>,
-	kgraul@linux.ibm.com, wenjia@linux.ibm.com, jaka@linux.ibm.com,
-	ast@kernel.org, daniel@iogearbox.net, andrii@kernel.org,
-	martin.lau@linux.dev, pabeni@redhat.com, song@kernel.org,
-	sdf@google.com, haoluo@google.com, yhs@fb.com, edumazet@google.com,
-	john.fastabend@gmail.com, kpsingh@kernel.org, jolsa@kernel.org,
-	guwen@linux.alibaba.com, kuba@kernel.org, davem@davemloft.net,
-	netdev@vger.kernel.org, linux-s390@vger.kernel.org,
-	linux-rdma@vger.kernel.org, bpf@vger.kernel.org
-Subject: Re: [PATCH bpf-next v7 3/6] net/smc: Introduce generic hook smc_ops
-Message-ID: <20250205080228.GA57822@j66a10360.sqa.eu95>
-References: <20250123015942.94810-1-alibuda@linux.alibaba.com>
- <20250123015942.94810-4-alibuda@linux.alibaba.com>
- <20250123073034.GQ89233@linux.alibaba.com>
- <6685f9266702dcf0a3123f9be7c1c0200a5f4032.camel@linux.ibm.com>
+	s=arc-20240116; t=1738742629; c=relaxed/simple;
+	bh=yz7odsFnsguGVNN3G5O+Sw4mTR1RNdKwVDH6gjoYXdc=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=kJCkzH3csDYcnUHtPjDJdm92dy8VkKyw2BQtm4oqK6y6i6+gnAtPSDqmrQgqz+cuSa+TUI8xibTZAxL32fIE3C6uRJY75Eea3YXtfien+gh9eMc7ydR5AfT2d163bRXYux+PSVNip2cuPPa3fyMDMUudkHRPfsJOaNTcuSK0nyU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=ZYiX6ShX; arc=none smtp.client-ip=209.85.214.171
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pl1-f171.google.com with SMTP id d9443c01a7336-2165448243fso33197605ad.1;
+        Wed, 05 Feb 2025 00:03:47 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1738742627; x=1739347427; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=kbxs9YmxoIn95oH9DLAYCIbGOus9KVINXI1mq4F3V+8=;
+        b=ZYiX6ShXCi3Cueq5rCWSqRFSzHec9Hc6uCZ4lIUzepBJGK/dzq6Uls3yv8VF0tHzBN
+         KYsGHHiVFO7K/FUNTz+Vf8RC+kzst0XiMBK9oXqA9G7iT8Rio6/0taRYKawDANX8O/ga
+         o+2zIir+aQqGdQi7UaXKBQxMaiBsZVxFFAogChoSDUmpi2iFaWZWuw4dcldz8cYvsQdo
+         SFa/XUQ7GJLYbyCTIQcGg7gw4NxGi3IFzCwSJYlrlfzWZrN7tKrtfMznP3osMxzzAwBE
+         8O+uHaMhqi81EenIhw94kBIZ8Nq+S3ljQICs/obv8J8cr4spbgQ+QVc1km6/SDutlI0F
+         XKLA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1738742627; x=1739347427;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=kbxs9YmxoIn95oH9DLAYCIbGOus9KVINXI1mq4F3V+8=;
+        b=keIIrlexDbNuKMicWommBaaA6cYA+Pf82OM4XKKRn6nXgeX/bGcy+MeXuRSr1QCQgw
+         g4Fjw0aoZf6zNmLAZFSpE/L/4BBXt+R6DSDKEnAiWhXteK6mrSYMknE1FCPtTsGs5oJi
+         fooNwKtRqwnqBPxgUeRKNwgHaGNt/8x2+rlf1ba9IUzobd/Czj1mAtAMI9rLSWLZ4iaA
+         1aB+yhvC24AaUrTv2E2jos0ube9oJLy55A68+B8/OT3uaXq33gqvmp3D/dWwnNEXIVyG
+         ZpLKhNhKuFgFhnJrM58ivpMN4N81ouUcrG9auh4dapHcXo/gMd713E6KIwTHwcWMjM7T
+         8kQQ==
+X-Forwarded-Encrypted: i=1; AJvYcCWLnGijozU93wwQVta9qFzCzI5QMMHKfMlgtFeuh4brwTNU0fboaukFeMBPtJ5ov1bmsz48i9rkJzvLsXrYk9kX@vger.kernel.org, AJvYcCXU9+AP5tskbdtzRkAEnyl4/PHm7+ujZ/UpFGkmDkzGoKinlX8r+TRxBLf6ucy/xYzdk7LJaE6fuOutjbY=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yxkbyxh7Gmp+4AbZNgGv1mbaT/3ym9rP5xfJ238EOX4Ka10/6t3
+	NcAcUHVFWHyHO6UD7pWaPT3SQiOIdY8j0IZiPer8t+a/1VyvYq85UxOa8OPgyVo=
+X-Gm-Gg: ASbGncv56pnDiX9HlJt1IxNn836s3u5s3UbSwpxvsnUPt4jCvJgv7BizMO3Jvdc1LXT
+	Uq2iKFqJewruZBG9QpuFDBTu5p/KSUDxob8K18hhgXRfBZFDil3HYzMSID19tkE1eGcj4tHdteN
+	gPbiCU1nw0AaDRvxL8rnjAebjRGHI871bZ6iCYWiXn3vOW+7ebkCo4MGSI+O3IaCRIRGEDGOMop
+	E4TE/5HxgyppMlt6RHAihjECMdENevYwFFfz/12SjF65MQiqaH2HqTlWnSv2IRTNn3AJb0ybWl2
+	fkhTes2xsTOrmJXRo72ENCgrvo1lWkWSvkg=
+X-Google-Smtp-Source: AGHT+IFIsfvqAytSXZuqYisL16QJIPp4q3yAjnnqkW/aMnwQ0E14n2yFNaIQTSwje6+mhaboPDnwOw==
+X-Received: by 2002:a05:6a00:1306:b0:72f:f872:30a7 with SMTP id d2e1a72fcca58-73035127555mr2776924b3a.6.1738742626840;
+        Wed, 05 Feb 2025 00:03:46 -0800 (PST)
+Received: from fedora.dns.podman ([43.228.180.230])
+        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-72fe6a18ae1sm11807039b3a.163.2025.02.05.00.03.41
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 05 Feb 2025 00:03:46 -0800 (PST)
+From: Hangbin Liu <liuhangbin@gmail.com>
+To: netdev@vger.kernel.org
+Cc: Jay Vosburgh <jv@jvosburgh.net>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Nikolay Aleksandrov <razor@blackwall.org>,
+	Simon Horman <horms@kernel.org>,
+	Jianbo Liu <jianbol@nvidia.com>,
+	Boris Pismenny <borisp@nvidia.com>,
+	Tariq Toukan <tariqt@nvidia.com>,
+	Shuah Khan <shuah@kernel.org>,
+	linux-kselftest@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	Hangbin Liu <liuhangbin@gmail.com>
+Subject: [PATCH net 0/2] bonding: fix incorrect mac address setting
+Date: Wed,  5 Feb 2025 08:03:34 +0000
+Message-ID: <20250205080336.2197369-1-liuhangbin@gmail.com>
+X-Mailer: git-send-email 2.46.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <6685f9266702dcf0a3123f9be7c1c0200a5f4032.camel@linux.ibm.com>
-User-Agent: Mutt/1.5.21 (2010-09-15)
 
-On Thu, Jan 23, 2025 at 11:15:21AM +0100, Gerd Bayer wrote:
-> On Thu, 2025-01-23 at 15:30 +0800, Dust Li wrote:
-> > On 2025-01-23 09:59:39, D. Wythe wrote:
-> > > The introduction of IPPROTO_SMC enables eBPF programs to determine
-> > > whether to use SMC based on the context of socket creation, such as
-> > > network namespaces, PID and comm name, etc.
-> > > 
-> > 
-> > I'm still not completely satisfied with the name smc_ops. Since this
-> > will be the API for our users, we need to be carefull on the name.
-> 
-> If I may jump in with a suggestion here:
-> On my first glance, I'd expect SMC_OPS to offer OPS as a general API.
-> The description however suggest that this adds "contol points" or hooks
-> in the SMC code, that eBPF programs can use to tweak the protocol's
-> behavior. Exclusively eBPF programs, it seems.
-> 
-> So how about naming this SMC_EBPF_HOOKS or SMC_EBPF_SUPPORT?
-> 
-> Just my 2ct,
-> Gerd
+The mac address on backup slave should be convert from Solicited-Node
+Multicast address, not from bonding unicast target address.
 
-Hi all,
+Hangbin Liu (2):
+  bonding: fix incorrect MAC address setting to receive NA messages
+  selftests: bonding: fix incorrect mac address
 
-Thanks for all the suggestion.It seems that the naming of this ops has indeed
-sparked some controversy. However, I still oppose explicitly linking the name
-to BPF. As I mentioned earlier, this ops is not strongly tied to BPF
-implementations, kernel modules can also implement them.
+ drivers/net/bonding/bond_options.c                          | 4 +++-
+ tools/testing/selftests/drivers/net/bonding/bond_options.sh | 4 ++--
+ 2 files changed, 5 insertions(+), 3 deletions(-)
 
-I used ChatGPT to generate some potential names, including:
-smc_ops / smc_hook / smc_aug / smc_ext / smc_alert / smc_support
+-- 
+2.39.5 (Apple Git-154)
 
-Perhaps these can be used as references.
-
-However, in any case, these changes need to be acked by the SMC
-maintainer, but for what I can tell, the maintainer of SMC is currently on
-leave, so this discussion may still take some time.
-
-Best wishes,
-D. Wythe
-
-> 
-> > 
-> > It seems like you're aiming to define a common set of operations, but
-> > the implementation appears to be intertwined with BPF. If this is
-> > intended to be a common interface, and if we are using another operation,
-> > there shouldn’t be a need to hold a BPF reference.
-> > 
-> > As your 'help' sugguest, What about smc_hook ?
-> > 
-> > Best regards,
-> > Dust
-> > 
-> > 
 
