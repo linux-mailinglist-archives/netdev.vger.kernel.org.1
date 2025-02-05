@@ -1,189 +1,82 @@
-Return-Path: <netdev+bounces-163242-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-163243-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4F5B9A29AA5
-	for <lists+netdev@lfdr.de>; Wed,  5 Feb 2025 21:08:57 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9653DA29ADB
+	for <lists+netdev@lfdr.de>; Wed,  5 Feb 2025 21:11:51 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A02F23A7C4C
-	for <lists+netdev@lfdr.de>; Wed,  5 Feb 2025 20:08:48 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 6F8E11883183
+	for <lists+netdev@lfdr.de>; Wed,  5 Feb 2025 20:11:56 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BC09620CCDD;
-	Wed,  5 Feb 2025 20:08:52 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2BC91213227;
+	Wed,  5 Feb 2025 20:10:31 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="WHM7nKWA"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="s0vG1fwS"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0454C1FFC5D
-	for <netdev@vger.kernel.org>; Wed,  5 Feb 2025 20:08:50 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E84D01D6DD4;
+	Wed,  5 Feb 2025 20:10:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1738786132; cv=none; b=eA49TebB6IQayRlMkS3wijA3C6GtpYUzuhoHbwbIGN1699f6Vrjh92MwApQ4vm/i8Bzpycwv2KtNanT8TN8MtN2zmx8VqHsdSHrc/R3zzb+/gn6F2icS30mnTVHFUSj+ChLFdIYZdxoG7U1gf9GLBwy7OFWb8cMdv+0a4yMID1o=
+	t=1738786231; cv=none; b=GSs9k4vtevVQnH07irVvXF4UbfeiJgy/bcwyZsEXotd3WS5tPkehG1wdyxgVR4EtdI0ZIGySbhOz9W/tlZJvpdm+skk9JxLLxj6xtpzmA6s5VpI2weXgqnGJRpO9XcCR8BNrbaSgUmIPP0VSjEh8QZxmTNHisL43ROslWUe06gI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1738786132; c=relaxed/simple;
-	bh=48MpIc2k/jmY6t1ssxUJmm8tTwOgHOeMG5JQpI2vmhE=;
+	s=arc-20240116; t=1738786231; c=relaxed/simple;
+	bh=n5Fu9QQKG274QOcfOnLbIuHfV+7+uC51NIfVkJyjpUY=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=nbxmXm8lH3OHP58Uy5ugDnMVtRRYQ/R646xFB8gziHTK1g5BN6HzJPzdjFifPEEJqsxdU+2sFBQWdzDzpJpPro0SiZYBf8TYvvgBdCaWIvzM6JHmPkeAlCrTWQ1i3udstfDDhKACeAgUgeNunPQoYUvKC3jjvnV+JUUKMhHzLxA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=WHM7nKWA; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1738786129;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=+33+Ba770uAWZtcvAI/AKlCQsR645ObAcdThYuTeEVg=;
-	b=WHM7nKWAX/Gj0OjHG1A+SKrg2p2AvEbxPKn50BFuWiq+HTq8RNzQMkwz+j5RmAKVD3jWhF
-	7A9ApTMV1k6DRwWGecsU6/fwh77pmQCeuJoZ6LIhteo/kDLwQtssuvgk0p813QHBfwTIGK
-	WUs5AHJiDV3LfrM5HOReSkG2NOU3cao=
-Received: from mx-prod-mc-05.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
- relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-605-JPd_PKP3ML6oGb8Ch3XJQA-1; Wed,
- 05 Feb 2025 15:08:46 -0500
-X-MC-Unique: JPd_PKP3ML6oGb8Ch3XJQA-1
-X-Mimecast-MFC-AGG-ID: JPd_PKP3ML6oGb8Ch3XJQA
-Received: from mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.111])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mx-prod-mc-05.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 75EB31956096;
-	Wed,  5 Feb 2025 20:08:44 +0000 (UTC)
-Received: from wcosta-thinkpadt14gen4.rmtbr.csb (unknown [10.22.88.24])
-	by mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 3D79E1800878;
-	Wed,  5 Feb 2025 20:08:36 +0000 (UTC)
-Date: Wed, 5 Feb 2025 17:08:35 -0300
-From: Wander Lairson Costa <wander@redhat.com>
-To: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
-Cc: Tony Nguyen <anthony.l.nguyen@intel.com>, davem@davemloft.net, 
-	kuba@kernel.org, pabeni@redhat.com, edumazet@google.com, andrew+netdev@lunn.ch, 
-	netdev@vger.kernel.org, rostedt@goodmis.org, clrkwllms@kernel.org, jgarzik@redhat.com, 
-	yuma@redhat.com, linux-rt-devel@lists.linux.dev
-Subject: Re: [PATCH net 0/4][pull request] igb: fix igb_msix_other() handling
- for PREEMPT_RT
-Message-ID: <mrw3tpwsravsaibkcpptdkko3ff6qtk6w6ernqvjisk4l7owok@q6hmxkzcdkey>
-References: <20250204175243.810189-1-anthony.l.nguyen@intel.com>
- <20250205094818.I-Jl44AK@linutronix.de>
+	 Content-Type:Content-Disposition:In-Reply-To; b=Nba9lmhraQkTCyeLGSVSPbDs9O/3pn7GCIww8o5nBeDXmDP3Vr+2AdKNkcOMVDNXNQss5d2KlOTDkIUS0RU7G6/eaJgesuIeLxcxo9e7IVqSB8F2qjdK4jwZLrmh86aGc2lA01K1Ce+p/A3NjTvhiDiEM58JhFDnmBoZw6SNPms=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=s0vG1fwS; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 88B01C4CED1;
+	Wed,  5 Feb 2025 20:10:27 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1738786230;
+	bh=n5Fu9QQKG274QOcfOnLbIuHfV+7+uC51NIfVkJyjpUY=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=s0vG1fwSrABA9KsB/GC3atYToYgUnehdtv5U1rahq7r6NUCKCxVDZRqW0LDgquv8M
+	 bEOWhROAEucIWEEcgrTrYL69PObFHuAfjtUjliTBKd7FWDuJjs4AkFW4ncLqq5yqQh
+	 z2lcMDUCzkgICFWMLPEYxEuvLdMGG1nriNejoGkpyNXQu7H1qjRXS2/Jc+aJEGaNRb
+	 iPrnu18g9s7G802Y0JOzyWoWhtmYYdmPdE/aRlQnDkU+f6alj/hNtM7E1WqyY9GnzL
+	 943ze64Hep2uRbCL10E/TJndQkGzur1fnttdrTZPcgivhCDWd9h1mLFXPctL2R1nQz
+	 FA6TTCGXE3xMQ==
+Date: Wed, 5 Feb 2025 20:10:25 +0000
+From: Simon Horman <horms@kernel.org>
+To: Song Yoong Siang <yoong.siang.song@intel.com>
+Cc: Tony Nguyen <anthony.l.nguyen@intel.com>,
+	Przemek Kitszel <przemyslaw.kitszel@intel.com>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S . Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Vinicius Costa Gomes <vinicius.gomes@intel.com>,
+	Malli C <mallikarjuna.chilakala@intel.com>,
+	Maciej Fijalkowski <maciej.fijalkowski@intel.com>,
+	intel-wired-lan@lists.osuosl.org, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org, stable@vger.kernel.org
+Subject: Re: [PATCH iwl-net v1 1/1] igc: Set buffer type for empty frames in
+ igc_init_empty_frame
+Message-ID: <20250205201025.GL554665@kernel.org>
+References: <20250205023603.798819-1-yoong.siang.song@intel.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <20250205094818.I-Jl44AK@linutronix.de>
-X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.111
+In-Reply-To: <20250205023603.798819-1-yoong.siang.song@intel.com>
 
-On Wed, Feb 05, 2025 at 10:48:18AM +0100, Sebastian Andrzej Siewior wrote:
-> On 2025-02-04 09:52:36 [-0800], Tony Nguyen wrote:
-> > Wander Lairson Costa says:
-> > 
-> > This is the second attempt at fixing the behavior of igb_msix_other()
-> > for PREEMPT_RT. The previous attempt [1] was reverted [2] following
-> > concerns raised by Sebastian [3].
+On Wed, Feb 05, 2025 at 10:36:03AM +0800, Song Yoong Siang wrote:
+> Set the buffer type to IGC_TX_BUFFER_TYPE_SKB for empty frame in the
+> igc_init_empty_frame function. This ensures that the buffer type is
+> correctly identified and handled during Tx ring cleanup.
 > 
-> I still prefer a solution where we don't have the ifdef in the driver. I
-> was presented two traces but I didn't get why it works in once case but
-> not in the other. Maybe it was too obvious.
+> Fixes: db0b124f02ba ("igc: Enhance Qbv scheduling by using first flag bit")
+> Cc: stable@vger.kernel.org # 6.2+
+> Signed-off-by: Song Yoong Siang <yoong.siang.song@intel.com>
 
-Copying the traces here for further explanation. Both cases are for
-PREEMPT_RT.
-
-Failure case:
-
-kworker/-86      0...1    85.381866: function:                   igbvf_reset
-kworker/-86      0...2    85.381866: function:                      e1000_reset_hw_vf
-kworker/-86      0...2    85.381867: function:                         e1000_check_for_rst_vf
-kworker/-86      0...2    85.381868: function:                         e1000_write_posted_mbx
-kworker/-86      0...2    85.381868: function:                            e1000_write_mbx_vf
-kworker/-86      0...2    85.381870: function:                            e1000_check_for_ack_vf // repeats for 2000 lines
-...
-kworker/-86      0.N.2    86.393782: function:                         e1000_read_posted_mbx
-kworker/-86      0.N.2    86.398606: function:                      e1000_init_hw_vf
-kworker/-86      0.N.2    86.398606: function:                         e1000_rar_set_vf
-kworker/-86      0.N.2    86.398606: function:                            e1000_write_posted_mbx
-irq/65-e-1287    0d..1    86.398609: function:             igb_msix_other
-irq/65-e-1287    0d..1    86.398609: function:                igb_rd32
-irq/65-e-1287    0d..2    86.398610: function:                igb_check_for_rst
-irq/65-e-1287    0d..2    86.398610: function:                igb_check_for_rst_pf
-irq/65-e-1287    0d..2    86.398610: function:                   igb_rd32
-irq/65-e-1287    0d..2    86.398611: function:                igb_check_for_msg
-irq/65-e-1287    0d..2    86.398611: function:                igb_check_for_msg_pf
-irq/65-e-1287    0d..2    86.398611: function:                   igb_rd32
-irq/65-e-1287    0d..2    86.398612: function:                igb_rcv_msg_from_vf
-irq/65-e-1287    0d..2    86.398612: function:                   igb_read_mbx
-irq/65-e-1287    0d..2    86.398612: function:                   igb_read_mbx_pf
-irq/65-e-1287    0d..2    86.398612: function:                      igb_obtain_mbx_lock_pf
-irq/65-e-1287    0d..2    86.398612: function:                         igb_rd32
-
-In the above trace, observe that the ISR igb_msix_other() is only
-scheduled after e1000_write_posted_mbx() fails due to a timeout.
-The interrupt handler should run during the looping calls to
-e1000_check_for_ack_vf(), but it is not scheduled because
-preemption is disabled.
-
-Note that e1000_check_for_ack_vf() is called 2000 times before
-it finally times out.
-
-Sucessful case:
-
-      ip-5603    0...1  1884.710747: function:             igbvf_reset
-      ip-5603    0...2  1884.710754: function:                e1000_reset_hw_vf
-      ip-5603    0...2  1884.710755: function:                   e1000_check_for_rst_vf
-      ip-5603    0...2  1884.710756: function:                   e1000_write_posted_mbx
-      ip-5603    0...2  1884.710756: function:                      e1000_write_mbx_vf
-      ip-5603    0...2  1884.710758: function:                      e1000_check_for_ack_vf
-      ip-5603    0d.h2  1884.710760: function:             igb_msix_other
-      ip-5603    0d.h2  1884.710760: function:                igb_rd32
-      ip-5603    0d.h3  1884.710761: function:                igb_check_for_rst
-      ip-5603    0d.h3  1884.710761: function:                igb_check_for_rst_pf
-      ip-5603    0d.h3  1884.710761: function:                   igb_rd32
-      ip-5603    0d.h3  1884.710762: function:                igb_check_for_msg
-      ip-5603    0d.h3  1884.710762: function:                igb_check_for_msg_pf
-      ip-5603    0d.h3  1884.710762: function:                   igb_rd32
-      ip-5603    0d.h3  1884.710763: function:                igb_rcv_msg_from_vf
-      ip-5603    0d.h3  1884.710763: function:                   igb_read_mbx
-      ip-5603    0d.h3  1884.710763: function:                   igb_read_mbx_pf
-      ip-5603    0d.h3  1884.710763: function:                      igb_obtain_mbx_lock_pf
-      ip-5603    0d.h3  1884.710763: function:                         igb_rd32
-
-Since we forced the interrupt context for igb_msix_other(), it now
-runs immediately while the driver checks for an acknowledgment via
-e1000_check_for_ack_vf().
-
-> In the mean time:
-> 
-> igb_msg_task_irq_safe()
-> -> vfs_raw_spin_lock_irqsave() // raw_spinlock_t
-> -> igb_vf_reset_event()
->   -> igb_vf_reset()
->     -> igb_set_rx_mode()
->       -> igb_write_mc_addr_list()
->          -> mta_list = kcalloc(netdev_mc_count(netdev), 6, GFP_ATOMIC); // kaboom?
-
-Perhaps the solution is to preallocate this buffer, if possible.
-Doing so would significantly simplify the patch. However, this
-would require knowing when the multicast (mc) count changes.
-I attempted to identify this but have not succeeded so far.
-
-> 
-> By explicitly disabling preemption or using a raw_spinlock_t you need to
-> pay attention not to do anything that might lead to unbounded loops
-> (like iterating over many lists, polling on a bit for ages, …) and
-> paying attention that the whole API underneath that it is not doing that
-> is allowed to.
-
-I unsure if I understood what you are trying to say.
-
-> 
-> Sebastian
-> 
-
+Reviewed-by: Simon Horman <horms@kernel.org>
 
