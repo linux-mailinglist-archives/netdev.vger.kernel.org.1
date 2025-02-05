@@ -1,65 +1,80 @@
-Return-Path: <netdev+bounces-162937-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-162938-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id B2AABA2882B
-	for <lists+netdev@lfdr.de>; Wed,  5 Feb 2025 11:39:22 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 74FB1A2885D
+	for <lists+netdev@lfdr.de>; Wed,  5 Feb 2025 11:46:13 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 406301679BE
-	for <lists+netdev@lfdr.de>; Wed,  5 Feb 2025 10:39:21 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 684EA7A94CB
+	for <lists+netdev@lfdr.de>; Wed,  5 Feb 2025 10:45:06 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4DC5822AE65;
-	Wed,  5 Feb 2025 10:39:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0D23B22C339;
+	Wed,  5 Feb 2025 10:43:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="FgtdGvGY"
 X-Original-To: netdev@vger.kernel.org
-Received: from metis.whiteo.stw.pengutronix.de (metis.whiteo.stw.pengutronix.de [185.203.201.7])
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.16])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5D78622B5A3
-	for <netdev@vger.kernel.org>; Wed,  5 Feb 2025 10:39:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.203.201.7
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2E28122AE73
+	for <netdev@vger.kernel.org>; Wed,  5 Feb 2025 10:43:15 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.16
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1738751952; cv=none; b=Y1IoGEvJ0eDC1O2h5bsDxSJmwlKk3Z/Y3lsUh4ZTDtt1oc0PIkxQBNsOs0B1VAIc3ay9NU4aGtDdXBGoCkWjzr5VHUpihOaCj7OdeWWG5V39XZOW1BRw6t+6RLTkSplxry+XQnq9K/6cwzqwyXfVfJ1InUrG8Ym+2ajll3ycylE=
+	t=1738752197; cv=none; b=jTYo8dx0zoWJ2WUtlQaivQcpxN+wdBlrmcm8I/sZlVW0VA6WAtBhA+zrZJecKD8CiJyiJ1sw4ejBt+cZPqSo7l1KyESGQwDx3Tl93mvQzn4hRf3jMRcXHoVUYtP8vixgqcLV8MAwyt3yIERHrPF0JnpjMfxcfbwTAE01sRleAx0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1738751952; c=relaxed/simple;
-	bh=P0VU7UMU1X2gguhoQwApVSnZes7wcczyANucJcp6haI=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=XlH7Ciq3VrxsnFUgVfxk3WhYLEFujk7b0SIQDXrGsMZBD/DKjB63W/07RQErZRcXtrF0Rz3SirZA/UwaMIqEzKqAPgesxj4G7vRIfo0Opnov3Xg4Q3ume4CJWlEROeiB6IkwaqoqG5A8ErbVLED5TTz/1T56FUiQZWpUIY1sHME=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de; spf=pass smtp.mailfrom=pengutronix.de; arc=none smtp.client-ip=185.203.201.7
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=pengutronix.de
-Received: from drehscheibe.grey.stw.pengutronix.de ([2a0a:edc0:0:c01:1d::a2])
-	by metis.whiteo.stw.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
-	(Exim 4.92)
-	(envelope-from <ore@pengutronix.de>)
-	id 1tfcnx-0003EZ-3I; Wed, 05 Feb 2025 11:38:49 +0100
-Received: from dude04.red.stw.pengutronix.de ([2a0a:edc0:0:1101:1d::ac])
-	by drehscheibe.grey.stw.pengutronix.de with esmtps  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.96)
-	(envelope-from <ore@pengutronix.de>)
-	id 1tfcnv-003cUo-1b;
-	Wed, 05 Feb 2025 11:38:47 +0100
-Received: from ore by dude04.red.stw.pengutronix.de with local (Exim 4.96)
-	(envelope-from <ore@pengutronix.de>)
-	id 1tfcnv-009XYV-1O;
-	Wed, 05 Feb 2025 11:38:47 +0100
-From: Oleksij Rempel <o.rempel@pengutronix.de>
-To: Andrew Lunn <andrew@lunn.ch>,
-	Heiner Kallweit <hkallweit1@gmail.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Jonathan Corbet <corbet@lwn.net>
-Cc: Oleksij Rempel <o.rempel@pengutronix.de>,
-	kernel@pengutronix.de,
-	linux-kernel@vger.kernel.org,
-	netdev@vger.kernel.org,
-	Russell King <linux@armlinux.org.uk>
-Subject: [PATCH net-next v1 1/1] net: phy: dp83td510: introduce LED framework support
-Date: Wed,  5 Feb 2025 11:38:46 +0100
-Message-Id: <20250205103846.2273833-1-o.rempel@pengutronix.de>
-X-Mailer: git-send-email 2.39.5
+	s=arc-20240116; t=1738752197; c=relaxed/simple;
+	bh=4Ag5ibDA/QpCTvAlojzppiuL7T6KCryqcE51LrTwlJE=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=kIIQVI8bMNjquofIKo9pKu6DRkuLxtnSEz1L1L+jh23frXo9p88jOWm8jaPZlxE/QfnmjVHlA9J4Zip4AwDuxpdsLgD1g62ozDCKzvThpqDQsntvEXm5xS2ywgtSWuru3ymxSMWh7SxYLxhKn5H92bD4on2x30Gv7QMFQwxonI4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=FgtdGvGY; arc=none smtp.client-ip=198.175.65.16
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1738752196; x=1770288196;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=4Ag5ibDA/QpCTvAlojzppiuL7T6KCryqcE51LrTwlJE=;
+  b=FgtdGvGYMT0IrhSMQxeO2elC0OnTUOY2qrW3F/Z2IS6vlp+YSilnlr40
+   sgv/k0Ly1p4/zx0+tOe6mIsiZvQ7jsq3eaDB25UZEWGGXNe7oM293A98p
+   kJIApMAvdlyVi7c+QardYT/ecc7xhDu5v+qy9yytDgD6aYSi1sjgb4cnA
+   vdx97VxSOE63xc25yypTps6RsTlYJnG6qrcci23ihbXhEdlD2ntpYq4Am
+   STpQAFIX3QjukufxZ75eIThv171AED5eff66+iXEOqVUJFKJS4PX2QFuE
+   phKMpTpE2lCKcr39YAZwcAL4m6WSjOY4f6ZUsib+rtgcWA6J/j35BZdiY
+   w==;
+X-CSE-ConnectionGUID: NueEUZzSTC60Nff8F3MLcQ==
+X-CSE-MsgGUID: Okk4AsJPTyW+9Lg8YNimXA==
+X-IronPort-AV: E=McAfee;i="6700,10204,11336"; a="39453190"
+X-IronPort-AV: E=Sophos;i="6.13,261,1732608000"; 
+   d="scan'208";a="39453190"
+Received: from orviesa005.jf.intel.com ([10.64.159.145])
+  by orvoesa108.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 05 Feb 2025 02:43:16 -0800
+X-CSE-ConnectionGUID: F2mt01+/Rc+vMCUx0oi0pQ==
+X-CSE-MsgGUID: cVvQEpvDT5GIYb/7SfZTPQ==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.12,224,1728975600"; 
+   d="scan'208";a="116061698"
+Received: from irvmail002.ir.intel.com ([10.43.11.120])
+  by orviesa005.jf.intel.com with ESMTP; 05 Feb 2025 02:43:12 -0800
+Received: from pkitszel-desk.tendawifi.com (unknown [10.245.246.222])
+	by irvmail002.ir.intel.com (Postfix) with ESMTP id 2A8A22FC63;
+	Wed,  5 Feb 2025 10:43:10 +0000 (GMT)
+From: Przemek Kitszel <przemyslaw.kitszel@intel.com>
+To: intel-wired-lan@lists.osuosl.org,
+	Tony Nguyen <anthony.l.nguyen@intel.com>
+Cc: netdev@vger.kernel.org,
+	Konrad Knitter <konrad.knitter@intel.com>,
+	Michal Swiatkowski <michal.swiatkowski@linux.intel.com>,
+	Przemek Kitszel <przemyslaw.kitszel@intel.com>,
+	Qiuxu Zhuo <qiuxu.zhuo@intel.com>,
+	Linus Torvalds <torvalds@linux-foundation.org>,
+	Kees Cook <kees@kernel.org>,
+	Nick Desaulniers <nick.desaulniers@gmail.com>
+Subject: [PATCH iwl-net] ice: health.c: fix compilation on gcc 7.5
+Date: Wed,  5 Feb 2025 11:42:12 +0100
+Message-ID: <20250205104252.30464-2-przemyslaw.kitszel@intel.com>
+X-Mailer: git-send-email 2.46.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -67,229 +82,70 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-SA-Exim-Connect-IP: 2a0a:edc0:0:c01:1d::a2
-X-SA-Exim-Mail-From: ore@pengutronix.de
-X-SA-Exim-Scanned: No (on metis.whiteo.stw.pengutronix.de); SAEximRunCond expanded to false
-X-PTX-Original-Recipient: netdev@vger.kernel.org
 
-Add LED brightness, mode, HW control and polarity functions to enable
-external LED control in the TI DP83TD510 PHY.
+GCC 7 is not as good as GCC 8+ in telling what is a compile-time const,
+and thus could be used for static storage. So we could not use variables
+for that, no matter how much "const" keyword is sprinkled around.
 
-Signed-off-by: Oleksij Rempel <o.rempel@pengutronix.de>
+Excerpt from the report:
+My GCC is: gcc (Ubuntu 7.5.0-3ubuntu1~18.04) 7.5.0.
+
+  CC [M]  drivers/net/ethernet/stmicro/stmmac/stmmac_mdio.o
+drivers/net/ethernet/intel/ice/devlink/health.c:35:3: error: initializer element is not constant
+   ice_common_port_solutions, {ice_port_number_label}},
+   ^~~~~~~~~~~~~~~~~~~~~~~~~
+drivers/net/ethernet/intel/ice/devlink/health.c:35:3: note: (near initialization for 'ice_health_status_lookup[0].solution')
+drivers/net/ethernet/intel/ice/devlink/health.c:35:31: error: initializer element is not constant
+   ice_common_port_solutions, {ice_port_number_label}},
+                               ^~~~~~~~~~~~~~~~~~~~~
+drivers/net/ethernet/intel/ice/devlink/health.c:35:31: note: (near initialization for 'ice_health_status_lookup[0].data_label[0]')
+drivers/net/ethernet/intel/ice/devlink/health.c:37:46: error: initializer element is not constant
+   "Change or replace the module or cable.", {ice_port_number_label}},
+                                              ^~~~~~~~~~~~~~~~~~~~~
+drivers/net/ethernet/intel/ice/devlink/health.c:37:46: note: (near initialization for 'ice_health_status_lookup[1].data_label[0]')
+drivers/net/ethernet/intel/ice/devlink/health.c:39:3: error: initializer element is not constant
+   ice_common_port_solutions, {ice_port_number_label}},
+   ^~~~~~~~~~~~~~~~~~~~~~~~~
+
+Fixes: 85d6164ec56d ("ice: add fw and port health reporters")
+Reported-by: Qiuxu Zhuo <qiuxu.zhuo@intel.com>
+Closes: https://lore.kernel.org/netdev/CY8PR11MB7134BF7A46D71E50D25FA7A989F72@CY8PR11MB7134.namprd11.prod.outlook.com
+Signed-off-by: Przemek Kitszel <przemyslaw.kitszel@intel.com>
 ---
- drivers/net/phy/dp83td510.c | 187 ++++++++++++++++++++++++++++++++++++
- 1 file changed, 187 insertions(+)
+I would really like to bump min gcc to 8.5 (RH 8 family),
+instead of supporting old Ubuntu. However SLES 15 is also stuck with gcc 7.5 :(
 
-diff --git a/drivers/net/phy/dp83td510.c b/drivers/net/phy/dp83td510.c
-index a42af9c168ec..23af1ac194fa 100644
---- a/drivers/net/phy/dp83td510.c
-+++ b/drivers/net/phy/dp83td510.c
-@@ -204,10 +204,191 @@ struct dp83td510_priv {
- #define DP83TD510E_UNKN_030E				0x30e
- #define DP83TD510E_030E_VAL				0x2520
+CC: Linus Torvalds <torvalds@linux-foundation.org>
+CC: Kees Cook <kees@kernel.org>
+CC: Nick Desaulniers <nick.desaulniers@gmail.com>
+---
+ drivers/net/ethernet/intel/ice/devlink/health.c | 8 ++++----
+ 1 file changed, 4 insertions(+), 4 deletions(-)
+
+diff --git a/drivers/net/ethernet/intel/ice/devlink/health.c b/drivers/net/ethernet/intel/ice/devlink/health.c
+index ea40f7941259..4bc546bafad1 100644
+--- a/drivers/net/ethernet/intel/ice/devlink/health.c
++++ b/drivers/net/ethernet/intel/ice/devlink/health.c
+@@ -23,12 +23,12 @@ struct ice_health_status {
+  * For instance, Health Code 0x1002 is triggered when the command fails.
+  * Such codes should be disregarded by the end-user.
+  * The below lookup requires to be sorted by code.
++ * #defines instead of proper const strings are used due to gcc 7 limitation.
+  */
  
-+#define DP83TD510E_LEDS_CFG_1				0x460
-+#define DP83TD510E_LED_FN(idx, val)		(((val) & 0xf) << ((idx) * 4))
-+#define DP83TD510E_LED_FN_MASK(idx)			(0xf << ((idx) * 4))
-+/* link OK */
-+#define DP83TD510E_LED_MODE_LINK_OK			0x0
-+/* TX/RX activity */
-+#define DP83TD510E_LED_MODE_TX_RX_ACTIVITY		0x1
-+/* TX activity */
-+#define DP83TD510E_LED_MODE_TX_ACTIVITY			0x2
-+/* RX activity */
-+#define DP83TD510E_LED_MODE_RX_ACTIVITY			0x3
-+/* LR */
-+#define DP83TD510E_LED_MODE_LR				0x4
-+/* SR */
-+#define DP83TD510E_LED_MODE_SR				0x5
-+/* LED SPEED: High for 10Base-T */
-+#define DP83TD510E_LED_MODE_LED_SPEED			0x6
-+/* Duplex mode */
-+#define DP83TD510E_LED_MODE_DUPLEX			0x7
-+/* link + blink on activity with stretch option */
-+#define DP83TD510E_LED_MODE_LINK_BLINK			0x8
-+/* blink on activity with stretch option */
-+#define DP83TD510E_LED_MODE_BLINK_ACTIVITY		0x9
-+/* blink on tx activity with stretch option */
-+#define DP83TD510E_LED_MODE_BLINK_TX			0xa
-+/* blink on rx activity with stretch option */
-+#define DP83TD510E_LED_MODE_BLINK_RX			0xb
-+/* link_lost */
-+#define DP83TD510E_LED_MODE_LINK_LOST			0xc
-+/* PRBS error: toggles on error */
-+#define DP83TD510E_LED_MODE_PRBS_ERROR			0xd
-+/* XMII TX/RX Error with stretch option */
-+#define DP83TD510E_LED_MODE_XMII_ERR			0xe
-+
-+#define DP83TD510E_LED_COUNT				4
-+
-+#define DP83TD510E_LEDS_CFG_2				0x469
-+#define DP83TD510E_LED_POLARITY(idx)			BIT((idx) * 4 + 2)
-+#define DP83TD510E_LED_DRV_VAL(idx)			BIT((idx) * 4 + 1)
-+#define DP83TD510E_LED_DRV_EN(idx)			BIT((idx) * 4)
-+
- #define DP83TD510E_ALCD_STAT				0xa9f
- #define DP83TD510E_ALCD_COMPLETE			BIT(15)
- #define DP83TD510E_ALCD_CABLE_LENGTH			GENMASK(10, 0)
+-static const char *const ice_common_port_solutions =
+-	"Check your cable connection. Change or replace the module or cable. Manually set speed and duplex.";
+-static const char *const ice_port_number_label = "Port Number";
+-static const char *const ice_update_nvm_solution = "Update to the latest NVM image.";
++#define ice_common_port_solutions	"Check your cable connection. Change or replace the module or cable. Manually set speed and duplex."
++#define ice_port_number_label		"Port Number"
++#define ice_update_nvm_solution		"Update to the latest NVM image."
  
-+static int dp83td510_led_brightness_set(struct phy_device *phydev, u8 index,
-+					enum led_brightness brightness)
-+{
-+	u32 val;
-+
-+	if (index >= DP83TD510E_LED_COUNT)
-+		return -EINVAL;
-+
-+	val = DP83TD510E_LED_DRV_EN(index);
-+
-+	if (brightness)
-+		val |= DP83TD510E_LED_DRV_VAL(index);
-+
-+	return phy_modify_mmd(phydev, MDIO_MMD_VEND2, DP83TD510E_LEDS_CFG_2,
-+			      DP83TD510E_LED_DRV_VAL(index) |
-+			      DP83TD510E_LED_DRV_EN(index), val);
-+}
-+
-+static int dp83td510_led_mode(u8 index, unsigned long rules)
-+{
-+	if (index >= DP83TD510E_LED_COUNT)
-+		return -EINVAL;
-+
-+	switch (rules) {
-+	case BIT(TRIGGER_NETDEV_LINK):
-+		return DP83TD510E_LED_MODE_LINK_OK;
-+	case BIT(TRIGGER_NETDEV_LINK_10):
-+		return DP83TD510E_LED_MODE_LED_SPEED;
-+	case BIT(TRIGGER_NETDEV_FULL_DUPLEX):
-+		return DP83TD510E_LED_MODE_DUPLEX;
-+	case BIT(TRIGGER_NETDEV_TX):
-+		return DP83TD510E_LED_MODE_TX_ACTIVITY;
-+	case BIT(TRIGGER_NETDEV_RX):
-+		return DP83TD510E_LED_MODE_RX_ACTIVITY;
-+	case BIT(TRIGGER_NETDEV_TX) | BIT(TRIGGER_NETDEV_RX):
-+		return DP83TD510E_LED_MODE_TX_RX_ACTIVITY;
-+	case BIT(TRIGGER_NETDEV_LINK) | BIT(TRIGGER_NETDEV_TX) |
-+			BIT(TRIGGER_NETDEV_RX):
-+		return DP83TD510E_LED_MODE_LINK_BLINK;
-+	default:
-+		return -EOPNOTSUPP;
-+	}
-+}
-+
-+static int dp83td510_led_hw_is_supported(struct phy_device *phydev, u8 index,
-+					 unsigned long rules)
-+{
-+	int ret;
-+
-+	ret = dp83td510_led_mode(index, rules);
-+	if (ret < 0)
-+		return ret;
-+
-+	return 0;
-+}
-+
-+static int dp83td510_led_hw_control_set(struct phy_device *phydev, u8 index,
-+					unsigned long rules)
-+{
-+	int mode, ret;
-+
-+	mode = dp83td510_led_mode(index, rules);
-+	if (mode < 0)
-+		return mode;
-+
-+	ret = phy_modify_mmd(phydev, MDIO_MMD_VEND2, DP83TD510E_LEDS_CFG_1,
-+			     DP83TD510E_LED_FN_MASK(index),
-+			     DP83TD510E_LED_FN(index, mode));
-+	if (ret)
-+		return ret;
-+
-+	return phy_modify_mmd(phydev, MDIO_MMD_VEND2, DP83TD510E_LEDS_CFG_2,
-+				DP83TD510E_LED_DRV_EN(index), 0);
-+}
-+
-+static int dp83td510_led_hw_control_get(struct phy_device *phydev,
-+					u8 index, unsigned long *rules)
-+{
-+	int val;
-+
-+	val = phy_read_mmd(phydev, MDIO_MMD_VEND2, DP83TD510E_LEDS_CFG_1);
-+	if (val < 0)
-+		return val;
-+
-+	val &= DP83TD510E_LED_FN_MASK(index);
-+	val >>= index * 4;
-+
-+	switch (val) {
-+	case DP83TD510E_LED_MODE_LINK_OK:
-+		*rules = BIT(TRIGGER_NETDEV_LINK);
-+		break;
-+	/* LED mode: LED SPEED (10BaseT1L indicator) */
-+	case DP83TD510E_LED_MODE_LED_SPEED:
-+		*rules = BIT(TRIGGER_NETDEV_LINK_10);
-+		break;
-+	case DP83TD510E_LED_MODE_DUPLEX:
-+		*rules = BIT(TRIGGER_NETDEV_FULL_DUPLEX);
-+		break;
-+	case DP83TD510E_LED_MODE_TX_ACTIVITY:
-+		*rules = BIT(TRIGGER_NETDEV_TX);
-+		break;
-+	case DP83TD510E_LED_MODE_RX_ACTIVITY:
-+		*rules = BIT(TRIGGER_NETDEV_RX);
-+		break;
-+	case DP83TD510E_LED_MODE_TX_RX_ACTIVITY:
-+		*rules = BIT(TRIGGER_NETDEV_TX) | BIT(TRIGGER_NETDEV_RX);
-+		break;
-+	case DP83TD510E_LED_MODE_LINK_BLINK:
-+		*rules = BIT(TRIGGER_NETDEV_LINK) |
-+			 BIT(TRIGGER_NETDEV_TX) |
-+			 BIT(TRIGGER_NETDEV_RX);
-+		break;
-+	default:
-+		*rules = 0;
-+		break;
-+	}
-+
-+	return 0;
-+}
-+
-+static int dp83td510_led_polarity_set(struct phy_device *phydev, int index,
-+				      unsigned long modes)
-+{
-+	u16 polarity = DP83TD510E_LED_POLARITY(index);
-+	u32 mode;
-+
-+	for_each_set_bit(mode, &modes, __PHY_LED_MODES_NUM) {
-+		switch (mode) {
-+		case PHY_LED_ACTIVE_LOW:
-+			polarity = 0;
-+			break;
-+		default:
-+			return -EINVAL;
-+		}
-+	}
-+
-+	return phy_modify_mmd(phydev, MDIO_MMD_VEND2, DP83TD510E_LEDS_CFG_2,
-+			      DP83TD510E_LED_POLARITY(index), polarity);
-+}
-+
- /**
-  * dp83td510_update_stats - Update the PHY statistics for the DP83TD510 PHY.
-  * @phydev: Pointer to the phy_device structure.
-@@ -712,6 +893,12 @@ static struct phy_driver dp83td510_driver[] = {
- 	.get_phy_stats	= dp83td510_get_phy_stats,
- 	.update_stats	= dp83td510_update_stats,
- 
-+	.led_brightness_set = dp83td510_led_brightness_set,
-+	.led_hw_is_supported = dp83td510_led_hw_is_supported,
-+	.led_hw_control_set = dp83td510_led_hw_control_set,
-+	.led_hw_control_get = dp83td510_led_hw_control_get,
-+	.led_polarity_set = dp83td510_led_polarity_set,
-+
- 	.suspend	= genphy_suspend,
- 	.resume		= genphy_resume,
- } };
+ static const struct ice_health_status ice_health_status_lookup[] = {
+ 	{ICE_AQC_HEALTH_STATUS_ERR_UNKNOWN_MOD_STRICT, "An unsupported module was detected.",
+
+base-commit: 4241a702e0d0c2ca9364cfac08dbf134264962de
 -- 
-2.39.5
+2.46.0
 
 
