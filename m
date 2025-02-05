@@ -1,77 +1,77 @@
-Return-Path: <netdev+bounces-163159-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-163160-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 58F03A29710
-	for <lists+netdev@lfdr.de>; Wed,  5 Feb 2025 18:17:26 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9221AA29712
+	for <lists+netdev@lfdr.de>; Wed,  5 Feb 2025 18:17:34 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 57C38167915
-	for <lists+netdev@lfdr.de>; Wed,  5 Feb 2025 17:17:23 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id AD6EB7A2E2B
+	for <lists+netdev@lfdr.de>; Wed,  5 Feb 2025 17:16:38 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8555B1FC7F7;
-	Wed,  5 Feb 2025 17:16:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E72AD1FC7E7;
+	Wed,  5 Feb 2025 17:17:00 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="L/q2r/Yz"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="SincgL1f"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f46.google.com (mail-wm1-f46.google.com [209.85.128.46])
+Received: from mail-wr1-f48.google.com (mail-wr1-f48.google.com [209.85.221.48])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ABFB21FC112;
-	Wed,  5 Feb 2025 17:16:57 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.46
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1C2841FC7E4;
+	Wed,  5 Feb 2025 17:16:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.48
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1738775819; cv=none; b=OQgJcSqBkyfyimzm42eZx0R1LUE3pdtH6Il7tMLtPWRz5cH+oARJzQOQCkJFFqkSC+b0dK8f6o3PJ8jJvDdI1SpjqvFQN9jEvhi9VYUjZ3qc7ps+0RtpEAwoowtVr9n6zPH+/Z7cmJBiDN2UnXoN8jn4nkoZ6yuqbQNECDHn6xM=
+	t=1738775820; cv=none; b=pTIlf7lWhrrKBSQqE9elyzDEQdGalaGZVT/Ac9Zp2s3fa8yi03B8E9aMYEueezRxm3ittwRnNhFCJfS3IO8nJd00qpKBEw4hg9aQJgcEVrcoN4tmFuCD+ySi3OVzWBmi0quRLh06OIXV648ZA06kKpvc3/YAb6Q6thBkB56B/nM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1738775819; c=relaxed/simple;
-	bh=JNM+xJCaItR02fuhdJjaI5OW53diysJABbpIdanaGOU=;
+	s=arc-20240116; t=1738775820; c=relaxed/simple;
+	bh=HGkAqnHPOKtmMRSfsOuCAQLa4bQPzE6IJGRPUNgKpxw=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=Qhc4LtsplBKnNNQn9C312lW/WOcBlDxd/9x0IGg4JEp5kx5QjTTltHmvHvvdKb2E2ZnpC1BNoxaE1AaOv39avIKHIoLYsLqKPvAu8nTkhRjUuIGnt6PvCTnIenUZ7fT6O5ml/OzVyqrWM0fabFzBcnlJzbJz3ujZhjlJSrv6AHU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=L/q2r/Yz; arc=none smtp.client-ip=209.85.128.46
+	 MIME-Version; b=rSJQ0AdTmi60NOA72Ro2PFp9t/pJ1vUsFU5repXX4w+QufAF9Shfux9aeG0x1p2l6bU16q89upwR8KmtiKu/8wpotzFfa0mVw2Rs97Wi3wgbPWU/3nXkxfkUBg4Fhuu421aQKXZEORQ2uRJUln1gRhGW7gdUOYDg6T3S8xjVaAc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=SincgL1f; arc=none smtp.client-ip=209.85.221.48
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wm1-f46.google.com with SMTP id 5b1f17b1804b1-436202dd7f6so227695e9.0;
-        Wed, 05 Feb 2025 09:16:57 -0800 (PST)
+Received: by mail-wr1-f48.google.com with SMTP id ffacd0b85a97d-38db570a639so594528f8f.1;
+        Wed, 05 Feb 2025 09:16:58 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1738775816; x=1739380616; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1738775817; x=1739380617; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=Q560iUflz9C+1XE8KBgcw0eVXI/n7mkGqzaVgKvz5w0=;
-        b=L/q2r/YzY7dP6ZQGR6SAW6f26+Fl8Rb0mZ0TZM/0LWk5TpSavVNiXQUOwiVsLzxz5G
-         pnlF1LncVnGbdH0p9zlgmOHZ2Fvg6DTw8syGuJSIXJkToskVM60+kJs6iOiXCinwBMLG
-         1AfHQHy3H12EUIt76Z4YEexZB8x/nBVyc09j2/5f60A0n6UM2ndU+xbz2/9P11a0Kdq0
-         f26uhn2nhfMNZmQy7LnCcrJ0eIjLBeCO6DAKqNRQW6Jg0fo0JSd72odnwO5Stau1OhUL
-         61bZU4wa1nm9Ryj4agwq/DyDJxhWrOpaNaQkKYd2nyIlnUf8DL2qgKjJQJhMnqOK/bzF
-         NP3Q==
+        bh=kQMXDsJ+SXzMDP2QUH2Jb8GTtmEVlRcsfi8K0BJi/fA=;
+        b=SincgL1f2s5o0THeKpu/mg7lx8hXT3OYa+Ck3+ZeGroR5WPj3eh4/YFfGXn01bLzpZ
+         LVEkHi2JVXwv05BUfSZoVTySNbuuRC0wTm1t6YHHxeAaUrcb53KZIYcNzxwFUdY1f4MM
+         g/NNL4p8G4Uqm1EzcbLuQCQh4PcAVmPN/hC2XIA4FB8s2qEYxaJ/jLWmF4PgQM5DdRMN
+         AQ89tv+FTJUpP5ly4kAdQoaqz0XZe8yWmOyoN2UcKi2K5SKUWCi+KEA6ftoEqcE4CB53
+         v507dQkuVxzOyBGarbKhzHKO8kr3DHyG4u5AHHXMu8WRAVvWoQNjG3GF3N8RtUPrfZyA
+         QwFw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1738775816; x=1739380616;
+        d=1e100.net; s=20230601; t=1738775817; x=1739380617;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=Q560iUflz9C+1XE8KBgcw0eVXI/n7mkGqzaVgKvz5w0=;
-        b=Uipq7KtdwBex5Qzvp086NuZo85re/IlQ1xVycVRJhMkjBF6hM+13IL5ZkW9Su8OrFJ
-         emrl/HqWPaGaT0kLxHOwq+VLR9Zkl9XcBEklICQAa7vqR3ZP/F4JjMldC97EYxaNlowP
-         kd7uVh7vXO64a46P17r7m5Msbrbf/ekKhuUf1wJDtTu1CeiQrJFUoRkmVNcf6DqSLUOg
-         qOFV3qUN3IvPk2/+JEQSEFgC7Xzd6PmorX7PSDVXdpLNuhpr9e7qQqq12OXD4W9VbGNO
-         BHBYbkftqSS+nyHPfrFpTHeYaOwnjZUl/e4ZY3E2nVxMUTQYOn9pi7ASUnW4FJms06yg
-         VHsQ==
-X-Forwarded-Encrypted: i=1; AJvYcCW5d7l1a9gNr6fZOFrPXi6oYKiSeFhdr4+s5G6re3ZvyhmH/0+OkV3pNffnCQsHA4V/1vOvSM8=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yyh/nfly4iCs9hdt8qQBuO/ayqGU99CFirEGYcj6GOMWsCyyY4u
-	f9DDj37W0a+7SS4e0nQIUYY+2/bQb/9+hK7RZmxauL3Dh52n+llA
-X-Gm-Gg: ASbGncvUY0dZgZDrEQOLF+ELAJTYM8Zk6Hjq5JtWlLOq6FrFQFu2HaT7ue9+lVedXcS
-	jMq+l25OLur0Jo9EwWWWymh8DpyGbwzG48Rww+yS9tTmv17vfNeDRCa+h4pACDnL4yKny5KEYvO
-	LvdRMAUy//X3l8legyKL/VzHlxS/svqzrL6F6xu9H0Ssyo6uG8Y/IfBKfdLAHz5eWNmIYEfgFHd
-	tKA7bADwU+cicwcISWQaPkRoDLA3AjaibmPjde0wH+XhaYvPy8VyBe5nvHDPZnRjiHn1LZzZQzy
-	rZ6+KQrZmdrJ25vXn2lzbRdSo1Z6t4RE+c4PeRkRP7NKPQ==
-X-Google-Smtp-Source: AGHT+IHMB3fg22IzIJLhEQCjY975z2jCxrV33MmGgePRsw5efnIW+BFXH2OR6PNKKfqSgZvv8zW87w==
-X-Received: by 2002:a05:600c:5127:b0:436:1b81:b65c with SMTP id 5b1f17b1804b1-4390d43e2a7mr32846695e9.15.1738775815618;
-        Wed, 05 Feb 2025 09:16:55 -0800 (PST)
+        bh=kQMXDsJ+SXzMDP2QUH2Jb8GTtmEVlRcsfi8K0BJi/fA=;
+        b=M/9QBNcGFDwzttxxtoxAloeH+sw0Kdex5KOWnXWok43pfvLg633IU6RrAkODfGi6Ky
+         dUqM4cK9dFzaSpRqTkHR9SAUW0lTwXD+OJ/ZCNQew4+Ftg6CPZAq9GvRq/Mx+7sMBxTV
+         Z8eMHnNSzQFckZmKsBFBk1tJHnu7X29YDpKCSTu9PadHUwInWXGCLdI9IOquNgsfNsfF
+         2Nkm//ACLUSFidKXW7GHEmWAp9RECUK+mrmMo/lGlxbXuqkI/NkZAeeD71qaJtzYDOId
+         uNYosSjR/w1yBg0Wx4OmfG84yTgXfubYOXrnP18UUBzo5bi6qJeMoHw85WuraIWVDqK1
+         JJJA==
+X-Forwarded-Encrypted: i=1; AJvYcCU5ea3PjAUdFpcA4kTUIF1DQgNCRGkDY3Ttzms7qajoEgsVUEmPSFClH+weEH03bYcEdUvFr5A=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwxHOgp/YZAIoLPeZqKmnv4jY6r7vLo3/fITSTGaMex0FXnbCEk
+	P/IzovOuOJPvh1c9TDxyOuXIv/92RwFFwa+iK1cPW1RbTHJQi6KJ
+X-Gm-Gg: ASbGncu1DpagQrY1uccam523xdRapudmWRflf9Kv4yooVJMj6ZJtJm0D06wL2zqxf7y
+	IZJxwtMTg/5aiBcBZx50vAYeKdfBRh0NW+39XwBDmNvI7BPqgOJDLgPPaMYE801hWDvCOWKdk4s
+	05UnmMyln7Bvy+o+Iuc+QXozpKsCil3CSEBCqY45avrfs+PCRqHO09wKQkJ0NHJevq96nuC5VD/
+	YZGQ7v1JzAb5w7+jU07e6TQtfslPzmgL7UjW1qeui0xaK2J6rbsjabtO+Wjq8wipJ179WcP4Vo2
+	gf3TU+eoN/ddL3qZaCxcClqVjJ269DGtYkqTOQJCHt3bwA==
+X-Google-Smtp-Source: AGHT+IEiRZdKEQzz104CB7vDS3KpP+uAHK8+sp7Adp/Kw0nnMVg/0Q2w/YJFq2KrnuiDcd2sFW87YA==
+X-Received: by 2002:a5d:64ac:0:b0:386:374b:e8bc with SMTP id ffacd0b85a97d-38dbb270a4cmr97344f8f.15.1738775816997;
+        Wed, 05 Feb 2025 09:16:56 -0800 (PST)
 Received: from labdl-itc-sw06.tmt.telital.com ([2a01:7d0:4800:a:8eec:4bff:febd:98b9])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-4390daf4480sm27185705e9.27.2025.02.05.09.16.54
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-4390daf4480sm27185705e9.27.2025.02.05.09.16.55
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 05 Feb 2025 09:16:55 -0800 (PST)
+        Wed, 05 Feb 2025 09:16:56 -0800 (PST)
 From: Fabio Porcedda <fabio.porcedda@gmail.com>
 To: Oliver Neukum <oliver@neukum.org>,
 	Andrew Lunn <andrew+netdev@lunn.ch>,
@@ -85,9 +85,9 @@ To: Oliver Neukum <oliver@neukum.org>,
 Cc: linux-usb@vger.kernel.org,
 	netdev@vger.kernel.org,
 	Daniele Palmas <dnlplm@gmail.com>
-Subject: [PATCH 3/5] USB: serial: option: fix Telit Cinterion FN990A name
-Date: Wed,  5 Feb 2025 18:16:47 +0100
-Message-ID: <20250205171649.618162-4-fabio.porcedda@gmail.com>
+Subject: [PATCH 4/5] net: usb: qmi_wwan: fix Telit Cinterion FN990A name
+Date: Wed,  5 Feb 2025 18:16:48 +0100
+Message-ID: <20250205171649.618162-5-fabio.porcedda@gmail.com>
 X-Mailer: git-send-email 2.48.1
 In-Reply-To: <20250205171649.618162-1-fabio.porcedda@gmail.com>
 References: <20250205171649.618162-1-fabio.porcedda@gmail.com>
@@ -104,34 +104,22 @@ confusion with FN990B.
 
 Signed-off-by: Fabio Porcedda <fabio.porcedda@gmail.com>
 ---
- drivers/usb/serial/option.c | 10 +++++-----
- 1 file changed, 5 insertions(+), 5 deletions(-)
+ drivers/net/usb/qmi_wwan.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/drivers/usb/serial/option.c b/drivers/usb/serial/option.c
-index 1f3c05ed5236..2e493041c3bf 100644
---- a/drivers/usb/serial/option.c
-+++ b/drivers/usb/serial/option.c
-@@ -1367,15 +1367,15 @@ static const struct usb_device_id option_ids[] = {
- 	  .driver_info = NCTRL(2) | RSVD(3) },
- 	{ USB_DEVICE_INTERFACE_CLASS(TELIT_VENDOR_ID, 0x1063, 0xff),	/* Telit LN920 (ECM) */
- 	  .driver_info = NCTRL(0) | RSVD(1) },
--	{ USB_DEVICE_INTERFACE_CLASS(TELIT_VENDOR_ID, 0x1070, 0xff),	/* Telit FN990 (rmnet) */
-+	{ USB_DEVICE_INTERFACE_CLASS(TELIT_VENDOR_ID, 0x1070, 0xff),	/* Telit FN990A (rmnet) */
- 	  .driver_info = NCTRL(0) | RSVD(1) | RSVD(2) },
--	{ USB_DEVICE_INTERFACE_CLASS(TELIT_VENDOR_ID, 0x1071, 0xff),	/* Telit FN990 (MBIM) */
-+	{ USB_DEVICE_INTERFACE_CLASS(TELIT_VENDOR_ID, 0x1071, 0xff),	/* Telit FN990A (MBIM) */
- 	  .driver_info = NCTRL(0) | RSVD(1) },
--	{ USB_DEVICE_INTERFACE_CLASS(TELIT_VENDOR_ID, 0x1072, 0xff),	/* Telit FN990 (RNDIS) */
-+	{ USB_DEVICE_INTERFACE_CLASS(TELIT_VENDOR_ID, 0x1072, 0xff),	/* Telit FN990A (RNDIS) */
- 	  .driver_info = NCTRL(2) | RSVD(3) },
--	{ USB_DEVICE_INTERFACE_CLASS(TELIT_VENDOR_ID, 0x1073, 0xff),	/* Telit FN990 (ECM) */
-+	{ USB_DEVICE_INTERFACE_CLASS(TELIT_VENDOR_ID, 0x1073, 0xff),	/* Telit FN990A (ECM) */
- 	  .driver_info = NCTRL(0) | RSVD(1) },
--	{ USB_DEVICE_INTERFACE_CLASS(TELIT_VENDOR_ID, 0x1075, 0xff),	/* Telit FN990 (PCIe) */
-+	{ USB_DEVICE_INTERFACE_CLASS(TELIT_VENDOR_ID, 0x1075, 0xff),	/* Telit FN990A (PCIe) */
- 	  .driver_info = RSVD(0) },
- 	{ USB_DEVICE_INTERFACE_CLASS(TELIT_VENDOR_ID, 0x1080, 0xff),	/* Telit FE990 (rmnet) */
- 	  .driver_info = NCTRL(0) | RSVD(1) | RSVD(2) },
+diff --git a/drivers/net/usb/qmi_wwan.c b/drivers/net/usb/qmi_wwan.c
+index 7548ac187c26..14d1c85c8000 100644
+--- a/drivers/net/usb/qmi_wwan.c
++++ b/drivers/net/usb/qmi_wwan.c
+@@ -1360,7 +1360,7 @@ static const struct usb_device_id products[] = {
+ 	{QMI_QUIRK_SET_DTR(0x1bc7, 0x1050, 2)},	/* Telit FN980 */
+ 	{QMI_QUIRK_SET_DTR(0x1bc7, 0x1057, 2)},	/* Telit FN980 */
+ 	{QMI_QUIRK_SET_DTR(0x1bc7, 0x1060, 2)},	/* Telit LN920 */
+-	{QMI_QUIRK_SET_DTR(0x1bc7, 0x1070, 2)},	/* Telit FN990 */
++	{QMI_QUIRK_SET_DTR(0x1bc7, 0x1070, 2)},	/* Telit FN990A */
+ 	{QMI_QUIRK_SET_DTR(0x1bc7, 0x1080, 2)}, /* Telit FE990 */
+ 	{QMI_QUIRK_SET_DTR(0x1bc7, 0x10a0, 0)}, /* Telit FN920C04 */
+ 	{QMI_QUIRK_SET_DTR(0x1bc7, 0x10a4, 0)}, /* Telit FN920C04 */
 -- 
 2.48.1
 
