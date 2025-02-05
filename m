@@ -1,320 +1,148 @@
-Return-Path: <netdev+bounces-162868-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-162869-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3A011A28389
-	for <lists+netdev@lfdr.de>; Wed,  5 Feb 2025 06:13:50 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6A456A2839B
+	for <lists+netdev@lfdr.de>; Wed,  5 Feb 2025 06:22:29 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id E895B188652F
-	for <lists+netdev@lfdr.de>; Wed,  5 Feb 2025 05:13:54 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 03A14165BDD
+	for <lists+netdev@lfdr.de>; Wed,  5 Feb 2025 05:22:28 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6D66121D584;
-	Wed,  5 Feb 2025 05:13:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 21547215072;
+	Wed,  5 Feb 2025 05:22:25 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="GZYTbZe2"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="eLjtJx3c"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-il1-f182.google.com (mail-il1-f182.google.com [209.85.166.182])
+Received: from mail-wm1-f41.google.com (mail-wm1-f41.google.com [209.85.128.41])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8463025A638;
-	Wed,  5 Feb 2025 05:13:43 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.182
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4E12B2770B;
+	Wed,  5 Feb 2025 05:22:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.41
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1738732425; cv=none; b=VyqxqEPfeKDYwxsa4ujmga/9eD5cM58gDHlkVLw3441J7+/GGhWHotVnCiQMvQtkulaFzNtM2uFmJ4c7HBMzRHUpfaZabck2oR7pSUs6yUQKFQCunRh5OCP3p+IrYuTIBWbL2FxpDb8q3PI5j53unTe0wPYv/WGog+qn/KKdflI=
+	t=1738732945; cv=none; b=qnls9MsvsP1sLX6BLmfVJl38DOwy81OvTm3nF0gGAXoG299TyfRqPaiV/3RjdmBSGbP6gy/5Kq1PhuxcNcXvA6Wj4Uj1qRyOj05eg+WgfhX0UN1st7mFqbn8PYoRbeaUY6MUJ3r6Y/5uk9QtqHSgtGHs6gzRyLmlCRtbzbjmHiw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1738732425; c=relaxed/simple;
-	bh=NnUyLGd0J5HP1qkVQ2irVv/Ke+Av9/j8d6x87t+V09c=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=lKfYTDQw+eFgOmRbYYK1AF7DhE7NjKeLTH5f1fP/vgvFEp6jH3F3Waf+LE80yIgABZxrptmKXcYziV5xYSxbbr3h6M0IOSQHlsp9FL7SKUULNmw5njbMeDWHpKuZwCjtc0/RgZSb4egxcC+01IlPrHmVpDg83FTuPhKLr3Cf3yg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=GZYTbZe2; arc=none smtp.client-ip=209.85.166.182
+	s=arc-20240116; t=1738732945; c=relaxed/simple;
+	bh=teAmRA/glxpd4DiIqY2xWP0ql5pxdUqg7CzHOFSUFIs=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=iPK9oIQNCkcJO5TuVcYIWjqIpRLJzZ0NiDy1MYb9N0U7YxAo5WnaTzn/VTr2xMmrPsJZ4RlYvWnPfpKKWuYjSQOC6zXfeNu+Ovq6kzXhPOoxUQd+9cfJHH8HJrNFjoZlbuOCLOOzWuLekHrUYmviHUrOJMO5v+/B90oi176jLBA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=eLjtJx3c; arc=none smtp.client-ip=209.85.128.41
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-il1-f182.google.com with SMTP id e9e14a558f8ab-3cfae81ab24so20316285ab.3;
-        Tue, 04 Feb 2025 21:13:43 -0800 (PST)
+Received: by mail-wm1-f41.google.com with SMTP id 5b1f17b1804b1-436202dd7f6so72889315e9.0;
+        Tue, 04 Feb 2025 21:22:22 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1738732422; x=1739337222; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=09LBenV5RdUiRWqwecYlsSGYpMdBrlv60A9ABrvh5+w=;
-        b=GZYTbZe27sdppxd1VsoBubNSM71loY3ytCkCe6jZlydncwq0PC/CBFxvpYfNK+pU1F
-         KVbrrSwmsyqk+a7iy0+3/z/V3vSWokcJfMTKCW1BAAWGffxs2unuXMDamF0+Hg2fj52T
-         rYjrnV/QQ0mwO3sulZ16OpBu4wqlzdPs6uKdIp9BNO6udWkK4if0b8PC7fWdQ3eKjaTC
-         iYqzY50Gre28d1FsfTX3ViUYt6mLYAHb+OH2CbmXmcH325vBZB6vbw3hVBVXUZUWUmUV
-         lUl+cAlso5Sl2jmy20oxMajEYaegEMr+2JLicTfw2ntYVbccfZ2FmfA93MrkJMrVS9/d
-         SQbw==
+        d=gmail.com; s=20230601; t=1738732941; x=1739337741; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=21hP7bpdvokUxQxofV+KNEVpID3xm7+fvYQNUaPIP6I=;
+        b=eLjtJx3c1JM9P3wPGj7x78Afnegjr4uQm6gJEPoG4pP8NyqkAeyAjbsizpmVfnyElJ
+         kupFLvAM42HGkIb49+P+GEKvM/ktAC+FJ2G8qw0vnTP5r1joq356aPL9Eq1plOGeoKYx
+         3WYEajYJei/cXMSF7xt/qI5gTUk3hoQl0jkbe95lQlq2KTHq47bB43U0m9v7rQ3rnxl6
+         lFbTE8irU7f7P03gJHawbqsoO5xocqciHYjqTE1yvATcLaba/qIS0hHDyEBhHz380/QR
+         UCOMFYbci8zWPRMU90tGL7ft11K+SeNn6M5jrTrSH4WwDpsuTIUI+fHbvGsMuB6JIkVF
+         SK5A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1738732422; x=1739337222;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=09LBenV5RdUiRWqwecYlsSGYpMdBrlv60A9ABrvh5+w=;
-        b=YCLgN9CJs96IllbgtK0+JYgV8KNdMlTMAPf7uSdZ5qZCeJqIKLD+RH7LrCYSu3jp8U
-         fEOQUC5fjcsugOuCls5W81oMeMUcRkx71AICKT9Fo9ClKCKOY8sm1fLI82n/UKdtv1vt
-         JUzMAfqjP5uk0DoTFUrlr21bQph/Do6NooHsPQQEPIKHJt1U3bnt4gxvGXly/Aj3k6ef
-         IbZK25nFNrzQoARlt/D5uv/dFHiOcyDbzgtvTm2FFtszRMPjgWropXFtYbiX7Fdd2ZL1
-         Ix9nxZT2FgGhKvctHtA9IIXPQq39HhNjXfaNutS4EtAnrGBGRJ3paXX4moVd1wYvQnfP
-         1WZQ==
-X-Forwarded-Encrypted: i=1; AJvYcCVevGnopNOIXO7vLtIaleiMVZ32atOXtSy58+6AxpeDM6H/7kceekEL87+PVrr9gvWwCpLNbJHj@vger.kernel.org, AJvYcCWv+YiVgeJY+cM61zV4hDlo2njsUtxDj8yvL3RwS7fu2l6n4WdxJn/WPfctjJ7tZPnzUHE=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yw+M4utgxyzzYqODFfvJP96ZwDQxNLHpP+87Eoy2f87YVEHUZfr
-	6NCHhhM3r6iHpPqaiTs0dCT11K+OufT7oP2EPC38BRGuYNhpz6Jkbbjn5dOIvCt3nvnP6ZVrSov
-	fr5GFnTOgdy+nz+38NRcsayXoIRs=
-X-Gm-Gg: ASbGncsA01Md+byUNnXfU1ZiTTVNw4dNhEe1F56hSMrPARfgGPCA1lFVTm2vreXjXR3
-	Sc4Gdq8UYnsbNkbBUO+N8SO9YpGil6Av7nEM9YJGFyoyh9gvpNcmkKyOHTfc5XIsouJQB9UEn
-X-Google-Smtp-Source: AGHT+IFOuNBLGLMg6CePjetYHglzt/3zLqFdGfLGGVjYbL+iFpd91o7KB6frYSjLXmtoT1KjaYPcnbG9BOcnP5/Bub8=
-X-Received: by 2002:a05:6e02:2610:b0:3cf:ba5:1ea3 with SMTP id
- e9e14a558f8ab-3d04f42562amr17150305ab.7.1738732422500; Tue, 04 Feb 2025
- 21:13:42 -0800 (PST)
+        d=1e100.net; s=20230601; t=1738732941; x=1739337741;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=21hP7bpdvokUxQxofV+KNEVpID3xm7+fvYQNUaPIP6I=;
+        b=sX36P8DhivzqxaocU7Wtx6gw//w2tA6BX5rMPK6bHC/8XGKGBHciSxj841KOrHfdTu
+         xUPAthTT7KCj55nfESTSj9nraNzX7ydPm0vqzwmc4cktZ5o20b7jsmH+lOySxz2/RK4d
+         jXv9byes2MGbh3jk3mItmEK8wQhhcvZHn3oDfqKxUSZjXRhYbjH8qJzkprDQUH1FvBWR
+         zpTy9FHDrLG4N8m1r8X/G/o1hSoiZRI/nZR07f66VoFjoM4nKNG0O3dSsS3SY32lA0Wl
+         InG86An7BRO7SnJsXiTTbMwQVKmtwjs1xDvWUCvLi+uZAD6FJc6bVMhf5wTskG/nik4u
+         7gWA==
+X-Forwarded-Encrypted: i=1; AJvYcCWagE/VGv3FNmmn0QikqdmaTNTKQKQT47OAfcOfqZYNeBqpLzWjj7cLw3/go2luLeEzzP0nvqDnp/Hb@vger.kernel.org, AJvYcCXcoMVg/tnkab3logrMExDhyyfh54pumRZcqKoyZNnJnua5s6r8l27Oh6bQeXZDlpEQbk4GHsJE4AMsDGqh@vger.kernel.org, AJvYcCXlAJ8yMa6e6Sk2zWh2g4KEHLHXoiImfIo8ymEMP4AHiT8JgCI3ne1GXxKEhOsS1htZd84O7fIK@vger.kernel.org
+X-Gm-Message-State: AOJu0YyPX6n3ohohgp0ZwitDvW2+4EnnlHp5oowFnfXcxo9ZQFnVO9H3
+	DRxmNF7RM5LkhQ8qCL/Ks3QFw9gUCl0LhDLGhHwlOyExWCqKN9Ov
+X-Gm-Gg: ASbGncupk/UXcf8W+9n2nSRFyH2dNGSzoXQ+RO08oW2WJfdXU8+tPH6tO55FCzNvJVi
+	/pHwgIM2eiWrdOHZ/MR6bxB39SVlH69kTa1OQJmYWf/H3n2/h6ZJwMI3oa2/j6HjtDMpPTLUtSg
+	x9bUogYRWHQCJSi0M9ql9Z2PvIQ3Qdj5l7KWzIk0dvVfzUaWsAjL6xrL+EcpWlE8amzc+I9vc2R
+	vhm6LI+Umm3XpupcTFz8fLun2PQjpEVeURfCB5XrhODJIVg5Cm2pC679/UEwOfPGS0y50OdaA4l
+	eNUx1V+rDiUV
+X-Google-Smtp-Source: AGHT+IHj+FMgfhyJJ0oFoOUI5MqNe+dA1CICeYNUtW99AhsoLmOYnMg9M/knYT0ZemyuxGW8Rnlntw==
+X-Received: by 2002:a05:600c:3b98:b0:434:a781:f5d5 with SMTP id 5b1f17b1804b1-4390d574e18mr8415565e9.30.1738732941277;
+        Tue, 04 Feb 2025 21:22:21 -0800 (PST)
+Received: from debian ([2a00:79c0:661:ad00:45fb:7d1a:5e4d:9727])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-4390d965438sm9366515e9.22.2025.02.04.21.22.19
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 04 Feb 2025 21:22:20 -0800 (PST)
+Date: Wed, 5 Feb 2025 06:22:18 +0100
+From: Dimitri Fedrau <dima.fedrau@gmail.com>
+To: "Russell King (Oracle)" <linux@armlinux.org.uk>
+Cc: dimitri.fedrau@liebherr.com, Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Rob Herring <robh@kernel.org>,
+	Krzysztof Kozlowski <krzk+dt@kernel.org>,
+	Conor Dooley <conor+dt@kernel.org>, Andrew Davis <afd@ti.com>,
+	Andrew Lunn <andrew@lunn.ch>,
+	Heiner Kallweit <hkallweit1@gmail.com>,
+	Florian Fainelli <f.fainelli@gmail.com>, netdev@vger.kernel.org,
+	devicetree@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH net-next v3 2/3] net: phy: Add helper for getting tx
+ amplitude gain
+Message-ID: <20250205052218.GC3831@debian>
+References: <20250204-dp83822-tx-swing-v3-0-9798e96500d9@liebherr.com>
+ <20250204-dp83822-tx-swing-v3-2-9798e96500d9@liebherr.com>
+ <Z6JUbW72_CqCY9Zq@shell.armlinux.org.uk>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250128084620.57547-1-kerneljasonxing@gmail.com>
- <20250128084620.57547-12-kerneljasonxing@gmail.com> <d2605829-d5c2-4ce2-ac27-9f1df0398ccc@linux.dev>
- <CAL+tcoDZXc56BsO9tYvb1EFDdMHhv3OcBsPwY3ctJ85rvb+OHA@mail.gmail.com>
- <67a24989d7202_bb56629425@willemb.c.googlers.com.notmuch> <CAL+tcoA7Efzxg9c-CBn3S0JEQZLUHBaCA+dL=mgWbVh26SukgA@mail.gmail.com>
- <CAL+tcoAeBJ=F8cZ9qYwGF6jmc+DwA2byrrzAZjcpNYzrjT541g@mail.gmail.com>
-In-Reply-To: <CAL+tcoAeBJ=F8cZ9qYwGF6jmc+DwA2byrrzAZjcpNYzrjT541g@mail.gmail.com>
-From: Jason Xing <kerneljasonxing@gmail.com>
-Date: Wed, 5 Feb 2025 13:13:06 +0800
-X-Gm-Features: AWEUYZmEz1iGFd_6PPKlmf26vpGNnkcpEsxZtllyK3tICyJjNaHpxurKIR9tR5c
-Message-ID: <CAL+tcoDZyB8FX1=zMZq5vgB_DWc=qpmJ0xQP7N2T90a4wamFjQ@mail.gmail.com>
-Subject: Re: [PATCH bpf-next v7 11/13] net-timestamp: add a new callback in tcp_tx_timestamp()
-To: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
-Cc: Martin KaFai Lau <martin.lau@linux.dev>, davem@davemloft.net, edumazet@google.com, 
-	kuba@kernel.org, pabeni@redhat.com, dsahern@kernel.org, willemb@google.com, 
-	ast@kernel.org, daniel@iogearbox.net, andrii@kernel.org, eddyz87@gmail.com, 
-	song@kernel.org, yonghong.song@linux.dev, john.fastabend@gmail.com, 
-	kpsingh@kernel.org, sdf@fomichev.me, haoluo@google.com, jolsa@kernel.org, 
-	horms@kernel.org, bpf@vger.kernel.org, netdev@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <Z6JUbW72_CqCY9Zq@shell.armlinux.org.uk>
 
-On Wed, Feb 5, 2025 at 11:05=E2=80=AFAM Jason Xing <kerneljasonxing@gmail.c=
-om> wrote:
->
-> On Wed, Feb 5, 2025 at 2:09=E2=80=AFAM Jason Xing <kerneljasonxing@gmail.=
-com> wrote:
-> >
-> > On Wed, Feb 5, 2025 at 1:08=E2=80=AFAM Willem de Bruijn
-> > <willemdebruijn.kernel@gmail.com> wrote:
-> > >
-> > > Jason Xing wrote:
-> > > > On Tue, Feb 4, 2025 at 9:16=E2=80=AFAM Martin KaFai Lau <martin.lau=
-@linux.dev> wrote:
-> > > > >
-> > > > > On 1/28/25 12:46 AM, Jason Xing wrote:
-> > > > > > Introduce the callback to correlate tcp_sendmsg timestamp with =
-other
-> > > > > > points, like SND/SW/ACK. We can let bpf trace the beginning of
-> > > > > > tcp_sendmsg_locked() and fetch the socket addr, so that in
-> > > > >
-> > > > > Instead of "fetch the socket addr...", should be "store the sendm=
-sg timestamp at
-> > > > > the bpf_sk_storage ...".
-> > > >
-> > > > I will revise it. Thanks.
-> > > >
-> > > > >
-> > > > > > tcp_tx_timestamp() we can correlate the tskey with the socket a=
-ddr.
-> > > > >
-> > > > >
-> > > > > > It is accurate since they are under the protect of socket lock.
-> > > > > > More details can be found in the selftest.
-> > > > >
-> > > > > The selftest uses the bpf_sk_storage to store the sendmsg timesta=
-mp at
-> > > > > fentry/tcp_sendmsg_locked and retrieves it back at tcp_tx_timesta=
-mp (i.e.
-> > > > > BPF_SOCK_OPS_TS_SND_CB added in this patch).
-> > > > >
-> > > > > >
-> > > > > > Signed-off-by: Jason Xing <kerneljasonxing@gmail.com>
-> > > > > > ---
-> > > > > >   include/uapi/linux/bpf.h       | 7 +++++++
-> > > > > >   net/ipv4/tcp.c                 | 1 +
-> > > > > >   tools/include/uapi/linux/bpf.h | 7 +++++++
-> > > > > >   3 files changed, 15 insertions(+)
-> > > > > >
-> > > > > > diff --git a/include/uapi/linux/bpf.h b/include/uapi/linux/bpf.=
-h
-> > > > > > index 800122a8abe5..accb3b314fff 100644
-> > > > > > --- a/include/uapi/linux/bpf.h
-> > > > > > +++ b/include/uapi/linux/bpf.h
-> > > > > > @@ -7052,6 +7052,13 @@ enum {
-> > > > > >                                        * when SK_BPF_CB_TX_TIME=
-STAMPING
-> > > > > >                                        * feature is on.
-> > > > > >                                        */
-> > > > > > +     BPF_SOCK_OPS_TS_SND_CB,         /* Called when every send=
-msg syscall
-> > > > > > +                                      * is triggered. For TCP,=
- it stays
-> > > > > > +                                      * in the last send proce=
-ss to
-> > > > > > +                                      * correlate with tcp_sen=
-dmsg timestamp
-> > > > > > +                                      * with other timestampin=
-g callbacks,
-> > > > > > +                                      * like SND/SW/ACK.
-> > > > >
-> > > > > Do you have a chance to look at how this will work at UDP?
-> > > >
-> > > > Sure, I feel like it could not be useful for UDP. Well, things get
-> > > > strange because I did write a long paragraph about this thing which
-> > > > apparently disappeared...
-> > > >
-> > > > I manage to find what I wrote:
-> > > >     For UDP type, BPF_SOCK_OPS_TS_SND_CB may be not suitable becaus=
-e
-> > > >     there are two sending process, 1) lockless path, 2) lock path, =
-which
-> > > >     should be handled carefully later. For the former, even though =
-it's
-> > > >     unlikely multiple threads access the socket to call sendmsg at =
-the
-> > > >     same time, I think we'd better not correlate it like what we do=
- to the
-> > > >     TCP case because of the lack of sock lock protection. Consideri=
-ng SND_CB is
-> > > >     uapi flag, I think we don't need to forcely add the 'TCP_' pref=
-ix in
-> > > >     case we need to use it someday.
-> > > >
-> > > >     And one more thing is I'd like to use the v5[1] method in the n=
-ext round
-> > > >     to introduce a new tskey_bpf which is good for UDP type. The ne=
-w field
-> > > >     will not conflict with the tskey in shared info which is genera=
-ted
-> > > >     by sk->sk_tskey in __ip_append_data(). It hardly works if both =
-features
-> > > >     (so_timestamping and its bpf extension) exists at the same time=
-. Users
-> > > >     could get confused because sometimes they fetch the tskey from =
-skb,
-> > > >     sometimes they don't, especially when we have cmsg feature to t=
-urn it on/
-> > > >     off per sendmsg. A standalone tskey for bpf extension will be n=
-eeded.
-> > > >     With this tskey_bpf, we can easily correlate the timestamp in s=
-endmsg
-> > > >     syscall with other tx points(SND/SW/ACK...).
-> > > >
-> > > >     [1]: https://lore.kernel.org/all/20250112113748.73504-14-kernel=
-jasonxing@gmail.com/
-> > > >
-> > > >     If possible, we can leave this question until the UDP support s=
-eries
-> > > >     shows up. I will figure out a better solution :)
-> > > >
-> > > > In conclusion, it probably won't be used by the UDP type. It's uAPI
-> > > > flag so I consider the compatibility reason.
-> > >
-> > > I don't think this is acceptable. We should aim for an API that can
-> > > easily be used across protocols, like SO_TIMESTAMPING.
-> >
-> > After I revisit the UDP SO_TIMESTAMPING again, my thoughts are
-> > adjusted like below:
-> >
-> > It's hard to provide an absolutely uniform interface or usage to users
-> > for TCP and UDP and even more protocols. Cases can be handled one by
-> > one. The main obstacle is how we can correlate the timestamp in
-> > sendmsg syscall with other sending timestamps. It's worth noticing
-> > that for SO_TIMESTAMPING the sendmsg timestamp is collected in the
-> > userspace. For instance, while skb enters the qdisc, we fail to know
-> > which skb belongs to which sendmsg.
-> >
-> > An idea coming up is to introduce BPF_SOCK_OPS_TS_SND_CB to correlate
-> > the sendmsg timestamp with tskey (in tcp_tx_timestamp()) under the
-> > protection of socket lock + syscall as the current patch does. But for
-> > UDP, it can be lockless. IIUC, there is a very special case where even
-> > SO_TIMESTAMPING may get lost: if multiple threads accessing the same
-> > socket send UDP packets in parallel, then users could be confused
-> > which tskey matches which sendmsg. IIUC, I will not consider this
-> > unlikely case, then the UDP case is quite similar to the TCP case.
-> >
-> > The scenario for the UDP case is:
-> > 1) using fentry bpf to hook the udp_sendmsg() to get the timestamp
-> > like TCP does in this series.
-> > 2) insert BPF_SOCK_OPS_TS_SND_CB into __ip_append_data() near the
-> > SO_TIMESTAMPING code snippets to let bpf program correlate the tskey
-> > with timestamp.
-> > Note: tskey in UDP will be handled carefully in a different way
-> > because we should support both modes for socket timestamping at the
-> > same time.
-> > It's really similar to TCP regardless of handling tskey.
-> >
->
-> To be more precise in case you don't have much time to read the above
-> long paragraph, BPF_SOCK_OPS_TS_SND_CB is mainly used to correlate
-> sendmsg timestamp with corresponding tskey.
->
-> 1. For TCP, we can correlate it in tcp_tx_timestamp() like this patch doe=
-s.
->
-> 2. For UDP, we can correlate in __ip_append_data() along with those
-> tskey initialization, assuming there are no multiple threads calling
-> locklessly ip_make_skb(). Locked path
-> (udp_sendmsg()->ip_append_data()) works like TCP under the socket lock
-> protection, so it can be easily handled. Lockless path
-> (udp_sendmsg()->ip_make_skb()) can be visited by multiple threads at
-> the same time, which should be handled properly. I prefer to implement
-> the bpf extension for IPCORK_TS_OPT_ID, which should be another topic,
-> I think. This might be the only one corner case, IIUC?
->
-> Overall I think BPF_SOCK_OPS_TS_SND_CB can work across protocols to do
-> the correlation job.
->
-> To be on the safe side, I can change the name BPF_SOCK_OPS_TS_SND_CB
-> to BPF_SOCK_OPS_TS_TCP_SND_CB just in case this approach is not the
-> best one. What do you think about this?
->
-> [1]
-> commit 4aecca4c76808f3736056d18ff510df80424bc9f
-> Author: Vadim Fedorenko <vadim.fedorenko@linux.dev>
-> Date:   Tue Oct 1 05:57:14 2024 -0700
->
->     net_tstamp: add SCM_TS_OPT_ID to provide OPT_ID in control message
->
->     SOF_TIMESTAMPING_OPT_ID socket option flag gives a way to correlate T=
-X
->     timestamps and packets sent via socket. Unfortunately, there is no wa=
-y
->     to reliably predict socket timestamp ID value in case of error return=
-ed
->     by sendmsg. For UDP sockets it's impossible because of lockless
->     nature of UDP transmit, several threads may send packets in parallel.=
- In
->     case of RAW sockets MSG_MORE option makes things complicated. More
->     details are in the conversation [1].
->     This patch adds new control message type to give user-space
->     software an opportunity to control the mapping between packets and
->     values by providing ID with each sendmsg for UDP sockets.
->     The documentation is also added in this patch.
->
->     [1] https://lore.kernel.org/netdev/CALCETrU0jB+kg0mhV6A8mrHfTE1D1pr1S=
-D_B9Eaa9aDPfgHdtA@mail.gmail.com/
+Am Tue, Feb 04, 2025 at 05:54:53PM +0000 schrieb Russell King (Oracle):
+> On Tue, Feb 04, 2025 at 02:09:16PM +0100, Dimitri Fedrau via B4 Relay wrote:
+> >  #if IS_ENABLED(CONFIG_OF_MDIO)
+> > -static int phy_get_int_delay_property(struct device *dev, const char *name)
+> > +static int phy_get_u32_property(struct device *dev, const char *name)
+> >  {
+> >  	s32 int_delay;
+> >  	int ret;
+> > @@ -3108,7 +3108,7 @@ static int phy_get_int_delay_property(struct device *dev, const char *name)
+> >  	return int_delay;
+> 
+> Hmm. You're changing the name of this function from "int" to "u32", yet
+> it still returns "int".
 >
 
-Oh, I came up with a feasible approach for UDP protocol:
-1. introduce a field ts_opt_id_bpf which works like ts_opt_id to allow
-the bpf program to fully take control of the management of tskey.
-2. use fentry hook udp_sendmsg(), and introduce a callback function
-like BPF_SOCK_OPS_TIMEOUT_INIT in kernel to initialize the
-ts_opt_id_bpf with tskey that bpf prog generates. We can directly use
-BPF_SOCK_OPS_TS_SND_CB.
-3. modify the SCM_TS_OPT_ID logic to support bpf extension so that the
-newly added field ts_opt_id_bpf can be passed to the
-skb_shinfo(skb)->tskey in __ip_append_data().
+I just wanted to reuse code for retrieving the u32, I found
+phy_get_int_delay_property and renamed it. But the renaming from "int"
+to "u32" is wrong as you outlined.
 
-In this way, this approach can also be extended for other protocols.
+> What range of values are you expecting to be returned by this function?
+> If it's the full range of u32 values, then that overlaps with the error
+> range returned by device_property_read_u32().
+>
 
-Thanks,
-Jason
+Values are in percent, u8 would already be enough, so it wouldn't
+overlap with the error range.
+
+> I'm wondering whether it would be better to follow the example set by
+> these device_* functions, and pass a pointer for the value to them, and
+> just have the return value indicating success/failure.
+>
+
+I would prefer this, but this would mean changes in phy_get_internal_delay
+if we don't want to duplicate code, as phy_get_internal_delay relies on
+phy_get_int_delay_property and we change function parameters of
+phy_get_int_delay_property as you described. I would switch from
+static int phy_get_int_delay_property(struct device *dev, const char *name)
+to
+static int phy_get_u32_property(struct device *dev, const char *name, u32 *val)
+
+Do you agree ?
+
+Best regards,
+Dimitri Fedrau
 
