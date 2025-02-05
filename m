@@ -1,73 +1,98 @@
-Return-Path: <netdev+bounces-163293-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-163294-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0D93DA29DA9
-	for <lists+netdev@lfdr.de>; Thu,  6 Feb 2025 00:46:19 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id E6CBAA29DB4
+	for <lists+netdev@lfdr.de>; Thu,  6 Feb 2025 00:55:39 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 7415718885D3
-	for <lists+netdev@lfdr.de>; Wed,  5 Feb 2025 23:46:18 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 2A13F3A59A5
+	for <lists+netdev@lfdr.de>; Wed,  5 Feb 2025 23:55:31 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0CC4121CFF7;
-	Wed,  5 Feb 2025 23:46:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6FE9521B19F;
+	Wed,  5 Feb 2025 23:55:36 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b="EFzUOuY5"
+	dkim=pass (1024-bit key) header.d=cisco.com header.i=@cisco.com header.b="VY7SYnER"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp-fw-9106.amazon.com (smtp-fw-9106.amazon.com [207.171.188.206])
+Received: from rcdn-iport-4.cisco.com (rcdn-iport-4.cisco.com [173.37.86.75])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 55E6821B19F;
-	Wed,  5 Feb 2025 23:46:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=207.171.188.206
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8A68618A6BA
+	for <netdev@vger.kernel.org>; Wed,  5 Feb 2025 23:55:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=173.37.86.75
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1738799165; cv=none; b=q2jEHL9tyQoT/rLUJJVMVrA2NzUDWXi9CW9amg8VIEbHtHiw39JlfkOwZY9PnNL7+cxGKeISklnG94FDlnI35/640Qo0iujcPj05QLDt6R6F2cDoLrfRcw0P+VrlgDFfr2TjWSf9bT2vzXlchzXMLe8JH0EDYcqifwE1ax41pnc=
+	t=1738799736; cv=none; b=pplu9tqoE32YrrmDUZETt5GOrMvTi4YNEsxkL51dQuMTg3GBwTJmJDnm/kEtLEpZCL2Z/nvtha2H55qLngm7vSTO9nOZ6kG8toGznWP7YzWpau9Jxcfen/Z/r7QXIzji8q4BE7nByBAj7tGbfc9S5kdiAyhiidlxoCg85G3glyk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1738799165; c=relaxed/simple;
-	bh=g09ZCqXnNJJVNUAm2aaH4LByKmRn9oc/DAVX0yAT7Ww=;
-	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=qf4/33DLZ5H3VsQR7Pq+x6IZTrcByg75MHuz5otPE11DrMamW/ZSKojzCACM8u8ycWebSYYByVvE8aRrUDCR7hF07NyFanr+vKFSq+HuudjUMtTiE3rATp7/mFY2v04Mun8FPMbw+/F/NrGUmXkBvbW/KejdiAyMBmapNxhYx5A=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.co.jp; dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b=EFzUOuY5; arc=none smtp.client-ip=207.171.188.206
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.co.jp
+	s=arc-20240116; t=1738799736; c=relaxed/simple;
+	bh=55QeOGOw7wr2Rz9o5LVhV1mqpCy0NuFDG0DMEIWoSig=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=kiYL1y4S5kKLm9b3AkG3RVu0CNEfLGmvVu2qBzVlveDQe+zwEj3KMeof1qIsKBE47brNqi8H5GErZcInyeFL0JmiTUOwv4ncumCCto2hhh93FA4sqJ08modX64RZvnnfSEyIuotBmSF3eZQAZtUxJLE0XMWtmc8VCPL8gsYPUQc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=cisco.com; spf=pass smtp.mailfrom=cisco.com; dkim=pass (1024-bit key) header.d=cisco.com header.i=@cisco.com header.b=VY7SYnER; arc=none smtp.client-ip=173.37.86.75
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=cisco.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=cisco.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
-  t=1738799164; x=1770335164;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=LVoyEb4eO8E2i2Vxvj92QtiYB4cbewa0hWoTfpwNUdc=;
-  b=EFzUOuY5kwvg5DBvBYRlWZKoABO+tVbLsiz8yUWkyZVmKrz3U8X5bwBH
-   MEelcNC7ytddRDCYOoll2bwygjvjMht55zp0y9KYpmdsJ3hL64gaRGeia
-   bwPYKosYTjPK9fiTOPW7+gCEVnd82ioefmtD8j2qfx4g4Ii4takP0nCGu
-   0=;
+  d=cisco.com; i=@cisco.com; l=2519; q=dns/txt; s=iport;
+  t=1738799734; x=1740009334;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=Oz6bqcAG+/Uh1xGLxco0JsxVhnmnm8I7NnI5Hjbki7s=;
+  b=VY7SYnER2z0MlPVocj3tXn9MMCSuHbGLlckZcdUed739FkNhcfmg+0l4
+   N0VMu1HIWuQEUqVIAU8R5RKugrfJGfWKKgQoiRqUoDCmUduPowPPNO8q+
+   rI9N/+bgVKpPHEHcHXegXSmQlJc0Z+dF71YIVaYCcn8FzFPYeUPVeke3H
+   M=;
+X-CSE-ConnectionGUID: 3sUANSjxTeyDXlj+31w4vw==
+X-CSE-MsgGUID: LhyFSfJpQZaPqPgga3kH5Q==
+X-IPAS-Result: =?us-ascii?q?A0AnAABv+aNn/43/Ja1aHAEBAQEBAQcBARIBAQQEAQGBf?=
+ =?us-ascii?q?wcBAQsBgkqBT0NIjHJfiHSeFxSBEQNWDwEBAQ9EBAEBhQeLAgImNAkOAQIEA?=
+ =?us-ascii?q?QEBAQMCAwEBAQEBAQEBAQEBCwEBBQEBAQIBBwWBDhOGCIZdNgFGgQwyEoMCg?=
+ =?us-ascii?q?mUDsFGCLIEB3jSBboFIAYVrh19whHcnG4FJRIQOb4QpZ4V3BIIvgUCDb5cki?=
+ =?us-ascii?q?1BIgSEDWSwBVRMNCgsHBYE5OAMgCgsMCxQcFQIUHQ8GEARqRDeCR2lJOgINA?=
+ =?us-ascii?q?jWCHiRYgiuEWoRDhE2CQ1SCRIISdIEagjKGCkADCxgNSBEsNwYOGwY+bgedT?=
+ =?us-ascii?q?TyEFgEBgQ0BeytuFFGTDwmSIaEEhCWBY59jGjOqU5h8IqNvN4RmgWc8gVkzG?=
+ =?us-ascii?q?ggbFYMiUhkP2mklMjwCBwsBAQMJkXwBAQ?=
+IronPort-Data: A9a23:KspvU68CnrHddiaW262rDrUDon+TJUtcMsCJ2f8bNWPcYEJGY0x3y
+ TAWXGCPOayNa2f2KNwnOou19E4CupWDyoc2T1Nv/yFEQiMRo6IpJzg2wmQcns+2BpeeJK6yx
+ 5xGMrEsFOhtEDmE4E/rauW5xZVF/fngbqLmD+LZMTxGSwZhSSMw4TpugOdRbrRA2bBVOCvT/
+ 4qpyyHjEAX9gWMsaDpJs/jrRC5H5ZwehhtJ5jTSWtgT1LPuvyF9JI4SI6i3M0z5TuF8dsamR
+ /zOxa2O5WjQ+REgELuNyt4XpWVTH9Y+lSDX4pZnc/DKbipq/0Te4Y5nXBYoUnq7vh3S9zxHJ
+ HqhgrTrIeshFvWkdO3wyHC0GQkmVUFN0OevzXRSLaV/wmWeG0YAzcmCA2ltJrAx3N11EV1D5
+ NAoLDJONUmc2/yplefTpulE3qzPLeHxN48Z/3UlxjbDALN+HdbIQr7B4plT2zJYasJmRKmFI
+ ZFGL2AyMVKZP0Qn1lQ/UPrSmM+qgXn5fzRcpXqepLE85C7YywkZPL3Fa4OII4XTFJwF9qqej
+ kbG7krCDDMCDe6W8SO9/X2l3ezvwBquDer+E5X9rJaGmma7ymUNBRg+WVKlrPy9jUCiHdRSN
+ yQ89yYzqKEg+VCDQd76UBm15nWDu3Y0WMdaGsU55RuLx66S5ByWbkANSDJbZcNlssIqSTE0/
+ luUmdWvDjwHmKWcQ3+b95+OoD+yMDRTJmgHDQcCQBcJ7sfLvo4+lFTMQ8xlHarzicf6cQwc2
+ BiQpyQ4wrFWhskR2uDjoRbMgimnod7CSQtdChjrY19JJzhRPOaND7FEI3CChRqcBO51lmW8g
+ UU=
+IronPort-HdrOrdr: A9a23:XUrQQ6Gq7JW+nUIbpLqE48eALOsnbusQ8zAXPo5KJiC9Ffbo8v
+ xG88576faZslsssRIb6LK90de7IU80nKQdieJ6AV7IZmfbUQWTQL2KlbGSoAEJ30bFh4lgPW
+ AKSdkbNOHN
+X-Talos-CUID: 9a23:csfwEm3P+9ATYscdur5cU7xfQdsYW1vmzmfsLl6UOWJrC+bMVgOO5/Yx
+X-Talos-MUID: =?us-ascii?q?9a23=3AEIbXUQ2kqbHRPBjF52HbfJf2VzUjx6S/JnsDs40?=
+ =?us-ascii?q?/icC8LBR/ND7GjxTqe9py?=
+X-IronPort-Anti-Spam-Filtered: true
 X-IronPort-AV: E=Sophos;i="6.13,262,1732579200"; 
-   d="scan'208";a="796459408"
-Received: from pdx4-co-svc-p1-lb2-vlan2.amazon.com (HELO smtpout.prod.us-west-2.prod.farcaster.email.amazon.dev) ([10.25.36.210])
-  by smtp-border-fw-9106.sea19.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 05 Feb 2025 23:45:58 +0000
-Received: from EX19MTAUWC002.ant.amazon.com [10.0.38.20:15949]
- by smtpin.naws.us-west-2.prod.farcaster.email.amazon.dev [10.0.42.242:2525] with esmtp (Farcaster)
- id c8515f7e-9835-464e-9b44-6453fd1c087c; Wed, 5 Feb 2025 23:45:57 +0000 (UTC)
-X-Farcaster-Flow-ID: c8515f7e-9835-464e-9b44-6453fd1c087c
-Received: from EX19D004ANA001.ant.amazon.com (10.37.240.138) by
- EX19MTAUWC002.ant.amazon.com (10.250.64.143) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1258.39;
- Wed, 5 Feb 2025 23:45:55 +0000
-Received: from 6c7e67bfbae3.amazon.com (10.37.244.8) by
- EX19D004ANA001.ant.amazon.com (10.37.240.138) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1258.39;
- Wed, 5 Feb 2025 23:45:51 +0000
-From: Kuniyuki Iwashima <kuniyu@amazon.com>
-To: <nicolas.dichtel@6wind.com>
-CC: <davem@davemloft.net>, <edumazet@google.com>, <horms@kernel.org>,
-	<kuba@kernel.org>, <kuniyu@amazon.com>, <netdev@vger.kernel.org>,
-	<pabeni@redhat.com>, <razor@blackwall.org>, <stable@vger.kernel.org>
-Subject: Re: [PATCH net] rtnetlink: fix netns leak with rtnl_setlink()
-Date: Thu, 6 Feb 2025 08:45:39 +0900
-Message-ID: <20250205234539.52299-1-kuniyu@amazon.com>
-X-Mailer: git-send-email 2.39.5 (Apple Git-154)
-In-Reply-To: <20250205221037.2474426-1-nicolas.dichtel@6wind.com>
-References: <20250205221037.2474426-1-nicolas.dichtel@6wind.com>
+   d="scan'208";a="315111918"
+Received: from rcdn-l-core-04.cisco.com ([173.37.255.141])
+  by rcdn-iport-4.cisco.com with ESMTP/TLS/TLS_AES_256_GCM_SHA384; 05 Feb 2025 23:54:25 +0000
+Received: from cisco.com (savbu-usnic-a.cisco.com [10.193.184.48])
+	by rcdn-l-core-04.cisco.com (Postfix) with ESMTP id 8B4461800019D;
+	Wed,  5 Feb 2025 23:54:25 +0000 (GMT)
+Received: by cisco.com (Postfix, from userid 392789)
+	id 5B1CD20F2003; Wed,  5 Feb 2025 15:54:25 -0800 (PST)
+From: John Daley <johndale@cisco.com>
+To: benve@cisco.com,
+	satishkh@cisco.com,
+	andrew+netdev@lunn.ch,
+	davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	netdev@vger.kernel.org
+Cc: John Daley <johndale@cisco.com>
+Subject: [PATCH net-next v8 0/4] enic: Use Page Pool API for receiving packets
+Date: Wed,  5 Feb 2025 15:54:12 -0800
+Message-Id: <20250205235416.25410-1-johndale@cisco.com>
+X-Mailer: git-send-email 2.35.2
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -75,41 +100,73 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: EX19D031UWA003.ant.amazon.com (10.13.139.47) To
- EX19D004ANA001.ant.amazon.com (10.37.240.138)
+X-Outbound-SMTP-Client: 10.193.184.48, savbu-usnic-a.cisco.com
+X-Outbound-Node: rcdn-l-core-04.cisco.com
 
-From: Nicolas Dichtel <nicolas.dichtel@6wind.com>
-Date: Wed,  5 Feb 2025 23:10:37 +0100
-> A call to rtnl_nets_destroy() is needed to release references taken on
-> netns put in rtnl_nets.
-> 
-> CC: stable@vger.kernel.org
-> Fixes: 636af13f213b ("rtnetlink: Register rtnl_dellink() and rtnl_setlink() with RTNL_FLAG_DOIT_PERNET_WIP.")
-> Signed-off-by: Nicolas Dichtel <nicolas.dichtel@6wind.com>
+Use the Page Pool API for RX. The Page Pool API improves bandwidth and
+CPU overhead by recycling pages instead of allocating new buffers in the
+driver. Also, page pool fragment allocation for smaller MTUs is used
+allow multiple packets to share pages.
 
-Reviewed-by: Kuniyuki Iwashima <kuniyu@amazon.com>
+RX code was moved to its own file and some refactoring was done
+beforehand to make the page pool changes more trasparent and to simplify
+the resulting code.
 
-Thanks!
+Signed-off-by: John Daley <johndale@cisco.com>
 
+---
+Changes in v2:
+- Fixed a valid warning found by build_clang where a variable was used
+  before it was initialized. The warnings in include/linux/mm.h were not
+  addressed since they do not appear to be realated to this patchset.
 
-> ---
->  net/core/rtnetlink.c | 1 +
->  1 file changed, 1 insertion(+)
-> 
-> diff --git a/net/core/rtnetlink.c b/net/core/rtnetlink.c
-> index 1f4d4b5570ab..d1e559fce918 100644
-> --- a/net/core/rtnetlink.c
-> +++ b/net/core/rtnetlink.c
-> @@ -3432,6 +3432,7 @@ static int rtnl_setlink(struct sk_buff *skb, struct nlmsghdr *nlh,
->  		err = -ENODEV;
->  
->  	rtnl_nets_unlock(&rtnl_nets);
-> +	rtnl_nets_destroy(&rtnl_nets);
->  errout:
->  	return err;
->  }
-> -- 
-> 2.47.1
-> 
+Changes in v3:
+- Moved a function to before where is was called and removed the forward
+  declaration. Reworded a commit message. No functional changes.
+
+Changes in v4:
+- Replaced call to page_pool_put_page() with page_pool_put_full_page()
+  since page_pool_dev_alloc() API is used and page_pool is created with
+  PP_FLAG_DMA_SYNC_DEV flag.
+- Reworded final commit message one more time to try to make it clear
+  that there is just one fix for the commit.
+
+Changes in v5:
+- Removed link related patches from the patchset. These were merged
+  seperately.
+- Removed inappropriate calls to napi_free_frags()
+- Moved pp_alloc_error out of ethtool stats and accumulate into netdev
+  queue stat 'alloc_error'.
+
+Changes in v6:
+- Use the page pool API for all MTUs, not just <= PAGE_SIZE. Use page
+  pool 'order' field to accomodate MTUs > PAGE_SIZE. Remove the
+  function pointers and functions that handled the bigger MTUs.
+
+Changes in v7:
+- Added return code check for page_pool_create()
+
+Change in v8:
+- removed vestiges of rx copybreak
+
+John Daley (4):
+  enic: Move RX functions to their own file
+  enic: Simplify RX handler function
+  enic: Use the Page Pool API for RX
+  enic: remove copybreak tunable
+
+ drivers/net/ethernet/cisco/enic/Makefile      |   2 +-
+ drivers/net/ethernet/cisco/enic/enic.h        |   4 +-
+ .../net/ethernet/cisco/enic/enic_ethtool.c    |  39 ---
+ drivers/net/ethernet/cisco/enic/enic_main.c   | 274 ++----------------
+ drivers/net/ethernet/cisco/enic/enic_rq.c     | 242 ++++++++++++++++
+ drivers/net/ethernet/cisco/enic/enic_rq.h     |  10 +
+ drivers/net/ethernet/cisco/enic/vnic_rq.h     |   2 +
+ 7 files changed, 290 insertions(+), 283 deletions(-)
+ create mode 100644 drivers/net/ethernet/cisco/enic/enic_rq.c
+ create mode 100644 drivers/net/ethernet/cisco/enic/enic_rq.h
+
+-- 
+2.44.0
+
 
