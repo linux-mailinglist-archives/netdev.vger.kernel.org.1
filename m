@@ -1,231 +1,204 @@
-Return-Path: <netdev+bounces-163102-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-163100-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 492F4A2956B
-	for <lists+netdev@lfdr.de>; Wed,  5 Feb 2025 16:56:03 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id DFDE6A2955C
+	for <lists+netdev@lfdr.de>; Wed,  5 Feb 2025 16:54:54 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id BD5D81674CD
-	for <lists+netdev@lfdr.de>; Wed,  5 Feb 2025 15:55:31 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 336413A1634
+	for <lists+netdev@lfdr.de>; Wed,  5 Feb 2025 15:54:24 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5929519068E;
-	Wed,  5 Feb 2025 15:55:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8134B190678;
+	Wed,  5 Feb 2025 15:54:27 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="nApj2/e/"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="GnYFwDPP"
 X-Original-To: netdev@vger.kernel.org
-Received: from NAM12-MW2-obe.outbound.protection.outlook.com (mail-mw2nam12on2066.outbound.protection.outlook.com [40.107.244.66])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-vs1-f53.google.com (mail-vs1-f53.google.com [209.85.217.53])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9C26518DF64
-	for <netdev@vger.kernel.org>; Wed,  5 Feb 2025 15:55:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.244.66
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1738770930; cv=fail; b=jH/v09cdSrb6Abb977nAiEhCXjbTbC117ADoHPUkkVEhJDJ9iXwICiapxQkM1BLStQdVZkF8XvbDtgXjuBqxq/o+PRWjF9W4AN1oF5t17SopMNYqehFGlpg35rcrmkUBUrIeqMxg8C193d20wy8m4FW50lvw7pAMZzBxFy9korI=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1738770930; c=relaxed/simple;
-	bh=XDharbSpQhQtiPQcW2BQBIpwZhJAc3S4ufsSo698PVg=;
-	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=M1mwzbpRkIAtUNOh73xfOf29SMg1gKGuxbge4AigGaqgiuNOAtdhG2+oXa+BpfdirmLDEEHzGTJc3dVXJn7m1HiWPJ+YeE+xr1CZd8gBi/NkdI1DWUepWvS4oCg7HELtV+DDyB12naNYLCSUF8gadRo1geXdxRi/ycpj2fIMawE=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=nApj2/e/; arc=fail smtp.client-ip=40.107.244.66
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=RU1OAJb65JVprOsFpuXRSBkTjJZ8u8FdJnmUPrWoHEcpjty6DHpo6MoUZ4NO3hMYq3JzpmLMRoBwp239gLWOEsMqZZYopoghaj+lJDAbgIlbsLnSq7peXsC38eQMlfFqrQ1b1l5ZIgryeis0hNkEX1/Xn8zQ8UeKKswHQtFpHb2Irf2RvGKben9SQr9XNDpr0utpv8IC8kkjgAu9STHmAwZlnevRatvyF/Mg2eQTBrztyGQZ1wDuzldWMXRK2rMMuyDLjvc/kn5DJrFhSsScPWdCsx21qaXrq++KNMtxInwnvGDu1fMsNP9LqUA0XyGQOGwwRrtdfHYTOXQL17iJmA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=WiL2+r9JXHgDjDoPXr9lnayjlJh8Bj0TcmiGAODIs8I=;
- b=vGeWH3xpHaLmmYEQvjfXCNmv52nhfdGanTNgZp2v3ZJtMNPZYQopPMJdDc3EnGGoiizT9We16jdB2bi4iJZ/YPamHvK5OtiyTWjt7xCoZsMoMPfzIbHbvT9QkAbLyR1nJ6Ihjy8GWFIxvvaqMgVV/nXjTy507lui7CxQcVzQODI3RvDcR/fuR0PgVkq/B+rOv8bDt2yUM7uei+XK04NaZgvd3ZCrTDcxqIRB0BDGTXoeJScf05Qhgr8NvIjb57DG/DTmhU2LEkWmOh+JBF10LOa+AA2DT5DMB343fCabOttsgOZZRC2xHr90MiOaThJ15tOckVZiFyKPoeqE4GAG7A==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
- 216.228.117.161) smtp.rcpttodomain=vger.kernel.org smtp.mailfrom=nvidia.com;
- dmarc=pass (p=reject sp=reject pct=100) action=none header.from=nvidia.com;
- dkim=none (message not signed); arc=none (0)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=WiL2+r9JXHgDjDoPXr9lnayjlJh8Bj0TcmiGAODIs8I=;
- b=nApj2/e/XKLH+EnYwuXnjlN1Q16CMN+hWEUA79LAzMBAbFLjX6DmjAZQH1X4SMLqutjB24P+tkdbMl9DD3MfmqzX0Asx15OkT1N9IKzX7nlmWSiih4u2GwPs04rQaymPHoqPNpZhmakQCznhyeN3LvIHYFVa+/O00H48rhgIvvpvsj0kUz60qtEyGQDM0Yyz/xHruWCLwNUQtjcRUvPsfRtmYkBHj5jmJdRf810kCS4DKMDLW2gmjwuW7PQwnGXUcIy0Vm/Lm018jf8MQsbpmI4ygRM7Bgv9bbGTiT63DdIcJiXyP6MuuSJCUrwpifTVq0iiwBCll7Gge7+pabFP9w==
-Received: from BL1PR13CA0144.namprd13.prod.outlook.com (2603:10b6:208:2bb::29)
- by SN7PR12MB6957.namprd12.prod.outlook.com (2603:10b6:806:263::17) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8398.23; Wed, 5 Feb
- 2025 15:55:17 +0000
-Received: from BL6PEPF0001AB78.namprd02.prod.outlook.com
- (2603:10b6:208:2bb:cafe::ae) by BL1PR13CA0144.outlook.office365.com
- (2603:10b6:208:2bb::29) with Microsoft SMTP Server (version=TLS1_3,
- cipher=TLS_AES_256_GCM_SHA384) id 15.20.8398.24 via Frontend Transport; Wed,
- 5 Feb 2025 15:55:16 +0000
-X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 216.228.117.161)
- smtp.mailfrom=nvidia.com; dkim=none (message not signed)
- header.d=none;dmarc=pass action=none header.from=nvidia.com;
-Received-SPF: Pass (protection.outlook.com: domain of nvidia.com designates
- 216.228.117.161 as permitted sender) receiver=protection.outlook.com;
- client-ip=216.228.117.161; helo=mail.nvidia.com; pr=C
-Received: from mail.nvidia.com (216.228.117.161) by
- BL6PEPF0001AB78.mail.protection.outlook.com (10.167.242.171) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.8398.14 via Frontend Transport; Wed, 5 Feb 2025 15:55:16 +0000
-Received: from rnnvmail201.nvidia.com (10.129.68.8) by mail.nvidia.com
- (10.129.200.67) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.4; Wed, 5 Feb 2025
- 07:55:01 -0800
-Received: from dev-r-vrt-155.mtr.labs.mlnx (10.126.231.35) by
- rnnvmail201.nvidia.com (10.129.68.8) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.14; Wed, 5 Feb 2025 07:54:59 -0800
-From: Danielle Ratson <danieller@nvidia.com>
-To: <netdev@vger.kernel.org>
-CC: <mkubecek@suse.cz>, <matt@traverse.com.au>, <daniel.zahka@gmail.com>,
-	<amcohen@nvidia.com>, <nbu-mlxsw@exchange.nvidia.com>, Danielle Ratson
-	<danieller@nvidia.com>
-Subject: [PATCH ethtool-next v4 02/16] ethtool: Standardize Link Length field names across module types
-Date: Wed, 5 Feb 2025 17:54:22 +0200
-Message-ID: <20250205155436.1276904-3-danieller@nvidia.com>
-X-Mailer: git-send-email 2.47.0
-In-Reply-To: <20250205155436.1276904-1-danieller@nvidia.com>
-References: <20250205155436.1276904-1-danieller@nvidia.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D30CE17B4FF;
+	Wed,  5 Feb 2025 15:54:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.217.53
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1738770867; cv=none; b=UQPpwCR01FK4RYfOq69iYjB4Dok8OWLKWo4yPAlO3XksQSUwSDi2CqfLTgkHriwfZUypK82fbxN1dJi+Qi9iHEpDps6VODAmXhFoAAnjWQC9Ql8B+qvFZ/30O10+s37K2sYDNfdbPemSfL5Ftk/5Hj2JhiJ5u5u7Q/x3+qsbZTY=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1738770867; c=relaxed/simple;
+	bh=NddFo7pHGxOYVD1rlayBJJ2Yt2lNUNtVRU4Hs7xUq6Y=;
+	h=Date:From:To:Cc:Message-ID:In-Reply-To:References:Subject:
+	 Mime-Version:Content-Type; b=AOU3GIJaSm2JPNw0iR8NVqmJCEtuJfjpS9JenBAHDUn7JakSnHv31k2L+9J7EsD3Y1T/ObzXgLoInvIp8at0K7XF1xM3uzUlxJaXzHR5fCwd14lS2m9/OZsAXEQ1ij402GMGTzOfM6fYJmezZipg1aqnjhowoP3LD+Cy2SOPe/E=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=GnYFwDPP; arc=none smtp.client-ip=209.85.217.53
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-vs1-f53.google.com with SMTP id ada2fe7eead31-4aff620b232so2115826137.0;
+        Wed, 05 Feb 2025 07:54:25 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1738770865; x=1739375665; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:subject:references
+         :in-reply-to:message-id:cc:to:from:date:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=BoodWVEkqC0vSzEBKMeol9Q37vSk2OY2aQv2UOwU71I=;
+        b=GnYFwDPPtp8W9mwmYvOQSlwxnMnqeo95RPUGcUbmmJWyBY2L5Jg379jkYSMofDABNS
+         MhtZxbY2SmzmP4C9j82u6409At3V1nB8ei1PwrooYfs6dzaqZ9tPFzVqpuQg0v/ipI2i
+         2kYmaYQ0K0/CmvNrpJ/acnGmAQSAnO8dTg1P1vzro0wQ7R1B+L4y+/q4/UdSyQ5j3AOe
+         rJWbhxGUZWnOCcgvC749TEVFamLHvMySGec81MQVERrvpe8AQeafyREKFK1hAagKfJ4V
+         WMQ6jTzyBe/iEURp7vs9WWK4ThjQappaYnCFW4xWgfNS5A9SP+4W7xw4x/eZOXhVIS2Q
+         7+Rw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1738770865; x=1739375665;
+        h=content-transfer-encoding:mime-version:subject:references
+         :in-reply-to:message-id:cc:to:from:date:x-gm-message-state:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=BoodWVEkqC0vSzEBKMeol9Q37vSk2OY2aQv2UOwU71I=;
+        b=pVxgh/dRGp+LsVDZO26c4DJmuq8FoZxvCCDqpuF1tF8OP6NdNoVwT/a+pd6WAhueEo
+         B1gE3mgNt6wqzhikt5RB5Poc6q7j85BcZagzvT0KeFD9c1m4KzrXx/spv+rETHE6lg4H
+         ya4BvbKtQWxNCc1EzzYum5C42UtlRMW7yjczwbQcZmVBdCC7MFzAvf+uUpMICUSbc9By
+         LAYiuQAuB7j5EB5RTZlff0Gh8M/342Uwfpm0HqCXCU/1qmin6lBgQTfQrFoHRnkTz27F
+         nHxW+/ckLYYoaJ0um8pMrqdD0hLo+myia8DSInfY9F7wCFxCFQJc+9XHEBBK3AnVGWDL
+         Rd/g==
+X-Forwarded-Encrypted: i=1; AJvYcCWwf2kZIEDvU66JQ0wb3fzsbxaFqP65oUVAV7AqnXrpMOldd9Dr2DraK7J2hMTVZib+HaN5flk=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwyAqV0OcAby/w8V37klhFAFyQS4AlM58tGeSM9eyl98827hatl
+	cOeu+4PPwTBpQTWRTXrT9o71ED4FORogYFugx8ViLzOPjCbh6lDp
+X-Gm-Gg: ASbGncv6wathWg9ByMhJ5WES+n2NhhJd9Li1KHyQdDrazhOJdDlSUMigw5o/44Vrvyv
+	+w8p/iB0+KKdqxDWZ7VwO2tHfhN9PTXEJkSdQqHFAWc9EnvPOs8yCECZ1lh0Bo5dNks1j1kpkJX
+	8wLiMkQs3zwpiIj0K/fNLicq40Rh0KK2UhcS2NyfT0wJ/Qwk+gJDLIsGPvO1W35wRUnl0QjPjd0
+	jmpcCHWzPfe2UUUC8xjO9TwgQk23Imm6Np8njJ+1m/QpeT9AYBCCcbbYjHqWMp7lblO5WMv/qgK
+	djZe6v2jT/K/qUOmVNGKQMdMQ7ARCVvYb7DuDsvca7um3NNSBeJu7ZO9JA0y5vE=
+X-Google-Smtp-Source: AGHT+IGyb070xp1TAY9/hmfH0vIei5z7pLSfRHLpkJL76Go1KURLWYqldJWvZslXqO7xtooG9FPJvw==
+X-Received: by 2002:a05:6102:3306:b0:4af:fc14:f138 with SMTP id ada2fe7eead31-4ba478b3694mr2316719137.7.1738770864612;
+        Wed, 05 Feb 2025 07:54:24 -0800 (PST)
+Received: from localhost (15.60.86.34.bc.googleusercontent.com. [34.86.60.15])
+        by smtp.gmail.com with ESMTPSA id ada2fe7eead31-4b9baa14c0fsm2414454137.2.2025.02.05.07.54.23
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 05 Feb 2025 07:54:24 -0800 (PST)
+Date: Wed, 05 Feb 2025 10:54:23 -0500
+From: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
+To: Jason Xing <kerneljasonxing@gmail.com>, 
+ davem@davemloft.net, 
+ edumazet@google.com, 
+ kuba@kernel.org, 
+ pabeni@redhat.com, 
+ dsahern@kernel.org, 
+ willemdebruijn.kernel@gmail.com, 
+ willemb@google.com, 
+ ast@kernel.org, 
+ daniel@iogearbox.net, 
+ andrii@kernel.org, 
+ martin.lau@linux.dev, 
+ eddyz87@gmail.com, 
+ song@kernel.org, 
+ yonghong.song@linux.dev, 
+ john.fastabend@gmail.com, 
+ kpsingh@kernel.org, 
+ sdf@fomichev.me, 
+ haoluo@google.com, 
+ jolsa@kernel.org, 
+ horms@kernel.org
+Cc: bpf@vger.kernel.org, 
+ netdev@vger.kernel.org, 
+ Jason Xing <kerneljasonxing@gmail.com>
+Message-ID: <67a389af981b0_14e0832949d@willemb.c.googlers.com.notmuch>
+In-Reply-To: <20250204183024.87508-13-kerneljasonxing@gmail.com>
+References: <20250204183024.87508-1-kerneljasonxing@gmail.com>
+ <20250204183024.87508-13-kerneljasonxing@gmail.com>
+Subject: Re: [PATCH bpf-next v8 12/12] selftests/bpf: add simple bpf tests in
+ the tx path for timestamping feature
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: rnnvmail202.nvidia.com (10.129.68.7) To
- rnnvmail201.nvidia.com (10.129.68.8)
-X-EOPAttributedMessage: 0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: BL6PEPF0001AB78:EE_|SN7PR12MB6957:EE_
-X-MS-Office365-Filtering-Correlation-Id: 7c26f80f-3d84-4d6c-2911-08dd45fd7bf5
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|1800799024|376014|36860700013|82310400026;
-X-Microsoft-Antispam-Message-Info:
-	=?us-ascii?Q?gIStDAF1OQJNobCgGx4E/VD/4/w4/AroPXZPvoKsgAcFL0BMfhE+Du4AWmja?=
- =?us-ascii?Q?OOiNJFfVPDSDZe7t3+ao1u48JLNG7sz4ILRny/VOq8m++xq7/AHCkwYcADOZ?=
- =?us-ascii?Q?TYqpXaNTKsg/rirepsoLsJY8idSdKiYasJY8vhs2Tc1jlKFndaoSQnEQ6OMl?=
- =?us-ascii?Q?8b+sKZ8H79aUQlY4x5faSWDKUogNmWXQ9WCfEbx6uiDYh2+ZDk4JywlIkOO8?=
- =?us-ascii?Q?EUH1RxwN5qp2Q0KbxaFEP68s6C8RIpDXBCcsel50z4mmL0Sv1Ebtw4002/JE?=
- =?us-ascii?Q?7c6uFx9Q6IbCyb46D/gHTONmvPSRBifzqugN1S+8+NjrBT7zoq0B5OIXHvcg?=
- =?us-ascii?Q?b4xEkccyUzBHo0B2rAnOCd7lPTc7WhzHfwJuwX/YAcJ/J99sc4Q9I9bUQlof?=
- =?us-ascii?Q?w9Yu67ik7CAjmrhUS1PvCqsl6HFyftDp/VXXiltl+tL2X98QquEl9L4LKJlK?=
- =?us-ascii?Q?wX38LCU183lZ02LIdkLi/lukCucZjXc7bQNzYG1aJqkflgfAYAU3gKjO4o05?=
- =?us-ascii?Q?v9aFlrmTtVN9rbn/76H4c4/ayudxh5Kq1ZdNpnxv/325OiO1UjLSkp6xbsGl?=
- =?us-ascii?Q?bg+MavYF6xDpgFc7jHyqF7JsGtsFsPaHbvyFc/xFrLft3961kda1dYBqMwNv?=
- =?us-ascii?Q?7NBEx3Z9wOur81cAbFgRv4XcJ+Z0o8erDWo60/k5sEl7NZuNMHbdRDccOSqR?=
- =?us-ascii?Q?lAloVk1gvfFS5bPH2p9aUw76xqx25M6mLuZutkA/XOaODdqVTcfCTl5c+iXW?=
- =?us-ascii?Q?y4ebl8zpToWJODbFdnd08P6RAJVHm6Ra4RZcj5ogYlFbnCkE52iYU3e6Au4F?=
- =?us-ascii?Q?hgXqrhUDklp6dTgw6gPfgl4Y7RdTY0PFqiu+YF0B2xJOaywhQdPkCJeJoAxf?=
- =?us-ascii?Q?K7WR8NJRdvSo1txBkCUzJYAjSkSzDDINDxQG0+2TRPlp2/vFqsJoKXySJIxX?=
- =?us-ascii?Q?OnVtV+pOhbtUWVYiKtw5jzeXmwSKTIprB9ioMEO8SQXLW+FGpqP657v2XEya?=
- =?us-ascii?Q?f6ksan8yC1Mx4CaCp9+4tv29TrARbCkoeeBdQXp7NrA+xCpKWb1n4aMqkn2p?=
- =?us-ascii?Q?ROWrIHH/hXTwt165ggPM3Nom23OkH4fpr9bAIIm47s8xb3IzyPlvR1WtAJpd?=
- =?us-ascii?Q?rptvp7ImmusOWQa3Tt9+ygd+YBVJuxBXYOkdqt6iIJAGuLDnhTdQCJIfr48h?=
- =?us-ascii?Q?uu/CAP7qnAXXm9ZDdH1nydokS7Wm7L8etZUKT3ylqq4gvmws7vmaT5O1xHfM?=
- =?us-ascii?Q?r0igElF9lV6XJgEW22DEvpA+VhaQhHPC9en2yh7ZW2GVFsX7TdwQCJ2QS/p6?=
- =?us-ascii?Q?/ZqBb2gt8fu2PakTp69BKBc6CBQAtEjILRVqwNxtE6P3IaCpxvEKMZ9/W2/W?=
- =?us-ascii?Q?DQ+I2h0EKboy1vrJIuqSEZMJ20P1CT/JnD695qlfVBhh0UTOp4ckvbspCHhP?=
- =?us-ascii?Q?Vxkf38pqBgWf3YcOPdhsyHEofZOPkJvrntDY9PmKoEFxsEQZmf2MFht8qAWI?=
- =?us-ascii?Q?JLGdWNbYH6n1dfQ=3D?=
-X-Forefront-Antispam-Report:
-	CIP:216.228.117.161;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:dc6edge2.nvidia.com;CAT:NONE;SFS:(13230040)(1800799024)(376014)(36860700013)(82310400026);DIR:OUT;SFP:1101;
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 05 Feb 2025 15:55:16.3310
- (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: 7c26f80f-3d84-4d6c-2911-08dd45fd7bf5
-X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[216.228.117.161];Helo=[mail.nvidia.com]
-X-MS-Exchange-CrossTenant-AuthSource:
-	BL6PEPF0001AB78.namprd02.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Anonymous
-X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: SN7PR12MB6957
+Mime-Version: 1.0
+Content-Type: text/plain;
+ charset=utf-8
+Content-Transfer-Encoding: 7bit
 
-The 'Link Length' fields have inconsistent naming across different
-module types.
+Jason Xing wrote:
+> Bpf prog calculates a couple of latency delta between each tx points
+> which SO_TIMESTAMPING feature has already implemented. It can be used
+> in the real world to diagnose the behaviour in the tx path.
+> 
+> Also, check the safety issues by accessing a few bpf calls in
+> bpf_test_access_bpf_calls().
+> 
+> Signed-off-by: Jason Xing <kerneljasonxing@gmail.com>
 
-To ensure consistency, especially with the upcoming JSON support for the
-EEPROM dump, these field names should be aligned.
+> +static bool bpf_test_delay(struct bpf_sock_ops *skops, const struct sock *sk)
+> +{
+> +	struct bpf_sock_ops_kern *skops_kern;
+> +	u64 timestamp = bpf_ktime_get_ns();
+> +	struct skb_shared_info *shinfo;
+> +	struct delay_info dinfo = {0};
+> +	struct sk_tskey key = {0};
+> +	struct delay_info *val;
+> +	struct sk_buff *skb;
+> +	struct sk_stg *stg;
+> +	u64 prior_ts, delay;
+> +
+> +	if (bpf_test_access_bpf_calls(skops, sk))
+> +		return false;
+> +
+> +	skops_kern = bpf_cast_to_kern_ctx(skops);
+> +	skb = skops_kern->skb;
+> +	shinfo = bpf_core_cast(skb->head + skb->end, struct skb_shared_info);
+> +	key.tskey = shinfo->tskey;
+> +	if (!key.tskey)
+> +		return false;
+> +
+> +	key.cookie = bpf_get_socket_cookie(skops);
+> +	if (!key.cookie)
+> +		return false;
+> +
+> +	if (skops->op == BPF_SOCK_OPS_TS_SND_CB) {
+> +		stg = bpf_sk_storage_get(&sk_stg_map, (void *)sk, 0, 0);
+> +		if (!stg)
+> +			return false;
+> +		dinfo.sendmsg_ns = stg->sendmsg_ns;
+> +		bpf_map_update_elem(&time_map, &key, &dinfo, BPF_ANY);
+> +		goto out;
+> +	}
+> +
+> +	val = bpf_map_lookup_elem(&time_map, &key);
+> +	if (!val)
+> +		return false;
+> +
+> +	switch (skops->op) {
+> +	case BPF_SOCK_OPS_TS_SCHED_OPT_CB:
+> +		delay = val->sched_delay = timestamp - val->sendmsg_ns;
+> +		break;
 
-Standardize the Link Length fields across all module types.
+For a test this is fine. But just a reminder that in general a packet
+may pass through multiple qdiscs. For instance with bonding or tunnel
+virtual devices in the egress path.
 
-Signed-off-by: Danielle Ratson <danieller@nvidia.com>
----
+> +	case BPF_SOCK_OPS_TS_SW_OPT_CB:
+> +		prior_ts = val->sched_delay + val->sendmsg_ns;
+> +		delay = val->sw_snd_delay = timestamp - prior_ts;
+> +		break;
+> +	case BPF_SOCK_OPS_TS_ACK_OPT_CB:
+> +		prior_ts = val->sw_snd_delay + val->sched_delay + val->sendmsg_ns;
+> +		delay = val->ack_delay = timestamp - prior_ts;
+> +		break;
 
-Notes:
-    v3:
-    	* New patch.
+Similar to the above: fine for a test, but in practice be aware that
+packets may be resent, in which case an ACK might precede a repeat
+SCHED and SND. And erroneous or malicious peers may also just never
+send an ACK. So this can never be relied on in production settings,
+e.g., as the only signal to clear an entry from a map (as done in the
+branch below).
 
- cmis.c  |  4 ++--
- qsfp.c  |  8 ++++----
- sfpid.c | 11 ++++++-----
- 3 files changed, 12 insertions(+), 11 deletions(-)
-
-diff --git a/cmis.c b/cmis.c
-index 71f0745..5efafca 100644
---- a/cmis.c
-+++ b/cmis.c
-@@ -282,9 +282,9 @@ static void cmis_show_link_len(const struct cmis_memory_map *map)
- 	module_show_value_with_unit(map->page_01h, CMIS_OM4_LEN_OFFSET,
- 				    "Length (OM4)", 2, "m");
- 	module_show_value_with_unit(map->page_01h, CMIS_OM3_LEN_OFFSET,
--				    "Length (OM3 50/125um)", 2, "m");
-+				    "Length (OM3)", 2, "m");
- 	module_show_value_with_unit(map->page_01h, CMIS_OM2_LEN_OFFSET,
--				    "Length (OM2 50/125um)", 1, "m");
-+				    "Length (OM2)", 1, "m");
- }
- 
- /**
-diff --git a/qsfp.c b/qsfp.c
-index 6d774f8..1aa75fd 100644
---- a/qsfp.c
-+++ b/qsfp.c
-@@ -736,13 +736,13 @@ static void sff8636_show_page_zero(const struct sff8636_memory_map *map)
- 				    "BR, Nominal", 100, "Mbps");
- 	sff8636_show_rate_identifier(map);
- 	module_show_value_with_unit(map->page_00h, SFF8636_SM_LEN_OFFSET,
--				    "Length (SMF,km)", 1, "km");
-+				    "Length (SMF)", 1, "km");
- 	module_show_value_with_unit(map->page_00h, SFF8636_OM3_LEN_OFFSET,
--				    "Length (OM3 50um)", 2, "m");
-+				    "Length (OM3)", 2, "m");
- 	module_show_value_with_unit(map->page_00h, SFF8636_OM2_LEN_OFFSET,
--				    "Length (OM2 50um)", 1, "m");
-+				    "Length (OM2)", 1, "m");
- 	module_show_value_with_unit(map->page_00h, SFF8636_OM1_LEN_OFFSET,
--				    "Length (OM1 62.5um)", 1, "m");
-+				    "Length (OM1)", 1, "m");
- 	module_show_value_with_unit(map->page_00h, SFF8636_CBL_LEN_OFFSET,
- 				    "Length (Copper or Active cable)", 1, "m");
- 	sff8636_show_wavelength_or_copper_compliance(map);
-diff --git a/sfpid.c b/sfpid.c
-index 459ed0b..d128f48 100644
---- a/sfpid.c
-+++ b/sfpid.c
-@@ -395,11 +395,12 @@ static void sff8079_show_all_common(const __u8 *id)
- 		sff8079_show_encoding(id);
- 		printf("\t%-41s : %u%s\n", "BR, Nominal", br_nom, "MBd");
- 		sff8079_show_rate_identifier(id);
--		module_show_value_with_unit(id, 14, "Length (SMF,km)", 1, "km");
--		module_show_value_with_unit(id, 15, "Length (SMF)", 100, "m");
--		module_show_value_with_unit(id, 16, "Length (50um)", 10, "m");
--		module_show_value_with_unit(id, 17, "Length (62.5um)", 10, "m");
--		module_show_value_with_unit(id, 18, "Length (Copper)", 1, "m");
-+		module_show_value_with_unit(id, 14, "Length (SMF)", 1, "km");
-+		module_show_value_with_unit(id, 16, "Length (OM2)", 10, "m");
-+		module_show_value_with_unit(id, 17, "Length (OM1)", 10, "m");
-+		module_show_value_with_unit(id, 18,
-+					    "Length (Copper or Active cable)",
-+					    1, "m");
- 		module_show_value_with_unit(id, 19, "Length (OM3)", 10, "m");
- 		sff8079_show_wavelength_or_copper_compliance(id);
- 		module_show_ascii(id, 20, 35, "Vendor name");
--- 
-2.47.0
-
+> +	}
+> +
+> +	if (delay >= delay_tolerance_nsec)
+> +		return false;
+> +
+> +	/* Since it's the last one, remove from the map after latency check */
+> +	if (skops->op == BPF_SOCK_OPS_TS_ACK_OPT_CB)
+> +		bpf_map_delete_elem(&time_map, &key);
+> +
+> +out:
+> +	return true;
+> +}
+> +
 
