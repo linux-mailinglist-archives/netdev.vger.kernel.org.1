@@ -1,418 +1,162 @@
-Return-Path: <netdev+bounces-162856-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-162855-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1A38EA282BB
-	for <lists+netdev@lfdr.de>; Wed,  5 Feb 2025 04:19:25 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0AA41A282BA
+	for <lists+netdev@lfdr.de>; Wed,  5 Feb 2025 04:18:45 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 7D4CF3A21DA
-	for <lists+netdev@lfdr.de>; Wed,  5 Feb 2025 03:19:16 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id F05541886814
+	for <lists+netdev@lfdr.de>; Wed,  5 Feb 2025 03:18:49 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E4349142E83;
-	Wed,  5 Feb 2025 03:19:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B45E779FE;
+	Wed,  5 Feb 2025 03:18:41 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="FMWxmAg1"
+	dkim=pass (1024-bit key) header.d=fastly.com header.i=@fastly.com header.b="vBylLj/d"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.12])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f172.google.com (mail-pl1-f172.google.com [209.85.214.172])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8932C25A647;
-	Wed,  5 Feb 2025 03:19:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=192.198.163.12
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1738725560; cv=fail; b=Ef3Jq0d4QqmVXsgJ4MfYcusp6v3lggS1fdFlAozlglpFGTaElory7+0JzfTxpJzbMiLeKZQk5/aSPmWlluiOc7EuMDIouhstUz+66c/XA5+X5EDdJPfRv5bJ+3d8G4eHREnMC1n4Po9K+S0ouJEdGuVnY/oks1J7ZBXiTkabB7A=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1738725560; c=relaxed/simple;
-	bh=zDZy29oIBpwv1WZgBYwMZ0hr8QAfxWaRWD8MSi0eJ8k=;
-	h=From:To:CC:Subject:Date:Message-ID:Content-Type:MIME-Version; b=JRtwHDfsrQdRScjWqsvbFFWfwCNAnBB6klWFIr/Q3uO8exKf5YX5vdsOaRrSwJ+JIVMLUZbjj4n8sSvKNiSSG3KbqYOCOoHWnCw2OrgiDpL0Ob3OsS5623txEFApd+lZaFryJzdZF29+1sLidcSRbBmYJAxfxD3e27He3zr81QI=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=FMWxmAg1; arc=fail smtp.client-ip=192.198.163.12
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1738725558; x=1770261558;
-  h=from:to:cc:subject:date:message-id:
-   content-transfer-encoding:mime-version;
-  bh=zDZy29oIBpwv1WZgBYwMZ0hr8QAfxWaRWD8MSi0eJ8k=;
-  b=FMWxmAg1+0Yqa58zswDKF4gqh0tTD39d9A+8AbDEJoYg1C7sIbR0fVje
-   /JsjFrED1SNjz4hkL13jTvc4pUgQN9XDGTU3Js2xzUfQf1ZgCKJOanGmT
-   mYJCTsw+Y3neJA8APX19oX3mgU8j8ad5rAH92UOSDy2nCt+5ZpO7bS8J4
-   //Nmzpj87+uHGcR007msRSui1j048cU/5EcTONEcAbaEZQIMFJEna4gmD
-   +TW16iv1yTLgL/3f0CYwLeFpn3HjA31QLhhBMQQ//MKIqFOxhgiTN+2cA
-   bN3Etf4E9TklgMwcKSxCwUFWfwvwo66XRzI4p9VpoLWr7XuJJB7+QUhYh
-   g==;
-X-CSE-ConnectionGUID: Lcfg0IPTTNmxqNvrkYacog==
-X-CSE-MsgGUID: 5H1Ag2hbS2KVhM/jDAdcSw==
-X-IronPort-AV: E=McAfee;i="6700,10204,11336"; a="43198866"
-X-IronPort-AV: E=Sophos;i="6.13,260,1732608000"; 
-   d="scan'208";a="43198866"
-Received: from orviesa009.jf.intel.com ([10.64.159.149])
-  by fmvoesa106.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 04 Feb 2025 19:19:17 -0800
-X-CSE-ConnectionGUID: p9X/CJmLTsuthfJLP75d5g==
-X-CSE-MsgGUID: M+imfa43TSqNQhuqEU+72w==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.13,260,1732608000"; 
-   d="scan'208";a="110555386"
-Received: from orsmsx603.amr.corp.intel.com ([10.22.229.16])
-  by orviesa009.jf.intel.com with ESMTP/TLS/AES256-GCM-SHA384; 04 Feb 2025 19:19:16 -0800
-Received: from orsmsx601.amr.corp.intel.com (10.22.229.14) by
- ORSMSX603.amr.corp.intel.com (10.22.229.16) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.44; Tue, 4 Feb 2025 19:19:15 -0800
-Received: from orsedg603.ED.cps.intel.com (10.7.248.4) by
- orsmsx601.amr.corp.intel.com (10.22.229.14) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.44 via Frontend Transport; Tue, 4 Feb 2025 19:19:15 -0800
-Received: from NAM11-DM6-obe.outbound.protection.outlook.com (104.47.57.171)
- by edgegateway.intel.com (134.134.137.100) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.1.2507.44; Tue, 4 Feb 2025 19:19:14 -0800
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=SqfyMAhAvwq+/2QUxVLzGMv90qdCOgEpYYjkOwKlsCZ0Eos7MVnMEodkZQqTBX5E+t5pnGYk99DgPa4cse6k96JBLeOyBsNHwfePUYZssr8+y5ahwTt+Lyw7fallQIcufy+Vjz7Qux6nJRfpdJoSS0RK0wjC1kDvmDMwbTHX2n3Rz00xJ+nmV7B3VRnCO+6ZFDocYSEyIRdI7HtCMrPMhzxRBYnOafxwcgZDiSNgAQTVJH2w2QPBMP5dfLPJb2b+sRo7aFFEe1FMt1qA4Jzlrt0Orgv50sIULBnIhcG8G1QLhTJutskOQNDEUI1U6v+kjoNlPasX3EthnCHhIl+rZA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=1tR8dnnCqQWL22nauXw/Zd9vdZwyLsESjcC15AEgOoE=;
- b=It60aXKYQf8R8aIzcEp1JN6DfozCnrSI+7qhd9F0X1QLpCXaJRG7ZSYWkQ4J9TSZqnA13GA5GHkTCqLzOyj9JBdYaRwWZAMHqGvCek6xzgicQABoAgPw3pohq8WBach6rF6isFHYmcM/lrmaFCdeHWLRTEF9GluekdEoREAUirOf+VUrvD9lrucKarpqMILnSMvwFzn8TbTVC/6vEQE3hzMZlf+DRSC/2HVZGgt0g2Hs9yTlX1w5oJx5w3ENiq8AVph2bPpaLy1SLcqR5LuWqhNb4C9lB2HBVG39B9dArJTsJOMO/u4FG6iB9I279Tk09uZT2E+79Lxawm51OC4Azw==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
- dkim=pass header.d=intel.com; arc=none
-Received: from CY8PR11MB7134.namprd11.prod.outlook.com (2603:10b6:930:62::17)
- by PH7PR11MB5864.namprd11.prod.outlook.com (2603:10b6:510:136::18) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8398.24; Wed, 5 Feb
- 2025 03:18:31 +0000
-Received: from CY8PR11MB7134.namprd11.prod.outlook.com
- ([fe80::cd87:9086:122c:be3d]) by CY8PR11MB7134.namprd11.prod.outlook.com
- ([fe80::cd87:9086:122c:be3d%4]) with mapi id 15.20.8398.025; Wed, 5 Feb 2025
- 03:18:31 +0000
-From: "Zhuo, Qiuxu" <qiuxu.zhuo@intel.com>
-To: "Nguyen, Anthony L" <anthony.l.nguyen@intel.com>, "Kitszel, Przemyslaw"
-	<przemyslaw.kitszel@intel.com>, "andrew+netdev@lunn.ch"
-	<andrew+netdev@lunn.ch>, "davem@davemloft.net" <davem@davemloft.net>,
-	"edumazet@google.com" <edumazet@google.com>, "kuba@kernel.org"
-	<kuba@kernel.org>, "pabeni@redhat.com" <pabeni@redhat.com>, "Knitter, Konrad"
-	<konrad.knitter@intel.com>
-CC: "intel-wired-lan@lists.osuosl.org" <intel-wired-lan@lists.osuosl.org>,
-	"netdev@vger.kernel.org" <netdev@vger.kernel.org>,
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
-Subject: Build error on "drivers/net/ethernet/intel/ice/devlink/health.c:35:3:
- error: initializer element is not constant"
-Thread-Topic: Build error on
- "drivers/net/ethernet/intel/ice/devlink/health.c:35:3: error: initializer
- element is not constant"
-Thread-Index: Adt3fFdYOdEzc7CrQOSZHCldp7twkA==
-Date: Wed, 5 Feb 2025 03:18:30 +0000
-Message-ID: <CY8PR11MB7134BF7A46D71E50D25FA7A989F72@CY8PR11MB7134.namprd11.prod.outlook.com>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach:
-X-MS-TNEF-Correlator:
-authentication-results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=intel.com;
-x-ms-publictraffictype: Email
-x-ms-traffictypediagnostic: CY8PR11MB7134:EE_|PH7PR11MB5864:EE_
-x-ms-office365-filtering-correlation-id: 482ee350-f1c0-4c5d-c0ae-08dd4593c43d
-x-ms-exchange-senderadcheck: 1
-x-ms-exchange-antispam-relay: 0
-x-microsoft-antispam: BCL:0;ARA:13230040|1800799024|366016|376014|921020|38070700018;
-x-microsoft-antispam-message-info: =?iso-8859-1?Q?F1xOlLsnDpUIesXNLG7AFhQmc1mCOIvREXthemh3PzgMPJXwj1BD4EwuoM?=
- =?iso-8859-1?Q?4X4tYlPSDxeQUQZO3LSAoni/JQrP96yVlYQO+lqImEpzPBnUoX5Ea+dJrL?=
- =?iso-8859-1?Q?jZp31q8qp8QcM2pPHMiiZ8DFxTO0EAmVtEFCgv5c84ETuGwNbxTnbxdZZ+?=
- =?iso-8859-1?Q?ssU+vqTPudnLm+6c6jjoShtezhdveCiisZO702F/c8UYn+8NgDaUv7RrGX?=
- =?iso-8859-1?Q?/Hvi304vGpkYS5LiITSM7QkxtHjRMKwU+QSdFBx0QgXfVWaaH2RuooDqKK?=
- =?iso-8859-1?Q?pkv8oml+F+CjGrGif583Bfd2jssWgSBLwqE1xnbsfnyZIDhI+kfDw/iAm7?=
- =?iso-8859-1?Q?Wwyr/ONl5coR+neaydHRwjrVNYUzTPdoAWHufUi0pPIQyWwlkWwMVfEXKZ?=
- =?iso-8859-1?Q?4O8ukIpKs1+Lc8XdkaZWkSQJ+vEgb49FwW01XjQi+J1iFObp6AZBS8gkuy?=
- =?iso-8859-1?Q?XJj4as8cAyy90tfHCyXRahnK8VvPMnAeKKyxI2cdgghx22RNRhU9TI61G2?=
- =?iso-8859-1?Q?UsNo7zP2S3w0GYNTkhqBJLCRXUJ4Ba1JxP+MDaWTkwQ+cESF26nsqXaKno?=
- =?iso-8859-1?Q?4ZpLoW4jDWpJsGDw+xnddd2T2vw8eBl7aDMFnCeCvpkDRIYYSXoeveQXJv?=
- =?iso-8859-1?Q?tLYI88joq/+zPh8lSsKk2X0Y09s8TPc0Ukcm+N98zFSzMa+Wjzbae1uygp?=
- =?iso-8859-1?Q?A68IR43RnO+vD6doJp5THsxUFJkf/dSp3eexOhScyfC5trc9u0sY35st+U?=
- =?iso-8859-1?Q?tqvD3F411Kr5+WYyVvJdGoWzrhLAnCLUsEL4PrHsA9oBAoz0u8VaK3q4xg?=
- =?iso-8859-1?Q?p4bL2SIvJtWt3a5ralyAl5PLgKFPjVJ1dUQ1LXXzvXl1/NaZHtFgmTlFJd?=
- =?iso-8859-1?Q?G4viAoYrrLmBO95BB5msvmmPAjtfEeC0AzEwCFT1qV5lqzjmuJ7yQVLJAh?=
- =?iso-8859-1?Q?rMiL3GuLVnEGOM5sgxC1AnLdTBvmjBBzlVmk7p3FjbKyQva8HLje77m1WN?=
- =?iso-8859-1?Q?Oob7zr6SVpyda+iN7td5ucs+KmPNkK8fsG0gzJoBVxextgjViJGgLHWjtR?=
- =?iso-8859-1?Q?txQTW2oZEr+/8AZYQPSxhpZ+Q9iW1KwD93FieG1QOQwT8rNzN67oQtKxHL?=
- =?iso-8859-1?Q?ryDhg7ioWyxm7exw4Fi2oI5Sta8KMZ64xerUk6+3te8QTYJLcYZ+jGh4Tb?=
- =?iso-8859-1?Q?swXzDJynzVE3xQOR3drk5Tt/6/RHm8hA6Fh8QnYTNfbXcba+KZRpC4UOI2?=
- =?iso-8859-1?Q?FO+/cYTa5eeiUd8JiZvnrG9fahykd2CvHbBTlseWIQQFsraiSfhnWMLmYe?=
- =?iso-8859-1?Q?jNfo703ZGW7xLNeR+ylohPQnN5beDlxbgztiLG4koRHGvcLwouUgDiyvmY?=
- =?iso-8859-1?Q?CVnnpgP47jdzqUtIf0McHPONUPPeshsZgJR9kIF8XRi1SetIG8x8li0Hby?=
- =?iso-8859-1?Q?YozCaJRvFthIrJhHwLAPqw2iHQFPhWE4OY2AqhG+cZ9yxfjADJySvbNDit?=
- =?iso-8859-1?Q?dzRfxbAZg8ANqCA1hlTRNhaRIUq4Bkf/EKFWQA08Wi0A=3D=3D?=
-x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:CY8PR11MB7134.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(1800799024)(366016)(376014)(921020)(38070700018);DIR:OUT;SFP:1101;
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0: =?iso-8859-1?Q?EJg0W7h17TK/0j0RAXIPhc5HZZINFX4W0t60JA8qZMvVT15V7WtQZOJyvf?=
- =?iso-8859-1?Q?bx3ejOBNeoEp6aj1r81SUD1V99OXA0WxaBqU1Wo6R2MlOG722xC1LjBcoe?=
- =?iso-8859-1?Q?1MalQl6/hFgjmXWKyMbayUzCv9Wgr7nQyNIhxMeO0KzC4WTgTWlPsjCOU3?=
- =?iso-8859-1?Q?0VPsmd7zaKAahcF6Bw/m9eVrZRCyZ8OPp0TTMV5W9/7PsYH4HeKWJZR6pk?=
- =?iso-8859-1?Q?ctwEKkInUn6g+g5Q/3nec1kT3g3mxb9ZDuEUhqFL9K+Afsbu3ajlpt1OXT?=
- =?iso-8859-1?Q?3WmbPRe6YV5uzoJUCIAMpUkI38bu4qTHziIBRG+6VX2hVzhPSlr6SKfTNt?=
- =?iso-8859-1?Q?acr06GcYxRXCwbH8c11IE4zMl51vZJmFk3PkYTNmCTeX5k9qIBj9FcWqbI?=
- =?iso-8859-1?Q?+mxdfRHALOopY03M3yDp/+mvkpKI2VJXUUbHopkY1cbZ+FoZQXzuUfXOe3?=
- =?iso-8859-1?Q?qTGzXMWCsBg4XMaLXSycvlouUxly0PmUG3DPvrUJ/OS4oxdXlROo4xY5vE?=
- =?iso-8859-1?Q?VwFtigcKaBBMfv6F4zxrZQ92ABpqHmud7Tu9IpWzRJPEzQXCUBR6zO/ViS?=
- =?iso-8859-1?Q?6Ji9/PHX0Jl9M+sNbJxAUtxikg52YOq2MtnN4E07MFKh+5BmfuMeJ3o6LC?=
- =?iso-8859-1?Q?t79PCzR6kwfBqVpAwR4JeEfX3zdd7b/rt5CYVEmt9tO/ib+3LEBPd6i0m3?=
- =?iso-8859-1?Q?jB0GPrcWM+Et50MAtS390aiuGC1n1xoMDlxvMov5yzPZKo7sUFX6haxKxK?=
- =?iso-8859-1?Q?3twTxU7fgZhVmNi1KSadt79SorVsHb3zn+Xliv6vQRWNUPKwUh1GDplMjQ?=
- =?iso-8859-1?Q?3W7vgbFGynskDM3n29Q2VmqXUTmn78+VkXSpeiXjBLRUImP9IewPa71oxr?=
- =?iso-8859-1?Q?6a3yIJZgbTycIv7zAKaWJDUHaaTx4bPJijPQNQTvB2mQEHCTA6bNVgrU/F?=
- =?iso-8859-1?Q?8i3Ynl64oD4oK5H2c/VIjjz2CZam+JMHDoLAFa6FLVVbD46bPhyzabHRfM?=
- =?iso-8859-1?Q?A0ADt3YdyMa9kkjkvwWXejdIQsxQMaZbum1fGzvDxFCWFqzV0u/YWz4sHS?=
- =?iso-8859-1?Q?xPaEry7L11cy3MKQERnSs+wUtfQd08SwYjWaK90C9d1J9kHzbZufH92QJU?=
- =?iso-8859-1?Q?B/cE40MWXEv2djoD0tUTZjNcIm2Yp21pbsQKadFYLNg6MK2Q6ty+4zpLKF?=
- =?iso-8859-1?Q?ZxlGMOlH8Lif3IFWLkQoNywk4zkNeykyp5Wu+NYsGp5Y71VfIY+jp+Csi+?=
- =?iso-8859-1?Q?+ChA7hgAn59eic5zUvlD4n0oYjgYlWdIcTUWFo3xC324UkjXPpNR2w90uA?=
- =?iso-8859-1?Q?APnFFF0uBoLKEX+PuROewUD+S/DskzjOLz/U6yvRY/hpfAW9UW4Ugj0PTn?=
- =?iso-8859-1?Q?GEjqbk1akP+VD2nL3V2EqzdqswOcorkzfzi4I61g5Au204hAb4I4+YbX6U?=
- =?iso-8859-1?Q?lI5CaQU4/pIDg2+ermFt60u2BJ+LpfYueNTbxSDk5y+W5y8+3EyigKVJxL?=
- =?iso-8859-1?Q?EZZXUVsY7vSMVWiaUHUYA5KeRdSQrH5bltqtHotBpRTriCv5srPDN1YUkY?=
- =?iso-8859-1?Q?d5AXZF4UmgBALvvlLWVD/nwMwhfsgMPH5Gq0VixclBHc9kKm9tdpa5wWt5?=
- =?iso-8859-1?Q?1BEBbwaMX3kH+OyFTsawAAtEI197mzU4KX?=
-Content-Type: text/plain; charset="iso-8859-1"
-Content-Transfer-Encoding: quoted-printable
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 15F5A25A647
+	for <netdev@vger.kernel.org>; Wed,  5 Feb 2025 03:18:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.172
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1738725521; cv=none; b=sGXHk6+UsFca4XwB3KL9qdrhgQo6SDuMq6V9d165LJY6+479s5y8x/OB37mFxb+ajiu+rvaoJ1UeLgiFbL+YMNLXI6cta2qXLSPn5HyUV6qsesSh+EtkCQMVq6gVaAr2IR9di9AIMU9MTDNb6Hsl591AoumKGPrQKh/BiqbM3xo=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1738725521; c=relaxed/simple;
+	bh=O7IeDytuScu5r0bK9yl/chNUeUiDA7ktYEBpbW0W5FA=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=o70n9P+YN0bhKF3yhHkvr+igETFu/owhJehgVw5PPSjrhbbpWfZ4sGGYX7HhytJJrWQpBGtxdimeQzIQvAsuveT+dy3RuUR8VS75yZVV62nE0NpGtgKwVyq+l/zhR2cDP1Uko+vEERHY25kgaUyWpckgPHTgTgqEDZwI4jv42XI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fastly.com; spf=pass smtp.mailfrom=fastly.com; dkim=pass (1024-bit key) header.d=fastly.com header.i=@fastly.com header.b=vBylLj/d; arc=none smtp.client-ip=209.85.214.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fastly.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=fastly.com
+Received: by mail-pl1-f172.google.com with SMTP id d9443c01a7336-21636268e43so140747075ad.2
+        for <netdev@vger.kernel.org>; Tue, 04 Feb 2025 19:18:39 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=fastly.com; s=google; t=1738725519; x=1739330319; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references
+         :mail-followup-to:message-id:subject:cc:to:from:date:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=hD/U5phP/RLFyGCm0vWNM7cwXNfVCS6mJRDW7IhkBrw=;
+        b=vBylLj/dWpW2PwNxO3h1pEqQvLMqZHzJQ/ly1vSTaxo9jBjkkgXCobVJpnHSPO2F6U
+         aPRGNMzH8HoiZtq7KP8j9Kzc7dUMH0LtUS+LoofFB3o33LwYlZdKjQRWNaXpd0mP44tc
+         ufXxdN4h8hc+qQdsgnaVa+xaQ5vv8c3Qlus/4=
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1738725519; x=1739330319;
+        h=in-reply-to:content-disposition:mime-version:references
+         :mail-followup-to:message-id:subject:cc:to:from:date
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=hD/U5phP/RLFyGCm0vWNM7cwXNfVCS6mJRDW7IhkBrw=;
+        b=hf9qrNgnwWRK6zDQQ6Fr6/D8al5pLP6KxPMWlo5RtY2nhEdNy7128wbhgLmqqJqREF
+         r9yPRO9ZDkoxwAUQW/h39ngvMVj0voZlussnxXkPbYIK55gFyUn4USUnIm1at80cI7Y3
+         yy0nUO/rJMKVFem+LPGunajU1QY5EZGTCiuvustmjIgvwqj2wnyKPzcyrPZdqgY6akep
+         8uoD/q3/wqhbOvAPmjGZrNPo37DU7J31BCbtV+erXLdv6a7U6flIe/HFN4s5AJuXI1tQ
+         XaZ8skCghvdJ0FriOW3llXdpF295gpWg2ntCWp5zoMYPI0rXO7cggcwFLXVNiNJiIGkV
+         4OIQ==
+X-Forwarded-Encrypted: i=1; AJvYcCUYKyMUjsYNJ/IbBZYgwxjiTk/r03X4j7gl7nqrAWDuCdsfGqLl2bX77Z3yputwiY5m/qkstyo=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzuuHSH3IlkStY/Zf3Wo3C2QnvTn8zK/W4N5/EIVqVzHpkaEMp7
+	eu01G9yH2M3EGhB5XHyrOpTMS63Dov74LW1HfVN7a8Jr9XFKguneXy/giAUTH3ecJ9vifWFwoTA
+	0
+X-Gm-Gg: ASbGncuYvmvqafPQMh2iYtHH5i26vZqZ/opsT42nbdXfUL6XQrUIJLQ1KvjZ8rZ70fG
+	3WUfP6w2wKqtJWYYmfYl6VMM52a8lM1K6De+vGNcyohYK7+rnYkHglUN0fLrHIKWsmOtL4hLAli
+	5cLSLjCG2kyoZfABqgeojzhCf3FdKT5fNV/mFi03kqPW3TPA+Ng/QshmTFe3PLCjDWR68V0qwl2
+	uTI9gZWS8YzxsIzHxWk/z1XftSjr8DsRurgGoMbVxnHI6Lwwfy+OkstLJRt/A+S1YIJg5Pe49Rt
+	tKvKPq7yCgiU/QJDTEXy+g7Q4Z1oN61MYYfDecyAD/6En5yaMYtO7Z5QQ34Xp5k=
+X-Google-Smtp-Source: AGHT+IEfmLyQd1Eaxi1hoFdjFd/Mju4vr9oEHQ4sXoQt7m0S21IoDP9guLOkX9clao+NmbzCrOUguw==
+X-Received: by 2002:a17:903:228a:b0:21d:cd0c:a1ac with SMTP id d9443c01a7336-21f17df7196mr19708445ad.17.1738725519335;
+        Tue, 04 Feb 2025 19:18:39 -0800 (PST)
+Received: from LQ3V64L9R2 (c-24-6-151-244.hsd1.ca.comcast.net. [24.6.151.244])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-21de330386fsm104694215ad.192.2025.02.04.19.18.38
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 04 Feb 2025 19:18:38 -0800 (PST)
+Date: Tue, 4 Feb 2025 19:18:36 -0800
+From: Joe Damato <jdamato@fastly.com>
+To: Samiullah Khawaja <skhawaja@google.com>
+Cc: Jakub Kicinski <kuba@kernel.org>,
+	"David S . Miller " <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
+	almasrymina@google.com, netdev@vger.kernel.org
+Subject: Re: [PATCH net-next v3 0/4] Add support to do threaded napi busy poll
+Message-ID: <Z6LYjHJxx0pI45WU@LQ3V64L9R2>
+Mail-Followup-To: Joe Damato <jdamato@fastly.com>,
+	Samiullah Khawaja <skhawaja@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	"David S . Miller " <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
+	almasrymina@google.com, netdev@vger.kernel.org
+References: <20250205001052.2590140-1-skhawaja@google.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: CY8PR11MB7134.namprd11.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 482ee350-f1c0-4c5d-c0ae-08dd4593c43d
-X-MS-Exchange-CrossTenant-originalarrivaltime: 05 Feb 2025 03:18:31.1266
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 46c98d88-e344-4ed4-8496-4ed7712e255d
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: Rxr28ryLRyaAuhyyxZShIEENpN4LJK6r6XneTqxXexxZ/H3tHjQIhwl7LXsZ8ODzM4pPuGE+Ez1zwOTOMEx24w==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH7PR11MB5864
-X-OriginatorOrg: intel.com
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250205001052.2590140-1-skhawaja@google.com>
 
-Hi,
+On Wed, Feb 05, 2025 at 12:10:48AM +0000, Samiullah Khawaja wrote:
+> Extend the already existing support of threaded napi poll to do continuous
+> busy polling.
 
-I got the=A0build error messages as below:
-My GCC is: gcc (Ubuntu 7.5.0-3ubuntu1~18.04) 7.5.0.
+[...]
 
+Overall, +1 to everything Martin said in his response. I think I'd
+like to try to reproduce this myself to better understand the stated
+numbers below.
 
-  CC [M]  drivers/net/ethernet/stmicro/stmmac/stmmac_mdio.o
-drivers/net/ethernet/intel/ice/devlink/health.c:35:3: error: initializer el=
-ement is not constant
-   ice_common_port_solutions, {ice_port_number_label}},
-   ^~~~~~~~~~~~~~~~~~~~~~~~~
-drivers/net/ethernet/intel/ice/devlink/health.c:35:3: note: (near initializ=
-ation for 'ice_health_status_lookup[0].solution')
-drivers/net/ethernet/intel/ice/devlink/health.c:35:31: error: initializer e=
-lement is not constant
-   ice_common_port_solutions, {ice_port_number_label}},
-                               ^~~~~~~~~~~~~~~~~~~~~
-drivers/net/ethernet/intel/ice/devlink/health.c:35:31: note: (near initiali=
-zation for 'ice_health_status_lookup[0].data_label[0]')
-drivers/net/ethernet/intel/ice/devlink/health.c:37:46: error: initializer e=
-lement is not constant
-   "Change or replace the module or cable.", {ice_port_number_label}},
-                                              ^~~~~~~~~~~~~~~~~~~~~
-drivers/net/ethernet/intel/ice/devlink/health.c:37:46: note: (near initiali=
-zation for 'ice_health_status_lookup[1].data_label[0]')
-drivers/net/ethernet/intel/ice/devlink/health.c:39:3: error: initializer el=
-ement is not constant
-   ice_common_port_solutions, {ice_port_number_label}},
-   ^~~~~~~~~~~~~~~~~~~~~~~~~
-drivers/net/ethernet/intel/ice/devlink/health.c:39:3: note: (near initializ=
-ation for 'ice_health_status_lookup[2].solution')
-drivers/net/ethernet/intel/ice/devlink/health.c:39:31: error: initializer e=
-lement is not constant
-   ice_common_port_solutions, {ice_port_number_label}},
-                               ^~~~~~~~~~~~~~~~~~~~~
-drivers/net/ethernet/intel/ice/devlink/health.c:39:31: note: (near initiali=
-zation for 'ice_health_status_lookup[2].data_label[0]')
-drivers/net/ethernet/intel/ice/devlink/health.c:43:4: error: initializer el=
-ement is not constant
-   {ice_port_number_label}},
-    ^~~~~~~~~~~~~~~~~~~~~
-drivers/net/ethernet/intel/ice/devlink/health.c:43:4: note: (near initializ=
-ation for 'ice_health_status_lookup[3].data_label[0]')
-drivers/net/ethernet/intel/ice/devlink/health.c:46:4: error: initializer el=
-ement is not constant
-   {ice_port_number_label}},
-    ^~~~~~~~~~~~~~~~~~~~~
-drivers/net/ethernet/intel/ice/devlink/health.c:46:4: note: (near initializ=
-ation for 'ice_health_status_lookup[4].data_label[0]')
-drivers/net/ethernet/intel/ice/devlink/health.c:49:4: error: initializer el=
-ement is not constant
-   {ice_port_number_label}},
-    ^~~~~~~~~~~~~~~~~~~~~
-drivers/net/ethernet/intel/ice/devlink/health.c:49:4: note: (near initializ=
-ation for 'ice_health_status_lookup[5].data_label[0]')
-drivers/net/ethernet/intel/ice/devlink/health.c:52:4: error: initializer el=
-ement is not constant
-   {ice_port_number_label}},
-    ^~~~~~~~~~~~~~~~~~~~~
-drivers/net/ethernet/intel/ice/devlink/health.c:52:4: note: (near initializ=
-ation for 'ice_health_status_lookup[6].data_label[0]')
-drivers/net/ethernet/intel/ice/devlink/health.c:54:3: error: initializer el=
-ement is not constant
-   ice_common_port_solutions, {ice_port_number_label}},
-   ^~~~~~~~~~~~~~~~~~~~~~~~~
-drivers/net/ethernet/intel/ice/devlink/health.c:54:3: note: (near initializ=
-ation for 'ice_health_status_lookup[7].solution')
-drivers/net/ethernet/intel/ice/devlink/health.c:54:31: error: initializer e=
-lement is not constant
-   ice_common_port_solutions, {ice_port_number_label}},
-                               ^~~~~~~~~~~~~~~~~~~~~
-drivers/net/ethernet/intel/ice/devlink/health.c:54:31: note: (near initiali=
-zation for 'ice_health_status_lookup[7].data_label[0]')
-drivers/net/ethernet/intel/ice/devlink/health.c:56:10: error: initializer e=
-lement is not constant
-   NULL, {ice_port_number_label}},
-          ^~~~~~~~~~~~~~~~~~~~~
-drivers/net/ethernet/intel/ice/devlink/health.c:56:10: note: (near initiali=
-zation for 'ice_health_status_lookup[8].data_label[0]')
-drivers/net/ethernet/intel/ice/devlink/health.c:58:3: error: initializer el=
-ement is not constant
-   ice_update_nvm_solution, {ice_port_number_label}},
-   ^~~~~~~~~~~~~~~~~~~~~~~
-drivers/net/ethernet/intel/ice/devlink/health.c:58:3: note: (near initializ=
-ation for 'ice_health_status_lookup[9].solution')
-drivers/net/ethernet/intel/ice/devlink/health.c:58:29: error: initializer e=
-lement is not constant
-   ice_update_nvm_solution, {ice_port_number_label}},
-                             ^~~~~~~~~~~~~~~~~~~~~
-drivers/net/ethernet/intel/ice/devlink/health.c:58:29: note: (near initiali=
-zation for 'ice_health_status_lookup[9].data_label[0]')
-drivers/net/ethernet/intel/ice/devlink/health.c:63:4: error: initializer el=
-ement is not constant
-   {ice_port_number_label}},
-    ^~~~~~~~~~~~~~~~~~~~~
-drivers/net/ethernet/intel/ice/devlink/health.c:63:4: note: (near initializ=
-ation for 'ice_health_status_lookup[11].data_label[0]')
-drivers/net/ethernet/intel/ice/devlink/health.c:67:4: error: initializer el=
-ement is not constant
-   {ice_port_number_label}},
-    ^~~~~~~~~~~~~~~~~~~~~
-drivers/net/ethernet/intel/ice/devlink/health.c:67:4: note: (near initializ=
-ation for 'ice_health_status_lookup[12].data_label[0]')
-drivers/net/ethernet/intel/ice/devlink/health.c:70:50: error: initializer e=
-lement is not constant
-   "Change the module to align to port option.", {ice_port_number_label}},
-                                                  ^~~~~~~~~~~~~~~~~~~~~
-drivers/net/ethernet/intel/ice/devlink/health.c:70:50: note: (near initiali=
-zation for 'ice_health_status_lookup[13].data_label[0]')
-drivers/net/ethernet/intel/ice/devlink/health.c:72:3: error: initializer el=
-ement is not constant
-   ice_update_nvm_solution, {ice_port_number_label}},
-   ^~~~~~~~~~~~~~~~~~~~~~~
-drivers/net/ethernet/intel/ice/devlink/health.c:72:3: note: (near initializ=
-ation for 'ice_health_status_lookup[14].solution')
-drivers/net/ethernet/intel/ice/devlink/health.c:72:29: error: initializer e=
-lement is not constant
-   ice_update_nvm_solution, {ice_port_number_label}},
-                             ^~~~~~~~~~~~~~~~~~~~~
-drivers/net/ethernet/intel/ice/devlink/health.c:72:29: note: (near initiali=
-zation for 'ice_health_status_lookup[14].data_label[0]')
-drivers/net/ethernet/intel/ice/devlink/health.c:74:3: error: initializer el=
-ement is not constant
-   ice_update_nvm_solution, {ice_port_number_label}},
-   ^~~~~~~~~~~~~~~~~~~~~~~
-drivers/net/ethernet/intel/ice/devlink/health.c:74:3: note: (near initializ=
-ation for 'ice_health_status_lookup[15].solution')
-drivers/net/ethernet/intel/ice/devlink/health.c:74:29: error: initializer e=
-lement is not constant
-   ice_update_nvm_solution, {ice_port_number_label}},
-                             ^~~~~~~~~~~~~~~~~~~~~
-drivers/net/ethernet/intel/ice/devlink/health.c:74:29: note: (near initiali=
-zation for 'ice_health_status_lookup[15].data_label[0]')
-drivers/net/ethernet/intel/ice/devlink/health.c:78:3: error: initializer el=
-ement is not constant
-   ice_update_nvm_solution, {ice_port_number_label}},
-   ^~~~~~~~~~~~~~~~~~~~~~~
-drivers/net/ethernet/intel/ice/devlink/health.c:78:3: note: (near initializ=
-ation for 'ice_health_status_lookup[17].solution')
-drivers/net/ethernet/intel/ice/devlink/health.c:78:29: error: initializer e=
-lement is not constant
-   ice_update_nvm_solution, {ice_port_number_label}},
-                             ^~~~~~~~~~~~~~~~~~~~~
-drivers/net/ethernet/intel/ice/devlink/health.c:78:29: note: (near initiali=
-zation for 'ice_health_status_lookup[17].data_label[0]')
-drivers/net/ethernet/intel/ice/devlink/health.c:80:3: error: initializer el=
-ement is not constant
-   ice_update_nvm_solution, {ice_port_number_label}},
-   ^~~~~~~~~~~~~~~~~~~~~~~
-drivers/net/ethernet/intel/ice/devlink/health.c:80:3: note: (near initializ=
-ation for 'ice_health_status_lookup[18].solution')
-drivers/net/ethernet/intel/ice/devlink/health.c:80:29: error: initializer e=
-lement is not constant
-   ice_update_nvm_solution, {ice_port_number_label}},
-                             ^~~~~~~~~~~~~~~~~~~~~
-drivers/net/ethernet/intel/ice/devlink/health.c:80:29: note: (near initiali=
-zation for 'ice_health_status_lookup[18].data_label[0]')
-drivers/net/ethernet/intel/ice/devlink/health.c:82:3: error: initializer el=
-ement is not constant
-   ice_update_nvm_solution, {ice_port_number_label}},
-   ^~~~~~~~~~~~~~~~~~~~~~~
-drivers/net/ethernet/intel/ice/devlink/health.c:82:3: note: (near initializ=
-ation for 'ice_health_status_lookup[19].solution')
-drivers/net/ethernet/intel/ice/devlink/health.c:82:29: error: initializer e=
-lement is not constant
-   ice_update_nvm_solution, {ice_port_number_label}},
-                             ^~~~~~~~~~~~~~~~~~~~~
-drivers/net/ethernet/intel/ice/devlink/health.c:82:29: note: (near initiali=
-zation for 'ice_health_status_lookup[19].data_label[0]')
-drivers/net/ethernet/intel/ice/devlink/health.c:85:3: error: initializer el=
-ement is not constant
-   ice_update_nvm_solution, {ice_port_number_label}},
-   ^~~~~~~~~~~~~~~~~~~~~~~
-drivers/net/ethernet/intel/ice/devlink/health.c:85:3: note: (near initializ=
-ation for 'ice_health_status_lookup[20].solution')
-drivers/net/ethernet/intel/ice/devlink/health.c:85:29: error: initializer e=
-lement is not constant
-   ice_update_nvm_solution, {ice_port_number_label}},
-                             ^~~~~~~~~~~~~~~~~~~~~
-drivers/net/ethernet/intel/ice/devlink/health.c:85:29: note: (near initiali=
-zation for 'ice_health_status_lookup[20].data_label[0]')
-drivers/net/ethernet/intel/ice/devlink/health.c:87:3: error: initializer el=
-ement is not constant
-   ice_update_nvm_solution, {"Extended Error"}},
-   ^~~~~~~~~~~~~~~~~~~~~~~
-drivers/net/ethernet/intel/ice/devlink/health.c:87:3: note: (near initializ=
-ation for 'ice_health_status_lookup[21].solution')
-drivers/net/ethernet/intel/ice/devlink/health.c:91:3: error: initializer el=
-ement is not constant
-   ice_update_nvm_solution},
-   ^~~~~~~~~~~~~~~~~~~~~~~
-drivers/net/ethernet/intel/ice/devlink/health.c:91:3: note: (near initializ=
-ation for 'ice_health_status_lookup[23].solution')
-drivers/net/ethernet/intel/ice/devlink/health.c:93:3: error: initializer el=
-ement is not constant
-   ice_update_nvm_solution},
-   ^~~~~~~~~~~~~~~~~~~~~~~
-drivers/net/ethernet/intel/ice/devlink/health.c:93:3: note: (near initializ=
-ation for 'ice_health_status_lookup[24].solution')
-drivers/net/ethernet/intel/ice/devlink/health.c:97:3: error: initializer el=
-ement is not constant
-   ice_update_nvm_solution},
-   ^~~~~~~~~~~~~~~~~~~~~~~
-drivers/net/ethernet/intel/ice/devlink/health.c:97:3: note: (near initializ=
-ation for 'ice_health_status_lookup[26].solution')
-drivers/net/ethernet/intel/ice/devlink/health.c:99:3: error: initializer el=
-ement is not constant
-   ice_update_nvm_solution, {"Expected PCI Device ID", "Expected Module ID"=
-}},
-   ^~~~~~~~~~~~~~~~~~~~~~~
-drivers/net/ethernet/intel/ice/devlink/health.c:99:3: note: (near initializ=
-ation for 'ice_health_status_lookup[27].solution')
-drivers/net/ethernet/intel/ice/devlink/health.c:103:4: error: initializer e=
-lement is not constant
-   {ice_port_number_label, "MIB ID"}},
-    ^~~~~~~~~~~~~~~~~~~~~
-drivers/net/ethernet/intel/ice/devlink/health.c:103:4: note: (near initiali=
-zation for 'ice_health_status_lookup[28].data_label[0]')
-  LD [M]  drivers/tty/ipwireless/ipwireless.o
-  CC [M]  drivers/staging/rtl8723bs/core/rtw_mlme.o
+IMHO: the cover letter needs more details.
 
+> 
+> Setup:
+> 
+> - Running on Google C3 VMs with idpf driver with following configurations.
+> - IRQ affinity and coalascing is common for both experiments.
+
+As Martin suggested, a lot more detail here would be helpful.
+
+> - There is only 1 RX/TX queue configured.
+> - First experiment enables busy poll using sysctl for both epoll and
+>   socket APIs.
+> - Second experiment enables NAPI threaded busy poll for the full device
+>   using sysctl.
+> 
+> Non threaded NAPI busy poll enabled using sysctl.
+> ```
+> echo 400 | sudo tee /proc/sys/net/core/busy_poll
+> echo 400 | sudo tee /proc/sys/net/core/busy_read
+
+I'm not sure why busy_read is enabled here?
+
+Maybe more details on how exactly the internals of onload+neper work
+would explain it, but I presume it's an epoll_wait loop with
+non-blocking reads so busy_read wouldn't do anything?
+
+> echo 2 | sudo tee /sys/class/net/eth0/napi_defer_hard_irqs
+> echo 15000  | sudo tee /sys/class/net/eth0/gro_flush_timeout
+> ```
+
+The deferral amounts above are relatively small, which makes me
+wonder if you are seeing IRQ and softIRQ interference in the base
+case?
+
+I ask because it seems like in the test case (if I read the patch
+correctly) the processing of packets happens when BH is disabled.
+
+Did I get that right?
+
+If so, then:
+  - In the base case, IRQs can be generated and softirq can interfere
+    with packet processing.
+
+  - In the test case, packet processing happens but BH is disabled,
+    reducing interference.
+
+If I got that right, it sounds like IRQ suspension would show good
+results in this case, too, and it's probably worth comparing IRQ
+suspension in the onload+neper setup.
+
+It seems like it shouldn't be too difficult to get onload+neper
+using it and the data would be very enlightening.
 
