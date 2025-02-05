@@ -1,108 +1,106 @@
-Return-Path: <netdev+bounces-162917-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-162918-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 64272A286DD
-	for <lists+netdev@lfdr.de>; Wed,  5 Feb 2025 10:44:55 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 90525A286ED
+	for <lists+netdev@lfdr.de>; Wed,  5 Feb 2025 10:48:33 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id F3365167FCE
-	for <lists+netdev@lfdr.de>; Wed,  5 Feb 2025 09:44:53 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 06EEA7A2270
+	for <lists+netdev@lfdr.de>; Wed,  5 Feb 2025 09:47:38 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 57C5522A4FE;
-	Wed,  5 Feb 2025 09:44:52 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BA2502288CA;
+	Wed,  5 Feb 2025 09:48:26 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="fUuCAvQK"
+	dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="o3clrBoZ";
+	dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="vZvhY/BN"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.15])
+Received: from galois.linutronix.de (Galois.linutronix.de [193.142.43.55])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 21C1F21A458;
-	Wed,  5 Feb 2025 09:44:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.15
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5E90F21A452
+	for <netdev@vger.kernel.org>; Wed,  5 Feb 2025 09:48:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=193.142.43.55
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1738748692; cv=none; b=t8YufhxlUS2guBh2W+iiTFdykAPMaqda2+N+M9fW514c1ttNETiH7YXYz2oTbXJjdPtqAFjMh7xUDuAb85384XbKkSjzkNEi3zehzBm3XkpoZXscRcJuuKbleMyNsvsOZjdLOPmWeEYETLlQX44vrruXj/hDSZkZme5yFFKR6iw=
+	t=1738748906; cv=none; b=DEKRr6+40hR9LJ8J3osGZe8PLbSJEE/0/RxJinfplEhyXbGU7qgtqkFjLQuajCptzULiwJ/d1kFFjoSv9iBKpfyj5cNjcYvY9a8hLxnRwYubskv5QGc/vEbaHM/qkbisGy4YEYXtlKSwEBG8crGkeEwYR/8eJ4TYGy3cHj8JwQs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1738748692; c=relaxed/simple;
-	bh=J6AXsn3lH7MBCqC6dF7yAkLsCQbHWrYkDB7bo9+iMlY=;
+	s=arc-20240116; t=1738748906; c=relaxed/simple;
+	bh=PAdXESz9pmvYiQESa/oih1b9ovwi1JoeIpZLrYiWciI=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=AbG2fi4XSAo5IIn0B3LQixOnyr8BCzCBEVmow6zooqwNdBlxNeNsYVDXMX71XNq4eC9nC2X/SZOyXY6bs3v66vmgJYMtSfJ7DMwq9QMSdDALK6q4Ke9bUqClu2SluS/WGejnBzPYY5x76ecPgBJeexmZQg9WU18pN17wk4j6UNc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=fUuCAvQK; arc=none smtp.client-ip=192.198.163.15
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1738748687; x=1770284687;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:content-transfer-encoding:in-reply-to;
-  bh=J6AXsn3lH7MBCqC6dF7yAkLsCQbHWrYkDB7bo9+iMlY=;
-  b=fUuCAvQK1H9xny/lo4SBZ7vn2djeCn0cjUQvjQdVGNXliVydg8DXSrL0
-   6otbPX0dMwdG3l81Ge2JDaSolGbjqQ5RgUoIvBi9jm9lUrEDrAoPYjCcZ
-   QTqjunuJUw97Rn8mNsykiY8FlpzAenZTSPNxmMHZf65wJNiPlYbt9P1e9
-   RRsOiOnX5EgRk3/raTYQiaI+wb9lusS9C/a3pCT1K7lGqW3gVwYWSPKAS
-   dLPXqPRuwGvtnozMJrW6Hjh4qPR8fEWa1Xmvvse1JOtOApbxFt6Eq9fcP
-   /zPugS+q285zX5vyg6Q30iNtzBXlnqk6eR+P0jQ4Dpe8o4i1J+1Q8KTQh
-   w==;
-X-CSE-ConnectionGUID: RT2ZXwbQSuOb1x8C7ITICQ==
-X-CSE-MsgGUID: 67HaaBpVScmY2GbozbQ6Sw==
-X-IronPort-AV: E=McAfee;i="6700,10204,11336"; a="39463536"
-X-IronPort-AV: E=Sophos;i="6.13,261,1732608000"; 
-   d="scan'208";a="39463536"
-Received: from fmviesa006.fm.intel.com ([10.60.135.146])
-  by fmvoesa109.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 05 Feb 2025 01:44:46 -0800
-X-CSE-ConnectionGUID: gsJi0kixTue3luxQo5W+OA==
-X-CSE-MsgGUID: JKqigt94Szu8N4LOKnQWqw==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.13,261,1732608000"; 
-   d="scan'208";a="110707699"
-Received: from mev-dev.igk.intel.com ([10.237.112.144])
-  by fmviesa006-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 05 Feb 2025 01:44:43 -0800
-Date: Wed, 5 Feb 2025 10:41:11 +0100
-From: Michal Swiatkowski <michal.swiatkowski@linux.intel.com>
-To: "Zhuo, Qiuxu" <qiuxu.zhuo@intel.com>
-Cc: "Nguyen, Anthony L" <anthony.l.nguyen@intel.com>,
-	"Kitszel, Przemyslaw" <przemyslaw.kitszel@intel.com>,
-	"andrew+netdev@lunn.ch" <andrew+netdev@lunn.ch>,
-	"davem@davemloft.net" <davem@davemloft.net>,
-	"edumazet@google.com" <edumazet@google.com>,
-	"kuba@kernel.org" <kuba@kernel.org>,
-	"pabeni@redhat.com" <pabeni@redhat.com>,
-	"Knitter, Konrad" <konrad.knitter@intel.com>,
-	"intel-wired-lan@lists.osuosl.org" <intel-wired-lan@lists.osuosl.org>,
-	"netdev@vger.kernel.org" <netdev@vger.kernel.org>,
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
-Subject: Re: Build error on
- "drivers/net/ethernet/intel/ice/devlink/health.c:35:3: error: initializer
- element is not constant"
-Message-ID: <Z6MyN8U6rt/6Ayye@mev-dev.igk.intel.com>
-References: <CY8PR11MB7134BF7A46D71E50D25FA7A989F72@CY8PR11MB7134.namprd11.prod.outlook.com>
+	 Content-Type:Content-Disposition:In-Reply-To; b=o4nYg8Uuus6kMFbBuufIqNH6Wy52N/bFXKoCLBWm4C5NaulUw0RBLuW5dndIAlQe553X4GYlfgOAwoV5Pgnw3UZTsXFvDEkRkBo6I/0vaizIBut0gq0bgjq1ZmOw5XmZ5Q/KMnYrNLQIEPHzKSOYTyMGiDcmOSMTWDsYE71Y9fE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de; spf=pass smtp.mailfrom=linutronix.de; dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=o3clrBoZ; dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=vZvhY/BN; arc=none smtp.client-ip=193.142.43.55
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linutronix.de
+Date: Wed, 5 Feb 2025 10:48:18 +0100
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linutronix.de;
+	s=2020; t=1738748899;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=WXt+Kvv82sa86yePbVkqorUGZQjbwbinHQ7/z88ldXk=;
+	b=o3clrBoZ3DCjVRMK/HaaGj9KzInl+AxivL8IcGVkyyHg2i9ZiRikL83+0OCmJu02yIbP+h
+	nZ2zGWlsMPoD3J7HhN/z/JBwV5pFNG95OsvYSW1v5xH1djpjFnAg4NazA0ynRUpq0Ptlag
+	6P1kC/9M13kwMLwGKrplUAaHckPZbP9GAnRht0aQ0OiPXxXv7hVr3gr5dOBusdV2LmrNsw
+	0WkPmNmpSGdHx+0gvEM1xNeq7C4osb2J1ocLaf2ODhdq1Q9D2PEqezp1zYYXDFMMwz83ZS
+	9+6rp8wjqyOffH6qW11ryk9jcR4TereXM9cqZ/vW97B5zRTI8E2bcAWvIkZkNw==
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=linutronix.de;
+	s=2020e; t=1738748899;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=WXt+Kvv82sa86yePbVkqorUGZQjbwbinHQ7/z88ldXk=;
+	b=vZvhY/BN2cjgdhl+HbKxSGcfqfVzhxXShXBm/IfLYUVqpH22dF7KEJcsTbbgmn4AKlaZeQ
+	sUYXEoce4frsKgBA==
+From: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
+To: Tony Nguyen <anthony.l.nguyen@intel.com>
+Cc: davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com,
+	edumazet@google.com, andrew+netdev@lunn.ch, netdev@vger.kernel.org,
+	wander@redhat.com, rostedt@goodmis.org, clrkwllms@kernel.org,
+	jgarzik@redhat.com, yuma@redhat.com, linux-rt-devel@lists.linux.dev
+Subject: Re: [PATCH net 0/4][pull request] igb: fix igb_msix_other() handling
+ for PREEMPT_RT
+Message-ID: <20250205094818.I-Jl44AK@linutronix.de>
+References: <20250204175243.810189-1-anthony.l.nguyen@intel.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <CY8PR11MB7134BF7A46D71E50D25FA7A989F72@CY8PR11MB7134.namprd11.prod.outlook.com>
+Content-Transfer-Encoding: quoted-printable
+In-Reply-To: <20250204175243.810189-1-anthony.l.nguyen@intel.com>
 
-On Wed, Feb 05, 2025 at 03:18:30AM +0000, Zhuo, Qiuxu wrote:
-> Hi,
-> 
-> I got the build error messages as below:
-> My GCC is: gcc (Ubuntu 7.5.0-3ubuntu1~18.04) 7.5.0.
-> 
+On 2025-02-04 09:52:36 [-0800], Tony Nguyen wrote:
+> Wander Lairson Costa says:
+>=20
+> This is the second attempt at fixing the behavior of igb_msix_other()
+> for PREEMPT_RT. The previous attempt [1] was reverted [2] following
+> concerns raised by Sebastian [3].
 
-Try compiling with gcc 8.1 or newer.
+I still prefer a solution where we don't have the ifdef in the driver. I
+was presented two traces but I didn't get why it works in once case but
+not in the other. Maybe it was too obvious.
+In the mean time:
 
-Thanks,
-Michal
+igb_msg_task_irq_safe()
+-> vfs_raw_spin_lock_irqsave() // raw_spinlock_t
+-> igb_vf_reset_event()
+  -> igb_vf_reset()
+    -> igb_set_rx_mode()
+      -> igb_write_mc_addr_list()
+         -> mta_list =3D kcalloc(netdev_mc_count(netdev), 6, GFP_ATOMIC); /=
+/ kaboom?
 
-> 
->   CC [M]  drivers/net/ethernet/stmicro/stmmac/stmmac_mdio.o
-> drivers/net/ethernet/intel/ice/devlink/health.c:35:3: error: initializer element is not constant
->    ice_common_port_solutions, {ice_port_number_label}},
->    ^~~~~~~~~~~~~~~~~~~~~~~~~
+By explicitly disabling preemption or using a raw_spinlock_t you need to
+pay attention not to do anything that might lead to unbounded loops
+(like iterating over many lists, polling on a bit for ages, =E2=80=A6) and
+paying attention that the whole API underneath that it is not doing that
+is allowed to.
+
+Sebastian
 
