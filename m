@@ -1,181 +1,222 @@
-Return-Path: <netdev+bounces-163281-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-163282-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8BBA7A29CB5
-	for <lists+netdev@lfdr.de>; Wed,  5 Feb 2025 23:32:37 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5A456A29CCD
+	for <lists+netdev@lfdr.de>; Wed,  5 Feb 2025 23:47:30 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 17734168030
-	for <lists+netdev@lfdr.de>; Wed,  5 Feb 2025 22:32:36 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A51F03A6979
+	for <lists+netdev@lfdr.de>; Wed,  5 Feb 2025 22:47:21 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7A604214A90;
-	Wed,  5 Feb 2025 22:32:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 24CC2217645;
+	Wed,  5 Feb 2025 22:47:27 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=fastly.com header.i=@fastly.com header.b="KfKZWdSF"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="ec+G/b5b"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f182.google.com (mail-pl1-f182.google.com [209.85.214.182])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.10])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B9F51192D83
-	for <netdev@vger.kernel.org>; Wed,  5 Feb 2025 22:32:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.182
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1738794753; cv=none; b=hnWkZolef4RU/5uvuaqhSIFdk28wm4V/MdSag9BFwhp6xOx29rTYDcADR1kvFsQINGbrRl+KH0AbYWLapqSFILC5zo4zdRPogCEdfJROpXc7FmK1vHPClUxD4BL2Wh1uLcr45/ThctXX6Xkm63mG42syGDhaQTf78USmjfW08YQ=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1738794753; c=relaxed/simple;
-	bh=rbtMWEoMMwxGw5KknDbNrT0/x7uWZL7UO8f3pMBT8Ik=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=q9LEyuOkxWAKR8uoMrS3fWFmXoWBmW+wLhPx+SdObzkW5XXwK+jSlztcwPtMkzyvvGfrSYBo5NwjOGmV0nSO1KwIP2D++wCd7CmFn9Y+DfG0YuL9yTlVm+tulM3qp0REbLGNcYlRi/quAEUVQZnWy56d4lFPx+0AGX4NL3I2/r0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fastly.com; spf=pass smtp.mailfrom=fastly.com; dkim=pass (1024-bit key) header.d=fastly.com header.i=@fastly.com header.b=KfKZWdSF; arc=none smtp.client-ip=209.85.214.182
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fastly.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=fastly.com
-Received: by mail-pl1-f182.google.com with SMTP id d9443c01a7336-21f1d4111d4so4945245ad.0
-        for <netdev@vger.kernel.org>; Wed, 05 Feb 2025 14:32:31 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=fastly.com; s=google; t=1738794751; x=1739399551; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references
-         :mail-followup-to:message-id:subject:cc:to:from:date:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=pswc9S70dFQyhH7NgxiZZFTh6vio2P5SVb8GGRDtltc=;
-        b=KfKZWdSF+hLZn4KZsQOwEQMKZO6/w1Kc2vwRTJ8Uma+fAla99ArkK6pbVvYcd5xGf1
-         wyPxx1R+jslD5QqY4ssDNEpGhPp61F/kDggc624T53G0xZ4VE1QvZxWRA/hKoz/vzecK
-         YsGCczLt8oPDh8rjTxUKTaPJbQzTUfvyXu6Bg=
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1738794751; x=1739399551;
-        h=in-reply-to:content-disposition:mime-version:references
-         :mail-followup-to:message-id:subject:cc:to:from:date
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=pswc9S70dFQyhH7NgxiZZFTh6vio2P5SVb8GGRDtltc=;
-        b=fdxcXVfN7g1WxaKpwsvK1UVpEt6nnfMkV6C1XUFp5a+f1TJO2bMw76vwUvJicp7HWJ
-         1Glkt5kOQPG6IReb8/1JWgNTKZJFDcqFAyYFlzhqlNQ7ezx971Osd/FoNCtLAorzd/K/
-         bnhBp7/pm6beIVfwNJXRzxmJwPyrviq7RQ4a57/UqMP5sKbD5dzpMWSjnNM9taq2K1XO
-         gyKIyZAGjQzsL+HfCbQNGsgMI9zxFfX+/zt2eN1n7K9uemdZ9PZB+JtXYntK/zj6VTQd
-         7qip1XArnea25gncqfEDctsy2Hftvbh6/5RUz2uINYbCRXcybqzvXjNH7btszcpJSJnO
-         a3ZQ==
-X-Forwarded-Encrypted: i=1; AJvYcCWsmlhGTYL84Z0yVEl9QWMVxor2dQ63ZQeegJqfjDPnD/9R7KuTnh84Op9xYfx2J9lgC5IK0e4=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzPWf6e+y4kUpclQH4/bGLZGEDkpp0OZ7WGULuR/5R9DMMSGSI7
-	cReCpBY68VM61SInmzvGS5ytr3e3Uft/mAVG5ONIudHgvrDT5CcnaYvcnrVwtAI=
-X-Gm-Gg: ASbGncvpbNTxCcG3hRY4shhahV0sUWzslc0O/NV/5H+kRtquAa84DHkZAlmH9BszVoL
-	LkfWkOxUg9qYERutwSkcy8dY4NJrisWynA/Tr0Z2IKsyTSsscVKnvV4AgYcnTwFISjgSj3a71xX
-	qxrba5ZNku16xHhUfhkrEdJCjzKSNIEOuM62W6t0aSa97vaspCIlD+vaDjzaOpDWZqbvANWD2/f
-	0RlTXY2hTBVZkJrxDHSxi5L86Xvw/8/h5gCbE1cG0QECeRLd8DoGUgWVqmfqHN9WLtiQ0g53w91
-	tCbdYmcf6U6NYW1zZMcNIAVfQVQhVtSrXASlA5/JEB/sfUNSVP2UmwR3qA==
-X-Google-Smtp-Source: AGHT+IG68U/Jf2uyCGOpSi/tnO/+6CQBIeEe5BbeOi6exCet3cF9p89ekuIWyFRAaQi6Fb2o8o5LeQ==
-X-Received: by 2002:a05:6a00:e13:b0:725:e37d:cd36 with SMTP id d2e1a72fcca58-730350e4f2amr7229142b3a.2.1738794750889;
-        Wed, 05 Feb 2025 14:32:30 -0800 (PST)
-Received: from LQ3V64L9R2 (c-24-6-151-244.hsd1.ca.comcast.net. [24.6.151.244])
-        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-72fe631bebdsm13081005b3a.29.2025.02.05.14.32.29
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 05 Feb 2025 14:32:30 -0800 (PST)
-Date: Wed, 5 Feb 2025 14:32:28 -0800
-From: Joe Damato <jdamato@fastly.com>
-To: Stanislav Fomichev <stfomichev@gmail.com>
-Cc: Stanislav Fomichev <sdf@fomichev.me>, netdev@vger.kernel.org,
-	davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
-	pabeni@redhat.com, Saeed Mahameed <saeed@kernel.org>
-Subject: Re: [RFC net-next 1/4] net: Hold netdev instance lock during
- ndo_open/ndo_stop
-Message-ID: <Z6Pm_AaXEwVFzHyI@LQ3V64L9R2>
-Mail-Followup-To: Joe Damato <jdamato@fastly.com>,
-	Stanislav Fomichev <stfomichev@gmail.com>,
-	Stanislav Fomichev <sdf@fomichev.me>, netdev@vger.kernel.org,
-	davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
-	pabeni@redhat.com, Saeed Mahameed <saeed@kernel.org>
-References: <20250204230057.1270362-1-sdf@fomichev.me>
- <20250204230057.1270362-2-sdf@fomichev.me>
- <Z6O8ujq-gYVG4sjw@LQ3V64L9R2>
- <Z6PYvNeBE2_dpRDG@mini-arch>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E8E8A215179;
+	Wed,  5 Feb 2025 22:47:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=192.198.163.10
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1738795647; cv=fail; b=M9IoyaBQC/QqhxRcRw/fULFjRzWsCfxsqWDg5tVX0aUmjQuIA6ipGRXHMhg96s90edgVLMCHTN0ZkrfGCW/csbyyLdRPsTEKgZ/Uc5uSo61s2XwAZkK9UdZAM+Zj51q3V1UvXtoxv1IZ2j33F9dDBSEHSj/73ktWvXxzGGjKFk8=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1738795647; c=relaxed/simple;
+	bh=kkYhEx2TQMs4YQSJXfUVC1efEU1Nt01xnuX7JeMYzk4=;
+	h=Date:From:To:CC:Subject:Message-ID:References:Content-Type:
+	 Content-Disposition:In-Reply-To:MIME-Version; b=A6j3OHGFu9kW6s+xWGQYFB+8aJZjIrS2c/BwgCwy8edE/KoV+H9y9rjdEILn8Sa0+4nJX5akrctT5LCOZLE2D4GB+akoG2i25aTcvFBkM86w6lXYDvXPcCzCDLSHQkEO/6ll9LfJy9TVeYXqFtlHqXtmgPQt4TN/RWbfYLZFs8A=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=ec+G/b5b; arc=fail smtp.client-ip=192.198.163.10
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1738795645; x=1770331645;
+  h=date:from:to:cc:subject:message-id:references:
+   in-reply-to:mime-version;
+  bh=kkYhEx2TQMs4YQSJXfUVC1efEU1Nt01xnuX7JeMYzk4=;
+  b=ec+G/b5b2Jm8phcxAhyeksrydXZfbc53if1W6qk/F9/L9kvq8k9pvZgd
+   xR/GBFJoXCLLxl6c82K9KIlODR244A9TUj6Gt6D6V228Ccuh3uUNku+YB
+   Ur92pQBzQs55l4fxHatqSWp31cch1sgM0TY5Jb4sEGcsKvQDd4iScDgNw
+   g5lQN+eyuQJIkvS2zaUkgizfS30rx8F4FQ/+cXSSyVKN5+qVY8fLOxIUY
+   YTMvRtEKfElg4ABkg/+IPGjY69uZ6bcxFIyAD1+1WQVxLW3iUGxNs2C86
+   s/zNrPu9JhGS/hh8QgNSyy/DyOKm5phUvUD0gM/to3dED5aqYjq9kBfDT
+   w==;
+X-CSE-ConnectionGUID: zPRRip3aTGyHiiD4XQ6ziQ==
+X-CSE-MsgGUID: zXT6+ezpQYugnIIwHn6jqA==
+X-IronPort-AV: E=McAfee;i="6700,10204,11314"; a="50804776"
+X-IronPort-AV: E=Sophos;i="6.12,310,1728975600"; 
+   d="scan'208";a="50804776"
+Received: from fmviesa007.fm.intel.com ([10.60.135.147])
+  by fmvoesa104.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 05 Feb 2025 14:47:24 -0800
+X-CSE-ConnectionGUID: L7GoTkbJRHCfaPeiqihXZw==
+X-CSE-MsgGUID: 2+tSe06+QBGmi+hqsAojhA==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.13,262,1732608000"; 
+   d="scan'208";a="110933162"
+Received: from orsmsx601.amr.corp.intel.com ([10.22.229.14])
+  by fmviesa007.fm.intel.com with ESMTP/TLS/AES256-GCM-SHA384; 05 Feb 2025 14:47:24 -0800
+Received: from orsmsx603.amr.corp.intel.com (10.22.229.16) by
+ ORSMSX601.amr.corp.intel.com (10.22.229.14) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.44; Wed, 5 Feb 2025 14:47:23 -0800
+Received: from orsedg603.ED.cps.intel.com (10.7.248.4) by
+ orsmsx603.amr.corp.intel.com (10.22.229.16) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.44 via Frontend Transport; Wed, 5 Feb 2025 14:47:23 -0800
+Received: from NAM04-MW2-obe.outbound.protection.outlook.com (104.47.73.177)
+ by edgegateway.intel.com (134.134.137.100) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.1.2507.44; Wed, 5 Feb 2025 14:47:23 -0800
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=MlxqUp2tfHF+8YdSbIOwoKtGuLgMjkqmv0Zp5/E5mhlOYnumwl+Vnu6OY/qOqI4It4hJdQ6vTkZvsWh6v0S07//YeuqCUrRJQoNCVMSvynXbQwQVayJ97fUSNbGpkWHOV+P5LpcMv0AMYGN8q53Fs0nREEFV/qtIoC6bYZfti4SDWuENJfDaSMPlHkjhaKpcb1FD5MJwo+KFB8ysWP0b1Cf7CABl6j6bTOv5MTtOyIcHKotIzz0LGM2m/50+BfjZhqn6Dqv3eRkxGi2Xhxoz82sFPn1J2mpN/BLGgiwmM7Hl9cf5P7UPONtYlikfBNXYlQ5xvQSRTZWJdPTRCkIj8Q==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=H5dYQ5vHoE70SM9wXEtMlbHpn6mMR7ZYPhz0yYI79Rw=;
+ b=j9+dOR3Lkt1xwSCQj9ZwYiIOkC8BIKSZHX8Y9ILLiL98dHxZiQyerOCl8RjYA1Rqn//eyMw6+ZB11a6KW4woc5+PuhUEQhhzezrjtTvDnHYIRD4xPNQaIT/KbpvF8fsSvot/zBjKmNLe/RO46QYn2WMLNrEEFF4/+Y98Y7/ed6uZIpJ7PcLoDye+ZMS6ICdTQ2BHL4pBc2Cid0kP8xmkZcJ6IFkL7x73/Iw/z7AXRD09sY9jufkVGzzRMJlu4Yy6CC83yhhDMBXmmajCsbPzWjcD2MAZ2vQJ2JWrO5QvV1gV1TiKOPdrnCfdluVP23bjrEZMLk08eSEgcOx5FXxehw==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=intel.com;
+Received: from SA1PR11MB6733.namprd11.prod.outlook.com (2603:10b6:806:25c::17)
+ by PH7PR11MB7097.namprd11.prod.outlook.com (2603:10b6:510:20c::6) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8398.24; Wed, 5 Feb
+ 2025 22:47:18 +0000
+Received: from SA1PR11MB6733.namprd11.prod.outlook.com
+ ([fe80::cf7d:9363:38f4:8c57]) by SA1PR11MB6733.namprd11.prod.outlook.com
+ ([fe80::cf7d:9363:38f4:8c57%6]) with mapi id 15.20.8398.020; Wed, 5 Feb 2025
+ 22:47:18 +0000
+Date: Wed, 5 Feb 2025 16:47:09 -0600
+From: Ira Weiny <ira.weiny@intel.com>
+To: <alucerop@amd.com>, <linux-cxl@vger.kernel.org>, <netdev@vger.kernel.org>,
+	<dan.j.williams@intel.com>, <edward.cree@amd.com>, <davem@davemloft.net>,
+	<kuba@kernel.org>, <pabeni@redhat.com>, <edumazet@google.com>,
+	<dave.jiang@intel.com>
+CC: Alejandro Lucero <alucerop@amd.com>
+Subject: Re: [PATCH v10 15/26] sfc: obtain root decoder with enough HPA free
+ space
+Message-ID: <67a3ea6d8432e_2ee27529434@iweiny-mobl.notmuch>
+References: <20250205151950.25268-1-alucerop@amd.com>
+ <20250205151950.25268-16-alucerop@amd.com>
+Content-Type: text/plain; charset="us-ascii"
+Content-Disposition: inline
+In-Reply-To: <20250205151950.25268-16-alucerop@amd.com>
+X-ClientProxiedBy: MW4P220CA0011.NAMP220.PROD.OUTLOOK.COM
+ (2603:10b6:303:115::16) To SA1PR11MB6733.namprd11.prod.outlook.com
+ (2603:10b6:806:25c::17)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <Z6PYvNeBE2_dpRDG@mini-arch>
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: SA1PR11MB6733:EE_|PH7PR11MB7097:EE_
+X-MS-Office365-Filtering-Correlation-Id: d85249b0-603f-4e3a-7029-08dd46370b4b
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;ARA:13230040|1800799024|366016|376014|7053199007|921020;
+X-Microsoft-Antispam-Message-Info: =?us-ascii?Q?GRnxnlk+he4+iz2WQ0j0XCG1unA3QdvR2qvQRMUa/o0vsX2aT6qOs5DTEJ7Z?=
+ =?us-ascii?Q?sKUtZi16vL6ZGcfHpqCPhFETNX4iVXwWTZHcG77yygLw5QAGzeEbC3b9B/Dr?=
+ =?us-ascii?Q?0gRvCebCuhuC9Vf2XcJ/A94jU5QMeuFE7Bnh1OrzbHk4aTJ7q8qgh83ynIla?=
+ =?us-ascii?Q?beGOeEaoZSXQdk+uANLSG+SCupTLLxHwHqhngesqNGETLxP4fUmqWENBZslW?=
+ =?us-ascii?Q?MtoickSK32+dHVpd4KmtyyQXsAU5q1nlOdIezeeCsYp+KEgvBuenJnQhEeoQ?=
+ =?us-ascii?Q?kaOv4GrvDTwAOGWQMVb+U2ddNomF8DasSU8Mtlb6WXtefNecmi8RfvE86ewt?=
+ =?us-ascii?Q?F0IS8W9b55CUnbDMSuURDVCeEw9UOIDuHogWcdToWvi/wFDNqGlvlZ4oORBs?=
+ =?us-ascii?Q?O8ajgQ1N+NkqjVP9NY+6uBEfrFbZI2/HJE/zzbJajtl4X7Zej/GU7M9sO34A?=
+ =?us-ascii?Q?zMoQcCOTN5AxvdrGOq+Rs1z0r9GNE095vPsA7tqyuPEkaq+AjJycquo51en+?=
+ =?us-ascii?Q?CQFN/amJl6KsTdRgD0DPrvvn4xqS1pphJXniV8e5cI5jqCPj/lxvtVUduBUf?=
+ =?us-ascii?Q?OXjACdojMKiHdeciJeTCMsBoklsOob/sZcDm6oj0oaN7X34fUDe5nqVuuLsJ?=
+ =?us-ascii?Q?SRSfyIufs+OJH6djND+Y8KLFXHtPl43nWp7XQNvcV6Q/1JBVQHWq+QU/iYK/?=
+ =?us-ascii?Q?IVWnOxnnWzB1NAqban1k28Lt3lKxPrIlyet5mWQt/DEdT/VGzc+bK/rh5ayi?=
+ =?us-ascii?Q?dKJG5jDPbHLEtXCeL7umLFZgPrKaJydlxDDLSetoCRDYs50OS/piwwOGvcWH?=
+ =?us-ascii?Q?1lmOJP0SlyS9/NwBklHH6bT6+H4P5kj3XMqTaH3YKkPsc0c709sNaqUYPAp+?=
+ =?us-ascii?Q?wBaR0lUYivdNLRGpkodAm/zfMeyI29sRZpup40Dy2BzkGvBnvA2efrsgAtb2?=
+ =?us-ascii?Q?1CK1uZwwTWENEU9mt9Oqs7y0M8Bqm9r78VwJkeqDaM+csQ9tn4nE7w9kefUC?=
+ =?us-ascii?Q?P1MxUqk1EhKLHh6ozlTZvflT/kz8QyWEW/Hm7pPm1VeD9bmABGn7AtnHG17i?=
+ =?us-ascii?Q?YWyviYQ9vCz+SiGo9Exolq53hg9+TzFSXovPlYPq7xYA2QAI9AVugS+/pwwn?=
+ =?us-ascii?Q?wpCWaYQx1VzrtzeNWDGJmMmmp1L06dO2VT5CeSlJygddoUs0fR2+l23J0B6m?=
+ =?us-ascii?Q?2WTfjwgN/UKWuRj4MkYXRVOjGQZ/RU2zVexzrRKUV5vQCQm5rSpykjSRVxzy?=
+ =?us-ascii?Q?QRfY4OnAO3JT9Ekt/hTgOl0ouMk4DZJ0D/p1Qa+AKBUplKLMJB6cPvgwwQrK?=
+ =?us-ascii?Q?QUjNE8E0FOUORCP/4/jRP5iNcuzSqIfd9zIJb0jmwZR5a0Mp7RR+WVx7ita6?=
+ =?us-ascii?Q?2k81h/90TrxkH58kGIm895fYSrHtKas9NrHmE1aaSJgJgauPBSZreN3fVwaj?=
+ =?us-ascii?Q?0J3+92nz6YY=3D?=
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SA1PR11MB6733.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(1800799024)(366016)(376014)(7053199007)(921020);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?40z65gLLujEaLlUQosi1guVUTQbMalADdqLNmrXdmrTOWNXIQpKl9qjB6xBm?=
+ =?us-ascii?Q?6xGnTH3ywwp57da6CPr1FT2aAK1/zIwxzwJSe1M7n8yML0YmAubO6mcods4I?=
+ =?us-ascii?Q?HAWJ4+XkKhP0+zS7BTEMP5gZW1Z4TZ9CXZrSyAJ8blgsbStrw+lLdnXBQkdi?=
+ =?us-ascii?Q?S6VaLd3thBHNcAhSeykqi36TWJLJ1Q6QoXfpR8v3BV174sZ8o7vWe8J2HzoV?=
+ =?us-ascii?Q?/gHvAMAMVQ9YsnWy00gYXHbg2yzB/XfSczOmoWpruL3ovCgFf3eyLwDZspJa?=
+ =?us-ascii?Q?q8xligKzJnQ2NlyWYXp/F2ZsCC/IPDHztbZ3VMNhkvyVvkQRuqq6+0VNpRgD?=
+ =?us-ascii?Q?IwRk4xgSC7HvGPLNrlw7xCmFzd+84sy/2q1f1JmCcUmnIgepF+T9YtII47Ke?=
+ =?us-ascii?Q?s5b1/32M/5YHAX2YmVejySd4drK1MmpCdAHSVDru3qeb/3gKieigPmi2ZYnt?=
+ =?us-ascii?Q?7uMrozmnoR0Mgo6uK3JsE227w9wPAYwH2InIf0Kg5NnCXWQW48rrOU0sTLvW?=
+ =?us-ascii?Q?v9wXKC1ynaZz245UY4d74VMRdNJuHBMo9n7FvzI2oweyYFES5q6zUvgVA/9K?=
+ =?us-ascii?Q?XlNGu+9S0QKnDqda65VJDv+2/UJ+kITkbMwDZ1rQx31xo8Ag91fmc4tdwx7a?=
+ =?us-ascii?Q?AN9d+L85SCK1KVsYCcV6lbYI2YiI+tqRIIsye/w6NiUi4s4rsh+rSRGnC4+9?=
+ =?us-ascii?Q?/Ksa4n7Ku8VcRp5XBhT/Xf5zRtjYnJKvs1HEEGEntDhl4COdPaMrfR6JvpXB?=
+ =?us-ascii?Q?l/bd1qcjiyP0pfz3Zpui5O21DEYLt6N6ltY5/w3VeH9kZbARDcu3GqU4WGoo?=
+ =?us-ascii?Q?jRTm1kSG58WJpeNBGAsWKVe0xsa0S2MmxUSlqGHruknnm8Ltqkh9zzND8orM?=
+ =?us-ascii?Q?1VR1AaDRgrJ79fWVbFs7o9phrJe5s+qDCr2zS1u/KgEI50fs/5Xg3ZQCTbFo?=
+ =?us-ascii?Q?52iNYgDCvxSALPST+DDcqc7ocmz4lSwsEW80kkid8mhjJ/qQAfKrqPfRpKgh?=
+ =?us-ascii?Q?llMgqoXPaRlD7kO+o9EtBAyF/OTOh3coJhx9nLdvQC6tCpx4l3E4EaE5HeZf?=
+ =?us-ascii?Q?NGPhWKdFTyxLKfChtOUIaAb8Ws7bFbyr6O+7GTiMXuFJCAegAZ9B+V6EFEJe?=
+ =?us-ascii?Q?g7+uxSlTuBpILrz04/V/v1dLLgOIzl+JTA6RneMozrlsTJfrQhd7VLivL965?=
+ =?us-ascii?Q?9gactt6M4+0NIGJ4SFYqOM7zSddkTz2CzBGgLJNbJTgEi8SVRjyzXB2EyN5H?=
+ =?us-ascii?Q?m6h212qVdNFvmjzKGio4djOuNdoqsjMkmgs3c6RHn6qMBM2bVbNywpxNHgay?=
+ =?us-ascii?Q?PqlblCoqhJhlszv4S5p8c7m1Idmb511KvzX4JK36Oz2zIjNmgXRH6Sr6YX4k?=
+ =?us-ascii?Q?79OWeP1nulpr1OvI1VzpNHwjzTKbbkBPw2OBzieddCJMUUFsFoTNfClELBh7?=
+ =?us-ascii?Q?TuRHmWO8e4+mvh4FhnGmPhS2y3UWbzLi5vepMRtbOgmJnF83Nn4MwXM57TGZ?=
+ =?us-ascii?Q?zUdVxmvmTT6DRqG5DLCozokSpzpJIcyBWjQOPEOLQe7hAGcEilrzd2SWQK2m?=
+ =?us-ascii?Q?drF1CwmP8fPQB5xdJQI67XeQu+vYlxI+uVTeB0nV?=
+X-MS-Exchange-CrossTenant-Network-Message-Id: d85249b0-603f-4e3a-7029-08dd46370b4b
+X-MS-Exchange-CrossTenant-AuthSource: SA1PR11MB6733.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 05 Feb 2025 22:47:18.5701
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: iBGADTtLNcummWRZTfNZDTYGNExaNWsK8lUZbKb5NvMqGPfGP8mnvadaPnFK+Na/tsmYsmQ2tJ300RCSQwmVHg==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH7PR11MB7097
+X-OriginatorOrg: intel.com
 
-On Wed, Feb 05, 2025 at 01:31:40PM -0800, Stanislav Fomichev wrote:
-> On 02/05, Joe Damato wrote:
-> > On Tue, Feb 04, 2025 at 03:00:54PM -0800, Stanislav Fomichev wrote:
-> > > For the drivers that use shaper API, switch to the mode where
-> > > core stack holds the netdev lock. This affects two drivers:
-> > > 
-> > > * iavf - already grabs netdev lock in ndo_open/ndo_stop, so mostly
-> > >          remove these
-> > > * netdevsim - switch to _locked APIs to avoid deadlock
-> > > 
-> > > Cc: Saeed Mahameed <saeed@kernel.org>
-> > > Signed-off-by: Stanislav Fomichev <sdf@fomichev.me>
-> > > ---
-> > >  Documentation/networking/netdevices.rst     |  6 ++++--
-> > >  drivers/net/ethernet/intel/iavf/iavf_main.c | 14 ++++++-------
-> > >  drivers/net/netdevsim/netdev.c              | 14 ++++++++-----
-> > >  include/linux/netdevice.h                   | 23 +++++++++++++++++++++
-> > >  net/core/dev.c                              | 12 +++++++++++
-> > >  net/core/dev.h                              |  6 ++++--
-> > >  6 files changed, 58 insertions(+), 17 deletions(-)
-> > 
-> > [...]
-> > 
-> > > @@ -4474,12 +4471,12 @@ static int iavf_close(struct net_device *netdev)
-> > >  	u64 aq_to_restore;
-> > >  	int status;
-> > >  
-> > > -	netdev_lock(netdev);
-> > > +	netdev_assert_locked(netdev);
-> > > +
-> > >  	mutex_lock(&adapter->crit_lock);
-> > >  
-> > >  	if (adapter->state <= __IAVF_DOWN_PENDING) {
-> > >  		mutex_unlock(&adapter->crit_lock);
-> > > -		netdev_unlock(netdev);
-> > >  		return 0;
-> > >  	}
-> > >  
-> > > @@ -4532,6 +4529,7 @@ static int iavf_close(struct net_device *netdev)
-> > >  	if (!status)
-> > >  		netdev_warn(netdev, "Device resources not yet released\n");
-> > >  
-> > > +	netdev_lock(netdev);
-> > 
-> > I'm probably just misreading the rest of the patch, but I was just
-> > wondering: is this netdev_lock call here intentional? I am asking
-> > because I thought the lock was taken in ndo_stop before this is
-> > called?
-> 
-> Yes, this part is a bit confusing. Existing iavf_close looks like
-> this:
-> 
-> iavf_close() {
->   netdev_lock()
->   .. 
->   netdev_unlock()
->   wait_event_timeout(down_waitqueue)
-> }
-> 
-> I change it to the following:
-> 
-> netdev_lock()
-> iavf_close() {
->   .. 
->   netdev_unlock()
->   wait_event_timeout(down_waitqueue)
->   netdev_lock()
-> }
-> netdev_unlock()
-> 
-> And the diff is confusing because I reuse existing netdev_lock call,
-> so it looks like I only add netdev_unlock...
+alucerop@ wrote:
+> From: Alejandro Lucero <alucerop@amd.com>
 
-Ah, I see. Thanks for explaining that; I looked at it a second time
-more closely and I see that you are correct and I did miss the
-existing netdev_lock call.
+[snip]
 
-> I don't think I can hold instance lock during wait_event_timeout because
-> the wake_up(down_waitqueue) callers grab netdev instance lock as well.
+> diff --git a/drivers/net/ethernet/sfc/efx_cxl.c b/drivers/net/ethernet/sfc/efx_cxl.c
+> index 774e1cb4b1cb..a9ff84143e5d 100644
+> --- a/drivers/net/ethernet/sfc/efx_cxl.c
+> +++ b/drivers/net/ethernet/sfc/efx_cxl.c
+> @@ -25,6 +25,7 @@ int efx_cxl_init(struct efx_probe_data *probe_data)
+>  	struct pci_dev *pci_dev = efx->pci_dev;
+>  	DECLARE_BITMAP(expected, CXL_MAX_CAPS);
+>  	DECLARE_BITMAP(found, CXL_MAX_CAPS);
+> +	resource_size_t max_size;
+>  	struct mds_info sfc_mds_info;
+>  	struct efx_cxl *cxl;
+>  
+> @@ -102,6 +103,24 @@ int efx_cxl_init(struct efx_probe_data *probe_data)
+>  		goto err_regs;
+>  	}
+>  
+> +	cxl->cxlrd = cxl_get_hpa_freespace(cxl->cxlmd, 1,
+> +					   CXL_DECODER_F_RAM | CXL_DECODER_F_TYPE2,
 
-Agreed.
+Won't the addition of CXL_DECODER_F_TYPE2 cause this to fail?  I'm not
+seeing CXL_DECODER_F_TYPE2 set on a decoder in any of the patches.  So
+won't that make the flags check fail?  Why is CXL_DECODER_F_RAM not
+enough?
+
+Ira
+
+[snip]
 
