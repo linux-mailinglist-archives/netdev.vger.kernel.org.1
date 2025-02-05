@@ -1,85 +1,91 @@
-Return-Path: <netdev+bounces-162820-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-162825-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id F1B4AA28178
-	for <lists+netdev@lfdr.de>; Wed,  5 Feb 2025 02:51:26 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id EB9E3A281A0
+	for <lists+netdev@lfdr.de>; Wed,  5 Feb 2025 03:11:40 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id CA6D73A7F70
-	for <lists+netdev@lfdr.de>; Wed,  5 Feb 2025 01:51:17 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 6FB801635DA
+	for <lists+netdev@lfdr.de>; Wed,  5 Feb 2025 02:11:39 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EE60620D50A;
-	Wed,  5 Feb 2025 01:50:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="rBAd6l2E"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3FE74212FAB;
+	Wed,  5 Feb 2025 02:11:35 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from szxga05-in.huawei.com (szxga05-in.huawei.com [45.249.212.191])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C4C8220D4E3;
-	Wed,  5 Feb 2025 01:50:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2101B13B280;
+	Wed,  5 Feb 2025 02:11:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.191
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1738720254; cv=none; b=CdQtDEDw3yWARTkz1VoW6eSsp0xz5EnszL+qQ4CfogaeeCD4oduvT23d87cb+quAGgI28fxzDtnf75ILz7hoYJ4/SaqQLwGt/Blg+1NpV2JvxqT5uuK+KQAtkzi6eycZRxBYk20hkiyggdif8/1IxfcsMuJl1zKdT24sFNM3I7w=
+	t=1738721495; cv=none; b=lKWCghB/C9zjlA2VndWyP8sgB9DmQtCC8Z/+Yhupvvg6FQ1zgSO2lvDLO4GZ2kSm4SDXhBb/ZJSN10w1E2yU3vRaNjuLDGVZiQoiRLh1dqK3F8JbGNedbsWCqWnLCzO/Hsw5ymZRiErMFq0s9RgHDyr9rHW7M0/2pp6aYavPi28=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1738720254; c=relaxed/simple;
-	bh=7s7GRHQ5AVO0CnKkXPTk9Zu1R2RTZUaBUWi/BL/K/xs=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=t3EM9za00zLj1zWYCqn/IO+8+X7Ddx6dU7v1i+P0d8sxD6QrZ/eFrTOYYAz9xvq7HEDcC0OBhaP+zkpV66EebE8ClAJqDPf5CBWUtQl91qS/x3QKadwI534xOjWu4Z866DfmWD3G/e6o1E5dCJ6AmOsvKX6U8QMR1XxSh8uXoY0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=rBAd6l2E; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 211F9C4CEDF;
-	Wed,  5 Feb 2025 01:50:53 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1738720254;
-	bh=7s7GRHQ5AVO0CnKkXPTk9Zu1R2RTZUaBUWi/BL/K/xs=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=rBAd6l2E4+/n4ycZRvBBlgGzYIcSxCt4/9dCKojo3Ber7opXnKS6i1EKI9s0aXfqU
-	 /YsRohBuit7WwHNy4rX7PlfkweAHlLMpQF3O1iQAarHAKOJmjBcoUQT7t/z5KrF7EU
-	 +i3KjDESbm6NtIr+FNj8ZUykuflAhBdpBOOZ9prZnqJLNRuhWquptbqieaJYM6StzY
-	 dt1ZzKHSumtc932xJxuhG5pW1j12Gh5hA/Ypb6zJp4iDpdCXjHEXkMVUkVuZz94f9P
-	 mHifvVAqvRHX/eFicNMaR7RTEPP5oCnzcWAD87/ETNpw6kO23iFQmPRjN8lqewV3gY
-	 B84R1VMG5sXKA==
-Date: Tue, 4 Feb 2025 17:50:52 -0800
-From: Jakub Kicinski <kuba@kernel.org>
-To: Jason Xing <kerneljasonxing@gmail.com>
-Cc: davem@davemloft.net, edumazet@google.com, pabeni@redhat.com,
- dsahern@kernel.org, willemdebruijn.kernel@gmail.com, willemb@google.com,
- ast@kernel.org, daniel@iogearbox.net, andrii@kernel.org,
- martin.lau@linux.dev, eddyz87@gmail.com, song@kernel.org,
- yonghong.song@linux.dev, john.fastabend@gmail.com, kpsingh@kernel.org,
- sdf@fomichev.me, haoluo@google.com, jolsa@kernel.org, horms@kernel.org,
- bpf@vger.kernel.org, netdev@vger.kernel.org
-Subject: Re: [PATCH bpf-next v8 05/12] net-timestamp: prepare for isolating
- two modes of SO_TIMESTAMPING
-Message-ID: <20250204175052.6abc3d2d@kernel.org>
-In-Reply-To: <20250204183024.87508-6-kerneljasonxing@gmail.com>
-References: <20250204183024.87508-1-kerneljasonxing@gmail.com>
-	<20250204183024.87508-6-kerneljasonxing@gmail.com>
+	s=arc-20240116; t=1738721495; c=relaxed/simple;
+	bh=iF5njG1fn3RK7jVRZRE5ebhpw9cp38oi9Orwah1OZA0=;
+	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
+	 In-Reply-To:Content-Type; b=SdsbzuwcE65U6bYdGVO3TKua+0a9e5fCgna3eUASH7kAIua6yV6B2p10D7TjOAyc3E7YWx3Kys0IVda8DmUsCdbSyeBTAQKGloRhbmS3F1jqkJiegMEUbjnk4r4lE+VIRsrmd52JBBPRfVcYmk0v/O6Cn+Dy22j/7lXJMFfcV28=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.191
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
+Received: from mail.maildlp.com (unknown [172.19.162.112])
+	by szxga05-in.huawei.com (SkyGuard) with ESMTP id 4Ynjsv0S4zz1l0dN;
+	Wed,  5 Feb 2025 09:52:35 +0800 (CST)
+Received: from dggemv711-chm.china.huawei.com (unknown [10.1.198.66])
+	by mail.maildlp.com (Postfix) with ESMTPS id 6272F1401F2;
+	Wed,  5 Feb 2025 09:56:11 +0800 (CST)
+Received: from kwepemn100009.china.huawei.com (7.202.194.112) by
+ dggemv711-chm.china.huawei.com (10.1.198.66) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.1.2507.39; Wed, 5 Feb 2025 09:56:11 +0800
+Received: from [10.67.121.59] (10.67.121.59) by kwepemn100009.china.huawei.com
+ (7.202.194.112) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.11; Wed, 5 Feb
+ 2025 09:56:10 +0800
+Message-ID: <13b36e29-de50-ef40-6483-2dc71cf780bc@huawei.com>
+Date: Wed, 5 Feb 2025 09:55:58 +0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:91.0) Gecko/20100101
+ Thunderbird/91.2.0
+Subject: Re: [PATCH v1 0/9] Use HWMON_CHANNEL_INFO macro to simplify code
+To: Krzysztof Kozlowski <krzk@kernel.org>
+CC: <oss-drivers@corigine.com>, <matt@ranostay.sg>, <mchehab@kernel.org>,
+	<irusskikh@marvell.com>, <andrew+netdev@lunn.ch>, <davem@davemloft.net>,
+	<edumazet@google.com>, <kuba@kernel.org>, <pabeni@redhat.com>,
+	<louis.peens@corigine.com>, <hkallweit1@gmail.com>, <linux@armlinux.org.uk>,
+	<kabel@kernel.org>, <alexandre.belloni@bootlin.com>,
+	<zhanjie9@hisilicon.com>, <zhenglifeng1@huawei.com>,
+	<liuyonglong@huawei.com>, <linux-hwmon@vger.kernel.org>,
+	<linux-media@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
+	<linux-rtc@vger.kernel.org>, <netdev@vger.kernel.org>
+References: <20250124022635.16647-1-lihuisong@huawei.com>
+ <1848ad5e-87cb-4f6b-a16d-c1b644add34f@kernel.org>
+From: "lihuisong (C)" <lihuisong@huawei.com>
+In-Reply-To: <1848ad5e-87cb-4f6b-a16d-c1b644add34f@kernel.org>
+Content-Type: text/plain; charset="UTF-8"; format=flowed
+Content-Transfer-Encoding: 8bit
+X-ClientProxiedBy: dggems705-chm.china.huawei.com (10.3.19.182) To
+ kwepemn100009.china.huawei.com (7.202.194.112)
 
-On Wed,  5 Feb 2025 02:30:17 +0800 Jason Xing wrote:
->  void __skb_tstamp_tx(struct sk_buff *orig_skb,
->  		     const struct sk_buff *ack_skb,
->  		     struct skb_shared_hwtstamps *hwtstamps,
-> -		     struct sock *sk, int tstype)
-> +		     struct sock *sk, bool sw, int tstype)
->  {
->  	struct sk_buff *skb;
->  	bool tsonly, opt_stats = false;
-> @@ -5551,6 +5576,9 @@ void __skb_tstamp_tx(struct sk_buff *orig_skb,
->  	if (!sk)
->  		return;
->  
-> +	if (!skb_enable_app_tstamp(orig_skb, tstype, sw))
 
-maybe keep the order of @tstype vs @sw consistent?
+在 2025/1/25 0:58, Krzysztof Kozlowski 写道:
+> On 24/01/2025 03:26, Huisong Li wrote:
+>> The HWMON_CHANNEL_INFO macro is provided by hwmon.h and used widely by many
+>> other drivers. This series use HWMON_CHANNEL_INFO macro to simplify code.
+>>
+> Read the feedback given to you last time. I do not see how you addressed
+> this:
+>
+> "Avoid combining independent patches into one patch bomb. Or explain the
+> dependencies and how is it supposed to be merged - that's why you have
+> cover letter here."
+Sorry. I got it now. Thank you for telling me again.😁
+There is no any dependency for this series.
+I will split these patches as Andrew suggested.
 
