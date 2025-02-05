@@ -1,108 +1,109 @@
-Return-Path: <netdev+bounces-163139-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-163149-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id B2806A29687
-	for <lists+netdev@lfdr.de>; Wed,  5 Feb 2025 17:43:52 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 06BBBA296BC
+	for <lists+netdev@lfdr.de>; Wed,  5 Feb 2025 17:53:22 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id F2D3D7A164A
-	for <lists+netdev@lfdr.de>; Wed,  5 Feb 2025 16:42:56 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id F0C2F3A505C
+	for <lists+netdev@lfdr.de>; Wed,  5 Feb 2025 16:51:52 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 884371DD87D;
-	Wed,  5 Feb 2025 16:43:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 333BD1DC9BA;
+	Wed,  5 Feb 2025 16:49:47 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="KhZl2/Ok"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="BReColQu"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-il1-f169.google.com (mail-il1-f169.google.com [209.85.166.169])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F38341DC9B3
-	for <netdev@vger.kernel.org>; Wed,  5 Feb 2025 16:43:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.169
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0212014B088;
+	Wed,  5 Feb 2025 16:49:46 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1738773820; cv=none; b=VKZ2ou7U25+7yVMm0IfEIROBh7m1P/2uBp6EAFt9sgmepxTnLfq5h2vrlqGGzxeZWHp9bNW3z0I+ve1DJ0GnhN1hUAD2Agnua3TovN8jugUnhZq16GeKK1TIqVTUnIPR1ZTBTngIq608nMEIWCisL+RTbsdByk+XDMC3ieX0oYo=
+	t=1738774187; cv=none; b=ORe1qkgGsbX8qk/ke5S+yky3C0Jr6uSmu3aZO7W4P5an52DbKPIUXUAQzCtYZgaKAMK7gFGpD7LKEvkqryfM2otOEAls6STAfwG1KZASxvkDNgG/Z8qE3IHrshF5KjncXej274V5ZObNzFXDay86N0EFLQiSO/J423X7F0IL0vU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1738773820; c=relaxed/simple;
-	bh=1lcEPj4mfazLPKYktUs5yWwM7eINxzSJwM9n75nebf4=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=YsytV+6NSAPJBQOqN5yem0jx867aRe177SVPoJqaNDKndNt5S7fC/5YjD17hce4wy2b8Fgi5IxvxzOQTyLobhOllYd1U3ltts8kaTTOoRiISBK4LeK6wPaObc9qoOV9WodAJe1buKESyJX1nG02bteV1PLHkeacoUxv87tyBYm8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=KhZl2/Ok; arc=none smtp.client-ip=209.85.166.169
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-il1-f169.google.com with SMTP id e9e14a558f8ab-3cfcf8b7455so52122975ab.3
-        for <netdev@vger.kernel.org>; Wed, 05 Feb 2025 08:43:38 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1738773818; x=1739378618; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=1lcEPj4mfazLPKYktUs5yWwM7eINxzSJwM9n75nebf4=;
-        b=KhZl2/OkHX5k6fTREFZK3Z+mVz5aFvwDvTnP1YLae/Pvmix2Jp0i/Zfb3Vlzd/hzml
-         riaaebu76w9k035jgVa4MvbckRsvqTxbEVHGDq5Te8p8eDEctDgwabbMAT9g3FiVi08U
-         c9ett0fnyLwBspK89ST0HLG5rZQxsIM0oNOLClhQ6RAkjjoD6YUeewMO2B+pDyRRt4Pc
-         IrrhIGE0LSCQyOmsdSneet3RS8+G0M26XgTWvCcPuJJ6Pr7b/HcX8RM/nfY7fdcNW1r5
-         4Orj3ZxcdcB4L5SG6H+prX5BbGRw8Aa31N+BtNNftnHjke6h2wirpNIQ8gPAA9X2hTW1
-         1VrQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1738773818; x=1739378618;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=1lcEPj4mfazLPKYktUs5yWwM7eINxzSJwM9n75nebf4=;
-        b=L0pz87Du+l7S1giuq3s9zdRm45veMCUESwU8jrpn1KB23DNc7w7vj/djzPkIMnI/xE
-         4GiOembmmN4fjk8Tlv8b1PsCofZjIkVI7fKcE0OMbgFjCAOzoKGI49tMHAW9U1fYdyam
-         1Q1pw9pJGFjNi54kQh8RZYSEj2sKDE5nK3H3KOs2NzpHNH9V80LLkrR8llqCTlEe554+
-         hrWI9G1PkfyHWZOAIJjTK9CR0ew019Z1TOs3DGdlDGoTWucsUNY05/hokV0bTHZhegvq
-         6m5jSVtLlKRWfhLacQ79tZLwr3AuUiTsBGnwC/dyww7411tls11uNsoTPxv09zu9uMtD
-         OHXQ==
-X-Forwarded-Encrypted: i=1; AJvYcCVqnGI8GJ4e9QedR/yryMPFO0Bq6jB7v+m7q0QdGG1fjuKDaZKFTrvMgyBxdBm597nDsCTyBOQ=@vger.kernel.org
-X-Gm-Message-State: AOJu0YySHK5jEi0ilRtpCLNFwzFO8Cp9wRO05pnehkHtB9E+Q32JswSa
-	qnMCst7Z//vjULhhbYCtJYu7mYb5ayDleLRmgYDwSUpIMyw+Zkp9VtBgNwiMvDomqyIa+qHiqgL
-	4o2wgc2hGkBqpjkrPL1DzWpg9w/eN/SEek0pkuExd
-X-Gm-Gg: ASbGncu4QlwloIGJnFwaKit40mb99uFT/HlRi29uIY2wpdPUMo0EZs0oVh4m4o8M9ED
-	x2U60fvZElXgQYBkrtvDPFSPiGjQvMjHPVpYlubXNgG6kc9LItMn0a5kkDpLMZrgUdjCm1OI=
-X-Google-Smtp-Source: AGHT+IFYjVdE80VF8gOnAqNj0iY33BTLBuVa7we+S2knIV3nA76hWkWy1ZlaUOZPIyurqA92NtOjOckr12DAL7RueaY=
-X-Received: by 2002:a05:6e02:20c8:b0:3d0:147a:b5da with SMTP id
- e9e14a558f8ab-3d04f3f7654mr32233145ab.5.1738773818107; Wed, 05 Feb 2025
- 08:43:38 -0800 (PST)
+	s=arc-20240116; t=1738774187; c=relaxed/simple;
+	bh=qqOru803PJBpLRoFdE8E4L+PVvp3s1DzHzqu8RFhS2U=;
+	h=Date:Content-Type:MIME-Version:From:Cc:To:In-Reply-To:References:
+	 Message-Id:Subject; b=At8Q7oIp4yAiAjajaCKNyuXacxZdzLKgGMd6wXo4qqU3Xdpf7zo4CvGz7HYD9NMySRAVlNEvtMDxUTJsCkBMtcRUKGhGue2qyWXL7gAYSp/CPbR1mjMzhoGsMmFHRGUQ1iKo5nAMqWVEBAjIQTdmRFTG7tyTjHqEKK6+d7sjKR4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=BReColQu; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 24A1BC4CED1;
+	Wed,  5 Feb 2025 16:49:46 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1738774186;
+	bh=qqOru803PJBpLRoFdE8E4L+PVvp3s1DzHzqu8RFhS2U=;
+	h=Date:From:Cc:To:In-Reply-To:References:Subject:From;
+	b=BReColQuEWyn4yxIv5AeBS7crCvCtH77t2Lu1COtQJY6hhi81ZT7gr/XuUL4huCOA
+	 aQ/tMbxYGPJALf+0XeeMY1GmLkcGNosbFLmBX/ax4wYDcOct4ZHqPbtKLlGrekQkjJ
+	 Xa52OwH/bhQVsDepXGMqs849SdSdsIeisitUPLTNpFbHQDwJiSXhfGQ4wpUN0gcdGm
+	 3LezgOcdbWDuZiayPN3Gx8IUKu4ysxoU0sSABtr79TxYuijIA4lac1rrGMajJZ7m9l
+	 3YPJeDKHuC9chZYzjEPw6oSChcXsWE1tEw0CEyrhahsdMaJFBTprkKKVH7oA36exUP
+	 mGryIMZi01LMA==
+Date: Wed, 05 Feb 2025 10:49:45 -0600
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250204144825.316785-1-edumazet@google.com>
-In-Reply-To: <20250204144825.316785-1-edumazet@google.com>
-From: Jason Xing <kerneljasonxing@gmail.com>
-Date: Thu, 6 Feb 2025 00:43:02 +0800
-X-Gm-Features: AWEUYZlNruO5nNS9MoCHeNCLj6sDlrreF15M9xBEn1a_OMpiWwBaXIsHl40n-bA
-Message-ID: <CAL+tcoB=jtXbH9LA_aa6MBHtYpsty=HqCG=cSYNgoHTJDwrnaw@mail.gmail.com>
-Subject: Re: [PATCH net-next] net: flush_backlog() small changes
-To: Eric Dumazet <edumazet@google.com>
-Cc: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
-	Paolo Abeni <pabeni@redhat.com>, netdev@vger.kernel.org, 
-	Kuniyuki Iwashima <kuniyu@amazon.com>, Simon Horman <horms@kernel.org>, eric.dumazet@gmail.com
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+From: "Rob Herring (Arm)" <robh@kernel.org>
+Cc: netdev@vger.kernel.org, Krzysztof Kozlowski <krzk+dt@kernel.org>, 
+ Conor Dooley <conor+dt@kernel.org>, "David S. Miller" <davem@davemloft.net>, 
+ Dinh Nguyen <dinguyen@kernel.org>, kernel@pengutronix.de, 
+ linux-kernel@vger.kernel.org, Paolo Abeni <pabeni@redhat.com>, 
+ Jakub Kicinski <kuba@kernel.org>, Eric Dumazet <edumazet@google.com>, 
+ devicetree@vger.kernel.org, Andrew Lunn <andrew+netdev@lunn.ch>
+To: Steffen Trumtrar <s.trumtrar@pengutronix.de>
+In-Reply-To: <20250205-v6-12-topic-socfpga-agilex5-v4-2-ebf070e2075f@pengutronix.de>
+References: <20250205-v6-12-topic-socfpga-agilex5-v4-0-ebf070e2075f@pengutronix.de>
+ <20250205-v6-12-topic-socfpga-agilex5-v4-2-ebf070e2075f@pengutronix.de>
+Message-Id: <173877418502.1694868.7734639778320336620.robh@kernel.org>
+Subject: Re: [PATCH v4 2/6] dt-bindings: net: dwmac: Convert socfpga dwmac
+ to DT schema
 
-On Tue, Feb 4, 2025 at 10:49=E2=80=AFPM Eric Dumazet <edumazet@google.com> =
-wrote:
->
-> Add READ_ONCE() around reads of skb->dev->reg_state, because
-> this field can be changed from other threads/cpus.
->
-> Instead of calling dev_kfree_skb_irq() and kfree_skb()
-> while interrupts are masked and locks held,
-> use a temporary list and use __skb_queue_purge_reason()
->
-> Use SKB_DROP_REASON_DEV_READY drop reason to better
-> describe why these skbs are dropped.
->
-> Signed-off-by: Eric Dumazet <edumazet@google.com>
 
-Thanks for the optimization!
+On Wed, 05 Feb 2025 16:32:23 +0100, Steffen Trumtrar wrote:
+> Changes to the binding while converting:
+> - add "snps,dwmac-3.7{0,2,4}a". They are used, but undocumented.
+> - altr,f2h_ptp_ref_clk is not a required property but optional.
+> 
+> Signed-off-by: Steffen Trumtrar <s.trumtrar@pengutronix.de>
+> ---
+>  .../bindings/net/pcs/altr,gmii-to-sgmii.yaml       |  47 ++++++++++
+>  .../devicetree/bindings/net/socfpga-dwmac.txt      |  57 ------------
+>  .../devicetree/bindings/net/socfpga-dwmac.yaml     | 102 +++++++++++++++++++++
+>  3 files changed, 149 insertions(+), 57 deletions(-)
+> 
 
-Reviewed-by: Jason Xing <kerneljasonxing@gmail.com>
+My bot found errors running 'make dt_binding_check' on your patch:
+
+yamllint warnings/errors:
+
+dtschema/dtc warnings/errors:
+/builds/robherring/dt-review-ci/linux/Documentation/devicetree/bindings/net/pcs/altr,gmii-to-sgmii.example.dtb: phy@100000240: reg: [[1, 576], [8, 1], [512, 64]] is too short
+	from schema $id: http://devicetree.org/schemas/pcs/altr,gmii-to-sgmii.yaml#
+/builds/robherring/dt-review-ci/linux/Documentation/devicetree/bindings/net/pcs/altr,gmii-to-sgmii.example.dtb: phy@100000240: 'clock-names', 'clocks' do not match any of the regexes: 'pinctrl-[0-9]+'
+	from schema $id: http://devicetree.org/schemas/pcs/altr,gmii-to-sgmii.yaml#
+
+doc reference errors (make refcheckdocs):
+
+See https://patchwork.ozlabs.org/project/devicetree-bindings/patch/20250205-v6-12-topic-socfpga-agilex5-v4-2-ebf070e2075f@pengutronix.de
+
+The base for the series is generally the latest rc1. A different dependency
+should be noted in *this* patch.
+
+If you already ran 'make dt_binding_check' and didn't see the above
+error(s), then make sure 'yamllint' is installed and dt-schema is up to
+date:
+
+pip3 install dtschema --upgrade
+
+Please check and re-submit after running the above command yourself. Note
+that DT_SCHEMA_FILES can be set to your schema file to speed up checking
+your schema. However, it must be unset to test all examples with your schema.
+
 
