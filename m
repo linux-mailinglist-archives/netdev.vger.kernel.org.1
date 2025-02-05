@@ -1,163 +1,160 @@
-Return-Path: <netdev+bounces-163244-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-163245-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 70E18A29B01
-	for <lists+netdev@lfdr.de>; Wed,  5 Feb 2025 21:15:21 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 52AEFA29B10
+	for <lists+netdev@lfdr.de>; Wed,  5 Feb 2025 21:22:33 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 47DAF1883713
-	for <lists+netdev@lfdr.de>; Wed,  5 Feb 2025 20:14:54 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 998EE3A8965
+	for <lists+netdev@lfdr.de>; Wed,  5 Feb 2025 20:22:24 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4B552212D68;
-	Wed,  5 Feb 2025 20:14:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 79BA6212B3E;
+	Wed,  5 Feb 2025 20:22:27 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="GQMkzJKl"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="aEqR4OUj"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f170.google.com (mail-pl1-f170.google.com [209.85.214.170])
+Received: from mail-pl1-f182.google.com (mail-pl1-f182.google.com [209.85.214.182])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A60B420CCDD
-	for <netdev@vger.kernel.org>; Wed,  5 Feb 2025 20:14:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.170
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B97C71D6DD4
+	for <netdev@vger.kernel.org>; Wed,  5 Feb 2025 20:22:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.182
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1738786464; cv=none; b=ru6IpvwX5tP4XsG8AdLZuar68SJ4GT9bWz1BpP72/j+F7lput43Q2iBBi6on1cLsdpTcAxRxipSbKN+ArTy9jJEAaKpOwADk3kydEv3pOawICzy3GwM27GELhaIx12+D2yncwx3cHIhrDPJnx1pDhna0vZ17npcqJ70uh2lUJlg=
+	t=1738786947; cv=none; b=a2y5v1tbcmmlBmFYi+AEr85XBiPCUsjliO0N2uYEQfXjzm42dtdPrYoLQQuPDpaCnX3LTdDU8SK+uOMxzSlyj7Uu4/KKL8sQjwV9cZPyAsNHxByp6T4mLgWKmiza342+b9JeFa1Si9UAz11vDDF8r2bu9nhGWPcPC2de/ZWUm1U=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1738786464; c=relaxed/simple;
-	bh=5paWUhXR1rOAMff3mPwld/knPMys5QgirJdpEwaSp8c=;
+	s=arc-20240116; t=1738786947; c=relaxed/simple;
+	bh=W/BDzfS0731XNlp5uGEgPUbjHeZNHpyjqCYetUqQRxQ=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=SbUhNiYQQmJrQApNsVOhcZ6l/gW7aEJRJJrfUr/OW9fpYex+BfYCo/w0z1bEAdBJQSJ3Fs6qgrwX9HfC+DsAzbQuWH7VAAjkeMSeg0nBlDhqg7/x2Jmy9e1Ew/7D8//o8ozurGUVM/7FBKH/oIXsdF1Ronbmy2FK2Ck8RMSFTfQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=GQMkzJKl; arc=none smtp.client-ip=209.85.214.170
+	 To:Cc:Content-Type; b=T2fQSl+dxNZrKzYCpeUkOoddZ2Wnw8LjwPYYZdM97ChNmwDJExK5vytTlXKIGv+h6ScJ+fWC5mXzMtaZxdYk0T1h5xzjY/Z057LehUBU/Vm/vDx/rWQ61W06IvDQmjm9YpGln0KbIaRXE1a5uvrag8NNdNK19b76KHxcTzObP0s=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=aEqR4OUj; arc=none smtp.client-ip=209.85.214.182
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-pl1-f170.google.com with SMTP id d9443c01a7336-219f6ca9a81so24405ad.1
-        for <netdev@vger.kernel.org>; Wed, 05 Feb 2025 12:14:22 -0800 (PST)
+Received: by mail-pl1-f182.google.com with SMTP id d9443c01a7336-21f032484d4so32345ad.0
+        for <netdev@vger.kernel.org>; Wed, 05 Feb 2025 12:22:25 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1738786462; x=1739391262; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1738786945; x=1739391745; darn=vger.kernel.org;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=9aykfFszNEUjgkYynV/1gVqvefwgRmwcsH9OuhoxV/A=;
-        b=GQMkzJKlOTEJntl2Yc1vFs3ZpynBO1C0jHg8MJDyRaPbN/WXYSQEMBBc3DzeasA6oF
-         inzfpoqAv9LtDfR4On8In8fs8sM5wa95Nf3sQQJHVmykuzUnJB8M/51lpEMjbxRJcKLR
-         ARj/UiVVtGxfbYfP6TnkuJ4MOPX8450yQqN8OoPKd9shxa4XmlMcZ2b9ndkZG+nBorkh
-         ff54sPAyrbEHSMEU7w5B3wvO/scj3XB4CScHi37NXtaMir706Hw8gb+MWrrKmmqZYHU5
-         iElGQyFaqJ05ydzRAaLY5B0RUT0PfX5XrzHkbaRyBTYNTPEMqGXVuUNYF17ajZqmSV3U
-         bZFA==
+        bh=qkxLeSmqP0bYGjmD83E3Y/4YIZD5CnHUYSNEP7lCym8=;
+        b=aEqR4OUjEXOk+Plcx0PsYOho51wcq4oRNSX2zvM5RE6Sgc079JRIortawJIyNHH5Vp
+         CO3NiFzoe4fKwfJTSNFib38UdXSni6DjIpCZkcZNzFn9EmY5MiTxviY3ZjgnMitFSaVI
+         b1dzui4HIIGfHIXl9v9akFiWxSC7IvI964ax1384+5jK2rjGJKiX+Es/VGFDAuAZ+ly1
+         D+p3ZP6yz6AOUhVc3G/EKMM4Z1EHQCgIurhcqIxORO9D77owYm+rY/vBiZmxO61s+Zul
+         eKEbCvw+iD9vZUwR6a90JJwEHkOkh/htlDbjgRjmiBAuca54U71HXMya9cTuHJF7Z88S
+         CsfA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1738786462; x=1739391262;
+        d=1e100.net; s=20230601; t=1738786945; x=1739391745;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=9aykfFszNEUjgkYynV/1gVqvefwgRmwcsH9OuhoxV/A=;
-        b=Tl+eXasKf86HAcRfMhptIRkvqmq/gYcoBfIcPgK9LtELEzRnNJrrTB7PjWxtLjEWbU
-         Og0k2oAMzfBJ5ceiTvBVh2uosBFMH1xUopPUO3nEye2ktbaOq9e4kj3JZ/qhGapL2huM
-         MGEwaEfmeBOCdyaWbdgc7gaVMieNarWpq9e2VFxXH6LkIGfosZYyfa69pr/bwA4lHzny
-         pSJq5pUD1blQWJYrsHcqczoS/+FeRA5fC7FzJTnBk+6hkIvLyoBKRxnjJ72hth2n6QcN
-         xfwO8m+cUmq9nDVJVMffMpyCkhxUfsa5p7zciHV3pIiM0kH9utFfR0SH75EwRmQlv2fO
-         T9aQ==
-X-Forwarded-Encrypted: i=1; AJvYcCU4aUvIl4uad1HDA+EGdG3n2t40nVigIjF4Vn5LhD9Hfpa0n73n0Ob/8OK5rqRV59XeUTaDeYE=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yw7qkWnHmiBpapiIeCeN/ZJin4Wmq5L3WGSH04kTPjT5UBBUlS/
-	oXdJ2+vdExIBR+6fATfzW+VmFMjVFt0Np0ElpK2Xp75UgxV8SH674CNNzG0/kypvru26leUGQYR
-	G1D5Ir5IxYtp2VviUtQWA9Z7dbkUZIt0ZWeYx
-X-Gm-Gg: ASbGncsFPn0oOMOh3Q4q0X+V5gPhD7XTRbfo+8PgViJB4+yYqVci4rBazOwfvhdlVKL
-	6LFT5JPHyKhaUD2+r3lp//8YLtVW9QDlmb6NQOzN5Z+PNpS46vd31TVZ6ExFLXYZ0pMNGk1Al
-X-Google-Smtp-Source: AGHT+IFJL2drsEsHnij5iaeW4ADSn+VN61Jmiapuz2mjIAGBoHqmz6hdc7oZYk31AJFjYJBMNipNVpGLALhIAHJ2BIs=
-X-Received: by 2002:a17:902:d9c6:b0:21d:dbe3:fc48 with SMTP id
- d9443c01a7336-21f30334a32mr333785ad.28.1738786461682; Wed, 05 Feb 2025
- 12:14:21 -0800 (PST)
+        bh=qkxLeSmqP0bYGjmD83E3Y/4YIZD5CnHUYSNEP7lCym8=;
+        b=ilDDBr5dr46v1zorjSfOclPE5xJWb6L5kgICsq56pI/4v6PqZjLZxb9nR5z9wiy5Y6
+         LuB9zHgU50uRA5Eio5RvqQGPn1mPH+ufmhqQHLnMVcZjz70jNfBwCAWe1aL8AYCOa++i
+         VAgTYcTgBj6ab5yuLcxOm0tpPBqV4yLSNSr9geQv0oa5IkAoIw8QbMpcs4xy82sg9Cpl
+         eV8gAlqop9l0wr4H9f7FcyNllfZV0Xieq9bqXcEQG3ItAVGHI/xy1dBX4gQ8P7jXXQJe
+         9qwR25UBY9g27skAZRjOusYQ9tQvPtmtiIgupM1XkjaMvhYiCmyn6HJFG5MYsCkbjE3Q
+         6GeQ==
+X-Forwarded-Encrypted: i=1; AJvYcCWyEZah/0vHkj42pPe77DDLKk4I2NNHA7+RMEJTcwjXRO0rMrWAkJxOA+fO49HQDpnOOVPYkU8=@vger.kernel.org
+X-Gm-Message-State: AOJu0YygY2LWf+6U9BcSFG5mJ9Z7r6Z5Jog7BLdTm4mq7ayeOHT9tWAd
+	0IKNetYDwaLZJ6D7eloeSYPkj+7FVZUyfBqtET3mMYzR1SwSR1azoiJem1hJjVCwS0zZRt/GJu7
+	zxqd3csw72yv2WaLDKSOBLqQFx2PyctBaLwbF
+X-Gm-Gg: ASbGncvc9W8AjyhJRm7+7LlsaDFZYx7d4yK3fkUe1Zem/zGUw2yauZ+ibohzR5MhkvH
+	WDaZekPi73ncuSMj3oH3nMg5tV9p59pDtufa4yAgvz44sZ32qgZDZSRwjDa+m0DGd2RDQYjiN
+X-Google-Smtp-Source: AGHT+IHe8klwDgJSKEW2jpBdb9Qr5QEYUblXIVK5qhpQjddp07M20x9TqO2J5WfJ10zWsmr9wDdoAZ9pqxtBzG8aw9E=
+X-Received: by 2002:a17:902:d582:b0:215:4bdd:9919 with SMTP id
+ d9443c01a7336-21f311f9d6fmr275545ad.17.1738786944775; Wed, 05 Feb 2025
+ 12:22:24 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250116215530.158886-1-saeed@kernel.org> <20250116215530.158886-8-saeed@kernel.org>
-In-Reply-To: <20250116215530.158886-8-saeed@kernel.org>
+References: <20241221004236.2629280-1-almasrymina@google.com>
+ <20241221004236.2629280-6-almasrymina@google.com> <676dd022d1388_1d346b2947@willemb.c.googlers.com.notmuch>
+ <CAHS8izNzbEi_Dn+hDohF9Go=et7kts-BnmEpq=Znpot7o7B5wA@mail.gmail.com>
+ <6798ee97c73e1_987d9294d6@willemb.c.googlers.com.notmuch> <53192c45-df3c-4a65-9047-bbd59d4aee47@gmail.com>
+In-Reply-To: <53192c45-df3c-4a65-9047-bbd59d4aee47@gmail.com>
 From: Mina Almasry <almasrymina@google.com>
-Date: Wed, 5 Feb 2025 12:14:08 -0800
-X-Gm-Features: AWEUYZnEltJTKqE1HoNd23aEAihqbocvcmRmFeEjBPqCkok3JuEl8VAs1QjzzAs
-Message-ID: <CAHS8izOfkLtFzqsfnacQrVaiW0ZkHRoeZwNK4FVV7j3yR1T_vQ@mail.gmail.com>
-Subject: Re: [net-next 07/11] net/mlx5e: Convert over to netmem
-To: Saeed Mahameed <saeed@kernel.org>
-Cc: "David S. Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
-	Paolo Abeni <pabeni@redhat.com>, Eric Dumazet <edumazet@google.com>, 
-	Saeed Mahameed <saeedm@nvidia.com>, netdev@vger.kernel.org, 
-	Tariq Toukan <tariqt@nvidia.com>, Gal Pressman <gal@nvidia.com>, Leon Romanovsky <leonro@nvidia.com>, 
-	Dragos Tatulea <dtatulea@nvidia.com>
+Date: Wed, 5 Feb 2025 12:22:10 -0800
+X-Gm-Features: AWEUYZmi_S38KTdRcwjGkZKd5Xr1UKSuxDipsps1bDEi3RA74FXERhOLWF6TuhY
+Message-ID: <CAHS8izMcs=3qo1jhZSM499mxHh10-oBL6Fhb2W0eKWhJGax4Bg@mail.gmail.com>
+Subject: Re: [PATCH RFC net-next v1 5/5] net: devmem: Implement TX path
+To: Pavel Begunkov <asml.silence@gmail.com>
+Cc: Willem de Bruijn <willemdebruijn.kernel@gmail.com>, netdev@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, linux-doc@vger.kernel.org, 
+	virtualization@lists.linux.dev, kvm@vger.kernel.org, 
+	linux-kselftest@vger.kernel.org, "David S. Miller" <davem@davemloft.net>, 
+	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+	Simon Horman <horms@kernel.org>, Donald Hunter <donald.hunter@gmail.com>, 
+	Jonathan Corbet <corbet@lwn.net>, Andrew Lunn <andrew+netdev@lunn.ch>, David Ahern <dsahern@kernel.org>, 
+	"Michael S. Tsirkin" <mst@redhat.com>, Jason Wang <jasowang@redhat.com>, 
+	Xuan Zhuo <xuanzhuo@linux.alibaba.com>, =?UTF-8?Q?Eugenio_P=C3=A9rez?= <eperezma@redhat.com>, 
+	Stefan Hajnoczi <stefanha@redhat.com>, Stefano Garzarella <sgarzare@redhat.com>, Shuah Khan <shuah@kernel.org>, 
+	Kaiyuan Zhang <kaiyuanz@google.com>, Willem de Bruijn <willemb@google.com>, 
+	Samiullah Khawaja <skhawaja@google.com>, Stanislav Fomichev <sdf@fomichev.me>, Joe Damato <jdamato@fastly.com>, 
+	dw@davidwei.uk
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-On Thu, Jan 16, 2025 at 1:56=E2=80=AFPM Saeed Mahameed <saeed@kernel.org> w=
-rote:
+On Wed, Feb 5, 2025 at 4:41=E2=80=AFAM Pavel Begunkov <asml.silence@gmail.c=
+om> wrote:
 >
-> From: Saeed Mahameed <saeedm@nvidia.com>
+> On 1/28/25 14:49, Willem de Bruijn wrote:
+> >>>> +struct net_devmem_dmabuf_binding *
+> >>>> +net_devmem_get_sockc_binding(struct sock *sk, struct sockcm_cookie =
+*sockc)
+> >>>> +{
+> >>>> +     struct net_devmem_dmabuf_binding *binding;
+> >>>> +     int err =3D 0;
+> >>>> +
+> >>>> +     binding =3D net_devmem_lookup_dmabuf(sockc->dmabuf_id);
+> >>>
+> >>> This lookup is from global xarray net_devmem_dmabuf_bindings.
+> >>>
+> >>> Is there a check that the socket is sending out through the device
+> >>> to which this dmabuf was bound with netlink? Should there be?
+> >>> (e.g., SO_BINDTODEVICE).
+> >>>
+> >>
+> >> Yes, I think it may be an issue if the user triggers a send from a
+> >> different netdevice, because indeed when we bind a dmabuf we bind it
+> >> to a specific netdevice.
+> >>
+> >> One option is as you say to require TX sockets to be bound and to
+> >> check that we're bound to the correct netdev. I also wonder if I can
+> >> make this work without SO_BINDTODEVICE, by querying the netdev the
+> >> sock is currently trying to send out on and doing a check in the
+> >> tcp_sendmsg. I'm not sure if this is possible but I'll give it a look.
+> >
+> > I was a bit quick on mentioning SO_BINDTODEVICE. Agreed that it is
+> > vastly preferable to not require that, but infer the device from
+> > the connected TCP sock.
 >
-> mlx5e_page_frag holds the physical page itself, to naturally support
-> zc page pools, remove physical page reference from mlx5 and replace it
-> with netmem_ref, to avoid internal handling in mlx5 for net_iov backed
-> pages.
+> I wonder why so? I'd imagine something like SO_BINDTODEVICE is a
+> better way to go. The user has to do it anyway, otherwise packets
+> might go to a different device and the user would suddenly start
+> getting errors with no good way to alleviate them (apart from
+> likes of SO_BINDTODEVICE). It's even worse if it works for a while
+> but starts to unpredictably fail as time passes. With binding at
+> least it'd fail fast if the setup is not done correctly.
 >
-> No performance degradation observed.
->
-> Signed-off-by: Saeed Mahameed <saeedm@nvidia.com>
-> Reviewed-by: Dragos Tatulea <dtatulea@nvidia.com>
-> Reviewed-by: Tariq Toukan <tariqt@nvidia.com>
-> ---
->  drivers/net/ethernet/mellanox/mlx5/core/en.h  |  2 +-
->  .../net/ethernet/mellanox/mlx5/core/en_rx.c   | 80 ++++++++++---------
->  2 files changed, 43 insertions(+), 39 deletions(-)
->
-...
-> @@ -514,9 +514,9 @@ mlx5e_add_skb_shared_info_frag(struct mlx5e_rq *rq, s=
-truct skb_shared_info *sinf
->         }
->
->         frag =3D &sinfo->frags[sinfo->nr_frags++];
-> -       skb_frag_fill_page_desc(frag, frag_page->page, frag_offset, len);
-> +       skb_frag_fill_netmem_desc(frag, netmem, frag_offset, len);
->
-> -       if (page_is_pfmemalloc(frag_page->page))
-> +       if (!netmem_is_net_iov(netmem) && page_is_pfmemalloc(netmem_to_pa=
-ge(netmem)))
->                 xdp_buff_set_frag_pfmemalloc(xdp);
 
-Consider using:
+I think there may be a misunderstanding. There is nothing preventing
+the user from SO_BINDTODEVICE to make sure the socket is bound to the
+ifindex, and the test changes in the latest series actually do this
+binding.
 
-netmem_is_pfmemalloc(netmem_ref netmem)
+It's just that on TX, we check what device we happen to be going out
+over, and fail if we're going out of a different device.
 
-In general we try to avoid netmem_to_page() casts in the driver. These
-assumptions may break in the future.
-
->         sinfo->xdp_frags_size +=3D len;
->  }
-> @@ -527,27 +527,29 @@ mlx5e_add_skb_frag(struct mlx5e_rq *rq, struct sk_b=
-uff *skb,
->                    u32 frag_offset, u32 len,
->                    unsigned int truesize)
->  {
-> -       dma_addr_t addr =3D page_pool_get_dma_addr(frag_page->page);
-> +       dma_addr_t addr =3D page_pool_get_dma_addr_netmem(frag_page->netm=
-em);
-> +       struct page *page =3D netmem_to_page(frag_page->netmem);
->         u8 next_frag =3D skb_shinfo(skb)->nr_frags;
->
->         dma_sync_single_for_cpu(rq->pdev, addr + frag_offset, len,
->                                 rq->buff.map_dir);
->
-> -       if (skb_can_coalesce(skb, next_frag, frag_page->page, frag_offset=
-)) {
-> +       if (skb_can_coalesce(skb, next_frag, page, frag_offset)) {
-
-Similarly here, consider adding skb_can_coalesce_netmem() that handles
-this correctly in core code (which future drivers can reuse) rather
-than doing 1-off handling in the driver.
-
-Also, from a quick look at skb_can_coalesce(), I think it can work
-fine with netmems? Because it just needs to be converted to use
-skb_frag_netmem istead of skb_frag_page() inside of the function, but
-otherwise the function looks applicable to netmem for me.
+There are setups where the device will always be correct even without
+SO_BINDTODEVICE. Like if the host has only 1 interface or if the
+egress IP is only reachable over 1 interface. I don't see much reason
+to require the user to SO_BINDTODEVICE in these cases.
 
 --=20
 Thanks,
