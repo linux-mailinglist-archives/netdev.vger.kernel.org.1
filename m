@@ -1,85 +1,90 @@
-Return-Path: <netdev+bounces-162824-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-162834-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5C3B7A28197
-	for <lists+netdev@lfdr.de>; Wed,  5 Feb 2025 03:08:43 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6BA4BA281CC
+	for <lists+netdev@lfdr.de>; Wed,  5 Feb 2025 03:30:05 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id DDA761633C9
-	for <lists+netdev@lfdr.de>; Wed,  5 Feb 2025 02:08:41 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id F01DD164707
+	for <lists+netdev@lfdr.de>; Wed,  5 Feb 2025 02:30:03 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 46032212D68;
-	Wed,  5 Feb 2025 02:08:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ivZjlLBT"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6A6A1212D86;
+	Wed,  5 Feb 2025 02:29:59 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from szxga01-in.huawei.com (szxga01-in.huawei.com [45.249.212.187])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0307620DD45;
-	Wed,  5 Feb 2025 02:08:36 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BF5D678F4C;
+	Wed,  5 Feb 2025 02:29:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.187
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1738721317; cv=none; b=qg69FuqXAolG3GQ/W4dZuGAY6ALyi4SsJJl2/G8hbISy3hi0n6rGB8iRbdXPnh21l8VG6dAFCrjOI15AxMbTzGeIb1PabFPAYUKBqPANCzX+ORCg2gEFvTa7d1/ibdsfQjoDgmbE3rabORWHeyfzR1owv7iTkScoKvXKeItrA7Y=
+	t=1738722599; cv=none; b=IPDJLtVLC/cLbkxI+s6ixszEz697lHLE1GSyGcn56zWFKy6YUX9vtt9iyMrflF9ImXmX7fvw1EVb9slMb7FS5kQtg86NYUhZjB1lGwmkOiFKPe9Z0GjQrAjfJ1lKz+MJs8sCw7nv8k1FQDdIJXYeulOov+OuV3veTt1kwZf6UXU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1738721317; c=relaxed/simple;
-	bh=7mGvON76aOVSll1EQ1UpgCRp0itlDsHTpyTyDoSJjsg=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=T17x98PmrQKvCHZMu0b00r6KTI/Fk4eEpKGkQsqqdlBumJFlp8+H9EYKEKiAu+yBZ7MT/WjgCOZv8zznY4LtK7MqEQvBs9MoZqdz27VZc6ikdd8Wv/QvrplnRc1MK0hk66EgHVg4aAvFmDhvn9aqL68nLgHWUzBa4o9M556Duq4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ivZjlLBT; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id D9F97C4CEDF;
-	Wed,  5 Feb 2025 02:08:34 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1738721316;
-	bh=7mGvON76aOVSll1EQ1UpgCRp0itlDsHTpyTyDoSJjsg=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=ivZjlLBTdS2rCYB5+K9xcl83RZhD5DhJ3yYaCpho/7AXEsYqjjESebQLp5CXMvh9D
-	 YwRTXfL+NkYxLtZd17ZCbOv8CMAsTbklFxdxpeoOvOb++Eutws+ab9YNxEnwVw61gC
-	 CU+z8mSlId0tOZGhko0DPEwst1is2qmaUuD6LBPBjYV9QKT1Kv6TnM2VmGH8vFqF9Y
-	 2uo0t/m/Ct9TnnXstE2zlfqfunwFWSRAu27GlU4ts6pTXj6Fd/Y/GDdRSoZLPBxRaG
-	 cFpsLkqv91AlEMzI1Co6ZSV4lw5s3DgNsrV8ZEUUEuO3JK1nZYIykd7N6/lv7Zp3Li
-	 +EeIFBzwmqG1A==
-Date: Tue, 4 Feb 2025 18:08:33 -0800
-From: Jakub Kicinski <kuba@kernel.org>
-To: Mina Almasry <almasrymina@google.com>
-Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
- linux-doc@vger.kernel.org, kvm@vger.kernel.org,
- virtualization@lists.linux.dev, linux-kselftest@vger.kernel.org, Donald
- Hunter <donald.hunter@gmail.com>, "David S. Miller" <davem@davemloft.net>,
- Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, Simon
- Horman <horms@kernel.org>, Jonathan Corbet <corbet@lwn.net>, Andrew Lunn
- <andrew+netdev@lunn.ch>, Neal Cardwell <ncardwell@google.com>, David Ahern
- <dsahern@kernel.org>, "Michael S. Tsirkin" <mst@redhat.com>, Jason Wang
- <jasowang@redhat.com>, Xuan Zhuo <xuanzhuo@linux.alibaba.com>, "Eugenio
- =?UTF-8?B?UMOpcmV6?=" <eperezma@redhat.com>, Stefan Hajnoczi
- <stefanha@redhat.com>, Stefano Garzarella <sgarzare@redhat.com>, Shuah Khan
- <shuah@kernel.org>, sdf@fomichev.me, asml.silence@gmail.com,
- dw@davidwei.uk, Jamal Hadi Salim <jhs@mojatatu.com>, Victor Nogueira
- <victor@mojatatu.com>, Pedro Tammela <pctammela@mojatatu.com>, Samiullah
- Khawaja <skhawaja@google.com>
-Subject: Re: [PATCH net-next v3 0/6] Device memory TCP TX
-Message-ID: <20250204180833.48cb40cb@kernel.org>
-In-Reply-To: <20250203223916.1064540-1-almasrymina@google.com>
-References: <20250203223916.1064540-1-almasrymina@google.com>
+	s=arc-20240116; t=1738722599; c=relaxed/simple;
+	bh=oxnH1SRs7qzqidSeh6lDtPs3UM5RE2YKmoGQtyn1w7g=;
+	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
+	 In-Reply-To:Content-Type; b=PC4Cp7/TtbgfKmfqZU0awPLzbjYGnW2QT8SBNMiJujbGstDPGyny+fgdMZvdw+z3twE8lYuRy5YTUtZuXQId9RoN+McDLoK0vvaa27noVMEv+DHPQI5uLO9lNcYfhHy/Tz89WR1mxRT82KEPuXipe0nl9R3+QvMjsouPB1koarc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.187
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
+Received: from mail.maildlp.com (unknown [172.19.163.252])
+	by szxga01-in.huawei.com (SkyGuard) with ESMTP id 4Ynk9v3zQxz11PYG;
+	Wed,  5 Feb 2025 10:06:27 +0800 (CST)
+Received: from dggemv711-chm.china.huawei.com (unknown [10.1.198.66])
+	by mail.maildlp.com (Postfix) with ESMTPS id 575E11800D9;
+	Wed,  5 Feb 2025 10:10:45 +0800 (CST)
+Received: from kwepemn100009.china.huawei.com (7.202.194.112) by
+ dggemv711-chm.china.huawei.com (10.1.198.66) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.1.2507.39; Wed, 5 Feb 2025 10:10:45 +0800
+Received: from [10.67.121.59] (10.67.121.59) by kwepemn100009.china.huawei.com
+ (7.202.194.112) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.11; Wed, 5 Feb
+ 2025 10:10:43 +0800
+Message-ID: <094ebe59-debd-4cc1-c963-904d8fff14c9@huawei.com>
+Date: Wed, 5 Feb 2025 10:10:43 +0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:91.0) Gecko/20100101
+ Thunderbird/91.2.0
+Subject: Re: (subset) [PATCH v1 8/9] w1: w1_therm: w1: Use HWMON_CHANNEL_INFO
+ macro to simplify code
+To: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
+CC: <oss-drivers@corigine.com>, <matt@ranostay.sg>, <mchehab@kernel.org>,
+	<irusskikh@marvell.com>, <andrew+netdev@lunn.ch>, <davem@davemloft.net>,
+	<edumazet@google.com>, <kuba@kernel.org>, <pabeni@redhat.com>,
+	<louis.peens@corigine.com>, <hkallweit1@gmail.com>, <linux@armlinux.org.uk>,
+	<kabel@kernel.org>, <alexandre.belloni@bootlin.com>, <krzk@kernel.org>,
+	<zhanjie9@hisilicon.com>, <zhenglifeng1@huawei.com>,
+	<liuyonglong@huawei.com>, <linux-hwmon@vger.kernel.org>,
+	<linux-kernel@vger.kernel.org>, <linux-media@vger.kernel.org>,
+	<linux-rtc@vger.kernel.org>, <netdev@vger.kernel.org>
+References: <20250124022635.16647-1-lihuisong@huawei.com>
+ <20250124022635.16647-9-lihuisong@huawei.com>
+ <173858376808.132674.4568544450122043067.b4-ty@linaro.org>
+From: "lihuisong (C)" <lihuisong@huawei.com>
+In-Reply-To: <173858376808.132674.4568544450122043067.b4-ty@linaro.org>
+Content-Type: text/plain; charset="UTF-8"; format=flowed
+Content-Transfer-Encoding: 8bit
+X-ClientProxiedBy: dggems702-chm.china.huawei.com (10.3.19.179) To
+ kwepemn100009.china.huawei.com (7.202.194.112)
 
-On Mon,  3 Feb 2025 22:39:10 +0000 Mina Almasry wrote:
-> v3: https://patchwork.kernel.org/project/netdevbpf/list/?series=929401&state=*
-> ===
-> 
-> RFC v2: https://patchwork.kernel.org/project/netdevbpf/list/?series=920056&state=*
 
-nit: lore links are better
-
-please stick to RFC until a driver implementation is ready and
-included
+在 2025/2/3 19:56, Krzysztof Kozlowski 写道:
+> On Fri, 24 Jan 2025 10:26:34 +0800, Huisong Li wrote:
+>> Use HWMON_CHANNEL_INFO macro to simplify code.
+>>
+>>
+> Applied, thanks!
+>
+> [8/9] w1: w1_therm: w1: Use HWMON_CHANNEL_INFO macro to simplify code
+>        https://git.kernel.org/krzk/linux-w1/c/33c145297840dddf0dc23d5822159c26aba920d3
+>
+Thanks for picking it up.
 
