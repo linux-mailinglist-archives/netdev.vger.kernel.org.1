@@ -1,157 +1,101 @@
-Return-Path: <netdev+bounces-163228-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-163232-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id DE45CA29A26
-	for <lists+netdev@lfdr.de>; Wed,  5 Feb 2025 20:34:01 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 32739A29A35
+	for <lists+netdev@lfdr.de>; Wed,  5 Feb 2025 20:35:42 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 583DD167D06
-	for <lists+netdev@lfdr.de>; Wed,  5 Feb 2025 19:33:58 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 8B3B03A52EB
+	for <lists+netdev@lfdr.de>; Wed,  5 Feb 2025 19:35:30 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D83F620CCD8;
-	Wed,  5 Feb 2025 19:33:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B2D10212B00;
+	Wed,  5 Feb 2025 19:35:19 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="j0LatF6S"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="bKVstiUN"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AE8FB20C026;
-	Wed,  5 Feb 2025 19:33:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 12597211472;
+	Wed,  5 Feb 2025 19:35:17 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1738783996; cv=none; b=ThIw9/63pdPzXbr5PEPY8y6ZY8/DdoTpruGe1js9kxdjoCDdWzn6rXOQuDw7MZgdAZo9cHrM3yZwHoIEaYuXIrdBMOqeq9VV42vtPEWJ2tGj9BjsTPSWFUAp6cXf9PAzcUfhUBWUcQN90t0Bko6WEKLsaf4N3DXZ1mAh8jVvy34=
+	t=1738784119; cv=none; b=feNYjoH+o1w2khJjyIi23inqeHbmNOpbAl33kMo623xtebYC2XUf5F/R1B6bkevjFQDinyg79inw6ydDbyK3sHVgbnb5w+BRuIPy3P/zOtaW3Pv3rASAZH7oTXcD5IWnnWfiWgUSfMOR/CxCRwE/ZwXMrI0F/1g9P09R0Z8796g=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1738783996; c=relaxed/simple;
-	bh=B/kqz7BMCRcXcNkULlXWbe8rQqpjmskiXpQUTOkxG2A=;
+	s=arc-20240116; t=1738784119; c=relaxed/simple;
+	bh=DO6FpVoqzj5kCjnT44+RkYsqLTR3OjhBRC7wUK5LZZE=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=MH4sbamfwb8Cej/sKJe5tA8z0uQokrLxstThqNB3w4N6/OPklrVZ80GHLkGW8ZEFPfxFthk6VRoEiyzcdaeNJzVU1Zrc7t33XaE8mFlf+oaMs7IIFAjAntMeo4CyUfqBloBm6ktIinDkXzhTxNid5ed43e9KnycVRhblcBb1vz8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=j0LatF6S; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9931DC4CED1;
-	Wed,  5 Feb 2025 19:33:15 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1738783996;
-	bh=B/kqz7BMCRcXcNkULlXWbe8rQqpjmskiXpQUTOkxG2A=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=j0LatF6SvEfeeYJE9BNmmmeizE1IeFzFC658QJrATwfK6HNFvVLtJrAkMQtMMNUTj
-	 okszOcVt1KpVOzZieCzo1NLZRZflHzBEm2hCN4KoYXqhRSDywgacluxdY7BMG5db3x
-	 EteR5UMxvyv3meUlTb+w/IxDbB+Dj/eO5qHxpvLYsEGTgLwsgYIa9O7r0ymes11/2r
-	 /ceQUFUrMPdni1DrgeYEGvQQ/f9YSwBCaVz0r7y9OEwT7A5hWkASoGSzEAJcMXQ1PO
-	 4E7IgS/cU0UERNM5gFeBk2mPdGvROfdLIox5FUZ76UkNhPj3qJTgYRFHAQbp2nadRb
-	 vQmPlv5stGGBw==
-Date: Wed, 5 Feb 2025 20:33:13 +0100
-From: Lorenzo Bianconi <lorenzo@kernel.org>
-To: Conor Dooley <conor@kernel.org>
-Cc: Andrew Lunn <andrew+netdev@lunn.ch>,
+	 Content-Type:Content-Disposition:In-Reply-To; b=AvKeCH0ug0ZmSAPgDjmrWqebyNbWUJK+mykYbL38RiIR3uqcH3uqKX9J3DKvHliv9b4/+/6sNYoCGOb6aCbxLFoBrIakx1TntEsuPVX3QJ/w0Wyj3I5KdqiVX2GPzv7CX/6iwh2CAqbF9hqGJ6aSoG2Igss0PUFxknwPvnXgb4M=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=bKVstiUN; arc=none smtp.client-ip=156.67.10.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=826zsmKNv9Jw5QB/wJ9JVPtGcQjVlcATi9B8bvTUPOc=; b=bKVstiUNxvz75cQPO0AULFZQDS
+	Xud6Id3iizvk9wCZ3Jd86tRqhwel4z1IPZZpBxdXdOy/wmDqxVQc8MTy16DMiI3eXKNbBFoWSUB13
+	zszWQ7Bl/pE6jpqmAJZbFOSlOVHUzy12vVAANaJjldqyR0Grso0P+IvUYVxseBbllets=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1tflAz-00BHnk-Rr; Wed, 05 Feb 2025 20:35:09 +0100
+Date: Wed, 5 Feb 2025 20:35:09 +0100
+From: Andrew Lunn <andrew@lunn.ch>
+To: Nikita Yushchenko <nikita.yoush@cogentembedded.com>
+Cc: Yoshihiro Shimoda <yoshihiro.shimoda.uh@renesas.com>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
 	"David S. Miller" <davem@davemloft.net>,
 	Eric Dumazet <edumazet@google.com>,
 	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Felix Fietkau <nbd@nbd.name>, Sean Wang <sean.wang@mediatek.com>,
-	Matthias Brugger <matthias.bgg@gmail.com>,
-	AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>,
-	Philipp Zabel <p.zabel@pengutronix.de>,
-	Rob Herring <robh@kernel.org>,
-	Krzysztof Kozlowski <krzk+dt@kernel.org>,
-	Conor Dooley <conor+dt@kernel.org>, netdev@vger.kernel.org,
-	linux-arm-kernel@lists.infradead.org,
-	linux-mediatek@lists.infradead.org, devicetree@vger.kernel.org,
-	upstream@airoha.com
-Subject: Re: [PATCH net-next 09/13] dt-bindings: net: airoha: Add airoha,npu
- phandle property
-Message-ID: <Z6O8-dUrLNmvnW1u@lore-desk>
-References: <20250205-airoha-en7581-flowtable-offload-v1-0-d362cfa97b01@kernel.org>
- <20250205-airoha-en7581-flowtable-offload-v1-9-d362cfa97b01@kernel.org>
- <20250205-cleaver-evaluator-648c8f0b99bb@spud>
+	Geert Uytterhoeven <geert+renesas@glider.be>,
+	netdev@vger.kernel.org, linux-renesas-soc@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	Michael Dege <michael.dege@renesas.com>,
+	Christian Mardmoeller <christian.mardmoeller@renesas.com>,
+	Dennis Ostermann <dennis.ostermann@renesas.com>
+Subject: Re: [PATCH net-next] net: renesas: rswitch: cleanup max_speed setting
+Message-ID: <18a72981-9896-4725-8f5b-5783224de300@lunn.ch>
+References: <20250203170941.2491964-1-nikita.yoush@cogentembedded.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha512;
-	protocol="application/pgp-signature"; boundary="OLRYiDtnqR+Ktbpf"
-Content-Disposition: inline
-In-Reply-To: <20250205-cleaver-evaluator-648c8f0b99bb@spud>
-
-
---OLRYiDtnqR+Ktbpf
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+In-Reply-To: <20250203170941.2491964-1-nikita.yoush@cogentembedded.com>
 
-> On Wed, Feb 05, 2025 at 07:21:28PM +0100, Lorenzo Bianconi wrote:
-> > Introduce the airoha,npu property for the npu syscon node available on
-> > EN7581 SoC. The airoha Network Processor Unit (NPU) is used to offload
-> > network traffic forwarded between Packet Switch Engine (PSE) ports.
-> >=20
-> > Signed-off-by: Lorenzo Bianconi <lorenzo@kernel.org>
-> > ---
-> >  Documentation/devicetree/bindings/net/airoha,en7581-eth.yaml | 8 +++++=
-+++
-> >  1 file changed, 8 insertions(+)
-> >=20
-> > diff --git a/Documentation/devicetree/bindings/net/airoha,en7581-eth.ya=
-ml b/Documentation/devicetree/bindings/net/airoha,en7581-eth.yaml
-> > index c578637c5826db4bf470a4d01ac6f3133976ae1a..6388afff64e990a20230b0c=
-4e58534aa61f984da 100644
-> > --- a/Documentation/devicetree/bindings/net/airoha,en7581-eth.yaml
-> > +++ b/Documentation/devicetree/bindings/net/airoha,en7581-eth.yaml
-> > @@ -63,6 +63,12 @@ properties:
-> >    "#size-cells":
-> >      const: 0
-> > =20
-> > +  airoha,npu:
-> > +    $ref: /schemas/types.yaml#/definitions/phandle
-> > +    description:
-> > +      Phandle to the syscon node used to configure the NPU module
-> > +      used for traffic offloading.
->=20
-> Why do you need a phandle for this, instead of a lookup by compatible?
-> Do you have multiple instances of this ethernet controller on the
-> device, that each need to look up a different npu?
+> +	err = of_get_phy_mode(rdev->np_port, &etha->phy_interface);
+>  	if (err)
+>  		return err;
+>  
+> -	err = of_property_read_u32(rdev->np_port, "max-speed", &max_speed);
+> -	if (!err) {
+> -		rdev->etha->speed = max_speed;
+> -		return 0;
+> -	}
+> -
+> -	/* if no "max-speed" property, let's use default speed */
+> -	switch (rdev->etha->phy_interface) {
+> -	case PHY_INTERFACE_MODE_MII:
+> -		rdev->etha->speed = SPEED_100;
+> -		break;
+> +	switch (etha->phy_interface) {
+>  	case PHY_INTERFACE_MODE_SGMII:
+> -		rdev->etha->speed = SPEED_1000;
+> +		etha->max_speed = SPEED_1000;
+>  		break;
+>  	case PHY_INTERFACE_MODE_USXGMII:
+> -		rdev->etha->speed = SPEED_2500;
+> +	case PHY_INTERFACE_MODE_5GBASER:
+> +		etha->max_speed = SPEED_2500;
 
-actually not, but looking up via the compatible string has been naked by
-Krzysztof on a different series [0].
+If the interface mode is 5GBASER why set the speed to SPEED_2500?
+Also, USXGMII allows up to 10G. So this all looks a bit odd.
 
-Regards,
-Lorenzo
-
-[0] https://patchwork.kernel.org/project/linux-pci/patch/20250115-en7581-pc=
-ie-pbus-csr-v1-2-40d8fcb9360f@kernel.org/
-
->=20
-> > +
-> >  patternProperties:
-> >    "^ethernet@[1-4]$":
-> >      type: object
-> > @@ -132,6 +138,8 @@ examples:
-> >                       <GIC_SPI 49 IRQ_TYPE_LEVEL_HIGH>,
-> >                       <GIC_SPI 64 IRQ_TYPE_LEVEL_HIGH>;
-> > =20
-> > +        airoha,npu =3D <&npu>;
-> > +
-> >          #address-cells =3D <1>;
-> >          #size-cells =3D <0>;
-> > =20
-> >=20
-> > --=20
-> > 2.48.1
-> >=20
-
-
-
---OLRYiDtnqR+Ktbpf
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iHUEABYKAB0WIQTquNwa3Txd3rGGn7Y6cBh0uS2trAUCZ6O8+QAKCRA6cBh0uS2t
-rBuDAQC8IfaonQoR+OsBNVLR3QqRP2V9u+fgOgmLkd8nLqxJXgD+LlNv2zJCpRM4
-mPz3craYS9w8t05bFQju9tmeKJ0FSQ4=
-=7CSn
------END PGP SIGNATURE-----
-
---OLRYiDtnqR+Ktbpf--
+	Andrew
 
