@@ -1,123 +1,143 @@
-Return-Path: <netdev+bounces-163152-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-163153-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id B0F02A296F3
-	for <lists+netdev@lfdr.de>; Wed,  5 Feb 2025 18:08:18 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1060AA296F6
+	for <lists+netdev@lfdr.de>; Wed,  5 Feb 2025 18:09:12 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 4922716667A
-	for <lists+netdev@lfdr.de>; Wed,  5 Feb 2025 17:08:17 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 5BA0E3A5A94
+	for <lists+netdev@lfdr.de>; Wed,  5 Feb 2025 17:09:03 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6109B1DC9B1;
-	Wed,  5 Feb 2025 17:08:15 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9D3571DDA18;
+	Wed,  5 Feb 2025 17:09:07 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="spfHHxUM"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="HHcL0D7e"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-f53.google.com (mail-ed1-f53.google.com [209.85.208.53])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9F2CC4C76
-	for <netdev@vger.kernel.org>; Wed,  5 Feb 2025 17:08:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.53
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2733B4C76;
+	Wed,  5 Feb 2025 17:09:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1738775295; cv=none; b=uDggFIPKcvVf7+uzpIReBaugPO1B7KtDkobBF3uTIt9XCaq1V/0LX0K9DCWaRoXqe7EBaZUe7s3iYPzC0mrzLrqO8HhnxZwRitdpb3mmXQmlLhsXOSCbY0LIfiSvOGXpPjYZ676pr3YON6AHCv1jtlSyhjhjeYXLBK/u+f6gZFs=
+	t=1738775347; cv=none; b=WFGmJ2w9xrSIwznLOswfJnOmriLkG5AEQ5G5i5dds8imQ42+D3L/EmHqBgh4o4A+8sCFRxEd3GLY0WUxTEYXJwNxsYqjU3KMKC61qlcqOUXVdj6aHdfPyv14fu7kxjoVsTL0iJQ9wbwVFPbGWb+e84FAAr6wIcZtvm1TE6J4EK4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1738775295; c=relaxed/simple;
-	bh=t2L34pN2hUz8xQF5rrPBVCqCJfmo3WOb3urGpAQ4sRU=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=ImdQfgXUBMDqB83Tdm/5khatz89CwbGZkUGF0+XdYI1/rSJPJGyZqepmvLrD00o8N5kPq6lqcrr7duPh9SSxCU6FwZf09uzs+w5lC0MWZWku9sSa00M7go113sfkL8tHXRrIRujmmy3nvJZD06DfKRJykckwERNvDrMSnKCjy/8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=spfHHxUM; arc=none smtp.client-ip=209.85.208.53
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-ed1-f53.google.com with SMTP id 4fb4d7f45d1cf-5dc75f98188so56160a12.2
-        for <netdev@vger.kernel.org>; Wed, 05 Feb 2025 09:08:13 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1738775292; x=1739380092; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=t2L34pN2hUz8xQF5rrPBVCqCJfmo3WOb3urGpAQ4sRU=;
-        b=spfHHxUMLEaKoV3QWUFINqgkSa3rMDjZE92qo0UWqL6Aa+EpsYAhY0lTpyOvNBhIyO
-         gZYC7bOldKAXCuFkUvuXzqn1FBb2euXxXcRD6E200xB1MteWKY3puNY2V5RM7fZPqrFD
-         ud8pXhpT3rzjLHuDPu3zjzxFlAopJLYwoqVe80k/zn6Ui93JBSgW6kCR6If0vQF1TtTi
-         6OWNpyGgV1u455RWThlcwywrcUx3gco0Lkqeuwn2N018gB/zNO1UMb/slNCBz9UAnV38
-         Q5aI+OoDiEcaWb685rwwv7WkYJuz9UBTKlqbUyAWVVzrf3Tlsn0FRLWlXM/2M8xjsb+V
-         nRKg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1738775292; x=1739380092;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=t2L34pN2hUz8xQF5rrPBVCqCJfmo3WOb3urGpAQ4sRU=;
-        b=ipREaICIi4ULAa15o8sNYyHh9LioLup7an0CMIKZ1tYcwX08/H8w6xJCiXVERD09uy
-         UCoR9KIKgH6qFiKl/mX7q6w0SwsePla/k1wimvGiwHq0oqSJPj9BisUul10tjRKH6skM
-         QXL0RcfeEKiF4h1S3BVigMiMTSgeux1tqnPHGfAIxcSNwvlI/wneGgDxe/JeaJxPDDH2
-         SEMh0mXYfVZ4NajL0e9uz+6r+FSxsx37eN0PGXla3TKNtdiab7MaE+45WjDKD3Wrt26Z
-         R5SOK1mtwyaWhtlZM0q4tW6Oox00R+2+GYE7O+XFuaulacL3eyxe6vOZeRLXuqgQDLRi
-         Ue3g==
-X-Forwarded-Encrypted: i=1; AJvYcCXVN3LMa+PJZA2UzsisjqsvLgRpURpIbp1aDsdwowVrW72pRLfpmF7DRrluJvXzu3KZk6CBpY0=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwbecNVKG2O1NOmDtDLFIADXqUygRKY1UQ4AY59JJnhRdUEElgn
-	JcdhOQm6EzsFB+1NlkpUF2/nf68eKSKowdmdBzCodnCawEVMd60gAli6E6K5IStfRMN8jz8NHlU
-	m/ijwcw+MD360sU5+rRJujR4VZIzTCGoesOxB
-X-Gm-Gg: ASbGncvE871rOGC1WvCeqAz6X+TCnWNlLYJmZh2D7dmGP482s7G+0O0wJMz4EvK7tnO
-	rz9KSl5pvToU0146uqvqoBqfD9RWaNA17O37oLNNGq40zynN+ibIGjF7apa5urY6Y1sv+apK/
-X-Google-Smtp-Source: AGHT+IF96FMEiMEt4CwbA9RNG4YeDn3DguRJVDTdrlI1M/30E8qnAWjgozkcw597YlFFZ/1YDtERDgMJM1VqAQghy9U=
-X-Received: by 2002:a05:6402:5d0:b0:5d3:cf08:d64d with SMTP id
- 4fb4d7f45d1cf-5dcdb779fb9mr4399915a12.32.1738775291646; Wed, 05 Feb 2025
- 09:08:11 -0800 (PST)
+	s=arc-20240116; t=1738775347; c=relaxed/simple;
+	bh=CbXagtJhrSGSS95bINrZ5cWssD3AwQsuc3B6gL6u2k4=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=TXeUk0WolvQbXuiq+foW5mDXwRWHLEsQJPHCLNo2HXjMbXA7A8rdDJRnfisXhbDpw4DuFvMFXDsss3klEi+Ch682tTK2Qdm+0neMSMcLQ4DCwhEq4Lm7YoLr3obvDbgCKqxGTIpadA/IL6lw1c4yOvdthrtkTerLoWmF2veQVb4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=HHcL0D7e; arc=none smtp.client-ip=156.67.10.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=5wOT3p+XzV1SocAEzl8vME7EDx+B302N3XwBDJwQTAw=; b=HHcL0D7eVudx5sZ9hoN8wpNrbI
+	t4b0+DaMY/lTfTeq+vCdBwadnnwopZA99yGVHx3/OGzYQOnTmxaG1p3NKzw/esjxyrB9ydYL7ovmV
+	MdI1fUeGPecHwBzGWYuWLR6PLvr2ovWboTs8+J/Urym3vnDNzAGn4QZ3CowwSyCtnRlQ=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1tfitL-00BFNQ-QE; Wed, 05 Feb 2025 18:08:47 +0100
+Date: Wed, 5 Feb 2025 18:08:47 +0100
+From: Andrew Lunn <andrew@lunn.ch>
+To: Dimitri Fedrau <dima.fedrau@gmail.com>
+Cc: "Russell King (Oracle)" <linux@armlinux.org.uk>,
+	dimitri.fedrau@liebherr.com, Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Rob Herring <robh@kernel.org>,
+	Krzysztof Kozlowski <krzk+dt@kernel.org>,
+	Conor Dooley <conor+dt@kernel.org>, Andrew Davis <afd@ti.com>,
+	Heiner Kallweit <hkallweit1@gmail.com>,
+	Florian Fainelli <f.fainelli@gmail.com>, netdev@vger.kernel.org,
+	devicetree@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH net-next v3 2/3] net: phy: Add helper for getting tx
+ amplitude gain
+Message-ID: <b28755b0-9104-4295-8cd3-508818445a4b@lunn.ch>
+References: <20250204-dp83822-tx-swing-v3-0-9798e96500d9@liebherr.com>
+ <20250204-dp83822-tx-swing-v3-2-9798e96500d9@liebherr.com>
+ <Z6JUbW72_CqCY9Zq@shell.armlinux.org.uk>
+ <20250205052218.GC3831@debian>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250203-netdevsim-perm_addr-v1-1-10084bc93044@redhat.com>
- <20250203143958.6172c5cd@kernel.org> <871pweymzr.fsf@toke.dk>
- <20250204085624.39b0dc69@kernel.org> <87seosyd6a.fsf@toke.dk> <20250205090000.3eb3cb9d@kernel.org>
-In-Reply-To: <20250205090000.3eb3cb9d@kernel.org>
-From: Eric Dumazet <edumazet@google.com>
-Date: Wed, 5 Feb 2025 18:08:00 +0100
-X-Gm-Features: AWEUYZkjj77gvRVHmfVcvHVGPAX1r2sGkRcFM4P8TqpQqi1mT8vKLngwYCzcJPs
-Message-ID: <CANn89iK8YpzNhJv4R+x80hcq794bh_ykS-O-2UHziBXixNhzyA@mail.gmail.com>
-Subject: Re: [PATCH net-next] net: netdevsim: Support setting dev->perm_addr
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: =?UTF-8?B?VG9rZSBIw7hpbGFuZC1Kw7hyZ2Vuc2Vu?= <toke@redhat.com>, 
-	Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller" <davem@davemloft.net>, 
-	Paolo Abeni <pabeni@redhat.com>, netdev@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250205052218.GC3831@debian>
 
-On Wed, Feb 5, 2025 at 6:00=E2=80=AFPM Jakub Kicinski <kuba@kernel.org> wro=
-te:
->
-> On Wed, 05 Feb 2025 10:05:17 +0100 Toke H=C3=B8iland-J=C3=B8rgensen wrote=
-:
-> > >> Can certainly add a test case, sure! Any preference for where to put=
- it?
-> > >> Somewhere in selftests/net, I guess, but where? rtnetlink.sh and
-> > >> bpf_offload.py seem to be the only files currently doing anything wi=
-th
-> > >> netdevsim. I could add a case to the former?
-> > >
-> > > No preference, just an emphasis on _meaningful_.
+On Wed, Feb 05, 2025 at 06:22:18AM +0100, Dimitri Fedrau wrote:
+> Am Tue, Feb 04, 2025 at 05:54:53PM +0000 schrieb Russell King (Oracle):
+> > On Tue, Feb 04, 2025 at 02:09:16PM +0100, Dimitri Fedrau via B4 Relay wrote:
+> > >  #if IS_ENABLED(CONFIG_OF_MDIO)
+> > > -static int phy_get_int_delay_property(struct device *dev, const char *name)
+> > > +static int phy_get_u32_property(struct device *dev, const char *name)
+> > >  {
+> > >  	s32 int_delay;
+> > >  	int ret;
+> > > @@ -3108,7 +3108,7 @@ static int phy_get_int_delay_property(struct device *dev, const char *name)
+> > >  	return int_delay;
+> > 
+> > Hmm. You're changing the name of this function from "int" to "u32", yet
+> > it still returns "int".
 > >
-> > OK, so checking that the feature works is not enough, in other words?
->
-> Depends on your definition of "feature works". Going thru all the
-> address types and how they behave would be a reasonable test I think.
-> Checking that an address from debugfs makes it to netlink would not.
->
-> > > Kernel supports loading OOT modules, too. I really don't want us
-> > > to be in the business of carrying test harnesses for random pieces
-> > > of user space code.
+> 
+> I just wanted to reuse code for retrieving the u32, I found
+> phy_get_int_delay_property and renamed it. But the renaming from "int"
+> to "u32" is wrong as you outlined.
+> 
+> > What range of values are you expecting to be returned by this function?
+> > If it's the full range of u32 values, then that overlaps with the error
+> > range returned by device_property_read_u32().
 > >
-> > Right. How do you feel about Andrew's suggestion of just setting a
-> > static perm_addr for netdevsim devices?
->
-> I don't see how that'd be sufficient for a meaningful test.
+> 
+> Values are in percent, u8 would already be enough, so it wouldn't
+> overlap with the error range.
+> 
+> > I'm wondering whether it would be better to follow the example set by
+> > these device_* functions, and pass a pointer for the value to them, and
+> > just have the return value indicating success/failure.
+> >
+> 
+> I would prefer this, but this would mean changes in phy_get_internal_delay
+> if we don't want to duplicate code, as phy_get_internal_delay relies on
+> phy_get_int_delay_property and we change function parameters of
+> phy_get_int_delay_property as you described. I would switch from
+> static int phy_get_int_delay_property(struct device *dev, const char *name)
+> to
+> static int phy_get_u32_property(struct device *dev, const char *name, u32 *val)
+> 
+> Do you agree ?
 
-Perhaps allow IFLA_PERM_ADDRESS to be set at veth creation time,
-or other virtual devices...
+This looks O.K. You should also rename the local variable int_delay.
+
+Humm, that function has other issues.
+
+static int phy_get_int_delay_property(struct device *dev, const char *name)
+{
+	s32 int_delay;
+	int ret;
+
+	ret = device_property_read_u32(dev, name, &int_delay);
+	if (ret)
+		return ret;
+
+	return int_delay;
+}
+
+int_delay should really be a u32. if ret is not an error, there should
+be a range check to ensure int_long actually fits in an s32, otherwise
+-EINVAL, or maybe -ERANGE.
+
+For delays, we never expect too much more than 2000ps, so no valid DT
+blob should trigger issues here.
+
+     Andrew
 
