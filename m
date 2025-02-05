@@ -1,170 +1,108 @@
-Return-Path: <netdev+bounces-162913-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-162917-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 903EEA286A9
-	for <lists+netdev@lfdr.de>; Wed,  5 Feb 2025 10:37:18 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 64272A286DD
+	for <lists+netdev@lfdr.de>; Wed,  5 Feb 2025 10:44:55 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 1E36F7A34F5
-	for <lists+netdev@lfdr.de>; Wed,  5 Feb 2025 09:36:23 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id F3365167FCE
+	for <lists+netdev@lfdr.de>; Wed,  5 Feb 2025 09:44:53 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 43A3F22A7E1;
-	Wed,  5 Feb 2025 09:37:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 57C5522A4FE;
+	Wed,  5 Feb 2025 09:44:52 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="fUuCAvQK"
 X-Original-To: netdev@vger.kernel.org
-Received: from frasgout.his.huawei.com (frasgout.his.huawei.com [185.176.79.56])
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.15])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E7D1D229B36;
-	Wed,  5 Feb 2025 09:37:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.176.79.56
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 21C1F21A458;
+	Wed,  5 Feb 2025 09:44:46 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.15
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1738748232; cv=none; b=U+M903hltS3tNH9jAEoXFKTJUKzcDJBF2T2HC9+gF4cEnMGC7unLJOwgz9fo8MvBzVQzk1CV733OWzu+CEmzXoRMX/DZbgV6yE5Q/uO22rc3TEwd6E4aE6wQo5HtGMfRU9JisquCtNSJTZ/ZbUA9nP18oyAF0jpfZ0tsRllMlR0=
+	t=1738748692; cv=none; b=t8YufhxlUS2guBh2W+iiTFdykAPMaqda2+N+M9fW514c1ttNETiH7YXYz2oTbXJjdPtqAFjMh7xUDuAb85384XbKkSjzkNEi3zehzBm3XkpoZXscRcJuuKbleMyNsvsOZjdLOPmWeEYETLlQX44vrruXj/hDSZkZme5yFFKR6iw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1738748232; c=relaxed/simple;
-	bh=A7+g72QjPlUQUIWPTKMLnaCm8tb54u9e4q8eS9BE0lU=;
-	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=cBLdlilEuwLkm7G049IiITzoV4D5qppF3nElrvfMZHZt3u+W75rlMWHGDZ4SPq87qFO7hg+pAIxUWT+K4/Ez3byDZvq/JXgg30Mq3x1XbbQXF2tS4FUwXgHp8dhsGCbaiGjYgXNQBlBm4ioa/MnI5DmrmAyi2W96JKgkWMkRN90=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei-partners.com; spf=pass smtp.mailfrom=huawei-partners.com; arc=none smtp.client-ip=185.176.79.56
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei-partners.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei-partners.com
-Received: from mail.maildlp.com (unknown [172.18.186.31])
-	by frasgout.his.huawei.com (SkyGuard) with ESMTP id 4Ynw8k6SLkz6K9Cb;
-	Wed,  5 Feb 2025 17:36:06 +0800 (CST)
-Received: from mscpeml500004.china.huawei.com (unknown [7.188.26.250])
-	by mail.maildlp.com (Postfix) with ESMTPS id E4AD71404C4;
-	Wed,  5 Feb 2025 17:37:01 +0800 (CST)
-Received: from mscphis02103.huawei.com (10.123.65.215) by
- mscpeml500004.china.huawei.com (7.188.26.250) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1258.34; Wed, 5 Feb 2025 12:37:01 +0300
-From: Mikhail Ivanov <ivanov.mikhail1@huawei-partners.com>
-To: <mic@digikod.net>, <gnoack@google.com>
-CC: <willemdebruijn.kernel@gmail.com>, <matthieu@buffet.re>,
-	<linux-security-module@vger.kernel.org>, <netdev@vger.kernel.org>,
-	<netfilter-devel@vger.kernel.org>, <yusongping@huawei.com>,
-	<artem.kuzin@huawei.com>, <konstantin.meskhidze@huawei.com>
-Subject: [RFC PATCH v3 3/3] selftests/landlock: Test that MPTCP actions are not restricted
-Date: Wed, 5 Feb 2025 17:36:51 +0800
-Message-ID: <20250205093651.1424339-4-ivanov.mikhail1@huawei-partners.com>
-X-Mailer: git-send-email 2.34.1
-In-Reply-To: <20250205093651.1424339-1-ivanov.mikhail1@huawei-partners.com>
-References: <20250205093651.1424339-1-ivanov.mikhail1@huawei-partners.com>
+	s=arc-20240116; t=1738748692; c=relaxed/simple;
+	bh=J6AXsn3lH7MBCqC6dF7yAkLsCQbHWrYkDB7bo9+iMlY=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=AbG2fi4XSAo5IIn0B3LQixOnyr8BCzCBEVmow6zooqwNdBlxNeNsYVDXMX71XNq4eC9nC2X/SZOyXY6bs3v66vmgJYMtSfJ7DMwq9QMSdDALK6q4Ke9bUqClu2SluS/WGejnBzPYY5x76ecPgBJeexmZQg9WU18pN17wk4j6UNc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=fUuCAvQK; arc=none smtp.client-ip=192.198.163.15
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1738748687; x=1770284687;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:content-transfer-encoding:in-reply-to;
+  bh=J6AXsn3lH7MBCqC6dF7yAkLsCQbHWrYkDB7bo9+iMlY=;
+  b=fUuCAvQK1H9xny/lo4SBZ7vn2djeCn0cjUQvjQdVGNXliVydg8DXSrL0
+   6otbPX0dMwdG3l81Ge2JDaSolGbjqQ5RgUoIvBi9jm9lUrEDrAoPYjCcZ
+   QTqjunuJUw97Rn8mNsykiY8FlpzAenZTSPNxmMHZf65wJNiPlYbt9P1e9
+   RRsOiOnX5EgRk3/raTYQiaI+wb9lusS9C/a3pCT1K7lGqW3gVwYWSPKAS
+   dLPXqPRuwGvtnozMJrW6Hjh4qPR8fEWa1Xmvvse1JOtOApbxFt6Eq9fcP
+   /zPugS+q285zX5vyg6Q30iNtzBXlnqk6eR+P0jQ4Dpe8o4i1J+1Q8KTQh
+   w==;
+X-CSE-ConnectionGUID: RT2ZXwbQSuOb1x8C7ITICQ==
+X-CSE-MsgGUID: 67HaaBpVScmY2GbozbQ6Sw==
+X-IronPort-AV: E=McAfee;i="6700,10204,11336"; a="39463536"
+X-IronPort-AV: E=Sophos;i="6.13,261,1732608000"; 
+   d="scan'208";a="39463536"
+Received: from fmviesa006.fm.intel.com ([10.60.135.146])
+  by fmvoesa109.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 05 Feb 2025 01:44:46 -0800
+X-CSE-ConnectionGUID: gsJi0kixTue3luxQo5W+OA==
+X-CSE-MsgGUID: JKqigt94Szu8N4LOKnQWqw==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.13,261,1732608000"; 
+   d="scan'208";a="110707699"
+Received: from mev-dev.igk.intel.com ([10.237.112.144])
+  by fmviesa006-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 05 Feb 2025 01:44:43 -0800
+Date: Wed, 5 Feb 2025 10:41:11 +0100
+From: Michal Swiatkowski <michal.swiatkowski@linux.intel.com>
+To: "Zhuo, Qiuxu" <qiuxu.zhuo@intel.com>
+Cc: "Nguyen, Anthony L" <anthony.l.nguyen@intel.com>,
+	"Kitszel, Przemyslaw" <przemyslaw.kitszel@intel.com>,
+	"andrew+netdev@lunn.ch" <andrew+netdev@lunn.ch>,
+	"davem@davemloft.net" <davem@davemloft.net>,
+	"edumazet@google.com" <edumazet@google.com>,
+	"kuba@kernel.org" <kuba@kernel.org>,
+	"pabeni@redhat.com" <pabeni@redhat.com>,
+	"Knitter, Konrad" <konrad.knitter@intel.com>,
+	"intel-wired-lan@lists.osuosl.org" <intel-wired-lan@lists.osuosl.org>,
+	"netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
+Subject: Re: Build error on
+ "drivers/net/ethernet/intel/ice/devlink/health.c:35:3: error: initializer
+ element is not constant"
+Message-ID: <Z6MyN8U6rt/6Ayye@mev-dev.igk.intel.com>
+References: <CY8PR11MB7134BF7A46D71E50D25FA7A989F72@CY8PR11MB7134.namprd11.prod.outlook.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: mscpeml500004.china.huawei.com (7.188.26.250) To
- mscpeml500004.china.huawei.com (7.188.26.250)
+In-Reply-To: <CY8PR11MB7134BF7A46D71E50D25FA7A989F72@CY8PR11MB7134.namprd11.prod.outlook.com>
 
-Extend protocol fixture with test suits for MPTCP protocol.
-Add CONFIG_MPTCP and CONFIG_MPTCP_IPV6 options in config.
+On Wed, Feb 05, 2025 at 03:18:30AM +0000, Zhuo, Qiuxu wrote:
+> Hi,
+> 
+> I got the build error messages as below:
+> My GCC is: gcc (Ubuntu 7.5.0-3ubuntu1~18.04) 7.5.0.
+> 
 
-Signed-off-by: Mikhail Ivanov <ivanov.mikhail1@huawei-partners.com>
----
+Try compiling with gcc 8.1 or newer.
 
-Changes since v1:
-* Removes SMC test suits and puts SCTP test suits in a separate commit.
----
- tools/testing/selftests/landlock/config     |  2 +
- tools/testing/selftests/landlock/net_test.c | 44 +++++++++++++++++++++
- 2 files changed, 46 insertions(+)
+Thanks,
+Michal
 
-diff --git a/tools/testing/selftests/landlock/config b/tools/testing/selftests/landlock/config
-index 29af19c4e9f9..a8982da4acbd 100644
---- a/tools/testing/selftests/landlock/config
-+++ b/tools/testing/selftests/landlock/config
-@@ -3,6 +3,8 @@ CONFIG_CGROUP_SCHED=y
- CONFIG_INET=y
- CONFIG_IPV6=y
- CONFIG_KEYS=y
-+CONFIG_MPTCP=y
-+CONFIG_MPTCP_IPV6=y
- CONFIG_NET=y
- CONFIG_NET_NS=y
- CONFIG_OVERLAY_FS=y
-diff --git a/tools/testing/selftests/landlock/net_test.c b/tools/testing/selftests/landlock/net_test.c
-index 333263780fae..d9de0ee49ebc 100644
---- a/tools/testing/selftests/landlock/net_test.c
-+++ b/tools/testing/selftests/landlock/net_test.c
-@@ -312,6 +312,17 @@ FIXTURE_VARIANT_ADD(protocol, no_sandbox_with_ipv4_tcp2) {
- 	},
- };
- 
-+/* clang-format off */
-+FIXTURE_VARIANT_ADD(protocol, no_sandbox_with_ipv4_mptcp) {
-+	/* clang-format on */
-+	.sandbox = NO_SANDBOX,
-+	.prot = {
-+		.domain = AF_INET,
-+		.type = SOCK_STREAM,
-+		.protocol = IPPROTO_MPTCP,
-+	},
-+};
-+
- /* clang-format off */
- FIXTURE_VARIANT_ADD(protocol, no_sandbox_with_ipv6_tcp1) {
- 	/* clang-format on */
-@@ -335,6 +346,17 @@ FIXTURE_VARIANT_ADD(protocol, no_sandbox_with_ipv6_tcp2) {
- 	},
- };
- 
-+/* clang-format off */
-+FIXTURE_VARIANT_ADD(protocol, no_sandbox_with_ipv6_mptcp) {
-+	/* clang-format on */
-+	.sandbox = NO_SANDBOX,
-+	.prot = {
-+		.domain = AF_INET6,
-+		.type = SOCK_STREAM,
-+		.protocol = IPPROTO_MPTCP,
-+	},
-+};
-+
- /* clang-format off */
- FIXTURE_VARIANT_ADD(protocol, no_sandbox_with_ipv4_udp) {
- 	/* clang-format on */
-@@ -398,6 +420,17 @@ FIXTURE_VARIANT_ADD(protocol, tcp_sandbox_with_ipv4_tcp2) {
- 	},
- };
- 
-+/* clang-format off */
-+FIXTURE_VARIANT_ADD(protocol, tcp_sandbox_with_ipv4_mptcp) {
-+	/* clang-format on */
-+	.sandbox = TCP_SANDBOX,
-+	.prot = {
-+		.domain = AF_INET,
-+		.type = SOCK_STREAM,
-+		.protocol = IPPROTO_MPTCP,
-+	},
-+};
-+
- /* clang-format off */
- FIXTURE_VARIANT_ADD(protocol, tcp_sandbox_with_ipv6_tcp1) {
- 	/* clang-format on */
-@@ -421,6 +454,17 @@ FIXTURE_VARIANT_ADD(protocol, tcp_sandbox_with_ipv6_tcp2) {
- 	},
- };
- 
-+/* clang-format off */
-+FIXTURE_VARIANT_ADD(protocol, tcp_sandbox_with_ipv6_mptcp) {
-+	/* clang-format on */
-+	.sandbox = TCP_SANDBOX,
-+	.prot = {
-+		.domain = AF_INET6,
-+		.type = SOCK_STREAM,
-+		.protocol = IPPROTO_MPTCP,
-+	},
-+};
-+
- /* clang-format off */
- FIXTURE_VARIANT_ADD(protocol, tcp_sandbox_with_ipv4_udp) {
- 	/* clang-format on */
--- 
-2.34.1
-
+> 
+>   CC [M]  drivers/net/ethernet/stmicro/stmmac/stmmac_mdio.o
+> drivers/net/ethernet/intel/ice/devlink/health.c:35:3: error: initializer element is not constant
+>    ice_common_port_solutions, {ice_port_number_label}},
+>    ^~~~~~~~~~~~~~~~~~~~~~~~~
 
