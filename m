@@ -1,113 +1,114 @@
-Return-Path: <netdev+bounces-162836-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-162837-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 51BBCA281DB
-	for <lists+netdev@lfdr.de>; Wed,  5 Feb 2025 03:36:18 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7E6B4A281E1
+	for <lists+netdev@lfdr.de>; Wed,  5 Feb 2025 03:37:22 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id BE8D23A2803
-	for <lists+netdev@lfdr.de>; Wed,  5 Feb 2025 02:36:09 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 6555B18860EE
+	for <lists+netdev@lfdr.de>; Wed,  5 Feb 2025 02:37:27 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0239F20C479;
-	Wed,  5 Feb 2025 02:36:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D0D11200A3;
+	Wed,  5 Feb 2025 02:37:17 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="YK7U9Y3U"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="VAf1OaNH"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.13])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D945CEAD0;
-	Wed,  5 Feb 2025 02:36:10 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.13
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AC3B7EAD0
+	for <netdev@vger.kernel.org>; Wed,  5 Feb 2025 02:37:15 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1738722972; cv=none; b=kXOGWH7UFHmQIYcdRx9C2pVTq5HHStEH+AIqKRucIkwpT0yA93MzY6y1jOgrJggQdyEcT42gh1m2Jd+TgLjIJwupQOpZnRBU+sgCMNBZCtfpT/7VqeouxjbljjcnKGAZfrTM0RSyRp3mYbL64nbVUyVF0AbgtLqhTc1GXRtM9pU=
+	t=1738723037; cv=none; b=hHL2xTA21tnicT0vm1sd5BtMUL/j3qTVv4x/FVYMa3VyiXB1rvibqOadMmeVWKZp+sPEPo/Iyq0B0GPfcmmuEmgjPqH6dAb4IZuFKlvRQf28gh9Pn4L16yS1PGErXldVVCQAqxf6k7J99nVLYeswtwHbHtj2tnBWvYuBnnMkTzo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1738722972; c=relaxed/simple;
-	bh=HhCIS7TjDEYPBJlyHuTw26lt0WykU+1bGAGU6W+Mqco=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=mrxMNF6KN+X3rSL0zy+RA3RsLlcrdVrQN9vuwZBvwmX42b9TeRtDpK8FX0tIWMUFIxJArO/YoHzuo59CPmEqFDpslQ2NUTdFj4G5ObDZt+Ro2nsleFz0hc+FRyIrKG39xXSYC8WPQT5T3n31dubO1DkSzLKEw+c5SPHtDPKP8ns=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=YK7U9Y3U; arc=none smtp.client-ip=198.175.65.13
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1738722971; x=1770258971;
-  h=from:to:cc:subject:date:message-id:mime-version:
-   content-transfer-encoding;
-  bh=HhCIS7TjDEYPBJlyHuTw26lt0WykU+1bGAGU6W+Mqco=;
-  b=YK7U9Y3UdUX3A8t77/ndcTkujrZq4Fti+GlcPTDoXQHphD7N6Yz9F60Y
-   d3dJTENcx6wmtcklTuLMBVzqVHYPZ3DVMRD5jB/NAtfiX3s07//cuWfdX
-   r4EH4cPjGeF/MvHyXwxXzQiuyrfTG1GGMSMRcUho+RarwIm2Rt2pChDCU
-   2SB1UZKZsfczc9XaRyLrpMpCInRQ+YGB7corHjBgmD9/8NJmpTRArx86o
-   bI7cL+qk4eRSdl0oOBzzddh2pSz3qmYU9d2zbOFtjuZpFqKiyNmo3fCb/
-   Xatd3EYprva0zayL88ON+pVOaRtmyhoOW9nKgatlrCpI+4h4Szy+te0O5
-   Q==;
-X-CSE-ConnectionGUID: kuDXCEVpTcOfrEYp4a2e9Q==
-X-CSE-MsgGUID: 0I0SZ9Z/TZCR3IGJMVHA6A==
-X-IronPort-AV: E=McAfee;i="6700,10204,11336"; a="50265591"
-X-IronPort-AV: E=Sophos;i="6.13,260,1732608000"; 
-   d="scan'208";a="50265591"
-Received: from fmviesa009.fm.intel.com ([10.60.135.149])
-  by orvoesa105.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 04 Feb 2025 18:36:10 -0800
-X-CSE-ConnectionGUID: Y4AIYHQJRZeWzE+Xt9rY5Q==
-X-CSE-MsgGUID: 5p4O0Ya+S1ibxn2bhXFbGA==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.13,260,1732608000"; 
-   d="scan'208";a="111351076"
-Received: from p12ill20yoongsia.png.intel.com ([10.88.227.38])
-  by fmviesa009.fm.intel.com with ESMTP; 04 Feb 2025 18:36:06 -0800
-From: Song Yoong Siang <yoong.siang.song@intel.com>
-To: Tony Nguyen <anthony.l.nguyen@intel.com>,
-	Przemek Kitszel <przemyslaw.kitszel@intel.com>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S . Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Vinicius Costa Gomes <vinicius.gomes@intel.com>,
-	Malli C <mallikarjuna.chilakala@intel.com>,
-	Maciej Fijalkowski <maciej.fijalkowski@intel.com>
-Cc: intel-wired-lan@lists.osuosl.org,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	stable@vger.kernel.org
-Subject: [PATCH iwl-net v1 1/1] igc: Set buffer type for empty frames in igc_init_empty_frame
-Date: Wed,  5 Feb 2025 10:36:03 +0800
-Message-Id: <20250205023603.798819-1-yoong.siang.song@intel.com>
-X-Mailer: git-send-email 2.34.1
+	s=arc-20240116; t=1738723037; c=relaxed/simple;
+	bh=FF85+HxXlWBrw/2UFMwJHB+TGmNDf8/xSe+ql3+lxzg=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=V9qrM4oD5R+ChnUC24EDfNZQPxXKXKUO+FZ3ISCSSIL0M9qUEXokoBXrTmOKsv2RI//2xjFn1aV2NM8xMubL+6dBtNa4M2m9AlosfsRtQZB+g+bN8QXHl/du2KIXXYxjDKpkopRG/lIEjK35xSoe7hQFOelLfTdQHP4a3TvU4Ro=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=VAf1OaNH; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id A850CC4CEDF;
+	Wed,  5 Feb 2025 02:37:14 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1738723035;
+	bh=FF85+HxXlWBrw/2UFMwJHB+TGmNDf8/xSe+ql3+lxzg=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=VAf1OaNH5pldm/mcRBBkJz1kJ9NWXlewLEj2HnC/P9X6/EbW6FsCDii9R56V2fOXv
+	 MGp3d31eJDYDtRFa2VCI7zrEFO7z8/+xMi7m+ThG7BtG1oqv8UZDOrDF7xRWbEz9lm
+	 y3Qav1KTa6Qg/ZpnvrKcvnG7kPJg8agO/PWVItL+tMk/Wat+ZU9sOPSWxMQoOHy2eI
+	 wKvAQPkY/UxnweAveGP5e6qUDcmPuwk/Rl6Nu25JixQeOgCkba7w+Kwls3C/6IEX0g
+	 C47O7+NmpNdT4rh8Egsf6p/vPnEbvwg53JUckIGeI/tgacDTUlCD74RCHwjeJlby3z
+	 5FAQ/PmkheBZw==
+Date: Tue, 4 Feb 2025 18:37:13 -0800
+From: Jakub Kicinski <kuba@kernel.org>
+To: Danielle Ratson <danieller@nvidia.com>
+Cc: <netdev@vger.kernel.org>, <mkubecek@suse.cz>, <matt@traverse.com.au>,
+ <daniel.zahka@gmail.com>, <amcohen@nvidia.com>,
+ <nbu-mlxsw@exchange.nvidia.com>
+Subject: Re: [PATCH ethtool-next v3 10/16] qsfp: Add JSON output handling to
+ --module-info in SFF8636 modules
+Message-ID: <20250204183713.5cf64e08@kernel.org>
+In-Reply-To: <20250204133957.1140677-11-danieller@nvidia.com>
+References: <20250204133957.1140677-1-danieller@nvidia.com>
+	<20250204133957.1140677-11-danieller@nvidia.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-Set the buffer type to IGC_TX_BUFFER_TYPE_SKB for empty frame in the
-igc_init_empty_frame function. This ensures that the buffer type is
-correctly identified and handled during Tx ring cleanup.
+On Tue, 4 Feb 2025 15:39:51 +0200 Danielle Ratson wrote:
+> +	if (is_json_context())
+> +		print_string(PRINT_JSON, "description", "%s", description);
+> +	else
+> +		printf("%s %s\n", pfx, description);
+> +
+>  	if (map->page_00h[SFF8636_EXT_ID_OFFSET] & SFF8636_EXT_ID_CDR_TX_MASK)
+> -		printf("%s CDR present in TX,", pfx);
+> +		strncpy(description, "CDR present in TX,", 64);
+>  	else
+> -		printf("%s No CDR in TX,", pfx);
+> +		strncpy(description, "No CDR in TX,", 64);
+>  
+>  	if (map->page_00h[SFF8636_EXT_ID_OFFSET] & SFF8636_EXT_ID_CDR_RX_MASK)
+> -		printf(" CDR present in RX\n");
+> +		strcat(description, " CDR present in RX");
+> +	else
+> +		strcat(description, " No CDR in RX");
+> +
+> +	if (is_json_context())
+> +		print_string(PRINT_JSON, "description", "%s", description);
+>  	else
+> -		printf(" No CDR in RX\n");
+> +		printf("%s %s\n", pfx, description);
 
-Fixes: db0b124f02ba ("igc: Enhance Qbv scheduling by using first flag bit")
-Cc: stable@vger.kernel.org # 6.2+
-Signed-off-by: Song Yoong Siang <yoong.siang.song@intel.com>
----
- drivers/net/ethernet/intel/igc/igc_main.c | 1 +
- 1 file changed, 1 insertion(+)
+I think the description fields need to either be concatenated, or an
+array. Otherwise the parser picks one:
 
-diff --git a/drivers/net/ethernet/intel/igc/igc_main.c b/drivers/net/ethernet/intel/igc/igc_main.c
-index 56a35d58e7a6..7daa7f8f81ca 100644
---- a/drivers/net/ethernet/intel/igc/igc_main.c
-+++ b/drivers/net/ethernet/intel/igc/igc_main.c
-@@ -1096,6 +1096,7 @@ static int igc_init_empty_frame(struct igc_ring *ring,
- 		return -ENOMEM;
- 	}
- 
-+	buffer->type = IGC_TX_BUFFER_TYPE_SKB;
- 	buffer->skb = skb;
- 	buffer->protocol = 0;
- 	buffer->bytecount = skb->len;
--- 
-2.34.1
+from the commit msg:
 
+$ cat tmp
+[{
+        "extended_identifier": {
+            "value": 207,
+            "description": "3.5W max. Power consumption",
+            "description": "CDR present in TX, CDR present in RX",
+            "description": "5.0W max. Power consumption, High Power Class enabled"
+        },
+}]
+
+$ cat tmp | jq
+[
+  {
+    "extended_identifier": {
+      "value": 207,
+      "description": "5.0W max. Power consumption, High Power Class enabled"
+    }
+  }
+]
 
