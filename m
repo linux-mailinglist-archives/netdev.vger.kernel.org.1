@@ -1,126 +1,144 @@
-Return-Path: <netdev+bounces-163584-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-163583-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 16773A2AD35
-	for <lists+netdev@lfdr.de>; Thu,  6 Feb 2025 17:01:32 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id BDB43A2AD31
+	for <lists+netdev@lfdr.de>; Thu,  6 Feb 2025 17:01:14 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id ECE833A9971
-	for <lists+netdev@lfdr.de>; Thu,  6 Feb 2025 16:01:16 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id E14967A18B4
+	for <lists+netdev@lfdr.de>; Thu,  6 Feb 2025 16:00:18 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7B25F1624CF;
-	Thu,  6 Feb 2025 16:01:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 25FB11F419B;
+	Thu,  6 Feb 2025 16:01:08 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="cx2gjWaN"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Fxvu6Zx0"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qt1-f173.google.com (mail-qt1-f173.google.com [209.85.160.173])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E51E21F419B
-	for <netdev@vger.kernel.org>; Thu,  6 Feb 2025 16:01:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.173
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EC6471F416F;
+	Thu,  6 Feb 2025 16:01:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1738857683; cv=none; b=Lb7/hLLIzP7wrdl9h137MHgVdCeldYQ9xZoAoWvQuMR1ee2HBs4TYxBXztzoWxuredm3bG9xv0d5QN+dLmmHvn1dTh7CMTR6aUdol+4wqcxqGVcgcWntbG8Kwvtl7MInjj0MHpv6OtU+3+9EOi3NL/NOMtORVioW7nEQLBi+MiE=
+	t=1738857668; cv=none; b=tvPeLl4hjwq/tArrU0Ffp8jMHeX/OzM4Li/w3N3epBs+WFGmzwYrvxYbKBpP1bcvh2igHWGMH6b7SLDsyitjkzMvTSMVyD7j480fweUhE6DK83xKTw4x7thRkVQrMSKKteiwXDkOb5b8bhyp5Ly+gfbLWXnZ7QxGchL2qLFYlpM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1738857683; c=relaxed/simple;
-	bh=cjrvqKwflKGDwidBjxOl4fQeR+OSK3UfDfYbifKFa8M=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=nmjkaeNHMgSM9tvgnyGbTBBXAares8Y/B1ktfgp/GUBRHmtRO0+qoQlq9BRfvFZw/SLRq4qggssHgdgOup0ACE0Yf4moCtUog5LMAFEezLbH/zFuMeS8dnqP/OgpmsRP6lzCYOlQbKitcf7C530NnPA83/q6EXXUdze0b6Yo+5g=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=cx2gjWaN; arc=none smtp.client-ip=209.85.160.173
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-qt1-f173.google.com with SMTP id d75a77b69052e-46785b66168so161cf.0
-        for <netdev@vger.kernel.org>; Thu, 06 Feb 2025 08:01:21 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1738857681; x=1739462481; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=cjrvqKwflKGDwidBjxOl4fQeR+OSK3UfDfYbifKFa8M=;
-        b=cx2gjWaNrtShGDM8ubQzym32fXxhQC/dSeX3Xgcbvp8w9sWnR7mP6fkaT3BoPGEPmp
-         /Cxr2F31U78RoM3oYsdFOKYvksfVv5AIicoiRgdKagzVGbf8r1a/0GqorTV4Q2r/ytrt
-         u6IL/GHsXUeZ55B2dEPTpb48hmbCfWwy3keIlucoT8UH/jB2gVNVF3BrmEaLq5gvY6kP
-         PNO3pBqYp8F2RO2ZKgRx+eWu5niLAnz5seKjGvkcfMw1/THx1gJzdbmNZT7bpQsIgoaF
-         NmLvnkrNajPdIGbZtBQD47YhF7kBCcMXMP3YBvbLAx4jeXHqCxnF9LadfBz925SkleIo
-         03Gg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1738857681; x=1739462481;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=cjrvqKwflKGDwidBjxOl4fQeR+OSK3UfDfYbifKFa8M=;
-        b=rwZ8DHIWbFD/q8T2gpLhfmsw5ia6i8msEqKRRZ4+G2j20AhPC1TYuP1Z777h9bSZGE
-         j0xAqw2nZH16lOVVS+Hp5N8TTAwAJ8UY+oLZFHIAK+wIBzAGIIHdJ+0vkHwm6Q0LUqbq
-         O0DB5UVMgJFIYviRDEL1ma4zZ8hJQPmcpzc0KK3t31n61el0MIOzCzqZUCBGoSJDOmkM
-         ilkd5ZRRdnbLsRLI1WQIiCoXAwnMj/ejdktOnyELchEG6UkzQDJyQiRMfLZK+O/+DNJX
-         L/v0wCUFglqHWBNsaqXoQBxqx5L6ZamBD1Usb5l4eoBQrjnJq3Ohc+/yeRP39lfTN/UX
-         gPvg==
-X-Forwarded-Encrypted: i=1; AJvYcCXp0ODOG9HJyRu0bQ4P/10+X1Odm2ZE4VWSAs8D9ESJsvAH4aomhm+PDusocYlmAnvEwtWJCAA=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzNqg2PjAqSZwlez7F9SPF3JgaF+KtDxlTF7Si06PYjOn5u+NEq
-	+4ICFX/uz1ULd2idboWjwqYdVfBmGDQ5Q7Q4T5xPQhV19dxykFbR8YjWFVACkoSebpQanZoZQOe
-	3dDWg4BPraVOJCsieUPi6NnFsO9zT5UhqQwvL
-X-Gm-Gg: ASbGncuJH+GFXY8A09ZEASPDToofaDy7eJ/rpD2TOZhRMnejtyVkJOVIjFuBAWwVN6p
-	buwQg8e+51G/jJwleH6fScShdXKc0CzDgnzWeGAN1nAdtQ09T15jFXKU7CAFEpT+0b8A=
-X-Google-Smtp-Source: AGHT+IHjB+F8/fZHMMhgSaAE47vlW3DeQZTVy9zE6ENZIrdv7ci+SVjgVYdT6IJkDJ7qIU2CbsI9uq24EaoX1d8IAqE=
-X-Received: by 2002:a05:622a:6119:b0:46e:bdd:64a3 with SMTP id
- d75a77b69052e-47165943ec9mr108971cf.0.1738857677787; Thu, 06 Feb 2025
- 08:01:17 -0800 (PST)
+	s=arc-20240116; t=1738857668; c=relaxed/simple;
+	bh=CRbUrt8hTzi7475aDlmDlLKM7hBdm42ThEEOGqT4H4g=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=Tmz0rFm0bolvefaMWC7FfgyPdcsQZz3DfjlmvC2idh27Uw4V5vSp0XAzHYBpVjWKzNEwgbEkp/P9oyaikpW87eSAIWtJARx8tHrDCKXa60edwdb+7XwRl3TeaeYhxCCVODNcAlbIqVTuyzBDROv1g7jB8DFo4s86arwn2A2T9aI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Fxvu6Zx0; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8F367C4CEDD;
+	Thu,  6 Feb 2025 16:01:05 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1738857667;
+	bh=CRbUrt8hTzi7475aDlmDlLKM7hBdm42ThEEOGqT4H4g=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=Fxvu6Zx0Q8P6eCMe27z0y2ijR0hj+oqqiDVgyU0FaM/WikmqoNkuynWHz8cFAweNB
+	 LprWdS7bUJcjd34W9B4dU/MK7oCkEYhrzXjsZ7zOhqHHRMaydF1h5r7VHl2x4UhALD
+	 XSrlvV8lpc6tAOP8PZU9JOodxhbDVhrMq2S4mCnc+aFZXZmht4LDL9ce00FuSV+XEp
+	 OKyIEwNtJqsLVHpriVmMqEUK1Nj+1Ep3Iu+HrJ2rK357D1pti3uo3RCuJq/UK4qB3m
+	 awo3jKHl0qZepCjaWzj2DYVRXjHjOwGT/Q5nBjutRntk+Ww5wVnm6hlKrobRRGtwUk
+	 +24DXo11ef+aw==
+Date: Thu, 6 Feb 2025 16:01:03 +0000
+From: Simon Horman <horms@kernel.org>
+To: Peter Seiderer <ps.report@gmx.net>
+Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+	linux-kselftest@vger.kernel.org,
+	"David S . Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Shuah Khan <shuah@kernel.org>
+Subject: Re: [PATCH net-next v4 13/17] net: pktgen: fix access outside of
+ user given buffer in pktgen_if_write()
+Message-ID: <20250206160103.GV554665@kernel.org>
+References: <20250205131153.476278-1-ps.report@gmx.net>
+ <20250205131153.476278-14-ps.report@gmx.net>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250204091918.2652604-1-yuyanghuang@google.com> <efd3dee8-5a2d-4928-ba1d-ddccb2f29fbe@redhat.com>
-In-Reply-To: <efd3dee8-5a2d-4928-ba1d-ddccb2f29fbe@redhat.com>
-From: Yuyang Huang <yuyanghuang@google.com>
-Date: Fri, 7 Feb 2025 01:00:40 +0900
-X-Gm-Features: AWEUYZlBPEi6CskLDdUiEXDiby9O2raxQzVoLylqLV5g0ljIatLjaaRQmQ_o_mk
-Message-ID: <CADXeF1H32H=SsMUM7DgA=v9utzhnWfpPhKu5wouriOkTCtVUnw@mail.gmail.com>
-Subject: Re: [PATCH net-next, v7 1/2] netlink: support dumping IPv4 multicast addresses
-To: Paolo Abeni <pabeni@redhat.com>
-Cc: "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
-	Jakub Kicinski <kuba@kernel.org>, Simon Horman <horms@kernel.org>, David Ahern <dsahern@kernel.org>, 
-	netdev@vger.kernel.org, Donald Hunter <donald.hunter@gmail.com>, 
-	Shuah Khan <shuah@kernel.org>, Nikolay Aleksandrov <razor@blackwall.org>, 
-	Hangbin Liu <liuhangbin@gmail.com>, Daniel Borkmann <daniel@iogearbox.net>, 
-	linux-kselftest@vger.kernel.org, =?UTF-8?Q?Maciej_=C5=BBenczykowski?= <maze@google.com>, 
-	Lorenzo Colitti <lorenzo@google.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250205131153.476278-14-ps.report@gmx.net>
 
->I did not undertand you intended to place the new header under the
->'include' directory. I still have a preference for a really private
->header that would under 'net/ipv4/' (IMHO the possible future divergence
->of inet_fill_args and inet6_fill_args is not very relevant) but it's not
->a deal breaker.
+On Wed, Feb 05, 2025 at 02:11:49PM +0100, Peter Seiderer wrote:
+> Honour the user given buffer size for the hex32_arg(), num_arg(),
+> strn_len(), get_imix_entries() and get_labels() calls (otherwise they will
+> access memory outside of the user given buffer).
+> 
+> Signed-off-by: Peter Seiderer <ps.report@gmx.net>
+> ---
+> Changes v3 -> v4:
+>   - replace C99 comment (suggested by Paolo Abeni)
+>   - drop available characters check in strn_len() (suggested by Paolo Abeni)
+>   - factored out patch 'net: pktgen: align some variable declarations to the
+>     most common pattern' (suggested by Paolo Abeni)
+>   - factored out patch 'net: pktgen: remove extra tmp variable (re-use len
+>     instead)' (suggested by Paolo Abeni)
+>   - factored out patch 'net: pktgen: remove some superfluous variable
+>     initializing' (suggested by Paolo Abeni)
+>   - factored out patch 'net: pktgen: fix mpls maximum labels list parsing'
+>     (suggested by Paolo Abeni)
+>   - factored out 'net: pktgen: hex32_arg/num_arg error out in case no
+>     characters are available' (suggested by Paolo Abeni)
+>   - factored out 'net: pktgen: num_arg error out in case no valid character
+>     is parsed' (suggested by Paolo Abeni)
+> 
+> Changes v2 -> v3:
+>   - no changes
+> 
+> Changes v1 -> v2:
+>   - additional fix get_imix_entries() and get_labels()
 
-Thanks for the advice, I will move the header file under 'net/ipv4' in
-the next version of this patch.
+Reviewed-by: Simon Horman <horms@kernel.org>
 
-Thanks,
+> ---
+>  net/core/pktgen.c | 176 ++++++++++++++++++++++++++++++----------------
 
-Yuyang
+...
 
-On Thu, Feb 6, 2025 at 11:29=E2=80=AFPM Paolo Abeni <pabeni@redhat.com> wro=
-te:
->
-> On 2/4/25 10:19 AM, Yuyang Huang wrote:
-> > diff --git a/include/linux/igmp_internal.h b/include/linux/igmp_interna=
-l.h
-> > new file mode 100644
-> > index 000000000000..0a1bcc8ec8e1
-> > --- /dev/null
-> > +++ b/include/linux/igmp_internal.h
->
-> I did not undertand you intended to place the new header under the
-> 'include' directory. I still have a preference for a really private
-> header that would under 'net/ipv4/' (IMHO the possible future divergence
-> of inet_fill_args and inet6_fill_args is not very relevant) but it's not
-> a deal breaker.
->
-> /P
->
+> @@ -1015,7 +1025,8 @@ static ssize_t pktgen_if_write(struct file *file,
+>  	}
+>  
+>  	if (!strcmp(name, "min_pkt_size")) {
+> -		len = num_arg(&user_buffer[i], DEC_10_DIGITS, &value);
+> +		max = min(DEC_10_DIGITS, count - i);
+> +		len = num_arg(&user_buffer[i], max, &value);
+>  		if (len < 0)
+>  			return len;
+>  
+
+As an aside:
+
+The code immediately following the hunk above is as follows.
+And this block it is representative of many (all?) of the code
+modified by the hunks that make up the remainder of this patch.
+
+My observation is that i is incremented but never used again -
+the function subsequently returns at the end of the if condition.
+
+So perhaps it would be a nice, as a follow-up, to clean this up
+be removing the increment of i from this and similar blocks.
+
+
+		if (len < 0)
+			return len;
+
+		i += len;
+		if (value < 14 + 20 + 8)
+			value = 14 + 20 + 8;
+		if (value != pkt_dev->min_pkt_size) {
+			pkt_dev->min_pkt_size = value;
+			pkt_dev->cur_pkt_size = value;
+		}
+		sprintf(pg_result, "OK: min_pkt_size=%d",
+			pkt_dev->min_pkt_size);
+		return count;
+	}
+
+...
 
