@@ -1,330 +1,363 @@
-Return-Path: <netdev+bounces-163355-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-163356-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 95D15A29FB0
-	for <lists+netdev@lfdr.de>; Thu,  6 Feb 2025 05:33:31 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 30558A29FB7
+	for <lists+netdev@lfdr.de>; Thu,  6 Feb 2025 05:37:33 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 6E1681888258
-	for <lists+netdev@lfdr.de>; Thu,  6 Feb 2025 04:33:36 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 0E3ED1887157
+	for <lists+netdev@lfdr.de>; Thu,  6 Feb 2025 04:37:38 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A73D215B99E;
-	Thu,  6 Feb 2025 04:32:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CE7E515FD13;
+	Thu,  6 Feb 2025 04:37:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="D34i8Tmv"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=embeddedor.com header.i=@embeddedor.com header.b="ZHYKIVBs"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from omta038.useast.a.cloudfilter.net (omta038.useast.a.cloudfilter.net [44.202.169.37])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 82B8313AD22
-	for <netdev@vger.kernel.org>; Thu,  6 Feb 2025 04:32:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7F8773B1A4
+	for <netdev@vger.kernel.org>; Thu,  6 Feb 2025 04:37:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=44.202.169.37
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1738816379; cv=none; b=WMKUfrX5aw530B8xkANM5s8uhgPEtBMl+95l+s04IJh1tpglwY0r/gt6uf4pVr57LMJGbitCW+dEH3opyvlh1KRepRi55NQdKI65bqAYbuWXRUCsIWyHbfm5JWC+2zeco3r8xOjrt7hLPZhNq2UEiFUpoQGWvYPCYmZINpGvVpg=
+	t=1738816649; cv=none; b=C7kvNgXIsDIKgtz3d/Epj+ad2W4ev858V6H5QdcxfLrUh4vbv/1Yepo7LoRTINHoM7cyUxzj/AttfZ6Lahhmqd0JaZDCQTYvtZxdlWZUWsRIshvoEx+3bnrB3eIQaNR3mIDIEYDXzpZWTV8tOnMumzq4AKenLufVN8UbH4qhbRQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1738816379; c=relaxed/simple;
-	bh=tIt43yDrnoX3boD296nWHfgOoMYI93zCpj5fIoKJvTE=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=lRET//dwWHduNFivjkDekKESr8hvA6sNznyNHOLyQRFu36s302APM3WLw1VS0kC7ft/Xwp5O+xjHvGEDQAk/e1TPaaNoqTnUGBqw7Qq6pJzF7f+mHLyt2jruEP4y5kV3nzWJmsb0kfORqqzhaDylNwbOI4s3Lw37GDZWWSnMEuM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=D34i8Tmv; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id C5213C4CEDD;
-	Thu,  6 Feb 2025 04:32:58 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1738816378;
-	bh=tIt43yDrnoX3boD296nWHfgOoMYI93zCpj5fIoKJvTE=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=D34i8Tmvh7O7uUMbOStKx3Z7SHYvbhR8gATv5VI39MumdbHdzgBkznGvOixmWQLmL
-	 fvAZd8rIZpiJIg76vvOW9sfsTfklD0zEKjqMb7wvsIS78K0NF7NpAXs9WUrXogx5XT
-	 X2JwG6hvcMwwOeYo0RpxX8WjjMPbJHczWLzO0TDZhYGCdib2w8YvKh0R5KQWDV9T0D
-	 SX8EK9AqmlwPBtZyiY+JIjPOBWY3mlpp3v+aMvwpiJ5Qm49Zy9R/b3r2Y6dPPUEp+C
-	 GWhTyQUQfMtT0tKbNifQAu9uk/QkPthOE/iBIM/dzMQFft09REVIAr+VXLgXICcXSh
-	 7DP6Rz0yo11cQ==
-Date: Wed, 5 Feb 2025 20:32:58 -0800
-From: Jakub Kicinski <kuba@kernel.org>
-To: Jacob Keller <jacob.e.keller@intel.com>
-Cc: "netdev@vger.kernel.org" <netdev@vger.kernel.org>
-Subject: Re: iAVF circular lock dependency due to netdev_lock
-Message-ID: <20250205203258.1767c337@kernel.org>
-In-Reply-To: <a376e87b-fbd8-4f07-9ab2-80a479782699@intel.com>
-References: <81562543-5ea1-4994-9503-90b5ff19b094@intel.com>
-	<20250205172325.5f7c8969@kernel.org>
-	<a376e87b-fbd8-4f07-9ab2-80a479782699@intel.com>
+	s=arc-20240116; t=1738816649; c=relaxed/simple;
+	bh=N0DvuSe/lIH+kRjwXSdDBh6Fhhbw9RKU+RCtaqaYkfA=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=EGo0IgXDhtByYJqRFybnvZLyP6XLMI0INWz6hIIoQMK6BfDgtNBEmtuGUuTeMerR5xuZ1nm13jZhk+2ZAXe4DSOKFPnbKNHyYW7xQdLIWAYJ2SjN1sjFDdA0ZFoIywgAZloZ1ESQIjEZUe1bGa2KVxkXJzqf9UM5WfeCHd4mNa0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=embeddedor.com; spf=pass smtp.mailfrom=embeddedor.com; dkim=pass (2048-bit key) header.d=embeddedor.com header.i=@embeddedor.com header.b=ZHYKIVBs; arc=none smtp.client-ip=44.202.169.37
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=embeddedor.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=embeddedor.com
+Received: from eig-obgw-6004a.ext.cloudfilter.net ([10.0.30.197])
+	by cmsmtp with ESMTPS
+	id frQ0tDoRBiuzSftdmtRVrJ; Thu, 06 Feb 2025 04:37:26 +0000
+Received: from gator4166.hostgator.com ([108.167.133.22])
+	by cmsmtp with ESMTPS
+	id ftdktwF05lqdtftdktRfw6; Thu, 06 Feb 2025 04:37:24 +0000
+X-Authority-Analysis: v=2.4 cv=JIzwsNKb c=1 sm=1 tr=0 ts=67a43c84
+ a=1YbLdUo/zbTtOZ3uB5T3HA==:117 a=6Vi/Wpy7sgpXGMLew8oZcg==:17
+ a=IkcTkHD0fZMA:10 a=T2h4t0Lz3GQA:10 a=7T7KSl7uo7wA:10 a=VwQbUJbxAAAA:8
+ a=klVnHSuGmlGqL09SeYAA:9 a=QEXdDO2ut3YA:10 a=Xt_RvD8W3m28Mn_h3AK8:22
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=embeddedor.com; s=default; h=Content-Transfer-Encoding:Content-Type:
+	In-Reply-To:From:References:Cc:To:Subject:MIME-Version:Date:Message-ID:Sender
+	:Reply-To:Content-ID:Content-Description:Resent-Date:Resent-From:
+	Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:List-Help:
+	List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
+	bh=UI/rvOkUbnqui88BmNEI08jm0hlJMmOpKKuR2cLnH4g=; b=ZHYKIVBseIV428frTB+avylk7k
+	f52Zd+9DPXYVyJ3rW9g8/ucGYGKi+2YiA1TcVgPYyjksxjvasItvmk9or/FNWS3BlW3a0zvcAMkDh
+	CHec/2D8cTbn1+BYW5rwQbncPGiMxDfxL3mCkHLUOrV19vBYTTE+S0k6qBMg7K3ewLWhEJe//3wa5
+	eseNTMVNKJn4iL6Y5OI6KFhjwO6/RqDcLw6BdzDHBmIC+8SsZ6Uprd/OgBt4TOQuEdLPQfIo5k9Ow
+	9NYpOnLs9IpXP5ee3VVOGSrg8P/8wt4Ckj8AgsdT/pL7etGXnpuvTpREUE99Pwo/yZNogfCR5lXQY
+	BUgedVnw==;
+Received: from [45.124.203.140] (port=54891 helo=[192.168.0.152])
+	by gator4166.hostgator.com with esmtpsa  (TLS1.2) tls TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256
+	(Exim 4.96.2)
+	(envelope-from <gustavo@embeddedor.com>)
+	id 1tftdj-000JL1-0x;
+	Wed, 05 Feb 2025 22:37:23 -0600
+Message-ID: <4e556977-c7b9-4d37-b874-4f3d60d54429@embeddedor.com>
+Date: Thu, 6 Feb 2025 15:07:07 +1030
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH][next] net/mlx5e: Avoid a hundred
+ -Wflex-array-member-not-at-end warnings
+To: "Gustavo A. R. Silva" <gustavoars@kernel.org>,
+ Saeed Mahameed <saeedm@nvidia.com>, Leon Romanovsky <leon@kernel.org>,
+ Tariq Toukan <tariqt@nvidia.com>, Andrew Lunn <andrew+netdev@lunn.ch>,
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>
+Cc: netdev@vger.kernel.org, linux-rdma@vger.kernel.org,
+ linux-kernel@vger.kernel.org, linux-hardening@vger.kernel.org
+References: <Z6GCJY8G9EzASrwQ@kspp>
+Content-Language: en-US
+From: "Gustavo A. R. Silva" <gustavo@embeddedor.com>
+In-Reply-To: <Z6GCJY8G9EzASrwQ@kspp>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
+X-AntiAbuse: This header was added to track abuse, please include it with any abuse report
+X-AntiAbuse: Primary Hostname - gator4166.hostgator.com
+X-AntiAbuse: Original Domain - vger.kernel.org
+X-AntiAbuse: Originator/Caller UID/GID - [47 12] / [47 12]
+X-AntiAbuse: Sender Address Domain - embeddedor.com
+X-BWhitelist: no
+X-Source-IP: 45.124.203.140
+X-Source-L: No
+X-Exim-ID: 1tftdj-000JL1-0x
+X-Source: 
+X-Source-Args: 
+X-Source-Dir: 
+X-Source-Sender: ([192.168.0.152]) [45.124.203.140]:54891
+X-Source-Auth: gustavo@embeddedor.com
+X-Email-Count: 4
+X-Org: HG=hgshared;ORG=hostgator;
+X-Source-Cap: Z3V6aWRpbmU7Z3V6aWRpbmU7Z2F0b3I0MTY2Lmhvc3RnYXRvci5jb20=
+X-Local-Domain: yes
+X-CMAE-Envelope: MS4xfL5QAhKnaJcLRj4AjWN34KxGTKefkz3g0/+BmTdt06eWuS59sSpvC43UBulnmfs0GGCwl+spkf0lKqaFBQ/wjNhC67mtptQT5WOi648oxSIi8mpygns2
+ pzDYI8ZS1dxvusqsmqzKVCGqrJNlKwDKaB5xthVlFZMUb4xAQgczYDvL5l3B4hE/qr4Sb2MBzOZPdcFb2vwlBUWG84mcWz+Bg4Q=
 
-On Wed, 5 Feb 2025 18:27:40 -0800 Jacob Keller wrote:
-> > Not sure either, the locking in this driver is quite odd. Do you know
-> > why it's registering the netdev from a workqueue, and what the entry
-> > points to the driver are?
-> 
-> Yes, the locking in iAVF has been problematic for years :(
-> 
-> We register the netdevice from a work queue because we are waiting on
-> messages from the PF over virtchnl. I don't fully understand the
-> motivation behind the way the initialization was moved into a work
-> queue, but this appears to be the historical reasoning from examining
-> commit logs.
-> 
-> > Normally before the netdev is registered it can't get called, so all 
-> > the locking is moot. But IDK if we need to protect from some FW
-> > interactions, maybe?  
-> 
-> We had a lot of issues with locking and pain getting to the state we are
-> in today. I think part of the challenge is that the VF is communicating
-> asynchronously over virtchnl queue messages to the PF for setup.
-> 
-> Its a mess :( I could re-order the locks so we go "RTNL -> crit_lock ->
-> netdev_lock" but that will only work as long as no flow from the kernel
-> does something like "RTNL -> netdev_lock -> <driver callback that takes
-> crit lock>" which seems unlikely :(
-> 
-> Its a mess and I don't quite know how to dig out of it.
+Hi,
 
-Stanislav suggested off list that we could add a _locked() version of
-register_netdevice(). I'm worried that it's just digging a deeper hole.
-We'd cover with the lock parts of core which weren't covered before.
+On 04/02/25 13:27, Gustavo A. R. Silva wrote:
+> -Wflex-array-member-not-at-end was introduced in GCC-14, and we are
+> getting ready to enable it, globally.
+> 
+> So, in order to avoid ending up with a flexible-array member in the
+> middle of other structs, we use the `struct_group_tagged()` helper
+> to create a new tagged `struct mlx5e_umr_wqe_hdr`. This structure
+> groups together all the members of the flexible `struct mlx5e_umr_wqe`
+> except the flexible array.
+> 
+> As a result, the array is effectively separated from the rest of the
+> members without modifying the memory layout of the flexible structure.
+> We then change the type of the middle struct member currently causing
+> trouble from `struct mlx5e_umr_wqe` to `struct mlx5e_umr_wqe_hdr`.
+> 
+> We also want to ensure that when new members need to be added to the
+> flexible structure, they are always included within the newly created
+> tagged struct. For this, we use `static_assert()`. This ensures that the
+> memory layout for both the flexible structure and the new tagged struct
+> is the same after any changes.
+> 
+> This approach avoids having to implement `struct mlx5e_umr_wqe_hdr` as
+> a completely separate structure, thus preventing having to maintain two
+> independent but basically identical structures, closing the door to
+> potential bugs in the future.
+> 
+> We also use `container_of()` whenever we need to retrieve a pointer to
+> the flexible structure, through which we can access the flexible-array
+> member, if necessary.
+> 
+> So, with these changes, fix 124 of the following warnings:
+> 
+> drivers/net/ethernet/mellanox/mlx5/core/en.h:664:48: warning: structure containing a flexible array member is not at the end of another structure [-Wflex-array-member-not-at-end]
+> 
+> Signed-off-by: Gustavo A. R. Silva <gustavoars@kernel.org>
+> ---
+>   drivers/net/ethernet/mellanox/mlx5/core/en.h      | 13 +++++++++----
+>   drivers/net/ethernet/mellanox/mlx5/core/en_main.c |  4 +++-
+>   2 files changed, 12 insertions(+), 5 deletions(-)
+> 
+> diff --git a/drivers/net/ethernet/mellanox/mlx5/core/en.h b/drivers/net/ethernet/mellanox/mlx5/core/en.h
+> index 979fc56205e1..c30c64eb346f 100644
+> --- a/drivers/net/ethernet/mellanox/mlx5/core/en.h
+> +++ b/drivers/net/ethernet/mellanox/mlx5/core/en.h
+> @@ -233,15 +233,20 @@ struct mlx5e_rx_wqe_cyc {
+>   };
+>   
+>   struct mlx5e_umr_wqe {
+> -	struct mlx5_wqe_ctrl_seg       ctrl;
+> -	struct mlx5_wqe_umr_ctrl_seg   uctrl;
+> -	struct mlx5_mkey_seg           mkc;
+> +	/* New members MUST be added within the struct_group() macro below. */
+> +	struct_group_tagged(mlx5e_umr_wqe_hdr, hdr,
+> +		struct mlx5_wqe_ctrl_seg       ctrl;
+> +		struct mlx5_wqe_umr_ctrl_seg   uctrl;
+> +		struct mlx5_mkey_seg           mkc;
+> +	);
+>   	union {
+>   		DECLARE_FLEX_ARRAY(struct mlx5_mtt, inline_mtts);
+>   		DECLARE_FLEX_ARRAY(struct mlx5_klm, inline_klms);
+>   		DECLARE_FLEX_ARRAY(struct mlx5_ksm, inline_ksms);
+>   	};
+>   };
+> +static_assert(offsetof(struct mlx5e_umr_wqe, inline_mtts) == sizeof(struct mlx5e_umr_wqe_hdr),
+> +	      "struct member likely outside of struct_group_tagged()");
+>   
+>   enum mlx5e_priv_flag {
+>   	MLX5E_PFLAG_RX_CQE_BASED_MODER,
+> @@ -660,7 +665,7 @@ struct mlx5e_rq {
+>   		} wqe;
+>   		struct {
+>   			struct mlx5_wq_ll      wq;
+> -			struct mlx5e_umr_wqe   umr_wqe;
+> +			struct mlx5e_umr_wqe_hdr umr_wqe;
+>   			struct mlx5e_mpw_info *info;
+>   			mlx5e_fp_skb_from_cqe_mpwrq skb_from_cqe_mpwrq;
+>   			__be32                 umr_mkey_be;
+> diff --git a/drivers/net/ethernet/mellanox/mlx5/core/en_main.c b/drivers/net/ethernet/mellanox/mlx5/core/en_main.c
+> index bd41b75d246e..4ff4ff2342cf 100644
+> --- a/drivers/net/ethernet/mellanox/mlx5/core/en_main.c
+> +++ b/drivers/net/ethernet/mellanox/mlx5/core/en_main.c
+> @@ -373,6 +373,8 @@ static void mlx5e_rq_shampo_hd_info_free(struct mlx5e_rq *rq)
+>   
+>   static int mlx5e_rq_alloc_mpwqe_info(struct mlx5e_rq *rq, int node)
+>   {
+> +	struct mlx5e_umr_wqe *umr_wqe =
+> +		container_of(&rq->mpwqe.umr_wqe, struct mlx5e_umr_wqe, hdr);
+>   	int wq_sz = mlx5_wq_ll_get_size(&rq->mpwqe.wq);
+>   	size_t alloc_size;
+>   
+> @@ -393,7 +395,7 @@ static int mlx5e_rq_alloc_mpwqe_info(struct mlx5e_rq *rq, int node)
+>   		bitmap_fill(wi->skip_release_bitmap, rq->mpwqe.pages_per_wqe);
+>   	}
+>   
+> -	mlx5e_build_umr_wqe(rq, rq->icosq, &rq->mpwqe.umr_wqe);
+> +	mlx5e_build_umr_wqe(rq, rq->icosq, umr_wqe);
+>   
+>   	return 0;
+>   }
 
-Maybe the saving grace is that the driver appears to never transition
-out of the registered state. And netdev lock only protects the core.
-So we could elide taking the netdev lock if device is not registered
-yet? We'd still need to convince lockdep that its okay to take the
-netdev lock under crit lock once.
+Here is another alternative for this.  And similarly to the struct_group_tagged()
+change above, no struct members should be added before or after `struct
+mlx5e_umr_wqe_hdr hdr;` in `struct mlx5e_umr_wqe`:
 
-Code below is incomplete but hopefully it will illustrate. 
-Key unanswered question is how to explain this to lockdep..
+diff --git a/drivers/net/ethernet/mellanox/mlx5/core/en.h b/drivers/net/ethernet/mellanox/mlx5/core/en.h
+index 979fc56205e1..912b97eeb4d6 100644
+--- a/drivers/net/ethernet/mellanox/mlx5/core/en.h
++++ b/drivers/net/ethernet/mellanox/mlx5/core/en.h
+@@ -232,10 +232,13 @@ struct mlx5e_rx_wqe_cyc {
+         DECLARE_FLEX_ARRAY(struct mlx5_wqe_data_seg, data);
+  };
 
-diff --git a/drivers/net/ethernet/intel/iavf/iavf_main.c b/drivers/net/ethernet/intel/iavf/iavf_main.c
-index 4fe481433842..79904d49792a 100644
---- a/drivers/net/ethernet/intel/iavf/iavf_main.c
-+++ b/drivers/net/ethernet/intel/iavf/iavf_main.c
-@@ -1974,6 +1974,67 @@ static int iavf_reinit_interrupt_scheme(struct iavf_adapter *adapter, bool runni
- 	return err;
- }
- 
-+enum iavf_lock_level {
-+	IAVF_LOCK_REMOVING,
-+	IAVF_LOCK_CONTENDED,
-+	IAVF_LOCK_CRIT_ONLY,
-+	IAVF_LOCK_FULL, /* CRIT + netdev_lock */
+-struct mlx5e_umr_wqe {
++struct mlx5e_umr_wqe_hdr {
+         struct mlx5_wqe_ctrl_seg       ctrl;
+         struct mlx5_wqe_umr_ctrl_seg   uctrl;
+         struct mlx5_mkey_seg           mkc;
 +};
-+
-+static enum iavf_lock_level iavf_lock(struct iavf_adapter *adapter, bool try)
-+{
-+	struct net_device *netdev = adapter->netdev;
-+	enum iavf_lock_level ret;
-+
-+	if (READ_ONCE(netdev->reg_state) >= NETREG_REGISTERED) {
-+		netdev_lock(netdev);
-+		ret = IAVF_LOCK_FULL;
-+	} else {
-+		ret = IAVF_LOCK_CRIT_ONLY;
-+	}
-+
-+	if (!try) {
-+		mutex_lock(&adapter->crit_lock);
-+	} else if (!mutex_trylock(&adapter->crit_lock)) {
-+		if (ret == IAVF_LOCK_FULL)
-+			netdev_unlock(netdev);
-+
-+		return adapter->state == __IAVF_REMOVE ?
-+			IAVF_LOCK_REMOVING : IAVF_LOCK_CONTENDED;
-+	}
-+
-+	/* Incredibly unlucky, we saw unregistered device yet didn't contend
-+	 * with registration for the crit lock. Act as if we did contend.
-+	 */
-+	if (ret == IAVF_LOCK_CRIT_ONLY &&
-+	    READ_ONCE(netdev->reg_state) >= NETREG_REGISTERED) {
-+		mutex_unlock(&adapter->crit_lock);
-+		return IAVF_LOCK_CONTENDED;
-+	}
-+
-+	return ret;
-+}
-+
-+static void iavf_unlock(struct iavf_adapter *adapter, enum iavf_lock_level lock)
-+{
-+	struct net_device *netdev = adapter->netdev;
-+
-+	switch (lock) {
-+	case IAVF_LOCK_REMOVING:
-+	case IAVF_LOCK_CONTENDED:
-+		WARN_ON_ONCE(1);
-+		return;
-+
-+	case IAVF_LOCK_CRIT_ONLY:
-+		mutex_unlock(&adapter->crit_lock);
-+		break;
-+	case IAVF_LOCK_FULL:
-+		mutex_unlock(&adapter->crit_lock);
-+		netdev_unlock(netdev);
-+		break;
-+	}
-+}
-+
- /**
-  * iavf_finish_config - do all netdev work that needs RTNL
-  * @work: our work_struct
-@@ -1983,7 +2044,7 @@ static int iavf_reinit_interrupt_scheme(struct iavf_adapter *adapter, bool runni
- static void iavf_finish_config(struct work_struct *work)
- {
- 	struct iavf_adapter *adapter;
--	bool netdev_released = false;
-+	enum iavf_lock_level lock;
- 	int pairs, err;
- 
- 	adapter = container_of(work, struct iavf_adapter, finish_config);
-@@ -1992,8 +2053,7 @@ static void iavf_finish_config(struct work_struct *work)
- 	 * The dev->lock is needed to update the queue number
- 	 */
- 	rtnl_lock();
--	netdev_lock(adapter->netdev);
--	mutex_lock(&adapter->crit_lock);
-+	lock = iavf_lock(adapter, false);
- 
- 	if ((adapter->flags & IAVF_FLAG_SETUP_NETDEV_FEATURES) &&
- 	    adapter->netdev->reg_state == NETREG_REGISTERED &&
-@@ -2012,8 +2072,6 @@ static void iavf_finish_config(struct work_struct *work)
- 		netif_set_real_num_tx_queues(adapter->netdev, pairs);
- 
- 		if (adapter->netdev->reg_state != NETREG_REGISTERED) {
--			netdev_unlock(adapter->netdev);
--			netdev_released = true;
- 			err = register_netdevice(adapter->netdev);
- 			if (err) {
- 				dev_err(&adapter->pdev->dev, "Unable to register netdev (%d)\n",
-@@ -2040,9 +2098,7 @@ static void iavf_finish_config(struct work_struct *work)
- 	}
- 
- out:
--	mutex_unlock(&adapter->crit_lock);
--	if (!netdev_released)
--		netdev_unlock(adapter->netdev);
-+	iavf_unlock(adapter, lock);
- 	rtnl_unlock();
- }
- 
-@@ -2737,16 +2793,18 @@ static void iavf_watchdog_task(struct work_struct *work)
- 						    watchdog_task.work);
- 	struct net_device *netdev = adapter->netdev;
- 	struct iavf_hw *hw = &adapter->hw;
-+	enum iavf_lock_level lock;
- 	u32 reg_val;
- 
--	netdev_lock(netdev);
--	if (!mutex_trylock(&adapter->crit_lock)) {
--		if (adapter->state == __IAVF_REMOVE) {
--			netdev_unlock(netdev);
--			return;
--		}
--
-+	lock = iavf_lock(adapter, true);
-+	switch (lock) {
-+	case IAVF_LOCK_REMOVING:
-+		return;
-+	case IAVF_LOCK_CONTENDED:
- 		goto restart_watchdog;
-+	case IAVF_LOCK_CRIT_ONLY:
-+	case IAVF_LOCK_FULL:
-+		break; /* continue */
- 	}
- 
- 	if (adapter->flags & IAVF_FLAG_PF_COMMS_FAILED)
-@@ -2755,15 +2813,13 @@ static void iavf_watchdog_task(struct work_struct *work)
- 	switch (adapter->state) {
- 	case __IAVF_STARTUP:
- 		iavf_startup(adapter);
--		mutex_unlock(&adapter->crit_lock);
--		netdev_unlock(netdev);
-+		iavf_unlock(adapter, lock);
- 		queue_delayed_work(adapter->wq, &adapter->watchdog_task,
- 				   msecs_to_jiffies(30));
- 		return;
- 	case __IAVF_INIT_VERSION_CHECK:
- 		iavf_init_version_check(adapter);
--		mutex_unlock(&adapter->crit_lock);
--		netdev_unlock(netdev);
-+		iavf_unlock(adapter, lock);
- 		queue_delayed_work(adapter->wq, &adapter->watchdog_task,
- 				   msecs_to_jiffies(30));
- 		return;
-@@ -2902,8 +2958,7 @@ static void iavf_watchdog_task(struct work_struct *work)
- 		return;
- 	}
- 
--	mutex_unlock(&adapter->crit_lock);
--	netdev_unlock(netdev);
-+	iavf_unlock(adapter, lock);
- restart_watchdog:
- 	if (adapter->state >= __IAVF_DOWN)
- 		queue_work(adapter->wq, &adapter->adminq_task);
-@@ -3022,6 +3077,7 @@ static void iavf_reset_task(struct work_struct *work)
- 	struct iavf_hw *hw = &adapter->hw;
- 	struct iavf_mac_filter *f, *ftmp;
- 	struct iavf_cloud_filter *cf;
-+	enum iavf_lock_level lock;
- 	enum iavf_status status;
- 	u32 reg_val;
- 	int i = 0, err;
-@@ -3030,13 +3086,16 @@ static void iavf_reset_task(struct work_struct *work)
- 	/* When device is being removed it doesn't make sense to run the reset
- 	 * task, just return in such a case.
- 	 */
--	netdev_lock(netdev);
--	if (!mutex_trylock(&adapter->crit_lock)) {
--		if (adapter->state != __IAVF_REMOVE)
--			queue_work(adapter->wq, &adapter->reset_task);
--
--		netdev_unlock(netdev);
-+	lock = iavf_lock(adapter, true);
-+	switch (lock) {
-+	case IAVF_LOCK_REMOVING:
- 		return;
-+	case IAVF_LOCK_CONTENDED:
-+		queue_work(adapter->wq, &adapter->reset_task);
-+		return;
-+	case IAVF_LOCK_CRIT_ONLY:
-+	case IAVF_LOCK_FULL:
-+		break; /* continue */
- 	}
- 
- 	iavf_misc_irq_disable(adapter);
-@@ -3082,8 +3141,7 @@ static void iavf_reset_task(struct work_struct *work)
- 		dev_err(&adapter->pdev->dev, "Reset never finished (%x)\n",
- 			reg_val);
- 		iavf_disable_vf(adapter);
--		mutex_unlock(&adapter->crit_lock);
--		netdev_unlock(netdev);
-+		iavf_unlock(adapter, lock);
- 		return; /* Do not attempt to reinit. It's dead, Jim. */
- 	}
- 
-@@ -3223,8 +3281,7 @@ static void iavf_reset_task(struct work_struct *work)
- 	adapter->flags &= ~IAVF_FLAG_REINIT_ITR_NEEDED;
- 
- 	wake_up(&adapter->reset_waitqueue);
--	mutex_unlock(&adapter->crit_lock);
--	netdev_unlock(netdev);
-+	iavf_unlock(adapter, lock);
- 
- 	return;
- reset_err:
-@@ -3234,8 +3291,7 @@ static void iavf_reset_task(struct work_struct *work)
- 	}
- 	iavf_disable_vf(adapter);
- 
--	mutex_unlock(&adapter->crit_lock);
--	netdev_unlock(netdev);
-+	iavf_unlock(adapter, lock);
- 	dev_err(&adapter->pdev->dev, "failed to allocate resources during reinit\n");
- }
- 
++struct mlx5e_umr_wqe {
++       struct mlx5e_umr_wqe_hdr hdr;
+         union {
+                 DECLARE_FLEX_ARRAY(struct mlx5_mtt, inline_mtts);
+                 DECLARE_FLEX_ARRAY(struct mlx5_klm, inline_klms);
+@@ -660,7 +663,7 @@ struct mlx5e_rq {
+                 } wqe;
+                 struct {
+                         struct mlx5_wq_ll      wq;
+-                       struct mlx5e_umr_wqe   umr_wqe;
++                       struct mlx5e_umr_wqe_hdr umr_wqe;
+                         struct mlx5e_mpw_info *info;
+                         mlx5e_fp_skb_from_cqe_mpwrq skb_from_cqe_mpwrq;
+                         __be32                 umr_mkey_be;
+diff --git a/drivers/net/ethernet/mellanox/mlx5/core/en/xsk/rx.c b/drivers/net/ethernet/mellanox/mlx5/core/en/xsk/rx.c
+index 1b7132fa70de..2b05536d564a 100644
+--- a/drivers/net/ethernet/mellanox/mlx5/core/en/xsk/rx.c
++++ b/drivers/net/ethernet/mellanox/mlx5/core/en/xsk/rx.c
+@@ -123,7 +123,7 @@ int mlx5e_xsk_alloc_rx_mpwqe(struct mlx5e_rq *rq, u16 ix)
+         bitmap_zero(wi->skip_release_bitmap, rq->mpwqe.pages_per_wqe);
+         wi->consumed_strides = 0;
+
+-       umr_wqe->ctrl.opmod_idx_opcode =
++       umr_wqe->hdr.ctrl.opmod_idx_opcode =
+                 cpu_to_be32((icosq->pc << MLX5_WQE_CTRL_WQE_INDEX_SHIFT) | MLX5_OPCODE_UMR);
+
+         /* Optimized for speed: keep in sync with mlx5e_mpwrq_umr_entry_size. */
+@@ -134,7 +134,7 @@ int mlx5e_xsk_alloc_rx_mpwqe(struct mlx5e_rq *rq, u16 ix)
+                 offset = offset * sizeof(struct mlx5_klm) * 2 / MLX5_OCTWORD;
+         else if (unlikely(rq->mpwqe.umr_mode == MLX5E_MPWRQ_UMR_MODE_TRIPLE))
+                 offset = offset * sizeof(struct mlx5_ksm) * 4 / MLX5_OCTWORD;
+-       umr_wqe->uctrl.xlt_offset = cpu_to_be16(offset);
++       umr_wqe->hdr.uctrl.xlt_offset = cpu_to_be16(offset);
+
+         icosq->db.wqe_info[pi] = (struct mlx5e_icosq_wqe_info) {
+                 .wqe_type = MLX5E_ICOSQ_WQE_UMR_RX,
+@@ -144,7 +144,7 @@ int mlx5e_xsk_alloc_rx_mpwqe(struct mlx5e_rq *rq, u16 ix)
+
+         icosq->pc += rq->mpwqe.umr_wqebbs;
+
+-       icosq->doorbell_cseg = &umr_wqe->ctrl;
++       icosq->doorbell_cseg = &umr_wqe->hdr.ctrl;
+
+         return 0;
+
+diff --git a/drivers/net/ethernet/mellanox/mlx5/core/en_main.c b/drivers/net/ethernet/mellanox/mlx5/core/en_main.c
+index a814b63ed97e..bbd0b888d237 100644
+--- a/drivers/net/ethernet/mellanox/mlx5/core/en_main.c
++++ b/drivers/net/ethernet/mellanox/mlx5/core/en_main.c
+@@ -311,8 +311,8 @@ static inline void mlx5e_build_umr_wqe(struct mlx5e_rq *rq,
+                                        struct mlx5e_icosq *sq,
+                                        struct mlx5e_umr_wqe *wqe)
+  {
+-       struct mlx5_wqe_ctrl_seg      *cseg = &wqe->ctrl;
+-       struct mlx5_wqe_umr_ctrl_seg *ucseg = &wqe->uctrl;
++       struct mlx5_wqe_ctrl_seg      *cseg = &wqe->hdr.ctrl;
++       struct mlx5_wqe_umr_ctrl_seg *ucseg = &wqe->hdr.uctrl;
+         u16 octowords;
+         u8 ds_cnt;
+
+@@ -393,7 +393,9 @@ static int mlx5e_rq_alloc_mpwqe_info(struct mlx5e_rq *rq, int node)
+                 bitmap_fill(wi->skip_release_bitmap, rq->mpwqe.pages_per_wqe);
+         }
+
+-       mlx5e_build_umr_wqe(rq, rq->icosq, &rq->mpwqe.umr_wqe);
++       mlx5e_build_umr_wqe(rq, rq->icosq,
++                           container_of(&rq->mpwqe.umr_wqe,
++                                        struct mlx5e_umr_wqe, hdr));
+
+         return 0;
+  }
+diff --git a/drivers/net/ethernet/mellanox/mlx5/core/en_rx.c b/drivers/net/ethernet/mellanox/mlx5/core/en_rx.c
+index 1963bc5adb18..5fd70b4d55be 100644
+--- a/drivers/net/ethernet/mellanox/mlx5/core/en_rx.c
++++ b/drivers/net/ethernet/mellanox/mlx5/core/en_rx.c
+@@ -631,16 +631,16 @@ static void build_ksm_umr(struct mlx5e_icosq *sq, struct mlx5e_umr_wqe *umr_wqe,
+                           __be32 key, u16 offset, u16 ksm_len)
+  {
+         memset(umr_wqe, 0, offsetof(struct mlx5e_umr_wqe, inline_ksms));
+-       umr_wqe->ctrl.opmod_idx_opcode =
++       umr_wqe->hdr.ctrl.opmod_idx_opcode =
+                 cpu_to_be32((sq->pc << MLX5_WQE_CTRL_WQE_INDEX_SHIFT) |
+                              MLX5_OPCODE_UMR);
+-       umr_wqe->ctrl.umr_mkey = key;
+-       umr_wqe->ctrl.qpn_ds = cpu_to_be32((sq->sqn << MLX5_WQE_CTRL_QPN_SHIFT)
++       umr_wqe->hdr.ctrl.umr_mkey = key;
++       umr_wqe->hdr.ctrl.qpn_ds = cpu_to_be32((sq->sqn << MLX5_WQE_CTRL_QPN_SHIFT)
+                                             | MLX5E_KSM_UMR_DS_CNT(ksm_len));
+-       umr_wqe->uctrl.flags = MLX5_UMR_TRANSLATION_OFFSET_EN | MLX5_UMR_INLINE;
+-       umr_wqe->uctrl.xlt_offset = cpu_to_be16(offset);
+-       umr_wqe->uctrl.xlt_octowords = cpu_to_be16(ksm_len);
+-       umr_wqe->uctrl.mkey_mask     = cpu_to_be64(MLX5_MKEY_MASK_FREE);
++       umr_wqe->hdr.uctrl.flags = MLX5_UMR_TRANSLATION_OFFSET_EN | MLX5_UMR_INLINE;
++       umr_wqe->hdr.uctrl.xlt_offset = cpu_to_be16(offset);
++       umr_wqe->hdr.uctrl.xlt_octowords = cpu_to_be16(ksm_len);
++       umr_wqe->hdr.uctrl.mkey_mask     = cpu_to_be64(MLX5_MKEY_MASK_FREE);
+  }
+
+  static struct mlx5e_frag_page *mlx5e_shampo_hd_to_frag_page(struct mlx5e_rq *rq, int header_index)
+@@ -704,7 +704,7 @@ static int mlx5e_build_shampo_hd_umr(struct mlx5e_rq *rq,
+
+         shampo->pi = (shampo->pi + ksm_entries) & (shampo->hd_per_wq - 1);
+         sq->pc += wqe_bbs;
+-       sq->doorbell_cseg = &umr_wqe->ctrl;
++       sq->doorbell_cseg = &umr_wqe->hdr.ctrl;
+
+         return 0;
+
+@@ -814,12 +814,12 @@ static int mlx5e_alloc_rx_mpwqe(struct mlx5e_rq *rq, u16 ix)
+         bitmap_zero(wi->skip_release_bitmap, rq->mpwqe.pages_per_wqe);
+         wi->consumed_strides = 0;
+
+-       umr_wqe->ctrl.opmod_idx_opcode =
++       umr_wqe->hdr.ctrl.opmod_idx_opcode =
+                 cpu_to_be32((sq->pc << MLX5_WQE_CTRL_WQE_INDEX_SHIFT) |
+                             MLX5_OPCODE_UMR);
+
+         offset = (ix * rq->mpwqe.mtts_per_wqe) * sizeof(struct mlx5_mtt) / MLX5_OCTWORD;
+-       umr_wqe->uctrl.xlt_offset = cpu_to_be16(offset);
++       umr_wqe->hdr.uctrl.xlt_offset = cpu_to_be16(offset);
+
+         sq->db.wqe_info[pi] = (struct mlx5e_icosq_wqe_info) {
+                 .wqe_type   = MLX5E_ICOSQ_WQE_UMR_RX,
+@@ -829,7 +829,7 @@ static int mlx5e_alloc_rx_mpwqe(struct mlx5e_rq *rq, u16 ix)
+
+         sq->pc += rq->mpwqe.umr_wqebbs;
+
+-       sq->doorbell_cseg = &umr_wqe->ctrl;
++       sq->doorbell_cseg = &umr_wqe->hdr.ctrl;
+
+         return 0;
+
+
+Thanks
+--
+Gustavo
 
