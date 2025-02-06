@@ -1,105 +1,98 @@
-Return-Path: <netdev+bounces-163476-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-163478-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9F2F3A2A5C4
-	for <lists+netdev@lfdr.de>; Thu,  6 Feb 2025 11:26:22 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 78BBBA2A5D4
+	for <lists+netdev@lfdr.de>; Thu,  6 Feb 2025 11:29:15 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id D29BC7A1AFF
-	for <lists+netdev@lfdr.de>; Thu,  6 Feb 2025 10:25:26 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id BBBD23A8529
+	for <lists+netdev@lfdr.de>; Thu,  6 Feb 2025 10:29:06 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D05A322686E;
-	Thu,  6 Feb 2025 10:26:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B500922688F;
+	Thu,  6 Feb 2025 10:29:10 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="XGMRVZoi"
+	dkim=pass (2048-bit key) header.d=sipsolutions.net header.i=@sipsolutions.net header.b="PacvTEnv"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-il1-f169.google.com (mail-il1-f169.google.com [209.85.166.169])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from sipsolutions.net (s3.sipsolutions.net [168.119.38.16])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5C07022686A
-	for <netdev@vger.kernel.org>; Thu,  6 Feb 2025 10:26:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.169
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3069F215F52;
+	Thu,  6 Feb 2025 10:29:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=168.119.38.16
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1738837576; cv=none; b=LOJAzhHPPnkmR50SGM0hQwI+lHPAt9sZEGbqBAHScrIqqWXtPksZdxH3W/DMoEgyWneKeV7HvHC9ADetYNLGIelujKsAQtJ++5DNI0PAOwy3VcyqizJn45fX793Yoe+D5hYYyNMzQ/inXHgTzL+gF7891CHQtnUGPWpgzKyzjww=
+	t=1738837750; cv=none; b=AS87eQ+va9wlCsT3X/MT3b7yo3wLpnRGyyzkQZ/RkK0RsBP1WYFLYwexCRLLcRwsffCab1Q4+bgLJ/rHpyDPcUmLkQG3KtWlvWs3BDAXnfD7Uv0OygEl/GDRV1q/V+ggk+tHGGy0sHWlGJVFJFPxfNsMQirqLm6dq+TeYF7GflU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1738837576; c=relaxed/simple;
-	bh=Pf2se8yEan/1gp2hFEqHDKCSn4B3Ks8rDhLvWs4KA0k=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=PrDeFGRESLY93kuJMolxWHk7N2Z+MvWnvNGhs/WyIxdnmLJg6wleEEvdsdQa3ju7FzS4pWIWsaHG7ScygvqHv2xA/1sZ+czTWCI7om6JZXnDa9u+hNsckx/E0a0XZEfCfqPjP3m+03iAo4tVt/eteWBzvNkUCIaIFHIcXG2BrE4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=XGMRVZoi; arc=none smtp.client-ip=209.85.166.169
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-il1-f169.google.com with SMTP id e9e14a558f8ab-3d03ac846a7so2333085ab.2
-        for <netdev@vger.kernel.org>; Thu, 06 Feb 2025 02:26:15 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1738837574; x=1739442374; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=Pf2se8yEan/1gp2hFEqHDKCSn4B3Ks8rDhLvWs4KA0k=;
-        b=XGMRVZoiIi4Lu4jmq8oPztgMlmDRcsQK2hsLTMQd6NwTRHrpAnNEfoMVZM95X5Rcen
-         gqAFkHWQ7HTc++T4vDdZ6kKm+7S5wSa6HdkH9V0C9AydVKGbvYvoDIn9Ze4Pf65RRo+1
-         rG0HF3e8qyYfQ7ZXtJkkxVTNqSeI408VAGeQscZ46Ku63hZ88mTxchFNrAVbH/xiZwk6
-         6thxEOVqixWEv3iamnha2WaaA/zshwxb1HDELJot8VGwOJwsuu+h/qDaaD7WCrat7tkd
-         jXBT2kuGHbpdMenU99sy0qa261bgejpmq0b2EzGKnvGXeyHI2o55a1K28fEmAubOd9R0
-         JJ5g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1738837574; x=1739442374;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=Pf2se8yEan/1gp2hFEqHDKCSn4B3Ks8rDhLvWs4KA0k=;
-        b=gQLGCIuZYEpEUqNG3jMlWOLYFr0ZhvqBRa+ZHhciaFqjNy3KDGwBeO682LOxFCHHv0
-         6g9/1aZCblJ0W76X92tdows28TKY+A63VxeoC4B05QRoc6LPYuLgCQCG6CS9/0cXW/gv
-         oDvBzorLg9ToYQAZMYviTal8YzCpXHXmkJ+1YfGun06bxK3LHxR9Ea2X20oJ5pw/YNRD
-         +G9jC0ae1V0yexrGiQ3XFA9HRFdsKSCtADeXmR9ku2QfBNZGgQj6JhcVh3Tz5yFUzoxa
-         K9ELLGCnOz7esdDA8lZVQ8DqMPuXUkUuwtPjcEHKzBjBlEEF4bJigDqUD4dn1A2wizbg
-         8YiQ==
-X-Forwarded-Encrypted: i=1; AJvYcCWdvKxKca1APsCGxSzxRMUpqIwTWawLXFONnCbkHsCu0r7MXAaVngFaotkmXBd+WTfLTJZKsp4=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwoMCF88xyLW1UTaVDbyjsd+/4I3QZ7PwPlCYSmFr2MmXOM0DSA
-	e4JEsKdbO57BLGztsYv8ab6LsqfZnGVsdtriuOy0aj1jOJi+mP8by1mpWR5RFdvZ1RB5+Mqmdgd
-	r0541aQqPpiSxn7wWH/Q3TmTgMBQ=
-X-Gm-Gg: ASbGnctwM8eOaCWh693EgYj63XAlkPzClpCA7BQ+dNg3imi3KhgFATGsxYb5Y6XkKpY
-	0REYBQjUQBQ4wCIsoT9YEVVBDBSrKOdKlCNMBfriBvdVraJ/dL1jBsttC+jH+RhyQ7/a/7ATg
-X-Google-Smtp-Source: AGHT+IEVCOdta2ugzbj6qcXOHYJfY2VSsBEcYVBA5FIX4t6+5XC2lmPdNW/nZOjyC5r0jwh65z8Lt6sSuMLjbMrgygw=
-X-Received: by 2002:a05:6e02:2688:b0:3d0:2b88:116c with SMTP id
- e9e14a558f8ab-3d04f45aff3mr55030015ab.10.1738837574364; Thu, 06 Feb 2025
- 02:26:14 -0800 (PST)
+	s=arc-20240116; t=1738837750; c=relaxed/simple;
+	bh=S7P6lVDUiM8BkwNZyEPAIeV/qXqEvPpGQZH6A/FLfSA=;
+	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
+	 Content-Type:MIME-Version; b=JMlz6A7GzVgCOS8FTmIp7t1VlSUuWf/JPDR8x38XkE0jhJbanLqlWdo4M2kx/IrOVcD9w+/MAc5KfUcHRXo7scT3PnC+n2ttmuYaXustQOzABJEEbopnRZp2+PYn6180umscQ5mj7H5jMGZ0WC38vXGz0TiYkxngUv60DVJusVw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=sipsolutions.net; spf=pass smtp.mailfrom=sipsolutions.net; dkim=pass (2048-bit key) header.d=sipsolutions.net header.i=@sipsolutions.net header.b=PacvTEnv; arc=none smtp.client-ip=168.119.38.16
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=sipsolutions.net
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=sipsolutions.net
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=sipsolutions.net; s=mail; h=MIME-Version:Content-Transfer-Encoding:
+	Content-Type:References:In-Reply-To:Date:Cc:To:From:Subject:Message-ID:Sender
+	:Reply-To:Content-ID:Content-Description:Resent-Date:Resent-From:Resent-To:
+	Resent-Cc:Resent-Message-ID; bh=8lEz4PZA3e6wBA7eHEmBgEXubre6UC4Pm/7j8argqZw=;
+	t=1738837749; x=1740047349; b=PacvTEnvoOY8gAlKBWsCqZ/Idw0yYEsO7z5e0clCvDBmgRa
+	NfZLCn9Mh3gJWDmjvXiOLhenrS/BilGBFtdEsrhLvB/jne5aaG+2wsZZSq4DbzltUBdXSvjwygw2T
+	RghTCwg8HcyEIl/YzixLjgtlb5Amn9n6meghOu2qBSFoKsgt5WSs4QIFi573hPWqZBN27Sg4NwR4M
+	eoionr/5Od39ND3rFlNvX3fbAJmIg1YyuX+VJgFGRqwyBlp7xS1QS7B7s5zGgMuAA2cjc5kLD8esy
+	Aq7uhAr6glJaswwx/bKDpvV8H0kfUd/OTQYw4hTgEeR6ALo0OEuRheqGPAk8ydUw==;
+Received: by sipsolutions.net with esmtpsa (TLS1.3:ECDHE_X25519__RSA_PSS_RSAE_SHA256__AES_256_GCM:256)
+	(Exim 4.98)
+	(envelope-from <johannes@sipsolutions.net>)
+	id 1tfz7z-00000004zMd-04fP;
+	Thu, 06 Feb 2025 11:28:59 +0100
+Message-ID: <da5a789176b6a4c3e7c6d5f40dd75e50c9fbae39.camel@sipsolutions.net>
+Subject: Re: [PATCH v3 1/2] net, treewide: define and use MAC_ADDR_STR_LEN
+From: Johannes Berg <johannes@sipsolutions.net>
+To: Michal Swiatkowski <michal.swiatkowski@linux.intel.com>
+Cc: Uday Shankar <ushankar@purestorage.com>, Breno Leitao
+ <leitao@debian.org>,  Andrew Lunn <andrew+netdev@lunn.ch>, "David S.
+ Miller" <davem@davemloft.net>, Eric Dumazet	 <edumazet@google.com>, Jakub
+ Kicinski <kuba@kernel.org>, Paolo Abeni	 <pabeni@redhat.com>, Srinivas
+ Kandagatla <srinivas.kandagatla@linaro.org>, 
+ =?UTF-8?Q?Rafa=C5=82_Mi=C5=82ecki?=	 <rafal@milecki.pl>, Simon Horman
+ <horms@kernel.org>, Andrew Morton	 <akpm@linux-foundation.org>, Jonathan
+ Corbet <corbet@lwn.net>, 	netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org, 	linux-wireless@vger.kernel.org,
+ linux-doc@vger.kernel.org
+Date: Thu, 06 Feb 2025 11:28:57 +0100
+In-Reply-To: <Z6SNxrEteMx0/0sb@mev-dev.igk.intel.com>
+References: <20250205-netconsole-v3-0-132a31f17199@purestorage.com>
+	 <20250205-netconsole-v3-1-132a31f17199@purestorage.com>
+	 <Z6SEeO0QFx9Y52LJ@mev-dev.igk.intel.com>
+	 <a2a26c7eaf20bb972289a804ecfe0e532f0f85ae.camel@sipsolutions.net>
+	 <Z6SNxrEteMx0/0sb@mev-dev.igk.intel.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+User-Agent: Evolution 3.54.3 (3.54.3-1.fc41) 
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250206094605.2694118-1-edumazet@google.com>
-In-Reply-To: <20250206094605.2694118-1-edumazet@google.com>
-From: Jason Xing <kerneljasonxing@gmail.com>
-Date: Thu, 6 Feb 2025 18:25:37 +0800
-X-Gm-Features: AWEUYZlDP-SxNEyJo7gNUFC-WOzibgjTBQVLm5wZjUt6P1qfzXxHXmpB6i4T7tA
-Message-ID: <CAL+tcoAHcK8bRJFRZN-U6AxyUZY88oLESUEW98uzsTDdg0apkQ@mail.gmail.com>
-Subject: Re: [PATCH net-next] tcp: rename inet_csk_{delete|reset}_keepalive_timer()
-To: Eric Dumazet <edumazet@google.com>
-Cc: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
-	Paolo Abeni <pabeni@redhat.com>, netdev@vger.kernel.org, 
-	Kuniyuki Iwashima <kuniyu@amazon.com>, Neal Cardwell <ncardwell@google.com>, 
-	Simon Horman <horms@kernel.org>, eric.dumazet@gmail.com
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+X-malware-bazaar: not-scanned
 
-On Thu, Feb 6, 2025 at 5:46=E2=80=AFPM Eric Dumazet <edumazet@google.com> w=
-rote:
->
-> inet_csk_delete_keepalive_timer() and inet_csk_reset_keepalive_timer()
-> are only used from core TCP, there is no need to export them.
->
-> Replace their prefix by tcp.
->
-> Move them to net/ipv4/tcp_timer.c and make tcp_delete_keepalive_timer()
-> static.
->
-> Signed-off-by: Eric Dumazet <edumazet@google.com>
+On Thu, 2025-02-06 at 11:24 +0100, Michal Swiatkowski wrote:
+> On Thu, Feb 06, 2025 at 10:50:36AM +0100, Johannes Berg wrote:
+> > On Thu, 2025-02-06 at 10:44 +0100, Michal Swiatkowski wrote:
+> > >=20
+> > > >  net/mac80211/debugfs_sta.c         | 5 +++--
+> > >=20
+> > > What about ieee80211_sta_debugfs_add()? (net/mac80211/debugfs_sta.c)
+> >=20
+> > What about it? It's modified accordingly, just needs a bit more +/-1
+> > now.
+>=20
+> I meant that it can be done in this patch too.=20
 
-Reviewed-by: Jason Xing <kerneljasonxing@gmail.com>
+Oh, oops, right. I thought it _was_ done here, because I didn't pay
+enough attention to the actual change. Either way is fine to me though.
+
+johannes
 
