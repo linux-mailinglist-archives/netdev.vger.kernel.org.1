@@ -1,120 +1,119 @@
-Return-Path: <netdev+bounces-163359-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-163349-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id EFF0BA29FC9
-	for <lists+netdev@lfdr.de>; Thu,  6 Feb 2025 05:47:54 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7FD69A29FA0
+	for <lists+netdev@lfdr.de>; Thu,  6 Feb 2025 05:31:36 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 05FE2188A63D
-	for <lists+netdev@lfdr.de>; Thu,  6 Feb 2025 04:48:00 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 6F20B7A34C4
+	for <lists+netdev@lfdr.de>; Thu,  6 Feb 2025 04:30:40 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CF846189BBB;
-	Thu,  6 Feb 2025 04:47:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AB68C502B1;
+	Thu,  6 Feb 2025 04:31:28 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=163.com header.i=@163.com header.b="c/ligPbZ"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="MqEqb7t4"
 X-Original-To: netdev@vger.kernel.org
-Received: from m16.mail.163.com (m16.mail.163.com [117.135.210.2])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6FA5AA2D;
-	Thu,  6 Feb 2025 04:47:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=117.135.210.2
+Received: from mail-pl1-f179.google.com (mail-pl1-f179.google.com [209.85.214.179])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 31E52A2D;
+	Thu,  6 Feb 2025 04:31:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.179
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1738817269; cv=none; b=d8hwWz3uCfOVZlFrqeO6BwRhcdAdJHJDM0OafMFddNFq3SR85Z/ySp7TKQnU6EiQgOhfzn3o5Iu+9xK7292OzBeGkepzgv/IFYK3pNIk+NaupJoGI038RjPVoYef/t3Qlos1aY6cpPxgFXRp62QB4PUeRX0WF81ZGQqvLl3KA24=
+	t=1738816288; cv=none; b=LfkIhAwQew0Z7AEIHDgxJ9AxrMbceQ83Z2BRTn0er6Dcl5HRMQHvyA7jAY0h1ag4Qg146+YojbPGFWd+PYAEbB9i65HB3uvRrygPG4rfLOmWiWVOYx1rZXwjYuk1ltOU4aJrpp25uzmpbynO0jOvQs0GiFh6jUzkkGzGPYpy/oc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1738817269; c=relaxed/simple;
-	bh=zTJMwEQDpyIXC+zI5jGHk1tzEApj3e4XPeD9OYd7Hbs=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=iP0N81v317GbNO2FNDmNi1Sg5j83wwSZylvWWqTdEVASwhhNVUFQu+brtb8HN8IA+wjrfdIDgChLWr1S2nQ6R/yIQhk7scnITZPxIOWH+wtLCisCULkKRVSiO+qUGQ1dPlJnz/S5MA6ibJjpcXdt7sc7TmxWZ/taEssC0OZ6Xh0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=163.com; spf=pass smtp.mailfrom=163.com; dkim=pass (1024-bit key) header.d=163.com header.i=@163.com header.b=c/ligPbZ; arc=none smtp.client-ip=117.135.210.2
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=163.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=163.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=163.com;
-	s=s110527; h=From:Subject:Date:Message-Id:MIME-Version:
-	Content-Type; bh=lRCb1p6vbOS9wVnuLjOyk+RxFhhCPf08U5liQjx+Ork=;
-	b=c/ligPbZKT3ELxH6dvS/O0XMkXlWSsAnBtfcwJn61L88hpVtujagHPm+GK0eEX
-	SDyXAwbDirrX/FCPf/YmH51a7nWVliezZm7o0N0JFji0WqwYvGrozBQ4WklgHBpm
-	8ThfZuckBNaK3xnd/68qJj2Fag+fSIZE8VI8oovwtvPwk=
-Received: from hello.company.local (unknown [])
-	by gzsmtp2 (Coremail) with SMTP id PSgvCgBnr_RNOqRnkz4GGw--.7261S2;
-	Thu, 06 Feb 2025 12:27:58 +0800 (CST)
-From: Liang Jie <buaajxlj@163.com>
-To: kuniyu@amazon.com
-Cc: buaajxlj@163.com,
-	davem@davemloft.net,
-	edumazet@google.com,
-	horms@kernel.org,
-	kuba@kernel.org,
-	liangjie@lixiang.com,
-	linux-kernel@vger.kernel.org,
-	mhal@rbox.co,
+	s=arc-20240116; t=1738816288; c=relaxed/simple;
+	bh=HiD+sUX5DogwZZwDFTTS3We15HNuMBYLuDdPYjMAtM8=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=u/qo/AkXIfKnE4sNuWa3cmrn+3EZYd9PVreffZrvdkW3JV1e7PIa0Aop3RnK4isstE8USjGLy9zUFOxrro5u63k5opKCAjDO2VqJq9agB+9NBfoAC1COSERns5iJpHfdYcck0v2NWqCl64MOWlGh6iejcXFyJX6Jonrx5/oqJoM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=MqEqb7t4; arc=none smtp.client-ip=209.85.214.179
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pl1-f179.google.com with SMTP id d9443c01a7336-21f05693a27so7276515ad.2;
+        Wed, 05 Feb 2025 20:31:26 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1738816286; x=1739421086; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=ZMzXaQZQdeFCGBtaHpQImI/ekjahPsKRElVgyT2QUG4=;
+        b=MqEqb7t4Q8JlwVaKC38qhGDAg/3DtSJoWP0WxIW7xV3xdgj6sknJcOUAptFkNbtWwx
+         tuRe9B6WpeLj4F/nRlQJq/BNLfeNJ2oUdzoICZ8GNTm2T1zqVZSE8IvrfLznHPQ0X2Qf
+         jNkps7ypfnQXMkzi6Z7bY+EIHwuTwF+j/Z2T0NS+z0vOz+pq4R2BYlDjmcBHG5mRkBeG
+         yitn/VceheLeXiQBaYBZnOmjheT1Jv9p+b9mJUCuWY9dhmgskQCM7mdqHWkd+/mUbX0/
+         82A/FIw7hfc+8ujNJ6HyCReldGMFEgMy5M2oryW8tQs+TIQ/3sMrPjN0CxxDdkyZHhHG
+         ZO1w==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1738816286; x=1739421086;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=ZMzXaQZQdeFCGBtaHpQImI/ekjahPsKRElVgyT2QUG4=;
+        b=EP3VNVuETd3rtyTT7VUjjyXtlt7bpbqI56CEdVBbc12atD8AOxzXWYL47YK9pFgBCC
+         dI2Q4q+wdcFBt97vl9Ii4Wz+awo0hDVYZj+amUkP5x6PyLO8A9CwNhyfJHVGO59BfM7v
+         9ek71ZcNnxTEqrmTFAgUj3YMm1aSMWvof6/k7pyKFgucRtAJqMAVe/eriPQqSz+R9VBs
+         2R+nKnWdm8KLNVFIkO3NSH8dVL07jMurI0sFAdJzd7oPW2aSfqz0oh1Zuj4Spj/Eh+eb
+         VufNScZ3K4Jugj3+MZc4TT1h9TQKBZXC2JFTP+glLMzxAjcO3833C0/Ff9Rtv7KA2KmQ
+         puoQ==
+X-Forwarded-Encrypted: i=1; AJvYcCWQClwbYm1SbCPwShuWDknzaebv0tMxdc8zpu2ayKyyFLeIv5Xz1NI5u7wjX1O6M7n/9/6LbQW/Fx0wrd0=@vger.kernel.org, AJvYcCWTv0huVjueGdpnCs7dGUhb/SL/2j0Y4dO4wkPY9rUBn4PnsQmC4kLFLeLFaRSBDofNDDaPTrMp@vger.kernel.org
+X-Gm-Message-State: AOJu0YyBVorEYTaFOqGmBkzXyKaQ8+i7rGgLE9XEOAm4Nth3zRO7V+SC
+	S+EJDn25Pgx3fCjH0+xPZ1znndbbyENidPEJF79pN9A79hqjfZHZ
+X-Gm-Gg: ASbGncs6CBiQpJthZ5tIwPQndkggN3WfGZIFSSxCoLYrAXYFHYD7jxcOsNT4gMh2r9P
+	74xRhbYbLuUCQeyiorOb24erWthdn/e6gr+DfzJtpja+sQjt+5t9P7Jfq62gDNaLgWz9oS8n0ww
+	3WjeDQe3uFYpm2o/tVxu00/Dxj2vaKPHsE20CBSmLFCDBy9IlAvZ+GBMz8PrKarWRH0SB7QM50q
+	CgIfAT0dIRM08x6A1CNJWorLcWVLMLrG5xgzkhQ67vnADaWWioi/I46duTuSfqdQD+DQPcVcK5j
+	lkEXAy4wLjrQPYZUr0ueScZN0gmBA/ZNKHo=
+X-Google-Smtp-Source: AGHT+IELmtILtA8Rpi//cGWk1LYvPHMmLUyUdg8UjctgCHCyQXUaaj7bE5H9AtI3V4+n4325E3ySnw==
+X-Received: by 2002:a05:6a00:4608:b0:72d:9ec5:928 with SMTP id d2e1a72fcca58-730351f063amr9096128b3a.22.1738816286235;
+        Wed, 05 Feb 2025 20:31:26 -0800 (PST)
+Received: from localhost.localdomain ([205.250.172.175])
+        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-73048c162f6sm305013b3a.143.2025.02.05.20.31.25
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 05 Feb 2025 20:31:25 -0800 (PST)
+From: Kyle Hendry <kylehendrydev@gmail.com>
+To: Florian Fainelli <florian.fainelli@broadcom.com>,
+	Andrew Lunn <andrew@lunn.ch>,
+	Vladimir Oltean <olteanv@gmail.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Russell King <linux@armlinux.org.uk>
+Cc: Kyle Hendry <kylehendrydev@gmail.com>,
 	netdev@vger.kernel.org,
-	pabeni@redhat.com
-Subject: Re: [PATCH net-next] af_unix: Refine UNIX domain sockets autobind identifier length
-Date: Thu,  6 Feb 2025 12:27:57 +0800
-Message-Id: <20250206042757.3966975-1-buaajxlj@163.com>
-X-Mailer: git-send-email 2.25.1
-In-Reply-To: <20250206040118.77016-1-kuniyu@amazon.com>
-References: <20250206040118.77016-1-kuniyu@amazon.com>
+	linux-kernel@vger.kernel.org
+Subject: [PATCH 0/4] net: dsa: b53: Enable internal GPHY on BCM63268 
+Date: Wed,  5 Feb 2025 20:30:44 -0800
+Message-ID: <20250206043055.177004-1-kylehendrydev@gmail.com>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-X-CM-TRANSID:PSgvCgBnr_RNOqRnkz4GGw--.7261S2
-X-Coremail-Antispam: 1Uf129KBjvJXoW7AFy5KFyrCry8Ww1rKr1UGFg_yoW8Zr47pa
-	y7t3W5JrWkJFnrtF4xtr17Arn0kw4fJ39xAF1DJF17Za1YgF9F9FnrKr1j93yqkr4Iqr15
-	trWYka429Fyjva7anT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
-	9KBjDUYxBIdaVFxhVjvjDU0xZFpf9x0JUx-BtUUUUU=
-X-CM-SenderInfo: pexdtyx0omqiywtou0bp/1tbiNgDrIGekLSi1UQAAsf
 
-From: Kuniyuki Iwashima <kuniyu@amazon.com>,
-Date: Thu, 6 Feb 2025 13:01:18 +0900
-> > The logs from 'netdev/build_allmodconfig_warn' indicate that the patch has
-> > given rise to the following warning:
-> > 
-> >  - ../net/unix/af_unix.c: In function ‘unix_autobind’:
-> >  - ../net/unix/af_unix.c:1227:48: warning: ‘sprintf’ writing a terminating nul past the end of the destination [-Wformat-overflow=]
-> >  -  1227 |         sprintf(addr->name->sun_path + 1, "%0*x", AUTOBIND_LEN - 1, ordernum);
-> >  -       |                                                ^
-> >  - ../net/unix/af_unix.c:1227:9: note: ‘sprintf’ output 6 bytes into a destination of size 5
-> >  -  1227 |         sprintf(addr->name->sun_path + 1, "%0*x", AUTOBIND_LEN - 1, ordernum);
-> >  -       |         ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-> > 
-> > It appears that the 'sprintf' call attempts to write a terminating null
-> > byte past the end of the 'sun_path' array, potentially causing an overflow.
-> > 
-> > To address this issue, I am considering the following approach:
-> > 
-> > 	char orderstring[6];
-> > 
-> > 	sprintf(orderstring, "%05x", ordernum);
-> > 	memcpy(addr->name->sun_path + 1, orderstring, 5);
-> > 
-> > This would prevent the buffer overflow by using 'memcpy' to safely copy the
-> > formatted string into 'sun_path'.
-> 
-> Finally new hard-coded values are introduced..
-> 
-> I'm not sure this is worth saving just 10 bytes, which is not excessive,
-> vs extra 5 bytes memcpy(), so I'd rather not touch here.
-> 
-> > 
-> > Before proceeding with a patch submission, I wanted to consult with you to
-> > see if you have any suggestions for a better or more elegant solution to
-> > this problem.
-> 
-> An elegant option might be add a variant of snprintf without terminating
-> string by \0 ?
+Some BCM63268 bootloaders do not enable the internal PHYs by default.
+This patch series adds functionality for the switch driver to 
+configure the gigabit ethernet PHY. 
 
-Thank you very much for your suggestions. It's an elegant solution that
-avoids additional overhead and neatly solves the problem. I appreciate your
-insight and will incorporate your idea into the updated patch.
+Signed-off-by: Kyle Hendry <kylehendrydev@gmail.com>
 
-Best regards,
-Liang Jie
+Kyle Hendry (4):
+  net: dsa: b53: Indicate which BCM63268 port is GPHY
+  net: dsa: b53: mmap: Add gphy control register as a resource
+  net: dsa: b53: Add phy_enable(), phy_disable() methods
+  net: dsa: b53: mmap: Implement phy_enable for BCM63268 gphy
+
+ drivers/net/dsa/b53/b53_common.c  |  9 +++++++
+ drivers/net/dsa/b53/b53_mmap.c    | 42 ++++++++++++++++++++++++++++++-
+ drivers/net/dsa/b53/b53_priv.h    |  3 +++
+ drivers/net/dsa/b53/b53_regs.h    |  7 ++++++
+ include/linux/platform_data/b53.h |  1 +
+ 5 files changed, 61 insertions(+), 1 deletion(-)
+
+-- 
+2.43.0
 
 
