@@ -1,74 +1,75 @@
-Return-Path: <netdev+bounces-163423-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-163424-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0E7FAA2A389
-	for <lists+netdev@lfdr.de>; Thu,  6 Feb 2025 09:49:55 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 91B82A2A38F
+	for <lists+netdev@lfdr.de>; Thu,  6 Feb 2025 09:51:26 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 02B383A8003
-	for <lists+netdev@lfdr.de>; Thu,  6 Feb 2025 08:49:33 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D0F2C3A422D
+	for <lists+netdev@lfdr.de>; Thu,  6 Feb 2025 08:51:17 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 012BB214231;
-	Thu,  6 Feb 2025 08:49:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7D56922577D;
+	Thu,  6 Feb 2025 08:51:22 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b="v6Ce1OFC"
+	dkim=pass (2048-bit key) header.d=marvell.com header.i=@marvell.com header.b="gXq+X1H/"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp-fw-80007.amazon.com (smtp-fw-80007.amazon.com [99.78.197.218])
+Received: from mx0a-0016f401.pphosted.com (mx0a-0016f401.pphosted.com [67.231.148.174])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5464D22578E
-	for <netdev@vger.kernel.org>; Thu,  6 Feb 2025 08:49:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=99.78.197.218
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D9F66214231;
+	Thu,  6 Feb 2025 08:51:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=67.231.148.174
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1738831764; cv=none; b=k5ruaBb6+NDCxNjmlmhM6ib/pX9l6KA8qIIf8KjD7sbz4Qci+tgIT6Xcxz9kCTcUcpTLHmLeRPPSmijX+bel9awxPKZOudtnFZ1mUAZmoMG3+SFAS6/9Xlgdc/mxfDyhLWoJXEfC5F9BsF4JjzLd7RoyeSPemrZyBnQwTAkqL9Q=
+	t=1738831882; cv=none; b=tGIVh5Cwm6+2mXL7bDy5sT9WDcd4TFTW06G/6urKMFKsN0aLWSmu1I+HeIoS43hQDWvQ3P/Kpyn/O19cuVSZqYsSMjy20amn/HVYct0MjSKLhlUJ/5WAvkECUzYdE3K3D8Nu2qMzrVbBXg+0wkZpbRWul1Q8l47HGpzqhQCMQ0U=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1738831764; c=relaxed/simple;
-	bh=yuQndV53eh6JnDaOL7Dv7tv7gWBKGlFuStTlljBr1a4=;
-	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=RWYytE758Gv134SkMVK0mgAmlAsPxz39ztEh2LpSG2iEexI4kaYCTRob0ip0bLjtbpu3hfQkIr5FYh2+j5ulg5kDtGcWoYgUQkDEH2Am6CJl24vRHwxTmZurojfVskJeDQP7i0HB5NNC76uIJmk8xQbzOjza9e0iwlcaJK3aQGI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.co.jp; dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b=v6Ce1OFC; arc=none smtp.client-ip=99.78.197.218
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.co.jp
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
-  t=1738831763; x=1770367763;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=/LyxjULeVQVu51J3sSQ7p8Lmg0R5Trlt+EwKMvHVY4A=;
-  b=v6Ce1OFCqbutRgpYAiZwoFIsqOHZI4YhyhIT1MmyZcF1Vo8vQNvy7BY/
-   AqcB3OpsX3n81t/IlNbuVxadMYN7PmYns/Kh/ze6I0qYQkg3nkc8f3/oB
-   tkhdj/0IyKIQeM5V+29VxSjh0HyUpq8WVM6YslYcBb3GClsaRCDWCX3gC
-   Q=;
-X-IronPort-AV: E=Sophos;i="6.13,264,1732579200"; 
-   d="scan'208";a="374964194"
-Received: from pdx4-co-svc-p1-lb2-vlan2.amazon.com (HELO smtpout.prod.us-west-2.prod.farcaster.email.amazon.dev) ([10.25.36.210])
-  by smtp-border-fw-80007.pdx80.corp.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 06 Feb 2025 08:49:23 +0000
-Received: from EX19MTAUWB002.ant.amazon.com [10.0.21.151:47884]
- by smtpin.naws.us-west-2.prod.farcaster.email.amazon.dev [10.0.42.242:2525] with esmtp (Farcaster)
- id dc3ebe3a-7086-4f78-940b-1cdb748fc108; Thu, 6 Feb 2025 08:49:22 +0000 (UTC)
-X-Farcaster-Flow-ID: dc3ebe3a-7086-4f78-940b-1cdb748fc108
-Received: from EX19D004ANA001.ant.amazon.com (10.37.240.138) by
- EX19MTAUWB002.ant.amazon.com (10.250.64.231) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1258.39;
- Thu, 6 Feb 2025 08:49:22 +0000
-Received: from 6c7e67bfbae3.amazon.com (10.37.244.8) by
- EX19D004ANA001.ant.amazon.com (10.37.240.138) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1258.39;
- Thu, 6 Feb 2025 08:49:18 +0000
-From: Kuniyuki Iwashima <kuniyu@amazon.com>
-To: "David S. Miller" <davem@davemloft.net>, Eric Dumazet
-	<edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
-	<pabeni@redhat.com>, Simon Horman <horms@kernel.org>
-CC: Kuniyuki Iwashima <kuniyu@amazon.com>, Kuniyuki Iwashima
-	<kuni1840@gmail.com>, <netdev@vger.kernel.org>
-Subject: [PATCH v1 net-next 6/6] fib: rules: Convert RTM_DELRULE to per-netns RTNL.
-Date: Thu, 6 Feb 2025 17:46:29 +0900
-Message-ID: <20250206084629.16602-7-kuniyu@amazon.com>
-X-Mailer: git-send-email 2.39.5 (Apple Git-154)
-In-Reply-To: <20250206084629.16602-1-kuniyu@amazon.com>
-References: <20250206084629.16602-1-kuniyu@amazon.com>
+	s=arc-20240116; t=1738831882; c=relaxed/simple;
+	bh=JKCmw5pDaLAFqBhIlO6NyYAjW5GUiLAiShjZy0hyb+k=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=m+dS2OUN4AIcY9hT3uqavOD+++ThIu3RkocN47GqZY85RFdfdiachNjle1IA2ANZS6n90k2sxrt/WhS0Mqz8Fr4hYXo2fXG91AmDcPsw0GnjQzwa70QNFUzBLCJzmFnQRnTewc1oNYEDmBRvzs2Suc0O0v8sfL0+NQqxyRFZfU8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=marvell.com; spf=pass smtp.mailfrom=marvell.com; dkim=pass (2048-bit key) header.d=marvell.com header.i=@marvell.com header.b=gXq+X1H/; arc=none smtp.client-ip=67.231.148.174
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=marvell.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=marvell.com
+Received: from pps.filterd (m0431384.ppops.net [127.0.0.1])
+	by mx0a-0016f401.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 5167MNjC015382;
+	Thu, 6 Feb 2025 00:50:44 -0800
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=marvell.com; h=
+	cc:content-transfer-encoding:content-type:date:from:message-id
+	:mime-version:subject:to; s=pfpt0220; bh=CNVx3hFwqLKCf979AeskNWg
+	5bSvnmcY54EumXWb1M/o=; b=gXq+X1H/JjJsL54LSNoSa2dobN9W35Txcia+h5R
+	aCyX9t+lwNEGdEUswczd/+Vu7lENQf07kYU4zWm0K/o/02xzn8MuZ87G770kjY53
+	k3Y67xpiqE6a09qEOLqvGW1OQYwjpUWL63dxzCN0zJ1tQJpxnYhdBS5R3tE/Jrp7
+	+JmcWoOPHmFnMy3uthHzOO6e5ql0TnGZ+rAAeCI5KMhQg/2PMxn1ILBaR+S79RP3
+	NI8BK1IJ3ct9BrJZiUiIfqWvUNh39homQ2ewrtd4jC9nO4l2fFmhzXZZyD+iyS4Y
+	nlt5MD8dFtgEhRQRb8WoSc1x1b9m+ro9AMMmkXUyoFCLduw==
+Received: from dc6wp-exch02.marvell.com ([4.21.29.225])
+	by mx0a-0016f401.pphosted.com (PPS) with ESMTPS id 44mrmsg52d-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Thu, 06 Feb 2025 00:50:44 -0800 (PST)
+Received: from DC6WP-EXCH02.marvell.com (10.76.176.209) by
+ DC6WP-EXCH02.marvell.com (10.76.176.209) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1544.4; Thu, 6 Feb 2025 00:50:43 -0800
+Received: from maili.marvell.com (10.69.176.80) by DC6WP-EXCH02.marvell.com
+ (10.76.176.209) with Microsoft SMTP Server id 15.2.1544.4 via Frontend
+ Transport; Thu, 6 Feb 2025 00:50:42 -0800
+Received: from localhost.localdomain (unknown [10.28.36.166])
+	by maili.marvell.com (Postfix) with ESMTP id C9EBE3F705F;
+	Thu,  6 Feb 2025 00:50:36 -0800 (PST)
+From: Suman Ghosh <sumang@marvell.com>
+To: <horms@kernel.org>, <sgoutham@marvell.com>, <gakula@marvell.com>,
+        <sbhatta@marvell.com>, <hkelam@marvell.com>, <davem@davemloft.net>,
+        <edumazet@google.com>, <kuba@kernel.org>, <pabeni@redhat.com>,
+        <netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
+        <lcherian@marvell.com>, <jerinj@marvell.com>,
+        <john.fastabend@gmail.com>, <bbhushan2@marvell.com>, <hawk@kernel.org>,
+        <andrew+netdev@lunn.ch>, <ast@kernel.org>, <daniel@iogearbox.net>,
+        <bpf@vger.kernel.org>, <larysa.zaremba@intel.com>
+CC: Suman Ghosh <sumang@marvell.com>
+Subject: [net-next PATCH v5 0/6] Add af_xdp support for cn10k
+Date: Thu, 6 Feb 2025 14:20:28 +0530
+Message-ID: <20250206085034.1978172-1-sumang@marvell.com>
+X-Mailer: git-send-email 2.25.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -77,112 +78,76 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 Content-Type: text/plain
-X-ClientProxiedBy: EX19D043UWA001.ant.amazon.com (10.13.139.45) To
- EX19D004ANA001.ant.amazon.com (10.37.240.138)
+X-Proofpoint-GUID: 4ShNTj4w1nIx8zwGzM8JsMFX7eFQWgCv
+X-Proofpoint-ORIG-GUID: 4ShNTj4w1nIx8zwGzM8JsMFX7eFQWgCv
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1057,Hydra:6.0.680,FMLib:17.12.68.34
+ definitions=2025-02-06_02,2025-02-05_03,2024-11-22_01
 
-fib_nl_delrule() is the doit() handler for RTM_DELRULE but also called
-1;95;0cfrom vrf_newlink() in case something fails in vrf_add_fib_rules().
+This patchset includes changes to support AF_XDP for cn10k chipsets. Both
+non-zero copy and zero copy will be supported after these changes. Also,
+the RSS will be reconfigured once a particular receive queue is
+added/removed to/from AF_XDP support.
 
-In the latter case, RTNL is already held and the 3rd arg extack is NULL.
+Patch #1: octeontx2-pf: use xdp_return_frame() to free xdp buffers
 
-Let's hold per-netns RTNL in fib_nl_delrule() if extack is NULL.
+Patch #2: octeontx2-pf: Add AF_XDP non-zero copy support
 
-Now we can place ASSERT_RTNL_NET() in call_fib_rule_notifiers().
+Patch #3: octeontx2-pf: AF_XDP zero copy receive support
 
-While at it, fib_rule r is moved to the suitable scope.
+Patch #4: octeontx2-pf: Reconfigure RSS table after enabling AF_XDP
+zerocopy on rx queue
 
-Signed-off-by: Kuniyuki Iwashima <kuniyu@amazon.com>
----
- net/core/fib_rules.c | 29 +++++++++++++++++++----------
- 1 file changed, 19 insertions(+), 10 deletions(-)
+Patch #5: octeontx2-pf: Prepare for AF_XDP transmit
 
-diff --git a/net/core/fib_rules.c b/net/core/fib_rules.c
-index cc26c762fa9e..3430d026134d 100644
---- a/net/core/fib_rules.c
-+++ b/net/core/fib_rules.c
-@@ -371,7 +371,8 @@ static int call_fib_rule_notifiers(struct net *net,
- 		.rule = rule,
- 	};
- 
--	ASSERT_RTNL();
-+	ASSERT_RTNL_NET(net);
-+
- 	/* Paired with READ_ONCE() in fib_rules_seq() */
- 	WRITE_ONCE(ops->fib_rules_seq, ops->fib_rules_seq + 1);
- 	return call_fib_notifiers(net, event_type, &info.info);
-@@ -909,13 +910,13 @@ EXPORT_SYMBOL_GPL(fib_nl_newrule);
- int fib_nl_delrule(struct sk_buff *skb, struct nlmsghdr *nlh,
- 		   struct netlink_ext_ack *extack)
- {
--	struct net *net = sock_net(skb->sk);
-+	bool user_priority = false, hold_rtnl = !!extack;
-+	struct fib_rule *rule = NULL, *nlrule = NULL;
- 	struct fib_rule_hdr *frh = nlmsg_data(nlh);
-+	struct net *net = sock_net(skb->sk);
- 	struct fib_rules_ops *ops = NULL;
--	struct fib_rule *rule = NULL, *r, *nlrule = NULL;
- 	struct nlattr *tb[FRA_MAX+1];
- 	int err = -EINVAL;
--	bool user_priority = false;
- 
- 	if (nlh->nlmsg_len < nlmsg_msg_size(sizeof(*frh))) {
- 		NL_SET_ERR_MSG(extack, "Invalid msg length");
-@@ -940,6 +941,9 @@ int fib_nl_delrule(struct sk_buff *skb, struct nlmsghdr *nlh,
- 	if (err)
- 		goto errout;
- 
-+	if (hold_rtnl)
-+		rtnl_net_lock(net);
-+
- 	err = fib_nl2rule_rtnl(nlrule, ops, tb, extack);
- 	if (err)
- 		goto errout_free;
-@@ -980,7 +984,7 @@ int fib_nl_delrule(struct sk_buff *skb, struct nlmsghdr *nlh,
- 	 * current if it is goto rule, have actually been added.
- 	 */
- 	if (ops->nr_goto_rules > 0) {
--		struct fib_rule *n;
-+		struct fib_rule *n, *r;
- 
- 		n = list_next_entry(rule, list);
- 		if (&n->list == &ops->rules_list || n->pref != rule->pref)
-@@ -994,10 +998,12 @@ int fib_nl_delrule(struct sk_buff *skb, struct nlmsghdr *nlh,
- 		}
- 	}
- 
--	call_fib_rule_notifiers(net, FIB_EVENT_RULE_DEL, rule, ops,
--				NULL);
--	notify_rule_change(RTM_DELRULE, rule, ops, nlh,
--			   NETLINK_CB(skb).portid);
-+	call_fib_rule_notifiers(net, FIB_EVENT_RULE_DEL, rule, ops, NULL);
-+
-+	if (hold_rtnl)
-+		rtnl_net_unlock(net);
-+
-+	notify_rule_change(RTM_DELRULE, rule, ops, nlh, NETLINK_CB(skb).portid);
- 	fib_rule_put(rule);
- 	flush_route_cache(ops);
- 	rules_ops_put(ops);
-@@ -1005,6 +1011,8 @@ int fib_nl_delrule(struct sk_buff *skb, struct nlmsghdr *nlh,
- 	return 0;
- 
- errout_free:
-+	if (hold_rtnl)
-+		rtnl_net_unlock(net);
- 	kfree(nlrule);
- errout:
- 	rules_ops_put(ops);
-@@ -1324,7 +1332,8 @@ static struct pernet_operations fib_rules_net_ops = {
- static const struct rtnl_msg_handler fib_rules_rtnl_msg_handlers[] __initconst = {
- 	{.msgtype = RTM_NEWRULE, .doit = fib_nl_newrule,
- 	 .flags = RTNL_FLAG_DOIT_PERNET},
--	{.msgtype = RTM_DELRULE, .doit = fib_nl_delrule},
-+	{.msgtype = RTM_DELRULE, .doit = fib_nl_delrule,
-+	 .flags = RTNL_FLAG_DOIT_PERNET},
- 	{.msgtype = RTM_GETRULE, .dumpit = fib_nl_dumprule,
- 	 .flags = RTNL_FLAG_DUMP_UNLOCKED},
- };
+Patch #6: octeontx2-pf: AF_XDP zero copy transmit support
+
+Geetha sowjanya (1):
+  octeontx2-pf: use xdp_return_frame() to free xdp buffers
+
+Hariprasad Kelam (2):
+  octeontx2-pf: Prepare for AF_XDP
+  octeontx2-pf: AF_XDP zero copy transmit support
+
+Suman Ghosh (3):
+  octeontx2-pf: Add AF_XDP non-zero copy support
+  octeontx2-pf: AF_XDP zero copy receive support
+  octeontx2-pf: Reconfigure RSS table after enabling AF_XDP zerocopy on
+    rx queue
+
+v5 changes:
+- Updated patch #1 to use xdp_return_frame 
+- Updated patch #6 to use xdp_return_frame
+
+v4 changes:
+- Addressed minor comments from Paolo regarding adding fixes tag in patch#2
+  and removed one unnecessary NULL check from patch#3
+
+v3 changes:
+- Rearrenged patch ordering to fix individual patch compilation issue
+- Fixed un-initialized variable declaration and reverse x-mas tree issue
+  pointed by Simon
+
+v2 changes:
+- Addressed minor review comments from Simon regrading smatch warnings
+
+ .../ethernet/marvell/octeontx2/nic/Makefile   |   2 +-
+ .../ethernet/marvell/octeontx2/nic/cn10k.c    |   6 +-
+ .../marvell/octeontx2/nic/otx2_common.c       | 120 ++++++++--
+ .../marvell/octeontx2/nic/otx2_common.h       |  17 +-
+ .../marvell/octeontx2/nic/otx2_ethtool.c      |   6 +-
+ .../ethernet/marvell/octeontx2/nic/otx2_pf.c  |  32 +--
+ .../marvell/octeontx2/nic/otx2_txrx.c         | 191 +++++++++++----
+ .../marvell/octeontx2/nic/otx2_txrx.h         |   9 +
+ .../ethernet/marvell/octeontx2/nic/otx2_vf.c  |  12 +-
+ .../ethernet/marvell/octeontx2/nic/otx2_xsk.c | 226 ++++++++++++++++++
+ .../ethernet/marvell/octeontx2/nic/otx2_xsk.h |  24 ++
+ .../ethernet/marvell/octeontx2/nic/qos_sq.c   |   2 +-
+ 12 files changed, 557 insertions(+), 90 deletions(-)
+ create mode 100644 drivers/net/ethernet/marvell/octeontx2/nic/otx2_xsk.c
+ create mode 100644 drivers/net/ethernet/marvell/octeontx2/nic/otx2_xsk.h
+
 -- 
-2.39.5 (Apple Git-154)
+2.25.1
 
 
