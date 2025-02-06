@@ -1,132 +1,138 @@
-Return-Path: <netdev+bounces-163599-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-163601-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 42470A2AE2F
-	for <lists+netdev@lfdr.de>; Thu,  6 Feb 2025 17:52:02 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8A95CA2AE38
+	for <lists+netdev@lfdr.de>; Thu,  6 Feb 2025 17:54:42 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 0969D16AF17
-	for <lists+netdev@lfdr.de>; Thu,  6 Feb 2025 16:51:58 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id CAD9F3A4FF7
+	for <lists+netdev@lfdr.de>; Thu,  6 Feb 2025 16:54:33 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EBF281A3176;
-	Thu,  6 Feb 2025 16:51:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3E5611624E9;
+	Thu,  6 Feb 2025 16:54:38 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=6wind.com header.i=@6wind.com header.b="DitYfYLt"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="OZdVhJfb"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f97.google.com (mail-wm1-f97.google.com [209.85.128.97])
+Received: from mail-pl1-f173.google.com (mail-pl1-f173.google.com [209.85.214.173])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 15905235359
-	for <netdev@vger.kernel.org>; Thu,  6 Feb 2025 16:51:39 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.97
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AE94923537F
+	for <netdev@vger.kernel.org>; Thu,  6 Feb 2025 16:54:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.173
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1738860701; cv=none; b=oFFaf05vfc6pMbL04Y1UHg3fEXieC3B1QttFugOoBZB4T45hWzIwuWZ3oagWvmwiMqNh6GG+5yvorL667sHyZSIf2sb4rGsCSH98EWVP5iQ9Wn1VMrzNVGUcB3xajBWY3t/53c+DgFRL4BQ655j2RO/OTeEd3KD0D5lNE4j3VVI=
+	t=1738860878; cv=none; b=iZPlslEFdmEvhb/XNQYdyjXIu1bGUE2ss4N9gsxwfM+mYoqJi+BrbaYYZ1lcEbJRBFY3omFyKCpu0DZpAkm3YLhAhBGCp0O8R8+ziz1oZfF9iAnfY64li3VSnlc/PW02PrRJC7XS6YD7D2ZLPcfqGDow9kcmxAC81HaYSXg3Zo4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1738860701; c=relaxed/simple;
-	bh=C7uZAIgSKoTeGiTKDnQ7yxruXbSRF/2IFcjaFKrPEJo=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=Sap8O3YmIzPahGGHIDYDtAbtO5gp0o3UusQTh15emi00VN8JgP8tg+ZVRvahHdVasyvRrIV4REguTGKsTWOYCxEqAYY/ScMicJMqpYxhpIshU3AoZTRK7TDNRMaoaKAToHtd6Yu9Nzuvxi+o3O0FzOkjxJyf+wFUXjvLypUi3KM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=6wind.com; spf=pass smtp.mailfrom=6wind.com; dkim=pass (2048-bit key) header.d=6wind.com header.i=@6wind.com header.b=DitYfYLt; arc=none smtp.client-ip=209.85.128.97
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=6wind.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=6wind.com
-Received: by mail-wm1-f97.google.com with SMTP id 5b1f17b1804b1-43616c12d72so1677405e9.2
-        for <netdev@vger.kernel.org>; Thu, 06 Feb 2025 08:51:39 -0800 (PST)
+	s=arc-20240116; t=1738860878; c=relaxed/simple;
+	bh=3ZZUQukPMQhDSn6JUeVKKpej9i1kOO3tGVWwO1oxg2Y=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=Y0UuMmd2+KqNhBS+xuQcrEGyrkys7SA8h6AXfT2ETgzqh05PEDDkgLxHnffYJteeVGK7m5p+Y7+VZvEVn07iYmjzHw3l1ofdcAtkGVE11A+XO3IOgf7Jz+8G6emqDaaf/EdRBBBVhWE2tR9YjGeNmjR15kAXczNEl8ZkEt8EKW8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=OZdVhJfb; arc=none smtp.client-ip=209.85.214.173
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-pl1-f173.google.com with SMTP id d9443c01a7336-21f032484d4so37665ad.0
+        for <netdev@vger.kernel.org>; Thu, 06 Feb 2025 08:54:36 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=6wind.com; s=google; t=1738860698; x=1739465498; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
+        d=google.com; s=20230601; t=1738860876; x=1739465676; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=KWLfxsZQyBwYG4PJltfCoD/xQYNBrAmXgMfWeDg+aUc=;
-        b=DitYfYLtYMUNeNafqzAJh74Ak5ecjpo7kezgMJDwj81asYCFz1dEvRda4zKSCPL5AP
-         FDeLDboMV3BL/a8u2FcsR2YsSpsYY4AZtU9f9OfZM+UU2ja8JxSqNkgJy2KKperazdg5
-         nD+O7jnfWNMRfWR8yfUT5aXDBPqrWLqxCeRnGbQzdcTVwndu8PyP/ayhfk6ceDbEQsfD
-         BhXgkFQGphC7lNsssMiCNfPyB0zVZvfyA4ZsUJdjPID4JI/YsFQqSzB62yJSpqyX+o7P
-         16DPHAYezopdLCdesFClgIz2guHgMyNaUHG9fTCBEnf4t9wxzoaz2itrdHYwwvRUxcNl
-         5PeA==
+        bh=LTi6XQsJ5RIwztDyjcq4PDuI/5/RV6XdKp/ZtUfpYp0=;
+        b=OZdVhJfbJN4rA0Ge2vuLq0ZQPPrPBocmWtbJ3ZqjhvOvklb5o3RmVLtSkV3vSQL7qz
+         axfizU76aeAhPqrrRkWJmVToXMOAJV3bf3f+Jndeb+gi0Z7rGxHLBlIQcbyhMica23Yy
+         Bo6mRZLyX+C59j2+eUG5AD3iKhCuvn+b6efdOFRvd6ISycCBZxNpi5AUThzlImzhzmdo
+         l8akDZinu1771IrPedYR4xJqo7GHeg9wqgrOXqyUEix0d6zp6kGOmC/0mqr2Zo1De53D
+         BTGkNLWMe9BYFtTLdym0NWA+G8DU8d8GKqVgigg3V7gGAtdeeQIytzYICekR00Fn+VHL
+         67Hw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1738860698; x=1739465498;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
+        d=1e100.net; s=20230601; t=1738860876; x=1739465676;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=KWLfxsZQyBwYG4PJltfCoD/xQYNBrAmXgMfWeDg+aUc=;
-        b=VkPeZrJ/LqWE9palj5gEWVH1BhYfCdRXpgwqZAnz4tY3Fa1Ispk97GoQbWlAcH2myA
-         CnkXS8lB6WowoF9hbfv3eZiSPEDFjm4I1Nh8MTdduPtPRGBKKXwh6ijXdINFF1omwwET
-         i7+QS6q3hD7kQ0pj1DWB4nQs3s8T1oav32XZWcNXFIIx98jFjv9TF/jyuLCCsmwOb+/q
-         BwlE+aUB74lAexZFX9/3UxXt2nxJ6MkM1BFADCoIj9Wyqc0lJFFWYSWwwb1PCilhxfn4
-         HYVDvsVGT/gGOoeeofNhMq7PGru6IJIotBC0LUE+HEU45ZPHDNpJIqLKnCOL09dUhpEQ
-         2VPA==
-X-Gm-Message-State: AOJu0YyHkJX5lmPzLFhLPReZyI1avyzkeZ86GluMcTTpm77Cf04YnZ2O
-	7nCt+YEjExbnQ1KYHODZxxyljIAW06Mx8bmWl4SD60X/NuME1zF/9JdMY+szXK6gJrdHwHnHTDU
-	yeV99yW+3S/Vq/UH1gBLLw2tcCG9XyRMe
-X-Gm-Gg: ASbGnctmPqry6tJ3t88+f880Z1t1LjyszMCuo3I3zhHHaO3sGWc7TztCTL7vte9P8RE
-	pnd6nGCLfm8JnKxC8dfaCUemaRRDP2m/UorFPLfdLf0B8zzV/1cSI/SaWdZlzV5Re0pHgxO9CHM
-	i377wvPKfsOxMLX+k7eMRU+2RqHw4EaEgFi5X0p9/hcCHGG5PIJpPglQZbq3hd2MLxCrVw3vrsk
-	zIHHVmGtSjY+i4bkjD3gDDK/rma1+zfvEW5q67o5LiMJPxwK73+VRck7YniAkQBKQFfYiv7UiJy
-	7VKo7K74xSxQqst9M9K46WzTHzVy86GFUZszhR3gOV6skpLDM0T8otOHqJku
-X-Google-Smtp-Source: AGHT+IEl38lSUUQgvvCOUank03kf7DqPvH6MKe2hmtpbBvJRYwvExSdw4yu79kpQbRasXKgmsDcTME3XiOgB
-X-Received: by 2002:a05:600c:4691:b0:436:fb10:d583 with SMTP id 5b1f17b1804b1-4392497ea09mr512405e9.2.1738860698069;
-        Thu, 06 Feb 2025 08:51:38 -0800 (PST)
-Received: from smtpservice.6wind.com ([185.13.181.2])
-        by smtp-relay.gmail.com with ESMTP id ffacd0b85a97d-38dbdd1b951sm42572f8f.1.2025.02.06.08.51.37;
-        Thu, 06 Feb 2025 08:51:38 -0800 (PST)
-X-Relaying-Domain: 6wind.com
-Received: from bretzel (bretzel.dev.6wind.com [10.17.1.57])
-	by smtpservice.6wind.com (Postfix) with ESMTPS id D636D1CD33;
-	Thu,  6 Feb 2025 17:51:37 +0100 (CET)
-Received: from dichtel by bretzel with local (Exim 4.94.2)
-	(envelope-from <nicolas.dichtel@6wind.com>)
-	id 1tg56H-00CA07-KB; Thu, 06 Feb 2025 17:51:37 +0100
-From: Nicolas Dichtel <nicolas.dichtel@6wind.com>
-To: "David S . Miller" <davem@davemloft.net>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Eric Dumazet <edumazet@google.com>,
-	Alexander Lobakin <aleksander.lobakin@intel.com>
-Cc: netdev@vger.kernel.org,
-	Nicolas Dichtel <nicolas.dichtel@6wind.com>
-Subject: [PATCH net 2/2] net: enhance error message for 'netns local' iface
-Date: Thu,  6 Feb 2025 17:50:27 +0100
-Message-ID: <20250206165132.2898347-3-nicolas.dichtel@6wind.com>
-X-Mailer: git-send-email 2.47.1
-In-Reply-To: <20250206165132.2898347-1-nicolas.dichtel@6wind.com>
-References: <20250206165132.2898347-1-nicolas.dichtel@6wind.com>
+        bh=LTi6XQsJ5RIwztDyjcq4PDuI/5/RV6XdKp/ZtUfpYp0=;
+        b=dj0cx20llRLhpb3OVcvsWnJrLasr1GRrL1005jLizoUaWOmFpg+4mNTeCh0+Bo+zrF
+         9YdvN+4hWz+QqFMhWHvb7QCZUayBxc+O1H3UWuziHSPnUsKAGCgtK8sNBGEc93vkUYcl
+         GMqMYrifUEVQmBlgBznU0M+wS/VVi3bAISFtA4aLlFZrghChBOVTPHVjGQF5+MYYumf/
+         JS5cnS2NkxCLY24s8Gf544Wk9bd2lNkcuaJe4M3zqSEKUs9+MMX9BNLnsHjiiWMcHRrA
+         Yy8d+oX41HL4xfqk5NfEhIVe/Pe4nf2NqKVvBZlbt6aPK+tXGhAxod0/WZFIU/z7MZ25
+         2OJQ==
+X-Forwarded-Encrypted: i=1; AJvYcCWVjuLnyCT7mJBpsKb1+aCamWRZpNp/vxcAb2J20bs5RTfKmeLi+oI4Q3B5EbKSllSlblHyR6w=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yx3Ec4CaU4TTSdwgyrVJvhW/XiOKze1ChPo/dbaHdruyomYguJx
+	06HjlAMJ/LsPXbDV4+JQwTzyzpdya2itRnx+6R7CAW/T7GJP9jCCLN8L7T0er9GQ+oJ4gkopja4
+	6smGBROAhECDiqbIiYkF4Cd+zXB/zLTkvYXgs
+X-Gm-Gg: ASbGncu2uWx0lNQ6Kd8pd8hGAO3x2cwpVP0V5NWOIGHxLSAeTVQk+XFiKuCbZKJbdNI
+	aR97zBrMS+vE2FVc0qafAFTJYI6XyYMO8yHYOgOufov5gycK/aUR/TQQBaH1A+tIDtr2A5+81
+X-Google-Smtp-Source: AGHT+IHzryBnDyIuG4kua5nqFv0t3CUZetv5VWZDEVSBd2Q6xKHftpMfzmT/4FNKDJh9y7JmfSRCt/+KPeHBMGILBJ4=
+X-Received: by 2002:a17:902:ef4c:b0:21f:2ded:bfa0 with SMTP id
+ d9443c01a7336-21f4c50aef0mr178385ad.25.1738860875702; Thu, 06 Feb 2025
+ 08:54:35 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+References: <20250127025734.3406167-1-linyunsheng@huawei.com>
+ <20250127025734.3406167-4-linyunsheng@huawei.com> <Z5h1OMgcHuPSMaHM@infradead.org>
+ <c4b8f494-1928-4cf6-afe2-61ab1ac7e641@gmail.com>
+In-Reply-To: <c4b8f494-1928-4cf6-afe2-61ab1ac7e641@gmail.com>
+From: Mina Almasry <almasrymina@google.com>
+Date: Thu, 6 Feb 2025 08:54:23 -0800
+X-Gm-Features: AWEUYZkAfsd2D0WA6s0xLr-HWyLjnZliAFrvM7gs-k38rOzilGMV9dLNA263rHA
+Message-ID: <CAHS8izO5_=w4x8rhnHujCWQn7nhEDzaNGgJSrcZEwOQ+dN_o3w@mail.gmail.com>
+Subject: Re: [RFC v8 3/5] page_pool: fix IOMMU crash when driver has already unbound
+To: Yunsheng Lin <yunshenglin0825@gmail.com>
+Cc: Christoph Hellwig <hch@infradead.org>, Yunsheng Lin <linyunsheng@huawei.com>, davem@davemloft.net, 
+	kuba@kernel.org, pabeni@redhat.com, zhangkun09@huawei.com, 
+	liuyonglong@huawei.com, fanghaiqing@huawei.com, 
+	Robin Murphy <robin.murphy@arm.com>, Alexander Duyck <alexander.duyck@gmail.com>, 
+	IOMMU <iommu@lists.linux.dev>, Andrew Morton <akpm@linux-foundation.org>, 
+	Eric Dumazet <edumazet@google.com>, Simon Horman <horms@kernel.org>, 
+	Jesper Dangaard Brouer <hawk@kernel.org>, Ilias Apalodimas <ilias.apalodimas@linaro.org>, linux-mm@kvack.org, 
+	linux-kernel@vger.kernel.org, netdev@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-The current message is "Invalid argument". Let's help the user by
-explaining the error.
+On Tue, Feb 4, 2025 at 6:23=E2=80=AFAM Yunsheng Lin <yunshenglin0825@gmail.=
+com> wrote:
+>
+> On 1/28/2025 2:12 PM, Christoph Hellwig wrote:
+> > On Mon, Jan 27, 2025 at 10:57:32AM +0800, Yunsheng Lin wrote:
+> >> Note, the devmem patchset seems to make the bug harder to fix,
+> >> and may make backporting harder too. As there is no actual user
+> >> for the devmem and the fixing for devmem is unclear for now,
+> >> this patch does not consider fixing the case for devmem yet.
+> >
+> > Is there another outstanding patchet?  Or do you mean the existing
+> > devmem code already merged?  If that isn't actually used it should
+> > be removed, but otherwise you need to fix it.
+>
+> The last time I checked, only the code for networking stack supporting
+> the devmem had been merged.
+>
+> The first driver suppporting seems to be bnxt, which seems to be under
+> review:
+> https://lore.kernel.org/all/20241022162359.2713094-1-ap420073@gmail.com/
+>
+> As my understanding, this should work for the devmem too if the devmem
 
-Signed-off-by: Nicolas Dichtel <nicolas.dichtel@6wind.com>
----
- net/core/rtnetlink.c | 6 +++++-
- 1 file changed, 5 insertions(+), 1 deletion(-)
+From a quick look at this patch, it looks like you're handling
+netmem/net_iovs in the implementation, so this implementation is
+indeed considering netmem. I think the paragraph in the commit message
+that Christoph is responding to should be deleted, because in recent
+iterations you're handling netmem.
 
-diff --git a/net/core/rtnetlink.c b/net/core/rtnetlink.c
-index 5032e65b8faa..91b358bdfe5c 100644
---- a/net/core/rtnetlink.c
-+++ b/net/core/rtnetlink.c
-@@ -3024,8 +3024,12 @@ static int do_setlink(const struct sk_buff *skb, struct net_device *dev,
- 		new_ifindex = nla_get_s32_default(tb[IFLA_NEW_IFINDEX], 0);
- 
- 		err = __dev_change_net_namespace(dev, tgt_net, pat, new_ifindex);
--		if (err)
-+		if (err) {
-+			if (dev->netns_local)
-+				NL_SET_ERR_MSG(extack,
-+					       "The interface has the 'netns local' property");
- 			goto errout;
-+		}
- 
- 		status |= DO_SETLINK_MODIFIED;
- 	}
--- 
-2.47.1
+> provide a ops to do the per-netmem dma unmapping
+> It would be good that devmem people can have a look at it and see if
+> this fix works for the specific page_pool mp provider.
+>
 
+We set pool->dma_map=3D=3Dfalse for memory providers that do not need
+mapping/unmapping, which you are checking in
+__page_pool_release_page_dma.
+
+--=20
+Thanks,
+Mina
 
