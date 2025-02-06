@@ -1,122 +1,119 @@
-Return-Path: <netdev+bounces-163467-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-163465-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id C116EA2A510
-	for <lists+netdev@lfdr.de>; Thu,  6 Feb 2025 10:48:39 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1C209A2A4F7
+	for <lists+netdev@lfdr.de>; Thu,  6 Feb 2025 10:47:02 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id D6BF41887BB4
-	for <lists+netdev@lfdr.de>; Thu,  6 Feb 2025 09:48:42 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 70B0D3A6D2A
+	for <lists+netdev@lfdr.de>; Thu,  6 Feb 2025 09:46:44 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 560C222653A;
-	Thu,  6 Feb 2025 09:48:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E6D3722756E;
+	Thu,  6 Feb 2025 09:46:21 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="hV7KPuI3"
+	dkim=pass (1024-bit key) header.d=163.com header.i=@163.com header.b="h/aPps5Z"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.15])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9B3CD226169;
-	Thu,  6 Feb 2025 09:48:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.15
+Received: from m16.mail.163.com (m16.mail.163.com [220.197.31.5])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CE8BE226193;
+	Thu,  6 Feb 2025 09:46:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=220.197.31.5
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1738835293; cv=none; b=YYmxqWiKNzjQJoGpez2cUFYGKeCPcax08nXK6CXwlRmDFe7Y6Sx9OEKpA0fHBMAb4CLPIk7g62MgHfVBSgfWZpv9QPbzCaUYzDc1pTXTTBcv6hJpO5IHgOGQSBokXeR69qSik0nSbAvS1NYji+6yLUT55NzqiXw2ZHNNq43UToM=
+	t=1738835181; cv=none; b=eFqYXqXNZQnVJEmfEzPbuHOh5y1h7NWMkr9MaQ3uhx+1CflLoV44gWdhb5oHmkVBRDObo09B9bIIF3d9qeLL/WHPgkBt+1fJggx/9ntE+ez9jDgKU3PPGj5p0hAxC/GgtZkAXF/BlR1bT9YJngixcsvHaKdPFJz95FV05g/2ov8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1738835293; c=relaxed/simple;
-	bh=Zcs5Snf4g8flz7TYouYgDp3W2DHK3PiGIpAbCvqR+HM=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=ckUfV97tuMhuYChCE+yZ7X9qq9vHk82MMkusYTWH+WkjEH5KVJ3AT2EYAWjDP9ps1Fn2EpWRRcXutkh1cnQKUH8gKrgkWCPLUuadiAa9b1HwOpCX1mM9U/p5mGkGiQ1xcAZR17xL2UUGDQzuR3HdUN+PFdZITWc6oMHrm+JFBi0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=hV7KPuI3; arc=none smtp.client-ip=198.175.65.15
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1738835292; x=1770371292;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=Zcs5Snf4g8flz7TYouYgDp3W2DHK3PiGIpAbCvqR+HM=;
-  b=hV7KPuI3JymAskwy1Gtbw2ZQ9bu2OLPmq7erGJeHDgLQAsA/XttsPsKd
-   iIiAF/DYA2j5r8FjU4o65Mwrug5dnqWsc4TfXeWsRHc7pNnco43l7+YvW
-   3TkQVJR0rFDciT3KGQUFQ98tcVAhW9i1tyvf8p40yZ6d8vatI1+TliL7A
-   mm5KSnRbStSymtUQOUl1sV8XS5xpAlsXU1SMz8P4LDKB2DhxLCTgO4NCP
-   Ulria1jUSjfj7CvP+EtS3ke3b33oa5Pi3HJOB9nI0ipHLviUCM4gApl1n
-   9/py0N/8ZFaiinPToQNN4xUVnIF58+Ia8+08RpQeLwMVUkSxat77LXBta
-   A==;
-X-CSE-ConnectionGUID: bsCNwcH5TpGXsdilmzNB4w==
-X-CSE-MsgGUID: om8mz04ORu67LojgRpyOUw==
-X-IronPort-AV: E=McAfee;i="6700,10204,11336"; a="43092133"
-X-IronPort-AV: E=Sophos;i="6.13,264,1732608000"; 
-   d="scan'208";a="43092133"
-Received: from orviesa006.jf.intel.com ([10.64.159.146])
-  by orvoesa107.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 06 Feb 2025 01:48:11 -0800
-X-CSE-ConnectionGUID: moeHN7m+QPajiFGHxiYh3Q==
-X-CSE-MsgGUID: mmIcINAIRZ+fvr1HFc8qig==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.13,264,1732608000"; 
-   d="scan'208";a="111127724"
-Received: from mev-dev.igk.intel.com ([10.237.112.144])
-  by orviesa006-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 06 Feb 2025 01:48:07 -0800
-Date: Thu, 6 Feb 2025 10:44:34 +0100
-From: Michal Swiatkowski <michal.swiatkowski@linux.intel.com>
-To: Uday Shankar <ushankar@purestorage.com>
-Cc: Breno Leitao <leitao@debian.org>, Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Srinivas Kandagatla <srinivas.kandagatla@linaro.org>,
-	=?utf-8?B?UmFmYcWCIE1pxYJlY2tp?= <rafal@milecki.pl>,
-	Simon Horman <horms@kernel.org>,
-	Andrew Morton <akpm@linux-foundation.org>,
-	Johannes Berg <johannes@sipsolutions.net>,
-	Jonathan Corbet <corbet@lwn.net>, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org, linux-wireless@vger.kernel.org,
-	linux-doc@vger.kernel.org
-Subject: Re: [PATCH v3 1/2] net, treewide: define and use MAC_ADDR_STR_LEN
-Message-ID: <Z6SEeO0QFx9Y52LJ@mev-dev.igk.intel.com>
-References: <20250205-netconsole-v3-0-132a31f17199@purestorage.com>
- <20250205-netconsole-v3-1-132a31f17199@purestorage.com>
+	s=arc-20240116; t=1738835181; c=relaxed/simple;
+	bh=OciwV88ohOu6tEga8w5/A7cFo03Xlfs4DGnqeIwiR/M=;
+	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=JScltmne14Ee8J4YjC/OGZRH2SJmB4Npa0esh2puOsN2jrLygvFrpuJiUNxl9t7jncpG6/jAC/Sas1a55xCwU90NeRvv8uRUeu8wttm/NWx1iiS9meGA+OtaqErncYR/iKD9335HacxgUuLFzk1yP2gK4rchBr1PGjBt414Uub0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=163.com; spf=pass smtp.mailfrom=163.com; dkim=pass (1024-bit key) header.d=163.com header.i=@163.com header.b=h/aPps5Z; arc=none smtp.client-ip=220.197.31.5
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=163.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=163.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=163.com;
+	s=s110527; h=From:Subject:Date:Message-Id:MIME-Version:
+	Content-Type; bh=HFB+Bawv3lBqMs7vEm+2pmHpbYdR99g6fi3SDpxKfB8=;
+	b=h/aPps5ZJ+I20lNC0VHDQ/kPCevoAKLrxhrSuMBrsLNRmyl5ZiiVhcg336TSyx
+	om0tVKJhSBdOozwLA2pCvtyoRcXxrJD+9NvReSSIu3jnCjxpMvfsmu9JsksKVJ17
+	aZIsu1hOKfZqleRpkiRQwuiGBzHoWbnKxn6AdETGmDrQM=
+Received: from hello.company.local (unknown [])
+	by gzga-smtp-mtada-g1-4 (Coremail) with SMTP id _____wD3jWuZhKRn7M3tJw--.17672S2;
+	Thu, 06 Feb 2025 17:44:58 +0800 (CST)
+From: Liang Jie <buaajxlj@163.com>
+To: kuniyu@amazon.com
+Cc: buaajxlj@163.com,
+	davem@davemloft.net,
+	edumazet@google.com,
+	horms@kernel.org,
+	kuba@kernel.org,
+	liangjie@lixiang.com,
+	linux-kernel@vger.kernel.org,
+	mhal@rbox.co,
+	netdev@vger.kernel.org,
+	pabeni@redhat.com
+Subject: Re: [PATCH net-next v2] af_unix: Refine UNIX pathname sockets autobind identifier length
+Date: Thu,  6 Feb 2025 17:44:57 +0800
+Message-Id: <20250206094457.196837-1-buaajxlj@163.com>
+X-Mailer: git-send-email 2.25.1
+In-Reply-To: <20250206085834.17590-1-kuniyu@amazon.com>
+References: <20250206085834.17590-1-kuniyu@amazon.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250205-netconsole-v3-1-132a31f17199@purestorage.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+X-CM-TRANSID:_____wD3jWuZhKRn7M3tJw--.17672S2
+X-Coremail-Antispam: 1Uf129KBjvJXoW7ZFWDWr13urWDCryftF43ZFb_yoW8AFykpF
+	W5Ka43JrZ5ArWxKr1Iqw10krs5ta15t3yUArW8XFy0kF4agrWxJF1SkrWj9w1DCr1Iqw1a
+	qr1rCa9FkryqvaDanT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
+	9KBjDUYxBIdaVFxhVjvjDU0xZFpf9x0JUx-BtUUUUU=
+X-CM-SenderInfo: pexdtyx0omqiywtou0bp/xtbBzwvrIGekg7ALjgAAs6
 
-On Wed, Feb 05, 2025 at 10:21:30PM -0700, Uday Shankar wrote:
-> There are a few places in the tree which compute the length of the
-> string representation of a MAC address as 3 * ETH_ALEN - 1. Define a
-> constant for this and use it where relevant. No functionality changes
-> are expected.
+From: Kuniyuki Iwashima <kuniyu@amazon.com>
+Date: Thu, 6 Feb 2025 17:58:34 +0900
+> From: Liang Jie <buaajxlj@163.com>
+> Date: Thu,  6 Feb 2025 16:19:05 +0800
+> > Hi Kuniyuki,
+> > 
+> > The logs from 'netdev/build_allmodconfig_warn' is as follows:
+> >   ../net/unix/af_unix.c: In function ‘unix_autobind’:
+> >   ../net/unix/af_unix.c:1222:52: warning: ‘snprintf’ output truncated before the last format character [-Wformat-truncation=]
+> >    1222 |         snprintf(addr->name->sun_path + 1, 5, "%05x", ordernum);
+> >         |                                                    ^
+> >   ../net/unix/af_unix.c:1222:9: note: ‘snprintf’ output 6 bytes into a destination of size 5
+> >    1222 |         snprintf(addr->name->sun_path + 1, 5, "%05x", ordernum);
+> >         |         ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+> > 
+> > snprintf() also append a trailing '\0' at the end of the sun_path.
 > 
-> Signed-off-by: Uday Shankar <ushankar@purestorage.com>
-> ---
->  drivers/net/netconsole.c           | 2 +-
->  drivers/nvmem/brcm_nvram.c         | 2 +-
->  drivers/nvmem/layouts/u-boot-env.c | 2 +-
->  include/linux/if_ether.h           | 3 +++
->  lib/net_utils.c                    | 4 +---
->  net/mac80211/debugfs_sta.c         | 5 +++--
->  6 files changed, 10 insertions(+), 8 deletions(-)
+> I didn't say snprintf() would work rather we need a variant of it that
+> does not terminate string with \0.
 > 
-> diff --git a/drivers/net/netconsole.c b/drivers/net/netconsole.c
-> index 86ab4a42769a49eebe5dd6f01dafafc6c86ec54f..6db5af2d8d059fa5c072194545d4408eec19b4a9 100644
-> --- a/drivers/net/netconsole.c
-> +++ b/drivers/net/netconsole.c
-> @@ -675,7 +675,7 @@ static ssize_t remote_mac_store(struct config_item *item, const char *buf,
->  
-[...]
-
-What about ieee80211_sta_debugfs_add()? (net/mac80211/debugfs_sta.c)
-
-In gerneal looks fine, thanks:
-Reviewed-by: Michal Swiatkowski <michal.swiatkowski@linux.intel.com>
-
 > 
-> -- 
-> 2.34.1
+> > 
+> > Now, I think of three options. Which one do you think we should choose?
+> > 
+> > 1. Allocate an additional byte during the kzalloc phase.
+> > 	addr = kzalloc(sizeof(*addr) + offsetof(struct sockaddr_un, sun_path) +
+> > 		       UNIX_AUTOBIND_LEN + 1, GFP_KERNEL);
+> > 
+> > 2. Use temp buffer and memcpy() for handling.
+> > 
+> > 3. Keep the current code as it is.
+> > 
+> > Do you have any other suggestions?
+> 
+> I'd choose 3. as said in v1 thread.  We can't avoid hard-coding and
+> adjustment like +1 and -1 here.
+
+The option 3 would result in a waste of ten bytes. Why not choose option 1.
+
+I have a question about the initial use of the hardcoded value 16.
+Why was this value chosen and not another?  sizeof(struct sockaddr)?
+
+Its introduction felt abrupt and made understanding the code challenging for me,
+which is why I submitted a patch to address this.
+
 
