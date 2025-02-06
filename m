@@ -1,149 +1,209 @@
-Return-Path: <netdev+bounces-163576-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-163577-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id E6D25A2AC54
-	for <lists+netdev@lfdr.de>; Thu,  6 Feb 2025 16:20:40 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 62733A2AC6A
+	for <lists+netdev@lfdr.de>; Thu,  6 Feb 2025 16:25:09 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id C857D1888EB3
-	for <lists+netdev@lfdr.de>; Thu,  6 Feb 2025 15:20:45 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 9DBE83A5B00
+	for <lists+netdev@lfdr.de>; Thu,  6 Feb 2025 15:25:00 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1A80A1EDA27;
-	Thu,  6 Feb 2025 15:20:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 698DA1EDA1A;
+	Thu,  6 Feb 2025 15:25:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="VFyJWy++"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-il1-f205.google.com (mail-il1-f205.google.com [209.85.166.205])
+Received: from mail-ed1-f46.google.com (mail-ed1-f46.google.com [209.85.208.46])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 33E671E5B82
-	for <netdev@vger.kernel.org>; Thu,  6 Feb 2025 15:20:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.205
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 895541EDA19
+	for <netdev@vger.kernel.org>; Thu,  6 Feb 2025 15:25:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.46
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1738855229; cv=none; b=q7ckOdx5wpoUMGR4tzkHpwjyC7kjZnOJD3cCg1/2NyVBddALi4REF4wpMFrKRuQSEWXfGxqgOfpNkUbNpiCXDCRHuyrTYsQ0ucKZA0xgQscv1wtirCjxbjJFDblHX5fF1UFDGUyXJX4hqsr0CLH7/q0vxOztz62P39reHMDmAog=
+	t=1738855505; cv=none; b=IGiCA8PZySxRr4FSG2i08JavBBpGfjvyEXlcwN0iTPicQMZ2Yg6Cr+oAvtbGhmh58v4hAXJ47tXu36rbzpnrzBhb1HrNqG2sVRflIAyhQvJiXrO5lqouhmgadJOhIJqCVn8ZVzX1VF3bHMkh8aNfFxYv6mp7/7gTjqe7anBj6uY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1738855229; c=relaxed/simple;
-	bh=eDOqP7+BXpHVhicCo7wyvj5oRo7WDsDZLNCNVn5vrec=;
-	h=MIME-Version:Date:In-Reply-To:Message-ID:Subject:From:To:
-	 Content-Type; b=Wn1uwV19B5Y9KHBOPlHxll5F3v4uihfo+r5IxUKr0FexBsrcv71Sm2ckKMPrOvceOSAydmNJbtwxKKh/Gs/dtt9mzgQZZe7U0XLt4jhVn0VZg4ja3Qu4KSQ7ilRNQulnKFoCk2/u5g52dr8SgYxITv5B2i9KHSds5jKTH0K3ibs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.205
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
-Received: by mail-il1-f205.google.com with SMTP id e9e14a558f8ab-3d0203cf90cso18813375ab.2
-        for <netdev@vger.kernel.org>; Thu, 06 Feb 2025 07:20:26 -0800 (PST)
+	s=arc-20240116; t=1738855505; c=relaxed/simple;
+	bh=PMLesM+sPegvoYcCev5jpE3NIVmJ3+iUSGjK6zOUD0w=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=bRelUBkyacrVEI7wUAKJI9ciW0ESNqkK6fjWEIIecNFEYE8Q0vSXdxHQo+9ciAuo8OILrg5SS6CneB4XoHvxRz3FektGdTuKsp1c5fMDw+qMOcukH3lBm6oF40y8eq7F2nbiIVvJDNC935KOhtHqOeMjBFa4SJUEiGYGya4K1kQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=VFyJWy++; arc=none smtp.client-ip=209.85.208.46
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-ed1-f46.google.com with SMTP id 4fb4d7f45d1cf-5de38c3d2acso606697a12.1
+        for <netdev@vger.kernel.org>; Thu, 06 Feb 2025 07:25:03 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1738855502; x=1739460302; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=+KdOMKcFzgnDfOmgNKtWwp/r3hPNm7tMk0Q2fozSuNc=;
+        b=VFyJWy++bm+tvZ5jjRtBVWFujSCEJv/QgOBL4UCk0n+tN6Wuytpwuo6xhyWiyQ0a0u
+         n8mk1ulZjwBca/zIBjjSBp2HG2z+5/JWluXFs+HQ1iRWTihhlawnZh1j1Ip32S+qrOHV
+         rL1S/Z4vSJWYsJhz0fSoifCDC5NzNM6wxYIwhqIFUumNJyDLdLqzc4zd6jSlH4vRn43l
+         uyDKAZ441ftQTG7KxSTo5SDiPptKauM3/5VKcOhziHKNj7ExsGzdhWFMkCpSfUKUIyF3
+         5KhC8I8U7b9UjXQc9BaHaDFHeypiKx+G1V3u+s5l5bkG2iGUbOmagB3PwOPUnU/6S+Uq
+         NK6w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1738855226; x=1739460026;
-        h=to:from:subject:message-id:in-reply-to:date:mime-version
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=oFl5kinqp9gWgJ6tj81uzJp2ykUIOW0B39E6YsNbxHk=;
-        b=qqP0AneiP6YJXTBmCLpInqBlDEbKNsQ36LQRaQ0IIaqnTLJ6YFWD00GXY2vvff4327
-         uazNHUffKoqlQy+BfdXmt+tukkwMTMfv9KmkmeOveTKBu1e8XPkS0Qgr/CbF7LO9k7Jw
-         7bAdqxVIx7HJq7i7HWIHtAW3jTDaGmed9/4tbAx2kkEBP80DgYl1h8HXR2Or4O5foKM6
-         QDoTCGk2hAe7VU4p6//B8FPxCTAP6VKjJGPbKTzy6RU1358hy5xxpHGxFuyfsiB+MSOm
-         h/NmYkzsrOg6YhixnFeigzNznoJn5c1mnihJUp4CP1bExXxgS33xuirc79WQSlkgRFXl
-         dlhw==
-X-Forwarded-Encrypted: i=1; AJvYcCXGhg0E/aQDh1KdTD0hgB8trcJR03HbV36RJPVzVv0eYOuI5kGX6ufOZV+9MkgzGrIamKGFDrc=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzKbdBCc5EaYWFoonQ/Drwx7rY/TfGoRyNa3OLpRg2DXnZMreQn
-	dfeWTd4Y8LomXPKpz7w+lW+kl3trpBVGN7LZq8FypIHCNaxCQmJuNRNh9u2FKiNmoWG+nIr5ZZb
-	38L4yFfGrf/KG+vahl3yLTpCxsYeJpTrDCBLtNRilYPRDb1mKN0Pac/w=
-X-Google-Smtp-Source: AGHT+IG1TBbxPcDH0VtNoKmuHiOCibLk8WhoSRtt5DH6Mk+ghMjbBCAoPEk9GNVTz8/IEEyMT7PZRg5b+JXlMEO3Ym1EcZx5C0JJ
+        d=1e100.net; s=20230601; t=1738855502; x=1739460302;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=+KdOMKcFzgnDfOmgNKtWwp/r3hPNm7tMk0Q2fozSuNc=;
+        b=JXS+D8kouPXD2Akjmls0U8srdSf3zKwVWr4WcGvldF7FgM/g5TxRxUC98P7aN3BGIP
+         u4IFj787wLAnZxO4F3WlS95MsVQB64d0W/jLxBkMXyP6jq5JT8I48jjNwB2E6IN92qp2
+         eHIPxipfKnIPxgcsW57wbEGG5Ul+juDbrYCZIMSx+Tsmvv220vNwsP07B1azTG0Q19h/
+         lk+RL4xifAOBaFE6TMZnJwPFucTrZtaBoRzJy4DDgAkHVO5/VbRWhB7vKSU9SGTxc9bH
+         uLdcsXEpZS/SAOvPNOmacEEjhtPqDWBaU1w1orFoVoJaJKbnSNtmLfHZgJIXslEKBlhR
+         cxeQ==
+X-Forwarded-Encrypted: i=1; AJvYcCVQxhlEsatCrEDYd9rmq4LigqdQYAsR9f/fabs7S2NszZwKjO0DP3crwk3YB30bVn8rJ5ThnpA=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzaZPaqu0yfjrkxime8PTpSqiNdDNUejGfhc7fFtKYHJ/tXSTa2
+	7xmYEHzzAidWlrTbFNYzK7m38aBzjONO/nTjgScfMQfzZ+wnFikTCZc+m0OlbmgUXeWprZp0WUE
+	Wy2Mq56k9DFeCo/SvumsW2TarFJFV3/Ar0Usu
+X-Gm-Gg: ASbGncs6ncVNvZzO/YqJDvhiMYhTmPvbbZCXa08imvcNFfpA+iAmQy2KWvFb0Pey3T8
+	HbjrFdnKROrvNNhx7C+VLoKVm7xp0XrHesC3Si/FhiO102Z/MWDlOlzH856U49Nyr1TM8d7CWhw
+	==
+X-Google-Smtp-Source: AGHT+IGOHBlplyJ9pA4VMmcFSNZGwnfQEuUeNgaCGG6Eqk3N+5X9Zh5XzH6+ynGov9Aw1u3s6Or12xGt4LtoDXMTx2Y=
+X-Received: by 2002:a05:6402:2106:b0:5dc:893d:6dd4 with SMTP id
+ 4fb4d7f45d1cf-5dcdb586859mr8621466a12.0.1738855501549; Thu, 06 Feb 2025
+ 07:25:01 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Received: by 2002:a05:6e02:471b:b0:3d1:98e:4916 with SMTP id
- e9e14a558f8ab-3d1098e4c9dmr2346685ab.9.1738855226087; Thu, 06 Feb 2025
- 07:20:26 -0800 (PST)
-Date: Thu, 06 Feb 2025 07:20:26 -0800
-In-Reply-To: <671906e2.050a0220.1e4b4d.008d.GAE@google.com>
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <67a4d33a.050a0220.6230e.0002.GAE@google.com>
-Subject: Re: [syzbot] [wireless?] WARNING: ODEBUG bug in ieee80211_led_exit (2)
-From: syzbot <syzbot+e84ecca6d1fa09a9b3d9@syzkaller.appspotmail.com>
-To: johannes@sipsolutions.net, linux-kernel@vger.kernel.org, 
-	linux-usb@vger.kernel.org, linux-wireless@vger.kernel.org, 
-	netdev@vger.kernel.org, syzkaller-bugs@googlegroups.com
+References: <20250206140422.3134815-1-edumazet@google.com> <d729f05a-e5e6-4d67-8fe6-888e1e761b34@unstable.cc>
+In-Reply-To: <d729f05a-e5e6-4d67-8fe6-888e1e761b34@unstable.cc>
+From: Eric Dumazet <edumazet@google.com>
+Date: Thu, 6 Feb 2025 16:24:50 +0100
+X-Gm-Features: AWEUYZmLNMOyertnK904apoKkiVMcJPz0eX6UZCANJ8E7eXqNpVldUrAkNrzFFQ
+Message-ID: <CANn89i+ySFS5C24guM9E9UsPWfQBL69-OoRDbOGfih9vLGxDJg@mail.gmail.com>
+Subject: Re: [PATCH net-next] batman-adv: adopt netdev_hold() / netdev_put()
+To: Antonio Quartulli <a@unstable.cc>
+Cc: Marek Lindner <marek.lindner@mailbox.org>, Simon Wunderlich <sw@simonwunderlich.de>, 
+	Sven Eckelmann <sven@narfation.org>, b.a.t.m.a.n@lists.open-mesh.org, 
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, netdev@vger.kernel.org, 
+	eric.dumazet@gmail.com
 Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-syzbot has found a reproducer for the following issue on:
+On Thu, Feb 6, 2025 at 3:13=E2=80=AFPM Antonio Quartulli <a@unstable.cc> wr=
+ote:
+>
+> On 06/02/2025 15:04, Eric Dumazet wrote:
+> > Add a device tracker to struct batadv_hard_iface to help
+> > debugging of network device refcount imbalances.
+> >
+> > Signed-off-by: Eric Dumazet <edumazet@google.com>
+> > ---
+> >   net/batman-adv/hard-interface.c | 14 +++++---------
+> >   net/batman-adv/types.h          |  3 +++
+> >   2 files changed, 8 insertions(+), 9 deletions(-)
+> >
+> > diff --git a/net/batman-adv/hard-interface.c b/net/batman-adv/hard-inte=
+rface.c
+> > index 96a412beab2de9069c0f88e4cd844fbc0922aa18..9a3ae567eb12d0c65b25292=
+d020462b6ad60b699 100644
+> > --- a/net/batman-adv/hard-interface.c
+> > +++ b/net/batman-adv/hard-interface.c
+> > @@ -51,7 +51,7 @@ void batadv_hardif_release(struct kref *ref)
+> >       struct batadv_hard_iface *hard_iface;
+> >
+> >       hard_iface =3D container_of(ref, struct batadv_hard_iface, refcou=
+nt);
+> > -     dev_put(hard_iface->net_dev);
+> > +     netdev_put(hard_iface->net_dev, &hard_iface->dev_tracker);
+> >
+> >       kfree_rcu(hard_iface, rcu);
+> >   }
+> > @@ -875,15 +875,16 @@ batadv_hardif_add_interface(struct net_device *ne=
+t_dev)
+> >       ASSERT_RTNL();
+> >
+> >       if (!batadv_is_valid_iface(net_dev))
+> > -             goto out;
+> > +             return NULL;
+> >
+> > -     dev_hold(net_dev);
+> >
+> >       hard_iface =3D kzalloc(sizeof(*hard_iface), GFP_ATOMIC);
+> >       if (!hard_iface)
+> > -             goto release_dev;
+> > +             return NULL;
+> >
+> > +     netdev_hold(net_dev, &hard_iface->dev_tracker, GFP_ATOMIC);
+> >       hard_iface->net_dev =3D net_dev;
+> > +
+> >       hard_iface->soft_iface =3D NULL;
+> >       hard_iface->if_status =3D BATADV_IF_NOT_IN_USE;
+> >
+> > @@ -909,11 +910,6 @@ batadv_hardif_add_interface(struct net_device *net=
+_dev)
+> >       batadv_hardif_generation++;
+> >
+> >       return hard_iface;
+> > -
+> > -release_dev:
+> > -     dev_put(net_dev);
+> > -out:
+> > -     return NULL;
+> >   }
+> >
+> >   static void batadv_hardif_remove_interface(struct batadv_hard_iface *=
+hard_iface)
+> > diff --git a/net/batman-adv/types.h b/net/batman-adv/types.h
+> > index f491bff8c51b8bf68eb11dbbeb1a434d446c25f0..a73fc3ab7dd28ae2c8484c0=
+d198a15437d49ea73 100644
+> > --- a/net/batman-adv/types.h
+> > +++ b/net/batman-adv/types.h
+> > @@ -186,6 +186,9 @@ struct batadv_hard_iface {
+> >       /** @net_dev: pointer to the net_device */
+> >       struct net_device *net_dev;
+> >
+> > +     /** @dev_tracker device tracker for @net_dev */
+> > +     netdevice_tracker  dev_tracker;
+>
+> There are two blanks between type and member name. Is that intended?
 
-HEAD commit:    9682c35ff6ec usb: typec: thunderbolt: Remove IS_ERR check ..
-git tree:       https://git.kernel.org/pub/scm/linux/kernel/git/gregkh/usb.git usb-testing
-console output: https://syzkaller.appspot.com/x/log.txt?x=130e6df8580000
-kernel config:  https://syzkaller.appspot.com/x/.config?x=ed7570f7f6046a71
-dashboard link: https://syzkaller.appspot.com/bug?extid=e84ecca6d1fa09a9b3d9
-compiler:       gcc (Debian 12.2.0-14) 12.2.0, GNU ld (GNU Binutils for Debian) 2.40
-syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=170e6df8580000
-C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=155c5318580000
+Not intended. Also a : is missing :
 
-Downloadable assets:
-disk image: https://storage.googleapis.com/syzbot-assets/3c194e311f90/disk-9682c35f.raw.xz
-vmlinux: https://storage.googleapis.com/syzbot-assets/daad45c8e7c8/vmlinux-9682c35f.xz
-kernel image: https://storage.googleapis.com/syzbot-assets/8a4e74467d7e/bzImage-9682c35f.xz
+I can submit a V2 if you want, or feel free to make the changes.
 
-IMPORTANT: if you fix the issue, please add the following tag to the commit:
-Reported-by: syzbot+e84ecca6d1fa09a9b3d9@syzkaller.appspotmail.com
+diff --git a/net/batman-adv/types.h b/net/batman-adv/types.h
+index a73fc3ab7dd28ae2c8484c0d198a15437d49ea73..8ac061379b6f72ef7f1d4e19188=
+8db2cc56376da
+100644
+--- a/net/batman-adv/types.h
++++ b/net/batman-adv/types.h
+@@ -186,8 +186,8 @@ struct batadv_hard_iface {
+        /** @net_dev: pointer to the net_device */
+        struct net_device *net_dev;
 
-------------[ cut here ]------------
-ODEBUG: free active (active state 0) object: ffff888114d18330 object type: timer_list hint: tpt_trig_timer+0x0/0x300 net/mac80211/led.c:145
-WARNING: CPU: 0 PID: 705 at lib/debugobjects.c:612 debug_print_object+0x1a2/0x2b0 lib/debugobjects.c:612
-Modules linked in:
+-       /** @dev_tracker device tracker for @net_dev */
+-       netdevice_tracker  dev_tracker;
++       /** @dev_tracker: device tracker for @net_dev */
++       netdevice_tracker dev_tracker;
 
-CPU: 0 UID: 0 PID: 705 Comm: kworker/0:2 Not tainted 6.14.0-rc1-syzkaller-g9682c35ff6ec #0
-Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 12/27/2024
-Workqueue: usb_hub_wq hub_event
-RIP: 0010:debug_print_object+0x1a2/0x2b0 lib/debugobjects.c:612
-Code: fc ff df 48 89 fa 48 c1 ea 03 80 3c 02 00 75 54 48 8b 14 dd 40 d0 47 87 41 56 4c 89 e6 48 c7 c7 c0 c4 47 87 e8 af f6 c0 fe 90 <0f> 0b 90 90 58 83 05 96 71 d8 07 01 48 83 c4 18 5b 5d 41 5c 41 5d
-RSP: 0018:ffffc9000198f488 EFLAGS: 00010286
-RAX: 0000000000000000 RBX: 0000000000000003 RCX: ffffffff813f4d09
-RDX: ffff88810b3d8000 RSI: ffffffff813f4d16 RDI: 0000000000000001
-RBP: 0000000000000001 R08: 0000000000000001 R09: 0000000000000000
-R10: 0000000000000001 R11: 0000000000000008 R12: ffffffff8747cb60
-R13: ffffffff872acb00 R14: ffffffff86f6b4e0 R15: ffffc9000198f598
-FS:  0000000000000000(0000) GS:ffff8881f5800000(0000) knlGS:0000000000000000
-CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-CR2: 00007ffebc06edcc CR3: 0000000008ca2000 CR4: 00000000003506f0
-DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
-DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
-Call Trace:
- <TASK>
- __debug_check_no_obj_freed lib/debugobjects.c:1099 [inline]
- debug_check_no_obj_freed+0x4b7/0x600 lib/debugobjects.c:1129
- slab_free_hook mm/slub.c:2284 [inline]
- slab_free mm/slub.c:4609 [inline]
- kfree+0x2e1/0x480 mm/slub.c:4757
- ieee80211_led_exit+0x162/0x1c0 net/mac80211/led.c:210
- ieee80211_unregister_hw+0x27e/0x3a0 net/mac80211/main.c:1706
- rt2x00lib_remove_hw drivers/net/wireless/ralink/rt2x00/rt2x00dev.c:1085 [inline]
- rt2x00lib_remove_dev+0x528/0x640 drivers/net/wireless/ralink/rt2x00/rt2x00dev.c:1550
- rt2x00usb_disconnect+0x71/0x240 drivers/net/wireless/ralink/rt2x00/rt2x00usb.c:872
- usb_unbind_interface+0x1e2/0x960 drivers/usb/core/driver.c:458
- device_remove drivers/base/dd.c:569 [inline]
- device_remove+0x122/0x170 drivers/base/dd.c:561
- __device_release_driver drivers/base/dd.c:1273 [inline]
- device_release_driver_internal+0x44a/0x610 drivers/base/dd.c:1296
- bus_remove_device+0x22f/0x420 drivers/base/bus.c:579
- device_del+0x396/0x9f0 drivers/base/core.c:3854
- usb_disable_device+0x36c/0x7f0 drivers/usb/core/message.c:1418
- usb_disconnect+0x2e1/0x920 drivers/usb/core/hub.c:2305
- hub_port_connect drivers/usb/core/hub.c:5363 [inline]
- hub_port_connect_change drivers/usb/core/hub.c:5663 [inline]
- port_event drivers/usb/core/hub.c:5823 [inline]
- hub_event+0x1bed/0x4f40 drivers/usb/core/hub.c:5905
- process_one_work+0x9c5/0x1ba0 kernel/workqueue.c:3236
- process_scheduled_works kernel/workqueue.c:3317 [inline]
- worker_thread+0x6c8/0xf00 kernel/workqueue.c:3398
- kthread+0x3af/0x750 kernel/kthread.c:464
- ret_from_fork+0x45/0x80 arch/x86/kernel/process.c:148
- ret_from_fork_asm+0x1a/0x30 arch/x86/entry/entry_64.S:244
- </TASK>
+        /** @refcount: number of contexts the object is used */
+        struct kref refcount;
 
 
----
-If you want syzbot to run the reproducer, reply with:
-#syz test: git://repo/address.git branch-or-commit-hash
-If you attach or paste a git patch, syzbot will apply it before testing.
+>
+> > +
+> >       /** @refcount: number of contexts the object is used */
+> >       struct kref refcount;
+> >
+>
+> We also have hard_iface->soft_iface storing a pointer to the soft_iface
+> (batX) netdev.
+>
+> How about converting that to netdev_put/hold as well?
+> See batadv_hardif_enable_interface() / batadv_hardif_disable_interface()
+>
+
+Sure, feel free to submit a patch for this one as well.
+
+Thanks.
 
