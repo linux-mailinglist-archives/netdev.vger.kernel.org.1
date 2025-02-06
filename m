@@ -1,154 +1,120 @@
-Return-Path: <netdev+bounces-163377-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-163378-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id C68B1A2A0B8
-	for <lists+netdev@lfdr.de>; Thu,  6 Feb 2025 07:12:51 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 76DFCA2A0D5
+	for <lists+netdev@lfdr.de>; Thu,  6 Feb 2025 07:19:09 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id BC0451886A82
-	for <lists+netdev@lfdr.de>; Thu,  6 Feb 2025 06:12:56 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 10AF8164202
+	for <lists+netdev@lfdr.de>; Thu,  6 Feb 2025 06:19:08 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8C0ED223326;
-	Thu,  6 Feb 2025 06:12:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9D6687FBA2;
+	Thu,  6 Feb 2025 06:19:04 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="HA1BjPN7"
+	dkim=pass (1024-bit key) header.d=ti.com header.i=@ti.com header.b="SaO8TYF8"
 X-Original-To: netdev@vger.kernel.org
-Received: from out-189.mta1.migadu.com (out-189.mta1.migadu.com [95.215.58.189])
+Received: from lelvem-ot01.ext.ti.com (lelvem-ot01.ext.ti.com [198.47.23.234])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 97B382E64A
-	for <netdev@vger.kernel.org>; Thu,  6 Feb 2025 06:12:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.189
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 515D24C76;
+	Thu,  6 Feb 2025 06:19:01 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.47.23.234
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1738822367; cv=none; b=IgGm30sCtv0V9bBpLb3Tb8MGLmVdzp1UvlfxhU93+5PuBaDji4+g4C+cArAHrbgvNUQVhOT6o6N2tpnJHmiUT3L3W9aYOdh2x6UzwOcLb9VRo1thNYNfDbu3XwD4KdFfRSyAVA+Imn346X8ZMcAd7HNvEkHfj7r6FsRknnuwjA0=
+	t=1738822744; cv=none; b=p1OlxKKf8HW3pXmJkjgZkc+jNspIY95DEJ3bqpGaQYH4r1YVbCVORhEWoHE0ShnrScxtAl0pdhAe2cmgEN1WCdyWw2b+teYxPqeIo7COW4Y+uvoSaXmumRuWzeZbBnxPt2NdhI/soYFuaiMEaLzrjq16NBQUmzB/BriKmL1fNT8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1738822367; c=relaxed/simple;
-	bh=hogkxHDEfpKbYOQm+WoV7gcsiLjVcIZZhSZnar9SZ2M=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=cqz0TsDi+GupLC9eE+W0+/RCBADlVZzLQi9KF8ffYZf6eRU5p+a05dw3xS5nYs91lkhXk4V7iik0FuUckSAP4ujUvfBNPJYDk5tUcWTqZsyb40Or4HiRDCUrz9sr/HrKjQzT8eI1V8QS2nr6c0kCW7SjWkE+0pBg24MYa+Plwvs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=HA1BjPN7; arc=none smtp.client-ip=95.215.58.189
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
-Message-ID: <b158a837-d46c-4ae0-8130-7aa288422182@linux.dev>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1738822359;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=fP09qw0fTTx05drYQv3984Q2Z6Ps7338BY1vTUz5Gr0=;
-	b=HA1BjPN7H6pdK3AQPHUWBR9CHXN16ayPkbkeHGvuP2GKpSsCEwT2H2iw6bGpEyB9tWasQe
-	Rk/oV7PeEgmp+rux3MlammoofunRdZXnGozYtW9LE2xOhbOCmu5TQp39Yq2QnfC7p6LTgq
-	zsMyB+R+joci9qA/38YWvfSVpCszJTI=
-Date: Wed, 5 Feb 2025 22:12:29 -0800
+	s=arc-20240116; t=1738822744; c=relaxed/simple;
+	bh=65NOKSzb4RgUpAGuJG4ZIwRp90PqbEeynoqsVgo5Wdk=;
+	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
+	 In-Reply-To:Content-Type; b=aYC9c1XHSa0tC3IwgZPX3iDExwYaUA0GfKANEnFE3YcxU5zgsjKkT4LoQk5/sgXX0dDzradMTgn+XMnvyEnvD8HjdlieLNJdv7jC6bl4lKbhu5pWPEvLFhWBGY+Ok99TrRH5S1hQs3X32B55m90m7of65uaOwt1B2pL04N0gB6c=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=ti.com; spf=pass smtp.mailfrom=ti.com; dkim=pass (1024-bit key) header.d=ti.com header.i=@ti.com header.b=SaO8TYF8; arc=none smtp.client-ip=198.47.23.234
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=ti.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ti.com
+Received: from lelv0265.itg.ti.com ([10.180.67.224])
+	by lelvem-ot01.ext.ti.com (8.15.2/8.15.2) with ESMTPS id 5166IkEp3572168
+	(version=TLSv1.2 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Thu, 6 Feb 2025 00:18:46 -0600
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ti.com;
+	s=ti-com-17Q1; t=1738822726;
+	bh=y+B1tLhnx490D3c67MYqTu7vOV20MAOWuSnvm+C2xrE=;
+	h=Date:Subject:To:CC:References:From:In-Reply-To;
+	b=SaO8TYF8dw7KezI6AbasZqvVO9ik5Ojoo/S/K4JnasBMhXn0SV3OcVEFZoenqDISU
+	 jppkwGH9MC3C+k+EaZitviyVvU44qviahtGPaVf78JG+h6TCT2/eWjE/7jYngKAwA5
+	 4gHjzhlIpg3l5WkMAhaOhvmTdiu+s+PDLdkzALSE=
+Received: from DLEE107.ent.ti.com (dlee107.ent.ti.com [157.170.170.37])
+	by lelv0265.itg.ti.com (8.15.2/8.15.2) with ESMTPS id 5166IkBQ018652
+	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=FAIL);
+	Thu, 6 Feb 2025 00:18:46 -0600
+Received: from DLEE110.ent.ti.com (157.170.170.21) by DLEE107.ent.ti.com
+ (157.170.170.37) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.2507.23; Thu, 6
+ Feb 2025 00:18:45 -0600
+Received: from lelvsmtp6.itg.ti.com (10.180.75.249) by DLEE110.ent.ti.com
+ (157.170.170.21) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.2507.23 via
+ Frontend Transport; Thu, 6 Feb 2025 00:18:45 -0600
+Received: from [172.24.227.220] (chintan-thinkstation-p360-tower.dhcp.ti.com [172.24.227.220])
+	by lelvsmtp6.itg.ti.com (8.15.2/8.15.2) with ESMTP id 5166IehD056873;
+	Thu, 6 Feb 2025 00:18:41 -0600
+Message-ID: <cecaf839-c203-43a5-aa11-f428ab0ba4c2@ti.com>
+Date: Thu, 6 Feb 2025 11:48:39 +0530
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Subject: Re: [PATCH bpf-next v8 10/12] bpf: make TCP tx timestamp bpf
- extension work
-To: Jason Xing <kerneljasonxing@gmail.com>
-Cc: Willem de Bruijn <willemdebruijn.kernel@gmail.com>,
- Jakub Kicinski <kuba@kernel.org>, davem@davemloft.net, edumazet@google.com,
- pabeni@redhat.com, dsahern@kernel.org, willemb@google.com, ast@kernel.org,
- daniel@iogearbox.net, andrii@kernel.org, eddyz87@gmail.com, song@kernel.org,
- yonghong.song@linux.dev, john.fastabend@gmail.com, kpsingh@kernel.org,
- sdf@fomichev.me, haoluo@google.com, jolsa@kernel.org, horms@kernel.org,
- bpf@vger.kernel.org, netdev@vger.kernel.org
-References: <20250204183024.87508-1-kerneljasonxing@gmail.com>
- <20250204183024.87508-11-kerneljasonxing@gmail.com>
- <20250204175744.3f92c33e@kernel.org>
- <e894c427-b4b3-4706-b44c-44fc6402c14c@linux.dev>
- <CAL+tcoCQ165Y4R7UWG=J=8e=EzwFLxSX3MQPOv=kOS3W1Q7R0A@mail.gmail.com>
- <0a8e7b84-bab6-4852-8616-577d9b561f4c@linux.dev>
- <CAL+tcoAp8v49fwUrN5pNkGHPF-+RzDDSNdy3PhVoJ7+MQGNbXQ@mail.gmail.com>
- <CAL+tcoC5hmm1HQdbDaYiQ1iW1x2J+H42RsjbS_ghyG8mSDgqqQ@mail.gmail.com>
- <67a424d2aa9ea_19943029427@willemb.c.googlers.com.notmuch>
- <CAL+tcoCPGAjs=+Hnzr4RLkioUV7nzy=ZmKkTDPA7sBeVP=qzow@mail.gmail.com>
- <67a42ba112990_19c315294b7@willemb.c.googlers.com.notmuch>
- <CAL+tcoC_5106onp6yQh-dKnCTLtEr73EZVC31T_YeMtqbZ5KBw@mail.gmail.com>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [RFC PATCH 0/2] Add support for Timesync Interrupt Router
+To: Vignesh Raghavendra <vigneshr@ti.com>, Jason Reeder <jreeder@ti.com>,
+        <nm@ti.com>, Paolo Abeni <pabeni@redhat.com>,
+        Jakub Kicinski
+	<kuba@kernel.org>, Eric Dumazet <edumazet@google.com>,
+        "David S. Miller"
+	<davem@davemloft.net>,
+        Andrew Lunn <andrew+netdev@lunn.ch>,
+        Thomas Gleixner
+	<tglx@linutronix.de>
+CC: <netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>, <srk@ti.com>,
+        <s-vadapalli@ti.com>, <danishanwar@ti.com>, <m-malladi@ti.com>
+References: <20250205160119.136639-1-c-vankar@ti.com>
+ <bbbcba04-3e31-4282-a383-fb4daa7c6de3@ti.com>
 Content-Language: en-US
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Martin KaFai Lau <martin.lau@linux.dev>
-In-Reply-To: <CAL+tcoC_5106onp6yQh-dKnCTLtEr73EZVC31T_YeMtqbZ5KBw@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
-X-Migadu-Flow: FLOW_OUT
+From: Chintan Vankar <c-vankar@ti.com>
+In-Reply-To: <bbbcba04-3e31-4282-a383-fb4daa7c6de3@ti.com>
+Content-Type: text/plain; charset="UTF-8"; format=flowed
+Content-Transfer-Encoding: 7bit
+X-C2ProcessedOrg: 333ef613-75bf-4e12-a4b1-8e3623f5dcea
 
-On 2/5/25 7:41 PM, Jason Xing wrote:
-> On Thu, Feb 6, 2025 at 11:25 AM Willem de Bruijn
-> <willemdebruijn.kernel@gmail.com> wrote:
->>
->>>>> I think we can split the whole idea into two parts: for now, because
->>>>> of the current series implementing the same function as SO_TIMETAMPING
->>>>> does, I will implement the selective sample feature in the series.
->>>>> After someday we finish tracing all the skb, then we will add the
->>>>> corresponding selective sample feature.
->>>>
->>>> Are you saying that you will include selective sampling now or want to
->>>> postpone it?
->>>
->>> A few months ago, I planned to do it after this series. Since you all
->>> ask, it's not complex to have it included in this series :)
->>>
->>> Selective sampling has two kinds of meaning like I mentioned above, so
->>> in the next re-spin I will implement the cmsg feature for bpf
->>> extension in this series.
->>
->> Great thanks.
+
+
+On 06/02/25 10:43, Vignesh Raghavendra wrote:
 > 
-> I have to rephrase a bit in case Martin visits here soon: I will
-> compare two approaches 1) reply value, 2) bpf kfunc and then see which
-> way is better.
-
-I have already explained in details why the 1) reply value from the bpf prog 
-won't work. Please go back to that reply which has the context.
-
 > 
+> On 05/02/25 21:31, Chintan Vankar wrote:
+>> Chintan Vankar (2):
+>>    irqchip: ti-tsir: Add support for Timesync Interrupt Router
+>>    net: ethernet: ti: am65-cpts: Add support to configure GenF signal for
+>>      CPTS
 >>
->>> I'm doing the test right now. And leave
->>> another selective sampling small feature until the feature of tracing
->>> all the skbs is implemented if possible.
->>
->> Can you elaborate on this other feature?
+>>   drivers/irqchip/Kconfig             |   9 +++
+>>   drivers/irqchip/Makefile            |   1 +
+>>   drivers/irqchip/ti-timesync-intr.c  | 109 ++++++++++++++++++++++++++++
+>>   drivers/net/ethernet/ti/am65-cpts.c |  21 ++++++
+>>   4 files changed, 140 insertions(+)
+>>   create mode 100644 drivers/irqchip/ti-timesync-intr.c
 > 
-> Do you recall oneday I asked your opinion privately about whether we
-> can trace _all the skbs_ (not the last skb from each sendmsg) to have
-> a better insight of kernel behaviour? I can also see a couple of
-> latency issues in the kernel. If it is approved, then corresponding
-> selective sampling should be supported. It's what I was trying to
-> describe.
+> Where are the device-tree binding updates that need to go with
+> individual driver changes?
 > 
-> The advantage of relying on the timestamping feature is that we can
-> isolate normal flows and monitored flow so that normal flows wouldn't
-> be affected because of enabling the monitoring feature, compared to so
-> many open source monitoring applications I've dug into. They usually
-> directly hook the hot path like __tcp_transmit_skb() or
-> dev_queue_xmit, which will surely influence the normal flows and cause
-> performance degradation to some extent. I noticed that after
-> conducting some tests a few months ago. The principle behind the bpf
-> fentry is to replace some instructions at the very beginning of the
-> hooked function, so every time even normal flows entering the
-> monitored function will get affected.
 
-I sort of guess this while stalled in the traffic... :/
 
-I was not asking to be able to "selective on all skb of a large msg". This will 
-be a separate topic. If we really wanted to support this case (tbh, I am not 
-convinced) in the future, there is more reason the default behavior should be 
-"off" now for consistency reason.
+Hello Vignesh, This series is not specific to any use-case that Timesync
+Interrupt Router is implementing. Through this RFC series I am expecting
+a feedback on driver implementation so that later on we can make use of
+this driver to implement certain functionality.
 
-The comment was on the existing tcp_tx_timestamp(). First focus on allowing 
-selective tracking of the skb that the current tcp_tx_timestamp() also tracks 
-because it is the most understood use case. This will allow the bpf prog to 
-select which tcp_sendmsg call it should track/sample. Perhaps the bpf prog will 
-limit tracking X numbers of packets and then will stop there. Perhaps the bpf 
-prog will only allocate X numbers of sample spaces in the bpf_sk_storage to 
-track packet. There are many reasons that bpf prog may want to sample and stop 
-tracking at some point even in the current tcp_tx_timestamp().
-
+Regards,
+Chintan.
 
