@@ -1,49 +1,49 @@
-Return-Path: <netdev+bounces-163317-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-163318-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 90C28A29EA9
-	for <lists+netdev@lfdr.de>; Thu,  6 Feb 2025 03:20:10 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 974C7A29EAC
+	for <lists+netdev@lfdr.de>; Thu,  6 Feb 2025 03:20:24 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 21256167B5C
-	for <lists+netdev@lfdr.de>; Thu,  6 Feb 2025 02:20:09 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A1BF03A7965
+	for <lists+netdev@lfdr.de>; Thu,  6 Feb 2025 02:20:12 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C65C06A33B;
-	Thu,  6 Feb 2025 02:20:05 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2541113BADF;
+	Thu,  6 Feb 2025 02:20:07 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="RuLaYuvV"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="R/y+Gm19"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 893062E62B;
-	Thu,  6 Feb 2025 02:20:05 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0139A13B2B8
+	for <netdev@vger.kernel.org>; Thu,  6 Feb 2025 02:20:06 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1738808405; cv=none; b=D3ONayPf7LEcqvs9Bq9XLxjqnQj6r+3vLq/Knw+IJ2r1NUet4Hel+uf/VdQ9ew5r/Bhs7T9xQ3JW6rBJddI3nDQFiqw8KcLr3gFU1Fspi1WlS5OyWEeycQ/hGYd58uoEFUKGFaO8qiir9gG46nqVswdb7Y/qq55JdFvESisNIfo=
+	t=1738808407; cv=none; b=eRNavq0PBc39CifF/0yvvkLTPRPPaSqUKHm1WUeMM2uQIY5nrW9ssjFRycyvZJ2x3SGFaNT87eRagaxMY1AQr2C2ISiv1s2eIh9x4OYlm/Nt/Y+pVnZzzYeWOVrX/Uka4gUYTR8xLQWv0BnIrFHAahepcyr4/SFjU65HwL6FrWI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1738808405; c=relaxed/simple;
-	bh=oHSSIC5E6hzcwmxupX44t54z1KpOd5ZqlBP1+ll/XwU=;
+	s=arc-20240116; t=1738808407; c=relaxed/simple;
+	bh=/SUYUq0ixsQe5U0+TeIpuY1kP9tT/er0o0uXPIm9bww=;
 	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=DjvfEhRImaSzWERAbBuQoMt0mpX10RhGwkftJSLViJhtm11Bb7s2kP0d+n9vseFCEfoZ8iKtgtoZEAi7YpqiU7uUzLqD5qCb0Q7oT3+ae2yeYm4LUswuXl0JcM5On/7QudJn+qLGozbJg9Cx1GdXQE12syQMwfdebF8kpvmIZ90=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=RuLaYuvV; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id E0DE2C4CED1;
-	Thu,  6 Feb 2025 02:20:04 +0000 (UTC)
+	 In-Reply-To:To:Cc; b=gXsTZRaS+VP/AR5cOt0SoN5tNlpsOYaW+T1b3s5AM6zZPDKkey3vnQZ4OqEQDaUIn4FJHmKmIiMz2gXTMxSrjqGu52O5ZzScgDzNEeOWTmA32HwKSUXu0hxDJz0KeSffVTdViBmrhKJy1e+PHiAPJSK0Qp3T5lPs0/R9f+6dZR8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=R/y+Gm19; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6C01CC4CEE5;
+	Thu,  6 Feb 2025 02:20:06 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1738808404;
-	bh=oHSSIC5E6hzcwmxupX44t54z1KpOd5ZqlBP1+ll/XwU=;
+	s=k20201202; t=1738808406;
+	bh=/SUYUq0ixsQe5U0+TeIpuY1kP9tT/er0o0uXPIm9bww=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=RuLaYuvV7nEVrtDqSIwidq4MXaSGOW12xBIIZCmJP5+141K8m5sc3iB2EwE8EMho2
-	 Rx6+2RQTBW1TQ1p8hI9v3M157OeOs1BPHX1o38UguND3o4JzEYxMQ8eJf6r99lFIwM
-	 216vXoTwEiUix03H2qSNECCtI9LgycOu25/U8CRclSRTswlYyzGGW6GClrq7Dn2KqQ
-	 IVwP63GHMAOZ0srzpDiRtYkItx63kFyd7fJ++ytm2JGsCvWzL/CmU/fEeqXgY0oSE8
-	 6+LllxtjCVo/42QqXamMd/k8aAFK6iQZ4wWEvQRSqQXtskwFgeY4GhtaQS6gjM/IIT
-	 ZggF4ttW28x7w==
+	b=R/y+Gm1966iapeNpiDmx5Ytm6Vlna1+FLzH9zbQfp1icrZqombxWtwsFXV8xmKFmP
+	 ZYOe6Tsxfwl5cZqUN9xCQmb3lH5CpqP7tnjBOl6LNJs1Xh9EXOsj9eCms2n+zlbQI7
+	 fs5YYsSa3h9HZf5d7VWJk4mZ3Il+N0DzNrxMznsjutxqWkifx0GG4q+1KpIhZGq7Gd
+	 Ff5Zp7/Xb48ZxwFHdUw3HLDn1/Bq+oaW6vBts2Tmfe1ABjaCDp2Q43Nso2UYnaE1Lu
+	 Dsv3g/y2ablvf/FWVvtaaNKX5RTAT1PyDZIfn6WRG+lvNwqW+CrNuV9+HnT2QEs/1j
+	 K3nyOOPv8JNpg==
 Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id AE1A8380AAD0;
-	Thu,  6 Feb 2025 02:20:33 +0000 (UTC)
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 33D56380AAD0;
+	Thu,  6 Feb 2025 02:20:35 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -52,39 +52,44 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net] selftests: mptcp: connect: -f: no reconnect
+Subject: Re: [Patch net v3 0/4] net_sched: two security bug fixes and test cases
 From: patchwork-bot+netdevbpf@kernel.org
 Message-Id: 
- <173880843253.974883.18192366892501704782.git-patchwork-notify@kernel.org>
-Date: Thu, 06 Feb 2025 02:20:32 +0000
-References: <20250204-net-mptcp-sft-conn-f-v1-1-6b470c72fffa@kernel.org>
-In-Reply-To: <20250204-net-mptcp-sft-conn-f-v1-1-6b470c72fffa@kernel.org>
-To: Matthieu Baerts <matttbe@kernel.org>
-Cc: mptcp@lists.linux.dev, martineau@kernel.org, geliang@kernel.org,
- davem@davemloft.net, edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
- horms@kernel.org, shuah@kernel.org, netdev@vger.kernel.org,
- linux-kselftest@vger.kernel.org, linux-kernel@vger.kernel.org,
- stable@vger.kernel.org
+ <173880843375.974883.4547524655772131156.git-patchwork-notify@kernel.org>
+Date: Thu, 06 Feb 2025 02:20:33 +0000
+References: <20250204005841.223511-1-xiyou.wangcong@gmail.com>
+In-Reply-To: <20250204005841.223511-1-xiyou.wangcong@gmail.com>
+To: Cong Wang <xiyou.wangcong@gmail.com>
+Cc: netdev@vger.kernel.org, jhs@mojatatu.com, jiri@resnulli.us,
+ pctammela@mojatatu.com, mincho@theori.io, quanglex97@gmail.com,
+ cong.wang@bytedance.com
 
 Hello:
 
-This patch was applied to netdev/net.git (main)
+This series was applied to netdev/net.git (main)
 by Jakub Kicinski <kuba@kernel.org>:
 
-On Tue, 04 Feb 2025 23:19:53 +0100 you wrote:
-> The '-f' parameter is there to force the kernel to emit MPTCP FASTCLOSE
-> by closing the connection with unread bytes in the receive queue.
+On Mon,  3 Feb 2025 16:58:37 -0800 you wrote:
+> From: Cong Wang <cong.wang@bytedance.com>
 > 
-> The xdisconnect() helper was used to stop the connection, but it does
-> more than that: it will shut it down, then wait before reconnecting to
-> the same address. This causes the mptcp_join's "fastclose test" to fail
-> all the time.
+> This patchset contains two bug fixes reported in security mailing list,
+> and test cases for both of them.
+> 
+> ---
+> v3: added Fixes tag for patch 1/4
+>     removed a redudant ip link add/del in patch 2/4 (thanks to Pedro Tammela)
 > 
 > [...]
 
 Here is the summary with links:
-  - [net] selftests: mptcp: connect: -f: no reconnect
-    https://git.kernel.org/netdev/net/c/5368a67307b3
+  - [net,v3,1/4] pfifo_tail_enqueue: Drop new packet when sch->limit == 0
+    https://git.kernel.org/netdev/net/c/647cef20e649
+  - [net,v3,2/4] selftests/tc-testing: Add a test case for pfifo_head_drop qdisc when limit==0
+    https://git.kernel.org/netdev/net/c/3fe5648d1df1
+  - [net,v3,3/4] netem: Update sch->q.qlen before qdisc_tree_reduce_backlog()
+    https://git.kernel.org/netdev/net/c/638ba5089324
+  - [net,v3,4/4] selftests/tc-testing: Add a test case for qdisc_tree_reduce_backlog()
+    https://git.kernel.org/netdev/net/c/91aadc16ee73
 
 You are awesome, thank you!
 -- 
