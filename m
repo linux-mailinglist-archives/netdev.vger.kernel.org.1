@@ -1,89 +1,124 @@
-Return-Path: <netdev+bounces-163709-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-163710-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id C0249A2B6A6
-	for <lists+netdev@lfdr.de>; Fri,  7 Feb 2025 00:39:59 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 842E8A2B6D4
+	for <lists+netdev@lfdr.de>; Fri,  7 Feb 2025 00:54:25 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id A6ACE7A2AE2
-	for <lists+netdev@lfdr.de>; Thu,  6 Feb 2025 23:39:03 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 1D946166055
+	for <lists+netdev@lfdr.de>; Thu,  6 Feb 2025 23:54:24 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4AEE0226539;
-	Thu,  6 Feb 2025 23:39:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C510A23A572;
+	Thu,  6 Feb 2025 23:53:39 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="cD8Peldp"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="LWk+S3YJ"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1F8472417EF;
-	Thu,  6 Feb 2025 23:39:52 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9761522FF41
+	for <netdev@vger.kernel.org>; Thu,  6 Feb 2025 23:53:39 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1738885193; cv=none; b=VWRDVjzW3oo0Q9Iq/s7/Fp3Xr4Jdm65lnSL4tHkUB97mPC/F1KG4DJ80HW4iE8JU2nJZLCzeMdH/HDgct0D1xJhRY79mjby2rBz4YrxudUhfkXzp7KpXur7xiUSkcRg1deURUnYAVQIMU5CfStKRuIjngHk/EtlzKYetNUevSPA=
+	t=1738886019; cv=none; b=AyUcmQGCG7+w3PmThJEIVmXXuPB8K9g+0NaNkD1rko5u2N3gyaL0v7kns0FeAgTf/hvZJo7KHH5mCo4Gg8OBbJBLoWtk+BEdc09FkJGTrjkXwtKho8iMjccc2iPpasz+6vlGAkm3hSJZgfUXAMgnkIIkRIWvt8OR2QeILRcqfcM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1738885193; c=relaxed/simple;
-	bh=p0DLFVOiELhPDzFWd2fbfQXfQiU4pRtGR9G1jmfaePQ=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=C3PL/CB6y3fDPFwI2zSXzNTHtaUD7jBoXML4uSyOndgCi6Mgc+vV2b0CaVQE4FHvS4oorIiq8RR4HBCBAb9xzpUKV2FAudnZq6iahi1bgQqQ1Lx83nv2io4pOy3ifWbXV7wz+R/5vNw3o5UIawVIsaTymogf7Ldhkr4g5gFPwLE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=cD8Peldp; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 40A01C4CEDD;
-	Thu,  6 Feb 2025 23:39:52 +0000 (UTC)
+	s=arc-20240116; t=1738886019; c=relaxed/simple;
+	bh=ckUQo5kA5rfDBQFnMtmWsNyxuB3IW3Zdsa/ks0048J8=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=GWv0GVW3vjBkHOXRrqLD5olndNdD1PIr64RFZtF7lZUdPEb+uDfYtUCuLk59G5/NdrRBCKCJanu9B+eui6oYmO8FXrG1SoAWZNZZU9rMoYd/z7IwfVNUzArqLWmMntb58QOpLhyTc5PYaTX3Hq7dRzj7kXQn5tHuGNNFUDbTh/8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=LWk+S3YJ; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id B854EC4CEDD;
+	Thu,  6 Feb 2025 23:53:38 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1738885192;
-	bh=p0DLFVOiELhPDzFWd2fbfQXfQiU4pRtGR9G1jmfaePQ=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=cD8PeldpAgOrn7XgIMI4wrG50qQ3MU5MzZkhafVPUo/d7HLwCcxrjSkniinpVXooK
-	 sN9LZjjoaLlAzCbEEYqf3WpZxH9jvi6fFzsyup8k7mErggbGx8X9f09fftDtJoacbm
-	 epNVN7QiEbhWb8sKZvH16vG28zqhFSs+3VnD/OUkNIpNUH8yChTpx92noz1e9rjS+c
-	 dTix9pxuf7V36J4c1oEFCImQfTSSz/ahxFHCL9cfUh8o73nmpr/2WzBUVyU+x4Q7VI
-	 QJaPfdJ5vRxnV2HofXYjb4pSA+EFfGTPVPHOOKZruY5ciQQ4tb+sxYSXX38V7NpllR
-	 20gdyEKRr7OJg==
-Date: Thu, 6 Feb 2025 15:39:51 -0800
+	s=k20201202; t=1738886019;
+	bh=ckUQo5kA5rfDBQFnMtmWsNyxuB3IW3Zdsa/ks0048J8=;
+	h=From:To:Cc:Subject:Date:From;
+	b=LWk+S3YJWX80EQT/qogv2EWKvFCUNDyAbhGY5SSzca0FmNPoH+gw2A5TOpbqCfGjS
+	 4N5a6Byl+JzWVFS7TO0CApNHg0yEjsR9fu5bLnc+n4R3A2UZ/Shnxa1YZmNxaPY0p4
+	 6ZvR75S0GcJvK8u+0hMS3JKWorhG9zsCi/4zc2cTaAGqsiZInQ976vMkWwN2sdbSPS
+	 v4Mn1OpYF338BIiKWKlR7v4gU1p5xXJMpZaJMKZAJFTp86L+/wMuiqf+5XxDy0nVSy
+	 DLHMdfdaFYqAIFd2pgb6uxRwqvqhtB970DhiRBGauj07pvucM9d/6FvPg1pNZhOWZs
+	 W8Uq8hsXNVBXg==
 From: Jakub Kicinski <kuba@kernel.org>
-To: Nicolas Dichtel <nicolas.dichtel@6wind.com>
-Cc: "David S . Miller" <davem@davemloft.net>, Paolo Abeni
- <pabeni@redhat.com>, Eric Dumazet <edumazet@google.com>, Alexander Lobakin
- <aleksander.lobakin@intel.com>, netdev@vger.kernel.org,
- stable@vger.kernel.org
-Subject: Re: [PATCH net 1/2] net: advertise 'netns local' property via
- netlink
-Message-ID: <20250206153951.41fbcb84@kernel.org>
-In-Reply-To: <20250206165132.2898347-2-nicolas.dichtel@6wind.com>
-References: <20250206165132.2898347-1-nicolas.dichtel@6wind.com>
-	<20250206165132.2898347-2-nicolas.dichtel@6wind.com>
+To: davem@davemloft.net
+Cc: netdev@vger.kernel.org,
+	edumazet@google.com,
+	pabeni@redhat.com,
+	andrew+netdev@lunn.ch,
+	horms@kernel.org,
+	Jakub Kicinski <kuba@kernel.org>
+Subject: [PATCH net-next 0/7] eth: fbnic: support RSS contexts and ntuple filters
+Date: Thu,  6 Feb 2025 15:53:27 -0800
+Message-ID: <20250206235334.1425329-1-kuba@kernel.org>
+X-Mailer: git-send-email 2.48.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 
-On Thu,  6 Feb 2025 17:50:26 +0100 Nicolas Dichtel wrote:
-> Since the below commit, there is no way to see if the netns_local property
-> is set on a device. Let's add a netlink attribute to advertise it.
+Add support for RSS contexts and ntuple filters in fbnic.
+The device has only one context, intended for use by TCP zero-copy Rx.
 
-I think the motivation for the change may be worth elaborating on.
-It's a bit unclear to me what user space would care about this
-information, a bit of a "story" on how you hit the issue could
-be useful perhaps? The uAPI is new but the stable tag indicates
-regression..
+First two patches add a check we seem to be missing in the core,
+to avoid having to copy it to all drivers.
 
-> @@ -2041,6 +2042,7 @@ static int rtnl_fill_ifinfo(struct sk_buff *skb,
->  		       netif_running(dev) ? READ_ONCE(dev->operstate) :
->  					    IF_OPER_DOWN) ||
->  	    nla_put_u8(skb, IFLA_LINKMODE, READ_ONCE(dev->link_mode)) ||
-> +	    nla_put_u8(skb, IFLA_NETNS_LOCAL, dev->netns_local) ||
+  $ ./drivers/net/hw/rss_ctx.py
+  KTAP version 1
+  1..16
+  ok 1 rss_ctx.test_rss_key_indir
+  ok 2 rss_ctx.test_rss_queue_reconfigure
+  ok 3 rss_ctx.test_rss_resize
+  ok 4 rss_ctx.test_hitless_key_update
+  ok 5 rss_ctx.test_rss_context
+  # Failed to create context 2, trying to test what we got
+  ok 6 rss_ctx.test_rss_context4 # SKIP Tested only 1 contexts, wanted 4
+  # Increasing queue count 44 -> 66
+  # Failed to create context 2, trying to test what we got
+  ok 7 rss_ctx.test_rss_context32 # SKIP Tested only 1 contexts, wanted 32
+  # Added only 1 out of 3 contexts
+  ok 8 rss_ctx.test_rss_context_dump
+  # Driver does not support rss + queue offset
+  ok 9 rss_ctx.test_rss_context_queue_reconfigure
+  ok 10 rss_ctx.test_rss_context_overlap
+  ok 11 rss_ctx.test_rss_context_overlap2 # SKIP Test requires at least 2 contexts, but device only has 1
+  ok 12 rss_ctx.test_rss_context_out_of_order # SKIP Test requires at least 4 contexts, but device only has 1
+  # Failed to create context 2, trying to test what we got
+  ok 13 rss_ctx.test_rss_context4_create_with_cfg # SKIP Tested only 1 contexts, wanted 4
+  ok 14 rss_ctx.test_flow_add_context_missing
+  ok 15 rss_ctx.test_delete_rss_context_busy
+  ok 16 rss_ctx.test_rss_ntuple_addition # SKIP Ntuple filter with RSS and nonzero action not supported
+  # Totals: pass:10 fail:0 xfail:0 xpass:0 skip:6 error:0
 
-Maybe nla_put_flag() ? Or do you really care about false being there?
-The 3 bytes wasted on padding always makes me question when people pick
-NLA_u8.
+Alexander Duyck (3):
+  eth: fbnic: add IP TCAM programming
+  eth: fbnic: support n-tuple filters
+  eth: fbnic: support listing tcam content via debugfs
 
->  	    nla_put_u32(skb, IFLA_MTU, READ_ONCE(dev->mtu)) ||
->  	    nla_put_u32(skb, IFLA_MIN_MTU, READ_ONCE(dev->min_mtu)) ||
->  	    nla_put_u32(skb, IFLA_MAX_MTU, READ_ONCE(dev->max_mtu)) ||
+Daniel Zahka (1):
+  eth: fbnic: support an additional RSS context
+
+Jakub Kicinski (3):
+  net: ethtool: prevent flow steering to RSS contexts which don't exist
+  selftests: net-drv: test adding flow rule to invalid RSS context
+  selftests: drv-net: rss_ctx: skip tests which need multiple contexts
+    cleanly
+
+ drivers/net/ethernet/meta/fbnic/fbnic.h       |   6 +
+ drivers/net/ethernet/meta/fbnic/fbnic_csr.h   |   6 +
+ drivers/net/ethernet/meta/fbnic/fbnic_rpc.h   |  35 +
+ .../net/ethernet/meta/fbnic/fbnic_debugfs.c   | 138 ++++
+ .../net/ethernet/meta/fbnic/fbnic_ethtool.c   | 705 ++++++++++++++++++
+ .../net/ethernet/meta/fbnic/fbnic_netdev.c    |   1 +
+ drivers/net/ethernet/meta/fbnic/fbnic_rpc.c   | 356 ++++++++-
+ net/ethtool/ioctl.c                           |  12 +-
+ .../selftests/drivers/net/hw/rss_ctx.py       |  46 +-
+ 9 files changed, 1294 insertions(+), 11 deletions(-)
+
+-- 
+2.48.1
+
 
