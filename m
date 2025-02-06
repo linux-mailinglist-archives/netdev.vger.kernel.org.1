@@ -1,97 +1,119 @@
-Return-Path: <netdev+bounces-163519-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-163520-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 334A9A2A8F0
-	for <lists+netdev@lfdr.de>; Thu,  6 Feb 2025 14:03:10 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 8753CA2A900
+	for <lists+netdev@lfdr.de>; Thu,  6 Feb 2025 14:05:23 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 3D5277A1D15
-	for <lists+netdev@lfdr.de>; Thu,  6 Feb 2025 13:02:14 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 478747A3AD6
+	for <lists+netdev@lfdr.de>; Thu,  6 Feb 2025 13:04:13 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 37B7613D897;
-	Thu,  6 Feb 2025 13:03:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2741F22E3F8;
+	Thu,  6 Feb 2025 13:05:01 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (4096-bit key) header.d=prolan.hu header.i=@prolan.hu header.b="t4zQE011"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ihtyc1/W"
 X-Original-To: netdev@vger.kernel.org
-Received: from fw2.prolan.hu (fw2.prolan.hu [193.68.50.107])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7EBF917579;
-	Thu,  6 Feb 2025 13:02:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=193.68.50.107
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EDE4422DF89;
+	Thu,  6 Feb 2025 13:05:00 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1738846983; cv=none; b=iYZ6quwU8Mt4O6VgThVQqAh5cT9qIVo5opi29guyVHKzs2GAYri5hwRSofB6OkbZgXohBlAYFooCVqJiLwnfPhAkc/LDD8edh/J/4/n9FHlRkqH+zl14TRNoc6E/NquldtLG2R5r3Y7hO93NK3Q+QmgJe+rm5Q3WqYZhknzPebs=
+	t=1738847101; cv=none; b=NwNIm6kNbnY53zNvPhzmAnwrLjykxJ3uA6nBdS97nG4M2ZWFPgtQn37IEXmmsNsxOyHoOQsgAI0Tr5Hbels7U5BLdc/7DBBcc4TlKaLXfCVv+Oy4kLE4lw7h47G4arl6jxQollE4M3xAjXFQ999Rbw0DRoQ0IO1Nq2pyWegXpzY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1738846983; c=relaxed/simple;
-	bh=exKTE07mHM56JEN6zML1GUbV1qmMKOK94H5J27Lb5eQ=;
-	h=Message-ID:Date:MIME-Version:From:Subject:To:CC:References:
-	 In-Reply-To:Content-Type; b=KvieR3pV4xKuFOFKPfaW6AcyjzFkYKMk6sx53ln5z4ShP0W0UvdXr+paiLptKh/3nUjvWtIr8kBiXoeOe40HRd7shv+zyOgVRwOHvrQo60cXpct7peUtTiUPEOJC+tzCTo8Kces7dydJe6XRe8H2jbnOdxzcHvdF4rFVBB3CLL0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=prolan.hu; spf=pass smtp.mailfrom=prolan.hu; dkim=pass (4096-bit key) header.d=prolan.hu header.i=@prolan.hu header.b=t4zQE011; arc=none smtp.client-ip=193.68.50.107
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=prolan.hu
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=prolan.hu
-Received: from proxmox-mailgw.intranet.prolan.hu (localhost.localdomain [127.0.0.1])
-	by proxmox-mailgw.intranet.prolan.hu (Proxmox) with ESMTP id 1D8E8A02D7;
-	Thu,  6 Feb 2025 14:02:51 +0100 (CET)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=prolan.hu; h=cc
-	:cc:content-transfer-encoding:content-type:content-type:date
-	:from:from:in-reply-to:message-id:mime-version:references
-	:reply-to:subject:subject:to:to; s=mail; bh=9IthvkQUSloN+jU4yaLe
-	CO+AOQgNxpCCwaPiXCqsXVs=; b=t4zQE011ccbQ89ZD9bPeDDyb4u4SUWP1glT9
-	CAupoRlmKb0Q77M6dRUMK5GRU2RSvRFlYrFI359l1VyHRWzhG0pIDgZltHDvB7eK
-	1MD5ehD267tm9vmkbmrsnUVH6wbZ3tqPcPcKNVjY9Kl6YX5S4y+DvocH42pgIrsO
-	p8ynpLwMWzEvHbsW5tiRd1xF8+NzACOA6YLLSld91DjjKvD+zQXd41caiYaBjlE5
-	nCw/2qKyupfEIC4R/B0chZxGxcM95EmPeuR1PAzLEZtsugvfXfQV2qXZkJwUplze
-	QuHBaOs40tNh43NwEE8U4GyzEerGZWszs5UnD16CTdhEUG4vI+LRjuvMWWWsip3i
-	TMtOysY7BQ6YcyOaQGxQVmTVhZegNI2vDmCGMfdVHWTPUYGWHi/gu7OKWpVrcOTd
-	1XR5m1PsUiNHuGdrT0VKlOmtma7Xa/6y998FiwYNalyDijB9hmWlcJ0m7Ct39QE1
-	hY2Atk+JGCC86+CoNdLiM9rrtRyUx2pOVtIqQUiiNQqiwshkUmdw+LY4+mHbeCFw
-	qTRzE5e5Hfy5tqJB90uqI488tRysXo4APELjb8Reb13nuPHIJyYNHOUE2IKptEfP
-	9DYlKvZjECogPJWqeLpBaBEP/2FxOTNxt+QVWFpiSvGvFjxeHfKAFzugMAU85Wev
-	Fu8LyBU=
-Message-ID: <299a1239-7149-42f1-b3fb-ba538ae2a30a@prolan.hu>
-Date: Thu, 6 Feb 2025 14:02:50 +0100
+	s=arc-20240116; t=1738847101; c=relaxed/simple;
+	bh=t2o8FDsmLuwiGZddcqgwIo19XnRmyE8T3EKEBiZzF/Y=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=TcZ16Ehr/lfQPQ7E62/aaeAYL47sqNg1UH3dwc53GXkxfMhmq8153Y2LzXC/+TSnQX56w6bH1eLGB9zXo72Lo0L4Fuz4zlgHgF4kei3NRR7BsxxTWmyQY1jxQ1oTQiD6syW1kx+OEFHA89p5GNqvFxufdYV6sEA70VAw/mDxB7Q=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ihtyc1/W; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 99BC5C4CEDF;
+	Thu,  6 Feb 2025 13:04:58 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1738847100;
+	bh=t2o8FDsmLuwiGZddcqgwIo19XnRmyE8T3EKEBiZzF/Y=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=ihtyc1/WHl258ovUgszYqsIr8IWqTe1ncsvqHxfzaMmzlMDAiZe5VKnwQJY5i7Ijr
+	 5DUMu69sWOS3YRh5S7dfBiPp5VISV52nS+ZUzM7B9kPDlFqM4OexEDCyiKcaIDYJ+2
+	 6NiFiQ7qgBEON37koggqPwjSeNw0u/GA94B3YgIWkUTob5cR6kFKRnhon3OudALTHD
+	 2xeQ8G1E2WOE4o7mjk4UzPmCC+Y4czRbe5QG1/yz1RF7czjt2MfKMslSCW7rxv4pjZ
+	 ObI/iAf9a1tL74Gg7WEvZtKH9m0SoK8VQQ6C5cb7UOKei5N4OLJs/Fv1EKuYyPTQ3y
+	 zBmUjIyZnBZpA==
+Date: Thu, 6 Feb 2025 13:04:56 +0000
+From: Simon Horman <horms@kernel.org>
+To: Peter Seiderer <ps.report@gmx.net>
+Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+	linux-kselftest@vger.kernel.org,
+	"David S . Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Shuah Khan <shuah@kernel.org>
+Subject: Re: [PATCH net-next v4 12/17] net: pktgen: fix mpls maximum labels
+ list parsing
+Message-ID: <20250206130456.GQ554665@kernel.org>
+References: <20250205131153.476278-1-ps.report@gmx.net>
+ <20250205131153.476278-13-ps.report@gmx.net>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-From: =?UTF-8?B?Q3PDs2vDoXMgQmVuY2U=?= <csokas.bence@prolan.hu>
-Subject: Re: [PATCH] net: fec: Refactor MAC reset to function
-To: Simon Horman <horms@kernel.org>
-CC: Laurent Badel <laurentbadel@eaton.com>, Jakub Kicinski <kuba@kernel.org>,
-	Andrew Lunn <andrew@lunn.ch>, <imx@lists.linux.dev>,
-	<netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>, Michal Swiatkowski
-	<michal.swiatkowski@linux.intel.com>, Jacob Keller
-	<jacob.e.keller@intel.com>, Wei Fang <wei.fang@nxp.com>, Shenwei Wang
-	<shenwei.wang@nxp.com>, Clark Wang <xiaoning.wang@nxp.com>, Andrew Lunn
-	<andrew+netdev@lunn.ch>, "David S. Miller" <davem@davemloft.net>, "Eric
- Dumazet" <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>
-References: <20250204093604.253436-2-csokas.bence@prolan.hu>
- <20250205132832.GC554665@kernel.org> <20250205134824.GF554665@kernel.org>
-Content-Language: en-US
-In-Reply-To: <20250205134824.GF554665@kernel.org>
-Content-Type: text/plain; charset="UTF-8"; format=flowed
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: ATLAS.intranet.prolan.hu (10.254.0.229) To
- ATLAS.intranet.prolan.hu (10.254.0.229)
-X-EsetResult: clean, is OK
-X-EsetId: 37303A2980D94852667C62
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250205131153.476278-13-ps.report@gmx.net>
 
-Hi,
-sorry for the confusion. I accidentally sent that one while editing the 
-headers.
-
-On 2025. 02. 05. 14:48, Simon Horman wrote:
->> Reviewed-by: Simon Horman <horms@kernel.org>
+On Wed, Feb 05, 2025 at 02:11:48PM +0100, Peter Seiderer wrote:
+> Fix mpls maximum labels list parsing up to MAX_MPLS_LABELS/16 entries
+> (instead of up to MAX_MPLS_LABELS - 1).
 > 
-> Sorry, I think I have to take that back for now.
+> Fixes:
 
-Would you keep it if I retargeted to net-next without the Fixes: tags?
+"Fixes: " has a special meaning, it  is recognised as a tag by tooling, and
+implies a bug fix. Please consider some other way of describing this, e.g.
 
-Bence
+Addresses the following:
 
+> 
+> 	$ echo "mpls 00000f00,00000f01,00000f02,00000f03,00000f04,00000f05,00000f06,00000f07,00000f08,00000f09,00000f0a,00000f0b,00000f0c,00000f0d,00000f0e,00000f0f" > /proc/net/pktgen/lo\@0
+> 	-bash: echo: write error: Argument list too long
+> 
+> Signed-off-by: Peter Seiderer <ps.report@gmx.net>
+> ---
+> Changes v3 -> v4
+>   - new patch (factored out of patch 'net: pktgen: fix access outside of user
+>     given buffer in pktgen_if_write()')
+> ---
+>  net/core/pktgen.c | 6 ++++--
+>  1 file changed, 4 insertions(+), 2 deletions(-)
+> 
+> diff --git a/net/core/pktgen.c b/net/core/pktgen.c
+> index 84fd88e48275..0fd15f21119b 100644
+> --- a/net/core/pktgen.c
+> +++ b/net/core/pktgen.c
+> @@ -908,6 +908,10 @@ static int get_labels(const char __user *buffer, struct pktgen_dev *pkt_dev)
+>  	pkt_dev->nr_labels = 0;
+>  	do {
+>  		__u32 tmp;
+> +
+> +		if (n >= MAX_MPLS_LABELS)
+> +			return -E2BIG;
+> +
+>  		len = hex32_arg(&buffer[i], HEX_8_DIGITS, &tmp);
+>  		if (len <= 0)
+>  			return len;
+> @@ -919,8 +923,6 @@ static int get_labels(const char __user *buffer, struct pktgen_dev *pkt_dev)
+>  			return -EFAULT;
+>  		i++;
+>  		n++;
+> -		if (n >= MAX_MPLS_LABELS)
+> -			return -E2BIG;
+>  	} while (c == ',');
+>  
+>  	pkt_dev->nr_labels = n;
+> -- 
+> 2.48.1
+> 
 
