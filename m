@@ -1,117 +1,182 @@
-Return-Path: <netdev+bounces-163675-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-163676-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id B35F0A2B57C
-	for <lists+netdev@lfdr.de>; Thu,  6 Feb 2025 23:47:29 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1E33EA2B584
+	for <lists+netdev@lfdr.de>; Thu,  6 Feb 2025 23:48:30 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E43D23A335E
-	for <lists+netdev@lfdr.de>; Thu,  6 Feb 2025 22:47:20 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 4ACB63A6686
+	for <lists+netdev@lfdr.de>; Thu,  6 Feb 2025 22:48:21 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 909EF22FF42;
-	Thu,  6 Feb 2025 22:47:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3E02E237174;
+	Thu,  6 Feb 2025 22:48:25 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=wp.pl header.i=@wp.pl header.b="Xr4cWiRh"
+	dkim=pass (2048-bit key) header.d=baylibre-com.20230601.gappssmtp.com header.i=@baylibre-com.20230601.gappssmtp.com header.b="e7YtTFBj"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx3.wp.pl (mx3.wp.pl [212.77.101.9])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ot1-f53.google.com (mail-ot1-f53.google.com [209.85.210.53])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4497D197A8E
-	for <netdev@vger.kernel.org>; Thu,  6 Feb 2025 22:47:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=212.77.101.9
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 61A4022653F
+	for <netdev@vger.kernel.org>; Thu,  6 Feb 2025 22:48:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.53
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1738882044; cv=none; b=FCXtHSdINxb9LSVInox6Bfrgd7LCIiVAqiUMZ/OQvlVjidzNUWn+csoHB4ol4LPgOd/F6mPVCgY+F1gaYQADL+a7egycHRFvkp3Hqmf3ftJ7ngoZnxlrlfuYQz+Feh8CuZFBZomMf/3QieOQBACX4S2JyJbN5XOAa439+OPlp1c=
+	t=1738882105; cv=none; b=fe0RTMpk2t2At+fyF1+m4MyTDgPcrfza7pTu1vFdM34v1+WIIn4UvhsB9K8q2ZnpeDK8/T5ZjTV2drmlrVTqXulJVFtdFjYE8zQce/uGfUFOYuMmSkfdNibaYa/02uX40Wy3e8HGseYlVdlA810ah6n/EaDj9H7YN2O+h5sj3PY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1738882044; c=relaxed/simple;
-	bh=cKvEJg/NR6Vzc5ifX66Y8af1qoE9/1oLpW0tirx20vc=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=tohSRUs2wDbH1j8a2rLOBd87wjAO+ox7cA4euwfz1Ys+EcGouRGNgWSuzjt/XulHz4+qEdjevGKbl+OH1Au0Fzg/vu0K/+LsE9mN9xpL4zIpxXzcLvW1/TyJBXL1r7COicl78sL6fDFd2blC56LgBsvoKRgSmpDKTOdBItnVASc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=wp.pl; spf=pass smtp.mailfrom=wp.pl; dkim=pass (2048-bit key) header.d=wp.pl header.i=@wp.pl header.b=Xr4cWiRh; arc=none smtp.client-ip=212.77.101.9
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=wp.pl
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=wp.pl
-Received: (wp-smtpd smtp.wp.pl 15612 invoked from network); 6 Feb 2025 23:40:36 +0100
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=wp.pl; s=20241105;
-          t=1738881636; bh=/dxcutMpXbREWxlgUU/VpF3517cOAAEJq3LxSyYzdIE=;
-          h=From:To:Cc:Subject;
-          b=Xr4cWiRheAZg5JdrJGjhXYoC+eMr7Utq1SMheuCvEHW0H8j8Ihp504rcwdztWSi8Q
-           LQiswyd3EZPIXgwSJ1Vx6v5g4KrxypWwQzDrwjbEMr+EIHreXWo7VZd9iAyoe1wrlq
-           ELPyfftNWaa8CTlLovl4nv1NkalFYjLCDMlsyCbrmpjQXUMjzQEe1yqMpxZgR8q73X
-           U04BamSqVbNH8y6zWSLrHqUu2c9wQ2PkqY+ke6KuI2R/tHxncDAcS/PR+xbNm9axxu
-           9xikN1ufsHm31Qw/WOT5rPaGdUgV7ZLNX4r0Cc6VDoB0+/NOVrgVBrYr8XQV8YxS7c
-           KXY0F2krJbf0w==
-Received: from 83.24.144.222.ipv4.supernova.orange.pl (HELO laptop-olek.lan) (olek2@wp.pl@[83.24.144.222])
-          (envelope-sender <olek2@wp.pl>)
-          by smtp.wp.pl (WP-SMTPD) with ECDHE-RSA-AES256-GCM-SHA384 encrypted SMTP
-          for <andrew+netdev@lunn.ch>; 6 Feb 2025 23:40:36 +0100
-From: Aleksander Jan Bajkowski <olek2@wp.pl>
-To: andrew+netdev@lunn.ch,
-	davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	gregkh@linuxfoundation.org,
-	hayeswang@realtek.com,
-	horms@kernel.org,
-	dianders@chromium.org,
-	gmazyland@gmail.com,
-	ste3ls@gmail.com,
-	linux-usb@vger.kernel.org,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Cc: Aleksander Jan Bajkowski <olek2@wp.pl>
-Subject: [PATCH net-next] r8152: add vendor/device ID pair for Dell Alienware AW1022z
-Date: Thu,  6 Feb 2025 23:40:33 +0100
-Message-Id: <20250206224033.980115-1-olek2@wp.pl>
-X-Mailer: git-send-email 2.39.5
+	s=arc-20240116; t=1738882105; c=relaxed/simple;
+	bh=zis4tQ7I07460hkbbniR15rXPSwxoQBpcub6c24O+rE=;
+	h=From:Subject:Date:Message-Id:MIME-Version:Content-Type:To:Cc; b=XTrg1TQQCfckH4jtKCNoWUej4qejJnKZfwXVSLTI8NAvF6prkV6kB/CHGITJO2prpQLqEfON3AKqBJlA98e9cAeVq+OwL8ATT33nmBTGt2YBS1KlRUKKa3me4AdRn6CDFcBCu+h+GUYGby2mfvWb84ihK26TddtsBWXzr2zO9k4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=baylibre.com; spf=pass smtp.mailfrom=baylibre.com; dkim=pass (2048-bit key) header.d=baylibre-com.20230601.gappssmtp.com header.i=@baylibre-com.20230601.gappssmtp.com header.b=e7YtTFBj; arc=none smtp.client-ip=209.85.210.53
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=baylibre.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=baylibre.com
+Received: by mail-ot1-f53.google.com with SMTP id 46e09a7af769-71e15d9629bso499839a34.1
+        for <netdev@vger.kernel.org>; Thu, 06 Feb 2025 14:48:22 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=baylibre-com.20230601.gappssmtp.com; s=20230601; t=1738882101; x=1739486901; darn=vger.kernel.org;
+        h=cc:to:content-transfer-encoding:mime-version:message-id:date
+         :subject:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=nTjUVrGhE9LEkuAZwVXSbsr3BolYrhi8U68+FxZFaxQ=;
+        b=e7YtTFBjy0uRy0vsgSxptxwfBMUs7cm3Q81BJzZuEGoce04DXOj2iKHnO/iJuLCXA0
+         kHgWo5/x4hdC7kcSBkBGAxaFnvlBY8JDgW/o/o/oVwTtw3RfUkUZjk3rF8FujoWHmwYU
+         Gd94Ko8GUAu+qr8VG7ANeqeIQ+G0ij6tTn2YSUWcTy/OwbA3H9Ss2nQ/rZ+ey5w+A+6Z
+         8/J34qev7ibdViIyGLwB9NaMt51bgRSdoSVAtYiiKZtdpvwi7iOSl34DkzWunPa0wUzD
+         V31wdC0bPvpK43WMpk6fgEvCVTQsFqu0pQbCNjeJZdg1BcwG30KxoUrLHuM6WrUd1ThY
+         welA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1738882101; x=1739486901;
+        h=cc:to:content-transfer-encoding:mime-version:message-id:date
+         :subject:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=nTjUVrGhE9LEkuAZwVXSbsr3BolYrhi8U68+FxZFaxQ=;
+        b=R1KWnr0je+CNOdonUfFlDy0+rnyeak9pc1awGjJvEa4pdqfLXBNcI3sVn2YMrPFRW/
+         1/m8vSHFC7xm19VqNfNV42M27/nuXsQKZllMSclQ1lWaJRGACNoqI0sPmPMe2Xt/ZCLV
+         lOsJpE1pJqQk0Sld4ald2F2Vl46qB9kpAFpDNrkBLGdAyVzIY+ABQLxFKXvYXSWyqvs4
+         37BDY4oyDnfXns0x/nQCewJSGwJx9cFmDBkac+4tDR1Xw3ObL9asx5jlyWfGmmxrf04W
+         Ha7n1N/v+PJ8HAurZ5bSpjMP0vkQCl/8M69PsBh1M24SXO9z1Cuf1psjy37jGN2roCmX
+         HGdw==
+X-Forwarded-Encrypted: i=1; AJvYcCW8D5DvHtybQMa9wDQqsQ0T2TYViXhx6IHoVlGDX+GPCBXeZeixqNaDd2dkx3uwzf71G3dAVeU=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwUnVbpOk+27seVvJs0B5DR42X0TSWJtAu+aDZxPWQFbK6hnu6P
+	2b2U8jplLVDTFApGp6Rs5A6k89e8VBdJ3MXDPUVG+36YUpAhfUPhPnC/Uvk3X+w=
+X-Gm-Gg: ASbGncvtjpReLrtYFF011kj1E+nlou2j+7o9r3jYcHmkZLIt0ynAPWHCfDiYax35k0U
+	h2tSZZ6nuR6TyHu8gK61+z60E8eYf3NWGSFWWhB6imDebcWZyV9blw9P0zK45vtdoeCqA4Zq7Xb
+	wbNwezrSAfd7k7NpnPCiWkfWB07LKLxAqdxEqu8JMQxAW8i5zEWT2hKRVo2Avy+pQHcTGXMyfZE
+	myhIizjkpiO+ABCNw0S/iPRis2xzhh8ei/tfEgAcqK0Y5KoRwDfTTGJc5ndJwlEV8JVdBi+rO8M
+	Me7fTfSMiRDSU4TYvXg6s+/RcRgTVmsGlYVSROrHs0zvqNI=
+X-Google-Smtp-Source: AGHT+IEe89bED7ukyh1rQCd1X1Mi1wrPA7ENfU7mpvKe6wSKoopBL7B45Hnhs3EJFS2hj21RE4OaAw==
+X-Received: by 2002:a05:6830:6204:b0:71d:fe93:2570 with SMTP id 46e09a7af769-726b883e93emr835305a34.14.1738882101425;
+        Thu, 06 Feb 2025 14:48:21 -0800 (PST)
+Received: from [127.0.1.1] (ip98-183-112-25.ok.ok.cox.net. [98.183.112.25])
+        by smtp.gmail.com with ESMTPSA id 46e09a7af769-726af95bbb5sm510986a34.41.2025.02.06.14.48.20
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 06 Feb 2025 14:48:21 -0800 (PST)
+From: David Lechner <dlechner@baylibre.com>
+Subject: [PATCH v2 00/13] gpiolib: add gpiod_multi_set_value_cansleep
+Date: Thu, 06 Feb 2025 16:48:14 -0600
+Message-Id: <20250206-gpio-set-array-helper-v2-0-1c5f048f79c3@baylibre.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-WP-DKIM-Status: good (id: wp.pl)                                                      
-X-WP-MailID: cc4d85941aa823555ff2ff16ba445377
-X-WP-AV: skaner antywirusowy Poczty Wirtualnej Polski
-X-WP-SPAM: NO 000000B [cdME]                               
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+X-B4-Tracking: v=1; b=H4sIAC48pWcC/4WNSw6CQBAFr0JmbZv5oIIr72FYzKeFTpAhPYRIy
+ NzdkQu4rEpevV0kZMIk7tUuGFdKFKcC+lQJP9ipR6BQWGipL1IZBf1MERIuYJntBgOOMzK4UFu
+ jG3OTwYiynRlf9Dm6z67wQGmJvB03q/rZf8VVgYS2Vb7x3tXhig9nt5Ec49nHt+hyzl9lqEWmv
+ QAAAA==
+X-Change-ID: 20250131-gpio-set-array-helper-bd4a328370d3
+To: Linus Walleij <linus.walleij@linaro.org>, 
+ Bartosz Golaszewski <brgl@bgdev.pl>, Andy Shevchenko <andy@kernel.org>, 
+ Geert Uytterhoeven <geert@linux-m68k.org>, 
+ Lars-Peter Clausen <lars@metafoo.de>, 
+ Michael Hennerich <Michael.Hennerich@analog.com>, 
+ Jonathan Cameron <jic23@kernel.org>, Ulf Hansson <ulf.hansson@linaro.org>, 
+ Peter Rosin <peda@axentia.se>, Andrew Lunn <andrew@lunn.ch>, 
+ Heiner Kallweit <hkallweit1@gmail.com>, 
+ Russell King <linux@armlinux.org.uk>, 
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+ Vinod Koul <vkoul@kernel.org>, Kishon Vijay Abraham I <kishon@kernel.org>, 
+ =?utf-8?q?Nuno_S=C3=A1?= <nuno.sa@analog.com>, 
+ Liam Girdwood <lgirdwood@gmail.com>, Mark Brown <broonie@kernel.org>, 
+ Jaroslav Kysela <perex@perex.cz>, Takashi Iwai <tiwai@suse.com>
+Cc: linux-gpio@vger.kernel.org, linux-kernel@vger.kernel.org, 
+ linux-iio@vger.kernel.org, linux-mmc@vger.kernel.org, 
+ netdev@vger.kernel.org, linux-phy@lists.infradead.org, 
+ linux-sound@vger.kernel.org, David Lechner <dlechner@baylibre.com>
+X-Mailer: b4 0.14.2
 
-The Dell AW1022z is an RTL8156B based 2.5G Ethernet controller.
+This series was inspired by some minor annoyance I have experienced a
+few times in recent reviews.
 
-Add the vendor and product ID values to the driver. This makes Ethernet
-work with the adapter.
+Calling gpiod_set_array_value_cansleep() can be quite verbose due to
+having so many parameters. In most cases, we already have a struct
+gpio_descs that contains the first 3 parameters so we end up with 3 (or
+often even 6) pointer indirections at each call site. Also, people have
+a tendency to want to hard-code the first argument instead of using
+struct gpio_descs.ndescs, often without checking that ndescs >= the
+hard-coded value.
 
-Signed-off-by: Aleksander Jan Bajkowski <olek2@wp.pl>
+So I'm proposing that we add a gpiod_multi_set_value_cansleep()
+function that is a wrapper around gpiod_set_array_value_cansleep()
+that has struct gpio_descs as the first parameter to make it a bit
+easier to read the code and avoid the hard-coding temptation.
+
+I've just done gpiod_multi_set_value_cansleep() for now since there
+were over 10 callers of this one. There aren't as many callers of
+the get and atomic variants, but we can add those too if this seems
+like a useful thing to do.
+
+Maintainers, if you prefer to have this go through the gpio tree, please
+give your Acked-by:, otherwise I will resend what is left after the next
+kernel release.
+
 ---
- drivers/net/usb/r8152.c   | 1 +
- include/linux/usb/r8152.h | 1 +
- 2 files changed, 2 insertions(+)
+Changes in v2:
+- Renamed new function from gpiods_multi_set_value_cansleep() to
+  gpiod_multi_set_value_cansleep()
+- Fixed typo in name of replaced function in all commit messages.
+- Picked up trailers.
+- Link to v1: https://lore.kernel.org/r/20250131-gpio-set-array-helper-v1-0-991c8ccb4d6e@baylibre.com
 
-diff --git a/drivers/net/usb/r8152.c b/drivers/net/usb/r8152.c
-index 468c73974046..e1021148d3a6 100644
---- a/drivers/net/usb/r8152.c
-+++ b/drivers/net/usb/r8152.c
-@@ -10079,6 +10079,7 @@ static const struct usb_device_id rtl8152_table[] = {
- 	{ USB_DEVICE(VENDOR_ID_NVIDIA,  0x09ff) },
- 	{ USB_DEVICE(VENDOR_ID_TPLINK,  0x0601) },
- 	{ USB_DEVICE(VENDOR_ID_DLINK,   0xb301) },
-+	{ USB_DEVICE(VENDOR_ID_DELL,    0xb097) },
- 	{ USB_DEVICE(VENDOR_ID_ASUS,    0x1976) },
- 	{}
- };
-diff --git a/include/linux/usb/r8152.h b/include/linux/usb/r8152.h
-index 33a4c146dc19..2ca60828f28b 100644
---- a/include/linux/usb/r8152.h
-+++ b/include/linux/usb/r8152.h
-@@ -30,6 +30,7 @@
- #define VENDOR_ID_NVIDIA		0x0955
- #define VENDOR_ID_TPLINK		0x2357
- #define VENDOR_ID_DLINK			0x2001
-+#define VENDOR_ID_DELL			0x413c
- #define VENDOR_ID_ASUS			0x0b05
- 
- #if IS_REACHABLE(CONFIG_USB_RTL8152)
+---
+David Lechner (13):
+      gpiolib: add gpiod_multi_set_value_cansleep()
+      auxdisplay: seg-led-gpio: use gpiod_multi_set_value_cansleep
+      bus: ts-nbus: validate ts,data-gpios array size
+      bus: ts-nbus: use gpiod_multi_set_value_cansleep
+      gpio: max3191x: use gpiod_multi_set_value_cansleep
+      iio: adc: ad7606: use gpiod_multi_set_value_cansleep
+      iio: amplifiers: hmc425a: use gpiod_multi_set_value_cansleep
+      iio: resolver: ad2s1210: use gpiod_multi_set_value_cansleep
+      mmc: pwrseq_simple: use gpiod_multi_set_value_cansleep
+      mux: gpio: use gpiod_multi_set_value_cansleep
+      net: mdio: mux-gpio: use gpiod_multi_set_value_cansleep
+      phy: mapphone-mdm6600: use gpiod_multi_set_value_cansleep
+      ASoC: adau1701: use gpiod_multi_set_value_cansleep
+
+ drivers/auxdisplay/seg-led-gpio.c           |  3 +--
+ drivers/bus/ts-nbus.c                       | 10 ++++++----
+ drivers/gpio/gpio-max3191x.c                | 18 +++++++-----------
+ drivers/iio/adc/ad7606.c                    |  3 +--
+ drivers/iio/adc/ad7606_spi.c                |  3 +--
+ drivers/iio/amplifiers/hmc425a.c            |  3 +--
+ drivers/iio/resolver/ad2s1210.c             |  8 ++------
+ drivers/mmc/core/pwrseq_simple.c            |  3 +--
+ drivers/mux/gpio.c                          |  4 +---
+ drivers/net/mdio/mdio-mux-gpio.c            |  3 +--
+ drivers/phy/motorola/phy-mapphone-mdm6600.c |  4 +---
+ include/linux/gpio/consumer.h               |  7 +++++++
+ sound/soc/codecs/adau1701.c                 |  4 +---
+ 13 files changed, 31 insertions(+), 42 deletions(-)
+---
+base-commit: df4b2bbff898227db0c14264ac7edd634e79f755
+change-id: 20250131-gpio-set-array-helper-bd4a328370d3
+
+Best regards,
 -- 
-2.39.5
+David Lechner <dlechner@baylibre.com>
 
 
