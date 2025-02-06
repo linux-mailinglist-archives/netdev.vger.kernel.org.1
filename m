@@ -1,49 +1,49 @@
-Return-Path: <netdev+bounces-163326-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-163327-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0A37AA29ECB
-	for <lists+netdev@lfdr.de>; Thu,  6 Feb 2025 03:30:08 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7B3E8A29ECC
+	for <lists+netdev@lfdr.de>; Thu,  6 Feb 2025 03:30:14 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 0796318892B9
-	for <lists+netdev@lfdr.de>; Thu,  6 Feb 2025 02:30:13 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B837D3A7E97
+	for <lists+netdev@lfdr.de>; Thu,  6 Feb 2025 02:30:04 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2955913A86C;
-	Thu,  6 Feb 2025 02:30:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8973C13D8A3;
+	Thu,  6 Feb 2025 02:30:05 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="drQBG/vS"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="VzkbqaXd"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F17DF1339A4;
-	Thu,  6 Feb 2025 02:30:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5C1B513CA93;
+	Thu,  6 Feb 2025 02:30:05 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1738809004; cv=none; b=k7Lx0FeWhDKp3GFzhZb2uNR6QutTPt+Z2RI5ujQQcFz1qksfrbZadQGoGK+tyelyMpVRFZSEBL5doKiPSPCb+oIgB0m7pN2fY9ibxggxrMdxwKCqWWuBt/mmVhh1T6ZikNPc+HDl1aEkQ9IliwcL9Zoei4bK87MB3UUEJNyXl/g=
+	t=1738809005; cv=none; b=S7YcY2thumOJvgLq2Ptjxzva+MXbKbB1ioNN2uE7mePwziEG5t5GD30Cwk0+yT3exkQL2ajON968JfCeAqzeD+mqAJN+BPnD+/mH0MOiI3tT4t7b4tSipK1tNbuayrU4wU6P5UjANUgr/Yla4Y5IHtKQdpK2lySCOWsYDouHYKk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1738809004; c=relaxed/simple;
-	bh=Z+7WwaOqoB8lbYMJl+MJRy5YxMMtQ2ceeFQLgMAAG74=;
+	s=arc-20240116; t=1738809005; c=relaxed/simple;
+	bh=GsiWg255+oQli3R2cw8dchDOAynRzKekhfvI2X34Xm0=;
 	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=Y6nYtiYKeUkTR/Ayv8sYL6DH7yp8glX5YEOApvPXjEbJ40N/Tm3ZL7qhzsoXDQEkA9LGLl8l95uzPE9zABf0X+xFrmH+8X6keSQ71v8ZHqXQjIKy6wE4XskKZM/XcwhTE3BMm4R3OZUa32mDFA/1dMnWAlIoqw54hUYYvbOk1mg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=drQBG/vS; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id AB073C4CED1;
-	Thu,  6 Feb 2025 02:30:03 +0000 (UTC)
+	 In-Reply-To:To:Cc; b=BbtHGr9/gka2amMIUbklGC8JlisYE8OcCD2Z4PovOucZZqMvKf5Tyt9MD4ICN3dxooftyJf6/RLwwo0S3tO0CzRKblGOniCMRaN8C+uoGBuK209gWYkrdX9TDrfxIVyRP2grueDJtXR+mLKodJ6X/dcDSQQc5AChQFRJ6BB/c+s=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=VzkbqaXd; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 244DCC4CED1;
+	Thu,  6 Feb 2025 02:30:05 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1738809003;
-	bh=Z+7WwaOqoB8lbYMJl+MJRy5YxMMtQ2ceeFQLgMAAG74=;
+	s=k20201202; t=1738809005;
+	bh=GsiWg255+oQli3R2cw8dchDOAynRzKekhfvI2X34Xm0=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=drQBG/vSF1o8mt2PJNCAWe02eZzTcLhv1C5UH598u+mUj6tU+D0EY/5aI1Bpvmc9I
-	 WdQKycFF7Vtm0DiCo1Cf0OJTInc8A3hzlOAk7biebWMNp+PiUGyQsWGsEWW4AbhLql
-	 u6h310XVMftOQRM10h5L3RSKjXZ2sZRf73N4trnXky0Xd6mNiUFxkrWGHf6nUhN+jT
-	 fe5JDuicI/BaSPnift4FAglPeJuVqfz3MEn+juaYHgV/tCi5Mfqs7gFqeWfYwGB1AK
-	 sZrFYpK+p24cgUaTEXIXdEW2oGirj7U5EmEJtOz/6Epnod76mfqlBzEzp1AwqTQAXq
-	 22AUTP5KnrHxw==
+	b=VzkbqaXd53htU4S+7T5KL67kPkupTG7UfP7oeDekEBsZA06M2utlHuUwtpBO42Dq7
+	 3MROnBcpdOkDSBF6zZcscYHYV0SSASWUvQCcL80ZellI09p1faJmqAr+UEPChRsC0s
+	 b7CMij3xj3GY+OmUm72AsB5T9x/s5MotnyuBJE8BipKZEJ3ukouGE3zAJEhFe2zi37
+	 WLLYp8P84GZMrQlbJCwpILwYckKKmUPIzq+UmT1yM/ziEDrPtKjWrSXF3NLbC8WCjg
+	 pUj8hBjOC4QQnR4/xVVgJ1bh0qo0PcMCBnJ5ZQwwmRsSF+HoHTJc/QUyShV4aN3ml0
+	 f/yc45GIp42uA==
 Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 717B1380AAD0;
-	Thu,  6 Feb 2025 02:30:32 +0000 (UTC)
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id EB0B0380AAD0;
+	Thu,  6 Feb 2025 02:30:33 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -52,42 +52,38 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net-next] s390/net: Remove LCS driver
+Subject: Re: [PATCH v2][next] cxgb4: Avoid a -Wflex-array-member-not-at-end
+ warning
 From: patchwork-bot+netdevbpf@kernel.org
 Message-Id: 
- <173880903129.977176.16252464144075540544.git-patchwork-notify@kernel.org>
-Date: Thu, 06 Feb 2025 02:30:31 +0000
-References: <20250204103135.1619097-1-wintera@linux.ibm.com>
-In-Reply-To: <20250204103135.1619097-1-wintera@linux.ibm.com>
-To: Alexandra Winter <wintera@linux.ibm.com>
-Cc: davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com,
- edumazet@google.com, andrew+netdev@lunn.ch, aswin@linux.ibm.com,
- netdev@vger.kernel.org, linux-s390@vger.kernel.org, hca@linux.ibm.com,
- gor@linux.ibm.com, agordeev@linux.ibm.com, borntraeger@linux.ibm.com,
- svens@linux.ibm.com, twinkler@linux.ibm.com, horms@kernel.org,
- corbet@lwn.net, oberpar@linux.ibm.com
+ <173880903266.977176.16088517272942602170.git-patchwork-notify@kernel.org>
+Date: Thu, 06 Feb 2025 02:30:32 +0000
+References: <Z6GBZ4brXYffLkt_@kspp>
+In-Reply-To: <Z6GBZ4brXYffLkt_@kspp>
+To: Gustavo A. R. Silva <gustavoars@kernel.org>
+Cc: bharat@chelsio.com, andrew+netdev@lunn.ch, davem@davemloft.net,
+ edumazet@google.com, kuba@kernel.org, pabeni@redhat.com, horms@kernel.org,
+ netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+ linux-hardening@vger.kernel.org
 
 Hello:
 
 This patch was applied to netdev/net-next.git (main)
 by Jakub Kicinski <kuba@kernel.org>:
 
-On Tue,  4 Feb 2025 11:31:35 +0100 you wrote:
-> From: Aswin Karuvally <aswin@linux.ibm.com>
+On Tue, 4 Feb 2025 13:24:31 +1030 you wrote:
+> -Wflex-array-member-not-at-end was introduced in GCC-14, and we are
+> getting ready to enable it, globally.
 > 
-> The original Open Systems Adapter (OSA) was introduced by IBM in the
-> mid-90s. These were then superseded by OSA-Express in 1999 which used
-> Queued Direct IO to greatly improve throughput. The newer cards
-> retained the older, slower non-QDIO (OSE) modes for compatibility with
-> older systems. In Linux, the lcs driver was responsible for cards
-> operating in the older OSE mode and the qeth driver was introduced to
-> allow the OSA-Express cards to operate in the newer QDIO (OSD) mode.
+> Move the conflicting declaration to the end of the structure. Notice
+> that `struct ethtool_dump` is a flexible structure --a structure that
+> contains a flexible-array member.
 > 
 > [...]
 
 Here is the summary with links:
-  - [net-next] s390/net: Remove LCS driver
-    https://git.kernel.org/netdev/net-next/c/6cccb3bb0561
+  - [v2,next] cxgb4: Avoid a -Wflex-array-member-not-at-end warning
+    https://git.kernel.org/netdev/net-next/c/863257c29fe9
 
 You are awesome, thank you!
 -- 
