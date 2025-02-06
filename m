@@ -1,158 +1,152 @@
-Return-Path: <netdev+bounces-163550-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-163551-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5138EA2AAD7
-	for <lists+netdev@lfdr.de>; Thu,  6 Feb 2025 15:14:12 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 36450A2AAEA
+	for <lists+netdev@lfdr.de>; Thu,  6 Feb 2025 15:16:10 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 391C5188787D
-	for <lists+netdev@lfdr.de>; Thu,  6 Feb 2025 14:14:16 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 5913E1889150
+	for <lists+netdev@lfdr.de>; Thu,  6 Feb 2025 14:16:14 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 528BF214A99;
-	Thu,  6 Feb 2025 14:14:05 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 541F31C701B;
+	Thu,  6 Feb 2025 14:15:57 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=unstable.cc header.i=a@unstable.cc header.b="J7sh+k75"
+	dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b="aoUpCZ7+"
 X-Original-To: netdev@vger.kernel.org
-Received: from wilbur.contactoffice.com (wilbur.contactoffice.com [212.3.242.68])
+Received: from smtp-fw-52003.amazon.com (smtp-fw-52003.amazon.com [52.119.213.152])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 26BB21EA7FD
-	for <netdev@vger.kernel.org>; Thu,  6 Feb 2025 14:14:01 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=212.3.242.68
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 99C3F3207
+	for <netdev@vger.kernel.org>; Thu,  6 Feb 2025 14:15:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=52.119.213.152
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1738851245; cv=none; b=Au3QAM3K98vNykG0OktgN7+GFfjHxQJV2HpDKHlWpjYhhHBklzBICDbTee9KkngXeQB0kAFKiqKlTyoVyd9hlEGGxwMFxDY4fD83102CZ6vqRaG/xp6h2f16W0ASlxl2BEXJPBT6abuelTR/KwvUcIIhhd2Nihy+3GxYegBc0O8=
+	t=1738851357; cv=none; b=JvnSqs04xL6hPM3BYEj8AhpX+LVL7K25zPwQB4tipsqDsm+fFP7BoDzhGpVkskdQyf/LisZ36GtyUv8n3F+mhzD62ap7xwMyGynH5cQt7/AF+P3Qm2N1uacX2wRS7kldd7Ey3zOQiKlBcOWThQ0j5ZVwUrp/tBSr3OlqwrXIoSM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1738851245; c=relaxed/simple;
-	bh=jwfMeoN8qdiK7hSweXrTVHveOh+4D8/ilaEBT0ay/Vk=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=Vo1EE3whibKm7GP/SxIeUSKkbAnM/ql5QLUyYwTlEB8dvnEVSY6nN506/ad5R3bGa1WiUVPbT63Xwr+UYx76rDODmZqEkph/y84+0saSP92X45x1qG0O5jcEkg8sUET7T+BuTLTIuh/AShMin8y63TgSHt94cfKhTR7+HlgvBKw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=unstable.cc; spf=pass smtp.mailfrom=unstable.cc; dkim=pass (2048-bit key) header.d=unstable.cc header.i=a@unstable.cc header.b=J7sh+k75; arc=none smtp.client-ip=212.3.242.68
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=unstable.cc
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=unstable.cc
-Received: from smtpauth2.co-bxl (smtpauth2.co-bxl [10.2.0.24])
-	by wilbur.contactoffice.com (Postfix) with ESMTP id C9F9D3FA5;
-	Thu,  6 Feb 2025 15:13:53 +0100 (CET)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; t=1738851233;
-	s=20220809-q8oc; d=unstable.cc; i=a@unstable.cc;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:In-Reply-To:Content-Type:Content-Transfer-Encoding;
-	bh=m+yP7O2OoLUgMMYnKp9PRAYvDDAEHKsr5IjQROK+U1U=;
-	b=J7sh+k75BnlKCJg0TBWxHaMSDEpLhXB3lp0P9/pwH8cFmSnkl18e2+zZBJ7DBpwQ
-	gZcWamBRFsuj1bHTWu/vW/qG8wwySTbd7d9Pq47f7aPAPz7T219lGBP2L6SLEKqRO3F
-	Bk+o81KkgqQSpvh4hHXNja0m0C9aKpXuSxNO3f27VRemtBXkpqlkL3K1ebj6/BJvwVq
-	9hRNvgBHQTQVmL/yv5vdVG2KcOh2C7tkM1opMjv+cvU0qbhGPALoKnKYyNmlmf4aOqv
-	M7LaAzjw4UqroY+TPvn0Akwx7q64r/OftoQUlvmiEiNfJIXAzSexOl50S9JKvvKvyz4
-	rsBHxY8OvA==
-Received: by smtp.mailfence.com with ESMTPSA ; Thu, 6 Feb 2025 15:13:51 +0100 (CET)
-Message-ID: <d729f05a-e5e6-4d67-8fe6-888e1e761b34@unstable.cc>
-Date: Thu, 6 Feb 2025 15:15:00 +0100
+	s=arc-20240116; t=1738851357; c=relaxed/simple;
+	bh=J8c55LzCeL3mmFlqrZjlAKjd50RASL5kGUs6yQxUCyQ=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=QG3hjRf2/EJgJyz0CqXRlqbZNMQU3HZlpnDa7hNtrYxvtyLtNxJIUCJNA25yLUtQorhQKne2okQcs8Js+ij2bPfixsvw+V4XfSk4uBdJXaVibM2yUew742+GgkSr+mPaItRvJpayE2IfZI++/cVszgOqha2RuK5WUFtG9rzDMV4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.com; dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b=aoUpCZ7+; arc=none smtp.client-ip=52.119.213.152
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
+  t=1738851355; x=1770387355;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=PgIUHGsBE2GyM+A+krXLAsG1E/0pULmhnJNQlJjROQE=;
+  b=aoUpCZ7+J88cvlthPX3HnuxK5i5ukEi6QjnnlOP3UWDitV1kbf+DzpKt
+   pDy6cqM4Xj9oNOqvUZA/1AZw81FqB+rJmFtFh6Ax8AWf+feMR8rUsh+Be
+   jdzGiIJA+yQbu9uCydcUTpb0cJLgESQnoETysW9Ef6I1p1R0jTQX0OCSz
+   4=;
+X-IronPort-AV: E=Sophos;i="6.13,264,1732579200"; 
+   d="scan'208";a="63688651"
+Received: from iad12-co-svc-p1-lb1-vlan3.amazon.com (HELO smtpout.prod.us-east-1.prod.farcaster.email.amazon.dev) ([10.43.8.6])
+  by smtp-border-fw-52003.iad7.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 06 Feb 2025 14:15:52 +0000
+Received: from EX19MTAUEC002.ant.amazon.com [10.0.0.204:35608]
+ by smtpin.naws.us-east-1.prod.farcaster.email.amazon.dev [10.0.30.79:2525] with esmtp (Farcaster)
+ id 48817950-537f-4404-a0f2-e70a254b07c1; Thu, 6 Feb 2025 14:15:52 +0000 (UTC)
+X-Farcaster-Flow-ID: 48817950-537f-4404-a0f2-e70a254b07c1
+Received: from EX19D008UEA004.ant.amazon.com (10.252.134.191) by
+ EX19MTAUEC002.ant.amazon.com (10.252.135.253) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1258.39;
+ Thu, 6 Feb 2025 14:15:48 +0000
+Received: from EX19MTAUEB001.ant.amazon.com (10.252.135.35) by
+ EX19D008UEA004.ant.amazon.com (10.252.134.191) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1258.39;
+ Thu, 6 Feb 2025 14:15:48 +0000
+Received: from email-imr-corp-prod-pdx-all-2b-dbd438cc.us-west-2.amazon.com
+ (10.43.8.2) by mail-relay.amazon.com (10.252.135.35) with Microsoft SMTP
+ Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id
+ 15.2.1258.39 via Frontend Transport; Thu, 6 Feb 2025 14:15:48 +0000
+Received: from HFA15-G9FV5D3.amazon.com (unknown [10.85.143.172])
+	by email-imr-corp-prod-pdx-all-2b-dbd438cc.us-west-2.amazon.com (Postfix) with ESMTP id 6D1E6A021D;
+	Thu,  6 Feb 2025 14:15:41 +0000 (UTC)
+From: David Arinzon <darinzon@amazon.com>
+To: David Miller <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>,
+	<netdev@vger.kernel.org>
+CC: David Arinzon <darinzon@amazon.com>, Eric Dumazet <edumazet@google.com>,
+	Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, "Richard
+ Cochran" <richardcochran@gmail.com>, "Woodhouse, David" <dwmw@amazon.com>,
+	"Machulsky, Zorik" <zorik@amazon.com>, "Matushevsky, Alexander"
+	<matua@amazon.com>, Saeed Bshara <saeedb@amazon.com>, "Wilson, Matt"
+	<msw@amazon.com>, "Liguori, Anthony" <aliguori@amazon.com>, "Bshara, Nafea"
+	<nafea@amazon.com>, "Schmeilin, Evgeny" <evgenys@amazon.com>, "Belgazal,
+ Netanel" <netanel@amazon.com>, "Saidi, Ali" <alisaidi@amazon.com>,
+	"Herrenschmidt, Benjamin" <benh@amazon.com>, "Kiyanovski, Arthur"
+	<akiyano@amazon.com>, "Dagan, Noam" <ndagan@amazon.com>, "Bernstein, Amit"
+	<amitbern@amazon.com>, "Agroskin, Shay" <shayagr@amazon.com>, "Abboud, Osama"
+	<osamaabb@amazon.com>, "Ostrovsky, Evgeny" <evostrov@amazon.com>, "Tabachnik,
+ Ofir" <ofirt@amazon.com>, "Machnikowski, Maciek" <maciek@machnikowski.net>,
+	Rahul Rameshbabu <rrameshbabu@nvidia.com>, Gal Pressman <gal@nvidia.com>
+Subject: [PATCH v6 net-next 0/4] PHC support in ENA driver
+Date: Thu, 6 Feb 2025 16:15:34 +0200
+Message-ID: <20250206141538.549-1-darinzon@amazon.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next] batman-adv: adopt netdev_hold() / netdev_put()
-To: Eric Dumazet <edumazet@google.com>,
- Marek Lindner <marek.lindner@mailbox.org>,
- Simon Wunderlich <sw@simonwunderlich.de>, Sven Eckelmann <sven@narfation.org>
-Cc: b.a.t.m.a.n@lists.open-mesh.org, Jakub Kicinski <kuba@kernel.org>,
- Paolo Abeni <pabeni@redhat.com>, netdev@vger.kernel.org,
- eric.dumazet@gmail.com
-References: <20250206140422.3134815-1-edumazet@google.com>
-Content-Language: en-US
-From: Antonio Quartulli <a@unstable.cc>
-In-Reply-To: <20250206140422.3134815-1-edumazet@google.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-ContactOffice-Account: com:375058688
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8bit
 
-On 06/02/2025 15:04, Eric Dumazet wrote:
-> Add a device tracker to struct batadv_hard_iface to help
-> debugging of network device refcount imbalances.
-> 
-> Signed-off-by: Eric Dumazet <edumazet@google.com>
-> ---
->   net/batman-adv/hard-interface.c | 14 +++++---------
->   net/batman-adv/types.h          |  3 +++
->   2 files changed, 8 insertions(+), 9 deletions(-)
-> 
-> diff --git a/net/batman-adv/hard-interface.c b/net/batman-adv/hard-interface.c
-> index 96a412beab2de9069c0f88e4cd844fbc0922aa18..9a3ae567eb12d0c65b25292d020462b6ad60b699 100644
-> --- a/net/batman-adv/hard-interface.c
-> +++ b/net/batman-adv/hard-interface.c
-> @@ -51,7 +51,7 @@ void batadv_hardif_release(struct kref *ref)
->   	struct batadv_hard_iface *hard_iface;
->   
->   	hard_iface = container_of(ref, struct batadv_hard_iface, refcount);
-> -	dev_put(hard_iface->net_dev);
-> +	netdev_put(hard_iface->net_dev, &hard_iface->dev_tracker);
->   
->   	kfree_rcu(hard_iface, rcu);
->   }
-> @@ -875,15 +875,16 @@ batadv_hardif_add_interface(struct net_device *net_dev)
->   	ASSERT_RTNL();
->   
->   	if (!batadv_is_valid_iface(net_dev))
-> -		goto out;
-> +		return NULL;
->   
-> -	dev_hold(net_dev);
->   
->   	hard_iface = kzalloc(sizeof(*hard_iface), GFP_ATOMIC);
->   	if (!hard_iface)
-> -		goto release_dev;
-> +		return NULL;
->   
-> +	netdev_hold(net_dev, &hard_iface->dev_tracker, GFP_ATOMIC);
->   	hard_iface->net_dev = net_dev;
-> +
->   	hard_iface->soft_iface = NULL;
->   	hard_iface->if_status = BATADV_IF_NOT_IN_USE;
->   
-> @@ -909,11 +910,6 @@ batadv_hardif_add_interface(struct net_device *net_dev)
->   	batadv_hardif_generation++;
->   
->   	return hard_iface;
-> -
-> -release_dev:
-> -	dev_put(net_dev);
-> -out:
-> -	return NULL;
->   }
->   
->   static void batadv_hardif_remove_interface(struct batadv_hard_iface *hard_iface)
-> diff --git a/net/batman-adv/types.h b/net/batman-adv/types.h
-> index f491bff8c51b8bf68eb11dbbeb1a434d446c25f0..a73fc3ab7dd28ae2c8484c0d198a15437d49ea73 100644
-> --- a/net/batman-adv/types.h
-> +++ b/net/batman-adv/types.h
-> @@ -186,6 +186,9 @@ struct batadv_hard_iface {
->   	/** @net_dev: pointer to the net_device */
->   	struct net_device *net_dev;
->   
-> +	/** @dev_tracker device tracker for @net_dev */
-> +	netdevice_tracker  dev_tracker;
+Changes in v6:
+- Remove PHC error bound
 
-There are two blanks between type and member name. Is that intended?
+Changes in v5 (https://lore.kernel.org/netdev/20250122102040.752-1-darinzon@amazon.com/):
+- Add PHC error bound
+- Add PHC enablement and error bound retrieval through sysfs
 
-> +
->   	/** @refcount: number of contexts the object is used */
->   	struct kref refcount;
->   
+Changes in v4 (https://lore.kernel.org/netdev/20241114095930.200-1-darinzon@amazon.com/):
+- Minor documentation change (resolution instead of accuracy)
 
-We also have hard_iface->soft_iface storing a pointer to the soft_iface 
-(batX) netdev.
+Changes in v3 (https://lore.kernel.org/netdev/20241103113140.275-1-darinzon@amazon.com/):
+- Resolve a compilation error
 
-How about converting that to netdev_put/hold as well?
-See batadv_hardif_enable_interface() / batadv_hardif_disable_interface()
+Changes in v2 (https://lore.kernel.org/netdev/20241031085245.18146-1-darinzon@amazon.com/):
+- CCd PTP maintainer
+- Fixed style issues
+- Fixed documentation warning
+
+v1 (https://lore.kernel.org/netdev/20241021052011.591-1-darinzon@amazon.com/)
+
+This patchset adds the support for PHC (PTP Hardware Clock)
+in the ENA driver. The documentation part of the patchset
+includes additional information, including statistics,
+utilization and invocation examples through the testptp
+utility.
 
 
-Best Regards,
+David Arinzon (4):
+  net: ena: Add PHC support in the ENA driver
+  net: ena: PHC silent reset
+  net: ena: Add PHC documentation
+  net: ena: PHC enable through sysfs
 
+ .../device_drivers/ethernet/amazon/ena.rst    |  90 +++++++
+ drivers/net/ethernet/amazon/Kconfig           |   1 +
+ drivers/net/ethernet/amazon/ena/Makefile      |   2 +-
+ .../net/ethernet/amazon/ena/ena_admin_defs.h  |  63 ++++-
+ drivers/net/ethernet/amazon/ena/ena_com.c     | 247 ++++++++++++++++++
+ drivers/net/ethernet/amazon/ena/ena_com.h     |  83 ++++++
+ drivers/net/ethernet/amazon/ena/ena_ethtool.c | 102 ++++++--
+ drivers/net/ethernet/amazon/ena/ena_netdev.c  |  44 +++-
+ drivers/net/ethernet/amazon/ena/ena_netdev.h  |   6 +
+ drivers/net/ethernet/amazon/ena/ena_phc.c     | 230 ++++++++++++++++
+ drivers/net/ethernet/amazon/ena/ena_phc.h     |  37 +++
+ .../net/ethernet/amazon/ena/ena_regs_defs.h   |   8 +
+ drivers/net/ethernet/amazon/ena/ena_sysfs.c   |  83 ++++++
+ drivers/net/ethernet/amazon/ena/ena_sysfs.h   |  28 ++
+ 14 files changed, 995 insertions(+), 29 deletions(-)
+ create mode 100644 drivers/net/ethernet/amazon/ena/ena_phc.c
+ create mode 100644 drivers/net/ethernet/amazon/ena/ena_phc.h
+ create mode 100644 drivers/net/ethernet/amazon/ena/ena_sysfs.c
+ create mode 100644 drivers/net/ethernet/amazon/ena/ena_sysfs.h
 
 -- 
-Antonio Quartulli
+2.47.1
 
 
