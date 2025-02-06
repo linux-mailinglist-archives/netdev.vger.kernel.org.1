@@ -1,79 +1,63 @@
-Return-Path: <netdev+bounces-163389-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-163390-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 00337A2A1A9
-	for <lists+netdev@lfdr.de>; Thu,  6 Feb 2025 07:58:49 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 9082AA2A1B3
+	for <lists+netdev@lfdr.de>; Thu,  6 Feb 2025 08:02:16 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id BD9B71887282
-	for <lists+netdev@lfdr.de>; Thu,  6 Feb 2025 06:58:54 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id B43E31888970
+	for <lists+netdev@lfdr.de>; Thu,  6 Feb 2025 07:02:20 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1A543224AFD;
-	Thu,  6 Feb 2025 06:58:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 465CD224AEF;
+	Thu,  6 Feb 2025 07:02:08 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=daynix-com.20230601.gappssmtp.com header.i=@daynix-com.20230601.gappssmtp.com header.b="vmnDxC7G"
+	dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b="Yp060fIw"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f172.google.com (mail-pl1-f172.google.com [209.85.214.172])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mx0b-0031df01.pphosted.com (mx0b-0031df01.pphosted.com [205.220.180.131])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 973CF22489A
-	for <netdev@vger.kernel.org>; Thu,  6 Feb 2025 06:58:41 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.172
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 61B961FDE08;
+	Thu,  6 Feb 2025 07:02:06 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.180.131
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1738825124; cv=none; b=A9NoizOPlWesoM0ILZkVjR1qHhhHYPastvemzy3+uThvNT7zOdGlHhHq/bAwxQ7/GMePbqASCMncPwo6BEHJ5U47aI5VsXqkMeUnYomsSdZt72oTUL0KTKohPXBlI0gxjbsxJM5QtLaReI2n3za746kTlMcXsg47wk3/JHC/ZNk=
+	t=1738825328; cv=none; b=okfjyiRjOWXr+x2mgB4qYxh9TmAFI0vb7myIsNdqhAWJmRxa++49Dv8M0fGkNHlYYkG1jhWRLpJ10FE9ypNi9Kb4QTgJ+Xg54fUcH3YCoyE7NbYe/28R/qr/kNDejHCiDIRz71KVmA+MdTztAiAQPHmKICQPLRmXkJGHlt+nhSs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1738825124; c=relaxed/simple;
-	bh=og3Aq1IjApPzY4pBlRJEpp2monYtKZMRFoZcCbo2WO8=;
-	h=Message-ID:Date:MIME-Version:Subject:To:References:From:
-	 In-Reply-To:Content-Type; b=tlkJBtsQuERap5q+LikrULbXOvEmAuklf0cI23njRik0jNmvwa2V+ZvEsDCI2IHR9elg0+Tyow7+Sx8HNbZeUcLqLD6eGa1pfBzNcAIK8iVOLZuMubs8OB3bX4LWh0fXb8QLp8oYc8DispNsHvRmlhcglCZfX5LQ05c045Gtozk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=daynix.com; spf=pass smtp.mailfrom=daynix.com; dkim=pass (2048-bit key) header.d=daynix-com.20230601.gappssmtp.com header.i=@daynix-com.20230601.gappssmtp.com header.b=vmnDxC7G; arc=none smtp.client-ip=209.85.214.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=daynix.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=daynix.com
-Received: by mail-pl1-f172.google.com with SMTP id d9443c01a7336-2164b662090so11591955ad.1
-        for <netdev@vger.kernel.org>; Wed, 05 Feb 2025 22:58:41 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=daynix-com.20230601.gappssmtp.com; s=20230601; t=1738825121; x=1739429921; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:to:subject:user-agent:mime-version:date:message-id:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=MfkFHRY4BuNO95W0YyldJMDcWeJ1g/mRAGw+u9+CPB0=;
-        b=vmnDxC7Gxchxw1LtQ3i7bSdlDrG0ebeWraoMP4rauxsI9uiJ5x+WxrDyHSIEWhrb0p
-         wjraVaFlMkv16b6IYjG27lol78/n506Ws//dWuJ4sPiUyma+6x3CiRJVc7ZjhHFeEneU
-         yA5j0VaFe53ATkXIMJJ8zr1nAuQT1R2TpUOwnainI2C6d7kh4p4AmArZOLGoJ197SCFs
-         ngwx3rOENpKJlGX2wy8DLXNzl8vDSmoNgSBWiI3zfDp7FyKrxW9qDdhRXo4i61+y8DFm
-         kkfGhfHGGr3rrXObj5zbMB/3FQTxXVU397KqaGCwtPQKG0Qcs+9FdemWZTsf+yuamk0/
-         Hpgg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1738825121; x=1739429921;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=MfkFHRY4BuNO95W0YyldJMDcWeJ1g/mRAGw+u9+CPB0=;
-        b=C2mFPX0b2c6tEzgggkVEmCbeI1Iwf3ndodnQ2e33ICKupSRwyKTPUL4NU/OauTEwZC
-         kJtwIUX5wKkiSwhG2wS7vJBQlWPrQBNCSicvo8Ci2N4Jk6CUmuYX58zeRE/+RU0KuzL6
-         AayX/hDDRbZoOlUeQmkFxl4UfEBCVwAMO8AB/ZHDB5gnfuSbV1kc19goOO4DulPAmw/L
-         krT7al4qULZKwKOgoniQ+WqNjUk7+unNYid1ImJGBDsPgbbEhqhMX2neOEpv7bmuoaoT
-         vPduqF/3vyXIWXpVXUJc/a2D22fAvKBq41dhkwe3HcOSzBSkKcyEZwLVcIkmOJBcOazE
-         b7IQ==
-X-Forwarded-Encrypted: i=1; AJvYcCWyiIOcIWcO152OsqHjAIdSYIORuKtnvKESBw++FPPK11wQhlGWt09thMh/pi8eGH3+EwCjtzU=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwPFMDnc9/NleUO/B/3rb1BBZ9UAhZgxgvUD6mVGWWtH34UDDm9
-	GVgeb4aPNZ3W9epjHNV46Dho/ktSOt1CsuolsI1qSdISZ/YGM5meeWhJQwPn6i0=
-X-Gm-Gg: ASbGncsyei9R+ExUuXessO+5mMGuoNGS7kGKuexDyk3kpU2u5ZG2/HbqbNBJkOUm+mz
-	u/kGwgRXgScffLYXNiCNp3ebirXzf8iFiTX4rCpgZJU2aAWDFC0Sdr/3K5dciGyFRgOGrbBESDV
-	7j7DO9mtwSXVfnu4UnIguurHWHSBbbrSTlPqxN4BKM69kf2Q47gfWxUwNNYvdBCerl3Gol+ilnM
-	+S/CDDXb1Hg9DILcbPJuGPCw/dDcgDiozC0vbSXxdqidm3TAhM0FGhl6bd4yqqtOcIUCAMElNLE
-	SZNuweL+nQllzxsUufpBo0sMPQgP
-X-Google-Smtp-Source: AGHT+IHSHvbDEBE36nUTLqiZtQMOf3j/rI2OoIwM0kMRTh5vyxMjVD4DwGY5i/68BnM7I5tCX5GUew==
-X-Received: by 2002:a05:6a21:1805:b0:1ed:a6d7:3c07 with SMTP id adf61e73a8af0-1ede881f0b3mr9719443637.4.1738825121065;
-        Wed, 05 Feb 2025 22:58:41 -0800 (PST)
-Received: from [157.82.207.107] ([157.82.207.107])
-        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-73048ad292dsm590546b3a.61.2025.02.05.22.58.35
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 05 Feb 2025 22:58:40 -0800 (PST)
-Message-ID: <1c2a1bd6-9ce9-47d8-b89d-1a647575ce07@daynix.com>
-Date: Thu, 6 Feb 2025 15:58:34 +0900
+	s=arc-20240116; t=1738825328; c=relaxed/simple;
+	bh=2GiFkygq3de9GLjZ4hEtVqwNNmejJsX0fXM8BEvQD+4=;
+	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
+	 In-Reply-To:Content-Type; b=RPLpLRKuMwGNw4jCBX6WUyHlZaQQAd7ryeF2Kl3xS+NRKFzoWJj4BVKSPKCYXkrSKdJKaXzjIWNMXoYxkR/gKnoE2BplmkIHUNflt9j3QH5rogqwe8SLM5innFJfY+PU2mQagOAOhwc7QHYOnltKVitfcifGMCR55Je3idMeUIU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com; spf=pass smtp.mailfrom=quicinc.com; dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b=Yp060fIw; arc=none smtp.client-ip=205.220.180.131
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=quicinc.com
+Received: from pps.filterd (m0279873.ppops.net [127.0.0.1])
+	by mx0a-0031df01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 515J0TJv031638;
+	Thu, 6 Feb 2025 07:01:46 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=quicinc.com; h=
+	cc:content-transfer-encoding:content-type:date:from:in-reply-to
+	:message-id:mime-version:references:subject:to; s=qcppdkim1; bh=
+	ZrAPzN3R+g1+r+81eLhRZv0SycNO8ZdkZdwOO3LB4P0=; b=Yp060fIwEXZ2Lmia
+	I6xC/YsvbTDluwBhMfCfrp2hjbbBVCu8BlrYf7D12R1+/z/0KMJGO8jox3N5Xe5e
+	Q1QqKHaOvy2aLbSLhA+Mr6/5AvuMjLuaqRhtnq6IFN0ZcNA/KhH/GXPlm8+sSh5k
+	tPpcayFuwe7TGdxLouIxrWMpnnt5HUkqfElJXDiVySnzqOz9x2N/yrpc3erJsTeW
+	XhF+NltzsWBqcVy5QDRhTLAZ/Ie7nJOu2au2uKuQXzFB1ha+88JBb0vIrgT9dt9u
+	DX8lcAmoFPJ5xO8kZtiKqmTLM2/mNgFNGEFsg+FGFxOO7cYNA1RUvKHxkO2PxfWy
+	6ZXQOg==
+Received: from nalasppmta02.qualcomm.com (Global_NAT1.qualcomm.com [129.46.96.20])
+	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 44mds2hbb4-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Thu, 06 Feb 2025 07:01:46 +0000 (GMT)
+Received: from nalasex01a.na.qualcomm.com (nalasex01a.na.qualcomm.com [10.47.209.196])
+	by NALASPPMTA02.qualcomm.com (8.18.1.2/8.18.1.2) with ESMTPS id 51671i9h019165
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Thu, 6 Feb 2025 07:01:44 GMT
+Received: from [10.152.195.140] (10.80.80.8) by nalasex01a.na.qualcomm.com
+ (10.47.209.196) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.9; Wed, 5 Feb 2025
+ 23:01:36 -0800
+Message-ID: <1cac47ba-f33d-4d2b-8808-c56012b5bbaf@quicinc.com>
+Date: Thu, 6 Feb 2025 12:31:33 +0530
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -81,61 +65,81 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next v5 5/7] tun: Extract the vnet handling code
-To: Willem de Bruijn <willemdebruijn.kernel@gmail.com>,
- Jonathan Corbet <corbet@lwn.net>, Jason Wang <jasowang@redhat.com>,
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- "Michael S. Tsirkin" <mst@redhat.com>, Xuan Zhuo
- <xuanzhuo@linux.alibaba.com>, Shuah Khan <shuah@kernel.org>,
- linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org,
- netdev@vger.kernel.org, kvm@vger.kernel.org,
- virtualization@lists.linux-foundation.org, linux-kselftest@vger.kernel.org,
- Yuri Benditovich <yuri.benditovich@daynix.com>,
- Andrew Melnychenko <andrew@daynix.com>,
- Stephen Hemminger <stephen@networkplumber.org>, gur.stavi@huawei.com,
- devel@daynix.com
-References: <20250205-tun-v5-0-15d0b32e87fa@daynix.com>
- <20250205-tun-v5-5-15d0b32e87fa@daynix.com>
- <67a3d44d44f12_170d392947c@willemb.c.googlers.com.notmuch>
+Subject: Re: [PATCH v8 5/7] clk: qcom: Add NSS clock Controller driver for
+ IPQ9574
+To: Konrad Dybcio <konrad.dybcio@oss.qualcomm.com>,
+        Dmitry Baryshkov
+	<dmitry.baryshkov@linaro.org>
+CC: <andersson@kernel.org>, <mturquette@baylibre.com>, <sboyd@kernel.org>,
+        <robh@kernel.org>, <krzk+dt@kernel.org>, <conor+dt@kernel.org>,
+        <konradybcio@kernel.org>, <catalin.marinas@arm.com>, <will@kernel.org>,
+        <p.zabel@pengutronix.de>, <richardcochran@gmail.com>,
+        <geert+renesas@glider.be>, <angelogioacchino.delregno@collabora.com>,
+        <neil.armstrong@linaro.org>, <arnd@arndb.de>,
+        <nfraprado@collabora.com>, <quic_anusha@quicinc.com>,
+        <linux-arm-msm@vger.kernel.org>, <linux-clk@vger.kernel.org>,
+        <devicetree@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
+        <linux-arm-kernel@lists.infradead.org>, <netdev@vger.kernel.org>,
+        <quic_srichara@quicinc.com>, <quic_varada@quicinc.com>
+References: <20241025035520.1841792-1-quic_mmanikan@quicinc.com>
+ <20241025035520.1841792-6-quic_mmanikan@quicinc.com>
+ <jhykmuvgltvuqf74evvenbagmftam2gaeoknuq5msxop4mkh65@dya6vvqytfcx>
+ <21365836-aa06-4269-885c-591f43e2e5fc@quicinc.com>
+ <befd6574-b9f0-4483-a767-684a729cfde0@oss.qualcomm.com>
 Content-Language: en-US
-From: Akihiko Odaki <akihiko.odaki@daynix.com>
-In-Reply-To: <67a3d44d44f12_170d392947c@willemb.c.googlers.com.notmuch>
-Content-Type: text/plain; charset=UTF-8; format=flowed
+From: Manikanta Mylavarapu <quic_mmanikan@quicinc.com>
+In-Reply-To: <befd6574-b9f0-4483-a767-684a729cfde0@oss.qualcomm.com>
+Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: nasanex01a.na.qualcomm.com (10.52.223.231) To
+ nalasex01a.na.qualcomm.com (10.47.209.196)
+X-QCInternal: smtphost
+X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=5800 signatures=585085
+X-Proofpoint-ORIG-GUID: WdhfDpuHSihYg8CzZyg0zXeFFz5NP4Q0
+X-Proofpoint-GUID: WdhfDpuHSihYg8CzZyg0zXeFFz5NP4Q0
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1057,Hydra:6.0.680,FMLib:17.12.68.34
+ definitions=2025-02-06_01,2025-02-05_03,2024-11-22_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 lowpriorityscore=0 mlxscore=0
+ spamscore=0 adultscore=0 mlxlogscore=709 bulkscore=0 malwarescore=0
+ impostorscore=0 clxscore=1011 suspectscore=0 phishscore=0
+ priorityscore=1501 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.19.0-2501170000 definitions=main-2502060057
 
-On 2025/02/06 6:12, Willem de Bruijn wrote:
-> Akihiko Odaki wrote:
->> The vnet handling code will be reused by tap.
+
+
+On 12/30/2024 8:18 PM, Konrad Dybcio wrote:
+> On 28.10.2024 7:25 AM, Manikanta Mylavarapu wrote:
 >>
->> Signed-off-by: Akihiko Odaki <akihiko.odaki@daynix.com>
->> ---
->>   MAINTAINERS            |   2 +-
->>   drivers/net/tun.c      | 179 +----------------------------------------------
->>   drivers/net/tun_vnet.h | 184 +++++++++++++++++++++++++++++++++++++++++++++++++
->>   3 files changed, 187 insertions(+), 178 deletions(-)
+>>
+>> On 10/25/2024 11:21 AM, Dmitry Baryshkov wrote:
+>>> On Fri, Oct 25, 2024 at 09:25:18AM +0530, Manikanta Mylavarapu wrote:
+>>>> From: Devi Priya <quic_devipriy@quicinc.com>
+>>>>
+>>>> Add Networking Sub System Clock Controller(NSSCC) driver for ipq9574 based
+>>>> devices.
+>>>>
+>>>> Reported-by: kernel test robot <lkp@intel.com>
+>>>> Closes: https://lore.kernel.org/oe-kbuild-all/202410101431.tjpSRNTY-lkp@intel.com/
+>>>
+>>> These tags are incorrect. Please read the text of the email that you've
+>>> got.
+>>
+>> Added these tags since the dependent patch [1] was included in v8.
+>> Please let me know if this should be removed.
 > 
->> -static inline bool tun_legacy_is_little_endian(unsigned int flags)
->> -{
->> -	return !(IS_ENABLED(CONFIG_TUN_VNET_CROSS_LE) &&
->> -		 (flags & TUN_VNET_BE)) &&
->> -		virtio_legacy_is_little_endian();
->> -}
+> These tags are useful when you submit a faulty patch, it gets merged
+> quickly, and only then the robot reports it. In that situation, you
+> would be expected to send a fix, including these tags to credit the
+> robot for catching the issue.
 > 
->> +static inline bool tun_vnet_legacy_is_little_endian(unsigned int flags)
->> +{
->> +	return !(IS_ENABLED(CONFIG_TUN_VNET_CROSS_LE) &&
->> +		 (flags & TUN_VNET_BE)) &&
->> +		virtio_legacy_is_little_endian();
->> +}
-> 
-> In general LGTM. But why did you rename functions while moving them?
-> Please add an explanation in the commit message for any non obvious
-> changes like that.
+> Here, your patches haven't been merged yet, so it's not applicable.
 
-I renamed them to clarify they are in a distinct, decoupled part of 
-code. It was obvious in the previous version as they are static 
-functions contained in a translation unit, but now they are part of a 
-header file so I'm clarifying that with this rename. I will add this 
-explanation to the commit message.
+Hi Konrad,
+
+I apologize for the delay. I will remove the tags and post the next version.
+
+Thanks & Regards,
+Manikanta.
+
 
