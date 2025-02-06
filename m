@@ -1,243 +1,390 @@
-Return-Path: <netdev+bounces-163513-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-163515-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 97CE3A2A88A
-	for <lists+netdev@lfdr.de>; Thu,  6 Feb 2025 13:32:35 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 65A18A2A8B8
+	for <lists+netdev@lfdr.de>; Thu,  6 Feb 2025 13:46:00 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id F23CC18893ED
-	for <lists+netdev@lfdr.de>; Thu,  6 Feb 2025 12:32:38 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 71F227A20DB
+	for <lists+netdev@lfdr.de>; Thu,  6 Feb 2025 12:45:04 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B7F2422E3FC;
-	Thu,  6 Feb 2025 12:32:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="II48N7hC"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A0B3722DFA7;
+	Thu,  6 Feb 2025 12:45:54 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from metis.whiteo.stw.pengutronix.de (metis.whiteo.stw.pengutronix.de [185.203.201.7])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D352522DFBE
-	for <netdev@vger.kernel.org>; Thu,  6 Feb 2025 12:32:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 865FA21CFF7
+	for <netdev@vger.kernel.org>; Thu,  6 Feb 2025 12:45:51 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.203.201.7
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1738845131; cv=none; b=XPAWQgLlRpBC28y2O9gH/oiRWfdi387vRD6EDURHwiWHhKTA28WrIkDkOFzBFGEoiL4B0dlnTiMG0Do3cOl4QNKZjmfb0r3ymS6s7G5lSHeHit+FObglyYlNLG73lb6aP5SXEOuhcZDFj4BZzaCEVxMBlSJg+mHZ14LEiGmwnBc=
+	t=1738845954; cv=none; b=Y7grAEm0YEeULCqcr9vmtf4c6dfgscI/McEOzw7BCzSRf38Cw61twxqSRiWaZcWVZTYkb6CwTvVLXl9o4C+4+/kPomI7HYv99kNYKdipfuCRbAjlUbnRsuZesx/gq7jyG25hXH7JpT1IVZwCodsa5OJOQlNJFui7emcScQ2BXFc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1738845131; c=relaxed/simple;
-	bh=D6rSv5QJt8rljmi1u+LhaGbvWVdAvFOUbjBSD9nJTkE=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version:Content-Type; b=ccb841ZBi4Fq2G5zRSt8zyfBfC8fz2GeeNp0lh/x970NKZ/sJT8fsgeJmVwNlzb8gimN60S2cqmx3S+1kINLcPJ843SWYXFp9/i/Jn90Z5kILy4tG40w+4Wmhznc2UL0QnbqumAK9mKwkGIdqFWBMV9QTmlkbHObw10edmN3I/I=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=II48N7hC; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1738845128;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding;
-	bh=K1Qok3qY+Sgc1nq8fGNVOEuzrOY5wRE4ZSW4ewvvA58=;
-	b=II48N7hCv097474MAjEq8Vm35XaFOhCwtK3aluMzhLI1QgZAo5VLaPaWh6o3Fnq2HMyrx+
-	OzA+BtDOwiRAsmQ0o3vs2+DnvwgaZZGrgCe2rdCms2+K7axuGSgSMFc6hvsLS8e9cGSr3/
-	l+2Mgdt/Swbjnc8sFt+5wV5PrIn7lQs=
-Received: from mx-prod-mc-04.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
- relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-63-_goKTm1ENwuqRiiM2bRrZw-1; Thu,
- 06 Feb 2025 07:32:03 -0500
-X-MC-Unique: _goKTm1ENwuqRiiM2bRrZw-1
-X-Mimecast-MFC-AGG-ID: _goKTm1ENwuqRiiM2bRrZw
-Received: from mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.111])
+	s=arc-20240116; t=1738845954; c=relaxed/simple;
+	bh=kghRt7GzMORt+txKdgQ0nTzbjr8JoGelsjiQ9A3NIXc=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=HS4YLTLhx2ODSQCzYcUnrYyunwC438YDBSUMaCzKP2n8zlCJ5BynNP/CZ7MPjbvqEwH01DdMGr2oVzIFXp0giX7fOpz0/OfGbb8PzrmBT3oeUrW3MNHmdo0xEj4w0YHGWPpYlN7c+X9Oesc+loFS8+ts6QEBAKBPhAZAyZgVM7s=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de; spf=pass smtp.mailfrom=pengutronix.de; arc=none smtp.client-ip=185.203.201.7
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=pengutronix.de
+Received: from drehscheibe.grey.stw.pengutronix.de ([2a0a:edc0:0:c01:1d::a2])
+	by metis.whiteo.stw.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
+	(Exim 4.92)
+	(envelope-from <mkl@pengutronix.de>)
+	id 1tg1G5-0004Rm-RI; Thu, 06 Feb 2025 13:45:29 +0100
+Received: from moin.white.stw.pengutronix.de ([2a0a:edc0:0:b01:1d::7b] helo=bjornoya.blackshift.org)
+	by drehscheibe.grey.stw.pengutronix.de with esmtps  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.96)
+	(envelope-from <mkl@pengutronix.de>)
+	id 1tg1G5-003oDb-0r;
+	Thu, 06 Feb 2025 13:45:29 +0100
+Received: from pengutronix.de (pd9e59fec.dip0.t-ipconnect.de [217.229.159.236])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mx-prod-mc-04.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 0FA401955DD0;
-	Thu,  6 Feb 2025 12:32:02 +0000 (UTC)
-Received: from gerbillo.redhat.com (unknown [10.44.32.200])
-	by mx-prod-int-08.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id E0CE01800352;
-	Thu,  6 Feb 2025 12:31:59 +0000 (UTC)
-From: Paolo Abeni <pabeni@redhat.com>
-To: torvalds@linux-foundation.org
-Cc: kuba@kernel.org,
-	davem@davemloft.net,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: [GIT PULL] Networking for v6.14-rc2
-Date: Thu,  6 Feb 2025 13:31:06 +0100
-Message-ID: <20250206123106.37283-1-pabeni@redhat.com>
+	 key-exchange ECDHE (prime256v1) server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(Client did not present a certificate)
+	(Authenticated sender: mkl-all@blackshift.org)
+	by smtp.blackshift.org (Postfix) with ESMTPSA id DE0DB3BB4C0;
+	Thu, 06 Feb 2025 12:45:28 +0000 (UTC)
+Date: Thu, 6 Feb 2025 13:45:27 +0100
+From: Marc Kleine-Budde <mkl@pengutronix.de>
+To: Stefan =?utf-8?B?TcOkdGpl?= <stefan.maetje@esd.eu>
+Cc: Vincent Mailhol <mailhol.vincent@wanadoo.fr>, 
+	Frank Jungclaus <frank.jungclaus@esd.eu>, linux-can@vger.kernel.org, Simon Horman <horms@kernel.org>, 
+	netdev@vger.kernel.org
+Subject: Re: [PATCH 1/1] can: esd_usb: Fix not detecting version reply in
+ probe routine
+Message-ID: <20250206-wild-masked-hoatzin-b194e1-mkl@pengutronix.de>
+References: <20250203145810.1286331-1-stefan.maetje@esd.eu>
+ <20250203145810.1286331-2-stefan.maetje@esd.eu>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.111
+Content-Type: multipart/signed; micalg=pgp-sha512;
+	protocol="application/pgp-signature"; boundary="vaw6nh53tkwvlyt2"
+Content-Disposition: inline
+In-Reply-To: <20250203145810.1286331-2-stefan.maetje@esd.eu>
+X-SA-Exim-Connect-IP: 2a0a:edc0:0:c01:1d::a2
+X-SA-Exim-Mail-From: mkl@pengutronix.de
+X-SA-Exim-Scanned: No (on metis.whiteo.stw.pengutronix.de); SAEximRunCond expanded to false
+X-PTX-Original-Recipient: netdev@vger.kernel.org
 
-Hi Linus!
 
-Interestingly the recent kmemleak improvements allowed our CI to
-catch a couple of percpu leaks addressed here.
-We (mostly Jakub, to be accurate) are working to increase review
-coverage over the net code-base tweaking the MAINTAINER entries.
+--vaw6nh53tkwvlyt2
+Content-Type: text/plain; protected-headers=v1; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [PATCH 1/1] can: esd_usb: Fix not detecting version reply in
+ probe routine
+MIME-Version: 1.0
 
-The following changes since commit c2933b2befe25309f4c5cfbea0ca80909735fd76:
+On 03.02.2025 15:58:10, Stefan M=C3=A4tje wrote:
+> This patch fixes some problems in the esd_usb_probe routine that render
+> the CAN interface unusable.
+>=20
+> The probe routine sends a version request message to the USB device to
+> receive a version reply with the number of CAN ports and the hard-
+> & firmware versions. Then for each CAN port a CAN netdev is registered.
+>=20
+> The previous code assumed that the version reply would be received
+> immediately. But if the driver was reloaded without power cycling the
+> USB device (i. e. on a reboot) there could already be other incoming
+> messages in the USB buffers. These would be in front of the version
+> reply and need to be skipped.
+>=20
+> In the previous code these problems were present:
+> - Only one usb_bulk_msg() read was done into a buffer of
+>   sizeof(union esd_usb_msg) which is smaller than ESD_USB_RX_BUFFER_SIZE
+>   which could lead to an overflow error from the USB stack.
+> - The first bytes of the received data were taken without checking for
+>   the message type. This could lead to zero detected CAN interfaces.
+> - On kmalloc() fail for the "union esd_usb_msg msg" (i. e. msg =3D=3D NUL=
+L)
+>   kfree() would be called with this NULL pointer.
+>=20
+> To mitigate these problems:
+> - Use a transfer buffer "buf" with ESD_USB_RX_BUFFER_SIZE.
+> - Fix the error exit path taken after allocation failure for the
+>   transfer buffer.
+> - Added a function esd_usb_recv_version() that reads and skips incoming
+>   "esd_usb_msg" messages until a version reply message is found. This
+>   is evaluated to return the count of CAN ports and version information.
+>=20
+> Fixes: 80662d943075 ("can: esd_usb: Add support for esd CAN-USB/3")
+> Signed-off-by: Stefan M=C3=A4tje <stefan.maetje@esd.eu>
+> ---
+>  drivers/net/can/usb/esd_usb.c | 122 +++++++++++++++++++++++++---------
+>  1 file changed, 92 insertions(+), 30 deletions(-)
+>=20
+> diff --git a/drivers/net/can/usb/esd_usb.c b/drivers/net/can/usb/esd_usb.c
+> index 03ad10b01867..a6b3b100f8ac 100644
+> --- a/drivers/net/can/usb/esd_usb.c
+> +++ b/drivers/net/can/usb/esd_usb.c
+> @@ -625,17 +625,86 @@ static int esd_usb_send_msg(struct esd_usb *dev, un=
+ion esd_usb_msg *msg)
+>  			    1000);
+>  }
+> =20
+> -static int esd_usb_wait_msg(struct esd_usb *dev,
+> -			    union esd_usb_msg *msg)
+> +static int esd_usb_req_version(struct esd_usb *dev, void *buf)
+> +{
+> +	union esd_usb_msg *msg =3D buf;
+> +
+> +	msg->hdr.cmd =3D ESD_USB_CMD_VERSION;
+> +	msg->hdr.len =3D sizeof(struct esd_usb_version_msg) / sizeof(u32); /* #=
+ of 32bit words */
+> +	msg->version.rsvd =3D 0;
+> +	msg->version.flags =3D 0;
+> +	msg->version.drv_version =3D 0;
+> +
+> +	return esd_usb_send_msg(dev, msg);
+> +}
+> +
+> +static int esd_usb_recv_version(struct esd_usb *dev,
+> +				void *rx_buf,
+> +				u32 *version,
+> +				int *net_count)
 
-  Merge tag 'net-6.14-rc1' of git://git.kernel.org/pub/scm/linux/kernel/git/netdev/net (2025-01-30 12:24:20 -0800)
+static int esd_usb_recv_version(struct esd_usb *dev, void *rx_buf,
+				u32 *version, int *net_count)
 
-are available in the Git repository at:
+>  {
+>  	int actual_length;
+> +	int cnt_other =3D 0;
+> +	int cnt_ts =3D 0;
+> +	int cnt_vs =3D 0;
+> +	int attempt;
+> +	int pos;
+> +	int err;
 
-  git://git.kernel.org/pub/scm/linux/kernel/git/netdev/net.git net-6.14-rc2
+Try to reduce the scope of the variables and move them into the for-loop.
 
-for you to fetch changes up to 2a64c96356c87aa8af826605943e5524bf45e24d:
+> =20
+> -	return usb_bulk_msg(dev->udev,
+> -			    usb_rcvbulkpipe(dev->udev, 1),
+> -			    msg,
+> -			    sizeof(*msg),
+> -			    &actual_length,
+> -			    1000);
+> +	for (attempt =3D 0; attempt < 8 && cnt_vs =3D=3D 0; ++attempt) {
 
-  Revert "net: stmmac: Specify hardware capability value when FIFO size isn't specified" (2025-02-06 11:53:54 +0100)
+Can you create a #define for the "8" to avoid a magic number here?
 
-----------------------------------------------------------------
-Current release - regressions:
+> +		err =3D usb_bulk_msg(dev->udev,
+> +				   usb_rcvbulkpipe(dev->udev, 1),
+> +				   rx_buf,
+> +				   ESD_USB_RX_BUFFER_SIZE,
+> +				   &actual_length,
+> +				   1000);
+> +		if (err)
+> +			break;
 
-  - core: harmonize tstats and dstats
+nitpick: I would make it explicit with "goto bail", should be the same?
 
-  - ipv6: fix dst refleaks in rpl, seg6 and ioam6 lwtunnels
+> +
+> +		err =3D -ENOENT;
+> +		pos =3D 0;
+> +		while (pos < actual_length) {
+> +			union esd_usb_msg *p_msg;
+> +
+> +			p_msg =3D (union esd_usb_msg *)(rx_buf + pos);
+> +
+> +			switch (p_msg->hdr.cmd) {
+> +			case ESD_USB_CMD_VERSION:
+> +				++cnt_vs;
+> +				*net_count =3D (int)p_msg->version_reply.nets;
 
-  - eth: tun: revert fix group permission check
+Cast not needed.
 
-  - eth: stmmac: revert "specify hardware capability value when FIFO size isn't specified"
+What happens if nets is > 2? Please sanitize input from outside against
+ESD_USB_MAX_NETS.
 
-Previous releases - regressions:
+> +				*version =3D le32_to_cpu(p_msg->version_reply.version);
+> +				err =3D 0;
+> +				dev_dbg(&dev->udev->dev, "TS 0x%08x, V 0x%08x, N %u, F 0x%02x, %.16s=
+\n",
+> +					le32_to_cpu(p_msg->version_reply.ts),
+> +					le32_to_cpu(p_msg->version_reply.version),
+> +					p_msg->version_reply.nets,
+> +					p_msg->version_reply.features,
+> +					(char *)p_msg->version_reply.name
 
-  - udp: gso: do not drop small packets when PMTU reduces
+Is this cast needed?
+What about using '"%.*s", sizeof(p_msg->version_reply.name)'?
 
-  - rxrpc: fix race in call state changing vs recvmsg()
+> +					);
 
-  - eth: ice: fix Rx data path for heavy 9k MTU traffic
+Please move the closing ")" into the previous line.
 
-  - eth: vmxnet3: fix tx queue race condition with XDP
+> +				break;
 
-Previous releases - always broken:
+Why keep parsing after you've found the version?
 
-  - sched: pfifo_tail_enqueue: drop new packet when sch->limit == 0
+> +			case ESD_USB_CMD_TS:
+> +				++cnt_ts;
+> +				dev_dbg(&dev->udev->dev, "TS 0x%08x\n",
+> +					le32_to_cpu(p_msg->rx.ts));
+> +				break;
+> +			default:
+> +				++cnt_other;
+> +				dev_dbg(&dev->udev->dev, "HDR %d\n", p_msg->hdr.cmd);
+> +				break;
+> +			}
+> +			pos +=3D p_msg->hdr.len * sizeof(u32); /* convert to # of bytes */
+> +
+> +			if (pos > actual_length) {
+> +				dev_err(&dev->udev->dev, "format error\n");
+> +				err =3D -EPROTO;
+> +				goto bail;
+> +			}
+> +		}
+> +	}
+> +bail:
+> +	dev_dbg(&dev->udev->dev, "%s()->%d; ATT=3D%d, TS=3D%d, VS=3D%d, O=3D%d\=
+n",
+> +		__func__, err, attempt, cnt_ts, cnt_vs, cnt_other);
+> +	return err;
+>  }
+> =20
+>  static int esd_usb_setup_rx_urbs(struct esd_usb *dev)
+> @@ -1258,7 +1327,7 @@ static int esd_usb_probe_one_net(struct usb_interfa=
+ce *intf, int index)
+>  	}
+> =20
+>  	dev->nets[index] =3D priv;
+> -	netdev_info(netdev, "device %s registered\n", netdev->name);
+> +	netdev_info(netdev, "registered\n");
+> =20
+>  done:
+>  	return err;
+> @@ -1273,13 +1342,13 @@ static int esd_usb_probe(struct usb_interface *in=
+tf,
+>  			 const struct usb_device_id *id)
+>  {
+>  	struct esd_usb *dev;
+> -	union esd_usb_msg *msg;
+> +	void *buf;
+>  	int i, err;
+> =20
+>  	dev =3D kzalloc(sizeof(*dev), GFP_KERNEL);
+>  	if (!dev) {
+>  		err =3D -ENOMEM;
+> -		goto done;
+> +		goto bail;
+>  	}
+> =20
+>  	dev->udev =3D interface_to_usbdev(intf);
+> @@ -1288,34 +1357,25 @@ static int esd_usb_probe(struct usb_interface *in=
+tf,
+> =20
+>  	usb_set_intfdata(intf, dev);
+> =20
+> -	msg =3D kmalloc(sizeof(*msg), GFP_KERNEL);
+> -	if (!msg) {
+> +	buf =3D kmalloc(ESD_USB_RX_BUFFER_SIZE, GFP_KERNEL);
+> +	if (!buf) {
+>  		err =3D -ENOMEM;
+> -		goto free_msg;
+> +		goto free_dev;
+>  	}
+> =20
+>  	/* query number of CAN interfaces (nets) */
+> -	msg->hdr.cmd =3D ESD_USB_CMD_VERSION;
+> -	msg->hdr.len =3D sizeof(struct esd_usb_version_msg) / sizeof(u32); /* #=
+ of 32bit words */
+> -	msg->version.rsvd =3D 0;
+> -	msg->version.flags =3D 0;
+> -	msg->version.drv_version =3D 0;
+> -
+> -	err =3D esd_usb_send_msg(dev, msg);
+> +	err =3D esd_usb_req_version(dev, buf);
+>  	if (err < 0) {
+>  		dev_err(&intf->dev, "sending version message failed\n");
+> -		goto free_msg;
+> +		goto free_buf;
+>  	}
+> =20
+> -	err =3D esd_usb_wait_msg(dev, msg);
+> +	err =3D esd_usb_recv_version(dev, buf, &dev->version, &dev->net_count);
 
-  - ethtool: ntuple: fix rss + ring_cookie check
+Why pass the "&dev->version, &dev->net_count" pointers, if you already
+pass dev?
 
-  - rxrpc: fix the rxrpc_connection attend queue handling
+>  	if (err < 0) {
+>  		dev_err(&intf->dev, "no version message answer\n");
+> -		goto free_msg;
+> +		goto free_buf;
+>  	}
+> =20
+> -	dev->net_count =3D (int)msg->version_reply.nets;
+> -	dev->version =3D le32_to_cpu(msg->version_reply.version);
+> -
+>  	if (device_create_file(&intf->dev, &dev_attr_firmware))
+>  		dev_err(&intf->dev,
+>  			"Couldn't create device file for firmware\n");
+> @@ -1332,11 +1392,12 @@ static int esd_usb_probe(struct usb_interface *in=
+tf,
+>  	for (i =3D 0; i < dev->net_count; i++)
+>  		esd_usb_probe_one_net(intf, i);
 
-Misc:
+Return values are not checked here. :/
 
-  - recognize Kuniyuki Iwashima as a maintainer
+> =20
+> -free_msg:
+> -	kfree(msg);
+> +free_buf:
+> +	kfree(buf);
+> +free_dev:
+>  	if (err)
+>  		kfree(dev);
+> -done:
+> +bail:
+>  	return err;
+>  }
+> =20
+> @@ -1357,6 +1418,7 @@ static void esd_usb_disconnect(struct usb_interface=
+ *intf)
+>  		for (i =3D 0; i < dev->net_count; i++) {
+>  			if (dev->nets[i]) {
+>  				netdev =3D dev->nets[i]->netdev;
+> +				netdev_info(netdev, "unregister\n");
+>  				unregister_netdev(netdev);
+>  				free_candev(netdev);
+>  			}
+> --=20
+> 2.34.1
+>=20
+>=20
+>=20
 
-Signed-off-by: Paolo Abeni <pabeni@redhat.com>
+regards,
+Marc
 
-----------------------------------------------------------------
-Cong Wang (2):
-      netem: Update sch->q.qlen before qdisc_tree_reduce_backlog()
-      selftests/tc-testing: Add a test case for qdisc_tree_reduce_backlog()
+--=20
+Pengutronix e.K.                 | Marc Kleine-Budde          |
+Embedded Linux                   | https://www.pengutronix.de |
+Vertretung N=C3=BCrnberg              | Phone: +49-5121-206917-129 |
+Amtsgericht Hildesheim, HRA 2686 | Fax:   +49-5121-206917-9   |
 
-David Howells (3):
-      rxrpc: Fix the rxrpc_connection attend queue handling
-      rxrpc: Fix call state set to not include the SERVER_SECURING state
-      rxrpc: Fix race in call state changing vs recvmsg()
+--vaw6nh53tkwvlyt2
+Content-Type: application/pgp-signature; name="signature.asc"
 
-Eric Dumazet (1):
-      net: rose: lock the socket in rose_bind()
+-----BEGIN PGP SIGNATURE-----
 
-Florian Fainelli (1):
-      net: bcmgenet: Correct overlaying of PHY and MAC Wake-on-LAN
+iQEzBAABCgAdFiEEn/sM2K9nqF/8FWzzDHRl3/mQkZwFAmekruQACgkQDHRl3/mQ
+kZybbwgAtsPIdtggyaoprycIyPs18kKX1/vpDc/uw/46gCC4Yo7U6GRG+q/owYfk
+j6sUe2VlVZG0jdK/0Cl5EpJx8eYViNzdsYEkQkBvrTA5m/7Y+BBpAqpV+OeeB2dx
+I6a7wfnnxltLyFJ3zpDQNpzmsMlUGaRAfYUvhKx7RJEjB9BVlm8dWv6UptompQ7x
+CVRN9HJDkbzjtGyg6bghWry4/eRIzxKmEzGufqsKIXg2d7lfZL4ihIHYv4U04oLC
+vGUJUEsKZNJfcaCWArUVQ8UHiiwsMAvf+wLZalxzyFRYuTzdPxd+RhekNux2GF5r
+69i7okhFP+vcWzMHcqYGdQin+Lwykg==
+=6QkE
+-----END PGP SIGNATURE-----
 
-Ido Schimmel (1):
-      net: sched: Fix truncation of offloaded action statistics
-
-Jacob Moroni (1):
-      net: atlantic: fix warning during hot unplug
-
-Jakub Kicinski (17):
-      net: ipv6: fix dst refleaks in rpl, seg6 and ioam6 lwtunnels
-      net: ipv6: fix dst ref loops in rpl, seg6 and ioam6 lwtunnels
-      Merge branch '100GbE' of git://git.kernel.org/pub/scm/linux/kernel/git/tnguy/net-queue
-      MAINTAINERS: list openvswitch docs under its entry
-      MAINTAINERS: add Kuniyuki Iwashima to TCP reviewers
-      MAINTAINERS: add a general entry for BSD sockets
-      MAINTAINERS: add entry for UNIX sockets
-      Merge branch 'maintainers-recognize-kuniyuki-iwashima-as-a-maintainer'
-      ethtool: rss: fix hiding unsupported fields in dumps
-      ethtool: ntuple: fix rss + ring_cookie check
-      selftests: drv-net: rss_ctx: add missing cleanup in queue reconfigure
-      selftests: drv-net: rss_ctx: don't fail reconfigure test if queue offset not supported
-      Merge branch 'ethtool-rss-minor-fixes-for-recent-rss-changes'
-      Merge branch 'net_sched-two-security-bug-fixes-and-test-cases'
-      Merge branch 'rxrpc-call-state-fixes'
-      MAINTAINERS: add entry for ethtool
-      MAINTAINERS: add a sample ethtool section entry
-
-Jiasheng Jiang (1):
-      ice: Add check for devm_kzalloc()
-
-Lenny Szubowicz (1):
-      tg3: Disable tg3 PCIe AER on system reboot
-
-Maciej Fijalkowski (3):
-      ice: put Rx buffers after being done with current frame
-      ice: gather page_count()'s of each frag right before XDP prog call
-      ice: stop storing XDP verdict within ice_rx_buf
-
-Matthieu Baerts (NGI0) (1):
-      selftests: mptcp: connect: -f: no reconnect
-
-Paolo Abeni (1):
-      net: harmonize tstats and dstats
-
-Quang Le (2):
-      pfifo_tail_enqueue: Drop new packet when sch->limit == 0
-      selftests/tc-testing: Add a test case for pfifo_head_drop qdisc when limit==0
-
-Russell King (Oracle) (1):
-      Revert "net: stmmac: Specify hardware capability value when FIFO size isn't specified"
-
-Sankararaman Jayaraman (1):
-      vmxnet3: Fix tx queue race condition with XDP
-
-Willem de Bruijn (1):
-      tun: revert fix group permission check
-
-Yan Zhai (1):
-      udp: gso: do not drop small packets when PMTU reduces
-
- MAINTAINERS                                        |  43 ++++++
- drivers/net/ethernet/aquantia/atlantic/aq_nic.c    |   4 +-
- drivers/net/ethernet/broadcom/genet/bcmgenet_wol.c |  16 ++-
- drivers/net/ethernet/broadcom/tg3.c                |  58 ++++++++
- drivers/net/ethernet/intel/ice/devlink/devlink.c   |   3 +
- drivers/net/ethernet/intel/ice/ice_txrx.c          | 150 ++++++++++++++-------
- drivers/net/ethernet/intel/ice/ice_txrx.h          |   1 -
- drivers/net/ethernet/intel/ice/ice_txrx_lib.h      |  43 ------
- drivers/net/ethernet/stmicro/stmmac/stmmac_main.c  |  35 +++--
- drivers/net/tun.c                                  |  14 +-
- drivers/net/vmxnet3/vmxnet3_xdp.c                  |  14 +-
- include/linux/netdevice.h                          |   2 +-
- include/net/sch_generic.h                          |   2 +-
- include/trace/events/rxrpc.h                       |   1 +
- net/core/dev.c                                     |  14 ++
- net/ethtool/ioctl.c                                |   2 +-
- net/ethtool/rss.c                                  |   3 +-
- net/ipv4/udp.c                                     |   4 +-
- net/ipv6/ioam6_iptunnel.c                          |  14 +-
- net/ipv6/rpl_iptunnel.c                            |  15 ++-
- net/ipv6/seg6_iptunnel.c                           |  15 ++-
- net/ipv6/udp.c                                     |   4 +-
- net/rose/af_rose.c                                 |  24 ++--
- net/rxrpc/ar-internal.h                            |   2 +-
- net/rxrpc/call_object.c                            |   6 +-
- net/rxrpc/conn_event.c                             |  21 +--
- net/rxrpc/conn_object.c                            |   1 +
- net/rxrpc/input.c                                  |  12 +-
- net/rxrpc/sendmsg.c                                |   2 +-
- net/sched/sch_fifo.c                               |   3 +
- net/sched/sch_netem.c                              |   2 +-
- tools/testing/selftests/drivers/net/hw/rss_ctx.py  |   9 +-
- tools/testing/selftests/net/mptcp/mptcp_connect.c  |   2 +-
- tools/testing/selftests/net/udpgso.c               |  26 ++++
- .../tc-testing/tc-tests/infra/qdiscs.json          |  34 ++++-
- .../selftests/tc-testing/tc-tests/qdiscs/fifo.json |  23 ++++
- 36 files changed, 446 insertions(+), 178 deletions(-)
-
+--vaw6nh53tkwvlyt2--
 
