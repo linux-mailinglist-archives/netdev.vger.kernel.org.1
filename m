@@ -1,98 +1,98 @@
-Return-Path: <netdev+bounces-163478-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-163479-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 78BBBA2A5D4
-	for <lists+netdev@lfdr.de>; Thu,  6 Feb 2025 11:29:15 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id B9A41A2A5D9
+	for <lists+netdev@lfdr.de>; Thu,  6 Feb 2025 11:34:27 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id BBBD23A8529
-	for <lists+netdev@lfdr.de>; Thu,  6 Feb 2025 10:29:06 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 558AB1646D0
+	for <lists+netdev@lfdr.de>; Thu,  6 Feb 2025 10:34:26 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B500922688F;
-	Thu,  6 Feb 2025 10:29:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8B7842144C4;
+	Thu,  6 Feb 2025 10:34:24 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=sipsolutions.net header.i=@sipsolutions.net header.b="PacvTEnv"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Iot787BE"
 X-Original-To: netdev@vger.kernel.org
-Received: from sipsolutions.net (s3.sipsolutions.net [168.119.38.16])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3069F215F52;
-	Thu,  6 Feb 2025 10:29:08 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=168.119.38.16
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5E2DA18B03;
+	Thu,  6 Feb 2025 10:34:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1738837750; cv=none; b=AS87eQ+va9wlCsT3X/MT3b7yo3wLpnRGyyzkQZ/RkK0RsBP1WYFLYwexCRLLcRwsffCab1Q4+bgLJ/rHpyDPcUmLkQG3KtWlvWs3BDAXnfD7Uv0OygEl/GDRV1q/V+ggk+tHGGy0sHWlGJVFJFPxfNsMQirqLm6dq+TeYF7GflU=
+	t=1738838064; cv=none; b=P5iTwt1wGRmTQOMPpKnVyljrpUQtLu4Wyn/IOofFkfoA+pPJqw3O3WkZO26AC038E9teeF1P35NtNZudMvlljUUm++sFJqUMxCeH1o1vWQQK3Fl2QXKEbCER730d3CZlaGJhxRRX0HOYuUvzW9ej+qHPutja7qVX94VamONo2Ck=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1738837750; c=relaxed/simple;
-	bh=S7P6lVDUiM8BkwNZyEPAIeV/qXqEvPpGQZH6A/FLfSA=;
-	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=JMlz6A7GzVgCOS8FTmIp7t1VlSUuWf/JPDR8x38XkE0jhJbanLqlWdo4M2kx/IrOVcD9w+/MAc5KfUcHRXo7scT3PnC+n2ttmuYaXustQOzABJEEbopnRZp2+PYn6180umscQ5mj7H5jMGZ0WC38vXGz0TiYkxngUv60DVJusVw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=sipsolutions.net; spf=pass smtp.mailfrom=sipsolutions.net; dkim=pass (2048-bit key) header.d=sipsolutions.net header.i=@sipsolutions.net header.b=PacvTEnv; arc=none smtp.client-ip=168.119.38.16
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=sipsolutions.net
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=sipsolutions.net
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=sipsolutions.net; s=mail; h=MIME-Version:Content-Transfer-Encoding:
-	Content-Type:References:In-Reply-To:Date:Cc:To:From:Subject:Message-ID:Sender
-	:Reply-To:Content-ID:Content-Description:Resent-Date:Resent-From:Resent-To:
-	Resent-Cc:Resent-Message-ID; bh=8lEz4PZA3e6wBA7eHEmBgEXubre6UC4Pm/7j8argqZw=;
-	t=1738837749; x=1740047349; b=PacvTEnvoOY8gAlKBWsCqZ/Idw0yYEsO7z5e0clCvDBmgRa
-	NfZLCn9Mh3gJWDmjvXiOLhenrS/BilGBFtdEsrhLvB/jne5aaG+2wsZZSq4DbzltUBdXSvjwygw2T
-	RghTCwg8HcyEIl/YzixLjgtlb5Amn9n6meghOu2qBSFoKsgt5WSs4QIFi573hPWqZBN27Sg4NwR4M
-	eoionr/5Od39ND3rFlNvX3fbAJmIg1YyuX+VJgFGRqwyBlp7xS1QS7B7s5zGgMuAA2cjc5kLD8esy
-	Aq7uhAr6glJaswwx/bKDpvV8H0kfUd/OTQYw4hTgEeR6ALo0OEuRheqGPAk8ydUw==;
-Received: by sipsolutions.net with esmtpsa (TLS1.3:ECDHE_X25519__RSA_PSS_RSAE_SHA256__AES_256_GCM:256)
-	(Exim 4.98)
-	(envelope-from <johannes@sipsolutions.net>)
-	id 1tfz7z-00000004zMd-04fP;
-	Thu, 06 Feb 2025 11:28:59 +0100
-Message-ID: <da5a789176b6a4c3e7c6d5f40dd75e50c9fbae39.camel@sipsolutions.net>
-Subject: Re: [PATCH v3 1/2] net, treewide: define and use MAC_ADDR_STR_LEN
-From: Johannes Berg <johannes@sipsolutions.net>
-To: Michal Swiatkowski <michal.swiatkowski@linux.intel.com>
-Cc: Uday Shankar <ushankar@purestorage.com>, Breno Leitao
- <leitao@debian.org>,  Andrew Lunn <andrew+netdev@lunn.ch>, "David S.
- Miller" <davem@davemloft.net>, Eric Dumazet	 <edumazet@google.com>, Jakub
- Kicinski <kuba@kernel.org>, Paolo Abeni	 <pabeni@redhat.com>, Srinivas
- Kandagatla <srinivas.kandagatla@linaro.org>, 
- =?UTF-8?Q?Rafa=C5=82_Mi=C5=82ecki?=	 <rafal@milecki.pl>, Simon Horman
- <horms@kernel.org>, Andrew Morton	 <akpm@linux-foundation.org>, Jonathan
- Corbet <corbet@lwn.net>, 	netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org, 	linux-wireless@vger.kernel.org,
- linux-doc@vger.kernel.org
-Date: Thu, 06 Feb 2025 11:28:57 +0100
-In-Reply-To: <Z6SNxrEteMx0/0sb@mev-dev.igk.intel.com>
-References: <20250205-netconsole-v3-0-132a31f17199@purestorage.com>
-	 <20250205-netconsole-v3-1-132a31f17199@purestorage.com>
-	 <Z6SEeO0QFx9Y52LJ@mev-dev.igk.intel.com>
-	 <a2a26c7eaf20bb972289a804ecfe0e532f0f85ae.camel@sipsolutions.net>
-	 <Z6SNxrEteMx0/0sb@mev-dev.igk.intel.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-User-Agent: Evolution 3.54.3 (3.54.3-1.fc41) 
+	s=arc-20240116; t=1738838064; c=relaxed/simple;
+	bh=HtJGuuBPY7GzLXY3kxC0VzXl+lpKcP1odVWAB06tJ9Q=;
+	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:
+	 Content-Disposition:In-Reply-To; b=NIJHoiLweQNY//MQ0CmuHbqWXwNTKd0Ts4/KjD064Ka70ZhirwmlR0am2/NL36Z9YeC5wneVHKGiz+VTCW/LAkhj3IKQJv1jJelLqKZ3TXRwr8pXESaCr3oN5bJd/hYVn+hfpAwvS4axk2x7jn0sRx1CQzHdCCq3/3o7WbRV6Zo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Iot787BE; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id D1E42C4CEDD;
+	Thu,  6 Feb 2025 10:34:20 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1738838063;
+	bh=HtJGuuBPY7GzLXY3kxC0VzXl+lpKcP1odVWAB06tJ9Q=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:From;
+	b=Iot787BECykWp2gtP3LBBfpkGun7l00fOPAElaA5BAiQCtwwTeI+lVecYMzKwAnts
+	 4mcyF+D7fWht1j+3rEu3Cj1DeyPer4iHjAMiI9YUWs+kcZZlBXtr31rsdaxfYzyLlo
+	 W04h+ye22xoupObrmhPOhQ3wmdVoNLUsufgqTPam+umbVH0CCgAW87+XGI3BvdHj7B
+	 6bGGqk9nn8pKjJ1FUWcQSS28fa1KRdLaD1dIgqoGtHBv8bFZMZk/H7/f1DvM+JP+ZX
+	 woAuP/pEtkO6VckSw7t2BXzkqiKH0LqFV0wwy5n6jYGwhxehp1ZAZDN0bLIEDFYrQR
+	 6h+Szxrv3EMNQ==
+Date: Thu, 6 Feb 2025 10:34:18 +0000
+From: Simon Horman <horms@kernel.org>
+To: Chen-Yu Tsai <wens@kernel.org>,
+	"Russell King (Oracle)" <linux@armlinux.org.uk>
+Cc: Jakub Kicinski <kuba@kernel.org>, Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
+	Heiko Stuebner <heiko@sntech.de>,
+	"Russell King (Oracle)" <rmk+kernel@armlinux.org.uk>,
+	Steven Price <steven.price@arm.com>,
+	Kunihiko Hayashi <hayashi.kunihiko@socionext.com>,
+	netdev@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+	linux-kernel@vger.kernel.org, linux-rockchip@lists.infradead.org,
+	stable@vger.kernel.org
+Subject: Re: [PATCH netdev] net: stmmac: dwmac-rk: Provide FIFO sizes for
+ DWMAC 1000
+Message-ID: <20250206103418.GO554665@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-malware-bazaar: not-scanned
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <Z6OjmtiZ4A8BzvsP@shell.armlinux.org.uk>
+ <CAGb2v64CZWZwC7T9NNN7Re8pkCLQZEh3bcraYjcQRyVxtJgS5w@mail.gmail.com>
 
-On Thu, 2025-02-06 at 11:24 +0100, Michal Swiatkowski wrote:
-> On Thu, Feb 06, 2025 at 10:50:36AM +0100, Johannes Berg wrote:
-> > On Thu, 2025-02-06 at 10:44 +0100, Michal Swiatkowski wrote:
-> > >=20
-> > > >  net/mac80211/debugfs_sta.c         | 5 +++--
-> > >=20
-> > > What about ieee80211_sta_debugfs_add()? (net/mac80211/debugfs_sta.c)
-> >=20
-> > What about it? It's modified accordingly, just needs a bit more +/-1
-> > now.
->=20
-> I meant that it can be done in this patch too.=20
+On Thu, Feb 06, 2025 at 01:40:17AM +0800, Chen-Yu Tsai wrote:
+> On Thu, Feb 6, 2025 at 1:38 AM Simon Horman <horms@kernel.org> wrote:
 
-Oh, oops, right. I thought it _was_ done here, because I didn't pay
-enough attention to the actual change. Either way is fine to me though.
+...
 
-johannes
+> > I think the point is that someone needs to formally
+> > submit the revert. And I assume it should target the net tree.
+> 
+> Russell sent one a couple hours ago, so I think we're covered.
+> 
+
+On Wed, Feb 05, 2025 at 05:44:58PM +0000, Russell King (Oracle) wrote:
+> On Wed, Feb 05, 2025 at 05:38:24PM +0000, Simon Horman wrote:
+
+...
+
+> > I think the point is that someone needs to formally
+> > submit the revert. And I assume it should target the net tree.
+> 
+> For what I think is the third time today (fourth if you include the
+> actual patch...)
+> 
+> https://lore.kernel.org/r/E1tfeyR-003YGJ-Gb@rmk-PC.armlinux.org.uk
+
+Thanks, I see it now.
 
