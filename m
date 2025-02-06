@@ -1,123 +1,193 @@
-Return-Path: <netdev+bounces-163394-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-163395-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id A8ED6A2A1C4
-	for <lists+netdev@lfdr.de>; Thu,  6 Feb 2025 08:05:54 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 95EF4A2A1C9
+	for <lists+netdev@lfdr.de>; Thu,  6 Feb 2025 08:08:23 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 440B21680CE
-	for <lists+netdev@lfdr.de>; Thu,  6 Feb 2025 07:05:53 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 711661887198
+	for <lists+netdev@lfdr.de>; Thu,  6 Feb 2025 07:08:28 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 09703195FEC;
-	Thu,  6 Feb 2025 07:05:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C58BF1FECBD;
+	Thu,  6 Feb 2025 07:08:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b="0MK8jrjn"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx.socionext.com (mx.socionext.com [202.248.49.38])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 42F01FC0A;
-	Thu,  6 Feb 2025 07:05:47 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=202.248.49.38
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 93BB81FDA7E;
+	Thu,  6 Feb 2025 07:08:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1738825550; cv=none; b=p3vGj0hJZ+Ov8xY8DJ+fYdBccKc6qpZqtNKbgYKzUysl9QftbBtmi9dEPqoSL+MTxplFd6l18n/7lcR/Ou/f50EV7DO1gPk5IJyUDwfYJB1vs+GZ9uoq5goL/gB5j1DO8PPoPgKZwVeg6GHQianiGmIs/SL8kX/aK/xtoyAzaiY=
+	t=1738825698; cv=none; b=k3lHWFfALerc6PHrlLBf58GLMF77zO47+XFt0eeQWD2f+214N8/RHqv0Uv6r+NFmWM+MoxFToHOvNEcowJoiosb027AcpbqenYIijGkaCnrzJyhUprSMhQrWfIMJ1G3+XO5OXlHLWoAf7sH8SsySRt8Odj0PbXFf8jbUQKXg93g=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1738825550; c=relaxed/simple;
-	bh=8+jUVZiYKGnZrclx7DOOFWR+vHgGDmVWRoQmfd56CBo=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=ANi2CbXhCpcVzDUDlQ61j98MllJGuOs7Eub1VKMtG+j37mMDgZ+bD+8+40HlZRJJ7vKbeY8OAnk7ERaCeK2aSGeoVAq1NQiEli/qnIMztn7isRj8Jscxy/Ms197JLJZiM6LpZJ1NVvcrWnGL5UbLCZ9ekKVjguWBNXuzjwCILe4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=socionext.com; spf=pass smtp.mailfrom=socionext.com; arc=none smtp.client-ip=202.248.49.38
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=socionext.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=socionext.com
-Received: from unknown (HELO iyokan2-ex.css.socionext.com) ([172.31.9.54])
-  by mx.socionext.com with ESMTP; 06 Feb 2025 16:05:41 +0900
-Received: from mail.mfilter.local (mail-arc02.css.socionext.com [10.213.46.40])
-	by iyokan2-ex.css.socionext.com (Postfix) with ESMTP id 139D8200705C;
-	Thu,  6 Feb 2025 16:05:41 +0900 (JST)
-Received: from iyokan2.css.socionext.com ([172.31.9.53]) by m-FILTER with ESMTP; Thu, 6 Feb 2025 16:05:41 +0900
-Received: from [192.168.1.141] (unknown [10.213.44.71])
-	by iyokan2.css.socionext.com (Postfix) with ESMTP id 14A9CAB188;
-	Thu,  6 Feb 2025 16:05:40 +0900 (JST)
-Message-ID: <ac319cf8-5501-40f2-bf23-fc04a91d4f1f@socionext.com>
-Date: Thu, 6 Feb 2025 16:05:39 +0900
+	s=arc-20240116; t=1738825698; c=relaxed/simple;
+	bh=HeWXmU4VCIrpiGA3pbenOLw3kZZeb/1o9MznZPgjZqg=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=WVoYGBZNidWa/iPU29afDyhacg9lHNmWnt5yljDuDgUaZLR6SHue5oduy3GIa774qEADLALXAU3aJ+wxedTz9RXerdQRpDh4wd5N0Lr7o1EMYI//uGKTFX+VGLR+HilPiCXOIT/zbRNh/QkslytnEZUTEA7aT4/CI4ONOgb2154=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b=0MK8jrjn; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 79580C4CEE0;
+	Thu,  6 Feb 2025 07:08:17 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linuxfoundation.org;
+	s=korg; t=1738825698;
+	bh=HeWXmU4VCIrpiGA3pbenOLw3kZZeb/1o9MznZPgjZqg=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=0MK8jrjnKE0UC5T1+tipxAJnfcvKoRb1M/CJ51cV0dSii9K7gYBVQrkyOjBzqKX4J
+	 CXvUVeqVu1cM10d2fbGO1S/eNMPWD5lsRRvbji4qWT5P0U5KiDdQzeEmcnvSl1YoJx
+	 HhDDJnZmR6dllMk2dMP6IoSx0XB4frDgqmuyRKgM=
+Date: Thu, 6 Feb 2025 08:07:16 +0100
+From: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+To: Jeremy Kerr <jk@codeconstruct.com.au>
+Cc: Matt Johnston <matt@codeconstruct.com.au>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	netdev@vger.kernel.org, linux-usb@vger.kernel.org,
+	Santosh Puranik <spuranik@nvidia.com>
+Subject: Re: [PATCH net-next 2/2] net: mctp: Add MCTP USB transport driver
+Message-ID: <2025020657-unsubtly-imbecile-faf4@gregkh>
+References: <20250206-dev-mctp-usb-v1-0-81453fe26a61@codeconstruct.com.au>
+ <20250206-dev-mctp-usb-v1-2-81453fe26a61@codeconstruct.com.au>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH] net: stmmac: Allow zero for [tr]x_fifo_size
-To: "Russell King (Oracle)" <linux@armlinux.org.uk>,
- Yanteng Si <si.yanteng@linux.dev>
-Cc: Jakub Kicinski <kuba@kernel.org>, Steven Price <steven.price@arm.com>,
- "David S. Miller" <davem@davemloft.net>,
- Alexandre Torgue <alexandre.torgue@foss.st.com>,
- Andrew Lunn <andrew+netdev@lunn.ch>, Eric Dumazet <edumazet@google.com>,
- Maxime Coquelin <mcoquelin.stm32@gmail.com>,
- Jose Abreu <joabreu@synopsys.com>, Paolo Abeni <pabeni@redhat.com>,
- linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
- linux-stm32@st-md-mailman.stormreply.com, netdev@vger.kernel.org,
- Furong Xu <0x1207@gmail.com>, Petr Tesarik <petr@tesarici.cz>,
- Serge Semin <fancer.lancer@gmail.com>, Xi Ruoyao <xry111@xry111.site>
-References: <20250203093419.25804-1-steven.price@arm.com>
- <Z6CckJtOo-vMrGWy@shell.armlinux.org.uk>
- <811ea27c-c1c3-454a-b3d9-fa4cd6d57e44@arm.com>
- <Z6Clkh44QgdNJu_O@shell.armlinux.org.uk> <20250203142342.145af901@kernel.org>
- <f728a006-e588-4eab-b667-b1ff7dfd66c5@linux.dev>
- <Z6N4J-_C3lq5a_VQ@shell.armlinux.org.uk>
-Content-Language: en-US
-From: Kunihiko Hayashi <hayashi.kunihiko@socionext.com>
-In-Reply-To: <Z6N4J-_C3lq5a_VQ@shell.armlinux.org.uk>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250206-dev-mctp-usb-v1-2-81453fe26a61@codeconstruct.com.au>
 
-Hi Russell,
-
-On 2025/02/05 23:39, Russell King (Oracle) wrote:
-> On Wed, Feb 05, 2025 at 10:22:00PM +0800, Yanteng Si wrote:
->>
->> 在 2/4/25 06:23, Jakub Kicinski 写道:
->>> On Mon, 3 Feb 2025 11:16:34 +0000 Russell King (Oracle) wrote:
->>>>> I've no opinion whether the original series "had value" - I'm just
->>>>> trying to fix the breakage that entailed. My first attempt at a
->>>>> patch
->>>>> was indeed a (partial) revert, but Andrew was keen to find a better
->>>>> solution[1].
->>>> There are two ways to fix the breakage - either revert the original
->>>> patches (which if they have little value now would be the sensible
->>>> approach IMHO)
->>> +1, I also vote revert FWIW
->>
->> +1, same here.
->>
->>
->> For a driver that runs on so much hardware, we need to act
->>
->> cautiously. A crucial prerequisite is that code changes must
->>
->> never cause some hardware to malfunction. I was too simplistic
->>
->> in my thinking when reviewing this before, and I sincerely
->>
->> apologize for that.
->>
->>
->> Steven, thank you for your tests, Let's revert it.
+On Thu, Feb 06, 2025 at 02:48:24PM +0800, Jeremy Kerr wrote:
+> Add an implementation for DMTF DSP0283, which defines a MCTP-over-USB
+> transport. As per that spec, we're restricted to full speed mode,
+> requiring 512-byte transfers.
 > 
-> https://lore.kernel.org/r/E1tfeyR-003YGJ-Gb@rmk-PC.armlinux.org.uk
+> Each MCTP-over-USB interface is a peer-to-peer link to a single MCTP
+> endpoint, so no physical addressing is required (of course, that MCTP
+> endpoint may then bridge to further MCTP endpoints). Consequently,
+> interfaces will report with no lladdr data:
+> 
+>     # mctp link
+>     dev lo index 1 address 00:00:00:00:00:00 net 1 mtu 65536 up
+>     dev mctpusb0 index 6 address none net 1 mtu 68 up
+> 
+> This is a simple initial implementation, with single rx & tx urbs, and
+> no multi-packet tx transfers - although we do accept multi-packet rx
+> from the device.
+> 
+> Includes suggested fixes from Santosh Puranik <spuranik@nvidia.com>.
+> 
+> Signed-off-by: Jeremy Kerr <jk@codeconstruct.com.au>
+> Cc: Santosh Puranik <spuranik@nvidia.com>
+> ---
+>  drivers/net/mctp/Kconfig    |  10 ++
+>  drivers/net/mctp/Makefile   |   1 +
+>  drivers/net/mctp/mctp-usb.c | 367 ++++++++++++++++++++++++++++++++++++++++++++
+>  3 files changed, 378 insertions(+)
+> 
+> diff --git a/drivers/net/mctp/Kconfig b/drivers/net/mctp/Kconfig
+> index 15860d6ac39fef62847d7186f1f0d81c1d3cd619..cf325ab0b1ef555e21983ace1b838e10c7f34570 100644
+> --- a/drivers/net/mctp/Kconfig
+> +++ b/drivers/net/mctp/Kconfig
+> @@ -47,6 +47,16 @@ config MCTP_TRANSPORT_I3C
+>  	  A MCTP protocol network device is created for each I3C bus
+>  	  having a "mctp-controller" devicetree property.
+>  
+> +config MCTP_TRANSPORT_USB
+> +	tristate "MCTP USB transport"
+> +	depends on USB
+> +	help
+> +	  Provides a driver to access MCTP devices over USB transport,
+> +	  defined by DMTF specification DSP0283.
+> +
+> +	  MCTP-over-USB interfaces are peer-to-peer, so each interface
+> +	  represents a physical connection to one remote MCTP endpoint.
+> +
+>  endmenu
+>  
+>  endif
+> diff --git a/drivers/net/mctp/Makefile b/drivers/net/mctp/Makefile
+> index e1cb99ced54ac136db0347a9ee0435a5ed938955..c36006849a1e7d04f2cafafb8931329fc0992b63 100644
+> --- a/drivers/net/mctp/Makefile
+> +++ b/drivers/net/mctp/Makefile
+> @@ -1,3 +1,4 @@
+>  obj-$(CONFIG_MCTP_SERIAL) += mctp-serial.o
+>  obj-$(CONFIG_MCTP_TRANSPORT_I2C) += mctp-i2c.o
+>  obj-$(CONFIG_MCTP_TRANSPORT_I3C) += mctp-i3c.o
+> +obj-$(CONFIG_MCTP_TRANSPORT_USB) += mctp-usb.o
+> diff --git a/drivers/net/mctp/mctp-usb.c b/drivers/net/mctp/mctp-usb.c
+> new file mode 100644
+> index 0000000000000000000000000000000000000000..f44e3d418d9544b45cc0369c3c3fa4d6ca11cc29
+> --- /dev/null
+> +++ b/drivers/net/mctp/mctp-usb.c
+> @@ -0,0 +1,367 @@
+> +// SPDX-License-Identifier: GPL-2.0+
+> +/*
+> + * mctp-usb.c - MCTP-over-USB (DMTF DSP0283) transport binding driver.
+> + *
+> + * DSP0283 is available at:
+> + * https://www.dmtf.org/sites/default/files/standards/documents/DSP0283_1.0.1.pdf
+> + *
+> + * Copyright (C) 2024 Code Construct Pty Ltd
 
-I'm sorry to bother you. Thanks for posting revert.
+It's 2025 :)
 
-There are variations in the capabilities that the hardware has, and more
-hardware needs to be verified to show that they work correctly, so it had
-to be handled carefully. Reports that the change patch "worked" or
-"didn't work" on any hardware are helpful.
+> +static void mctp_usb_out_complete(struct urb *urb)
+> +{
+> +	struct sk_buff *skb = urb->context;
+> +	struct net_device *netdev = skb->dev;
+> +	struct mctp_usb *mctp_usb = netdev_priv(netdev);
+> +	int status;
+> +
+> +	status = urb->status;
+> +
+> +	switch (status) {
+> +	case -ENOENT:
+> +	case -ECONNRESET:
+> +	case -ESHUTDOWN:
+> +	case -EPROTO:
+> +		mctp_usb_stat_tx_dropped(netdev);
+> +		break;
+> +	case 0:
+> +		mctp_usb_stat_tx_done(netdev, skb->len);
+> +		netif_wake_queue(netdev);
+> +		consume_skb(skb);
+> +		return;
+> +	default:
+> +		dev_err(&mctp_usb->usbdev->dev, "%s: urb status: %d\n",
+> +			__func__, status);
 
-I apologize that posting this change to "-net" was inappropriate
-because I added a completely new feature.
+This could flood the logs, are you sure you need it at dev_err() level?
 
-Thank you,
+And __func__ is redundant, it's present in dev_*() calls already.
 
----
-Best Regards
-Kunihiko Hayashi
+> +static int mctp_usb_rx_queue(struct mctp_usb *mctp_usb)
+> +{
+> +	struct sk_buff *skb;
+> +	int rc;
+> +
+> +	skb = netdev_alloc_skb(mctp_usb->netdev, MCTP_USB_XFER_SIZE);
+> +	if (!skb)
+> +		return -ENOMEM;
+> +
+> +	usb_fill_bulk_urb(mctp_usb->rx_urb, mctp_usb->usbdev,
+> +			  usb_rcvbulkpipe(mctp_usb->usbdev, mctp_usb->ep_in),
+> +			  skb->data, MCTP_USB_XFER_SIZE,
+> +			  mctp_usb_in_complete, skb);
+> +
+> +	rc = usb_submit_urb(mctp_usb->rx_urb, GFP_ATOMIC);
+> +	if (rc) {
+> +		dev_err(&mctp_usb->usbdev->dev, "%s: usb_submit_urb: %d\n",
+> +			__func__, rc);
+
+Again, __func__ is redundant.  Same everywhere else in this file.
+
+thanks,
+
+greg k-h
 
