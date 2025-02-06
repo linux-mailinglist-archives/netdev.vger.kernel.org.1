@@ -1,134 +1,114 @@
-Return-Path: <netdev+bounces-163474-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-163477-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id AF4FDA2A5B8
-	for <lists+netdev@lfdr.de>; Thu,  6 Feb 2025 11:22:46 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0EB6DA2A5CD
+	for <lists+netdev@lfdr.de>; Thu,  6 Feb 2025 11:27:54 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 8A5B21887E2D
-	for <lists+netdev@lfdr.de>; Thu,  6 Feb 2025 10:22:51 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 5A0C73A7E54
+	for <lists+netdev@lfdr.de>; Thu,  6 Feb 2025 10:27:40 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3F35422686A;
-	Thu,  6 Feb 2025 10:22:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BC9D122689C;
+	Thu,  6 Feb 2025 10:27:45 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Mn3XOFt8"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="GaQytxVJ"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-il1-f174.google.com (mail-il1-f174.google.com [209.85.166.174])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.7])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AFFA122540F;
-	Thu,  6 Feb 2025 10:22:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.174
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B6F3E227560;
+	Thu,  6 Feb 2025 10:27:43 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.7
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1738837362; cv=none; b=cr0Bxr5yqFM35lM7Af6K/kxl0psW4iEf5NCQ0EnroZqPMuBtkXqPzbvrg7p8V+/XlE90sTQ5HsKEAmdX/Qx7/7b9vEqXrSJe98Ykidrza6cJb5vFlpTTDf6wK2RYfYkjfdh3Fk8b/EiAKF62SMvBRvH+LkIMkJDkfzN7MKe6Tek=
+	t=1738837665; cv=none; b=gVPXYDlbF+al0cPy0QVnek6ARV58PlO472OWouGXf7wTmbcESMNX1kVBEJs09hL21mUROix8ARpkI3e6XJEd4zM3b6EFxXZsSCEDXx7ZHW57BA9wW7dpG6uuPpIcdO2R9RLPI7yPxkX9r3SbSWKMhwEYJu0xtXcpA2Dsp7NFs4Y=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1738837362; c=relaxed/simple;
-	bh=ITRUK2mleEF/74KTc1V9MJDwrYb1+CFbhx+ekjh6RF4=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=KPpbH1cgplBNfZmlCR5vaTVHMcH5dLTUZy6KueszaKgF6zYuPIRqkDlxfUUd2soPqOYrDahmzbmgIdrR+E3yc1E6+IodZDI80yMhnYCoeSGm5UbhplVDJur5BC3sJrleApH9r7jiFsADDBidyIuRyti7r1S2j0rNHp1/eC4Ukpo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Mn3XOFt8; arc=none smtp.client-ip=209.85.166.174
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-il1-f174.google.com with SMTP id e9e14a558f8ab-3d0558c61f4so3966895ab.0;
-        Thu, 06 Feb 2025 02:22:40 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1738837359; x=1739442159; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=ITRUK2mleEF/74KTc1V9MJDwrYb1+CFbhx+ekjh6RF4=;
-        b=Mn3XOFt8YO2RyEAbnu5a3n7tkACutT9bXrRcarY3bbxlrGnjxLzPas81mbNgO3gRV5
-         nbFiOm8YQH+OVTFfywMV02c5UU8/6KS/JBLLGdehjs6R3wd6G7WsfnX0G2aAjBFZjpU5
-         0VBUydFMgUcCz2vQJtmA/esrOeeBW3ax9cm3Hky2djMG0HfgdzgTFligEbX6kH1+NzbA
-         LfsE8UE5JllJ7++BMQ5saC/B1i6jbbZp3gh4LE+YhMEukU8F4t/9sKAQO/9eiJ8d0TQA
-         KrS9mFjF4HHsrAgjM7OkswHIaDS0VWjjmGiBERJdSb/pFnSa1da/6r/9fibJe6TUrGe5
-         sUrA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1738837359; x=1739442159;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=ITRUK2mleEF/74KTc1V9MJDwrYb1+CFbhx+ekjh6RF4=;
-        b=qFmHOIQjSxJT70cutPwiEUl5hDhscdStyv3hO8uyFB6i1ReTYTYGHJztYffkJGujZ3
-         +89PbfIcSeH9F20DKjYgchZit7m2ofoxRoT4kt/9/sDElOW1NADiYWiFn6a2Q9wiykYp
-         ngGQrwS4EQQ9j4eVS0GlU0iyHXT/mBF0XG7ZsigCML0r79UHGcC3xYp7MqrM/5J9x0a2
-         sGpPOD5Q/5Lf0EHMQoA9yDucOIzKt7JSbHUQVJlo0Rg3gdzC4U9TRK0RB5EHWZfUFErp
-         pCY55zGwdtzO+IwM3SfizPxhwox/AV4PBvWJQylQZWiteXWyFCd0j8MNo/ULuc2qNy3P
-         gCKw==
-X-Forwarded-Encrypted: i=1; AJvYcCW07gHTdd+QNzUzsdVgINdS/KvS0vuimPH2maOIGna9xT1pmcFhWNZsqme/oyHx30PctmZfJIf6@vger.kernel.org, AJvYcCXSmHNDRo3ppy1V6Q7VHETU4NFLiTucC4eh2wBl/IBAoNLOoaaKcqyqcq+/h8OHJ2GxWss=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyKEmFzyEH3TMS+Od0DFvh2cCD8heEd6cXhUuCBxQMPzRZs9PzO
-	t1W67eKGeFQrBfLAuzDKfaxKtWl/zpDU7rtmZk1Y7QEPHgr9aYyQREdtpFUlcnPELFpcbL3tR9p
-	BytFMJ5YPbLQk4X39CCnlLroSxEU=
-X-Gm-Gg: ASbGncsAY0PT9uKLO+wplelxOaW6nb2CPqXKmBZKjzKAx/hlSnL/0CyyK+PYvArfXYi
-	ARh6dyMtPcuxHRcM/8PS0ppS7JxEShCh8Xp036z3IBgOszIm1nHiAJFpsVL3VBj583A4MLUWi
-X-Google-Smtp-Source: AGHT+IEtPTc9uft8nwa3L0tYQXjWEa0eIxuJSderjWOqvglwujSfCkIPE1NYtRO9VTJALAgsAbH02UD4m46o1/aevAk=
-X-Received: by 2002:a05:6e02:12ce:b0:3cf:c07d:e9a with SMTP id
- e9e14a558f8ab-3d05a58d185mr19078455ab.4.1738837359688; Thu, 06 Feb 2025
- 02:22:39 -0800 (PST)
+	s=arc-20240116; t=1738837665; c=relaxed/simple;
+	bh=B0aenSas7uI6VgQrWrZ3K7h+bbJCK1O9BDNE8yjWiV4=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=Q9PEg/i3wZAHqfPQk/mgewHJA8B10Ta3HObhA36eTJuUteFGjQ5NciFutywNCVIvbd5xUy5LEJ8cb7Yhv8tj9cZlBjQSqY4V0Pd8CsXPgk8sCP+sNd8/XfQaf7ienJM+hAM+1aw7G/q9VBQZ99SGtOD3r4KHJ4z7Abfn9CfoX2k=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=GaQytxVJ; arc=none smtp.client-ip=192.198.163.7
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1738837664; x=1770373664;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=B0aenSas7uI6VgQrWrZ3K7h+bbJCK1O9BDNE8yjWiV4=;
+  b=GaQytxVJEIHD9Dv4muk7bIQGI7QgHZpf4APR+Y2CVU31AtvvER/nDrfP
+   x+ouXde/m9QWxtPg+Kt7RTuEZetx0TA8VU8MsJIvJbi1EfklgEeXFtfzv
+   iZQQXSCrTZVa21SbK8ErYJ7NxRde+5ntOJA/C9uZpFiZy1F/3Hj8Fegzc
+   dJfF5/QmpE2UFsHImYTH0OlNADzvKFcIrwF988ZcY84Aw7/BGz22Y5jhL
+   3RH+/PGEbaaIeNQYeEyPbPUBz/D+quVDja7NZM/THhLgEFGR+Ami6Y5BW
+   U63QTQ9M0UJYhsqoLqYY5VU1GWNGXQHiEdLk4JgjGNFSxirZ8DSYy2tDa
+   w==;
+X-CSE-ConnectionGUID: VGB4zUVaSJOyOO2XYhanKg==
+X-CSE-MsgGUID: n3SOVOx9Rg+EDnqX3qNzkA==
+X-IronPort-AV: E=McAfee;i="6700,10204,11336"; a="64787105"
+X-IronPort-AV: E=Sophos;i="6.13,264,1732608000"; 
+   d="scan'208";a="64787105"
+Received: from fmviesa006.fm.intel.com ([10.60.135.146])
+  by fmvoesa101.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 06 Feb 2025 02:27:42 -0800
+X-CSE-ConnectionGUID: XqbzmsnuTg+1aaXPoCj2Iw==
+X-CSE-MsgGUID: ETqe/vM9SHWZhA2ViQnQXg==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.13,264,1732608000"; 
+   d="scan'208";a="110998246"
+Received: from mev-dev.igk.intel.com ([10.237.112.144])
+  by fmviesa006-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 06 Feb 2025 02:27:38 -0800
+Date: Thu, 6 Feb 2025 11:24:06 +0100
+From: Michal Swiatkowski <michal.swiatkowski@linux.intel.com>
+To: Johannes Berg <johannes@sipsolutions.net>
+Cc: Uday Shankar <ushankar@purestorage.com>,
+	Breno Leitao <leitao@debian.org>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Srinivas Kandagatla <srinivas.kandagatla@linaro.org>,
+	=?utf-8?B?UmFmYcWCIE1pxYJlY2tp?= <rafal@milecki.pl>,
+	Simon Horman <horms@kernel.org>,
+	Andrew Morton <akpm@linux-foundation.org>,
+	Jonathan Corbet <corbet@lwn.net>, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org, linux-wireless@vger.kernel.org,
+	linux-doc@vger.kernel.org
+Subject: Re: [PATCH v3 1/2] net, treewide: define and use MAC_ADDR_STR_LEN
+Message-ID: <Z6SNxrEteMx0/0sb@mev-dev.igk.intel.com>
+References: <20250205-netconsole-v3-0-132a31f17199@purestorage.com>
+ <20250205-netconsole-v3-1-132a31f17199@purestorage.com>
+ <Z6SEeO0QFx9Y52LJ@mev-dev.igk.intel.com>
+ <a2a26c7eaf20bb972289a804ecfe0e532f0f85ae.camel@sipsolutions.net>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250204183024.87508-1-kerneljasonxing@gmail.com>
- <20250204183024.87508-6-kerneljasonxing@gmail.com> <67a384ea2d547_14e0832942c@willemb.c.googlers.com.notmuch>
- <CAL+tcoDvCrfE+Xs3ywTA35pvR_NyFyXLihyAuFFZBA4aHmiZBg@mail.gmail.com>
-In-Reply-To: <CAL+tcoDvCrfE+Xs3ywTA35pvR_NyFyXLihyAuFFZBA4aHmiZBg@mail.gmail.com>
-From: Jason Xing <kerneljasonxing@gmail.com>
-Date: Thu, 6 Feb 2025 18:22:03 +0800
-X-Gm-Features: AWEUYZnwB6USsLHlfud560t2tqXbwmTMNfmbEHPVYZlfcOIutFZZOfwE_OwrI1k
-Message-ID: <CAL+tcoAPpLwRt1_81yM66MpeiJvD1oZjCOzy4auKR585M24yPA@mail.gmail.com>
-Subject: Re: [PATCH bpf-next v8 05/12] net-timestamp: prepare for isolating
- two modes of SO_TIMESTAMPING
-To: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
-Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org, 
-	pabeni@redhat.com, dsahern@kernel.org, willemb@google.com, ast@kernel.org, 
-	daniel@iogearbox.net, andrii@kernel.org, martin.lau@linux.dev, 
-	eddyz87@gmail.com, song@kernel.org, yonghong.song@linux.dev, 
-	john.fastabend@gmail.com, kpsingh@kernel.org, sdf@fomichev.me, 
-	haoluo@google.com, jolsa@kernel.org, horms@kernel.org, bpf@vger.kernel.org, 
-	netdev@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <a2a26c7eaf20bb972289a804ecfe0e532f0f85ae.camel@sipsolutions.net>
 
-On Thu, Feb 6, 2025 at 4:43=E2=80=AFPM Jason Xing <kerneljasonxing@gmail.co=
-m> wrote:
->
-> On Wed, Feb 5, 2025 at 11:34=E2=80=AFPM Willem de Bruijn
-> <willemdebruijn.kernel@gmail.com> wrote:
-> >
-> > Jason Xing wrote:
-> > > No functional changes here, only add skb_enable_app_tstamp() to test
-> > > if the orig_skb matches the usage of application SO_TIMESTAMPING
-> > > or its bpf extension. And it's good to support two modes in
-> > > parallel later in this series.
-> > >
-> > > Also, this patch deliberately distinguish the software and
-> > > hardware SCM_TSTAMP_SND timestamp by passing 'sw' parameter in order
-> > > to avoid such a case where hardware may go wrong and pass a NULL
-> > > hwstamps, which is even though unlikely to happen. If it really
-> > > happens, bpf prog will finally consider it as a software timestamp.
-> > > It will be hardly recognized. Let's make the timestamping part
-> > > more robust.
-> >
-> > Disagree. Don't add a crutch that has not shown to be necessary for
-> > all this time.
-> >
-> > Just infer hw from hwtstamps !=3D NULL.
->
-> I can surely modify this part as you said, but may I ask why? I cannot
-> find a good reason to absolutely trust the hardware behaviour. If that
-> corner case happens, it would be very hard to trace the root cause...
+On Thu, Feb 06, 2025 at 10:50:36AM +0100, Johannes Berg wrote:
+> On Thu, 2025-02-06 at 10:44 +0100, Michal Swiatkowski wrote:
+> > 
+> > >  net/mac80211/debugfs_sta.c         | 5 +++--
+> > 
+> > What about ieee80211_sta_debugfs_add()? (net/mac80211/debugfs_sta.c)
+> 
+> What about it? It's modified accordingly, just needs a bit more +/-1
+> now.
 
-No offense, just curious. I can keep the same approach as
-SO_TIMESTAMPING since you disagree. I have no strong preference
-because I found It's simpler after rewriting this part.
+I meant that it can be done in this patch too. 
 
-I will simplify this patch in v9 :)
-
-Thanks,
-Jason
+> 
+> For that:
+> Acked-by: Johannes Berg <johannes@sipsolutions.net>
+> 
+> Thanks for the rename, per the robot report that just came in it looks
+> like that also saved you from some hassle in drivers that have their own
+> MAC_ADDR_LEN for some reason :)
+> 
+> johannes
 
