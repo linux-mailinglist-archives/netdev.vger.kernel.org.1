@@ -1,179 +1,318 @@
-Return-Path: <netdev+bounces-163653-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-163654-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id A9569A2B260
-	for <lists+netdev@lfdr.de>; Thu,  6 Feb 2025 20:36:06 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id AD488A2B266
+	for <lists+netdev@lfdr.de>; Thu,  6 Feb 2025 20:37:48 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 55C45188BB7E
-	for <lists+netdev@lfdr.de>; Thu,  6 Feb 2025 19:36:08 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 3370716A8B1
+	for <lists+netdev@lfdr.de>; Thu,  6 Feb 2025 19:37:47 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 229BE1B0420;
-	Thu,  6 Feb 2025 19:35:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C8E961A8F84;
+	Thu,  6 Feb 2025 19:37:43 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="X3p/VMAy"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="YzLf5Awg"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qt1-f169.google.com (mail-qt1-f169.google.com [209.85.160.169])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.13])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 718021AB531
-	for <netdev@vger.kernel.org>; Thu,  6 Feb 2025 19:35:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.169
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1738870535; cv=none; b=oMpgf0hXNKaFLrxgylLEFvWXUgrIKt4yVUAnlfvMAXVLyz5oCv4zSI8NdtiXWTfnygzVLhlSSP+xT6kRI3qjf1zp3nt4t7Yy7Vzyx84GUXoKZ9R5zzDPsHIq+WmkGVxX66fayvbOifZiYlQYWcKK/F0BqI7o9xG3SweQdIXzHHE=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1738870535; c=relaxed/simple;
-	bh=6A1Yr0Nt2Y/i+CplfXUAh9Lytzs53pef80EIPY87Uso=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=s6ptGd7GFL/YzspwGfy0P+VpnkhWY8YwPVOUToiLptlhOFMwyMrcNIegW/tEX4ZCbRUf3NsqwzcFKr3DvcsW9BNmfzStZQ/vJo9ZrGCwOZfWJB5DjxtnsTtNoszVBVT7BpxDfLHnBQMbVRwhamhj0yECmQmRITOFcxz/JLc+BFc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=X3p/VMAy; arc=none smtp.client-ip=209.85.160.169
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-qt1-f169.google.com with SMTP id d75a77b69052e-467a37a2a53so14756361cf.2
-        for <netdev@vger.kernel.org>; Thu, 06 Feb 2025 11:35:33 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1738870532; x=1739475332; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=GvZCJalBx72YoEeHFrYTX0UbCE0kMxHPZc2AdScVOTM=;
-        b=X3p/VMAyNExXmJqj28iHnkL0ind5ip+cD/kyFgm5deAdPHwi8WBH9B9g7lKzwM0CDs
-         dtMjJeMX6RXJDfFIRm/bUCwpqFBbwefnGG572oxQbAKvRDImkxYhf+iZsVYKyIEMP8cK
-         jEasb88y/SiSKyXkMJ3w84ciWJ9IJYgvbL3U650NXUi22TJzNGzam5i+RebCaWg6D1lm
-         asf9lfHdQeCYSKN+RPPy78TyPxKa2yh8hlIBiT2VrbP1bjLy9IzF81pq/C1jXlC4x2Oh
-         wuPACUfkj6JN56AzEwIjvsvQ2EERfH+Hw7mtROtD+sGuYJNdrr1eXgJH2b/SZJ+E5bOi
-         mIqg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1738870532; x=1739475332;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=GvZCJalBx72YoEeHFrYTX0UbCE0kMxHPZc2AdScVOTM=;
-        b=V38xQ4V0eEpyNhZQ8qsPfNUx4jAp+j/WvI6t0pwoKgxdETySk9wadV9seCiUcw7bOs
-         F4ekwwVPQeJQ3LYu5i1ykhvb/LXf9IZ8lUlSGyf1qD9xufOoNhhMIHxksZIa9Q36vcB1
-         4FHSb6t7v1on4t/X5pL9EM7zuI4CizVbI+DPqmI87b1ASty11XWGXPHjf6319aWYd3ox
-         Vq+ED1Ot87nxwJm+NgZdVIpzCNxUjqV8WtKbLGXDenfxtwkgig28PcByLa2RmZUQ5usJ
-         LxW9LXdBqzJYq6CUif7m83ufbd+hq6Dn3tZQyC1JimMD74E85jycFfnXTqgrjYsf3EGv
-         c3dQ==
-X-Gm-Message-State: AOJu0YxBDbTJLQ0+XcK0RN2RAmrY9K+fuhyG3l7EB9aOSlKYTNwdBJ2Z
-	gTaI5HlO7QE6urUUqEOVGcDyPz0cV7UN6HuCV1L/UOn1lKKwi0E2C0peiw==
-X-Gm-Gg: ASbGncvN6X/g8Rf1byyy1umk59jOPArakWAQH4bZK6Fc6FKXUvtCnkaIbZ60m/F+uMB
-	HRSJQfrfhacZ7EXDkmtLldqMhX6eGuaqhM50i+u1y3nxEFhsafXxLmeOvEbn/86kotEpLTuWqO3
-	tgXvSAs6Z+zRekJxpNq7e5Oc6QRfyZthO80k99TFP8r6kWdHvKHG4zhUqp9Z0xiqQSCfD+7Yt88
-	PyijF+nlTUADddx3rIlxF3/kn5XpAUs+4pFPZhqw+jOF4vspp3sPgQHCzr3KKXq9xVbjXYhfXfM
-	6SnYMY5cPWrFwbXihZOclu/D5tKcJjdKaUC/pJlNg4F10LbvBDn7RUmMD70O8+bw7CnTm5Bq68H
-	PcYuEI0iBZg==
-X-Google-Smtp-Source: AGHT+IGkY+JMfwba7VxB+PVQmMvFkCo7/YXD7BOIvb/28yhyacGspyXnvDpUrLu702oXvm3bXCQWuQ==
-X-Received: by 2002:a05:622a:199a:b0:467:6bd8:accd with SMTP id d75a77b69052e-47167a9ed37mr6206191cf.15.1738870532241;
-        Thu, 06 Feb 2025 11:35:32 -0800 (PST)
-Received: from willemb.c.googlers.com.com (15.60.86.34.bc.googleusercontent.com. [34.86.60.15])
-        by smtp.gmail.com with ESMTPSA id d75a77b69052e-471492accc2sm8349301cf.30.2025.02.06.11.35.31
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 06 Feb 2025 11:35:31 -0800 (PST)
-From: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
-To: netdev@vger.kernel.org
-Cc: davem@davemloft.net,
-	kuba@kernel.org,
-	edumazet@google.com,
-	pabeni@redhat.com,
-	Willem de Bruijn <willemb@google.com>
-Subject: [PATCH net-next 7/7] ipv6: initialize inet socket cookies with sockcm_init
-Date: Thu,  6 Feb 2025 14:34:54 -0500
-Message-ID: <20250206193521.2285488-8-willemdebruijn.kernel@gmail.com>
-X-Mailer: git-send-email 2.48.1.502.g6dc24dfdaf-goog
-In-Reply-To: <20250206193521.2285488-1-willemdebruijn.kernel@gmail.com>
-References: <20250206193521.2285488-1-willemdebruijn.kernel@gmail.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 08F7D1A9B24;
+	Thu,  6 Feb 2025 19:37:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=192.198.163.13
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1738870663; cv=fail; b=cNrKYEqjb85tLg7nnTQyyR+EZDf5l7ZVvRvyEbEHDQnhP9KizFXmrGfzR5LLp/2nu0IWdAdbuFbOmq/qOXBjQaV0RKC1eKUecYnVvQG13g8uXbHOQ00/sjqf+aA/R/pxOR1vqoHcYrERx5nziznsWldzyVfNwxu1zk50sx5JsbY=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1738870663; c=relaxed/simple;
+	bh=JOdZLxF/XW0u5Mj/Qy3/WyV3CdIiLgQl0h/YwJXTqvI=;
+	h=Date:From:To:CC:Subject:Message-ID:References:Content-Type:
+	 Content-Disposition:In-Reply-To:MIME-Version; b=tj4GZSVr/Ll6cIDCSrnNXKUJZQkMQq6f0dPq3SitJ+sVu4hBHGZUw83ygmw52UMPLUaDm6BrcAXlxIZHmrAfUsxe0JqR94I2f9NpXXlzdQnBpt9/vYJuxGFP8Bd6tElj4N2nrH99Xf595bryXHfUqsWAE0mP0/daj+lI7pEgkKE=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=YzLf5Awg; arc=fail smtp.client-ip=192.198.163.13
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1738870662; x=1770406662;
+  h=date:from:to:cc:subject:message-id:references:
+   in-reply-to:mime-version;
+  bh=JOdZLxF/XW0u5Mj/Qy3/WyV3CdIiLgQl0h/YwJXTqvI=;
+  b=YzLf5Awg4KuN+RPFSZANXgWwbWhv8HUiuxw+uWRUO1saMUZnDOcQJY/o
+   tqs1XS06bFsQIPa6l+owBe6/Au+pvWj/Z8e3FJiuiCHQ2zMwzo7C1kJ7Z
+   QzSyATxoOtrI7WURTo6GxLc6vgQ4/W8mezHGTJwAKfHKCfSTPCtlLZorP
+   FmeU0r40YMXgOzV4xZFWmgIFQVSX8PmcUnzBXMkeRfeJ1hFSyOaNp5cUi
+   rsHFSuIfmE1Gl8wv/wLiVjkeag+rOPpNvjg1KPO2bb+g77i/h2UelfQVs
+   9m9rbokPmF5Qgiqdy5blauDDWFCK54CaI1rYVVcdRh31osQooTI5/GZ8/
+   A==;
+X-CSE-ConnectionGUID: tQPdkITHTzeSM2mPTWXN8g==
+X-CSE-MsgGUID: Qp31n07nQxyj3WUxp8xQ/Q==
+X-IronPort-AV: E=McAfee;i="6700,10204,11336"; a="42333841"
+X-IronPort-AV: E=Sophos;i="6.13,265,1732608000"; 
+   d="scan'208";a="42333841"
+Received: from orviesa009.jf.intel.com ([10.64.159.149])
+  by fmvoesa107.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 06 Feb 2025 11:37:41 -0800
+X-CSE-ConnectionGUID: wCPEIV5UT1CL+JKZ8RzNaQ==
+X-CSE-MsgGUID: SEsVFzjsTFOaxUYE6YHbAQ==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.13,265,1732608000"; 
+   d="scan'208";a="111080506"
+Received: from orsmsx603.amr.corp.intel.com ([10.22.229.16])
+  by orviesa009.jf.intel.com with ESMTP/TLS/AES256-GCM-SHA384; 06 Feb 2025 11:37:42 -0800
+Received: from orsmsx601.amr.corp.intel.com (10.22.229.14) by
+ ORSMSX603.amr.corp.intel.com (10.22.229.16) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.44; Thu, 6 Feb 2025 11:37:40 -0800
+Received: from orsedg603.ED.cps.intel.com (10.7.248.4) by
+ orsmsx601.amr.corp.intel.com (10.22.229.14) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.44 via Frontend Transport; Thu, 6 Feb 2025 11:37:40 -0800
+Received: from NAM04-MW2-obe.outbound.protection.outlook.com (104.47.73.176)
+ by edgegateway.intel.com (134.134.137.100) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.1.2507.44; Thu, 6 Feb 2025 11:37:40 -0800
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=G4B9RjqjA377iqPwVGct3X+OS4+ip6eh22UzVkOcMKliEA2OWFaDSe6l7rcv3br8YoPzTqge6pTSdSrL9N8S2PKgpUPUDdXku9TmyC+meI1dEBGC43gvj2XNf4re414FX0a5Pqyniph4hM6hwkTgvUpdc1RA921PY2F8vn1bDM6SwUZg0LA6fyRiV1nej/+4Wktt0RINCQAIjETD3vtjfukCf1Mf/ikAkNGOmmwKdm1yFXinEvwKRwEDJ+hBw4n+MRsAsU7ataobmV2dU9XaTHmz8qsqdjWP3PCIuBrk6FS+zffnQaW1NGHKl558ljrxNNqGa+HKovLKHAKLjfz6dw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=Fk8fPdlxWIqybVbwAsZzzyIj/zqhohJF3LBUV6PJOQQ=;
+ b=YjzFlbImjpucNEbk/FVU4bYNUMeWlu/lCaaka0V/a6g3T77ni+C3L0YFMRe0I2HmPLB/gE5nFfHrwQ4ylE1migqQRTgXAzSc3W3xYRyIthsEvZ+nRdlC9SufqoT6UnLcQJk++1ofSgEMk8NlmAhWq7dh9Rgjn6o4N10JvRHjZtTIKnhc3h8Ty0X1aWhK3+hROz2hl1KtlNUe8KKkv+XhS0E2PEUA0AdNGdpzE5Hu8Q1Qkf7cEfiVOIrhKmVRrODfM+Iod4VcNzpVVAVIQEeDkM59zxg31pxbI4wQ99cZ7ZNRwUvtcw1a6ugljnVxETmr3gZothPrhnvRxt5xFVmDVg==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=intel.com;
+Received: from PH8PR11MB8107.namprd11.prod.outlook.com (2603:10b6:510:256::6)
+ by DM4PR11MB8130.namprd11.prod.outlook.com (2603:10b6:8:181::8) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8398.24; Thu, 6 Feb
+ 2025 19:37:37 +0000
+Received: from PH8PR11MB8107.namprd11.prod.outlook.com
+ ([fe80::6b05:74cf:a304:ecd8]) by PH8PR11MB8107.namprd11.prod.outlook.com
+ ([fe80::6b05:74cf:a304:ecd8%4]) with mapi id 15.20.8422.011; Thu, 6 Feb 2025
+ 19:37:37 +0000
+Date: Thu, 6 Feb 2025 11:37:35 -0800
+From: Dan Williams <dan.j.williams@intel.com>
+To: <alucerop@amd.com>, <linux-cxl@vger.kernel.org>, <netdev@vger.kernel.org>,
+	<dan.j.williams@intel.com>, <edward.cree@amd.com>, <davem@davemloft.net>,
+	<kuba@kernel.org>, <pabeni@redhat.com>, <edumazet@google.com>,
+	<dave.jiang@intel.com>
+CC: Alejandro Lucero <alucerop@amd.com>
+Subject: Re: [PATCH v10 01/26] cxl: make memdev creation type agnostic
+Message-ID: <67a50f7fbdfb_2d2c29447@dwillia2-xfh.jf.intel.com.notmuch>
+References: <20250205151950.25268-1-alucerop@amd.com>
+ <20250205151950.25268-2-alucerop@amd.com>
+Content-Type: text/plain; charset="us-ascii"
+Content-Disposition: inline
+In-Reply-To: <20250205151950.25268-2-alucerop@amd.com>
+X-ClientProxiedBy: MW4PR04CA0352.namprd04.prod.outlook.com
+ (2603:10b6:303:8a::27) To PH8PR11MB8107.namprd11.prod.outlook.com
+ (2603:10b6:510:256::6)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: PH8PR11MB8107:EE_|DM4PR11MB8130:EE_
+X-MS-Office365-Filtering-Correlation-Id: a2d815ad-585d-4705-8056-08dd46e5b64f
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;ARA:13230040|1800799024|376014|366016|921020|7053199007;
+X-Microsoft-Antispam-Message-Info: =?us-ascii?Q?IdEIWdf2qPye6kM1ji6VH9+fwgHkWEnYN6RzJr8pDWMWhz6MeYi6vuqhgwDw?=
+ =?us-ascii?Q?8YdJvGdvdj2+b4x05RjWv16IFvEYcW59UT6eiHH6Mi0WaNPYbhc7AKX9H5FK?=
+ =?us-ascii?Q?L0LbBxnTMKlFV2Cj2vlhZ/f7xUpjkPohvwHjqTyr5OIDUpITwUK6kNcbfA1O?=
+ =?us-ascii?Q?k4WG/wnXsBTVeR1aXmCm6nlBTuiqlXvnnKd4Jm3BBWJHaqNMDYo8QqDaDMOn?=
+ =?us-ascii?Q?2C+EN6fTbRZtvxTGBbLWX7OQUGdF0vCQCylIjL3DqTKMfpYOgeUeEMHpJIZe?=
+ =?us-ascii?Q?WiBfIc1YzRmauPNod0adZox/Sz+5gEArsXBP97nBzhLEixlToUPw2nGqojLD?=
+ =?us-ascii?Q?n0JHccz/50m2UUTMGbXcWVnztNMkyx2xZ/BW4UocFG3Sx4rOVdOweRqP+Hro?=
+ =?us-ascii?Q?HWIoxy6G/XLpQa9yBx8hjikMIqIdM05WLNhakAqFZth0jXOKNhcg+utT7gsG?=
+ =?us-ascii?Q?i0Vn3Js+jQIXL8wJ+gIgouO0pZETQXQqao4A0FwGmh3SN+M59GzQ0g0O2Arm?=
+ =?us-ascii?Q?MXaS6bUjvoGLjr3XP3c9pGcrOZQC0A7Ae0IHKhU8Q8+NqlbkYy8cltvteaiL?=
+ =?us-ascii?Q?aTYbDrbmJJuOWM6c+6iIw/LOkKi3UTT6m/tHEZvesT+FEm/dIlP2k0xbQ2/t?=
+ =?us-ascii?Q?GUTqeQNHYXuX9C+yzM97inQm2ucKitiQ7b9IfO5v9uD2hl7SNhL/StscLV7Q?=
+ =?us-ascii?Q?l8vC6qRh+upN1ps/HJDCJs8IIBSkFIDOvOj4X+plsqUIb5nmY6s3Hv0fr/K+?=
+ =?us-ascii?Q?yrFT9JzY81fmsImXiPJfLHs7oKypC6Dt1lEqe98NWsu+FTB2KqLJDCh0rWPj?=
+ =?us-ascii?Q?jPhH+Q77YBRZrX5MDOJdjbBGndCXnqvX6kKfvUlJEj0/Bzmw6uZZpSWK2NLN?=
+ =?us-ascii?Q?xo/YiXOjSUC9R0F2PZFdBcnJu7mpFGmlfwNtKFdQjXLDpzAYR+eBR5nK8RPr?=
+ =?us-ascii?Q?hVRwNVHjlmR7gQ8QZYOQYIVqwH5ZpWoZHZhUY5+2J3m5j/MhKfTBL1/DbKpz?=
+ =?us-ascii?Q?rD31UfWWQ2wTF09gRYnmFY3+UdJx3yKUR2dePzjw07TowyGOBnVcYV/jWCLb?=
+ =?us-ascii?Q?1+BHGDGkkv5gWNfDUbc0lULXrhJbVWk6MjQsev+C3UUekLFyOoYlWbl2KF+r?=
+ =?us-ascii?Q?5jqoM2TJoAKEoRz3YWFebwmIFCk6BLWOehqefNbFQ/e1AuF8iE5p2/XtTiB+?=
+ =?us-ascii?Q?HGuXosNGhLsh0q7Dup14JRtlFCtLlbUZ5i+/jsIj5ZJu9mwTOMXUmvK3nE81?=
+ =?us-ascii?Q?OUjuLc8U3emADW8aj0ECMV9fA/i+qoC1t3piSe7s8bX1RiZNHOr2EcltX0HC?=
+ =?us-ascii?Q?WyBl0F4rgN5srMAKhzSp1s2E5o0pEha57MXx9FxeVeQcaAckVkllaOq66jnC?=
+ =?us-ascii?Q?ellBJ4Mvv4DSzykztvi/NdDRLYTylud5XxzAjkBtlb48QzgKxkLCyzDvr+m+?=
+ =?us-ascii?Q?dmZq6ya0qtg=3D?=
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:PH8PR11MB8107.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(1800799024)(376014)(366016)(921020)(7053199007);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?K9dQqk3u5MmdDStBmHZmK0jkBN7h8JNrPKFLKZyPH8dTEoGXtbO5xA4LN91F?=
+ =?us-ascii?Q?uzA7eLG8bZTKCA1APTnSLT+dHeeZFY+eqERp1GW8OZMrQt3GnlwL/7paiKPZ?=
+ =?us-ascii?Q?Hbu2icAYHBM7vDHrzUa60QsBu34FK2XANrMXisQP+pyQgoQ9Cckx3Qr2Bctz?=
+ =?us-ascii?Q?wADP1dsgWfePkQBXGg+bkToWjKZTIbZXLUA6eOiw+VtUZRuRdXmIakjrveDn?=
+ =?us-ascii?Q?jjsIzhewKqbpsWjEGlELWSs/YhJ1mT71gs2ZbivVCAB2WQtCn+dPo1UNE40U?=
+ =?us-ascii?Q?Dh4zYlbLDdQXa3G3zUnCjkSQw/1ThaGmF7iXVNaJaocjRtxJGvUx9s5dXfYs?=
+ =?us-ascii?Q?Ih1mCzPYSvoiNNjh3lmDOTuOQw4lKDkngipF8Jmo0sjxJKVfpyaXG6wROenD?=
+ =?us-ascii?Q?1kAQGmcQJ+rJhkxM92AOtDiUAW0IUvLoHEmwMjOrlDa4Y1jaNDR//XK1iIKN?=
+ =?us-ascii?Q?uz4cp37Nd4ipBZhbann1Tr0yMTJugV84IqjfUkfxUsCgfp6ht4XnD3ig/KBi?=
+ =?us-ascii?Q?l39t6ZimFLv9ZdkqhYN4N7GXZKGUDyYps9uqGgwYvaeXd5zQuKvEmuGWZrES?=
+ =?us-ascii?Q?fzV/leN6lHuqlTd7+uOvTPILamQrzXqEuoBgPAadY4QFhL3OnyrV4XRWqNe5?=
+ =?us-ascii?Q?w1MMP+ldydVb646BGUbUNbykT/ihYNOCJkLhT0X07/EEbrpOVd7YCw1QxTuK?=
+ =?us-ascii?Q?HpGNgWg+Rul/GRg+bLPCPBae2w9Hw8lqrC+WMqB4lk7FUiKm01Jcj9ZHTjT0?=
+ =?us-ascii?Q?kH5DQii31ZUshUsujgvBi1QFFvQe6PDuMzihZaH6i6GLDTBszwJj7nnBW8+n?=
+ =?us-ascii?Q?7E1Lv2pZTHUg5P/Glb8kqxQOM742sXi2gE/PbsFkjvmh+0swd/sd0COv1Xf2?=
+ =?us-ascii?Q?FFyv+RwINl3nY9CFPNGmw0FPbzcpv/Hd/cYYiQZfdl+2t7qAIJWVOjX7KQGY?=
+ =?us-ascii?Q?TGJGIhsvKuWksrDUMFTUoUfzpCTz/JMo8ouuPgN48p1hsz3hZxCyk23aqR7O?=
+ =?us-ascii?Q?fl3xkUW8mf4m3POrVZmnjevOja9VmxjEWE8NrYBUUy7NLLbfHwQKev5eNikI?=
+ =?us-ascii?Q?zVJ0D+ghw1HR062tsCKt7nt/njUOwQeWk2xBKTHs2w16OSKLZ4Zrg7I1SyM5?=
+ =?us-ascii?Q?kHcOoaOH04Hbxgm+MKTrExFM4K+GMOp3eSew7kYuff8rQxlveuBduEhNHfZ7?=
+ =?us-ascii?Q?89TEvxmI+n3om/kglnBgqOH5X0HeqB+ecHYN98uUqebh56eJugB6fzdnDqu5?=
+ =?us-ascii?Q?1nRBj0thc3J148kNJhl616TLq4mfLMUmzW1hG3CPK7a2PwrlRy3X7/qJRqFs?=
+ =?us-ascii?Q?MqWFTMkrzy2K/f6sBdTe/mjQnIj9LQHiIzHJjP/R8eBHk7ZvnomfWFsEOukX?=
+ =?us-ascii?Q?Nn6iwwFqlCHFM4cVO8X8Ap9r2FH39zg/5i45M9tNO17XGtx5/0oo36jn0yna?=
+ =?us-ascii?Q?hl3DaM4bomGJPC4rQJqueZFgq4JsOcpZzwXDxsjk8YW2N04+CoGZBt69JURl?=
+ =?us-ascii?Q?l3Ru4Jt0x7XtBef1RgbluQ/AHzaiy0cjKqc0drvrvAOTThiuHzo9DxjSfYav?=
+ =?us-ascii?Q?oo39fXiwG0KFNto5z2FZiDwsqPvNxcR8T1xGV6FgIulj4VzF10Nl+3MpLXww?=
+ =?us-ascii?Q?/w=3D=3D?=
+X-MS-Exchange-CrossTenant-Network-Message-Id: a2d815ad-585d-4705-8056-08dd46e5b64f
+X-MS-Exchange-CrossTenant-AuthSource: PH8PR11MB8107.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 06 Feb 2025 19:37:37.7887
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: L9G1815zlONzUt1OoojMrFYdTkRCRX1gPlDfVuKBVMMZh/uOAURtv3a7gvjfspD8k4XH7Cnlh8kz/YDAeCMKepCWoolbLtMLA1d0xt+YKMA=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM4PR11MB8130
+X-OriginatorOrg: intel.com
 
-From: Willem de Bruijn <willemb@google.com>
+alucerop@ wrote:
+> From: Alejandro Lucero <alucerop@amd.com>
+> 
+> In preparation for Type2 support, change memdev creation making
+> type based on argument.
+> 
+> Integrate initialization of dvsec and serial fields in the related
+> cxl_dev_state within same function creating the memdev.
+> 
+> Move the code from mbox file to memdev file.
+> 
+> Add new header files with type2 required definitions for memdev
+> state creation.
+> 
+> Signed-off-by: Alejandro Lucero <alucerop@amd.com>
+> ---
+>  drivers/cxl/core/mbox.c   | 20 --------------------
+>  drivers/cxl/core/memdev.c | 23 +++++++++++++++++++++++
+>  drivers/cxl/cxlmem.h      | 18 +++---------------
+>  drivers/cxl/cxlpci.h      | 17 +----------------
+>  drivers/cxl/pci.c         | 16 +++++++++-------
+>  include/cxl/cxl.h         | 26 ++++++++++++++++++++++++++
+>  include/cxl/pci.h         | 23 +++++++++++++++++++++++
+>  7 files changed, 85 insertions(+), 58 deletions(-)
+>  create mode 100644 include/cxl/cxl.h
+>  create mode 100644 include/cxl/pci.h
+> 
+> diff --git a/drivers/cxl/core/mbox.c b/drivers/cxl/core/mbox.c
+> index 4d22bb731177..96155b8af535 100644
+> --- a/drivers/cxl/core/mbox.c
+> +++ b/drivers/cxl/core/mbox.c
+> @@ -1435,26 +1435,6 @@ int cxl_mailbox_init(struct cxl_mailbox *cxl_mbox, struct device *host)
+>  }
+>  EXPORT_SYMBOL_NS_GPL(cxl_mailbox_init, "CXL");
+>  
+> -struct cxl_memdev_state *cxl_memdev_state_create(struct device *dev)
+> -{
+> -	struct cxl_memdev_state *mds;
+> -
+> -	mds = devm_kzalloc(dev, sizeof(*mds), GFP_KERNEL);
+> -	if (!mds) {
+> -		dev_err(dev, "No memory available\n");
+> -		return ERR_PTR(-ENOMEM);
+> -	}
+> -
+> -	mutex_init(&mds->event.log_lock);
+> -	mds->cxlds.dev = dev;
+> -	mds->cxlds.reg_map.host = dev;
+> -	mds->cxlds.reg_map.resource = CXL_RESOURCE_NONE;
+> -	mds->cxlds.type = CXL_DEVTYPE_CLASSMEM;
+> -
+> -	return mds;
+> -}
+> -EXPORT_SYMBOL_NS_GPL(cxl_memdev_state_create, "CXL");
+> -
+>  void __init cxl_mbox_init(void)
+>  {
+>  	struct dentry *mbox_debugfs;
+> diff --git a/drivers/cxl/core/memdev.c b/drivers/cxl/core/memdev.c
+> index 63c6c681125d..456d505f1bc8 100644
+> --- a/drivers/cxl/core/memdev.c
+> +++ b/drivers/cxl/core/memdev.c
+> @@ -632,6 +632,29 @@ static void detach_memdev(struct work_struct *work)
+>  
+>  static struct lock_class_key cxl_memdev_key;
+>  
+> +struct cxl_memdev_state *cxl_memdev_state_create(struct device *dev, u64 serial,
+> +						 u16 dvsec, enum cxl_devtype type)
+> +{
+> +	struct cxl_memdev_state *mds;
+> +
+> +	mds = devm_kzalloc(dev, sizeof(*mds), GFP_KERNEL);
+> +	if (!mds) {
+> +		dev_err(dev, "No memory available\n");
+> +		return ERR_PTR(-ENOMEM);
+> +	}
+> +
+> +	mutex_init(&mds->event.log_lock);
+> +	mds->cxlds.dev = dev;
+> +	mds->cxlds.reg_map.host = dev;
+> +	mds->cxlds.reg_map.resource = CXL_RESOURCE_NONE;
+> +	mds->cxlds.cxl_dvsec = dvsec;
+> +	mds->cxlds.serial = serial;
+> +	mds->cxlds.type = type;
+> +
+> +	return mds;
+> +}
+> +EXPORT_SYMBOL_NS_GPL(cxl_memdev_state_create, "CXL");
 
-Avoid open coding the same logic.
+I was envisioning that accelerators only consider 'struct cxl_dev_state'
+and that 'struct cxl_memdev_state' is exclusively for
+CXL_DEVTYPE_CLASSMEM memory expander use case. Something roughly like
+the below. Note, this borrows from the fwctl_alloc_device() example
+which captures the spirit of registering a core object wrapped by an end
+driver provided structure).
 
-Signed-off-by: Willem de Bruijn <willemb@google.com>
----
- include/net/ipv6.h | 2 ++
- net/ipv6/ping.c    | 3 ---
- net/ipv6/raw.c     | 9 +++------
- net/ipv6/udp.c     | 3 ---
- 4 files changed, 5 insertions(+), 12 deletions(-)
+#define cxl_dev_state_create(parent, serial, dvsec, type, drv_struct, member)  \
+        ({                                                                     \
+                static_assert(__same_type(struct cxl_dev_state,                \
+                                          ((drv_struct *)NULL)->member));      \
+                static_assert(offsetof(drv_struct, member) == 0);              \
+                (drv_struct *)_cxl_dev_state_create(parent, serial, dvsec,     \
+                                                    type, sizeof(drv_struct)); \
+        })
 
-diff --git a/include/net/ipv6.h b/include/net/ipv6.h
-index 46a679d9b334..9614006f483c 100644
---- a/include/net/ipv6.h
-+++ b/include/net/ipv6.h
-@@ -371,6 +371,8 @@ static inline void ipcm6_init_sk(struct ipcm6_cookie *ipc6,
- 		.tclass = inet6_sk(sk)->tclass,
- 		.dontfrag = inet6_test_bit(DONTFRAG, sk),
- 	};
-+
-+	sockcm_init(&ipc6->sockc, sk);
- }
- 
- static inline struct ipv6_txoptions *txopt_get(const struct ipv6_pinfo *np)
-diff --git a/net/ipv6/ping.c b/net/ipv6/ping.c
-index 46b8adf6e7f8..84d90dd8b3f0 100644
---- a/net/ipv6/ping.c
-+++ b/net/ipv6/ping.c
-@@ -119,9 +119,6 @@ static int ping_v6_sendmsg(struct sock *sk, struct msghdr *msg, size_t len)
- 		return -EINVAL;
- 
- 	ipcm6_init_sk(&ipc6, sk);
--	ipc6.sockc.priority = READ_ONCE(sk->sk_priority);
--	ipc6.sockc.tsflags = READ_ONCE(sk->sk_tsflags);
--	ipc6.sockc.mark = READ_ONCE(sk->sk_mark);
- 
- 	fl6.flowi6_oif = oif;
- 
-diff --git a/net/ipv6/raw.c b/net/ipv6/raw.c
-index ae68d3f7dd32..fda640ebd53f 100644
---- a/net/ipv6/raw.c
-+++ b/net/ipv6/raw.c
-@@ -769,19 +769,16 @@ static int rawv6_sendmsg(struct sock *sk, struct msghdr *msg, size_t len)
- 
- 	hdrincl = inet_test_bit(HDRINCL, sk);
- 
-+	ipcm6_init_sk(&ipc6, sk);
-+
- 	/*
- 	 *	Get and verify the address.
- 	 */
- 	memset(&fl6, 0, sizeof(fl6));
- 
--	fl6.flowi6_mark = READ_ONCE(sk->sk_mark);
-+	fl6.flowi6_mark = ipc6.sockc.mark;
- 	fl6.flowi6_uid = sk->sk_uid;
- 
--	ipcm6_init_sk(&ipc6, sk);
--	ipc6.sockc.tsflags = READ_ONCE(sk->sk_tsflags);
--	ipc6.sockc.mark = fl6.flowi6_mark;
--	ipc6.sockc.priority = READ_ONCE(sk->sk_priority);
--
- 	if (sin6) {
- 		if (addr_len < SIN6_LEN_RFC2133)
- 			return -EINVAL;
-diff --git a/net/ipv6/udp.c b/net/ipv6/udp.c
-index 8d1ef8e2fe1e..1c6c86c0b8a9 100644
---- a/net/ipv6/udp.c
-+++ b/net/ipv6/udp.c
-@@ -1496,9 +1496,6 @@ int udpv6_sendmsg(struct sock *sk, struct msghdr *msg, size_t len)
- 
- 	ipcm6_init_sk(&ipc6, sk);
- 	ipc6.gso_size = READ_ONCE(up->gso_size);
--	ipc6.sockc.tsflags = READ_ONCE(sk->sk_tsflags);
--	ipc6.sockc.mark = READ_ONCE(sk->sk_mark);
--	ipc6.sockc.priority = READ_ONCE(sk->sk_priority);
- 
- 	/* destination address check */
- 	if (sin6) {
--- 
-2.48.1.502.g6dc24dfdaf-goog
+struct cxl_memdev_state *cxl_memdev_state_create(parent, serial, dvsec)
+{
+        struct cxl_memdev_state *mds = cxl_dev_state_create(
+                parent, serial, dvsec, CXL_DEVTYPE_CLASSMEM,
+                struct cxl_memdev_state, cxlds);
 
+        if (IS_ERR(mds))
+                return mds;
+        
+        mutex_init(&mds->event.log_lock);
+        mds->cxlds.dev = dev;
+        mds->cxlds.reg_map.host = dev;
+        mds->cxlds.reg_map.resource = CXL_RESOURCE_NONE;
+        mds->cxlds.cxl_dvsec = dvsec;
+        mds->cxlds.serial = serial;
+        mds->cxlds.type = type;
+
+        return mds;
+}
+
+If an accelerator wants to share infrastructure that is currently housed
+in 'struct cxl_memdev_state', then that functionality should first move
+to 'struct cxl_dev_state'.
 
