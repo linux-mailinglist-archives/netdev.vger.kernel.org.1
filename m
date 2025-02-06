@@ -1,92 +1,68 @@
-Return-Path: <netdev+bounces-163578-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-163579-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6B614A2AC79
-	for <lists+netdev@lfdr.de>; Thu,  6 Feb 2025 16:31:38 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id F1CE9A2AD0C
+	for <lists+netdev@lfdr.de>; Thu,  6 Feb 2025 16:52:06 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 08820168F41
-	for <lists+netdev@lfdr.de>; Thu,  6 Feb 2025 15:31:37 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 24A017A285C
+	for <lists+netdev@lfdr.de>; Thu,  6 Feb 2025 15:51:11 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 10DCA1EDA32;
-	Thu,  6 Feb 2025 15:31:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="wFMh7IIq"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5EB6C1F4169;
+	Thu,  6 Feb 2025 15:52:02 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ej1-f49.google.com (mail-ej1-f49.google.com [209.85.218.49])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C3C311624F1;
-	Thu,  6 Feb 2025 15:31:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 918734C8E
+	for <netdev@vger.kernel.org>; Thu,  6 Feb 2025 15:52:00 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.49
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1738855893; cv=none; b=rSu0JAvOIZuZFP3vmfTTvzDJ94sXF5Rrz/DNqWkJx+lwrbvqDZ0YQb7RfBwC0HI4i5EiQgld1cpVUW/EypGqlUENUtWXAw6c4vTD5kNvdymq8dr9reeaGO//hrj8cm5CdJ3jdAR0H7DtUlNksuc6YTPkVPLl9eesKnkW+tuKn8Y=
+	t=1738857122; cv=none; b=mO/uiJ20q1I3n/Qmhxpr7Gzh4JYN5opU4axhsBs4etfmIHbzaalzpSNA837o2/sQ6nl3pdl34zLs2vq1G9/VDL5Z04TGPxzrdxCK+JJy2wnlHOlWhl+DTwdWE0C6snW5PYmAtzJdeIia+kLvGj2VxVNBN0K0nGbFC/+CzbtJarI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1738855893; c=relaxed/simple;
-	bh=U7rfiEVLIQsb2FlQZ09+zMrIO5/nfqM6NR7c4p887yY=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=FUUdsufzHoU7VzVcbag+S9icZI83+mzTwhny2EonLN+Cr2kRG3kv/sHvxwLVYZb2no26z52RpzkXrLAimXmrfqEu2svWsymiBKRMMShw65b1IdlyOhwTDRUzyeSvSRNNaS/YVCaAWsjJUTltuDwUUS1jNwB0Z+TTK8bl5wR7x7A=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=wFMh7IIq; arc=none smtp.client-ip=78.32.30.218
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
-	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
-	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
-	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=cQ0FdpNgHOekWmP2VoCpsk8gYuzsChIxdkx5orIICcA=; b=wFMh7IIqWLcDH4ZdUBSwhGC7hT
-	KAple1XmoomeYbrKzex41iFR/7byyI62Rmox1VtsvppXUxxDoq5L0fgJf4nGLPX9/4vdsjn81cIcy
-	ySrNV3KlsBTXGKznowYajXxOw6ivDfvB8TRz26mgBQTYCmh24NqZ1evcB+M7LXHGj6vc6TS7LZwGt
-	USN46/YhkZzAd1KiVjlJbJejwwc2xJVVdJyKafyppyyK0LukdKxmTHaXua2pWNERrsvpsyAy32jsO
-	UE3XUNH74+8kogXNTDPyepANF3PN20DY4ymDPjhitqNQzodxxNaaVwWXJoWHEdlingxOKpluTEzZH
-	vAXhaGEw==;
-Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:54766)
-	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.96)
-	(envelope-from <linux@armlinux.org.uk>)
-	id 1tg3py-0002c8-0a;
-	Thu, 06 Feb 2025 15:30:42 +0000
-Received: from linux by shell.armlinux.org.uk with local (Exim 4.96)
-	(envelope-from <linux@shell.armlinux.org.uk>)
-	id 1tg3pp-0003WN-2X;
-	Thu, 06 Feb 2025 15:30:33 +0000
-Date: Thu, 6 Feb 2025 15:30:33 +0000
-From: "Russell King (Oracle)" <linux@armlinux.org.uk>
-To: Choong Yong Liang <yong.liang.choong@linux.intel.com>
-Cc: Simon Horman <horms@kernel.org>, Jose Abreu <joabreu@synopsys.com>,
-	Jose Abreu <Jose.Abreu@synopsys.com>,
-	David E Box <david.e.box@linux.intel.com>,
-	Thomas Gleixner <tglx@linutronix.de>,
-	Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
-	Dave Hansen <dave.hansen@linux.intel.com>,
-	"H . Peter Anvin" <hpa@zytor.com>,
-	Rajneesh Bhardwaj <irenic.rajneesh@gmail.com>,
-	David E Box <david.e.box@intel.com>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S . Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Maxime Coquelin <mcoquelin.stm32@gmail.com>,
-	Alexandre Torgue <alexandre.torgue@foss.st.com>,
-	Jiawen Wu <jiawenwu@trustnetic.com>,
-	Mengyuan Lou <mengyuanlou@net-swift.com>,
-	Heiner Kallweit <hkallweit1@gmail.com>,
-	Hans de Goede <hdegoede@redhat.com>,
-	Ilpo =?iso-8859-1?Q?J=E4rvinen?= <ilpo.jarvinen@linux.intel.com>,
-	Richard Cochran <richardcochran@gmail.com>,
-	Serge Semin <fancer.lancer@gmail.com>, x86@kernel.org,
-	linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
-	platform-driver-x86@vger.kernel.org,
-	linux-stm32@st-md-mailman.stormreply.com,
-	linux-arm-kernel@lists.infradead.org
-Subject: Re: [PATCH net-next v7 2/7] net: pcs: xpcs: re-initiate clause 37
- Auto-negotiation
-Message-ID: <Z6TVmdCZeWerAZKP@shell.armlinux.org.uk>
-References: <20250206131859.2960543-1-yong.liang.choong@linux.intel.com>
- <20250206131859.2960543-3-yong.liang.choong@linux.intel.com>
+	s=arc-20240116; t=1738857122; c=relaxed/simple;
+	bh=ukqqqE2k1aVRmMvYA/TAh2FMUzu+oahWgtuLTb9OCRg=;
+	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:
+	 Content-Disposition; b=dbcWOV9MO98pxydCTT9+KHdEAacAa+Yp1XMc1t491YT6XZskjTopjOwj7ocvqQ9HJkI6gGnptJT85VruQIa7F98VCE7IAV9A85G7Rlsmd5l1+hdAs5cV3+S3auJIXrBcukyWQaY2+JIExud/EaXKNc4/gxpPvEgMR7Mx/axemUM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.218.49
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-ej1-f49.google.com with SMTP id a640c23a62f3a-aaf0f1adef8so218990266b.3
+        for <netdev@vger.kernel.org>; Thu, 06 Feb 2025 07:52:00 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1738857119; x=1739461919;
+        h=content-disposition:mime-version:message-id:subject:cc:to:from:date
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=Ks6HDYNpkanxX5TcHyJb08tU6kgEMiqJau/hJ+RtZio=;
+        b=O5h9DgWVaNKL4ajpHZ+P5M44E6jnQiKxP1nzbsMn6Y49iPWgcxila5VTbNUuJshgIu
+         XvqeWf5Af6VyPVUJv2yGDmXjqstZD8Uc/05/psGd1eYgsFr5B0aBhwzM820vDblDxgqg
+         g+fELB+3VP2Tk23VNDqW5sz33O3YNVxy4pz36rdnGQA2/hxa0LJzPtl4l44uSh9fICRi
+         EC7bNn4fMdhjYEGPNccQ6icUC6AhEcI7QjKh0AmUC2mBPAhXqSMMewB8cfRGWem4HyyC
+         BKgBkfoovjBjEPl3SVsjaRp7rkT/PEfwexc7JKO16KHAs4exoRi7ZBQXvkPABh0ij2k0
+         u4Pg==
+X-Gm-Message-State: AOJu0Yx5reqhnxmd6jwTlX+bkVwudC7Vv1JL2Ve9NXGPJH8ZBGgkhbzC
+	e2kMpWb125FzusL/M9XPg7Yyj19kY1FGVEwR0EHbGzkiiWq4NzRQ
+X-Gm-Gg: ASbGncvVtlo+Bni2QqIieTA/SqcJBqpIQskPDO8wxWRjA1n71y+OGTrR/yoTDLHkFbt
+	ezA2y62CubDmhlRC+Ou+c4BcSAmfafh0Mlmsw7CkhyQ0EnTBHHS4YNWTZdEQjTjNFYAmMmQe4ri
+	qXKjcR8dbXB8Y5eA380m3izHM7VKsHItxgDwfU01W+ZrK9BPt704w8rjypEGdI8ljkM9QPY322x
+	OIWXFGx3SrXflRPV+8GZ/m9p6LKCFKI1QkBr915vqfCrQdtYBZ0aYbec7KBnmqVSu/cco+RjgfV
+	pfc9qg==
+X-Google-Smtp-Source: AGHT+IG/g5M+wh4c5KYO2Hmd0HNqC9l3FrW6iPYb7yJhEx1HJ0RIzp+MU8p4JX7YN74E0vocHdvkeg==
+X-Received: by 2002:a17:907:26cd:b0:ab2:d8e7:682c with SMTP id a640c23a62f3a-ab75e345cb1mr665391966b.38.1738857118532;
+        Thu, 06 Feb 2025 07:51:58 -0800 (PST)
+Received: from gmail.com ([2a03:2880:30ff:2::])
+        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-ab7736468e7sm117774466b.172.2025.02.06.07.51.57
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 06 Feb 2025 07:51:57 -0800 (PST)
+Date: Thu, 6 Feb 2025 07:51:55 -0800
+From: Breno Leitao <leitao@debian.org>
+To: kuniyu@amazon.com, kuba@kernel.org, edumazet@google.com,
+	andrew+netdev@lunn.ch
+Cc: netdev@vger.kernel.org, ushankar@purestorage.com, kernel-team@meta.com
+Subject: for_each_netdev_rcu() protected by RTNL and CONFIG_PROVE_RCU_LIST
+Message-ID: <20250206-scarlet-ermine-of-improvement-1fcac5@leitao>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -95,69 +71,50 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20250206131859.2960543-3-yong.liang.choong@linux.intel.com>
-Sender: Russell King (Oracle) <linux@armlinux.org.uk>
 
-On Thu, Feb 06, 2025 at 09:18:54PM +0800, Choong Yong Liang wrote:
-> The xpcs_switch_interface_mode function was introduced to handle
-> interface switching.
-> 
-> According to the XPCS datasheet, a soft reset is required to initiate
-> Clause 37 auto-negotiation when the XPCS switches interface modes.
+Hello,
 
-Hmm. Given that description, taking it literally, claus 37
-auto-negotiation is 1000BASE-X, not Cisco SGMII (which isn't an IEEE
-802.3 standard.) Are you absolutely sure that this applies to Cisco
-SGMII?
+We're seeing CONFIG_PROVE_RCU_LIST warnings when for_each_netdev_rcu()
+is called with RTNL held. While RTNL provides sufficient locking, the
+RCU list checker isn't aware of this relationship, leading to false
+positives like:
 
-If the reset is required when switching to SGMII, should it be done
-before or after configuring the XPCS for SGMII?
+	WARNING: suspicious RCU usage
+	net/core/dev.c:1143 RCU-list traversed in non-reader section!!
 
-Also, if the reset is required, what happens if we're already using
-SGMII, but AN has been disabled temporarily and is then re-enabled?
-Is a reset required?
+The initial discussion popped up in:
 
-What about 1000BASE-X when AN is enabled or disabled and then switching
-to SGMII?
+	https://lore.kernel.org/all/20250205-flying-coucal-of-influence-0dcbc3@leitao/
 
-> +static int xpcs_switch_to_aneg_c37_sgmii(const struct dw_xpcs_compat *compat,
-> +					 struct dw_xpcs *xpcs,
-> +					 unsigned int neg_mode)
-> +{
-> +	bool an_c37_enabled;
-> +	int ret, mdio_ctrl;
-> +
-> +	if (neg_mode == PHYLINK_PCS_NEG_INBAND_ENABLED) {
-> +		mdio_ctrl = xpcs_read(xpcs, MDIO_MMD_VEND2, MII_BMCR);
-> +		if (mdio_ctrl < 0)
-> +			return mdio_ctrl;
-> +
-> +		an_c37_enabled = mdio_ctrl & BMCR_ANENABLE;
-> +		if (!an_c37_enabled) {
+I've attempted a solution by modifying for_each_netdev_rcu():
 
-I don't think that we need "an_c37_enabled" here, I think simply:
+	diff --git a/include/linux/netdevice.h b/include/linux/netdevice.h
+	index 2a59034a5fa2f..59b18b58fa927 100644
+	--- a/include/linux/netdevice.h
+	+++ b/include/linux/netdevice.h
+	@@ -3210,13 +3210,14 @@ netdev_notifier_info_to_extack(const struct netdev_notifier_info *info)
+	int call_netdevice_notifiers(unsigned long val, struct net_device *dev);
+	int call_netdevice_notifiers_info(unsigned long val,
+					struct netdev_notifier_info *info);
+	+bool lockdep_rtnl_net_is_held(struct net *net);
 
-		if (!(mdio_ctrl & BMCR_ANENABLE)) {
+	#define for_each_netdev(net, d)		\
+			list_for_each_entry(d, &(net)->dev_base_head, dev_list)
+	#define for_each_netdev_reverse(net, d)	\
+			list_for_each_entry_reverse(d, &(net)->dev_base_head, dev_list)
+	#define for_each_netdev_rcu(net, d)		\
+	-		list_for_each_entry_rcu(d, &(net)->dev_base_head, dev_list)
+	+		list_for_each_entry_rcu(d, &(net)->dev_base_head, dev_list, lockdep_rtnl_net_is_held(net))
+	#define for_each_netdev_safe(net, d, n)	\
+			list_for_each_entry_safe(d, n, &(net)->dev_base_head, dev_list)
+	#define for_each_netdev_continue(net, d)		\
 
-would be sufficient.
+However, I have concerns about using lockdep_rtnl_net_is_held() since it
+has a dependency on CONFIG_DEBUG_NET_SMALL_RTNL.
 
-> +			//Perform soft reset to initiate C37 auto-negotiation
-> +			ret = xpcs_soft_reset(xpcs, compat);
-> +			if (ret)
-> +				return ret;
-> +		}
-> +	}
-> +	return 0;
+Are there better approaches to silence these warnings when RTNL is held?
+Any suggestions would be appreciated.
 
-I'm also wondering (as above) whether this soft reset needs to happen
-_after_ xpcs_config_aneg_c37_sgmii() has done its work - this function
-temporarily disables AN while it's doing its work.
-
-I'm also wondering whether AN being disabled is really a deciding
-factor (e.g. when switching from 1000BASE-X AN-enabled to SGMII, is a
-reset required?)
-
--- 
-RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
-FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
+Thanks
+--breno
 
