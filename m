@@ -1,186 +1,178 @@
-Return-Path: <netdev+bounces-163671-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-163672-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3BE0CA2B4C6
-	for <lists+netdev@lfdr.de>; Thu,  6 Feb 2025 23:08:12 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9571FA2B4C3
+	for <lists+netdev@lfdr.de>; Thu,  6 Feb 2025 23:06:52 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 356FB7A4CAB
-	for <lists+netdev@lfdr.de>; Thu,  6 Feb 2025 22:05:53 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 25F84168139
+	for <lists+netdev@lfdr.de>; Thu,  6 Feb 2025 22:06:51 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 25C2A22FF51;
-	Thu,  6 Feb 2025 22:05:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6172B22FF23;
+	Thu,  6 Feb 2025 22:06:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="O1dA+n8e"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="gbYWxlby"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f41.google.com (mail-wm1-f41.google.com [209.85.128.41])
+Received: from mail-wm1-f44.google.com (mail-wm1-f44.google.com [209.85.128.44])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5927D23C399
-	for <netdev@vger.kernel.org>; Thu,  6 Feb 2025 22:05:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.41
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6A17723C395
+	for <netdev@vger.kernel.org>; Thu,  6 Feb 2025 22:06:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.44
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1738879550; cv=none; b=eY1xUO3wef/ZrLESHw5hMW9RCjZWjyy/oBlZ4cYb30THvEKGBDUAccHCy9sTBDrj66tvNvK/PzcibcggcGFWIkt1cfqE4KuND2EulWign9BhxaLW1UJe5k75x4AigddhEOoX6GqBy9OMnIPkZ+qhp3RIi3NZ0AYKH7BnjZ1E7x0=
+	t=1738879590; cv=none; b=ELwmdN1efEYw1oIK/otX45tABzydh+xnhjP5cl3v+ZxdlZWJGZtjHZQyUXeDWbObKx00v+z6omvdrL6z+61hbXDV6k4jsGz5CqqjnYLHzzbr+R3dV7n4RpkKc1aaJtMx/J5da2VULUoZFwx399V+7Nnne3j4PFpDYGTbZER3Ob4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1738879550; c=relaxed/simple;
-	bh=yFvLRB/1uonYJvUB3pyNx25eA6KZEsnXVeCG7KnhEYs=;
-	h=Message-ID:Date:MIME-Version:To:Cc:From:Subject:Content-Type; b=IdSVgyENS9Vbm+tedkdOUPi/hBYKjSn1gn00mETJn5Vml3ppIOMvl81+1IzSHcDfksJsl+jMbM/inZjSUQetbXYm+26ZXPRVpetmDhydqI1BpvbeJ9hzGSaFx5NgxeE9HmvuaGMwfpaS5AU3BS92yoi3L9wLhDSUBswytP6chhc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=O1dA+n8e; arc=none smtp.client-ip=209.85.128.41
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wm1-f41.google.com with SMTP id 5b1f17b1804b1-43626213fffso15469985e9.1
-        for <netdev@vger.kernel.org>; Thu, 06 Feb 2025 14:05:47 -0800 (PST)
+	s=arc-20240116; t=1738879590; c=relaxed/simple;
+	bh=X77zs/U3vERwGQtGKjkthBLNZyS+hGgA1zQJ5FfC8TE=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Content-Type; b=lIC5g6k4/mK9dfXzcs32HirrJjQT3LFs3OpXMtr/sIHnCCJcVpidHyvHopEKglq2yOq0zOk5PE7rp0DrWN5px32qEo1qd8d/Gu1l0+kbl1ZprwIuUzyJdX9dLHqPFrbnqkdpWoxadiRQjoJdhT9HPD1dgwg9MzhFM1QVUCfbcEs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=gbYWxlby; arc=none smtp.client-ip=209.85.128.44
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-wm1-f44.google.com with SMTP id 5b1f17b1804b1-4368a290e0dso7005e9.1
+        for <netdev@vger.kernel.org>; Thu, 06 Feb 2025 14:06:28 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1738879546; x=1739484346; darn=vger.kernel.org;
-        h=content-transfer-encoding:autocrypt:subject:from:cc:to
-         :content-language:user-agent:mime-version:date:message-id:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=y7dqCtGhKj3MthuvB5nCkF/cPPEOW7b1Hfa03hOxjmU=;
-        b=O1dA+n8esCMpcVgKi/SoZyEbDE3lO5s32EL7kkDJ+L1iigxBn/iMB88fbiWQ8dik6U
-         qkeZ+oohWvvqKCE50X09yM3MvDP1d75jt/PYFUcULME37P+9n9OAUbtiPGZyY4+S/w5d
-         GyoKglutrYEkIomum1a8w6o6JdidvdBq44WjGejeOXFhfrbRrSMiRPhQ3+StiHYgqOWu
-         mSUT+ccI9NtANh8a/PwOqrAH+ar0njQV/GMy6WJNXhjaVK5bZYvBb41ICPL4nYnmAY0u
-         qqAdXt2dzyHGqBUqDFqvyRDZUq3lazY0HVLRX1yVsjdeBrIMtZZlNg8+tqN7Hu11H1qe
-         S/Hw==
+        d=google.com; s=20230601; t=1738879587; x=1739484387; darn=vger.kernel.org;
+        h=content-transfer-encoding:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=xp8iDOYQXltBGNr+rgLCsCyZdt6CZUmdZc8/qGk7FfM=;
+        b=gbYWxlbyT3FzaICcqhYMPxRLNvg3nE0ENhSJ+G/S7wOCpE+JDXZUmY8rlR/nCYiEf5
+         joZykE6HKnX66m2SgAml7FnNaekwOAuxb6vUjblsC7XQFhsnn96vmmeRBY3A2IpmqGDp
+         TG6bkuXU9TrTEMBQq+Qehk/Zktde25q0ZK1gJv6Trhdt1p/3BIQqUB/wm/KTEiRv+5im
+         5nh5wpfEzYGI66V4gRlAtvWRG4+G7K7A5BfMnGABsaXHKjCSqLU4CfjLxGcvDoIH3VwK
+         d16S9cruZFFkAxB3rBd6GPcX9cqzTaz8EXDBpYbqkW6pZnoyY6vG1JvsDHX6brp3zkys
+         251Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1738879546; x=1739484346;
-        h=content-transfer-encoding:autocrypt:subject:from:cc:to
-         :content-language:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=y7dqCtGhKj3MthuvB5nCkF/cPPEOW7b1Hfa03hOxjmU=;
-        b=MBlRZBME3nAI3KW3H8JOt2WOTGbG+uRowwKY+Go31NGx3ONRMWC0w9bKvHXfMpBWhj
-         v9LTKKio4Ck/dNRz9MUy+A3vvn8HSPepeyOYuM37y0/SeEK+etNlUSMeML5hcUn7DnEx
-         DuxiOuCMF4iwbSC9nFuve48X8MMen+W029ekVKFCAS3FR2tsPXtCij+Lv8qiMCYgQtnW
-         +EIqZIj1exZYaP5fK7BrK1q7yROx76OoXjeshgYDC2Xa8QeXEvTd4gTUWK+yjN0AptaH
-         taHYNd7aGlREMvTRwjDoK8gJhsAtvTiODH2lll2B5qbRbO529mW7cbHq0Kj+ojOq+7h3
-         lm2A==
-X-Gm-Message-State: AOJu0YyuGsLh6AyULGO/UJGCdmwJWjvTyvAd0BSIDJSfMQ85BkgShknH
-	5JCVXSI/b0GtrzZK4YFyhXfBwK58haG3rDJ6/5tg8nS6vjXWxrZ0
-X-Gm-Gg: ASbGnct9E8r3ee6Qj/YgOzKjbId5958xO96iHtA5BQONVFhsyzfGK39aD8YHez2pAor
-	FpBPAMjYrhgi3KLm8NXCi+KyVxkH07zGsPhW11O6AeTAYpmvZ5OqIVKall7XWU4qIQ7sxojwmBW
-	Dz8YsUl49/1JlvRdBzgf4oCIVf5zOxhslD+A9RIIP5MtKGmfGDeMH76YZ01is9gSRjC6+hRfzks
-	G3HzS6DQ3DaO1vRG01vXqC1KkEMvc4NGjwqFOxBdD2GLM1+thhAf16eiKEUHneyl18Iw1ybydWd
-	ChV1DTxiPKS3Idp1+mb2DIK95vyfzRAhJTIO/SrN3kMC5WCLdqkSwBoMAXiZ3BGO6GbGDZTLWB+
-	MLWibpOMWLsA5H1aOsxucpA3SHub0LMLKxl48zljcCLkA8MKgQsbgxQfTwmp5uoOOUK4+H9CQwV
-	nkgp7S
-X-Google-Smtp-Source: AGHT+IH4gkScH6vog8Eo6d8+mq9PgQqZOBWF10bLCXiT1vwOYA9VEcWv2eAd25Oac7ShDV19LL9klA==
-X-Received: by 2002:a05:6000:4009:b0:38c:24f0:fc28 with SMTP id ffacd0b85a97d-38dbb20b3d7mr3424412f8f.3.1738879546367;
-        Thu, 06 Feb 2025 14:05:46 -0800 (PST)
-Received: from ?IPV6:2a02:3100:a4c1:b600:2cd2:4b1:d253:fccb? (dynamic-2a02-3100-a4c1-b600-2cd2-04b1-d253-fccb.310.pool.telefonica.de. [2a02:3100:a4c1:b600:2cd2:4b1:d253:fccb])
-        by smtp.googlemail.com with ESMTPSA id 5b1f17b1804b1-4391dcae5c7sm31504405e9.18.2025.02.06.14.05.44
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 06 Feb 2025 14:05:45 -0800 (PST)
-Message-ID: <b863dcf7-31e8-45a1-a284-7075da958ff0@gmail.com>
-Date: Thu, 6 Feb 2025 23:06:07 +0100
+        d=1e100.net; s=20230601; t=1738879587; x=1739484387;
+        h=content-transfer-encoding:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=xp8iDOYQXltBGNr+rgLCsCyZdt6CZUmdZc8/qGk7FfM=;
+        b=ACukJDhSTRRGW6M2heh0exjIPI3xIZLDIio5a3z5StLf4cmhLKwpaP59X5cBk5i92j
+         lGmbUuVEEzcAUvjX4K+Jf5vqGNUE91L27L/iw1Ip3jVupMbktZAOJvnvTVB4mwhNZWxP
+         i8/gcbYZfoQ9ZfmdYah4EOFO4kiEXLQttY0p/bSNs9yNFzDcjIV3kafXgqr1iDtvO4F2
+         EmRBLdRQfbMqGNqobcgDcQ+vF3rfFyqhyIhudTaiXZ/JMrlVQbW1o4/1qJRdRJ3fPzQJ
+         HRYWBwMKKP3mwqTsKBjljUNOKBPPiG8jJLaCpwbiGIqTzkCdN7PIg8J0I4NsAyeltOyl
+         iQgQ==
+X-Forwarded-Encrypted: i=1; AJvYcCUAyW4GJdSyQL+mMcMYjA2svTdAbW03z08u4AvU/yxnZYFTTN52rnrfcajaSY0idpWYC2vxYzA=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzSfFRvw+I2shA/GWGCTzgA8xqophVHwhIBYA0VxlylaDfLKd9v
+	KNdWVYzvwvz7PpajlgFtlEjf7L3mawJloQOM9ktXTutsevE3hqXEhtek0t8LTKIT4BMMRVLc21m
+	AnppgPgTHCwyAb9ooRLEvZOIYVx/alxeCDn7y
+X-Gm-Gg: ASbGncuTCngYJep5+SpqZLcActsY9/2dZvN9ysZm1HJ3fR442GlqIS+AqK1yQT/Quv9
+	9xipomXPx/Sofl/1qGUl6Mv23TFV2+bqsFiQIKYLqyKafZ4mFKmIsZF2NKfC05mVa0hajY4Ip8H
+	sAfoYGh761mi6TOAvgUx14k0vW54D3xw==
+X-Google-Smtp-Source: AGHT+IEn8Q0gdX5EG+Vag9xOtdq5gtEp5PgQL9pH4d3PNECuT7mA6s4+bZQnRdJEB2otVCuRflFyR1/CNhyNlIQZxE4=
+X-Received: by 2002:a05:600c:568f:b0:42c:9e35:cde6 with SMTP id
+ 5b1f17b1804b1-439252682demr288915e9.2.1738879586489; Thu, 06 Feb 2025
+ 14:06:26 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Content-Language: en-US
-To: Claudiu Manoil <claudiu.manoil@nxp.com>,
- Andrew Lunn <andrew+netdev@lunn.ch>, Paolo Abeni <pabeni@redhat.com>,
- David Miller <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>,
- Eric Dumazet <edumazet@google.com>
-Cc: "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
- Simon Horman <horms@kernel.org>
-From: Heiner Kallweit <hkallweit1@gmail.com>
-Subject: [PATCH net-next] net: gianfar: simplify init_phy()
-Autocrypt: addr=hkallweit1@gmail.com; keydata=
- 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
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+References: <20250205001052.2590140-1-skhawaja@google.com> <Z6LYjHJxx0pI45WU@LQ3V64L9R2>
+ <Z6UnSe1CGdeNSv2q@LQ3V64L9R2>
+In-Reply-To: <Z6UnSe1CGdeNSv2q@LQ3V64L9R2>
+From: Samiullah Khawaja <skhawaja@google.com>
+Date: Thu, 6 Feb 2025 14:06:14 -0800
+X-Gm-Features: AWEUYZn_o3A2V_fnwe31oFFnEF57TiPvEVzeNYNKpT6enkIEn7cWds32EHJrd2s
+Message-ID: <CAAywjhQAb+ExOuPo33ahT68592M4FDNuWx0ieVqevBfNR-Q5TQ@mail.gmail.com>
+Subject: Re: [PATCH net-next v3 0/4] Add support to do threaded napi busy poll
+To: Joe Damato <jdamato@fastly.com>, Samiullah Khawaja <skhawaja@google.com>, 
+	Jakub Kicinski <kuba@kernel.org>, "David S . Miller" <davem@davemloft.net>, 
+	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, almasrymina@google.com, 
+	netdev@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Use phy_set_max_speed() to simplify init_phy().
-
-Signed-off-by: Heiner Kallweit <hkallweit1@gmail.com>
----
- drivers/net/ethernet/freescale/gianfar.c | 14 ++------------
- 1 file changed, 2 insertions(+), 12 deletions(-)
-
-diff --git a/drivers/net/ethernet/freescale/gianfar.c b/drivers/net/ethernet/freescale/gianfar.c
-index 435138f46..deb35b38c 100644
---- a/drivers/net/ethernet/freescale/gianfar.c
-+++ b/drivers/net/ethernet/freescale/gianfar.c
-@@ -1647,20 +1647,11 @@ static void gfar_configure_serdes(struct net_device *dev)
-  */
- static int init_phy(struct net_device *dev)
- {
--	__ETHTOOL_DECLARE_LINK_MODE_MASK(mask) = { 0, };
- 	struct gfar_private *priv = netdev_priv(dev);
- 	phy_interface_t interface = priv->interface;
- 	struct phy_device *phydev;
- 	struct ethtool_keee edata;
- 
--	linkmode_set_bit_array(phy_10_100_features_array,
--			       ARRAY_SIZE(phy_10_100_features_array),
--			       mask);
--	linkmode_set_bit(ETHTOOL_LINK_MODE_Autoneg_BIT, mask);
--	linkmode_set_bit(ETHTOOL_LINK_MODE_MII_BIT, mask);
--	if (priv->device_flags & FSL_GIANFAR_DEV_HAS_GIGABIT)
--		linkmode_set_bit(ETHTOOL_LINK_MODE_1000baseT_Full_BIT, mask);
--
- 	priv->oldlink = 0;
- 	priv->oldspeed = 0;
- 	priv->oldduplex = -1;
-@@ -1675,9 +1666,8 @@ static int init_phy(struct net_device *dev)
- 	if (interface == PHY_INTERFACE_MODE_SGMII)
- 		gfar_configure_serdes(dev);
- 
--	/* Remove any features not supported by the controller */
--	linkmode_and(phydev->supported, phydev->supported, mask);
--	linkmode_copy(phydev->advertising, phydev->supported);
-+	if (!(priv->device_flags & FSL_GIANFAR_DEV_HAS_GIGABIT))
-+		phy_set_max_speed(phydev, SPEED_100);
- 
- 	/* Add support for flow control */
- 	phy_support_asym_pause(phydev);
--- 
-2.48.1
-
+On Thu, Feb 6, 2025 at 1:19=E2=80=AFPM Joe Damato <jdamato@fastly.com> wrot=
+e:
+>
+> On Tue, Feb 04, 2025 at 07:18:36PM -0800, Joe Damato wrote:
+> > On Wed, Feb 05, 2025 at 12:10:48AM +0000, Samiullah Khawaja wrote:
+> > > Extend the already existing support of threaded napi poll to do conti=
+nuous
+> > > busy polling.
+> >
+> > [...]
+> >
+> > Overall, +1 to everything Martin said in his response. I think I'd
+> > like to try to reproduce this myself to better understand the stated
+> > numbers below.
+> >
+> > IMHO: the cover letter needs more details.
+> >
+> > >
+> > > Setup:
+> > >
+> > > - Running on Google C3 VMs with idpf driver with following configurat=
+ions.
+> > > - IRQ affinity and coalascing is common for both experiments.
+> >
+> > As Martin suggested, a lot more detail here would be helpful.
+>
+> Just to give you a sense of the questions I ran into while trying to
+> reproduce this just now:
+>
+> - What is the base SHA? You should use --base when using git
+>   format-patch. I assumed the latest net-next SHA and applied the
+>   patches to that.
+Yes that is true. I will use --base when I do it next. Thanks for the
+suggestion.
+>
+> - Which C3 instance type? I chose c3-highcpu-192-metal, but I could
+>   have chosen c3-standard-192-metal, apparently. No idea what
+>   difference this makes on the results, if any.
+The tricky part is that the c3 instance variant that I am using for
+dev is probably not available publicly. It is a variant of
+c3-standard-192-metal but we had to enable AF_XDP on it to make it
+stable to be able to run onload. You will have to reproduce this on a
+platform available to you with AF_XDP as suggested in the onload
+github I shared. This is the problem with providing an
+installer/runner script and also system configuration. My
+configuration would not be best for your platform, but you should
+certainly be able to reproduce the relative improvements in latency
+using the different busypolling schemes (busy_read/busy_poll vs
+threaded napi busy poll) I mentioned in the cover letter.
+>
+> - Was "tier 1 networking" enabled? I enabled it. No idea if it
+>   matters or not. I assume not, since it would be internal
+>   networking within the GCP VPC of my instances and not real egress?
+>
+> - What version of onload was used? Which SHA or release tag?
+v9.0, I agree this should be added to the cover letter.
+>
+> - I have no idea where to put CPU affinity for the 1 TX/RX queue, I
+>   assume CPU 2 based on your other message.
+Yes I replied to Martin with this information, but like I said it
+certainly depends on your platform and hence didn't include it in the
+cover letter. Since I don't know what/where core 2 looks like on your
+platform.
+>
+> - The neper commands provided seem to be the server side since there
+>   is no -c mentioned. What is the neper client side command?
+Same command with -c
+>
+> - What do the environment variables set for onload+neper mean?
+>
+> ...
+>
+> Do you follow what I'm getting at here? The cover lacks a tremendous
+> amount of detail that makes reproducing the setup you are using
+> unnecessarily difficult.
+>
+> Do you agree that I should be able to read the cover letter and, if
+> so desired, go off and reproduce the setup and get similar results?
+Yes you should be able to that, but there are micro details of your
+platform and configuration that I have no way of knowing and suggest
+configurations. I have certainly pointed out the relevant environment
+and special configurations (netdev queues sizes, sysctls, irq defer,
+neper command and onload environment variables) that I did for each
+test case in my experiment. Beyond that I have no way of providing you
+an internal C3 platform or providing system configuration for your
+platform.
 
