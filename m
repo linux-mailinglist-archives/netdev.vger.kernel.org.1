@@ -1,170 +1,140 @@
-Return-Path: <netdev+bounces-163437-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-163440-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9FB63A2A42C
-	for <lists+netdev@lfdr.de>; Thu,  6 Feb 2025 10:25:35 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id C744FA2A43F
+	for <lists+netdev@lfdr.de>; Thu,  6 Feb 2025 10:27:44 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 9424D3A3043
-	for <lists+netdev@lfdr.de>; Thu,  6 Feb 2025 09:25:26 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id D32FA1888DC5
+	for <lists+netdev@lfdr.de>; Thu,  6 Feb 2025 09:27:47 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 08684226160;
-	Thu,  6 Feb 2025 09:25:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 902F8226535;
+	Thu,  6 Feb 2025 09:27:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="BJXHUnKc"
 X-Original-To: netdev@vger.kernel.org
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 656C81FCCE4
-	for <netdev@vger.kernel.org>; Thu,  6 Feb 2025 09:25:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
+Received: from mail-wm1-f46.google.com (mail-wm1-f46.google.com [209.85.128.46])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 743E1226165;
+	Thu,  6 Feb 2025 09:27:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.46
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1738833931; cv=none; b=uXTtIFXkmHqLi3mJloxhyh5YRyBrpF9p18KnRLrPZ3aFzb/Bz8bXo7vtxc9T2tDeQddl0+hkgcvDowe6eXpJB4odsHEPX3agTFWy1X+dpQG4giaEfwBaG5LbwJWCG0zfgi+viC+Y2+ehdgUnhRCLLgqIa+J1gzJvCJ7ZvZXhi+E=
+	t=1738834039; cv=none; b=h/rsg45YPVIkvZy0sTG4teQgRs22UXaatGLIeYqEbimxIwF0F4VGWahmm66RNOBs700xw+yW5ukGBnszUYSC3d6NSg8euoNXue4vVPzT97L9nP0WrsPpGVMsegyMucTCqA3yDBrGNjEOQj8X+4e2cL94PL3O7sFrF2QlqF/QRE0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1738833931; c=relaxed/simple;
-	bh=tE2AYB16+fgBWvhMHWaTL73rEi56eWaSNbgT1CPsE7c=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=V2/eZ8edLjlkI8lpgSXIV5/ocPDaMKowfW/daFhMA9yJIGHbEpOem54MiX2pqtCJlvXRA4ZUXflczrtexC7MXTfnV0Un8dYepeonIPsW5Pok7ILKt3sOft6mj8Warv6Zxm9WSpeUbfzyHvnOoJAQiEpzdr49sNaD8YBMhrZYfng=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 94A9F12FC;
-	Thu,  6 Feb 2025 01:25:51 -0800 (PST)
-Received: from [10.1.30.52] (e122027.cambridge.arm.com [10.1.30.52])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 732CC3F63F;
-	Thu,  6 Feb 2025 01:25:25 -0800 (PST)
-Message-ID: <4ed5b1dc-4f5c-4d2a-97e2-7b1f43dccfdc@arm.com>
-Date: Thu, 6 Feb 2025 09:25:23 +0000
+	s=arc-20240116; t=1738834039; c=relaxed/simple;
+	bh=lcx/16fnWRrRAPSitTCsB7hwMqM515e4kpAPwXmpS5U=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=vFjqr7/E1gSq9PmNNTRKLBw8GF0PygvvmV3xWu/c1YwdHlbnEzK73+QwXMnmlhnjTDTXNm1uglp6aosYucfMWZGiS7TTAgtXXekOFO72Hid1lH19Omjle0d+a7No6KN2+/t7PBNRCgxutKeA0khERPnAhWC90zevR8SXWIflMb0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=BJXHUnKc; arc=none smtp.client-ip=209.85.128.46
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-wm1-f46.google.com with SMTP id 5b1f17b1804b1-43675b1155bso7184405e9.2;
+        Thu, 06 Feb 2025 01:27:14 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1738834032; x=1739438832; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=fNDukdLUclulwvbY5VrD2HTtaCRvfs2m8Kmu+NBmTvM=;
+        b=BJXHUnKct6SRG77JZ5MeNYsaLaCLSk3/vCY2jXTqtv7N5xqubkvDhpYIvZaGlFEYXW
+         i8+bWwHSXXq/co2xrXotN1LG0FURbvp5rspO0G/gWqqMD9IV2HBKq+YJVaIweF1jvm/0
+         8iXgO/Emo/EQQO9tDQ2nZ9k+wGaFd0G8iAcAd4v7jgxOwWRtZQRGyLqEGRDc7EYqD4tp
+         O1+1hTUPDCJUZOVRhuzn+V8sYosQU/0KS6iHjxLWt9hp0gs+/soiMeiide/z2Kb+91jX
+         UjY4a/pOYlz+pp5rYRHIlDxi9pzJTEiv5muG4J1dTToKrIkQUiDk2HLda+ijFlC7YII8
+         tphw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1738834032; x=1739438832;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=fNDukdLUclulwvbY5VrD2HTtaCRvfs2m8Kmu+NBmTvM=;
+        b=mPP6r0HHC5yza/I9UHKTCXCvvOZPs5mYv6lyRf+muKZRP2dK4Yxk1lRUnwMs45L2Xz
+         HEklPi9602Drv1M8VLOqM9BIPauAsEMRKbrKmPUXrQj4o5J9q+/3T2v4Qqspg2CMpQcP
+         yiD6hECX8TbOdoy5rO2wjtC/1lOFjoZxE6KY7tVWdrNttcNSo3zFUF0djQ+CGkShMg1H
+         ATp4NNLbfHlYVE+0nZMCej+55p6XYxjsCI+/9DKFXWXqBWgv1yowEXHk5bYaAMhn5Co/
+         NgRH4tvYdNqoiPujZlg2HWnRqc1EQ/jn5UufdMriUnlLTYKmN/vVribJRg4HRnAQACt5
+         Uahw==
+X-Forwarded-Encrypted: i=1; AJvYcCXixvL1U/HzwuTEMoto4NZf32BMLyZWWnKjll/o9ZdiEtmxlP/5NFTzJs+AhE83rDWtRruVv4KkpHT3RDIeEg==@vger.kernel.org
+X-Gm-Message-State: AOJu0YzTziQNL7aNulm2ggZtt3x36vQY6mq7wtUn5RYFl61DZ1WPXOwB
+	+bFtpKtdkydH32+FKFvuQYRqzCCG94aD/0YEgFZYcajxWOr0XSAMJ/JUyA==
+X-Gm-Gg: ASbGnct6ZrrDy5ZLwPBmXq2mZFgwebvPrWsqOCaoYv9yCN9buHWphvhk+YzyMc+ohXa
+	t721NB55fAFG5GFDn+M29l04zK5VkqBxk05qvFJGYygh5QZhmUTHODicRyEF7XYYtzJ9ejmmdse
+	s5JUDf3NZSBmmsQtfv2mawTN5Mr2GuyW2ybzRiz+w0DF1MiAow7+ppi0c0JBQaoBfVU0+j75M0F
+	IvVvhYKjTDwJwmFkQnhEFpAYd3O19ITIirq7xHFTaiija2Cv8x/VkWQ6weppKIrrcAH+qoryO6A
+	oXsGu7zHngNidciM4bPKvEQWe2jaxZsmew==
+X-Google-Smtp-Source: AGHT+IHhSHxOUFCkPrhKeomCcGPw14hS4wb7HtxXpXpI8A8Oi5KJIRzr4NUSjnNn27/EnbOloQEJKw==
+X-Received: by 2002:a05:600c:1d1e:b0:435:294:f1c8 with SMTP id 5b1f17b1804b1-4390d574e09mr44240645e9.28.1738834032203;
+        Thu, 06 Feb 2025 01:27:12 -0800 (PST)
+Received: from imac.lan ([2a02:8010:60a0:0:c428:5404:970c:34c7])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-4391dca004esm12832585e9.13.2025.02.06.01.27.11
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 06 Feb 2025 01:27:11 -0800 (PST)
+From: Donald Hunter <donald.hunter@gmail.com>
+To: netdev@vger.kernel.org,
+	Jakub Kicinski <kuba@kernel.org>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Simon Horman <horms@kernel.org>,
+	Johannes Berg <johannes@sipsolutions.net>,
+	linux-wireless@vger.kernel.org
+Cc: donald.hunter@redhat.com,
+	Donald Hunter <donald.hunter@gmail.com>
+Subject: [PATCH net-next v3 00/10] netlink: specs: add a spec for nl80211 wiphy
+Date: Thu,  6 Feb 2025 09:26:48 +0000
+Message-ID: <20250206092658.1383-1-donald.hunter@gmail.com>
+X-Mailer: git-send-email 2.48.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net] Revert "net: stmmac: Specify hardware capability
- value when FIFO size isn't specified"
-To: "Russell King (Oracle)" <rmk+kernel@armlinux.org.uk>,
- Andrew Lunn <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>
-Cc: Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller"
- <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- Maxime Coquelin <mcoquelin.stm32@gmail.com>,
- Alexandre Torgue <alexandre.torgue@foss.st.com>, netdev@vger.kernel.org,
- linux-stm32@st-md-mailman.stormreply.com,
- linux-arm-kernel@lists.infradead.org
-References: <E1tfeyR-003YGJ-Gb@rmk-PC.armlinux.org.uk>
-From: Steven Price <steven.price@arm.com>
-Content-Language: en-GB
-In-Reply-To: <E1tfeyR-003YGJ-Gb@rmk-PC.armlinux.org.uk>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 
-On 05/02/2025 12:57, Russell King (Oracle) wrote:
-> This reverts commit 8865d22656b4, which caused breakage for platforms
-> which are not using xgmac2 or gmac4. Only these two cores have the
-> capability of providing the FIFO sizes from hardware capability fields
-> (which are provided in priv->dma_cap.[tr]x_fifo_size.)
-> 
-> All other cores can not, which results in these two fields containing
-> zero. We also have platforms that do not provide a value in
-> priv->plat->[tr]x_fifo_size, resulting in these also being zero.
-> 
-> This causes the new tests introduced by the reverted commit to fail,
-> and produce e.g.:
-> 
-> 	stmmaceth f0804000.eth: Can't specify Rx FIFO size
-> 
-> An example of such a platform which fails is QEMU's npcm750-evb.
-> This uses dwmac1000 which, as noted above, does not have the capability
-> to provide the FIFO sizes from hardware.
-> 
-> Therefore, revert the commit to maintain compatibility with the way
-> the driver used to work.
-> 
-> Reported-by: Guenter Roeck <linux@roeck-us.net>
-> Link: https://lore.kernel.org/r/4e98f967-f636-46fb-9eca-d383b9495b86@roeck-us.net
-> Signed-off-by: Russell King (Oracle) <rmk+kernel@armlinux.org.uk>
+Add a rudimentary YNL spec for nl80211 that includes get-wiphy and
+get-interface, along with some required enhancements to YNL and the
+netlink schemas.
 
-Tested on my Firefly RK3288
+Patch 1 is a minor cleanup to prepare for patch 2
+Patches 2-4 are new features for YNL
+Patches 5-7 are updates to ynl_gen_c
+Patches 8-9 are schema updates for feature parity
+Patch 10 is the new nl80211 spec
 
-Tested-by: Steven Price <steven.price@arm.com>
+v2 -> v3
+ - Updates to spec and codegen to clean up compiler
+   errors in generated nl80211-user.[ch]
 
-> ---
->  .../net/ethernet/stmicro/stmmac/stmmac_main.c | 35 +++++++++----------
->  1 file changed, 17 insertions(+), 18 deletions(-)
-> 
-> diff --git a/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c b/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
-> index d04543e5697b..b34ebb916b89 100644
-> --- a/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
-> +++ b/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
-> @@ -2424,6 +2424,11 @@ static void stmmac_dma_operation_mode(struct stmmac_priv *priv)
->  	u32 chan = 0;
->  	u8 qmode = 0;
->  
-> +	if (rxfifosz == 0)
-> +		rxfifosz = priv->dma_cap.rx_fifo_size;
-> +	if (txfifosz == 0)
-> +		txfifosz = priv->dma_cap.tx_fifo_size;
-> +
->  	/* Split up the shared Tx/Rx FIFO memory on DW QoS Eth and DW XGMAC */
->  	if (priv->plat->has_gmac4 || priv->plat->has_xgmac) {
->  		rxfifosz /= rx_channels_count;
-> @@ -2892,6 +2897,11 @@ static void stmmac_set_dma_operation_mode(struct stmmac_priv *priv, u32 txmode,
->  	int rxfifosz = priv->plat->rx_fifo_size;
->  	int txfifosz = priv->plat->tx_fifo_size;
->  
-> +	if (rxfifosz == 0)
-> +		rxfifosz = priv->dma_cap.rx_fifo_size;
-> +	if (txfifosz == 0)
-> +		txfifosz = priv->dma_cap.tx_fifo_size;
-> +
->  	/* Adjust for real per queue fifo size */
->  	rxfifosz /= rx_channels_count;
->  	txfifosz /= tx_channels_count;
-> @@ -5868,6 +5878,9 @@ static int stmmac_change_mtu(struct net_device *dev, int new_mtu)
->  	const int mtu = new_mtu;
->  	int ret;
->  
-> +	if (txfifosz == 0)
-> +		txfifosz = priv->dma_cap.tx_fifo_size;
-> +
->  	txfifosz /= priv->plat->tx_queues_to_use;
->  
->  	if (stmmac_xdp_is_enabled(priv) && new_mtu > ETH_DATA_LEN) {
-> @@ -7219,29 +7232,15 @@ static int stmmac_hw_init(struct stmmac_priv *priv)
->  		priv->plat->tx_queues_to_use = priv->dma_cap.number_tx_queues;
->  	}
->  
-> -	if (!priv->plat->rx_fifo_size) {
-> -		if (priv->dma_cap.rx_fifo_size) {
-> -			priv->plat->rx_fifo_size = priv->dma_cap.rx_fifo_size;
-> -		} else {
-> -			dev_err(priv->device, "Can't specify Rx FIFO size\n");
-> -			return -ENODEV;
-> -		}
-> -	} else if (priv->dma_cap.rx_fifo_size &&
-> -		   priv->plat->rx_fifo_size > priv->dma_cap.rx_fifo_size) {
-> +	if (priv->dma_cap.rx_fifo_size &&
-> +	    priv->plat->rx_fifo_size > priv->dma_cap.rx_fifo_size) {
->  		dev_warn(priv->device,
->  			 "Rx FIFO size (%u) exceeds dma capability\n",
->  			 priv->plat->rx_fifo_size);
->  		priv->plat->rx_fifo_size = priv->dma_cap.rx_fifo_size;
->  	}
-> -	if (!priv->plat->tx_fifo_size) {
-> -		if (priv->dma_cap.tx_fifo_size) {
-> -			priv->plat->tx_fifo_size = priv->dma_cap.tx_fifo_size;
-> -		} else {
-> -			dev_err(priv->device, "Can't specify Tx FIFO size\n");
-> -			return -ENODEV;
-> -		}
-> -	} else if (priv->dma_cap.tx_fifo_size &&
-> -		   priv->plat->tx_fifo_size > priv->dma_cap.tx_fifo_size) {
-> +	if (priv->dma_cap.tx_fifo_size &&
-> +	    priv->plat->tx_fifo_size > priv->dma_cap.tx_fifo_size) {
->  		dev_warn(priv->device,
->  			 "Tx FIFO size (%u) exceeds dma capability\n",
->  			 priv->plat->tx_fifo_size);
+v1 -> v2
+ - Add formatting hints support to patch 3, thanks Jakub
+ - Raise exception for unhandled hints in patch 4, thanks Jakub
+ - Update nl80211 spec w/ split-wiphy-dump in patch 7, thanks Johannes
+
+Donald Hunter (10):
+  tools/net/ynl: remove extraneous plural from variable names
+  tools/net/ynl: support decoding indexed arrays as enums
+  tools/net/ynl: support rendering C array members to strings
+  tools/net/ynl: accept IP string inputs
+  tools/net/ynl: add s8, s16 to valid scalars in ynl-gen-c
+  tools/net/ynl: sanitise enums with leading digits in ynl-gen-c
+  tools/net/ynl: add indexed-array scalar support to ynl-gen-c
+  netlink: specs: support nested structs in genetlink legacy
+  netlink: specs: add s8, s16 to genetlink schemas
+  netlink: specs: wireless: add a spec for nl80211
+
+ Documentation/netlink/genetlink-c.yaml      |    2 +-
+ Documentation/netlink/genetlink-legacy.yaml |    5 +-
+ Documentation/netlink/genetlink.yaml        |    2 +-
+ Documentation/netlink/specs/nl80211.yaml    | 2000 +++++++++++++++++++
+ tools/net/ynl/Makefile.deps                 |    1 +
+ tools/net/ynl/pyynl/lib/ynl.py              |   46 +-
+ tools/net/ynl/pyynl/ynl_gen_c.py            |   30 +-
+ 7 files changed, 2065 insertions(+), 21 deletions(-)
+ create mode 100644 Documentation/netlink/specs/nl80211.yaml
+
+-- 
+2.48.1
 
 
