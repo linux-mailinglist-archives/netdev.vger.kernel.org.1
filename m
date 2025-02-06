@@ -1,221 +1,131 @@
-Return-Path: <netdev+bounces-163637-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-163638-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id C1015A2B155
-	for <lists+netdev@lfdr.de>; Thu,  6 Feb 2025 19:38:40 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 295C9A2B166
+	for <lists+netdev@lfdr.de>; Thu,  6 Feb 2025 19:40:50 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 4BCD01881BAF
-	for <lists+netdev@lfdr.de>; Thu,  6 Feb 2025 18:38:39 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 3F5441882C67
+	for <lists+netdev@lfdr.de>; Thu,  6 Feb 2025 18:40:55 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9437B1A0BED;
-	Thu,  6 Feb 2025 18:36:05 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3A8FF1624ED;
+	Thu,  6 Feb 2025 18:40:24 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="4JoHTE0C"
+	dkim=pass (1024-bit key) header.d=fastly.com header.i=@fastly.com header.b="BzJ2a9ha"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-f44.google.com (mail-ed1-f44.google.com [209.85.208.44])
+Received: from mail-pl1-f172.google.com (mail-pl1-f172.google.com [209.85.214.172])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7219A1624ED
-	for <netdev@vger.kernel.org>; Thu,  6 Feb 2025 18:36:03 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.44
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 92AC919E99A
+	for <netdev@vger.kernel.org>; Thu,  6 Feb 2025 18:40:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1738866965; cv=none; b=Dj8kg1F17Fhc2NM34VkMAeJU5E7tcvQ+qENzqxC00FXC9W14dRafmH17HmC9nigXY9w4zT5cGvH/kASSovEgbrcTIUGjzc/lHbP9jPH0x6acix6Rpxhy0uEYbF/Roru56ylFeQeP+ZMvKjAf7q5CYn4fmp8rkYCBbn5H46fOpZk=
+	t=1738867224; cv=none; b=XHLaJA+jV8kaNCtCCN08JxMXQL/U/6W2oAHy93VXpWgG3wHS4+g8rfOUNdxwkR5OoVQpKvt1uqeqiCHQ437s5asxZ8pvfDaPvx7oA0RJcipexPYUtQNC3r71sboruFZZZ9ClJmkUsO/KE2dWlAKp6SegbjbN/bWbzhf8H80s1mE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1738866965; c=relaxed/simple;
-	bh=6k0c514ifgRxumVpwmuklzpT5/ghthq6fO5uum6kidQ=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=Wa0h2mW5sDwt/wQGbUxHnW0kdbnTGb4qM618Hs40tzjuEhER5r+MdgEuXq6uxKv2cq0TNdFZPAd+JUujSyVTZP9wDWupqhtHt36ja2+12yASr0drQr6ndTv3kkYW2Bh7LR7OOJq+IG7emBNjvdyDHD9sK8LPaNdmQuvIrHxxyTA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=4JoHTE0C; arc=none smtp.client-ip=209.85.208.44
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-ed1-f44.google.com with SMTP id 4fb4d7f45d1cf-5dcf0de81ebso2151296a12.1
-        for <netdev@vger.kernel.org>; Thu, 06 Feb 2025 10:36:03 -0800 (PST)
+	s=arc-20240116; t=1738867224; c=relaxed/simple;
+	bh=MZkfK2lTbRGoT8Ii/polcb28rK/eytN5P/Ez7yOpQE8=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=CvrP9/go5LbhfSKVUrTD8vuXI/+7OApgv5mMrl3lfJf87Sywr2IiRjTBht7pvvvEGojIlG0sub7SkEAeE2tUi5hQdtxmIhFeNLKk1BRKfU4nDGd81IsfyjCEeIEW5roJb0WhaxsycDJmIItZb37KvB7T0a+GsoqGCpGC6Yziwl0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fastly.com; spf=pass smtp.mailfrom=fastly.com; dkim=pass (1024-bit key) header.d=fastly.com header.i=@fastly.com header.b=BzJ2a9ha; arc=none smtp.client-ip=209.85.214.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fastly.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=fastly.com
+Received: by mail-pl1-f172.google.com with SMTP id d9443c01a7336-21f3c119fe6so21782355ad.0
+        for <netdev@vger.kernel.org>; Thu, 06 Feb 2025 10:40:20 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1738866962; x=1739471762; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=O8XOC3TytrR9S7MCmV022YQgT71sHiaPGs7/xP0Tr+s=;
-        b=4JoHTE0CWwe2DfunqmhhT+qByDmP4059sqtY5kqDq3IAbcqe0L+YmbKjWfGbyyNBw+
-         6/hKCvrpuP7RtBUc/dvQ19qLaKYWjFEAqlm/Ir4GiIf9/SaGLHozHbKKgiJ2FDdhaRMH
-         7UAAyJB5TRTtE1Xtn1bT2ZXa9fxZALhTI5eO/CJTqZxyedOBrpVoTVbWmuAOFpHqtVfZ
-         BRSBS18fV1bchahTZNXWGQg803aVLe1u0OKBJ4QHq/iKjob9XEaQXotnWd0q8gNLWVt4
-         oENyDKCzoEI9W5PjRmAclXdzeoUCXJLTBJR0YfBStsjSTKdLgErZrD/1dJZHgd/XjzYL
-         OyZA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1738866962; x=1739471762;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+        d=fastly.com; s=google; t=1738867220; x=1739472020; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references
+         :mail-followup-to:message-id:subject:cc:to:from:date:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=O8XOC3TytrR9S7MCmV022YQgT71sHiaPGs7/xP0Tr+s=;
-        b=KfU94QdQwUgaB93PBa5k6f2IICgFC4uvtnz0rtklUU6UHvtKRdYWA1ZJG9+60e0anL
-         fZrEa83ajRB7/JIan6sp1WpCPEz9XSk1Hn1b6ot1ECoSInGDH9/P14n19KV1oVMgiC5Y
-         Ch7N1XcgrUnARf+BUc0M41gIYlwtJBJPyPLPGSl9ZmUqNPQj7p9R10bz0RjS8wyaPS1V
-         slLY4Gf1NuvPAQQHPFLJwJlv6eg690B4mu/OZ+LmpTR4GoJhu/zsG4tgWEGmjTbTTP4m
-         WjGTuFJWwNyqfR8+4z6nFrzUHDBLhbHPwyOAz7BNaYyuPr6A2v9pvPoKbSYp8mtbrxXU
-         1M9Q==
-X-Forwarded-Encrypted: i=1; AJvYcCWNrexHIK1Ri+vBsjLGaxLBS8Q21YIUsj+k80TBneVz2MfqCLiZjqSDFKm/+PreVz6ac9Zi4R4=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwaULWNMZsmeXGsDrW4YHr2h5KaTts9J6SE4TPQ3JlJsXIgbNVN
-	SA21whQhMeX0icobBnkpRdMW5254YxBsIMoWflBykD8ryzp/InqY2MCnlfq7FcScY4bLvHarCVj
-	s+OT38Ux76B6ixHya3JOF63VUX7kJStbK9aCv
-X-Gm-Gg: ASbGncuqY+bGO+k6eAXHZPgrD5Zw+1wUw/mJrQvovH2cQlBamtmqx1pKjUDXytj75pP
-	VrpegjttM52ACAm101VFsi8sm3ONR2DFctzPA79uscO+70WGG2ZBV4AGG20SCKHdamV+yt95qXw
-	==
-X-Google-Smtp-Source: AGHT+IFXoIlo5OhRCrRfNENEXc9lTNGNnilDEW1dMSiWoU33MHjOBEIQu2SK614pEEXybYMSzqUG2hkz3c1RbOLHTv0=
-X-Received: by 2002:a05:6402:13ca:b0:5de:3ce0:a489 with SMTP id
- 4fb4d7f45d1cf-5de45048206mr508392a12.10.1738866961551; Thu, 06 Feb 2025
- 10:36:01 -0800 (PST)
+        bh=1ZWS20kqs9c+3CnxDS3Fzgm4QnMLxyNZHTj1EHfLVwk=;
+        b=BzJ2a9haRTQ437jd2gmiH960Et7cKkb7rNtDPbh/9lwYudpD3jIxaIEgIf1d7uh4Ny
+         4sjHTPnlzo28WmVfoVjcM4+WfRq6UT+1jZOF4MPpAoXKvLEjfAj6/ZzLTzhZhymTKoAM
+         XaAaaghq/nq41BxDDClCxQeDqXmTlt5OQT76I=
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1738867220; x=1739472020;
+        h=in-reply-to:content-disposition:mime-version:references
+         :mail-followup-to:message-id:subject:cc:to:from:date
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=1ZWS20kqs9c+3CnxDS3Fzgm4QnMLxyNZHTj1EHfLVwk=;
+        b=rvdOM0RnZwspS8x9cOFNZD3iAapb/vdmBRG1vnaZoP2U/dCnn6QBgpDqZuMSMV4x15
+         rHzVVy9NB/1d4rsAJ9fyheHvQcTW90SN4PeTVf4IbRUrG3QTsmCxrUwGO7Jd5hwXtigt
+         9niIgUlL6ILDAbxs7rKC/BzS/l7dZBFm/CytAB/hH7ZhAQlLWxVUd/cNGHXhrUXr6dDC
+         IbOW3hep/owfBYvn60Lq25ah3N3MMmNAa1I/+el/Egd99I22Rdz7xI5KMWHFEXn0JwCz
+         xjlaPaDj5RxVg9E5TE3RFUIboLxPgUntQR8FD5LtGku7Kt7rGVXcupMJViq/iteF/qbV
+         9qNg==
+X-Forwarded-Encrypted: i=1; AJvYcCXq2MI2qMWP+23oZMiiuAUw4+lCG3bK6v84KgvgpUb6sZxnntcp8OPN2M1+CKTg3U1cEan2HZ0=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyioOTEz3yiC3RuvGNl4sqI7pd2yhXifVEtfgT1oxCsipeUZMdU
+	TE1jyHSbUe9R/6aI9LeF3rwxWL6muzCgI2lX9GgdMjyG9GTbfgluUogg3SuZ4No=
+X-Gm-Gg: ASbGncv2VhBFdyoyiJJzOpO/7CZl/qDOo341tuWvoohoCtM4grAHblvA7+qXC7bOVOm
+	IL94zkCiXIWJVd9AGs16P/mIJbMv53GbHJ0ons8BjpTGkrRtQd+fLGkzK4Y1FBXit4n/Ag/KTdl
+	TO5PUTXwuJf+hfWwB7D0cB8vNlNKhwbZc8pFMWkgKzy/2HJn2PmdXP8mvV4dVLCU0P+ln4PwJlS
+	c5wVret7v3NloiW+5LIyh95OMPBsk/4TyecnvtZBzVylaH2DnT+A50035neJVWjXT3OVFieBiIG
+	v97zgcXLBEsDNk4dnLAbNTXigLkEYoTrsgyStJFBtUGb2Ns1TqzLVyaxqA==
+X-Google-Smtp-Source: AGHT+IFo9j1ajk/Tt6RMe7wwdg1j0XpSjWn7QyBeflmg/QIs9FlX75snei4ufVdUAa7uqMz5vZCJ8w==
+X-Received: by 2002:a05:6a21:158c:b0:1e0:f05b:e727 with SMTP id adf61e73a8af0-1ee03a24f9cmr787997637.2.1738867219767;
+        Thu, 06 Feb 2025 10:40:19 -0800 (PST)
+Received: from LQ3V64L9R2 (c-24-6-151-244.hsd1.ca.comcast.net. [24.6.151.244])
+        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-73048ae7c19sm1613985b3a.79.2025.02.06.10.40.17
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 06 Feb 2025 10:40:19 -0800 (PST)
+Date: Thu, 6 Feb 2025 10:40:16 -0800
+From: Joe Damato <jdamato@fastly.com>
+To: David Laight <david.laight.linux@gmail.com>
+Cc: Samiullah Khawaja <skhawaja@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	"David S . Miller " <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
+	almasrymina@google.com, netdev@vger.kernel.org
+Subject: Re: [PATCH net-next v3 1/4] Add support to set napi threaded for
+ individual napi
+Message-ID: <Z6UCELdW86ZdcTK4@LQ3V64L9R2>
+Mail-Followup-To: Joe Damato <jdamato@fastly.com>,
+	David Laight <david.laight.linux@gmail.com>,
+	Samiullah Khawaja <skhawaja@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	"David S . Miller " <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
+	almasrymina@google.com, netdev@vger.kernel.org
+References: <20250205001052.2590140-1-skhawaja@google.com>
+ <20250205001052.2590140-2-skhawaja@google.com>
+ <20250205231003.49e5cc3f@pumpkin>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250205163609.3208829-1-aleksander.lobakin@intel.com>
- <20250205163609.3208829-2-aleksander.lobakin@intel.com> <CANn89iJjCOThDqwsK4v2O8LfcwAB55YohNZ8T2sR40uM2ZoX5w@mail.gmail.com>
- <fe1b0def-89d1-4db3-bf98-7d6c61ff5361@intel.com>
-In-Reply-To: <fe1b0def-89d1-4db3-bf98-7d6c61ff5361@intel.com>
-From: Eric Dumazet <edumazet@google.com>
-Date: Thu, 6 Feb 2025 19:35:50 +0100
-X-Gm-Features: AWEUYZkgMWMsqddmhSmfJEHSnYJnyX3bRJ9m7a-gsPgESmDHp_hBbW4k9tvnkg4
-Message-ID: <CANn89iJr1R4BGK2Qd+OEgsE7kEPi7X8tgyxjHnYoU7VOU_wgfA@mail.gmail.com>
-Subject: Re: [PATCH net-next v4 1/8] net: gro: decouple GRO from the NAPI layer
-To: Alexander Lobakin <aleksander.lobakin@intel.com>
-Cc: Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller" <davem@davemloft.net>, 
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
-	Lorenzo Bianconi <lorenzo@kernel.org>, Daniel Xu <dxu@dxuuu.xyz>, Alexei Starovoitov <ast@kernel.org>, 
-	Daniel Borkmann <daniel@iogearbox.net>, Andrii Nakryiko <andrii@kernel.org>, 
-	John Fastabend <john.fastabend@gmail.com>, =?UTF-8?B?VG9rZSBIw7hpbGFuZC1Kw7hyZ2Vuc2Vu?= <toke@kernel.org>, 
-	Jesper Dangaard Brouer <hawk@kernel.org>, Martin KaFai Lau <martin.lau@linux.dev>, netdev@vger.kernel.org, 
-	bpf@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	=?UTF-8?B?VG9rZSBIw7hpbGFuZC1Kw7hyZ2Vuc2Vu?= <toke@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250205231003.49e5cc3f@pumpkin>
 
-On Thu, Feb 6, 2025 at 1:15=E2=80=AFPM Alexander Lobakin
-<aleksander.lobakin@intel.com> wrote:
->
-> From: Eric Dumazet <edumazet@google.com>
-> Date: Wed, 5 Feb 2025 18:48:50 +0100
->
-> > On Wed, Feb 5, 2025 at 5:46=E2=80=AFPM Alexander Lobakin
-> > <aleksander.lobakin@intel.com> wrote:
-> >>
-> >> In fact, these two are not tied closely to each other. The only
-> >> requirements to GRO are to use it in the BH context and have some
-> >> sane limits on the packet batches, e.g. NAPI has a limit of its
-> >> budget (64/8/etc.).
-> >> Move purely GRO fields into a new tagged group, &gro_node. Embed it
-> >> into &napi_struct and adjust all the references. napi_id doesn't
-> >> really belong to GRO, but:
-> >>
-> >> 1. struct gro_node has a 4-byte padding at the end anyway. If you
-> >>    leave napi_id outside, struct napi_struct takes additional 8 bytes
-> >>    (u32 napi_id + another 4-byte padding).
-> >> 2. gro_receive_skb() uses it to mark skbs. We don't want to split it
-> >>    into two functions or add an `if`, as this would be less efficient,
-> >>    but we need it to be NAPI-independent. The current approach doesn't
-> >>    change anything for NAPI-backed GROs; for standalone ones (which
-> >>    are less important currently), the embedded napi_id will be just
-> >>    zero =3D> no-op.
-> >>
-> >> Three Ethernet drivers use napi_gro_flush() not really meant to be
-> >> exported, so move it to <net/gro.h> and add that include there.
-> >> napi_gro_receive() is used in more than 100 drivers, keep it
-> >> in <linux/netdevice.h>.
-> >> This does not make GRO ready to use outside of the NAPI context
-> >> yet.
-> >>
-> >> Tested-by: Daniel Xu <dxu@dxuuu.xyz>
-> >> Acked-by: Jakub Kicinski <kuba@kernel.org>
-> >> Reviewed-by: Toke H=C3=B8iland-J=C3=B8rgensen <toke@redhat.com>
-> >> Signed-off-by: Alexander Lobakin <aleksander.lobakin@intel.com>
-> >> ---
-> >>  include/linux/netdevice.h                  | 26 +++++---
-> >>  include/net/busy_poll.h                    | 11 +++-
-> >>  include/net/gro.h                          | 35 +++++++----
-> >>  drivers/net/ethernet/brocade/bna/bnad.c    |  1 +
-> >>  drivers/net/ethernet/cortina/gemini.c      |  1 +
-> >>  drivers/net/wwan/t7xx/t7xx_hif_dpmaif_rx.c |  1 +
-> >>  net/core/dev.c                             | 60 ++++++++-----------
-> >>  net/core/gro.c                             | 69 +++++++++++----------=
--
-> >>  8 files changed, 112 insertions(+), 92 deletions(-)
-> >>
-> >> diff --git a/include/linux/netdevice.h b/include/linux/netdevice.h
-> >> index 2a59034a5fa2..d29b6ebde73f 100644
-> >> --- a/include/linux/netdevice.h
-> >> +++ b/include/linux/netdevice.h
-> >> @@ -340,8 +340,8 @@ struct gro_list {
-> >>  };
-> >>
-> >>  /*
-> >> - * size of gro hash buckets, must less than bit number of
-> >> - * napi_struct::gro_bitmask
-> >> + * size of gro hash buckets, must be <=3D the number of bits in
-> >> + * gro_node::bitmask
-> >>   */
-> >>  #define GRO_HASH_BUCKETS       8
-> >>
-> >> @@ -370,7 +370,6 @@ struct napi_struct {
-> >>         unsigned long           state;
-> >>         int                     weight;
-> >>         u32                     defer_hard_irqs_count;
-> >> -       unsigned long           gro_bitmask;
-> >>         int                     (*poll)(struct napi_struct *, int);
-> >>  #ifdef CONFIG_NETPOLL
-> >>         /* CPU actively polling if netpoll is configured */
-> >> @@ -379,11 +378,14 @@ struct napi_struct {
-> >>         /* CPU on which NAPI has been scheduled for processing */
-> >>         int                     list_owner;
-> >>         struct net_device       *dev;
-> >> -       struct gro_list         gro_hash[GRO_HASH_BUCKETS];
-> >>         struct sk_buff          *skb;
-> >> -       struct list_head        rx_list; /* Pending GRO_NORMAL skbs */
-> >> -       int                     rx_count; /* length of rx_list */
-> >> -       unsigned int            napi_id; /* protected by netdev_lock *=
-/
-> >> +       struct_group_tagged(gro_node, gro,
-> >> +               unsigned long           bitmask;
-> >> +               struct gro_list         hash[GRO_HASH_BUCKETS];
-> >> +               struct list_head        rx_list; /* Pending GRO_NORMAL=
- skbs */
-> >> +               int                     rx_count; /* length of rx_list=
- */
-> >> +               u32                     napi_id; /* protected by netde=
-v_lock */
-> >> +
-> >
-> > I am old school, I would prefer a proper/standalone old C construct.
-> >
-> > struct gro_node  {
-> >                 unsigned long           bitmask;
-> >                struct gro_list         hash[GRO_HASH_BUCKETS];
-> >                struct list_head        rx_list; /* Pending GRO_NORMAL s=
-kbs */
-> >                int                     rx_count; /* length of rx_list *=
-/
-> >                u32                     napi_id; /* protected by netdev_=
-lock */
-> > };
-> >
-> > Really, what struct_group_tagged() can possibly bring here, other than
-> > obfuscation ?
->
-> You'd need to adjust every ->napi_id access, which is a lot.
-> Plus, as I wrote previously, napi_id doesn't really belong here, but
-> embedding it here eases life.
->
-> I'm often an old school, too, but sometimes this helps a lot.
-> Unless you have very strong preference on this.
->
+On Wed, Feb 05, 2025 at 11:10:03PM +0000, David Laight wrote:
+> On Wed,  5 Feb 2025 00:10:49 +0000
+> Samiullah Khawaja <skhawaja@google.com> wrote:
+> 
+> > A net device has a threaded sysctl that can be used to enable threaded
+> > napi polling on all of the NAPI contexts under that device. Allow
+> > enabling threaded napi polling at individual napi level using netlink.
+> > 
+> > Extend the netlink operation `napi-set` and allow setting the threaded
+> > attribute of a NAPI. This will enable the threaded polling on a napi
+> > context.
+> > 
+> > Tested using following command in qemu/virtio-net:
+> > ./tools/net/ynl/cli.py --spec Documentation/netlink/specs/netdev.yaml \
+> >   --do napi-set       --json '{"id": 66, "threaded": 1}'
+> 
+> Is there a sane way for a 'real person' to set these from a normal
+> startup/network configuration script?
+> 
+> The netlink API is hardly user-friendly.
 
-Is struct_group_tagged even supported by ctags ?
+There is a C library, libynl that abstracts a lot of the netlink
+stuff away and is quite nice. That said, if you wanted to use it
+from a script, you'd probably need bindings for it in the language
+of your choice.
 
-In terms of maintenance, I am sorry to say this looks bad to me.
-
-Even without ctags, I find git grep -n "struct xxxx {" quite good.
+If you meant more a shell script type setup, then yea.... the python
+CLI is (AFAIK) the only option.
 
