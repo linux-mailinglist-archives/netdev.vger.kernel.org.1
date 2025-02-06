@@ -1,162 +1,391 @@
-Return-Path: <netdev+bounces-163300-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-163301-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1166CA29DD0
-	for <lists+netdev@lfdr.de>; Thu,  6 Feb 2025 01:13:38 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9FE3DA29DE4
+	for <lists+netdev@lfdr.de>; Thu,  6 Feb 2025 01:34:34 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 49B233A337C
-	for <lists+netdev@lfdr.de>; Thu,  6 Feb 2025 00:13:29 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id ED4183A77C1
+	for <lists+netdev@lfdr.de>; Thu,  6 Feb 2025 00:34:25 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 79F22A2D;
-	Thu,  6 Feb 2025 00:13:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2D1A4746E;
+	Thu,  6 Feb 2025 00:34:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="frFWFS/K"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="c4Ok49Qx"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-il1-f177.google.com (mail-il1-f177.google.com [209.85.166.177])
+Received: from mail-io1-f42.google.com (mail-io1-f42.google.com [209.85.166.42])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D7DD028F1;
-	Thu,  6 Feb 2025 00:13:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.177
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 33EFC28366;
+	Thu,  6 Feb 2025 00:34:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.42
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1738800813; cv=none; b=dHOSZW+/mu9wHyy8jrRUmqoAkrXbcXby5mObIo2i59e+mXEPGKbsV4HJPr9HfsrJOto2jv/Rh3st/cUdixp9zSFwPfDzuGa6dPOwp9S2/N3kknQMfM47gktKAoW6AFdjB7VTemSEbV7bnew9x7ugEYgfupgcRpGGqlRw+XK2mZ4=
+	t=1738802070; cv=none; b=quWk4JPABxx7UPrVbJCjqC7plmlMfwMp3crsl/1dabbnEJ8nlvp6mfRZeXWtzrATj1wunL2xqCO7Zmlzg59zBZTqlMM0iHWUJtMiP4QAgWPYhDEgxvB8iHXUrvqeeGtqgjsnbT0Syt+GV29Wzlxf4YqJGReFFaWL7mkS0LJeSJs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1738800813; c=relaxed/simple;
-	bh=I9RWG4JWiuo01AmK+FK5z5pg1WoJS6+WlcDifh54GrA=;
+	s=arc-20240116; t=1738802070; c=relaxed/simple;
+	bh=E+uxlyJPeO1acBfWGC6B7sMwjn24VTp7X1GYaMoFogw=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=RiAfx646bX7YuARCA7yUlFzE3PIqektmPOyk18cPt4AKRyYbv7Z2MJrIluAzJEyd0YK8rZj8F23UZyVacNTNICuZCSGlS6HYkrZWri3U9bJs75xTqlL9cE/3uyj/zyzw2K3hLrwdqU0VSlj4Xq66IG3X3z2gJ572V/t0B2ROYKI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=frFWFS/K; arc=none smtp.client-ip=209.85.166.177
+	 To:Cc:Content-Type; b=ljwFF1hVq0vDKgqAXv8k+82N2X/Eyi+At4puacA97xf46+yBHeccmEoaUi85MVXlk23Yt9KRttEK6wg8GQoKE/hFNfKuoxlAAx22V+44eooEcMayc9p5rfhM+D55289Ro0vGh3RMKq7+SWZsDLebdKPE44w++HmY5B/F1Kr+DNE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=c4Ok49Qx; arc=none smtp.client-ip=209.85.166.42
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-il1-f177.google.com with SMTP id e9e14a558f8ab-3d04d767d3aso2509405ab.2;
-        Wed, 05 Feb 2025 16:13:31 -0800 (PST)
+Received: by mail-io1-f42.google.com with SMTP id ca18e2360f4ac-844e61f3902so30897139f.0;
+        Wed, 05 Feb 2025 16:34:27 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1738800811; x=1739405611; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1738802067; x=1739406867; darn=vger.kernel.org;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=8nDC13wO7BQNudhGcbpiJgtYUZKRa9Wfr1pLvthotCQ=;
-        b=frFWFS/KVcbYJpZAmqfrV4JJ6zqvojooPaSe99Esnfgw9Y7vhoH6NKeqB4W4jW4j6C
-         hLx19iCIvkJfmekBiJMWcmPINIMiDS+xEnW8deJByHRmLnGyso164ClIMHbcy2hPyw2c
-         BRvvF6+q/yZHn2j/oyDRJ5N/gzcV1a6G7ubKuOR48o6vwexpOWX4rorlZMz+btAybDg1
-         w6d9MqVM4Puk/b4zFUelMW3JQtidH12cT0uDjejGZ+VzQ8RR8b+QT+upD9cstwu008Ht
-         hvnFfEJEhx/MTaNMPyuBmeLYIFgOL2IF5wcox+oqN5DF9IwpHLxLq5QZ1Y/QUt8OR3Ni
-         WbHA==
+        bh=WNe4WHKF9kuKq7UqfQwwDZlTYjaqkudSbb+q19vJZDo=;
+        b=c4Ok49Qxqc1EsB/f1sP8RCJY7mvreoA+MJfPGNXiGgoAPjaj3whLU4hHxGP8AHxtDr
+         uZ+NHDOPLkh2BhKKpODaxLwEcI8WKeCq5u1Z6BprDGoLpT3IvgWHhy4K2PRX/KTOH9dy
+         IfE2pyQmgX74w6oIL0oe3jlIuaDxJDGLZDj80AerqTHwwjRSPTfD2NsxgYDsnS1p9Nv+
+         74uajnVngU5ZvnPDxGHzHgedcBOIlub4A5LXU97uS8OCkQ8ObkVsOPfrsfI8ftRpUzEi
+         CLHTZGQCC8K1bc+uOklxbqypaBWAF8uw/RUJ7S1MbtleBzfVVJnXoGOhBEDqh5kz+PmW
+         7GPQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1738800811; x=1739405611;
+        d=1e100.net; s=20230601; t=1738802067; x=1739406867;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=8nDC13wO7BQNudhGcbpiJgtYUZKRa9Wfr1pLvthotCQ=;
-        b=rIEFyBFagdM48W0RIwjaOn6P7LpORjblW8uIqiPy0TDgV/B4kDbu4kkXM8YOa2W7/+
-         YKJLcxR8aDtzrW66h0fp9EnB93rLiU5xjPMrn/JTLqmqOI74y0bANI1c+PXIXbhZOlPB
-         rkRqgI2Yk1cpfUyzok6cIn2LBdOtyUpAj/zX8zkwUpc6gLbavFkXEhY8P+In+IWnAuV/
-         hiLoXiDjLsfNQeAdz9nWjpJDSOwUGCl8wIxqb0cyzQIuX4eR+pXluBk8lcn/vsplM5hR
-         9lkLYoQwvCfDX0iTEpQgtIJ7lR8y6B4cjuH2jMI348FZacXB3uqViRM2GFG1q6LMIyvI
-         eEIA==
-X-Forwarded-Encrypted: i=1; AJvYcCUZGTkdMIUGprF+5+No7Vvu00MKdmHfHDza2CA9q4jkc9ApAKzXfzI3/mIWoaV+U/lQjuXz/PPO@vger.kernel.org, AJvYcCVs62z8UtSkyU2XXdSKsjqgq7o7otJYyVNE3iUu3iB0/5dP1wMaWmPX+a2vZLvUfy6X6OQ=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxyX3ikvGxLDm3jq5UPaHbhJkf+ozW68BvadlD+XN6QZHAJlJ0W
-	V0lcjZyfCADNhyt0YU5p/DiuetxTc2A/wiMyI4z/N4zIqDjkl9u7CPO3ir6GaUI+TWU5mW2hdUO
-	eW9+pn9eXOCAcVsjSxZtSoXL9JaM=
-X-Gm-Gg: ASbGnctvznIE+wEoSIF60sgI/JfiTkOoHejvO2dpqnAEo5MjozqUOE2fxB/dWCLzIDK
-	4t65QLJ60qz9gLPiQZhoi+5VrmdmCdPiA4HZ4bg/w/RDlTMdcvKUPj94esI00ANuVVuC1/psx
-X-Google-Smtp-Source: AGHT+IEhgTk9YbnevXYLYUtiDKFyDtdhdPNBIAJFDY0qNen8QemsPHHBlh/Wbvt1Fi5kdLUTZdqOr+8CBpuJq7XdnsI=
-X-Received: by 2002:a05:6e02:1b0c:b0:3cf:c8bf:3b8a with SMTP id
- e9e14a558f8ab-3d04f419163mr52725465ab.7.1738800810808; Wed, 05 Feb 2025
- 16:13:30 -0800 (PST)
+        bh=WNe4WHKF9kuKq7UqfQwwDZlTYjaqkudSbb+q19vJZDo=;
+        b=aelj9dzljsVxVbi2Dg3bWk9AhGH8CZg3xePMBcPv4RyZXYj4cr39SBBEgLWUVh3rBi
+         +jOmAx2uMtZ29EgUR6NRaQOuCfB4qNh6dEvz4ss0eHhcvIkatf1AR2PN2tj7pqQgX3VL
+         z8BwZqAXiVewiI1Lzh/Or4DQMevXcov+H6V4sgDkG2tTpwEOsb85YD4MQwCDjiz/AuX8
+         vXcwQzdmgXire2yX+OxrWFcTk3CFRJDL4PKGRP96CTFFbvv7IQG/Q496hI56n8uvUfZf
+         Pyv+C9yDtOhnu+B7vhXQgVL5DD9MEdJcztk7w8RAYgJLrmbd0e4E1W0cTQ+uYwvWUqZH
+         uXtg==
+X-Forwarded-Encrypted: i=1; AJvYcCUdA9TUvufAUJxiSPaB67G+sA7qxssUlVjWOmG5uRcHp5vNxHRog/t0zJJ4ah8jAxGMCaE=@vger.kernel.org, AJvYcCVP1ZC7yailyaHIo5maoqslRaNg+3qtfzcf0VO+linBbJi5UVR+eEcMbRHv5GSQwIegUFtGzKas@vger.kernel.org
+X-Gm-Message-State: AOJu0YxFSv45h69RzkSzJNtWFHKc3gfdRQC84BYSK+SfYV2AU2O4NRvh
+	f08wl7QU5zxgRNntqH4m3/8PbP03r/2DkRMrJGB+SbJpD3rTbMR0+OeF6Q9byLTd5r0lLG7X+j3
+	soNoHuXWv487MAXM9+jq0SUXQklQ=
+X-Gm-Gg: ASbGncv7Oq7+rQlr2NeLnj6iXd8Vd8nR05r816Ng7IHnynK2r/xMZFzqWFv/uj6/cG3
+	rTF/xFlgj35VlW3+sPtLKGV+9+yzoTJATxkMnK7ZYGs2XPc7HYUwc10n0NhoqZxCdsY3fhD4=
+X-Google-Smtp-Source: AGHT+IGqSMmqT8WbKq5FsyJmF3tUxnUHQ/F2W8ysiy8LP9sGdw8I6Mfz4Z0wGrwwLAoYxMZVN4/NrKmUwTBYf+MNMnc=
+X-Received: by 2002:a05:6e02:1ca3:b0:3cf:b626:66c2 with SMTP id
+ e9e14a558f8ab-3d04f97b1b0mr50145575ab.19.1738802067122; Wed, 05 Feb 2025
+ 16:34:27 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250204183024.87508-1-kerneljasonxing@gmail.com>
- <20250204183024.87508-11-kerneljasonxing@gmail.com> <20250204175744.3f92c33e@kernel.org>
- <e894c427-b4b3-4706-b44c-44fc6402c14c@linux.dev>
-In-Reply-To: <e894c427-b4b3-4706-b44c-44fc6402c14c@linux.dev>
+References: <20250128084620.57547-1-kerneljasonxing@gmail.com>
+ <20250128084620.57547-12-kerneljasonxing@gmail.com> <d2605829-d5c2-4ce2-ac27-9f1df0398ccc@linux.dev>
+ <CAL+tcoDZXc56BsO9tYvb1EFDdMHhv3OcBsPwY3ctJ85rvb+OHA@mail.gmail.com>
+ <67a24989d7202_bb56629425@willemb.c.googlers.com.notmuch> <CAL+tcoA7Efzxg9c-CBn3S0JEQZLUHBaCA+dL=mgWbVh26SukgA@mail.gmail.com>
+ <CAL+tcoAeBJ=F8cZ9qYwGF6jmc+DwA2byrrzAZjcpNYzrjT541g@mail.gmail.com>
+ <67a381a6bef0b_14e08329474@willemb.c.googlers.com.notmuch>
+ <CAL+tcoC4E3zn4gB6PC_Kj5jTShNiounu8vjsZbfDCAOn2fNqXw@mail.gmail.com> <67a3d1dba6803_170d392948c@willemb.c.googlers.com.notmuch>
+In-Reply-To: <67a3d1dba6803_170d392948c@willemb.c.googlers.com.notmuch>
 From: Jason Xing <kerneljasonxing@gmail.com>
-Date: Thu, 6 Feb 2025 08:12:54 +0800
-X-Gm-Features: AWEUYZkV5dzLYm2UHctk11Vr97P7s1xam3Xwcfe8_isfQve_IUocjYJ3X0Qksjk
-Message-ID: <CAL+tcoCQ165Y4R7UWG=J=8e=EzwFLxSX3MQPOv=kOS3W1Q7R0A@mail.gmail.com>
-Subject: Re: [PATCH bpf-next v8 10/12] bpf: make TCP tx timestamp bpf
- extension work
-To: Martin KaFai Lau <martin.lau@linux.dev>
-Cc: Jakub Kicinski <kuba@kernel.org>, davem@davemloft.net, edumazet@google.com, 
-	pabeni@redhat.com, dsahern@kernel.org, willemdebruijn.kernel@gmail.com, 
-	willemb@google.com, ast@kernel.org, daniel@iogearbox.net, andrii@kernel.org, 
-	eddyz87@gmail.com, song@kernel.org, yonghong.song@linux.dev, 
-	john.fastabend@gmail.com, kpsingh@kernel.org, sdf@fomichev.me, 
-	haoluo@google.com, jolsa@kernel.org, horms@kernel.org, bpf@vger.kernel.org, 
-	netdev@vger.kernel.org
+Date: Thu, 6 Feb 2025 08:33:51 +0800
+X-Gm-Features: AWEUYZkKcfauhM6AHiDAmnd86MWg9f1mg71cfJPE3Ybu2TNlqgBdyg2KKeEGJfc
+Message-ID: <CAL+tcoBuQYsbfGuL0PUGdvy7UHGKii3rXv8q+GjzbHvK3hKsQw@mail.gmail.com>
+Subject: Re: [PATCH bpf-next v7 11/13] net-timestamp: add a new callback in tcp_tx_timestamp()
+To: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
+Cc: Martin KaFai Lau <martin.lau@linux.dev>, davem@davemloft.net, edumazet@google.com, 
+	kuba@kernel.org, pabeni@redhat.com, dsahern@kernel.org, willemb@google.com, 
+	ast@kernel.org, daniel@iogearbox.net, andrii@kernel.org, eddyz87@gmail.com, 
+	song@kernel.org, yonghong.song@linux.dev, john.fastabend@gmail.com, 
+	kpsingh@kernel.org, sdf@fomichev.me, haoluo@google.com, jolsa@kernel.org, 
+	horms@kernel.org, bpf@vger.kernel.org, netdev@vger.kernel.org
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-On Thu, Feb 6, 2025 at 5:57=E2=80=AFAM Martin KaFai Lau <martin.lau@linux.d=
-ev> wrote:
+On Thu, Feb 6, 2025 at 5:02=E2=80=AFAM Willem de Bruijn
+<willemdebruijn.kernel@gmail.com> wrote:
 >
-> On 2/4/25 5:57 PM, Jakub Kicinski wrote:
-> > On Wed,  5 Feb 2025 02:30:22 +0800 Jason Xing wrote:
-> >> +    if (cgroup_bpf_enabled(CGROUP_SOCK_OPS) &&
-> >> +        SK_BPF_CB_FLAG_TEST(sk, SK_BPF_CB_TX_TIMESTAMPING) && skb) {
-> >> +            struct skb_shared_info *shinfo =3D skb_shinfo(skb);
-> >> +            struct tcp_skb_cb *tcb =3D TCP_SKB_CB(skb);
-> >> +
-> >> +            tcb->txstamp_ack_bpf =3D 1;
-> >> +            shinfo->tx_flags |=3D SKBTX_BPF;
-> >> +            shinfo->tskey =3D TCP_SKB_CB(skb)->seq + skb->len - 1;
-> >> +    }
+> Jason Xing wrote:
+> > On Wed, Feb 5, 2025 at 11:20=E2=80=AFPM Willem de Bruijn
+> > <willemdebruijn.kernel@gmail.com> wrote:
+> > >
+> > > Jason Xing wrote:
+> > > > On Wed, Feb 5, 2025 at 2:09=E2=80=AFAM Jason Xing <kerneljasonxing@=
+gmail.com> wrote:
+> > > > >
+> > > > > On Wed, Feb 5, 2025 at 1:08=E2=80=AFAM Willem de Bruijn
+> > > > > <willemdebruijn.kernel@gmail.com> wrote:
+> > > > > >
+> > > > > > Jason Xing wrote:
+> > > > > > > On Tue, Feb 4, 2025 at 9:16=E2=80=AFAM Martin KaFai Lau <mart=
+in.lau@linux.dev> wrote:
+> > > > > > > >
+> > > > > > > > On 1/28/25 12:46 AM, Jason Xing wrote:
+> > > > > > > > > Introduce the callback to correlate tcp_sendmsg timestamp=
+ with other
+> > > > > > > > > points, like SND/SW/ACK. We can let bpf trace the beginni=
+ng of
+> > > > > > > > > tcp_sendmsg_locked() and fetch the socket addr, so that i=
+n
+> > > > > > > >
+> > > > > > > > Instead of "fetch the socket addr...", should be "store the=
+ sendmsg timestamp at
+> > > > > > > > the bpf_sk_storage ...".
+> > > > > > >
+> > > > > > > I will revise it. Thanks.
+> > > > > > >
+> > > > > > > >
+> > > > > > > > > tcp_tx_timestamp() we can correlate the tskey with the so=
+cket addr.
+> > > > > > > >
+> > > > > > > >
+> > > > > > > > > It is accurate since they are under the protect of socket=
+ lock.
+> > > > > > > > > More details can be found in the selftest.
+> > > > > > > >
+> > > > > > > > The selftest uses the bpf_sk_storage to store the sendmsg t=
+imestamp at
+> > > > > > > > fentry/tcp_sendmsg_locked and retrieves it back at tcp_tx_t=
+imestamp (i.e.
+> > > > > > > > BPF_SOCK_OPS_TS_SND_CB added in this patch).
+> > > > > > > >
+> > > > > > > > >
+> > > > > > > > > Signed-off-by: Jason Xing <kerneljasonxing@gmail.com>
+> > > > > > > > > ---
+> > > > > > > > >   include/uapi/linux/bpf.h       | 7 +++++++
+> > > > > > > > >   net/ipv4/tcp.c                 | 1 +
+> > > > > > > > >   tools/include/uapi/linux/bpf.h | 7 +++++++
+> > > > > > > > >   3 files changed, 15 insertions(+)
+> > > > > > > > >
+> > > > > > > > > diff --git a/include/uapi/linux/bpf.h b/include/uapi/linu=
+x/bpf.h
+> > > > > > > > > index 800122a8abe5..accb3b314fff 100644
+> > > > > > > > > --- a/include/uapi/linux/bpf.h
+> > > > > > > > > +++ b/include/uapi/linux/bpf.h
+> > > > > > > > > @@ -7052,6 +7052,13 @@ enum {
+> > > > > > > > >                                        * when SK_BPF_CB_T=
+X_TIMESTAMPING
+> > > > > > > > >                                        * feature is on.
+> > > > > > > > >                                        */
+> > > > > > > > > +     BPF_SOCK_OPS_TS_SND_CB,         /* Called when ever=
+y sendmsg syscall
+> > > > > > > > > +                                      * is triggered. Fo=
+r TCP, it stays
+> > > > > > > > > +                                      * in the last send=
+ process to
+> > > > > > > > > +                                      * correlate with t=
+cp_sendmsg timestamp
+> > > > > > > > > +                                      * with other times=
+tamping callbacks,
+> > > > > > > > > +                                      * like SND/SW/ACK.
+> > > > > > > >
+> > > > > > > > Do you have a chance to look at how this will work at UDP?
+> > > > > > >
+> > > > > > > Sure, I feel like it could not be useful for UDP. Well, thing=
+s get
+> > > > > > > strange because I did write a long paragraph about this thing=
+ which
+> > > > > > > apparently disappeared...
+> > > > > > >
+> > > > > > > I manage to find what I wrote:
+> > > > > > >     For UDP type, BPF_SOCK_OPS_TS_SND_CB may be not suitable =
+because
+> > > > > > >     there are two sending process, 1) lockless path, 2) lock =
+path, which
+> > > > > > >     should be handled carefully later. For the former, even t=
+hough it's
+> > > > > > >     unlikely multiple threads access the socket to call sendm=
+sg at the
+> > > > > > >     same time, I think we'd better not correlate it like what=
+ we do to the
+> > > > > > >     TCP case because of the lack of sock lock protection. Con=
+sidering SND_CB is
+> > > > > > >     uapi flag, I think we don't need to forcely add the 'TCP_=
+' prefix in
+> > > > > > >     case we need to use it someday.
+> > > > > > >
+> > > > > > >     And one more thing is I'd like to use the v5[1] method in=
+ the next round
+> > > > > > >     to introduce a new tskey_bpf which is good for UDP type. =
+The new field
+> > > > > > >     will not conflict with the tskey in shared info which is =
+generated
+> > > > > > >     by sk->sk_tskey in __ip_append_data(). It hardly works if=
+ both features
+> > > > > > >     (so_timestamping and its bpf extension) exists at the sam=
+e time. Users
+> > > > > > >     could get confused because sometimes they fetch the tskey=
+ from skb,
+> > > > > > >     sometimes they don't, especially when we have cmsg featur=
+e to turn it on/
+> > > > > > >     off per sendmsg. A standalone tskey for bpf extension wil=
+l be needed.
+> > > > > > >     With this tskey_bpf, we can easily correlate the timestam=
+p in sendmsg
+> > > > > > >     syscall with other tx points(SND/SW/ACK...).
+> > > > > > >
+> > > > > > >     [1]: https://lore.kernel.org/all/20250112113748.73504-14-=
+kerneljasonxing@gmail.com/
+> > > > > > >
+> > > > > > >     If possible, we can leave this question until the UDP sup=
+port series
+> > > > > > >     shows up. I will figure out a better solution :)
+> > > > > > >
+> > > > > > > In conclusion, it probably won't be used by the UDP type. It'=
+s uAPI
+> > > > > > > flag so I consider the compatibility reason.
+> > > > > >
+> > > > > > I don't think this is acceptable. We should aim for an API that=
+ can
+> > > > > > easily be used across protocols, like SO_TIMESTAMPING.
+> > > > >
+> > > > > After I revisit the UDP SO_TIMESTAMPING again, my thoughts are
+> > > > > adjusted like below:
+> > > > >
+> > > > > It's hard to provide an absolutely uniform interface or usage to =
+users
+> > > > > for TCP and UDP and even more protocols. Cases can be handled one=
+ by
+> > > > > one.
+> > >
+> > > We should try hard. SO_TIMESTAMPING is uniform across protocols.
+> > > An interface that is not is just hard to use.
+> > >
+> > > > > The main obstacle is how we can correlate the timestamp in
+> > > > > sendmsg syscall with other sending timestamps. It's worth noticin=
+g
+> > > > > that for SO_TIMESTAMPING the sendmsg timestamp is collected in th=
+e
+> > > > > userspace. For instance, while skb enters the qdisc, we fail to k=
+now
+> > > > > which skb belongs to which sendmsg.
+> > > > >
+> > > > > An idea coming up is to introduce BPF_SOCK_OPS_TS_SND_CB to corre=
+late
+> > > > > the sendmsg timestamp with tskey (in tcp_tx_timestamp()) under th=
+e
+> > > > > protection of socket lock + syscall as the current patch does. Bu=
+t for
+> > > > > UDP, it can be lockless. IIUC, there is a very special case where=
+ even
+> > > > > SO_TIMESTAMPING may get lost: if multiple threads accessing the s=
+ame
+> > > > > socket send UDP packets in parallel, then users could be confused
+> > > > > which tskey matches which sendmsg.
+> > >
+> > > This is a known issue for lockless datagram sockets.
+> > >
+> > > With SO_TIMESTAMPING, but the use of timestamping and of concurrent
+> > > sendmsg calls is under control of the process, so it only shoots
+> > > itself in the foot.
+> > >
+> > > With BPF timestamping, a process may confuse a third party admin, so
+> > > the situation is slightly different.
 > >
-> > If BPF program is attached we'll timestamp all skbs? Am I reading this
-> > right?
->
-> If the attached bpf program explicitly turns on the SK_BPF_CB_TX_TIMESTAM=
-PING
-> bit of a sock, then all skbs of this sock will be tx timestamp-ed.
-
-Martin, I'm afraid it's not like what you expect. Only the last
-portion of the sendmsg will enter the above function which means if
-the size of sendmsg is large, only the last skb will be set SKBTX_BPF
-and be timestamped.
-
->
+> > Agreed.
 > >
-> > Wouldn't it be better to let BPF_SOCK_OPS_TS_SND_CB return whether it's
-> > interested in tracing current packet all the way thru the stack?
+> > >
+> > > > > IIUC, I will not consider this
+> > > > > unlikely case, then the UDP case is quite similar to the TCP case=
+.
+> > > > >
+> > > > > The scenario for the UDP case is:
+> > > > > 1) using fentry bpf to hook the udp_sendmsg() to get the timestam=
+p
+> > > > > like TCP does in this series.
+> > > > > 2) insert BPF_SOCK_OPS_TS_SND_CB into __ip_append_data() near the
+> > > > > SO_TIMESTAMPING code snippets to let bpf program correlate the ts=
+key
+> > > > > with timestamp.
+> > > > > Note: tskey in UDP will be handled carefully in a different way
+> > > > > because we should support both modes for socket timestamping at t=
+he
+> > > > > same time.
+> > > > > It's really similar to TCP regardless of handling tskey.
+> > > > >
+> > > >
+> > > > To be more precise in case you don't have much time to read the abo=
+ve
+> > > > long paragraph, BPF_SOCK_OPS_TS_SND_CB is mainly used to correlate
+> > > > sendmsg timestamp with corresponding tskey.
+> > > >
+> > > > 1. For TCP, we can correlate it in tcp_tx_timestamp() like this pat=
+ch does.
+> > > >
+> > > > 2. For UDP, we can correlate in __ip_append_data() along with those
+> > > > tskey initialization, assuming there are no multiple threads callin=
+g
+> > > > locklessly ip_make_skb(). Locked path
+> > > > (udp_sendmsg()->ip_append_data()) works like TCP under the socket l=
+ock
+> > > > protection, so it can be easily handled. Lockless path
+> > > > (udp_sendmsg()->ip_make_skb()) can be visited by multiple threads a=
+t
+> > > > the same time, which should be handled properly.
+> > >
+> > > Different hook points is fine, as UDP (and RAW) uses __ip_append_data
+> >
+> > Then this approach (introducing this new flag) is feasible. Sorry that
+> > last night I wrote such a long paragraph which buried something
+> > important. Because of that, I rephrase the whole idea about how to let
+> > UDP work with this kind of new flag in [patch v8 11/12]. Link is
+> > https://lore.kernel.org/all/CAL+tcoCmXcDot-855XYU7PKCiGvJL=3DO3CQBGuOTR=
+As2_=3DYs=3Dgg@mail.gmail.com/
+> >
+> > > or more importantly ip_send_skb, while TCP uses ip_queue_xmit.
+> >
+> > For TCP, we use tcp_tx_timestamp to finish the map between sendmsg
+> > timestamp and tskey.
+> >
+> > >
+> > > As long as the API is the same: the operation (BPF_SOCK_OPS_TS_SND_CB=
+)
+> > > and the behavior of that operation. Subject to the usual distinction
+> > > between protocol behavior (bytestream vs datagram).
+> >
+> > I see your point.
+> >
+> > >
+> > > > I prefer to implement
+> > > > the bpf extension for IPCORK_TS_OPT_ID, which should be another top=
+ic,
+> > > > I think. This might be the only one corner case, IIUC?
+> > >
+> > > This sounds like an entirely different topic? Not sure what this is.
+> >
+> > Not really a different topic. I mean let bpf prog take the whole
+> > control of setting the tskey, then with this BPF_SOCK_OPS_TS_SND_CB
+> > flag we can correlate the sendmsg timestamp with tskey. So It has
+> > something to do with the usage of UDP. Please take a look at that link
+> > to patch 11/12. For TCP, we don't need to care about the value of
+> > tskey which has already been taken care of by SO_TIMESTAMPING. So it
+> > is slightly different. I'm not sure if this kind of usage is
+> > acceptable?
 >
-> I like this idea. It can give the BPF prog a chance to do skb sampling on=
- a
-> particular socket.
->
-> The return value of BPF_SOCK_OPS_TS_SND_CB (or any cgroup BPF prog return=
- value)
-> already has another usage, which its return value is currently enforced b=
-y the
-> verifier. It is better not to convolute it further.
->
-> I don't prefer to add more use cases to skops->reply either, which is an =
-union
-> of args[4], such that later progs (in the cgrp prog array) may lose the a=
-rgs value.
->
-> Jason, instead of always setting SKBTX_BPF and txstamp_ack_bpf in the ker=
-nel, a
-> new BPF kfunc can be added so that the BPF prog can call it to selectivel=
-y set
-> SKBTX_BPF and txstamp_ack_bpf in some skb.
+> Why can TCP rely on SO_TIMESTAMPING to set tskey, but UDP cannot?
 
-Agreed because at netdev 0x19 I have an explicit plan to share the
-experience from our company about how to trace all the skbs which were
-completed through a kernel module. It's how we use in production
-especially for debug or diagnose use.
+Because for TCP the shared info tskey is calculated by seqno (in
+tcp_tx_timestamp()), so it works for so_timestamping and its bpf
+extension and they are the same. However, for UDP, the shared info
+tskey can be different, depending on when to call __ip_append_data()
+and what the sk->sk_tskey is. It can cause conflicts when two modes
+work at the same time. More than that, lockless UDP case is a tough
+one since we cannot correlate the sendmsg timestamp in udp_sendmsg()
+with the tskey generated in __ip_append_data(), which is a long gap
+without any lock. So reuse the IPCORK_TS_OPT_ID logic for bpf
+extension here can work.
 
-I'm not knowledgeable enough about BPF, so I'd like to know if there
-are some functions that I can take as good examples?
+It's worth to highlight that 1) for TCP the time to generate a sendmsg
+timestamp and generate a tskey are under the same lock, 2) for
+non-lockless UDP, it works like TCP. But in order to deal with the
+lockless part, I choose to implement the IPCORK_TS_OPT_ID idea. This
+is somehow another topic, but the relevant part is that I tried to
+prove BPF_SOCK_OPS_TS_SND_CB can be also used in UDP (but in a
+different position compared to TCP protocol).
 
-I think it's a standalone and good feature, can I handle it after this seri=
-es?
+>
+> BPF will need to set the key for both protocol if SO_TIMESTAMPING is
+> not enabled, right?
+
+For TCP, we will rely on 'shinfo->tskey =3D TCP_SKB_CB(skb)->seq +
+skb->len - 1;' in tcp_tx_timestamp() regardless of the status of
+SO_TIMESTAMPING, so don't bother to manage the tskey from bpf prog.
+While for UDP, we have to manage the tskey. Of course, it's another
+topic.
 
 Thanks,
 Jason
