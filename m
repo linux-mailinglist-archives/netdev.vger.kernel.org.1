@@ -1,183 +1,140 @@
-Return-Path: <netdev+bounces-163401-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-163402-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 72E6BA2A295
-	for <lists+netdev@lfdr.de>; Thu,  6 Feb 2025 08:45:31 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 867B0A2A2AA
+	for <lists+netdev@lfdr.de>; Thu,  6 Feb 2025 08:53:31 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id ABD333A0347
-	for <lists+netdev@lfdr.de>; Thu,  6 Feb 2025 07:45:21 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 495843A50C1
+	for <lists+netdev@lfdr.de>; Thu,  6 Feb 2025 07:53:21 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C416D1FFC6C;
-	Thu,  6 Feb 2025 07:45:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8298D225A56;
+	Thu,  6 Feb 2025 07:52:31 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="WC0N7uIw"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="m9fVOtFE"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9F1D0156968
-	for <netdev@vger.kernel.org>; Thu,  6 Feb 2025 07:45:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4997C225A4C;
+	Thu,  6 Feb 2025 07:52:31 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1738827920; cv=none; b=JUBi/VJK+Sy11T5yD9QkrE3PlZW67h8rhFhus7Wrh+wA7tESNlURehRjDs76Wx/exR9c+oWIhESwf42zyTmrIVIk8BKCIM8ApGUEMnyL/rs0LohM39O7ul3ke4Ox1wtgVK+b9u8uzHXXkoh0qvuKNyz+zu2Q7tvRnrLZdgwk7y4=
+	t=1738828351; cv=none; b=ngwG1BEdyx+UOgvE+qySrLSsHTaOhiUmJnZ/gsYrCT4l6lIUQ02zWrC7FI515k5HBwuw8aDCoPUM603EKHpz8YfycJOISa/Oarfda6x1UlgKtYB41vABTfxV/TNbXuMNdcfEMrRvsDXUie35CwCF6z1nKZH7UoHay5XPkXN3g24=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1738827920; c=relaxed/simple;
-	bh=BT3Xj2lQU4/CMYnebLcZtcHV78BN7hYLOTmT/oMW4TY=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=jsXrNOViYEFTyaie/c+2DA5wpAJaUyTJT2vSfepE5eUthbHsF3vATn2OJaBHsccpSjjNNV4CH9Co9CmiYnKOO54/m91xvGEjYg1itxPkZ5//hgcrGHMVWu9iAZnoFTNE6rN/pMQrXK7rbO08fajs0Y10+7JvQOs/bPacfYh9BcI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=WC0N7uIw; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id E9D3AC4CEDD;
-	Thu,  6 Feb 2025 07:45:16 +0000 (UTC)
+	s=arc-20240116; t=1738828351; c=relaxed/simple;
+	bh=JNGdLVOeh2u3LfPFwDeakrrHIl4B6WTrzvbCBTqoGeY=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=ds4v4p3puQt/75hISuraQvw+EOapVHV+Jg/vFxcOaYvfi+Ld4p9uoCjSyYttsWwXn8fOaclAhXjFx4S/MvM2T3yMUY5wnUXhquNUYnX/5TzCLSV3Z8AIApvTgyn265Jzd7UG9Amtta8pGXul/KRDw5y3SY9V9O1lEUdJoboQvwc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=m9fVOtFE; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0BF1FC4AF0B;
+	Thu,  6 Feb 2025 07:52:31 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1738827919;
-	bh=BT3Xj2lQU4/CMYnebLcZtcHV78BN7hYLOTmT/oMW4TY=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=WC0N7uIw+MoNkbJpy9osVf0ANA8n98/2M/PxHW9Yuo9nw1Be2VU8JzRcisxS4jCL2
-	 9krjJWqEKx4bBsq8g5ICuZJytWBcUt80us79hoUKtYi9rHCGY6KLnZZhazaFyNZCsi
-	 8A3xyjnnCbYL4G2lnXsKK4s0PaT8EHnze8tqOMf+s4v+zD9MwMiE3z8aGeJ6F+raD9
-	 /nPskkzWeIkxktA4EFu+lKUW8GASTzb6g3WvVCF4asVGEJGFSbkR0C42DL0MDOj/Ma
-	 05sEQIQgvfprusqGkm/uqnBG00rTUC8HPrSnA3DLRslWzzgDMKFBkmCfxiuRLpY+pg
-	 8ZZDD/N8gzoKg==
-Message-ID: <c66c2aa1-62fd-4da8-b69e-a845ab955851@kernel.org>
-Date: Thu, 6 Feb 2025 08:45:14 +0100
+	s=k20201202; t=1738828351;
+	bh=JNGdLVOeh2u3LfPFwDeakrrHIl4B6WTrzvbCBTqoGeY=;
+	h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
+	b=m9fVOtFErGQpnJf5/iN5CB1c0VupczSJaRHZaDv2SOKgQV7lqNh8LA0QBEoXhlgg6
+	 YBQmHjIonQrlf/Z8zr/h9bbXNzln+SaFYPyqeD+nrNunWuP1aQF40o38u6SZz5QAxt
+	 ZKFRZ+MSugUteJtAXmnal48H0sX0XwE0aOodcb63EWtOuCR1hQdMCFH5xgwoiJF2Mq
+	 PCigyV1dDo2eoXbnmY9TYVqsMwQsPXisHncM5P4G7Q+XS9W0je3rOaEOdCApfFUb+9
+	 o/fmQxpPFQuPA4UrfjQ13VgtWmxZE615O41KGTAdkcSzZg9/hbYa+xsctSjLZAUV0Y
+	 JF7cGdGA84W5A==
+Received: by mail-ed1-f41.google.com with SMTP id 4fb4d7f45d1cf-5dcdb56c9d3so1129294a12.0;
+        Wed, 05 Feb 2025 23:52:30 -0800 (PST)
+X-Forwarded-Encrypted: i=1; AJvYcCUIWwlJIUUyGFbk8+EuO6CvwwJA5X5tbUauzVVirldbBG70HKv30MBNsYgmCBriYRfnTzaToEHz@vger.kernel.org, AJvYcCUfFiqZY5u/EthgWNd5S3tS4KTX1KByFUbRVwOeqmUNFQm6FmerhYoH7PxVnGpX+F9fOeO/3Y+qQDUogDk=@vger.kernel.org, AJvYcCVs894KtmQwqo32ltsoYqDoqf5tUZBS33OTHXSJ65sh7zYrfM5IJBLQ8cjnd7IIl1JkSL0ijVXO@vger.kernel.org
+X-Gm-Message-State: AOJu0Yzh9wU7Obsvh1acgHWUFGV6H4sENHnqjvM9/K2Yzhb6r916Dw5l
+	Cix8IAJRklQ8gztAqI8n9IASsd274v0wEnkyld4fZcclWwmtRCr+8f8amNKkc35aB/4ndmblArF
+	G8KZ91Md3gEW6BNz5YI0RrBU2PB0=
+X-Google-Smtp-Source: AGHT+IH24vRXBYoqM/jKh3fYrGtREWzXUQuxr3aqDKc+0gt0XoP0E0jPFsfdnTA3uGJugs8u05hHKqeHbKBb9kMpP9U=
+X-Received: by 2002:a05:6402:4486:b0:5dc:74fd:abf1 with SMTP id
+ 4fb4d7f45d1cf-5dcdb728ea9mr15097911a12.15.1738828349606; Wed, 05 Feb 2025
+ 23:52:29 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH iwl-net] ice: health.c: fix compilation on gcc 7.5
-To: Simon Horman <horms@kernel.org>,
- Przemek Kitszel <przemyslaw.kitszel@intel.com>
-Cc: intel-wired-lan@lists.osuosl.org, Tony Nguyen
- <anthony.l.nguyen@intel.com>, netdev@vger.kernel.org,
- Konrad Knitter <konrad.knitter@intel.com>,
- Michal Swiatkowski <michal.swiatkowski@linux.intel.com>,
- Qiuxu Zhuo <qiuxu.zhuo@intel.com>,
- Linus Torvalds <torvalds@linux-foundation.org>, Kees Cook <kees@kernel.org>,
- Nick Desaulniers <nick.desaulniers@gmail.com>
-References: <20250205104252.30464-2-przemyslaw.kitszel@intel.com>
- <20250205204546.GM554665@kernel.org>
-Content-Language: en-US
-From: Jiri Slaby <jirislaby@kernel.org>
-Autocrypt: addr=jirislaby@kernel.org; keydata=
- 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
-In-Reply-To: <20250205204546.GM554665@kernel.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+References: <20250121093703.2660482-1-chenhuacai@loongson.cn> <20250127140607.6b3617df@kernel.org>
+In-Reply-To: <20250127140607.6b3617df@kernel.org>
+From: Huacai Chen <chenhuacai@kernel.org>
+Date: Thu, 6 Feb 2025 15:52:21 +0800
+X-Gmail-Original-Message-ID: <CAAhV-H6oGvixPkPJ+fr8edxAu8rgjPwgaDh508cSzdAFG8Hrqg@mail.gmail.com>
+X-Gm-Features: AWEUYZm2wkOOP8qw23WLa1Zx8_PUScQBUh61vYQPDWNLR3cFPdaLul3L2ZbvAK0
+Message-ID: <CAAhV-H6oGvixPkPJ+fr8edxAu8rgjPwgaDh508cSzdAFG8Hrqg@mail.gmail.com>
+Subject: Re: [PATCH] net: stmmac: dwmac-loongson: Set correct {tx,rx}_fifo_size
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: Huacai Chen <chenhuacai@loongson.cn>, Andrew Lunn <andrew+netdev@lunn.ch>, 
+	"David S . Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+	Paolo Abeni <pabeni@redhat.com>, loongarch@lists.linux.dev, netdev@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, stable@vger.kernel.org, 
+	Chong Qiao <qiaochong@loongson.cn>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On 05. 02. 25, 21:45, Simon Horman wrote:
-> + Jiri
-> 
-> On Wed, Feb 05, 2025 at 11:42:12AM +0100, Przemek Kitszel wrote:
->> GCC 7 is not as good as GCC 8+ in telling what is a compile-time const,
->> and thus could be used for static storage. So we could not use variables
->> for that, no matter how much "const" keyword is sprinkled around.
->>
->> Excerpt from the report:
->> My GCC is: gcc (Ubuntu 7.5.0-3ubuntu1~18.04) 7.5.0.
->>
->>    CC [M]  drivers/net/ethernet/stmicro/stmmac/stmmac_mdio.o
->> drivers/net/ethernet/intel/ice/devlink/health.c:35:3: error: initializer element is not constant
->>     ice_common_port_solutions, {ice_port_number_label}},
->>     ^~~~~~~~~~~~~~~~~~~~~~~~~
->> drivers/net/ethernet/intel/ice/devlink/health.c:35:3: note: (near initialization for 'ice_health_status_lookup[0].solution')
->> drivers/net/ethernet/intel/ice/devlink/health.c:35:31: error: initializer element is not constant
->>     ice_common_port_solutions, {ice_port_number_label}},
->>                                 ^~~~~~~~~~~~~~~~~~~~~
->> drivers/net/ethernet/intel/ice/devlink/health.c:35:31: note: (near initialization for 'ice_health_status_lookup[0].data_label[0]')
->> drivers/net/ethernet/intel/ice/devlink/health.c:37:46: error: initializer element is not constant
->>     "Change or replace the module or cable.", {ice_port_number_label}},
->>                                                ^~~~~~~~~~~~~~~~~~~~~
->> drivers/net/ethernet/intel/ice/devlink/health.c:37:46: note: (near initialization for 'ice_health_status_lookup[1].data_label[0]')
->> drivers/net/ethernet/intel/ice/devlink/health.c:39:3: error: initializer element is not constant
->>     ice_common_port_solutions, {ice_port_number_label}},
->>     ^~~~~~~~~~~~~~~~~~~~~~~~~
->>
->> Fixes: 85d6164ec56d ("ice: add fw and port health reporters")
->> Reported-by: Qiuxu Zhuo <qiuxu.zhuo@intel.com>
->> Closes: https://lore.kernel.org/netdev/CY8PR11MB7134BF7A46D71E50D25FA7A989F72@CY8PR11MB7134.namprd11.prod.outlook.com
->> Signed-off-by: Przemek Kitszel <przemyslaw.kitszel@intel.com>
->> ---
->> I would really like to bump min gcc to 8.5 (RH 8 family),
->> instead of supporting old Ubuntu. However SLES 15 is also stuck with gcc 7.5 :(
->>
->> CC: Linus Torvalds <torvalds@linux-foundation.org>
->> CC: Kees Cook <kees@kernel.org>
->> CC: Nick Desaulniers <nick.desaulniers@gmail.com>
-> 
-> Hi Prezemek,
-> 
-> I ran into a similar problem not so long ago and I'm wondering if
-> the following, based on a suggestion by Jiri Slaby, resolves your
-> problem.
-> 
-> diff --git a/drivers/net/ethernet/intel/ice/devlink/health.c b/drivers/net/ethernet/intel/ice/devlink/health.c
-> index ea40f7941259..19c3d37aa768 100644
-> --- a/drivers/net/ethernet/intel/ice/devlink/health.c
-> +++ b/drivers/net/ethernet/intel/ice/devlink/health.c
-> @@ -25,10 +25,10 @@ struct ice_health_status {
->    * The below lookup requires to be sorted by code.
->    */
->   
-> -static const char *const ice_common_port_solutions =
-> +static const char ice_common_port_solutions[] =
->   	"Check your cable connection. Change or replace the module or cable. Manually set speed and duplex.";
-> -static const char *const ice_port_number_label = "Port Number";
-> -static const char *const ice_update_nvm_solution = "Update to the latest NVM image.";
-> +static const char ice_port_number_label[] = "Port Number";
-> +static const char ice_update_nvm_solution[] = "Update to the latest NVM image.";
+Hi, Jakub,
 
-Indeed, no reason to create an (unused) pointer.
+Sorry for the late reply.
 
-And no, don't use macros for strings.
+On Tue, Jan 28, 2025 at 6:06=E2=80=AFAM Jakub Kicinski <kuba@kernel.org> wr=
+ote:
+>
+> On Tue, 21 Jan 2025 17:37:03 +0800 Huacai Chen wrote:
+> > Now for dwmac-loongson {tx,rx}_fifo_size are uninitialised, which means
+> > zero. This means dwmac-loongson doesn't support changing MTU,
+>
+> Please provide more details here than "doesn't support changing".
+> Does it return an error every time, but the device is operating
+> correctly?
+>
+> Do the flow control thresholds also get programmed incorrectly?
+OK, I will give more details, the root cause is stmmac_change_mtu()
+fails if txfifosz is zero.
 
-thanks,
--- 
-js
-suse labs
+>
+> > so set the
+> > correct tx_fifo_size and rx_fifo_size for it (16KB multiplied by channe=
+l
+> > counts).
+> >
+> > Note: the Fixes tag is not exactly right, but it is a key commit of the
+> > dwmac-loongson series.
+>
+> Please pick a better one, then. Oldest commit where issue can be
+> observed by the user is usually a safe choice.
+Emmm, the commit I picked is the oldest in the "stmmac: Add Loongson
+platform support".
+
+>
+> Please use 12 chars of the hash in the tag.
+OK, will do.
+
+>
+> > +     plat->tx_fifo_size =3D SZ_16K * plat->tx_queues_to_use;
+> > +     plat->rx_fifo_size =3D SZ_16K * plat->rx_queues_to_use;
+>
+> Is this really right? 16k times the number of queues seems like you're
+> just trying to get the main driver to calculate 16k.
+> What if user decreases the queue count? Maybe you should add a way to
+> communicate the fifo size regardless of the queue count to the main
+ > driver?
+Here {tx,rx}_fifo_size is initialised before stmmac_dvr_probe(), so it
+uses the maximum {tx,rx}_queues_to_use to calculate.
+
+If we use ethtool to decrease queue count, stmmac_change_mtu() will
+get txfifosz larger than 16K, but stmmac_change_mtu() can still work
+because there is a condition "if ((txfifosz < new_mtu) || (new_mtu >
+BUF_SIZE_16KiB))".
+
+This is not perfect, but it seems a perfect solution needs to rework
+the main driver, and dwmac-intel also uses {tx,rx}_queues_to_use to
+calculate {tx,rx}_fifo_size now.
+
+
+Huacai
+
+> --
+> pw-bot: cr
 
