@@ -1,122 +1,134 @@
-Return-Path: <netdev+bounces-163473-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-163474-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id D8626A2A599
-	for <lists+netdev@lfdr.de>; Thu,  6 Feb 2025 11:12:14 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id AF4FDA2A5B8
+	for <lists+netdev@lfdr.de>; Thu,  6 Feb 2025 11:22:46 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 2BFCB3A4C1D
-	for <lists+netdev@lfdr.de>; Thu,  6 Feb 2025 10:12:06 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 8A5B21887E2D
+	for <lists+netdev@lfdr.de>; Thu,  6 Feb 2025 10:22:51 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 96C9322619D;
-	Thu,  6 Feb 2025 10:12:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3F35422686A;
+	Thu,  6 Feb 2025 10:22:42 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="VrGjZMXN"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Mn3XOFt8"
 X-Original-To: netdev@vger.kernel.org
-Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-il1-f174.google.com (mail-il1-f174.google.com [209.85.166.174])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A534522331F;
-	Thu,  6 Feb 2025 10:12:08 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AFFA122540F;
+	Thu,  6 Feb 2025 10:22:40 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.174
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1738836730; cv=none; b=m89Knyqx1TokM709CrC/EieX0I1hVGF/3bnww0giyOi2xDyUfc8PcrucLXYl6IxvErfP4eA7JYSi8SAplMVFIUpQL79d+72Rlfi/Hb29L5Q6nUtoKuOOMdHdEpWivbFWmf94p49boWPrSk7u7d/mFNUW0CIt7DWGx1UWKkSucVE=
+	t=1738837362; cv=none; b=cr0Bxr5yqFM35lM7Af6K/kxl0psW4iEf5NCQ0EnroZqPMuBtkXqPzbvrg7p8V+/XlE90sTQ5HsKEAmdX/Qx7/7b9vEqXrSJe98Ykidrza6cJb5vFlpTTDf6wK2RYfYkjfdh3Fk8b/EiAKF62SMvBRvH+LkIMkJDkfzN7MKe6Tek=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1738836730; c=relaxed/simple;
-	bh=dl8ZXnQCbi3Y8kVYZFjrzTlPj5aOIr0W5r+muArOoeY=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=YkMJkWSij0OWUSTujRw8OV1dOIifjSc9oEExxXIJgc5ZZBhQ2RaeRdr3+pVRSVFA2AFaU0B05o9QthjW6ImrSSm8mHDbqJQiVK7gH4aPfsDiaN/FWMMtrvZj93YyvwZe+UhZbyla+jLPBsX9xywmerE4jnx3qXDN+YxIcF/pEzg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=VrGjZMXN; arc=none smtp.client-ip=78.32.30.218
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
-	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
-	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
-	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=IGtT4jJj54W9qkniOIuHDmAyLAJNfLsZ3atVdSoL2Sw=; b=VrGjZMXNKqp11sBPpNPyr9bd8j
-	iDW8pjUfPny4JDeSdAM75qSlzDloRDzAuw8WPJ+YuCmZrT/uT0LWIy5VkIf9jmIxSMpOpb6SgsdTz
-	+G/JpsS0x5S/EIl2UzUs7CYJrHEb12+B0+LZp+ntHccablhQbEOP6Cy+ZaXE0VSy1uFyMo53wgLfH
-	2hzZRTL4roOnp4giNFVCOQ1gW/WFSYAStewJD3KnebYOAQ68PoitLuWosk5mUgkGk6NMo3H8ZUfCN
-	PpjJf3Ew9XEO+zWoiOltaJbtDSQyt0EopVzMPvXzJaHI9iniyUZh974YIgNFl/TXHxlLDo/DfkjRE
-	J+0zciZA==;
-Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:58646)
-	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.96)
-	(envelope-from <linux@armlinux.org.uk>)
-	id 1tfyqw-0001h6-11;
-	Thu, 06 Feb 2025 10:11:22 +0000
-Received: from linux by shell.armlinux.org.uk with local (Exim 4.96)
-	(envelope-from <linux@shell.armlinux.org.uk>)
-	id 1tfyqn-0003LY-04;
-	Thu, 06 Feb 2025 10:11:13 +0000
-Date: Thu, 6 Feb 2025 10:11:12 +0000
-From: "Russell King (Oracle)" <linux@armlinux.org.uk>
-To: Choong Yong Liang <yong.liang.choong@linux.intel.com>
-Cc: Simon Horman <horms@kernel.org>, Jose Abreu <joabreu@synopsys.com>,
-	Jose Abreu <Jose.Abreu@synopsys.com>,
-	David E Box <david.e.box@linux.intel.com>,
-	Thomas Gleixner <tglx@linutronix.de>,
-	Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
-	Dave Hansen <dave.hansen@linux.intel.com>,
-	"H . Peter Anvin" <hpa@zytor.com>,
-	Rajneesh Bhardwaj <irenic.rajneesh@gmail.com>,
-	David E Box <david.e.box@intel.com>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S . Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Maxime Coquelin <mcoquelin.stm32@gmail.com>,
-	Alexandre Torgue <alexandre.torgue@foss.st.com>,
-	Jiawen Wu <jiawenwu@trustnetic.com>,
-	Mengyuan Lou <mengyuanlou@net-swift.com>,
-	Heiner Kallweit <hkallweit1@gmail.com>,
-	Hans de Goede <hdegoede@redhat.com>,
-	Ilpo =?iso-8859-1?Q?J=E4rvinen?= <ilpo.jarvinen@linux.intel.com>,
-	Richard Cochran <richardcochran@gmail.com>,
-	Andrew Halaney <ahalaney@redhat.com>,
-	Serge Semin <fancer.lancer@gmail.com>, x86@kernel.org,
-	linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
-	platform-driver-x86@vger.kernel.org,
-	linux-stm32@st-md-mailman.stormreply.com,
-	linux-arm-kernel@lists.infradead.org
-Subject: Re: [PATCH net-next v6 4/7] stmmac: intel: configure SerDes
- according to the interface mode
-Message-ID: <Z6SKwNF8ib2BgIsL@shell.armlinux.org.uk>
-References: <20250204061020.1199124-1-yong.liang.choong@linux.intel.com>
- <20250204061020.1199124-5-yong.liang.choong@linux.intel.com>
- <Z6IDWiRF73sdVWob@shell.armlinux.org.uk>
- <f272cb2a-1167-4e34-9209-ffdbbb107bdd@linux.intel.com>
+	s=arc-20240116; t=1738837362; c=relaxed/simple;
+	bh=ITRUK2mleEF/74KTc1V9MJDwrYb1+CFbhx+ekjh6RF4=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=KPpbH1cgplBNfZmlCR5vaTVHMcH5dLTUZy6KueszaKgF6zYuPIRqkDlxfUUd2soPqOYrDahmzbmgIdrR+E3yc1E6+IodZDI80yMhnYCoeSGm5UbhplVDJur5BC3sJrleApH9r7jiFsADDBidyIuRyti7r1S2j0rNHp1/eC4Ukpo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Mn3XOFt8; arc=none smtp.client-ip=209.85.166.174
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-il1-f174.google.com with SMTP id e9e14a558f8ab-3d0558c61f4so3966895ab.0;
+        Thu, 06 Feb 2025 02:22:40 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1738837359; x=1739442159; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=ITRUK2mleEF/74KTc1V9MJDwrYb1+CFbhx+ekjh6RF4=;
+        b=Mn3XOFt8YO2RyEAbnu5a3n7tkACutT9bXrRcarY3bbxlrGnjxLzPas81mbNgO3gRV5
+         nbFiOm8YQH+OVTFfywMV02c5UU8/6KS/JBLLGdehjs6R3wd6G7WsfnX0G2aAjBFZjpU5
+         0VBUydFMgUcCz2vQJtmA/esrOeeBW3ax9cm3Hky2djMG0HfgdzgTFligEbX6kH1+NzbA
+         LfsE8UE5JllJ7++BMQ5saC/B1i6jbbZp3gh4LE+YhMEukU8F4t/9sKAQO/9eiJ8d0TQA
+         KrS9mFjF4HHsrAgjM7OkswHIaDS0VWjjmGiBERJdSb/pFnSa1da/6r/9fibJe6TUrGe5
+         sUrA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1738837359; x=1739442159;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=ITRUK2mleEF/74KTc1V9MJDwrYb1+CFbhx+ekjh6RF4=;
+        b=qFmHOIQjSxJT70cutPwiEUl5hDhscdStyv3hO8uyFB6i1ReTYTYGHJztYffkJGujZ3
+         +89PbfIcSeH9F20DKjYgchZit7m2ofoxRoT4kt/9/sDElOW1NADiYWiFn6a2Q9wiykYp
+         ngGQrwS4EQQ9j4eVS0GlU0iyHXT/mBF0XG7ZsigCML0r79UHGcC3xYp7MqrM/5J9x0a2
+         sGpPOD5Q/5Lf0EHMQoA9yDucOIzKt7JSbHUQVJlo0Rg3gdzC4U9TRK0RB5EHWZfUFErp
+         pCY55zGwdtzO+IwM3SfizPxhwox/AV4PBvWJQylQZWiteXWyFCd0j8MNo/ULuc2qNy3P
+         gCKw==
+X-Forwarded-Encrypted: i=1; AJvYcCW07gHTdd+QNzUzsdVgINdS/KvS0vuimPH2maOIGna9xT1pmcFhWNZsqme/oyHx30PctmZfJIf6@vger.kernel.org, AJvYcCXSmHNDRo3ppy1V6Q7VHETU4NFLiTucC4eh2wBl/IBAoNLOoaaKcqyqcq+/h8OHJ2GxWss=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyKEmFzyEH3TMS+Od0DFvh2cCD8heEd6cXhUuCBxQMPzRZs9PzO
+	t1W67eKGeFQrBfLAuzDKfaxKtWl/zpDU7rtmZk1Y7QEPHgr9aYyQREdtpFUlcnPELFpcbL3tR9p
+	BytFMJ5YPbLQk4X39CCnlLroSxEU=
+X-Gm-Gg: ASbGncsAY0PT9uKLO+wplelxOaW6nb2CPqXKmBZKjzKAx/hlSnL/0CyyK+PYvArfXYi
+	ARh6dyMtPcuxHRcM/8PS0ppS7JxEShCh8Xp036z3IBgOszIm1nHiAJFpsVL3VBj583A4MLUWi
+X-Google-Smtp-Source: AGHT+IEtPTc9uft8nwa3L0tYQXjWEa0eIxuJSderjWOqvglwujSfCkIPE1NYtRO9VTJALAgsAbH02UD4m46o1/aevAk=
+X-Received: by 2002:a05:6e02:12ce:b0:3cf:c07d:e9a with SMTP id
+ e9e14a558f8ab-3d05a58d185mr19078455ab.4.1738837359688; Thu, 06 Feb 2025
+ 02:22:39 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <f272cb2a-1167-4e34-9209-ffdbbb107bdd@linux.intel.com>
-Sender: Russell King (Oracle) <linux@armlinux.org.uk>
+References: <20250204183024.87508-1-kerneljasonxing@gmail.com>
+ <20250204183024.87508-6-kerneljasonxing@gmail.com> <67a384ea2d547_14e0832942c@willemb.c.googlers.com.notmuch>
+ <CAL+tcoDvCrfE+Xs3ywTA35pvR_NyFyXLihyAuFFZBA4aHmiZBg@mail.gmail.com>
+In-Reply-To: <CAL+tcoDvCrfE+Xs3ywTA35pvR_NyFyXLihyAuFFZBA4aHmiZBg@mail.gmail.com>
+From: Jason Xing <kerneljasonxing@gmail.com>
+Date: Thu, 6 Feb 2025 18:22:03 +0800
+X-Gm-Features: AWEUYZnwB6USsLHlfud560t2tqXbwmTMNfmbEHPVYZlfcOIutFZZOfwE_OwrI1k
+Message-ID: <CAL+tcoAPpLwRt1_81yM66MpeiJvD1oZjCOzy4auKR585M24yPA@mail.gmail.com>
+Subject: Re: [PATCH bpf-next v8 05/12] net-timestamp: prepare for isolating
+ two modes of SO_TIMESTAMPING
+To: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
+Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org, 
+	pabeni@redhat.com, dsahern@kernel.org, willemb@google.com, ast@kernel.org, 
+	daniel@iogearbox.net, andrii@kernel.org, martin.lau@linux.dev, 
+	eddyz87@gmail.com, song@kernel.org, yonghong.song@linux.dev, 
+	john.fastabend@gmail.com, kpsingh@kernel.org, sdf@fomichev.me, 
+	haoluo@google.com, jolsa@kernel.org, horms@kernel.org, bpf@vger.kernel.org, 
+	netdev@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Thu, Feb 06, 2025 at 10:22:04AM +0800, Choong Yong Liang wrote:
-> Thank you for your feedback on the patch. Based on your suggestion, I have
-> updated the code to align with the mac_finish() method and included the AN
-> mode as well. The updated function signature is as follows:
-> 
-> int (*mac_finish)(struct net_device *ndev,
->                   void *priv,
->                   unsigned int mode,
->                   phy_interface_t interface);
-> 
-> Could you please confirm if this meets your expectations, or if there are
-> any further adjustments needed?
+On Thu, Feb 6, 2025 at 4:43=E2=80=AFPM Jason Xing <kerneljasonxing@gmail.co=
+m> wrote:
+>
+> On Wed, Feb 5, 2025 at 11:34=E2=80=AFPM Willem de Bruijn
+> <willemdebruijn.kernel@gmail.com> wrote:
+> >
+> > Jason Xing wrote:
+> > > No functional changes here, only add skb_enable_app_tstamp() to test
+> > > if the orig_skb matches the usage of application SO_TIMESTAMPING
+> > > or its bpf extension. And it's good to support two modes in
+> > > parallel later in this series.
+> > >
+> > > Also, this patch deliberately distinguish the software and
+> > > hardware SCM_TSTAMP_SND timestamp by passing 'sw' parameter in order
+> > > to avoid such a case where hardware may go wrong and pass a NULL
+> > > hwstamps, which is even though unlikely to happen. If it really
+> > > happens, bpf prog will finally consider it as a software timestamp.
+> > > It will be hardly recognized. Let's make the timestamping part
+> > > more robust.
+> >
+> > Disagree. Don't add a crutch that has not shown to be necessary for
+> > all this time.
+> >
+> > Just infer hw from hwtstamps !=3D NULL.
+>
+> I can surely modify this part as you said, but may I ask why? I cannot
+> find a good reason to absolutely trust the hardware behaviour. If that
+> corner case happens, it would be very hard to trace the root cause...
 
-That's fine, thanks.
+No offense, just curious. I can keep the same approach as
+SO_TIMESTAMPING since you disagree. I have no strong preference
+because I found It's simpler after rewriting this part.
 
--- 
-RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
-FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
+I will simplify this patch in v9 :)
+
+Thanks,
+Jason
 
