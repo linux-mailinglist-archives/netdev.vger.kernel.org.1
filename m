@@ -1,423 +1,142 @@
-Return-Path: <netdev+bounces-163517-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-163518-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7FE3DA2A8C9
-	for <lists+netdev@lfdr.de>; Thu,  6 Feb 2025 13:49:39 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id B7670A2A8E2
+	for <lists+netdev@lfdr.de>; Thu,  6 Feb 2025 13:58:11 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id A361F7A169E
-	for <lists+netdev@lfdr.de>; Thu,  6 Feb 2025 12:48:43 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 53CAB166594
+	for <lists+netdev@lfdr.de>; Thu,  6 Feb 2025 12:58:10 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8460521CFF7;
-	Thu,  6 Feb 2025 12:49:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DF30C22D4C8;
+	Thu,  6 Feb 2025 12:58:08 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="Yti7+tsD"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="HZUM2pbL"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-f42.google.com (mail-ed1-f42.google.com [209.85.208.42])
+Received: from mail-ed1-f54.google.com (mail-ed1-f54.google.com [209.85.208.54])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 472AA13D897
-	for <netdev@vger.kernel.org>; Thu,  6 Feb 2025 12:49:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.42
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2499813D897
+	for <netdev@vger.kernel.org>; Thu,  6 Feb 2025 12:58:06 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.54
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1738846173; cv=none; b=J+PPnyHrtdWPKwWVO4Bm4jF9EIwzzwRr+U2MGYQN7Tof/6RjC6EFsaA0eM6vZLAEQeRSB4EUxycn41Vk0cG6q9Azq+2QNbNd2wzjwxEpxDiTD3+GntMH55DwFN2SmEgecwCH4LG9VUtzYYTLgeEqOuZ+pOFuTiqZl+KPuW4B+gg=
+	t=1738846688; cv=none; b=lqP06zJsQ6E/tXSc19sTZEMyg1jOm0YOYFS4C/wH7aygLOx6JiL8E1t9+bA37GmSsPPjpqf5RpSk0Wk6uBp50c1TfWuKVEbAgmLhTjvpE/ny9X9Hp9msocs/H1AEkf1DAkDHVwqX+g/8GApQCEJjWOJT8E9nkpNtn6M6fbeqAss=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1738846173; c=relaxed/simple;
-	bh=2/sAW5GS60BqYO5Cgr3ilmK+Fvzr6AkkhDBuBcGzPyE=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=TQ1Z56gpgpIOnmY94IczkxGufUBoeNUF0ijwmh4jG6fEscFW1PX9pDNYlJX056z1aVsWPhFSBuf+VGtU8MSxJUdaOI1DZhTYWKQVd+lVeQs/bdZyfRo+k7jRCWIqR3Cl/pOs8RHCb1lG+eIxiGmyZWJg7Oga5f2gF/ZSEgW8l1U=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=Yti7+tsD; arc=none smtp.client-ip=209.85.208.42
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-ed1-f42.google.com with SMTP id 4fb4d7f45d1cf-5dcd8d6f130so1791972a12.1
-        for <netdev@vger.kernel.org>; Thu, 06 Feb 2025 04:49:30 -0800 (PST)
+	s=arc-20240116; t=1738846688; c=relaxed/simple;
+	bh=/+YE97l5gGGdMiaSTgR2MdCMaMZNNMImj90AujmvGRI=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=vBsiml5SvIND9Rj4fNpylu6wue0ZwcwOFRkjCvlDfq5fBwPMjdorTFu6CiG1XbWau3fLHupT+whM+cWRzcS2ieuRxNGaBc8xAQB6ogxN+20hwyjHMCZ1B94J/Lbtms50BNDwjdqoGbqbdD1HWRcEdILpAdIjLcDSwRdYXk4vZdI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=HZUM2pbL; arc=none smtp.client-ip=209.85.208.54
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-ed1-f54.google.com with SMTP id 4fb4d7f45d1cf-5dca468c5e4so1880971a12.1
+        for <netdev@vger.kernel.org>; Thu, 06 Feb 2025 04:58:06 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1738846169; x=1739450969; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=oAeQ4FPBlr22EyVCod2Fq8Lh4yWSF+w+ybsWOylWAP8=;
-        b=Yti7+tsDJfzN2wRJ0EswwXvd0AJUs8gKqiLWwnPUFElBvwVp5Kih6+zjqLCTkeeg2J
-         BLhmZTB+s+pWW5HAxt4Pf4bndCY8fkPU/OjtHuZI5dP6atZBOi44+gh+hF5mzG0Wfn4G
-         ZCEc4yECSmnCfYrq7U6Oyw8asFyanK85AFjdZ5j+CUD6yC4CH2aUjRSpobMNu1YyWYGy
-         JSUe/Ed3jgregfIfZGbBo4A45pygtpOuLBm58pkkjw5lIOhDzHo3GcRTb5a19TBsqj8+
-         GWoOygQSphfabCDSmewZTQxiI+ePLd9GH68veRwAeRtJp6I4hGSrvcO8m6wk0TsJRItt
-         w9jw==
+        d=gmail.com; s=20230601; t=1738846685; x=1739451485; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=82VL9XvXONz1JmWwmNafYVNrGyFeti9Oa0ZI1OXfhcY=;
+        b=HZUM2pbLzMEEV4vH0LPfd8iU1y1my0G5oOp1paerDWtdCn/5C6AOb4NrM2GhPEbGOx
+         mfM88ewwr0kyS+CEGgPtSqk57MwjpMwV+YXpnjaQ7FxSFPF71/5u8hCsJ/AkuGNHhpea
+         i50hlrtOP5D/7N8hdJBpeRAr0xRmZfbc0efALQuL2P7CNE9v/kcn7wcPpn1KvI/3EzFs
+         k8iD7kfG+8I7Q0Jy+0DFCgfEpul2hIToW43ue2H8y11SN8AW4J78P4IGVks2p4hqxZVC
+         5aIF9taJO+1k9spnMz44dcuUKt4NAtnc4qwIaxNM/Zt7eemEI1w7+FOlfI0msEuujQT5
+         L37w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1738846169; x=1739450969;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=oAeQ4FPBlr22EyVCod2Fq8Lh4yWSF+w+ybsWOylWAP8=;
-        b=uVwsq8ERgs2lPrWtSw4B4CbryO7dacmYIuGUhC9BfTK2OxCOeOko/AOaF+p6NLqOAh
-         z8pGO4KSab64i5aiFXefBph/m9WFq0pf9k4DU2BtfFDN3r0rDufIXMXtX2OmIgpI6Vzs
-         VuHBFQWStQBsxJnQXRkA7ScSaCreqxgHptKY802/nOzIS5HRFKRPNPk3Kdq1dSDO/F6m
-         9hZExAvrnyDXcrhZrA//XRSG22JjKTfMR6CiKbSDs8JvkEqWcax0VFCDIdbDepONLb0c
-         O7/bufwYQWNYhE/LSS+t8ky6SIHd1zlI9p85yajDz1z12NPjQr4eGC8/man7KL76lAxN
-         LQ9Q==
-X-Forwarded-Encrypted: i=1; AJvYcCWSUlCpVwS7weCrR9ho5jLxm6HfncOkZsiXGkWeiEkdUdGHmS5Wj2ucm82QGBhR7K07trzpIk0=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yzo10oy1/q1eu6I6OZrhEDKKRaOpaB8KCfOqiE5hyIkUjQaMEnB
-	EVGCvmwDmwkKD2EWdBdQJRmGWwnAtzVbLFcftVLoA3jFoPgBFYHyJpRxe7B9K8KWVaKD00COB98
-	r5rSk6N5s4wY44XhWJgVhDzmEMdF/Z8CDXf5/
-X-Gm-Gg: ASbGncvYCcvxezKXPKCxmeE1oxmGfE0XwP8puqhjWTUwiDezb318vzEGAw27xzcrMLA
-	GdazIsAbzpYdOUNDvjTH5GwCraDmnjDnFElfvI/rg7QeooLCfoSoExh68CGt6S4JRXQzVRqkjRw
-	==
-X-Google-Smtp-Source: AGHT+IHWjl7To5/Z/Os3cpQDmVu0PZ0+cTu3HBsVZDoGGlSNfub+QqW88g1srj1Qth6joLQVoPTv/aZIz8jWxojUsa8=
-X-Received: by 2002:a05:6402:390c:b0:5dc:7425:ea9c with SMTP id
- 4fb4d7f45d1cf-5dcdb7782ccmr6793745a12.26.1738846169110; Thu, 06 Feb 2025
- 04:49:29 -0800 (PST)
+        d=1e100.net; s=20230601; t=1738846685; x=1739451485;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=82VL9XvXONz1JmWwmNafYVNrGyFeti9Oa0ZI1OXfhcY=;
+        b=ABKdDpJ0jSrXoh2I+IdeC8a5Qw9R9yxemJ0BsI0HDACRFQGo9REc4b+oS+iL1cO0+9
+         opLz2WITVjBWUZgCB94iO14l6I3sM5wg/X5HqCEu2iFErxACCCAn2d+xzouJ9WOkBcfJ
+         oeQYY6as8eqzKXwGwBianIn8GSUdh6kr5tENMmOOgxsFM6aG49blVKcD9C3o3H87hmMF
+         wFS/95MGNsjMC6mzOneVifZBP+eL9Bb1ecOPOk7lTl0kgZeccp1z2oi2CLjwyEA4Wsct
+         yB7xD0wSyx/LBADePtMa4EBOxOjh1rOJK7TWQcAB68Fu/o5uVwj+3gYSTMbgJriKLn8/
+         bWwA==
+X-Gm-Message-State: AOJu0YwZhC7TkCDnNBTy2WcjBztRej4/cMJkM1RknjXoeTT0w4g6+6TQ
+	qT/Z5T1uh7WU2VvL4bemGQabgjBZA3u5cxd+SSFM/4Hed6bWV7Em4pQWYg==
+X-Gm-Gg: ASbGncuDopjFio6iiSfcxwp9BzY7ebBzkYsZW5Bl+RNcWyf2SZyM/trH3dxRUx5UMFq
+	VOTJTaFvG1gVQUZUz9+CY3lR84J10bBVE0PC41OxVrGULknD9YyWGiWtQNdhQJTdRVej5arcUnW
+	BaNCpd7nknKPbw6VQ9TynUwlCkyjh9d9LawWNjqCgc43oCBr0IMVghjYnZO448jfCIp/DB+cDpx
+	rzDkkYxwJrv+VPP+TS3yDN1lZ9dMv/4X+wCp2s443HGJtX5DVjNG/XKdUm00wsX8VdaxYGlu0oV
+	oq5OAcap1GZgziDaZZKv9/G04f77ut0w0DQ=
+X-Google-Smtp-Source: AGHT+IHrDxmFpahE2Xf73yd6XY7H9pIuigc7Nof9979nKjHSrUsBzLKuD0egSCQoGlQ/UBARmteifw==
+X-Received: by 2002:a05:6402:4486:b0:5dc:7538:3c5 with SMTP id 4fb4d7f45d1cf-5dcdb717b28mr7207419a12.4.1738846683865;
+        Thu, 06 Feb 2025 04:58:03 -0800 (PST)
+Received: from [172.27.34.32] ([193.47.165.251])
+        by smtp.gmail.com with ESMTPSA id 4fb4d7f45d1cf-5dcf6c9f9b3sm837776a12.59.2025.02.06.04.58.00
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 06 Feb 2025 04:58:03 -0800 (PST)
+Message-ID: <c130df76-9b18-40a9-9b0c-7ad21fd6625b@gmail.com>
+Date: Thu, 6 Feb 2025 14:57:59 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <5ae45813.3235.194db3d35f5.Coremail.stitch@zju.edu.cn>
-In-Reply-To: <5ae45813.3235.194db3d35f5.Coremail.stitch@zju.edu.cn>
-From: Eric Dumazet <edumazet@google.com>
-Date: Thu, 6 Feb 2025 13:49:17 +0100
-X-Gm-Features: AWEUYZmZj1dULrCa9boc22dTr2_fzaBJL4RLRK0F-Rt1H0nxb0wvS2etPnlFs44
-Message-ID: <CANn89i+dsbTvY3tKhTGAEKUtHqThya2vELVTTDfrUSppMLt3SA@mail.gmail.com>
-Subject: Re: [BUG] KASAN: slab-use-after-free in slip_open
-To: Jiacheng Xu <stitch@zju.edu.cn>
-Cc: andrew+netdev@lunn.ch, davem@davemloft.net, kuba@kernel.org, 
-	pabeni@redhat.com, netdev@vger.kernel.org, wolffd@comp.nus.edu.sg
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-
-On Thu, Feb 6, 2025 at 1:30=E2=80=AFPM Jiacheng Xu <stitch@zju.edu.cn> wrot=
-e:
->
-> Hi developers:
->
-> We are reporting a Linux issue using a modified version of Syzkaller.
->
-> HEAD commit: 4bbf9020 6.13.0-rc4
-> git tree: upstream
-> kernel config: https://github.com/google/syzkaller/blob/master/dashboard/=
-config/linux/upstream-apparmor-kasan.config
-> syz repro: https://drive.google.com/file/d/1XV9WHwMvK4eZIPuyjiWoTpyQ0FpDa=
-UpT/view?usp=3Dsharing
-> C reproducer: As this is a race condition, a stable C reproducer is not a=
-vailable yet.
->
-> Environment:
-> Ubuntu 22.04 on Linux 5.15
-> QEMU emulator version 6.2.0
-> qemu-system-x86_64 \
-> -m 2G \
-> -smp 2 \
-> -kernel /home/wd/bzImage \
-> -append "console=3DttyS0 root=3D/dev/sda earlyprintk=3Dserial net.ifnames=
-=3D0" \
-> -drive file=3D/home/wd/bullseye.img,format=3Draw \
-> -net user,host=3D10.0.2.10,hostfwd=3Dtcp:127.0.0.1:10021-:22 \
-> -net nic,model=3De1000 \
-> -enable-kvm \
-> -nographic \
-> -pidfile vm.pid \
-> 2>&1 | tee vm.log
->
-> Steps to reproduce:
-> 1. Setup a vm on given kernel.
-> 2. Execute the syz reproducer with `./syz-execprog -executor=3D./syz-exec=
-utor -repeat=3D20000 -procs=3D8 -cover=3D0 ~/repro.prog`
->
-> Description:
-> The SLIP driver suffers from a Use-After-Free issue in sl_sync() due to u=
-nsynchronized access to net_device pointers stored in slip_devs[]. When a d=
-evice is being freed (for example, via tty_release()/netdev_run_todo()), sl=
-_sync() may access it after it has been freed.
->
-> Patch:
-> We try to write a patch for the crash. And after applying the patch, the =
-crash can no longer be triggered with the PoC.
->
-> --- slip.c      2025-02-06 12:26:25.690890378 +0000
-> +++ slip.c      2025-02-06 12:29:30.554820899 +0000
-> @@ -721,8 +721,9 @@
->         struct net_device *dev;
->         struct slip       *sl;
->
-> +       rcu_read_lock();
->         for (i =3D 0; i < slip_maxdev; i++) {
-> -               dev =3D slip_devs[i];
-> +               dev =3D rcu_dereference(slip_devs[i]);
->                 if (dev =3D=3D NULL)
->                         break;
->
-> @@ -732,6 +733,7 @@
->                 if (dev->flags & IFF_UP)
->                         dev_close(dev);
->         }
-> +       rcu_read_unlock();
->  }
->
-
-Hi there.
-
-We had numerous public sybot reports with the same signature.
-
-Your patch can not work, we can not call dev_close() under rcu_read_lock().
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next 0/4] eth: mlx4: use the page pool for Rx buffers
+To: Jakub Kicinski <kuba@kernel.org>, davem@davemloft.net
+Cc: netdev@vger.kernel.org, edumazet@google.com, pabeni@redhat.com,
+ andrew+netdev@lunn.ch, horms@kernel.org, tariqt@nvidia.com, hawk@kernel.org
+References: <20250205031213.358973-1-kuba@kernel.org>
+Content-Language: en-US
+From: Tariq Toukan <ttoukan.linux@gmail.com>
+In-Reply-To: <20250205031213.358973-1-kuba@kernel.org>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
 
 
+On 05/02/2025 5:12, Jakub Kicinski wrote:
+> Convert mlx4 to page pool. I've been sitting on these patches for
+> over a year, and Jonathan Lemon had a similar series years before.
+> We never deployed it or sent upstream because it didn't really show
+> much perf win under normal load (admittedly I think the real testing
+> was done before Ilias's work on recycling).
+> 
+> During the v6.9 kernel rollout Meta's CDN team noticed that machines
+> with CX3 Pro (mlx4) are prone to overloads (double digit % of CPU time
+> spent mapping buffers in the IOMMU). The problem does not occur with
+> modern NICs, so I dusted off this series and reportedly it still works.
+> And it makes the problem go away, no overloads, perf back in line with
+> older kernels. Something must have changed in IOMMU code, I guess.
+> 
+> This series is very simple, and can very likely be optimized further.
+> Thing is, I don't have access to any CX3 Pro NICs. They only exist
+> in CDN locations which haven't had a HW refresh for a while. So I can
+> say this series survives a week under traffic w/ XDP enabled, but
+> my ability to iterate and improve is a bit limited.
 
->
-> If you fix this issue, please add the following tag to the commit:
-> Reported-by: Jiacheng Xu <stitch@zju.edu.cn>, Dylan Wolff <wolffd@comp.nu=
-s.edu.sg>
-> =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
-> BUG: KASAN: slab-use-after-free in sl_sync drivers/net/slip/slip.c:732 [i=
-nline]
-> BUG: KASAN: slab-use-after-free in slip_open+0x293/0x1330 drivers/net/sli=
-p/slip.c:806
-> Read of size 4 at addr ffff88805cfca0b0 by task syz-executor.2/46673
->
->
-> CPU: 0 UID: 0 PID: 46673 Comm: syz-executor.2 Not tainted 6.13.0-rc4 #2
->
->
-> Hardware name: QEMU Standard PC (i440FX + PIIX, 1996), BIOS 1.15.0-1 04/0=
-1/2014
->
-> Sched_ext: serialise (enabled+all), task: runnable_at=3D-30ms
-> Call Trace:
->  <TASK>
->  __dump_stack lib/dump_stack.c:94 [inline]
->  dump_stack_lvl+0x229/0x350 lib/dump_stack.c:120
->  print_address_description mm/kasan/report.c:378 [inline]
->  print_report+0x164/0x530 mm/kasan/report.c:489
->  kasan_report+0x147/0x180 mm/kasan/report.c:602
->  sl_sync drivers/net/slip/slip.c:732 [inline]
->  slip_open+0x293/0x1330 drivers/net/slip/slip.c:806
->  tty_ldisc_open+0xbd/0x120 drivers/tty/tty_ldisc.c:432
->  tty_set_ldisc+0x32b/0x5c0 drivers/tty/tty_ldisc.c:563
->  tiocsetd+0x126/0x170 drivers/tty/tty_io.c:2439
->  tty_ioctl+0xe5c/0x1090 drivers/tty/tty_io.c:2739
->  vfs_ioctl fs/ioctl.c:51 [inline]
->  __do_sys_ioctl fs/ioctl.c:906 [inline]
->  __se_sys_ioctl+0x266/0x350 fs/ioctl.c:892
->  do_syscall_x64 arch/x86/entry/common.c:52 [inline]
->  do_syscall_64+0xf6/0x210 arch/x86/entry/common.c:83
->  entry_SYSCALL_64_after_hwframe+0x77/0x7f
-> RIP: 0033:0x7fed56a903ad
-> Code: c3 e8 a7 2b 00 00 0f 1f 80 00 00 00 00 f3 0f 1e fa 48 89 f8 48 89 f=
-7 48 89 d6 48 89 ca 4d 89 c2 4d 89 c8 4c 8b 4c 24 08 0f 05 <48> 3d 01 f0 ff=
- ff 73 01 c3 48 c7 c1 b0 ff ff ff f7 d8 64 89 01 48
-> RSP: 002b:00007fed578b20c8 EFLAGS: 00000246 ORIG_RAX: 0000000000000010
-> RAX: ffffffffffffffda RBX: 00007fed56bcbf80 RCX: 00007fed56a903ad
-> RDX: 0000000020000080 RSI: 0000000000005423 RDI: 0000000000000003
-> RBP: 0000000000000000 R08: 0000000000000000 R09: 0000000000000000
-> R10: 0000000000000000 R11: 0000000000000246 R12: 00007fed578b2640
-> R13: 000000000000000e R14: 00007fed56a4fc90 R15: 00007fed578aa000
->  </TASK>
->
->
-> Allocated by task 46683:
->
->
->  kasan_save_stack mm/kasan/common.c:47 [inline]
->
->  kasan_save_track+0x3f/0x80 mm/kasan/common.c:68
->  poison_kmalloc_redzone mm/kasan/common.c:377 [inline]
->  __kasan_kmalloc+0x89/0xa0 mm/kasan/common.c:394
->  kasan_kmalloc include/linux/kasan.h:260 [inline]
->  __do_kmalloc_node mm/slub.c:4298 [inline]
->  __kmalloc_node_noprof+0x28c/0x530 mm/slub.c:4304
->  __kvmalloc_node_noprof+0x70/0x180 mm/util.c:650
->  alloc_netdev_mqs+0xa7/0x1870 net/core/dev.c:11209
->  sl_alloc drivers/net/slip/slip.c:756 [inline]
->  slip_open+0x483/0x1330 drivers/net/slip/slip.c:817
->  tty_ldisc_open+0xbd/0x120 drivers/tty/tty_ldisc.c:432
->  tty_set_ldisc+0x32b/0x5c0 drivers/tty/tty_ldisc.c:563
->  tiocsetd+0x126/0x170 drivers/tty/tty_io.c:2439
->  tty_ioctl+0xe5c/0x1090 drivers/tty/tty_io.c:2739
->  vfs_ioctl fs/ioctl.c:51 [inline]
->  __do_sys_ioctl fs/ioctl.c:906 [inline]
->  __se_sys_ioctl+0x266/0x350 fs/ioctl.c:892
->  do_syscall_x64 arch/x86/entry/common.c:52 [inline]
->  do_syscall_64+0xf6/0x210 arch/x86/entry/common.c:83
->  entry_SYSCALL_64_after_hwframe+0x77/0x7f
->
->
-> Freed by task 46682:
->
->
->  kasan_save_stack mm/kasan/common.c:47 [inline]
->
->  kasan_save_track+0x3f/0x80 mm/kasan/common.c:68
->  kasan_save_free_info+0x40/0x50 mm/kasan/generic.c:582
->  poison_slab_object mm/kasan/common.c:247 [inline]
->  __kasan_slab_free+0x5a/0x70 mm/kasan/common.c:264
->  kasan_slab_free include/linux/kasan.h:233 [inline]
->  slab_free_hook mm/slub.c:2353 [inline]
->  slab_free mm/slub.c:4613 [inline]
->  kfree+0x196/0x450 mm/slub.c:4761
->  device_release+0xcd/0x240
->  kobject_cleanup lib/kobject.c:689 [inline]
->  kobject_release lib/kobject.c:720 [inline]
->  kref_put include/linux/kref.h:65 [inline]
->  kobject_put+0x248/0x490 lib/kobject.c:737
->  netdev_run_todo+0x10e0/0x1280 net/core/dev.c:10924
->  tty_ldisc_kill+0xbf/0x150 drivers/tty/tty_ldisc.c:613
->  tty_ldisc_release+0x1ae/0x210 drivers/tty/tty_ldisc.c:781
->  tty_release_struct+0x2a/0x100 drivers/tty/tty_io.c:1690
->  tty_release+0xe4d/0x1460 drivers/tty/tty_io.c:1861
->  __fput+0x2ba/0xa80 fs/file_table.c:450
->  __fput_sync+0x180/0x1e0 fs/file_table.c:535
->  __do_sys_close fs/open.c:1554 [inline]
->  __se_sys_close fs/open.c:1539 [inline]
->  __x64_sys_close+0x93/0x120 fs/open.c:1539
->  do_syscall_x64 arch/x86/entry/common.c:52 [inline]
->  do_syscall_64+0xf6/0x210 arch/x86/entry/common.c:83
->  entry_SYSCALL_64_after_hwframe+0x77/0x7f
->
->
-> The buggy address belongs to the object at ffff88805cfca000
->
->
->  which belongs to the cache kmalloc-cg-4k of size 4096
->
-> The buggy address is located 176 bytes inside of
->  freed 4096-byte region [ffff88805cfca000, ffff88805cfcb000)
->
->
-> The buggy address belongs to the physical page:
->
->
-> page: refcount:1 mapcount:0 mapping:0000000000000000 index:0x0 pfn:0x5cfc=
-8
->
-> head: order:3 mapcount:0 entire_mapcount:0 nr_pages_mapped:0 pincount:0
-> memcg:ffff888075c64a01
-> flags: 0x4fff00000000040(head|node=3D1|zone=3D1|lastcpupid=3D0x7ff)
-> page_type: f5(slab)
-> raw: 04fff00000000040 ffff88801d44f500 dead000000000100 dead000000000122
-> raw: 0000000000000000 0000000000040004 00000001f5000000 ffff888075c64a01
-> head: 04fff00000000040 ffff88801d44f500 dead000000000100 dead000000000122
-> head: 0000000000000000 0000000000040004 00000001f5000000 ffff888075c64a01
-> head: 04fff00000000003 ffffea000173f201 ffffffffffffffff 0000000000000000
-> head: 0000000000000008 0000000000000000 00000000ffffffff 0000000000000000
-> page dumped because: kasan: bad access detected
-> page_owner tracks the page as allocated
-> page last allocated via order 3, migratetype Unmovable, gfp_mask 0xd20c0(=
-__GFP_IO|__GFP_FS|__GFP_NOWARN|__GFP_NORETRY|__GFP_COMP|__GFP_NOMEMALLOC), =
-pid 9660, tgid 9660 (syz-executor.1), ts 93383578089, free_ts 93076565836
->  set_page_owner include/linux/page_owner.h:32 [inline]
->  post_alloc_hook+0x1f6/0x240 mm/page_alloc.c:1558
->  prep_new_page mm/page_alloc.c:1566 [inline]
->  get_page_from_freelist+0x3586/0x36d0 mm/page_alloc.c:3476
->  __alloc_pages_noprof+0x260/0x680 mm/page_alloc.c:4753
->  alloc_pages_mpol_noprof+0x3c8/0x650 mm/mempolicy.c:2269
->  alloc_slab_page+0x6a/0x110 mm/slub.c:2423
->  allocate_slab+0x5f/0x2b0 mm/slub.c:2589
->  new_slab mm/slub.c:2642 [inline]
->  ___slab_alloc+0xbdf/0x1490 mm/slub.c:3830
->  __slab_alloc mm/slub.c:3920 [inline]
->  __slab_alloc_node mm/slub.c:3995 [inline]
->  slab_alloc_node mm/slub.c:4156 [inline]
->  __do_kmalloc_node mm/slub.c:4297 [inline]
->  __kmalloc_node_track_caller_noprof+0x30f/0x520 mm/slub.c:4317
->  kmemdup_noprof+0x2b/0x60 mm/util.c:135
->  __addrconf_sysctl_register+0xb1/0x430 net/ipv6/addrconf.c:7221
->  addrconf_sysctl_register+0x1bd/0x220 net/ipv6/addrconf.c:7287
->  ipv6_add_dev+0xe13/0x13e0 net/ipv6/addrconf.c:456
->  addrconf_notify+0x6d8/0x1170 net/ipv6/addrconf.c:3674
->  notifier_call_chain+0x1c6/0x410 kernel/notifier.c:85
->  call_netdevice_notifiers_extack net/core/dev.c:2034 [inline]
->  call_netdevice_notifiers+0xd3/0x110 net/core/dev.c:2048
->  register_netdevice+0x190c/0x1da0 net/core/dev.c:10632
-> page last free pid 100 tgid 100 stack trace:
->  reset_page_owner include/linux/page_owner.h:25 [inline]
->  free_pages_prepare mm/page_alloc.c:1127 [inline]
->  free_unref_folios+0xe03/0x1860 mm/page_alloc.c:2706
->  shrink_folio_list+0x4698/0x5c80 mm/vmscan.c:1483
->  evict_folios+0x3b12/0x5610 mm/vmscan.c:4593
->  try_to_shrink_lruvec+0x941/0xc10 mm/vmscan.c:4789
->  shrink_one+0x20e/0x870 mm/vmscan.c:4834
->  shrink_many mm/vmscan.c:4897 [inline]
->  lru_gen_shrink_node mm/vmscan.c:4975 [inline]
->  shrink_node+0x3862/0x3f20 mm/vmscan.c:5956
->  kswapd_shrink_node mm/vmscan.c:6785 [inline]
->  balance_pgdat mm/vmscan.c:6977 [inline]
->  kswapd+0x1c9f/0x36f0 mm/vmscan.c:7246
->  kthread+0x2c3/0x360 kernel/kthread.c:389
->  ret_from_fork+0x4b/0x80 arch/x86/kernel/process.c:147
->  ret_from_fork_asm+0x1a/0x30 arch/x86/entry/entry_64.S:244
->
->
-> Memory state around the buggy address:
->
->
->  ffff88805cfc9f80: fc fc fc fc fc fc fc fc fc fc fc fc fc fc fc fc
->
->  ffff88805cfca000: fa fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb
-> >ffff88805cfca080: fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb
->                                      ^
->  ffff88805cfca100: fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb
->  ffff88805cfca180: fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb
-> =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
->
-> Hi developers:
->
->
-> We are reporting a Linux issue using a modified version of Syzkaller.
->
->
-> HEAD commit: 4bbf9020 6.13.0-rc4
->
-> git tree: upstream
-> kernel config: https://github.com/google/syzkaller/blob/master/dashboard/=
-config/linux/upstream-apparmor-kasan.config
-> syz repro: https://drive.google.com/file/d/1XV9WHwMvK4eZIPuyjiWoTpyQ0FpDa=
-UpT/view?usp=3Dsharing
-> C reproducer: As this is a race condition, we cannot obtain a stable C re=
-producer.
->
->
-> Description:
->
-> The SLIP driver suffers from a concurrent Use-After-Free issue in sl_sync=
-() due to
-> unsynchronized access to net_device pointers stored in slip_devs[]. When =
-a
-> device is being freed (for example, via tty_release()/netdev_run_todo()),
-> sl_sync() may access it after it has been freed.
->
-> Steps to reproducer:
->
-> 1. Setup a vm on the given kernel.
-> 2. Use syzkaller to run syz repro with `./syz-execprog -executor=3D./syz-=
-executor -repeat=3D20000 -procs=3D8 -cover=3D0 ~/repro.prog`.
->
->
-> Environment:
->
-> Ubuntu 22.04 on Linux 5.15
-> QEMU emulator version 6.2.0
-> qemu-system-x86_64 \
-> -m 2G \
-> -smp 2 \
-> -kernel /home/wd/bzImage \
-> -append "console=3DttyS0 root=3D/dev/sda earlyprintk=3Dserial net.ifnames=
-=3D0" \
-> -drive file=3D/home/wd/bullseye.img,format=3Draw \
-> -net user,host=3D10.0.2.10,hostfwd=3Dtcp:127.0.0.1:10021-:22 \
-> -net nic,model=3De1000 \
-> -enable-kvm \
-> -nographic \
-> -pidfile vm.pid \
-> 2>&1 | tee vm.log
->
-> If you fix this issue, please add the following tag to the commit:
->
-> Reported-by: Jiacheng Xu <stitch@zju.edu.cn>
->
+Hi Jakub,
+
+Thanks for your patches.
+
+As this series touches critical data-path area, and you had no real 
+option of testing it, we are taking it through a regression cycle, in 
+parallel to the code review.
+
+We should have results early next week. We'll update.
+
+Regards,
+Tariq
+
+> 
+> Jakub Kicinski (4):
+>    eth: mlx4: create a page pool for Rx
+>    eth: mlx4: don't try to complete XDP frames in netpoll
+>    eth: mlx4: remove the local XDP fast-recycling ring
+>    eth: mlx4: use the page pool for Rx buffers
+> 
+>   drivers/net/ethernet/mellanox/mlx4/mlx4_en.h |  15 +--
+>   drivers/net/ethernet/mellanox/mlx4/en_rx.c   | 120 +++++++------------
+>   drivers/net/ethernet/mellanox/mlx4/en_tx.c   |  17 ++-
+>   3 files changed, 53 insertions(+), 99 deletions(-)
+> 
+
 
