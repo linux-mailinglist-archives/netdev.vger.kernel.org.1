@@ -1,86 +1,87 @@
-Return-Path: <netdev+bounces-163364-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-163365-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 454CEA2A006
-	for <lists+netdev@lfdr.de>; Thu,  6 Feb 2025 06:21:40 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id C8C44A2A00E
+	for <lists+netdev@lfdr.de>; Thu,  6 Feb 2025 06:22:09 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 434DE165A12
-	for <lists+netdev@lfdr.de>; Thu,  6 Feb 2025 05:21:38 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 513B9165F53
+	for <lists+netdev@lfdr.de>; Thu,  6 Feb 2025 05:22:02 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1B34F22259F;
-	Thu,  6 Feb 2025 05:21:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 796722236EA;
+	Thu,  6 Feb 2025 05:21:38 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=purestorage.com header.i=@purestorage.com header.b="W8xuRfyj"
+	dkim=pass (2048-bit key) header.d=purestorage.com header.i=@purestorage.com header.b="SJbC8piE"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ej1-f98.google.com (mail-ej1-f98.google.com [209.85.218.98])
+Received: from mail-ej1-f99.google.com (mail-ej1-f99.google.com [209.85.218.99])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AD2A422257F
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6BD5722257D
 	for <netdev@vger.kernel.org>; Thu,  6 Feb 2025 05:21:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.98
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.99
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1738819297; cv=none; b=gwe88mbtIgdNEOXBgvAtv4WfZj7iNILrcog/gFb1qg/KIaAe485C/JDf+GwMQDJP0FfQwj7jzwuYU3/ou8jzSFiddpKEsoWQLwADvXSQC2NpX6xmeO0wzygHkQ6dLhHZTnpZe+Je+FJgg3jmW8+h71TrflsztfS9dxgJWvc1kDQ=
+	t=1738819298; cv=none; b=EwV77OuwDZtIpPYnweiY950bdfhCyTGFX8fufMAOOs2Eu9JyRj6NOWa4xJtMvgIrP6O7HNR/MnOTGYYTinFMn049WvKRjUO1/+f9q7HOZ7nOFFcviwAkkXswVMOj2nsO1Nwpv3vcqCPeR2vRcpLYlLm5hxgzpZd8SWLD8SutrWA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1738819297; c=relaxed/simple;
-	bh=fMVr7qFL+cRYpNCU1acUph+KfjFdj44f7OgeU21s32E=;
+	s=arc-20240116; t=1738819298; c=relaxed/simple;
+	bh=BroGEX3nunAdikjx03Lrr0TXP2Y+6z/r/wQ8/CLIkPU=;
 	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=eH8HhQPuprBlrb4I6mhmUK8wi2xs5lOxWNaVzcPhPSiJDwfKR0xnmHjrNXOH2yR8lqJbeTa02P5Kz+X99Q3NKW2+Z8m2ru8k//2WH0rQrB9cTgufz3PzYyfORHrNbRSK7rCvLyHecPPqoQ6r/8t0uaty2T2qf8ZcPRGVK7cyWkM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=purestorage.com; spf=fail smtp.mailfrom=purestorage.com; dkim=pass (2048-bit key) header.d=purestorage.com header.i=@purestorage.com header.b=W8xuRfyj; arc=none smtp.client-ip=209.85.218.98
+	 In-Reply-To:To:Cc; b=E2Q6x7PHRzC6zl0biFORw/htBlsKhYJip0sOyZcwOsdYa5/676/qK5U2XZwCwqXHMbUPTyyJfGBWmyAgss2yoZvkiJ16dHHftf/boAqflRm6LMDbr97a6T2Kp8l1egALPVTeSw5Mfgi2EMrFIYv69ANyXbF2u+T+vrIKfuG2GDU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=purestorage.com; spf=fail smtp.mailfrom=purestorage.com; dkim=pass (2048-bit key) header.d=purestorage.com header.i=@purestorage.com header.b=SJbC8piE; arc=none smtp.client-ip=209.85.218.99
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=purestorage.com
 Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=purestorage.com
-Received: by mail-ej1-f98.google.com with SMTP id a640c23a62f3a-aaedd529ba1so79167466b.1
+Received: by mail-ej1-f99.google.com with SMTP id a640c23a62f3a-ab771575040so70455466b.1
         for <netdev@vger.kernel.org>; Wed, 05 Feb 2025 21:21:34 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=purestorage.com; s=google2022; t=1738819293; x=1739424093; darn=vger.kernel.org;
         h=cc:to:in-reply-to:references:message-id:content-transfer-encoding
          :mime-version:subject:date:from:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=bdHVYTQfcccNoKDFaDK7nnVwIj0vWvmHUufF6M15JVk=;
-        b=W8xuRfyj+jYzC5bbCKR2wje3v3pSVLpQfTB8H9CMwfb4GcOA83LsuPyOhemOcW5QfH
-         xocRl53Ett0OqyQTBTO0Yj+qUeb1T63zb4DHtRSXJls0OMxsDoCzAaZodeIYxZx4oiTB
-         sl0UIitmoQNtoTIWtcOqYOkCSkpe0MdG5wk+RjtbUNP0gCrb9crEqaiTG9Fthc21Vb5G
-         5EDA2BoAKLpwF/8RJskFzog3nXgdoiiLWnxGPZIor+1QEMwWlz8UK/SM1L592Pd2PeT+
-         /E7eQ5Djbwb9C8fPxf/Uk5HgAW5//usImW5Exp2ztE/ILaMo7N+gF4j36nvfrQcG/G3z
-         Or8g==
+        bh=otzVsN1NW+U9mK3ObL5P0pr2UFgS62iOxxgXBwBSQ+o=;
+        b=SJbC8piEB6uYrqUfMLXlOPryFjaiRBfK/WMMVt2NkpFkue2aiGeoPrd0Dagr5g1DAR
+         L+rRPC+7PFtdkXYMMvaodEhEOhMpxo1KqQ3pzIBU6mi4+yX0HGfnQsuObx710OTMnS0s
+         vBsX3l38MuHv4gw8vk4CRR8IapLeQFEVhCxJoAnKFCR/NTkDy4SVWx5qNzVv/lY5Nij+
+         Pz04Q/bTpmw4zrg/lI01s6TcQleKiXHZUTRXH/gLjg2tXFVZWD+0YFsWV/D2999jg65H
+         RotzVa2vmMpj29MdwEdoZ/XOONV4pQVEDqpFxwE1UdIPOgiCmM27zc0DudkNidL7xr7k
+         Fuzg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20230601; t=1738819293; x=1739424093;
         h=cc:to:in-reply-to:references:message-id:content-transfer-encoding
          :mime-version:subject:date:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=bdHVYTQfcccNoKDFaDK7nnVwIj0vWvmHUufF6M15JVk=;
-        b=Q72hGY0xfJmmHonmNiGJYMTlZ2faKanjm1exkpgOCSpfaEZr9ARtkNIZWGSWIi/svT
-         /kq5PYpBwr4/ywD9mmTDIr6HuzICsBmFTxo1ITxWumaWOQQ3zqWoMbpedNbhAQ7Cy+Dt
-         NafzcO5TEj4/uLKP626uogCtZcvYOKKPAOk7nZvajbsMEtFZh3gJ1wczzGuI7G3t24DU
-         0yDDlVlwpqaitslr9iyp9zPAC4fo2g9RbfHh+h8fmgcWrorN2eW9I0JzrA9ZjcuVO/VD
-         r1CuaWHnGc0/PWskgHLSaVd73O6Qe6doe1J9gVKmsoxbKL/hQwvjWrxclU3DpHAtGPEW
-         7O/g==
-X-Gm-Message-State: AOJu0YySWD53sDbDGh9Bk3wM0cNW35HL/GXeWfn511c/KFOufXFmFVbG
-	yGpXQSezaJUeuwG8kknvBreizoqXfQ9jf3isFVaT+kN1y01qaiY4KPTuXRvzzzBlSn2vYB2jFH/
-	Dtin3PzOIwvETAo7npOv3OwaLG33UquXUhD3xkX0aNh9nmVnO
-X-Gm-Gg: ASbGnct/3JFDdXVfh1iXRIMP21AgRolnHBG+jWcqPEkuPUDZpVkNIhUSMc7noXolwDI
-	+yyYKCK6zNA2F/pi1YGjmKFZloid1VpQ2HjEYO8B+KkWBGaAiyQCqJnv2kAe3e91T+wsljXoxag
-	I4P34VqWvOmZq+aHEs5eKHnsTFNrE8wKjN0Aw/2mBhGU3cknnkYR598GALLtO1/cENayWgZlH+R
-	lq92j3QLMJQSgRQcSaxrq+k5QOTniBwrkh1lIOg7cCuHHC+g/Kt1kTJXnWn/r5QyipZihEbQjyX
-	foQhMx5B3KYOX1nIv06Qzn8f
-X-Google-Smtp-Source: AGHT+IFl089+rm1zmjN8iG+9/13B8VrWSPOdNpDBwWTsJRYlUmvKdrLpWygnLduVxQtW4kKWbhPWJgyCJ0BB
-X-Received: by 2002:a05:6402:4404:b0:5d9:ad1:dafc with SMTP id 4fb4d7f45d1cf-5dcdb762de1mr11066307a12.25.1738819292786;
+        bh=otzVsN1NW+U9mK3ObL5P0pr2UFgS62iOxxgXBwBSQ+o=;
+        b=SBgvc7My7LQ2K/faZ9XlcN806+ED32stCK43tTsM3iQEw9Sn5mebOiHYAm4/9Apkp8
+         ZXF2JiFe3zkuzehSeLNut+oYv2sfHss6Dywv/9NMBMUVoQfPW81VYHi4uBNeDsh756rz
+         ECGpqr1FEtu3UAl2IydR8s2gxCyi7jja58TEeUVT1SVU0Q6bD8n+DZgkYn0rN0Qmhzgk
+         L1tsTDqn+AL8A3GjRTwLV31jPB4fFPgb+he4T8aBL7xNfdd6/JKKZuX2RIL9fbr63P5B
+         y9m2iegNb0M2IbmTKUOMFVF5syYjnwLqBauRV6ZmlBCf7x7yy4IuAJxG9UKlwDAanj6G
+         g//w==
+X-Gm-Message-State: AOJu0YwlL2cHKwMb3TVeag89Qfr2Q4xUFbxf8Gj2pvr6lZ2hR5gfvUBD
+	WFeMQRYx2NdlZ0xdBg3K+km5fLv4aCKs3sK8uowilbdwUlW+uR65GM0LFL+oD9OoaJUUYWO0BsD
+	zmaLSqgtzHUHWJBrbXFp50hdDhtIWUPDb
+X-Gm-Gg: ASbGncuRBXB3jPPslU7zkJGvCrO5khcM2iTHCiFMvkzFWcz9qWs8nRFq8OlynRe1pS7
+	w+RzDOicBquPmjvV71zkgteP7sBzfrN6A3djCQ9uE7z11kUcmU/qi0k4G6sZme7dI8YVcydH9r9
+	foYYn13Ms/XR5RzHu6AyUE2d/o597+2AAQtze6yKphNkAzP8OFnAAHMoJD+IidbHMKc+0U1SoCJ
+	p9oQcTRG37lue7Ir5yFAHCfNCP16xJY4VYaNOZlg2diHcXDS6QfjmL3ynJlAjZk9TtBYmKXFVt5
+	k32ppfoFFEb8i7DkrswA5O4HsgZJKiOUrXrY0Zk=
+X-Google-Smtp-Source: AGHT+IEOeUong+iqEZmE/uaY2diPiB8AmCybH/LMhnwCuyEOfGjLLgOGIi3uenVtSrG1ZH7jt6SIEBI035c5
+X-Received: by 2002:a17:907:1c0f:b0:ab6:726e:b14d with SMTP id a640c23a62f3a-ab76e9d8cb5mr212784566b.23.1738819292450;
         Wed, 05 Feb 2025 21:21:32 -0800 (PST)
-Received: from c7-smtp-2023.dev.purestorage.com ([2620:125:9017:12:36:3:5:0])
-        by smtp-relay.gmail.com with ESMTPS id a640c23a62f3a-ab773548c81sm1221366b.204.2025.02.05.21.21.32
+Received: from c7-smtp-2023.dev.purestorage.com ([208.88.159.128])
+        by smtp-relay.gmail.com with ESMTPS id a640c23a62f3a-ab77332cb2dsm1017866b.186.2025.02.05.21.21.32
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
         Wed, 05 Feb 2025 21:21:32 -0800 (PST)
 X-Relaying-Domain: purestorage.com
-Received: from dev-ushankar.dev.purestorage.com (dev-ushankar.dev.purestorage.com [IPv6:2620:125:9007:640:7:70:36:0])
-	by c7-smtp-2023.dev.purestorage.com (Postfix) with ESMTP id 8A789340576;
+Received: from dev-ushankar.dev.purestorage.com (dev-ushankar.dev.purestorage.com [10.7.70.36])
+	by c7-smtp-2023.dev.purestorage.com (Postfix) with ESMTP id 4605634032D;
 	Wed,  5 Feb 2025 22:21:31 -0700 (MST)
 Received: by dev-ushankar.dev.purestorage.com (Postfix, from userid 1557716368)
-	id 366DAE40ECA; Wed,  5 Feb 2025 22:21:31 -0700 (MST)
+	id 3BEC3E55FE0; Wed,  5 Feb 2025 22:21:31 -0700 (MST)
 From: Uday Shankar <ushankar@purestorage.com>
-Date: Wed, 05 Feb 2025 22:21:30 -0700
-Subject: [PATCH v3 1/2] net, treewide: define and use MAC_ADDR_STR_LEN
+Date: Wed, 05 Feb 2025 22:21:31 -0700
+Subject: [PATCH v3 2/2] netconsole: allow selection of egress interface via
+ MAC address
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -89,7 +90,7 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-Message-Id: <20250205-netconsole-v3-1-132a31f17199@purestorage.com>
+Message-Id: <20250205-netconsole-v3-2-132a31f17199@purestorage.com>
 References: <20250205-netconsole-v3-0-132a31f17199@purestorage.com>
 In-Reply-To: <20250205-netconsole-v3-0-132a31f17199@purestorage.com>
 To: Breno Leitao <leitao@debian.org>, Andrew Lunn <andrew+netdev@lunn.ch>, 
@@ -104,110 +105,203 @@ Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
  Uday Shankar <ushankar@purestorage.com>
 X-Mailer: b4 0.14.2
 
-There are a few places in the tree which compute the length of the
-string representation of a MAC address as 3 * ETH_ALEN - 1. Define a
-constant for this and use it where relevant. No functionality changes
-are expected.
+Currently, netconsole has two methods of configuration - module
+parameter and configfs. The former interface allows for netconsole
+activation earlier during boot (by specifying the module parameter on
+the kernel command line), so it is preferred for debugging issues which
+arise before userspace is up/the configfs interface can be used. The
+module parameter syntax requires specifying the egress interface name.
+This requirement makes it hard to use for a couple reasons:
+- The egress interface name can be hard or impossible to predict. For
+  example, installing a new network card in a system can change the
+  interface names assigned by the kernel.
+- When constructing the module parameter, one may have trouble
+  determining the original (kernel-assigned) name of the interface
+  (which is the name that should be given to netconsole) if some stable
+  interface naming scheme is in effect. A human can usually look at
+  kernel logs to determine the original name, but this is very painful
+  if automation is constructing the parameter.
+
+For these reasons, allow selection of the egress interface via MAC
+address when configuring netconsole using the module parameter. Update
+the netconsole documentation with an example of the new syntax.
+Selection of egress interface by MAC address via configfs is far less
+interesting (since when this interface can be used, one should be able
+to easily convert between MAC address and interface name), so it is left
+unimplemented.
 
 Signed-off-by: Uday Shankar <ushankar@purestorage.com>
+Reviewed-by: Breno Leitao <leitao@debian.org>
+Tested-by: Breno Leitao <leitao@debian.org>
 ---
- drivers/net/netconsole.c           | 2 +-
- drivers/nvmem/brcm_nvram.c         | 2 +-
- drivers/nvmem/layouts/u-boot-env.c | 2 +-
- include/linux/if_ether.h           | 3 +++
- lib/net_utils.c                    | 4 +---
- net/mac80211/debugfs_sta.c         | 5 +++--
- 6 files changed, 10 insertions(+), 8 deletions(-)
+ Documentation/networking/netconsole.rst |  6 +++-
+ include/linux/netpoll.h                 |  6 ++++
+ net/core/netpoll.c                      | 51 +++++++++++++++++++++++++--------
+ 3 files changed, 50 insertions(+), 13 deletions(-)
 
-diff --git a/drivers/net/netconsole.c b/drivers/net/netconsole.c
-index 86ab4a42769a49eebe5dd6f01dafafc6c86ec54f..6db5af2d8d059fa5c072194545d4408eec19b4a9 100644
---- a/drivers/net/netconsole.c
-+++ b/drivers/net/netconsole.c
-@@ -675,7 +675,7 @@ static ssize_t remote_mac_store(struct config_item *item, const char *buf,
+diff --git a/Documentation/networking/netconsole.rst b/Documentation/networking/netconsole.rst
+index 94c4680fdf3e7e1a0020d11b44547acfd68072a5..90a1bbb52918a0163828f4e96c89781e0bc6856b 100644
+--- a/Documentation/networking/netconsole.rst
++++ b/Documentation/networking/netconsole.rst
+@@ -45,7 +45,7 @@ following format::
+ 	r             if present, prepend kernel version (release) to the message
+ 	src-port      source for UDP packets (defaults to 6665)
+ 	src-ip        source IP to use (interface address)
+-	dev           network interface (eth0)
++	dev           network interface name (eth0) or MAC address
+ 	tgt-port      port for logging agent (6666)
+ 	tgt-ip        IP address for logging agent
+ 	tgt-macaddr   ethernet MAC address for logging agent (broadcast)
+@@ -62,6 +62,10 @@ or using IPv6::
  
- 	if (!mac_pton(buf, remote_mac))
- 		goto out_unlock;
--	if (buf[3 * ETH_ALEN - 1] && buf[3 * ETH_ALEN - 1] != '\n')
-+	if (buf[MAC_ADDR_STR_LEN] && buf[MAC_ADDR_STR_LEN] != '\n')
- 		goto out_unlock;
- 	memcpy(nt->np.remote_mac, remote_mac, ETH_ALEN);
+  insmod netconsole netconsole=@/,@fd00:1:2:3::1/
  
-diff --git a/drivers/nvmem/brcm_nvram.c b/drivers/nvmem/brcm_nvram.c
-index b810df727b446b1762a1851750f743e0de6e8788..b4cf245fb2467d281111001bb7ed8db5993a09b2 100644
---- a/drivers/nvmem/brcm_nvram.c
-+++ b/drivers/nvmem/brcm_nvram.c
-@@ -100,7 +100,7 @@ static int brcm_nvram_read_post_process_macaddr(void *context, const char *id, i
- {
- 	u8 mac[ETH_ALEN];
- 
--	if (bytes != 3 * ETH_ALEN - 1)
-+	if (bytes != MAC_ADDR_STR_LEN)
- 		return -EINVAL;
- 
- 	if (!mac_pton(buf, mac))
-diff --git a/drivers/nvmem/layouts/u-boot-env.c b/drivers/nvmem/layouts/u-boot-env.c
-index 731e6f4f12b2bf28e4547d128954a095545ad461..436426d4e8f910b51b92f88acddfbb40d374587a 100644
---- a/drivers/nvmem/layouts/u-boot-env.c
-+++ b/drivers/nvmem/layouts/u-boot-env.c
-@@ -37,7 +37,7 @@ static int u_boot_env_read_post_process_ethaddr(void *context, const char *id, i
- {
- 	u8 mac[ETH_ALEN];
- 
--	if (bytes != 3 * ETH_ALEN - 1)
-+	if (bytes != MAC_ADDR_STR_LEN)
- 		return -EINVAL;
- 
- 	if (!mac_pton(buf, mac))
-diff --git a/include/linux/if_ether.h b/include/linux/if_ether.h
-index 8a9792a6427ad9cf58b50c79cbfe185615800dcb..61b7335aa037c7232a0caa45572043057c02dde3 100644
---- a/include/linux/if_ether.h
-+++ b/include/linux/if_ether.h
-@@ -19,6 +19,9 @@
- #include <linux/skbuff.h>
- #include <uapi/linux/if_ether.h>
- 
-+/* XX:XX:XX:XX:XX:XX */
-+#define MAC_ADDR_STR_LEN (3 * ETH_ALEN - 1)
++or using a MAC address to select the egress interface::
 +
- static inline struct ethhdr *eth_hdr(const struct sk_buff *skb)
- {
- 	return (struct ethhdr *)skb_mac_header(skb);
-diff --git a/lib/net_utils.c b/lib/net_utils.c
-index 42bb0473fb22f977409f7a6792bb1340f4e911c3..215cda672fee1b5a029c2b61529c6813c0edab11 100644
---- a/lib/net_utils.c
-+++ b/lib/net_utils.c
-@@ -7,11 +7,9 @@
++   linux netconsole=4444@10.0.0.1/22:33:44:55:66:77,9353@10.0.0.2/12:34:56:78:9a:bc
++
+ It also supports logging to multiple remote agents by specifying
+ parameters for the multiple agents separated by semicolons and the
+ complete string enclosed in "quotes", thusly::
+diff --git a/include/linux/netpoll.h b/include/linux/netpoll.h
+index f91e50a76efd4b016381c632456397eea1ea877f..1ade65b59be49cfdcf86ed6e938287b949aa9f58 100644
+--- a/include/linux/netpoll.h
++++ b/include/linux/netpoll.h
+@@ -25,7 +25,13 @@ union inet_addr {
+ struct netpoll {
+ 	struct net_device *dev;
+ 	netdevice_tracker dev_tracker;
++	/*
++	 * Either dev_name or dev_mac can be used to specify the local
++	 * interface - dev_name is used if it is a nonempty string, else
++	 * dev_mac is used.
++	 */
+ 	char dev_name[IFNAMSIZ];
++	u8 dev_mac[ETH_ALEN];
+ 	const char *name;
  
- bool mac_pton(const char *s, u8 *mac)
- {
--	size_t maxlen = 3 * ETH_ALEN - 1;
- 	int i;
+ 	union inet_addr local_ip, remote_ip;
+diff --git a/net/core/netpoll.c b/net/core/netpoll.c
+index 62b4041aae1ae8c7dc47c89fb40b14bbd4ad0e0e..327c409b1974b9ecc1e078c78ca090b05c3ca9dd 100644
+--- a/net/core/netpoll.c
++++ b/net/core/netpoll.c
+@@ -501,7 +501,8 @@ void netpoll_print_options(struct netpoll *np)
+ 		np_info(np, "local IPv6 address %pI6c\n", &np->local_ip.in6);
+ 	else
+ 		np_info(np, "local IPv4 address %pI4\n", &np->local_ip.ip);
+-	np_info(np, "interface '%s'\n", np->dev_name);
++	np_info(np, "interface name '%s'\n", np->dev_name);
++	np_info(np, "local ethernet address '%pM'\n", np->dev_mac);
+ 	np_info(np, "remote port %d\n", np->remote_port);
+ 	if (np->ipv6)
+ 		np_info(np, "remote IPv6 address %pI6c\n", &np->remote_ip.in6);
+@@ -570,11 +571,18 @@ int netpoll_parse_options(struct netpoll *np, char *opt)
+ 	cur++;
  
--	/* XX:XX:XX:XX:XX:XX */
--	if (strnlen(s, maxlen) < maxlen)
-+	if (strnlen(s, MAC_ADDR_STR_LEN) < MAC_ADDR_STR_LEN)
- 		return false;
- 
- 	/* Don't dirty result unless string is valid MAC. */
-diff --git a/net/mac80211/debugfs_sta.c b/net/mac80211/debugfs_sta.c
-index a67a9d3160086ac492d77092a0c8a74d2384b28c..11d51e348339f1eec1a7d3fd04b1439aaed64593 100644
---- a/net/mac80211/debugfs_sta.c
-+++ b/net/mac80211/debugfs_sta.c
-@@ -457,11 +457,12 @@ static ssize_t link_sta_addr_read(struct file *file, char __user *userbuf,
- 				  size_t count, loff_t *ppos)
- {
- 	struct link_sta_info *link_sta = file->private_data;
--	u8 mac[3 * ETH_ALEN + 1];
-+	u8 mac[MAC_ADDR_STR_LEN + 2];
- 
- 	snprintf(mac, sizeof(mac), "%pM\n", link_sta->pub->addr);
- 
--	return simple_read_from_buffer(userbuf, count, ppos, mac, 3 * ETH_ALEN);
-+	return simple_read_from_buffer(userbuf, count, ppos, mac,
-+				       MAC_ADDR_STR_LEN + 1);
+ 	if (*cur != ',') {
+-		/* parse out dev name */
++		/* parse out dev_name or dev_mac */
+ 		if ((delim = strchr(cur, ',')) == NULL)
+ 			goto parse_failed;
+ 		*delim = 0;
+-		strscpy(np->dev_name, cur, sizeof(np->dev_name));
++
++		np->dev_name[0] = '\0';
++		eth_broadcast_addr(np->dev_mac);
++		if (!strchr(cur, ':'))
++			strscpy(np->dev_name, cur, sizeof(np->dev_name));
++		else if (!mac_pton(cur, np->dev_mac))
++			goto parse_failed;
++
+ 		cur = delim;
+ 	}
+ 	cur++;
+@@ -679,27 +687,45 @@ int __netpoll_setup(struct netpoll *np, struct net_device *ndev)
  }
+ EXPORT_SYMBOL_GPL(__netpoll_setup);
  
- LINK_STA_OPS(addr);
++/*
++ * Returns a pointer to a string representation of the identifier used
++ * to select the egress interface for the given netpoll instance. buf
++ * must be a buffer of length at least MAC_ADDR_STR_LEN + 1.
++ */
++static char *egress_dev(struct netpoll *np, char *buf)
++{
++	if (np->dev_name[0])
++		return np->dev_name;
++
++	snprintf(buf, MAC_ADDR_STR_LEN, "%pM", np->dev_mac);
++	return buf;
++}
++
+ int netpoll_setup(struct netpoll *np)
+ {
++	struct net *net = current->nsproxy->net_ns;
++	char buf[MAC_ADDR_STR_LEN + 1];
+ 	struct net_device *ndev = NULL;
+ 	bool ip_overwritten = false;
+ 	struct in_device *in_dev;
+ 	int err;
+ 
+ 	rtnl_lock();
+-	if (np->dev_name[0]) {
+-		struct net *net = current->nsproxy->net_ns;
++	if (np->dev_name[0])
+ 		ndev = __dev_get_by_name(net, np->dev_name);
+-	}
++	else if (is_valid_ether_addr(np->dev_mac))
++		ndev = dev_getbyhwaddr_rcu(net, ARPHRD_ETHER, np->dev_mac);
++
+ 	if (!ndev) {
+-		np_err(np, "%s doesn't exist, aborting\n", np->dev_name);
++		np_err(np, "%s doesn't exist, aborting\n", egress_dev(np, buf));
+ 		err = -ENODEV;
+ 		goto unlock;
+ 	}
+ 	netdev_hold(ndev, &np->dev_tracker, GFP_KERNEL);
+ 
+ 	if (netdev_master_upper_dev_get(ndev)) {
+-		np_err(np, "%s is a slave device, aborting\n", np->dev_name);
++		np_err(np, "%s is a slave device, aborting\n",
++		       egress_dev(np, buf));
+ 		err = -EBUSY;
+ 		goto put;
+ 	}
+@@ -707,7 +733,8 @@ int netpoll_setup(struct netpoll *np)
+ 	if (!netif_running(ndev)) {
+ 		unsigned long atmost;
+ 
+-		np_info(np, "device %s not up yet, forcing it\n", np->dev_name);
++		np_info(np, "device %s not up yet, forcing it\n",
++			egress_dev(np, buf));
+ 
+ 		err = dev_open(ndev, NULL);
+ 
+@@ -741,7 +768,7 @@ int netpoll_setup(struct netpoll *np)
+ 			if (!ifa) {
+ put_noaddr:
+ 				np_err(np, "no IP address for %s, aborting\n",
+-				       np->dev_name);
++				       egress_dev(np, buf));
+ 				err = -EDESTADDRREQ;
+ 				goto put;
+ 			}
+@@ -772,13 +799,13 @@ int netpoll_setup(struct netpoll *np)
+ 			}
+ 			if (err) {
+ 				np_err(np, "no IPv6 address for %s, aborting\n",
+-				       np->dev_name);
++				       egress_dev(np, buf));
+ 				goto put;
+ 			} else
+ 				np_info(np, "local IPv6 %pI6c\n", &np->local_ip.in6);
+ #else
+ 			np_err(np, "IPv6 is not supported %s, aborting\n",
+-			       np->dev_name);
++			       egress_dev(np, buf));
+ 			err = -EINVAL;
+ 			goto put;
+ #endif
 
 -- 
 2.34.1
