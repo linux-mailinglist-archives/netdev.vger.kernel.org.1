@@ -1,78 +1,78 @@
-Return-Path: <netdev+bounces-163568-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-163569-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 54E03A2ABA1
-	for <lists+netdev@lfdr.de>; Thu,  6 Feb 2025 15:39:53 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7BF50A2ABAC
+	for <lists+netdev@lfdr.de>; Thu,  6 Feb 2025 15:40:45 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 84E1216B15C
-	for <lists+netdev@lfdr.de>; Thu,  6 Feb 2025 14:39:13 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 2F47D16AA58
+	for <lists+netdev@lfdr.de>; Thu,  6 Feb 2025 14:39:47 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8D58623645B;
-	Thu,  6 Feb 2025 14:39:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 21EC01624FF;
+	Thu,  6 Feb 2025 14:39:25 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=blackwall-org.20230601.gappssmtp.com header.i=@blackwall-org.20230601.gappssmtp.com header.b="sj28Y190"
+	dkim=pass (2048-bit key) header.d=blackwall-org.20230601.gappssmtp.com header.i=@blackwall-org.20230601.gappssmtp.com header.b="nS58+4LO"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-f54.google.com (mail-ed1-f54.google.com [209.85.208.54])
+Received: from mail-ej1-f50.google.com (mail-ej1-f50.google.com [209.85.218.50])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BA6A5236446
-	for <netdev@vger.kernel.org>; Thu,  6 Feb 2025 14:39:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.54
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2303E236449
+	for <netdev@vger.kernel.org>; Thu,  6 Feb 2025 14:39:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.50
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1738852748; cv=none; b=FHiTKiQj7l4n87J11E4ylu3AAwRVQo7f5KI39erpd8sH4HIfMIw8uxV5cYLUooyxhAetsn7XS+6/Ba2lKyz7GQFPDhc3gzo3zMcNyugpwoNscz/rUT8/iZzZ7AE2FKcoYGjVxSKTJTgPsRyd/zMHLkMh1Xi3dntX7nK/oAMMuJc=
+	t=1738852765; cv=none; b=oeTVSmI4JGHthlTvWgUuKOfFkAHCVlYyz5XrCCD8C4JC51jcRdOJQioXSB5S7skdOqwlP7XV7v4+rpI5uGzmnMzfc9PRrbVrcxummkYOOjQUo2K7Z/YnZP4IMS2N94gRX5pPq3DzIyQ4/R1YZkxusU2rWBPeBzgNZviANjw2E2U=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1738852748; c=relaxed/simple;
-	bh=ISXGN/k+kX7BuDCNrato4yYtVy7+BXIuaTBPg+6KtsI=;
+	s=arc-20240116; t=1738852765; c=relaxed/simple;
+	bh=Uu8aEP8VA8t1pCN7nvIDtXe9YZ0sStLUfZzdpt3Xdwk=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=Nf+xVmYv3sv/c3Ukf5a+BEz5zeiWXmEMrCEjJnHRXtDEstz8pEaUt/NW3oZPmknK8++o+qKN+URMziWTYVtTFMFXWsR49/UfmCpDiv7Kf4MMFHRkxn5YxaQUVyr8VZ77DQkoxBlYJWbzvYHvcnoYvM8qdJ0kzjhgU2XFsROggMw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=blackwall.org; spf=none smtp.mailfrom=blackwall.org; dkim=pass (2048-bit key) header.d=blackwall-org.20230601.gappssmtp.com header.i=@blackwall-org.20230601.gappssmtp.com header.b=sj28Y190; arc=none smtp.client-ip=209.85.208.54
+	 In-Reply-To:Content-Type; b=COUqeYSh+daDYPHhnEjswrYtbyRUsB6lLxKJugkoYhWu5Hln3YKK6Ri3G+9zNnn0aiu342xnLqaFHDfK+tBXrVllk3wQflKnobTORh+8VGLcFoN+xdKreOCyy704YqVLfHIO9uUahtjdvkp04JapEAhS/jkjT/bgJxeSsM4bOzY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=blackwall.org; spf=none smtp.mailfrom=blackwall.org; dkim=pass (2048-bit key) header.d=blackwall-org.20230601.gappssmtp.com header.i=@blackwall-org.20230601.gappssmtp.com header.b=nS58+4LO; arc=none smtp.client-ip=209.85.218.50
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=blackwall.org
 Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=blackwall.org
-Received: by mail-ed1-f54.google.com with SMTP id 4fb4d7f45d1cf-5dce4a5d8a0so1697067a12.1
-        for <netdev@vger.kernel.org>; Thu, 06 Feb 2025 06:39:06 -0800 (PST)
+Received: by mail-ej1-f50.google.com with SMTP id a640c23a62f3a-ab77e266c71so60767166b.2
+        for <netdev@vger.kernel.org>; Thu, 06 Feb 2025 06:39:22 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=blackwall-org.20230601.gappssmtp.com; s=20230601; t=1738852745; x=1739457545; darn=vger.kernel.org;
+        d=blackwall-org.20230601.gappssmtp.com; s=20230601; t=1738852761; x=1739457561; darn=vger.kernel.org;
         h=content-transfer-encoding:in-reply-to:from:content-language
          :references:cc:to:subject:user-agent:mime-version:date:message-id
          :from:to:cc:subject:date:message-id:reply-to;
-        bh=S0JkQI3U6f+a8v60Ya7beYBhUDwWewUAZsXtUyTx0ac=;
-        b=sj28Y190ZWUnke3mXhBKqYOJYbdhMa0A2ghzlmCVtvr0hOmCUOxMC8mP4IR8QuuCMt
-         zkLcvBspqAEdNQpX0Nnu08Ax+kuLBE0m51+33u1yrSbaJXgYVxDdfsT1vvA2DeeswjKT
-         +tHgNclcpn09FV+Vd+qKX5xSb9uzGFrpELKMicmW4SdrYw8WgaQuFOMljzaSC89tvRqb
-         jxgpiSu09FLGpxDaXZldZ6MsKnQleOV8DfwoArpRPIx3iPvBWNHKUc7dft3kGbxa3HSX
-         MfrOFTrwPDedhP3yV+VPNtvlHAvEyE/mhu/RQDCqDWP3PQ4Vn63UfqiAj3j0ievDfI50
-         osMA==
+        bh=THjRLKw27fymwkm9c9udCcZ4ry8EIlt6eJdjpKX8aMI=;
+        b=nS58+4LOG6u/Q5ccdch9G5EWZXlco1ayiEjfSMtXeD4KHtM0gHL3VN6RGk38uCmt5t
+         Oc1QT11cxpBtlZ7J6cMHsPLGuIWjxT8hf/GUer0jGV6PneXcnspl8Rx9f29MHYVY1knt
+         BODAkrTcImAboCfJIwCA7ot+15ooIr7DmrqOX0VyCEkeDCMNx1Q1YlaPhCrlwMKtE6qG
+         5vMd9IF3RURy/IG87UyUoWMOoDmZ4soLRScIXcgoTKVgUouv08GdLpqzxXE6rIfwPhwx
+         vd80oxE8H8nGLHk2HHU4TJclxaz0kZi4YTpb3h8w4X7fmMHz2ouYinsEs6FF5XwqF4Cv
+         UO8A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1738852745; x=1739457545;
+        d=1e100.net; s=20230601; t=1738852761; x=1739457561;
         h=content-transfer-encoding:in-reply-to:from:content-language
          :references:cc:to:subject:user-agent:mime-version:date:message-id
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=S0JkQI3U6f+a8v60Ya7beYBhUDwWewUAZsXtUyTx0ac=;
-        b=lzoc9wyNDBU0XcopSjMpPh5MvgpFB3GC3NpvRJDlouhI3N32UPr3RfiMy2uCmj4sJM
-         ikaJQ9md4R4ehT+6+bp2nnjr6sLM4qaekBAItWOWqHR1es537MayvPryWRJk6w0Fc3ij
-         3tMahXia+QACHJiAWCRE0dtsLjuBnrFY9jlgo1mCQ5TEmVUcsVVexaHmkR6x2SZf168d
-         cDRxlO+RCM4m0qRJul4NHgWAsWLfL1ziUybWUOnql8lgSkvaXJCOiEpLFGK5x3MmtZCY
-         PGLt971IzMwtSg69LAVLHcP4PLTA+Z6//Pd20zQp7A7tEoafHSn7ObCtMyTaVd1CsTux
-         FtcQ==
-X-Gm-Message-State: AOJu0YwbwAFHzgEufj/kUK+loQlbt4GPfkwT+gwpAscM4Z4qsQVGOcAJ
-	yzMiSOEMN6RixyqCB7WVzUe4UgwxQJf3/o45XY/Urrk88NX5Lpn/bM/8dHPqp2A=
-X-Gm-Gg: ASbGncsMHF4kRnABNR4ngmCeg8adrHjDXXiaiNMjV356FbFdLRGJxbg/4GyMgmff8BL
-	6BHV0gyj/MJp7bMZOcO7Fcmex0WIbTiQ3Jju/n2/UA0SL+i+dlKASDAaIBWULkSBwAeMEHW2cDc
-	ws8ixSF5OInKJh8BWT4tgZJUhakSDfHwMWkFy0YgNZOlCFvSpRy18zqd7/sy7jh3KTGEiwLWvzp
-	+YvFof2dLDtE0w1E+wfjcW0cHI6x3j63pd2bKqHrzKeoh3z2RV37cVtuu5P06xLnOUJ3/KkaKIB
-	BbblNQ3rFfteeEmT/05NsdTbNtuPqiBzBE6AHzqhZowwgmQ=
-X-Google-Smtp-Source: AGHT+IFfccbgqNHY4pVflwA0HY/1yvIqL3O/a0V1EXaUtiholMev7dwDOL+lRjcs6CbBMFf4cXAhig==
-X-Received: by 2002:a05:6402:2812:b0:5d0:bf5e:eb8 with SMTP id 4fb4d7f45d1cf-5dcdb762d40mr15968196a12.23.1738852744810;
-        Thu, 06 Feb 2025 06:39:04 -0800 (PST)
+        bh=THjRLKw27fymwkm9c9udCcZ4ry8EIlt6eJdjpKX8aMI=;
+        b=XwVpBNHxi4lOGFTprBgE0jC40IakGvAl6YqK68KETJ5EoyXAt7yX6z/ozOttgbqigW
+         3ZphyvUv3huXb0tghttgG9GGpXAUqo8f0GGukXhWV72ANis4wQ5NtlYjdOVXAQgMz2/Z
+         mbrV2y7RysFNTxzswESKa157t1WTnUJUStcMVD6I1CkqsOHYq9FPqKhr4P1cnYs+Zeps
+         4IWwhkrMZXe+wc+CgMMFwtQXE4dedTly9cmKajdnEtjuFiAUFm21mQtpetLo6h0C65or
+         85W8tpOY1YNAp1XD3Z8yAD+XkS55LTs7ybv9+OzEiGBvxBWwvkf/Vrk4Tqp1+/Q87kV4
+         Gt9Q==
+X-Gm-Message-State: AOJu0Yy/WrpptdVpeW1m4zdqJVwYrWYNSZzRZdTU6H9CYHJ1rJRfSGd3
+	ibnAJ6dnnimWkKS66U8EaMVnd+dKBs76ySBT2CkPHt9VR269Wmakw+QU5VtvxcA=
+X-Gm-Gg: ASbGncvWBFnya8k7R+vBlVRmrxvSbANxhziI2BUahffbCiPn6DcUwbFWtpZNzZayw5u
+	T4i7yFm/LQo+Jn1W9GubI5n3IJSWrJVXAP/DKlWq8g2qBLKXXW4xJMBItpzbn9XjZ04TL8OoLDs
+	AKb1v+mv7+GpcpjYzYHFL8sz9jydqj2b0mIVX8NdgRXhk4oYyBd70vDKJgywWZCIQZbNCBcSQ1u
+	dG4he/PUnM5A5bw2lZf/CTYdKJ20/KOgId4zrdnf+As4VbEz/qrjb5eC0Yhw2BMOO2nTuVrJ3KO
+	z6QXa82VKDkJ4wnDT/rc3RFiZTJsCUEbcsEUxFacmVHc0k0=
+X-Google-Smtp-Source: AGHT+IFlbmeulV0zbsnKd23pIgbY7sXFFTYPJ1StMcXHIPOGJvEQyfJ18rL8z1Xxot6BGyZS0rrfLw==
+X-Received: by 2002:a17:906:ca48:b0:ab7:6e14:c03f with SMTP id a640c23a62f3a-ab76e14c0d5mr312575166b.21.1738852761390;
+        Thu, 06 Feb 2025 06:39:21 -0800 (PST)
 Received: from [192.168.0.205] (78-154-15-142.ip.btc-net.bg. [78.154.15.142])
-        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-ab773339349sm107647866b.146.2025.02.06.06.39.02
+        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-ab772f843a9sm109650266b.67.2025.02.06.06.39.19
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 06 Feb 2025 06:39:04 -0800 (PST)
-Message-ID: <98c8cbec-28f4-4814-bce4-e07101553f92@blackwall.org>
-Date: Thu, 6 Feb 2025 16:39:02 +0200
+        Thu, 06 Feb 2025 06:39:20 -0800 (PST)
+Message-ID: <114ff1da-c7f4-4851-af3e-1a4fdabde9f5@blackwall.org>
+Date: Thu, 6 Feb 2025 16:39:19 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -80,8 +80,8 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v5 net-next 04/14] netfilter: nft_chain_filter: Add bridge
- double vlan and pppoe
+Subject: Re: [PATCH v5 net-next 07/14] netfilter :nf_flow_table_offload: Add
+ nf_flow_rule_bridge()
 To: Eric Woudstra <ericwouds@gmail.com>, Andrew Lunn <andrew+netdev@lunn.ch>,
  "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
  Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
@@ -102,21 +102,24 @@ Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
  bridge@lists.linux.dev, linux-arm-kernel@lists.infradead.org,
  linux-mediatek@lists.infradead.org
 References: <20250204194921.46692-1-ericwouds@gmail.com>
- <20250204194921.46692-5-ericwouds@gmail.com>
+ <20250204194921.46692-8-ericwouds@gmail.com>
 Content-Language: en-US
 From: Nikolay Aleksandrov <razor@blackwall.org>
-In-Reply-To: <20250204194921.46692-5-ericwouds@gmail.com>
+In-Reply-To: <20250204194921.46692-8-ericwouds@gmail.com>
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
 
 On 2/4/25 21:49, Eric Woudstra wrote:
-> This adds the capability to evaluate 802.1ad, QinQ, PPPoE and PPPoE-in-Q
-> packets in the bridge filter chain.
+> Add nf_flow_rule_bridge().
+> 
+> It only calls the common rule and adds the redirect.
 > 
 > Signed-off-by: Eric Woudstra <ericwouds@gmail.com>
 > ---
->  net/netfilter/nft_chain_filter.c | 20 +++++++++++++++++++-
->  1 file changed, 19 insertions(+), 1 deletion(-)
+>  include/net/netfilter/nf_flow_table.h |  3 +++
+>  net/netfilter/nf_flow_table_offload.c | 13 +++++++++++++
+>  2 files changed, 16 insertions(+)
+> 
 
 Reviewed-by: Nikolay Aleksandrov <razor@blackwall.org>
 
