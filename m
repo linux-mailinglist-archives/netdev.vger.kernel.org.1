@@ -1,165 +1,317 @@
-Return-Path: <netdev+bounces-163415-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-163416-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id F3085A2A36D
-	for <lists+netdev@lfdr.de>; Thu,  6 Feb 2025 09:44:09 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 48E75A2A373
+	for <lists+netdev@lfdr.de>; Thu,  6 Feb 2025 09:46:26 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 3EF1C3A3E90
-	for <lists+netdev@lfdr.de>; Thu,  6 Feb 2025 08:44:01 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 250341889159
+	for <lists+netdev@lfdr.de>; Thu,  6 Feb 2025 08:46:31 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DCEDE22577C;
-	Thu,  6 Feb 2025 08:44:05 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5DDBD211A0B;
+	Thu,  6 Feb 2025 08:46:22 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="fB9ix6wm"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="FpdJp5PT"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-il1-f173.google.com (mail-il1-f173.google.com [209.85.166.173])
+Received: from mail-yw1-f173.google.com (mail-yw1-f173.google.com [209.85.128.173])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4D5881FCCE1;
-	Thu,  6 Feb 2025 08:44:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.173
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 93236163;
+	Thu,  6 Feb 2025 08:46:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.173
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1738831445; cv=none; b=kcNuyVsd51bGM5w7G+31tzapNSkEXQkSSJvw0wBhi7A8rE0XJD9DA03HjWD52vjTRInHw79HIYV9Y/5KpO/aEpVgGjUO8jT5MALJg3KFjMSdwk7NlArdBHy5v8MyMkeuEj7xp/c8/mNaDY+wmuVS68GP2aEibpCpZb+31mK+pRA=
+	t=1738831582; cv=none; b=TADhEkzjSSA1kx/TDGlSRvOrp3qy1BFkNrUni/BaMFqpxx3DI4Z5LjagVET7g9pos3JAxAyX+sjgEUHInDC9sHINlnmAPEelP5F6nMO2YDl2CmT6S81wvEJrAhb2NNknOx2eBNagDULk1xP2a5dSM3I2h1525J5eCWj/q9HZetk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1738831445; c=relaxed/simple;
-	bh=mJI+NVNthZdvvzNIH/oOTIwroKqZU59erMXCgc1Nqic=;
+	s=arc-20240116; t=1738831582; c=relaxed/simple;
+	bh=IAiTciPvdIP2WnYFSwJejvd1JoLA6W0q2++HzT6PUjU=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=F/WUXJpWSUTVTOc3Y/octNZy6O8YY5Z/69h708KtPG6t1VxxLRkjN/z8Lu4t2Cu59hGguG41b63dOQuwFYdggQuQBWK1PGRT7W1WEIDK4U3e/qiVqAVscSeGrBxhxRA2EjL239iQx0NooexYf8wnOwNUQDCFT6WSBZfr+h81Axk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=fB9ix6wm; arc=none smtp.client-ip=209.85.166.173
+	 To:Cc:Content-Type; b=R2aSoKkYC5X9asbaDscIVVgqSW3sShI6iQyrwwG22/3NxwDnWkzL5UBX4K+rXjlnCvAgORTeowdU9G26mw+0ezNYQ/ZZYXR0cYuzPpP9pc6XIZrKuYU0F50EAz5z1DJtmEY/9VCimeaaRcrcPYx9ayq/AO0Dt+6dUrO2SP1T+9Y=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=FpdJp5PT; arc=none smtp.client-ip=209.85.128.173
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-il1-f173.google.com with SMTP id e9e14a558f8ab-3d06026ddf8so552715ab.3;
-        Thu, 06 Feb 2025 00:44:04 -0800 (PST)
+Received: by mail-yw1-f173.google.com with SMTP id 00721157ae682-6f768e9be1aso15044167b3.0;
+        Thu, 06 Feb 2025 00:46:20 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1738831443; x=1739436243; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1738831579; x=1739436379; darn=vger.kernel.org;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=pQScERGpxW6SHFx96DVuTqcdq334QwjiqkR8FbScGZ8=;
-        b=fB9ix6wmi1uT1DBza9XclRKhbj7BqxHVVv5lvgVHSIVke7+YL03SDAnKDw3jGRvBkJ
-         imrgObdsYaAgzFKyZIJ61p3pICG5BhCvvTYW1DsyqKCJZ7j4/TlYI32ctJ4fhNgFhka2
-         I7aB6JwF6fEP65AtR+tdFUkfreXwS9xhNLhyIxw0qoo8oOcNWf7i/CApPYrO5Lt7bp0D
-         dnrVAioBA4xQQWoVrXYOtbzCzOCOXfDkDvNLWV3jpYF4fMVvUuYx90TB2q5x+PvlQKig
-         Npsjub363SPEthIXZfYap7toCsVdtbOVlFwLrow5nWVJ15wfYpbIrozXHXKg5F89VTBM
-         5b2A==
+        bh=z3XBaUKrT/1hQhJVYaeQ/iTYgSEZTAUQE8cvCrT/xK8=;
+        b=FpdJp5PTzQyIGR6ZONzJTaR+Gdo5/qDAba0Lwb5zNJkrUqV9KDQz6aSJkwgSmafLC1
+         v0ls6h6UaEtyyQmzWFdnFHjmzrS+A3dynuCZvDa66fQxSDeMU1PHYiO6R7/BeUBjp2Td
+         PKarr9U0lsywds9Rbfxec9ZNNghDKSV3MJ8eomQRFacXKdW+eE2Z/zIwhIhbtYEaZ102
+         G75ZIlHHrumF7aymWXzz88wksDFVqDeDI/bT3AIcH7yGrnis2xhOPpSLaWeJvbQDVmGe
+         xS4RaLgnuzPAfYhkrVpmh7FFJYpfQWWuCZAjQgIw62JHBviec7lbzZtAD2HKQb9leAsL
+         bTGw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1738831443; x=1739436243;
+        d=1e100.net; s=20230601; t=1738831579; x=1739436379;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=pQScERGpxW6SHFx96DVuTqcdq334QwjiqkR8FbScGZ8=;
-        b=SCQNaENq1v1JcqqN44QoRqzic5ZU3Sm15NRDelyJadyrCtpw9bJFyZc0MTxNZTabzG
-         5AmSpXALwED901WpwMshKkh+yhwrL3Tbm9wZgtSl9xmQzMagRWWA2U6hnjSYfSt0UNMG
-         4kjRr/bX7FmI6egqPIEw+9s/vuISJrwWcNE9bf0F2kzCeMVI6LZ6AFKJfcE44X+hxMJ+
-         BvJKJleoSNJPjWlTB+W0hfXoAC0h9uajmp9F/sr3HxbhMshdOWYMFt22T5NnY5zPZ8wX
-         e2shikj/j7d6R0NXE2JCqQDcMlFlE4tzoZo1g8csJ/CaY1sMtP9pC3TyKLchAm0HGx1d
-         Yp6Q==
-X-Forwarded-Encrypted: i=1; AJvYcCUUSmCRgmevXdQSapzywqxrHJHjEiIUkZW3ZrRiu2kIuKhz2BgS0o82LhkoAcdQCM/vF2GmBMeq@vger.kernel.org, AJvYcCVLC05KjPl/i3DKHghu7TfroQVW2VV1/HobAza1hZOjsXHvWz7JMnrgYxgOe1KHlrjTU1Q=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwRAiFuYs+0q1eoXLkWO2A/019TJ0l2Gjc7I49XCSAJW5rbdpWF
-	Lmv/HW1oBP6FoTk/Zj8UbSiSt24gCyPiQKc+Zr5UCCygarotjqF7umRg31ZmhkUYcNdehQf5IZU
-	G0AwSHk+l+mrY7ve0F5VGysCkVHHpbExKmyhAMAcj
-X-Gm-Gg: ASbGncuZ8ckabgKDUVTo9M9ZlK2QPRJzHLv/SDtDvGdmECs3pNe1MjVtpLoewFN/wd1
-	cgfO7W8epcBMUaP3l5FiB2tsVfn5IitLsiYyLQ1sZxZqb3UUbd3/LvXU+1x2RQYmus4bbdG8=
-X-Google-Smtp-Source: AGHT+IHWLEhsS7LqZ5gd45UDsRpIQEL0inWymvxBPPbh6qSBomvkAtK+YhKOVaLCpaSAx+7IZIsS1DvEQZo4HE4hXvs=
-X-Received: by 2002:a05:6e02:1546:b0:3d0:d0d:db8e with SMTP id
- e9e14a558f8ab-3d04f40204cmr54065475ab.1.1738831443340; Thu, 06 Feb 2025
- 00:44:03 -0800 (PST)
+        bh=z3XBaUKrT/1hQhJVYaeQ/iTYgSEZTAUQE8cvCrT/xK8=;
+        b=AdCoL/CND8Gp9gsZC87DAOvzI9priKSeo2NnJxM3+j3rKsNb2WcFrtzkBrN0XjGY1t
+         GAcTVuncqROoMKXfIQeBMKzHIoEbuOquIf+gpfOv8Na1twqMixdmltftuS3E2KDe1/Z7
+         exFmy/7UK2yXZiFsXEKsDhSWgjthEXn/bdvxMrKYLGyVE+01wr3bV559TZX7o+uN96PI
+         ZY51QHFbSfFyaJvizq7vgObKn1N0eUHLRtmVBMpheT2DdfLeqMw5SdJ+kWSYV+sHLh45
+         vTMRB5mK2tFkgl3+l7x+D2Pk82eYB67Vqc7ddgBLeC5N6Oa/XEvvIPuGxTa82tc0l34D
+         ph+g==
+X-Forwarded-Encrypted: i=1; AJvYcCUb1Kx9gkXSNB1LqgSWwvsNj2SIGt/7ezF6pXRZFt7cYu5xar5bzNKVV09Rbbt+QbB+ygk8cuUl@vger.kernel.org, AJvYcCUfW4BaqdffXMMmxFAYZ4LsZ4AVBFlEiCinNM79ndeZgLgGmSS3eb1zKONWos7j45n5HjUSRHQXuOE=@vger.kernel.org, AJvYcCWJHozFuwESzPtrFL/qkD/5DnrMkeR0jcJmzQ7t6l0jg1FycKxF6rrlfL3PXnmGTabVqG9d67YSaDNlJQ==@vger.kernel.org
+X-Gm-Message-State: AOJu0YyX0I/ryVu0F0FmR34I/kxCJ5gZpPCNefAsWnwa26WlqkLBHicu
+	x5rsBwPhqKWy5rQ96it62RMZRpEbUMylsnBEjrtytgQlZT6mgKotw5o8JFPbKSSMEzktnsoCYpH
+	a/WCd3Nnz+rLcG5GTwE8hZEcQmMA=
+X-Gm-Gg: ASbGnctCUm533pWPXvfSL8NnzkpfrF9WhjzzIWhl2LLyqMeE5LoXceqqO55haGKHqOU
+	VlkTl1NZKEFPZYpZl87uTAMDYJ/crrnwGrSdmBLPiBQBVrPY3Kf7lbvkcmLdUn3yoZI5DXNk1
+X-Google-Smtp-Source: AGHT+IHlYR0Zc+BAJP/A0hhKu9kjrN2V2QsyHX5Z8jg+7GABYOGH/px7fkCyHAuejCjFPZU4qbzWOL2mVuYSGnHzdSI=
+X-Received: by 2002:a05:690c:62c1:b0:6f7:9f95:d916 with SMTP id
+ 00721157ae682-6f99a618f37mr23145587b3.16.1738831579416; Thu, 06 Feb 2025
+ 00:46:19 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250204183024.87508-1-kerneljasonxing@gmail.com>
- <20250204183024.87508-6-kerneljasonxing@gmail.com> <67a384ea2d547_14e0832942c@willemb.c.googlers.com.notmuch>
-In-Reply-To: <67a384ea2d547_14e0832942c@willemb.c.googlers.com.notmuch>
-From: Jason Xing <kerneljasonxing@gmail.com>
-Date: Thu, 6 Feb 2025 16:43:27 +0800
-X-Gm-Features: AWEUYZm9CtHc2dAYDxFup6EhapE81ULeSHDkFtB31pl0iV5_EYoDvqCMUmmShiU
-Message-ID: <CAL+tcoDvCrfE+Xs3ywTA35pvR_NyFyXLihyAuFFZBA4aHmiZBg@mail.gmail.com>
-Subject: Re: [PATCH bpf-next v8 05/12] net-timestamp: prepare for isolating
- two modes of SO_TIMESTAMPING
-To: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
-Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org, 
-	pabeni@redhat.com, dsahern@kernel.org, willemb@google.com, ast@kernel.org, 
-	daniel@iogearbox.net, andrii@kernel.org, martin.lau@linux.dev, 
-	eddyz87@gmail.com, song@kernel.org, yonghong.song@linux.dev, 
-	john.fastabend@gmail.com, kpsingh@kernel.org, sdf@fomichev.me, 
-	haoluo@google.com, jolsa@kernel.org, horms@kernel.org, bpf@vger.kernel.org, 
-	netdev@vger.kernel.org
+References: <cover.1738778580.git.leon@kernel.org> <e536ca28cd1686dfbb613de7ccfc01fbe5a734e4.1738778580.git.leon@kernel.org>
+In-Reply-To: <e536ca28cd1686dfbb613de7ccfc01fbe5a734e4.1738778580.git.leon@kernel.org>
+From: Bharat Bhushan <bharatb.linux@gmail.com>
+Date: Thu, 6 Feb 2025 14:16:08 +0530
+X-Gm-Features: AWEUYZmguP9vZm_NGHalzZfLh9uJ-aw1wjN_NXnWeY6O7H3_MnQ8VHc2Z6HpMSk
+Message-ID: <CAAeCc_kfRt8LhKgRmLsaaSmJs94hjH85DxCjEnJA6OQc5S5XXw@mail.gmail.com>
+Subject: Re: [PATCH ipsec-next 1/5] xfrm: delay initialization of offload path
+ till its actually requested
+To: Leon Romanovsky <leon@kernel.org>
+Cc: Steffen Klassert <steffen.klassert@secunet.com>, Leon Romanovsky <leonro@nvidia.com>, 
+	Andrew Lunn <andrew+netdev@lunn.ch>, Ayush Sawal <ayush.sawal@chelsio.com>, 
+	Bharat Bhushan <bbhushan2@marvell.com>, Eric Dumazet <edumazet@google.com>, 
+	Geetha sowjanya <gakula@marvell.com>, hariprasad <hkelam@marvell.com>, 
+	Herbert Xu <herbert@gondor.apana.org.au>, intel-wired-lan@lists.osuosl.org, 
+	Jakub Kicinski <kuba@kernel.org>, Jay Vosburgh <jv@jvosburgh.net>, Jonathan Corbet <corbet@lwn.net>, 
+	linux-doc@vger.kernel.org, linux-rdma@vger.kernel.org, 
+	Louis Peens <louis.peens@corigine.com>, netdev@vger.kernel.org, oss-drivers@corigine.com, 
+	Paolo Abeni <pabeni@redhat.com>, Potnuri Bharat Teja <bharat@chelsio.com>, 
+	Przemek Kitszel <przemyslaw.kitszel@intel.com>, Saeed Mahameed <saeedm@nvidia.com>, 
+	Subbaraya Sundeep <sbhatta@marvell.com>, Sunil Goutham <sgoutham@marvell.com>, 
+	Tariq Toukan <tariqt@nvidia.com>, Tony Nguyen <anthony.l.nguyen@intel.com>, 
+	Ilia Lin <ilia.lin@kernel.org>
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-On Wed, Feb 5, 2025 at 11:34=E2=80=AFPM Willem de Bruijn
-<willemdebruijn.kernel@gmail.com> wrote:
->
-> Jason Xing wrote:
-> > No functional changes here, only add skb_enable_app_tstamp() to test
-> > if the orig_skb matches the usage of application SO_TIMESTAMPING
-> > or its bpf extension. And it's good to support two modes in
-> > parallel later in this series.
-> >
-> > Also, this patch deliberately distinguish the software and
-> > hardware SCM_TSTAMP_SND timestamp by passing 'sw' parameter in order
-> > to avoid such a case where hardware may go wrong and pass a NULL
-> > hwstamps, which is even though unlikely to happen. If it really
-> > happens, bpf prog will finally consider it as a software timestamp.
-> > It will be hardly recognized. Let's make the timestamping part
-> > more robust.
->
-> Disagree. Don't add a crutch that has not shown to be necessary for
-> all this time.
->
-> Just infer hw from hwtstamps !=3D NULL.
+Hi Leon,
 
-I can surely modify this part as you said, but may I ask why? I cannot
-find a good reason to absolutely trust the hardware behaviour. If that
-corner case happens, it would be very hard to trace the root cause...
-
+On Wed, Feb 5, 2025 at 11:50=E2=80=AFPM Leon Romanovsky <leon@kernel.org> w=
+rote:
 >
-> > Signed-off-by: Jason Xing <kerneljasonxing@gmail.com>
-> > ---
-> >  include/linux/skbuff.h | 13 +++++++------
-> >  net/core/dev.c         |  2 +-
-> >  net/core/skbuff.c      | 32 ++++++++++++++++++++++++++++++--
-> >  net/ipv4/tcp_input.c   |  3 ++-
-> >  4 files changed, 40 insertions(+), 10 deletions(-)
-> >
-> > diff --git a/include/linux/skbuff.h b/include/linux/skbuff.h
-> > index bb2b751d274a..dfc419281cc9 100644
-> > --- a/include/linux/skbuff.h
-> > +++ b/include/linux/skbuff.h
-> > @@ -39,6 +39,7 @@
-> >  #include <net/net_debug.h>
-> >  #include <net/dropreason-core.h>
-> >  #include <net/netmem.h>
-> > +#include <uapi/linux/errqueue.h>
-> >
-> >  /**
-> >   * DOC: skb checksums
-> > @@ -4533,18 +4534,18 @@ void skb_complete_tx_timestamp(struct sk_buff *=
-skb,
-> >
-> >  void __skb_tstamp_tx(struct sk_buff *orig_skb, const struct sk_buff *a=
-ck_skb,
-> >                    struct skb_shared_hwtstamps *hwtstamps,
-> > -                  struct sock *sk, int tstype);
-> > +                  struct sock *sk, bool sw, int tstype);
-> >
-> >  /**
-> > - * skb_tstamp_tx - queue clone of skb with send time stamps
-> > + * skb_tstamp_tx - queue clone of skb with send HARDWARE timestamps
+> From: Leon Romanovsky <leonro@nvidia.com>
 >
-> Unfortunately this cannot be modified to skb_tstamp_tx_hw, as that
-> would require updating way too many callers.
+> XFRM offload path is probed even if offload isn't needed at all. Let's
+> make sure that x->type_offload pointer stays NULL for such path to
+> reduce ambiguity.
+>
+> Fixes: 9d389d7f84bb ("xfrm: Add a xfrm type offload.")
+> Signed-off-by: Leon Romanovsky <leonro@nvidia.com>
+> ---
+>  include/net/xfrm.h     | 12 +++++++++++-
+>  net/xfrm/xfrm_device.c | 14 +++++++++-----
+>  net/xfrm/xfrm_state.c  | 22 +++++++++-------------
+>  net/xfrm/xfrm_user.c   |  2 +-
+>  4 files changed, 30 insertions(+), 20 deletions(-)
+>
+> diff --git a/include/net/xfrm.h b/include/net/xfrm.h
+> index ed4b83696c77..28355a5be5b9 100644
+> --- a/include/net/xfrm.h
+> +++ b/include/net/xfrm.h
+> @@ -464,6 +464,16 @@ struct xfrm_type_offload {
+>
+>  int xfrm_register_type_offload(const struct xfrm_type_offload *type, uns=
+igned short family);
+>  void xfrm_unregister_type_offload(const struct xfrm_type_offload *type, =
+unsigned short family);
+> +const struct xfrm_type_offload *xfrm_get_type_offload(u8 proto,
+> +                                                     unsigned short fami=
+ly);
+> +static inline void xfrm_put_type_offload(const struct xfrm_type_offload =
+*type)
+> +{
+> +       if (!type)
+> +               return;
+> +
+> +       module_put(type->owner);
+> +}
+> +
+>
+>  /**
+>   * struct xfrm_mode_cbs - XFRM mode callbacks
+> @@ -1760,7 +1770,7 @@ void xfrm_spd_getinfo(struct net *net, struct xfrmk=
+_spdinfo *si);
+>  u32 xfrm_replay_seqhi(struct xfrm_state *x, __be32 net_seq);
+>  int xfrm_init_replay(struct xfrm_state *x, struct netlink_ext_ack *extac=
+k);
+>  u32 xfrm_state_mtu(struct xfrm_state *x, int mtu);
+> -int __xfrm_init_state(struct xfrm_state *x, bool init_replay, bool offlo=
+ad,
+> +int __xfrm_init_state(struct xfrm_state *x, bool init_replay,
+>                       struct netlink_ext_ack *extack);
+>  int xfrm_init_state(struct xfrm_state *x);
+>  int xfrm_input(struct sk_buff *skb, int nexthdr, __be32 spi, int encap_t=
+ype);
+> diff --git a/net/xfrm/xfrm_device.c b/net/xfrm/xfrm_device.c
+> index d1fa94e52cea..e01a7f5a4c75 100644
+> --- a/net/xfrm/xfrm_device.c
+> +++ b/net/xfrm/xfrm_device.c
+> @@ -244,11 +244,6 @@ int xfrm_dev_state_add(struct net *net, struct xfrm_=
+state *x,
+>         xfrm_address_t *daddr;
+>         bool is_packet_offload;
+>
+> -       if (!x->type_offload) {
+> -               NL_SET_ERR_MSG(extack, "Type doesn't support offload");
+> -               return -EINVAL;
+> -       }
+> -
+>         if (xuo->flags &
+>             ~(XFRM_OFFLOAD_IPV6 | XFRM_OFFLOAD_INBOUND | XFRM_OFFLOAD_PAC=
+KET)) {
+>                 NL_SET_ERR_MSG(extack, "Unrecognized flags in offload req=
+uest");
+> @@ -310,6 +305,13 @@ int xfrm_dev_state_add(struct net *net, struct xfrm_=
+state *x,
+>                 return -EINVAL;
+>         }
+>
+> +       x->type_offload =3D xfrm_get_type_offload(x->id.proto, x->props.f=
+amily);
+> +       if (!x->type_offload) {
+> +               NL_SET_ERR_MSG(extack, "Type doesn't support offload");
+> +               dev_put(dev);
+> +               return -EINVAL;
+> +       }
+> +
+>         xso->dev =3D dev;
+>         netdev_tracker_alloc(dev, &xso->dev_tracker, GFP_ATOMIC);
+>         xso->real_dev =3D dev;
+> @@ -332,6 +334,8 @@ int xfrm_dev_state_add(struct net *net, struct xfrm_s=
+tate *x,
+>                 netdev_put(dev, &xso->dev_tracker);
+>                 xso->type =3D XFRM_DEV_OFFLOAD_UNSPECIFIED;
+>
+> +               xfrm_put_type_offload(x->type_offload);
+> +               x->type_offload =3D NULL;
 
-I didn't change the name, only the description and usage of
-skb_tstamp_tx(). It always gets called in the hardware timestamp
-situation except skb_tx_timestamp() that is modified.
+We always set type_offload to NULL. Can we move type_offload =3D NULL in
+xfrm_put_type_offload() ?
 
-Thanks,
-Jason
+Thanks
+-Bharat
+
+>                 /* User explicitly requested packet offload mode and conf=
+igured
+>                  * policy in addition to the XFRM state. So be civil to u=
+sers,
+>                  * and return an error instead of taking fallback path.
+> diff --git a/net/xfrm/xfrm_state.c b/net/xfrm/xfrm_state.c
+> index ad2202fa82f3..568fe8df7741 100644
+> --- a/net/xfrm/xfrm_state.c
+> +++ b/net/xfrm/xfrm_state.c
+> @@ -424,11 +424,12 @@ void xfrm_unregister_type_offload(const struct xfrm=
+_type_offload *type,
+>  }
+>  EXPORT_SYMBOL(xfrm_unregister_type_offload);
+>
+> -static const struct xfrm_type_offload *
+> -xfrm_get_type_offload(u8 proto, unsigned short family, bool try_load)
+> +const struct xfrm_type_offload *xfrm_get_type_offload(u8 proto,
+> +                                                     unsigned short fami=
+ly)
+>  {
+>         const struct xfrm_type_offload *type =3D NULL;
+>         struct xfrm_state_afinfo *afinfo;
+> +       bool try_load =3D true;
+>
+>  retry:
+>         afinfo =3D xfrm_state_get_afinfo(family);
+> @@ -456,11 +457,7 @@ xfrm_get_type_offload(u8 proto, unsigned short famil=
+y, bool try_load)
+>
+>         return type;
+>  }
+> -
+> -static void xfrm_put_type_offload(const struct xfrm_type_offload *type)
+> -{
+> -       module_put(type->owner);
+> -}
+> +EXPORT_SYMBOL(xfrm_get_type_offload);
+>
+>  static const struct xfrm_mode xfrm4_mode_map[XFRM_MODE_MAX] =3D {
+>         [XFRM_MODE_BEET] =3D {
+> @@ -609,8 +606,6 @@ static void ___xfrm_state_destroy(struct xfrm_state *=
+x)
+>         kfree(x->coaddr);
+>         kfree(x->replay_esn);
+>         kfree(x->preplay_esn);
+> -       if (x->type_offload)
+> -               xfrm_put_type_offload(x->type_offload);
+>         if (x->type) {
+>                 x->type->destructor(x);
+>                 xfrm_put_type(x->type);
+> @@ -784,6 +779,9 @@ void xfrm_dev_state_free(struct xfrm_state *x)
+>         struct xfrm_dev_offload *xso =3D &x->xso;
+>         struct net_device *dev =3D READ_ONCE(xso->dev);
+>
+> +       xfrm_put_type_offload(x->type_offload);
+> +       x->type_offload =3D NULL;
+> +
+>         if (dev && dev->xfrmdev_ops) {
+>                 spin_lock_bh(&xfrm_state_dev_gc_lock);
+>                 if (!hlist_unhashed(&x->dev_gclist))
+> @@ -3122,7 +3120,7 @@ u32 xfrm_state_mtu(struct xfrm_state *x, int mtu)
+>  }
+>  EXPORT_SYMBOL_GPL(xfrm_state_mtu);
+>
+> -int __xfrm_init_state(struct xfrm_state *x, bool init_replay, bool offlo=
+ad,
+> +int __xfrm_init_state(struct xfrm_state *x, bool init_replay,
+>                       struct netlink_ext_ack *extack)
+>  {
+>         const struct xfrm_mode *inner_mode;
+> @@ -3178,8 +3176,6 @@ int __xfrm_init_state(struct xfrm_state *x, bool in=
+it_replay, bool offload,
+>                 goto error;
+>         }
+>
+> -       x->type_offload =3D xfrm_get_type_offload(x->id.proto, family, of=
+fload);
+> -
+>         err =3D x->type->init_state(x, extack);
+>         if (err)
+>                 goto error;
+> @@ -3229,7 +3225,7 @@ int xfrm_init_state(struct xfrm_state *x)
+>  {
+>         int err;
+>
+> -       err =3D __xfrm_init_state(x, true, false, NULL);
+> +       err =3D __xfrm_init_state(x, true, NULL);
+>         if (!err)
+>                 x->km.state =3D XFRM_STATE_VALID;
+>
+> diff --git a/net/xfrm/xfrm_user.c b/net/xfrm/xfrm_user.c
+> index 08c6d6f0179f..82a768500999 100644
+> --- a/net/xfrm/xfrm_user.c
+> +++ b/net/xfrm/xfrm_user.c
+> @@ -907,7 +907,7 @@ static struct xfrm_state *xfrm_state_construct(struct=
+ net *net,
+>                         goto error;
+>         }
+>
+> -       err =3D __xfrm_init_state(x, false, attrs[XFRMA_OFFLOAD_DEV], ext=
+ack);
+> +       err =3D __xfrm_init_state(x, false, extack);
+>         if (err)
+>                 goto error;
+>
+> --
+> 2.48.1
+>
+>
 
