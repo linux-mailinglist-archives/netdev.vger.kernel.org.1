@@ -1,85 +1,71 @@
-Return-Path: <netdev+bounces-163477-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-163475-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0EB6DA2A5CD
-	for <lists+netdev@lfdr.de>; Thu,  6 Feb 2025 11:27:54 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id B3E51A2A5BD
+	for <lists+netdev@lfdr.de>; Thu,  6 Feb 2025 11:24:46 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 5A0C73A7E54
-	for <lists+netdev@lfdr.de>; Thu,  6 Feb 2025 10:27:40 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E0A2F3A56A7
+	for <lists+netdev@lfdr.de>; Thu,  6 Feb 2025 10:24:37 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BC9D122689C;
-	Thu,  6 Feb 2025 10:27:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 679F8226899;
+	Thu,  6 Feb 2025 10:24:42 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="GaQytxVJ"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="uPg2UyKU"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.7])
+Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B6F3E227560;
-	Thu,  6 Feb 2025 10:27:43 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.7
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3240022540F;
+	Thu,  6 Feb 2025 10:24:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1738837665; cv=none; b=gVPXYDlbF+al0cPy0QVnek6ARV58PlO472OWouGXf7wTmbcESMNX1kVBEJs09hL21mUROix8ARpkI3e6XJEd4zM3b6EFxXZsSCEDXx7ZHW57BA9wW7dpG6uuPpIcdO2R9RLPI7yPxkX9r3SbSWKMhwEYJu0xtXcpA2Dsp7NFs4Y=
+	t=1738837482; cv=none; b=Qr+qL6v0zMg7XSgT88oVQKzZsw5QMUQ2Cdyg9z0ejVsQ5AEmJ0C0maUYaUI83tGvitV8/wzt5/7tKpruzDiUVpetsxHy6MZxqk8ZwZ2WdWFMzaEnRJZXm9m0r86BXwxuY+wv6dJn508ns3d1e5TYfy8xyrlLP9uA5hwyrzqleDY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1738837665; c=relaxed/simple;
-	bh=B0aenSas7uI6VgQrWrZ3K7h+bbJCK1O9BDNE8yjWiV4=;
+	s=arc-20240116; t=1738837482; c=relaxed/simple;
+	bh=V2R7f06XbvyAt5iCH3t8bRwSEWxBPWVf0fxAB9GCG/E=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Q9PEg/i3wZAHqfPQk/mgewHJA8B10Ta3HObhA36eTJuUteFGjQ5NciFutywNCVIvbd5xUy5LEJ8cb7Yhv8tj9cZlBjQSqY4V0Pd8CsXPgk8sCP+sNd8/XfQaf7ienJM+hAM+1aw7G/q9VBQZ99SGtOD3r4KHJ4z7Abfn9CfoX2k=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=GaQytxVJ; arc=none smtp.client-ip=192.198.163.7
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1738837664; x=1770373664;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=B0aenSas7uI6VgQrWrZ3K7h+bbJCK1O9BDNE8yjWiV4=;
-  b=GaQytxVJEIHD9Dv4muk7bIQGI7QgHZpf4APR+Y2CVU31AtvvER/nDrfP
-   x+ouXde/m9QWxtPg+Kt7RTuEZetx0TA8VU8MsJIvJbi1EfklgEeXFtfzv
-   iZQQXSCrTZVa21SbK8ErYJ7NxRde+5ntOJA/C9uZpFiZy1F/3Hj8Fegzc
-   dJfF5/QmpE2UFsHImYTH0OlNADzvKFcIrwF988ZcY84Aw7/BGz22Y5jhL
-   3RH+/PGEbaaIeNQYeEyPbPUBz/D+quVDja7NZM/THhLgEFGR+Ami6Y5BW
-   U63QTQ9M0UJYhsqoLqYY5VU1GWNGXQHiEdLk4JgjGNFSxirZ8DSYy2tDa
-   w==;
-X-CSE-ConnectionGUID: VGB4zUVaSJOyOO2XYhanKg==
-X-CSE-MsgGUID: n3SOVOx9Rg+EDnqX3qNzkA==
-X-IronPort-AV: E=McAfee;i="6700,10204,11336"; a="64787105"
-X-IronPort-AV: E=Sophos;i="6.13,264,1732608000"; 
-   d="scan'208";a="64787105"
-Received: from fmviesa006.fm.intel.com ([10.60.135.146])
-  by fmvoesa101.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 06 Feb 2025 02:27:42 -0800
-X-CSE-ConnectionGUID: XqbzmsnuTg+1aaXPoCj2Iw==
-X-CSE-MsgGUID: ETqe/vM9SHWZhA2ViQnQXg==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.13,264,1732608000"; 
-   d="scan'208";a="110998246"
-Received: from mev-dev.igk.intel.com ([10.237.112.144])
-  by fmviesa006-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 06 Feb 2025 02:27:38 -0800
-Date: Thu, 6 Feb 2025 11:24:06 +0100
-From: Michal Swiatkowski <michal.swiatkowski@linux.intel.com>
-To: Johannes Berg <johannes@sipsolutions.net>
-Cc: Uday Shankar <ushankar@purestorage.com>,
-	Breno Leitao <leitao@debian.org>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
+	 Content-Type:Content-Disposition:In-Reply-To; b=sQ6DAcPt5xqI+AJU9OamtkZTVT2gQ9vqrHPHFocHZDmugpIcl5NIkevXg1blrHuNu97snjoPS5bTWw9tmTYaF8esUxr2Q8mXdjeaxB1T7rJJ2FzgOsJKOX+uqtTjaM03xCRsZSWZ+PQOAfb18KU5Lrpx+4ijNTuMhDembiQ4Iuk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=uPg2UyKU; arc=none smtp.client-ip=78.32.30.218
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
+	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
+	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
+	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
+	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
+	bh=iMI7yWLcG9Uq7pXGUKF4gIfihSrRKWMD0664Ni2nOgU=; b=uPg2UyKU8/3KU2OghvDljf5n2j
+	fSct2xXHLfauULT7TJ/1smHjAeaqT68BMIW75Gv9XBsIWkWS9H20GzASOSqCEVg/hg2tqEISYruwG
+	/Yo/l8x1v6BGRCMPTiNTaXoxtV4XYGUI986lsw0v0OJLQY3z80ZBY9y14BUQyssBEeoPLvxJPD4RL
+	aYJppKdKKpBYX8ls7YbYW7yFWh/Jpgj48u4tqvBMwRTd6eT9NtlYto9b+BifR8Ymzt7ZpYv1gmgzG
+	JesVU3E6Mj4Ry+dRF4EAf4KAqF+EwITZ3dDwKN8LvWhua7kVZiYJQi7d8liWu6SNli8gl79NGOeRK
+	28sU+naA==;
+Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:57546)
+	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.96)
+	(envelope-from <linux@armlinux.org.uk>)
+	id 1tfz3e-0001jE-1g;
+	Thu, 06 Feb 2025 10:24:32 +0000
+Received: from linux by shell.armlinux.org.uk with local (Exim 4.96)
+	(envelope-from <linux@shell.armlinux.org.uk>)
+	id 1tfz3d-0003Lm-0K;
+	Thu, 06 Feb 2025 10:24:29 +0000
+Date: Thu, 6 Feb 2025 10:24:28 +0000
+From: "Russell King (Oracle)" <linux@armlinux.org.uk>
+To: Oleksij Rempel <o.rempel@pengutronix.de>
+Cc: Byungho An <bh74.an@samsung.com>, Andrew Lunn <andrew@lunn.ch>,
 	"David S. Miller" <davem@davemloft.net>,
 	Eric Dumazet <edumazet@google.com>,
 	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Srinivas Kandagatla <srinivas.kandagatla@linaro.org>,
-	=?utf-8?B?UmFmYcWCIE1pxYJlY2tp?= <rafal@milecki.pl>,
-	Simon Horman <horms@kernel.org>,
-	Andrew Morton <akpm@linux-foundation.org>,
-	Jonathan Corbet <corbet@lwn.net>, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org, linux-wireless@vger.kernel.org,
-	linux-doc@vger.kernel.org
-Subject: Re: [PATCH v3 1/2] net, treewide: define and use MAC_ADDR_STR_LEN
-Message-ID: <Z6SNxrEteMx0/0sb@mev-dev.igk.intel.com>
-References: <20250205-netconsole-v3-0-132a31f17199@purestorage.com>
- <20250205-netconsole-v3-1-132a31f17199@purestorage.com>
- <Z6SEeO0QFx9Y52LJ@mev-dev.igk.intel.com>
- <a2a26c7eaf20bb972289a804ecfe0e532f0f85ae.camel@sipsolutions.net>
+	kernel@pengutronix.de, linux-kernel@vger.kernel.org,
+	netdev@vger.kernel.org
+Subject: Re: [PATCH net-next v1 1/1] net: sxgbe: rework EEE handling to use
+ PHY negotiation results
+Message-ID: <Z6SN3GSwPsh6m8UI@shell.armlinux.org.uk>
+References: <20250206075856.3266068-1-o.rempel@pengutronix.de>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -88,27 +74,35 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <a2a26c7eaf20bb972289a804ecfe0e532f0f85ae.camel@sipsolutions.net>
+In-Reply-To: <20250206075856.3266068-1-o.rempel@pengutronix.de>
+Sender: Russell King (Oracle) <linux@armlinux.org.uk>
 
-On Thu, Feb 06, 2025 at 10:50:36AM +0100, Johannes Berg wrote:
-> On Thu, 2025-02-06 at 10:44 +0100, Michal Swiatkowski wrote:
-> > 
-> > >  net/mac80211/debugfs_sta.c         | 5 +++--
-> > 
-> > What about ieee80211_sta_debugfs_add()? (net/mac80211/debugfs_sta.c)
+On Thu, Feb 06, 2025 at 08:58:56AM +0100, Oleksij Rempel wrote:
+> From: Andrew Lunn <andrew@lunn.ch>
 > 
-> What about it? It's modified accordingly, just needs a bit more +/-1
-> now.
+> The enabling/disabling of EEE in the MAC should happen as a result of
+> auto negotiation. So rework sxgbe_eee_adjust() to take the result of
+> negotiation into account.
 
-I meant that it can be done in this patch too. 
+PLS, at least in stmmac terminology, is "phy link status" and there it
+is used with a separate timer which prevents LPI mode being entered
+near to the link coming up. Given that the method is called
+priv->hw->mac->set_eee_pls, and what was being passed to it was the
+link status, I think this is the same thing in this driver.
 
-> 
-> For that:
-> Acked-by: Johannes Berg <johannes@sipsolutions.net>
-> 
-> Thanks for the rename, per the robot report that just came in it looks
-> like that also saved you from some hassle in drivers that have their own
-> MAC_ADDR_LEN for some reason :)
-> 
-> johannes
+So, I think repurposing this bit to indicate whether EEE has been
+negotiated is not correct.
+
+> sxgbe_set_eee() now just stores LTI timer value. Everything else is
+> passed to phylib, so it can correctly setup the PHY.
+
+Not sure why you don't use phydev->eee_cfg.lpi_timer which will be
+updated correctly - if phy_ethtool_set_eee() reutrns an error, then
+priv->tx_lpi_timer will have been updated yet an error will be
+returned to userspace. Sure, have priv->tx_lpi_timer, but update
+this on link-up.
+
+-- 
+RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
+FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
 
