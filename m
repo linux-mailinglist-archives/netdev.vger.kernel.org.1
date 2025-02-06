@@ -1,188 +1,281 @@
-Return-Path: <netdev+bounces-163504-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-163505-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id CA8D0A2A6E8
-	for <lists+netdev@lfdr.de>; Thu,  6 Feb 2025 12:09:20 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 63111A2A71B
+	for <lists+netdev@lfdr.de>; Thu,  6 Feb 2025 12:13:57 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 58025169428
-	for <lists+netdev@lfdr.de>; Thu,  6 Feb 2025 11:09:19 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id D3C907A4EBE
+	for <lists+netdev@lfdr.de>; Thu,  6 Feb 2025 11:12:32 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A54F8230274;
-	Thu,  6 Feb 2025 11:06:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6E2A8228CA9;
+	Thu,  6 Feb 2025 11:12:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=suse.com header.i=@suse.com header.b="OtLs3PS0"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ej1-f54.google.com (mail-ej1-f54.google.com [209.85.218.54])
+Received: from mail-wr1-f50.google.com (mail-wr1-f50.google.com [209.85.221.50])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 20F4422F3AB;
-	Thu,  6 Feb 2025 11:06:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.54
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2B47A22687B
+	for <netdev@vger.kernel.org>; Thu,  6 Feb 2025 11:12:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.50
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1738839983; cv=none; b=oBaQnX+whqjdxcwyUu7QUjJZOW6ow4peXTRTNK4n9EVw4av3svD5qhbxdx/yL5yq/QNOnmKW/eNykUa0IhfjRyF2jW1U5TPnNln6nF4N4fMVGyKcjMJUumKVkCkM2Klors5qKjTr1WSp2XJpUvua3Ze0AfP43us4QeH7i0WJcGs=
+	t=1738840357; cv=none; b=st72g3o+X4FkJF9+6eMu+8bHNhxTyoKFEnSovawh1qhg1oTfDTF4n+xh/sZumhJmC3cU6DOsxzYTLjWO+CtE/7jOSzBDmX0TZslxXWbwR2PlPWtLIfIIHEZtkHbDsdOQmk3etZsSI5G40PXe3lHqBIepVmYnGXuRssC0uQVlYLY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1738839983; c=relaxed/simple;
-	bh=tamcCxHm3y1DTBqjP1FY4004ODbiDOOle1ZuKGQMC/k=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=Er5XyY5Sl4tcVq1OdwAM2P+plEGele6FAcLDSMCttqos/nLMDJwgz+PqbzXTRtI+jW3zqKTNvGZxYa9k8F42efTdY+xbq9Agl0EiYpIYh83CxAo3yHRUmKQSwmROtw7HD2/hvlt0Op92XDjJc8guo9NV0sWJGfcG9Uoj3qTuTng=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.218.54
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ej1-f54.google.com with SMTP id a640c23a62f3a-aaeef97ff02so136057466b.1;
-        Thu, 06 Feb 2025 03:06:19 -0800 (PST)
+	s=arc-20240116; t=1738840357; c=relaxed/simple;
+	bh=5PdoUKp8sDUkFBopWK086WpaKYpFta5+chXQ5K9Um/E=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=e9HxSr5cMAFVMX+Xv6uJiK+UeBg+EhbdpLgzBDEtHVT4MzRry2P5vPnA2RR2tjGOwrkREcZ/GQP8ikDa7vYjlB41957iVLrvyU2sWtUYGLLerr1smZRI0JfZNevPO0ujB7VkEu3IRLG1ODwi8+cHkFEYl3PdzNTPw+gs06maDS0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com; spf=pass smtp.mailfrom=suse.com; dkim=pass (2048-bit key) header.d=suse.com header.i=@suse.com header.b=OtLs3PS0; arc=none smtp.client-ip=209.85.221.50
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.com
+Received: by mail-wr1-f50.google.com with SMTP id ffacd0b85a97d-38db0146117so319456f8f.3
+        for <netdev@vger.kernel.org>; Thu, 06 Feb 2025 03:12:34 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=suse.com; s=google; t=1738840353; x=1739445153; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=05pulSuSE99qxkmEMmiSEJZyQjWQQwPFcROHf49vxwM=;
+        b=OtLs3PS0Fpz8OfTTO/wXpwpLfA7seCHTYl3/Iri3K1XEYa+M3GTzjWm62O2HIw7XZP
+         yqODTvVD5Qc0LIMT3s58BMNaJVO2IermbogE+uqWMYx02Y5RsENYVBDf6eJrCz4z5Rq5
+         o3EkqciUjj5k7OP2NtVr06hHZKW92W5EKwvRAoxH8eOVsryneMRKUKrGPDUJhX1ghSSK
+         vmQpXX4jSrFQI8lP7cLrgx6gG69pPMLoZSchjP1XVndNdSV2548ZT6K6hrJ5yQpPzfO/
+         hz1CPYItSvW356yMRYrelfAQ1SLzhnHKdpQXlEeKCkzWozpfoIF1wVZ5uk5AXs9Vl5zt
+         qQBw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1738839978; x=1739444778;
-        h=cc:to:in-reply-to:references:message-id:content-transfer-encoding
-         :mime-version:subject:date:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=TpvAfT2xKK2DzPTMuzs3BntCPv5+DBlkGoA1AwbPHIc=;
-        b=hvUFP3bTUPvF102P0VqNyXxi10Qv29CBXCSuD0yvRuujgacW0wOih0aRCCdT5DrFyD
-         +Yn/Eml84LUVj4QSmlk+yMqFsVISfpEHCXkkHGfvJGK7yIISP4HBkrGqv2yt2NBmvgX2
-         kqDK5YOKXKxvTZ9xs2CZmYQkFZQILzEwLyLXsF8srjLDKYo6dw2voPyQhe3eYT1mSueq
-         NLqUcLLIA/DZ9BKeVQ3LZ812nYx+CEjFB2zATHylU42tizMFPipwZ4M3cVdsh6OWBdHw
-         /SYiny1WDOx6RtRRP8EAIKdausko7dbhB9cSL2jqxBr8AVbmbDOG4tnpCbm/VRRip3g6
-         wolg==
-X-Forwarded-Encrypted: i=1; AJvYcCUC0zyXyPVOXW4X4n0/qU/N9hbe1u7J5J7MJmQh7BAn6ZVhTfWwxZgy/U/CLllLaJ2qiNuFzf86/zrsyfHPhbhr@vger.kernel.org, AJvYcCUSkDnNObyH3/t/2S0AxlVBi9TX2Fp1sXWyB1+e9noOKI0ALu5FG9zzgjHD1IWc27lg1TF3NH/ppfo=@vger.kernel.org, AJvYcCXNtYG4cVx/22mgUp8/8Uof06BSgkKLjJd2KWJJtBc+bGLHsyB72K197RYwHi8W+4OIz0qm8cgcHyt0FFKF@vger.kernel.org
-X-Gm-Message-State: AOJu0YzDiSCwGE1ajsMHYKQSCA0AjqOpdrjgvHZlGezUrrdzJhgtK8q4
-	p2jmUDrX12J1vFEymdA0rrouCzDID3+TdFGSoB1eLE4bZvBfXEls
-X-Gm-Gg: ASbGnctVG43YZ65hGFI3WizlsCWDNv4To4wVpqv10/dztMWPqXa+dVil+yuqiAtZJtw
-	zd9B8eDoXHSL035PZJ9nGF9QVc4NibDt8zgAYDi1n5RojyoqQfu8veke2V47EpDqKlR2sAi8qXO
-	MiiTrE97ZC5cXzSyugRQcvMBjyraHI0/pxwc5VKvj4Qyllg8c6qNbuYBzpNb5S+r3yyMFOHo8tH
-	SAGWrce+Jnt2apyCOXBNmJSaVls3keS/3ZLnaMLYCRASRn2Z0NjZRGEQXB1u6Gcz063jUSC6VrW
-	trrQew==
-X-Google-Smtp-Source: AGHT+IEXjLuBa1sEdPanHbL309t415dJgNNLyYgGBO6Jyc44lhGdhmYjk1F095sezbxN70cTox5t9g==
-X-Received: by 2002:a17:907:7b96:b0:ab7:6c4e:8e52 with SMTP id a640c23a62f3a-ab76c4e9dfdmr429966966b.5.1738839978140;
-        Thu, 06 Feb 2025 03:06:18 -0800 (PST)
-Received: from localhost ([2a03:2880:30ff:2::])
-        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-ab7732e73a4sm82544666b.108.2025.02.06.03.06.17
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 06 Feb 2025 03:06:17 -0800 (PST)
-From: Breno Leitao <leitao@debian.org>
-Date: Thu, 06 Feb 2025 03:05:59 -0800
-Subject: [PATCH net-next v5 8/8] netconsole: docs: Add documentation for
- CPU number auto-population
+        d=1e100.net; s=20230601; t=1738840353; x=1739445153;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=05pulSuSE99qxkmEMmiSEJZyQjWQQwPFcROHf49vxwM=;
+        b=CkTbtLgi/8ox3OKEQ+m9uh5j4L0bxBmo1ZJofcKf1+qsQmpQuy7cH4GPiIxuSZUIK7
+         D1dp/Mg0cDjmWuEjusb0fZUh1XikRhpY3NIJf8rP2vnLWlqo/3QyYMZZfAYAm3Osccun
+         nnCNwIdAD2UtuFMH1jKmYj0oOmRwpPwNQxhMhOvduj8mf1Hm4C47BsOP+Q9DD07Y68Mn
+         uIopnmrzmq+wE/sLZfynXEIxdtaiUe/Tsfu6de2mIjQ2e+wNAa7bfi7c3JVT3PwbYjzW
+         lN1gxmq/fhZNWzexbXumVU1Rq5oXL4jEgh/WZudyCTxPbahlp0ezcpJC71pHHPG9DEB6
+         OfJQ==
+X-Gm-Message-State: AOJu0YwA3FfYzjkwVMkTFKgqnzkpqXAS7XMmtGrl/4KdaVTerzoUnt/P
+	63hkgBrIwTfuHEma9Tx/OIdhOdZs4hv2jKNnpBS+LpRqm0ncjiOuP4cfOqyhNkc=
+X-Gm-Gg: ASbGncucz6Vw51CY9jqNjtU5YgfXjiQsd10uSoGFDYNGGSnwqaBK3+E0/d1E3RiHyb0
+	3p3fPiVtOlu2hcSIJRUyK+sG58p+UeL78HnBS2daeA5JgBfOuJ1IWQOivsXeD+w7zx+j/sHMI4N
+	jhEYvPwcVHvz/Knq9M7c9RE2amFFT3bU8XIBHeA5VNQo2uQvgZw7uZl3vu3Kn3hSjVAKhXuyd1u
+	G5jGvrPny/nUl0uv620Xg7kf+TlCT6I5e+seUmJWnFAIyUEdzRoUPQO5CCJHjLgTi9t7W4lstnN
+	BOUZ+wL2ZRUmFM3z62GD1O748kZxveuXXi6F+nwoPMz5u9RzsGBn3Q4=
+X-Google-Smtp-Source: AGHT+IFMZs9f3ZpCYf49DKZBu3JvAGOtaYOxNomlj0FH/GVBeAlf7NL4aYMnUcimyY7i5fPFrFC/Kg==
+X-Received: by 2002:a05:6000:1aca:b0:388:da10:ff13 with SMTP id ffacd0b85a97d-38db488173fmr4923459f8f.21.1738840353331;
+        Thu, 06 Feb 2025 03:12:33 -0800 (PST)
+Received: from ?IPV6:2001:a61:13fe:9601:597e:3e98:d02:6bc5? ([2001:a61:13fe:9601:597e:3e98:d02:6bc5])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-38dbdd1afcdsm1464978f8f.14.2025.02.06.03.12.32
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 06 Feb 2025 03:12:33 -0800 (PST)
+Message-ID: <b78d0e25-f8cc-43af-90d8-2c7344895d55@suse.com>
+Date: Thu, 6 Feb 2025 12:12:31 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next 2/2] net: mctp: Add MCTP USB transport driver
+To: Jeremy Kerr <jk@codeconstruct.com.au>,
+ Matt Johnston <matt@codeconstruct.com.au>,
+ Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+ Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller"
+ <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>
+Cc: netdev@vger.kernel.org, linux-usb@vger.kernel.org,
+ Santosh Puranik <spuranik@nvidia.com>
+References: <20250206-dev-mctp-usb-v1-0-81453fe26a61@codeconstruct.com.au>
+ <20250206-dev-mctp-usb-v1-2-81453fe26a61@codeconstruct.com.au>
+Content-Language: en-US
+From: Oliver Neukum <oneukum@suse.com>
+In-Reply-To: <20250206-dev-mctp-usb-v1-2-81453fe26a61@codeconstruct.com.au>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
-Message-Id: <20250206-netcon_cpu-v5-8-859b23cc3826@debian.org>
-References: <20250206-netcon_cpu-v5-0-859b23cc3826@debian.org>
-In-Reply-To: <20250206-netcon_cpu-v5-0-859b23cc3826@debian.org>
-To: Andrew Lunn <andrew+netdev@lunn.ch>, 
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
- Simon Horman <horms@kernel.org>, Jonathan Corbet <corbet@lwn.net>, 
- Shuah Khan <shuah@kernel.org>
-Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
- linux-doc@vger.kernel.org, linux-kselftest@vger.kernel.org, 
- rdunlap@infradead.org, Breno Leitao <leitao@debian.org>, 
- kernel-team@meta.com
-X-Mailer: b4 0.14.2
-X-Developer-Signature: v=1; a=openpgp-sha256; l=3210; i=leitao@debian.org;
- h=from:subject:message-id; bh=tamcCxHm3y1DTBqjP1FY4004ODbiDOOle1ZuKGQMC/k=;
- b=owEBbQKS/ZANAwAIATWjk5/8eHdtAcsmYgBnpJea6w5eCWTb5GW4BldBdPwcZG1M0KDuBZcua
- mxmxb3Uq7iJAjMEAAEIAB0WIQSshTmm6PRnAspKQ5s1o5Of/Hh3bQUCZ6SXmgAKCRA1o5Of/Hh3
- bUNID/425UN9lskLXEizCZaIfjB3/tMcvhX6/cNzqJNcQrO/tt3S5x7EoSpWxBaVMUImw9+A7NZ
- vl8rfEDsQkhqIrE4mWbAhPa2WwHbYwj3OIbldhmriysTjtA3a6hdl+klJerN8xnj3Ow1QtMvtBc
- TBy2CPy2hxf+lr5Si92pXeUHXSSR4QGrRWBw+1XONZOqlNpuodUq2uMbmUnn0qtNl9EN6snHXT4
- PDuxHbMSHhKE+mPhdFLmCxdttkr4rT0C6SRDZ0rqI2PJqRXMv7vj7+ve8CN9AK1LpAXQpfCvOGS
- wMjKD+fUegV9xulQxfVD/IGELYrnyYvW8NsARBdnA8wQA65oSCv4xa4+inG3CyY2eDrqvspOEXn
- 86pI6BXxgIN14bzfuhlXFpi74+F2FZULvYBncZ/NgX5ZMH9G7SWCl0uIvMvQC3Ee+gPTy0LcFGi
- PcnXokaoTwL15swRG6oPoNXyRmlYS0F0ew0/DdSVPG9tBg7nqSq/axa6A/gJ8mvHMDPT125/SE2
- 5FV6WCPLCuY4p5VxKNin3ZTQDIfkcqhJFg6KecEhzl8W0bbkhwkgjoopxlcmsEkP213i9llkHUc
- h/+6TMGrkmhNMGdRWnTJZg4DzCcbaXFzfuMk5uH1wG+f1D5vyiTw+68Q7x86dFNr1QGSkZI224t
- QZgn23mBl2yPV4g==
-X-Developer-Key: i=leitao@debian.org; a=openpgp;
- fpr=AC8539A6E8F46702CA4A439B35A3939FFC78776D
 
-Update the netconsole documentation to explain the new feature that
-allows automatic population of the CPU number.
+On 06.02.25 07:48, Jeremy Kerr wrote:
 
-The key changes include introducing a new section titled "CPU number
-auto population in userdata", explaining how to enable the CPU number
-auto-population feature by writing to the "populate_cpu_nr" file in the
-netconsole configfs hierarchy.
+Hi,
 
-This documentation update ensures users are aware of the new CPU number
-auto-population functionality and how to leverage it for better
-demultiplexing and visibility of parallel netconsole output.
+remarks inline.
 
-Signed-off-by: Breno Leitao <leitao@debian.org>
-Reviewed-by: Simon Horman <horms@kernel.org>
----
- Documentation/networking/netconsole.rst | 45 +++++++++++++++++++++++++++++++++
- 1 file changed, 45 insertions(+)
+	Regards
+		Oliver
 
-diff --git a/Documentation/networking/netconsole.rst b/Documentation/networking/netconsole.rst
-index 94c4680fdf3e7e1a0020d11b44547acfd68072a5..84803c59968a3237012fab821f432eb531aba45c 100644
---- a/Documentation/networking/netconsole.rst
-+++ b/Documentation/networking/netconsole.rst
-@@ -17,6 +17,8 @@ Release prepend support by Breno Leitao <leitao@debian.org>, Jul 7 2023
- 
- Userdata append support by Matthew Wood <thepacketgeek@gmail.com>, Jan 22 2024
- 
-+Sysdata append support by Breno Leitao <leitao@debian.org>, Jan 15 2025
-+
- Please send bug reports to Matt Mackall <mpm@selenic.com>
- Satyam Sharma <satyam.sharma@gmail.com>, and Cong Wang <xiyou.wangcong@gmail.com>
- 
-@@ -238,6 +240,49 @@ Delete `userdata` entries with `rmdir`::
- 
-    It is recommended to not write user data values with newlines.
- 
-+CPU number auto population in userdata
-+--------------------------------------
-+
-+Inside the netconsole configfs hierarchy, there is a file called
-+`cpu_nr` under the `userdata` directory. This file is used to enable or disable
-+the automatic CPU number population feature. This feature automatically
-+populates the CPU number that is sending the message.
-+
-+To enable the CPU number auto-population::
-+
-+  echo 1 > /sys/kernel/config/netconsole/target1/userdata/cpu_nr
-+
-+When this option is enabled, the netconsole messages will include an additional
-+line in the userdata field with the format `cpu=<cpu_number>`. This allows the
-+receiver of the netconsole messages to easily differentiate and demultiplex
-+messages originating from different CPUs, which is particularly useful when
-+dealing with parallel log output.
-+
-+Example::
-+
-+  echo "This is a message" > /dev/kmsg
-+  12,607,22085407756,-;This is a message
-+   cpu=42
-+
-+In this example, the message was sent by CPU 42.
-+
-+.. note::
-+
-+   If the user has set a conflicting `cpu` key in the userdata dictionary,
-+   both keys will be reported, with the kernel-populated entry appearing after
-+   the user one. For example::
-+
-+     # User-defined CPU entry
-+     mkdir -p /sys/kernel/config/netconsole/target1/userdata/cpu
-+     echo "1" > /sys/kernel/config/netconsole/target1/userdata/cpu/value
-+
-+   Output might look like::
-+
-+     12,607,22085407756,-;This is a message
-+      cpu=1
-+      cpu=42    # kernel-populated value
-+
-+
- Extended console:
- =================
- 
+> +static void mctp_usb_in_complete(struct urb *urb)
+> +{
+> +	struct sk_buff *skb = urb->context;
+> +	struct net_device *netdev = skb->dev;
+> +	struct pcpu_dstats *dstats = this_cpu_ptr(netdev->dstats);
+> +	struct mctp_usb *mctp_usb = netdev_priv(netdev);
+> +	struct mctp_skb_cb *cb;
+> +	unsigned int len;
+> +	int status;
+> +
+> +	status = urb->status;
+> +
+> +	switch (status) {
+> +	case -ENOENT:
+> +	case -ECONNRESET:
+> +	case -ESHUTDOWN:
+> +	case -EPROTO:
+> +		kfree_skb(skb);
+> +		return;
+> +	case 0:
+> +		break;
+> +	default:
+> +		dev_err(&mctp_usb->usbdev->dev, "%s: urb status: %d\n",
+> +			__func__, status);
+> +		kfree_skb(skb);
+> +		return;
+> +	}
+> +
+> +	len = urb->actual_length;
+> +	__skb_put(skb, len);
+> +
+> +	while (skb) {
+> +		struct sk_buff *skb2 = NULL;
+> +		struct mctp_usb_hdr *hdr;
+> +		u8 pkt_len; /* length of MCTP packet, no USB header */
+> +
+> +		hdr = skb_pull_data(skb, sizeof(*hdr));
+> +		if (!hdr)
+> +			break;
+> +
+> +		if (be16_to_cpu(hdr->id) != MCTP_USB_DMTF_ID) {
 
--- 
-2.43.5
+It would be more efficient to do the conversion on the constant
 
+> +			dev_dbg(&mctp_usb->usbdev->dev, "%s: invalid id %04x\n",
+> +				__func__, be16_to_cpu(hdr->id));
+> +			break;
+> +		}
+> +
+> +		if (hdr->len <
+> +		    sizeof(struct mctp_hdr) + sizeof(struct mctp_usb_hdr)) {
+> +			dev_dbg(&mctp_usb->usbdev->dev,
+> +				"%s: short packet (hdr) %d\n",
+> +				__func__, hdr->len);
+> +			break;
+> +		}
+> +
+> +		/* we know we have at least sizeof(struct mctp_usb_hdr) here */
+> +		pkt_len = hdr->len - sizeof(struct mctp_usb_hdr);
+> +		if (pkt_len > skb->len) {
+> +			dev_dbg(&mctp_usb->usbdev->dev,
+> +				"%s: short packet (xfer) %d, actual %d\n",
+> +				__func__, hdr->len, skb->len);
+> +			break;
+> +		}
+> +
+> +		if (pkt_len < skb->len) {
+> +			/* more packets may follow - clone to a new
+> +			 * skb to use on the next iteration
+> +			 */
+> +			skb2 = skb_clone(skb, GFP_ATOMIC);
+> +			if (skb2) {
+> +				if (!skb_pull(skb2, pkt_len)) {
+> +					kfree_skb(skb2);
+> +					skb2 = NULL;
+> +				}
+> +			}
+> +			skb_trim(skb, pkt_len);
+
+This is functional. Though in terms of algorithm you are copying
+the same data multiple times.
+
+> +		}
+> +
+> +		skb->protocol = htons(ETH_P_MCTP);
+> +		skb_reset_network_header(skb);
+> +		cb = __mctp_cb(skb);
+> +		cb->halen = 0;
+> +		netif_rx(skb);
+> +
+> +		u64_stats_update_begin(&dstats->syncp);
+> +		u64_stats_inc(&dstats->rx_packets);
+> +		u64_stats_add(&dstats->rx_bytes, skb->len);
+> +		u64_stats_update_end(&dstats->syncp);
+> +
+> +		skb = skb2;
+> +	}
+> +
+> +	if (skb)
+> +		kfree_skb(skb);
+> +
+> +	mctp_usb_rx_queue(mctp_usb);
+> +}
+> +
+> +static int mctp_usb_open(struct net_device *dev)
+> +{
+> +	struct mctp_usb *mctp_usb = netdev_priv(dev);
+> +
+> +	return mctp_usb_rx_queue(mctp_usb);
+
+This will needlessly use GFP_ATOMIC
+
+> +}
+
+[..]
+
+> +static int mctp_usb_probe(struct usb_interface *intf,
+> +			  const struct usb_device_id *id)
+> +{
+> +	struct usb_endpoint_descriptor *ep_in, *ep_out;
+> +	struct usb_host_interface *iface_desc;
+> +	struct net_device *netdev;
+> +	struct mctp_usb *dev;
+> +	int rc;
+> +
+> +	/* only one alternate */
+> +	iface_desc = intf->cur_altsetting;
+> +
+> +	rc = usb_find_common_endpoints(iface_desc, &ep_in, &ep_out, NULL, NULL);
+> +	if (rc) {
+> +		dev_err(&intf->dev, "invalid endpoints on device?\n");
+> +		return rc;
+> +	}
+> +
+> +	netdev = alloc_netdev(sizeof(*dev), "mctpusb%d", NET_NAME_ENUM,
+> +			      mctp_usb_netdev_setup);
+> +	if (!netdev)
+> +		return -ENOMEM;
+> +
+> +	SET_NETDEV_DEV(netdev, &intf->dev);
+> +	dev = netdev_priv(netdev);
+> +	dev->netdev = netdev;
+> +	dev->usbdev = usb_get_dev(interface_to_usbdev(intf));
+
+Taking a reference.
+Where is the corresponding put?
+
+> +	dev->intf = intf;
+> +	usb_set_intfdata(intf, dev);
+> +
+> +	dev->ep_in = ep_in->bEndpointAddress;
+> +	dev->ep_out = ep_out->bEndpointAddress;
+> +
+> +	dev->tx_urb = usb_alloc_urb(0, GFP_KERNEL);
+> +	dev->rx_urb = usb_alloc_urb(0, GFP_KERNEL);
+> +	if (!dev->tx_urb || !dev->rx_urb) {
+> +		rc = -ENOMEM;
+> +		goto err_free_urbs;
+> +	}
+> +
+> +	rc = register_netdev(netdev);
+> +	if (rc)
+> +		goto err_free_urbs;
+> +
+> +	return 0;
+> +
+> +err_free_urbs:
+> +	usb_free_urb(dev->tx_urb);
+> +	usb_free_urb(dev->rx_urb);
+> +	free_netdev(netdev);
+> +	return rc;
+> +}
 
