@@ -1,148 +1,88 @@
-Return-Path: <netdev+bounces-163358-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-163360-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 792F1A29FBB
-	for <lists+netdev@lfdr.de>; Thu,  6 Feb 2025 05:44:07 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 89843A29FCB
+	for <lists+netdev@lfdr.de>; Thu,  6 Feb 2025 05:48:39 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 5658A18826F4
-	for <lists+netdev@lfdr.de>; Thu,  6 Feb 2025 04:44:12 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D75E93A98B8
+	for <lists+netdev@lfdr.de>; Thu,  6 Feb 2025 04:48:30 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F0F24156C5E;
-	Thu,  6 Feb 2025 04:44:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0C33618C035;
+	Thu,  6 Feb 2025 04:48:35 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="arf/i6/t"
+	dkim=pass (1024-bit key) header.d=linux.microsoft.com header.i=@linux.microsoft.com header.b="PRpDxkhX"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f54.google.com (mail-wm1-f54.google.com [209.85.128.54])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 106D95B211
-	for <netdev@vger.kernel.org>; Thu,  6 Feb 2025 04:44:01 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.54
+Received: from linux.microsoft.com (linux.microsoft.com [13.77.154.182])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9E3A818A6A8;
+	Thu,  6 Feb 2025 04:48:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=13.77.154.182
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1738817043; cv=none; b=ePtkelpUjvWjyI00TWUq0gTcxAI+ZeGDM71aP5Zv8dorN/Ofp8IpB5uhQZuoNN7RTTXl8FFjvVpMqQPgldizeN8OAaAZfnizL6T60kp15NcgTc/nehZuc/ysgcg7Q1JoQNf5JjmXrRybTqfJzMTveZ4ZYjdHQzfIqy1dKggkZ58=
+	t=1738817314; cv=none; b=V8BDJujkm5nGKDR4ZldD8RgULJwC4CX9oO62LbL0F0H6BbrDC91ZJgkqPJFPFggtraU+9rSq/KLBUV/cEgHKtoMX7b891v4ajenl0QrutIZzfxl5CXbcHTT78uR2iwernphsaYhnGbLeB8h03BYR7BNMv0gZp9Y4t2zj89y9W10=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1738817043; c=relaxed/simple;
-	bh=XajYIlq4+0ks+mg4p+aIPvD6U9mjVlXfFcjc+tEoIRg=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=M/eca61FSMQyp7t+wd/L2rpkgggNjXiZoaXyQQDtpk/Sn1pOOmVB5uud6qRRj/7Mzya1S5Az1DEou7c3OB9FF8KWv2pWQk9vsemanjMTFzlSezNlmjANKTd5vUxHkSfWJ7h5LX0cXbX+a8O8thhM9g28jY6F9TBX+BZ4ufB1jk4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=arf/i6/t; arc=none smtp.client-ip=209.85.128.54
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-wm1-f54.google.com with SMTP id 5b1f17b1804b1-4361d5730caso13035e9.1
-        for <netdev@vger.kernel.org>; Wed, 05 Feb 2025 20:44:01 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1738817040; x=1739421840; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=XajYIlq4+0ks+mg4p+aIPvD6U9mjVlXfFcjc+tEoIRg=;
-        b=arf/i6/tfyLA8pYxDdJ5kMVZPbJWdzpszo6686x6lX3Df6mM9kVyc0BbhI6rWr7vnu
-         qtl64rLb1jnMgxJypp0mvknqd6VUiAVlg8nhBV/5n78NiETKTBWMbaF5Um4s10Wleeqb
-         3LzLJcSKii86SOPe+YcRc5SMx2KmbqPGUdqGDe1jxGEBF435vP1Z07RmiWamC2WBrCDa
-         F+ckCEowhMPexnsRYDuU9TPpuuw5+4LLUN8qT0lUiz+d9fE6Vpgr0hLL/UJG6u4yZ5wD
-         A1DfOvHoEXfZ9a/pbXiypN967T0cPz6GAVBuY8sFvHPFMIGyWKuJ7jXjgV4tOBFINQY8
-         J87g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1738817040; x=1739421840;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=XajYIlq4+0ks+mg4p+aIPvD6U9mjVlXfFcjc+tEoIRg=;
-        b=FU41SO8nmZcglTS8NxbPNZUpOiUj/4Io0dIbGeZIhxU1+TCnF2FYDfC9X64aiQQR4t
-         OcLNjiaoY6yFvi1xLNJ6JwhXEY/dKHBZApNxtd8stnEkts9XgOIggCQERjjwyFR4iiGN
-         9I1hxYRX+tR5rHq4Ej+ETbQHwrTn+hGsSnTcCPy1ZpXoIhvrk5GzNDSl0F/W5aj4HYX5
-         JU1dhyw765b5dqRDerzBl4x1jNaF21WH5e8kh+RvefCjYUqPULJskwlgIa802iqWDnCz
-         r8LVsrwFYR6lWtG0OBvLxjWziAQ9sf8LcPlqXajqmVTMhtcqGxa+NsL6ONjphP5yVuyB
-         Ac7Q==
-X-Forwarded-Encrypted: i=1; AJvYcCUXYhzegkna7LJ0UxEiOOqGdmu3zTN94MRIHFHNYrhwKMOWraIZFqXpfYtg4UU0yL5hulsTO70=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwNsurxErSpEg7+BgKF+bSBbDB1BEmnyIaNKXKX9+mL0k8nJqTj
-	vF4BiU5skl6M6nhABHkK7iqCJKUYOgv6Xw6eOcPCP65QTJIpPaVO/V7BUj++fnBnZxoEhhd5lWv
-	EN7FS/vkbgeEUo1oC6L73sjOubAt8NHeyqbJI
-X-Gm-Gg: ASbGncuxnlFyZlhL6071tzqTNaw2SnY7uNIHXeAlKH0Dk+K3m/aDFeUTTCSGS+6n3Li
-	dDqcOsH1kqvzZ9syn6RjClBidHfchlMwntU4mqBaCW8HdzMZNkG8rIUB56B6MVkB7mvP+wWFwFK
-	Jg/LwrZoEP517T9H4lMUInfir5znGHtQ==
-X-Google-Smtp-Source: AGHT+IG2HIUnj/yy5PRmLtzyvKmIbb1xtWCvCZkjyStYNB4TY/LcxF+FzLEMunWkvzajMsXpBmoE6vfoJ099bBdp7Vw=
-X-Received: by 2002:a05:600c:1d14:b0:434:a0fd:95d9 with SMTP id
- 5b1f17b1804b1-4391a84fb20mr351235e9.5.1738817040102; Wed, 05 Feb 2025
- 20:44:00 -0800 (PST)
+	s=arc-20240116; t=1738817314; c=relaxed/simple;
+	bh=MNi7mcAWBRDY2SSGt0bepZ81pQN0hFOvCIGNtZNDud0=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=OO2qUVfk8p8FuKEZESOP1WV7TElRsnLBsWB9SOxmxZTJA+XhH0ORLJ6azhv087Q6vmV7j4rY+gKbGIIFH24B5Jzkzkv06B0QnfvXt95z4JDyiL0snpeGSoH6dZ8Q7X2WkRmGLJxPDHk3hVUu7jVVrd5s+jQcLHVz9qcxP7tBcss=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.microsoft.com; spf=pass smtp.mailfrom=linux.microsoft.com; dkim=pass (1024-bit key) header.d=linux.microsoft.com header.i=@linux.microsoft.com header.b=PRpDxkhX; arc=none smtp.client-ip=13.77.154.182
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.microsoft.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.microsoft.com
+Received: by linux.microsoft.com (Postfix, from userid 1134)
+	id D513F20BCAF2; Wed,  5 Feb 2025 20:48:32 -0800 (PST)
+DKIM-Filter: OpenDKIM Filter v2.11.0 linux.microsoft.com D513F20BCAF2
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.microsoft.com;
+	s=default; t=1738817312;
+	bh=OWuupa1UaQmJt5ljiVVqvWF1YiE/WgToQRN8ScivRUw=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=PRpDxkhXHW6UiaI19CMB9sPZjhSuXDlEzclqTsmZ7PYbwazSRRjEO8D9ljTSdtyBB
+	 5gHij1UMy0QLHvEeAq3mI2IfK8orY2Y+cNBb4PGvoVOjZTzJnvNE8Xu45utJ03DN0J
+	 zdSxw1oo7VLbWtY70Wdx74a9qrmjyPNdUq4GNggw=
+Date: Wed, 5 Feb 2025 20:48:32 -0800
+From: Shradha Gupta <shradhagupta@linux.microsoft.com>
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: linux-hyperv@vger.kernel.org, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	"K. Y. Srinivasan" <kys@microsoft.com>,
+	Haiyang Zhang <haiyangz@microsoft.com>,
+	Wei Liu <wei.liu@kernel.org>, Dexuan Cui <decui@microsoft.com>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
+	Long Li <longli@microsoft.com>,
+	Konstantin Taranov <kotaranov@microsoft.com>,
+	Souradeep Chakrabarti <schakrabarti@linux.microsoft.com>,
+	Erick Archer <erick.archer@outlook.com>,
+	Shradha Gupta <shradhagupta@microsoft.com>
+Subject: Re: [PATCH 2/2] hv_netvsc: Use VF's tso_max_size value when data
+ path is VF
+Message-ID: <20250206044832.GA3614@linuxonhyperv3.guj3yctzbm1etfxqx2vob5hsef.xx.internal.cloudapp.net>
+References: <1738729257-25510-1-git-send-email-shradhagupta@linux.microsoft.com>
+ <1738729316-25922-1-git-send-email-shradhagupta@linux.microsoft.com>
+ <20250205184319.360d2ca0@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250205001052.2590140-1-skhawaja@google.com> <772affea-8d44-43ab-81e6-febaf0548da1@uwaterloo.ca>
- <CAAywjhQM4BLXX55Kh0XQ_NqYv8sJVWBfPfSZMb7724_3DrsjjA@mail.gmail.com>
- <Z6Pg6Ye5ZbzMlBeP@LQ3V64L9R2> <b2c7d2dc-595f-4cae-ab00-61b89243fc9e@uwaterloo.ca>
-In-Reply-To: <b2c7d2dc-595f-4cae-ab00-61b89243fc9e@uwaterloo.ca>
-From: Samiullah Khawaja <skhawaja@google.com>
-Date: Wed, 5 Feb 2025 20:43:48 -0800
-X-Gm-Features: AWEUYZlq4EJ_siL6Tp4e9YYEoif0RsZTsfT5Flt7RJ4SpGLFgIb-zRC_IiczLDQ
-Message-ID: <CAAywjhS69zRTBM7ZLNR08kL+anYuffppzU5ZuNORxKGQgo7_TA@mail.gmail.com>
-Subject: Re: [PATCH net-next v3 0/4] Add support to do threaded napi busy poll
-To: Martin Karsten <mkarsten@uwaterloo.ca>
-Cc: Joe Damato <jdamato@fastly.com>, Jakub Kicinski <kuba@kernel.org>, 
-	"David S . Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
-	Paolo Abeni <pabeni@redhat.com>, almasrymina@google.com, netdev@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250205184319.360d2ca0@kernel.org>
+User-Agent: Mutt/1.5.21 (2010-09-15)
 
-On Wed, Feb 5, 2025 at 5:15=E2=80=AFPM Martin Karsten <mkarsten@uwaterloo.c=
-a> wrote:
->
-> On 2025-02-05 17:06, Joe Damato wrote:
-> > On Wed, Feb 05, 2025 at 12:35:00PM -0800, Samiullah Khawaja wrote:
-> >> On Tue, Feb 4, 2025 at 5:32=E2=80=AFPM Martin Karsten <mkarsten@uwater=
-loo.ca> wrote:
-> >>>
-> >>> On 2025-02-04 19:10, Samiullah Khawaja wrote:
->
-> [snip]
->
-> >>> Note that I don't dismiss the approach out of hand. I just think it's
-> >>> important to properly understand the purported performance improvemen=
-ts.
-> >> I think the performance improvements are apparent with the data I
-> >> provided, I purposefully used more sockets to show the real
-> >> differences in tail latency with this revision.
-> >
-> > Respectfully, I don't agree that the improvements are "apparent." I
-> > think my comments and Martin's comments both suggest that the cover
-> > letter does not make the improvements apparent.
-> >
-> >> Also one thing that you are probably missing here is that the change
-> >> here also has an API aspect, that is it allows a user to drive napi
-> >> independent of the user API or protocol being used.
-> >
-> > I'm not missing that part; I'll let Martin speak for himself but I
-> > suspect he also follows that part.
->
-> Yes, the API aspect is quite interesting. In fact, Joe has given you
-> pointers how to split this patch into multiple incremental steps, the
-> first of which should be uncontroversial.
->
-> I also just read your subsequent response to Joe. He has captured the
-> relevant concerns very well and I don't understand why you refuse to
-> document your complete experiment setup for transparency and
-> reproducibility. This shouldn't be hard.
-I think I have provided all the setup details and pointers to
-components. I appreciate that you want to reproduce the results and If
-you really really want to set it up then start by setting up onload on
-your platform. I cannot provide a generic installer script for onload
-that _claims_ to set it up on an arbitrary platform (with arbitrary
-NIC and environment). If it works on your platform (on top of AF_XDP)
-then from that point you can certainly build neper and run it using
-the command I shared.
->
-> To be clear: I would like to reproduce the experiments and then engage
-> in a meaningful discussion about the pros and cons of this mechanism,
-> but right now I need to speculate and there's no point in arguing
-> speculation vs. assertions.
->
-> Thanks,
-> Martin
->
+On Wed, Feb 05, 2025 at 06:43:19PM -0800, Jakub Kicinski wrote:
+> On Tue,  4 Feb 2025 20:21:55 -0800 Shradha Gupta wrote:
+> > Therefore, we use netif_set_tso_max_size() to set max segment size
+> 
+> I think the term "segment" is used incorrectly throughout the patch ?
+> Isn't the right term "superframe", "aggregate" or some such ?
+
+Thanks Jakub, I think you are right. 'aggregate' or 'aggregated pkt'
+would be a more accurate term. I'll have this incorporated in the next
+version.
+
+> -- 
+> pw-bot: cr
 
