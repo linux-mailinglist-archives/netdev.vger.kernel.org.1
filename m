@@ -1,230 +1,107 @@
-Return-Path: <netdev+bounces-163431-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-163432-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0B3BDA2A3A5
-	for <lists+netdev@lfdr.de>; Thu,  6 Feb 2025 09:54:55 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8D004A2A3AC
+	for <lists+netdev@lfdr.de>; Thu,  6 Feb 2025 09:55:54 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id DBA9C1881C81
-	for <lists+netdev@lfdr.de>; Thu,  6 Feb 2025 08:54:59 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 331713A8022
+	for <lists+netdev@lfdr.de>; Thu,  6 Feb 2025 08:54:53 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C18D7225792;
-	Thu,  6 Feb 2025 08:54:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2401B22578E;
+	Thu,  6 Feb 2025 08:55:00 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Wiu/wDul"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="GB5DOncZ"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-oa1-f50.google.com (mail-oa1-f50.google.com [209.85.160.50])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 909422248AF;
-	Thu,  6 Feb 2025 08:54:49 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 90B71222570
+	for <netdev@vger.kernel.org>; Thu,  6 Feb 2025 08:54:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.50
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1738832089; cv=none; b=CvR+4fZcT4n8E/dVyJmEbKMEkNl+fTK3+iMai9CXFIcSb8ZT5G/7VSzAcdBL+xBnDKmeqDIM9FEfMd3lj1GgcB7smCbvDBeRKFQzfQFg+QU9qvZwslBGWx/A69HDidagh4mMyYtO4V/fiHrb5ILipsPboQFYwg59Jp4q7TKhWc0=
+	t=1738832100; cv=none; b=fKMTJOFy4naM3ilKT5zySO6PzSQQL69mKFbZ3Qy078yP60iZCSVDmNnAsQwetUVvOlOKS8PDK7F423l1twKli017sXTzJzRXhhvMWFHSeW3WEtMPnBFLiBP/li7iMGP+i0CxtEoLFaVaJpWx0dkUBUXQX21liaDDal/6oXlHGoY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1738832089; c=relaxed/simple;
-	bh=yULdxGqmQ06JbHuTh2NwOIHtkfoYPeXquDIDEV+zq3A=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=V8vcpOFLfS3S+rzt1EVeG/5UNiW1sJGx9nSnKOQzxafcMOum+PHvfExnf1grZ+h2jjv+1sqPUK23qw2kEOIFpWjQWdLbDcRE6ixwuiALiGqGDW8T0kIRCEHGanxhAZJbedw+tKk7byMolWZAU4T6ZZF+353T718R0BSKtdxfvlI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Wiu/wDul; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5944CC4CEDD;
-	Thu,  6 Feb 2025 08:54:48 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1738832089;
-	bh=yULdxGqmQ06JbHuTh2NwOIHtkfoYPeXquDIDEV+zq3A=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=Wiu/wDulu4gSCxASFwwD1coOYNpze48vT261YPsNdXwWfAtCOALgHZHXBNL+crSLH
-	 iGotaThdawnMRYinh/yaO/wm9kInQAifQaDwIu4+EROEmHS9rRFaMuAIjA4t5HjAv/
-	 KUGlw5pT+cgpcQGJw4pqHQZgCI5Rst/1Rgp/GSEYnxXAwyM0HS+aMRoTVzTG+DO9yM
-	 edZjU/8A8vCz2ntZxkRN+oXActOuYAXlENKVCsR6HxOkNUSERw1irTJRDvG0PJ57Wr
-	 hxDREJBYp0BlTflvZGI8439Ne0nKKUG0TJI9DfrIFxYcM+LOPmLRauyv1oAVewMNF6
-	 tUcfZMfg2pPFQ==
-Date: Thu, 6 Feb 2025 10:54:43 +0200
-From: Leon Romanovsky <leon@kernel.org>
-To: Bharat Bhushan <bharatb.linux@gmail.com>
-Cc: Steffen Klassert <steffen.klassert@secunet.com>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	Ayush Sawal <ayush.sawal@chelsio.com>,
-	Bharat Bhushan <bbhushan2@marvell.com>,
-	Eric Dumazet <edumazet@google.com>,
-	Geetha sowjanya <gakula@marvell.com>,
-	hariprasad <hkelam@marvell.com>,
-	Herbert Xu <herbert@gondor.apana.org.au>,
-	intel-wired-lan@lists.osuosl.org, Jakub Kicinski <kuba@kernel.org>,
-	Jay Vosburgh <jv@jvosburgh.net>, Jonathan Corbet <corbet@lwn.net>,
-	linux-doc@vger.kernel.org, linux-rdma@vger.kernel.org,
-	Louis Peens <louis.peens@corigine.com>, netdev@vger.kernel.org,
-	oss-drivers@corigine.com, Paolo Abeni <pabeni@redhat.com>,
-	Potnuri Bharat Teja <bharat@chelsio.com>,
-	Przemek Kitszel <przemyslaw.kitszel@intel.com>,
-	Saeed Mahameed <saeedm@nvidia.com>,
-	Subbaraya Sundeep <sbhatta@marvell.com>,
-	Sunil Goutham <sgoutham@marvell.com>,
-	Tariq Toukan <tariqt@nvidia.com>,
-	Tony Nguyen <anthony.l.nguyen@intel.com>,
-	Ilia Lin <ilia.lin@kernel.org>
-Subject: Re: [PATCH ipsec-next 1/5] xfrm: delay initialization of offload
- path till its actually requested
-Message-ID: <20250206085443.GO74886@unreal>
-References: <cover.1738778580.git.leon@kernel.org>
- <e536ca28cd1686dfbb613de7ccfc01fbe5a734e4.1738778580.git.leon@kernel.org>
- <CAAeCc_kfRt8LhKgRmLsaaSmJs94hjH85DxCjEnJA6OQc5S5XXw@mail.gmail.com>
+	s=arc-20240116; t=1738832100; c=relaxed/simple;
+	bh=Wcu7Ed3WxWpIZTpgSe4AEYA4xjESjcUxk4eT3EboN9I=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=hRpICjR8001rLbRcKRVpAG4eV5TSFBI581NTegMUoNavBVS1VM2+Z7VKGrKwEoMeNtvSCpsdEwyPMad01JiYCiExXsjZvUzuuOjcSDvetFAcJei49HKjWcFqnLcUGyJyrMfaXekLxXr8WiDqrIYlEgPSKFGVPROQ6HqZBdMxaYM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=GB5DOncZ; arc=none smtp.client-ip=209.85.160.50
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-oa1-f50.google.com with SMTP id 586e51a60fabf-2b7f9158b97so191018fac.2
+        for <netdev@vger.kernel.org>; Thu, 06 Feb 2025 00:54:58 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1738832097; x=1739436897; darn=vger.kernel.org;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=Wcu7Ed3WxWpIZTpgSe4AEYA4xjESjcUxk4eT3EboN9I=;
+        b=GB5DOncZn5AjQ+Io6yWJ3mrNe3T3Aw1oVoXwtIvvI/6/x0JnXCWtac1y2bUDB0g6Ci
+         yjEj/gaq207/Bf+H5iJGr6dx5aupkAFo63H+jTl2z3SStC7b2s3L/BtCuex6nO0A5v3k
+         9J0XhG+5SbVGt5FDcNcnXLpEZGh5xWeWQtk15IudlsRALygWFPTvVL0l91p4/fDnJzJX
+         7jmqDWCkoQSM6uif3fr+XR3gAUzvOV3rf2WRwAkv51pkMjIg9a1GXlX8sS2xXwc85cVa
+         cb6aW9/QF8EOvgA4S8F5NI9NzyqBZfa8Q2/+sPXzSYhLQ8HVtkPqKEsdt3zljil8W4F5
+         w0FA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1738832097; x=1739436897;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=Wcu7Ed3WxWpIZTpgSe4AEYA4xjESjcUxk4eT3EboN9I=;
+        b=KGJ2l5h3xrT0+JX1VpoUNPgwz8tXltPPkipuvlY/pFREWWNj02Da89qqE3CdOMZTdM
+         V1dSrQbT+35tTTPoJfDxK94f270fsL50PfVqOmhy8hz3OSEnHChplt5WXWRCzs5jyy+8
+         LDaFMDP5L/AST5PhUr9BlqAFmH0SFJUzCXHITVcX9M3AmhiqAnr6oA3ZTwxT37KAANKi
+         jX9CD5Z3lULMZTPLEWjq/RAh/hJZqNcTpzdR6uv+jGFenx6xEJL9IkQilVHfj6LpuTKY
+         z7s5DWI+GGaS1odjgWyWoBo3zlZkLNbS8YIjbccovcssD2ZRtGQ389tZFgIYbyjC9p+8
+         uvfQ==
+X-Forwarded-Encrypted: i=1; AJvYcCUAG1KihVkQ1Fixgkq5ybMMpLus435LV8LGZYQKxF/hVaUJ/7iAosP/lNtsWToMaXMNbLg4R/E=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyZfjl+wDv6sodY+O5IFdysaEx8JbVVtmu4uYpdtLYMuYL3VUR/
+	4gK5DNM+OGiBG+gq4k70O30gSdabe2Y50e5NwZ2UpYMT1GseTGJ8hqWVpJZUJPmjDwvFNiqdbte
+	JYCEKs7eliXiYqYW/bQcZLO+abiU=
+X-Gm-Gg: ASbGnctAOcK8iNp9czEEwyhKISkTNteVYiv92x8ouE0V6zlH6QO1icQlPE8XnlygznH
+	ASEpWuK4EoLMu8gXQkRnUAO6ExhVlLkrzQya7CXyqFuzEI4r46uoqqyFtRa7Mqjf8d+4lZRf70x
+	lJQFr/j0fngXabBRtCeP4WCZfdpmU=
+X-Google-Smtp-Source: AGHT+IE6ccwu8UuDUNkbctOquhUxWNSWqyNVSV7RAVNH+aYOtdH3ep0JQw+KwE7JppLBin90c2DlmJtqy3enbnYfwTM=
+X-Received: by 2002:a05:6870:41cd:b0:29d:c624:7cad with SMTP id
+ 586e51a60fabf-2b804ed55e4mr3944559fac.3.1738832097527; Thu, 06 Feb 2025
+ 00:54:57 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <CAAeCc_kfRt8LhKgRmLsaaSmJs94hjH85DxCjEnJA6OQc5S5XXw@mail.gmail.com>
+References: <20250205173352.446704-1-kuba@kernel.org>
+In-Reply-To: <20250205173352.446704-1-kuba@kernel.org>
+From: Donald Hunter <donald.hunter@gmail.com>
+Date: Thu, 6 Feb 2025 08:54:46 +0000
+X-Gm-Features: AWEUYZljq0DLqnN1zAv7smsTtZy5IFtLQkQkZlHRf_zgCLQ_QGTvTmexWCw7-Ig
+Message-ID: <CAD4GDZxO8O4L1Zj2gSXZp9utSmKTE4_6AegTKEf=9vqN697-2g@mail.gmail.com>
+Subject: Re: [PATCH net-next] tools: ynl: add all headers to makefile deps
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: davem@davemloft.net, netdev@vger.kernel.org, edumazet@google.com, 
+	pabeni@redhat.com, andrew+netdev@lunn.ch, horms@kernel.org, 
+	danieller@nvidia.com, sdf@fomichev.me
+Content-Type: text/plain; charset="UTF-8"
 
-On Thu, Feb 06, 2025 at 02:16:08PM +0530, Bharat Bhushan wrote:
-> Hi Leon,
-> 
-> On Wed, Feb 5, 2025 at 11:50 PM Leon Romanovsky <leon@kernel.org> wrote:
-> >
-> > From: Leon Romanovsky <leonro@nvidia.com>
-> >
-> > XFRM offload path is probed even if offload isn't needed at all. Let's
-> > make sure that x->type_offload pointer stays NULL for such path to
-> > reduce ambiguity.
-> >
-> > Fixes: 9d389d7f84bb ("xfrm: Add a xfrm type offload.")
-> > Signed-off-by: Leon Romanovsky <leonro@nvidia.com>
-> > ---
-> >  include/net/xfrm.h     | 12 +++++++++++-
-> >  net/xfrm/xfrm_device.c | 14 +++++++++-----
-> >  net/xfrm/xfrm_state.c  | 22 +++++++++-------------
-> >  net/xfrm/xfrm_user.c   |  2 +-
-> >  4 files changed, 30 insertions(+), 20 deletions(-)
+On Wed, 5 Feb 2025 at 17:33, Jakub Kicinski <kuba@kernel.org> wrote:
+>
+> The Makefile.deps lists uAPI headers to make the build work when
+> system headers are older than in-tree headers. The problem doesn't
+> occur for new headers, because system headers are not there at all.
+> But out-of-tree YNL clone on GH also uses this header to identify
+> header dependencies, and one day the system headers will exist,
+> and will get out of date. So let's add the headers we missed.
+>
+> I don't think this is a fix, but FWIW the commits which added
+> the missing headers are:
+>
+> commit 04e65df94b31 ("netlink: spec: add shaper YAML spec")
+> commit 49922401c219 ("ethtool: separate definitions that are gonna be generated")
+>
+> Signed-off-by: Jakub Kicinski <kuba@kernel.org>
 
-<...>
-
-> > +       x->type_offload = xfrm_get_type_offload(x->id.proto, x->props.family);
-> > +       if (!x->type_offload) {
-
-<...>
-
-> > +               xfrm_put_type_offload(x->type_offload);
-> > +               x->type_offload = NULL;
-> 
-> We always set type_offload to NULL. Can we move type_offload = NULL in
-> xfrm_put_type_offload() ?
-
-We can, but it will require change to xfrm_get_type_offload() too,
-otherwise we will get asymmetrical get/put.
-
-Do you want something like that?
-int xfrm_get_type_offload(struct xfrm_state *x);
-void xfrm_put_type_offload(struct xfrm_state *x);
-
-Thansk
-
-> 
-> Thanks
-> -Bharat
-> 
-> >                 /* User explicitly requested packet offload mode and configured
-> >                  * policy in addition to the XFRM state. So be civil to users,
-> >                  * and return an error instead of taking fallback path.
-> > diff --git a/net/xfrm/xfrm_state.c b/net/xfrm/xfrm_state.c
-> > index ad2202fa82f3..568fe8df7741 100644
-> > --- a/net/xfrm/xfrm_state.c
-> > +++ b/net/xfrm/xfrm_state.c
-> > @@ -424,11 +424,12 @@ void xfrm_unregister_type_offload(const struct xfrm_type_offload *type,
-> >  }
-> >  EXPORT_SYMBOL(xfrm_unregister_type_offload);
-> >
-> > -static const struct xfrm_type_offload *
-> > -xfrm_get_type_offload(u8 proto, unsigned short family, bool try_load)
-> > +const struct xfrm_type_offload *xfrm_get_type_offload(u8 proto,
-> > +                                                     unsigned short family)
-> >  {
-> >         const struct xfrm_type_offload *type = NULL;
-> >         struct xfrm_state_afinfo *afinfo;
-> > +       bool try_load = true;
-> >
-> >  retry:
-> >         afinfo = xfrm_state_get_afinfo(family);
-> > @@ -456,11 +457,7 @@ xfrm_get_type_offload(u8 proto, unsigned short family, bool try_load)
-> >
-> >         return type;
-> >  }
-> > -
-> > -static void xfrm_put_type_offload(const struct xfrm_type_offload *type)
-> > -{
-> > -       module_put(type->owner);
-> > -}
-> > +EXPORT_SYMBOL(xfrm_get_type_offload);
-> >
-> >  static const struct xfrm_mode xfrm4_mode_map[XFRM_MODE_MAX] = {
-> >         [XFRM_MODE_BEET] = {
-> > @@ -609,8 +606,6 @@ static void ___xfrm_state_destroy(struct xfrm_state *x)
-> >         kfree(x->coaddr);
-> >         kfree(x->replay_esn);
-> >         kfree(x->preplay_esn);
-> > -       if (x->type_offload)
-> > -               xfrm_put_type_offload(x->type_offload);
-> >         if (x->type) {
-> >                 x->type->destructor(x);
-> >                 xfrm_put_type(x->type);
-> > @@ -784,6 +779,9 @@ void xfrm_dev_state_free(struct xfrm_state *x)
-> >         struct xfrm_dev_offload *xso = &x->xso;
-> >         struct net_device *dev = READ_ONCE(xso->dev);
-> >
-> > +       xfrm_put_type_offload(x->type_offload);
-> > +       x->type_offload = NULL;
-> > +
-> >         if (dev && dev->xfrmdev_ops) {
-> >                 spin_lock_bh(&xfrm_state_dev_gc_lock);
-> >                 if (!hlist_unhashed(&x->dev_gclist))
-> > @@ -3122,7 +3120,7 @@ u32 xfrm_state_mtu(struct xfrm_state *x, int mtu)
-> >  }
-> >  EXPORT_SYMBOL_GPL(xfrm_state_mtu);
-> >
-> > -int __xfrm_init_state(struct xfrm_state *x, bool init_replay, bool offload,
-> > +int __xfrm_init_state(struct xfrm_state *x, bool init_replay,
-> >                       struct netlink_ext_ack *extack)
-> >  {
-> >         const struct xfrm_mode *inner_mode;
-> > @@ -3178,8 +3176,6 @@ int __xfrm_init_state(struct xfrm_state *x, bool init_replay, bool offload,
-> >                 goto error;
-> >         }
-> >
-> > -       x->type_offload = xfrm_get_type_offload(x->id.proto, family, offload);
-> > -
-> >         err = x->type->init_state(x, extack);
-> >         if (err)
-> >                 goto error;
-> > @@ -3229,7 +3225,7 @@ int xfrm_init_state(struct xfrm_state *x)
-> >  {
-> >         int err;
-> >
-> > -       err = __xfrm_init_state(x, true, false, NULL);
-> > +       err = __xfrm_init_state(x, true, NULL);
-> >         if (!err)
-> >                 x->km.state = XFRM_STATE_VALID;
-> >
-> > diff --git a/net/xfrm/xfrm_user.c b/net/xfrm/xfrm_user.c
-> > index 08c6d6f0179f..82a768500999 100644
-> > --- a/net/xfrm/xfrm_user.c
-> > +++ b/net/xfrm/xfrm_user.c
-> > @@ -907,7 +907,7 @@ static struct xfrm_state *xfrm_state_construct(struct net *net,
-> >                         goto error;
-> >         }
-> >
-> > -       err = __xfrm_init_state(x, false, attrs[XFRMA_OFFLOAD_DEV], extack);
-> > +       err = __xfrm_init_state(x, false, extack);
-> >         if (err)
-> >                 goto error;
-> >
-> > --
-> > 2.48.1
-> >
-> >
-> 
+Reviewed-by: Donald Hunter <donald.hunter@gmail.com>
 
