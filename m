@@ -1,46 +1,40 @@
-Return-Path: <netdev+bounces-163451-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-163452-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6633CA2A4AA
-	for <lists+netdev@lfdr.de>; Thu,  6 Feb 2025 10:36:43 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5CCDEA2A4B3
+	for <lists+netdev@lfdr.de>; Thu,  6 Feb 2025 10:37:06 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id BCF727A149C
-	for <lists+netdev@lfdr.de>; Thu,  6 Feb 2025 09:35:47 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 3BFB6168671
+	for <lists+netdev@lfdr.de>; Thu,  6 Feb 2025 09:36:46 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8C5D7226528;
-	Thu,  6 Feb 2025 09:35:05 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D199422759D;
+	Thu,  6 Feb 2025 09:35:10 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from szxga06-in.huawei.com (szxga06-in.huawei.com [45.249.212.32])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A9B1D22652B
-	for <netdev@vger.kernel.org>; Thu,  6 Feb 2025 09:35:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.32
+Received: from foss.arm.com (foss.arm.com [217.140.110.172])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9809E226525;
+	Thu,  6 Feb 2025 09:35:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1738834505; cv=none; b=bS36WxLUKV8Y/vaIMF+F9gzczolSvLdEvghgV2MjmGWoMrvG365uorxs1Q6sXUJwtQ41IPFmpo9zzP06Wl1hnRff6s0qj0c2gqFNc4vpF79i36Gq4AM78HIWtP2P1On9ov82PyY/70HfZQqTPWPb8MB/hFFfJd5BQfIKQ/agOYI=
+	t=1738834510; cv=none; b=PIqJCB/WUI8/ImGan8Q9FAvZGAT/RC36BgctwTkJ+LyN3IL1/4PfVyOFVypw7YAt+x/SEdMGX3Mf8+F4eLZ+UPqmxSLkcT0S+DfvvSxXCZwaXzK89Rq949Nn2PilEfz6F7pzj6uEO0g23cKhWvQSr7BxZc/DiLuxwafWJRuPIc0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1738834505; c=relaxed/simple;
-	bh=xwNW2rnL6WuNu4Bu2mCvnWRTADakVsFtzgL1yVDiAaY=;
-	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
-	 In-Reply-To:Content-Type; b=qMr/aEYWNkbOr3AVe+KKBzW19PqtynIv5C5iHPJwGwb7q8aDMAQYX9EdDc1PVAJa3aPpqOYCFwmxsDfzMa5/Idt3zboC+CyLkkJUOPN/EpZtbpPMdxi0Ypri195s9izBwsVTWiXi/YdMlCjxJl4GaB6+3XtbzJ/rCF4shqafm04=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.32
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
-Received: from mail.maildlp.com (unknown [172.19.88.214])
-	by szxga06-in.huawei.com (SkyGuard) with ESMTP id 4YpX5X1PL7z20q2C;
-	Thu,  6 Feb 2025 17:35:28 +0800 (CST)
-Received: from dggpemf200006.china.huawei.com (unknown [7.185.36.61])
-	by mail.maildlp.com (Postfix) with ESMTPS id ECD251A016C;
-	Thu,  6 Feb 2025 17:34:59 +0800 (CST)
-Received: from [10.67.120.129] (10.67.120.129) by
- dggpemf200006.china.huawei.com (7.185.36.61) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.11; Thu, 6 Feb 2025 17:34:59 +0800
-Message-ID: <76025962-594e-442e-928f-d88ed1d73ab5@huawei.com>
-Date: Thu, 6 Feb 2025 17:34:59 +0800
+	s=arc-20240116; t=1738834510; c=relaxed/simple;
+	bh=SqQ8gnGSj8uW1Bp4Pzd61JpHuw3t5hDau+dUBaAn1eg=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=aMIfxHh0YXYUAFDYnumQX0iHMKBw05fzJVPq0TRivrchxwXDn/4Qh3k+DgB0a/S/eZzK1tVGc87oV2mDXaKAcx7NU++z14sRg2mZPEh+EmUYj7Lh0wYnxG4oMeLtNOVuEBrUnvRO+p4zfD8RHsBbqPi5+yuN8i4A0ozUjsCxdZA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
+Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
+	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 19E8F12FC;
+	Thu,  6 Feb 2025 01:35:31 -0800 (PST)
+Received: from [10.1.30.52] (e122027.cambridge.arm.com [10.1.30.52])
+	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 71C553F63F;
+	Thu,  6 Feb 2025 01:35:05 -0800 (PST)
+Message-ID: <de9aa254-dcfc-4a7d-b89d-79b41649a6b2@arm.com>
+Date: Thu, 6 Feb 2025 09:35:03 +0000
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -48,106 +42,88 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next v8 3/4] enic: Use the Page Pool API for RX
-To: John Daley <johndale@cisco.com>, <benve@cisco.com>, <satishkh@cisco.com>,
-	<andrew+netdev@lunn.ch>, <davem@davemloft.net>, <edumazet@google.com>,
-	<kuba@kernel.org>, <pabeni@redhat.com>, <netdev@vger.kernel.org>
-CC: Nelson Escobar <neescoba@cisco.com>
-References: <20250205235416.25410-1-johndale@cisco.com>
- <20250205235416.25410-4-johndale@cisco.com>
-Content-Language: en-US
-From: Yunsheng Lin <linyunsheng@huawei.com>
-In-Reply-To: <20250205235416.25410-4-johndale@cisco.com>
-Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [PATCH netdev] net: stmmac: dwmac-rk: Provide FIFO sizes for
+ DWMAC 1000
+To: Chen-Yu Tsai <wens@kernel.org>, Andrew Lunn <andrew+netdev@lunn.ch>,
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ Heiko Stuebner <heiko@sntech.de>
+Cc: "Russell King (Oracle)" <rmk+kernel@armlinux.org.uk>,
+ Chen-Yu Tsai <wens@csie.org>,
+ Kunihiko Hayashi <hayashi.kunihiko@socionext.com>, netdev@vger.kernel.org,
+ linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
+ linux-rockchip@lists.infradead.org, stable@vger.kernel.org
+References: <20250204161359.3335241-1-wens@kernel.org>
+From: Steven Price <steven.price@arm.com>
+Content-Language: en-GB
+In-Reply-To: <20250204161359.3335241-1-wens@kernel.org>
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: dggems703-chm.china.huawei.com (10.3.19.180) To
- dggpemf200006.china.huawei.com (7.185.36.61)
 
-On 2025/2/6 7:54, John Daley wrote:
-> The Page Pool API improves bandwidth and CPU overhead by recycling pages
-> instead of allocating new buffers in the driver. Make use of page pool
-> fragment allocation for smaller MTUs so that multiple packets can share
-> a page. For MTUs larger than PAGE_SIZE, adjust the 'order' page
-> parameter so that contiguous pages can be used to receive the larger
-> packets.
+On 04/02/2025 16:13, Chen-Yu Tsai wrote:
+> From: Chen-Yu Tsai <wens@csie.org>
 > 
-> The RQ descriptor field 'os_buf' is repurposed to hold page pointers
-> allocated from page_pool instead of SKBs. When packets arrive, SKBs are
-> allocated and the page pointers are attached instead of preallocating SKBs.
+> The DWMAC 1000 DMA capabilities register does not provide actual
+> FIFO sizes, nor does the driver really care. If they are not
+> provided via some other means, the driver will work fine, only
+> disallowing changing the MTU setting.
 > 
-> 'alloc_fail' netdev statistic is incremented when page_pool_dev_alloc()
-> fails.
+> The recent commit 8865d22656b4 ("net: stmmac: Specify hardware
+> capability value when FIFO size isn't specified") changed this by
+> requiring the FIFO sizes to be provided, breaking devices that were
+> working just fine.
 > 
-> Co-developed-by: Nelson Escobar <neescoba@cisco.com>
-> Signed-off-by: Nelson Escobar <neescoba@cisco.com>
-> Co-developed-by: Satish Kharat <satishkh@cisco.com>
-> Signed-off-by: Satish Kharat <satishkh@cisco.com>
-> Signed-off-by: John Daley <johndale@cisco.com>
+> Provide the FIFO sizes through the driver's platform data, to not
+> only fix the breakage, but also enable MTU changes. The FIFO sizes
+> are confirmed to be the same across RK3288, RK3328, RK3399 and PX30,
+> based on their respective manuals. It is likely that Rockchip
+> synthesized their DWMAC 1000 with the same parameters on all their
+> chips that have it.
+> 
+> Fixes: eaf4fac47807 ("net: stmmac: Do not accept invalid MTU values")
+> Fixes: 8865d22656b4 ("net: stmmac: Specify hardware capability value when FIFO size isn't specified")
+> Cc: <stable@vger.kernel.org>
+> Signed-off-by: Chen-Yu Tsai <wens@csie.org>
+
+I think it's better at this stage to apply the revert first. However
+I've run this on my board (Firefly RK3288) and it works, so when rebased
+onto the (reverted) revert:
+
+Tested-by: Steven Price <steven.price@arm.com>
+
+Thanks,
+Steve
+
 > ---
->  drivers/net/ethernet/cisco/enic/enic.h      |  3 +
->  drivers/net/ethernet/cisco/enic/enic_main.c | 33 +++++++-
->  drivers/net/ethernet/cisco/enic/enic_rq.c   | 94 ++++++++-------------
->  drivers/net/ethernet/cisco/enic/vnic_rq.h   |  2 +
->  4 files changed, 71 insertions(+), 61 deletions(-)
+> The reason for stable inclusion is not to fix the device breakage
+> (which only broke in v6.14-rc1), but to provide the values so that MTU
+> changes can work in older kernels.
 > 
-> diff --git a/drivers/net/ethernet/cisco/enic/enic.h b/drivers/net/ethernet/cisco/enic/enic.h
-> index 10b7e02ba4d0..2ccf2d2a77db 100644
-> --- a/drivers/net/ethernet/cisco/enic/enic.h
-> +++ b/drivers/net/ethernet/cisco/enic/enic.h
-> @@ -17,6 +17,7 @@
->  #include "vnic_nic.h"
->  #include "vnic_rss.h"
->  #include <linux/irq.h>
-> +#include <net/page_pool/helpers.h>
+> Since a fix for stmmac in general has already been sent [1] and a revert
+> was also proposed [2], I'll refrain from sending mine.
+> 
+> [1] https://lore.kernel.org/all/20250203093419.25804-1-steven.price@arm.com/
+> [2] https://lore.kernel.org/all/Z6Clkh44QgdNJu_O@shell.armlinux.org.uk/
+> 
+>  drivers/net/ethernet/stmicro/stmmac/dwmac-rk.c | 5 ++++-
+>  1 file changed, 4 insertions(+), 1 deletion(-)
+> 
+> diff --git a/drivers/net/ethernet/stmicro/stmmac/dwmac-rk.c b/drivers/net/ethernet/stmicro/stmmac/dwmac-rk.c
+> index a4dc89e23a68..71a4c4967467 100644
+> --- a/drivers/net/ethernet/stmicro/stmmac/dwmac-rk.c
+> +++ b/drivers/net/ethernet/stmicro/stmmac/dwmac-rk.c
+> @@ -1966,8 +1966,11 @@ static int rk_gmac_probe(struct platform_device *pdev)
+>  	/* If the stmmac is not already selected as gmac4,
+>  	 * then make sure we fallback to gmac.
+>  	 */
+> -	if (!plat_dat->has_gmac4)
+> +	if (!plat_dat->has_gmac4) {
+>  		plat_dat->has_gmac = true;
+> +		plat_dat->rx_fifo_size = 4096;
+> +		plat_dat->tx_fifo_size = 2048;
+> +	}
+>  	plat_dat->fix_mac_speed = rk_fix_speed;
 >  
->  #define DRV_NAME		"enic"
->  #define DRV_DESCRIPTION		"Cisco VIC Ethernet NIC Driver"
-> @@ -158,6 +159,7 @@ struct enic_rq_stats {
->  	u64 pkt_truncated;		/* truncated pkts */
->  	u64 no_skb;			/* out of skbs */
->  	u64 desc_skip;			/* Rx pkt went into later buffer */
-> +	u64 pp_alloc_fail;		/* page pool alloc failure */
-
-why not consider adding the above to pool->alloc_stats so that other
-drivers doesn't need to implement something similar?
-
->  };
->  
->  struct enic_wq {
-> @@ -169,6 +171,7 @@ struct enic_wq {
->  struct enic_rq {
->  	struct vnic_rq vrq;
->  	struct enic_rq_stats stats;
-> +	struct page_pool *pool;
->  } ____cacheline_aligned;
->  
->  /* Per-instance private data structure */
-> diff --git a/drivers/net/ethernet/cisco/enic/enic_main.c b/drivers/net/ethernet/cisco/enic/enic_main.c
-> index 1d9f109346b8..447c54dcd89b 100644
-> --- a/drivers/net/ethernet/cisco/enic/enic_main.c
-> +++ b/drivers/net/ethernet/cisco/enic/enic_main.c
-> @@ -1736,6 +1736,17 @@ static int enic_open(struct net_device *netdev)
->  	struct enic *enic = netdev_priv(netdev);
->  	unsigned int i;
->  	int err, ret;
-> +	unsigned int max_pkt_len = netdev->mtu + VLAN_ETH_HLEN;
-> +	struct page_pool_params pp_params = {
-> +		.order = get_order(max_pkt_len),
-> +		.pool_size = enic->config.rq_desc_count,
-> +		.nid = dev_to_node(&enic->pdev->dev),
-> +		.dev = &enic->pdev->dev,
-> +		.dma_dir = DMA_FROM_DEVICE,
-> +		.max_len = (max_pkt_len > PAGE_SIZE) ? max_pkt_len : PAGE_SIZE,
-
-Perhaps change the checking to ((max_pkt_len << 1) > PAGE_SIZE) to avoid
-overhead of dma sync operation as much as possible?
-
-Also, there is a similar checking page_pool_alloc(), maybe add an inline
-helper for that checking so that there is a consistent checking for both
-page_pool core and drivers.
-
-> +		.netdev = netdev,
-> +		.flags = PP_FLAG_DMA_MAP | PP_FLAG_DMA_SYNC_DEV,
-> +	};
+>  	plat_dat->bsp_priv = rk_gmac_setup(pdev, plat_dat, data);
 
 
