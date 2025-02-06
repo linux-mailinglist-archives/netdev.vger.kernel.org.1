@@ -1,241 +1,218 @@
-Return-Path: <netdev+bounces-163609-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-163610-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0BBEAA2AEFC
-	for <lists+netdev@lfdr.de>; Thu,  6 Feb 2025 18:36:39 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3176FA2AF06
+	for <lists+netdev@lfdr.de>; Thu,  6 Feb 2025 18:38:25 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 31C627A2927
-	for <lists+netdev@lfdr.de>; Thu,  6 Feb 2025 17:35:43 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 262DB16B77C
+	for <lists+netdev@lfdr.de>; Thu,  6 Feb 2025 17:38:17 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4CA9016DEA9;
-	Thu,  6 Feb 2025 17:36:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0E72E194091;
+	Thu,  6 Feb 2025 17:37:47 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="c0u6NvTg"
+	dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b="TRI6m5Ik"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
+Received: from NAM04-DM6-obe.outbound.protection.outlook.com (mail-dm6nam04on2054.outbound.protection.outlook.com [40.107.102.54])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A57D3239569;
-	Thu,  6 Feb 2025 17:36:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.156.1
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1738863392; cv=none; b=mT6t11v2bHOiCH4b7AmURmPVhZhXioo5jNjJVdtKjPYEVJ0pHUubMEhauXWrEusbmpbdm49dUok/eO+OReeabJJl3bdaKuDiCueOq70vJ8CeRrvMcCXsLmDVhWG9SUHKaf4Iozo6xo6nytzPgtoPu7vMJXnvJc5HUinguGwxar8=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1738863392; c=relaxed/simple;
-	bh=d4gBXBu4ap4WuzCeqgPtbkDNvVvzmqMNjC9rIdF5Y6s=;
-	h=Mime-Version:Content-Type:Date:Message-Id:To:Cc:Subject:From:
-	 References:In-Reply-To; b=cocc7JQavFR97Bq4pWYXKry2Uf1SVNpD8O1afFeJFTyMYdxRAKdMOBFWGKjDzsBzvLeo43396XGUSCj76dMYhY5tlfZ9+diEaePOmkZeasVs+1qLWZi5v6ZemN5ajuvH38HmQzgKisTSrD4M7cMsGmGXDl45AYhtk6t7IbSVFbc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=c0u6NvTg; arc=none smtp.client-ip=148.163.156.1
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
-Received: from pps.filterd (m0353729.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 516ESKgh020344;
-	Thu, 6 Feb 2025 17:36:22 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
-	:content-transfer-encoding:content-type:date:from:in-reply-to
-	:message-id:mime-version:references:subject:to; s=pp1; bh=syYJ/e
-	u8dhsmwgEpaRbh4JJJ7WxUlNJv4JPugmKe2gY=; b=c0u6NvTgHIjEulRvHFLCif
-	rxrJ2j6YqYVuQVLS8/Q5/CX1+gZrQg0d2kGs4RxM+RvEnirYrRikDqC+HE/qEy0l
-	9nFQwgY9zBWGSo5UWO04n8zezIGyPt8lqo1VVfbT5gbmrwyQDaLeIqhqlxF8RPCL
-	ELTy3yhbCASW9kIW3Q1p3ORHj7J2e1KVvf1ZjrT9lCDew0B0E04qZlP2B6FvRizb
-	Qs4CMDH+kW/uGqDD3C5ZG5T+Pc4gacbG7vH+nkYO0lSDyfSQs29EFHMmQdcxQy6T
-	RW/c5+S8nBYO6UsEVAMEG644IQ+eO69BlcwuHFszA1xtHgzza6WUEmuT38LFmg9w
-	==
-Received: from pps.reinject (localhost [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 44mpw83rhk-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Thu, 06 Feb 2025 17:36:21 +0000 (GMT)
-Received: from m0353729.ppops.net (m0353729.ppops.net [127.0.0.1])
-	by pps.reinject (8.18.0.8/8.18.0.8) with ESMTP id 516HYwxu026990;
-	Thu, 6 Feb 2025 17:36:21 GMT
-Received: from ppma11.dal12v.mail.ibm.com (db.9e.1632.ip4.static.sl-reverse.com [50.22.158.219])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 44mpw83rhe-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Thu, 06 Feb 2025 17:36:21 +0000 (GMT)
-Received: from pps.filterd (ppma11.dal12v.mail.ibm.com [127.0.0.1])
-	by ppma11.dal12v.mail.ibm.com (8.18.1.2/8.18.1.2) with ESMTP id 516GaDgC021474;
-	Thu, 6 Feb 2025 17:36:20 GMT
-Received: from smtprelay06.fra02v.mail.ibm.com ([9.218.2.230])
-	by ppma11.dal12v.mail.ibm.com (PPS) with ESMTPS id 44j0n1q4x1-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Thu, 06 Feb 2025 17:36:20 +0000
-Received: from smtpav06.fra02v.mail.ibm.com (smtpav06.fra02v.mail.ibm.com [10.20.54.105])
-	by smtprelay06.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 516HaGns34931278
-	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Thu, 6 Feb 2025 17:36:16 GMT
-Received: from smtpav06.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 9D695200DC;
-	Thu,  6 Feb 2025 17:36:16 +0000 (GMT)
-Received: from smtpav06.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 5F441200DB;
-	Thu,  6 Feb 2025 17:36:16 +0000 (GMT)
-Received: from localhost (unknown [9.152.212.252])
-	by smtpav06.fra02v.mail.ibm.com (Postfix) with ESMTP;
-	Thu,  6 Feb 2025 17:36:16 +0000 (GMT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 59F9B192D83;
+	Thu,  6 Feb 2025 17:37:44 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.102.54
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1738863466; cv=fail; b=OI3lfmtJAFHzUelOUbF1has7Ok9sbDBk922XhzLACzjPwUgavg6/JSqB1JSA+kDmQ6rCsXL8qWyH5U+3jmPqTCD22G0PHWcxE6fXQE+jSP8MHiVuy9Zm9g7VqN/mvKseyWMOnfQZ02lqtf6UdxpMAxWiJOI0HFGOIOErVcc5Hs4=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1738863466; c=relaxed/simple;
+	bh=MtBOnLR8qpOcj/w809dj3z23vorsxvPCLuy5xJY5k2Y=;
+	h=Message-ID:Date:Subject:To:References:From:In-Reply-To:
+	 Content-Type:MIME-Version; b=VSOVpn4uQHzAIWhUD06prcncDD8bEZDCzBU4w0j+ibvo3HkxcCix9DbK7BL979d6SrVeWsBA3s+JVh+CaTX8NGElFFUznOZYdenTYb8xUstJMmj1uOWLcLVqEE8ZN1JcBjk1XpNDgPQCy2ASN4CqCOmW9CszY5xNSOMWlmP2WCU=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com; spf=fail smtp.mailfrom=amd.com; dkim=pass (1024-bit key) header.d=amd.com header.i=@amd.com header.b=TRI6m5Ik; arc=fail smtp.client-ip=40.107.102.54
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amd.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=amd.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=VZo+eI25tqJIdK5nWcid1cSAxrY6vHPe3FaKsAH94EGnXVRsHq9E4cROerKNlm9i1hbao+ZOxNOX1x8IObPhvyLEmnJEajOOSmaSsC0SN5qTBBOLRLxZYFWjKG9qYIKQpRMnIkXKGgO6hazC1DuJsOnAoDnl8SQd2bGHhSt+jNED96ol7VRqL7aSuWpfIT9Iwq6eNSH3H8Myw9llASwD5ciWRGu4q+HEOL8/X2G7dagXK7v7v0PNzxVySwbDAkOzlirCwKnbXVi/4nk5C6BcRFG44uW+vauQPMQmBuy2mdpXgWJ++7tQeLjyGfhkz7TxQAazWK2lNIBjGnMGVW0t5Q==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=2XqJyt7nUhwuj+jXpS+TjcZbwSYBok8gT0CnznnFako=;
+ b=hoeZ9zyRQwsJM4Buo3lNVaMUgRGNRB9SFZ+eThdQfaFkGoQ/rC+HOW+c5sZxdgPtbTk5+pEzx0/EullFj/P6PPDXxgvREKWBoRbnE1y1CBH7ke6/V8NEo79TSBxfSmh2vbwheDnOcFkEL4Z9bUOeLsrAlw6Zm4GKve3urt9dhuIZZdMGzWA2vYmuYdCjjgUSpeJ/SPNruK3tldmHdyurGn6eJJK6979JewM0UkuaWW4v7vlNxOly2O4i+1pTgdmQS9iCAOkIcaDqYIYIPakaLmN9KfWAy9efLhTvFNmtrCzTi7iVL743EUQoD6qGuxqIa+J/ZYi31tq2GfINtPc4AA==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
+ header.d=amd.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=2XqJyt7nUhwuj+jXpS+TjcZbwSYBok8gT0CnznnFako=;
+ b=TRI6m5IkPsBY+yPinPnW6Rts1JKcEusMe7l1fCbN9H5CxNdTxGn/agWcU0wtGoGtcayPs6JEmgMSRw9Rzqc7ArXmUcQKU4+Sp3j4T96608IxT+ryA97CV61Ib6SkHco9xsETiOI1a1RXkBvn5LRVvXL6QYNLro9O3/ACBkyV38k=
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=amd.com;
+Received: from DM6PR12MB4202.namprd12.prod.outlook.com (2603:10b6:5:219::22)
+ by SN7PR12MB7021.namprd12.prod.outlook.com (2603:10b6:806:262::16) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8422.10; Thu, 6 Feb
+ 2025 17:37:40 +0000
+Received: from DM6PR12MB4202.namprd12.prod.outlook.com
+ ([fe80::f943:600c:2558:af79]) by DM6PR12MB4202.namprd12.prod.outlook.com
+ ([fe80::f943:600c:2558:af79%6]) with mapi id 15.20.8422.012; Thu, 6 Feb 2025
+ 17:37:40 +0000
+Message-ID: <5cd8ee3d-c764-403d-9b9b-bca268b33383@amd.com>
+Date: Thu, 6 Feb 2025 17:37:31 +0000
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v8 01/27] cxl: add type2 device basic support
+To: Dan Williams <dan.j.williams@intel.com>, alejandro.lucero-palau@amd.com,
+ linux-cxl@vger.kernel.org, netdev@vger.kernel.org, martin.habets@xilinx.com,
+ edward.cree@amd.com, davem@davemloft.net, kuba@kernel.org,
+ pabeni@redhat.com, edumazet@google.com, dave.jiang@intel.com
+References: <20241216161042.42108-1-alejandro.lucero-palau@amd.com>
+ <20241216161042.42108-2-alejandro.lucero-palau@amd.com>
+ <677dbbd46e630_2aff42944@dwillia2-xfh.jf.intel.com.notmuch>
+ <677dd5ea832e6_f58f29444@dwillia2-xfh.jf.intel.com.notmuch>
+ <c3812ef0-dd17-a6f5-432a-93d98aff70b7@amd.com>
+ <92e3b256-b660-5074-f3aa-c8ab158fcb8b@amd.com>
+ <6786eab3a124c_20f3294f4@dwillia2-xfh.jf.intel.com.notmuch>
+ <67a3c49e1a6ef_2d2c29487@dwillia2-xfh.jf.intel.com.notmuch>
+Content-Language: en-US
+From: Alejandro Lucero Palau <alucerop@amd.com>
+In-Reply-To: <67a3c49e1a6ef_2d2c29487@dwillia2-xfh.jf.intel.com.notmuch>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: TLZP290CA0013.ISRP290.PROD.OUTLOOK.COM (2603:1096:950:9::6)
+ To DM6PR12MB4202.namprd12.prod.outlook.com (2603:10b6:5:219::22)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Content-Transfer-Encoding: quoted-printable
-Content-Type: text/plain; charset=UTF-8
-Date: Thu, 06 Feb 2025 18:36:16 +0100
-Message-Id: <D7LJMF6OMXFQ.1ADL6WMIWIQ5C@linux.ibm.com>
-To: "Alexandra Winter" <wintera@linux.ibm.com>,
-        "Wenjia Zhang"
- <wenjia@linux.ibm.com>,
-        "Jan Karcher" <jaka@linux.ibm.com>,
-        "Gerd Bayer"
- <gbayer@linux.ibm.com>,
-        "Halil Pasic" <pasic@linux.ibm.com>,
-        "D. Wythe"
- <alibuda@linux.alibaba.com>,
-        "Tony Lu" <tonylu@linux.alibaba.com>,
-        "Wen Gu"
- <guwen@linux.alibaba.com>,
-        "Peter Oberparleiter" <oberpar@linux.ibm.com>,
-        "David Miller" <davem@davemloft.net>,
-        "Jakub Kicinski" <kuba@kernel.org>, "Paolo Abeni" <pabeni@redhat.com>,
-        "Eric Dumazet" <edumazet@google.com>,
-        "Andrew Lunn" <andrew+netdev@lunn.ch>
-Cc: "Niklas Schnelle" <schnelle@linux.ibm.com>,
-        "Thorsten Winkler"
- <twinkler@linux.ibm.com>, <netdev@vger.kernel.org>,
-        <linux-s390@vger.kernel.org>, "Heiko Carstens" <hca@linux.ibm.com>,
-        "Vasily
- Gorbik" <gor@linux.ibm.com>,
-        "Alexander Gordeev" <agordeev@linux.ibm.com>,
-        "Christian Borntraeger" <borntraeger@linux.ibm.com>,
-        "Sven Schnelle"
- <svens@linux.ibm.com>,
-        "Simon Horman" <horms@kernel.org>
-Subject: Re: [RFC net-next 5/7] net/ism: Move ism_loopback to net/ism
-From: "Julian Ruess" <julianr@linux.ibm.com>
-X-Mailer: aerc 0.20.1
-References: <20250115195527.2094320-1-wintera@linux.ibm.com>
- <20250115195527.2094320-6-wintera@linux.ibm.com>
-In-Reply-To: <20250115195527.2094320-6-wintera@linux.ibm.com>
-X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: PBypoT_HftuRHrn1cpTmtdkwj9djft2b
-X-Proofpoint-ORIG-GUID: RvArULKGIkziuQeR2QU1yV2L_4QgVtRR
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1057,Hydra:6.0.680,FMLib:17.12.68.34
- definitions=2025-02-06_05,2025-02-05_03,2024-11-22_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 lowpriorityscore=0
- suspectscore=0 spamscore=0 impostorscore=0 mlxscore=0 bulkscore=0
- phishscore=0 priorityscore=1501 clxscore=1015 mlxlogscore=735 adultscore=0
- malwarescore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.19.0-2501170000 definitions=main-2502060141
+MIME-Version: 1.0
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: DM6PR12MB4202:EE_|SN7PR12MB7021:EE_
+X-MS-Office365-Filtering-Correlation-Id: bd0896d2-32c1-4242-d4c0-08dd46d4f3e8
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;ARA:13230040|366016|1800799024|376014|921020;
+X-Microsoft-Antispam-Message-Info:
+	=?utf-8?B?UkdySHV0ZkQyY3lRL0x2cm5Xd0NtQ3BnQ1RmRVgzWk9nQS9UZ0dQeVpXenRi?=
+ =?utf-8?B?ZXVESUQrS2VjM0JxOUEyd1JzcEF0V0E1V001dkMvaFVFRHdUK3k4NWFKclpq?=
+ =?utf-8?B?cGM4aVA3SEhCZDlCUjhMSUdFbFFyVDU1blZOejF2TlFiZlR6SzFkOU5tcTcz?=
+ =?utf-8?B?ZjhVWWxhT2dqNU5kaDBRWnFLSmRMRzAwNlFBWFJ3dW9yOTNrUzFSVkJGQm1J?=
+ =?utf-8?B?cXUwb3pWMmlNaEVrWkIxbXpyT01xWktueWpuWVhNNXlSNGE5elRPUUdodnpP?=
+ =?utf-8?B?emFoU2VFOFU3QVVHeDFvZzh4S09CMUdUNzMza1FxZW90VDFpVkFiZWM3MUR0?=
+ =?utf-8?B?NHJxK0IvZ0EvYzNnUGZnckhnbEZkaVRFUk90d0lHWXJlelQzcFNRUDkrdnVn?=
+ =?utf-8?B?TU9KcW1rdkxKeTkzODVlUnZ4eWJybXV3azFhbFJvM2Z6Y3RCdUhacjY2V0p0?=
+ =?utf-8?B?K2JMUWI5Wlc5aGVRTWNwemhMV0w4ZFJONkhFakxJL1lpRjJsSE5sSUhZNDYz?=
+ =?utf-8?B?VDBNSERUQkJPS204b0taaUl3NTRTTTdFcDB6MWFUK0tsMW8wMHJWNWtmQTJ5?=
+ =?utf-8?B?bXhFbm1vY2hELzliOVNOanNXVDBQMWRsOXhTeSt4TUdBUWdEV2tXRWEvWXgv?=
+ =?utf-8?B?eGlob3h3VXY1MEc1OGVWcldiL2dmNzk0REZibEh0a0liQktEQ2NUbFg1bDdj?=
+ =?utf-8?B?YWJoY3pLeW1UVWRqM3RsTFBzSyt3NXFUUTd1WGcremxvUER1ZjRENElwRW13?=
+ =?utf-8?B?K2tqeG5FbHNPTTVoV0krOHZneFVVTi8vMXVmZ0t5SldBa3JQTnZjeDNVc3ln?=
+ =?utf-8?B?WDNKTlZZU09TeERLOWordHhDRm1lUEVkRC9lV0FZVEk1UUExQVBoZ2hiMDND?=
+ =?utf-8?B?VFFRdzZOYkdBZ0czUElkTEdkdEVkOTFBb1AwM2FTcjYwblVUc0VlbGZxTlhS?=
+ =?utf-8?B?aGF6K2pKK3RndUxWdUsyYnBxdzgzZVRYLzZFdWp6Tnh5MVdxUnExVmhoa1gy?=
+ =?utf-8?B?SzhqUEg3Q0xheGVyNzYxKzdEVnp5bW1lbVBYOTdYbW9TMllHd251QnhOWm9Q?=
+ =?utf-8?B?MG9rWnBHMm01U1pWeEFkd2hjdGZ3ZUhpNHFnWmNDd0IreHp6YUlTaGQ0RUtQ?=
+ =?utf-8?B?dDRpdFBPa1Y5MGp3bUVmUlptS25LT29UK0loOHU0RU1UTGZZSVMxTnRiemRp?=
+ =?utf-8?B?Y2JSZGcvMXltNVFzSXlGeDduMlFtZUwyRnUyVjVNZGRjWjJkaW9jVW5GN2NW?=
+ =?utf-8?B?MlM3bmwvZGNhbDM3alA3WHlVOUtJR0FyZnlkQUk2V3dZU1RMcUF3K3FYSTRI?=
+ =?utf-8?B?Sm94cTlmZUhVK1dmOVYrQnN5L2FrTW9OMkhOb2VKdi9VTklTakJjQlJlVU9O?=
+ =?utf-8?B?ejU2TGdBQVkwVXRKRXFKUGFudEYycnRFZ0wydXNmb3hINGl6T0VvYnlxampa?=
+ =?utf-8?B?a3d6YVQ1bldRNFJIaWtGT1hua3kzYUJPcFQ0OFlEQ1hoNVZVTGQ5cW4wTmto?=
+ =?utf-8?B?Qm5zNEJLdThYeTh4ZDVTanQvZGJHNlI2Q2RlSjlUcGkreENaUVdEK001U05E?=
+ =?utf-8?B?cExOWEtBNnpzblAvMEtYUXJoREYzOWNua0kxRThJK3YxQ0gxelRBMXdOYXRS?=
+ =?utf-8?B?Uk9vVVMwZlpTbGEzQmEyTktoa2Mvcmc4YnRsRm1PbnJrRXJIUnprRjluMVQ3?=
+ =?utf-8?B?ZUFGK2NkTGJjbFVqNE9DZTNiemw4ZG05cGtydWpZSDFjUnRUNXcrbnQ3cTdL?=
+ =?utf-8?B?Z29WckFIMHRwRHdhdi92cFltYzUrMHNQWFNtYWN2WFE0WjRnTnVGYmd2T1RF?=
+ =?utf-8?B?ckhMczQyWHAvMkV3dHpsKzMzekFvUmc4aDdaT2ROeFZRQVFkQjVPT3ZKeHps?=
+ =?utf-8?Q?QMH5yIABCzSGl?=
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DM6PR12MB4202.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(366016)(1800799024)(376014)(921020);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?utf-8?B?MjRLVG9TY0RMTEdqdkFrMmQrSzJKbUtJVXZSTFpXeHY1SktFZXppRGUrQ0x0?=
+ =?utf-8?B?S1AzY1M2N1NGa3h2YzFEM0c1OW5yL3hMU2FZQU1UaWZoVVByUTJUVW13dGlo?=
+ =?utf-8?B?MCs4R0l1c2RuZzlrV1Y2SEJXamJWWFN3aW9HV0NmZUtUSURXVUJocGQwRjUr?=
+ =?utf-8?B?VmtBSW9KS095WXdYbk8xU0lBWTQzSFBERDJWVVc5c2hodjVjT0oyZHU3cEZh?=
+ =?utf-8?B?RUZKS2JuWXFtN2puYks0OFdkQjdvTjlFM1g0bnJCOTJWSGlpL1hyNiswNitx?=
+ =?utf-8?B?TnJyTklua2tBanZNbTZYYUlyUjE3WDFldzJKeG5GUUc3V2dpMkVLT1U2MjNT?=
+ =?utf-8?B?aTJrY0UyaGoySXd1c3YxdDgwTHh3RlFPYlp0UGVYdml1ek42YnJ2dWIwYkVh?=
+ =?utf-8?B?eFRKdlg5V2orL1Y5QVVSYTUyYjdKMitKNGtoMXI4dnZVMXFiT1JYSEhpSXA2?=
+ =?utf-8?B?RG1POUFsRVk4QlUwYnA0NStNbmxWNStGUXZSV0J6TTNOWEZZY2RLT1VoeVNv?=
+ =?utf-8?B?VEkvc09rQ1NDSk1mZlZKbWt3bW9TRSs5UGtLSTdUNG42WXJuRXpYVUkzWnNn?=
+ =?utf-8?B?akN4cmR1VUNCMXlUb3F5V1FRVEdXVmpVTXQ3UDlaUHgxM0xXNnVvMVFuS2po?=
+ =?utf-8?B?bkdLRFgvU2NGbEREZVIwTE9DekVLRGtBNGQvYm9UVXEvRUlEOTgvMGtadnYr?=
+ =?utf-8?B?MXhVOUlaQmREVnJmSWpDNGZ1UVQveUViek1jcEVKN1Rra0tzZEE3VkRMc1FM?=
+ =?utf-8?B?L25SRXlaY2R3SUlnRnBxUXgzL1FTVUVWd3crNGFGeWx0L0tEZElhK1JxUGFZ?=
+ =?utf-8?B?T0tNL0VoZFA0am5Wa0N4T1p1QkpIZ0k3c0RwUlNKa3UxY2MvcytLaXlHV0pn?=
+ =?utf-8?B?Z0Y3V01JQlFmR1N0R1E1RTlqaUNxUStia1daL3NXVWlYRC9ETGNIOEFMQmFj?=
+ =?utf-8?B?eTRrZlYvS1FZQ09jTE4wWmwybzFUd1A3TjJTRFZ2ODdKOGt2MFJIOHhzWjV5?=
+ =?utf-8?B?TjdmeFJNSVJVQkFRRE5iY0EvOU10eWtiU2pPcVZpZ2tIUVpsZmliM003Unk5?=
+ =?utf-8?B?bVp0Rzd0MTN2azdFU01CNjFBaUxkRFkwTmRZQzJBa2trbFF0ZEF2OGtncU5B?=
+ =?utf-8?B?bDBHMUhMUTJXUy9WeDl6ajBIVnU2aEhRdTZib2I2ZHptMmtZcGZndzBTeHFD?=
+ =?utf-8?B?OGtXejN4RVRPNlRPNzNBY2t0VjZmWENrUngrWDFKUXV0NHJ4QnpGZTdudkY3?=
+ =?utf-8?B?ZDFiMnpnUDlFRXZlWnZjNWdQeHo0aW5JbDlaT1R1VHpHTmRLNVpudW00c2Nv?=
+ =?utf-8?B?SHJCSVVLQTN6VW91K2U3N2FEUTZtTnVEeWgrVFRoSmtHQU1Mb2NydHBXRmlB?=
+ =?utf-8?B?YkNxNzJNalhHOUFDc3hlZGFtTlpHQTlEUVBwaTdHNExvN3kvUnlXN2piNlVq?=
+ =?utf-8?B?VDc2NjYyd1c5Yks1cENjQ2p0Zk9NWWhpZGpvek0yYUIvQUljd2czRUI2aHVi?=
+ =?utf-8?B?NXhzY2N5VS90c2t3YUVDa3lHMjdpSFI0VVVRaDZsZlY0NXpzdUZLSXJET2pn?=
+ =?utf-8?B?RlpYQlExaUptNmZwUEl5L3dIQzRnTGRuc2dnSTVwcjdJMmNPSkpuR0cvL29q?=
+ =?utf-8?B?K2srK2FPcHFmNzVjeWNqQnhlTW01Qk01b1liM2M3TDJpR1lCQS9ZMGFYNi9F?=
+ =?utf-8?B?TVJjSElkQStsWVpjZFl1clpXRXQyR2NINEZ3R1JCTWplTVhsZDVPdDZGbXRE?=
+ =?utf-8?B?ZlQrTmlvT0J0aVY5NXRReFJMWk1tczlrS1RoQ1VvSUhzNmRzaFBGTnpaQmkr?=
+ =?utf-8?B?clJQU2VXMVlEWmlnM0FXak9VODRPYll1THFoZGZxZjJhZTZucFpTNzlDbkc3?=
+ =?utf-8?B?ZUE1Y1AzTG14dXpqa1M0akhpUXA0QkkwTFJlMDNVR0FFS21Gb0ZkcnlBeHc1?=
+ =?utf-8?B?c3ViSTB0YmtDUkFJVFQzN3ZXZ1hYQ0FHeUdqTld6T0JFYXd3TThvUmZaNjFl?=
+ =?utf-8?B?bjhITk54Q1hPV1Z6YkFXNFVMYklPdkNJY1c2VzJnY2N4dWRadDNsNEhyem1V?=
+ =?utf-8?B?YzgvOXFmbEY5Y0kwZ2xoSVJBYVJZQzYvN2RDNEphY3hEVFptZ1ZZZUVMWnhh?=
+ =?utf-8?Q?U4QXOM+RzvUe13RKWHiyuGJ21?=
+X-OriginatorOrg: amd.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: bd0896d2-32c1-4242-d4c0-08dd46d4f3e8
+X-MS-Exchange-CrossTenant-AuthSource: DM6PR12MB4202.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 06 Feb 2025 17:37:40.1084
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: fFNS5TZkwG0uvylYMw7cj+Yl4SyKG0vqXdlirR4ieQWceXhyE733VrZcuWFPExfJ7eI1+u30XWc4CWW6Wr2gCA==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SN7PR12MB7021
 
-On Wed Jan 15, 2025 at 8:55 PM CET, Alexandra Winter wrote:
-> The first stage of ism_loopback was implemented as part of the
-> SMC module [1]. Now that we have the ism layer, provide
-> access to the ism_loopback device to all ism clients.
->
-> Move ism_loopback.* from net/smc to net/ism.
-> The following changes are required to ism_loopback.c:
-> - Change ism_lo_move_data() to no longer schedule an smcd receive tasklet=
-,
-> but instead call ism_client->handle_irq().
-> Note: In this RFC patch ism_loppback is not fully generic.
->   The smc-d client uses attached buffers, for moves without signalling.
->   and not-attached buffers for moves with signalling.
->   ism_lo_move_data() must not rely on that assumption.
->   ism_lo_move_data() must be able to handle more than one ism client.
->
-> In addition the following changes are required to unify ism_loopback and
-> ism_vp:
->
-> In ism layer and ism_vpci:
-> ism_loopback is not backed by a pci device, so use dev instead of pdev in
-> ism_dev.
->
-> In smc-d:
-> in smcd_alloc_dev():
-> - use kernel memory instead of device memory for smcd_dev and smcd->conn.
->         An alternative would be to ask device to alloc the memory.
-> - use different smcd_ops and max_dmbs for ism_vp and ism_loopback.
->     A future patch can change smc-d to directly use ism_ops instead of
->     smcd_ops.
-> - use ism dev_name instead of pci dev name for ism_evt_wq name
-> - allocate an event workqueue for ism_loopback, although it currently doe=
-s
->   not generate events.
->
-> Link: https://lore.kernel.org/linux-kernel//20240428060738.60843-1-guwen@=
-linux.alibaba.com/ [1]
->
-> Signed-off-by: Alexandra Winter <wintera@linux.ibm.com>
-> ---
->  drivers/s390/net/ism.h     |   6 +-
->  drivers/s390/net/ism_drv.c |  31 ++-
->  include/linux/ism.h        |  59 +++++
->  include/net/smc.h          |   4 +-
->  net/ism/Kconfig            |  13 ++
->  net/ism/Makefile           |   1 +
->  net/ism/ism_loopback.c     | 366 +++++++++++++++++++++++++++++++
->  net/ism/ism_loopback.h     |  59 +++++
->  net/ism/ism_main.c         |  11 +-
->  net/smc/Kconfig            |  13 --
->  net/smc/Makefile           |   1 -
->  net/smc/af_smc.c           |  12 +-
->  net/smc/smc_ism.c          | 108 +++++++---
->  net/smc/smc_loopback.c     | 427 -------------------------------------
->  net/smc/smc_loopback.h     |  60 ------
->  15 files changed, 606 insertions(+), 565 deletions(-)
->  create mode 100644 net/ism/ism_loopback.c
->  create mode 100644 net/ism/ism_loopback.h
->  delete mode 100644 net/smc/smc_loopback.c
->  delete mode 100644 net/smc/smc_loopback.h
->
 
-...
+On 2/5/25 20:05, Dan Williams wrote:
+> Dan Williams wrote:
+> [..]
+>> I think there is a benefit from a driver being able to do someting like:
+>>
+>> struct my_cxl_accelerator_context {
+>>      ...
+>>      struct cxl_dev_state cxlds;
+>>      ...
+>> };
+>>
+>> Even if the rule is that direct consumption of 'struct cxl_dev_state'
+>> outside of the cxl core is unwanted.
+>>
+>> C does not make this easy, so it is either make the definition of
+>> 'struct cxl_dev_state' public to CXL accelerator drivers so that they
+>> know the size, or add an allocation API that takes in the extra size
+>> that accelerator needs to allocate the core CXL context.
+> Jason has a novel approach to this problem of defining an allocation
+> interface that lets the caller register a caller provided data structure
+> that wraps a core internal object. Have a look at fwctl_alloc_device()
+> for inspiration:
+>
+> http://lore.kernel.org/1-v3-960f17f90f17+516-fwctl_jgg@nvidia.com
 
-> diff --git a/net/ism/ism_loopback.c b/net/ism/ism_loopback.c
-> new file mode 100644
-> index 000000000000..47e5ef355dd7
-> --- /dev/null
-> +++ b/net/ism/ism_loopback.c
-> @@ -0,0 +1,366 @@
-> +// SPDX-License-Identifier: GPL-2.0
-> +/*
-> + *  Functions for loopback-ism device.
-> + *
-> + *  Copyright (c) 2024, Alibaba Inc.
-> + *
-> + *  Author: Wen Gu <guwen@linux.alibaba.com>
-> + *          Tony Lu <tonylu@linux.alibaba.com>
-> + *
-> + */
-> +
-> +#include <linux/bitops.h>
-> +#include <linux/device.h>
-> +#include <linux/ism.h>
-> +#include <linux/spinlock.h>
-> +#include <linux/types.h>
-> +
-> +#include "ism_loopback.h"
-> +
-> +#define ISM_LO_V2_CAPABLE	0x1 /* loopback-ism acts as ISMv2 */
-> +#define ISM_LO_SUPPORT_NOCOPY	0x1
-> +#define ISM_DMA_ADDR_INVALID	(~(dma_addr_t)0)
-> +
-> +static const char ism_lo_dev_name[] =3D "loopback-ism";
-> +/* global loopback device */
-> +static struct ism_lo_dev *lo_dev;
-> +
-> +static int ism_lo_query_rgid(struct ism_dev *ism, uuid_t *rgid,
-> +			     u32 vid_valid, u32 vid)
-> +{
-> +	/* rgid should be the same as lgid; vlan is not supported */
-> +	if (!vid_valid && uuid_equal(rgid, &ism->gid))
-> +		return 0;
-> +	return -ENETUNREACH;
-> +}
 
-This vid_valid check breaks ism-loopback for me.
+I'm not sure what you mean here, and I just gave a quick look to that 
+reference, but in my opinion, it is quite different userspace triggering 
+some sort of allocation based on some sysfs files giving the relevant 
+information than a kernel driver using an internal kernel API.
+
+
+Anyway, if you have look at v10, I have modified the accel driver 
+allocation for state using the memdev state instead which makes more 
+sense to me. I did use that from your original patch, but it makes 
+things complicated and a Type2 is a memdev after all. The code is 
+cleaner and simpler now.
+
 
