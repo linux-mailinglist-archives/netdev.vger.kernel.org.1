@@ -1,143 +1,98 @@
-Return-Path: <netdev+bounces-163409-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-163411-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5061EA2A34B
-	for <lists+netdev@lfdr.de>; Thu,  6 Feb 2025 09:37:37 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id A7194A2A35D
+	for <lists+netdev@lfdr.de>; Thu,  6 Feb 2025 09:40:31 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 9D0527A46E3
-	for <lists+netdev@lfdr.de>; Thu,  6 Feb 2025 08:36:17 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id EF9203A3978
+	for <lists+netdev@lfdr.de>; Thu,  6 Feb 2025 08:40:22 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B3FBE225796;
-	Thu,  6 Feb 2025 08:36:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 457C7225768;
+	Thu,  6 Feb 2025 08:40:28 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="WKv5X9MI"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="PyGuF2S5"
 X-Original-To: netdev@vger.kernel.org
-Received: from out-178.mta0.migadu.com (out-178.mta0.migadu.com [91.218.175.178])
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.11])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2453C22541D;
-	Thu,  6 Feb 2025 08:36:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.178
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6779B2253F1
+	for <netdev@vger.kernel.org>; Thu,  6 Feb 2025 08:40:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.11
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1738831017; cv=none; b=L/t0qAMrCe64G2JJmr+xSDNQp7AcYwDpwaLE6K6JQRbx8/OiQFf/NCHxQAFYC0ZdrkrLwuPVhXgnRzBPk/CjSH1dVIyMB7tbD4jMqZl9cCeX0vCRWPGiA0F3v43JP10pJuF81tyEZD1ICwzx70DHnTqPXM8AQvsWwbruVQKNJKQ=
+	t=1738831228; cv=none; b=nGoPW3fS+cVUg60uydj1GdhfSlBwNoTHrzhRWmE2cTqqbqufnOFOj01qSDVLxZSB/D4/1ER1b/fOqHKEDd/VLhfwaGTTPh1Eh1UKo/4C6KmLu8AuxqILq/uqjrHACFXTTtatb9PIix4r+NGMqu+oT9pp735ZavNpXDKCI3q5Fjg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1738831017; c=relaxed/simple;
-	bh=jt8ujfaC69ia9GkYnhjdl7obavX9X7/hAPGeTpwe05E=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=oV31xGfsjCWI9H7HBcYchtVQX+DzmBS1uJAHechwqZWN21lcN85S6Z1N1nh4hF+1kAvqw0XphQAxO0fAbJGti7ebsybFFz4tUmkIPyOC6BiuMIn9pLCxiiKpjVxbJMcMUs+kDB4Xw8Z1zGS/aaZXb1X2FGiuXOmWYBZMOgvYodc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=WKv5X9MI; arc=none smtp.client-ip=91.218.175.178
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
-Message-ID: <d9901633-956d-48f2-8b10-d18a760cc5f4@linux.dev>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1738831007;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=O0u7DtVaCKa1n9NpquVUnz53jEcq0GDnVDDM9No824o=;
-	b=WKv5X9MIWoa7/iH3XGn5KcvmHnpEWI2BQrND0bJwAJa/aPZioiuviE8wzagJxwiwzgwY9E
-	I2Z790Wvgi685juZ+sCufb/tV78TPkPbjpf798EKiPXxJT2qLgSuiZHOUXQ7IwScwgJbkq
-	eRmzLQC4dEVciZ+IDRPpCJKmt96l5bc=
-Date: Thu, 6 Feb 2025 16:36:41 +0800
+	s=arc-20240116; t=1738831228; c=relaxed/simple;
+	bh=di+hvTmQjctnKvY30xevDPGzRJy0W/wSEhqMf8pXGV8=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=pAA6KESSmSdUjTAGr/vAGwS1Ln3dr2ZNZrG8qI6rTuaxeD5S5SFkip4hiow0QC2wDOG5NUIHXPsZk5fs/Lm7nHXMVoWsG/Kxb6s/IyD72CSqxUtiaURsFUl8RnLbbZO37r27z1lJfScMHT4drgvMOP7Mk8J98tVx/95rE0agVwM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=PyGuF2S5; arc=none smtp.client-ip=198.175.65.11
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1738831226; x=1770367226;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=di+hvTmQjctnKvY30xevDPGzRJy0W/wSEhqMf8pXGV8=;
+  b=PyGuF2S5rZ+Qhw+EmCfpzOdah/qOFrzSe6xKzD8Q7giSjDaTUFvdFe6T
+   4/um0XPrKHtF2IL0wZpEeuTgdPy4b5nTAeMN8zjf/uChNlvHrJZgpSQ9b
+   moIRSYUStMU3lHBXcC59YImb8Jt1z/ZUhUlj1NjuXUEdMQV8v+h0zdgBb
+   J/6xGjTbIf/GPdLyqNBYrKYhpu6tPMG311sNjW/hz+OLdQlftGrQDHGOg
+   2Y4zC7H6f4WBZwmcr/5iyWNytTiDVNbcN+LRt4FlHVugMlf7Vyz3B23xG
+   l7yNZ3kAqJzuISKe4RQgtW032MtkN/NvlXAImu9XEPgmt1u7oQjkex9bG
+   g==;
+X-CSE-ConnectionGUID: gVi00x47QqaoQQP7KBHjpw==
+X-CSE-MsgGUID: MC3tDWDhShaprwNW5g6l2w==
+X-IronPort-AV: E=McAfee;i="6700,10204,11336"; a="49667818"
+X-IronPort-AV: E=Sophos;i="6.13,264,1732608000"; 
+   d="scan'208";a="49667818"
+Received: from fmviesa006.fm.intel.com ([10.60.135.146])
+  by orvoesa103.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 06 Feb 2025 00:40:26 -0800
+X-CSE-ConnectionGUID: iOFVivvQRuOli/LD+8maIQ==
+X-CSE-MsgGUID: sL4QVyujShCKT/m8CYcQ8g==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.13,264,1732608000"; 
+   d="scan'208";a="110979363"
+Received: from gklab-003-001.igk.intel.com ([10.211.3.1])
+  by fmviesa006.fm.intel.com with ESMTP; 06 Feb 2025 00:40:24 -0800
+From: Grzegorz Nitka <grzegorz.nitka@intel.com>
+To: intel-wired-lan@lists.osuosl.org
+Cc: netdev@vger.kernel.org,
+	anthony.l.nguyen@intel.com,
+	przemyslaw.kitszel@intel.com,
+	Grzegorz Nitka <grzegorz.nitka@intel.com>
+Subject: [PATCH iwl-next v1 0/3] E825C PTP cleanup
+Date: Thu,  6 Feb 2025 09:36:52 +0100
+Message-Id: <20250206083655.3005151-1-grzegorz.nitka@intel.com>
+X-Mailer: git-send-email 2.39.3
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Subject: Re: [PATCH] net: stmmac: dwmac-loongson: Add fix_soc_reset function
-To: Qunqin Zhao <zhaoqunqin@loongson.cn>
-Cc: kuba@kernel.org, andrew+netdev@lunn.ch, davem@davemloft.net,
- edumazet@google.com, pabeni@redhat.com, chenhuacai@kernel.org,
- fancer.lancer@gmail.com, netdev@vger.kernel.org, linux-kernel@vger.kernel.org
-References: <20250121082536.11752-1-zhaoqunqin@loongson.cn>
- <4787f868-a384-4753-8cfd-3027f5c88fd0@linux.dev>
- <7073a4e9-2a6b-a3e9-769e-5069b0e9772c@loongson.cn>
- <b77ce124-af98-40e3-84bb-b743cc6f5f92@linux.dev>
- <c5abbb5b-97f3-2b34-26db-06e0dc82be84@loongson.cn>
-Content-Language: en-US
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Yanteng Si <si.yanteng@linux.dev>
-In-Reply-To: <c5abbb5b-97f3-2b34-26db-06e0dc82be84@loongson.cn>
-Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
-X-Migadu-Flow: FLOW_OUT
+
+This patch series simplifies PTP code related to E825C products by
+simplifying PHY register info definition.
+Cleanup the code by removing unused register definitions.
+Also, add sync delay compensation between PHC and PHY for E825C.
+
+Karol Kolacinski (3):
+  ice: Add sync delay for E825C
+  ice: Refactor E825C PHY registers info struct
+  ice: E825C PHY register cleanup
+
+ .../net/ethernet/intel/ice/ice_ptp_consts.h   | 75 ++++---------------
+ drivers/net/ethernet/intel/ice/ice_ptp_hw.c   | 20 ++---
+ drivers/net/ethernet/intel/ice/ice_ptp_hw.h   | 36 ++++-----
+ 3 files changed, 43 insertions(+), 88 deletions(-)
 
 
-在 2/6/25 3:22 PM, Qunqin Zhao 写道:
->
-> 在 2025/1/22 下午4:53, Yanteng Si 写道:
->>
->>
->>
->> 在 2025/1/22 09:31, Qunqin Zhao 写道:
->>>
->>> 在 2025/1/21 下午9:41, Yanteng Si 写道:
->>>>
->>>> 在 1/21/25 16:25, Qunqin Zhao 写道:
->>>>> Loongson's GMAC device takes nearly two seconds to complete DMA 
->>>>> reset,
->>>>> however, the default waiting time for reset is 200 milliseconds
->>>> Is only GMAC like this?
->>> At present, this situation has only been found on GMAC.
->>
->>>>> @@ -566,6 +578,7 @@ static int loongson_dwmac_probe(struct pci_dev 
->>>>> *pdev, const struct pci_device_id
->>>>>         plat->bsp_priv = ld;
->>>>>       plat->setup = loongson_dwmac_setup;
->>>>> +    plat->fix_soc_reset = loongson_fix_soc_reset;
->>>>
->>>> If only GMAC needs to be done this way, how about putting it inside 
->>>> the loongson_gmac_data()?
->>>
->>> Regardless of whether this situation occurs in other devices(like 
->>> gnet), this change will not have any impact on gnet, right?
->>>
->> Yeah，However, it is obvious that there is now a more suitable
->> place for it. In the Loongson driver, `loongson_gmac_data()`
->> and `loongson_default_data()` were designed from the beginning.
->> When GNET support was added later, `loongson_gnet_data()`
->> was designed. We once made great efforts to extract these codes
->> from the `probe()` . Are we going to go back to the past?
->>
->> Of course, I'm not saying that I disagree with you fixing the
->> GMAC in the `probe()`. I just think it's a bad start. After that,
->> other people may also put similar code here, and eventually
->> it will make the `probe` a mess.
->>
->> If you insist on doing this, please change the function name
->> to `loongson_gmac_fix_reset()`, just like `loongson_gnet_fix_speed`.
->
-> Recently, it is found that GNET may also have a long DMA reset time.  
-> And the commit
-
-It seems that you haven't tested all the gnet devices. Please test all
-
-the devices before sending v2. Since I've left Loongson, I only have
-
-the 7A2000(gnet) device at hand to assist with the testing.
-
->
-> message should be "Loongson's DWMAC device may take nearly two seconds 
-> to complete DMA reset,
-> however, the default waiting time for reset is 200 milliseconds".
-
-The function name can refer to loongson_dwmac_setup.
-
-       plat->setup = loongson_dwmac_setup;
-
-+    plat->fix_soc_reset = loongson_dwmac_fix_reset;
-
-
-Oh, don't forget the necessary comments.
-
-
-Thanks
-
-Yanteng
+base-commit: 70bdf16570c2c207a562e996833ff196a4bd7029
+-- 
+2.39.3
 
 
