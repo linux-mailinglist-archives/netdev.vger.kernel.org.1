@@ -1,210 +1,180 @@
-Return-Path: <netdev+bounces-163455-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-163458-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 05F0FA2A4C5
-	for <lists+netdev@lfdr.de>; Thu,  6 Feb 2025 10:39:58 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2936AA2A4D7
+	for <lists+netdev@lfdr.de>; Thu,  6 Feb 2025 10:42:12 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 969C8168231
-	for <lists+netdev@lfdr.de>; Thu,  6 Feb 2025 09:39:51 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A71A13A3221
+	for <lists+netdev@lfdr.de>; Thu,  6 Feb 2025 09:40:46 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E97E722757C;
-	Thu,  6 Feb 2025 09:39:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7E64E226539;
+	Thu,  6 Feb 2025 09:40:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="dYIgfyov"
 X-Original-To: netdev@vger.kernel.org
-Received: from metis.whiteo.stw.pengutronix.de (metis.whiteo.stw.pengutronix.de [185.203.201.7])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wm1-f42.google.com (mail-wm1-f42.google.com [209.85.128.42])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 466F3226536
-	for <netdev@vger.kernel.org>; Thu,  6 Feb 2025 09:39:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.203.201.7
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 953C422652D;
+	Thu,  6 Feb 2025 09:40:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.42
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1738834754; cv=none; b=ScHTwLhhdqYKka8MKv1W/h2KAPLExlzLujYTi5C3uglXqM4+5g13aFDWmKeoGlOCqAmYYxYXlHEB6jbacsRI0RqWu41OAek8y4yE6ZImc0YGLeHDNSngHDHnrXFarHpFpvW0C0ql/Eo1mV097fM0UquClEEpDK/vYIkg3ayz+S0=
+	t=1738834827; cv=none; b=bGZHXw3ooPx8JFhewDNwriLG8xfHsMtcZtM2ZVegIvZ2fkgx0SiZT+E2SckxlzpjqdM/z0PAlTA2UsIGRpHewae2/+eny9yMC6gPZmnMv0KxE+ybdFM2HoQWHzTmfCrSP2fqhSyGOoY5EjfLwREA1rc6kUfrzLYZmRVfxVojh8U=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1738834754; c=relaxed/simple;
-	bh=P3TXZ0XfcN4Ruic9R+WnW6jVhWEGzvQvYt4rLT1G6TQ=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=teGdCCGQdlRF2l5lGptYzFgWWgBRBUCq8zFintXfcs+kUjFtRSi8H+EA/QCaX5JYeaxRqfyyl7ZCP+FszSqzI5s8ZGu3Ggwou30X0aTan9c8UHP9mMrShMXOY0RnMOF2LaI7aLybCJCqUpxdlsW0ivJrwZKaUWg/aR2ONmYmHjs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de; spf=pass smtp.mailfrom=pengutronix.de; arc=none smtp.client-ip=185.203.201.7
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=pengutronix.de
-Received: from drehscheibe.grey.stw.pengutronix.de ([2a0a:edc0:0:c01:1d::a2])
-	by metis.whiteo.stw.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
-	(Exim 4.92)
-	(envelope-from <ore@pengutronix.de>)
-	id 1tfyLg-0006zf-7E; Thu, 06 Feb 2025 10:39:04 +0100
-Received: from dude04.red.stw.pengutronix.de ([2a0a:edc0:0:1101:1d::ac])
-	by drehscheibe.grey.stw.pengutronix.de with esmtps  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.96)
-	(envelope-from <ore@pengutronix.de>)
-	id 1tfyLf-003mdE-03;
-	Thu, 06 Feb 2025 10:39:03 +0100
-Received: from ore by dude04.red.stw.pengutronix.de with local (Exim 4.96)
-	(envelope-from <ore@pengutronix.de>)
-	id 1tfyLe-00Dym5-34;
-	Thu, 06 Feb 2025 10:39:02 +0100
-From: Oleksij Rempel <o.rempel@pengutronix.de>
-To: Andrew Lunn <andrew@lunn.ch>,
-	Heiner Kallweit <hkallweit1@gmail.com>,
-	Russell King <linux@armlinux.org.uk>,
+	s=arc-20240116; t=1738834827; c=relaxed/simple;
+	bh=5HaMqH6ACPaZZ+jYPKdOVGdO5CJDeUWtDjJRtpOQNSg=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=TJEIpkKf2BdUMuRJ7MFxcDDYOLG500WGvdKqljJZ9hH2ThiMyurBThXkWMCnRmoIRAOxya6x8xfu4ZEBEnwTBQfV1nMxDkdHO2aIxmu3+/Ltp1/RLRqdWIPoP5yJ4bJZoUdPgaC5RUYZLIAjivEmkiEZQ1Jh/ZOdSHnh2ai0sxA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=dYIgfyov; arc=none smtp.client-ip=209.85.128.42
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-wm1-f42.google.com with SMTP id 5b1f17b1804b1-436326dcb1cso4272095e9.0;
+        Thu, 06 Feb 2025 01:40:25 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1738834824; x=1739439624; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=QFKBSoOVGRBtSVzPGty71l+771OyWvjkU/yq+7DfWR4=;
+        b=dYIgfyovCiD/JMawQ/hnenbVlah/uWGR3rwxz8eNepX5rIl7wJVWtXwCXeuctYyjJH
+         43r4e8DZo3PmoOaIF1GGGEor4nOtii01iolE7WCO7b1br7tAzYj1d3kghl4w7D+vbdnB
+         sPChPNfcs8G63GDmg47082o3nAHDEuuafap8m6w+fY3p4rfTBbXNnkCZzMO1Ns8PlKXV
+         iDeVH3GdqQXWbZVoNn2ZSpfY/TOCM78m4cnfT44FJ5ARwA9lyIHWIRK76DvOkKbd7S5R
+         9ukCQw6VknVXTL2fst7iimXhNWxxN6EXlrsDCwmklFFtDAi8Pu4TARTtnZnJH921Z9+p
+         OTBA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1738834824; x=1739439624;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=QFKBSoOVGRBtSVzPGty71l+771OyWvjkU/yq+7DfWR4=;
+        b=rq7az9lJ5elFLeUo5xpEbm8rhFlfzZGRhqc96/yKyNUsN6IuvkZBV51/0/WQI3le7n
+         AEOZemE6+jbrkpJLFVp029MFygcBGyDX6cWhEBjcRAcG7yCIJkHe0tieKRS8ZjycyUBz
+         aE6iYJjwY59iswQ9GNp8SStIYzpiwx9Nsezv4WsB1yGqG87W/H6NKZWf1pd7EH5HXnf5
+         e8Luw5i3zA1MjlELFaZwjPZxGxN0M2omYHe1t3kTwPjk2feHHXmxZqoNwynrQgitN2bV
+         /GS+0ruf661kVRFCNJh6hA+SH8xLUy2oJkzQOj8fCUtIowQzD1g2eBU12/FVuLl/EUcU
+         Y2BQ==
+X-Forwarded-Encrypted: i=1; AJvYcCVp3FOIBKn0JbzEN2SQKdsHhMvsoGjiDJfR+CpnJWI6CdynSaScOltqr/oih+nCpuNuw+0m4+3cKpRC@vger.kernel.org, AJvYcCWOnhF/2G5ednQg3mJ6ZOWcRHJp7ZI+XpJWJg3JMPpMvkoiAeMWTgHtk5Eim/SDVsoHkwnJvkLA@vger.kernel.org, AJvYcCX2DfWGrB8DVjnxqIWEzoiNp16FHu8M63QOZr27DEMDFC6cFVlUDAtzuZsVwcObLIqZgK7eqn5H/MSE5oyR@vger.kernel.org
+X-Gm-Message-State: AOJu0Yxr6UsqmOPUk3UwAdSG2VG6LGIV+E41giQC10YceA+AI8u1BZWX
+	ScdZQlpyV5huevhwhd2pQctLoBG14TwXYMXziR5Pm3EX9PEORMmw
+X-Gm-Gg: ASbGncvywmdthgXxyQq+OAadBH+0+0KtBaX6/bHbC4fgxBsL9Eiu5alvE4Rdzc7PLYi
+	QsLpOMvF0vbtKFCORt2oiSUiXkX/rZZHwe9KsYNScwxlc4GtX4ghWi1UR/A98kyuhtnhWa4nsmj
+	zcHBXMHMDaHLRVAVQf/j06HJwv3a0E2LNh13siS/Ks0XfM1v5TVD9LXU5MF3nBBzYDyyHz45Szj
+	PsLlgx79YlVRmmBWmI7+/TBPt/psS8pzLGZZOWJaDXVLOhUarhMJtGo2z8emDCcJUXcg8i780/t
+	5LlykE3MA/Nf
+X-Google-Smtp-Source: AGHT+IGyKNrq+Ez6Do5rq2gjjPAYOznaKQ67YtgOLU60pod/oeG3KF49eKfnrIrBCjWw68ieGkh4Og==
+X-Received: by 2002:a05:600c:3112:b0:438:ad4d:cf09 with SMTP id 5b1f17b1804b1-4390d43542fmr47180615e9.9.1738834823682;
+        Thu, 06 Feb 2025 01:40:23 -0800 (PST)
+Received: from debian ([2a00:79c0:61a:4600:45fb:7d1a:5e4d:9727])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-4390d964c7csm48555715e9.17.2025.02.06.01.40.22
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 06 Feb 2025 01:40:22 -0800 (PST)
+Date: Thu, 6 Feb 2025 10:40:20 +0100
+From: Dimitri Fedrau <dima.fedrau@gmail.com>
+To: Andrew Lunn <andrew@lunn.ch>
+Cc: "Russell King (Oracle)" <linux@armlinux.org.uk>,
+	dimitri.fedrau@liebherr.com, Andrew Lunn <andrew+netdev@lunn.ch>,
 	"David S. Miller" <davem@davemloft.net>,
 	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>
-Cc: Oleksij Rempel <o.rempel@pengutronix.de>,
-	kernel@pengutronix.de,
-	linux-kernel@vger.kernel.org,
-	netdev@vger.kernel.org
-Subject: [PATCH net-next v3 2/2] net: phy: dp83tg720: Add randomized polling intervals for unstable link detection
-Date: Thu,  6 Feb 2025 10:39:02 +0100
-Message-Id: <20250206093902.3331832-3-o.rempel@pengutronix.de>
-X-Mailer: git-send-email 2.39.5
-In-Reply-To: <20250206093902.3331832-1-o.rempel@pengutronix.de>
-References: <20250206093902.3331832-1-o.rempel@pengutronix.de>
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Rob Herring <robh@kernel.org>,
+	Krzysztof Kozlowski <krzk+dt@kernel.org>,
+	Conor Dooley <conor+dt@kernel.org>, Andrew Davis <afd@ti.com>,
+	Heiner Kallweit <hkallweit1@gmail.com>,
+	Florian Fainelli <f.fainelli@gmail.com>, netdev@vger.kernel.org,
+	devicetree@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH net-next v3 2/3] net: phy: Add helper for getting tx
+ amplitude gain
+Message-ID: <20250206094020.GA4585@debian>
+References: <20250204-dp83822-tx-swing-v3-0-9798e96500d9@liebherr.com>
+ <20250204-dp83822-tx-swing-v3-2-9798e96500d9@liebherr.com>
+ <Z6JUbW72_CqCY9Zq@shell.armlinux.org.uk>
+ <20250205052218.GC3831@debian>
+ <b28755b0-9104-4295-8cd3-508818445a4b@lunn.ch>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-SA-Exim-Connect-IP: 2a0a:edc0:0:c01:1d::a2
-X-SA-Exim-Mail-From: ore@pengutronix.de
-X-SA-Exim-Scanned: No (on metis.whiteo.stw.pengutronix.de); SAEximRunCond expanded to false
-X-PTX-Original-Recipient: netdev@vger.kernel.org
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <b28755b0-9104-4295-8cd3-508818445a4b@lunn.ch>
 
-Address the limitations of the DP83TG720 PHY, which cannot reliably detect or
-report a stable link state. To handle this, the PHY must be periodically reset
-when the link is down. However, synchronized reset intervals between the PHY
-and its link partner can result in a deadlock, preventing the link from
-re-establishing.
+Am Wed, Feb 05, 2025 at 06:08:47PM +0100 schrieb Andrew Lunn:
+> On Wed, Feb 05, 2025 at 06:22:18AM +0100, Dimitri Fedrau wrote:
+> > Am Tue, Feb 04, 2025 at 05:54:53PM +0000 schrieb Russell King (Oracle):
+> > > On Tue, Feb 04, 2025 at 02:09:16PM +0100, Dimitri Fedrau via B4 Relay wrote:
+> > > >  #if IS_ENABLED(CONFIG_OF_MDIO)
+> > > > -static int phy_get_int_delay_property(struct device *dev, const char *name)
+> > > > +static int phy_get_u32_property(struct device *dev, const char *name)
+> > > >  {
+> > > >  	s32 int_delay;
+> > > >  	int ret;
+> > > > @@ -3108,7 +3108,7 @@ static int phy_get_int_delay_property(struct device *dev, const char *name)
+> > > >  	return int_delay;
+> > > 
+> > > Hmm. You're changing the name of this function from "int" to "u32", yet
+> > > it still returns "int".
+> > >
+> > 
+> > I just wanted to reuse code for retrieving the u32, I found
+> > phy_get_int_delay_property and renamed it. But the renaming from "int"
+> > to "u32" is wrong as you outlined.
+> > 
+> > > What range of values are you expecting to be returned by this function?
+> > > If it's the full range of u32 values, then that overlaps with the error
+> > > range returned by device_property_read_u32().
+> > >
+> > 
+> > Values are in percent, u8 would already be enough, so it wouldn't
+> > overlap with the error range.
+> > 
+> > > I'm wondering whether it would be better to follow the example set by
+> > > these device_* functions, and pass a pointer for the value to them, and
+> > > just have the return value indicating success/failure.
+> > >
+> > 
+> > I would prefer this, but this would mean changes in phy_get_internal_delay
+> > if we don't want to duplicate code, as phy_get_internal_delay relies on
+> > phy_get_int_delay_property and we change function parameters of
+> > phy_get_int_delay_property as you described. I would switch from
+> > static int phy_get_int_delay_property(struct device *dev, const char *name)
+> > to
+> > static int phy_get_u32_property(struct device *dev, const char *name, u32 *val)
+> > 
+> > Do you agree ?
+> 
+> This looks O.K. You should also rename the local variable int_delay.
+> 
+> Humm, that function has other issues.
+> 
+> static int phy_get_int_delay_property(struct device *dev, const char *name)
+> {
+> 	s32 int_delay;
+> 	int ret;
+> 
+> 	ret = device_property_read_u32(dev, name, &int_delay);
+> 	if (ret)
+> 		return ret;
+> 
+> 	return int_delay;
+> }
+> 
+> int_delay should really be a u32. if ret is not an error, there should
+> be a range check to ensure int_long actually fits in an s32, otherwise
+> -EINVAL, or maybe -ERANGE.
+> 
+> For delays, we never expect too much more than 2000ps, so no valid DT
+> blob should trigger issues here.
+> 
+I think you mention this because you want to avoid changes in
+phy_get_internal_delay because this would lead to changes in other
+drivers too. Is it worth fixing this ? Then we didn't have to workaround by
+checking if int_long actually fits in an s32.
 
-This change introduces a randomized polling interval when the link is down to
-desynchronize resets between link partners.
-
-Signed-off-by: Oleksij Rempel <o.rempel@pengutronix.de>
----
-changes v3:
-- use jiffies instead of milliseconds
----
- drivers/net/phy/dp83tg720.c | 75 +++++++++++++++++++++++++++++++++++++
- 1 file changed, 75 insertions(+)
-
-diff --git a/drivers/net/phy/dp83tg720.c b/drivers/net/phy/dp83tg720.c
-index 050f4537d140..002b08d85e98 100644
---- a/drivers/net/phy/dp83tg720.c
-+++ b/drivers/net/phy/dp83tg720.c
-@@ -4,12 +4,31 @@
-  */
- #include <linux/bitfield.h>
- #include <linux/ethtool_netlink.h>
-+#include <linux/jiffies.h>
- #include <linux/kernel.h>
- #include <linux/module.h>
- #include <linux/phy.h>
-+#include <linux/random.h>
-
- #include "open_alliance_helpers.h"
-
-+/*
-+ * DP83TG720S_POLL_ACTIVE_LINK - Polling interval in milliseconds when the link
-+ *				 is active.
-+ * DP83TG720S_POLL_NO_LINK_MIN - Minimum polling interval in milliseconds when
-+ *				 the link is down.
-+ * DP83TG720S_POLL_NO_LINK_MAX - Maximum polling interval in milliseconds when
-+ *				 the link is down.
-+ *
-+ * These values are not documented or officially recommended by the vendor but
-+ * were determined through empirical testing. They achieve a good balance in
-+ * minimizing the number of reset retries while ensuring reliable link recovery
-+ * within a reasonable timeframe.
-+ */
-+#define DP83TG720S_POLL_ACTIVE_LINK		1000
-+#define DP83TG720S_POLL_NO_LINK_MIN		100
-+#define DP83TG720S_POLL_NO_LINK_MAX		1000
-+
- #define DP83TG720S_PHY_ID			0x2000a284
-
- /* MDIO_MMD_VEND2 registers */
-@@ -371,6 +390,13 @@ static int dp83tg720_read_status(struct phy_device *phydev)
- 		if (ret)
- 			return ret;
-
-+		/* Sleep 600ms for PHY stabilization post-reset.
-+		 * Empirically chosen value (not documented).
-+		 * Helps reduce reset bounces with link partners having similar
-+		 * issues.
-+		 */
-+		msleep(600);
-+
- 		/* After HW reset we need to restore master/slave configuration.
- 		 * genphy_c45_pma_baset1_read_master_slave() call will be done
- 		 * by the dp83tg720_config_aneg() function.
-@@ -498,6 +524,54 @@ static int dp83tg720_probe(struct phy_device *phydev)
- 	return 0;
- }
-
-+/**
-+ * dp83tg720_phy_get_next_update_time - Determine the next update time for PHY
-+ *                                      state
-+ * @phydev: Pointer to the phy_device structure
-+ *
-+ * This function addresses a limitation of the DP83TG720 PHY, which cannot
-+ * reliably detect or report a stable link state. To recover from such
-+ * scenarios, the PHY must be periodically reset when the link is down. However,
-+ * if the link partner also runs Linux with the same driver, synchronized reset
-+ * intervals can lead to a deadlock where the link never establishes due to
-+ * simultaneous resets on both sides.
-+ *
-+ * To avoid this, the function implements randomized polling intervals when the
-+ * link is down. It ensures that reset intervals are desynchronized by
-+ * introducing a random delay between a configured minimum and maximum range.
-+ * When the link is up, a fixed polling interval is used to minimize overhead.
-+ *
-+ * This mechanism guarantees that the link will reestablish within 10 seconds
-+ * in the worst-case scenario.
-+ *
-+ * Return: Time (in jiffies) until the next update event for the PHY state
-+ * machine.
-+ */
-+static unsigned int dp83tg720_phy_get_next_update_time(struct phy_device *phydev)
-+{
-+	unsigned int next_time_jiffies;
-+
-+	if (phydev->link) {
-+		/* When the link is up, use a fixed 1000ms interval (in jiffies) */
-+		next_time_jiffies = msecs_to_jiffies(DP83TG720S_POLL_ACTIVE_LINK);
-+	} else {
-+		unsigned int min_jiffies, max_jiffies, rand_jiffies;
-+
-+		/* When the link is down, randomize interval between min/max
-+		 * (in jiffies)
-+		 */
-+		min_jiffies = msecs_to_jiffies(DP83TG720S_POLL_NO_LINK_MIN);
-+		max_jiffies = msecs_to_jiffies(DP83TG720S_POLL_NO_LINK_MAX);
-+
-+		rand_jiffies = min_jiffies +
-+			get_random_u32_below(max_jiffies - min_jiffies + 1);
-+		next_time_jiffies = rand_jiffies;
-+	}
-+
-+	/* Ensure the polling time is at least one jiffy */
-+	return max(next_time_jiffies, 1U);
-+}
-+
- static struct phy_driver dp83tg720_driver[] = {
- {
- 	PHY_ID_MATCH_MODEL(DP83TG720S_PHY_ID),
-@@ -516,6 +590,7 @@ static struct phy_driver dp83tg720_driver[] = {
- 	.get_link_stats	= dp83tg720_get_link_stats,
- 	.get_phy_stats	= dp83tg720_get_phy_stats,
- 	.update_stats	= dp83tg720_update_stats,
-+	.get_next_update_time = dp83tg720_phy_get_next_update_time,
-
- 	.suspend	= genphy_suspend,
- 	.resume		= genphy_resume,
---
-2.39.5
-
+Best regards,
+Dimitri Fedrau
 
