@@ -1,302 +1,191 @@
-Return-Path: <netdev+bounces-163669-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-163668-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 195F4A2B42E
-	for <lists+netdev@lfdr.de>; Thu,  6 Feb 2025 22:29:58 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id A8153A2B428
+	for <lists+netdev@lfdr.de>; Thu,  6 Feb 2025 22:29:08 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id AEBEF168BBD
-	for <lists+netdev@lfdr.de>; Thu,  6 Feb 2025 21:29:56 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id AFE4018837E0
+	for <lists+netdev@lfdr.de>; Thu,  6 Feb 2025 21:29:13 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 21D5D1F4178;
-	Thu,  6 Feb 2025 21:29:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3397E1F4191;
+	Thu,  6 Feb 2025 21:29:04 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="PB1xB1Vj"
+	dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="UJ13jo8B";
+	dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="77pYTPSo"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from galois.linutronix.de (Galois.linutronix.de [193.142.43.55])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2E1B61F63E8
-	for <netdev@vger.kernel.org>; Thu,  6 Feb 2025 21:29:43 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5F46D1F4179;
+	Thu,  6 Feb 2025 21:29:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=193.142.43.55
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1738877387; cv=none; b=f/q+bYrkpNbfE8V7Yf8RrWRUFx3SGFVyYZB05gagomnDtgt6FEwqXC84B6cRI3BaKzRdKsu79TdwK7M6xgWhszNV8vxCvFQIt5Uo4Jt9FyxHMpZXIwey3tQiDKA+X6JkoJET0bwu08FzYwLPCnEWcvPnkuNk9YEZoJmbvla2z0w=
+	t=1738877344; cv=none; b=uB5kZksNlVyqN08oJ8qDB4BgRD9jrAHQz2aJ2EjZk6EWqmFCjUl13V53phXuOO1xeAt2NYLQP44nTbTZVrpO91ta8B+Ko48j1FdeGslu1CBiRCDWPCsjEqCJIDQL11vgzz0C71F5IVKfA2c6o86Z6elP2v/hwQskwEZ3N3OUYQc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1738877387; c=relaxed/simple;
-	bh=A6TTiu3mBQ8WrU99XKbFU9nfwT1ncucUhelx3jmdnOI=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=JDv8GnTdx2Bmwp4PomVekGREenEbqkTBmavNxJhzDFcG7D3K6orGtfgXcpWmUTdsnMk0xPkul5VI2vLiFlJ1kZNsHAlhSB0gSmMa5yhGSYpmvxnn1YesJJpZ6FCIaD16H7YUcgMyr/3sA3JKRWYMu+AFf0k936GBjEelObevUmk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=PB1xB1Vj; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1738877382;
+	s=arc-20240116; t=1738877344; c=relaxed/simple;
+	bh=NNLc9sYYM1xBfpokXu/kvh5M5qCiFpLmAd08ymL5+Pw=;
+	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
+	 MIME-Version:Content-Type; b=lCKOcDhEF7yrwWiOMRzbnGXMB8OUkeBlrod/jt/WD+Ben6Z1Mbi7zdJQScgip47QNDzzjKefT8q680TQjvuVZH5Ma5aIesZLLKvp138jPLomsaY7GHGId9/zxyjGfH5uth8wG3KtvbT7SdqF+bx6yGM3uTYc77LQuFtb8KMt4is=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de; spf=pass smtp.mailfrom=linutronix.de; dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=UJ13jo8B; dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=77pYTPSo; arc=none smtp.client-ip=193.142.43.55
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linutronix.de
+From: Thomas Gleixner <tglx@linutronix.de>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linutronix.de;
+	s=2020; t=1738877340;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding;
-	bh=gke+kpGI22E8kWaQlFj2yXZXAZ9KiJB37Zh0LKiikgs=;
-	b=PB1xB1Vju0QS85iTJmsI47JLsgbHOKuoZZGGBzZ92YlpQzuXQMeQSphzKi1eZ0Z0WEY9hD
-	nZSQLgFfoM7reEDiYlDPDm2kXJ0mZO2iKb+8I/5n7WnPY1Wevq4H8gBl28xNU+0FC+ot+w
-	4zVvngvvQeQW5HTf9f+veWCCxXenejU=
-Received: from mx-prod-mc-05.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
- relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-612-njuxJtXbPQmPbyC1gXO4Xg-1; Thu,
- 06 Feb 2025 16:29:37 -0500
-X-MC-Unique: njuxJtXbPQmPbyC1gXO4Xg-1
-X-Mimecast-MFC-AGG-ID: njuxJtXbPQmPbyC1gXO4Xg
-Received: from mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.4])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mx-prod-mc-05.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 9ABE01956094;
-	Thu,  6 Feb 2025 21:29:35 +0000 (UTC)
-Received: from gerbillo.redhat.com (unknown [10.44.32.200])
-	by mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 2906130001AB;
-	Thu,  6 Feb 2025 21:29:31 +0000 (UTC)
-From: Paolo Abeni <pabeni@redhat.com>
-To: netdev@vger.kernel.org
-Cc: "David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Simon Horman <horms@kernel.org>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	Alexander Duyck <alexanderduyck@fb.com>
-Subject: [PATCH net] Revert "net: skb: introduce and use a single page frag cache"
-Date: Thu,  6 Feb 2025 22:28:48 +0100
-Message-ID: <e649212fde9f0fdee23909ca0d14158d32bb7425.1738877290.git.pabeni@redhat.com>
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=XwtTKiTRLh2dJDu6X8M8DZSQzJ03tIcOdYOJcxTLuvs=;
+	b=UJ13jo8BGpxPbQUDaCZ/zFFku4V9dUaq7fgeJJOtHgRmxy3uihujzN0/V+ksjJhplqJhcf
+	ZIwomLtVo9KwZzNy8ZFcEO5BONSmziinWf4Af4H7ZlwhDO3R7z69LaRSNCtq9A+DITL26+
+	A8MIOPzh8CwO8SuKhLkf5ic9D38MuVUNNyIEhRiSg35jmtOkz++5G5NAtKb4qnvY3EhHlB
+	sp7KBmg6ZSbwxNKldSWlfjcqlefLRPwABIaCizw1osxlj/nlPXORUH1/QUTKUuZIZeuYCo
+	yE1I/vzeWGn0NZz08CNg0bZ2CMqjdA5/5dUoZ3VbTGK4rDBKTs+4btCqzCFjBw==
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=linutronix.de;
+	s=2020e; t=1738877340;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=XwtTKiTRLh2dJDu6X8M8DZSQzJ03tIcOdYOJcxTLuvs=;
+	b=77pYTPSoBgfyBqKpQUS+RAjpC1/n6MfHZpl/jtlAapmV1+8ZwWOr2fJPIrn1zABdjZkioh
+	RPTjmllGXm+0FOBw==
+To: Chintan Vankar <c-vankar@ti.com>, Jason Reeder <jreeder@ti.com>,
+ vigneshr@ti.com, nm@ti.com, Chintan
+ Vankar <c-vankar@ti.com>, Paolo Abeni <pabeni@redhat.com>, Jakub Kicinski
+ <kuba@kernel.org>, Eric Dumazet <edumazet@google.com>, "David S. Miller"
+ <davem@davemloft.net>, Andrew Lunn <andrew+netdev@lunn.ch>
+Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org, srk@ti.com,
+ s-vadapalli@ti.com, danishanwar@ti.com, m-malladi@ti.com
+Subject: Re: [RFC PATCH 1/2] irqchip: ti-tsir: Add support for Timesync
+ Interrupt Router
+In-Reply-To: <20250205160119.136639-2-c-vankar@ti.com>
+References: <20250205160119.136639-1-c-vankar@ti.com>
+ <20250205160119.136639-2-c-vankar@ti.com>
+Date: Thu, 06 Feb 2025 22:28:58 +0100
+Message-ID: <87lduin4o5.ffs@tglx>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.4
+Content-Type: text/plain
 
-This reverts commit dbae2b062824 ("net: skb: introduce and use a single
-page frag cache"). The intended goal of such change was to counter a
-performance regression introduced by commit 3226b158e67c ("net: avoid
-32 x truesize under-estimation for tiny skbs").
+On Wed, Feb 05 2025 at 21:31, Chintan Vankar wrote:
+> +++ b/drivers/irqchip/ti-timesync-intr.c
+> @@ -0,0 +1,109 @@
+> +// SPDX-License-Identifier: GPL
 
-Unfortunately, the blamed commit introduces another regression for the
-virtio_net driver. Such a driver calls napi_alloc_skb() with a tiny
-size, so that the whole head frag could fit a 512-byte block.
+That's not a valid license identifier
 
-The single page frag cache uses a 1K fragment for such allocation, and
-the additional overhead, under small UDP packets flood, makes the page
-allocator a bottleneck.
+> +static struct irq_chip ts_intr_irq_chip = {
+> +	.name			= "TIMESYNC_INTRTR",
+> +};
 
-Thanks to commit bf9f1baa279f ("net: add dedicated kmem_cache for
-typical/small skb->head"), this revert does not re-introduce the
-original regression. Actually, in the relevant test on top of this
-revert, I measure a small but noticeable positive delta, just above
-noise level.
+How is this interrupt chip supposed to work? All it implements is a
+name.
 
-The revert itself required some additional mangling due to the
-introduction of the SKB_HEAD_ALIGN() helper and local lock infra in the
-affected code.
+> +static int ts_intr_irq_domain_alloc(struct irq_domain *domain, unsigned int virq,
+> +				    unsigned int nr_irqs, void *arg)
+> +{
+> +	unsigned int output_line, input_line, output_line_offset;
+> +	struct irq_fwspec *fwspec = (struct irq_fwspec *)arg;
+> +	int ret;
+> +
+> +	irq_domain_set_hwirq_and_chip(domain, virq, output_line,
+> +				      &ts_intr_irq_chip,
+> +				      NULL);
 
-Suggested-by: Eric Dumazet <edumazet@google.com>
-Fixes: dbae2b062824 ("net: skb: introduce and use a single page frag cache")
-Signed-off-by: Paolo Abeni <pabeni@redhat.com>
----
-@Eric: IIRC, once upon time, you reported a similar regression, which
-was root-caused to the SLOB allocator. Please let me know if you prefer
-your Reported-by tag here.
----
- include/linux/netdevice.h |   1 -
- net/core/dev.c            |  17 +++++++
- net/core/skbuff.c         | 103 ++------------------------------------
- 3 files changed, 22 insertions(+), 99 deletions(-)
+You set the interrupt chip and data before validating that the input
+argument is valid. That does not make any sense.
 
-diff --git a/include/linux/netdevice.h b/include/linux/netdevice.h
-index 03bb584c62cf..8c91cdf06afd 100644
---- a/include/linux/netdevice.h
-+++ b/include/linux/netdevice.h
-@@ -4109,7 +4109,6 @@ void netif_receive_skb_list(struct list_head *head);
- gro_result_t napi_gro_receive(struct napi_struct *napi, struct sk_buff *skb);
- void napi_gro_flush(struct napi_struct *napi, bool flush_old);
- struct sk_buff *napi_get_frags(struct napi_struct *napi);
--void napi_get_frags_check(struct napi_struct *napi);
- gro_result_t napi_gro_frags(struct napi_struct *napi);
- 
- static inline void napi_free_frags(struct napi_struct *napi)
-diff --git a/net/core/dev.c b/net/core/dev.c
-index b91658e8aedb..55e356a68db6 100644
---- a/net/core/dev.c
-+++ b/net/core/dev.c
-@@ -6920,6 +6920,23 @@ netif_napi_dev_list_add(struct net_device *dev, struct napi_struct *napi)
- 	list_add_rcu(&napi->dev_list, higher); /* adds after higher */
- }
- 
-+/* Double check that napi_get_frags() allocates skbs with
-+ * skb->head being backed by slab, not a page fragment.
-+ * This is to make sure bug fixed in 3226b158e67c
-+ * ("net: avoid 32 x truesize under-estimation for tiny skbs")
-+ * does not accidentally come back.
-+ */
-+static void napi_get_frags_check(struct napi_struct *napi)
-+{
-+	struct sk_buff *skb;
-+
-+	local_bh_disable();
-+	skb = napi_get_frags(napi);
-+	WARN_ON_ONCE(skb && skb->head_frag);
-+	napi_free_frags(napi);
-+	local_bh_enable();
-+}
-+
- void netif_napi_add_weight_locked(struct net_device *dev,
- 				  struct napi_struct *napi,
- 				  int (*poll)(struct napi_struct *, int),
-diff --git a/net/core/skbuff.c b/net/core/skbuff.c
-index a441613a1e6c..6a99c453397f 100644
---- a/net/core/skbuff.c
-+++ b/net/core/skbuff.c
-@@ -220,67 +220,9 @@ static void skb_under_panic(struct sk_buff *skb, unsigned int sz, void *addr)
- #define NAPI_SKB_CACHE_BULK	16
- #define NAPI_SKB_CACHE_HALF	(NAPI_SKB_CACHE_SIZE / 2)
- 
--#if PAGE_SIZE == SZ_4K
--
--#define NAPI_HAS_SMALL_PAGE_FRAG	1
--#define NAPI_SMALL_PAGE_PFMEMALLOC(nc)	((nc).pfmemalloc)
--
--/* specialized page frag allocator using a single order 0 page
-- * and slicing it into 1K sized fragment. Constrained to systems
-- * with a very limited amount of 1K fragments fitting a single
-- * page - to avoid excessive truesize underestimation
-- */
--
--struct page_frag_1k {
--	void *va;
--	u16 offset;
--	bool pfmemalloc;
--};
--
--static void *page_frag_alloc_1k(struct page_frag_1k *nc, gfp_t gfp)
--{
--	struct page *page;
--	int offset;
--
--	offset = nc->offset - SZ_1K;
--	if (likely(offset >= 0))
--		goto use_frag;
--
--	page = alloc_pages_node(NUMA_NO_NODE, gfp, 0);
--	if (!page)
--		return NULL;
--
--	nc->va = page_address(page);
--	nc->pfmemalloc = page_is_pfmemalloc(page);
--	offset = PAGE_SIZE - SZ_1K;
--	page_ref_add(page, offset / SZ_1K);
--
--use_frag:
--	nc->offset = offset;
--	return nc->va + offset;
--}
--#else
--
--/* the small page is actually unused in this build; add dummy helpers
-- * to please the compiler and avoid later preprocessor's conditionals
-- */
--#define NAPI_HAS_SMALL_PAGE_FRAG	0
--#define NAPI_SMALL_PAGE_PFMEMALLOC(nc)	false
--
--struct page_frag_1k {
--};
--
--static void *page_frag_alloc_1k(struct page_frag_1k *nc, gfp_t gfp_mask)
--{
--	return NULL;
--}
--
--#endif
--
- struct napi_alloc_cache {
- 	local_lock_t bh_lock;
- 	struct page_frag_cache page;
--	struct page_frag_1k page_small;
- 	unsigned int skb_count;
- 	void *skb_cache[NAPI_SKB_CACHE_SIZE];
- };
-@@ -290,23 +232,6 @@ static DEFINE_PER_CPU(struct napi_alloc_cache, napi_alloc_cache) = {
- 	.bh_lock = INIT_LOCAL_LOCK(bh_lock),
- };
- 
--/* Double check that napi_get_frags() allocates skbs with
-- * skb->head being backed by slab, not a page fragment.
-- * This is to make sure bug fixed in 3226b158e67c
-- * ("net: avoid 32 x truesize under-estimation for tiny skbs")
-- * does not accidentally come back.
-- */
--void napi_get_frags_check(struct napi_struct *napi)
--{
--	struct sk_buff *skb;
--
--	local_bh_disable();
--	skb = napi_get_frags(napi);
--	WARN_ON_ONCE(!NAPI_HAS_SMALL_PAGE_FRAG && skb && skb->head_frag);
--	napi_free_frags(napi);
--	local_bh_enable();
--}
--
- void *__napi_alloc_frag_align(unsigned int fragsz, unsigned int align_mask)
- {
- 	struct napi_alloc_cache *nc = this_cpu_ptr(&napi_alloc_cache);
-@@ -813,10 +738,8 @@ struct sk_buff *napi_alloc_skb(struct napi_struct *napi, unsigned int len)
- 
- 	/* If requested length is either too small or too big,
- 	 * we use kmalloc() for skb->head allocation.
--	 * When the small frag allocator is available, prefer it over kmalloc
--	 * for small fragments
- 	 */
--	if ((!NAPI_HAS_SMALL_PAGE_FRAG && len <= SKB_WITH_OVERHEAD(1024)) ||
-+	if (len <= SKB_WITH_OVERHEAD(1024) ||
- 	    len > SKB_WITH_OVERHEAD(PAGE_SIZE) ||
- 	    (gfp_mask & (__GFP_DIRECT_RECLAIM | GFP_DMA))) {
- 		skb = __alloc_skb(len, gfp_mask, SKB_ALLOC_RX | SKB_ALLOC_NAPI,
-@@ -826,32 +749,16 @@ struct sk_buff *napi_alloc_skb(struct napi_struct *napi, unsigned int len)
- 		goto skb_success;
- 	}
- 
-+	len = SKB_HEAD_ALIGN(len);
-+
- 	if (sk_memalloc_socks())
- 		gfp_mask |= __GFP_MEMALLOC;
- 
- 	local_lock_nested_bh(&napi_alloc_cache.bh_lock);
- 	nc = this_cpu_ptr(&napi_alloc_cache);
--	if (NAPI_HAS_SMALL_PAGE_FRAG && len <= SKB_WITH_OVERHEAD(1024)) {
--		/* we are artificially inflating the allocation size, but
--		 * that is not as bad as it may look like, as:
--		 * - 'len' less than GRO_MAX_HEAD makes little sense
--		 * - On most systems, larger 'len' values lead to fragment
--		 *   size above 512 bytes
--		 * - kmalloc would use the kmalloc-1k slab for such values
--		 * - Builds with smaller GRO_MAX_HEAD will very likely do
--		 *   little networking, as that implies no WiFi and no
--		 *   tunnels support, and 32 bits arches.
--		 */
--		len = SZ_1K;
- 
--		data = page_frag_alloc_1k(&nc->page_small, gfp_mask);
--		pfmemalloc = NAPI_SMALL_PAGE_PFMEMALLOC(nc->page_small);
--	} else {
--		len = SKB_HEAD_ALIGN(len);
--
--		data = page_frag_alloc(&nc->page, len, gfp_mask);
--		pfmemalloc = page_frag_cache_is_pfmemalloc(&nc->page);
--	}
-+	data = page_frag_alloc(&nc->page, len, gfp_mask);
-+	pfmemalloc = page_frag_cache_is_pfmemalloc(&nc->page);
- 	local_unlock_nested_bh(&napi_alloc_cache.bh_lock);
- 
- 	if (unlikely(!data))
--- 
-2.48.1
+> +	/* Check for two input parameters: output line and corresponding input line */
+> +	if (fwspec->param_count != 2)
+> +		return -EINVAL;
+> +
+> +	output_line = fwspec->param[0];
+> +
+> +	/* Timesync Interrupt Router's mux-controller register starts at offset 4 from base
+> +	 * address and each output line are at offset in multiple of 4s in Timesync INTR's
+> +	 * register space, calculate the register offset from provided output line.
+> +	 */
+
+Please use proper kernel comment style as documented:
+
+  https://www.kernel.org/doc/html/latest/process/maintainer-tip.html#comment-style
+
+This is not networking code.
+
+> +	output_line_offset = 4 * output_line + 0x4;
+
+Magic hardcoded numbers '4' and '0x4' without any explanation of the logic.
+
+> +	output_line_to_virq[output_line] = virq;
+> +	input_line = fwspec->param[1] & TIMESYNC_INTRTR_ENABLE;
+> +
+> +	/* Map output line corresponding to input line */
+> +	writel(input_line, tsr_data.tsr_base + output_line_offset);
+> +
+> +	/* When interrupt enable bit is set for Timesync Interrupt Router it maps the output
+> +	 * line with the existing input line, hence enable interrupt line after we set bits for
+> +	 * output line.
+
+I have no idea what this comment is trying to tell me.
+
+> +	 */
+> +	input_line |= TIMESYNC_INTRTR_INT_ENABLE;
+> +	writel(input_line, tsr_data.tsr_base + output_line_offset);
+> +
+> +	return 0;
+> +}
+> +
+> +static void ts_intr_irq_domain_free(struct irq_domain *domain, unsigned int virq,
+> +				    unsigned int nr_irqs)
+> +{
+> +	struct output_line_to_virq *node, *n;
+> +	unsigned int output_line_offset;
+> +	int i;
+> +
+> +	for (i = 0; i < TIMESYNC_INTRTR_MAX_OUTPUT_LINES; i++) {
+> +		if (output_line_to_virq[i] == virq) {
+> +			/* Calculate the register offset value from provided output line */
+
+Can you please implement a properly commented helper function which
+explains how this offset calculation is supposed to work?
+
+> +			output_line_offset = 4 * i + 0x4;
+> +			writel(~TIMESYNC_INTRTR_INT_ENABLE, tsr_data.tsr_base + output_line_offset);
+> +		}
+> +	}
+> +}
+> +
+> +static const struct irq_domain_ops ts_intr_irq_domain_ops = {
+> +	.alloc		= ts_intr_irq_domain_alloc,
+> +	.free		= ts_intr_irq_domain_free,
+> +};
+> +
+> +static int tsr_init(struct device_node *node)
+> +{
+> +	tsr_data.tsr_base = of_iomap(node, 0);
+> +	if (IS_ERR(tsr_data.tsr_base)) {
+> +		pr_err("Unable to get reg\n");
+> +		return PTR_ERR(tsr_data.tsr_base);
+> +	}
+> +
+> +	tsr_data.domain = irq_domain_create_tree(&node->fwnode, &ts_intr_irq_domain_ops, &tsr_data);
+
+So this instantiates a interrupt domain which is completely disconnected
+from the rest of the world.
+
+How is the output side of this supposed to handle an interrupt which is
+routed to it?
+
+Thanks,
+
+        tglx
+
 
 
