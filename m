@@ -1,63 +1,63 @@
-Return-Path: <netdev+bounces-163412-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-163413-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id D0432A2A362
-	for <lists+netdev@lfdr.de>; Thu,  6 Feb 2025 09:40:38 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id AA3D1A2A364
+	for <lists+netdev@lfdr.de>; Thu,  6 Feb 2025 09:40:45 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 8EE0916631E
-	for <lists+netdev@lfdr.de>; Thu,  6 Feb 2025 08:40:34 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C0C65166326
+	for <lists+netdev@lfdr.de>; Thu,  6 Feb 2025 08:40:38 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 637B022578D;
-	Thu,  6 Feb 2025 08:40:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 69A97225772;
+	Thu,  6 Feb 2025 08:40:34 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="dmhYfCKf"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="H2nDE6Q/"
 X-Original-To: netdev@vger.kernel.org
 Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.11])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 79D2722578B
-	for <netdev@vger.kernel.org>; Thu,  6 Feb 2025 08:40:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 990FC225A20
+	for <netdev@vger.kernel.org>; Thu,  6 Feb 2025 08:40:32 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.11
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1738831231; cv=none; b=HsdlQ1uWnYODkCw/O0G40e1wQzvvFxANK0ThVngQhG8hr5dwsUPeqAHslfY+u2sTwJm6FUZxVyo1Q0TohwIufDPCzBKdinJyzJQJZ/NeXxvAb553AbSPuj5NbdD0E8+BTisvKMtBHhZgDBOqg0m+DoHgzWbbuK1+RWqUKSFEYJk=
+	t=1738831234; cv=none; b=KEr7NR5QdEV/SJqGpEnEDRXFaNOpCJMcr3ggKLkQaSjOlpOOaabKrsFjBPCBQXfxoQKWLzIGbKJjEqGt7v90TNqNrDX29CyipMfUn2p3b+p4rG04t3B2CwsS183sKxkE8XDVnSImeP3sj/y3FxkxMrIcTStc0U76htFUYeushtQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1738831231; c=relaxed/simple;
-	bh=k1Ti7SgA70qAbXdLeZYBjcInqT9fi/BmVWI2W8IES6c=;
+	s=arc-20240116; t=1738831234; c=relaxed/simple;
+	bh=z6PGNnGXoikoYsPEQiGiz3uQUXRt68IyszS2WX20zE0=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=LvvSEaR+J1s4daCkqaT6BrZ3Pnzk+/i2pGUj7TpVmoDzyYuf+Hj0D+PGzB7pS8JccoDaoiRhjPInLozmwVTd4bw9p9hfE23SDeAzKX9cORtyi7e2y8neL6LdT3j2jb8a4ZR+nJR5/8xZstJBdAKU/WtHA/1kCU4tFVH4vv2T0eQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=dmhYfCKf; arc=none smtp.client-ip=198.175.65.11
+	 MIME-Version; b=J9RwQvpBtAz51GCCHwt8kmC8tmvmONJdR2wHw1qaSFYayznc2Sq3slEac2OKj8gK0RFGarAp/mP7Fl7/ATGHEG8X9cn+FqpHF0/cehCzVHwm6zOaBWtsxxnBzrUFucryTvt2Zvff+dBVPcdiM5BkWoMP9AlPa4jEDXNc8EWwywA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=H2nDE6Q/; arc=none smtp.client-ip=198.175.65.11
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1738831229; x=1770367229;
+  t=1738831233; x=1770367233;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=k1Ti7SgA70qAbXdLeZYBjcInqT9fi/BmVWI2W8IES6c=;
-  b=dmhYfCKf5kkYlOjcg4TtM5ApcMv7I+vGyFcwEUIPwD4/90OXYGSbHl3M
-   KfjkGXwFqdymjEleeDBtPjd2jakbG/aZjSkjSNvfzY5uZhTm6Hf0qInRW
-   sw2bYfmO4WTa2XGlQOi7A4RxXt99qKWbobonTZCd8GSX0UHJ7R2bA+4Sn
-   KLXjlHc9sadT6Kk87pxXOHru7RLNInkFt22emGehywqCl+lSJAs7zHdXr
-   w2UcDBpSdFHkHZzlyr4OK3I9Zk/pq1yPkh3+LFFnNnLXhCmS8UhgBbYh+
-   Etc1KTWH/HL75dXmSin8Cg8yUPJjY9/HDpN2/BmLdcG1OwKGnSOaBwrYM
-   w==;
-X-CSE-ConnectionGUID: bNSXOfcsRcK3LAPk1I+a3w==
-X-CSE-MsgGUID: eVXFjAjbSTqix0fKUmttQg==
-X-IronPort-AV: E=McAfee;i="6700,10204,11336"; a="49667822"
+  bh=z6PGNnGXoikoYsPEQiGiz3uQUXRt68IyszS2WX20zE0=;
+  b=H2nDE6Q/+lUB/LgEzOE26Sci1bh9awVYufI/qkVWwP1ivJqwUjWjG2z3
+   PCwcphTAMEG4OfZ9lf7ryLSeIaHtPCJkVbOKYVKo9zaKZwjjTsMLt06cs
+   AzVzQqXotziVhXNXOh7dWok8XW8OO/KBT2WK4O98v9MrZLz1ECS5Gqo4U
+   RiASudYxmuXkh3ub3qdzJj8FY0N0d6n/26hU+3su7a+nC+RRFkrEdH0RX
+   hzA14NA7CRr+FFWNuwA8D0JZTkqQCHGwcS6+DXZeHYW3BTgtNH3egLdus
+   NEpwVvdPgh0fH2aqNCnM51HPtjTi/qEux1MZdAGiCSICVej4+3RJAtxGy
+   A==;
+X-CSE-ConnectionGUID: AsVQYte+RwGTeaNPH7MX3A==
+X-CSE-MsgGUID: 1B7j1qB9QESe0lUhPDV94A==
+X-IronPort-AV: E=McAfee;i="6700,10204,11336"; a="49667825"
 X-IronPort-AV: E=Sophos;i="6.13,264,1732608000"; 
-   d="scan'208";a="49667822"
+   d="scan'208";a="49667825"
 Received: from fmviesa006.fm.intel.com ([10.60.135.146])
-  by orvoesa103.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 06 Feb 2025 00:40:29 -0800
-X-CSE-ConnectionGUID: YKJysrYgQTCoAZUtI26INw==
-X-CSE-MsgGUID: 07vMuCMeSJKAAIWU21kd7A==
+  by orvoesa103.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 06 Feb 2025 00:40:32 -0800
+X-CSE-ConnectionGUID: TsBTAi/DS6C1xxtiXa07Zg==
+X-CSE-MsgGUID: pTCpoKX1TAeou44rFB7xMw==
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="6.13,264,1732608000"; 
-   d="scan'208";a="110979378"
+   d="scan'208";a="110979390"
 Received: from gklab-003-001.igk.intel.com ([10.211.3.1])
-  by fmviesa006.fm.intel.com with ESMTP; 06 Feb 2025 00:40:27 -0800
+  by fmviesa006.fm.intel.com with ESMTP; 06 Feb 2025 00:40:31 -0800
 From: Grzegorz Nitka <grzegorz.nitka@intel.com>
 To: intel-wired-lan@lists.osuosl.org
 Cc: netdev@vger.kernel.org,
@@ -65,9 +65,9 @@ Cc: netdev@vger.kernel.org,
 	przemyslaw.kitszel@intel.com,
 	Karol Kolacinski <karol.kolacinski@intel.com>,
 	Grzegorz Nitka <grzegorz.nitka@intel.com>
-Subject: [PATCH iwl-next v1 1/3] ice: Add sync delay for E825C
-Date: Thu,  6 Feb 2025 09:36:53 +0100
-Message-Id: <20250206083655.3005151-2-grzegorz.nitka@intel.com>
+Subject: [PATCH iwl-next v1 2/3] ice: Refactor E825C PHY registers info struct
+Date: Thu,  6 Feb 2025 09:36:54 +0100
+Message-Id: <20250206083655.3005151-3-grzegorz.nitka@intel.com>
 X-Mailer: git-send-email 2.39.3
 In-Reply-To: <20250206083655.3005151-1-grzegorz.nitka@intel.com>
 References: <20250206083655.3005151-1-grzegorz.nitka@intel.com>
@@ -81,74 +81,153 @@ Content-Transfer-Encoding: 8bit
 
 From: Karol Kolacinski <karol.kolacinski@intel.com>
 
-Implement setting GLTSYN_SYNC_DLAY for E825C products.
-This is the execution delay compensation of SYNC command between
-PHC and PHY.
-Also, refactor the code by changing ice_ptp_init_phc_eth56g function
-name to ice_ptp_init_phc_e825, to be consistent with the naming pattern
-for other devices.
+Simplify ice_phy_reg_info_eth56g struct definition to include base
+address for the very first quad. Use base address info and 'step'
+value to determine address for specific PHY quad.
 
 Reviewed-by: Przemek Kitszel <przemyslaw.kitszel@intel.com>
 Signed-off-by: Karol Kolacinski <karol.kolacinski@intel.com>
 Signed-off-by: Grzegorz Nitka <grzegorz.nitka@intel.com>
 ---
- drivers/net/ethernet/intel/ice/ice_ptp_hw.c | 14 +++++++-------
- drivers/net/ethernet/intel/ice/ice_ptp_hw.h |  3 +++
- 2 files changed, 10 insertions(+), 7 deletions(-)
+ .../net/ethernet/intel/ice/ice_ptp_consts.h   | 75 ++++---------------
+ drivers/net/ethernet/intel/ice/ice_ptp_hw.c   |  6 +-
+ drivers/net/ethernet/intel/ice/ice_ptp_hw.h   |  2 +-
+ 3 files changed, 19 insertions(+), 64 deletions(-)
 
+diff --git a/drivers/net/ethernet/intel/ice/ice_ptp_consts.h b/drivers/net/ethernet/intel/ice/ice_ptp_consts.h
+index ac46d1183300..003cdfada3ca 100644
+--- a/drivers/net/ethernet/intel/ice/ice_ptp_consts.h
++++ b/drivers/net/ethernet/intel/ice/ice_ptp_consts.h
+@@ -10,70 +10,25 @@
+ /* Constants defined for the PTP 1588 clock hardware. */
+ 
+ const struct ice_phy_reg_info_eth56g eth56g_phy_res[NUM_ETH56G_PHY_RES] = {
+-	/* ETH56G_PHY_REG_PTP */
+-	{
+-		/* base_addr */
+-		{
+-			0x092000,
+-			0x126000,
+-			0x1BA000,
+-			0x24E000,
+-			0x2E2000,
+-		},
+-		/* step */
+-		0x98,
++	[ETH56G_PHY_REG_PTP] = {
++		.base_addr = 0x092000,
++		.step = 0x98,
+ 	},
+-	/* ETH56G_PHY_MEM_PTP */
+-	{
+-		/* base_addr */
+-		{
+-			0x093000,
+-			0x127000,
+-			0x1BB000,
+-			0x24F000,
+-			0x2E3000,
+-		},
+-		/* step */
+-		0x200,
++	[ETH56G_PHY_MEM_PTP] = {
++		.base_addr = 0x093000,
++		.step = 0x200,
+ 	},
+-	/* ETH56G_PHY_REG_XPCS */
+-	{
+-		/* base_addr */
+-		{
+-			0x000000,
+-			0x009400,
+-			0x128000,
+-			0x1BC000,
+-			0x250000,
+-		},
+-		/* step */
+-		0x21000,
++	[ETH56G_PHY_REG_XPCS] = {
++		.base_addr = 0x000000,
++		.step = 0x21000,
+ 	},
+-	/* ETH56G_PHY_REG_MAC */
+-	{
+-		/* base_addr */
+-		{
+-			0x085000,
+-			0x119000,
+-			0x1AD000,
+-			0x241000,
+-			0x2D5000,
+-		},
+-		/* step */
+-		0x1000,
++	[ETH56G_PHY_REG_MAC] = {
++		.base_addr = 0x085000,
++		.step = 0x1000,
+ 	},
+-	/* ETH56G_PHY_REG_GPCS */
+-	{
+-		/* base_addr */
+-		{
+-			0x084000,
+-			0x118000,
+-			0x1AC000,
+-			0x240000,
+-			0x2D4000,
+-		},
+-		/* step */
+-		0x400,
++	[ETH56G_PHY_REG_GPCS] = {
++		.base_addr = 0x084000,
++		.step = 0x400,
+ 	},
+ };
+ 
 diff --git a/drivers/net/ethernet/intel/ice/ice_ptp_hw.c b/drivers/net/ethernet/intel/ice/ice_ptp_hw.c
-index 3e824f7b30c0..c3dea6d61de4 100644
+index c3dea6d61de4..5c61bc3a2c25 100644
 --- a/drivers/net/ethernet/intel/ice/ice_ptp_hw.c
 +++ b/drivers/net/ethernet/intel/ice/ice_ptp_hw.c
-@@ -2650,18 +2650,18 @@ static void ice_sb_access_ena_eth56g(struct ice_hw *hw, bool enable)
- }
+@@ -1010,7 +1010,7 @@ static int ice_phy_res_address_eth56g(struct ice_hw *hw, u8 lane,
  
- /**
-- * ice_ptp_init_phc_eth56g - Perform E82X specific PHC initialization
-+ * ice_ptp_init_phc_e825 - Perform E825 specific PHC initialization
-  * @hw: pointer to HW struct
-  *
-- * Perform PHC initialization steps specific to E82X devices.
-+ * Perform E825-specific PTP hardware clock initialization steps.
-  *
-- * Return:
-- * * %0     - success
-- * * %other - failed to initialize CGU
-+ * Return: 0 on success, negative error code otherwise.
-  */
--static int ice_ptp_init_phc_eth56g(struct ice_hw *hw)
-+static int ice_ptp_init_phc_e825(struct ice_hw *hw)
- {
- 	ice_sb_access_ena_eth56g(hw, true);
-+	ice_ptp_cfg_sync_delay(hw, ICE_E825_SYNC_DELAY);
-+
- 	/* Initialize the Clock Generation Unit */
- 	return ice_init_cgu_e82x(hw);
+ 	/* Lanes 4..7 are in fact 0..3 on a second PHY */
+ 	lane %= hw->ptp.ports_per_phy;
+-	*addr = eth56g_phy_res[res_type].base[0] +
++	*addr = eth56g_phy_res[res_type].base_addr +
+ 		lane * eth56g_phy_res[res_type].step + offset;
+ 
+ 	return 0;
+@@ -1240,7 +1240,7 @@ static int ice_write_quad_ptp_reg_eth56g(struct ice_hw *hw, u8 port,
+ 	if (port >= hw->ptp.num_lports)
+ 		return -EIO;
+ 
+-	addr = eth56g_phy_res[ETH56G_PHY_REG_PTP].base[0] + offset;
++	addr = eth56g_phy_res[ETH56G_PHY_REG_PTP].base_addr + offset;
+ 
+ 	return ice_write_phy_eth56g(hw, port, addr, val);
  }
-@@ -6123,7 +6123,7 @@ int ice_ptp_init_phc(struct ice_hw *hw)
- 	case ICE_MAC_GENERIC:
- 		return ice_ptp_init_phc_e82x(hw);
- 	case ICE_MAC_GENERIC_3K_E825:
--		return ice_ptp_init_phc_eth56g(hw);
-+		return ice_ptp_init_phc_e825(hw);
- 	default:
- 		return -EOPNOTSUPP;
- 	}
+@@ -1265,7 +1265,7 @@ static int ice_read_quad_ptp_reg_eth56g(struct ice_hw *hw, u8 port,
+ 	if (port >= hw->ptp.num_lports)
+ 		return -EIO;
+ 
+-	addr = eth56g_phy_res[ETH56G_PHY_REG_PTP].base[0] + offset;
++	addr = eth56g_phy_res[ETH56G_PHY_REG_PTP].base_addr + offset;
+ 
+ 	return ice_read_phy_eth56g(hw, port, addr, val);
+ }
 diff --git a/drivers/net/ethernet/intel/ice/ice_ptp_hw.h b/drivers/net/ethernet/intel/ice/ice_ptp_hw.h
-index 8442d1d60351..10295fa9a383 100644
+index 10295fa9a383..63a63ef64aaa 100644
 --- a/drivers/net/ethernet/intel/ice/ice_ptp_hw.h
 +++ b/drivers/net/ethernet/intel/ice/ice_ptp_hw.h
-@@ -324,7 +324,10 @@ extern const struct ice_vernier_info_e82x e822_vernier[NUM_ICE_PTP_LNK_SPD];
+@@ -72,7 +72,7 @@ enum ice_eth56g_link_spd {
+  * ETH56G devices
   */
- #define ICE_E810_PLL_FREQ		812500000
- #define ICE_PTP_NOMINAL_INCVAL_E810	0x13b13b13bULL
-+
-+/* PHC to PHY synchronization delay definitions */
- #define ICE_E810_E830_SYNC_DELAY	0
-+#define ICE_E825_SYNC_DELAY		6
+ struct ice_phy_reg_info_eth56g {
+-	u32 base[NUM_ETH56G_PHY_RES];
++	u32 base_addr;
+ 	u32 step;
+ };
  
- /* Device agnostic functions */
- u8 ice_get_ptp_src_clock_index(struct ice_hw *hw);
 -- 
 2.39.3
 
