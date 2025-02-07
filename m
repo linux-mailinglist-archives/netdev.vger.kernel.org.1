@@ -1,95 +1,91 @@
-Return-Path: <netdev+bounces-164205-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-164206-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id A113EA2CECF
-	for <lists+netdev@lfdr.de>; Fri,  7 Feb 2025 22:10:17 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0D17EA2CFC8
+	for <lists+netdev@lfdr.de>; Fri,  7 Feb 2025 22:38:49 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 670C67A535B
-	for <lists+netdev@lfdr.de>; Fri,  7 Feb 2025 21:09:21 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 9F2171665F7
+	for <lists+netdev@lfdr.de>; Fri,  7 Feb 2025 21:38:47 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EDA191ADC7B;
-	Fri,  7 Feb 2025 21:10:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 62AAE1DE2CF;
+	Fri,  7 Feb 2025 21:36:27 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="qQ2UJDkF"
+	dkim=pass (1024-bit key) header.d=linuxonhyperv.com header.i=@linuxonhyperv.com header.b="ME+OdEW/"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C7C821ACEDF
-	for <netdev@vger.kernel.org>; Fri,  7 Feb 2025 21:10:07 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+Received: from linux.microsoft.com (linux.microsoft.com [13.77.154.182])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CBEF21B4F14;
+	Fri,  7 Feb 2025 21:36:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=13.77.154.182
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1738962607; cv=none; b=Jx2KclYR10ehBi1g6UwMdwdgSK/lexnfXadf6Hm4P/dDhoJEIL8mE6lfpw0+9Hw6Afc3gEiRpn7XuCQeROXAL+0QmX1vaOwTIgfofLU6HC3Q7zL0RHbZPMUu8ORyInzAI/MaZ/s6c4epdwaKw5F6/nsavBQcRoCYuvhBgCg5twU=
+	t=1738964187; cv=none; b=VFUY5irlTDV+bE3zC19xvz+1iOWu+kkQMu2oe1hn80vH2q0OFKYOad57qXum7cyd4/JzV2E9etQuU5gorL1/lLZRQqz5lNKOsN1/ldX5sRQjeCk0bTWIRE+Y12h/Bo6RtSvXSJRr7bwZ95ZIwBIrAH79BTVHg3SPkkUDzr2LZas=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1738962607; c=relaxed/simple;
-	bh=Er8FdtrS9/hS9BLMow3pB/qGm4YSDCVZyoV9EoEuFFk=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=cBCSw9hypCbyaeWC23XFUnorp6vprnrLLLGjdPjn8WjfPj93GLFziFfM2WdeeubRx/DKwucmnZScFsxU/IOeDEptiN6AAiqy3HxugCvE0+agOQBNgaOCkVWtpZNzohePHI8PEC2Il7QwGpfGPwokuEmYtXuq92W2oUE97fqyY0o=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=qQ2UJDkF; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3ECBCC4CED1;
-	Fri,  7 Feb 2025 21:10:07 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1738962607;
-	bh=Er8FdtrS9/hS9BLMow3pB/qGm4YSDCVZyoV9EoEuFFk=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=qQ2UJDkF/WM7dmrzjZXnfkL21Qt2UqgZxygIMxtP0mSzcu9XG1cb9mOgIcWBP5yUU
-	 Ssk91Kv5qF04yDpp6gVOvmjKhJl01puQXBzEVbSDkett0vlvhzrHcuQRoFrcZzykOt
-	 yXrsR3LCjdU3HHqkOjsyRdzAeUsS4mLvWpxkqMxqE5BW9No36eOKS7x/5SCm6LmyCy
-	 8HDh5VbdrNgFz8yjP6h5g1Inf/MVM2UMHfgPuZpbVHCbswBLXPn84eLSl3vFvN8eCL
-	 ylwe+xg4t9B5S1feAzylL4GMNjx5WlkCDfcnMtpd3YdSuP6H61D0F/UKUJOiJOw23Q
-	 g3bJrofSpPnvg==
-Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 70DA4380AAF5;
-	Fri,  7 Feb 2025 21:10:36 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=arc-20240116; t=1738964187; c=relaxed/simple;
+	bh=dq8AoIefuUIcX+6Fl38jm6DSCoHVqLFOJQoP9AmB4+0=;
+	h=From:To:Cc:Subject:Date:Message-Id; b=D4f60pJ9sUzlJnJm23d1w9ie0B0oSj5rYOaaCgxA7+GZi/vBf+1khFvhKwSBpWLd7gTKffKkqKjRKUxKB4afZSKcMjCWQsnmQfxSQcjqjU1/WW3USYve3DV/E8R7tiWT57Gclci0r09wM+Jrf+3wWcIWqClVVuTRDfuabkllzZI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linuxonhyperv.com; spf=pass smtp.mailfrom=linux.microsoft.com; dkim=pass (1024-bit key) header.d=linuxonhyperv.com header.i=@linuxonhyperv.com header.b=ME+OdEW/; arc=none smtp.client-ip=13.77.154.182
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linuxonhyperv.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.microsoft.com
+Received: by linux.microsoft.com (Postfix, from userid 1202)
+	id 5026A2107308; Fri,  7 Feb 2025 13:36:25 -0800 (PST)
+DKIM-Filter: OpenDKIM Filter v2.11.0 linux.microsoft.com 5026A2107308
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linuxonhyperv.com;
+	s=default; t=1738964185;
+	bh=Ghb8m6Qjf7GD05c82JLyKk+8Oh8Ruz05CDBAoS3gH/E=;
+	h=From:To:Cc:Subject:Date:From;
+	b=ME+OdEW/ia90/o9xyGz0sk85qh9y6omn8JlFSCv7Qamb1NgzbIIbhELZJqLVsqV3X
+	 mKjVqwcmE9Mf8qykPLMg4UX/BFAScc240TW5wEmcV01fATNTMN933lCkSa5+HIxJvq
+	 avopxRmtZCORl4glanKVDnKDAZbdlwfDMozo9VLY=
+From: longli@linuxonhyperv.com
+To: Jason Gunthorpe <jgg@ziepe.ca>,
+	Leon Romanovsky <leon@kernel.org>,
+	Ajay Sharma <sharmaajay@microsoft.com>,
+	Konstantin Taranov <kotaranov@microsoft.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>
+Cc: linux-rdma@vger.kernel.org,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	linux-hyperv@vger.kernel.org,
+	Long Li <longli@microsoft.com>
+Subject: [Patch v2 0/3] IB/core: Fix GID cache for bonded net devices
+Date: Fri,  7 Feb 2025 13:36:15 -0800
+Message-Id: <1738964178-18836-1-git-send-email-longli@linuxonhyperv.com>
+X-Mailer: git-send-email 1.8.3.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH iproute2-next] tc_util: Add support for 64-bit hardware
- packets counter
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <173896263528.2382953.12890804961821521297.git-patchwork-notify@kernel.org>
-Date: Fri, 07 Feb 2025 21:10:35 +0000
-References: <20250204123143.1146078-1-idosch@nvidia.com>
-In-Reply-To: <20250204123143.1146078-1-idosch@nvidia.com>
-To: Ido Schimmel <idosch@nvidia.com>
-Cc: netdev@vger.kernel.org, dsahern@gmail.com, stephen@networkplumber.org,
- petrm@nvidia.com, joe@atomic.ac
 
-Hello:
+From: Long Li <longli@microsoft.com>
 
-This patch was applied to iproute2/iproute2-next.git (main)
-by David Ahern <dsahern@kernel.org>:
+When populating GID cache for net devices in a bonded setup, it should use the master device's
+address whenever applicable.
 
-On Tue, 4 Feb 2025 14:31:43 +0200 you wrote:
-> The netlink nest that carriers tc action statistics looks as follows:
-> 
-> [TCA_ACT_STATS]
-> 	[TCA_STATS_BASIC]
-> 	[TCA_STATS_BASIC_HW]
-> 
-> Where 'TCA_STATS_BASIC' carries the combined software and hardware
-> packets (32-bits) and bytes (64-bit) counters and 'TCA_STATS_BASIC_HW'
-> carries the hardware statistics.
-> 
-> [...]
+The current code has some incorrect behaviors when dealing with bonded devices:
+1. It adds IP of bonded slave to the GID cache when the device is already bonded
+2. It adds IP of bonded slave to the GID cache when the device becomes bonded (via NETDEV_CHANGEUPPER notifier)
+3. When a bonded slave device is unbonded, it doesn't add its IP to the default table in GID cache.
 
-Here is the summary with links:
-  - [iproute2-next] tc_util: Add support for 64-bit hardware packets counter
-    https://git.kernel.org/pub/scm/network/iproute2/iproute2-next.git/commit/?id=e7638a027a05
+The patchset fixes those issues.
 
-You are awesome, thank you!
+Changes log:
+v2: Added cover letter explaining the overall problem and current behaviors.
+
+Long Li (3):
+  IB/core: Do not use netdev IP if it is a bonded slave
+  IB/core: Use upper_device_filter to add upper ips
+  IB/core: Add default IP when a slave is unlinked
+
+ drivers/infiniband/core/roce_gid_mgmt.c | 17 +++++++++--------
+ 1 file changed, 9 insertions(+), 8 deletions(-)
+
 -- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
-
+2.34.1
 
 
