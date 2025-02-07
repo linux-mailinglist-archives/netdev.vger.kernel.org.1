@@ -1,288 +1,163 @@
-Return-Path: <netdev+bounces-164235-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-164236-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8B981A2D165
-	for <lists+netdev@lfdr.de>; Sat,  8 Feb 2025 00:18:55 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 78C24A2D17B
+	for <lists+netdev@lfdr.de>; Sat,  8 Feb 2025 00:29:35 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A22E83A40CE
-	for <lists+netdev@lfdr.de>; Fri,  7 Feb 2025 23:18:46 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 60BC3188CDE3
+	for <lists+netdev@lfdr.de>; Fri,  7 Feb 2025 23:29:40 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0DEA71BCA0A;
-	Fri,  7 Feb 2025 23:18:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CEF8B1D8E12;
+	Fri,  7 Feb 2025 23:29:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b="YIaXc9RO"
+	dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b="LURJPCuy"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pj1-f54.google.com (mail-pj1-f54.google.com [209.85.216.54])
+Received: from mail-wm1-f49.google.com (mail-wm1-f49.google.com [209.85.128.49])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4E1631A5B9D
-	for <netdev@vger.kernel.org>; Fri,  7 Feb 2025 23:18:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.54
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D8E4D1D619F
+	for <netdev@vger.kernel.org>; Fri,  7 Feb 2025 23:29:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.49
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1738970329; cv=none; b=Ll3SxR7KXM7XPvN6jiYXSp3aK7RSqQSV3oY2LgHGX2DrUuLFgju1fq8msoX7ha1q+ZOHOWNtFBdzxJxnthW3u7rzRDnzPHinjiAa63Br8FXpOoRf67aS7sCMCxsAz4CdhsFfl2INB1I+rpV77RluJSlDfjbgMvNIACkHJy49JA0=
+	t=1738970969; cv=none; b=W2+k6Jro8g4Zoc1voOktu5uSFg/9s6mRPIVR5Bjqsz0sTxE/Oy44iF1D3326D2281Fb7r50Ui0L0v6ecbGBjn/o3I8dO0lppovO3hqx9zI/rJKWnh1T33LG7IuTxLLwJHqjcL1M+Ng3t/OnvgyGZ6F1AxEG9mxz4xR2Kv+p76cA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1738970329; c=relaxed/simple;
-	bh=06XwhzwzcvSjX7wRgrIsUDM952qvD7/bmiXWaI69wsE=;
+	s=arc-20240116; t=1738970969; c=relaxed/simple;
+	bh=LfbUpyjGHYX7RFAeqCfeoZO0Lm3old+X04Jmz2KNwmw=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=fGnDED5pbn0ZTDzMNProSMqBIeyj+uEUdLFNLVZXHZJAJhWGJhdP4+JjjHZDEzldHRQkuj6IlJHuKZtC/Gu3zTmNth6vLs46AFiB4ct0QhB+sOTViIkISF8VYiSVOl6ou5AXiXwV2qyoyLjaGHSmrP26DfktQh3qFuUebLtfmdU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com; spf=fail smtp.mailfrom=broadcom.com; dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b=YIaXc9RO; arc=none smtp.client-ip=209.85.216.54
+	 To:Cc:Content-Type; b=b4vFo9r/Zi8k5nLx6qJgxwun0DyzfMeaK4YAz4OYVf2O2z4IHA0KNi8Elg8yTVA+Yu0zv1UMdW4eue4CEXEa0cLBwSKCfAvedcWBpI9yvn/7Dvajo9tDgi2w6APeZuNRkHxKW14r5WIzqIhFFijf33saXCVydIDv3i87i7qncvk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com; spf=fail smtp.mailfrom=broadcom.com; dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b=LURJPCuy; arc=none smtp.client-ip=209.85.128.49
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com
 Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=broadcom.com
-Received: by mail-pj1-f54.google.com with SMTP id 98e67ed59e1d1-2fa1fb3c445so2619652a91.2
-        for <netdev@vger.kernel.org>; Fri, 07 Feb 2025 15:18:48 -0800 (PST)
+Received: by mail-wm1-f49.google.com with SMTP id 5b1f17b1804b1-4361b6f9faeso15611915e9.1
+        for <netdev@vger.kernel.org>; Fri, 07 Feb 2025 15:29:27 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=broadcom.com; s=google; t=1738970327; x=1739575127; darn=vger.kernel.org;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=A3SwQFGKojJktzITjmcwqXdg8XG5QiYM8a5oge3xoLo=;
-        b=YIaXc9ROJgnGNz16RpkV82PrCdV9SKVXHfbsz0FJtuPAgnCpKrHn/YlawCDeF1sCX9
-         OF5XS6LEav4cSkTXYTOQwWPPOpbvzReKI325g6YbUrKyKFsayLB6M5YAOsEsYeKchk9P
-         SbR8FFZnjhFioHnS89Mpbe7Xr9yFDPJcJkh4o=
+        d=broadcom.com; s=google; t=1738970966; x=1739575766; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=vxrq3y0zWcusMdm5gKmy0RSUVEtUhaV6df4ledtnR3g=;
+        b=LURJPCuyQgUJiHM0ekNEUJhwT9HGdVn/BUc86TurajLss3++4qObzPhdi9LtvDTAP3
+         /wOsmYOYVGbfzkm16YzzBm189BGGCJDAq3O08LesEsoNjPAClHMSdwSdWiSVAl7j1oxD
+         CNehSCZ80Xgpcm6wYuGExmnKY7ycOGYDWYf+Y=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1738970327; x=1739575127;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=A3SwQFGKojJktzITjmcwqXdg8XG5QiYM8a5oge3xoLo=;
-        b=OMSBUG7G2rgvgu04vAR2I/DxgFVEDgiuSvj7whFZXQrLBXlq3/c04e4Yut5kUkOxuG
-         6+mEIywCnX+ua1WghmzQY6r2jZR4MlcTQ0eDG5aHbEXXvJIZDo5xLqpEsDwCIAc9OUMN
-         42EC/REgXpsleRBLrEYNnSSOWaAUZhU+qFZOeU/99jky+HB6P0HxgCSLVYmQUdZpHb6d
-         JXmWHDakG+OfCg+Ym5FOszvp+eiljRZDt+3T078UYFWbxp28rPAccCodaW1q0cl0SUG7
-         Zp7iB5rADR/PHa+VDRJKYICiS0ni7a/FUACID0gt+r2ae2fp/J/LoYVODvJXXFy8+rQt
-         rdXQ==
-X-Gm-Message-State: AOJu0YzcLFva9PV4r2rigCI8NiklIP3glh7VXpIH1EE5kgW+wdB90WwQ
-	wlsPc0txVk5/IqJzJXRXpv3GvxjZhxYryYntArLidsj4CYZk8GjwDcrdZhwdd5oA5VCwzFt1rue
-	wphZrIUiAN5C/ldiczGA2LQ2oliX3DYJ0vz73
-X-Gm-Gg: ASbGncsurVopg+W4eVSmsf/hJG3pMu2n4BdN7Bh+TVHFNOVItKN13blnZhq6ciBPD+9
-	jtMl2KZa8iBVVp4El/DhWUHa/HkSRwHOSplPhAEdVsb1B5Xpa7ZvQRB7EDhGRxwk99GbnkcEi5A
-	==
-X-Google-Smtp-Source: AGHT+IE4lfz9Fh5v9JdiZ5M0ffjh4tLJUafbDcqw7fPxWUhBu63mA74BrOYKCI8Qj5LacoCaI86AvHrc9JedA4ysMaA=
-X-Received: by 2002:a17:90b:3fc3:b0:2ee:8008:b583 with SMTP id
- 98e67ed59e1d1-2fa24274b87mr8579382a91.16.1738970327542; Fri, 07 Feb 2025
- 15:18:47 -0800 (PST)
+        d=1e100.net; s=20230601; t=1738970966; x=1739575766;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=vxrq3y0zWcusMdm5gKmy0RSUVEtUhaV6df4ledtnR3g=;
+        b=uWxt81/wxxNWs6aUYzqwKohPpm6abaKrBze9x1FYVwHHzGir8194yzj4Hqi1M40h21
+         rzcGebWf1BV/Wm93A85pGe0ar1ftp6zRxX/MvgMCCevTLEuzO9m2hyvSeSzPMPdZVzgP
+         UV7+FfRFDsdbDi5thX2EU34rv8FacWnXSJofXpL+pD60kipXOWVimoqJkcbshOU4nIRs
+         W2gclHBWxKNUp/QQs8HJ5OjE/RQ8LCbKDh35hDLZycucg7JQbQsHegZqjLjZIDoXMaNv
+         LufPBjUbMZ86ngS0D8kASgdnsuOkyNUT4ylgJUgp+UUZgnzzmys/q5ITV/vtkfOu+VIr
+         ECuQ==
+X-Forwarded-Encrypted: i=1; AJvYcCVwcX1mkaMF5yqUWweqoQnqjAbtZE7CAxfVG25Y44EL/KtWbEAsQuGt8SZV2k/ADVOm7Fz50HY=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yw2Jkscl/iC4AmKEveBrKCYPu/3V5bA29IshToQB18xxcpA+13p
+	wj1g+7ieK0QUUBay6f0vl8BHuhFXIIwfkffjjFQeQLW451V40rBFI0TeJVY+2scfURGBvqGf8ji
+	H0LyBx3T7HSl78SaioJNbZHsXPXIMJ/sr8h5M
+X-Gm-Gg: ASbGncs7laL1H65uvBx8cNX+Cyn6L7e+ur0MXqtIV8SPX1K5GWbYYC1/xbDJV4Tq/Ou
+	ZG18f7w5nWGEaIW6XdZPIlHHRtjZ8MmiTdjFUbyjvrqqV/ibzBQg/dgiW26lLdrX0JNXOyFy3
+X-Google-Smtp-Source: AGHT+IHzbgTJPlwhp2rxVyfXTFAiBs82aNuiqx6uZAtVL2iql18//vPZ4iyLFNt7DsusmD2ZyYpKKa2AXyZ4gTFATlw=
+X-Received: by 2002:a05:600c:a47:b0:436:e3ea:64dd with SMTP id
+ 5b1f17b1804b1-43912d3ef4bmr72734975e9.11.1738970966099; Fri, 07 Feb 2025
+ 15:29:26 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20241018205332.525595-1-jitendra.vegiraju@broadcom.com>
- <CAMdnO-+FjsRX4fjbCE_RVNY4pEoArD68dAWoEM+oaEZNJiuA3g@mail.gmail.com> <67919001-1cb7-4e9b-9992-5b3dd9b03406@quicinc.com>
-In-Reply-To: <67919001-1cb7-4e9b-9992-5b3dd9b03406@quicinc.com>
-From: Jitendra Vegiraju <jitendra.vegiraju@broadcom.com>
-Date: Fri, 7 Feb 2025 15:18:35 -0800
-X-Gm-Features: AWEUYZkdCDRaHgbK79-4_vZ3Z-i97Aw1Rvr0Mirz3m8-Wj2cdRiP6FpmPRGkkRc
-Message-ID: <CAMdnO-+HwXf7c=igt2j6VHcki3cYanXpFApZDcEe7DibDz810g@mail.gmail.com>
-Subject: Re: [PATCH net-next v6 0/5] net: stmmac: Add PCI driver support for BCM8958x
-To: "Abhishek Chauhan (ABC)" <quic_abchauha@quicinc.com>
-Cc: netdev@vger.kernel.org, alexandre.torgue@foss.st.com, joabreu@synopsys.com, 
-	davem@davemloft.net, edumazet@google.com, kuba@kernel.org, pabeni@redhat.com, 
-	mcoquelin.stm32@gmail.com, bcm-kernel-feedback-list@broadcom.com, 
-	richardcochran@gmail.com, ast@kernel.org, daniel@iogearbox.net, 
-	hawk@kernel.org, john.fastabend@gmail.com, fancer.lancer@gmail.com, 
-	rmk+kernel@armlinux.org.uk, ahalaney@redhat.com, xiaolei.wang@windriver.com, 
-	rohan.g.thomas@intel.com, Jianheng.Zhang@synopsys.com, 
-	linux-kernel@vger.kernel.org, linux-stm32@st-md-mailman.stormreply.com, 
-	linux-arm-kernel@lists.infradead.org, bpf@vger.kernel.org, andrew@lunn.ch, 
-	linux@armlinux.org.uk, horms@kernel.org, florian.fainelli@broadcom.com
-Content-Type: multipart/signed; protocol="application/pkcs7-signature"; micalg=sha-256;
-	boundary="000000000000ab55f3062d9594a6"
-
---000000000000ab55f3062d9594a6
-Content-Type: multipart/alternative; boundary="000000000000a62238062d9594fb"
-
---000000000000a62238062d9594fb
+References: <0-v4-0cf4ec3b8143+4995-fwctl_jgg@nvidia.com> <10-v4-0cf4ec3b8143+4995-fwctl_jgg@nvidia.com>
+ <20250206164449.52b2dfef@kernel.org> <CACDg6nU_Dkte_GASNRpkvSSCihpg52FBqNr0KR3ud1YRvrRs3w@mail.gmail.com>
+ <20250207073648.1f0bad47@kernel.org>
+In-Reply-To: <20250207073648.1f0bad47@kernel.org>
+From: Andy Gospodarek <andrew.gospodarek@broadcom.com>
+Date: Fri, 7 Feb 2025 18:29:15 -0500
+X-Gm-Features: AWEUYZlrtI146fT0ZIPrxYebKfGyT2dPVkxZPcjyu29IMriUNecpOQzGJhSSMY8
+Message-ID: <CACDg6nWU7XXn4X3LGy=jxREYDDVaqy1Pq19kt93wQPn_US9iiQ@mail.gmail.com>
+Subject: Re: [PATCH v4 10/10] bnxt: Create an auxiliary device for fwctl_bnxt
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: Jason Gunthorpe <jgg@nvidia.com>, Aron Silverton <aron.silverton@oracle.com>, 
+	Dan Williams <dan.j.williams@intel.com>, Daniel Vetter <daniel.vetter@ffwll.ch>, 
+	Dave Jiang <dave.jiang@intel.com>, David Ahern <dsahern@kernel.org>, 
+	Andy Gospodarek <gospo@broadcom.com>, Christoph Hellwig <hch@infradead.org>, 
+	Itay Avraham <itayavr@nvidia.com>, Jiri Pirko <jiri@nvidia.com>, 
+	Jonathan Cameron <Jonathan.Cameron@huawei.com>, Leonid Bloch <lbloch@nvidia.com>, 
+	Leon Romanovsky <leonro@nvidia.com>, linux-cxl@vger.kernel.org, linux-rdma@vger.kernel.org, 
+	netdev@vger.kernel.org, Saeed Mahameed <saeedm@nvidia.com>, 
+	"Nelson, Shannon" <shannon.nelson@amd.com>, Michael Chan <michael.chan@broadcom.com>
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-Hi Abhishek,
-
-On Fri, Feb 7, 2025 at 10:21=E2=80=AFAM Abhishek Chauhan (ABC) <
-quic_abchauha@quicinc.com> wrote:
-
+On Fri, Feb 7, 2025 at 10:36=E2=80=AFAM Jakub Kicinski <kuba@kernel.org> wr=
+ote:
 >
->
-> On 11/5/2024 8:12 AM, Jitendra Vegiraju wrote:
-> > Hi netdev team,
+> On Thu, 6 Feb 2025 22:17:58 -0500 Andy Gospodarek wrote:
+> > On Thu, Feb 6, 2025 at 7:44=E2=80=AFPM Jakub Kicinski <kuba@kernel.org>=
+ wrote:
+> > > On Thu,  6 Feb 2025 20:13:32 -0400 Jason Gunthorpe wrote:
+> > > > From: Andy Gospodarek <gospo@broadcom.com>
+> > > >
+> > > > Signed-off-by: Andy Gospodarek <gospo@broadcom.com>
+> > > > Signed-off-by: Jason Gunthorpe <jgg@nvidia.com>
+> > >
+> > > This is only needed for RDMA, why can't you make this part of bnxt_re=
+ ?
 > >
-> > On Fri, Oct 18, 2024 at 1:53=E2=80=AFPM <jitendra.vegiraju@broadcom.com=
-> wrote:
-> >>
-> >> From: Jitendra Vegiraju <jitendra.vegiraju@broadcom.com>
-> >>
-> >> This patchset adds basic PCI ethernet device driver support for Broadc=
-om
-> >> BCM8958x Automotive Ethernet switch SoC devices.
-> >>
-> >
-> > I would like to seek your guidance on how to take this patch series
-> forward.
-> > Thanks to your feedback and Serge's suggestions, we made some forward
-> > progress on this patch series.
-> > Please make any suggestions to enable us to upstream driver support
-> > for BCM8958x.
+> > This is not just needed for RDMA, so having the aux device for fwctl
+> > as part of the base driver is preferred.
 >
-> Jitendra,
->          Have we resent this patch or got it approved ? I dont see any
-> updates after this patch.
+> Please elaborate. As you well know I have experience using Broadcom
+> devices in large TCP/IP networks, without the need for proprietary
+> tooling.
+
+I totally get that.  As a user it is not satisfying to have to
+download and attempt to compile complicated proprietary tools to use
+hardware features that seem like they should just work.  I don't think
+fwctl should be used as a crutch to avoid doing the work that is
+needed to get support upstream.
+
+> Now, I understand that it may be expedient for Broadcom and nVidia
+> to skip the upstream process and ship "features" to customers using
+> DOCA and whatever you call your tooling. But let's be honest that
+> this is the motivation here. Unified support for proprietary tooling
+> across subsystems and product lines for a given vendor. This way
+> migrating from in-tree networking to proprietary IPU/DPU networking
+> is easier, while migrating to another vendor would require full tooling
+> replacement.
 >
+> I have nothing against RDMA and CXL subsystems adding whatever APIs
+> they want. But I don't understand why you think it's okay to force
+> this on normal networking, which does not need it.
 >
-Thank you for inquiring about the status of this patch.
-As stmmac driver is going through a maintainer transition, we wanted to
-wait until a new maintainer is identified.
-We would like to send the updated patch as soon as possible.
-Thanks,
-Jitendra
-
---000000000000a62238062d9594fb
-Content-Type: text/html; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-
-<div dir=3D"ltr"><div>Hi Abhishek,</div><br><div class=3D"gmail_quote gmail=
-_quote_container"><div dir=3D"ltr" class=3D"gmail_attr">On Fri, Feb 7, 2025=
- at 10:21=E2=80=AFAM Abhishek Chauhan (ABC) &lt;<a href=3D"mailto:quic_abch=
-auha@quicinc.com">quic_abchauha@quicinc.com</a>&gt; wrote:<br></div><blockq=
-uote class=3D"gmail_quote" style=3D"margin:0px 0px 0px 0.8ex;border-left:1p=
-x solid rgb(204,204,204);padding-left:1ex"><br>
-<br>
-On 11/5/2024 8:12 AM, Jitendra Vegiraju wrote:<br>
-&gt; Hi netdev team,<br>
-&gt; <br>
-&gt; On Fri, Oct 18, 2024 at 1:53=E2=80=AFPM &lt;<a href=3D"mailto:jitendra=
-.vegiraju@broadcom.com" target=3D"_blank">jitendra.vegiraju@broadcom.com</a=
->&gt; wrote:<br>
-&gt;&gt;<br>
-&gt;&gt; From: Jitendra Vegiraju &lt;<a href=3D"mailto:jitendra.vegiraju@br=
-oadcom.com" target=3D"_blank">jitendra.vegiraju@broadcom.com</a>&gt;<br>
-&gt;&gt;<br>
-&gt;&gt; This patchset adds basic PCI ethernet device driver support for Br=
-oadcom<br>
-&gt;&gt; BCM8958x Automotive Ethernet switch SoC devices.<br>
-&gt;&gt;<br>&gt; <br>
-&gt; I would like to seek your guidance on how to take this patch series fo=
-rward.<br>
-&gt; Thanks to your feedback and Serge&#39;s suggestions, we made some forw=
-ard<br>
-&gt; progress on this patch series.<br>
-&gt; Please make any suggestions to enable us to upstream driver support<br=
+> nVidia is already refusing to add basic minoring features to their
+> upstream driver, and keeps asking its customers to migrate to libdoca.
+> So the concern that merging this will negatively impact standard
+> tooling is no longer theoretical.
 >
-&gt; for BCM8958x.<br>
-<br>
-Jitendra,<br>
-=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0Have we resent this patch or got it appro=
-ved ? I dont see any updates after this patch. <br><br></blockquote><div><b=
-r></div><div>Thank you for inquiring about the status of this patch.</div><=
-div>As stmmac driver is going through a maintainer transition, we wanted to=
- wait until a new maintainer is identified.</div><div>We would like to send=
- the updated patch as soon as possible.</div><div>Thanks,</div><div>Jitendr=
-a</div><div><br></div></div></div>
+> Anyway, rant over. Give us some technical details.
 
---000000000000a62238062d9594fb--
+The primary use-case that I find valuable is the ability to perform
+debug of different parts of a hardware pipeline when devices are
+already in the field.  This could be the standard ethernet pipeline,
+RoCE, crypto, etc.
 
---000000000000ab55f3062d9594a6
-Content-Type: application/pkcs7-signature; name="smime.p7s"
-Content-Transfer-Encoding: base64
-Content-Disposition: attachment; filename="smime.p7s"
-Content-Description: S/MIME Cryptographic Signature
+We do have the ability to gather all the information we need via tools
+like ethtool and devlink, but there are cases where running a tool in
+real-time can help us know what is happening in a system on a per
+packet basis.  We actually did something like this this week.
 
-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
-tJVewHuOmXgWQxNWV7Oiszu1d9xAcqyj65s1PrEIIaHnxEM3eTK+teecLEy8QymZjjDTrCHg4x36
-2AczdlQAIiq5TSAucGja5VP8g1zTnfL/RAxEZvLS471GABptArolXY2hMVHdVEYcTduZlu8aHARc
-phXveOB5/l3bPqpMVf2aFalv4ab733Aw6cPuQkbtwpMFifp9Y3s/0HGBfADomK4OeDTDJfuvCp8g
-a907E48SjOJBGkh6c6B3ace2XH+CyB7+WBsoK6hsrV5twAXSe7frgP4lN/4Cm2isQl3D7vXM3PBQ
-ddI2aZzmewTfbgZptt4KCUhZh+t7FGB6ZKppQ++Rx0zsGN1s71MtjJnhXvJyPs9UyL1n7KQPTEX/
-07kwIwdMjxC/hpbZmVq0mVccpMy7FYlTuiwFD+TEnhmxGDTVTJ267fcfrySVBHioA7vugeXaX3yL
-SqGQdCWnsz5LyCxWvcfI7zjiXJLwefechLp0LWEBIH5+0fJPB1lfiy1DUutGDJTh9WZHeXfVVFsf
-rSQ3y0VaTqBESMjYsJnFFYQJ9tZJScBluOYacW6gqPGC6EU+bNYC1wpngwVayaQQMIIGbTCCBFWg
-AwIBAgIMGHX6KxYK3WW2YyprMA0GCSqGSIb3DQEBCwUAMFIxCzAJBgNVBAYTAkJFMRkwFwYDVQQK
-ExBHbG9iYWxTaWduIG52LXNhMSgwJgYDVQQDEx9HbG9iYWxTaWduIEdDQyBSNiBTTUlNRSBDQSAy
-MDIzMB4XDTI0MDkyNTEzNTAzMVoXDTI2MDkyNjEzNTAzMVowgbMxCzAJBgNVBAYTAlVTMRMwEQYD
-VQQIEwpDYWxpZm9ybmlhMREwDwYDVQQHEwhTYW4gSm9zZTEZMBcGA1UEYRMQTlRSVVMrREUtNjYx
-MDExNzEWMBQGA1UEChMNQlJPQURDT00gSU5DLjEaMBgGA1UEAxMRSml0ZW5kcmEgVmVnaXJhanUx
-LTArBgkqhkiG9w0BCQEWHmppdGVuZHJhLnZlZ2lyYWp1QGJyb2FkY29tLmNvbTCCASIwDQYJKoZI
-hvcNAQEBBQADggEPADCCAQoCggEBAKWV+9PYvG4njqRsbQas79f8Q46VL7b1ZxvWT6ik6VMbdRZx
-tfpfZalVXksqcb02/N1H7UA9V04cV2q97FkSr/KxeFLMetPb3cVJZICg23IRO2NTPdmgPFzwkPTo
-35h9h/OYLgh3/9a1nTsC2xqJa8GtohD5+42rsskGcI57U4n1r1L4R5IL9ypSqDxX/xVEAdGI5FTj
-VgvoZC6iuEbnez+yO8TT3wun9b/PQowOB5P0CwIFv7ERW0S1s6B8yrbsoaTrz0vQaEA786k1pZkg
-ykC1+zXq/iTyZuPP4B4RkzFd43Pw+GAH0Tt2nx5V4rNisJHeAVNU92Gj01cEg0I+FnsCAwEAAaOC
-Ad8wggHbMA4GA1UdDwEB/wQEAwIFoDCBkwYIKwYBBQUHAQEEgYYwgYMwRgYIKwYBBQUHMAKGOmh0
-dHA6Ly9zZWN1cmUuZ2xvYmFsc2lnbi5jb20vY2FjZXJ0L2dzZ2NjcjZzbWltZWNhMjAyMy5jcnQw
-OQYIKwYBBQUHMAGGLWh0dHA6Ly9vY3NwLmdsb2JhbHNpZ24uY29tL2dzZ2NjcjZzbWltZWNhMjAy
-MzBlBgNVHSAEXjBcMAkGB2eBDAEFAwEwCwYJKwYBBAGgMgEoMEIGCisGAQQBoDIKAwIwNDAyBggr
-BgEFBQcCARYmaHR0cHM6Ly93d3cuZ2xvYmFsc2lnbi5jb20vcmVwb3NpdG9yeS8wCQYDVR0TBAIw
-ADBBBgNVHR8EOjA4MDagNKAyhjBodHRwOi8vY3JsLmdsb2JhbHNpZ24uY29tL2dzZ2NjcjZzbWlt
-ZWNhMjAyMy5jcmwwKQYDVR0RBCIwIIEeaml0ZW5kcmEudmVnaXJhanVAYnJvYWRjb20uY29tMBMG
-A1UdJQQMMAoGCCsGAQUFBwMEMB8GA1UdIwQYMBaAFAApNp5ceroPry1QLdugI4UYsKCSMB0GA1Ud
-DgQWBBRq5Jlxz3MqC+zEgUxK566xEc2g3DANBgkqhkiG9w0BAQsFAAOCAgEARXrmeeWA31pp9Tr0
-M6mOlMv+Pr2raES4GzPSyftvxf6tBQCBNaqi6LSbyusDYOj3mG9bp6VeVn+68OxNY9iNAk+ujtId
-f3+30BlZOQ1v8z9u2peUOUtWI60y2MxhdH0X0n2H+BCGvUOFqs5z440jqqy1HsscZTXHB7FEZmVP
-fyD+0Z6cxyh7WNC6+BgLiFwf8iqmAbu7Yb1sGTUGyS5gfYEjJbF2PJfwNUcJDd7eS4w5Ju5mK5y7
-spgjH2/JmDgbkpSk9JyuWfjGZIg4ah/q2nb6UMd1XJb6gLQZuzPOI3SgXPvd8MHGjKZrX2BHOBSC
-bJJ8rp4w4a9QMS6dde2MFObusxkZAft4tUnwo+ProchHs7iA85sL7sWEZhAmjmKKCpECpEfZm0+/
-hpvKQV3AZp5vBstb4IVL8QmLj8beDVHYnNhEicsSiG1wW7zSYyBnmGbFRrFQIJnJDWPjTZOlVEyp
-T1ShrXRCtqJpOt6rgg+rFEY3D8j6/bAkJXnmKnE2LZ0YyrrKk7eC6UfNNimx38w3NWchtcGY8zJn
-Y/1/C9Jv/mWm/2lK8nvusOFxhKmbG83Hx8toQdZ5F1kYk6zAWjfB7lwXr/En9mCmLieJ18hen9EK
-qbYyUkmCmuoLi5GXFMJy+iQv6DgMVQ7CACagybU6FUrmL9lVa+A6caBEEh4xggJkMIICYAIBATBi
-MFIxCzAJBgNVBAYTAkJFMRkwFwYDVQQKExBHbG9iYWxTaWduIG52LXNhMSgwJgYDVQQDEx9HbG9i
-YWxTaWduIEdDQyBSNiBTTUlNRSBDQSAyMDIzAgwYdforFgrdZbZjKmswDQYJYIZIAWUDBAIBBQCg
-gdQwLwYJKoZIhvcNAQkEMSIEIACLRu++4+XaqPmKtMtKpJYU2j5rKyoV7Ufg8GaNA86VMBgGCSqG
-SIb3DQEJAzELBgkqhkiG9w0BBwEwHAYJKoZIhvcNAQkFMQ8XDTI1MDIwNzIzMTg0N1owaQYJKoZI
-hvcNAQkPMVwwWjALBglghkgBZQMEASowCwYJYIZIAWUDBAEWMAsGCWCGSAFlAwQBAjAKBggqhkiG
-9w0DBzALBgkqhkiG9w0BAQowCwYJKoZIhvcNAQEHMAsGCWCGSAFlAwQCATANBgkqhkiG9w0BAQEF
-AASCAQBPrNla8/0W+0X6MCVu8XWhB/XD5b2kylwc5oOfOLfCww/ssj/BxUwgvcT4TL8hWI9ftTTC
-vjbsPuzYDumkHgCy8MqTTwLs7DO/Iss+cnnHRUQJVqcE//ODTxXgD5WL0jwVpIIUb2F+gHqMyrBE
-y35Hh/5bJdKcWjFrQnq65gXJ9PXsfFo1r3oK2kRvPGpApzWeNTsG41ymp3KelC0HSUZ/yWbeHzoS
-06MwoEa5I1jMHFHA+pa1PvMAc9t2k6obTeV7ZO3YYuHTRB1rtuZNyhHMK0/y+2Oo2d61/AYvhlh2
-ywrHdRWBwIbLEHiDfYuiVKg2pwwaSkf9anfaDAVc9WUQ
---000000000000ab55f3062d9594a6--
+When I look at fwctl, I don't see it as something that is valuable
+only today -- I see it as something that is valuable 2 years from now.
+When someone is still running v6.17 and we have discovered that a
+debug counter/infra that was added in v7.0, but they cannot use it
+without installing a new kernel or an OOB driver we don't have an
+option to easily help narrow down the problem.
+
+If a fairly simple tool can help perform RPC to FW to glean some of
+this hardware information we save days of back and forth debugging
+with special drivers to try and help narrow down the issue.
 
