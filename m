@@ -1,149 +1,105 @@
-Return-Path: <netdev+bounces-163863-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-163864-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7A533A2BDC8
-	for <lists+netdev@lfdr.de>; Fri,  7 Feb 2025 09:24:51 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6F335A2BDE1
+	for <lists+netdev@lfdr.de>; Fri,  7 Feb 2025 09:28:08 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 8FA4E1885C05
-	for <lists+netdev@lfdr.de>; Fri,  7 Feb 2025 08:24:56 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 6D83D7A26B0
+	for <lists+netdev@lfdr.de>; Fri,  7 Feb 2025 08:27:12 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 11C461AA1DA;
-	Fri,  7 Feb 2025 08:24:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E00C41A9B2A;
+	Fri,  7 Feb 2025 08:28:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="AwilwGu0"
 X-Original-To: netdev@vger.kernel.org
-Received: from metis.whiteo.stw.pengutronix.de (metis.whiteo.stw.pengutronix.de [185.203.201.7])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ed1-f41.google.com (mail-ed1-f41.google.com [209.85.208.41])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D64CF1A83EE
-	for <netdev@vger.kernel.org>; Fri,  7 Feb 2025 08:24:43 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.203.201.7
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2E6261A5B99
+	for <netdev@vger.kernel.org>; Fri,  7 Feb 2025 08:28:00 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.41
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1738916686; cv=none; b=BF+RJ74+bWQ2DiEqQqLGq1kXqtoaXVf6xsEeP+4sTCYhNnFQDo/Ao8//ZRBroMz1PBCgoYu+QYetwuEUk/1+AiFYnuN+lun6qIY4amMLcj6el5TZcAsByIbWzjaKONBiMTnySGImsfU9aooHg7SgS73jg4RdLkWjTjzmSHjZCsU=
+	t=1738916882; cv=none; b=flmiQKX+hJ3933NrFQtsbMxsMYpQ7+CwV/bkDSIgOF0raiJfbmSdquzrF2sVdFBHMOZ3cFlF+5CZosUTGrUyLlyTXd12V9vy6tkOXyyeB3vEKMdbS1dATV+unz7wrH1yHGI0CmlVhxboHiLieagTHu7MGs6GAfUvUMooVndwbx8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1738916686; c=relaxed/simple;
-	bh=kI4Fyn7CvsZ6t9HvUQsul7UYVpT9ozBs0hE2VBctCOQ=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=vEKk9uqOw5NWkKBF6Up3lA+RA8vx2EtFpQDUw7cfghmv+Yg9hjVHF7GXfrg6n9BKegWA5vKUtvrEZNT2zMcDT3sx4eQotpev1Dc2lTEylmRcHVdJm5DRvLs3/a0BAXmzMRFCe3RaOzgIrGdLBM4NKAC1q034joM+diLXZEtEE7I=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de; spf=pass smtp.mailfrom=pengutronix.de; arc=none smtp.client-ip=185.203.201.7
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=pengutronix.de
-Received: from drehscheibe.grey.stw.pengutronix.de ([2a0a:edc0:0:c01:1d::a2])
-	by metis.whiteo.stw.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
-	(Exim 4.92)
-	(envelope-from <ore@pengutronix.de>)
-	id 1tgJep-0000UF-AY; Fri, 07 Feb 2025 09:24:15 +0100
-Received: from pty.whiteo.stw.pengutronix.de ([2a0a:edc0:2:b01:1d::c5])
-	by drehscheibe.grey.stw.pengutronix.de with esmtps  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.96)
-	(envelope-from <ore@pengutronix.de>)
-	id 1tgJek-003whN-2j;
-	Fri, 07 Feb 2025 09:24:10 +0100
-Received: from ore by pty.whiteo.stw.pengutronix.de with local (Exim 4.96)
-	(envelope-from <ore@pengutronix.de>)
-	id 1tgJek-001cd8-2G;
-	Fri, 07 Feb 2025 09:24:10 +0100
-Date: Fri, 7 Feb 2025 09:24:10 +0100
-From: Oleksij Rempel <o.rempel@pengutronix.de>
-To: Zhang Zekun <zhangzekun11@huawei.com>
-Cc: robh@kernel.org, saravanak@google.com, justin.chen@broadcom.com,
-	florian.fainelli@broadcom.com, andrew+netdev@lunn.ch,
-	kuba@kernel.org, kory.maincent@bootlin.com,
-	jacopo+renesas@jmondi.org, kieran.bingham+renesas@ideasonboard.com,
-	laurent.pinchart+renesas@ideasonboard.com, maddy@linux.ibm.com,
-	mpe@ellerman.id.au, npiggin@gmail.com, olteanv@gmail.com,
-	davem@davemloft.net, taras.chornyi@plvision.eu, edumazet@google.com,
-	pabeni@redhat.com, sudeep.holla@arm.com, cristian.marussi@arm.com,
-	arm-scmi@vger.kernel.org, linuxppc-dev@lists.ozlabs.org,
-	linux-media@vger.kernel.org, netdev@vger.kernel.org,
-	devicetree@vger.kernel.org, chenjun102@huawei.com
-Subject: Re: [PATCH 1/9] of: Add warpper function
- of_find_node_by_name_balanced()
-Message-ID: <Z6XDKi_V0BZSdCeL@pengutronix.de>
-References: <20250207013117.104205-1-zhangzekun11@huawei.com>
- <20250207013117.104205-2-zhangzekun11@huawei.com>
+	s=arc-20240116; t=1738916882; c=relaxed/simple;
+	bh=Qi5NpsVqPgaOApaIyh0zKPkUnwhp3Owz1trYulmqFCo=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=IO+lRDOd7Bdncie9lQ9fAVMbnwAS7mD9owf89A77QABsYm6p2pPfE++JJM1RQrbdZ0QMandlgP2ZwE+8cy2dOxqEdbzcvBE8o8XRbQ6V3Gr77f6Z7CtULoOZ+ga8tL0l4X3Vv6BSfbGSRg7/ICjYGqP9spPvxzAYIOEYyMNqgRQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=AwilwGu0; arc=none smtp.client-ip=209.85.208.41
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-ed1-f41.google.com with SMTP id 4fb4d7f45d1cf-5de4a8b4f86so538861a12.2
+        for <netdev@vger.kernel.org>; Fri, 07 Feb 2025 00:28:00 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1738916879; x=1739521679; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=Qi5NpsVqPgaOApaIyh0zKPkUnwhp3Owz1trYulmqFCo=;
+        b=AwilwGu0lgQHJ494h/xHwSNJO4aajFP85xCWaiZW5Gt8jRkHv5PZqM0VMbfMD7C5zA
+         8jjI3Qu94TmPe2gV9P2uGKYEGWNtL6Z+upa3/VQ8Qza2KM7LQfoxaiJHlQzmaf0gMlYw
+         GWAuAA7wxF6KdVEmyQm4MmObkCCRNxOUk6sZhou07Hg519NlWN7BPNtE+Ct+4+OIyYqb
+         h+ZEreKWb3NsfDij8FMqivodIHQoThIw3cpApPaDqeAhJSuBTAWOILAcmcwl5AVociJy
+         fLrQHeynQHM8MdR4gjDFcBxQ/pTotpTzE0Xt+d0LuFrbdtpUbUuF8lXxQEygmtejBEhz
+         Cs5Q==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1738916879; x=1739521679;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=Qi5NpsVqPgaOApaIyh0zKPkUnwhp3Owz1trYulmqFCo=;
+        b=oD4/1mKlwSfPsyvIG5SOwho3qCNjNLRyj9HTuA9lwBEJmiqxGo5Dz8F0Nghimw4XDR
+         riO1LOhSvLnPswh6ZxGR0Baqw9tFhmiyhczmT0+RRtxPfFtofZBeBHxnOFMwmzqD8xIk
+         l0NagHqtFE1XmsFYB/mv39vqcz3PmO66oiyMdQGuUut5WSkkAl3rDgAleDWqmg5tpE3x
+         ylGB0DGsmTPVYYor6jXEuxwaFZ/bcflMqemWfdOmstzU6ZLceMl93UFZSf0pKfxiKEba
+         goTldiGcmL7hlvxvwVWD8GetN0QV49qxJRQV1WA2olKzGXTr7r5L+oNkICpepIH0yv+Q
+         FM+w==
+X-Forwarded-Encrypted: i=1; AJvYcCVCjOI04mJXJD88AKYVday83YTXPW16rU2s8kzq6XLx5anD5J7FtqPgmjfF0ulZdaj6iuni4qA=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yxf5+ArgxQHah/hm3bWvwzemIbkTm98UDAtt6lC7FnOobVuQeE1
+	TcHPvwPnym4CTPcde1wEj2sRjzV/JUGHUB7mM7xdhLQwFCoA3+H5Lxc2Pl81CPPqG2OZCdr7HBa
+	/wOcdAY2i5V0fjlQzXfVsIUfOCoYLxbX+34+Z
+X-Gm-Gg: ASbGncsVn9QTTBAlqJsD5C8roTT30HFELBPH477uzysD1sGweKKUwlJGUb1tNG8PSgA
+	DKx2zTXjfxlTZ7ueqaWHmi5JziSCAut/DrtIgmUBJDd6ldBKRwffEMLInNpYY0J14fZagK9RY
+X-Google-Smtp-Source: AGHT+IH+y9I+9dCfPkmf56SL2QK/b+ugU1eXw/bnplOBw648LM/DlL9SmYrFh4fbGGTn7gpFS1ddE0NZLtKS/6VJ+Ms=
+X-Received: by 2002:a05:6402:2801:b0:5dc:d31a:398d with SMTP id
+ 4fb4d7f45d1cf-5de450059cbmr2877302a12.10.1738916879230; Fri, 07 Feb 2025
+ 00:27:59 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <20250207013117.104205-2-zhangzekun11@huawei.com>
-X-Sent-From: Pengutronix Hildesheim
-X-URL: http://www.pengutronix.de/
-X-Accept-Language: de,en
-X-Accept-Content-Type: text/plain
-X-SA-Exim-Connect-IP: 2a0a:edc0:0:c01:1d::a2
-X-SA-Exim-Mail-From: ore@pengutronix.de
-X-SA-Exim-Scanned: No (on metis.whiteo.stw.pengutronix.de); SAEximRunCond expanded to false
-X-PTX-Original-Recipient: netdev@vger.kernel.org
+References: <20250207072502.87775-1-kuniyu@amazon.com> <20250207072502.87775-2-kuniyu@amazon.com>
+In-Reply-To: <20250207072502.87775-2-kuniyu@amazon.com>
+From: Eric Dumazet <edumazet@google.com>
+Date: Fri, 7 Feb 2025 09:27:47 +0100
+X-Gm-Features: AWEUYZkqGmzb20tlsCEvRr35aOomnlp5RcGNUcEcPpm8lz_whdiLynM9dLvgrv0
+Message-ID: <CANn89iJWXUQ3iVkePuBuQtW6CnTZXiskX+GS4ziXeO_AuzMCsw@mail.gmail.com>
+Subject: Re: [PATCH v2 net-next 1/8] net: fib_rules: Don't check net in
+ rule_exists() and rule_find().
+To: Kuniyuki Iwashima <kuniyu@amazon.com>
+Cc: "David S. Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
+	Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, Ido Schimmel <idosch@idosch.org>, 
+	Kuniyuki Iwashima <kuni1840@gmail.com>, netdev@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Fri, Feb 07, 2025 at 09:31:09AM +0800, Zhang Zekun wrote:
-> There are many drivers use of_find_node_by_name() with a not-NULL
-> device_node pointer, and a number of callers would require a call to
-> of_node_get() before using it. There are also some drivers who forget
-> to call of_node_get() which would cause a ref count leak[1]. So, Add a
-> wraper function for of_find_node_by_name(), drivers may use this function
-> to call of_find_node_by_name() with the refcount already balanced.
-> 
-> [1] https://lore.kernel.org/all/20241024015909.58654-1-zhangzekun11@huawei.com/
+On Fri, Feb 7, 2025 at 8:25=E2=80=AFAM Kuniyuki Iwashima <kuniyu@amazon.com=
+> wrote:
+>
+> fib_nl_newrule() / fib_nl_delrule() looks up struct fib_rules_ops
+> in sock_net(skb->sk) and calls rule_exists() / rule_find() respectively.
+>
+> fib_nl_newrule() creates a new rule and links it to the found ops, so
+> struct fib_rule never belongs to a different netns's ops->rules_list.
+>
+> Let's remove redundant netns check in rule_exists() and rule_find().
+>
+> Signed-off-by: Kuniyuki Iwashima <kuniyu@amazon.com>
 
-Hi Zhang Zekun,
-
-thank you for working on this issue!
-
-First of all, let's take a step back and analyze the initial problem.
-Everything following is only my opinion...
-
-The main issue I see is that the current API - of_find_node_by_name -
-modifies the refcount of its input by calling of_node_put(from) as part
-of its search. Typically, a "find" function is expected to treat its
-input as read-only. That is, when you pass an object into such a
-function, you expect its reference count to remain unchanged unless
-ownership is explicitly transferred. In this case, lowering the refcount
-on the input node is counterintuitive and already lead to unexpected
-behavior and subtle bugs.
-
-To address this, the workaround introduces a wrapper function,
-of_find_node_by_name_balanced, which first increments the input’s
-refcount (via of_node_get()) before calling the original function. While
-this "balances" the refcount change, the naming remains problematic from
-my perspective. The "_balanced" suffix isn’t part of our common naming
-conventions (traditions? :)). Most drivers expect that a function
-starting with "find" will not alter the reference count of its input.
-The term "balanced" doesn’t clearly convey that the input's refcount is
-being explicitly managed - it instead obscures the underlying behavior,
-leaving many developers confused about what guarantees the API provides.
-
-In my view, a more natural solution would be to redesign the API so that
-it doesn’t modify the input object’s refcount at all. Instead, it should
-solely increase the refcount of the returned node (if found) for safe
-asynchronous usage. This approach would align with established
-conventions where "find" implies no side effects on inputs or output,
-and a "get" indicates that the output comes with an extra reference. For
-example, a function named of_get_node_by_name would clearly signal that
-only the returned node is subject to a refcount increase while leaving
-the input intact.
-
-Thus, while the current workaround "balances" the reference count, it
-doesn't address the underlying design flaw. The naming still suggests a
-"find" function that should leave the input untouched, which isn’t the
-case here. A redesign of the API - with both the behavior and naming
-aligned to common expectations - would be a clearer and more robust
-solution.
-
-Nevertheless, it is only my POV, and the final decision rests with the
-OpenFirmware framework maintainers.
-
-Best Regards,
-Oleksij
--- 
-Pengutronix e.K.                           |                             |
-Steuerwalder Str. 21                       | http://www.pengutronix.de/  |
-31137 Hildesheim, Germany                  | Phone: +49-5121-206917-0    |
-Amtsgericht Hildesheim, HRA 2686           | Fax:   +49-5121-206917-5555 |
+Reviewed-by: Eric Dumazet <edumazet@google.com>
 
