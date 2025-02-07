@@ -1,149 +1,121 @@
-Return-Path: <netdev+bounces-164068-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-164062-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 767CBA2C82D
-	for <lists+netdev@lfdr.de>; Fri,  7 Feb 2025 17:00:46 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id DCD7CA2C7F6
+	for <lists+netdev@lfdr.de>; Fri,  7 Feb 2025 16:55:12 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 418ED166157
-	for <lists+netdev@lfdr.de>; Fri,  7 Feb 2025 16:00:25 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id EC7597A3D84
+	for <lists+netdev@lfdr.de>; Fri,  7 Feb 2025 15:54:15 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7B3082451C6;
-	Fri,  7 Feb 2025 15:59:15 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BC8DE23C8B3;
+	Fri,  7 Feb 2025 15:55:00 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b="byed9zhr"
+	dkim=pass (2048-bit key) header.d=ziepe.ca header.i=@ziepe.ca header.b="HT8TUE/8"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0a-0031df01.pphosted.com (mx0a-0031df01.pphosted.com [205.220.168.131])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qv1-f42.google.com (mail-qv1-f42.google.com [209.85.219.42])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ED18F1EB18D;
-	Fri,  7 Feb 2025 15:59:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.168.131
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2532423C8A8
+	for <netdev@vger.kernel.org>; Fri,  7 Feb 2025 15:54:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.42
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1738943955; cv=none; b=aOauz6zYIHy5Qb6hy1ORs7VjVwb6tpW0sQHen1lwtfelGxWUQj6nmhWf7YkjB/wcY1Ol8wuZqzWxHhQFgigMRIMyARJewyyjmrWl5cZuJ10zcM9dkSn8oGWJ4z0dbC+j+o6ZD2UR2o6O07aH02DYmC+pHajqL6Ts+Vdrn8pfe7Q=
+	t=1738943700; cv=none; b=OSVONqvRSsnec3NSk93CwzJAHv5Qeiev0WYtwb2JP5C2RG3uIeLazWfdRXqbkSYKKj0jIc9bYKPPKx9c1nIqj47U1nwbAKK1N28u3n+/Evq8uCZHxNqvaW9PLMzTIGDSpHR6iTJYt7hu0zQlXCMOlgJFF6xguyQOYUel80XA1+M=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1738943955; c=relaxed/simple;
-	bh=HpFqvIT+cfFtpH+ABRHpXGMzJbwYFkCkvBI+O9Njk7I=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-ID:References:
-	 In-Reply-To:To:CC; b=NJvqUAUVPcF2SajMSILrLJkA7+L+kRBG/RLjd3NYrffNMmMYaSCDWBXJ8tBn2b5N0baNQ8/NUYFgYVKt9Osp83GK/72aAQDZ8SPg3WUY8mlzg3+hjbdRx71AKXAgKfyFtZYbsLYTiv2ygvuNjAJFp0XF0p4xTSTgvlo1qMgRBOI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com; spf=pass smtp.mailfrom=quicinc.com; dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b=byed9zhr; arc=none smtp.client-ip=205.220.168.131
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=quicinc.com
-Received: from pps.filterd (m0279866.ppops.net [127.0.0.1])
-	by mx0a-0031df01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 51770SKi016630;
-	Fri, 7 Feb 2025 15:59:00 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=quicinc.com; h=
-	cc:content-transfer-encoding:content-type:date:from:in-reply-to
-	:message-id:mime-version:references:subject:to; s=qcppdkim1; bh=
-	btt4RdEIIBJit2kN1ZGw58yZ2tYbo1VWqyU39sDoZ30=; b=byed9zhrpfHTTQ/X
-	LfH+jwBFDCMq3fX98IR5AUybDQ14ORpb7PPMbTUnTwfWnbpWiZcjMSK5DOhIUxJ0
-	uPmxtugUXK0XXmVDbS91rG2fjWhBRNTtjQQSWKJfp3RJoJnsoRs4qdOo3WB4ZtOc
-	sRCauJVK257buDaWy638BZOx8OYGagO1sYyHn2MOjdLjGSMk/Q30k+O6fcx8EiXH
-	RwaMNs1hdpzHXIZ5k0xJy9dMSNH85pZ/9R2R8zcQoHX59Pq4+sxFjFwXhiL8XiUl
-	WNqAAsymidUEcvxj5+5Vx3k2boomnxo3yfwVQMh6dHvkUVkwvqAemr72mIb/ygmU
-	B/ZsFA==
-Received: from nasanppmta03.qualcomm.com (i-global254.qualcomm.com [199.106.103.254])
-	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 44nddh1bxx-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Fri, 07 Feb 2025 15:58:59 +0000 (GMT)
-Received: from nasanex01a.na.qualcomm.com (nasanex01a.na.qualcomm.com [10.52.223.231])
-	by NASANPPMTA03.qualcomm.com (8.18.1.2/8.18.1.2) with ESMTPS id 517FwxUw007384
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Fri, 7 Feb 2025 15:58:59 GMT
-Received: from nsssdc-sh01-lnx.ap.qualcomm.com (10.80.80.8) by
- nasanex01a.na.qualcomm.com (10.52.223.231) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.9; Fri, 7 Feb 2025 07:58:54 -0800
-From: Lei Wei <quic_leiwei@quicinc.com>
-Date: Fri, 7 Feb 2025 23:53:16 +0800
-Subject: [PATCH net-next v5 5/5] MAINTAINERS: Add maintainer for Qualcomm
- IPQ9574 PCS driver
+	s=arc-20240116; t=1738943700; c=relaxed/simple;
+	bh=I2GuDhxl+08paIRrviBkUYIALNebE4rhANc6ESbwfJk=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=pV6Zbl6Bm1TABXeh40tA1RBdRPIUoxkh7AGGZSUFN8JnQmaclMmSCXU5L/QBRvdCBEQ892cC/9pFEERRRtUjo+bFjWF2brpfUHSjk6V3Vm3H9m0LTyckJiDN/tgEZ2/d1AHEnGwg40fU2BGGnYcSB9aSnuaFf6IzugLrKDbGwUE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ziepe.ca; spf=pass smtp.mailfrom=ziepe.ca; dkim=pass (2048-bit key) header.d=ziepe.ca header.i=@ziepe.ca header.b=HT8TUE/8; arc=none smtp.client-ip=209.85.219.42
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ziepe.ca
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ziepe.ca
+Received: by mail-qv1-f42.google.com with SMTP id 6a1803df08f44-6e440e64249so18789586d6.3
+        for <netdev@vger.kernel.org>; Fri, 07 Feb 2025 07:54:58 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=ziepe.ca; s=google; t=1738943698; x=1739548498; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=wG4kDX3mPsVlAfvrUd487lzsY97VgTkw0/bdTrkhSGs=;
+        b=HT8TUE/8/UXvNaK5LmB/835+M8y9p+nozLAhhaRKfPQUnhy28oZ0BpcxKxygPiVK2e
+         0UgWSXIhF+xAR3eojV0+7V2VAeCMmmnNy6DICKseoiCyEvtDk8GiZWfDKWts25dDqKKF
+         8U3nA/JxGFuPvLioH7pcJO4B2CCVrAAQKFXFs5V2GdsgI7z4NtC396a4v5kWFW8mAv1q
+         QZxYjB34hpMKOJiwuhkP5OIZ7sLrmJSe8VsS7LHiogQW0bLMZX0Cn2xwbHKSx/YSbVrZ
+         OBXC5YgCBUYUpehBIhozOTD2gFyKVMa4zVgw0tccR9fS67jLAFJY7PmkGa2rQyhrEHHC
+         RRDw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1738943698; x=1739548498;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=wG4kDX3mPsVlAfvrUd487lzsY97VgTkw0/bdTrkhSGs=;
+        b=R8RjWOFZQU/f1IKjECv7wmDQlv6UmQwbI3/eco2kpXhlC1lEXSk0Xp+YfJd6xAe4Sh
+         o+ee4p45C/aGlFPFrL+A0dws4IWe2qgoAcJzjtiNgTi+DWwvh85yImHOQYvTegEjcDIa
+         LN/e/5F/8jGkKXzUiOMQvP/N1/9lpXv1bAQNFDpjznZirz0tDwiwlWTsDTNo0XWRbA2D
+         s9FD9Hy9GDK1nxjLSzMd7cvMFFum1FCwVno3DjWpfdBIX0XagBeJjIAMCrVQ0fHeaI0M
+         +DIwr7++S9PMJgnJ7lPpBBOCVJ7zIgXJW+H/daEcLpww/YSSVUZHJNUWxXbHuGPRV4B+
+         J/Iw==
+X-Forwarded-Encrypted: i=1; AJvYcCUDr2AbIHoq5QS7vDn47T+DHsj2X9IQjikzwIpQ9Hq82jnVl5PIPmbBJuJC3RiyLphJXf6Ju64=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzuwvgPSAmoiRFRvMfVM2Bv9Hl5gYNSZ6JNa1yhSn/LoBpYh50v
+	Z13BL66kYHjbsR0DZ7XvGaGrFtmQpi8pCG1qo14lXN+zkwQD0zGFOwoWO9sz4Ds=
+X-Gm-Gg: ASbGncslkDL4y0w1Tl0/sSlJKuPJDOu3RUPzGPfSq8cTLwolDywe3A9TbXDQtB2eWyB
+	9sy6Mc4r50tZ++P2m4gkkrV+8tpzjktCG+3QYCo28Nz07cG6nYTt44oCTMp17dlHJ7n4tiuCmxb
+	vv0KUjZC76bvOTFjG7J+y1B8NCEs1RNTHDW04DXNeaLyu5IthHJn6Vz7iP92gDTLnKQ7r+fOPvr
+	AoUt3qLxViDRKFPZujuMMwUg6HQHSb9yxz/LniHcqfHB2JziKjCRiI26OVI4JB7IobACxhAqHSa
+	bENh2BeKRqLYreCy8U2FCNI5VIwIaCAMfTDPrtGWRKWQhRVSFP4eGyq7rZAvujVX
+X-Google-Smtp-Source: AGHT+IEq6vakQzNYiXzUmxGw05TQjdF65NCz8Qjlk4Szby4FeLGiS8FNdUCgGzZaq1/yR/BAprqyEQ==
+X-Received: by 2002:ad4:5f89:0:b0:6d8:8a7b:66a4 with SMTP id 6a1803df08f44-6e4455e8913mr53333496d6.14.1738943697961;
+        Fri, 07 Feb 2025 07:54:57 -0800 (PST)
+Received: from ziepe.ca (hlfxns017vw-142-68-128-5.dhcp-dynamic.fibreop.ns.bellaliant.net. [142.68.128.5])
+        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-6e43ba2be69sm18281116d6.15.2025.02.07.07.54.57
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 07 Feb 2025 07:54:57 -0800 (PST)
+Received: from jgg by wakko with local (Exim 4.97)
+	(envelope-from <jgg@ziepe.ca>)
+	id 1tgQgy-0000000FNdT-38ej;
+	Fri, 07 Feb 2025 11:54:56 -0400
+Date: Fri, 7 Feb 2025 11:54:56 -0400
+From: Jason Gunthorpe <jgg@ziepe.ca>
+To: Mitchell Augustin <mitchell.augustin@canonical.com>
+Cc: saeedm@nvidia.com, leon@kernel.org, tariqt@nvidia.com,
+	andrew+netdev@lunn.ch, "David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	netdev@vger.kernel.org, linux-rdma@vger.kernel.org,
+	linux-kernel@vger.kernel.org, Talat Batheesh <talatb@nvidia.com>,
+	Feras Daoud <ferasda@nvidia.com>
+Subject: Re: modprobe mlx5_core on OCI bare-metal instance causes
+ unrecoverable hang and I/O error
+Message-ID: <20250207155456.GA3665725@ziepe.ca>
+References: <CAHTA-uaH9w2LqQdxY4b=7q9WQsuA6ntg=QRKrsf=mPfNBmM5pw@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Message-ID: <20250207-ipq_pcs_6-14_rc1-v5-5-be2ebec32921@quicinc.com>
-References: <20250207-ipq_pcs_6-14_rc1-v5-0-be2ebec32921@quicinc.com>
-In-Reply-To: <20250207-ipq_pcs_6-14_rc1-v5-0-be2ebec32921@quicinc.com>
-To: Andrew Lunn <andrew+netdev@lunn.ch>,
-        "David S. Miller"
-	<davem@davemloft.net>,
-        Eric Dumazet <edumazet@google.com>, Jakub Kicinski
-	<kuba@kernel.org>,
-        Paolo Abeni <pabeni@redhat.com>, Rob Herring
-	<robh@kernel.org>,
-        Krzysztof Kozlowski <krzk+dt@kernel.org>,
-        Conor Dooley
-	<conor+dt@kernel.org>, Andrew Lunn <andrew@lunn.ch>,
-        Heiner Kallweit
-	<hkallweit1@gmail.com>,
-        Russell King <linux@armlinux.org.uk>
-CC: <netdev@vger.kernel.org>, <devicetree@vger.kernel.org>,
-        <linux-kernel@vger.kernel.org>, <linux-arm-msm@vger.kernel.org>,
-        <quic_kkumarcs@quicinc.com>, <quic_suruchia@quicinc.com>,
-        <quic_pavir@quicinc.com>, <quic_linchen@quicinc.com>,
-        <quic_luoj@quicinc.com>, <quic_leiwei@quicinc.com>,
-        <srinivas.kandagatla@linaro.org>, <bartosz.golaszewski@linaro.org>,
-        <vsmuthu@qti.qualcomm.com>, <john@phrozen.org>
-X-Mailer: b4 0.14.1
-X-Developer-Signature: v=1; a=ed25519-sha256; t=1738943908; l=960;
- i=quic_leiwei@quicinc.com; s=20240829; h=from:subject:message-id;
- bh=HpFqvIT+cfFtpH+ABRHpXGMzJbwYFkCkvBI+O9Njk7I=;
- b=VSf5SDGe+EnzqQXbNcX0ZedQX9iLRui2ne1AO4awX8E7tUkqeORxShAC4dsbxOx3N9vUvaoaj
- cvqD6OL5v74D1zuNfctv9XjqfM+PNLpLq7JYEMjArAWFapZ/nPs3zzI
-X-Developer-Key: i=quic_leiwei@quicinc.com; a=ed25519;
- pk=uFXBHtxtDjtIrTKpDEZlMLSn1i/sonZepYO8yioKACM=
-X-ClientProxiedBy: nasanex01a.na.qualcomm.com (10.52.223.231) To
- nasanex01a.na.qualcomm.com (10.52.223.231)
-X-QCInternal: smtphost
-X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=5800 signatures=585085
-X-Proofpoint-ORIG-GUID: rHfawhoiJifVUufzwZsZwbfmp-crgsGk
-X-Proofpoint-GUID: rHfawhoiJifVUufzwZsZwbfmp-crgsGk
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1057,Hydra:6.0.680,FMLib:17.12.68.34
- definitions=2025-02-07_07,2025-02-07_03,2024-11-22_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 phishscore=0 suspectscore=0
- clxscore=1015 mlxlogscore=814 lowpriorityscore=0 impostorscore=0
- mlxscore=0 spamscore=0 priorityscore=1501 adultscore=0 malwarescore=0
- bulkscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.19.0-2501170000 definitions=main-2502070121
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <CAHTA-uaH9w2LqQdxY4b=7q9WQsuA6ntg=QRKrsf=mPfNBmM5pw@mail.gmail.com>
 
-Add maintainer for the Ethernet PCS driver supported for Qualcomm
-IPQ9574 SoC.
+On Wed, Feb 05, 2025 at 05:09:13PM -0600, Mitchell Augustin wrote:
+> Hello,
+> 
+> I have identified a bug in the mlx5_core module, or some related component.
+> 
+> Doing the following on a freshly provisioned Oracle Cloud bare metal
+> node with this configuration [0] will reliably cause the entire
+> instance to become unresponsive:
+> 
+> rmmod mlx5_ib; rmmod mlx5_core; modprobe mlx5_core
+> 
+> This also produces the following output:
+> 
+> [  331.267175] I/O error, dev sda, sector 35602992 op 0x0:(READ) flags
+> 0x80700 phys_seg 33 prio class 0
 
-Signed-off-by: Lei Wei <quic_leiwei@quicinc.com>
----
- MAINTAINERS | 9 +++++++++
- 1 file changed, 9 insertions(+)
+Is it using iscsi/srp/nfs/etc for any filesystems?
 
-diff --git a/MAINTAINERS b/MAINTAINERS
-index 896a307fa065..60c340a2de5e 100644
---- a/MAINTAINERS
-+++ b/MAINTAINERS
-@@ -19525,6 +19525,15 @@ S:	Maintained
- F:	Documentation/devicetree/bindings/regulator/vqmmc-ipq4019-regulator.yaml
- F:	drivers/regulator/vqmmc-ipq4019-regulator.c
- 
-+QUALCOMM IPQ9574 Ethernet PCS DRIVER
-+M:	Lei Wei <quic_leiwei@quicinc.com>
-+L:	netdev@vger.kernel.org
-+S:	Supported
-+F:	Documentation/devicetree/bindings/net/pcs/qcom,ipq9574-pcs.yaml
-+F:	drivers/net/pcs/pcs-qcom-ipq9574.c
-+F:	include/dt-bindings/net/qcom,ipq9574-pcs.h
-+F:	include/linux/pcs/pcs-qcom-ipq9574.h
-+
- QUALCOMM NAND CONTROLLER DRIVER
- M:	Manivannan Sadhasivam <manivannan.sadhasivam@linaro.org>
- L:	linux-mtd@lists.infradead.org
-
--- 
-2.34.1
-
+Jason
 
