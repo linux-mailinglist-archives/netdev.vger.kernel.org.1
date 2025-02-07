@@ -1,193 +1,129 @@
-Return-Path: <netdev+bounces-164091-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-164092-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6E41FA2C918
-	for <lists+netdev@lfdr.de>; Fri,  7 Feb 2025 17:42:24 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2BD97A2C923
+	for <lists+netdev@lfdr.de>; Fri,  7 Feb 2025 17:44:13 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E758F165258
-	for <lists+netdev@lfdr.de>; Fri,  7 Feb 2025 16:42:22 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 52E41188772C
+	for <lists+netdev@lfdr.de>; Fri,  7 Feb 2025 16:44:18 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C9CF218DB01;
-	Fri,  7 Feb 2025 16:42:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9E17F18DB0C;
+	Fri,  7 Feb 2025 16:44:08 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="QuTqCW8G"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="GgL7g8p2"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f42.google.com (mail-wm1-f42.google.com [209.85.128.42])
+Received: from mail-ed1-f49.google.com (mail-ed1-f49.google.com [209.85.208.49])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0249923C8DE;
-	Fri,  7 Feb 2025 16:42:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.42
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E98E223C8DE;
+	Fri,  7 Feb 2025 16:44:06 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.49
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1738946538; cv=none; b=KRXBZ+8izq2IlZSb/pou/jMEbKDYaqQdMVNu6u96izsSaxA7zCoCz3KWU4Xmamv668uRJJsayu9N9eZV2kPzFeV/JGvmlgjnnpL7KD5/l3KE8+ihB9quaXjnJnWpTenf9p7FDgVJH9iMcc6v+J90stKa4eBQoqtbaAa1ecSGPGc=
+	t=1738946648; cv=none; b=kehyrXJLcsqH5/LXMMU3UiYqrFDXLpe7q0TzJ2DDwkqwjo6FNFK+bG/51G1FEgfB52hLu/HAV9u5kIEULURDT8pmBWeCSTZmz6H72xE1t655PhFyFVt+fMZWdB+mjBvmKBln5HzHRPfyI8OaOGeQjY5Aj95330MP8rjb2BhYjpM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1738946538; c=relaxed/simple;
-	bh=xahoYTgr2JXlBEBiH4Eh9CeXWNus+8o8NYBdfY24J1o=;
+	s=arc-20240116; t=1738946648; c=relaxed/simple;
+	bh=2x8YH7UX2qAhD4V59FweuHIOMl/p+Qb21KQFd3jGD9k=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=HRECTWWDo0VZ7+9tqwREAyuiu81RGZPtBqdCenV0hmLUE5x1VLzrVo0moxSFy82uBNaR+AQCUhdSm3oObOgY1P+cl4LVp1oGrJrBqhyKOSG2bqyiSmp8ZNVzrXRnMFAC7n6cTUGXPGpNcmmi5uCwLCLoKt+FXdmtC6OCdpQiq5A=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=QuTqCW8G; arc=none smtp.client-ip=209.85.128.42
+	 Content-Type:Content-Disposition:In-Reply-To; b=itg8ycXEjBjJjAJOi2zBvlHPdRjiolIcPpdCOy5KOPa91TSl1iEN6KkOeZqoIhjP3F6dS2wwaZZxHGnu6et5Pq7n9dnoIZK/HV6OjR5GKxiuh3l/dxCkfwrinh8hzNX2GkIbICMm6mvU/IGpLgLWIV31lRQBJ7vvLcJQC+7LJLI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=GgL7g8p2; arc=none smtp.client-ip=209.85.208.49
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wm1-f42.google.com with SMTP id 5b1f17b1804b1-436341f575fso27832015e9.1;
-        Fri, 07 Feb 2025 08:42:16 -0800 (PST)
+Received: by mail-ed1-f49.google.com with SMTP id 4fb4d7f45d1cf-5de459b79ddso212867a12.0;
+        Fri, 07 Feb 2025 08:44:06 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1738946535; x=1739551335; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1738946645; x=1739551445; darn=vger.kernel.org;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=FiPV/oHe7RmZIp/M852C28biSFhSs4bIOllT1QoCRG4=;
-        b=QuTqCW8GlqBrQsgS1iMUPOTh5xsw8n14Ap4L4KDg0LuMS4ApXp+89jAfMIxcT//1IW
-         aBBvlgDMfuiEVnVFe5lO4Lxt/1iVMlbFSi+2Ul7s8ClZkKp76pHPsBOfGjt2OoA+5p2k
-         h3XG+87bTI1S0KvKge1INoR+KcMR/ObnEEtZEuC/arI30vOA/gm1M9vfVA6P8wrhvMTB
-         Qn2xJA1DWbhcDsZB+w3HJ24YcIIRctySrwDBTAUr1+8qKp0l0NoFda3a6Ah6szMRv6ul
-         LMtiETMuF3dxa46QOYa+CQW0c9KJM99lGgH9/Aq8/6imj/Uv3EJxdGQ8H1oL+aWEPy4G
-         JPsQ==
+        bh=eYt9zEq2uTN42PpE2KerymI/xM/Tffg4zFTM6kV6KmM=;
+        b=GgL7g8p27qZZkUQfa38U5vVPfeNfqw7zWYIYEkmBxPa1NiEz4Nh/W2kOYjbx+mekBh
+         /LNS5YcdAXhWiPbOkSyZKD9jFmvnnnVqilVm/b0hBMwuBClVvu6Rxd1jAyYIjvErU/6S
+         CH7PBP/zRot8Z7psU+zvbCopzD9j0gdyWNuDqT0huSVo0dlewGerH6vtva5XhXQ7ZTvZ
+         m2u1cvEO7tcJj+itMctbDbUZMfuVVsr9grVbqsLECiKzYGc5i7uHZZ0NJOVCfCn6HHrf
+         oZFry6vKyN2W8ho56wzdLwQamwE+Kq2BGWBtRSuQK/1CXmEL0x9RQ4tpKsWmWkA7yn5L
+         rERQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1738946535; x=1739551335;
+        d=1e100.net; s=20230601; t=1738946645; x=1739551445;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=FiPV/oHe7RmZIp/M852C28biSFhSs4bIOllT1QoCRG4=;
-        b=bUdHwKym8HnPP4PbbQhk5fComzgTcG43uFteEhW5vUL869PfrKiIi2mvNlDlrJMNK7
-         CpOGS+bxWNbyt4nyczMyl9bKYDEAnw9Sgsi3qAFe6Z2Z23KK2QT2UpxVQQuI0XEqHhJv
-         QCQiCbRKRIwiYqH/EZuTUgm0FTR2w0lC0eUHQvvdpzCpfi/CA6z/Zm+PE8XkSON+tR47
-         Y1DlBOYKLnxukFIxF0i69VlI4Pls+yzgqL/gQ7jHo0J0izmD/dnvS8uia1GDj3X38nUR
-         S1N/r6Sfoj7semkbooTad1Y6qpad6tP6AKNmz9wRe1YBlMl9qvW/TaY+4dBKMNbQUrt6
-         8uuA==
-X-Forwarded-Encrypted: i=1; AJvYcCUVTJdL7FkgEdoLn8azsbeS8gIOdPZKAyZdYEEw6Vfwg4G+XBEpdC/QdX6SKt25yU2F0y9ZcDnu@vger.kernel.org, AJvYcCXpZqNzLN3MCGr42y40JZnTnTJG5PEKMGdq79lCYIqk8a6eWiPHb0x4geA+AkTzgPSCabQOP0D/F2tqnkk=@vger.kernel.org, AJvYcCXstpVvzl/77KyuSsPZve4cNTm9jQCM16K+pNb6DMHh+esCJMlOJ1PiK+OAvUaf4nE0asoHKEPu/Uhlkbs=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzfYH7r4BU2cda2vJDZ2HZalFuO+Fdlsw49veIo8l18ly1l62Z1
-	CmzseHghEBQ8SKvlwIkmdwrUfTi/xju+vpTu+iUVYikCli1OyTXz7U9tAQ==
-X-Gm-Gg: ASbGncuTtH1f2FTGQcsCnFWHMzymLB/38KkuFMy69A8wkMnnOE4xnG8d1BFiwemT3ho
-	3n5SkX7patgI5+v+n0rmd8KJNMYFPDoN9W1LOYpF0UPgBJZurJ5G13P2O5euxJSS5eHD/z8Br/2
-	opcfTClltwIL1tikK4YLHF0gOVQ5Gis/3L6t8ALKxJrH9YTdf8b9GdCmHTliSBn/+ZQMWZ6COoJ
-	g++Al3OEkP2rjz/pAmS3Nk9Hzf7RSrrOlC/WQIYY0GWH2m+TlcwKELyYVxh0k7mK7EKA/5ewB8t
-	On18qgBMIYncJFgv0tzBZYJZ/AutOAjy9b67cknq2102YmdLEncPdmn+Emp833M7H94fkbm+Z8H
-	nVQ==
-X-Google-Smtp-Source: AGHT+IF7y5ag5xXtJbBXF9RYFf/lu5m+MBmyeyrGK4CKk4esPPFHu01PFcCg+qkitoVRNQ1xblHDPw==
-X-Received: by 2002:a05:6000:1863:b0:38d:d0e7:7d5c with SMTP id ffacd0b85a97d-38dd0e77fc3mr943984f8f.23.1738946534954;
-        Fri, 07 Feb 2025 08:42:14 -0800 (PST)
-Received: from orome (p200300e41f281900f22f74fffe1f3a53.dip0.t-ipconnect.de. [2003:e4:1f28:1900:f22f:74ff:fe1f:3a53])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-4390db11264sm94032655e9.35.2025.02.07.08.42.13
+        bh=eYt9zEq2uTN42PpE2KerymI/xM/Tffg4zFTM6kV6KmM=;
+        b=wqFvJlrAFr6sEtPfUIa9WOvkXZi35TwMLvw3/fA3bpgPSd6q2+CLPHM05/GgGx8FNn
+         HJag3mmgT6yibfzH2e4grqqwwM/yzFQZ3mx16jw4vkcAaByPA8iBXz9bH9/zqyEwWD2E
+         NIWaUq1tVhSTScUAnF6uqmYMvfokP4pa629+8QcsoKTO7BfS+scrEUMQ/camfsoi+aTO
+         ld4ZEQ22LCibjbyxo9emsKAvgL4zMFY38oaqfnzfqot4g4tEhcoORliIfv2nMU3/EDl2
+         oowE7s54UF99xJ09Frum/2i1qVEYMoeeLaJWmuQVFBeYx8sGUbudWxJ+57RESs/fkXA9
+         Xp7A==
+X-Forwarded-Encrypted: i=1; AJvYcCV/CWWrrComW3oTYhZGK/UBZKryt12fX47/e4a65VBJlrte+abtwjb1qZCjLvOh1EMJ/MbdiLMfArdterg=@vger.kernel.org, AJvYcCXwBDz6AX+A7mxWG6rK6u2XeEnJSoQxsKenXQpP1s4VkyWFZnN3gg72pEphXtFQx/ISagDZbmwI@vger.kernel.org
+X-Gm-Message-State: AOJu0YyC4zFQFC1GpW3qen2qUtZwc9+oaSWgAWcF/ZGno9CInOzwuaWp
+	u3K4YQy0+AKYR0l8U+G6OrjQDe6y0PARPl+6wJDKakaSVp8cgWta
+X-Gm-Gg: ASbGncsxxrF56eMIE9ChrumZmtC8FbGYieVEKhAKrVGN12+/pVDrWzV7JBV1hlr6oRn
+	Wuik30JRUJpSNXuU82P2H9gxlEYGOB5kZcnu5jWohzzK9IDCh4Y2kbi8i6HDHo8QdhH88KxgpRS
+	+p00zs9cynfDuxF6t2RSu6WQYniagMGbU5dvCp4d0X6rXjg0srC73/Puqg0a3ArbFNPhD85mQ4i
+	YIUC7yCTghISCmTHjAmp44m8bVPv38BkR2qZ4Xf87bqKzKIDUCXhY3T9lIStYtsR1ykXtsnnSJJ
+	C/I=
+X-Google-Smtp-Source: AGHT+IEGw2Il/V7x/MJTsaTutvOMVEPAejMjGCruncfxQtoi6CZFpQMmX5c2XSv6GXZocDlpfjv4pA==
+X-Received: by 2002:a05:6402:34c8:b0:5dc:882f:74b1 with SMTP id 4fb4d7f45d1cf-5de45046dd9mr1634028a12.3.1738946644941;
+        Fri, 07 Feb 2025 08:44:04 -0800 (PST)
+Received: from skbuf ([86.127.124.81])
+        by smtp.gmail.com with ESMTPSA id 4fb4d7f45d1cf-5dcf1b85a4dsm2807030a12.47.2025.02.07.08.44.02
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 07 Feb 2025 08:42:13 -0800 (PST)
-Date: Fri, 7 Feb 2025 17:42:11 +0100
-From: Thierry Reding <thierry.reding@gmail.com>
-To: Jon Hunter <jonathanh@nvidia.com>
-Cc: Furong Xu <0x1207@gmail.com>, netdev@vger.kernel.org, 
-	linux-stm32@st-md-mailman.stormreply.com, linux-arm-kernel@lists.infradead.org, 
-	linux-kernel@vger.kernel.org, Andrew Lunn <andrew+netdev@lunn.ch>, 
-	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
-	Maxime Coquelin <mcoquelin.stm32@gmail.com>, Alexandre Torgue <alexandre.torgue@foss.st.com>, xfr@outlook.com, 
-	Brad Griffis <bgriffis@nvidia.com>, Ido Schimmel <idosch@idosch.org>, 
-	"linux-tegra@vger.kernel.org" <linux-tegra@vger.kernel.org>
-Subject: Re: [PATCH net v1] net: stmmac: Apply new page pool parameters when
- SPH is enabled
-Message-ID: <heg3exbrmo4zt64cdeolououo25lj2idusepuyuu7iggxgn5fe@6bky6h5pe3tu>
-References: <20250207085639.13580-1-0x1207@gmail.com>
- <8fc7c79d-ace8-4e05-acef-1699ee6c4158@nvidia.com>
+        Fri, 07 Feb 2025 08:44:04 -0800 (PST)
+Date: Fri, 7 Feb 2025 18:44:00 +0200
+From: Vladimir Oltean <olteanv@gmail.com>
+To: Kyle Hendry <kylehendrydev@gmail.com>
+Cc: Andrew Lunn <andrew@lunn.ch>,
+	Florian Fainelli <florian.fainelli@broadcom.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Russell King <linux@armlinux.org.uk>, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: Re: [PATCH 0/4] net: dsa: b53: Enable internal GPHY on BCM63268
+Message-ID: <20250207164400.x2fobtcblr7g3dil@skbuf>
+References: <20250206043055.177004-1-kylehendrydev@gmail.com>
+ <1317d50b-8302-4936-b56c-7a9f5b3970b9@broadcom.com>
+ <9bd9c1e4-2401-46bd-937f-996e97d750c5@lunn.ch>
+ <a804e0a4-2275-41c3-be3b-7dd79c2418cd@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature"; boundary="fkugobpneo3jjh3p"
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <8fc7c79d-ace8-4e05-acef-1699ee6c4158@nvidia.com>
+In-Reply-To: <a804e0a4-2275-41c3-be3b-7dd79c2418cd@gmail.com>
 
+On Thu, Feb 06, 2025 at 05:41:19PM -0800, Kyle Hendry wrote:
+> On 2025-02-06 12:17, Andrew Lunn wrote:
+> > On Thu, Feb 06, 2025 at 10:15:50AM -0800, Florian Fainelli wrote:
+> > > Hi Kyle,
+> > > 
+> > > On 2/5/25 20:30, Kyle Hendry wrote:
+> > > > Some BCM63268 bootloaders do not enable the internal PHYs by default.
+> > > > This patch series adds functionality for the switch driver to
+> > > > configure the gigabit ethernet PHY.
+> > > > 
+> > > > Signed-off-by: Kyle Hendry <kylehendrydev@gmail.com>
+> > > So the register address you are manipulating logically belongs in the GPIO
+> > > block (GPIO_GPHY_CTRL) which has become quite a bit of a sundry here. I
+> > > don't have a strong objection about the approach picked up here but we will
+> > > need a Device Tree binding update describing the second (and optional)
+> > > register range.
+> > Despite this being internal, is this actually a GPIO? Should it be
+> > modelled as a GPIO line connected to a reset input on the PHY? It
+> > would then nicely fit in the existing phylib handling of a PHY with a
+> > GPIO reset line?
+> > 
+> > 	Andrew
+> The main reason I took this approach is because a SF2 register has
+> similar bits and I wanted to be consistent with that driver. If it
+> makes more sense to treat these bits as GPIOs/clocks/resets then it
+> would make the implementation simpler.
 
---fkugobpneo3jjh3p
-Content-Type: text/plain; protected-headers=v1; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [PATCH net v1] net: stmmac: Apply new page pool parameters when
- SPH is enabled
-MIME-Version: 1.0
-
-On Fri, Feb 07, 2025 at 01:41:49PM +0000, Jon Hunter wrote:
-> Hi Furong,
->=20
-> On 07/02/2025 08:56, Furong Xu wrote:
-> > Commit df542f669307 ("net: stmmac: Switch to zero-copy in
-> > non-XDP RX path") makes DMA write received frame into buffer at offset
-> > of NET_SKB_PAD and sets page pool parameters to sync from offset of
-> > NET_SKB_PAD. But when Header Payload Split is enabled, the header is
-> > written at offset of NET_SKB_PAD, while the payload is written at
-> > offset of zero. Uncorrect offset parameter for the payload breaks dma
-> > coherence [1] since both CPU and DMA touch the page buffer from offset
-> > of zero which is not handled by the page pool sync parameter.
-> >=20
-> > And in case the DMA cannot split the received frame, for example,
-> > a large L2 frame, pp_params.max_len should grow to match the tail
-> > of entire frame.
-> >=20
-> > [1] https://lore.kernel.org/netdev/d465f277-bac7-439f-be1d-9a47dfe2d951=
-@nvidia.com/
-> >=20
-> > Reported-by: Jon Hunter <jonathanh@nvidia.com>
-> > Reported-by: Brad Griffis <bgriffis@nvidia.com>
-> > Suggested-by: Ido Schimmel <idosch@idosch.org>
-> > Fixes: df542f669307 ("net: stmmac: Switch to zero-copy in non-XDP RX pa=
-th")
-> > Signed-off-by: Furong Xu <0x1207@gmail.com>
-> > ---
-> >   drivers/net/ethernet/stmicro/stmmac/stmmac_main.c | 5 +++++
-> >   1 file changed, 5 insertions(+)
-> >=20
-> > diff --git a/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c b/driver=
-s/net/ethernet/stmicro/stmmac/stmmac_main.c
-> > index b34ebb916b89..c0ae7db96f46 100644
-> > --- a/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
-> > +++ b/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
-> > @@ -2094,6 +2094,11 @@ static int __alloc_dma_rx_desc_resources(struct =
-stmmac_priv *priv,
-> >   	pp_params.offset =3D stmmac_rx_offset(priv);
-> >   	pp_params.max_len =3D dma_conf->dma_buf_sz;
-> > +	if (priv->sph) {
-> > +		pp_params.offset =3D 0;
-> > +		pp_params.max_len +=3D stmmac_rx_offset(priv);
-> > +	}
-> > +
-> >   	rx_q->page_pool =3D page_pool_create(&pp_params);
-> >   	if (IS_ERR(rx_q->page_pool)) {
-> >   		ret =3D PTR_ERR(rx_q->page_pool);
->=20
->=20
-> Thanks for sending this. I can confirm that it fixes the issue we are see=
-ing
-> and so ...
->=20
-> Tested-by: Jon Hunter <jonathanh@nvidia.com>
-
-Yes, I can confirm as well. I've tested based on the discussion in the
-earlier thread and had the equivalent of this patch (modulo the ->sph
-check, but that's always true on this system), so:
-
-Tested-by: Thierry Reding <treding@nvidia.com>
-
---fkugobpneo3jjh3p
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQIzBAABCAAdFiEEiOrDCAFJzPfAjcif3SOs138+s6EFAmemN+MACgkQ3SOs138+
-s6Fq3A//eleSd2dC6AIYwZSlmN2xxQXFAVjTTNU/LQhRI2PSENWvFHSXJDcGTG+U
-OTEIid1JgSaw+/xwshMu0F6lR1OmIeBCMudKmla/AxFUEOYF2JWkYPQgCfGalJxe
-Ig9uZMsXmaxIeunEhaRQhYiBU0F9l7+IKe5yr8sFnUNrI1UJUQ23aJqAnCxJmtW7
-3w/KbNMMii2TygqUrDaVHaDqOe4azGVzAGNYSd1g1iNpVYiORO8t6VHpiUBtJfme
-k3ryZ+ptRKVTJX6pdiUYtjfTlSOW9ncvlgwyD8OGGaLG1RsoOWBiVTdGm13XDbm2
-tDEY4ggUyPYUmphjKNsCjivZ9vqeMWoQ35MDCR3/pI6j/RVDkNSQmEH55qLyW4WD
-67s3SF4eoDiAQAzzZ1C9vp96I2bm10J/NX2flJ036cw+2SXAl2rprzDrARhTupC9
-uKTCXlV7vep2zRRDIljBxZDE90WTUL4fj/u9cKDXjRkkYrf5inVJuMM9zTO56HGn
-hyYqmUhDklG4jLYmEp/g2H9pberttT7RCVo6UeI/P+Ms9B5Xszf+tiIzGti/SrDv
-pCTV4/2D/wucb7zdNeX+a2j6D1rr6CgITO5sWT7i2w/o/UcHoXQV4E/gY39V4s9O
-g1NrNtk9aOd2qalUqpS56aboQSaz04QWnYNubjlbxDgT9R+f46E=
-=AlgO
------END PGP SIGNATURE-----
-
---fkugobpneo3jjh3p--
+This has not always been clear, but we prefer handling components
+unrelated to Ethernet switching outside of DSA, if at all possible.
 
