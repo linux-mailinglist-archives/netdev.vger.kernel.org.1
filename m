@@ -1,124 +1,118 @@
-Return-Path: <netdev+bounces-163923-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-163924-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3E1DEA2C0AC
-	for <lists+netdev@lfdr.de>; Fri,  7 Feb 2025 11:35:44 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id CDF94A2C0C8
+	for <lists+netdev@lfdr.de>; Fri,  7 Feb 2025 11:43:49 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 2F3AD188CDF8
-	for <lists+netdev@lfdr.de>; Fri,  7 Feb 2025 10:35:49 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 6F0C0169566
+	for <lists+netdev@lfdr.de>; Fri,  7 Feb 2025 10:43:48 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E6C361DE3B6;
-	Fri,  7 Feb 2025 10:35:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 306551DC9A3;
+	Fri,  7 Feb 2025 10:43:48 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Ge21TZ35"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="DKZc6cTu"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-f54.google.com (mail-ed1-f54.google.com [209.85.208.54])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.9])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3756553A7;
-	Fri,  7 Feb 2025 10:35:35 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.54
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 916291DE3C7
+	for <netdev@vger.kernel.org>; Fri,  7 Feb 2025 10:43:46 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.9
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1738924537; cv=none; b=JPte5bIid8fy0LurPfX8s8I98skDaTBPgYkrg9pmw1dAg8Z6ruGFnO2oxB1ZB6tszvi8oLDRomoJqtDN1UcvtIV2lscUlTLe6/pw6kS9f2k5Nhq7+MWt6p5kS8a/V5u3vMgHmhTuA+isYHQdtA4b90QYUHR87XhKE7lD/ISF/II=
+	t=1738925028; cv=none; b=oAYAgwOUpGy+s+k4uWjcs5UqiRSyq9X+WDxUNPpd8D7wwGvFqqmFb7QkkO7an0g8NMFKVwGyXQn9xJufwi5YqeakN08dWbO8D+A+nI/wkXE0BcdTMxJYbxrVwfeBuLdUbxuOAI2avVTNZurEvwwPYybQpmNe8VjJHfHKsFwQd1c=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1738924537; c=relaxed/simple;
-	bh=drEqbq+UnvUiG38XEE933fBD387EM48h5DcS6gouwlY=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=l4hP9UgxW38FWfgIqkvMsb4Sgfm698zMYFK0/tbRMuWgBd5C3IN9PO0u2zQQXbDuUBANJhNHIIf0f3PbTLHpFDwiy4wjvs0q9kZWNmcmZMDHagBoSKZoWSsyY9ybZ55bRWhzPnoEErUYtAduYZh+XQfMNYOCkpEhsqO24UT9CJ4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Ge21TZ35; arc=none smtp.client-ip=209.85.208.54
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ed1-f54.google.com with SMTP id 4fb4d7f45d1cf-5dce4a5d8a0so3220982a12.1;
-        Fri, 07 Feb 2025 02:35:35 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1738924534; x=1739529334; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=MSXOXieTVzhRaapZT+T7hFM0hi46AothZ59+EmZcB08=;
-        b=Ge21TZ35TTdcA4rTcPUGHtfa0lsIwv7wuJ1PhFEMD1+so8hxfV5tHx4StI15UsOmoU
-         7vsH0kqvUlYTO+lGW2c1Xta5DKBrSNa8dlcXcZenp22PJUNtCM9I4Z+19ef0wgv3N/2t
-         58Onh+JX4x6+2/CiaBww828WM9NZkdr4BvLuZpI/lsm6sjG8zJ+WxEjqQr4U1QXYWklm
-         lowwm1Nezzy4SJQzWLuQ/zz9QvxkZFbUwh0KoEc4afXe8lmJzCmtS5+mCIbL/ltspNbJ
-         DLL8qJXvGwFnX9K87AKOTxQp74gzZ2Qz6WC1bMxGlOlqFgpeokqaZT5jxVuOWyx+AmIx
-         wE7g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1738924534; x=1739529334;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=MSXOXieTVzhRaapZT+T7hFM0hi46AothZ59+EmZcB08=;
-        b=XTA9vTH2HRyfyOUwPJndBMzfnu9SjUFt7uRcGZJzWhL7g33vnwzZxsu4jSg71uM/pl
-         Y86X8skvmiNHr/kA1VecePI6wAfwe7+7W7N3N2tjPsso1Q4WfgqSMQcKymNbSBxYPzpv
-         EMVJV0aIsmSpD9heT5GmJSmtaWQl549flU10FBB2T2Rqi5dnM4Onb7xwLP4bh86+iB/h
-         9eSaJU4E175NZ+4P1S7zl3SzrK9NMEHhe2TL8XhvfXAyTFeJSohVtq74Wm6FkHdvHnOT
-         ICAn+5Ss7Pf5r6T7RTnNZDD3vUYu2cwkoINLgf6U/+QFVTh+Gmcrylh134Nzj1+FkBLx
-         t9MA==
-X-Forwarded-Encrypted: i=1; AJvYcCUB4pewmjylgyeFfzAQ2ix6qsMxNV/a4SwthdK2xYoyEIh77nkQsUsXR0quDEsZLUqIHOEaTRG0XqzO@vger.kernel.org, AJvYcCUHSXb5v0nkYHZVm5btNixaimW2aTJ0Kh9RlHjpM52miaWj/yQoyT/CnPkOAouPPv5R/qhqIZMhWaHoLqIN@vger.kernel.org, AJvYcCVZrJT2tBCVAnX9vEttYIYaTwdKhbWlYfEK0YQrGwaNGDwRAdwJbDeB6VsFbHNhOt0ykJrNW+MD@vger.kernel.org, AJvYcCW2UzeLCY/C1GadvMyakiYGgINDPJK1ncn2Mj7fSskmSOV3E2TItdGdqNMZQY4NY/DpvND+89oVYkjCNnc=@vger.kernel.org, AJvYcCWgyrajtyKEfUa7ogbh7nq7avb6iDBgfC9UBpLnc2WWfXKC1vpDw4w10OMkV6GK5dJN7qXxx1sShlwN@vger.kernel.org, AJvYcCXhs6/c4mdz4F5pX1oOGEA5YXSCfqPKO0FSoinF70pV1JSYTrkASWPQCYi2OB52Gs9VcRAw5CWffvGh@vger.kernel.org
-X-Gm-Message-State: AOJu0YzJ8F/iptWSxgFcGvq8PC89Oo8YXXYoxmQssDzly5tHG9bLRYyC
-	WzQNxPwWzCOiSbKhgSAa4Io11a7e4qf2duddwKwzayTMNrcQ8kygvj60Jn1VLEd5duPDW6YB5NB
-	bxulvXYFcZCpDKjdVk3JMj9OJZes=
-X-Gm-Gg: ASbGncuvqKN0E4kKEwmxEd8p0gjsbYeiRn7yyu1mxXdT7NcOvnrCwqj+PHR6xKbPiJn
-	jEIiDcrSC+upPJ9muWXK1b9XAxLswfv45+U5otWMoluzCrxM53RqXLpwykREi3Yf+pdnsJUPX
-X-Google-Smtp-Source: AGHT+IFsDdaucX1wfJ1VUpx8G0evRZY0LiedNNpXT4C7C5nBCiZUH/mVnC/GlcSGS3PbeRf0OT9nsN0Xw9qx25jpLbY=
-X-Received: by 2002:a05:6402:4606:b0:5d9:ae5:8318 with SMTP id
- 4fb4d7f45d1cf-5de450706dbmr6829476a12.20.1738924534208; Fri, 07 Feb 2025
- 02:35:34 -0800 (PST)
+	s=arc-20240116; t=1738925028; c=relaxed/simple;
+	bh=+P3HLtADhmrmNGgsvWskNIvrO88Mxapm/ysDKpFFEqY=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=QzAm/0PJdfq11wio4vfv8ax4oFw03/zwEP09HjR6AU+kMFamgsPo0xh6jZrFz8YQN3tBE7aom9JssQvMPETMJxsBBVJCMz0wufo8cBENY0znz2Jzo6ol3zl5Zb4rX/dJmiE1qzUPbIF2vKpjOJbXFh9jkADvCvZ3e8RMi5BhtFE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=DKZc6cTu; arc=none smtp.client-ip=198.175.65.9
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1738925026; x=1770461026;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=+P3HLtADhmrmNGgsvWskNIvrO88Mxapm/ysDKpFFEqY=;
+  b=DKZc6cTuQl+r8pJnVsDGYlloWebxP4BqgIxyfOJLRSiqU7jmZEdGUjcz
+   RLM+xGWaldvFKHztfyaCh3AawS2tW4xRRe0WDuXWKFi3Ik0oCUx8RUivL
+   dOU1a6ZZN8As/FwwgZavXVRj/YVpLAkm7tRBSJBSMVVIBe0w+63gLnt9D
+   3CiSMEHfZHCyXkw/gUhGQ1EYnaNVMPGQ7N8FypGwjTBMiCGuT49KfmNL8
+   uOfqmPI3AqIgDs5WZsCR/kh+Eui4PiExfNjkdAoWkqpxcT4sIC1fb75qw
+   EiBRld/AmTl9k0xMrI8HCe8TPilRifx9HehKljPCFWHUYrnoZQy2nXYo+
+   A==;
+X-CSE-ConnectionGUID: Lpw6NGv8SEarQbXzPAbDEA==
+X-CSE-MsgGUID: +Ea+ijchS4Cgc+thWIh2WA==
+X-IronPort-AV: E=McAfee;i="6700,10204,11336"; a="62039827"
+X-IronPort-AV: E=Sophos;i="6.13,266,1732608000"; 
+   d="scan'208";a="62039827"
+Received: from orviesa003.jf.intel.com ([10.64.159.143])
+  by orvoesa101.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 07 Feb 2025 02:43:46 -0800
+X-CSE-ConnectionGUID: a+RYWCvIS7OVefdW2AaAvA==
+X-CSE-MsgGUID: 4UFibppgSHSXkCarmM2WRg==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.11,199,1725346800"; 
+   d="scan'208";a="116429784"
+Received: from gk3153-dr2-r750-36946.igk.intel.com ([10.102.20.192])
+  by orviesa003.jf.intel.com with ESMTP; 07 Feb 2025 02:43:44 -0800
+From: Michal Swiatkowski <michal.swiatkowski@linux.intel.com>
+To: intel-wired-lan@lists.osuosl.org
+Cc: netdev@vger.kernel.org,
+	marcin.szycik@linux.intel.com,
+	jedrzej.jagielski@intel.com,
+	przemyslaw.kitszel@intel.com,
+	piotr.kwapulinski@intel.com,
+	anthony.l.nguyen@intel.com,
+	dawid.osuchowski@intel.com
+Subject: [iwl-next v1 0/4] ixgbe: support MDD events
+Date: Fri,  7 Feb 2025 11:43:39 +0100
+Message-ID: <20250207104343.2791001-1-michal.swiatkowski@linux.intel.com>
+X-Mailer: git-send-email 2.42.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250206-gpio-set-array-helper-v2-0-1c5f048f79c3@baylibre.com> <20250206-gpio-set-array-helper-v2-5-1c5f048f79c3@baylibre.com>
-In-Reply-To: <20250206-gpio-set-array-helper-v2-5-1c5f048f79c3@baylibre.com>
-From: Andy Shevchenko <andy.shevchenko@gmail.com>
-Date: Fri, 7 Feb 2025 12:34:58 +0200
-X-Gm-Features: AWEUYZn9dUBLgrBMB29t-azFViPsoLod9-AdOpM2gmZK6mo_lnlhIZ1x0iHhJeM
-Message-ID: <CAHp75VcNJzPH8to1Y6NzPMXnH48Ve4LJ7oid7_wEHtwhO82Fmw@mail.gmail.com>
-Subject: Re: [PATCH v2 05/13] gpio: max3191x: use gpiod_multi_set_value_cansleep
-To: David Lechner <dlechner@baylibre.com>
-Cc: Linus Walleij <linus.walleij@linaro.org>, Bartosz Golaszewski <brgl@bgdev.pl>, 
-	Andy Shevchenko <andy@kernel.org>, Geert Uytterhoeven <geert@linux-m68k.org>, 
-	Lars-Peter Clausen <lars@metafoo.de>, Michael Hennerich <Michael.Hennerich@analog.com>, 
-	Jonathan Cameron <jic23@kernel.org>, Ulf Hansson <ulf.hansson@linaro.org>, Peter Rosin <peda@axentia.se>, 
-	Andrew Lunn <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>, 
-	Russell King <linux@armlinux.org.uk>, "David S. Miller" <davem@davemloft.net>, 
-	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
-	Vinod Koul <vkoul@kernel.org>, Kishon Vijay Abraham I <kishon@kernel.org>, =?UTF-8?B?TnVubyBTw6E=?= <nuno.sa@analog.com>, 
-	Liam Girdwood <lgirdwood@gmail.com>, Mark Brown <broonie@kernel.org>, 
-	Jaroslav Kysela <perex@perex.cz>, Takashi Iwai <tiwai@suse.com>, linux-gpio@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, linux-iio@vger.kernel.org, 
-	linux-mmc@vger.kernel.org, netdev@vger.kernel.org, 
-	linux-phy@lists.infradead.org, linux-sound@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
 
-On Fri, Feb 7, 2025 at 12:48=E2=80=AFAM David Lechner <dlechner@baylibre.co=
-m> wrote:
->
-> Reduce verbosity by using gpiod_multi_set_value_cansleep() instead of
-> gpiod_set_array_value_cansleep().
+Hi,
 
-It seems you missed my comment.
+This patchset is adding support for MDD (malicious driver detection) for
+ixgbe driver. It can catch the error on VF side and reset malicious VF.
 
-> +static void gpiod_set_array_single_value_cansleep(struct gpio_descs *des=
-cs,
->                                                   int value)
+An MDD event can be triggered for example by sending from VF a TSO packet
+with segment number set to 0.
 
-This is not good namespacing. Can we change this while at it?
+Add checking for Tx hang in case of MDD is unhandled. It will prevent VF
+from staying in Tx hang state.
 
-max3191x_...
+Don Skidmore (1):
+  ixgbe: check for MDD events
 
-(I would go with max3191x_set_modesel_pins() to make it shorter. I
-have no clue why the function repeats so much from gpiod API naming.
-Is there anything else which is named in a similar way? Perhaps fix it
-by a separate patch?)
+Paul Greenwalt (1):
+  ixgbe: add MDD support
 
---=20
-With Best Regards,
-Andy Shevchenko
+Radoslaw Tyl (1):
+  ixgbe: turn off MDD while modifying SRRCTL
+
+Slawomir Mrozowicz (1):
+  ixgbe: add Tx hang detection unhandled MDD
+
+ drivers/net/ethernet/intel/ixgbe/ixgbe.h      |   5 +
+ .../net/ethernet/intel/ixgbe/ixgbe_sriov.h    |   1 +
+ drivers/net/ethernet/intel/ixgbe/ixgbe_type.h |  42 +++-
+ drivers/net/ethernet/intel/ixgbe/ixgbe_x550.h |   5 +
+ drivers/net/ethernet/intel/ixgbe/ixgbe_e610.c |   4 +
+ drivers/net/ethernet/intel/ixgbe/ixgbe_lib.c  |   3 +-
+ drivers/net/ethernet/intel/ixgbe/ixgbe_main.c | 224 ++++++++++++++++--
+ .../net/ethernet/intel/ixgbe/ixgbe_sriov.c    |  50 ++++
+ drivers/net/ethernet/intel/ixgbe/ixgbe_x550.c | 119 ++++++++++
+ 9 files changed, 430 insertions(+), 23 deletions(-)
+
+-- 
+2.42.0
+
 
