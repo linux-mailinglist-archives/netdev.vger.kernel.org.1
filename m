@@ -1,153 +1,120 @@
-Return-Path: <netdev+bounces-163887-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-163888-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3CE0DA2BF31
-	for <lists+netdev@lfdr.de>; Fri,  7 Feb 2025 10:25:34 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 28226A2BF4A
+	for <lists+netdev@lfdr.de>; Fri,  7 Feb 2025 10:29:37 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 645123A280C
-	for <lists+netdev@lfdr.de>; Fri,  7 Feb 2025 09:25:25 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 219801888B01
+	for <lists+netdev@lfdr.de>; Fri,  7 Feb 2025 09:29:42 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8C3CE1DBB37;
-	Fri,  7 Feb 2025 09:25:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D58851DC184;
+	Fri,  7 Feb 2025 09:29:31 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="reP7Jvbc";
-	dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="qJt5Iz8U"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="eSET2Yxt"
 X-Original-To: netdev@vger.kernel.org
-Received: from galois.linutronix.de (Galois.linutronix.de [193.142.43.55])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f177.google.com (mail-pl1-f177.google.com [209.85.214.177])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C3D221DE2BF;
-	Fri,  7 Feb 2025 09:25:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=193.142.43.55
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6D612481B6;
+	Fri,  7 Feb 2025 09:29:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.177
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1738920320; cv=none; b=LA1xhGaEvYUfEVdQ9zXAyxjIOPq1jpXJGRPdnBiOuFnpFK2KLheF2BkEGuQqB9Q+OGhwTLqKxOTx5fV2q4smQLwjTXEgHhLUqYBq3fiUy8oUqbgAmnKjt5mdBlJshfDz6bLFFPd/fDodkatyrhksVWBky24RFNfJ+1oCcBdmBNQ=
+	t=1738920571; cv=none; b=pa7Q28b0edbfp8fOnc5Pc3qh2ZHwAxWGzzvlGQvs541QttttzKxsh1DpkO//Q/BrM0rJ41Asb5JCqEguXA5FN2vTkLQa5651DRYK8K4QDe9ci/AHWhX5Fx5K6auXsXCbvymfv8OfXZGge4ZvFG3UH5Uzmy9KltF5B9Mx7d7hPQQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1738920320; c=relaxed/simple;
-	bh=KBLkEL12Og2x3Pglq0lPKHmlfc+op+vs3fb6Uyx1aJ4=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=dYKGGsahQul9/We9fhQQuIC3G0o0Mglq/YXWy9Y6YbUXGuO6Y3DvY7OGUl2TMnOiv6AxJGeDSjAh+qGC23qiEq3SlBYFdvC67OZBTBEqm0KjS6+ZkMYXlt0txJ7bFaHNybTclm4u0oSdl6w0puvVWgHwO2M2+eeib6di4cFH7so=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de; spf=pass smtp.mailfrom=linutronix.de; dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=reP7Jvbc; dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=qJt5Iz8U; arc=none smtp.client-ip=193.142.43.55
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linutronix.de
-Date: Fri, 7 Feb 2025 10:25:14 +0100
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linutronix.de;
-	s=2020; t=1738920316;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=VhaHIolMqVaOKYQrrLkqK1G4I/2AK3phIMMuTF3pFWo=;
-	b=reP7JvbcU0nfOWcSr3dJZmrxK5PQZGFlsLkEuFFgIPl0MwajUgTqxxSd2w1mapH1lnohce
-	Dt+L8IRlNu3GG4Y4SPILVNj/qQ51TByMbchdQI4kOrjL6EPzsm5hA4oHHNWCgM0dwx092g
-	1uTItGKhAbjDmnB8dciy/vxknCXn8o0ZTuLzjLERhGSFbYbONep0oJ7EN3HyAQlDLonCpJ
-	hHkfcCXWi8Ns5jgBfKcA0Fc7xQ3JyipUAksSeDCLWCVnloijRX5cAwXh1DxWZ9CgghQ74D
-	PqWgiz/Blka85Kxai5sWW625S7TUlRc8Fn+M/nZDvohviOy6mdTEwTEcb/po8w==
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=linutronix.de;
-	s=2020e; t=1738920316;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=VhaHIolMqVaOKYQrrLkqK1G4I/2AK3phIMMuTF3pFWo=;
-	b=qJt5Iz8UgObFD7UP8tWK4AITuhI5urfa9k2BZtjcbS8a/x8wc1tc8plkXpxvBbvmp/93Gi
-	W3afGDhGaKSUj7AA==
-From: Thomas =?utf-8?Q?Wei=C3=9Fschuh?= <thomas.weissschuh@linutronix.de>
-To: David Woodhouse <dwmw2@infradead.org>
-Cc: Mateusz Polchlopek <mateusz.polchlopek@intel.com>, 
-	Richard Cochran <richardcochran@gmail.com>, Andrew Lunn <andrew+netdev@lunn.ch>, 
-	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, netdev@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, stable@vger.kernel.org, 
-	"Mohamed Abuelfotoh, Hazem" <abuehaze@amazon.com>
-Subject: Re: [PATCH net-next 0/4] ptp: vmclock: bugfixes and cleanups for
- error handling
-Message-ID: <20250207102320-55575f30-68fd-4aa3-93a0-d97173253471@linutronix.de>
-References: <20250206-vmclock-probe-v1-0-17a3ea07be34@linutronix.de>
- <e16551dd-3a84-49ba-b875-c11f77239984@intel.com>
- <34d961bf2f40f054dd79cf7d8cf81a3eefd00a59.camel@infradead.org>
+	s=arc-20240116; t=1738920571; c=relaxed/simple;
+	bh=IYiaoxs2qX405DwEdIK1fruiV+WtOb/Zvj2bo3yxUZ4=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=QPRDQMkzj2eMjQBcUgw7FkOKe/To0Z0/bwcLi2DYWXYxe2UqdZgycGTM1kifmRjmqEPICzhOyapdO2Czx6tun1Cs1WldQadFu5wNlVMJKbv8NYP8bkq0L6XnGkWBLtr+yv6mqJa2hrOv9ZTJnL7Oh2/fEfkLPp25UvXsPxfDd8c=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=eSET2Yxt; arc=none smtp.client-ip=209.85.214.177
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pl1-f177.google.com with SMTP id d9443c01a7336-21f5268cf50so6736415ad.1;
+        Fri, 07 Feb 2025 01:29:30 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1738920569; x=1739525369; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=HtfAb+rS0GAdgCngxEid4x/Qai1tJ56U7SdmAfXpqj8=;
+        b=eSET2Yxtxst9m8MlrjpS3KoGrXdSn9MGmITXCGLwyDbRWiDUH5RdycIUmmcn+Mi+9h
+         +krRAS4ZSjGzEHDl/wV47tqOtRD0OAsnf4G3h+9oXHKrwtbWh/Nt1VQm67bRcw3d261q
+         wu2KxHd3pvGsAk7uH08d2CFRtyrB9nBpCbyLCQcA2Jud6sR2CUhz2oocbCibiyM6M45t
+         RJxZfVbZhpNmdFVO27KQGSsZj9TuIe6Y0vUnLWixA2rzpCEBi5XQW33wjalXWzeTlEP8
+         V912MhEbnorFKUnkbd55xM2SKtmFAJcWPMyeYzHP5AbsSfAui5fspnXgacSZpowbT3vo
+         caGQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1738920569; x=1739525369;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=HtfAb+rS0GAdgCngxEid4x/Qai1tJ56U7SdmAfXpqj8=;
+        b=KoeF/nFTnGqj8amkd0ZMqtmNDBbVVNwXXoSKvmJgyhJurVcjM+LW8oEbAi6lT+bI9j
+         ayA/Wftnn73iQrSe1awT3uF2GM6hVtheVPk4THU9FZ29hppZHYJ/x4B1yj4opccfFg9Q
+         v00xJQKPKvxge716gllO1x92oentHF3hvqaq45nZMZwS/jpKqXC0CSL0obJuAGwGrQWR
+         xhvqj3ytjOZgne/M6i0P9h2mXTyfRqlx/fgdSb8MFhEn0oB34r15rz1V6OwQ9hy66aiH
+         avk4t/gteQm5miEChGu6Fdc8YG9QNl59STS/AZM1XBH94zLYfmDOzVaK0aWy9DdOGYlx
+         7zpg==
+X-Forwarded-Encrypted: i=1; AJvYcCUpzkTj/tpER56v8hXyO6uSLQnC+q6Ej/hdR0Kg4KVEu0Hs5k4IbaQUilKbkuT1prZEymcLPTEfoni03jw=@vger.kernel.org, AJvYcCWhp4Boz7XHPrdsKDATGmrHbuZqt51UnRe/cFSHf7iFSQbT6zwaSKNSqNcIEhFKtzF6fqxBec/QDnGYyC0vgPpH@vger.kernel.org
+X-Gm-Message-State: AOJu0YxVUvEVad+BedTgJA9601NwGut7UfFvPUNXpbOCKFhXVdbOM0tY
+	CtrNeut3UNRjL+C92//g01qHMm1SY36vR+2Dsn73qrKTktoRcLWrC5K33+Y7e9o=
+X-Gm-Gg: ASbGncusmCyPcAxBqCnKqvusWl/Nm7oRrGgQaDPceB+LDnM3aapJKZ4O7mbWYtiqQj1
+	zGXowB03rCWZyJ2k9oZqz+mXyHrl+wUzVd70ERrc0fJTc+Yxl7oWjaDf5gugga3HH96Dw7bqu29
+	1N2v2JEKUCYSyH0SgAgzSbhxfDrM+NZswp20rQKxEimT9I6FSbOWnj/ZNAUAyMZQ3iZ923pqN9B
+	WK4G8MR9E2Hba6F80ShlMop+6HAtcFqR/6k8L0jkqat/Oz1avv9stpdTp8UsBfrwfESVOogYRDS
+	4HUEhTqDY8+bip3ZbrOXjUz2ivhDW9RS0jE=
+X-Google-Smtp-Source: AGHT+IHi3a0j+tMm6fRh+W+6twQQqlb4uCRebdXT42txjYpAY+R1tpaojvghV7BVeaWDYKlf51pqkQ==
+X-Received: by 2002:a05:6a00:189f:b0:729:cc5:fa42 with SMTP id d2e1a72fcca58-7305d516f36mr5186020b3a.20.1738920569273;
+        Fri, 07 Feb 2025 01:29:29 -0800 (PST)
+Received: from fedora.dns.podman ([43.228.180.230])
+        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-73048ae7f84sm2591586b3a.80.2025.02.07.01.29.23
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 07 Feb 2025 01:29:28 -0800 (PST)
+From: Hangbin Liu <liuhangbin@gmail.com>
+To: netdev@vger.kernel.org
+Cc: Jay Vosburgh <jv@jvosburgh.net>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Nikolay Aleksandrov <razor@blackwall.org>,
+	Simon Horman <horms@kernel.org>,
+	Jianbo Liu <jianbol@nvidia.com>,
+	Boris Pismenny <borisp@nvidia.com>,
+	Tariq Toukan <tariqt@nvidia.com>,
+	Shuah Khan <shuah@kernel.org>,
+	linux-kselftest@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	Hangbin Liu <liuhangbin@gmail.com>
+Subject: [PATCHv3 net 0/2] bonding: fix incorrect mac address setting
+Date: Fri,  7 Feb 2025 09:29:18 +0000
+Message-ID: <20250207092920.543458-1-liuhangbin@gmail.com>
+X-Mailer: git-send-email 2.46.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <34d961bf2f40f054dd79cf7d8cf81a3eefd00a59.camel@infradead.org>
 
-On Fri, Feb 07, 2025 at 09:10:42AM +0000, David Woodhouse wrote:
-> On Fri, 2025-02-07 at 08:13 +0100, Mateusz Polchlopek wrote:
-> > 
-> > 
-> > On 2/6/2025 6:45 PM, Thomas Weiﬂschuh wrote:
-> > > Some error handling issues I noticed while looking at the code.
-> > > 
-> > > Only compile-tested.
-> > > 
-> > > Signed-off-by: Thomas Weiﬂschuh <thomas.weissschuh@linutronix.de>
-> > > ---
-> > > Thomas Weiﬂschuh (4):
-> > > †††††† ptp: vmclock: Set driver data before its usage
-> > > †††††† ptp: vmclock: Don't unregister misc device if it was not registered
-> > > †††††† ptp: vmclock: Clean up miscdev and ptp clock through devres
-> > > †††††† ptp: vmclock: Remove goto-based cleanup logic
-> > > 
-> > > † drivers/ptp/ptp_vmclock.c | 46 ++++++++++++++++++++--------------------------
-> > > † 1 file changed, 20 insertions(+), 26 deletions(-)
-> > > ---
-> > > base-commit: 2014c95afecee3e76ca4a56956a936e23283f05b
-> > > change-id: 20250206-vmclock-probe-57cbcb770925
-> > > 
-> > > Best regards,
-> > 
-> > As those all are fixes and cleanups then I think it should be tagged to
-> > net not net-next.
-> 
-> Agreed. Thanks, Thomas. For all four:
+The mac address on backup slave should be convert from Solicited-Node
+Multicast address, not from bonding unicast target address.
 
-Ack.
+v3: also fix the mac setting for slave_set_ns_maddr. (Jay)
+    Add function description for slave_set_ns_maddr/slave_set_ns_maddrs (Jay)
+v2: fix patch 01's subject
 
+Hangbin Liu (2):
+  bonding: fix incorrect MAC address setting to receive NS messages
+  selftests: bonding: fix incorrect mac address
 
-> Reviewed-by: David Woodhouse <dwmw@amazon.co.uk>
+ drivers/net/bonding/bond_options.c            | 55 ++++++++++++++++---
+ .../drivers/net/bonding/bond_options.sh       |  4 +-
+ 2 files changed, 49 insertions(+), 10 deletions(-)
 
-Thanks.
-
-> I'm about to post a fifth which adds a .owner to vmclock_miscdev_fops.
-
-I assume you want me to include this in my series.
-
-> Tested with the existing '-device vmclock' support in QEMU, plus this
-> hack to actually expose a PTP clock to the guest (which we haven't
-> worked out how to do *properly* from the timekeeping subsystem of a
-> Linux host yet; qv).
-> 
-> --- a/hw/acpi/vmclock.c
-> +++ b/hw/acpi/vmclock.c
-> @@ -151,6 +151,18 @@ static void vmclock_realize(DeviceState *dev,
-> Error **errp)
->  
->      qemu_register_reset(vmclock_handle_reset, vms);
->  
-> +	vms->clk->time_type = VMCLOCK_TIME_TAI;
-> +    vms->clk->flags = VMCLOCK_FLAG_TAI_OFFSET_VALID;
-> +    vms->clk->tai_offset_sec = -3600;
-> +    vms->clk->clock_status = VMCLOCK_STATUS_SYNCHRONIZED;
-> +    vms->clk->counter_value = 0;
-> +    vms->clk->counter_id = VMCLOCK_COUNTER_X86_TSC;
-> +    vms->clk->time_sec = 1704067200;
-> +    vms->clk->time_frac_sec = 0x8000000000000000ULL;
-> +    vms->clk->counter_period_frac_sec = 0x1a6e39b3e0ULL;
-> +    vms->clk->counter_period_shift = 4;
-> +    //vms->clk->counter_period_frac_sec = 0x1934c67f9b2ce6ULL;
-> +
->      vmclock_update_guest(vms);
->  }
->  
-> 
-
+-- 
+2.46.0
 
 
