@@ -1,130 +1,152 @@
-Return-Path: <netdev+bounces-163935-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-163936-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 92B5AA2C175
-	for <lists+netdev@lfdr.de>; Fri,  7 Feb 2025 12:26:26 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9D243A2C179
+	for <lists+netdev@lfdr.de>; Fri,  7 Feb 2025 12:28:57 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 2F25116AB0F
-	for <lists+netdev@lfdr.de>; Fri,  7 Feb 2025 11:26:25 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 80F6A7A50EC
+	for <lists+netdev@lfdr.de>; Fri,  7 Feb 2025 11:28:01 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F33C71DE886;
-	Fri,  7 Feb 2025 11:26:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 837021DEFE9;
+	Fri,  7 Feb 2025 11:28:42 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ej1-f44.google.com (mail-ej1-f44.google.com [209.85.218.44])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from szxga01-in.huawei.com (szxga01-in.huawei.com [45.249.212.187])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1EFC11AB50D
-	for <netdev@vger.kernel.org>; Fri,  7 Feb 2025 11:26:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.44
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 167A61DED6B;
+	Fri,  7 Feb 2025 11:28:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.187
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1738927581; cv=none; b=YzRApKgaIFt7bXCo3cMpbDAKSnrOGVD963c34AIgpMk8v7qkw/uBp8v08TN16VlQa51/9GYlTGyeSXWLagwP90qlOtxjCG1NV92L+Nb6Ri498bgJy53/5r/Ue4JzRohHXE3OWUJLuv3a+kzceg7T1v9XFm/2bcNTZOR96+x5l9g=
+	t=1738927722; cv=none; b=KJKmCEhxnBk8TljPdcveaUnrPUgkgI5mpD0Jgwok2zD29nzpoRgaRXs8uX4W8ItcbKrGjqeHHAqA/ugRA/uSQcKCslOy1oi+ccVzOp5XJqi82WJHiZKlSCx3jHiwfkz83f6TxcNB/fzfrgDx8fNpB2uq52ks6QTf2Ptt7OOFTXY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1738927581; c=relaxed/simple;
-	bh=A4MWwDO+EC6h2NVGi/wpJl6YikbNA82pnPhv6CmFTeA=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=a/n45vOapKcu16eaL6a0ptn0C3ZJL4YlVoGYtMjTPqZvUs/TjwdFM6hpSbPsnWGsTitTt4GeHKnnSNkF6SY9I/BsxSMrcSQ7spaFkGVFZq0JDvgY/nKXNsPSZ/srodZdcMc1w16E+sEWwHECJPP+qx1cBiAad5m6/80l99UALmU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.218.44
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ej1-f44.google.com with SMTP id a640c23a62f3a-aaeec07b705so344154466b.2
-        for <netdev@vger.kernel.org>; Fri, 07 Feb 2025 03:26:18 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1738927577; x=1739532377;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=WWh94EtXCDhDqr1icqhVIF+ck9xtHGANZJfC+IEuyf4=;
-        b=rEsbnd3keM107fkbKA0IAhv3eTQZp2G7SpSBbPDd+/O7/DUduOejASYHWiNA3SulYd
-         w63gPRHep6ZNIn1BqE5T0VpceCv0IhcJV+5BkqqXNky43vB1gAiuxfnLA7NkfNTnAykp
-         3HOVfF5vKbtoy6mfCWyE7bwD1PEz8/c0Coqcz1L+mLu+jtm109bg81Eh0Tcq9P9rrLR9
-         lKQCrVGYbW2IpM13B22MPz3FDJgbLUzABAkPx87qwfiZ8wDWivMvf4ujrJiZms8+a9tH
-         dq8fwoaViSmD3rnh6wwML91XFaGDiqoZOrR1xVR1ZObPAXA/sZE5J3xwl3FDuXilPot8
-         5yxw==
-X-Forwarded-Encrypted: i=1; AJvYcCXFJRpiw5lb7bw9B8of38Ia6TE1JWFDatyc+9aIwFEE1CKtMOOBSqwZ+lNhTXklEYZew+ojIco=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyttpKFu3XGG8gGgFWa2UzrlfJCy+sRD+OqL59iui7toaRKYy5z
-	UbFq69KR+jFv0+CISCYVRuc7m/+ezG+pZSDfoHEq2FC8BJur8VXT
-X-Gm-Gg: ASbGnctzHoZSPXoGkvTcKpZ9gk6L8wdqEkOFfL2zd5pqynWMjKfFXn9WLu+SzIcd3tv
-	cWizC5Jrniz1w25rcj0okgPB6gUYcLlqaxBgZ3qQ7LT5H6Imp0072dPNoWukp+OcI1ixnkVSI0g
-	wfWla/8ZY8Lh/T7SR7QxXpPf0E5zqFzzOVCJInl15B3rRVx1J6lAMVHYLRG5nF/6bEU6MU8oY9M
-	L+4yAYM1ikHzFrzd83ik+3Zg//ndq1TZWguMghy/jAK5niKW/hvXPQutmk76zVJOA5urTIy6i+H
-	LegTQg==
-X-Google-Smtp-Source: AGHT+IG9cUt6tVcqX1h0/65FzslG19XUckEykxSWc9MqiTncNNxs+taQo+zQb/+x9C9cVY8mLKAwxw==
-X-Received: by 2002:a17:907:3dac:b0:ab7:83aa:b19 with SMTP id a640c23a62f3a-ab789bfab8fmr246819566b.42.1738927577033;
-        Fri, 07 Feb 2025 03:26:17 -0800 (PST)
-Received: from gmail.com ([2a03:2880:30ff:5::])
-        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-ab77365c9fdsm248556566b.169.2025.02.07.03.26.16
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 07 Feb 2025 03:26:16 -0800 (PST)
-Date: Fri, 7 Feb 2025 03:26:14 -0800
-From: Breno Leitao <leitao@debian.org>
-To: Eric Dumazet <edumazet@google.com>
-Cc: Kuniyuki Iwashima <kuniyu@amazon.com>, andrew+netdev@lunn.ch,
-	kernel-team@meta.com, kuba@kernel.org, netdev@vger.kernel.org,
-	ushankar@purestorage.com
-Subject: Re: for_each_netdev_rcu() protected by RTNL and CONFIG_PROVE_RCU_LIST
-Message-ID: <20250207-adamant-copper-jackrabbit-27e9fc@leitao>
-References: <20250206-scarlet-ermine-of-improvement-1fcac5@leitao>
- <20250207033822.47317-1-kuniyu@amazon.com>
- <20250207-active-solid-vole-26a2c6@leitao>
- <CANn89iJ0UdSpuA9gMEDeZ1UU+_VwjvD=bdQPeEA0kWfKMBwC8g@mail.gmail.com>
+	s=arc-20240116; t=1738927722; c=relaxed/simple;
+	bh=rE6lHm65mg1GEw5D+xuDHshi7zGvNb59fTyiTc+SPsE=;
+	h=Message-ID:Date:MIME-Version:From:Subject:To:CC:References:
+	 In-Reply-To:Content-Type; b=RVTq9dpHcXvEJeBzYxVIFzE31rODai/+7UgbGYbykRb0kpuyQxBn0YwXQpbSIBGCNu8KB3rGXgcoDAKfiTzIjK2rVgMaA7vMR7ultPDdwnSdHMj64bf9bGqbY27Rzi6zK1WuQundR7VbnJlmIPrs0Cw95XIvxxgGOOLMAlUSXp4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.187
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
+Received: from mail.maildlp.com (unknown [172.19.88.194])
+	by szxga01-in.huawei.com (SkyGuard) with ESMTP id 4YqBST5ps2z11Pm5;
+	Fri,  7 Feb 2025 19:24:09 +0800 (CST)
+Received: from kwepemf500003.china.huawei.com (unknown [7.202.181.241])
+	by mail.maildlp.com (Postfix) with ESMTPS id A6F821400D5;
+	Fri,  7 Feb 2025 19:28:30 +0800 (CST)
+Received: from [10.174.176.82] (10.174.176.82) by
+ kwepemf500003.china.huawei.com (7.202.181.241) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1544.11; Fri, 7 Feb 2025 19:28:28 +0800
+Message-ID: <80b1c21c-096b-4a11-b9d7-069c972b146a@huawei.com>
+Date: Fri, 7 Feb 2025 19:28:23 +0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <CANn89iJ0UdSpuA9gMEDeZ1UU+_VwjvD=bdQPeEA0kWfKMBwC8g@mail.gmail.com>
+User-Agent: Mozilla Thunderbird
+From: "zhangzekun (A)" <zhangzekun11@huawei.com>
+Subject: Re: [PATCH 1/9] of: Add warpper function
+ of_find_node_by_name_balanced()
+To: Oleksij Rempel <o.rempel@pengutronix.de>
+CC: <robh@kernel.org>, <saravanak@google.com>, <justin.chen@broadcom.com>,
+	<florian.fainelli@broadcom.com>, <andrew+netdev@lunn.ch>, <kuba@kernel.org>,
+	<kory.maincent@bootlin.com>, <jacopo+renesas@jmondi.org>,
+	<kieran.bingham+renesas@ideasonboard.com>,
+	<laurent.pinchart+renesas@ideasonboard.com>, <maddy@linux.ibm.com>,
+	<mpe@ellerman.id.au>, <npiggin@gmail.com>, <olteanv@gmail.com>,
+	<davem@davemloft.net>, <taras.chornyi@plvision.eu>, <edumazet@google.com>,
+	<pabeni@redhat.com>, <sudeep.holla@arm.com>, <cristian.marussi@arm.com>,
+	<arm-scmi@vger.kernel.org>, <linuxppc-dev@lists.ozlabs.org>,
+	<linux-media@vger.kernel.org>, <netdev@vger.kernel.org>,
+	<devicetree@vger.kernel.org>, <chenjun102@huawei.com>
+References: <20250207013117.104205-1-zhangzekun11@huawei.com>
+ <20250207013117.104205-2-zhangzekun11@huawei.com>
+ <Z6XDKi_V0BZSdCeL@pengutronix.de>
+In-Reply-To: <Z6XDKi_V0BZSdCeL@pengutronix.de>
+Content-Type: text/plain; charset="UTF-8"; format=flowed
+Content-Transfer-Encoding: 8bit
+X-ClientProxiedBy: dggems704-chm.china.huawei.com (10.3.19.181) To
+ kwepemf500003.china.huawei.com (7.202.181.241)
 
-Hello Eric,
 
-On Fri, Feb 07, 2025 at 11:56:53AM +0100, Eric Dumazet wrote:
 
-> > I suppose we will need to move some of definitions around, but, I am
-> > NOT confident in which way.
+在 2025/2/7 16:24, Oleksij Rempel 写道:
+> On Fri, Feb 07, 2025 at 09:31:09AM +0800, Zhang Zekun wrote:
+>> There are many drivers use of_find_node_by_name() with a not-NULL
+>> device_node pointer, and a number of callers would require a call to
+>> of_node_get() before using it. There are also some drivers who forget
+>> to call of_node_get() which would cause a ref count leak[1]. So, Add a
+>> wraper function for of_find_node_by_name(), drivers may use this function
+>> to call of_find_node_by_name() with the refcount already balanced.
+>>
+>> [1] https://lore.kernel.org/all/20241024015909.58654-1-zhangzekun11@huawei.com/
 > 
-> Note that we have different accessors like rtnl_dereference() and
-> rcu_dereference_rtnl()
+> Hi Zhang Zekun,
+> 
+> thank you for working on this issue!
+> 
+> First of all, let's take a step back and analyze the initial problem.
+> Everything following is only my opinion...
+> 
+> The main issue I see is that the current API - of_find_node_by_name -
+> modifies the refcount of its input by calling of_node_put(from) as part
+> of its search. Typically, a "find" function is expected to treat its
+> input as read-only. That is, when you pass an object into such a
+> function, you expect its reference count to remain unchanged unless
+> ownership is explicitly transferred. In this case, lowering the refcount
+> on the input node is counterintuitive and already lead to unexpected
+> behavior and subtle bugs.
+> 
+> To address this, the workaround introduces a wrapper function,
+> of_find_node_by_name_balanced, which first increments the input’s
+> refcount (via of_node_get()) before calling the original function. While
+> this "balances" the refcount change, the naming remains problematic from
+> my perspective. The "_balanced" suffix isn’t part of our common naming
+> conventions (traditions? :)). Most drivers expect that a function
+> starting with "find" will not alter the reference count of its input.
+> The term "balanced" doesn’t clearly convey that the input's refcount is
+> being explicitly managed - it instead obscures the underlying behavior,
+> leaving many developers confused about what guarantees the API provides.
+> 
+> In my view, a more natural solution would be to redesign the API so that
+> it doesn’t modify the input object’s refcount at all. Instead, it should
+> solely increase the refcount of the returned node (if found) for safe
+> asynchronous usage. This approach would align with established
+> conventions where "find" implies no side effects on inputs or output,
+> and a "get" indicates that the output comes with an extra reference. For
+> example, a function named of_get_node_by_name would clearly signal that
+> only the returned node is subject to a refcount increase while leaving
+> the input intact.
+> 
+> Thus, while the current workaround "balances" the reference count, it
+> doesn't address the underlying design flaw. The naming still suggests a
+> "find" function that should leave the input untouched, which isn’t the
+> case here. A redesign of the API - with both the behavior and naming
+> aligned to common expectations - would be a clearer and more robust
+> solution.
+> 
+> Nevertheless, it is only my POV, and the final decision rests with the
+> OpenFirmware framework maintainers.
+> 
+> Best Regards,
+> Oleksij
 
-Makes sense. I suppose that would be a for_each_netdev_rtnl().
+Hi, Oleksij,
 
-> It helps to differentiate expectations, and as self describing code.
+Thanks for your review. I think redesign the API would be a fundamental 
+way to fix this issue, but it would cause impact for current users who 
+knows the exact functionality of of_find_node_by_name(), which need to 
+put the "from" before calling it (I can't make the assumption that all 
+of drivers calling of_find_node_by_name() with a not-NULL "from" 
+pointer, but not calling of_node_get() before is misuse). The basic idea 
+for adding a new function is try not to impact current users. For users 
+who are confused about the "_balanced" suffix,the comments of 
+of_find_node_by_name() explains why this interface exists.
 
-The problem with this approach, is that we don't know what lock the
-caller of dev_getbyhwaddr_rcu() is using, thus, we cannot leverage
-a possible for_each_netdev_rtnl() inside dev_getbyhwaddr_rcu().
-
-> I would not change  for_each_netdev_rcu(), and instead add a new
-> dev_getbyhwaddr_rtnl()
-> function for contexts holding RTNL.
-
-Initially, I had reservations about this approach, but after further
-consideration, it seems that creating separate variants of
-dev_getbyhwaddr() might be the most effective solution.
-
-By doing so, we can introduce dev_getbyhwaddr_rcu() and
-dev_getbyhwaddr_rtnl(), each tailored to specific locking mechanisms.
-
-To explore this idea further, I'll create a proof-of-concept
-implementation to see how these new functions would look in practice.
-
-This will help us determine whether this approach is indeed the best way
-forward. Thanks for the suggestion.
-
-> Alternatively, add one rcu_read_lock()/rcu_read_unlock() pair as some
-> dev_getbyhwaddr_rcu() callers already do.
-
-Fair, we can do that as well, but, it seemed weird to me to have
-something like:
-
-	rtnl_lock();
-	rcu_read_lock();
-	dev_getbyhwaddr_rcu();
-
-Thanks for chiming in
---breno
+Thanks,
+Zekun
 
