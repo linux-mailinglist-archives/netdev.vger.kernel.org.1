@@ -1,210 +1,109 @@
-Return-Path: <netdev+bounces-163966-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-163967-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id E2507A2C324
-	for <lists+netdev@lfdr.de>; Fri,  7 Feb 2025 13:59:33 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2051CA2C330
+	for <lists+netdev@lfdr.de>; Fri,  7 Feb 2025 14:03:52 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 07EEB1889F7F
-	for <lists+netdev@lfdr.de>; Fri,  7 Feb 2025 12:59:39 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 2B154188BCD5
+	for <lists+netdev@lfdr.de>; Fri,  7 Feb 2025 13:03:57 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 990821E1035;
-	Fri,  7 Feb 2025 12:59:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5AC221E0DE5;
+	Fri,  7 Feb 2025 13:03:47 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="CcFEnB42"
 X-Original-To: netdev@vger.kernel.org
-Received: from frasgout.his.huawei.com (frasgout.his.huawei.com [185.176.79.56])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 17B4B7FD;
-	Fri,  7 Feb 2025 12:59:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.176.79.56
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 329BB1D63D6;
+	Fri,  7 Feb 2025 13:03:46 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1738933169; cv=none; b=Pa3Sk4O3mudc5KB+URUj37B3oAptXKMhFb3qI2DHcco2NiQGbDBBiVV264SOw7pMFzflibWgicyxDBkReBWsFTjeLJ5ifXQQAXxA1mRnuXEzgA4mqG84v/IFOcXXTWR9Wl+nLRcu0F+qrwfExH0at6rCJESMzx8tteIXecz3kNE=
+	t=1738933427; cv=none; b=ni2bp1mqf4VqM7uksLGCSsoNNYhP0pB2yTTmKfJMX9gJEmIIxi8iuGfVfsP9MUvsha4BwqauzyWMW3g3GfR188pxjXJvsNTC+Gg8MT+dVSL+BFpftFW3VXH+QjFfqmYooNwCLD083V5YqbOMPi2snrfE9f3eXqQblveue4EcFvA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1738933169; c=relaxed/simple;
-	bh=PiBkQPbiA1N3w3yTc/P+6JoMC2L6C5HIzraVGz5XBrI=;
-	h=Date:From:To:CC:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=hvWDs/I9R6VUNMn0Qtk7sMXfqURtfDrQ+75CEp0RuXvG7ahOU4f2Q/yZhsTFI7glhku+k8Y0bJruEDRDqjDQrEsq8dfqRwMHYMTsCEtPKFPnqasbo6XIbiM4s2mdYVQe3yFsGVoHTwV0nn5DzqJvGKwf2+P10jtr+p0TrOb0hds=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=185.176.79.56
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
-Received: from mail.maildlp.com (unknown [172.18.186.216])
-	by frasgout.his.huawei.com (SkyGuard) with ESMTP id 4YqDW50x3hz67Ct8;
-	Fri,  7 Feb 2025 20:56:33 +0800 (CST)
-Received: from frapeml500008.china.huawei.com (unknown [7.182.85.71])
-	by mail.maildlp.com (Postfix) with ESMTPS id D57AF1406AC;
-	Fri,  7 Feb 2025 20:59:17 +0800 (CST)
-Received: from localhost (10.203.177.66) by frapeml500008.china.huawei.com
- (7.182.85.71) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.1.2507.39; Fri, 7 Feb
- 2025 13:59:17 +0100
-Date: Fri, 7 Feb 2025 12:59:15 +0000
-From: Jonathan Cameron <Jonathan.Cameron@huawei.com>
-To: Jason Gunthorpe <jgg@nvidia.com>
-CC: Andy Gospodarek <andrew.gospodarek@broadcom.com>, Aron Silverton
-	<aron.silverton@oracle.com>, Dan Williams <dan.j.williams@intel.com>, Daniel
- Vetter <daniel.vetter@ffwll.ch>, Dave Jiang <dave.jiang@intel.com>, David
- Ahern <dsahern@kernel.org>, Andy Gospodarek <gospo@broadcom.com>, Christoph
- Hellwig <hch@infradead.org>, Itay Avraham <itayavr@nvidia.com>, Jiri Pirko
-	<jiri@nvidia.com>, Jakub Kicinski <kuba@kernel.org>, Leonid Bloch
-	<lbloch@nvidia.com>, Leon Romanovsky <leonro@nvidia.com>,
-	<linux-cxl@vger.kernel.org>, <linux-rdma@vger.kernel.org>,
-	<netdev@vger.kernel.org>, Saeed Mahameed <saeedm@nvidia.com>, "Nelson,
- Shannon" <shannon.nelson@amd.com>
-Subject: Re: [PATCH v4 02/10] fwctl: Basic ioctl dispatch for the character
- device
-Message-ID: <20250207125915.000079e4@huawei.com>
-In-Reply-To: <2-v4-0cf4ec3b8143+4995-fwctl_jgg@nvidia.com>
-References: <0-v4-0cf4ec3b8143+4995-fwctl_jgg@nvidia.com>
-	<2-v4-0cf4ec3b8143+4995-fwctl_jgg@nvidia.com>
-X-Mailer: Claws Mail 4.3.0 (GTK 3.24.42; x86_64-w64-mingw32)
+	s=arc-20240116; t=1738933427; c=relaxed/simple;
+	bh=Ge71FYL2GxX0fWNuNn/Fft2bQdnWJ71P5qdP6gV5SYM=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=hJ5CePNa+/vyjC0+40e/gCQPgAzHK9c7EGG8AiZDafHWQ0K5BBIWn9hVtZjoTHnq+fGdXg6K6Hk7eDKsh6pD4obyhZBjGzUIKpSheOvhCjW65PB6d0aK8qacZ6guOjYKxILG8dm79uNl5jhC0ZAEhY8uIaJ9pG7ttMk3KcFKKQo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=CcFEnB42; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9F49BC4CED1;
+	Fri,  7 Feb 2025 13:03:44 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1738933426;
+	bh=Ge71FYL2GxX0fWNuNn/Fft2bQdnWJ71P5qdP6gV5SYM=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=CcFEnB42ximi0lRosDYVFzLu1WwYULG5V0ke7KdfA2vjf1QBIlf1s1AaelQCjVrwg
+	 Vcb4LXUPEa8bR+lZNv/HCjtvxH9fSkBepF/UmRGWiWC2Acnn7S4rJPqCazUD5PkSnF
+	 ybqeRT8ruM7Ej5QWEv2P3Bzb9m/2bzvwcfoQe7BRgsia4WWGM2NWMlMHw8nK4nQavu
+	 ki1W3UDbFs+waHdWGJAGbhbCtWo6xCuSIMCsBdm1DctbKQzdL1fXE5U82w5t9oEXw/
+	 rLzEhPgPPjCVvHb44AXydjwcQHa2zsh9zqH4CSxbwEPZfkZKsANGbXPiiM40+uX4ne
+	 2U0HKR46BJvQg==
+Date: Fri, 7 Feb 2025 13:03:42 +0000
+From: Simon Horman <horms@kernel.org>
+To: alucerop@amd.com
+Cc: linux-cxl@vger.kernel.org, netdev@vger.kernel.org,
+	dan.j.williams@intel.com, edward.cree@amd.com, davem@davemloft.net,
+	kuba@kernel.org, pabeni@redhat.com, edumazet@google.com,
+	dave.jiang@intel.com
+Subject: Re: [PATCH v10 02/26] sfc: add basic cxl initialization
+Message-ID: <20250207130342.GS554665@kernel.org>
+References: <20250205151950.25268-1-alucerop@amd.com>
+ <20250205151950.25268-3-alucerop@amd.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="US-ASCII"
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: lhrpeml500012.china.huawei.com (7.191.174.4) To
- frapeml500008.china.huawei.com (7.182.85.71)
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250205151950.25268-3-alucerop@amd.com>
 
-On Thu,  6 Feb 2025 20:13:24 -0400
-Jason Gunthorpe <jgg@nvidia.com> wrote:
-
-> Each file descriptor gets a chunk of per-FD driver specific context that
-> allows the driver to attach a device specific struct to. The core code
-> takes care of the memory lifetime for this structure.
+On Wed, Feb 05, 2025 at 03:19:26PM +0000, alucerop@amd.com wrote:
+> From: Alejandro Lucero <alucerop@amd.com>
 > 
-> The ioctl dispatch and design is based on what was built for iommufd. The
-> ioctls have a struct which has a combined in/out behavior with a typical
-> 'zero pad' scheme for future extension and backwards compatibility.
+> Create a cxl_memdev_state with CXL_DEVTYPE_DEVMEM, aka CXL Type2 memory
+> device.
 > 
-> Like iommufd some shared logic does most of the ioctl marshalling and
-> compatibility work and tables diatches to some function pointers for
-> each unique iotcl.
+> Make sfc CXL initialization dependent on kernel CXL configuration.
 > 
-> This approach has proven to work quite well in the iommufd and rdma
-> subsystems.
+> Signed-off-by: Alejandro Lucero <alucerop@amd.com>
+> ---
+>  drivers/net/ethernet/sfc/Kconfig      |  5 +++
+>  drivers/net/ethernet/sfc/Makefile     |  1 +
+>  drivers/net/ethernet/sfc/efx.c        | 16 ++++++-
+>  drivers/net/ethernet/sfc/efx_cxl.c    | 60 +++++++++++++++++++++++++++
+>  drivers/net/ethernet/sfc/efx_cxl.h    | 40 ++++++++++++++++++
+>  drivers/net/ethernet/sfc/net_driver.h | 10 +++++
+>  6 files changed, 131 insertions(+), 1 deletion(-)
+>  create mode 100644 drivers/net/ethernet/sfc/efx_cxl.c
+>  create mode 100644 drivers/net/ethernet/sfc/efx_cxl.h
 > 
-> Allocate an ioctl number space for the subsystem.
-> 
-> Reviewed-by: Jonathan Cameron <Jonathan.Cameron@huawei.com>
-> Signed-off-by: Jason Gunthorpe <jgg@nvidia.com>
-Hi Jason,
+> diff --git a/drivers/net/ethernet/sfc/Kconfig b/drivers/net/ethernet/sfc/Kconfig
+> index 3eb55dcfa8a6..0ce4a9cd5590 100644
+> --- a/drivers/net/ethernet/sfc/Kconfig
+> +++ b/drivers/net/ethernet/sfc/Kconfig
+> @@ -65,6 +65,11 @@ config SFC_MCDI_LOGGING
+>  	  Driver-Interface) commands and responses, allowing debugging of
+>  	  driver/firmware interaction.  The tracing is actually enabled by
+>  	  a sysfs file 'mcdi_logging' under the PCI device.
+> +config SFC_CXL
+> +	bool "Solarflare SFC9100-family CXL support"
+> +	depends on SFC && CXL_BUS && !(SFC=y && CXL_BUS=m)
+> +	depends on CXL_BUS >= CXL_BUS
 
-Fresh read through given it's been a while.
+Hi Alejandro,
 
-A few really trivial things inline + one passing comment on a future
-entertaining corner.
+I'm confused by the intent of the line above.
+Could you clarify?
 
-Jonathan
-
-
->  M:	Sebastian Reichel <sre@kernel.org>
-> diff --git a/drivers/fwctl/main.c b/drivers/fwctl/main.c
-> index 34946bdc3bf3d7..d561deaf2b86d8 100644
-> --- a/drivers/fwctl/main.c
-> +++ b/drivers/fwctl/main.c
-
-
-
-
->  static int fwctl_fops_release(struct inode *inode, struct file *filp)
->  {
-> -	struct fwctl_device *fwctl = filp->private_data;
-> +	struct fwctl_uctx *uctx = filp->private_data;
-> +	struct fwctl_device *fwctl = uctx->fwctl;
+> +	default SFC
 >  
-> +	scoped_guard(rwsem_read, &fwctl->registration_lock) {
-> +		/*
-> +		 * fwctl_unregister() has already removed the driver and
-> +		 * destroyed the uctx.
+>  source "drivers/net/ethernet/sfc/falcon/Kconfig"
+>  source "drivers/net/ethernet/sfc/siena/Kconfig"
 
-Comment is a little odd given it is I think referring to why
-the code that follows wouldn't run. Perhaps just add a 'may'
-
-fwctl_unregister() may have already removed the driver and destroyed
-the uctx.
-
-> +		 */
-> +		if (fwctl->ops) {
-> +			guard(mutex)(&fwctl->uctx_list_lock);
-> +			fwctl_destroy_uctx(uctx);
-> +		}
-> +	}
-> +
-> +	kfree(uctx);
->  	fwctl_put(fwctl);
->  	return 0;
->  }
-
->  
-> @@ -71,14 +183,17 @@ _alloc_device(struct device *parent, const struct fwctl_ops *ops, size_t size)
->  	if (!fwctl)
->  		return NULL;
->  
-> -	fwctl->dev.class = &fwctl_class;
-> -	fwctl->dev.parent = parent;
-> -
->  	devnum = ida_alloc_max(&fwctl_ida, FWCTL_MAX_DEVICES - 1, GFP_KERNEL);
->  	if (devnum < 0)
->  		return NULL;
->  	fwctl->dev.devt = fwctl_dev + devnum;
->  
-> +	fwctl->dev.class = &fwctl_class;
-> +	fwctl->dev.parent = parent;
-
-Shunt this move back to previous patch?
-
-
-> +	init_rwsem(&fwctl->registration_lock);
-> +	mutex_init(&fwctl->uctx_list_lock);
-> +	INIT_LIST_HEAD(&fwctl->uctx_list);
-> +
->  	device_initialize(&fwctl->dev);
->  	return_ptr(fwctl);
->  }
-
-> diff --git a/include/linux/fwctl.h b/include/linux/fwctl.h
-> index 68ac2d5ab87481..93b470efb9dbc3 100644
-> --- a/include/linux/fwctl.h
-> +++ b/include/linux/fwctl.h
-> @@ -11,7 +11,30 @@
->  struct fwctl_device;
->  struct fwctl_uctx;
->  
-> +/**
-> + * struct fwctl_ops - Driver provided operations
-> + *
-> + * fwctl_unregister() will wait until all excuting ops are completed before it
-> + * returns. Drivers should be mindful to not let their ops run for too long as
-> + * it will block device hot unplug and module unloading.
-
-A passing comment on this.  Seems likely that at somepoint we'll want an
-abort op to enable cancelling if the particular driver supports it
-(abort background command in CXL).  Anyhow, problem for another day.
-
-> + */
->  struct fwctl_ops {
-> +	/**
-> +	 * @uctx_size: The size of the fwctl_uctx struct to allocate. The first
-> +	 * bytes of this memory will be a fwctl_uctx. The driver can use the
-> +	 * remaining bytes as its private memory.
-> +	 */
-> +	size_t uctx_size;
-> +	/**
-> +	 * @open_uctx: Called when a file descriptor is opened before the uctx
-> +	 * is ever used.
-> +	 */
-> +	int (*open_uctx)(struct fwctl_uctx *uctx);
-> +	/**
-> +	 * @close_uctx: Called when the uctx is destroyed, usually when the FD
-> +	 * is closed.
-> +	 */
-> +	void (*close_uctx)(struct fwctl_uctx *uctx);
->  };
-
-
+...
 
