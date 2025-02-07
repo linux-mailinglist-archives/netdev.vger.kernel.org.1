@@ -1,100 +1,129 @@
-Return-Path: <netdev+bounces-163968-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-163969-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 23E95A2C338
-	for <lists+netdev@lfdr.de>; Fri,  7 Feb 2025 14:05:28 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 356A6A2C33F
+	for <lists+netdev@lfdr.de>; Fri,  7 Feb 2025 14:06:53 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 48AE1188C480
-	for <lists+netdev@lfdr.de>; Fri,  7 Feb 2025 13:05:33 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 40D0C188C518
+	for <lists+netdev@lfdr.de>; Fri,  7 Feb 2025 13:06:58 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0FEC31DF247;
-	Fri,  7 Feb 2025 13:05:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 11E831EDA3B;
+	Fri,  7 Feb 2025 13:06:48 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-il1-f200.google.com (mail-il1-f200.google.com [209.85.166.200])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from frasgout.his.huawei.com (frasgout.his.huawei.com [185.176.79.56])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7F4A42417C9
-	for <netdev@vger.kernel.org>; Fri,  7 Feb 2025 13:05:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.200
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 19AA31E1A23;
+	Fri,  7 Feb 2025 13:06:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.176.79.56
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1738933524; cv=none; b=PTW5GdF1Z5bNcJXhasIBUosK+QoC83RnFsX2F3+dgq8VqgSk7loBZGP+r7dC1XqZEsIGnkewvclVjr1QaCn1vji4VJ6bqQTPyWyTW6hiIkpOh9p/OxzH9K+zuaHplt5VXg+4JivkPBGnLCWkhiZhipEO8qGRhW/GSJ0CAVqrMuo=
+	t=1738933608; cv=none; b=bg2ZM0lJunlTFENAAWgrGH/NLqfQ3o6AbGjGv8Y7DoCG/UNA4IKagGcbJi2TUna3vpvBwzZRoLh4Sj7nOSqCISDIbxLFjWOcGv+Whv1HBfUqcTzkyGyuhX+/LLyNOzpswnxGY8XqkZBozvyLvsLHTtl8VcjQCYWU9CinMh0ull4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1738933524; c=relaxed/simple;
-	bh=/3TUutAEsyiEiao1f5FuJ2MBJPxkW4v41kYmALIyI0c=;
-	h=MIME-Version:Date:Message-ID:Subject:From:To:Content-Type; b=YwHQCnPJkB3t5ptEeVfzfcdNdnLhGeyetUUPKvsKa8youPh0Eo4WAOrH4IDQaoXpiLat3Q7HuNOm2PRXRCSSVNjSfevby/WXxGBDBNYnBv1poZ66tTkD4rZ7jZfg61QkHzoMyTGHA/hL1OvyGbLLteJC8CqnK9OZT6S7aqPeePY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.200
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
-Received: by mail-il1-f200.google.com with SMTP id e9e14a558f8ab-3cf6ceaccdbso13771245ab.1
-        for <netdev@vger.kernel.org>; Fri, 07 Feb 2025 05:05:23 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1738933523; x=1739538323;
-        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=IiVOJOpa7LbU2POENlx9r029/9cBmYAxUUpk+kw3rJE=;
-        b=C5xjFdp5bhBCzLP0h5ic6Y797q4jvcl9gXzTT5oC5oUmUTFcql88jVtmAya9nAVYZx
-         fxURnOERnne9bHPTd/PLk53yOh31OWSudGClXQqWCas3dPsHq/1b9tHZ9sPwZYVN0Xf3
-         /mscrhG+OI1jvY1M1tF2yPOVfSpEWWNZvQug/06Yd/CHzUuXgcxxLvAY2LWf/3bQJ3Iy
-         oFVsPejMwnWXVwsRuVnBUqSvwWGi8tt+ewRbVU0YMD/qUUgn7CIT57xYMqdpyDKeUEoO
-         cBrdl6REh9Ziu23/8zjn1C5kuaCNe16y2e2dahz5DwjJYDSEJK5Xt/WpMAX+pv4MX9sb
-         C8Dw==
-X-Forwarded-Encrypted: i=1; AJvYcCWrE5HoWYDbVQBSCdklzCpYg0GCmue74D5yPdCoGGMjSNCdZXz39F9z963cQor8mTqyYMiS1mQ=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxtmxMMMf3QHXvK2+6SDlpBCzcpFcK+U1FUnbqPIO13NdKoI+ny
-	3jyCd16oUO6hPR1ondACph2whe84kOmTuxejLVbaAzo015eS+9SW9gO7r3AUj3p1LeLcI6ymNFE
-	rRTK8Vn4e5L0QYHac2sGXfI3BvHjxbkIvq8XetK0AVT7RDg5mLEU8leU=
-X-Google-Smtp-Source: AGHT+IG0tuY2b6nMAOLuwu6yK48ezZCBaK2ZBL+1JMYx0HTn541i6zfsmHzkEyOTjECukRqzo4b1KBq2R0zJRhzdL0+U7VRNyorx
+	s=arc-20240116; t=1738933608; c=relaxed/simple;
+	bh=D7RNcAAO05N1HIIZezFPcpHocutqTqQ2WqDfdpexqi8=;
+	h=Date:From:To:CC:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=h7wqMlOjYpPnFn38EnK3i8Nr2U+rmxsXhGgK3zf3tycIuKHQ2bfP6/eovIE2NRqh57K0mrY/P6KYEDTBn0KqiZ0ngjgYeywSIcm47NmuYmktqGnW8yZCrQyHafqzdDzUYycIsNpPRsvYsfvQ5cGede18S8/Bzbun8xY206PsiVc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=185.176.79.56
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
+Received: from mail.maildlp.com (unknown [172.18.186.231])
+	by frasgout.his.huawei.com (SkyGuard) with ESMTP id 4YqDjf5vc6z6HJbd;
+	Fri,  7 Feb 2025 21:05:42 +0800 (CST)
+Received: from frapeml500008.china.huawei.com (unknown [7.182.85.71])
+	by mail.maildlp.com (Postfix) with ESMTPS id EC9E0140A30;
+	Fri,  7 Feb 2025 21:06:43 +0800 (CST)
+Received: from localhost (10.203.177.66) by frapeml500008.china.huawei.com
+ (7.182.85.71) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.1.2507.39; Fri, 7 Feb
+ 2025 14:06:43 +0100
+Date: Fri, 7 Feb 2025 13:06:41 +0000
+From: Jonathan Cameron <Jonathan.Cameron@huawei.com>
+To: Jason Gunthorpe <jgg@nvidia.com>
+CC: Andy Gospodarek <andrew.gospodarek@broadcom.com>, Aron Silverton
+	<aron.silverton@oracle.com>, Dan Williams <dan.j.williams@intel.com>, Daniel
+ Vetter <daniel.vetter@ffwll.ch>, Dave Jiang <dave.jiang@intel.com>, David
+ Ahern <dsahern@kernel.org>, Andy Gospodarek <gospo@broadcom.com>, Christoph
+ Hellwig <hch@infradead.org>, Itay Avraham <itayavr@nvidia.com>, Jiri Pirko
+	<jiri@nvidia.com>, Jakub Kicinski <kuba@kernel.org>, Leonid Bloch
+	<lbloch@nvidia.com>, Leon Romanovsky <leonro@nvidia.com>,
+	<linux-cxl@vger.kernel.org>, <linux-rdma@vger.kernel.org>,
+	<netdev@vger.kernel.org>, Saeed Mahameed <saeedm@nvidia.com>, "Nelson,
+ Shannon" <shannon.nelson@amd.com>
+Subject: Re: [PATCH v4 03/10] fwctl: FWCTL_INFO to return basic information
+ about the device
+Message-ID: <20250207130641.00005cb9@huawei.com>
+In-Reply-To: <3-v4-0cf4ec3b8143+4995-fwctl_jgg@nvidia.com>
+References: <0-v4-0cf4ec3b8143+4995-fwctl_jgg@nvidia.com>
+	<3-v4-0cf4ec3b8143+4995-fwctl_jgg@nvidia.com>
+X-Mailer: Claws Mail 4.3.0 (GTK 3.24.42; x86_64-w64-mingw32)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Received: by 2002:a05:6e02:216a:b0:3cf:fd28:852 with SMTP id
- e9e14a558f8ab-3d13dd0280fmr28382165ab.3.1738933522772; Fri, 07 Feb 2025
- 05:05:22 -0800 (PST)
-Date: Fri, 07 Feb 2025 05:05:22 -0800
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <67a60512.050a0220.2b1e6.0024.GAE@google.com>
-Subject: [syzbot] Monthly wpan report (Feb 2025)
-From: syzbot <syzbot+list9ffec93ebc4680dc8d34@syzkaller.appspotmail.com>
-To: alex.aring@gmail.com, linux-kernel@vger.kernel.org, 
-	linux-wpan@vger.kernel.org, miquel.raynal@bootlin.com, netdev@vger.kernel.org, 
-	stefan@datenfreihafen.org, syzkaller-bugs@googlegroups.com
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset="US-ASCII"
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: lhrpeml500012.china.huawei.com (7.191.174.4) To
+ frapeml500008.china.huawei.com (7.182.85.71)
 
-Hello wpan maintainers/developers,
+On Thu,  6 Feb 2025 20:13:25 -0400
+Jason Gunthorpe <jgg@nvidia.com> wrote:
 
-This is a 31-day syzbot report for the wpan subsystem.
-All related reports/information can be found at:
-https://syzkaller.appspot.com/upstream/s/wpan
+> Userspace will need to know some details about the fwctl interface being
+> used to locate the correct userspace code to communicate with the
+> kernel. Provide a simple device_type enum indicating what the kernel
+> driver is.
+> 
+> Allow the device to provide a device specific info struct that contains
+> any additional information that the driver may need to provide to
+> userspace.
+> 
+> Reviewed-by: Jonathan Cameron <Jonathan.Cameron@huawei.com>
+> Signed-off-by: Jason Gunthorpe <jgg@nvidia.com>
+Trivial comment inline.
 
-During the period, 0 new issues were detected and 0 were fixed.
-In total, 5 issues are still open and 26 have already been fixed.
 
-Some of the still happening issues:
+> ---
+>  drivers/fwctl/main.c       | 51 ++++++++++++++++++++++++++++++++++++++
+>  include/linux/fwctl.h      | 12 +++++++++
+>  include/uapi/fwctl/fwctl.h | 32 ++++++++++++++++++++++++
+>  3 files changed, 95 insertions(+)
+> 
+> diff --git a/drivers/fwctl/main.c b/drivers/fwctl/main.c
+> index d561deaf2b86d8..4b6792f2031e86 100644
+> --- a/drivers/fwctl/main.c
+> +++ b/drivers/fwctl/main.c
+> @@ -27,8 +27,58 @@ struct fwctl_ucmd {
 
-Ref Crashes Repro Title
-<1> 192     Yes   KMSAN: uninit-value in ieee802154_hdr_push (2)
-                  https://syzkaller.appspot.com/bug?extid=60a66d44892b66b56545
-<2> 20      No    KASAN: global-out-of-bounds Read in mac802154_header_create (2)
-                  https://syzkaller.appspot.com/bug?extid=844d670c418e0353c6a8
-<3> 11      No    WARNING in __dev_change_net_namespace (3)
-                  https://syzkaller.appspot.com/bug?extid=3344d668bbbc12996d46
 
----
-This report is generated by a bot. It may contain errors.
-See https://goo.gl/tpsmEJ for more information about syzbot.
-syzbot engineers can be reached at syzkaller@googlegroups.com.
+> diff --git a/include/uapi/fwctl/fwctl.h b/include/uapi/fwctl/fwctl.h
+> index f4718a6240f281..ac66853200a5a8 100644
+> --- a/include/uapi/fwctl/fwctl.h
+> +++ b/include/uapi/fwctl/fwctl.h
+> @@ -4,6 +4,9 @@
+>  #ifndef _UAPI_FWCTL_H
+>  #define _UAPI_FWCTL_H
+>  
+> +#include <linux/types.h>
+> +#include <linux/ioctl.h>
+> +
+>  #define FWCTL_TYPE 0x9A
+>  
+>  /**
+> @@ -33,6 +36,35 @@
+>   */
+>  enum {
+>  	FWCTL_CMD_BASE = 0,
+> +	FWCTL_CMD_INFO = 0,
+> +	FWCTL_CMD_RPC = 1,
 
-To disable reminders for individual bugs, reply with the following command:
-#syz set <Ref> no-reminders
+Trivial but in theory should perhaps leave RPC for patch 5?
 
-To change bug's subsystems, reply with:
-#syz set <Ref> subsystems: new-subsystem
+>  };
 
-You may send multiple commands in a single email message.
+
 
