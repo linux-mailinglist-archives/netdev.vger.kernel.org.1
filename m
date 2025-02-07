@@ -1,159 +1,141 @@
-Return-Path: <netdev+bounces-164041-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-164043-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 60395A2C6CD
-	for <lists+netdev@lfdr.de>; Fri,  7 Feb 2025 16:21:11 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 48D34A2C6EB
+	for <lists+netdev@lfdr.de>; Fri,  7 Feb 2025 16:24:59 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id B2869188D82B
-	for <lists+netdev@lfdr.de>; Fri,  7 Feb 2025 15:21:01 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 83C46188C3E4
+	for <lists+netdev@lfdr.de>; Fri,  7 Feb 2025 15:24:05 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A62551EB184;
-	Fri,  7 Feb 2025 15:20:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DB4491EEA2A;
+	Fri,  7 Feb 2025 15:23:17 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="FsS1lfdk"
+	dkim=pass (2048-bit key) header.d=baylibre-com.20230601.gappssmtp.com header.i=@baylibre-com.20230601.gappssmtp.com header.b="dL5tXQN9"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-f45.google.com (mail-ed1-f45.google.com [209.85.208.45])
+Received: from mail-oa1-f50.google.com (mail-oa1-f50.google.com [209.85.160.50])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B7EED1EB19A
-	for <netdev@vger.kernel.org>; Fri,  7 Feb 2025 15:20:05 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.45
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B35C31EB1AD
+	for <netdev@vger.kernel.org>; Fri,  7 Feb 2025 15:23:15 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.50
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1738941607; cv=none; b=BELVVAGBovLrBFvtALaimdZSLCn0v2DMInguFAUc4bzFowxmiSEAsuT6lexoTsCm9wVbLRhoFaK61TgWRKptNzBHuwsMpwoJ5yCBKLJmfvrAFWIvyKAeK+VuoHIaSj2ZmgTOeEx5FXXRdA3CyCuIAnZZuYkijmVV7coWfzHffog=
+	t=1738941797; cv=none; b=FfaOkMxCnKULzT0WjqdP+IRglH4pI7YGohoamlgxsDilj4MjM4iNsaB8mmfciYhGX2l5ifoyUQV+yZNHla4AJ1qDi+ME4h3z0Q/fA/Dybj4EQqN5/DkJG1LM7+vJEGokC5hzdXz9W+NtNnQFBqWy/Ja9XzH+QjS2C0BXkJTEMKI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1738941607; c=relaxed/simple;
-	bh=SBQ4MyZoDsmflVQ146EzX/jzu5z0ACXQWfg4e2eQLKY=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=BP/smuGoyvSPk18xZtGmosugmQAhZ/asXdVYAAAcHBS5slqDzTj8BefBSoIklh+hBPITJNRSAFwkPX08AjQNuWg5hh4DDgq0yh9xgRVtF2PIPw7jhDIqAN94goPwoUCJTj5VyTQzV9WDz9hYpfIUbZ6xtgxeLXWK7tVs1KaVwz8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=FsS1lfdk; arc=none smtp.client-ip=209.85.208.45
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ed1-f45.google.com with SMTP id 4fb4d7f45d1cf-5de459b79ddso199399a12.0
-        for <netdev@vger.kernel.org>; Fri, 07 Feb 2025 07:20:05 -0800 (PST)
+	s=arc-20240116; t=1738941797; c=relaxed/simple;
+	bh=JDDbmK++u5Zrrl9i4wETB+fZ6+WtylkQrpDbOxAMbWI=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=u/YXVOAJP9Fi3PuVpwcgsDCZ3Rk5hxGjUb9jkHAEKK8R09lBNmWvTEE+hzI1UFO4Aqgi35dr4DZ3191+M56OzkI74Ql2eh/yZmO7jiuRmVOcNxYGts+hSddIDJr9Tttu6x4aVrtSEmhzrKGq8L6fSvBO/zSng0SF59KX1BCocp8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=baylibre.com; spf=pass smtp.mailfrom=baylibre.com; dkim=pass (2048-bit key) header.d=baylibre-com.20230601.gappssmtp.com header.i=@baylibre-com.20230601.gappssmtp.com header.b=dL5tXQN9; arc=none smtp.client-ip=209.85.160.50
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=baylibre.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=baylibre.com
+Received: by mail-oa1-f50.google.com with SMTP id 586e51a60fabf-2b832eabf39so791937fac.3
+        for <netdev@vger.kernel.org>; Fri, 07 Feb 2025 07:23:15 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1738941604; x=1739546404; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=Lh728/h5T9UnM+HASA8Jq2heTWOphh/67rcOx7NkUt0=;
-        b=FsS1lfdk4iwnCvB6KmyStoUWttFD9pag+3a+8WKo0RkhyGOiyYZpeFUNLjEMHv38eJ
-         PTuiFSwkNGatFcclLay0G4xtZHFQc/J9D84NzIxnQJ3hVoMFRtElyhDCOS1gdmP+x1w3
-         Wew4+aoQBurdBF32ZPyM/2hqaQ6kYjwIh9lWNNxdq6MlDQlayUFS2RU0/xCW2mG361Ci
-         z7RpSce5ZNEuGlXZ2TWwr02d3PgnYvNi1Dv6uWSUjM0b9u+JRsbDlWcesa61evSOJzTN
-         /Okd0NBofygRBywdmkLqrGqQz+KQm10p0JKkcdMTZ6sYz+DYE863vn1uGG0HXt7DrSx1
-         clkQ==
+        d=baylibre-com.20230601.gappssmtp.com; s=20230601; t=1738941795; x=1739546595; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:content-language:from
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=pKN8sjRb3wgYxS8vD82nCdPhJYpZegmXytH3ZuvLDaU=;
+        b=dL5tXQN99tpWF8iJr8PDD/x7JBvxCw1n0YxRCcqPSFnvPpC7pz3PL/hYn91vWQB0Lt
+         PZ+YGjJPRvMOtCt8XuOsWuFMiBIr2RD5IvXR6mjqKscso6rFMGbhNJ1G5MGrXATFbpfa
+         VRbiSVly/+dXXwGwD1F+9fcauRK/lcPtiyKuMiFGHGzuW5dhBj3e3WC6bCiqAoyuOliI
+         TzBamMlWWZOQmTpDeCDQ2jegAqduAHVG1KqRiD/u6gqi6cFOo8bwhGGFnLZUJxCbVubd
+         OMzJuQnB26STASsbn1P2y5yqqihWcI+LVXiQ57JzNDbcJB8FV+q3D1HXZajrsTQxKz0A
+         d1YA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1738941604; x=1739546404;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=Lh728/h5T9UnM+HASA8Jq2heTWOphh/67rcOx7NkUt0=;
-        b=e0jEzj17bjfYcqlFYond0tt/PQNOsiplKbKu8RNe4GmkBGxe9VSmEZVKSn3VZEjfEy
-         5iPFiIqKEHy48kEdUKoJ9kU9uEWv56UiXKLteFL7LKNaflb9h+8dJvyaW3rPFMfDFJBv
-         9twV+8QsV5KEVKP2+aMpC8qNjIljbvbjtSO3ukd9M0gd6+QCajiHOwdk2oJgNut9dijU
-         aoJ7qmoqXwGiJUzXv4A8Jic9dpwTQrx05vyDK4HxOrx6P66d3FFkbLcDMHBg4MtRuUmx
-         xcYYxrHVW2YZSLw353/vuF7tApfFgPO3WXQsHqSoCcgVWsnqNdSxFFCEuGkXdBy0ftow
-         HmRw==
-X-Forwarded-Encrypted: i=1; AJvYcCUQnKdXbZXtcxQf34qZhMEd+XqvUFALq1JAvdjYuZI1b8th557p839Jl4KgyaxrsBA440ttydw=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwPKlPkPqOFdEAp58HmAsTAifYWhTWZXWLm6jof3OEAaZ09XtLd
-	w0M9mOSW3fjREfN9mxg41Ec5UugBWWiPZ4vkVdkSblDJiMzRVJmk
-X-Gm-Gg: ASbGncsKJNXlB8yZUoir8ZVrlRwLJkdF7SWeWCq1jO4k2gY4cY+ueX3Jqiv68uhe6oz
-	0jXLAvL5e4v4y86ZAjLcWqUlxveoXeLoHxMi3BAmuhh0q213yQB7E8a+08Z5X8tlPE1ce3+vYr7
-	/gJw+UnKvNObWjRIBOi8QQExb35NfzWrsFCz7rostvwElGTX/YXZPMrOHj8fEBi3qt4+yigVTPN
-	YAl/3Z8hsponhuQWe/BFP7M9JpeTOXVG0fgzS7e+a5vK4be+jp731LF74/35a6mQcu1gqHvVDU3
-	R5A=
-X-Google-Smtp-Source: AGHT+IFUjfhOH0beogOCy9/ovimvABwSwvmh22ByKVKZ5A30iXNQpGJX9oTjv2FUtPbwL+S7YBZBEQ==
-X-Received: by 2002:a05:6402:1e91:b0:5de:39fd:b310 with SMTP id 4fb4d7f45d1cf-5de44e5dafamr1699198a12.0.1738941603629;
-        Fri, 07 Feb 2025 07:20:03 -0800 (PST)
-Received: from skbuf ([86.127.124.81])
-        by smtp.gmail.com with ESMTPSA id 4fb4d7f45d1cf-5dcf6c9f9a6sm2677109a12.55.2025.02.07.07.20.00
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 07 Feb 2025 07:20:02 -0800 (PST)
-Date: Fri, 7 Feb 2025 17:19:59 +0200
-From: Vladimir Oltean <olteanv@gmail.com>
-To: "Russell King (Oracle)" <rmk+kernel@armlinux.org.uk>
-Cc: Andrew Lunn <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>,
-	AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>,
-	"Chester A. Unal" <chester.a.unal@arinc9.com>,
-	Daniel Golle <daniel@makrotopia.org>,
-	"David S. Miller" <davem@davemloft.net>,
-	DENG Qingfang <dqfext@gmail.com>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	linux-arm-kernel@lists.infradead.org,
-	linux-mediatek@lists.infradead.org,
-	Matthias Brugger <matthias.bgg@gmail.com>, netdev@vger.kernel.org,
-	Paolo Abeni <pabeni@redhat.com>, Sean Wang <sean.wang@mediatek.com>,
-	Simon Horman <horms@kernel.org>
-Subject: Re: [PATCH net-next v2 2/3] net: dsa: allow use of phylink managed
- EEE support
-Message-ID: <20250207151959.jab2c36oejmdhf3k@skbuf>
-References: <Z6YF4o0ED0KLqYS9@shell.armlinux.org.uk>
- <E1tgO70-003ilF-1x@rmk-PC.armlinux.org.uk>
+        d=1e100.net; s=20230601; t=1738941795; x=1739546595;
+        h=content-transfer-encoding:in-reply-to:content-language:from
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=pKN8sjRb3wgYxS8vD82nCdPhJYpZegmXytH3ZuvLDaU=;
+        b=Th7/BtZi9EeR+hkaSdibU9WnbsWxlCQPTgLaUf5EEeYIeBVuh0TKnogvAB2ehPRVCY
+         7VYo4Mo9wcjMZef7Xpmc2R37u8LcbYtUYLmVKBgmU2CzYfURCQ+lUvQhaiDrZNRBmSXX
+         GieHVS3Svad1YHu6Obr0uJgEqpMPldohfvqLDjtvpg0/ivl0NLS7KiKYvGSJ57HCF+WF
+         wbxCGMsKMlhtLamGFhtZvA3hMiFkogeXBPVkrOpOpbPEtWXmzfdXT4aLAJl+PfDZyMQk
+         R5CpqT3rtV/CNfw+TSakl3eXetpzoMj65fTBC73G4apO2IPDbNBKgOp5sjza1rsOiAkC
+         1UWg==
+X-Forwarded-Encrypted: i=1; AJvYcCX3PafqYObR+Oy1Ngme0ihtnI0TI+Tw3F+oLdQJhCvr3z6WAsf8IVz7pH8N4qyw+5YLncVIx4g=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxCQssYvf/SaS/KFF/UifLiNXp94e0U5/VgEQD+OtqZNUAmm5N5
+	tI9n5tOulYPp5i3qYaN6YOdXqmrVDntLpNRX3Ll+ws28v7sd9Cdvpca6HNS0b78=
+X-Gm-Gg: ASbGncvSAoY3OPcTLQ0W93RFiEegcEkReMushq8GaTQc5knw+YaZSmjhfMrGbt2dYyj
+	A6mLqDN/QBz5SQy26hNy8q1gmiFmowReCFaV/ENq6R8kcVJ5OtZsMdkuhMFn8duW/Zn+ru7EMog
+	4+jBQEWjJZ48SUCdxvHLODqsXXWrB9YViniFaYXih7SqfYLTyfxkaRpnZtjohY9yt6FEBW3AoG1
+	WBin7fh9KTXJ2z/+7X13P1Y98Pr3jUAkFb2j4g8TuXwY/zk6GQjMKh/uNV786CFsVVKMpNlXmMz
+	x2LwRqEpcYLdDLYwtch2WxPiqwHUR3WsluMVmI2NkttxQVjjGAG8
+X-Google-Smtp-Source: AGHT+IEEGiDMzanhY46VT0zPfUJ5PNu5OgiAyh3A5rsLRVIHkXKzWkfKjdhXcmoVPsTyGbzMvvecNA==
+X-Received: by 2002:a05:6870:169d:b0:29e:4340:b1b with SMTP id 586e51a60fabf-2b83ed06682mr2385084fac.9.1738941794664;
+        Fri, 07 Feb 2025 07:23:14 -0800 (PST)
+Received: from [192.168.0.142] (ip98-183-112-25.ok.ok.cox.net. [98.183.112.25])
+        by smtp.gmail.com with ESMTPSA id 586e51a60fabf-2b826261c16sm829675fac.40.2025.02.07.07.23.11
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Fri, 07 Feb 2025 07:23:13 -0800 (PST)
+Message-ID: <945b338c-8fe1-4082-a20f-57f8152e8f80@baylibre.com>
+Date: Fri, 7 Feb 2025 09:23:11 -0600
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <E1tgO70-003ilF-1x@rmk-PC.armlinux.org.uk>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v2 05/13] gpio: max3191x: use
+ gpiod_multi_set_value_cansleep
+To: Andy Shevchenko <andy.shevchenko@gmail.com>
+Cc: Linus Walleij <linus.walleij@linaro.org>,
+ Bartosz Golaszewski <brgl@bgdev.pl>, Andy Shevchenko <andy@kernel.org>,
+ Geert Uytterhoeven <geert@linux-m68k.org>,
+ Lars-Peter Clausen <lars@metafoo.de>,
+ Michael Hennerich <Michael.Hennerich@analog.com>,
+ Jonathan Cameron <jic23@kernel.org>, Ulf Hansson <ulf.hansson@linaro.org>,
+ Peter Rosin <peda@axentia.se>, Andrew Lunn <andrew@lunn.ch>,
+ Heiner Kallweit <hkallweit1@gmail.com>, Russell King
+ <linux@armlinux.org.uk>, "David S. Miller" <davem@davemloft.net>,
+ Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+ Paolo Abeni <pabeni@redhat.com>, Vinod Koul <vkoul@kernel.org>,
+ Kishon Vijay Abraham I <kishon@kernel.org>, =?UTF-8?Q?Nuno_S=C3=A1?=
+ <nuno.sa@analog.com>, Liam Girdwood <lgirdwood@gmail.com>,
+ Mark Brown <broonie@kernel.org>, Jaroslav Kysela <perex@perex.cz>,
+ Takashi Iwai <tiwai@suse.com>, linux-gpio@vger.kernel.org,
+ linux-kernel@vger.kernel.org, linux-iio@vger.kernel.org,
+ linux-mmc@vger.kernel.org, netdev@vger.kernel.org,
+ linux-phy@lists.infradead.org, linux-sound@vger.kernel.org
+References: <20250206-gpio-set-array-helper-v2-0-1c5f048f79c3@baylibre.com>
+ <20250206-gpio-set-array-helper-v2-5-1c5f048f79c3@baylibre.com>
+ <CAHp75VcNJzPH8to1Y6NzPMXnH48Ve4LJ7oid7_wEHtwhO82Fmw@mail.gmail.com>
+From: David Lechner <dlechner@baylibre.com>
+Content-Language: en-US
+In-Reply-To: <CAHp75VcNJzPH8to1Y6NzPMXnH48Ve4LJ7oid7_wEHtwhO82Fmw@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 
-On Fri, Feb 07, 2025 at 01:09:38PM +0000, Russell King (Oracle) wrote:
-> In order to allow DSA drivers to use phylink managed EEE, changes are
-> necessary to the DSA .set_eee() and .get_eee() methods. Where drivers
-> make use of phylink managed EEE, these should just pass the method on
-> to their phylink implementation without calling the DSA specific
-> operations.
+On 2/7/25 4:34 AM, Andy Shevchenko wrote:
+> On Fri, Feb 7, 2025 at 12:48 AM David Lechner <dlechner@baylibre.com> wrote:
+>>
+>> Reduce verbosity by using gpiod_multi_set_value_cansleep() instead of
+>> gpiod_set_array_value_cansleep().
 > 
-> Signed-off-by: Russell King (Oracle) <rmk+kernel@armlinux.org.uk>
-> ---
->  net/dsa/user.c | 21 +++++++++++++--------
->  1 file changed, 13 insertions(+), 8 deletions(-)
-> 
-> diff --git a/net/dsa/user.c b/net/dsa/user.c
-> index 291ab1b4acc4..2e0a51c1b750 100644
-> --- a/net/dsa/user.c
-> +++ b/net/dsa/user.c
-> @@ -1243,16 +1243,21 @@ static int dsa_user_set_eee(struct net_device *dev, struct ethtool_keee *e)
->  	if (!ds->ops->support_eee || !ds->ops->support_eee(ds, dp->index))
->  		return -EOPNOTSUPP;
->  
-> -	/* Port's PHY and MAC both need to be EEE capable */
-> -	if (!dev->phydev)
-> -		return -ENODEV;
-> +	/* If the port is using phylink managed EEE, then get_mac_eee is
-> +	 * unnecessary.
+> It seems you missed my comment.
 
-You thanked me for spotting that this should have been set_mac_eee() in
-the comment, but you didn't update it.
-https://lore.kernel.org/netdev/Z4bC77mwoeypDAdH@shell.armlinux.org.uk/
+Yes, I must have been sleeping on the job. :-/
 
-> +	 */
-> +	if (!phylink_mac_implements_lpi(ds->phylink_mac_ops)) {
-> +		/* Port's PHY and MAC both need to be EEE capable */
-> +		if (!dev->phydev)
-> +			return -ENODEV;
->  
-> -	if (!ds->ops->set_mac_eee)
-> -		return -EOPNOTSUPP;
-> +		if (!ds->ops->set_mac_eee)
-> +			return -EOPNOTSUPP;
->  
-> -	ret = ds->ops->set_mac_eee(ds, dp->index, e);
-> -	if (ret)
-> -		return ret;
-> +		ret = ds->ops->set_mac_eee(ds, dp->index, e);
-> +		if (ret)
-> +			return ret;
-> +	}
->  
->  	return phylink_ethtool_set_eee(dp->pl, e);
->  }
-> -- 
-> 2.30.2
 > 
+>> +static void gpiod_set_array_single_value_cansleep(struct gpio_descs *descs,
+>>                                                   int value)
+> 
+> This is not good namespacing. Can we change this while at it?
+
+sure
+
+> 
+> max3191x_...
+> 
+> (I would go with max3191x_set_modesel_pins() to make it shorter. I
+> have no clue why the function repeats so much from gpiod API naming.
+> Is there anything else which is named in a similar way? Perhaps fix it
+> by a separate patch?)
+> 
+
 
