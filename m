@@ -1,177 +1,167 @@
-Return-Path: <netdev+bounces-164006-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-164007-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6290CA2C450
-	for <lists+netdev@lfdr.de>; Fri,  7 Feb 2025 15:00:42 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id D977FA2C45C
+	for <lists+netdev@lfdr.de>; Fri,  7 Feb 2025 15:02:15 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id ED6C516B4DF
-	for <lists+netdev@lfdr.de>; Fri,  7 Feb 2025 14:00:08 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 690A416BDF2
+	for <lists+netdev@lfdr.de>; Fri,  7 Feb 2025 14:01:25 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E823822068D;
-	Fri,  7 Feb 2025 13:58:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EA05D1F9F61;
+	Fri,  7 Feb 2025 13:59:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="sJpuaj5C"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Mzb3v+O1"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qt1-f202.google.com (mail-qt1-f202.google.com [209.85.160.202])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3D4FF212FBC
-	for <netdev@vger.kernel.org>; Fri,  7 Feb 2025 13:58:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.202
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BF2F71F8AE8;
+	Fri,  7 Feb 2025 13:59:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1738936736; cv=none; b=e7TDaoZbBxADNWjS4dte5CPbGJLQHozH7DoIbn7pwVu7E8Hili1aMQfATFfqEuInusX2fisrzGC7pBeuorIyMhspZhes4kyWpBWLGK3MOZBLDDLDM7/bTGuV28IRHfWbSyqiMzcP0vIK4CnxX2I1dymYIadz3a+Cdi26++3qjsk=
+	t=1738936769; cv=none; b=g/Z6zFzAFV57ZbPEPCvP4iNftStF3ZfU6786/o4iNYYKefLRUGbvI9YyW/MkNr9bmQnAkGdwc86OrQ5Trc7iqUV/iOwQxIOkjI5MXKsmmY6x/ysJw4QgXEuIDq7AS9Fde46k1LXU3pqJCnW1Hwp8NtpbEV1PU8n4LqqEmSBjTh0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1738936736; c=relaxed/simple;
-	bh=BSlpgDTG2Fr7hbiihOQf1WACP2NvQoi7ZQqYL9HMoKc=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=vFlUCW4F8uaGkw1eiClFas/BiCxcgOaznkxM5brm2YHFFIL9TWay0lSTTbweMb7a6M+CbNUE0RXFuTgB28JukOK9WulFUyquXxXeQjtAiU0bozvl1DbKIU8lJZ/+qCO5P+yNUYxJGTL38REebu75OXk0RDB7lg44K7dRZ69MI8s=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=sJpuaj5C; arc=none smtp.client-ip=209.85.160.202
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com
-Received: by mail-qt1-f202.google.com with SMTP id d75a77b69052e-467b5861766so39028681cf.2
-        for <netdev@vger.kernel.org>; Fri, 07 Feb 2025 05:58:54 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1738936734; x=1739541534; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=ChZ4IRphUYImFbjgGHf7CKcI7RILBkFZjntsWsfQYgY=;
-        b=sJpuaj5C2pQSHIofG/xs3jzU28VsltcjZYDPZCDnnxhI7BSLixntcabXH1Yzj+NVu+
-         b1AzkX/6/JcjEBdGsprrzlFRtTODqIMxOrenIvKFczZHl3BcHkjyYZAzAGON7wHQ4Wnn
-         S24NbtHU02oZQNumhdzwQBubMufgVUBRtET+kwaEgt93i6sP5mLYJSBykSRDwZEczvwI
-         kHEEU8AKxVFETm3EjX9snkCn6yBBKok4KE9aXo8yEOenGlfE+j/nxp9AnOtQJMNr6pGI
-         l4zBhtDu/o5rRNDJoyIcw6+3Nx/Hy2DKwNXhkE5yCoyiZjNWcW+cL/exqnoWgPBzUk50
-         bMxQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1738936734; x=1739541534;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=ChZ4IRphUYImFbjgGHf7CKcI7RILBkFZjntsWsfQYgY=;
-        b=qNra57lTWfpYfYRKqjYUPGZm7X98GmvV2UrOd6SDZp32VsQZTundU8vM3XZAvNT/ow
-         bqY0kgZxsZ5HMrDYbe4agESsdnTm0S+lWMNCZCnrC1dbfb8JFZ1r1V5ZpGMFUYmkyxNV
-         1I3KugViNP8a2OUq1a5BEhxAks/LmANLqS8w46zUFQd/EfFHQ8fcGB+nHp8hWo8rK6VU
-         tLDVxsI5TnshKXB+DYgsJjkEE3bpIrrnYlhGaCUMcfIpRbG530mpDUNMZy8vUkv8tvYT
-         wLYSnbEQWptGI7+MQbVnUG2QBlfaPG3bVhe83ZhzW5o33/W5mpBnUHqlTnxKKmYrQ9lA
-         ut+Q==
-X-Gm-Message-State: AOJu0Yx6rfNpOgaAXL5/ImlCxEK0BJpZdFCHQKw5bdOC3mpMN45THkNX
-	EOWSvUG5vs297mdJnqigPizyjSfSWJjONj18FXGd5CIgqhTGl4IAGZxi/Fs2mK8OC6DhLgaA4Vj
-	PCIOHqZiVMg==
-X-Google-Smtp-Source: AGHT+IG5lPJTOUia1yxV4mb6TxVSgxlYEX0B/TzZNnqIN2yX+bdC58iBKUHxZ7Iqn+E4jV+m6Egy0mPIc9s0eg==
-X-Received: from qtbgd21.prod.google.com ([2002:a05:622a:5c15:b0:467:971c:6905])
- (user=edumazet job=prod-delivery.src-stubby-dispatcher) by
- 2002:ac8:5a51:0:b0:460:8f80:909a with SMTP id d75a77b69052e-47167ad842dmr41409961cf.32.1738936734100;
- Fri, 07 Feb 2025 05:58:54 -0800 (PST)
-Date: Fri,  7 Feb 2025 13:58:40 +0000
-In-Reply-To: <20250207135841.1948589-1-edumazet@google.com>
+	s=arc-20240116; t=1738936769; c=relaxed/simple;
+	bh=1Z1+NL8yeZN9e9Y7PheCaIDo410qxsv0w5WsGMG7jd0=;
+	h=From:Subject:Date:Message-Id:MIME-Version:Content-Type:To:Cc; b=raBKmKGl5VwRGk/tLKnNNGou6PwcE9PozQtqqlqQM7ggdph6tSRad5IUfcTptP0CLjJva+ZvbQesv9IZTrpLaGTEPwy7AclRQ/0BdKr+3gkUmS+cge6zWC1PLXlLXm0ftDgk5p6edDZ/LlxO5sCrl5zA/Il4dfswE/sygjXBwMA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Mzb3v+O1; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2FFEBC4CED1;
+	Fri,  7 Feb 2025 13:59:27 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1738936769;
+	bh=1Z1+NL8yeZN9e9Y7PheCaIDo410qxsv0w5WsGMG7jd0=;
+	h=From:Subject:Date:To:Cc:From;
+	b=Mzb3v+O1yft7lyMAZukW4IvRF/4p4M+QvJmVnThgZ0WEbmtS6NyFmRepo0k8BLIJa
+	 Xkwsjs1Zlm6akochNdwETzOFJ2kdNMxDEvMuze1HS29qaBl0WOkbkETMszAMGQLjHP
+	 NyZpCNIypjPvr1aDrKC7lIqpWAvjLOmN38eJq/nhIxxcBQIt6Shp3+b5L7lTMafTTz
+	 AajnQzKZDCfTviUQAtbllGiERkWHj8kS6Ydv0V1bjcsvqM7LNAHfXpBlfLQl6bCLyz
+	 6JyRR4jb5Gocd51o9/qEdw0qn7wpCXQdkWS3Ixag5XHvgQQL6tv6xhzaJzPCVWpXAm
+	 waopiT4KtXTPw==
+From: "Matthieu Baerts (NGI0)" <matttbe@kernel.org>
+Subject: [PATCH net-next v3 00/15] mptcp: pm: misc cleanups, part 2
+Date: Fri, 07 Feb 2025 14:59:18 +0100
+Message-Id: <20250207-net-next-mptcp-pm-misc-cleanup-2-v3-0-71753ed957de@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-References: <20250207135841.1948589-1-edumazet@google.com>
-X-Mailer: git-send-email 2.48.1.502.g6dc24dfdaf-goog
-Message-ID: <20250207135841.1948589-9-edumazet@google.com>
-Subject: [PATCH net 8/8] ipv6: mcast: extend RCU protection in igmp6_send()
-From: Eric Dumazet <edumazet@google.com>
-To: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
-	Paolo Abeni <pabeni@redhat.com>
-Cc: netdev@vger.kernel.org, David Ahern <dsahern@kernel.org>, 
-	Kuniyuki Iwashima <kuniyu@amazon.com>, Simon Horman <horms@kernel.org>, eric.dumazet@gmail.com, 
-	Eric Dumazet <edumazet@google.com>
-Content-Type: text/plain; charset="UTF-8"
+MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+X-B4-Tracking: v=1; b=H4sIALYRpmcC/43NTQrDIBAF4KsE152i5qfSVe9RukjMmEgTI2olJ
+ eTuFaHQ7rKYxeMx39uIR6fRk2uxEYdRe72YFMpTQeTYmgFB9ykTTnlNGWvAYEi3BphtkBbsDLP
+ 2EuSErXlZ4NBRVVNUSlBRkcRYh0qveeJOvt/kkZpR+7C4d96OLPfHZyIDCpJ2VamYUEib2xOdw
+ em8uCHrkf+KlwMiT2LD+ipptWhQ/In7vn8Aa58GOy0BAAA=
+X-Change-ID: 20250116-net-next-mptcp-pm-misc-cleanup-2-b0f50eff8084
+To: mptcp@lists.linux.dev, Mat Martineau <martineau@kernel.org>, 
+ Geliang Tang <geliang@kernel.org>, "David S. Miller" <davem@davemloft.net>, 
+ Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
+ Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>
+Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
+ "Matthieu Baerts (NGI0)" <matttbe@kernel.org>, 
+ Geliang Tang <geliang@kernel.org>
+X-Mailer: b4 0.14.2
+X-Developer-Signature: v=1; a=openpgp-sha256; l=3259; i=matttbe@kernel.org;
+ h=from:subject:message-id; bh=1Z1+NL8yeZN9e9Y7PheCaIDo410qxsv0w5WsGMG7jd0=;
+ b=owEBbQKS/ZANAwAIAfa3gk9CaaBzAcsmYgBnphG9lRnBPv0YSIvaVRrtU+I7VLFpBVrB9xAAl
+ BLUnk2aJPuJAjMEAAEIAB0WIQToy4X3aHcFem4n93r2t4JPQmmgcwUCZ6YRvQAKCRD2t4JPQmmg
+ c/EhEACZCiM5ZIeuwZ+3CHKHFdEgVVN2YnO5FlDtlHlI1q5As9P+6yDHuGyRCMaT555HwYVV9pv
+ 7dNJEJeDtvLZlMwEjVHrpOWw4lbIgfxKnIQgq3cf1ULy2gnuRVBz5A6W9Yvyp4x8dYdjgsLG02y
+ Y//9IIs4dbGGzuSksVISmpVnbJLWz3XfDKadjLVIIDPYkl9gA10G4LAcvhJeKDfWhYpWWS240t4
+ fPXHsSkpf6o3GiKSsBMd7DXXOv+qvVT0Fpx+7XYr9UZGlzaR9eHuY+hhRasX4OrFoGbWsaWp2Ll
+ XzBhhCsdQHuAIezCLxPB0y/lEbj+5ywZ+4nnX0qmxKTCReCQ3egNBBHdTYdFzKZwStDPOQzjYhY
+ mEYj8s4xsIxIJDnZ9hDwgQdnKoFhvZMxoM06S+dkiWiya7Ult6w4RSEuilv6SMzjIjirO2ItVoL
+ IdTvStg1hnABUOU4qFnJgPnzkTJ8/lU1x/tPg3a9sNh66Ygpbq5Jno8ka6eP+fcM3yokKFpjys6
+ oHYYeYCUWE1H72c95YSN5VJm7UmqXli4aWD36tKw3KnTXDs25OLegJdAUCOapD5q5WsQYMlPdcK
+ 7LbNAcv4vMjBwyF5PpiWK3Oq0j0ahHeH7Fh/im83ZvFFvNAGgQ2045wKAL5klR1PnmfyArDtZu4
+ asCpKIDh8g/MQCQ==
+X-Developer-Key: i=matttbe@kernel.org; a=openpgp;
+ fpr=E8CB85F76877057A6E27F77AF6B7824F4269A073
 
-igmp6_send() can be called without RTNL or RCU being held.
+These cleanups lead the way to the unification of the path-manager
+interfaces, and allow future extensions. The following patches are not
+all linked to each others, but are all related to the path-managers.
 
-Extend RCU protection so that we can safely fetch the net pointer
-and avoid a potential UAF.
+- Patch 1: drop unneeded parameter in a function helper.
 
-Note that we no longer can use sock_alloc_send_skb() because
-ipv6.igmp_sk uses GFP_KERNEL allocations which can sleep.
+- Patch 2: clearer NL error message when an NL attribute is missing.
 
-Instead use alloc_skb() and charge the net->ipv6.igmp_sk
-socket under RCU protection.
+- Patch 3: more precise NL messages by avoiding 'this or that is NOK'.
 
-Fixes: b8ad0cbc58f7 ("[NETNS][IPV6] mcast - handle several network namespace")
-Signed-off-by: Eric Dumazet <edumazet@google.com>
+- Patch 4: improve too vague or missing NL err messages.
+
+- Patch 5: use GENL_REQ_ATTR_CHECK to look for mandatory NL attributes.
+
+- Patch 6: avoid overriding the error message.
+
+- Patch 7: check all mandatory NL attributes with GENL_REQ_ATTR_CHECK.
+
+- Patch 8: use NL_SET_ERR_MSG_ATTR instead of GENL_SET_ERR_MSG
+
+- Patch 9: move doit callbacks used for both PM to pm.c.
+
+- Patch 10: drop another unneeded parameter in a function helper.
+
+- Patch 11: share the ID parsing code for the 'get_addr' callback.
+
+- Patch 12: share sending NL code for the 'get_addr' callback.
+
+- Patch 13: drop yet another unneeded parameter in a function helper.
+
+- Patch 14: pick the usual structure type for the remote address.
+
+- Patch 15: share the local addr parsing code for the 'set_flags' cb.
+
+The behaviour when there are no errors should then not be modified.
+
+Signed-off-by: Matthieu Baerts (NGI0) <matttbe@kernel.org>
 ---
- net/ipv6/mcast.c | 31 +++++++++++++++----------------
- 1 file changed, 15 insertions(+), 16 deletions(-)
+Changes in v3:
+- Patch 11: a variable was no longer assigned in pm_userspace.c, but
+  still used in this patch (and no longer in the next one). (Geliang)
+- Rebased on top of the latest net-next.
+- Link to v2: https://lore.kernel.org/r/20250117-net-next-mptcp-pm-misc-cleanup-2-v2-0-61d4fe0586e8@kernel.org
 
-diff --git a/net/ipv6/mcast.c b/net/ipv6/mcast.c
-index 9dfdb40988b0f8edd882c07b555ea0115ee95cab..81a739ebf7094694a6f5de5020cd4c4d1c9642d1 100644
---- a/net/ipv6/mcast.c
-+++ b/net/ipv6/mcast.c
-@@ -2165,21 +2165,21 @@ static void mld_send_cr(struct inet6_dev *idev)
- 
- static void igmp6_send(struct in6_addr *addr, struct net_device *dev, int type)
- {
--	struct net *net = dev_net(dev);
--	struct sock *sk = net->ipv6.igmp_sk;
-+	const struct in6_addr *snd_addr, *saddr;
-+	int err, len, payload_len, full_len;
-+	struct in6_addr addr_buf;
- 	struct inet6_dev *idev;
- 	struct sk_buff *skb;
- 	struct mld_msg *hdr;
--	const struct in6_addr *snd_addr, *saddr;
--	struct in6_addr addr_buf;
- 	int hlen = LL_RESERVED_SPACE(dev);
- 	int tlen = dev->needed_tailroom;
--	int err, len, payload_len, full_len;
- 	u8 ra[8] = { IPPROTO_ICMPV6, 0,
- 		     IPV6_TLV_ROUTERALERT, 2, 0, 0,
- 		     IPV6_TLV_PADN, 0 };
--	struct flowi6 fl6;
- 	struct dst_entry *dst;
-+	struct flowi6 fl6;
-+	struct net *net;
-+	struct sock *sk;
- 
- 	if (type == ICMPV6_MGM_REDUCTION)
- 		snd_addr = &in6addr_linklocal_allrouters;
-@@ -2190,19 +2190,21 @@ static void igmp6_send(struct in6_addr *addr, struct net_device *dev, int type)
- 	payload_len = len + sizeof(ra);
- 	full_len = sizeof(struct ipv6hdr) + payload_len;
- 
--	rcu_read_lock();
--	IP6_INC_STATS(net, __in6_dev_get(dev), IPSTATS_MIB_OUTREQUESTS);
--	rcu_read_unlock();
-+	skb = alloc_skb(hlen + tlen + full_len, GFP_KERNEL);
- 
--	skb = sock_alloc_send_skb(sk, hlen + tlen + full_len, 1, &err);
-+	rcu_read_lock();
- 
-+	net = dev_net_rcu(dev);
-+	idev = __in6_dev_get(dev);
-+	IP6_INC_STATS(net, idev, IPSTATS_MIB_OUTREQUESTS);
- 	if (!skb) {
--		rcu_read_lock();
--		IP6_INC_STATS(net, __in6_dev_get(dev),
--			      IPSTATS_MIB_OUTDISCARDS);
-+		IP6_INC_STATS(net, idev, IPSTATS_MIB_OUTDISCARDS);
- 		rcu_read_unlock();
- 		return;
- 	}
-+	sk = net->ipv6.igmp_sk;
-+	skb_set_owner_w(skb, sk);
-+
- 	skb->priority = TC_PRIO_CONTROL;
- 	skb_reserve(skb, hlen);
- 
-@@ -2227,9 +2229,6 @@ static void igmp6_send(struct in6_addr *addr, struct net_device *dev, int type)
- 					 IPPROTO_ICMPV6,
- 					 csum_partial(hdr, len, 0));
- 
--	rcu_read_lock();
--	idev = __in6_dev_get(skb->dev);
--
- 	icmpv6_flow_init(sk, &fl6, type,
- 			 &ipv6_hdr(skb)->saddr, &ipv6_hdr(skb)->daddr,
- 			 skb->dev->ifindex);
+Changes in v2:
+- Patch 11: a variable was no longer assigned in pm_netlink.c, but still
+  used in this patch (and no longer in the next one). (Simon)
+- Link to v1: https://lore.kernel.org/r/20250116-net-next-mptcp-pm-misc-cleanup-2-v1-0-c0b43f18fe06@kernel.org
+
+---
+Geliang Tang (9):
+      mptcp: pm: drop info of userspace_pm_remove_id_zero_address
+      mptcp: pm: userspace: use GENL_REQ_ATTR_CHECK
+      mptcp: pm: make three pm wrappers static
+      mptcp: pm: drop skb parameter of get_addr
+      mptcp: pm: add id parameter for get_addr
+      mptcp: pm: reuse sending nlmsg code in get_addr
+      mptcp: pm: drop skb parameter of set_flags
+      mptcp: pm: change rem type of set_flags
+      mptcp: pm: add local parameter for set_flags
+
+Matthieu Baerts (NGI0) (6):
+      mptcp: pm: userspace: flags: clearer msg if no remote addr
+      mptcp: pm: more precise error messages
+      mptcp: pm: improve error messages
+      mptcp: pm: remove duplicated error messages
+      mptcp: pm: mark missing address attributes
+      mptcp: pm: use NL_SET_ERR_MSG_ATTR when possible
+
+ net/mptcp/pm.c           |  86 +++++++++++++++++--
+ net/mptcp/pm_netlink.c   | 129 ++++++++++-------------------
+ net/mptcp/pm_userspace.c | 209 +++++++++++++++++++++--------------------------
+ net/mptcp/protocol.h     |  14 ++--
+ 4 files changed, 225 insertions(+), 213 deletions(-)
+---
+base-commit: 26db4dbb747813b5946aff31485873f071a10332
+change-id: 20250116-net-next-mptcp-pm-misc-cleanup-2-b0f50eff8084
+
+Best regards,
 -- 
-2.48.1.502.g6dc24dfdaf-goog
+Matthieu Baerts (NGI0) <matttbe@kernel.org>
 
 
