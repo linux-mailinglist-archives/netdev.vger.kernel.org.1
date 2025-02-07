@@ -1,50 +1,50 @@
-Return-Path: <netdev+bounces-164082-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-164083-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id C56B8A2C8C8
-	for <lists+netdev@lfdr.de>; Fri,  7 Feb 2025 17:28:28 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7D644A2C8CE
+	for <lists+netdev@lfdr.de>; Fri,  7 Feb 2025 17:28:57 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 20D5916220E
-	for <lists+netdev@lfdr.de>; Fri,  7 Feb 2025 16:28:06 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 820AA7A4E38
+	for <lists+netdev@lfdr.de>; Fri,  7 Feb 2025 16:27:20 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2D58C192B82;
-	Fri,  7 Feb 2025 16:27:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 11BEB192D7C;
+	Fri,  7 Feb 2025 16:27:11 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="jQkdo+Z/"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="CLY+/YPu"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0041518FDB9;
-	Fri,  7 Feb 2025 16:27:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DECA418EFED;
+	Fri,  7 Feb 2025 16:27:10 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1738945628; cv=none; b=g+5Jm2e1VijWYpwDlFemwTswLO1i4MnUAWQlMifYqiuEOU4FLIkvdUPfv+eHAdqaRDGwgDcCqSjQJlZ8LQt4znY2jbMPxqtduDsKnjrW3/8jzDMWOdtcntTwu1kNJGqaqIyevPCjUU6RtYoeoWRWfUWukKqqUR31T/flMVDpbSE=
+	t=1738945631; cv=none; b=oCSTBbNjQgP0T6Q4ReD+eir4nyN6b5+n72Wo2W9dFfXgk3O8cBw4TB/8IZcpxNiDiA+VnObnpPbjNTD1cFGG/u0taUU1VTKaZSIeLcfeYp1LkyihFvvHrq3WZbU2fXGIdpSP14Tfu6TOixckKnpgBjjbZCm/kSFrLQonQTaqxWo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1738945628; c=relaxed/simple;
-	bh=WFtXkOHzpsVl/lSmvchFASlqyP6fybupy9T9sIM0y/o=;
+	s=arc-20240116; t=1738945631; c=relaxed/simple;
+	bh=4Qk8X7qpIVCbN/KBSqhoxxEZY1Ovomp+1fX44eKyUmk=;
 	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=FealKBqE6TgW5yXjLxqzoeLpyrwlxDqzSLyGaZ/uAp7zQQ94V9YDJRkiMX0ZpRczWX0OthdOY7Bouewn7IrKAe/rOs4dVTZ8rjB69mX8YfZoVzh89iRopDtCoM+VtnpSdb7yIl6cb/RnZPfoBvvs6EVIJO206eUS0RW+w2jRDfc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=jQkdo+Z/; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 80EA7C4CEDF;
-	Fri,  7 Feb 2025 16:27:07 +0000 (UTC)
+	 In-Reply-To:To:Cc; b=G22iON+aQ9C09bvCBdrGN8JC+LLF1YdZWJ1BGtmHLY1mfHdGpXlIE0t4oj1Rfb+QQ9TRBdgLTJwJLV79fioxTaA9xiuayTu4dgKW6HQtHOvtrUFNZVMr8+I13b8t7TDC8TfVqtCjZIHZTTs/N6sh+Hv/NMWNqJFyn/bTAYWxh+o=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=CLY+/YPu; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 15FAAC4CED1;
+	Fri,  7 Feb 2025 16:27:09 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1738945627;
-	bh=WFtXkOHzpsVl/lSmvchFASlqyP6fybupy9T9sIM0y/o=;
+	s=k20201202; t=1738945630;
+	bh=4Qk8X7qpIVCbN/KBSqhoxxEZY1Ovomp+1fX44eKyUmk=;
 	h=From:Date:Subject:References:In-Reply-To:To:Cc:From;
-	b=jQkdo+Z/NUbYlv85u9QTlYkVzt5i8HJIoTLvUG7HQ5KrHRUQyOEyv3umWAPL2Hd3z
-	 X/VGMCpPjkAee7I0smhUrZX4kBYmGAoRpgq5ga9t3s4gPR43ZmWy9S2Pr2jn5QVtD1
-	 NqJY9PKuEgLroWPqrFeZarW1nSxNWsvJ6meZtXeXSEiOAIMNuRnGBlUkbFi0gzyYY3
-	 4IPKtF/nV5ZDVSGd4+wv4fkfKs1xBZFcVNqGks1FGtPUJE9j5FCdD0Y9eGHHiKr0F/
-	 QmjBtNWT/JQyFqH6TNKSGFIOtQu+Xb0x+nsVah0RaUlmKWek8gZqAYNdbA6Te4XqhT
-	 L1OC9Bb5qBEGQ==
+	b=CLY+/YPu+e8E6LOxIrIQWdtzysanVhH+MsFYa2mt5qgUjr/bv0qNGwnvOYOEeGd7p
+	 ywKSjVPna8eW2qPI6TL6OwP3vX1x5TKvLZzcOvKPhzyWGwCSsKP4p9XOCSvaD4YfZR
+	 Mry1PFhNHKxYOyyew3OUcOVEG82qP6j6rLg14nnvus8ExPWr77pBwCBx4Uhq3r/k7Q
+	 zFCJKf06N4FPcspWM9LeOEJoeiF/YXXMT1l20hb2w0KrT/vRuI3gyDvc3woMMcsSN7
+	 +KLqYSTVbUF94nMB5Ln7/vFALMxCe79StoauFXqRTQ+y/Ww2fFO3EWWREvTKlgKI2J
+	 aoTTpTcEZjb2w==
 From: Lorenzo Bianconi <lorenzo@kernel.org>
-Date: Fri, 07 Feb 2025 17:26:23 +0100
-Subject: [PATCH net-next v2 08/15] net: airoha: Move REG_GDM_FWD_CFG()
- initialization in airoha_dev_init()
+Date: Fri, 07 Feb 2025 17:26:24 +0100
+Subject: [PATCH net-next v2 09/15] net: airoha: Rename
+ airoha_set_gdm_port_fwd_cfg() in airoha_set_vip_for_gdm_port()
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -53,7 +53,7 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-Message-Id: <20250207-airoha-en7581-flowtable-offload-v2-8-3a2239692a67@kernel.org>
+Message-Id: <20250207-airoha-en7581-flowtable-offload-v2-9-3a2239692a67@kernel.org>
 References: <20250207-airoha-en7581-flowtable-offload-v2-0-3a2239692a67@kernel.org>
 In-Reply-To: <20250207-airoha-en7581-flowtable-offload-v2-0-3a2239692a67@kernel.org>
 To: Andrew Lunn <andrew+netdev@lunn.ch>, 
@@ -73,78 +73,123 @@ Cc: netdev@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
  upstream@airoha.com
 X-Mailer: b4 0.14.2
 
-Move REG_GDM_FWD_CFG() register initialization in airoha_dev_init
-routine. Moreover, always send traffic PPE module in order to be
-processed by hw accelerator.
-This is a preliminary patch to enable netfilter flowtable hw offloading
-on EN7581 SoC.
+Rename airoha_set_gdm_port() in airoha_set_vip_for_gdm_port().
+Get rid of airoha_set_gdm_ports routine.
 
 Signed-off-by: Lorenzo Bianconi <lorenzo@kernel.org>
 ---
- drivers/net/ethernet/airoha/airoha_eth.c | 14 ++++----------
- 1 file changed, 4 insertions(+), 10 deletions(-)
+ drivers/net/ethernet/airoha/airoha_eth.c | 49 +++++++-------------------------
+ drivers/net/ethernet/airoha/airoha_eth.h |  8 ------
+ 2 files changed, 11 insertions(+), 46 deletions(-)
 
 diff --git a/drivers/net/ethernet/airoha/airoha_eth.c b/drivers/net/ethernet/airoha/airoha_eth.c
-index 42b5e0945fb8738f70d0b77bf597a7a04e5f0716..db75a9b1d5766bfaaa92312d625c395e19c88368 100644
+index db75a9b1d5766bfaaa92312d625c395e19c88368..52be276039eff7772b3c604cf7db5d456ec155ab 100644
 --- a/drivers/net/ethernet/airoha/airoha_eth.c
 +++ b/drivers/net/ethernet/airoha/airoha_eth.c
-@@ -107,25 +107,20 @@ static void airoha_set_gdm_port_fwd_cfg(struct airoha_eth *eth, u32 addr,
+@@ -105,25 +105,23 @@ static void airoha_set_gdm_port_fwd_cfg(struct airoha_eth *eth, u32 addr,
+ 		      FIELD_PREP(GDM_UCFQ_MASK, val));
+ }
  
- static int airoha_set_gdm_port(struct airoha_eth *eth, int port, bool enable)
+-static int airoha_set_gdm_port(struct airoha_eth *eth, int port, bool enable)
++static int airoha_set_vip_for_gdm_port(struct airoha_gdm_port *port,
++				       bool enable)
  {
--	u32 val = enable ? FE_PSE_PORT_PPE1 : FE_PSE_PORT_DROP;
--	u32 vip_port, cfg_addr;
-+	u32 vip_port;
++	struct airoha_eth *eth = port->qdma->eth;
+ 	u32 vip_port;
  
- 	switch (port) {
- 	case XSI_PCIE0_PORT:
+-	switch (port) {
+-	case XSI_PCIE0_PORT:
++	switch (port->id) {
++	case 3:
++		/* FIXME: handle XSI_PCIE1_PORT */
  		vip_port = XSI_PCIE0_VIP_PORT_MASK;
--		cfg_addr = REG_GDM_FWD_CFG(3);
  		break;
- 	case XSI_PCIE1_PORT:
- 		vip_port = XSI_PCIE1_VIP_PORT_MASK;
--		cfg_addr = REG_GDM_FWD_CFG(3);
- 		break;
- 	case XSI_USB_PORT:
- 		vip_port = XSI_USB_VIP_PORT_MASK;
--		cfg_addr = REG_GDM_FWD_CFG(4);
- 		break;
- 	case XSI_ETH_PORT:
+-	case XSI_PCIE1_PORT:
+-		vip_port = XSI_PCIE1_VIP_PORT_MASK;
+-		break;
+-	case XSI_USB_PORT:
+-		vip_port = XSI_USB_VIP_PORT_MASK;
+-		break;
+-	case XSI_ETH_PORT:
++	case 4:
++		/* FIXME: handle XSI_USB_PORT */
  		vip_port = XSI_ETH_VIP_PORT_MASK;
--		cfg_addr = REG_GDM_FWD_CFG(4);
  		break;
  	default:
- 		return -EINVAL;
-@@ -139,8 +134,6 @@ static int airoha_set_gdm_port(struct airoha_eth *eth, int port, bool enable)
- 		airoha_fe_clear(eth, REG_FE_IFC_PORT_EN, vip_port);
+-		return -EINVAL;
++		return 0;
  	}
  
--	airoha_set_gdm_port_fwd_cfg(eth, cfg_addr, val);
+ 	if (enable) {
+@@ -137,31 +135,6 @@ static int airoha_set_gdm_port(struct airoha_eth *eth, int port, bool enable)
+ 	return 0;
+ }
+ 
+-static int airoha_set_gdm_ports(struct airoha_eth *eth, bool enable)
+-{
+-	const int port_list[] = {
+-		XSI_PCIE0_PORT,
+-		XSI_PCIE1_PORT,
+-		XSI_USB_PORT,
+-		XSI_ETH_PORT
+-	};
+-	int i, err;
 -
- 	return 0;
- }
- 
-@@ -177,8 +170,6 @@ static void airoha_fe_maccr_init(struct airoha_eth *eth)
- 		airoha_fe_set(eth, REG_GDM_FWD_CFG(p),
- 			      GDM_TCP_CKSUM | GDM_UDP_CKSUM | GDM_IP4_CKSUM |
- 			      GDM_DROP_CRC_ERR);
--		airoha_set_gdm_port_fwd_cfg(eth, REG_GDM_FWD_CFG(p),
--					    FE_PSE_PORT_CDM1);
- 		airoha_fe_rmw(eth, REG_GDM_LEN_CFG(p),
- 			      GDM_SHORT_LEN_MASK | GDM_LONG_LEN_MASK,
- 			      FIELD_PREP(GDM_SHORT_LEN_MASK, 60) |
-@@ -1614,8 +1605,11 @@ static int airoha_dev_set_macaddr(struct net_device *dev, void *p)
- static int airoha_dev_init(struct net_device *dev)
+-	for (i = 0; i < ARRAY_SIZE(port_list); i++) {
+-		err = airoha_set_gdm_port(eth, port_list[i], enable);
+-		if (err)
+-			goto error;
+-	}
+-
+-	return 0;
+-
+-error:
+-	for (i--; i >= 0; i--)
+-		airoha_set_gdm_port(eth, port_list[i], false);
+-
+-	return err;
+-}
+-
+ static void airoha_fe_maccr_init(struct airoha_eth *eth)
  {
- 	struct airoha_gdm_port *port = netdev_priv(dev);
-+	struct airoha_eth *eth = port->qdma->eth;
+ 	int p;
+@@ -1539,7 +1512,7 @@ static int airoha_dev_open(struct net_device *dev)
+ 	int err;
  
- 	airoha_set_macaddr(port, dev->dev_addr);
-+	airoha_set_gdm_port_fwd_cfg(eth, REG_GDM_FWD_CFG(port->id),
-+				    FE_PSE_PORT_PPE1);
+ 	netif_tx_start_all_queues(dev);
+-	err = airoha_set_gdm_ports(qdma->eth, true);
++	err = airoha_set_vip_for_gdm_port(port, true);
+ 	if (err)
+ 		return err;
  
- 	return 0;
- }
+@@ -1565,7 +1538,7 @@ static int airoha_dev_stop(struct net_device *dev)
+ 	int i, err;
+ 
+ 	netif_tx_disable(dev);
+-	err = airoha_set_gdm_ports(qdma->eth, false);
++	err = airoha_set_vip_for_gdm_port(port, false);
+ 	if (err)
+ 		return err;
+ 
+diff --git a/drivers/net/ethernet/airoha/airoha_eth.h b/drivers/net/ethernet/airoha/airoha_eth.h
+index 74bdfd9e8d2fb3706f5ec6a4e17fe07fbcb38c3d..44834227a58982d4491f3d8174b9e0bea542f785 100644
+--- a/drivers/net/ethernet/airoha/airoha_eth.h
++++ b/drivers/net/ethernet/airoha/airoha_eth.h
+@@ -57,14 +57,6 @@ enum {
+ 	QDMA_INT_REG_MAX
+ };
+ 
+-enum {
+-	XSI_PCIE0_PORT,
+-	XSI_PCIE1_PORT,
+-	XSI_USB_PORT,
+-	XSI_AE_PORT,
+-	XSI_ETH_PORT,
+-};
+-
+ enum {
+ 	XSI_PCIE0_VIP_PORT_MASK	= BIT(22),
+ 	XSI_PCIE1_VIP_PORT_MASK	= BIT(23),
 
 -- 
 2.48.1
