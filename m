@@ -1,254 +1,111 @@
-Return-Path: <netdev+bounces-164128-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-164129-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 98D06A2CAED
-	for <lists+netdev@lfdr.de>; Fri,  7 Feb 2025 19:13:07 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id DC5F9A2CAF0
+	for <lists+netdev@lfdr.de>; Fri,  7 Feb 2025 19:14:38 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 27BEC16AC42
-	for <lists+netdev@lfdr.de>; Fri,  7 Feb 2025 18:13:06 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 054A7188A105
+	for <lists+netdev@lfdr.de>; Fri,  7 Feb 2025 18:14:44 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 89A4219CD1E;
-	Fri,  7 Feb 2025 18:13:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5318619D8B2;
+	Fri,  7 Feb 2025 18:14:35 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="X7faWZZZ"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="aIKOh63l"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wr1-f42.google.com (mail-wr1-f42.google.com [209.85.221.42])
+Received: from mail-qk1-f169.google.com (mail-qk1-f169.google.com [209.85.222.169])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9A63E199EB7;
-	Fri,  7 Feb 2025 18:13:01 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.42
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C34D5199EB7;
+	Fri,  7 Feb 2025 18:14:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.169
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1738951983; cv=none; b=PtbixnsKY2abOTr3EobXZaDnR3AftFcbzILOloFoqPzYV+tpa6z7+ckPWYMkph60qY7wERtGiQZUweHd5mUX2qG33UUXGertEMm84juNLa52bvmhdvJfWL33Xbh/rEkEjAM8fJkEhgM6RDX2luVNc3SYpNHDzJeyKbWw7mjVYUM=
+	t=1738952075; cv=none; b=JpQp67fx2tneHHkJ4iAIPFyoZLiDqhWIWSfXbHoY923G7nxDXpDHbdjNOh0z+lAfDIf5Hw6t7rHK+RviGOngPK092MwZwL6RG51uaZ70zPqf1d7kKCD+yjUcB2FpIgjQkbTlKUUcPOMw4AziJFrVPYAiRZxq5f4trXIOHBm/Rzo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1738951983; c=relaxed/simple;
-	bh=/uqcjveFI+Ohn3TTizoKIDoUauFjbJO6klBGzCaZkzM=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=cw9FvER4uyiSeWSbl07kSowCKKgEDb9sKrW7BzpKhT/CC9g3J5qCTy9iNfFcRB+AcAlBSJierJiGIrfmyj+SegeJMN7qO0zhjRsip7Pk/RgKRhuo2CUrBXDX4ew4vbz6vZ0YuV25da7irCaFMgJLeu/JfLlePnAaHHPDgunhqfo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=X7faWZZZ; arc=none smtp.client-ip=209.85.221.42
+	s=arc-20240116; t=1738952075; c=relaxed/simple;
+	bh=wc2Uo4qAIKE4YpBCI6MhwPDzpuOUfeuKc6K4dUFY00w=;
+	h=Date:From:To:Cc:Message-ID:In-Reply-To:References:Subject:
+	 Mime-Version:Content-Type; b=dFag6ZHUDeu/52Hv5CE+KBWmEjrkDl78wSMakd7/GYdy5qwwT7hb7l03O4Uu9Zlcb7EKO7ksi2WgpW0knoQ2BARlTCgWfvqYozGrkZPHnOZEJaJC3voRfPpo9Tp8Z6fiG2Odsu9b9q89YfacfXTx6v9V7DAVhv9QQaWG74plMeo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=aIKOh63l; arc=none smtp.client-ip=209.85.222.169
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wr1-f42.google.com with SMTP id ffacd0b85a97d-38dcab4b0e1so783732f8f.0;
-        Fri, 07 Feb 2025 10:13:01 -0800 (PST)
+Received: by mail-qk1-f169.google.com with SMTP id af79cd13be357-7b6fc3e9e4aso212550785a.2;
+        Fri, 07 Feb 2025 10:14:33 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1738951980; x=1739556780; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:subject:cc:to:from:date:from:to:cc:subject:date
+        d=gmail.com; s=20230601; t=1738952072; x=1739556872; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:subject:references
+         :in-reply-to:message-id:cc:to:from:date:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=MpcNUJESxQP4cEYWzq72lineCe5thDI/PST7eW8txNg=;
-        b=X7faWZZZm2IaPz78WkIix91hqgQkW6iJy9pIgLxZvHqqQK7rtD7EdwgJB5MqtX9cfq
-         SN86ZI5g846Q1sGGBn+iHNUVPepb9ddQF2Ri2ibzpbmZhOXpmnWgVvTV8lDGOG9qaN+5
-         E4ZdwoqBLEPpJFECo/rqqjR09KmnGZyUBbBiLpl/iLC4lm3R+Yh1CeuEQdH3iJotnQDO
-         X7bFPHgYiKsh0cSqCZxxZFZm8iDl0Qgdq1wSIMEMa9+5MApoF7pFrwdBSzhaD/3svMFo
-         Ls7qWMbcX1RXq0bHuSwrGZnphVja1dznR53nsYA4Ei3ou+hcZcs0gmxUtTrPZBzHTeUg
-         LqKA==
+        bh=6cpR/catNjUKVLPE8TnRdeFUXnQLkPZNrbuMZWab4WE=;
+        b=aIKOh63lN2xo1cU/Nij2fJLX7Hd2psSrLfqeW2COJiFU9kkBGv5xy9daITK4pvelsv
+         G8NeKH6SkB63w3vj2oUXbVbZV7pdrbD8QvpVP9FBGM1O2Qf28isd8+kDAGZbMV7GcMok
+         3vD00dF4b9Udr0fkfWHQA7m8z00KusWJj89Xmdg9Y6f6xfLn3GsGWkERglGQfcf4kOzu
+         gCJI4yebn77ec14DyuCZcMPTHfh7L+QxMg3Q0P5X9F/4h+5ftvspJuF7WN0+DVxnIP37
+         L7IDorZiSh+dS4/fAyxuWwqqmORs2PjsUPjfrZSkNdaXyXn7p/3xB1lFhxIEvqH8Ezc/
+         aRng==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1738951980; x=1739556780;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:subject:cc:to:from:date:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=MpcNUJESxQP4cEYWzq72lineCe5thDI/PST7eW8txNg=;
-        b=P4+bSvewSCiSTEB5LLb0BS/HUq3FxNTYY/Yd0e5ghBGzzrUqF+ZE/UE2tRiAS0fr5z
-         xUin7qnWml0HytM38JkO/NT02LBPUFxx4UGC69id6ErPunGZ7wrJrZB0s36ixbixdfqr
-         BcyaZ+zXMn+Tbttup6h/wOcmuFHNsmVQWt9LMcp0cH4ernadEVrBOYqobn6++BmRuvtQ
-         Cf6r1ayt4gK41mRbjdUIfxjD3+Ajvmki77BCWSzBEWex5InO1ARaJGllw0DsbCrynw54
-         xRT76DdKbXbp1Vas4X9i9UeaktLzHYuMdJ5mBuQXmjTq6guj1rpLIu4GQFezIhxhcz5w
-         sjTQ==
-X-Forwarded-Encrypted: i=1; AJvYcCUFJmedhz+RiEdcAGxuB59a0lHvMzVnrDN9/dmqfu7aFNZsVtrzh/Hsh3RtiljLnTJxhvRE0/eyej3LNpbYXek=@vger.kernel.org, AJvYcCWvtwno071mYmCPP58jIGR3QDb2O6ymGGqSZNBnLAHnb+VrsQFZa2LLNic4RMteCfZdNnNkbBU=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzONO4VyVXM54kLcnxlLrAWoViMT4c3etyw5pvztRMQyI8K5MxC
-	caFBvzqe6CZsack9TBKeJnOO3rayhilAegwWiW1ev7ejimk6H6GP
-X-Gm-Gg: ASbGncuHsKF07pRgZaEmAThy7zuBlDFff5w4W2fPaiiGwuRjIzGLeC1xoyGEDwYqbDv
-	Va3c07nfE10MK/a1/mDHELpIK/MdHcYNGIHBhdkAPy9P6M4uN57D8GXVMUn2okLFDCNYRdRQEOt
-	kL3+m+ejSCFJeQzq/HQbO4kVYKU9cyrSI0WBQr8rEbi0Sb01+LMmPkkVTDqD7CpY4yx77dusGBf
-	Ag5z/u+Ue/yFCW1GVickNgwJ4slcYYL0l0QOlDJjrIF6DxK85ND2nAK6k+qePuB5jGCKbitrtpL
-	M8MOcFLdOCf6T3re3b3t/OFZvNiJSXmBYY21G/43AtAB6rt1LS+mdg==
-X-Google-Smtp-Source: AGHT+IH9f/rM0alPOoLvlOp5+ELsH+loKBcYfbYyhZiiWirjT52V0qbJhI8A+/XxbqFtm/iX1rywig==
-X-Received: by 2002:a05:6000:2a2:b0:38d:b281:1b24 with SMTP id ffacd0b85a97d-38dc910a550mr3270100f8f.32.1738951979624;
-        Fri, 07 Feb 2025 10:12:59 -0800 (PST)
-Received: from pumpkin (82-69-66-36.dsl.in-addr.zen.co.uk. [82.69.66.36])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-38dc4458d71sm4054254f8f.63.2025.02.07.10.12.58
+        d=1e100.net; s=20230601; t=1738952072; x=1739556872;
+        h=content-transfer-encoding:mime-version:subject:references
+         :in-reply-to:message-id:cc:to:from:date:x-gm-message-state:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=6cpR/catNjUKVLPE8TnRdeFUXnQLkPZNrbuMZWab4WE=;
+        b=uus/5XK2IGjd40BBQ/GlQBn/6Hy9MDP+Il4fe5puFXwa5vcb9bmFsWWy5JWxYB2wGG
+         WXYQmo6pbi+StFBFKZ99OxNsi9jeeq/BS9/UbxqMyCNJkfw6Zp5Et8RCtMlbaKwLVZG/
+         qL60DmXyfEW97xD2fhJ4+EU37XbksbJwnCz6wIokb8B4wAM65cY4kI9CRhloTvGLo+Jn
+         TUcgdK8Onc8FpyV67fSnM/gaDf8FWyUTaGib44Ffxj1eSW2samWYVtscgUd2LGcxVGvh
+         oab8ZFAZJg2A+l/g+I2DhBOTtuXJ1Rfrq0z++M6FiD8OHE47RQ52sm/9HbBdL00TgrU7
+         Ry1g==
+X-Forwarded-Encrypted: i=1; AJvYcCUwQRmyRKXNQGZZIRLd2y7Wbbjht4ix9Bzg22ZS2Sb29UJG/koypYKSGynSxwIuPcbLU1Ih1RXF7/18+t3PXis=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yw70PuyMKITkOs5SfBHK6xSRYIrtHoZn6J+KoWm+JmZBquufrAU
+	y6WLDefbG9pokr1XS6AbrLAtklpHkna2gJz1TljOoNOa7jT7daf2
+X-Gm-Gg: ASbGnctL7IPupv13H2QXlcEKY2rhpyPxkmifTF8bcpeoQcluIC9DdfVkopF4Yl+sb7r
+	z1JaLJgdriw9HAdq967ENjY1fQ6s6Bsi/cE/8eXruo2cg5jVrGQbKNAx6LCGzPAP4IHP20JmDSA
+	nYoRzb3WPqsT7IvZS3HZBX58blGGGfZ5uEd9WwghOsfh5wbqXrG8UAmvETOZ0irwsvRO5VU0EzL
+	GIW8gBuwCOQhi1uIHbIFt2VgdUeE+kGP8UvSqWG2i7S2UFoKvd9XYnH1+E8f4hjfYlmQXoN6Upw
+	4TO5X6gQurLfoFyHlBtmGKQX6fytYonSlkHrDdS/ZZlndR7xT1lJTn16CYxAML0=
+X-Google-Smtp-Source: AGHT+IHcZed8Y6N75kfOPaZKLNyruXtqM3If5ETw+a5qwmO6s3qeq+mVUwkgur5WqipW3FrL8J3u4w==
+X-Received: by 2002:a05:620a:45a5:b0:7b6:c92e:2e74 with SMTP id af79cd13be357-7c047bbc521mr580447785a.20.1738952072471;
+        Fri, 07 Feb 2025 10:14:32 -0800 (PST)
+Received: from localhost (15.60.86.34.bc.googleusercontent.com. [34.86.60.15])
+        by smtp.gmail.com with ESMTPSA id af79cd13be357-7c041ded1c5sm220032685a.3.2025.02.07.10.14.31
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 07 Feb 2025 10:12:59 -0800 (PST)
-Date: Fri, 7 Feb 2025 18:12:58 +0000
-From: David Laight <david.laight.linux@gmail.com>
-To: FUJITA Tomonori <fujita.tomonori@gmail.com>
-Cc: linux-kernel@vger.kernel.org, Alice Ryhl <aliceryhl@google.com>, Boqun
- Feng <boqun.feng@gmail.com>, rust-for-linux@vger.kernel.org,
- netdev@vger.kernel.org, andrew@lunn.ch, hkallweit1@gmail.com,
- tmgross@umich.edu, ojeda@kernel.org, alex.gaynor@gmail.com,
- gary@garyguo.net, bjorn3_gh@protonmail.com, benno.lossin@proton.me,
- a.hindborg@samsung.com, anna-maria@linutronix.de, frederic@kernel.org,
- tglx@linutronix.de, arnd@arndb.de, jstultz@google.com, sboyd@kernel.org,
- mingo@redhat.com, peterz@infradead.org, juri.lelli@redhat.com,
- vincent.guittot@linaro.org, dietmar.eggemann@arm.com, rostedt@goodmis.org,
- bsegall@google.com, mgorman@suse.de, vschneid@redhat.com,
- tgunders@redhat.com, me@kloenk.dev
-Subject: Re: [PATCH v10 1/8] sched/core: Add __might_sleep_precision()
-Message-ID: <20250207181258.233674df@pumpkin>
-In-Reply-To: <20250207132623.168854-2-fujita.tomonori@gmail.com>
-References: <20250207132623.168854-1-fujita.tomonori@gmail.com>
-	<20250207132623.168854-2-fujita.tomonori@gmail.com>
-X-Mailer: Claws Mail 4.1.1 (GTK 3.24.38; arm-unknown-linux-gnueabihf)
+        Fri, 07 Feb 2025 10:14:31 -0800 (PST)
+Date: Fri, 07 Feb 2025 13:14:31 -0500
+From: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
+To: Jakub Kicinski <kuba@kernel.org>, 
+ davem@davemloft.net
+Cc: netdev@vger.kernel.org, 
+ edumazet@google.com, 
+ pabeni@redhat.com, 
+ andrew+netdev@lunn.ch, 
+ horms@kernel.org, 
+ Jakub Kicinski <kuba@kernel.org>, 
+ shuah@kernel.org, 
+ willemb@google.com, 
+ linux-kselftest@vger.kernel.org
+Message-ID: <67a64d879b34e_2b3e7e29442@willemb.c.googlers.com.notmuch>
+In-Reply-To: <20250206235334.1425329-3-kuba@kernel.org>
+References: <20250206235334.1425329-1-kuba@kernel.org>
+ <20250206235334.1425329-3-kuba@kernel.org>
+Subject: Re: [PATCH net-next 2/7] selftests: net-drv: test adding flow rule to
+ invalid RSS context
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+Mime-Version: 1.0
+Content-Type: text/plain;
+ charset=utf-8
 Content-Transfer-Encoding: 7bit
 
-On Fri,  7 Feb 2025 22:26:16 +0900
-FUJITA Tomonori <fujita.tomonori@gmail.com> wrote:
-
-> Add __might_sleep_precision(), Rust friendly version of
-> __might_sleep(), which takes a pointer to a string with the length
-> instead of a null-terminated string.
+Jakub Kicinski wrote:
+> Check that adding Rx flow steering rules pointing to an RSS
+> context which does not exist is prevented.
 > 
-> Rust's core::panic::Location::file(), which gives the file name of a
-> caller, doesn't provide a null-terminated
-> string. __might_sleep_precision() uses a precision specifier in the
-> printk format, which specifies the length of a string; a string
-> doesn't need to be a null-terminated.
-> 
-> Modify __might_sleep() to call __might_sleep_precision() but the
-> impact should be negligible. strlen() isn't called in a normal case;
-> it's called only when printing the error (sleeping function called
-> from invalid context).
-> 
-> Note that Location::file() providing a null-terminated string for
-> better C interoperability is under discussion [1].
-> 
-> Link: https://github.com/rust-lang/libs-team/issues/466 [1]
-> Reviewed-by: Alice Ryhl <aliceryhl@google.com>
-> Co-developed-by: Boqun Feng <boqun.feng@gmail.com>
-> Signed-off-by: Boqun Feng <boqun.feng@gmail.com>
-> Signed-off-by: FUJITA Tomonori <fujita.tomonori@gmail.com>
-> ---
->  include/linux/kernel.h |  2 ++
->  kernel/sched/core.c    | 55 ++++++++++++++++++++++++++----------------
->  2 files changed, 36 insertions(+), 21 deletions(-)
-> 
-> diff --git a/include/linux/kernel.h b/include/linux/kernel.h
-> index be2e8c0a187e..086ee1dc447e 100644
-> --- a/include/linux/kernel.h
-> +++ b/include/linux/kernel.h
-> @@ -87,6 +87,7 @@ extern int dynamic_might_resched(void);
->  #ifdef CONFIG_DEBUG_ATOMIC_SLEEP
->  extern void __might_resched(const char *file, int line, unsigned int offsets);
->  extern void __might_sleep(const char *file, int line);
-> +extern void __might_sleep_precision(const char *file, int len, int line);
->  extern void __cant_sleep(const char *file, int line, int preempt_offset);
->  extern void __cant_migrate(const char *file, int line);
->  
-> @@ -145,6 +146,7 @@ extern void __cant_migrate(const char *file, int line);
->    static inline void __might_resched(const char *file, int line,
->  				     unsigned int offsets) { }
->  static inline void __might_sleep(const char *file, int line) { }
-> +static inline void __might_sleep_precision(const char *file, int len, int line) { }
->  # define might_sleep() do { might_resched(); } while (0)
->  # define cant_sleep() do { } while (0)
->  # define cant_migrate()		do { } while (0)
-> diff --git a/kernel/sched/core.c b/kernel/sched/core.c
-> index 165c90ba64ea..d308f2a8692e 100644
-> --- a/kernel/sched/core.c
-> +++ b/kernel/sched/core.c
-> @@ -8678,24 +8678,6 @@ void __init sched_init(void)
->  
->  #ifdef CONFIG_DEBUG_ATOMIC_SLEEP
->  
-> -void __might_sleep(const char *file, int line)
-> -{
-> -	unsigned int state = get_current_state();
-> -	/*
-> -	 * Blocking primitives will set (and therefore destroy) current->state,
-> -	 * since we will exit with TASK_RUNNING make sure we enter with it,
-> -	 * otherwise we will destroy state.
-> -	 */
-> -	WARN_ONCE(state != TASK_RUNNING && current->task_state_change,
-> -			"do not call blocking ops when !TASK_RUNNING; "
-> -			"state=%x set at [<%p>] %pS\n", state,
-> -			(void *)current->task_state_change,
-> -			(void *)current->task_state_change);
-> -
-> -	__might_resched(file, line, 0);
-> -}
-> -EXPORT_SYMBOL(__might_sleep);
-> -
->  static void print_preempt_disable_ip(int preempt_offset, unsigned long ip)
->  {
->  	if (!IS_ENABLED(CONFIG_DEBUG_PREEMPT))
-> @@ -8717,7 +8699,8 @@ static inline bool resched_offsets_ok(unsigned int offsets)
->  	return nested == offsets;
->  }
->  
-> -void __might_resched(const char *file, int line, unsigned int offsets)
-> +static void __might_resched_precision(const char *file, int len, int line,
+> Signed-off-by: Jakub Kicinski <kuba@kernel.org>
 
-For clarity that ought to be file_len.
-
-> +				      unsigned int offsets)
->  {
->  	/* Ratelimiting timestamp: */
->  	static unsigned long prev_jiffy;
-> @@ -8740,8 +8723,10 @@ void __might_resched(const char *file, int line, unsigned int offsets)
->  	/* Save this before calling printk(), since that will clobber it: */
->  	preempt_disable_ip = get_preempt_disable_ip(current);
->  
-> -	pr_err("BUG: sleeping function called from invalid context at %s:%d\n",
-> -	       file, line);
-> +	if (len < 0)
-> +		len = strlen(file);
-
-No need for strlen(), just use a big number instead of -1.
-Anything bigger than a sane upper limit on the filename length will do.
-
-	David
-
-> +	pr_err("BUG: sleeping function called from invalid context at %.*s:%d\n",
-> +	       len, file, line);
->  	pr_err("in_atomic(): %d, irqs_disabled(): %d, non_block: %d, pid: %d, name: %s\n",
->  	       in_atomic(), irqs_disabled(), current->non_block_count,
->  	       current->pid, current->comm);
-> @@ -8766,8 +8751,36 @@ void __might_resched(const char *file, int line, unsigned int offsets)
->  	dump_stack();
->  	add_taint(TAINT_WARN, LOCKDEP_STILL_OK);
->  }
-> +
-> +void __might_resched(const char *file, int line, unsigned int offsets)
-> +{
-> +	__might_resched_precision(file, -1, line, offsets);
-> +}
->  EXPORT_SYMBOL(__might_resched);
->  
-> +void __might_sleep_precision(const char *file, int len, int line)
-> +{
-> +	unsigned int state = get_current_state();
-> +	/*
-> +	 * Blocking primitives will set (and therefore destroy) current->state,
-> +	 * since we will exit with TASK_RUNNING make sure we enter with it,
-> +	 * otherwise we will destroy state.
-> +	 */
-> +	WARN_ONCE(state != TASK_RUNNING && current->task_state_change,
-> +			"do not call blocking ops when !TASK_RUNNING; "
-> +			"state=%x set at [<%p>] %pS\n", state,
-> +			(void *)current->task_state_change,
-> +			(void *)current->task_state_change);
-> +
-> +	__might_resched_precision(file, len, line, 0);
-> +}
-> +
-> +void __might_sleep(const char *file, int line)
-> +{
-> +	__might_sleep_precision(file, -1, line);
-> +}
-> +EXPORT_SYMBOL(__might_sleep);
-> +
->  void __cant_sleep(const char *file, int line, int preempt_offset)
->  {
->  	static unsigned long prev_jiffy;
-
+Reviewed-by: Willem de Bruijn <willemb@google.com>
 
