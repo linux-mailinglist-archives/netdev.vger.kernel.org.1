@@ -1,267 +1,303 @@
-Return-Path: <netdev+bounces-164237-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-164238-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2AF99A2D17F
-	for <lists+netdev@lfdr.de>; Sat,  8 Feb 2025 00:32:16 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 375C2A2D189
+	for <lists+netdev@lfdr.de>; Sat,  8 Feb 2025 00:38:55 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id ACC0616BC2F
-	for <lists+netdev@lfdr.de>; Fri,  7 Feb 2025 23:32:14 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B941216BD83
+	for <lists+netdev@lfdr.de>; Fri,  7 Feb 2025 23:38:53 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4ADBD1C6FF4;
-	Fri,  7 Feb 2025 23:32:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C07A61D8A0D;
+	Fri,  7 Feb 2025 23:38:49 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="nJIBCCsH"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="C1RxTtLd"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.14])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qv1-f52.google.com (mail-qv1-f52.google.com [209.85.219.52])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 629F6187872;
-	Fri,  7 Feb 2025 23:32:08 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=198.175.65.14
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1738971130; cv=fail; b=PyDqSvgQOE7CBJu3Gh4uyIRINzzLTmJ3D+DGDxnQyCo3oQU0I3WHz/ZAC57ABm8ZYHeflsYwnAaz19gbxeP+5ldSZ/rS5sSx/bgtPtAW1M0aLqsr/0tVOyYRgY7Ikxqd+bty+uXE+kmmKJ/Zh/u5kQm056xkplDSGq4yt2CKRrI=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1738971130; c=relaxed/simple;
-	bh=Lx91zJeR5R/wAjiropcGGLhAgTPwiiAZ41Yir0CflkU=;
-	h=Date:From:To:CC:Subject:Message-ID:References:Content-Type:
-	 Content-Disposition:In-Reply-To:MIME-Version; b=exb+ATwUrvn9J7uHs4LdS4EELOB4EkoEa7pqJeJorfc/fMLzotFLxrVigUyqthzfujZO6llS+kGpzqiJ13QL7FpjQ/VyOVAOp+lzv7yFcNLiV1S+Is97+Ly64j6FeRdgfA2uqKx8HcfHX+QYLEtBvuyPc82D0Z0ojAjYwAieG28=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=nJIBCCsH; arc=fail smtp.client-ip=198.175.65.14
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1738971129; x=1770507129;
-  h=date:from:to:cc:subject:message-id:references:
-   in-reply-to:mime-version;
-  bh=Lx91zJeR5R/wAjiropcGGLhAgTPwiiAZ41Yir0CflkU=;
-  b=nJIBCCsHrFiKmtKBub/td+hpaj341ZtmRPnJ5WC1fAkuyjL8prwN4XTu
-   4wKQD4cAaZExHOzDbh8T0R41q5hpkpTldZr1FV7LCV8cx5mqivSztNEF7
-   LPB1UzzG0fZ1RlHECEjkJNuB0Vo1mkXW0UIg7Qnq5kzOsinTzDroXx/EB
-   6AvlUCMf9Vtng8E3Qqfh9I3kOSrQnjfEaa1ullORE9m77u1ATcQYw7lmO
-   6MBIALFCMXVPpcBG6MXozwhqvLhIDUttY3Fr0EVJUeRql7LpSCv6OfWRI
-   q/OFNSpmqztQniZ1DSrs9g6jBik4GchgJ75ycfoPlUkPvHQRsJ31Std9I
-   A==;
-X-CSE-ConnectionGUID: Y5D4sWw3TPGvKe/F5fYuSg==
-X-CSE-MsgGUID: i5RHoNB/Qd20YsE/pZLhIQ==
-X-IronPort-AV: E=McAfee;i="6700,10204,11338"; a="43387516"
-X-IronPort-AV: E=Sophos;i="6.13,268,1732608000"; 
-   d="scan'208";a="43387516"
-Received: from fmviesa003.fm.intel.com ([10.60.135.143])
-  by orvoesa106.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 07 Feb 2025 15:32:08 -0800
-X-CSE-ConnectionGUID: IVdqelYiQCiKGR8ScJNvSA==
-X-CSE-MsgGUID: IGK6ceFARciLfl6QA0TeVw==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.12,224,1728975600"; 
-   d="scan'208";a="115741534"
-Received: from orsmsx603.amr.corp.intel.com ([10.22.229.16])
-  by fmviesa003.fm.intel.com with ESMTP/TLS/AES256-GCM-SHA384; 07 Feb 2025 15:32:07 -0800
-Received: from orsmsx601.amr.corp.intel.com (10.22.229.14) by
- ORSMSX603.amr.corp.intel.com (10.22.229.16) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.44; Fri, 7 Feb 2025 15:32:06 -0800
-Received: from orsedg603.ED.cps.intel.com (10.7.248.4) by
- orsmsx601.amr.corp.intel.com (10.22.229.14) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.44 via Frontend Transport; Fri, 7 Feb 2025 15:32:06 -0800
-Received: from NAM04-DM6-obe.outbound.protection.outlook.com (104.47.73.43) by
- edgegateway.intel.com (134.134.137.100) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.1.2507.44; Fri, 7 Feb 2025 15:32:05 -0800
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=jm/0/ih6d9/4o93rVBZjFPsFMJRvabZGWGhLGHAqA4YBUTcPo1X2ddje3QxqTHifxvLAutlNWK8yolrK37TGUqxoaxvevDQNYVi2FINM5FNxLDVnOjeXcI5EFn6cUWx7WVK6Qqz6ySnRXPWxBwEp+mEXCjQ3wH57dtxdLoQPGaui94i303kXS+XOSkVnJPWJ9XrHywktQfFuGnv6Ajr+JC8UhQAOVwZqc7x4myVKKHw6CojThy1USGAJk2W8oDst0WFdvaStHoPi3R4xu9axa0dmXXje1Zj6v1sh+6PXqLrmEZu7LqOpAZsRCi12Z1zK1+g1G32NgzjXOPvUjI9suw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=k9XO2dPV/vMLls92uREiYlYQh+uqzKpLffqYdOTXL8s=;
- b=GcMgGVaBaLwsbMMUnuzB3rb59DSB3IvE9Cfppq9+rsfcu9LatkTFRyb/jALMbib8FrZnZl/06odgXCO6/t83pVjB1nTLNzo84X7qWGSz8H6qwLp2S7mdh7Cj/twT1ZuULy0fk/yvEuypf9rf0JuF4YH7pxTm3pKsRoWcfkfiIoDrQttrTjljjmF3w8WLHcgu+GsrwQZw5kU1Dzd56KdBWRITONp+YibR6a+aop0115OufAxdcZnaYdvKi9o+e+3X9gWA0LEnx+TBNQshJjmveo5mh/mkn4LqAaMdg2kpmVJeF9JHT/w/OB6FQVvGAOgCTvYlfZBMp4Rft3D2qwCDPQ==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
- dkim=pass header.d=intel.com; arc=none
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=intel.com;
-Received: from PH8PR11MB8107.namprd11.prod.outlook.com (2603:10b6:510:256::6)
- by IA0PR11MB7380.namprd11.prod.outlook.com (2603:10b6:208:430::5) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8422.11; Fri, 7 Feb
- 2025 23:32:03 +0000
-Received: from PH8PR11MB8107.namprd11.prod.outlook.com
- ([fe80::6b05:74cf:a304:ecd8]) by PH8PR11MB8107.namprd11.prod.outlook.com
- ([fe80::6b05:74cf:a304:ecd8%4]) with mapi id 15.20.8422.011; Fri, 7 Feb 2025
- 23:32:03 +0000
-Date: Fri, 7 Feb 2025 15:32:00 -0800
-From: Dan Williams <dan.j.williams@intel.com>
-To: Jason Gunthorpe <jgg@nvidia.com>
-CC: Andy Gospodarek <andrew.gospodarek@broadcom.com>, Aron Silverton
-	<aron.silverton@oracle.com>, Dan Williams <dan.j.williams@intel.com>, "Daniel
- Vetter" <daniel.vetter@ffwll.ch>, Dave Jiang <dave.jiang@intel.com>, "David
- Ahern" <dsahern@kernel.org>, Andy Gospodarek <gospo@broadcom.com>, "Christoph
- Hellwig" <hch@infradead.org>, Itay Avraham <itayavr@nvidia.com>, Jiri Pirko
-	<jiri@nvidia.com>, Jonathan Cameron <Jonathan.Cameron@huawei.com>, "Jakub
- Kicinski" <kuba@kernel.org>, Leonid Bloch <lbloch@nvidia.com>, Leon
- Romanovsky <leonro@nvidia.com>, <linux-cxl@vger.kernel.org>,
-	<linux-rdma@vger.kernel.org>, <netdev@vger.kernel.org>, Saeed Mahameed
-	<saeedm@nvidia.com>, "Nelson, Shannon" <shannon.nelson@amd.com>
-Subject: Re: [PATCH v4 01/10] fwctl: Add basic structure for a class
- subsystem with a cdev
-Message-ID: <67a697f02bc0b_2d1e2948a@dwillia2-xfh.jf.intel.com.notmuch>
-References: <1-v4-0cf4ec3b8143+4995-fwctl_jgg@nvidia.com>
-Content-Type: text/plain; charset="us-ascii"
-Content-Disposition: inline
-In-Reply-To: <1-v4-0cf4ec3b8143+4995-fwctl_jgg@nvidia.com>
-X-ClientProxiedBy: MW4PR04CA0069.namprd04.prod.outlook.com
- (2603:10b6:303:6b::14) To PH8PR11MB8107.namprd11.prod.outlook.com
- (2603:10b6:510:256::6)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DF5BC8479;
+	Fri,  7 Feb 2025 23:38:47 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.52
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1738971529; cv=none; b=abM/BRRI5Cot1XRyZhTWDkltNe5I7ldkaHWZBfuid1rSKDqQPdbPUtF+tb1zepaMOMx9Y9BDPaioyL2vzkBVxRBrZOpCCypQvgar2qxP9PMvhK8v5rPiQRd1mVSXBpzyfCKfxU76Pl5dpQDBiY2tauaec4haYA7HRfl2+gsi1So=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1738971529; c=relaxed/simple;
+	bh=BkTWJoWP2WfdeOTFjlr/lcL4ibVk6vt/UZhSO/XKCNE=;
+	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:To:Cc; b=T32BPNyGoRJSCinOdUmIyRPdY6IUzONvOIYmxcHZe6DKGCKLzF4u1f1TPmEccVcV5zsJmL+pH6I9O6C7zVpCi5j+IiCt0f/+IIPZPEKbsD9c7k/B7JCLPjVhggkaiMiOy5AlknSvg8wqZ3161m0liEpNoh4ivPZeXFfcvv7mQMs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=C1RxTtLd; arc=none smtp.client-ip=209.85.219.52
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-qv1-f52.google.com with SMTP id 6a1803df08f44-6d92e457230so26697926d6.1;
+        Fri, 07 Feb 2025 15:38:47 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1738971527; x=1739576327; darn=vger.kernel.org;
+        h=cc:to:message-id:content-transfer-encoding:mime-version:subject
+         :date:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=gNXBg4daHIABB/yTMDVoSJWD25P1rTtltrI8i7arR5c=;
+        b=C1RxTtLdnhlL7HmpabQgkk+natnOikyuv1Qu6MquCqeuDYVIS+Rz0LJGo03pPzHJ1W
+         qEclfHItyMtQ8540zC1USnqECDr2cz84tuIyie9vsIveTdBSxOeSgmSOR5ZRbzfjPkxy
+         6isTXqeJDuGXbnobc8Mj9iIsbdU8nyLkqRRjLwQ/iF4hUpj27+rjONex1T87d5kIppYR
+         8aooo36S98DPFncgyNZ6kCypN7ZtGMhPNcFIXc1nFx8erQExph2dva6eSeqlJ95PRs8O
+         jyFhWQ6Ow3/b8JIUKhWCnrra+gEYftOr1JujWL/XA646+RXVp3CVlnwuRuI2Q5CrtV+V
+         UMhw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1738971527; x=1739576327;
+        h=cc:to:message-id:content-transfer-encoding:mime-version:subject
+         :date:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=gNXBg4daHIABB/yTMDVoSJWD25P1rTtltrI8i7arR5c=;
+        b=nQyVSCkvrXQsPzlFSWu1FEIEpg6c80G9SeAULMsobNdwQpHqbSFbLf2ICKzv3hUP+T
+         gQBYyAQEwiK0pdBlJiQBNTHjgLyM23HxnTOgn0R/iHDa+M6Na2YfbZpJTH0jVtKhxVPG
+         lxKR1+FFNItxgSWgp0xKJzj65B99gTLnpDY/haKWDIvHXXmto8UiCnCSIm9u/JqQLPyJ
+         WmV0d42Jc3cl43HIbLGQFPpU4qYHY5m1f81bt/cWf7z1aZQmL6sfwaHYssXe6FEcLgPH
+         gw+oQ3lq/vBvyiGd6xOuEBt2Lo3cFtj53UoHpJUPfC6uyxGd/tXMcSRpSEtIFUV3dqjA
+         QvbQ==
+X-Forwarded-Encrypted: i=1; AJvYcCVH/Ma5sePzcyGg0RNdNwyUMMyrVkAvZ5ic9eFtHDoWFK/6C34Ep4Em7nPbs/t+OdM0RuwLN9jSttXo3OUzxJo=@vger.kernel.org, AJvYcCW6S85uZ4pgvtOJVbPTWQSUUeTZq+mxVAR2sLNnPogqxDWCiJoN/E5CbzdIrzogYuydk42j6TKR@vger.kernel.org
+X-Gm-Message-State: AOJu0YzGii0NCpvyVGPC9agpInF9rl8HYMrPoKD/Y4/7AHvtUdri4WvN
+	L9fv//2en58FPTAQgHzcgUMw3ZInXYKLUUXYDa5alF4i16VcsFJ4
+X-Gm-Gg: ASbGncsR5+f4YcIvErB9v94eKrhCaBhp4ZnFIHVcbRVtcrBsGAhBk3tHoPBVe5ZeidK
+	8B7cg10evkzjJ4HD2S1015a1egzhHNJ51QcrreiQvXsGilDUYV+XLFQTnD7YnibA6y/xxZiTLdc
+	a7aAUVyJAUj72r17RRoOOd7dReMZJAt9B3duXTPumjA4n32OJ3xDnTua4ngYqeZZRSppvDH8yMl
+	X1NpV2mLn7iUi5+MX1lvSNnNh7sFr9k1yBEZL9pO3LPjFsotjPTXUzYu7UxC8QMdxeXbGqXWNi5
+	shL3P3TjVpqYU1vW+k7fzJxPTqZCn33Y84ugxT3B9+9ZicPmmQ==
+X-Google-Smtp-Source: AGHT+IFgwe+y0rnFQIDXEowT8WZlxbeKXv4NpGTED5yOqbyNN1kdkaooufe+2Y2XJ+62b9eMKCK6CA==
+X-Received: by 2002:a05:6214:2125:b0:6d8:99cf:d2db with SMTP id 6a1803df08f44-6e4456e0c44mr73149906d6.38.1738971526687;
+        Fri, 07 Feb 2025 15:38:46 -0800 (PST)
+Received: from Tamirs-MacBook-Pro.local ([2600:4041:5be7:7c00:c58e:ed03:1b60:c56d])
+        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-6e43baacbbasm22006416d6.73.2025.02.07.15.38.43
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 07 Feb 2025 15:38:45 -0800 (PST)
+From: Tamir Duberstein <tamird@gmail.com>
+Date: Fri, 07 Feb 2025 18:38:41 -0500
+Subject: [PATCH] blackhole_dev: convert self-test to KUnit
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: PH8PR11MB8107:EE_|IA0PR11MB7380:EE_
-X-MS-Office365-Filtering-Correlation-Id: 2edb02a1-11fd-4855-35c4-08dd47cfa064
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;ARA:13230040|376014|7416014|366016|1800799024|7053199007;
-X-Microsoft-Antispam-Message-Info: =?us-ascii?Q?QaAgo1gVXbCJRgc2+RScgr4papbaGz4ja5vNO4vZeFnh2KTuv3XVd6YUhhlo?=
- =?us-ascii?Q?txnnxe9bhTdvlRIjMyL7DYLhSe6h4s+2la+g/gdblUXAjMpIyTyqxB8cbB9I?=
- =?us-ascii?Q?eVM9Ad0+l/49QPKEZDoVSjh+fz/CvaQ8zIzUMwCeNDsbxOaRy5IMXPX4PF5s?=
- =?us-ascii?Q?O/Bm30BkpSwwqI90n+AyfCTHZjuSsntsEdjuRIrwqvYDdB8ljAhV/9hBPu1X?=
- =?us-ascii?Q?en0zSytwQkujd17SQtyxdiX1WfGfLWaRL37gUlUWydJLq4q89MWdYwy7QcgT?=
- =?us-ascii?Q?qDNC+k2AQh+nZDSJ5ozzw+KG5XFll/BC0/VaHdq1YdvwDyqBsgVr5of/1B1z?=
- =?us-ascii?Q?4qqI9b5hmkrVsPe9IVubSOD8v8WkB4Wc7XOOa9oco9PN1ThAVBt1EoZs63AV?=
- =?us-ascii?Q?Wop6eBBMsaSpBBSzGK33bEd/+VJSt9m0LcOUmr11uMBjE4U+UH29vfIwrquc?=
- =?us-ascii?Q?E5wK2jIJhTOv9VmXFIUQOltpHAB+KeLi6b1c8JjsRrBOulXn42jL6I+zaahw?=
- =?us-ascii?Q?bTOWz6gIcSlxm7goG805kiINshIp9C3g7pp6JlwxOw2TPIOekGgfzM58onYg?=
- =?us-ascii?Q?oYW0VVmi2r3npzlTo6HEUKnbrs0o6UgTnK4Up0WgypyuoWQxcEVJ1v2GuSIp?=
- =?us-ascii?Q?BC7DOXR5mWZWmulwVXz9avHvnMvJFt6WEanB9CG8Jgpi8QUoisY6/s+WqNJF?=
- =?us-ascii?Q?rA581wdae2buTeE36nX2/bRJvEV7eUH1XLtDr2Wu4WGhHF8uJuPHNYGKf7ND?=
- =?us-ascii?Q?mfaY2zdH9qTPM48853alyjIiyGURYdvtH0roChB9A/fjet+LEtFzBQnFQMyp?=
- =?us-ascii?Q?uTZG8SMO09nvr36nrOk6xQ74pmSoF8XReJr6Ufc5P10cOUHEplWnxk8my+hJ?=
- =?us-ascii?Q?Ex/1f1+3vTdmSBQZnvmAaCOXEw7yQepzT1qWRyeVVNJt65W8xEnqK8nqgqIb?=
- =?us-ascii?Q?Ev08dWBcKFp+LSSwKMRZUOeEKZ3UnkjkRlVo/LuuzYtyyPxd69kwtQt3g3qJ?=
- =?us-ascii?Q?DnIhI+Pvg5E5Z78s32DSq0APde4Wf97UQ85Jc5u7VI8mXWqoVLC8nQua0OLq?=
- =?us-ascii?Q?bLVX+9+MJbaQj6hg/H2zBgnIGI5DjkSN4xJ2EOVssHEQKR3P22y0jxA0y9Xz?=
- =?us-ascii?Q?QZIepPE+YlJLHd386EbSpwjih46NZLLIha+lQHASmWheoztK2EeDbIbuopp3?=
- =?us-ascii?Q?bYEh0VK1vBsApnffFraRsQoG855H/3Ak6vwuGh38+EycopR58TIQB5s244BT?=
- =?us-ascii?Q?0rHPodaDY5iz61miUZv1/JQnWUQPOohY40HpiGMBVRejzlqIVenCrNd0git8?=
- =?us-ascii?Q?2qpQIAcvNux+aIQHk97khOJxUWwsiH2agIaSInwHCPNj0yr5WweCE1LFjNqI?=
- =?us-ascii?Q?iY+ys+bV094dZxF/Xu4WU5XO+ymL?=
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:PH8PR11MB8107.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(376014)(7416014)(366016)(1800799024)(7053199007);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?nVwX5xiE1JIfkyv2UEvT1SpXuscyHq050y3Rth/dsVhBgqBkbOxylsBpEKFs?=
- =?us-ascii?Q?dy0VwXT1OEoQMXcEG8Y1sWfVL5CsqzH5XZrhzQKHaDLLH3iFFWGXQbgc29hV?=
- =?us-ascii?Q?6wBauCCX3k4UXIuJfPN+QlM0B1ZLLk5T1xtOvkAYbF8buhou6RnJfEZmc6QV?=
- =?us-ascii?Q?absKXoopp4D3bEI+7RGdc3faUXOjxp++pLSVpV8xaZTCC73ICdTRndEsO8S2?=
- =?us-ascii?Q?25PbNDBO/EXZTnLyNV2mtHOujOhxeIEE9rb4bfShbjEV0mf8t9ufzSODvWNy?=
- =?us-ascii?Q?tHGI0UltTjkKYyUsJNeilCGSTveEl5B03F5Xrv52b8/XuTNJBwesc8nnpfSa?=
- =?us-ascii?Q?fS/a3YxI1b0+3oxs6Mgz6OT06e/UwBeNzAqOV8QvnKeAcxoraLVz7eAmmSro?=
- =?us-ascii?Q?p6fD9DA8tUpjxgwLxVGiWM03fmo914FQJVju8MDkZ2/fmNrfd4MNB02dwaFl?=
- =?us-ascii?Q?SHXrp15mAJ9CkYLBcaXFBI3Wpku0g7lt8bfPKRL2hh4oNnOOM3XQlpVrIArL?=
- =?us-ascii?Q?Zk7dBl6C64Q7EbC1szfVvYelm/ezvApSVYPXsBSbVZJ9pTo0QGDeB32ETE3A?=
- =?us-ascii?Q?DfK+gTM1NovyTctCdbxCoEpQDrkRhCJreuerju++IGm6FjcCki50mzoTMVje?=
- =?us-ascii?Q?CLOtNwZrUa/TKPrne//YRiR20szQ0PRmBEUS+mO56tBif+oDpNFv6KatCx4Y?=
- =?us-ascii?Q?/v8yYXWnMd1stsw4QjsY2978/k0x8o1/dHz+cTzqIaRGMVU47ZBizrJEEmoM?=
- =?us-ascii?Q?jFJUbcKssoZdh2gkkeWnJFU3peIJGllr5T7f4pmwzSSBt/F9Gv7Mq/7rmiPa?=
- =?us-ascii?Q?7BKJCB7K/1O6vPEJfyDaUq1TUF3V52gFo9qKqoMZxVygXXhzAJKaNWdmF5xU?=
- =?us-ascii?Q?rHNun9zntTnhdmkao3QMFistwuND9LQFImIDTP//VUHUr/JKZYevwPdMMUds?=
- =?us-ascii?Q?VlnlBk9RLM+tOamndnuIHzCtRJxtIlH6yXsE2B2OuHOwU9B9I4f94qS+TawB?=
- =?us-ascii?Q?UV9osmirrYXvcM99Y8UPEDA5vpUi2vJ/b/GqaB2Krc47qX5pjJoXoau0qi4x?=
- =?us-ascii?Q?A5D8pwM1nFohG57bih1c86MpKPIu17SPs4ruMArkb5+soto2X4drUnSRNGJY?=
- =?us-ascii?Q?LrUu79DOrurlRFF5NB/kBsGaGj9nI/7lJUlDnkQpiE7c2Jk8YnLxRwa1jpaj?=
- =?us-ascii?Q?20RuTgdkQvvNUcBJvtBwbHtU4WYKXS0WPcsGTxYFR8s9TAE4VmQf8ItiyMFc?=
- =?us-ascii?Q?0B2DmpsrRuEzBafxoRu5P3OajbtEsbTI2aydRIn37Bs/Sj0ey4hzq6vrCSJR?=
- =?us-ascii?Q?IIdqLKXfzWb+KkaxLQJbkUsLvXuWgpPlYQd5bx+6/WeP9DaOvMWFZ+VJa1tU?=
- =?us-ascii?Q?DpW3CCsbsMo/jZjEzaLkc4TZqeor6RVItiIPTO1wd1BHAT1DCvqHG35rA90x?=
- =?us-ascii?Q?OkBIYf+QA+QzSlffgEtmFgjlkU+x/9DLRQC8JBO7blasEDP1/1rHrP1mBaP3?=
- =?us-ascii?Q?3yXyySrWgDXADznYFBJ7DGvFR5UKEKhbaW1BW9dWjGHzKnlniPqQhB1GFopS?=
- =?us-ascii?Q?O0hBuzHIh6ie2b/j6RwIm5ULIsQatgfAI71gjMyASga/2styEgsQ5XG9CtLs?=
- =?us-ascii?Q?RQ=3D=3D?=
-X-MS-Exchange-CrossTenant-Network-Message-Id: 2edb02a1-11fd-4855-35c4-08dd47cfa064
-X-MS-Exchange-CrossTenant-AuthSource: PH8PR11MB8107.namprd11.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 07 Feb 2025 23:32:03.3282
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: Krw6ya7hKUDKOizUjAviigyjJRQCSJ/Bw2N/KJHV+X7ipMIMmKk/psjJObBKXmelo6MuQlSlLNpUBpRJPh0ry2cFwTkQRGRNSoyQgeiRbcg=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: IA0PR11MB7380
-X-OriginatorOrg: intel.com
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+Message-Id: <20250207-blackholedev-kunit-convert-v1-1-8ef0dc1ff881@gmail.com>
+X-B4-Tracking: v=1; b=H4sIAICZpmcC/x3MQQqAIBBA0avErBuwiYi6SrQwm2ooNLQkkO6ex
+ F+9zU8Q2AsH6IsEnqMEcTajKgswm7Yro8zZQIoaRarF6dBm39zBM0fcbysXGmcj+ws73ZCucqo
+ myIPT8yLPPx/G9/0A2TrPEmwAAAA=
+X-Change-ID: 20250207-blackholedev-kunit-convert-9a52a1a1a032
+To: Andrew Morton <akpm@linux-foundation.org>, 
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+ Simon Horman <horms@kernel.org>, Shuah Khan <shuah@kernel.org>, 
+ Nathan Chancellor <nathan@kernel.org>, 
+ Nick Desaulniers <ndesaulniers@google.com>, 
+ Bill Wendling <morbo@google.com>, Justin Stitt <justinstitt@google.com>
+Cc: linux-kernel@vger.kernel.org, netdev@vger.kernel.org, 
+ linux-kselftest@vger.kernel.org, llvm@lists.linux.dev, 
+ Tamir Duberstein <tamird@gmail.com>
+X-Mailer: b4 0.15-dev
 
-Jason Gunthorpe wrote:
-> Create the class, character device and functions for a fwctl driver to
-> un/register to the subsystem.
-> 
-> A typical fwctl driver has a sysfs presence like:
-> 
-> $ ls -l /dev/fwctl/fwctl0
-> crw------- 1 root root 250, 0 Apr 25 19:16 /dev/fwctl/fwctl0
-> 
-> $ ls /sys/class/fwctl/fwctl0
-> dev  device  power  subsystem  uevent
-> 
-> $ ls /sys/class/fwctl/fwctl0/device/infiniband/
-> ibp0s10f0
-> 
-> $ ls /sys/class/infiniband/ibp0s10f0/device/fwctl/
-> fwctl0/
-> 
-> $ ls /sys/devices/pci0000:00/0000:00:0a.0/fwctl/fwctl0
-> dev  device  power  subsystem  uevent
-> 
-> Which allows userspace to link all the multi-subsystem driver components
-> together and learn the subsystem specific names for the device's
-> components.
-> 
-> Reviewed-by: Jonathan Cameron <Jonathan.Cameron@huawei.com>
-> Signed-off-by: Jason Gunthorpe <jgg@nvidia.com>
-[..]
-> +struct fwctl_device *_fwctl_alloc_device(struct device *parent,
-> +					 const struct fwctl_ops *ops,
-> +					 size_t size);
-> +/**
-> + * fwctl_alloc_device - Allocate a fwctl
-> + * @parent: Physical device that provides the FW interface
-> + * @ops: Driver ops to register
-> + * @drv_struct: 'struct driver_fwctl' that holds the struct fwctl_device
-> + * @member: Name of the struct fwctl_device in @drv_struct
-> + *
-> + * This allocates and initializes the fwctl_device embedded in the drv_struct.
-> + * Upon success the pointer must be freed via fwctl_put(). Returns a 'drv_struct
-> + * \*' on success, NULL on error.
-> + */
-> +#define fwctl_alloc_device(parent, ops, drv_struct, member)               \
-> +	({                                                                \
-> +		static_assert(__same_type(struct fwctl_device,            \
-> +					  ((drv_struct *)NULL)->member)); \
-> +		static_assert(offsetof(drv_struct, member) == 0);         \
-> +		(drv_struct *)_fwctl_alloc_device(parent, ops,            \
-> +						  sizeof(drv_struct));    \
-> +	})
+Convert this very simple smoke test to a KUnit test.
 
-I have already suggested someone else copy this approach to context
-allocation. What do you think of generalizing this in
-include/linux/container_of.h as:
+Signed-off-by: Tamir Duberstein <tamird@gmail.com>
+---
+I tested this using:
 
-#define container_alloc(core_struct, drv_struct, member, alloc_fn, ...)    \
-       ({                                                                 \
-               static_assert(__same_type(core_struct,                     \
-                                         ((drv_struct *)NULL)->member));  \
-               static_assert(offsetof(drv_struct, member) == 0);          \
-               (drv_struct *)(alloc_fn)(sizeof(drv_struct), __VA_ARGS__); \
-       })
+$ tools/testing/kunit/kunit.py run --arch arm64 --make_options LLVM=1 --kconfig_add CONFIG_NET=y blackholedev
+---
+ lib/Kconfig.debug                                  | 20 +++++-----
+ lib/Makefile                                       |  2 +-
+ ...{test_blackhole_dev.c => blackhole_dev_kunit.c} | 45 ++++++++--------------
+ tools/testing/selftests/net/Makefile               |  2 +-
+ tools/testing/selftests/net/test_blackhole_dev.sh  | 11 ------
+ 5 files changed, 28 insertions(+), 52 deletions(-)
 
-...and then fwctl_alloc_device becomes:
+diff --git a/lib/Kconfig.debug b/lib/Kconfig.debug
+index 1af972a92d06..238321830993 100644
+--- a/lib/Kconfig.debug
++++ b/lib/Kconfig.debug
+@@ -2557,15 +2557,6 @@ config TEST_BPF
+ 
+ 	  If unsure, say N.
+ 
+-config TEST_BLACKHOLE_DEV
+-	tristate "Test blackhole netdev functionality"
+-	depends on m && NET
+-	help
+-	  This builds the "test_blackhole_dev" module that validates the
+-	  data path through this blackhole netdev.
+-
+-	  If unsure, say N.
+-
+ config FIND_BIT_BENCHMARK
+ 	tristate "Test find_bit functions"
+ 	help
+@@ -2888,6 +2879,17 @@ config USERCOPY_KUNIT_TEST
+ 	  on the copy_to/from_user infrastructure, making sure basic
+ 	  user/kernel boundary testing is working.
+ 
++config BLACKHOLE_DEV_KUNIT_TEST
++	tristate "Test blackhole netdev functionality" if !KUNIT_ALL_TESTS
++	depends on NET
++	depends on KUNIT
++	default KUNIT_ALL_TESTS
++	help
++	  This builds the "blackhole_dev_kunit" module that validates the
++	  data path through this blackhole netdev.
++
++	  If unsure, say N.
++
+ config TEST_UDELAY
+ 	tristate "udelay test driver"
+ 	help
+diff --git a/lib/Makefile b/lib/Makefile
+index d5cfc7afbbb8..19ff6993c2bc 100644
+--- a/lib/Makefile
++++ b/lib/Makefile
+@@ -102,7 +102,6 @@ obj-$(CONFIG_TEST_RUNTIME) += tests/
+ obj-$(CONFIG_TEST_DEBUG_VIRTUAL) += test_debug_virtual.o
+ obj-$(CONFIG_TEST_MEMCAT_P) += test_memcat_p.o
+ obj-$(CONFIG_TEST_OBJAGG) += test_objagg.o
+-obj-$(CONFIG_TEST_BLACKHOLE_DEV) += test_blackhole_dev.o
+ obj-$(CONFIG_TEST_MEMINIT) += test_meminit.o
+ obj-$(CONFIG_TEST_LOCKUP) += test_lockup.o
+ obj-$(CONFIG_TEST_HMM) += test_hmm.o
+@@ -393,6 +392,7 @@ obj-$(CONFIG_FORTIFY_KUNIT_TEST) += fortify_kunit.o
+ obj-$(CONFIG_CRC_KUNIT_TEST) += crc_kunit.o
+ obj-$(CONFIG_SIPHASH_KUNIT_TEST) += siphash_kunit.o
+ obj-$(CONFIG_USERCOPY_KUNIT_TEST) += usercopy_kunit.o
++obj-$(CONFIG_BLACKHOLE_DEV_KUNIT_TEST) += blackhole_dev_kunit.o
+ 
+ obj-$(CONFIG_GENERIC_LIB_DEVMEM_IS_ALLOWED) += devmem_is_allowed.o
+ 
+diff --git a/lib/test_blackhole_dev.c b/lib/blackhole_dev_kunit.c
+similarity index 70%
+rename from lib/test_blackhole_dev.c
+rename to lib/blackhole_dev_kunit.c
+index ec290ac2a0d9..f8f5184d5b43 100644
+--- a/lib/test_blackhole_dev.c
++++ b/lib/blackhole_dev_kunit.c
+@@ -1,6 +1,6 @@
+ // SPDX-License-Identifier: GPL-2.0
+ /*
+- * This module tests the blackhole_dev that is created during the
++ * This tests the blackhole_dev that is created during the
+  * net subsystem initialization. The test this module performs is
+  * by injecting an skb into the stack with skb->dev as the
+  * blackhole_dev and expects kernel to behave in a sane manner
+@@ -9,9 +9,8 @@
+  * Copyright (c) 2018, Mahesh Bandewar <maheshb@google.com>
+  */
+ 
+-#include <linux/init.h>
++#include <kunit/test.h>
+ #include <linux/module.h>
+-#include <linux/printk.h>
+ #include <linux/skbuff.h>
+ #include <linux/netdevice.h>
+ #include <linux/udp.h>
+@@ -25,17 +24,15 @@
+ 
+ #define UDP_PORT 1234
+ 
+-static int __init test_blackholedev_init(void)
++static void test_blackholedev(struct kunit *test)
+ {
+ 	struct ipv6hdr *ip6h;
+ 	struct sk_buff *skb;
+ 	struct udphdr *uh;
+ 	int data_len;
+-	int ret;
+ 
+ 	skb = alloc_skb(SKB_SIZE, GFP_KERNEL);
+-	if (!skb)
+-		return -ENOMEM;
++	KUNIT_ASSERT_NOT_NULL(test, skb);
+ 
+ 	/* Reserve head-room for the headers */
+ 	skb_reserve(skb, HEAD_SIZE);
+@@ -68,32 +65,20 @@ static int __init test_blackholedev_init(void)
+ 	skb->dev = blackhole_netdev;
+ 
+ 	/* Now attempt to send the packet */
+-	ret = dev_queue_xmit(skb);
+-
+-	switch (ret) {
+-	case NET_XMIT_SUCCESS:
+-		pr_warn("dev_queue_xmit() returned NET_XMIT_SUCCESS\n");
+-		break;
+-	case NET_XMIT_DROP:
+-		pr_warn("dev_queue_xmit() returned NET_XMIT_DROP\n");
+-		break;
+-	case NET_XMIT_CN:
+-		pr_warn("dev_queue_xmit() returned NET_XMIT_CN\n");
+-		break;
+-	default:
+-		pr_err("dev_queue_xmit() returned UNKNOWN(%d)\n", ret);
+-	}
+-
+-	return 0;
++	KUNIT_EXPECT_EQ(test, dev_queue_xmit(skb), NET_XMIT_SUCCESS);
+ }
+ 
+-static void __exit test_blackholedev_exit(void)
+-{
+-	pr_warn("test_blackholedev module terminating.\n");
+-}
++static struct kunit_case blackholedev_cases[] = {
++	KUNIT_CASE(test_blackholedev),
++	{},
++};
++
++static struct kunit_suite blackholedev_suite = {
++	.name = "blackholedev",
++	.test_cases = blackholedev_cases,
++};
+ 
+-module_init(test_blackholedev_init);
+-module_exit(test_blackholedev_exit);
++kunit_test_suite(blackholedev_suite);
+ 
+ MODULE_AUTHOR("Mahesh Bandewar <maheshb@google.com>");
+ MODULE_DESCRIPTION("module test of the blackhole_dev");
+diff --git a/tools/testing/selftests/net/Makefile b/tools/testing/selftests/net/Makefile
+index 73ee88d6b043..afa4bcdc5833 100644
+--- a/tools/testing/selftests/net/Makefile
++++ b/tools/testing/selftests/net/Makefile
+@@ -7,7 +7,7 @@ CFLAGS += -I../../../../usr/include/ $(KHDR_INCLUDES)
+ CFLAGS += -I../
+ 
+ TEST_PROGS := run_netsocktests run_afpackettests test_bpf.sh netdevice.sh \
+-	      rtnetlink.sh xfrm_policy.sh test_blackhole_dev.sh
++	      rtnetlink.sh xfrm_policy.sh
+ TEST_PROGS += fib_tests.sh fib-onlink-tests.sh pmtu.sh udpgso.sh ip_defrag.sh
+ TEST_PROGS += udpgso_bench.sh fib_rule_tests.sh msg_zerocopy.sh psock_snd.sh
+ TEST_PROGS += udpgro_bench.sh udpgro.sh test_vxlan_under_vrf.sh reuseport_addr_any.sh
+diff --git a/tools/testing/selftests/net/test_blackhole_dev.sh b/tools/testing/selftests/net/test_blackhole_dev.sh
+deleted file mode 100755
+index 3119b80e711f..000000000000
+--- a/tools/testing/selftests/net/test_blackhole_dev.sh
++++ /dev/null
+@@ -1,11 +0,0 @@
+-#!/bin/sh
+-# SPDX-License-Identifier: GPL-2.0
+-# Runs blackhole-dev test using blackhole-dev kernel module
+-
+-if /sbin/modprobe -q test_blackhole_dev ; then
+-	/sbin/modprobe -q -r test_blackhole_dev;
+-	echo "test_blackhole_dev: ok";
+-else
+-	echo "test_blackhole_dev: [FAIL]";
+-	exit 1;
+-fi
 
-#define fwctl_alloc_device(parent, ops, drv_struct, member) \
-	container_alloc(struct fwctl_device, drv_struct, member, \
-			_fwctl_alloc_device, parent, ops);
+---
+base-commit: 2014c95afecee3e76ca4a56956a936e23283f05b
+change-id: 20250207-blackholedev-kunit-convert-9a52a1a1a032
 
-Either way, you can add:
+Best regards,
+-- 
+Tamir Duberstein <tamird@gmail.com>
 
-Reviewed-by: Dan Williams <dan.j.williams@intel.com>
 
