@@ -1,170 +1,254 @@
-Return-Path: <netdev+bounces-164123-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-164128-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id AF5B8A2CABC
-	for <lists+netdev@lfdr.de>; Fri,  7 Feb 2025 19:04:58 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 98D06A2CAED
+	for <lists+netdev@lfdr.de>; Fri,  7 Feb 2025 19:13:07 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id A7B0D188C133
-	for <lists+netdev@lfdr.de>; Fri,  7 Feb 2025 18:05:03 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 27BEC16AC42
+	for <lists+netdev@lfdr.de>; Fri,  7 Feb 2025 18:13:06 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2DC8F1990A2;
-	Fri,  7 Feb 2025 18:04:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 89A4219CD1E;
+	Fri,  7 Feb 2025 18:13:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="X7faWZZZ"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-f53.google.com (mail-ed1-f53.google.com [209.85.208.53])
+Received: from mail-wr1-f42.google.com (mail-wr1-f42.google.com [209.85.221.42])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5E89C8479;
-	Fri,  7 Feb 2025 18:04:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.53
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9A63E199EB7;
+	Fri,  7 Feb 2025 18:13:01 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.42
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1738951495; cv=none; b=eOjoVa8wIt08T2Ql6FKdOP2uYz4YMhWbfOxQYpXFx/eczxYwL5Z2ILgSuDObr14NgejHLiZpqOfhywzor9v5UhdZSydjGXiIWYIowLbRS76m1opcGOSOSk41lD0X+kmsSPZmlNxhc/HcDh3jGBawQGYNaizycF03GdVDdU3862Q=
+	t=1738951983; cv=none; b=PtbixnsKY2abOTr3EobXZaDnR3AftFcbzILOloFoqPzYV+tpa6z7+ckPWYMkph60qY7wERtGiQZUweHd5mUX2qG33UUXGertEMm84juNLa52bvmhdvJfWL33Xbh/rEkEjAM8fJkEhgM6RDX2luVNc3SYpNHDzJeyKbWw7mjVYUM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1738951495; c=relaxed/simple;
-	bh=tvo5NDkfWGS1QCxE9BRsTOO9ib/fhBg1vpDi7HXyydA=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:To:Cc; b=nIi13ciDVuAhwAu6BgH1U8XU7HSzTiiDV0wLLtejIZjRZH+93UEEAkWeV7+HQjl1HYDDA2WkqoW7CYVWA77cxlSlPESky2Of/kmVhIoGOHw1/+Cq75r5RhplsMzDd6JfdruxWLSmkLdgHmjUmaLrxj835Jx3KT29yLaN6z8Bt1o=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.208.53
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org
+	s=arc-20240116; t=1738951983; c=relaxed/simple;
+	bh=/uqcjveFI+Ohn3TTizoKIDoUauFjbJO6klBGzCaZkzM=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=cw9FvER4uyiSeWSbl07kSowCKKgEDb9sKrW7BzpKhT/CC9g3J5qCTy9iNfFcRB+AcAlBSJierJiGIrfmyj+SegeJMN7qO0zhjRsip7Pk/RgKRhuo2CUrBXDX4ew4vbz6vZ0YuV25da7irCaFMgJLeu/JfLlePnAaHHPDgunhqfo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=X7faWZZZ; arc=none smtp.client-ip=209.85.221.42
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ed1-f53.google.com with SMTP id 4fb4d7f45d1cf-5dcd8d6f130so4703073a12.1;
-        Fri, 07 Feb 2025 10:04:53 -0800 (PST)
+Received: by mail-wr1-f42.google.com with SMTP id ffacd0b85a97d-38dcab4b0e1so783732f8f.0;
+        Fri, 07 Feb 2025 10:13:01 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1738951980; x=1739556780; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:subject:cc:to:from:date:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=MpcNUJESxQP4cEYWzq72lineCe5thDI/PST7eW8txNg=;
+        b=X7faWZZZm2IaPz78WkIix91hqgQkW6iJy9pIgLxZvHqqQK7rtD7EdwgJB5MqtX9cfq
+         SN86ZI5g846Q1sGGBn+iHNUVPepb9ddQF2Ri2ibzpbmZhOXpmnWgVvTV8lDGOG9qaN+5
+         E4ZdwoqBLEPpJFECo/rqqjR09KmnGZyUBbBiLpl/iLC4lm3R+Yh1CeuEQdH3iJotnQDO
+         X7bFPHgYiKsh0cSqCZxxZFZm8iDl0Qgdq1wSIMEMa9+5MApoF7pFrwdBSzhaD/3svMFo
+         Ls7qWMbcX1RXq0bHuSwrGZnphVja1dznR53nsYA4Ei3ou+hcZcs0gmxUtTrPZBzHTeUg
+         LqKA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1738951491; x=1739556291;
-        h=cc:to:message-id:content-transfer-encoding:mime-version:subject
-         :date:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=BEG0ZGL7WR2xRJMYONjM2DZlvzrNSsGBEyaJEQhqy7Y=;
-        b=d4ghzYE2YBok+VCwGP7akRL/ep5eSnWyx/oyVkwO2FaxbJGVf7s8TDoA4eshE/elW5
-         WIixU0G8sSIUKauYQTpCvSHB94cmA7pM/bNqENa+/wFDZcPxYwUePYkNPDgsdNrX4go2
-         pbRImfut+iK2p2o+S8MKeSZQwhFF8vBZax+ZJQubGZS7F5EPIzY45CZH+QG609RH3zSG
-         D5cAxzhin0dWHDkoWCULtcNmcAmfqap+MjiruF05fAGk1Sr5elN9pPsCUKqysPNzuOch
-         u0ONF/XQyQmfE4JvVMhXeoqLynkC2imnsocFTOODODf9D1XYUB30k19E+Yo6o1o+rtOx
-         3bTw==
-X-Forwarded-Encrypted: i=1; AJvYcCUTD7yWDUJSRCXHHlZ4re7yJvUEJZx9VWXQNiHwTK2zZm34do12J1cTe/knRd6P3Pd9A7C69asgvJyVfzLE0XkyU2wD@vger.kernel.org, AJvYcCVumvsxPUkYLJeztAd5HwQV7gE8AdgW5LmdAGJYxnmjwGZNj2LDMHO8kjhxbD3EPCAiMwNGDi2b3spGE7o=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzAamRqaBgM3cTWoxg953YlXym+UTUom/sJHYtmw6KVVSpG6wKo
-	FJr8/jMy3VbblHEbjok+f/xB4hkJc2rgcl3/dfT10VhZEI1JzY2X
-X-Gm-Gg: ASbGncsdsaQ7GhPcTsK72mVxLqJDbj6ZAtgLJwYAtq6hKPetwGaTvjW3dw3wzgHBfTY
-	NHL17WKV6QqQj/TxN39vkyJ0LJSeMOv9EVqC4Z78jCwhkJ23xpWJzxc0ogaA5BNOm54rs5hIpcg
-	s/USV1LlRQV7y/6nZlibA1ls1853oSpcYv2gWp6YHHMI1oo8FnsrKIgIwhECNc8M3hohEY47pKW
-	8HCINbQi6Z4nO1ZO+CuwDtz6vHGIcEzPGWL8Trlk+WDImiVKnIVLjY58Yop1f0Y2pHP3+w+AfWz
-	qXIsYA==
-X-Google-Smtp-Source: AGHT+IHphCsXNhMeNQVH7Ib2GeF+KatME8KGOMIDRzOSqeYur303sjJDqjpMEcEi3mxHHVqgFvd/Og==
-X-Received: by 2002:a17:906:360a:b0:ab7:5c95:3a66 with SMTP id a640c23a62f3a-ab789cbe59bmr347184766b.40.1738951491250;
-        Fri, 07 Feb 2025 10:04:51 -0800 (PST)
-Received: from localhost ([2a03:2880:30ff:2::])
-        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-ab772f8442dsm307309366b.46.2025.02.07.10.04.50
+        d=1e100.net; s=20230601; t=1738951980; x=1739556780;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:subject:cc:to:from:date:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=MpcNUJESxQP4cEYWzq72lineCe5thDI/PST7eW8txNg=;
+        b=P4+bSvewSCiSTEB5LLb0BS/HUq3FxNTYY/Yd0e5ghBGzzrUqF+ZE/UE2tRiAS0fr5z
+         xUin7qnWml0HytM38JkO/NT02LBPUFxx4UGC69id6ErPunGZ7wrJrZB0s36ixbixdfqr
+         BcyaZ+zXMn+Tbttup6h/wOcmuFHNsmVQWt9LMcp0cH4ernadEVrBOYqobn6++BmRuvtQ
+         Cf6r1ayt4gK41mRbjdUIfxjD3+Ajvmki77BCWSzBEWex5InO1ARaJGllw0DsbCrynw54
+         xRT76DdKbXbp1Vas4X9i9UeaktLzHYuMdJ5mBuQXmjTq6guj1rpLIu4GQFezIhxhcz5w
+         sjTQ==
+X-Forwarded-Encrypted: i=1; AJvYcCUFJmedhz+RiEdcAGxuB59a0lHvMzVnrDN9/dmqfu7aFNZsVtrzh/Hsh3RtiljLnTJxhvRE0/eyej3LNpbYXek=@vger.kernel.org, AJvYcCWvtwno071mYmCPP58jIGR3QDb2O6ymGGqSZNBnLAHnb+VrsQFZa2LLNic4RMteCfZdNnNkbBU=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzONO4VyVXM54kLcnxlLrAWoViMT4c3etyw5pvztRMQyI8K5MxC
+	caFBvzqe6CZsack9TBKeJnOO3rayhilAegwWiW1ev7ejimk6H6GP
+X-Gm-Gg: ASbGncuHsKF07pRgZaEmAThy7zuBlDFff5w4W2fPaiiGwuRjIzGLeC1xoyGEDwYqbDv
+	Va3c07nfE10MK/a1/mDHELpIK/MdHcYNGIHBhdkAPy9P6M4uN57D8GXVMUn2okLFDCNYRdRQEOt
+	kL3+m+ejSCFJeQzq/HQbO4kVYKU9cyrSI0WBQr8rEbi0Sb01+LMmPkkVTDqD7CpY4yx77dusGBf
+	Ag5z/u+Ue/yFCW1GVickNgwJ4slcYYL0l0QOlDJjrIF6DxK85ND2nAK6k+qePuB5jGCKbitrtpL
+	M8MOcFLdOCf6T3re3b3t/OFZvNiJSXmBYY21G/43AtAB6rt1LS+mdg==
+X-Google-Smtp-Source: AGHT+IH9f/rM0alPOoLvlOp5+ELsH+loKBcYfbYyhZiiWirjT52V0qbJhI8A+/XxbqFtm/iX1rywig==
+X-Received: by 2002:a05:6000:2a2:b0:38d:b281:1b24 with SMTP id ffacd0b85a97d-38dc910a550mr3270100f8f.32.1738951979624;
+        Fri, 07 Feb 2025 10:12:59 -0800 (PST)
+Received: from pumpkin (82-69-66-36.dsl.in-addr.zen.co.uk. [82.69.66.36])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-38dc4458d71sm4054254f8f.63.2025.02.07.10.12.58
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 07 Feb 2025 10:04:50 -0800 (PST)
-From: Breno Leitao <leitao@debian.org>
-Date: Fri, 07 Feb 2025 10:03:53 -0800
-Subject: [PATCH net-next] trace: tcp: Add tracepoint for
- tcp_cwnd_reduction()
+        Fri, 07 Feb 2025 10:12:59 -0800 (PST)
+Date: Fri, 7 Feb 2025 18:12:58 +0000
+From: David Laight <david.laight.linux@gmail.com>
+To: FUJITA Tomonori <fujita.tomonori@gmail.com>
+Cc: linux-kernel@vger.kernel.org, Alice Ryhl <aliceryhl@google.com>, Boqun
+ Feng <boqun.feng@gmail.com>, rust-for-linux@vger.kernel.org,
+ netdev@vger.kernel.org, andrew@lunn.ch, hkallweit1@gmail.com,
+ tmgross@umich.edu, ojeda@kernel.org, alex.gaynor@gmail.com,
+ gary@garyguo.net, bjorn3_gh@protonmail.com, benno.lossin@proton.me,
+ a.hindborg@samsung.com, anna-maria@linutronix.de, frederic@kernel.org,
+ tglx@linutronix.de, arnd@arndb.de, jstultz@google.com, sboyd@kernel.org,
+ mingo@redhat.com, peterz@infradead.org, juri.lelli@redhat.com,
+ vincent.guittot@linaro.org, dietmar.eggemann@arm.com, rostedt@goodmis.org,
+ bsegall@google.com, mgorman@suse.de, vschneid@redhat.com,
+ tgunders@redhat.com, me@kloenk.dev
+Subject: Re: [PATCH v10 1/8] sched/core: Add __might_sleep_precision()
+Message-ID: <20250207181258.233674df@pumpkin>
+In-Reply-To: <20250207132623.168854-2-fujita.tomonori@gmail.com>
+References: <20250207132623.168854-1-fujita.tomonori@gmail.com>
+	<20250207132623.168854-2-fujita.tomonori@gmail.com>
+X-Mailer: Claws Mail 4.1.1 (GTK 3.24.38; arm-unknown-linux-gnueabihf)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
-Message-Id: <20250207-cwnd_tracepoint-v1-1-13650f3ca96d@debian.org>
-X-B4-Tracking: v=1; b=H4sIAAlLpmcC/3XNQQqDMBBA0auEWZuSia2gq96jSInJqLOZSBKsR
- XL3gvuuP7x/QqbElGFQJyTaOXMUGBQ2CvzqZCHNAQYF1tiHQWu0/0h4l+Q8bZGlaEuIvu871/s
- JGgVbopmPS3yBUNFCR4GxUbByLjF9r9WOV/+r7qhRt91kyITu3s7uGWhiJ7eYFhhrrT8rbdwYu
- QAAAA==
-X-Change-ID: 20250120-cwnd_tracepoint-2e11c996a9cb
-To: Eric Dumazet <edumazet@google.com>, 
- Steven Rostedt <rostedt@goodmis.org>, 
- Masami Hiramatsu <mhiramat@kernel.org>, 
- Mathieu Desnoyers <mathieu.desnoyers@efficios.com>, 
- "David S. Miller" <davem@davemloft.net>, David Ahern <dsahern@kernel.org>, 
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
- Simon Horman <horms@kernel.org>, Neal Cardwell <ncardwell@google.com>
-Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
- linux-trace-kernel@vger.kernel.org, kernel-team@meta.com, 
- Breno Leitao <leitao@debian.org>
-X-Mailer: b4 0.14.2
-X-Developer-Signature: v=1; a=openpgp-sha256; l=2341; i=leitao@debian.org;
- h=from:subject:message-id; bh=tvo5NDkfWGS1QCxE9BRsTOO9ib/fhBg1vpDi7HXyydA=;
- b=owEBbQKS/ZANAwAIATWjk5/8eHdtAcsmYgBnpktBtueCo/j+Z0lpU9qnH3gCdzZ8cp6UDHd/Q
- j1d/m6wY1aJAjMEAAEIAB0WIQSshTmm6PRnAspKQ5s1o5Of/Hh3bQUCZ6ZLQQAKCRA1o5Of/Hh3
- bRUUD/0UdyGBWm96xj2/FVv0DVk7gty8wf/UptvkUkSPbo9NrXezaIKzk2idOMC6idwuWUIfdbr
- zxeYjTFoSwVii4pWPPCdMjvtf2szUzkZSzw++EZi0SFnIL9l3DXWcQaOrzDVMSzoLCYt9dRZHqK
- x/17PnNIM07geOPLFsgEbNkUAgj5cqD+U63pguPSVsHDPg2bEvsygkA63PfozdedeLB3sPeyxfx
- qHOQY5G0XIRuWwiB7t89yNg96M3ZY3MsWdDdiSI2AAs8I4rPJM8U7FL1BPQ4n5jR+/izL6nz5jH
- OVZD0BpgQpnnJZpAAhHWyCbrUp6sgvv8tlrsBCeQM2QybuQzChUX7UYLgv+XNZCB7/ZiWr5NyHh
- OrOH6q7TLSoaUuX+3uuAcZN91ZRjoybm2D+BYy6uh/FInn75sypNEuM+Spba7705//mgz3Gs2WZ
- 7SXFK9M1kYPwWlsUYefPyMdlk7NvaOX0xKQs9Vxmzm9TALU69d9C6QWI+BZAfinALMQ6U314d+v
- dzhKeTUoWyD4l3AUunn7Ulc1eytn2tHJFdFLRCBId9dD3LFJ+apUWZ37kAkuVWfaSGmjy/HvQc6
- qJ/4bf3BTPLAsMnITBFQO8yz22gMkovromDa0/Xe0iWck92as0lS/tonLSCsoT6pa7YtYHHntAp
- ewDwt56xEUNBnmg==
-X-Developer-Key: i=leitao@debian.org; a=openpgp;
- fpr=AC8539A6E8F46702CA4A439B35A3939FFC78776D
 
-Add a lightweight tracepoint to monitor TCP congestion window
-adjustments via tcp_cwnd_reduction(). This tracepoint enables tracking
-of:
-- TCP window size fluctuations
-- Active socket behavior
-- Congestion window reduction events
+On Fri,  7 Feb 2025 22:26:16 +0900
+FUJITA Tomonori <fujita.tomonori@gmail.com> wrote:
 
-Meta has been using BPF programs to monitor this function for years.
-Adding a proper tracepoint provides a stable API for all users who need
-to monitor TCP congestion window behavior.
+> Add __might_sleep_precision(), Rust friendly version of
+> __might_sleep(), which takes a pointer to a string with the length
+> instead of a null-terminated string.
+> 
+> Rust's core::panic::Location::file(), which gives the file name of a
+> caller, doesn't provide a null-terminated
+> string. __might_sleep_precision() uses a precision specifier in the
+> printk format, which specifies the length of a string; a string
+> doesn't need to be a null-terminated.
+> 
+> Modify __might_sleep() to call __might_sleep_precision() but the
+> impact should be negligible. strlen() isn't called in a normal case;
+> it's called only when printing the error (sleeping function called
+> from invalid context).
+> 
+> Note that Location::file() providing a null-terminated string for
+> better C interoperability is under discussion [1].
+> 
+> Link: https://github.com/rust-lang/libs-team/issues/466 [1]
+> Reviewed-by: Alice Ryhl <aliceryhl@google.com>
+> Co-developed-by: Boqun Feng <boqun.feng@gmail.com>
+> Signed-off-by: Boqun Feng <boqun.feng@gmail.com>
+> Signed-off-by: FUJITA Tomonori <fujita.tomonori@gmail.com>
+> ---
+>  include/linux/kernel.h |  2 ++
+>  kernel/sched/core.c    | 55 ++++++++++++++++++++++++++----------------
+>  2 files changed, 36 insertions(+), 21 deletions(-)
+> 
+> diff --git a/include/linux/kernel.h b/include/linux/kernel.h
+> index be2e8c0a187e..086ee1dc447e 100644
+> --- a/include/linux/kernel.h
+> +++ b/include/linux/kernel.h
+> @@ -87,6 +87,7 @@ extern int dynamic_might_resched(void);
+>  #ifdef CONFIG_DEBUG_ATOMIC_SLEEP
+>  extern void __might_resched(const char *file, int line, unsigned int offsets);
+>  extern void __might_sleep(const char *file, int line);
+> +extern void __might_sleep_precision(const char *file, int len, int line);
+>  extern void __cant_sleep(const char *file, int line, int preempt_offset);
+>  extern void __cant_migrate(const char *file, int line);
+>  
+> @@ -145,6 +146,7 @@ extern void __cant_migrate(const char *file, int line);
+>    static inline void __might_resched(const char *file, int line,
+>  				     unsigned int offsets) { }
+>  static inline void __might_sleep(const char *file, int line) { }
+> +static inline void __might_sleep_precision(const char *file, int len, int line) { }
+>  # define might_sleep() do { might_resched(); } while (0)
+>  # define cant_sleep() do { } while (0)
+>  # define cant_migrate()		do { } while (0)
+> diff --git a/kernel/sched/core.c b/kernel/sched/core.c
+> index 165c90ba64ea..d308f2a8692e 100644
+> --- a/kernel/sched/core.c
+> +++ b/kernel/sched/core.c
+> @@ -8678,24 +8678,6 @@ void __init sched_init(void)
+>  
+>  #ifdef CONFIG_DEBUG_ATOMIC_SLEEP
+>  
+> -void __might_sleep(const char *file, int line)
+> -{
+> -	unsigned int state = get_current_state();
+> -	/*
+> -	 * Blocking primitives will set (and therefore destroy) current->state,
+> -	 * since we will exit with TASK_RUNNING make sure we enter with it,
+> -	 * otherwise we will destroy state.
+> -	 */
+> -	WARN_ONCE(state != TASK_RUNNING && current->task_state_change,
+> -			"do not call blocking ops when !TASK_RUNNING; "
+> -			"state=%x set at [<%p>] %pS\n", state,
+> -			(void *)current->task_state_change,
+> -			(void *)current->task_state_change);
+> -
+> -	__might_resched(file, line, 0);
+> -}
+> -EXPORT_SYMBOL(__might_sleep);
+> -
+>  static void print_preempt_disable_ip(int preempt_offset, unsigned long ip)
+>  {
+>  	if (!IS_ENABLED(CONFIG_DEBUG_PREEMPT))
+> @@ -8717,7 +8699,8 @@ static inline bool resched_offsets_ok(unsigned int offsets)
+>  	return nested == offsets;
+>  }
+>  
+> -void __might_resched(const char *file, int line, unsigned int offsets)
+> +static void __might_resched_precision(const char *file, int len, int line,
 
-Use DECLARE_TRACE instead of TRACE_EVENT to avoid creating trace event
-infrastructure and exporting to tracefs, keeping the implementation
-minimal. (Thanks Steven Rostedt)
+For clarity that ought to be file_len.
 
-Signed-off-by: Breno Leitao <leitao@debian.org>
----
-Changes since RFC:
-- Change from a full tracepoint to DECLARE_TRACE() as suggested by
-  Steven
-- Link to RFC: https://lore.kernel.org/r/20250120-cwnd_tracepoint-v1-1-36b0e0d643fa@debian.org
----
- include/trace/events/tcp.h | 5 +++++
- net/ipv4/tcp_input.c       | 2 ++
- 2 files changed, 7 insertions(+)
+> +				      unsigned int offsets)
+>  {
+>  	/* Ratelimiting timestamp: */
+>  	static unsigned long prev_jiffy;
+> @@ -8740,8 +8723,10 @@ void __might_resched(const char *file, int line, unsigned int offsets)
+>  	/* Save this before calling printk(), since that will clobber it: */
+>  	preempt_disable_ip = get_preempt_disable_ip(current);
+>  
+> -	pr_err("BUG: sleeping function called from invalid context at %s:%d\n",
+> -	       file, line);
+> +	if (len < 0)
+> +		len = strlen(file);
 
-diff --git a/include/trace/events/tcp.h b/include/trace/events/tcp.h
-index a27c4b619dffd7dcc72fffa71bf0fd5e34fe6681..d574e6151dc4f7430206f9ccefe0bf0d463aaa52 100644
---- a/include/trace/events/tcp.h
-+++ b/include/trace/events/tcp.h
-@@ -259,6 +259,11 @@ TRACE_EVENT(tcp_retransmit_synack,
- 		  __entry->saddr_v6, __entry->daddr_v6)
- );
- 
-+DECLARE_TRACE(tcp_cwnd_reduction_tp,
-+	TP_PROTO(const struct sock *sk, int newly_acked_sacked,
-+		 int newly_lost, int flag),
-+	TP_ARGS(sk, newly_acked_sacked, newly_lost, flag));
-+
- #include <trace/events/net_probe_common.h>
- 
- TRACE_EVENT(tcp_probe,
-diff --git a/net/ipv4/tcp_input.c b/net/ipv4/tcp_input.c
-index eb82e01da911048b41ca380f913ef55566be79a7..1a667e67df6beacde9871a50d44e180c2943ded0 100644
---- a/net/ipv4/tcp_input.c
-+++ b/net/ipv4/tcp_input.c
-@@ -2710,6 +2710,8 @@ void tcp_cwnd_reduction(struct sock *sk, int newly_acked_sacked, int newly_lost,
- 	if (newly_acked_sacked <= 0 || WARN_ON_ONCE(!tp->prior_cwnd))
- 		return;
- 
-+	trace_tcp_cwnd_reduction_tp(sk, newly_acked_sacked, newly_lost, flag);
-+
- 	tp->prr_delivered += newly_acked_sacked;
- 	if (delta < 0) {
- 		u64 dividend = (u64)tp->snd_ssthresh * tp->prr_delivered +
+No need for strlen(), just use a big number instead of -1.
+Anything bigger than a sane upper limit on the filename length will do.
 
----
-base-commit: 09717c28b76c30b1dc8c261c855ffb2406abab2e
-change-id: 20250120-cwnd_tracepoint-2e11c996a9cb
+	David
 
-Best regards,
--- 
-Breno Leitao <leitao@debian.org>
+> +	pr_err("BUG: sleeping function called from invalid context at %.*s:%d\n",
+> +	       len, file, line);
+>  	pr_err("in_atomic(): %d, irqs_disabled(): %d, non_block: %d, pid: %d, name: %s\n",
+>  	       in_atomic(), irqs_disabled(), current->non_block_count,
+>  	       current->pid, current->comm);
+> @@ -8766,8 +8751,36 @@ void __might_resched(const char *file, int line, unsigned int offsets)
+>  	dump_stack();
+>  	add_taint(TAINT_WARN, LOCKDEP_STILL_OK);
+>  }
+> +
+> +void __might_resched(const char *file, int line, unsigned int offsets)
+> +{
+> +	__might_resched_precision(file, -1, line, offsets);
+> +}
+>  EXPORT_SYMBOL(__might_resched);
+>  
+> +void __might_sleep_precision(const char *file, int len, int line)
+> +{
+> +	unsigned int state = get_current_state();
+> +	/*
+> +	 * Blocking primitives will set (and therefore destroy) current->state,
+> +	 * since we will exit with TASK_RUNNING make sure we enter with it,
+> +	 * otherwise we will destroy state.
+> +	 */
+> +	WARN_ONCE(state != TASK_RUNNING && current->task_state_change,
+> +			"do not call blocking ops when !TASK_RUNNING; "
+> +			"state=%x set at [<%p>] %pS\n", state,
+> +			(void *)current->task_state_change,
+> +			(void *)current->task_state_change);
+> +
+> +	__might_resched_precision(file, len, line, 0);
+> +}
+> +
+> +void __might_sleep(const char *file, int line)
+> +{
+> +	__might_sleep_precision(file, -1, line);
+> +}
+> +EXPORT_SYMBOL(__might_sleep);
+> +
+>  void __cant_sleep(const char *file, int line, int preempt_offset)
+>  {
+>  	static unsigned long prev_jiffy;
 
 
