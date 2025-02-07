@@ -1,145 +1,247 @@
-Return-Path: <netdev+bounces-163774-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-163777-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 436DEA2B860
-	for <lists+netdev@lfdr.de>; Fri,  7 Feb 2025 02:46:37 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id E124CA2B873
+	for <lists+netdev@lfdr.de>; Fri,  7 Feb 2025 02:53:09 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 5DC347A27BB
-	for <lists+netdev@lfdr.de>; Fri,  7 Feb 2025 01:45:41 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id E0B971888EBB
+	for <lists+netdev@lfdr.de>; Fri,  7 Feb 2025 01:53:14 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 40DE914EC46;
-	Fri,  7 Feb 2025 01:46:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CE05513D8A0;
+	Fri,  7 Feb 2025 01:53:05 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=fastly.com header.i=@fastly.com header.b="Lz5cm0GD"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="PwRDzSaR"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f181.google.com (mail-pl1-f181.google.com [209.85.214.181])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.17])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A8D8D1474A7
-	for <netdev@vger.kernel.org>; Fri,  7 Feb 2025 01:46:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.181
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1738892784; cv=none; b=J2Ga+8WlBP8wQbTwksvwuyVGqImrTJec06y3pS2bihxIRjIyAmdQkwR+14elYmKQc4WTL2493YVUc+bDqZct1FL3pBF2eV1QuwtDlpXRZXtKpiflEHMaxtfBkSHm1MOzB08gyPvfjLA+Ffld7GVRvYk5MV8mL6Ly5G3ZtoDT6Lg=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1738892784; c=relaxed/simple;
-	bh=hyLeDvnLTV29+khiprOAmxfCaatpQ++A9+PmCn+j+KY=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=UGSJfV2P15YG4nKai5XSF0hdOZzEByKoGDXpYmx+mDzhO7eeKKKNbNppGPBRWowvVyhbka0cKvfrXGszOE5HWVvv4Uwg421Tp/I+wtOhq81SKXkKNqt4+rOiPK0JJabxXQ7vNhRYNfdcE9/bQ2nGfgolf8NvgksJOYkFYK7/96A=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fastly.com; spf=pass smtp.mailfrom=fastly.com; dkim=pass (1024-bit key) header.d=fastly.com header.i=@fastly.com header.b=Lz5cm0GD; arc=none smtp.client-ip=209.85.214.181
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fastly.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=fastly.com
-Received: by mail-pl1-f181.google.com with SMTP id d9443c01a7336-21f11b0e580so31273315ad.1
-        for <netdev@vger.kernel.org>; Thu, 06 Feb 2025 17:46:22 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=fastly.com; s=google; t=1738892782; x=1739497582; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references
-         :mail-followup-to:message-id:subject:cc:to:from:date:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=95W319fF0TuhfADXZYWyhM8ZPI/uC+h6x4fXlzFN76M=;
-        b=Lz5cm0GDjVY3zKssrueI3yp6yB6Dj63XoNB8OfiJexs9LQuY7zMNghBaUVtVGCF+A4
-         Q56mpqr4xUWGTHzZwvbhgNbPZx0FIbyku4wJOZLAWwfiDJNWU1fY+UntwxvWbwse4cuC
-         T5PtKm50gM/rurwBd1E8DGYQvAatzANG84d1U=
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1738892782; x=1739497582;
-        h=in-reply-to:content-disposition:mime-version:references
-         :mail-followup-to:message-id:subject:cc:to:from:date
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=95W319fF0TuhfADXZYWyhM8ZPI/uC+h6x4fXlzFN76M=;
-        b=s1kUkb97+sV9ue7kXEkAi7nqTvXDdgbp5ZGL4K7Ji7gadDk4610JwmVMuC5oxT9oyO
-         jfwqKNu3KfIO0qfYnOLqpfdU8WyrtWbdkaqjNVuTSvdscjUmNUcwePPNHXQ/zw2tDdth
-         XThLV1u7BuvzKKL3DHKj1zSSZdw/OGp5Pf0uwDv+5juHr9WuBdwlV7IR8s2UKZ1tIoUj
-         HRqqyGCMQOtiWJsQm45Ezxk3OVhu2VFZVOGzQugFmoXiNDqLShlhQNySGQ1IAdvHEG01
-         +iqy0UQUSYvwpukSco2M0zJlYFaRyl+FnIzgfMa/eWXVWWPdkX2z3uA4o61glzJDNDLp
-         w54g==
-X-Gm-Message-State: AOJu0YxmMXErjPjJOSXz/z04sEBEZ+g497WqNt3AjvWxDeIm+wUXJHnb
-	iC92ds8bCgJJIEimV8SlJu1egH2fA23gbrZSq0vHj3v9tWUDDz3Bev/DgpU/2uw=
-X-Gm-Gg: ASbGnctLbbN9HzldjPZKELs5nYDUr7k5GTHcS00P2rH8SdDONPT6q+iz5Q2u92ghs9T
-	aEyy7BUJfnLieFDwO5nsbbyVQaJwKAC62EwD5jBsyjZs1M40fJV64U5JwNLILONIN9G/m+RQZmB
-	Yj0wvBj/bytWPIdAbEILg6RMKhI+TaFZmLqVWaU4NpymD86+Xp7M90kEWYiDpZrwvNFq4bUpatW
-	yuZ7d7AcDx5G65af7ah7y47smrRviVVP5LRZoTkedytsGiBkera8QBoIsdbVYCC6S3BMjQjhBke
-	kkZNwmHWXwmN+svBlknryrfJKeZzTMbtUTFv99ToQDq+U3A0Xa/fRptgzg==
-X-Google-Smtp-Source: AGHT+IEb0fEGfaDmVEdZDvNICNH+t4hrQlDHBujjTzaFy892ln/2xVZtzkVxDOZrFFZTZ5x9LoppSA==
-X-Received: by 2002:a17:902:f60a:b0:215:94eb:adb6 with SMTP id d9443c01a7336-21f4e73b2c6mr26502755ad.40.1738892781880;
-        Thu, 06 Feb 2025 17:46:21 -0800 (PST)
-Received: from LQ3V64L9R2 (c-24-6-151-244.hsd1.ca.comcast.net. [24.6.151.244])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-21f3653af3bsm19561545ad.57.2025.02.06.17.46.20
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 06 Feb 2025 17:46:21 -0800 (PST)
-Date: Thu, 6 Feb 2025 17:46:18 -0800
-From: Joe Damato <jdamato@fastly.com>
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: netdev@vger.kernel.org, Donald Hunter <donald.hunter@gmail.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
-	Simon Horman <horms@kernel.org>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	Xuan Zhuo <xuanzhuo@linux.alibaba.com>,
-	Stanislav Fomichev <sdf@fomichev.me>,
-	Mina Almasry <almasrymina@google.com>,
-	Daniel Jurgens <danielj@nvidia.com>,
-	Martin Karsten <mkarsten@uwaterloo.ca>,
-	open list <linux-kernel@vger.kernel.org>
-Subject: Re: [PATCH net-next v3 1/2] netdev-genl: Add an XSK attribute to
- queues
-Message-ID: <Z6Vl6lcPpj1qBN5e@LQ3V64L9R2>
-Mail-Followup-To: Joe Damato <jdamato@fastly.com>,
-	Jakub Kicinski <kuba@kernel.org>, netdev@vger.kernel.org,
-	Donald Hunter <donald.hunter@gmail.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
-	Simon Horman <horms@kernel.org>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	Xuan Zhuo <xuanzhuo@linux.alibaba.com>,
-	Stanislav Fomichev <sdf@fomichev.me>,
-	Mina Almasry <almasrymina@google.com>,
-	Daniel Jurgens <danielj@nvidia.com>,
-	Martin Karsten <mkarsten@uwaterloo.ca>,
-	open list <linux-kernel@vger.kernel.org>
-References: <20250204191108.161046-1-jdamato@fastly.com>
- <20250204191108.161046-2-jdamato@fastly.com>
- <20250206165746.7cf392b6@kernel.org>
- <Z6Vig04c-a46WScr@LQ3V64L9R2>
- <20250206174138.7de4580d@kernel.org>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AC08E4C6E
+	for <netdev@vger.kernel.org>; Fri,  7 Feb 2025 01:53:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=192.198.163.17
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1738893185; cv=fail; b=cXHy5y3iBf98yZqkoCFKiY9OCOspVLapf0/AQR7icmbxztIDqbqmzqR3gdX3lqGcda59Rwo1aXxTAazY3hICFexU5A36rrcg9PgOFa78ApFZKz2vcwAug9KqqFd6c8hzfW6fRx9dNOBvb3ztMnnbl320ewC1WGzoVB30eg0NeQo=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1738893185; c=relaxed/simple;
+	bh=VV6Cl+HcOOeOsRXwzpfd7LvUx65TEVowxXGKCiRlxtc=;
+	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
+	 Content-Type:MIME-Version; b=YBAVluyMGwYI/uI5OeDHCNeCzM79TZkwQJKoESwD4j2tda4/v32vL4Zg78FSvbA0xRApRaBWYc4xXFX/rLarb3nMMVgdnBtkjvIitESVGxie3ChowKqxp8LK/Cq7vJQeOzj6EqgKQP3jrprwFxCxbhDwbePF+FrmSIW3wItLoXU=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=PwRDzSaR; arc=fail smtp.client-ip=192.198.163.17
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1738893184; x=1770429184;
+  h=from:to:cc:subject:date:message-id:references:
+   in-reply-to:content-transfer-encoding:mime-version;
+  bh=VV6Cl+HcOOeOsRXwzpfd7LvUx65TEVowxXGKCiRlxtc=;
+  b=PwRDzSaR/lqcOWqw9XsQmg8qEgmwsruZfzl+CZSrBGTRn1178+UTDgEg
+   xT/ooqRBiS8XgWkIJAmH5j6H7j510Us4oGa+pThMQ27bkhsDTZJrOfyc5
+   1obtJ5zW5TtSZQzWlAKfs4Z51iaUwybuU7I7mqoPUrAIKLNOJ2SLv2/4q
+   Yh8YqbMAVTmBlmKJzaaqkUHNnIiSPCE1UDqa42WaIuJWWS8j2JPHtkMVf
+   gQYv4uJ/cPiaNArkugHDogdaqBe5Z/XMgcHQ6H8TEzBrAWFZ8fCT1/f4Y
+   6mppAkYT7YS3KQkRkPQguXCTvtiqh42XKVqvCK0z/t0uKLb/6zy5oEUD1
+   g==;
+X-CSE-ConnectionGUID: iyDS/VNMTcWCjTzuzRgVkA==
+X-CSE-MsgGUID: eIp3Dl3wTwGBaEeSKU/hOA==
+X-IronPort-AV: E=McAfee;i="6700,10204,11336"; a="39419706"
+X-IronPort-AV: E=Sophos;i="6.13,265,1732608000"; 
+   d="scan'208";a="39419706"
+Received: from orviesa001.jf.intel.com ([10.64.159.141])
+  by fmvoesa111.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 06 Feb 2025 17:52:56 -0800
+X-CSE-ConnectionGUID: I12UVP54S/WlxovmIfIooQ==
+X-CSE-MsgGUID: bBGBWa2ER9G9dzUA/TFySA==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.12,224,1728975600"; 
+   d="scan'208";a="148609223"
+Received: from orsmsx601.amr.corp.intel.com ([10.22.229.14])
+  by orviesa001.jf.intel.com with ESMTP/TLS/AES256-GCM-SHA384; 06 Feb 2025 17:50:37 -0800
+Received: from orsmsx601.amr.corp.intel.com (10.22.229.14) by
+ ORSMSX601.amr.corp.intel.com (10.22.229.14) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.44; Thu, 6 Feb 2025 17:50:36 -0800
+Received: from orsedg603.ED.cps.intel.com (10.7.248.4) by
+ orsmsx601.amr.corp.intel.com (10.22.229.14) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.44 via Frontend Transport; Thu, 6 Feb 2025 17:50:36 -0800
+Received: from NAM12-MW2-obe.outbound.protection.outlook.com (104.47.66.40) by
+ edgegateway.intel.com (134.134.137.100) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.1.2507.44; Thu, 6 Feb 2025 17:50:36 -0800
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=pSh0+Q0aiLS5Fg5pme0Iv2JuSTlS0rGFNVL/LgEzaT+VRRYRbOH2s8MFQvyv6hzOAdvEShDhyrxUQGNByXBaEQ3c8OEqNE9DS3BERtDPHSTiEi5HwwxfR79EViksVtD5RYZ2SR9M9p6bQLKQE4PfhE3YtToY3xggGs2cl5EVeFNThlU6JRfUCDE71Ghk1hSBqaM8abMFCFt+vFEWwbkSzR/xe8h+OqyVt6YStGpjk0EjROzbtfl5u8EGXyfcJD5j6KHPp6A4GzAlcXmRZLtsEoO7wt3Thrt0gkXMqzVeYVQ/3OwjBkQ2x7VSzyUSejT4kbal0c1idrI9ipuPyzyRRg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=M2AcJMXo0z8RlcqvdMLKJ4gHtIwt9RsxiLi7CVl4yh4=;
+ b=bkXblsKxKoe0fEJnVIaf8GgC9GCCKy3kSMLd64+BLMKOHdq6XrZbYrsFATEKHbOUXmDqNhTyksLZRMTPVXjWAeCJjzGycP1wlI79vm6ZCdqWmT+GTJZOv2nJKlx0Qt1Q6DuJ5kvM9QHpMicwvgsRHifSVgAxrGsULAtXXUo89Xyvo+ePos07yPixcmEyJgMyYiY1atznY0DAgCLDSJM2voee5a78LspXQ6MgSFJWEGZYwDpgRYX5MW/CFxcbvXB1QVqJU33inG7SFQdwjas7CyJTsbQ4NdUzhxpWHGqSXyVKw/RMD/c1BbFTZFkV5xw1kJkQA75e6Il8H+PswNSnuQ==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
+Received: from CY8PR11MB7134.namprd11.prod.outlook.com (2603:10b6:930:62::17)
+ by DM3PR11MB8760.namprd11.prod.outlook.com (2603:10b6:0:4b::19) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8422.11; Fri, 7 Feb
+ 2025 01:49:52 +0000
+Received: from CY8PR11MB7134.namprd11.prod.outlook.com
+ ([fe80::cd87:9086:122c:be3d]) by CY8PR11MB7134.namprd11.prod.outlook.com
+ ([fe80::cd87:9086:122c:be3d%4]) with mapi id 15.20.8398.025; Fri, 7 Feb 2025
+ 01:49:51 +0000
+From: "Zhuo, Qiuxu" <qiuxu.zhuo@intel.com>
+To: "Kitszel, Przemyslaw" <przemyslaw.kitszel@intel.com>,
+	"intel-wired-lan@lists.osuosl.org" <intel-wired-lan@lists.osuosl.org>,
+	"Nguyen, Anthony L" <anthony.l.nguyen@intel.com>
+CC: "netdev@vger.kernel.org" <netdev@vger.kernel.org>, "Knitter, Konrad"
+	<konrad.knitter@intel.com>, Michal Swiatkowski
+	<michal.swiatkowski@linux.intel.com>, Simon Horman <horms@kernel.org>, "Kees
+ Cook" <kees@kernel.org>, Jiri Slaby <jirislaby@kernel.org>
+Subject: RE: [PATCH iwl-net v2] ice: health.c: fix compilation on gcc 7.5
+Thread-Topic: [PATCH iwl-net v2] ice: health.c: fix compilation on gcc 7.5
+Thread-Index: AQHbeObnGzM6hqP+wU64EQjO3IixRrM7ExRA
+Date: Fri, 7 Feb 2025 01:49:51 +0000
+Message-ID: <CY8PR11MB7134F3AF2F1B04B48AF9D17C89F12@CY8PR11MB7134.namprd11.prod.outlook.com>
+References: <20250206223101.6469-2-przemyslaw.kitszel@intel.com>
+In-Reply-To: <20250206223101.6469-2-przemyslaw.kitszel@intel.com>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach:
+X-MS-TNEF-Correlator:
+authentication-results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=intel.com;
+x-ms-publictraffictype: Email
+x-ms-traffictypediagnostic: CY8PR11MB7134:EE_|DM3PR11MB8760:EE_
+x-ms-office365-filtering-correlation-id: c6420c3b-9ed6-424c-e727-08dd4719b682
+x-ms-exchange-senderadcheck: 1
+x-ms-exchange-antispam-relay: 0
+x-microsoft-antispam: BCL:0;ARA:13230040|376014|366016|1800799024|38070700018;
+x-microsoft-antispam-message-info: =?us-ascii?Q?0g+l7hjCCIxr/Cbe/cjk2LxQL0CLErdzQ4bO1yVxHHMxR54/Y9wMB8vMV8fy?=
+ =?us-ascii?Q?vGPQVPUrrogwhmMVE/CuERmofZe56EWq1UrmtfUtJN7DUPDZY/Uw5apZ56RB?=
+ =?us-ascii?Q?7SK7KNV2N0X8Wgw+pYvfLSNYLETNGo1cgdFPY7DN4Tpjo3YjYMBLHrFKITwW?=
+ =?us-ascii?Q?2PRMoG1cIrea5U3OlJpd420i2g7EmeIlhYtYOH4UpEJ4s2ZrrxBhoCTykGRr?=
+ =?us-ascii?Q?ON+4MdmC+u1RXk2/BmgZk5oHa8gvQLBlM7IeUWycHTTdeu6xBjOtQdxmdAV/?=
+ =?us-ascii?Q?gvFKn82y8gC+oCYWsVU6gct0Bi95qj5bcR7Y0vNuk/EIkelzgji4+km/3Nov?=
+ =?us-ascii?Q?n3R6UREgKerFDRJpHO4VAeTGL/mfkfQGFTabAC/jUiC/Xpmr6Y7H9S7N1RHS?=
+ =?us-ascii?Q?/fxkpJ6UWOqTuvKUugP53Sv7whbro9ZoDB7ZiG5HZAbAGftM7QDI0JQE2Dbd?=
+ =?us-ascii?Q?wtbnBMK//rTABTtSpsJt+F66yq69Bgj+oLfsg42cYOnPJX7MGTPWRWEzL5tM?=
+ =?us-ascii?Q?Z3FT6OLOqOHBASEsd+gD1Ii6QZelD6S4fSkPzoWpdofuEURD+dOrkQn5h4id?=
+ =?us-ascii?Q?m4ctwNwlo9sF/r7lBfV7xIYbpQtMFBt2LTLSEyos9BaJsON3NVe+f0BrAYok?=
+ =?us-ascii?Q?EnyxfLj3r4JJdp0r1N7FIrnDoIeYRg+Y9dbciQ/L3VLvjefwfKEfnjv2T1ML?=
+ =?us-ascii?Q?orofmveZK14S9km1l2bpUfUGtT04BApptb8n/7rHSz5SuVAd8fyjVpuzwJq7?=
+ =?us-ascii?Q?AXjTb7f9HznK06mwM/TQf5pUQXOvkpp1hlUfEBA0TJ768tgJnQP/h1diCsKh?=
+ =?us-ascii?Q?dFCUCQhTg/VYGcM/8e5AmejOvlVQ0Gyugb0TC4La2wpW0uyn1HFB9zzxxvms?=
+ =?us-ascii?Q?D8ukqBjMh/gkUqEi0C+PITwjt+l4HUuW4MYKQqbnlBP8o/frPC+aqGs2t/Rn?=
+ =?us-ascii?Q?Vpgxlt78pLYt+pKirRhkxP4++W5pMXir8HrcrgmfmJ3BYSgLkCpjmdlDjnaT?=
+ =?us-ascii?Q?oPkknA6mB0G6G3VpxDpxgwDsZnNYIeutX2CH8K+iUQMgrgMXdgA3FeXlAwth?=
+ =?us-ascii?Q?LoNos0WVztWGb0gnHHykJUPJMnA7dGW9D9MwD0symwRr1j//d7Dzvxza0JZX?=
+ =?us-ascii?Q?OLW2zy8XoEg27UoOa4UIA00G0XamhyJKrYeUHvzaOHkmZqkevftOCxAf+yfU?=
+ =?us-ascii?Q?Y6EmoCaGOTA78v148HMPgEeKHmx2rYq2yIo2pAHTZzmWjTjY1DET1X619WjO?=
+ =?us-ascii?Q?XU7bo7zgrwp9T9quwWssR7sUQIBR9nG4B4ugXJi7SAH234tIPtfSl7mWbDDY?=
+ =?us-ascii?Q?Xm7xb6Vc9gIq1tTKBafFoZGhLk8wghoOFns4zOrAf8l+0PjIxEImoopb2Rry?=
+ =?us-ascii?Q?UDOu3ZjPJuDrxfI9yiYKpFtgJnHO4KYZ0aEgcM4K45Ux3tsV5g=3D=3D?=
+x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:CY8PR11MB7134.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(376014)(366016)(1800799024)(38070700018);DIR:OUT;SFP:1101;
+x-ms-exchange-antispam-messagedata-chunkcount: 1
+x-ms-exchange-antispam-messagedata-0: =?us-ascii?Q?mdQIBJDRaYUp2H52B4rolgSlQaEkA+oKxb5VCpKI9jVcZKrvQR6u8NK9qBIo?=
+ =?us-ascii?Q?7EL4pWmn4JvYKAvPe9ZOp2104UKp1D1H8d4VSdMp2ntcO9fvohh0M36TxVjO?=
+ =?us-ascii?Q?lB1o5jizN0Q2D99TkYn5Z9n9b1ZW826JcJrRUAXq+orEj3nOPF50AqpDCT7L?=
+ =?us-ascii?Q?U6GIccn3YuFJk1HdZSJeIUuNSADc01H+cW9xuqcpxNJv9AwXruxcN5nLDIBJ?=
+ =?us-ascii?Q?dbNyKkEmWSXt8fjNI2hFVQhDQHatleHqawsw+9uESLY9pvio8HoFzUYKgJAW?=
+ =?us-ascii?Q?4cf1GqaRyA7xZYBzWx14dbWuXOPD1X3f7bu9WCkC0ynbrDw6cUDBmIa9QrWx?=
+ =?us-ascii?Q?E4H3qdlk4mmth3Ptc2HYpn09Epjvl72JT6cBOStcuaqN26PcfChZY4diHgR4?=
+ =?us-ascii?Q?AEq8mbPgHgqI89cdgpRt405oMePiW431O0UrbUZ3CF8tTAGIGnZksmGpa3Pm?=
+ =?us-ascii?Q?9VXV2k8tB6nboWQ5CuLziSNgk7CNWxjkngsxMHJT2NVCvOu9vChxYXu7yn5X?=
+ =?us-ascii?Q?c2SObJjQBOhBkGWjgLSItQS0MM5oICNSDUXW9vBwlk8QpvAe3RqFTQenX2lH?=
+ =?us-ascii?Q?Vlxzv1EQxC0pUd+JczERmSG6wF15xLxmSes9xqN6nCA5nCRSrlhMg60i5Mro?=
+ =?us-ascii?Q?LSX/fB/eiLLDCirwBqq171Mes1e+EnLvyxckw8ygBBYDJS98gwNlxxI/0vJS?=
+ =?us-ascii?Q?TdUNji60DcG1QMBKTmssJV8OZxuUa9kNcYn25O9JOyHg7EH9VORTOTrstTxP?=
+ =?us-ascii?Q?OWtTLYtpFLrb5tGtJiPqIDKDggn/PMJhpcPnqqMrRMrn+ZXyrI11MQ3WdfSz?=
+ =?us-ascii?Q?xHHY9dV8cpppPMZKlprF3T+ihr78PPcL9Fc1wW820lH1QtLklJSdBZzmgrpf?=
+ =?us-ascii?Q?e3QRKEursSQ1thpW0cECS9PzJcKoaLonvy7sEcGnjQiAg2oydrWdBm0eoY6r?=
+ =?us-ascii?Q?r86FaqQNOdRvipjok6prHOsHAWgaxMjHxHg92XFZj7LJ3dqJ7J6OwSEmn9gx?=
+ =?us-ascii?Q?0kFsQgyFC05ourzg3co1947eufEAW9Ht2LuhXzyc0IqSB4fQ1B9jl17YzmoR?=
+ =?us-ascii?Q?w2uIEKZFFF8KP/30Md0zP4qHBgA6qk9N4VmM/VFy3kctlcqHfxr+QMl6r80o?=
+ =?us-ascii?Q?TBQ9/dX6SaCb131Y5iPd3pPs/P2f181qMjnvD/HE5TBOKTji37HhQVuUie9J?=
+ =?us-ascii?Q?ZVetQuZYSLRtX8ddiK/oT9wmw4xTA62p8BJEymbCQSi1HheD8ftVROJ+WjRE?=
+ =?us-ascii?Q?vVylIR4VguOv784BCrZpYyLn+F57sKHPCEsmaU4/xepgI5hEtinJ1XbH3V9H?=
+ =?us-ascii?Q?ggFBchuSFQHcm1VDZkGrBl/IOlp9rXtq732uX7w8fV/30UIOv5D6IOh7K2L+?=
+ =?us-ascii?Q?kU8Yl+5Bnokgr003xz0Qa1BTwnloSB2ulFNGIJ6LWUTuOu1JVGtAHbsVuU6a?=
+ =?us-ascii?Q?/tvBkvAMvGufWBGMml1UfcrJpXw5hvHdaXdaTqOgE3z7qhUZYRzLFgSTP+wu?=
+ =?us-ascii?Q?IPi9w29hJkSlhsD/GqgGQ4nPC8MoaDVSzEh30RXFu6Vpsd4zanxvlFB/JzQ/?=
+ =?us-ascii?Q?t8gaI1uMIM0Ei20ghclnn8y/IEL/sCT7A5yVWkUy?=
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250206174138.7de4580d@kernel.org>
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: CY8PR11MB7134.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: c6420c3b-9ed6-424c-e727-08dd4719b682
+X-MS-Exchange-CrossTenant-originalarrivaltime: 07 Feb 2025 01:49:51.7841
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: 3y787Zxg18Lgc0swFDg8QTsgzXWwqKAJGwRr216tGUqcuSgFvNco5uAkc8BrvQafldutCyAcueCzFosFR7gYOQ==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM3PR11MB8760
+X-OriginatorOrg: intel.com
 
-On Thu, Feb 06, 2025 at 05:41:38PM -0800, Jakub Kicinski wrote:
-> On Thu, 6 Feb 2025 17:31:47 -0800 Joe Damato wrote:
-> > > nla_nest_start() can fail, you gotta nul-check the return value.
-> > > You could possibly add an nla_put_empty_nest() helper in netlink.h
-> > > to make this less awkward? I think the iouring guys had the same bug  
-> > 
-> > Ah, right.
-> > 
-> > I'll see what a helper looks like. Feels like maybe overkill?
-> 
-> Yeah, not sure either. Technically nla_nest_end() isn't required here,
-> but that's not very obvious to a casual reader. So a helper that hides
-> that fact could be useful:
-> 
-> static inline int nla_put_empty_nest(struct sk_buff *skb, int attrtype)
-> {
-> 	return nla_nest_start(skb, attrtype) ? 0 : -EMSGSIZE;
-> }
+> From: Kitszel, Przemyslaw <przemyslaw.kitszel@intel.com>
+> [...]
+> Subject: [PATCH iwl-net v2] ice: health.c: fix compilation on gcc 7.5
+>=20
+> GCC 7 is not as good as GCC 8+ in telling what is a compile-time const, a=
+nd
+> thus could be used for static storage.
+> Fortunately keeping strings as const arrays is enough to make old gcc hap=
+py.
+>=20
+> Excerpt from the report:
+> My GCC is: gcc (Ubuntu 7.5.0-3ubuntu1~18.04) 7.5.0.
+>=20
+>   CC [M]  drivers/net/ethernet/stmicro/stmmac/stmmac_mdio.o
+> drivers/net/ethernet/intel/ice/devlink/health.c:35:3: error: initializer =
+element
+> is not constant
+>    ice_common_port_solutions, {ice_port_number_label}},
+>    ^~~~~~~~~~~~~~~~~~~~~~~~~
+> drivers/net/ethernet/intel/ice/devlink/health.c:35:3: note: (near initial=
+ization
+> for 'ice_health_status_lookup[0].solution')
+> drivers/net/ethernet/intel/ice/devlink/health.c:35:31: error: initializer
+> element is not constant
+>    ice_common_port_solutions, {ice_port_number_label}},
+>                                ^~~~~~~~~~~~~~~~~~~~~
+> drivers/net/ethernet/intel/ice/devlink/health.c:35:31: note: (near initia=
+lization
+> for 'ice_health_status_lookup[0].data_label[0]')
+> drivers/net/ethernet/intel/ice/devlink/health.c:37:46: error: initializer
+> element is not constant
+>    "Change or replace the module or cable.", {ice_port_number_label}},
+>                                               ^~~~~~~~~~~~~~~~~~~~~
+> drivers/net/ethernet/intel/ice/devlink/health.c:37:46: note: (near initia=
+lization
+> for 'ice_health_status_lookup[1].data_label[0]')
+> drivers/net/ethernet/intel/ice/devlink/health.c:39:3: error: initializer =
+element
+> is not constant
+>    ice_common_port_solutions, {ice_port_number_label}},
+>    ^~~~~~~~~~~~~~~~~~~~~~~~~
+>=20
+> Fixes: 85d6164ec56d ("ice: add fw and port health reporters")
+> Reported-by: Qiuxu Zhuo <qiuxu.zhuo@intel.com>
+> Closes:
+> https://lore.kernel.org/netdev/CY8PR11MB7134BF7A46D71E50D25FA7A989F
+> 72@CY8PR11MB7134.namprd11.prod.outlook.com
+> Reviewed-by: Michal Swiatkowski <michal.swiatkowski@linux.intel.com>
+> Suggested-by: Simon Horman <horms@kernel.org>
+> Signed-off-by: Przemek Kitszel <przemyslaw.kitszel@intel.com>
 
-Yea after reading the code it makes sense that nla_nest_end is not
-needed. I wrote a small thing similar to what you proposed above,
-but yours is more succinct.
+   Tested-by: Qiuxu Zhuo <qiuxu.zhuo@intel.com>
 
-I'll go with that and see how it looks.
+Thanks!
 
-> But totally unsure whether it's worthwhile. Just don't want for someone
-> to suggest this on v4 and make you respin once again.
-
-No worries; respinning is not the end of the world.
 
