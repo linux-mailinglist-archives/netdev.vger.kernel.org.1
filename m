@@ -1,200 +1,100 @@
-Return-Path: <netdev+bounces-163753-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-163754-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id E69E1A2B7B9
-	for <lists+netdev@lfdr.de>; Fri,  7 Feb 2025 02:19:44 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5B919A2B7C0
+	for <lists+netdev@lfdr.de>; Fri,  7 Feb 2025 02:20:17 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 22AD13A7291
-	for <lists+netdev@lfdr.de>; Fri,  7 Feb 2025 01:19:36 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 9E3C11669B7
+	for <lists+netdev@lfdr.de>; Fri,  7 Feb 2025 01:20:13 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9997033997;
-	Fri,  7 Feb 2025 01:19:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6A25F54723;
+	Fri,  7 Feb 2025 01:20:07 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=jvosburgh.net header.i=@jvosburgh.net header.b="N7OpDhCI";
-	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="df66N7m+"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="YEWH5E2p"
 X-Original-To: netdev@vger.kernel.org
-Received: from fhigh-a4-smtp.messagingengine.com (fhigh-a4-smtp.messagingengine.com [103.168.172.155])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 111082417EF;
-	Fri,  7 Feb 2025 01:19:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=103.168.172.155
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4524D33997
+	for <netdev@vger.kernel.org>; Fri,  7 Feb 2025 01:20:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1738891180; cv=none; b=Fju8NGulFso+XAy3+/+iiBEZI9NrRYZVT3EWw8cNIMc4cgnQkzPG0h5D0TCfFDsNtMh80QHuZQAtV7XF+7xf5R5NNlklBaALwvYxkR/uygCSRO1RLfNNb8i29J1PKRJ6+yzF4Y6DPv1735MqT1Qu1T5y2a8jzU1QMYJUn/wiD7I=
+	t=1738891207; cv=none; b=Vp6f4rkH3NHzU0uX3CyFlgckWq2qhkD/GIePW3/Js3EQhujc3Qu/la+V0x7dcA5mCSV670Lif3xecU06n2MgwWxKrJOu9oNIaDJkxO55bF/Tq+g/Epl2PGUQbH/HHciFmJRqB39irzlEb5w7itvP1oqGs5D5MOnW1rHArBwZDnA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1738891180; c=relaxed/simple;
-	bh=KN6mFjpaqTVBw7J+oEKnqle3KzOzbwQRqtAiVjvxZiA=;
-	h=From:To:cc:Subject:In-reply-to:References:MIME-Version:
-	 Content-Type:Date:Message-ID; b=cPhiIOyseoV5QuZqBPFX0XPJSHVr+9BIQ1gumsh9uSTjTYcEEiICeOyj3rJOA6eQkXzj2m3hH4/iVtR9+LvHyzrn/uFqpkYZtPCbDGx9rPVzyBP/PF5n7EvK96Jw9URW0m9md5223VV+YPnTKAokvTuk7B05BVFrnx7BBgpgsi4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=jvosburgh.net; spf=pass smtp.mailfrom=jvosburgh.net; dkim=pass (2048-bit key) header.d=jvosburgh.net header.i=@jvosburgh.net header.b=N7OpDhCI; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=df66N7m+; arc=none smtp.client-ip=103.168.172.155
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=jvosburgh.net
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=jvosburgh.net
-Received: from phl-compute-09.internal (phl-compute-09.phl.internal [10.202.2.49])
-	by mailfhigh.phl.internal (Postfix) with ESMTP id F037E1140217;
-	Thu,  6 Feb 2025 20:19:36 -0500 (EST)
-Received: from phl-mailfrontend-01 ([10.202.2.162])
-  by phl-compute-09.internal (MEProxy); Thu, 06 Feb 2025 20:19:36 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=jvosburgh.net;
-	 h=cc:cc:content-id:content-transfer-encoding:content-type
-	:content-type:date:date:from:from:in-reply-to:in-reply-to
-	:message-id:mime-version:references:reply-to:subject:subject:to
-	:to; s=fm1; t=1738891176; x=1738977576; bh=nM5RR7pVDpPRZWTwREsGw
-	zpq8Pw6RX8jNoRT+vRn0tE=; b=N7OpDhCIXK5uHXT/xymgQ9g8YeW13I9BEBZ9g
-	uPbzc+GmvpyvEs7AmuloiVeoC8vhPNdV6Jjacfj88zSIaW1EZ51UulhMZZTnz8m6
-	15XVmdvALO4ZJcXtXrZbg6igk55FE4tHL4a4kkHKOveuDO8CLSuz3Zo9r1IlFDyo
-	MmXgEp9pWx6Azuas+c2wi+KuZzIcbnoPPI810Xr4tZyWNNhl42uxvt7Rh3lhEXFj
-	sxTegQhVnJxRue2VvYhHf/S9EEwLbE5sECvIztfPylFcPlatJOra+j7XH1TNa1ir
-	ROVTcCdjhUu0zTa5BhXHwu2RS1+FamRUxkyuXo69geoB7X2Dg==
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
-	messagingengine.com; h=cc:cc:content-id
-	:content-transfer-encoding:content-type:content-type:date:date
-	:feedback-id:feedback-id:from:from:in-reply-to:in-reply-to
-	:message-id:mime-version:references:reply-to:subject:subject:to
-	:to:x-me-proxy:x-me-sender:x-me-sender:x-sasl-enc; s=fm3; t=
-	1738891176; x=1738977576; bh=nM5RR7pVDpPRZWTwREsGwzpq8Pw6RX8jNoR
-	T+vRn0tE=; b=df66N7m+bqR9HJ0VIYLH3uoC8fzk/c4i04ara7vRbUrScMRd7+3
-	5ikfobG1iykN5bJ/eBM3yeFkz6VE84F19Ho5GlT2sA+RcMpXabwHST2DU+g1P3c9
-	J47C92GGHJ2bxKKrqF5m2pfxhr8bjRcSedp3Nocil6CKrQlQH2Zb6OkDRy6u/Rl1
-	NVWoSCLEPRtTkTrbPsBfrRFUxw6PshV9156ZKxZ6uv9U6pj/BhsR5jhsUdvzPu3B
-	9m6Ew2D3rGKqa3eG6k4sUAu6kDnCb0Uvn1OJSDqv3gFgyr2WmjOs6Qeqap8mty6a
-	GVTuXOlFJGc7MgFph/qmpQmF0ROi94POP7w==
-X-ME-Sender: <xms:qF-lZ84iFZrW9tb-KW9H4ldlnFAVabJqovzws6kFxVP1PbTebDMlFw>
-    <xme:qF-lZ94BI5pN-msy4r0gdZts-spE_Q_l4KaNK1K5dScqPDMwUmjZXGlCuycfzm7F5
-    PN-bK4d9IBtNRMvNdc>
-X-ME-Received: <xmr:qF-lZ7eXnUgVtK2gxypF1EwG65BzUVMPxLYoNtROoc_u2bvvT9VEhTKJCyyutOY32GZWQw>
-X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeefvddrtddtgddvjeelfecutefuodetggdotefrod
-    ftvfcurfhrohhfihhlvgemucfhrghsthforghilhdpggftfghnshhusghstghrihgsvgdp
-    uffrtefokffrpgfnqfghnecuuegrihhlohhuthemuceftddtnecusecvtfgvtghiphhivg
-    hnthhsucdlqddutddtmdenucfjughrpefhvfevufgjfhfogggtgfffkfesthhqredtredt
-    vdenucfhrhhomheplfgrhicugghoshgsuhhrghhhuceojhhvsehjvhhoshgsuhhrghhhrd
-    hnvghtqeenucggtffrrghtthgvrhhnpeeifedvleefleejveethfefieduueeivdefieev
-    leffuddvveeftdehffffteefffenucevlhhushhtvghrufhiiigvpedtnecurfgrrhgrmh
-    epmhgrihhlfhhrohhmpehjvhesjhhvohhssghurhhghhdrnhgvthdpnhgspghrtghpthht
-    ohepudehpdhmohguvgepshhmthhpohhuthdprhgtphhtthhopehrrgiiohhrsegslhgrtg
-    hkfigrlhhlrdhorhhgpdhrtghpthhtohepuggrvhgvmhesuggrvhgvmhhlohhfthdrnhgv
-    thdprhgtphhtthhopehlihhuhhgrnhhgsghinhesghhmrghilhdrtghomhdprhgtphhtth
-    hopegvughumhgriigvthesghhoohhglhgvrdgtohhmpdhrtghpthhtohephhhorhhmshes
-    khgvrhhnvghlrdhorhhgpdhrtghpthhtohepkhhusggrsehkvghrnhgvlhdrohhrghdprh
-    gtphhtthhopehshhhurghhsehkvghrnhgvlhdrohhrghdprhgtphhtthhopegrnhgurhgv
-    fidonhgvthguvghvsehluhhnnhdrtghhpdhrtghpthhtohepsghorhhishhpsehnvhhiug
-    hirgdrtghomh
-X-ME-Proxy: <xmx:qF-lZxJv_1QqvaG3_PVHE_tUuOx_8HSSon8COsL3br0CneBccCE7Qw>
-    <xmx:qF-lZwI7aOvUq2OyvORL1RP6NqzxJIMl6EIWCZ5l4DgGciJPziEpGA>
-    <xmx:qF-lZyyII4POJE9YZVBh6R5sxxCjuAmyPHe0FELvLWFVyVlJu6GfFg>
-    <xmx:qF-lZ0IUpuU93ALE4_M2sDDHpZxLi_gHFVvBGvmbCeQDIa4lHPG00A>
-    <xmx:qF-lZx4nruX6811yxh_FmcnVygtGCvUc24oT6ItovWu1Cm4yPRxDXN4A>
-Feedback-ID: i53714940:Fastmail
-Received: by mail.messagingengine.com (Postfix) with ESMTPA; Thu,
- 6 Feb 2025 20:19:36 -0500 (EST)
-Received: by famine.localdomain (Postfix, from userid 1000)
-	id B13239FD35; Thu,  6 Feb 2025 17:19:34 -0800 (PST)
-Received: from famine (localhost [127.0.0.1])
-	by famine.localdomain (Postfix) with ESMTP id AE1DA9FCB2;
-	Thu,  6 Feb 2025 17:19:34 -0800 (PST)
-From: Jay Vosburgh <jv@jvosburgh.net>
-To: Hangbin Liu <liuhangbin@gmail.com>
-cc: netdev@vger.kernel.org, Andrew Lunn <andrew+netdev@lunn.ch>,
-    "David S. Miller" <davem@davemloft.net>,
-    Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
-    Paolo Abeni <pabeni@redhat.com>,
-    Nikolay Aleksandrov <razor@blackwall.org>,
-    Simon Horman <horms@kernel.org>, Jianbo Liu <jianbol@nvidia.com>,
-    Boris Pismenny <borisp@nvidia.com>, Tariq Toukan <tariqt@nvidia.com>,
-    Shuah Khan <shuah@kernel.org>, linux-kselftest@vger.kernel.org,
-    linux-kernel@vger.kernel.org
-Subject: Re: [PATCHv2 net 1/2] bonding: fix incorrect MAC address setting to
- receive NS messages
-In-reply-to: <20250206094600.357420-2-liuhangbin@gmail.com>
-References: <20250206094600.357420-1-liuhangbin@gmail.com>
- <20250206094600.357420-2-liuhangbin@gmail.com>
-Comments: In-reply-to Hangbin Liu <liuhangbin@gmail.com>
-   message dated "Thu, 06 Feb 2025 09:45:59 +0000."
-X-Mailer: MH-E 8.6+git; nmh 1.8+dev; Emacs 29.3
+	s=arc-20240116; t=1738891207; c=relaxed/simple;
+	bh=/eQepd7t9WbqF+rO+C6ugvIzUBu5cUU400/lwirMgpw=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=qLPzMqmBuBOR2ku7DeSDidP1ImHLmQHHLgGM9IJzecDZ+bm95VhS2I1ltnQILboFiFx2qoqSZGwRjGv4IQogluZPkXj41+4jYzEZx9N7H7HvQfTRYqoY2UvEXVQZRkylJHzQe9R+GxjzOY7eUgvWbsAfwS1zRzHdM84FNenU09M=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=YEWH5E2p; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id AB52FC4CEDD;
+	Fri,  7 Feb 2025 01:20:05 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1738891205;
+	bh=/eQepd7t9WbqF+rO+C6ugvIzUBu5cUU400/lwirMgpw=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=YEWH5E2pCBDkGC+GXfNk5R9MRcF4t4GkkyUfyJNi0ZugDp8gYAaa432EL9gQIAWw8
+	 BjxkrqSPV+Te5MQ0ynW1pGbPg84Z0c+NqikeYlDGzID8bY2ga2rWi17TkopGXQr6KM
+	 tGD9TJxPG2GlmGmCEqW70H8D9i5E096ym/cBKDdEw3TIpWmZSN9c9RVeMs0OXkyYoT
+	 Dcid8YiiMWRzRuC+Q5nGB/WignYzbAGLQ8EM0J8JEk2ufMF2ByK1NilIdgdGNalRkk
+	 wAOztIKrrvH09I4EgNt6zRClZT8/RWWSa7AmONR1oOMXV2Z7w/MxTbSwLsN2FdjeD8
+	 Lvc7XbM9QH3rg==
+Received: from [10.30.226.235] (localhost [IPv6:::1])
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id ADEF5380AADE;
+	Fri,  7 Feb 2025 01:20:34 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-ID: <624904.1738891174.1@famine>
-Content-Transfer-Encoding: quoted-printable
-Date: Thu, 06 Feb 2025 17:19:34 -0800
-Message-ID: <624905.1738891174@famine>
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH net-next v8 0/4] enic: Use Page Pool API for receiving packets
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <173889123353.1724081.15721162809855684305.git-patchwork-notify@kernel.org>
+Date: Fri, 07 Feb 2025 01:20:33 +0000
+References: <20250205235416.25410-1-johndale@cisco.com>
+In-Reply-To: <20250205235416.25410-1-johndale@cisco.com>
+To: John Daley <johndale@cisco.com>
+Cc: benve@cisco.com, satishkh@cisco.com, andrew+netdev@lunn.ch,
+ davem@davemloft.net, edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
+ netdev@vger.kernel.org
 
-Hangbin Liu <liuhangbin@gmail.com> wrote:
+Hello:
 
->When validation on the backup slave is enabled, we need to validate the
->Neighbor Solicitation (NS) messages received on the backup slave. To
->receive these messages, the correct destination MAC address must be added
->to the slave. However, the target in bonding is a unicast address, which
->we cannot use directly. Instead, we should first convert it to a
->Solicited-Node Multicast Address and then derive the corresponding MAC
->address.
->
->Fixes: 8eb36164d1a6 ("bonding: add ns target multicast address to slave d=
-evice")
->Signed-off-by: Hangbin Liu <liuhangbin@gmail.com>
+This series was applied to netdev/net-next.git (main)
+by Jakub Kicinski <kuba@kernel.org>:
 
-	I think this now deserves some commentary in the code.  Not
-because this function itself is unclear, but because there's the
-similarly-named slave_set_ns_maddr() (singular, not plural as in this
-patch) that will behave in a subtly different manner after this patch is
-applied.
+On Wed,  5 Feb 2025 15:54:12 -0800 you wrote:
+> Use the Page Pool API for RX. The Page Pool API improves bandwidth and
+> CPU overhead by recycling pages instead of allocating new buffers in the
+> driver. Also, page pool fragment allocation for smaller MTUs is used
+> allow multiple packets to share pages.
+> 
+> RX code was moved to its own file and some refactoring was done
+> beforehand to make the page pool changes more trasparent and to simplify
+> the resulting code.
+> 
+> [...]
 
-	The "maddrs" version here will convert the provided IPv6 address
-to the IPv6 solicited-nodes multicast address (RFC 4291 section 2.7.1)
-and thence to the MAC address, via ndisc_mc_map(), whereas the "maddr"
-version uses the supplied IPv6 address directly for multicast MAC
-address conversion.
+Here is the summary with links:
+  - [net-next,v8,1/4] enic: Move RX functions to their own file
+    https://git.kernel.org/netdev/net-next/c/fe57762c6490
+  - [net-next,v8,2/4] enic: Simplify RX handler function
+    https://git.kernel.org/netdev/net-next/c/eab3726347f8
+  - [net-next,v8,3/4] enic: Use the Page Pool API for RX
+    https://git.kernel.org/netdev/net-next/c/d24cb52b2d8a
+  - [net-next,v8,4/4] enic: remove copybreak tunable
+    https://git.kernel.org/netdev/net-next/c/a3b2caaedeaa
 
-	Assuming that I'm following that correctly, I think this
-distinction deserves explanation.  And if I'm getting it wrong, then it
-definitely deserves some explanation.
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
 
-	FWIW, functionally, I think it's doing the correct thing.
 
-	-J
-
->---
-> drivers/net/bonding/bond_options.c | 4 +++-
-> 1 file changed, 3 insertions(+), 1 deletion(-)
->
->diff --git a/drivers/net/bonding/bond_options.c b/drivers/net/bonding/bon=
-d_options.c
->index 327b6ecdc77e..63cf209dcdc9 100644
->--- a/drivers/net/bonding/bond_options.c
->+++ b/drivers/net/bonding/bond_options.c
->@@ -1246,6 +1246,7 @@ static void slave_set_ns_maddrs(struct bonding *bon=
-d, struct slave *slave, bool
-> {
-> 	struct in6_addr *targets =3D bond->params.ns_targets;
-> 	char slot_maddr[MAX_ADDR_LEN];
->+	struct in6_addr mcaddr;
-> 	int i;
-> =
-
-> 	if (!slave_can_set_ns_maddr(bond, slave))
->@@ -1255,7 +1256,8 @@ static void slave_set_ns_maddrs(struct bonding *bon=
-d, struct slave *slave, bool
-> 		if (ipv6_addr_any(&targets[i]))
-> 			break;
-> =
-
->-		if (!ndisc_mc_map(&targets[i], slot_maddr, slave->dev, 0)) {
->+		addrconf_addr_solict_mult(&targets[i], &mcaddr);
->+		if (!ndisc_mc_map(&mcaddr, slot_maddr, slave->dev, 0)) {
-> 			if (add)
-> 				dev_mc_add(slave->dev, slot_maddr);
-> 			else
->-- =
-
->2.46.0
->
-
----
-	-Jay Vosburgh, jv@jvosburgh.net
 
