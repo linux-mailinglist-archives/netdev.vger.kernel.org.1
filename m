@@ -1,148 +1,210 @@
-Return-Path: <netdev+bounces-163965-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-163966-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id DDD7FA2C319
-	for <lists+netdev@lfdr.de>; Fri,  7 Feb 2025 13:55:51 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id E2507A2C324
+	for <lists+netdev@lfdr.de>; Fri,  7 Feb 2025 13:59:33 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 7F30316AA75
-	for <lists+netdev@lfdr.de>; Fri,  7 Feb 2025 12:55:50 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 07EEB1889F7F
+	for <lists+netdev@lfdr.de>; Fri,  7 Feb 2025 12:59:39 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 379E51E04AD;
-	Fri,  7 Feb 2025 12:55:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="QZNM0J0d"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 990821E1035;
+	Fri,  7 Feb 2025 12:59:29 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from frasgout.his.huawei.com (frasgout.his.huawei.com [185.176.79.56])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0E2DA1A260;
-	Fri,  7 Feb 2025 12:55:47 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 17B4B7FD;
+	Fri,  7 Feb 2025 12:59:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.176.79.56
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1738932948; cv=none; b=RgCnJh/FuV3hV53rHgy7xF+ulZThnKroE1Qwie4igQlKjG164GVOSeUfs1PJfEZkw4XB+NK1aUMenOAqRY9l2HllISzi/Qleda/AC/IpNbuF5kkrvZ3kr26gKVGi5i87S2B+iWAmu+TTr6W1SpZDkmiG7qAqEnVWYMl/iiS5dQw=
+	t=1738933169; cv=none; b=Pa3Sk4O3mudc5KB+URUj37B3oAptXKMhFb3qI2DHcco2NiQGbDBBiVV264SOw7pMFzflibWgicyxDBkReBWsFTjeLJ5ifXQQAXxA1mRnuXEzgA4mqG84v/IFOcXXTWR9Wl+nLRcu0F+qrwfExH0at6rCJESMzx8tteIXecz3kNE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1738932948; c=relaxed/simple;
-	bh=UBCBRhwkkRi/uwegXH4w6XZjDAhtUW45z+ZLEeQCO4A=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=DSXfb9Jy+qVvCH4VW4NWYdWjApo/5N9aEsJ6WeAp6sGoZcGl1dFJ0xygR3lMylwyjFj1GkiiosdJ8OAG0Vy0BOwBjdrbcacH+YH5K3fWPfloRtQ6oi9zLHZiQ49o7nMLLKeuDsfhMuaRTqvL03dYd4xTIMhB7AOrSSy2w6tSBIQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=QZNM0J0d; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 81B1EC4CED1;
-	Fri,  7 Feb 2025 12:55:45 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1738932947;
-	bh=UBCBRhwkkRi/uwegXH4w6XZjDAhtUW45z+ZLEeQCO4A=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=QZNM0J0duXEVVky2iOZ/6UoXSHv/b5mtU1raSX/+psvup92ghHs/zwYO61H2rXSyQ
-	 pZnOAD4hZ6nE2Te7hpcEi92plq9EJ1BsC+3QFLdOr4RmJU99a0f7iwQ+QSJ95wKIU0
-	 Z+ityEnTMJ1MT1WniwzUG/5v1jVmhYXMzLYAT+NsbOKCU9ELriZdJoC2GYh03dz+Vm
-	 RvbxF+w5PYGUdbCTP/ATuYMRp3V115aheY+td3uRnq6nsH8oaxNaVJXwKTe42bu6oq
-	 q6JVyEwo6Utrb2tJqjCr+DGpmPAPfzz0mndIH4Rf5cbfRX65dypOS2N7Uiru+pC8JH
-	 D/bZXyTgePfcw==
-Date: Fri, 7 Feb 2025 12:55:43 +0000
-From: Simon Horman <horms@kernel.org>
-To: alucerop@amd.com
-Cc: linux-cxl@vger.kernel.org, netdev@vger.kernel.org,
-	dan.j.williams@intel.com, edward.cree@amd.com, davem@davemloft.net,
-	kuba@kernel.org, pabeni@redhat.com, edumazet@google.com,
-	dave.jiang@intel.com
-Subject: Re: [PATCH v10 14/26] cxl: define a driver interface for HPA free
- space enumeration
-Message-ID: <20250207125543.GR554665@kernel.org>
-References: <20250205151950.25268-1-alucerop@amd.com>
- <20250205151950.25268-15-alucerop@amd.com>
+	s=arc-20240116; t=1738933169; c=relaxed/simple;
+	bh=PiBkQPbiA1N3w3yTc/P+6JoMC2L6C5HIzraVGz5XBrI=;
+	h=Date:From:To:CC:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=hvWDs/I9R6VUNMn0Qtk7sMXfqURtfDrQ+75CEp0RuXvG7ahOU4f2Q/yZhsTFI7glhku+k8Y0bJruEDRDqjDQrEsq8dfqRwMHYMTsCEtPKFPnqasbo6XIbiM4s2mdYVQe3yFsGVoHTwV0nn5DzqJvGKwf2+P10jtr+p0TrOb0hds=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=185.176.79.56
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
+Received: from mail.maildlp.com (unknown [172.18.186.216])
+	by frasgout.his.huawei.com (SkyGuard) with ESMTP id 4YqDW50x3hz67Ct8;
+	Fri,  7 Feb 2025 20:56:33 +0800 (CST)
+Received: from frapeml500008.china.huawei.com (unknown [7.182.85.71])
+	by mail.maildlp.com (Postfix) with ESMTPS id D57AF1406AC;
+	Fri,  7 Feb 2025 20:59:17 +0800 (CST)
+Received: from localhost (10.203.177.66) by frapeml500008.china.huawei.com
+ (7.182.85.71) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.1.2507.39; Fri, 7 Feb
+ 2025 13:59:17 +0100
+Date: Fri, 7 Feb 2025 12:59:15 +0000
+From: Jonathan Cameron <Jonathan.Cameron@huawei.com>
+To: Jason Gunthorpe <jgg@nvidia.com>
+CC: Andy Gospodarek <andrew.gospodarek@broadcom.com>, Aron Silverton
+	<aron.silverton@oracle.com>, Dan Williams <dan.j.williams@intel.com>, Daniel
+ Vetter <daniel.vetter@ffwll.ch>, Dave Jiang <dave.jiang@intel.com>, David
+ Ahern <dsahern@kernel.org>, Andy Gospodarek <gospo@broadcom.com>, Christoph
+ Hellwig <hch@infradead.org>, Itay Avraham <itayavr@nvidia.com>, Jiri Pirko
+	<jiri@nvidia.com>, Jakub Kicinski <kuba@kernel.org>, Leonid Bloch
+	<lbloch@nvidia.com>, Leon Romanovsky <leonro@nvidia.com>,
+	<linux-cxl@vger.kernel.org>, <linux-rdma@vger.kernel.org>,
+	<netdev@vger.kernel.org>, Saeed Mahameed <saeedm@nvidia.com>, "Nelson,
+ Shannon" <shannon.nelson@amd.com>
+Subject: Re: [PATCH v4 02/10] fwctl: Basic ioctl dispatch for the character
+ device
+Message-ID: <20250207125915.000079e4@huawei.com>
+In-Reply-To: <2-v4-0cf4ec3b8143+4995-fwctl_jgg@nvidia.com>
+References: <0-v4-0cf4ec3b8143+4995-fwctl_jgg@nvidia.com>
+	<2-v4-0cf4ec3b8143+4995-fwctl_jgg@nvidia.com>
+X-Mailer: Claws Mail 4.3.0 (GTK 3.24.42; x86_64-w64-mingw32)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250205151950.25268-15-alucerop@amd.com>
+Content-Type: text/plain; charset="US-ASCII"
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: lhrpeml500012.china.huawei.com (7.191.174.4) To
+ frapeml500008.china.huawei.com (7.182.85.71)
 
-On Wed, Feb 05, 2025 at 03:19:38PM +0000, alucerop@amd.com wrote:
-> From: Alejandro Lucero <alucerop@amd.com>
+On Thu,  6 Feb 2025 20:13:24 -0400
+Jason Gunthorpe <jgg@nvidia.com> wrote:
+
+> Each file descriptor gets a chunk of per-FD driver specific context that
+> allows the driver to attach a device specific struct to. The core code
+> takes care of the memory lifetime for this structure.
 > 
-> CXL region creation involves allocating capacity from device DPA
-> (device-physical-address space) and assigning it to decode a given HPA
-> (host-physical-address space). Before determining how much DPA to
-> allocate the amount of available HPA must be determined. Also, not all
-> HPA is created equal, some specifically targets RAM, some target PMEM,
-> some is prepared for device-memory flows like HDM-D and HDM-DB, and some
-> is host-only (HDM-H).
+> The ioctl dispatch and design is based on what was built for iommufd. The
+> ioctls have a struct which has a combined in/out behavior with a typical
+> 'zero pad' scheme for future extension and backwards compatibility.
 > 
-> Wrap all of those concerns into an API that retrieves a root decoder
-> (platform CXL window) that fits the specified constraints and the
-> capacity available for a new region.
+> Like iommufd some shared logic does most of the ioctl marshalling and
+> compatibility work and tables diatches to some function pointers for
+> each unique iotcl.
 > 
-> Add a complementary function for releasing the reference to such root
-> decoder.
+> This approach has proven to work quite well in the iommufd and rdma
+> subsystems.
 > 
-> Based on https://lore.kernel.org/linux-cxl/168592159290.1948938.13522227102445462976.stgit@dwillia2-xfh.jf.intel.com/
+> Allocate an ioctl number space for the subsystem.
 > 
-> Signed-off-by: Alejandro Lucero <alucerop@amd.com>
-> Co-developed-by: Dan Williams <dan.j.williams@intel.com>
 > Reviewed-by: Jonathan Cameron <Jonathan.Cameron@huawei.com>
-> ---
->  drivers/cxl/core/region.c | 160 ++++++++++++++++++++++++++++++++++++++
->  drivers/cxl/cxl.h         |   3 +
->  include/cxl/cxl.h         |  10 +++
->  3 files changed, 173 insertions(+)
-> 
-> diff --git a/drivers/cxl/core/region.c b/drivers/cxl/core/region.c
-> index 84ce625b8591..69ff00154298 100644
-> --- a/drivers/cxl/core/region.c
-> +++ b/drivers/cxl/core/region.c
-> @@ -695,6 +695,166 @@ static int free_hpa(struct cxl_region *cxlr)
->  	return 0;
->  }
+> Signed-off-by: Jason Gunthorpe <jgg@nvidia.com>
+Hi Jason,
+
+Fresh read through given it's been a while.
+
+A few really trivial things inline + one passing comment on a future
+entertaining corner.
+
+Jonathan
+
+
+>  M:	Sebastian Reichel <sre@kernel.org>
+> diff --git a/drivers/fwctl/main.c b/drivers/fwctl/main.c
+> index 34946bdc3bf3d7..d561deaf2b86d8 100644
+> --- a/drivers/fwctl/main.c
+> +++ b/drivers/fwctl/main.c
+
+
+
+
+>  static int fwctl_fops_release(struct inode *inode, struct file *filp)
+>  {
+> -	struct fwctl_device *fwctl = filp->private_data;
+> +	struct fwctl_uctx *uctx = filp->private_data;
+> +	struct fwctl_device *fwctl = uctx->fwctl;
 >  
-> +struct cxlrd_max_context {
-> +	struct device * const *host_bridges;
-> +	int interleave_ways;
-> +	unsigned long flags;
-> +	resource_size_t max_hpa;
-> +	struct cxl_root_decoder *cxlrd;
-> +};
-> +
-> +static int find_max_hpa(struct device *dev, void *data)
-> +{
-> +	struct cxlrd_max_context *ctx = data;
-> +	struct cxl_switch_decoder *cxlsd;
-> +	struct cxl_root_decoder *cxlrd;
-> +	struct resource *res, *prev;
-> +	struct cxl_decoder *cxld;
-> +	resource_size_t max;
-> +	int found;
-> +
-> +	if (!is_root_decoder(dev))
-> +		return 0;
-> +
-> +	cxlrd = to_cxl_root_decoder(dev);
-> +	cxlsd = &cxlrd->cxlsd;
-> +	cxld = &cxlsd->cxld;
-> +	if ((cxld->flags & ctx->flags) != ctx->flags) {
-> +		dev_dbg(dev, "flags not matching: %08lx vs %08lx\n",
-> +			cxld->flags, ctx->flags);
-> +		return 0;
+> +	scoped_guard(rwsem_read, &fwctl->registration_lock) {
+> +		/*
+> +		 * fwctl_unregister() has already removed the driver and
+> +		 * destroyed the uctx.
+
+Comment is a little odd given it is I think referring to why
+the code that follows wouldn't run. Perhaps just add a 'may'
+
+fwctl_unregister() may have already removed the driver and destroyed
+the uctx.
+
+> +		 */
+> +		if (fwctl->ops) {
+> +			guard(mutex)(&fwctl->uctx_list_lock);
+> +			fwctl_destroy_uctx(uctx);
+> +		}
 > +	}
 > +
-> +	for (int i = 0; i < ctx->interleave_ways; i++)
-> +		for (int j = 0; j < ctx->interleave_ways; j++)
-> +			if (ctx->host_bridges[i] == cxlsd->target[j]->dport_dev) {
-> +				found++;
+> +	kfree(uctx);
+>  	fwctl_put(fwctl);
+>  	return 0;
+>  }
 
-Hi Alejandro,
+>  
+> @@ -71,14 +183,17 @@ _alloc_device(struct device *parent, const struct fwctl_ops *ops, size_t size)
+>  	if (!fwctl)
+>  		return NULL;
+>  
+> -	fwctl->dev.class = &fwctl_class;
+> -	fwctl->dev.parent = parent;
+> -
+>  	devnum = ida_alloc_max(&fwctl_ida, FWCTL_MAX_DEVICES - 1, GFP_KERNEL);
+>  	if (devnum < 0)
+>  		return NULL;
+>  	fwctl->dev.devt = fwctl_dev + devnum;
+>  
+> +	fwctl->dev.class = &fwctl_class;
+> +	fwctl->dev.parent = parent;
 
-found is incremented here, but does not appear to have been initialised.
+Shunt this move back to previous patch?
 
-Flagged by W=1 build with clang-19, and by Smatch.
 
-> +				break;
-> +			}
+> +	init_rwsem(&fwctl->registration_lock);
+> +	mutex_init(&fwctl->uctx_list_lock);
+> +	INIT_LIST_HEAD(&fwctl->uctx_list);
+> +
+>  	device_initialize(&fwctl->dev);
+>  	return_ptr(fwctl);
+>  }
 
-...
+> diff --git a/include/linux/fwctl.h b/include/linux/fwctl.h
+> index 68ac2d5ab87481..93b470efb9dbc3 100644
+> --- a/include/linux/fwctl.h
+> +++ b/include/linux/fwctl.h
+> @@ -11,7 +11,30 @@
+>  struct fwctl_device;
+>  struct fwctl_uctx;
+>  
+> +/**
+> + * struct fwctl_ops - Driver provided operations
+> + *
+> + * fwctl_unregister() will wait until all excuting ops are completed before it
+> + * returns. Drivers should be mindful to not let their ops run for too long as
+> + * it will block device hot unplug and module unloading.
+
+A passing comment on this.  Seems likely that at somepoint we'll want an
+abort op to enable cancelling if the particular driver supports it
+(abort background command in CXL).  Anyhow, problem for another day.
+
+> + */
+>  struct fwctl_ops {
+> +	/**
+> +	 * @uctx_size: The size of the fwctl_uctx struct to allocate. The first
+> +	 * bytes of this memory will be a fwctl_uctx. The driver can use the
+> +	 * remaining bytes as its private memory.
+> +	 */
+> +	size_t uctx_size;
+> +	/**
+> +	 * @open_uctx: Called when a file descriptor is opened before the uctx
+> +	 * is ever used.
+> +	 */
+> +	int (*open_uctx)(struct fwctl_uctx *uctx);
+> +	/**
+> +	 * @close_uctx: Called when the uctx is destroyed, usually when the FD
+> +	 * is closed.
+> +	 */
+> +	void (*close_uctx)(struct fwctl_uctx *uctx);
+>  };
+
+
 
