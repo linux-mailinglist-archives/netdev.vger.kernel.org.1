@@ -1,252 +1,210 @@
-Return-Path: <netdev+bounces-164033-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-164034-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 31ED9A2C64F
-	for <lists+netdev@lfdr.de>; Fri,  7 Feb 2025 15:55:58 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id B4F64A2C654
+	for <lists+netdev@lfdr.de>; Fri,  7 Feb 2025 15:57:19 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 2FC5F3A9F55
-	for <lists+netdev@lfdr.de>; Fri,  7 Feb 2025 14:55:49 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 43F5916A6F7
+	for <lists+netdev@lfdr.de>; Fri,  7 Feb 2025 14:57:18 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7E057238D45;
-	Fri,  7 Feb 2025 14:55:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 85672238D2E;
+	Fri,  7 Feb 2025 14:57:15 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="d6MwczPh"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="T1S4h2aa"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-f42.google.com (mail-ed1-f42.google.com [209.85.208.42])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E4271238D2F
-	for <netdev@vger.kernel.org>; Fri,  7 Feb 2025 14:55:47 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.42
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 618F8238D26
+	for <netdev@vger.kernel.org>; Fri,  7 Feb 2025 14:57:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1738940150; cv=none; b=r1BcG+7qzPQQyoJJSX+xElVr1z2Buw2mD+kTUpDBrN7r1b9t/N0nphPyFjODqjdgoS0PflpKtASkBaA2tFyDIp2Uqz7Y5yD12eUUNEPa6JgL12Ci080jIH6jfVsR2yZ6vbhhpTW8O7MNxblxaTS8kUCrKSvoI5kS2Kpxm4NpCoc=
+	t=1738940235; cv=none; b=WZ4JL9gY+Q+nYhUeUiIYC7ZYGaBYnYEDAefqHTKq7vUracblhOqU0YTayJjYutcYGQB7FUslQKOE666Yt2k6uuzqDz9T07kAk/8Z7Q17Xi6GVH6kiFDo8zqoDAeEKnDl1MdEusvekuOalmrSfUKlhYecV23qSyXybdnpLA7GcMs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1738940150; c=relaxed/simple;
-	bh=ps1zzEkNImieF8mbHoTKbxIx4PanamP60WsGwxnYYWA=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=NbC3w9pxr03CGss5MqjqY6IW/HfLqW3eZSA8xMLiCqrbvrwcDdfocxwxm2ZGtbWhxA/64sKl9oZetByjyQkG+pd6M2YPUO8JjTnabskreyZ8O/LEtJDvd13fYkfXVU7ZOjMoAsRoPe/K2r0j+rpyS0wTjWJdPT2AAESk+rogRWU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=d6MwczPh; arc=none smtp.client-ip=209.85.208.42
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-ed1-f42.google.com with SMTP id 4fb4d7f45d1cf-5dcea56d6e2so3981737a12.1
-        for <netdev@vger.kernel.org>; Fri, 07 Feb 2025 06:55:47 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1738940146; x=1739544946; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=daaNvLMzn/C14SPQHtJPlMGQZX0eBHgUr4X9JmhBDFI=;
-        b=d6MwczPh3qixMTJSmmI0xYIrQmuj40CPRK6Vt0AldkX3jOVeKyTsIhtr1/ExoYIJ0A
-         bdTQ8dPGSFBnCRlQXwu4haim6RrmJd15N7J022/SxY9ydueWMhNUwDx9W/mJiysFRGJ1
-         ai42TlxMf+6+sGAO/nwaKSq32AH1x/XbHxGUfng3PkoO8dNpNn94e9RJjPnLFqHyngSs
-         n/F08LFP28hEllBLIhlG/e9B5UVPjHafM8XthggoRifl3CbyloVvB7r2SsUmZYgaVyyO
-         Wt9pBj2+z4K/SFEQ8EyYhp54oF7tijFIkF6nT5JzXGB1R/Wu8qnpQft7c1k/55PchrDJ
-         UmXw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1738940146; x=1739544946;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=daaNvLMzn/C14SPQHtJPlMGQZX0eBHgUr4X9JmhBDFI=;
-        b=hLLxgardpUi8q8+HxTcVh97OunA3BLXGXOvSs9BvpdXCklYgdkgiFTUHPLEv8pnqh7
-         7o3xmrYUNY4npGO3eVW3LpSpO8e0TPMUYeAx7V7ko7Qb0mH+gZ7It5Kdp1hn2/nMTh8B
-         LmNgmGvHYKzu2yphoPWoW5BXugaa715uDgMsQbytS6pJoVAxaKWrOZTTVXHGSvDL732k
-         AO8ZNr7MAf29cch0TwD9S5BLZRAAVTjaycCV4/BJkuA048Z+2gDajq1HVhuJ4727OzwW
-         e1MpRz9c09oOMli4JgHuFH/CqVdoCzz9gzaxMM/EIGY75JxJ7GR9AJm3u2IkDc5BBMwh
-         y62Q==
-X-Forwarded-Encrypted: i=1; AJvYcCUaXaMR8lfzjipH9+Ky33UE9h7E/wflpJSr1bLYAaDUTt58Q9LurhByCHXTpP+7i2zflV3wz38=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yz4KVPbvQqrrwpwaUr5iZl0tBTB7gNwVpShCEW+/s4xQlywYW7T
-	4PYGDRPFOi0IxPnxNxJLQ+mGVRMdkU74yL4PT38q3Q44kZ306Mj3E1UJPQ8u6CCt9kPxuaiv0JZ
-	Snxd0JdsWUsgb02N4JoKIjO5iJ28SHBEknlAP
-X-Gm-Gg: ASbGncuZ0tOKTX1BJ5Ac0ycDNVWYPFs/6Hxpmvqku5vt82NFIXkXplSvHtNLPclOWET
-	0AN8mRmiYU5ZBRKJaKO8FT27keen2X0VyjD/w7bKZqN6c8yw9L3Uftg0MNZXEj/7lzGpkbub9
-X-Google-Smtp-Source: AGHT+IFSsEet/4yJ/161O0Uvv6q3fbuknhI7ZPo2TFQ2ugoTZ1KvI6aQQGUzVl4jTas+kZyyjbO3zYDo95CL+8LTaLA=
-X-Received: by 2002:a17:906:7954:b0:ab7:ad9:7baf with SMTP id
- a640c23a62f3a-ab789a65709mr445745066b.4.1738940146034; Fri, 07 Feb 2025
- 06:55:46 -0800 (PST)
+	s=arc-20240116; t=1738940235; c=relaxed/simple;
+	bh=5Bld7wfIGwWOXEK781i9Fo+q0vuOhNDcDamVB3lM6sc=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=hhR74enzMvqgZiE57TjKZzJenxbIRv3MLyPJ3SqIf9u6Zn7VdIt5qegrmnTAe9AIs2YZ3GwGCS+DCxI1vjGA09MRfzAX4L/f5nwRZlwNCBpsl0pvHv/5ae8DVH6a1nuzSqEANsOjp+r9xX4ySD+pYFCjoBmcRKZIoBwMV5zHxI0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=T1S4h2aa; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 08996C4CED1;
+	Fri,  7 Feb 2025 14:57:12 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1738940234;
+	bh=5Bld7wfIGwWOXEK781i9Fo+q0vuOhNDcDamVB3lM6sc=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=T1S4h2aauLw15m8I6q0fNLRgJOsiz3Ap8ywkBHofNOjrO/OxbGODm9zNJThtVxsNV
+	 EDZk2pddxNormkAd4dMo5GrOIavzso19D0bwoE2VHb9pOtuWljERvgX576T/aLAgBt
+	 JOhb22kGVYsfpgnRyIJiUV1CBaUafu6d3HIyddY8TqDxU7OH4JwFZfeHVKbGUfOQYi
+	 AXOiDuqjkAfnYInmHSQPXE7/UFG+mGopO9pGsa8I9b9YevKMcQ1TpeU/Wjj1DregYr
+	 PDuEC6xtR3dSKQvBpmnYAbCnGfi+QDlmnNntQLQn2aAaTLw80JL4uvyOXTahWTGdXc
+	 6aNggYoZbeSwQ==
+Date: Fri, 7 Feb 2025 14:57:10 +0000
+From: Simon Horman <horms@kernel.org>
+To: Michal Swiatkowski <michal.swiatkowski@linux.intel.com>
+Cc: intel-wired-lan@lists.osuosl.org, netdev@vger.kernel.org,
+	marcin.szycik@linux.intel.com, jedrzej.jagielski@intel.com,
+	przemyslaw.kitszel@intel.com, piotr.kwapulinski@intel.com,
+	anthony.l.nguyen@intel.com, dawid.osuchowski@intel.com
+Subject: Re: [iwl-next v1 3/4] ixgbe: add Tx hang detection unhandled MDD
+Message-ID: <20250207145710.GX554665@kernel.org>
+References: <20250207104343.2791001-1-michal.swiatkowski@linux.intel.com>
+ <20250207104343.2791001-4-michal.swiatkowski@linux.intel.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250205163609.3208829-1-aleksander.lobakin@intel.com>
- <20250205163609.3208829-2-aleksander.lobakin@intel.com> <CANn89iJjCOThDqwsK4v2O8LfcwAB55YohNZ8T2sR40uM2ZoX5w@mail.gmail.com>
- <fe1b0def-89d1-4db3-bf98-7d6c61ff5361@intel.com> <CANn89iJr1R4BGK2Qd+OEgsE7kEPi7X8tgyxjHnYoU7VOU_wgfA@mail.gmail.com>
- <3decafb9-34fe-4fb7-9203-259b813f810c@intel.com>
-In-Reply-To: <3decafb9-34fe-4fb7-9203-259b813f810c@intel.com>
-From: Eric Dumazet <edumazet@google.com>
-Date: Fri, 7 Feb 2025 15:55:35 +0100
-X-Gm-Features: AWEUYZnJnHzdvKxve0MJIVdVjA-1GeUXFloJeOiMB6oD9CE892YP9IKOO_loV8U
-Message-ID: <CANn89iJNq2VC55c-DcA6YC-2EHYZoyov7EUXTHKF2fYy8-wW+w@mail.gmail.com>
-Subject: Re: [PATCH net-next v4 1/8] net: gro: decouple GRO from the NAPI layer
-To: Alexander Lobakin <aleksander.lobakin@intel.com>
-Cc: Kees Cook <kees@kernel.org>, Andrew Lunn <andrew+netdev@lunn.ch>, 
-	"David S. Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
-	Lorenzo Bianconi <lorenzo@kernel.org>, Daniel Xu <dxu@dxuuu.xyz>, Alexei Starovoitov <ast@kernel.org>, 
-	Daniel Borkmann <daniel@iogearbox.net>, Andrii Nakryiko <andrii@kernel.org>, 
-	John Fastabend <john.fastabend@gmail.com>, =?UTF-8?B?VG9rZSBIw7hpbGFuZC1Kw7hyZ2Vuc2Vu?= <toke@kernel.org>, 
-	Jesper Dangaard Brouer <hawk@kernel.org>, Martin KaFai Lau <martin.lau@linux.dev>, netdev@vger.kernel.org, 
-	bpf@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	=?UTF-8?B?VG9rZSBIw7hpbGFuZC1Kw7hyZ2Vuc2Vu?= <toke@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250207104343.2791001-4-michal.swiatkowski@linux.intel.com>
 
-On Fri, Feb 7, 2025 at 1:00=E2=80=AFPM Alexander Lobakin
-<aleksander.lobakin@intel.com> wrote:
->
-> From: Eric Dumazet <edumazet@google.com>
-> Date: Thu, 6 Feb 2025 19:35:50 +0100
->
-> > On Thu, Feb 6, 2025 at 1:15=E2=80=AFPM Alexander Lobakin
-> > <aleksander.lobakin@intel.com> wrote:
-> >>
-> >> From: Eric Dumazet <edumazet@google.com>
-> >> Date: Wed, 5 Feb 2025 18:48:50 +0100
-> >>
-> >>> On Wed, Feb 5, 2025 at 5:46=E2=80=AFPM Alexander Lobakin
-> >>> <aleksander.lobakin@intel.com> wrote:
-> >>>>
-> >>>> In fact, these two are not tied closely to each other. The only
-> >>>> requirements to GRO are to use it in the BH context and have some
-> >>>> sane limits on the packet batches, e.g. NAPI has a limit of its
-> >>>> budget (64/8/etc.).
-> >>>> Move purely GRO fields into a new tagged group, &gro_node. Embed it
-> >>>> into &napi_struct and adjust all the references. napi_id doesn't
-> >>>> really belong to GRO, but:
-> >>>>
-> >>>> 1. struct gro_node has a 4-byte padding at the end anyway. If you
-> >>>>    leave napi_id outside, struct napi_struct takes additional 8 byte=
-s
-> >>>>    (u32 napi_id + another 4-byte padding).
-> >>>> 2. gro_receive_skb() uses it to mark skbs. We don't want to split it
-> >>>>    into two functions or add an `if`, as this would be less efficien=
-t,
-> >>>>    but we need it to be NAPI-independent. The current approach doesn=
-'t
-> >>>>    change anything for NAPI-backed GROs; for standalone ones (which
-> >>>>    are less important currently), the embedded napi_id will be just
-> >>>>    zero =3D> no-op.
-> >>>>
-> >>>> Three Ethernet drivers use napi_gro_flush() not really meant to be
-> >>>> exported, so move it to <net/gro.h> and add that include there.
-> >>>> napi_gro_receive() is used in more than 100 drivers, keep it
-> >>>> in <linux/netdevice.h>.
-> >>>> This does not make GRO ready to use outside of the NAPI context
-> >>>> yet.
-> >>>>
-> >>>> Tested-by: Daniel Xu <dxu@dxuuu.xyz>
-> >>>> Acked-by: Jakub Kicinski <kuba@kernel.org>
-> >>>> Reviewed-by: Toke H=C3=B8iland-J=C3=B8rgensen <toke@redhat.com>
-> >>>> Signed-off-by: Alexander Lobakin <aleksander.lobakin@intel.com>
-> >>>> ---
-> >>>>  include/linux/netdevice.h                  | 26 +++++---
-> >>>>  include/net/busy_poll.h                    | 11 +++-
-> >>>>  include/net/gro.h                          | 35 +++++++----
-> >>>>  drivers/net/ethernet/brocade/bna/bnad.c    |  1 +
-> >>>>  drivers/net/ethernet/cortina/gemini.c      |  1 +
-> >>>>  drivers/net/wwan/t7xx/t7xx_hif_dpmaif_rx.c |  1 +
-> >>>>  net/core/dev.c                             | 60 ++++++++-----------
-> >>>>  net/core/gro.c                             | 69 +++++++++++--------=
----
-> >>>>  8 files changed, 112 insertions(+), 92 deletions(-)
-> >>>>
-> >>>> diff --git a/include/linux/netdevice.h b/include/linux/netdevice.h
-> >>>> index 2a59034a5fa2..d29b6ebde73f 100644
-> >>>> --- a/include/linux/netdevice.h
-> >>>> +++ b/include/linux/netdevice.h
-> >>>> @@ -340,8 +340,8 @@ struct gro_list {
-> >>>>  };
-> >>>>
-> >>>>  /*
-> >>>> - * size of gro hash buckets, must less than bit number of
-> >>>> - * napi_struct::gro_bitmask
-> >>>> + * size of gro hash buckets, must be <=3D the number of bits in
-> >>>> + * gro_node::bitmask
-> >>>>   */
-> >>>>  #define GRO_HASH_BUCKETS       8
-> >>>>
-> >>>> @@ -370,7 +370,6 @@ struct napi_struct {
-> >>>>         unsigned long           state;
-> >>>>         int                     weight;
-> >>>>         u32                     defer_hard_irqs_count;
-> >>>> -       unsigned long           gro_bitmask;
-> >>>>         int                     (*poll)(struct napi_struct *, int);
-> >>>>  #ifdef CONFIG_NETPOLL
-> >>>>         /* CPU actively polling if netpoll is configured */
-> >>>> @@ -379,11 +378,14 @@ struct napi_struct {
-> >>>>         /* CPU on which NAPI has been scheduled for processing */
-> >>>>         int                     list_owner;
-> >>>>         struct net_device       *dev;
-> >>>> -       struct gro_list         gro_hash[GRO_HASH_BUCKETS];
-> >>>>         struct sk_buff          *skb;
-> >>>> -       struct list_head        rx_list; /* Pending GRO_NORMAL skbs =
-*/
-> >>>> -       int                     rx_count; /* length of rx_list */
-> >>>> -       unsigned int            napi_id; /* protected by netdev_lock=
- */
-> >>>> +       struct_group_tagged(gro_node, gro,
-> >>>> +               unsigned long           bitmask;
-> >>>> +               struct gro_list         hash[GRO_HASH_BUCKETS];
-> >>>> +               struct list_head        rx_list; /* Pending GRO_NORM=
-AL skbs */
-> >>>> +               int                     rx_count; /* length of rx_li=
-st */
-> >>>> +               u32                     napi_id; /* protected by net=
-dev_lock */
-> >>>> +
-> >>>
-> >>> I am old school, I would prefer a proper/standalone old C construct.
-> >>>
-> >>> struct gro_node  {
-> >>>                 unsigned long           bitmask;
-> >>>                struct gro_list         hash[GRO_HASH_BUCKETS];
-> >>>                struct list_head        rx_list; /* Pending GRO_NORMAL=
- skbs */
-> >>>                int                     rx_count; /* length of rx_list=
- */
-> >>>                u32                     napi_id; /* protected by netde=
-v_lock */
-> >>> };
-> >>>
-> >>> Really, what struct_group_tagged() can possibly bring here, other tha=
-n
-> >>> obfuscation ?
-> >>
-> >> You'd need to adjust every ->napi_id access, which is a lot.
-> >> Plus, as I wrote previously, napi_id doesn't really belong here, but
-> >> embedding it here eases life.
-> >>
-> >> I'm often an old school, too, but sometimes this helps a lot.
-> >> Unless you have very strong preference on this.
-> >>
-> >
-> > Is struct_group_tagged even supported by ctags ?
-> >
-> > In terms of maintenance, I am sorry to say this looks bad to me.
-> >
-> > Even without ctags, I find git grep -n "struct xxxx {" quite good.
->
-> compile_commands.json (already supported natively by Kbuild) + clangd is
-> not enough?
->
-> Elixir correctly tags struct_group()s.
->
-> napi->napi_id is used in a lot of core files and drivers, adjusting all
-> the references is not what I wanted to do in the series which does
-> completely different things.
+On Fri, Feb 07, 2025 at 11:43:42AM +0100, Michal Swiatkowski wrote:
+> From: Slawomir Mrozowicz <slawomirx.mrozowicz@intel.com>
+> 
+> Add Tx Hang detection due to an unhandled MDD Event.
+> 
+> Previously, a malicious VF could disable the entire port causing
+> TX to hang on the E610 card.
+> Those events that caused PF to freeze were not detected
+> as an MDD event and usually required a Tx Hang watchdog timer
+> to catch the suspension, and perform a physical function reset.
+> 
+> Implement flows in the affected PF driver in such a way to check
+> the cause of the hang, detect it as an MDD event and log an
+> entry of the malicious VF that caused the Hang.
+> 
+> The PF blocks the malicious VF, if it continues to be the source
+> of several MDD events.
+> 
+> Reviewed-by: Przemek Kitszel <przemyslaw.kitszel@intel.com>
+> Reviewed-by: Marcin Szycik <marcin.szycik@linux.intel.com>
+> Signed-off-by: Slawomir Mrozowicz <slawomirx.mrozowicz@intel.com>
+> Co-developed-by: Michal Swiatkowski <michal.swiatkowski@linux.intel.com>
+> Signed-off-by: Michal Swiatkowski <michal.swiatkowski@linux.intel.com>
 
-Leave napi_id in struct napi, it has nothing to do with gro.
+...
 
->
-> Page Pool uses tagged struct groups, as well a ton of other different
-> files. Do you want to revert all this and adjust a couple thousand
-> references only due to ctags and grep?
->
-> (instead of just clicking on the references generated by clangd)
+> diff --git a/drivers/net/ethernet/intel/ixgbe/ixgbe_type.h b/drivers/net/ethernet/intel/ixgbe/ixgbe_type.h
+> index aa3b498558bc..e07b56625595 100644
+> --- a/drivers/net/ethernet/intel/ixgbe/ixgbe_type.h
+> +++ b/drivers/net/ethernet/intel/ixgbe/ixgbe_type.h
+> @@ -1044,6 +1044,7 @@ struct ixgbe_nvm_version {
+>  #define IXGBE_GCR_EXT_VT_MODE_16        0x00000001
+>  #define IXGBE_GCR_EXT_VT_MODE_32        0x00000002
+>  #define IXGBE_GCR_EXT_VT_MODE_64        0x00000003
+> +#define IXGBE_GCR_EXT_VT_MODE_MASK	0x00000003
 
-I obviously can not catch all netdev traffic.
+nit: For consistency I think spaces should be used to indent 0x00000003
+
+>  #define IXGBE_GCR_EXT_SRIOV             (IXGBE_GCR_EXT_MSIX_EN | \
+>  					 IXGBE_GCR_EXT_VT_MODE_64)
+>  
+
+...
+
+> diff --git a/drivers/net/ethernet/intel/ixgbe/ixgbe_main.c b/drivers/net/ethernet/intel/ixgbe/ixgbe_main.c
+
+...
+
+> +static u32 ixgbe_poll_tx_icache(struct ixgbe_hw *hw, u16 queue, u16 idx)
+> +{
+> +	IXGBE_WRITE_REG(hw, IXGBE_TXDESCIC, queue * idx);
+> +	return IXGBE_READ_REG(hw, IXGBE_TXDESCIC);
+> +}
+> +
+> +/**
+> + * ixgbe_check_illegal_queue - search for queue with illegal packet
+> + * @adapter: structure containing ring specific data
+> + * @queue: queue index
+> + *
+> + * Check if tx descriptor connected with input queue
+> + * contains illegal packet.
+> + *
+> + * Returns: true if queue contain illegal packet.
+> + */
+> +static bool ixgbe_check_illegal_queue(struct ixgbe_adapter *adapter,
+> +				      u16 queue)
+> +{
+> +	u32 hdr_len_reg, mss_len_reg, type_reg;
+> +	struct ixgbe_hw *hw = &adapter->hw;
+> +	u32 mss_len, header_len, reg;
+> +
+> +	for (u16 i = 0; i < IXGBE_MAX_TX_DESCRIPTORS; i++) {
+> +		/* HW will clear bit IXGBE_TXDESCIC_READY when address
+> +		 * is written to address field. HW will set this bit
+> +		 * when iCache read is done, and data is ready at TIC_DWx.
+> +		 * Set descriptor address.
+> +		 */
+> +		read_poll_timeout(ixgbe_poll_tx_icache, reg,
+> +				  !(reg & IXGBE_TXDESCIC_READY), 0, 0, false,
+> +				  hw, queue, i);
+> +
+> +		/* read tx descriptor access registers */
+> +		hdr_len_reg = IXGBE_READ_REG(hw, IXGBE_TIC_DW2(IXGBE_VLAN_MACIP_LENS_REG));
+> +		type_reg = IXGBE_READ_REG(hw, IXGBE_TIC_DW2(IXGBE_TYPE_TUCMD_MLHL));
+> +		mss_len_reg = IXGBE_READ_REG(hw, IXGBE_TIC_DW2(IXGBE_MSS_L4LEN_IDX));
+> +
+> +		/* check if Advanced Context Descriptor */
+> +		if (FIELD_GET(IXGBE_ADVTXD_DTYP_MASK, type_reg) !=
+> +		    IXGBE_ADVTXD_DTYP_CTXT)
+> +			continue;
+> +
+> +		/* check for illegal MSS and Header length */
+> +		mss_len = FIELD_GET(IXGBE_ADVTXD_MSS_MASK, mss_len_reg);
+> +		header_len = FIELD_GET(IXGBE_ADVTXD_HEADER_LEN_MASK,
+> +				       hdr_len_reg);
+> +		if ((mss_len + header_len) > SZ_16K) {
+> +			e_warn(probe,
+> +			       "mss len + header len too long\n");
+
+nit: The above two lines can be a single line.
+
+> +			return true;
+> +		}
+> +	}
+> +
+> +	return false;
+> +}
+> +
+> +/**
+> + * ixgbe_handle_mdd_event - handle mdd event
+> + * @adapter: structure containing ring specific data
+> + * @tx_ring: tx descriptor ring to handle
+> + *
+> + * Reset VF driver if malicious vf detected or
+> + * illegal packet in an any queue detected.
+> + */
+> +static void ixgbe_handle_mdd_event(struct ixgbe_adapter *adapter,
+> +				   struct ixgbe_ring *tx_ring)
+> +{
+> +	u16 vf, q;
+> +
+> +	if (adapter->vfinfo && ixgbe_check_mdd_event(adapter)) {
+> +		/* vf mdd info and malicious vf detected */
+> +		if (!ixgbe_get_vf_idx(adapter, tx_ring->queue_index, &vf))
+> +			ixgbe_vf_handle_tx_hang(adapter, vf);
+> +	} else {
+> +		/* malicious vf not detected */
+> +		for (q = 0; q < IXGBE_MAX_TX_QUEUES; q++) {
+> +			if (ixgbe_check_illegal_queue(adapter, q) &&
+> +			    !ixgbe_get_vf_idx(adapter, q, &vf))
+> +				/* illegal queue detected */
+> +				ixgbe_vf_handle_tx_hang(adapter, vf);
+
+It looks like ixgbe_vf_handle_tx_hang() will run for each illegal queue.
+Could that be more than once for a given vf? If so, is that desirable?
+
+> +		}
+> +	}
+> +}
+> +
+>  /**
+>   * ixgbe_clean_tx_irq - Reclaim resources after transmit completes
+>   * @q_vector: structure containing interrupt and ring information
+
+...
 
