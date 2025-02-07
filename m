@@ -1,173 +1,164 @@
-Return-Path: <netdev+bounces-164039-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-164040-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 094A6A2C675
-	for <lists+netdev@lfdr.de>; Fri,  7 Feb 2025 16:04:03 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 13B7AA2C687
+	for <lists+netdev@lfdr.de>; Fri,  7 Feb 2025 16:07:57 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 788183A50DA
-	for <lists+netdev@lfdr.de>; Fri,  7 Feb 2025 15:03:53 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 3393B3A3060
+	for <lists+netdev@lfdr.de>; Fri,  7 Feb 2025 15:07:48 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A03461EB19C;
-	Fri,  7 Feb 2025 15:03:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 79BA3238D5F;
+	Fri,  7 Feb 2025 15:07:53 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Ccn3nv3r"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="bMr9DsMj"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ej1-f48.google.com (mail-ej1-f48.google.com [209.85.218.48])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CAB41CA6B;
-	Fri,  7 Feb 2025 15:03:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.48
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5493C238D52
+	for <netdev@vger.kernel.org>; Fri,  7 Feb 2025 15:07:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1738940630; cv=none; b=sFl1RboYeYpMlGW7BpccFjKOOFtSN+QrbCsG2oZnuQzT9V7Mc2X1m4OPxGZ4M2xDzUHSFm20qtifK5n+kv7RknXBSboU4IkylyU3ndbOTvScfP1Dua7s4KwgH5YCeWBFVEvioHBNRs5IYRNi+1T8kGhUjA+Aanf5iK538UBElzc=
+	t=1738940873; cv=none; b=Uun8j+1pA7l7iGS7L7L9Y1vuuLqwp2QtOqTIlCuTUVuk/1mceRv8lYemhJ8otxoe5Sgln1IG/NbvVNGgT6ninHY2Jbe9AC7vyzFy70WvwEHDaS3ok7k/TsWWOh4sbOCIgtgEq1d90OaAyOhxnNZc55hpw+xtBk8lQcERFF2HshA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1738940630; c=relaxed/simple;
-	bh=Dv/Su0DUCWL65dbGc50TWvwNdQUcJSM82wl4CKW8Ybo=;
+	s=arc-20240116; t=1738940873; c=relaxed/simple;
+	bh=v1KzgMiQjDb+Z8BzvytQeodhaZrSQcciaDlfQvx2zvA=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=ena1/X332b3f28n+35Q669+8MYr9D/EqVb0F2tQRxGY9QzNzxo3BaUv5t06s5A86esVReq9JPIQKdYvI3T477eSEgZAmIty2xQIn95N7M3UD3xdIxbOMYEwiTdY5LUP8BH4PdY9n6bJXIumZyNU1n1CPxGRXD8R/n47BxosMnWo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Ccn3nv3r; arc=none smtp.client-ip=209.85.218.48
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ej1-f48.google.com with SMTP id a640c23a62f3a-ab7908ecb31so9819466b.1;
-        Fri, 07 Feb 2025 07:03:48 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1738940627; x=1739545427; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=oe749KfJTlBXfu5CFXqHM08pOCrnuopnGGzvAlfhP8M=;
-        b=Ccn3nv3rAcWR47XaI+p0pinCGXZ98RMKlgZMQ1TmV9qcS6N82S3Wvzh9WfwVLy43yd
-         7i85RQk0PEtFIxhxfPOs7WP6HwLlmQSPFAS3StUnSdAYA59QiekVA0sEZz9KjsYarKWz
-         zviStzLO6Dtao64yrbu9eASmD5RNFTUT1R7juzAu1y83b7u8eo14clFBFhfD7R9WDPSt
-         BK6qT3sd9HbT9CtRyPbXEeREOI7rdj4Np3ekD1Ou+SjURsOXjotHXfRjE4jKzBmjC1Ci
-         K9PR/ppq0awLPVZ+xG+WatDcpH/QDp8WjLKWs7Vo1CgP0hdRAC1UB06baN7TiV03aSKC
-         wdGg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1738940627; x=1739545427;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=oe749KfJTlBXfu5CFXqHM08pOCrnuopnGGzvAlfhP8M=;
-        b=hXAH2hGQK0kpUp0NlQF0VKvjJIVGZ/lwRuWt5eeO5QW+8J1NS5aKpx7PJeMk+QJIvb
-         vD6FUdZ9axbFgmvyXznfcPI/9WxzlhTL+UznKoqKObKR/pV+bc4m/UX/RqZ0gbmvzf8H
-         hTwmQKXN+dy0wPnL16ewgHByG8/1DWLjt3rsdiJ9l9Q7IUwwbshHxXwMNjDUE/VuJZ5i
-         FenLqpouI3lKIgIDLJ/0F5MvLTCbJKN0yM9i5Y2tMp8i7WckmjtqlNz02y0eeZAXu5kz
-         gYSJX8/F90Dm8sfsKA2zb2Kjgm3zBmNx/ulX+fBIu+d26SN73m9/LRNgdtYtTLmUfq0Z
-         kpjA==
-X-Forwarded-Encrypted: i=1; AJvYcCU8Iw+4y/lXg3KpVAcuS80TjRo9V1Q9n28Nmsj0eQwZanCSdcyl4Fs5+96BX0JE7Tr+Ej6TruquEd6HnWg=@vger.kernel.org, AJvYcCUW97b28TpU0/WPbH6H8NT7XEAo23T5bSl5UTuxOU7CjAPU7KAUt46SbitePWozbsyizidTMmacGOw0wPfiyTgw@vger.kernel.org, AJvYcCXwREiUfDarKYilRsQBuxNjVSgfoQTzquBLuxhki6W1a8OTTaHZJiKukSiN/OQOo087FxyXdrop@vger.kernel.org
-X-Gm-Message-State: AOJu0Yy5M6kKP7p/ctDr0Dx+nXHcgFCiBh7Gnvs8v5dV87n/6ta7J8bP
-	1Uh68aKdufJykRkvR1GmRYRVelUcGS6tYfaGofwUiT2d9OQFdb8L
-X-Gm-Gg: ASbGncuWVOewCyNTdsMHf3HC1qqmGP5MG7R56gpJeDZF3GLKx2O9ZHoty9HwJOvMYxk
-	Fa7DYwy7oPRaliFTldwe74+odZaQ3LAfwqsJJQAtR8ZjaNuq0U10sI4tFcLL0G495FIceJPz+uA
-	BEEpUghJ6LbCFvrSoUB95SJwX0/WsdXa8HuCHw9nAirAuqxJdFLtP3VpuFB/8gP5adJV6Q4H0OI
-	ztTin2EoktatGJNU+7o84SJNFU+RRR1XxPqMOl4lgv2nNxWPXq0ZYMaWd2TaD5MI1Pgbf1HSfFe
-	y+Q=
-X-Google-Smtp-Source: AGHT+IHsKZDrEgjFzsjOHb6AegH/WyuF+q13HWJO6Xd2xBaxIXrpB2eiffrWM2ZlqpgeNqo0xDb4cA==
-X-Received: by 2002:a17:907:360d:b0:ab6:ed8a:1593 with SMTP id a640c23a62f3a-ab789b6045amr110408366b.7.1738940625225;
-        Fri, 07 Feb 2025 07:03:45 -0800 (PST)
-Received: from skbuf ([86.127.124.81])
-        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-ab7732e6192sm278238266b.121.2025.02.07.07.03.42
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 07 Feb 2025 07:03:44 -0800 (PST)
-Date: Fri, 7 Feb 2025 17:03:40 +0200
-From: Vladimir Oltean <olteanv@gmail.com>
-To: Eric Woudstra <ericwouds@gmail.com>
-Cc: Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Simon Horman <horms@kernel.org>,
-	Pablo Neira Ayuso <pablo@netfilter.org>,
-	Jozsef Kadlecsik <kadlec@netfilter.org>,
-	Jiri Pirko <jiri@resnulli.us>, Ivan Vecera <ivecera@redhat.com>,
-	Roopa Prabhu <roopa@nvidia.com>,
-	Nikolay Aleksandrov <razor@blackwall.org>,
-	Matthias Brugger <matthias.bgg@gmail.com>,
-	AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>,
-	Kuniyuki Iwashima <kuniyu@amazon.com>,
-	Sebastian Andrzej Siewior <bigeasy@linutronix.de>,
-	Lorenzo Bianconi <lorenzo@kernel.org>,
-	Joe Damato <jdamato@fastly.com>,
-	Alexander Lobakin <aleksander.lobakin@intel.com>,
-	Frank Wunderlich <frank-w@public-files.de>,
-	Daniel Golle <daniel@makrotopia.org>, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org, netfilter-devel@vger.kernel.org,
-	coreteam@netfilter.org, bridge@lists.linux.dev,
-	linux-arm-kernel@lists.infradead.org,
-	linux-mediatek@lists.infradead.org
-Subject: Re: [PATCH v5 net-next 12/14] bridge: No DEV_PATH_BR_VLAN_UNTAG_HW
- for dsa foreign
-Message-ID: <20250207150340.sxhsva7qz7bb7qjd@skbuf>
-References: <20250204194921.46692-1-ericwouds@gmail.com>
- <20250204194921.46692-13-ericwouds@gmail.com>
+	 Content-Type:Content-Disposition:In-Reply-To; b=L90K2Ng9jJ7JoXtnougD/w9tiS3z8XYkJLyXcHC7L69ZcjNXuXjGoTxzHeKWYhWd/7Wn1B+quOSCXr+qxUz+wfMtiMIROo1pXK+SMiLdR1PgaUwwJA5LUQd5UKJOoaP5tWMxguE85B0In9LG2yqIpHCBqKg2fvKaiqCy6cnuzO0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=bMr9DsMj; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6217DC4CED1;
+	Fri,  7 Feb 2025 15:07:51 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1738940873;
+	bh=v1KzgMiQjDb+Z8BzvytQeodhaZrSQcciaDlfQvx2zvA=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=bMr9DsMjg1owhYUANvbZ3XPgHwGiUrhfLMUGmwLYkH9Jpg/K9CZXsaSbUbNIDsldJ
+	 iA6Z3r+0WKlsJlp0pdL1MO1Gsfrur8CFSzhcflqBZv6D81Jsm4sF7eeb94/JFBgqcx
+	 +RHOQQKKzKPIaP6J2oAt9ubzOK+RkYTgExrlLFIJPOL08vmkQoJXPB4ZRSEBBkZCx/
+	 H76BQvVbjoqVT0F8mFpF8RHDL5WPRmKdzuDNEyM8YL/nZiV6eLaDhXrNZCORLYjZCU
+	 haePR8+Ed8JRh17v11OV8IpGXM0S9CZELJGeImkZHjnaOBZWF7+RJV+zsLd/pOTCXv
+	 ITBSb0iV80AGA==
+Date: Fri, 7 Feb 2025 15:07:49 +0000
+From: Simon Horman <horms@kernel.org>
+To: Michal Swiatkowski <michal.swiatkowski@linux.intel.com>
+Cc: intel-wired-lan@lists.osuosl.org, netdev@vger.kernel.org,
+	marcin.szycik@linux.intel.com, jedrzej.jagielski@intel.com,
+	przemyslaw.kitszel@intel.com, piotr.kwapulinski@intel.com,
+	anthony.l.nguyen@intel.com, dawid.osuchowski@intel.com
+Subject: Re: [iwl-next v1 1/4] ixgbe: add MDD support
+Message-ID: <20250207150749.GY554665@kernel.org>
+References: <20250207104343.2791001-1-michal.swiatkowski@linux.intel.com>
+ <20250207104343.2791001-2-michal.swiatkowski@linux.intel.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <20250204194921.46692-13-ericwouds@gmail.com>
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <20250207104343.2791001-2-michal.swiatkowski@linux.intel.com>
 
-On Tue, Feb 04, 2025 at 08:49:19PM +0100, Eric Woudstra wrote:
-> In network setup as below:
+On Fri, Feb 07, 2025 at 11:43:40AM +0100, Michal Swiatkowski wrote:
+> From: Paul Greenwalt <paul.greenwalt@intel.com>
 > 
->              fastpath bypass
->  .----------------------------------------.
-> /                                          \
-> |                        IP - forwarding    |
-> |                       /                \  v
-> |                      /                  wan ...
-> |                     /
-> |                     |
-> |                     |
-> |                   brlan.1
-> |                     |
-> |    +-------------------------------+
-> |    |           vlan 1              |
-> |    |                               |
-> |    |     brlan (vlan-filtering)    |
-> |    |               +---------------+
-> |    |               |  DSA-SWITCH   |
-> |    |    vlan 1     |               |
-> |    |      to       |               |
-> |    |   untagged    1     vlan 1    |
-> |    +---------------+---------------+
-> .         /                   \
->  ----->wlan1                 lan0
->        .                       .
->        .                       ^
->        ^                     vlan 1 tagged packets
->      untagged packets
+> Add malicious driver detection. Support enabling MDD, disabling MDD,
+> handling a MDD event, and restoring a MDD VF.
 > 
-> br_vlan_fill_forward_path_mode() sets DEV_PATH_BR_VLAN_UNTAG_HW when
-> filling in from brlan.1 towards wlan1. But it should be set to
-> DEV_PATH_BR_VLAN_UNTAG in this case. Using BR_VLFLAG_ADDED_BY_SWITCHDEV
-> is not correct. The dsa switchdev adds it as a foreign port.
-> 
-> The same problem for all foreignly added dsa vlans on the bridge.
-> 
-> First add the vlan, trying only native devices.
-> If this fails, we know this may be a vlan from a foreign device.
-> 
-> Use BR_VLFLAG_TAGGING_BY_SWITCHDEV to make sure DEV_PATH_BR_VLAN_UNTAG_HW
-> is set only when there if no foreign device involved.
-> 
-> Signed-off-by: Eric Woudstra <ericwouds@gmail.com>
-> ---
+> Reviewed-by: Przemek Kitszel <przemyslaw.kitszel@intel.com>
+> Reviewed-by: Jedrzej Jagielski <jedrzej.jagielski@intel.com>
+> Reviewed-by: Marcin Szycik <marcin.szycik@linux.intel.com>
+> Signed-off-by: Paul Greenwalt <paul.greenwalt@intel.com>
+> Signed-off-by: Michal Swiatkowski <michal.swiatkowski@linux.intel.com>
 
-Shouldn't mlxsw_sp_switchdev_vxlan_vlans_add() also respect the
-SWITCHDEV_F_NO_FOREIGN flag? My (maybe incorrect) understanding of
-bridging topologies with vxlan and mlxsw is that they are neighbor
-bridge ports, and mlxsw doesn't (seem to) call
-switchdev_bridge_port_offload() for the vxlan bridge port. This
-technically makes vxlan a foreign bridge port to mlxsw, so it should
-skip reacting on VLAN switchdev objects when that flag is set, just
-for uniform behavior across the board.
+...
 
-(your patch repeats the notifier without the SWITCHDEV_F_NO_FOREIGN
-flag anyway, so it only matters for flowtable offload).
+> diff --git a/drivers/net/ethernet/intel/ixgbe/ixgbe_x550.c b/drivers/net/ethernet/intel/ixgbe/ixgbe_x550.c
+
+...
+
+> +/**
+> + * ixgbe_handle_mdd_x550 - handle malicious driver detection event
+> + * @hw: pointer to hardware structure
+> + * @vf_bitmap: output vf bitmap of malicious vfs
+> + */
+> +void ixgbe_handle_mdd_x550(struct ixgbe_hw *hw, unsigned long *vf_bitmap)
+> +{
+> +	u32 i, j, reg, q, div, vf, wqbr;
+> +
+> +	/* figure out pool size for mapping to vf's */
+> +	reg = IXGBE_READ_REG(hw, IXGBE_MRQC);
+> +	switch (reg & IXGBE_MRQC_MRQE_MASK) {
+> +	case IXGBE_MRQC_VMDQRT8TCEN:
+> +		div = IXGBE_16VFS_QUEUES;
+> +		break;
+> +	case IXGBE_MRQC_VMDQRSS32EN:
+> +	case IXGBE_MRQC_VMDQRT4TCEN:
+> +		div = IXGBE_32VFS_QUEUES;
+> +		break;
+> +	default:
+> +		div = IXGBE_64VFS_QUEUES;
+> +		break;
+> +	}
+> +
+> +	/* Read WQBR_TX and WQBR_RX and check for malicious queues */
+> +	for (i = 0; i < IXGBE_QUEUES_REG_AMOUNT; i++) {
+> +		wqbr = IXGBE_READ_REG(hw, IXGBE_WQBR_TX(i)) |
+> +		       IXGBE_READ_REG(hw, IXGBE_WQBR_RX(i));
+> +		if (!wqbr)
+> +			continue;
+> +
+> +		/* Get malicious queue */
+> +		for_each_set_bit(j, (unsigned long *)&wqbr,
+> +				 IXGBE_QUEUES_PER_REG) {
+
+The type of wqbr is a u32, that is it is 32-bits wide.
+Above it's address is cast to unsigned long *.
+But, unsigned long may be 64-bits wide, e.g. on x86_64.
+
+GCC 14.2.0 EXTRA_CFLAGS=-Warray-bounds builds report this as:
+
+In file included from ./include/linux/bitmap.h:11,
+                 from ./include/linux/cpumask.h:12,
+                 from ./arch/x86/include/asm/paravirt.h:21,
+                 from ./arch/x86/include/asm/cpuid.h:71,
+                 from ./arch/x86/include/asm/processor.h:19,
+                 from ./arch/x86/include/asm/cpufeature.h:5,
+                 from ./arch/x86/include/asm/thread_info.h:59,
+                 from ./include/linux/thread_info.h:60,
+                 from ./include/linux/uio.h:9,
+                 from ./include/linux/socket.h:8,
+                 from ./include/uapi/linux/if.h:25,
+                 from ./include/linux/mii.h:12,
+                 from ./include/uapi/linux/mdio.h:15,
+                 from ./include/linux/mdio.h:9,
+                 from drivers/net/ethernet/intel/ixgbe/ixgbe_type.h:8,
+                 from drivers/net/ethernet/intel/ixgbe/ixgbe_x540.h:7,
+                 from drivers/net/ethernet/intel/ixgbe/ixgbe_x550.c:4:
+In function ‘find_next_bit’,
+    inlined from ‘ixgbe_handle_mdd_x550’ at drivers/net/ethernet/intel/ixgbe/ixgbe_x550.c:3907:3:
+./include/linux/find.h:65:23: error: array subscript ‘long unsigned int[0]’ is partly outside array bounds of ‘u32[1]’ {aka ‘unsigned int[1]’} [-Werror=array-bounds=]
+   65 |                 val = *addr & GENMASK(size - 1, offset);
+      |                       ^~~~~
+
+I think this can be addressed by changing the type of wqmbr to unsigned long.
+
+> +			/* Get queue from bitmask */
+> +			q = j + (i * IXGBE_QUEUES_PER_REG);
+> +			/* Map queue to vf */
+> +			vf = q / div;
+> +			set_bit(vf, vf_bitmap);
+> +		}
+> +	}
+> +}
+> +
+>  #define X550_COMMON_MAC \
+>  	.init_hw			= &ixgbe_init_hw_generic, \
+>  	.start_hw			= &ixgbe_start_hw_X540, \
+
+...
 
