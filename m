@@ -1,50 +1,50 @@
-Return-Path: <netdev+bounces-164083-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-164084-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7D644A2C8CE
-	for <lists+netdev@lfdr.de>; Fri,  7 Feb 2025 17:28:57 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id C7928A2C8D1
+	for <lists+netdev@lfdr.de>; Fri,  7 Feb 2025 17:29:06 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 820AA7A4E38
-	for <lists+netdev@lfdr.de>; Fri,  7 Feb 2025 16:27:20 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 97BDE7A4372
+	for <lists+netdev@lfdr.de>; Fri,  7 Feb 2025 16:27:26 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 11BEB192D7C;
-	Fri,  7 Feb 2025 16:27:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5E97218BB9C;
+	Fri,  7 Feb 2025 16:27:13 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="CLY+/YPu"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="nGxGZ6U7"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DECA418EFED;
-	Fri,  7 Feb 2025 16:27:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3574618C011;
+	Fri,  7 Feb 2025 16:27:13 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1738945631; cv=none; b=oCSTBbNjQgP0T6Q4ReD+eir4nyN6b5+n72Wo2W9dFfXgk3O8cBw4TB/8IZcpxNiDiA+VnObnpPbjNTD1cFGG/u0taUU1VTKaZSIeLcfeYp1LkyihFvvHrq3WZbU2fXGIdpSP14Tfu6TOixckKnpgBjjbZCm/kSFrLQonQTaqxWo=
+	t=1738945633; cv=none; b=G0Wv/UNGwkUWnO7WulaRCj9DL5RyZ6+/eHt7CHr7R+NpluT0S+J49QJcFq4++EHLh++zZ3kSKI0ijtFJvZmlBj0trkErhzp3z5gQIJ6ryi/4Hq3ZiD3gOes8lQjglzsSwxB2L7ovhvbKatvXQTOAecxM1vH4vRJYcY9WZ3/XIbU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1738945631; c=relaxed/simple;
-	bh=4Qk8X7qpIVCbN/KBSqhoxxEZY1Ovomp+1fX44eKyUmk=;
+	s=arc-20240116; t=1738945633; c=relaxed/simple;
+	bh=9MLgp6BnjDhauGe+vw7L5oPe/nVs55P5xZ18grfkNcA=;
 	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=G22iON+aQ9C09bvCBdrGN8JC+LLF1YdZWJ1BGtmHLY1mfHdGpXlIE0t4oj1Rfb+QQ9TRBdgLTJwJLV79fioxTaA9xiuayTu4dgKW6HQtHOvtrUFNZVMr8+I13b8t7TDC8TfVqtCjZIHZTTs/N6sh+Hv/NMWNqJFyn/bTAYWxh+o=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=CLY+/YPu; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 15FAAC4CED1;
-	Fri,  7 Feb 2025 16:27:09 +0000 (UTC)
+	 In-Reply-To:To:Cc; b=OzolVpjDzxORB9I8iwQsOSutpuPhStRvrnq8Jn69dWaq5HHHL5F2W8GRLqC1At7fXlafHZD3bwkG6zY0nN3e6Xadu/HSjJcMwIlJxGzWc9Tb2kYkS7TExCB/4bhBb3QvPCelJSVSs/qJ1TfNsES51Hx3mGBuCRqw1WWE+J3gDs4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=nGxGZ6U7; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8FF57C4CEDF;
+	Fri,  7 Feb 2025 16:27:12 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1738945630;
-	bh=4Qk8X7qpIVCbN/KBSqhoxxEZY1Ovomp+1fX44eKyUmk=;
+	s=k20201202; t=1738945633;
+	bh=9MLgp6BnjDhauGe+vw7L5oPe/nVs55P5xZ18grfkNcA=;
 	h=From:Date:Subject:References:In-Reply-To:To:Cc:From;
-	b=CLY+/YPu+e8E6LOxIrIQWdtzysanVhH+MsFYa2mt5qgUjr/bv0qNGwnvOYOEeGd7p
-	 ywKSjVPna8eW2qPI6TL6OwP3vX1x5TKvLZzcOvKPhzyWGwCSsKP4p9XOCSvaD4YfZR
-	 Mry1PFhNHKxYOyyew3OUcOVEG82qP6j6rLg14nnvus8ExPWr77pBwCBx4Uhq3r/k7Q
-	 zFCJKf06N4FPcspWM9LeOEJoeiF/YXXMT1l20hb2w0KrT/vRuI3gyDvc3woMMcsSN7
-	 +KLqYSTVbUF94nMB5Ln7/vFALMxCe79StoauFXqRTQ+y/Ww2fFO3EWWREvTKlgKI2J
-	 aoTTpTcEZjb2w==
+	b=nGxGZ6U7cmQ8L+ico6eJK3xtFJysdSt0fWemEtoGiBSGGiAI0Dn58+G3m6oUUAFXL
+	 HgsRhSq66uhf3W5CZVS2QuAtvywV5enkj8kfJ2UuiKVejF3VM/W3G+mH7ATblU5BMX
+	 NdAeepwKZikuclVgCYo7fGhP+oXoR92kK8JDaiESqS8xHxCgWf5k6faprndV61ZuQi
+	 w8nMRL+Vb/5/sbdouXq0jiIfyyS0Ipl+2ai2HllhsAzu6+VbHgIN1EaR2rFfC3cdOm
+	 8UZUnupJ8Mtqs8RBnX8jL0eLuegdblVuZ+qUyzgBrcCHYdHVssDoGq28y1fjx8Ko/Q
+	 nYjRCpQklL5Uw==
 From: Lorenzo Bianconi <lorenzo@kernel.org>
-Date: Fri, 07 Feb 2025 17:26:24 +0100
-Subject: [PATCH net-next v2 09/15] net: airoha: Rename
- airoha_set_gdm_port_fwd_cfg() in airoha_set_vip_for_gdm_port()
+Date: Fri, 07 Feb 2025 17:26:25 +0100
+Subject: [PATCH net-next v2 10/15] dt-bindings: arm: airoha: Add the NPU
+ node for EN7581 SoC
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -53,7 +53,7 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-Message-Id: <20250207-airoha-en7581-flowtable-offload-v2-9-3a2239692a67@kernel.org>
+Message-Id: <20250207-airoha-en7581-flowtable-offload-v2-10-3a2239692a67@kernel.org>
 References: <20250207-airoha-en7581-flowtable-offload-v2-0-3a2239692a67@kernel.org>
 In-Reply-To: <20250207-airoha-en7581-flowtable-offload-v2-0-3a2239692a67@kernel.org>
 To: Andrew Lunn <andrew+netdev@lunn.ch>, 
@@ -73,123 +73,93 @@ Cc: netdev@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
  upstream@airoha.com
 X-Mailer: b4 0.14.2
 
-Rename airoha_set_gdm_port() in airoha_set_vip_for_gdm_port().
-Get rid of airoha_set_gdm_ports routine.
+This patch adds the NPU document binding for EN7581 SoC.
+The Airoha Network Processor Unit (NPU) provides a configuration interface
+to implement wired and wireless hardware flow offloading programming Packet
+Processor Engine (PPE) flow table.
 
 Signed-off-by: Lorenzo Bianconi <lorenzo@kernel.org>
 ---
- drivers/net/ethernet/airoha/airoha_eth.c | 49 +++++++-------------------------
- drivers/net/ethernet/airoha/airoha_eth.h |  8 ------
- 2 files changed, 11 insertions(+), 46 deletions(-)
+ .../devicetree/bindings/arm/airoha,en7581-npu.yaml | 71 ++++++++++++++++++++++
+ 1 file changed, 71 insertions(+)
 
-diff --git a/drivers/net/ethernet/airoha/airoha_eth.c b/drivers/net/ethernet/airoha/airoha_eth.c
-index db75a9b1d5766bfaaa92312d625c395e19c88368..52be276039eff7772b3c604cf7db5d456ec155ab 100644
---- a/drivers/net/ethernet/airoha/airoha_eth.c
-+++ b/drivers/net/ethernet/airoha/airoha_eth.c
-@@ -105,25 +105,23 @@ static void airoha_set_gdm_port_fwd_cfg(struct airoha_eth *eth, u32 addr,
- 		      FIELD_PREP(GDM_UCFQ_MASK, val));
- }
- 
--static int airoha_set_gdm_port(struct airoha_eth *eth, int port, bool enable)
-+static int airoha_set_vip_for_gdm_port(struct airoha_gdm_port *port,
-+				       bool enable)
- {
-+	struct airoha_eth *eth = port->qdma->eth;
- 	u32 vip_port;
- 
--	switch (port) {
--	case XSI_PCIE0_PORT:
-+	switch (port->id) {
-+	case 3:
-+		/* FIXME: handle XSI_PCIE1_PORT */
- 		vip_port = XSI_PCIE0_VIP_PORT_MASK;
- 		break;
--	case XSI_PCIE1_PORT:
--		vip_port = XSI_PCIE1_VIP_PORT_MASK;
--		break;
--	case XSI_USB_PORT:
--		vip_port = XSI_USB_VIP_PORT_MASK;
--		break;
--	case XSI_ETH_PORT:
-+	case 4:
-+		/* FIXME: handle XSI_USB_PORT */
- 		vip_port = XSI_ETH_VIP_PORT_MASK;
- 		break;
- 	default:
--		return -EINVAL;
-+		return 0;
- 	}
- 
- 	if (enable) {
-@@ -137,31 +135,6 @@ static int airoha_set_gdm_port(struct airoha_eth *eth, int port, bool enable)
- 	return 0;
- }
- 
--static int airoha_set_gdm_ports(struct airoha_eth *eth, bool enable)
--{
--	const int port_list[] = {
--		XSI_PCIE0_PORT,
--		XSI_PCIE1_PORT,
--		XSI_USB_PORT,
--		XSI_ETH_PORT
--	};
--	int i, err;
--
--	for (i = 0; i < ARRAY_SIZE(port_list); i++) {
--		err = airoha_set_gdm_port(eth, port_list[i], enable);
--		if (err)
--			goto error;
--	}
--
--	return 0;
--
--error:
--	for (i--; i >= 0; i--)
--		airoha_set_gdm_port(eth, port_list[i], false);
--
--	return err;
--}
--
- static void airoha_fe_maccr_init(struct airoha_eth *eth)
- {
- 	int p;
-@@ -1539,7 +1512,7 @@ static int airoha_dev_open(struct net_device *dev)
- 	int err;
- 
- 	netif_tx_start_all_queues(dev);
--	err = airoha_set_gdm_ports(qdma->eth, true);
-+	err = airoha_set_vip_for_gdm_port(port, true);
- 	if (err)
- 		return err;
- 
-@@ -1565,7 +1538,7 @@ static int airoha_dev_stop(struct net_device *dev)
- 	int i, err;
- 
- 	netif_tx_disable(dev);
--	err = airoha_set_gdm_ports(qdma->eth, false);
-+	err = airoha_set_vip_for_gdm_port(port, false);
- 	if (err)
- 		return err;
- 
-diff --git a/drivers/net/ethernet/airoha/airoha_eth.h b/drivers/net/ethernet/airoha/airoha_eth.h
-index 74bdfd9e8d2fb3706f5ec6a4e17fe07fbcb38c3d..44834227a58982d4491f3d8174b9e0bea542f785 100644
---- a/drivers/net/ethernet/airoha/airoha_eth.h
-+++ b/drivers/net/ethernet/airoha/airoha_eth.h
-@@ -57,14 +57,6 @@ enum {
- 	QDMA_INT_REG_MAX
- };
- 
--enum {
--	XSI_PCIE0_PORT,
--	XSI_PCIE1_PORT,
--	XSI_USB_PORT,
--	XSI_AE_PORT,
--	XSI_ETH_PORT,
--};
--
- enum {
- 	XSI_PCIE0_VIP_PORT_MASK	= BIT(22),
- 	XSI_PCIE1_VIP_PORT_MASK	= BIT(23),
+diff --git a/Documentation/devicetree/bindings/arm/airoha,en7581-npu.yaml b/Documentation/devicetree/bindings/arm/airoha,en7581-npu.yaml
+new file mode 100644
+index 0000000000000000000000000000000000000000..a5bcfa299e7cd54f51e70f7ded113f1efcd3e8b7
+--- /dev/null
++++ b/Documentation/devicetree/bindings/arm/airoha,en7581-npu.yaml
+@@ -0,0 +1,71 @@
++# SPDX-License-Identifier: (GPL-2.0 OR BSD-2-Clause)
++%YAML 1.2
++---
++$id: http://devicetree.org/schemas/arm/airoha,en7581-npu.yaml#
++$schema: http://devicetree.org/meta-schemas/core.yaml#
++
++title: Airoha Network Processor Unit for EN7581 SoC
++
++maintainers:
++  - Lorenzo Bianconi <lorenzo@kernel.org>
++
++description:
++  The Airoha Network Processor Unit (NPU) provides a configuration interface
++  to implement wired and wireless hardware flow offloading programming Packet
++  Processor Engine (PPE) flow table.
++
++properties:
++  compatible:
++    items:
++      - enum:
++          - airoha,en7581-npu
++      - const: syscon
++
++  reg:
++    maxItems: 1
++
++  interrupts:
++    maxItems: 15
++
++  memory-region:
++    maxItems: 1
++    description:
++      Phandle to the node describing memory used to store NPU firmware binary.
++
++required:
++  - compatible
++  - reg
++  - interrupts
++  - memory-region
++
++additionalProperties: false
++
++examples:
++  - |
++    #include <dt-bindings/interrupt-controller/arm-gic.h>
++    #include <dt-bindings/interrupt-controller/irq.h>
++    soc {
++      #address-cells = <2>;
++      #size-cells = <2>;
++
++      npu@1e900000 {
++        compatible = "airoha,en7581-npu", "syscon";
++        reg = <0 0x1e900000 0 0x313000>;
++        interrupts = <GIC_SPI 118 IRQ_TYPE_LEVEL_HIGH>,
++                     <GIC_SPI 119 IRQ_TYPE_LEVEL_HIGH>,
++                     <GIC_SPI 120 IRQ_TYPE_LEVEL_HIGH>,
++                     <GIC_SPI 121 IRQ_TYPE_LEVEL_HIGH>,
++                     <GIC_SPI 122 IRQ_TYPE_LEVEL_HIGH>,
++                     <GIC_SPI 123 IRQ_TYPE_LEVEL_HIGH>,
++                     <GIC_SPI 125 IRQ_TYPE_LEVEL_HIGH>,
++                     <GIC_SPI 103 IRQ_TYPE_LEVEL_HIGH>,
++                     <GIC_SPI 109 IRQ_TYPE_LEVEL_HIGH>,
++                     <GIC_SPI 113 IRQ_TYPE_LEVEL_HIGH>,
++                     <GIC_SPI 117 IRQ_TYPE_LEVEL_HIGH>,
++                     <GIC_SPI 134 IRQ_TYPE_LEVEL_HIGH>,
++                     <GIC_SPI 135 IRQ_TYPE_LEVEL_HIGH>,
++                     <GIC_SPI 136 IRQ_TYPE_LEVEL_HIGH>,
++                     <GIC_SPI 137 IRQ_TYPE_LEVEL_HIGH>;
++        memory-region = <&npu_binary>;
++      };
++    };
 
 -- 
 2.48.1
