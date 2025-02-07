@@ -1,146 +1,200 @@
-Return-Path: <netdev+bounces-164061-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-164064-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3AF66A2C7ED
-	for <lists+netdev@lfdr.de>; Fri,  7 Feb 2025 16:53:12 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 38731A2C81E
+	for <lists+netdev@lfdr.de>; Fri,  7 Feb 2025 16:59:11 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 9B14C1886F40
-	for <lists+netdev@lfdr.de>; Fri,  7 Feb 2025 15:52:15 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id F0C37165298
+	for <lists+netdev@lfdr.de>; Fri,  7 Feb 2025 15:59:07 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0498223C8B2;
-	Fri,  7 Feb 2025 15:51:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7756118E351;
+	Fri,  7 Feb 2025 15:58:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b="NZex1JnO"
 X-Original-To: netdev@vger.kernel.org
-Received: from metis.whiteo.stw.pengutronix.de (metis.whiteo.stw.pengutronix.de [185.203.201.7])
+Received: from mx0a-0031df01.pphosted.com (mx0a-0031df01.pphosted.com [205.220.168.131])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7D0E123C8AD
-	for <netdev@vger.kernel.org>; Fri,  7 Feb 2025 15:51:57 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.203.201.7
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AC1EE23C8B9;
+	Fri,  7 Feb 2025 15:58:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.168.131
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1738943518; cv=none; b=H2J4wst9j/Y17QUfYJCHZ702yboSP5LqE8f4/cZCtz+LRAHD0Y8y+zClrLMShZNNouiDtYv5/RV17LI0iFxnwQIZNl4y3pmxRFTKVB6zrE58mKH/+RmZjgLTdGaqrVrCf3Jlswd0U/QdwUYRI0O/F3lP8lzpOryiBBC1X+neUJI=
+	t=1738943938; cv=none; b=e4/uXM/5Zn/+7EebUi3oaVVqEK/tc70sGRsHMRH0peDFiaeWScr3z7WVWRo/tRRnzwE1rXBt2TFlPXOEMTVxObS8ani1xBVAO0B+vs9VrqmYiyNIa+2ICQHIhKBCrRuJGTB3zHcNwqb2E8vkuAIgdgQqo10JmQ5BhAsrK0vAQlQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1738943518; c=relaxed/simple;
-	bh=FYBzQWrbc5BZbG36FmSxvb/yRkK3m4dSs/j7WyRK1LM=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=VAMEAoAoxTHIykdTJOfmCFY9rJsuHuWgX9dowaZhgSrLLN6qbYXauDdVeFXk1r7R6KxUkI1bLXi25vRWj5cx0rffNnk71PnmGGQgxXgDoleQhv8qdRpWsskaUBiO/tDe5+msAHdbzgdFgq/pVgV2ucD4sgZV+/O5ApJOl5IAWGM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de; spf=pass smtp.mailfrom=pengutronix.de; arc=none smtp.client-ip=185.203.201.7
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=pengutronix.de
-Received: from drehscheibe.grey.stw.pengutronix.de ([2a0a:edc0:0:c01:1d::a2])
-	by metis.whiteo.stw.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
-	(Exim 4.92)
-	(envelope-from <mkl@pengutronix.de>)
-	id 1tgQdX-00035S-1R; Fri, 07 Feb 2025 16:51:23 +0100
-Received: from moin.white.stw.pengutronix.de ([2a0a:edc0:0:b01:1d::7b] helo=bjornoya.blackshift.org)
-	by drehscheibe.grey.stw.pengutronix.de with esmtps  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.96)
-	(envelope-from <mkl@pengutronix.de>)
-	id 1tgQdU-003zzi-0y;
-	Fri, 07 Feb 2025 16:51:20 +0100
-Received: from pengutronix.de (pd9e59fec.dip0.t-ipconnect.de [217.229.159.236])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange ECDHE (prime256v1) server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(Client did not present a certificate)
-	(Authenticated sender: mkl-all@blackshift.org)
-	by smtp.blackshift.org (Postfix) with ESMTPSA id DAB1B3BC4F8;
-	Fri, 07 Feb 2025 15:51:19 +0000 (UTC)
-Date: Fri, 7 Feb 2025 16:51:19 +0100
-From: Marc Kleine-Budde <mkl@pengutronix.de>
-To: Vincent Mailhol <mailhol.vincent@wanadoo.fr>
-Cc: Ming Yu <a0282524688@gmail.com>, tmyu0@nuvoton.com, lee@kernel.org, 
-	linus.walleij@linaro.org, brgl@bgdev.pl, andi.shyti@kernel.org, andrew+netdev@lunn.ch, 
-	davem@davemloft.net, edumazet@google.com, kuba@kernel.org, pabeni@redhat.com, 
-	wim@linux-watchdog.org, linux@roeck-us.net, jdelvare@suse.com, 
-	alexandre.belloni@bootlin.com, linux-kernel@vger.kernel.org, linux-gpio@vger.kernel.org, 
-	linux-i2c@vger.kernel.org, linux-can@vger.kernel.org, netdev@vger.kernel.org, 
-	linux-watchdog@vger.kernel.org, linux-hwmon@vger.kernel.org, linux-rtc@vger.kernel.org, 
-	linux-usb@vger.kernel.org
-Subject: Re: [PATCH v7 4/7] can: Add Nuvoton NCT6694 CANFD support
-Message-ID: <20250207-fair-active-robin-30025a-mkl@pengutronix.de>
-References: <20250207074502.1055111-1-a0282524688@gmail.com>
- <20250207074502.1055111-5-a0282524688@gmail.com>
- <20250207-savvy-beaver-of-culture-45698d-mkl@pengutronix.de>
- <9a3f1242-794e-41f1-80a5-bc6d18ff6641@wanadoo.fr>
+	s=arc-20240116; t=1738943938; c=relaxed/simple;
+	bh=o7NPCUuz+LB8O51ZyJvr5ddsy22WVJ+Ql5GYrv/R/Bw=;
+	h=From:Subject:Date:Message-ID:MIME-Version:Content-Type:To:CC; b=QClyQCTi6szfWGbNRl3hacT5EC2SfHpRn/SjOPkRKb677nIGGYkPN2w3eyFEIAIZd0AoqCPnZW4hPuhwmUDa0+eQ9jBBVDcYVS0d7hZAu+MAPrBkkApOIUICVL1XNdCc+dH4MP/8i+gAhseqdh/Eg6zzBHEZB2BFQqzE6+DKFsw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com; spf=pass smtp.mailfrom=quicinc.com; dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b=NZex1JnO; arc=none smtp.client-ip=205.220.168.131
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=quicinc.com
+Received: from pps.filterd (m0279867.ppops.net [127.0.0.1])
+	by mx0a-0031df01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 517EpRbn012365;
+	Fri, 7 Feb 2025 15:58:35 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=quicinc.com; h=
+	cc:content-transfer-encoding:content-type:date:from:message-id
+	:mime-version:subject:to; s=qcppdkim1; bh=aUb3f4LlVHMAyJJYmmtuM3
+	IJcOvHPWLZjaImJ+vXer4=; b=NZex1JnOVVZM+hQZs5CKwBBzRn8/cxwSSuV7iD
+	cAVXXMmJDkSYZqKLy1ARKx+XN4FK2fOUxqyalA7Hma81FovjZUOCoHkPN4t+4iQV
+	zypvxCEF1YZFYvtHVhbbJdl9IeOVEsoxj6pQD3iMZFYQokAKoJZOtmpPZpTocYbS
+	wKZaNgZNLrCZqWHDYBJG9niVchD12qu1gEuftgQ3+wBiSi/OfW5H7l8K9RF+smK7
+	oueYVlk5EuQywEZHKLwD0CGtBwFfEtnmHGDozYZ5hyA5b4wL2wHIkuTU816CaKx7
+	CnuxYsV1z3aJHZJQtAloHZPwXSWgVTmQtaE26F3vcTuX7tlg==
+Received: from nasanppmta02.qualcomm.com (i-global254.qualcomm.com [199.106.103.254])
+	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 44nmaag5nu-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Fri, 07 Feb 2025 15:58:34 +0000 (GMT)
+Received: from nasanex01a.na.qualcomm.com (nasanex01a.na.qualcomm.com [10.52.223.231])
+	by NASANPPMTA02.qualcomm.com (8.18.1.2/8.18.1.2) with ESMTPS id 517FwYY7014327
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Fri, 7 Feb 2025 15:58:34 GMT
+Received: from nsssdc-sh01-lnx.ap.qualcomm.com (10.80.80.8) by
+ nasanex01a.na.qualcomm.com (10.52.223.231) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1544.9; Fri, 7 Feb 2025 07:58:28 -0800
+From: Lei Wei <quic_leiwei@quicinc.com>
+Subject: [PATCH net-next v5 0/5] Add PCS support for Qualcomm IPQ9574 SoC
+Date: Fri, 7 Feb 2025 23:53:11 +0800
+Message-ID: <20250207-ipq_pcs_6-14_rc1-v5-0-be2ebec32921@quicinc.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha512;
-	protocol="application/pgp-signature"; boundary="76ydemzthxfsfgeu"
-Content-Disposition: inline
-In-Reply-To: <9a3f1242-794e-41f1-80a5-bc6d18ff6641@wanadoo.fr>
-X-SA-Exim-Connect-IP: 2a0a:edc0:0:c01:1d::a2
-X-SA-Exim-Mail-From: mkl@pengutronix.de
-X-SA-Exim-Scanned: No (on metis.whiteo.stw.pengutronix.de); SAEximRunCond expanded to false
-X-PTX-Original-Recipient: netdev@vger.kernel.org
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+X-B4-Tracking: v=1; b=H4sIAGcspmcC/x3MSwqAMAwA0atI1gba+EOvIlK0Rs2m1lZEEO9uc
+ fkWMw9EDsIRuuyBwJdE2V1ClWdgt9GtjDInAymqFKkGxR/G22hq1KUJVqNqSdcF0dRYhpT5wIv
+ c/7IHxyc6vk8Y3vcDHuRhSGwAAAA=
+To: Andrew Lunn <andrew+netdev@lunn.ch>,
+        "David S. Miller"
+	<davem@davemloft.net>,
+        Eric Dumazet <edumazet@google.com>, Jakub Kicinski
+	<kuba@kernel.org>,
+        Paolo Abeni <pabeni@redhat.com>, Rob Herring
+	<robh@kernel.org>,
+        Krzysztof Kozlowski <krzk+dt@kernel.org>,
+        Conor Dooley
+	<conor+dt@kernel.org>, Andrew Lunn <andrew@lunn.ch>,
+        Heiner Kallweit
+	<hkallweit1@gmail.com>,
+        Russell King <linux@armlinux.org.uk>
+CC: <netdev@vger.kernel.org>, <devicetree@vger.kernel.org>,
+        <linux-kernel@vger.kernel.org>, <linux-arm-msm@vger.kernel.org>,
+        <quic_kkumarcs@quicinc.com>, <quic_suruchia@quicinc.com>,
+        <quic_pavir@quicinc.com>, <quic_linchen@quicinc.com>,
+        <quic_luoj@quicinc.com>, <quic_leiwei@quicinc.com>,
+        <srinivas.kandagatla@linaro.org>, <bartosz.golaszewski@linaro.org>,
+        <vsmuthu@qti.qualcomm.com>, <john@phrozen.org>,
+        Krzysztof Kozlowski
+	<krzysztof.kozlowski@linaro.org>
+X-Mailer: b4 0.14.1
+X-Developer-Signature: v=1; a=ed25519-sha256; t=1738943908; l=3713;
+ i=quic_leiwei@quicinc.com; s=20240829; h=from:subject:message-id;
+ bh=o7NPCUuz+LB8O51ZyJvr5ddsy22WVJ+Ql5GYrv/R/Bw=;
+ b=kewZVGiKxxaOpV2cZx65JUC76212JgpN+pr5L+LNHx4ed5qnewAYMb9UkOV+pcr5l7z1RDc9D
+ 5364Qj6LNwpAIMy+r9IkRGYfehNTJ+LuBaGnLl3cQpde/Sz5PGTzVY6
+X-Developer-Key: i=quic_leiwei@quicinc.com; a=ed25519;
+ pk=uFXBHtxtDjtIrTKpDEZlMLSn1i/sonZepYO8yioKACM=
+X-ClientProxiedBy: nasanex01a.na.qualcomm.com (10.52.223.231) To
+ nasanex01a.na.qualcomm.com (10.52.223.231)
+X-QCInternal: smtphost
+X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=5800 signatures=585085
+X-Proofpoint-ORIG-GUID: WF6NNe7mu58UzutKiC56N1jr8LTRbndK
+X-Proofpoint-GUID: WF6NNe7mu58UzutKiC56N1jr8LTRbndK
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1057,Hydra:6.0.680,FMLib:17.12.68.34
+ definitions=2025-02-07_07,2025-02-07_03,2024-11-22_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 impostorscore=0
+ priorityscore=1501 bulkscore=0 spamscore=0 lowpriorityscore=0
+ clxscore=1015 adultscore=0 phishscore=0 suspectscore=0 malwarescore=0
+ mlxlogscore=999 mlxscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.19.0-2501170000 definitions=main-2502070120
 
+The 'UNIPHY' PCS block in the Qualcomm IPQ9574 SoC provides Ethernet
+PCS and SerDes functions. It supports 1Gbps mode PCS and 10-Gigabit
+mode PCS (XPCS) functions, and supports various interface modes for
+the connectivity between the Ethernet MAC and the external PHYs/Switch.
+There are three UNIPHY (PCS) instances in IPQ9574, supporting the six
+Ethernet ports.
 
---76ydemzthxfsfgeu
-Content-Type: text/plain; protected-headers=v1; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [PATCH v7 4/7] can: Add Nuvoton NCT6694 CANFD support
-MIME-Version: 1.0
+This patch series adds base driver support for initializing the PCS,
+and PCS phylink ops for managing the PCS modes/states. Support for
+SGMII/QSGMII (PCS) and USXGMII (XPCS) modes is being added initially.
 
-On 08.02.2025 00:00:43, Vincent Mailhol wrote:
-> On 07/02/2025 at 21:15, Marc Kleine-Budde wrote:
-> > On 07.02.2025 15:44:59, Ming Yu wrote:
->=20
-> (...)
->=20
-> >> +static netdev_tx_t nct6694_can_start_xmit(struct sk_buff *skb,
-> >> +					  struct net_device *ndev)
-> >> +{
-> >> +	struct nct6694_can_priv *priv =3D netdev_priv(ndev);
-> >> +
-> >> +	if (can_dev_dropped_skb(ndev, skb))
-> >> +		return NETDEV_TX_OK;
-> >> +
-> >> +	netif_stop_queue(ndev);
-> >> +	can_put_echo_skb(skb, ndev, 0, 0);
-> >> +	queue_work(priv->wq, &priv->tx_work);
->=20
-> What is the reason to use a work queue here? xmit() is not a hard IRQ.
-> Also, the other USB CAN devices just directly send the USB message in
-> their xmit() without the need to rely on such worker.
->=20
-> Sorry if this was discussed in the past, I can not remember if this
-> question has already been raised.
+The Ethernet driver which handles the MAC operations will create the
+PCS instances and phylink for the MAC, by utilizing the API exported
+by this driver.
 
-AFAICS xmit uses nct6694_write_msg(), which uses several usb_bulk_msg(),
-that can only be used from task context.
+While support is being added initially for IPQ9574, the driver is
+expected to be easily extendable later for other SoCs in the IPQ
+family such as IPQ5332.
 
-You can build a chain of usb_fill_bulk_urb(), usb_submit_urb(),
-callbacks instead, but that's hard to read compared to blocking
-usb_bulk_msg()s.
+Signed-off-by: Lei Wei <quic_leiwei@quicinc.com>
+---
+Changes in v5:
+- Add a comment in "ipq_pcs_enable" to note that the RX clock is not
+  disabled as PHYLINK does not unwind the state back.
+- Add PCS device compatible string check for the device node in
+  "ipq_pcs_get".
+- Link to v4: https://lore.kernel.org/r/20250108-ipq_pcs_net-next-v4-0-0de14cd2902b@quicinc.com
 
-Marc
+Changes in v4:
+- Add "COMMON_CLK" to the Kconfig dependency option.
+- Optimize to avoid indentation in "ipq_pcs_config_usxgmii".
+- Remove the PCS config lock.
+- Add the "pcs_inband_caps" method.
+- Link to v3: https://lore.kernel.org/r/20241216-ipq_pcs_6-13_rc1-v3-0-3abefda0fc48@quicinc.com
 
---=20
-Pengutronix e.K.                 | Marc Kleine-Budde          |
-Embedded Linux                   | https://www.pengutronix.de |
-Vertretung N=C3=BCrnberg              | Phone: +49-5121-206917-129 |
-Amtsgericht Hildesheim, HRA 2686 | Fax:   +49-5121-206917-9   |
+Changes in v3:
+- Remove the clk enabled check in "pcs_disable" method.
+- Add "pcs_validate" method to validate supported interface mode and
+  duplex mode.
+- Use regmap_set_bits()/regmap_clear_bits() API where appropriate.
+- Collect Reviewed-by tag for dtbindings.
+- Link to v2: https://lore.kernel.org/r/20241204-ipq_pcs_rc1-v2-0-26155f5364a1@quicinc.com
 
---76ydemzthxfsfgeu
-Content-Type: application/pgp-signature; name="signature.asc"
+Changes in v2:
+- dtbindings updates
+  a.) Rename dt-binding header file to match binding file name.
+  b.) Drop unused labels and the redundant examples.
+  c.) Rename "mii_rx"/"mii_tx" clock names to "rx"/"tx".
+- Rename "PCS_QCOM_IPQ" with specific name "PCS_QCOM_IPQ9574" in
+  Kconfig.
+- Remove interface mode check for the PCS lock.
+- Use Cisco SGMII AN mode as default SGMII/QSGMII AN mode.
+- Instantiate MII PCS instances in probe and export "ipq_pcs_get" and
+  "ipq_pcs_put" APIs.
+- Move MII RX and TX clock enable and disable to "pcs_enable" and
+  "pcs_disable" methods.
+- Change "dev_dbg" to "dev_dbg_ratelimited" in "pcs_get_state" method.
+- Link to v1: https://lore.kernel.org/r/20241101-ipq_pcs_rc1-v1-0-fdef575620cf@quicinc.com
 
------BEGIN PGP SIGNATURE-----
+---
+Lei Wei (5):
+      dt-bindings: net: pcs: Add Ethernet PCS for Qualcomm IPQ9574 SoC
+      net: pcs: Add PCS driver for Qualcomm IPQ9574 SoC
+      net: pcs: qcom-ipq9574: Add PCS instantiation and phylink operations
+      net: pcs: qcom-ipq9574: Add USXGMII interface mode support
+      MAINTAINERS: Add maintainer for Qualcomm IPQ9574 PCS driver
 
-iQEzBAABCgAdFiEEn/sM2K9nqF/8FWzzDHRl3/mQkZwFAmemK/QACgkQDHRl3/mQ
-kZwmeQf+K8g+Oy8vCIUI/Kice58VwDSu6EFa30wRLM0oqjCgE4LqXapNiSB1F8iJ
-sDm2IyQER6qNYSLqzeZWG/bMyJwfHNpKjfXN3RImtyTXuN4nlvraaQabsV1bEY3y
-rNGHojpZqxDXCb3Q9B5GLjNhdZldM4T+Xrs8gG+7Zv4jBxjNxn8J7Xz+1BpX3UqZ
-ql8gENFEAe9nb6O5ODNVcGTnU+SzGWvy1VsEz23VcvXWEKbyyObvG+e0yUoYEi4y
-s2MbMh1xxkTliIXn7GvqIdMj6/RSPo7xLoShAalHzurN1mey2u5PZfQapk718BEx
-Wj/o/s1vTiX+qqRfcgpDz3UvoRZEtQ==
-=0uK9
------END PGP SIGNATURE-----
+ .../bindings/net/pcs/qcom,ipq9574-pcs.yaml         | 190 +++++
+ MAINTAINERS                                        |   9 +
+ drivers/net/pcs/Kconfig                            |   9 +
+ drivers/net/pcs/Makefile                           |   1 +
+ drivers/net/pcs/pcs-qcom-ipq9574.c                 | 884 +++++++++++++++++++++
+ include/dt-bindings/net/qcom,ipq9574-pcs.h         |  15 +
+ include/linux/pcs/pcs-qcom-ipq9574.h               |  15 +
+ 7 files changed, 1123 insertions(+)
+---
+base-commit: 2014c95afecee3e76ca4a56956a936e23283f05b
+change-id: 20250207-ipq_pcs_6-14_rc1-09216322b7ce
 
---76ydemzthxfsfgeu--
+Best regards,
+-- 
+Lei Wei <quic_leiwei@quicinc.com>
+
 
