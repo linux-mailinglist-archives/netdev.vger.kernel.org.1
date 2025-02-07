@@ -1,125 +1,153 @@
-Return-Path: <netdev+bounces-163886-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-163887-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0B38FA2BF24
-	for <lists+netdev@lfdr.de>; Fri,  7 Feb 2025 10:24:32 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3CE0DA2BF31
+	for <lists+netdev@lfdr.de>; Fri,  7 Feb 2025 10:25:34 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 9A0D716A6CA
-	for <lists+netdev@lfdr.de>; Fri,  7 Feb 2025 09:24:30 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 645123A280C
+	for <lists+netdev@lfdr.de>; Fri,  7 Feb 2025 09:25:25 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0B5911D63EB;
-	Fri,  7 Feb 2025 09:24:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8C3CE1DBB37;
+	Fri,  7 Feb 2025 09:25:20 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="DYo48zgh"
+	dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="reP7Jvbc";
+	dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="qJt5Iz8U"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f48.google.com (mail-wm1-f48.google.com [209.85.128.48])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from galois.linutronix.de (Galois.linutronix.de [193.142.43.55])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5D74B1A4F12;
-	Fri,  7 Feb 2025 09:24:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.48
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C3D221DE2BF;
+	Fri,  7 Feb 2025 09:25:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=193.142.43.55
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1738920266; cv=none; b=OqzZs0dVKvLfKzQCXMC035qgjDZ/J5tnWvfi9oVxZxcFeXgyGEu0rQyie9DoKCtV6QkAB/JDfOQAs/KldCzchMxob4VSGlFz8L4flq8WsT9d+Gug2haSOyG/LuaFBcI4EvIV60xwSPATzT0gl9lkAKl7QKYKF/+LUiwSlwNunlE=
+	t=1738920320; cv=none; b=LA1xhGaEvYUfEVdQ9zXAyxjIOPq1jpXJGRPdnBiOuFnpFK2KLheF2BkEGuQqB9Q+OGhwTLqKxOTx5fV2q4smQLwjTXEgHhLUqYBq3fiUy8oUqbgAmnKjt5mdBlJshfDz6bLFFPd/fDodkatyrhksVWBky24RFNfJ+1oCcBdmBNQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1738920266; c=relaxed/simple;
-	bh=+MbzPOcGNRRPhnTBCFQgzSjGsnegZzFp3CefwijqsqA=;
-	h=From:To:Cc:Subject:In-Reply-To:Date:Message-ID:References:
-	 MIME-Version:Content-Type; b=I9foAO8yU2aEN+FUnQQsRjdyoyHMla9ZsNbUarROOV8Jt7LFIWBFOJr4VQ2UeqlBXcgOv1BDkq65TEZdlrJWC3hiZwda+7LtzM+HKfb23mLVUy6A8dLfTm4JpMk4VXKWCYqQcIMcEqadGbZTiQDlXUqAx0uFojt/PeKB5oJqSy0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=DYo48zgh; arc=none smtp.client-ip=209.85.128.48
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wm1-f48.google.com with SMTP id 5b1f17b1804b1-436341f575fso21090125e9.1;
-        Fri, 07 Feb 2025 01:24:25 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1738920263; x=1739525063; darn=vger.kernel.org;
-        h=mime-version:user-agent:references:message-id:date:in-reply-to
-         :subject:cc:to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=iKkuoAldlKbaq/b6Dxxu4R9211eD0SUopSgn5S6J0Yo=;
-        b=DYo48zghdG1iOloiJ0+3d43U04Am7hVtTDLU8+gDQ2hTSHHD947mDCXtUFXgQd2tyE
-         BHrhcBmG4IH7OyF4wgag3jg9G4kUgZfl/VKd1BQ7fphZQohvEILJ22VcGeflu1vXLoUC
-         SFmgumpgyFHq52RUrsCqTVumXSmivQMR/9ClbGKxCph7KDw1cD+U3xttKOlpF/vRnb3R
-         7O/JfrIxSiEHs9vKEKEcfxLgcHzHVRMYbxRGt9NwLLGeLcOYxG7Rc3nL5sjiJewX8JNx
-         cRXRvKb1rtFDGXvJOalfEMopo9cTU4DRh1cYlpapswyoMgOGuaFLNizW0Id0f6G0dQEM
-         bB1w==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1738920263; x=1739525063;
-        h=mime-version:user-agent:references:message-id:date:in-reply-to
-         :subject:cc:to:from:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=iKkuoAldlKbaq/b6Dxxu4R9211eD0SUopSgn5S6J0Yo=;
-        b=G4QvJhnoKPnrb+uHB06zyPtuEycfoVrQ2fWUWIDP25EviFVNR4B989jNhxxqobIYSJ
-         zLZPTEbzAkyGNQC7n7o5bRpdQAxJAXEqS7n1WtxK/T2CvSk6hNCF0UUPQHVtV1uhKtS7
-         ZnLUDvMT5LY+jzvOXFdpG9rmEO9jYaRcYJ5ox66s5IBD7IvPjjL4+Yv4LuG51F+HTJsE
-         jNIMArlXcI8UvMVn9KlX64wut1jSdiwYnIlgZlvxMISWfveEPl6tElJWWzSYDIRDT4+L
-         kL6AYg2dAR6q+6Ao1GFCCYzXtGrz3B9DUlmQMXKID3BMARD44/B5eVshNDj6plKDhsBh
-         Q7Ag==
-X-Forwarded-Encrypted: i=1; AJvYcCWnP5eFkat60l3TnPHwW4AydROqFqig3yzZjTD++84kZv/YvMV6fZUbCcqnX5upOWjhpmRH/gAS9mpr+EBWVQ==@vger.kernel.org
-X-Gm-Message-State: AOJu0YyYAkQM51WQS3qdq42UfP1CXL1YjF4dQaz8nPWuv+ciVSa8yKEE
-	xjS9QTTsLC5qb3doQWtpse2d+qyM7lGywkEVmpmZ/cOlSmcHdGtYdLRnBA==
-X-Gm-Gg: ASbGncuEjKtcuscJuqwwPzMjRv7nXCLZR/mz11lSxJa2V/pIdQF1VOu0FahWn3woUzF
-	0o+buy4Zzj+/wJc8B7hJ9nsA3fjPQrf+3DaX3qK89HGbI1b7tPI76yhAKVguv/fBZ3bH2Ymxsyc
-	W9MkM8bBp3aWuOwEGJsqraRl+Oei5WePerhnwWA1+/WQ1ooMbsj4HQu9SKrHskmhHzbUx8aABZy
-	+H4Wkj0JiuQFbVxhb1BOC3GVudB0UAY2cmHGCOk7x4lGBCL+VUfodMI2FAt9VN/Wke6s3W1dsmZ
-	RyC0FqjzzinrxkL4HMHzeh/mKcCB
-X-Google-Smtp-Source: AGHT+IHhZnHjFwbkKjfbLgOfw31yp2iise56LxN7QfoigXsUv9a+uGxBG4cxjAvd8Vn74fQsjipemQ==
-X-Received: by 2002:a05:600c:c0b:b0:436:1ac2:1acf with SMTP id 5b1f17b1804b1-439249a7c30mr21551365e9.20.1738920263262;
-        Fri, 07 Feb 2025 01:24:23 -0800 (PST)
-Received: from imac ([2a02:8010:60a0:0:14f1:dd0a:e74e:7c33])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-4390daf44f3sm85554115e9.29.2025.02.07.01.24.21
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 07 Feb 2025 01:24:22 -0800 (PST)
-From: Donald Hunter <donald.hunter@gmail.com>
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: netdev@vger.kernel.org,  "David S. Miller" <davem@davemloft.net>,  Eric
- Dumazet <edumazet@google.com>,  Paolo Abeni <pabeni@redhat.com>,  Simon
- Horman <horms@kernel.org>,  Johannes Berg <johannes@sipsolutions.net>,
-  linux-wireless@vger.kernel.org,  donald.hunter@redhat.com
-Subject: Re: [PATCH net-next v3 06/10] tools/net/ynl: sanitise enums with
- leading digits in ynl-gen-c
-In-Reply-To: <20250206081033.49a7f4d6@kernel.org> (Jakub Kicinski's message of
-	"Thu, 6 Feb 2025 08:10:33 -0800")
-Date: Fri, 07 Feb 2025 09:24:14 +0000
-Message-ID: <m2mseyxg3l.fsf@gmail.com>
-References: <20250206092658.1383-1-donald.hunter@gmail.com>
-	<20250206092658.1383-7-donald.hunter@gmail.com>
-	<20250206081033.49a7f4d6@kernel.org>
-User-Agent: Gnus/5.13 (Gnus v5.13)
+	s=arc-20240116; t=1738920320; c=relaxed/simple;
+	bh=KBLkEL12Og2x3Pglq0lPKHmlfc+op+vs3fb6Uyx1aJ4=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=dYKGGsahQul9/We9fhQQuIC3G0o0Mglq/YXWy9Y6YbUXGuO6Y3DvY7OGUl2TMnOiv6AxJGeDSjAh+qGC23qiEq3SlBYFdvC67OZBTBEqm0KjS6+ZkMYXlt0txJ7bFaHNybTclm4u0oSdl6w0puvVWgHwO2M2+eeib6di4cFH7so=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de; spf=pass smtp.mailfrom=linutronix.de; dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=reP7Jvbc; dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=qJt5Iz8U; arc=none smtp.client-ip=193.142.43.55
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linutronix.de
+Date: Fri, 7 Feb 2025 10:25:14 +0100
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linutronix.de;
+	s=2020; t=1738920316;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=VhaHIolMqVaOKYQrrLkqK1G4I/2AK3phIMMuTF3pFWo=;
+	b=reP7JvbcU0nfOWcSr3dJZmrxK5PQZGFlsLkEuFFgIPl0MwajUgTqxxSd2w1mapH1lnohce
+	Dt+L8IRlNu3GG4Y4SPILVNj/qQ51TByMbchdQI4kOrjL6EPzsm5hA4oHHNWCgM0dwx092g
+	1uTItGKhAbjDmnB8dciy/vxknCXn8o0ZTuLzjLERhGSFbYbONep0oJ7EN3HyAQlDLonCpJ
+	hHkfcCXWi8Ns5jgBfKcA0Fc7xQ3JyipUAksSeDCLWCVnloijRX5cAwXh1DxWZ9CgghQ74D
+	PqWgiz/Blka85Kxai5sWW625S7TUlRc8Fn+M/nZDvohviOy6mdTEwTEcb/po8w==
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=linutronix.de;
+	s=2020e; t=1738920316;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=VhaHIolMqVaOKYQrrLkqK1G4I/2AK3phIMMuTF3pFWo=;
+	b=qJt5Iz8UgObFD7UP8tWK4AITuhI5urfa9k2BZtjcbS8a/x8wc1tc8plkXpxvBbvmp/93Gi
+	W3afGDhGaKSUj7AA==
+From: Thomas =?utf-8?Q?Wei=C3=9Fschuh?= <thomas.weissschuh@linutronix.de>
+To: David Woodhouse <dwmw2@infradead.org>
+Cc: Mateusz Polchlopek <mateusz.polchlopek@intel.com>, 
+	Richard Cochran <richardcochran@gmail.com>, Andrew Lunn <andrew+netdev@lunn.ch>, 
+	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, netdev@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, stable@vger.kernel.org, 
+	"Mohamed Abuelfotoh, Hazem" <abuehaze@amazon.com>
+Subject: Re: [PATCH net-next 0/4] ptp: vmclock: bugfixes and cleanups for
+ error handling
+Message-ID: <20250207102320-55575f30-68fd-4aa3-93a0-d97173253471@linutronix.de>
+References: <20250206-vmclock-probe-v1-0-17a3ea07be34@linutronix.de>
+ <e16551dd-3a84-49ba-b875-c11f77239984@intel.com>
+ <34d961bf2f40f054dd79cf7d8cf81a3eefd00a59.camel@infradead.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <34d961bf2f40f054dd79cf7d8cf81a3eefd00a59.camel@infradead.org>
 
-Jakub Kicinski <kuba@kernel.org> writes:
+On Fri, Feb 07, 2025 at 09:10:42AM +0000, David Woodhouse wrote:
+> On Fri, 2025-02-07 at 08:13 +0100, Mateusz Polchlopek wrote:
+> > 
+> > 
+> > On 2/6/2025 6:45 PM, Thomas Weiﬂschuh wrote:
+> > > Some error handling issues I noticed while looking at the code.
+> > > 
+> > > Only compile-tested.
+> > > 
+> > > Signed-off-by: Thomas Weiﬂschuh <thomas.weissschuh@linutronix.de>
+> > > ---
+> > > Thomas Weiﬂschuh (4):
+> > > †††††† ptp: vmclock: Set driver data before its usage
+> > > †††††† ptp: vmclock: Don't unregister misc device if it was not registered
+> > > †††††† ptp: vmclock: Clean up miscdev and ptp clock through devres
+> > > †††††† ptp: vmclock: Remove goto-based cleanup logic
+> > > 
+> > > † drivers/ptp/ptp_vmclock.c | 46 ++++++++++++++++++++--------------------------
+> > > † 1 file changed, 20 insertions(+), 26 deletions(-)
+> > > ---
+> > > base-commit: 2014c95afecee3e76ca4a56956a936e23283f05b
+> > > change-id: 20250206-vmclock-probe-57cbcb770925
+> > > 
+> > > Best regards,
+> > 
+> > As those all are fixes and cleanups then I think it should be tagged to
+> > net not net-next.
+> 
+> Agreed. Thanks, Thomas. For all four:
 
-> On Thu,  6 Feb 2025 09:26:54 +0000 Donald Hunter wrote:
->>  class Type(SpecAttr):
->> +    starts_with_digit = re.compile(r"^\d")
->> +
->>      def __init__(self, family, attr_set, attr, value):
->>          super().__init__(family, attr_set, attr, value)
->>  
->> @@ -74,6 +76,8 @@ class Type(SpecAttr):
->>          self.c_name = c_lower(self.name)
->>          if self.c_name in _C_KW:
->>              self.c_name += '_'
->> +        if self.starts_with_digit.match(self.c_name):
->> +            self.c_name = '_' + self.c_name
->
-> bit heavyweight with the regex? I think this would do:
->
-> 	if self.c_name[0].isdigit():
+Ack.
 
-Agreed. I'll use the simpler method.
 
-> but either way:
->
-> Acked-by: Jakub Kicinski <kuba@kernel.org>
+> Reviewed-by: David Woodhouse <dwmw@amazon.co.uk>
 
-TY.
+Thanks.
+
+> I'm about to post a fifth which adds a .owner to vmclock_miscdev_fops.
+
+I assume you want me to include this in my series.
+
+> Tested with the existing '-device vmclock' support in QEMU, plus this
+> hack to actually expose a PTP clock to the guest (which we haven't
+> worked out how to do *properly* from the timekeeping subsystem of a
+> Linux host yet; qv).
+> 
+> --- a/hw/acpi/vmclock.c
+> +++ b/hw/acpi/vmclock.c
+> @@ -151,6 +151,18 @@ static void vmclock_realize(DeviceState *dev,
+> Error **errp)
+>  
+>      qemu_register_reset(vmclock_handle_reset, vms);
+>  
+> +	vms->clk->time_type = VMCLOCK_TIME_TAI;
+> +    vms->clk->flags = VMCLOCK_FLAG_TAI_OFFSET_VALID;
+> +    vms->clk->tai_offset_sec = -3600;
+> +    vms->clk->clock_status = VMCLOCK_STATUS_SYNCHRONIZED;
+> +    vms->clk->counter_value = 0;
+> +    vms->clk->counter_id = VMCLOCK_COUNTER_X86_TSC;
+> +    vms->clk->time_sec = 1704067200;
+> +    vms->clk->time_frac_sec = 0x8000000000000000ULL;
+> +    vms->clk->counter_period_frac_sec = 0x1a6e39b3e0ULL;
+> +    vms->clk->counter_period_shift = 4;
+> +    //vms->clk->counter_period_frac_sec = 0x1934c67f9b2ce6ULL;
+> +
+>      vmclock_update_guest(vms);
+>  }
+>  
+> 
+
+
 
