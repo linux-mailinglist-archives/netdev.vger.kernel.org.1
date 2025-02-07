@@ -1,90 +1,70 @@
-Return-Path: <netdev+bounces-164122-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-164124-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id DF7D9A2CAB0
-	for <lists+netdev@lfdr.de>; Fri,  7 Feb 2025 19:01:28 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5AC2DA2CADE
+	for <lists+netdev@lfdr.de>; Fri,  7 Feb 2025 19:09:01 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 0ACFB3A87C8
-	for <lists+netdev@lfdr.de>; Fri,  7 Feb 2025 18:01:20 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id BCA9A188D8AD
+	for <lists+netdev@lfdr.de>; Fri,  7 Feb 2025 18:08:55 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0D5A7195381;
-	Fri,  7 Feb 2025 18:01:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 24B2819DF5F;
+	Fri,  7 Feb 2025 18:08:42 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="aU/8coHR"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="BCRJZ9M7"
 X-Original-To: netdev@vger.kernel.org
-Received: from NAM04-DM6-obe.outbound.protection.outlook.com (mail-dm6nam04on2073.outbound.protection.outlook.com [40.107.102.73])
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.14])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6A49423C8D8
-	for <netdev@vger.kernel.org>; Fri,  7 Feb 2025 18:01:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.102.73
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1738951284; cv=fail; b=t7tPJi4wTmd3GDMQZ707HdNC5pzzkbZ+merIDBJ7XVUhmi5kTayVtq0lTpWzaWGMSx88V6+S53Q1NVlOYsE0Lkt+YAhzhFjoMqA6eq7I1HHgXeFlh7p4Jrf/8EDXVKBUhACpPqQqWhVLkt1M0C9OmLH0HnO9mvfaxC1WMoy03ZY=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1738951284; c=relaxed/simple;
-	bh=kNiFhD29d7+VZ+rJGTvAem+vvabdb6jBu2vxeZQAQ3c=;
-	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=WQ4rX30K0aJt8LOqAlBB/qsltNWh8v4Cqgo3kTKa0xd6yJDoJFF7yCNjyvhSGphWK2bCxBlxh1W56Al8PEW+TSx5PyDapQjm8+Er965vJueWTNd8Es0XwY7cBIx7QQLq70YypwlGYwCBvk5ImoHbN6lZpPpRVToOdqQq/jQopAQ=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=aU/8coHR; arc=fail smtp.client-ip=40.107.102.73
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=LUhqYiOKPntsIwGwRP1GMXLjFVsqKAMArS+IqAvt8TzN+AnV7nMe6B5E2Y1mCKi5L1ZfPoJcjGcJMeeVLpPE2dk6QpUZGNaTfAUOjSnfCNQrIiyCl4D7K7pT++mHr9A4P8nik/o8eXeCHeYhg6aHKe2wI3wvCMwJLSXoLGO2Ri05EROdsFJiVyCYwMjToOVxcz73QBS4YMDBwmUDds1ZHvuNppUB8+IuVzcN3w12jssNZcsd9WRM41ylM0Jo9W/bdl6CbjgPyuMsEQCZ1xfW7b9OEnVmb/Gcd3a2+c/HxRi9/9Ha9+ftV+w0U1fCNV4L1/Zyvy805N1NgcD8b5CrrQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=bHJ/fg8OO39i0v277nPHCF2bDAGWOvmKi/DAK6woWhI=;
- b=g6MrS+xSG30tGa1JDskLDmfeqIGH9Xg86F9vNGALy9NcfN5/8THxwSnfP2KJ5OOa7QJgo7peU0VjhHM9kWGP5rfmYildQbciY7SLYE+cBuCqB/Afc8HrnOHjzFX6lxNlRBuS4t/7vuw3E/Z21EvisRS2fSJGBs0y4AurFSu+x2JE3QhGHWA8dKIWtNEAgRJWcOjSl0AIjODBD5f63HQSJvGwf/4H8MU1uaZZm+zygUSWRDz/1RA3hoUFBI3BhFncMx34D1Y3aa1DNq9Xko+rQ5UAjAy1XXkJuf8mg+EI8tzxgT9xwC+4vb3g8TB93gMImvv6quwKjg0JGMLyYC6Z8A==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
- 216.228.117.161) smtp.rcpttodomain=davemloft.net smtp.mailfrom=nvidia.com;
- dmarc=pass (p=reject sp=reject pct=100) action=none header.from=nvidia.com;
- dkim=none (message not signed); arc=none (0)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=bHJ/fg8OO39i0v277nPHCF2bDAGWOvmKi/DAK6woWhI=;
- b=aU/8coHRSckPE4YZ7OAFT/JkCa/cli8dgjb5g2A8eAa0WjYyokx9XY77fXlRb83TYCYch3PTBWcsoDi0w6cTwFjU4Mhr4e9QUZFzi46Ilf0iTLW9zeRBHibkOR7L9CyrwG3OCO1lRxVhI/AhYnSvDn8UxOVnQiLlnLncFepDgTKUuJvaqGyaIgFeOK759lh6CKbnioyqVWj1kieYLtvfbNMjLjPGBgiJdUzeULQb/jU3PUvyUOMMZ4UnyqudQx3ZoHeXxLlOBEjTosd/w2ZEjqFf4vHaBg2gXH3EcBx//wA+JwHmLN6SooXHbboskDDlm/n+CmgFIXDd8GbPnaN7kQ==
-Received: from SN4PR0501CA0111.namprd05.prod.outlook.com
- (2603:10b6:803:42::28) by CYXPR12MB9387.namprd12.prod.outlook.com
- (2603:10b6:930:e6::19) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8422.14; Fri, 7 Feb
- 2025 18:01:17 +0000
-Received: from SN1PEPF0002BA50.namprd03.prod.outlook.com
- (2603:10b6:803:42:cafe::d4) by SN4PR0501CA0111.outlook.office365.com
- (2603:10b6:803:42::28) with Microsoft SMTP Server (version=TLS1_3,
- cipher=TLS_AES_256_GCM_SHA384) id 15.20.8377.13 via Frontend Transport; Fri,
- 7 Feb 2025 18:01:16 +0000
-X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 216.228.117.161)
- smtp.mailfrom=nvidia.com; dkim=none (message not signed)
- header.d=none;dmarc=pass action=none header.from=nvidia.com;
-Received-SPF: Pass (protection.outlook.com: domain of nvidia.com designates
- 216.228.117.161 as permitted sender) receiver=protection.outlook.com;
- client-ip=216.228.117.161; helo=mail.nvidia.com; pr=C
-Received: from mail.nvidia.com (216.228.117.161) by
- SN1PEPF0002BA50.mail.protection.outlook.com (10.167.242.73) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.8398.14 via Frontend Transport; Fri, 7 Feb 2025 18:01:16 +0000
-Received: from rnnvmail201.nvidia.com (10.129.68.8) by mail.nvidia.com
- (10.129.200.67) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.4; Fri, 7 Feb 2025
- 10:00:59 -0800
-Received: from fedora.mtl.com (10.126.231.35) by rnnvmail201.nvidia.com
- (10.129.68.8) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.14; Fri, 7 Feb
- 2025 10:00:55 -0800
-From: Petr Machata <petrm@nvidia.com>
-To: "David S. Miller" <davem@davemloft.net>, Eric Dumazet
-	<edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
-	<pabeni@redhat.com>, Andrew Lunn <andrew+netdev@lunn.ch>,
-	<netdev@vger.kernel.org>
-CC: Ido Schimmel <idosch@nvidia.com>, Petr Machata <petrm@nvidia.com>,
-	<mlxsw@nvidia.com>
-Subject: [PATCH net-next] mlxsw: Enable Tx checksum offload
-Date: Fri, 7 Feb 2025 19:00:44 +0100
-Message-ID: <8dc86c95474ce10572a0fa83b8adb0259558e982.1738950446.git.petrm@nvidia.com>
-X-Mailer: git-send-email 2.48.1
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E9CC619ADA2
+	for <netdev@vger.kernel.org>; Fri,  7 Feb 2025 18:08:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.14
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1738951722; cv=none; b=mBaRyeRTBGbs/jmpEtRfV686UicYx5DWOhI4R35f9r2fCqpMkCfjZ8b/ANBQ7qFyZpJq5hNeHLkalsq7LQ9wnItzvAoxsMTd1e5YDwApjZZeDw9gcfwVBfCuhEsvIHxE4pVrZGSX6z6MMaMDh9xFDqTjBSilGEpUvdHvtgvoQag=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1738951722; c=relaxed/simple;
+	bh=sAwdtgk0CrHBLbeGMTfCXrAD0j0R2rEF9a62rfdB4bA=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=cpYWZ70cwaKQ2PfJfVn2wZ0mwJcg7hr7Txepg3RplEyWnEej8c/g4TT5j/M1tkCo8svCoE4AuYIKKwNuc8IQ4KUz5HjTjg78qfhiop9VDR+VQ5gQHFtE0XzdV3sH6PmpA+ZGFsdd4Vkeac8RudJFW1Fn5eC2/+9HC4mFXcymsk0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=BCRJZ9M7; arc=none smtp.client-ip=192.198.163.14
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1738951720; x=1770487720;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=sAwdtgk0CrHBLbeGMTfCXrAD0j0R2rEF9a62rfdB4bA=;
+  b=BCRJZ9M7I98IXNH1e+xVORXgYl8aF7krL0XbpLpc1fobqUlgk4bias2o
+   bW59mzRt92pm3rcrZgqIVkIHgfkE+y9vQro+61ezlLMZvhcazbpG6Dkf1
+   zO4nwUVIjf7bOLOnFLH1AK2wM+9+7N4cVJ8A6Ef+RSGu3R91FCutAQcmu
+   wnoN4ZvI7E3r1y+xaVzKP746r2Y/We4G6p1v0ej2gkk2S47Ql3mNAMQyb
+   Yt1CT/8z4IXEltF6fr5hTQKozmX7YCi5f/csgEiZVG8sTM2cA/E533A8W
+   LYPCr6y+a23NnuNHWYUImWdRK5yGinxy/WM2upRPorlZbOB8esuCDlqiU
+   Q==;
+X-CSE-ConnectionGUID: KRSP8ioJTNK5xtFANhXW5g==
+X-CSE-MsgGUID: inKaEqB0Rz2z8nEcybOfww==
+X-IronPort-AV: E=McAfee;i="6700,10204,11338"; a="39865626"
+X-IronPort-AV: E=Sophos;i="6.13,267,1732608000"; 
+   d="scan'208";a="39865626"
+Received: from orviesa008.jf.intel.com ([10.64.159.148])
+  by fmvoesa108.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 07 Feb 2025 10:08:39 -0800
+X-CSE-ConnectionGUID: hu6FgR58SUO3fa+60xdZLg==
+X-CSE-MsgGUID: qjuK7UQuTLS+v1gLOjAWrQ==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.12,224,1728975600"; 
+   d="scan'208";a="112486301"
+Received: from amlin-018-114.igk.intel.com ([10.102.18.114])
+  by orviesa008.jf.intel.com with ESMTP; 07 Feb 2025 10:08:38 -0800
+From: Arkadiusz Kubalewski <arkadiusz.kubalewski@intel.com>
+To: intel-wired-lan@lists.osuosl.org
+Cc: netdev@vger.kernel.org,
+	Arkadiusz Kubalewski <arkadiusz.kubalewski@intel.com>
+Subject: [PATCH iwl-next 0/3] ice: decouple control of SMA/U.FL/SDP pins
+Date: Fri,  7 Feb 2025 19:02:51 +0100
+Message-Id: <20250207180254.549314-1-arkadiusz.kubalewski@intel.com>
+X-Mailer: git-send-email 2.38.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -92,132 +72,73 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: rnnvmail203.nvidia.com (10.129.68.9) To
- rnnvmail201.nvidia.com (10.129.68.8)
-X-EOPAttributedMessage: 0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: SN1PEPF0002BA50:EE_|CYXPR12MB9387:EE_
-X-MS-Office365-Filtering-Correlation-Id: 12ea7c92-31a6-4ca9-ab31-08dd47a16aca
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|376014|36860700013|82310400026|1800799024;
-X-Microsoft-Antispam-Message-Info:
-	=?us-ascii?Q?pyuw2gKeyz1f0Hv43uUXP5o/FF54HdP8uVd2DE150sVgyVB4ndWPsF3bOkar?=
- =?us-ascii?Q?m7R618tX+GrMJL+SzSlIua39xdCpH8KN93zTQzbVeKjpij5ewzxexzepbYFD?=
- =?us-ascii?Q?6fMiEhic2cAGsU8XRWbv/nt9GE0IxFN2eUSKsSKKSzFCJMjIw51AjQCQgPmz?=
- =?us-ascii?Q?DfEMDQ7f/qhLbcwlaX4m0PYahbW87qMEdpbNxBgNX6VsELx7CC0Xl3/oQuzu?=
- =?us-ascii?Q?xiFjyyaqFvOVzv72sHmhjTsXtmEzeb+IHvnd7UQIT4FTbcSwBn1cpWf46f6Q?=
- =?us-ascii?Q?ww8Pnn/k5ivodTLmULVLdvlXTZ1kfaqOzE4J3wk7LVJ4BNusJODF65Bu4IKS?=
- =?us-ascii?Q?wEDu2E2U7HZzeJtLEnIR+lDoAUI+dZaj2k9VgtFhDhZI7OE3eICoDFF111l/?=
- =?us-ascii?Q?I5JnnI07CR1u8uF14oPKVBxZQfapyIhizlTmwAx3Z95WPhzYlp1LuLs1ZHqK?=
- =?us-ascii?Q?xrxOJywLyaIQArpw5Fb+FYea2HY72rqtLHzhDtXiuCrYYtq/+o+3MX81xgJK?=
- =?us-ascii?Q?L7xOtEu4DmGfp7CmqYB3bulUK694MCq0DhySk5ysNCZ2RQTTBKPMcx9blag1?=
- =?us-ascii?Q?VYgqxePaBC9QmdbdskQTI3qXD9rNfDIFyHPTHpRBbGkXMmcOSRMWdHDcK06E?=
- =?us-ascii?Q?++nsPoc/f0v8FHQgXEhgEFxxz+0OOo230Mbvvfe5E//NTi4POZkW3IfZBADH?=
- =?us-ascii?Q?a9407/Uxc+zMVPdvpzG7GJs4tVX2JyoI4upRfgj9mmnqxDdclSHnZn21tcqC?=
- =?us-ascii?Q?w8N/dMW7yGxfsRyLX7m+TZ1d1lGKbh2zUAT1VjuvP1MQmHEykJnoTZzUKyCv?=
- =?us-ascii?Q?RzVtmmwqRq/oHWraDDv3Zzvcu4rS+qhLq3wHtQLdj+W865NXbdyMQgfN2wWx?=
- =?us-ascii?Q?2LT316PDbCEz06zJYgb62ShXS+gBGt9OUVRVgOOLsE3w34ikASlHyl55JAYe?=
- =?us-ascii?Q?IQqTRBaQeYVqvbowqy0xRGKvXBDJiOweW4xkFRqTa74StYOsJhSuivmWIohs?=
- =?us-ascii?Q?2ZxStxOSABJ6EFpnuP8FV6Hqs54lWZXDZJFyEHGYpA3Z/xmsd/9bPr1u0661?=
- =?us-ascii?Q?MSJ4Ji8fO1Dk3DAPT/w2ZJqifhuThJGZpo1ywuSZBlLpA6c9JhTBaR00N1dN?=
- =?us-ascii?Q?mPFZ87tkeC0P7ET/I0SfBm60i+SzQYc78C4Ub7DGCxt9Muoah138CvSkAXgQ?=
- =?us-ascii?Q?Sv7kVtjrOAkTU0lDiMJlHzg63G7pQtkNrrjqwA4XiC5cm4nHlHGiyHpHJ3Io?=
- =?us-ascii?Q?iuNqdnkMHk2hXcgOZMQhQuETLuGlwFS7eF2Ne9gF24qF/O+tYMqMaZqbLs+C?=
- =?us-ascii?Q?m1o1lF8L/BRYdks/bk+Kl9CVrGQKaR6bBf/cwdDodk/RSxIuOvFJfLpkoDX7?=
- =?us-ascii?Q?/gOjDGItvBWZytErXO3Lsuo98+6Y4ZSU2EyLdrf6ESkYx0SbO8S8AbM+C1N2?=
- =?us-ascii?Q?jbVb3kviu5+jfDHGNez+QBmOlmX++frNJ2TC67DszoNSxRFzM8ypuB75Ax/L?=
- =?us-ascii?Q?1ZbbBc0N2/3X63U=3D?=
-X-Forefront-Antispam-Report:
-	CIP:216.228.117.161;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:dc6edge2.nvidia.com;CAT:NONE;SFS:(13230040)(376014)(36860700013)(82310400026)(1800799024);DIR:OUT;SFP:1101;
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 07 Feb 2025 18:01:16.2045
- (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: 12ea7c92-31a6-4ca9-ab31-08dd47a16aca
-X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[216.228.117.161];Helo=[mail.nvidia.com]
-X-MS-Exchange-CrossTenant-AuthSource:
-	SN1PEPF0002BA50.namprd03.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Anonymous
-X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: CYXPR12MB9387
 
-From: Ido Schimmel <idosch@nvidia.com>
+Previously control of the dpll SMA/U.FL pins was partially done through
+ptp API, decouple pins control from both interfaces (dpll and ptp).
+Allow the SMA/U.FL pins control over a dpll subsystem, and leave ptp
+related SDP pins control over a ptp subsystem.
 
-The device is able to checksum plain TCP / UDP packets over IPv4 / IPv6
-when the 'ipcs' bit in the send descriptor is set. Advertise support for
-the 'NETIF_F_IP{,6}_CSUM' features in net devices registered by the
-driver and VLAN uppers and set the 'ipcs' bit when the stack requests Tx
-checksum offload.
+Arkadiusz Kubalewski (1):
+  ice: redesign dpll sma/u.fl pins control
 
-Note that the device also calculates the IPv4 checksum, but it first
-zeroes the current checksum so there should not be any difference
-compared to the checksum calculated by the kernel.
+Karol Kolacinski (2):
+  ice: change SMA pins to SDP in PTP API
+  ice: add ice driver PTP pin documentation
 
-On SN5600 (Spectrum-4) there is about 10% improvement in Tx packet rate
-with 1400 byte packets when using pktgen.
+ .../device_drivers/ethernet/intel/ice.rst     |  13 +
+ drivers/net/ethernet/intel/ice/ice_dpll.c     | 952 +++++++++++++++++-
+ drivers/net/ethernet/intel/ice/ice_dpll.h     |  23 +-
+ drivers/net/ethernet/intel/ice/ice_ptp.c      | 254 +----
+ drivers/net/ethernet/intel/ice/ice_ptp.h      |   3 -
+ 5 files changed, 1011 insertions(+), 234 deletions(-)
 
-Tested on Spectrum-{1,2,3,4} with all the combinations of IPv4 / IPv6,
-TCP / UDP, with and without VLAN.
 
-Signed-off-by: Ido Schimmel <idosch@nvidia.com>
-Reviewed-by: Petr Machata <petrm@nvidia.com>
-Signed-off-by: Petr Machata <petrm@nvidia.com>
----
- drivers/net/ethernet/mellanox/mlxsw/pci.c      | 2 ++
- drivers/net/ethernet/mellanox/mlxsw/pci_hw.h   | 5 +++++
- drivers/net/ethernet/mellanox/mlxsw/spectrum.c | 6 ++++--
- 3 files changed, 11 insertions(+), 2 deletions(-)
-
-diff --git a/drivers/net/ethernet/mellanox/mlxsw/pci.c b/drivers/net/ethernet/mellanox/mlxsw/pci.c
-index 2c34c420af56..3488d6e4fbf1 100644
---- a/drivers/net/ethernet/mellanox/mlxsw/pci.c
-+++ b/drivers/net/ethernet/mellanox/mlxsw/pci.c
-@@ -2595,6 +2595,8 @@ static int mlxsw_pci_skb_transmit(void *bus_priv, struct sk_buff *skb,
- 	for (i++; i < MLXSW_PCI_WQE_SG_ENTRIES; i++)
- 		mlxsw_pci_wqe_byte_count_set(wqe, i, 0);
- 
-+	mlxsw_pci_wqe_ipcs_set(wqe, skb->ip_summed == CHECKSUM_PARTIAL);
-+
- 	/* Everything is set up, ring producer doorbell to get HW going */
- 	q->producer_counter++;
- 	mlxsw_pci_queue_doorbell_producer_ring(mlxsw_pci, q);
-diff --git a/drivers/net/ethernet/mellanox/mlxsw/pci_hw.h b/drivers/net/ethernet/mellanox/mlxsw/pci_hw.h
-index e56da24e9e9e..882e01abd9c4 100644
---- a/drivers/net/ethernet/mellanox/mlxsw/pci_hw.h
-+++ b/drivers/net/ethernet/mellanox/mlxsw/pci_hw.h
-@@ -96,6 +96,11 @@ MLXSW_ITEM32(pci, wqe, lp, 0x00, 30, 1);
-  */
- MLXSW_ITEM32(pci, wqe, type, 0x00, 23, 4);
- 
-+/* pci_wqe_ipcs
-+ * Calculate IPv4 and TCP / UDP checksums.
-+ */
-+MLXSW_ITEM32(pci, wqe, ipcs, 0x00, 14, 1);
-+
- /* pci_wqe_byte_count
-  * Size of i-th scatter/gather entry, 0 if entry is unused.
-  */
-diff --git a/drivers/net/ethernet/mellanox/mlxsw/spectrum.c b/drivers/net/ethernet/mellanox/mlxsw/spectrum.c
-index 98632c046170..2f4e14d2f2e2 100644
---- a/drivers/net/ethernet/mellanox/mlxsw/spectrum.c
-+++ b/drivers/net/ethernet/mellanox/mlxsw/spectrum.c
-@@ -1630,8 +1630,10 @@ static int mlxsw_sp_port_create(struct mlxsw_sp *mlxsw_sp, u16 local_port,
- 	netif_carrier_off(dev);
- 
- 	dev->features |= NETIF_F_SG | NETIF_F_HW_VLAN_CTAG_FILTER |
--			 NETIF_F_HW_TC;
--	dev->hw_features |= NETIF_F_HW_TC | NETIF_F_LOOPBACK;
-+			 NETIF_F_HW_TC | NETIF_F_IP_CSUM | NETIF_F_IPV6_CSUM;
-+	dev->hw_features |= NETIF_F_HW_TC | NETIF_F_LOOPBACK |
-+			    NETIF_F_IP_CSUM | NETIF_F_IPV6_CSUM;
-+	dev->vlan_features |= NETIF_F_IP_CSUM | NETIF_F_IPV6_CSUM;
- 	dev->lltx = true;
- 	dev->netns_local = true;
- 
+base-commit: 233a2b1480a0bdf6b40d4debf58a07084e9921ff
+prerequisite-patch-id: 2cda134043ccfc781dd595052cfc60a3e2ea48ea
+prerequisite-patch-id: 62ac41823e7278621af3745a171aae07508711c8
+prerequisite-patch-id: 1330728a760d99174344cb421336ae9b01e17f38
+prerequisite-patch-id: ff2afa3e3a2c60a590d17a880b610e2a37e7af0c
+prerequisite-patch-id: cbff95efd09cb57e17c68c464ee1e317d01cf822
+prerequisite-patch-id: e5be07f7b169f2443c034f04e3d0a00a8d0a8894
+prerequisite-patch-id: a5f362eec88b62ff098203469cef8534f176d2a8
+prerequisite-patch-id: 545b9e38f61ccfd5b33ab9c3e3a6e7a9f899e306
+prerequisite-patch-id: a74b6b981ecd8a320284454d75b1dfc9e555b5f0
+prerequisite-patch-id: df0a5f503065fa5869b1c915721a54eb3c7394cb
+prerequisite-patch-id: faebd604b0a6eb2a888e99b8977f803abe035abf
+prerequisite-patch-id: b7543662f5225ce13a1c95749504c68ef4733aea
+prerequisite-patch-id: a7297c1e743f01d118c7f77b39e5755f7a704e17
+prerequisite-patch-id: 6f036cdf7bca2a272b153ecc5b3a767f41517c38
+prerequisite-patch-id: bb790f877236aad43dae0bdbdceb0a3553260d10
+prerequisite-patch-id: 2f53433b0d2a98cd42b18429bdbec1542b175b1f
+prerequisite-patch-id: cc9bf85bb9d988d92ab6cb1524bf213ec1351032
+prerequisite-patch-id: 112c048b7ae143edda05244b0d8b5ab928d3eff4
+prerequisite-patch-id: 124be0607c41aebe292c7b81910857489027baf1
+prerequisite-patch-id: b6b5f0e405d566879133d53c26fd998e9f330ff2
+prerequisite-patch-id: 777e25e09efe2ec4863e3bebdb247bac3e037c85
+prerequisite-patch-id: bf13dbef14d654b243150d4f2603eb90ae497058
+prerequisite-patch-id: 76f1c5ef5dacad0600339d5cf843ca14fcfa9dde
+prerequisite-patch-id: 586431a13be4f1ecf0adf450242aa7e90975d38f
+prerequisite-patch-id: e5c687a47edf3659dca8519e4c5250bbea89171b
+prerequisite-patch-id: 9f8081c59e275240cd76911fbede7d2737473357
+prerequisite-patch-id: f4d6edba52edea1276e0095e132733f4438de720
+prerequisite-patch-id: 5e7afab1204a42d90b8b6a14e3881cf1d4987954
+prerequisite-patch-id: 708e14a83a03377f2909b3ce0d72d21a4619a03d
+prerequisite-patch-id: ae9720262fb8d1f92b157865f02a9fc7d9aa1582
+prerequisite-patch-id: 11c806ab6cc8d29c86218d5760ca22cf3ef2ae05
+prerequisite-patch-id: 1aae146d6c20d41b4785d37962052a52c320ac3b
+prerequisite-patch-id: 59b00a073b5055091ccf55905e746a372dfc5e8e
+prerequisite-patch-id: 5b640578751b48ab50748dbe6f864ce14f1978c9
+prerequisite-patch-id: 725ea892cdefd598a1841323c6e74efe160dd3fe
+prerequisite-patch-id: 03bb4b3b1f37211fbcd379a19ebff5621c9d901f
+prerequisite-patch-id: 877ab147dd7c2e56beeb97bc4651fef89590cc23
+prerequisite-patch-id: 798f81cfb09f75af615986689658787d29427e85
+prerequisite-patch-id: 4e64a22702fa030f57436da273da1093153cfa7a
+prerequisite-patch-id: c8b8f75ae6c949e68a8ee0b6e7b09344a700663f
+prerequisite-patch-id: 19fed1ea4aaa320e4a4e46f9c39c7e994f09c7d9
+prerequisite-patch-id: 546c7611f620c90a054da039dd19cbc7339edb39
+prerequisite-patch-id: 272344e3e7ca650f3833ad62ffa75aa3b080fd72
+prerequisite-patch-id: b1d967b8973ec9320e239653773c7caa9d54de70
 -- 
-2.47.0
+2.38.1
 
 
