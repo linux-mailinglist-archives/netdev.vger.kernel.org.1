@@ -1,158 +1,191 @@
-Return-Path: <netdev+bounces-164110-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-164111-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3AC02A2CA1A
-	for <lists+netdev@lfdr.de>; Fri,  7 Feb 2025 18:25:08 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id EC7F3A2CA36
+	for <lists+netdev@lfdr.de>; Fri,  7 Feb 2025 18:33:07 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 5AF7B3A73A8
-	for <lists+netdev@lfdr.de>; Fri,  7 Feb 2025 17:24:59 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 172793A110D
+	for <lists+netdev@lfdr.de>; Fri,  7 Feb 2025 17:32:59 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DA1DE191F95;
-	Fri,  7 Feb 2025 17:25:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B9D941885A1;
+	Fri,  7 Feb 2025 17:33:04 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=fastly.com header.i=@fastly.com header.b="bPGNccpg"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="BMcpqH3Q"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f170.google.com (mail-pl1-f170.google.com [209.85.214.170])
+Received: from mail-qv1-f48.google.com (mail-qv1-f48.google.com [209.85.219.48])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4D13D1885B4
-	for <netdev@vger.kernel.org>; Fri,  7 Feb 2025 17:25:03 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.170
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 17F3915E5B8
+	for <netdev@vger.kernel.org>; Fri,  7 Feb 2025 17:33:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.48
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1738949104; cv=none; b=DjdZEBN2hV9+kRqfToxxsnoKnZhOcuGnYZ5cMlOLD6CiJGGuTf6GjlRJ2QliMM27xBddLIkGub6BdJyC1tSC/xsFRTMrCbN+DdUvjSyurZSC+0trVx5YKf6TLwipk/PJTr7lHlMohhmbRR/E3h1/PkrH4YUth/PebXSXGnaHFCA=
+	t=1738949584; cv=none; b=CgOYAn2Dd+WHF3dxu6e19J7ttVints0fk14JWmhpeFGuGXgg2/XLN0/WVjldB879FHdDLRX1CUoTZEuSl7jxPJsl37pglfQ0r5VctIIbupCV9P9QO+WtRwyE55ROY3GvjRt6y/Akh/5CqRcjGMEa3lpdP+bB/oshJ/BIHABG1fo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1738949104; c=relaxed/simple;
-	bh=iKoA3Dq9s3tWAZm62D5N3xmXxicb6RywtNHezCBtBjk=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=fxGEqp4ghPtVYTJkFEYPCSEbppjeXhWaWrv1uvdWqQIPtf7H0TNiRI+yzlaSw9X1zg7jn9dH5V4BBIszEVjHdzAzQXWbs6pdToLAzq26uJNoSUIZeNEvU6botBixOY6MvuqW2TqU4t62lYLBAjUIfunZB4IaPQRp0FVra6kbFHI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fastly.com; spf=pass smtp.mailfrom=fastly.com; dkim=pass (1024-bit key) header.d=fastly.com header.i=@fastly.com header.b=bPGNccpg; arc=none smtp.client-ip=209.85.214.170
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fastly.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=fastly.com
-Received: by mail-pl1-f170.google.com with SMTP id d9443c01a7336-21f61b01630so8107755ad.1
-        for <netdev@vger.kernel.org>; Fri, 07 Feb 2025 09:25:03 -0800 (PST)
+	s=arc-20240116; t=1738949584; c=relaxed/simple;
+	bh=cKEqUb8E/dm3JqDoluKkF7uJ6WOXqwJncWIdLXdarYg=;
+	h=Date:From:To:Cc:Message-ID:In-Reply-To:References:Subject:
+	 Mime-Version:Content-Type; b=WbbJiiFc97jZa9bLketFO0cZJOxzvxHFUWypTg2+hAuMQmYCy1HBGmTHcIbiCnWPBtmjvrJE//QWWXYbA0bGZ2tEMfd/lLQztkfOCsH9xfDLXGnV3vOgGItlihPjXFSOR0D8CMPpEM6vvFjkwE13NaCVT8wTx6oPqHHrKhdAcr4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=BMcpqH3Q; arc=none smtp.client-ip=209.85.219.48
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-qv1-f48.google.com with SMTP id 6a1803df08f44-6e41e18137bso20595486d6.1
+        for <netdev@vger.kernel.org>; Fri, 07 Feb 2025 09:33:02 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=fastly.com; s=google; t=1738949102; x=1739553902; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references
-         :mail-followup-to:message-id:subject:cc:to:from:date:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=1h8iE+x6l6fDJRgf8jTiyVWI9cwMS/v7wWiYAjXKBN4=;
-        b=bPGNccpgVP8NAVw2pbgWymIAlF3oqRVcv99rNyir/1U8NVLU3BoRI+TZi6mcoGbwwN
-         xrDzjKsGYWyPAsSDalVCxOx85QtuU31dNKp7C6NslBTPBh9DBsc1vFt7FDZ6Xoql6MmK
-         janBPaymt43cLvhlsahwguuTakDFFMDvPvpy0=
+        d=gmail.com; s=20230601; t=1738949582; x=1739554382; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:subject:references
+         :in-reply-to:message-id:cc:to:from:date:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=UOZQ6FzeNn5UP+LNZcRFn7cpfwanmQMk0JsuQ+dl1kg=;
+        b=BMcpqH3QhKGyz4eSUzPSm8PYEb89gCQP4EnBRh7C2npn4hGnEcOVC64SR0PCIBGpyw
+         r6Bc0f8tYXBDmolKiZeTSbFR64J5SA4X8u2zpALVPfmso1/f5lem28Eujwc4rR8PlcZA
+         hL2qX1rgZmiUP1qlybNetBrIKdVX/rS5AJV3fBxERWczh3UzsplzC0MqGdL6MamyVbwn
+         OksIMMdvMDnR0bSNZ5ze4nktPvCggXKTtHT/0tj6T1emv0w4Nh/4b1fpm7BJfMGmLwHF
+         rm1ZtsrprYRLF8R4OHY14ZG1IjHYokwMjTEe1kV3P8KsssalvlEkvHKM/xqoeEb4TKqn
+         6RUA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1738949102; x=1739553902;
-        h=in-reply-to:content-disposition:mime-version:references
-         :mail-followup-to:message-id:subject:cc:to:from:date
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=1h8iE+x6l6fDJRgf8jTiyVWI9cwMS/v7wWiYAjXKBN4=;
-        b=hv/SQUPkw7ogI4ln0LIBGpQvvdwUmSPEjuebofLaPjMX+9CYaMnQMkglizszjo876C
-         jNGzXuLXGUw6MybAh7gjcP2Y6SVOME7swuovE5IEOOq/vFD8ERiLlLFKmGQjkJ6NB1A4
-         m5dFeG3uJmAb1F+KFUYuCfdGmoh0pCWYN1QhmJk5AywGuRHSQ+V6yi2/8UZW30eBdRvq
-         IgpOyrmwVtgnOHnf6ZWZlzxGwXgrZuB2omRpRmRYmjSeDQR//J/PhD2K3v7bEU3wjUyV
-         t9mBlS0XwFgplnYKmLpwTLocnWnyd6ONwtx9f7sGg9b+0HhZhlA9qllNuY10ytIiDnwc
-         mCog==
-X-Gm-Message-State: AOJu0Yy1aGRXLM5EcU08yZ9x7CO+aW+e7jgGYiQMdynH1xnKYnxypDac
-	Y+MFUGeM98EZHRdp7dyZ6M2rtmcps8QqZlLahXwyQw17qA81LCYWqXT9oHJaFV8=
-X-Gm-Gg: ASbGncsSIrpAlEshUY5jbkp3Yd6JwhlB5hkqE/z7zDoxbcHPxUTe1DqKvZd7/G7lykv
-	FfohV7USsvvsRu9agettuwXw1dBIPI2rMGb9azbaY+ol18SkUFJPzLgh67KjH3qALq+aynxSR0v
-	N7Z1Wa2TrJTO/LR0LZ3nSOnV1Kuy16czJz/BONn9uZ279oUfhKGibiE9kYC14FQkEQMqHskMaLG
-	0hYg/t+Ip+278/X4+BXwIWHKQLjetxLQxkdGb7nk3XbMU0ca8zuSU+0bBT9jYf1rbjx3g8Z8qDY
-	IumJYe0TVhMYEYXmGSbd+Xf1DDXMOanBg/UKBzgljIPa1Q5YRg0AOnZgRQ==
-X-Google-Smtp-Source: AGHT+IFuPBqihb3KRgNAtHFlI8yllud1dbR8e/Jm9UPR/bBfgMm14QMh/DgJHKaG0i4Y2Ug1DdBN0Q==
-X-Received: by 2002:a05:6a20:439f:b0:1ed:a4b1:9124 with SMTP id adf61e73a8af0-1ee05299d4fmr5115662637.8.1738949102366;
-        Fri, 07 Feb 2025 09:25:02 -0800 (PST)
-Received: from LQ3V64L9R2 (c-24-6-151-244.hsd1.ca.comcast.net. [24.6.151.244])
-        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-73048e20bcdsm3342780b3a.178.2025.02.07.09.24.58
+        d=1e100.net; s=20230601; t=1738949582; x=1739554382;
+        h=content-transfer-encoding:mime-version:subject:references
+         :in-reply-to:message-id:cc:to:from:date:x-gm-message-state:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=UOZQ6FzeNn5UP+LNZcRFn7cpfwanmQMk0JsuQ+dl1kg=;
+        b=K6wr2goikIrs2vhBvwM0MPUX+XRYpEDQUB1g2LCi4jJ3/cyQYcDKRQeMrgLaq2Zzfe
+         lFuLyQXGt0k0Ru2miWtBLzlhiy6NidGapNi7CRK1JiWQ9iTjc5riXv7oynxf3kSkROtL
+         PlS5izacL2fo+mePEogd48Htcxy0aS6+nr7tAoSWgKjONPmA4Ca2iI5QvISlZEjMGihV
+         wUQrj1NddhpMPQ5XhCQDJcohZ3hs79UHXF4WuPMnYmcqAQk+g/VxcLalfpZbs9Zx1HDW
+         LCPcJnC2v3VISGvfKrXrUz4wZA1wIaXWm03Pr86wkipqqpTQLzEXJDlynjG6nW27JKu+
+         SjbA==
+X-Forwarded-Encrypted: i=1; AJvYcCV21SH4M41HEPMR/t26hg6S08WB2iki+7TZmXLgD/BzqUxwKN9nX6WZR01Rw+x9tWsA5aO+Br8=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxJsIRi+qIGFq9+SBzxFkKrNagnS8EB15Vo94LiOv5hIKQ+t2n9
+	qqAaGDPeH80HeRQXzOV7r9PtfOcm0t/YjDr+AL3tQ2KGQ8lNLwfj
+X-Gm-Gg: ASbGncsc+MdFD4K8wVNs7fr19jiNAAN3wnyNTNNiniZ8eKLxAREV5uXieCG3pK50h6k
+	29kVSu2+rjtl00EsjCiaeik/dSqRHIY1WPsyvna/ZfVGYmDoPp5I82UV7+pQp7n0iOQx3Wm2q5W
+	fLvydqpwAxVWn/wYgBC1j2scfwlK0VfVE4O/jICiw/ITZt/3yUjGyqaelRacciLnoeX8DNrgeGX
+	LZGKEL+/6bHlTzJtJ3d4ychNH5pq4yLZ1DtnSAyqWwGx4tLaOuKcvFYmx5aXIPSo+e+2/OWWqAo
+	R8cdKnsjmfrOT4ptYv5SqUTXXXjvRXAkh9okkT5aH3sJzVWbNl4YBcLMUjHo27M=
+X-Google-Smtp-Source: AGHT+IGQKD30JLRXtNStRt8a0vwToJno+70jF7Tu7JJglRYLiOFM+Hmu+Pf/czSanB2yyabEJUIVhw==
+X-Received: by 2002:ad4:5f0e:0:b0:6d4:211c:dff0 with SMTP id 6a1803df08f44-6e4456d9d9dmr51160396d6.29.1738949581985;
+        Fri, 07 Feb 2025 09:33:01 -0800 (PST)
+Received: from localhost (15.60.86.34.bc.googleusercontent.com. [34.86.60.15])
+        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-6e43e6b3c32sm16506636d6.124.2025.02.07.09.33.01
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 07 Feb 2025 09:25:01 -0800 (PST)
-Date: Fri, 7 Feb 2025 09:24:57 -0800
-From: Joe Damato <jdamato@fastly.com>
-To: Simon Horman <horms@kernel.org>
-Cc: netdev@vger.kernel.org, pabeni@redhat.com, edumazet@google.com,
-	sridhar.samudrala@intel.com, Jakub Kicinski <kuba@kernel.org>,
-	Donald Hunter <donald.hunter@gmail.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	Stanislav Fomichev <sdf@fomichev.me>,
-	Xuan Zhuo <xuanzhuo@linux.alibaba.com>,
-	Mina Almasry <almasrymina@google.com>,
-	Daniel Jurgens <danielj@nvidia.com>,
-	Amritha Nambiar <amritha.nambiar@intel.com>,
-	David Wei <dw@davidwei.uk>,
-	open list <linux-kernel@vger.kernel.org>
-Subject: Re: [PATCH net-next v4 2/3] netdev-genl: Add an XSK attribute to
- queues
-Message-ID: <Z6ZB6SdcO4kBi-Au@LQ3V64L9R2>
-Mail-Followup-To: Joe Damato <jdamato@fastly.com>,
-	Simon Horman <horms@kernel.org>, netdev@vger.kernel.org,
-	pabeni@redhat.com, edumazet@google.com, sridhar.samudrala@intel.com,
-	Jakub Kicinski <kuba@kernel.org>,
-	Donald Hunter <donald.hunter@gmail.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	Stanislav Fomichev <sdf@fomichev.me>,
-	Xuan Zhuo <xuanzhuo@linux.alibaba.com>,
-	Mina Almasry <almasrymina@google.com>,
-	Daniel Jurgens <danielj@nvidia.com>,
-	Amritha Nambiar <amritha.nambiar@intel.com>,
-	David Wei <dw@davidwei.uk>,
-	open list <linux-kernel@vger.kernel.org>
-References: <20250207030916.32751-1-jdamato@fastly.com>
- <20250207030916.32751-3-jdamato@fastly.com>
- <20250207133055.GU554665@kernel.org>
+        Fri, 07 Feb 2025 09:33:01 -0800 (PST)
+Date: Fri, 07 Feb 2025 12:33:01 -0500
+From: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
+To: Willem de Bruijn <willemdebruijn.kernel@gmail.com>, 
+ Willem de Bruijn <willemdebruijn.kernel@gmail.com>, 
+ netdev@vger.kernel.org
+Cc: davem@davemloft.net, 
+ kuba@kernel.org, 
+ edumazet@google.com, 
+ pabeni@redhat.com, 
+ Willem de Bruijn <willemb@google.com>
+Message-ID: <67a643cde07d_2b3e7e2943@willemb.c.googlers.com.notmuch>
+In-Reply-To: <67a55afb822cc_25109e294cc@willemb.c.googlers.com.notmuch>
+References: <20250206193521.2285488-1-willemdebruijn.kernel@gmail.com>
+ <20250206193521.2285488-5-willemdebruijn.kernel@gmail.com>
+ <67a55afb822cc_25109e294cc@willemb.c.googlers.com.notmuch>
+Subject: Re: [PATCH net-next 4/7] ipv4: remove get_rttos
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250207133055.GU554665@kernel.org>
+Mime-Version: 1.0
+Content-Type: text/plain;
+ charset=utf-8
+Content-Transfer-Encoding: 7bit
 
-On Fri, Feb 07, 2025 at 01:30:55PM +0000, Simon Horman wrote:
-> On Fri, Feb 07, 2025 at 03:08:54AM +0000, Joe Damato wrote:
-> > Expose a new per-queue nest attribute, xsk, which will be present for
-> > queues that are being used for AF_XDP. If the queue is not being used for
-> > AF_XDP, the nest will not be present.
+Willem de Bruijn wrote:
+> Willem de Bruijn wrote:
+> > From: Willem de Bruijn <willemb@google.com>
 > > 
-> > In the future, this attribute can be extended to include more data about
-> > XSK as it is needed.
+> > Initialize the ip cookie tos field when initializing the cookie, in
+> > ipcm_init_sk.
 > > 
-> > Signed-off-by: Joe Damato <jdamato@fastly.com>
-> > Suggested-by: Jakub Kicinski <kuba@kernel.org>
-> 
-> ...
-> 
-> > diff --git a/net/core/netdev-genl.c b/net/core/netdev-genl.c
-> > index 0dcd4faefd8d..75ca111aa591 100644
-> > --- a/net/core/netdev-genl.c
-> > +++ b/net/core/netdev-genl.c
-> > @@ -380,6 +380,7 @@ netdev_nl_queue_fill_one(struct sk_buff *rsp, struct net_device *netdev,
-> >  	struct netdev_rx_queue *rxq;
-> >  	struct netdev_queue *txq;
-> >  	void *hdr;
-> > +	int ret;
+> > The existing code inverts the standard pattern for initializing cookie
+> > fields. Default is to initialize the field from the sk, then possibly
+> > overwrite that when parsing cmsgs (the unlikely case).
+> > 
+> > This field inverts that, setting the field to an illegal value and
+> > after cmsg parsing checking whether the value is still illegal and
+> > thus should be overridden.
+> > 
+> > Be careful to always apply mask INET_DSCP_MASK, as before.
+> > 
+> > Signed-off-by: Willem de Bruijn <willemb@google.com>
+> > ---
+> >  include/net/ip.h       | 11 +++--------
+> >  net/ipv4/ip_sockglue.c |  4 ++--
+> >  net/ipv4/ping.c        |  1 -
+> >  net/ipv4/raw.c         |  1 -
+> >  net/ipv4/udp.c         |  1 -
+> >  5 files changed, 5 insertions(+), 13 deletions(-)
+> > 
+> > diff --git a/include/net/ip.h b/include/net/ip.h
+> > index 6af16545b3e3..6819704e2642 100644
+> > --- a/include/net/ip.h
+> > +++ b/include/net/ip.h
+> > @@ -92,7 +92,9 @@ static inline void ipcm_init(struct ipcm_cookie *ipcm)
+> >  static inline void ipcm_init_sk(struct ipcm_cookie *ipcm,
+> >  				const struct inet_sock *inet)
+> >  {
+> > -	ipcm_init(ipcm);
+> > +	*ipcm = (struct ipcm_cookie) {
+> > +		.tos = READ_ONCE(inet->tos) & INET_DSCP_MASK,
+> > +	};
 > >  
+> >  	sockcm_init(&ipcm->sockc, &inet->sk);
+> >  
+> > @@ -256,13 +258,6 @@ static inline u8 ip_sendmsg_scope(const struct inet_sock *inet,
+> >  	return RT_SCOPE_UNIVERSE;
+> >  }
+> >  
+> > -static inline __u8 get_rttos(struct ipcm_cookie* ipc, struct inet_sock *inet)
+> > -{
+> > -	u8 dsfield = ipc->tos != -1 ? ipc->tos : READ_ONCE(inet->tos);
+> > -
+> > -	return dsfield & INET_DSCP_MASK;
+> > -}
+> > -
+> >  /* datagram.c */
+> >  int __ip4_datagram_connect(struct sock *sk, struct sockaddr *uaddr, int addr_len);
+> >  int ip4_datagram_connect(struct sock *sk, struct sockaddr *uaddr, int addr_len);
+> > diff --git a/net/ipv4/ip_sockglue.c b/net/ipv4/ip_sockglue.c
+> > index 6d9c5c20b1c4..98b1e4a8b72e 100644
+> > --- a/net/ipv4/ip_sockglue.c
+> > +++ b/net/ipv4/ip_sockglue.c
+> > @@ -314,8 +314,8 @@ int ip_cmsg_send(struct sock *sk, struct msghdr *msg, struct ipcm_cookie *ipc,
+> >  				return -EINVAL;
+> >  			if (val < 0 || val > 255)
+> >  				return -EINVAL;
+> > -			ipc->tos = val;
+> > -			ipc->sockc.priority = rt_tos2priority(ipc->tos);
+> > +			ipc->sockc.priority = rt_tos2priority(val);
+> > +			ipc->tos = val & INET_DSCP_MASK;
+> >  			break;
+> >  		case IP_PROTOCOL:
+> >  			if (cmsg->cmsg_len != CMSG_LEN(sizeof(int)))
+> > diff --git a/net/ipv4/ping.c b/net/ipv4/ping.c
+> > index 619ddc087957..0215885c6df5 100644
+> > --- a/net/ipv4/ping.c
+> > +++ b/net/ipv4/ping.c
+> > @@ -768,7 +768,6 @@ static int ping_v4_sendmsg(struct sock *sk, struct msghdr *msg, size_t len)
+> >  		}
+> >  		faddr = ipc.opt->opt.faddr;
+> >  	}
+> > -	tos = get_rttos(&ipc, inet);
 > 
-> Hi Joe,
-> 
-> Perhaps this got left behind after some revisions elsewhere.
-> But as it stands ret is unused in this function and should be removed.
-> 
-> >  	hdr = genlmsg_iput(rsp, info);
-> >  	if (!hdr)
-> 
-> ...
+> Here and elsewhere, subsequent code needs to use ipc.tos directly.
 
-Yes, you are right. I originally added it for the empty nest and
-then didn't use it.
+Actually I misunderstood the purpose of get_rttos.
 
-Sorry that I missed that and caused unnecessary churn due to my own
-negligence.
+It only masks the dsfield when passed to the routing layer, with
+flowi4_init_output().
 
-Thanks for the review / catching it.
+The other purpose of ipc->tos, to initialize iph->tos, takes the
+unmasked version including ECN bits.
+
 
