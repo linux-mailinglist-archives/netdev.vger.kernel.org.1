@@ -1,152 +1,148 @@
-Return-Path: <netdev+bounces-163936-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-163937-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9D243A2C179
-	for <lists+netdev@lfdr.de>; Fri,  7 Feb 2025 12:28:57 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 239DFA2C1C0
+	for <lists+netdev@lfdr.de>; Fri,  7 Feb 2025 12:41:10 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 80F6A7A50EC
-	for <lists+netdev@lfdr.de>; Fri,  7 Feb 2025 11:28:01 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 1DC0F7A114B
+	for <lists+netdev@lfdr.de>; Fri,  7 Feb 2025 11:40:14 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 837021DEFE9;
-	Fri,  7 Feb 2025 11:28:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D703A1DE899;
+	Fri,  7 Feb 2025 11:41:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="E+3Ktxd6"
 X-Original-To: netdev@vger.kernel.org
-Received: from szxga01-in.huawei.com (szxga01-in.huawei.com [45.249.212.187])
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.9])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 167A61DED6B;
-	Fri,  7 Feb 2025 11:28:39 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.187
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 26DA31A83F5;
+	Fri,  7 Feb 2025 11:41:01 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.9
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1738927722; cv=none; b=KJKmCEhxnBk8TljPdcveaUnrPUgkgI5mpD0Jgwok2zD29nzpoRgaRXs8uX4W8ItcbKrGjqeHHAqA/ugRA/uSQcKCslOy1oi+ccVzOp5XJqi82WJHiZKlSCx3jHiwfkz83f6TxcNB/fzfrgDx8fNpB2uq52ks6QTf2Ptt7OOFTXY=
+	t=1738928463; cv=none; b=bNCCMwe1A72NwymtWQbe11shwXJom0/lWs4w2n5KU6EeATZBEWmlngNW4zgDjdCyNk591MxZpUt+MAADF7eqv74X/cue+bTxt45koaKdAUEyTs7aFnqdkT6zHnK03iqS5+HOPUeSjx6Lq+ppNSXUk4wTl4bEj0u4PHywRL2601I=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1738927722; c=relaxed/simple;
-	bh=rE6lHm65mg1GEw5D+xuDHshi7zGvNb59fTyiTc+SPsE=;
-	h=Message-ID:Date:MIME-Version:From:Subject:To:CC:References:
-	 In-Reply-To:Content-Type; b=RVTq9dpHcXvEJeBzYxVIFzE31rODai/+7UgbGYbykRb0kpuyQxBn0YwXQpbSIBGCNu8KB3rGXgcoDAKfiTzIjK2rVgMaA7vMR7ultPDdwnSdHMj64bf9bGqbY27Rzi6zK1WuQundR7VbnJlmIPrs0Cw95XIvxxgGOOLMAlUSXp4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.187
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
-Received: from mail.maildlp.com (unknown [172.19.88.194])
-	by szxga01-in.huawei.com (SkyGuard) with ESMTP id 4YqBST5ps2z11Pm5;
-	Fri,  7 Feb 2025 19:24:09 +0800 (CST)
-Received: from kwepemf500003.china.huawei.com (unknown [7.202.181.241])
-	by mail.maildlp.com (Postfix) with ESMTPS id A6F821400D5;
-	Fri,  7 Feb 2025 19:28:30 +0800 (CST)
-Received: from [10.174.176.82] (10.174.176.82) by
- kwepemf500003.china.huawei.com (7.202.181.241) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.11; Fri, 7 Feb 2025 19:28:28 +0800
-Message-ID: <80b1c21c-096b-4a11-b9d7-069c972b146a@huawei.com>
-Date: Fri, 7 Feb 2025 19:28:23 +0800
+	s=arc-20240116; t=1738928463; c=relaxed/simple;
+	bh=Kr3VE9NUyZO8hS9QqWqW3tBkPoYkI+NxTJxvWVkvBkA=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=At1e8l77Um540pNmXO/N7Cmqouy3khTM+ruvgy8iCGnWXpX/MNmAFw2SeMzK0FO6uF7O5qYh4hVQ3IjtKG1PPZmmKp8I+ovCdXeQmpkukspqxnFD9vy9FX5Ra0a44It/6RITWcAIpkGFU8DPS0/Ilsfz2eiwKpcCyAO/2B2abAw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=E+3Ktxd6; arc=none smtp.client-ip=192.198.163.9
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1738928462; x=1770464462;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=Kr3VE9NUyZO8hS9QqWqW3tBkPoYkI+NxTJxvWVkvBkA=;
+  b=E+3Ktxd6ld7bk0PZqL1XlsaV/l1FDW/wJDBjvjip+lY7m4mjNZ4TQL8B
+   Cytb2XuwFlUqkMrPS35M9H8fngyL5cNNew2EonMHjeCzfBtsmtqz56kwe
+   JFakJ5Nl2OH4aK/Fz4lfz0iC6w+LWnw5PtHMdL3xZOPn00V3w0yYqoj7z
+   rauFCMQ3UdWUcmpf51GcJKG4XsxX16z4tDZCrdI8h3yiFDodBCM15EXxS
+   d5M61J02J+jbenrBJssgW3cbrF8GgOHsbYO6AkUkpaSs63918KQrYpd5V
+   T7S/4U85c7PJJ9jEFd3J6CPGrcpoD6Xr6wSkhSpkiHk+/WVmjRQZL5Zss
+   A==;
+X-CSE-ConnectionGUID: a5Z5cfmsQSCal/R5udKozw==
+X-CSE-MsgGUID: Jef3ZS/KQCK3lujza3IRSQ==
+X-IronPort-AV: E=McAfee;i="6700,10204,11336"; a="50204716"
+X-IronPort-AV: E=Sophos;i="6.13,266,1732608000"; 
+   d="scan'208";a="50204716"
+Received: from orviesa009.jf.intel.com ([10.64.159.149])
+  by fmvoesa103.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 07 Feb 2025 03:41:01 -0800
+X-CSE-ConnectionGUID: KPH5yCU9QtuhzEinvrTVsw==
+X-CSE-MsgGUID: LxkwO1UyTTKjfONVxwkKqw==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.13,266,1732608000"; 
+   d="scan'208";a="111290324"
+Received: from lkp-server01.sh.intel.com (HELO d63d4d77d921) ([10.239.97.150])
+  by orviesa009.jf.intel.com with ESMTP; 07 Feb 2025 03:40:56 -0800
+Received: from kbuild by d63d4d77d921 with local (Exim 4.96)
+	(envelope-from <lkp@intel.com>)
+	id 1tgMj6-000yF9-36;
+	Fri, 07 Feb 2025 11:40:52 +0000
+Date: Fri, 7 Feb 2025 19:40:10 +0800
+From: kernel test robot <lkp@intel.com>
+To: Suman Ghosh <sumang@marvell.com>, horms@kernel.org,
+	sgoutham@marvell.com, gakula@marvell.com, sbhatta@marvell.com,
+	hkelam@marvell.com, davem@davemloft.net, edumazet@google.com,
+	kuba@kernel.org, pabeni@redhat.com, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org, lcherian@marvell.com,
+	jerinj@marvell.com, john.fastabend@gmail.com, bbhushan2@marvell.com,
+	hawk@kernel.org, andrew+netdev@lunn.ch, ast@kernel.org,
+	daniel@iogearbox.net, bpf@vger.kernel.org, larysa.zaremba@intel.com
+Cc: llvm@lists.linux.dev, oe-kbuild-all@lists.linux.dev,
+	Suman Ghosh <sumang@marvell.com>
+Subject: Re: [net-next PATCH v5 6/6] octeontx2-pf: AF_XDP zero copy transmit
+ support
+Message-ID: <202502071925.3T93J9MM-lkp@intel.com>
+References: <20250206085034.1978172-7-sumang@marvell.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-From: "zhangzekun (A)" <zhangzekun11@huawei.com>
-Subject: Re: [PATCH 1/9] of: Add warpper function
- of_find_node_by_name_balanced()
-To: Oleksij Rempel <o.rempel@pengutronix.de>
-CC: <robh@kernel.org>, <saravanak@google.com>, <justin.chen@broadcom.com>,
-	<florian.fainelli@broadcom.com>, <andrew+netdev@lunn.ch>, <kuba@kernel.org>,
-	<kory.maincent@bootlin.com>, <jacopo+renesas@jmondi.org>,
-	<kieran.bingham+renesas@ideasonboard.com>,
-	<laurent.pinchart+renesas@ideasonboard.com>, <maddy@linux.ibm.com>,
-	<mpe@ellerman.id.au>, <npiggin@gmail.com>, <olteanv@gmail.com>,
-	<davem@davemloft.net>, <taras.chornyi@plvision.eu>, <edumazet@google.com>,
-	<pabeni@redhat.com>, <sudeep.holla@arm.com>, <cristian.marussi@arm.com>,
-	<arm-scmi@vger.kernel.org>, <linuxppc-dev@lists.ozlabs.org>,
-	<linux-media@vger.kernel.org>, <netdev@vger.kernel.org>,
-	<devicetree@vger.kernel.org>, <chenjun102@huawei.com>
-References: <20250207013117.104205-1-zhangzekun11@huawei.com>
- <20250207013117.104205-2-zhangzekun11@huawei.com>
- <Z6XDKi_V0BZSdCeL@pengutronix.de>
-In-Reply-To: <Z6XDKi_V0BZSdCeL@pengutronix.de>
-Content-Type: text/plain; charset="UTF-8"; format=flowed
-Content-Transfer-Encoding: 8bit
-X-ClientProxiedBy: dggems704-chm.china.huawei.com (10.3.19.181) To
- kwepemf500003.china.huawei.com (7.202.181.241)
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250206085034.1978172-7-sumang@marvell.com>
+
+Hi Suman,
+
+kernel test robot noticed the following build warnings:
+
+[auto build test WARNING on net-next/main]
+
+url:    https://github.com/intel-lab-lkp/linux/commits/Suman-Ghosh/octeontx2-pf-use-xdp_return_frame-to-free-xdp-buffers/20250206-165634
+base:   net-next/main
+patch link:    https://lore.kernel.org/r/20250206085034.1978172-7-sumang%40marvell.com
+patch subject: [net-next PATCH v5 6/6] octeontx2-pf: AF_XDP zero copy transmit support
+config: x86_64-buildonly-randconfig-006-20250207 (https://download.01.org/0day-ci/archive/20250207/202502071925.3T93J9MM-lkp@intel.com/config)
+compiler: clang version 19.1.3 (https://github.com/llvm/llvm-project ab51eccf88f5321e7c60591c5546b254b6afab99)
+reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20250207/202502071925.3T93J9MM-lkp@intel.com/reproduce)
+
+If you fix the issue in a separate patch/commit (i.e. not just a new version of
+the same patch/commit), kindly add following tags
+| Reported-by: kernel test robot <lkp@intel.com>
+| Closes: https://lore.kernel.org/oe-kbuild-all/202502071925.3T93J9MM-lkp@intel.com/
+
+All warnings (new ones prefixed by >>):
+
+>> drivers/net/ethernet/marvell/octeontx2/nic/otx2_txrx.c:112:6: warning: variable 'iova' set but not used [-Wunused-but-set-variable]
+     112 |         u64 iova;
+         |             ^
+   1 warning generated.
 
 
+vim +/iova +112 drivers/net/ethernet/marvell/octeontx2/nic/otx2_txrx.c
 
-在 2025/2/7 16:24, Oleksij Rempel 写道:
-> On Fri, Feb 07, 2025 at 09:31:09AM +0800, Zhang Zekun wrote:
->> There are many drivers use of_find_node_by_name() with a not-NULL
->> device_node pointer, and a number of callers would require a call to
->> of_node_get() before using it. There are also some drivers who forget
->> to call of_node_get() which would cause a ref count leak[1]. So, Add a
->> wraper function for of_find_node_by_name(), drivers may use this function
->> to call of_find_node_by_name() with the refcount already balanced.
->>
->> [1] https://lore.kernel.org/all/20241024015909.58654-1-zhangzekun11@huawei.com/
-> 
-> Hi Zhang Zekun,
-> 
-> thank you for working on this issue!
-> 
-> First of all, let's take a step back and analyze the initial problem.
-> Everything following is only my opinion...
-> 
-> The main issue I see is that the current API - of_find_node_by_name -
-> modifies the refcount of its input by calling of_node_put(from) as part
-> of its search. Typically, a "find" function is expected to treat its
-> input as read-only. That is, when you pass an object into such a
-> function, you expect its reference count to remain unchanged unless
-> ownership is explicitly transferred. In this case, lowering the refcount
-> on the input node is counterintuitive and already lead to unexpected
-> behavior and subtle bugs.
-> 
-> To address this, the workaround introduces a wrapper function,
-> of_find_node_by_name_balanced, which first increments the input’s
-> refcount (via of_node_get()) before calling the original function. While
-> this "balances" the refcount change, the naming remains problematic from
-> my perspective. The "_balanced" suffix isn’t part of our common naming
-> conventions (traditions? :)). Most drivers expect that a function
-> starting with "find" will not alter the reference count of its input.
-> The term "balanced" doesn’t clearly convey that the input's refcount is
-> being explicitly managed - it instead obscures the underlying behavior,
-> leaving many developers confused about what guarantees the API provides.
-> 
-> In my view, a more natural solution would be to redesign the API so that
-> it doesn’t modify the input object’s refcount at all. Instead, it should
-> solely increase the refcount of the returned node (if found) for safe
-> asynchronous usage. This approach would align with established
-> conventions where "find" implies no side effects on inputs or output,
-> and a "get" indicates that the output comes with an extra reference. For
-> example, a function named of_get_node_by_name would clearly signal that
-> only the returned node is subject to a refcount increase while leaving
-> the input intact.
-> 
-> Thus, while the current workaround "balances" the reference count, it
-> doesn't address the underlying design flaw. The naming still suggests a
-> "find" function that should leave the input untouched, which isn’t the
-> case here. A redesign of the API - with both the behavior and naming
-> aligned to common expectations - would be a clearer and more robust
-> solution.
-> 
-> Nevertheless, it is only my POV, and the final decision rests with the
-> OpenFirmware framework maintainers.
-> 
-> Best Regards,
-> Oleksij
+   104	
+   105	static void otx2_xdp_snd_pkt_handler(struct otx2_nic *pfvf,
+   106					     struct otx2_snd_queue *sq,
+   107					     struct nix_cqe_tx_s *cqe,
+   108					     int *xsk_frames)
+   109	{
+   110		struct nix_send_comp_s *snd_comp = &cqe->comp;
+   111		struct sg_list *sg;
+ > 112		u64 iova;
+   113	
+   114		sg = &sq->sg[snd_comp->sqe_id];
+   115	
+   116		if (sg->flags & OTX2_AF_XDP_FRAME) {
+   117			(*xsk_frames)++;
+   118			return;
+   119		}
+   120	
+   121		iova = sg->dma_addr[0];
+   122		if (sg->flags & OTX2_XDP_REDIRECT)
+   123			otx2_dma_unmap_page(pfvf, sg->dma_addr[0], sg->size[0], DMA_TO_DEVICE);
+   124		xdp_return_frame((struct xdp_frame *)sg->skb);
+   125		sg->skb = (u64)NULL;
+   126	}
+   127	
 
-Hi, Oleksij,
-
-Thanks for your review. I think redesign the API would be a fundamental 
-way to fix this issue, but it would cause impact for current users who 
-knows the exact functionality of of_find_node_by_name(), which need to 
-put the "from" before calling it (I can't make the assumption that all 
-of drivers calling of_find_node_by_name() with a not-NULL "from" 
-pointer, but not calling of_node_get() before is misuse). The basic idea 
-for adding a new function is try not to impact current users. For users 
-who are confused about the "_balanced" suffix,the comments of 
-of_find_node_by_name() explains why this interface exists.
-
-Thanks,
-Zekun
+-- 
+0-DAY CI Kernel Test Service
+https://github.com/intel/lkp-tests/wiki
 
