@@ -1,208 +1,212 @@
-Return-Path: <netdev+bounces-163974-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-163975-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id D68B4A2C34B
-	for <lists+netdev@lfdr.de>; Fri,  7 Feb 2025 14:10:21 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 97961A2C34D
+	for <lists+netdev@lfdr.de>; Fri,  7 Feb 2025 14:12:39 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A9AD83A4806
-	for <lists+netdev@lfdr.de>; Fri,  7 Feb 2025 13:10:07 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 109EC1677E3
+	for <lists+netdev@lfdr.de>; Fri,  7 Feb 2025 13:12:38 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DBA861E7C02;
-	Fri,  7 Feb 2025 13:10:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 40EF41EB9E5;
+	Fri,  7 Feb 2025 13:12:35 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="s0SIzxM7"
+	dkim=pass (2048-bit key) header.d=openvpn.net header.i=@openvpn.net header.b="XK/cYaOa"
 X-Original-To: netdev@vger.kernel.org
-Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wm1-f47.google.com (mail-wm1-f47.google.com [209.85.128.47])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 120271E1A33
-	for <netdev@vger.kernel.org>; Fri,  7 Feb 2025 13:10:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F1AEA1E1A33
+	for <netdev@vger.kernel.org>; Fri,  7 Feb 2025 13:12:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.47
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1738933814; cv=none; b=KxIFwzM2zTg1lk1L+9xiHyqwOkq6XjFMCIp+jEcixlHZaVcg7b7c6QioNT2XWbp9M3nDOZu4coa4LFJoZ+iVIL+5zcIw79BiwwCO4t0a3EFMqSPhf3cLnas/Apsc/8otgBVUxj7YeI8hrnOngrDVO0MujFGcHp9Q4SW8TUfEgNk=
+	t=1738933955; cv=none; b=dvD4R79SPEr69Q+zsGQhC1ns1lM+VnCkMMbLZ/B+M2RxD+h1Q6tHHLxTGiHAH+jdMiB4mFcstksLmAceEeLAkourWYfECBKpBpypGuSoJ9PjnrfnAUIolEX4TRv5VPAHSMSVYVCHdVvWM9CGIVvNafRZx08h3jzCb+qEViT0HKg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1738933814; c=relaxed/simple;
-	bh=uhnsYK8lhYw1vJvlUg+sUQjW9WgfpkLhxLKh5lEuTvo=;
-	h=In-Reply-To:References:From:To:Cc:Subject:MIME-Version:
-	 Content-Disposition:Content-Type:Message-Id:Date; b=CiPPFPTC7APX0pwtW0lzSkFW+ED0Vi2azwW3XI/wUKQn+nZplLtIc7DGhtGjr7QBM/nRf4s2MCx75S3C9qXzki06ufXTL312Ehfa1HRbFDauucmszFiuBRgJin4uIwFKniSGGHYhRvz8AcvR70VZfUcU5kI7b1SRAW6p0zP+KlM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=s0SIzxM7; arc=none smtp.client-ip=78.32.30.218
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=armlinux.org.uk; s=pandora-2019; h=Date:Sender:Message-Id:Content-Type:
-	Content-Transfer-Encoding:MIME-Version:Subject:Cc:To:From:References:
-	In-Reply-To:Reply-To:Content-ID:Content-Description:Resent-Date:Resent-From:
-	Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:List-Help:
-	List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=rPlsVId33txdBBranLBlQ1L7Lpylf6kTxcaJ3s9zHV8=; b=s0SIzxM70be6SAqLGuJXeih+Tp
-	19KfL9tugVDmsXOCiNA9pyGA66ziK+piIdSmtneKyo2RBtQC+F+qvKOQKqkM6r71REHtaX7iJo6qB
-	VYvDsWHfRX3mF8Pd0uUACPhm1SNimt7oYgOkx3Ynf8JI5ftSq69sdzOGia05DPm7K3CzJOq8b+4WE
-	xs8ZK1pIABQX7Nh6XupXwsHZm1ZyiMxNdh6HC6tAOjX8BEbauC3WoMEmB92kCs122bnF1Mg7N6mdO
-	YpsKqFNnR0MEk3t3vOJEeuFhbsE8EhyW+1bA1KbqBsBQns/2lA82fDnwByMlfheTik2lIn5Pf5erB
-	qWnyJPLg==;
-Received: from e0022681537dd.dyn.armlinux.org.uk ([fd8f:7570:feb6:1:222:68ff:fe15:37dd]:37010 helo=rmk-PC.armlinux.org.uk)
-	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.96)
-	(envelope-from <rmk@armlinux.org.uk>)
-	id 1tgO7P-0005i4-2e;
-	Fri, 07 Feb 2025 13:10:03 +0000
-Received: from rmk by rmk-PC.armlinux.org.uk with local (Exim 4.94.2)
-	(envelope-from <rmk@rmk-PC.armlinux.org.uk>)
-	id 1tgO75-003ilL-5y; Fri, 07 Feb 2025 13:09:43 +0000
-In-Reply-To: <Z6YF4o0ED0KLqYS9@shell.armlinux.org.uk>
-References: <Z6YF4o0ED0KLqYS9@shell.armlinux.org.uk>
-From: "Russell King (Oracle)" <rmk+kernel@armlinux.org.uk>
-To: Andrew Lunn <andrew@lunn.ch>,
-	Heiner Kallweit <hkallweit1@gmail.com>
-Cc: AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>,
-	"Chester A. Unal" <chester.a.unal@arinc9.com>,
-	Daniel Golle <daniel@makrotopia.org>,
-	"David S. Miller" <davem@davemloft.net>,
-	DENG Qingfang <dqfext@gmail.com>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	linux-arm-kernel@lists.infradead.org,
-	linux-mediatek@lists.infradead.org,
-	Matthias Brugger <matthias.bgg@gmail.com>,
-	netdev@vger.kernel.org,
-	Paolo Abeni <pabeni@redhat.com>,
-	Sean Wang <sean.wang@mediatek.com>,
-	Simon Horman <horms@kernel.org>,
-	Vladimir Oltean <olteanv@gmail.com>
-Subject: [PATCH net-next v2 3/3] net: dsa: mt7530: convert to phylink managed
- EEE
+	s=arc-20240116; t=1738933955; c=relaxed/simple;
+	bh=V8LDVkl2nRQ6eAdBK40xG1bKfK4P9CzdnIHedeqf3Ic=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=W59XVn4GiJns8k+aFpW5ZhQh+/bfligcGWCm8GfF34bJHwzHdEFaB452wngsRj2zQOZR0V7SAitVO8h6LLlcJtZkJanJOyL1vTOE24IXq90q6KuXgkE6O1JNgp1Mdp4gq610601WDPTjRjcaMTjllDxPD6O1ncAeHEivbIw3qRA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=openvpn.net; spf=pass smtp.mailfrom=openvpn.com; dkim=pass (2048-bit key) header.d=openvpn.net header.i=@openvpn.net header.b=XK/cYaOa; arc=none smtp.client-ip=209.85.128.47
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=openvpn.net
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=openvpn.com
+Received: by mail-wm1-f47.google.com with SMTP id 5b1f17b1804b1-436ce2ab251so13572955e9.1
+        for <netdev@vger.kernel.org>; Fri, 07 Feb 2025 05:12:32 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=openvpn.net; s=google; t=1738933951; x=1739538751; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:organization:autocrypt:from
+         :content-language:references:cc:to:subject:user-agent:mime-version
+         :date:message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=ULYqwQI7CRaAqRL8oB/X08x15C2FHRC/9lLiC6I/SiA=;
+        b=XK/cYaOaEdxWlPmatP+1cDEoWY86h/rHp6XPTISPoA19PK9HjNN4IPbVCTUMCklbsL
+         NZsl9+vVOXScvoSBGykt7UkM25yN2Fe0kSvVKmGp5lWiutfY9Qm4XFyklSyZ33ZOaf0y
+         yMrEH6mqigDxcBUqtPhIPJgkmc8SnfWPIOvPJVUdmrheFfWx1C4w7tm1tPdcIMVRTMUZ
+         lFQRpn8ntvuD9SjNiJppZeXjMDpI9OtyXXTf9WPml9rS0r/aN+l2tZ/DbSvG9EaTlZ1J
+         np4fNTrVnvpNbjYmanOfDXIt5WOw/vGDILpjox8sMa9JQpDQSIFhkdgWyGcKJT0aXWLX
+         CW0Q==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1738933951; x=1739538751;
+        h=content-transfer-encoding:in-reply-to:organization:autocrypt:from
+         :content-language:references:cc:to:subject:user-agent:mime-version
+         :date:message-id:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=ULYqwQI7CRaAqRL8oB/X08x15C2FHRC/9lLiC6I/SiA=;
+        b=qHijQyimxWFV4O6eAXEqHz8TR/wtZJnTEX5R+yIIIgXJzIzz9BW6qIthAm1VQgcpNZ
+         flmIwV4qORWc8Jz/N214Cv2FXjph18SlsA8tj2N5Y8yjgU0mttkj/vmw5NT1XwhTyZO9
+         4GL0wOEtCzNjbigRCAtwf3ZINRaXW2IK2va5x9YzxGbT2Jc6Ga08+yVo8Sk6EK+1ylI2
+         beUwMpi6jeWVIsrbocxLiwUZ6OLghmbrm5ZnD/7LShldvvlMbrTcxXEZQWzZgVl7AJAq
+         l2jFvfH08WzV+AdFFO07Yk9LEROPTker1cEtDzGsH7KY4U0Cr3I5y90BYGccJwxqETBL
+         BUrA==
+X-Gm-Message-State: AOJu0Yw6qCLArnqs/oRV3H+GSuu6eIZ+WHeFxfNRK7DYG2etfOcRSVo4
+	w599spRIxJWiHj33zudGfmac+BOG5wgYG2mfrKiFMImyM9tSvvHtHog6UOZBd3c=
+X-Gm-Gg: ASbGncvM3GYYDlyOCwIXnLMQtWkdUrMjQoiNF2eCdBnTrqj+PYA4EjMuiIHG7nkEkB0
+	9C6aUEXOmPWEAZBTJdZHFBbB3yz4qNmyqbMJrMeaK8Ec7m/5HnX7sHG/fSUgfeQXs9/Yu9TvBs3
+	2aKgo0IFYP359Q050tJF/Ctvo8T28dEof+vuxuc9CsFGo2b10r6EZEwMiLKAlPqkQ46LiYRltL3
+	s1d0swyoX+Km3TL5V6a/QWTgZ8NgxDoQQdRWKJfGrzo88mqe6Un8Ma76MidR501rtyFI9s/sZTp
+	J6Lh0CxkHbSulNTe7K6E7Sbek7K4jUQyIp+zAhuvLc9PiF9Qda3dMA==
+X-Google-Smtp-Source: AGHT+IF9wBsCSNNxAMG2g04BTTFcZiuGmMSSq1jpBjzRykjiBDMEmwtMfluBKIAcP83yb2c/VLnsOg==
+X-Received: by 2002:a05:600c:4f52:b0:434:b9c6:68f7 with SMTP id 5b1f17b1804b1-439249b2ba4mr23665845e9.26.1738933951145;
+        Fri, 07 Feb 2025 05:12:31 -0800 (PST)
+Received: from ?IPV6:2001:67c:2fbc:1:5aa9:f4c3:dbe3:332c? ([2001:67c:2fbc:1:5aa9:f4c3:dbe3:332c])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-4390d94d7c7sm88973265e9.14.2025.02.07.05.12.29
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Fri, 07 Feb 2025 05:12:30 -0800 (PST)
+Message-ID: <3dca88d7-7037-4721-aae7-35970e97be21@openvpn.net>
+Date: Fri, 7 Feb 2025 14:13:40 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain; charset="utf-8"
-Message-Id: <E1tgO75-003ilL-5y@rmk-PC.armlinux.org.uk>
-Sender: Russell King <rmk@armlinux.org.uk>
-Date: Fri, 07 Feb 2025 13:09:43 +0000
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next v18 09/25] ovpn: implement packet processing
+To: Sabrina Dubroca <sd@queasysnail.net>
+Cc: netdev@vger.kernel.org, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ Donald Hunter <donald.hunter@gmail.com>, Shuah Khan <shuah@kernel.org>,
+ ryazanov.s.a@gmail.com, Andrew Lunn <andrew+netdev@lunn.ch>,
+ Simon Horman <horms@kernel.org>, linux-kernel@vger.kernel.org,
+ linux-kselftest@vger.kernel.org, Xiao Liang <shaw.leon@gmail.com>
+References: <20250113-b4-ovpn-v18-0-1f00db9c2bd6@openvpn.net>
+ <20250113-b4-ovpn-v18-9-1f00db9c2bd6@openvpn.net> <Z6PdEurGNirlnkoM@hog>
+Content-Language: en-US
+From: Antonio Quartulli <antonio@openvpn.net>
+Autocrypt: addr=antonio@openvpn.net; keydata=
+ xsFNBFN3k+ABEADEvXdJZVUfqxGOKByfkExNpKzFzAwHYjhOb3MTlzSLlVKLRIHxe/Etj13I
+ X6tcViNYiIiJxmeHAH7FUj/yAISW56lynAEt7OdkGpZf3HGXRQz1Xi0PWuUINa4QW+ipaKmv
+ voR4b1wZQ9cZ787KLmu10VF1duHW/IewDx9GUQIzChqQVI3lSHRCo90Z/NQ75ZL/rbR3UHB+
+ EWLIh8Lz1cdE47VaVyX6f0yr3Itx0ZuyIWPrctlHwV5bUdA4JnyY3QvJh4yJPYh9I69HZWsj
+ qplU2WxEfM6+OlaM9iKOUhVxjpkFXheD57EGdVkuG0YhizVF4p9MKGB42D70pfS3EiYdTaKf
+ WzbiFUunOHLJ4hyAi75d4ugxU02DsUjw/0t0kfHtj2V0x1169Hp/NTW1jkqgPWtIsjn+dkde
+ dG9mXk5QrvbpihgpcmNbtloSdkRZ02lsxkUzpG8U64X8WK6LuRz7BZ7p5t/WzaR/hCdOiQCG
+ RNup2UTNDrZpWxpwadXMnJsyJcVX4BAKaWGsm5IQyXXBUdguHVa7To/JIBlhjlKackKWoBnI
+ Ojl8VQhVLcD551iJ61w4aQH6bHxdTjz65MT2OrW/mFZbtIwWSeif6axrYpVCyERIDEKrX5AV
+ rOmGEaUGsCd16FueoaM2Hf96BH3SI3/q2w+g058RedLOZVZtyQARAQABzSdBbnRvbmlvIFF1
+ YXJ0dWxsaSA8YW50b25pb0BvcGVudnBuLm5ldD7Cwa0EEwEIAFcCGwMFCwkIBwMFFQoJCAsF
+ FgIDAQACHgECF4AFCRWQ2TIWIQTKvaEoIBfCZyGYhcdI8My2j1nRTAUCYRUquBgYaGtwczov
+ L2tleXMub3BlbnBncC5vcmcACgkQSPDMto9Z0UzmcxAAjzLeD47We0R4A/14oDKlZxXO0mKL
+ fCzaWFsdhQCDhZkgxoHkYRektK2cEOh4Vd+CnfDcPs/iZ1i2+Zl+va79s4fcUhRReuwi7VCg
+ 7nHiYSNC7qZo84Wzjz3RoGYyJ6MKLRn3zqAxUtFECoS074/JX1sLG0Z3hi19MBmJ/teM84GY
+ IbSvRwZu+VkJgIvZonFZjbwF7XyoSIiEJWQC+AKvwtEBNoVOMuH0tZsgqcgMqGs6lLn66RK4
+ tMV1aNeX6R+dGSiu11i+9pm7sw8tAmsfu3kQpyk4SB3AJ0jtXrQRESFa1+iemJtt+RaSE5LK
+ 5sGLAO+oN+DlE0mRNDQowS6q/GBhPCjjbTMcMfRoWPCpHZZfKpv5iefXnZ/xVj7ugYdV2T7z
+ r6VL2BRPNvvkgbLZgIlkWyfxRnGh683h4vTqRqTb1wka5pmyBNAv7vCgqrwfvaV1m7J9O4B5
+ PuRjYRelmCygQBTXFeJAVJvuh2efFknMh41R01PP2ulXAQuVYEztq3t3Ycw6+HeqjbeqTF8C
+ DboqYeIM18HgkOqRrn3VuwnKFNdzyBmgYh/zZx/dJ3yWQi/kfhR6TawAwz6GdbQGiu5fsx5t
+ u14WBxmzNf9tXK7hnXcI24Z1z6e5jG6U2Swtmi8sGSh6fqV4dBKmhobEoS7Xl496JN2NKuaX
+ jeWsF2rOwE0EZmhJFwEIAOAWiIj1EYkbikxXSSP3AazkI+Y/ICzdFDmiXXrYnf/mYEzORB0K
+ vqNRQOdLyjbLKPQwSjYEt1uqwKaD1LRLbA7FpktAShDK4yIljkxhvDI8semfQ5WE/1Jj/I/Q
+ U+4VXhkd6UvvpyQt/LiWvyAfvExPEvhiMnsg2zkQbBQ/M4Ns7ck0zQ4BTAVzW/GqoT2z03mg
+ p1FhxkfzHMKPQ6ImEpuY5cZTQwrBUgWif6HzCtQJL7Ipa2fFnDaIHQeiJG0RXl/g9x3YlwWG
+ sxOFrpWWsh6GI0Mo2W2nkinEIts48+wNDBCMcMlOaMYpyAI7fT5ziDuG2CBA060ZT7qqdl6b
+ aXUAEQEAAcLBfAQYAQgAJhYhBMq9oSggF8JnIZiFx0jwzLaPWdFMBQJmaEkXAhsMBQkB4TOA
+ AAoJEEjwzLaPWdFMbRUP/0t5FrjF8KY6uCU4Tx029NYKDN9zJr0CVwSGsNfC8WWonKs66QE1
+ pd6xBVoBzu5InFRWa2ed6d6vBw2BaJHC0aMg3iwwBbEgPn4Jx89QfczFMJvFm+MNc2DLDrqN
+ zaQSqBzQ5SvUjxh8lQ+iqAhi0MPv4e2YbXD0ROyO+ITRgQVZBVXoPm4IJGYWgmVmxP34oUQh
+ BM7ipfCVbcOFU5OPhd9/jn1BCHzir+/i0fY2Z/aexMYHwXUMha/itvsBHGcIEYKk7PL9FEfs
+ wlbq+vWoCtUTUc0AjDgB76AcUVxxJtxxpyvES9aFxWD7Qc+dnGJnfxVJI0zbN2b37fX138Bf
+ 27NuKpokv0sBnNEtsD7TY4gBz4QhvRNSBli0E5bGUbkM31rh4Iz21Qk0cCwR9D/vwQVsgPvG
+ ioRqhvFWtLsEt/xKolOmUWA/jP0p8wnQ+3jY6a/DJ+o5LnVFzFqbK3fSojKbfr3bY33iZTSj
+ DX9A4BcohRyqhnpNYyHL36gaOnNnOc+uXFCdoQkI531hXjzIsVs2OlfRufuDrWwAv+em2uOT
+ BnRX9nFx9kPSO42TkFK55Dr5EDeBO3v33recscuB8VVN5xvh0GV57Qre+9sJrEq7Es9W609a
+ +M0yRJWJEjFnMa/jsGZ+QyLD5QTL6SGuZ9gKI3W1SfFZOzV7hHsxPTZ6
+Organization: OpenVPN Inc.
+In-Reply-To: <Z6PdEurGNirlnkoM@hog>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-Convert mt7530 to use phylink managed EEE. When enabling EEE, we set
-both PMCR_FORCE_EEE1G and PMCR_FORCE_EEE100 irrespective of the speed,
-and clear them both when disabling.
+On 05/02/2025 22:50, Sabrina Dubroca wrote:
+> Hi Antonio,
+> 
+> Another one I should have spotted a long time ago :(
 
-Signed-off-by: Russell King (Oracle) <rmk+kernel@armlinux.org.uk>
----
- drivers/net/dsa/mt7530.c | 68 +++++++++++++++++++++++++++-------------
- 1 file changed, 47 insertions(+), 21 deletions(-)
+better late than never (I think..)
 
-diff --git a/drivers/net/dsa/mt7530.c b/drivers/net/dsa/mt7530.c
-index 1c83af805209..9fd44e55d519 100644
---- a/drivers/net/dsa/mt7530.c
-+++ b/drivers/net/dsa/mt7530.c
-@@ -2957,28 +2957,61 @@ static void mt753x_phylink_mac_link_up(struct phylink_config *config,
- 			mcr |= PMCR_FORCE_RX_FC_EN;
- 	}
- 
--	if (mode == MLO_AN_PHY && phydev && phy_init_eee(phydev, false) >= 0) {
--		switch (speed) {
--		case SPEED_1000:
--		case SPEED_2500:
--			mcr |= PMCR_FORCE_EEE1G;
--			break;
--		case SPEED_100:
--			mcr |= PMCR_FORCE_EEE100;
--			break;
--		}
--	}
--
- 	mt7530_set(priv, MT753X_PMCR_P(dp->index), mcr);
- }
- 
-+static void mt753x_phylink_mac_disable_tx_lpi(struct phylink_config *config)
-+{
-+	struct dsa_port *dp = dsa_phylink_to_port(config);
-+	struct mt7530_priv *priv = dp->ds->priv;
-+
-+	mt7530_clear(priv, MT753X_PMCR_P(dp->index),
-+		     PMCR_FORCE_EEE1G | PMCR_FORCE_EEE100);
-+}
-+
-+static int mt753x_phylink_mac_enable_tx_lpi(struct phylink_config *config,
-+					    u32 timer, bool tx_clock_stop)
-+{
-+	struct dsa_port *dp = dsa_phylink_to_port(config);
-+	struct mt7530_priv *priv = dp->ds->priv;
-+	u32 val;
-+
-+	/* If the timer is zero, then set LPI_MODE_EN, which allows the
-+	 * system to enter LPI mode immediately rather than waiting for
-+	 * the LPI threshold.
-+	 */
-+	if (!timer)
-+		val = LPI_MODE_EN;
-+	else if (FIELD_FIT(LPI_THRESH_MASK, timer))
-+		val = FIELD_PREP(LPI_THRESH_MASK, timer);
-+	else
-+		val = LPI_THRESH_MASK;
-+
-+	mt7530_rmw(priv, MT753X_PMEEECR_P(dp->index),
-+		   LPI_THRESH_MASK | LPI_MODE_EN, val);
-+
-+	mt7530_set(priv, MT753X_PMCR_P(dp->index),
-+		   PMCR_FORCE_EEE1G | PMCR_FORCE_EEE100);
-+
-+	return 0;
-+}
-+
- static void mt753x_phylink_get_caps(struct dsa_switch *ds, int port,
- 				    struct phylink_config *config)
- {
- 	struct mt7530_priv *priv = ds->priv;
-+	u32 eeecr;
- 
- 	config->mac_capabilities = MAC_ASYM_PAUSE | MAC_SYM_PAUSE;
- 
-+	config->lpi_capabilities = MAC_100FD | MAC_1000FD | MAC_2500FD;
-+
-+	eeecr = mt7530_read(priv, MT753X_PMEEECR_P(port));
-+	/* tx_lpi_timer should be in microseconds. The time units for
-+	 * LPI threshold are unspecified.
-+	 */
-+	config->lpi_timer_default = FIELD_GET(LPI_THRESH_MASK, eeecr);
-+
- 	priv->info->mac_port_get_caps(ds, port, config);
- }
- 
-@@ -3088,18 +3121,9 @@ mt753x_setup(struct dsa_switch *ds)
- static int mt753x_set_mac_eee(struct dsa_switch *ds, int port,
- 			      struct ethtool_keee *e)
- {
--	struct mt7530_priv *priv = ds->priv;
--	u32 set, mask = LPI_THRESH_MASK | LPI_MODE_EN;
--
- 	if (e->tx_lpi_timer > 0xFFF)
- 		return -EINVAL;
- 
--	set = LPI_THRESH_SET(e->tx_lpi_timer);
--	if (!e->tx_lpi_enabled)
--		/* Force LPI Mode without a delay */
--		set |= LPI_MODE_EN;
--	mt7530_rmw(priv, MT753X_PMEEECR_P(port), mask, set);
--
- 	return 0;
- }
- 
-@@ -3238,6 +3262,8 @@ static const struct phylink_mac_ops mt753x_phylink_mac_ops = {
- 	.mac_config	= mt753x_phylink_mac_config,
- 	.mac_link_down	= mt753x_phylink_mac_link_down,
- 	.mac_link_up	= mt753x_phylink_mac_link_up,
-+	.mac_disable_tx_lpi = mt753x_phylink_mac_disable_tx_lpi,
-+	.mac_enable_tx_lpi = mt753x_phylink_mac_enable_tx_lpi,
- };
- 
- const struct mt753x_info mt753x_table[] = {
+> 
+> 2025-01-13, 10:31:28 +0100, Antonio Quartulli wrote:
+>> +int ovpn_aead_encrypt(struct ovpn_peer *peer, struct ovpn_crypto_key_slot *ks,
+>> +		      struct sk_buff *skb)
+>> +{
+>> +	const unsigned int tag_size = crypto_aead_authsize(ks->encrypt);
+>> +	struct aead_request *req;
+>> +	struct sk_buff *trailer;
+>> +	struct scatterlist *sg;
+>> +	u8 iv[OVPN_NONCE_SIZE];
+> 
+> You'll have to kmalloc this as well, it gets passed to the crypto API
+> and with async crypto, it'll be used after ovpn_aead_encrypt has
+> returned.
+> 
+> [...]
+>> +	/* setup async crypto operation */
+>> +	aead_request_set_tfm(req, ks->encrypt);
+>> +	aead_request_set_callback(req, 0, ovpn_encrypt_post, skb);
+>> +	aead_request_set_crypt(req, sg, sg,
+>> +			       skb->len - ovpn_aead_encap_overhead(ks), iv);
+>                                                                          ^^
+> passed here
+> 
+> 
+>> +	aead_request_set_ad(req, OVPN_AAD_SIZE);
+>> +
+>> +	/* encrypt it */
+>> +	return crypto_aead_encrypt(req);
+>> +free_sg:
+>> +	kfree(ovpn_skb_cb(skb)->sg);
+>> +	ovpn_skb_cb(skb)->sg = NULL;
+>> +	return ret;
+>> +}
+>> +
+>> +int ovpn_aead_decrypt(struct ovpn_peer *peer, struct ovpn_crypto_key_slot *ks,
+>> +		      struct sk_buff *skb)
+>> +{
+>> +	const unsigned int tag_size = crypto_aead_authsize(ks->decrypt);
+>> +	int ret, payload_len, nfrags;
+>> +	unsigned int payload_offset;
+>> +	struct aead_request *req;
+>> +	struct sk_buff *trailer;
+>> +	struct scatterlist *sg;
+>> +	u8 iv[OVPN_NONCE_SIZE];
+> 
+> And same here.
+> 
+> (maybe something for the todolist: ovpn could copy the alloc trick
+> from esp_alloc_tmp, like I did for macsec_alloc_req -- not required,
+> but could be nice to avoid many small allocs and all their failure
+> checks)
+> 
+
+Ouch, you're right. I will pre-allocate iv as well, like I do for sg.
+
+And thanks for the hints, I'll add that to my todo.
+
+Cheers,
+
+
 -- 
-2.30.2
+Antonio Quartulli
+OpenVPN Inc.
 
 
