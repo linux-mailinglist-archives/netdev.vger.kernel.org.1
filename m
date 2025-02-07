@@ -1,218 +1,288 @@
-Return-Path: <netdev+bounces-164234-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-164235-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 49B5FA2D0C9
-	for <lists+netdev@lfdr.de>; Fri,  7 Feb 2025 23:40:54 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 8B981A2D165
+	for <lists+netdev@lfdr.de>; Sat,  8 Feb 2025 00:18:55 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 620753A6552
-	for <lists+netdev@lfdr.de>; Fri,  7 Feb 2025 22:40:45 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A22E83A40CE
+	for <lists+netdev@lfdr.de>; Fri,  7 Feb 2025 23:18:46 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9B97F225393;
-	Fri,  7 Feb 2025 22:37:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0DEA71BCA0A;
+	Fri,  7 Feb 2025 23:18:50 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="BNGDRvXh"
+	dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b="YIaXc9RO"
 X-Original-To: netdev@vger.kernel.org
-Received: from relay3-d.mail.gandi.net (relay3-d.mail.gandi.net [217.70.183.195])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pj1-f54.google.com (mail-pj1-f54.google.com [209.85.216.54])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4D3C51EA7D7;
-	Fri,  7 Feb 2025 22:37:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.195
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4E1631A5B9D
+	for <netdev@vger.kernel.org>; Fri,  7 Feb 2025 23:18:48 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.54
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1738967824; cv=none; b=N7IYCVbpd/f5PDjqQ/HzMW+4YqtyxY/DyJgUJKR9BVwdn+DsLhWQNaJ4oMlhaY+y6dVDOXyWDI/FLOdsv4wjXF8wxdN3Wng2uY4vk348Zgfk11Vm6vXc3wSOGfIh+Tt0dBBIgNGuiZkPuvhVvAGQXaiQsPDI/pbwUDxZXWUSb1I=
+	t=1738970329; cv=none; b=Ll3SxR7KXM7XPvN6jiYXSp3aK7RSqQSV3oY2LgHGX2DrUuLFgju1fq8msoX7ha1q+ZOHOWNtFBdzxJxnthW3u7rzRDnzPHinjiAa63Br8FXpOoRf67aS7sCMCxsAz4CdhsFfl2INB1I+rpV77RluJSlDfjbgMvNIACkHJy49JA0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1738967824; c=relaxed/simple;
-	bh=R7fHZ2/aol9wndAGd2tI1d1cUD+QFaTH8izRSPGvO44=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=MLYSq0x95w7D8VbBrrvcDQ1gCP9Z5emF3Fut8QhwSFTGzMoqzdWmHJh/yf5NzkRVIVoI5OKXgzo3KCVCcITpI+p6WStioHiJQTgGVGylzn5HtzjuNJgnTEq0HG/AT13deePbpNwjeztIbrXvy5UGNinvKn/zQAbOwE5QlFVUtBw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=BNGDRvXh; arc=none smtp.client-ip=217.70.183.195
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
-Received: by mail.gandi.net (Postfix) with ESMTPSA id 6F614204D7;
-	Fri,  7 Feb 2025 22:36:59 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
-	t=1738967821;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=jtBEdDFyHM7TrJGYplmIDsTu3tggBHU0A+jgdykLjok=;
-	b=BNGDRvXhLX8GjXA70jATJ7Rw147bsli5TRUf62YEWJqL4zUjmi3M4tTJc1ijh0ldWZWMn3
-	iP1EGJEsE8YzM0q6CYKeMMhPTFN5M0L06NoAnfJWq7W0fz/Rvu5rEJH4q//AQ+scJHFf55
-	ArM8k9BGpOAE1P2F9bBbhW+nJgEIM+szkogMoeUm7jBMSq3FMKk/iUn3qiUgUttE3H++fx
-	tDBbUJtGzWytYZYBznc4iPLOtvAMRu3Cz7+SXyJrJZbC3bdka9XsX1N+RPZE+aNxQ5M0cJ
-	Ysodirva09ORQJVZgUwoQDgvZQHEGc3kxIBxsgzL9XN/uzCgX7vK/VBh/puXlg==
-From: Maxime Chevallier <maxime.chevallier@bootlin.com>
-To: davem@davemloft.net
-Cc: Maxime Chevallier <maxime.chevallier@bootlin.com>,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	linux-arm-msm@vger.kernel.org,
-	thomas.petazzoni@bootlin.com,
-	Andrew Lunn <andrew@lunn.ch>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Eric Dumazet <edumazet@google.com>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Russell King <linux@armlinux.org.uk>,
-	linux-arm-kernel@lists.infradead.org,
-	Christophe Leroy <christophe.leroy@csgroup.eu>,
-	Herve Codina <herve.codina@bootlin.com>,
-	Florian Fainelli <f.fainelli@gmail.com>,
-	Heiner Kallweit <hkallweit1@gmail.com>,
-	Vladimir Oltean <vladimir.oltean@nxp.com>,
-	=?UTF-8?q?K=C3=B6ry=20Maincent?= <kory.maincent@bootlin.com>,
-	=?UTF-8?q?Marek=20Beh=C3=BAn?= <kabel@kernel.org>,
-	Oleksij Rempel <o.rempel@pengutronix.de>,
-	=?UTF-8?q?Nicol=C3=B2=20Veronese?= <nicveronese@gmail.com>,
-	Simon Horman <horms@kernel.org>,
-	mwojtas@chromium.org,
-	Antoine Tenart <atenart@kernel.org>,
-	devicetree@vger.kernel.org,
-	Conor Dooley <conor+dt@kernel.org>,
-	Krzysztof Kozlowski <krzk+dt@kernel.org>,
-	Rob Herring <robh@kernel.org>,
-	Romain Gantois <romain.gantois@bootlin.com>
-Subject: [PATCH net-next 13/13] dt-bindings: net: Introduce the phy-port description
-Date: Fri,  7 Feb 2025 23:36:32 +0100
-Message-ID: <20250207223634.600218-14-maxime.chevallier@bootlin.com>
-X-Mailer: git-send-email 2.48.1
-In-Reply-To: <20250207223634.600218-1-maxime.chevallier@bootlin.com>
-References: <20250207223634.600218-1-maxime.chevallier@bootlin.com>
+	s=arc-20240116; t=1738970329; c=relaxed/simple;
+	bh=06XwhzwzcvSjX7wRgrIsUDM952qvD7/bmiXWaI69wsE=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=fGnDED5pbn0ZTDzMNProSMqBIeyj+uEUdLFNLVZXHZJAJhWGJhdP4+JjjHZDEzldHRQkuj6IlJHuKZtC/Gu3zTmNth6vLs46AFiB4ct0QhB+sOTViIkISF8VYiSVOl6ou5AXiXwV2qyoyLjaGHSmrP26DfktQh3qFuUebLtfmdU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com; spf=fail smtp.mailfrom=broadcom.com; dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b=YIaXc9RO; arc=none smtp.client-ip=209.85.216.54
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=broadcom.com
+Received: by mail-pj1-f54.google.com with SMTP id 98e67ed59e1d1-2fa1fb3c445so2619652a91.2
+        for <netdev@vger.kernel.org>; Fri, 07 Feb 2025 15:18:48 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=broadcom.com; s=google; t=1738970327; x=1739575127; darn=vger.kernel.org;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=A3SwQFGKojJktzITjmcwqXdg8XG5QiYM8a5oge3xoLo=;
+        b=YIaXc9ROJgnGNz16RpkV82PrCdV9SKVXHfbsz0FJtuPAgnCpKrHn/YlawCDeF1sCX9
+         OF5XS6LEav4cSkTXYTOQwWPPOpbvzReKI325g6YbUrKyKFsayLB6M5YAOsEsYeKchk9P
+         SbR8FFZnjhFioHnS89Mpbe7Xr9yFDPJcJkh4o=
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1738970327; x=1739575127;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=A3SwQFGKojJktzITjmcwqXdg8XG5QiYM8a5oge3xoLo=;
+        b=OMSBUG7G2rgvgu04vAR2I/DxgFVEDgiuSvj7whFZXQrLBXlq3/c04e4Yut5kUkOxuG
+         6+mEIywCnX+ua1WghmzQY6r2jZR4MlcTQ0eDG5aHbEXXvJIZDo5xLqpEsDwCIAc9OUMN
+         42EC/REgXpsleRBLrEYNnSSOWaAUZhU+qFZOeU/99jky+HB6P0HxgCSLVYmQUdZpHb6d
+         JXmWHDakG+OfCg+Ym5FOszvp+eiljRZDt+3T078UYFWbxp28rPAccCodaW1q0cl0SUG7
+         Zp7iB5rADR/PHa+VDRJKYICiS0ni7a/FUACID0gt+r2ae2fp/J/LoYVODvJXXFy8+rQt
+         rdXQ==
+X-Gm-Message-State: AOJu0YzcLFva9PV4r2rigCI8NiklIP3glh7VXpIH1EE5kgW+wdB90WwQ
+	wlsPc0txVk5/IqJzJXRXpv3GvxjZhxYryYntArLidsj4CYZk8GjwDcrdZhwdd5oA5VCwzFt1rue
+	wphZrIUiAN5C/ldiczGA2LQ2oliX3DYJ0vz73
+X-Gm-Gg: ASbGncsurVopg+W4eVSmsf/hJG3pMu2n4BdN7Bh+TVHFNOVItKN13blnZhq6ciBPD+9
+	jtMl2KZa8iBVVp4El/DhWUHa/HkSRwHOSplPhAEdVsb1B5Xpa7ZvQRB7EDhGRxwk99GbnkcEi5A
+	==
+X-Google-Smtp-Source: AGHT+IE4lfz9Fh5v9JdiZ5M0ffjh4tLJUafbDcqw7fPxWUhBu63mA74BrOYKCI8Qj5LacoCaI86AvHrc9JedA4ysMaA=
+X-Received: by 2002:a17:90b:3fc3:b0:2ee:8008:b583 with SMTP id
+ 98e67ed59e1d1-2fa24274b87mr8579382a91.16.1738970327542; Fri, 07 Feb 2025
+ 15:18:47 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-GND-State: clean
-X-GND-Score: -100
-X-GND-Cause: gggruggvucftvghtrhhoucdtuddrgeefvddrtddtgdeftdehtdcutefuodetggdotefrodftvfcurfhrohhfihhlvgemucfitefpfffkpdcuggftfghnshhusghstghrihgsvgenuceurghilhhouhhtmecufedtudenucesvcftvggtihhpihgvnhhtshculddquddttddmnecujfgurhephffvvefufffkofgjfhgggfestdekredtredttdenucfhrhhomhepofgrgihimhgvucevhhgvvhgrlhhlihgvrhcuoehmrgigihhmvgdrtghhvghvrghllhhivghrsegsohhothhlihhnrdgtohhmqeenucggtffrrghtthgvrhhnpeeulefgvddthfekkedugeeikeeuudekhfekgfehgfelkeekkeekhfejkefgvefhieenucffohhmrghinhepuggvvhhitggvthhrvggvrdhorhhgnecukfhppedvrgdtudemtggsudelmeekugegtgemlehftddtmegttgeftgemgeelfhegmeefieehheemsgehjeegnecuvehluhhsthgvrhfuihiivgeptdenucfrrghrrghmpehinhgvthepvdgrtddumegtsgduleemkegugegtmeelfhdttdemtggtfegtmeeglehfgeemfeeiheehmegsheejgedphhgvlhhopehfvgguohhrrgdquddrhhhomhgvpdhmrghilhhfrhhomhepmhgrgihimhgvrdgthhgvvhgrlhhlihgvrhessghoohhtlhhinhdrtghomhdpnhgspghrtghpthhtohepvdelpdhrtghpthhtohepuggrvhgvmhesuggrvhgvmhhlohhfthdrnhgvthdprhgtphhtthhopehmrgigihhmvgdrtghhvghvrghllhhivghrsegsohhothhlihhnr
- dgtohhmpdhrtghpthhtohepnhgvthguvghvsehvghgvrhdrkhgvrhhnvghlrdhorhhgpdhrtghpthhtoheplhhinhhugidqkhgvrhhnvghlsehvghgvrhdrkhgvrhhnvghlrdhorhhgpdhrtghpthhtoheplhhinhhugidqrghrmhdqmhhsmhesvhhgvghrrdhkvghrnhgvlhdrohhrghdprhgtphhtthhopehthhhomhgrshdrphgvthgriiiiohhnihessghoohhtlhhinhdrtghomhdprhgtphhtthhopegrnhgurhgvfieslhhunhhnrdgthhdprhgtphhtthhopehkuhgsrgeskhgvrhhnvghlrdhorhhg
-X-GND-Sasl: maxime.chevallier@bootlin.com
+References: <20241018205332.525595-1-jitendra.vegiraju@broadcom.com>
+ <CAMdnO-+FjsRX4fjbCE_RVNY4pEoArD68dAWoEM+oaEZNJiuA3g@mail.gmail.com> <67919001-1cb7-4e9b-9992-5b3dd9b03406@quicinc.com>
+In-Reply-To: <67919001-1cb7-4e9b-9992-5b3dd9b03406@quicinc.com>
+From: Jitendra Vegiraju <jitendra.vegiraju@broadcom.com>
+Date: Fri, 7 Feb 2025 15:18:35 -0800
+X-Gm-Features: AWEUYZkdCDRaHgbK79-4_vZ3Z-i97Aw1Rvr0Mirz3m8-Wj2cdRiP6FpmPRGkkRc
+Message-ID: <CAMdnO-+HwXf7c=igt2j6VHcki3cYanXpFApZDcEe7DibDz810g@mail.gmail.com>
+Subject: Re: [PATCH net-next v6 0/5] net: stmmac: Add PCI driver support for BCM8958x
+To: "Abhishek Chauhan (ABC)" <quic_abchauha@quicinc.com>
+Cc: netdev@vger.kernel.org, alexandre.torgue@foss.st.com, joabreu@synopsys.com, 
+	davem@davemloft.net, edumazet@google.com, kuba@kernel.org, pabeni@redhat.com, 
+	mcoquelin.stm32@gmail.com, bcm-kernel-feedback-list@broadcom.com, 
+	richardcochran@gmail.com, ast@kernel.org, daniel@iogearbox.net, 
+	hawk@kernel.org, john.fastabend@gmail.com, fancer.lancer@gmail.com, 
+	rmk+kernel@armlinux.org.uk, ahalaney@redhat.com, xiaolei.wang@windriver.com, 
+	rohan.g.thomas@intel.com, Jianheng.Zhang@synopsys.com, 
+	linux-kernel@vger.kernel.org, linux-stm32@st-md-mailman.stormreply.com, 
+	linux-arm-kernel@lists.infradead.org, bpf@vger.kernel.org, andrew@lunn.ch, 
+	linux@armlinux.org.uk, horms@kernel.org, florian.fainelli@broadcom.com
+Content-Type: multipart/signed; protocol="application/pkcs7-signature"; micalg=sha-256;
+	boundary="000000000000ab55f3062d9594a6"
 
-The ability to describe the physical ports of Ethernet devices is useful
-to describe multi-port devices, as well as to remove any ambiguity with
-regard to the nature of the port.
+--000000000000ab55f3062d9594a6
+Content-Type: multipart/alternative; boundary="000000000000a62238062d9594fb"
 
-Moreover, describing ports allows for a better description of features
-that are tied to connectors, such as PoE through the PSE-PD devices.
+--000000000000a62238062d9594fb
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Introduce a binding to allow describing the ports, for now with 2
-attributes :
+Hi Abhishek,
 
- - The number of lanes, which is a quite generic property that allows
-   differentating between multiple similar technologies such as BaseT1
-   and "regular" BaseT (which usually means BaseT4).
+On Fri, Feb 7, 2025 at 10:21=E2=80=AFAM Abhishek Chauhan (ABC) <
+quic_abchauha@quicinc.com> wrote:
 
- - The media that can be used on that port, such as BaseT for Twisted
-   Copper, BaseC for coax copper, BaseS/L for Fiber, BaseK for backplane
-   ethernet, etc. This allows defining the nature of the port, and
-   therefore avoids the need for vendor-specific properties such as
-   "micrel,fiber-mode" or "ti,fiber-mode".
+>
+>
+> On 11/5/2024 8:12 AM, Jitendra Vegiraju wrote:
+> > Hi netdev team,
+> >
+> > On Fri, Oct 18, 2024 at 1:53=E2=80=AFPM <jitendra.vegiraju@broadcom.com=
+> wrote:
+> >>
+> >> From: Jitendra Vegiraju <jitendra.vegiraju@broadcom.com>
+> >>
+> >> This patchset adds basic PCI ethernet device driver support for Broadc=
+om
+> >> BCM8958x Automotive Ethernet switch SoC devices.
+> >>
+> >
+> > I would like to seek your guidance on how to take this patch series
+> forward.
+> > Thanks to your feedback and Serge's suggestions, we made some forward
+> > progress on this patch series.
+> > Please make any suggestions to enable us to upstream driver support
+> > for BCM8958x.
+>
+> Jitendra,
+>          Have we resent this patch or got it approved ? I dont see any
+> updates after this patch.
+>
+>
+Thank you for inquiring about the status of this patch.
+As stmmac driver is going through a maintainer transition, we wanted to
+wait until a new maintainer is identified.
+We would like to send the updated patch as soon as possible.
+Thanks,
+Jitendra
 
-The port description lives in its own file, as it is intended in the
-future to allow describing the ports for phy-less devices.
+--000000000000a62238062d9594fb
+Content-Type: text/html; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Signed-off-by: Maxime Chevallier <maxime.chevallier@bootlin.com>
----
- .../devicetree/bindings/net/ethernet-phy.yaml | 18 +++++++
- .../bindings/net/ethernet-port.yaml           | 47 +++++++++++++++++++
- 2 files changed, 65 insertions(+)
- create mode 100644 Documentation/devicetree/bindings/net/ethernet-port.yaml
+<div dir=3D"ltr"><div>Hi Abhishek,</div><br><div class=3D"gmail_quote gmail=
+_quote_container"><div dir=3D"ltr" class=3D"gmail_attr">On Fri, Feb 7, 2025=
+ at 10:21=E2=80=AFAM Abhishek Chauhan (ABC) &lt;<a href=3D"mailto:quic_abch=
+auha@quicinc.com">quic_abchauha@quicinc.com</a>&gt; wrote:<br></div><blockq=
+uote class=3D"gmail_quote" style=3D"margin:0px 0px 0px 0.8ex;border-left:1p=
+x solid rgb(204,204,204);padding-left:1ex"><br>
+<br>
+On 11/5/2024 8:12 AM, Jitendra Vegiraju wrote:<br>
+&gt; Hi netdev team,<br>
+&gt; <br>
+&gt; On Fri, Oct 18, 2024 at 1:53=E2=80=AFPM &lt;<a href=3D"mailto:jitendra=
+.vegiraju@broadcom.com" target=3D"_blank">jitendra.vegiraju@broadcom.com</a=
+>&gt; wrote:<br>
+&gt;&gt;<br>
+&gt;&gt; From: Jitendra Vegiraju &lt;<a href=3D"mailto:jitendra.vegiraju@br=
+oadcom.com" target=3D"_blank">jitendra.vegiraju@broadcom.com</a>&gt;<br>
+&gt;&gt;<br>
+&gt;&gt; This patchset adds basic PCI ethernet device driver support for Br=
+oadcom<br>
+&gt;&gt; BCM8958x Automotive Ethernet switch SoC devices.<br>
+&gt;&gt;<br>&gt; <br>
+&gt; I would like to seek your guidance on how to take this patch series fo=
+rward.<br>
+&gt; Thanks to your feedback and Serge&#39;s suggestions, we made some forw=
+ard<br>
+&gt; progress on this patch series.<br>
+&gt; Please make any suggestions to enable us to upstream driver support<br=
+>
+&gt; for BCM8958x.<br>
+<br>
+Jitendra,<br>
+=C2=A0 =C2=A0 =C2=A0 =C2=A0 =C2=A0Have we resent this patch or got it appro=
+ved ? I dont see any updates after this patch. <br><br></blockquote><div><b=
+r></div><div>Thank you for inquiring about the status of this patch.</div><=
+div>As stmmac driver is going through a maintainer transition, we wanted to=
+ wait until a new maintainer is identified.</div><div>We would like to send=
+ the updated patch as soon as possible.</div><div>Thanks,</div><div>Jitendr=
+a</div><div><br></div></div></div>
 
-diff --git a/Documentation/devicetree/bindings/net/ethernet-phy.yaml b/Documentation/devicetree/bindings/net/ethernet-phy.yaml
-index 2c71454ae8e3..950fdacfd27d 100644
---- a/Documentation/devicetree/bindings/net/ethernet-phy.yaml
-+++ b/Documentation/devicetree/bindings/net/ethernet-phy.yaml
-@@ -261,6 +261,17 @@ properties:
- 
-     additionalProperties: false
- 
-+  mdi:
-+    type: object
-+
-+    patternProperties:
-+      '^port-[a-f0-9]+$':
-+        $ref: /schemas/net/ethernet-port.yaml#
-+
-+        unevaluatedProperties: false
-+
-+    additionalProperties: false
-+
- required:
-   - reg
- 
-@@ -297,5 +308,12 @@ examples:
-                     default-state = "keep";
-                 };
-             };
-+
-+            mdi {
-+              port-0 {
-+                lanes = <2>;
-+                media = "BaseT";
-+              };
-+            };
-         };
-     };
-diff --git a/Documentation/devicetree/bindings/net/ethernet-port.yaml b/Documentation/devicetree/bindings/net/ethernet-port.yaml
-new file mode 100644
-index 000000000000..bf0f64f1b0aa
---- /dev/null
-+++ b/Documentation/devicetree/bindings/net/ethernet-port.yaml
-@@ -0,0 +1,47 @@
-+# SPDX-License-Identifier: (GPL-2.0-only OR BSD-2-Clause)
-+%YAML 1.2
-+---
-+$id: http://devicetree.org/schemas/net/ethernet-port.yaml#
-+$schema: http://devicetree.org/meta-schemas/core.yaml#
-+
-+title: Generic Ethernet Port
-+
-+maintainers:
-+  - Maxime Chevallier <maxime.chevallier@bootlin.com>
-+
-+description:
-+  An Ethernet port represents an output, such as a connector, of a network
-+  component such as a PHY, an Ethernet controller with no PHY, or an SFP module.
-+
-+properties:
-+
-+  lanes:
-+    description:
-+      Defines the number of lanes on the port, that is the number of physical
-+      channels used to convey the data with the link partner.
-+    $ref: /schemas/types.yaml#/definitions/uint32
-+
-+  media:
-+    description:
-+      The mediums, as defined in 802.3, that can be used on the port.
-+    items:
-+      enum:
-+        - BaseT
-+        - BaseK
-+        - BaseS
-+        - BaseC
-+        - BaseL
-+        - BaseD
-+        - BaseE
-+        - BaseF
-+        - BaseV
-+        - BaseMLD
-+        - BaseX
-+
-+required:
-+  - lanes
-+  - media
-+
-+additionalProperties: true
-+
-+...
--- 
-2.48.1
+--000000000000a62238062d9594fb--
 
+--000000000000ab55f3062d9594a6
+Content-Type: application/pkcs7-signature; name="smime.p7s"
+Content-Transfer-Encoding: base64
+Content-Disposition: attachment; filename="smime.p7s"
+Content-Description: S/MIME Cryptographic Signature
+
+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
+tJVewHuOmXgWQxNWV7Oiszu1d9xAcqyj65s1PrEIIaHnxEM3eTK+teecLEy8QymZjjDTrCHg4x36
+2AczdlQAIiq5TSAucGja5VP8g1zTnfL/RAxEZvLS471GABptArolXY2hMVHdVEYcTduZlu8aHARc
+phXveOB5/l3bPqpMVf2aFalv4ab733Aw6cPuQkbtwpMFifp9Y3s/0HGBfADomK4OeDTDJfuvCp8g
+a907E48SjOJBGkh6c6B3ace2XH+CyB7+WBsoK6hsrV5twAXSe7frgP4lN/4Cm2isQl3D7vXM3PBQ
+ddI2aZzmewTfbgZptt4KCUhZh+t7FGB6ZKppQ++Rx0zsGN1s71MtjJnhXvJyPs9UyL1n7KQPTEX/
+07kwIwdMjxC/hpbZmVq0mVccpMy7FYlTuiwFD+TEnhmxGDTVTJ267fcfrySVBHioA7vugeXaX3yL
+SqGQdCWnsz5LyCxWvcfI7zjiXJLwefechLp0LWEBIH5+0fJPB1lfiy1DUutGDJTh9WZHeXfVVFsf
+rSQ3y0VaTqBESMjYsJnFFYQJ9tZJScBluOYacW6gqPGC6EU+bNYC1wpngwVayaQQMIIGbTCCBFWg
+AwIBAgIMGHX6KxYK3WW2YyprMA0GCSqGSIb3DQEBCwUAMFIxCzAJBgNVBAYTAkJFMRkwFwYDVQQK
+ExBHbG9iYWxTaWduIG52LXNhMSgwJgYDVQQDEx9HbG9iYWxTaWduIEdDQyBSNiBTTUlNRSBDQSAy
+MDIzMB4XDTI0MDkyNTEzNTAzMVoXDTI2MDkyNjEzNTAzMVowgbMxCzAJBgNVBAYTAlVTMRMwEQYD
+VQQIEwpDYWxpZm9ybmlhMREwDwYDVQQHEwhTYW4gSm9zZTEZMBcGA1UEYRMQTlRSVVMrREUtNjYx
+MDExNzEWMBQGA1UEChMNQlJPQURDT00gSU5DLjEaMBgGA1UEAxMRSml0ZW5kcmEgVmVnaXJhanUx
+LTArBgkqhkiG9w0BCQEWHmppdGVuZHJhLnZlZ2lyYWp1QGJyb2FkY29tLmNvbTCCASIwDQYJKoZI
+hvcNAQEBBQADggEPADCCAQoCggEBAKWV+9PYvG4njqRsbQas79f8Q46VL7b1ZxvWT6ik6VMbdRZx
+tfpfZalVXksqcb02/N1H7UA9V04cV2q97FkSr/KxeFLMetPb3cVJZICg23IRO2NTPdmgPFzwkPTo
+35h9h/OYLgh3/9a1nTsC2xqJa8GtohD5+42rsskGcI57U4n1r1L4R5IL9ypSqDxX/xVEAdGI5FTj
+VgvoZC6iuEbnez+yO8TT3wun9b/PQowOB5P0CwIFv7ERW0S1s6B8yrbsoaTrz0vQaEA786k1pZkg
+ykC1+zXq/iTyZuPP4B4RkzFd43Pw+GAH0Tt2nx5V4rNisJHeAVNU92Gj01cEg0I+FnsCAwEAAaOC
+Ad8wggHbMA4GA1UdDwEB/wQEAwIFoDCBkwYIKwYBBQUHAQEEgYYwgYMwRgYIKwYBBQUHMAKGOmh0
+dHA6Ly9zZWN1cmUuZ2xvYmFsc2lnbi5jb20vY2FjZXJ0L2dzZ2NjcjZzbWltZWNhMjAyMy5jcnQw
+OQYIKwYBBQUHMAGGLWh0dHA6Ly9vY3NwLmdsb2JhbHNpZ24uY29tL2dzZ2NjcjZzbWltZWNhMjAy
+MzBlBgNVHSAEXjBcMAkGB2eBDAEFAwEwCwYJKwYBBAGgMgEoMEIGCisGAQQBoDIKAwIwNDAyBggr
+BgEFBQcCARYmaHR0cHM6Ly93d3cuZ2xvYmFsc2lnbi5jb20vcmVwb3NpdG9yeS8wCQYDVR0TBAIw
+ADBBBgNVHR8EOjA4MDagNKAyhjBodHRwOi8vY3JsLmdsb2JhbHNpZ24uY29tL2dzZ2NjcjZzbWlt
+ZWNhMjAyMy5jcmwwKQYDVR0RBCIwIIEeaml0ZW5kcmEudmVnaXJhanVAYnJvYWRjb20uY29tMBMG
+A1UdJQQMMAoGCCsGAQUFBwMEMB8GA1UdIwQYMBaAFAApNp5ceroPry1QLdugI4UYsKCSMB0GA1Ud
+DgQWBBRq5Jlxz3MqC+zEgUxK566xEc2g3DANBgkqhkiG9w0BAQsFAAOCAgEARXrmeeWA31pp9Tr0
+M6mOlMv+Pr2raES4GzPSyftvxf6tBQCBNaqi6LSbyusDYOj3mG9bp6VeVn+68OxNY9iNAk+ujtId
+f3+30BlZOQ1v8z9u2peUOUtWI60y2MxhdH0X0n2H+BCGvUOFqs5z440jqqy1HsscZTXHB7FEZmVP
+fyD+0Z6cxyh7WNC6+BgLiFwf8iqmAbu7Yb1sGTUGyS5gfYEjJbF2PJfwNUcJDd7eS4w5Ju5mK5y7
+spgjH2/JmDgbkpSk9JyuWfjGZIg4ah/q2nb6UMd1XJb6gLQZuzPOI3SgXPvd8MHGjKZrX2BHOBSC
+bJJ8rp4w4a9QMS6dde2MFObusxkZAft4tUnwo+ProchHs7iA85sL7sWEZhAmjmKKCpECpEfZm0+/
+hpvKQV3AZp5vBstb4IVL8QmLj8beDVHYnNhEicsSiG1wW7zSYyBnmGbFRrFQIJnJDWPjTZOlVEyp
+T1ShrXRCtqJpOt6rgg+rFEY3D8j6/bAkJXnmKnE2LZ0YyrrKk7eC6UfNNimx38w3NWchtcGY8zJn
+Y/1/C9Jv/mWm/2lK8nvusOFxhKmbG83Hx8toQdZ5F1kYk6zAWjfB7lwXr/En9mCmLieJ18hen9EK
+qbYyUkmCmuoLi5GXFMJy+iQv6DgMVQ7CACagybU6FUrmL9lVa+A6caBEEh4xggJkMIICYAIBATBi
+MFIxCzAJBgNVBAYTAkJFMRkwFwYDVQQKExBHbG9iYWxTaWduIG52LXNhMSgwJgYDVQQDEx9HbG9i
+YWxTaWduIEdDQyBSNiBTTUlNRSBDQSAyMDIzAgwYdforFgrdZbZjKmswDQYJYIZIAWUDBAIBBQCg
+gdQwLwYJKoZIhvcNAQkEMSIEIACLRu++4+XaqPmKtMtKpJYU2j5rKyoV7Ufg8GaNA86VMBgGCSqG
+SIb3DQEJAzELBgkqhkiG9w0BBwEwHAYJKoZIhvcNAQkFMQ8XDTI1MDIwNzIzMTg0N1owaQYJKoZI
+hvcNAQkPMVwwWjALBglghkgBZQMEASowCwYJYIZIAWUDBAEWMAsGCWCGSAFlAwQBAjAKBggqhkiG
+9w0DBzALBgkqhkiG9w0BAQowCwYJKoZIhvcNAQEHMAsGCWCGSAFlAwQCATANBgkqhkiG9w0BAQEF
+AASCAQBPrNla8/0W+0X6MCVu8XWhB/XD5b2kylwc5oOfOLfCww/ssj/BxUwgvcT4TL8hWI9ftTTC
+vjbsPuzYDumkHgCy8MqTTwLs7DO/Iss+cnnHRUQJVqcE//ODTxXgD5WL0jwVpIIUb2F+gHqMyrBE
+y35Hh/5bJdKcWjFrQnq65gXJ9PXsfFo1r3oK2kRvPGpApzWeNTsG41ymp3KelC0HSUZ/yWbeHzoS
+06MwoEa5I1jMHFHA+pa1PvMAc9t2k6obTeV7ZO3YYuHTRB1rtuZNyhHMK0/y+2Oo2d61/AYvhlh2
+ywrHdRWBwIbLEHiDfYuiVKg2pwwaSkf9anfaDAVc9WUQ
+--000000000000ab55f3062d9594a6--
 
