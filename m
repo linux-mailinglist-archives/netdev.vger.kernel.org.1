@@ -1,98 +1,146 @@
-Return-Path: <netdev+bounces-163900-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-163884-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0E961A2BFB2
-	for <lists+netdev@lfdr.de>; Fri,  7 Feb 2025 10:42:43 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id C2016A2BF0A
+	for <lists+netdev@lfdr.de>; Fri,  7 Feb 2025 10:17:53 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 361F916AD6F
-	for <lists+netdev@lfdr.de>; Fri,  7 Feb 2025 09:42:31 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id E463B188CBA4
+	for <lists+netdev@lfdr.de>; Fri,  7 Feb 2025 09:17:57 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 67DD81DE2D6;
-	Fri,  7 Feb 2025 09:42:14 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b="ZXDaVjrD"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E2DB41DDA31;
+	Fri,  7 Feb 2025 09:17:20 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from abb.hmeau.com (abb.hmeau.com [144.6.53.87])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-il1-f175.google.com (mail-il1-f175.google.com [209.85.166.175])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C49F41DE2CD;
-	Fri,  7 Feb 2025 09:42:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=144.6.53.87
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1D7621D5AD8;
+	Fri,  7 Feb 2025 09:17:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.175
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1738921334; cv=none; b=BIRGhLVOeyjPGUS7iXKOfULlTWGCLKTeKA+HXshPh9dekyIQa3zZsmdOXAWYw9ksD1KBrmR79x4C3TfUxfQ13bDaECr5aZ4NHch9HG5k3NaArAcB+7EgfGv0U2FEFWkp8f1KqOYY9h0V49ELDMTNF3v3pFmFY0K3/+iu8rVdBzg=
+	t=1738919840; cv=none; b=C6gAQLfzR8sVOnmNE9ynzbRVuEoohS6IGxjpUdx+WlnKs1PvVaJTZoWWH/VVc2rF224k1gS5naHO3kB2mq/B6NEnrj4MjSVKuJgTH3o94MEkzAn1EymUboS7aK9ry1tb43gS9WocBfid47RQdZa/beGeoljCEnVW2mgm1U5J5x8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1738921334; c=relaxed/simple;
-	bh=EewjN7nUhhtBPJOdfrZj64y7+JiFITVsxY5wBikw+WQ=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=YaroOi9OJkcqxJ9pYjTXQxe+jCnMiVL5EaSqPN+qPZmqjpyqzyHTLW5qPZ2Qgg6qBgPXC+8QhWtvu+1i9KvhTRsMLH+7y/KCHmDQDp0DpIduj6eMAMiROjfeh8UZwp+VotxJumfMdG+Vopzp1DpRq6TuRtRxp24wPLu+OWvjadw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au; spf=pass smtp.mailfrom=gondor.apana.org.au; dkim=pass (2048-bit key) header.d=hmeau.com header.i=@hmeau.com header.b=ZXDaVjrD; arc=none smtp.client-ip=144.6.53.87
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gondor.apana.org.au
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gondor.apana.org.au
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=hmeau.com;
-	s=formenos; h=In-Reply-To:Content-Type:MIME-Version:References:Message-ID:
-	Subject:Cc:To:From:Date:Sender:Reply-To:Content-Transfer-Encoding:Content-ID:
-	Content-Description:Resent-Date:Resent-From:Resent-Sender:Resent-To:Resent-Cc
-	:Resent-Message-ID:List-Id:List-Help:List-Unsubscribe:List-Subscribe:
-	List-Post:List-Owner:List-Archive;
-	bh=MhA1jDIfQ8iLGh9WfIUR3+LgFXMnqWm6EVDsj31vync=; b=ZXDaVjrDmJbS9jssNlbQ3D9Elb
-	r5Xsr+O3eH47BnThcCfwS3N8+p4zkexJmJG/747y6dDuOu7tkQkOCvKJ/GIuRunQjUD6KD25n0+X3
-	kcG1BAZ7Itvv9TbLunVGLSNIL1mtgJ3nUXgMX0L0AqAZcAaGEdBVjoDUsKQTUOzpRXN09nHvpZUNL
-	gxmLUvE2bu1GrU38+PRWbHHxCXP/OkHk9Ra1tn1ik0thv5vZatZna2CGm8jwG8HBcv9Yy+l75vUsS
-	o1ViSi5mUUyx6WHm0LR1XrsNS8UhS0DYuuJvLTJx0/gsGGdfUYRudFcqYM/d22WAdImA1rarkFFsF
-	lnfvqmgw==;
-Received: from loth.rohan.me.apana.org.au ([192.168.167.2])
-	by formenos.hmeau.com with smtp (Exim 4.96 #2 (Debian))
-	id 1tgJwx-00FpRv-2r;
-	Fri, 07 Feb 2025 16:56:21 +0800
-Received: by loth.rohan.me.apana.org.au (sSMTP sendmail emulation); Fri, 07 Feb 2025 16:56:20 +0800
-Date: Fri, 7 Feb 2025 16:56:20 +0800
-From: Herbert Xu <herbert@gondor.apana.org.au>
-To: David Howells <dhowells@redhat.com>
-Cc: netdev@vger.kernel.org, Marc Dionne <marc.dionne@auristor.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
-	Simon Horman <horms@kernel.org>,
-	Trond Myklebust <trond.myklebust@hammerspace.com>,
-	Chuck Lever <chuck.lever@oracle.com>,
-	Eric Biggers <ebiggers@kernel.org>,
-	Ard Biesheuvel <ardb@kernel.org>, linux-crypto@vger.kernel.org,
-	linux-afs@lists.infradead.org, linux-nfs@vger.kernel.org,
-	linux-fsdevel@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH net 03/24] crypto: Add 'krb5enc' hash and cipher AEAD
- algorithm
-Message-ID: <Z6XKtPKryJsRfYvK@gondor.apana.org.au>
-References: <20250203142343.248839-1-dhowells@redhat.com>
- <20250203142343.248839-4-dhowells@redhat.com>
+	s=arc-20240116; t=1738919840; c=relaxed/simple;
+	bh=gZaXz7XL6hd/UGWpNon4f9PYF3b0mzV4TxHZOcz4Sak=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=QZ3plTTDndS84yz4CkwbScFetHCdaKSff+AsZXIPJuQyQIYxO1zrkfenOELMSEe5oSyLYdVk5tLnaqqX9wz10xjtUKhrYeoeShFXxvhl0TCPcehBc0KuB5HQGeYt/nztfgC2bkSDLzHJNH2ERbkyuA2/W4eDkPB8zMxcwC1ZTKA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=linux-m68k.org; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.166.175
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=linux-m68k.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-il1-f175.google.com with SMTP id e9e14a558f8ab-3ce873818a3so15935775ab.1;
+        Fri, 07 Feb 2025 01:17:18 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1738919837; x=1739524637;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=o4kJhOPtCECyINUZkXDqpO81cp9u410vUEkFnMeAGRE=;
+        b=psVmUxRbc7tPvjHIlZY9iE1kQfF2KVBfNj1bHv+Dw5tbAlmHLIPUpXEwJjoYdxllNG
+         mhQU/KiKPAzqtPmVhHjUDWcEIxVMlE0Yp3qnNyGTE92DrnzlT4/3jWCN4PtSTWQaWmG1
+         7uuGsr3ZHJfL3d8livOkBfu8KxH8VqxxfTJqkLxQOTaNI4wnSrIk7QVVxFnNFUZdmIwI
+         RQdoaoGgMPlZqERuQgJRjwWpbOeyKJYUha+uKUJzpRUIPygCJLKPoe2TD8TquRGoS2ZS
+         n69qg9p4NY0uz8aekY83rPacoBlI+kfq5ekbKgFJhJndH08WzILBi3JvRwi+EtY+wHmu
+         TTvQ==
+X-Forwarded-Encrypted: i=1; AJvYcCU7aV51ddKRCrXKtzObRnPgOlCuoWEPKfzLw12VWkuXUP3Z0o5Zm3VVn6ymOLB/vuiIUVjMELGcavsL@vger.kernel.org, AJvYcCVtjtVaaFLkRoQPdcGaoloBn2RbxGtgKYfNMzQDxFn026UwUhXZ3oXBoCrJCwdjw3ut2Hsp7N4WxWrMRKrt@vger.kernel.org, AJvYcCVwHuRta5+BpcmmbUyqmnIYLF4BlcfLEYR/jQJIfYKuTqnyD+Nlbvwg1kiqqZTYmySx3W5LrW4XJa3Y@vger.kernel.org, AJvYcCX+vy/T2iO+hOeWf3pSYXepiPluQ4x1zp2Sj1tGhPJy1KhJplXrWeASZNgH6cAVieg1vwIeqicS7Lfz@vger.kernel.org, AJvYcCXdTZAW8YRE7pv9dsNbSqyf22zW/F/RN460WObUCULaAeF2oWP673EkDB95EclwPLpXh0na/SGcVKniil4=@vger.kernel.org, AJvYcCXwxOj8zyWmWutsyWjU5VgFrekoEgFVA7nPQU4I3ZOY0Zs3tLIE+Z54cV1ccHv7RzMd13GESPF/@vger.kernel.org
+X-Gm-Message-State: AOJu0YwE5ubkR5bOmMhuK4aEcs0gxBnNnkFpEL8Obb2ukt0OcSJuX/Q6
+	whpiZcshV1uZy3ezOSrLrODGqOcHntfBnj/15q/ldBU+kcmEE3/dgxcPexBC
+X-Gm-Gg: ASbGnct6GMwQzXLSjcBjT3RR2fW1DaZxkCSajpGuDAbIcGKwOwDsoihfs4KPmXmMlF6
+	dywMSH2WcNqHJYP/c/FlWVdU1oeiutdBRgmC5Wr6F8kWCC+2FKwxVS5blKk7Km0YLFDUZXtNXTG
+	1EqyoBsZeTBAqjzgBwj1/GbAn1ntQpxDYJ5GX8upGdC+PaOC+sM8+F5SguwtQwp+ep2D+Q7/VSR
+	Kt516lK2DhsuU1G7MXxpfkTjdfDSJmC6ob3fpwpTU0QRC06R/dMigB322zl9jhFYDPiPhwIf5s9
+	AnrIJGpDV6oay9GKvKyNI1zXby5icsijzjhM8X3i08imWdmWWIo3qg==
+X-Google-Smtp-Source: AGHT+IG043XEt5V/lr+jQskxWxCFLSi7BiNG4a20ljNVDAJMmu20cN9bDvLVgzdiBOpI7glFiTGhAA==
+X-Received: by 2002:a05:6e02:160d:b0:3d0:618c:1b17 with SMTP id e9e14a558f8ab-3d13dd38108mr20902755ab.7.1738919837393;
+        Fri, 07 Feb 2025 01:17:17 -0800 (PST)
+Received: from mail-io1-f53.google.com (mail-io1-f53.google.com. [209.85.166.53])
+        by smtp.gmail.com with ESMTPSA id 8926c6da1cb9f-4eccfacfee0sm673185173.82.2025.02.07.01.17.16
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Fri, 07 Feb 2025 01:17:16 -0800 (PST)
+Received: by mail-io1-f53.google.com with SMTP id ca18e2360f4ac-844e9b8b0b9so143334439f.0;
+        Fri, 07 Feb 2025 01:17:16 -0800 (PST)
+X-Forwarded-Encrypted: i=1; AJvYcCUEIPycsT2k50iQZgTDK8nsrVcE5vEIWJ2pL81Gp5Kghr9N/cSIPopfbQXUbqSqFxXk09irH9SST5v5@vger.kernel.org, AJvYcCUGjMfKX6bUWXjrzz8lMsj2LZZvsoqowBjF5bOSTDhppNIiw56OdEGNoDGQ8n00g/EloPUy1O0/7f3FabGu@vger.kernel.org, AJvYcCUUM/0e52LemMCo1O20BgFnDAn5IFEb6ot2DY8JxmnHHypZQk+MaA35gaPEGlZHnFfnmvaEgt8F3LSt@vger.kernel.org, AJvYcCUy8XA7RemWYcsi0p6GovRiCNH4UoRAZtgQR46Dprpcnv5ySWnewZml++KbhroXXiaE7XwqJ9ij@vger.kernel.org, AJvYcCW/SY1G7CH3gKqRSLlrWlK4UYw0QHETlMKBrP4ZjVmOLe7K1drfonFbQPcr477IYKHjVBHiQ1hjKOXh/Dg=@vger.kernel.org, AJvYcCWNUFvyaRae7OB0+yS/NL3qf2aZYIRftmwqPZBiCwoGKMXv3aRtDhS7fjSVtHvlgpeq0gwqKf8dFVVb@vger.kernel.org
+X-Received: by 2002:a05:6102:41a0:b0:4b2:5d63:ff72 with SMTP id
+ ada2fe7eead31-4ba85e7d7e5mr1354232137.13.1738919445022; Fri, 07 Feb 2025
+ 01:10:45 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250203142343.248839-4-dhowells@redhat.com>
+References: <20250206-gpio-set-array-helper-v2-0-1c5f048f79c3@baylibre.com> <20250206-gpio-set-array-helper-v2-1-1c5f048f79c3@baylibre.com>
+In-Reply-To: <20250206-gpio-set-array-helper-v2-1-1c5f048f79c3@baylibre.com>
+From: Geert Uytterhoeven <geert@linux-m68k.org>
+Date: Fri, 7 Feb 2025 10:10:33 +0100
+X-Gmail-Original-Message-ID: <CAMuHMdU5tt5_t2SfYO3OUsHenu_0PhpKeLHktNdCx-W6zCEymw@mail.gmail.com>
+X-Gm-Features: AWEUYZmj9DYQSOmgGzGXyOkOE57CQ_wkxVouudAJc-ubVAUCMSn97Ipr2XIc-m4
+Message-ID: <CAMuHMdU5tt5_t2SfYO3OUsHenu_0PhpKeLHktNdCx-W6zCEymw@mail.gmail.com>
+Subject: Re: [PATCH v2 01/13] gpiolib: add gpiod_multi_set_value_cansleep()
+To: David Lechner <dlechner@baylibre.com>
+Cc: Linus Walleij <linus.walleij@linaro.org>, Bartosz Golaszewski <brgl@bgdev.pl>, 
+	Andy Shevchenko <andy@kernel.org>, Lars-Peter Clausen <lars@metafoo.de>, 
+	Michael Hennerich <Michael.Hennerich@analog.com>, Jonathan Cameron <jic23@kernel.org>, 
+	Ulf Hansson <ulf.hansson@linaro.org>, Peter Rosin <peda@axentia.se>, Andrew Lunn <andrew@lunn.ch>, 
+	Heiner Kallweit <hkallweit1@gmail.com>, Russell King <linux@armlinux.org.uk>, 
+	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Vinod Koul <vkoul@kernel.org>, 
+	Kishon Vijay Abraham I <kishon@kernel.org>, =?UTF-8?B?TnVubyBTw6E=?= <nuno.sa@analog.com>, 
+	Liam Girdwood <lgirdwood@gmail.com>, Mark Brown <broonie@kernel.org>, 
+	Jaroslav Kysela <perex@perex.cz>, Takashi Iwai <tiwai@suse.com>, linux-gpio@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, linux-iio@vger.kernel.org, 
+	linux-mmc@vger.kernel.org, netdev@vger.kernel.org, 
+	linux-phy@lists.infradead.org, linux-sound@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
 
-On Mon, Feb 03, 2025 at 02:23:19PM +0000, David Howells wrote:
+Hi David,
+
+On Thu, 6 Feb 2025 at 23:48, David Lechner <dlechner@baylibre.com> wrote:
+> Add a new gpiod_multi_set_value_cansleep() helper function with fewer
+> parameters than gpiod_set_array_value_cansleep().
 >
-> [!] Note that the net/sunrpc/auth_gss/ implementation gets a pair of
-> ciphers, one non-CTS and one CTS, using the former to do all the aligned
-> blocks and the latter to do the last two blocks if they aren't also
-> aligned.  It may be necessary to do this here too for performance reasons -
-> but there are considerations both ways:
+> Calling gpiod_set_array_value_cansleep() can get quite verbose. In many
+> cases, the first arguments all come from the same struct gpio_descs, so
+> having a separate function where we can just pass that cuts down on the
+> boilerplate.
+>
+> Reviewed-by: Linus Walleij <linus.walleij@linaro.org>
+> Signed-off-by: David Lechner <dlechner@baylibre.com>
 
-The CTS template will take any hardware accelerated CBC implementation
-and turn it into CTS.
+Thanks for your patch!
 
-So there is no reason to do the CTS/CBC thing by hand at all.
+> --- a/include/linux/gpio/consumer.h
+> +++ b/include/linux/gpio/consumer.h
+> @@ -655,4 +655,11 @@ static inline void gpiod_unexport(struct gpio_desc *desc)
+>
+>  #endif /* CONFIG_GPIOLIB && CONFIG_GPIO_SYSFS */
+>
+> +static inline int gpiod_multi_set_value_cansleep(struct gpio_descs *descs,
+> +                                                unsigned long *value_bitmap)
+> +{
+> +       return gpiod_set_array_value_cansleep(descs->ndescs, descs->desc,
+> +                                             descs->info, value_bitmap);
 
-Cheers,
+I am wondering whether this needs a check for !IS_ERR_OR_NULL(descs),
+to handle the !CONFIG_GPIOLIB and gpiod_get_array_optional() cases?
+
+Slightly related: shouldn't gpiod_put_array() (both the implementation
+and the !CONFIG_GPIOLIB dummy) allow the caller to pass NULL, to
+streamline the gpiod_get_array_optional() case?
+
+> +}
+> +
+>  #endif
+
+Gr{oetje,eeting}s,
+
+                        Geert
+
 -- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+Geert Uytterhoeven -- There's lots of Linux beyond ia32 -- geert@linux-m68k.org
+
+In personal conversations with technical people, I call myself a hacker. But
+when I'm talking to journalists I just say "programmer" or something like that.
+                                -- Linus Torvalds
 
