@@ -1,696 +1,196 @@
-Return-Path: <netdev+bounces-163961-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-163940-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 21B84A2C29D
-	for <lists+netdev@lfdr.de>; Fri,  7 Feb 2025 13:23:57 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id A058FA2C233
+	for <lists+netdev@lfdr.de>; Fri,  7 Feb 2025 13:08:23 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id BC9D57A5203
-	for <lists+netdev@lfdr.de>; Fri,  7 Feb 2025 12:22:58 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 8971B188CD61
+	for <lists+netdev@lfdr.de>; Fri,  7 Feb 2025 12:08:28 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 740E61E9B3E;
-	Fri,  7 Feb 2025 12:23:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1177B1DEFFD;
+	Fri,  7 Feb 2025 12:08:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="bmFp749p"
 X-Original-To: netdev@vger.kernel.org
-Received: from Chamillionaire.breakpoint.cc (Chamillionaire.breakpoint.cc [91.216.245.30])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-io1-f54.google.com (mail-io1-f54.google.com [209.85.166.54])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7AC681DE8AE;
-	Fri,  7 Feb 2025 12:23:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.216.245.30
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 738B92417C7;
+	Fri,  7 Feb 2025 12:08:17 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.54
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1738931017; cv=none; b=DN56SwGRq1TByTx2dMnIxw/P4Vcy1M5DqhxVgJYSWWIuJWLi5okrMkjS4aYQB8BlteaGhC6bR3Pc6G+1dFcfe0QCWm04RdHGUp5tz2pEEdwwSmVStuundmx+LSZv4z2fhtPXoPNpWFVDEXhIqQLlzTDmseWEhm5rrxTYivcwqhc=
+	t=1738930099; cv=none; b=ADODo9gzGSwMI2NUtIyEzU9pNknPzWL5FOW32hRIe4uobk63XKUoLWE6QDKJ0nLxy1ObZkrJO6n1OYC7dM9qLdUjz7J/IiIwyPf+RcEEf73RcL643RLq53Esrg/RIXSCm65aDigh9jMP9qa0n7SQfh08Wj7HHxU4OdaHPR/WlDo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1738931017; c=relaxed/simple;
-	bh=6Yof+os6gFXj+ulCAt/INhfoL9VP78z82WJhNwth4n4=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=GycuoxSNHz9F8i+3OIwsZG7vPvn2oH3+EvovSe0wYQTWTlpdcyAzAFGhWLF7FWsEWdM4hEKQqxor/bd/ZDD3RDCuMS5BzOx6g2JsZKgopTJm+yzR0Adw/iAT7TiUt99nn3fpcw4YupROG3kWd0p7MhIv62ry5mozq5BggTrnKEE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=strlen.de; spf=pass smtp.mailfrom=breakpoint.cc; arc=none smtp.client-ip=91.216.245.30
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=strlen.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=breakpoint.cc
-Received: from fw by Chamillionaire.breakpoint.cc with local (Exim 4.92)
-	(envelope-from <fw@breakpoint.cc>)
-	id 1tgN6u-0000NH-IS; Fri, 07 Feb 2025 13:05:28 +0100
-From: Florian Westphal <fw@strlen.de>
-To: <netdev@vger.kernel.org>
-Cc: donald.hunter@gmail.com,
-	<netfilter-devel@vger.kernel.org>,
-	Florian Westphal <fw@strlen.de>
-Subject: [PATCH net-next] netlink: specs: add ctnetlink dump and stats dump support
-Date: Fri,  7 Feb 2025 13:05:11 +0100
-Message-ID: <20250207120516.17002-1-fw@strlen.de>
-X-Mailer: git-send-email 2.48.1
+	s=arc-20240116; t=1738930099; c=relaxed/simple;
+	bh=cPcpt0PXK7obvNiTC5aMFDuDmdDtdl5Q8IABBt5/KWo=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=dXcwhR1B1yjfUBSm3wSFTWWj/kpbOHI78alddFZSmDCl5ttYfSq6fS+UgQZdJB4kkDPlVtfvcYuMVh40DRuWfzLxmgInBzNyeW+ZhSPIr1RfSGzAgGJ+io7pwF2huiCTX9XEVUvSyqrV5RuFXKzaL0bdl5yAzoU5pSPPbbz04gU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=bmFp749p; arc=none smtp.client-ip=209.85.166.54
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-io1-f54.google.com with SMTP id ca18e2360f4ac-854a68f5a9cso158924039f.0;
+        Fri, 07 Feb 2025 04:08:17 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1738930096; x=1739534896; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=o4hHCVYSEIrh1Wchgp0ooIrORTPHl9IOkpabYOgczME=;
+        b=bmFp749pMxMAiEhGtS9wKq/QG2pfozFASWan+DgiwCJmy7pmofSB1dx78XhOqTxOzy
+         W3P6uzTQuhTzBnOZF7E1bH2Ke4rysBhw+WXNRTVhehIYztPZeIpuKHSKFMz7DLkIqDE4
+         QCpnLwl3tzEzcfLrSAZQkW90pxnUXeX0eoalGUl+k5qlNNk4qbbiYi8RhPGq7qQR+Q2L
+         /Y5nSPBorV9Km+BGNQ03rm3WiVYDlZS524B1mMpErhI/0DaSLzv842PHGLRN0S+pvs4y
+         vaDY3PX9JmEYTh3FFguyWfm/YvxNXtV4x/YaqKNOF0EcS7d8BK1sB2OA4wFyl1uHAZ2H
+         rqBw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1738930096; x=1739534896;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=o4hHCVYSEIrh1Wchgp0ooIrORTPHl9IOkpabYOgczME=;
+        b=hvmdM3bMPD6DZazQHRF/KuLWFg50WH8RRVoKJfs+IFHBNOLqrNV4Dx50O5ZE4DNojT
+         /dVuUAstoDWNF9KwaJzHbLb6jTaVMk/eA4rRCVB6jd+VkVIwRkH6jv3SegdIgv3XnvcO
+         uFYvLxAbpkkyiSiA29xEOb30cNuJdgbVl+U1AwAHwG1Gu30zEkzdGXau+WB6JOctIXOr
+         rzDxuMn6o8tlNPtVr6YTjkXkJQuVHCOq0YT/uLvoj7/YmKewjTkxbywIh+U97bXHvsq8
+         kp62XJI3YSfxzinso0+2e3RncbH2vJKdd6v0As8imWO0wZ9vfPkf6CdaMr0abOcdJRve
+         xDQQ==
+X-Forwarded-Encrypted: i=1; AJvYcCWlP4t3fPXnW3wljX5FyzULMNnl/SAtv9bhLOrP7ky0+VvgBDx6HBVzkyvOpWAHRIobq4rzl3Ym@vger.kernel.org, AJvYcCXCUhXlMo+9WQsw0oCpPOxcuNVfiAC/T7H6sfCDq1SGvj5xb2/xbO8jnsyJd6mAhhl5PTQ=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzaQC4Dp6IPxXoz0x41VlXuRm7gHnWesU4n74PV06Qco/Apcaid
+	SlSlTVuExxPLW0tEYAxF7V9+HF19MQuqVGREbFTZBIKls0SwqhjDKIX5/7vlPHWtk9xuXp+qH1K
+	R4mhiqbi6r5fe3SGJMU+GC9lGcgg=
+X-Gm-Gg: ASbGncsvAKoQfUc+ceI42r3uv30Q3ddsCe0qAdEq3yhC+70xphK2oCDmsbo8cE89tPK
+	2+/tImQj7RionsMzHNQl4SHtFbMM5rqX16yUY8I7TekCnE6jsAQHZXpdfyvx8tWNTjyXzthsb
+X-Google-Smtp-Source: AGHT+IEQNNHrVr0PANu0V/eLZqnnKZOy5Tmk7TYWBug6YqbOgLEKOgen5g/aLeTkPC64mEFgCdyJoQ12+Kn8rlsyz90=
+X-Received: by 2002:a92:c263:0:b0:3cf:f88b:b51a with SMTP id
+ e9e14a558f8ab-3d13dcfce6cmr23555255ab.2.1738930096325; Fri, 07 Feb 2025
+ 04:08:16 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+References: <20250204183024.87508-1-kerneljasonxing@gmail.com>
+ <20250204183024.87508-11-kerneljasonxing@gmail.com> <20250204175744.3f92c33e@kernel.org>
+ <e894c427-b4b3-4706-b44c-44fc6402c14c@linux.dev> <CAL+tcoCQ165Y4R7UWG=J=8e=EzwFLxSX3MQPOv=kOS3W1Q7R0A@mail.gmail.com>
+ <0a8e7b84-bab6-4852-8616-577d9b561f4c@linux.dev> <CAL+tcoAp8v49fwUrN5pNkGHPF-+RzDDSNdy3PhVoJ7+MQGNbXQ@mail.gmail.com>
+ <CAL+tcoC5hmm1HQdbDaYiQ1iW1x2J+H42RsjbS_ghyG8mSDgqqQ@mail.gmail.com>
+ <67a424d2aa9ea_19943029427@willemb.c.googlers.com.notmuch>
+ <CAL+tcoCPGAjs=+Hnzr4RLkioUV7nzy=ZmKkTDPA7sBeVP=qzow@mail.gmail.com>
+ <67a42ba112990_19c315294b7@willemb.c.googlers.com.notmuch>
+ <CAL+tcoC_5106onp6yQh-dKnCTLtEr73EZVC31T_YeMtqbZ5KBw@mail.gmail.com>
+ <b158a837-d46c-4ae0-8130-7aa288422182@linux.dev> <CAL+tcoCUjxvE-DaQ8AMxMgjLnV+J1jpYMh7BCOow4AohW1FFSg@mail.gmail.com>
+ <739d6f98-8a44-446e-85a4-c499d154b57b@linux.dev> <CAL+tcoA14HKQmG9dtMdRVqgJJ87hcvynPjqVLkAbHnDcsq-RzQ@mail.gmail.com>
+In-Reply-To: <CAL+tcoA14HKQmG9dtMdRVqgJJ87hcvynPjqVLkAbHnDcsq-RzQ@mail.gmail.com>
+From: Jason Xing <kerneljasonxing@gmail.com>
+Date: Fri, 7 Feb 2025 20:07:40 +0800
+X-Gm-Features: AWEUYZmdF_0BLXWdpelwDDZ4cVzJhNyFiTtA_JpiQwjorMeNrDoSqEGZZELOLcg
+Message-ID: <CAL+tcoD9qZvbo53QsUcC27Dp=tJshBFdjoM9RCHxHEsYjwaXWg@mail.gmail.com>
+Subject: Re: [PATCH bpf-next v8 10/12] bpf: make TCP tx timestamp bpf
+ extension work
+To: Martin KaFai Lau <martin.lau@linux.dev>
+Cc: Willem de Bruijn <willemdebruijn.kernel@gmail.com>, Jakub Kicinski <kuba@kernel.org>, 
+	davem@davemloft.net, edumazet@google.com, pabeni@redhat.com, 
+	dsahern@kernel.org, willemb@google.com, ast@kernel.org, daniel@iogearbox.net, 
+	andrii@kernel.org, eddyz87@gmail.com, song@kernel.org, 
+	yonghong.song@linux.dev, john.fastabend@gmail.com, kpsingh@kernel.org, 
+	sdf@fomichev.me, haoluo@google.com, jolsa@kernel.org, horms@kernel.org, 
+	bpf@vger.kernel.org, netdev@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-This adds support to dump the connection tracking table
-("conntrack -L") and the conntrack statistics, ("conntrack -S").
+On Fri, Feb 7, 2025 at 10:18=E2=80=AFAM Jason Xing <kerneljasonxing@gmail.c=
+om> wrote:
+>
+> On Fri, Feb 7, 2025 at 10:07=E2=80=AFAM Martin KaFai Lau <martin.lau@linu=
+x.dev> wrote:
+> >
+> > On 2/5/25 10:56 PM, Jason Xing wrote:
+> > >>> I have to rephrase a bit in case Martin visits here soon: I will
+> > >>> compare two approaches 1) reply value, 2) bpf kfunc and then see wh=
+ich
+> > >>> way is better.
+> > >>
+> > >> I have already explained in details why the 1) reply value from the =
+bpf prog
+> > >> won't work. Please go back to that reply which has the context.
+> > >
+> > > Yes, of course I saw this, but I said I need to implement and dig mor=
+e
+> > > into this on my own. One of my replies includes a little code snippet
+> > > regarding reply value approach. I didn't expect you to misunderstand
+> > > that I would choose reply value, so I rephrase it like above :)
+> >
+> > I did see the code snippet which is incomplete, so I have to guess. afa=
+ik, it is
+> > not going to work. I was hoping to save some time without detouring to =
+the
+> > reply-value path in case my earlier message was missed. I will stay qui=
+et and
+> > wait for v9 first then to avoid extending this long thread further.
+>
+> I see. I'm grateful that you point out the right path. I'm still
+> investigating to find a good existing example in selftests and how to
+> support kfunc.
 
-Example conntrack dump:
-tools/net/ynl/pyynl/cli.py --spec Documentation/netlink/specs/ctnetlink.yaml --dump ctnetlink-get
-[{'id': 59489769,
-  'mark': 0,
-  'nfgen-family': 2,
-  'protoinfo': {'protoinfo-tcp': {'tcp-flags-original': {'flags': {'maxack',
-                                                                   'sack-perm',
-                                                                   'window-scale'},
-                                                         'mask': set()},
-                                  'tcp-flags-reply': {'flags': {'maxack',
-                                                                'sack-perm',
-                                                                'window-scale'},
-                                                      'mask': set()},
-                                  'tcp-state': 'established',
-                                  'tcp-wscale-original': 7,
-                                  'tcp-wscale-reply': 8}},
-  'res-id': 0,
-  'secctx': {'secctx-name': 'system_u:object_r:unlabeled_t:s0'},
-  'status': {'assured',
-             'confirmed',
-             'dst-nat-done',
-             'seen-reply',
-             'src-nat-done'},
-  'timeout': 431949,
-  'tuple-orig': {'tuple-ip': {'ip-v4-dst': '34.107.243.93',
-                              'ip-v4-src': '192.168.0.114'},
-                 'tuple-proto': {'proto-dst-port': 443,
-                                 'proto-num': 6,
-                                 'proto-src-port': 37104}},
-  'tuple-reply': {'tuple-ip': {'ip-v4-dst': '192.168.0.114',
-                               'ip-v4-src': '34.107.243.93'},
-                  'tuple-proto': {'proto-dst-port': 37104,
-                                  'proto-num': 6,
-                                  'proto-src-port': 443}},
-  'use': 1,
-  'version': 0},
- {'id': 3402229480,
+Martin, sorry to revive this thread.
 
-Example stats dump:
-tools/net/ynl/pyynl/cli.py --spec Documentation/netlink/specs/ctnetlink.yaml --dump ctnetlink-stats-get
-[{'chain-toolong': 0,
-  'clash-resolve': 3,
-  'drop': 0,
- ....
+It's a little bit hard for me to find a proper example to follow. I
+tried to call __bpf_kfunc in the BPF_SOCK_OPS_TS_SND_CB callback and
+then failed because kfunc is not supported in the sock_ops case.
+Later, I tried to kprobe to hook a function, say,
+tcp_tx_timestamp_bpf(), passed the skb parameter to the kfunc and then
+got an error.
 
-Signed-off-by: Florian Westphal <fw@strlen.de>
----
- Documentation/netlink/specs/ctnetlink.yaml | 582 +++++++++++++++++++++
- 1 file changed, 582 insertions(+)
- create mode 100644 Documentation/netlink/specs/ctnetlink.yaml
+Here is code snippet:
+1) net/ipv4/tcp.c
++__bpf_kfunc static void tcp_init_tx_timestamp(struct sk_buff *skb)
++{
++       struct skb_shared_info *shinfo =3D skb_shinfo(skb);
++       struct tcp_skb_cb *tcb =3D TCP_SKB_CB(skb);
++
++       printk(KERN_ERR "jason: %d, %d\n\n", tcb->txstamp_ack,
+shinfo->tx_flags);
++       /*
++       tcb->txstamp_ack =3D 2;
++       shinfo->tx_flags |=3D SKBTX_BPF;
++       shinfo->tskey =3D TCP_SKB_CB(skb)->seq + skb->len - 1;
++       */
++}
+Note: I skipped copying some codes like BTF_ID_FLAGS...
 
-diff --git a/Documentation/netlink/specs/ctnetlink.yaml b/Documentation/netlink/specs/ctnetlink.yaml
-new file mode 100644
-index 000000000000..b477c6ddee9e
---- /dev/null
-+++ b/Documentation/netlink/specs/ctnetlink.yaml
-@@ -0,0 +1,582 @@
-+# SPDX-License-Identifier: ((GPL-2.0 WITH Linux-syscall-note) OR BSD-3-Clause)
-+
-+name: conntrack
-+protocol: netlink-raw
-+protonum: 12
-+
-+doc:
-+  Netfilter connection tracking subsystem over nfnetlink
-+
-+definitions:
-+  -
-+    name: nfgenmsg
-+    type: struct
-+    members:
-+      -
-+        name: nfgen-family
-+        type: u8
-+      -
-+        name: version
-+        type: u8
-+      -
-+        name: res-id
-+        byte-order: big-endian
-+        type: u16
-+  -
-+    name: nf-ct-tcp-flags-mask
-+    type: struct
-+    members:
-+      -
-+        name: flags
-+        type: u8
-+        enum: nf-ct-tcp-flags
-+        enum-as-flags: true
-+      -
-+        name: mask
-+        type: u8
-+        enum: nf-ct-tcp-flags
-+        enum-as-flags: true
-+  -
-+    name: nf-ct-tcp-flags
-+    type: flags
-+    entries:
-+      - window-scale
-+      - sack-perm
-+      - close-init
-+      - be-liberal
-+      - unacked
-+      - maxack
-+      - challenge-ack
-+      - simultaneous-open
-+  -
-+    name: nf-ct-tcp-state
-+    type: enum
-+    entries:
-+      - none
-+      - syn-sent
-+      - syn-recv
-+      - established
-+      - fin-wait
-+      - close-wait
-+      - last-ack
-+      - time-wait
-+      - close
-+      - syn-sent2
-+      - max
-+      - ignore
-+      - retrans
-+      - unack
-+      - timeout-max
-+  -
-+    name: nf-ct-sctp-state
-+    type: enum
-+    entries:
-+      - none
-+      - cloned
-+      - cookie-wait
-+      - cookie-echoed
-+      - established
-+      - shutdown-sent
-+      - shutdown-received
-+      - shutdown-ack-sent
-+      - shutdown-heartbeat-sent
-+  -
-+    name: nf-ct-status
-+    type: flags
-+    entries:
-+      - expected
-+      - seen-reply
-+      - assured
-+      - confirmed
-+      - src-nat
-+      - dst-nat
-+      - seq-adj
-+      - src-nat-done
-+      - dst-nat-done
-+      - dying
-+      - fixed-timeout
-+      - template
-+      - nat-clash
-+      - helper
-+      - offload
-+      - hw-offload
-+
-+attribute-sets:
-+  -
-+    name: ctnetlink-counter-attrs
-+    attributes:
-+      -
-+        name: packets
-+        type: u64
-+        byte-order: big-endian
-+      -
-+        name: bytes
-+        type: u64
-+        byte-order: big-endian
-+      -
-+        name: packets-old
-+        type: u32
-+      -
-+        name: bytes-old
-+        type: u32
-+      -
-+        name: pad
-+        type: pad
-+  -
-+    name: ctnetlink-tuple-proto-attrs
-+    attributes:
-+      -
-+        name: proto-num
-+        type: u8
-+        doc: l4 protocol number
-+      -
-+        name: proto-src-port
-+        type: u16
-+        byte-order: big-endian
-+        doc: l4 source port
-+      -
-+        name: proto-dst-port
-+        type: u16
-+        byte-order: big-endian
-+        doc: l4 source port
-+      -
-+        name: proto-icmp-id
-+        type: u16
-+        byte-order: big-endian
-+        doc: l4 icmp id
-+      -
-+        name: proto-icmp-type
-+        type: u8
-+      -
-+        name: proto-icmp-code
-+        type: u8
-+      -
-+        name: proto-icmpv6-id
-+        type: u16
-+        byte-order: big-endian
-+        doc: l4 icmp id
-+      -
-+        name: proto-icmpv6-type
-+        type: u8
-+      -
-+        name: proto-icmpv6-code
-+        type: u8
-+  -
-+    name: ctnetlink-tuple-ip-attrs
-+    attributes:
-+      -
-+        name: ip-v4-src
-+        type: u32
-+        byte-order: big-endian
-+        display-hint: ipv4
-+        doc: ipv4 source address
-+      -
-+        name: ip-v4-dst
-+        type: u32
-+        byte-order: big-endian
-+        display-hint: ipv4
-+        doc: ipv4 destination address
-+      -
-+        name: ip-v6-src
-+        type: binary
-+        checks:
-+          min-len: 16
-+        byte-order: big-endian
-+        display-hint: ipv6
-+        doc: ipv6 source address
-+      -
-+        name: ip-v6-dst
-+        type: binary
-+        checks:
-+          min-len: 16
-+        byte-order: big-endian
-+        display-hint: ipv6
-+        doc: ipv6 destination address
-+  -
-+    name: ctnetlink-tuple-attrs
-+    attributes:
-+    -
-+        name: tuple-ip
-+        type: nest
-+        nested-attributes: ctnetlink-tuple-ip-attrs
-+        doc: conntrack l3 information
-+    -
-+        name: tuple-proto
-+        type: nest
-+        nested-attributes: ctnetlink-tuple-proto-attrs
-+        doc: conntrack l4 information
-+    -
-+        name: tuple-zone
-+        type: u16
-+        byte-order: big-endian
-+        doc: conntrack zone id
-+  -
-+    name: ctnetlink-protoinfo-tcp-attrs
-+    attributes:
-+    -
-+        name: tcp-state
-+        type: u8
-+        enum: nf-ct-tcp-state
-+        doc: tcp connection state
-+    -
-+        name: tcp-wscale-original
-+        type: u8
-+        doc: window scaling factor in original direction
-+    -
-+        name: tcp-wscale-reply
-+        type: u8
-+        doc: window scaling factor in reply direction
-+    -
-+        name: tcp-flags-original
-+        type: binary
-+        struct: nf-ct-tcp-flags-mask
-+    -
-+        name: tcp-flags-reply
-+        type: binary
-+        struct: nf-ct-tcp-flags-mask
-+  -
-+    name: ctnetlink-protoinfo-dccp-attrs
-+    attributes:
-+    -
-+        name: dccp-state
-+        type: u8
-+        doc: dccp connection state
-+    -
-+        name: dccp-role
-+        type: u8
-+    -
-+        name: dccp-handshake-seq
-+        type: u64
-+        byte-order: big-endian
-+    -
-+        name: dccp-pad
-+        type: pad
-+  -
-+    name: ctnetlink-protoinfo-sctp-attrs
-+    attributes:
-+    -
-+        name: sctp-state
-+        type: u8
-+        doc: sctp connection state
-+        enum: nf-ct-sctp-state
-+    -
-+        name: vtag-original
-+        type: u32
-+        byte-order: big-endian
-+    -
-+        name: vtag-reply
-+        type: u32
-+        byte-order: big-endian
-+  -
-+    name: ctnetlink-protoinfo-attrs
-+    attributes:
-+    -
-+        name: protoinfo-tcp
-+        type: nest
-+        nested-attributes: ctnetlink-protoinfo-tcp-attrs
-+        doc: conntrack tcp state information
-+    -
-+        name: protoinfo-dccp
-+        type: nest
-+        nested-attributes: ctnetlink-protoinfo-dccp-attrs
-+        doc: conntrack dccp state information
-+    -
-+        name: protoinfo-sctp
-+        type: nest
-+        nested-attributes: ctnetlink-protoinfo-sctp-attrs
-+        doc: conntrack sctp state information
-+  -
-+    name: ctnetlink-help-attrs
-+    attributes:
-+      -
-+        name: help-name
-+        type: string
-+        doc: helper name
-+  -
-+    name: ctnetlink-nat-proto-attrs
-+    attributes:
-+      -
-+        name: nat-port-min
-+        type: u16
-+        byte-order: big-endian
-+      -
-+        name: nat-port-max
-+        type: u16
-+        byte-order: big-endian
-+  -
-+    name: ctnetlink-nat-attrs
-+    attributes:
-+      -
-+        name: nat-v4-minip
-+        type: u32
-+        byte-order: big-endian
-+      -
-+        name: nat-v4-maxip
-+        type: u32
-+        byte-order: big-endian
-+      -
-+        name: nat-v6-minip
-+        type: binary
-+      -
-+        name: nat-v6-maxip
-+        type: binary
-+      -
-+        name: nat-proto
-+        type: nest
-+        nested-attributes: ctnetlink-nat-proto-attrs
-+  -
-+    name: ctnetlink-seqadj-attrs
-+    attributes:
-+      -
-+        name: correction-pos
-+        type: u32
-+        byte-order: big-endian
-+      -
-+        name: offset-before
-+        type: u32
-+        byte-order: big-endian
-+      -
-+        name: offset-after
-+        type: u32
-+        byte-order: big-endian
-+  -
-+    name: ctnetlink-secctx-attrs
-+    attributes:
-+      -
-+        name: secctx-name
-+        type: string
-+  -
-+    name: ctnetlink-synproxy-attrs
-+    attributes:
-+      -
-+        name: isn
-+        type: u32
-+        byte-order: big-endian
-+      -
-+        name: its
-+        type: u32
-+        byte-order: big-endian
-+      -
-+        name: tsoff
-+        type: u32
-+        byte-order: big-endian
-+  -
-+    name: ctnetlink-attrs
-+    attributes:
-+      -
-+        name: tuple-orig
-+        type: nest
-+        nested-attributes: ctnetlink-tuple-attrs
-+        doc: conntrack l3+l4 protocol information, original direction
-+      -
-+        name: tuple-reply
-+        type: nest
-+        nested-attributes: ctnetlink-tuple-attrs
-+        doc: conntrack l3+l4 protocol information, reply direction
-+      -
-+        name: status
-+        type: u32
-+        byte-order: big-endian
-+        enum: nf-ct-status
-+        enum-as-flags: true
-+        doc: conntrack flag bits
-+      -
-+        name: protoinfo
-+        type: nest
-+        nested-attributes: ctnetlink-protoinfo-attrs
-+      -
-+        name: help
-+        type: nest
-+        nested-attributes: ctnetlink-help-attrs
-+      -
-+        name: nat-src
-+        type: nest
-+        nested-attributes: ctnetlink-nat-attrs
-+      -
-+        name: timeout
-+        type: u32
-+        byte-order: big-endian
-+      -
-+        name: mark
-+        type: u32
-+        byte-order: big-endian
-+      -
-+        name: counters-orig
-+        type: nest
-+        nested-attributes: ctnetlink-counter-attrs
-+      -
-+        name: counters-reply
-+        type: nest
-+        nested-attributes: ctnetlink-counter-attrs
-+      -
-+        name: use
-+        type: u32
-+        byte-order: big-endian
-+      -
-+        name: id
-+        type: u32
-+        byte-order: big-endian
-+      -
-+        name: nat-dst
-+        type: nest
-+        nested-attributes: ctnetlink-nat-attrs
-+      -
-+        name: tuple-master
-+        type: nest
-+        nested-attributes: ctnetlink-tuple-attrs
-+      -
-+        name: seq-adj-orig
-+        type: nest
-+        nested-attributes: ctnetlink-seqadj-attrs
-+      -
-+        name: seq-adj-reply
-+        type: nest
-+        nested-attributes: ctnetlink-seqadj-attrs
-+      -
-+        name: secmark
-+        type: binary
-+        doc: obsolete
-+      -
-+        name: zone
-+        type: u16
-+        byte-order: big-endian
-+        doc: conntrack zone id
-+      -
-+        name: secctx
-+        type: nest
-+        nested-attributes: ctnetlink-secctx-attrs
-+      -
-+        name: timestamp
-+        type: u64
-+        byte-order: big-endian
-+      -
-+        name: mark-mask
-+        type: u32
-+        byte-order: big-endian
-+      -
-+        name: labels
-+        type: binary
-+      -
-+        name: labels mask
-+        type: binary
-+      -
-+        name: synproxy
-+        type: nest
-+        nested-attributes: ctnetlink-synproxy-attrs
-+      -
-+        name: filter
-+        type: nest
-+        nested-attributes: ctnetlink-tuple-attrs
-+      -
-+        name: status-mask
-+        type: u32
-+        byte-order: big-endian
-+        enum: nf-ct-status
-+        enum-as-flags: true
-+        doc: conntrack flag bits to change
-+      -
-+        name: timestamp-event
-+        type: u64
-+        byte-order: big-endian
-+  -
-+    name: ctnetlink-stats-attrs
-+    attributes:
-+      -
-+        name: searched
-+        type: u32
-+        byte-order: big-endian
-+        doc: obsolete
-+      -
-+        name: found
-+        type: u32
-+        byte-order: big-endian
-+      -
-+        name: new
-+        type: u32
-+        byte-order: big-endian
-+        doc: obsolete
-+      -
-+        name: invalid
-+        type: u32
-+        byte-order: big-endian
-+        doc: obsolete
-+      -
-+        name: ignore
-+        type: u32
-+        byte-order: big-endian
-+        doc: obsolete
-+      -
-+        name: delete
-+        type: u32
-+        byte-order: big-endian
-+        doc: obsolete
-+      -
-+        name: delete-list
-+        type: u32
-+        byte-order: big-endian
-+        doc: obsolete
-+      -
-+        name: insert
-+        type: u32
-+        byte-order: big-endian
-+      -
-+        name: insert-failed
-+        type: u32
-+        byte-order: big-endian
-+      -
-+        name: drop
-+        type: u32
-+        byte-order: big-endian
-+      -
-+        name: early-drop
-+        type: u32
-+        byte-order: big-endian
-+      -
-+        name: error
-+        type: u32
-+        byte-order: big-endian
-+      -
-+        name: search-restart
-+        type: u32
-+        byte-order: big-endian
-+      -
-+        name: clash-resolve
-+        type: u32
-+        byte-order: big-endian
-+      -
-+        name: chain-toolong
-+        type: u32
-+        byte-order: big-endian
-+
-+operations:
-+  enum-model: directional
-+  list:
-+    -
-+      name: ctnetlink-get
-+      doc: get / dump entries
-+      attribute-set: ctnetlink-attrs
-+      fixed-header: nfgenmsg
-+      do:
-+        request:
-+          value: 0x101
-+          attributes:
-+            - name
-+        reply:
-+          value: 0x100
-+          attributes:
-+            - name
-+    -
-+      name: ctnetlink-stats-get
-+      doc: dump pcpu conntrack stats
-+      attribute-set: ctnetlink-stats-attrs
-+      fixed-header: nfgenmsg
-+      do:
-+        request:
-+          value: 0x104
-+          attributes:
-+            - name
-+        reply:
-+          value: 0x104
-+          attributes:
-+            - name
-+
--- 
-2.48.1
+2) bpf prog
+SEC("kprobe/tcp_tx_timestamp_bpf") // I wrote a new function/wrapper to hoo=
+k
+int BPF_KPROBE(kprobe__tcp_tx_timestamp_bpf, struct sock *sk, struct
+sk_buff *skb)
+{
+        tcp_init_tx_timestamp(skb);
+        return 0;
+}
 
+Then running the bpf prog, I got the following message:
+; tcp_init_tx_timestamp(skb); @ so_timestamping.c:281
+1: (85) call tcp_init_tx_timestamp#120682
+arg#0 pointer type STRUCT sk_buff must point to scalar, or struct with scal=
+ar
+processed 2 insns (limit 1000000) max_states_per_insn 0 total_states 0
+peak_states 0 mark_read 0
+-- END PROG LOAD LOG --
+libbpf: prog 'kprobe__tcp_tx_timestamp_bpf': failed to load: -22
+libbpf: failed to load object 'so_timestamping'
+libbpf: failed to load BPF skeleton 'so_timestamping': -22
+test_so_timestamping:FAIL:open and load skel unexpected error: -22
+
+If I don't pass any parameter in the kfunc, it can work.
+
+Should we support the sock_ops for __bpf_kfunc?
+
+Please enlighten me more about this. Thanks in advance!
+
+Thanks,
+Jason
 
