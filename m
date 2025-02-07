@@ -1,241 +1,123 @@
-Return-Path: <netdev+bounces-164035-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-164036-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3CF7DA2C65B
-	for <lists+netdev@lfdr.de>; Fri,  7 Feb 2025 15:59:40 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id B3ECDA2C663
+	for <lists+netdev@lfdr.de>; Fri,  7 Feb 2025 16:01:22 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 14CAC7A33D9
-	for <lists+netdev@lfdr.de>; Fri,  7 Feb 2025 14:58:44 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E6D3B3AB8A0
+	for <lists+netdev@lfdr.de>; Fri,  7 Feb 2025 15:01:09 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A6D0C238D37;
-	Fri,  7 Feb 2025 14:59:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BC8D5149E16;
+	Fri,  7 Feb 2025 15:01:11 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=wanadoo.fr header.i=@wanadoo.fr header.b="ltR/Bra9"
 X-Original-To: netdev@vger.kernel.org
-Received: from frasgout.his.huawei.com (frasgout.his.huawei.com [185.176.79.56])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from out.smtpout.orange.fr (out-15.smtpout.orange.fr [193.252.22.15])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 68F0C238D2E;
-	Fri,  7 Feb 2025 14:59:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.176.79.56
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 15356238D52;
+	Fri,  7 Feb 2025 15:01:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=193.252.22.15
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1738940371; cv=none; b=EUIPsXuSFslWgohLZ/K1LxDiP5yGqhlXULy/csD2e7vCvqnvHV6C9m9aHlBMv5rPXKxDz0kfjNAaGZe5jNyyxvbZ9bC7WyISEoYmRqpsDxQd7wrGwKB1woNXg0Qd2oD7qs/XFDGD/g3ax6LNFbgwTMv2MZsN9broXxBFS99bh3A=
+	t=1738940471; cv=none; b=PohG2zyZKZrzCfNcR1k99ffARgQJ7VD2Ne6nn7TsxkQMLScdRSVZn2E6ITATZxO9rsL7p5ju1w/ixah7r/qz59ktPmP/DgYB7tr5Jk/O6rPSL7MqqNROLIf8P08uvwUE5gu3I2xZWItPDg9iQ7vGGLMnPCVjrrERMZw1fCPOafE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1738940371; c=relaxed/simple;
-	bh=rmZr9HCPCElSz0+WiHiZD0EiNZtU+Ri5hWC5RXhinyI=;
-	h=Date:From:To:CC:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=RS8cYxeOYeUM4blMbittfIXy04ktwy7NqQhM9ByjWX93OyzzQG3ZbZTKiqzUY2+BEHtrS3cfvWtBk59j146D4kp0TACPMX+PfRy5uuE06xmkyJKcsFrRhfyPcUg6w+qepMJZPbQAP36L6lYGv0yMevNPIdYwgmhaA4T4jCnYZKY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=185.176.79.56
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
-Received: from mail.maildlp.com (unknown [172.18.186.31])
-	by frasgout.his.huawei.com (SkyGuard) with ESMTP id 4YqH9j0Ns3z6L4yw;
-	Fri,  7 Feb 2025 22:56:41 +0800 (CST)
-Received: from frapeml500008.china.huawei.com (unknown [7.182.85.71])
-	by mail.maildlp.com (Postfix) with ESMTPS id 132471402A5;
-	Fri,  7 Feb 2025 22:59:26 +0800 (CST)
-Received: from localhost (10.203.177.66) by frapeml500008.china.huawei.com
- (7.182.85.71) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.1.2507.39; Fri, 7 Feb
- 2025 15:59:25 +0100
-Date: Fri, 7 Feb 2025 14:59:23 +0000
-From: Jonathan Cameron <Jonathan.Cameron@huawei.com>
-To: Jason Gunthorpe <jgg@nvidia.com>
-CC: Andy Gospodarek <andrew.gospodarek@broadcom.com>, Aron Silverton
-	<aron.silverton@oracle.com>, Dan Williams <dan.j.williams@intel.com>, Daniel
- Vetter <daniel.vetter@ffwll.ch>, Dave Jiang <dave.jiang@intel.com>, David
- Ahern <dsahern@kernel.org>, Andy Gospodarek <gospo@broadcom.com>, Christoph
- Hellwig <hch@infradead.org>, Itay Avraham <itayavr@nvidia.com>, Jiri Pirko
-	<jiri@nvidia.com>, Jakub Kicinski <kuba@kernel.org>, Leonid Bloch
-	<lbloch@nvidia.com>, Leon Romanovsky <leonro@nvidia.com>,
-	<linux-cxl@vger.kernel.org>, <linux-rdma@vger.kernel.org>,
-	<netdev@vger.kernel.org>, Saeed Mahameed <saeedm@nvidia.com>, "Nelson,
- Shannon" <shannon.nelson@amd.com>
-Subject: Re: [PATCH v4 09/10] fwctl/bnxt: Support communicating with bnxt fw
-Message-ID: <20250207145923.0000335e@huawei.com>
-In-Reply-To: <9-v4-0cf4ec3b8143+4995-fwctl_jgg@nvidia.com>
-References: <0-v4-0cf4ec3b8143+4995-fwctl_jgg@nvidia.com>
-	<9-v4-0cf4ec3b8143+4995-fwctl_jgg@nvidia.com>
-X-Mailer: Claws Mail 4.3.0 (GTK 3.24.42; x86_64-w64-mingw32)
+	s=arc-20240116; t=1738940471; c=relaxed/simple;
+	bh=Ismxwm1c+xEaqBjLFJVdqK9TSoif2Fk0K+yMxRkINVg=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=JYR9ybp/2M5pr5QzBHTMbiKESRtx582ocPyncHDLb1HU4p8DYS/hzclOcoTOkIXl22gDVKtV5f4iFuWAd/fjIp/j9K/sa2sIYdTeMpKQNZZSnk5xXZKIUHT/Ex5Ol+ORlgC57GoD4Z7DkOp/8TQAg47quKT8v2Uqd4h/ghW6dAw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=wanadoo.fr; spf=pass smtp.mailfrom=wanadoo.fr; dkim=pass (2048-bit key) header.d=wanadoo.fr header.i=@wanadoo.fr header.b=ltR/Bra9; arc=none smtp.client-ip=193.252.22.15
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=wanadoo.fr
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=wanadoo.fr
+Received: from [172.16.82.72] ([124.33.176.97])
+	by smtp.orange.fr with ESMTPA
+	id gPqWtL8WXFt3IgPqatESry; Fri, 07 Feb 2025 16:01:01 +0100
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=wanadoo.fr;
+	s=t20230301; t=1738940461;
+	bh=Pyha5odVGsX/CKqH1ZkXIQ53HwwjGzZ3ipFrj9lnhz4=;
+	h=Message-ID:Date:MIME-Version:Subject:To:From;
+	b=ltR/Bra9iY/vwRcNq/YBqz4kt3s9oCNpzfGigntH9sfQiTTrkWuSMYZeRdTVHAm9q
+	 ELN6QjvKXUDDagncZdtHNzfc4Dph6J9ZbNAMnJ2T8uTjBMkcQOy0w1CmQsZPJ0LpWT
+	 dOCxl+huYkYk1+Wj2h6oeNsysoenQmB6u8IMRd2y9Xmr3zkUCeN66z+Hha7pFLRs/W
+	 89ZI+zgAKMoUKsVRYls4qKSqE9WdR4rHvgwufNzfv2EPxKESy+aJXcg95jlM25oO+E
+	 8PurBrxhE+/r4TKOfBZKrvfxeXyUB4hsDku2l6X/asT6VfDK7fDLpwcmkDwpo0QgCf
+	 a+3PA3c1yBBLw==
+X-ME-Helo: [172.16.82.72]
+X-ME-Auth: bWFpbGhvbC52aW5jZW50QHdhbmFkb28uZnI=
+X-ME-Date: Fri, 07 Feb 2025 16:01:01 +0100
+X-ME-IP: 124.33.176.97
+Message-ID: <9a3f1242-794e-41f1-80a5-bc6d18ff6641@wanadoo.fr>
+Date: Sat, 8 Feb 2025 00:00:43 +0900
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="US-ASCII"
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v7 4/7] can: Add Nuvoton NCT6694 CANFD support
+To: Marc Kleine-Budde <mkl@pengutronix.de>, Ming Yu <a0282524688@gmail.com>
+Cc: tmyu0@nuvoton.com, lee@kernel.org, linus.walleij@linaro.org,
+ brgl@bgdev.pl, andi.shyti@kernel.org, andrew+netdev@lunn.ch,
+ davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+ pabeni@redhat.com, wim@linux-watchdog.org, linux@roeck-us.net,
+ jdelvare@suse.com, alexandre.belloni@bootlin.com,
+ linux-kernel@vger.kernel.org, linux-gpio@vger.kernel.org,
+ linux-i2c@vger.kernel.org, linux-can@vger.kernel.org,
+ netdev@vger.kernel.org, linux-watchdog@vger.kernel.org,
+ linux-hwmon@vger.kernel.org, linux-rtc@vger.kernel.org,
+ linux-usb@vger.kernel.org
+References: <20250207074502.1055111-1-a0282524688@gmail.com>
+ <20250207074502.1055111-5-a0282524688@gmail.com>
+ <20250207-savvy-beaver-of-culture-45698d-mkl@pengutronix.de>
+Content-Language: en-US
+From: Vincent Mailhol <mailhol.vincent@wanadoo.fr>
+Autocrypt: addr=mailhol.vincent@wanadoo.fr; keydata=
+ xjMEZluomRYJKwYBBAHaRw8BAQdAf+/PnQvy9LCWNSJLbhc+AOUsR2cNVonvxhDk/KcW7FvN
+ LFZpbmNlbnQgTWFpbGhvbCA8bWFpbGhvbC52aW5jZW50QHdhbmFkb28uZnI+wrIEExYKAFoC
+ GwMFCQp/CJcFCwkIBwICIgIGFQoJCAsCBBYCAwECHgcCF4AWIQTtj3AFdOZ/IOV06OKrX+uI
+ bbuZwgUCZx41XhgYaGtwczovL2tleXMub3BlbnBncC5vcmcACgkQq1/riG27mcIYiwEAkgKK
+ BJ+ANKwhTAAvL1XeApQ+2NNNEwFWzipVAGvTRigA+wUeyB3UQwZrwb7jsQuBXxhk3lL45HF5
+ 8+y4bQCUCqYGzjgEZx4y8xIKKwYBBAGXVQEFAQEHQJrbYZzu0JG5w8gxE6EtQe6LmxKMqP6E
+ yR33sA+BR9pLAwEIB8J+BBgWCgAmFiEE7Y9wBXTmfyDldOjiq1/riG27mcIFAmceMvMCGwwF
+ CQPCZwAACgkQq1/riG27mcJU7QEA+LmpFhfQ1aij/L8VzsZwr/S44HCzcz5+jkxnVVQ5LZ4B
+ ANOCpYEY+CYrld5XZvM8h2EntNnzxHHuhjfDOQ3MAkEK
+In-Reply-To: <20250207-savvy-beaver-of-culture-45698d-mkl@pengutronix.de>
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: lhrpeml100009.china.huawei.com (7.191.174.83) To
- frapeml500008.china.huawei.com (7.182.85.71)
 
-On Thu,  6 Feb 2025 20:13:31 -0400
-Jason Gunthorpe <jgg@nvidia.com> wrote:
+On 07/02/2025 at 21:15, Marc Kleine-Budde wrote:
+> On 07.02.2025 15:44:59, Ming Yu wrote:
 
-> From: Andy Gospodarek <gospo@broadcom.com>
-> 
-> This patch adds basic support for the fwctl infrastructure.  With the
-> approriate tool, the most basic RPC to the bnxt_en firmware can be
-> called.
-> 
-> Signed-off-by: Andy Gospodarek <gospo@broadcom.com>
-> Signed-off-by: Jason Gunthorpe <jgg@nvidia.com>
-As commented on below, this one should perhaps have been marked
-RFC given there are a bunch of FIXME inline.
+(...)
 
+>> +static netdev_tx_t nct6694_can_start_xmit(struct sk_buff *skb,
+>> +					  struct net_device *ndev)
+>> +{
+>> +	struct nct6694_can_priv *priv = netdev_priv(ndev);
+>> +
+>> +	if (can_dev_dropped_skb(ndev, skb))
+>> +		return NETDEV_TX_OK;
+>> +
+>> +	netif_stop_queue(ndev);
+>> +	can_put_echo_skb(skb, ndev, 0, 0);
+>> +	queue_work(priv->wq, &priv->tx_work);
 
-> diff --git a/drivers/fwctl/bnxt/bnxt.c b/drivers/fwctl/bnxt/bnxt.c
-> new file mode 100644
-> index 00000000000000..d2b9a64a1402bf
-> --- /dev/null
-> +++ b/drivers/fwctl/bnxt/bnxt.c
-> @@ -0,0 +1,167 @@
+What is the reason to use a work queue here? xmit() is not a hard IRQ.
+Also, the other USB CAN devices just directly send the USB message in
+their xmit() without the need to rely on such worker.
 
-> +
-> +/*
-> + * bnxt_fw_msg->msg has the whole command
-> + * the start of message is of type struct input
-> + * struct input {
-> + *         __le16  req_type;
-> + *         __le16  cmpl_ring;
-> + *         __le16  seq_id;
-> + *         __le16  target_id;
-> + *         __le64  resp_addr;
-> + * };
-> + * so the hwrm op should be (struct input *)(hwrm_in->msg)->req_type
-> + */
-> +static bool bnxtctl_validate_rpc(struct fwctl_uctx *uctx,
-> +				 struct bnxt_fw_msg *hwrm_in)
-> +{
-> +	struct input *req = (struct input *)hwrm_in->msg;
+Sorry if this was discussed in the past, I can not remember if this
+question has already been raised.
 
-hwrm_in->msg is void * so should be no need to cast here.
+>> +	return NETDEV_TX_OK;
+>> +}
 
-> +
-> +	switch (req->req_type) {
-> +	case HWRM_VER_GET:
-> +		return true;
-> +	default:
-> +		return false;
-> +	}
-> +}
-> +
-> +static void *bnxtctl_fw_rpc(struct fwctl_uctx *uctx, enum fwctl_rpc_scope scope,
-> +			    void *in, size_t in_len, size_t *out_len)
-> +{
-> +	struct bnxtctl_dev *bnxtctl =
-> +		container_of(uctx->fwctl, struct bnxtctl_dev, fwctl);
-> +	struct bnxt_aux_priv *bnxt_aux_priv = bnxtctl->aux_priv;
-> +	/* FIXME: Check me */
+(...)
 
-With the various FIXME in here I'm guessing this is an RFC for now?
-Maybe better to make that clear in the patch title.
-
-> +	struct bnxt_fw_msg rpc_in = {
-> +		// FIXME: does bnxt_send_msg() copy?
-> +		.msg = in,
-> +		.msg_len = in_len,
-> +		.resp = in,
-> +		// FIXME: Dynamic memory for out_len
-> +		.resp_max_len = in_len,
-> +	};
-> +	int rc;
-> +
-> +	if (!bnxtctl_validate_rpc(uctx, &rpc_in))
-> +		return ERR_PTR(-EPERM);
-> +
-> +	rc = bnxt_send_msg(bnxt_aux_priv->edev, &rpc_in);
-> +	if (!rc)
-> +		return ERR_PTR(-EOPNOTSUPP);
-> +	return in;
-> +}
-
-> +
-> +static int bnxtctl_probe(struct auxiliary_device *adev,
-> +			 const struct auxiliary_device_id *id)
-> +{
-> +	struct bnxt_aux_priv *aux_priv =
-> +		container_of(adev, struct bnxt_aux_priv, aux_dev);
-> +	struct bnxtctl_dev *bnxtctl __free(bnxtctl) =
-> +		fwctl_alloc_device(&aux_priv->edev->pdev->dev, &bnxtctl_ops,
-
-Does this make more sense than setting parent to the
-auxiliary device?  (same applies to the mlx5 driver but I didn't notice
-it there).  That will result in a deeper nest in sysfs but
-at least makes it obvious what the aux dev is doing.
-
-> +				   struct bnxtctl_dev, fwctl);
-> +	int rc;
-> +
-> +	if (!bnxtctl)
-> +		return -ENOMEM;
-> +
-> +	bnxtctl->aux_priv = aux_priv;
-> +
-> +	rc = fwctl_register(&bnxtctl->fwctl);
-> +	if (rc)
-> +		return rc;
-> +
-> +	auxiliary_set_drvdata(adev, no_free_ptr(bnxtctl));
-> +	return 0;
-> +}
-
-> +static const struct auxiliary_device_id bnxtctl_id_table[] = {
-> +	{ .name = "bnxt_en.fwctl", },
-> +	{},
-
-Trivial but no need for that trailing comma given this will always
-be the last entry.
-
-> +};
-> +MODULE_DEVICE_TABLE(auxiliary, bnxtctl_id_table);
-> +
-> +static struct auxiliary_driver bnxtctl_driver = {
-> +	.name = "bnxt_fwctl",
-> +	.probe = bnxtctl_probe,
-> +	.remove = bnxtctl_remove,
-> +	.id_table = bnxtctl_id_table,
-> +};
-> +
-> +module_auxiliary_driver(bnxtctl_driver);
-
-> diff --git a/include/uapi/fwctl/bnxt.h b/include/uapi/fwctl/bnxt.h
-> new file mode 100644
-> index 00000000000000..ea47fdbbf6ea3e
-> --- /dev/null
-> +++ b/include/uapi/fwctl/bnxt.h
-> @@ -0,0 +1,27 @@
-> +/* SPDX-License-Identifier: GPL-2.0 WITH Linux-syscall-note */
-> +/*
-> + * Copyright (c) 2024, Broadcom Corporation
-> + *
-> + */
-> +#ifndef _UAPI_FWCTL_BNXT_H_
-> +#define _UAPI_FWCTL_BNXT_H_
-> +
-> +#include <linux/types.h>
-> +
-> +enum fwctl_bnxt_commands {
-> +	FWCTL_BNXT_QUERY_COMMANDS = 0,
-> +	FWCTL_BNXT_SEND_COMMAND,
-> +};
-> +
-> +/**
-> + * struct fwctl_info_bnxt - ioctl(FWCTL_INFO) out_device_data
-> + * @uctx_caps: The command capabilities driver accepts.
-
-Silly though it may be, if the kernel-doc script runs on this I'm fairly
-sure it will moan about lack of docs for reserved.
-
-> + *
-> + * Return basic information about the FW interface available.
-> + */
-> +struct fwctl_info_bnxt {
-> +	__u32 uctx_caps;
-> +	__u32 reserved;
-> +};
-> +
-> +#endif
-
+Yours sincerely,
+Vincent Mailhol
 
 
