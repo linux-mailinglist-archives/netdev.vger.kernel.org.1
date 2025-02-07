@@ -1,111 +1,188 @@
-Return-Path: <netdev+bounces-164129-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-164130-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id DC5F9A2CAF0
-	for <lists+netdev@lfdr.de>; Fri,  7 Feb 2025 19:14:38 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id F0958A2CB6C
+	for <lists+netdev@lfdr.de>; Fri,  7 Feb 2025 19:37:33 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 054A7188A105
-	for <lists+netdev@lfdr.de>; Fri,  7 Feb 2025 18:14:44 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 68D1D3ACD75
+	for <lists+netdev@lfdr.de>; Fri,  7 Feb 2025 18:37:23 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5318619D8B2;
-	Fri,  7 Feb 2025 18:14:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8E9921DF250;
+	Fri,  7 Feb 2025 18:24:28 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="aIKOh63l"
+	dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b="E03V5WVd"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qk1-f169.google.com (mail-qk1-f169.google.com [209.85.222.169])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mx0b-0031df01.pphosted.com (mx0b-0031df01.pphosted.com [205.220.180.131])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C34D5199EB7;
-	Fri,  7 Feb 2025 18:14:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.169
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9F64F1A314E;
+	Fri,  7 Feb 2025 18:24:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.180.131
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1738952075; cv=none; b=JpQp67fx2tneHHkJ4iAIPFyoZLiDqhWIWSfXbHoY923G7nxDXpDHbdjNOh0z+lAfDIf5Hw6t7rHK+RviGOngPK092MwZwL6RG51uaZ70zPqf1d7kKCD+yjUcB2FpIgjQkbTlKUUcPOMw4AziJFrVPYAiRZxq5f4trXIOHBm/Rzo=
+	t=1738952668; cv=none; b=Skx+Epa0GQJp3iWLGe9PpIv5Bw04XZV/8nxOlwfLbKNLK5V/UDoGuop8kDjPOPxlFz3F+sL8sjWjxIgihJHTYteHTfIbyWMY5mnlGoYzOjpp8FH58YzclB88+xXifdJDmp3pvPC0vOg3V+JJ4ma/ma7P3LT2EoVLhQCPx46dur0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1738952075; c=relaxed/simple;
-	bh=wc2Uo4qAIKE4YpBCI6MhwPDzpuOUfeuKc6K4dUFY00w=;
-	h=Date:From:To:Cc:Message-ID:In-Reply-To:References:Subject:
-	 Mime-Version:Content-Type; b=dFag6ZHUDeu/52Hv5CE+KBWmEjrkDl78wSMakd7/GYdy5qwwT7hb7l03O4Uu9Zlcb7EKO7ksi2WgpW0knoQ2BARlTCgWfvqYozGrkZPHnOZEJaJC3voRfPpo9Tp8Z6fiG2Odsu9b9q89YfacfXTx6v9V7DAVhv9QQaWG74plMeo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=aIKOh63l; arc=none smtp.client-ip=209.85.222.169
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-qk1-f169.google.com with SMTP id af79cd13be357-7b6fc3e9e4aso212550785a.2;
-        Fri, 07 Feb 2025 10:14:33 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1738952072; x=1739556872; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:subject:references
-         :in-reply-to:message-id:cc:to:from:date:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=6cpR/catNjUKVLPE8TnRdeFUXnQLkPZNrbuMZWab4WE=;
-        b=aIKOh63lN2xo1cU/Nij2fJLX7Hd2psSrLfqeW2COJiFU9kkBGv5xy9daITK4pvelsv
-         G8NeKH6SkB63w3vj2oUXbVbZV7pdrbD8QvpVP9FBGM1O2Qf28isd8+kDAGZbMV7GcMok
-         3vD00dF4b9Udr0fkfWHQA7m8z00KusWJj89Xmdg9Y6f6xfLn3GsGWkERglGQfcf4kOzu
-         gCJI4yebn77ec14DyuCZcMPTHfh7L+QxMg3Q0P5X9F/4h+5ftvspJuF7WN0+DVxnIP37
-         L7IDorZiSh+dS4/fAyxuWwqqmORs2PjsUPjfrZSkNdaXyXn7p/3xB1lFhxIEvqH8Ezc/
-         aRng==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1738952072; x=1739556872;
-        h=content-transfer-encoding:mime-version:subject:references
-         :in-reply-to:message-id:cc:to:from:date:x-gm-message-state:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=6cpR/catNjUKVLPE8TnRdeFUXnQLkPZNrbuMZWab4WE=;
-        b=uus/5XK2IGjd40BBQ/GlQBn/6Hy9MDP+Il4fe5puFXwa5vcb9bmFsWWy5JWxYB2wGG
-         WXYQmo6pbi+StFBFKZ99OxNsi9jeeq/BS9/UbxqMyCNJkfw6Zp5Et8RCtMlbaKwLVZG/
-         qL60DmXyfEW97xD2fhJ4+EU37XbksbJwnCz6wIokb8B4wAM65cY4kI9CRhloTvGLo+Jn
-         TUcgdK8Onc8FpyV67fSnM/gaDf8FWyUTaGib44Ffxj1eSW2samWYVtscgUd2LGcxVGvh
-         oab8ZFAZJg2A+l/g+I2DhBOTtuXJ1Rfrq0z++M6FiD8OHE47RQ52sm/9HbBdL00TgrU7
-         Ry1g==
-X-Forwarded-Encrypted: i=1; AJvYcCUwQRmyRKXNQGZZIRLd2y7Wbbjht4ix9Bzg22ZS2Sb29UJG/koypYKSGynSxwIuPcbLU1Ih1RXF7/18+t3PXis=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yw70PuyMKITkOs5SfBHK6xSRYIrtHoZn6J+KoWm+JmZBquufrAU
-	y6WLDefbG9pokr1XS6AbrLAtklpHkna2gJz1TljOoNOa7jT7daf2
-X-Gm-Gg: ASbGnctL7IPupv13H2QXlcEKY2rhpyPxkmifTF8bcpeoQcluIC9DdfVkopF4Yl+sb7r
-	z1JaLJgdriw9HAdq967ENjY1fQ6s6Bsi/cE/8eXruo2cg5jVrGQbKNAx6LCGzPAP4IHP20JmDSA
-	nYoRzb3WPqsT7IvZS3HZBX58blGGGfZ5uEd9WwghOsfh5wbqXrG8UAmvETOZ0irwsvRO5VU0EzL
-	GIW8gBuwCOQhi1uIHbIFt2VgdUeE+kGP8UvSqWG2i7S2UFoKvd9XYnH1+E8f4hjfYlmQXoN6Upw
-	4TO5X6gQurLfoFyHlBtmGKQX6fytYonSlkHrDdS/ZZlndR7xT1lJTn16CYxAML0=
-X-Google-Smtp-Source: AGHT+IHcZed8Y6N75kfOPaZKLNyruXtqM3If5ETw+a5qwmO6s3qeq+mVUwkgur5WqipW3FrL8J3u4w==
-X-Received: by 2002:a05:620a:45a5:b0:7b6:c92e:2e74 with SMTP id af79cd13be357-7c047bbc521mr580447785a.20.1738952072471;
-        Fri, 07 Feb 2025 10:14:32 -0800 (PST)
-Received: from localhost (15.60.86.34.bc.googleusercontent.com. [34.86.60.15])
-        by smtp.gmail.com with ESMTPSA id af79cd13be357-7c041ded1c5sm220032685a.3.2025.02.07.10.14.31
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 07 Feb 2025 10:14:31 -0800 (PST)
-Date: Fri, 07 Feb 2025 13:14:31 -0500
-From: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
-To: Jakub Kicinski <kuba@kernel.org>, 
- davem@davemloft.net
-Cc: netdev@vger.kernel.org, 
- edumazet@google.com, 
- pabeni@redhat.com, 
- andrew+netdev@lunn.ch, 
- horms@kernel.org, 
- Jakub Kicinski <kuba@kernel.org>, 
- shuah@kernel.org, 
- willemb@google.com, 
- linux-kselftest@vger.kernel.org
-Message-ID: <67a64d879b34e_2b3e7e29442@willemb.c.googlers.com.notmuch>
-In-Reply-To: <20250206235334.1425329-3-kuba@kernel.org>
-References: <20250206235334.1425329-1-kuba@kernel.org>
- <20250206235334.1425329-3-kuba@kernel.org>
-Subject: Re: [PATCH net-next 2/7] selftests: net-drv: test adding flow rule to
- invalid RSS context
+	s=arc-20240116; t=1738952668; c=relaxed/simple;
+	bh=FhhB4c8kNy0sdg1h6MWe7LzbIqu9Q4gW5zAslqAxxYc=;
+	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
+	 In-Reply-To:Content-Type; b=qiYDqi5Lx1ZHbZ2oYEEIJoY2p36ZuLfDUkItc4AHA/MVhaOtKT93Ocd1tMvYf3D5LoNudqgAIw3lX7+okje4I4u2ja7qht8jet5htqdA1Zg4fg2eDhaiS4h4SH39Ugrs8yNsVI3JB9Gd0RsjHjIOVfZbqBK5mxql+WaRbooqPN8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com; spf=pass smtp.mailfrom=quicinc.com; dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b=E03V5WVd; arc=none smtp.client-ip=205.220.180.131
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=quicinc.com
+Received: from pps.filterd (m0279868.ppops.net [127.0.0.1])
+	by mx0a-0031df01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 517CT9pQ010620;
+	Fri, 7 Feb 2025 18:21:34 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=quicinc.com; h=
+	cc:content-transfer-encoding:content-type:date:from:in-reply-to
+	:message-id:mime-version:references:subject:to; s=qcppdkim1; bh=
+	24vCB/Znf/TjzLM/rAbzJHPouiMnIdlOj3IaBxZTHOA=; b=E03V5WVdh1fY1DbW
+	yBGjR8ooUk49Udw8Yr32oTNz88DdkkXzhfc4KbaBHW/INhjp6UGF0M5G/UAg7bCw
+	S9AiqmeMDOSlhBQUMBp8rA+fLZOH2c+u9MLB6qy37fUeKdiH9NmFOFgkMGU+hXRk
+	DQ90WmK62P4xV7Tryte3Dsuus4bSV2YEXKbDFX16lYR+nWN8WkgwZVffiKtWFxjA
+	7vIqKvZ8015aTGkRDpuxE/TxwPNdNgi0HySfB75yl/t+FCk+wuvIdgrQga1jFG+v
+	IjE2AbkHni6qP2AtopA/KGwkaBJieEKSxxwV7Wz90tGNC4+Kj8I+EbZm1kgg8gc2
+	E4gLFg==
+Received: from nasanppmta04.qualcomm.com (i-global254.qualcomm.com [199.106.103.254])
+	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 44nj6w8v2w-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Fri, 07 Feb 2025 18:21:34 +0000 (GMT)
+Received: from nasanex01a.na.qualcomm.com (nasanex01a.na.qualcomm.com [10.52.223.231])
+	by NASANPPMTA04.qualcomm.com (8.18.1.2/8.18.1.2) with ESMTPS id 517ILXDi023451
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Fri, 7 Feb 2025 18:21:33 GMT
+Received: from [10.110.91.228] (10.80.80.8) by nasanex01a.na.qualcomm.com
+ (10.52.223.231) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.9; Fri, 7 Feb 2025
+ 10:21:32 -0800
+Message-ID: <67919001-1cb7-4e9b-9992-5b3dd9b03406@quicinc.com>
+Date: Fri, 7 Feb 2025 10:21:25 -0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Content-Type: text/plain;
- charset=utf-8
-Content-Transfer-Encoding: 7bit
+MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next v6 0/5] net: stmmac: Add PCI driver support for
+ BCM8958x
+To: Jitendra Vegiraju <jitendra.vegiraju@broadcom.com>,
+        <netdev@vger.kernel.org>
+CC: <alexandre.torgue@foss.st.com>, <joabreu@synopsys.com>,
+        <davem@davemloft.net>, <edumazet@google.com>, <kuba@kernel.org>,
+        <pabeni@redhat.com>, <mcoquelin.stm32@gmail.com>,
+        <bcm-kernel-feedback-list@broadcom.com>, <richardcochran@gmail.com>,
+        <ast@kernel.org>, <daniel@iogearbox.net>, <hawk@kernel.org>,
+        <john.fastabend@gmail.com>, <fancer.lancer@gmail.com>,
+        <rmk+kernel@armlinux.org.uk>, <ahalaney@redhat.com>,
+        <xiaolei.wang@windriver.com>, <rohan.g.thomas@intel.com>,
+        <Jianheng.Zhang@synopsys.com>, <linux-kernel@vger.kernel.org>,
+        <linux-stm32@st-md-mailman.stormreply.com>,
+        <linux-arm-kernel@lists.infradead.org>, <bpf@vger.kernel.org>,
+        <andrew@lunn.ch>, <linux@armlinux.org.uk>, <horms@kernel.org>,
+        <florian.fainelli@broadcom.com>
+References: <20241018205332.525595-1-jitendra.vegiraju@broadcom.com>
+ <CAMdnO-+FjsRX4fjbCE_RVNY4pEoArD68dAWoEM+oaEZNJiuA3g@mail.gmail.com>
+Content-Language: en-US
+From: "Abhishek Chauhan (ABC)" <quic_abchauha@quicinc.com>
+In-Reply-To: <CAMdnO-+FjsRX4fjbCE_RVNY4pEoArD68dAWoEM+oaEZNJiuA3g@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8bit
+X-ClientProxiedBy: nasanex01a.na.qualcomm.com (10.52.223.231) To
+ nasanex01a.na.qualcomm.com (10.52.223.231)
+X-QCInternal: smtphost
+X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=5800 signatures=585085
+X-Proofpoint-ORIG-GUID: OOmFY7SmVHmL41lJG0u5sLFBwJ4eloTj
+X-Proofpoint-GUID: OOmFY7SmVHmL41lJG0u5sLFBwJ4eloTj
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1057,Hydra:6.0.680,FMLib:17.12.68.34
+ definitions=2025-02-07_08,2025-02-07_03,2024-11-22_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 adultscore=0 impostorscore=0
+ bulkscore=0 mlxscore=0 lowpriorityscore=0 priorityscore=1501 phishscore=0
+ suspectscore=0 clxscore=1011 mlxlogscore=832 spamscore=0 malwarescore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.19.0-2501170000
+ definitions=main-2502070137
 
-Jakub Kicinski wrote:
-> Check that adding Rx flow steering rules pointing to an RSS
-> context which does not exist is prevented.
+
+
+On 11/5/2024 8:12 AM, Jitendra Vegiraju wrote:
+> Hi netdev team,
 > 
-> Signed-off-by: Jakub Kicinski <kuba@kernel.org>
+> On Fri, Oct 18, 2024 at 1:53 PM <jitendra.vegiraju@broadcom.com> wrote:
+>>
+>> From: Jitendra Vegiraju <jitendra.vegiraju@broadcom.com>
+>>
+>> This patchset adds basic PCI ethernet device driver support for Broadcom
+>> BCM8958x Automotive Ethernet switch SoC devices.
+>>
+>> This SoC device has PCIe ethernet MAC attached to an integrated ethernet
+>> switch using XGMII interface. The PCIe ethernet controller is presented to
+>> the Linux host as PCI network device.
+>>
+>> The following block diagram gives an overview of the application.
+>>              +=================================+
+>>              |       Host CPU/Linux            |
+>>              +=================================+
+>>                         || PCIe
+>>                         ||
+>>         +==========================================+
+>>         |           +--------------+               |
+>>         |           | PCIE Endpoint|               |
+>>         |           | Ethernet     |               |
+>>         |           | Controller   |               |
+>>         |           |   DMA        |               |
+>>         |           +--------------+               |
+>>         |           |   MAC        |   BCM8958X    |
+>>         |           +--------------+   SoC         |
+>>         |               || XGMII                   |
+>>         |               ||                         |
+>>         |           +--------------+               |
+>>         |           | Ethernet     |               |
+>>         |           | switch       |               |
+>>         |           +--------------+               |
+>>         |             || || || ||                  |
+>>         +==========================================+
+>>                       || || || || More external interfaces
+>>
+>> The MAC block on BCM8958x is based on Synopsis XGMAC 4.00a core. This
+>> MAC IP introduces new DMA architecture called Hyper-DMA for virtualization
+>> scalability.
+>>
+>> Driver functionality specific to new MAC (DW25GMAC) is implemented in
+>> new file dw25gmac.c.
+>>
+>> Management of integrated ethernet switch on this SoC is not handled by
+>> the PCIe interface.
+>> This SoC device has PCIe ethernet MAC directly attached to an integrated
+>> ethernet switch using XGMII interface.
+>>
+>> v5->v6:
+>>    Change summary to address comments/suggestions by Serge Semin.
+>>    Patch1:
+>>      Removed the comlexity of hdma mapping in previous patch series and
+>>      use static DMA mapping.
+>>      Renamed plat_stmmacenet_data::snps_dev_id as dev_id and moved to
+>>      the beginning of the struct.
+>>    Patch2:
+>>      Added dw25gmac_get_hw_feature() for dw25gmac.
+>>      Use static one-to-one VDMA-TC-PDMA mapping.
+>>    Patch4:
+>>      Remove usage of plat_stmmacenet_data::msi_*_vec variables for
+>>      interrupt vector initialization.
+>>      Change phy_interface type to XGMII.
+>>      Cleanup unused macros.
+>>
+> 
+> I would like to seek your guidance on how to take this patch series forward.
+> Thanks to your feedback and Serge's suggestions, we made some forward
+> progress on this patch series.
+> Please make any suggestions to enable us to upstream driver support
+> for BCM8958x.
 
-Reviewed-by: Willem de Bruijn <willemb@google.com>
+Jitendra,
+	 Have we resent this patch or got it approved ? I dont see any updates after this patch. 
+
+> Thanks,
+> Jitendra
 
