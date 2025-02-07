@@ -1,292 +1,153 @@
-Return-Path: <netdev+bounces-163931-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-163932-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 89751A2C10B
-	for <lists+netdev@lfdr.de>; Fri,  7 Feb 2025 11:56:51 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9E44CA2C114
+	for <lists+netdev@lfdr.de>; Fri,  7 Feb 2025 11:57:24 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 1C558188B9DD
-	for <lists+netdev@lfdr.de>; Fri,  7 Feb 2025 10:56:40 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 598F13ABB90
+	for <lists+netdev@lfdr.de>; Fri,  7 Feb 2025 10:57:03 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B4B651DE8AE;
-	Fri,  7 Feb 2025 10:56:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7EA081DE4CD;
+	Fri,  7 Feb 2025 10:57:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="hYu2o3eL"
 X-Original-To: netdev@vger.kernel.org
-Received: from metis.whiteo.stw.pengutronix.de (metis.whiteo.stw.pengutronix.de [185.203.201.7])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ej1-f45.google.com (mail-ej1-f45.google.com [209.85.218.45])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4E25D1DE4CE
-	for <netdev@vger.kernel.org>; Fri,  7 Feb 2025 10:56:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.203.201.7
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9CD761B4133
+	for <netdev@vger.kernel.org>; Fri,  7 Feb 2025 10:57:06 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.45
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1738925787; cv=none; b=Yol+oWz0XhpUTB1KfFUEAEY/MhcLza1gKfYQtRIRh4/jwLvyWdXnExKBPVDtV8e5EWUQfTiUHCHQY8llssVCXjEZziKXFfg35BSEklMtny116CBpo9r9CpWhGp8peAHzMLwi1HB6cbUpQE4ONjyH1bw2FOcFfjdoN5/PcS7Y06M=
+	t=1738925828; cv=none; b=Vmp7nCUglGYR2aDvJYhm7jZaXp2Bi9zPwcdE1CsjsIxfta8n+03mpu1riIEQuLIQG5bniXphvap1bK2BUEg4YE4v8O42rGADql7BjcyxOsY4xBpRGGsJCh9Xic4waI5lCqK/bsnQCNDRn4AE0u69LLFTlvL/y5ZklxZjfF5M0Ac=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1738925787; c=relaxed/simple;
-	bh=bLLFVr6Bm8Tegrq2cqZjHRigcihHscrYl+BIeOaDFRc=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=HpmDwcq4PEhMbEGmb/w9wlTYjxwSNEfp2imF0/c6p6L/4x2tbSN6L9Xrs4V3fUmTx3yeXhtJIACowd5QFsvEvFKNjHndSVZuKmQDLKHNmlqqWw7i02WEsFpn1PuqXfRkqwb57QmLTl+aa9rUtz3jjeBhNh6Fnp/64H5r+drZEWE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de; spf=pass smtp.mailfrom=pengutronix.de; arc=none smtp.client-ip=185.203.201.7
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=pengutronix.de
-Received: from drehscheibe.grey.stw.pengutronix.de ([2a0a:edc0:0:c01:1d::a2])
-	by metis.whiteo.stw.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
-	(Exim 4.92)
-	(envelope-from <ore@pengutronix.de>)
-	id 1tgM1w-00054w-LI; Fri, 07 Feb 2025 11:56:16 +0100
-Received: from dude04.red.stw.pengutronix.de ([2a0a:edc0:0:1101:1d::ac])
-	by drehscheibe.grey.stw.pengutronix.de with esmtps  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.96)
-	(envelope-from <ore@pengutronix.de>)
-	id 1tgM1r-003xhc-2o;
-	Fri, 07 Feb 2025 11:56:11 +0100
-Received: from ore by dude04.red.stw.pengutronix.de with local (Exim 4.96)
-	(envelope-from <ore@pengutronix.de>)
-	id 1tgM1r-007rrW-2a;
-	Fri, 07 Feb 2025 11:56:11 +0100
-From: Oleksij Rempel <o.rempel@pengutronix.de>
-To: Byungho An <bh74.an@samsung.com>,
-	Andrew Lunn <andrew@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>
-Cc: Oleksij Rempel <o.rempel@pengutronix.de>,
-	kernel@pengutronix.de,
-	linux-kernel@vger.kernel.org,
-	netdev@vger.kernel.org,
-	Russell King <linux@armlinux.org.uk>
-Subject: [PATCH net-next v2 1/1] net: sxgbe: rework EEE handling based on PHY negotiation
-Date: Fri,  7 Feb 2025 11:56:10 +0100
-Message-Id: <20250207105610.1875327-1-o.rempel@pengutronix.de>
-X-Mailer: git-send-email 2.39.5
+	s=arc-20240116; t=1738925828; c=relaxed/simple;
+	bh=XhqhA/Rdf3wowMZThBY4E0Dr1Ikf5GSzmF3crbWDwfo=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=HG3lWn/x5l+T7cOCNYZ3xN7pqe6cWxk33Y+Wjz4MCnawpZIkr+RU9ebMxN/w5aBTQi61pApaj+GjreZWiG9qlBnYPtyboIR6/XUUKVEt6w3SgZngCWmceJjJlH8xCyuXe6HDNs6AsEhpo61HnySr0mBaXkViGK3qg1sPpD3jt/M=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=hYu2o3eL; arc=none smtp.client-ip=209.85.218.45
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-ej1-f45.google.com with SMTP id a640c23a62f3a-ab76aa0e6fcso261640366b.3
+        for <netdev@vger.kernel.org>; Fri, 07 Feb 2025 02:57:06 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1738925825; x=1739530625; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=+oixZqE4mjnFMF72kYzo+MwAIOVoVqFcrjg9SKs2ioE=;
+        b=hYu2o3eLbw8q7BiJgy2nsNo/oHrMeWqHpxLE/s6n3TCX0S6ECYVcxwiurR32Lffn/P
+         m4mz2Y3iXJfWbpS2dTeIuoQWqy/Y46K+k9+dp/vn8Tl/OWtGJP70q5iYqn78E7OxKC8k
+         VGr9n4U6oVXbMQ1os9gLF2nnJqz0mOCJRv0X6SMnHcwztrTEkRFuoy6LgFISPXFW3LJ9
+         thmjYq7XAAZ3VVoo9aNsgH3rI2mbm7bxblq63wtwJhfLLnP+BMO0H2m+RS0VHdS3Uhgo
+         /EKHxB5yNVy/96Zx5onIK3WexD1bDFURSvT6h9ghmF1EyWnywyc/2qWScLHyT38vxsME
+         cSrg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1738925825; x=1739530625;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=+oixZqE4mjnFMF72kYzo+MwAIOVoVqFcrjg9SKs2ioE=;
+        b=wPdqeHsS8H08B4kdJnCl2tRQxxS/KGc2hLoPEbBehvGT2VgxkwpTUOmHi1GIJ7M9zj
+         x7FoQJJwovFAabIjRgmtoovpGoAMc0Ylo+1fFvVHBqlubtIZY22xY5vQlPdmFfvAjFR0
+         RSd1G+K3imXAc8ouf/ZIPghysTNXiKXHcjHzGQ592sLEcExYXFb/02J2Sc2BZzk+Ium0
+         TWStjPdBR3QFxXKLycz967CBmICCZn719RXnh4pPNWGncLQSO5iMktUCBex3Hfq58HRw
+         iZ7SXpKjwfYoGxeNDqKFT1e6z4oT3oFUvBxhrWWLHYDQyzz8wlPuVA+zuACSsZ+JO8zx
+         JYgg==
+X-Forwarded-Encrypted: i=1; AJvYcCUB2BsB4TMF3cTXluHRJTb33EMI3HQJp8Z5rc/go198a85WXUX6BNf1PDe2kcZWdeafG5QyjxI=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwHNYAorCJQpMYMTySuX4j9a+9ud76uObcpR+6LqZT0+FFNvqo/
+	g2k7mVJTE7iL0xWjfA/nUFsT6BiwW88/7lgpnFJQcfi1tiMpiD5RQXlPANvHv0hin/Tf2MQ2Jp9
+	eWfwHtvIOYg1KCOtft2uL02We4l+Bv9F/seNn
+X-Gm-Gg: ASbGncuSS06LGGZ2MMmgU0emAvDQt2B5PJI3hPP4S9VNEMtDXhnfBnuT0fh9dTUQTgb
+	TtTL5bwqhgsgCmByKO69NKx322sJdLC6dHO1Pgfp5TMnmsDToWVMRaOxckPHlAXPbDL+xnaQ3
+X-Google-Smtp-Source: AGHT+IHsIzlaRbpgEITLHhJuOsk3unfBeSfEeTwsa08pijLhdbuUaZLTzdnfyTNlDZXNMwXNcnR8FQV36oxqS/7UuYM=
+X-Received: by 2002:a05:6402:1ecf:b0:5dc:796f:fc86 with SMTP id
+ 4fb4d7f45d1cf-5de4501880amr7430231a12.16.1738925824799; Fri, 07 Feb 2025
+ 02:57:04 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-SA-Exim-Connect-IP: 2a0a:edc0:0:c01:1d::a2
-X-SA-Exim-Mail-From: ore@pengutronix.de
-X-SA-Exim-Scanned: No (on metis.whiteo.stw.pengutronix.de); SAEximRunCond expanded to false
-X-PTX-Original-Recipient: netdev@vger.kernel.org
+References: <20250206-scarlet-ermine-of-improvement-1fcac5@leitao>
+ <20250207033822.47317-1-kuniyu@amazon.com> <20250207-active-solid-vole-26a2c6@leitao>
+In-Reply-To: <20250207-active-solid-vole-26a2c6@leitao>
+From: Eric Dumazet <edumazet@google.com>
+Date: Fri, 7 Feb 2025 11:56:53 +0100
+X-Gm-Features: AWEUYZmYp8_1cFrM4wCX1ah20Em91z0JEliqSD4w8oGVXpCV-ULTiV0K7niq6Iw
+Message-ID: <CANn89iJ0UdSpuA9gMEDeZ1UU+_VwjvD=bdQPeEA0kWfKMBwC8g@mail.gmail.com>
+Subject: Re: for_each_netdev_rcu() protected by RTNL and CONFIG_PROVE_RCU_LIST
+To: Breno Leitao <leitao@debian.org>
+Cc: Kuniyuki Iwashima <kuniyu@amazon.com>, andrew+netdev@lunn.ch, kernel-team@meta.com, 
+	kuba@kernel.org, netdev@vger.kernel.org, ushankar@purestorage.com
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-From: Andrew Lunn <andrew@lunn.ch>
+On Fri, Feb 7, 2025 at 11:46=E2=80=AFAM Breno Leitao <leitao@debian.org> wr=
+ote:
+>
+> Hello Kuniyuki,
+>
+> On Fri, Feb 07, 2025 at 12:38:22PM +0900, Kuniyuki Iwashima wrote:
+> > From: Breno Leitao <leitao@debian.org>
+> > Date: Thu, 6 Feb 2025 07:51:55 -0800
+>
+> > > Are there better approaches to silence these warnings when RTNL is he=
+ld?
+> > > Any suggestions would be appreciated.
+> >
+> > We can't use lockdep_rtnl_net_is_held() there yet because most users ar=
+e
+> > not converted to per-netns RTNL, so it will complain loudly.
+>
+> Right, so, I understand the best approach is to leverage
+> lockdep_rtnl_is_held() only right now. Something as:
+>
+>         diff --git a/include/linux/netdevice.h b/include/linux/netdevice.=
+h
+>         index 1dcc76af75203..0deee1313f23a 100644
+>         --- a/include/linux/netdevice.h
+>         +++ b/include/linux/netdevice.h
+>         @@ -3217,7 +3217,8 @@ int call_netdevice_notifiers_info(unsigned =
+long val,
+>         #define for_each_netdev_reverse(net, d)        \
+>                         list_for_each_entry_reverse(d, &(net)->dev_base_h=
+ead, dev_list)
+>         #define for_each_netdev_rcu(net, d)            \
+>         -               list_for_each_entry_rcu(d, &(net)->dev_base_head,=
+ dev_list)
+>         +               list_for_each_entry_rcu(d, &(net)->dev_base_head,=
+ dev_list, \
+>         +                                       lockdep_rtnl_is_held())
+>         #define for_each_netdev_safe(net, d, n)        \
+>                         list_for_each_entry_safe(d, n, &(net)->dev_base_h=
+ead, dev_list)
+>         #define for_each_netdev_continue(net, d)               \
+>
+> Which brings another problem:
+>
+> lockdep_rtnl_is_held() is defined in include/linux/rtnetlink.h, so,
+> we'll need to include 'linux/rtnetlink.h' in linux/netdevice.h, which
+> doesn't seem correct (!?).
+>
+> Otherwise drivers using for_each_netdev_rcu() will not be able to find
+> lockdep_rtnl_is_held().
+>
+> I suppose we will need to move some of definitions around, but, I am
+> confident in which way.
 
-Rework EEE handling to depend on PHY negotiation results. Enable EEE
-only after a valid link is established and allow proper LPI mode
-activation.
+Note that we have different accessors like rtnl_dereference() and
+rcu_dereference_rtnl()
+It helps to differentiate expectations, and as self describing code.
 
-Previously, sxgbe_eee_init() was called in sxgbe_open() to invoke
-phy_init_eee() most probably before the PHY could complete
-auto-negotiation. Non-automotive PHYs typically take ~1 sec to
-establish a link, so EEE was rarely enabled.
+I would not change  for_each_netdev_rcu(), and instead add a new
+dev_getbyhwaddr_rtnl()
+function for contexts holding RTNL.
 
-Now, EEE activation is deferred until after PHY negotiation.  The driver
-delegates EEE control to phylib via ethtool set/get calls. Timer values
-are taken from phydev->eee_cfg.tx_lpi_timer, and sxgbe_eee_adjust()
-configures EEE based on phydev->enable_tx_lpi and the PHY link status.
-
-This activation of LPI may reveal issues that were hidden when LPI was
-rarely active.
-
-WARNING: This patch is only compile tested.
-
-Signed-off-by: Andrew Lunn <andrew@lunn.ch>
-Signed-off-by: Oleksij Rempel <o.rempel@pengutronix.de>
----
-changes v2:
-- major rework with many changes
-- use phydev->eee_cfg.tx_lpi_timer where possible
-- drop sxgbe_eee_init() and rework sxgbe_eee_adjust()
----
- .../net/ethernet/samsung/sxgbe/sxgbe_common.h |  2 -
- .../ethernet/samsung/sxgbe/sxgbe_ethtool.c    | 22 +-----
- .../net/ethernet/samsung/sxgbe/sxgbe_main.c   | 69 +++++++------------
- 3 files changed, 26 insertions(+), 67 deletions(-)
-
-diff --git a/drivers/net/ethernet/samsung/sxgbe/sxgbe_common.h b/drivers/net/ethernet/samsung/sxgbe/sxgbe_common.h
-index 1458939c3bf5..a8eed188d110 100644
---- a/drivers/net/ethernet/samsung/sxgbe/sxgbe_common.h
-+++ b/drivers/net/ethernet/samsung/sxgbe/sxgbe_common.h
-@@ -526,6 +526,4 @@ int sxgbe_restore(struct net_device *ndev);
- 
- const struct sxgbe_mtl_ops *sxgbe_get_mtl_ops(void);
- 
--void sxgbe_disable_eee_mode(struct sxgbe_priv_data * const priv);
--bool sxgbe_eee_init(struct sxgbe_priv_data * const priv);
- #endif /* __SXGBE_COMMON_H__ */
-diff --git a/drivers/net/ethernet/samsung/sxgbe/sxgbe_ethtool.c b/drivers/net/ethernet/samsung/sxgbe/sxgbe_ethtool.c
-index 4a439b34114d..a13360962e47 100644
---- a/drivers/net/ethernet/samsung/sxgbe/sxgbe_ethtool.c
-+++ b/drivers/net/ethernet/samsung/sxgbe/sxgbe_ethtool.c
-@@ -140,8 +140,6 @@ static int sxgbe_get_eee(struct net_device *dev,
- 	if (!priv->hw_cap.eee)
- 		return -EOPNOTSUPP;
- 
--	edata->tx_lpi_timer = priv->tx_lpi_timer;
--
- 	return phy_ethtool_get_eee(dev->phydev, edata);
- }
- 
-@@ -150,22 +148,8 @@ static int sxgbe_set_eee(struct net_device *dev,
- {
- 	struct sxgbe_priv_data *priv = netdev_priv(dev);
- 
--	priv->eee_enabled = edata->eee_enabled;
--
--	if (!priv->eee_enabled) {
--		sxgbe_disable_eee_mode(priv);
--	} else {
--		/* We are asking for enabling the EEE but it is safe
--		 * to verify all by invoking the eee_init function.
--		 * In case of failure it will return an error.
--		 */
--		priv->eee_enabled = sxgbe_eee_init(priv);
--		if (!priv->eee_enabled)
--			return -EOPNOTSUPP;
--
--		/* Do not change tx_lpi_timer in case of failure */
--		priv->tx_lpi_timer = edata->tx_lpi_timer;
--	}
-+	if (!priv->hw_cap.eee)
-+		return -EOPNOTSUPP;
- 
- 	return phy_ethtool_set_eee(dev->phydev, edata);
- }
-@@ -228,7 +212,7 @@ static void sxgbe_get_ethtool_stats(struct net_device *dev,
- 	int i;
- 	char *p;
- 
--	if (priv->eee_enabled) {
-+	if (dev->phydev->eee_active) {
- 		int val = phy_get_eee_err(dev->phydev);
- 
- 		if (val)
-diff --git a/drivers/net/ethernet/samsung/sxgbe/sxgbe_main.c b/drivers/net/ethernet/samsung/sxgbe/sxgbe_main.c
-index 12c8396b6942..8a385c92a6d1 100644
---- a/drivers/net/ethernet/samsung/sxgbe/sxgbe_main.c
-+++ b/drivers/net/ethernet/samsung/sxgbe/sxgbe_main.c
-@@ -87,7 +87,7 @@ static void sxgbe_enable_eee_mode(const struct sxgbe_priv_data *priv)
- 		priv->hw->mac->set_eee_mode(priv->ioaddr);
- }
- 
--void sxgbe_disable_eee_mode(struct sxgbe_priv_data * const priv)
-+static void sxgbe_disable_eee_mode(struct sxgbe_priv_data * const priv)
- {
- 	/* Exit and disable EEE in case of we are in LPI state. */
- 	priv->hw->mac->reset_eee_mode(priv->ioaddr);
-@@ -110,52 +110,25 @@ static void sxgbe_eee_ctrl_timer(struct timer_list *t)
- 	mod_timer(&priv->eee_ctrl_timer, SXGBE_LPI_TIMER(eee_timer));
- }
- 
--/**
-- * sxgbe_eee_init
-- * @priv: private device pointer
-- * Description:
-- *  If the EEE support has been enabled while configuring the driver,
-- *  if the GMAC actually supports the EEE (from the HW cap reg) and the
-- *  phy can also manage EEE, so enable the LPI state and start the timer
-- *  to verify if the tx path can enter in LPI state.
-- */
--bool sxgbe_eee_init(struct sxgbe_priv_data * const priv)
-+static void sxgbe_eee_adjust(struct sxgbe_priv_data *priv)
- {
--	struct net_device *ndev = priv->dev;
--	bool ret = false;
-+	struct phy_device *phydev = priv->dev->phydev;
- 
--	/* MAC core supports the EEE feature. */
--	if (priv->hw_cap.eee) {
--		/* Check if the PHY supports EEE */
--		if (phy_init_eee(ndev->phydev, true))
--			return false;
-+	if (!priv->hw_cap.eee)
-+		return;
- 
--		timer_setup(&priv->eee_ctrl_timer, sxgbe_eee_ctrl_timer, 0);
--		priv->eee_ctrl_timer.expires = SXGBE_LPI_TIMER(eee_timer);
-+	if (phydev->enable_tx_lpi) {
- 		add_timer(&priv->eee_ctrl_timer);
--
- 		priv->hw->mac->set_eee_timer(priv->ioaddr,
- 					     SXGBE_DEFAULT_LPI_TIMER,
--					     priv->tx_lpi_timer);
--
--		pr_info("Energy-Efficient Ethernet initialized\n");
--
--		ret = true;
-+					     phydev->eee_cfg.tx_lpi_timer);
-+		priv->eee_enabled = true;
-+	} else {
-+		sxgbe_disable_eee_mode(priv);
-+		priv->eee_enabled = false;
- 	}
- 
--	return ret;
--}
--
--static void sxgbe_eee_adjust(const struct sxgbe_priv_data *priv)
--{
--	struct net_device *ndev = priv->dev;
--
--	/* When the EEE has been already initialised we have to
--	 * modify the PLS bit in the LPI ctrl & status reg according
--	 * to the PHY link status. For this reason.
--	 */
--	if (priv->eee_enabled)
--		priv->hw->mac->set_eee_pls(priv->ioaddr, ndev->phydev->link);
-+	priv->hw->mac->set_eee_pls(priv->ioaddr, phydev->link);
- }
- 
- /**
-@@ -301,6 +274,16 @@ static int sxgbe_init_phy(struct net_device *ndev)
- 		return -ENODEV;
- 	}
- 
-+	if (priv->hw_cap.eee) {
-+		phy_support_eee(phydev);
-+		phy_eee_rx_clock_stop(priv->dev->phydev, true);
-+		phydev->eee_cfg.tx_lpi_timer = SXGBE_DEFAULT_LPI_TIMER;
-+
-+		/* configure timer which will be used for LPI handling */
-+		timer_setup(&priv->eee_ctrl_timer, sxgbe_eee_ctrl_timer, 0);
-+		priv->eee_ctrl_timer.expires = SXGBE_LPI_TIMER(eee_timer);
-+	}
-+
- 	netdev_dbg(ndev, "%s: attached to PHY (UID 0x%x) Link = %d\n",
- 		   __func__, phydev->phy_id, phydev->link);
- 
-@@ -802,7 +785,7 @@ static void sxgbe_tx_all_clean(struct sxgbe_priv_data * const priv)
- 		sxgbe_tx_queue_clean(tqueue);
- 	}
- 
--	if ((priv->eee_enabled) && (!priv->tx_path_in_lpi_mode)) {
-+	if (priv->eee_enabled && !priv->tx_path_in_lpi_mode) {
- 		sxgbe_enable_eee_mode(priv);
- 		mod_timer(&priv->eee_ctrl_timer, SXGBE_LPI_TIMER(eee_timer));
- 	}
-@@ -1179,9 +1162,6 @@ static int sxgbe_open(struct net_device *dev)
- 		priv->hw->dma->rx_watchdog(priv->ioaddr, SXGBE_MAX_DMA_RIWT);
- 	}
- 
--	priv->tx_lpi_timer = SXGBE_DEFAULT_LPI_TIMER;
--	priv->eee_enabled = sxgbe_eee_init(priv);
--
- 	napi_enable(&priv->napi);
- 	netif_start_queue(dev);
- 
-@@ -1207,9 +1187,6 @@ static int sxgbe_release(struct net_device *dev)
- {
- 	struct sxgbe_priv_data *priv = netdev_priv(dev);
- 
--	if (priv->eee_enabled)
--		del_timer_sync(&priv->eee_ctrl_timer);
--
- 	/* Stop and disconnect the PHY */
- 	if (dev->phydev) {
- 		phy_stop(dev->phydev);
--- 
-2.39.5
-
+Alternatively, add one rcu_read_lock()/rcu_read_unlock() pair as some
+dev_getbyhwaddr_rcu() callers already do.
 
