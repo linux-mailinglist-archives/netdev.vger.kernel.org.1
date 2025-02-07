@@ -1,199 +1,203 @@
-Return-Path: <netdev+bounces-163941-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-163942-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2E10AA2C23F
-	for <lists+netdev@lfdr.de>; Fri,  7 Feb 2025 13:12:02 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6BE74A2C244
+	for <lists+netdev@lfdr.de>; Fri,  7 Feb 2025 13:13:39 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id AFBC2169DA1
-	for <lists+netdev@lfdr.de>; Fri,  7 Feb 2025 12:12:00 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 5FCC41889BBC
+	for <lists+netdev@lfdr.de>; Fri,  7 Feb 2025 12:13:44 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 69ABF1DF725;
-	Fri,  7 Feb 2025 12:11:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A79B11DF738;
+	Fri,  7 Feb 2025 12:13:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (4096-bit key) header.d=prolan.hu header.i=@prolan.hu header.b="hbmmYScl"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ej1-f44.google.com (mail-ej1-f44.google.com [209.85.218.44])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from fw2.prolan.hu (fw2.prolan.hu [193.68.50.107])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 846EE2417C7;
-	Fri,  7 Feb 2025 12:11:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.44
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8304B1DEFDC;
+	Fri,  7 Feb 2025 12:13:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=193.68.50.107
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1738930318; cv=none; b=YdvDfiBP91Vfr4sdINB7ok56Uyi3cZADqp4NCg2B6DL3ht2iQj2nscX83cPdluyKjLRgLAgdTtqItzjLLAvWtKV8oGVaF9nfjdQK6zHF7YbFjza9Wm3bNMn8tSSnGkKmqvgaKXZDdVvvohhh1CgOVVoM6iK8b5LbF0J/r/qcQf4=
+	t=1738930414; cv=none; b=or62JOQQ2crzA54tjqADr9Np/NEb76AVhDZ4MBxdEcylk8t1aIwu0jFuYyBqfyPKQLXV3OtuL8IRspaXoP6lPVBdZ+/4fefcylZWC7Hi7u0k7nThmQDX9Z+ZIFxRH/Tn3edllZBUSA6hLU5d1LqHRCcCo0hVk4KmzbFwanviUig=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1738930318; c=relaxed/simple;
-	bh=Ll3dxUML4y6ZQQh2Iv6OscNZv5RDJ+EQkHjfe/iByKM=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:To:Cc; b=k0Zgh2JIhoH2fW72+N4nPUG85BopAuHVl/s4vQOw+SxkCRAyK0F6zHR2pWAMmkJCBgxcs6Y7M3C+EIfYrDNWABjhueAxcsLp7M2o6h+JKqOozKlCGvA34I/Tf/iEFa50jEm+KiL2LZIMPDJQvvyvpOWwhgN9Z6bp0gcIATdcwlg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.218.44
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ej1-f44.google.com with SMTP id a640c23a62f3a-aaeef97ff02so348603766b.1;
-        Fri, 07 Feb 2025 04:11:56 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1738930315; x=1739535115;
-        h=cc:to:message-id:content-transfer-encoding:mime-version:subject
-         :date:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=FsxP7EqkW7P33SSUxO3dtpPHBiQBsrqgjhAIX/9EzSE=;
-        b=JKhLcwHuWoyfMObFvVPzQJBsYvoeDNB9H/iNmayyD0bbCigf4SrgiZnNwxKCPFMf7m
-         2zB9fYpPsV5ixi0DcQQ1ZR4VkuY+pcytvxKncsTMP1HN2cQO82zyCELYLQOlqmv5eatH
-         od6c+aPI/cSFFuLZKK/Eo4NIZLTKQ22c/HcavgFzEYjwEM9x25qppmjANCHQhBc7S8xo
-         aPYj5FbiPfMZ4Exdu+umAmSBZWKROmu1DtbXgsCQgRzG0SLeJIRmnYbUwQnO8qach34E
-         aPk3ystH+sPxZGBym6BBzIHAjH2WiqVDsuhGn9Xumte3zkFzi9TkfZeCFEKtZPWbUm1u
-         quVQ==
-X-Forwarded-Encrypted: i=1; AJvYcCVAeojqGg7MgIuWL4nXvVZbPaa0zXfIeCS2o26OoXWiLkxBhjmCIbeCi4lrQ3JBnW5sf1zFPjI=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yybsj9ad6X4+A4fA65rqhqNiEmhdxuaj9z83fSvL020PIqqmDDi
-	lfUVptDihqUAFas5eVB/gSi9ZrtTbe8FC1Gc51xcmOdxI/ZAkH3O
-X-Gm-Gg: ASbGncv/gaiKkXd7XX9B2JtPD3Tm71UW3jZEInd7fBJqFKIZRhrpQPa5PbmLucbd0BO
-	TdBZjObTsbiUEHuqPGSYmhzavMytrM2BFArvId1bgXhT6b/Fd1RKulfqPcdJwH+ik6DlfEERRt1
-	Tu2XEZzq53cqcWSHm9tnYVIlPXwx8NFo6CGr3KvUoYUvqeVkNvuOM4AfsXqcnskWiyoKFpfUs4b
-	qFhS9dCLJtECwlXkmV9zSgXRk5eEQ1MneaqsD9s17cY3Pgd7En5fIqxSgvXBojyp07WPrN8FACI
-	wS8y4w==
-X-Google-Smtp-Source: AGHT+IGyMvm4QZSm5TwWC03zC7HkVHovRxMnBlWjI3qW3nbEII4YZeP6KXA8u5PoBBhGkYMHQbENPw==
-X-Received: by 2002:a17:907:c285:b0:ab2:c1da:b725 with SMTP id a640c23a62f3a-ab789b22c86mr314357066b.30.1738930314423;
-        Fri, 07 Feb 2025 04:11:54 -0800 (PST)
-Received: from localhost ([2a03:2880:30ff:8::])
-        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-ab773339349sm256408266b.146.2025.02.07.04.11.53
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 07 Feb 2025 04:11:53 -0800 (PST)
-From: Breno Leitao <leitao@debian.org>
-Date: Fri, 07 Feb 2025 04:11:34 -0800
-Subject: [PATCH RFC net-next] net: Add dev_getbyhwaddr_rtnl() helper
+	s=arc-20240116; t=1738930414; c=relaxed/simple;
+	bh=UgGDfz4QxlxB7uGN8UyOKQSTzMDA+3Otn6I41VTV8cA=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=Ty+ZZzfauGkUO+90JmBm5KlVxaPxBr1djib2b4iyBEQrru1mSZL2FbfApOiF0ROxjbZ6lnhqm7C/KALiJF5dqyCXJVONvGsNKjZMoe9nO2q7qNYzp/DJSNv4dCIeIB6c7kjTT6gB/y6CutWklLzG1pQZXAdHfXmdCbQgrZnohpQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=prolan.hu; spf=pass smtp.mailfrom=prolan.hu; dkim=pass (4096-bit key) header.d=prolan.hu header.i=@prolan.hu header.b=hbmmYScl; arc=none smtp.client-ip=193.68.50.107
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=prolan.hu
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=prolan.hu
+Received: from proxmox-mailgw.intranet.prolan.hu (localhost.localdomain [127.0.0.1])
+	by proxmox-mailgw.intranet.prolan.hu (Proxmox) with ESMTP id BB49AA0155;
+	Fri,  7 Feb 2025 13:13:28 +0100 (CET)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=prolan.hu; h=cc
+	:cc:content-transfer-encoding:content-type:content-type:date
+	:from:from:message-id:mime-version:reply-to:subject:subject:to
+	:to; s=mail; bh=9OWJCfb9mBLeS+qmNVaUT+6UZW8yr/J2AZVV36sD2ZM=; b=
+	hbmmYSclNOifu72HvKJxj6Y5pZNFpH6l4kkirtkjOaoTZiSI7K3JJAUx8Pa3SXq+
+	mdf8oDbbSLODUF38fKCw0nGjT/imQ/ZCqHImbjtST5Av33AEF2xuSnMRQVnJEaVV
+	7yBq17zEmanhUQdwMksLjcRS6CAQTLnTM6VpiNQPdzd7xuyayyMTpwZyMJTNAKso
+	bxR2R2EZyLfukKSKdvGy9BfIQiXk0E+0pNT644TuNfEa4jS+4+batQACg9oXVLeH
+	00FXDQk41hra3YYyEi3QMXIHacJqmEI3H9Ta8JFpToX05GGly/uyXWUo01MBiQR8
+	ktIS65aCK+9sJUnVuVGn7rcq65TWPOCXAoXMZt1As9uVHV1vxd5f/GQHdTvMshN5
+	fElzM0reZ1kyBJ2vGSMG/KRCaBfuUa86hfYri9Sf+mkb4YjolUlbbftrg6NvGL8b
+	4m/dsJyeK492Ix9v9RnaoM+7yZit0YD4PPzwBmzTZnWpR13Jq+mJrz3YtYXMrOlc
+	gFruXYe7sMO19gdVizP/2P8joDU51Lr9JNcYrmSrWK+ctVgGhl+kQ5514aYWa6gv
+	mn6sYR8uiBV4oxnmSXhoC3PnZO0ZE6EDAhC/jR7QQp6oB6HYqq8kJKOTPdqQU2cG
+	5I62Vbc/hrgsci1ULrMGQblwR116tSu2GaIvWIFI3P4=
+From: =?UTF-8?q?Cs=C3=B3k=C3=A1s=2C=20Bence?= <csokas.bence@prolan.hu>
+To: <imx@lists.linux.dev>, <netdev@vger.kernel.org>,
+	<linux-kernel@vger.kernel.org>
+CC: =?UTF-8?q?Cs=C3=B3k=C3=A1s=2C=20Bence?= <csokas.bence@prolan.hu>, "Michal
+ Swiatkowski" <michal.swiatkowski@linux.intel.com>, Jacob Keller
+	<jacob.e.keller@intel.com>, Simon Horman <horms@kernel.org>, Wei Fang
+	<wei.fang@nxp.com>, Shenwei Wang <shenwei.wang@nxp.com>, Clark Wang
+	<xiaoning.wang@nxp.com>, Andrew Lunn <andrew+netdev@lunn.ch>, "David S.
+ Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, "Jakub
+ Kicinski" <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>
+Subject: [PATCH net-next v4] net: fec: Refactor MAC reset to function
+Date: Fri, 7 Feb 2025 13:12:55 +0100
+Message-ID: <20250207121255.161146-2-csokas.bence@prolan.hu>
+X-Mailer: git-send-email 2.48.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Message-Id: <20250207-arm_fix_selftest-v1-1-487518d2fd1c@debian.org>
-X-B4-Tracking: v=1; b=H4sIAHX4pWcC/3WN0QqCMBhGX2X81y62WYZeBUEP0G2ITPepP9SMb
- YghvnvkfbeHwzkrRQRGpEqsFDBz5MlTJXQmqButHyDZUSXIKHNSRp2lDa+m56WJePYJMUnAlK7
- t8tyqgjJB74Celz35oPvt+mMeSXosiepM0MgxTeGzL2e9a//rs5ZaKlcArTqassTFoWXrD1MYq
- N627Qv+PS2rwgAAAA==
-X-Change-ID: 20250207-arm_fix_selftest-ee29dbc33a06
-To: "David S. Miller" <davem@davemloft.net>, 
- Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
- Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>
-Cc: linux-kernel@vger.kernel.org, netdev@vger.kernel.org, 
- kernel-team@meta.com, kuniyu@amazon.com, ushankar@purestorage.com, 
- Breno Leitao <leitao@debian.org>
-X-Mailer: b4 0.14.2
-X-Developer-Signature: v=1; a=openpgp-sha256; l=2975; i=leitao@debian.org;
- h=from:subject:message-id; bh=Ll3dxUML4y6ZQQh2Iv6OscNZv5RDJ+EQkHjfe/iByKM=;
- b=owEBbQKS/ZANAwAIATWjk5/8eHdtAcsmYgBnpfiI69v/HRwhpN0AMwEJZerttK0/+ReZL4Q2u
- ZDknJTcXNGJAjMEAAEIAB0WIQSshTmm6PRnAspKQ5s1o5Of/Hh3bQUCZ6X4iAAKCRA1o5Of/Hh3
- bf1AD/9wZX9vQauQG+h2D83v98qMs/1n0I1k/5sd8AVcpjAjitRLt+hHA060Sn7Rf01HyZCzcBG
- D73BMG8JFA9Qa3oy+CcHTbsq89hZtyMogbw7npLr5N8Of/SnkI2sZ/yh09w9HARol6r3aXbKmAE
- 3QK7vXQUYdeveASRcaAJwWCAowzzI/1JmMpnh+bgEoD0ZCbw64q7pb4j6ZkbJo3foR5RXp4mH1E
- rCZw45zCMk65Lnn+jFTn/kPC2cpFzsLxJwVX0N3CTv1yfzyEfe1sI3Wubxg5r2tvHX/s6HNPegZ
- UpE7jos07Deq7VVp9g+tRYMGesjD1nn1i4l6lSWFruY+OgvxLeqMs8mrQtze8lofSKm+LKnthi0
- mx2Bp9wRMKywBbSWIRSvs4DhnJseT1iIqLgqQnqzGvjnH5/qB8zlFQCz6ulu4o9q0lCVqG3Ld2m
- FeOYmgP2tlGgA03eGIitv9JoZya9/CusjVoE/68OcLEQOXOONcu+5HzOqx6Afh3fOZssxTDz0nK
- 5XY5+RpMbo6ZbhnPifBaOPDed06E8Wy7cnLOr4mGSLnjqczJ+upblOiy98biik3MoQ5SRhfo1bW
- 9CB/TJAIaeomU8/A0T0JZ72pzw1MkllhP5T6ivh6EWwQq8Y8iY3YNYpXk0PQt6r+OWUJCGoIdvo
- f1O133/JJDNTo+g==
-X-Developer-Key: i=leitao@debian.org; a=openpgp;
- fpr=AC8539A6E8F46702CA4A439B35A3939FFC78776D
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8bit
+X-ESET-AS: R=OK;S=0;OP=CALC;TIME=1738930407;VERSION=7985;MC=1996129542;ID=399764;TRN=0;CRV=0;IPC=;SP=0;SIPS=0;PI=3;F=0
+X-ESET-Antispam: OK
+X-EsetResult: clean, is OK
+X-EsetId: 37303A29ACD94852617560
 
-Add dedicated helper for finding devices by hardware address when
-holding RTNL, similar to existing dev_getbyhwaddr_rcu(). This prevents
-PROVE_LOCKING warnings when RTNL is held but RCU read lock is not.
+The core is reset both in `fec_restart()` (called on link-up) and
+`fec_stop()` (going to sleep, driver remove etc.). These two functions
+had their separate implementations, which was at first only a register
+write and a `udelay()` (and the accompanying block comment). However,
+since then we got soft-reset (MAC disable) and Wake-on-LAN support, which
+meant that these implementations diverged, often causing bugs.
 
-Extract common address comparison logic into dev_comp_addr().
+For instance, as of now, `fec_stop()` does not check for
+`FEC_QUIRK_NO_HARD_RESET`, meaning the MII/RMII mode is cleared on eg.
+a PM power-down event; and `fec_restart()` missed the refactor renaming
+the "magic" constant `1` to `FEC_ECR_RESET`.
 
-The context about this change could be found in the following
-discussion:
+To harmonize current implementations, and eliminate this source of
+potential future bugs, refactor implementation to a common function.
 
-Link: https://lore.kernel.org/all/20250206-scarlet-ermine-of-improvement-1fcac5@leitao/
-
-Cc: kuniyu@amazon.com
-Cc: ushankar@purestorage.com
-Suggested-by: Eric Dumazet <edumazet@google.com>
-Signed-off-by: Breno Leitao <leitao@debian.org>
+Reviewed-by: Michal Swiatkowski <michal.swiatkowski@linux.intel.com>
+Reviewed-by: Jacob Keller <jacob.e.keller@intel.com>
+Reviewed-by: Simon Horman <horms@kernel.org>
+Signed-off-by: Csókás, Bence <csokas.bence@prolan.hu>
 ---
- net/core/dev.c | 39 ++++++++++++++++++++++++++++++++++++---
- 1 file changed, 36 insertions(+), 3 deletions(-)
 
-diff --git a/net/core/dev.c b/net/core/dev.c
-index c41d1e1cbf62e0c5778c472cdb947b6f140f6064..75f0c533ff10e7188aa55345cd8140b88a7d09ca 100644
---- a/net/core/dev.c
-+++ b/net/core/dev.c
-@@ -1121,6 +1121,16 @@ int netdev_get_name(struct net *net, char *name, int ifindex)
- 	return ret;
+Notes:
+    Recommended options for this patch:
+    `--color-moved --color-moved-ws=allow-indentation-change`
+    Changes in v2:
+    * collect Michal's tag
+    * reformat message to 75 cols
+    * fix missing `u32 val`
+    Changes in v3:
+    * rename parameter to `allow_wol`
+    Changes in v3:
+    * clarify message
+    * collect Jacob's tag
+    * rebased onto c2933b2befe2
+    Changes in v4:
+    * collect Simon's tag
+    * rebased again
+    * drop Fixes:, target net-next
+
+ drivers/net/ethernet/freescale/fec_main.c | 52 +++++++++++------------
+ 1 file changed, 25 insertions(+), 27 deletions(-)
+
+diff --git a/drivers/net/ethernet/freescale/fec_main.c b/drivers/net/ethernet/freescale/fec_main.c
+index f7c4ce8e9a26..a86cfebedaa8 100644
+--- a/drivers/net/ethernet/freescale/fec_main.c
++++ b/drivers/net/ethernet/freescale/fec_main.c
+@@ -1093,6 +1093,29 @@ static void fec_enet_enable_ring(struct net_device *ndev)
+ 	}
  }
  
-+static bool dev_comp_addr(struct net_device *dev,
-+			  unsigned short type,
-+			  const char *ha)
-+{
-+	if (dev->type == type && !memcmp(dev->dev_addr, ha, dev->addr_len))
-+		return true;
-+
-+	return false;
-+}
-+
- /**
-  *	dev_getbyhwaddr_rcu - find a device by its hardware address
-  *	@net: the applicable net namespace
-@@ -1129,7 +1139,7 @@ int netdev_get_name(struct net *net, char *name, int ifindex)
-  *
-  *	Search for an interface by MAC address. Returns NULL if the device
-  *	is not found or a pointer to the device.
-- *	The caller must hold RCU or RTNL.
-+ *	The caller must hold RCU.
-  *	The returned device has not had its ref count increased
-  *	and the caller must therefore be careful about locking
-  *
-@@ -1141,14 +1151,37 @@ struct net_device *dev_getbyhwaddr_rcu(struct net *net, unsigned short type,
- 	struct net_device *dev;
- 
- 	for_each_netdev_rcu(net, dev)
--		if (dev->type == type &&
--		    !memcmp(dev->dev_addr, ha, dev->addr_len))
-+		if (dev_comp_addr(dev, type, ha))
- 			return dev;
- 
- 	return NULL;
- }
- EXPORT_SYMBOL(dev_getbyhwaddr_rcu);
- 
-+/**
-+ *	dev_getbyhwaddr_rtnl - find a device by its hardware address
-+ *	@net: the applicable net namespace
-+ *	@type: media type of device
-+ *	@ha: hardware address
-+ *
-+ *	Similar to dev_getbyhwaddr_rcu(), but, the owner needs to hold
-+ *	RTNL.
-+ *
++/* Whack a reset.  We should wait for this.
++ * For i.MX6SX SOC, enet use AXI bus, we use disable MAC
++ * instead of reset MAC itself.
 + */
-+struct net_device *dev_getbyhwaddr_rtnl(struct net *net, unsigned short type,
-+					const char *ha)
++static void fec_ctrl_reset(struct fec_enet_private *fep, bool allow_wol)
 +{
-+	struct net_device *dev;
++	u32 val;
 +
-+	ASSERT_RTNL();
-+	for_each_netdev(net, dev)
-+		if (dev_comp_addr(dev, type, ha))
-+			return dev;
-+
-+	return NULL;
++	if (!allow_wol || !(fep->wol_flag & FEC_WOL_FLAG_SLEEP_ON)) {
++		if (fep->quirks & FEC_QUIRK_HAS_MULTI_QUEUES ||
++		    ((fep->quirks & FEC_QUIRK_NO_HARD_RESET) && fep->link)) {
++			writel(0, fep->hwp + FEC_ECNTRL);
++		} else {
++			writel(FEC_ECR_RESET, fep->hwp + FEC_ECNTRL);
++			udelay(10);
++		}
++	} else {
++		val = readl(fep->hwp + FEC_ECNTRL);
++		val |= (FEC_ECR_MAGICEN | FEC_ECR_SLEEP);
++		writel(val, fep->hwp + FEC_ECNTRL);
++	}
 +}
-+EXPORT_SYMBOL(dev_getbyhwaddr_rtnl);
 +
- struct net_device *dev_getfirstbyhwtype(struct net *net, unsigned short type)
- {
- 	struct net_device *dev, *ret = NULL;
+ /*
+  * This function is called to start or restart the FEC during a link
+  * change, transmit timeout, or to reconfigure the FEC.  The network
+@@ -1109,17 +1132,7 @@ fec_restart(struct net_device *ndev)
+ 	if (fep->bufdesc_ex)
+ 		fec_ptp_save_state(fep);
+ 
+-	/* Whack a reset.  We should wait for this.
+-	 * For i.MX6SX SOC, enet use AXI bus, we use disable MAC
+-	 * instead of reset MAC itself.
+-	 */
+-	if (fep->quirks & FEC_QUIRK_HAS_MULTI_QUEUES ||
+-	    ((fep->quirks & FEC_QUIRK_NO_HARD_RESET) && fep->link)) {
+-		writel(0, fep->hwp + FEC_ECNTRL);
+-	} else {
+-		writel(1, fep->hwp + FEC_ECNTRL);
+-		udelay(10);
+-	}
++	fec_ctrl_reset(fep, false);
+ 
+ 	/*
+ 	 * enet-mac reset will reset mac address registers too,
+@@ -1373,22 +1386,7 @@ fec_stop(struct net_device *ndev)
+ 	if (fep->bufdesc_ex)
+ 		fec_ptp_save_state(fep);
+ 
+-	/* Whack a reset.  We should wait for this.
+-	 * For i.MX6SX SOC, enet use AXI bus, we use disable MAC
+-	 * instead of reset MAC itself.
+-	 */
+-	if (!(fep->wol_flag & FEC_WOL_FLAG_SLEEP_ON)) {
+-		if (fep->quirks & FEC_QUIRK_HAS_MULTI_QUEUES) {
+-			writel(0, fep->hwp + FEC_ECNTRL);
+-		} else {
+-			writel(FEC_ECR_RESET, fep->hwp + FEC_ECNTRL);
+-			udelay(10);
+-		}
+-	} else {
+-		val = readl(fep->hwp + FEC_ECNTRL);
+-		val |= (FEC_ECR_MAGICEN | FEC_ECR_SLEEP);
+-		writel(val, fep->hwp + FEC_ECNTRL);
+-	}
++	fec_ctrl_reset(fep, true);
+ 	writel(fep->phy_speed, fep->hwp + FEC_MII_SPEED);
+ 	writel(FEC_DEFAULT_IMASK, fep->hwp + FEC_IMASK);
+ 
 
----
-base-commit: 0d5248724ed8bc68c867c4c65dda625277f68fbc
-change-id: 20250207-arm_fix_selftest-ee29dbc33a06
-
-Best regards,
+base-commit: 26db4dbb747813b5946aff31485873f071a10332
 -- 
-Breno Leitao <leitao@debian.org>
+2.48.1
+
 
 
