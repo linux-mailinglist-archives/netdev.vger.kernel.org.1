@@ -1,107 +1,95 @@
-Return-Path: <netdev+bounces-163802-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-163803-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4AC89A2B998
-	for <lists+netdev@lfdr.de>; Fri,  7 Feb 2025 04:18:20 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5DAF7A2B9BF
+	for <lists+netdev@lfdr.de>; Fri,  7 Feb 2025 04:29:57 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 9AD6A7A2204
-	for <lists+netdev@lfdr.de>; Fri,  7 Feb 2025 03:17:23 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id F1744167758
+	for <lists+netdev@lfdr.de>; Fri,  7 Feb 2025 03:29:55 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C59A816C687;
-	Fri,  7 Feb 2025 03:18:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 48FAA17B418;
+	Fri,  7 Feb 2025 03:29:54 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b="NLhQ4+Rk"
+	dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b="kt2HqqvS"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wr1-f49.google.com (mail-wr1-f49.google.com [209.85.221.49])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp-fw-6002.amazon.com (smtp-fw-6002.amazon.com [52.95.49.90])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EC816156F3A
-	for <netdev@vger.kernel.org>; Fri,  7 Feb 2025 03:18:10 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.49
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 85301176FB0
+	for <netdev@vger.kernel.org>; Fri,  7 Feb 2025 03:29:52 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=52.95.49.90
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1738898292; cv=none; b=nZ9kFEiIoBDRIC9xuCoriJSQNvFbyjdmQFRqFtV56d6BJRyoePHCiX+v7XysqYW3g+zg+g5T6M480JfXcv4WhNruQaDfoAgjKw06rLpc4KZ+JQWX1UJQQ1iXUV4ox+er1lJpqSqRhPWFpT/fIKdfjfcZ8UgwKv67/1cuTdsAQv0=
+	t=1738898994; cv=none; b=Xe5STcdt3euaYG2GmTsd9rBc1ilZE1Wk9Kxm1/jAoAC/Jez0FzTkaGr5Fo3e4dZZ6KDWHcvMihmF01up29XayJrbIPnughAxmVU0rJGyc1gWXx3QPwlaeiXUDlhnOq3oT1U8euBpO3NIWrHXY4zHo+zwIWssY+dU+wC5HR0/KJg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1738898292; c=relaxed/simple;
-	bh=vqL7xw8jlNr58XR+Bz0Kdoo+ACYUYOxJBFCw2VuheYI=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=Mr1EVex42vL9iRTQmBNb+LTJTMy9GHQdejjE6FHijDXq7pG01cmN7nCbs/j12aa/1CHyWLenwPwxg66rBhp7Wr0BhD2KYMEAMPeMM8K962asxhuiIW6b1WnfjP8lhyMXXZr2rJHWWjIdC0fF2yGLL0mTc845kEECSfNQM/fsPoc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com; spf=fail smtp.mailfrom=broadcom.com; dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b=NLhQ4+Rk; arc=none smtp.client-ip=209.85.221.49
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=broadcom.com
-Received: by mail-wr1-f49.google.com with SMTP id ffacd0b85a97d-38daf14018eso1211673f8f.1
-        for <netdev@vger.kernel.org>; Thu, 06 Feb 2025 19:18:10 -0800 (PST)
+	s=arc-20240116; t=1738898994; c=relaxed/simple;
+	bh=CC/lU5cBSriNbt4FVv1OO8X38BLGgU7IgaOqNuYHyKs=;
+	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=iz78e7KtBdyoLSoHZkN5ikwG1wsFlGb6YsjdYb2JTwTFpLttRfIF5wdVb3w1tkrBNYNx9UyeYLd2Bl3BYEdVCxcizNaVruJcy+abCRmI9WpjPns3aFt6qM/ZbehbvKGxgevqlUawOu8+LhazyQ3ATulY1gpkDoqb3AxFeBpHwxE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.co.jp; dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b=kt2HqqvS; arc=none smtp.client-ip=52.95.49.90
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.co.jp
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=broadcom.com; s=google; t=1738898289; x=1739503089; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=3lm/AB3lty+Hlch8L0p4a3FVB4h5zLJbB7JP8TUeaKU=;
-        b=NLhQ4+RkjCkH2lbGFXbz6nQiafbFK4GaH1+tFJM1JNR5MJqdc8YNFugDkROAUi+G2T
-         YsZwD4fuORjt9Moue1Zngb373d1LBMjKlo8LEYEE7ZsZ8EY2oYQ6gcok1AYZEgQNzZq5
-         1N7ObEhZkh9D9vUOGSx3LPZxf9Q+DI5MZ4duU=
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1738898289; x=1739503089;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=3lm/AB3lty+Hlch8L0p4a3FVB4h5zLJbB7JP8TUeaKU=;
-        b=EHXX0t31L6im3FnsLSnVTJruipaNK5CRR0zIAXT6MCSOHTrwAn5yDWS7qxcO+MT7+s
-         8SxClDBR+Vq8QYypiKRAbe9qP+k2w54RXGvb2EW7D6umWT1zAcByhC4GUmcD61CzsgFs
-         E9h7TwocNh8ARjc1alXhnGMV4cJlIHVXRTRMzG974ngCZH62sKxx3Ql5DGezCpHDfe47
-         O86Ij7HnIo2AP2BcaA5LzOHYcf+tHJvatNvPpJKfRNNIMri4jhdxtl0QrCn1ww3Ejq9w
-         WC9DoSR1yJJZgt+WK2ITeZstUuXDIq2kRHXrJndV/6Kc22pEttTrt+OxQmHWRZhMEQyV
-         o6zg==
-X-Forwarded-Encrypted: i=1; AJvYcCUCexIjfdjyG/Au57ac+nabzHOKiTMW93JLS8TD+Caj3StTjC2VaTC6IFVjKkLqpIGCp3YFqI8=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yz/5Q+KdxIw24/AzdEoXGXf9349x7mBZTcP135dya/Or05KXjcg
-	zpqzK71ZxU8xSczrX5BAi8bAqcupyv3/riruVvcLqcPgJgpzLvxFV2K6PtNyslsbniUiiejfmF6
-	U07FqlLkC3ZTmC32EklTm5V/tReHLaIt4nnSR
-X-Gm-Gg: ASbGncvTsHpQdbGO0gyt7fdnOwBgOjwtLcPoptcsjMaaoAoFW4FA0ZkEXmj9QMLVW/+
-	cQiVvV7XrGMsFjgxnSd23QldX7+N3Rqz37nMj9/hC7zXMQEobDvcae02JdPflkXLI3hvh45nA
-X-Google-Smtp-Source: AGHT+IGgbufJoZgaw1aufBoiKaHbppw2L/63RQ7Kbg9CLe7VMVFZtWxoIcfYaDn8o0UPK8J6+CyQ5pO1U8PPRBCJQyI=
-X-Received: by 2002:a05:6000:4010:b0:385:faf5:eba6 with SMTP id
- ffacd0b85a97d-38dc8d9b92dmr694333f8f.1.1738898289266; Thu, 06 Feb 2025
- 19:18:09 -0800 (PST)
+  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
+  t=1738898992; x=1770434992;
+  h=from:to:cc:subject:date:message-id:in-reply-to:
+   references:mime-version:content-transfer-encoding;
+  bh=F0WfW4sAPRDbPL0mr74cO6djVsFck/d6n3VknRLAwUA=;
+  b=kt2HqqvSh9ZFrE6A3gDp+t95uvvVnTI2/4ReSnmHxkpu7sMlts7AaI8f
+   /d7+v64AtNjXW8Xjwo5pU44soeOlggVj13pRnfqlxdjzoJ1hJyHTlD5Dx
+   bcCtsl2uTGod3iaObCxk5ODzxs/Clh+YZw2HdajRxsT3Zj/WUzFqqFYDc
+   g=;
+X-IronPort-AV: E=Sophos;i="6.13,266,1732579200"; 
+   d="scan'208";a="470101543"
+Received: from iad12-co-svc-p1-lb1-vlan3.amazon.com (HELO smtpout.prod.us-west-2.prod.farcaster.email.amazon.dev) ([10.43.8.6])
+  by smtp-border-fw-6002.iad6.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 07 Feb 2025 03:29:43 +0000
+Received: from EX19MTAUWC001.ant.amazon.com [10.0.38.20:31633]
+ by smtpin.naws.us-west-2.prod.farcaster.email.amazon.dev [10.0.49.27:2525] with esmtp (Farcaster)
+ id 10bcf97f-aca7-4e9e-8adb-b2b183e6e0b1; Fri, 7 Feb 2025 03:29:42 +0000 (UTC)
+X-Farcaster-Flow-ID: 10bcf97f-aca7-4e9e-8adb-b2b183e6e0b1
+Received: from EX19D004ANA001.ant.amazon.com (10.37.240.138) by
+ EX19MTAUWC001.ant.amazon.com (10.250.64.174) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1258.39;
+ Fri, 7 Feb 2025 03:29:42 +0000
+Received: from 6c7e67bfbae3.amazon.com (10.118.243.9) by
+ EX19D004ANA001.ant.amazon.com (10.37.240.138) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1544.14;
+ Fri, 7 Feb 2025 03:29:38 +0000
+From: Kuniyuki Iwashima <kuniyu@amazon.com>
+To: <edumazet@google.com>
+CC: <davem@davemloft.net>, <eric.dumazet@gmail.com>, <horms@kernel.org>,
+	<kuba@kernel.org>, <kuniyu@amazon.com>, <ncardwell@google.com>,
+	<netdev@vger.kernel.org>, <pabeni@redhat.com>
+Subject: Re: [PATCH net-next] tcp: rename inet_csk_{delete|reset}_keepalive_timer()
+Date: Fri, 7 Feb 2025 12:29:22 +0900
+Message-ID: <20250207032922.45679-1-kuniyu@amazon.com>
+X-Mailer: git-send-email 2.39.5 (Apple Git-154)
+In-Reply-To: <20250206094605.2694118-1-edumazet@google.com>
+References: <20250206094605.2694118-1-edumazet@google.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <0-v4-0cf4ec3b8143+4995-fwctl_jgg@nvidia.com> <10-v4-0cf4ec3b8143+4995-fwctl_jgg@nvidia.com>
- <20250206164449.52b2dfef@kernel.org>
-In-Reply-To: <20250206164449.52b2dfef@kernel.org>
-From: Andy Gospodarek <andrew.gospodarek@broadcom.com>
-Date: Thu, 6 Feb 2025 22:17:58 -0500
-X-Gm-Features: AWEUYZnWk6trO8wL0uhorILjdXFks8iTPAcYKElY2-JZ81kkM7gTCevOLbdyxOk
-Message-ID: <CACDg6nU_Dkte_GASNRpkvSSCihpg52FBqNr0KR3ud1YRvrRs3w@mail.gmail.com>
-Subject: Re: [PATCH v4 10/10] bnxt: Create an auxiliary device for fwctl_bnxt
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: Jason Gunthorpe <jgg@nvidia.com>, Aron Silverton <aron.silverton@oracle.com>, 
-	Dan Williams <dan.j.williams@intel.com>, Daniel Vetter <daniel.vetter@ffwll.ch>, 
-	Dave Jiang <dave.jiang@intel.com>, David Ahern <dsahern@kernel.org>, 
-	Andy Gospodarek <gospo@broadcom.com>, Christoph Hellwig <hch@infradead.org>, 
-	Itay Avraham <itayavr@nvidia.com>, Jiri Pirko <jiri@nvidia.com>, 
-	Jonathan Cameron <Jonathan.Cameron@huawei.com>, Leonid Bloch <lbloch@nvidia.com>, 
-	Leon Romanovsky <leonro@nvidia.com>, linux-cxl@vger.kernel.org, linux-rdma@vger.kernel.org, 
-	netdev@vger.kernel.org, Saeed Mahameed <saeedm@nvidia.com>, 
-	"Nelson, Shannon" <shannon.nelson@amd.com>, Michael Chan <michael.chan@broadcom.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-ClientProxiedBy: EX19D031UWA002.ant.amazon.com (10.13.139.96) To
+ EX19D004ANA001.ant.amazon.com (10.37.240.138)
 
-On Thu, Feb 6, 2025 at 7:44=E2=80=AFPM Jakub Kicinski <kuba@kernel.org> wro=
-te:
->
-> On Thu,  6 Feb 2025 20:13:32 -0400 Jason Gunthorpe wrote:
-> > From: Andy Gospodarek <gospo@broadcom.com>
-> >
-> > Signed-off-by: Andy Gospodarek <gospo@broadcom.com>
-> > Signed-off-by: Jason Gunthorpe <jgg@nvidia.com>
->
-> This is only needed for RDMA, why can't you make this part of bnxt_re ?
+From: Eric Dumazet <edumazet@google.com>
+Date: Thu,  6 Feb 2025 09:46:05 +0000
+> inet_csk_delete_keepalive_timer() and inet_csk_reset_keepalive_timer()
+> are only used from core TCP, there is no need to export them.
+> 
+> Replace their prefix by tcp.
+> 
+> Move them to net/ipv4/tcp_timer.c and make tcp_delete_keepalive_timer()
+> static.
+> 
+> Signed-off-by: Eric Dumazet <edumazet@google.com>
 
-This is not just needed for RDMA, so having the aux device for fwctl
-as part of the base driver is preferred.
+Reviewed-by: Kuniyuki Iwashima <kuniyu@amazon.com>
 
