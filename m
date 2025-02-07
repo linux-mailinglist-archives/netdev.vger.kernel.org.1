@@ -1,113 +1,164 @@
-Return-Path: <netdev+bounces-163990-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-163991-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 372F2A2C3AF
-	for <lists+netdev@lfdr.de>; Fri,  7 Feb 2025 14:34:54 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id C8B18A2C3B2
+	for <lists+netdev@lfdr.de>; Fri,  7 Feb 2025 14:35:15 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id CB17C188A7E0
-	for <lists+netdev@lfdr.de>; Fri,  7 Feb 2025 13:34:47 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id BCB8B188108C
+	for <lists+netdev@lfdr.de>; Fri,  7 Feb 2025 13:35:20 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B79951F63E8;
-	Fri,  7 Feb 2025 13:33:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 474321F4179;
+	Fri,  7 Feb 2025 13:35:12 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="ikZHdtyb"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="kGdcbgRM"
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-il1-f174.google.com (mail-il1-f174.google.com [209.85.166.174])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EED8F1F37C6;
-	Fri,  7 Feb 2025 13:32:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B36C11A5BB1;
+	Fri,  7 Feb 2025 13:35:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.174
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1738935180; cv=none; b=BdNS6QUZ1IZ/PlU/gdUSqEggyKCCq2HPley2dtkWxLqpyO9vGmF7wbL7RvcIwkadvoseXphazT1K38YVPaCO/D4gbYXuUnZqLVXGj2YurpKm7TUVeV0WDxkoTo0sOJr84KqdDDdGIG86MtMP9TuZEHeywwcmfVQy/iiZRL/AvW0=
+	t=1738935312; cv=none; b=t1ijPaKvDZuAwXFSjiWinIPrs06/BdY6Z46YKYaQxrbg+3xGwTCyvIFVbtm0+2XW+Q/WdUCmyXLMl3+ZcoYp++za7G5azLHSuyWSzXuQqx0E4yGL89kUiyn/hAd6YudMd0ei8L0ybF+GDtT7UP+bXeyy4NRH5BENA6TrhfzvxFg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1738935180; c=relaxed/simple;
-	bh=WFmNlRT/1piaJgm4c0NfJA8P9P62SmS6UdgYC76xKuM=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=lk38cJ16Ey8FIinMe+8P/TJBLgRZIXuZZVPVOCRinveHpZ5g2JLjyr3lirPcz5+LPq9v0UZXetaJLaIld+i+Lmmrn7Vigp00UnhxzrPBE7SKycbYFOTZaQ+KU13X8TGMF7G8Ojh1RmGNFUXhw1rsJCxQt92PgNJ3tzaPLXtb380=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=ikZHdtyb; arc=none smtp.client-ip=156.67.10.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=7B6nKxsZ/sgpbYSbmczXl/HDAlWGMnjUjIEUqDEu3fE=; b=ikZHdtybyl/A4VFw2VkwQGYUTI
-	I5VXMO2Dsq9C6j9NPVSnVHI8byHRtV/uaWU/t71xO8V9YWONlWrw4NkA31Qgj7jaXKhYUM+5sSJwd
-	EGZH7ss/mH8O6TO7DqY00Yy1HTQRU6CUGICBH3CUAKUQ5s0GbwiSc7s9zIREc3Phv1Fs=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1tgOT6-00Br1x-S2; Fri, 07 Feb 2025 14:32:28 +0100
-Date: Fri, 7 Feb 2025 14:32:28 +0100
-From: Andrew Lunn <andrew@lunn.ch>
-To: Choong Yong Liang <yong.liang.choong@linux.intel.com>
-Cc: "Russell King (Oracle)" <linux@armlinux.org.uk>,
-	Simon Horman <horms@kernel.org>, Jose Abreu <joabreu@synopsys.com>,
-	Jose Abreu <Jose.Abreu@synopsys.com>,
-	David E Box <david.e.box@linux.intel.com>,
-	Thomas Gleixner <tglx@linutronix.de>,
-	Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
-	Dave Hansen <dave.hansen@linux.intel.com>,
-	"H . Peter Anvin" <hpa@zytor.com>,
-	Rajneesh Bhardwaj <irenic.rajneesh@gmail.com>,
-	David E Box <david.e.box@intel.com>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S . Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Maxime Coquelin <mcoquelin.stm32@gmail.com>,
-	Alexandre Torgue <alexandre.torgue@foss.st.com>,
-	Jiawen Wu <jiawenwu@trustnetic.com>,
-	Mengyuan Lou <mengyuanlou@net-swift.com>,
-	Heiner Kallweit <hkallweit1@gmail.com>,
-	Hans de Goede <hdegoede@redhat.com>,
-	Ilpo =?iso-8859-1?Q?J=E4rvinen?= <ilpo.jarvinen@linux.intel.com>,
-	Richard Cochran <richardcochran@gmail.com>,
-	Serge Semin <fancer.lancer@gmail.com>, x86@kernel.org,
-	linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
-	platform-driver-x86@vger.kernel.org,
-	linux-stm32@st-md-mailman.stormreply.com,
-	linux-arm-kernel@lists.infradead.org
-Subject: Re: [PATCH net-next v7 2/7] net: pcs: xpcs: re-initiate clause 37
- Auto-negotiation
-Message-ID: <12e86fbe-9515-4b81-951c-8bf86e2939d6@lunn.ch>
-References: <20250206131859.2960543-1-yong.liang.choong@linux.intel.com>
- <20250206131859.2960543-3-yong.liang.choong@linux.intel.com>
- <Z6TVmdCZeWerAZKP@shell.armlinux.org.uk>
- <564ede5d-9f53-40be-9305-63f63b384e15@linux.intel.com>
+	s=arc-20240116; t=1738935312; c=relaxed/simple;
+	bh=vY1bOS/eum+ZjHSSi6snToo0JUebutpJNRJprO0sdOg=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=W9/sMMFF9lIBDK+u/puxnqTw1hbcGQr30a4qpQ8dzzQO8+/fuZyYiSyNVpVEoYySdKy7scEOfhzTjzLIfIQGgf+fCmVRM8D2SSWEbOb9OzPtvWcRl0W++xzS1ENfC5r61kM7Jydn9RvfCAXPDGNDnTfVR5uzxtQ867n5lfKEBmQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=kGdcbgRM; arc=none smtp.client-ip=209.85.166.174
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-il1-f174.google.com with SMTP id e9e14a558f8ab-3d04d655fefso17446875ab.3;
+        Fri, 07 Feb 2025 05:35:10 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1738935310; x=1739540110; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=v1rbN1kyJhZtSFWy60iFcf++JcmL12EiVI3WC4zT40U=;
+        b=kGdcbgRMqK0sy6kpPKmPLDjwtzUvxmI8HaqG8fR6Y9RJUtvoRWXHZWOzFi46w+AWf+
+         6C9QU1jefXrnRLjfEHERDJ60TXlYAHr6Mptz+J1iEh/N0WLqEzjMecmnbqoF99YsLnjH
+         blo8HxsQdYnRKMYKJ2oFS3GJTdcT7EYlFPNaEve3d9cUdhuxER+B/gzD/a0cI69dmVZG
+         syXOATgNWEVh1U82us+Zs0uIv2EJNTNTKofhoZv/Uu75VwZOtckQwqLYYWOKgx4c3Rl5
+         8vkI5KA55rkDybH8cIGjYMQkUudGrWaslAlp4pIcdSVPB8HA+0FjsBgQnyBMCpDSos2w
+         WchA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1738935310; x=1739540110;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=v1rbN1kyJhZtSFWy60iFcf++JcmL12EiVI3WC4zT40U=;
+        b=Hfl5YX1BVjcQ6QbhjuBsdqtTnkMD8+WWbYrVeyQMG7b10o37tJ5rGo3OYQ2bm7TERC
+         Qn1KQvnW+bF9ZAUtaM33c863xsgljthqGc5yE/4tS7QmSwnECmu6FWlSwi4lfn2atDaF
+         /CTJDkgZdRQ6N5Kysba3sBkN1bs9Vs13C6SXDtclT5dmSFAR9hT5NYNxSa0cPfBV+fEd
+         xpUQS9c9s0SN/zjIv1ytoISqJ6T573yTWBkN7CxNex7eddliz0kRWR4fPmDbC+q8oWks
+         qV6kQX4bXrOhXbrAno8I8ionktJ/uAFyx8kXzs6QVoEXatRI3J9RcOjaznayhAMn7ZAl
+         oZ5g==
+X-Forwarded-Encrypted: i=1; AJvYcCVewL3vKA6I6vGjNWQnJYkad5BS9z36ujADX5BoJA1R0Voa9tEUKAF8uuJleDNzhpxx+X+ms7is@vger.kernel.org, AJvYcCXNNM0WoN1x6FrU5wStx447dgIUV9hvKGZhXjpjdhhq44iyAGH9BmDWsqRlYSPSZsqdvk4=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzmZzmL5oKxEgdnMW+4kCNcd3r3Bru7JiRtVziIheLTI6VaCEQj
+	4tv93hI53gS4vPE2qsI2xlVdL4QriFqTk3zBtaFf2C1eGKeD/sUG47k14D69eOBR1BX74WP3mB+
+	no0tdzkTrT4Lbij7TOyQjZH8PDnjzMQNwIOCV7w==
+X-Gm-Gg: ASbGncs5mr1DcJSGbeb+qM4pwK2/IgtFdl55vUXZxFFcZUr4m3HcJ5NuZ5nRS2Zw8lZ
+	wcTrnFei02F9Xo52DliGbb8pDppVu5La9ypS70fg9I9fQE5nxC0cHDNBDI1BkmCYJ8nRZmDhc
+X-Google-Smtp-Source: AGHT+IES5rVLZOf/UVlLT9BZGHdOYu6CE+b8aXL5spCx4XiVOrbok6X4DRYffGjknCfdHTLqo5gBwe9gHu9v+bnBxhk=
+X-Received: by 2002:a92:c263:0:b0:3cf:f88b:b51a with SMTP id
+ e9e14a558f8ab-3d13dcfce6cmr25963575ab.2.1738935309702; Fri, 07 Feb 2025
+ 05:35:09 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <564ede5d-9f53-40be-9305-63f63b384e15@linux.intel.com>
+References: <20250204183024.87508-1-kerneljasonxing@gmail.com>
+ <20250204183024.87508-11-kerneljasonxing@gmail.com> <20250204175744.3f92c33e@kernel.org>
+ <e894c427-b4b3-4706-b44c-44fc6402c14c@linux.dev> <CAL+tcoCQ165Y4R7UWG=J=8e=EzwFLxSX3MQPOv=kOS3W1Q7R0A@mail.gmail.com>
+ <0a8e7b84-bab6-4852-8616-577d9b561f4c@linux.dev> <CAL+tcoAp8v49fwUrN5pNkGHPF-+RzDDSNdy3PhVoJ7+MQGNbXQ@mail.gmail.com>
+ <CAL+tcoC5hmm1HQdbDaYiQ1iW1x2J+H42RsjbS_ghyG8mSDgqqQ@mail.gmail.com>
+ <67a424d2aa9ea_19943029427@willemb.c.googlers.com.notmuch>
+ <CAL+tcoCPGAjs=+Hnzr4RLkioUV7nzy=ZmKkTDPA7sBeVP=qzow@mail.gmail.com>
+ <67a42ba112990_19c315294b7@willemb.c.googlers.com.notmuch>
+ <CAL+tcoC_5106onp6yQh-dKnCTLtEr73EZVC31T_YeMtqbZ5KBw@mail.gmail.com>
+ <b158a837-d46c-4ae0-8130-7aa288422182@linux.dev> <CAL+tcoCUjxvE-DaQ8AMxMgjLnV+J1jpYMh7BCOow4AohW1FFSg@mail.gmail.com>
+ <739d6f98-8a44-446e-85a4-c499d154b57b@linux.dev>
+In-Reply-To: <739d6f98-8a44-446e-85a4-c499d154b57b@linux.dev>
+From: Jason Xing <kerneljasonxing@gmail.com>
+Date: Fri, 7 Feb 2025 21:34:33 +0800
+X-Gm-Features: AWEUYZm6WNHjuSs7mQCHIFvotgjIiK9WGdoU-XRw6scHDKV5BZ2JZ1tEgyb7RQk
+Message-ID: <CAL+tcoCEw7ppu7OvgOhcb=oeJLi4ZwhVdCHuHVSkhP8gEcpVDg@mail.gmail.com>
+Subject: Re: [PATCH bpf-next v8 10/12] bpf: make TCP tx timestamp bpf
+ extension work
+To: Martin KaFai Lau <martin.lau@linux.dev>
+Cc: Willem de Bruijn <willemdebruijn.kernel@gmail.com>, Jakub Kicinski <kuba@kernel.org>, 
+	davem@davemloft.net, edumazet@google.com, pabeni@redhat.com, 
+	dsahern@kernel.org, willemb@google.com, ast@kernel.org, daniel@iogearbox.net, 
+	andrii@kernel.org, eddyz87@gmail.com, song@kernel.org, 
+	yonghong.song@linux.dev, john.fastabend@gmail.com, kpsingh@kernel.org, 
+	sdf@fomichev.me, haoluo@google.com, jolsa@kernel.org, horms@kernel.org, 
+	bpf@vger.kernel.org, netdev@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-> Good point. I cannot find this scenario in the datasheet. Please allow me
-> some time to test this scenario. I will update you with the results.
+On Fri, Feb 7, 2025 at 10:07=E2=80=AFAM Martin KaFai Lau <martin.lau@linux.=
+dev> wrote:
+>
+> On 2/5/25 10:56 PM, Jason Xing wrote:
+> >>> I have to rephrase a bit in case Martin visits here soon: I will
+> >>> compare two approaches 1) reply value, 2) bpf kfunc and then see whic=
+h
+> >>> way is better.
+> >>
+> >> I have already explained in details why the 1) reply value from the bp=
+f prog
+> >> won't work. Please go back to that reply which has the context.
+> >
+> > Yes, of course I saw this, but I said I need to implement and dig more
+> > into this on my own. One of my replies includes a little code snippet
+> > regarding reply value approach. I didn't expect you to misunderstand
+> > that I would choose reply value, so I rephrase it like above :)
+>
+> I did see the code snippet which is incomplete, so I have to guess. afaik=
+, it is
+> not going to work. I was hoping to save some time without detouring to th=
+e
+> reply-value path in case my earlier message was missed. I will stay quiet=
+ and
+> wait for v9 first then to avoid extending this long thread further.
 
-By data sheet, do you mean documentation from Synopsis, or is this an
-internal document? Assuming the hardware engineers have not hacked up
-the Synopsis IP too much, the Synopsis documentation is probably the
-most accurate you have.
+FYI, the code I adjusted works, a little bit ugly though.
 
-> > What about 1000BASE-X when AN is enabled or disabled and then switching
-> > to SGMII?
-> > 
-> According to the datasheet, a soft reset is required.
+diff --git a/net/ipv4/tcp.c b/net/ipv4/tcp.c
+index ad4f056aff22..44b4f8655668 100644
+--- a/net/ipv4/tcp.c
++++ b/net/ipv4/tcp.c
+@@ -498,10 +498,13 @@ static void tcp_tx_timestamp(struct sock *sk,
+struct sockcm_cookie *sockc)
+                struct skb_shared_info *shinfo =3D skb_shinfo(skb);
+                struct tcp_skb_cb *tcb =3D TCP_SKB_CB(skb);
 
-Do you know if this is specific to Intels integration of the Synopsis
-IP, or this is part of the core licensed IP?
+-               tcb->txstamp_ack =3D 2;
+-               shinfo->tx_flags |=3D SKBTX_BPF;
+                shinfo->tskey =3D TCP_SKB_CB(skb)->seq + skb->len - 1;
+-               bpf_skops_tx_timestamping(sk, skb, BPF_SOCK_OPS_TS_SND_CB);
++               if (bpf_skops_tx_timestamping(sk, skb,
+BPF_SOCK_OPS_TS_SND_CB)) {
++                       tcb->txstamp_ack =3D 2;
++                       shinfo->tx_flags |=3D SKBTX_BPF;
++               } else {
++                       shinfo->tskey =3D 0;
++               }
+        }
+ }
 
-We need to understand when we need a quirk because intel did something
-odd, or it is part of the licensed IP and should happen for all
-devices using the IP.
+I'm not sure if it meets your requirement? The reason why I resorted
+to this method is because I failed to attempt to use kfunc and
+struggled to read many btf codes :(
 
-	Andrew
+So please provide more hints so that I can start again. Thanks.
+
+Thanks,
+Jason
 
