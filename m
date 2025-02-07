@@ -1,90 +1,95 @@
-Return-Path: <netdev+bounces-163742-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-163743-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8F591A2B755
-	for <lists+netdev@lfdr.de>; Fri,  7 Feb 2025 01:39:53 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5F2FBA2B756
+	for <lists+netdev@lfdr.de>; Fri,  7 Feb 2025 01:40:11 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 9CCA9188951A
-	for <lists+netdev@lfdr.de>; Fri,  7 Feb 2025 00:39:58 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id EC887166DBB
+	for <lists+netdev@lfdr.de>; Fri,  7 Feb 2025 00:40:09 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C36B31799F;
-	Fri,  7 Feb 2025 00:39:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7338B1802B;
+	Fri,  7 Feb 2025 00:40:07 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="G9opnII2"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="YIlhB6yd"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9EC16B652
-	for <netdev@vger.kernel.org>; Fri,  7 Feb 2025 00:39:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 48F8F17BBF;
+	Fri,  7 Feb 2025 00:40:06 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1738888790; cv=none; b=I66zEFe13aaUpbImaAKyf4RH29ncTbFf5aKtoJkuSxFKO26cc4VTzCh7+DK7InNfI6rHmjV3of0PkwIPh2hzC91qyzjVdYBmZGGY4DjaqB1TLxdHj67Ymm+r9YVvqrTKd2Dci2WTvBLNEoxKXkAWmZbPPR8zDwSzAwWPDCwSnU4=
+	t=1738888807; cv=none; b=WB0UFBN1Nx+LaBnJVK7pSeZObE2TdgWxUj2ZQH5vTtAWAcfNVHqlGXX6fgXs/7DnXin/siWfj1F0fD/RnlfkcvB+lzDXQoskAVRcQB9hEHOYySWtUtpQ5nRGQH3a3bpDlZ+Bc2EIN4VCAz4ME0IvrdOXYMm5IAV884dVzD4XOZ4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1738888790; c=relaxed/simple;
-	bh=huNkBQeJW5IRjnMzes6IdNxKMJXQ4wyfsH4ego2Q9oc=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=ruhGxrKMnJz/OhAQ5ELuTdfZvqqn3kI0DjciufkuuGBPNmfC6HNkN09vFSrN0+2uRi1zc1M45kdKQ/REDmAQRZ8oEs28fjaTl/UES1UtTyjMqtuVwFuno9wRhP0iURMtqH0kS1O9eXU34gPE6Na0eej+D8XHJ1liLCLTvkR0y6M=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=G9opnII2; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 23355C4CEDD;
-	Fri,  7 Feb 2025 00:39:50 +0000 (UTC)
+	s=arc-20240116; t=1738888807; c=relaxed/simple;
+	bh=MPTrX/pGnmLsi85CgZUN8PpdQ4oomrsyAoZFgar388w=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=bwVfNHM3NkE8L2+W1WF/Vs/KS5Nzo24vBtAmUFYq2KiUpTqtZ0m5hHOh+5e1mpzmyNAJsoOKUEfavCt8zm683b7ktxgAoeIvvwKb01P9IfvqSlhIWT0WemU1Z5KHL3O3CiASn0e8EQ9vq5eLKsA9jo4YDIouqIE7n6BRKtDUWdE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=YIlhB6yd; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id AEF2EC4CEDD;
+	Fri,  7 Feb 2025 00:40:06 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1738888790;
-	bh=huNkBQeJW5IRjnMzes6IdNxKMJXQ4wyfsH4ego2Q9oc=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=G9opnII2nPLreTQGOVQDobjE6NMOfMv7P27FX2WBzjb2Szs/g8ue/QXlmhztg6nI6
-	 BzYBBy2x0v8PgNPDiFYUwpEVGpl+xwTUeYM/AJjaO44etdDprtNWDNi56Z+0WkzArG
-	 4uSWL/9baUJ0n9823gWsaZAtAUDc1LxTrkv1TfR0yJuvNdSJ8WdC3pC1rDDAFvK5tq
-	 C5VLIR+7b17+PEKesFLeaVvY5xklrPA7EH9oksDxOv69PZKAJ6+7CyVirmpR9SG2g9
-	 //ntqv0AVEE8e3EzjFoyLN69gYB7vl9wv0dzG+eIMqXsucuu5qFn4S2BsfZa3/W+eL
-	 vBT8WuXcxDHgQ==
-Date: Thu, 6 Feb 2025 16:39:49 -0800
-From: Jakub Kicinski <kuba@kernel.org>
-To: Danielle Ratson <danieller@nvidia.com>
-Cc: <netdev@vger.kernel.org>, <mkubecek@suse.cz>, <matt@traverse.com.au>,
- <daniel.zahka@gmail.com>, <amcohen@nvidia.com>,
- <nbu-mlxsw@exchange.nvidia.com>
-Subject: Re: [PATCH ethtool-next v4 00/16] Add JSON output to --module-info
-Message-ID: <20250206163949.370011ae@kernel.org>
-In-Reply-To: <20250205155436.1276904-1-danieller@nvidia.com>
-References: <20250205155436.1276904-1-danieller@nvidia.com>
+	s=k20201202; t=1738888806;
+	bh=MPTrX/pGnmLsi85CgZUN8PpdQ4oomrsyAoZFgar388w=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=YIlhB6ydzcttB5rfxkNjxseW1u+hRA1ud4jYcm3Asu9xsBOyj0EmWPu+AnU5kqQu6
+	 8agWo1H7zU7QnPorvTcMg9JLhjashGUR+q+q3WzYRO5ELotF76uihODAfTc8sqONfq
+	 GgTyqvRAAGzze2glkw6x0IN7KO342T985AvrZRmcVJz7lQvRW0ewVbhBllVh5naYyW
+	 HyMeIOfi5GcfEcZUe4PQ2YoHMNVxHGTx5kwp/zf/HHZbvv7C6ujRGq4RxaK1pqjHaL
+	 8QvUdj8EUASvKoaiQxe6MPk/OzhwAnDJtGcPv4ZCngVvsY5xBRNVDMpDsCsGPopy3R
+	 UgzQBoQt8FURQ==
+Received: from [10.30.226.235] (localhost [IPv6:::1])
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id AE2D4380AADE;
+	Fri,  7 Feb 2025 00:40:35 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH net v2] net: ethtool: tsconfig: Fix netlink type of hwtstamp
+ flags
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <173888883452.1715572.8579419338327846660.git-patchwork-notify@kernel.org>
+Date: Fri, 07 Feb 2025 00:40:34 +0000
+References: <20250205110304.375086-1-kory.maincent@bootlin.com>
+In-Reply-To: <20250205110304.375086-1-kory.maincent@bootlin.com>
+To: Kory Maincent <kory.maincent@bootlin.com>
+Cc: davem@davemloft.net, netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+ thomas.petazzoni@bootlin.com, donald.hunter@gmail.com, kuba@kernel.org,
+ edumazet@google.com, pabeni@redhat.com, horms@kernel.org
 
-On Wed, 5 Feb 2025 17:54:20 +0200 Danielle Ratson wrote:
-> Add JSON output for 'ethtool -m' / --module-info, following the
-> guideline below:
-> 
-> 1. Fields with description, will have a separate description field.
-> 2. Units will be documented in a separate module-info.json file.
-> 3. ASCII fields will be presented as strings.
-> 4. On/Off is rendered as true/false.
-> 5. Yes/no is rendered as true/false.
-> 6. Per-channel fields will be presented as array, when each element
->    represents a channel.
-> 7. Fields that hold version, will be split to major and minor sub
->    fields.
-> 
-> This patchset suppose to extend [1] to cover all types of modules.
-> 
-> Patchset overview:
-> Patches #1-#7: Preparations.
-> Patches #8-#9: Add JSON output support for CMIS compliant modules.
-> Patches #10-#11: Add JSON output support for SFF8636 modules.
-> Patches #12-#14: Add JSON output support for SFF8079 and SFF8472 modules.
-> Patch #15: Add a new schema JSON file for units documentation.
-> Patches #16: Add '-j' support to ethtool
+Hello:
 
-Acked-by: Jakub Kicinski <kuba@kernel.org>
+This patch was applied to netdev/net.git (main)
+by Jakub Kicinski <kuba@kernel.org>:
 
-Thanks a lot for doing this work!
+On Wed,  5 Feb 2025 12:03:01 +0100 you wrote:
+> Fix the netlink type for hardware timestamp flags, which are represented
+> as a bitset of flags. Although only one flag is supported currently, the
+> correct netlink bitset type should be used instead of u32 to keep
+> consistency with other fields. Address this by adding a new named string
+> set description for the hwtstamp flag structure.
+> 
+> The code has been introduced in the current release so the uAPI change is
+> still okay.
+> 
+> [...]
+
+Here is the summary with links:
+  - [net,v2] net: ethtool: tsconfig: Fix netlink type of hwtstamp flags
+    https://git.kernel.org/netdev/net/c/6a774228e890
+
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
+
+
 
