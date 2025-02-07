@@ -1,103 +1,112 @@
-Return-Path: <netdev+bounces-163790-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-163794-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5EAA3A2B921
-	for <lists+netdev@lfdr.de>; Fri,  7 Feb 2025 03:37:31 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 216A9A2B934
+	for <lists+netdev@lfdr.de>; Fri,  7 Feb 2025 03:44:43 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id EAA2B1664F1
-	for <lists+netdev@lfdr.de>; Fri,  7 Feb 2025 02:37:29 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 31B681887EEC
+	for <lists+netdev@lfdr.de>; Fri,  7 Feb 2025 02:44:48 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BAD721519B4;
-	Fri,  7 Feb 2025 02:37:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5453216DEB3;
+	Fri,  7 Feb 2025 02:44:14 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="OD9fAU4r"
+	dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b="a4vaGSdv"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from esa.microchip.iphmx.com (esa.microchip.iphmx.com [68.232.153.233])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 945847E9
-	for <netdev@vger.kernel.org>; Fri,  7 Feb 2025 02:37:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C8F03149C4A;
+	Fri,  7 Feb 2025 02:44:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=68.232.153.233
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1738895847; cv=none; b=W3LQD+CPngP7Ar/4k416IOrnClPX2zF5/uBbzlsZTPTDoEQGADMc6VIRHEilDnD8TsO2oZydHNP5HufC2dIzcybgvjmFtt8piAcKG2CoJ1Sq0cnSo7K7YTykKD2IFZNlug7pS5n2cBmzmQt8/laHlgJCT6A/mXf3g8ly3KPn4go=
+	t=1738896254; cv=none; b=Zv7MzUn/av8Ooojhlh9Jik/Av40yqhERIfVJPWnkkAtUtfMM537z9XUfdkz7p/LU254z6dNg/CWc7Xik4W30iaHk9gAKA1s3IQ9Gk91cbdd7X5Jc+BJN9ElVoME4XSASnz/Zmg9WUsuqz4QXLbL7ur9nQEKjSU4mq+ZShW5nli4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1738895847; c=relaxed/simple;
-	bh=IpOs8bZ1l+1vPpWpZ68iIFwqWwg5GZcdljkc6X5jQUc=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=tz0jdQcXOCqFP2nxFQq9r4+7Y/fNRJ96JtD51gvlGpDz/GGEmnm6V3dwJ2ub8bew3u+b4V65Itq10BKQOnvBhEfUnGmO/uAx0mL3Nv/K/OSE08/Mp+7DcTndgMMggMkDdb9/xmYZDCmPyfHt8bwLEr+I14dQuSf2r3MU/ZZ98IU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=OD9fAU4r; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4BDF1C4CEDD;
-	Fri,  7 Feb 2025 02:37:26 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1738895847;
-	bh=IpOs8bZ1l+1vPpWpZ68iIFwqWwg5GZcdljkc6X5jQUc=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=OD9fAU4rrXS6DO+oUKUbCR3VXB87MKi30VaUdgAg73bSkcQ0qS5DO6C1NdgTOdbQs
-	 p18r2gv6WDhuF9COK8dcOZyhE4wRl4wrqNwFdNeecQQSjC1AsZT/Te7REDRfklBKqZ
-	 yp7Wc4Tg++QLrkgMgunNApTE3esj0KmFeiQYNtPDN6T8R4UE+M3FqtI5b/yoNIHAGz
-	 SKB74SPsKdXgjoQOm1koOuUfGiNPLLIrWDQ7OHN5DhVbXw07HooaUvgSw2KWtDGFCR
-	 g3g1XklIr3yzEIn5Wrc/gURBV4T9knlCvuJUXDSVu1H7LBMXLIrdUFJVViEAUBYaaK
-	 Y0aFyoDrE2xWg==
-Date: Thu, 6 Feb 2025 18:37:25 -0800
-From: Jakub Kicinski <kuba@kernel.org>
-To: Ahmed Zaki <ahmed.zaki@intel.com>
-Cc: netdev@vger.kernel.org, intel-wired-lan@lists.osuosl.org,
- andrew+netdev@lunn.ch, edumazet@google.com, horms@kernel.org,
- pabeni@redhat.com, davem@davemloft.net, michael.chan@broadcom.com,
- tariqt@nvidia.com, anthony.l.nguyen@intel.com,
- przemyslaw.kitszel@intel.com, jdamato@fastly.com, shayd@nvidia.com,
- akpm@linux-foundation.org, shayagr@amazon.com,
- kalesh-anakkur.purayil@broadcom.com
-Subject: Re: [PATCH net-next v7 2/5] net: napi: add CPU affinity to
- napi_config
-Message-ID: <20250206183725.7da19b5c@kernel.org>
-In-Reply-To: <20250204220622.156061-3-ahmed.zaki@intel.com>
-References: <20250204220622.156061-1-ahmed.zaki@intel.com>
-	<20250204220622.156061-3-ahmed.zaki@intel.com>
+	s=arc-20240116; t=1738896254; c=relaxed/simple;
+	bh=VbPngllkP6TXRFEyarsd6ZxTYcW9ZU4pMNo2V2PKJ4s=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=T3t7q6sCfXFu+3c0SD3iSte6oWeuPB1TZgLbKeoOlz1kAYVA9fMpRoQ9WtuknMr1xUcU4KOuQikGaztKuGQJapn+opJeCnqIzUcwr4bVcxEYmporxTk43oZeLERF8hFBSpV7LTpr6EjUqcEEvBLBrsHUH0IQvApP0TQ7op6O/hE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microchip.com; spf=pass smtp.mailfrom=microchip.com; dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b=a4vaGSdv; arc=none smtp.client-ip=68.232.153.233
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microchip.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=microchip.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=microchip.com; i=@microchip.com; q=dns/txt; s=mchp;
+  t=1738896252; x=1770432252;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=VbPngllkP6TXRFEyarsd6ZxTYcW9ZU4pMNo2V2PKJ4s=;
+  b=a4vaGSdvJ/nXf5+sGi2xoSt0UAHTGKm17cSEERjJZL2M/qsh0Cx4vMCG
+   vzBRuGO378fiQ1aW60nRwImNX0YTmbYyDkfOjgutIo8TW1muJ69rNcVeY
+   RBwaZZdEXtzPIBB1LqEvG6Cy6QPuj0Z3rSoKmfkH0nK8OzUSI07Ns4d9d
+   aZ4GiBzJ+ipBZdOJ4WcW+EMCj2Ome04t/wgx7wJZr23zGryfmlhnZ9dTk
+   XrT9hPIRHRwweYVL3vFrxCHyIjV+wWr9obEtMI+qStKLxxBZyDDdAXVWV
+   C0zEmpf/PrtBcvvZsrhUFraLVdODWQR2SnKrt+MQMC/BCo10N0CzhMc1w
+   w==;
+X-CSE-ConnectionGUID: jwTuGLRpSWGwq6CvVvRIVQ==
+X-CSE-MsgGUID: SwF/xYKvRsitL+oqQZ5Bmw==
+X-IronPort-AV: E=Sophos;i="6.13,266,1732604400"; 
+   d="scan'208";a="41415873"
+X-Amp-Result: SKIPPED(no attachment in message)
+Received: from unknown (HELO email.microchip.com) ([170.129.1.10])
+  by esa1.microchip.iphmx.com with ESMTP/TLS/ECDHE-RSA-AES128-GCM-SHA256; 06 Feb 2025 19:44:11 -0700
+Received: from chn-vm-ex03.mchp-main.com (10.10.85.151) by
+ chn-vm-ex01.mchp-main.com (10.10.85.143) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.35; Thu, 6 Feb 2025 19:43:08 -0700
+Received: from pop-os.microchip.com (10.10.85.11) by chn-vm-ex03.mchp-main.com
+ (10.10.85.151) with Microsoft SMTP Server id 15.1.2507.35 via Frontend
+ Transport; Thu, 6 Feb 2025 19:43:08 -0700
+From: <Tristram.Ha@microchip.com>
+To: Russell King <linux@armlinux.org.uk>, Woojung Huh
+	<woojung.huh@microchip.com>, Andrew Lunn <andrew@lunn.ch>, Vladimir Oltean
+	<olteanv@gmail.com>, Heiner Kallweit <hkallweit1@gmail.com>, "Maxime
+ Chevallier" <maxime.chevallier@bootlin.com>
+CC: "David S. Miller" <davem@davemloft.net>, Eric Dumazet
+	<edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
+	<pabeni@redhat.com>, <UNGLinuxDriver@microchip.com>,
+	<netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>, Tristram Ha
+	<tristram.ha@microchip.com>
+Subject: [PATCH RFC net-next v2 0/3] Add SGMII port support to KSZ9477 switch
+Date: Thu, 6 Feb 2025 18:43:13 -0800
+Message-ID: <20250207024316.25334-1-Tristram.Ha@microchip.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
 
-On Tue,  4 Feb 2025 15:06:19 -0700 Ahmed Zaki wrote:
-> + *	@irq_affinity_auto: driver wants the core to manage the IRQ affinity.
+From: Tristram Ha <tristram.ha@microchip.com>
 
-"manage" is probably too strong? "store" or "remember" ?
-Your commit message explains it quite nicely.
+The KSZ9477 switch DSA driver uses XPCS driver to operate its SGMII
+port.  After the previous XPCS driver updates are added the XPCS patch
+can be used to activate DW_XPCS_SGMII_MODE_MAC_MANUAL for KSZ9477.
 
-> + *			    Set by netif_enable_irq_affinity(), then driver must
-> + *			    create persistent napi by netif_napi_add_config()
-> + *			    and finally bind napi to IRQ (netif_napi_set_irq).
-> + *
->   *	@rx_cpu_rmap_auto: driver wants the core to manage the ARFS rmap.
->   *	                   Set by calling netif_enable_cpu_rmap().
->   *
-> @@ -2402,6 +2406,7 @@ struct net_device {
->  	struct lock_class_key	*qdisc_tx_busylock;
->  	bool			proto_down;
->  	bool			threaded;
-> +	bool			irq_affinity_auto;
->  	bool			rx_cpu_rmap_auto;
->  
->  	/* priv_flags_slow, ungrouped to save space */
-> @@ -2662,6 +2667,11 @@ static inline void netdev_set_ml_priv(struct net_device *dev,
->  	dev->ml_priv_type = type;
->  }
->  
-> +static inline void netif_enable_irq_affinity(struct net_device *dev)
+The KSZ9477 driver will generate a special value for PMA device ids to
+activate the new code.
 
-Similar here, "enable affinity" is a bit strong.
+This will require the previous 4 patches from Russell King about
+"net: xpcs: cleanups and partial support for KSZ9477."
 
-netif_remember_irq_affinity() would be more accurate IMHO
+Tristram Ha (3):
+  net: pcs: xpcs: Activate DW_XPCS_SGMII_MODE_MAC_MANUAL for KSZ9477
+  net: dsa: microchip: Add SGMII port support to KSZ9477 switch
+  net: dsa: microchip: Add SGMII port support to KSZ9477 switch
 
-> +{
-> +	dev->irq_affinity_auto = true;
-> +}
+ drivers/net/dsa/microchip/Kconfig      |  1 +
+ drivers/net/dsa/microchip/ksz9477.c    | 98 +++++++++++++++++++++++++-
+ drivers/net/dsa/microchip/ksz9477.h    |  4 +-
+ drivers/net/dsa/microchip/ksz_common.c | 36 ++++++++--
+ drivers/net/dsa/microchip/ksz_common.h | 22 +++++-
+ drivers/net/pcs/pcs-xpcs.c             |  2 +
+ include/linux/pcs/pcs-xpcs.h           |  1 +
+ 7 files changed, 157 insertions(+), 7 deletions(-)
+
+-- 
+2.34.1
+
 
