@@ -1,2141 +1,1090 @@
-Return-Path: <netdev+bounces-163954-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-163956-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 25D4AA2C264
-	for <lists+netdev@lfdr.de>; Fri,  7 Feb 2025 13:17:01 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 2D2C7A2C270
+	for <lists+netdev@lfdr.de>; Fri,  7 Feb 2025 13:18:00 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 0C504188D5D5
-	for <lists+netdev@lfdr.de>; Fri,  7 Feb 2025 12:17:02 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 60ED7188D87C
+	for <lists+netdev@lfdr.de>; Fri,  7 Feb 2025 12:18:00 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 275C91E1A32;
-	Fri,  7 Feb 2025 12:15:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="VEmn/4Fz"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2F9E81F91C8;
+	Fri,  7 Feb 2025 12:16:14 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f49.google.com (mail-wm1-f49.google.com [209.85.128.49])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from metis.whiteo.stw.pengutronix.de (metis.whiteo.stw.pengutronix.de [185.203.201.7])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F22501F7098;
-	Fri,  7 Feb 2025 12:15:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.49
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 80F741DF986
+	for <netdev@vger.kernel.org>; Fri,  7 Feb 2025 12:16:11 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.203.201.7
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1738930538; cv=none; b=eoZIDc1ZOt96d5LhKB8XsoImAWkoy6sxS1mHX/KUIywCKvM6XQrqpb56dHbAn733JcjSvhNIoCegfA4hZDv95tyPQ2msmdgLrXxeEyyw+SyI2rcYG9eIHNId1zd5LU4UviTXV07o81WFL90wdTjQt4d792ha9zEAfTQBY7FOgb8=
+	t=1738930574; cv=none; b=UjN2ktWUN+LXE3EIsaODYxttH7HvMycYWixpMOrqQVYC5Ca9LLe+R9pQPnBXSs7pKxbLYlWBAscGXjHyrNAU26miTaEGfdGcsaeIFNb0DT3LzaanR4mWbL/7wU99w6j/BQwz9+9kLeoCHXq12e1CE2d35/Me0kB6a1bUDm4GIXA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1738930538; c=relaxed/simple;
-	bh=e0RlaLJqm1pN3/NjY+LFbIN8Mpab1ILWURRg/vc1UF0=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=azCB2zTnyZqbhkU2IA6vsZwvtq4Xrtw8ki4+0qIWWwLefgZe1MK8ft85nNbEFqklHN3xxERqPpg1/+J6Y0LvrD1nSCnn+5XVfCDbUavibzMSRNcOJKXgvIjnIBMxCu4eT3tCKpsRPXGsqzBG7egTLAE6EhAdSJvA1P6VoLyXE8E=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=VEmn/4Fz; arc=none smtp.client-ip=209.85.128.49
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wm1-f49.google.com with SMTP id 5b1f17b1804b1-435f8f29f8aso14127725e9.2;
-        Fri, 07 Feb 2025 04:15:34 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1738930533; x=1739535333; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=ejVqRzPS353PQvkGdzgZu3J1A4EnoRFu8T2SCs/l0Ns=;
-        b=VEmn/4Fzk1ytqUXaLyOea+UJbVI7zULytYq6enH1TnKE5UKEfL+YAc0UeZI8zol1f4
-         j4SGOCrv9SXSL2Vqrft4QfraEVqn3dO8dap3/qx0JotHLkhMUwRDiNFoRBa7Fi8yKbeY
-         +iqCJPuN5m0Kbfn5J4oH27e3sqg8waNQ8Q0j7jKq51vGE8ifwy6A38jvS010El4W+t5g
-         ZD7orRF6JCX5BQZHZMPfUIsOIqzzH4ECRYE+TC+2ngYPabEsi9SaH5afU3DcVgig2nPm
-         pJ74R6kpZ6V8j7VwaWOUsLR5vr3PhKwYpEDqUxJzwbM9s/8LoBJMXFb2shgdp7AzBaFj
-         ZcGQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1738930533; x=1739535333;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=ejVqRzPS353PQvkGdzgZu3J1A4EnoRFu8T2SCs/l0Ns=;
-        b=Rgx5rlgRLQuF5kUZONCaf8NI1h+YDmMY8VtSvE1ArMXI/Ia1RhUpCFiItZZXvBU5dP
-         poqU1bbElNKnLapy8VteENJ6NC+6vSnMZuWbpMpGUDvdeOeRHUJGy8aJ100jtbJ79vLa
-         dddV58vAvefy9U45ZOIJendELAWFllD6wdsFf0kS1tbu1urVGt/uEVQwdG/LOjMc+y8B
-         ZSwjwA69a0vrCP15wwImIqrHumI0AgQaxXy/w5GT+GAYojiwnH7FmkJOi2ITd7Wjrf28
-         mFHttp6PpyDS/pCWaagbEvT2Xetjk7Ehha1S33fcDaJ6LyPuJMYKRfY+lD8M6s1Gl2n3
-         ct/Q==
-X-Forwarded-Encrypted: i=1; AJvYcCXJHAtBFzv1l0Ubl9P4WWNgGfgmrJYklm+Jhl0/qbehJ347zVyVVa+CQJYZHGEa2/8JMmbICxl+Y+7KwBBFgQ==@vger.kernel.org
-X-Gm-Message-State: AOJu0Yyqkshju/8hp9mrAANPolfYZxht1besDta5/iYcVQj29vMEkzGy
-	uRycCglxLCBguglCjrGFKuI0wHce3DJGSLHECg1PhLx+KpmQERFdSsnZxg==
-X-Gm-Gg: ASbGncs1qgXEu7Xr6XrR1CFVGrp9MpL4AExpFobOZP/0wM7LufjhHqOCEO0yRG+gP4q
-	pasBSbDY3jM8nJQY8maaw1sKqywpC3bn6bbzutFg/OdpvM3IBj0MoI5b8rE4lngfkD0ahfISQ5k
-	RvP0G05LPfjkeYoDW0akQvAzQASEQR36AaOnEx4WUHT2H2ZOJk8OUvaqmspfTcT4EkBazJLEHDO
-	J5/H0W5XXJCIDQYrXKoUQtiLuCpV412OZFcfgnXY5byO9wMNrkUYBOkRbxCwNVGH/JbbRbBzOWD
-	MG7FgI041v+ebQPFzOhFkkXVgIYqmDz/Ng==
-X-Google-Smtp-Source: AGHT+IHXaO9zeNOVB40XvlOKx9PAI/xL/ZW6YlJ+g1qzDpCK1gfGEtFErNIvwFUV+wSjdP7DAcNK5w==
-X-Received: by 2002:a05:600c:198f:b0:436:1b08:4c78 with SMTP id 5b1f17b1804b1-439249ec4fdmr26074655e9.31.1738930532450;
-        Fri, 07 Feb 2025 04:15:32 -0800 (PST)
-Received: from imac.lan ([2a02:8010:60a0:0:ac43:c7d9:c802:8ec3])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-4391dfc87d2sm51555035e9.26.2025.02.07.04.15.30
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 07 Feb 2025 04:15:31 -0800 (PST)
-From: Donald Hunter <donald.hunter@gmail.com>
-To: netdev@vger.kernel.org,
-	Jakub Kicinski <kuba@kernel.org>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Simon Horman <horms@kernel.org>,
-	Johannes Berg <johannes@sipsolutions.net>,
-	linux-wireless@vger.kernel.org
-Cc: donald.hunter@redhat.com,
-	Donald Hunter <donald.hunter@gmail.com>
-Subject: [PATCH net-next v4 10/10] netlink: specs: wireless: add a spec for nl80211
-Date: Fri,  7 Feb 2025 12:15:07 +0000
-Message-ID: <20250207121507.94221-11-donald.hunter@gmail.com>
-X-Mailer: git-send-email 2.48.1
-In-Reply-To: <20250207121507.94221-1-donald.hunter@gmail.com>
-References: <20250207121507.94221-1-donald.hunter@gmail.com>
+	s=arc-20240116; t=1738930574; c=relaxed/simple;
+	bh=39WsFI51lZJBbrvV6T1tprAD5kEvF0k54q0BXneTDrM=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=BBz56nKCCDg34mMzf5I9sFp5+S8KpYJg+eFbVcWDO/9tajcMk+IRT5KRWyvFm480KMGW0VSPoOk3ay+DZaYXGNS5CGT65vWyEjmZoixPJS0+9ejzfPqNW3Yk+rr1iRXgp4QDb9MROG6NqI3/QAx0oOjSNvpC2KO4NpwplmTwPZc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de; spf=pass smtp.mailfrom=pengutronix.de; arc=none smtp.client-ip=185.203.201.7
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=pengutronix.de
+Received: from drehscheibe.grey.stw.pengutronix.de ([2a0a:edc0:0:c01:1d::a2])
+	by metis.whiteo.stw.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
+	(Exim 4.92)
+	(envelope-from <mkl@pengutronix.de>)
+	id 1tgNGb-00062J-47; Fri, 07 Feb 2025 13:15:29 +0100
+Received: from moin.white.stw.pengutronix.de ([2a0a:edc0:0:b01:1d::7b] helo=bjornoya.blackshift.org)
+	by drehscheibe.grey.stw.pengutronix.de with esmtps  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.96)
+	(envelope-from <mkl@pengutronix.de>)
+	id 1tgNGW-003yQ3-2H;
+	Fri, 07 Feb 2025 13:15:24 +0100
+Received: from pengutronix.de (pd9e59fec.dip0.t-ipconnect.de [217.229.159.236])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange ECDHE (prime256v1) server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(Client did not present a certificate)
+	(Authenticated sender: mkl-all@blackshift.org)
+	by smtp.blackshift.org (Postfix) with ESMTPSA id 326FF3BC298;
+	Fri, 07 Feb 2025 12:15:24 +0000 (UTC)
+Date: Fri, 7 Feb 2025 13:15:23 +0100
+From: Marc Kleine-Budde <mkl@pengutronix.de>
+To: Ming Yu <a0282524688@gmail.com>
+Cc: tmyu0@nuvoton.com, lee@kernel.org, linus.walleij@linaro.org, 
+	brgl@bgdev.pl, andi.shyti@kernel.org, mailhol.vincent@wanadoo.fr, 
+	andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com, kuba@kernel.org, 
+	pabeni@redhat.com, wim@linux-watchdog.org, linux@roeck-us.net, jdelvare@suse.com, 
+	alexandre.belloni@bootlin.com, linux-kernel@vger.kernel.org, linux-gpio@vger.kernel.org, 
+	linux-i2c@vger.kernel.org, linux-can@vger.kernel.org, netdev@vger.kernel.org, 
+	linux-watchdog@vger.kernel.org, linux-hwmon@vger.kernel.org, linux-rtc@vger.kernel.org, 
+	linux-usb@vger.kernel.org
+Subject: Re: [PATCH v7 4/7] can: Add Nuvoton NCT6694 CANFD support
+Message-ID: <20250207-savvy-beaver-of-culture-45698d-mkl@pengutronix.de>
+References: <20250207074502.1055111-1-a0282524688@gmail.com>
+ <20250207074502.1055111-5-a0282524688@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: multipart/signed; micalg=pgp-sha512;
+	protocol="application/pgp-signature"; boundary="jwbz2hu4fil3rzed"
+Content-Disposition: inline
+In-Reply-To: <20250207074502.1055111-5-a0282524688@gmail.com>
+X-SA-Exim-Connect-IP: 2a0a:edc0:0:c01:1d::a2
+X-SA-Exim-Mail-From: mkl@pengutronix.de
+X-SA-Exim-Scanned: No (on metis.whiteo.stw.pengutronix.de); SAEximRunCond expanded to false
+X-PTX-Original-Recipient: netdev@vger.kernel.org
 
-Add a rudimentary YNL spec for nl80211 that covers get-wiphy,
-get-interface and get-protocol-features.
 
-./tools/net/ynl/pyynl/cli.py --family nl80211 \
-    --do get-protocol-features
-{'protocol-features': {'split-wiphy-dump'}}
+--jwbz2hu4fil3rzed
+Content-Type: text/plain; protected-headers=v1; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [PATCH v7 4/7] can: Add Nuvoton NCT6694 CANFD support
+MIME-Version: 1.0
 
-./tools/net/ynl/pyynl/cli.py --family nl80211 \
-    --dump get-wiphy --json '{ "split-wiphy-dump": true }'
+On 07.02.2025 15:44:59, Ming Yu wrote:
+> This driver supports Socket CANFD functionality for NCT6694 MFD
+> device based on USB interface.
+>=20
+> Signed-off-by: Ming Yu <a0282524688@gmail.com>
+> ---
+>  MAINTAINERS                         |   1 +
+>  drivers/net/can/usb/Kconfig         |  11 +
+>  drivers/net/can/usb/Makefile        |   1 +
+>  drivers/net/can/usb/nct6694_canfd.c | 809 ++++++++++++++++++++++++++++
+>  4 files changed, 822 insertions(+)
+>  create mode 100644 drivers/net/can/usb/nct6694_canfd.c
+>=20
+> diff --git a/MAINTAINERS b/MAINTAINERS
+> index 1327e7a6e507..8aa611504172 100644
+> --- a/MAINTAINERS
+> +++ b/MAINTAINERS
+> @@ -16925,6 +16925,7 @@ S:	Supported
+>  F:	drivers/gpio/gpio-nct6694.c
+>  F:	drivers/i2c/busses/i2c-nct6694.c
+>  F:	drivers/mfd/nct6694.c
+> +F:	drivers/net/can/usb/nct6694_canfd.c
+>  F:	include/linux/mfd/nct6694.h
+> =20
+>  NVIDIA (rivafb and nvidiafb) FRAMEBUFFER DRIVER
+> diff --git a/drivers/net/can/usb/Kconfig b/drivers/net/can/usb/Kconfig
+> index 9dae0c71a2e1..759e724a67cf 100644
+> --- a/drivers/net/can/usb/Kconfig
+> +++ b/drivers/net/can/usb/Kconfig
+> @@ -133,6 +133,17 @@ config CAN_MCBA_USB
+>  	  This driver supports the CAN BUS Analyzer interface
+>  	  from Microchip (http://www.microchip.com/development-tools/).
+> =20
+> +config CAN_NCT6694
+> +	tristate "Nuvoton NCT6694 Socket CANfd support"
+> +	depends on MFD_NCT6694
+> +	select CAN_RX_OFFLOAD
+> +	help
+> +	  If you say yes to this option, support will be included for Nuvoton
+> +	  NCT6694, a USB device to socket CANfd controller.
+> +
+> +	  This driver can also be built as a module. If so, the module will
+> +	  be called nct6694_canfd.
+> +
+>  config CAN_PEAK_USB
+>  	tristate "PEAK PCAN-USB/USB Pro interfaces for CAN 2.0b/CAN-FD"
+>  	help
+> diff --git a/drivers/net/can/usb/Makefile b/drivers/net/can/usb/Makefile
+> index 8b11088e9a59..fcafb1ac262e 100644
+> --- a/drivers/net/can/usb/Makefile
+> +++ b/drivers/net/can/usb/Makefile
+> @@ -11,5 +11,6 @@ obj-$(CONFIG_CAN_F81604) +=3D f81604.o
+>  obj-$(CONFIG_CAN_GS_USB) +=3D gs_usb.o
+>  obj-$(CONFIG_CAN_KVASER_USB) +=3D kvaser_usb/
+>  obj-$(CONFIG_CAN_MCBA_USB) +=3D mcba_usb.o
+> +obj-$(CONFIG_CAN_NCT6694) +=3D nct6694_canfd.o
+>  obj-$(CONFIG_CAN_PEAK_USB) +=3D peak_usb/
+>  obj-$(CONFIG_CAN_UCAN) +=3D ucan.o
+> diff --git a/drivers/net/can/usb/nct6694_canfd.c b/drivers/net/can/usb/nc=
+t6694_canfd.c
+> new file mode 100644
+> index 000000000000..a7527020ff71
+> --- /dev/null
+> +++ b/drivers/net/can/usb/nct6694_canfd.c
+> @@ -0,0 +1,809 @@
+> +// SPDX-License-Identifier: GPL-2.0
+> +/*
+> + * Nuvoton NCT6694 Socket CANfd driver based on USB interface.
+> + *
+> + * Copyright (C) 2024 Nuvoton Technology Corp.
+> + */
 
-./tools/net/ynl/pyynl/cli.py --family nl80211 \
-    --dump get-interface
+/* net-dev style multiline
+ * comments look like this
+ */
 
-Signed-off-by: Donald Hunter <donald.hunter@gmail.com>
----
- Documentation/netlink/specs/nl80211.yaml | 2000 ++++++++++++++++++++++
- tools/net/ynl/Makefile.deps              |    1 +
- 2 files changed, 2001 insertions(+)
- create mode 100644 Documentation/netlink/specs/nl80211.yaml
+> +
+> +#include <linux/can/dev.h>
+> +#include <linux/can/rx-offload.h>
+> +#include <linux/ethtool.h>
+> +#include <linux/irqdomain.h>
+> +#include <linux/kernel.h>
+> +#include <linux/mfd/core.h>
+> +#include <linux/mfd/nct6694.h>
+> +#include <linux/module.h>
+> +#include <linux/netdevice.h>
+> +#include <linux/platform_device.h>
+> +
+> +#define DRVNAME "nct6694_canfd"
+> +
+> +/*
+> + * USB command module type for NCT6694 CANfd controller.
+> + * This defines the module type used for communication with the NCT6694
+> + * CANfd controller over the USB interface.
+> + */
 
-diff --git a/Documentation/netlink/specs/nl80211.yaml b/Documentation/netlink/specs/nl80211.yaml
-new file mode 100644
-index 000000000000..30e5c3add528
---- /dev/null
-+++ b/Documentation/netlink/specs/nl80211.yaml
-@@ -0,0 +1,2000 @@
-+# SPDX-License-Identifier: ((GPL-2.0 WITH Linux-syscall-note) OR BSD-3-Clause)
-+
-+name: nl80211
-+protocol: genetlink-legacy
-+
-+doc:
-+  Netlink API for 802.11 wireless devices
-+
-+definitions:
-+  -
-+    name: commands
-+    type: enum
-+    entries:
-+      - unspec
-+      - get-wiphy
-+      - set-wiphy
-+      - new-wiphy
-+      - del-wiphy
-+      - get-interface
-+      - set-interface
-+      - new-interface
-+      - del-interface
-+      - get-key
-+      - set-key
-+      - new-key
-+      - del-key
-+      - get-beacon
-+      - set-beacon
-+      - new-beacon
-+      - del-beacon
-+      - get-station
-+      - set-station
-+      - new-station
-+      - del-station
-+      - get-mpath
-+      - set-mpath
-+      - new-mpath
-+      - del-mpath
-+      - set-bss
-+      - set-reg
-+      - req-set-reg
-+      - get-mesh-config
-+      - set-mesh-config
-+      - set-mgmt-extra-ie
-+      - get-reg
-+      - get-scan
-+      - trigger-scan
-+      - new-scan-results
-+      - scan-aborted
-+      - reg-change
-+      - authenticate
-+      - associate
-+      - deauthenticate
-+      - disassociate
-+      - michael-mic-failure
-+      - reg-beacon-hint
-+      - join-ibss
-+      - leave-ibss
-+      - testmode
-+      - connect
-+      - roam
-+      - disconnect
-+      - set-wiphy-netns
-+      - get-survey
-+      - new-survey-results
-+      - set-pmksa
-+      - del-pmksa
-+      - flush-pmksa
-+      - remain-on-channel
-+      - cancel-remain-on-channel
-+      - set-tx-bitrate-mask
-+      - register-action
-+      - action
-+      - action-tx-status
-+      - set-power-save
-+      - get-power-save
-+      - set-cqm
-+      - notify-cqm
-+      - set-channel
-+      - set-wds-peer
-+      - frame-wait-cancel
-+      - join-mesh
-+      - leave-mesh
-+      - unprot-deauthenticate
-+      - unprot-disassociate
-+      - new-peer-candidate
-+      - get-wowlan
-+      - set-wowlan
-+      - start-sched-scan
-+      - stop-sched-scan
-+      - sched-scan-results
-+      - sched-scan-stopped
-+      - set-rekey-offload
-+      - pmksa-candidate
-+      - tdls-oper
-+      - tdls-mgmt
-+      - unexpected-frame
-+      - probe-client
-+      - register-beacons
-+      - unexpected-4-addr-frame
-+      - set-noack-map
-+      - ch-switch-notify
-+      - start-p2p-device
-+      - stop-p2p-device
-+      - conn-failed
-+      - set-mcast-rate
-+      - set-mac-acl
-+      - radar-detect
-+      - get-protocol-features
-+      - update-ft-ies
-+      - ft-event
-+      - crit-protocol-start
-+      - crit-protocol-stop
-+      - get-coalesce
-+      - set-coalesce
-+      - channel-switch
-+      - vendor
-+      - set-qos-map
-+      - add-tx-ts
-+      - del-tx-ts
-+      - get-mpp
-+      - join-ocb
-+      - leave-ocb
-+      - ch-switch-started-notify
-+      - tdls-channel-switch
-+      - tdls-cancel-channel-switch
-+      - wiphy-reg-change
-+      - abort-scan
-+      - start-nan
-+      - stop-nan
-+      - add-nan-function
-+      - del-nan-function
-+      - change-nan-config
-+      - nan-match
-+      - set-multicast-to-unicast
-+      - update-connect-params
-+      - set-pmk
-+      - del-pmk
-+      - port-authorized
-+      - reload-regdb
-+      - external-auth
-+      - sta-opmode-changed
-+      - control-port-frame
-+      - get-ftm-responder-stats
-+      - peer-measurement-start
-+      - peer-measurement-result
-+      - peer-measurement-complete
-+      - notify-radar
-+      - update-owe-info
-+      - probe-mesh-link
-+      - set-tid-config
-+      - unprot-beacon
-+      - control-port-frame-tx-status
-+      - set-sar-specs
-+      - obss-color-collision
-+      - color-change-request
-+      - color-change-started
-+      - color-change-aborted
-+      - color-change-completed
-+      - set-fils-aad
-+      - assoc-comeback
-+      - add-link
-+      - remove-link
-+      - add-link-sta
-+      - modify-link-sta
-+      - remove-link-sta
-+      - set-hw-timestamp
-+      - links-removed
-+      - set-tid-to-link-mapping
-+  -
-+    name: feature-flags
-+    type: flags
-+    entries:
-+      - sk-tx-status
-+      - ht-ibss
-+      - inactivity-timer
-+      - cell-base-reg-hints
-+      - p2p-device-needs-channel
-+      - sae
-+      - low-priority-scan
-+      - scan-flush
-+      - ap-scan
-+      - vif-txpower
-+      - need-obss-scan
-+      - p2p-go-ctwin
-+      - p2p-go-oppps
-+      - reserved
-+      - advertise-chan-limits
-+      - full-ap-client-state
-+      - userspace-mpm
-+      - active-monitor
-+      - ap-mode-chan-width-change
-+      - ds-param-set-ie-in-probes
-+      - wfa-tpc-ie-in-probes
-+      - quiet
-+      - tx-power-insertion
-+      - ackto-estimation
-+      - static-smps
-+      - dynamic-smps
-+      - supports-wmm-admission
-+      - mac-on-create
-+      - tdls-channel-switch
-+      - scan-random-mac-addr
-+      - sched-scan-random-mac-addr
-+      - no-random-mac-addr
-+  -
-+    name: ieee80211-mcs-info
-+    type: struct
-+    members:
-+      -
-+        name: rx-mask
-+        type: binary
-+        len: 10
-+      -
-+        name: rx-highest
-+        type: u16
-+        byte-order: little-endian
-+      -
-+        name: tx-params
-+        type: u8
-+      -
-+        name: reserved
-+        type: binary
-+        len: 3
-+  -
-+    name: ieee80211-vht-mcs-info
-+    type: struct
-+    members:
-+      -
-+        name: rx-mcs-map
-+        type: u16
-+        byte-order: little-endian
-+      -
-+        name: rx-highest
-+        type: u16
-+        byte-order: little-endian
-+      -
-+        name: tx-mcs-map
-+        type: u16
-+        byte-order: little-endian
-+      -
-+        name: tx-highest
-+        type: u16
-+        byte-order: little-endian
-+  -
-+    name: ieee80211-ht-cap
-+    type: struct
-+    members:
-+      -
-+        name: cap-info
-+        type: u16
-+        byte-order: little-endian
-+      -
-+        name: ampdu-params-info
-+        type: u8
-+      -
-+        name: mcs
-+        type: binary
-+        struct: ieee80211-mcs-info
-+      -
-+        name: extended-ht-cap-info
-+        type: u16
-+        byte-order: little-endian
-+      -
-+        name: tx-bf-cap-info
-+        type: u32
-+        byte-order: little-endian
-+      -
-+        name: antenna-selection-info
-+        type: u8
-+  -
-+    name: channel-type
-+    type: enum
-+    entries:
-+      - no-ht
-+      - ht20
-+      - ht40minus
-+      - ht40plus
-+  -
-+    name: sta-flag-update
-+    type: struct
-+    members:
-+      -
-+        name: mask
-+        type: u32
-+      -
-+        name: set
-+        type: u32
-+  -
-+    name: protocol-features
-+    type: flags
-+    entries:
-+      - split-wiphy-dump
-+
-+attribute-sets:
-+  -
-+    name: nl80211-attrs
-+    name-prefix: nl80211-attr-
-+    enum-name: nl80211-attrs
-+    attr-max-name: num-nl80211-attr
-+    attributes:
-+      -
-+        name: wiphy
-+        type: u32
-+      -
-+        name: wiphy-name
-+        type: string
-+      -
-+        name: ifindex
-+        type: u32
-+      -
-+        name: ifname
-+        type: string
-+      -
-+        name: iftype
-+        type: u32
-+      -
-+        name: mac
-+        type: binary
-+        display-hint: mac
-+      -
-+        name: key-data
-+        type: binary
-+      -
-+        name: key-idx
-+        type: u8
-+      -
-+        name: key-cipher
-+        type: u32
-+      -
-+        name: key-seq
-+        type: binary
-+      -
-+        name: key-default
-+        type: flag
-+      -
-+        name: beacon-interval
-+        type: u32
-+      -
-+        name: dtim-period
-+        type: u32
-+      -
-+        name: beacon-head
-+        type: binary
-+      -
-+        name: beacon-tail
-+        type: binary
-+      -
-+        name: sta-aid
-+        type: u16
-+      -
-+        name: sta-flags
-+        type: binary # TODO: nest
-+      -
-+        name: sta-listen-interval
-+        type: u16
-+      -
-+        name: sta-supported-rates
-+        type: binary
-+      -
-+        name: sta-vlan
-+        type: u32
-+      -
-+        name: sta-info
-+        type: binary # TODO: nest
-+      -
-+        name: wiphy-bands
-+        type: nest
-+        nested-attributes: wiphy-bands
-+      -
-+        name: mntr-flags
-+        type: binary # TODO: nest
-+      -
-+        name: mesh-id
-+        type: binary
-+      -
-+        name: sta-plink-action
-+        type: u8
-+      -
-+        name: mpath-next-hop
-+        type: binary
-+        display-hint: mac
-+      -
-+        name: mpath-info
-+        type: binary # TODO: nest
-+      -
-+        name: bss-cts-prot
-+        type: u8
-+      -
-+        name: bss-short-preamble
-+        type: u8
-+      -
-+        name: bss-short-slot-time
-+        type: u8
-+      -
-+        name: ht-capability
-+        type: binary
-+      -
-+        name: supported-iftypes
-+        type: nest
-+        nested-attributes: supported-iftypes
-+      -
-+        name: reg-alpha2
-+        type: binary
-+      -
-+        name: reg-rules
-+        type: binary # TODO: nest
-+      -
-+        name: mesh-config
-+        type: binary # TODO: nest
-+      -
-+        name: bss-basic-rates
-+        type: binary
-+      -
-+        name: wiphy-txq-params
-+        type: binary # TODO: nest
-+      -
-+        name: wiphy-freq
-+        type: u32
-+      -
-+        name: wiphy-channel-type
-+        type: u32
-+        enum: channel-type
-+      -
-+        name: key-default-mgmt
-+        type: flag
-+      -
-+        name: mgmt-subtype
-+        type: u8
-+      -
-+        name: ie
-+        type: binary
-+      -
-+        name: max-num-scan-ssids
-+        type: u8
-+      -
-+        name: scan-frequencies
-+        type: binary # TODO: nest
-+      -
-+        name: scan-ssids
-+        type: binary # TODO: nest
-+      -
-+        name: generation
-+        type: u32
-+      -
-+        name: bss
-+        type: binary # TODO: nest
-+      -
-+        name: reg-initiator
-+        type: u8
-+      -
-+        name: reg-type
-+        type: u8
-+      -
-+        name: supported-commands
-+        type: indexed-array
-+        sub-type: u32
-+        enum: commands
-+      -
-+        name: frame
-+        type: binary
-+      -
-+        name: ssid
-+        type: binary
-+      -
-+        name: auth-type
-+        type: u32
-+      -
-+        name: reason-code
-+        type: u16
-+      -
-+        name: key-type
-+        type: u32
-+      -
-+        name: max-scan-ie-len
-+        type: u16
-+      -
-+        name: cipher-suites
-+        type: binary
-+        sub-type: u32
-+        display-hint: hex
-+      -
-+        name: freq-before
-+        type: binary # TODO: nest
-+      -
-+        name: freq-after
-+        type: binary # TODO: nest
-+      -
-+        name: freq-fixed
-+        type: flag
-+      -
-+        name: wiphy-retry-short
-+        type: u8
-+      -
-+        name: wiphy-retry-long
-+        type: u8
-+      -
-+        name: wiphy-frag-threshold
-+        type: u32
-+      -
-+        name: wiphy-rts-threshold
-+        type: u32
-+      -
-+        name: timed-out
-+        type: flag
-+      -
-+        name: use-mfp
-+        type: u32
-+      -
-+        name: sta-flags2
-+        type: binary
-+        struct: sta-flag-update
-+      -
-+        name: control-port
-+        type: flag
-+      -
-+        name: testdata
-+        type: binary
-+      -
-+        name: privacy
-+        type: flag
-+      -
-+        name: disconnected-by-ap
-+        type: flag
-+      -
-+        name: status-code
-+        type: u16
-+      -
-+        name: cipher-suites-pairwise
-+        type: binary
-+      -
-+        name: cipher-suite-group
-+        type: u32
-+      -
-+        name: wpa-versions
-+        type: u32
-+      -
-+        name: akm-suites
-+        type: binary
-+      -
-+        name: req-ie
-+        type: binary
-+      -
-+        name: resp-ie
-+        type: binary
-+      -
-+        name: prev-bssid
-+        type: binary
-+      -
-+        name: key
-+        type: binary # TODO: nest
-+      -
-+        name: keys
-+        type: binary # TODO: nest
-+      -
-+        name: pid
-+        type: u32
-+      -
-+        name: 4addr
-+        type: u8
-+      -
-+        name: survey-info
-+        type: binary # TODO: nest
-+      -
-+        name: pmkid
-+        type: binary
-+      -
-+        name: max-num-pmkids
-+        type: u8
-+      -
-+        name: duration
-+        type: u32
-+      -
-+        name: cookie
-+        type: u64
-+      -
-+        name: wiphy-coverage-class
-+        type: u8
-+      -
-+        name: tx-rates
-+        type: binary # TODO: nest
-+      -
-+        name: frame-match
-+        type: binary
-+      -
-+        name: ack
-+        type: flag
-+      -
-+        name: ps-state
-+        type: u32
-+      -
-+        name: cqm
-+        type: binary # TODO: nest
-+      -
-+        name: local-state-change
-+        type: flag
-+      -
-+        name: ap-isolate
-+        type: u8
-+      -
-+        name: wiphy-tx-power-setting
-+        type: u32
-+      -
-+        name: wiphy-tx-power-level
-+        type: u32
-+      -
-+        name: tx-frame-types
-+        type: nest
-+        nested-attributes: nl80211-iftype-attrs
-+      -
-+        name: rx-frame-types
-+        type: nest
-+        nested-attributes: nl80211-iftype-attrs
-+      -
-+        name: frame-type
-+        type: u16
-+      -
-+        name: control-port-ethertype
-+        type: flag
-+      -
-+        name: control-port-no-encrypt
-+        type: flag
-+      -
-+        name: support-ibss-rsn
-+        type: flag
-+      -
-+        name: wiphy-antenna-tx
-+        type: u32
-+      -
-+        name: wiphy-antenna-rx
-+        type: u32
-+      -
-+        name: mcast-rate
-+        type: u32
-+      -
-+        name: offchannel-tx-ok
-+        type: flag
-+      -
-+        name: bss-ht-opmode
-+        type: u16
-+      -
-+        name: key-default-types
-+        type: binary # TODO: nest
-+      -
-+        name: max-remain-on-channel-duration
-+        type: u32
-+      -
-+        name: mesh-setup
-+        type: binary # TODO: nest
-+      -
-+        name: wiphy-antenna-avail-tx
-+        type: u32
-+      -
-+        name: wiphy-antenna-avail-rx
-+        type: u32
-+      -
-+        name: support-mesh-auth
-+        type: flag
-+      -
-+        name: sta-plink-state
-+        type: u8
-+      -
-+        name: wowlan-triggers
-+        type: binary # TODO: nest
-+      -
-+        name: wowlan-triggers-supported
-+        type: nest
-+        nested-attributes: wowlan-triggers-attrs
-+      -
-+        name: sched-scan-interval
-+        type: u32
-+      -
-+        name: interface-combinations
-+        type: indexed-array
-+        sub-type: nest
-+        nested-attributes: if-combination-attributes
-+      -
-+        name: software-iftypes
-+        type: nest
-+        nested-attributes: supported-iftypes
-+      -
-+        name: rekey-data
-+        type: binary # TODO: nest
-+      -
-+        name: max-num-sched-scan-ssids
-+        type: u8
-+      -
-+        name: max-sched-scan-ie-len
-+        type: u16
-+      -
-+        name: scan-supp-rates
-+        type: binary # TODO: nest
-+      -
-+        name: hidden-ssid
-+        type: u32
-+      -
-+        name: ie-probe-resp
-+        type: binary
-+      -
-+        name: ie-assoc-resp
-+        type: binary
-+      -
-+        name: sta-wme
-+        type: binary # TODO: nest
-+      -
-+        name: support-ap-uapsd
-+        type: flag
-+      -
-+        name: roam-support
-+        type: flag
-+      -
-+        name: sched-scan-match
-+        type: binary # TODO: nest
-+      -
-+        name: max-match-sets
-+        type: u8
-+      -
-+        name: pmksa-candidate
-+        type: binary # TODO: nest
-+      -
-+        name: tx-no-cck-rate
-+        type: flag
-+      -
-+        name: tdls-action
-+        type: u8
-+      -
-+        name: tdls-dialog-token
-+        type: u8
-+      -
-+        name: tdls-operation
-+        type: u8
-+      -
-+        name: tdls-support
-+        type: flag
-+      -
-+        name: tdls-external-setup
-+        type: flag
-+      -
-+        name: device-ap-sme
-+        type: u32
-+      -
-+        name: dont-wait-for-ack
-+        type: flag
-+      -
-+        name: feature-flags
-+        type: u32
-+        enum: feature-flags
-+        enum-as-flags: True
-+      -
-+        name: probe-resp-offload
-+        type: u32
-+      -
-+        name: probe-resp
-+        type: binary
-+      -
-+        name: dfs-region
-+        type: u8
-+      -
-+        name: disable-ht
-+        type: flag
-+      -
-+        name: ht-capability-mask
-+        type: binary
-+        struct: ieee80211-ht-cap
-+      -
-+        name: noack-map
-+        type: u16
-+      -
-+        name: inactivity-timeout
-+        type: u16
-+      -
-+        name: rx-signal-dbm
-+        type: u32
-+      -
-+        name: bg-scan-period
-+        type: u16
-+      -
-+        name: wdev
-+        type: u64
-+      -
-+        name: user-reg-hint-type
-+        type: u32
-+      -
-+        name: conn-failed-reason
-+        type: u32
-+      -
-+        name: auth-data
-+        type: binary
-+      -
-+        name: vht-capability
-+        type: binary
-+      -
-+        name: scan-flags
-+        type: u32
-+      -
-+        name: channel-width
-+        type: u32
-+      -
-+        name: center-freq1
-+        type: u32
-+      -
-+        name: center-freq2
-+        type: u32
-+      -
-+        name: p2p-ctwindow
-+        type: u8
-+      -
-+        name: p2p-oppps
-+        type: u8
-+      -
-+        name: local-mesh-power-mode
-+        type: u32
-+      -
-+        name: acl-policy
-+        type: u32
-+      -
-+        name: mac-addrs
-+        type: binary # TODO: nest
-+      -
-+        name: mac-acl-max
-+        type: u32
-+      -
-+        name: radar-event
-+        type: u32
-+      -
-+        name: ext-capa
-+        type: binary
-+      -
-+        name: ext-capa-mask
-+        type: binary
-+      -
-+        name: sta-capability
-+        type: u16
-+      -
-+        name: sta-ext-capability
-+        type: binary
-+      -
-+        name: protocol-features
-+        type: u32
-+        enum: protocol-features
-+      -
-+        name: split-wiphy-dump
-+        type: flag
-+      -
-+        name: disable-vht
-+        type: flag
-+      -
-+        name: vht-capability-mask
-+        type: binary
-+      -
-+        name: mdid
-+        type: u16
-+      -
-+        name: ie-ric
-+        type: binary
-+      -
-+        name: crit-prot-id
-+        type: u16
-+      -
-+        name: max-crit-prot-duration
-+        type: u16
-+      -
-+        name: peer-aid
-+        type: u16
-+      -
-+        name: coalesce-rule
-+        type: binary # TODO: nest
-+      -
-+        name: ch-switch-count
-+        type: u32
-+      -
-+        name: ch-switch-block-tx
-+        type: flag
-+      -
-+        name: csa-ies
-+        type: binary # TODO: nest
-+      -
-+        name: cntdwn-offs-beacon
-+        type: binary
-+      -
-+        name: cntdwn-offs-presp
-+        type: binary
-+      -
-+        name: rxmgmt-flags
-+        type: binary
-+      -
-+        name: sta-supported-channels
-+        type: binary
-+      -
-+        name: sta-supported-oper-classes
-+        type: binary
-+      -
-+        name: handle-dfs
-+        type: flag
-+      -
-+        name: support-5-mhz
-+        type: flag
-+      -
-+        name: support-10-mhz
-+        type: flag
-+      -
-+        name: opmode-notif
-+        type: u8
-+      -
-+        name: vendor-id
-+        type: u32
-+      -
-+        name: vendor-subcmd
-+        type: u32
-+      -
-+        name: vendor-data
-+        type: binary
-+      -
-+        name: vendor-events
-+        type: binary
-+      -
-+        name: qos-map
-+        type: binary
-+      -
-+        name: mac-hint
-+        type: binary
-+        display-hint: mac
-+      -
-+        name: wiphy-freq-hint
-+        type: u32
-+      -
-+        name: max-ap-assoc-sta
-+        type: u32
-+      -
-+        name: tdls-peer-capability
-+        type: u32
-+      -
-+        name: socket-owner
-+        type: flag
-+      -
-+        name: csa-c-offsets-tx
-+        type: binary
-+      -
-+        name: max-csa-counters
-+        type: u8
-+      -
-+        name: tdls-initiator
-+        type: flag
-+      -
-+        name: use-rrm
-+        type: flag
-+      -
-+        name: wiphy-dyn-ack
-+        type: flag
-+      -
-+        name: tsid
-+        type: u8
-+      -
-+        name: user-prio
-+        type: u8
-+      -
-+        name: admitted-time
-+        type: u16
-+      -
-+        name: smps-mode
-+        type: u8
-+      -
-+        name: oper-class
-+        type: u8
-+      -
-+        name: mac-mask
-+        type: binary
-+        display-hint: mac
-+      -
-+        name: wiphy-self-managed-reg
-+        type: flag
-+      -
-+        name: ext-features
-+        type: binary
-+      -
-+        name: survey-radio-stats
-+        type: binary
-+      -
-+        name: netns-fd
-+        type: u32
-+      -
-+        name: sched-scan-delay
-+        type: u32
-+      -
-+        name: reg-indoor
-+        type: flag
-+      -
-+        name: max-num-sched-scan-plans
-+        type: u32
-+      -
-+        name: max-scan-plan-interval
-+        type: u32
-+      -
-+        name: max-scan-plan-iterations
-+        type: u32
-+      -
-+        name: sched-scan-plans
-+        type: binary # TODO: nest
-+      -
-+        name: pbss
-+        type: flag
-+      -
-+        name: bss-select
-+        type: binary # TODO: nest
-+      -
-+        name: sta-support-p2p-ps
-+        type: u8
-+      -
-+        name: pad
-+        type: binary
-+      -
-+        name: iftype-ext-capa
-+        type: binary # TODO: nest
-+      -
-+        name: mu-mimo-group-data
-+        type: binary
-+      -
-+        name: mu-mimo-follow-mac-addr
-+        type: binary
-+        display-hint: mac
-+      -
-+        name: scan-start-time-tsf
-+        type: u64
-+      -
-+        name: scan-start-time-tsf-bssid
-+        type: binary
-+      -
-+        name: measurement-duration
-+        type: u16
-+      -
-+        name: measurement-duration-mandatory
-+        type: flag
-+      -
-+        name: mesh-peer-aid
-+        type: u16
-+      -
-+        name: nan-master-pref
-+        type: u8
-+      -
-+        name: bands
-+        type: u32
-+      -
-+        name: nan-func
-+        type: binary # TODO: nest
-+      -
-+        name: nan-match
-+        type: binary # TODO: nest
-+      -
-+        name: fils-kek
-+        type: binary
-+      -
-+        name: fils-nonces
-+        type: binary
-+      -
-+        name: multicast-to-unicast-enabled
-+        type: flag
-+      -
-+        name: bssid
-+        type: binary
-+        display-hint: mac
-+      -
-+        name: sched-scan-relative-rssi
-+        type: s8
-+      -
-+        name: sched-scan-rssi-adjust
-+        type: binary
-+      -
-+        name: timeout-reason
-+        type: u32
-+      -
-+        name: fils-erp-username
-+        type: binary
-+      -
-+        name: fils-erp-realm
-+        type: binary
-+      -
-+        name: fils-erp-next-seq-num
-+        type: u16
-+      -
-+        name: fils-erp-rrk
-+        type: binary
-+      -
-+        name: fils-cache-id
-+        type: binary
-+      -
-+        name: pmk
-+        type: binary
-+      -
-+        name: sched-scan-multi
-+        type: flag
-+      -
-+        name: sched-scan-max-reqs
-+        type: u32
-+      -
-+        name: want-1x-4way-hs
-+        type: flag
-+      -
-+        name: pmkr0-name
-+        type: binary
-+      -
-+        name: port-authorized
-+        type: binary
-+      -
-+        name: external-auth-action
-+        type: u32
-+      -
-+        name: external-auth-support
-+        type: flag
-+      -
-+        name: nss
-+        type: u8
-+      -
-+        name: ack-signal
-+        type: s32
-+      -
-+        name: control-port-over-nl80211
-+        type: flag
-+      -
-+        name: txq-stats
-+        type: nest
-+        nested-attributes: txq-stats-attrs
-+      -
-+        name: txq-limit
-+        type: u32
-+      -
-+        name: txq-memory-limit
-+        type: u32
-+      -
-+        name: txq-quantum
-+        type: u32
-+      -
-+        name: he-capability
-+        type: binary
-+      -
-+        name: ftm-responder
-+        type: binary # TODO: nest
-+      -
-+        name: ftm-responder-stats
-+        type: binary # TODO: nest
-+      -
-+        name: timeout
-+        type: u32
-+      -
-+        name: peer-measurements
-+        type: binary # TODO: nest
-+      -
-+        name: airtime-weight
-+        type: u16
-+      -
-+        name: sta-tx-power-setting
-+        type: u8
-+      -
-+        name: sta-tx-power
-+        type: s16
-+      -
-+        name: sae-password
-+        type: binary
-+      -
-+        name: twt-responder
-+        type: flag
-+      -
-+        name: he-obss-pd
-+        type: binary # TODO: nest
-+      -
-+        name: wiphy-edmg-channels
-+        type: u8
-+      -
-+        name: wiphy-edmg-bw-config
-+        type: u8
-+      -
-+        name: vlan-id
-+        type: u16
-+      -
-+        name: he-bss-color
-+        type: binary # TODO: nest
-+      -
-+        name: iftype-akm-suites
-+        type: binary # TODO: nest
-+      -
-+        name: tid-config
-+        type: binary # TODO: nest
-+      -
-+        name: control-port-no-preauth
-+        type: flag
-+      -
-+        name: pmk-lifetime
-+        type: u32
-+      -
-+        name: pmk-reauth-threshold
-+        type: u8
-+      -
-+        name: receive-multicast
-+        type: flag
-+      -
-+        name: wiphy-freq-offset
-+        type: u32
-+      -
-+        name: center-freq1-offset
-+        type: u32
-+      -
-+        name: scan-freq-khz
-+        type: binary # TODO: nest
-+      -
-+        name: he-6ghz-capability
-+        type: binary
-+      -
-+        name: fils-discovery
-+        type: binary # TOOD: nest
-+      -
-+        name: unsol-bcast-probe-resp
-+        type: binary # TOOD: nest
-+      -
-+        name: s1g-capability
-+        type: binary
-+      -
-+        name: s1g-capability-mask
-+        type: binary
-+      -
-+        name: sae-pwe
-+        type: u8
-+      -
-+        name: reconnect-requested
-+        type: binary
-+      -
-+        name: sar-spec
-+        type: nest
-+        nested-attributes: sar-attributes
-+      -
-+        name: disable-he
-+        type: flag
-+      -
-+        name: obss-color-bitmap
-+        type: u64
-+      -
-+        name: color-change-count
-+        type: u8
-+      -
-+        name: color-change-color
-+        type: u8
-+      -
-+        name: color-change-elems
-+        type: binary # TODO: nest
-+      -
-+        name: mbssid-config
-+        type: binary # TODO: nest
-+      -
-+        name: mbssid-elems
-+        type: binary # TODO: nest
-+      -
-+        name: radar-background
-+        type: flag
-+      -
-+        name: ap-settings-flags
-+        type: u32
-+      -
-+        name: eht-capability
-+        type: binary
-+      -
-+        name: disable-eht
-+        type: flag
-+      -
-+        name: mlo-links
-+        type: binary # TODO: nest
-+      -
-+        name: mlo-link-id
-+        type: u8
-+      -
-+        name: mld-addr
-+        type: binary
-+        display-hint: mac
-+      -
-+        name: mlo-support
-+        type: flag
-+      -
-+        name: max-num-akm-suites
-+        type: binary
-+      -
-+        name: eml-capability
-+        type: u16
-+      -
-+        name: mld-capa-and-ops
-+        type: u16
-+      -
-+        name: tx-hw-timestamp
-+        type: u64
-+      -
-+        name: rx-hw-timestamp
-+        type: u64
-+      -
-+        name: td-bitmap
-+        type: binary
-+      -
-+        name: punct-bitmap
-+        type: u32
-+      -
-+        name: max-hw-timestamp-peers
-+        type: u16
-+      -
-+        name: hw-timestamp-enabled
-+        type: flag
-+      -
-+        name: ema-rnr-elems
-+        type: binary # TODO: nest
-+      -
-+        name: mlo-link-disabled
-+        type: flag
-+      -
-+        name: bss-dump-include-use-data
-+        type: flag
-+      -
-+        name: mlo-ttlm-dlink
-+        type: u16
-+      -
-+        name: mlo-ttlm-ulink
-+        type: u16
-+      -
-+        name: assoc-spp-amsdu
-+        type: flag
-+      -
-+        name: wiphy-radios
-+        type: binary # TODO: nest
-+      -
-+        name: wiphy-interface-combinations
-+        type: binary # TODO: nest
-+      -
-+        name: vif-radio-mask
-+        type: u32
-+  -
-+    name: frame-type-attrs
-+    subset-of: nl80211-attrs
-+    attributes:
-+      -
-+        name: frame-type
-+  -
-+    name: wiphy-bands
-+    name-prefix: nl80211-band-
-+    attr-max-name: num-nl80211-bands
-+    attributes:
-+      -
-+        name: 2ghz
-+        doc: 2.4 GHz ISM band
-+        value: 0
-+        type: nest
-+        nested-attributes: band-attrs
-+      -
-+        name: 5ghz
-+        doc: around 5 GHz band (4.9 - 5.7 GHz)
-+        type: nest
-+        nested-attributes: band-attrs
-+      -
-+        name: 60ghz
-+        doc: around 60 GHz band (58.32 - 69.12 GHz)
-+        type: nest
-+        nested-attributes: band-attrs
-+      -
-+        name: 6ghz
-+        type: nest
-+        nested-attributes: band-attrs
-+      -
-+        name: s1ghz
-+        type: nest
-+        nested-attributes: band-attrs
-+      -
-+        name: lc
-+        type: nest
-+        nested-attributes: band-attrs
-+  -
-+    name: band-attrs
-+    enum-name: nl80211-band-attr
-+    name-prefix: nl80211-band-attr-
-+    attributes:
-+      -
-+        name: freqs
-+        type: indexed-array
-+        sub-type: nest
-+        nested-attributes: frequency-attrs
-+      -
-+        name: rates
-+        type: indexed-array
-+        sub-type: nest
-+        nested-attributes: bitrate-attrs
-+      -
-+        name: ht-mcs-set
-+        type: binary
-+        struct: ieee80211-mcs-info
-+      -
-+        name: ht-capa
-+        type: u16
-+      -
-+        name: ht-ampdu-factor
-+        type: u8
-+      -
-+        name: ht-ampdu-density
-+        type: u8
-+      -
-+        name: vht-mcs-set
-+        type: binary
-+        struct: ieee80211-vht-mcs-info
-+      -
-+        name: vht-capa
-+        type: u32
-+      -
-+        name: iftype-data
-+        type: indexed-array
-+        sub-type: nest
-+        nested-attributes: iftype-data-attrs
-+      -
-+        name: edmg-channels
-+        type: binary
-+      -
-+        name: edmg-bw-config
-+        type: binary
-+      -
-+        name: s1g-mcs-nss-set
-+        type: binary
-+      -
-+        name: s1g-capa
-+        type: binary
-+  -
-+    name: bitrate-attrs
-+    name-prefix: nl80211-bitrate-attr-
-+    attributes:
-+      -
-+        name: rate
-+        type: u32
-+      -
-+        name: 2ghz-shortpreamble
-+        type: flag
-+  -
-+    name: frequency-attrs
-+    name-prefix: nl80211-frequency-attr-
-+    attributes:
-+      -
-+        name: freq
-+        type: u32
-+      -
-+        name: disabled
-+        type: flag
-+      -
-+        name: no-ir
-+        type: flag
-+      -
-+        name: no-ibss
-+        name-prefix: __nl80211-frequency-attr-
-+        type: flag
-+      -
-+        name: radar
-+        type: flag
-+      -
-+        name: max-tx-power
-+        type: u32
-+      -
-+        name: dfs-state
-+        type: u32
-+      -
-+        name: dfs-time
-+        type: binary
-+      -
-+        name: no-ht40-minus
-+        type: binary
-+      -
-+        name: no-ht40-plus
-+        type: binary
-+      -
-+        name: no-80mhz
-+        type: binary
-+      -
-+        name: no-160mhz
-+        type: binary
-+      -
-+        name: dfs-cac-time
-+        type: binary
-+      -
-+        name: indoor-only
-+        type: binary
-+      -
-+        name: ir-concurrent
-+        type: binary
-+      -
-+        name: no-20mhz
-+        type: binary
-+      -
-+        name: no-10mhz
-+        type: binary
-+      -
-+        name: wmm
-+        type: indexed-array
-+        sub-type: nest
-+        nested-attributes: wmm-attrs
-+      -
-+        name: no-he
-+        type: binary
-+      -
-+        name: offset
-+        type: u32
-+      -
-+        name: 1mhz
-+        type: binary
-+      -
-+        name: 2mhz
-+        type: binary
-+      -
-+        name: 4mhz
-+        type: binary
-+      -
-+        name: 8mhz
-+        type: binary
-+      -
-+        name: 16mhz
-+        type: binary
-+      -
-+        name: no-320mhz
-+        type: binary
-+      -
-+        name: no-eht
-+        type: binary
-+      -
-+        name: psd
-+        type: binary
-+      -
-+        name: dfs-concurrent
-+        type: binary
-+      -
-+        name: no-6ghz-vlp-client
-+        type: binary
-+      -
-+        name: no-6ghz-afc-client
-+        type: binary
-+      -
-+        name: can-monitor
-+        type: binary
-+      -
-+        name: allow-6ghz-vlp-ap
-+        type: binary
-+  -
-+    name: if-combination-attributes
-+    enum-name: nl80211-if-combination-attrs
-+    name-prefix: nl80211-iface-comb-
-+    attr-max-name: max-nl80211-iface-comb
-+    attributes:
-+      -
-+        name: limits
-+        type: indexed-array
-+        sub-type: nest
-+        nested-attributes: iface-limit-attributes
-+      -
-+        name: maxnum
-+        type: u32
-+      -
-+        name: sta-ap-bi-match
-+        type: flag
-+      -
-+        name: num-channels
-+        type: u32
-+      -
-+        name: radar-detect-widths
-+        type: u32
-+      -
-+        name: radar-detect-regions
-+        type: u32
-+      -
-+        name: bi-min-gcd
-+        type: u32
-+  -
-+    name: iface-limit-attributes
-+    enum-name: nl80211-iface-limit-attrs
-+    name-prefix: nl80211-iface-limit-
-+    attr-max-name: max-nl80211-iface-limit
-+    attributes:
-+      -
-+        name: max
-+        type: u32
-+      -
-+        name: types
-+        type: nest
-+        nested-attributes: supported-iftypes
-+  -
-+    name: iftype-data-attrs
-+    name-prefix: nl80211-band-iftype-attr-
-+    attributes:
-+      -
-+        name: iftypes
-+        type: binary
-+      -
-+        name: he-cap-mac
-+        type: binary
-+      -
-+        name: he-cap-phy
-+        type: binary
-+      -
-+        name: he-cap-mcs-set
-+        type: binary
-+      -
-+        name: he-cap-ppe
-+        type: binary
-+      -
-+        name: he-6ghz-capa
-+        type: binary
-+      -
-+        name: vendor-elems
-+        type: binary
-+      -
-+        name: eht-cap-mac
-+        type: binary
-+      -
-+        name: eht-cap-phy
-+        type: binary
-+      -
-+        name: eht-cap-mcs-set
-+        type: binary
-+      -
-+        name: eht-cap-ppe
-+        type: binary
-+  -
-+    name: nl80211-iftype-attrs
-+    enum-name: nl80211-iftype
-+    name-prefix: nl80211-iftype-
-+    attributes:
-+      -
-+        name: unspecified
-+        type: nest
-+        value: 0
-+        nested-attributes: frame-type-attrs
-+      -
-+        name: adhoc
-+        type: nest
-+        nested-attributes: frame-type-attrs
-+      -
-+        name: station
-+        type: nest
-+        nested-attributes: frame-type-attrs
-+      -
-+        name: ap
-+        type: nest
-+        nested-attributes: frame-type-attrs
-+      -
-+        name: ap-vlan
-+        type: nest
-+        nested-attributes: frame-type-attrs
-+      -
-+        name: wds
-+        type: nest
-+        nested-attributes: frame-type-attrs
-+      -
-+        name: monitor
-+        type: nest
-+        nested-attributes: frame-type-attrs
-+      -
-+        name: mesh-point
-+        type: nest
-+        nested-attributes: frame-type-attrs
-+      -
-+        name: p2p-client
-+        type: nest
-+        nested-attributes: frame-type-attrs
-+      -
-+        name: p2p-go
-+        type: nest
-+        nested-attributes: frame-type-attrs
-+      -
-+        name: p2p-device
-+        type: nest
-+        nested-attributes: frame-type-attrs
-+      -
-+        name: ocb
-+        type: nest
-+        nested-attributes: frame-type-attrs
-+      -
-+        name: nan
-+        type: nest
-+        nested-attributes: frame-type-attrs
-+  -
-+    name: sar-attributes
-+    enum-name: nl80211-sar-attrs
-+    name-prefix: nl80211-sar-attr-
-+    attributes:
-+      -
-+        name: type
-+        type: u32
-+      -
-+        name: specs
-+        type: indexed-array
-+        sub-type: nest
-+        nested-attributes: sar-specs
-+  -
-+    name: sar-specs
-+    enum-name: nl80211-sar-specs-attrs
-+    name-prefix: nl80211-sar-attr-specs-
-+    attributes:
-+      -
-+        name: power
-+        type: s32
-+      -
-+        name: range-index
-+        type: u32
-+      -
-+        name: start-freq
-+        type: u32
-+      -
-+        name: end-freq
-+        type: u32
-+  -
-+    name: supported-iftypes
-+    enum-name: nl80211-iftype
-+    name-prefix: nl80211-iftype-
-+    attributes:
-+      -
-+        name: adhoc
-+        type: flag
-+      -
-+        name: station
-+        type: flag
-+      -
-+        name: ap
-+        type: flag
-+      -
-+        name: ap-vlan
-+        type: flag
-+      -
-+        name: wds
-+        type: flag
-+      -
-+        name: monitor
-+        type: flag
-+      -
-+        name: mesh-point
-+        type: flag
-+      -
-+        name: p2p-client
-+        type: flag
-+      -
-+        name: p2p-go
-+        type: flag
-+      -
-+        name: p2p-device
-+        type: flag
-+      -
-+        name: ocb
-+        type: flag
-+      -
-+        name: nan
-+        type: flag
-+  -
-+    name: txq-stats-attrs
-+    name-prefix: nl80211-txq-stats-
-+    attributes:
-+      -
-+        name: backlog-bytes
-+        type: u32
-+      -
-+        name: backlog-packets
-+        type: u32
-+      -
-+        name: flows
-+        type: u32
-+      -
-+        name: drops
-+        type: u32
-+      -
-+        name: ecn-marks
-+        type: u32
-+      -
-+        name: overlimit
-+        type: u32
-+      -
-+        name: overmemory
-+        type: u32
-+      -
-+        name: collisions
-+        type: u32
-+      -
-+        name: tx-bytes
-+        type: u32
-+      -
-+        name: tx-packets
-+        type: u32
-+      -
-+        name: max-flows
-+        type: u32
-+  -
-+    name: wmm-attrs
-+    enum-name: nl80211-wmm-rule
-+    name-prefix: nl80211-wmmr-
-+    attributes:
-+      -
-+        name: cw-min
-+        type: u16
-+      -
-+        name: cw-max
-+        type: u16
-+      -
-+        name: aifsn
-+        type: u8
-+      -
-+        name: txop
-+        type: u16
-+  -
-+    name: wowlan-triggers-attrs
-+    enum-name: nl80211-wowlan-triggers
-+    name-prefix: nl80211-wowlan-trig-
-+    attr-max-name: max-nl80211-wowlan-trig
-+    attributes:
-+      -
-+        name: any
-+        type: flag
-+      -
-+        name: disconnect
-+        type: flag
-+      -
-+        name: magic-pkt
-+        type: flag
-+      -
-+        name: pkt-pattern
-+        type: flag
-+      -
-+        name: gtk-rekey-supported
-+        type: flag
-+      -
-+        name: gtk-rekey-failure
-+        type: flag
-+      -
-+        name: eap-ident-request
-+        type: flag
-+      -
-+        name: 4way-handshake
-+        type: flag
-+      -
-+        name: rfkill-release
-+        type: flag
-+      -
-+        name: wakeup-pkt-80211
-+        type: flag
-+      -
-+        name: wakeup-pkt-80211-len
-+        type: flag
-+      -
-+        name: wakeup-pkt-8023
-+        type: flag
-+      -
-+        name: wakeup-pkt-8023-len
-+        type: flag
-+      -
-+        name: tcp-connection
-+        type: flag
-+      -
-+        name: wakeup-tcp-match
-+        type: flag
-+      -
-+        name: wakeup-tcp-connlost
-+        type: flag
-+      -
-+        name: wakeup-tcp-nomoretokens
-+        type: flag
-+      -
-+        name: net-detect
-+        type: flag
-+      -
-+        name: net-detect-results
-+        type: flag
-+      -
-+        name: unprotected-deauth-disassoc
-+        type: flag
-+
-+operations:
-+  enum-model: directional
-+  list:
-+    -
-+      name: get-wiphy
-+      doc: |
-+        Get information about a wiphy or dump a list of all wiphys. Requests to dump get-wiphy
-+        should unconditionally include the split-wiphy-dump flag in the request.
-+      attribute-set: nl80211-attrs
-+      do:
-+        request:
-+          value: 1
-+          attributes:
-+            - wiphy
-+            - wdev
-+            - ifindex
-+        reply:
-+          value: 3
-+          attributes: &wiphy-reply-attrs
-+            - bands
-+            - cipher-suites
-+            - control-port-ethertype
-+            - ext-capa
-+            - ext-capa-mask
-+            - ext-features
-+            - feature-flags
-+            - generation
-+            - ht-capability-mask
-+            - interface-combinations
-+            - mac
-+            - max-csa-counters
-+            - max-match-sets
-+            - max-num-akm-suites
-+            - max-num-pmkids
-+            - max-num-scan-ssids
-+            - max-num-sched-scan-plans
-+            - max-num-sched-scan-ssids
-+            - max-remain-on-channel-duration
-+            - max-scan-ie-len
-+            - max-scan-plan-interval
-+            - max-scan-plan-iterations
-+            - max-sched-scan-ie-len
-+            - offchannel-tx-ok
-+            - rx-frame-types
-+            - sar-spec
-+            - sched-scan-max-reqs
-+            - software-iftypes
-+            - support-ap-uapsd
-+            - supported-commands
-+            - supported-iftypes
-+            - tdls-external-setup
-+            - tdls-support
-+            - tx-frame-types
-+            - txq-limit
-+            - txq-memory-limit
-+            - txq-quantum
-+            - txq-stats
-+            - vht-capability-mask
-+            - wiphy
-+            - wiphy-antenna-avail-rx
-+            - wiphy-antenna-avail-tx
-+            - wiphy-antenna-rx
-+            - wiphy-antenna-tx
-+            - wiphy-bands
-+            - wiphy-coverage-class
-+            - wiphy-frag-threshold
-+            - wiphy-name
-+            - wiphy-retry-long
-+            - wiphy-retry-short
-+            - wiphy-rts-threshold
-+            - wowlan-triggers-supported
-+      dump:
-+        request:
-+          attributes:
-+            - wiphy
-+            - wdev
-+            - ifindex
-+            - split-wiphy-dump
-+        reply:
-+          attributes: *wiphy-reply-attrs
-+    -
-+      name: get-interface
-+      doc: Get information about an interface or dump a list of all interfaces
-+      attribute-set: nl80211-attrs
-+      do:
-+        request:
-+          value: 5
-+          attributes:
-+            - ifname
-+        reply:
-+          value: 7
-+          attributes: &interface-reply-attrs
-+            - ifname
-+            - iftype
-+            - ifindex
-+            - wiphy
-+            - wdev
-+            - mac
-+            - generation
-+            - txq-stats
-+            - 4addr
-+      dump:
-+        request:
-+          attributes:
-+            - ifname
-+        reply:
-+          attributes: *interface-reply-attrs
-+    -
-+      name: get-protocol-features
-+      doc: Get information about supported protocol features
-+      attribute-set: nl80211-attrs
-+      do:
-+        request:
-+          value: 95
-+          attributes:
-+            - protocol-features
-+        reply:
-+          value: 95
-+          attributes:
-+            - protocol-features
-+
-+mcast-groups:
-+  list:
-+    -
-+      name: config
-+    -
-+      name: scan
-+    -
-+      name: regulatory
-+    -
-+      name: mlme
-+    -
-+      name: vendor
-+    -
-+      name: nan
-+    -
-+      name: testmode
-diff --git a/tools/net/ynl/Makefile.deps b/tools/net/ynl/Makefile.deps
-index d027a07c1e2c..f3269ce39e5b 100644
---- a/tools/net/ynl/Makefile.deps
-+++ b/tools/net/ynl/Makefile.deps
-@@ -23,6 +23,7 @@ CFLAGS_handshake:=$(call get_hdr_inc,_LINUX_HANDSHAKE_H,handshake.h)
- CFLAGS_mptcp_pm:=$(call get_hdr_inc,_LINUX_MPTCP_PM_H,mptcp_pm.h)
- CFLAGS_net_shaper:=$(call get_hdr_inc,_LINUX_NET_SHAPER_H,net_shaper.h)
- CFLAGS_netdev:=$(call get_hdr_inc,_LINUX_NETDEV_H,netdev.h)
-+CFLAGS_nl80211:=$(call get_hdr_inc,__LINUX_NL802121_H,nl80211.h)
- CFLAGS_nlctrl:=$(call get_hdr_inc,__LINUX_GENERIC_NETLINK_H,genetlink.h)
- CFLAGS_nfsd:=$(call get_hdr_inc,_LINUX_NFSD_NETLINK_H,nfsd_netlink.h)
- CFLAGS_ovs_datapath:=$(call get_hdr_inc,__LINUX_OPENVSWITCH_H,openvswitch.h)
--- 
-2.48.1
+/* net-dev style multiline
+ * comments look like this
+ */
 
+or remove the comment altogether as it's stating the obvious :)
+
+> +#define NCT6694_CAN_MOD			0x05
+> +
+> +/* Command 00h - CAN Setting and Initialization */
+> +#define NCT6694_CAN_SETTING		0x00
+> +#define NCT6694_CAN_SETTING_CTRL1_MON	BIT(0)
+> +#define NCT6694_CAN_SETTING_CTRL1_NISO	BIT(1)
+> +#define NCT6694_CAN_SETTING_CTRL1_LBCK	BIT(2)
+> +
+> +/* Command 01h - CAN Information */
+> +#define NCT6694_CAN_INFORMATION		0x01
+> +#define NCT6694_CAN_INFORMATION_SEL	0x00
+> +
+> +/* Command 02h - CAN Event */
+> +#define NCT6694_CAN_EVENT		0x02
+> +#define NCT6694_CAN_EVENT_SEL(idx, mask)	\
+> +	((idx ? 0x80 : 0x00) | ((mask) & 0x7F))
+> +
+> +#define NCT6694_CAN_EVENT_MASK		GENMASK(5, 0)
+> +#define NCT6694_CAN_EVT_TX_FIFO_EMPTY	BIT(7)	/* Read-clear */
+> +#define NCT6694_CAN_EVT_RX_DATA_LOST	BIT(5)	/* Read-clear */
+> +#define NCT6694_CAN_EVT_RX_DATA_IN	BIT(7)	/* Read-clear*/
+> +
+> +/* Command 10h - CAN Deliver */
+> +#define NCT6694_CAN_DELIVER		0x10
+> +#define NCT6694_CAN_DELIVER_SEL(buf_cnt)	\
+> +	((buf_cnt) & 0xFF)
+> +
+> +/* Command 11h - CAN Receive */
+> +#define NCT6694_CAN_RECEIVE		0x11
+> +#define NCT6694_CAN_RECEIVE_SEL(idx, buf_cnt)	\
+> +	((idx ? 0x80 : 0x00) | ((buf_cnt) & 0x7F))
+> +
+> +#define NCT6694_CAN_FRAME_TAG_CAN0	0xC0
+> +#define NCT6694_CAN_FRAME_TAG_CAN1	0xC1
+
+in "include/linux/mfd/nct6694.h" it's CAN1 and CAN2, can you make it "0"
+based everywhere?
+
+what about making it:
+
+#define NCT6694_CAN_FRAME_TAG_CAN(idx)  (0xC0 | (idx))
+
+> +#define NCT6694_CAN_FRAME_FLAG_EFF	BIT(0)
+> +#define NCT6694_CAN_FRAME_FLAG_RTR	BIT(1)
+> +#define NCT6694_CAN_FRAME_FLAG_FD	BIT(2)
+> +#define NCT6694_CAN_FRAME_FLAG_BRS	BIT(3)
+> +#define NCT6694_CAN_FRAME_FLAG_ERR	BIT(4)
+> +
+> +#define NCT6694_NAPI_WEIGHT		32
+> +
+> +enum nct6694_event_err {
+> +	NCT6694_CAN_EVT_ERR_NO_ERROR =3D 0,
+> +	NCT6694_CAN_EVT_ERR_CRC_ERROR,
+> +	NCT6694_CAN_EVT_ERR_STUFF_ERROR,
+> +	NCT6694_CAN_EVT_ERR_ACK_ERROR,
+> +	NCT6694_CAN_EVT_ERR_FORM_ERROR,
+> +	NCT6694_CAN_EVT_ERR_BIT_ERROR,
+> +	NCT6694_CAN_EVT_ERR_TIMEOUT_ERROR,
+> +	NCT6694_CAN_EVT_ERR_UNKNOWN_ERROR,
+> +};
+> +
+> +enum nct6694_event_status {
+> +	NCT6694_CAN_EVT_STS_ERROR_ACTIVE =3D 0,
+> +	NCT6694_CAN_EVT_STS_ERROR_PASSIVE,
+> +	NCT6694_CAN_EVT_STS_BUS_OFF,
+> +	NCT6694_CAN_EVT_STS_WARNING,
+> +};
+> +
+> +struct __packed nct6694_can_setting {
+> +	__le32 nbr;
+> +	__le32 dbr;
+> +	u8 active;
+> +	u8 reserved[3];
+> +	__le16 ctrl1;
+> +	__le16 ctrl2;
+> +	__le32 nbtp;
+> +	__le32 dbtp;
+> +};
+> +
+> +struct __packed nct6694_can_information {
+> +	u8 tx_fifo_cnt;
+> +	u8 rx_fifo_cnt;
+> +	u8 reserved[2];
+> +	__le32 can_clk;
+> +};
+> +
+> +struct __packed nct6694_can_event {
+> +	u8 err;
+> +	u8 status;
+> +	u8 tx_evt;
+> +	u8 rx_evt;
+> +	u8 rec;
+> +	u8 tec;
+> +	u8 reserved[2];
+> +};
+> +
+> +struct __packed nct6694_can_frame {
+> +	u8 tag;
+> +	u8 flag;
+> +	u8 reserved;
+> +	u8 length;
+> +	__le32 id;
+> +	u8 data[CANFD_MAX_DLEN];
+> +};
+> +
+> +struct nct6694_can_priv {
+> +	struct can_priv can;	/* must be the first member */
+> +	struct can_rx_offload offload;
+> +	struct net_device *ndev;
+> +	struct nct6694 *nct6694;
+> +	struct workqueue_struct *wq;
+> +	struct work_struct tx_work;
+> +	struct nct6694_can_frame tx;
+> +	struct nct6694_can_frame rx;
+> +	struct nct6694_can_event event[2];
+> +	struct can_berr_counter bec;
+> +	unsigned char can_idx;
+
+can you use ndev->dev_port instead?
+
+> +};
+> +
+> +static inline struct nct6694_can_priv *rx_offload_to_priv(struct can_rx_=
+offload *offload)
+> +{
+> +	return container_of(offload, struct nct6694_can_priv, offload);
+> +}
+> +
+> +static const struct can_bittiming_const nct6694_can_bittiming_nominal_co=
+nst =3D {
+> +	.name =3D DRVNAME,
+> +	.tseg1_min =3D 2,
+> +	.tseg1_max =3D 256,
+> +	.tseg2_min =3D 2,
+> +	.tseg2_max =3D 128,
+> +	.sjw_max =3D 128,
+> +	.brp_min =3D 1,
+> +	.brp_max =3D 511,
+> +	.brp_inc =3D 1,
+> +};
+> +
+> +static const struct can_bittiming_const nct6694_can_bittiming_data_const=
+ =3D {
+> +	.name =3D DRVNAME,
+> +	.tseg1_min =3D 1,
+> +	.tseg1_max =3D 32,
+> +	.tseg2_min =3D 1,
+> +	.tseg2_max =3D 16,
+> +	.sjw_max =3D 16,
+> +	.brp_min =3D 1,
+> +	.brp_max =3D 31,
+> +	.brp_inc =3D 1,
+> +};
+> +
+> +static void nct6694_can_rx_offload(struct can_rx_offload *offload,
+> +				   struct sk_buff *skb)
+> +{
+> +	struct nct6694_can_priv *priv =3D rx_offload_to_priv(offload);
+> +	int ret;
+> +
+> +	ret =3D can_rx_offload_queue_tail(offload, skb);
+> +	if (ret)
+> +		priv->ndev->stats.rx_fifo_errors++;
+> +}
+> +
+> +static void nct6694_can_handle_lost_msg(struct net_device *ndev)
+> +{
+> +	struct nct6694_can_priv *priv =3D netdev_priv(ndev);
+> +	struct net_device_stats *stats =3D &ndev->stats;
+> +	struct can_frame *cf;
+> +	struct sk_buff *skb;
+> +
+> +	netdev_err(ndev, "RX FIFO overflow, message(s) lost.\n");
+> +
+> +	stats->rx_errors++;
+> +	stats->rx_over_errors++;
+> +
+> +	skb =3D alloc_can_err_skb(ndev, &cf);
+> +	if (!skb)
+> +		return;
+> +
+> +	cf->can_id |=3D CAN_ERR_CRTL;
+> +	cf->data[1] =3D CAN_ERR_CRTL_RX_OVERFLOW;
+> +
+> +	nct6694_can_rx_offload(&priv->offload, skb);
+> +}
+> +
+> +static void nct6694_can_rx(struct net_device *ndev, u8 rx_evt)
+> +{
+> +	struct nct6694_can_priv *priv =3D netdev_priv(ndev);
+> +	struct nct6694_can_frame *frame =3D &priv->rx;
+> +	struct nct6694_cmd_header cmd_hd =3D {
+> +		.mod =3D NCT6694_CAN_MOD,
+> +		.cmd =3D NCT6694_CAN_RECEIVE,
+> +		.sel =3D NCT6694_CAN_RECEIVE_SEL(priv->can_idx, 1),
+> +		.len =3D cpu_to_le16(sizeof(*frame))
+> +	};
+> +	struct sk_buff *skb;
+> +	int ret;
+> +
+> +	ret =3D nct6694_read_msg(priv->nct6694, &cmd_hd, frame);
+> +	if (ret)
+> +		return;
+> +
+> +	if (frame->flag & NCT6694_CAN_FRAME_FLAG_FD) {
+> +		struct canfd_frame *cfd;
+> +
+> +		skb =3D alloc_canfd_skb(priv->ndev, &cfd);
+> +		if (!skb)
+> +			return;
+> +
+> +		cfd->can_id =3D le32_to_cpu(frame->id);
+> +		cfd->len =3D canfd_sanitize_len(frame->length);
+> +		if (frame->flag & NCT6694_CAN_FRAME_FLAG_EFF)
+> +			cfd->can_id |=3D CAN_EFF_FLAG;
+> +		if (frame->flag & NCT6694_CAN_FRAME_FLAG_BRS)
+> +			cfd->flags |=3D CANFD_BRS;
+> +		if (frame->flag & NCT6694_CAN_FRAME_FLAG_ERR)
+> +			cfd->flags |=3D CANFD_ESI;
+> +
+> +		memcpy(cfd->data, frame->data, cfd->len);
+> +	} else {
+> +		struct can_frame *cf;
+> +
+> +		skb =3D alloc_can_skb(priv->ndev, &cf);
+> +		if (!skb)
+> +			return;
+> +
+> +		cf->can_id =3D le32_to_cpu(frame->id);
+> +		cf->len =3D min_t(u8, frame->length, CAN_MAX_DLEN);
+
+use can_cc_dlc2len()
+
+> +		if (frame->flag & NCT6694_CAN_FRAME_FLAG_EFF)
+> +			cf->can_id |=3D CAN_EFF_FLAG;
+> +
+> +		if (frame->flag & NCT6694_CAN_FRAME_FLAG_RTR)
+> +			cf->can_id |=3D CAN_RTR_FLAG;
+> +		else
+> +			memcpy(cf->data, frame->data, cf->len);
+> +	}
+> +
+> +	nct6694_can_rx_offload(&priv->offload, skb);
+> +}
+> +
+> +static int nct6694_can_get_berr_counter(const struct net_device *ndev,
+> +					struct can_berr_counter *bec)
+> +{
+> +	struct nct6694_can_priv *priv =3D netdev_priv(ndev);
+> +
+> +	*bec =3D priv->bec;
+> +
+> +	return 0;
+> +}
+> +
+> +static void nct6694_can_handle_state_change(struct net_device *ndev,
+> +					    enum can_state new_state)
+> +{
+> +	struct nct6694_can_priv *priv =3D netdev_priv(ndev);
+> +	struct can_berr_counter bec;
+> +	struct can_frame *cf;
+> +	struct sk_buff *skb;
+> +
+> +	skb =3D alloc_can_err_skb(ndev, &cf);
+> +
+> +	nct6694_can_get_berr_counter(ndev, &bec);
+> +
+> +	switch (new_state) {
+> +	case CAN_STATE_ERROR_ACTIVE:
+> +		priv->can.can_stats.error_warning++;
+                                    ^^^^^^^^^^^^^
+> +		priv->can.state =3D CAN_STATE_ERROR_ACTIVE;
+> +		if (cf)
+> +			cf->data[1] |=3D CAN_ERR_CRTL_ACTIVE;
+> +		break;
+> +	case CAN_STATE_ERROR_WARNING:
+> +		priv->can.can_stats.error_warning++;
+> +		priv->can.state =3D CAN_STATE_ERROR_WARNING;
+> +		if (cf) {
+> +			cf->can_id |=3D CAN_ERR_CRTL;
+> +			if (bec.txerr > bec.rxerr)
+> +				cf->data[1] =3D CAN_ERR_CRTL_TX_WARNING;
+> +			else
+> +				cf->data[1] =3D CAN_ERR_CRTL_RX_WARNING;
+> +			cf->data[6] =3D bec.txerr;
+> +			cf->data[7] =3D bec.rxerr;
+> +		}
+> +		break;
+> +	case CAN_STATE_ERROR_PASSIVE:
+> +		priv->can.can_stats.error_passive++;
+> +		priv->can.state =3D CAN_STATE_ERROR_PASSIVE;
+> +		if (cf) {
+> +			cf->can_id |=3D CAN_ERR_CRTL;
+> +			cf->data[1] |=3D CAN_ERR_CRTL_RX_PASSIVE;
+> +			if (bec.txerr >=3D CAN_ERROR_PASSIVE_THRESHOLD)
+> +				cf->data[1] |=3D CAN_ERR_CRTL_TX_PASSIVE;
+> +			cf->data[6] =3D bec.txerr;
+> +			cf->data[7] =3D bec.rxerr;
+> +		}
+> +		break;
+> +	case CAN_STATE_BUS_OFF:
+> +		priv->can.state =3D CAN_STATE_BUS_OFF;
+> +		priv->can.can_stats.bus_off++;
+> +		if (cf)
+> +			cf->can_id |=3D CAN_ERR_BUSOFF;
+> +		can_free_echo_skb(ndev, 0, NULL);
+> +		netif_stop_queue(ndev);
+> +		can_bus_off(ndev);
+> +		break;
+> +	default:
+> +		break;
+> +	}
+> +
+> +	nct6694_can_rx_offload(&priv->offload, skb);
+> +}
+> +
+> +static void nct6694_can_handle_state_errors(struct net_device *ndev, u8 =
+status)
+> +{
+> +	struct nct6694_can_priv *priv =3D netdev_priv(ndev);
+
+It seems you don't have dedicated RX and TX states, so call
+nct6694_can_get_berr_counter() and use can_state_get_by_berr_counter()
+to get the states. Then basically do that what what
+mcp251xfd_handle_cerrif() does, starting with "new_state =3D max(tx_state, =
+rx_state);"
+
+> +
+> +	if (status =3D=3D NCT6694_CAN_EVT_STS_ERROR_ACTIVE &&
+> +	    priv->can.state !=3D CAN_STATE_ERROR_ACTIVE) {
+> +		netdev_dbg(ndev, "Error, entered active state\n");
+> +		nct6694_can_handle_state_change(ndev, CAN_STATE_ERROR_ACTIVE);
+> +	}
+> +
+> +	if (status =3D=3D NCT6694_CAN_EVT_STS_WARNING &&
+> +	    priv->can.state !=3D CAN_STATE_ERROR_WARNING) {
+> +		netdev_dbg(ndev, "Error, entered warning state\n");
+> +		nct6694_can_handle_state_change(ndev, CAN_STATE_ERROR_WARNING);
+> +	}
+> +
+> +	if (status =3D=3D NCT6694_CAN_EVT_STS_ERROR_PASSIVE &&
+> +	    priv->can.state !=3D CAN_STATE_ERROR_PASSIVE) {
+> +		netdev_dbg(ndev, "Error, entered passive state\n");
+> +		nct6694_can_handle_state_change(ndev, CAN_STATE_ERROR_PASSIVE);
+> +	}
+> +
+> +	if (status =3D=3D NCT6694_CAN_EVT_STS_BUS_OFF &&
+> +	    priv->can.state !=3D CAN_STATE_BUS_OFF) {
+> +		netdev_dbg(ndev, "Error, entered bus-off state\n");
+> +		nct6694_can_handle_state_change(ndev, CAN_STATE_BUS_OFF);
+> +	}
+> +}
+> +
+> +static void nct6694_can_handle_bus_err(struct net_device *ndev, u8 bus_e=
+rr)
+> +{
+> +	struct nct6694_can_priv *priv =3D netdev_priv(ndev);
+> +	struct can_frame *cf;
+> +	struct sk_buff *skb;
+> +
+> +	if (bus_err =3D=3D NCT6694_CAN_EVT_ERR_NO_ERROR)
+> +		return;
+> +
+> +	priv->can.can_stats.bus_error++;
+> +
+> +	skb =3D alloc_can_err_skb(ndev, &cf);
+> +	if (skb)
+> +		cf->can_id |=3D CAN_ERR_PROT | CAN_ERR_BUSERROR;
+> +
+> +	switch (bus_err) {
+> +	case NCT6694_CAN_EVT_ERR_CRC_ERROR:
+> +		netdev_dbg(ndev, "CRC error\n");
+> +		ndev->stats.rx_errors++;
+> +		if (skb)
+> +			cf->data[3] |=3D CAN_ERR_PROT_LOC_CRC_SEQ;
+> +		break;
+> +
+> +	case NCT6694_CAN_EVT_ERR_STUFF_ERROR:
+> +		netdev_dbg(ndev, "Stuff error\n");
+> +		ndev->stats.rx_errors++;
+> +		if (skb)
+> +			cf->data[2] |=3D CAN_ERR_PROT_STUFF;
+> +		break;
+> +
+> +	case NCT6694_CAN_EVT_ERR_ACK_ERROR:
+> +		netdev_dbg(ndev, "Ack error\n");
+> +		ndev->stats.tx_errors++;
+> +		if (skb) {
+> +			cf->can_id |=3D CAN_ERR_ACK;
+> +			cf->data[2] |=3D CAN_ERR_PROT_TX;
+> +		}
+> +		break;
+> +
+> +	case NCT6694_CAN_EVT_ERR_FORM_ERROR:
+> +		netdev_dbg(ndev, "Form error\n");
+> +		ndev->stats.rx_errors++;
+> +		if (skb)
+> +			cf->data[2] |=3D CAN_ERR_PROT_FORM;
+> +		break;
+> +
+> +	case NCT6694_CAN_EVT_ERR_BIT_ERROR:
+> +		netdev_dbg(ndev, "Bit error\n");
+> +		ndev->stats.tx_errors++;
+> +		if (skb)
+> +			cf->data[2] |=3D CAN_ERR_PROT_TX | CAN_ERR_PROT_BIT;
+> +		break;
+> +
+> +	default:
+> +		break;
+> +	}
+> +
+
+missing check:
+
+        if (skb)
+
+> +	nct6694_can_rx_offload(&priv->offload, skb);
+> +}
+> +
+> +static void nct6694_can_tx_irq(struct net_device *ndev)
+> +{
+> +	struct net_device_stats *stats =3D &ndev->stats;
+> +
+> +	stats->tx_bytes +=3D can_get_echo_skb(ndev, 0, NULL);
+
+use can_rx_offload_get_echo_skb_queue_tail() here
+
+> +	stats->tx_packets++;
+> +	netif_wake_queue(ndev);
+> +}
+> +
+> +static irqreturn_t nct6694_can_irq(int irq, void *data)
+> +{
+> +	struct net_device *ndev =3D data;
+> +	struct nct6694_can_priv *priv =3D netdev_priv(ndev);
+> +	struct nct6694_can_event *evt =3D priv->event;
+> +	struct nct6694_cmd_header cmd_hd =3D {
+> +		.mod =3D NCT6694_CAN_MOD,
+> +		.cmd =3D NCT6694_CAN_EVENT,
+> +		.sel =3D NCT6694_CAN_EVENT_SEL(priv->can_idx, NCT6694_CAN_EVENT_MASK),
+> +		.len =3D cpu_to_le16(sizeof(priv->event))
+> +	};
+> +	irqreturn_t handled =3D IRQ_NONE;
+> +	int can_idx =3D priv->can_idx;
+> +	int ret;
+
+it would make sense to have a event pointer here instead of the can_idx?
+
+        const struct nct6694_can_event *event =3D &priv->event[priv->can_id=
+x];
+
+> +
+> +	ret =3D nct6694_read_msg(priv->nct6694, &cmd_hd, evt);
+> +	if (ret < 0)
+> +		return handled;
+> +
+> +	if (priv->event[can_idx].rx_evt & NCT6694_CAN_EVT_RX_DATA_IN) {
+> +		nct6694_can_rx(ndev, priv->event[can_idx].rx_evt);
+> +		handled =3D IRQ_HANDLED;
+> +	}
+> +
+> +	if (priv->event[can_idx].rx_evt & NCT6694_CAN_EVT_RX_DATA_LOST) {
+> +		nct6694_can_handle_lost_msg(ndev);
+> +		handled =3D IRQ_HANDLED;
+> +	}
+> +
+> +	if (priv->event[can_idx].status) {
+> +		nct6694_can_handle_state_errors(ndev, priv->event[can_idx].status);
+> +		handled =3D IRQ_HANDLED;
+> +	}
+> +
+> +	if (priv->can.ctrlmode & CAN_CTRLMODE_BERR_REPORTING) {
+> +		nct6694_can_handle_bus_err(ndev, priv->event[can_idx].err);
+> +		handled =3D IRQ_HANDLED;
+> +	}
+> +
+> +	if (handled)
+> +		can_rx_offload_threaded_irq_finish(&priv->offload);
+> +
+> +	if (priv->event[can_idx].tx_evt & NCT6694_CAN_EVT_TX_FIFO_EMPTY)
+> +		nct6694_can_tx_irq(ndev);
+
+Move this in front of the handled check and add "handled =3D IRQ_HANDLED;"
+to the if-block.
+
+> +
+> +	priv->bec.rxerr =3D priv->event[can_idx].rec;
+> +	priv->bec.txerr =3D priv->event[can_idx].tec;
+> +
+> +	return handled;
+> +}
+> +
+> +static void nct6694_can_tx_work(struct work_struct *work)
+> +{
+> +	struct nct6694_can_priv *priv =3D container_of(work,
+> +						     struct nct6694_can_priv,
+> +						     tx_work);
+> +	struct nct6694_can_frame *frame =3D &priv->tx;
+> +	struct net_device *ndev =3D priv->ndev;
+> +	struct net_device_stats *stats =3D &ndev->stats;
+> +	struct sk_buff *skb =3D priv->can.echo_skb[0];
+> +	static const struct nct6694_cmd_header cmd_hd =3D {
+> +		.mod =3D NCT6694_CAN_MOD,
+> +		.cmd =3D NCT6694_CAN_DELIVER,
+> +		.sel =3D NCT6694_CAN_DELIVER_SEL(1),
+> +		.len =3D cpu_to_le16(sizeof(*frame))
+> +	};
+> +	u32 txid;
+> +	int err;
+> +
+> +	memset(frame, 0, sizeof(*frame));
+> +
+> +	if (priv->can_idx =3D=3D 0)
+> +		frame->tag =3D NCT6694_CAN_FRAME_TAG_CAN0;
+> +	else
+> +		frame->tag =3D NCT6694_CAN_FRAME_TAG_CAN1;
+
+        frame->tag =3D NCT6694_CAN_FRAME_TAG_CAN(priv->can_idx);
+       =20
+> +
+> +	if (can_is_canfd_skb(skb)) {
+> +		struct canfd_frame *cfd =3D (struct canfd_frame *)skb->data;
+> +
+> +		if (cfd->flags & CANFD_BRS)
+> +			frame->flag |=3D NCT6694_CAN_FRAME_FLAG_BRS;
+> +
+> +		if (cfd->can_id & CAN_EFF_FLAG) {
+> +			txid =3D cfd->can_id & CAN_EFF_MASK;
+> +			frame->flag |=3D NCT6694_CAN_FRAME_FLAG_EFF;
+> +		} else {
+> +			txid =3D cfd->can_id & CAN_SFF_MASK;
+> +		}
+> +		frame->flag |=3D NCT6694_CAN_FRAME_FLAG_FD;
+> +		frame->id =3D cpu_to_le32(txid);
+> +		frame->length =3D cfd->len;
+> +
+> +		memcpy(frame->data, cfd->data, cfd->len);
+> +	} else {
+> +		struct can_frame *cf =3D (struct can_frame *)skb->data;
+> +
+> +		if (cf->can_id & CAN_EFF_FLAG) {
+> +			txid =3D cf->can_id & CAN_EFF_MASK;
+> +			frame->flag |=3D NCT6694_CAN_FRAME_FLAG_EFF;
+> +		} else {
+> +			txid =3D cf->can_id & CAN_SFF_MASK;
+> +		}
+> +
+> +		if (cf->can_id & CAN_RTR_FLAG)
+> +			frame->flag |=3D NCT6694_CAN_FRAME_FLAG_RTR;
+> +		else
+> +			memcpy(frame->data, cf->data, cf->len);
+> +
+> +		frame->id =3D cpu_to_le32(txid);
+> +		frame->length =3D cf->len;
+> +	}
+> +
+> +	err =3D nct6694_write_msg(priv->nct6694, &cmd_hd, frame);
+> +	if (err) {
+> +		netdev_err(ndev, "%s: TX FIFO is full!\n", __func__);
+> +		can_free_echo_skb(ndev, 0, NULL);
+> +		stats->tx_dropped++;
+> +		stats->tx_errors++;
+> +		netif_wake_queue(ndev);
+> +	}
+> +}
+> +
+> +static netdev_tx_t nct6694_can_start_xmit(struct sk_buff *skb,
+> +					  struct net_device *ndev)
+> +{
+> +	struct nct6694_can_priv *priv =3D netdev_priv(ndev);
+> +
+> +	if (can_dev_dropped_skb(ndev, skb))
+> +		return NETDEV_TX_OK;
+> +
+> +	netif_stop_queue(ndev);
+> +	can_put_echo_skb(skb, ndev, 0, 0);
+> +	queue_work(priv->wq, &priv->tx_work);
+> +
+> +	return NETDEV_TX_OK;
+> +}
+> +
+> +static int nct6694_can_start(struct net_device *ndev)
+> +{
+> +	struct nct6694_can_priv *priv =3D netdev_priv(ndev);
+> +	struct nct6694_can_setting *setting;
+> +	struct nct6694_cmd_header cmd_hd =3D {
+> +		.mod =3D NCT6694_CAN_MOD,
+> +		.cmd =3D NCT6694_CAN_SETTING,
+> +		.sel =3D priv->can_idx,
+> +		.len =3D cpu_to_le16(sizeof(*setting))
+> +	};
+> +	const struct can_bittiming *n_bt =3D &priv->can.bittiming;
+> +	const struct can_bittiming *d_bt =3D &priv->can.data_bittiming;
+
+nitpick:
+move these 2 right after priv and d_bt first.
+
+> +	int ret;
+> +
+> +	setting =3D kzalloc(sizeof(*setting), GFP_KERNEL);
+> +	if (!setting)
+> +		return -ENOMEM;
+> +
+> +	setting->nbr =3D cpu_to_le32(n_bt->bitrate);
+> +	setting->dbr =3D cpu_to_le32(d_bt->bitrate);
+> +
+> +	if (priv->can.ctrlmode & CAN_CTRLMODE_LISTENONLY)
+> +		setting->ctrl1 |=3D cpu_to_le16(NCT6694_CAN_SETTING_CTRL1_MON);
+> +
+> +	if ((priv->can.ctrlmode & CAN_CTRLMODE_FD) &&
+> +	    priv->can.ctrlmode & CAN_CTRLMODE_FD_NON_ISO)
+
+We should move this check into the infrastructure. Please only check for
+CAN_CTRLMODE_FD_NON_ISO.
+
+> +		setting->ctrl1 |=3D cpu_to_le16(NCT6694_CAN_SETTING_CTRL1_NISO);
+> +
+> +	if (priv->can.ctrlmode & CAN_CTRLMODE_LOOPBACK)
+> +		setting->ctrl1 |=3D cpu_to_le16(NCT6694_CAN_SETTING_CTRL1_LBCK);
+> +
+> +	ret =3D nct6694_write_msg(priv->nct6694, &cmd_hd, setting);
+> +	if (ret)
+> +		goto exit;
+> +
+> +	priv->can.state =3D CAN_STATE_ERROR_ACTIVE;
+> +
+> +exit:
+> +	kfree(setting);
+> +	return ret;
+> +}
+> +
+> +static int nct6694_can_stop(struct net_device *ndev)
+> +{
+> +	struct nct6694_can_priv *priv =3D netdev_priv(ndev);
+> +
+
+How does the device know, that it should leave the CAN bus? Is there a
+message you can send to it? If not put it at least into listen only mode.
+
+> +	netif_stop_queue(ndev);
+> +	free_irq(ndev->irq, ndev);
+> +	destroy_workqueue(priv->wq);
+> +	priv->wq =3D NULL;
+
+no need to set wq to NULL
+
+> +	priv->can.state =3D CAN_STATE_STOPPED;
+> +	can_rx_offload_disable(&priv->offload);
+
+Please change move can_rx_offload_disable() in front of "priv->can.state
+=3D CAN_STATE_STOPPED".
+
+> +	close_candev(ndev);
+> +
+> +	return 0;
+> +}
+> +
+> +static int nct6694_can_set_mode(struct net_device *ndev, enum can_mode m=
+ode)
+> +{
+> +	switch (mode) {
+> +	case CAN_MODE_START:
+> +		nct6694_can_start(ndev);
+
+please add error checking
+
+> +		netif_wake_queue(ndev);
+> +		return 0;
+> +	default:
+> +		return -EOPNOTSUPP;
+> +	}
+> +}
+> +
+> +static int nct6694_can_open(struct net_device *ndev)
+> +{
+> +	struct nct6694_can_priv *priv =3D netdev_priv(ndev);
+> +	int ret;
+> +
+> +	ret =3D open_candev(ndev);
+> +	if (ret)
+> +		return ret;
+> +
+> +	can_rx_offload_enable(&priv->offload);
+> +
+> +	ret =3D request_threaded_irq(ndev->irq, NULL,
+> +				   nct6694_can_irq, IRQF_ONESHOT,
+> +				   "nct6694_can", ndev);
+> +	if (ret) {
+> +		netdev_err(ndev, "Failed to request IRQ\n");
+> +		goto close_candev;
+> +	}
+> +
+> +	priv->wq =3D alloc_ordered_workqueue("%s-nct6694_wq",
+> +					   WQ_FREEZABLE | WQ_MEM_RECLAIM,
+> +					   ndev->name);
+> +	if (!priv->wq) {
+> +		ret =3D -ENOMEM;
+> +		goto free_irq;
+> +	}
+> +
+> +	ret =3D nct6694_can_start(ndev);
+> +	if (ret)
+> +		goto destroy_wq;
+> +
+> +	netif_start_queue(ndev);
+> +
+> +	return 0;
+> +
+> +destroy_wq:
+> +	destroy_workqueue(priv->wq);
+> +free_irq:
+> +	free_irq(ndev->irq, ndev);
+> +close_candev:
+> +	can_rx_offload_disable(&priv->offload);
+> +	close_candev(ndev);
+> +	return ret;
+> +}
+> +
+> +static const struct net_device_ops nct6694_can_netdev_ops =3D {
+> +	.ndo_open =3D nct6694_can_open,
+> +	.ndo_stop =3D nct6694_can_stop,
+> +	.ndo_start_xmit =3D nct6694_can_start_xmit,
+> +	.ndo_change_mtu =3D can_change_mtu,
+> +};
+> +
+> +static const struct ethtool_ops nct6694_can_ethtool_ops =3D {
+> +	.get_ts_info =3D ethtool_op_get_ts_info,
+> +};
+> +
+> +static int nct6694_can_get_clock(struct nct6694_can_priv *priv)
+> +{
+> +	struct nct6694_can_information *info;
+> +	static const struct nct6694_cmd_header cmd_hd =3D {
+> +		.mod =3D NCT6694_CAN_MOD,
+> +		.cmd =3D NCT6694_CAN_INFORMATION,
+> +		.sel =3D NCT6694_CAN_INFORMATION_SEL,
+> +		.len =3D cpu_to_le16(sizeof(*info))
+> +	};
+> +	int ret, can_clk;
+> +
+> +	info =3D kzalloc(sizeof(*info), GFP_KERNEL);
+> +	if (!info)
+> +		return -ENOMEM;
+> +
+> +	ret =3D nct6694_read_msg(priv->nct6694, &cmd_hd, info);
+> +	if (ret) {
+> +		kfree(info);
+> +		return ret;
+> +	}
+> +
+> +	can_clk =3D le32_to_cpu(info->can_clk);
+> +	kfree(info);
+> +
+> +	return can_clk;
+> +}
+> +
+> +static int nct6694_can_probe(struct platform_device *pdev)
+> +{
+> +	const struct mfd_cell *cell =3D mfd_get_cell(pdev);
+> +	struct nct6694 *nct6694 =3D dev_get_drvdata(pdev->dev.parent);
+> +	struct nct6694_can_priv *priv;
+> +	struct net_device *ndev;
+> +	int ret, irq, can_clk;
+> +
+> +	irq =3D irq_create_mapping(nct6694->domain,
+> +				 NCT6694_IRQ_CAN1 + cell->id);
+> +	if (!irq)
+> +		return irq;
+> +
+> +	ndev =3D alloc_candev(sizeof(struct nct6694_can_priv), 1);
+> +	if (!ndev)
+> +		return -ENOMEM;
+> +
+> +	ndev->irq =3D irq;
+> +	ndev->flags |=3D IFF_ECHO;
+> +	ndev->dev_port =3D cell->id;
+> +	ndev->netdev_ops =3D &nct6694_can_netdev_ops;
+> +	ndev->ethtool_ops =3D &nct6694_can_ethtool_ops;
+> +
+> +	priv =3D netdev_priv(ndev);
+> +	priv->nct6694 =3D nct6694;
+> +	priv->ndev =3D ndev;
+> +
+> +	can_clk =3D nct6694_can_get_clock(priv);
+> +	if (can_clk < 0) {
+> +		ret =3D dev_err_probe(&pdev->dev, can_clk,
+> +				    "Failed to get clock\n");
+> +		goto free_candev;
+> +	}
+> +
+> +	INIT_WORK(&priv->tx_work, nct6694_can_tx_work);
+> +
+> +	priv->can_idx =3D cell->id;
+> +	priv->can.state =3D CAN_STATE_STOPPED;
+
+The device is allocated with CAN_STATE_STOPPED set, can be removed.
+
+> +	priv->can.clock.freq =3D can_clk;
+> +	priv->can.bittiming_const =3D &nct6694_can_bittiming_nominal_const;
+> +	priv->can.data_bittiming_const =3D &nct6694_can_bittiming_data_const;
+> +	priv->can.do_set_mode =3D nct6694_can_set_mode;
+> +	priv->can.do_get_berr_counter =3D nct6694_can_get_berr_counter;
+> +
+> +	priv->can.ctrlmode =3D CAN_CTRLMODE_FD;
+> +
+> +	priv->can.ctrlmode_supported =3D CAN_CTRLMODE_LOOPBACK		|
+> +				       CAN_CTRLMODE_LISTENONLY		|
+> +				       CAN_CTRLMODE_FD			|
+> +				       CAN_CTRLMODE_FD_NON_ISO		|
+> +				       CAN_CTRLMODE_BERR_REPORTING;
+
+nitpick: one space in front of "|" please
+
+Does your device run in CAN-FD mode all the time? If so, please use
+can_set_static_ctrlmode() to set it after priv->can.ctrlmode_supported
+and remove CAN_CTRLMODE_FD from ctrlmode_supported.
+
+> +
+> +	ret =3D can_rx_offload_add_manual(ndev, &priv->offload,
+> +					NCT6694_NAPI_WEIGHT);
+> +	if (ret) {
+> +		dev_err_probe(&pdev->dev, ret, "Failed to add rx_offload\n");
+> +		goto free_candev;
+> +	}
+> +
+> +	platform_set_drvdata(pdev, priv);
+> +	SET_NETDEV_DEV(priv->ndev, &pdev->dev);
+> +
+> +	ret =3D register_candev(priv->ndev);
+> +	if (ret)
+> +		goto del_rx_offload;
+> +
+> +	return 0;
+> +
+> +del_rx_offload:
+
+nitpick: please rename to rx_offload_del or can_rx_offload_del
+
+> +	can_rx_offload_del(&priv->offload);
+> +free_candev:
+> +	free_candev(ndev);
+> +	return ret;
+> +}
+> +
+> +static void nct6694_can_remove(struct platform_device *pdev)
+> +{
+> +	struct nct6694_can_priv *priv =3D platform_get_drvdata(pdev);
+> +
+> +	cancel_work_sync(&priv->tx_work);
+
+The workqueue has already been destroyed in nct6694_can_stop(), so more
+work should be pending.
+
+> +	unregister_candev(priv->ndev);
+> +	can_rx_offload_del(&priv->offload);
+> +	free_candev(priv->ndev);
+> +}
+> +
+> +static struct platform_driver nct6694_can_driver =3D {
+> +	.driver =3D {
+> +		.name	=3D DRVNAME,
+> +	},
+> +	.probe		=3D nct6694_can_probe,
+> +	.remove		=3D nct6694_can_remove,
+> +};
+> +
+> +module_platform_driver(nct6694_can_driver);
+> +
+> +MODULE_DESCRIPTION("USB-CAN FD driver for NCT6694");
+> +MODULE_AUTHOR("Ming Yu <tmyu0@nuvoton.com>");
+> +MODULE_LICENSE("GPL");
+> +MODULE_ALIAS("platform:nct6694-can");
+> --=20
+> 2.34.1
+
+regards,
+Marc
+
+--=20
+Pengutronix e.K.                 | Marc Kleine-Budde          |
+Embedded Linux                   | https://www.pengutronix.de |
+Vertretung N=C3=BCrnberg              | Phone: +49-5121-206917-129 |
+Amtsgericht Hildesheim, HRA 2686 | Fax:   +49-5121-206917-9   |
+
+--jwbz2hu4fil3rzed
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAABCgAdFiEEn/sM2K9nqF/8FWzzDHRl3/mQkZwFAmel+VgACgkQDHRl3/mQ
+kZyrfgf/dL3YcIbnGvX3UetNgdrMfxKxrX1TBAZrAtjVAag91iCQgmUi04NqwPPe
+quP5RIF3FzXpN9JPx+3xmwDwNUrEyuYqnZbPsLPfldNVenRJcbGPsvUfNXW8prd/
+aJi46i5ANvpouvbX0MvsOnKh4LX/D7zDP3C8aroob7vjhwfQfmYyf/x38BYm6054
+I/B7tVLOO2bsVDzdN+ATremPNePY0Pk8TMlDntQAW+aS9NUkXS1Do5obtAuloshg
+gsRceA8rh1xqLw4eGbcXWfbLjS+JEn394ThM950ZzdVUNa2viLC3lY4h02Jcgq3R
+hBo74qyBUDF6xxA4/06ry51Uuqmujg==
+=Rcon
+-----END PGP SIGNATURE-----
+
+--jwbz2hu4fil3rzed--
 
