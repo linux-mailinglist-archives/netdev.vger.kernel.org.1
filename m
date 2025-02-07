@@ -1,121 +1,193 @@
-Return-Path: <netdev+bounces-164062-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-164069-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id DCD7CA2C7F6
-	for <lists+netdev@lfdr.de>; Fri,  7 Feb 2025 16:55:12 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id C5818A2C837
+	for <lists+netdev@lfdr.de>; Fri,  7 Feb 2025 17:03:19 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id EC7597A3D84
-	for <lists+netdev@lfdr.de>; Fri,  7 Feb 2025 15:54:15 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 0E97A3A6D7D
+	for <lists+netdev@lfdr.de>; Fri,  7 Feb 2025 16:03:05 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BC8DE23C8B3;
-	Fri,  7 Feb 2025 15:55:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0988F14E2C2;
+	Fri,  7 Feb 2025 16:03:05 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ziepe.ca header.i=@ziepe.ca header.b="HT8TUE/8"
+	dkim=pass (2048-bit key) header.d=canonical.com header.i=@canonical.com header.b="NIZYa3UE"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qv1-f42.google.com (mail-qv1-f42.google.com [209.85.219.42])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp-relay-internal-0.canonical.com (smtp-relay-internal-0.canonical.com [185.125.188.122])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2532423C8A8
-	for <netdev@vger.kernel.org>; Fri,  7 Feb 2025 15:54:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.42
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E235F1F754E
+	for <netdev@vger.kernel.org>; Fri,  7 Feb 2025 16:03:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.125.188.122
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1738943700; cv=none; b=OSVONqvRSsnec3NSk93CwzJAHv5Qeiev0WYtwb2JP5C2RG3uIeLazWfdRXqbkSYKKj0jIc9bYKPPKx9c1nIqj47U1nwbAKK1N28u3n+/Evq8uCZHxNqvaW9PLMzTIGDSpHR6iTJYt7hu0zQlXCMOlgJFF6xguyQOYUel80XA1+M=
+	t=1738944184; cv=none; b=pFSaKL7F3wORvR84U/okW4T19XSZRj4S+Zy1gTSL5lse56xG4ds39wy3A1W1x6OmfQBxxwZQgct5JtJ2EzLHVpKxrWiyIewTIoDJxSjVEB7Ai6y+jaE4CuApDH33Ad5OjB6BzbDgXBC7F23V7fScqX8FmeUwqrhHVFG4t+PQuVw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1738943700; c=relaxed/simple;
-	bh=I2GuDhxl+08paIRrviBkUYIALNebE4rhANc6ESbwfJk=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=pV6Zbl6Bm1TABXeh40tA1RBdRPIUoxkh7AGGZSUFN8JnQmaclMmSCXU5L/QBRvdCBEQ892cC/9pFEERRRtUjo+bFjWF2brpfUHSjk6V3Vm3H9m0LTyckJiDN/tgEZ2/d1AHEnGwg40fU2BGGnYcSB9aSnuaFf6IzugLrKDbGwUE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ziepe.ca; spf=pass smtp.mailfrom=ziepe.ca; dkim=pass (2048-bit key) header.d=ziepe.ca header.i=@ziepe.ca header.b=HT8TUE/8; arc=none smtp.client-ip=209.85.219.42
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ziepe.ca
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ziepe.ca
-Received: by mail-qv1-f42.google.com with SMTP id 6a1803df08f44-6e440e64249so18789586d6.3
-        for <netdev@vger.kernel.org>; Fri, 07 Feb 2025 07:54:58 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=ziepe.ca; s=google; t=1738943698; x=1739548498; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=wG4kDX3mPsVlAfvrUd487lzsY97VgTkw0/bdTrkhSGs=;
-        b=HT8TUE/8/UXvNaK5LmB/835+M8y9p+nozLAhhaRKfPQUnhy28oZ0BpcxKxygPiVK2e
-         0UgWSXIhF+xAR3eojV0+7V2VAeCMmmnNy6DICKseoiCyEvtDk8GiZWfDKWts25dDqKKF
-         8U3nA/JxGFuPvLioH7pcJO4B2CCVrAAQKFXFs5V2GdsgI7z4NtC396a4v5kWFW8mAv1q
-         QZxYjB34hpMKOJiwuhkP5OIZ7sLrmJSe8VsS7LHiogQW0bLMZX0Cn2xwbHKSx/YSbVrZ
-         OBXC5YgCBUYUpehBIhozOTD2gFyKVMa4zVgw0tccR9fS67jLAFJY7PmkGa2rQyhrEHHC
-         RRDw==
+	s=arc-20240116; t=1738944184; c=relaxed/simple;
+	bh=Wh0CsikOm5x73NTfTEyd+qSpHJH1XYBWccrtpGIZG7w=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=O89AhSvQ3hsN8+OKsWUkRZTBDBVTtNepe2PlyhaehMYo0w5AuZQ3eaq0YT4By0Lo4LLEa2UchJW9Z/hWfzHO2yWWewOzZhS8FtbLaeXi7251+DUj+rUvbXEfT+RARL8r/zKfQtCUS+Z8ZGi/+mTVsgw2MG8cjHeZoJx5hZ7bGWI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=canonical.com; spf=pass smtp.mailfrom=canonical.com; dkim=pass (2048-bit key) header.d=canonical.com header.i=@canonical.com header.b=NIZYa3UE; arc=none smtp.client-ip=185.125.188.122
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=canonical.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=canonical.com
+Received: from mail-ed1-f70.google.com (mail-ed1-f70.google.com [209.85.208.70])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by smtp-relay-internal-0.canonical.com (Postfix) with ESMTPS id C782E3F87A
+	for <netdev@vger.kernel.org>; Fri,  7 Feb 2025 16:03:00 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=canonical.com;
+	s=20210705; t=1738944180;
+	bh=IrnwfeZghfHKVVuuD+X+K3BBifM4PVk8VbFlg3AlP50=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type;
+	b=NIZYa3UEsXtAV7V0iGA4hLQCU5gMjep72YcfRF3usZv1h4GshdlFyFcZ0FaC15+ds
+	 Z3pSqY/NDF+p6czihKbwUJgPiQy1zORJTqd7O85AH5lz/tVAUpc7Gmnlu/YCW0wCBG
+	 dyqbuCGFcN4BBHALFGPqUOMVasYoVL10Lq5M87dAPuDBo2phecN1Km5hwp/ZREJQlA
+	 L1ieg2/Du1wlH3zeBTHAh8EfcddlYK8nfg+ekz2BgdcFr6Its5ejwHH2wyuBqIeqIW
+	 rcK8Rfx80KVDVlDlQT0xhIoLpW5wI/U7IT8n9ufAXPWtNhYDExsHQPc4HVEbISjAe5
+	 Oye/HsNnv2/ng==
+Received: by mail-ed1-f70.google.com with SMTP id 4fb4d7f45d1cf-5d9fb24f87bso2637695a12.0
+        for <netdev@vger.kernel.org>; Fri, 07 Feb 2025 08:03:00 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1738943698; x=1739548498;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=wG4kDX3mPsVlAfvrUd487lzsY97VgTkw0/bdTrkhSGs=;
-        b=R8RjWOFZQU/f1IKjECv7wmDQlv6UmQwbI3/eco2kpXhlC1lEXSk0Xp+YfJd6xAe4Sh
-         o+ee4p45C/aGlFPFrL+A0dws4IWe2qgoAcJzjtiNgTi+DWwvh85yImHOQYvTegEjcDIa
-         LN/e/5F/8jGkKXzUiOMQvP/N1/9lpXv1bAQNFDpjznZirz0tDwiwlWTsDTNo0XWRbA2D
-         s9FD9Hy9GDK1nxjLSzMd7cvMFFum1FCwVno3DjWpfdBIX0XagBeJjIAMCrVQ0fHeaI0M
-         +DIwr7++S9PMJgnJ7lPpBBOCVJ7zIgXJW+H/daEcLpww/YSSVUZHJNUWxXbHuGPRV4B+
-         J/Iw==
-X-Forwarded-Encrypted: i=1; AJvYcCUDr2AbIHoq5QS7vDn47T+DHsj2X9IQjikzwIpQ9Hq82jnVl5PIPmbBJuJC3RiyLphJXf6Ju64=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzuwvgPSAmoiRFRvMfVM2Bv9Hl5gYNSZ6JNa1yhSn/LoBpYh50v
-	Z13BL66kYHjbsR0DZ7XvGaGrFtmQpi8pCG1qo14lXN+zkwQD0zGFOwoWO9sz4Ds=
-X-Gm-Gg: ASbGncslkDL4y0w1Tl0/sSlJKuPJDOu3RUPzGPfSq8cTLwolDywe3A9TbXDQtB2eWyB
-	9sy6Mc4r50tZ++P2m4gkkrV+8tpzjktCG+3QYCo28Nz07cG6nYTt44oCTMp17dlHJ7n4tiuCmxb
-	vv0KUjZC76bvOTFjG7J+y1B8NCEs1RNTHDW04DXNeaLyu5IthHJn6Vz7iP92gDTLnKQ7r+fOPvr
-	AoUt3qLxViDRKFPZujuMMwUg6HQHSb9yxz/LniHcqfHB2JziKjCRiI26OVI4JB7IobACxhAqHSa
-	bENh2BeKRqLYreCy8U2FCNI5VIwIaCAMfTDPrtGWRKWQhRVSFP4eGyq7rZAvujVX
-X-Google-Smtp-Source: AGHT+IEq6vakQzNYiXzUmxGw05TQjdF65NCz8Qjlk4Szby4FeLGiS8FNdUCgGzZaq1/yR/BAprqyEQ==
-X-Received: by 2002:ad4:5f89:0:b0:6d8:8a7b:66a4 with SMTP id 6a1803df08f44-6e4455e8913mr53333496d6.14.1738943697961;
-        Fri, 07 Feb 2025 07:54:57 -0800 (PST)
-Received: from ziepe.ca (hlfxns017vw-142-68-128-5.dhcp-dynamic.fibreop.ns.bellaliant.net. [142.68.128.5])
-        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-6e43ba2be69sm18281116d6.15.2025.02.07.07.54.57
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 07 Feb 2025 07:54:57 -0800 (PST)
-Received: from jgg by wakko with local (Exim 4.97)
-	(envelope-from <jgg@ziepe.ca>)
-	id 1tgQgy-0000000FNdT-38ej;
-	Fri, 07 Feb 2025 11:54:56 -0400
-Date: Fri, 7 Feb 2025 11:54:56 -0400
-From: Jason Gunthorpe <jgg@ziepe.ca>
-To: Mitchell Augustin <mitchell.augustin@canonical.com>
-Cc: saeedm@nvidia.com, leon@kernel.org, tariqt@nvidia.com,
-	andrew+netdev@lunn.ch, "David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	netdev@vger.kernel.org, linux-rdma@vger.kernel.org,
-	linux-kernel@vger.kernel.org, Talat Batheesh <talatb@nvidia.com>,
-	Feras Daoud <ferasda@nvidia.com>
-Subject: Re: modprobe mlx5_core on OCI bare-metal instance causes
- unrecoverable hang and I/O error
-Message-ID: <20250207155456.GA3665725@ziepe.ca>
-References: <CAHTA-uaH9w2LqQdxY4b=7q9WQsuA6ntg=QRKrsf=mPfNBmM5pw@mail.gmail.com>
+        d=1e100.net; s=20230601; t=1738944180; x=1739548980;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=IrnwfeZghfHKVVuuD+X+K3BBifM4PVk8VbFlg3AlP50=;
+        b=iY11b60lHyzZfaMJtwERYO1wXfBlNfNzAb5DeebnVkzz/Xyf4KpEpLM0ALPd6KlhF9
+         NP7+PoIc+cAEHauetOelyFHyfsnNrnvA0so3hVNx4i7LsIGrJaWIYGvPfikpPeTfuhzY
+         AK+rboyZSunWeS2zad3mGSxEYT7tufB0bRj5yg8N0FSb5NeVaD0rDAUuypfteXZOOCEt
+         3jXUsEOMfqNM19kyxPgb6ZFf0eSdzPzjsGpGJzTAr+pUNPVPGxCw09PspJaQMOOdcs6h
+         cJFaO05a8wdsGkPAmAsfsq/Xs6SsaV8aL39GwvpMHVYGUGEr6WchzVGUIQx7KAPnagPJ
+         jXmg==
+X-Forwarded-Encrypted: i=1; AJvYcCWPJntNaUSLWFbmgOLYHtlgHBQENYJxS1GYc7569jrsW2+5CsD3O5xoCEdEdN09eZlfQdgOpIA=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxV4M8I+sao/372Ggwpsj9o4BAy8z6J1YYB6dLWICGsnEXSM/D7
+	9RPsKJIiLxu/1XcI9i8OplxGVY7Z/+tD8LUID1gvSHgyv57oSwiPak8Z60Wh3d3bNwnTjb1zJV0
+	h+tgVNJDPqSEMYPEU0WzS2iBH04s6ID/cD8BP3EeWBPXRRdwYqZNteJkN5CqIidCN0/XUSfd7WX
+	uWgufpzb4iIWlIhVB6QfBTLMbyysnYSa/sdLTI24eBKLLL
+X-Gm-Gg: ASbGnctBbeUnQpFKcrvZ5TtynYFtD3Jg5eKljAnVDLnqRNUunoIKA7kyuVwskpAxtgC
+	OaYmAsS7NtDjukBWSJnKRBNHOLVlMBXpmi7U0D2qHLNQ8DPBiLN4z5RHVGf4q
+X-Received: by 2002:a05:6402:3903:b0:5dc:da2f:9cda with SMTP id 4fb4d7f45d1cf-5de450e1eccmr4571677a12.27.1738944179653;
+        Fri, 07 Feb 2025 08:02:59 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IEj6Mdi97JKw/hR9AkdCdVySubZ6ydgC5KXtMsuuQx57RvTNFxEZaCcBX7XMkx94Gl9KaXNPcQoTe/+8OHlO+4=
+X-Received: by 2002:a05:6402:3903:b0:5dc:da2f:9cda with SMTP id
+ 4fb4d7f45d1cf-5de450e1eccmr4571438a12.27.1738944177679; Fri, 07 Feb 2025
+ 08:02:57 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <CAHTA-uaH9w2LqQdxY4b=7q9WQsuA6ntg=QRKrsf=mPfNBmM5pw@mail.gmail.com>
+References: <CAHTA-uaH9w2LqQdxY4b=7q9WQsuA6ntg=QRKrsf=mPfNBmM5pw@mail.gmail.com>
+ <20250207155456.GA3665725@ziepe.ca>
+In-Reply-To: <20250207155456.GA3665725@ziepe.ca>
+From: Mitchell Augustin <mitchell.augustin@canonical.com>
+Date: Fri, 7 Feb 2025 10:02:46 -0600
+X-Gm-Features: AWEUYZkGrEAvJxAVFrNYmmhKqMlsU32h-AS8UVgClt5mRfnNId8ifTzmInnj1qk
+Message-ID: <CAHTA-uasZ+ZkdzaSzz-QH=brD3PDb+wGfvE-k377SW7BCEi6hg@mail.gmail.com>
+Subject: Re: modprobe mlx5_core on OCI bare-metal instance causes
+ unrecoverable hang and I/O error
+To: Jason Gunthorpe <jgg@ziepe.ca>
+Cc: saeedm@nvidia.com, leon@kernel.org, tariqt@nvidia.com, 
+	andrew+netdev@lunn.ch, "David S. Miller" <davem@davemloft.net>, 
+	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+	netdev@vger.kernel.org, linux-rdma@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, Talat Batheesh <talatb@nvidia.com>, 
+	Feras Daoud <ferasda@nvidia.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Wed, Feb 05, 2025 at 05:09:13PM -0600, Mitchell Augustin wrote:
-> Hello,
-> 
-> I have identified a bug in the mlx5_core module, or some related component.
-> 
-> Doing the following on a freshly provisioned Oracle Cloud bare metal
-> node with this configuration [0] will reliably cause the entire
-> instance to become unresponsive:
-> 
-> rmmod mlx5_ib; rmmod mlx5_core; modprobe mlx5_core
-> 
-> This also produces the following output:
-> 
-> [  331.267175] I/O error, dev sda, sector 35602992 op 0x0:(READ) flags
-> 0x80700 phys_seg 33 prio class 0
+> Is it using iscsi/srp/nfs/etc for any filesystems?
 
-Is it using iscsi/srp/nfs/etc for any filesystems?
+Yes, dev sda is using iSCSI:
 
-Jason
+ubuntu@inst-v4ovk-mitchell-instance-pool-20250205-1119:~$ sudo
+iscsiadm -m session -P 3
+iSCSI Transport Class version 2.0-870
+version 2.1.9
+Target: iqn.2015-02.oracle.boot:uefi (non-flash)
+Current Portal: 169.254.0.2:3260,1
+Persistent Portal: 169.254.0.2:3260,1
+**********
+Interface:
+**********
+Iface Name: default
+Iface Transport: tcp
+Iface Initiatorname: iqn.2010-04.org.ipxe:080020ff-ffff-ffff-ffff-a8698c179=
+e5c
+Iface IPaddress: 10.0.0.254
+Iface HWaddress: default
+Iface Netdev: default
+SID: 1
+iSCSI Connection State: LOGGED IN
+iSCSI Session State: LOGGED_IN
+Internal iscsid Session State: NO CHANGE
+*********
+Timeouts:
+*********
+Recovery Timeout: 6000
+Target Reset Timeout: 30
+LUN Reset Timeout: 30
+Abort Timeout: 15
+*****
+CHAP:
+*****
+username: <empty>
+password: ********
+username_in: <empty>
+password_in: ********
+************************
+Negotiated iSCSI params:
+************************
+HeaderDigest: None
+DataDigest: None
+MaxRecvDataSegmentLength: 262144
+MaxXmitDataSegmentLength: 8192
+FirstBurstLength: 65536
+MaxBurstLength: 262144
+ImmediateData: Yes
+InitialR2T: Yes
+MaxOutstandingR2T: 1
+************************
+Attached SCSI devices:
+************************
+Host Number: 0 State: running
+scsi0 Channel 00 Id 0 Lun: 0
+scsi0 Channel 00 Id 0 Lun: 1
+Attached scsi disk sda State: running
+
+
+
+On Fri, Feb 7, 2025 at 9:55=E2=80=AFAM Jason Gunthorpe <jgg@ziepe.ca> wrote=
+:
+>
+> On Wed, Feb 05, 2025 at 05:09:13PM -0600, Mitchell Augustin wrote:
+> > Hello,
+> >
+> > I have identified a bug in the mlx5_core module, or some related compon=
+ent.
+> >
+> > Doing the following on a freshly provisioned Oracle Cloud bare metal
+> > node with this configuration [0] will reliably cause the entire
+> > instance to become unresponsive:
+> >
+> > rmmod mlx5_ib; rmmod mlx5_core; modprobe mlx5_core
+> >
+> > This also produces the following output:
+> >
+> > [  331.267175] I/O error, dev sda, sector 35602992 op 0x0:(READ) flags
+> > 0x80700 phys_seg 33 prio class 0
+>
+> Is it using iscsi/srp/nfs/etc for any filesystems?
+>
+> Jason
+
+
+
+--=20
+Mitchell Augustin
+Software Engineer - Ubuntu Partner Engineering
 
