@@ -1,140 +1,256 @@
-Return-Path: <netdev+bounces-164162-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-164163-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id B72EAA2CCF2
-	for <lists+netdev@lfdr.de>; Fri,  7 Feb 2025 20:44:12 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id A5AE6A2CD0D
+	for <lists+netdev@lfdr.de>; Fri,  7 Feb 2025 20:50:30 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id CA3603ACC57
-	for <lists+netdev@lfdr.de>; Fri,  7 Feb 2025 19:43:31 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id A77951887D05
+	for <lists+netdev@lfdr.de>; Fri,  7 Feb 2025 19:50:35 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 15BF61B86EF;
-	Fri,  7 Feb 2025 19:41:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DD77E195FE5;
+	Fri,  7 Feb 2025 19:50:23 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=fastly.com header.i=@fastly.com header.b="SODA4jv9"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="IiawNioQ"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f182.google.com (mail-pl1-f182.google.com [209.85.214.182])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.13])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3C02D1B6547
-	for <netdev@vger.kernel.org>; Fri,  7 Feb 2025 19:41:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.182
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4524F23C8CB;
+	Fri,  7 Feb 2025 19:50:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.13
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1738957318; cv=none; b=qLhTka87g8cKFElMvIcMIqFYmLvNrBcbEiKfcM5qfPC3o0o1bRZdzZIS0xcFfzV+w7W2uBcOoyLzM7Th7M+7bfq2oxYIVeLmuJhTd9OTyA0GTkZC+2aH3v8U8VeSeMn92J6BxO2VExl6GefpaClb+FkTybTT1ev5w7OyNb50byY=
+	t=1738957823; cv=none; b=qaHwzWDFauuodfEKLoyyNZW6O6iiRuafMI4hnV73i4oQDPObkjgHY0+ceQv+MSkCXwYp6lylW878AeWICIuDt/yaLAS61/l0T9LdVO1WLPx6SBZvsDpTMzrEQn1PT9otWr0LDrmhajHDjBqMxumezs4H/rGnWmkTJpMnv4ST/9I=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1738957318; c=relaxed/simple;
-	bh=SMwBd6ZFz1RNRp5vpuFG0544mDPvmygMzDy31Hy2VdI=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=FMWeNMMY+QQZ3sBO/VtfrlbPqLg8N7w2eej1f0of39w5z7cO0agJAlHCgSk7TyPPcXYXlaJAoAPs8tVGNYEQedWy7yTSZODsD5fF7yjJZtDwCvwoG4Z4q4uCSRhiNhCj+k6CFf+fdSSrpdP302SuxQG5YFhYxt1A5ZsE5shXcE4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fastly.com; spf=pass smtp.mailfrom=fastly.com; dkim=pass (1024-bit key) header.d=fastly.com header.i=@fastly.com header.b=SODA4jv9; arc=none smtp.client-ip=209.85.214.182
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fastly.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=fastly.com
-Received: by mail-pl1-f182.google.com with SMTP id d9443c01a7336-21f2f386cbeso44544515ad.0
-        for <netdev@vger.kernel.org>; Fri, 07 Feb 2025 11:41:55 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=fastly.com; s=google; t=1738957315; x=1739562115; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references
-         :mail-followup-to:message-id:subject:cc:to:from:date:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=STZUdNDBAr6eEE3n280mLE1PmnG8AcLyCV0yym0DKhk=;
-        b=SODA4jv9b7vvcpXoDmv002n9dH1uA7H0bz3Xtd0v+mRUjQsknSWeKbIP0zIbwz6mBk
-         pgn/7isUsDyH9S42//hm9ohgWOlcwoNBwTuFWvkwLbbhaR/YS6H3FlveVEl+I8Hc7mKg
-         TuyNTVkDQvFIbgR2DT/y6to2t5i5WMMDHdIh8=
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1738957315; x=1739562115;
-        h=in-reply-to:content-disposition:mime-version:references
-         :mail-followup-to:message-id:subject:cc:to:from:date
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=STZUdNDBAr6eEE3n280mLE1PmnG8AcLyCV0yym0DKhk=;
-        b=HvSS+7wnjPQyywG3e09ZCyV8NdCeTJZwleVsjnSkk8gW9vcTjoC/rDgdJXh51dlz6P
-         sgfMWp/7lEPgzgJwpfsimtrRS1mAOjNZrVU0OZrZyltkRGZU/DXPR9b4EyPySt/+i5a1
-         zfgaW6ZWkvXCjtsoUB2tZ9G+I2nsRfqShLqBPHkwzySmnnawZ5pKnjpZf5dM2xFZedX9
-         iUN6UeXgq98S0bLQNs+bgr7TjF4DmwpfG/8xPZNZQvaH0ksGd8G0hzwHGztEBrL1lzpn
-         0OV3NVOvZFJ6+0A4Td/rxBpRtoe6nawl1ad5CbblcHxxvgiva1iNYjqEY0OHP6I9jApV
-         IrDw==
-X-Forwarded-Encrypted: i=1; AJvYcCXOQ8QUEKibCl24Sgaen3XlcCTYqXXtW5IeAuUm/Rx8YV3YsmwX8H1/mWnqu7YKzAjOHhxA5n4=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yxip/VcFFAmRn/2CdouptA3JzQ6/FAfRNXfgDfDXkt7kOH6ad1R
-	0t7wIK9BPsUHIBhdEwJApz3dyDKoY/uAUUUnDo4a+woIsqlprPtcL03jE27iOcns6qre0ryhqQu
-	e
-X-Gm-Gg: ASbGnctlehty6vU5YHgRWIgIdJd6wQO3H06KZtDgWY4RXdPokUWs6mvTvhUwtQxFi/Q
-	TECdCXD2gozqNeRCA/i21fcwE/s0N9DHTFniZIsckg15CLXFRzch1Ow8q1q+STGLNtC+gxGGm8T
-	gp5B8V1HWLybBxyXAUe2Fyp+xO+fr88Q9Jmj7SLZ50nExUW6AyzxqTum0koX3oHdiOT8MFzOANS
-	ny0rmSZWHvoIywacbY+ktdbHKs4xojurQUrGrYxlCNIHZmJNRtL47in1BqmybZODjxH2J31uUFm
-	tEZCi8S2jKEGqCYkauaS5hYv7tHAM3rIc+cgaunHQqtuxD+iEp0W3j8Aqg==
-X-Google-Smtp-Source: AGHT+IE1w81vZQ+PCOzSFV8jBjQPCgDtQlZH1Y7MzYjqGA+fhvhfTdYXFwEqbQcHZegPtP72fGUaWQ==
-X-Received: by 2002:a17:902:e946:b0:216:5af7:5a6a with SMTP id d9443c01a7336-21f4e75e66bmr81790405ad.32.1738957315440;
-        Fri, 07 Feb 2025 11:41:55 -0800 (PST)
-Received: from LQ3V64L9R2 (c-24-6-151-244.hsd1.ca.comcast.net. [24.6.151.244])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-21f3683d6e5sm34469065ad.141.2025.02.07.11.41.54
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 07 Feb 2025 11:41:55 -0800 (PST)
-Date: Fri, 7 Feb 2025 11:41:52 -0800
-From: Joe Damato <jdamato@fastly.com>
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: davem@davemloft.net, netdev@vger.kernel.org, edumazet@google.com,
-	pabeni@redhat.com, andrew+netdev@lunn.ch, horms@kernel.org,
-	Daniel Zahka <daniel.zahka@gmail.com>
-Subject: Re: [PATCH net-next 3/7] eth: fbnic: support an additional RSS
- context
-Message-ID: <Z6ZiADvMTAYN0tw0@LQ3V64L9R2>
-Mail-Followup-To: Joe Damato <jdamato@fastly.com>,
-	Jakub Kicinski <kuba@kernel.org>, davem@davemloft.net,
-	netdev@vger.kernel.org, edumazet@google.com, pabeni@redhat.com,
-	andrew+netdev@lunn.ch, horms@kernel.org,
-	Daniel Zahka <daniel.zahka@gmail.com>
-References: <20250206235334.1425329-1-kuba@kernel.org>
- <20250206235334.1425329-4-kuba@kernel.org>
+	s=arc-20240116; t=1738957823; c=relaxed/simple;
+	bh=GtGlxqXv+tsjAO8Caeb7ywfrHU4twoF3PXGRm0Pnm1k=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=IsTD5g1kUL4FqhD+wtxIbj3LnTpX5+Jkt6JqJkj+tHtRRPhUeLjkExMfThYaLEJcT22ByIY2it4cBsco3NReVw1wmlpLgpBxnzr5hFU+xnKGyaDWxyHfwL+JkvzHIP7/QBQqD7JtJQogA7NSxVAFqHvZtOVWIzQmUZpzYQcwLS8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=IiawNioQ; arc=none smtp.client-ip=192.198.163.13
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1738957821; x=1770493821;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=GtGlxqXv+tsjAO8Caeb7ywfrHU4twoF3PXGRm0Pnm1k=;
+  b=IiawNioQ0LfuvwQ3GGQqEcd7VndGduxUV46bs2LuJZM2KYJ3twUEd3pr
+   iWeWDu47xDzZig75Hf5z5YTzceLGXpneKkHxcuasLOdEjy3mc7zxY3vpH
+   4NCYvsuQwmaYyrI36+tLCwwUG5FGMVcaCP+BDQYzlBHhVg5v+yumb7TM3
+   EUEV+i/PDzN+RYLtjRo6PA7z0TEX9lBivO/Clty/MZDSRWCo2qPlVyA99
+   5jKg0p5J6A7NWtRMLiVZ2RVFTcb0pIWD0A7fVrWDlTV69dMVNaPYEY5v4
+   6GQV++pYGoYjwEeqC+4ZDciWAC3UgnSTGwkSnnvOzMCIlsm2KwfD3xsR0
+   Q==;
+X-CSE-ConnectionGUID: fQ5fnDIpQzycG7tdKE2c5Q==
+X-CSE-MsgGUID: 18zzEp5uRX6ZB6ZZsoo2iQ==
+X-IronPort-AV: E=McAfee;i="6700,10204,11338"; a="42451736"
+X-IronPort-AV: E=Sophos;i="6.13,268,1732608000"; 
+   d="scan'208";a="42451736"
+Received: from fmviesa009.fm.intel.com ([10.60.135.149])
+  by fmvoesa107.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 07 Feb 2025 11:50:20 -0800
+X-CSE-ConnectionGUID: 34C0oul1Q0mQnLtRAAtGdw==
+X-CSE-MsgGUID: MzrsVY2MScq5uEMwMK5a5w==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.13,268,1732608000"; 
+   d="scan'208";a="112238093"
+Received: from tenikolo-mobl1.amr.corp.intel.com ([10.124.81.134])
+  by fmviesa009-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 07 Feb 2025 11:50:20 -0800
+From: Tatyana Nikolova <tatyana.e.nikolova@intel.com>
+To: jgg@nvidia.com,
+	leon@kernel.org,
+	intel-wired-lan@lists.osuosl.org
+Cc: linux-rdma@vger.kernel.org,
+	netdev@vger.kernel.org,
+	Tatyana Nikolova <tatyana.e.nikolova@intel.com>
+Subject: [iwl-next,rdma v3 00/24] Add RDMA support for Intel IPU E2000 (GEN3)
+Date: Fri,  7 Feb 2025 13:49:07 -0600
+Message-Id: <20250207194931.1569-1-tatyana.e.nikolova@intel.com>
+X-Mailer: git-send-email 2.28.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250206235334.1425329-4-kuba@kernel.org>
+Content-Transfer-Encoding: 8bit
 
-On Thu, Feb 06, 2025 at 03:53:30PM -0800, Jakub Kicinski wrote:
-> From: Daniel Zahka <daniel.zahka@gmail.com>
-> 
-> Add support for an extra RSS context. The device has a primary
-> and a secondary context.
-> 
-> Signed-off-by: Daniel Zahka <daniel.zahka@gmail.com>
-> Signed-off-by: Jakub Kicinski <kuba@kernel.org>
-> ---
->  .../net/ethernet/meta/fbnic/fbnic_ethtool.c   | 59 +++++++++++++++++++
->  1 file changed, 59 insertions(+)
-> 
-> diff --git a/drivers/net/ethernet/meta/fbnic/fbnic_ethtool.c b/drivers/net/ethernet/meta/fbnic/fbnic_ethtool.c
-> index 20cd9f5f89e2..4d73b405c8b9 100644
-> --- a/drivers/net/ethernet/meta/fbnic/fbnic_ethtool.c
-> +++ b/drivers/net/ethernet/meta/fbnic/fbnic_ethtool.c
-> @@ -374,6 +374,61 @@ fbnic_set_rxfh(struct net_device *netdev, struct ethtool_rxfh_param *rxfh,
->  	return 0;
->  }
->  
-> +static int
-> +fbnic_modify_rxfh_context(struct net_device *netdev,
-> +			  struct ethtool_rxfh_context *ctx,
-> +			  const struct ethtool_rxfh_param *rxfh,
-> +			  struct netlink_ext_ack *extack)
-> +{
-> +	struct fbnic_net *fbn = netdev_priv(netdev);
-> +	const u32 *indir = rxfh->indir;
-> +	unsigned int changes;
-> +
-> +	if (!indir)
-> +		indir = ethtool_rxfh_context_indir(ctx);
+This patch series is based on 6.14-rc1 and includes both netdev and RDMA
+patches for ease of review. It can also be viewed here [1]. A shared pull
+request will be sent for patches 1-7 following review.
 
-Was slightly confused by this, but I assume that there's an
-indirection table in core and its possible that modify_rxfh_context
-is called without a call to create... maybe in the case of the
-default RSS context or something?
+The patch series introduces RDMA RoCEv2 support for the Intel Infrastructure
+Processing Unit (IPU) E2000 line of products, referred to as GEN3 in the
+irdma provider.  It supports both physical and virtual functions.
+The irdma driver communicates with the device Control Plane (CP) to
+discover capabilities and perform privileged operations through an
+RDMA-specific messaging interface built atop the Infrastructure
+Data-Plane Function (IDPF) mailbox and virtchannel protocol [2].
 
-At any rate after browsing the fbnic code a bit: LGTM.
+To support RDMA for E2000 product, the idpf driver requires the use of
+the Inter-Driver Communication (IDC) interface which is currently already
+in use between ice and irdma. With a second consumer, the IDC is
+generalized to support multiple consumers and ice, idpf and irdma
+are adapted to the IDC definitions.
 
-Reviewed-by: Joe Damato <jdamato@fastly.com>
+The IPU model can host one or more logical network endpoints called vPorts
+per PCI function that are flexibly associated with a physical port or an
+internal communication port. irdma exposes a verbs device per vPort.
+
+Other key highlights of this series as it pertains to GEN3 device include:
+
+MMIO learning, RDMA capability negotiation and RDMA vectors
+discovery between idpf and CP
+PCI core device level RDMA resource initialization via
+a GEN3 core auxiliary driver
+Shared Receive Queue (SRQ) Support
+Atomic Operations Support (Compare and Swap and Fetch and Add)
+Completion Queue Element (CQE) Error and Flush Handling
+Push Page Support
+
+Changelog:
+
+V3 series irdma changes:
+* Move the call to get RDMA features just after CQP is created,
+otherwise the feature flags are not defined before used.
+* Move the check for supported atomic operations after reading
+the RDMA feature info to correctly enable atomics.
+* Round up to power of two the resource size for Read Responses and
+Transmit Queue elements.
+* Do not use the Work Queue element index passed in the Asynchronous Event
+info to get SRQ context, because it is incorrect.
+* Fix detection of Completion Queue (CQ) empty when 64-byte CQ elements
+are enabled.
+* Minor improvements and cleanup.
+
+V3 series idpf changes:
+* Reduce required minimum RDMA vectors to 2.
+
+V2 RFC series includes only idpf changes:
+
+* RDMA vector number adjustment
+* Fix unplugging vport auxiliary device twice
+* General cleanup and minor improvements
+
+V2 RFC series is at https://lwn.net/Articles/987141/.
+
+[1] https://git.kernel.org/pub/scm/linux/kernel/git/tnguy/linux.git/log/?h=idpf-rdma
+[2] https://elixir.bootlin.com/linux/latest/source/drivers/net/ethernet/intel/idpf/idpf_virtchnl.c
+
+Christopher Bednarz (1):
+  RDMA/irdma: Discover and set up GEN3 hardware register layout
+
+Dave Ertman (1):
+  iidc/ice/irdma: Update IDC to support multiple consumers
+
+Faisal Latif (2):
+  RDMA/irdma: Add SRQ support
+  RDMA/irdma: Add Atomic Operations support
+
+Jay Bhat (1):
+  RDMA/irdma: Add Push Page Support for GEN3
+
+Joshua Hay (6):
+  idpf: use reserved RDMA vectors from control plane
+  idpf: implement core RDMA auxiliary dev create, init, and destroy
+  idpf: implement RDMA vport auxiliary dev create, init, and destroy
+  idpf: implement remaining IDC RDMA core callbacks and handlers
+  idpf: implement IDC vport aux driver MTU change handler
+  idpf: implement get LAN mmio memory regions
+
+Krzysztof Czurylo (2):
+  RDMA/irdma: Add GEN3 CQP support with deferred completions
+  RDMA/irdma: Add GEN3 HW statistics support
+
+Mustafa Ismail (3):
+  RDMA/irdma: Refactor GEN2 auxiliary driver
+  RDMA/irdma: Add GEN3 core driver support
+  RDMA/irdma: Introduce GEN3 vPort driver support
+
+Shiraz Saleem (7):
+  RDMA/irdma: Add GEN3 support for AEQ and CEQ
+  RDMA/irdma: Add GEN3 virtual QP1 support
+  RDMA/irdma: Extend QP context programming for GEN3
+  RDMA/irdma: Support 64-byte CQEs and GEN3 CQE opcode decoding
+  RDMA/irdma: Restrict Memory Window and CQE Timestamping to GEN3
+  RDMA/irdma: Extend CQE Error and Flush Handling for GEN3 Devices
+  RDMA/irdma: Update Kconfig
+
+Vinoth Kumar Chandra Mohan (1):
+  RDMA/irdma: Add support for V2 HMC resource management scheme
+
+ drivers/infiniband/hw/irdma/Kconfig           |    7 +-
+ drivers/infiniband/hw/irdma/Makefile          |    4 +
+ drivers/infiniband/hw/irdma/ctrl.c            | 1469 +++++++++++++++--
+ drivers/infiniband/hw/irdma/defs.h            |  266 +--
+ drivers/infiniband/hw/irdma/hmc.c             |   18 +-
+ drivers/infiniband/hw/irdma/hmc.h             |   19 +-
+ drivers/infiniband/hw/irdma/hw.c              |  357 ++--
+ drivers/infiniband/hw/irdma/i40iw_hw.c        |    2 +
+ drivers/infiniband/hw/irdma/i40iw_hw.h        |    2 +
+ drivers/infiniband/hw/irdma/i40iw_if.c        |    3 +
+ drivers/infiniband/hw/irdma/icrdma_hw.c       |    3 +
+ drivers/infiniband/hw/irdma/icrdma_hw.h       |    5 +-
+ drivers/infiniband/hw/irdma/icrdma_if.c       |  267 +++
+ drivers/infiniband/hw/irdma/ig3rdma_hw.c      |  170 ++
+ drivers/infiniband/hw/irdma/ig3rdma_hw.h      |   29 +
+ drivers/infiniband/hw/irdma/ig3rdma_if.c      |  279 ++++
+ drivers/infiniband/hw/irdma/irdma.h           |   23 +-
+ drivers/infiniband/hw/irdma/main.c            |  323 +---
+ drivers/infiniband/hw/irdma/main.h            |   42 +-
+ drivers/infiniband/hw/irdma/osdep.h           |    4 +-
+ drivers/infiniband/hw/irdma/pble.c            |   20 +-
+ drivers/infiniband/hw/irdma/protos.h          |    1 +
+ drivers/infiniband/hw/irdma/puda.h            |    4 +-
+ drivers/infiniband/hw/irdma/type.h            |  224 ++-
+ drivers/infiniband/hw/irdma/uda_d.h           |    5 +-
+ drivers/infiniband/hw/irdma/uk.c              |  303 +++-
+ drivers/infiniband/hw/irdma/user.h            |  268 ++-
+ drivers/infiniband/hw/irdma/utils.c           |  133 +-
+ drivers/infiniband/hw/irdma/verbs.c           |  873 ++++++++--
+ drivers/infiniband/hw/irdma/verbs.h           |   47 +
+ drivers/infiniband/hw/irdma/virtchnl.c        |  656 ++++++++
+ drivers/infiniband/hw/irdma/virtchnl.h        |  189 +++
+ .../net/ethernet/intel/ice/devlink/devlink.c  |   40 +-
+ drivers/net/ethernet/intel/ice/ice.h          |    6 +-
+ drivers/net/ethernet/intel/ice/ice_dcb_lib.c  |   46 +-
+ drivers/net/ethernet/intel/ice/ice_dcb_lib.h  |    4 +
+ drivers/net/ethernet/intel/ice/ice_ethtool.c  |    8 +-
+ drivers/net/ethernet/intel/ice/ice_idc.c      |  255 ++-
+ drivers/net/ethernet/intel/ice/ice_idc_int.h  |    5 +-
+ drivers/net/ethernet/intel/ice/ice_main.c     |   18 +-
+ drivers/net/ethernet/intel/idpf/Makefile      |    1 +
+ drivers/net/ethernet/intel/idpf/idpf.h        |  114 +-
+ .../net/ethernet/intel/idpf/idpf_controlq.c   |   14 +-
+ .../net/ethernet/intel/idpf/idpf_controlq.h   |   15 +-
+ drivers/net/ethernet/intel/idpf/idpf_dev.c    |   48 +-
+ drivers/net/ethernet/intel/idpf/idpf_idc.c    |  490 ++++++
+ drivers/net/ethernet/intel/idpf/idpf_lib.c    |   93 +-
+ drivers/net/ethernet/intel/idpf/idpf_main.c   |   32 +-
+ drivers/net/ethernet/intel/idpf/idpf_mem.h    |    8 +-
+ drivers/net/ethernet/intel/idpf/idpf_txrx.h   |    1 +
+ drivers/net/ethernet/intel/idpf/idpf_vf_dev.c |   44 +-
+ .../net/ethernet/intel/idpf/idpf_virtchnl.c   |  189 ++-
+ .../net/ethernet/intel/idpf/idpf_virtchnl.h   |    3 +
+ drivers/net/ethernet/intel/idpf/virtchnl2.h   |   52 +-
+ include/linux/net/intel/idc_rdma.h            |  138 ++
+ include/linux/net/intel/iidc.h                |  107 --
+ include/linux/net/intel/iidc_rdma.h           |   67 +
+ include/uapi/rdma/irdma-abi.h                 |   17 +-
+ 58 files changed, 6693 insertions(+), 1137 deletions(-)
+ create mode 100644 drivers/infiniband/hw/irdma/icrdma_if.c
+ create mode 100644 drivers/infiniband/hw/irdma/ig3rdma_hw.c
+ create mode 100644 drivers/infiniband/hw/irdma/ig3rdma_hw.h
+ create mode 100644 drivers/infiniband/hw/irdma/ig3rdma_if.c
+ create mode 100644 drivers/infiniband/hw/irdma/virtchnl.c
+ create mode 100644 drivers/infiniband/hw/irdma/virtchnl.h
+ create mode 100644 drivers/net/ethernet/intel/idpf/idpf_idc.c
+ create mode 100644 include/linux/net/intel/idc_rdma.h
+ delete mode 100644 include/linux/net/intel/iidc.h
+ create mode 100644 include/linux/net/intel/iidc_rdma.h
+
+-- 
+2.37.3
+
 
