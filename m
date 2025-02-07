@@ -1,169 +1,111 @@
-Return-Path: <netdev+bounces-164118-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-164119-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id F0A18A2CA68
-	for <lists+netdev@lfdr.de>; Fri,  7 Feb 2025 18:40:04 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id A456BA2CA6C
+	for <lists+netdev@lfdr.de>; Fri,  7 Feb 2025 18:41:18 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id F3F2E188D1F6
-	for <lists+netdev@lfdr.de>; Fri,  7 Feb 2025 17:40:09 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 415621681E5
+	for <lists+netdev@lfdr.de>; Fri,  7 Feb 2025 17:41:17 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BCD0619597F;
-	Fri,  7 Feb 2025 17:40:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B3C02191F95;
+	Fri,  7 Feb 2025 17:41:14 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="srAac+z9"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="C4gCRQH3"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f177.google.com (mail-pl1-f177.google.com [209.85.214.177])
+Received: from mail-wr1-f54.google.com (mail-wr1-f54.google.com [209.85.221.54])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F336A18E050
-	for <netdev@vger.kernel.org>; Fri,  7 Feb 2025 17:39:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.177
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F34FC2A1D8;
+	Fri,  7 Feb 2025 17:41:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.54
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1738950000; cv=none; b=fGz1SlCgASChIGHBVq4NZmQot8MV8WRoMQv96ZJD8/1W8D+T2FeF6+ABzOmSKRZXJ4XvLrHm36cL++MwxIMBHDOPHVUJ1dpTCz9TssbUzgbn9RfY+prViICVULFLMGh+b3upT+qyghwBcoZWtBvWKLqi3mZKttn6lXJB9XiTnkg=
+	t=1738950074; cv=none; b=oAR6T1SUqtkiinT+u0ExznjE4eYYD6SwuOoPhYDx6YCgp1lSmJ2g558NGemwQNNTyJz/iCX2s4ThMKcJ+lZIeHPUibcsSclonIikpuVf2sEutLYngjxtJLgkYmFp9JlhIvt309txgPZkxnp1YdXJzgUJ6Yq9wF6Cqs6vkLRqoTg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1738950000; c=relaxed/simple;
-	bh=riq/CY74pjqc7hoeUCw3A5jSjpnEdW/Eu2wmTlSk7Ak=;
+	s=arc-20240116; t=1738950074; c=relaxed/simple;
+	bh=Xn77w4aBJFwCCNr0XS/c5Muj74MH6oiUnI01m0Esciw=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=o/LKGfjQRtYsMuIaQTs4KlSS4ANFPlBZoKGv6m5FRmEkbryh1K3NQmbdIfrzMyZqKuqGZFm0nxuKVwvJJ7CWDDC4C9UDHJ8DkSei+/R0lpDG0P0MEwBe+GPAtg0HtX0o9pGllj9LtcPS4cTlQE8SJ3l0h1jqr9HIZHDP9hVu0FM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=srAac+z9; arc=none smtp.client-ip=209.85.214.177
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
-Received: by mail-pl1-f177.google.com with SMTP id d9443c01a7336-2166360285dso43111495ad.1
-        for <netdev@vger.kernel.org>; Fri, 07 Feb 2025 09:39:58 -0800 (PST)
+	 Content-Type:Content-Disposition:In-Reply-To; b=YmrGiB0PG5GzK6g6Jmkcdq/VNYAAh8Ps4QCSh1szcYpdZbuiDocbRFUnO8PLwVCW7AaQgPu/sPL9ae7kfvyLUPZdjNxxKSwOv6ZfAKL8b/GudjXrIGUd1t10SyDQep+YIiXg1YY+n1GoVbBOs3v4kzKZpOdbYfEnHK1jPoDuv0Y=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=C4gCRQH3; arc=none smtp.client-ip=209.85.221.54
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-wr1-f54.google.com with SMTP id ffacd0b85a97d-38dc0c5546aso98535f8f.1;
+        Fri, 07 Feb 2025 09:41:12 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1738949998; x=1739554798; darn=vger.kernel.org;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=dmmypO5lGpZElJBOwBx5Lqq47jvwTZgB8nZohxAsWnU=;
-        b=srAac+z9eQCg/vz0BGPMgOn2FqLYq5HCMTx2lX/2Bj/c4MsCcyZpcrrp5NNo8zxG4j
-         7bRgNDvSORVBlpAt3fYDwY/R2zxGD3szhstjA21DCNalvnPUVUHJ3CU3J8j0lIFZ0R9h
-         hViXzWa44dnJYqy0Kb6exs5Ewu2dqOT+zB7bMOoe+PDI4adPTCKO2+xvuIwl2+6f3TEX
-         14OcLA4h9PxwIKFHppPN7JqDGSLU9T7YgpMP04LdW7KZxpXVO3gAIFiehITE/Naw2cof
-         vfNT7tLwoUUHrQL0lSdygoamXE5ZhpHUl4mmNvYoPlbXGCU9EpA55DVrvqKVJV8ke0QU
-         4WSA==
+        d=gmail.com; s=20230601; t=1738950071; x=1739554871; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=1Q+ZnVbE1eVzMq3qC0UwrUCaQ9zd7oSIY7glJtsdthI=;
+        b=C4gCRQH3xPqK93PIZrxELdHrWiZyjjOYAPrLkpx9Udy6VwRGuqq/pBqNh1ZMFS35ET
+         0aVZrjXCQPkwkgG0Ve0puX8iqlwNNCmNeTkb7rL7bDoejYMp35kimvELIfzxtRT+1f8u
+         JibUMZ2me7kqUvvNQuynBtIuPPCRsBc4uRJaCHhN3URcK4Mu3I8evVfGeBldwdhUVmiO
+         p83olfVfYj6EarkgEg+GjDwz/51CZiHSnX7m9jSgGwT+gPHZBlcL4OjqTXG9Q6mwL6hp
+         eGlC9/0kmzLMe4eY1R0AWFXJuZYZ2VZAyrs6VAuyTHNG0AO6ALo+aqP737nnhlbFcqXi
+         VJ4w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1738949998; x=1739554798;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=dmmypO5lGpZElJBOwBx5Lqq47jvwTZgB8nZohxAsWnU=;
-        b=Jj2bPiBASyYNvd9mDL7ZzQDJ8IoSZGvzVSURWHIPyHJmbC3C7xiUVqfWdw0XuKlIrJ
-         zp/lOExQylCHZgs81fn0px2FnXwx98WgQHU4H1e7miy9oUJ1SfkYWQOge0z5epw/n5J1
-         kdf974WzpFrcyi2mHYWHpuOVRxFUJFgnCYJgpleKORbspd+ziLiVxmrPofj/7uHPnMIk
-         kjOUxJrQ/8tOL3sRc600EAuK5/dHXP/EvnXio/Xaf/fk2Yy9soR0TUAlXYxuqnHstCwk
-         GfT7c1I9O4dn+yIakhEsJicfIFs09Xs1nJ7AFJEMmkMSlIma/gZT4xqcLJI/kuFjH63L
-         ikLg==
-X-Forwarded-Encrypted: i=1; AJvYcCXwEc+iAjmXJbFF4Exa780z+aw29w0Lph0BchC8Owsx41hbtiqLawo42486AfDj9PQLbQsBCJA=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxYWRApgDTbUqDYItQ54MsQKjz7gwLH3h9stuyEIV1NPwvBnQt2
-	PW2/UrNlRi+2BkLhC4DGRAcrj5A3JtY+I+mkcEbgtIzbI89fohkOD5lfdImBhg==
-X-Gm-Gg: ASbGncuvuNsHhQYwf7rN5yyuiFI4I2WmNQlolYSfMHj6aSTW7lUfbGUVmBOZhpFyevj
-	c2pi1ptvti0Z4t6ABw7KM0dqR/UyrXhh3F1r6QWoAIUGiiaPKjSyc3xfHdUHxSMWtlARY4upMCK
-	CQW2HzgxskgqzLq1Oc52UAb8dl81LR8twYa21xnwu/idI5zpQnIHgqYE0/RzV//q9eISMK+l4Eo
-	+FcHnkJz/voKLfIASiSwRrI6MLPQc4poq310Yu0lCTnaV6/wegV1wgcwMhwEkQ5RlJM5l7Oh8lx
-	uyS9+/pkfWdXzjr9gQdWxcmqUw==
-X-Google-Smtp-Source: AGHT+IEHqbioMS1WS0fxuFiPxBnBQRht7nJ0wdLWWq8J6BK7IgFAuo6kNnHsIYM7adDcTJZyHqhf+w==
-X-Received: by 2002:a05:6a21:99a6:b0:1ed:a4cd:acfc with SMTP id adf61e73a8af0-1ee03a3cf11mr6657350637.10.1738949998229;
-        Fri, 07 Feb 2025 09:39:58 -0800 (PST)
-Received: from thinkpad ([120.60.76.168])
-        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-73048e20b2esm3324297b3a.179.2025.02.07.09.39.54
+        d=1e100.net; s=20230601; t=1738950071; x=1739554871;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=1Q+ZnVbE1eVzMq3qC0UwrUCaQ9zd7oSIY7glJtsdthI=;
+        b=FyK5eDgWbk1+We/mZTY82qNMHH8fEEQdQlK7lr+BcBnHNDEtcHM+F6CD2WxfwSXeAr
+         bmTbq/5lcs4rJcjGU7DvbfcFKkS6gUxEfTW1GI5H3DrixV+gzeJnR84B2VbYJTl53lwE
+         ZTqOkX8zo/+klmEbLLkq/HMlDvjse7gWtMtmN4M8XjR2Xfr6bhCLvMVsmF1MybujHrqa
+         a81Ue+NMXFE2yBYgwSF6Ny+cELyWlcSrjwnODFKumBS+Kt3l1Byw17air20LNJp6F6wc
+         S9mz0Ghr4P9BMUxl8e5FfOZgASCS6in/EOb7FYJKC3bkgVKGYn88hSJJWoLLfneyN4B8
+         3RhQ==
+X-Forwarded-Encrypted: i=1; AJvYcCVxc1IizfzoAO40Ki7RkLpj0XY3i5H6SzSyo4ZH6+XPdTGxN5VuJET3ybOpeNvnKsiBj1Aop4jX19OqHT4EwYDZMg==@vger.kernel.org, AJvYcCWA7YHqP784JQuOovLxlBXsfpUMq9jJ3e1TGlEfPF+oGuQovHTvu7jMymtrOH/ztEF8QOORHLag@vger.kernel.org
+X-Gm-Message-State: AOJu0YxHJLKUZLh2pYsfvot6TF2DGbfFLz7vDsy/fZzX+qgfZmzE6URk
+	xr1KdsrTdxk/TP5oxxcieJKbzjXGTvX43Ww6NL5p92EiZz1FPrGu
+X-Gm-Gg: ASbGncvMNr4uVupy7hV3grtiXRNzWsDhVxYpiKGFcYrT9k/UyhbYFV+Uo3fFv0FtByo
+	KhK5jz/Amd9oh3N/3J1uS4pc5wJou6Kxn6k7uSM+lBq2zIr7i77oY4s8DwUKs5wkCMx5itaUTfo
+	j412x54tlqUpZ8wtLn2Cu+hxPTggSCJyFgZX9OXP0au6QIIdy0X2SegSjJJIOgeYNCTWKCD4p2+
+	7UEX1cyOIIZa7ywd54CL5UD/FWALydLCRg3Ngz8vmFpU/4TuTlFnm3V3zdUW8jYupdYRCwm8p7e
+	3Xc=
+X-Google-Smtp-Source: AGHT+IHfq8cUnsf6uHYsmTvPy/WN3vJAhSzfibriEFaELW5QRffpx/a3TNT0WeqH7o2cjxvtCM0rjg==
+X-Received: by 2002:a5d:6d84:0:b0:38d:b505:2cbd with SMTP id ffacd0b85a97d-38dc8dd589bmr1285167f8f.7.1738950071255;
+        Fri, 07 Feb 2025 09:41:11 -0800 (PST)
+Received: from skbuf ([86.127.124.81])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-38dbdd5c87csm5175102f8f.52.2025.02.07.09.41.09
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 07 Feb 2025 09:39:57 -0800 (PST)
-Date: Fri, 7 Feb 2025 23:09:52 +0530
-From: Manivannan Sadhasivam <manivannan.sadhasivam@linaro.org>
+        Fri, 07 Feb 2025 09:41:10 -0800 (PST)
+Date: Fri, 7 Feb 2025 19:41:08 +0200
+From: Vladimir Oltean <olteanv@gmail.com>
 To: Biju Das <biju.das.jz@bp.renesas.com>
-Cc: Andrew Lunn <andrew+netdev@lunn.ch>,
+Cc: =?utf-8?B?Q2zDqW1lbnQgTMOpZ2Vy?= <clement.leger@bootlin.com>,
+	Andrew Lunn <andrew@lunn.ch>,
 	"David S. Miller" <davem@davemloft.net>,
 	Eric Dumazet <edumazet@google.com>,
 	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Andreas =?utf-8?Q?F=C3=A4rber?= <afaerber@suse.de>,
-	netdev@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
-	linux-actions@lists.infradead.org,
+	linux-renesas-soc@vger.kernel.org, netdev@vger.kernel.org,
 	Geert Uytterhoeven <geert+renesas@glider.be>,
+	Prabhakar Mahadev Lad <prabhakar.mahadev-lad.rj@bp.renesas.com>,
 	Biju Das <biju.das.au@gmail.com>
-Subject: Re: [PATCH] net: ethernet: actions: Use
+Subject: Re: [PATCH net-next v2 2/7] net: dsa: rzn1_a5psw: Use
  of_get_available_child_by_name()
-Message-ID: <20250207173952.lpeazjyxnhfuhwb3@thinkpad>
-References: <20250201171530.54612-1-biju.das.jz@bp.renesas.com>
+Message-ID: <20250207174108.rg3km3byekqtw6p5@skbuf>
+References: <20250205124235.53285-1-biju.das.jz@bp.renesas.com>
+ <20250205124235.53285-3-biju.das.jz@bp.renesas.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <20250201171530.54612-1-biju.das.jz@bp.renesas.com>
+In-Reply-To: <20250205124235.53285-3-biju.das.jz@bp.renesas.com>
 
-On Sat, Feb 01, 2025 at 05:15:18PM +0000, Biju Das wrote:
-> Use the helper of_get_available_child_by_name() to simplify
-> owl_emac_mdio_init().
+On Wed, Feb 05, 2025 at 12:42:22PM +0000, Biju Das wrote:
+> Simplify a5psw_probe() by using of_get_available_child_by_name().
+> 
+> While at it, move of_node_put(mdio) inside the if block to avoid code
+> duplication.
 > 
 > Signed-off-by: Biju Das <biju.das.jz@bp.renesas.com>
-
-Acked-by: Manivannan Sadhasivam <manivannan.sadhasivam@linaro.org>
-
-- Mani
-
 > ---
-> This patch is only compile tested and depend upon[1]
-> [1] https://lore.kernel.org/all/20250201093126.7322-1-biju.das.jz@bp.renesas.com/
-> ---
->  drivers/net/ethernet/actions/owl-emac.c | 21 +++++----------------
->  1 file changed, 5 insertions(+), 16 deletions(-)
-> 
-> diff --git a/drivers/net/ethernet/actions/owl-emac.c b/drivers/net/ethernet/actions/owl-emac.c
-> index 115f48b3342c..3457ce041335 100644
-> --- a/drivers/net/ethernet/actions/owl-emac.c
-> +++ b/drivers/net/ethernet/actions/owl-emac.c
-> @@ -1323,22 +1323,15 @@ static int owl_emac_mdio_init(struct net_device *netdev)
->  	struct owl_emac_priv *priv = netdev_priv(netdev);
->  	struct device *dev = owl_emac_get_dev(priv);
->  	struct device_node *mdio_node;
-> -	int ret;
-> +	struct device_node *mdio_node _free(device_node) =
-> +		of_get_available_child_by_name(dev->of_node, "mdio");
->  
-> -	mdio_node = of_get_child_by_name(dev->of_node, "mdio");
->  	if (!mdio_node)
->  		return -ENODEV;
->  
-> -	if (!of_device_is_available(mdio_node)) {
-> -		ret = -ENODEV;
-> -		goto err_put_node;
-> -	}
-> -
->  	priv->mii = devm_mdiobus_alloc(dev);
-> -	if (!priv->mii) {
-> -		ret = -ENOMEM;
-> -		goto err_put_node;
-> -	}
-> +	if (!priv->mii)
-> +		return -ENOMEM;
->  
->  	snprintf(priv->mii->id, MII_BUS_ID_SIZE, "%s", dev_name(dev));
->  	priv->mii->name = "owl-emac-mdio";
-> @@ -1348,11 +1341,7 @@ static int owl_emac_mdio_init(struct net_device *netdev)
->  	priv->mii->phy_mask = ~0; /* Mask out all PHYs from auto probing. */
->  	priv->mii->priv = priv;
->  
-> -	ret = devm_of_mdiobus_register(dev, priv->mii, mdio_node);
-> -
-> -err_put_node:
-> -	of_node_put(mdio_node);
-> -	return ret;
-> +	return devm_of_mdiobus_register(dev, priv->mii, mdio_node);
->  }
->  
->  static int owl_emac_phy_init(struct net_device *netdev)
-> -- 
-> 2.43.0
-> 
 
--- 
-மணிவண்ணன் சதாசிவம்
+Reviewed-by: Vladimir Oltean <olteanv@gmail.com>
 
