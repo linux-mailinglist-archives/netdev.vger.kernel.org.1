@@ -1,68 +1,73 @@
-Return-Path: <netdev+bounces-163805-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-163806-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id E322FA2B9C5
-	for <lists+netdev@lfdr.de>; Fri,  7 Feb 2025 04:33:23 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id AB4F5A2B9CA
+	for <lists+netdev@lfdr.de>; Fri,  7 Feb 2025 04:38:46 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 1009F7A1DDA
-	for <lists+netdev@lfdr.de>; Fri,  7 Feb 2025 03:32:28 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id BAA877A2CA4
+	for <lists+netdev@lfdr.de>; Fri,  7 Feb 2025 03:37:50 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F03501494B5;
-	Fri,  7 Feb 2025 03:33:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 81CF61632F2;
+	Fri,  7 Feb 2025 03:38:40 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=uniontech.com header.i=@uniontech.com header.b="nbTteDYY"
+	dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b="X/oGDqTC"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtpbgbr2.qq.com (smtpbgbr2.qq.com [54.207.22.56])
+Received: from smtp-fw-52004.amazon.com (smtp-fw-52004.amazon.com [52.119.213.154])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6C7EF2417E7;
-	Fri,  7 Feb 2025 03:33:10 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=54.207.22.56
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BA1A62417E7
+	for <netdev@vger.kernel.org>; Fri,  7 Feb 2025 03:38:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=52.119.213.154
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1738899197; cv=none; b=abFnjAZ5kMrYluS+WGzpAYBL6Vm+55sGUCWZXfDwyScGwrTduZBLFTTfOT5T6GWmZI9LBwr/iPnvFIPXKYgTK/wSZ6A53r7RhujL6EHTwqQThoH/i/wxjc5/7DVxa9FB+WqoWwMTPNRu1S7xdLrYntIMOhfmGV9WMQ//7hnF7Qw=
+	t=1738899520; cv=none; b=p1OWNXwfqrUtsZ2b4gEuxQXIvAZZ1vnPISHKV4/99OcQYU5WBI8vwL5T2Kfh+Osv2/lFOMv1etNgBf9ZwqEOdHmTqSJ9TS7WbV7+JhFbyp7hqRg0U6Bqwx40KANiOY8tzObuR/eChtV+0J09uNms4nw394hi9e8afirJd7ED164=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1738899197; c=relaxed/simple;
-	bh=h/LL9hB+rFwBBYYdjwkCol08R+/c72GTXL2mQLrYofA=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=MOIg3S6N3Q/wQmSmT+DqqewCfyCIohtuwhu/E92WLYdCFJvlOiDu86D+KhxH1VThutVfTwofOpPtWuRUx1UQ6KPR/F9h+HsFKU7MXIg83kF+0k0XrL+RvIJo5h392q2U8g2MgoqzFW/TNY/E0wJb+TFwPptsuMuwndP+1UNM6Ac=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=uniontech.com; spf=none smtp.mailfrom=uniontech.com; dkim=pass (1024-bit key) header.d=uniontech.com header.i=@uniontech.com header.b=nbTteDYY; arc=none smtp.client-ip=54.207.22.56
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=uniontech.com
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=uniontech.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=uniontech.com;
-	s=onoh2408; t=1738899139;
-	bh=HoKWwYr5Flu2cgUgqaZ/TV+1hwihy+b3dUE89jI9Cq4=;
-	h=From:To:Subject:Date:Message-ID:MIME-Version;
-	b=nbTteDYY9qmYG0b0NMvxjTWJmVzoH7Ex0l8POQw30Sh2G1itySvXrUKk1u9+4HlmB
-	 eiTNbn5oYtk8TvMm2Aa7tLTIzIFLVcD8oJksb65pYTdMNg3kLtabqZBgNdL1jV6bCL
-	 n6ygEm1BiT3nMv+qhV/hmr0jQr/UP//a1t58V3pY=
-X-QQ-mid: bizesmtpip2t1738899097t6pcqco
-X-QQ-Originating-IP: 9+v8GzvjcRVxj3/wxhEcn8FXY0lqalswqnLtMpkfjW0=
-Received: from localhost.localdomain ( [localhost])
-	by bizesmtp.qq.com (ESMTP) with 
-	id ; Fri, 07 Feb 2025 11:31:35 +0800 (CST)
-X-QQ-SSF: 0000000000000000000000000000000
-X-QQ-GoodBg: 1
-X-BIZMAIL-ID: 10689580007085991278
-From: WangYuli <wangyuli@uniontech.com>
-To: Jason@zx2c4.com,
-	shuah@kernel.org
-Cc: wangyuli@uniontech.com,
-	horms@kernel.org,
-	tglx@linutronix.de,
-	jstultz@google.com,
-	wireguard@lists.zx2c4.com,
-	netdev@vger.kernel.org,
-	linux-kselftest@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	zhanjun@uniontech.com,
-	guanwentao@uniontech.com,
-	chenlinxuan@uniontech.com
-Subject: [PATCH v2] wireguard: selftests: Cleanup CONFIG_UBSAN_SANITIZE_ALL
-Date: Fri,  7 Feb 2025 11:31:31 +0800
-Message-ID: <2CCC5056FBF7DD72+20250207033131.20046-1-wangyuli@uniontech.com>
-X-Mailer: git-send-email 2.47.2
+	s=arc-20240116; t=1738899520; c=relaxed/simple;
+	bh=Ff5Ide4rsuAFsbUZ8FtG8TtEujx/ZXkKtij3MwLsmKc=;
+	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=GDqC+2/TLcAHYuS8kwBEukPEZslxAZTIw6dzqle//wHYXa0xUK6rQbTva/1M4k9ahrOLAFP7hJGp3G/ouxwXwPq7SQeXtBEG+JK1DQgifm5tc2bwKFwEPsKrhA0PeUqyqLFIIyuHrYfrwa0tZUpgbWWjtVnexKhfI9N63DWob0E=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.co.jp; dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b=X/oGDqTC; arc=none smtp.client-ip=52.119.213.154
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.co.jp
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
+  t=1738899519; x=1770435519;
+  h=from:to:cc:subject:date:message-id:in-reply-to:
+   references:mime-version:content-transfer-encoding;
+  bh=XpTfcUasFvA7loNDgAdhgEW2CY/Wwpq46dz0wNsj6sg=;
+  b=X/oGDqTCtz9xoOu0bilGbyLEL0OeWeYWuyBJQqIT/EPPBP0yjlOZvDwj
+   ua59HuTHDfEzvgbOzbMOGsGvhAQKUAY0uztjWS/E143fUT6EdQqK5SZ6l
+   RkNSZqXTNtDY7xrB3f1rX6fVWlO0o+L7dCIaI559yhOOQk55op2CfiqN0
+   g=;
+X-IronPort-AV: E=Sophos;i="6.13,266,1732579200"; 
+   d="scan'208";a="269106493"
+Received: from iad12-co-svc-p1-lb1-vlan2.amazon.com (HELO smtpout.prod.us-west-2.prod.farcaster.email.amazon.dev) ([10.43.8.2])
+  by smtp-border-fw-52004.iad7.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 07 Feb 2025 03:38:35 +0000
+Received: from EX19MTAUWC002.ant.amazon.com [10.0.38.20:9448]
+ by smtpin.naws.us-west-2.prod.farcaster.email.amazon.dev [10.0.19.117:2525] with esmtp (Farcaster)
+ id cda0908a-e2f4-4127-a625-b95823ce202e; Fri, 7 Feb 2025 03:38:34 +0000 (UTC)
+X-Farcaster-Flow-ID: cda0908a-e2f4-4127-a625-b95823ce202e
+Received: from EX19D004ANA001.ant.amazon.com (10.37.240.138) by
+ EX19MTAUWC002.ant.amazon.com (10.250.64.143) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1258.39;
+ Fri, 7 Feb 2025 03:38:34 +0000
+Received: from 6c7e67bfbae3.amazon.com (10.118.243.9) by
+ EX19D004ANA001.ant.amazon.com (10.37.240.138) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1544.14;
+ Fri, 7 Feb 2025 03:38:30 +0000
+From: Kuniyuki Iwashima <kuniyu@amazon.com>
+To: <leitao@debian.org>
+CC: <andrew+netdev@lunn.ch>, <edumazet@google.com>, <kernel-team@meta.com>,
+	<kuba@kernel.org>, <kuniyu@amazon.com>, <netdev@vger.kernel.org>,
+	<ushankar@purestorage.com>
+Subject: Re: for_each_netdev_rcu() protected by RTNL and CONFIG_PROVE_RCU_LIST
+Date: Fri, 7 Feb 2025 12:38:22 +0900
+Message-ID: <20250207033822.47317-1-kuniyu@amazon.com>
+X-Mailer: git-send-email 2.39.5 (Apple Git-154)
+In-Reply-To: <20250206-scarlet-ermine-of-improvement-1fcac5@leitao>
+References: <20250206-scarlet-ermine-of-improvement-1fcac5@leitao>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -70,53 +75,55 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-QQ-SENDSIZE: 520
-Feedback-ID: bizesmtpip:uniontech.com:qybglogicsvrgz:qybglogicsvrgz8a-1
-X-QQ-XMAILINFO: Odky5wNUcHo/uj5SfSwfuY2WuIGafpNqbRh05g7wplfkTkaAT/yGmohs
-	/XY1Jj+mYC9K1Wgw5fk5syZLQcuo77ZZjspX7vvwy2TdjEfMdqdGG4yzMhpwNs0yZ7n9ZK+
-	ZYZKpiG0EnvRLFYVD7hm7f52YxxxzNsV9IdxKLAkUb/xvSpLz1C9yim7KoHwhjYMqmfgf8H
-	i19xlii2zXuSB2ZWm/XjBsmfei5C8Oltr813qAF9hKtT2Mj47uMjseLtyx0wXbqX57XgwPx
-	fjxESRxaF9JYqC2e7AoWdbvRgvgc6jlW5JRjwQFayKV0cKBpAGAukJaTYYrJ4ezVsxBRJg2
-	js/XMTN8qQ9lcHCPDYc2jALYO4vUMwrxez11jiOEPOpPBbql43pAhnFk/hO9bUuOHqdcycU
-	Ng1BWtUoOjT3hfRmr/eSs41RIro52i08abikW0c29970bAmYyu6d0krLybGVRiDQ3zxMlZD
-	xkEbWF3lsrvCml016Gw60f7Z7rtpu0L2VO2qai3C6hh+YIAFFcWbtSg+EUSC+O6Oinjn7Ml
-	zE8lQDUDy07y8BObPT7A7cSf5LgL/Bml1K7mefEm7MzAOnV2fHsM3zhaI8ojIBfV0VigVt/
-	Hml/Nm//Xm/kM2IckMB+K2yixFjpBTivdH0elxazxxl5AtzndCheTueADbvBzb6No6qaqAl
-	8gW4lSYgvyUkvwnh4OL6/Hq9FY/qaZ9G8fasZryDI+QZMTJgCPNaVgZjjtElAZ1QjBBUc9K
-	0zfTE7glEA6eBFX4PkIzAUJcdcC/az71rpOVojZBZLw9R92oSccVAibZwmazNMWs9dENzx9
-	7PihbzWjjcE+nuS0EKMbOv1xkp1ROvDh0H0ymcbzNvSoRxYmq4l7y+MBZ/g1DFBVdIRT40m
-	Oi0rb9hMD6sAtajbqYfyX5WIp4Q4+aGjuQzMSPEji2ALiGevmDLWXH1613gzACqRbcJbyfy
-	qgakdLo2+9py87dKTgDKomhPiP0SN469He0SEU55wu4LliYRQkVNECJE84uYcxvTDKRv0Xc
-	ByilfdpRiF+u1Y1DHx
-X-QQ-XMRINFO: OWPUhxQsoeAVDbp3OJHYyFg=
-X-QQ-RECHKSPAM: 0
+Content-Type: text/plain
+X-ClientProxiedBy: EX19D045UWC004.ant.amazon.com (10.13.139.203) To
+ EX19D004ANA001.ant.amazon.com (10.37.240.138)
 
-Commit 918327e9b7ff ("ubsan: Remove CONFIG_UBSAN_SANITIZE_ALL")
-removed the CONFIG_UBSAN_SANITIZE_ALL configuration option.
-Eliminate invalid configurations to improve code readability.
+From: Breno Leitao <leitao@debian.org>
+Date: Thu, 6 Feb 2025 07:51:55 -0800
+> Hello,
+> 
+> We're seeing CONFIG_PROVE_RCU_LIST warnings when for_each_netdev_rcu()
+> is called with RTNL held. While RTNL provides sufficient locking, the
+> RCU list checker isn't aware of this relationship, leading to false
+> positives like:
+> 
+> 	WARNING: suspicious RCU usage
+> 	net/core/dev.c:1143 RCU-list traversed in non-reader section!!
+> 
+> The initial discussion popped up in:
+> 
+> 	https://lore.kernel.org/all/20250205-flying-coucal-of-influence-0dcbc3@leitao/
+> 
+> I've attempted a solution by modifying for_each_netdev_rcu():
+> 
+> 	diff --git a/include/linux/netdevice.h b/include/linux/netdevice.h
+> 	index 2a59034a5fa2f..59b18b58fa927 100644
+> 	--- a/include/linux/netdevice.h
+> 	+++ b/include/linux/netdevice.h
+> 	@@ -3210,13 +3210,14 @@ netdev_notifier_info_to_extack(const struct netdev_notifier_info *info)
+> 	int call_netdevice_notifiers(unsigned long val, struct net_device *dev);
+> 	int call_netdevice_notifiers_info(unsigned long val,
+> 					struct netdev_notifier_info *info);
+> 	+bool lockdep_rtnl_net_is_held(struct net *net);
+> 
+> 	#define for_each_netdev(net, d)		\
+> 			list_for_each_entry(d, &(net)->dev_base_head, dev_list)
+> 	#define for_each_netdev_reverse(net, d)	\
+> 			list_for_each_entry_reverse(d, &(net)->dev_base_head, dev_list)
+> 	#define for_each_netdev_rcu(net, d)		\
+> 	-		list_for_each_entry_rcu(d, &(net)->dev_base_head, dev_list)
+> 	+		list_for_each_entry_rcu(d, &(net)->dev_base_head, dev_list, lockdep_rtnl_net_is_held(net))
+> 	#define for_each_netdev_safe(net, d, n)	\
+> 			list_for_each_entry_safe(d, n, &(net)->dev_base_head, dev_list)
+> 	#define for_each_netdev_continue(net, d)		\
+> 
+> However, I have concerns about using lockdep_rtnl_net_is_held() since it
+> has a dependency on CONFIG_DEBUG_NET_SMALL_RTNL.
+> 
+> Are there better approaches to silence these warnings when RTNL is held?
+> Any suggestions would be appreciated.
 
-Reviewed-by: Simon Horman <horms@kernel.org>
-Signed-off-by: WangYuli <wangyuli@uniontech.com>
----
-Changelog:
- *v1->v2: Add Simon Horman's "Reviewed-by" tag.
----
- tools/testing/selftests/wireguard/qemu/debug.config | 1 -
- 1 file changed, 1 deletion(-)
-
-diff --git a/tools/testing/selftests/wireguard/qemu/debug.config b/tools/testing/selftests/wireguard/qemu/debug.config
-index 139fd9aa8b12..828f14300d0a 100644
---- a/tools/testing/selftests/wireguard/qemu/debug.config
-+++ b/tools/testing/selftests/wireguard/qemu/debug.config
-@@ -22,7 +22,6 @@ CONFIG_HAVE_ARCH_KASAN=y
- CONFIG_KASAN=y
- CONFIG_KASAN_INLINE=y
- CONFIG_UBSAN=y
--CONFIG_UBSAN_SANITIZE_ALL=y
- CONFIG_DEBUG_KMEMLEAK=y
- CONFIG_DEBUG_STACK_USAGE=y
- CONFIG_DEBUG_SHIRQ=y
--- 
-2.47.2
-
+We can't use lockdep_rtnl_net_is_held() there yet because most users are
+not converted to per-netns RTNL, so it will complain loudly.
 
