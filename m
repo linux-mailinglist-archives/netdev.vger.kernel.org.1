@@ -1,64 +1,62 @@
-Return-Path: <netdev+bounces-163789-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-163790-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 96B03A2B91E
-	for <lists+netdev@lfdr.de>; Fri,  7 Feb 2025 03:33:59 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5EAA3A2B921
+	for <lists+netdev@lfdr.de>; Fri,  7 Feb 2025 03:37:31 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id A64DC1887AAC
-	for <lists+netdev@lfdr.de>; Fri,  7 Feb 2025 02:34:04 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id EAA2B1664F1
+	for <lists+netdev@lfdr.de>; Fri,  7 Feb 2025 02:37:29 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1F7C6282E1;
-	Fri,  7 Feb 2025 02:33:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BAD721519B4;
+	Fri,  7 Feb 2025 02:37:27 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="pcwn6q13"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="OD9fAU4r"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EE0CF7E9
-	for <netdev@vger.kernel.org>; Fri,  7 Feb 2025 02:33:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 945847E9
+	for <netdev@vger.kernel.org>; Fri,  7 Feb 2025 02:37:27 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1738895636; cv=none; b=BOTfTXNc77gMngCJzJJWoOd4H9jXn5El7Y4rTt04NZFq2hfHFYq6N43zqFQjEcJTcLQzAeZDmhEeBQAaaw6lP2xqI0Uwrhi7mwO7RWJEDn14O0oim7HcDTKUo4l0Sfkv+ggbLOrTfbnCPDEOAAS7LkmbPz5BRXgZAccLLYVL8N4=
+	t=1738895847; cv=none; b=W3LQD+CPngP7Ar/4k416IOrnClPX2zF5/uBbzlsZTPTDoEQGADMc6VIRHEilDnD8TsO2oZydHNP5HufC2dIzcybgvjmFtt8piAcKG2CoJ1Sq0cnSo7K7YTykKD2IFZNlug7pS5n2cBmzmQt8/laHlgJCT6A/mXf3g8ly3KPn4go=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1738895636; c=relaxed/simple;
-	bh=GdDbyGIzviXjTeSXk/FPXDQ2vguVeuJkFIC2V1e/OoQ=;
+	s=arc-20240116; t=1738895847; c=relaxed/simple;
+	bh=IpOs8bZ1l+1vPpWpZ68iIFwqWwg5GZcdljkc6X5jQUc=;
 	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=NBnybfSevj0NtfJIOvSkmsxD1l8aQaSEpkMO1/jK8mtydDTQTHUegcfEqWJnM5CvqFnJm04/mHQbIBGKpNSVHNqasWMPscS26X1O9X2+IL1Yu12N/0x84E7r6vdZehXupAavjD4logshig7m/vKDczDi/id2DuTKO0S0LIUZyBw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=pcwn6q13; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7A292C4CEDD;
-	Fri,  7 Feb 2025 02:33:53 +0000 (UTC)
+	 MIME-Version:Content-Type; b=tz0jdQcXOCqFP2nxFQq9r4+7Y/fNRJ96JtD51gvlGpDz/GGEmnm6V3dwJ2ub8bew3u+b4V65Itq10BKQOnvBhEfUnGmO/uAx0mL3Nv/K/OSE08/Mp+7DcTndgMMggMkDdb9/xmYZDCmPyfHt8bwLEr+I14dQuSf2r3MU/ZZ98IU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=OD9fAU4r; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4BDF1C4CEDD;
+	Fri,  7 Feb 2025 02:37:26 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1738895634;
-	bh=GdDbyGIzviXjTeSXk/FPXDQ2vguVeuJkFIC2V1e/OoQ=;
+	s=k20201202; t=1738895847;
+	bh=IpOs8bZ1l+1vPpWpZ68iIFwqWwg5GZcdljkc6X5jQUc=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=pcwn6q13hRXYMLVPzLkpUE3XNdu5FK8aSZaVdBXIT3SlnQ3hEFO/9VHDf2myjE9RZ
-	 NmYaM32lmEPEMtDRzpHbnYDR5zaTNEkYR6XHJEq1hyWkkBAS4s32vF05Mwg8fcxA2Z
-	 etsT1WQzHfZA1fAAXpGGVr4/b9M+92Nqu9wx7jAh2M4/9187ovosBft3hEzg9TFk21
-	 iUe4gjPaJAid6Rn8P/9p6e67kLK1RMtKD0tLyFUxuvECO3PyO61FzY8A0jN1lBoA97
-	 v+o7KW8WwIH+vSIe/VYfHGx8flmtqQcnBwb3qXjkUMCmhbnp3w7dGQDCM6VrgrAtN1
-	 eyie2xQ1JAwuw==
-Date: Thu, 6 Feb 2025 18:33:52 -0800
+	b=OD9fAU4rrXS6DO+oUKUbCR3VXB87MKi30VaUdgAg73bSkcQ0qS5DO6C1NdgTOdbQs
+	 p18r2gv6WDhuF9COK8dcOZyhE4wRl4wrqNwFdNeecQQSjC1AsZT/Te7REDRfklBKqZ
+	 yp7Wc4Tg++QLrkgMgunNApTE3esj0KmFeiQYNtPDN6T8R4UE+M3FqtI5b/yoNIHAGz
+	 SKB74SPsKdXgjoQOm1koOuUfGiNPLLIrWDQ7OHN5DhVbXw07HooaUvgSw2KWtDGFCR
+	 g3g1XklIr3yzEIn5Wrc/gURBV4T9knlCvuJUXDSVu1H7LBMXLIrdUFJVViEAUBYaaK
+	 Y0aFyoDrE2xWg==
+Date: Thu, 6 Feb 2025 18:37:25 -0800
 From: Jakub Kicinski <kuba@kernel.org>
 To: Ahmed Zaki <ahmed.zaki@intel.com>
-Cc: Joe Damato <jdamato@fastly.com>, <netdev@vger.kernel.org>,
- <intel-wired-lan@lists.osuosl.org>, <andrew+netdev@lunn.ch>,
- <edumazet@google.com>, <horms@kernel.org>, <pabeni@redhat.com>,
- <davem@davemloft.net>, <michael.chan@broadcom.com>, <tariqt@nvidia.com>,
- <anthony.l.nguyen@intel.com>, <przemyslaw.kitszel@intel.com>,
- <shayd@nvidia.com>, <akpm@linux-foundation.org>, <shayagr@amazon.com>,
- <kalesh-anakkur.purayil@broadcom.com>
+Cc: netdev@vger.kernel.org, intel-wired-lan@lists.osuosl.org,
+ andrew+netdev@lunn.ch, edumazet@google.com, horms@kernel.org,
+ pabeni@redhat.com, davem@davemloft.net, michael.chan@broadcom.com,
+ tariqt@nvidia.com, anthony.l.nguyen@intel.com,
+ przemyslaw.kitszel@intel.com, jdamato@fastly.com, shayd@nvidia.com,
+ akpm@linux-foundation.org, shayagr@amazon.com,
+ kalesh-anakkur.purayil@broadcom.com
 Subject: Re: [PATCH net-next v7 2/5] net: napi: add CPU affinity to
  napi_config
-Message-ID: <20250206183352.4cecc85e@kernel.org>
-In-Reply-To: <8270a43c-61f8-446d-8701-4fbd13a72e32@intel.com>
+Message-ID: <20250206183725.7da19b5c@kernel.org>
+In-Reply-To: <20250204220622.156061-3-ahmed.zaki@intel.com>
 References: <20250204220622.156061-1-ahmed.zaki@intel.com>
 	<20250204220622.156061-3-ahmed.zaki@intel.com>
-	<Z6KYDs0os_DizhMa@LQ3V64L9R2>
-	<8270a43c-61f8-446d-8701-4fbd13a72e32@intel.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -68,38 +66,38 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
 
-On Wed, 5 Feb 2025 08:20:20 -0700 Ahmed Zaki wrote:
-> >> +	if (napi->dev->rx_cpu_rmap_auto) {
-> >>   		rc = napi_irq_cpu_rmap_add(napi, irq);
-> >>   		if (rc)
-> >>   			netdev_warn(napi->dev, "Unable to update ARFS map (%d)\n",
-> >>   				    rc);
-> >> +	} else if (napi->config && napi->dev->irq_affinity_auto) {
-> >> +		napi->notify.notify = netif_napi_irq_notify;
-> >> +		napi->notify.release = netif_napi_affinity_release;
-> >> +
-> >> +		rc = irq_set_affinity_notifier(irq, &napi->notify);
-> >> +		if (rc)
-> >> +			netdev_warn(napi->dev, "Unable to set IRQ notifier (%d)\n",
-> >> +				    rc);
-> >>   	}  
-> > 
-> > Should there be a WARN_ON or WARN_ON_ONCE in here somewhere if the
-> > driver calls netif_napi_set_irq_locked but did not link NAPI config
-> > with a call to netif_napi_add_config?
-> > 
-> > It seems like in that case the driver is buggy and a warning might
-> > be helpful.
-> >   
-> 
-> I think that is a good idea, if there is a new version I can add this in 
-> the second part of the if:
-> 
-> 
-> if (WARN_ON_ONCE(!napi->config))
-> 	return;
+On Tue,  4 Feb 2025 15:06:19 -0700 Ahmed Zaki wrote:
+> + *	@irq_affinity_auto: driver wants the core to manage the IRQ affinity.
 
-To be clear, this will make it illegal to set IRQ on a NAPI instance
-before it's listed. Probably for the best if we also have auto-remove
-in netif_napi_del().
+"manage" is probably too strong? "store" or "remember" ?
+Your commit message explains it quite nicely.
+
+> + *			    Set by netif_enable_irq_affinity(), then driver must
+> + *			    create persistent napi by netif_napi_add_config()
+> + *			    and finally bind napi to IRQ (netif_napi_set_irq).
+> + *
+>   *	@rx_cpu_rmap_auto: driver wants the core to manage the ARFS rmap.
+>   *	                   Set by calling netif_enable_cpu_rmap().
+>   *
+> @@ -2402,6 +2406,7 @@ struct net_device {
+>  	struct lock_class_key	*qdisc_tx_busylock;
+>  	bool			proto_down;
+>  	bool			threaded;
+> +	bool			irq_affinity_auto;
+>  	bool			rx_cpu_rmap_auto;
+>  
+>  	/* priv_flags_slow, ungrouped to save space */
+> @@ -2662,6 +2667,11 @@ static inline void netdev_set_ml_priv(struct net_device *dev,
+>  	dev->ml_priv_type = type;
+>  }
+>  
+> +static inline void netif_enable_irq_affinity(struct net_device *dev)
+
+Similar here, "enable affinity" is a bit strong.
+
+netif_remember_irq_affinity() would be more accurate IMHO
+
+> +{
+> +	dev->irq_affinity_auto = true;
+> +}
 
