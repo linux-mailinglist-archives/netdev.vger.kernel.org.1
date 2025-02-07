@@ -1,62 +1,57 @@
-Return-Path: <netdev+bounces-163976-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-163977-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3A47DA2C366
-	for <lists+netdev@lfdr.de>; Fri,  7 Feb 2025 14:19:52 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id EDC8AA2C372
+	for <lists+netdev@lfdr.de>; Fri,  7 Feb 2025 14:24:10 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 53EC5188C5EB
-	for <lists+netdev@lfdr.de>; Fri,  7 Feb 2025 13:19:57 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id CA2D37A553F
+	for <lists+netdev@lfdr.de>; Fri,  7 Feb 2025 13:23:14 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9BC301E105E;
-	Fri,  7 Feb 2025 13:19:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 296871E98F4;
+	Fri,  7 Feb 2025 13:24:04 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="dkXz39eB"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="rw4kTpt1"
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 869779454;
-	Fri,  7 Feb 2025 13:19:45 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F393E1448E0;
+	Fri,  7 Feb 2025 13:24:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1738934387; cv=none; b=WYSCJqacY3RsrS/GIWKmDYP85GMnNlbdzJ551SKcmFc7H2lUOeibdkEsSdFi195o4sOEjrNZHmFeLeVGHw4McWQV/peRr3W94sjwSV9gwgCOJe0HKYGkHKm6jdml63gsk7z3edmEFZ5qvhYnVtEFpKTRu6BF3p0TmJx0PEte1jA=
+	t=1738934644; cv=none; b=dVxFSNMdvTGlbgI9g6QsZ642oruDIfj3bobl6xgh+wzLw1sfvuYA+v3SjjrmXVxyrV6PFAkQpdUF4jhH0ApohBTaQbH//FdYvrbiU6mvAOPR3IhZbyMZsvBH/Pa9d+uJU7UukkM1fXWftJLYm2I1cHMQQJxDqhC+KBi3y5hoHTo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1738934387; c=relaxed/simple;
-	bh=jRrB2qmo7JrU98XWap5HuVTNK8sJMFUVIUhbRBVGh3o=;
+	s=arc-20240116; t=1738934644; c=relaxed/simple;
+	bh=pvBHIzpMFGVggBJELNXPy0i5kwkvMht4y9SKOGdc3BI=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=B1wSvA/oHF6zJnObv2h2qrdosNddahrzGxKDrlGgWlx/e48ifl29/JPMW2Ricur6U2P7KpCxaJhCludLbIQl9QPjue14+NiRXZ6A+6x7vac41mV6BDrGxz2dIyYP6djRK6UOUb+4wDgK4CdsqYYiBLzvbnLUUL1V1pxa75aeXIA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=dkXz39eB; arc=none smtp.client-ip=156.67.10.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=6IvWTedbFSZ2DZf9hRcDWc+nGLgLBJV4pd4iba6oTfA=; b=dkXz39eBc1Jhhf2RLEJnoSB5IC
-	dyQlxKs8BCdsVI/ibsWTME3NpJoftbO7Y82uL4umSlJq8yaO3Scd+XcjCxvmMGu2sVgcu21gNc/ZN
-	F4TIPUKFCP6aFNW/IaHnKHhDS0XUNU0FCKcdsgipYs15Dyo11z8KVrRr173WmH54XuGs=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1tgOGZ-00Bqmp-R0; Fri, 07 Feb 2025 14:19:31 +0100
-Date: Fri, 7 Feb 2025 14:19:31 +0100
-From: Andrew Lunn <andrew@lunn.ch>
-To: "Russell King (Oracle)" <linux@armlinux.org.uk>
-Cc: Oleksij Rempel <o.rempel@pengutronix.de>,
-	Byungho An <bh74.an@samsung.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	kernel@pengutronix.de, linux-kernel@vger.kernel.org,
-	netdev@vger.kernel.org
-Subject: Re: [PATCH net-next v2 1/1] net: sxgbe: rework EEE handling based on
- PHY negotiation
-Message-ID: <0d3ba7a5-0e24-4cb5-be52-74a7096a11eb@lunn.ch>
-References: <20250207105610.1875327-1-o.rempel@pengutronix.de>
- <Z6X0WsUaRw-P-QVt@shell.armlinux.org.uk>
+	 Content-Type:Content-Disposition:In-Reply-To; b=nccBpfV4HSuu8HQgNgMhrvoMTUBi5fuLKfkfo9P3uZG10+RmayD4WQGnv5AP82hb/N71p6Ms8tr0/WLmnK9b8izBER2eAw7H3FJgrv7nW4ayxonqO+pyPCiIrBRB92VlVy4ouy9MHcGotHQuTQAjzZDsKGTGhg58Rg8xjSjTwpg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=rw4kTpt1; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 73B99C4CED1;
+	Fri,  7 Feb 2025 13:24:01 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1738934643;
+	bh=pvBHIzpMFGVggBJELNXPy0i5kwkvMht4y9SKOGdc3BI=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=rw4kTpt1tekZ8TNkYbm5HzowTm5bOJYiJ0g6UXjHkZCR94UL3do1qXYNe1Rz23Fz/
+	 r6gxbcPsZuPa4yLfeNokkTviYfMH/prqGUtPwg0LHA8BZnyk4MbH/fB7zWw5oywapp
+	 GkD5ulGtBi9IwQ+LJ3phxKT0aZfFWasBol1JKoCRLY2Fr5QAiYtSvkeNLrwkRYQRXr
+	 Fl6YD22UMRgi8USCS/EOs7n5uJXLK+uuBuTlkQ0U8/pZkS0YaNkTusqouLa2l6DEDu
+	 E5L0eM8IK+81T5dF++QnnJhITaIg0fztLDVREHsojOgcIcnyzknEeVo/Ezafz+Gm6h
+	 PItmKql7Ec1yA==
+Date: Fri, 7 Feb 2025 13:23:59 +0000
+From: Simon Horman <horms@kernel.org>
+To: alucerop@amd.com
+Cc: linux-cxl@vger.kernel.org, netdev@vger.kernel.org,
+	dan.j.williams@intel.com, edward.cree@amd.com, davem@davemloft.net,
+	kuba@kernel.org, pabeni@redhat.com, edumazet@google.com,
+	dave.jiang@intel.com
+Subject: Re: [PATCH v10 21/26] cxl: allow region creation by type2 drivers
+Message-ID: <20250207132359.GT554665@kernel.org>
+References: <20250205151950.25268-1-alucerop@amd.com>
+ <20250205151950.25268-22-alucerop@amd.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -65,22 +60,48 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <Z6X0WsUaRw-P-QVt@shell.armlinux.org.uk>
+In-Reply-To: <20250205151950.25268-22-alucerop@amd.com>
 
-> ... and given this, I ask again: should there be a generic
-> software-timer EEE implementation so we're not having to patch multiple
-> drivers for the same bug(s).
+On Wed, Feb 05, 2025 at 03:19:45PM +0000, alucerop@amd.com wrote:
+> From: Alejandro Lucero <alucerop@amd.com>
+> 
+> Creating a CXL region requires userspace intervention through the cxl
+> sysfs files. Type2 support should allow accelerator drivers to create
+> such cxl region from kernel code.
+> 
+> Adding that functionality and integrating it with current support for
+> memory expanders.
+> 
+> Based on https://lore.kernel.org/linux-cxl/168592159835.1948938.1647215579839222774.stgit@dwillia2-xfh.jf.intel.com/
+> 
+> Signed-off-by: Alejandro Lucero <alucerop@amd.com>
+> Co-developed-by: Dan Williams <dan.j.williams@intel.com>
+> Reviewed-by: Zhi Wang <zhiw@nvidia.com>
+> Reviewed-by: Jonathan Cameron <Jonathan.Cameron@huawei.com>
+> ---
+>  drivers/cxl/core/region.c | 145 ++++++++++++++++++++++++++++++++++----
+>  drivers/cxl/cxlmem.h      |   2 +
+>  drivers/cxl/port.c        |   5 +-
+>  include/cxl/cxl.h         |   4 ++
+>  4 files changed, 141 insertions(+), 15 deletions(-)
+> 
+> diff --git a/drivers/cxl/core/region.c b/drivers/cxl/core/region.c
 
-Probably there should be. But given how little resources we have, i'm
-not sure it will ever get done.
+...
 
-Is there anything special in the stmmac code? Workarounds for stmmac
-peculiarities? Could it be pulled out? Given you have looked at it,
-and fixed it up, it seems like the obvious candidate for code
-donation.
+> +/**
+> + * cxl_create_region - Establish a region given an endpoint decoder
+> + * @cxlrd: root decoder to allocate HPA
+> + * @cxled: endpoint decoder with reserved DPA capacity
 
-Maybe we need to ask the next developer who submits a MAC driver with
-a software-timer EEE implementation to build the library?
+nit: @ways: should be documented here too.
 
-	Andrew
+> + *
+> + * Returns a fully formed region in the commit state and attached to the
+> + * cxl_region driver.
+> + */
+> +struct cxl_region *cxl_create_region(struct cxl_root_decoder *cxlrd,
+> +				     struct cxl_endpoint_decoder *cxled, int ways)
+
+...
 
