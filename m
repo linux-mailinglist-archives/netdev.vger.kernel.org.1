@@ -1,77 +1,80 @@
-Return-Path: <netdev+bounces-164048-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-164049-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 88089A2C710
-	for <lists+netdev@lfdr.de>; Fri,  7 Feb 2025 16:29:23 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id DB1F3A2C70F
+	for <lists+netdev@lfdr.de>; Fri,  7 Feb 2025 16:29:16 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 6F6F9165E3E
-	for <lists+netdev@lfdr.de>; Fri,  7 Feb 2025 15:29:02 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 9D51418850FF
+	for <lists+netdev@lfdr.de>; Fri,  7 Feb 2025 15:29:14 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E356923ED56;
-	Fri,  7 Feb 2025 15:28:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C18DA23FC79;
+	Fri,  7 Feb 2025 15:28:36 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="1wVy1Iz1"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="VRq3hlYd"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qk1-f201.google.com (mail-qk1-f201.google.com [209.85.222.201])
+Received: from mail-qv1-f73.google.com (mail-qv1-f73.google.com [209.85.219.73])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4D0341F754E
-	for <netdev@vger.kernel.org>; Fri,  7 Feb 2025 15:28:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1B27923F28C
+	for <netdev@vger.kernel.org>; Fri,  7 Feb 2025 15:28:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.73
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1738942114; cv=none; b=X/dv4T6+Fel/8w8bLDf5kW7lXHHUW6H3f6/zeMc0JR9TUGrWbVVn71AVenUbV+farDwA08sErBs0VHZjCWaqTGwm5iuRKaxv57mpp0tHxInmgyeN0yxvTdokF+BeGYvz02g7hst6Wm0YJ87peEf0WzkHta4yw990xoWjtaPA9+M=
+	t=1738942116; cv=none; b=REwFtcNclW727Wt9Sk3kHtVVy67CrJQ3othWr8+S609pj65M4VRFfV+N8cqIs5eLbHan9qoRb5v68k0znEGCEUUz6PczV0j0nyZIPGEZkkv8k7bQ9DlB7rDUTp3JCfT+XHqkJTfL4XqiR1GA79Oxj8NTeeOdBIIW1It7tUdBIkA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1738942114; c=relaxed/simple;
-	bh=MNg5t0obD+l9VfmCP+ew1a4B7cWNxQ6zs40edflxk3k=;
-	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=mNeKruVRbniylOz73yhVSaR0/hjGn1iO9ht8eU9SEnYzo4uO6t5zOgxs+0z/1yoa+w+gZrN1+G9u5Kc/tCI80B4oBLihybKX2l+ANHe+p+ZmHQNkhDLADo5yms3XqIhaHUhHI50phmYC0VB0cY+nsIRYXC9fiMdlU7C8G83rC80=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=1wVy1Iz1; arc=none smtp.client-ip=209.85.222.201
+	s=arc-20240116; t=1738942116; c=relaxed/simple;
+	bh=IEIO+ZsyHOlhOT+I7Xe9TeGpieItZRSi3OfIxk3A90g=;
+	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
+	 To:Cc:Content-Type; b=UlCyWKztnyQZdDSvwZMKySygzSJMzg7AIFJnQj1xH624kQOxy1mVutdg/6OHgyqNeQlGjEMlgzkLe4fX5kgXZHASr4eRKXBgEY7/fo6BPk2lJW0adYhaSAX5Ry/qewrp76RFTBljvPXep6ps/QNk0IZZqVT8CU7hWTWLNECUoy8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=VRq3hlYd; arc=none smtp.client-ip=209.85.219.73
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com
-Received: by mail-qk1-f201.google.com with SMTP id af79cd13be357-7b6eabd51cfso332574885a.0
-        for <netdev@vger.kernel.org>; Fri, 07 Feb 2025 07:28:32 -0800 (PST)
+Received: by mail-qv1-f73.google.com with SMTP id 6a1803df08f44-6e44150a32dso43419056d6.1
+        for <netdev@vger.kernel.org>; Fri, 07 Feb 2025 07:28:34 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1738942112; x=1739546912; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=ph0dcDx4Idx2qj7S+NDNtuss91kI7EPeBUIj57hyeYM=;
-        b=1wVy1Iz13Bn6orM6yWERNeFDgJlx42+L5yCq724H8bmQ2SHnWlUGWGAhlpNgkYESKj
-         hyAHWnsU3MwW22F1ZXRo3SwAWfoHs009W6Kydf3zTq3B5Wm1pDGV2GDfCpM5EVaTvBVA
-         SOvbKwubHZQ14EwrPD6mAmObt2FbxXdkmqTT94Nmrg/KrDi5TOoLhsabPPenbbvJpV12
-         Ic9292DvJ0czznygJnXt+OVvu+dePZmhY7SWRETsU15iouwJKX0I1RyzLFHyCC9EznX6
-         sikrSn71RWEGsxE7Uj4EHoFW1D+VxCiLU3u5Ub9UoZH53ylq39UkJoc0305aW5E50nyV
-         avqw==
+        d=google.com; s=20230601; t=1738942114; x=1739546914; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=tjtdZgIywkKdhw+U6v/N25zweMYcOEuBKhAWh4rC2iY=;
+        b=VRq3hlYdK3Lkg9WtQ5++L3G4sO7Zbr0+NC4ulZ433tBQssvFd0pNExGPEBBQDwVrlQ
+         o/FLvDarwTL9ax+pTYwqhHT6YyearMqu+XV978Y/pUIdtU0R7kTqvIx5WV9mc28lv3Rb
+         08urqjy/Bl4KjkVE8VuugKazfmKAuumK6livam1ZOMq9N6ItaQ5ULrKbGSM4EjnufWER
+         H8M6kX7AuB/E8c3DPS2N7Z6axec3KJqdoaB9ZTjDGxChsrgAczQxlgF7UM0SGSNJNenK
+         4vvNlQpY57OczJCSAZaWRB3Al9DL3F8ggvZn2W0l2bZkU84eJKxDDeap3AGb3Ih05L12
+         M9Bg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1738942112; x=1739546912;
-        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=ph0dcDx4Idx2qj7S+NDNtuss91kI7EPeBUIj57hyeYM=;
-        b=hL5d23bgQkjW9rv7haaYFTl+WM+cJJ4jHRCrBx/rPdyayr7/WMtfJ8E7Gcqfin2jnJ
-         Js3Y5VTAwYILN2lzDKBljI2no09Q77szGNyZBgdUGrEtaZ0VDA+YIP6sfq/LZMSrzB88
-         ezwvYf11Yowy6TfaCnY/ORhIDOBmYFfxqfWW8pdhTpFJvbWK3OLUntr3XSagyzls6y/8
-         sfnMRykUdaIhykd/kmAxxUnxw8/CYAxzfeuqUP48yZhOsCfl32RXomM5FkHAc64KuE3G
-         Do8liY+Hd7IhQRWMnVy2Uw8FEUrj1pKSLj0gYyNnejk+ySxwgPewioGU1a4zZnTA+RYq
-         lyvA==
-X-Gm-Message-State: AOJu0YwE4dEZNJmccgKzOOUqrC2JA0wFcx23a0UNQhf4aZXNyWsohCPG
-	Z1UBExdHk8jRO8L22LDXjenl5PrQkmTUX8NTMK2M/Vwclz7COnmInxLmXtfJEtBeKaJ3UBG6yqs
-	OpA2ZAkj1Mg==
-X-Google-Smtp-Source: AGHT+IFlbyR0jp/xhYfajHRqCHuy21beiJ7tXSEu5fPiB74msenRkeAe86AySLEHNwniWzBLs+icLc4Bl0t90g==
-X-Received: from qkpg3.prod.google.com ([2002:a05:620a:2783:b0:7bf:ff35:5ef])
+        d=1e100.net; s=20230601; t=1738942114; x=1739546914;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=tjtdZgIywkKdhw+U6v/N25zweMYcOEuBKhAWh4rC2iY=;
+        b=t1l3L1qrnbf5hti1IDMGtdjkjFXcrjOBFCbZNbgeqW+HPBpgJgn7QQvseOWxd+NA24
+         DvVZkVRT108Td1YxguZapOXU9LLlQWqRhQr8HJlBdPnaRBuA9Rhim3dxcA5LXJT5dVBs
+         rOf/6+9K5vkSU8vM282iy46S82wdVvzs93+AJg4tADFXepq1tVHL21VMhsJ7ga1kMBKe
+         F8+UFzEpP3CAaEOqxLXFFdNc+HxiXnqtxfVq8wzRSApK0Xpp+yhKPVvJDK0o3NPZHxzB
+         5IH4p2f/9ZrrbzvO1Z5ojBxeWil4UBDZUn8dY7p5zeLFxKAjyNpdeWNKAbcFuCYw5IDr
+         3Kdw==
+X-Gm-Message-State: AOJu0YzecvqzS4bWR2GZ1ZT/+xCjOPiP43EaZvPNYKFSVuFKEjydHT+m
+	IaaXoy278yNHJsCyObNtCngBD4DsSFbcEURYTgwao2o0setolkhfSTygNRZYoWm8Al2gp/3CEKu
+	xylgXd5O2hw==
+X-Google-Smtp-Source: AGHT+IFBt7fkTu/BrGAiOfqNRGD167c1HAdjYDaEhyqnyGO8rxamVJtbtlWxhEIMMihLeEPMz3Imttzy+t1cyA==
+X-Received: from qvbnz11.prod.google.com ([2002:a05:6214:3a8b:b0:6e4:2ef1:361a])
  (user=edumazet job=prod-delivery.src-stubby-dispatcher) by
- 2002:a05:620a:488f:b0:7b6:6765:4ca6 with SMTP id af79cd13be357-7c047c62d56mr525960985a.34.1738942112159;
- Fri, 07 Feb 2025 07:28:32 -0800 (PST)
-Date: Fri,  7 Feb 2025 15:28:25 +0000
+ 2002:a05:6214:27c6:b0:6d8:846b:cd8d with SMTP id 6a1803df08f44-6e4456d9ce3mr38348656d6.30.1738942114016;
+ Fri, 07 Feb 2025 07:28:34 -0800 (PST)
+Date: Fri,  7 Feb 2025 15:28:26 +0000
+In-Reply-To: <20250207152830.2527578-1-edumazet@google.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
+References: <20250207152830.2527578-1-edumazet@google.com>
 X-Mailer: git-send-email 2.48.1.502.g6dc24dfdaf-goog
-Message-ID: <20250207152830.2527578-1-edumazet@google.com>
-Subject: [PATCH net-next 0/5] tcp: allow to reduce max RTO
+Message-ID: <20250207152830.2527578-2-edumazet@google.com>
+Subject: [PATCH net-next 1/5] tcp: remove tcp_reset_xmit_timer() @max_when argument
 From: Eric Dumazet <edumazet@google.com>
 To: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
 	Paolo Abeni <pabeni@redhat.com>
@@ -81,48 +84,98 @@ Cc: netdev@vger.kernel.org, Neal Cardwell <ncardwell@google.com>,
 	Eric Dumazet <edumazet@google.com>
 Content-Type: text/plain; charset="UTF-8"
 
-This is a followup of a discussion started 6 months ago
-by Jason Xing.
+All callers use TCP_RTO_MAX, we can factorize this constant,
+becoming a variable soon.
 
-Some applications want to lower the time between each
-retransmit attempts.
+Signed-off-by: Eric Dumazet <edumazet@google.com>
+---
+ include/net/tcp.h     | 7 +++----
+ net/ipv4/tcp_input.c  | 5 ++---
+ net/ipv4/tcp_output.c | 7 +++----
+ 3 files changed, 8 insertions(+), 11 deletions(-)
 
-TCP_KEEPINTVL and TCP_KEEPCNT socket options don't
-work around the issue.
-
-This series adds:
-
-- a new TCP level socket option (TCP_RTO_MAX_MS)
-- a new sysctl (/proc/sys/net/ipv4/tcp_rto_max_ms)
-
-Admins and/or applications can now change the max rto value
-at their own risk.
-
-Link: https://lore.kernel.org/netdev/20240715033118.32322-1-kerneljasonxing@gmail.com/T/
-
-Eric Dumazet (5):
-  tcp: remove tcp_reset_xmit_timer() @max_when argument
-  tcp: add a @pace_delay parameter to tcp_reset_xmit_timer()
-  tcp: use tcp_reset_xmit_timer()
-  tcp: add the ability to control max RTO
-  tcp: add tcp_rto_max_ms sysctl
-
- Documentation/networking/ip-sysctl.rst        | 13 ++++++++
- .../net_cachelines/inet_connection_sock.rst   |  1 +
- .../net_cachelines/netns_ipv4_sysctl.rst      |  1 +
- include/net/inet_connection_sock.h            |  1 +
- include/net/netns/ipv4.h                      |  1 +
- include/net/tcp.h                             | 23 +++++++++-----
- include/uapi/linux/tcp.h                      |  1 +
- net/ipv4/sysctl_net_ipv4.c                    | 10 ++++++
- net/ipv4/tcp.c                                | 14 ++++++++-
- net/ipv4/tcp_fastopen.c                       |  4 +--
- net/ipv4/tcp_input.c                          | 19 +++++-------
- net/ipv4/tcp_ipv4.c                           |  6 ++--
- net/ipv4/tcp_output.c                         | 17 +++++-----
- net/ipv4/tcp_timer.c                          | 31 ++++++++++---------
- 14 files changed, 93 insertions(+), 49 deletions(-)
-
+diff --git a/include/net/tcp.h b/include/net/tcp.h
+index 5b2b04835688f65daa25ca208e29775326520e1e..356f5aa51ce22921320e34adec111fc4e412de8f 100644
+--- a/include/net/tcp.h
++++ b/include/net/tcp.h
+@@ -1422,11 +1422,10 @@ static inline unsigned long tcp_pacing_delay(const struct sock *sk)
+ 
+ static inline void tcp_reset_xmit_timer(struct sock *sk,
+ 					const int what,
+-					unsigned long when,
+-					const unsigned long max_when)
++					unsigned long when)
+ {
+ 	inet_csk_reset_xmit_timer(sk, what, when + tcp_pacing_delay(sk),
+-				  max_when);
++				  TCP_RTO_MAX);
+ }
+ 
+ /* Something is really bad, we could not queue an additional packet,
+@@ -1455,7 +1454,7 @@ static inline void tcp_check_probe_timer(struct sock *sk)
+ {
+ 	if (!tcp_sk(sk)->packets_out && !inet_csk(sk)->icsk_pending)
+ 		tcp_reset_xmit_timer(sk, ICSK_TIME_PROBE0,
+-				     tcp_probe0_base(sk), TCP_RTO_MAX);
++				     tcp_probe0_base(sk));
+ }
+ 
+ static inline void tcp_init_wl(struct tcp_sock *tp, u32 seq)
+diff --git a/net/ipv4/tcp_input.c b/net/ipv4/tcp_input.c
+index eb82e01da911048b41ca380f913ef55566be79a7..cf5cb710f202b29563de51179eaed0823aff8090 100644
+--- a/net/ipv4/tcp_input.c
++++ b/net/ipv4/tcp_input.c
+@@ -3282,8 +3282,7 @@ void tcp_rearm_rto(struct sock *sk)
+ 			 */
+ 			rto = usecs_to_jiffies(max_t(int, delta_us, 1));
+ 		}
+-		tcp_reset_xmit_timer(sk, ICSK_TIME_RETRANS, rto,
+-				     TCP_RTO_MAX);
++		tcp_reset_xmit_timer(sk, ICSK_TIME_RETRANS, rto);
+ 	}
+ }
+ 
+@@ -3563,7 +3562,7 @@ static void tcp_ack_probe(struct sock *sk)
+ 		unsigned long when = tcp_probe0_when(sk, TCP_RTO_MAX);
+ 
+ 		when = tcp_clamp_probe0_to_user_timeout(sk, when);
+-		tcp_reset_xmit_timer(sk, ICSK_TIME_PROBE0, when, TCP_RTO_MAX);
++		tcp_reset_xmit_timer(sk, ICSK_TIME_PROBE0, when);
+ 	}
+ }
+ 
+diff --git a/net/ipv4/tcp_output.c b/net/ipv4/tcp_output.c
+index bc95d2a5924fdc6ea609fa006432db9b13444706..93401dbf39d223a4943579786be5aa6d14e0ed8d 100644
+--- a/net/ipv4/tcp_output.c
++++ b/net/ipv4/tcp_output.c
+@@ -2911,7 +2911,7 @@ bool tcp_schedule_loss_probe(struct sock *sk, bool advancing_rto)
+ 	if (rto_delta_us > 0)
+ 		timeout = min_t(u32, timeout, usecs_to_jiffies(rto_delta_us));
+ 
+-	tcp_reset_xmit_timer(sk, ICSK_TIME_LOSS_PROBE, timeout, TCP_RTO_MAX);
++	tcp_reset_xmit_timer(sk, ICSK_TIME_LOSS_PROBE, timeout);
+ 	return true;
+ }
+ 
+@@ -3545,8 +3545,7 @@ void tcp_xmit_retransmit_queue(struct sock *sk)
+ 	}
+ 	if (rearm_timer)
+ 		tcp_reset_xmit_timer(sk, ICSK_TIME_RETRANS,
+-				     inet_csk(sk)->icsk_rto,
+-				     TCP_RTO_MAX);
++				     inet_csk(sk)->icsk_rto);
+ }
+ 
+ /* We allow to exceed memory limits for FIN packets to expedite
+@@ -4402,7 +4401,7 @@ void tcp_send_probe0(struct sock *sk)
+ 	}
+ 
+ 	timeout = tcp_clamp_probe0_to_user_timeout(sk, timeout);
+-	tcp_reset_xmit_timer(sk, ICSK_TIME_PROBE0, timeout, TCP_RTO_MAX);
++	tcp_reset_xmit_timer(sk, ICSK_TIME_PROBE0, timeout);
+ }
+ 
+ int tcp_rtx_synack(const struct sock *sk, struct request_sock *req)
 -- 
 2.48.1.502.g6dc24dfdaf-goog
 
