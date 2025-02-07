@@ -1,139 +1,113 @@
-Return-Path: <netdev+bounces-164157-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-164158-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7B6E7A2CC80
-	for <lists+netdev@lfdr.de>; Fri,  7 Feb 2025 20:24:49 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 17094A2CC90
+	for <lists+netdev@lfdr.de>; Fri,  7 Feb 2025 20:27:43 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 9A27E1886C81
-	for <lists+netdev@lfdr.de>; Fri,  7 Feb 2025 19:24:54 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 11A643AADBE
+	for <lists+netdev@lfdr.de>; Fri,  7 Feb 2025 19:27:34 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 676021A316C;
-	Fri,  7 Feb 2025 19:24:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 240131A3145;
+	Fri,  7 Feb 2025 19:27:40 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=canonical.com header.i=@canonical.com header.b="WaxJRb8v"
+	dkim=pass (1024-bit key) header.d=fastly.com header.i=@fastly.com header.b="cPEgdg0a"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp-relay-internal-0.canonical.com (smtp-relay-internal-0.canonical.com [185.125.188.122])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f171.google.com (mail-pl1-f171.google.com [209.85.214.171])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 38C331A262A
-	for <netdev@vger.kernel.org>; Fri,  7 Feb 2025 19:24:39 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.125.188.122
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 79DF319D072
+	for <netdev@vger.kernel.org>; Fri,  7 Feb 2025 19:27:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.171
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1738956282; cv=none; b=QJXzASTl6EMa4D7zNktT18RBfBXpL3T1O4En9zhDPXdGsyZ8jlC0uzlpPF6qMivlvBp5jJ4J7ZoSUzWfrxunz02uT7yuUk1KnNYcvEF74GvVzajsy3P2NdhfcdhCJNMeLAPGmOmUz1ZKYFmg8jKHpofkPXsd2L8MBli2/wnuYHg=
+	t=1738956460; cv=none; b=sz6JBWjiUX7zWVXQPs9Jww8NUoRN4mBeUiRQ0tY+AqtfHml/kf63udpmy45jDD9/Jd4G+RfWAaevvQhjUfTLwUl9lVwRPVRmPzD0kMEHDPCwYFDmEyWooSzJpJNr5SnK0S3OIOX+ZZOCdAt5iXQL40HOIZjAlu1vHSOkQeMcxuQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1738956282; c=relaxed/simple;
-	bh=vxU+tYVnh6kMXN1kCB92NtopAdH3cQ9eveg0cFzyLtc=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=qtzvGV6HefclKvn65ssLtKmLAMeDSt7JTVYynpnHOJ2zyt/saJr522y1rZA3RAFlxdKD+psUcmF4NdM998uLAUnLCZNhqS18Ng6115wcCneG6LE3g+ATHihI/CPwZvb/tfrcWHb4rizMnyo4zY7SBdMR/W2KcsuuNrej1scS53k=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=canonical.com; spf=pass smtp.mailfrom=canonical.com; dkim=pass (2048-bit key) header.d=canonical.com header.i=@canonical.com header.b=WaxJRb8v; arc=none smtp.client-ip=185.125.188.122
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=canonical.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=canonical.com
-Received: from mail-ed1-f72.google.com (mail-ed1-f72.google.com [209.85.208.72])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by smtp-relay-internal-0.canonical.com (Postfix) with ESMTPS id 33D3A3F87A
-	for <netdev@vger.kernel.org>; Fri,  7 Feb 2025 19:24:38 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=canonical.com;
-	s=20210705; t=1738956278;
-	bh=vxU+tYVnh6kMXN1kCB92NtopAdH3cQ9eveg0cFzyLtc=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type;
-	b=WaxJRb8vOGSQ3WsD6VIO9G1iAjcqbgCpt2h2KQr3TjTpaoBWu2Wj56ywDNu85itEh
-	 7ImC3fZ4wWOsTujVEgipdzjoP0f4IKfpwhaenncDSIx040fkJ4/l4c5gtliC4NQ+OT
-	 2/+Q36nbd8U5cwTOy35QlqQK7QEf/x20bzIjXmfC/WpsvorVL/Vdxq6Ej6wofb3+bF
-	 0f4Pe1Th18jA8g7lyiFDNIPIGCSpsgyjdVdQQlXhBB+WP5lc06+VSJI3vr/H8fKELz
-	 U+FqGuqLTwMn7E7KzvUaUjGG99vv4+TBhlwJ4G0izDmNm48mUlEJfotv/eSFHdelW2
-	 IwRSL8PUIZ3wg==
-Received: by mail-ed1-f72.google.com with SMTP id 4fb4d7f45d1cf-5d9fb24f87bso2838791a12.0
-        for <netdev@vger.kernel.org>; Fri, 07 Feb 2025 11:24:38 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1738956276; x=1739561076;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+	s=arc-20240116; t=1738956460; c=relaxed/simple;
+	bh=uaLgx2F8vFMpjWzVEVskiaSW/W6Fq/0kEb812AEkh10=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=P3iBBNAkA3Isn8UHCmCREKaP68Yy7EKI4NQMKHxs6Vn7UOKxlZx2AYNJKtL8ljlpcaNoJo33V8JBqLmn48dpCjSiNJNMI0BhjaGfeU1e2RnImJAfD1G7uOrkFZW1nY7uttmOUrhsfHLmGA5Wpjv0WxVbdsVfVl2e2HyGHwNHZyE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fastly.com; spf=pass smtp.mailfrom=fastly.com; dkim=pass (1024-bit key) header.d=fastly.com header.i=@fastly.com header.b=cPEgdg0a; arc=none smtp.client-ip=209.85.214.171
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fastly.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=fastly.com
+Received: by mail-pl1-f171.google.com with SMTP id d9443c01a7336-21f4a4fbb35so26898905ad.0
+        for <netdev@vger.kernel.org>; Fri, 07 Feb 2025 11:27:38 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=fastly.com; s=google; t=1738956458; x=1739561258; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references
+         :mail-followup-to:message-id:subject:cc:to:from:date:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=vxU+tYVnh6kMXN1kCB92NtopAdH3cQ9eveg0cFzyLtc=;
-        b=xBUyC/d3QwSZEzLjRjJOrjQ7IsKLM+1x+u4t/4IzK+fHWE4jFvPb8T6QjIfaTXctta
-         gmlBGIO9dR9OtcgQqvH0yIaH6zSqQqdcfkvUMYKJFXp+9YqSAeTxAMGc35e31RZt/UCO
-         10/UelGdCShS6fC9R/yS74dRDshbm++ehOgpgo3bypRf5npI6DajqsAEL/4zGVNMRpoK
-         3tk/u5v8YGMEETGIjz8o0jmnwqMdUvz6Qhz0NmxMqS0aHIYQR6C+LEdoHc93DP0jg73W
-         vZ9mVnM0Nu1s1mD1xZ0jUAQnawd39Oo0dWNoLGfAIfEwOIXbQL75xt9xkiqQ5JkmFSdv
-         5rXw==
-X-Forwarded-Encrypted: i=1; AJvYcCUxBurEZzD0MIo/dr5tKbT/ZMUxVsHmeFr/yXM5eo+mOMO2MJVmoyKW3v9psNJHUo2Sifcq9u8=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzwsuH1Xpvf/l19EQ8k3Ly5M1VGlHDbovP5R1VWhWgge1N+xDqQ
-	9djvx5MAwXetrzxs0P6+codEzhV5dUuub9uQLLAzvirRaoRO3fPmAqAwylhEK6RleK3kInCx9SW
-	n0PUKK+3dOVhwK5gveqbqlSoSmMbuUBLOw7o2tHA5wYzN2WU84pxYEQYG+zG4YJVW4Ezkffbdy5
-	t7zQZF6wHV+GFtyoaRxy0geKxVIUfztGcNAYlNJb/DQxT2
-X-Gm-Gg: ASbGnctxasg4iKkcULjfh4dohkjUol1y6ieRiUH2BA+8BnjChAufTWU/gUTTV7d89qD
-	I2G3zH/97Ql9ftIqlSrR/ydoc41KpuqNPsqLae1cm6KQk7I2Fbi4OFLYu0hKG
-X-Received: by 2002:a17:906:6a29:b0:aa6:a572:49fd with SMTP id a640c23a62f3a-ab789ca2972mr420380866b.54.1738956276682;
-        Fri, 07 Feb 2025 11:24:36 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IEW39V6vxQtVQ8dceJH6mGloMgI0XHnyBDpBS0JjWTn/3cHP5RLfgBQFsUPSHSqaPzI8YS3WFgZCGADlt7dVJo=
-X-Received: by 2002:a17:906:6a29:b0:aa6:a572:49fd with SMTP id
- a640c23a62f3a-ab789ca2972mr420379566b.54.1738956276318; Fri, 07 Feb 2025
- 11:24:36 -0800 (PST)
+        bh=2AGqpSphEUXaOVV96AwpA/N7z6AmrhfmgOb2ebxvnt4=;
+        b=cPEgdg0aJkYvb6E3VZv/Mr1X/+I9AMswK9qxf53m4USeI/+xq1+hBfLoiRjXe+Mqu8
+         KaWZJU1aLF8FjiafhYd1YzSx6n8aGrHVQ6CryViBYhA42tp3ZEZyqCX4/XxBCmOxGMHC
+         WXtP4X5WAdx/Y7e5PV4MZ0rQesafrU/RQa1PE=
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1738956458; x=1739561258;
+        h=in-reply-to:content-disposition:mime-version:references
+         :mail-followup-to:message-id:subject:cc:to:from:date
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=2AGqpSphEUXaOVV96AwpA/N7z6AmrhfmgOb2ebxvnt4=;
+        b=so9Kx0M9Pmw2Bo760hoeOMieapjrAOAMep1SF7ESWFEXzhh3jWz7U32OEhmPfEsw6A
+         NTzMlvpRCdwX8sdti8s5w7Bq3WsJORwWtvYMkzGgSuHCrGI7eihOFX2zcANHtMXoDph+
+         k6LUvt8WW5eryI0Fte30T6tdoqJUUcGjpaTQuC0NsytGDEjHaTxigmg11XyHQh+vRMuz
+         /Ii0z8skzVEgHd7aXMiGxI92qTi0rvvVCG5fji12MzrDMiE3NZa0PlUD1IfqGMs7XMIB
+         tcRc0EuxGSqyEO3JI5KWwzsC+lX1RK7GX9rbSy3HtowZk5dC4k1cykkSRn/KfkTo/aE4
+         ImDw==
+X-Forwarded-Encrypted: i=1; AJvYcCUazB0ZyCQ32N7jjgOeuGxSlO7azaDlz786zfq5N6VZ9DT6Tdzp/yrA4m1owO6Ij6xDD/1YBwM=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwFZJNP/oj2b/HrD+MUzBbsSZYyba1L4NhvnuQ6CUVCTZw/UspL
+	kANyNioQL8n3sz6ot+1Kj+h6akzI0KzmqkzQJumeiaD4z6QpNW1WCGoWevH1pA0=
+X-Gm-Gg: ASbGnct3xIE65x/VNnb2hnWWovE3+KRWpV62ko5684E/pf4kQCv5XhWATU25jGY7Pf3
+	O25788oc9czrRGTOEgmKJU7dEEkokA5FHY5gmE/iGWJ/pQg1dsYLNkJiUW/2NE1yyZ/4y9hQkwN
+	DszH2N3lVsr4pcWjKJbc7aHmRD5WAuwxwmqOfBj4pOksEJqJzbFuHnJ6XjiOdeajOiGNfoXOd/N
+	26NO4lc9apsQeMMaFkGK6aR+BgbF03whHea7b9+fr0vcgmJmJNNmj6XOAFFkhpKT7WBjfkqDNV2
+	i3kHrEgxtqee7JDhq9VFyAoQHHulZZvZQpsM6+3Vz4ahulOZuMdhUHXo8A==
+X-Google-Smtp-Source: AGHT+IEqGSwbbfe7x+02GvK9S0+QjbvhZz1kpYfgI3/1bz4pe1TM2GiDO54hpqIv8kjFyjZb9Jxxxw==
+X-Received: by 2002:a17:902:cf04:b0:216:5db1:5dc1 with SMTP id d9443c01a7336-21f4f0ef803mr66053595ad.1.1738956457693;
+        Fri, 07 Feb 2025 11:27:37 -0800 (PST)
+Received: from LQ3V64L9R2 (c-24-6-151-244.hsd1.ca.comcast.net. [24.6.151.244])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-21f3650eca2sm34253775ad.19.2025.02.07.11.27.36
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 07 Feb 2025 11:27:37 -0800 (PST)
+Date: Fri, 7 Feb 2025 11:27:34 -0800
+From: Joe Damato <jdamato@fastly.com>
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: davem@davemloft.net, netdev@vger.kernel.org, edumazet@google.com,
+	pabeni@redhat.com, andrew+netdev@lunn.ch, horms@kernel.org,
+	ecree.xilinx@gmail.com, gal@nvidia.com
+Subject: Re: [PATCH net-next 1/7] net: ethtool: prevent flow steering to RSS
+ contexts which don't exist
+Message-ID: <Z6ZephEIxtHfG4bi@LQ3V64L9R2>
+Mail-Followup-To: Joe Damato <jdamato@fastly.com>,
+	Jakub Kicinski <kuba@kernel.org>, davem@davemloft.net,
+	netdev@vger.kernel.org, edumazet@google.com, pabeni@redhat.com,
+	andrew+netdev@lunn.ch, horms@kernel.org, ecree.xilinx@gmail.com,
+	gal@nvidia.com
+References: <20250206235334.1425329-1-kuba@kernel.org>
+ <20250206235334.1425329-2-kuba@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <CAHTA-uaH9w2LqQdxY4b=7q9WQsuA6ntg=QRKrsf=mPfNBmM5pw@mail.gmail.com>
- <20250207155456.GA3665725@ziepe.ca> <CAHTA-uasZ+ZkdzaSzz-QH=brD3PDb+wGfvE-k377SW7BCEi6hg@mail.gmail.com>
- <20250207190152.GA3665794@ziepe.ca>
-In-Reply-To: <20250207190152.GA3665794@ziepe.ca>
-From: Mitchell Augustin <mitchell.augustin@canonical.com>
-Date: Fri, 7 Feb 2025 13:24:24 -0600
-X-Gm-Features: AWEUYZlr2pi0PkFPhk6g8C39Y1EN3TzUeAopLgpyoqvD13zRSg5s6jJmYOdIuQ4
-Message-ID: <CAHTA-uZMZ6qQZf_n55gNaTjQQ0j8nXdt1Yi_+8+-YUNhxcrs_A@mail.gmail.com>
-Subject: Re: modprobe mlx5_core on OCI bare-metal instance causes
- unrecoverable hang and I/O error
-To: Jason Gunthorpe <jgg@ziepe.ca>
-Cc: saeedm@nvidia.com, leon@kernel.org, tariqt@nvidia.com, 
-	andrew+netdev@lunn.ch, "David S. Miller" <davem@davemloft.net>, 
-	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
-	netdev@vger.kernel.org, linux-rdma@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, Talat Batheesh <talatb@nvidia.com>, 
-	Feras Daoud <ferasda@nvidia.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250206235334.1425329-2-kuba@kernel.org>
 
-*facepalm*
+On Thu, Feb 06, 2025 at 03:53:28PM -0800, Jakub Kicinski wrote:
+> Since commit 42dc431f5d0e ("ethtool: rss: prevent rss ctx deletion
+> when in use") we prevent removal of RSS contexts pointed to by
+> existing flow rules. Core should also prevent creation of rules
+> which point to RSS context which don't exist in the first place.
+> 
+> Signed-off-by: Jakub Kicinski <kuba@kernel.org>
+> ---
+> CC: ecree.xilinx@gmail.com
+> CC: gal@nvidia.com
+> ---
+>  net/ethtool/ioctl.c | 12 ++++++++----
+>  1 file changed, 8 insertions(+), 4 deletions(-)
 
-Thanks, I can't believe that wasn't my first thought as soon as I
-learned these instances were using iSCSI. That's almost certainly what
-is happening on this OCI instance, since the host adapter for its
-iSCSI transport is a ConnectX card.
-
-The fact that I was able to see similar behavior once on a machine
-booted from a local disk (in the A100 test I mentioned) is still
-confusing though. I'll update this thread if I can figure out a
-reliable way to reproduce that behavior.
-
-
-On Fri, Feb 7, 2025 at 1:01=E2=80=AFPM Jason Gunthorpe <jgg@ziepe.ca> wrote=
-:
->
-> On Fri, Feb 07, 2025 at 10:02:46AM -0600, Mitchell Augustin wrote:
-> > > Is it using iscsi/srp/nfs/etc for any filesystems?
-> >
-> > Yes, dev sda is using iSCSI:
->
-> If you remove the driver that is providing transport for your
-> filesystem the system will hang like you showed.
->
-> It can be done, but the process sequencing the load/unload has to be
-> entirely contained to a tmpfs so it doesn't become blocked on IO that
-> cannot complete.
->
-> Jason
-
-
-
---=20
-Mitchell Augustin
-Software Engineer - Ubuntu Partner Engineering
+Reviewed-by: Joe Damato <jdamato@fastly.com>
 
