@@ -1,182 +1,149 @@
-Return-Path: <netdev+bounces-163862-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-163863-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6D1CDA2BCEC
-	for <lists+netdev@lfdr.de>; Fri,  7 Feb 2025 08:50:04 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7A533A2BDC8
+	for <lists+netdev@lfdr.de>; Fri,  7 Feb 2025 09:24:51 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 428187A05D3
-	for <lists+netdev@lfdr.de>; Fri,  7 Feb 2025 07:49:08 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 8FA4E1885C05
+	for <lists+netdev@lfdr.de>; Fri,  7 Feb 2025 08:24:56 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F2D3D1A8413;
-	Fri,  7 Feb 2025 07:49:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bgdev-pl.20230601.gappssmtp.com header.i=@bgdev-pl.20230601.gappssmtp.com header.b="xRxOy3TK"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 11C461AA1DA;
+	Fri,  7 Feb 2025 08:24:46 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-lf1-f51.google.com (mail-lf1-f51.google.com [209.85.167.51])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from metis.whiteo.stw.pengutronix.de (metis.whiteo.stw.pengutronix.de [185.203.201.7])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BE26C1A7264
-	for <netdev@vger.kernel.org>; Fri,  7 Feb 2025 07:49:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.51
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D64CF1A83EE
+	for <netdev@vger.kernel.org>; Fri,  7 Feb 2025 08:24:43 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.203.201.7
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1738914596; cv=none; b=NAD2vo3tjE047b95v2bzWLqjKPt4kUBInzb7+qMCFU7MG/RDqVEAuzk2w6fPqj/FhvSCso5wYqNe23N544CHy3Xeh6Y+2FbUa2GFB2ZQaxgjTsleM2hRDJrMW/YS4UVC8gIIBezEq2e67IPB3rUTObCxwT2+GnaSZRbzyEO1SRk=
+	t=1738916686; cv=none; b=BF+RJ74+bWQ2DiEqQqLGq1kXqtoaXVf6xsEeP+4sTCYhNnFQDo/Ao8//ZRBroMz1PBCgoYu+QYetwuEUk/1+AiFYnuN+lun6qIY4amMLcj6el5TZcAsByIbWzjaKONBiMTnySGImsfU9aooHg7SgS73jg4RdLkWjTjzmSHjZCsU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1738914596; c=relaxed/simple;
-	bh=Ygym6BkiYRNRVTcjvqeMUfbvwZUuejhc3e16JsbSEyU=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=E0c3aMrfplLpHD8vg6PBNrqEzFY0ULfYJcmeubO/itGaP3kJspmgd4Z5zfBquSa3M7pQQz1D4sbqf6liWSydT1H29bbweSgM2NNs1Zq7fUNQFH1UlhLZ92uFgHlhOfX7FV8nIcoKsstihPPhwJ3ApLmQizHWTcRHX1OLXhWvWrk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=bgdev.pl; spf=none smtp.mailfrom=bgdev.pl; dkim=pass (2048-bit key) header.d=bgdev-pl.20230601.gappssmtp.com header.i=@bgdev-pl.20230601.gappssmtp.com header.b=xRxOy3TK; arc=none smtp.client-ip=209.85.167.51
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=bgdev.pl
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=bgdev.pl
-Received: by mail-lf1-f51.google.com with SMTP id 2adb3069b0e04-544fe0313a8so146666e87.1
-        for <netdev@vger.kernel.org>; Thu, 06 Feb 2025 23:49:54 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=bgdev-pl.20230601.gappssmtp.com; s=20230601; t=1738914593; x=1739519393; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=9YnJ+2PmTsfRhc+KXPzUKFsOLYmtdTuDzT6pXI9Dax4=;
-        b=xRxOy3TKazuT/+N00yFHK2AMpqnNnjvi6VtAotQPdtxANrvIobd6xcardMunCAayWo
-         pdF2TzifsGYZJwzOCRRof6xhnzgh2wSitTnmSSXVjYGkKkdUSc+SsGq4Un0k+1AO1zJE
-         u3RV8S7YHV3jmgH9qIDx1t0BH2sKRJLYlWMG7OUp0WIkaRzY21YNhFlqZu0DCH8lndx4
-         H14WrlmMZcSLFYXikk7KXcgoVZXupaWEeo4luT8AaCXQpRga3GwEuPul0wVXt7eYa+g9
-         j4TJrslFQ6uz8PsWqKr52AOOKGORUFUky5QTgUA1RNhQkBvte8EEMagzkSnGt/eGgq9a
-         T/Wg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1738914593; x=1739519393;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=9YnJ+2PmTsfRhc+KXPzUKFsOLYmtdTuDzT6pXI9Dax4=;
-        b=TGCEu2sOtjWj9xLwSYC3tf8QRi3LXSNk737NXQEOXipME1k4S27/IInUakLAP8ywPb
-         DaPOx0ho5jiFtvoEhdc42FSFY3nTYuzly/tmDqnIOSIZUBnGGSngfJzqi/HXyKafq6D0
-         zcoTpeX5i4HtU9PaGQD73XrzI84Gp+ZrJGivj/J+oY7ldIwHCzaTRtmdzoNYB2r0iOGz
-         Vmd+JIKvlYJ8E+kBkAanFqnP52xPJa0PkScDhL/Wcb9InGhdKSBtY+iSniWjTyKIXkDq
-         45PTW0F12XPye2XHuOIGIM+O4t584UvwrSWZhj9th98rKA2Crjq4qcz/+WTk2PBrxsPf
-         Rmcg==
-X-Forwarded-Encrypted: i=1; AJvYcCUvykSEbDc4jeLIWeHsILLwrD7wKtGM1uDZ1Gi1/c7KM7flq4C6FSHVWaXt+buNCOQAwgIlnQc=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwvEhVRPV84O0gtkgSVoKH+uYO8qZtgdFAfKVPPfGDIo0CGkadK
-	FYeUtwNHp01SwpTEIBE3K71pBdQjUjfMoal72qDXSwTJiQX8F4Gi5Ga1+hKknNbYCGnvh67xQM7
-	MeBh4Lq6NTtTAqPvM3z5lAMjGr2ZG7U80IeKL4Q==
-X-Gm-Gg: ASbGncsF7TXmemZf3bfuXmvhT9WNEwmNyIzUXqjsNNKP7IceZOvlZrjLAiPdar+RmGY
-	mn3JRF9/IIIO//ZMky4t9K0quGBU6MSqt5cSM4b09MOS3iBte729LF10WuGp+HUEwft6CGwoRLZ
-	GGsqsQWtLGGphOwWS9+ncOVy3xWvs=
-X-Google-Smtp-Source: AGHT+IHxfwDC2v+wc+kLsonGMp3GoKKzCthmXUYddx5+xjdW0P9Z9tmgYCfXp3s8UQ6aQdx9J+hIzu6ut5Mn8kOKlFE=
-X-Received: by 2002:a05:6512:2348:b0:542:1ba3:984c with SMTP id
- 2adb3069b0e04-54414a9656dmr486368e87.6.1738914592500; Thu, 06 Feb 2025
- 23:49:52 -0800 (PST)
+	s=arc-20240116; t=1738916686; c=relaxed/simple;
+	bh=kI4Fyn7CvsZ6t9HvUQsul7UYVpT9ozBs0hE2VBctCOQ=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=vEKk9uqOw5NWkKBF6Up3lA+RA8vx2EtFpQDUw7cfghmv+Yg9hjVHF7GXfrg6n9BKegWA5vKUtvrEZNT2zMcDT3sx4eQotpev1Dc2lTEylmRcHVdJm5DRvLs3/a0BAXmzMRFCe3RaOzgIrGdLBM4NKAC1q034joM+diLXZEtEE7I=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de; spf=pass smtp.mailfrom=pengutronix.de; arc=none smtp.client-ip=185.203.201.7
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=pengutronix.de
+Received: from drehscheibe.grey.stw.pengutronix.de ([2a0a:edc0:0:c01:1d::a2])
+	by metis.whiteo.stw.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
+	(Exim 4.92)
+	(envelope-from <ore@pengutronix.de>)
+	id 1tgJep-0000UF-AY; Fri, 07 Feb 2025 09:24:15 +0100
+Received: from pty.whiteo.stw.pengutronix.de ([2a0a:edc0:2:b01:1d::c5])
+	by drehscheibe.grey.stw.pengutronix.de with esmtps  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.96)
+	(envelope-from <ore@pengutronix.de>)
+	id 1tgJek-003whN-2j;
+	Fri, 07 Feb 2025 09:24:10 +0100
+Received: from ore by pty.whiteo.stw.pengutronix.de with local (Exim 4.96)
+	(envelope-from <ore@pengutronix.de>)
+	id 1tgJek-001cd8-2G;
+	Fri, 07 Feb 2025 09:24:10 +0100
+Date: Fri, 7 Feb 2025 09:24:10 +0100
+From: Oleksij Rempel <o.rempel@pengutronix.de>
+To: Zhang Zekun <zhangzekun11@huawei.com>
+Cc: robh@kernel.org, saravanak@google.com, justin.chen@broadcom.com,
+	florian.fainelli@broadcom.com, andrew+netdev@lunn.ch,
+	kuba@kernel.org, kory.maincent@bootlin.com,
+	jacopo+renesas@jmondi.org, kieran.bingham+renesas@ideasonboard.com,
+	laurent.pinchart+renesas@ideasonboard.com, maddy@linux.ibm.com,
+	mpe@ellerman.id.au, npiggin@gmail.com, olteanv@gmail.com,
+	davem@davemloft.net, taras.chornyi@plvision.eu, edumazet@google.com,
+	pabeni@redhat.com, sudeep.holla@arm.com, cristian.marussi@arm.com,
+	arm-scmi@vger.kernel.org, linuxppc-dev@lists.ozlabs.org,
+	linux-media@vger.kernel.org, netdev@vger.kernel.org,
+	devicetree@vger.kernel.org, chenjun102@huawei.com
+Subject: Re: [PATCH 1/9] of: Add warpper function
+ of_find_node_by_name_balanced()
+Message-ID: <Z6XDKi_V0BZSdCeL@pengutronix.de>
+References: <20250207013117.104205-1-zhangzekun11@huawei.com>
+ <20250207013117.104205-2-zhangzekun11@huawei.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250206-gpio-set-array-helper-v2-0-1c5f048f79c3@baylibre.com>
-In-Reply-To: <20250206-gpio-set-array-helper-v2-0-1c5f048f79c3@baylibre.com>
-From: Bartosz Golaszewski <brgl@bgdev.pl>
-Date: Fri, 7 Feb 2025 08:49:41 +0100
-X-Gm-Features: AWEUYZmvPOokVsveJHg1umO_SehF1d2PdlzyWo93hmjOZpSCnJ3bOhxNiJqJwrs
-Message-ID: <CAMRc=Mf9WQjVXvea7tHx0MJG2H8Yqxw=zGqvjp7dfD7+=huDKw@mail.gmail.com>
-Subject: Re: [PATCH v2 00/13] gpiolib: add gpiod_multi_set_value_cansleep
-To: David Lechner <dlechner@baylibre.com>
-Cc: Linus Walleij <linus.walleij@linaro.org>, Andy Shevchenko <andy@kernel.org>, 
-	Geert Uytterhoeven <geert@linux-m68k.org>, Lars-Peter Clausen <lars@metafoo.de>, 
-	Michael Hennerich <Michael.Hennerich@analog.com>, Jonathan Cameron <jic23@kernel.org>, 
-	Ulf Hansson <ulf.hansson@linaro.org>, Peter Rosin <peda@axentia.se>, Andrew Lunn <andrew@lunn.ch>, 
-	Heiner Kallweit <hkallweit1@gmail.com>, Russell King <linux@armlinux.org.uk>, 
-	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Vinod Koul <vkoul@kernel.org>, 
-	Kishon Vijay Abraham I <kishon@kernel.org>, =?UTF-8?B?TnVubyBTw6E=?= <nuno.sa@analog.com>, 
-	Liam Girdwood <lgirdwood@gmail.com>, Mark Brown <broonie@kernel.org>, 
-	Jaroslav Kysela <perex@perex.cz>, Takashi Iwai <tiwai@suse.com>, linux-gpio@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, linux-iio@vger.kernel.org, 
-	linux-mmc@vger.kernel.org, netdev@vger.kernel.org, 
-	linux-phy@lists.infradead.org, linux-sound@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <20250207013117.104205-2-zhangzekun11@huawei.com>
+X-Sent-From: Pengutronix Hildesheim
+X-URL: http://www.pengutronix.de/
+X-Accept-Language: de,en
+X-Accept-Content-Type: text/plain
+X-SA-Exim-Connect-IP: 2a0a:edc0:0:c01:1d::a2
+X-SA-Exim-Mail-From: ore@pengutronix.de
+X-SA-Exim-Scanned: No (on metis.whiteo.stw.pengutronix.de); SAEximRunCond expanded to false
+X-PTX-Original-Recipient: netdev@vger.kernel.org
 
-On Thu, Feb 6, 2025 at 11:48=E2=80=AFPM David Lechner <dlechner@baylibre.co=
-m> wrote:
->
-> This series was inspired by some minor annoyance I have experienced a
-> few times in recent reviews.
->
-> Calling gpiod_set_array_value_cansleep() can be quite verbose due to
-> having so many parameters. In most cases, we already have a struct
-> gpio_descs that contains the first 3 parameters so we end up with 3 (or
-> often even 6) pointer indirections at each call site. Also, people have
-> a tendency to want to hard-code the first argument instead of using
-> struct gpio_descs.ndescs, often without checking that ndescs >=3D the
-> hard-coded value.
->
-> So I'm proposing that we add a gpiod_multi_set_value_cansleep()
-> function that is a wrapper around gpiod_set_array_value_cansleep()
-> that has struct gpio_descs as the first parameter to make it a bit
-> easier to read the code and avoid the hard-coding temptation.
->
-> I've just done gpiod_multi_set_value_cansleep() for now since there
-> were over 10 callers of this one. There aren't as many callers of
-> the get and atomic variants, but we can add those too if this seems
-> like a useful thing to do.
->
-> Maintainers, if you prefer to have this go through the gpio tree, please
-> give your Acked-by:, otherwise I will resend what is left after the next
-> kernel release.
->
-> ---
-> Changes in v2:
-> - Renamed new function from gpiods_multi_set_value_cansleep() to
->   gpiod_multi_set_value_cansleep()
-> - Fixed typo in name of replaced function in all commit messages.
-> - Picked up trailers.
-> - Link to v1: https://lore.kernel.org/r/20250131-gpio-set-array-helper-v1=
--0-991c8ccb4d6e@baylibre.com
->
-> ---
-> David Lechner (13):
->       gpiolib: add gpiod_multi_set_value_cansleep()
->       auxdisplay: seg-led-gpio: use gpiod_multi_set_value_cansleep
->       bus: ts-nbus: validate ts,data-gpios array size
->       bus: ts-nbus: use gpiod_multi_set_value_cansleep
->       gpio: max3191x: use gpiod_multi_set_value_cansleep
->       iio: adc: ad7606: use gpiod_multi_set_value_cansleep
->       iio: amplifiers: hmc425a: use gpiod_multi_set_value_cansleep
->       iio: resolver: ad2s1210: use gpiod_multi_set_value_cansleep
->       mmc: pwrseq_simple: use gpiod_multi_set_value_cansleep
->       mux: gpio: use gpiod_multi_set_value_cansleep
->       net: mdio: mux-gpio: use gpiod_multi_set_value_cansleep
->       phy: mapphone-mdm6600: use gpiod_multi_set_value_cansleep
->       ASoC: adau1701: use gpiod_multi_set_value_cansleep
->
->  drivers/auxdisplay/seg-led-gpio.c           |  3 +--
->  drivers/bus/ts-nbus.c                       | 10 ++++++----
->  drivers/gpio/gpio-max3191x.c                | 18 +++++++-----------
->  drivers/iio/adc/ad7606.c                    |  3 +--
->  drivers/iio/adc/ad7606_spi.c                |  3 +--
->  drivers/iio/amplifiers/hmc425a.c            |  3 +--
->  drivers/iio/resolver/ad2s1210.c             |  8 ++------
->  drivers/mmc/core/pwrseq_simple.c            |  3 +--
->  drivers/mux/gpio.c                          |  4 +---
->  drivers/net/mdio/mdio-mux-gpio.c            |  3 +--
->  drivers/phy/motorola/phy-mapphone-mdm6600.c |  4 +---
->  include/linux/gpio/consumer.h               |  7 +++++++
->  sound/soc/codecs/adau1701.c                 |  4 +---
->  13 files changed, 31 insertions(+), 42 deletions(-)
-> ---
-> base-commit: df4b2bbff898227db0c14264ac7edd634e79f755
-> change-id: 20250131-gpio-set-array-helper-bd4a328370d3
->
-> Best regards,
-> --
-> David Lechner <dlechner@baylibre.com>
->
+On Fri, Feb 07, 2025 at 09:31:09AM +0800, Zhang Zekun wrote:
+> There are many drivers use of_find_node_by_name() with a not-NULL
+> device_node pointer, and a number of callers would require a call to
+> of_node_get() before using it. There are also some drivers who forget
+> to call of_node_get() which would cause a ref count leak[1]. So, Add a
+> wraper function for of_find_node_by_name(), drivers may use this function
+> to call of_find_node_by_name() with the refcount already balanced.
+> 
+> [1] https://lore.kernel.org/all/20241024015909.58654-1-zhangzekun11@huawei.com/
 
-I can provide an immutable branch for the entire series for everyone
-to pull or I can apply patch one, provide an immutable branch and
-every subsystem can take their respective patches. What do you prefer?
+Hi Zhang Zekun,
 
-Bartosz
+thank you for working on this issue!
+
+First of all, let's take a step back and analyze the initial problem.
+Everything following is only my opinion...
+
+The main issue I see is that the current API - of_find_node_by_name -
+modifies the refcount of its input by calling of_node_put(from) as part
+of its search. Typically, a "find" function is expected to treat its
+input as read-only. That is, when you pass an object into such a
+function, you expect its reference count to remain unchanged unless
+ownership is explicitly transferred. In this case, lowering the refcount
+on the input node is counterintuitive and already lead to unexpected
+behavior and subtle bugs.
+
+To address this, the workaround introduces a wrapper function,
+of_find_node_by_name_balanced, which first increments the input’s
+refcount (via of_node_get()) before calling the original function. While
+this "balances" the refcount change, the naming remains problematic from
+my perspective. The "_balanced" suffix isn’t part of our common naming
+conventions (traditions? :)). Most drivers expect that a function
+starting with "find" will not alter the reference count of its input.
+The term "balanced" doesn’t clearly convey that the input's refcount is
+being explicitly managed - it instead obscures the underlying behavior,
+leaving many developers confused about what guarantees the API provides.
+
+In my view, a more natural solution would be to redesign the API so that
+it doesn’t modify the input object’s refcount at all. Instead, it should
+solely increase the refcount of the returned node (if found) for safe
+asynchronous usage. This approach would align with established
+conventions where "find" implies no side effects on inputs or output,
+and a "get" indicates that the output comes with an extra reference. For
+example, a function named of_get_node_by_name would clearly signal that
+only the returned node is subject to a refcount increase while leaving
+the input intact.
+
+Thus, while the current workaround "balances" the reference count, it
+doesn't address the underlying design flaw. The naming still suggests a
+"find" function that should leave the input untouched, which isn’t the
+case here. A redesign of the API - with both the behavior and naming
+aligned to common expectations - would be a clearer and more robust
+solution.
+
+Nevertheless, it is only my POV, and the final decision rests with the
+OpenFirmware framework maintainers.
+
+Best Regards,
+Oleksij
+-- 
+Pengutronix e.K.                           |                             |
+Steuerwalder Str. 21                       | http://www.pengutronix.de/  |
+31137 Hildesheim, Germany                  | Phone: +49-5121-206917-0    |
+Amtsgericht Hildesheim, HRA 2686           | Fax:   +49-5121-206917-5555 |
 
