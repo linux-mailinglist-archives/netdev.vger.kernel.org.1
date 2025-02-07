@@ -1,69 +1,69 @@
-Return-Path: <netdev+bounces-164005-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-164006-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 944AFA2C44E
-	for <lists+netdev@lfdr.de>; Fri,  7 Feb 2025 15:00:06 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6290CA2C450
+	for <lists+netdev@lfdr.de>; Fri,  7 Feb 2025 15:00:42 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 701F03A9441
-	for <lists+netdev@lfdr.de>; Fri,  7 Feb 2025 13:59:47 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id ED6C516B4DF
+	for <lists+netdev@lfdr.de>; Fri,  7 Feb 2025 14:00:08 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 37B8121D003;
-	Fri,  7 Feb 2025 13:58:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E823822068D;
+	Fri,  7 Feb 2025 13:58:56 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="p7wiMAim"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="sJpuaj5C"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qk1-f202.google.com (mail-qk1-f202.google.com [209.85.222.202])
+Received: from mail-qt1-f202.google.com (mail-qt1-f202.google.com [209.85.160.202])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8F6D7215043
-	for <netdev@vger.kernel.org>; Fri,  7 Feb 2025 13:58:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.202
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3D4FF212FBC
+	for <netdev@vger.kernel.org>; Fri,  7 Feb 2025 13:58:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.202
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1738936735; cv=none; b=GCFNtRa35HVTEPJbYFpnlQSMfybKcr7Xur9v0krYSt653q5qSl0URex2+88N3blsFhBSuXr7HnMoorzrOHY6Hd1yrqG6GaX5RIQdFtUXn5DX/9HDJMr+VDMzOizTO7sWnLWneZrUnlqkNzdA8U+dMCsiM0G7xaHziinjSCStyiQ=
+	t=1738936736; cv=none; b=e7TDaoZbBxADNWjS4dte5CPbGJLQHozH7DoIbn7pwVu7E8Hili1aMQfATFfqEuInusX2fisrzGC7pBeuorIyMhspZhes4kyWpBWLGK3MOZBLDDLDM7/bTGuV28IRHfWbSyqiMzcP0vIK4CnxX2I1dymYIadz3a+Cdi26++3qjsk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1738936735; c=relaxed/simple;
-	bh=/LJvWcreEEAerDSTukjmKP7MgWMa9UN2BBvpxyTf3DQ=;
+	s=arc-20240116; t=1738936736; c=relaxed/simple;
+	bh=BSlpgDTG2Fr7hbiihOQf1WACP2NvQoi7ZQqYL9HMoKc=;
 	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=Qd+UKChzcSIK9knt69KVGnZ3bA9N2AlwdBRMVQ7BIFP8iKseGE7LSBEC+fVm9MBALnX7lyJDvJR92hULpXefWrFzmAlMQTnhz42i0P+DHXGkk62RjTsgQAptSa5LrWYpK4isXqzjaxCfr/xmQjXL7iGVLpYk5w6ft64c3X8CYUg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=p7wiMAim; arc=none smtp.client-ip=209.85.222.202
+	 To:Cc:Content-Type; b=vFlUCW4F8uaGkw1eiClFas/BiCxcgOaznkxM5brm2YHFFIL9TWay0lSTTbweMb7a6M+CbNUE0RXFuTgB28JukOK9WulFUyquXxXeQjtAiU0bozvl1DbKIU8lJZ/+qCO5P+yNUYxJGTL38REebu75OXk0RDB7lg44K7dRZ69MI8s=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=sJpuaj5C; arc=none smtp.client-ip=209.85.160.202
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com
-Received: by mail-qk1-f202.google.com with SMTP id af79cd13be357-7c03ff85008so424411585a.1
-        for <netdev@vger.kernel.org>; Fri, 07 Feb 2025 05:58:53 -0800 (PST)
+Received: by mail-qt1-f202.google.com with SMTP id d75a77b69052e-467b5861766so39028681cf.2
+        for <netdev@vger.kernel.org>; Fri, 07 Feb 2025 05:58:54 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1738936732; x=1739541532; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1738936734; x=1739541534; darn=vger.kernel.org;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=dg8FsbPy9RUFaLmEehAwSOfd1SNk5Hq1VflxMhl3GFs=;
-        b=p7wiMAimTrDnHOOvap0DhH0npkQGWziLR7ppPa7xi14PLTW6UeMYo46yrPPl/1jbBx
-         E5nW3mPVNmiEZuxaG2g3Q7FXSsPrRPJh6R2f3kRBPGW4grijWRbG+a5mVL7xANEFJ73g
-         8idbmR11XkQ/uP8aNHQEk3vTMpY45OTfG1W6VGRJ/Xxzy8fYhZ8tCvmnGvGiBS5NiIVo
-         QSQTdvdEKRGT3yQGnX4tCgMnRM7b2qg+p8+yJ/+Q1M5gV8t6WRmnNmHZUGJbe5WZREWD
-         YoVoyB+IHRz5C79EXAPhVmjsNm214uYTnJBBww+oHlGIeuiskvIcw/F/ep55OQeNPHBq
-         YqIw==
+        bh=ChZ4IRphUYImFbjgGHf7CKcI7RILBkFZjntsWsfQYgY=;
+        b=sJpuaj5C2pQSHIofG/xs3jzU28VsltcjZYDPZCDnnxhI7BSLixntcabXH1Yzj+NVu+
+         b1AzkX/6/JcjEBdGsprrzlFRtTODqIMxOrenIvKFczZHl3BcHkjyYZAzAGON7wHQ4Wnn
+         S24NbtHU02oZQNumhdzwQBubMufgVUBRtET+kwaEgt93i6sP5mLYJSBykSRDwZEczvwI
+         kHEEU8AKxVFETm3EjX9snkCn6yBBKok4KE9aXo8yEOenGlfE+j/nxp9AnOtQJMNr6pGI
+         l4zBhtDu/o5rRNDJoyIcw6+3Nx/Hy2DKwNXhkE5yCoyiZjNWcW+cL/exqnoWgPBzUk50
+         bMxQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1738936732; x=1739541532;
+        d=1e100.net; s=20230601; t=1738936734; x=1739541534;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=dg8FsbPy9RUFaLmEehAwSOfd1SNk5Hq1VflxMhl3GFs=;
-        b=SgTSaIfZpGVND31uPc4CyvJu9NeXmI+IIofP7arMKGXMtIX07SPUNaK0mwCyw4dAOV
-         YVuqSjS52UL8CTZVEKv6IwkSA4Frv0RaTFeTCi7lxZxoNDqI5omivFtezQrxRObjpF6A
-         F5oEHQFs9akSTR7SlX6Hh18KT1qQUxYPWB3bTsh6zFZ5phKAvRwNB3KFw4UhzkeqZAyZ
-         cDxaY08tCptVB8UKYxsOQq3SiZS8kWW2ru7DcxH+3eEUMKW2P+J7npridlG6cOU/3BrR
-         5bjHXgQq2wqIxwgbQ6k89qIh8wbowVCEOnVBhsuA2egs+FmEdMQxNtackkRbYARVgBz8
-         75xQ==
-X-Gm-Message-State: AOJu0Yzvq6YcFn7t7fNxmtrXzPhdIW/izMXyqSiJZDaNx4de9lC4kddv
-	acnO2cr29+DmEz630dEWdxZJ+w8B6OKR3aVorWisEmLyBMa7JBxRd7fZxgcxjhiO75pCXRW/J7a
-	xo2n/BMWrKw==
-X-Google-Smtp-Source: AGHT+IH7/Fk/TY+gtkWI3ooyPh6oleQRaIyPv9Ln518JfwFJs7mrvZJNuZAgR5ZjhgLc6iLYDV6Xh9NtTh+MMw==
-X-Received: from qknpw5.prod.google.com ([2002:a05:620a:63c5:b0:7bc:e5d3:d03b])
+        bh=ChZ4IRphUYImFbjgGHf7CKcI7RILBkFZjntsWsfQYgY=;
+        b=qNra57lTWfpYfYRKqjYUPGZm7X98GmvV2UrOd6SDZp32VsQZTundU8vM3XZAvNT/ow
+         bqY0kgZxsZ5HMrDYbe4agESsdnTm0S+lWMNCZCnrC1dbfb8JFZ1r1V5ZpGMFUYmkyxNV
+         1I3KugViNP8a2OUq1a5BEhxAks/LmANLqS8w46zUFQd/EfFHQ8fcGB+nHp8hWo8rK6VU
+         tLDVxsI5TnshKXB+DYgsJjkEE3bpIrrnYlhGaCUMcfIpRbG530mpDUNMZy8vUkv8tvYT
+         wLYSnbEQWptGI7+MQbVnUG2QBlfaPG3bVhe83ZhzW5o33/W5mpBnUHqlTnxKKmYrQ9lA
+         ut+Q==
+X-Gm-Message-State: AOJu0Yx6rfNpOgaAXL5/ImlCxEK0BJpZdFCHQKw5bdOC3mpMN45THkNX
+	EOWSvUG5vs297mdJnqigPizyjSfSWJjONj18FXGd5CIgqhTGl4IAGZxi/Fs2mK8OC6DhLgaA4Vj
+	PCIOHqZiVMg==
+X-Google-Smtp-Source: AGHT+IG5lPJTOUia1yxV4mb6TxVSgxlYEX0B/TzZNnqIN2yX+bdC58iBKUHxZ7Iqn+E4jV+m6Egy0mPIc9s0eg==
+X-Received: from qtbgd21.prod.google.com ([2002:a05:622a:5c15:b0:467:971c:6905])
  (user=edumazet job=prod-delivery.src-stubby-dispatcher) by
- 2002:a05:620a:45a5:b0:7b6:d799:1f84 with SMTP id af79cd13be357-7c047bbc66bmr456653585a.15.1738936732607;
- Fri, 07 Feb 2025 05:58:52 -0800 (PST)
-Date: Fri,  7 Feb 2025 13:58:39 +0000
+ 2002:ac8:5a51:0:b0:460:8f80:909a with SMTP id d75a77b69052e-47167ad842dmr41409961cf.32.1738936734100;
+ Fri, 07 Feb 2025 05:58:54 -0800 (PST)
+Date: Fri,  7 Feb 2025 13:58:40 +0000
 In-Reply-To: <20250207135841.1948589-1-edumazet@google.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -73,8 +73,8 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
 References: <20250207135841.1948589-1-edumazet@google.com>
 X-Mailer: git-send-email 2.48.1.502.g6dc24dfdaf-goog
-Message-ID: <20250207135841.1948589-8-edumazet@google.com>
-Subject: [PATCH net 7/8] ndisc: extend RCU protection in ndisc_send_skb()
+Message-ID: <20250207135841.1948589-9-edumazet@google.com>
+Subject: [PATCH net 8/8] ipv6: mcast: extend RCU protection in igmp6_send()
 From: Eric Dumazet <edumazet@google.com>
 To: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
 	Paolo Abeni <pabeni@redhat.com>
@@ -83,61 +83,94 @@ Cc: netdev@vger.kernel.org, David Ahern <dsahern@kernel.org>,
 	Eric Dumazet <edumazet@google.com>
 Content-Type: text/plain; charset="UTF-8"
 
-ndisc_send_skb() can be called without RTNL or RCU held.
+igmp6_send() can be called without RTNL or RCU being held.
 
-Acquire rcu_read_lock() earlier, so that we can use dev_net_rcu()
+Extend RCU protection so that we can safely fetch the net pointer
 and avoid a potential UAF.
 
-Fixes: 1762f7e88eb3 ("[NETNS][IPV6] ndisc - make socket control per namespace")
+Note that we no longer can use sock_alloc_send_skb() because
+ipv6.igmp_sk uses GFP_KERNEL allocations which can sleep.
+
+Instead use alloc_skb() and charge the net->ipv6.igmp_sk
+socket under RCU protection.
+
+Fixes: b8ad0cbc58f7 ("[NETNS][IPV6] mcast - handle several network namespace")
 Signed-off-by: Eric Dumazet <edumazet@google.com>
 ---
- net/ipv6/ndisc.c | 12 ++++++++----
- 1 file changed, 8 insertions(+), 4 deletions(-)
+ net/ipv6/mcast.c | 31 +++++++++++++++----------------
+ 1 file changed, 15 insertions(+), 16 deletions(-)
 
-diff --git a/net/ipv6/ndisc.c b/net/ipv6/ndisc.c
-index 90f8aa2d7af2ec1103220378c155b7b724efc575..8699d1a188dc4a15ac0b65229c4dd19240c9c054 100644
---- a/net/ipv6/ndisc.c
-+++ b/net/ipv6/ndisc.c
-@@ -471,16 +471,20 @@ static void ip6_nd_hdr(struct sk_buff *skb,
- void ndisc_send_skb(struct sk_buff *skb, const struct in6_addr *daddr,
- 		    const struct in6_addr *saddr)
+diff --git a/net/ipv6/mcast.c b/net/ipv6/mcast.c
+index 9dfdb40988b0f8edd882c07b555ea0115ee95cab..81a739ebf7094694a6f5de5020cd4c4d1c9642d1 100644
+--- a/net/ipv6/mcast.c
++++ b/net/ipv6/mcast.c
+@@ -2165,21 +2165,21 @@ static void mld_send_cr(struct inet6_dev *idev)
+ 
+ static void igmp6_send(struct in6_addr *addr, struct net_device *dev, int type)
  {
-+	struct icmp6hdr *icmp6h = icmp6_hdr(skb);
- 	struct dst_entry *dst = skb_dst(skb);
--	struct net *net = dev_net(skb->dev);
--	struct sock *sk = net->ipv6.ndisc_sk;
+-	struct net *net = dev_net(dev);
+-	struct sock *sk = net->ipv6.igmp_sk;
++	const struct in6_addr *snd_addr, *saddr;
++	int err, len, payload_len, full_len;
++	struct in6_addr addr_buf;
  	struct inet6_dev *idev;
+ 	struct sk_buff *skb;
+ 	struct mld_msg *hdr;
+-	const struct in6_addr *snd_addr, *saddr;
+-	struct in6_addr addr_buf;
+ 	int hlen = LL_RESERVED_SPACE(dev);
+ 	int tlen = dev->needed_tailroom;
+-	int err, len, payload_len, full_len;
+ 	u8 ra[8] = { IPPROTO_ICMPV6, 0,
+ 		     IPV6_TLV_ROUTERALERT, 2, 0, 0,
+ 		     IPV6_TLV_PADN, 0 };
+-	struct flowi6 fl6;
+ 	struct dst_entry *dst;
++	struct flowi6 fl6;
 +	struct net *net;
 +	struct sock *sk;
- 	int err;
--	struct icmp6hdr *icmp6h = icmp6_hdr(skb);
- 	u8 type;
  
- 	type = icmp6h->icmp6_type;
- 
-+	rcu_read_lock();
-+
-+	net = dev_net_rcu(skb->dev);
-+	sk = net->ipv6.ndisc_sk;
- 	if (!dst) {
- 		struct flowi6 fl6;
- 		int oif = skb->dev->ifindex;
-@@ -488,6 +492,7 @@ void ndisc_send_skb(struct sk_buff *skb, const struct in6_addr *daddr,
- 		icmpv6_flow_init(sk, &fl6, type, saddr, daddr, oif);
- 		dst = icmp6_dst_alloc(skb->dev, &fl6);
- 		if (IS_ERR(dst)) {
-+			rcu_read_unlock();
- 			kfree_skb(skb);
- 			return;
- 		}
-@@ -502,7 +507,6 @@ void ndisc_send_skb(struct sk_buff *skb, const struct in6_addr *daddr,
- 
- 	ip6_nd_hdr(skb, saddr, daddr, READ_ONCE(inet6_sk(sk)->hop_limit), skb->len);
+ 	if (type == ICMPV6_MGM_REDUCTION)
+ 		snd_addr = &in6addr_linklocal_allrouters;
+@@ -2190,19 +2190,21 @@ static void igmp6_send(struct in6_addr *addr, struct net_device *dev, int type)
+ 	payload_len = len + sizeof(ra);
+ 	full_len = sizeof(struct ipv6hdr) + payload_len;
  
 -	rcu_read_lock();
- 	idev = __in6_dev_get(dst->dev);
- 	IP6_INC_STATS(net, idev, IPSTATS_MIB_OUTREQUESTS);
+-	IP6_INC_STATS(net, __in6_dev_get(dev), IPSTATS_MIB_OUTREQUESTS);
+-	rcu_read_unlock();
++	skb = alloc_skb(hlen + tlen + full_len, GFP_KERNEL);
  
+-	skb = sock_alloc_send_skb(sk, hlen + tlen + full_len, 1, &err);
++	rcu_read_lock();
+ 
++	net = dev_net_rcu(dev);
++	idev = __in6_dev_get(dev);
++	IP6_INC_STATS(net, idev, IPSTATS_MIB_OUTREQUESTS);
+ 	if (!skb) {
+-		rcu_read_lock();
+-		IP6_INC_STATS(net, __in6_dev_get(dev),
+-			      IPSTATS_MIB_OUTDISCARDS);
++		IP6_INC_STATS(net, idev, IPSTATS_MIB_OUTDISCARDS);
+ 		rcu_read_unlock();
+ 		return;
+ 	}
++	sk = net->ipv6.igmp_sk;
++	skb_set_owner_w(skb, sk);
++
+ 	skb->priority = TC_PRIO_CONTROL;
+ 	skb_reserve(skb, hlen);
+ 
+@@ -2227,9 +2229,6 @@ static void igmp6_send(struct in6_addr *addr, struct net_device *dev, int type)
+ 					 IPPROTO_ICMPV6,
+ 					 csum_partial(hdr, len, 0));
+ 
+-	rcu_read_lock();
+-	idev = __in6_dev_get(skb->dev);
+-
+ 	icmpv6_flow_init(sk, &fl6, type,
+ 			 &ipv6_hdr(skb)->saddr, &ipv6_hdr(skb)->daddr,
+ 			 skb->dev->ifindex);
 -- 
 2.48.1.502.g6dc24dfdaf-goog
 
