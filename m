@@ -1,53 +1,53 @@
-Return-Path: <netdev+bounces-163792-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-163793-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id A5610A2B930
-	for <lists+netdev@lfdr.de>; Fri,  7 Feb 2025 03:44:12 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9B968A2B932
+	for <lists+netdev@lfdr.de>; Fri,  7 Feb 2025 03:44:23 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 3F71C166FDC
-	for <lists+netdev@lfdr.de>; Fri,  7 Feb 2025 02:44:11 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 0337E3A31A1
+	for <lists+netdev@lfdr.de>; Fri,  7 Feb 2025 02:44:14 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3F00918132A;
-	Fri,  7 Feb 2025 02:43:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CC0CA188591;
+	Fri,  7 Feb 2025 02:43:57 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b="qN7j1jUP"
+	dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b="PkAv2Ld1"
 X-Original-To: netdev@vger.kernel.org
 Received: from esa.microchip.iphmx.com (esa.microchip.iphmx.com [68.232.153.233])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9B9F117CA17;
-	Fri,  7 Feb 2025 02:43:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4E4AB7E0FF;
+	Fri,  7 Feb 2025 02:43:56 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=68.232.153.233
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1738896236; cv=none; b=f+xQifB8Mj+mM5S/Yr37baL7zTsfigVY8cIa6Pb+kV92M94RF3Ne29VwH+xCU45oqewKsUuoJcUN0W0oD6p5dMa1kj2F3woESHOA6wIdqal4rwoCdKfgNr5eNDd0q52lj6xbgv1gSXCBq0tfU7SMECtYVXuFT0jXxhwdKepiD/o=
+	t=1738896237; cv=none; b=mpV1EN9ZCWN/45z1bzZLuelNKQTzMJnqhBurUbYj9n/0gxupi8JF3wHYj1qEPqFjBrN5J4p/mYJZZcfP4ENHTcSFgaWQAdYMeFfZDQFrdLnCIKl5gFLW0dTZeT2CP++DPa8dN0RAqE9KT/DHlutzuOKYHb/ARTeT13WdDl5ijjQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1738896236; c=relaxed/simple;
-	bh=KnnMJ5gA4MaTm4LyzoHVsG5QMMlcHjMBNuQdqkXXobo=;
+	s=arc-20240116; t=1738896237; c=relaxed/simple;
+	bh=x55ztdVWpMWIFD+YnbXU+Mpg5vtUMbqKH4u/cg8trv0=;
 	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=Ww/gpIS+VUn1obbiWZx4GH+/b/NyRaRLc2Sa6cNuobO7t/IIRc9w3S/Gz/3fWAmMTeLis98vgin7dX04dZCkvBJgZ5N4UwtH8N6UH8M4iUw+kuFISiB1lqrczd76EW+DZn2TEoLR1+3F+v9FsHejO/RS/44j2PrKa/FG4ni9VCQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microchip.com; spf=pass smtp.mailfrom=microchip.com; dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b=qN7j1jUP; arc=none smtp.client-ip=68.232.153.233
+	 MIME-Version:Content-Type; b=h9SVNblazCLza58icCA/VTcmuKk47V4jQbJIzU/gmYJMoAUh91/10gqQuah0skEAGdf2QJmVga/77z+xfEmPJHFId7LZCTxtye2LQC9KZCNaNH/q4gH/rKR2Bo5OoDKoSzSq7u3LKVmb7tdn6dEoMuEwOViWRQH0VLeX3dBlUEc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microchip.com; spf=pass smtp.mailfrom=microchip.com; dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b=PkAv2Ld1; arc=none smtp.client-ip=68.232.153.233
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microchip.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=microchip.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=microchip.com; i=@microchip.com; q=dns/txt; s=mchp;
-  t=1738896235; x=1770432235;
+  t=1738896236; x=1770432236;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=KnnMJ5gA4MaTm4LyzoHVsG5QMMlcHjMBNuQdqkXXobo=;
-  b=qN7j1jUPJfPkna1G6tu1xpDF1nlMSXifabxtbt+woE0U8diSr91jOoto
-   z0CKAfekw6t3sj/Bu+z9qQh2isRBSq/o4/i3wvscpid/CsNzeoiHOdzBj
-   n64O4mi0nESjWausGQl6QD8gsqo1yqhQV/w/xob/jSii554EH0dbXtXcH
-   hdrDvXIgfk8yWVyKixn3rllh4B91b/y7xC1H7T1Q588JCICIYKvvIdn8E
-   zSkCW1J6KcvNLeiX9KkWo8H9paNxK/PtwGEGqaI4ml4JWFfXs7ewKhdwg
-   bwIeInr18hdXv4OiDVF9gbQHanCaAOeeAHEVOPBVXhdvXnY16sJLjIao5
-   w==;
+  bh=x55ztdVWpMWIFD+YnbXU+Mpg5vtUMbqKH4u/cg8trv0=;
+  b=PkAv2Ld1hYEqG/IGM/cNmkUiTcuQejwNCI7AHoTUvwrk8jYF6idtwJ6o
+   gnrWv+FGD4rDKzFEEdTVGx7wZXCeAxpShyp0LCCDwoPu2tlnbMgauhDbq
+   6U8Soq6rHA0A38+/TOdd45tOqHPWAOFSmCHbqdQiEYH7NOQr960Zcl3+q
+   o1kVJ3eaT8Fpo7fM7P/aY0GB9rin6NygD6c7JtY2qSVOlXsyAbHA0/tHO
+   iw2slbRjutY1Q/0Rvwj2DKrVnXIuWB/tKD83S2QBDor0pKuFJt6sA+MTZ
+   keybpJZ1Q8xYapnPUgl9xCECEPR1GCflMr5moIOepbl+eVjGKaEJnztlO
+   g==;
 X-CSE-ConnectionGUID: HtEgmb03QQa8PJ+IoVcYWA==
-X-CSE-MsgGUID: g+PjePLaRVmmcLrwtqXAmA==
+X-CSE-MsgGUID: TQnFM0foTBCIdErefi0/pQ==
 X-IronPort-AV: E=Sophos;i="6.13,266,1732604400"; 
-   d="scan'208";a="37381075"
+   d="scan'208";a="37381076"
 X-Amp-Result: SKIPPED(no attachment in message)
 Received: from unknown (HELO email.microchip.com) ([170.129.1.10])
   by esa3.microchip.iphmx.com with ESMTP/TLS/ECDHE-RSA-AES128-GCM-SHA256; 06 Feb 2025 19:43:47 -0700
@@ -57,7 +57,7 @@ Received: from chn-vm-ex03.mchp-main.com (10.10.85.151) by
  15.1.2507.35; Thu, 6 Feb 2025 19:43:09 -0700
 Received: from pop-os.microchip.com (10.10.85.11) by chn-vm-ex03.mchp-main.com
  (10.10.85.151) with Microsoft SMTP Server id 15.1.2507.35 via Frontend
- Transport; Thu, 6 Feb 2025 19:43:08 -0700
+ Transport; Thu, 6 Feb 2025 19:43:09 -0700
 From: <Tristram.Ha@microchip.com>
 To: Russell King <linux@armlinux.org.uk>, Woojung Huh
 	<woojung.huh@microchip.com>, Andrew Lunn <andrew@lunn.ch>, Vladimir Oltean
@@ -68,9 +68,9 @@ CC: "David S. Miller" <davem@davemloft.net>, Eric Dumazet
 	<pabeni@redhat.com>, <UNGLinuxDriver@microchip.com>,
 	<netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>, Tristram Ha
 	<tristram.ha@microchip.com>
-Subject: [PATCH RFC net-next v2 1/3] net: pcs: xpcs: Activate DW_XPCS_SGMII_MODE_MAC_MANUAL for KSZ9477
-Date: Thu, 6 Feb 2025 18:43:14 -0800
-Message-ID: <20250207024316.25334-2-Tristram.Ha@microchip.com>
+Subject: [PATCH RFC net-next v2 2/3] net: dsa: microchip: Add SGMII port support to KSZ9477 switch
+Date: Thu, 6 Feb 2025 18:43:15 -0800
+Message-ID: <20250207024316.25334-3-Tristram.Ha@microchip.com>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20250207024316.25334-1-Tristram.Ha@microchip.com>
 References: <20250207024316.25334-1-Tristram.Ha@microchip.com>
@@ -85,41 +85,28 @@ Content-Type: text/plain
 
 From: Tristram Ha <tristram.ha@microchip.com>
 
-Microchip KSZ9477 SGMII uses old XPCS IP and requires special code to
-operate correctly.  A special value from PMA device ids will be used to
-activate DW_XPCS_SGMII_MODE_MAC_MANUL.
+The KSZ9477 DSA driver uses XPCS driver to operate its SGMII port.
 
 Signed-off-by: Tristram Ha <tristram.ha@microchip.com>
 ---
- drivers/net/pcs/pcs-xpcs.c   | 2 ++
- include/linux/pcs/pcs-xpcs.h | 1 +
- 2 files changed, 3 insertions(+)
+v2
+ - update Kconfig to pass compilation test
 
-diff --git a/drivers/net/pcs/pcs-xpcs.c b/drivers/net/pcs/pcs-xpcs.c
-index d522e4a5a138..5aad67ff4a4f 100644
---- a/drivers/net/pcs/pcs-xpcs.c
-+++ b/drivers/net/pcs/pcs-xpcs.c
-@@ -1482,6 +1482,8 @@ static struct dw_xpcs *xpcs_create(struct mdio_device *mdiodev)
- 		xpcs->sgmii_10_100_8bit = DW_XPCS_SGMII_10_100_8BIT;
- 		xpcs->sgmii_mode = DW_XPCS_SGMII_MODE_PHY_HW;
- 	} else {
-+		if (xpcs->info.pma == MICROCHIP_KSZ9477_PMA_ID)
-+			xpcs->sgmii_mode = DW_XPCS_SGMII_MODE_MAC_MANUAL;
- 		xpcs->need_reset = true;
- 	}
- 
-diff --git a/include/linux/pcs/pcs-xpcs.h b/include/linux/pcs/pcs-xpcs.h
-index 733f4ddd2ef1..637d5356a961 100644
---- a/include/linux/pcs/pcs-xpcs.h
-+++ b/include/linux/pcs/pcs-xpcs.h
-@@ -39,6 +39,7 @@ enum dw_xpcs_pma_id {
- 	DW_XPCS_PMA_GEN5_10G_ID,
- 	DW_XPCS_PMA_GEN5_12G_ID,
- 	WX_TXGBE_XPCS_PMA_10G_ID = 0x0018fc80,
-+	MICROCHIP_KSZ9477_PMA_ID = 0x00229477,
- };
- 
- struct dw_xpcs_info {
+ drivers/net/dsa/microchip/Kconfig | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/drivers/net/dsa/microchip/Kconfig b/drivers/net/dsa/microchip/Kconfig
+index 12a86585a77f..c71d3fd5dfeb 100644
+--- a/drivers/net/dsa/microchip/Kconfig
++++ b/drivers/net/dsa/microchip/Kconfig
+@@ -6,6 +6,7 @@ menuconfig NET_DSA_MICROCHIP_KSZ_COMMON
+ 	select NET_DSA_TAG_NONE
+ 	select NET_IEEE8021Q_HELPERS
+ 	select DCB
++	select PCS_XPCS
+ 	help
+ 	  This driver adds support for Microchip KSZ8, KSZ9 and
+ 	  LAN937X series switch chips, being KSZ8863/8873,
 -- 
 2.34.1
 
