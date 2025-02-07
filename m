@@ -1,107 +1,185 @@
-Return-Path: <netdev+bounces-164189-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-164190-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 57F88A2CD80
-	for <lists+netdev@lfdr.de>; Fri,  7 Feb 2025 21:04:58 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id CBDA2A2CD87
+	for <lists+netdev@lfdr.de>; Fri,  7 Feb 2025 21:05:43 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 007913ABC67
-	for <lists+netdev@lfdr.de>; Fri,  7 Feb 2025 20:04:49 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id F216A16E006
+	for <lists+netdev@lfdr.de>; Fri,  7 Feb 2025 20:05:15 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7A2A21A08A0;
-	Fri,  7 Feb 2025 20:04:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C67F41A8407;
+	Fri,  7 Feb 2025 20:04:34 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="r5IPLDS1"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="SAXBQJiy"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ed1-f41.google.com (mail-ed1-f41.google.com [209.85.208.41])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3C1FC18C930;
-	Fri,  7 Feb 2025 20:04:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E167F19F47E;
+	Fri,  7 Feb 2025 20:04:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.41
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1738958662; cv=none; b=q6sgQqFxE8LPlBdSD67UoigQV+QkPWEfU5AZGau43yfai0xmyw5IJKdZjMZzHyg8X8qQMCs9zRXcFxQ97lWzelDKPYN2Q6kjyCtZP76atAibNqwXAJMqdYTk/iJA32L5cFOu4py489xTkxXtKjTOrlW21Tw2/bEhV6mVTQa3QjM=
+	t=1738958674; cv=none; b=nVjzz+jiq97lpVpdD8KdSQjRmnPkaR+cK+Z6qreLGnexoxcz3Qfen6dVry2Sak/3YcMvHCp37/HIBQzJl5iOicotCnn/uaBY44A0+gqfm7+udTDyt02/hnqf8+teelMxe5BkD0jPxVjOYFp5BbuXXa97fbcFkOET6lB0vSddXSA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1738958662; c=relaxed/simple;
-	bh=V/d0cHVmH87BvmOD994J3enMdP4akQHipKqVYK9lI+E=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=GKKKSUOkvhAzx34fQAnlCwHcUwpvikTyx65VL1lIT3Mr/BtXT3BrKH2dFUNMwgKIK43p8jWQXdSAzjkkCSANVQLkEJr17WzMJsC5Hn4SozCJL4zh7pVpAWwHBLK0CG0sShTj8HvG9PocWe7rKi9WS360BzvVxOu/GSy2ZTWLgvA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=r5IPLDS1; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5C742C4CED1;
-	Fri,  7 Feb 2025 20:04:21 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1738958661;
-	bh=V/d0cHVmH87BvmOD994J3enMdP4akQHipKqVYK9lI+E=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=r5IPLDS1OfDoymxXg1xTZN0El7zvLcoyuS18V+fkNQyxEQyMCBRZPn7hbKjNuwYOB
-	 brbI/QyMHmPyQnUTKkz6tV7c90QQeIxyYg53bH3NVtJePTiRpjvRVdGJftED+97zMZ
-	 aQH1e+IB+APL3n4or51dNWIHUa6VGWa5rzgrfzN79itYImyABatpR9uPwiww/UvhL1
-	 kTOiiNoOvG5bScnHYzyDOtWsK3dXk/F9aQLSg5fSbZ+gQsWgKUIcXce0pIqJpHw30b
-	 R5fm/5WgoxPIk5fJKM8z8icyI4pjH08MBnD3XK8cTnCzQr3VM8Hsi/y4V6CdFD9KUD
-	 3gRfoXesMl7nQ==
-Date: Fri, 7 Feb 2025 20:04:19 +0000
-From: Eric Biggers <ebiggers@kernel.org>
-To: David Howells <dhowells@redhat.com>
-Cc: netdev@vger.kernel.org, Herbert Xu <herbert@gondor.apana.org.au>,
-	Marc Dionne <marc.dionne@auristor.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
-	Simon Horman <horms@kernel.org>,
-	Trond Myklebust <trond.myklebust@hammerspace.com>,
-	Chuck Lever <chuck.lever@oracle.com>,
-	Ard Biesheuvel <ardb@kernel.org>, linux-crypto@vger.kernel.org,
-	linux-afs@lists.infradead.org, linux-nfs@vger.kernel.org,
-	linux-fsdevel@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH net 03/24] crypto: Add 'krb5enc' hash and cipher AEAD
- algorithm
-Message-ID: <20250207200419.GA2819332@google.com>
-References: <20250203142343.248839-1-dhowells@redhat.com>
- <20250203142343.248839-4-dhowells@redhat.com>
+	s=arc-20240116; t=1738958674; c=relaxed/simple;
+	bh=c0HE3fhR5sqsIIunJnpVU2sofmoEc9yrKyaRzinguC8=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=grBGPYP5L4ptu6S1luAtH6TR72Oh1g/nWRocd4i+nSq1D+ka96efmbnGgJvhQ39YmdE0V/TlepLySzFztaGpJPmQGS6uw4XsX+eSXKAVSL5Bfr+0JxIbnJAdkncTDBMdk6AOXsY9ORxk6mCvChcTwTIq2WUylU7IEb6EOjXek8k=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=SAXBQJiy; arc=none smtp.client-ip=209.85.208.41
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-ed1-f41.google.com with SMTP id 4fb4d7f45d1cf-5de4c7720bcso1505588a12.0;
+        Fri, 07 Feb 2025 12:04:32 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1738958671; x=1739563471; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:content-language:from
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=G2tTSDZ2XD8g2DNn6kyimdWtnPTRpKW0MbS5kEtAlX8=;
+        b=SAXBQJiymYy9Sbzdk6toeL64YqaicGu6DZtSrw4ip2ukGMFdd7no7pBXA2iZ0UzDlS
+         WCkMpk0A9Rxb0DSgly46vFJY0qXX/xWW0T5mjlr7BiyxlKT/14uYYRdj5KlQuLdFivD/
+         4OsKK33/NZMDHbXZSAUS/aV8Z1prc/+5PjpgSl5+V2WmbJ1k5tmH2VhdhfvcnfyoF35b
+         xRuCJZSuQQ++UGC5JVMECbX4vA1rLzUq2nL0fVWFRVNTPl1jFJEeu2yRgSiPS2h4g5j+
+         O9WsJN0V3NHr2iwkHkO6Fmmwvvj0qSAwQxxjoLi58dVAnjX4DEvpqfcaUgNY1MPBu0D8
+         8aKA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1738958671; x=1739563471;
+        h=content-transfer-encoding:in-reply-to:content-language:from
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=G2tTSDZ2XD8g2DNn6kyimdWtnPTRpKW0MbS5kEtAlX8=;
+        b=mpYd+7Tu7uT9DJnqLMT5kZekW6fWirdOMguttaxJBN+MzCyIwwP3gBNd9gfIG95aY7
+         wBGGdHwmvKoduPLV6yRGcE2MpMttpsGLwcCn2bW9affcaoTQUHKkYNLQQhQIHUW5nN87
+         yqiP/RfAznrRmjWq+9OhSZfz1Tb1v1ga25GOV5QgzY+UDX6elSHsaLcYaWEHnmTYg/yx
+         BeTeZWLA+66ZMJDIyInA9++MpI8gudEFlG1//K6zK7lt9WVubLSuTPaseNpHBicJCx74
+         UOLfM14/VCWJ2+lALVIgLg6lRbWHqDs68+OYrGWLl2NzhmMaNvgAxEpLuY4xM5u8qUVF
+         z5ng==
+X-Forwarded-Encrypted: i=1; AJvYcCU2iY+8/UWpoOWwF621dla/l0I8odqlmX4gL5VgG8/r5GMzQBl3b4FihurC+1YZZTQkhoOLphHuvlzxsM/VUw1M@vger.kernel.org, AJvYcCWnMamlCoNS4Yt4skDYM8nQdnbOb6Bbr7a/1av/Us3zxN4oGFlD0jPjoLEkwagztGomExDVBmpMva8fzBI=@vger.kernel.org, AJvYcCXN0JoZQLSnWb6TnbVq4istIVzBIu1BsiBKO1UC9lzD8zK4CeX0zVrzD2bw9ARA/gkyJRC1YXtx@vger.kernel.org
+X-Gm-Message-State: AOJu0YyTiRwDlWBcLECEMFyEriVoM/FjqN7ryyRLjw8UCJLoIO8oMc8K
+	OOMF4ejNdRrbFzUgkHqzaRsyQ9RH6IIfvxIkY5TNWa+hDrtXX226
+X-Gm-Gg: ASbGnctT2jsEHFYh7wqRk8wylplwNMhTFrKFbfGkyHmcKQ1Ak1vnliP7ACREPFxZUnG
+	zuLHXmV0N0e9YviO8Z1qMX4hxojoPRIq8C1sd97e3HSh5GlIDdKZAJ0PbkAu65VBFLu+cXSbb7B
+	xghqyoWbYenFF/iEpi6d11ExhPVzayjBL3Svysip2gYWcB7tEwQ70sfBMj3ihIAnj/+qaFBguCV
+	V+7aAgnbAUlZafhxbxPhut8Ow+8eUIQhDIpuH/NXKgnO2SiF3j83d3PRWiUbOkL2Qvx7VqoDJPN
+	iwvaAnT22MF5V4yz9ifGNuk6hXPTH6GUnPzgHFstU3B1Z8qH+nbeehWxraHnWW0Q/77idgSRMVh
+	fhdF4ulERK6B7TcY6dtWYVCSRnFhlc7wMlK+/4zxU3EDSDR83lF9/J6gI8xtpIme+ZA==
+X-Google-Smtp-Source: AGHT+IFwhFFxWKhiLiV5wk2B71s8k88eNWyrwlatwlmZhNRtZGKXQn0gb2lgnlR7Mo2Je7BPaqOlyA==
+X-Received: by 2002:a05:6402:2383:b0:5dc:7fbe:7313 with SMTP id 4fb4d7f45d1cf-5de44feb7bfmr6015830a12.6.1738958670962;
+        Fri, 07 Feb 2025 12:04:30 -0800 (PST)
+Received: from ?IPV6:2001:1c00:20d:1300:1b1c:4449:176a:89ea? (2001-1c00-020d-1300-1b1c-4449-176a-89ea.cable.dynamic.v6.ziggo.nl. [2001:1c00:20d:1300:1b1c:4449:176a:89ea])
+        by smtp.gmail.com with ESMTPSA id 4fb4d7f45d1cf-5de39feff59sm2298672a12.77.2025.02.07.12.04.28
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Fri, 07 Feb 2025 12:04:30 -0800 (PST)
+Message-ID: <78a30eab-cae6-4026-b701-7d7002fe3abb@gmail.com>
+Date: Fri, 7 Feb 2025 21:04:28 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250203142343.248839-4-dhowells@redhat.com>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v5 net-next 12/14] bridge: No DEV_PATH_BR_VLAN_UNTAG_HW
+ for dsa foreign
+To: Vladimir Oltean <olteanv@gmail.com>
+Cc: Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller"
+ <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ Simon Horman <horms@kernel.org>, Pablo Neira Ayuso <pablo@netfilter.org>,
+ Jozsef Kadlecsik <kadlec@netfilter.org>, Jiri Pirko <jiri@resnulli.us>,
+ Ivan Vecera <ivecera@redhat.com>, Roopa Prabhu <roopa@nvidia.com>,
+ Nikolay Aleksandrov <razor@blackwall.org>,
+ Matthias Brugger <matthias.bgg@gmail.com>,
+ AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>,
+ Kuniyuki Iwashima <kuniyu@amazon.com>,
+ Sebastian Andrzej Siewior <bigeasy@linutronix.de>,
+ Lorenzo Bianconi <lorenzo@kernel.org>, Joe Damato <jdamato@fastly.com>,
+ Alexander Lobakin <aleksander.lobakin@intel.com>,
+ Frank Wunderlich <frank-w@public-files.de>,
+ Daniel Golle <daniel@makrotopia.org>, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org, netfilter-devel@vger.kernel.org,
+ coreteam@netfilter.org, bridge@lists.linux.dev,
+ linux-arm-kernel@lists.infradead.org, linux-mediatek@lists.infradead.org
+References: <20250204194921.46692-1-ericwouds@gmail.com>
+ <20250204194921.46692-13-ericwouds@gmail.com>
+ <20250207150340.sxhsva7qz7bb7qjd@skbuf>
+From: Eric Woudstra <ericwouds@gmail.com>
+Content-Language: en-US
+In-Reply-To: <20250207150340.sxhsva7qz7bb7qjd@skbuf>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-On Mon, Feb 03, 2025 at 02:23:19PM +0000, David Howells wrote:
-> [!] Note that the net/sunrpc/auth_gss/ implementation gets a pair of
-> ciphers, one non-CTS and one CTS, using the former to do all the aligned
-> blocks and the latter to do the last two blocks if they aren't also
-> aligned.  It may be necessary to do this here too for performance reasons -
-> but there are considerations both ways:
+
+
+On 2/7/25 4:03 PM, Vladimir Oltean wrote:
+> On Tue, Feb 04, 2025 at 08:49:19PM +0100, Eric Woudstra wrote:
+>> In network setup as below:
+>>
+>>              fastpath bypass
+>>  .----------------------------------------.
+>> /                                          \
+>> |                        IP - forwarding    |
+>> |                       /                \  v
+>> |                      /                  wan ...
+>> |                     /
+>> |                     |
+>> |                     |
+>> |                   brlan.1
+>> |                     |
+>> |    +-------------------------------+
+>> |    |           vlan 1              |
+>> |    |                               |
+>> |    |     brlan (vlan-filtering)    |
+>> |    |               +---------------+
+>> |    |               |  DSA-SWITCH   |
+>> |    |    vlan 1     |               |
+>> |    |      to       |               |
+>> |    |   untagged    1     vlan 1    |
+>> |    +---------------+---------------+
+>> .         /                   \
+>>  ----->wlan1                 lan0
+>>        .                       .
+>>        .                       ^
+>>        ^                     vlan 1 tagged packets
+>>      untagged packets
+>>
+>> br_vlan_fill_forward_path_mode() sets DEV_PATH_BR_VLAN_UNTAG_HW when
+>> filling in from brlan.1 towards wlan1. But it should be set to
+>> DEV_PATH_BR_VLAN_UNTAG in this case. Using BR_VLFLAG_ADDED_BY_SWITCHDEV
+>> is not correct. The dsa switchdev adds it as a foreign port.
+>>
+>> The same problem for all foreignly added dsa vlans on the bridge.
+>>
+>> First add the vlan, trying only native devices.
+>> If this fails, we know this may be a vlan from a foreign device.
+>>
+>> Use BR_VLFLAG_TAGGING_BY_SWITCHDEV to make sure DEV_PATH_BR_VLAN_UNTAG_HW
+>> is set only when there if no foreign device involved.
+>>
+>> Signed-off-by: Eric Woudstra <ericwouds@gmail.com>
+>> ---
 > 
->  (1) firstly, there is an optimised assembly version of cts(cbc(aes)) on
->      x86_64 that should be used instead of having two ciphers;
+> Shouldn't mlxsw_sp_switchdev_vxlan_vlans_add() also respect the
+> SWITCHDEV_F_NO_FOREIGN flag? My (maybe incorrect) understanding of
+> bridging topologies with vxlan and mlxsw is that they are neighbor
+> bridge ports, and mlxsw doesn't (seem to) call
+> switchdev_bridge_port_offload() for the vxlan bridge port. This
+> technically makes vxlan a foreign bridge port to mlxsw, so it should
+> skip reacting on VLAN switchdev objects when that flag is set, just
+> for uniform behavior across the board.
 > 
->  (2) secondly, none of the hardware offload drivers seem to offer CTS
->      support (Intel QAT does not, for instance).
-> 
-> However, I don't know if it's possible to query the crypto API to find out
-> whether there's an optimised CTS algorithm available.
+> (your patch repeats the notifier without the SWITCHDEV_F_NO_FOREIGN
+> flag anyway, so it only matters for flowtable offload).
 
-Linux's "cts" is specifically the CS3 variant of CTS (using the terminology of
-NIST SP800-38A https://dl.acm.org/doi/pdf/10.5555/2206248) which unconditionally
-swaps the last two blocks.  Is that the variant that is needed here?  SP800-38A
-mentions that CS3 is the variant used in Kerberos 5, so I assume yes.  If yes,
-then you need to use cts(cbc(aes)) unconditionally.  (BTW, I hope you have some
-test that shows that you actually implemented the Kerberos protocol correctly?)
+Or should mlxsw_sp_switchdev_blocking_event() use
+switchdev_handle_port_obj_add_foreign() to add the vxlan
+foreign port?
 
-x86_64 already has an AES-NI assembly optimized cts(cbc(aes)), as you mentioned.
-I will probably add a VAES optimized cts(cbc(aes)) at some point; I've just been
-doing other modes first.  I don't see why off-CPU hardware offload support
-should deserve much attention here, given the extremely high speed of on-CPU
-crypto these days and the great difficulty of integrating off-CPU acceleration
-efficiently.  In particular it seems weird to consider Intel QAT a reasonable
-thing to use over VAES.  Regardless, absent direct support for cts(cbc(aes)) the
-cts template will build it on top of cbc(aes) anyway.
+Then all foreign ports are added in a uniform manner and
+SWITCHDEV_F_NO_FOREIGN is respected.
 
-- Eric
-
+I do not have the hardware to test any changes in that code.
 
