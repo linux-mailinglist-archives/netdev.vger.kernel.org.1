@@ -1,50 +1,60 @@
-Return-Path: <netdev+bounces-163756-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-163760-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id B88BCA2B7E3
-	for <lists+netdev@lfdr.de>; Fri,  7 Feb 2025 02:30:08 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4284CA2B807
+	for <lists+netdev@lfdr.de>; Fri,  7 Feb 2025 02:40:32 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id D26371889364
-	for <lists+netdev@lfdr.de>; Fri,  7 Feb 2025 01:30:13 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D0AEE165BC2
+	for <lists+netdev@lfdr.de>; Fri,  7 Feb 2025 01:40:30 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3E28F55887;
-	Fri,  7 Feb 2025 01:30:05 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="h4+lgdBz"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0D39716130C;
+	Fri,  7 Feb 2025 01:39:47 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from szxga05-in.huawei.com (szxga05-in.huawei.com [45.249.212.191])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 131794C6E;
-	Fri,  7 Feb 2025 01:30:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8606C155345;
+	Fri,  7 Feb 2025 01:39:43 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.191
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1738891805; cv=none; b=KZMbHjKk+1V4oWlEzaeUTiVXC3lgJqemYf6b8FKNQrqXdO2sImhZdkUP13pIRcajHEDx3eWyMgZpjgRX1Msij4s9Jo5OYSoVy9Cc/ZJJvxSDdc8HP1syy5rilA3p2xBRjUotavSxanEXauhPQSyDjj+nWmcVaH4mVxBNI4TVeLg=
+	t=1738892386; cv=none; b=Rnmm1GYUJIFao3Ea0jaK43jWCPFKeG41ndTBHAgEN1Sajz+GhDv1jJ8+Wsxph5O2vrnzlu+JqLqEHK1p8j7Kmeexe7KM8OObDT7ZRmrj8xpU11pKcAf+zsuJfeXqqaZMZ8WrwEy1BElL2Qj3HlJAT8MiZLnE1cT+hbj8A9gasb0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1738891805; c=relaxed/simple;
-	bh=r7URMYvSbFSh9hdd9YhFOLAKhIuXQ6O1LB4qURNctr8=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=Pk2/7Vuulm+gfDVXeL+SUoZ03U86wMS4blu2S3O5+avW/qfWSDV1r0lS75l7QJ4vJKsD7JG+CKCLXJrFozSP1CyjpsIyhpFCWk7COlxYxDgj3UemmGB6NFuuv8TGx8kSa9pthZYVQ4iIPKcvJqrH+oFFNbH+p/v6Iew95Twnkv0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=h4+lgdBz; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 78A4EC4CEDD;
-	Fri,  7 Feb 2025 01:30:04 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1738891804;
-	bh=r7URMYvSbFSh9hdd9YhFOLAKhIuXQ6O1LB4qURNctr8=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=h4+lgdBzSVnM/xbMxLPA+/rXwj8rO5jelryqOJf/BHNt05uoaVaxOiie1szb23IYT
-	 0hlwsbd+jqjIYHSlMQJgMkjFXlLpLY7kgSjY7LfGVetvwMnbBkDRLbbAZeR1Loavga
-	 7ecxbRytc1v4cfgNYVBxgscvzTfab1naK+M8Nyufh8fEvi0innJ4WTOvQ5wR9qdnCc
-	 k22UaVsFPsyHGE4JpzutWJOxJ0fahIScDBCvcPVJdlw0fR8N0sCsVePdJRLbcS53s1
-	 09LVBZj+4/QV/5By7nPKj2n4JUx+ya41bV3UDKtkTjXPPbbtToXWKuZitZombJxlyR
-	 /l9SCjjBBcCmQ==
-Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 71515380AAE9;
-	Fri,  7 Feb 2025 01:30:33 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=arc-20240116; t=1738892386; c=relaxed/simple;
+	bh=p8oqDDtgBzQVcYulMD+72DyGGgTem1qPlS+4hciKRvc=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=GPEkUkJcQ9qodV8Xbd748UUcVpJqJjzPwNfTFORdlgx1K+CAu2kS6VCPwLRIeA7hNPyS0I2Ujcmr1m1CJCRbj7MkNioeKzc+OGXRlBVLMk2Nnn14Gd1B4dOWnFkSjknrfmnr2hrQ5tDvp8ZTp6/v+bdJXeDabBfX+hVjscxP2X4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.191
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
+Received: from mail.maildlp.com (unknown [172.19.88.234])
+	by szxga05-in.huawei.com (SkyGuard) with ESMTP id 4YpxSb3dxzz1JJdX;
+	Fri,  7 Feb 2025 09:38:23 +0800 (CST)
+Received: from kwepemf500003.china.huawei.com (unknown [7.202.181.241])
+	by mail.maildlp.com (Postfix) with ESMTPS id C4B5D1400CA;
+	Fri,  7 Feb 2025 09:39:40 +0800 (CST)
+Received: from huawei.com (10.175.112.208) by kwepemf500003.china.huawei.com
+ (7.202.181.241) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.11; Fri, 7 Feb
+ 2025 09:39:38 +0800
+From: Zhang Zekun <zhangzekun11@huawei.com>
+To: <robh@kernel.org>, <saravanak@google.com>, <justin.chen@broadcom.com>,
+	<florian.fainelli@broadcom.com>, <andrew+netdev@lunn.ch>, <kuba@kernel.org>,
+	<o.rempel@pengutronix.de>, <kory.maincent@bootlin.com>,
+	<jacopo+renesas@jmondi.org>, <kieran.bingham+renesas@ideasonboard.com>,
+	<laurent.pinchart+renesas@ideasonboard.com>, <maddy@linux.ibm.com>,
+	<mpe@ellerman.id.au>, <npiggin@gmail.com>, <olteanv@gmail.com>,
+	<davem@davemloft.net>, <taras.chornyi@plvision.eu>, <edumazet@google.com>,
+	<pabeni@redhat.com>, <sudeep.holla@arm.com>, <cristian.marussi@arm.com>
+CC: <arm-scmi@vger.kernel.org>, <linuxppc-dev@lists.ozlabs.org>,
+	<linux-media@vger.kernel.org>, <netdev@vger.kernel.org>,
+	<devicetree@vger.kernel.org>, <chenjun102@huawei.com>,
+	<zhangzekun11@huawei.com>
+Subject: [PATCH 0/9] Add wrapper function of_find_node_by_name_balanced()
+Date: Fri, 7 Feb 2025 09:31:08 +0800
+Message-ID: <20250207013117.104205-1-zhangzekun11@huawei.com>
+X-Mailer: git-send-email 2.22.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -52,41 +62,42 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net] rtnetlink: fix netns leak with rtnl_setlink()
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <173889183231.1726849.8036843600319862341.git-patchwork-notify@kernel.org>
-Date: Fri, 07 Feb 2025 01:30:32 +0000
-References: <20250205221037.2474426-1-nicolas.dichtel@6wind.com>
-In-Reply-To: <20250205221037.2474426-1-nicolas.dichtel@6wind.com>
-To: Nicolas Dichtel <nicolas.dichtel@6wind.com>
-Cc: davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com,
- edumazet@google.com, kuniyu@amazon.com, horms@kernel.org,
- razor@blackwall.org, netdev@vger.kernel.org, stable@vger.kernel.org
+Content-Type: text/plain
+X-ClientProxiedBy: dggems706-chm.china.huawei.com (10.3.19.183) To
+ kwepemf500003.china.huawei.com (7.202.181.241)
 
-Hello:
+Add wrapper function of_find_node_by_name_balanced() for drivers who
+want to call of_find_node_by_name() and have to blance the ref count
+by calling of_node_get(). For drivers who forget to call of_node_get(),
+can also utilizing of_find_node_by_name_balanced() to fix a refcount
+leak.
 
-This patch was applied to netdev/net.git (main)
-by Jakub Kicinski <kuba@kernel.org>:
+Zhang Zekun (9):
+  of: Add warpper function of_find_node_by_name_balanced()
+  net: bcmasp: Add missing of_node_get() before of_find_node_by_name()
+  net: pse-pd: Add missing of_node_get() before of_find_node_by_name()
+  media: max9286: Use of_find_node_by_name_balanced() to find
+    device_node
+  powerpc: Use of_find_node_by_name_balanced() to find device_node
+  net: dsa: Use of_find_node_by_name_balanced() to find device_node
+  net: dsa: hellcreek: Use of_find_node_by_name_balanced() to find
+    device_node
+  net: prestera: Use of_find_node_by_name_balanced() to find device_node
+  regulator: scmi: Use of_find_node_by_name_balanced() to find
+    device_node
 
-On Wed,  5 Feb 2025 23:10:37 +0100 you wrote:
-> A call to rtnl_nets_destroy() is needed to release references taken on
-> netns put in rtnl_nets.
-> 
-> CC: stable@vger.kernel.org
-> Fixes: 636af13f213b ("rtnetlink: Register rtnl_dellink() and rtnl_setlink() with RTNL_FLAG_DOIT_PERNET_WIP.")
-> Signed-off-by: Nicolas Dichtel <nicolas.dichtel@6wind.com>
-> 
-> [...]
+ arch/powerpc/platforms/powermac/pic.c                 | 4 +---
+ drivers/media/i2c/max9286.c                           | 4 +---
+ drivers/net/dsa/bcm_sf2.c                             | 4 +---
+ drivers/net/dsa/hirschmann/hellcreek_ptp.c            | 3 +--
+ drivers/net/ethernet/broadcom/asp2/bcmasp.c           | 2 +-
+ drivers/net/ethernet/marvell/prestera/prestera_main.c | 3 +--
+ drivers/net/pse-pd/tps23881.c                         | 2 +-
+ drivers/regulator/scmi-regulator.c                    | 3 +--
+ include/linux/of.h                                    | 5 +++++
+ 9 files changed, 13 insertions(+), 17 deletions(-)
 
-Here is the summary with links:
-  - [net] rtnetlink: fix netns leak with rtnl_setlink()
-    https://git.kernel.org/netdev/net/c/1438f5d07b9a
-
-You are awesome, thank you!
 -- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
-
+2.22.0
 
 
