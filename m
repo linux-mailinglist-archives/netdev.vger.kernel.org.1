@@ -1,196 +1,199 @@
-Return-Path: <netdev+bounces-163940-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-163941-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id A058FA2C233
-	for <lists+netdev@lfdr.de>; Fri,  7 Feb 2025 13:08:23 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2E10AA2C23F
+	for <lists+netdev@lfdr.de>; Fri,  7 Feb 2025 13:12:02 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 8971B188CD61
-	for <lists+netdev@lfdr.de>; Fri,  7 Feb 2025 12:08:28 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id AFBC2169DA1
+	for <lists+netdev@lfdr.de>; Fri,  7 Feb 2025 12:12:00 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1177B1DEFFD;
-	Fri,  7 Feb 2025 12:08:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="bmFp749p"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 69ABF1DF725;
+	Fri,  7 Feb 2025 12:11:58 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-io1-f54.google.com (mail-io1-f54.google.com [209.85.166.54])
+Received: from mail-ej1-f44.google.com (mail-ej1-f44.google.com [209.85.218.44])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 738B92417C7;
-	Fri,  7 Feb 2025 12:08:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.54
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 846EE2417C7;
+	Fri,  7 Feb 2025 12:11:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.44
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1738930099; cv=none; b=ADODo9gzGSwMI2NUtIyEzU9pNknPzWL5FOW32hRIe4uobk63XKUoLWE6QDKJ0nLxy1ObZkrJO6n1OYC7dM9qLdUjz7J/IiIwyPf+RcEEf73RcL643RLq53Esrg/RIXSCm65aDigh9jMP9qa0n7SQfh08Wj7HHxU4OdaHPR/WlDo=
+	t=1738930318; cv=none; b=YdvDfiBP91Vfr4sdINB7ok56Uyi3cZADqp4NCg2B6DL3ht2iQj2nscX83cPdluyKjLRgLAgdTtqItzjLLAvWtKV8oGVaF9nfjdQK6zHF7YbFjza9Wm3bNMn8tSSnGkKmqvgaKXZDdVvvohhh1CgOVVoM6iK8b5LbF0J/r/qcQf4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1738930099; c=relaxed/simple;
-	bh=cPcpt0PXK7obvNiTC5aMFDuDmdDtdl5Q8IABBt5/KWo=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=dXcwhR1B1yjfUBSm3wSFTWWj/kpbOHI78alddFZSmDCl5ttYfSq6fS+UgQZdJB4kkDPlVtfvcYuMVh40DRuWfzLxmgInBzNyeW+ZhSPIr1RfSGzAgGJ+io7pwF2huiCTX9XEVUvSyqrV5RuFXKzaL0bdl5yAzoU5pSPPbbz04gU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=bmFp749p; arc=none smtp.client-ip=209.85.166.54
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+	s=arc-20240116; t=1738930318; c=relaxed/simple;
+	bh=Ll3dxUML4y6ZQQh2Iv6OscNZv5RDJ+EQkHjfe/iByKM=;
+	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:To:Cc; b=k0Zgh2JIhoH2fW72+N4nPUG85BopAuHVl/s4vQOw+SxkCRAyK0F6zHR2pWAMmkJCBgxcs6Y7M3C+EIfYrDNWABjhueAxcsLp7M2o6h+JKqOozKlCGvA34I/Tf/iEFa50jEm+KiL2LZIMPDJQvvyvpOWwhgN9Z6bp0gcIATdcwlg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.218.44
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-io1-f54.google.com with SMTP id ca18e2360f4ac-854a68f5a9cso158924039f.0;
-        Fri, 07 Feb 2025 04:08:17 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1738930096; x=1739534896; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=o4hHCVYSEIrh1Wchgp0ooIrORTPHl9IOkpabYOgczME=;
-        b=bmFp749pMxMAiEhGtS9wKq/QG2pfozFASWan+DgiwCJmy7pmofSB1dx78XhOqTxOzy
-         W3P6uzTQuhTzBnOZF7E1bH2Ke4rysBhw+WXNRTVhehIYztPZeIpuKHSKFMz7DLkIqDE4
-         QCpnLwl3tzEzcfLrSAZQkW90pxnUXeX0eoalGUl+k5qlNNk4qbbiYi8RhPGq7qQR+Q2L
-         /Y5nSPBorV9Km+BGNQ03rm3WiVYDlZS524B1mMpErhI/0DaSLzv842PHGLRN0S+pvs4y
-         vaDY3PX9JmEYTh3FFguyWfm/YvxNXtV4x/YaqKNOF0EcS7d8BK1sB2OA4wFyl1uHAZ2H
-         rqBw==
+Received: by mail-ej1-f44.google.com with SMTP id a640c23a62f3a-aaeef97ff02so348603766b.1;
+        Fri, 07 Feb 2025 04:11:56 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1738930096; x=1739534896;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=o4hHCVYSEIrh1Wchgp0ooIrORTPHl9IOkpabYOgczME=;
-        b=hvmdM3bMPD6DZazQHRF/KuLWFg50WH8RRVoKJfs+IFHBNOLqrNV4Dx50O5ZE4DNojT
-         /dVuUAstoDWNF9KwaJzHbLb6jTaVMk/eA4rRCVB6jd+VkVIwRkH6jv3SegdIgv3XnvcO
-         uFYvLxAbpkkyiSiA29xEOb30cNuJdgbVl+U1AwAHwG1Gu30zEkzdGXau+WB6JOctIXOr
-         rzDxuMn6o8tlNPtVr6YTjkXkJQuVHCOq0YT/uLvoj7/YmKewjTkxbywIh+U97bXHvsq8
-         kp62XJI3YSfxzinso0+2e3RncbH2vJKdd6v0As8imWO0wZ9vfPkf6CdaMr0abOcdJRve
-         xDQQ==
-X-Forwarded-Encrypted: i=1; AJvYcCWlP4t3fPXnW3wljX5FyzULMNnl/SAtv9bhLOrP7ky0+VvgBDx6HBVzkyvOpWAHRIobq4rzl3Ym@vger.kernel.org, AJvYcCXCUhXlMo+9WQsw0oCpPOxcuNVfiAC/T7H6sfCDq1SGvj5xb2/xbO8jnsyJd6mAhhl5PTQ=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzaQC4Dp6IPxXoz0x41VlXuRm7gHnWesU4n74PV06Qco/Apcaid
-	SlSlTVuExxPLW0tEYAxF7V9+HF19MQuqVGREbFTZBIKls0SwqhjDKIX5/7vlPHWtk9xuXp+qH1K
-	R4mhiqbi6r5fe3SGJMU+GC9lGcgg=
-X-Gm-Gg: ASbGncsvAKoQfUc+ceI42r3uv30Q3ddsCe0qAdEq3yhC+70xphK2oCDmsbo8cE89tPK
-	2+/tImQj7RionsMzHNQl4SHtFbMM5rqX16yUY8I7TekCnE6jsAQHZXpdfyvx8tWNTjyXzthsb
-X-Google-Smtp-Source: AGHT+IEQNNHrVr0PANu0V/eLZqnnKZOy5Tmk7TYWBug6YqbOgLEKOgen5g/aLeTkPC64mEFgCdyJoQ12+Kn8rlsyz90=
-X-Received: by 2002:a92:c263:0:b0:3cf:f88b:b51a with SMTP id
- e9e14a558f8ab-3d13dcfce6cmr23555255ab.2.1738930096325; Fri, 07 Feb 2025
- 04:08:16 -0800 (PST)
+        d=1e100.net; s=20230601; t=1738930315; x=1739535115;
+        h=cc:to:message-id:content-transfer-encoding:mime-version:subject
+         :date:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=FsxP7EqkW7P33SSUxO3dtpPHBiQBsrqgjhAIX/9EzSE=;
+        b=JKhLcwHuWoyfMObFvVPzQJBsYvoeDNB9H/iNmayyD0bbCigf4SrgiZnNwxKCPFMf7m
+         2zB9fYpPsV5ixi0DcQQ1ZR4VkuY+pcytvxKncsTMP1HN2cQO82zyCELYLQOlqmv5eatH
+         od6c+aPI/cSFFuLZKK/Eo4NIZLTKQ22c/HcavgFzEYjwEM9x25qppmjANCHQhBc7S8xo
+         aPYj5FbiPfMZ4Exdu+umAmSBZWKROmu1DtbXgsCQgRzG0SLeJIRmnYbUwQnO8qach34E
+         aPk3ystH+sPxZGBym6BBzIHAjH2WiqVDsuhGn9Xumte3zkFzi9TkfZeCFEKtZPWbUm1u
+         quVQ==
+X-Forwarded-Encrypted: i=1; AJvYcCVAeojqGg7MgIuWL4nXvVZbPaa0zXfIeCS2o26OoXWiLkxBhjmCIbeCi4lrQ3JBnW5sf1zFPjI=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yybsj9ad6X4+A4fA65rqhqNiEmhdxuaj9z83fSvL020PIqqmDDi
+	lfUVptDihqUAFas5eVB/gSi9ZrtTbe8FC1Gc51xcmOdxI/ZAkH3O
+X-Gm-Gg: ASbGncv/gaiKkXd7XX9B2JtPD3Tm71UW3jZEInd7fBJqFKIZRhrpQPa5PbmLucbd0BO
+	TdBZjObTsbiUEHuqPGSYmhzavMytrM2BFArvId1bgXhT6b/Fd1RKulfqPcdJwH+ik6DlfEERRt1
+	Tu2XEZzq53cqcWSHm9tnYVIlPXwx8NFo6CGr3KvUoYUvqeVkNvuOM4AfsXqcnskWiyoKFpfUs4b
+	qFhS9dCLJtECwlXkmV9zSgXRk5eEQ1MneaqsD9s17cY3Pgd7En5fIqxSgvXBojyp07WPrN8FACI
+	wS8y4w==
+X-Google-Smtp-Source: AGHT+IGyMvm4QZSm5TwWC03zC7HkVHovRxMnBlWjI3qW3nbEII4YZeP6KXA8u5PoBBhGkYMHQbENPw==
+X-Received: by 2002:a17:907:c285:b0:ab2:c1da:b725 with SMTP id a640c23a62f3a-ab789b22c86mr314357066b.30.1738930314423;
+        Fri, 07 Feb 2025 04:11:54 -0800 (PST)
+Received: from localhost ([2a03:2880:30ff:8::])
+        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-ab773339349sm256408266b.146.2025.02.07.04.11.53
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 07 Feb 2025 04:11:53 -0800 (PST)
+From: Breno Leitao <leitao@debian.org>
+Date: Fri, 07 Feb 2025 04:11:34 -0800
+Subject: [PATCH RFC net-next] net: Add dev_getbyhwaddr_rtnl() helper
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250204183024.87508-1-kerneljasonxing@gmail.com>
- <20250204183024.87508-11-kerneljasonxing@gmail.com> <20250204175744.3f92c33e@kernel.org>
- <e894c427-b4b3-4706-b44c-44fc6402c14c@linux.dev> <CAL+tcoCQ165Y4R7UWG=J=8e=EzwFLxSX3MQPOv=kOS3W1Q7R0A@mail.gmail.com>
- <0a8e7b84-bab6-4852-8616-577d9b561f4c@linux.dev> <CAL+tcoAp8v49fwUrN5pNkGHPF-+RzDDSNdy3PhVoJ7+MQGNbXQ@mail.gmail.com>
- <CAL+tcoC5hmm1HQdbDaYiQ1iW1x2J+H42RsjbS_ghyG8mSDgqqQ@mail.gmail.com>
- <67a424d2aa9ea_19943029427@willemb.c.googlers.com.notmuch>
- <CAL+tcoCPGAjs=+Hnzr4RLkioUV7nzy=ZmKkTDPA7sBeVP=qzow@mail.gmail.com>
- <67a42ba112990_19c315294b7@willemb.c.googlers.com.notmuch>
- <CAL+tcoC_5106onp6yQh-dKnCTLtEr73EZVC31T_YeMtqbZ5KBw@mail.gmail.com>
- <b158a837-d46c-4ae0-8130-7aa288422182@linux.dev> <CAL+tcoCUjxvE-DaQ8AMxMgjLnV+J1jpYMh7BCOow4AohW1FFSg@mail.gmail.com>
- <739d6f98-8a44-446e-85a4-c499d154b57b@linux.dev> <CAL+tcoA14HKQmG9dtMdRVqgJJ87hcvynPjqVLkAbHnDcsq-RzQ@mail.gmail.com>
-In-Reply-To: <CAL+tcoA14HKQmG9dtMdRVqgJJ87hcvynPjqVLkAbHnDcsq-RzQ@mail.gmail.com>
-From: Jason Xing <kerneljasonxing@gmail.com>
-Date: Fri, 7 Feb 2025 20:07:40 +0800
-X-Gm-Features: AWEUYZmdF_0BLXWdpelwDDZ4cVzJhNyFiTtA_JpiQwjorMeNrDoSqEGZZELOLcg
-Message-ID: <CAL+tcoD9qZvbo53QsUcC27Dp=tJshBFdjoM9RCHxHEsYjwaXWg@mail.gmail.com>
-Subject: Re: [PATCH bpf-next v8 10/12] bpf: make TCP tx timestamp bpf
- extension work
-To: Martin KaFai Lau <martin.lau@linux.dev>
-Cc: Willem de Bruijn <willemdebruijn.kernel@gmail.com>, Jakub Kicinski <kuba@kernel.org>, 
-	davem@davemloft.net, edumazet@google.com, pabeni@redhat.com, 
-	dsahern@kernel.org, willemb@google.com, ast@kernel.org, daniel@iogearbox.net, 
-	andrii@kernel.org, eddyz87@gmail.com, song@kernel.org, 
-	yonghong.song@linux.dev, john.fastabend@gmail.com, kpsingh@kernel.org, 
-	sdf@fomichev.me, haoluo@google.com, jolsa@kernel.org, horms@kernel.org, 
-	bpf@vger.kernel.org, netdev@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+Message-Id: <20250207-arm_fix_selftest-v1-1-487518d2fd1c@debian.org>
+X-B4-Tracking: v=1; b=H4sIAHX4pWcC/3WN0QqCMBhGX2X81y62WYZeBUEP0G2ITPepP9SMb
+ YghvnvkfbeHwzkrRQRGpEqsFDBz5MlTJXQmqButHyDZUSXIKHNSRp2lDa+m56WJePYJMUnAlK7
+ t8tyqgjJB74Celz35oPvt+mMeSXosiepM0MgxTeGzL2e9a//rs5ZaKlcArTqassTFoWXrD1MYq
+ N627Qv+PS2rwgAAAA==
+X-Change-ID: 20250207-arm_fix_selftest-ee29dbc33a06
+To: "David S. Miller" <davem@davemloft.net>, 
+ Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
+ Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>
+Cc: linux-kernel@vger.kernel.org, netdev@vger.kernel.org, 
+ kernel-team@meta.com, kuniyu@amazon.com, ushankar@purestorage.com, 
+ Breno Leitao <leitao@debian.org>
+X-Mailer: b4 0.14.2
+X-Developer-Signature: v=1; a=openpgp-sha256; l=2975; i=leitao@debian.org;
+ h=from:subject:message-id; bh=Ll3dxUML4y6ZQQh2Iv6OscNZv5RDJ+EQkHjfe/iByKM=;
+ b=owEBbQKS/ZANAwAIATWjk5/8eHdtAcsmYgBnpfiI69v/HRwhpN0AMwEJZerttK0/+ReZL4Q2u
+ ZDknJTcXNGJAjMEAAEIAB0WIQSshTmm6PRnAspKQ5s1o5Of/Hh3bQUCZ6X4iAAKCRA1o5Of/Hh3
+ bf1AD/9wZX9vQauQG+h2D83v98qMs/1n0I1k/5sd8AVcpjAjitRLt+hHA060Sn7Rf01HyZCzcBG
+ D73BMG8JFA9Qa3oy+CcHTbsq89hZtyMogbw7npLr5N8Of/SnkI2sZ/yh09w9HARol6r3aXbKmAE
+ 3QK7vXQUYdeveASRcaAJwWCAowzzI/1JmMpnh+bgEoD0ZCbw64q7pb4j6ZkbJo3foR5RXp4mH1E
+ rCZw45zCMk65Lnn+jFTn/kPC2cpFzsLxJwVX0N3CTv1yfzyEfe1sI3Wubxg5r2tvHX/s6HNPegZ
+ UpE7jos07Deq7VVp9g+tRYMGesjD1nn1i4l6lSWFruY+OgvxLeqMs8mrQtze8lofSKm+LKnthi0
+ mx2Bp9wRMKywBbSWIRSvs4DhnJseT1iIqLgqQnqzGvjnH5/qB8zlFQCz6ulu4o9q0lCVqG3Ld2m
+ FeOYmgP2tlGgA03eGIitv9JoZya9/CusjVoE/68OcLEQOXOONcu+5HzOqx6Afh3fOZssxTDz0nK
+ 5XY5+RpMbo6ZbhnPifBaOPDed06E8Wy7cnLOr4mGSLnjqczJ+upblOiy98biik3MoQ5SRhfo1bW
+ 9CB/TJAIaeomU8/A0T0JZ72pzw1MkllhP5T6ivh6EWwQq8Y8iY3YNYpXk0PQt6r+OWUJCGoIdvo
+ f1O133/JJDNTo+g==
+X-Developer-Key: i=leitao@debian.org; a=openpgp;
+ fpr=AC8539A6E8F46702CA4A439B35A3939FFC78776D
 
-On Fri, Feb 7, 2025 at 10:18=E2=80=AFAM Jason Xing <kerneljasonxing@gmail.c=
-om> wrote:
->
-> On Fri, Feb 7, 2025 at 10:07=E2=80=AFAM Martin KaFai Lau <martin.lau@linu=
-x.dev> wrote:
-> >
-> > On 2/5/25 10:56 PM, Jason Xing wrote:
-> > >>> I have to rephrase a bit in case Martin visits here soon: I will
-> > >>> compare two approaches 1) reply value, 2) bpf kfunc and then see wh=
-ich
-> > >>> way is better.
-> > >>
-> > >> I have already explained in details why the 1) reply value from the =
-bpf prog
-> > >> won't work. Please go back to that reply which has the context.
-> > >
-> > > Yes, of course I saw this, but I said I need to implement and dig mor=
-e
-> > > into this on my own. One of my replies includes a little code snippet
-> > > regarding reply value approach. I didn't expect you to misunderstand
-> > > that I would choose reply value, so I rephrase it like above :)
-> >
-> > I did see the code snippet which is incomplete, so I have to guess. afa=
-ik, it is
-> > not going to work. I was hoping to save some time without detouring to =
-the
-> > reply-value path in case my earlier message was missed. I will stay qui=
-et and
-> > wait for v9 first then to avoid extending this long thread further.
->
-> I see. I'm grateful that you point out the right path. I'm still
-> investigating to find a good existing example in selftests and how to
-> support kfunc.
+Add dedicated helper for finding devices by hardware address when
+holding RTNL, similar to existing dev_getbyhwaddr_rcu(). This prevents
+PROVE_LOCKING warnings when RTNL is held but RCU read lock is not.
 
-Martin, sorry to revive this thread.
+Extract common address comparison logic into dev_comp_addr().
 
-It's a little bit hard for me to find a proper example to follow. I
-tried to call __bpf_kfunc in the BPF_SOCK_OPS_TS_SND_CB callback and
-then failed because kfunc is not supported in the sock_ops case.
-Later, I tried to kprobe to hook a function, say,
-tcp_tx_timestamp_bpf(), passed the skb parameter to the kfunc and then
-got an error.
+The context about this change could be found in the following
+discussion:
 
-Here is code snippet:
-1) net/ipv4/tcp.c
-+__bpf_kfunc static void tcp_init_tx_timestamp(struct sk_buff *skb)
+Link: https://lore.kernel.org/all/20250206-scarlet-ermine-of-improvement-1fcac5@leitao/
+
+Cc: kuniyu@amazon.com
+Cc: ushankar@purestorage.com
+Suggested-by: Eric Dumazet <edumazet@google.com>
+Signed-off-by: Breno Leitao <leitao@debian.org>
+---
+ net/core/dev.c | 39 ++++++++++++++++++++++++++++++++++++---
+ 1 file changed, 36 insertions(+), 3 deletions(-)
+
+diff --git a/net/core/dev.c b/net/core/dev.c
+index c41d1e1cbf62e0c5778c472cdb947b6f140f6064..75f0c533ff10e7188aa55345cd8140b88a7d09ca 100644
+--- a/net/core/dev.c
++++ b/net/core/dev.c
+@@ -1121,6 +1121,16 @@ int netdev_get_name(struct net *net, char *name, int ifindex)
+ 	return ret;
+ }
+ 
++static bool dev_comp_addr(struct net_device *dev,
++			  unsigned short type,
++			  const char *ha)
 +{
-+       struct skb_shared_info *shinfo =3D skb_shinfo(skb);
-+       struct tcp_skb_cb *tcb =3D TCP_SKB_CB(skb);
++	if (dev->type == type && !memcmp(dev->dev_addr, ha, dev->addr_len))
++		return true;
 +
-+       printk(KERN_ERR "jason: %d, %d\n\n", tcb->txstamp_ack,
-shinfo->tx_flags);
-+       /*
-+       tcb->txstamp_ack =3D 2;
-+       shinfo->tx_flags |=3D SKBTX_BPF;
-+       shinfo->tskey =3D TCP_SKB_CB(skb)->seq + skb->len - 1;
-+       */
++	return false;
 +}
-Note: I skipped copying some codes like BTF_ID_FLAGS...
++
+ /**
+  *	dev_getbyhwaddr_rcu - find a device by its hardware address
+  *	@net: the applicable net namespace
+@@ -1129,7 +1139,7 @@ int netdev_get_name(struct net *net, char *name, int ifindex)
+  *
+  *	Search for an interface by MAC address. Returns NULL if the device
+  *	is not found or a pointer to the device.
+- *	The caller must hold RCU or RTNL.
++ *	The caller must hold RCU.
+  *	The returned device has not had its ref count increased
+  *	and the caller must therefore be careful about locking
+  *
+@@ -1141,14 +1151,37 @@ struct net_device *dev_getbyhwaddr_rcu(struct net *net, unsigned short type,
+ 	struct net_device *dev;
+ 
+ 	for_each_netdev_rcu(net, dev)
+-		if (dev->type == type &&
+-		    !memcmp(dev->dev_addr, ha, dev->addr_len))
++		if (dev_comp_addr(dev, type, ha))
+ 			return dev;
+ 
+ 	return NULL;
+ }
+ EXPORT_SYMBOL(dev_getbyhwaddr_rcu);
+ 
++/**
++ *	dev_getbyhwaddr_rtnl - find a device by its hardware address
++ *	@net: the applicable net namespace
++ *	@type: media type of device
++ *	@ha: hardware address
++ *
++ *	Similar to dev_getbyhwaddr_rcu(), but, the owner needs to hold
++ *	RTNL.
++ *
++ */
++struct net_device *dev_getbyhwaddr_rtnl(struct net *net, unsigned short type,
++					const char *ha)
++{
++	struct net_device *dev;
++
++	ASSERT_RTNL();
++	for_each_netdev(net, dev)
++		if (dev_comp_addr(dev, type, ha))
++			return dev;
++
++	return NULL;
++}
++EXPORT_SYMBOL(dev_getbyhwaddr_rtnl);
++
+ struct net_device *dev_getfirstbyhwtype(struct net *net, unsigned short type)
+ {
+ 	struct net_device *dev, *ret = NULL;
 
-2) bpf prog
-SEC("kprobe/tcp_tx_timestamp_bpf") // I wrote a new function/wrapper to hoo=
-k
-int BPF_KPROBE(kprobe__tcp_tx_timestamp_bpf, struct sock *sk, struct
-sk_buff *skb)
-{
-        tcp_init_tx_timestamp(skb);
-        return 0;
-}
+---
+base-commit: 0d5248724ed8bc68c867c4c65dda625277f68fbc
+change-id: 20250207-arm_fix_selftest-ee29dbc33a06
 
-Then running the bpf prog, I got the following message:
-; tcp_init_tx_timestamp(skb); @ so_timestamping.c:281
-1: (85) call tcp_init_tx_timestamp#120682
-arg#0 pointer type STRUCT sk_buff must point to scalar, or struct with scal=
-ar
-processed 2 insns (limit 1000000) max_states_per_insn 0 total_states 0
-peak_states 0 mark_read 0
--- END PROG LOAD LOG --
-libbpf: prog 'kprobe__tcp_tx_timestamp_bpf': failed to load: -22
-libbpf: failed to load object 'so_timestamping'
-libbpf: failed to load BPF skeleton 'so_timestamping': -22
-test_so_timestamping:FAIL:open and load skel unexpected error: -22
+Best regards,
+-- 
+Breno Leitao <leitao@debian.org>
 
-If I don't pass any parameter in the kfunc, it can work.
-
-Should we support the sock_ops for __bpf_kfunc?
-
-Please enlighten me more about this. Thanks in advance!
-
-Thanks,
-Jason
 
