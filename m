@@ -1,210 +1,241 @@
-Return-Path: <netdev+bounces-164034-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-164035-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id B4F64A2C654
-	for <lists+netdev@lfdr.de>; Fri,  7 Feb 2025 15:57:19 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3CF7DA2C65B
+	for <lists+netdev@lfdr.de>; Fri,  7 Feb 2025 15:59:40 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 43F5916A6F7
-	for <lists+netdev@lfdr.de>; Fri,  7 Feb 2025 14:57:18 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 14CAC7A33D9
+	for <lists+netdev@lfdr.de>; Fri,  7 Feb 2025 14:58:44 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 85672238D2E;
-	Fri,  7 Feb 2025 14:57:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="T1S4h2aa"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A6D0C238D37;
+	Fri,  7 Feb 2025 14:59:31 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from frasgout.his.huawei.com (frasgout.his.huawei.com [185.176.79.56])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 618F8238D26
-	for <netdev@vger.kernel.org>; Fri,  7 Feb 2025 14:57:14 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 68F0C238D2E;
+	Fri,  7 Feb 2025 14:59:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.176.79.56
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1738940235; cv=none; b=WZ4JL9gY+Q+nYhUeUiIYC7ZYGaBYnYEDAefqHTKq7vUracblhOqU0YTayJjYutcYGQB7FUslQKOE666Yt2k6uuzqDz9T07kAk/8Z7Q17Xi6GVH6kiFDo8zqoDAeEKnDl1MdEusvekuOalmrSfUKlhYecV23qSyXybdnpLA7GcMs=
+	t=1738940371; cv=none; b=EUIPsXuSFslWgohLZ/K1LxDiP5yGqhlXULy/csD2e7vCvqnvHV6C9m9aHlBMv5rPXKxDz0kfjNAaGZe5jNyyxvbZ9bC7WyISEoYmRqpsDxQd7wrGwKB1woNXg0Qd2oD7qs/XFDGD/g3ax6LNFbgwTMv2MZsN9broXxBFS99bh3A=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1738940235; c=relaxed/simple;
-	bh=5Bld7wfIGwWOXEK781i9Fo+q0vuOhNDcDamVB3lM6sc=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=hhR74enzMvqgZiE57TjKZzJenxbIRv3MLyPJ3SqIf9u6Zn7VdIt5qegrmnTAe9AIs2YZ3GwGCS+DCxI1vjGA09MRfzAX4L/f5nwRZlwNCBpsl0pvHv/5ae8DVH6a1nuzSqEANsOjp+r9xX4ySD+pYFCjoBmcRKZIoBwMV5zHxI0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=T1S4h2aa; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 08996C4CED1;
-	Fri,  7 Feb 2025 14:57:12 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1738940234;
-	bh=5Bld7wfIGwWOXEK781i9Fo+q0vuOhNDcDamVB3lM6sc=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=T1S4h2aauLw15m8I6q0fNLRgJOsiz3Ap8ywkBHofNOjrO/OxbGODm9zNJThtVxsNV
-	 EDZk2pddxNormkAd4dMo5GrOIavzso19D0bwoE2VHb9pOtuWljERvgX576T/aLAgBt
-	 JOhb22kGVYsfpgnRyIJiUV1CBaUafu6d3HIyddY8TqDxU7OH4JwFZfeHVKbGUfOQYi
-	 AXOiDuqjkAfnYInmHSQPXE7/UFG+mGopO9pGsa8I9b9YevKMcQ1TpeU/Wjj1DregYr
-	 PDuEC6xtR3dSKQvBpmnYAbCnGfi+QDlmnNntQLQn2aAaTLw80JL4uvyOXTahWTGdXc
-	 6aNggYoZbeSwQ==
-Date: Fri, 7 Feb 2025 14:57:10 +0000
-From: Simon Horman <horms@kernel.org>
-To: Michal Swiatkowski <michal.swiatkowski@linux.intel.com>
-Cc: intel-wired-lan@lists.osuosl.org, netdev@vger.kernel.org,
-	marcin.szycik@linux.intel.com, jedrzej.jagielski@intel.com,
-	przemyslaw.kitszel@intel.com, piotr.kwapulinski@intel.com,
-	anthony.l.nguyen@intel.com, dawid.osuchowski@intel.com
-Subject: Re: [iwl-next v1 3/4] ixgbe: add Tx hang detection unhandled MDD
-Message-ID: <20250207145710.GX554665@kernel.org>
-References: <20250207104343.2791001-1-michal.swiatkowski@linux.intel.com>
- <20250207104343.2791001-4-michal.swiatkowski@linux.intel.com>
+	s=arc-20240116; t=1738940371; c=relaxed/simple;
+	bh=rmZr9HCPCElSz0+WiHiZD0EiNZtU+Ri5hWC5RXhinyI=;
+	h=Date:From:To:CC:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=RS8cYxeOYeUM4blMbittfIXy04ktwy7NqQhM9ByjWX93OyzzQG3ZbZTKiqzUY2+BEHtrS3cfvWtBk59j146D4kp0TACPMX+PfRy5uuE06xmkyJKcsFrRhfyPcUg6w+qepMJZPbQAP36L6lYGv0yMevNPIdYwgmhaA4T4jCnYZKY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=185.176.79.56
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
+Received: from mail.maildlp.com (unknown [172.18.186.31])
+	by frasgout.his.huawei.com (SkyGuard) with ESMTP id 4YqH9j0Ns3z6L4yw;
+	Fri,  7 Feb 2025 22:56:41 +0800 (CST)
+Received: from frapeml500008.china.huawei.com (unknown [7.182.85.71])
+	by mail.maildlp.com (Postfix) with ESMTPS id 132471402A5;
+	Fri,  7 Feb 2025 22:59:26 +0800 (CST)
+Received: from localhost (10.203.177.66) by frapeml500008.china.huawei.com
+ (7.182.85.71) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.1.2507.39; Fri, 7 Feb
+ 2025 15:59:25 +0100
+Date: Fri, 7 Feb 2025 14:59:23 +0000
+From: Jonathan Cameron <Jonathan.Cameron@huawei.com>
+To: Jason Gunthorpe <jgg@nvidia.com>
+CC: Andy Gospodarek <andrew.gospodarek@broadcom.com>, Aron Silverton
+	<aron.silverton@oracle.com>, Dan Williams <dan.j.williams@intel.com>, Daniel
+ Vetter <daniel.vetter@ffwll.ch>, Dave Jiang <dave.jiang@intel.com>, David
+ Ahern <dsahern@kernel.org>, Andy Gospodarek <gospo@broadcom.com>, Christoph
+ Hellwig <hch@infradead.org>, Itay Avraham <itayavr@nvidia.com>, Jiri Pirko
+	<jiri@nvidia.com>, Jakub Kicinski <kuba@kernel.org>, Leonid Bloch
+	<lbloch@nvidia.com>, Leon Romanovsky <leonro@nvidia.com>,
+	<linux-cxl@vger.kernel.org>, <linux-rdma@vger.kernel.org>,
+	<netdev@vger.kernel.org>, Saeed Mahameed <saeedm@nvidia.com>, "Nelson,
+ Shannon" <shannon.nelson@amd.com>
+Subject: Re: [PATCH v4 09/10] fwctl/bnxt: Support communicating with bnxt fw
+Message-ID: <20250207145923.0000335e@huawei.com>
+In-Reply-To: <9-v4-0cf4ec3b8143+4995-fwctl_jgg@nvidia.com>
+References: <0-v4-0cf4ec3b8143+4995-fwctl_jgg@nvidia.com>
+	<9-v4-0cf4ec3b8143+4995-fwctl_jgg@nvidia.com>
+X-Mailer: Claws Mail 4.3.0 (GTK 3.24.42; x86_64-w64-mingw32)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250207104343.2791001-4-michal.swiatkowski@linux.intel.com>
+Content-Type: text/plain; charset="US-ASCII"
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: lhrpeml100009.china.huawei.com (7.191.174.83) To
+ frapeml500008.china.huawei.com (7.182.85.71)
 
-On Fri, Feb 07, 2025 at 11:43:42AM +0100, Michal Swiatkowski wrote:
-> From: Slawomir Mrozowicz <slawomirx.mrozowicz@intel.com>
+On Thu,  6 Feb 2025 20:13:31 -0400
+Jason Gunthorpe <jgg@nvidia.com> wrote:
+
+> From: Andy Gospodarek <gospo@broadcom.com>
 > 
-> Add Tx Hang detection due to an unhandled MDD Event.
+> This patch adds basic support for the fwctl infrastructure.  With the
+> approriate tool, the most basic RPC to the bnxt_en firmware can be
+> called.
 > 
-> Previously, a malicious VF could disable the entire port causing
-> TX to hang on the E610 card.
-> Those events that caused PF to freeze were not detected
-> as an MDD event and usually required a Tx Hang watchdog timer
-> to catch the suspension, and perform a physical function reset.
-> 
-> Implement flows in the affected PF driver in such a way to check
-> the cause of the hang, detect it as an MDD event and log an
-> entry of the malicious VF that caused the Hang.
-> 
-> The PF blocks the malicious VF, if it continues to be the source
-> of several MDD events.
-> 
-> Reviewed-by: Przemek Kitszel <przemyslaw.kitszel@intel.com>
-> Reviewed-by: Marcin Szycik <marcin.szycik@linux.intel.com>
-> Signed-off-by: Slawomir Mrozowicz <slawomirx.mrozowicz@intel.com>
-> Co-developed-by: Michal Swiatkowski <michal.swiatkowski@linux.intel.com>
-> Signed-off-by: Michal Swiatkowski <michal.swiatkowski@linux.intel.com>
+> Signed-off-by: Andy Gospodarek <gospo@broadcom.com>
+> Signed-off-by: Jason Gunthorpe <jgg@nvidia.com>
+As commented on below, this one should perhaps have been marked
+RFC given there are a bunch of FIXME inline.
 
-...
 
-> diff --git a/drivers/net/ethernet/intel/ixgbe/ixgbe_type.h b/drivers/net/ethernet/intel/ixgbe/ixgbe_type.h
-> index aa3b498558bc..e07b56625595 100644
-> --- a/drivers/net/ethernet/intel/ixgbe/ixgbe_type.h
-> +++ b/drivers/net/ethernet/intel/ixgbe/ixgbe_type.h
-> @@ -1044,6 +1044,7 @@ struct ixgbe_nvm_version {
->  #define IXGBE_GCR_EXT_VT_MODE_16        0x00000001
->  #define IXGBE_GCR_EXT_VT_MODE_32        0x00000002
->  #define IXGBE_GCR_EXT_VT_MODE_64        0x00000003
-> +#define IXGBE_GCR_EXT_VT_MODE_MASK	0x00000003
+> diff --git a/drivers/fwctl/bnxt/bnxt.c b/drivers/fwctl/bnxt/bnxt.c
+> new file mode 100644
+> index 00000000000000..d2b9a64a1402bf
+> --- /dev/null
+> +++ b/drivers/fwctl/bnxt/bnxt.c
+> @@ -0,0 +1,167 @@
 
-nit: For consistency I think spaces should be used to indent 0x00000003
-
->  #define IXGBE_GCR_EXT_SRIOV             (IXGBE_GCR_EXT_MSIX_EN | \
->  					 IXGBE_GCR_EXT_VT_MODE_64)
->  
-
-...
-
-> diff --git a/drivers/net/ethernet/intel/ixgbe/ixgbe_main.c b/drivers/net/ethernet/intel/ixgbe/ixgbe_main.c
-
-...
-
-> +static u32 ixgbe_poll_tx_icache(struct ixgbe_hw *hw, u16 queue, u16 idx)
-> +{
-> +	IXGBE_WRITE_REG(hw, IXGBE_TXDESCIC, queue * idx);
-> +	return IXGBE_READ_REG(hw, IXGBE_TXDESCIC);
-> +}
 > +
-> +/**
-> + * ixgbe_check_illegal_queue - search for queue with illegal packet
-> + * @adapter: structure containing ring specific data
-> + * @queue: queue index
-> + *
-> + * Check if tx descriptor connected with input queue
-> + * contains illegal packet.
-> + *
-> + * Returns: true if queue contain illegal packet.
+> +/*
+> + * bnxt_fw_msg->msg has the whole command
+> + * the start of message is of type struct input
+> + * struct input {
+> + *         __le16  req_type;
+> + *         __le16  cmpl_ring;
+> + *         __le16  seq_id;
+> + *         __le16  target_id;
+> + *         __le64  resp_addr;
+> + * };
+> + * so the hwrm op should be (struct input *)(hwrm_in->msg)->req_type
 > + */
-> +static bool ixgbe_check_illegal_queue(struct ixgbe_adapter *adapter,
-> +				      u16 queue)
+> +static bool bnxtctl_validate_rpc(struct fwctl_uctx *uctx,
+> +				 struct bnxt_fw_msg *hwrm_in)
 > +{
-> +	u32 hdr_len_reg, mss_len_reg, type_reg;
-> +	struct ixgbe_hw *hw = &adapter->hw;
-> +	u32 mss_len, header_len, reg;
-> +
-> +	for (u16 i = 0; i < IXGBE_MAX_TX_DESCRIPTORS; i++) {
-> +		/* HW will clear bit IXGBE_TXDESCIC_READY when address
-> +		 * is written to address field. HW will set this bit
-> +		 * when iCache read is done, and data is ready at TIC_DWx.
-> +		 * Set descriptor address.
-> +		 */
-> +		read_poll_timeout(ixgbe_poll_tx_icache, reg,
-> +				  !(reg & IXGBE_TXDESCIC_READY), 0, 0, false,
-> +				  hw, queue, i);
-> +
-> +		/* read tx descriptor access registers */
-> +		hdr_len_reg = IXGBE_READ_REG(hw, IXGBE_TIC_DW2(IXGBE_VLAN_MACIP_LENS_REG));
-> +		type_reg = IXGBE_READ_REG(hw, IXGBE_TIC_DW2(IXGBE_TYPE_TUCMD_MLHL));
-> +		mss_len_reg = IXGBE_READ_REG(hw, IXGBE_TIC_DW2(IXGBE_MSS_L4LEN_IDX));
-> +
-> +		/* check if Advanced Context Descriptor */
-> +		if (FIELD_GET(IXGBE_ADVTXD_DTYP_MASK, type_reg) !=
-> +		    IXGBE_ADVTXD_DTYP_CTXT)
-> +			continue;
-> +
-> +		/* check for illegal MSS and Header length */
-> +		mss_len = FIELD_GET(IXGBE_ADVTXD_MSS_MASK, mss_len_reg);
-> +		header_len = FIELD_GET(IXGBE_ADVTXD_HEADER_LEN_MASK,
-> +				       hdr_len_reg);
-> +		if ((mss_len + header_len) > SZ_16K) {
-> +			e_warn(probe,
-> +			       "mss len + header len too long\n");
+> +	struct input *req = (struct input *)hwrm_in->msg;
 
-nit: The above two lines can be a single line.
+hwrm_in->msg is void * so should be no need to cast here.
 
-> +			return true;
-> +		}
-> +	}
 > +
-> +	return false;
-> +}
-> +
-> +/**
-> + * ixgbe_handle_mdd_event - handle mdd event
-> + * @adapter: structure containing ring specific data
-> + * @tx_ring: tx descriptor ring to handle
-> + *
-> + * Reset VF driver if malicious vf detected or
-> + * illegal packet in an any queue detected.
-> + */
-> +static void ixgbe_handle_mdd_event(struct ixgbe_adapter *adapter,
-> +				   struct ixgbe_ring *tx_ring)
-> +{
-> +	u16 vf, q;
-> +
-> +	if (adapter->vfinfo && ixgbe_check_mdd_event(adapter)) {
-> +		/* vf mdd info and malicious vf detected */
-> +		if (!ixgbe_get_vf_idx(adapter, tx_ring->queue_index, &vf))
-> +			ixgbe_vf_handle_tx_hang(adapter, vf);
-> +	} else {
-> +		/* malicious vf not detected */
-> +		for (q = 0; q < IXGBE_MAX_TX_QUEUES; q++) {
-> +			if (ixgbe_check_illegal_queue(adapter, q) &&
-> +			    !ixgbe_get_vf_idx(adapter, q, &vf))
-> +				/* illegal queue detected */
-> +				ixgbe_vf_handle_tx_hang(adapter, vf);
-
-It looks like ixgbe_vf_handle_tx_hang() will run for each illegal queue.
-Could that be more than once for a given vf? If so, is that desirable?
-
-> +		}
+> +	switch (req->req_type) {
+> +	case HWRM_VER_GET:
+> +		return true;
+> +	default:
+> +		return false;
 > +	}
 > +}
 > +
->  /**
->   * ixgbe_clean_tx_irq - Reclaim resources after transmit completes
->   * @q_vector: structure containing interrupt and ring information
+> +static void *bnxtctl_fw_rpc(struct fwctl_uctx *uctx, enum fwctl_rpc_scope scope,
+> +			    void *in, size_t in_len, size_t *out_len)
+> +{
+> +	struct bnxtctl_dev *bnxtctl =
+> +		container_of(uctx->fwctl, struct bnxtctl_dev, fwctl);
+> +	struct bnxt_aux_priv *bnxt_aux_priv = bnxtctl->aux_priv;
+> +	/* FIXME: Check me */
 
-...
+With the various FIXME in here I'm guessing this is an RFC for now?
+Maybe better to make that clear in the patch title.
+
+> +	struct bnxt_fw_msg rpc_in = {
+> +		// FIXME: does bnxt_send_msg() copy?
+> +		.msg = in,
+> +		.msg_len = in_len,
+> +		.resp = in,
+> +		// FIXME: Dynamic memory for out_len
+> +		.resp_max_len = in_len,
+> +	};
+> +	int rc;
+> +
+> +	if (!bnxtctl_validate_rpc(uctx, &rpc_in))
+> +		return ERR_PTR(-EPERM);
+> +
+> +	rc = bnxt_send_msg(bnxt_aux_priv->edev, &rpc_in);
+> +	if (!rc)
+> +		return ERR_PTR(-EOPNOTSUPP);
+> +	return in;
+> +}
+
+> +
+> +static int bnxtctl_probe(struct auxiliary_device *adev,
+> +			 const struct auxiliary_device_id *id)
+> +{
+> +	struct bnxt_aux_priv *aux_priv =
+> +		container_of(adev, struct bnxt_aux_priv, aux_dev);
+> +	struct bnxtctl_dev *bnxtctl __free(bnxtctl) =
+> +		fwctl_alloc_device(&aux_priv->edev->pdev->dev, &bnxtctl_ops,
+
+Does this make more sense than setting parent to the
+auxiliary device?  (same applies to the mlx5 driver but I didn't notice
+it there).  That will result in a deeper nest in sysfs but
+at least makes it obvious what the aux dev is doing.
+
+> +				   struct bnxtctl_dev, fwctl);
+> +	int rc;
+> +
+> +	if (!bnxtctl)
+> +		return -ENOMEM;
+> +
+> +	bnxtctl->aux_priv = aux_priv;
+> +
+> +	rc = fwctl_register(&bnxtctl->fwctl);
+> +	if (rc)
+> +		return rc;
+> +
+> +	auxiliary_set_drvdata(adev, no_free_ptr(bnxtctl));
+> +	return 0;
+> +}
+
+> +static const struct auxiliary_device_id bnxtctl_id_table[] = {
+> +	{ .name = "bnxt_en.fwctl", },
+> +	{},
+
+Trivial but no need for that trailing comma given this will always
+be the last entry.
+
+> +};
+> +MODULE_DEVICE_TABLE(auxiliary, bnxtctl_id_table);
+> +
+> +static struct auxiliary_driver bnxtctl_driver = {
+> +	.name = "bnxt_fwctl",
+> +	.probe = bnxtctl_probe,
+> +	.remove = bnxtctl_remove,
+> +	.id_table = bnxtctl_id_table,
+> +};
+> +
+> +module_auxiliary_driver(bnxtctl_driver);
+
+> diff --git a/include/uapi/fwctl/bnxt.h b/include/uapi/fwctl/bnxt.h
+> new file mode 100644
+> index 00000000000000..ea47fdbbf6ea3e
+> --- /dev/null
+> +++ b/include/uapi/fwctl/bnxt.h
+> @@ -0,0 +1,27 @@
+> +/* SPDX-License-Identifier: GPL-2.0 WITH Linux-syscall-note */
+> +/*
+> + * Copyright (c) 2024, Broadcom Corporation
+> + *
+> + */
+> +#ifndef _UAPI_FWCTL_BNXT_H_
+> +#define _UAPI_FWCTL_BNXT_H_
+> +
+> +#include <linux/types.h>
+> +
+> +enum fwctl_bnxt_commands {
+> +	FWCTL_BNXT_QUERY_COMMANDS = 0,
+> +	FWCTL_BNXT_SEND_COMMAND,
+> +};
+> +
+> +/**
+> + * struct fwctl_info_bnxt - ioctl(FWCTL_INFO) out_device_data
+> + * @uctx_caps: The command capabilities driver accepts.
+
+Silly though it may be, if the kernel-doc script runs on this I'm fairly
+sure it will moan about lack of docs for reserved.
+
+> + *
+> + * Return basic information about the FW interface available.
+> + */
+> +struct fwctl_info_bnxt {
+> +	__u32 uctx_caps;
+> +	__u32 reserved;
+> +};
+> +
+> +#endif
+
+
 
