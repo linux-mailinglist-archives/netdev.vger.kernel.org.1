@@ -1,177 +1,193 @@
-Return-Path: <netdev+bounces-164090-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-164091-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id CD709A2C8E2
-	for <lists+netdev@lfdr.de>; Fri,  7 Feb 2025 17:30:54 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6E41FA2C918
+	for <lists+netdev@lfdr.de>; Fri,  7 Feb 2025 17:42:24 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 7264A7A52C7
-	for <lists+netdev@lfdr.de>; Fri,  7 Feb 2025 16:28:54 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E758F165258
+	for <lists+netdev@lfdr.de>; Fri,  7 Feb 2025 16:42:22 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EBCAC18FC92;
-	Fri,  7 Feb 2025 16:29:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C9CF218DB01;
+	Fri,  7 Feb 2025 16:42:18 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=baylibre-com.20230601.gappssmtp.com header.i=@baylibre-com.20230601.gappssmtp.com header.b="mtEJ1Sr2"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="QuTqCW8G"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-oi1-f170.google.com (mail-oi1-f170.google.com [209.85.167.170])
+Received: from mail-wm1-f42.google.com (mail-wm1-f42.google.com [209.85.128.42])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3E63418DF89
-	for <netdev@vger.kernel.org>; Fri,  7 Feb 2025 16:29:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.170
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0249923C8DE;
+	Fri,  7 Feb 2025 16:42:16 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.42
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1738945759; cv=none; b=qTIgxkfu0VxGUatE2rFF4nIP0+0mu8rgtZlkvbGxHYGK1R/GIOp8DaV0TcuK7GmHH00VEZfvLE0CcNmU/Leyr1jCuk6bQLA5C+gy3tpbvufX6jQ+oZriG0wAzUWJNKSDAIaoJUuM8zX0AORR3xtrNuqXObwS+V9n61pTaET5klE=
+	t=1738946538; cv=none; b=KRXBZ+8izq2IlZSb/pou/jMEbKDYaqQdMVNu6u96izsSaxA7zCoCz3KWU4Xmamv668uRJJsayu9N9eZV2kPzFeV/JGvmlgjnnpL7KD5/l3KE8+ihB9quaXjnJnWpTenf9p7FDgVJH9iMcc6v+J90stKa4eBQoqtbaAa1ecSGPGc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1738945759; c=relaxed/simple;
-	bh=57uHeJssUhSTwboeRjLbjHP/8gebXbxQ08iLQ68S9QU=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=BSJp/p6Tt01lvSQyP7bgQsY8JTMHj6jcWSoxNwF73k8wZUWxVxJChM+3Qujj/M+n9ppbRKoVxvQ37S9v3fAzNUxlzg6CceHfSr/4QOJPEEEUT5r0CG5A3cPxU5HfmRbqyfxMouUeS260s69ZKqUiCM2qcmZtm36sLOeraavXe+o=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=baylibre.com; spf=pass smtp.mailfrom=baylibre.com; dkim=pass (2048-bit key) header.d=baylibre-com.20230601.gappssmtp.com header.i=@baylibre-com.20230601.gappssmtp.com header.b=mtEJ1Sr2; arc=none smtp.client-ip=209.85.167.170
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=baylibre.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=baylibre.com
-Received: by mail-oi1-f170.google.com with SMTP id 5614622812f47-3f34101f68eso471400b6e.0
-        for <netdev@vger.kernel.org>; Fri, 07 Feb 2025 08:29:15 -0800 (PST)
+	s=arc-20240116; t=1738946538; c=relaxed/simple;
+	bh=xahoYTgr2JXlBEBiH4Eh9CeXWNus+8o8NYBdfY24J1o=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=HRECTWWDo0VZ7+9tqwREAyuiu81RGZPtBqdCenV0hmLUE5x1VLzrVo0moxSFy82uBNaR+AQCUhdSm3oObOgY1P+cl4LVp1oGrJrBqhyKOSG2bqyiSmp8ZNVzrXRnMFAC7n6cTUGXPGpNcmmi5uCwLCLoKt+FXdmtC6OCdpQiq5A=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=QuTqCW8G; arc=none smtp.client-ip=209.85.128.42
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-wm1-f42.google.com with SMTP id 5b1f17b1804b1-436341f575fso27832015e9.1;
+        Fri, 07 Feb 2025 08:42:16 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=baylibre-com.20230601.gappssmtp.com; s=20230601; t=1738945755; x=1739550555; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:content-language:from
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=k5z98lSfe6WwRG+wC0Tg6PRqMgic/o2qF3h3J+ulLEk=;
-        b=mtEJ1Sr2l7/lIK8nvmtXf2sOSfDvQGnL/msUKLZ4fK99Rd4clSOcYOIj0eFfGaLOdX
-         PhbPZ29bbmJC0xUP5e0yRlFjkXShnUq/dnZ/WcJcZ9M7t7eYficY5G1lTOMk0+/DyFz7
-         e7suiMpue9zPF6ivH9gxewbO9CUN2xj5AcJLrNAWv/c297UzMkAI7UiZLl1csBec2nzX
-         TKEh6k+Px2lri8jnJt3ooEj+r4MH63cF5+lZ0wLdUaKwV8lZvZ4i9cjd0QcxPZu2haAn
-         qI9z/jykdLqcHLrqXuxBKAy1uKVNi2IOwAJY0Rl1NN0AWeZ68C+NE4/maNTj/grV7fSA
-         H/KA==
+        d=gmail.com; s=20230601; t=1738946535; x=1739551335; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=FiPV/oHe7RmZIp/M852C28biSFhSs4bIOllT1QoCRG4=;
+        b=QuTqCW8GlqBrQsgS1iMUPOTh5xsw8n14Ap4L4KDg0LuMS4ApXp+89jAfMIxcT//1IW
+         aBBvlgDMfuiEVnVFe5lO4Lxt/1iVMlbFSi+2Ul7s8ClZkKp76pHPsBOfGjt2OoA+5p2k
+         h3XG+87bTI1S0KvKge1INoR+KcMR/ObnEEtZEuC/arI30vOA/gm1M9vfVA6P8wrhvMTB
+         Qn2xJA1DWbhcDsZB+w3HJ24YcIIRctySrwDBTAUr1+8qKp0l0NoFda3a6Ah6szMRv6ul
+         LMtiETMuF3dxa46QOYa+CQW0c9KJM99lGgH9/Aq8/6imj/Uv3EJxdGQ8H1oL+aWEPy4G
+         JPsQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1738945755; x=1739550555;
-        h=content-transfer-encoding:in-reply-to:content-language:from
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=k5z98lSfe6WwRG+wC0Tg6PRqMgic/o2qF3h3J+ulLEk=;
-        b=m9HoMqm/qhN1mYPraIe3G2d7uS3fwGn+18QnQr9PMLcQvM6QJ/K3RBLmO0xfyzQZW7
-         bkq68fdBnWQBPmQxln34a3J6CUS6mWoJiOO0eWFBaH+igstijcQycC8vUitBye53xl4R
-         bWuDgx2q+8SnmhXkxnSslyYd4CqX+HFu1gcvxVlj1usX4Bdvf8XZmcvB8rNgf12QXBoo
-         381o+KrnQScz1iLCO0ECMDvh8JTF7lb/ItmLbWtbR4uHQ1fLk/gsbr6l2T6Rp3QMU78Y
-         cTblrWBLyEF8a6tTv9ELqta3FHp3W97cxsR/YvJHhV74g9NaV4PdueNN2yMhLSyCDTRw
-         z1xw==
-X-Forwarded-Encrypted: i=1; AJvYcCXTRwSXynASsv4TWLA2s1RLn067pZt4AM/mjitaIUlKtXeDymHdoBe6azC09WGcz6gOzp6JAZk=@vger.kernel.org
-X-Gm-Message-State: AOJu0YysjMTAOJ9dKO0VaiPKI0aUzyjVrpgWScNDNpGrAABKWW19lBCC
-	n8IIIo+cQqiCUREgYpr3pj1VcoXfZC6R/0/5exCP2TFmrEA6nMPyhVC5CbKpJMU=
-X-Gm-Gg: ASbGncsG3olQG2i6c/7Bp3qCBK7n9W+NmKWwhatf/LbB0H8oVIiJsPPbyMdI9YfGHih
-	g8YkoUlfL/Yb1zBhFqSGWILPx3KhhlHmqkimJ7usRdNmvuoFtEEM0W9lH5V098CNZWBGDgcDJab
-	JYG03m1717fjHLCjuyo+KtoWrqzJ6bpyEowPYw/pX8kbOngQVOVx7Q+Uii+hhIec1RI5Tto7POy
-	FZlSKfkRGEA4o8R0Qm63xlXnLIsym1PtfAcn0ypvj/OF9vdlag9sA7EezQ+KvBOjmPKKy+YhLp4
-	TJR+L+SkpvOcsyUcQejn7q8EFFUZL6S2JlRI/frkQw/Ck/kwhu6W
-X-Google-Smtp-Source: AGHT+IG7StedQ5Vnf2T8W9EtvcPrRVDItpyl7T3DBHEMIV0RzDgNrv3XTiomaadolzmBwJACvP6VXg==
-X-Received: by 2002:a05:6808:30a3:b0:3e3:bd1c:d584 with SMTP id 5614622812f47-3f3922d9a38mr2709674b6e.9.1738945755147;
-        Fri, 07 Feb 2025 08:29:15 -0800 (PST)
-Received: from [192.168.0.142] (ip98-183-112-25.ok.ok.cox.net. [98.183.112.25])
-        by smtp.gmail.com with ESMTPSA id 5614622812f47-3f389ed6220sm756084b6e.15.2025.02.07.08.29.12
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 07 Feb 2025 08:29:13 -0800 (PST)
-Message-ID: <74ec33db-6721-4b86-86a6-e18b0a01fc47@baylibre.com>
-Date: Fri, 7 Feb 2025 10:29:11 -0600
+        d=1e100.net; s=20230601; t=1738946535; x=1739551335;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=FiPV/oHe7RmZIp/M852C28biSFhSs4bIOllT1QoCRG4=;
+        b=bUdHwKym8HnPP4PbbQhk5fComzgTcG43uFteEhW5vUL869PfrKiIi2mvNlDlrJMNK7
+         CpOGS+bxWNbyt4nyczMyl9bKYDEAnw9Sgsi3qAFe6Z2Z23KK2QT2UpxVQQuI0XEqHhJv
+         QCQiCbRKRIwiYqH/EZuTUgm0FTR2w0lC0eUHQvvdpzCpfi/CA6z/Zm+PE8XkSON+tR47
+         Y1DlBOYKLnxukFIxF0i69VlI4Pls+yzgqL/gQ7jHo0J0izmD/dnvS8uia1GDj3X38nUR
+         S1N/r6Sfoj7semkbooTad1Y6qpad6tP6AKNmz9wRe1YBlMl9qvW/TaY+4dBKMNbQUrt6
+         8uuA==
+X-Forwarded-Encrypted: i=1; AJvYcCUVTJdL7FkgEdoLn8azsbeS8gIOdPZKAyZdYEEw6Vfwg4G+XBEpdC/QdX6SKt25yU2F0y9ZcDnu@vger.kernel.org, AJvYcCXpZqNzLN3MCGr42y40JZnTnTJG5PEKMGdq79lCYIqk8a6eWiPHb0x4geA+AkTzgPSCabQOP0D/F2tqnkk=@vger.kernel.org, AJvYcCXstpVvzl/77KyuSsPZve4cNTm9jQCM16K+pNb6DMHh+esCJMlOJ1PiK+OAvUaf4nE0asoHKEPu/Uhlkbs=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzfYH7r4BU2cda2vJDZ2HZalFuO+Fdlsw49veIo8l18ly1l62Z1
+	CmzseHghEBQ8SKvlwIkmdwrUfTi/xju+vpTu+iUVYikCli1OyTXz7U9tAQ==
+X-Gm-Gg: ASbGncuTtH1f2FTGQcsCnFWHMzymLB/38KkuFMy69A8wkMnnOE4xnG8d1BFiwemT3ho
+	3n5SkX7patgI5+v+n0rmd8KJNMYFPDoN9W1LOYpF0UPgBJZurJ5G13P2O5euxJSS5eHD/z8Br/2
+	opcfTClltwIL1tikK4YLHF0gOVQ5Gis/3L6t8ALKxJrH9YTdf8b9GdCmHTliSBn/+ZQMWZ6COoJ
+	g++Al3OEkP2rjz/pAmS3Nk9Hzf7RSrrOlC/WQIYY0GWH2m+TlcwKELyYVxh0k7mK7EKA/5ewB8t
+	On18qgBMIYncJFgv0tzBZYJZ/AutOAjy9b67cknq2102YmdLEncPdmn+Emp833M7H94fkbm+Z8H
+	nVQ==
+X-Google-Smtp-Source: AGHT+IF7y5ag5xXtJbBXF9RYFf/lu5m+MBmyeyrGK4CKk4esPPFHu01PFcCg+qkitoVRNQ1xblHDPw==
+X-Received: by 2002:a05:6000:1863:b0:38d:d0e7:7d5c with SMTP id ffacd0b85a97d-38dd0e77fc3mr943984f8f.23.1738946534954;
+        Fri, 07 Feb 2025 08:42:14 -0800 (PST)
+Received: from orome (p200300e41f281900f22f74fffe1f3a53.dip0.t-ipconnect.de. [2003:e4:1f28:1900:f22f:74ff:fe1f:3a53])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-4390db11264sm94032655e9.35.2025.02.07.08.42.13
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 07 Feb 2025 08:42:13 -0800 (PST)
+Date: Fri, 7 Feb 2025 17:42:11 +0100
+From: Thierry Reding <thierry.reding@gmail.com>
+To: Jon Hunter <jonathanh@nvidia.com>
+Cc: Furong Xu <0x1207@gmail.com>, netdev@vger.kernel.org, 
+	linux-stm32@st-md-mailman.stormreply.com, linux-arm-kernel@lists.infradead.org, 
+	linux-kernel@vger.kernel.org, Andrew Lunn <andrew+netdev@lunn.ch>, 
+	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+	Maxime Coquelin <mcoquelin.stm32@gmail.com>, Alexandre Torgue <alexandre.torgue@foss.st.com>, xfr@outlook.com, 
+	Brad Griffis <bgriffis@nvidia.com>, Ido Schimmel <idosch@idosch.org>, 
+	"linux-tegra@vger.kernel.org" <linux-tegra@vger.kernel.org>
+Subject: Re: [PATCH net v1] net: stmmac: Apply new page pool parameters when
+ SPH is enabled
+Message-ID: <heg3exbrmo4zt64cdeolououo25lj2idusepuyuu7iggxgn5fe@6bky6h5pe3tu>
+References: <20250207085639.13580-1-0x1207@gmail.com>
+ <8fc7c79d-ace8-4e05-acef-1699ee6c4158@nvidia.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v2 01/13] gpiolib: add gpiod_multi_set_value_cansleep()
-To: Geert Uytterhoeven <geert@linux-m68k.org>
-Cc: Linus Walleij <linus.walleij@linaro.org>,
- Bartosz Golaszewski <brgl@bgdev.pl>, Andy Shevchenko <andy@kernel.org>,
- Lars-Peter Clausen <lars@metafoo.de>,
- Michael Hennerich <Michael.Hennerich@analog.com>,
- Jonathan Cameron <jic23@kernel.org>, Ulf Hansson <ulf.hansson@linaro.org>,
- Peter Rosin <peda@axentia.se>, Andrew Lunn <andrew@lunn.ch>,
- Heiner Kallweit <hkallweit1@gmail.com>, Russell King
- <linux@armlinux.org.uk>, "David S. Miller" <davem@davemloft.net>,
- Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
- Paolo Abeni <pabeni@redhat.com>, Vinod Koul <vkoul@kernel.org>,
- Kishon Vijay Abraham I <kishon@kernel.org>, =?UTF-8?Q?Nuno_S=C3=A1?=
- <nuno.sa@analog.com>, Liam Girdwood <lgirdwood@gmail.com>,
- Mark Brown <broonie@kernel.org>, Jaroslav Kysela <perex@perex.cz>,
- Takashi Iwai <tiwai@suse.com>, linux-gpio@vger.kernel.org,
- linux-kernel@vger.kernel.org, linux-iio@vger.kernel.org,
- linux-mmc@vger.kernel.org, netdev@vger.kernel.org,
- linux-phy@lists.infradead.org, linux-sound@vger.kernel.org
-References: <20250206-gpio-set-array-helper-v2-0-1c5f048f79c3@baylibre.com>
- <20250206-gpio-set-array-helper-v2-1-1c5f048f79c3@baylibre.com>
- <CAMuHMdU5tt5_t2SfYO3OUsHenu_0PhpKeLHktNdCx-W6zCEymw@mail.gmail.com>
-From: David Lechner <dlechner@baylibre.com>
-Content-Language: en-US
-In-Reply-To: <CAMuHMdU5tt5_t2SfYO3OUsHenu_0PhpKeLHktNdCx-W6zCEymw@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature"; boundary="fkugobpneo3jjh3p"
+Content-Disposition: inline
+In-Reply-To: <8fc7c79d-ace8-4e05-acef-1699ee6c4158@nvidia.com>
 
-On 2/7/25 3:10 AM, Geert Uytterhoeven wrote:
-> Hi David,
-> 
-> On Thu, 6 Feb 2025 at 23:48, David Lechner <dlechner@baylibre.com> wrote:
->> Add a new gpiod_multi_set_value_cansleep() helper function with fewer
->> parameters than gpiod_set_array_value_cansleep().
->>
->> Calling gpiod_set_array_value_cansleep() can get quite verbose. In many
->> cases, the first arguments all come from the same struct gpio_descs, so
->> having a separate function where we can just pass that cuts down on the
->> boilerplate.
->>
->> Reviewed-by: Linus Walleij <linus.walleij@linaro.org>
->> Signed-off-by: David Lechner <dlechner@baylibre.com>
-> 
-> Thanks for your patch!
-> 
->> --- a/include/linux/gpio/consumer.h
->> +++ b/include/linux/gpio/consumer.h
->> @@ -655,4 +655,11 @@ static inline void gpiod_unexport(struct gpio_desc *desc)
->>
->>  #endif /* CONFIG_GPIOLIB && CONFIG_GPIO_SYSFS */
->>
->> +static inline int gpiod_multi_set_value_cansleep(struct gpio_descs *descs,
->> +                                                unsigned long *value_bitmap)
->> +{
->> +       return gpiod_set_array_value_cansleep(descs->ndescs, descs->desc,
->> +                                             descs->info, value_bitmap);
-> 
-> I am wondering whether this needs a check for !IS_ERR_OR_NULL(descs),
-> to handle the !CONFIG_GPIOLIB and gpiod_get_array_optional() cases?
 
-I don't think it is strictly needed, but could be convenient for future use
-cases. If we add it, should it be:
+--fkugobpneo3jjh3p
+Content-Type: text/plain; protected-headers=v1; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [PATCH net v1] net: stmmac: Apply new page pool parameters when
+ SPH is enabled
+MIME-Version: 1.0
 
-	if (IS_ERR_OR_NULL(descs))
-		return PTR_ERR(descs);
+On Fri, Feb 07, 2025 at 01:41:49PM +0000, Jon Hunter wrote:
+> Hi Furong,
+>=20
+> On 07/02/2025 08:56, Furong Xu wrote:
+> > Commit df542f669307 ("net: stmmac: Switch to zero-copy in
+> > non-XDP RX path") makes DMA write received frame into buffer at offset
+> > of NET_SKB_PAD and sets page pool parameters to sync from offset of
+> > NET_SKB_PAD. But when Header Payload Split is enabled, the header is
+> > written at offset of NET_SKB_PAD, while the payload is written at
+> > offset of zero. Uncorrect offset parameter for the payload breaks dma
+> > coherence [1] since both CPU and DMA touch the page buffer from offset
+> > of zero which is not handled by the page pool sync parameter.
+> >=20
+> > And in case the DMA cannot split the received frame, for example,
+> > a large L2 frame, pp_params.max_len should grow to match the tail
+> > of entire frame.
+> >=20
+> > [1] https://lore.kernel.org/netdev/d465f277-bac7-439f-be1d-9a47dfe2d951=
+@nvidia.com/
+> >=20
+> > Reported-by: Jon Hunter <jonathanh@nvidia.com>
+> > Reported-by: Brad Griffis <bgriffis@nvidia.com>
+> > Suggested-by: Ido Schimmel <idosch@idosch.org>
+> > Fixes: df542f669307 ("net: stmmac: Switch to zero-copy in non-XDP RX pa=
+th")
+> > Signed-off-by: Furong Xu <0x1207@gmail.com>
+> > ---
+> >   drivers/net/ethernet/stmicro/stmmac/stmmac_main.c | 5 +++++
+> >   1 file changed, 5 insertions(+)
+> >=20
+> > diff --git a/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c b/driver=
+s/net/ethernet/stmicro/stmmac/stmmac_main.c
+> > index b34ebb916b89..c0ae7db96f46 100644
+> > --- a/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
+> > +++ b/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
+> > @@ -2094,6 +2094,11 @@ static int __alloc_dma_rx_desc_resources(struct =
+stmmac_priv *priv,
+> >   	pp_params.offset =3D stmmac_rx_offset(priv);
+> >   	pp_params.max_len =3D dma_conf->dma_buf_sz;
+> > +	if (priv->sph) {
+> > +		pp_params.offset =3D 0;
+> > +		pp_params.max_len +=3D stmmac_rx_offset(priv);
+> > +	}
+> > +
+> >   	rx_q->page_pool =3D page_pool_create(&pp_params);
+> >   	if (IS_ERR(rx_q->page_pool)) {
+> >   		ret =3D PTR_ERR(rx_q->page_pool);
+>=20
+>=20
+> Thanks for sending this. I can confirm that it fixes the issue we are see=
+ing
+> and so ...
+>=20
+> Tested-by: Jon Hunter <jonathanh@nvidia.com>
 
-or:
+Yes, I can confirm as well. I've tested based on the discussion in the
+earlier thread and had the equivalent of this patch (modulo the ->sph
+check, but that's always true on this system), so:
 
-	if (!descs)
-		return -EINVAL;
+Tested-by: Thierry Reding <treding@nvidia.com>
 
-	if (IS_ERR(descs))
-		return PTR_ERR(descs);
+--fkugobpneo3jjh3p
+Content-Type: application/pgp-signature; name="signature.asc"
 
-?
+-----BEGIN PGP SIGNATURE-----
 
-For comparison, gpiod_set_array_value_cansleep() will return -EINVAL if the
-first argument is NULL.
+iQIzBAABCAAdFiEEiOrDCAFJzPfAjcif3SOs138+s6EFAmemN+MACgkQ3SOs138+
+s6Fq3A//eleSd2dC6AIYwZSlmN2xxQXFAVjTTNU/LQhRI2PSENWvFHSXJDcGTG+U
+OTEIid1JgSaw+/xwshMu0F6lR1OmIeBCMudKmla/AxFUEOYF2JWkYPQgCfGalJxe
+Ig9uZMsXmaxIeunEhaRQhYiBU0F9l7+IKe5yr8sFnUNrI1UJUQ23aJqAnCxJmtW7
+3w/KbNMMii2TygqUrDaVHaDqOe4azGVzAGNYSd1g1iNpVYiORO8t6VHpiUBtJfme
+k3ryZ+ptRKVTJX6pdiUYtjfTlSOW9ncvlgwyD8OGGaLG1RsoOWBiVTdGm13XDbm2
+tDEY4ggUyPYUmphjKNsCjivZ9vqeMWoQ35MDCR3/pI6j/RVDkNSQmEH55qLyW4WD
+67s3SF4eoDiAQAzzZ1C9vp96I2bm10J/NX2flJ036cw+2SXAl2rprzDrARhTupC9
+uKTCXlV7vep2zRRDIljBxZDE90WTUL4fj/u9cKDXjRkkYrf5inVJuMM9zTO56HGn
+hyYqmUhDklG4jLYmEp/g2H9pberttT7RCVo6UeI/P+Ms9B5Xszf+tiIzGti/SrDv
+pCTV4/2D/wucb7zdNeX+a2j6D1rr6CgITO5sWT7i2w/o/UcHoXQV4E/gY39V4s9O
+g1NrNtk9aOd2qalUqpS56aboQSaz04QWnYNubjlbxDgT9R+f46E=
+=AlgO
+-----END PGP SIGNATURE-----
 
-> 
-> Slightly related: shouldn't gpiod_put_array() (both the implementation
-> and the !CONFIG_GPIOLIB dummy) allow the caller to pass NULL, to
-> streamline the gpiod_get_array_optional() case?
-> 
->> +}
->> +
->>  #endif
-> 
-> Gr{oetje,eeting}s,
-> 
->                         Geert
-> 
-
+--fkugobpneo3jjh3p--
 
