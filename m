@@ -1,232 +1,130 @@
-Return-Path: <netdev+bounces-164053-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-164054-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5A51FA2C722
-	for <lists+netdev@lfdr.de>; Fri,  7 Feb 2025 16:30:24 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 44F53A2C749
+	for <lists+netdev@lfdr.de>; Fri,  7 Feb 2025 16:34:23 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 261087A566B
-	for <lists+netdev@lfdr.de>; Fri,  7 Feb 2025 15:28:42 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 404927A3A8C
+	for <lists+netdev@lfdr.de>; Fri,  7 Feb 2025 15:33:27 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B4F2524061F;
-	Fri,  7 Feb 2025 15:28:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 595C4238D50;
+	Fri,  7 Feb 2025 15:34:17 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="h9ViTXG6"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="QXJn9+pI"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qt1-f201.google.com (mail-qt1-f201.google.com [209.85.160.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F40A324060A
-	for <netdev@vger.kernel.org>; Fri,  7 Feb 2025 15:28:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F1644238D30
+	for <netdev@vger.kernel.org>; Fri,  7 Feb 2025 15:34:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1738942122; cv=none; b=Os3wIe6A5lOo2HqahXPnxlQAdhy6svbwsbozLXLUJ5ygr1ORC+yckgbCSTGQrgXuZTSrQiJvspP0GAIXfPG2FuHM4mRv4vqCKdTuIOkfJ0xqsow/aogMlgsqJ2fSXdxiB6pLOxhwyw42M147QL7Afq+8GvTFVDqJw1GCU15kYSY=
+	t=1738942457; cv=none; b=e4yNqeliVpTMnzk7qj+gBU7odyE5LsnY2bUWrarZv217g2b3gdFj6f1vKQHLvVH/KQ6GTZXY6M2JkXR01/w6Lg9TD1qTNRYDj71oQzf03KIaBDUWkPwTarB3iWNbeOgVBWl5jTDC051gDeHP+Jf9UIH1F0cO5UKOBMxXqNXCaic=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1738942122; c=relaxed/simple;
-	bh=NNnbWHuwj574rTYCFA12cg4LsOMc4Jxyp/bJhCBDayE=;
-	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
-	 To:Cc:Content-Type; b=lrSy3F7oPGTh70qxqSFoBv9lPfJaXnXHhJYHVRgiogg52NJsTiF/gQhW6TucxK92UQzr1lu54NwUpxIihOLD6Y6nkBKL8JHOAUoYsA+tj12OfOz7c+BIeW9FxqcrDuUhf2LFT/Wp8Pe137S0yt15RbK29poxyVMlW6AIMOcPgTk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=h9ViTXG6; arc=none smtp.client-ip=209.85.160.201
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com
-Received: by mail-qt1-f201.google.com with SMTP id d75a77b69052e-46799aa9755so65447041cf.0
-        for <netdev@vger.kernel.org>; Fri, 07 Feb 2025 07:28:40 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1738942120; x=1739546920; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=HO4qNwEJsDi5dYMX4pd1JVkM8xWaqdgSDRcLjbN+3t8=;
-        b=h9ViTXG6/2rl3ZDauXk8LlWlR+ZTpQma/HIk7fwTmTifdHDlHUtW2vER8Vn8ZmLlwr
-         0jlHfLVQ/UbRIfoIzDQJ9NY679MXlPX/D26Sn9+NfoaOVxKd7oodMAjWa17woF7nE/C/
-         lh6xe2ST8RT5s1Mj9zCJNnBIQRk4uktjckJt+y/hbc9mm1S4A/zdshtVLYkJbP2D5xzM
-         T10OY1J/oTgDBAMLLP/zkYsYfEAPncaL+bls4UMvwqee3R04FOWhLd9Rhh7V91+QYaWy
-         r780QE3/wJrR85D7AGmWQqVZL2x2+PU7Vqhy9GsVIjcHKP43p9yzBP8GVgza+6bP0uet
-         qleQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1738942120; x=1739546920;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=HO4qNwEJsDi5dYMX4pd1JVkM8xWaqdgSDRcLjbN+3t8=;
-        b=MW/PmxR1lvxWnpbRMchAM8cROiHPaRZkOPMIug3mLcB4Q8PsZRlilWqymhW+Tuorhw
-         EX+AJ41zDY94O0FSjLKdii2Nw/IwfjbWOpyZawpZ7ekALeeYEJVxjun9H2n9nDdzap7E
-         7zBdaCHqUEIILhvbYXTWp+LHsw+u1qUSbes81g7mm/N0A5llwxNF5Hv9NxaGvytMw7sf
-         deQzzfoeXsFW7SjSfpOVUWEZCh3I2aBWWJnasqgpqLOJ+/n8wvg0JZJFaGlHN2lEp2Wx
-         1frxCsnE4b1lTxfygsZcNtHGZs6VmQ7yp9wb3fl5JStHB6ikTHNVdyuF94qr6sWsXmXs
-         PXKA==
-X-Gm-Message-State: AOJu0YxMjs21elzQ/bn3b9C0NK1V7bP2DLF94gF1eZq3FfF42W58WmiM
-	Qu+q9SThC+AkxjpuTAf7huNWM6lCsuWVXVpV68nudYUaNhWyoaGxmfksdcFP1hGVygNRS7YC7DS
-	xKKJS3jaiKw==
-X-Google-Smtp-Source: AGHT+IH2Ij6C8gMw8XYNJbsFtcxctcgEaeCdJY2TIoiQzdKLUBfVs21LdEh1p1i1TURZqd67kobE0bW7Pp1qEw==
-X-Received: from qtbch12.prod.google.com ([2002:a05:622a:40cc:b0:46c:74db:e1cb])
- (user=edumazet job=prod-delivery.src-stubby-dispatcher) by
- 2002:ac8:7d4a:0:b0:466:954e:a89f with SMTP id d75a77b69052e-471679f3027mr51417141cf.14.1738942119888;
- Fri, 07 Feb 2025 07:28:39 -0800 (PST)
-Date: Fri,  7 Feb 2025 15:28:30 +0000
-In-Reply-To: <20250207152830.2527578-1-edumazet@google.com>
+	s=arc-20240116; t=1738942457; c=relaxed/simple;
+	bh=QdBMV6xl03WvysrFlwNC70YTYa1Qt0Jj3FeUjlhP64A=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=MKdZcC4wLtOyM8HSKr/xX9tpeVgyzbnH656nWdowtg5+NfXPMqKhg1md/0x+aokEG/1zU96lHfsBcIhEB1qnWShkNFku+wWMR7P9RZANmHYI2Ynh3DUoATzXPxd4XCIBMxlJExw6nUUca9cuQNSwSwC6w873YjkvzfzNNdTx8p4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=QXJn9+pI; arc=none smtp.client-ip=78.32.30.218
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
+	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
+	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
+	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
+	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
+	bh=lIvRVDhUAojUHbrCWzuM16eBFe9BZTzTrRg0NCgYhfw=; b=QXJn9+pIYGKd03PucI01BeMp8Y
+	5trHss2ZdbBc3MQKAMPhqcoHCp+wJjozpeWlHkvJZJ5XFbCIils23LS3gU+n24HqCkhbfGGYeL8IN
+	TIGwsyHhqyiOBU4YyPWfS19Zz4ZF3DMWez5Saro+smM5hZ6Yr2yqWJ6Y4V0orqCBPlCumiZkqCfdy
+	uaLGSHQeWcdIBRfzAVDISDxzqwu8BNguF19exj8Kh5VUEF+7hTUxDtWy5OPwNIzp6hYRQmUwA9lp4
+	Cte5hU9GaMVnsY/gxp3+TFMdBnAfmRo7cxT6Z/6Sn2WRgib+jCRwRVHjy0SvHmBu/vx+0XOWGzSir
+	FEsQGZKg==;
+Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:58702)
+	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.96)
+	(envelope-from <linux@armlinux.org.uk>)
+	id 1tgQMb-00065K-0Z;
+	Fri, 07 Feb 2025 15:33:53 +0000
+Received: from linux by shell.armlinux.org.uk with local (Exim 4.96)
+	(envelope-from <linux@shell.armlinux.org.uk>)
+	id 1tgQMU-0004YF-1T;
+	Fri, 07 Feb 2025 15:33:46 +0000
+Date: Fri, 7 Feb 2025 15:33:46 +0000
+From: "Russell King (Oracle)" <linux@armlinux.org.uk>
+To: Vladimir Oltean <olteanv@gmail.com>
+Cc: Andrew Lunn <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>,
+	AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>,
+	"Chester A. Unal" <chester.a.unal@arinc9.com>,
+	Daniel Golle <daniel@makrotopia.org>,
+	"David S. Miller" <davem@davemloft.net>,
+	DENG Qingfang <dqfext@gmail.com>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	linux-arm-kernel@lists.infradead.org,
+	linux-mediatek@lists.infradead.org,
+	Matthias Brugger <matthias.bgg@gmail.com>, netdev@vger.kernel.org,
+	Paolo Abeni <pabeni@redhat.com>, Sean Wang <sean.wang@mediatek.com>,
+	Simon Horman <horms@kernel.org>
+Subject: Re: [PATCH net-next v2 2/3] net: dsa: allow use of phylink managed
+ EEE support
+Message-ID: <Z6Yn2jTVmbEmhPf9@shell.armlinux.org.uk>
+References: <Z6YF4o0ED0KLqYS9@shell.armlinux.org.uk>
+ <E1tgO70-003ilF-1x@rmk-PC.armlinux.org.uk>
+ <20250207151959.jab2c36oejmdhf3k@skbuf>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-References: <20250207152830.2527578-1-edumazet@google.com>
-X-Mailer: git-send-email 2.48.1.502.g6dc24dfdaf-goog
-Message-ID: <20250207152830.2527578-6-edumazet@google.com>
-Subject: [PATCH net-next 5/5] tcp: add tcp_rto_max_ms sysctl
-From: Eric Dumazet <edumazet@google.com>
-To: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
-	Paolo Abeni <pabeni@redhat.com>
-Cc: netdev@vger.kernel.org, Neal Cardwell <ncardwell@google.com>, 
-	Kuniyuki Iwashima <kuniyu@amazon.com>, Jason Xing <kernelxing@tencent.com>, 
-	Simon Horman <horms@kernel.org>, eric.dumazet@gmail.com, 
-	Eric Dumazet <edumazet@google.com>
-Content-Type: text/plain; charset="UTF-8"
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250207151959.jab2c36oejmdhf3k@skbuf>
+Sender: Russell King (Oracle) <linux@armlinux.org.uk>
 
-Previous patch added a TCP_RTO_MAX_MS socket option
-to tune a TCP socket max RTO value.
+On Fri, Feb 07, 2025 at 05:19:59PM +0200, Vladimir Oltean wrote:
+> On Fri, Feb 07, 2025 at 01:09:38PM +0000, Russell King (Oracle) wrote:
+> > In order to allow DSA drivers to use phylink managed EEE, changes are
+> > necessary to the DSA .set_eee() and .get_eee() methods. Where drivers
+> > make use of phylink managed EEE, these should just pass the method on
+> > to their phylink implementation without calling the DSA specific
+> > operations.
+> > 
+> > Signed-off-by: Russell King (Oracle) <rmk+kernel@armlinux.org.uk>
+> > ---
+> >  net/dsa/user.c | 21 +++++++++++++--------
+> >  1 file changed, 13 insertions(+), 8 deletions(-)
+> > 
+> > diff --git a/net/dsa/user.c b/net/dsa/user.c
+> > index 291ab1b4acc4..2e0a51c1b750 100644
+> > --- a/net/dsa/user.c
+> > +++ b/net/dsa/user.c
+> > @@ -1243,16 +1243,21 @@ static int dsa_user_set_eee(struct net_device *dev, struct ethtool_keee *e)
+> >  	if (!ds->ops->support_eee || !ds->ops->support_eee(ds, dp->index))
+> >  		return -EOPNOTSUPP;
+> >  
+> > -	/* Port's PHY and MAC both need to be EEE capable */
+> > -	if (!dev->phydev)
+> > -		return -ENODEV;
+> > +	/* If the port is using phylink managed EEE, then get_mac_eee is
+> > +	 * unnecessary.
+> 
+> You thanked me for spotting that this should have been set_mac_eee() in
+> the comment, but you didn't update it.
+> https://lore.kernel.org/netdev/Z4bC77mwoeypDAdH@shell.armlinux.org.uk/
 
-Many setups prefer to change a per netns sysctl.
+Bah - actually I _did_ update the patch, but in a different tree:
 
-This patch adds /proc/sys/net/ipv4/tcp_rto_max_ms
+http://git.armlinux.org.uk/cgit/linux-arm.git/commit/?h=net-queue&id=2ee2b1d5f0f8cee7dd748cfae9c20af429d5a4c2
 
-Its initial value is 120000 (120 seconds).
+I'm now looking at this wondering what updates were made in each tree
+and therefore what I need to pass across between the two trees...
 
-Keep in mind that a decrease of tcp_rto_max_ms
-means shorter overall timeouts, unless tcp_retries2
-sysctl is increased.
-
-Signed-off-by: Eric Dumazet <edumazet@google.com>
----
- Documentation/networking/ip-sysctl.rst              | 13 +++++++++++++
- .../networking/net_cachelines/netns_ipv4_sysctl.rst |  1 +
- include/net/netns/ipv4.h                            |  1 +
- net/ipv4/sysctl_net_ipv4.c                          | 10 ++++++++++
- net/ipv4/tcp.c                                      |  6 +++---
- net/ipv4/tcp_ipv4.c                                 |  1 +
- 6 files changed, 29 insertions(+), 3 deletions(-)
-
-diff --git a/Documentation/networking/ip-sysctl.rst b/Documentation/networking/ip-sysctl.rst
-index 363b4950d542aa32fbf6ab1617de46a900061f82..054561f8dcae77d4183f5b7e45f671ba8979390a 100644
---- a/Documentation/networking/ip-sysctl.rst
-+++ b/Documentation/networking/ip-sysctl.rst
-@@ -705,6 +705,8 @@ tcp_retries2 - INTEGER
- 	seconds and is a lower bound for the effective timeout.
- 	TCP will effectively time out at the first RTO which exceeds the
- 	hypothetical timeout.
-+	If tcp_rto_max_ms is decreased, it is recommended to also
-+	change tcp_retries2.
- 
- 	RFC 1122 recommends at least 100 seconds for the timeout,
- 	which corresponds to a value of at least 8.
-@@ -1237,6 +1239,17 @@ tcp_rto_min_us - INTEGER
- 
- 	Default: 200000
- 
-+tcp_rto_max_ms - INTEGER
-+	Maximal TCP retransmission timeout (in ms).
-+	Note that TCP_RTO_MAX_MS socket option has higher precedence.
-+
-+	When changing tcp_rto_max_ms, it is important to understand
-+	that tcp_retries2 might need a change.
-+
-+	Possible Values: 1000 - 120,000
-+
-+	Default: 120,000
-+
- UDP variables
- =============
- 
-diff --git a/Documentation/networking/net_cachelines/netns_ipv4_sysctl.rst b/Documentation/networking/net_cachelines/netns_ipv4_sysctl.rst
-index de0263302f16dd815593671c4f75a93ed6f7cac4..6e7b20afd2d4984233e91d713ee9acd4b2e007f2 100644
---- a/Documentation/networking/net_cachelines/netns_ipv4_sysctl.rst
-+++ b/Documentation/networking/net_cachelines/netns_ipv4_sysctl.rst
-@@ -86,6 +86,7 @@ u8                              sysctl_tcp_sack
- u8                              sysctl_tcp_window_scaling                                                            tcp_syn_options,tcp_parse_options
- u8                              sysctl_tcp_timestamps
- u8                              sysctl_tcp_early_retrans                     read_mostly                             tcp_schedule_loss_probe(tcp_write_xmit)
-+u32                             sysctl_tcp_rto_max_ms
- u8                              sysctl_tcp_recovery                                                                  tcp_fastretrans_alert
- u8                              sysctl_tcp_thin_linear_timeouts                                                      tcp_retrans_timer(on_thin_streams)
- u8                              sysctl_tcp_slow_start_after_idle                                                     unlikely(tcp_cwnd_validate-network-not-starved)
-diff --git a/include/net/netns/ipv4.h b/include/net/netns/ipv4.h
-index 46452da352061007d19d00fdacddd25bbe56444d..45ac125e8aebb99d4083d540c907f0d560dac0b0 100644
---- a/include/net/netns/ipv4.h
-+++ b/include/net/netns/ipv4.h
-@@ -181,6 +181,7 @@ struct netns_ipv4 {
- 	u8 sysctl_tcp_window_scaling;
- 	u8 sysctl_tcp_timestamps;
- 	int sysctl_tcp_rto_min_us;
-+	int sysctl_tcp_rto_max_ms;
- 	u8 sysctl_tcp_recovery;
- 	u8 sysctl_tcp_thin_linear_timeouts;
- 	u8 sysctl_tcp_slow_start_after_idle;
-diff --git a/net/ipv4/sysctl_net_ipv4.c b/net/ipv4/sysctl_net_ipv4.c
-index 42cb5dc9cb245c26f9a38f8c8c4b26b1adddca39..3a43010d726fb103beaad2b11d6797424b0c946e 100644
---- a/net/ipv4/sysctl_net_ipv4.c
-+++ b/net/ipv4/sysctl_net_ipv4.c
-@@ -28,6 +28,7 @@ static int tcp_adv_win_scale_max = 31;
- static int tcp_app_win_max = 31;
- static int tcp_min_snd_mss_min = TCP_MIN_SND_MSS;
- static int tcp_min_snd_mss_max = 65535;
-+static int tcp_rto_max_max = TCP_RTO_MAX_SEC * MSEC_PER_SEC;
- static int ip_privileged_port_min;
- static int ip_privileged_port_max = 65535;
- static int ip_ttl_min = 1;
-@@ -1583,6 +1584,15 @@ static struct ctl_table ipv4_net_table[] = {
- 		.proc_handler	= proc_dointvec_minmax,
- 		.extra1		= SYSCTL_ONE,
- 	},
-+	{
-+		.procname	= "tcp_rto_max_ms",
-+		.data		= &init_net.ipv4.sysctl_tcp_rto_max_ms,
-+		.maxlen		= sizeof(int),
-+		.mode		= 0644,
-+		.proc_handler	= proc_dointvec_minmax,
-+		.extra1		= SYSCTL_ONE_THOUSAND,
-+		.extra2		= &tcp_rto_max_max,
-+	},
- };
- 
- static __net_init int ipv4_sysctl_init_net(struct net *net)
-diff --git a/net/ipv4/tcp.c b/net/ipv4/tcp.c
-index a9b92d8bfb5644431683ec214aedd0e9756e8a0a..d01f42cf3863bd87ac0a91ab01505616a1bd4225 100644
---- a/net/ipv4/tcp.c
-+++ b/net/ipv4/tcp.c
-@@ -423,7 +423,7 @@ void tcp_init_sock(struct sock *sk)
- {
- 	struct inet_connection_sock *icsk = inet_csk(sk);
- 	struct tcp_sock *tp = tcp_sk(sk);
--	int rto_min_us;
-+	int rto_min_us, rto_max_ms;
- 
- 	tp->out_of_order_queue = RB_ROOT;
- 	sk->tcp_rtx_queue = RB_ROOT;
-@@ -433,8 +433,8 @@ void tcp_init_sock(struct sock *sk)
- 
- 	icsk->icsk_rto = TCP_TIMEOUT_INIT;
- 
--	/* Use a sysctl ? */
--	icsk->icsk_rto_max = TCP_RTO_MAX;
-+	rto_max_ms = READ_ONCE(sock_net(sk)->ipv4.sysctl_tcp_rto_max_ms);
-+	icsk->icsk_rto_max = msecs_to_jiffies(rto_max_ms);
- 
- 	rto_min_us = READ_ONCE(sock_net(sk)->ipv4.sysctl_tcp_rto_min_us);
- 	icsk->icsk_rto_min = usecs_to_jiffies(rto_min_us);
-diff --git a/net/ipv4/tcp_ipv4.c b/net/ipv4/tcp_ipv4.c
-index 06fb0123d2d60e22f19ea48b73ac3668c51465a2..d1fd2128ac6cce9b845b1f8d278a194c511db87b 100644
---- a/net/ipv4/tcp_ipv4.c
-+++ b/net/ipv4/tcp_ipv4.c
-@@ -3532,6 +3532,7 @@ static int __net_init tcp_sk_init(struct net *net)
- 
- 	net->ipv4.sysctl_tcp_pingpong_thresh = 1;
- 	net->ipv4.sysctl_tcp_rto_min_us = jiffies_to_usecs(TCP_RTO_MIN);
-+	net->ipv4.sysctl_tcp_rto_max_ms = TCP_RTO_MAX_SEC * MSEC_PER_SEC;
- 
- 	return 0;
- }
 -- 
-2.48.1.502.g6dc24dfdaf-goog
-
+RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
+FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
 
