@@ -1,90 +1,91 @@
-Return-Path: <netdev+bounces-164158-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-164159-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 17094A2CC90
-	for <lists+netdev@lfdr.de>; Fri,  7 Feb 2025 20:27:43 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 31A4FA2CC97
+	for <lists+netdev@lfdr.de>; Fri,  7 Feb 2025 20:29:15 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 11A643AADBE
-	for <lists+netdev@lfdr.de>; Fri,  7 Feb 2025 19:27:34 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 536783AAE16
+	for <lists+netdev@lfdr.de>; Fri,  7 Feb 2025 19:29:06 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 240131A3145;
-	Fri,  7 Feb 2025 19:27:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9C2481A314C;
+	Fri,  7 Feb 2025 19:29:11 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=fastly.com header.i=@fastly.com header.b="cPEgdg0a"
+	dkim=pass (1024-bit key) header.d=fastly.com header.i=@fastly.com header.b="Cwtw9/D+"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f171.google.com (mail-pl1-f171.google.com [209.85.214.171])
+Received: from mail-pl1-f181.google.com (mail-pl1-f181.google.com [209.85.214.181])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 79DF319D072
-	for <netdev@vger.kernel.org>; Fri,  7 Feb 2025 19:27:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.171
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1D8F018DB0E
+	for <netdev@vger.kernel.org>; Fri,  7 Feb 2025 19:29:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.181
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1738956460; cv=none; b=sz6JBWjiUX7zWVXQPs9Jww8NUoRN4mBeUiRQ0tY+AqtfHml/kf63udpmy45jDD9/Jd4G+RfWAaevvQhjUfTLwUl9lVwRPVRmPzD0kMEHDPCwYFDmEyWooSzJpJNr5SnK0S3OIOX+ZZOCdAt5iXQL40HOIZjAlu1vHSOkQeMcxuQ=
+	t=1738956551; cv=none; b=nAOE/Xxq4iXsQgSvbs+tKT+1TJQWJciWoCBHNK66d+jthXd1M0ktvInAUCaa0ylYuCuX899R1QXVUM55WSwutl6GiE1mg40Qeug1g3cqlGxk4mrin2ynI6EU9PSiXvyiW3kvk/83ykm+Z+3x66c1+eZuJ1677LzzNGPhKBuyyt8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1738956460; c=relaxed/simple;
-	bh=uaLgx2F8vFMpjWzVEVskiaSW/W6Fq/0kEb812AEkh10=;
+	s=arc-20240116; t=1738956551; c=relaxed/simple;
+	bh=jGP5mFG9d1VkQT0Qx6S6OeAgqKqg5Do51TXFE7eo7e0=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=P3iBBNAkA3Isn8UHCmCREKaP68Yy7EKI4NQMKHxs6Vn7UOKxlZx2AYNJKtL8ljlpcaNoJo33V8JBqLmn48dpCjSiNJNMI0BhjaGfeU1e2RnImJAfD1G7uOrkFZW1nY7uttmOUrhsfHLmGA5Wpjv0WxVbdsVfVl2e2HyGHwNHZyE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fastly.com; spf=pass smtp.mailfrom=fastly.com; dkim=pass (1024-bit key) header.d=fastly.com header.i=@fastly.com header.b=cPEgdg0a; arc=none smtp.client-ip=209.85.214.171
+	 Content-Type:Content-Disposition:In-Reply-To; b=tZWpFnALngq6b034+DdCOiSP+kkSpqTa0T4dpkL6D2wiZkox5b26mlrPziXlp9QV6RKHyq+nd2b/GHicqej+WEoRnV/p29T/HIQi/Mj+++pjvZAgUC/Fk+I+eee+BbeupZCldISbTzrz5OR4JbyvvO2BvK5PQANBeNXJddZNkGQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fastly.com; spf=pass smtp.mailfrom=fastly.com; dkim=pass (1024-bit key) header.d=fastly.com header.i=@fastly.com header.b=Cwtw9/D+; arc=none smtp.client-ip=209.85.214.181
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fastly.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=fastly.com
-Received: by mail-pl1-f171.google.com with SMTP id d9443c01a7336-21f4a4fbb35so26898905ad.0
-        for <netdev@vger.kernel.org>; Fri, 07 Feb 2025 11:27:38 -0800 (PST)
+Received: by mail-pl1-f181.google.com with SMTP id d9443c01a7336-21f2cfd821eso45547325ad.3
+        for <netdev@vger.kernel.org>; Fri, 07 Feb 2025 11:29:09 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=fastly.com; s=google; t=1738956458; x=1739561258; darn=vger.kernel.org;
+        d=fastly.com; s=google; t=1738956549; x=1739561349; darn=vger.kernel.org;
         h=in-reply-to:content-disposition:mime-version:references
          :mail-followup-to:message-id:subject:cc:to:from:date:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=2AGqpSphEUXaOVV96AwpA/N7z6AmrhfmgOb2ebxvnt4=;
-        b=cPEgdg0aJkYvb6E3VZv/Mr1X/+I9AMswK9qxf53m4USeI/+xq1+hBfLoiRjXe+Mqu8
-         KaWZJU1aLF8FjiafhYd1YzSx6n8aGrHVQ6CryViBYhA42tp3ZEZyqCX4/XxBCmOxGMHC
-         WXtP4X5WAdx/Y7e5PV4MZ0rQesafrU/RQa1PE=
+        bh=R1AbH5V70bHGz7mIe4cxxe7yGnWNMvz7BnJGz16vITI=;
+        b=Cwtw9/D+w/rnBQal57ecAK9q2aYbRDWLtVvwHNrMbC0VaxL0+/iO4khqIOhbyiYji2
+         Nxj57vrTZHGXLfDwxHwusa7aw+cL80soL/sgGqQd9sXqt/8ZFRU/KOs7mvTcheHGtOdf
+         CNK+C7sQAhd9BirQFlFdfPQzconAshtH0oxW8=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1738956458; x=1739561258;
+        d=1e100.net; s=20230601; t=1738956549; x=1739561349;
         h=in-reply-to:content-disposition:mime-version:references
          :mail-followup-to:message-id:subject:cc:to:from:date
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=2AGqpSphEUXaOVV96AwpA/N7z6AmrhfmgOb2ebxvnt4=;
-        b=so9Kx0M9Pmw2Bo760hoeOMieapjrAOAMep1SF7ESWFEXzhh3jWz7U32OEhmPfEsw6A
-         NTzMlvpRCdwX8sdti8s5w7Bq3WsJORwWtvYMkzGgSuHCrGI7eihOFX2zcANHtMXoDph+
-         k6LUvt8WW5eryI0Fte30T6tdoqJUUcGjpaTQuC0NsytGDEjHaTxigmg11XyHQh+vRMuz
-         /Ii0z8skzVEgHd7aXMiGxI92qTi0rvvVCG5fji12MzrDMiE3NZa0PlUD1IfqGMs7XMIB
-         tcRc0EuxGSqyEO3JI5KWwzsC+lX1RK7GX9rbSy3HtowZk5dC4k1cykkSRn/KfkTo/aE4
-         ImDw==
-X-Forwarded-Encrypted: i=1; AJvYcCUazB0ZyCQ32N7jjgOeuGxSlO7azaDlz786zfq5N6VZ9DT6Tdzp/yrA4m1owO6Ij6xDD/1YBwM=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwFZJNP/oj2b/HrD+MUzBbsSZYyba1L4NhvnuQ6CUVCTZw/UspL
-	kANyNioQL8n3sz6ot+1Kj+h6akzI0KzmqkzQJumeiaD4z6QpNW1WCGoWevH1pA0=
-X-Gm-Gg: ASbGnct3xIE65x/VNnb2hnWWovE3+KRWpV62ko5684E/pf4kQCv5XhWATU25jGY7Pf3
-	O25788oc9czrRGTOEgmKJU7dEEkokA5FHY5gmE/iGWJ/pQg1dsYLNkJiUW/2NE1yyZ/4y9hQkwN
-	DszH2N3lVsr4pcWjKJbc7aHmRD5WAuwxwmqOfBj4pOksEJqJzbFuHnJ6XjiOdeajOiGNfoXOd/N
-	26NO4lc9apsQeMMaFkGK6aR+BgbF03whHea7b9+fr0vcgmJmJNNmj6XOAFFkhpKT7WBjfkqDNV2
-	i3kHrEgxtqee7JDhq9VFyAoQHHulZZvZQpsM6+3Vz4ahulOZuMdhUHXo8A==
-X-Google-Smtp-Source: AGHT+IEqGSwbbfe7x+02GvK9S0+QjbvhZz1kpYfgI3/1bz4pe1TM2GiDO54hpqIv8kjFyjZb9Jxxxw==
-X-Received: by 2002:a17:902:cf04:b0:216:5db1:5dc1 with SMTP id d9443c01a7336-21f4f0ef803mr66053595ad.1.1738956457693;
-        Fri, 07 Feb 2025 11:27:37 -0800 (PST)
+        bh=R1AbH5V70bHGz7mIe4cxxe7yGnWNMvz7BnJGz16vITI=;
+        b=SKVNlZZShIwHMl8hniao8JnYxVpHKlte+VSFoF9/FaTKS8nDCapITKukoe2pNtOVp9
+         HzMdVlgbXzXhSkFxw2moC4QNPCK6BCnCSzhl+f2bRG0KFb270XOXh0XeDhYnU07PxF9G
+         dmPLwiNWc8inIV08gX8c6BYQUAz/AgLA/CJt6qb/H6Q7qfcKSQv17/vft2S65Mhwi11w
+         o51vsmag0nVxtPc0y8sIpcfUZgTIqxXhmNoLv3qKyKyCLVtHHQIhfgYJEQchrtd4a1s+
+         hDH0XH+y+HdAPnGz+D7QQ0HiSYhN70l8l6Wj17fO93yXQytfRkoYE18FoBb0m17+bOfv
+         hYlQ==
+X-Forwarded-Encrypted: i=1; AJvYcCV2dZW5O1PMFzzhfgtYo8fQRytdGfL37iNGKyx4pPIYtWL+vplAwLoURtRhrtWBBPjqEdDrNz4=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yx//LYRQOodZO2eiaTIaAziH5HbUB/rSqat6wAoJG6qIaiivfKL
+	3HJ8/to9b+5JqnvnhdUZoF12CBWyzWonjWTjZASKddQC2nyhMIuYVE+/JlLQDXA=
+X-Gm-Gg: ASbGncvdEfjFL0s3cJA4tAJo5SY8zTBSmYIuPf627I1AvzmG2TlvmU1Ez3Y5dVZ2P+r
+	vSgXS55iJ7F1iJccmBOrM3EWxWwyJbKs2oh98g7t4kW20cxfIXvDHD4zeljZiiR6b4zGDR800E+
+	RAb68PgPKIvIHlnZQnJ+3xFw1/+hAbZNA0dWYoT8nvSap4P76cmjhw5gIE/KnsR3I/eIhXuZAYq
+	5lWfZtH5eHeMIJLZ2Dk2bL5RDuetnYIcAK07Wt0dVHkYXhJa6FaJb5hZN/pm+TPoLpGeShTbbqS
+	v0biorDihtvBIaI1M8Cd5SoC/I0ssdSFISUjOlq6DpMkSwbieeA61nWfww==
+X-Google-Smtp-Source: AGHT+IGZNI13IW2GQmLhADOPb0VmGp1wsNJ3tV7vuohGReKlzYi1jCgh6LE/YHnSXl139yGF0c4pxw==
+X-Received: by 2002:a05:6a21:3305:b0:1ed:753a:cfbc with SMTP id adf61e73a8af0-1ee03b4187dmr8541363637.27.1738956549412;
+        Fri, 07 Feb 2025 11:29:09 -0800 (PST)
 Received: from LQ3V64L9R2 (c-24-6-151-244.hsd1.ca.comcast.net. [24.6.151.244])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-21f3650eca2sm34253775ad.19.2025.02.07.11.27.36
+        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-73048c16292sm3505288b3a.149.2025.02.07.11.29.08
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 07 Feb 2025 11:27:37 -0800 (PST)
-Date: Fri, 7 Feb 2025 11:27:34 -0800
+        Fri, 07 Feb 2025 11:29:09 -0800 (PST)
+Date: Fri, 7 Feb 2025 11:29:06 -0800
 From: Joe Damato <jdamato@fastly.com>
 To: Jakub Kicinski <kuba@kernel.org>
 Cc: davem@davemloft.net, netdev@vger.kernel.org, edumazet@google.com,
 	pabeni@redhat.com, andrew+netdev@lunn.ch, horms@kernel.org,
-	ecree.xilinx@gmail.com, gal@nvidia.com
-Subject: Re: [PATCH net-next 1/7] net: ethtool: prevent flow steering to RSS
- contexts which don't exist
-Message-ID: <Z6ZephEIxtHfG4bi@LQ3V64L9R2>
+	shuah@kernel.org, willemb@google.com,
+	linux-kselftest@vger.kernel.org
+Subject: Re: [PATCH net-next 2/7] selftests: net-drv: test adding flow rule
+ to invalid RSS context
+Message-ID: <Z6ZfAr3RIyqGOrrP@LQ3V64L9R2>
 Mail-Followup-To: Joe Damato <jdamato@fastly.com>,
 	Jakub Kicinski <kuba@kernel.org>, davem@davemloft.net,
 	netdev@vger.kernel.org, edumazet@google.com, pabeni@redhat.com,
-	andrew+netdev@lunn.ch, horms@kernel.org, ecree.xilinx@gmail.com,
-	gal@nvidia.com
+	andrew+netdev@lunn.ch, horms@kernel.org, shuah@kernel.org,
+	willemb@google.com, linux-kselftest@vger.kernel.org
 References: <20250206235334.1425329-1-kuba@kernel.org>
- <20250206235334.1425329-2-kuba@kernel.org>
+ <20250206235334.1425329-3-kuba@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -93,21 +94,20 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20250206235334.1425329-2-kuba@kernel.org>
+In-Reply-To: <20250206235334.1425329-3-kuba@kernel.org>
 
-On Thu, Feb 06, 2025 at 03:53:28PM -0800, Jakub Kicinski wrote:
-> Since commit 42dc431f5d0e ("ethtool: rss: prevent rss ctx deletion
-> when in use") we prevent removal of RSS contexts pointed to by
-> existing flow rules. Core should also prevent creation of rules
-> which point to RSS context which don't exist in the first place.
+On Thu, Feb 06, 2025 at 03:53:29PM -0800, Jakub Kicinski wrote:
+> Check that adding Rx flow steering rules pointing to an RSS
+> context which does not exist is prevented.
 > 
 > Signed-off-by: Jakub Kicinski <kuba@kernel.org>
 > ---
-> CC: ecree.xilinx@gmail.com
-> CC: gal@nvidia.com
+> CC: shuah@kernel.org
+> CC: willemb@google.com
+> CC: linux-kselftest@vger.kernel.org
 > ---
->  net/ethtool/ioctl.c | 12 ++++++++----
->  1 file changed, 8 insertions(+), 4 deletions(-)
+>  .../selftests/drivers/net/hw/rss_ctx.py       | 27 ++++++++++++++++++-
+>  1 file changed, 26 insertions(+), 1 deletion(-)
 
 Reviewed-by: Joe Damato <jdamato@fastly.com>
 
