@@ -1,131 +1,80 @@
-Return-Path: <netdev+bounces-163758-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-163759-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5D42CA2B7EE
-	for <lists+netdev@lfdr.de>; Fri,  7 Feb 2025 02:31:57 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 11736A2B7F0
+	for <lists+netdev@lfdr.de>; Fri,  7 Feb 2025 02:32:31 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 6A4E918892CC
-	for <lists+netdev@lfdr.de>; Fri,  7 Feb 2025 01:32:02 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 1FC971889308
+	for <lists+netdev@lfdr.de>; Fri,  7 Feb 2025 01:32:36 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 136DA2E403;
-	Fri,  7 Feb 2025 01:31:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E4D45208A0;
+	Fri,  7 Feb 2025 01:32:27 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=fastly.com header.i=@fastly.com header.b="TMcs2V8A"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="LYe4qkfO"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f174.google.com (mail-pl1-f174.google.com [209.85.214.174])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 84CE44C6E
-	for <netdev@vger.kernel.org>; Fri,  7 Feb 2025 01:31:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.174
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BA62D2417E9;
+	Fri,  7 Feb 2025 01:32:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1738891913; cv=none; b=qNcEle3vcEhrOQ2zbKp6H7J5LX+sZWu+GOCmW7sXMPjaLnaEKn6Byyce/nXye+iQqgY9LlV9xygaW2IyUU3h1NE0Wx+nABtxIm1A1EaecKJwnF/fifLUrhnhE81WI5dl7gZj0FFgriwozWlZZCRpcJsIg+fUGP8VeSIJRez54/U=
+	t=1738891947; cv=none; b=txpwPdkL9eBtrSbmdDpItCLPs5mybOXvES8+6n2Ajgss3l7uQiZY+dc+OOU/wM3aLLUyeefonu8Yg1bv51GjkOeQXxiit7LgCVMcA06AN2qgffr2GcZxMoRHmthLsyIM+SIgvjGbEobBNa0EXOqS+2jGhdZBMuW4eXe7OPLTrpI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1738891913; c=relaxed/simple;
-	bh=GUOj2ZnJFMk8jI4YQw6Hs7Ivl5JzKD3GTW85TdS1UPY=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Fp9IwfdeDGHYReb8HTjwPCOZGG7L2Q6bbPcU37ggOgP6CpdauKNrnopGjYPF3q92LdJo11x32cFIzt15o/vhnZwr1XhGoD5L+OFttIsIb/4/b+PYufr2CeLjdo9mnrmtrmXXlkg3XgeJqTeyXbkPEc+Buzz4bhCEM8Fq7nHqhSc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fastly.com; spf=pass smtp.mailfrom=fastly.com; dkim=pass (1024-bit key) header.d=fastly.com header.i=@fastly.com header.b=TMcs2V8A; arc=none smtp.client-ip=209.85.214.174
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fastly.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=fastly.com
-Received: by mail-pl1-f174.google.com with SMTP id d9443c01a7336-21f40deb941so22969875ad.2
-        for <netdev@vger.kernel.org>; Thu, 06 Feb 2025 17:31:51 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=fastly.com; s=google; t=1738891911; x=1739496711; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references
-         :mail-followup-to:message-id:subject:cc:to:from:date:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=zkdizXVnDff782XdC9GQ7GAh99Z1PbQXJxP3JewgzVM=;
-        b=TMcs2V8AEtHfXgEceCWsJCCHvfqC+LK4N6pcubDRs52DW/tQm6N5YnhBPfOuj+KrOT
-         t0ZKVvN0VFRU6ZvkGr5I6Q4SlyuiFSsdfmkFHweRhyGYJwonA2vCY0g4ebwJQ3JL0Wdq
-         IkJSZ+BBzee6gSQAI0jhzFko9Hok29xop9brg=
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1738891911; x=1739496711;
-        h=in-reply-to:content-disposition:mime-version:references
-         :mail-followup-to:message-id:subject:cc:to:from:date
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=zkdizXVnDff782XdC9GQ7GAh99Z1PbQXJxP3JewgzVM=;
-        b=oFJFd/tGXChpt3ECcIyUMXT/ZWsIdOW3M4M224WTzehGGgRXd448hfQI3xGbJGf8R+
-         dGg/V+n9dAd6z0oysaqyQmaEDoamqXWgJL9yWQ3iEHwbkUsVnWq3ZMDt8PkgZ2NA+ivq
-         Jb0zEJftYIlUGRCYrNknW8+7oKnEACRENAXnpLiPo/IPwnuBCVvYGi0ZJLmEbSBm+FfM
-         9/cX4PHrfolBRMbgEPgddXB4N8ivWUrpqDYdGx5QW4039Yld/F9+sdu3f6rhut1Nxn76
-         oVsJ4PPJIrEPoiFmPYFHX9m2Judb7awDF8uwktfQQ3+xjagSSxdePvwVpKN14FP4HDda
-         F6jw==
-X-Gm-Message-State: AOJu0YyiWyJY/ZyWp2Z0H2mPCd/r/849ELhOKWHN/mNrqBCQslrN9xMN
-	wE9ilcie3JWNxuCJ1HGPNpsJSCeJDojvWHB3x3OSBh6aljqQkp9PvY6vAAj+Z/tuc6QsoiyR3SN
-	z
-X-Gm-Gg: ASbGnct16pAd1j5vEnXc18xHhZo47yFVChVwitwHvNM41TMhKNAnaKiC1DvIiIySYzE
-	ZiBn0hp6uPQtgdYB09BMaw2h0zu6YqUuT50bGcYsbEK1nR2KprMeL1jnvNjW+PaXhqKZ0RiDUma
-	tfTaBxCLr21yIt7jOHuCxpv/OmzSHx1+4AIxdb99Gwil4UjBma1FsRkiL9DKt8XlEIxRDoZ2eHv
-	CIEjy4Ve2d/PH2YNg7mNq4DvwXKqRAcGPgosOtdUYpDZvf7YFy7JCWqXxgDyzFHtJ6ajoNPFzVt
-	DEww4KKON2L6KwYFeNBGiz1Dou1qSD8xepeBn7xgJsv+bTfWMFP/f1DOvQ==
-X-Google-Smtp-Source: AGHT+IGMVSk0+D0Pm2WrWKIsbJKHGAuK+5twucIHXYMohW7EqwtJaWRIMlCDOxpEZ/uNPENnZ5b76g==
-X-Received: by 2002:a17:902:e946:b0:216:7cde:51a with SMTP id d9443c01a7336-21f4e72631dmr29074325ad.28.1738891910784;
-        Thu, 06 Feb 2025 17:31:50 -0800 (PST)
-Received: from LQ3V64L9R2 (c-24-6-151-244.hsd1.ca.comcast.net. [24.6.151.244])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-21f3687c209sm19268865ad.192.2025.02.06.17.31.49
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 06 Feb 2025 17:31:50 -0800 (PST)
-Date: Thu, 6 Feb 2025 17:31:47 -0800
-From: Joe Damato <jdamato@fastly.com>
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: netdev@vger.kernel.org, Donald Hunter <donald.hunter@gmail.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
-	Simon Horman <horms@kernel.org>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	Xuan Zhuo <xuanzhuo@linux.alibaba.com>,
-	Stanislav Fomichev <sdf@fomichev.me>,
-	Mina Almasry <almasrymina@google.com>,
-	Daniel Jurgens <danielj@nvidia.com>,
-	Martin Karsten <mkarsten@uwaterloo.ca>,
-	open list <linux-kernel@vger.kernel.org>
-Subject: Re: [PATCH net-next v3 1/2] netdev-genl: Add an XSK attribute to
- queues
-Message-ID: <Z6Vig04c-a46WScr@LQ3V64L9R2>
-Mail-Followup-To: Joe Damato <jdamato@fastly.com>,
-	Jakub Kicinski <kuba@kernel.org>, netdev@vger.kernel.org,
-	Donald Hunter <donald.hunter@gmail.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
-	Simon Horman <horms@kernel.org>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	Xuan Zhuo <xuanzhuo@linux.alibaba.com>,
-	Stanislav Fomichev <sdf@fomichev.me>,
-	Mina Almasry <almasrymina@google.com>,
-	Daniel Jurgens <danielj@nvidia.com>,
-	Martin Karsten <mkarsten@uwaterloo.ca>,
-	open list <linux-kernel@vger.kernel.org>
-References: <20250204191108.161046-1-jdamato@fastly.com>
- <20250204191108.161046-2-jdamato@fastly.com>
- <20250206165746.7cf392b6@kernel.org>
+	s=arc-20240116; t=1738891947; c=relaxed/simple;
+	bh=T37dtycyJzG6v1jI8BCgWdahQS0XYiAjaqwLUXtcki4=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=RFvhtu2F5VY/JYjZ3O0pzdFHDHvYcpW76ysdT2givbUHpeuzpmP/r6043OL95k/g65IKu5EBFXFVBnoMmFMXqd+ksHMdsPe0/GLUFk3+7Z+K+VpLu/DIIPQJpNmRSFtJwKOjvIVT5KOx3anYaMEUMaNR/+OU4RLecgjKA+m8bUI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=LYe4qkfO; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9A5D1C4CEDD;
+	Fri,  7 Feb 2025 01:32:26 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1738891947;
+	bh=T37dtycyJzG6v1jI8BCgWdahQS0XYiAjaqwLUXtcki4=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=LYe4qkfO6HIvZSw2DM88W1S8PZ8t1LeJ+ozVHIwaxOnHYtOHlpLBEtb81dzZqNPEU
+	 7Ai+SD2nqQWwV9z93ZQl0j02OBV3NQp2SOASAIbQkICz23qHglfut+LKRPYhOYHrMW
+	 vgZuXRHuIhXVARkEl1XmTbEDQXaiXfakZLxJ5vYbQteCdlrERHBY9GMi0ooRItQRSw
+	 9mfNZeMALob2hn2lxy3C4F3Soxc+Ank0DPscOUq6cMQav3ysJ3QE94esYVRJ2shnJ8
+	 B+l4cZo7DZFzTvDempz9j+C078fIEWY+/FlJupliAEAtmgwfdR2vSmhnGt3+cYIafI
+	 thN97dQp81l3g==
+Date: Thu, 6 Feb 2025 17:32:25 -0800
+From: Jakub Kicinski <kuba@kernel.org>
+To: Gal Pressman <gal@nvidia.com>
+Cc: "David S. Miller" <davem@davemloft.net>, <netdev@vger.kernel.org>, Eric
+ Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, Simon
+ Horman <horms@kernel.org>, Jonathan Corbet <corbet@lwn.net>, Tony Nguyen
+ <anthony.l.nguyen@intel.com>, Przemek Kitszel
+ <przemyslaw.kitszel@intel.com>, Andrew Lunn <andrew+netdev@lunn.ch>, "Tariq
+ Toukan" <tariqt@nvidia.com>, Edward Cree <ecree.xilinx@gmail.com>, Ahmed
+ Zaki <ahmed.zaki@intel.com>, <linux-doc@vger.kernel.org>
+Subject: Re: [PATCH net-next v2 0/2] Symmetric OR-XOR RSS hash
+Message-ID: <20250206173225.294954e2@kernel.org>
+In-Reply-To: <20250205135341.542720-1-gal@nvidia.com>
+References: <20250205135341.542720-1-gal@nvidia.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250206165746.7cf392b6@kernel.org>
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-On Thu, Feb 06, 2025 at 04:57:46PM -0800, Jakub Kicinski wrote:
-> On Tue,  4 Feb 2025 19:10:47 +0000 Joe Damato wrote:
-> > +		if (rxq->pool) {
-> > +			nest = nla_nest_start(rsp, NETDEV_A_QUEUE_XSK);
-> > +			nla_nest_end(rsp, nest);
-> > +		}
+On Wed, 5 Feb 2025 15:53:39 +0200 Gal Pressman wrote:
+> Add support for a new type of input_xfrm: Symmetric OR-XOR.
+> Symmetric OR-XOR performs hash as follows:
+> (SRC_IP | DST_IP, SRC_IP ^ DST_IP, SRC_PORT | DST_PORT, SRC_PORT ^ DST_PORT)
 > 
-> nla_nest_start() can fail, you gotta nul-check the return value.
-> You could possibly add an nla_put_empty_nest() helper in netlink.h
-> to make this less awkward? I think the iouring guys had the same bug
+> Configuration is done through ethtool -x/X command.
+> For mlx5, the default is already symmetric hash, this patch now exposes
+> this to userspace and allows enabling/disabling of the feature.
 
-Ah, right.
-
-I'll see what a helper looks like. Feels like maybe overkill?
-
-Thanks for the review.
+Please add a selftest (hw-only is fine, netdevsim can't do flow
+hashing).
+-- 
+pw-bot: cr
 
