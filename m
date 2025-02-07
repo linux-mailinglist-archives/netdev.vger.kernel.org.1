@@ -1,66 +1,84 @@
-Return-Path: <netdev+bounces-163980-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-163990-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id BB029A2C395
-	for <lists+netdev@lfdr.de>; Fri,  7 Feb 2025 14:31:05 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 372F2A2C3AF
+	for <lists+netdev@lfdr.de>; Fri,  7 Feb 2025 14:34:54 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id D48D118890DF
-	for <lists+netdev@lfdr.de>; Fri,  7 Feb 2025 13:31:10 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id CB17C188A7E0
+	for <lists+netdev@lfdr.de>; Fri,  7 Feb 2025 13:34:47 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 70E231DE89B;
-	Fri,  7 Feb 2025 13:31:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B79951F63E8;
+	Fri,  7 Feb 2025 13:33:00 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ncqHG1xj"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="ikZHdtyb"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 484222417DB;
-	Fri,  7 Feb 2025 13:31:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EED8F1F37C6;
+	Fri,  7 Feb 2025 13:32:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1738935061; cv=none; b=HSvEjv1ZO0HL2vnpLhiDtDQZ+RnuLZqAertHFfFtyWdoOIOKoKZpIO8ABmqInE+XXodiHt01raZ70oKPVM0+TotCeZpQTBkdtYTdLSboPf40oVrjv4mWulmPiPJuRXlCz8sxlntODJDO5M2tax7/c9ttj/16vk08+EDhcPPmS/U=
+	t=1738935180; cv=none; b=BdNS6QUZ1IZ/PlU/gdUSqEggyKCCq2HPley2dtkWxLqpyO9vGmF7wbL7RvcIwkadvoseXphazT1K38YVPaCO/D4gbYXuUnZqLVXGj2YurpKm7TUVeV0WDxkoTo0sOJr84KqdDDdGIG86MtMP9TuZEHeywwcmfVQy/iiZRL/AvW0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1738935061; c=relaxed/simple;
-	bh=NsSmOwhEZRd+aVZXPOwC9ZF+E9OTzkX7OgEXWYjui74=;
+	s=arc-20240116; t=1738935180; c=relaxed/simple;
+	bh=WFmNlRT/1piaJgm4c0NfJA8P9P62SmS6UdgYC76xKuM=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=FbZsJ/umuUEWaJnErc4k7DDfVHP4F4HBjtW5h9FJnYifvz8Itdrsa2Al2ZnW0ch1muGDB20pgtWc2/rH5jWx76Eya7497MHubdQQ34qF3ynyy1TVx4+rUimklpNje0IboC5wMUAlkh2C91ve1CONCnTVxcl2J1i21DqdY2xNumE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ncqHG1xj; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id C2365C4CED1;
-	Fri,  7 Feb 2025 13:30:57 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1738935060;
-	bh=NsSmOwhEZRd+aVZXPOwC9ZF+E9OTzkX7OgEXWYjui74=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=ncqHG1xjMH3im4kyO+IV6bpRSlqPmofmKvKKNQf0rhGaq4F8ERegSG+6SnFNxSO4I
-	 HzuZ3Eg+So+TXGr2cq2X0sZPhkwIxZYEWNU7zXXGma8QsnvT3B32QX2IFJ7LEwzqeM
-	 A/WYUQ3qxXWhUTsMbdXHIojsT2Ie2/Otp/agjBCFQsYuxAVRjL7ccoi2r1hJmI4ReE
-	 OvWXd9toAFuQGnnwfqn3l6ZwW7fiueR0iduHnDhlezXX1K5rpIkBWKtjDgdoALsCYZ
-	 oukD1BeMp4rVKmdMThw9imvlhQRQyzxtvJdHz4ADL2Z01jzVh4d0wshJQMkd1ro3gC
-	 EGZDxXUriFJqw==
-Date: Fri, 7 Feb 2025 13:30:55 +0000
-From: Simon Horman <horms@kernel.org>
-To: Joe Damato <jdamato@fastly.com>
-Cc: netdev@vger.kernel.org, pabeni@redhat.com, edumazet@google.com,
-	sridhar.samudrala@intel.com, Jakub Kicinski <kuba@kernel.org>,
-	Donald Hunter <donald.hunter@gmail.com>,
-	"David S. Miller" <davem@davemloft.net>,
+	 Content-Type:Content-Disposition:In-Reply-To; b=lk38cJ16Ey8FIinMe+8P/TJBLgRZIXuZZVPVOCRinveHpZ5g2JLjyr3lirPcz5+LPq9v0UZXetaJLaIld+i+Lmmrn7Vigp00UnhxzrPBE7SKycbYFOTZaQ+KU13X8TGMF7G8Ojh1RmGNFUXhw1rsJCxQt92PgNJ3tzaPLXtb380=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=ikZHdtyb; arc=none smtp.client-ip=156.67.10.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=7B6nKxsZ/sgpbYSbmczXl/HDAlWGMnjUjIEUqDEu3fE=; b=ikZHdtybyl/A4VFw2VkwQGYUTI
+	I5VXMO2Dsq9C6j9NPVSnVHI8byHRtV/uaWU/t71xO8V9YWONlWrw4NkA31Qgj7jaXKhYUM+5sSJwd
+	EGZH7ss/mH8O6TO7DqY00Yy1HTQRU6CUGICBH3CUAKUQ5s0GbwiSc7s9zIREc3Phv1Fs=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1tgOT6-00Br1x-S2; Fri, 07 Feb 2025 14:32:28 +0100
+Date: Fri, 7 Feb 2025 14:32:28 +0100
+From: Andrew Lunn <andrew@lunn.ch>
+To: Choong Yong Liang <yong.liang.choong@linux.intel.com>
+Cc: "Russell King (Oracle)" <linux@armlinux.org.uk>,
+	Simon Horman <horms@kernel.org>, Jose Abreu <joabreu@synopsys.com>,
+	Jose Abreu <Jose.Abreu@synopsys.com>,
+	David E Box <david.e.box@linux.intel.com>,
+	Thomas Gleixner <tglx@linutronix.de>,
+	Ingo Molnar <mingo@redhat.com>, Borislav Petkov <bp@alien8.de>,
+	Dave Hansen <dave.hansen@linux.intel.com>,
+	"H . Peter Anvin" <hpa@zytor.com>,
+	Rajneesh Bhardwaj <irenic.rajneesh@gmail.com>,
+	David E Box <david.e.box@intel.com>,
 	Andrew Lunn <andrew+netdev@lunn.ch>,
-	Stanislav Fomichev <sdf@fomichev.me>,
-	Xuan Zhuo <xuanzhuo@linux.alibaba.com>,
-	Mina Almasry <almasrymina@google.com>,
-	Daniel Jurgens <danielj@nvidia.com>,
-	Amritha Nambiar <amritha.nambiar@intel.com>,
-	David Wei <dw@davidwei.uk>,
-	open list <linux-kernel@vger.kernel.org>
-Subject: Re: [PATCH net-next v4 2/3] netdev-genl: Add an XSK attribute to
- queues
-Message-ID: <20250207133055.GU554665@kernel.org>
-References: <20250207030916.32751-1-jdamato@fastly.com>
- <20250207030916.32751-3-jdamato@fastly.com>
+	"David S . Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Maxime Coquelin <mcoquelin.stm32@gmail.com>,
+	Alexandre Torgue <alexandre.torgue@foss.st.com>,
+	Jiawen Wu <jiawenwu@trustnetic.com>,
+	Mengyuan Lou <mengyuanlou@net-swift.com>,
+	Heiner Kallweit <hkallweit1@gmail.com>,
+	Hans de Goede <hdegoede@redhat.com>,
+	Ilpo =?iso-8859-1?Q?J=E4rvinen?= <ilpo.jarvinen@linux.intel.com>,
+	Richard Cochran <richardcochran@gmail.com>,
+	Serge Semin <fancer.lancer@gmail.com>, x86@kernel.org,
+	linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
+	platform-driver-x86@vger.kernel.org,
+	linux-stm32@st-md-mailman.stormreply.com,
+	linux-arm-kernel@lists.infradead.org
+Subject: Re: [PATCH net-next v7 2/7] net: pcs: xpcs: re-initiate clause 37
+ Auto-negotiation
+Message-ID: <12e86fbe-9515-4b81-951c-8bf86e2939d6@lunn.ch>
+References: <20250206131859.2960543-1-yong.liang.choong@linux.intel.com>
+ <20250206131859.2960543-3-yong.liang.choong@linux.intel.com>
+ <Z6TVmdCZeWerAZKP@shell.armlinux.org.uk>
+ <564ede5d-9f53-40be-9305-63f63b384e15@linux.intel.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -69,42 +87,27 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20250207030916.32751-3-jdamato@fastly.com>
+In-Reply-To: <564ede5d-9f53-40be-9305-63f63b384e15@linux.intel.com>
 
-On Fri, Feb 07, 2025 at 03:08:54AM +0000, Joe Damato wrote:
-> Expose a new per-queue nest attribute, xsk, which will be present for
-> queues that are being used for AF_XDP. If the queue is not being used for
-> AF_XDP, the nest will not be present.
-> 
-> In the future, this attribute can be extended to include more data about
-> XSK as it is needed.
-> 
-> Signed-off-by: Joe Damato <jdamato@fastly.com>
-> Suggested-by: Jakub Kicinski <kuba@kernel.org>
+> Good point. I cannot find this scenario in the datasheet. Please allow me
+> some time to test this scenario. I will update you with the results.
 
-...
+By data sheet, do you mean documentation from Synopsis, or is this an
+internal document? Assuming the hardware engineers have not hacked up
+the Synopsis IP too much, the Synopsis documentation is probably the
+most accurate you have.
 
-> diff --git a/net/core/netdev-genl.c b/net/core/netdev-genl.c
-> index 0dcd4faefd8d..75ca111aa591 100644
-> --- a/net/core/netdev-genl.c
-> +++ b/net/core/netdev-genl.c
-> @@ -380,6 +380,7 @@ netdev_nl_queue_fill_one(struct sk_buff *rsp, struct net_device *netdev,
->  	struct netdev_rx_queue *rxq;
->  	struct netdev_queue *txq;
->  	void *hdr;
-> +	int ret;
->  
+> > What about 1000BASE-X when AN is enabled or disabled and then switching
+> > to SGMII?
+> > 
+> According to the datasheet, a soft reset is required.
 
-Hi Joe,
+Do you know if this is specific to Intels integration of the Synopsis
+IP, or this is part of the core licensed IP?
 
-Perhaps this got left behind after some revisions elsewhere.
-But as it stands ret is unused in this function and should be removed.
+We need to understand when we need a quirk because intel did something
+odd, or it is part of the licensed IP and should happen for all
+devices using the IP.
 
->  	hdr = genlmsg_iput(rsp, info);
->  	if (!hdr)
-
-...
-
--- 
-pw-bot: changes-requested
+	Andrew
 
