@@ -1,115 +1,106 @@
-Return-Path: <netdev+bounces-163920-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-163921-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 65152A2C06F
-	for <lists+netdev@lfdr.de>; Fri,  7 Feb 2025 11:19:50 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id A2E70A2C078
+	for <lists+netdev@lfdr.de>; Fri,  7 Feb 2025 11:21:08 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 8C0A73AA8F8
-	for <lists+netdev@lfdr.de>; Fri,  7 Feb 2025 10:19:41 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 43BD9168E95
+	for <lists+netdev@lfdr.de>; Fri,  7 Feb 2025 10:21:07 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0399E1A76AE;
-	Fri,  7 Feb 2025 10:19:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6C0C81DE4EA;
+	Fri,  7 Feb 2025 10:20:58 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="fyonaDtV"
+	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="VrqrRAkm"
 X-Original-To: netdev@vger.kernel.org
-Received: from relay7-d.mail.gandi.net (relay7-d.mail.gandi.net [217.70.183.200])
+Received: from fout-b2-smtp.messagingengine.com (fout-b2-smtp.messagingengine.com [202.12.124.145])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 78AA680BFF;
-	Fri,  7 Feb 2025 10:19:43 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.200
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AB9E680BFF
+	for <netdev@vger.kernel.org>; Fri,  7 Feb 2025 10:20:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=202.12.124.145
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1738923585; cv=none; b=ZzSlTb+CNshlSWJIv4mFXWNMph0PLDxNNKT3WWKLAvzCG2lqVMq6yBMyHPSkcu369wEAGpExjsqJS1i8W8Ya2mCrVPyhgV/Fk7vYEdTKzhi45NDR5QDrX6yGEYsjiQ/eRYskE78e31gg8hLfV9Hxz3+gfevdY49IXV11CrVSOXI=
+	t=1738923658; cv=none; b=JuLtbviFx2KhSLU+ZRhSTxN3QynJ6ggqJgE+09fAuFleq/8harspha8IBZYP2yQWksJ5mP2ZRtWgzCdnzYhg8GzETYwkUQhTQC6eChIL+MDoxza1SnhYSF4rITLo7wGyL7VJhH7bw2kXs3lDRtwhomPpQeTMt3a1HpYvtkD7dJ0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1738923585; c=relaxed/simple;
-	bh=mPMFTHR4rBA+H6dCcJyNw7a2lNwmdYXMtTaGdeo4Dno=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=Ubab3sLPnmRoT/TQFpqm9y0lcHOrYlFAogF+j2F4JoJuDbuqURPPk5kGNfbx76Q2Tv0BIjHLZg+IjxW2BxGTAzI2t2Xcab+wuFNaL/wktJOG5VS12Q+CPEF+yZDwZ/i8ml8ScIfL4uPdGDAMuONBxbAL/lg/lmaezciTkUFTM5o=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=fyonaDtV; arc=none smtp.client-ip=217.70.183.200
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
-Received: by mail.gandi.net (Postfix) with ESMTPSA id A90014320C;
-	Fri,  7 Feb 2025 10:19:35 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
-	t=1738923576;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=7SMfhxqX1urprU+ZzaHkHZbbWVTlqJ3h4oTfkgVeU/g=;
-	b=fyonaDtVpwCNdRj3zDEoj1XxT0seswkdK6PMTLH0BqYGKcyyGt6W9Gx4HPKTFKsSey0lHn
-	XsYISdmWpOJfdAnQ4eA9xQKvi25oFSYTljMkEVmF11/Mrs1QquexBb/wuAqbbxXxVXht2y
-	gpy24acboli5tKIwEkxubaot/nMDnhOWJSHbd1VUKbiLkSVIdRvaUwg2o+utXl5mPbA0Se
-	l9LwTes51GK2w8B0eXIVp2r2Jw7yclz4CZk00KZBrKNvbz2gUiZurgnZKFBrQYJVzTWRwI
-	t5j8Hkl7Cj+uSZs4OobaPSfRETg13Xz1J7yZ0l48Ioh/CONrzYBOop9jXddA0w==
-Date: Fri, 7 Feb 2025 11:19:32 +0100
-From: Kory Maincent <kory.maincent@bootlin.com>
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: syzbot <syzbot+86a8ab09a0f655f1ff19@syzkaller.appspotmail.com>,
- davem@davemloft.net, edumazet@google.com, horms@kernel.org,
- linux-kernel@vger.kernel.org, netdev@vger.kernel.org, pabeni@redhat.com,
- syzkaller-bugs@googlegroups.com
-Subject: Re: [syzbot] [net?] general protection fault in
- generic_hwtstamp_ioctl_lower (2)
-Message-ID: <20250207111932.55e9d377@kmaincent-XPS-13-7390>
-In-Reply-To: <20250206175618.6ac4182d@kernel.org>
-References: <67a230a8.050a0220.d7c5a.00ba.GAE@google.com>
-	<20250206175618.6ac4182d@kernel.org>
-Organization: bootlin
-X-Mailer: Claws Mail 4.0.0 (GTK+ 3.24.33; x86_64-pc-linux-gnu)
+	s=arc-20240116; t=1738923658; c=relaxed/simple;
+	bh=ggZjxOnu5YXJz/Yx2yanKyEKxn3BYEv0ZC4rdCMwxoU=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=j5fbJx1NICnJudsU7WobjeEgnt9Ku2SIwvjddR4VloRiONL4GuWatbByY2hPERLwuCGCCcK1mRVDoj6u4FkAwvNv/W3diaFw2VNIKw371QDuGOes40E0/jBJHlM/Wk5tZp9mOI2VZOxk7MafYzXIR1LQlosKYSW0ERrKwDr1bSs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=idosch.org; spf=none smtp.mailfrom=idosch.org; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=VrqrRAkm; arc=none smtp.client-ip=202.12.124.145
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=idosch.org
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=idosch.org
+Received: from phl-compute-08.internal (phl-compute-08.phl.internal [10.202.2.48])
+	by mailfout.stl.internal (Postfix) with ESMTP id 73CE711400FB;
+	Fri,  7 Feb 2025 05:20:54 -0500 (EST)
+Received: from phl-mailfrontend-01 ([10.202.2.162])
+  by phl-compute-08.internal (MEProxy); Fri, 07 Feb 2025 05:20:54 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
+	messagingengine.com; h=cc:cc:content-type:content-type:date:date
+	:feedback-id:feedback-id:from:from:in-reply-to:in-reply-to
+	:message-id:mime-version:references:reply-to:subject:subject:to
+	:to:x-me-proxy:x-me-sender:x-me-sender:x-sasl-enc; s=fm3; t=
+	1738923654; x=1739010054; bh=ggZjxOnu5YXJz/Yx2yanKyEKxn3BYEv0ZC4
+	rdCMwxoU=; b=VrqrRAkmc+xCD9KLW9ObeH9Tp98OFarfIgxYc8+BGKMYFkbarXR
+	hGA8nc8HlKvwWW1PhdphmNlD4gkFeouc1YIs/RKnOQugC8v2HOgyZja7Fod8qjTB
+	hMCy47AjaUf1Mt7+/LdOKPUESGqUSSSIY/+Z2r2TqzO55dZDXj3rnXOep3Dhe69B
+	+pQlPrJ9/GUaEFushd2MpenIq0hazbOY4GvjdMqNkKpnVTPrLVAGJLZHiGkX2vaI
+	EWoW24/LJTVlWkaXlNW+Y3oIpWqu4TTa+cj7xbSM78f48HxxX/OLRMoqDXVK0ldu
+	BrUWr45sxqCURutKmS0O7EHKAiIo7EE1xZA==
+X-ME-Sender: <xms:hd6lZ_ixIkEP6-vt9gWmAgRVh_toypQlzIIIwMBpIOWuHfgcZCJRDw>
+    <xme:hd6lZ8CyQFCNJtqaWtYlHbvlspjLExmn2CWiIpMz9k6XddVaZpIkRtbF3e34-KFpd
+    q8qW_iI9EswO9c>
+X-ME-Received: <xmr:hd6lZ_HzhIyrmDRyWRl_JAaR8ypIXebu_HhdNKmS3l_5yjtKrfahCDlLOFutYpaWqV5SlFivbYbeoEQpOx6IaDa-Ifc>
+X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeefvddrtddtgddvledtfecutefuodetggdotefrod
+    ftvfcurfhrohhfihhlvgemucfhrghsthforghilhdpggftfghnshhusghstghrihgsvgdp
+    uffrtefokffrpgfnqfghnecuuegrihhlohhuthemuceftddtnecusecvtfgvtghiphhivg
+    hnthhsucdlqddutddtmdenucfjughrpeffhffvvefukfhfgggtuggjsehttdertddttddv
+    necuhfhrohhmpefkughoucfutghhihhmmhgvlhcuoehiughoshgthhesihguohhstghhrd
+    horhhgqeenucggtffrrghtthgvrhhnpedvudefveekheeugeeftddvveefgfduieefudei
+    fefgleekheegleegjeejgeeghfenucevlhhushhtvghrufhiiigvpedtnecurfgrrhgrmh
+    epmhgrihhlfhhrohhmpehiughoshgthhesihguohhstghhrdhorhhgpdhnsggprhgtphht
+    thhopeekpdhmohguvgepshhmthhpohhuthdprhgtphhtthhopehkuhhnihihuhesrghmrg
+    iiohhnrdgtohhmpdhrtghpthhtohepuggrvhgvmhesuggrvhgvmhhlohhfthdrnhgvthdp
+    rhgtphhtthhopegvughumhgriigvthesghhoohhglhgvrdgtohhmpdhrtghpthhtohepkh
+    husggrsehkvghrnhgvlhdrohhrghdprhgtphhtthhopehprggsvghnihesrhgvughhrght
+    rdgtohhmpdhrtghpthhtohephhhorhhmsheskhgvrhhnvghlrdhorhhgpdhrtghpthhtoh
+    epkhhunhhiudekgedtsehgmhgrihhlrdgtohhmpdhrtghpthhtohepnhgvthguvghvsehv
+    ghgvrhdrkhgvrhhnvghlrdhorhhg
+X-ME-Proxy: <xmx:hd6lZ8TP1WyNx1kbxMojOOtwmY070Ywq6tlelPUO_mARR1hfqo6reQ>
+    <xmx:hd6lZ8xSpyyhWe9f-LZLIPB7pI_Yj4r4RlZTQRXxKRxUp0pKwdEwwA>
+    <xmx:hd6lZy4lmBTAHkMowxYCwsofkyR5Bgv3JfR1OmKYehHyINQlIh5K7A>
+    <xmx:hd6lZxy6NBNqNHGKE6_t7p0N2X0dkm5EiZIO_ZhpiNqr9JPp8Q3OHw>
+    <xmx:ht6lZ_xsPNOW1ihsEI9YoHlBC1FoiwpDmJvUhT0egU0NBumRt40dc2a->
+Feedback-ID: i494840e7:Fastmail
+Received: by mail.messagingengine.com (Postfix) with ESMTPA; Fri,
+ 7 Feb 2025 05:20:52 -0500 (EST)
+Date: Fri, 7 Feb 2025 12:20:45 +0200
+From: Ido Schimmel <idosch@idosch.org>
+To: Kuniyuki Iwashima <kuniyu@amazon.com>
+Cc: "David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Simon Horman <horms@kernel.org>,
+	Kuniyuki Iwashima <kuni1840@gmail.com>, netdev@vger.kernel.org
+Subject: Re: [PATCH v2 net-next 0/8] fib: rules: Convert RTM_NEWRULE and
+ RTM_DELRULE to per-netns RTNL.
+Message-ID: <Z6XefRMDYOQqOmcW@shredder>
+References: <20250207072502.87775-1-kuniyu@amazon.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-X-GND-State: clean
-X-GND-Score: 0
-X-GND-Cause: gggruggvucftvghtrhhoucdtuddrgeefvddrtddtgddvledtvdcutefuodetggdotefrodftvfcurfhrohhfihhlvgemucfitefpfffkpdcuggftfghnshhusghstghrihgsvgenuceurghilhhouhhtmecufedtudenucenucfjughrpeffhffvvefukfgjfhhoofggtgfgsehtqhertdertdejnecuhfhrohhmpefmohhrhicuofgrihhntggvnhhtuceokhhorhihrdhmrghinhgtvghnthessghoohhtlhhinhdrtghomheqnecuggftrfgrthhtvghrnhepheffgfevteehfeektedvheduudelffdtkeelleeuledtkeetveffhfdtgedvleetnecuffhomhgrihhnpehshiiikhgrlhhlvghrrdgrphhpshhpohhtrdgtohhmpdgsohhothhlihhnrdgtohhmnecukfhppedvrgdtudemtggsudelmeelhegrvgemlehftddtmeduvdeffhemfheffeejmedusgejheemkeekhegrnecuvehluhhsthgvrhfuihiivgeptdenucfrrghrrghmpehinhgvthepvdgrtddumegtsgduleemleehrggvmeelfhdttdemuddvfehfmehffeefjeemudgsjeehmeekkeehrgdphhgvlhhopehkmhgrihhntggvnhhtqdgirffuqddufedqjeefledtpdhmrghilhhfrhhomhepkhhorhihrdhmrghinhgtvghnthessghoohhtlhhinhdrtghomhdpnhgspghrtghpthhtohepledprhgtphhtthhopehkuhgsrgeskhgvrhhnvghlrdhorhhgpdhrtghpthhtohepshihiigsohhtodekiegrkegrsgdtlegrtdhfieehhehfudhffhduleesshihiihkr
- ghllhgvrhdrrghpphhsphhothhmrghilhdrtghomhdprhgtphhtthhopegurghvvghmsegurghvvghmlhhofhhtrdhnvghtpdhrtghpthhtohepvgguuhhmrgiivghtsehgohhoghhlvgdrtghomhdprhgtphhtthhopehhohhrmhhssehkvghrnhgvlhdrohhrghdprhgtphhtthhopehlihhnuhigqdhkvghrnhgvlhesvhhgvghrrdhkvghrnhgvlhdrohhrghdprhgtphhtthhopehnvghtuggvvhesvhhgvghrrdhkvghrnhgvlhdrohhrghdprhgtphhtthhopehprggsvghnihesrhgvughhrghtrdgtohhm
-X-GND-Sasl: kory.maincent@bootlin.com
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250207072502.87775-1-kuniyu@amazon.com>
 
-On Thu, 6 Feb 2025 17:56:18 -0800
-Jakub Kicinski <kuba@kernel.org> wrote:
+On Fri, Feb 07, 2025 at 04:24:54PM +0900, Kuniyuki Iwashima wrote:
+> Patch 1 ~ 2 are small cleanup, and patch 3 ~ 8 make fib_nl_newrule()
+> and fib_nl_delrule() hold per-netns RTNL.
 
-> On Tue, 04 Feb 2025 07:22:16 -0800 syzbot wrote:
-> > Hello,
-> >=20
-> > syzbot found the following issue on:
-> >=20
-> > HEAD commit:    69e858e0b8b2 Merge tag 'uml-for-linus-6.14-rc1' of git:=
-//g..
-> > git tree:       upstream
-> > console output: https://syzkaller.appspot.com/x/log.txt?x=3D13324b24580=
-000
-> > kernel config:  https://syzkaller.appspot.com/x/.config?x=3D98d83cc1742=
-b7377
-> > dashboard link: https://syzkaller.appspot.com/bug?extid=3D86a8ab09a0f65=
-5f1ff19
-> > compiler:       gcc (Debian 12.2.0-14) 12.2.0, GNU ld (GNU Binutils for
-> > Debian) 2.40 syz repro:
-> > https://syzkaller.appspot.com/x/repro.syz?x=3D17324b24580000 C reproduc=
-er:
-> > https://syzkaller.appspot.com/x/repro.c?x=3D161595f8580000 =20
->=20
-> Hi Kory!
->=20
-> Looks like syzbot wasn't able to bisect and didn't CC you.
-> Please take a look, looks like struct kernel_hwtstamp_config
-> gets into the ioctl paths.
-
-Hello Jakub,
-
-Thanks for transferring it to me. I will look at it.
-
-Regards,
---=20
-K=C3=B6ry Maincent, Bootlin
-Embedded Linux and kernel engineering
-https://bootlin.com
+Reviewed-by: Ido Schimmel <idosch@nvidia.com>
+Tested-by: Ido Schimmel <idosch@nvidia.com>
 
