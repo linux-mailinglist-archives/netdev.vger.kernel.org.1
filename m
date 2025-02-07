@@ -1,107 +1,125 @@
-Return-Path: <netdev+bounces-164133-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-164148-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 21BCEA2CB81
-	for <lists+netdev@lfdr.de>; Fri,  7 Feb 2025 19:40:00 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id E02E5A2CBE4
+	for <lists+netdev@lfdr.de>; Fri,  7 Feb 2025 19:49:31 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 160743AEFFB
-	for <lists+netdev@lfdr.de>; Fri,  7 Feb 2025 18:39:36 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 01DBA188C646
+	for <lists+netdev@lfdr.de>; Fri,  7 Feb 2025 18:49:26 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 93CE31A3144;
-	Fri,  7 Feb 2025 18:33:05 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DB06D1AD403;
+	Fri,  7 Feb 2025 18:46:27 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="LEfx4YA8"
+	dkim=pass (2048-bit key) header.d=wanadoo.fr header.i=@wanadoo.fr header.b="nHaBnrUd"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f169.google.com (mail-pl1-f169.google.com [209.85.214.169])
+Received: from smtp.smtpout.orange.fr (smtp-65.smtpout.orange.fr [80.12.242.65])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1DA7F199E8D
-	for <netdev@vger.kernel.org>; Fri,  7 Feb 2025 18:33:03 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.169
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C653419CD19;
+	Fri,  7 Feb 2025 18:46:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=80.12.242.65
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1738953185; cv=none; b=Po9VfwTqjJ8oV32FdrxuGKqQRZ1xEsuHk6iDeXTfdxq35ruGg2AxoXb5iBvQSq8lXAu6fatybTiLMAunvBQEQycqDarbFyVxie96HB7tXVt1DvGcWEeCIKxxCtc1BI5u43KgcAIbLoSlX7eciVJbe529l2fCV2kh8cRDVGQmzLo=
+	t=1738953987; cv=none; b=U5cIoV1Log3WK8pL7fBd+f3J/HlBEkVrmnoNb2dHdPt6HwBwJHegiI2AqwEq2LeIb8DHni1sDqEmqjBbMBq0vRG9p1wVCV3UsWIsPvkHwvREQ2NqZmseQaZGPFLi7SAh6ozWI9GKNRjZiHhurlVGuqsEspSVNEiWLpFYVJXW5no=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1738953185; c=relaxed/simple;
-	bh=KFotgUxfmC7ai7PyzaxjdZAl1GAe29TnsnSw34Gvzmo=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=ug5UKRUQU/3IpxqMuFrbb4BPEoWGYhLOQZxCeJwNo36elEpR8ff3BYtuBCPFxnJWHN31wUoRcOJ7CtK4TCjA2kmyUTdcmPwz/FE6nsSJ+RyLFDpw3ViwBP+bKccpf+CxI1/NB8SKkcnCp0XFtIcy7/spdNXjujRmftPMq32pStI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=LEfx4YA8; arc=none smtp.client-ip=209.85.214.169
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-pl1-f169.google.com with SMTP id d9443c01a7336-2163affd184so12875ad.1
-        for <netdev@vger.kernel.org>; Fri, 07 Feb 2025 10:33:03 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1738953183; x=1739557983; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=KFotgUxfmC7ai7PyzaxjdZAl1GAe29TnsnSw34Gvzmo=;
-        b=LEfx4YA8i2YlptRF6xEt3Md0UGpJIkbUXuyFbz0+GWr4wQd0vh1MoxDLJGkmCWLDzb
-         2kwTDWZKy24Qsfrqyuq/3uRcEqThd5BNBkiQ7X0oi3kxebcpz6b4fRD27SqBPihf/d5r
-         Rzj3jTBN3sST6vngOFmJmO5UP1OAlmNblwVEXhruQOSKOmrRp70k97NMXCPgJilUCAbd
-         PNzIBFdJJGk9sGexNC+3Z3mwxVO+HW9VFkyYDdWlrQ2iNrWnkE/Ig/urHTjWRXYRSB2H
-         j3cQhK8b0XGm7CVu+GIgSX/YFhWTeqNLiwWxOtPY/PElmFT9TsiKtyCa5n0zka+Gl+Yu
-         7+Eg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1738953183; x=1739557983;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=KFotgUxfmC7ai7PyzaxjdZAl1GAe29TnsnSw34Gvzmo=;
-        b=OtWAeR18cC0hzJvfRlnko79Eg163Ak9vUZRC6X/zbOJGWn5nuilkOu9Qa1KZGOvzYl
-         ljhl0+9CTTPVBd+E0qoftD6tt7dUmP5Z1hChwwPUTPeuv/VlmQbJBcdnVWHgZuGXJFt/
-         fxmGjpyMYV3YbilvILpgBs/s0A2UIFLQx0U6g4ZPtM+xwMSXy0HI6p8TPf+/Rg9MhJt6
-         xzGal36NQQNdEwc5UFGaXhqQzVDEp0Yp4C6Mic8GBQ9g6+UMLAnzvaqqUkJsTJl+j0uU
-         wc50SIW+VGfalS9YysbrQ0M7rM9HiRhAb/Q28VUXjcXEKIUgkOFCL2pWp5cZG6Y521dT
-         AaMA==
-X-Forwarded-Encrypted: i=1; AJvYcCX/X4MVFnCh0FKybhW/A8RIgp8nn9sud8xs+lyWCuHPU+r95M2hjF7VEiiSxSCPfeqC11ucxbM=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzlxjVugaBJuTRNmFt1wr0fyeGHMFcrh1AXKo+1o+sJDCQCZvx6
-	oTdfGMEBSdIOY/GJKAg/Hok8m5FanauE2BxY4K+h773YgbN3VRo+bjcQMK+AWuMWHWCK9xhoFXH
-	92DSRz3sZOBy6N0bD4SZAALEvI9mOlyU4hQFsCmqCRd06MPG/t/rz
-X-Gm-Gg: ASbGncuB7YEwsqM8Nve0PPv07C3wF3xQqaDIl7HbbisTcX7bMp3TmMLqK4yKOJ3hQV9
-	ePSqLWG8fpxcNJK/cjugh5hi8GOdmgLx8pJqnc74eYJaCJvd9PKDXU1yey99qcqupt57WDZ8w
-X-Google-Smtp-Source: AGHT+IGdkOU+RI13xBQWaUOd/wbOo4jvt9gqCAHc80EjxhuB0ItJIVoLSEPn1GqroBqJsRXJB90ylZ6PxUDTgJP1w2I=
-X-Received: by 2002:a17:903:1a27:b0:216:6dab:8042 with SMTP id
- d9443c01a7336-21f69deebc5mr34745ad.12.1738953183161; Fri, 07 Feb 2025
- 10:33:03 -0800 (PST)
+	s=arc-20240116; t=1738953987; c=relaxed/simple;
+	bh=jG9PP8OmSmsAi3gu2ND0UFBXsklxiSRJ0nVDoTXKJjQ=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=FzEZcYjrLr/e+N/57VzZTy8FCqH3XmiGEhdMJOUbXa3Gle3tDsfv9haUjp7+pWPcPUHStfaMjSQvVlpo9tAaJZ3kUSK1x3z8myTlgsx7O5lEAflRnOPoo5kD5cjh0zqZOmHAi4K6mqT1PjDXdaGsD8m0y66FIJC4aZtb4zShlsk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=wanadoo.fr; spf=pass smtp.mailfrom=wanadoo.fr; dkim=pass (2048-bit key) header.d=wanadoo.fr header.i=@wanadoo.fr header.b=nHaBnrUd; arc=none smtp.client-ip=80.12.242.65
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=wanadoo.fr
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=wanadoo.fr
+Received: from [192.168.1.37] ([90.11.132.44])
+	by smtp.orange.fr with ESMTPA
+	id gTDktBe395xHLgTDntrXhH; Fri, 07 Feb 2025 19:37:05 +0100
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=wanadoo.fr;
+	s=t20230301; t=1738953425;
+	bh=6PlvsS0qz2CZcL8tmalhXpsBjS7gKY13HQPvHB3Mi8k=;
+	h=Message-ID:Date:MIME-Version:Subject:To:From;
+	b=nHaBnrUdPy2gXkXp1Wx7o8rVZjSVn4a+/+Mp+IizYUbpbvBBy3HoHLGJMgWzlxKvK
+	 5mx95ssZsPeC5rsYQbglj27IczHL+NWevccjj363Yq+Rf4LvKqqgIKlI563wq+hmiG
+	 g4sWQJ7WfTaafSCF9z1teOIui76v+b9w9DP1hJciI4GLT1yyT09v9SyWBZYlhZVe2b
+	 +5iNuQOPcZGanus78zusUL+B02npJA3gBILv3KU6Myi1E5A4eVu25j7bb5slSrpAXS
+	 ao6+TeuupJbe8BNAdA+VveQj+8ZmmL9B1wxVhhjhyiAj1n3SjQQMilYPY8a5dWpeUs
+	 bKu8dZTtMSyZw==
+X-ME-Helo: [192.168.1.37]
+X-ME-Auth: bWFyaW9uLmphaWxsZXRAd2FuYWRvby5mcg==
+X-ME-Date: Fri, 07 Feb 2025 19:37:05 +0100
+X-ME-IP: 90.11.132.44
+Message-ID: <1ee664ec-f912-467e-aedb-81208987ea2a@wanadoo.fr>
+Date: Fri, 7 Feb 2025 19:36:56 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250207183119.1721424-1-kuba@kernel.org>
-In-Reply-To: <20250207183119.1721424-1-kuba@kernel.org>
-From: Mina Almasry <almasrymina@google.com>
-Date: Fri, 7 Feb 2025 10:32:50 -0800
-X-Gm-Features: AWEUYZnZliuX8rWa3MXmPQtRIn0btUOZFS0F9oDOzflkwn3pR8toh5q8iLYN5Ck
-Message-ID: <CAHS8izP8MtA=JKi+M9yEyXpNMhfVQB0_RF0kCJnwU+BAHpdeEw@mail.gmail.com>
-Subject: Re: [PATCH net-next] selftests: drv-net: remove an unnecessary libmnl include
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: davem@davemloft.net, netdev@vger.kernel.org, edumazet@google.com, 
-	pabeni@redhat.com, andrew+netdev@lunn.ch, horms@kernel.org, shuah@kernel.org, 
-	sdf@fomichev.me, jdamato@fastly.com, linux-kselftest@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v7 1/7] mfd: Add core driver for Nuvoton NCT6694
+To: Ming Yu <a0282524688@gmail.com>, tmyu0@nuvoton.com, lee@kernel.org,
+ linus.walleij@linaro.org, brgl@bgdev.pl, andi.shyti@kernel.org,
+ mkl@pengutronix.de, mailhol.vincent@wanadoo.fr, andrew+netdev@lunn.ch,
+ davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+ pabeni@redhat.com, wim@linux-watchdog.org, linux@roeck-us.net,
+ jdelvare@suse.com, alexandre.belloni@bootlin.com
+Cc: linux-kernel@vger.kernel.org, linux-gpio@vger.kernel.org,
+ linux-i2c@vger.kernel.org, linux-can@vger.kernel.org,
+ netdev@vger.kernel.org, linux-watchdog@vger.kernel.org,
+ linux-hwmon@vger.kernel.org, linux-rtc@vger.kernel.org,
+ linux-usb@vger.kernel.org
+References: <20250207074502.1055111-1-a0282524688@gmail.com>
+ <20250207074502.1055111-2-a0282524688@gmail.com>
+Content-Language: en-US, fr-FR
+From: Christophe JAILLET <christophe.jaillet@wanadoo.fr>
+In-Reply-To: <20250207074502.1055111-2-a0282524688@gmail.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
 
-On Fri, Feb 7, 2025 at 10:31=E2=80=AFAM Jakub Kicinski <kuba@kernel.org> wr=
-ote:
->
-> ncdevmem doesn't need libmnl, remove the unnecessary include.
->
-> Since YNL doesn't depend on libmnl either, any more, it's actually
-> possible to build selftests without having libmnl installed.
->
-> Signed-off-by: Jakub Kicinski <kuba@kernel.org>
+Le 07/02/2025 à 08:44, Ming Yu a écrit :
+> The Nuvoton NCT6694 is a peripheral expander with 16 GPIO chips,
+> 6 I2C controllers, 2 CANfd controllers, 2 Watchdog timers, ADC,
+> PWM, and RTC.
+> 
+> This driver implements USB device functionality and shares the
+> chip's peripherals as a child device.
+> 
+> Each child device can use the USB functions nct6694_read_msg()
+> and nct6694_write_msg() to issue a command. They can also request
+> interrupt that will be called when the USB device receives its
+> interrupt pipe.
 
-Whoops, sorry about that.
+...
 
-Reviewed-by: Mina Almasry <almasrymina@google.com>
+> +static struct irq_chip nct6694_irq_chip = {
 
---=20
-Thanks,
-Mina
+This could be const.
+
+(I'm working on a serie that should constify struct irq_chip, so this 
+one would already be done)
+
+> +	.name = "nct6694-irq",
+> +	.flags = IRQCHIP_SKIP_SET_WAKE,
+> +	.irq_bus_lock = nct6694_irq_lock,
+> +	.irq_bus_sync_unlock = nct6694_irq_sync_unlock,
+> +	.irq_enable = nct6694_irq_enable,
+> +	.irq_disable = nct6694_irq_disable,
+> +};
+> +
+> +static int nct6694_irq_domain_map(struct irq_domain *d, unsigned int irq,
+> +				  irq_hw_number_t hw)
+> +{
+> +	struct nct6694 *nct6694 = d->host_data;
+> +
+> +	irq_set_chip_data(irq, nct6694);
+> +	irq_set_chip_and_handler(irq, &nct6694_irq_chip, handle_simple_irq);
+> +
+> +	return 0;
+> +}
+
+...
+
+CJ
+
 
