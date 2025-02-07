@@ -1,312 +1,281 @@
-Return-Path: <netdev+bounces-163799-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-163800-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 933F6A2B97A
-	for <lists+netdev@lfdr.de>; Fri,  7 Feb 2025 04:10:35 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 56358A2B982
+	for <lists+netdev@lfdr.de>; Fri,  7 Feb 2025 04:13:20 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 3226C164F04
-	for <lists+netdev@lfdr.de>; Fri,  7 Feb 2025 03:10:34 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 47AD1188977F
+	for <lists+netdev@lfdr.de>; Fri,  7 Feb 2025 03:13:25 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 471E818DB14;
-	Fri,  7 Feb 2025 03:09:52 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 338BE13B29F;
+	Fri,  7 Feb 2025 03:13:16 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=fastly.com header.i=@fastly.com header.b="ro0LhLYG"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="lDgspSgW"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pj1-f49.google.com (mail-pj1-f49.google.com [209.85.216.49])
+Received: from mail-wm1-f45.google.com (mail-wm1-f45.google.com [209.85.128.45])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6E69918C91F
-	for <netdev@vger.kernel.org>; Fri,  7 Feb 2025 03:09:50 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.49
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 29EE310E9
+	for <netdev@vger.kernel.org>; Fri,  7 Feb 2025 03:13:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.45
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1738897792; cv=none; b=fLoasBjwGHPCUtGi0/odBWnJgdyevoC4LPKjVJQVxWCk9yExso9zVZKJNPqc2QH8p5YFCOSqorZ/57/Ad29cK3nSAe04TUpw3zJRSvPO3hPxvgOase82N6W4EneYuqLPBxa0bYXab5FytBlDh6fbsKGCB/eOlSiRC2fp/352Fsk=
+	t=1738897996; cv=none; b=AEUweU1dXYHXDRRuK23O9tvgcArqYZRIYmpIpPJGuXN+QNTB9hkZA+ZKK6LkkPPMonJfGL47lIyxpTQUPi1gMUBC6zoiQv8Ey2AoG3wGNofZiVtVDS4537iMqAGLvfQAV7HJ2urytBokUcy7jLU54bbIIbkLido2QkgL6+ajkzA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1738897792; c=relaxed/simple;
-	bh=TmFrieKafs0y9qgWW4DLzVPuAlNlJxW158B1qIqoulU=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=M0Sh8Lga/PW9zktw6rnWTYqjTY23anhggXLNQFj0e2sPv0mnheMUo0CvY3v5vcbL6ih/p0803pPkaXjR9x/w9Bm3RSg1i6t1ENDB3QFnKPUBS8czUY1SvNtmcli0Q8Yop9Pozx+ulltMSlX1fhX6tmnZwhmSn7tZhqzhZ+iXim4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fastly.com; spf=pass smtp.mailfrom=fastly.com; dkim=pass (1024-bit key) header.d=fastly.com header.i=@fastly.com header.b=ro0LhLYG; arc=none smtp.client-ip=209.85.216.49
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fastly.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=fastly.com
-Received: by mail-pj1-f49.google.com with SMTP id 98e67ed59e1d1-2fa2c456816so34757a91.1
-        for <netdev@vger.kernel.org>; Thu, 06 Feb 2025 19:09:50 -0800 (PST)
+	s=arc-20240116; t=1738897996; c=relaxed/simple;
+	bh=ZMX1B97Mlox5aghP7JZKu39Vqu64Bx2P2P2nHxEJmuA=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Content-Type; b=r9HGYbMedBQuRlSkV3ec1DUtKe4BMs1q5Tv+mjOXqb1qK2exoM9lyFihWn7XxzakXbqER2Lf+66uP/P947tEkktGPIowKJ8XPLGkalmFdYNHEXznXYbfOULB4NjfbpvryUtm7JsEKJQNJ8VBqAzXmjxaQlTV3b17zkEW/opPOpA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=lDgspSgW; arc=none smtp.client-ip=209.85.128.45
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-wm1-f45.google.com with SMTP id 5b1f17b1804b1-438d9c391fcso30845e9.0
+        for <netdev@vger.kernel.org>; Thu, 06 Feb 2025 19:13:13 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=fastly.com; s=google; t=1738897789; x=1739502589; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
+        d=google.com; s=20230601; t=1738897992; x=1739502792; darn=vger.kernel.org;
+        h=content-transfer-encoding:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=r7RUZIqHwLPt1JPkc0hYqOZYvl0G8thAspfJu2yEGWI=;
-        b=ro0LhLYGYhuzHAu/hNKV84xL1bFap2uUJXzsNfNRVLTFYRZwarmHfbdLqqXMt/E0YS
-         Uf81+eq8lqLvIUOlf5yQ69S0TQiNyOx7UQBq3w/7Oc6VyNpV2TW0RhZr2+FoTmpUbev0
-         DO2hVT7JH5LIjT2lHGD3CbpO9vCipb/DlUsQs=
+        bh=Z0VU6ylENWQne19YIy4mG95TY/8BJ5b12cNwMUco42s=;
+        b=lDgspSgWy9/KPpsA8OjNiSgdty1/n9yzWR0ib6m6jqhrFclM4XEtnqaAdH6cuh4bA+
+         FB4neDE1WVUjVYw85BTvLuxF2tpG9Dlwx2liVdO5qd3Omtb9pzOCVVWYPtSvGWu4jIPT
+         4CqR8fONj6mVVFtkoXvlyZBNiGSh2LoXEfjXeNChITCpiGkC6koaTXsGhKxpTTeSVKKt
+         qaTCiMsWTMpBhSWkxo8UUGmbCDcZ+xguveJI3kmdz+EpJftzPF4OVWoPqUckqt28hZGs
+         BXFsjySOgY4qtR8QigVHP4fKlhiWzztJQJtPCBghjiP84t8SGRUXY95eQDFkMGNjbTWc
+         AOCg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1738897789; x=1739502589;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
+        d=1e100.net; s=20230601; t=1738897992; x=1739502792;
+        h=content-transfer-encoding:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=r7RUZIqHwLPt1JPkc0hYqOZYvl0G8thAspfJu2yEGWI=;
-        b=WXwbhyOgYh57kAAAOrar197uQYFG/RkSw6BBoDKwfy9+KEZlk0TxrvCU8SJy5Khp7s
-         B7pqsAQkgTZwveRiGI1X4iuYMysiBHb8m1Z3PYnlwwz/fPD242nciDqHcWHlTopF0db5
-         K5R/A3A9SdWJ7Nf7PUYL2Era8UlYj9USp3cj6WsM2/y1PP0D5bKd0DVC4leHiIqKW8FT
-         T1yDeNV51NxV7ppiZkCNhv0VoBh19YooRdJ8cDLTNFv/SVyWGZE5IQmhpPYhSkGUQcYI
-         A3xrrRKJZGMEuaXS/VkDVlJYAmcTkNy7f3Tp7DTgmOTcCjpIUmHsj/C/i7a3axvJOoQz
-         7Z5A==
-X-Gm-Message-State: AOJu0YyA2R9bOtJEFUquVDq+d1wH0kXMahUsIno8NlAViTt/ukKUcwiz
-	qs0o0e31POV2nIqeKYDTQxDnLOO06lxvGrIy6HV3qwhyyop/uakMiA6WdHlyTM1HTnDDuuHBgU1
-	dV7rAJz45fUaZvogofPaEK70g7UUeuEH4tCXY0kA/vL0KoY1flMpUzz9lB+qt82q9CWKmkOrAFJ
-	FMx9hCZ83/o8DGY7YUgwpJN411GWp8b3uxCIA=
-X-Gm-Gg: ASbGncviCQgmv94WJRt/+M+Yszc1CTxrDLMnvpmFD6R02aItfTq3nMR5ZH1Bz0kVxjp
-	ugt+App5HNOnfQf0Ov6mF2egdLp5V50uLOQYiMLQHxAkPPxHPbRl1hJ1+k157PVQdoLvBTb4hIj
-	G70HSKq3YETYiZwXGcUT+jZ3dou/TCfLO0XuMk6jxAgbRpI31vvLT/Sxw0LKgtofhDAMz0Be1H9
-	I5QLy1pxL5WVSlfXiZmfSxcsbzM3yrZCCcwzwCOGGDsRFOWwFSroLkllO6tZqsO5A6vnbuUXebW
-	qPntDixT7zdGwkBYaZ5XvCs=
-X-Google-Smtp-Source: AGHT+IE/mTf+RgI6SASTcTKQhP0AQNPSWXueq68RE7gGuzT1ocUjhsKBGM/Nermff6/ehihz9yHN/g==
-X-Received: by 2002:a17:90b:234e:b0:2f4:4500:bb4d with SMTP id 98e67ed59e1d1-2fa24175d44mr2496123a91.20.1738897788831;
-        Thu, 06 Feb 2025 19:09:48 -0800 (PST)
-Received: from localhost.localdomain ([2620:11a:c019:0:65e:3115:2f58:c5fd])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-21f368ab196sm20348955ad.222.2025.02.06.19.09.47
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 06 Feb 2025 19:09:48 -0800 (PST)
-From: Joe Damato <jdamato@fastly.com>
-To: netdev@vger.kernel.org
-Cc: pabeni@redhat.com,
-	edumazet@google.com,
-	sridhar.samudrala@intel.com,
-	Joe Damato <jdamato@fastly.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Shuah Khan <shuah@kernel.org>,
-	Alexei Starovoitov <ast@kernel.org>,
-	Daniel Borkmann <daniel@iogearbox.net>,
-	Jesper Dangaard Brouer <hawk@kernel.org>,
-	John Fastabend <john.fastabend@gmail.com>,
-	linux-kernel@vger.kernel.org (open list),
-	linux-kselftest@vger.kernel.org (open list:KERNEL SELFTEST FRAMEWORK),
-	bpf@vger.kernel.org (open list:XDP (eXpress Data Path):Keyword:(?:\b|_)xdp(?:\b|_))
-Subject: [PATCH net-next v4 3/3] selftests: drv-net: Test queue xsk attribute
-Date: Fri,  7 Feb 2025 03:08:55 +0000
-Message-ID: <20250207030916.32751-4-jdamato@fastly.com>
-X-Mailer: git-send-email 2.43.0
-In-Reply-To: <20250207030916.32751-1-jdamato@fastly.com>
-References: <20250207030916.32751-1-jdamato@fastly.com>
+        bh=Z0VU6ylENWQne19YIy4mG95TY/8BJ5b12cNwMUco42s=;
+        b=jDh9PzezUYKQvCi7qySXB0fhDnD1kCJAUibS7BvMiTaAPyncyHo5sjDRvTJqM+vSwi
+         cyIJMOB0KedRbTWp3+5rXjV1/PHuT+PjvSHY7UE13MUXRirUv3+8H7opriqB1IOKcpBb
+         sDX8pGQee/WpNxjqC37ozGAZlkrmIN8AvVpMuUWBIWH9+zay6eEIJ/MNtctoR1QMgTW+
+         1abEFIj4Yc+96ivXW7rblKl6UINumN/HVGeIkD9tW+WCUzNadDBIr/QIXUXlq9+n9ElC
+         rkFd0QwLwC265m9qkegNx0IXQ8iy4zHXpZzhRcUFshK4sFYaBDeSKcyLvokKGGtQJcCF
+         tsyA==
+X-Forwarded-Encrypted: i=1; AJvYcCUf6zEtXvP9JFjG+WUziFTvuyeQLJJJDh+3b32GpJ05NdbfK0/0GY+ECdFYFXgA2lxOX6y+hHY=@vger.kernel.org
+X-Gm-Message-State: AOJu0YysLzNyg1RQaPrIzYbJuH8rfpPc0/yHR3fUR5j17+CuIsto+gz9
+	I8emBMO9SJMt6N8Sel5Q4iA8QFoSb12COMghrbbe2gPg8nOMxQNy/Gtk5FGc9zdt8EasfhE+pP7
+	Vt1y9lBQbUohDkM9BSIkGolOHKXE4HJxBLzgr
+X-Gm-Gg: ASbGncvVQD53VJ4OFppoOxa32sf88+br1hkn/Y5O0sqBzHocylI6hcEdmyXqaHNw+tO
+	WNBAN+qFbTaQ2preiwc/GwSLfOwY0US5C3Q4LzbT2tlRGAQmjMWNMzlUjBaBlM7shFNd5WSdAF9
+	rLEWTHTL2bmgcjEKUD0ErGHkCMPEQaHw==
+X-Google-Smtp-Source: AGHT+IE7+jfBYInJx2BCah/D4tVU5LhjaMnABqhGnmzKK50VapgUDzBX+++RLsfN6WWHCupQW7ebgPLNh3OxAghyaCc=
+X-Received: by 2002:a05:600c:568f:b0:42c:9e35:cde6 with SMTP id
+ 5b1f17b1804b1-439252682demr588935e9.2.1738897992111; Thu, 06 Feb 2025
+ 19:13:12 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+References: <20250205001052.2590140-1-skhawaja@google.com> <Z6LYjHJxx0pI45WU@LQ3V64L9R2>
+ <Z6UnSe1CGdeNSv2q@LQ3V64L9R2> <CAAywjhQAb+ExOuPo33ahT68592M4FDNuWx0ieVqevBfNR-Q5TQ@mail.gmail.com>
+ <Z6U8Smr1rwMDHvEm@LQ3V64L9R2>
+In-Reply-To: <Z6U8Smr1rwMDHvEm@LQ3V64L9R2>
+From: Samiullah Khawaja <skhawaja@google.com>
+Date: Thu, 6 Feb 2025 19:13:00 -0800
+X-Gm-Features: AWEUYZla2SWAUY96jdfj4QXqNthKLYivNQbeqYRB-3fSarc2FXE8PhgxpIhoA-U
+Message-ID: <CAAywjhQ+KBTaqQ=jtOtpx9+82ToOid5n06+NdqLX_iDhH7SQcA@mail.gmail.com>
+Subject: Re: [PATCH net-next v3 0/4] Add support to do threaded napi busy poll
+To: Joe Damato <jdamato@fastly.com>, Samiullah Khawaja <skhawaja@google.com>, 
+	Jakub Kicinski <kuba@kernel.org>, "David S . Miller" <davem@davemloft.net>, 
+	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, almasrymina@google.com, 
+	netdev@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Test that queues which are used for AF_XDP have the xsk nest attribute.
-The attribute is currently empty, but its existence means the AF_XDP is
-being used for the queue.
-
-Signed-off-by: Joe Damato <jdamato@fastly.com>
-Suggested-by: Jakub Kicinski <kuba@kernel.org>
----
- v3:
-   - Change comment style of helper C program to avoid kdoc warnings as
-     suggested by Jakub. No other changes.
-
- v2:
-   - Updated the Python test after changes to patch 1 which expose an
-     empty nest
-   - Updated Python test with general Python coding feedback
-
- .../testing/selftests/drivers/net/.gitignore  |  2 +
- tools/testing/selftests/drivers/net/Makefile  |  3 +
- tools/testing/selftests/drivers/net/queues.py | 35 +++++++-
- .../selftests/drivers/net/xdp_helper.c        | 89 +++++++++++++++++++
- 4 files changed, 127 insertions(+), 2 deletions(-)
- create mode 100644 tools/testing/selftests/drivers/net/.gitignore
- create mode 100644 tools/testing/selftests/drivers/net/xdp_helper.c
-
-diff --git a/tools/testing/selftests/drivers/net/.gitignore b/tools/testing/selftests/drivers/net/.gitignore
-new file mode 100644
-index 000000000000..ec746f374e85
---- /dev/null
-+++ b/tools/testing/selftests/drivers/net/.gitignore
-@@ -0,0 +1,2 @@
-+# SPDX-License-Identifier: GPL-2.0-only
-+xdp_helper
-diff --git a/tools/testing/selftests/drivers/net/Makefile b/tools/testing/selftests/drivers/net/Makefile
-index c7f1c443f2af..81961c6e059d 100644
---- a/tools/testing/selftests/drivers/net/Makefile
-+++ b/tools/testing/selftests/drivers/net/Makefile
-@@ -1,10 +1,13 @@
- # SPDX-License-Identifier: GPL-2.0
-+CFLAGS += $(KHDR_INCLUDES)
- 
- TEST_INCLUDES := $(wildcard lib/py/*.py) \
- 		 $(wildcard lib/sh/*.sh) \
- 		 ../../net/net_helper.sh \
- 		 ../../net/lib.sh \
- 
-+TEST_GEN_PROGS := xdp_helper
-+
- TEST_PROGS := \
- 	netcons_basic.sh \
- 	netcons_fragmented_msg.sh \
-diff --git a/tools/testing/selftests/drivers/net/queues.py b/tools/testing/selftests/drivers/net/queues.py
-index 38303da957ee..55c2b296ad3c 100755
---- a/tools/testing/selftests/drivers/net/queues.py
-+++ b/tools/testing/selftests/drivers/net/queues.py
-@@ -8,7 +8,10 @@ from lib.py import NetDrvEnv
- from lib.py import cmd, defer, ip
- import errno
- import glob
--
-+import os
-+import socket
-+import struct
-+import subprocess
- 
- def sys_get_queues(ifname, qtype='rx') -> int:
-     folders = glob.glob(f'/sys/class/net/{ifname}/queues/{qtype}-*')
-@@ -21,6 +24,34 @@ def nl_get_queues(cfg, nl, qtype='rx'):
-         return len([q for q in queues if q['type'] == qtype])
-     return None
- 
-+def check_xdp(cfg, nl, xdp_queue_id=0) -> None:
-+    test_dir = os.path.dirname(os.path.realpath(__file__))
-+    xdp = subprocess.Popen([f"{test_dir}/xdp_helper", f"{cfg.ifindex}", f"{xdp_queue_id}"],
-+                           stdin=subprocess.PIPE, stdout=subprocess.PIPE, bufsize=1,
-+                           text=True)
-+    defer(xdp.kill)
-+
-+    stdout, stderr = xdp.communicate(timeout=10)
-+    rx = tx = False
-+
-+    queues = nl.queue_get({'ifindex': cfg.ifindex}, dump=True)
-+    if not queues:
-+        raise KsftSkipEx("Netlink reports no queues")
-+
-+    for q in queues:
-+        if q['id'] == 0:
-+            if q['type'] == 'rx':
-+                rx = True
-+            if q['type'] == 'tx':
-+                tx = True
-+
-+            ksft_eq(q['xsk'], {})
-+        else:
-+            if 'xsk' in q:
-+                _fail("Check failed: xsk attribute set.")
-+
-+    ksft_eq(rx, True)
-+    ksft_eq(tx, True)
- 
- def get_queues(cfg, nl) -> None:
-     snl = NetdevFamily(recv_size=4096)
-@@ -81,7 +112,7 @@ def check_down(cfg, nl) -> None:
- 
- def main() -> None:
-     with NetDrvEnv(__file__, queue_count=100) as cfg:
--        ksft_run([get_queues, addremove_queues, check_down], args=(cfg, NetdevFamily()))
-+        ksft_run([get_queues, addremove_queues, check_down, check_xdp], args=(cfg, NetdevFamily()))
-     ksft_exit()
- 
- 
-diff --git a/tools/testing/selftests/drivers/net/xdp_helper.c b/tools/testing/selftests/drivers/net/xdp_helper.c
-new file mode 100644
-index 000000000000..b04d4e0ea30a
---- /dev/null
-+++ b/tools/testing/selftests/drivers/net/xdp_helper.c
-@@ -0,0 +1,89 @@
-+// SPDX-License-Identifier: GPL-2.0
-+#include <stdio.h>
-+#include <stdlib.h>
-+#include <string.h>
-+#include <unistd.h>
-+#include <sys/mman.h>
-+#include <sys/socket.h>
-+#include <linux/if_xdp.h>
-+#include <linux/if_link.h>
-+#include <net/if.h>
-+#include <inttypes.h>
-+
-+#define UMEM_SZ (1U << 16)
-+#define NUM_DESC (UMEM_SZ / 2048)
-+
-+/* this is a simple helper program that creates an XDP socket and does the
-+ * minimum necessary to get bind() to succeed.
-+ *
-+ * this test program is not intended to actually process packets, but could be
-+ * extended in the future if that is actually needed.
-+ *
-+ * it is used by queues.py to ensure the xsk netlinux attribute is set
-+ * correctly.
-+ */
-+int main(int argc, char **argv)
-+{
-+	struct xdp_umem_reg umem_reg = { 0 };
-+	struct sockaddr_xdp sxdp = { 0 };
-+	int num_desc = NUM_DESC;
-+	void *umem_area;
-+	int ifindex;
-+	int sock_fd;
-+	int queue;
-+	char byte;
-+
-+	if (argc != 3) {
-+		fprintf(stderr, "Usage: %s ifindex queue_id", argv[0]);
-+		return 1;
-+	}
-+
-+	sock_fd = socket(AF_XDP, SOCK_RAW, 0);
-+	if (sock_fd < 0) {
-+		perror("socket creation failed");
-+		return 1;
-+	}
-+
-+	ifindex = atoi(argv[1]);
-+	queue = atoi(argv[2]);
-+
-+	umem_area = mmap(NULL, UMEM_SZ, PROT_READ | PROT_WRITE, MAP_PRIVATE |
-+			MAP_ANONYMOUS, -1, 0);
-+	if (umem_area == MAP_FAILED)
-+		return -1;
-+
-+	umem_reg.addr = (uintptr_t)umem_area;
-+	umem_reg.len = UMEM_SZ;
-+	umem_reg.chunk_size = 2048;
-+	umem_reg.headroom = 0;
-+
-+	setsockopt(sock_fd, SOL_XDP, XDP_UMEM_REG, &umem_reg,
-+		   sizeof(umem_reg));
-+	setsockopt(sock_fd, SOL_XDP, XDP_UMEM_FILL_RING, &num_desc,
-+		   sizeof(num_desc));
-+	setsockopt(sock_fd, SOL_XDP, XDP_UMEM_COMPLETION_RING, &num_desc,
-+		   sizeof(num_desc));
-+	setsockopt(sock_fd, SOL_XDP, XDP_RX_RING, &num_desc, sizeof(num_desc));
-+
-+	sxdp.sxdp_family = AF_XDP;
-+	sxdp.sxdp_ifindex = ifindex;
-+	sxdp.sxdp_queue_id = queue;
-+	sxdp.sxdp_flags = 0;
-+
-+	if (bind(sock_fd, (struct sockaddr *)&sxdp, sizeof(sxdp)) != 0) {
-+		perror("bind failed");
-+		close(sock_fd);
-+		return 1;
-+	}
-+
-+	/* give the parent program some data when the socket is ready*/
-+	fprintf(stdout, "%d\n", sock_fd);
-+
-+	/* parent program will write a byte to stdin when its ready for this
-+	 * helper to exit
-+	 */
-+	read(STDIN_FILENO, &byte, 1);
-+
-+	close(sock_fd);
-+	return 0;
-+}
--- 
-2.43.0
-
+On Thu, Feb 6, 2025 at 2:48=E2=80=AFPM Joe Damato <jdamato@fastly.com> wrot=
+e:
+>
+> On Thu, Feb 06, 2025 at 02:06:14PM -0800, Samiullah Khawaja wrote:
+> > On Thu, Feb 6, 2025 at 1:19=E2=80=AFPM Joe Damato <jdamato@fastly.com> =
+wrote:
+> > >
+> > > On Tue, Feb 04, 2025 at 07:18:36PM -0800, Joe Damato wrote:
+> > > > On Wed, Feb 05, 2025 at 12:10:48AM +0000, Samiullah Khawaja wrote:
+> > > > > Extend the already existing support of threaded napi poll to do c=
+ontinuous
+> > > > > busy polling.
+> > > >
+> > > > [...]
+> > > >
+> > > > Overall, +1 to everything Martin said in his response. I think I'd
+> > > > like to try to reproduce this myself to better understand the state=
+d
+> > > > numbers below.
+> > > >
+> > > > IMHO: the cover letter needs more details.
+> > > >
+> > > > >
+> > > > > Setup:
+> > > > >
+> > > > > - Running on Google C3 VMs with idpf driver with following config=
+urations.
+> > > > > - IRQ affinity and coalascing is common for both experiments.
+> > > >
+> > > > As Martin suggested, a lot more detail here would be helpful.
+> > >
+> > > Just to give you a sense of the questions I ran into while trying to
+> > > reproduce this just now:
+> > >
+> > > - What is the base SHA? You should use --base when using git
+> > >   format-patch. I assumed the latest net-next SHA and applied the
+> > >   patches to that.
+> > Yes that is true. I will use --base when I do it next. Thanks for the
+> > suggestion.
+> > >
+> > > - Which C3 instance type? I chose c3-highcpu-192-metal, but I could
+> > >   have chosen c3-standard-192-metal, apparently. No idea what
+> > >   difference this makes on the results, if any.
+> > The tricky part is that the c3 instance variant that I am using for
+> > dev is probably not available publicly.
+>
+> Can you use a publicly available c3 instance type instead? Maybe you
+> can't, and if so you should probably mention that it's an internal
+> c3 image and can't be reproduced on the public c3's because of XYZ
+> in the cover letter.
+>
+> > It is a variant of c3-standard-192-metal but we had to enable
+> > AF_XDP on it to make it stable to be able to run onload. You will
+> > have to reproduce this on a platform available to you with AF_XDP
+> > as suggested in the onload github I shared. This is the problem
+> > with providing an installer/runner script and also system
+> > configuration. My configuration would not be best for your
+> > platform, but you should certainly be able to reproduce the
+> > relative improvements in latency using the different busypolling
+> > schemes (busy_read/busy_poll vs threaded napi busy poll) I
+> > mentioned in the cover letter.
+>
+> Sorry, I still don't agree. Just because your configuration won't
+> work for me out of the box is, IMHO, totally unrelated to what
+> Martin and I are asking for.
+>
+> I won't speak for Martin, but I am saying that the configuration you
+> are using should be thoroughly documented so that I can at least
+> understand it and how I might reproduce it.
+I provided all the relevant configuration I used that you can apply on
+your platform. Later also provided the IRQ routing and thread affinity
+as Martin asked, but as you can see it is pretty opaque and irrelevant
+to the experiment I am doing and it also depends on the platform you
+use. But I can add those to the cover letter next time. Specifically I
+will add the following plus the things that I already provided,
+- interrupt routing
+- any thread affinity
+- number of queues (already added)
+- threaded napi enablement (with affinity)
+>
+> > >
+> > > - Was "tier 1 networking" enabled? I enabled it. No idea if it
+> > >   matters or not. I assume not, since it would be internal
+> > >   networking within the GCP VPC of my instances and not real egress?
+> > >
+> > > - What version of onload was used? Which SHA or release tag?
+> > v9.0, I agree this should be added to the cover letter.
+>
+> To the list of things to add to the cover letter:
+>   - What OS and version are you using?
+>   - How many runs of neper? It seems like it was just 1 run. Is that
+>     sufficient? I'd argue you need to re-run the experiment many
+>     times, with different message sizes, queue counts, etc and
+>     compute some statistical analysis of the results.
+>
+> > >
+> > > - I have no idea where to put CPU affinity for the 1 TX/RX queue, I
+> > >   assume CPU 2 based on your other message.
+> > Yes I replied to Martin with this information, but like I said it
+> > certainly depends on your platform and hence didn't include it in the
+> > cover letter. Since I don't know what/where core 2 looks like on your
+> > platform.
+>
+> You keep referring to "your platform" and I'm still confused.
+>
+> Don't you think it's important to properly document _your setup_,
+> including mentioning that core 2 is used for the IRQ and the
+> onload+neper runs on other cores? Maybe I missed it in the cover
+> letter, but that details seems pretty important for analysis,
+> wouldn't you agree?
+Respectfully I think here you are again confusing things, napi
+threaded polling is running in a separate core (2). And the cover
+letter clearly states the following about the experiment.
+```
+Here with NAPI threaded busy poll in a separate core, we are able to
+consistently poll the NAPI to keep latency to absolute minimum.
+```
+>
+> Even if my computer is different, there should be enough detail for
+> me to form a mental model of what you are doing so that I can think
+> through it, understand the data, and, if I want to, try to reproduce
+> it.
+I agree to this 100% and I will fill in the interrupt routing and
+other affinity info so it gives you a mental model, that is I am doing
+a comparison between sharing a core between application processing and
+napi processing vs doing napi processing in dedicated cores. I want to
+focus on the premise of the problem/use case I am trying to solve. I
+mentioned this in the cover letter, but it seems you are looking for
+specifics however irrelevant they might be to your platform. I will
+put those in the next iteration.
+>
+> > >
+> > > - The neper commands provided seem to be the server side since there
+> > >   is no -c mentioned. What is the neper client side command?
+> > Same command with -c
+> > >
+> > > - What do the environment variables set for onload+neper mean?
+> > >
+> > > ...
+> > >
+> > > Do you follow what I'm getting at here? The cover lacks a tremendous
+> > > amount of detail that makes reproducing the setup you are using
+> > > unnecessarily difficult.
+> > >
+> > > Do you agree that I should be able to read the cover letter and, if
+> > > so desired, go off and reproduce the setup and get similar results?
+> > Yes you should be able to that, but there are micro details of your
+> > platform and configuration that I have no way of knowing and suggest
+> > configurations. I have certainly pointed out the relevant environment
+> > and special configurations (netdev queues sizes, sysctls, irq defer,
+> > neper command and onload environment variables) that I did for each
+> > test case in my experiment. Beyond that I have no way of providing you
+> > an internal C3 platform or providing system configuration for your
+> > platform.
+>
+> I'm going to let the thread rest at this point; I just think we are
+> talking past each other here and it just doesn't feel productive.
+>
+> You are saying that your platform and configuration are not publicly
+> available, there are too many "micro details", and that you can't
+> suggest a configuration for my computer, which is sure to be wildly
+> different.
+>
+> I keep repeating this, but I'll repeat it more explicitly: I'm not
+> asking you to suggest a configuration to me for my computer.
+>
+> I'm asking you to thoroughly, rigorously, and verbosely document
+> what _exactly_ *your setup* is, precisely how it is configured, and
+> all the versions and SHAs of everything so that if I want to try to
+> reproduce it I have enough information in order to do so.
+>
+> With your cover letter as it stands presently: this is not possible.
+>
+> Surely, if I can run neper and get a latency measurement, I can run
+> a script that you wrote which measures CPU cycles using a publicly
+> available tool, right? Then at least we are both measuring CPU
+> consumption the same way and can compare latency vs CPU tradeoff
+> results based on the same measurement.
+I am not considering the CPU/Latency tradeoff since my use case
+requires consistent latency. This is very apparent when the core is
+shared between application processing and napi processing and it is
+pretty intuitive. I think affinity info and the mental model you are
+looking for would probably make this more apparent.
+>
+> By providing better documentation, you make it more likely that
+> other people will try to reproduce your results. The more people who
+> reproduce your results, the stronger the argument to get this merged
+> becomes.
 
