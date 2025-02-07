@@ -1,108 +1,106 @@
-Return-Path: <netdev+bounces-163872-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-163873-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id C896EA2BE3C
-	for <lists+netdev@lfdr.de>; Fri,  7 Feb 2025 09:40:40 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 37E53A2BE3F
+	for <lists+netdev@lfdr.de>; Fri,  7 Feb 2025 09:41:42 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 165387A594A
-	for <lists+netdev@lfdr.de>; Fri,  7 Feb 2025 08:38:35 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 251F47A5016
+	for <lists+netdev@lfdr.de>; Fri,  7 Feb 2025 08:39:13 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 611FE238734;
-	Fri,  7 Feb 2025 08:37:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8AAB81A9B3B;
+	Fri,  7 Feb 2025 08:38:47 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="30aOKOyF"
+	dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="DNG3E55o";
+	dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="KZWqJSd9"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-f54.google.com (mail-ed1-f54.google.com [209.85.208.54])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from galois.linutronix.de (Galois.linutronix.de [193.142.43.55])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 96AB5237716
-	for <netdev@vger.kernel.org>; Fri,  7 Feb 2025 08:37:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.54
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E19CB7DA8C
+	for <netdev@vger.kernel.org>; Fri,  7 Feb 2025 08:38:44 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=193.142.43.55
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1738917460; cv=none; b=CdPsC6H84JLCE3e5PxPJB6wNuEXcM9bbMCDaH7ToyywBN6Sbyd+x3/rM9wFz5pPAdYaTeVbQTZ7dzF2c0KxBkqnWYoZt6EnD1Kq9M32a4JGz195IYv7RoLDt9QKDr8Lx40RtiX3wtgnpEZoFEQ3aPkU7IebyudyL18RJm1/LstQ=
+	t=1738917527; cv=none; b=t980BMOaKJ1vMTdmcaX25pOsH8vIFeV7ZDGkUI1TCnu/xl9QBNAnk9zUY6BGrWrbbzOgg5CXycgC7ht+VH0P1bFCIrvC6SHo9jKWK9CEUUESLnwHipMZJ0GpbEWuu/gXj8dvPf9RyxMhy8i3RuIKsSIDMinRd2Ce0Dm+9Qg4iOc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1738917460; c=relaxed/simple;
-	bh=uI4TlHZZiIwqBWmNQc1Th593qKERIXWU7cw6B+hkRZQ=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=FMky8A+GbDw3+BQV2I+k3ZuVi40CieFy+tXdP3HrlC+ay1n9MPoeYP+GP/0jTTLg+wtOkNvqw+qs8TjS2SOhh0RCkL0M8+upG2CB/EMFJH7qSnSvhq/Z1wVXahJE0I7+VRxx7qp6SVuJuJv9HvDG++gOLfSpMuhQZITyWiI54Xs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=30aOKOyF; arc=none smtp.client-ip=209.85.208.54
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-ed1-f54.google.com with SMTP id 4fb4d7f45d1cf-5de4f4b0e31so197142a12.0
-        for <netdev@vger.kernel.org>; Fri, 07 Feb 2025 00:37:38 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1738917457; x=1739522257; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=iIzAgXfTA/p0WCNTKl+kHVHAiTN250dD80Bu/crNQVQ=;
-        b=30aOKOyFKJriHNHxfzdDtdPQhMbETjUHWuoz3UGhqZNLy/bElyY54g9H3tkswLxJop
-         I9ROKCTNJTXtJecO8995f4DEZRmfQeUPOB2K34SW/X7JBLZNIripoRHYF+TIMjGyuz0G
-         l8Vzx2xSn9JfcJh7wkdqjlFY0I2Gsa3So9SkDyWeUrruLsezQ3YHf4MIGkELGb3LOswA
-         IbIER5DUzLQ/Zbn8em7ryJRHmBfa+CLniv02GfDiCgjmQqgKmb0Izx7bgpC+F3yosspS
-         XpfqUgruO8CdlrkVgOKnl49OsKmZa0CSS2Zm8ZCnXK1NJDBswUtu300FQJxNi/nXVoIF
-         yb4w==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1738917457; x=1739522257;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=iIzAgXfTA/p0WCNTKl+kHVHAiTN250dD80Bu/crNQVQ=;
-        b=pUMuFC3oFWxamjnLvBTiVH4Rjrig2WEs+4LyStEpe1LZvIY8DiHaVDx/RKMj42oH/u
-         q7tpzch4rdRZd2c59f+dxJ+JNiWenxT8JzEPXLz1Kycduqgp65O1HCfZWhicIk28iRiz
-         IdnuWsCjvk/E6Tk7eLqkq2V1t/6juD9ozVncvgJ+8jecaKs/ymKmB6BlgbBFBIXlNszO
-         34JPTglIe0wVxpTlk/8oWpu3kpS2ST593NLOv/dxKlCNXswx2s4hGOr/5LsSr0p9KY4V
-         aTtaXqpCNOeoo7X+5PWp9YXSHUUslXJk0CA+J5//8ZG6Ac8/Yt5ujNhs8sjon8lQD5ZN
-         UZsw==
-X-Forwarded-Encrypted: i=1; AJvYcCVjwL1JyyasdhUE3ATnnpq4H9T6J80fUM/lNPsgcDFpVnxlBoBSdZ7LL+tCgab3ij5UZMxJqrs=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yy+d3LRqch7iaWN8lyBTZLGQMuN20A800cseH5zrT4WizBmBf8h
-	ZHjD6jsuylQebKKGDwwKIyOg/uGfFEGfF+xHu1TVsONT27DSCC9c+kE5JZDqXoENLOb64C90/M/
-	vPf+YBBL+ShF1cc4tnTFrvyZdkspGuYzygKPw
-X-Gm-Gg: ASbGnctO/ZZ8ONEJObbnpHnuM+SZ/+TkNJhp6/ADc3IlJaGPX2AmfsThFHouGXbGJ6q
-	usri483nPNWC0fhGYbC8NNqPDskpmol2xsTj5fnixXginCfJLvY+ENvEBN8BNPpOTemFWL4Fg
-X-Google-Smtp-Source: AGHT+IFHyU70Tvk2QvIdFy7JmMG2/aC0AHs0JE+dBv7iYJhqk6AwTtzgymHVWv9L8SmeL9uahwra+DySC1B8vkRWowA=
-X-Received: by 2002:a05:6402:3907:b0:5dc:74f1:8a31 with SMTP id
- 4fb4d7f45d1cf-5de450b0d02mr2233560a12.26.1738917456655; Fri, 07 Feb 2025
- 00:37:36 -0800 (PST)
+	s=arc-20240116; t=1738917527; c=relaxed/simple;
+	bh=/YUQ/fILgc54btr/46zTjALdXn3Fvk+L2rzUrK8Xock=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version:Content-Type; b=rnRHQrx5og2HuceKnGWINzl8cmQYl9qmxPnCwxB+ML9TMNA1TDsRMg8Lhmlr7nzQcHKrCkX1cQb7YUo0sAMhLov1bfQ8MKo0MxyqhcViI8m1mB+3VCSJ0D7NrihFtsF8wP9KBCDGY2IR9fqG9nKkWcd9ziH3MZyHfwF4nXRjH5E=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de; spf=pass smtp.mailfrom=linutronix.de; dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=DNG3E55o; dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=KZWqJSd9; arc=none smtp.client-ip=193.142.43.55
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linutronix.de
+From: Kurt Kanzenbach <kurt@linutronix.de>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linutronix.de;
+	s=2020; t=1738917523;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type;
+	bh=/YUQ/fILgc54btr/46zTjALdXn3Fvk+L2rzUrK8Xock=;
+	b=DNG3E55oMumLP+OxTyPwucv7X27zS2lm28lD9JC5O3D1lSclgyqRTlD51/SYyB3QvhyeYa
+	Axi2kibW0OazKV1yYwnzcdcZy9s8ZhnM+lDUKbAgWVsenaNsDH79mK+dp+UtgaQ2rtgUJx
+	5VR2Kwdo56S5B2YIzwqzmD0r+EC1Kn7glZ0UcVOKqq8rSpKzX5wCouOMqzJnBUAWD5tCP1
+	aWTqa7ir/hqH2dK+/6PROG+QVyweAnEUWuB1iF/K9mstj+oCqMp56fmBfnAlzfVwhO95+3
+	Vxn63ioKHkK3q0RiLmywW5E7nZx7rBcigbVMU47Wv0yEyeyTHWYYybFKLTCrtg==
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=linutronix.de;
+	s=2020e; t=1738917523;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type;
+	bh=/YUQ/fILgc54btr/46zTjALdXn3Fvk+L2rzUrK8Xock=;
+	b=KZWqJSd90PgDReyirmGu+baYSzWqBPR4NT8ZJ9cY8gcXdRIvI7NAQ4M+khb7ohE0rzAiik
+	F0PXrhhbHST/0oCg==
+To: Joe Damato <jdamato@fastly.com>
+Cc: Sebastian Andrzej Siewior <bigeasy@linutronix.de>, Stanislav Fomichev
+ <sdf@fomichev.me>, netdev@vger.kernel.org,
+ intel-wired-lan@lists.osuosl.org
+Subject: igb: XDP/ZC busy polling
+Date: Fri, 07 Feb 2025 09:38:41 +0100
+Message-ID: <871pwa6tf2.fsf@kurt.kurt.home>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250207072502.87775-1-kuniyu@amazon.com>
-In-Reply-To: <20250207072502.87775-1-kuniyu@amazon.com>
-From: Eric Dumazet <edumazet@google.com>
-Date: Fri, 7 Feb 2025 09:37:25 +0100
-X-Gm-Features: AWEUYZkJSLIUmNEL4hQzqVv72CWfoiQTtgeB-h3EINFG4fAE6TRY47A76MUwYBI
-Message-ID: <CANn89iLRX3Hg1jvoBrYbRf3NgmBzXVKWNMXUZ-zppG4LdK5yiw@mail.gmail.com>
-Subject: Re: [PATCH v2 net-next 0/8] fib: rules: Convert RTM_NEWRULE and
- RTM_DELRULE to per-netns RTNL.
-To: Kuniyuki Iwashima <kuniyu@amazon.com>
-Cc: "David S. Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
-	Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, Ido Schimmel <idosch@idosch.org>, 
-	Kuniyuki Iwashima <kuni1840@gmail.com>, netdev@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: multipart/signed; boundary="=-=-=";
+	micalg=pgp-sha512; protocol="application/pgp-signature"
 
-On Fri, Feb 7, 2025 at 8:25=E2=80=AFAM Kuniyuki Iwashima <kuniyu@amazon.com=
-> wrote:
->
-> Patch 1 ~ 2 are small cleanup, and patch 3 ~ 8 make fib_nl_newrule()
-> and fib_nl_delrule() hold per-netns RTNL.
->
->
-> Changes:
->   v2:
->     * Add patch 4 & 5
->     * Don't use !!extack to check if RTNL is held
->
->   v1: https://lore.kernel.org/netdev/20250206084629.16602-1-kuniyu@amazon=
-.com/
->
+--=-=-=
+Content-Type: text/plain
 
-Reviewed-by: Eric Dumazet <edumazet@google.com>
+Hello Joe,
+
+I noticed that XDP/ZC busy polling does not work anymore in combination
+with igb driver. This seems to be related to commit 5ef44b3cb43b ("xsk:
+Bring back busy polling support") which relies on
+netif_queue_set_napi().
+
+I see you implemented it for e1000, igc and so on. However, igb is
+missing. Do you have any plans to add the missing registration to igb?
+Just asking. Otherwise, I can send a patch for it.
+
+Thanks,
+Kurt
+
+--=-=-=
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQJHBAEBCgAxFiEEvLm/ssjDfdPf21mSwZPR8qpGc4IFAmelxpETHGt1cnRAbGlu
+dXRyb25peC5kZQAKCRDBk9HyqkZzgra+D/wKi0eOYmVv55JcJAPC3Xn+o/z6WMtq
+B85O33kxcbKLdI4Q+VGbULeMUdJAo0BTdUJJTgFgFwlWQnLiD0XvHT6iduhL02/s
+Qa/pT4tGU5B6+fV6etQIs793r8ezrgHZkiPslAI2wHJ/9uWhQilGXPhw5j5sB5Gj
+qdSttpOGRgzxeKm5BroSkNBQ1uRV52rqedGGs4TMLq69/IS3B20tyT4ocphBB0Ig
+rQhWN1q6n9OLO8kQcuSIgqPhVdT4HRy0y4T4iHzoXmC4K2ixru7WlSdVHwdSn14K
+LaM8lzvUS3V+7OxJ4J3gSmrQDQi/SQ49bRMTUcsFc0lXJ5VSfe95Vhh7vGZplbyV
+eEDUHZV1doqBhEHMWlLWhUj62bMHHYYlLqnk891tJ3HH7Vg6qDRq48+rvq3l+cDx
+ARq8LYMurFk4u/3E2trAawqSjvojD8OIFuMpCM4ODzkHqtoBCQAIBE1y0x2jDbTt
+qHufPcfNmxSZ7/RpS8VzOKghRNkt6zr8XTfTNqdEQypcLfjLc1toH/nY2LPccSZR
+qxwRKhplh1MP/l+5ra7OZKU4IzM/jWiD/dCGwKD8bthdmWqJfbOYSyyRoU7Ss0V9
+i7LvonC4XtnfycNivIpG6JtG1X6xOdqUrmNkXMvzQ4LoiV1qIWJ9rSS+yw4j9Lk3
+AJoIsz2u6/tIWA==
+=p631
+-----END PGP SIGNATURE-----
+--=-=-=--
 
