@@ -1,55 +1,48 @@
-Return-Path: <netdev+bounces-164196-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-164197-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7538CA2CE27
-	for <lists+netdev@lfdr.de>; Fri,  7 Feb 2025 21:31:13 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6FBD5A2CE41
+	for <lists+netdev@lfdr.de>; Fri,  7 Feb 2025 21:41:55 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 80DE216B0EB
-	for <lists+netdev@lfdr.de>; Fri,  7 Feb 2025 20:31:11 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 8FAC1188F4D2
+	for <lists+netdev@lfdr.de>; Fri,  7 Feb 2025 20:42:00 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B6CA51ACEDF;
-	Fri,  7 Feb 2025 20:31:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 66C831B6CEF;
+	Fri,  7 Feb 2025 20:41:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=wanadoo.fr header.i=@wanadoo.fr header.b="TojjMHz8"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="rHE6+OT0"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.smtpout.orange.fr (smtp-72.smtpout.orange.fr [80.12.242.72])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0855B194C9E;
-	Fri,  7 Feb 2025 20:30:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=80.12.242.72
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3ECDC1B6547
+	for <netdev@vger.kernel.org>; Fri,  7 Feb 2025 20:41:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1738960260; cv=none; b=Z0rFEt2j3BrOzwoKKUSYuLQxuj8EP+sOuPadIEmjpE7JocvlJoMW1G23WDnbmky8u63Aw1ArUyDGNGjvINUN/+Gd7Gi65otPIwW3U8QLuYJNn2kw6lhRAg/QdySTuMoGfsD7Zx0ID0oryh+Tpr40dbnziUC1sRqJ5ZS/DBd57ME=
+	t=1738960889; cv=none; b=dpWc7cJJnBmAyti3yh8mfg9LDi54bb9Jd8CDzharPfqQmC3TdCRc5mxOAcpgNQlNWYY1NdTNvGDzeqbAEBVTUv/AKeZ34x7ZJX8VEPOEuWcA8kk7nlkRn964rBJM5aCp3GzH+AoqN6o9mWkMALaM+c0Wv1V7/rb4hh0+N/nWVgQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1738960260; c=relaxed/simple;
-	bh=5xCA2aFRWIHt9UXYtDkyYMN6nBFHc3iGvDF2cYwAjEI=;
+	s=arc-20240116; t=1738960889; c=relaxed/simple;
+	bh=F0ly61zN3/Kqry4N4YBUyRLu1aOn8+mXNNOAFb/71YY=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=Ll4eayEtJZBs1D7TdzOIYe1h5PaStTCG6VtlEj7epOJuiISn2Y0fjZ4/yGZs+YJi2P5jFVmrMqnvm+6j6SVKyfKDHiss3FA8Oeo3h2ajHeJ5ILIeMyhgak3haqCS1yfBxS3krZGUtFVz2/I7pKAGEOs7+ktQ+T03UitLC47NveU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=wanadoo.fr; spf=pass smtp.mailfrom=wanadoo.fr; dkim=pass (2048-bit key) header.d=wanadoo.fr header.i=@wanadoo.fr header.b=TojjMHz8; arc=none smtp.client-ip=80.12.242.72
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=wanadoo.fr
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=wanadoo.fr
-Received: from [192.168.1.37] ([90.11.132.44])
-	by smtp.orange.fr with ESMTPA
-	id gUzvtE7TuS3EkgUzztx5yo; Fri, 07 Feb 2025 21:30:54 +0100
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=wanadoo.fr;
-	s=t20230301; t=1738960254;
-	bh=v8RzLLz8uCfxpLBta41IG2wNm1yEnnjxj05C5WD4mOs=;
-	h=Message-ID:Date:MIME-Version:Subject:To:From;
-	b=TojjMHz8cfdFXLwbWT8w7XbHMiYM8vP1p/x6JCr68oFMahVzfgu/C1Jf9R/tcBHQs
-	 IzuZ4igAg8dwVzx+j7pnBWStOZGD6V5BPZ0fLCnulEhkXNrjHQvPEQ8o7jtKE7VIFB
-	 mtEc0AYTo8c4jYo+kKIFVxnQqss2l7fKHMjVI4XpNfycS2zr1pw7XKp1F0qRM/huU4
-	 9vHHF9Zi/bMqTgCYlRgNA3qZXveBQ+Oy8BL9U81m5BMqLgJQZppXkW1Ja36P/yOr1u
-	 L0oaW6UEtWtJUG0ZWua49q/+8OrFvsziOXBrnKw7Z1vfwS9yTe1jhTeOm3mxWA74Iz
-	 LRTMrr3BTIIaA==
-X-ME-Helo: [192.168.1.37]
-X-ME-Auth: bWFyaW9uLmphaWxsZXRAd2FuYWRvby5mcg==
-X-ME-Date: Fri, 07 Feb 2025 21:30:54 +0100
-X-ME-IP: 90.11.132.44
-Message-ID: <9b451153-41b4-4c15-a586-01cb5126e207@wanadoo.fr>
-Date: Fri, 7 Feb 2025 21:30:47 +0100
+	 In-Reply-To:Content-Type; b=ofqixbzii5aUMa44XO031F82QkQtPiv3fmFGBqsmTV3YECqEHEV51u7G3nZ2oUCLnu7ivOq9j+OfP8risg+2XuSKPdzijhKjzreRapVDs91uep8pcxkb8XxKP+wHx1abQai3rsLGDwoN5klFRieVpDDGDXTsdG+L2RDDS4a5xp0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=rHE6+OT0; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 37AD2C4CEE5;
+	Fri,  7 Feb 2025 20:41:28 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1738960888;
+	bh=F0ly61zN3/Kqry4N4YBUyRLu1aOn8+mXNNOAFb/71YY=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=rHE6+OT0kw/PjVBgdIXPRc5tKgnjmjTxebTf4rNn9+2N26Qob8Z+a9R5SjyhWwPQY
+	 lYH9vM/bi4IuYmKZc6JgFzbKAM6QnRKGMS87COrjTkYJ+2y62kmjMNRJGaU9y24PYP
+	 EMxvvmOjtMjSe3qpnBjg/IzmUItWEb+g0D1IsVDCYRkFQ4KdK/fGjmpo5mJz66CXmg
+	 Hypa10tfNuBIAAycmp/yyHbIojUruxmRnlWxAPt2o3FLkWkLGb6VPnItJfqYRdus+Y
+	 dg16hQCZjVxk252zH/i4jGbPH/qsQvy5WMj5UHStwgkMAQJP6oACNQI1p5FeJZh9jM
+	 OpDflVgZkZ/Xw==
+Message-ID: <d0dbc9e6-ca5d-41e1-ac98-855c3cfdaa59@kernel.org>
+Date: Fri, 7 Feb 2025 13:41:27 -0700
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -57,82 +50,36 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v7 5/7] watchdog: Add Nuvoton NCT6694 WDT support
-To: Ming Yu <a0282524688@gmail.com>, tmyu0@nuvoton.com, lee@kernel.org,
- linus.walleij@linaro.org, brgl@bgdev.pl, andi.shyti@kernel.org,
- mkl@pengutronix.de, mailhol.vincent@wanadoo.fr, andrew+netdev@lunn.ch,
- davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
- pabeni@redhat.com, wim@linux-watchdog.org, linux@roeck-us.net,
- jdelvare@suse.com, alexandre.belloni@bootlin.com
-Cc: linux-kernel@vger.kernel.org, linux-gpio@vger.kernel.org,
- linux-i2c@vger.kernel.org, linux-can@vger.kernel.org,
- netdev@vger.kernel.org, linux-watchdog@vger.kernel.org,
- linux-hwmon@vger.kernel.org, linux-rtc@vger.kernel.org,
- linux-usb@vger.kernel.org
-References: <20250207074502.1055111-1-a0282524688@gmail.com>
- <20250207074502.1055111-6-a0282524688@gmail.com>
-Content-Language: en-US, fr-FR
-From: Christophe JAILLET <christophe.jaillet@wanadoo.fr>
-In-Reply-To: <20250207074502.1055111-6-a0282524688@gmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH net 1/8] ndisc: ndisc_send_redirect() must use
+ dev_get_by_index_rcu()
+Content-Language: en-US
+To: Eric Dumazet <edumazet@google.com>, "David S . Miller"
+ <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>,
+ Paolo Abeni <pabeni@redhat.com>
+Cc: netdev@vger.kernel.org, Kuniyuki Iwashima <kuniyu@amazon.com>,
+ Simon Horman <horms@kernel.org>, eric.dumazet@gmail.com,
+ Stephen Suryaputra <ssuryaextr@gmail.com>
+References: <20250207135841.1948589-1-edumazet@google.com>
+ <20250207135841.1948589-2-edumazet@google.com>
+From: David Ahern <dsahern@kernel.org>
+In-Reply-To: <20250207135841.1948589-2-edumazet@google.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-Le 07/02/2025 à 08:45, Ming Yu a écrit :
-> This driver supports Watchdog timer functionality for NCT6694 MFD
-> device based on USB interface.
+On 2/7/25 6:58 AM, Eric Dumazet wrote:
+> ndisc_send_redirect() is called under RCU protection, not RTNL.
+> 
+> It must use dev_get_by_index_rcu() instead of __dev_get_by_index()
+> 
+> Fixes: 2f17becfbea5 ("vrf: check the original netdevice for generating redirect")
+> Signed-off-by: Eric Dumazet <edumazet@google.com>
+> Cc: Stephen Suryaputra <ssuryaextr@gmail.com>
+> ---
+>  net/ipv6/ndisc.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+> 
 
-...
+Reviewed-by: David Ahern <dsahern@kernel.org>
 
-> +static int nct6694_wdt_probe(struct platform_device *pdev)
-> +{
-> +	const struct mfd_cell *cell = mfd_get_cell(pdev);
-> +	struct device *dev = &pdev->dev;
-> +	struct nct6694 *nct6694 = dev_get_drvdata(pdev->dev.parent);
-> +	struct nct6694_wdt_data *data;
-> +	struct watchdog_device *wdev;
-> +
-> +	data = devm_kzalloc(&pdev->dev, sizeof(*data), GFP_KERNEL);
-> +	if (!data)
-> +		return -ENOMEM;
-> +
-> +	data->msg = devm_kzalloc(dev, sizeof(union nct6694_wdt_msg),
-> +				 GFP_KERNEL);
-> +	if (!data->msg)
-> +		return -ENOMEM;
-> +
-> +	data->dev = dev;
-> +	data->nct6694 = nct6694;
-> +	data->wdev_idx = cell->id;
-> +
-> +	wdev = &data->wdev;
-> +	wdev->info = &nct6694_wdt_info;
-> +	wdev->ops = &nct6694_wdt_ops;
-> +	wdev->timeout = timeout;
-> +	wdev->pretimeout = pretimeout;
-> +	if (timeout < pretimeout) {
-> +		dev_warn(data->dev, "pretimeout < timeout. Setting to zero\n");
-> +		wdev->pretimeout = 0;
-> +	}
-> +
-> +	wdev->min_timeout = 1;
-> +	wdev->max_timeout = 255;
-> +
-> +	devm_mutex_init(dev, &data->lock);
 
-Error handling?
-(also apply for patch 1/7 and 6/7)
-
-> +
-> +	platform_set_drvdata(pdev, data);
-> +
-> +	watchdog_set_drvdata(&data->wdev, data);
-> +	watchdog_set_nowayout(&data->wdev, nowayout);
-> +	watchdog_stop_on_reboot(&data->wdev);
-> +
-> +	return devm_watchdog_register_device(dev, &data->wdev);
-> +}
-
-...
-
-CJ
 
