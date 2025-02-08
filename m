@@ -1,119 +1,138 @@
-Return-Path: <netdev+bounces-164279-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-164280-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id A9A34A2D378
-	for <lists+netdev@lfdr.de>; Sat,  8 Feb 2025 04:24:30 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6280AA2D381
+	for <lists+netdev@lfdr.de>; Sat,  8 Feb 2025 04:33:55 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id CA1B9188D2F2
-	for <lists+netdev@lfdr.de>; Sat,  8 Feb 2025 03:24:35 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 793403A4549
+	for <lists+netdev@lfdr.de>; Sat,  8 Feb 2025 03:33:46 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4D16415573A;
-	Sat,  8 Feb 2025 03:24:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1EB46153BD7;
+	Sat,  8 Feb 2025 03:33:51 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b="gyu94s0l"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="JrWCyfyD"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wr1-f42.google.com (mail-wr1-f42.google.com [209.85.221.42])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.21])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 737FDA23
-	for <netdev@vger.kernel.org>; Sat,  8 Feb 2025 03:24:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.42
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 68E5A611E;
+	Sat,  8 Feb 2025 03:33:49 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.21
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1738985066; cv=none; b=cXWW52jb9vJpoEwGacSogEgceuZHslmOIXlWQaW866K5uCU1NRKCVGx5266YGKhqTFnFLasEDdCikLi4A5KH4+9Hv5OHPXOmgWy+bVKHjrkA72XiZ6PCLFHctpnWM/nMAnmMkbHWYwkSbPxciHrLgd60A4EpJx2BgYhW/LKkE5s=
+	t=1738985631; cv=none; b=MYuhKtwlYrH887i1B5PoEajS76d9jwCxArey3Pt1wDSLaLFCYHjQFHRq3OjAQtBaYBIelkc/oTzM06BPoPckRXEGVUjcsdE+UTFmuTTxyQHxE2YsSO2wo8xKrRNUe9bd9ojab4WFTK5AdYg9mHHVIm06dWruedVLlj5ZK/gMKwk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1738985066; c=relaxed/simple;
-	bh=Bg3OQ4u/q9PdnkN9l8oYbntB4/BsrRgui0pT0pdHJiw=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=NWF+wyQ6f5j7WBpemY2bMqPdZ3FUQIi3ukciUQfRx4CDLkv/2tLuCd/7YfZEl38j8uxik7GaK79xewfQvStK/jQ8hxNOBQdUu5HJiKUTvlmM45ZQ8wrHGbsLkcHJoAv7uPYbGJb8hNtJGi0y7I0fUXIEt+Yof9+nhcEot9g4V1w=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com; spf=fail smtp.mailfrom=broadcom.com; dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b=gyu94s0l; arc=none smtp.client-ip=209.85.221.42
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=broadcom.com
-Received: by mail-wr1-f42.google.com with SMTP id ffacd0b85a97d-38dd14c99d3so507514f8f.3
-        for <netdev@vger.kernel.org>; Fri, 07 Feb 2025 19:24:24 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=broadcom.com; s=google; t=1738985063; x=1739589863; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=Bg3OQ4u/q9PdnkN9l8oYbntB4/BsrRgui0pT0pdHJiw=;
-        b=gyu94s0lDtuZU6i/Dr+NKi9y1y+EDMmkPnayRDvSYJ382yB4EAkVuaW+EQ4/Iiu8Wp
-         9deJxvJhVe+bsfjC08bKP+zBNfME3TdzU5brq6qQ/l0UE0W4NdDVIpdlFqHX5Wc7IEri
-         8/poeC1Ekj74tzO7OckjzDvfO05U/VtQzh56g=
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1738985063; x=1739589863;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=Bg3OQ4u/q9PdnkN9l8oYbntB4/BsrRgui0pT0pdHJiw=;
-        b=h9OlW08t4g10oEHjmYwkl+xxN73vkaIa9DpacEmBdQEZCKpa1LDYjxmkFGriFrMdvO
-         0M/DxFdzazFdHOP+tnVsRwBdYX6C1E7YGrEhH4FPdMUD1mUZ+bQ62+9PMQJ1o8mTFWds
-         Z/8nGzzTAFD2eAqEinATWzVilB/aEcTKSNWZ8VKxGOLVdrEjpC9DU5MRhykUJjXa5nPb
-         OvE8wy7ZcnDXLBqpH6Xh1s0UXh8yutFIQNjY/WHlZAVj/1V03RZ7tyZ2UI1MH8KLBnbH
-         HkkeVIC2ZGjg2BHhNvKuL1ZIYLKc0UFAs7ipEACRqN3WA75VOr/Q1SkXYOwvlIkXfw2Y
-         NL8g==
-X-Forwarded-Encrypted: i=1; AJvYcCWwRPtpCPKgO52eO4LQd9jWwzbhXEKrI0cNMu7fsLYZsjzkuJpv64k/iTxjquV5gABpIXHxkjg=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yxqi79AJREB6TJhysU4qpGs+3S5hpDne6XV5yP0mLWh6CI0sUCm
-	vbNuYxE9mLxktvS4H9iRiNmFYLW0wdm16L1+ciImTQ4TxEYr50t5btK34SZhOA7IyBLniC1DMLi
-	MXZmTkPeQPL/3W6PXYpRrA68n8VykPm4Wj138
-X-Gm-Gg: ASbGnctbbOpr21pqtWRUSNrddu5IZZS0v1Q/vKuIhq16S77Hjazg7oj662nh28qEtA9
-	U+l8IR+OH15x2rCCbhoCL9MXO6WpQmDJvGJ9A39SLxy7YhN9NDhdFZo1gDnxLacHAbnyC9vXx
-X-Google-Smtp-Source: AGHT+IHVNfL+UbPR8r6YIkIAeXWNEW4gOAC+ilgLwizDADgYX4kQ+BV2BsgCSdE/lvi9D1W/g2gdhuhfsZtya/2NQx4=
-X-Received: by 2002:a05:6000:4021:b0:38d:c9da:d0d7 with SMTP id
- ffacd0b85a97d-38dc9dad258mr4248135f8f.2.1738985062707; Fri, 07 Feb 2025
- 19:24:22 -0800 (PST)
+	s=arc-20240116; t=1738985631; c=relaxed/simple;
+	bh=E4ef/ftjH8Y83ESfkZ/ek4OwMIc3mSgBksj42G9pEyE=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=ul9pRFqSUXXvr9Yc1YIcaYE0qjvZCEVE+Q18dqvfLisHYZ34HyDCEg5aAnlsz5Lgjeo1I4MWZITUj/gSjv+76nofXiM2ugqM8g8uXs2eswBgBGDFM6pqnMmEmSNeHG9/yzfmFLFnuEhXr0AzE6GBm6wpzsw/fPFNmX2js0YZKII=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=JrWCyfyD; arc=none smtp.client-ip=198.175.65.21
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1738985629; x=1770521629;
+  h=message-id:date:mime-version:subject:to:cc:references:
+   from:in-reply-to:content-transfer-encoding;
+  bh=E4ef/ftjH8Y83ESfkZ/ek4OwMIc3mSgBksj42G9pEyE=;
+  b=JrWCyfyDRTOUk0ngRY1C6TlxxztxhAuYGx0241kebH9QXtskTfEqynL7
+   LcP5cQHqCRGFLlx8g/bRNaQh+/b36nGXmXJxGXuWxAlql40gede9SWN2I
+   ek4aDW99n4kC+Bixd2+Ep9m24/yDbQJybBqqaM/bvdK9TG0A13tGJ4+RU
+   vUMj6cxeF6dvmgJ4aPo6yCJiajnURrPfQxfwkdrhNuuPZoLGX3i9unG1z
+   apfqvCfHYdiNR7iNYjCaipJ7uRoI87R8TJp+vIHOOpFxyy1+BiBsJuvZ2
+   fKrpQPHhzQaGpkosgpeNSrz62QsfvjrxV4wZGqWMRmGPtc5ETCIT6vkfu
+   w==;
+X-CSE-ConnectionGUID: IYAVMl0NSkuhQGMCWUWMTg==
+X-CSE-MsgGUID: UkVjxFPiS7eiJ1jNRFIsyA==
+X-IronPort-AV: E=McAfee;i="6700,10204,11338"; a="39541413"
+X-IronPort-AV: E=Sophos;i="6.13,268,1732608000"; 
+   d="scan'208";a="39541413"
+Received: from fmviesa007.fm.intel.com ([10.60.135.147])
+  by orvoesa113.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 07 Feb 2025 19:33:48 -0800
+X-CSE-ConnectionGUID: KfrjFuMpRnayDLYzhLb9nA==
+X-CSE-MsgGUID: nahwQkBJSY+cDoGI/mkrIA==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.13,268,1732608000"; 
+   d="scan'208";a="111621205"
+Received: from choongyo-mobl.gar.corp.intel.com (HELO [10.247.21.123]) ([10.247.21.123])
+  by fmviesa007-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 07 Feb 2025 19:33:41 -0800
+Message-ID: <71887246-d30f-4134-8c6d-b379477b2457@linux.intel.com>
+Date: Sat, 8 Feb 2025 11:33:38 +0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <0-v4-0cf4ec3b8143+4995-fwctl_jgg@nvidia.com> <10-v4-0cf4ec3b8143+4995-fwctl_jgg@nvidia.com>
- <20250206164449.52b2dfef@kernel.org> <CACDg6nU_Dkte_GASNRpkvSSCihpg52FBqNr0KR3ud1YRvrRs3w@mail.gmail.com>
- <20250207073648.1f0bad47@kernel.org> <Z6ZsOMLq7tt3ijX_@x130>
- <20250207135111.6e4e10b9@kernel.org> <20250208011647.GH3660748@nvidia.com>
-In-Reply-To: <20250208011647.GH3660748@nvidia.com>
-From: Andy Gospodarek <andrew.gospodarek@broadcom.com>
-Date: Fri, 7 Feb 2025 22:24:11 -0500
-X-Gm-Features: AWEUYZk3gk4vWfE5Xa1A63xy9j8Q_uI0hhFglszJkoyvnrcVpZjbm-6o_DTD9CY
-Message-ID: <CACDg6nX-W7hzDUFMDmEtaZGUJu5dnSzcZpTXpn__O1kEu0ddRQ@mail.gmail.com>
-Subject: Re: [PATCH v4 10/10] bnxt: Create an auxiliary device for fwctl_bnxt
-To: Jason Gunthorpe <jgg@nvidia.com>
-Cc: Jakub Kicinski <kuba@kernel.org>, Saeed Mahameed <saeedm@nvidia.com>, 
-	Aron Silverton <aron.silverton@oracle.com>, Dan Williams <dan.j.williams@intel.com>, 
-	Daniel Vetter <daniel.vetter@ffwll.ch>, Dave Jiang <dave.jiang@intel.com>, 
-	David Ahern <dsahern@kernel.org>, Andy Gospodarek <gospo@broadcom.com>, 
-	Christoph Hellwig <hch@infradead.org>, Itay Avraham <itayavr@nvidia.com>, Jiri Pirko <jiri@nvidia.com>, 
-	Jonathan Cameron <Jonathan.Cameron@huawei.com>, Leonid Bloch <lbloch@nvidia.com>, 
-	Leon Romanovsky <leonro@nvidia.com>, linux-cxl@vger.kernel.org, linux-rdma@vger.kernel.org, 
-	netdev@vger.kernel.org, "Nelson, Shannon" <shannon.nelson@amd.com>, 
-	Michael Chan <michael.chan@broadcom.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next v7 2/7] net: pcs: xpcs: re-initiate clause 37
+ Auto-negotiation
+To: Andrew Lunn <andrew@lunn.ch>
+Cc: "Russell King (Oracle)" <linux@armlinux.org.uk>,
+ Simon Horman <horms@kernel.org>, Jose Abreu <joabreu@synopsys.com>,
+ Jose Abreu <Jose.Abreu@synopsys.com>,
+ David E Box <david.e.box@linux.intel.com>,
+ Thomas Gleixner <tglx@linutronix.de>, Ingo Molnar <mingo@redhat.com>,
+ Borislav Petkov <bp@alien8.de>, Dave Hansen <dave.hansen@linux.intel.com>,
+ "H . Peter Anvin" <hpa@zytor.com>,
+ Rajneesh Bhardwaj <irenic.rajneesh@gmail.com>,
+ David E Box <david.e.box@intel.com>, Andrew Lunn <andrew+netdev@lunn.ch>,
+ "David S . Miller" <davem@davemloft.net>, Eric Dumazet
+ <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+ Paolo Abeni <pabeni@redhat.com>, Maxime Coquelin
+ <mcoquelin.stm32@gmail.com>, Alexandre Torgue
+ <alexandre.torgue@foss.st.com>, Jiawen Wu <jiawenwu@trustnetic.com>,
+ Mengyuan Lou <mengyuanlou@net-swift.com>,
+ Heiner Kallweit <hkallweit1@gmail.com>, Hans de Goede <hdegoede@redhat.com>,
+ =?UTF-8?Q?Ilpo_J=C3=A4rvinen?= <ilpo.jarvinen@linux.intel.com>,
+ Richard Cochran <richardcochran@gmail.com>,
+ Serge Semin <fancer.lancer@gmail.com>, x86@kernel.org,
+ linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
+ platform-driver-x86@vger.kernel.org,
+ linux-stm32@st-md-mailman.stormreply.com,
+ linux-arm-kernel@lists.infradead.org
+References: <20250206131859.2960543-1-yong.liang.choong@linux.intel.com>
+ <20250206131859.2960543-3-yong.liang.choong@linux.intel.com>
+ <Z6TVmdCZeWerAZKP@shell.armlinux.org.uk>
+ <564ede5d-9f53-40be-9305-63f63b384e15@linux.intel.com>
+ <12e86fbe-9515-4b81-951c-8bf86e2939d6@lunn.ch>
+Content-Language: en-US
+From: Choong Yong Liang <yong.liang.choong@linux.intel.com>
+In-Reply-To: <12e86fbe-9515-4b81-951c-8bf86e2939d6@lunn.ch>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-On Fri, Feb 7, 2025 at 8:16=E2=80=AFPM Jason Gunthorpe <jgg@nvidia.com> wro=
-te:
->
-> On Fri, Feb 07, 2025 at 01:51:11PM -0800, Jakub Kicinski wrote:
->
-> > But if you agree the netdev doesn't need it seems like a fairly
-> > straightforward way to unblock your progress.
->
-> I'm trying to understand what you are suggesting here.
->
-> We have many scenarios where mlx5_core spawns all kinds of different
-> devices, including recovery cases where there is no networking at all
-> and only fwctl. So we can't just discard the aux dev or mlx5_core
-> triggered setup without breaking scenarios.
->
-> However, you seem to be suggesting that netdev-only configurations (ie
-> netdev loaded but no rdma loaded) should disable fwctl. Is that the
-> case? All else would remain the same. It is very ugly but I could see
-> a technical path to do it, and would consider it if that brings peace.
->
 
-We can probably live with that as well if it's required to keep fwctl
-in an RDMA driver and out of pure netdevs.
+
+On 7/2/2025 9:32 pm, Andrew Lunn wrote:
+>> Good point. I cannot find this scenario in the datasheet. Please allow me
+>> some time to test this scenario. I will update you with the results.
+> 
+> By data sheet, do you mean documentation from Synopsis, or is this an
+> internal document? Assuming the hardware engineers have not hacked up
+> the Synopsis IP too much, the Synopsis documentation is probably the
+> most accurate you have.
+> 
+>>> What about 1000BASE-X when AN is enabled or disabled and then switching
+>>> to SGMII?
+>>>
+>> According to the datasheet, a soft reset is required.
+> 
+> Do you know if this is specific to Intels integration of the Synopsis
+> IP, or this is part of the core licensed IP?
+> 
+> We need to understand when we need a quirk because intel did something
+> odd, or it is part of the licensed IP and should happen for all
+> devices using the IP.
+> 
+> 	Andrew
+> 
+
+Hi Andrew,
+
+Thank you for your questions. Just to clarify, when I mention the 
+"datasheet," I am referring to the documentation from "Synopsis - 
+DesignWare Cores Ethernet PCS" and not specific to Intel's documentation.
 
