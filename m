@@ -1,107 +1,112 @@
-Return-Path: <netdev+bounces-164332-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-164333-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6379EA2D64C
-	for <lists+netdev@lfdr.de>; Sat,  8 Feb 2025 14:23:36 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 24A23A2D650
+	for <lists+netdev@lfdr.de>; Sat,  8 Feb 2025 14:30:02 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id B7F261884AF6
-	for <lists+netdev@lfdr.de>; Sat,  8 Feb 2025 13:23:40 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 3D249188C211
+	for <lists+netdev@lfdr.de>; Sat,  8 Feb 2025 13:30:07 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6151D2475E6;
-	Sat,  8 Feb 2025 13:23:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E04932475E2;
+	Sat,  8 Feb 2025 13:29:57 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="n7mZXu+F"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Nkfnq99V"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ed1-f48.google.com (mail-ed1-f48.google.com [209.85.208.48])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 29D6E246335;
-	Sat,  8 Feb 2025 13:23:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 38D181AF0CB
+	for <netdev@vger.kernel.org>; Sat,  8 Feb 2025 13:29:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.48
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1739021009; cv=none; b=CrwkcfJqxGsUnpantHVSNS5l/cS2DIobKsuucz7rKwpuy8lrX1+Enpe8bqVZN3UCI5R8ME0n+CpBPdAMcyrreBRXo1WR8GSRqraUnKo5SAPXUnTUBMU6ucOaQumecL93F1wKxh/eylX9+Nm4VRGFmK0f5JZstYMie4pEuUboIX4=
+	t=1739021397; cv=none; b=CC5lstqYpbjuXB9W70xFUYFapTsEFiEGSa/NRP8SvaqTwKT7Sf5JLYzhm1nEASp9iz4C6oJntTOf7Lfn3TfvweKEgCyl9oVPXnWFqS7azs8FNqa9DSr0LiNfqMsmTm22aZAK8KAFDejNBSjlGEo4EdG4gyo3ZCa/CLsrnzAr6cg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1739021009; c=relaxed/simple;
-	bh=UNQXvy+RWVdaIktgs9KmgGDMboPWfIfWS1mqCJ2dRMg=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=iikbuXTnK8R88zZ2nSzF70WwyfOMTyJMG20F+0Lk9+gTjtL3OqtmPQcUzz98oD2u4ktelPTkl5tO33/WTtNUrM6ukfn31kPnJnEKFNS3m/i4oITjXQzBCLVJ4sgKOrDdazUKOUN3WNVRr3j0/VtxQqu2P3hOaP7Ab2Fo6KPm9U0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=n7mZXu+F; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 51BC1C4CED6;
-	Sat,  8 Feb 2025 13:23:17 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1739021008;
-	bh=UNQXvy+RWVdaIktgs9KmgGDMboPWfIfWS1mqCJ2dRMg=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=n7mZXu+FCZa2zBnn8hwWDCQCrgdVRU/FiEZdEcQhRFE2+nrnbu4E/0rVIg30241ib
-	 j0uIVrbv8sxiG5Wl8Yy7b/XA4xW3Sd4uxw3aSH7yTq04q3R7OFyMX+WHkGLZuizJ9k
-	 z6GuuALfG/T8Bah6qucmpo2JYD+ThC0uCCsoYMYUlvSsIkD6sneYZan+4gme1v3dxB
-	 B6zYusbkISPsakXAcWU4bCRtbGN6JI/Don++Czch/tP72/U2kR50qAmUDp6wVrUfyQ
-	 xTrNY7rF50Zq6Fg8HGxNLhtOrMUMH9Hd45oFh73gupOaHy3TLmExhSv0xB6tntaZ2r
-	 whcVehzM3yyeA==
-Date: Sat, 8 Feb 2025 13:23:13 +0000
-From: Jonathan Cameron <jic23@kernel.org>
-To: Andy Shevchenko <andy.shevchenko@gmail.com>
-Cc: David Lechner <dlechner@baylibre.com>, Linus Walleij
- <linus.walleij@linaro.org>, Bartosz Golaszewski <brgl@bgdev.pl>, Andy
- Shevchenko <andy@kernel.org>, Geert Uytterhoeven <geert@linux-m68k.org>,
- Lars-Peter Clausen <lars@metafoo.de>, Michael Hennerich
- <Michael.Hennerich@analog.com>, Ulf Hansson <ulf.hansson@linaro.org>, Peter
- Rosin <peda@axentia.se>, Andrew Lunn <andrew@lunn.ch>, Heiner Kallweit
- <hkallweit1@gmail.com>, Russell King <linux@armlinux.org.uk>, "David S.
- Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Jakub
- Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Vinod Koul
- <vkoul@kernel.org>, Kishon Vijay Abraham I <kishon@kernel.org>, Nuno
- =?UTF-8?B?U8Oh?= <nuno.sa@analog.com>, Liam Girdwood <lgirdwood@gmail.com>,
- Mark Brown <broonie@kernel.org>, Jaroslav Kysela <perex@perex.cz>, Takashi
- Iwai <tiwai@suse.com>, linux-gpio@vger.kernel.org,
- linux-kernel@vger.kernel.org, linux-iio@vger.kernel.org,
- linux-mmc@vger.kernel.org, netdev@vger.kernel.org,
- linux-phy@lists.infradead.org, linux-sound@vger.kernel.org
-Subject: Re: [PATCH v2 06/13] iio: adc: ad7606: use
- gpiod_multi_set_value_cansleep
-Message-ID: <20250208132313.5b151ca0@jic23-huawei>
-In-Reply-To: <CAHp75Vfb7EgHkHtqm4b0QnG=uWwszpWwFe8MLDPRSifKtQFAcA@mail.gmail.com>
-References: <20250206-gpio-set-array-helper-v2-0-1c5f048f79c3@baylibre.com>
-	<20250206-gpio-set-array-helper-v2-6-1c5f048f79c3@baylibre.com>
-	<CAHp75Vfb7EgHkHtqm4b0QnG=uWwszpWwFe8MLDPRSifKtQFAcA@mail.gmail.com>
-X-Mailer: Claws Mail 4.3.0 (GTK 3.24.48; x86_64-pc-linux-gnu)
+	s=arc-20240116; t=1739021397; c=relaxed/simple;
+	bh=EKDxFScrz3YxFz9WKWySf8SdXWcCK92cilNVebTi5kU=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=MJ0ZPP9mzuAW1WYwZoNs/pkTQn1GXgK04/yq79H5td3h7pHapXvp7NBRq1OVEFChKGfFDM15FDDI4HMx5KxDe9DDA+ZGSbmesABNyTdBd1Ljh1p2Atphm+SmH5yxfCGHhwUxAdAxGItRrvIMx2/h5Sd77wy2LZdx520ZuOiEAqE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Nkfnq99V; arc=none smtp.client-ip=209.85.208.48
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-ed1-f48.google.com with SMTP id 4fb4d7f45d1cf-5dccc90a52eso5119864a12.0
+        for <netdev@vger.kernel.org>; Sat, 08 Feb 2025 05:29:55 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1739021394; x=1739626194; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=5RtnC138U0BoYb1FL9UElO6QLAScmnjJ6a0xWKkqDB0=;
+        b=Nkfnq99VqlBp8IyZZewCBSrx/Z5eP70xE7tjr46wD9Qb1UZbZiH8GTi78MXAkZefZg
+         GpucdTw1vwNcYA33HbC+TG7tPoTuUp70vrM1PciP3HwTnOqldZ46XNEtJty9J/k//EHO
+         CCj8vrvrdE3aw2UlYh1vFoiSZjK5mWvvkyJANjIaq1lOydZjnMZ8a7NlQFHGEPBnE3Gs
+         YTgshlMMUtsAJcEZq9Iawz2Ttdg2ypjrORmyk6uumLv5w4vXe81kMd/pvh6hTHmhG4HB
+         Xj4jC23EkXaftJKorRXXdzgUOVqxSqiFYaRrZaATWNqQ2ntCyWElTvBRzE1PzvJRDsnE
+         Gxnw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1739021394; x=1739626194;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=5RtnC138U0BoYb1FL9UElO6QLAScmnjJ6a0xWKkqDB0=;
+        b=Md+3CbZtHLWMNJjwCr8LZzgNpIQGN/goHIeZMkwcByFs2+I3Skz3enA/77ns9TwY3n
+         ZE5UYxMKTp9ed8IRC3563wDdv+XOx00yojDwu5id6fpBGw8KJJCwemx+itN8NESS5O9L
+         D75EVIJL1A3f3jbsBeYAHr+cb9kM6P44LU6QyPKcg5ffUImPJnHbH3zojozruQ/03Mgw
+         CAKOIp4AdiHNTKEIQVcv+ajETCI+X/Y8ASlrH4o2mOkl0zCioy3wYt68jFVWmJsfT1dO
+         h6kNAza0pIiJEeYcEAnmdmB5Rl+LXJxa5m6+VBwZoaipTOnhy5pA6iioM7fme2s5M4Yf
+         sCjw==
+X-Forwarded-Encrypted: i=1; AJvYcCVdDxw1hjm/u7dGP7vdMKLXoHfcq8ek/iRbJtly9QKrih85k//QfVOu2MDsBlQWlao/fiGpcas=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzorZOD0V7V9HeKIDFd/gLQjBwHYIbubdJj5PaEQQQjetlSrMYF
+	OxPqnWrh932lMPDGpBzuH45hRnvKJ1fWLjTdQM+mSL92UhEVDSHI
+X-Gm-Gg: ASbGncuhhv/LmatO7m2s5aHvSj6kRRVDxN4ATV4aVAylKfJ7EgqJ9jec2SgiX+8ujnR
+	e3V7+VBgmuHVTPhhC5aU/m95Gd6z2b6aUx04ptwJ4ivj0s94MpTXqrmIqAHsXGN8sTShZzPTQuT
+	Jpq7g52rxqAChC7eEjkivOWqkwyPe159ZMmGyp9q59xn0Q0kStjh+pT1bpSwhttj5/hLMtZ9Ns+
+	r35Uay+Nlwfii2pLX1LekzmZUglFW8xuJZdeQRmeuXYPEm7MtUdSJPypEdHYjx+yA03B4g1Ugw1
+	GnWSqCXMgPZXXWxn8+KU5WoSfA==
+X-Google-Smtp-Source: AGHT+IEsIUzKaNYNkdOlMDBB5GAJOdUXz6VuXPBewwPwg+4sWYsnp9f7ORFDOt7jDSAjbDZ31IqxZQ==
+X-Received: by 2002:a05:6402:e97:b0:5dc:c943:7b6 with SMTP id 4fb4d7f45d1cf-5de4504024emr8668396a12.3.1739021394396;
+        Sat, 08 Feb 2025 05:29:54 -0800 (PST)
+Received: from [192.168.8.100] ([148.252.133.220])
+        by smtp.gmail.com with ESMTPSA id 4fb4d7f45d1cf-5de3e49c372sm3474804a12.3.2025.02.08.05.29.51
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Sat, 08 Feb 2025 05:29:53 -0800 (PST)
+Message-ID: <39739559-6d28-429e-a1d6-430fe0f2490a@gmail.com>
+Date: Sat, 8 Feb 2025 13:29:56 +0000
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next v13 00/10] io_uring zero copy rx
+To: Jakub Kicinski <kuba@kernel.org>, patchwork-bot+netdevbpf@kernel.org
+Cc: David Wei <dw@davidwei.uk>, netdev@vger.kernel.org, pabeni@redhat.com,
+ davem@davemloft.net, edumazet@google.com, hawk@kernel.org,
+ dsahern@kernel.org, almasrymina@google.com, stfomichev@gmail.com,
+ jdamato@fastly.com, pctammela@mojatatu.com
+References: <20250204215622.695511-1-dw@davidwei.uk>
+ <173889003753.1718886.8005844111195907451.git-patchwork-notify@kernel.org>
+ <20250206170742.044536a1@kernel.org>
+Content-Language: en-US
+From: Pavel Begunkov <asml.silence@gmail.com>
+In-Reply-To: <20250206170742.044536a1@kernel.org>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-On Fri, 7 Feb 2025 14:13:23 +0200
-Andy Shevchenko <andy.shevchenko@gmail.com> wrote:
+On 2/7/25 01:07, Jakub Kicinski wrote:
+> On Fri, 07 Feb 2025 01:00:37 +0000 patchwork-bot+netdevbpf@kernel.org
+> wrote:
+>> This series was applied to netdev/net-next.git
+> 
+> off of v6.14-rc1 so 71f0dd5a3293d75 should pull in cleanly
 
-> On Fri, Feb 7, 2025 at 12:48=E2=80=AFAM David Lechner <dlechner@baylibre.=
-com> wrote:
-> >
-> > Reduce verbosity by using gpiod_multi_set_value_cansleep() instead of
-> > gpiod_set_array_value().
-> >
-> > These are not called in an atomic context, so changing to the cansleep
-> > variant is fine. =20
->=20
-> ...
->=20
-> >         if (st->gpio_os) {
-> > -               gpiod_set_array_value(st->gpio_os->ndescs,
-> > -                                     st->gpio_os->desc, st->gpio_os->i=
-nfo, os);
-> > +               gpiod_multi_set_value_cansleep(st->gpio_os, os);
-> >         } =20
->=20
-> Now I do not see any justification to leave {}.
->=20
-With that tidied up (good spot!) if this goes through the GPIO tree
-Acked-by: Jonathan Cameron <Jonathan.Cameron@huawei.com>
+Thanks Jakub, from here we'll merge the rest of the patches through
+io_uring as planned.
 
+-- 
+Pavel Begunkov
 
 
