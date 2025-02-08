@@ -1,171 +1,256 @@
-Return-Path: <netdev+bounces-164351-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-164353-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id F2F32A2D809
-	for <lists+netdev@lfdr.de>; Sat,  8 Feb 2025 19:37:54 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 8B4FCA2D81B
+	for <lists+netdev@lfdr.de>; Sat,  8 Feb 2025 19:55:53 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E1A8E3A58E8
-	for <lists+netdev@lfdr.de>; Sat,  8 Feb 2025 18:37:45 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 767DE3A73C9
+	for <lists+netdev@lfdr.de>; Sat,  8 Feb 2025 18:55:42 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CA068198E6D;
-	Sat,  8 Feb 2025 18:37:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id F3E0C1F3B85;
+	Sat,  8 Feb 2025 18:55:42 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="JMeK9eeu"
+	dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="S6hP4Ofg"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.17])
+Received: from mx0b-00069f02.pphosted.com (mx0b-00069f02.pphosted.com [205.220.177.32])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DF2E5241135;
-	Sat,  8 Feb 2025 18:37:47 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.17
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 28A56241134;
+	Sat,  8 Feb 2025 18:55:40 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.177.32
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1739039869; cv=none; b=coNEDsynzz2L0/b46Ikk/d9EPVgim+97IenEUej6/TCLk9YLz7WNqk+GAWbeVVUfcqhCcGhf/OZU1266R5D5U0KHHJLXAKoZh3OfVcIuQIi5VuTsrtpPn9spGSL9hAx5fD6yJ0zXtkXVoRcNxRoWQ0INf4Vkdj6UeS4+cWaTpAA=
+	t=1739040942; cv=none; b=JwysHw5ojSuTmyOI47wO7DEMCzZ2hfGnzrYcWohpRs5wS9AtHn2+NZPUbK8pVX/4GmXijnuIOFE+ud/PgBBYzksPBzEJRiEhk8P2Pc82SvIDkBHEhWJIfo/Sn7pptOmX5PkJrZImfygjAec+oCdZdmob4WYJVnR1cbh5JePmYQw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1739039869; c=relaxed/simple;
-	bh=OiPh1lu4rx22B7KSumWl+7P7nOfgNMfxfiVWxLMUgfo=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=rIofEOo5r0ip5+uaxvXZjoRkX+ACsD3b7bSXUvnqe6AEEMTwX5ChxNXb+JLvUGrCkZKLGpjp8yO+gxFs5nboZ4vNBHTMoy8yXLHuJiuwKFApe5jUoOZvd2yMxb/4pLVhjIVkY4CdN/dFDN0eteIjEb5iMQ8V8zx7pGQZ5/4nSLs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=JMeK9eeu; arc=none smtp.client-ip=192.198.163.17
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1739039868; x=1770575868;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=OiPh1lu4rx22B7KSumWl+7P7nOfgNMfxfiVWxLMUgfo=;
-  b=JMeK9eeuM0uTs6p5f+k/iLBWybKeqGegd1vl5E218jcC4fgbvWjaPEw3
-   6qQUy0pKutlkmqEC8fmILIYYe9J9vQP6RUB/c7in4AbNXprkEsBC3UkI4
-   gSbNgU5A51yUq1iKfnRqApeZVAuUl5dwRurrEMF8amZlhvIwNIwZ8lv4R
-   AvCgtYC4oWDpmgnySGZFu1+0qK6/ev8wYW4J78w3uwaDaFkfZa/SSooEA
-   OYw+Jh3s3QIWcKFOXnsFRVlMmwwY07Rn80yIZZ38g8pHdAyii8qfoN0uc
-   IIAvLfQrGShYCfZ/WNu9k9UIKJGsMJKlil/mNCrLvj2dApvfmjn0BtXMr
-   w==;
-X-CSE-ConnectionGUID: 9oXdIVUrQ+Cqzn+OHV6DBA==
-X-CSE-MsgGUID: hwah6nS7S5mkP0fzLTDKsA==
-X-IronPort-AV: E=McAfee;i="6700,10204,11339"; a="39555627"
-X-IronPort-AV: E=Sophos;i="6.13,270,1732608000"; 
-   d="scan'208";a="39555627"
-Received: from fmviesa009.fm.intel.com ([10.60.135.149])
-  by fmvoesa111.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 08 Feb 2025 10:37:47 -0800
-X-CSE-ConnectionGUID: ZUCm+zcCTCSDgP0A12ya5Q==
-X-CSE-MsgGUID: hRILAmttT0GVWW/cfCbPkA==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.13,270,1732608000"; 
-   d="scan'208";a="112441264"
-Received: from lkp-server01.sh.intel.com (HELO d63d4d77d921) ([10.239.97.150])
-  by fmviesa009.fm.intel.com with ESMTP; 08 Feb 2025 10:37:43 -0800
-Received: from kbuild by d63d4d77d921 with local (Exim 4.96)
-	(envelope-from <lkp@intel.com>)
-	id 1tgpi0-0010V9-2U;
-	Sat, 08 Feb 2025 18:37:40 +0000
-Date: Sun, 9 Feb 2025 02:36:40 +0800
-From: kernel test robot <lkp@intel.com>
-To: Tamir Duberstein <tamird@gmail.com>,
-	Andrew Morton <akpm@linux-foundation.org>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Simon Horman <horms@kernel.org>,
-	Shuah Khan <skhan@linuxfoundation.org>,
-	Nathan Chancellor <nathan@kernel.org>,
-	Nick Desaulniers <ndesaulniers@google.com>,
-	Bill Wendling <morbo@google.com>,
-	Justin Stitt <justinstitt@google.com>
-Cc: oe-kbuild-all@lists.linux.dev,
-	Linux Memory Management List <linux-mm@kvack.org>,
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
-	linux-kselftest@vger.kernel.org, llvm@lists.linux.dev,
-	Tamir Duberstein <tamird@gmail.com>
-Subject: Re: [PATCH] blackhole_dev: convert self-test to KUnit
-Message-ID: <202502090223.qCYMBjWT-lkp@intel.com>
-References: <20250207-blackholedev-kunit-convert-v1-1-8ef0dc1ff881@gmail.com>
+	s=arc-20240116; t=1739040942; c=relaxed/simple;
+	bh=HKqV33l+kZ2z72IScOQG7xAkwT/BPdByY+o4H9NCoz4=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=h+oqcIp2Ev2PzieDMguXcdrc07FY3N7JH9MW9A9GxHG4uLtsCbAjbdBT/clHf9GRFwiit4yoFNlfj0LbqdW6K4F5d5gDK54aE/fOKpkMaSWVyEK9JF+iBwVsO5qFKOk/M940BXc2YMzEdWHYSWwA3r/+ncSj+krTCfG8RTLi0zE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oracle.com; spf=pass smtp.mailfrom=oracle.com; dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b=S6hP4Ofg; arc=none smtp.client-ip=205.220.177.32
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oracle.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=oracle.com
+Received: from pps.filterd (m0333520.ppops.net [127.0.0.1])
+	by mx0b-00069f02.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 518He2Dp014983;
+	Sat, 8 Feb 2025 18:55:28 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=cc
+	:content-transfer-encoding:date:from:message-id:mime-version
+	:subject:to; s=corp-2023-11-20; bh=vdo7MFKxncptUF+do3OtQBEpYKXq0
+	WHLoGEcRo2k7Uo=; b=S6hP4OfgK0SmL6/2E6vbz32bJPcImPI54cfeBauHxXuTD
+	NO5iQNvg1Ow3lXxTcMjnBWdlz9JxRwllc935BuPJ4LpEKUqfKPnSO1SxQb4GNgBS
+	nyFV7DKm08RtZRAbZQv9+5v2Bratp9CFt+nTNY4apoxW5jWzvIZjq1sXbcMQrHZo
+	9giIVgQ3XFhFlMomARE6kCiYqzPp+E1vNxvfy8RdJyuqXnvNDqP4V0pP1Nz7gOAN
+	HNmudY6/wXNBUGf8NAbfElJytwBI9nLElgT5qKti0ebV3dxt2iy9l/pCAdkWTGPz
+	RABJevcfcyEt3NA/nZyaQEd3YDnSvZdm+wXTDdIhQ==
+Received: from iadpaimrmta01.imrmtpd1.prodappiadaev1.oraclevcn.com (iadpaimrmta01.appoci.oracle.com [130.35.100.223])
+	by mx0b-00069f02.pphosted.com (PPS) with ESMTPS id 44p0sq0ebr-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Sat, 08 Feb 2025 18:55:28 +0000 (GMT)
+Received: from pps.filterd (iadpaimrmta01.imrmtpd1.prodappiadaev1.oraclevcn.com [127.0.0.1])
+	by iadpaimrmta01.imrmtpd1.prodappiadaev1.oraclevcn.com (8.18.1.2/8.18.1.2) with ESMTP id 518FDOB0002035;
+	Sat, 8 Feb 2025 18:55:27 GMT
+Received: from pps.reinject (localhost [127.0.0.1])
+	by iadpaimrmta01.imrmtpd1.prodappiadaev1.oraclevcn.com (PPS) with ESMTPS id 44nwq601sa-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Sat, 08 Feb 2025 18:55:27 +0000
+Received: from iadpaimrmta01.imrmtpd1.prodappiadaev1.oraclevcn.com (iadpaimrmta01.imrmtpd1.prodappiadaev1.oraclevcn.com [127.0.0.1])
+	by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 518ItR0G019946;
+	Sat, 8 Feb 2025 18:55:27 GMT
+Received: from ca-dev112.us.oracle.com (ca-dev112.us.oracle.com [10.129.136.47])
+	by iadpaimrmta01.imrmtpd1.prodappiadaev1.oraclevcn.com (PPS) with ESMTP id 44nwq601ru-1;
+	Sat, 08 Feb 2025 18:55:27 +0000
+From: Harshit Mogalapalli <harshit.m.mogalapalli@oracle.com>
+To: stable@vger.kernel.org
+Cc: davem@davemloft.net, edumazet@google.com, horms@kernel.org,
+        jiri@resnulli.us, liuhangbin@gmail.com, kuba@kernel.org,
+        netdev@vger.kernel.org, stfomichev@gmail.com, shannon.nelson@amd.com,
+        darren.kenny@oracle.com,
+        Harshit Mogalapalli <harshit.m.mogalapalli@oracle.com>
+Subject: [PATCH 6.12.y 0/2] Fix rtnetlink.sh kselftest failures in stable
+Date: Sat,  8 Feb 2025 10:55:19 -0800
+Message-ID: <20250208185521.2998155-1-harshit.m.mogalapalli@oracle.com>
+X-Mailer: git-send-email 2.46.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250207-blackholedev-kunit-convert-v1-1-8ef0dc1ff881@gmail.com>
+Content-Transfer-Encoding: 8bit
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1057,Hydra:6.0.680,FMLib:17.12.68.34
+ definitions=2025-02-08_08,2025-02-07_03,2024-11-22_01
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 spamscore=0 mlxscore=0 mlxlogscore=999
+ phishscore=0 bulkscore=0 malwarescore=0 adultscore=0 suspectscore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2501170000
+ definitions=main-2502080160
+X-Proofpoint-ORIG-GUID: b3yfw6qaANX7p5e0dLlsrrs_OiQXzSDw
+X-Proofpoint-GUID: b3yfw6qaANX7p5e0dLlsrrs_OiQXzSDw
 
-Hi Tamir,
+This is reproducible on on stable kernels after the backport of commit:
+2cf567f421db ("netdevsim: copy addresses for both in and out paths") to
+stable kernels.
 
-kernel test robot noticed the following build warnings:
+Using a single cover letter for all stable kernels but will send
+separate patches for each stable kernel
 
-[auto build test WARNING on 2014c95afecee3e76ca4a56956a936e23283f05b]
+Which kselftests are particularly failing:
 
-url:    https://github.com/intel-lab-lkp/linux/commits/Tamir-Duberstein/blackhole_dev-convert-self-test-to-KUnit/20250208-074037
-base:   2014c95afecee3e76ca4a56956a936e23283f05b
-patch link:    https://lore.kernel.org/r/20250207-blackholedev-kunit-convert-v1-1-8ef0dc1ff881%40gmail.com
-patch subject: [PATCH] blackhole_dev: convert self-test to KUnit
-config: i386-randconfig-062-20250208 (https://download.01.org/0day-ci/archive/20250209/202502090223.qCYMBjWT-lkp@intel.com/config)
-compiler: gcc-12 (Debian 12.2.0-14) 12.2.0
-reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20250209/202502090223.qCYMBjWT-lkp@intel.com/reproduce)
+2c2
+< sa[0] tx ipaddr=0x00000000 00000000 00000000 047ba8c0
+---
+> sa[0] tx ipaddr=0x00000000 00000000 00000000 00000000
+FAIL: ipsec_offload incorrect driver data
+FAIL: ipsec_offload
 
-If you fix the issue in a separate patch/commit (i.e. not just a new version of
-the same patch/commit), kindly add following tags
-| Reported-by: kernel test robot <lkp@intel.com>
-| Closes: https://lore.kernel.org/oe-kbuild-all/202502090223.qCYMBjWT-lkp@intel.com/
+ 813         # does driver have correct offload info
+ 814         diff $sysfsf - << EOF
+ 815 SA count=2 tx=3
+ 816 sa[0] tx ipaddr=0x00000000 00000000 00000000 00000000
+ 817 sa[0]    spi=0x00000009 proto=0x32 salt=0x61626364 crypt=1
+ 818 sa[0]    key=0x34333231 38373635 32313039 36353433
+ 819 sa[1] rx ipaddr=0x00000000 00000000 00000000 037ba8c0
+ 820 sa[1]    spi=0x00000009 proto=0x32 salt=0x61626364 crypt=1
+ 821 sa[1]    key=0x34333231 38373635 32313039 36353433
+ 822 EOF
+ 823         if [ $? -ne 0 ] ; then
+ 824                 echo "FAIL: ipsec_offload incorrect driver data"
+ 825                 check_err 1
+ 826         fi
+ 827
 
-sparse warnings: (new ones prefixed by >>)
->> lib/blackhole_dev_kunit.c:55:27: sparse: sparse: incorrect type in assignment (different base types) @@     expected restricted __be16 [usertype] payload_len @@     got unsigned int @@
-   lib/blackhole_dev_kunit.c:55:27: sparse:     expected restricted __be16 [usertype] payload_len
-   lib/blackhole_dev_kunit.c:55:27: sparse:     got unsigned int
+This part of check throws errors and the rtnetlink.sh fails on ipsec_offload.
 
-vim +55 lib/blackhole_dev_kunit.c
+Reason is that the after the below patch:
 
-509e56b37cc32c lib/test_blackhole_dev.c  Mahesh Bandewar  2019-07-01  26  
-a644885645ce86 lib/blackhole_dev_kunit.c Tamir Duberstein 2025-02-07  27  static void test_blackholedev(struct kunit *test)
-509e56b37cc32c lib/test_blackhole_dev.c  Mahesh Bandewar  2019-07-01  28  {
-509e56b37cc32c lib/test_blackhole_dev.c  Mahesh Bandewar  2019-07-01  29  	struct ipv6hdr *ip6h;
-509e56b37cc32c lib/test_blackhole_dev.c  Mahesh Bandewar  2019-07-01  30  	struct sk_buff *skb;
-509e56b37cc32c lib/test_blackhole_dev.c  Mahesh Bandewar  2019-07-01  31  	struct udphdr *uh;
-509e56b37cc32c lib/test_blackhole_dev.c  Mahesh Bandewar  2019-07-01  32  	int data_len;
-509e56b37cc32c lib/test_blackhole_dev.c  Mahesh Bandewar  2019-07-01  33  
-509e56b37cc32c lib/test_blackhole_dev.c  Mahesh Bandewar  2019-07-01  34  	skb = alloc_skb(SKB_SIZE, GFP_KERNEL);
-a644885645ce86 lib/blackhole_dev_kunit.c Tamir Duberstein 2025-02-07  35  	KUNIT_ASSERT_NOT_NULL(test, skb);
-509e56b37cc32c lib/test_blackhole_dev.c  Mahesh Bandewar  2019-07-01  36  
-509e56b37cc32c lib/test_blackhole_dev.c  Mahesh Bandewar  2019-07-01  37  	/* Reserve head-room for the headers */
-509e56b37cc32c lib/test_blackhole_dev.c  Mahesh Bandewar  2019-07-01  38  	skb_reserve(skb, HEAD_SIZE);
-509e56b37cc32c lib/test_blackhole_dev.c  Mahesh Bandewar  2019-07-01  39  
-509e56b37cc32c lib/test_blackhole_dev.c  Mahesh Bandewar  2019-07-01  40  	/* Add data to the skb */
-509e56b37cc32c lib/test_blackhole_dev.c  Mahesh Bandewar  2019-07-01  41  	data_len = SKB_SIZE - (HEAD_SIZE + TAIL_SIZE);
-509e56b37cc32c lib/test_blackhole_dev.c  Mahesh Bandewar  2019-07-01  42  	memset(__skb_put(skb, data_len), 0xf, data_len);
-509e56b37cc32c lib/test_blackhole_dev.c  Mahesh Bandewar  2019-07-01  43  
-509e56b37cc32c lib/test_blackhole_dev.c  Mahesh Bandewar  2019-07-01  44  	/* Add protocol data */
-509e56b37cc32c lib/test_blackhole_dev.c  Mahesh Bandewar  2019-07-01  45  	/* (Transport) UDP */
-509e56b37cc32c lib/test_blackhole_dev.c  Mahesh Bandewar  2019-07-01  46  	uh = (struct udphdr *)skb_push(skb, sizeof(struct udphdr));
-509e56b37cc32c lib/test_blackhole_dev.c  Mahesh Bandewar  2019-07-01  47  	skb_set_transport_header(skb, 0);
-509e56b37cc32c lib/test_blackhole_dev.c  Mahesh Bandewar  2019-07-01  48  	uh->source = uh->dest = htons(UDP_PORT);
-509e56b37cc32c lib/test_blackhole_dev.c  Mahesh Bandewar  2019-07-01  49  	uh->len = htons(data_len);
-509e56b37cc32c lib/test_blackhole_dev.c  Mahesh Bandewar  2019-07-01  50  	uh->check = 0;
-509e56b37cc32c lib/test_blackhole_dev.c  Mahesh Bandewar  2019-07-01  51  	/* (Network) IPv6 */
-509e56b37cc32c lib/test_blackhole_dev.c  Mahesh Bandewar  2019-07-01  52  	ip6h = (struct ipv6hdr *)skb_push(skb, sizeof(struct ipv6hdr));
-509e56b37cc32c lib/test_blackhole_dev.c  Mahesh Bandewar  2019-07-01  53  	skb_set_network_header(skb, 0);
-509e56b37cc32c lib/test_blackhole_dev.c  Mahesh Bandewar  2019-07-01  54  	ip6h->hop_limit = 32;
-509e56b37cc32c lib/test_blackhole_dev.c  Mahesh Bandewar  2019-07-01 @55  	ip6h->payload_len = data_len + sizeof(struct udphdr);
-509e56b37cc32c lib/test_blackhole_dev.c  Mahesh Bandewar  2019-07-01  56  	ip6h->nexthdr = IPPROTO_UDP;
-509e56b37cc32c lib/test_blackhole_dev.c  Mahesh Bandewar  2019-07-01  57  	ip6h->saddr = in6addr_loopback;
-509e56b37cc32c lib/test_blackhole_dev.c  Mahesh Bandewar  2019-07-01  58  	ip6h->daddr = in6addr_loopback;
-509e56b37cc32c lib/test_blackhole_dev.c  Mahesh Bandewar  2019-07-01  59  	/* Ether */
-843a8851e89e2e lib/test_blackhole_dev.c  Breno Leitao     2024-02-02  60  	skb_push(skb, sizeof(struct ethhdr));
-509e56b37cc32c lib/test_blackhole_dev.c  Mahesh Bandewar  2019-07-01  61  	skb_set_mac_header(skb, 0);
-509e56b37cc32c lib/test_blackhole_dev.c  Mahesh Bandewar  2019-07-01  62  
-509e56b37cc32c lib/test_blackhole_dev.c  Mahesh Bandewar  2019-07-01  63  	skb->protocol = htons(ETH_P_IPV6);
-509e56b37cc32c lib/test_blackhole_dev.c  Mahesh Bandewar  2019-07-01  64  	skb->pkt_type = PACKET_HOST;
-509e56b37cc32c lib/test_blackhole_dev.c  Mahesh Bandewar  2019-07-01  65  	skb->dev = blackhole_netdev;
-509e56b37cc32c lib/test_blackhole_dev.c  Mahesh Bandewar  2019-07-01  66  
-509e56b37cc32c lib/test_blackhole_dev.c  Mahesh Bandewar  2019-07-01  67  	/* Now attempt to send the packet */
-a644885645ce86 lib/blackhole_dev_kunit.c Tamir Duberstein 2025-02-07  68  	KUNIT_EXPECT_EQ(test, dev_queue_xmit(skb), NET_XMIT_SUCCESS);
-509e56b37cc32c lib/test_blackhole_dev.c  Mahesh Bandewar  2019-07-01  69  }
-509e56b37cc32c lib/test_blackhole_dev.c  Mahesh Bandewar  2019-07-01  70  
+commit 2cf567f421dbfe7e53b7e5ddee9400da10efb75d
+Author: Hangbin Liu <liuhangbin@gmail.com>
+Date:   Thu Oct 10 04:00:26 2024 +0000
+
+    netdevsim: copy addresses for both in and out paths
+   
+    [ Upstream commit 2cf567f421dbfe7e53b7e5ddee9400da10efb75d ]
+   
+    The current code only copies the address for the in path, leaving the out
+    path address set to 0. This patch corrects the issue by copying the addresses
+    for both the in and out paths. Before this patch:
+   
+      # cat /sys/kernel/debug/netdevsim/netdevsim0/ports/0/ipsec
+      SA count=2 tx=20
+      sa[0] tx ipaddr=0.0.0.0
+      sa[0]    spi=0x00000100 proto=0x32 salt=0x0adecc3a crypt=1
+      sa[0]    key=0x3167608a ca4f1397 43565909 941fa627
+      sa[1] rx ipaddr=192.168.0.1
+      sa[1]    spi=0x00000101 proto=0x32 salt=0x0adecc3a crypt=1
+      sa[1]    key=0x3167608a ca4f1397 43565909 941fa627
+   
+    After this patch:
+   
+      = cat /sys/kernel/debug/netdevsim/netdevsim0/ports/0/ipsec
+      SA count=2 tx=20
+      sa[0] tx ipaddr=192.168.0.2
+      sa[0]    spi=0x00000100 proto=0x32 salt=0x0adecc3a crypt=1
+      sa[0]    key=0x3167608a ca4f1397 43565909 941fa627
+      sa[1] rx ipaddr=192.168.0.1
+      sa[1]    spi=0x00000101 proto=0x32 salt=0x0adecc3a crypt=1
+      sa[1]    key=0x3167608a ca4f1397 43565909 941fa627
+   
+    Fixes: 7699353da875 ("netdevsim: add ipsec offload testing")
+
+
+tx ip address is not 0.0.0.0 anymore, it is was 0.0.0.0 before above patch.
+
+So this commit: 3ec920bb978c ("selftests: rtnetlink: update netdevsim
+ipsec output format") which is not backported to stable kernels tries to
+address rtneltlink.sh fixing.
+
+fixes the change in handling tx ip address as well, so far so good!
+
+but when I apply this script fix it doesn't pass yet:
+
+2c2
+< sa[0] tx ipaddr=0x00000000 00000000 00000000 047ba8c0
+---
+> sa[0] tx ipaddr=192.168.123.4
+5c5
+< sa[1] rx ipaddr=0x00000000 00000000 00000000 037ba8c0
+---
+> sa[1] rx ipaddr=192.168.123.3
+FAIL: ipsec_offload incorrect driver data
+
+So it clearly suggest that addresses are not properly handled, IPSec addresses
+are printed in hexadecimal format, but the script expects it in more readable
+format, that hinted me whats missing, and that commit is:
+
+commit c71bc6da6198a6d88df86094f1052bb581951d65
+Author: Hangbin Liu <liuhangbin@gmail.com>
+Date:   Thu Oct 10 04:00:25 2024 +0000
+
+    netdevsim: print human readable IP address
+    
+    Currently, IPSec addresses are printed in hexadecimal format, which is
+    not user-friendly. e.g.
+    
+      # cat /sys/kernel/debug/netdevsim/netdevsim0/ports/0/ipsec
+      SA count=2 tx=20
+      sa[0] rx ipaddr=0x00000000 00000000 00000000 0100a8c0
+      sa[0]    spi=0x00000101 proto=0x32 salt=0x0adecc3a crypt=1
+      sa[0]    key=0x3167608a ca4f1397 43565909 941fa627
+      sa[1] tx ipaddr=0x00000000 00000000 00000000 00000000
+      sa[1]    spi=0x00000100 proto=0x32 salt=0x0adecc3a crypt=1
+      sa[1]    key=0x3167608a ca4f1397 43565909 941fa627
+    
+    This patch updates the code to print the IPSec address in a human-readable
+    format for easier debug. e.g.
+    
+     # cat /sys/kernel/debug/netdevsim/netdevsim0/ports/0/ipsec
+     SA count=4 tx=40
+     sa[0] tx ipaddr=0.0.0.0
+     sa[0]    spi=0x00000100 proto=0x32 salt=0x0adecc3a crypt=1
+     sa[0]    key=0x3167608a ca4f1397 43565909 941fa627
+     sa[1] rx ipaddr=192.168.0.1
+     sa[1]    spi=0x00000101 proto=0x32 salt=0x0adecc3a crypt=1
+     sa[1]    key=0x3167608a ca4f1397 43565909 941fa627
+     sa[2] tx ipaddr=::
+     sa[2]    spi=0x00000100 proto=0x32 salt=0x0adecc3a crypt=1
+     sa[2]    key=0x3167608a ca4f1397 43565909 941fa627
+     sa[3] rx ipaddr=2000::1
+     sa[3]    spi=0x00000101 proto=0x32 salt=0x0adecc3a crypt=1
+     sa[3]    key=0x3167608a ca4f1397 43565909 941fa627
+
+Solution:
+========
+
+Backport both the commits commit: c71bc6da6198 ("netdevsim: print human
+readable IP address") and script fixup commit: 3ec920bb978c ("selftests:
+rtnetlink: update netdevsim ipsec output format") to all stable kernels
+which have commit: 2cf567f421db ("netdevsim: copy addresses for both in
+and out paths") in them.
+
+Another clue to say this is right way to do this is that these above
+three patches did go as patchset into net/ [1].
+
+I am sending patches for all stable trees differently, however I am
+using same cover letter.
+
+Tested all stable kernels after patching. This failure is no more
+reproducible.
+
+Thanks,
+Harshit
+
+[1] https://lore.kernel.org/all/172868703973.3018281.2970275743967117794.git-patchwork-notify@kernel.org/
+
+
+Hangbin Liu (2):
+  netdevsim: print human readable IP address
+  selftests: rtnetlink: update netdevsim ipsec output format
+
+ drivers/net/netdevsim/ipsec.c            | 12 ++++++++----
+ tools/testing/selftests/net/rtnetlink.sh |  4 ++--
+ 2 files changed, 10 insertions(+), 6 deletions(-)
 
 -- 
-0-DAY CI Kernel Test Service
-https://github.com/intel/lkp-tests/wiki
+2.46.0
+
 
