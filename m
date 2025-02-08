@@ -1,544 +1,187 @@
-Return-Path: <netdev+bounces-164317-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-164318-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 26624A2D596
-	for <lists+netdev@lfdr.de>; Sat,  8 Feb 2025 11:34:29 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id F2518A2D5A6
+	for <lists+netdev@lfdr.de>; Sat,  8 Feb 2025 11:41:50 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 29D24188D93F
-	for <lists+netdev@lfdr.de>; Sat,  8 Feb 2025 10:34:21 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id EFBF03A60D6
+	for <lists+netdev@lfdr.de>; Sat,  8 Feb 2025 10:41:41 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0E62E1B85C9;
-	Sat,  8 Feb 2025 10:33:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 810391B4132;
+	Sat,  8 Feb 2025 10:41:46 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ecc0Qo8a"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="I1rPeHMO"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f170.google.com (mail-pl1-f170.google.com [209.85.214.170])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.12])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 310E37DA8C;
-	Sat,  8 Feb 2025 10:33:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.170
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C1A3D1624D0
+	for <netdev@vger.kernel.org>; Sat,  8 Feb 2025 10:41:43 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.12
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1739010813; cv=none; b=qO91JiUk3B4tUnZ+SYMLJkcMGeiJBjeMZkU5Yhuqmqetvmtk8v3dkTfOgBFaCEqQl5z39yISq3Vab18RMKuSLBDP4rHqo9hOYdmwOo85ukDFGdPln+Fct1nfuPtG5MktREtKLlaQUGmGMLueZCJCoAz4JN34QeJgP/Jmbsg0da0=
+	t=1739011306; cv=none; b=CQnwoy+iS5b+cek8H6RUfuE+Fva8SESj07RzeYJSz45Zwin0Riy3zGQeP4WDgjcwDfx2Q5CbwX3p6HBrnSUIncWDdWyOOisGahHcfpK5v3PSIF5Yvw+4/2fbXdVWb/sGsxATLLiCL8aMx8dWJVCr8j0BmNBqeVO17wG556EDXY4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1739010813; c=relaxed/simple;
-	bh=dlSRdpt2ITUSt5diLpEoyrE1DpZZ8Oi8bS8bS6JqHC0=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=g3dSLtA0mHCPra289vdyB+O1rocfK86x8iN/aeJDGv9pStPk4Bi571kgAVr8GjL7uIB9V53Yguk4jaaurrLPl2JcB/R1xq627MaSdOirPr+EPZMFGmmzyZ0mJVH5KVzu6in6V/usXcTx0CFhmYkKjYP92C/Hl5EQK4S8GQVD7Bo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=ecc0Qo8a; arc=none smtp.client-ip=209.85.214.170
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pl1-f170.google.com with SMTP id d9443c01a7336-21f6a47d617so6908825ad.2;
-        Sat, 08 Feb 2025 02:33:31 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1739010811; x=1739615611; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=trnKcvL/7ZWLD7eydlcY8QHFZw3zVQLPacf8LkGaFu8=;
-        b=ecc0Qo8agJZlh2t3WSY+lT5HeOAZ1moQsdbZJbu9PEBYFAPAz5UVZZNE1BAhXlqbSD
-         YfAfiUW0z7yaFtHajO5fLmeQfy3/ZJNbgZ9E22Erc3IsUfAwY4UPkZhrt0H2MMvq6Jif
-         QF0H6MZQ45MYEhcu5qdvbyNm4mXw8HeJQKp9lceeJ6L/RefrvnMPRr825NhiynZTmDrc
-         XDFRxT4TtPuAuBu03IHhEZD1sHwZ4gEc0hEc++nsus2f23pu28yxg+SyzE+hQN0CIKCk
-         C6ig+6Q7wKtDr2AiSuw51MfsDdDsmTLsvtrNQeaC637PsUgUWF6DdZwvcChHjozwCs3t
-         krOA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1739010811; x=1739615611;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=trnKcvL/7ZWLD7eydlcY8QHFZw3zVQLPacf8LkGaFu8=;
-        b=I3M3Dn5GV0cMSr/CMgXMDUkRgdL+IKNZbaZQOobID1S8a3BryCQIVKIM3P/4wwp/0d
-         IQW20N/NuVb3g8vbQO4dqWX0uDfhDH9RppOz6ZJCtr8+BV+VK068zE0g5Yjd5DqqOrWj
-         zss5RcD9mzosO7/8845yn/gKAeJ1Qvmxso8YLgbR0NbDXUXlode4rB2gcdF0zm64kg8n
-         bJSSlsYB40L1pHSOUc2/LjRF3lI2oplwL+PATuPDV8RKWNyXEAsbtdRBLEXY1zXYH9QB
-         7TQUVNFyGnUCwvITNPwQc3WEjsqUo+O1Fd6Xj07Wt22GZdLmPDhtjgUuPofRIgc66ptA
-         ahGg==
-X-Forwarded-Encrypted: i=1; AJvYcCVD6WC6eF+IA+nOD3RpiBbtRkXDG32XV0f3mWOu5YbLYDGDhmi/ZKVFtHkNC2YAIAuztifYZkc=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxpP8Nhz6Vk5PDfuEHLboFRegXpE+UYQ0MU6vZUF/3VfuNERJEM
-	FaeSLV3kMOwh17TmI/+dFCvDVqaMAr5Z3A5iITXzlRaQ8Z4MCpxs
-X-Gm-Gg: ASbGncuRyFuNQwpWUhGE21fKdQt93r6BHD2wKg7rbvd44sWXENDd59XYnIci+sJ68aD
-	Ne+PXD33pUE1d0/Rh4UtgrSOII+qqS0WhGG63wr27AuQ7l4vWnIyo8lKJrlUy8KM+ld6TdWFH7a
-	ptG0hIGoWMI8n9vp30vlPCF/NjmqRr0HDDEb9i3l+Rex3NgI/BSFKzZ4Iz9cAF2IOWcOUMXpVR8
-	yl6SE4711WixFALBjOhmmaUmTvO2kBIGIORfJLf/6X+c+710nm2oW0A0IAZVphNCZzHx0wnmvDX
-	mxn0uxpVDYvcPkwrCaaTq1fEGmRBny2jm2MWLK6jHCn4W37780dNTg==
-X-Google-Smtp-Source: AGHT+IEtkPAboRQ7FDT6VZmfM+tfR2H0lM2xM0ZY77w9cllZvXrLbM26Hcb8B4VW7agd5x8dCVkmnw==
-X-Received: by 2002:a17:903:234e:b0:216:4883:fb43 with SMTP id d9443c01a7336-21f4e7594e5mr114626615ad.32.1739010811311;
-        Sat, 08 Feb 2025 02:33:31 -0800 (PST)
-Received: from KERNELXING-MC1.tencent.com ([111.201.25.167])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-21f3653af58sm44527835ad.70.2025.02.08.02.33.26
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sat, 08 Feb 2025 02:33:30 -0800 (PST)
-From: Jason Xing <kerneljasonxing@gmail.com>
-To: davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	dsahern@kernel.org,
-	willemdebruijn.kernel@gmail.com,
-	willemb@google.com,
-	ast@kernel.org,
-	daniel@iogearbox.net,
-	andrii@kernel.org,
-	martin.lau@linux.dev,
-	eddyz87@gmail.com,
-	song@kernel.org,
-	yonghong.song@linux.dev,
-	john.fastabend@gmail.com,
-	kpsingh@kernel.org,
-	sdf@fomichev.me,
-	haoluo@google.com,
-	jolsa@kernel.org,
-	horms@kernel.org
-Cc: bpf@vger.kernel.org,
-	netdev@vger.kernel.org,
-	Jason Xing <kerneljasonxing@gmail.com>
-Subject: [PATCH bpf-next v9 12/12] selftests/bpf: add simple bpf tests in the tx path for timestamping feature
-Date: Sat,  8 Feb 2025 18:32:20 +0800
-Message-Id: <20250208103220.72294-13-kerneljasonxing@gmail.com>
-X-Mailer: git-send-email 2.33.0
-In-Reply-To: <20250208103220.72294-1-kerneljasonxing@gmail.com>
-References: <20250208103220.72294-1-kerneljasonxing@gmail.com>
+	s=arc-20240116; t=1739011306; c=relaxed/simple;
+	bh=MWG+6WKuPs6vj1SH93Cdkkga8aIS5/n3tbVO+NuMbIk=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=D01AyEAHX+jKcThwZKYtlWflBYVKKM7UCHC3bSpadh9vr8fDBPkhXzceLk9qCXJFFUA3goFacAK8Ko1HknPuh+9DwEOSnWX3JTtv45UdsYX3OleGxOxi9DUJ8/R0KYjZv+mUlSvov0gqO00dI4+OiymSDKcU3sjXLcCYgTWsZlI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=I1rPeHMO; arc=none smtp.client-ip=192.198.163.12
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1739011304; x=1770547304;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=MWG+6WKuPs6vj1SH93Cdkkga8aIS5/n3tbVO+NuMbIk=;
+  b=I1rPeHMOgSCdgC7U++V9J+TJcIFNUOJuG2Jnr6rTZlswymIvHCthfQsb
+   hhkUdwF9ulv9Rqe4W3VwCwvmQ1wf2WRYS2eRGl0zmdSu+CRwW3VxX9p5C
+   kHnjpSss6w4SRdMAuOK+TXqvxFhigNmajq/03ZTMaCM8qtho3BVTv84UY
+   yODYvaLCyxmtyFz6MyCvuvzoBhqpCSq0Ccc3cIHY+C7qvaUUBCosHW8K7
+   jJEa7+4JmikMQBDUhr8Bqx30Aplu2iwuj+lyeqJ9ywBQhY9cuVDvFSET6
+   DGQ+ddL54cuYYEJXV2z3DTapzVKktTRXtux6Wk6dB4rTkbBR3BA1Q+MX5
+   w==;
+X-CSE-ConnectionGUID: 7jud809vSJOV9i11n4/YkQ==
+X-CSE-MsgGUID: a7NIaoklRCWkXDQp/v5KVA==
+X-IronPort-AV: E=McAfee;i="6700,10204,11338"; a="43570979"
+X-IronPort-AV: E=Sophos;i="6.13,269,1732608000"; 
+   d="scan'208";a="43570979"
+Received: from orviesa003.jf.intel.com ([10.64.159.143])
+  by fmvoesa106.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 08 Feb 2025 02:41:43 -0800
+X-CSE-ConnectionGUID: xNCE5HYdSH2fX+RnJcWXRQ==
+X-CSE-MsgGUID: rwzju1O6RKalfAEbK8WziA==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.11,199,1725346800"; 
+   d="scan'208";a="116697290"
+Received: from lkp-server01.sh.intel.com (HELO d63d4d77d921) ([10.239.97.150])
+  by orviesa003.jf.intel.com with ESMTP; 08 Feb 2025 02:41:40 -0800
+Received: from kbuild by d63d4d77d921 with local (Exim 4.96)
+	(envelope-from <lkp@intel.com>)
+	id 1tgiHJ-000zrX-2T;
+	Sat, 08 Feb 2025 10:41:37 +0000
+Date: Sat, 8 Feb 2025 18:40:50 +0800
+From: kernel test robot <lkp@intel.com>
+To: Willem de Bruijn <willemdebruijn.kernel@gmail.com>,
+	netdev@vger.kernel.org
+Cc: llvm@lists.linux.dev, oe-kbuild-all@lists.linux.dev,
+	davem@davemloft.net, kuba@kernel.org, edumazet@google.com,
+	pabeni@redhat.com, Willem de Bruijn <willemb@google.com>
+Subject: Re: [PATCH net-next 5/7] icmp: reflect tos through ip cookie rather
+ than updating inet_sk
+Message-ID: <202502081845.hsTDUryC-lkp@intel.com>
+References: <20250206193521.2285488-6-willemdebruijn.kernel@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250206193521.2285488-6-willemdebruijn.kernel@gmail.com>
 
-Bpf prog calculates a couple of latency delta between each tx points
-which SO_TIMESTAMPING feature has already implemented. It can be used
-in the real world to diagnose the behaviour in the tx path.
+Hi Willem,
 
-Also, check the safety issues by accessing a few bpf calls in
-bpf_test_access_bpf_calls().
+kernel test robot noticed the following build warnings:
 
-There remains a few realistic things[1][2] to highlight:
-1. in general a packet may pass through multiple qdiscs. For instance
-with bonding or tunnel virtual devices in the egress path.
-2. packets may be resent, in which case an ACK might precede a repeat
-SCHED and SND.
-3. erroneous or malicious peers may also just never send an ACK.
+[auto build test WARNING on net-next/main]
 
-[1]: https://lore.kernel.org/all/67a389af981b0_14e0832949d@willemb.c.googlers.com.notmuch/
-[2]: https://lore.kernel.org/all/c329a0c1-239b-4ca1-91f2-cb30b8dd2f6a@linux.dev/
+url:    https://github.com/intel-lab-lkp/linux/commits/Willem-de-Bruijn/tcp-only-initialize-sockcm-tsflags-field/20250207-033912
+base:   net-next/main
+patch link:    https://lore.kernel.org/r/20250206193521.2285488-6-willemdebruijn.kernel%40gmail.com
+patch subject: [PATCH net-next 5/7] icmp: reflect tos through ip cookie rather than updating inet_sk
+config: x86_64-buildonly-randconfig-002-20250207 (https://download.01.org/0day-ci/archive/20250208/202502081845.hsTDUryC-lkp@intel.com/config)
+compiler: clang version 19.1.3 (https://github.com/llvm/llvm-project ab51eccf88f5321e7c60591c5546b254b6afab99)
+reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20250208/202502081845.hsTDUryC-lkp@intel.com/reproduce)
 
-Signed-off-by: Jason Xing <kerneljasonxing@gmail.com>
----
- .../bpf/prog_tests/so_timestamping.c          |  79 +++++
- .../selftests/bpf/progs/so_timestamping.c     | 312 ++++++++++++++++++
- 2 files changed, 391 insertions(+)
- create mode 100644 tools/testing/selftests/bpf/prog_tests/so_timestamping.c
- create mode 100644 tools/testing/selftests/bpf/progs/so_timestamping.c
+If you fix the issue in a separate patch/commit (i.e. not just a new version of
+the same patch/commit), kindly add following tags
+| Reported-by: kernel test robot <lkp@intel.com>
+| Closes: https://lore.kernel.org/oe-kbuild-all/202502081845.hsTDUryC-lkp@intel.com/
 
-diff --git a/tools/testing/selftests/bpf/prog_tests/so_timestamping.c b/tools/testing/selftests/bpf/prog_tests/so_timestamping.c
-new file mode 100644
-index 000000000000..1829f93bc52e
---- /dev/null
-+++ b/tools/testing/selftests/bpf/prog_tests/so_timestamping.c
-@@ -0,0 +1,79 @@
-+#include "test_progs.h"
-+#include "network_helpers.h"
-+
-+#include "so_timestamping.skel.h"
-+
-+#define CG_NAME "/so-timestamping-test"
-+
-+static const char addr4_str[] = "127.0.0.1";
-+static const char addr6_str[] = "::1";
-+static struct so_timestamping *skel;
-+
-+static void test_tcp(int family)
-+{
-+	struct so_timestamping__bss *bss = skel->bss;
-+	char buf[] = "testing testing";
-+	int sfd = -1, cfd = -1;
-+	int n;
-+
-+	memset(bss, 0, sizeof(*bss));
-+
-+	sfd = start_server(family, SOCK_STREAM,
-+			   family == AF_INET6 ? addr6_str : addr4_str, 0, 0);
-+	if (!ASSERT_OK_FD(sfd, "start_server"))
-+		goto out;
-+
-+	cfd = connect_to_fd(sfd, 0);
-+	if (!ASSERT_OK_FD(cfd, "connect_to_fd_server"))
-+		goto out;
-+
-+	n = write(cfd, buf, sizeof(buf));
-+	if (!ASSERT_EQ(n, sizeof(buf), "send to server"))
-+		goto out;
-+
-+	ASSERT_EQ(bss->nr_active, 1, "nr_active");
-+	ASSERT_EQ(bss->nr_snd, 2, "nr_snd");
-+	ASSERT_EQ(bss->nr_sched, 1, "nr_sched");
-+	ASSERT_EQ(bss->nr_txsw, 1, "nr_txsw");
-+	ASSERT_EQ(bss->nr_ack, 1, "nr_ack");
-+
-+out:
-+	if (sfd >= 0)
-+		close(sfd);
-+	if (cfd >= 0)
-+		close(cfd);
-+}
-+
-+void test_so_timestamping(void)
-+{
-+	struct netns_obj *ns;
-+	int cg_fd;
-+
-+	cg_fd = test__join_cgroup(CG_NAME);
-+	if (!ASSERT_OK_FD(cg_fd, "join cgroup"))
-+		return;
-+
-+	ns = netns_new("so_timestamping_ns", true);
-+	if (!ASSERT_OK_PTR(ns, "create ns"))
-+		goto done;
-+
-+	skel = so_timestamping__open_and_load();
-+	if (!ASSERT_OK_PTR(skel, "open and load skel"))
-+		goto done;
-+
-+	if (!ASSERT_OK(so_timestamping__attach(skel), "attach skel"))
-+		goto done;
-+
-+	skel->links.skops_sockopt =
-+		bpf_program__attach_cgroup(skel->progs.skops_sockopt, cg_fd);
-+	if (!ASSERT_OK_PTR(skel->links.skops_sockopt, "attach cgroup"))
-+		goto done;
-+
-+	test_tcp(AF_INET6);
-+	test_tcp(AF_INET);
-+
-+done:
-+	so_timestamping__destroy(skel);
-+	netns_free(ns);
-+	close(cg_fd);
-+}
-diff --git a/tools/testing/selftests/bpf/progs/so_timestamping.c b/tools/testing/selftests/bpf/progs/so_timestamping.c
-new file mode 100644
-index 000000000000..4974552cdecb
---- /dev/null
-+++ b/tools/testing/selftests/bpf/progs/so_timestamping.c
-@@ -0,0 +1,312 @@
-+#include "vmlinux.h"
-+#include "bpf_tracing_net.h"
-+#include <bpf/bpf_helpers.h>
-+#include <bpf/bpf_tracing.h>
-+#include "bpf_misc.h"
-+#include "bpf_kfuncs.h"
-+#define BPF_PROG_TEST_TCP_HDR_OPTIONS
-+#include "test_tcp_hdr_options.h"
-+#include <errno.h>
-+
-+#define SK_BPF_CB_FLAGS 1009
-+#define SK_BPF_CB_TX_TIMESTAMPING 1
-+
-+int nr_active;
-+int nr_snd;
-+int nr_passive;
-+int nr_sched;
-+int nr_txsw;
-+int nr_ack;
-+
-+struct sockopt_test {
-+	int opt;
-+	int new;
-+};
-+
-+static const struct sockopt_test sol_socket_tests[] = {
-+	{ .opt = SK_BPF_CB_FLAGS, .new = SK_BPF_CB_TX_TIMESTAMPING, },
-+	{ .opt = 0, },
-+};
-+
-+struct loop_ctx {
-+	void *ctx;
-+	const struct sock *sk;
-+};
-+
-+struct sk_stg {
-+	__u64 sendmsg_ns;	/* record ts when sendmsg is called */
-+};
-+
-+struct sk_tskey {
-+	u64 cookie;
-+	u32 tskey;
-+};
-+
-+struct delay_info {
-+	u64 sendmsg_ns;		/* record ts when sendmsg is called */
-+	u32 sched_delay;	/* SCHED_OPT_CB - sendmsg_ns */
-+	u32 sw_snd_delay;	/* SW_OPT_CB - SCHED_OPT_CB */
-+	u32 ack_delay;		/* ACK_OPT_CB - SW_OPT_CB */
-+};
-+
-+struct {
-+	__uint(type, BPF_MAP_TYPE_SK_STORAGE);
-+	__uint(map_flags, BPF_F_NO_PREALLOC);
-+	__type(key, int);
-+	__type(value, struct sk_stg);
-+} sk_stg_map SEC(".maps");
-+
-+struct {
-+	__uint(type, BPF_MAP_TYPE_HASH);
-+	__type(key, struct sk_tskey);
-+	__type(value, struct delay_info);
-+	__uint(max_entries, 1024);
-+} time_map SEC(".maps");
-+
-+static u64 delay_tolerance_nsec = 10000000000; /* 10 second as an example */
-+
-+extern int bpf_sock_ops_enable_tx_tstamp(struct bpf_sock_ops_kern *skops) __ksym;
-+
-+static int bpf_test_sockopt_int(void *ctx, const struct sock *sk,
-+				const struct sockopt_test *t,
-+				int level)
-+{
-+	int new, opt, tmp;
-+
-+	opt = t->opt;
-+	new = t->new;
-+
-+	if (bpf_setsockopt(ctx, level, opt, &new, sizeof(new)))
-+		return 1;
-+
-+	if (bpf_getsockopt(ctx, level, opt, &tmp, sizeof(tmp)) ||
-+	    tmp != new)
-+		return 1;
-+
-+	return 0;
-+}
-+
-+static int bpf_test_socket_sockopt(__u32 i, struct loop_ctx *lc)
-+{
-+	const struct sockopt_test *t;
-+
-+	if (i >= ARRAY_SIZE(sol_socket_tests))
-+		return 1;
-+
-+	t = &sol_socket_tests[i];
-+	if (!t->opt)
-+		return 1;
-+
-+	return bpf_test_sockopt_int(lc->ctx, lc->sk, t, SOL_SOCKET);
-+}
-+
-+static int bpf_test_sockopt(void *ctx, const struct sock *sk)
-+{
-+	struct loop_ctx lc = { .ctx = ctx, .sk = sk, };
-+	int n;
-+
-+	n = bpf_loop(ARRAY_SIZE(sol_socket_tests), bpf_test_socket_sockopt, &lc, 0);
-+	if (n != ARRAY_SIZE(sol_socket_tests))
-+		return -1;
-+
-+	return 0;
-+}
-+
-+static bool bpf_test_access_sockopt(void *ctx)
-+{
-+	const struct sockopt_test *t;
-+	int tmp, ret, i = 0;
-+	int level = SOL_SOCKET;
-+
-+	t = &sol_socket_tests[i];
-+
-+	for (; t->opt;) {
-+		ret = bpf_setsockopt(ctx, level, t->opt, (void *)&t->new, sizeof(t->new));
-+		if (ret != -EOPNOTSUPP)
-+			return true;
-+
-+		ret = bpf_getsockopt(ctx, level, t->opt, &tmp, sizeof(tmp));
-+		if (ret != -EOPNOTSUPP)
-+			return true;
-+
-+		if (++i >= ARRAY_SIZE(sol_socket_tests))
-+			break;
-+	}
-+
-+	return false;
-+}
-+
-+/* Adding a simple test to see if we can get an expected value */
-+static bool bpf_test_access_load_hdr_opt(struct bpf_sock_ops *skops)
-+{
-+	struct tcp_opt reg_opt;
-+	int load_flags = 0;
-+	int ret;
-+
-+	reg_opt.kind = TCPOPT_EXP;
-+	reg_opt.len = 0;
-+	reg_opt.data32 = 0;
-+	ret = bpf_load_hdr_opt(skops, &reg_opt, sizeof(reg_opt), load_flags);
-+	if (ret != -EOPNOTSUPP)
-+		return true;
-+
-+	return false;
-+}
-+
-+/* Adding a simple test to see if we can get an expected value */
-+static bool bpf_test_access_cb_flags_set(struct bpf_sock_ops *skops)
-+{
-+	int ret;
-+
-+	ret = bpf_sock_ops_cb_flags_set(skops, 0);
-+	if (ret != -EOPNOTSUPP)
-+		return true;
-+
-+	return false;
-+}
-+
-+/* In the timestamping callbacks, we're not allowed to call the following
-+ * BPF CALLs for the safety concern. Return false if expected.
-+ */
-+static bool bpf_test_access_bpf_calls(struct bpf_sock_ops *skops,
-+				     const struct sock *sk)
-+{
-+	if (bpf_test_access_sockopt(skops))
-+		return true;
-+
-+	if (bpf_test_access_load_hdr_opt(skops))
-+		return true;
-+
-+	if (bpf_test_access_cb_flags_set(skops))
-+		return true;
-+
-+	return false;
-+}
-+
-+static bool bpf_test_delay(struct bpf_sock_ops *skops, const struct sock *sk)
-+{
-+	struct bpf_sock_ops_kern *skops_kern;
-+	u64 timestamp = bpf_ktime_get_ns();
-+	struct skb_shared_info *shinfo;
-+	struct delay_info dinfo = {0};
-+	struct sk_tskey key = {0};
-+	struct delay_info *val;
-+	struct sk_buff *skb;
-+	struct sk_stg *stg;
-+	u64 prior_ts, delay;
-+
-+	if (bpf_test_access_bpf_calls(skops, sk))
-+		return false;
-+
-+	skops_kern = bpf_cast_to_kern_ctx(skops);
-+	skb = skops_kern->skb;
-+	shinfo = bpf_core_cast(skb->head + skb->end, struct skb_shared_info);
-+
-+	key.cookie = bpf_get_socket_cookie(skops);
-+	if (!key.cookie)
-+		return false;
-+
-+	if (skops->op == BPF_SOCK_OPS_TS_SND_CB) {
-+		stg = bpf_sk_storage_get(&sk_stg_map, (void *)sk, 0, 0);
-+		if (!stg)
-+			return false;
-+		dinfo.sendmsg_ns = stg->sendmsg_ns;
-+		bpf_sock_ops_enable_tx_tstamp(skops_kern);
-+		key.tskey = shinfo->tskey;
-+		if (!key.tskey)
-+			return false;
-+		bpf_map_update_elem(&time_map, &key, &dinfo, BPF_ANY);
-+		return true;
-+	}
-+
-+	key.tskey = shinfo->tskey;
-+	if (!key.tskey)
-+		return false;
-+
-+	val = bpf_map_lookup_elem(&time_map, &key);
-+	if (!val)
-+		return false;
-+
-+	switch (skops->op) {
-+	case BPF_SOCK_OPS_TS_SCHED_OPT_CB:
-+		delay = val->sched_delay = timestamp - val->sendmsg_ns;
-+		break;
-+	case BPF_SOCK_OPS_TS_SW_OPT_CB:
-+		prior_ts = val->sched_delay + val->sendmsg_ns;
-+		delay = val->sw_snd_delay = timestamp - prior_ts;
-+		break;
-+	case BPF_SOCK_OPS_TS_ACK_OPT_CB:
-+		prior_ts = val->sw_snd_delay + val->sched_delay + val->sendmsg_ns;
-+		delay = val->ack_delay = timestamp - prior_ts;
-+		break;
-+	}
-+
-+	if (delay >= delay_tolerance_nsec)
-+		return false;
-+
-+	/* Since it's the last one, remove from the map after latency check */
-+	if (skops->op == BPF_SOCK_OPS_TS_ACK_OPT_CB)
-+		bpf_map_delete_elem(&time_map, &key);
-+
-+	return true;
-+}
-+
-+SEC("fentry/tcp_sendmsg_locked")
-+int BPF_PROG(trace_tcp_sendmsg_locked, struct sock *sk, struct msghdr *msg, size_t size)
-+{
-+	u64 timestamp = bpf_ktime_get_ns();
-+	u32 flag = sk->sk_bpf_cb_flags;
-+	struct sk_stg *stg;
-+
-+	if (!flag)
-+		return 0;
-+
-+	stg = bpf_sk_storage_get(&sk_stg_map, sk, 0,
-+				 BPF_SK_STORAGE_GET_F_CREATE);
-+	if (!stg)
-+		return 0;
-+
-+	stg->sendmsg_ns = timestamp;
-+	nr_snd += 1;
-+	return 0;
-+}
-+
-+SEC("sockops")
-+int skops_sockopt(struct bpf_sock_ops *skops)
-+{
-+	struct bpf_sock *bpf_sk = skops->sk;
-+	const struct sock *sk;
-+
-+	if (!bpf_sk)
-+		return 1;
-+
-+	sk = (struct sock *)bpf_skc_to_tcp_sock(bpf_sk);
-+	if (!sk)
-+		return 1;
-+
-+	switch (skops->op) {
-+	case BPF_SOCK_OPS_ACTIVE_ESTABLISHED_CB:
-+		nr_active += !bpf_test_sockopt(skops, sk);
-+		break;
-+	case BPF_SOCK_OPS_TS_SND_CB:
-+		if (bpf_test_delay(skops, sk))
-+			nr_snd += 1;
-+		break;
-+	case BPF_SOCK_OPS_TS_SCHED_OPT_CB:
-+		if (bpf_test_delay(skops, sk))
-+			nr_sched += 1;
-+		break;
-+	case BPF_SOCK_OPS_TS_SW_OPT_CB:
-+		if (bpf_test_delay(skops, sk))
-+			nr_txsw += 1;
-+		break;
-+	case BPF_SOCK_OPS_TS_ACK_OPT_CB:
-+		if (bpf_test_delay(skops, sk))
-+			nr_ack += 1;
-+		break;
-+	}
-+
-+	return 1;
-+}
-+
-+char _license[] SEC("license") = "GPL";
+All warnings (new ones prefixed by >>):
+
+>> net/ipv4/icmp.c:408:20: warning: variable 'inet' set but not used [-Wunused-but-set-variable]
+     408 |         struct inet_sock *inet;
+         |                           ^
+   1 warning generated.
+
+
+vim +/inet +408 net/ipv4/icmp.c
+
+^1da177e4c3f41 Linus Torvalds         2005-04-16  395  
+^1da177e4c3f41 Linus Torvalds         2005-04-16  396  /*
+^1da177e4c3f41 Linus Torvalds         2005-04-16  397   *	Driving logic for building and sending ICMP messages.
+^1da177e4c3f41 Linus Torvalds         2005-04-16  398   */
+^1da177e4c3f41 Linus Torvalds         2005-04-16  399  
+^1da177e4c3f41 Linus Torvalds         2005-04-16  400  static void icmp_reply(struct icmp_bxm *icmp_param, struct sk_buff *skb)
+^1da177e4c3f41 Linus Torvalds         2005-04-16  401  {
+^1da177e4c3f41 Linus Torvalds         2005-04-16  402  	struct ipcm_cookie ipc;
+511c3f92ad5b6d Eric Dumazet           2009-06-02  403  	struct rtable *rt = skb_rtable(skb);
+d8d1f30b95a635 Changli Gao            2010-06-10  404  	struct net *net = dev_net(rt->dst.dev);
+8c2bd38b95f75f Eric Dumazet           2024-08-29  405  	bool apply_ratelimit = false;
+77968b78242ee2 David S. Miller        2011-05-08  406  	struct flowi4 fl4;
+fdc0bde90a689b Denis V. Lunev         2008-08-23  407  	struct sock *sk;
+fdc0bde90a689b Denis V. Lunev         2008-08-23 @408  	struct inet_sock *inet;
+35ebf65e851c6d David S. Miller        2012-06-28  409  	__be32 daddr, saddr;
+e110861f86094c Lorenzo Colitti        2014-05-13  410  	u32 mark = IP4_REPLY_MARK(net, skb->mark);
+c0303efeab7391 Jesper Dangaard Brouer 2017-01-09  411  	int type = icmp_param->data.icmph.type;
+c0303efeab7391 Jesper Dangaard Brouer 2017-01-09  412  	int code = icmp_param->data.icmph.code;
+^1da177e4c3f41 Linus Torvalds         2005-04-16  413  
+91ed1e666a4ea2 Paolo Abeni            2017-08-03  414  	if (ip_options_echo(net, &icmp_param->replyopts.opt.opt, skb))
+f00c401b9b5f0a Horms                  2006-02-02  415  		return;
+^1da177e4c3f41 Linus Torvalds         2005-04-16  416  
+8c2bd38b95f75f Eric Dumazet           2024-08-29  417  	/* Needed by both icmpv4_global_allow and icmp_xmit_lock */
+7ba91ecb16824f Jesper Dangaard Brouer 2017-01-09  418  	local_bh_disable();
+^1da177e4c3f41 Linus Torvalds         2005-04-16  419  
+8c2bd38b95f75f Eric Dumazet           2024-08-29  420  	/* is global icmp_msgs_per_sec exhausted ? */
+8c2bd38b95f75f Eric Dumazet           2024-08-29  421  	if (!icmpv4_global_allow(net, type, code, &apply_ratelimit))
+7ba91ecb16824f Jesper Dangaard Brouer 2017-01-09  422  		goto out_bh_enable;
+7ba91ecb16824f Jesper Dangaard Brouer 2017-01-09  423  
+7ba91ecb16824f Jesper Dangaard Brouer 2017-01-09  424  	sk = icmp_xmit_lock(net);
+7ba91ecb16824f Jesper Dangaard Brouer 2017-01-09  425  	if (!sk)
+7ba91ecb16824f Jesper Dangaard Brouer 2017-01-09  426  		goto out_bh_enable;
+7ba91ecb16824f Jesper Dangaard Brouer 2017-01-09  427  	inet = inet_sk(sk);
+c0303efeab7391 Jesper Dangaard Brouer 2017-01-09  428  
+^1da177e4c3f41 Linus Torvalds         2005-04-16  429  	icmp_param->data.icmph.checksum = 0;
+^1da177e4c3f41 Linus Torvalds         2005-04-16  430  
+351782067b6be8 Willem de Bruijn       2018-07-06  431  	ipcm_init(&ipc);
+bbd17d3104f5a7 Willem de Bruijn       2025-02-06  432  	ipc.tos = ip_hdr(skb)->tos;
+0da7536fb47f51 Willem de Bruijn       2020-07-01  433  	ipc.sockc.mark = mark;
+9f6abb5f175bdb David S. Miller        2011-05-09  434  	daddr = ipc.addr = ip_hdr(skb)->saddr;
+35ebf65e851c6d David S. Miller        2012-06-28  435  	saddr = fib_compute_spec_dst(skb);
+aa6615814533c6 Francesco Fusco        2013-09-24  436  
+f6d8bd051c391c Eric Dumazet           2011-04-21  437  	if (icmp_param->replyopts.opt.opt.optlen) {
+f6d8bd051c391c Eric Dumazet           2011-04-21  438  		ipc.opt = &icmp_param->replyopts.opt;
+f6d8bd051c391c Eric Dumazet           2011-04-21  439  		if (ipc.opt->opt.srr)
+f6d8bd051c391c Eric Dumazet           2011-04-21  440  			daddr = icmp_param->replyopts.opt.opt.faddr;
+^1da177e4c3f41 Linus Torvalds         2005-04-16  441  	}
+77968b78242ee2 David S. Miller        2011-05-08  442  	memset(&fl4, 0, sizeof(fl4));
+77968b78242ee2 David S. Miller        2011-05-08  443  	fl4.daddr = daddr;
+35ebf65e851c6d David S. Miller        2012-06-28  444  	fl4.saddr = saddr;
+e110861f86094c Lorenzo Colitti        2014-05-13  445  	fl4.flowi4_mark = mark;
+e2d118a1cb5e60 Lorenzo Colitti        2016-11-04  446  	fl4.flowi4_uid = sock_net_uid(net, NULL);
+0ed373390c5c18 Guillaume Nault        2024-10-22  447  	fl4.flowi4_tos = inet_dscp_to_dsfield(ip4h_dscp(ip_hdr(skb)));
+77968b78242ee2 David S. Miller        2011-05-08  448  	fl4.flowi4_proto = IPPROTO_ICMP;
+385add906b6155 David Ahern            2015-09-29  449  	fl4.flowi4_oif = l3mdev_master_ifindex(skb->dev);
+3df98d79215ace Paul Moore             2020-09-27  450  	security_skb_classify_flow(skb, flowi4_to_flowi_common(&fl4));
+9d6ec938019c6b David S. Miller        2011-03-12  451  	rt = ip_route_output_key(net, &fl4);
+b23dd4fe42b455 David S. Miller        2011-03-02  452  	if (IS_ERR(rt))
+^1da177e4c3f41 Linus Torvalds         2005-04-16  453  		goto out_unlock;
+8c2bd38b95f75f Eric Dumazet           2024-08-29  454  	if (icmpv4_xrlim_allow(net, rt, &fl4, type, code, apply_ratelimit))
+a15c89c703d434 Eric Dumazet           2022-01-24  455  		icmp_push_reply(sk, icmp_param, &fl4, &ipc, &rt);
+^1da177e4c3f41 Linus Torvalds         2005-04-16  456  	ip_rt_put(rt);
+^1da177e4c3f41 Linus Torvalds         2005-04-16  457  out_unlock:
+405666db84b984 Denis V. Lunev         2008-02-29  458  	icmp_xmit_unlock(sk);
+7ba91ecb16824f Jesper Dangaard Brouer 2017-01-09  459  out_bh_enable:
+7ba91ecb16824f Jesper Dangaard Brouer 2017-01-09  460  	local_bh_enable();
+^1da177e4c3f41 Linus Torvalds         2005-04-16  461  }
+^1da177e4c3f41 Linus Torvalds         2005-04-16  462  
+
 -- 
-2.43.5
-
+0-DAY CI Kernel Test Service
+https://github.com/intel/lkp-tests/wiki
 
