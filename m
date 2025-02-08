@@ -1,182 +1,171 @@
-Return-Path: <netdev+bounces-164349-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-164350-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 46332A2D7DC
-	for <lists+netdev@lfdr.de>; Sat,  8 Feb 2025 18:54:16 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 86A97A2D804
+	for <lists+netdev@lfdr.de>; Sat,  8 Feb 2025 19:26:53 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D377116714B
-	for <lists+netdev@lfdr.de>; Sat,  8 Feb 2025 17:54:14 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 0E913166458
+	for <lists+netdev@lfdr.de>; Sat,  8 Feb 2025 18:26:52 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CB483241131;
-	Sat,  8 Feb 2025 17:54:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E96001F30D1;
+	Sat,  8 Feb 2025 18:26:49 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="dG8vSLRV"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="hMfsMX/2"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-vk1-f175.google.com (mail-vk1-f175.google.com [209.85.221.175])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.17])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 32084241103;
-	Sat,  8 Feb 2025 17:54:10 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.175
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 51F581714AC;
+	Sat,  8 Feb 2025 18:26:47 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.17
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1739037252; cv=none; b=AsoET0MCC8rbc23Wvw/my4BDvQ6mhK6eAKIV/iAZYTCYybOUsQMcQK/P/6ztBkqJxsR/G6wJKSsaD+vslHfFqpMGi26uu6NDL5KG/hT7rDXFDjO+mEK0aQtNP1J+c1uhyELYwEdHzik+mh/l/Kontu//dorxAfhd4OF8Z8dN1G4=
+	t=1739039209; cv=none; b=UBnfnp7EQBXml2LDKsFyukhhhB52IeFiUUSgldnbtmkQs0RN+WJp9rAFRLqf0H8smDGzf+XTcrgBcbDKML4fMZxqMKVl7OT8hrJZVZwtx7pnpx8BPVYxj0/6RSukTXZjZFQx+NDQiqhFCLcuVUrdu/D3VczydiiUCiPuTBFeWrA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1739037252; c=relaxed/simple;
-	bh=0PVro0gUVvzQBouIK3AlBAd02LKCtyxzRT/S3wUsjZA=;
-	h=Date:From:To:Cc:Message-ID:In-Reply-To:References:Subject:
-	 Mime-Version:Content-Type; b=G7BcVcN3sQAR4KuRypikuW/+AsWKFalmHyTRj3a3Z6pVQxef4la+kxV6sAIsUzzMQQq+Qiwkvxfb92KqkxmVhw3x8Yte95u0ifYeq4/yAZky7q2kQSSLGgvIfmL24ypyRD0PK952sK9HES1pcwl6axfoarUZjYzIL6uK1Am+x/w=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=dG8vSLRV; arc=none smtp.client-ip=209.85.221.175
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-vk1-f175.google.com with SMTP id 71dfb90a1353d-5203149c8e9so296903e0c.3;
-        Sat, 08 Feb 2025 09:54:10 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1739037250; x=1739642050; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:subject:references
-         :in-reply-to:message-id:cc:to:from:date:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=ODPfWA5FJeQXJ9Sg2qOFReyedtyHAGRXFc0zVluYrzg=;
-        b=dG8vSLRVse3Jwn2MaU+sNmmbrYkDRaurp0FEHBP9s9+U2yPyQV+y7oyv+nfZFlggLv
-         +IgUa4U13V0eFFh1WSewIzmW4yfj90M90EPCarG1xrmbAPTEQpJCBd8+PK7+u/qPLc6u
-         FaFcsGTIgHkBqyXB0EocDVkCqrfbLgVObkJNkLtHGhAuLyqueZ7PFXQ52bfaNb9TtAFt
-         WADxMbW6/nwY4/lGKac5xOSEJ5AsNB/SYifuJk1sq69tgvhWZsuF3LjrCJaDwvyeeK5F
-         3/2tBFG8d0dg2yJHXmGjEV1+o49v5tuOGKmNBHBmlUjq9nP4X/BnPqUJWF/+qayyPgiu
-         O8og==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1739037250; x=1739642050;
-        h=content-transfer-encoding:mime-version:subject:references
-         :in-reply-to:message-id:cc:to:from:date:x-gm-message-state:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=ODPfWA5FJeQXJ9Sg2qOFReyedtyHAGRXFc0zVluYrzg=;
-        b=aIyaA52j7fRPU/eSM5xgigfysD/J+4IEbE4aEFHL6/1HcAp6ljylkrIMz5fV3fl4AO
-         MR5KF1jeDGG4f5iLufzz331+dg3u7Ybx8jE6uMvhJ65kvyLyF1Ixq0L5qGJM2xFBxbqh
-         xkekAEXhuGw8iwdgna4rr25Tm58koK80lV2CK06uPs9L5MH/2NywuZ81YfSIkXHaY+sb
-         u3MXbyezGdcM8QqwdutT5mWyqMKl2lT5NQxUnrXEuiuwoSJ3U2Wv4k5wlBhZY+Z0D4Wy
-         TYMDFH3yKYLR+SDs88iAJjn2vPiKqGofidsq1RjJ3yxSxfO5AcbZX5sfOSIqqlryVwzc
-         /K2A==
-X-Forwarded-Encrypted: i=1; AJvYcCV2w1amRv8REAoBmh6obtmLisg5adaVvQ0PrgkkLOA4oSrRXugDJO8e8RZuG7SJBXITcztxr+M=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwO1GRgWdmlL57xqJ3WXUOPqSVnn4SQqFUwtOzK9YXfQwwrRqMr
-	Vnvt1jHdmHBhcWpyz4YmUhLdup1EUDK06i2+YIaCPixwdapwXd8E
-X-Gm-Gg: ASbGncskgl9VswHRsn9eUhM/wdDmRAIok7y995pHfaBcEw3vq3T9YV4yiq7a0cqdIZJ
-	GrpsM1RRsrd2NaLAIIw8WKR45tCmsRHFu2UyOmxAbTPjZ+8x2z1Lz6RseYY+d85tXlQ7G3jbOZX
-	y9uqEfCZKO66FCj3vzxnVFHSg9xb8h5D4rZy2Ekunus4SMELHgeOzitLUIYGPkI2LNNkcStVsZn
-	zxxNu4O92JYAa6eHNu0QGPU1Up1iKDdpF8TWahN8xIqIzZob2oIczjq0NCiKzZ0HP3pOy3+DXGf
-	fyrupuR1JQ8yiHqawQlB4F5ZX2wQc3krrUixvp2cz8Z6c63MOyNH9U/8tMzB2og=
-X-Google-Smtp-Source: AGHT+IEcLY7ddFVQUmNxx2h+FkAFQSBCaYaYdcSHuQilYwtT+Wlfbvh9FGx/CBfBEiPsJZUX5+wzBQ==
-X-Received: by 2002:a05:6122:54f:b0:518:89d9:dd99 with SMTP id 71dfb90a1353d-51f2e0de362mr6503768e0c.3.1739037249838;
-        Sat, 08 Feb 2025 09:54:09 -0800 (PST)
-Received: from localhost (15.60.86.34.bc.googleusercontent.com. [34.86.60.15])
-        by smtp.gmail.com with ESMTPSA id a1e0cc1a2514c-866f9685897sm1062224241.14.2025.02.08.09.54.08
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sat, 08 Feb 2025 09:54:08 -0800 (PST)
-Date: Sat, 08 Feb 2025 12:54:07 -0500
-From: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
-To: Jason Xing <kerneljasonxing@gmail.com>, 
- davem@davemloft.net, 
- edumazet@google.com, 
- kuba@kernel.org, 
- pabeni@redhat.com, 
- dsahern@kernel.org, 
- willemdebruijn.kernel@gmail.com, 
- willemb@google.com, 
- ast@kernel.org, 
- daniel@iogearbox.net, 
- andrii@kernel.org, 
- martin.lau@linux.dev, 
- eddyz87@gmail.com, 
- song@kernel.org, 
- yonghong.song@linux.dev, 
- john.fastabend@gmail.com, 
- kpsingh@kernel.org, 
- sdf@fomichev.me, 
- haoluo@google.com, 
- jolsa@kernel.org, 
- horms@kernel.org
-Cc: bpf@vger.kernel.org, 
- netdev@vger.kernel.org, 
- Jason Xing <kerneljasonxing@gmail.com>
-Message-ID: <67a79a3f9c7ed_3488ef294cf@willemb.c.googlers.com.notmuch>
-In-Reply-To: <20250208103220.72294-10-kerneljasonxing@gmail.com>
-References: <20250208103220.72294-1-kerneljasonxing@gmail.com>
- <20250208103220.72294-10-kerneljasonxing@gmail.com>
-Subject: Re: [PATCH bpf-next v9 09/12] bpf: support SCM_TSTAMP_ACK of
- SO_TIMESTAMPING
+	s=arc-20240116; t=1739039209; c=relaxed/simple;
+	bh=9vDK68QQZRosnkDe9Vqw2x9gXKsq56LrqlcltzABfh8=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=DBmdCgTVYHxLPsj4b4SsCcGl8cY5jcwaJmkRPvvyCYbbMFRpF23/j5452BwZbOnJQj3+3khGZrv/FF4u3h0ZIP45EjFRrif3+bOhCkskS1vlSpIeN3aIZf7XgPIf1bU0C71/ASBr1+H+7C7kZcJOqNNHHtadWV9UtHa2c1wIMjM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=hMfsMX/2; arc=none smtp.client-ip=192.198.163.17
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1739039208; x=1770575208;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=9vDK68QQZRosnkDe9Vqw2x9gXKsq56LrqlcltzABfh8=;
+  b=hMfsMX/2c5iUcLCqAvixZmoSXlcXkKL8Nxl4X/x97CvbOhjlaaC/ra+1
+   O23X/LTFvOZO7ATuU3mCTx8gBNJAHG43LMjJQjmbzuBZ94xSEwVmvyYdD
+   7NfQl3J7h3Z8ZpR10hkb5B/4P58DaXX6V7NtuR6JqpUWBLnYOdPFi59xu
+   v64/M3mevZqRKEh8u7MbY6Z5msZmAncW9eix5MxFhhUfmVcZ8tXgOW7p/
+   7UGnaifdt6vjfj0mZNp4RdrDXWOEpAxtecPHiRwR/bBBZrDIKC/uR35Ca
+   kv1uE5hmoabgNlzRPamndVlOzqR8tMD2m8PqgMr72nC8w2eDBHqA7QVvD
+   Q==;
+X-CSE-ConnectionGUID: K+5Q//IaTwicM0FxtDo4sQ==
+X-CSE-MsgGUID: iRmcHAtuQkq9VnM4qGpeGg==
+X-IronPort-AV: E=McAfee;i="6700,10204,11339"; a="39555055"
+X-IronPort-AV: E=Sophos;i="6.13,270,1732608000"; 
+   d="scan'208";a="39555055"
+Received: from orviesa002.jf.intel.com ([10.64.159.142])
+  by fmvoesa111.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 08 Feb 2025 10:26:47 -0800
+X-CSE-ConnectionGUID: v2y3OrLBSIu7EbdKo51wjA==
+X-CSE-MsgGUID: LgCKuGihQye7mE4+/uUxZA==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.13,270,1732608000"; 
+   d="scan'208";a="142677431"
+Received: from lkp-server01.sh.intel.com (HELO d63d4d77d921) ([10.239.97.150])
+  by orviesa002.jf.intel.com with ESMTP; 08 Feb 2025 10:26:42 -0800
+Received: from kbuild by d63d4d77d921 with local (Exim 4.96)
+	(envelope-from <lkp@intel.com>)
+	id 1tgpXL-0010UZ-2B;
+	Sat, 08 Feb 2025 18:26:39 +0000
+Date: Sun, 9 Feb 2025 02:26:27 +0800
+From: kernel test robot <lkp@intel.com>
+To: Tamir Duberstein <tamird@gmail.com>,
+	Andrew Morton <akpm@linux-foundation.org>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Simon Horman <horms@kernel.org>,
+	Shuah Khan <skhan@linuxfoundation.org>,
+	Nathan Chancellor <nathan@kernel.org>,
+	Nick Desaulniers <ndesaulniers@google.com>,
+	Bill Wendling <morbo@google.com>,
+	Justin Stitt <justinstitt@google.com>
+Cc: oe-kbuild-all@lists.linux.dev,
+	Linux Memory Management List <linux-mm@kvack.org>,
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+	linux-kselftest@vger.kernel.org, llvm@lists.linux.dev,
+	Tamir Duberstein <tamird@gmail.com>
+Subject: Re: [PATCH] blackhole_dev: convert self-test to KUnit
+Message-ID: <202502090248.Ed6S8p8J-lkp@intel.com>
+References: <20250207-blackholedev-kunit-convert-v1-1-8ef0dc1ff881@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Content-Type: text/plain;
- charset=utf-8
-Content-Transfer-Encoding: 7bit
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250207-blackholedev-kunit-convert-v1-1-8ef0dc1ff881@gmail.com>
 
-Jason Xing wrote:
-> Support the ACK timestamp case. Extend txstamp_ack to two bits:
-> 1 stands for SO_TIMESTAMPING mode, 2 bpf extension. The latter
-> will be used later.
-> 
-> Signed-off-by: Jason Xing <kerneljasonxing@gmail.com>
-> ---
->  include/net/tcp.h              | 4 ++--
->  include/uapi/linux/bpf.h       | 5 +++++
->  net/core/skbuff.c              | 5 ++++-
->  tools/include/uapi/linux/bpf.h | 5 +++++
->  4 files changed, 16 insertions(+), 3 deletions(-)
-> 
-> diff --git a/include/net/tcp.h b/include/net/tcp.h
-> index 4c4dca59352b..ef30f3605e04 100644
-> --- a/include/net/tcp.h
-> +++ b/include/net/tcp.h
-> @@ -958,10 +958,10 @@ struct tcp_skb_cb {
->  
->  	__u8		sacked;		/* State flags for SACK.	*/
->  	__u8		ip_dsfield;	/* IPv4 tos or IPv6 dsfield	*/
-> -	__u8		txstamp_ack:1,	/* Record TX timestamp for ack? */
-> +	__u8		txstamp_ack:2,	/* Record TX timestamp for ack? */
->  			eor:1,		/* Is skb MSG_EOR marked? */
->  			has_rxtstamp:1,	/* SKB has a RX timestamp	*/
-> -			unused:5;
-> +			unused:4;
->  	__u32		ack_seq;	/* Sequence number ACK'd	*/
->  	union {
->  		struct {
-> diff --git a/include/uapi/linux/bpf.h b/include/uapi/linux/bpf.h
-> index e71a9b53e7bc..c04e788125a7 100644
-> --- a/include/uapi/linux/bpf.h
-> +++ b/include/uapi/linux/bpf.h
-> @@ -7044,6 +7044,11 @@ enum {
->  					 * SK_BPF_CB_TX_TIMESTAMPING feature
->  					 * is on.
->  					 */
-> +	BPF_SOCK_OPS_TS_ACK_OPT_CB,	/* Called when all the skbs in the
-> +					 * same sendmsg call are acked
-> +					 * when SK_BPF_CB_TX_TIMESTAMPING
-> +					 * feature is on.
-> +					 */
->  };
->  
->  /* List of TCP states. There is a build check in net/ipv4/tcp.c to detect
-> diff --git a/net/core/skbuff.c b/net/core/skbuff.c
-> index ca1ba4252ca5..c0f4d6f6583d 100644
-> --- a/net/core/skbuff.c
-> +++ b/net/core/skbuff.c
-> @@ -5549,7 +5549,7 @@ static bool skb_tstamp_tx_report_so_timestamping(struct sk_buff *skb,
->  		return skb_shinfo(skb)->tx_flags & (sw ? SKBTX_SW_TSTAMP :
->  						    SKBTX_HW_TSTAMP_NOBPF);
->  	case SCM_TSTAMP_ACK:
-> -		return TCP_SKB_CB(skb)->txstamp_ack;
-> +		return TCP_SKB_CB(skb)->txstamp_ack == 1;
+Hi Tamir,
 
-For the two to coexist, this should be txstamp_ack & 1
+kernel test robot noticed the following build warnings:
 
-And in the patch that introduces the BPF bit, txstamp_ack |= 2, rather than txstamp_ack = 2.
+[auto build test WARNING on 2014c95afecee3e76ca4a56956a936e23283f05b]
 
-And let's define labels rather than use constants directly: 
+url:    https://github.com/intel-lab-lkp/linux/commits/Tamir-Duberstein/blackhole_dev-convert-self-test-to-KUnit/20250208-074037
+base:   2014c95afecee3e76ca4a56956a936e23283f05b
+patch link:    https://lore.kernel.org/r/20250207-blackholedev-kunit-convert-v1-1-8ef0dc1ff881%40gmail.com
+patch subject: [PATCH] blackhole_dev: convert self-test to KUnit
+config: riscv-randconfig-r123-20250208 (https://download.01.org/0day-ci/archive/20250209/202502090248.Ed6S8p8J-lkp@intel.com/config)
+compiler: riscv64-linux-gcc (GCC) 14.2.0
+reproduce: (https://download.01.org/0day-ci/archive/20250209/202502090248.Ed6S8p8J-lkp@intel.com/reproduce)
 
-  #define TSTAMP_ACK_SK  0x1
-  #define TSTAMP_ACK_BPF 0x2
+If you fix the issue in a separate patch/commit (i.e. not just a new version of
+the same patch/commit), kindly add following tags
+| Reported-by: kernel test robot <lkp@intel.com>
+| Closes: https://lore.kernel.org/oe-kbuild-all/202502090248.Ed6S8p8J-lkp@intel.com/
+
+sparse warnings: (new ones prefixed by >>)
+>> lib/blackhole_dev_kunit.c:55:27: sparse: sparse: incorrect type in assignment (different base types) @@     expected restricted __be16 [usertype] payload_len @@     got unsigned long @@
+   lib/blackhole_dev_kunit.c:55:27: sparse:     expected restricted __be16 [usertype] payload_len
+   lib/blackhole_dev_kunit.c:55:27: sparse:     got unsigned long
+
+vim +55 lib/blackhole_dev_kunit.c
+
+509e56b37cc32c9 lib/test_blackhole_dev.c  Mahesh Bandewar  2019-07-01  26  
+a644885645ce867 lib/blackhole_dev_kunit.c Tamir Duberstein 2025-02-07  27  static void test_blackholedev(struct kunit *test)
+509e56b37cc32c9 lib/test_blackhole_dev.c  Mahesh Bandewar  2019-07-01  28  {
+509e56b37cc32c9 lib/test_blackhole_dev.c  Mahesh Bandewar  2019-07-01  29  	struct ipv6hdr *ip6h;
+509e56b37cc32c9 lib/test_blackhole_dev.c  Mahesh Bandewar  2019-07-01  30  	struct sk_buff *skb;
+509e56b37cc32c9 lib/test_blackhole_dev.c  Mahesh Bandewar  2019-07-01  31  	struct udphdr *uh;
+509e56b37cc32c9 lib/test_blackhole_dev.c  Mahesh Bandewar  2019-07-01  32  	int data_len;
+509e56b37cc32c9 lib/test_blackhole_dev.c  Mahesh Bandewar  2019-07-01  33  
+509e56b37cc32c9 lib/test_blackhole_dev.c  Mahesh Bandewar  2019-07-01  34  	skb = alloc_skb(SKB_SIZE, GFP_KERNEL);
+a644885645ce867 lib/blackhole_dev_kunit.c Tamir Duberstein 2025-02-07  35  	KUNIT_ASSERT_NOT_NULL(test, skb);
+509e56b37cc32c9 lib/test_blackhole_dev.c  Mahesh Bandewar  2019-07-01  36  
+509e56b37cc32c9 lib/test_blackhole_dev.c  Mahesh Bandewar  2019-07-01  37  	/* Reserve head-room for the headers */
+509e56b37cc32c9 lib/test_blackhole_dev.c  Mahesh Bandewar  2019-07-01  38  	skb_reserve(skb, HEAD_SIZE);
+509e56b37cc32c9 lib/test_blackhole_dev.c  Mahesh Bandewar  2019-07-01  39  
+509e56b37cc32c9 lib/test_blackhole_dev.c  Mahesh Bandewar  2019-07-01  40  	/* Add data to the skb */
+509e56b37cc32c9 lib/test_blackhole_dev.c  Mahesh Bandewar  2019-07-01  41  	data_len = SKB_SIZE - (HEAD_SIZE + TAIL_SIZE);
+509e56b37cc32c9 lib/test_blackhole_dev.c  Mahesh Bandewar  2019-07-01  42  	memset(__skb_put(skb, data_len), 0xf, data_len);
+509e56b37cc32c9 lib/test_blackhole_dev.c  Mahesh Bandewar  2019-07-01  43  
+509e56b37cc32c9 lib/test_blackhole_dev.c  Mahesh Bandewar  2019-07-01  44  	/* Add protocol data */
+509e56b37cc32c9 lib/test_blackhole_dev.c  Mahesh Bandewar  2019-07-01  45  	/* (Transport) UDP */
+509e56b37cc32c9 lib/test_blackhole_dev.c  Mahesh Bandewar  2019-07-01  46  	uh = (struct udphdr *)skb_push(skb, sizeof(struct udphdr));
+509e56b37cc32c9 lib/test_blackhole_dev.c  Mahesh Bandewar  2019-07-01  47  	skb_set_transport_header(skb, 0);
+509e56b37cc32c9 lib/test_blackhole_dev.c  Mahesh Bandewar  2019-07-01  48  	uh->source = uh->dest = htons(UDP_PORT);
+509e56b37cc32c9 lib/test_blackhole_dev.c  Mahesh Bandewar  2019-07-01  49  	uh->len = htons(data_len);
+509e56b37cc32c9 lib/test_blackhole_dev.c  Mahesh Bandewar  2019-07-01  50  	uh->check = 0;
+509e56b37cc32c9 lib/test_blackhole_dev.c  Mahesh Bandewar  2019-07-01  51  	/* (Network) IPv6 */
+509e56b37cc32c9 lib/test_blackhole_dev.c  Mahesh Bandewar  2019-07-01  52  	ip6h = (struct ipv6hdr *)skb_push(skb, sizeof(struct ipv6hdr));
+509e56b37cc32c9 lib/test_blackhole_dev.c  Mahesh Bandewar  2019-07-01  53  	skb_set_network_header(skb, 0);
+509e56b37cc32c9 lib/test_blackhole_dev.c  Mahesh Bandewar  2019-07-01  54  	ip6h->hop_limit = 32;
+509e56b37cc32c9 lib/test_blackhole_dev.c  Mahesh Bandewar  2019-07-01 @55  	ip6h->payload_len = data_len + sizeof(struct udphdr);
+509e56b37cc32c9 lib/test_blackhole_dev.c  Mahesh Bandewar  2019-07-01  56  	ip6h->nexthdr = IPPROTO_UDP;
+509e56b37cc32c9 lib/test_blackhole_dev.c  Mahesh Bandewar  2019-07-01  57  	ip6h->saddr = in6addr_loopback;
+509e56b37cc32c9 lib/test_blackhole_dev.c  Mahesh Bandewar  2019-07-01  58  	ip6h->daddr = in6addr_loopback;
+509e56b37cc32c9 lib/test_blackhole_dev.c  Mahesh Bandewar  2019-07-01  59  	/* Ether */
+843a8851e89e2e8 lib/test_blackhole_dev.c  Breno Leitao     2024-02-02  60  	skb_push(skb, sizeof(struct ethhdr));
+509e56b37cc32c9 lib/test_blackhole_dev.c  Mahesh Bandewar  2019-07-01  61  	skb_set_mac_header(skb, 0);
+509e56b37cc32c9 lib/test_blackhole_dev.c  Mahesh Bandewar  2019-07-01  62  
+509e56b37cc32c9 lib/test_blackhole_dev.c  Mahesh Bandewar  2019-07-01  63  	skb->protocol = htons(ETH_P_IPV6);
+509e56b37cc32c9 lib/test_blackhole_dev.c  Mahesh Bandewar  2019-07-01  64  	skb->pkt_type = PACKET_HOST;
+509e56b37cc32c9 lib/test_blackhole_dev.c  Mahesh Bandewar  2019-07-01  65  	skb->dev = blackhole_netdev;
+509e56b37cc32c9 lib/test_blackhole_dev.c  Mahesh Bandewar  2019-07-01  66  
+509e56b37cc32c9 lib/test_blackhole_dev.c  Mahesh Bandewar  2019-07-01  67  	/* Now attempt to send the packet */
+a644885645ce867 lib/blackhole_dev_kunit.c Tamir Duberstein 2025-02-07  68  	KUNIT_EXPECT_EQ(test, dev_queue_xmit(skb), NET_XMIT_SUCCESS);
+509e56b37cc32c9 lib/test_blackhole_dev.c  Mahesh Bandewar  2019-07-01  69  }
+509e56b37cc32c9 lib/test_blackhole_dev.c  Mahesh Bandewar  2019-07-01  70  
+
+-- 
+0-DAY CI Kernel Test Service
+https://github.com/intel/lkp-tests/wiki
 
