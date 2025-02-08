@@ -1,60 +1,60 @@
-Return-Path: <netdev+bounces-164257-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-164258-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id EED14A2D269
-	for <lists+netdev@lfdr.de>; Sat,  8 Feb 2025 01:58:51 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 620DFA2D26B
+	for <lists+netdev@lfdr.de>; Sat,  8 Feb 2025 02:00:43 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 154363ACD14
-	for <lists+netdev@lfdr.de>; Sat,  8 Feb 2025 00:58:43 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 786053ACD23
+	for <lists+netdev@lfdr.de>; Sat,  8 Feb 2025 01:00:34 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A7A3F79CF;
-	Sat,  8 Feb 2025 00:58:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C964DF9DA;
+	Sat,  8 Feb 2025 01:00:39 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="jSXK2vjz"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="oOgxAcLf"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 830736FBF
-	for <netdev@vger.kernel.org>; Sat,  8 Feb 2025 00:58:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A4DF2372
+	for <netdev@vger.kernel.org>; Sat,  8 Feb 2025 01:00:39 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1738976328; cv=none; b=TF/UImCeN36NzM/WTYpOYgxq8N90DyQHW/UgZXhmRI7z97QxDoA+L32xwbx24/aUwPKP+moNvV5Wof/PPUaPbw+T3S2hLNQk7mmA4RQzhTIcNXdpQ4Hm3ktr7RfuMlFvLknaDUqlfIaTpE40S201RxgR8q5CB7zEV7kgkvQIHtw=
+	t=1738976439; cv=none; b=INQjdjGMsZzHA5+S4qaMsUZSfdgSqKb2Kd+gRveiDcrgR+bT9M5qm9XxZ9V8SyP/sagfwYapAuhCzuPhW0r1dX2LRangGdzPafj0ovW3yPyYltozS9hrEbqvvFKxNQRQ7lY9F50OK7cUTWvLaREqdQK9lqGYJ+0Pf/su0aJUXR8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1738976328; c=relaxed/simple;
-	bh=GYf7HwR051ZEhHpJzoUGU4eNggpT3ZZX52etWY2c3ng=;
+	s=arc-20240116; t=1738976439; c=relaxed/simple;
+	bh=x1mUqnOkniDES3lkJdhTjBkR30wQXIi8uXOG0Q+GoBc=;
 	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=hFd8LqQKylhLZK30dJmRNL9lU6F2uqVoq/RBci6S7sdTBgK2a1+cnteT/hcjHDxBo6NhaZvkWVkLEy4ZoHWnjTHtR56t55NMklj9IP2MHhfX5+X+XNl1S9hVV8sxXgBMERR7EsmD3ZqmhVpfhaYuZZN1kw43Mv6BMDOY5WTo3WM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=jSXK2vjz; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 90BA1C4CED1;
-	Sat,  8 Feb 2025 00:58:47 +0000 (UTC)
+	 MIME-Version:Content-Type; b=Ns5dEknLzTdbwcydAYZEMDK1Y2r+loPUIlX7VUo1gB/hTKVQyG6HRZ6qleyWTr4osrqqbjqGgqrjrgPG9xdNocLiukT4ctzBxzdpfxARNFic2qmYNoZUaJgN/i5jb5Ltw6pNAKaOIAEfCmMNn//Q5ei0jqSsGxhs2XnPoKx/0hA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=oOgxAcLf; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9B4CDC4CED1;
+	Sat,  8 Feb 2025 01:00:38 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1738976328;
-	bh=GYf7HwR051ZEhHpJzoUGU4eNggpT3ZZX52etWY2c3ng=;
+	s=k20201202; t=1738976439;
+	bh=x1mUqnOkniDES3lkJdhTjBkR30wQXIi8uXOG0Q+GoBc=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=jSXK2vjzINK+2yMhBYMcwGOvswDDQ3mUUGqGFmjxyAtYdXCd0IFo1sEG+91Fe0rD6
-	 pDXQjrgLQQobprRT3TAiZ7RhdbYLhNddIFpLV9Lq8cNf+N/iUbb6bnWYtsFy/sgX0H
-	 uaP634A2jKaxanfZEUxoRsMgCm1pWr2yp7BmteQ6oKVyyIP5j79W/l06OcUT1Ho/sF
-	 JDaUr4iJc/B0UzFQVoHiKrRo0FyYjCegbHimX5OcEZ4UxGQsw2LJbaLT78fjnlp7V4
-	 nOzIdWnRWB6GR9TLKLJAG+DFjJoGvPN+mSQdehyEQgl4y2XvLe/1wc57PxsR6A+Se1
-	 roJfb7fs9xvqA==
-Date: Fri, 7 Feb 2025 16:58:46 -0800
+	b=oOgxAcLfarHpRhyZg9x7sXBSLw4jMN6Q9gmBFd3AMvSBLIJivFVKLk4ZL/h3mc1Cj
+	 ocOCK1bJS33GiTsewJ5yDBOz2zt2WOOX0U7yPgFp+KnHNIe4alGQff4uNS4jfjLfLX
+	 7jiwk0ukW8MKSMknQj8eDDME0IiCA6lFOyNoLX/d3mHI2B3b6jRLbtQnKdwirh/F3G
+	 PErrbr+1UwZ9aqPYNmoXX+oeaMMy6fw+Bxe1RWlhpJyVa+gp4s1UL7S+gCx7ConSLk
+	 g5YObsD6cnY6qumLCkJsbyFMHBGyVn0PLLUrSNP9uyQ4sA64C+3LKnSdJtEzd/J8G0
+	 KU6S8YOF6k4iQ==
+Date: Fri, 7 Feb 2025 17:00:37 -0800
 From: Jakub Kicinski <kuba@kernel.org>
-To: David Arinzon <darinzon@amazon.com>, "Machnikowski, Maciek"
- <maciek@machnikowski.net>
-Cc: David Miller <davem@davemloft.net>, <netdev@vger.kernel.org>, Eric
- Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, Simon
- Horman <horms@kernel.org>, "Richard Cochran" <richardcochran@gmail.com>,
- "Woodhouse, David" <dwmw@amazon.com>, Rahul Rameshbabu
- <rrameshbabu@nvidia.com>, Gal Pressman <gal@nvidia.com>, Vadim Fedorenko
- <vadim.fedorenko@linux.dev>
-Subject: Re: [PATCH v6 net-next 0/4] PHC support in ENA driver
-Message-ID: <20250207165846.53e52bf7@kernel.org>
-In-Reply-To: <20250206141538.549-1-darinzon@amazon.com>
-References: <20250206141538.549-1-darinzon@amazon.com>
+To: Thorsten Scherer <t.scherer@eckelmann.de>
+Cc: netdev@vger.kernel.org, Woojung Huh <woojung.huh@microchip.com>,
+ UNGLinuxDriver@microchip.com, Andrew Lunn <andrew@lunn.ch>, Vladimir Oltean
+ <olteanv@gmail.com>, "David S. Miller" <davem@davemloft.net>, Eric Dumazet
+ <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, Simon Horman
+ <horms@kernel.org>, Rasmus Villemoes <linux@rasmusvillemoes.dk>,
+ kernel@pengutronix.de
+Subject: Re: [PATCH] net: dsa: microchip: KSZ8563 register regmap alignment
+ to 32 bit boundaries
+Message-ID: <20250207170037.06d853af@kernel.org>
+In-Reply-To: <20250206122246.58115-1-t.scherer@eckelmann.de>
+References: <20250206122246.58115-1-t.scherer@eckelmann.de>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -64,14 +64,33 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
 
-On Thu, 6 Feb 2025 16:15:34 +0200 David Arinzon wrote:
-> This patchset adds the support for PHC (PTP Hardware Clock)
-> in the ENA driver. The documentation part of the patchset
-> includes additional information, including statistics,
-> utilization and invocation examples through the testptp
-> utility.
+On Thu,  6 Feb 2025 13:22:45 +0100 Thorsten Scherer wrote:
+> -	regmap_reg_range(0x1122, 0x1127),
+> -	regmap_reg_range(0x112a, 0x112b),
+> -	regmap_reg_range(0x1136, 0x1139),
+> -	regmap_reg_range(0x113e, 0x113f),
+> +	regmap_reg_range(0x1120, 0x112b),
+> +	regmap_reg_range(0x1134, 0x113b),
+> +	regmap_reg_range(0x113c, 0x113f),
 
-Vadim, Maciek, did you see this? Looks like the device has limitations
-on number of gettime calls per sec. Could be a good fit for the work
-you are prototyping?
+can these two not be merged?
+
+>  	regmap_reg_range(0x1400, 0x1401),
+>  	regmap_reg_range(0x1403, 0x1403),
+>  	regmap_reg_range(0x1410, 0x1417),
+> @@ -747,10 +746,9 @@ static const struct regmap_range ksz8563_valid_regs[] = {
+>  	regmap_reg_range(0x2030, 0x2030),
+>  	regmap_reg_range(0x2100, 0x2111),
+>  	regmap_reg_range(0x211a, 0x211d),
+> -	regmap_reg_range(0x2122, 0x2127),
+> -	regmap_reg_range(0x212a, 0x212b),
+> -	regmap_reg_range(0x2136, 0x2139),
+> -	regmap_reg_range(0x213e, 0x213f),
+> +	regmap_reg_range(0x2120, 0x212b),
+> +	regmap_reg_range(0x2134, 0x213b),
+> +	regmap_reg_range(0x213c, 0x213f),
+
+and these?
+-- 
+pw-bot: cr
 
