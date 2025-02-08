@@ -1,322 +1,343 @@
-Return-Path: <netdev+bounces-164298-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-164299-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id A9C4CA2D453
-	for <lists+netdev@lfdr.de>; Sat,  8 Feb 2025 07:54:44 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id DF1EDA2D53D
+	for <lists+netdev@lfdr.de>; Sat,  8 Feb 2025 10:25:40 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B46CC3AAD15
-	for <lists+netdev@lfdr.de>; Sat,  8 Feb 2025 06:54:35 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id DF3411887A73
+	for <lists+netdev@lfdr.de>; Sat,  8 Feb 2025 09:25:45 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6E6C31AB52F;
-	Sat,  8 Feb 2025 06:54:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8CED51AF0B5;
+	Sat,  8 Feb 2025 09:25:36 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="jmwxPUy4"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="LbTL8Tbc"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-il1-f172.google.com (mail-il1-f172.google.com [209.85.166.172])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.15])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9448913D28F;
-	Sat,  8 Feb 2025 06:54:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.172
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 23D191AD403
+	for <netdev@vger.kernel.org>; Sat,  8 Feb 2025 09:25:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.15
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1738997672; cv=none; b=UQ4klDmD83lBs2KHEWfXkea45Ct+MoXsKJINl/YyIQePk/nQZa1okCWQW+fmrRtcy2JQck93QzPMdwdX4PJ4rUQd4q04g0QB7ogkLg82QvcziDjUFzt9OjRiDVTB5lv3jFneMSphIrPQ4djToZmNX4pxZK5BJ5TktyY5bgHl6dM=
+	t=1739006736; cv=none; b=e2N+wqI+24JaT7wMQFcb1deb3FcZpo+0iNV/tHnGo48bC8G52JQRQiqFTxw3y/sFrGuQDLiSCu2mF+dGjSCDtsqmmSM7UfHvZajnO4YmII4bvcGff+u3GJBVg/eykutdhqyez/XmEAs0pbtjAgBKsAunFvf3HXXjxKLRzPBSnsw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1738997672; c=relaxed/simple;
-	bh=GOqFq08kb4mAjnpjZ7dY8tvP/9Sl5M2IAyaDMDSQ1mA=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=ntKa18UGdnl7pWJAE9RJL6XShby75jdAHKiDqNNEuRmnCJKEbAT9o1VJxdW4eKtT0uLORdDJtHmq1yX7aTa3pKSqZVxyql9pEyKhBOAznOPGzN0m7BiioMGF+yDT0WEcI7RH6PTwrF2mbS2aFKUUsE3zoj3I/6My/eVAeaku4G4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=jmwxPUy4; arc=none smtp.client-ip=209.85.166.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-il1-f172.google.com with SMTP id e9e14a558f8ab-3d146df0afeso7314095ab.3;
-        Fri, 07 Feb 2025 22:54:30 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1738997669; x=1739602469; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=E9Z9VrVCWbmpLh+Hg7PlddvN+/xuMtc+jiEOiugtVTs=;
-        b=jmwxPUy4DTJn+N0dftY0j44Mc0GgqIQnGrXtJgmQMkMBtTROL2Vsx0JePVO8w5UgHH
-         KpNGHmEF27sdSAvsvo+iJFOoVt8zy1wGzap+SNCI9OVFsX/6vd8zYz6avqGdabMmGQF0
-         2CM5UAiEj8NWAIdMjzGihf+k6tvd5GfaSilxRoUXZRqPPJF1w5HIqGeqvBiNwDDwadP2
-         PF5q/nfEZxrouxtFiXSRJnFM+LIw41QQKYEyBe2rujWzfRjesoIZQcQGMnkPuCYqKQFy
-         jVKpTLqN/rWCB+gX9R6l6/MI9zlzuyMJCanyhL6mcCG7XCGGMyfrJsdpNoDBSe2aP926
-         qe3w==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1738997669; x=1739602469;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=E9Z9VrVCWbmpLh+Hg7PlddvN+/xuMtc+jiEOiugtVTs=;
-        b=lmYgAOuUqJfX4xcgapsn5t42b6ApWHrGn/McoEIKi7FoxF15EAzmubiPwvy0PWY3QW
-         HR8n0yaurc0sRiksGjVYPkvXOM+ruyQxG3FZxIxTw0y7uLRrqkKBZugiDjjguyfm97LZ
-         Sn7fH/161Ilml+GI+JUrQc/lORgc9OdK563MXEKGSuyhsK5sHhjgJtYQbo7IJOaj0dyY
-         5PKabpBihayX2INxlrSjh5T2iYA5XbuQxJ90S2ruhstKNNDTXDK7Vgm1Dw2JNfZPVBvm
-         eDC+xJQWJHmuzkvA2YY8ccbkE2nkcEIpT9VPwU3HNkleMLbs6od7MqOqXxh0NyrO5vOz
-         6Naw==
-X-Forwarded-Encrypted: i=1; AJvYcCVEl5Y4UZBDUHUAgeP5Gv/Lic5RKGJgreEIECPvEdeBGO+vUvOIOYmUxru45XcWo2GVFBKBsW60@vger.kernel.org, AJvYcCXr7TwGUg31bQOG+vwz5tknd4/q8VK19A0iJ34ZjY+fMDa3NHrUX/cGx0K1+HXS1vL/izY=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwX65qAzTi/cnFV3iq5q5v1Rx/hrjmfa1Fo8TtfUxHeZaym75fN
-	QIeMJQEdJyr/ce8ntmwnW0iYseTAq4e8Pg3U00u1xcTs1qj9ivIUcRy8QDwRiQctbwNFGjf/AKE
-	D1Wk4hxZDjLDxYjPYbiiqyMvBmWU=
-X-Gm-Gg: ASbGncu/iF39zxeWRzApo59t7Aov5J2PK/sAaho29KokAp4IedOqhnu3F5CzZvGWEVy
-	h9WJUWtWCgL1qdWYkqLgfWe9ajyzhkAzOIAD4bzibzE6l+zsS9JMnJsLIo0dWjiCIFjPUrQdE
-X-Google-Smtp-Source: AGHT+IETM5eUX+Mc36jJh/HPLV5bCdv++TDdM6wxgrbSZP4F+Zk2pQHUfgeuB1AojRIfFpGo0NUu7GHut+HzQ9GLV/g=
-X-Received: by 2002:a05:6e02:3785:b0:3d0:4e57:bbd9 with SMTP id
- e9e14a558f8ab-3d13dd4d375mr46814125ab.10.1738997669607; Fri, 07 Feb 2025
- 22:54:29 -0800 (PST)
+	s=arc-20240116; t=1739006736; c=relaxed/simple;
+	bh=joHblAItfKU+h/X+EFyt+n7SmW1sFhQR4TvaCzkzN3U=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=s6bXSHSTNLkopqz6V/V/cLKe9sMymFnfodAJw11x2qJrmWQgItzr5O+lthroNxuqMXYyAKwHFm1Bw7+DF7XwkQmLYOZjg11U27qN/xPc+T/B7gs+csq7xZ3ta4GlPNx3TrJQWyOCrGlj5gTcfyJ5tbykuYPZgKFu/ezZHNYoX+E=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=LbTL8Tbc; arc=none smtp.client-ip=198.175.65.15
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1739006734; x=1770542734;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=joHblAItfKU+h/X+EFyt+n7SmW1sFhQR4TvaCzkzN3U=;
+  b=LbTL8TbcxD0DKaYHBSYbM5wmQNLn+bhd7MOfpyCLB1zjfb/uB6r+CXlR
+   Z2HFsY9ADUZa9wCSdBlk4rfTmDfG5ntG3UW1PmOCcY5s8s1j/7PhbXoU3
+   6/DLpE/oANQY4/bT2tgNyPDh5+1ORYahA8gg8w+saPI4NadY1uklsAtdo
+   HrmcmR2jTzguSUxYfB+Mm1TuvNjkXBOhJcHwU0d/FPoRpcx5XSh+oBMzN
+   q/yT1rad8Asb9F/KPvKKbIA/BL8AkQ4fBq4DjGsKN2psCY1mkC/PDt9Wb
+   tKUji5yspwNkC21L3SMDFLozkjLGvzWfU82Cn6Pkx/LGSY8vPwkh7Vbyw
+   g==;
+X-CSE-ConnectionGUID: jRS1by7uR86BMneuVdIPMg==
+X-CSE-MsgGUID: RNU/0wwRRdmWlL2DDJ2QvQ==
+X-IronPort-AV: E=McAfee;i="6700,10204,11338"; a="43307548"
+X-IronPort-AV: E=Sophos;i="6.13,269,1732608000"; 
+   d="scan'208";a="43307548"
+Received: from fmviesa009.fm.intel.com ([10.60.135.149])
+  by orvoesa107.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 08 Feb 2025 01:25:34 -0800
+X-CSE-ConnectionGUID: RVU9HfU2RzK82STwhGbSVQ==
+X-CSE-MsgGUID: PVgkhyQLTCKHY4WSfA1B9g==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.13,269,1732608000"; 
+   d="scan'208";a="112378602"
+Received: from lkp-server01.sh.intel.com (HELO d63d4d77d921) ([10.239.97.150])
+  by fmviesa009.fm.intel.com with ESMTP; 08 Feb 2025 01:25:31 -0800
+Received: from kbuild by d63d4d77d921 with local (Exim 4.96)
+	(envelope-from <lkp@intel.com>)
+	id 1tgh5c-000znL-2v;
+	Sat, 08 Feb 2025 09:25:28 +0000
+Date: Sat, 8 Feb 2025 17:24:41 +0800
+From: kernel test robot <lkp@intel.com>
+To: Willem de Bruijn <willemdebruijn.kernel@gmail.com>,
+	netdev@vger.kernel.org
+Cc: llvm@lists.linux.dev, oe-kbuild-all@lists.linux.dev,
+	davem@davemloft.net, kuba@kernel.org, edumazet@google.com,
+	pabeni@redhat.com, Willem de Bruijn <willemb@google.com>
+Subject: Re: [PATCH net-next 4/7] ipv4: remove get_rttos
+Message-ID: <202502081713.QmBbIMec-lkp@intel.com>
+References: <20250206193521.2285488-5-willemdebruijn.kernel@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250204183024.87508-1-kerneljasonxing@gmail.com>
- <20250204175744.3f92c33e@kernel.org> <e894c427-b4b3-4706-b44c-44fc6402c14c@linux.dev>
- <CAL+tcoCQ165Y4R7UWG=J=8e=EzwFLxSX3MQPOv=kOS3W1Q7R0A@mail.gmail.com>
- <0a8e7b84-bab6-4852-8616-577d9b561f4c@linux.dev> <CAL+tcoAp8v49fwUrN5pNkGHPF-+RzDDSNdy3PhVoJ7+MQGNbXQ@mail.gmail.com>
- <CAL+tcoC5hmm1HQdbDaYiQ1iW1x2J+H42RsjbS_ghyG8mSDgqqQ@mail.gmail.com>
- <67a424d2aa9ea_19943029427@willemb.c.googlers.com.notmuch>
- <CAL+tcoCPGAjs=+Hnzr4RLkioUV7nzy=ZmKkTDPA7sBeVP=qzow@mail.gmail.com>
- <67a42ba112990_19c315294b7@willemb.c.googlers.com.notmuch>
- <CAL+tcoC_5106onp6yQh-dKnCTLtEr73EZVC31T_YeMtqbZ5KBw@mail.gmail.com>
- <b158a837-d46c-4ae0-8130-7aa288422182@linux.dev> <CAL+tcoCUjxvE-DaQ8AMxMgjLnV+J1jpYMh7BCOow4AohW1FFSg@mail.gmail.com>
- <739d6f98-8a44-446e-85a4-c499d154b57b@linux.dev> <CAL+tcoA14HKQmG9dtMdRVqgJJ87hcvynPjqVLkAbHnDcsq-RzQ@mail.gmail.com>
- <CAL+tcoD9qZvbo53QsUcC27Dp=tJshBFdjoM9RCHxHEsYjwaXWg@mail.gmail.com> <1ef7e85b-03b7-4baa-aca2-3c18bf1e16e2@linux.dev>
-In-Reply-To: <1ef7e85b-03b7-4baa-aca2-3c18bf1e16e2@linux.dev>
-From: Jason Xing <kerneljasonxing@gmail.com>
-Date: Sat, 8 Feb 2025 14:53:53 +0800
-X-Gm-Features: AWEUYZl3FKcsSheniI0jLgCpjJA6LfsQQKBq81BqJz3BsKZDt6w5Nh2uauHRO6c
-Message-ID: <CAL+tcoAQt0LYucAah_=Kighv9AcdBg4ZZFzwZx9q9=5NBXP21Q@mail.gmail.com>
-Subject: Re: [PATCH bpf-next v8 10/12] bpf: make TCP tx timestamp bpf
- extension work
-To: Martin KaFai Lau <martin.lau@linux.dev>
-Cc: Willem de Bruijn <willemdebruijn.kernel@gmail.com>, Jakub Kicinski <kuba@kernel.org>, 
-	davem@davemloft.net, edumazet@google.com, pabeni@redhat.com, 
-	dsahern@kernel.org, willemb@google.com, ast@kernel.org, daniel@iogearbox.net, 
-	andrii@kernel.org, eddyz87@gmail.com, song@kernel.org, 
-	yonghong.song@linux.dev, john.fastabend@gmail.com, kpsingh@kernel.org, 
-	sdf@fomichev.me, haoluo@google.com, jolsa@kernel.org, horms@kernel.org, 
-	bpf@vger.kernel.org, netdev@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250206193521.2285488-5-willemdebruijn.kernel@gmail.com>
 
-On Sat, Feb 8, 2025 at 10:11=E2=80=AFAM Martin KaFai Lau <martin.lau@linux.=
-dev> wrote:
->
-> On 2/7/25 4:07 AM, Jason Xing wrote:
-> > On Fri, Feb 7, 2025 at 10:18=E2=80=AFAM Jason Xing <kerneljasonxing@gma=
-il.com> wrote:
-> >>
-> >> On Fri, Feb 7, 2025 at 10:07=E2=80=AFAM Martin KaFai Lau <martin.lau@l=
-inux.dev> wrote:
-> >>>
-> >>> On 2/5/25 10:56 PM, Jason Xing wrote:
-> >>>>>> I have to rephrase a bit in case Martin visits here soon: I will
-> >>>>>> compare two approaches 1) reply value, 2) bpf kfunc and then see w=
-hich
-> >>>>>> way is better.
-> >>>>>
-> >>>>> I have already explained in details why the 1) reply value from the=
- bpf prog
-> >>>>> won't work. Please go back to that reply which has the context.
-> >>>>
-> >>>> Yes, of course I saw this, but I said I need to implement and dig mo=
-re
-> >>>> into this on my own. One of my replies includes a little code snippe=
-t
-> >>>> regarding reply value approach. I didn't expect you to misunderstand
-> >>>> that I would choose reply value, so I rephrase it like above :)
-> >>>
-> >>> I did see the code snippet which is incomplete, so I have to guess. a=
-faik, it is
-> >>> not going to work. I was hoping to save some time without detouring t=
-o the
-> >>> reply-value path in case my earlier message was missed. I will stay q=
-uiet and
-> >>> wait for v9 first then to avoid extending this long thread further.
-> >>
-> >> I see. I'm grateful that you point out the right path. I'm still
-> >> investigating to find a good existing example in selftests and how to
-> >> support kfunc.
-> >
-> > Martin, sorry to revive this thread.
-> >
-> > It's a little bit hard for me to find a proper example to follow. I
-> > tried to call __bpf_kfunc in the BPF_SOCK_OPS_TS_SND_CB callback and
-> > then failed because kfunc is not supported in the sock_ops case.
-> > Later, I tried to kprobe to hook a function, say,
-> > tcp_tx_timestamp_bpf(), passed the skb parameter to the kfunc and then
-> > got an error.
-> >
-> > Here is code snippet:
-> > 1) net/ipv4/tcp.c
-> > +__bpf_kfunc static void tcp_init_tx_timestamp(struct sk_buff *skb)
-> > +{
-> > +       struct skb_shared_info *shinfo =3D skb_shinfo(skb);
-> > +       struct tcp_skb_cb *tcb =3D TCP_SKB_CB(skb);
-> > +
-> > +       printk(KERN_ERR "jason: %d, %d\n\n", tcb->txstamp_ack,
-> > shinfo->tx_flags);
-> > +       /*
-> > +       tcb->txstamp_ack =3D 2;
-> > +       shinfo->tx_flags |=3D SKBTX_BPF;
-> > +       shinfo->tskey =3D TCP_SKB_CB(skb)->seq + skb->len - 1;
-> > +       */
-> > +}
-> > Note: I skipped copying some codes like BTF_ID_FLAGS...
->
-> This part is missing, so I can only guess again. This BTF_ID_FLAGS
-> and the kfunc registration part went wrong when trying to add the
-> new kfunc for the sock_ops program. There are kfunc examples for
-> netdev related bpf prog in filter.c. e.g. bpf_sock_addr_set_sun_path.
->
-> [ The same goes for another later message where the changes in
->    bpf_skops_tx_timestamping is missing, so I won't comment there. ]
->
-> >
-> > 2) bpf prog
-> > SEC("kprobe/tcp_tx_timestamp_bpf") // I wrote a new function/wrapper to=
- hook
-> > int BPF_KPROBE(kprobe__tcp_tx_timestamp_bpf, struct sock *sk, struct
-> > sk_buff *skb)
-> > {
-> >          tcp_init_tx_timestamp(skb);
-> >          return 0;
-> > }
-> >
-> > Then running the bpf prog, I got the following message:
-> > ; tcp_init_tx_timestamp(skb); @ so_timestamping.c:281
-> > 1: (85) call tcp_init_tx_timestamp#120682
-> > arg#0 pointer type STRUCT sk_buff must point to scalar, or struct with =
-scalar
-> > processed 2 insns (limit 1000000) max_states_per_insn 0 total_states 0
-> > peak_states 0 mark_read 0
-> > -- END PROG LOAD LOG --
-> > libbpf: prog 'kprobe__tcp_tx_timestamp_bpf': failed to load: -22
-> > libbpf: failed to load object 'so_timestamping'
-> > libbpf: failed to load BPF skeleton 'so_timestamping': -22
-> > test_so_timestamping:FAIL:open and load skel unexpected error: -22
-> >
-> > If I don't pass any parameter in the kfunc, it can work.
-> >
-> > Should we support the sock_ops for __bpf_kfunc?
->
-> sock_ops does support kfunc. The patch 12 selftest is using the
-> bpf_cast_to_kern_ctx() and it is a kfunc:
->
-> --------8<--------
-> BTF_KFUNCS_START(common_btf_ids)
-> BTF_ID_FLAGS(func, bpf_cast_to_kern_ctx, KF_FASTCALL)
-> -------->8--------
->
-> It just the new kfunc is not registered at the right place, so the verifi=
-er
-> cannot find it.
->
-> Untested code on top of your v8, so I don't have your latest
-> changes on the txstamp_ack_bpf bits...etc.
+Hi Willem,
 
-Thanks for sharing your great understanding of BPF. And it's working!
-Many thanks here.
+kernel test robot noticed the following build warnings:
 
->
-> diff --git i/kernel/bpf/btf.c w/kernel/bpf/btf.c
-> index 9433b6467bbe..740210f883dc 100644
-> --- i/kernel/bpf/btf.c
-> +++ w/kernel/bpf/btf.c
-> @@ -8522,6 +8522,7 @@ static int bpf_prog_type_to_kfunc_hook(enum bpf_pro=
-g_type prog_type)
->         case BPF_PROG_TYPE_CGROUP_SOCK_ADDR:
->         case BPF_PROG_TYPE_CGROUP_SOCKOPT:
->         case BPF_PROG_TYPE_CGROUP_SYSCTL:
-> +       case BPF_PROG_TYPE_SOCK_OPS:
+[auto build test WARNING on net-next/main]
 
-The above line is exactly what I want (before this, I had no clue
-about how to write this part), causing my whole kfunc feature not to
-work.
+url:    https://github.com/intel-lab-lkp/linux/commits/Willem-de-Bruijn/tcp-only-initialize-sockcm-tsflags-field/20250207-033912
+base:   net-next/main
+patch link:    https://lore.kernel.org/r/20250206193521.2285488-5-willemdebruijn.kernel%40gmail.com
+patch subject: [PATCH net-next 4/7] ipv4: remove get_rttos
+config: x86_64-buildonly-randconfig-002-20250207 (https://download.01.org/0day-ci/archive/20250208/202502081713.QmBbIMec-lkp@intel.com/config)
+compiler: clang version 19.1.3 (https://github.com/llvm/llvm-project ab51eccf88f5321e7c60591c5546b254b6afab99)
+reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20250208/202502081713.QmBbIMec-lkp@intel.com/reproduce)
 
->                 return BTF_KFUNC_HOOK_CGROUP;
->         case BPF_PROG_TYPE_SCHED_ACT:
->                 return BTF_KFUNC_HOOK_SCHED_ACT;
-> diff --git i/net/core/filter.c w/net/core/filter.c
-> index d3395ffe058e..3bad67eb5c9e 100644
-> --- i/net/core/filter.c
-> +++ w/net/core/filter.c
-> @@ -12102,6 +12102,30 @@ __bpf_kfunc int bpf_sk_assign_tcp_reqsk(struct _=
-_sk_buff *s, struct sock *sk,
->   #endif
->   }
->
-> +enum {
-> +       BPF_SOCK_OPS_TX_TSTAMP_TCP_ACK =3D 1 << 0,
-> +};
+If you fix the issue in a separate patch/commit (i.e. not just a new version of
+the same patch/commit), kindly add following tags
+| Reported-by: kernel test robot <lkp@intel.com>
+| Closes: https://lore.kernel.org/oe-kbuild-all/202502081713.QmBbIMec-lkp@intel.com/
 
-Could I remove this flag since we have BPF_SOCK_OPS_TS_ACK_OPT_CB to
-control whether to report or not?
+All warnings (new ones prefixed by >>):
+
+>> net/ipv4/raw.c:608:52: warning: variable 'tos' is uninitialized when used here [-Wuninitialized]
+     608 |         flowi4_init_output(&fl4, ipc.oif, ipc.sockc.mark, tos, scope,
+         |                                                           ^~~
+   net/ipv4/raw.c:489:8: note: initialize the variable 'tos' to silence this warning
+     489 |         u8 tos, scope;
+         |               ^
+         |                = '\0'
+   1 warning generated.
+--
+>> net/ipv4/udp.c:1444:52: warning: variable 'tos' is uninitialized when used here [-Wuninitialized]
+    1444 |                 flowi4_init_output(fl4, ipc.oif, ipc.sockc.mark, tos, scope,
+         |                                                                  ^~~
+   net/ipv4/udp.c:1284:8: note: initialize the variable 'tos' to silence this warning
+    1284 |         u8 tos, scope;
+         |               ^
+         |                = '\0'
+   net/ipv4/udp.c:3883:27: warning: bitwise operation between different enumeration types ('enum bpf_reg_type' and 'enum bpf_type_flag') [-Wenum-enum-conversion]
+    3883 |                   PTR_TO_BTF_ID_OR_NULL | PTR_TRUSTED },
+         |                   ~~~~~~~~~~~~~~~~~~~~~ ^ ~~~~~~~~~~~
+   2 warnings generated.
+--
+>> net/ipv4/ping.c:781:52: warning: variable 'tos' is uninitialized when used here [-Wuninitialized]
+     781 |         flowi4_init_output(&fl4, ipc.oif, ipc.sockc.mark, tos, scope,
+         |                                                           ^~~
+   net/ipv4/ping.c:708:8: note: initialize the variable 'tos' to silence this warning
+     708 |         u8 tos, scope;
+         |               ^
+         |                = '\0'
+   1 warning generated.
 
 
-> +
-> +__bpf_kfunc int bpf_sock_ops_enable_tx_tstamp(struct bpf_sock_ops_kern *=
-skops, int flags)
-> +{
-> +       struct sk_buff *skb;
-> +
-> +       if (skops->op !=3D BPF_SOCK_OPS_TS_SND_CB)
-> +               return -EOPNOTSUPP;
-> +
-> +       if (flags & ~BPF_SOCK_OPS_TX_TSTAMP_TCP_ACK)
-> +               return -EINVAL;
-> +
-> +       skb =3D skops->skb;
-> +       /* [REMOVE THIS COMMENT]: sk_is_tcp check will be needed in the f=
-uture */
-> +       if (flags & BPF_SOCK_OPS_TX_TSTAMP_TCP_ACK)
-> +               TCP_SKB_CB(skb)->txstamp_ack_bpf =3D 1;
-> +       skb_shinfo(skb)->tx_flags |=3D SKBTX_BPF;
-> +       skb_shinfo(skb)->tskey =3D TCP_SKB_CB(skb)->seq + skb->len - 1;
-> +
-> +       return 0;
-> +}
-> +
->   __bpf_kfunc_end_defs();
->
->   int bpf_dynptr_from_skb_rdonly(struct __sk_buff *skb, u64 flags,
-> @@ -12135,6 +12159,10 @@ BTF_KFUNCS_START(bpf_kfunc_check_set_tcp_reqsk)
->   BTF_ID_FLAGS(func, bpf_sk_assign_tcp_reqsk, KF_TRUSTED_ARGS)
->   BTF_KFUNCS_END(bpf_kfunc_check_set_tcp_reqsk)
->
-> +BTF_KFUNCS_START(bpf_kfunc_check_set_sock_ops)
-> +BTF_ID_FLAGS(func, bpf_sock_ops_enable_tx_tstamp, KF_TRUSTED_ARGS)
-> +BTF_KFUNCS_END(bpf_kfunc_check_set_sock_ops)
-> +
->   static const struct btf_kfunc_id_set bpf_kfunc_set_skb =3D {
->         .owner =3D THIS_MODULE,
->         .set =3D &bpf_kfunc_check_set_skb,
-> @@ -12155,6 +12183,11 @@ static const struct btf_kfunc_id_set bpf_kfunc_s=
-et_tcp_reqsk =3D {
->         .set =3D &bpf_kfunc_check_set_tcp_reqsk,
->   };
->
-> +static const struct btf_kfunc_id_set bpf_kfunc_set_sock_ops =3D {
-> +       .owner =3D THIS_MODULE,
-> +       .set =3D &bpf_kfunc_check_set_sock_ops,
-> +};
-> +
->   static int __init bpf_kfunc_init(void)
->   {
->         int ret;
-> @@ -12173,6 +12206,7 @@ static int __init bpf_kfunc_init(void)
->         ret =3D ret ?: register_btf_kfunc_id_set(BPF_PROG_TYPE_XDP, &bpf_=
-kfunc_set_xdp);
->         ret =3D ret ?: register_btf_kfunc_id_set(BPF_PROG_TYPE_CGROUP_SOC=
-K_ADDR,
->                                                &bpf_kfunc_set_sock_addr);
-> +       ret =3D ret ?: register_btf_kfunc_id_set(BPF_PROG_TYPE_SOCK_OPS, =
-&bpf_kfunc_set_sock_ops);
->         return ret ?: register_btf_kfunc_id_set(BPF_PROG_TYPE_SCHED_CLS, =
-&bpf_kfunc_set_tcp_reqsk);
->   }
+vim +/tos +608 net/ipv4/raw.c
+
+c008ba5bdc9fa8 Herbert Xu            2014-11-07  481  
+1b784140474e4f Ying Xue              2015-03-02  482  static int raw_sendmsg(struct sock *sk, struct msghdr *msg, size_t len)
+^1da177e4c3f41 Linus Torvalds        2005-04-16  483  {
+^1da177e4c3f41 Linus Torvalds        2005-04-16  484  	struct inet_sock *inet = inet_sk(sk);
+bb191c3e874650 David Ahern           2015-10-05  485  	struct net *net = sock_net(sk);
+^1da177e4c3f41 Linus Torvalds        2005-04-16  486  	struct ipcm_cookie ipc;
+^1da177e4c3f41 Linus Torvalds        2005-04-16  487  	struct rtable *rt = NULL;
+77968b78242ee2 David S. Miller       2011-05-08  488  	struct flowi4 fl4;
+c85be08fc4fa44 Guillaume Nault       2023-05-22  489  	u8 tos, scope;
+^1da177e4c3f41 Linus Torvalds        2005-04-16  490  	int free = 0;
+3ca3c68e76686b Al Viro               2006-09-27  491  	__be32 daddr;
+c1d18f9fa09489 Al Viro               2006-09-27  492  	__be32 saddr;
+959d5c11601b2b Eric Dumazet          2023-09-22  493  	int uc_index, err;
+f6d8bd051c391c Eric Dumazet          2011-04-21  494  	struct ip_options_data opt_copy;
+c008ba5bdc9fa8 Herbert Xu            2014-11-07  495  	struct raw_frag_vec rfv;
+8f659a03a0ba92 Mohamed Ghannam       2017-12-10  496  	int hdrincl;
+^1da177e4c3f41 Linus Torvalds        2005-04-16  497  
+^1da177e4c3f41 Linus Torvalds        2005-04-16  498  	err = -EMSGSIZE;
+926d4b8122fb32 Jesper Juhl           2005-06-18  499  	if (len > 0xFFFF)
+^1da177e4c3f41 Linus Torvalds        2005-04-16  500  		goto out;
+^1da177e4c3f41 Linus Torvalds        2005-04-16  501  
+cafbe182a467bf Eric Dumazet          2023-08-16  502  	hdrincl = inet_test_bit(HDRINCL, sk);
+cafbe182a467bf Eric Dumazet          2023-08-16  503  
+^1da177e4c3f41 Linus Torvalds        2005-04-16  504  	/*
+^1da177e4c3f41 Linus Torvalds        2005-04-16  505  	 *	Check the flags.
+^1da177e4c3f41 Linus Torvalds        2005-04-16  506  	 */
+^1da177e4c3f41 Linus Torvalds        2005-04-16  507  
+^1da177e4c3f41 Linus Torvalds        2005-04-16  508  	err = -EOPNOTSUPP;
+^1da177e4c3f41 Linus Torvalds        2005-04-16  509  	if (msg->msg_flags & MSG_OOB)	/* Mirror BSD error message */
+^1da177e4c3f41 Linus Torvalds        2005-04-16  510  		goto out;               /* compatibility */
+^1da177e4c3f41 Linus Torvalds        2005-04-16  511  
+^1da177e4c3f41 Linus Torvalds        2005-04-16  512  	/*
+^1da177e4c3f41 Linus Torvalds        2005-04-16  513  	 *	Get and verify the address.
+^1da177e4c3f41 Linus Torvalds        2005-04-16  514  	 */
+^1da177e4c3f41 Linus Torvalds        2005-04-16  515  
+^1da177e4c3f41 Linus Torvalds        2005-04-16  516  	if (msg->msg_namelen) {
+342dfc306fb321 Steffen Hurrle        2014-01-17  517  		DECLARE_SOCKADDR(struct sockaddr_in *, usin, msg->msg_name);
+^1da177e4c3f41 Linus Torvalds        2005-04-16  518  		err = -EINVAL;
+^1da177e4c3f41 Linus Torvalds        2005-04-16  519  		if (msg->msg_namelen < sizeof(*usin))
+^1da177e4c3f41 Linus Torvalds        2005-04-16  520  			goto out;
+^1da177e4c3f41 Linus Torvalds        2005-04-16  521  		if (usin->sin_family != AF_INET) {
+058bd4d2a4ff0a Joe Perches           2012-03-11  522  			pr_info_once("%s: %s forgot to set AF_INET. Fix it!\n",
+058bd4d2a4ff0a Joe Perches           2012-03-11  523  				     __func__, current->comm);
+^1da177e4c3f41 Linus Torvalds        2005-04-16  524  			err = -EAFNOSUPPORT;
+^1da177e4c3f41 Linus Torvalds        2005-04-16  525  			if (usin->sin_family)
+^1da177e4c3f41 Linus Torvalds        2005-04-16  526  				goto out;
+^1da177e4c3f41 Linus Torvalds        2005-04-16  527  		}
+^1da177e4c3f41 Linus Torvalds        2005-04-16  528  		daddr = usin->sin_addr.s_addr;
+^1da177e4c3f41 Linus Torvalds        2005-04-16  529  		/* ANK: I did not forget to get protocol from port field.
+^1da177e4c3f41 Linus Torvalds        2005-04-16  530  		 * I just do not know, who uses this weirdness.
+^1da177e4c3f41 Linus Torvalds        2005-04-16  531  		 * IP_HDRINCL is much more convenient.
+^1da177e4c3f41 Linus Torvalds        2005-04-16  532  		 */
+^1da177e4c3f41 Linus Torvalds        2005-04-16  533  	} else {
+^1da177e4c3f41 Linus Torvalds        2005-04-16  534  		err = -EDESTADDRREQ;
+^1da177e4c3f41 Linus Torvalds        2005-04-16  535  		if (sk->sk_state != TCP_ESTABLISHED)
+^1da177e4c3f41 Linus Torvalds        2005-04-16  536  			goto out;
+c720c7e8383aff Eric Dumazet          2009-10-15  537  		daddr = inet->inet_daddr;
+^1da177e4c3f41 Linus Torvalds        2005-04-16  538  	}
+^1da177e4c3f41 Linus Torvalds        2005-04-16  539  
+351782067b6be8 Willem de Bruijn      2018-07-06  540  	ipcm_init_sk(&ipc, inet);
+3632679d9e4f87 Nicolas Dichtel       2023-05-22  541  	/* Keep backward compat */
+3632679d9e4f87 Nicolas Dichtel       2023-05-22  542  	if (hdrincl)
+3632679d9e4f87 Nicolas Dichtel       2023-05-22  543  		ipc.protocol = IPPROTO_RAW;
+^1da177e4c3f41 Linus Torvalds        2005-04-16  544  
+^1da177e4c3f41 Linus Torvalds        2005-04-16  545  	if (msg->msg_controllen) {
+24025c465f77c3 Soheil Hassas Yeganeh 2016-04-02  546  		err = ip_cmsg_send(sk, msg, &ipc, false);
+919483096bfe75 Eric Dumazet          2016-02-04  547  		if (unlikely(err)) {
+919483096bfe75 Eric Dumazet          2016-02-04  548  			kfree(ipc.opt);
+^1da177e4c3f41 Linus Torvalds        2005-04-16  549  			goto out;
+919483096bfe75 Eric Dumazet          2016-02-04  550  		}
+^1da177e4c3f41 Linus Torvalds        2005-04-16  551  		if (ipc.opt)
+^1da177e4c3f41 Linus Torvalds        2005-04-16  552  			free = 1;
+^1da177e4c3f41 Linus Torvalds        2005-04-16  553  	}
+^1da177e4c3f41 Linus Torvalds        2005-04-16  554  
+^1da177e4c3f41 Linus Torvalds        2005-04-16  555  	saddr = ipc.addr;
+^1da177e4c3f41 Linus Torvalds        2005-04-16  556  	ipc.addr = daddr;
+^1da177e4c3f41 Linus Torvalds        2005-04-16  557  
+f6d8bd051c391c Eric Dumazet          2011-04-21  558  	if (!ipc.opt) {
+f6d8bd051c391c Eric Dumazet          2011-04-21  559  		struct ip_options_rcu *inet_opt;
+f6d8bd051c391c Eric Dumazet          2011-04-21  560  
+f6d8bd051c391c Eric Dumazet          2011-04-21  561  		rcu_read_lock();
+f6d8bd051c391c Eric Dumazet          2011-04-21  562  		inet_opt = rcu_dereference(inet->inet_opt);
+f6d8bd051c391c Eric Dumazet          2011-04-21  563  		if (inet_opt) {
+f6d8bd051c391c Eric Dumazet          2011-04-21  564  			memcpy(&opt_copy, inet_opt,
+f6d8bd051c391c Eric Dumazet          2011-04-21  565  			       sizeof(*inet_opt) + inet_opt->opt.optlen);
+f6d8bd051c391c Eric Dumazet          2011-04-21  566  			ipc.opt = &opt_copy.opt;
+f6d8bd051c391c Eric Dumazet          2011-04-21  567  		}
+f6d8bd051c391c Eric Dumazet          2011-04-21  568  		rcu_read_unlock();
+f6d8bd051c391c Eric Dumazet          2011-04-21  569  	}
+^1da177e4c3f41 Linus Torvalds        2005-04-16  570  
+^1da177e4c3f41 Linus Torvalds        2005-04-16  571  	if (ipc.opt) {
+^1da177e4c3f41 Linus Torvalds        2005-04-16  572  		err = -EINVAL;
+^1da177e4c3f41 Linus Torvalds        2005-04-16  573  		/* Linux does not mangle headers on raw sockets,
+^1da177e4c3f41 Linus Torvalds        2005-04-16  574  		 * so that IP options + IP_HDRINCL is non-sense.
+^1da177e4c3f41 Linus Torvalds        2005-04-16  575  		 */
+8f659a03a0ba92 Mohamed Ghannam       2017-12-10  576  		if (hdrincl)
+^1da177e4c3f41 Linus Torvalds        2005-04-16  577  			goto done;
+f6d8bd051c391c Eric Dumazet          2011-04-21  578  		if (ipc.opt->opt.srr) {
+^1da177e4c3f41 Linus Torvalds        2005-04-16  579  			if (!daddr)
+^1da177e4c3f41 Linus Torvalds        2005-04-16  580  				goto done;
+f6d8bd051c391c Eric Dumazet          2011-04-21  581  			daddr = ipc.opt->opt.faddr;
+^1da177e4c3f41 Linus Torvalds        2005-04-16  582  		}
+^1da177e4c3f41 Linus Torvalds        2005-04-16  583  	}
+c85be08fc4fa44 Guillaume Nault       2023-05-22  584  	scope = ip_sendmsg_scope(inet, &ipc, msg);
+^1da177e4c3f41 Linus Torvalds        2005-04-16  585  
+959d5c11601b2b Eric Dumazet          2023-09-22  586  	uc_index = READ_ONCE(inet->uc_index);
+f97c1e0c6ebdb6 Joe Perches           2007-12-16  587  	if (ipv4_is_multicast(daddr)) {
+854da991733d1b Robert Shearman       2018-10-01  588  		if (!ipc.oif || netif_index_is_l3_master(sock_net(sk), ipc.oif))
+02715925222c13 Eric Dumazet          2023-09-22  589  			ipc.oif = READ_ONCE(inet->mc_index);
+^1da177e4c3f41 Linus Torvalds        2005-04-16  590  		if (!saddr)
+02715925222c13 Eric Dumazet          2023-09-22  591  			saddr = READ_ONCE(inet->mc_addr);
+9515a2e082f914 David Ahern           2018-01-24  592  	} else if (!ipc.oif) {
+959d5c11601b2b Eric Dumazet          2023-09-22  593  		ipc.oif = uc_index;
+959d5c11601b2b Eric Dumazet          2023-09-22  594  	} else if (ipv4_is_lbcast(daddr) && uc_index) {
+645f08975f4944 Miaohe Lin            2020-08-27  595  		/* oif is set, packet is to local broadcast
+9515a2e082f914 David Ahern           2018-01-24  596  		 * and uc_index is set. oif is most likely set
+9515a2e082f914 David Ahern           2018-01-24  597  		 * by sk_bound_dev_if. If uc_index != oif check if the
+9515a2e082f914 David Ahern           2018-01-24  598  		 * oif is an L3 master and uc_index is an L3 slave.
+9515a2e082f914 David Ahern           2018-01-24  599  		 * If so, we want to allow the send using the uc_index.
+9515a2e082f914 David Ahern           2018-01-24  600  		 */
+959d5c11601b2b Eric Dumazet          2023-09-22  601  		if (ipc.oif != uc_index &&
+9515a2e082f914 David Ahern           2018-01-24  602  		    ipc.oif == l3mdev_master_ifindex_by_index(sock_net(sk),
+959d5c11601b2b Eric Dumazet          2023-09-22  603  							      uc_index)) {
+959d5c11601b2b Eric Dumazet          2023-09-22  604  			ipc.oif = uc_index;
+9515a2e082f914 David Ahern           2018-01-24  605  		}
+9515a2e082f914 David Ahern           2018-01-24  606  	}
+^1da177e4c3f41 Linus Torvalds        2005-04-16  607  
+c85be08fc4fa44 Guillaume Nault       2023-05-22 @608  	flowi4_init_output(&fl4, ipc.oif, ipc.sockc.mark, tos, scope,
+3632679d9e4f87 Nicolas Dichtel       2023-05-22  609  			   hdrincl ? ipc.protocol : sk->sk_protocol,
+0e0d44ab427554 Steffen Klassert      2013-08-28  610  			   inet_sk_flowi_flags(sk) |
+8f659a03a0ba92 Mohamed Ghannam       2017-12-10  611  			    (hdrincl ? FLOWI_FLAG_KNOWN_NH : 0),
+e2d118a1cb5e60 Lorenzo Colitti       2016-11-04  612  			   daddr, saddr, 0, 0, sk->sk_uid);
+ef164ae3563bf4 David S. Miller       2011-03-31  613  
+fc1092f5156727 Shigeru Yoshida       2024-04-30  614  	fl4.fl4_icmp_type = 0;
+fc1092f5156727 Shigeru Yoshida       2024-04-30  615  	fl4.fl4_icmp_code = 0;
+fc1092f5156727 Shigeru Yoshida       2024-04-30  616  
+8f659a03a0ba92 Mohamed Ghannam       2017-12-10  617  	if (!hdrincl) {
+b61e9dcc5e77d5 Al Viro               2014-11-24  618  		rfv.msg = msg;
+c008ba5bdc9fa8 Herbert Xu            2014-11-07  619  		rfv.hlen = 0;
+c008ba5bdc9fa8 Herbert Xu            2014-11-07  620  
+c008ba5bdc9fa8 Herbert Xu            2014-11-07  621  		err = raw_probe_proto_opt(&rfv, &fl4);
+a27b58fed90cc5 Heiko Carstens        2006-10-30  622  		if (err)
+a27b58fed90cc5 Heiko Carstens        2006-10-30  623  			goto done;
+a27b58fed90cc5 Heiko Carstens        2006-10-30  624  	}
+^1da177e4c3f41 Linus Torvalds        2005-04-16  625  
+3df98d79215ace Paul Moore            2020-09-27  626  	security_sk_classify_flow(sk, flowi4_to_flowi_common(&fl4));
+bb191c3e874650 David Ahern           2015-10-05  627  	rt = ip_route_output_flow(net, &fl4, sk);
+b23dd4fe42b455 David S. Miller       2011-03-02  628  	if (IS_ERR(rt)) {
+b23dd4fe42b455 David S. Miller       2011-03-02  629  		err = PTR_ERR(rt);
+4910ac6c526d28 David S. Miller       2011-03-28  630  		rt = NULL;
+^1da177e4c3f41 Linus Torvalds        2005-04-16  631  		goto done;
+b23dd4fe42b455 David S. Miller       2011-03-02  632  	}
+^1da177e4c3f41 Linus Torvalds        2005-04-16  633  
+^1da177e4c3f41 Linus Torvalds        2005-04-16  634  	err = -EACCES;
+^1da177e4c3f41 Linus Torvalds        2005-04-16  635  	if (rt->rt_flags & RTCF_BROADCAST && !sock_flag(sk, SOCK_BROADCAST))
+^1da177e4c3f41 Linus Torvalds        2005-04-16  636  		goto done;
+^1da177e4c3f41 Linus Torvalds        2005-04-16  637  
+^1da177e4c3f41 Linus Torvalds        2005-04-16  638  	if (msg->msg_flags & MSG_CONFIRM)
+^1da177e4c3f41 Linus Torvalds        2005-04-16  639  		goto do_confirm;
+^1da177e4c3f41 Linus Torvalds        2005-04-16  640  back_from_confirm:
+^1da177e4c3f41 Linus Torvalds        2005-04-16  641  
+8f659a03a0ba92 Mohamed Ghannam       2017-12-10  642  	if (hdrincl)
+7ae9abfd9d6f32 Al Viro               2014-11-27  643  		err = raw_send_hdrinc(sk, &fl4, msg, len,
+c14ac9451c3483 Soheil Hassas Yeganeh 2016-04-02  644  				      &rt, msg->msg_flags, &ipc.sockc);
+^1da177e4c3f41 Linus Torvalds        2005-04-16  645  
+^1da177e4c3f41 Linus Torvalds        2005-04-16  646  	 else {
+^1da177e4c3f41 Linus Torvalds        2005-04-16  647  		if (!ipc.addr)
+77968b78242ee2 David S. Miller       2011-05-08  648  			ipc.addr = fl4.daddr;
+^1da177e4c3f41 Linus Torvalds        2005-04-16  649  		lock_sock(sk);
+c008ba5bdc9fa8 Herbert Xu            2014-11-07  650  		err = ip_append_data(sk, &fl4, raw_getfrag,
+c008ba5bdc9fa8 Herbert Xu            2014-11-07  651  				     &rfv, len, 0,
+2e77d89b2fa8e3 Eric Dumazet          2008-11-24  652  				     &ipc, &rt, msg->msg_flags);
+^1da177e4c3f41 Linus Torvalds        2005-04-16  653  		if (err)
+^1da177e4c3f41 Linus Torvalds        2005-04-16  654  			ip_flush_pending_frames(sk);
+6ce9e7b5fe3195 Eric Dumazet          2009-09-02  655  		else if (!(msg->msg_flags & MSG_MORE)) {
+77968b78242ee2 David S. Miller       2011-05-08  656  			err = ip_push_pending_frames(sk, &fl4);
+6b5f43ea08150e Eric Dumazet          2023-08-16  657  			if (err == -ENOBUFS && !inet_test_bit(RECVERR, sk))
+6ce9e7b5fe3195 Eric Dumazet          2009-09-02  658  				err = 0;
+6ce9e7b5fe3195 Eric Dumazet          2009-09-02  659  		}
+^1da177e4c3f41 Linus Torvalds        2005-04-16  660  		release_sock(sk);
+^1da177e4c3f41 Linus Torvalds        2005-04-16  661  	}
+^1da177e4c3f41 Linus Torvalds        2005-04-16  662  done:
+^1da177e4c3f41 Linus Torvalds        2005-04-16  663  	if (free)
+^1da177e4c3f41 Linus Torvalds        2005-04-16  664  		kfree(ipc.opt);
+^1da177e4c3f41 Linus Torvalds        2005-04-16  665  	ip_rt_put(rt);
+^1da177e4c3f41 Linus Torvalds        2005-04-16  666  
+5418c6926fcb0e Jesper Juhl           2005-06-18  667  out:
+5418c6926fcb0e Jesper Juhl           2005-06-18  668  	if (err < 0)
+5418c6926fcb0e Jesper Juhl           2005-06-18  669  		return err;
+5418c6926fcb0e Jesper Juhl           2005-06-18  670  	return len;
+^1da177e4c3f41 Linus Torvalds        2005-04-16  671  
+^1da177e4c3f41 Linus Torvalds        2005-04-16  672  do_confirm:
+0dec879f636f11 Julian Anastasov      2017-02-06  673  	if (msg->msg_flags & MSG_PROBE)
+0dec879f636f11 Julian Anastasov      2017-02-06  674  		dst_confirm_neigh(&rt->dst, &fl4.daddr);
+^1da177e4c3f41 Linus Torvalds        2005-04-16  675  	if (!(msg->msg_flags & MSG_PROBE) || len)
+^1da177e4c3f41 Linus Torvalds        2005-04-16  676  		goto back_from_confirm;
+^1da177e4c3f41 Linus Torvalds        2005-04-16  677  	err = 0;
+^1da177e4c3f41 Linus Torvalds        2005-04-16  678  	goto done;
+^1da177e4c3f41 Linus Torvalds        2005-04-16  679  }
+^1da177e4c3f41 Linus Torvalds        2005-04-16  680  
+
+-- 
+0-DAY CI Kernel Test Service
+https://github.com/intel/lkp-tests/wiki
 
