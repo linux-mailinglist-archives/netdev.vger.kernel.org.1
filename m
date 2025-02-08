@@ -1,89 +1,50 @@
-Return-Path: <netdev+bounces-164266-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-164267-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6499EA2D29B
-	for <lists+netdev@lfdr.de>; Sat,  8 Feb 2025 02:28:49 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 65EA0A2D29E
+	for <lists+netdev@lfdr.de>; Sat,  8 Feb 2025 02:30:11 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 05B1516D1D2
-	for <lists+netdev@lfdr.de>; Sat,  8 Feb 2025 01:28:48 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 60EB67A43B8
+	for <lists+netdev@lfdr.de>; Sat,  8 Feb 2025 01:29:15 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1DC9984D0E;
-	Sat,  8 Feb 2025 01:28:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BC43D145323;
+	Sat,  8 Feb 2025 01:30:05 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=fastly.com header.i=@fastly.com header.b="tNlsXaOG"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="QhefwuZc"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f173.google.com (mail-pl1-f173.google.com [209.85.214.173])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 85D0276026
-	for <netdev@vger.kernel.org>; Sat,  8 Feb 2025 01:28:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.173
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9292913EFE3;
+	Sat,  8 Feb 2025 01:30:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1738978124; cv=none; b=LglBr5MMzvwdcZTAmH9vnJoyYleGqXc9pBzwhfBXh80MzsuU9Xg9Jcw6UxZMsaI/swrVu/EHIgS+3Fn5UDaNEHaYbcI9jZQZrdTtdTS2oIDGs7G2IVf1NQ22yGQmQj+tMgZ99pYlsgadWn2cFrtR3q6quZEiqWFkMEXil+CelD0=
+	t=1738978205; cv=none; b=YBqp/fKiqV36+aBnmCD2vJRjF4jt+P2/dVqpHGIx0s+A0CV23ETyIrKhqV1kKETslgvQoSu5/TJkSnzULYodUUDq7qbZfFSikZKUKiEfNpP3bMa7agQp7OaYWX2127PLw+3CAsJIS1Yw8vIgaoMKFIiKv9IsCYfNzx3lnAcpVSw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1738978124; c=relaxed/simple;
-	bh=F9r7BAv4PgGXAhDfk4jGDe5wzI28HN9K/csThIkDDVg=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=dXV6sbf33fPn3sKw4mgNG/21GLIlbSQbIgIsGTX7yhINrHdhPWl78hSaPqhtIsDqUyubRlPHo72VkV/NjakiOKjNfO0p8zTKu3LaFfpfDqoXM1E+i7ijeCXMvNtWzd4jmL27UW7WRG3oHfNRQ3mj0yyTyp54KJ5tle624Ejm6OM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fastly.com; spf=pass smtp.mailfrom=fastly.com; dkim=pass (1024-bit key) header.d=fastly.com header.i=@fastly.com header.b=tNlsXaOG; arc=none smtp.client-ip=209.85.214.173
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fastly.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=fastly.com
-Received: by mail-pl1-f173.google.com with SMTP id d9443c01a7336-21f6a47d617so3747965ad.2
-        for <netdev@vger.kernel.org>; Fri, 07 Feb 2025 17:28:42 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=fastly.com; s=google; t=1738978121; x=1739582921; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=C/jz6zfV+DBHmvoxAFtAoktT0KBDhc6UitGswSFEQiw=;
-        b=tNlsXaOGnJGv54yuug2TQ3l7J8AARZmDHRB0RfvP+SdqZmgieZ2iE6WYUxuCJGi5v5
-         J1BkYe346Aeu2zEaLWgz7spm9X3X1YIua5YOpiwsYb/mutPxuBGLvd+c+89PAwjZvV7a
-         9nm4RTKRXO1vN1iyGSZfCI7vhqEcksMGj6sDE=
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1738978121; x=1739582921;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=C/jz6zfV+DBHmvoxAFtAoktT0KBDhc6UitGswSFEQiw=;
-        b=htRdxn4WKxryAH7JCsp7KuxwHn0Mpo0U5FImjOAaVOw6VWJTkvQzAtabmGbiIIysx/
-         leWnavk37EJ7vxcheirCBezj4RWTBtXpdyClT+v83S5pSZhuVqNd/Fp0GraIUuuyiiqg
-         FjEj1RTCN2fiamTGJXLEu00qogGRAJtmV5bBOyqEv5Znq6SNCJih9jDD4lR2sJr8BPtu
-         GY/9VzmXzqXncLd+v8xd7YdhUVjblJGxyFXg24Zn6OKyrr7TKV8uOSF5ghKiQtuw3Eek
-         Jup4S4Oe2P8rb/ns6xpP8rQDINKc6xg0hyr+lbMl5pVjRT6R+os6XrSSWEXdsDOTqGRG
-         YyEQ==
-X-Gm-Message-State: AOJu0YyE5xvVGX02+3RNpUQhUT610q3+2Ch4JZJWE7E48VUWCVKZHwQe
-	uSyPeoUf7N3KxLX6rQ2KVRiYeIuHtEyBxylxZgeI5FwgNctjlaixqtoCt/3iMmT47V4oV/rdXG6
-	hcK6tCfPUXCwaRF5/PlCuuEdZGw+AjepJBcUBOSyArUuVd4O2ZwR8qw7iau2/jlXSkJLNczTXdi
-	tuIVZ1CYpOmpzL483M/ylTq9QHfJfxnSiM/9w=
-X-Gm-Gg: ASbGnct4h/eB7EUlYtp5acClrDmuEzAliuQk2ob3gj0sxLHV19sURYclBedawTPxIVt
-	N3pnK9qrUoYfQcwVerqigonbHqAwJrdwFXtFmXRKE8erft6XLF9nTSO7VAp58dRly/jjeNw9U2n
-	uyVgokPuSSWahyT88A3p53z+ImZ30zGoGaBVTTG8j4rzoIxvr1ks8IFmdhqmRSuX3/3DWCOXi25
-	CrJiEREoWui8jULr4JG3h1V4bA5CnIP2ClGU4SR7ED7wcl/cD93IcVTTeMM5TkK/FmwhQjcVyD/
-	0CB3kJJ+cUgy7faT2XoFxV8=
-X-Google-Smtp-Source: AGHT+IEHMwYdGBJpLZD807RWAj5yJcAOhKgdcOa+RZW7NQ/Y7a8uV/knvJSk/mA8Tb9bfo/1eDkKWg==
-X-Received: by 2002:a17:903:2f8b:b0:216:1367:7e3d with SMTP id d9443c01a7336-21f4e70b204mr80906315ad.31.1738978121181;
-        Fri, 07 Feb 2025 17:28:41 -0800 (PST)
-Received: from localhost.localdomain ([2620:11a:c019:0:65e:3115:2f58:c5fd])
-        by smtp.gmail.com with ESMTPSA id 41be03b00d2f7-ad51af7815csm3715311a12.70.2025.02.07.17.28.40
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 07 Feb 2025 17:28:40 -0800 (PST)
-From: Joe Damato <jdamato@fastly.com>
-To: netdev@vger.kernel.org
-Cc: ahmed.zaki@intel.com,
-	Joe Damato <jdamato@fastly.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Simon Horman <horms@kernel.org>,
-	Jonathan Corbet <corbet@lwn.net>,
-	linux-doc@vger.kernel.org (open list:DOCUMENTATION),
-	linux-kernel@vger.kernel.org (open list)
-Subject: [PATCH net-next] documentation: networking: Add NAPI config
-Date: Sat,  8 Feb 2025 01:28:21 +0000
-Message-ID: <20250208012822.34327-1-jdamato@fastly.com>
-X-Mailer: git-send-email 2.43.0
+	s=arc-20240116; t=1738978205; c=relaxed/simple;
+	bh=poTwbNNcvJo7yOumtiBpv0VMWfCgxArliv+22wWXbLI=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=CgXNt2eYXvjpoDWaGoAFJatT0nDPT4ulOuHDpZymHT+yT1aZJoUWkbBUkLlHqFdWT02uIwwrqmHdRdCnh/gBPUccPpJCoOomGYTMHroUjy2hYko/J4N3DDurqMjsI0+ZkP9x2VgcT5MO9j4+zJocshcbm1JtkHJf6+p6WglVGtM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=QhefwuZc; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 01FC2C4CED1;
+	Sat,  8 Feb 2025 01:30:05 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1738978205;
+	bh=poTwbNNcvJo7yOumtiBpv0VMWfCgxArliv+22wWXbLI=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=QhefwuZc7A4lbT7zPyfR1ahcmIcf6sF//LICLfIg3hn7XaUAwUpkUovcuoIRvun5K
+	 D5qd+11GRz6yVXFeAcYbVn32gfCzFPud6SXqUxrJwv6m46xZf4WL5lgwzrmFwqTGAK
+	 uhcfdoKc952mKdtDLMZ4fFgSaEZrRxUHZUThavx24cxyNgOOqPuqGJD9XdAdXAcod9
+	 GRVrCMNO/0QHs5a2eExLf1VSlLJCfOGcFpIh8V+w+jtKNtNGFFBaG+x13+RQ87V79U
+	 v8xBN/5czHDt/TvO7wyPdlTnIRudtyCysT94W9pUQmOuM8eNsBpRJmMkbJbKULtcrV
+	 PAhlnMB3N4Udg==
+Received: from [10.30.226.235] (localhost [IPv6:::1])
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 3422F380AAEB;
+	Sat,  8 Feb 2025 01:30:34 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -91,69 +52,55 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH 0/5] Add usb support for Telit Cinterion FN990B
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <173897823305.2448842.1940161492015126627.git-patchwork-notify@kernel.org>
+Date: Sat, 08 Feb 2025 01:30:33 +0000
+References: <20250205171649.618162-1-fabio.porcedda@gmail.com>
+In-Reply-To: <20250205171649.618162-1-fabio.porcedda@gmail.com>
+To: Fabio Porcedda <fabio.porcedda@gmail.com>
+Cc: oliver@neukum.org, andrew+netdev@lunn.ch, davem@davemloft.net,
+ edumazet@google.com, kuba@kernel.org, pabeni@redhat.com, bjorn@mork.no,
+ johan@kernel.org, gregkh@linuxfoundation.org, linux-usb@vger.kernel.org,
+ netdev@vger.kernel.org, dnlplm@gmail.com
 
-Document the existence of persistent per-NAPI configuration space and
-the API that drivers can opt into.
+Hello:
 
-Update stale documentation which suggested that NAPI IDs cannot be
-queried from userspace.
+This series was applied to netdev/net-next.git (main)
+by Jakub Kicinski <kuba@kernel.org>:
 
-Signed-off-by: Joe Damato <jdamato@fastly.com>
----
- Documentation/networking/napi.rst | 32 ++++++++++++++++++++++++++++++-
- 1 file changed, 31 insertions(+), 1 deletion(-)
+On Wed,  5 Feb 2025 18:16:44 +0100 you wrote:
+> Add usb support for Telit Cinterion FN990B.
+> Also fix Telit Cinterion FN990A name.
+> 
+> Connection with ModemManager was tested also AT ports.
+> 
+> Fabio Porcedda (5):
+>   USB: serial: option: add Telit Cinterion FN990B compositions
+>   net: usb: qmi_wwan: add Telit Cinterion FN990B composition
+>   USB: serial: option: fix Telit Cinterion FN990A name
+>   net: usb: qmi_wwan: fix Telit Cinterion FN990A name
+>   net: usb: cdc_mbim: fix Telit Cinterion FN990A name
+> 
+> [...]
 
-diff --git a/Documentation/networking/napi.rst b/Documentation/networking/napi.rst
-index f970a2be271a..de146f63f09b 100644
---- a/Documentation/networking/napi.rst
-+++ b/Documentation/networking/napi.rst
-@@ -171,12 +171,42 @@ a channel as an IRQ/NAPI which services queues of a given type. For example,
- a configuration of 1 ``rx``, 1 ``tx`` and 1 ``combined`` channel is expected
- to utilize 3 interrupts, 2 Rx and 2 Tx queues.
- 
-+Persistent NAPI config
-+----------------------
-+
-+Drivers can opt-in to using a persistent NAPI configuration space by calling
-+netif_napi_add_config. This API maps a NAPI instance to a configuration
-+structure using a driver defined index value, like a queue number. If the
-+driver were to destroy and recreate NAPI instances (if a user requested a queue
-+count change, for example), the new NAPI instances will inherit the configuration
-+settings of the NAPI configuration structure they are mapped to.
-+
-+Using this API allows for persistent NAPI IDs (among other settings), which can
-+be beneficial to userspace programs using ``SO_INCOMING_NAPI_ID``. See the
-+sections below for other NAPI configuration settings.
-+
- User API
- ========
- 
- User interactions with NAPI depend on NAPI instance ID. The instance IDs
- are only visible to the user thru the ``SO_INCOMING_NAPI_ID`` socket option.
--It's not currently possible to query IDs used by a given device.
-+
-+Users can query NAPI IDs for a device or device queue using netlink. This can
-+be done programmatically in a user application or by using a script included in
-+the kernel source tree: ``tools/net/ynl/pyynl/cli.py``.
-+
-+For example, using the script to dump all of the queues for a device (which
-+will reveal each queue's NAPI ID):
-+
-+.. code-block:: bash
-+
-+   $ kernel-source/tools/net/ynl/pyynl/cli.py \
-+             --spec Documentation/netlink/specs/netdev.yaml \
-+             --dump queue-get \
-+             --json='{"ifindex": 2}'
-+
-+See ``Documentation/netlink/specs/netdev.yaml`` for more details on
-+available operations and attributes.
- 
- Software IRQ coalescing
- -----------------------
+Here is the summary with links:
+  - [1/5] USB: serial: option: add Telit Cinterion FN990B compositions
+    (no matching commit)
+  - [2/5] net: usb: qmi_wwan: add Telit Cinterion FN990B composition
+    https://git.kernel.org/netdev/net-next/c/9dba9a45f8ca
+  - [3/5] USB: serial: option: fix Telit Cinterion FN990A name
+    (no matching commit)
+  - [4/5] net: usb: qmi_wwan: fix Telit Cinterion FN990A name
+    https://git.kernel.org/netdev/net-next/c/ad1664fb6990
+  - [5/5] net: usb: cdc_mbim: fix Telit Cinterion FN990A name
+    https://git.kernel.org/netdev/net-next/c/9e5ac98829d9
 
-base-commit: 7bca2b2d5fcc685b81eb32fe564689eca6a59a99
+You are awesome, thank you!
 -- 
-2.43.0
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
+
 
 
