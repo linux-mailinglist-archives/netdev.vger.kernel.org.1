@@ -1,187 +1,149 @@
-Return-Path: <netdev+bounces-164318-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-164319-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id F2518A2D5A6
-	for <lists+netdev@lfdr.de>; Sat,  8 Feb 2025 11:41:50 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 41BF9A2D5D7
+	for <lists+netdev@lfdr.de>; Sat,  8 Feb 2025 12:51:33 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id EFBF03A60D6
-	for <lists+netdev@lfdr.de>; Sat,  8 Feb 2025 10:41:41 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 345123AAC9C
+	for <lists+netdev@lfdr.de>; Sat,  8 Feb 2025 11:51:24 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 810391B4132;
-	Sat,  8 Feb 2025 10:41:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="I1rPeHMO"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 57B991DA0E0;
+	Sat,  8 Feb 2025 11:51:30 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.12])
+Received: from metis.whiteo.stw.pengutronix.de (metis.whiteo.stw.pengutronix.de [185.203.201.7])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C1A3D1624D0
-	for <netdev@vger.kernel.org>; Sat,  8 Feb 2025 10:41:43 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.12
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D0E2714EC5B
+	for <netdev@vger.kernel.org>; Sat,  8 Feb 2025 11:51:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.203.201.7
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1739011306; cv=none; b=CQnwoy+iS5b+cek8H6RUfuE+Fva8SESj07RzeYJSz45Zwin0Riy3zGQeP4WDgjcwDfx2Q5CbwX3p6HBrnSUIncWDdWyOOisGahHcfpK5v3PSIF5Yvw+4/2fbXdVWb/sGsxATLLiCL8aMx8dWJVCr8j0BmNBqeVO17wG556EDXY4=
+	t=1739015490; cv=none; b=NYEBKqHJkhkuCep/3srERYGY4C37JjXf9n4qkUsASse7KWZ5OJznEits6VSyHhlZRgxER+Fojr3/anngUw2nirIvFN9EBCEuarPSj7Rl1toQTxBOwCQ9SOeD0nStBhnbcaOnLcXPysM1fk1nNnjUxtfvXF3p5Jki/A8PDqaEpvs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1739011306; c=relaxed/simple;
-	bh=MWG+6WKuPs6vj1SH93Cdkkga8aIS5/n3tbVO+NuMbIk=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=D01AyEAHX+jKcThwZKYtlWflBYVKKM7UCHC3bSpadh9vr8fDBPkhXzceLk9qCXJFFUA3goFacAK8Ko1HknPuh+9DwEOSnWX3JTtv45UdsYX3OleGxOxi9DUJ8/R0KYjZv+mUlSvov0gqO00dI4+OiymSDKcU3sjXLcCYgTWsZlI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=I1rPeHMO; arc=none smtp.client-ip=192.198.163.12
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1739011304; x=1770547304;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=MWG+6WKuPs6vj1SH93Cdkkga8aIS5/n3tbVO+NuMbIk=;
-  b=I1rPeHMOgSCdgC7U++V9J+TJcIFNUOJuG2Jnr6rTZlswymIvHCthfQsb
-   hhkUdwF9ulv9Rqe4W3VwCwvmQ1wf2WRYS2eRGl0zmdSu+CRwW3VxX9p5C
-   kHnjpSss6w4SRdMAuOK+TXqvxFhigNmajq/03ZTMaCM8qtho3BVTv84UY
-   yODYvaLCyxmtyFz6MyCvuvzoBhqpCSq0Ccc3cIHY+C7qvaUUBCosHW8K7
-   jJEa7+4JmikMQBDUhr8Bqx30Aplu2iwuj+lyeqJ9ywBQhY9cuVDvFSET6
-   DGQ+ddL54cuYYEJXV2z3DTapzVKktTRXtux6Wk6dB4rTkbBR3BA1Q+MX5
-   w==;
-X-CSE-ConnectionGUID: 7jud809vSJOV9i11n4/YkQ==
-X-CSE-MsgGUID: a7NIaoklRCWkXDQp/v5KVA==
-X-IronPort-AV: E=McAfee;i="6700,10204,11338"; a="43570979"
-X-IronPort-AV: E=Sophos;i="6.13,269,1732608000"; 
-   d="scan'208";a="43570979"
-Received: from orviesa003.jf.intel.com ([10.64.159.143])
-  by fmvoesa106.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 08 Feb 2025 02:41:43 -0800
-X-CSE-ConnectionGUID: xNCE5HYdSH2fX+RnJcWXRQ==
-X-CSE-MsgGUID: rwzju1O6RKalfAEbK8WziA==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.11,199,1725346800"; 
-   d="scan'208";a="116697290"
-Received: from lkp-server01.sh.intel.com (HELO d63d4d77d921) ([10.239.97.150])
-  by orviesa003.jf.intel.com with ESMTP; 08 Feb 2025 02:41:40 -0800
-Received: from kbuild by d63d4d77d921 with local (Exim 4.96)
-	(envelope-from <lkp@intel.com>)
-	id 1tgiHJ-000zrX-2T;
-	Sat, 08 Feb 2025 10:41:37 +0000
-Date: Sat, 8 Feb 2025 18:40:50 +0800
-From: kernel test robot <lkp@intel.com>
-To: Willem de Bruijn <willemdebruijn.kernel@gmail.com>,
-	netdev@vger.kernel.org
-Cc: llvm@lists.linux.dev, oe-kbuild-all@lists.linux.dev,
-	davem@davemloft.net, kuba@kernel.org, edumazet@google.com,
-	pabeni@redhat.com, Willem de Bruijn <willemb@google.com>
-Subject: Re: [PATCH net-next 5/7] icmp: reflect tos through ip cookie rather
- than updating inet_sk
-Message-ID: <202502081845.hsTDUryC-lkp@intel.com>
-References: <20250206193521.2285488-6-willemdebruijn.kernel@gmail.com>
+	s=arc-20240116; t=1739015490; c=relaxed/simple;
+	bh=4Umf3FahGxtcKtL0a03UpcioYK88anzb6shEzvG3Fj8=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version:Content-Type; b=nXWHwlLSiYw/FDnnNAwUgr65yxsiIJBUFjmYVOZ4NTENKrkpOTnQo5vKN0eqZZtNg9+8lV7CFbZmev6c2djaKJczPgo/bvS/+oIp4Wu/jYoMyM2eaR2Eg07uziGErtVBS+ltKHSJs5rCefJDml6IL4em5pt7mOVDJ+f96qoTQXg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de; spf=pass smtp.mailfrom=pengutronix.de; arc=none smtp.client-ip=185.203.201.7
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=pengutronix.de
+Received: from drehscheibe.grey.stw.pengutronix.de ([2a0a:edc0:0:c01:1d::a2])
+	by metis.whiteo.stw.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
+	(Exim 4.92)
+	(envelope-from <mkl@pengutronix.de>)
+	id 1tgjMs-0006d5-6O
+	for netdev@vger.kernel.org; Sat, 08 Feb 2025 12:51:26 +0100
+Received: from moin.white.stw.pengutronix.de ([2a0a:edc0:0:b01:1d::7b] helo=bjornoya.blackshift.org)
+	by drehscheibe.grey.stw.pengutronix.de with esmtps  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.96)
+	(envelope-from <mkl@pengutronix.de>)
+	id 1tgjMs-0048KL-01
+	for netdev@vger.kernel.org;
+	Sat, 08 Feb 2025 12:51:26 +0100
+Received: from dspam.blackshift.org (localhost [127.0.0.1])
+	by bjornoya.blackshift.org (Postfix) with SMTP id A937C3BCCB1
+	for <netdev@vger.kernel.org>; Sat, 08 Feb 2025 11:51:25 +0000 (UTC)
+Received: from hardanger.blackshift.org (unknown [172.20.34.65])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(Client did not present a certificate)
+	by bjornoya.blackshift.org (Postfix) with ESMTPS id 979313BCCAA;
+	Sat, 08 Feb 2025 11:51:23 +0000 (UTC)
+Received: from blackshift.org (localhost [::1])
+	by hardanger.blackshift.org (OpenSMTPD) with ESMTP id 37c6c551;
+	Sat, 8 Feb 2025 11:51:21 +0000 (UTC)
+From: Marc Kleine-Budde <mkl@pengutronix.de>
+To: netdev@vger.kernel.org
+Cc: davem@davemloft.net,
+	kuba@kernel.org,
+	linux-can@vger.kernel.org,
+	kernel@pengutronix.de
+Subject: [PATCH net 0/6] pull-request: can 2025-02-08
+Date: Sat,  8 Feb 2025 12:45:13 +0100
+Message-ID: <20250208115120.237274-1-mkl@pengutronix.de>
+X-Mailer: git-send-email 2.47.2
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250206193521.2285488-6-willemdebruijn.kernel@gmail.com>
+Content-Type: text/plain; charset=utf8
+Content-Transfer-Encoding: 8bit
+X-SA-Exim-Connect-IP: 2a0a:edc0:0:c01:1d::a2
+X-SA-Exim-Mail-From: mkl@pengutronix.de
+X-SA-Exim-Scanned: No (on metis.whiteo.stw.pengutronix.de); SAEximRunCond expanded to false
+X-PTX-Original-Recipient: netdev@vger.kernel.org
 
-Hi Willem,
+Hello netdev-team,
 
-kernel test robot noticed the following build warnings:
+this is a pull request of 6 patches for net/master.
 
-[auto build test WARNING on net-next/main]
+The first patch is by Reyders Morales and fixes a code example in the
+CAN ISO15765-2 documentation.
 
-url:    https://github.com/intel-lab-lkp/linux/commits/Willem-de-Bruijn/tcp-only-initialize-sockcm-tsflags-field/20250207-033912
-base:   net-next/main
-patch link:    https://lore.kernel.org/r/20250206193521.2285488-6-willemdebruijn.kernel%40gmail.com
-patch subject: [PATCH net-next 5/7] icmp: reflect tos through ip cookie rather than updating inet_sk
-config: x86_64-buildonly-randconfig-002-20250207 (https://download.01.org/0day-ci/archive/20250208/202502081845.hsTDUryC-lkp@intel.com/config)
-compiler: clang version 19.1.3 (https://github.com/llvm/llvm-project ab51eccf88f5321e7c60591c5546b254b6afab99)
-reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20250208/202502081845.hsTDUryC-lkp@intel.com/reproduce)
+The next patch is contributed by Alexander Hölzl and fixes sending of
+J1939 messages with zero data length.
 
-If you fix the issue in a separate patch/commit (i.e. not just a new version of
-the same patch/commit), kindly add following tags
-| Reported-by: kernel test robot <lkp@intel.com>
-| Closes: https://lore.kernel.org/oe-kbuild-all/202502081845.hsTDUryC-lkp@intel.com/
+Fedor Pchelkin's patch for the ctucanfd driver adds a missing handling
+for an skb allocation error.
 
-All warnings (new ones prefixed by >>):
+Krzysztof Kozlowski contributes a patch for the c_can driver to fix
+unbalanced runtime PM disable in error path.
 
->> net/ipv4/icmp.c:408:20: warning: variable 'inet' set but not used [-Wunused-but-set-variable]
-     408 |         struct inet_sock *inet;
-         |                           ^
-   1 warning generated.
+The next patch is by Vincent Mailhol and fixes a NULL pointer
+dereference on udev->serial in the etas_es58x driver.
 
+The patch is by Robin van der Gracht and fixes the handling for an skb
+allocation error.
 
-vim +/inet +408 net/ipv4/icmp.c
+regards,
+Marc
 
-^1da177e4c3f41 Linus Torvalds         2005-04-16  395  
-^1da177e4c3f41 Linus Torvalds         2005-04-16  396  /*
-^1da177e4c3f41 Linus Torvalds         2005-04-16  397   *	Driving logic for building and sending ICMP messages.
-^1da177e4c3f41 Linus Torvalds         2005-04-16  398   */
-^1da177e4c3f41 Linus Torvalds         2005-04-16  399  
-^1da177e4c3f41 Linus Torvalds         2005-04-16  400  static void icmp_reply(struct icmp_bxm *icmp_param, struct sk_buff *skb)
-^1da177e4c3f41 Linus Torvalds         2005-04-16  401  {
-^1da177e4c3f41 Linus Torvalds         2005-04-16  402  	struct ipcm_cookie ipc;
-511c3f92ad5b6d Eric Dumazet           2009-06-02  403  	struct rtable *rt = skb_rtable(skb);
-d8d1f30b95a635 Changli Gao            2010-06-10  404  	struct net *net = dev_net(rt->dst.dev);
-8c2bd38b95f75f Eric Dumazet           2024-08-29  405  	bool apply_ratelimit = false;
-77968b78242ee2 David S. Miller        2011-05-08  406  	struct flowi4 fl4;
-fdc0bde90a689b Denis V. Lunev         2008-08-23  407  	struct sock *sk;
-fdc0bde90a689b Denis V. Lunev         2008-08-23 @408  	struct inet_sock *inet;
-35ebf65e851c6d David S. Miller        2012-06-28  409  	__be32 daddr, saddr;
-e110861f86094c Lorenzo Colitti        2014-05-13  410  	u32 mark = IP4_REPLY_MARK(net, skb->mark);
-c0303efeab7391 Jesper Dangaard Brouer 2017-01-09  411  	int type = icmp_param->data.icmph.type;
-c0303efeab7391 Jesper Dangaard Brouer 2017-01-09  412  	int code = icmp_param->data.icmph.code;
-^1da177e4c3f41 Linus Torvalds         2005-04-16  413  
-91ed1e666a4ea2 Paolo Abeni            2017-08-03  414  	if (ip_options_echo(net, &icmp_param->replyopts.opt.opt, skb))
-f00c401b9b5f0a Horms                  2006-02-02  415  		return;
-^1da177e4c3f41 Linus Torvalds         2005-04-16  416  
-8c2bd38b95f75f Eric Dumazet           2024-08-29  417  	/* Needed by both icmpv4_global_allow and icmp_xmit_lock */
-7ba91ecb16824f Jesper Dangaard Brouer 2017-01-09  418  	local_bh_disable();
-^1da177e4c3f41 Linus Torvalds         2005-04-16  419  
-8c2bd38b95f75f Eric Dumazet           2024-08-29  420  	/* is global icmp_msgs_per_sec exhausted ? */
-8c2bd38b95f75f Eric Dumazet           2024-08-29  421  	if (!icmpv4_global_allow(net, type, code, &apply_ratelimit))
-7ba91ecb16824f Jesper Dangaard Brouer 2017-01-09  422  		goto out_bh_enable;
-7ba91ecb16824f Jesper Dangaard Brouer 2017-01-09  423  
-7ba91ecb16824f Jesper Dangaard Brouer 2017-01-09  424  	sk = icmp_xmit_lock(net);
-7ba91ecb16824f Jesper Dangaard Brouer 2017-01-09  425  	if (!sk)
-7ba91ecb16824f Jesper Dangaard Brouer 2017-01-09  426  		goto out_bh_enable;
-7ba91ecb16824f Jesper Dangaard Brouer 2017-01-09  427  	inet = inet_sk(sk);
-c0303efeab7391 Jesper Dangaard Brouer 2017-01-09  428  
-^1da177e4c3f41 Linus Torvalds         2005-04-16  429  	icmp_param->data.icmph.checksum = 0;
-^1da177e4c3f41 Linus Torvalds         2005-04-16  430  
-351782067b6be8 Willem de Bruijn       2018-07-06  431  	ipcm_init(&ipc);
-bbd17d3104f5a7 Willem de Bruijn       2025-02-06  432  	ipc.tos = ip_hdr(skb)->tos;
-0da7536fb47f51 Willem de Bruijn       2020-07-01  433  	ipc.sockc.mark = mark;
-9f6abb5f175bdb David S. Miller        2011-05-09  434  	daddr = ipc.addr = ip_hdr(skb)->saddr;
-35ebf65e851c6d David S. Miller        2012-06-28  435  	saddr = fib_compute_spec_dst(skb);
-aa6615814533c6 Francesco Fusco        2013-09-24  436  
-f6d8bd051c391c Eric Dumazet           2011-04-21  437  	if (icmp_param->replyopts.opt.opt.optlen) {
-f6d8bd051c391c Eric Dumazet           2011-04-21  438  		ipc.opt = &icmp_param->replyopts.opt;
-f6d8bd051c391c Eric Dumazet           2011-04-21  439  		if (ipc.opt->opt.srr)
-f6d8bd051c391c Eric Dumazet           2011-04-21  440  			daddr = icmp_param->replyopts.opt.opt.faddr;
-^1da177e4c3f41 Linus Torvalds         2005-04-16  441  	}
-77968b78242ee2 David S. Miller        2011-05-08  442  	memset(&fl4, 0, sizeof(fl4));
-77968b78242ee2 David S. Miller        2011-05-08  443  	fl4.daddr = daddr;
-35ebf65e851c6d David S. Miller        2012-06-28  444  	fl4.saddr = saddr;
-e110861f86094c Lorenzo Colitti        2014-05-13  445  	fl4.flowi4_mark = mark;
-e2d118a1cb5e60 Lorenzo Colitti        2016-11-04  446  	fl4.flowi4_uid = sock_net_uid(net, NULL);
-0ed373390c5c18 Guillaume Nault        2024-10-22  447  	fl4.flowi4_tos = inet_dscp_to_dsfield(ip4h_dscp(ip_hdr(skb)));
-77968b78242ee2 David S. Miller        2011-05-08  448  	fl4.flowi4_proto = IPPROTO_ICMP;
-385add906b6155 David Ahern            2015-09-29  449  	fl4.flowi4_oif = l3mdev_master_ifindex(skb->dev);
-3df98d79215ace Paul Moore             2020-09-27  450  	security_skb_classify_flow(skb, flowi4_to_flowi_common(&fl4));
-9d6ec938019c6b David S. Miller        2011-03-12  451  	rt = ip_route_output_key(net, &fl4);
-b23dd4fe42b455 David S. Miller        2011-03-02  452  	if (IS_ERR(rt))
-^1da177e4c3f41 Linus Torvalds         2005-04-16  453  		goto out_unlock;
-8c2bd38b95f75f Eric Dumazet           2024-08-29  454  	if (icmpv4_xrlim_allow(net, rt, &fl4, type, code, apply_ratelimit))
-a15c89c703d434 Eric Dumazet           2022-01-24  455  		icmp_push_reply(sk, icmp_param, &fl4, &ipc, &rt);
-^1da177e4c3f41 Linus Torvalds         2005-04-16  456  	ip_rt_put(rt);
-^1da177e4c3f41 Linus Torvalds         2005-04-16  457  out_unlock:
-405666db84b984 Denis V. Lunev         2008-02-29  458  	icmp_xmit_unlock(sk);
-7ba91ecb16824f Jesper Dangaard Brouer 2017-01-09  459  out_bh_enable:
-7ba91ecb16824f Jesper Dangaard Brouer 2017-01-09  460  	local_bh_enable();
-^1da177e4c3f41 Linus Torvalds         2005-04-16  461  }
-^1da177e4c3f41 Linus Torvalds         2005-04-16  462  
+---
 
--- 
-0-DAY CI Kernel Test Service
-https://github.com/intel/lkp-tests/wiki
+The following changes since commit 1438f5d07b9a7afb15e1d0e26df04a6fd4e56a3c:
+
+  rtnetlink: fix netns leak with rtnl_setlink() (2025-02-06 17:17:44 -0800)
+
+are available in the Git repository at:
+
+  git://git.kernel.org/pub/scm/linux/kernel/git/mkl/linux-can.git tags/linux-can-fixes-for-6.14-20250208
+
+for you to fetch changes up to f7f0adfe64de08803990dc4cbecd2849c04e314a:
+
+  can: rockchip: rkcanfd_handle_rx_fifo_overflow_int(): bail out if skb cannot be allocated (2025-02-08 12:42:56 +0100)
+
+----------------------------------------------------------------
+linux-can-fixes-for-6.14-20250208
+
+----------------------------------------------------------------
+Alexander Hölzl (1):
+      can: j1939: j1939_sk_send_loop(): fix unable to send messages with data length zero
+
+Fedor Pchelkin (1):
+      can: ctucanfd: handle skb allocation failure
+
+Krzysztof Kozlowski (1):
+      can: c_can: fix unbalanced runtime PM disable in error path
+
+Reyders Morales (1):
+      Documentation/networking: fix basic node example document ISO 15765-2
+
+Robin van der Gracht (1):
+      can: rockchip: rkcanfd_handle_rx_fifo_overflow_int(): bail out if skb cannot be allocated
+
+Vincent Mailhol (1):
+      can: etas_es58x: fix potential NULL pointer dereference on udev->serial
+
+ Documentation/networking/iso15765-2.rst        |  4 ++--
+ drivers/net/can/c_can/c_can_platform.c         |  5 +++--
+ drivers/net/can/ctucanfd/ctucanfd_base.c       | 10 ++++++----
+ drivers/net/can/rockchip/rockchip_canfd-core.c |  2 +-
+ drivers/net/can/usb/etas_es58x/es58x_devlink.c |  6 +++++-
+ net/can/j1939/socket.c                         |  4 ++--
+ net/can/j1939/transport.c                      |  5 +++--
+ 7 files changed, 22 insertions(+), 14 deletions(-)
+
 
