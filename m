@@ -1,64 +1,60 @@
-Return-Path: <netdev+bounces-164251-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-164252-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id E6D11A2D21E
-	for <lists+netdev@lfdr.de>; Sat,  8 Feb 2025 01:29:38 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 4AA4DA2D238
+	for <lists+netdev@lfdr.de>; Sat,  8 Feb 2025 01:32:53 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id AF1B9188FD3A
-	for <lists+netdev@lfdr.de>; Sat,  8 Feb 2025 00:29:40 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 6DD0418849A1
+	for <lists+netdev@lfdr.de>; Sat,  8 Feb 2025 00:32:58 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 32F5F18E3F;
-	Sat,  8 Feb 2025 00:28:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 698A61547E7;
+	Sat,  8 Feb 2025 00:31:41 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="IOpWvW0+"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="S64Hl+vP"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0035729D0E;
-	Sat,  8 Feb 2025 00:28:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 41E371CFBC;
+	Sat,  8 Feb 2025 00:31:39 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1738974526; cv=none; b=JRPd4xyU5k3K0jyTo8nk3bNj28o9wd7pf9kFcdAVSMwisE7atrbParwQmDScVhkVzWXKzUKCEsduI+TwL/aY4/DvF1BaZvc/J/JQ3ysAg/ibpTO/zGU7O4dOF8Pf/hArJcSSpzYMhP3isPO64K5XCT1vJK8Q4Ex4yL/7ZGZ/Dq0=
+	t=1738974701; cv=none; b=oIQ+GeoBroDTwyI2bxn7vaha2DTn3w29K2CFvlg+J8jVzxFaNjCpH6MSy7yb1yYlBUPR1ZcSXAq6titVux3HwQtAqW4bUoBiV6dVOMkBZ611qY4epbBIhBbEDMuJJ/K5p230qpVhDJ4nuu50Nk0nXZx0ZEfraN5XqrGbiY0dcUQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1738974526; c=relaxed/simple;
-	bh=u6eQSkM7Cfs+opcao0mVLmHYFdxwwlZIySepbPrVVzE=;
+	s=arc-20240116; t=1738974701; c=relaxed/simple;
+	bh=cc2dYe5P57m6NvP7002AV06nlfHegdYaT4xSz16lJfE=;
 	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=Q0nkCXGgBxWF2uE1pBxfxrp6n+bK+P1gxtWP7UDZepoe++ir05epx8MmXUZUR0UO5zze+GIB2DJ78mGmY95ZiCckGWjK9IjtQb+HLZp4pk9HBhkOs3om9TLO3p2PCnukraOw/KEXkMygunbhI4yEUdII13fjMITvFFL2sfFOz2k=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=IOpWvW0+; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id CD5F2C4CEE4;
-	Sat,  8 Feb 2025 00:28:44 +0000 (UTC)
+	 MIME-Version:Content-Type; b=T+d+9hCNuwT2zsYuCQ25HQB6m1TCU0n5mi7vWhQ5JcSBnl3gzUg4qkUcVkUHi4ejUkHEeV5EuUrHu2Mabr3V6dOOTwyHNFDvUEGN/gNP3kJjkqDWaIja21xmq7H3fL8WbNwl0GZafwDpxSqm/8OIp6cun52BKZfB1aqtTcYuXRE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=S64Hl+vP; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6A0D0C4CED1;
+	Sat,  8 Feb 2025 00:31:39 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1738974525;
-	bh=u6eQSkM7Cfs+opcao0mVLmHYFdxwwlZIySepbPrVVzE=;
+	s=k20201202; t=1738974699;
+	bh=cc2dYe5P57m6NvP7002AV06nlfHegdYaT4xSz16lJfE=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=IOpWvW0+YdUJ3ap6jQntf+5RAp4ed5ewCfgDB6op9LLzT6FVKaWHlWOc4ZMgg/HRC
-	 hbhP4gOwkSaiJslF3QGrcpqNyGCHtI6Tss8B8d4nwyD5t+3/7MLd16KxxlQS4uRY3f
-	 pBckzRjCmZIjLYlVFYKBOanTd5bhEoqcPV/CaSGsRT3ICWBwlTcPtpVJa1HHoCawmF
-	 VpTlThGRN4aJOSvIDlnckWMEtt23ZETAgvBt4UUZyGtvP8CHPyknolOXN6pjPYJyMi
-	 SAP0dltglldLXNba1Lyvj4n5MsHEwzm8H+W62oZ5HV3CgsxFKea8Xb9roqOwdwnaLc
-	 iXaFxcyoyyF7A==
-Date: Fri, 7 Feb 2025 16:28:44 -0800
+	b=S64Hl+vPFVpG1r/AiehRyENiIcy+MI3q/IHg7y+LXKA8cemrRfkwRi83nZ7VfHFgf
+	 njW1UBrv867UT0Wk914rOPE5wZc8gBe+F9qVoXgrhfyP4hgwhEWXuJFyEHjzSR2tl1
+	 JT535qgMgSzH1AslNOsWZQxR081na8SKz2TFaHy2o+j8WX0CEcNkRvhBwNDVBsfuu6
+	 lxi18hjZmfxtdLVkNCO3aw/bU6vv+Nb4/WCJHDzT7oUeTC2YENRJ0ENdfLR16H0SXa
+	 EHuzn5rjYHtY5w7F7sg89j/WqY6xvWFCmSVqJuJmmqIAfLqVW7OZu7b1EkcUvkCnY3
+	 6CuU7GzVhnupw==
+Date: Fri, 7 Feb 2025 16:31:38 -0800
 From: Jakub Kicinski <kuba@kernel.org>
-To: Uday Shankar <ushankar@purestorage.com>
-Cc: Breno Leitao <leitao@debian.org>, Andrew Lunn <andrew+netdev@lunn.ch>,
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet
- <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, Srinivas Kandagatla
- <srinivas.kandagatla@linaro.org>, =?UTF-8?B?UmFmYcWCIE1pxYJlY2tp?=
- <rafal@milecki.pl>, Simon Horman <horms@kernel.org>, Andrew Morton
- <akpm@linux-foundation.org>, Johannes Berg <johannes@sipsolutions.net>,
- Jonathan Corbet <corbet@lwn.net>, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org, linux-wireless@vger.kernel.org,
- linux-doc@vger.kernel.org
-Subject: Re: [PATCH v3 2/2] netconsole: allow selection of egress interface
- via MAC address
-Message-ID: <20250207162844.43b20256@kernel.org>
-In-Reply-To: <20250205-netconsole-v3-2-132a31f17199@purestorage.com>
-References: <20250205-netconsole-v3-0-132a31f17199@purestorage.com>
-	<20250205-netconsole-v3-2-132a31f17199@purestorage.com>
+To: Oleksij Rempel <o.rempel@pengutronix.de>
+Cc: Andrew Lunn <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>,
+ Russell King <linux@armlinux.org.uk>, "David S. Miller"
+ <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Paolo Abeni
+ <pabeni@redhat.com>, kernel@pengutronix.de, linux-kernel@vger.kernel.org,
+ netdev@vger.kernel.org
+Subject: Re: [PATCH net-next v3 1/2] net: phy: Add support for
+ driver-specific next update time
+Message-ID: <20250207163138.0af87fbb@kernel.org>
+In-Reply-To: <20250206093902.3331832-2-o.rempel@pengutronix.de>
+References: <20250206093902.3331832-1-o.rempel@pengutronix.de>
+	<20250206093902.3331832-2-o.rempel@pengutronix.de>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -68,35 +64,11 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
 
-On Wed, 05 Feb 2025 22:21:31 -0700 Uday Shankar wrote:
-> Currently, netconsole has two methods of configuration - module
-> parameter and configfs. The former interface allows for netconsole
-> activation earlier during boot (by specifying the module parameter on
-> the kernel command line), so it is preferred for debugging issues which
-> arise before userspace is up/the configfs interface can be used. The
-> module parameter syntax requires specifying the egress interface name.
-> This requirement makes it hard to use for a couple reasons:
-> - The egress interface name can be hard or impossible to predict. For
->   example, installing a new network card in a system can change the
->   interface names assigned by the kernel.
-> - When constructing the module parameter, one may have trouble
->   determining the original (kernel-assigned) name of the interface
->   (which is the name that should be given to netconsole) if some stable
->   interface naming scheme is in effect. A human can usually look at
->   kernel logs to determine the original name, but this is very painful
->   if automation is constructing the parameter.
-> 
-> For these reasons, allow selection of the egress interface via MAC
-> address when configuring netconsole using the module parameter. Update
-> the netconsole documentation with an example of the new syntax.
-> Selection of egress interface by MAC address via configfs is far less
-> interesting (since when this interface can be used, one should be able
-> to easily convert between MAC address and interface name), so it is left
-> unimplemented.
+On Thu,  6 Feb 2025 10:39:01 +0100 Oleksij Rempel wrote:
+> + * This function queries the PHY driver to get the time for the next polling
+> + * event. If the driver does not implement the callback, a default value is used.
 
-Sounds like dev_getbyhwaddr_rcu() will warn here. Either wrap it 
-in  RCU temporarily or combine the series with Breno's patch to 
-add a new helper?
+Please don't exceed 80 char line length without a reason.
 -- 
 pw-bot: cr
 
