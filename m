@@ -1,31 +1,31 @@
-Return-Path: <netdev+bounces-164320-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-164321-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id C3CC7A2D5DD
-	for <lists+netdev@lfdr.de>; Sat,  8 Feb 2025 12:51:45 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7756CA2D5E7
+	for <lists+netdev@lfdr.de>; Sat,  8 Feb 2025 12:52:05 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 3246B3A513D
-	for <lists+netdev@lfdr.de>; Sat,  8 Feb 2025 11:51:31 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 142397A4C85
+	for <lists+netdev@lfdr.de>; Sat,  8 Feb 2025 11:50:53 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 55052246335;
-	Sat,  8 Feb 2025 11:51:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B6002246345;
+	Sat,  8 Feb 2025 11:51:34 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from metis.whiteo.stw.pengutronix.de (metis.whiteo.stw.pengutronix.de [185.203.201.7])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2C5481AF0C0
-	for <netdev@vger.kernel.org>; Sat,  8 Feb 2025 11:51:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A3A95246328
+	for <netdev@vger.kernel.org>; Sat,  8 Feb 2025 11:51:31 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.203.201.7
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1739015492; cv=none; b=LHavl882nSsxZaf3mAVDUFUnu9HpCvMW9/vWm0kAYHgDtulaN5TsV5Iqcrrh17qfYc21Fi1W2iQAJvSpcuJPoCToURyScfWoqNKhWRH8plCVgazstTlI7My0cuGHuKG13UjpikSFL7h5TlgCD41edknl+uELbkM+A2ByzjHYhLs=
+	t=1739015494; cv=none; b=CpR+5rwG8mN2/K1dvWFCy+onxuh+EpoG9k1xJXwePkNO3aCldkK6FwrXGXWQaT6uszMg5EO11KaMQ/Vh++ESB0ZfFMkvJfJ8jyWwLGtfdAIm+B6sKJSBG/gVBSE9faJm3cjRVetTnkPPbg3q7R2PhZMlLWCSMT0sSqswe+EZaI0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1739015492; c=relaxed/simple;
-	bh=5t4DSBoOfzDPQtBpPBz5NqjlhY6Wn2pcw3wnr5yCXjM=;
+	s=arc-20240116; t=1739015494; c=relaxed/simple;
+	bh=d0I0NcU9zYnrhHQkvZdmUL7DdsVqAHzWb6MM+QEIlvU=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=OhsYYt+PpErfF2jSYs6Z0KnsCZQKX95K4p6AMfvRaA0D1rwYU2p9nxWbWssd43OPbHoT0k/AGD5FsHvsXGDaN2r+CBlsIIl7ccglo+wvHqyCw4qSqfAQU51hYZJTE3cDHE/YTDpHlKIj74Vnr52q1UI+7XMJOObzZF+cRI5oh0A=
+	 MIME-Version:Content-Type; b=sFRmuWj6Ou1jwX3zU/dawPIOVAwsc8v5b/DZs1rr77S7ayRYTFCLveV3VYIMqilDQFi4Aj3eRKWZHWKF0FFnWOUBLUXcetWRrG5L1vXEOCI4AOWldOdjYGNfNXSNwMBTyJK4T2pV/Y9c7a9m20sYxoXEVHxO6ySVTDAGgQahWlU=
 ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de; spf=pass smtp.mailfrom=pengutronix.de; arc=none smtp.client-ip=185.203.201.7
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=pengutronix.de
@@ -33,26 +33,26 @@ Received: from drehscheibe.grey.stw.pengutronix.de ([2a0a:edc0:0:c01:1d::a2])
 	by metis.whiteo.stw.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
 	(Exim 4.92)
 	(envelope-from <mkl@pengutronix.de>)
-	id 1tgjMu-0006fS-EG
-	for netdev@vger.kernel.org; Sat, 08 Feb 2025 12:51:28 +0100
+	id 1tgjMv-0006ik-Qh
+	for netdev@vger.kernel.org; Sat, 08 Feb 2025 12:51:29 +0100
 Received: from moin.white.stw.pengutronix.de ([2a0a:edc0:0:b01:1d::7b] helo=bjornoya.blackshift.org)
 	by drehscheibe.grey.stw.pengutronix.de with esmtps  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.96)
 	(envelope-from <mkl@pengutronix.de>)
-	id 1tgjMu-0048Kz-0g
+	id 1tgjMv-0048LR-1w
 	for netdev@vger.kernel.org;
-	Sat, 08 Feb 2025 12:51:28 +0100
+	Sat, 08 Feb 2025 12:51:29 +0100
 Received: from dspam.blackshift.org (localhost [127.0.0.1])
-	by bjornoya.blackshift.org (Postfix) with SMTP id CF5CB3BCCBC
-	for <netdev@vger.kernel.org>; Sat, 08 Feb 2025 11:51:27 +0000 (UTC)
+	by bjornoya.blackshift.org (Postfix) with SMTP id 4A46A3BCCC5
+	for <netdev@vger.kernel.org>; Sat, 08 Feb 2025 11:51:29 +0000 (UTC)
 Received: from hardanger.blackshift.org (unknown [172.20.34.65])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
 	(Client did not present a certificate)
-	by bjornoya.blackshift.org (Postfix) with ESMTPS id B35193BCCAC;
-	Sat, 08 Feb 2025 11:51:24 +0000 (UTC)
+	by bjornoya.blackshift.org (Postfix) with ESMTPS id 06F153BCCB3;
+	Sat, 08 Feb 2025 11:51:25 +0000 (UTC)
 Received: from blackshift.org (localhost [::1])
-	by hardanger.blackshift.org (OpenSMTPD) with ESMTP id e9a33575;
+	by hardanger.blackshift.org (OpenSMTPD) with ESMTP id d709db6e;
 	Sat, 8 Feb 2025 11:51:21 +0000 (UTC)
 From: Marc Kleine-Budde <mkl@pengutronix.de>
 To: netdev@vger.kernel.org
@@ -60,13 +60,13 @@ Cc: davem@davemloft.net,
 	kuba@kernel.org,
 	linux-can@vger.kernel.org,
 	kernel@pengutronix.de,
-	Reyders Morales <reyders1@gmail.com>,
-	Simon Horman <horms@kernel.org>,
-	Oliver Hartkopp <socketcan@hartkopp.net>,
+	=?UTF-8?q?Alexander=20H=C3=B6lzl?= <alexander.hoelzl@gmx.net>,
+	Oleksij Rempel <o.rempel@pengutronix.de>,
+	stable@vger.kernel.org,
 	Marc Kleine-Budde <mkl@pengutronix.de>
-Subject: [PATCH net 1/6] Documentation/networking: fix basic node example document ISO 15765-2
-Date: Sat,  8 Feb 2025 12:45:14 +0100
-Message-ID: <20250208115120.237274-2-mkl@pengutronix.de>
+Subject: [PATCH net 2/6] can: j1939: j1939_sk_send_loop(): fix unable to send messages with data length zero
+Date: Sat,  8 Feb 2025 12:45:15 +0100
+Message-ID: <20250208115120.237274-3-mkl@pengutronix.de>
 X-Mailer: git-send-email 2.47.2
 In-Reply-To: <20250208115120.237274-1-mkl@pengutronix.de>
 References: <20250208115120.237274-1-mkl@pengutronix.de>
@@ -76,44 +76,84 @@ List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 X-SA-Exim-Connect-IP: 2a0a:edc0:0:c01:1d::a2
 X-SA-Exim-Mail-From: mkl@pengutronix.de
 X-SA-Exim-Scanned: No (on metis.whiteo.stw.pengutronix.de); SAEximRunCond expanded to false
 X-PTX-Original-Recipient: netdev@vger.kernel.org
 
-From: Reyders Morales <reyders1@gmail.com>
+From: Alexander Hölzl <alexander.hoelzl@gmx.net>
 
-In the current struct sockaddr_can tp is member of can_addr. tp is not
-member of struct sockaddr_can.
+The J1939 standard requires the transmission of messages of length 0.
 
-Signed-off-by: Reyders Morales <reyders1@gmail.com>
-Reviewed-by: Simon Horman <horms@kernel.org>
-Acked-by: Oliver Hartkopp <socketcan@hartkopp.net>
-Link: https://patch.msgid.link/20250203224720.42530-1-reyders1@gmail.com
-Fixes: 67711e04254c ("Documentation: networking: document ISO 15765-2")
+For example proprietary messages are specified with a data length of 0
+to 1785. The transmission of such messages is not possible. Sending
+results in no error being returned but no corresponding can frame
+being generated.
+
+Enable the transmission of zero length J1939 messages. In order to
+facilitate this two changes are necessary:
+
+1) If the transmission of a new message is requested from user space
+the message is segmented in j1939_sk_send_loop(). Let the segmentation
+take into account zero length messages, do not terminate immediately,
+queue the corresponding skb.
+
+2) j1939_session_skb_get_by_offset() selects the next skb to transmit
+for a session. Take into account that there might be zero length skbs
+in the queue.
+
+Signed-off-by: Alexander Hölzl <alexander.hoelzl@gmx.net>
+Acked-by: Oleksij Rempel <o.rempel@pengutronix.de>
+Link: https://patch.msgid.link/20250205174651.103238-1-alexander.hoelzl@gmx.net
+Fixes: 9d71dd0c7009 ("can: add support of SAE J1939 protocol")
+Cc: stable@vger.kernel.org
+[mkl: commit message rephrased]
 Signed-off-by: Marc Kleine-Budde <mkl@pengutronix.de>
 ---
- Documentation/networking/iso15765-2.rst | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+ net/can/j1939/socket.c    | 4 ++--
+ net/can/j1939/transport.c | 5 +++--
+ 2 files changed, 5 insertions(+), 4 deletions(-)
 
-diff --git a/Documentation/networking/iso15765-2.rst b/Documentation/networking/iso15765-2.rst
-index 0e9d96074178..37ebb2c417cb 100644
---- a/Documentation/networking/iso15765-2.rst
-+++ b/Documentation/networking/iso15765-2.rst
-@@ -369,8 +369,8 @@ to their default.
+diff --git a/net/can/j1939/socket.c b/net/can/j1939/socket.c
+index 305dd72c844c..17226b2341d0 100644
+--- a/net/can/j1939/socket.c
++++ b/net/can/j1939/socket.c
+@@ -1132,7 +1132,7 @@ static int j1939_sk_send_loop(struct j1939_priv *priv,  struct sock *sk,
  
-   addr.can_family = AF_CAN;
-   addr.can_ifindex = if_nametoindex("can0");
--  addr.tp.tx_id = 0x18DA42F1 | CAN_EFF_FLAG;
--  addr.tp.rx_id = 0x18DAF142 | CAN_EFF_FLAG;
-+  addr.can_addr.tp.tx_id = 0x18DA42F1 | CAN_EFF_FLAG;
-+  addr.can_addr.tp.rx_id = 0x18DAF142 | CAN_EFF_FLAG;
+ 	todo_size = size;
  
-   ret = bind(s, (struct sockaddr *)&addr, sizeof(addr));
-   if (ret < 0)
-
-base-commit: 1438f5d07b9a7afb15e1d0e26df04a6fd4e56a3c
+-	while (todo_size) {
++	do {
+ 		struct j1939_sk_buff_cb *skcb;
+ 
+ 		segment_size = min_t(size_t, J1939_MAX_TP_PACKET_SIZE,
+@@ -1177,7 +1177,7 @@ static int j1939_sk_send_loop(struct j1939_priv *priv,  struct sock *sk,
+ 
+ 		todo_size -= segment_size;
+ 		session->total_queued_size += segment_size;
+-	}
++	} while (todo_size);
+ 
+ 	switch (ret) {
+ 	case 0: /* OK */
+diff --git a/net/can/j1939/transport.c b/net/can/j1939/transport.c
+index 95f7a7e65a73..9b72d118d756 100644
+--- a/net/can/j1939/transport.c
++++ b/net/can/j1939/transport.c
+@@ -382,8 +382,9 @@ sk_buff *j1939_session_skb_get_by_offset(struct j1939_session *session,
+ 	skb_queue_walk(&session->skb_queue, do_skb) {
+ 		do_skcb = j1939_skb_to_cb(do_skb);
+ 
+-		if (offset_start >= do_skcb->offset &&
+-		    offset_start < (do_skcb->offset + do_skb->len)) {
++		if ((offset_start >= do_skcb->offset &&
++		     offset_start < (do_skcb->offset + do_skb->len)) ||
++		     (offset_start == 0 && do_skcb->offset == 0 && do_skb->len == 0)) {
+ 			skb = do_skb;
+ 		}
+ 	}
 -- 
 2.47.2
 
