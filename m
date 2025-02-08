@@ -1,143 +1,157 @@
-Return-Path: <netdev+bounces-164278-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-164273-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3ACA6A2D358
-	for <lists+netdev@lfdr.de>; Sat,  8 Feb 2025 04:01:24 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id D2776A2D33A
+	for <lists+netdev@lfdr.de>; Sat,  8 Feb 2025 03:48:40 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 50DDD3ABFDB
-	for <lists+netdev@lfdr.de>; Sat,  8 Feb 2025 03:01:15 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id EA1753ACA45
+	for <lists+netdev@lfdr.de>; Sat,  8 Feb 2025 02:48:31 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3858929D0E;
-	Sat,  8 Feb 2025 03:01:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="I4F0oBfS"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 31588148FE6;
+	Sat,  8 Feb 2025 02:48:36 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f172.google.com (mail-pl1-f172.google.com [209.85.214.172])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtpbguseast1.qq.com (smtpbguseast1.qq.com [54.204.34.129])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A76102913;
-	Sat,  8 Feb 2025 03:01:14 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.172
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F0AEC14F90
+	for <netdev@vger.kernel.org>; Sat,  8 Feb 2025 02:48:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=54.204.34.129
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1738983679; cv=none; b=B2C4zUP4AdaaVPK7HHIKJbpwcG/imu72rogijVgHmc/la+XXvKq851vBQKOzMmQdcKmPRyFFXBuDahLR9gr2ZhZg0zfvdTRDq1aPrPidskFZw9mrzHnElLGrcuX1FtrvchzCFBWgJcZnJ2607kvsAWfgAXgiSm/dh2x7jikWp7w=
+	t=1738982916; cv=none; b=uFCq31UIEjeq55RyNWdpFADZwXZvxi5ulaexc+c1LkCdKy66DKRBia+OzhlLL3q48xDKmN9ytqSQpkjgdisDoKcbD/EBjItnkKMfARdow7tXIu30VkBaZ8oSEka5fyX6V4n1SJwIJ99uYaz239DgXzE3eJhDZ4nH2CyO46pEtm0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1738983679; c=relaxed/simple;
-	bh=nqpBlydxKobQ/cURbEJgsLrhdk+IEA8jA8MlvsXzBb0=;
-	h=Date:Message-Id:To:Cc:Subject:From:In-Reply-To:References:
-	 Mime-Version:Content-Type; b=e8zZf1s1E4zJwj1gUZcSFDJ40k0mqKJKJ1Uwlr5KlYVnmCWb33ObBX+7llJZv2U9eT57OTVDK9NKNUnMJhP9jR2ZKHlMx2ZrQOkdaI10vOFMjK2pi4CDLRhwiz7wXFXG57z12KC2WV+kcH4Se45NDaqoXiE6YvY+IT8He1C9YTU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=I4F0oBfS; arc=none smtp.client-ip=209.85.214.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pl1-f172.google.com with SMTP id d9443c01a7336-21634338cfdso67876445ad.2;
-        Fri, 07 Feb 2025 19:01:14 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1738983674; x=1739588474; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to:from
-         :subject:cc:to:message-id:date:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=SXzRRz14yqpIHofV/zFebh3y188Exztn/L4hTgRQI5c=;
-        b=I4F0oBfS9q32sTW2rD6hPODZ5A6FMg3e7ajBi80RVVWObSZVsz1PqUXM1irYqwnmzy
-         DOGsv+oa8deQ7gPgr3OWOQf0T20/M2sq4uGvfX8RzxS4NKL062WJMmdYpLkuXYrE6Qk8
-         t0rkaeunDpJXs5tEE8IWvF0YqrVcS8eiq24+OgvMRsTtWQSscV/giC8DcFlupZArbd9z
-         xXUL5lGf/1nj+J2Mms5B9miGMx99XMpcCo48rokcUlm4psCdoWSIMfs3AymLPKJ8HTRU
-         YARfvDkGMTzx8RNmtee0NsYWw76/ayQ7DCWabB+uEhewKR1JXBHc+C4YHO+/ArmQvCpi
-         jdQA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1738983674; x=1739588474;
-        h=content-transfer-encoding:mime-version:references:in-reply-to:from
-         :subject:cc:to:message-id:date:x-gm-message-state:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=SXzRRz14yqpIHofV/zFebh3y188Exztn/L4hTgRQI5c=;
-        b=Z1x65kK+hSqcSB8JZDaZizeke3sxzI5Z5inU+Tixs7tEw4wtFWx2ONLfWV2mGsIqc3
-         aWqiv7IZXJYWsV8M1I2v8R42TwMBQd6jxXKFHE/Mmn8il810wYZF26VSCWpFUkiYuXnH
-         tL2GCSonf7RSHMlIrOl7qvliyMAfcPAmZY3X1dy9+hLbuxu4EZhmx2Ccq4/tev6WxVv5
-         Eo2LFuLfFxaQudGBtTmBe8PU+9CCgr00slUOZfrWPm91Sv6vRwbUU8CTkeLxdO274pyc
-         VJMVAH4KHt07nnywtbNeQQVaYntebsyCNLIkFr8MJAp0G1+CNlSgVrJcsyRAiECWqoj3
-         MugQ==
-X-Forwarded-Encrypted: i=1; AJvYcCVj/w6iv9e32/dvoaMwC0yHja3l54rUmwQVTT3ZVDux98OisEQc7m3YHTvMWt21glHhIDxD1IwsiAweEOL8NVo=@vger.kernel.org, AJvYcCXhe7oF+6ylh6n0TzOFZ9cSb2oyjBTejTvNg1AdwUhOn6YNa+mKO4eRIE3vAy2cWsrNLf61Sevl@vger.kernel.org, AJvYcCXk3aG9tYiTds8yIrGQle1UXRuU2yq5LLqN+Bpe5/5mDV/taYd2Eb9x4u8Kfz8tLpH5GnsxDmiHgmCq7I0=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyY9SN7Ox268N30e5zTjEa8c/ARmVUfiKeQjtms1hVmXLFcdjSa
-	uH/qCmnwkQaKg/UU3xq4iuIPJeY+r9ILeVohkl8aQ4x4iuE9ZZnR
-X-Gm-Gg: ASbGncvZE9xPEM+8Phg/SSdqhzFotlatjfOHNHqiatVUKq4j7QCaev3GZGq5smgV1u+
-	OP8LEOvCPHyZZOAocN4cWklD/104LBYGhfADszlHSMkHR50RtB5Xn0tqLjJdn5cVTEE3Cvh4I13
-	xnFpCmHbn7E8T3srpAXPR7VFIBHdhxxsXXEFHVmXHPLhBGiU4vBqmxwCIpSd0q+8JdQfTY/OPD4
-	teR2z2fHgF/ncXjRRuabVSKGr/pHtgVU8gCQLx1OMe65lnN/jjXuYe5nKHUAPO0ft7GrF4hQaHV
-	KBBQAhVkgjj67fpRkxIB3NzQQuMfAk8hy+CTu3y1b0TUOxQzwpweaY9Tjl2+La1ZNjq0Vkw/
-X-Google-Smtp-Source: AGHT+IHN/+0/7nmDB66q1zqOa1jqJWOSI2wBvJ26ODCFMTLzQXppEZWJ/plqUGTPn9EYqJl/M+dNwQ==
-X-Received: by 2002:a17:903:2984:b0:21f:135e:76bf with SMTP id d9443c01a7336-21f4e6a9978mr87627755ad.12.1738983673897;
-        Fri, 07 Feb 2025 19:01:13 -0800 (PST)
-Received: from localhost (p3882177-ipxg22501hodogaya.kanagawa.ocn.ne.jp. [180.15.148.177])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-21f3653babfsm37704355ad.68.2025.02.07.19.01.05
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 07 Feb 2025 19:01:13 -0800 (PST)
-Date: Sat, 08 Feb 2025 12:01:03 +0900 (JST)
-Message-Id: <20250208.120103.2120997372702679311.fujita.tomonori@gmail.com>
-To: david.laight.linux@gmail.com, aliceryhl@google.com, boqun.feng@gmail.com
-Cc: fujita.tomonori@gmail.com, linux-kernel@vger.kernel.org,
- rust-for-linux@vger.kernel.org, netdev@vger.kernel.org, andrew@lunn.ch,
- hkallweit1@gmail.com, tmgross@umich.edu, ojeda@kernel.org,
- alex.gaynor@gmail.com, gary@garyguo.net, bjorn3_gh@protonmail.com,
- benno.lossin@proton.me, a.hindborg@samsung.com, anna-maria@linutronix.de,
- frederic@kernel.org, tglx@linutronix.de, arnd@arndb.de,
- jstultz@google.com, sboyd@kernel.org, mingo@redhat.com,
- peterz@infradead.org, juri.lelli@redhat.com, vincent.guittot@linaro.org,
- dietmar.eggemann@arm.com, rostedt@goodmis.org, bsegall@google.com,
- mgorman@suse.de, vschneid@redhat.com, tgunders@redhat.com, me@kloenk.dev
-Subject: Re: [PATCH v10 1/8] sched/core: Add __might_sleep_precision()
-From: FUJITA Tomonori <fujita.tomonori@gmail.com>
-In-Reply-To: <20250207181258.233674df@pumpkin>
-References: <20250207132623.168854-1-fujita.tomonori@gmail.com>
-	<20250207132623.168854-2-fujita.tomonori@gmail.com>
-	<20250207181258.233674df@pumpkin>
+	s=arc-20240116; t=1738982916; c=relaxed/simple;
+	bh=CuO4sMLRNu0w4gzwmF3nm1w7ffx/KnIN9Sxf30Dn6mk=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=tnmXdFrx59zDVTog4Qxpnm7NUTo9C8bTqQlj4ykb2yhLlVjYfHcvGF/QJUg9Snc/f4Z3yWGyZOGueSl09WT17ybTfcgXhNJSTQOUPKhqep/6Fx2CNR3qv0O96WHxqc9tkqMwqFhNSsA2K7hpIiCVcrqhjXneOqrumxHz4AK3cbs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=trustnetic.com; spf=pass smtp.mailfrom=trustnetic.com; arc=none smtp.client-ip=54.204.34.129
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=trustnetic.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=trustnetic.com
+X-QQ-mid: bizesmtpsz12t1738982901t4ke91
+X-QQ-Originating-IP: Dl4imzVFAdr2bFmJcE8EfjR3gYXl7npXy+rorH4LAyg=
+Received: from wxdbg.localdomain.com ( [125.120.70.88])
+	by bizesmtp.qq.com (ESMTP) with 
+	id ; Sat, 08 Feb 2025 10:48:12 +0800 (CST)
+X-QQ-SSF: 0000000000000000000000000000000
+X-QQ-GoodBg: 0
+X-BIZMAIL-ID: 16339831384622441020
+From: Jiawen Wu <jiawenwu@trustnetic.com>
+To: andrew+netdev@lunn.ch,
+	davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	richardcochran@gmail.com,
+	linux@armlinux.org.uk,
+	horms@kernel.org,
+	jacob.e.keller@intel.com,
+	netdev@vger.kernel.org,
+	vadim.fedorenko@linux.dev
+Cc: mengyuanlou@net-swift.com,
+	Jiawen Wu <jiawenwu@trustnetic.com>
+Subject: [PATCH net-next v6 0/4] Support PTP clock for Wangxun NICs
+Date: Sat,  8 Feb 2025 11:13:44 +0800
+Message-Id: <20250208031348.4368-1-jiawenwu@trustnetic.com>
+X-Mailer: git-send-email 2.27.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Content-Type: Text/Plain; charset=us-ascii
-Content-Transfer-Encoding: 7bit
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
+X-QQ-SENDSIZE: 520
+Feedback-ID: bizesmtpsz:trustnetic.com:qybglogicsvrgz:qybglogicsvrgz8a-1
+X-QQ-XMAILINFO: OatzRg8pHEjphw6SIo2fEHG21FzFspAZdKhIE3v03d1+gTgjFCOb4Pmy
+	xjyjbWl7mYK3qZXiK+Prf1ZEGMelQ9jUgHIg0XRjcZcImeAHhnp/dLOjqLCJQE5q+M44LNl
+	HqfMB9o5wSXbl0ttz8MDp6uDHR0W7Cnx2cWBAnB4hYK3VU2Wk5vP3ZBPQdwrpUySAes89N/
+	WWkE9o7eLYBHXqQLc+QRqpExi0yLWPSRdD94i1mvH6w+fzZsQMqYCTfLp3kuZTt2NU8ZVyv
+	+C9gO3bMf2vaSXPBFouL+QubQyFeD9lcY524aWSfr7Eqjn1MgTc5zJJQSXW6oi3Rjdeyp8N
+	KSt0BOmNmAkgpj1iVMvMIpWGgD6QMqHKvhQoYmTlrOHEVKzPA3MjoLoA1gp+8ajo9k70kZe
+	+W66SMMlrtONWG5irk8E8xLT6l3KtHbl5nTJfSiFa9Shz30DvgnZJP6tii5YXLSVIl3Ftlm
+	8LR+YEtJ6RXvEscGXMzhsNbjS8X/SWCde8990TIroxQ2tePdkp7vwS7s9LB3yM7j6QCRdVO
+	+z6NcmDeGlwgKilb/xleIobTBWN/36WMHiuGUx3Ta9L9n062iyl01f4XcLA451/uTu+FYrw
+	vjhZ3hqdOGbTyQajsFc68U5m/3EOkU3f6/c9AdRuRzR88UUizee8kSP5NbO8S7t+nxhzaNu
+	PGrFFx7DdBdwPTaU31IB4uZ6NY17Ml2u5QFPFBaN97e4gdr/yhVP8Uyrz7DEvD1yUBt4+x9
+	shai24abLzE11FRBEScByuVW2WDx458Ok5m7Ct13YL3O94QzfStyQuWp1yk5vbNQyzPTgl4
+	No1DDQ1s595j3k7HE/xZ+WvFo4cPcbpM1jD1pPiktL4hRWSt5dQImXMtxuX9BZqmrfBr/yn
+	sFy3o3mQ8OyFEv7xbWj0jk35MVXYpxOtHA0/wq+wOwMyormrJfHQSpKM4aaDGzKA/00QKc5
+	6OpVctCJsnEQhGs8EAYGQX3e0QYuMX2pLrmG8gWO6hEdrbw==
+X-QQ-XMRINFO: Mp0Kj//9VHAxr69bL5MkOOs=
+X-QQ-RECHKSPAM: 0
 
-On Fri, 7 Feb 2025 18:12:58 +0000
-David Laight <david.laight.linux@gmail.com> wrote:
+Implement support for PTP clock on Wangxun NICs.
 
->>  static void print_preempt_disable_ip(int preempt_offset, unsigned long ip)
->>  {
->>  	if (!IS_ENABLED(CONFIG_DEBUG_PREEMPT))
->> @@ -8717,7 +8699,8 @@ static inline bool resched_offsets_ok(unsigned int offsets)
->>  	return nested == offsets;
->>  }
->>  
->> -void __might_resched(const char *file, int line, unsigned int offsets)
->> +static void __might_resched_precision(const char *file, int len, int line,
-> 
-> For clarity that ought to be file_len.
+Changes in v6:
+- Link to v5: https://lore.kernel.org/all/20250117062051.2257073-1-jiawenwu@trustnetic.com/
+- Add "depends on PTP_1588_CLOCK_OPTIONAL" in Kconfig to fix build
+  errors
 
-Yeah, I'll update.
+Changes in v5:
+- Link to v4: https://lore.kernel.org/all/20250114084425.2203428-1-jiawenwu@trustnetic.com/
+- Use reading template for timecounter_cyc2time()
+- Move the same piece of codes to the functions
+- Fix read sequence for time registers
+- Remove skb_shared_hwtstamps zero out
+- Pass duty cycle for the pulse width
 
->> +				      unsigned int offsets)
->>  {
->>  	/* Ratelimiting timestamp: */
->>  	static unsigned long prev_jiffy;
->> @@ -8740,8 +8723,10 @@ void __might_resched(const char *file, int line, unsigned int offsets)
->>  	/* Save this before calling printk(), since that will clobber it: */
->>  	preempt_disable_ip = get_preempt_disable_ip(current);
->>  
->> -	pr_err("BUG: sleeping function called from invalid context at %s:%d\n",
->> -	       file, line);
->> +	if (len < 0)
->> +		len = strlen(file);
-> 
-> No need for strlen(), just use a big number instead of -1.
-> Anything bigger than a sane upper limit on the filename length will do.
+Changes in v4:
+- Link to v3: https://lore.kernel.org/all/20250110031716.2120642-1-jiawenwu@trustnetic.com/
+- Add tx_hwtstamp_errors to record errors of DMA mapping
+- Remove flag bits clear for default case in setting TS mode
+- Change to use seqlock_t hw_tc_lock
+- Add ptp_schedule_worker in wx_ptp_reset()
+- Remove perout index check
+- Refactor the same code into a function
 
-Ah, that's right. Just passing the maximum precision (1<<15-1) works.
+Changes in v3:
+- Link to v2: https://lore.kernel.org/all/20250106084506.2042912-1-jiawenwu@trustnetic.com/
+- Clean up messy patches
+- Return delay value in wx_ptp_do_aux_work()
+- Remove dev_warn()
+- Implement ethtool get_ts_stats
+- Support PTP_CLK_REQ_PEROUT instead of PTP_CLK_REQ_PPS
+- Change to start polling Tx timestamp once descriptor done bit is set
 
-The precision specifies the maximum length. vsnprintf() always
-iterates through a string until it reaches the maximum length or
-encounters the null terminator. So strlen() here is useless.
+Changes in v2:
+- Link to v1: https://lore.kernel.org/all/20250102103026.1982137-1-jiawenwu@trustnetic.com/
+- Fix build warning
+- Convert to .ndo_hwtstamp_get and .ndo_hwtstamp_set
+- Remove needless timestamp flags
+- Use .do_aux_work instead of driver service task
+- Use the better error code
+- Rename function wx_ptp_start_cyclecounter()
+- Keep the register names consistent between comments and code
 
-Alice and Boqun, the above change is fine? Can I keep the tags?
+Jiawen Wu (4):
+  net: wangxun: Add support for PTP clock
+  net: wangxun: Support to get ts info
+  net: wangxun: Implement do_aux_work of ptp_clock_info
+  net: ngbe: Add support for 1PPS and TOD
+
+ drivers/net/ethernet/wangxun/Kconfig          |    1 +
+ drivers/net/ethernet/wangxun/libwx/Makefile   |    2 +-
+ .../net/ethernet/wangxun/libwx/wx_ethtool.c   |   53 +
+ .../net/ethernet/wangxun/libwx/wx_ethtool.h   |    4 +
+ drivers/net/ethernet/wangxun/libwx/wx_hw.c    |   19 +
+ drivers/net/ethernet/wangxun/libwx/wx_hw.h    |    1 +
+ drivers/net/ethernet/wangxun/libwx/wx_lib.c   |   52 +-
+ drivers/net/ethernet/wangxun/libwx/wx_ptp.c   | 1021 +++++++++++++++++
+ drivers/net/ethernet/wangxun/libwx/wx_ptp.h   |   20 +
+ drivers/net/ethernet/wangxun/libwx/wx_type.h  |  106 ++
+ .../net/ethernet/wangxun/ngbe/ngbe_ethtool.c  |    2 +
+ drivers/net/ethernet/wangxun/ngbe/ngbe_main.c |   20 +-
+ drivers/net/ethernet/wangxun/ngbe/ngbe_mdio.c |   11 +
+ drivers/net/ethernet/wangxun/ngbe/ngbe_type.h |    5 +
+ .../ethernet/wangxun/txgbe/txgbe_ethtool.c    |    2 +
+ .../net/ethernet/wangxun/txgbe/txgbe_main.c   |   11 +
+ .../net/ethernet/wangxun/txgbe/txgbe_phy.c    |   10 +
+ 17 files changed, 1333 insertions(+), 7 deletions(-)
+ create mode 100644 drivers/net/ethernet/wangxun/libwx/wx_ptp.c
+ create mode 100644 drivers/net/ethernet/wangxun/libwx/wx_ptp.h
+
+-- 
+2.27.0
+
 
