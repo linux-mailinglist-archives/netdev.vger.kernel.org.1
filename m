@@ -1,176 +1,118 @@
-Return-Path: <netdev+bounces-164245-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-164249-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3B0AEA2D1F1
-	for <lists+netdev@lfdr.de>; Sat,  8 Feb 2025 01:24:35 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id AD615A2D20A
+	for <lists+netdev@lfdr.de>; Sat,  8 Feb 2025 01:28:09 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id BFB68169B30
-	for <lists+netdev@lfdr.de>; Sat,  8 Feb 2025 00:24:33 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id D07C2188F20F
+	for <lists+netdev@lfdr.de>; Sat,  8 Feb 2025 00:28:14 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7F4F78F5C;
-	Sat,  8 Feb 2025 00:24:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5AC7414900F;
+	Sat,  8 Feb 2025 00:27:20 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="HSN8vdJp"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="IMyPPTdY"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.11])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B70FFD528;
-	Sat,  8 Feb 2025 00:24:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.11
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2E83114830A;
+	Sat,  8 Feb 2025 00:27:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1738974269; cv=none; b=FUCBZ+ltJHi3rLmH7PtWh422YHRojTdD6u2EoRjGlLTGQ86vuPKd1umUhEEHXxpmvMcP5swdprc7Djol49a0kGVhz8xGJiWdrCy0lcljrKWqjVarDSvJkzNwU+0TbWhqgb6zrjLsDy/bYtV4LCLSEcOBuEpejBfk4qsswp1zul8=
+	t=1738974440; cv=none; b=rwNtDn7kFro21Rzh85ymoijR5ig5n1tSNRbC7u6WgRleV1WbPjlS2m9zgFEQzZjq++I5wtCpN1J/ucsmqXNR5XHJ2As8B2iFYys4wJd2J/vHHUaAObvwKeWLkoKHIXecXRX6gAw+Encc219/ABFT4YdBYzvZaatMpbuVNt0lw8o=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1738974269; c=relaxed/simple;
-	bh=ahQj+V5er1m7Zc89Bojm87PqLdkX1UrTeL6qrBYoilU=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=q9TSmaaXpqY7r6YFkgTwhEqTq9bHXlMXhW3Nk+tT3TNF2k3cqhtSR6NnHtskSfV6IsIWnmd46hVu6vIBZfec0Ir+PSEgBK7jZ1pFcIMW9B7TVKVNck00QHCYsC6tfmMzJgwV9gMkwC9kQs9RjHeUWz+7Z8fw2sungCkldZ8r4eA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=HSN8vdJp; arc=none smtp.client-ip=198.175.65.11
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1738974267; x=1770510267;
-  h=message-id:date:mime-version:subject:to:cc:references:
-   from:in-reply-to:content-transfer-encoding;
-  bh=ahQj+V5er1m7Zc89Bojm87PqLdkX1UrTeL6qrBYoilU=;
-  b=HSN8vdJpT7qoOKLFSK9AKnCnWdV9zg9vMesDcQ1lAIR1JTqUfFk5L5wL
-   thv17uqlS6z7D3YuAWE9/t8trjJ5M7cX5k+3wUnYjgqASKHAwhSirt/8J
-   XcRTmK8Tn3Nf2ivyIx+cfYiIVQTU6okVQraUq3ytyn61hKqvvGJsOfAVI
-   cpZjI2+XF2s9R06suEnP1nS9iYA6oK4tDcrj+7FiIgdPuJzVEE/U1+hI/
-   PPLneC1QmYcdrU15VyKIs/aN7gnK1GN1g9oL1lww1n54TPGk/AZZAHkVP
-   r/yLpHtIYuGtOxCfnXcKnXWuw8cAJTzmax/OvcWcM/l5cslo2+hXzWsr3
-   g==;
-X-CSE-ConnectionGUID: HyxGg9F6TBaN4jEDmRRe+Q==
-X-CSE-MsgGUID: ijqWwnV1TVCtK3NnFBDPsQ==
-X-IronPort-AV: E=McAfee;i="6700,10204,11338"; a="49867994"
-X-IronPort-AV: E=Sophos;i="6.13,268,1732608000"; 
-   d="scan'208";a="49867994"
-Received: from fmviesa009.fm.intel.com ([10.60.135.149])
-  by orvoesa103.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 07 Feb 2025 16:24:27 -0800
-X-CSE-ConnectionGUID: xfeSCHmOR3ikoIcfk1QtNA==
-X-CSE-MsgGUID: cUEFhb4NSfy9sJcyZw1fMQ==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.13,268,1732608000"; 
-   d="scan'208";a="112296017"
-Received: from agladkov-desk.ger.corp.intel.com (HELO [10.125.111.68]) ([10.125.111.68])
-  by fmviesa009-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 07 Feb 2025 16:24:25 -0800
-Message-ID: <1dbc68d4-355f-4baa-bbef-1e023959032d@intel.com>
-Date: Fri, 7 Feb 2025 17:24:24 -0700
+	s=arc-20240116; t=1738974440; c=relaxed/simple;
+	bh=umE6t0joR8G2vFmBUYWVjILv26oDiwZvq+HbzaQDyfA=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=ethqa9HTT4lIxV7npFcGa5tnBKUzB7nAvdPzm8WkaLrWA/ndzrFbOhwtsa8EXI/xHmGZu9iWLH0N5dx+OqYZVewmTMqrgJHs3AWiRz0g+03Cuxngpm22G31ftPkui2tBsarnZaRzWBdkSkHL271PKgODauz6ytyvcDHnV7DZEpQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=IMyPPTdY; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4BCDBC4CED1;
+	Sat,  8 Feb 2025 00:27:19 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1738974439;
+	bh=umE6t0joR8G2vFmBUYWVjILv26oDiwZvq+HbzaQDyfA=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=IMyPPTdYpqHmRZmeFFzM1Ii1zTiU1+16yBmvVkVLn8slx4VvSvQNnyd2Zzi/OvY1w
+	 UtKmXyH4BStcv2x8I63DNZuuZAyqxNZHDROrbD2MJRd7WZHXh0kQ5scaTgh/3K18uD
+	 bxMGtsfC94j9mPDhhvI+vXmDw8YourWQiQ+WZvfrOFjz4KFULJ9vK4JAkBv5fPzwAF
+	 52uyD0Z7F5LKzgFkGNJHN8+ehvecKIakWoSs0O2GTRElHY3TkWJknMREiCaNJv9a58
+	 mDz53NDRsCa423mzls8pkd0limpxlh9l/OGfYnzHMB5UVii9gw2CWsGNaLu145CYZB
+	 3oUjBaZQje/rA==
+Date: Fri, 7 Feb 2025 16:27:18 -0800
+From: Jakub Kicinski <kuba@kernel.org>
+To: Breno Leitao <leitao@debian.org>
+Cc: "David S. Miller" <davem@davemloft.net>, Eric Dumazet
+ <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, Simon Horman
+ <horms@kernel.org>, linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
+ kernel-team@meta.com, kuniyu@amazon.com, ushankar@purestorage.com
+Subject: Re: [PATCH RFC net-next] net: Add dev_getbyhwaddr_rtnl() helper
+Message-ID: <20250207162718.4f26219e@kernel.org>
+In-Reply-To: <20250207-arm_fix_selftest-v1-1-487518d2fd1c@debian.org>
+References: <20250207-arm_fix_selftest-v1-1-487518d2fd1c@debian.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v4 04/10] taint: Add TAINT_FWCTL
-To: Jason Gunthorpe <jgg@nvidia.com>
-Cc: Andy Gospodarek <andrew.gospodarek@broadcom.com>,
- Aron Silverton <aron.silverton@oracle.com>,
- Dan Williams <dan.j.williams@intel.com>,
- Daniel Vetter <daniel.vetter@ffwll.ch>, David Ahern <dsahern@kernel.org>,
- Andy Gospodarek <gospo@broadcom.com>, Christoph Hellwig <hch@infradead.org>,
- Itay Avraham <itayavr@nvidia.com>, Jiri Pirko <jiri@nvidia.com>,
- Jonathan Cameron <Jonathan.Cameron@huawei.com>,
- Jakub Kicinski <kuba@kernel.org>, Leonid Bloch <lbloch@nvidia.com>,
- Leon Romanovsky <leonro@nvidia.com>, linux-cxl@vger.kernel.org,
- linux-rdma@vger.kernel.org, netdev@vger.kernel.org,
- Saeed Mahameed <saeedm@nvidia.com>, "Nelson, Shannon"
- <shannon.nelson@amd.com>
-References: <4-v4-0cf4ec3b8143+4995-fwctl_jgg@nvidia.com>
-Content-Language: en-US
-From: Dave Jiang <dave.jiang@intel.com>
-In-Reply-To: <4-v4-0cf4ec3b8143+4995-fwctl_jgg@nvidia.com>
-Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
 
+On Fri, 07 Feb 2025 04:11:34 -0800 Breno Leitao wrote:
+> +static bool dev_comp_addr(struct net_device *dev,
+> +			  unsigned short type,
+> +			  const char *ha)
 
+Weird indentation.
 
-On 2/6/25 5:13 PM, Jason Gunthorpe wrote:
-> Requesting a fwctl scope of access that includes mutating device debug
-> data will cause the kernel to be tainted. Changing the device operation
-> through things in the debug scope may cause the device to malfunction in
-> undefined ways. This should be reflected in the TAINT flags to help any
-> debuggers understand that something has been done.
-> 
-> Signed-off-by: Jason Gunthorpe <jgg@nvidia.com>
-Reviewed-by: Dave Jiang <dave.jiang@intel.com>
+static bool 
+dev_comp_addr(struct net_device *dev,  unsigned short type, const char *ha)
 
-> ---
->  Documentation/admin-guide/tainted-kernels.rst | 5 +++++
->  include/linux/panic.h                         | 3 ++-
->  kernel/panic.c                                | 1 +
->  tools/debugging/kernel-chktaint               | 8 ++++++++
->  4 files changed, 16 insertions(+), 1 deletion(-)
-> 
-> diff --git a/Documentation/admin-guide/tainted-kernels.rst b/Documentation/admin-guide/tainted-kernels.rst
-> index 700aa72eecb169..a0cc017e44246f 100644
-> --- a/Documentation/admin-guide/tainted-kernels.rst
-> +++ b/Documentation/admin-guide/tainted-kernels.rst
-> @@ -101,6 +101,7 @@ Bit  Log  Number  Reason that got the kernel tainted
->   16  _/X   65536  auxiliary taint, defined for and used by distros
->   17  _/T  131072  kernel was built with the struct randomization plugin
->   18  _/N  262144  an in-kernel test has been run
-> + 19  _/J  524288  userspace used a mutating debug operation in fwctl
->  ===  ===  ======  ========================================================
->  
->  Note: The character ``_`` is representing a blank in this table to make reading
-> @@ -184,3 +185,7 @@ More detailed explanation for tainting
->       build time.
->  
->   18) ``N`` if an in-kernel test, such as a KUnit test, has been run.
+or
+
+static bool dev_comp_addr(struct net_device *dev, unsigned short type,
+			  const char *ha)
+
+> +{
+> +	if (dev->type == type && !memcmp(dev->dev_addr, ha, dev->addr_len))
+> +		return true;
 > +
-> + 19) ``J`` if userpace opened /dev/fwctl/* and performed a FWTCL_RPC_DEBUG_WRITE
-> +     to use the devices debugging features. Device debugging features could
-> +     cause the device to malfunction in undefined ways.
-> diff --git a/include/linux/panic.h b/include/linux/panic.h
-> index 54d90b6c5f47bd..2494d51707ef42 100644
-> --- a/include/linux/panic.h
-> +++ b/include/linux/panic.h
-> @@ -74,7 +74,8 @@ static inline void set_arch_panic_timeout(int timeout, int arch_default_timeout)
->  #define TAINT_AUX			16
->  #define TAINT_RANDSTRUCT		17
->  #define TAINT_TEST			18
-> -#define TAINT_FLAGS_COUNT		19
-> +#define TAINT_FWCTL			19
-> +#define TAINT_FLAGS_COUNT		20
->  #define TAINT_FLAGS_MAX			((1UL << TAINT_FLAGS_COUNT) - 1)
->  
->  struct taint_flag {
-> diff --git a/kernel/panic.c b/kernel/panic.c
-> index d8635d5cecb250..0c55eec9e8744a 100644
-> --- a/kernel/panic.c
-> +++ b/kernel/panic.c
-> @@ -511,6 +511,7 @@ const struct taint_flag taint_flags[TAINT_FLAGS_COUNT] = {
->  	TAINT_FLAG(AUX,				'X', ' ', true),
->  	TAINT_FLAG(RANDSTRUCT,			'T', ' ', true),
->  	TAINT_FLAG(TEST,			'N', ' ', true),
-> +	TAINT_FLAG(FWCTL,			'J', ' ', true),
->  };
->  
->  #undef TAINT_FLAG
-> diff --git a/tools/debugging/kernel-chktaint b/tools/debugging/kernel-chktaint
-> index 279be06332be99..e7da0909d09707 100755
-> --- a/tools/debugging/kernel-chktaint
-> +++ b/tools/debugging/kernel-chktaint
-> @@ -204,6 +204,14 @@ else
->  	echo " * an in-kernel test (such as a KUnit test) has been run (#18)"
->  fi
->  
-> +T=`expr $T / 2`
-> +if [ `expr $T % 2` -eq 0 ]; then
-> +	addout " "
-> +else
-> +	addout "J"
-> +	echo " * fwctl's mutating debug interface was used (#19)"
-> +fi
-> +
->  echo "For a more detailed explanation of the various taint flags see"
->  echo " Documentation/admin-guide/tainted-kernels.rst in the Linux kernel sources"
->  echo " or https://kernel.org/doc/html/latest/admin-guide/tainted-kernels.html"
+> +	return false;
 
+	return dev->type == type && !memcmp(dev->dev_addr, ha, dev->addr_len);
+
+> +}
+
+> +/**
+> + *	dev_getbyhwaddr_rtnl - find a device by its hardware address
+
+I guess Eric suggested the _rtnl() suffix, tho it's quite uncommon.
+Most function are either function() or function_rcu() in networking.
+
+> + *	@net: the applicable net namespace
+> + *	@type: media type of device
+> + *	@ha: hardware address
+> + *
+> + *	Similar to dev_getbyhwaddr_rcu(), but, the owner needs to hold
+
+unnecessary , after but
+
+> + *	RTNL.
+
+rtnl_lock. RTNL is short for RTNetLink
+
+> + *
+
+document the return value kdoc style:
+
+	Return: pointer to the net_device, or NULL if not found
+
+> + */
+> +struct net_device *dev_getbyhwaddr_rtnl(struct net *net, unsigned short type,
+> +					const char *ha)
+
+You missed adding this to a header file?
 
