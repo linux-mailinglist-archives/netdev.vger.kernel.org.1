@@ -1,70 +1,60 @@
-Return-Path: <netdev+bounces-164256-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-164257-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1C57DA2D266
-	for <lists+netdev@lfdr.de>; Sat,  8 Feb 2025 01:55:23 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id EED14A2D269
+	for <lists+netdev@lfdr.de>; Sat,  8 Feb 2025 01:58:51 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 2DE0B3A4D06
-	for <lists+netdev@lfdr.de>; Sat,  8 Feb 2025 00:55:14 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 154363ACD14
+	for <lists+netdev@lfdr.de>; Sat,  8 Feb 2025 00:58:43 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 675B68C1F;
-	Sat,  8 Feb 2025 00:55:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A7A3F79CF;
+	Sat,  8 Feb 2025 00:58:48 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="lOK+tsxg"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="jSXK2vjz"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4347D6FBF
-	for <netdev@vger.kernel.org>; Sat,  8 Feb 2025 00:55:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 830736FBF
+	for <netdev@vger.kernel.org>; Sat,  8 Feb 2025 00:58:48 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1738976119; cv=none; b=D+IXZ0eCMl/t+U2MwdRyVBn7Zy18DwBsFflEYYNngvSATF03NsIevRYW8CYs3c+8/cg9a+n+R5rFDmzh2j9GUAKpXs0sMfQ/Hir6l9y1hKVXUE2ISRL6s5TLtHz3maael345kzsTgf7DzP5jisWacK8vTdM1xPp7yjkIk+mZ13U=
+	t=1738976328; cv=none; b=TF/UImCeN36NzM/WTYpOYgxq8N90DyQHW/UgZXhmRI7z97QxDoA+L32xwbx24/aUwPKP+moNvV5Wof/PPUaPbw+T3S2hLNQk7mmA4RQzhTIcNXdpQ4Hm3ktr7RfuMlFvLknaDUqlfIaTpE40S201RxgR8q5CB7zEV7kgkvQIHtw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1738976119; c=relaxed/simple;
-	bh=jlYaB25Q8hqAbNoXFzJd6Qi4tevOG0OqHIb8UhdfbmA=;
+	s=arc-20240116; t=1738976328; c=relaxed/simple;
+	bh=GYf7HwR051ZEhHpJzoUGU4eNggpT3ZZX52etWY2c3ng=;
 	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=aebvk4jWGx6yI1v0QbwnZ1WHgWcVxfOLZtFv7Yng8pCsVyS135ZROQSSpniVJ/qj+pI0/Cc6BmBA9iyM4tTu0xNidjbnlofDhfqjij/MbiZPiGcyp0GY0BTMOx7Agnb1Jv8lTbrSq2X2VLFb8yjVH83Vy7qXgVD66vJ84VL3wi0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=lOK+tsxg; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id DCE61C4CED1;
-	Sat,  8 Feb 2025 00:55:16 +0000 (UTC)
+	 MIME-Version:Content-Type; b=hFd8LqQKylhLZK30dJmRNL9lU6F2uqVoq/RBci6S7sdTBgK2a1+cnteT/hcjHDxBo6NhaZvkWVkLEy4ZoHWnjTHtR56t55NMklj9IP2MHhfX5+X+XNl1S9hVV8sxXgBMERR7EsmD3ZqmhVpfhaYuZZN1kw43Mv6BMDOY5WTo3WM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=jSXK2vjz; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 90BA1C4CED1;
+	Sat,  8 Feb 2025 00:58:47 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1738976117;
-	bh=jlYaB25Q8hqAbNoXFzJd6Qi4tevOG0OqHIb8UhdfbmA=;
+	s=k20201202; t=1738976328;
+	bh=GYf7HwR051ZEhHpJzoUGU4eNggpT3ZZX52etWY2c3ng=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=lOK+tsxgeM4uOq1E2VyaTdepFtHBF+1zE5U1Oi+r5lMQjk65A+kMVePCnSezAT+up
-	 hF1JeRPDbK7a0JVdE4s7CR2wUu2eIzw7VbdZXsVMR61pWUIAvGfWg6/0nKNsTAzWHG
-	 fAs4Q/l8k51bFVw5rJdk/6m3LNqINu1wrLNgrsZ/phhIbTNlioowUcnEdo+LQ538tW
-	 0FC67DLH7ubGb60bx8JT+LW1pmQO497c9XW7/qe0ssi7se421awalI8YF7T2zrISys
-	 vrvsz+me+klXA8xI5uwnDiy1Drr9sL54DDk0aHwFVv2hiryACGYr16Dx4zSCLwrcEM
-	 eSqDySMidMAng==
-Date: Fri, 7 Feb 2025 16:55:16 -0800
+	b=jSXK2vjzINK+2yMhBYMcwGOvswDDQ3mUUGqGFmjxyAtYdXCd0IFo1sEG+91Fe0rD6
+	 pDXQjrgLQQobprRT3TAiZ7RhdbYLhNddIFpLV9Lq8cNf+N/iUbb6bnWYtsFy/sgX0H
+	 uaP634A2jKaxanfZEUxoRsMgCm1pWr2yp7BmteQ6oKVyyIP5j79W/l06OcUT1Ho/sF
+	 JDaUr4iJc/B0UzFQVoHiKrRo0FyYjCegbHimX5OcEZ4UxGQsw2LJbaLT78fjnlp7V4
+	 nOzIdWnRWB6GR9TLKLJAG+DFjJoGvPN+mSQdehyEQgl4y2XvLe/1wc57PxsR6A+Se1
+	 roJfb7fs9xvqA==
+Date: Fri, 7 Feb 2025 16:58:46 -0800
 From: Jakub Kicinski <kuba@kernel.org>
-To: David Arinzon <darinzon@amazon.com>
+To: David Arinzon <darinzon@amazon.com>, "Machnikowski, Maciek"
+ <maciek@machnikowski.net>
 Cc: David Miller <davem@davemloft.net>, <netdev@vger.kernel.org>, Eric
  Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, Simon
  Horman <horms@kernel.org>, "Richard Cochran" <richardcochran@gmail.com>,
- "Woodhouse, David" <dwmw@amazon.com>, "Machulsky, Zorik"
- <zorik@amazon.com>, "Matushevsky, Alexander" <matua@amazon.com>, Saeed
- Bshara <saeedb@amazon.com>, "Wilson, Matt" <msw@amazon.com>, "Liguori,
- Anthony" <aliguori@amazon.com>, "Bshara, Nafea" <nafea@amazon.com>,
- "Schmeilin, Evgeny" <evgenys@amazon.com>, "Belgazal, Netanel"
- <netanel@amazon.com>, "Saidi, Ali" <alisaidi@amazon.com>, "Herrenschmidt,
- Benjamin" <benh@amazon.com>, "Kiyanovski, Arthur" <akiyano@amazon.com>,
- "Dagan, Noam" <ndagan@amazon.com>, "Bernstein, Amit" <amitbern@amazon.com>,
- "Agroskin, Shay" <shayagr@amazon.com>, "Abboud, Osama"
- <osamaabb@amazon.com>, "Ostrovsky, Evgeny" <evostrov@amazon.com>,
- "Tabachnik, Ofir" <ofirt@amazon.com>, "Machnikowski, Maciek"
- <maciek@machnikowski.net>, Rahul Rameshbabu <rrameshbabu@nvidia.com>, Gal
- Pressman <gal@nvidia.com>
-Subject: Re: [PATCH v6 net-next 3/4] net: ena: Add PHC documentation
-Message-ID: <20250207165516.2f237586@kernel.org>
-In-Reply-To: <20250206141538.549-4-darinzon@amazon.com>
+ "Woodhouse, David" <dwmw@amazon.com>, Rahul Rameshbabu
+ <rrameshbabu@nvidia.com>, Gal Pressman <gal@nvidia.com>, Vadim Fedorenko
+ <vadim.fedorenko@linux.dev>
+Subject: Re: [PATCH v6 net-next 0/4] PHC support in ENA driver
+Message-ID: <20250207165846.53e52bf7@kernel.org>
+In-Reply-To: <20250206141538.549-1-darinzon@amazon.com>
 References: <20250206141538.549-1-darinzon@amazon.com>
-	<20250206141538.549-4-darinzon@amazon.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -74,17 +64,14 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
 
-On Thu, 6 Feb 2025 16:15:37 +0200 David Arinzon wrote:
-> +PHC can be monitored using :code:`ethtool -S` counters:
-> +
-> +=================   ======================================================
-> +**phc_cnt**         Number of successful retrieved timestamps (below expire timeout).
-> +**phc_exp**         Number of expired retrieved timestamps (above expire timeout).
-> +**phc_skp**         Number of skipped get time attempts (during block period).
-> +**phc_err**         Number of failed get time attempts (entering into block state).
-> +=================   ======================================================
+On Thu, 6 Feb 2025 16:15:34 +0200 David Arinzon wrote:
+> This patchset adds the support for PHC (PTP Hardware Clock)
+> in the ENA driver. The documentation part of the patchset
+> includes additional information, including statistics,
+> utilization and invocation examples through the testptp
+> utility.
 
-ethtool -S is for networking counters.
--- 
-pw-bot: cr
+Vadim, Maciek, did you see this? Looks like the device has limitations
+on number of gettime calls per sec. Could be a good fit for the work
+you are prototyping?
 
