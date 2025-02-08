@@ -1,325 +1,178 @@
-Return-Path: <netdev+bounces-164375-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-164376-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0454FA2D8A3
-	for <lists+netdev@lfdr.de>; Sat,  8 Feb 2025 21:30:55 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 68691A2D8C9
+	for <lists+netdev@lfdr.de>; Sat,  8 Feb 2025 22:14:02 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 0F1B11888A18
-	for <lists+netdev@lfdr.de>; Sat,  8 Feb 2025 20:31:00 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 756D01887BC6
+	for <lists+netdev@lfdr.de>; Sat,  8 Feb 2025 21:14:07 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BE0391F3BB2;
-	Sat,  8 Feb 2025 20:30:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 01AB9188596;
+	Sat,  8 Feb 2025 21:13:58 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b="CUwh+GdB"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="FCqJ79s5"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ot1-f42.google.com (mail-ot1-f42.google.com [209.85.210.42])
+Received: from mail-ej1-f49.google.com (mail-ej1-f49.google.com [209.85.218.49])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0C8E3241C93
-	for <netdev@vger.kernel.org>; Sat,  8 Feb 2025 20:30:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.42
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2D706243959
+	for <netdev@vger.kernel.org>; Sat,  8 Feb 2025 21:13:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.49
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1739046622; cv=none; b=prk6Tcq6iYXp6LSJJgGeHDGc8Fl/zH3Axq/oP6fdU1M5zKCU/m58w4K9XFplceu6lp4v+S+E6I4MPcwktzJpd+pQOFTXR94TiUhu7uTUQiUjcIRUIUqnUnIA41RiZmcWQ4NVYtTCELOBlIgw/RXc1G5gl8ZaeFqaaxj6pGrfq50=
+	t=1739049237; cv=none; b=bQrKdHsYep13yoo4mdlW4FsHcUYIjzuhNF6zcjkBjBW2s78ITsrvhqwQywrEqSJ/S96EdImr5rxwe6xGo6uk57ZSrqoI8Y+/dS6pR55snXKhQHsLwwlv+vZ2OXkbrXyriU9dp/fW1wZNRdzaxWSwLlsBmVFE1fSu74s0kBe2QIQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1739046622; c=relaxed/simple;
-	bh=87pEfRTnKV96xeMpSy0KROxiluXAc98traQJu9s7dlw=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=nssTqh/La1IGtKLjrLGF5aNmliuNNrQ4RZcgeedVpWpCz4VaGl/peORg1ZWX3q8M3ATjhR4qBUP6dXIk8i4iJkTwzGaF/ZUJPacCzSJ1GMiV2oFGTMFNzWm6L2A8khKV3CscE/JBKygr4lx72/C6ulutAyaYuFIa/Oho/bnJ+LY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com; spf=fail smtp.mailfrom=broadcom.com; dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b=CUwh+GdB; arc=none smtp.client-ip=209.85.210.42
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=broadcom.com
-Received: by mail-ot1-f42.google.com with SMTP id 46e09a7af769-71e22b2387cso2500473a34.3
-        for <netdev@vger.kernel.org>; Sat, 08 Feb 2025 12:30:20 -0800 (PST)
+	s=arc-20240116; t=1739049237; c=relaxed/simple;
+	bh=gorr4ba5bvlx9dW0jVwF+7Delk31zocW+dLnT2co150=;
+	h=Message-ID:Date:MIME-Version:From:Subject:To:Cc:Content-Type; b=l6inG5OXcuQIB3nzejP7EoiVQF7e4pvmnNTVO+0ooBURp/Tt4Ir2BP3GjmpEWZQfJvRc0Dob5D+w54RHtRhi7ZxCQnRoDw4c7oaOkrZEInTBJ3UplqyPLvVUBohifsGHSS9FwBXmUe3NhrXGUzIHmvuphh7hxPHXQlpRkChWiqc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=FCqJ79s5; arc=none smtp.client-ip=209.85.218.49
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-ej1-f49.google.com with SMTP id a640c23a62f3a-aaf0f1adef8so583206866b.3
+        for <netdev@vger.kernel.org>; Sat, 08 Feb 2025 13:13:54 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=broadcom.com; s=google; t=1739046620; x=1739651420; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=k87Da2ACADeCGaxRCBYzKnh8Kp1OiWpm7bvX4/oJ6Ws=;
-        b=CUwh+GdBahGeMoZODZXWEGw6qZasIyL2ODykuWEqddpke7T9jlJAgrkfYi8TatIzhl
-         PbyPUb4MnJtt4+BY5BBg/zYyj98oxiFRbQr2fqQLJobnva2kvqNpi39gV0O+zWP9Jet2
-         q2TNx/XjI8XZdJpUaqvovvITExvyas7M+p/ZI=
+        d=gmail.com; s=20230601; t=1739049233; x=1739654033; darn=vger.kernel.org;
+        h=content-transfer-encoding:autocrypt:content-language:cc:to:subject
+         :from:user-agent:mime-version:date:message-id:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=Yuom+fAcg0LIKG8GCnhZmdPyedfX7kOZ+zWmzLSTTLE=;
+        b=FCqJ79s5ukXHoNfrlQ5TyGyenk0tPfUWCoj+lNkV2KgKsVk9cn2CeTu3f3rqx5yVoN
+         9d3CCul8mLZNYm2ByR3Sy4U+JHKvMDAp7OXAPH0m/S/G+xPyutx/BsYumxOpnEmfr4CM
+         syhG4cVlOwq0cXRqDW0Iyt26TgEg4oMB26d7ciRvfqSxx4YIjtXMqRnbBtSWThQiJFZM
+         TpstAuxM35l8DeNTKG8SzGjltl8OOSkKYjaPzM/i+MdEUeOhz/hMLVo4zC8/YITaKWXN
+         BGBVwfk/ZiOfLsikpfOmfkAFgRpsvqSucIDtftJab+TNVygxSgZ6AqhcrncbbtVMSBfU
+         sUbA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1739046620; x=1739651420;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=k87Da2ACADeCGaxRCBYzKnh8Kp1OiWpm7bvX4/oJ6Ws=;
-        b=c5bqpn8Wcup5ZV8wmRl5iuCBQL9yD5Dq/Aw2eGLL3qLBwJ6alBhcnBGSZjfqzBqznt
-         1R2Wxw0vF/NLCh3iJFXzz2JRxFMhgxz7UueSSGJo/YG0l80MJzxyNw1UED8mFsBVbvIi
-         IEwKVnvdXbQkreGrlw0NY1O09USYxeBKZsmNGEMljMmlekWoL26ieDj/DtSq0KrwHCtK
-         ya8FgwMkZeZTfWsCBjL8YJEErqK9L2ySRkWKX/FMnfQZaMjFnmknW6rTcCHJZM620lpv
-         F4xo90v3SY3s238M5RyLu67omeie0UHYQXe19N5w4nEdoBRY5KtOMyfgWrM85DDK7XJj
-         7PCw==
-X-Gm-Message-State: AOJu0Yw9QLms0K1ikpiU75fh34AqW9kIn563JUrIjWIbgFJcPRU7IeC5
-	Ks/qAI1XGqDnjXZo7ttyhUYL0th9GNyon9eaJPUFJPHCeOVylNely1SfreSmiQ==
-X-Gm-Gg: ASbGnctc/ge4E0v9gFeOVKbhWPrDC9EJDaAAJy+58LWVefmot8vmzPbxwcg803L7xwB
-	2LYXcvSDzeIcun9atBEvfPyv4U/dtW1CqmAgKvGuu7fBivoUaKuhlMCtorJ5JypaErbMojzKqvz
-	8oleWOm/hOXIPjClgZoOmk/8bvim/wvWYM9pmtJq+FraGeYPjcmAymKkoOMC5uf6mHwzR0zO7VG
-	Glg/oP+Ofk+KxlwOpGfO8D58h8wr89N/lOP+vhcL8ojwA61tWAWsejfGqTs0FWd/e2nHpt1fmBe
-	SJwVcl0B1H1slisFqYOINxtQ+k+p/IhnoTHmbU/sTkbf8tsKKSveKoMwjkg6PyWneW4=
-X-Google-Smtp-Source: AGHT+IENpyIIr3h1KfmPH71lspQy9fQk3Z+P3mK0CJvNyXqQZGcyA4Ok/huOlnN3xbe3rsiG6fChnA==
-X-Received: by 2002:a05:6830:6010:b0:71e:904:6aed with SMTP id 46e09a7af769-726b87db5e6mr5931754a34.10.1739046620061;
-        Sat, 08 Feb 2025 12:30:20 -0800 (PST)
-Received: from lvnvda3289.lvn.broadcom.net ([192.19.161.250])
-        by smtp.gmail.com with ESMTPSA id 46e09a7af769-726af932f78sm1564130a34.18.2025.02.08.12.30.17
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sat, 08 Feb 2025 12:30:18 -0800 (PST)
-From: Michael Chan <michael.chan@broadcom.com>
-To: davem@davemloft.net
-Cc: netdev@vger.kernel.org,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	andrew+netdev@lunn.ch,
-	pavan.chebbi@broadcom.com,
-	andrew.gospodarek@broadcom.com,
-	michal.swiatkowski@linux.intel.com,
-	helgaas@kernel.org,
-	horms@kernel.org,
-	Manoj Panicker <manoj.panicker2@amd.com>,
-	Somnath Kotur <somnath.kotur@broadcom.com>,
-	Wei Huang <wei.huang2@amd.com>,
-	Ajit Khaparde <ajit.khaparde@broadcom.com>
-Subject: [PATCH net-next v4 10/10] bnxt_en: Add TPH support in BNXT driver
-Date: Sat,  8 Feb 2025 12:29:16 -0800
-Message-ID: <20250208202916.1391614-11-michael.chan@broadcom.com>
-X-Mailer: git-send-email 2.43.4
-In-Reply-To: <20250208202916.1391614-1-michael.chan@broadcom.com>
-References: <20250208202916.1391614-1-michael.chan@broadcom.com>
+        d=1e100.net; s=20230601; t=1739049233; x=1739654033;
+        h=content-transfer-encoding:autocrypt:content-language:cc:to:subject
+         :from:user-agent:mime-version:date:message-id:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=Yuom+fAcg0LIKG8GCnhZmdPyedfX7kOZ+zWmzLSTTLE=;
+        b=wafgUHZ8UVdOWeVMQg6m9QQuZR94r1+NxV9KjmmkO0KgzX9HKSjj5HggNFvgOSQnAb
+         YSRtUg81MD776fyNo6GvxlG+pUHdPGRrdeTMJbuW5IBw7ZEtJmMaQRCGJNZ7FKeHVm9c
+         o9cj0e85iuyI45eunugYad2fIVHVsL3YpBIjGMSvsrrBDGHZqz+cxsy0b6U79isf/yhO
+         eb6klEQs/c84YPix1t0JxF4zFcNQQxWWcZNap5XKdwvu+9RORCdTGsib524nzYnPOiGU
+         9eluDKpxzyt9coyKqDB5Zz7P28eGdVBBosSDQddsYPkf5eJm7Jhy6H4XeDUYwluiYb/T
+         vdPw==
+X-Gm-Message-State: AOJu0YxGL2WVnnzrzLwVOW27LV1nl9h86zU8tz6E+S5nKpW2ieteLOk+
+	PDPFeWIEyfhS7gU13imR4+L+QWLGpTACmikEmBMcyeBamRGunzzU
+X-Gm-Gg: ASbGncsa/XCaezxevxKaTHqaLm+XvDuXn1ADuNtP6jFmp+Erww7N97VzSAU6tJDc2TA
+	LjNI59rjDcQ+AMZljZITffmC0mORc3ufJV/DLK2tu1PEp+fnbIMCBKwbxzm2ofjE+JrSBzBM37G
+	CKSQRW9sBgqAcqB47TT2B5ryqHkQ+gnaGlApm41bwAWF57RP8w2uP/A6QmducTnbovR+Lf4TH3G
+	7fUaXY2THwpE2+h9vFAt2DyzB0+24GcXHpP2ItZB8g/szlnuu0e3trPK4qC4N2wJOHbVOGojQAn
+	7FZGfycMIxU2tUj0ywGfeOxdS66AfegvQ1INVauu3fUuMzrDuDC86Zd2FqH6hficlpFIgkaC5Xr
+	QkVoIFV+h2d2O+IqkGQpYPXAsoJFD03UbnqkSawdrtB4+u++Ep69Y5yr0T9v5Ipr75DXl67I52t
+	0n7lRoax8=
+X-Google-Smtp-Source: AGHT+IE5Y1r/zvxcLRd3QRDzVSyau3pCl0h0Recf7MhHmEd0OxZWSNta0GkDv3jugdxHaaRvOW5ERg==
+X-Received: by 2002:a17:907:9719:b0:a9e:b2da:b4a3 with SMTP id a640c23a62f3a-ab789c627ecmr956789466b.42.1739049233110;
+        Sat, 08 Feb 2025 13:13:53 -0800 (PST)
+Received: from ?IPV6:2a02:3100:b375:7f00:211e:90a3:e1ba:6cbb? (dynamic-2a02-3100-b375-7f00-211e-90a3-e1ba-6cbb.310.pool.telefonica.de. [2a02:3100:b375:7f00:211e:90a3:e1ba:6cbb])
+        by smtp.googlemail.com with ESMTPSA id a640c23a62f3a-ab772f48882sm548067066b.19.2025.02.08.13.13.50
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Sat, 08 Feb 2025 13:13:51 -0800 (PST)
+Message-ID: <11be8192-b722-4680-9d1c-3e4323afc27f@gmail.com>
+Date: Sat, 8 Feb 2025 22:14:15 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+User-Agent: Mozilla Thunderbird
+From: Heiner Kallweit <hkallweit1@gmail.com>
+Subject: [PATCH net-next] net: phy: remove unused PHY_INIT_TIMEOUT definitions
+To: Andrew Lunn <andrew+netdev@lunn.ch>, Paolo Abeni <pabeni@redhat.com>,
+ Jakub Kicinski <kuba@kernel.org>, David Miller <davem@davemloft.net>,
+ Eric Dumazet <edumazet@google.com>, Simon Horman <horms@kernel.org>,
+ Andrew Lunn <andrew@lunn.ch>,
+ Russell King - ARM Linux <linux@armlinux.org.uk>
+Cc: "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+ "linuxppc-dev@lists.ozlabs.org" <linuxppc-dev@lists.ozlabs.org>
+Content-Language: en-US
+Autocrypt: addr=hkallweit1@gmail.com; keydata=
+ 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
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-From: Manoj Panicker <manoj.panicker2@amd.com>
+Both identical definitions of PHY_INIT_TIMEOUT aren't used,
+so remove them.
 
-Add TPH support to the Broadcom BNXT device driver. This allows the
-driver to utilize TPH functions for retrieving and configuring Steering
-Tags when changing interrupt affinity. With compatible NIC firmware,
-network traffic will be tagged correctly with Steering Tags, resulting
-in significant memory bandwidth savings and other advantages as
-demonstrated by real network benchmarks on TPH-capable platforms.
-
-Co-developed-by: Somnath Kotur <somnath.kotur@broadcom.com>
-Signed-off-by: Somnath Kotur <somnath.kotur@broadcom.com>
-Co-developed-by: Wei Huang <wei.huang2@amd.com>
-Signed-off-by: Wei Huang <wei.huang2@amd.com>
-Signed-off-by: Manoj Panicker <manoj.panicker2@amd.com>
-Reviewed-by: Ajit Khaparde <ajit.khaparde@broadcom.com>
-Reviewed-by: Andy Gospodarek <andrew.gospodarek@broadcom.com>
-Signed-off-by: Michael Chan <michael.chan@broadcom.com>
+Signed-off-by: Heiner Kallweit <hkallweit1@gmail.com>
 ---
-Cc: Bjorn Helgaas <helgaas@kernel.org>
+ drivers/net/ethernet/freescale/ucc_geth.h | 1 -
+ include/linux/phy.h                       | 1 -
+ 2 files changed, 2 deletions(-)
 
-v3:
-Add MODULE_IMPORT_NS("NETDEV_INTERNAL")
-
-Previous driver series fixing rtnl_lock and empty release function:
-
-https://lore.kernel.org/netdev/20241115200412.1340286-1-wei.huang2@amd.com/
-
-v5 of the PCI series using netdev_rx_queue_restart():
-
-https://lore.kernel.org/netdev/20240916205103.3882081-5-wei.huang2@amd.com/
-
-v1 of the PCI series using open/close:
-
-https://lore.kernel.org/netdev/20240509162741.1937586-9-wei.huang2@amd.com/
----
- drivers/net/ethernet/broadcom/bnxt/bnxt.c | 106 ++++++++++++++++++++++
- drivers/net/ethernet/broadcom/bnxt/bnxt.h |   5 +
- 2 files changed, 111 insertions(+)
-
-diff --git a/drivers/net/ethernet/broadcom/bnxt/bnxt.c b/drivers/net/ethernet/broadcom/bnxt/bnxt.c
-index fee9baff9e5a..2b7df91840fd 100644
---- a/drivers/net/ethernet/broadcom/bnxt/bnxt.c
-+++ b/drivers/net/ethernet/broadcom/bnxt/bnxt.c
-@@ -55,6 +55,8 @@
- #include <net/page_pool/helpers.h>
- #include <linux/align.h>
- #include <net/netdev_queues.h>
-+#include <net/netdev_rx_queue.h>
-+#include <linux/pci-tph.h>
+diff --git a/drivers/net/ethernet/freescale/ucc_geth.h b/drivers/net/ethernet/freescale/ucc_geth.h
+index 38789faae..03b515240 100644
+--- a/drivers/net/ethernet/freescale/ucc_geth.h
++++ b/drivers/net/ethernet/freescale/ucc_geth.h
+@@ -890,7 +890,6 @@ struct ucc_geth_hardware_statistics {
+ 							   addresses */
  
- #include "bnxt_hsi.h"
- #include "bnxt.h"
-@@ -76,6 +78,7 @@
- #define BNXT_DEF_MSG_ENABLE	(NETIF_MSG_DRV | NETIF_MSG_HW | \
- 				 NETIF_MSG_TX_ERR)
+ #define TX_TIMEOUT                              (1*HZ)
+-#define PHY_INIT_TIMEOUT                        100000
+ #define PHY_CHANGE_TIME                         2
  
-+MODULE_IMPORT_NS("NETDEV_INTERNAL");
- MODULE_LICENSE("GPL");
- MODULE_DESCRIPTION("Broadcom NetXtreme network driver");
- 
-@@ -11359,6 +11362,83 @@ static int bnxt_tx_queue_start(struct bnxt *bp, int idx)
- 	return 0;
+ /* Fast Ethernet (10/100 Mbps) */
+diff --git a/include/linux/phy.h b/include/linux/phy.h
+index 3028f8abf..9cb86666c 100644
+--- a/include/linux/phy.h
++++ b/include/linux/phy.h
+@@ -293,7 +293,6 @@ static inline long rgmii_clock(int speed)
+ 	}
  }
  
-+static void bnxt_irq_affinity_notify(struct irq_affinity_notify *notify,
-+				     const cpumask_t *mask)
-+{
-+	struct bnxt_irq *irq;
-+	u16 tag;
-+	int err;
-+
-+	irq = container_of(notify, struct bnxt_irq, affinity_notify);
-+
-+	if (!irq->bp->tph_mode)
-+		return;
-+
-+	cpumask_copy(irq->cpu_mask, mask);
-+
-+	if (irq->ring_nr >= irq->bp->rx_nr_rings)
-+		return;
-+
-+	if (pcie_tph_get_cpu_st(irq->bp->pdev, TPH_MEM_TYPE_VM,
-+				cpumask_first(irq->cpu_mask), &tag))
-+		return;
-+
-+	if (pcie_tph_set_st_entry(irq->bp->pdev, irq->msix_nr, tag))
-+		return;
-+
-+	rtnl_lock();
-+	if (netif_running(irq->bp->dev)) {
-+		err = netdev_rx_queue_restart(irq->bp->dev, irq->ring_nr);
-+		if (err)
-+			netdev_err(irq->bp->dev,
-+				   "RX queue restart failed: err=%d\n", err);
-+	}
-+	rtnl_unlock();
-+}
-+
-+static void bnxt_irq_affinity_release(struct kref *ref)
-+{
-+	struct irq_affinity_notify *notify =
-+		container_of(ref, struct irq_affinity_notify, kref);
-+	struct bnxt_irq *irq;
-+
-+	irq = container_of(notify, struct bnxt_irq, affinity_notify);
-+
-+	if (!irq->bp->tph_mode)
-+		return;
-+
-+	if (pcie_tph_set_st_entry(irq->bp->pdev, irq->msix_nr, 0)) {
-+		netdev_err(irq->bp->dev,
-+			   "Setting ST=0 for MSIX entry %d failed\n",
-+			   irq->msix_nr);
-+		return;
-+	}
-+}
-+
-+static void bnxt_release_irq_notifier(struct bnxt_irq *irq)
-+{
-+	irq_set_affinity_notifier(irq->vector, NULL);
-+}
-+
-+static void bnxt_register_irq_notifier(struct bnxt *bp, struct bnxt_irq *irq)
-+{
-+	struct irq_affinity_notify *notify;
-+
-+	irq->bp = bp;
-+
-+	/* Nothing to do if TPH is not enabled */
-+	if (!bp->tph_mode)
-+		return;
-+
-+	/* Register IRQ affinity notifier */
-+	notify = &irq->affinity_notify;
-+	notify->irq = irq->vector;
-+	notify->notify = bnxt_irq_affinity_notify;
-+	notify->release = bnxt_irq_affinity_release;
-+
-+	irq_set_affinity_notifier(irq->vector, notify);
-+}
-+
- static void bnxt_free_irq(struct bnxt *bp)
- {
- 	struct bnxt_irq *irq;
-@@ -11381,11 +11461,18 @@ static void bnxt_free_irq(struct bnxt *bp)
- 				free_cpumask_var(irq->cpu_mask);
- 				irq->have_cpumask = 0;
- 			}
-+
-+			bnxt_release_irq_notifier(irq);
-+
- 			free_irq(irq->vector, bp->bnapi[i]);
- 		}
+-#define PHY_INIT_TIMEOUT	100000
+ #define PHY_FORCE_TIMEOUT	10
  
- 		irq->requested = 0;
- 	}
-+
-+	/* Disable TPH support */
-+	pcie_disable_tph(bp->pdev);
-+	bp->tph_mode = 0;
- }
- 
- static int bnxt_request_irq(struct bnxt *bp)
-@@ -11405,6 +11492,12 @@ static int bnxt_request_irq(struct bnxt *bp)
- #ifdef CONFIG_RFS_ACCEL
- 	rmap = bp->dev->rx_cpu_rmap;
- #endif
-+
-+	/* Enable TPH support as part of IRQ request */
-+	rc = pcie_enable_tph(bp->pdev, PCI_TPH_ST_IV_MODE);
-+	if (!rc)
-+		bp->tph_mode = PCI_TPH_ST_IV_MODE;
-+
- 	for (i = 0, j = 0; i < bp->cp_nr_rings; i++) {
- 		int map_idx = bnxt_cp_num_to_irq_num(bp, i);
- 		struct bnxt_irq *irq = &bp->irq_tbl[map_idx];
-@@ -11428,8 +11521,11 @@ static int bnxt_request_irq(struct bnxt *bp)
- 
- 		if (zalloc_cpumask_var(&irq->cpu_mask, GFP_KERNEL)) {
- 			int numa_node = dev_to_node(&bp->pdev->dev);
-+			u16 tag;
- 
- 			irq->have_cpumask = 1;
-+			irq->msix_nr = map_idx;
-+			irq->ring_nr = i;
- 			cpumask_set_cpu(cpumask_local_spread(i, numa_node),
- 					irq->cpu_mask);
- 			rc = irq_update_affinity_hint(irq->vector, irq->cpu_mask);
-@@ -11439,6 +11535,16 @@ static int bnxt_request_irq(struct bnxt *bp)
- 					    irq->vector);
- 				break;
- 			}
-+
-+			bnxt_register_irq_notifier(bp, irq);
-+
-+			/* Init ST table entry */
-+			if (pcie_tph_get_cpu_st(irq->bp->pdev, TPH_MEM_TYPE_VM,
-+						cpumask_first(irq->cpu_mask),
-+						&tag))
-+				continue;
-+
-+			pcie_tph_set_st_entry(irq->bp->pdev, irq->msix_nr, tag);
- 		}
- 	}
- 	return rc;
-diff --git a/drivers/net/ethernet/broadcom/bnxt/bnxt.h b/drivers/net/ethernet/broadcom/bnxt/bnxt.h
-index 4e20878e7714..e85b5ce94f58 100644
---- a/drivers/net/ethernet/broadcom/bnxt/bnxt.h
-+++ b/drivers/net/ethernet/broadcom/bnxt/bnxt.h
-@@ -1234,6 +1234,11 @@ struct bnxt_irq {
- 	u8		have_cpumask:1;
- 	char		name[IFNAMSIZ + BNXT_IRQ_NAME_EXTRA];
- 	cpumask_var_t	cpu_mask;
-+
-+	struct bnxt	*bp;
-+	int		msix_nr;
-+	int		ring_nr;
-+	struct irq_affinity_notify affinity_notify;
- };
- 
- #define HWRM_RING_ALLOC_TX	0x1
+ #define PHY_MAX_ADDR	32
 -- 
-2.30.1
+2.48.1
+
+
 
 
