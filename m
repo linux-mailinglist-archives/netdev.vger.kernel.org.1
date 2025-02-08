@@ -1,75 +1,75 @@
-Return-Path: <netdev+bounces-164284-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-164285-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id AF006A2D3AA
-	for <lists+netdev@lfdr.de>; Sat,  8 Feb 2025 05:14:54 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6F93AA2D3AF
+	for <lists+netdev@lfdr.de>; Sat,  8 Feb 2025 05:15:33 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 4216D7A53FC
-	for <lists+netdev@lfdr.de>; Sat,  8 Feb 2025 04:13:58 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 866D23AD30E
+	for <lists+netdev@lfdr.de>; Sat,  8 Feb 2025 04:15:11 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 78C9E1925A3;
-	Sat,  8 Feb 2025 04:14:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7E0C518E04D;
+	Sat,  8 Feb 2025 04:14:41 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=fastly.com header.i=@fastly.com header.b="FA1apH12"
+	dkim=pass (1024-bit key) header.d=fastly.com header.i=@fastly.com header.b="pxdGGLII"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f179.google.com (mail-pl1-f179.google.com [209.85.214.179])
+Received: from mail-pl1-f173.google.com (mail-pl1-f173.google.com [209.85.214.173])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E736F18FDCE
-	for <netdev@vger.kernel.org>; Sat,  8 Feb 2025 04:14:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.179
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DB76319DF8D
+	for <netdev@vger.kernel.org>; Sat,  8 Feb 2025 04:14:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.173
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1738988074; cv=none; b=AyIE8y83n9Qzi3JQrdEkwi7Br+ZKXdOgauBCNG26T2wxNfhv0x+FOZeMpm0x3sMD9gJsMwKs8BHumCZPqn/pLW6dsARNwl/7F+6gkOdaFtXMA1QgL5znfQ8vztvmFBk67sReGgKWENdkRKE6k29UA94rE6P+t1er0BpoJJoUubA=
+	t=1738988081; cv=none; b=O4Kio74uZqkalFPNQLJ5hZQMoI1ZG1XNz11ZCVa7D70OMV7oF9qrvmjt9G0KLRFSLfZ8bBZ9v/3lJFpvyPx6AodR4Grc3nn5pd6Rh461oPdaZZ81ixhTVJf5mAYaDxIWQe1nito59qDjD7eYpgseAshjPoytp+Q7OrOTOOtC/yM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1738988074; c=relaxed/simple;
-	bh=fgaREE9e6jz5S5ZRiFkiZ2u/DNlIlA4sG+vDOPb2x/w=;
+	s=arc-20240116; t=1738988081; c=relaxed/simple;
+	bh=qMU/SSD+GnDstgplnPhUezCKkpRh9MkYWQpob4UhFaw=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=ZLGuyIvJunIYEKk2X/SzAguQiEtz3Z3ZnjevKqrQZjLA4uxXe22cQgA08MvMJzf+Ob8eivyG4E8jdE3g0ztjL9jutfQnsMkPz6rMP6NBP+zOVIf3lqWuY5sh73CgvMBvs1rS3Mlncp5/ES5a/lDDujvSULFF5vlrTfxSiCDWrNE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fastly.com; spf=pass smtp.mailfrom=fastly.com; dkim=pass (1024-bit key) header.d=fastly.com header.i=@fastly.com header.b=FA1apH12; arc=none smtp.client-ip=209.85.214.179
+	 MIME-Version; b=qWB3M600Hwp9aUFBItOQeq111CNPQKxAnsF90FhQiJS1qHjQCwaRXLJNjmYU67cDjxcbHx8c8qMuFcxjoxV0P5FIXzeh7kmCB3TIx37Kpj1RRrxfa79w86b4YGbNpGdGSaglUQ5EMGhSsr8lQX/bidRNli+W8CB4yD4jDBk675g=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fastly.com; spf=pass smtp.mailfrom=fastly.com; dkim=pass (1024-bit key) header.d=fastly.com header.i=@fastly.com header.b=pxdGGLII; arc=none smtp.client-ip=209.85.214.173
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fastly.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=fastly.com
-Received: by mail-pl1-f179.google.com with SMTP id d9443c01a7336-21f48ab13d5so39807845ad.0
-        for <netdev@vger.kernel.org>; Fri, 07 Feb 2025 20:14:32 -0800 (PST)
+Received: by mail-pl1-f173.google.com with SMTP id d9443c01a7336-21f6d2642faso4400795ad.1
+        for <netdev@vger.kernel.org>; Fri, 07 Feb 2025 20:14:39 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=fastly.com; s=google; t=1738988072; x=1739592872; darn=vger.kernel.org;
+        d=fastly.com; s=google; t=1738988078; x=1739592878; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=h50Y3zF4tCkc/2EOdw4zLXgmcTIrGB/eNO65/LtZobs=;
-        b=FA1apH12R37ESE1KN4zVVlpFFt82VLgU7O/JZqnzAet/W+UmpDj2MZ3aEYtaNYaf1h
-         euPLeo0uoXbubqP4IYbSauBCz1r90fQIFDlDre7Ul/7gG90pD6C+uRTtGJFdb1/zsINk
-         M8hPVxquLjUEsWk3FRQZ/rA0aaiR/RCgIBCiI=
+        bh=P4DJzSaiR41L4hlteYq1D8hTA0O9UNuuENwILLXuiso=;
+        b=pxdGGLII/xKi1lFhN8O+lLmzjTr0dbr6fo3JQmUS+Gyf95jSWX0BBxxGAVL9qODOef
+         ykMxu4tUqeNjmLkOlhabSvKziab5u7ybG/cFoGa5RmozYQDhjnEjTM2P7Dn0bBZJ+0gf
+         BLt89WSVTPMAEsEVitDUwPopWuipnUiQovh3s=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1738988072; x=1739592872;
+        d=1e100.net; s=20230601; t=1738988078; x=1739592878;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=h50Y3zF4tCkc/2EOdw4zLXgmcTIrGB/eNO65/LtZobs=;
-        b=HCa/5RNY8W7+CAuZ6boJQZ4NoBCQ1l5g1KR6lcdo4027ULVnsvH/x9qButudhpsoZw
-         eYi05cgGQ+OZlUI2w4PVQS7FbSnYe4os8ycmmdQfvjC3stBHAAOtM0lblBW/ixpnI/OD
-         0iE27Ng4lU8FFp5l5uS43N7TH7rd36HR1dIUJPr1SRArSK1zc5GfeIHDWvSoP+WZdLEi
-         Uc8BRsAB3wuMp93UGg3t0hcZhuVUgGj2ghSOQFg47iQLNYzt2IrsKkeLNdJM+i1KPxfx
-         BBYjqeyZ6VCvQueBBBsepWXwN5BThedFf1dMQ4tzo8g+BlF1m9PTimdZOI87PXHjt4Ck
-         42ag==
-X-Gm-Message-State: AOJu0Yz+HkVSgKA1fPBwTh05xdUHPL4GfAQ2wc0l7zxBSXpMZUfw5S6S
-	2s10RDybt6ep1A4KQuokJuh5uqUsaOvip6ZoPibMmQWljznbWCo+vuYapmbuD1WpPpCsj2+m9C9
-	XOZRtf+/khYWFp7CcCtU/71fgJs5ICuOYtTimmE1N7M5p8FJrxsvjPs8jORh83w7JhAdLCs1feP
-	kbtAKJ6Sg0YvOES+trhvQCYaSi8QKlNFBQwac=
-X-Gm-Gg: ASbGnctwjHFlf/DPSugNZIf8FLNchZNdKqFqaWwJEzfzSIfg9WPxIgvSVXl4jIvCEsd
-	EqO/aIy86TnjWDRneIaIUD/joc3FMLFdU2VYEFSv/VJz08nW6HT7JwxpDiy64Rjm+5WfNBLXjGC
-	AZEAFTrrYacTKn7/M4C+IW38c1sUW8o+kcLXA6Tvb9xw7gFANckFGeJ8sBi2QD7yNtgFp47VnlY
-	Yz9Xxjt6mRU8zc2gcospR51D4jkUFuKc+Hatq8fLl/VbGTG/pZsVOS4AuZPTu63n1lmFFTddn8e
-	NI+GBZ49mwjhg4ul5vxfDA0=
-X-Google-Smtp-Source: AGHT+IFibipGLR5Jyf9zTmTf+G8WqPE/WDRNuZpNVsIuJ6CUOWboJI4UQgEjzXJ5C+bf4G/4+P5jHw==
-X-Received: by 2002:a17:902:e88e:b0:21f:55e:ed71 with SMTP id d9443c01a7336-21f4e6a0100mr87242125ad.5.1738988071853;
-        Fri, 07 Feb 2025 20:14:31 -0800 (PST)
+        bh=P4DJzSaiR41L4hlteYq1D8hTA0O9UNuuENwILLXuiso=;
+        b=N9MXNeJuiI402Edn8LfnHccIh8lxuzoUp/xbz+CCcUXdUWhEjZkAPU1oa6oHfgngdT
+         1ZNdZG1CoTn+umU0IPUgME6G/+x4zljdIToUEhOOMeuGucs8xm5FMLM6a+NTqTgJUe5p
+         mT1AtvLoHYNwdKCad1C0nc/iFLOTi7VWJVUYtExcElADVQdBT7XlfvqzewVC7isij8Ts
+         SA6RF94+0x0+vo1eET4MevXJLLm+gietP6oqE7LN8ee6Xnk37Aaj3SvJ8wZbcU53UCch
+         aDAOUIRJeJQz4nR4g9VKPPj5gbxQQYLAi0oj24je1zzPq2hd5XaXyf6Fbx8yQoCYlC0y
+         w4qA==
+X-Gm-Message-State: AOJu0Yy4fN00ChHPl/DGUCIvf5A0VRuW9Zf2iMxzl4vc72fgV23WGHcq
+	uJcHHySB1aojL+lP9/NCkCiieaPIpQFieSqsoZihbS/MGH5+il2zb0Y5C1DUEoNqmXsEpHwbTTk
+	+96iNk+4HZMIQBOdslA2Wp9PyrOKQOohr6Ce/SMir2wCy+4CXYTvYK1AnW6ARbm6XEfy21qZNYg
+	v0e03UEPYTOf1d37vJfBb/F9EcjUohTlWdlxU=
+X-Gm-Gg: ASbGncsVw6JFGcYZ8v5woI5+kap3tAob4BZbpiREggbHYYiLgixtRHNhL8pNYGsok/r
+	9hDTgiKY5/RTdPIbf4gkoi5hoKdRnFuUVNwOC1NZQ5Fkp3YL5NIPT2v2DQWbEpN2lZYYJxJXjCE
+	x5WPm9nhaGFQCp4aGvlM/CxP3nia2N+RxIjaz44qc9aOK2AMu2BxIc4rye2ZL1TX+82NSYb3mfz
+	SvHRg01Qo3HS1Y9gfZRjO0kvh33//AfqUD3z54A4u9JoGpWRZByY7Sx8+dHS63wh0L/2H0zYOjq
+	K1N6Z1LGxr+TnezNKLbtCmw=
+X-Google-Smtp-Source: AGHT+IFZ59NGSqTUMa/FLxvgaYbBKt8+YckD6RRdPZKX9/d1HXQ/rQ9E90HNh7Azr36Zxf8jvckMTA==
+X-Received: by 2002:a17:903:1c4:b0:216:4169:f9d7 with SMTP id d9443c01a7336-21f4e6a00f4mr104632155ad.2.1738988078328;
+        Fri, 07 Feb 2025 20:14:38 -0800 (PST)
 Received: from localhost.localdomain ([2620:11a:c019:0:65e:3115:2f58:c5fd])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-21f3650ce0bsm38567715ad.21.2025.02.07.20.14.30
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-21f3650ce0bsm38567715ad.21.2025.02.07.20.14.37
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 07 Feb 2025 20:14:31 -0800 (PST)
+        Fri, 07 Feb 2025 20:14:37 -0800 (PST)
 From: Joe Damato <jdamato@fastly.com>
 To: netdev@vger.kernel.org
 Cc: horms@kernel.org,
@@ -78,10 +78,18 @@ Cc: horms@kernel.org,
 	"David S. Miller" <davem@davemloft.net>,
 	Eric Dumazet <edumazet@google.com>,
 	Paolo Abeni <pabeni@redhat.com>,
+	Donald Hunter <donald.hunter@gmail.com>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	Xuan Zhuo <xuanzhuo@linux.alibaba.com>,
+	Stanislav Fomichev <sdf@fomichev.me>,
+	Mina Almasry <almasrymina@google.com>,
+	Martin Karsten <mkarsten@uwaterloo.ca>,
+	Sridhar Samudrala <sridhar.samudrala@intel.com>,
+	David Wei <dw@davidwei.uk>,
 	linux-kernel@vger.kernel.org (open list)
-Subject: [PATCH net-next v5 1/3] netlink: Add nla_put_empty_nest helper
-Date: Sat,  8 Feb 2025 04:12:23 +0000
-Message-ID: <20250208041248.111118-2-jdamato@fastly.com>
+Subject: [PATCH net-next v5 2/3] netdev-genl: Add an XSK attribute to queues
+Date: Sat,  8 Feb 2025 04:12:24 +0000
+Message-ID: <20250208041248.111118-3-jdamato@fastly.com>
 X-Mailer: git-send-email 2.43.0
 In-Reply-To: <20250208041248.111118-1-jdamato@fastly.com>
 References: <20250208041248.111118-1-jdamato@fastly.com>
@@ -93,51 +101,153 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Creating empty nests is helpful when the exact attributes to be exposed
-in the future are not known. Encapsulate the logic in a helper.
+Expose a new per-queue nest attribute, xsk, which will be present for
+queues that are being used for AF_XDP. If the queue is not being used for
+AF_XDP, the nest will not be present.
+
+In the future, this attribute can be extended to include more data about
+XSK as it is needed.
 
 Signed-off-by: Joe Damato <jdamato@fastly.com>
 Suggested-by: Jakub Kicinski <kuba@kernel.org>
 ---
+ v5:
+   - Removed unused variable, ret, from netdev_nl_queue_fill_one.
+
  v4:
-   - new in v4
+   - Updated netdev_nl_queue_fill_one to use the empty nest helper added
+     in patch 1.
 
- include/net/netlink.h | 15 +++++++++++++++
- 1 file changed, 15 insertions(+)
+ v2:
+   - Patch adjusted to include an attribute, xsk, which is an empty nest
+     and exposed for queues which have a pool.
 
-diff --git a/include/net/netlink.h b/include/net/netlink.h
-index e015ffbed819..29e0db940382 100644
---- a/include/net/netlink.h
-+++ b/include/net/netlink.h
-@@ -118,6 +118,7 @@
-  *   nla_nest_start(skb, type)		start a nested attribute
-  *   nla_nest_end(skb, nla)		finalize a nested attribute
-  *   nla_nest_cancel(skb, nla)		cancel nested attribute construction
-+ *   nla_put_empty_nest(skb, type)	create an empty nest
-  *
-  * Attribute Length Calculations:
-  *   nla_attr_size(payload)		length of attribute w/o padding
-@@ -2240,6 +2241,20 @@ static inline void nla_nest_cancel(struct sk_buff *skb, struct nlattr *start)
- 	nlmsg_trim(skb, start);
- }
+ Documentation/netlink/specs/netdev.yaml | 13 ++++++++++++-
+ include/uapi/linux/netdev.h             |  6 ++++++
+ net/core/netdev-genl.c                  | 11 +++++++++++
+ tools/include/uapi/linux/netdev.h       |  6 ++++++
+ 4 files changed, 35 insertions(+), 1 deletion(-)
+
+diff --git a/Documentation/netlink/specs/netdev.yaml b/Documentation/netlink/specs/netdev.yaml
+index 288923e965ae..85402a2e289c 100644
+--- a/Documentation/netlink/specs/netdev.yaml
++++ b/Documentation/netlink/specs/netdev.yaml
+@@ -276,6 +276,9 @@ attribute-sets:
+         doc: The timeout, in nanoseconds, of how long to suspend irq
+              processing, if event polling finds events
+         type: uint
++  -
++    name: xsk-info
++    attributes: []
+   -
+     name: queue
+     attributes:
+@@ -294,6 +297,9 @@ attribute-sets:
+       -
+         name: type
+         doc: Queue type as rx, tx. Each queue type defines a separate ID space.
++             XDP TX queues allocated in the kernel are not linked to NAPIs and
++             thus not listed. AF_XDP queues will have more information set in
++             the xsk attribute.
+         type: u32
+         enum: queue-type
+       -
+@@ -309,7 +315,11 @@ attribute-sets:
+         doc: io_uring memory provider information.
+         type: nest
+         nested-attributes: io-uring-provider-info
+-
++      -
++        name: xsk
++        doc: XSK information for this queue, if any.
++        type: nest
++        nested-attributes: xsk-info
+   -
+     name: qstats
+     doc: |
+@@ -652,6 +662,7 @@ operations:
+             - ifindex
+             - dmabuf
+             - io-uring
++            - xsk
+       dump:
+         request:
+           attributes:
+diff --git a/include/uapi/linux/netdev.h b/include/uapi/linux/netdev.h
+index 6c6ee183802d..4e82f3871473 100644
+--- a/include/uapi/linux/netdev.h
++++ b/include/uapi/linux/netdev.h
+@@ -136,6 +136,11 @@ enum {
+ 	NETDEV_A_NAPI_MAX = (__NETDEV_A_NAPI_MAX - 1)
+ };
  
-+/**
-+ * nla_put_empty_nest - Create an empty nest
-+ * @skb: socket buffer the message is stored in
-+ * @attrtype: attribute type of the container
-+ *
-+ * This function is a helper for creating empty nests.
-+ *
-+ * Returns: 0 when successful or -EMSGSIZE on failure.
-+ */
-+static inline int nla_put_empty_nest(struct sk_buff *skb, int attrtype)
-+{
-+	return nla_nest_start(skb, attrtype) ? 0 : -EMSGSIZE;
-+}
++enum {
++	__NETDEV_A_XSK_INFO_MAX,
++	NETDEV_A_XSK_INFO_MAX = (__NETDEV_A_XSK_INFO_MAX - 1)
++};
 +
- /**
-  * __nla_validate_nested - Validate a stream of nested attributes
-  * @start: container attribute
+ enum {
+ 	NETDEV_A_QUEUE_ID = 1,
+ 	NETDEV_A_QUEUE_IFINDEX,
+@@ -143,6 +148,7 @@ enum {
+ 	NETDEV_A_QUEUE_NAPI_ID,
+ 	NETDEV_A_QUEUE_DMABUF,
+ 	NETDEV_A_QUEUE_IO_URING,
++	NETDEV_A_QUEUE_XSK,
+ 
+ 	__NETDEV_A_QUEUE_MAX,
+ 	NETDEV_A_QUEUE_MAX = (__NETDEV_A_QUEUE_MAX - 1)
+diff --git a/net/core/netdev-genl.c b/net/core/netdev-genl.c
+index 0dcd4faefd8d..b5a93a449af9 100644
+--- a/net/core/netdev-genl.c
++++ b/net/core/netdev-genl.c
+@@ -400,11 +400,22 @@ netdev_nl_queue_fill_one(struct sk_buff *rsp, struct net_device *netdev,
+ 		if (params->mp_ops &&
+ 		    params->mp_ops->nl_fill(params->mp_priv, rsp, rxq))
+ 			goto nla_put_failure;
++
++		if (rxq->pool)
++			if (nla_put_empty_nest(rsp, NETDEV_A_QUEUE_XSK))
++				goto nla_put_failure;
++
+ 		break;
+ 	case NETDEV_QUEUE_TYPE_TX:
+ 		txq = netdev_get_tx_queue(netdev, q_idx);
+ 		if (nla_put_napi_id(rsp, txq->napi))
+ 			goto nla_put_failure;
++
++		if (txq->pool)
++			if (nla_put_empty_nest(rsp, NETDEV_A_QUEUE_XSK))
++				goto nla_put_failure;
++
++		break;
+ 	}
+ 
+ 	genlmsg_end(rsp, hdr);
+diff --git a/tools/include/uapi/linux/netdev.h b/tools/include/uapi/linux/netdev.h
+index 6c6ee183802d..4e82f3871473 100644
+--- a/tools/include/uapi/linux/netdev.h
++++ b/tools/include/uapi/linux/netdev.h
+@@ -136,6 +136,11 @@ enum {
+ 	NETDEV_A_NAPI_MAX = (__NETDEV_A_NAPI_MAX - 1)
+ };
+ 
++enum {
++	__NETDEV_A_XSK_INFO_MAX,
++	NETDEV_A_XSK_INFO_MAX = (__NETDEV_A_XSK_INFO_MAX - 1)
++};
++
+ enum {
+ 	NETDEV_A_QUEUE_ID = 1,
+ 	NETDEV_A_QUEUE_IFINDEX,
+@@ -143,6 +148,7 @@ enum {
+ 	NETDEV_A_QUEUE_NAPI_ID,
+ 	NETDEV_A_QUEUE_DMABUF,
+ 	NETDEV_A_QUEUE_IO_URING,
++	NETDEV_A_QUEUE_XSK,
+ 
+ 	__NETDEV_A_QUEUE_MAX,
+ 	NETDEV_A_QUEUE_MAX = (__NETDEV_A_QUEUE_MAX - 1)
 -- 
 2.43.0
 
