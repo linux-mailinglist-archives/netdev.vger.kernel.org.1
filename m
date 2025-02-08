@@ -1,104 +1,246 @@
-Return-Path: <netdev+bounces-164290-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-164291-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5E6FBA2D3D5
-	for <lists+netdev@lfdr.de>; Sat,  8 Feb 2025 05:42:36 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1E39EA2D3EC
+	for <lists+netdev@lfdr.de>; Sat,  8 Feb 2025 06:02:31 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id F1C4B16B393
-	for <lists+netdev@lfdr.de>; Sat,  8 Feb 2025 04:42:34 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 76D8016A20E
+	for <lists+netdev@lfdr.de>; Sat,  8 Feb 2025 05:02:29 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B949F1922F8;
-	Sat,  8 Feb 2025 04:42:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=truemaisha.co.tz header.i=@truemaisha.co.tz header.b="CFYyHZOb"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 86085188938;
+	Sat,  8 Feb 2025 05:02:26 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from server-598995.kolorio.com (server-598995.kolorio.com [162.241.152.247])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-il1-f208.google.com (mail-il1-f208.google.com [209.85.166.208])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 55DDF190665
-	for <netdev@vger.kernel.org>; Sat,  8 Feb 2025 04:42:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=162.241.152.247
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B0DE81494B2
+	for <netdev@vger.kernel.org>; Sat,  8 Feb 2025 05:02:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.208
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1738989752; cv=none; b=WYHcjCjofESwBZTitD5c6Ho6IFBkhETGIyGgcdrj/Y5arYl5/VKFm+Hpzv9MMxeSNFQcljUWPmPO15l2b0QTdz/BqRqsvsI95XBS0kWbNwkwQt4BTcBFayXkHt/VbX2BgwdVKwxYtsUZiYuzhp4udMm9bAWi3G5qJAAWgB7wDG0=
+	t=1738990946; cv=none; b=qwn2NngPEProFmvCrqKrS4aWFqUTgP8kzcHQL4z/Q0nWkJw/XBLgXpqN6zWa2Rb8xQIEF/LIfyWm3InSXwfHckH0fvBzUnJ/LUVVAFIXKZJGo+P1fxyf9RreUapeMUdmZI6ryMtlKIOU1xgFXOkyCBxCXsRk94YbMcCpuP9Q0CM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1738989752; c=relaxed/simple;
-	bh=gl4+7vNxgV9+JzZtw7EthQ6aGDgi0WVn3wQV/lnKiyo=;
-	h=From:To:Subject:Date:Message-ID:MIME-Version:Content-Type; b=Qach5pCrbQTRI5aX9dzx2L9ORXst0FXcM3chc+QsQl/LCfEJFEZnzFzNzYZXnFzPgmpsuIJma81FJ0ZgGPMGi2lPebVgMAjwZGMoroKnt1GbrdIS7sLpqLdm8GLsssJ+iP0BykgdlAj3wjyzEfjBUENlEuSv+2ZtPl4+3pzNvTY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=truemaisha.co.tz; spf=pass smtp.mailfrom=truemaisha.co.tz; dkim=pass (2048-bit key) header.d=truemaisha.co.tz header.i=@truemaisha.co.tz header.b=CFYyHZOb; arc=none smtp.client-ip=162.241.152.247
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=truemaisha.co.tz
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=truemaisha.co.tz
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=truemaisha.co.tz; s=default; h=Content-Transfer-Encoding:Content-Type:
-	MIME-Version:Message-ID:Date:Subject:To:From:Reply-To:Sender:Cc:Content-ID:
-	Content-Description:Resent-Date:Resent-From:Resent-Sender:Resent-To:Resent-Cc
-	:Resent-Message-ID:In-Reply-To:References:List-Id:List-Help:List-Unsubscribe:
-	List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=gl4+7vNxgV9+JzZtw7EthQ6aGDgi0WVn3wQV/lnKiyo=; b=CFYyHZObwUU1xPWtwdb5XDOLr1
-	A6sN/R/FDtCQnZJe7dMIluVeAWY62LZTBrVgvr2eDLSfTq1QOl1vV+uLdJ7pi5M2KvCu66mrP0AyR
-	Az1og1bTXI7VDmEHigkmru2ykU2/JTdCQ/gnjCH/4qtwbtbtdgYC6JtXWvjgHN0AsqjVZjEmd+keB
-	i2ZywRV5COdTerV4jeHcfIrAjaZR8dHO6zVNijGmGOUhIGv9St5pv/rn8lty/EBurjnceduM5L5/K
-	GTfUULy4gl0kFDit4iyMieSJ5Eq3Ayyy2dSGywoXLMj1dHJSF5aDrKz8+8zPaFMKA5rBGpYKYkkp0
-	Eukk8ORg==;
-Received: from [74.208.124.33] (port=51296 helo=truemaisha.co.tz)
-	by server-598995.kolorio.com with esmtpsa  (TLS1.2) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.96.2)
-	(envelope-from <chrispinerick@truemaisha.co.tz>)
-	id 1tgcfj-0004PM-1g
-	for netdev@vger.kernel.org;
-	Fri, 07 Feb 2025 22:42:28 -0600
-Reply-To: dsong@aa4financialservice.com
-From: David Song <chrispinerick@truemaisha.co.tz>
-To: netdev@vger.kernel.org
-Subject: Re: The business loan- 
-Date: 08 Feb 2025 04:42:29 +0000
-Message-ID: <20250208015433.82A4A5BDAECC9D6B@truemaisha.co.tz>
+	s=arc-20240116; t=1738990946; c=relaxed/simple;
+	bh=FhWnX8Dws+tE5PvQzH5KmVPXMmipMM6EM1G19il+x6c=;
+	h=MIME-Version:Date:In-Reply-To:Message-ID:Subject:From:To:
+	 Content-Type; b=n68wuZ4wUyVEQ1JwLU/v4PKmhCMp731dQ1XLXScxEtseg8eyDtUwDK9MNVxHIKwQAYwuzy+JvhO9kv9ULVAuhq3ad6C+FGDHeomHsCGrZa5I4krcHFtNN9OwRHFSry5CnU0pSGd4rq05LmyVXou3SakqxP6rkxgmsEbKDLHnYLk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.208
+Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
+Received: by mail-il1-f208.google.com with SMTP id e9e14a558f8ab-3d0225c44e8so51626685ab.0
+        for <netdev@vger.kernel.org>; Fri, 07 Feb 2025 21:02:24 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1738990944; x=1739595744;
+        h=to:from:subject:message-id:in-reply-to:date:mime-version
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=pXjDlQcZtOm4ojhk77V76o5Uy/7AELAPeFe6ypJDkI4=;
+        b=T03C9MhJ80D4dac8obKqpjYQn+38W8C9nkXnUq+j+ERyMnmM/Gby+Qwm96hYln7bJL
+         gky88nY7XQW6YoUzFYkTbo3/jaAMGyaZ2D7B5e7qYjfttQI+kfPQ7ue1KCw8Vc6uneQq
+         G8MdJZ+bJWTE3rQCdhreaB1NmdU1kxEkfS7uC8uAZY0ErJlLTgdF/xsc23OgXT3/w2Bf
+         FdPkVWbdO2FRNCvuHSdB0yOh0lbLg6B7zIYlVrQ54j9bHPCv+UTzUioiaoYMMTe7nxO0
+         VpmNoSGMj6DReQips0WaJ3MtE4ajjLFyAvQeN3k8ik9bmnxMFjW5SAtHtPr9/0HAM2CQ
+         h+7Q==
+X-Forwarded-Encrypted: i=1; AJvYcCVljvF3G7ycrHmZ1FHRebKv9LNwBMrW2e2NU/Clf56+pEXPuWdlP+Vfw3U5P+CW7wBzzA2zWGE=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyE38TVHjrtSeag9/N74qqwBuaLpHryx/b6/xauT9MPSdCNpXpq
+	o8wmy3pQAb0cRUtzjnfAHq9WxQu3rrasnVGtuv00h41WFkBnWCj4KBnwEmH7iSWAx9ecmKn1nrX
+	eva/aKgoToHCGvDLDvLVghleLtFNVsoxYkPBP5u3cUWD4EWlyENNaK70=
+X-Google-Smtp-Source: AGHT+IHGJbmzJqUEKvu7F3C1RmANTGtjRLJMNgGP3GONjOAz0tc4r1iww3J0mU270UJwha9nfBS6fxKBL5/WrUqy3AGtUxgwEypQ
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain;
-	charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-X-AntiAbuse: This header was added to track abuse, please include it with any abuse report
-X-AntiAbuse: Primary Hostname - server-598995.kolorio.com
-X-AntiAbuse: Original Domain - vger.kernel.org
-X-AntiAbuse: Originator/Caller UID/GID - [47 12] / [47 12]
-X-AntiAbuse: Sender Address Domain - truemaisha.co.tz
-X-Get-Message-Sender-Via: server-598995.kolorio.com: authenticated_id: chrispinerick@truemaisha.co.tz
-X-Authenticated-Sender: server-598995.kolorio.com: chrispinerick@truemaisha.co.tz
-X-Source: 
-X-Source-Args: 
-X-Source-Dir: 
+X-Received: by 2002:a05:6e02:b49:b0:3d0:24c0:bd45 with SMTP id
+ e9e14a558f8ab-3d13df5445emr40572725ab.20.1738990943836; Fri, 07 Feb 2025
+ 21:02:23 -0800 (PST)
+Date: Fri, 07 Feb 2025 21:02:23 -0800
+In-Reply-To: <67720722.050a0220.2f3838.04b4.GAE@google.com>
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <67a6e55f.050a0220.3d72c.001f.GAE@google.com>
+Subject: Re: [syzbot] [hams?] possible deadlock in nr_remove_neigh (2)
+From: syzbot <syzbot+8863ad36d31449b4dc17@syzkaller.appspotmail.com>
+To: davem@davemloft.net, edumazet@google.com, horms@kernel.org, 
+	kuba@kernel.org, linux-hams@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	netdev@vger.kernel.org, pabeni@redhat.com, syzkaller-bugs@googlegroups.com
+Content-Type: text/plain; charset="UTF-8"
 
-Hello,
+syzbot has found a reproducer for the following issue on:
 
-My name is David Song, at AA4 FS, we are a consultancy and
-brokerage Firm specializing in Growth Financial Loan and joint
-partnership venture. We specialize in investments in all Private
-and public sectors in a broad range of areas within our Financial
-Investment Services.
+HEAD commit:    7ee983c850b4 Merge tag 'drm-fixes-2025-02-08' of https://g..
+git tree:       upstream
+console output: https://syzkaller.appspot.com/x/log.txt?x=14b661b0580000
+kernel config:  https://syzkaller.appspot.com/x/.config?x=a7ddf49cf33ba213
+dashboard link: https://syzkaller.appspot.com/bug?extid=8863ad36d31449b4dc17
+compiler:       gcc (Debian 12.2.0-14) 12.2.0, GNU ld (GNU Binutils for Debian) 2.40
+syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=137a5df8580000
+C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=17148bdf980000
 
- We are experts in financial and operational management, due
-diligence and capital planning in all markets and industries. Our
-Investors wish to invest in any viable Project presented by your
-Management after reviews on your Business Project Presentation
-Plan.
+Downloadable assets:
+disk image: https://storage.googleapis.com/syzbot-assets/ecfa63f9f35c/disk-7ee983c8.raw.xz
+vmlinux: https://storage.googleapis.com/syzbot-assets/e9bfce21362e/vmlinux-7ee983c8.xz
+kernel image: https://storage.googleapis.com/syzbot-assets/2942fdcc30b7/bzImage-7ee983c8.xz
 
- We look forward to your Swift response. We also offer commission
-to consultants and brokers for any partnership referrals.
+IMPORTANT: if you fix the issue, please add the following tag to the commit:
+Reported-by: syzbot+8863ad36d31449b4dc17@syzkaller.appspotmail.com
 
- Regards,
-David Song
-Senior Broker
+======================================================
+WARNING: possible circular locking dependency detected
+6.14.0-rc1-syzkaller-00181-g7ee983c850b4 #0 Not tainted
+------------------------------------------------------
+syz-executor270/7031 is trying to acquire lock:
+ffffffff90146478 (nr_neigh_list_lock){+...}-{3:3}, at: spin_lock_bh include/linux/spinlock.h:356 [inline]
+ffffffff90146478 (nr_neigh_list_lock){+...}-{3:3}, at: nr_remove_neigh+0x1a/0x290 net/netrom/nr_route.c:307
 
-AA4 Financial Services
-13 Wonersh Way, Cheam,
-Sutton, Surrey, SM2 7LX
-Email: dsong@aa4financialservice.com
+but task is already holding lock:
+ffff888145b6b970 (&nr_node->node_lock){+...}-{3:3}, at: spin_lock_bh include/linux/spinlock.h:356 [inline]
+ffff888145b6b970 (&nr_node->node_lock){+...}-{3:3}, at: nr_node_lock include/net/netrom.h:152 [inline]
+ffff888145b6b970 (&nr_node->node_lock){+...}-{3:3}, at: nr_add_node+0x60b/0x2be0 net/netrom/nr_route.c:214
 
+which lock already depends on the new lock.
+
+
+the existing dependency chain (in reverse order) is:
+
+-> #2 (&nr_node->node_lock){+...}-{3:3}:
+       __raw_spin_lock_bh include/linux/spinlock_api_smp.h:126 [inline]
+       _raw_spin_lock_bh+0x33/0x40 kernel/locking/spinlock.c:178
+       spin_lock_bh include/linux/spinlock.h:356 [inline]
+       nr_node_lock include/net/netrom.h:152 [inline]
+       nr_rt_device_down+0x188/0x7f0 net/netrom/nr_route.c:519
+       nr_device_event+0x126/0x170 net/netrom/af_netrom.c:126
+       notifier_call_chain+0xb7/0x410 kernel/notifier.c:85
+       call_netdevice_notifiers_info+0xbe/0x140 net/core/dev.c:2141
+       call_netdevice_notifiers_extack net/core/dev.c:2179 [inline]
+       call_netdevice_notifiers net/core/dev.c:2193 [inline]
+       __dev_notify_flags+0x1f9/0x2e0 net/core/dev.c:9213
+       dev_change_flags+0x10c/0x160 net/core/dev.c:9249
+       dev_ifsioc+0x9d8/0x10d0 net/core/dev_ioctl.c:563
+       dev_ioctl+0x224/0x10c0 net/core/dev_ioctl.c:826
+       sock_do_ioctl+0x19e/0x280 net/socket.c:1213
+       sock_ioctl+0x228/0x6c0 net/socket.c:1318
+       vfs_ioctl fs/ioctl.c:51 [inline]
+       __do_sys_ioctl fs/ioctl.c:906 [inline]
+       __se_sys_ioctl fs/ioctl.c:892 [inline]
+       __x64_sys_ioctl+0x190/0x200 fs/ioctl.c:892
+       do_syscall_x64 arch/x86/entry/common.c:52 [inline]
+       do_syscall_64+0xcd/0x250 arch/x86/entry/common.c:83
+       entry_SYSCALL_64_after_hwframe+0x77/0x7f
+
+-> #1 (nr_node_list_lock){+...}-{3:3}:
+       __raw_spin_lock_bh include/linux/spinlock_api_smp.h:126 [inline]
+       _raw_spin_lock_bh+0x33/0x40 kernel/locking/spinlock.c:178
+       spin_lock_bh include/linux/spinlock.h:356 [inline]
+       nr_rt_device_down+0xd5/0x7f0 net/netrom/nr_route.c:517
+       nr_device_event+0x126/0x170 net/netrom/af_netrom.c:126
+       notifier_call_chain+0xb7/0x410 kernel/notifier.c:85
+       call_netdevice_notifiers_info+0xbe/0x140 net/core/dev.c:2141
+       call_netdevice_notifiers_extack net/core/dev.c:2179 [inline]
+       call_netdevice_notifiers net/core/dev.c:2193 [inline]
+       __dev_notify_flags+0x1f9/0x2e0 net/core/dev.c:9213
+       dev_change_flags+0x10c/0x160 net/core/dev.c:9249
+       dev_ifsioc+0x9d8/0x10d0 net/core/dev_ioctl.c:563
+       dev_ioctl+0x224/0x10c0 net/core/dev_ioctl.c:826
+       sock_do_ioctl+0x19e/0x280 net/socket.c:1213
+       sock_ioctl+0x228/0x6c0 net/socket.c:1318
+       vfs_ioctl fs/ioctl.c:51 [inline]
+       __do_sys_ioctl fs/ioctl.c:906 [inline]
+       __se_sys_ioctl fs/ioctl.c:892 [inline]
+       __x64_sys_ioctl+0x190/0x200 fs/ioctl.c:892
+       do_syscall_x64 arch/x86/entry/common.c:52 [inline]
+       do_syscall_64+0xcd/0x250 arch/x86/entry/common.c:83
+       entry_SYSCALL_64_after_hwframe+0x77/0x7f
+
+-> #0 (nr_neigh_list_lock){+...}-{3:3}:
+       check_prev_add kernel/locking/lockdep.c:3163 [inline]
+       check_prevs_add kernel/locking/lockdep.c:3282 [inline]
+       validate_chain kernel/locking/lockdep.c:3906 [inline]
+       __lock_acquire+0x249e/0x3c40 kernel/locking/lockdep.c:5228
+       lock_acquire.part.0+0x11b/0x380 kernel/locking/lockdep.c:5851
+       __raw_spin_lock_bh include/linux/spinlock_api_smp.h:126 [inline]
+       _raw_spin_lock_bh+0x33/0x40 kernel/locking/spinlock.c:178
+       spin_lock_bh include/linux/spinlock.h:356 [inline]
+       nr_remove_neigh+0x1a/0x290 net/netrom/nr_route.c:307
+       nr_add_node+0x23d1/0x2be0 net/netrom/nr_route.c:249
+       nr_rt_ioctl+0x126e/0x29e0 net/netrom/nr_route.c:651
+       nr_ioctl+0x19a/0x2e0 net/netrom/af_netrom.c:1254
+       sock_do_ioctl+0x116/0x280 net/socket.c:1199
+       sock_ioctl+0x228/0x6c0 net/socket.c:1318
+       vfs_ioctl fs/ioctl.c:51 [inline]
+       __do_sys_ioctl fs/ioctl.c:906 [inline]
+       __se_sys_ioctl fs/ioctl.c:892 [inline]
+       __x64_sys_ioctl+0x190/0x200 fs/ioctl.c:892
+       do_syscall_x64 arch/x86/entry/common.c:52 [inline]
+       do_syscall_64+0xcd/0x250 arch/x86/entry/common.c:83
+       entry_SYSCALL_64_after_hwframe+0x77/0x7f
+
+other info that might help us debug this:
+
+Chain exists of:
+  nr_neigh_list_lock --> nr_node_list_lock --> &nr_node->node_lock
+
+ Possible unsafe locking scenario:
+
+       CPU0                    CPU1
+       ----                    ----
+  lock(&nr_node->node_lock);
+                               lock(nr_node_list_lock);
+                               lock(&nr_node->node_lock);
+  lock(nr_neigh_list_lock);
+
+ *** DEADLOCK ***
+
+1 lock held by syz-executor270/7031:
+ #0: ffff888145b6b970 (&nr_node->node_lock){+...}-{3:3}, at: spin_lock_bh include/linux/spinlock.h:356 [inline]
+ #0: ffff888145b6b970 (&nr_node->node_lock){+...}-{3:3}, at: nr_node_lock include/net/netrom.h:152 [inline]
+ #0: ffff888145b6b970 (&nr_node->node_lock){+...}-{3:3}, at: nr_add_node+0x60b/0x2be0 net/netrom/nr_route.c:214
+
+stack backtrace:
+CPU: 1 UID: 0 PID: 7031 Comm: syz-executor270 Not tainted 6.14.0-rc1-syzkaller-00181-g7ee983c850b4 #0
+Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 12/27/2024
+Call Trace:
+ <TASK>
+ __dump_stack lib/dump_stack.c:94 [inline]
+ dump_stack_lvl+0x116/0x1f0 lib/dump_stack.c:120
+ print_circular_bug+0x490/0x760 kernel/locking/lockdep.c:2076
+ check_noncircular+0x31a/0x400 kernel/locking/lockdep.c:2208
+ check_prev_add kernel/locking/lockdep.c:3163 [inline]
+ check_prevs_add kernel/locking/lockdep.c:3282 [inline]
+ validate_chain kernel/locking/lockdep.c:3906 [inline]
+ __lock_acquire+0x249e/0x3c40 kernel/locking/lockdep.c:5228
+ lock_acquire.part.0+0x11b/0x380 kernel/locking/lockdep.c:5851
+ __raw_spin_lock_bh include/linux/spinlock_api_smp.h:126 [inline]
+ _raw_spin_lock_bh+0x33/0x40 kernel/locking/spinlock.c:178
+ spin_lock_bh include/linux/spinlock.h:356 [inline]
+ nr_remove_neigh+0x1a/0x290 net/netrom/nr_route.c:307
+ nr_add_node+0x23d1/0x2be0 net/netrom/nr_route.c:249
+ nr_rt_ioctl+0x126e/0x29e0 net/netrom/nr_route.c:651
+ nr_ioctl+0x19a/0x2e0 net/netrom/af_netrom.c:1254
+ sock_do_ioctl+0x116/0x280 net/socket.c:1199
+ sock_ioctl+0x228/0x6c0 net/socket.c:1318
+ vfs_ioctl fs/ioctl.c:51 [inline]
+ __do_sys_ioctl fs/ioctl.c:906 [inline]
+ __se_sys_ioctl fs/ioctl.c:892 [inline]
+ __x64_sys_ioctl+0x190/0x200 fs/ioctl.c:892
+ do_syscall_x64 arch/x86/entry/common.c:52 [inline]
+ do_syscall_64+0xcd/0x250 arch/x86/entry/common.c:83
+ entry_SYSCALL_64_after_hwframe+0x77/0x7f
+RIP: 0033:0x7fcbef4bd2e9
+Code: 28 00 00 00 75 05 48 83 c4 28 c3 e8 e1 1f 00 00 90 48 89 f8 48 89 f7 48 89 d6 48 89 ca 4d 89 c2 4d 89 c8 4c 8b 4c 24 08 0f 05 <48> 3d 01 f0 ff ff 73 01 c3 48 c7 c1 b0 ff ff ff f7 d8 64 89 01 48
+RSP: 002b:00007ffe540a63c8 EFLAGS: 00000246 ORIG_RAX: 0000000000000010
+RAX: ffffffffffffffda RBX: 0000000000000003 RCX: 00007fcbef4bd2e9
+RDX: 00002000000001c0 RSI: 000000000000890b RDI: 0000000000000008
+RBP: 0000000000000000 R08: 00007ffe540a6400 R09: 00007ffe540a6400
+R10: 00007ffe540a6400 R11: 0000000000000246 R12: 00007ffe540a63e8
+R13: 00007ffe540a6420 R14: 00000000000000de R15: 431bde82d7b634db
+ </TASK>
+
+
+---
+If you want syzbot to run the reproducer, reply with:
+#syz test: git://repo/address.git branch-or-commit-hash
+If you attach or paste a git patch, syzbot will apply it before testing.
 
