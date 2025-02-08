@@ -1,78 +1,79 @@
-Return-Path: <netdev+bounces-164347-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-164346-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id B1B52A2D754
-	for <lists+netdev@lfdr.de>; Sat,  8 Feb 2025 17:27:44 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4A5FBA2D752
+	for <lists+netdev@lfdr.de>; Sat,  8 Feb 2025 17:27:35 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 8C5077A174E
-	for <lists+netdev@lfdr.de>; Sat,  8 Feb 2025 16:26:48 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id CB64416753A
+	for <lists+netdev@lfdr.de>; Sat,  8 Feb 2025 16:27:33 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7BA0322E01C;
-	Sat,  8 Feb 2025 16:27:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BC61F22DFF3;
+	Sat,  8 Feb 2025 16:27:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="H55Z/Xm6"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="aY0K0x9F"
 X-Original-To: netdev@vger.kernel.org
 Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.11])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BFE9C22DFF7;
-	Sat,  8 Feb 2025 16:27:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D1A0C22DFE8;
+	Sat,  8 Feb 2025 16:27:27 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.11
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1739032052; cv=none; b=dhB0Ef51b6pqP2zvrMbE5rnmuGtnRMWkkMUEIIyfozhMyDHbKJDbl6fNUyl0ACE/BkzU/ST3pqMQNJBjDJ2yD6wNSTvX+9YTbWBbSb76RoQQrLtRxD6HXAuB8iJcFipO9zgJtskRcm8lARzGSMO54N5kUOs35e9zCbbOhu+nEL4=
+	t=1739032050; cv=none; b=Egtz6OkTwtdLgQ0gOGFlRqa+PbDjRc5hf23LICj5eF7RGLxkY3GzEw24KCTbWActLS2ohBQFMIHp3ZX2ppYESetvxj6apCis8zzCWhxSy2q6/zBJ+SSzJABrvpSwRzOiQfk4///6yBavzrL3BlFQumWM7e3ND7lr963KhL+Pjxo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1739032052; c=relaxed/simple;
-	bh=dj0OCXVbhkh8hV0+o02O/c4Nm3lkeARvpTdqlPVoXA8=;
+	s=arc-20240116; t=1739032050; c=relaxed/simple;
+	bh=KBpgtQSp3QDzHOeIRxUev1T7WAZQkiUIz/zQq6o8N4Q=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=EGiWCplDCz9CRFDxKEZjBDvzU+X/FuDP+lIcSfJ5O7gg/uQyQfV7MXbGg9xo+CfC5Zs2mZnWoC5sDDVIqyu+7BqcykY1jMFYbo9LTvPCJEj4n86KgvG7iz5ZUVGw9pG5dprm0HMvrJxBZ4O2zb48QmS2aUct+Vgn8ajzDshDVYY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=H55Z/Xm6; arc=none smtp.client-ip=198.175.65.11
+	 Content-Type:Content-Disposition:In-Reply-To; b=uMgQZEv341njmfXyzBPqZPEKsOFiWwKLObfySTBqxnEyg7zYAdUabp1GCVxXtftFdP/YO+Ittq5y5gWA1XZZXzFu0QCdCTPUGMzAoQ0SI0r4M6n8evZ3REhJkZ7tb9M2Kalj5aiWYYdR5PiyvQjeztj4yXUCIEXq6UYF22czBn0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=aY0K0x9F; arc=none smtp.client-ip=198.175.65.11
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1739032051; x=1770568051;
+  t=1739032048; x=1770568048;
   h=date:from:to:cc:subject:message-id:references:
    mime-version:in-reply-to;
-  bh=dj0OCXVbhkh8hV0+o02O/c4Nm3lkeARvpTdqlPVoXA8=;
-  b=H55Z/Xm6eE73wCf5hzp4owabcoEJvYT58XOWd/58w1eGcZKRUsIfFJhC
-   T4KSi+0jRfM+jYSvjR3bBcadISHpmmZu4rsz+QDyQOVyR2dWbRWJPAgdd
-   /OO8VgfVs0Xbnq+MfvImL1OMM/uY/MWmganG/OcT0mGwhcVND5RxS0Wf2
-   wh/M7FQPMtnH+Q3uCIv47Rw0JstJjQVsFl+AJ6RCTp6O44Mn8pg6aGjrW
-   AaaB4P2/HHq6xGkChNwiZyabNpcnolUXkxNXR0OayGDed++CBGG30G0O1
-   cbRLV/z4HZgSntBKnyjpaXXbTl679AafoOPSh1hIYD7uwLfGqpydEkW6D
+  bh=KBpgtQSp3QDzHOeIRxUev1T7WAZQkiUIz/zQq6o8N4Q=;
+  b=aY0K0x9FNpA3Lr5TQPuIsjCrMkTj8SKXYDux7w3mAePV0fWNhmh04UJv
+   fuXbSiCaN06D750dPelF4H8noBMeFnBABTdRSqBr2Vy/HGEiez8cLGP2k
+   f40HzxfBJ6e0BpiGT3AWw9BNrC5R214/U6NU/mAc43ZOLlNM+c8dEgJz7
+   /jpUZnh6YwqCvvp4y/vPBWqX7cMW9Qe23GBpCBXGTz+VWV4ABPV5BeKAo
+   /6ITicQlqzIHQaKqBFZj9aVfsnCnuDfj1A6VTBLE8AiJLi4jbG+N7ClAa
+   k6CyJm0CEa+fOPL6sfAJtJ4gBRA9nZGG4tYRewTVN63tLRWrJy9vQfNKT
    w==;
-X-CSE-ConnectionGUID: scsKfmNGSrKhobTbwjPUWw==
-X-CSE-MsgGUID: LzuUZ5tsQ7Cb35U0kN1Xjg==
-X-IronPort-AV: E=McAfee;i="6700,10204,11339"; a="49898105"
+X-CSE-ConnectionGUID: TYvg5/uhSqOIaysol5WKpg==
+X-CSE-MsgGUID: AJjWaMcCQzuJCf+NhD179g==
+X-IronPort-AV: E=McAfee;i="6700,10204,11339"; a="49898092"
 X-IronPort-AV: E=Sophos;i="6.13,270,1732608000"; 
-   d="scan'208";a="49898105"
+   d="scan'208";a="49898092"
 Received: from orviesa005.jf.intel.com ([10.64.159.145])
   by orvoesa103.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 08 Feb 2025 08:27:27 -0800
-X-CSE-ConnectionGUID: O7266KfJSq2Y6K1uIKuObA==
-X-CSE-MsgGUID: w/J60tw/T2yj85XNyVuLgA==
+X-CSE-ConnectionGUID: PkU26892TG6nlvbPTbz4fw==
+X-CSE-MsgGUID: sHqAQLdmQaym2sXLhJDMqw==
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="6.12,224,1728975600"; 
-   d="scan'208";a="117003987"
+   d="scan'208";a="117003985"
 Received: from lkp-server01.sh.intel.com (HELO d63d4d77d921) ([10.239.97.150])
-  by orviesa005.jf.intel.com with ESMTP; 08 Feb 2025 08:27:25 -0800
+  by orviesa005.jf.intel.com with ESMTP; 08 Feb 2025 08:27:24 -0800
 Received: from kbuild by d63d4d77d921 with local (Exim 4.96)
 	(envelope-from <lkp@intel.com>)
-	id 1tgnft-0010Kl-1g;
+	id 1tgnft-0010Kn-1j;
 	Sat, 08 Feb 2025 16:27:21 +0000
-Date: Sun, 9 Feb 2025 00:26:30 +0800
+Date: Sun, 9 Feb 2025 00:26:31 +0800
 From: kernel test robot <lkp@intel.com>
 To: Liang Jie <buaajxlj@163.com>, Kuniyuki Iwashima <kuniyu@amazon.com>,
 	Jakub Kicinski <kuba@kernel.org>
-Cc: oe-kbuild-all@lists.linux.dev, Eric Dumazet <edumazet@google.com>,
-	Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>,
-	Michal Luczaj <mhal@rbox.co>, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org, Liang Jie <liangjie@lixiang.com>
+Cc: llvm@lists.linux.dev, oe-kbuild-all@lists.linux.dev,
+	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
+	Simon Horman <horms@kernel.org>, Michal Luczaj <mhal@rbox.co>,
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+	Liang Jie <liangjie@lixiang.com>
 Subject: Re: [PATCH net-next v2] af_unix: Refine UNIX pathname sockets
  autobind identifier length
-Message-ID: <202502090018.NcW3Qcd3-lkp@intel.com>
+Message-ID: <202502090056.Rl1rtpr5-lkp@intel.com>
 References: <20250206054451.4070941-1-buaajxlj@163.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -94,24 +95,21 @@ url:    https://github.com/intel-lab-lkp/linux/commits/Liang-Jie/af_unix-Refine-
 base:   net-next/main
 patch link:    https://lore.kernel.org/r/20250206054451.4070941-1-buaajxlj%40163.com
 patch subject: [PATCH net-next v2] af_unix: Refine UNIX pathname sockets autobind identifier length
-config: csky-randconfig-001-20250207 (https://download.01.org/0day-ci/archive/20250209/202502090018.NcW3Qcd3-lkp@intel.com/config)
-compiler: csky-linux-gcc (GCC) 14.2.0
-reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20250209/202502090018.NcW3Qcd3-lkp@intel.com/reproduce)
+config: hexagon-randconfig-001-20250207 (https://download.01.org/0day-ci/archive/20250209/202502090056.Rl1rtpr5-lkp@intel.com/config)
+compiler: clang version 21.0.0git (https://github.com/llvm/llvm-project 6807164500e9920638e2ab0cdb4bf8321d24f8eb)
+reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20250209/202502090056.Rl1rtpr5-lkp@intel.com/reproduce)
 
 If you fix the issue in a separate patch/commit (i.e. not just a new version of
 the same patch/commit), kindly add following tags
 | Reported-by: kernel test robot <lkp@intel.com>
-| Closes: https://lore.kernel.org/oe-kbuild-all/202502090018.NcW3Qcd3-lkp@intel.com/
+| Closes: https://lore.kernel.org/oe-kbuild-all/202502090056.Rl1rtpr5-lkp@intel.com/
 
 All warnings (new ones prefixed by >>):
 
-   net/unix/af_unix.c: In function 'unix_autobind':
->> net/unix/af_unix.c:1222:52: warning: 'snprintf' output truncated before the last format character [-Wformat-truncation=]
+>> net/unix/af_unix.c:1222:2: warning: 'snprintf' will always be truncated; specified size is 5, but format string expands to at least 6 [-Wformat-truncation]
     1222 |         snprintf(addr->name->sun_path + 1, 5, "%05x", ordernum);
-         |                                                    ^
-   net/unix/af_unix.c:1222:9: note: 'snprintf' output 6 bytes into a destination of size 5
-    1222 |         snprintf(addr->name->sun_path + 1, 5, "%05x", ordernum);
-         |         ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+         |         ^
+   1 warning generated.
 
 
 vim +/snprintf +1222 net/unix/af_unix.c
