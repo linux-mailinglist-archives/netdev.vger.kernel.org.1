@@ -1,103 +1,98 @@
-Return-Path: <netdev+bounces-164418-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-164415-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2DEEDA2DC55
-	for <lists+netdev@lfdr.de>; Sun,  9 Feb 2025 11:25:09 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id CC3FFA2DC4E
+	for <lists+netdev@lfdr.de>; Sun,  9 Feb 2025 11:24:45 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 394CF16273A
-	for <lists+netdev@lfdr.de>; Sun,  9 Feb 2025 10:25:02 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id CA9FB3A73DF
+	for <lists+netdev@lfdr.de>; Sun,  9 Feb 2025 10:24:09 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4FE3F1D89F1;
-	Sun,  9 Feb 2025 10:20:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 48ED2170826;
+	Sun,  9 Feb 2025 10:20:09 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="ta3Y3B0j"
+	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="khT1O9Jk"
 X-Original-To: netdev@vger.kernel.org
-Received: from NAM10-MW2-obe.outbound.protection.outlook.com (mail-mw2nam10on2043.outbound.protection.outlook.com [40.107.94.43])
+Received: from NAM11-BN8-obe.outbound.protection.outlook.com (mail-bn8nam11on2081.outbound.protection.outlook.com [40.107.236.81])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 84EEF1D5AAD;
-	Sun,  9 Feb 2025 10:20:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.94.43
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E71471C700E;
+	Sun,  9 Feb 2025 10:20:06 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.236.81
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1739096423; cv=fail; b=kxgsmgSLkn7wsi5BVf1xil8KUnlt1cX/TTROql9fyaIjItSVTOrKgeYwglxV4UCDEPFbfAk1vFmkLbPkVMcHxB3XFfFd8bMQXWr3McMKIUXRDluSs8ndcUHsHt1PnXH0SmaRfxg03Cax/LVz2T67wSQPvWYOwFJcL80vbVbGhog=
+	t=1739096409; cv=fail; b=BlmDWJyJsltM3U7bgWhxMEWx69SBdq2oXor7U5X5LO9Z1cJ75EjY/6neQBrbF8NqfryzXKYK8T0+qJhAeteclml7hJdTf3JQZLQs8TJHexqk8qMzProtwrBcVVc8e1Fwe+eVVOOnPwA155cNZ0dBLsuMjgZLdNr38Eh1WKOHjNw=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1739096423; c=relaxed/simple;
-	bh=mtG2OBxa5lEk38ygdIVL/B6KTM8gISqWMJiPwtyYS/I=;
-	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=VO/0puUQwGvSCalcQUf++B90Us6eG8u5S2lblK6TTUmlTjelgc3S/JUNxSBkPrbnY4kDW3UDpDB0eOzBP+J8d5HHArH+uA9Q0SB59uXjjnMDIpyz8qhJGYClQw8KuRj4WstVuioScAplb4QiMQBLYAf7Fy+v5oixP1OJnSk0SGM=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=ta3Y3B0j; arc=fail smtp.client-ip=40.107.94.43
+	s=arc-20240116; t=1739096409; c=relaxed/simple;
+	bh=+bADT9a+t+bdPg23wvjBznOtPcp69eFHJVrMGDAQ8Tc=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=cLfk0JvwYg29miKm5nFQIZdORW5nIv8q2fGVmkU3ay4s1gvVi69S26s2viu+sQPikJ0PCeAapT6ltn7Wq7Wh4hZ8/+9QutIfogp1QdDuFbtLhj1dDQ+CSKtorBrU7KKVXnxYgWKGOc1zOf+aUuxRpJFhPOcYmBa2zlEU6Kh7seo=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=khT1O9Jk; arc=fail smtp.client-ip=40.107.236.81
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
 Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=ROuI3EXEb/6otIP0Ojf6/+jJTYIJlFqlCmrnh/q3pxJi0aAOKF8kTrHUz66eBCIa7tnyWHT4GN5bBqcxItIc2HC45RZF5klbw7TSNRy8r7tcr5qBrkI3+rmTXVt7hXCYMZYHn6FV+YfVNU30AZivi8HjKwtja7RiuNeSZh+IkbrB5U5fjJggUZfHiPq9Qkz2km4kwNq6aB7tiZpymkP03To0CjhL5zZe4h6wUcGId+aUIoKF/nye67YNdXH5X36Rh/YogxdSosDSCOkirT4YWr0Jw1KC6EQGARPbMlgjAufBAu1aFEoCJYbfOqaUET6pZme8/VFohA6rngVaJxJ2Yw==
+ b=LoyujvHLBRQLTei9wRDp0Pkw0dXjnAUPbU/UYcmSUlp69nAyfL1KlxCqxPjO2cs1w45WKGnkGbvqRxo8fdAvQbjFXcG82wP+7/atvec3peZWu6B0tXDoVuhWePHQn7Vk0eZ6A711goJ5+oLM1axVyPODJ2gvWWtE0PCep5A5uUBHanOVkdfRdO59GnVX4+scAbJaDub96qPfWrSYJqdOwycnR4oqWYS3NZ2in5wtjg01YnkCpND7xKOCS7pY818xgi8xTVVIBXhCbIUGyCCuFZ5AWY/By+KFwybOz6n5w+wW8sumc70xTbEvHbrRejpSqCjvADyg6AeHYC2SzhhxVQ==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector10001;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=r0gHxefuejxy5/6ZoMCuTrQc38czNSeq20vxSOdC1dQ=;
- b=mse7O6MrCjKZS1bUPpEBLD5pNuCpQJoKZATAf9u+l57mnzH80FVd52OMIekfG3TIpmMA9fOgR3grV4b3bsUOfTFvbb81GozOlrtpwIs347cGY7gtsNfOVFkeYSKpFq4PeSFxeoKeY9riA5p37zAUvHDr5HfdJQ2Fgt1+x2K/IfB0Pwmt4G6coQvdgRkYkuJYm2dbkQN/Ofp9ZBNg2xtasZ9cX9to7FNw8tJ81CWmh71MWKK1hsYT/wJIj9I+IBWdMVcsTdNA3l1YInhuvXta1hD7mopuh340ftoQsYFl+lPTdKzTbq+sTKgQU4VIDKksMkQimx1SsAgG2zK0YE9irA==
+ bh=+aecoF4oh1DeXVY4EIKyycsLQj5nQQJuaQQZsWhZrDQ=;
+ b=Sexa1i6R8/mz2BHv15hFHAH7Za5swAtgABnPX2QBE+ky4mLtG38oMujmaUtBbeM+ZkECl+JAFv/S96ZAUlXoXk6/tOFbN5SLiYTV3fw7Cm9gIPru7XZVYjDAC+wlEH7JFntOulB56bUvkXxgFLyMxRPfFWAwHWwFdy3nLjW0dC22KenXpWyvA2OREDqKl1CL/1Gi5aupqfqkHFyZGSoIgjxve4g3bS6Sixjyop2J34dOj5+3cciLFx1QAor3c4ItbSOxB/eT6z7E6/Ud7VJhLpENoUHBoOFBrByZrP2B0An2kZ/uLf4q/6wtHCJgg3eQsK3hQ831WOBSw0zaPQygAA==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
- 216.228.118.232) smtp.rcpttodomain=davemloft.net smtp.mailfrom=nvidia.com;
+ 216.228.117.160) smtp.rcpttodomain=vger.kernel.org smtp.mailfrom=nvidia.com;
  dmarc=pass (p=reject sp=reject pct=100) action=none header.from=nvidia.com;
  dkim=none (message not signed); arc=none (0)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
  s=selector2;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=r0gHxefuejxy5/6ZoMCuTrQc38czNSeq20vxSOdC1dQ=;
- b=ta3Y3B0jKCMrCkzfjjNMDNnQ8evMbEyLUlqKx9r4UC/XSO8Ivsyn79yKfch4rRJBEXph5l4p0EQXSDyUQzZQRF5FrWVYzjeeC3QyiqYZYeZ5/9+xoHqOEXSHYDeVoj93ttwopNTFiw6rRKeWVM3Sctw86bjKA0BJj7TDXy4eDAKAQDPgwsOUQ5iAs2TwK6/RNEx0bhQlGf+49RL1XB9/Wq0ra0oKMvkAyGInX4BfuJN3mZZvVAFvN2TH1Pf0vh15Jqdn492JpCFflsjL2BjG1PpXsT4d0Rut0mH/tVzciKCOehMajHidKJtWjepwpDFDXnfiSM1Qmnryk/qhJroe1g==
-Received: from BY3PR10CA0021.namprd10.prod.outlook.com (2603:10b6:a03:255::26)
- by CY5PR12MB6645.namprd12.prod.outlook.com (2603:10b6:930:42::15) with
+ bh=+aecoF4oh1DeXVY4EIKyycsLQj5nQQJuaQQZsWhZrDQ=;
+ b=khT1O9JkPOUZ6PfwmV/+0WpJPUCar3Fx+tuaxKYTMJnIEfh1liVGqjgLe8OeBDJq6Cyznh+UGyExZb+5vn/nY7HQCvuEDnVhSOol0sX/iaC+yvjkkxtODfAEoT6qXRchF4EM6tKVoPXLacXh38F+grlKUmxtSokGwJNky42tRaHVlW/HqPbzxkmIJISkY3JKt2cp/KPdUaIXseXnEhr2mDG7zen//ZCISfDxERZIDl6QCo781cpsuQsQmCs/IECOkeaCdZa7wfOyi+1RTXtOIZQzV9hakHvTKO/WRRJqd4nlC52d1WnST/fRAbAiOhFeAGW4gRIq28/vN60gbNr8/A==
+Received: from PH8PR07CA0030.namprd07.prod.outlook.com (2603:10b6:510:2cf::16)
+ by PH8PR12MB7446.namprd12.prod.outlook.com (2603:10b6:510:216::13) with
  Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8422.16; Sun, 9 Feb
- 2025 10:20:16 +0000
-Received: from SJ1PEPF00002321.namprd03.prod.outlook.com
- (2603:10b6:a03:255:cafe::1) by BY3PR10CA0021.outlook.office365.com
- (2603:10b6:a03:255::26) with Microsoft SMTP Server (version=TLS1_3,
- cipher=TLS_AES_256_GCM_SHA384) id 15.20.8398.24 via Frontend Transport; Sun,
- 9 Feb 2025 10:20:15 +0000
-X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 216.228.118.232)
+ 2025 10:20:00 +0000
+Received: from SN1PEPF0002529E.namprd05.prod.outlook.com
+ (2603:10b6:510:2cf:cafe::e8) by PH8PR07CA0030.outlook.office365.com
+ (2603:10b6:510:2cf::16) with Microsoft SMTP Server (version=TLS1_3,
+ cipher=TLS_AES_256_GCM_SHA384) id 15.20.8398.31 via Frontend Transport; Sun,
+ 9 Feb 2025 10:20:00 +0000
+X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 216.228.117.160)
  smtp.mailfrom=nvidia.com; dkim=none (message not signed)
  header.d=none;dmarc=pass action=none header.from=nvidia.com;
 Received-SPF: Pass (protection.outlook.com: domain of nvidia.com designates
- 216.228.118.232 as permitted sender) receiver=protection.outlook.com;
- client-ip=216.228.118.232; helo=mail.nvidia.com; pr=C
-Received: from mail.nvidia.com (216.228.118.232) by
- SJ1PEPF00002321.mail.protection.outlook.com (10.167.242.91) with Microsoft
+ 216.228.117.160 as permitted sender) receiver=protection.outlook.com;
+ client-ip=216.228.117.160; helo=mail.nvidia.com; pr=C
+Received: from mail.nvidia.com (216.228.117.160) by
+ SN1PEPF0002529E.mail.protection.outlook.com (10.167.242.5) with Microsoft
  SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.8445.10 via Frontend Transport; Sun, 9 Feb 2025 10:20:15 +0000
-Received: from drhqmail203.nvidia.com (10.126.190.182) by mail.nvidia.com
- (10.127.129.5) with Microsoft SMTP Server (version=TLS1_2,
+ 15.20.8445.10 via Frontend Transport; Sun, 9 Feb 2025 10:20:00 +0000
+Received: from rnnvmail201.nvidia.com (10.129.68.8) by mail.nvidia.com
+ (10.129.200.66) with Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.4; Sun, 9 Feb 2025
- 02:20:12 -0800
-Received: from drhqmail202.nvidia.com (10.126.190.181) by
- drhqmail203.nvidia.com (10.126.190.182) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.14; Sun, 9 Feb 2025 02:20:12 -0800
-Received: from vdi.nvidia.com (10.127.8.10) by mail.nvidia.com
- (10.126.190.181) with Microsoft SMTP Server id 15.2.1544.14 via Frontend
- Transport; Sun, 9 Feb 2025 02:20:07 -0800
-From: Tariq Toukan <tariqt@nvidia.com>
-To: "David S. Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>, Eric Dumazet <edumazet@google.com>, "Andrew
- Lunn" <andrew+netdev@lunn.ch>
-CC: <netdev@vger.kernel.org>, Saeed Mahameed <saeedm@nvidia.com>, Gal Pressman
-	<gal@nvidia.com>, Leon Romanovsky <leonro@nvidia.com>, Simon Horman
-	<horms@kernel.org>, Donald Hunter <donald.hunter@gmail.com>, Jiri Pirko
-	<jiri@resnulli.us>, Jonathan Corbet <corbet@lwn.net>, Leon Romanovsky
-	<leon@kernel.org>, Tariq Toukan <tariqt@nvidia.com>, Alexei Starovoitov
-	<ast@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>, "Jesper Dangaard
- Brouer" <hawk@kernel.org>, John Fastabend <john.fastabend@gmail.com>,
-	"Richard Cochran" <richardcochran@gmail.com>, <linux-kernel@vger.kernel.org>,
-	<linux-doc@vger.kernel.org>, <linux-rdma@vger.kernel.org>,
-	<bpf@vger.kernel.org>, Alexei Lazar <alazar@nvidia.com>
-Subject: [PATCH net-next 15/15] net/mlx5: XDP, Enable TX side XDP multi-buffer support
-Date: Sun, 9 Feb 2025 12:17:16 +0200
-Message-ID: <20250209101716.112774-16-tariqt@nvidia.com>
-X-Mailer: git-send-email 2.45.0
-In-Reply-To: <20250209101716.112774-1-tariqt@nvidia.com>
-References: <20250209101716.112774-1-tariqt@nvidia.com>
+ 02:19:49 -0800
+Received: from rnnvmail202.nvidia.com (10.129.68.7) by rnnvmail201.nvidia.com
+ (10.129.68.8) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.14; Sun, 9 Feb
+ 2025 02:19:48 -0800
+Received: from vdi.nvidia.com (10.127.8.12) by mail.nvidia.com (10.129.68.7)
+ with Microsoft SMTP Server id 15.2.1544.14 via Frontend Transport; Sun, 9 Feb
+ 2025 02:19:44 -0800
+From: Gal Pressman <gal@nvidia.com>
+To: <netdev@vger.kernel.org>, "David S. Miller" <davem@davemloft.net>, "Eric
+ Dumazet" <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
+	<pabeni@redhat.com>, Andrew Lunn <andrew+netdev@lunn.ch>
+CC: Tariq Toukan <tariqt@nvidia.com>, Louis Peens <louis.peens@corigine.com>,
+	Simon Horman <horms@kernel.org>, David Ahern <dsahern@kernel.org>, "Pravin B
+ Shelar" <pshelar@ovn.org>, Yotam Gigi <yotam.gi@gmail.com>, Jamal Hadi Salim
+	<jhs@mojatatu.com>, Cong Wang <xiyou.wangcong@gmail.com>, Jiri Pirko
+	<jiri@resnulli.us>, Kees Cook <kees@kernel.org>, "Gustavo A. R. Silva"
+	<gustavoars@kernel.org>, <dev@openvswitch.org>,
+	<linux-hardening@vger.kernel.org>, Gal Pressman <gal@nvidia.com>, "Cosmin
+ Ratiu" <cratiu@nvidia.com>
+Subject: [PATCH net-next] net: Add options as a flexible array to struct ip_tunnel_info
+Date: Sun, 9 Feb 2025 12:18:53 +0200
+Message-ID: <20250209101853.15828-1-gal@nvidia.com>
+X-Mailer: git-send-email 2.40.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -109,247 +104,487 @@ Content-Type: text/plain
 X-NV-OnPremToCloud: AnonymousSubmission
 X-EOPAttributedMessage: 0
 X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: SJ1PEPF00002321:EE_|CY5PR12MB6645:EE_
-X-MS-Office365-Filtering-Correlation-Id: 71062ce8-be56-4393-3256-08dd48f35870
+X-MS-TrafficTypeDiagnostic: SN1PEPF0002529E:EE_|PH8PR12MB7446:EE_
+X-MS-Office365-Filtering-Correlation-Id: 1d66e1e7-1b1e-4bce-820c-08dd48f34f7c
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
 X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|1800799024|376014|7416014|36860700013|82310400026;
+	BCL:0;ARA:13230040|376014|7416014|36860700013|82310400026|1800799024;
 X-Microsoft-Antispam-Message-Info:
-	=?us-ascii?Q?rme5fRCW4Xfl4pem0lPzHy5AF/9qyyA84mcpOJAOO+VV7DgfxGYtgXnKtp/R?=
- =?us-ascii?Q?80YhjbNJ43i+K2m78mH1Mcg1NeEdHmDTVRfVnn8Qc934LHyvErWb9DhQ4wRF?=
- =?us-ascii?Q?rVOD9CHhTC8JDo76Wz79ZruasB8nXu52NRKAkfA+vFWR4aFaTrW6lqSUTAeW?=
- =?us-ascii?Q?Ybwe4gn05eTZbONi6n8a+zICRbUT2wAJ2JlVQtPsEWze8jms3mR5FeDYo0xF?=
- =?us-ascii?Q?twPWMCOb0wDyG/HGwfDxcHCKioP7Z8dLdI3EiufvP9Dwe30txYGdrjztJvZv?=
- =?us-ascii?Q?NxNX3yHWkhWD7qukt46vyPj7YNEAoKkcPH/Cc70qO93wTk/ZyX3cW6INEl25?=
- =?us-ascii?Q?j4HCk1SKahJGyAXsihYRJOnzTrDh9dptG0IHQTGkCotMSmfzaTubPA7EHOYK?=
- =?us-ascii?Q?DESqGXJZ+BRT/TmodzoiGj/aW0mA1cGlZ7PTJKTVqwMN/uJVm35SNXnVnjD8?=
- =?us-ascii?Q?SMbyRk/LIIAcmllgOLFS6E1yVLBmXA9TBZe19ZdYv6PhjpNNisthjib9KqYN?=
- =?us-ascii?Q?fPWAbkUkTcje8dIKopX5Fjy7OSnb7ialCkAD2pzxZvbQD0t9MSjZhyOL4sGE?=
- =?us-ascii?Q?g/Huma6HaOkwxszC5mE6kE2vDkhNrf4eW6AvqfhroA4vJV8K8BTZlM6MMJcg?=
- =?us-ascii?Q?uODiviE565LY1me9K+YaCkDK9YwL4CigvT9CTkhTGfryaWgzqjd9tzJQXVY0?=
- =?us-ascii?Q?53fTZB2lyZ9Sm5i5SEmS+XRA/n9iv2eY5fEn9Wl2UoZxPuEdmnn5z0D4GvEt?=
- =?us-ascii?Q?LFqYuIqQAUGZsrV3ZFzhPNziWKrHV9sqycoWJ92vX7ZCxMZtBWwzQER5EKOp?=
- =?us-ascii?Q?655l6xg3vETjoOdgrQZq+gy8sjLoQuRfZaFb0XeiOPP783g0P7y1LsxpLT7O?=
- =?us-ascii?Q?yf2pA5yIyUii/FFr9CqY+d2leNfGwgwu9CvXFA7vMVEnM4pLQIG+JfkFeNuT?=
- =?us-ascii?Q?kx/avUtcbgp7mxlBeKIlxqQMM389ktjAKwSBTwZZM7qTk7dTj23dOIYIsbpd?=
- =?us-ascii?Q?+Tn9mIGCSruQTVEPY6JtIyNL2GezQCZ2Olxu74gMJfpZr+nlhWtiR/0Pdo2R?=
- =?us-ascii?Q?UGh8J1V7KqOooSkGk8dvrNNkv6A0hf2t2/h+ByoFqpKs529b+7+tEJlGmY9L?=
- =?us-ascii?Q?AYSvwTJXvDlTZaRSN7lICPr3fIVySAVz8VhH9wyjIwqrGUrWrltDqYtNGXCb?=
- =?us-ascii?Q?2idcn4C/LXbSDmXKeVbltHP/33ZK79+Mtaf65zoJbCiJ/6Cp1sDZRV5f3Am9?=
- =?us-ascii?Q?0pupXI6GBj3KeAwFKCuSAPnRNnef7O0NlIZDJIGp6B/bDZPQtFZ1HoLQ+gJi?=
- =?us-ascii?Q?UiX/FGaBV3dMShT5F2Ft8g7gH6mXnbT+5Oc6sFPbDzPAeNPhZnEPosff6r7D?=
- =?us-ascii?Q?smUWabX0vXJdD3i3iOEEJPTV5KFX9QBo6xpTQs9liP1lSuZEdVRgnppvT5pm?=
- =?us-ascii?Q?a706BfR0O0cZbjBxNWDJfYmVvwwPckNCtlbFzhJNNaLRdUjy9nBcI9KiH/tE?=
- =?us-ascii?Q?Vxf8BY2rRaRbLJg=3D?=
+	=?us-ascii?Q?MKPk9gEL9Ndvlhrxu/pOJFAT+PMXTvHPIOtfCiPh4U/ekV0DTy08bjrwGPLE?=
+ =?us-ascii?Q?DzaTkvjLkE+B6eK/rO1/O0b6ekiZn8PWbGlMNR5XuLbUfU7AwU68bYj2suya?=
+ =?us-ascii?Q?HZCRYgpAx2tjx0Xkuo+3tqg8n69MMHPtw2NMK9cqko7A6+Z9dQ+mDJUnW5fN?=
+ =?us-ascii?Q?rxiTYEAmLO29MsPtzS4pcgL6cuHI2rhItgXP4L+phpAO/TaPBn3uFulsYY4t?=
+ =?us-ascii?Q?zCQPfinX5pqAu6seY4YUtQhXYYsJ705j2m3RIyTUkH8UG/TPqUhtR6IKgJX7?=
+ =?us-ascii?Q?Ikq+54N1JMGJfkOzpB6xjPujxZICyoPvexijY2bA4Go9uMZxefn1InILT7mG?=
+ =?us-ascii?Q?u1RbMPOtTlsd0gSLQtCR07iRCCjqBEn491ca7xzcDxZPVhu0/ogH6MBexDky?=
+ =?us-ascii?Q?VvRGjsxonNGaj0kSfr1BxBfTUnhs8ziyoC74kDRrUjGMKsUUfPTcQy4iTCTz?=
+ =?us-ascii?Q?4TxqZcrsDv5082EYnyifsdLSxq8zLWarhICasOyVcPtAaF36UXr71dl1u9RK?=
+ =?us-ascii?Q?rywA5NXB5uFMKadg7/XKxB7IbKGb/i8XAxIZpWswYK8B+ZTGNURc+/v2/w+V?=
+ =?us-ascii?Q?aUd74+grdX9TLK4DLhME06PUmEmCxgxkKkb8ARuvV1/cc/s8+Jtrw6StPhYX?=
+ =?us-ascii?Q?HVHLu165oPWQVVVbjQab2fCp1hmWsJMdgZbTkY4Qrif7iK8tRWHM9nWbX578?=
+ =?us-ascii?Q?e7Rlc+WASmIryAEA3h+tXc1zKDGs90x/2XMr1ptUBM094wxcld5/zWayusJz?=
+ =?us-ascii?Q?aOKtQ0uI6dYVWDMXauNyeTNJXaisEmv6CqO0EMsXwCzz3tax2yye5Ar+AlUU?=
+ =?us-ascii?Q?eiejbZf0bjAxGFRmkJ5wJtq9FWqtlg/C5sEftNrW9AWxsquwS4nGHMiVHMbS?=
+ =?us-ascii?Q?ZSGEakTpJYDHbHGzAc5JEM90YGGYMTk4ClPHwuEq6/fUTgalCNtR0hLjMIMA?=
+ =?us-ascii?Q?XbVGTfZCYURMX+GEY1FOZxBhDgw4aL1LaHmCFSKAsoxo8jczqTXfsWXjaT3t?=
+ =?us-ascii?Q?7WdlYWLO6w1HxrvXuEnFeK66H1qEE6hLkXWcDynOZ1rpeyfCpDith1SPpYWv?=
+ =?us-ascii?Q?tF9JUr+wO+T/nIripXyHiee5yanIjgs9bjhN5tjTR/CO28Y9pZJ01BFO0t+q?=
+ =?us-ascii?Q?KIzCwzve6qBakiz6vyddU9Pt5PToVv+zJsSecNM7ulDPjujKrNObwI5lk82T?=
+ =?us-ascii?Q?gw0nennQc+awUk1iluJZ5IRj13eSaADnxxQDIPb5/LjUTYEo/JJh2dgVjqdL?=
+ =?us-ascii?Q?bR8pvidc+G58G5Znd6s3ouFw9TLrj7JNcbgyO7LoFD3vfVuvvLj1LooaCtkF?=
+ =?us-ascii?Q?83uRQEvlXPv8PsoD2FQsza71/Xdc/cFBMBuSaiioklyzw4PdhS/0o19OIF78?=
+ =?us-ascii?Q?OPP+XPaGCzYIclHobwfXMZDgrj1uJB9A2c0HVNgRl/50DEFavFXcSFhrPtN1?=
+ =?us-ascii?Q?I+hza3E2IPpLn/cJCPLij40706O7g5CfJi8pHtrGSBTZ1AitpZOLe5SsJUsu?=
+ =?us-ascii?Q?m3f4O/caA0Kb7G8=3D?=
 X-Forefront-Antispam-Report:
-	CIP:216.228.118.232;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:dc7edge1.nvidia.com;CAT:NONE;SFS:(13230040)(1800799024)(376014)(7416014)(36860700013)(82310400026);DIR:OUT;SFP:1101;
+	CIP:216.228.117.160;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:dc6edge1.nvidia.com;CAT:NONE;SFS:(13230040)(376014)(7416014)(36860700013)(82310400026)(1800799024);DIR:OUT;SFP:1101;
 X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 09 Feb 2025 10:20:15.4166
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 09 Feb 2025 10:20:00.2884
  (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: 71062ce8-be56-4393-3256-08dd48f35870
+X-MS-Exchange-CrossTenant-Network-Message-Id: 1d66e1e7-1b1e-4bce-820c-08dd48f34f7c
 X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[216.228.118.232];Helo=[mail.nvidia.com]
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[216.228.117.160];Helo=[mail.nvidia.com]
 X-MS-Exchange-CrossTenant-AuthSource:
-	SJ1PEPF00002321.namprd03.prod.outlook.com
+	SN1PEPF0002529E.namprd05.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Anonymous
 X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: CY5PR12MB6645
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH8PR12MB7446
 
-From: Alexei Lazar <alazar@nvidia.com>
+Remove the hidden assumption that options are allocated at the end of
+the struct, and teach the compiler about them using a flexible array.
 
-In XDP scenarios, fragmented packets can occur if the MTU is larger
-than the page size, even when the packet size fits within the linear
-part.
-If XDP multi-buffer support is disabled, the fragmented part won't be
-handled in the TX flow, leading to packet drops.
+With this, we can revert the unsafe_memcpy() call we have in
+tun_dst_unclone() [1], and resolve the false field-spanning write
+warning caused by the memcpy() in ip_tunnel_info_opts_set().
 
-Since XDP multi-buffer support is always available, this commit removes
-the conditional check for enabling it.
-This ensures that XDP multi-buffer support is always enabled,
-regardless of the `is_xdp_mb` parameter, and guarantees the handling of
-fragmented packets in such scenarios.
+Note that this patch changes the layout of struct ip_tunnel_info since
+there is padding at the end of the struct.
+Before this, options would be written at 'info + 1' which is after the
+padding.
+After this patch, options are written right after 'mode' field (into the
+padding).
 
-Signed-off-by: Alexei Lazar <alazar@nvidia.com>
-Signed-off-by: Tariq Toukan <tariqt@nvidia.com>
+[1] Commit 13cfd6a6d7ac ("net: Silence false field-spanning write warning in metadata_dst memcpy")
+
+Link: https://lore.kernel.org/all/53D1D353-B8F6-4ADC-8F29-8C48A7C9C6F1@kernel.org/
+Suggested-by: Kees Cook <kees@kernel.org>
+Reviewed-by: Cosmin Ratiu <cratiu@nvidia.com>
+Reviewed-by: Tariq Toukan <tariqt@nvidia.com>
+Signed-off-by: Gal Pressman <gal@nvidia.com>
 ---
- drivers/net/ethernet/mellanox/mlx5/core/en.h  |  1 -
- .../ethernet/mellanox/mlx5/core/en/params.c   |  1 -
- .../ethernet/mellanox/mlx5/core/en/params.h   |  1 -
- .../mellanox/mlx5/core/en/reporter_tx.c       |  1 -
- .../net/ethernet/mellanox/mlx5/core/en/xdp.c  | 49 ++++++++-----------
- .../net/ethernet/mellanox/mlx5/core/en_main.c | 29 -----------
- 6 files changed, 21 insertions(+), 61 deletions(-)
+ .../mellanox/mlx5/core/en/tc_tun_encap.c      |  4 +---
+ .../mellanox/mlx5/core/en/tc_tun_vxlan.c      |  2 +-
+ .../ethernet/netronome/nfp/flower/action.c    |  4 ++--
+ drivers/net/pfcp.c                            |  2 +-
+ drivers/net/vxlan/vxlan_core.c                |  4 ++--
+ include/net/dst_metadata.h                    |  7 ++----
+ include/net/ip_tunnels.h                      | 11 +++------
+ net/core/dst.c                                |  3 ++-
+ net/ipv4/ip_gre.c                             |  4 ++--
+ net/ipv4/ip_tunnel_core.c                     | 24 +++++++++----------
+ net/ipv6/ip6_gre.c                            |  4 ++--
+ net/openvswitch/flow_netlink.c                |  4 ++--
+ net/psample/psample.c                         |  2 +-
+ net/sched/act_tunnel_key.c                    | 12 +++++-----
+ 14 files changed, 39 insertions(+), 48 deletions(-)
 
-diff --git a/drivers/net/ethernet/mellanox/mlx5/core/en.h b/drivers/net/ethernet/mellanox/mlx5/core/en.h
-index 534fdd27c8de..769e683f2488 100644
---- a/drivers/net/ethernet/mellanox/mlx5/core/en.h
-+++ b/drivers/net/ethernet/mellanox/mlx5/core/en.h
-@@ -384,7 +384,6 @@ enum {
- 	MLX5E_SQ_STATE_VLAN_NEED_L2_INLINE,
- 	MLX5E_SQ_STATE_PENDING_XSK_TX,
- 	MLX5E_SQ_STATE_PENDING_TLS_RX_RESYNC,
--	MLX5E_SQ_STATE_XDP_MULTIBUF,
- 	MLX5E_NUM_SQ_STATES, /* Must be kept last */
- };
+diff --git a/drivers/net/ethernet/mellanox/mlx5/core/en/tc_tun_encap.c b/drivers/net/ethernet/mellanox/mlx5/core/en/tc_tun_encap.c
+index e7e01f3298ef..d9f40cf8198d 100644
+--- a/drivers/net/ethernet/mellanox/mlx5/core/en/tc_tun_encap.c
++++ b/drivers/net/ethernet/mellanox/mlx5/core/en/tc_tun_encap.c
+@@ -620,9 +620,7 @@ bool mlx5e_tc_tun_encap_info_equal_options(struct mlx5e_encap_key *a,
+ 	b_info = container_of(b->ip_tun_key, struct ip_tunnel_info, key);
  
-diff --git a/drivers/net/ethernet/mellanox/mlx5/core/en/params.c b/drivers/net/ethernet/mellanox/mlx5/core/en/params.c
-index e37d4c202bba..aa36670d9a36 100644
---- a/drivers/net/ethernet/mellanox/mlx5/core/en/params.c
-+++ b/drivers/net/ethernet/mellanox/mlx5/core/en/params.c
-@@ -1247,7 +1247,6 @@ void mlx5e_build_xdpsq_param(struct mlx5_core_dev *mdev,
- 	mlx5e_build_sq_param_common(mdev, param);
- 	MLX5_SET(wq, wq, log_wq_sz, params->log_sq_size);
- 	param->is_mpw = MLX5E_GET_PFLAG(params, MLX5E_PFLAG_XDP_TX_MPWQE);
--	param->is_xdp_mb = !mlx5e_rx_is_linear_skb(mdev, params, xsk);
- 	mlx5e_build_tx_cq_param(mdev, params, &param->cqp);
+ 	return a_info->options_len == b_info->options_len &&
+-	       !memcmp(ip_tunnel_info_opts(a_info),
+-		       ip_tunnel_info_opts(b_info),
+-		       a_info->options_len);
++	       !memcmp(a_info->options, b_info->options, a_info->options_len);
  }
  
-diff --git a/drivers/net/ethernet/mellanox/mlx5/core/en/params.h b/drivers/net/ethernet/mellanox/mlx5/core/en/params.h
-index 3f8986f9d862..bd5877acc5b1 100644
---- a/drivers/net/ethernet/mellanox/mlx5/core/en/params.h
-+++ b/drivers/net/ethernet/mellanox/mlx5/core/en/params.h
-@@ -33,7 +33,6 @@ struct mlx5e_sq_param {
- 	struct mlx5_wq_param       wq;
- 	bool                       is_mpw;
- 	bool                       is_tls;
--	bool                       is_xdp_mb;
- 	u16                        stop_room;
+ static int cmp_decap_info(struct mlx5e_decap_key *a,
+diff --git a/drivers/net/ethernet/mellanox/mlx5/core/en/tc_tun_vxlan.c b/drivers/net/ethernet/mellanox/mlx5/core/en/tc_tun_vxlan.c
+index e4e487c8431b..561c874b0825 100644
+--- a/drivers/net/ethernet/mellanox/mlx5/core/en/tc_tun_vxlan.c
++++ b/drivers/net/ethernet/mellanox/mlx5/core/en/tc_tun_vxlan.c
+@@ -100,7 +100,7 @@ static int mlx5e_gen_ip_tunnel_header_vxlan(char buf[],
+ 	vxh->vx_flags = VXLAN_HF_VNI;
+ 	vxh->vx_vni = vxlan_vni_field(tun_id);
+ 	if (test_bit(IP_TUNNEL_VXLAN_OPT_BIT, tun_key->tun_flags)) {
+-		md = ip_tunnel_info_opts(e->tun_info);
++		md = (struct vxlan_metadata *)e->tun_info->options;
+ 		vxlan_build_gbp_hdr(vxh, md);
+ 	}
+ 
+diff --git a/drivers/net/ethernet/netronome/nfp/flower/action.c b/drivers/net/ethernet/netronome/nfp/flower/action.c
+index aca2a7417af3..6dd8817771b5 100644
+--- a/drivers/net/ethernet/netronome/nfp/flower/action.c
++++ b/drivers/net/ethernet/netronome/nfp/flower/action.c
+@@ -333,7 +333,7 @@ nfp_fl_push_geneve_options(struct nfp_fl_payload *nfp_fl, int *list_len,
+ {
+ 	struct ip_tunnel_info *ip_tun = (struct ip_tunnel_info *)act->tunnel;
+ 	int opt_len, opt_cnt, act_start, tot_push_len;
+-	u8 *src = ip_tunnel_info_opts(ip_tun);
++	u8 *src = ip_tun->options;
+ 
+ 	/* We need to populate the options in reverse order for HW.
+ 	 * Therefore we go through the options, calculating the
+@@ -370,7 +370,7 @@ nfp_fl_push_geneve_options(struct nfp_fl_payload *nfp_fl, int *list_len,
+ 
+ 	act_start = *list_len;
+ 	*list_len += tot_push_len;
+-	src = ip_tunnel_info_opts(ip_tun);
++	src = ip_tun->options;
+ 	while (opt_cnt) {
+ 		struct geneve_opt *opt = (struct geneve_opt *)src;
+ 		struct nfp_fl_push_geneve *push;
+diff --git a/drivers/net/pfcp.c b/drivers/net/pfcp.c
+index 68d0d9e92a22..4963f85ad807 100644
+--- a/drivers/net/pfcp.c
++++ b/drivers/net/pfcp.c
+@@ -71,7 +71,7 @@ static int pfcp_encap_recv(struct sock *sk, struct sk_buff *skb)
+ 	if (unlikely(!tun_dst))
+ 		goto drop;
+ 
+-	md = ip_tunnel_info_opts(&tun_dst->u.tun_info);
++	md = (struct pfcp_metadata *)tun_dst->u.tun_info.options;
+ 	if (unlikely(!md))
+ 		goto drop;
+ 
+diff --git a/drivers/net/vxlan/vxlan_core.c b/drivers/net/vxlan/vxlan_core.c
+index 05c10acb2a57..9fd1832af6b0 100644
+--- a/drivers/net/vxlan/vxlan_core.c
++++ b/drivers/net/vxlan/vxlan_core.c
+@@ -1756,7 +1756,7 @@ static int vxlan_rcv(struct sock *sk, struct sk_buff *skb)
+ 			goto drop;
+ 		}
+ 
+-		md = ip_tunnel_info_opts(&tun_dst->u.tun_info);
++		md = (struct vxlan_metadata *)tun_dst->u.tun_info.options;
+ 
+ 		skb_dst_set(skb, (struct dst_entry *)tun_dst);
+ 	} else {
+@@ -2459,7 +2459,7 @@ void vxlan_xmit_one(struct sk_buff *skb, struct net_device *dev,
+ 		if (test_bit(IP_TUNNEL_VXLAN_OPT_BIT, info->key.tun_flags)) {
+ 			if (info->options_len < sizeof(*md))
+ 				goto drop;
+-			md = ip_tunnel_info_opts(info);
++			md = (struct vxlan_metadata *)info->options;
+ 		}
+ 		ttl = info->key.ttl;
+ 		tos = info->key.tos;
+diff --git a/include/net/dst_metadata.h b/include/net/dst_metadata.h
+index 84c15402931c..4160731dcb6e 100644
+--- a/include/net/dst_metadata.h
++++ b/include/net/dst_metadata.h
+@@ -163,11 +163,8 @@ static inline struct metadata_dst *tun_dst_unclone(struct sk_buff *skb)
+ 	if (!new_md)
+ 		return ERR_PTR(-ENOMEM);
+ 
+-	unsafe_memcpy(&new_md->u.tun_info, &md_dst->u.tun_info,
+-		      sizeof(struct ip_tunnel_info) + md_size,
+-		      /* metadata_dst_alloc() reserves room (md_size bytes) for
+-		       * options right after the ip_tunnel_info struct.
+-		       */);
++	memcpy(&new_md->u.tun_info, &md_dst->u.tun_info,
++	       sizeof(struct ip_tunnel_info) + md_size);
+ #ifdef CONFIG_DST_CACHE
+ 	/* Unclone the dst cache if there is one */
+ 	if (new_md->u.tun_info.dst_cache.cache) {
+diff --git a/include/net/ip_tunnels.h b/include/net/ip_tunnels.h
+index 1aa31bdb2b31..2a6dca52e61d 100644
+--- a/include/net/ip_tunnels.h
++++ b/include/net/ip_tunnels.h
+@@ -93,12 +93,6 @@ struct ip_tunnel_encap {
+ 	GENMASK((sizeof_field(struct ip_tunnel_info,		\
+ 			      options_len) * BITS_PER_BYTE) - 1, 0)
+ 
+-#define ip_tunnel_info_opts(info)				\
+-	_Generic(info,						\
+-		 const struct ip_tunnel_info * : ((const void *)((info) + 1)),\
+-		 struct ip_tunnel_info * : ((void *)((info) + 1))\
+-	)
+-
+ struct ip_tunnel_info {
+ 	struct ip_tunnel_key	key;
+ 	struct ip_tunnel_encap	encap;
+@@ -107,6 +101,7 @@ struct ip_tunnel_info {
+ #endif
+ 	u8			options_len;
+ 	u8			mode;
++	u8			options[] __counted_by(options_len);
  };
  
-diff --git a/drivers/net/ethernet/mellanox/mlx5/core/en/reporter_tx.c b/drivers/net/ethernet/mellanox/mlx5/core/en/reporter_tx.c
-index 09433b91be17..532c7fa94d17 100644
---- a/drivers/net/ethernet/mellanox/mlx5/core/en/reporter_tx.c
-+++ b/drivers/net/ethernet/mellanox/mlx5/core/en/reporter_tx.c
-@@ -16,7 +16,6 @@ static const char * const sq_sw_state_type_name[] = {
- 	[MLX5E_SQ_STATE_VLAN_NEED_L2_INLINE] = "vlan_need_l2_inline",
- 	[MLX5E_SQ_STATE_PENDING_XSK_TX] = "pending_xsk_tx",
- 	[MLX5E_SQ_STATE_PENDING_TLS_RX_RESYNC] = "pending_tls_rx_resync",
--	[MLX5E_SQ_STATE_XDP_MULTIBUF] = "xdp_multibuf",
- };
+ /* 6rd prefix/relay information */
+@@ -650,7 +645,7 @@ static inline void iptunnel_xmit_stats(struct net_device *dev, int pkt_len)
+ static inline void ip_tunnel_info_opts_get(void *to,
+ 					   const struct ip_tunnel_info *info)
+ {
+-	memcpy(to, info + 1, info->options_len);
++	memcpy(to, info->options, info->options_len);
+ }
  
- static int mlx5e_wait_for_sq_flush(struct mlx5e_txqsq *sq)
-diff --git a/drivers/net/ethernet/mellanox/mlx5/core/en/xdp.c b/drivers/net/ethernet/mellanox/mlx5/core/en/xdp.c
-index 3cc4d55613bf..6f3094a479e1 100644
---- a/drivers/net/ethernet/mellanox/mlx5/core/en/xdp.c
-+++ b/drivers/net/ethernet/mellanox/mlx5/core/en/xdp.c
-@@ -546,6 +546,7 @@ mlx5e_xmit_xdp_frame(struct mlx5e_xdpsq *sq, struct mlx5e_xmit_data *xdptxd,
- 	bool inline_ok;
- 	bool linear;
- 	u16 pi;
-+	int i;
+ static inline void ip_tunnel_info_opts_set(struct ip_tunnel_info *info,
+@@ -659,7 +654,7 @@ static inline void ip_tunnel_info_opts_set(struct ip_tunnel_info *info,
+ {
+ 	info->options_len = len;
+ 	if (len > 0) {
+-		memcpy(ip_tunnel_info_opts(info), from, len);
++		memcpy(info->options, from, len);
+ 		ip_tunnel_flags_or(info->key.tun_flags, info->key.tun_flags,
+ 				   flags);
+ 	}
+diff --git a/net/core/dst.c b/net/core/dst.c
+index 9552a90d4772..d981c295a48e 100644
+--- a/net/core/dst.c
++++ b/net/core/dst.c
+@@ -286,7 +286,8 @@ struct metadata_dst *metadata_dst_alloc(u8 optslen, enum metadata_type type,
+ {
+ 	struct metadata_dst *md_dst;
  
- 	struct mlx5e_xdpsq_stats *stats = sq->stats;
+-	md_dst = kmalloc(sizeof(*md_dst) + optslen, flags);
++	md_dst = kmalloc(struct_size(md_dst, u.tun_info.options, optslen),
++			 flags);
+ 	if (!md_dst)
+ 		return NULL;
  
-@@ -612,41 +613,33 @@ mlx5e_xmit_xdp_frame(struct mlx5e_xdpsq *sq, struct mlx5e_xmit_data *xdptxd,
+diff --git a/net/ipv4/ip_gre.c b/net/ipv4/ip_gre.c
+index ed1b6b44faf8..e061aec6e7bf 100644
+--- a/net/ipv4/ip_gre.c
++++ b/net/ipv4/ip_gre.c
+@@ -334,7 +334,7 @@ static int erspan_rcv(struct sk_buff *skb, struct tnl_ptk_info *tpi,
+ 			     skb_network_header_len(skb);
+ 			pkt_md = (struct erspan_metadata *)(gh + gre_hdr_len +
+ 							    sizeof(*ershdr));
+-			md = ip_tunnel_info_opts(&tun_dst->u.tun_info);
++			md = (struct erspan_metadata *)tun_dst->u.tun_info.options;
+ 			md->version = ver;
+ 			md2 = &md->u.md2;
+ 			memcpy(md2, pkt_md, ver == 1 ? ERSPAN_V1_MDSIZE :
+@@ -556,7 +556,7 @@ static void erspan_fb_xmit(struct sk_buff *skb, struct net_device *dev)
+ 		goto err_free_skb;
+ 	if (tun_info->options_len < sizeof(*md))
+ 		goto err_free_skb;
+-	md = ip_tunnel_info_opts(tun_info);
++	md = (struct erspan_metadata *)tun_info->options;
  
- 	cseg->opmod_idx_opcode = cpu_to_be32((sq->pc << 8) | MLX5_OPCODE_SEND);
+ 	/* ERSPAN has fixed 8 byte GRE header */
+ 	version = md->version;
+diff --git a/net/ipv4/ip_tunnel_core.c b/net/ipv4/ip_tunnel_core.c
+index a3676155be78..e0b0169175e5 100644
+--- a/net/ipv4/ip_tunnel_core.c
++++ b/net/ipv4/ip_tunnel_core.c
+@@ -147,8 +147,7 @@ struct metadata_dst *iptunnel_metadata_reply(struct metadata_dst *md,
+ 		dst->key.u.ipv4.dst = src->key.u.ipv4.src;
+ 	ip_tunnel_flags_copy(dst->key.tun_flags, src->key.tun_flags);
+ 	dst->mode = src->mode | IP_TUNNEL_INFO_TX;
+-	ip_tunnel_info_opts_set(dst, ip_tunnel_info_opts(src),
+-				src->options_len, tun_flags);
++	ip_tunnel_info_opts_set(dst, src->options, src->options_len, tun_flags);
  
--	if (test_bit(MLX5E_SQ_STATE_XDP_MULTIBUF, &sq->state)) {
--		int i;
--
--		memset(&cseg->trailer, 0, sizeof(cseg->trailer));
--		memset(eseg, 0, sizeof(*eseg) - sizeof(eseg->trailer));
--
--		eseg->inline_hdr.sz = cpu_to_be16(inline_hdr_sz);
-+	memset(&cseg->trailer, 0, sizeof(cseg->trailer));
-+	memset(eseg, 0, sizeof(*eseg) - sizeof(eseg->trailer));
+ 	return res;
+ }
+@@ -490,7 +489,8 @@ static int ip_tun_parse_opts_geneve(struct nlattr *attr,
+ 		return -EINVAL;
  
--		for (i = 0; i < num_frags; i++) {
--			skb_frag_t *frag = &xdptxdf->sinfo->frags[i];
--			dma_addr_t addr;
-+	eseg->inline_hdr.sz = cpu_to_be16(inline_hdr_sz);
+ 	if (info) {
+-		struct geneve_opt *opt = ip_tunnel_info_opts(info) + opts_len;
++		struct geneve_opt *opt =
++			(struct geneve_opt *)(info->options + opts_len);
  
--			addr = xdptxdf->dma_arr ? xdptxdf->dma_arr[i] :
--				page_pool_get_dma_addr(skb_frag_page(frag)) +
--				skb_frag_off(frag);
-+	for (i = 0; i < num_frags; i++) {
-+		skb_frag_t *frag = &xdptxdf->sinfo->frags[i];
-+		dma_addr_t addr;
+ 		memcpy(opt->opt_data, nla_data(attr), data_len);
+ 		opt->length = data_len / 4;
+@@ -521,7 +521,7 @@ static int ip_tun_parse_opts_vxlan(struct nlattr *attr,
  
--			dseg->addr = cpu_to_be64(addr);
--			dseg->byte_count = cpu_to_be32(skb_frag_size(frag));
--			dseg->lkey = sq->mkey_be;
--			dseg++;
--		}
-+		addr = xdptxdf->dma_arr ? xdptxdf->dma_arr[i] :
-+			page_pool_get_dma_addr(skb_frag_page(frag)) +
-+			skb_frag_off(frag);
+ 	if (info) {
+ 		struct vxlan_metadata *md =
+-			ip_tunnel_info_opts(info) + opts_len;
++			(struct vxlan_metadata *)(info->options + opts_len);
  
--		cseg->qpn_ds = cpu_to_be32((sq->sqn << 8) | ds_cnt);
-+		dseg->addr = cpu_to_be64(addr);
-+		dseg->byte_count = cpu_to_be32(skb_frag_size(frag));
-+		dseg->lkey = sq->mkey_be;
-+		dseg++;
-+	}
+ 		attr = tb[LWTUNNEL_IP_OPT_VXLAN_GBP];
+ 		md->gbp = nla_get_u32(attr);
+@@ -562,7 +562,7 @@ static int ip_tun_parse_opts_erspan(struct nlattr *attr,
  
--		sq->db.wqe_info[pi] = (struct mlx5e_xdp_wqe_info) {
--			.num_wqebbs = num_wqebbs,
--			.num_pkts = 1,
--		};
-+	cseg->qpn_ds = cpu_to_be32((sq->sqn << 8) | ds_cnt);
+ 	if (info) {
+ 		struct erspan_metadata *md =
+-			ip_tunnel_info_opts(info) + opts_len;
++			(struct erspan_metadata *)(info->options + opts_len);
  
--		sq->pc += num_wqebbs;
--	} else {
--		cseg->fm_ce_se = 0;
-+	sq->db.wqe_info[pi] = (struct mlx5e_xdp_wqe_info) {
-+		.num_wqebbs = num_wqebbs,
-+		.num_pkts = 1,
-+	};
+ 		md->version = ver;
+ 		if (ver == 1) {
+@@ -746,7 +746,7 @@ static int ip_tun_fill_encap_opts_geneve(struct sk_buff *skb,
+ 		return -ENOMEM;
  
--		sq->pc++;
--	}
-+	sq->pc += num_wqebbs;
+ 	while (tun_info->options_len > offset) {
+-		opt = ip_tunnel_info_opts(tun_info) + offset;
++		opt = (struct geneve_opt *)(tun_info->options + offset);
+ 		if (nla_put_be16(skb, LWTUNNEL_IP_OPT_GENEVE_CLASS,
+ 				 opt->opt_class) ||
+ 		    nla_put_u8(skb, LWTUNNEL_IP_OPT_GENEVE_TYPE, opt->type) ||
+@@ -772,7 +772,7 @@ static int ip_tun_fill_encap_opts_vxlan(struct sk_buff *skb,
+ 	if (!nest)
+ 		return -ENOMEM;
  
- 	xsk_tx_metadata_request(meta, &mlx5e_xsk_tx_metadata_ops, eseg);
+-	md = ip_tunnel_info_opts(tun_info);
++	md = (struct vxlan_metadata *)tun_info->options;
+ 	if (nla_put_u32(skb, LWTUNNEL_IP_OPT_VXLAN_GBP, md->gbp)) {
+ 		nla_nest_cancel(skb, nest);
+ 		return -ENOMEM;
+@@ -792,7 +792,7 @@ static int ip_tun_fill_encap_opts_erspan(struct sk_buff *skb,
+ 	if (!nest)
+ 		return -ENOMEM;
  
-diff --git a/drivers/net/ethernet/mellanox/mlx5/core/en_main.c b/drivers/net/ethernet/mellanox/mlx5/core/en_main.c
-index 2fdc86432ac0..5d5e7b19c396 100644
---- a/drivers/net/ethernet/mellanox/mlx5/core/en_main.c
-+++ b/drivers/net/ethernet/mellanox/mlx5/core/en_main.c
-@@ -2023,41 +2023,12 @@ int mlx5e_open_xdpsq(struct mlx5e_channel *c, struct mlx5e_params *params,
- 	csp.min_inline_mode = sq->min_inline_mode;
- 	set_bit(MLX5E_SQ_STATE_ENABLED, &sq->state);
+-	md = ip_tunnel_info_opts(tun_info);
++	md = (struct erspan_metadata *)tun_info->options;
+ 	if (nla_put_u8(skb, LWTUNNEL_IP_OPT_ERSPAN_VER, md->version))
+ 		goto err;
  
--	if (param->is_xdp_mb)
--		set_bit(MLX5E_SQ_STATE_XDP_MULTIBUF, &sq->state);
--
- 	err = mlx5e_create_sq_rdy(c->mdev, param, &csp, 0, &sq->sqn);
- 	if (err)
- 		goto err_free_xdpsq;
+@@ -875,7 +875,7 @@ static int ip_tun_opts_nlsize(struct ip_tunnel_info *info)
  
- 	mlx5e_set_xmit_fp(sq, param->is_mpw);
+ 		opt_len += nla_total_size(0);	/* LWTUNNEL_IP_OPTS_GENEVE */
+ 		while (info->options_len > offset) {
+-			opt = ip_tunnel_info_opts(info) + offset;
++			opt = (struct geneve_opt *)(info->options + offset);
+ 			opt_len += nla_total_size(2)	/* OPT_GENEVE_CLASS */
+ 				   + nla_total_size(1)	/* OPT_GENEVE_TYPE */
+ 				   + nla_total_size(opt->length * 4);
+@@ -886,7 +886,8 @@ static int ip_tun_opts_nlsize(struct ip_tunnel_info *info)
+ 		opt_len += nla_total_size(0)	/* LWTUNNEL_IP_OPTS_VXLAN */
+ 			   + nla_total_size(4);	/* OPT_VXLAN_GBP */
+ 	} else if (test_bit(IP_TUNNEL_ERSPAN_OPT_BIT, info->key.tun_flags)) {
+-		struct erspan_metadata *md = ip_tunnel_info_opts(info);
++		struct erspan_metadata *md =
++			(struct erspan_metadata *)info->options;
  
--	if (!param->is_mpw && !test_bit(MLX5E_SQ_STATE_XDP_MULTIBUF, &sq->state)) {
--		unsigned int ds_cnt = MLX5E_TX_WQE_EMPTY_DS_COUNT + 1;
--		unsigned int inline_hdr_sz = 0;
--		int i;
--
--		if (sq->min_inline_mode != MLX5_INLINE_MODE_NONE) {
--			inline_hdr_sz = MLX5E_XDP_MIN_INLINE;
--			ds_cnt++;
--		}
--
--		/* Pre initialize fixed WQE fields */
--		for (i = 0; i < mlx5_wq_cyc_get_size(&sq->wq); i++) {
--			struct mlx5e_tx_wqe      *wqe  = mlx5_wq_cyc_get_wqe(&sq->wq, i);
--			struct mlx5_wqe_ctrl_seg *cseg = &wqe->ctrl;
--			struct mlx5_wqe_eth_seg  *eseg = &wqe->eth;
--
--			sq->db.wqe_info[i] = (struct mlx5e_xdp_wqe_info) {
--				.num_wqebbs = 1,
--				.num_pkts   = 1,
--			};
--
--			cseg->qpn_ds = cpu_to_be32((sq->sqn << 8) | ds_cnt);
--			eseg->inline_hdr.sz = cpu_to_be16(inline_hdr_sz);
--		}
--	}
--
- 	return 0;
+ 		opt_len += nla_total_size(0)	/* LWTUNNEL_IP_OPTS_ERSPAN */
+ 			   + nla_total_size(1)	/* OPT_ERSPAN_VER */
+@@ -920,8 +921,7 @@ static int ip_tun_cmp_encap(struct lwtunnel_state *a, struct lwtunnel_state *b)
+ 	return memcmp(info_a, info_b, sizeof(info_a->key)) ||
+ 	       info_a->mode != info_b->mode ||
+ 	       info_a->options_len != info_b->options_len ||
+-	       memcmp(ip_tunnel_info_opts(info_a),
+-		      ip_tunnel_info_opts(info_b), info_a->options_len);
++	       memcmp(info_a->options, info_b->options, info_a->options_len);
+ }
  
- err_free_xdpsq:
+ static const struct lwtunnel_encap_ops ip_tun_lwt_ops = {
+diff --git a/net/ipv6/ip6_gre.c b/net/ipv6/ip6_gre.c
+index 235808cfec70..35b0fb2162d7 100644
+--- a/net/ipv6/ip6_gre.c
++++ b/net/ipv6/ip6_gre.c
+@@ -575,7 +575,7 @@ static int ip6erspan_rcv(struct sk_buff *skb,
+ 			pkt_md = (struct erspan_metadata *)(gh + gre_hdr_len +
+ 							    sizeof(*ershdr));
+ 			info = &tun_dst->u.tun_info;
+-			md = ip_tunnel_info_opts(info);
++			md = (struct erspan_metadata *)info->options;
+ 			md->version = ver;
+ 			md2 = &md->u.md2;
+ 			memcpy(md2, pkt_md, ver == 1 ? ERSPAN_V1_MDSIZE :
+@@ -1022,7 +1022,7 @@ static netdev_tx_t ip6erspan_tunnel_xmit(struct sk_buff *skb,
+ 			goto tx_err;
+ 		if (tun_info->options_len < sizeof(*md))
+ 			goto tx_err;
+-		md = ip_tunnel_info_opts(tun_info);
++		md = (struct erspan_metadata *)tun_info->options;
+ 
+ 		tun_id = tunnel_id_to_key32(key->tun_id);
+ 		if (md->version == 1) {
+diff --git a/net/openvswitch/flow_netlink.c b/net/openvswitch/flow_netlink.c
+index 881ddd3696d5..2c0ebc9890e4 100644
+--- a/net/openvswitch/flow_netlink.c
++++ b/net/openvswitch/flow_netlink.c
+@@ -980,7 +980,7 @@ int ovs_nla_put_tunnel_info(struct sk_buff *skb,
+ 			    struct ip_tunnel_info *tun_info)
+ {
+ 	return __ip_tun_to_nlattr(skb, &tun_info->key,
+-				  ip_tunnel_info_opts(tun_info),
++				  tun_info->options,
+ 				  tun_info->options_len,
+ 				  ip_tunnel_info_af(tun_info), tun_info->mode);
+ }
+@@ -3753,7 +3753,7 @@ static int set_action_to_attr(const struct nlattr *a, struct sk_buff *skb)
+ 			return -EMSGSIZE;
+ 
+ 		err =  ip_tun_to_nlattr(skb, &tun_info->key,
+-					ip_tunnel_info_opts(tun_info),
++					tun_info->options,
+ 					tun_info->options_len,
+ 					ip_tunnel_info_af(tun_info), tun_info->mode);
+ 		if (err)
+diff --git a/net/psample/psample.c b/net/psample/psample.c
+index 25f92ba0840c..8ed75e83826e 100644
+--- a/net/psample/psample.c
++++ b/net/psample/psample.c
+@@ -217,7 +217,7 @@ static int __psample_ip_tun_to_nlattr(struct sk_buff *skb,
+ 			      struct ip_tunnel_info *tun_info)
+ {
+ 	unsigned short tun_proto = ip_tunnel_info_af(tun_info);
+-	const void *tun_opts = ip_tunnel_info_opts(tun_info);
++	const void *tun_opts = tun_info->options;
+ 	const struct ip_tunnel_key *tun_key = &tun_info->key;
+ 	int tun_opts_len = tun_info->options_len;
+ 
+diff --git a/net/sched/act_tunnel_key.c b/net/sched/act_tunnel_key.c
+index af7c99845948..5bb7d32967da 100644
+--- a/net/sched/act_tunnel_key.c
++++ b/net/sched/act_tunnel_key.c
+@@ -303,7 +303,7 @@ static int tunnel_key_opts_set(struct nlattr *nla, struct ip_tunnel_info *info,
+ 	case TCA_TUNNEL_KEY_ENC_OPTS_GENEVE:
+ #if IS_ENABLED(CONFIG_INET)
+ 		__set_bit(IP_TUNNEL_GENEVE_OPT_BIT, info->key.tun_flags);
+-		return tunnel_key_copy_opts(nla, ip_tunnel_info_opts(info),
++		return tunnel_key_copy_opts(nla, info->options,
+ 					    opts_len, extack);
+ #else
+ 		return -EAFNOSUPPORT;
+@@ -311,7 +311,7 @@ static int tunnel_key_opts_set(struct nlattr *nla, struct ip_tunnel_info *info,
+ 	case TCA_TUNNEL_KEY_ENC_OPTS_VXLAN:
+ #if IS_ENABLED(CONFIG_INET)
+ 		__set_bit(IP_TUNNEL_VXLAN_OPT_BIT, info->key.tun_flags);
+-		return tunnel_key_copy_opts(nla, ip_tunnel_info_opts(info),
++		return tunnel_key_copy_opts(nla, info->options,
+ 					    opts_len, extack);
+ #else
+ 		return -EAFNOSUPPORT;
+@@ -319,7 +319,7 @@ static int tunnel_key_opts_set(struct nlattr *nla, struct ip_tunnel_info *info,
+ 	case TCA_TUNNEL_KEY_ENC_OPTS_ERSPAN:
+ #if IS_ENABLED(CONFIG_INET)
+ 		__set_bit(IP_TUNNEL_ERSPAN_OPT_BIT, info->key.tun_flags);
+-		return tunnel_key_copy_opts(nla, ip_tunnel_info_opts(info),
++		return tunnel_key_copy_opts(nla, info->options,
+ 					    opts_len, extack);
+ #else
+ 		return -EAFNOSUPPORT;
+@@ -572,7 +572,7 @@ static int tunnel_key_geneve_opts_dump(struct sk_buff *skb,
+ 				       const struct ip_tunnel_info *info)
+ {
+ 	int len = info->options_len;
+-	u8 *src = (u8 *)(info + 1);
++	u8 *src = (u8 *)info->options;
+ 	struct nlattr *start;
+ 
+ 	start = nla_nest_start_noflag(skb, TCA_TUNNEL_KEY_ENC_OPTS_GENEVE);
+@@ -603,7 +603,7 @@ static int tunnel_key_geneve_opts_dump(struct sk_buff *skb,
+ static int tunnel_key_vxlan_opts_dump(struct sk_buff *skb,
+ 				      const struct ip_tunnel_info *info)
+ {
+-	struct vxlan_metadata *md = (struct vxlan_metadata *)(info + 1);
++	struct vxlan_metadata *md = (struct vxlan_metadata *)info->options;
+ 	struct nlattr *start;
+ 
+ 	start = nla_nest_start_noflag(skb, TCA_TUNNEL_KEY_ENC_OPTS_VXLAN);
+@@ -622,7 +622,7 @@ static int tunnel_key_vxlan_opts_dump(struct sk_buff *skb,
+ static int tunnel_key_erspan_opts_dump(struct sk_buff *skb,
+ 				       const struct ip_tunnel_info *info)
+ {
+-	struct erspan_metadata *md = (struct erspan_metadata *)(info + 1);
++	struct erspan_metadata *md = (struct erspan_metadata *)info->options;
+ 	struct nlattr *start;
+ 
+ 	start = nla_nest_start_noflag(skb, TCA_TUNNEL_KEY_ENC_OPTS_ERSPAN);
 -- 
-2.45.0
+2.40.1
 
 
