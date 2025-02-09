@@ -1,174 +1,125 @@
-Return-Path: <netdev+bounces-164423-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-164425-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 32332A2DC93
-	for <lists+netdev@lfdr.de>; Sun,  9 Feb 2025 11:40:13 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 45308A2DCBC
+	for <lists+netdev@lfdr.de>; Sun,  9 Feb 2025 12:03:55 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 03E943A3A3D
-	for <lists+netdev@lfdr.de>; Sun,  9 Feb 2025 10:40:03 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id DD555164E20
+	for <lists+netdev@lfdr.de>; Sun,  9 Feb 2025 11:03:53 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 28FC013DBA0;
-	Sun,  9 Feb 2025 10:39:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 05DA515CD52;
+	Sun,  9 Feb 2025 11:03:51 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=iki.fi header.i=@iki.fi header.b="bj/k046j"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="gytcrkJ6"
 X-Original-To: netdev@vger.kernel.org
-Received: from lahtoruutu.iki.fi (lahtoruutu.iki.fi [185.185.170.37])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8047D243370;
-	Sun,  9 Feb 2025 10:39:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=185.185.170.37
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1739097582; cv=pass; b=NZDyEK+m49qZ6xvZ/JoSkf7Uf3N27dBV3FQl+zzdCcOt+ZjcizrIYf12/OjWHamJay/q4sdeqqlR1GndeeytmCWZkmEw70zEQlz/8dSYAdme7QN39OxqvaoYVOTGtZHgsPDf1w5DFW6UlfNJjHRtZ/1LrrlCYE5MnPVdAAoDSrU=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1739097582; c=relaxed/simple;
-	bh=pRj1P6xt5VnRUSC44/bBifRMJtk42pamaKar/KCrJDc=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=cvZ2FZsVRFzyZKcWGaBW//p7cVUwCBt+XGKhqsLODORpvx5/7bfx4Vy/dTUSJ005QnSSMhDJFPqBRO6JtPGE5frQ+1VWtO/DFr9Rj6yx1WrSn4umpbPKVoBP9X98/AWVclasJy9ic8fqRPTwC02SHRzx4UikENRGSJ/LEiox6Dk=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iki.fi; spf=pass smtp.mailfrom=iki.fi; dkim=pass (2048-bit key) header.d=iki.fi header.i=@iki.fi header.b=bj/k046j; arc=pass smtp.client-ip=185.185.170.37
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iki.fi
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=iki.fi
-Received: from monolith.lan (unknown [193.138.7.198])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	(Authenticated sender: pav)
-	by lahtoruutu.iki.fi (Postfix) with ESMTPSA id 4YrPN93Xffz49QC9;
-	Sun,  9 Feb 2025 12:39:37 +0200 (EET)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=iki.fi; s=lahtoruutu;
-	t=1739097579;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=XIHlb2ApKngockyPdMNG31MC4jnN36aCmtwjnch4pHo=;
-	b=bj/k046jp96fgsmejo4YCbJlc5FthrP7pJzba9cddr6jFYbc17bw70llsiIrbdbknHD5hW
-	lo2MSFCQKKVD1ppXynxyh2tkL990yrwiNflrvdfhHn3gokeg88c4Y4VndEekkqSCwfGHIz
-	TQk3ZVEFJKir3FYHXSCBA5YSoZqqEI+tqwr0XP506SQ8Np/iNieP13lDw9wBrwYabdK7Wn
-	IyUQLsMLKGlEGejhF1VijeJmrrEDUNn5+Vmx2R0sSu8S/+6NzBP3wkYIlaCzX9u4vqI50s
-	go0hCBu7u2HDy2qZ20EbYgOEOLSez7PFvlMlXunFvHp6xWJb2UX7oh4B3TBlQA==
-ARC-Seal: i=1; s=lahtoruutu; d=iki.fi; t=1739097578; a=rsa-sha256;
-	cv=none;
-	b=T/rGog2zmcnvO/Ud/IKdQolrBkqqxj8LGDNpJ7dS25oz+AFaSfidN6hAv1AlUeIvXTbLIz
-	5yiZjtk5z856xJiuKp/bdl7tL7jIG5o3rRIV5EMJKXK9ng4ZRdfs8cjrg8GdIdyqS+tUEK
-	JkjS46aAjaQ01N241LpFErNHgk1/tRULMYAcwiymRBdN+mj9d80GfYmV4sWQ+HG9P7bMSv
-	jr1gWFMvFngu9h5jHrKF4g3kOHymr5r/V02RV+9RyFV2EBR1PwwkGS6PelQ/6CP7VkFiAq
-	P4wWBeZtnEfhhz06ErupR75IUn41rjByBdqMTiVWtvzVEGOu1He06yx4fZ8a5w==
-ARC-Authentication-Results: i=1;
-	ORIGINATING;
-	auth=pass smtp.auth=pav smtp.mailfrom=pav@iki.fi
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=iki.fi;
-	s=lahtoruutu; t=1739097578;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=XIHlb2ApKngockyPdMNG31MC4jnN36aCmtwjnch4pHo=;
-	b=gyCxm1rtXgkvgil/usJ5hBKXb04yosvg7xglCn7CZ0GCVFBlHL6gUq+GXro9khf6lmnHkX
-	QjgtW9fOOIdvg7pX21y6UiQs2f7C/hJ2X8npEwRRxQETs+7U1EPZgSqF2CxTorCWFlfukE
-	wPYchjPOyDScjMdANjo1BOFeiXK9AfnETj9JJ3eQN/kUjFCXG8V3u4BAXR87p1fI47xI4l
-	y/5s7mWVFSHZV9Hphu6U4c/78Wd5scIRaKzMpFmwnHW2QUt3ISYSVjl+I+2hBFpFzVn++7
-	QcIK3zBvaRI/C3o/MkJVyWPJo9sD/bxydJTPBiRT8E5Ym6iJXGccfpkp0J//Mw==
-From: Pauli Virtanen <pav@iki.fi>
-To: linux-bluetooth@vger.kernel.org
-Cc: Pauli Virtanen <pav@iki.fi>,
-	Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
-	netdev@vger.kernel.org,
-	davem@davemloft.net,
-	kuba@kernel.org,
-	willemdebruijn.kernel@gmail.com
-Subject: [PATCH v3 5/5] Bluetooth: SCO: add TX timestamping socket-level mechanism
-Date: Sun,  9 Feb 2025 12:39:17 +0200
-Message-ID: <5e5ed3e5fd972b1f1f191045a890e5e23b8a1276.1739097311.git.pav@iki.fi>
-X-Mailer: git-send-email 2.48.1
-In-Reply-To: <cover.1739097311.git.pav@iki.fi>
-References: <cover.1739097311.git.pav@iki.fi>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CB32624336A;
+	Sun,  9 Feb 2025 11:03:50 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1739099030; cv=none; b=K9/Ku6IPfczklJCgXDEwvPCyFfImQPsW692vY/ImJI23nceOcW+COP862mpMU7uz1NvO28G0iJITYcAwRt0goyiRWdN+OEmhOuHMqbzZj526S0yBS+Zw8xg8WO7E0TvJ2/sRT3ZPcraoyI0nVjnrDFRWQT5w3LuLBHG8oVfhWIs=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1739099030; c=relaxed/simple;
+	bh=oz60or5wEgOb6d5kH7bybDsl98IrVud/6z5jFUnuKls=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=kqPMBt/HgXmy0SoGWfFHIkRLwhXqzOr4GFP3Zdr+PrsH2zUuxus6YobAIxEkjr0nNZIFaCwVBue9Fm3TPc/AwYO8wELTKzng8yt2SAABxrw+97ilznOe2mdl5DcLqAD/ifPkjMvmW4U9cWLGO5euzW/oPLbFqdlHoGzPBnOkmBE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=gytcrkJ6; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 69B1CC4CEDD;
+	Sun,  9 Feb 2025 11:03:46 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1739099030;
+	bh=oz60or5wEgOb6d5kH7bybDsl98IrVud/6z5jFUnuKls=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=gytcrkJ6Z1E/G+YNuNMhXFJBib42JqkrK+yhrggW2h+m+LPKbzXArP0J74xLu1Wtx
+	 78XuGzSe9EREjLXrqwt96GjVwMdOhe9xNFxeaDg19HQ9MXXRR9OoJdY1jPTYJJbgFq
+	 tY/f0/rSXtrZl9E/Ck2fooHhlIGzOFof3zbzHvPQrbqHWtvUuT8WG5UhGtzxf/FdSn
+	 r3rTGnWff5j+30c/jsUCyLluHlbsgoZBPdr4u8qjAbzurXbANc1D/VTYSeQCA7ZVVT
+	 P/UylASA6Sw29TetKBHAjlBSrY+Nl2tzvWmJU9pPK+qGqaBvI3JAr4rqKHGyO+QnwJ
+	 lEtN0/aqqJnrg==
+Date: Sun, 9 Feb 2025 11:03:44 +0000
+From: Simon Horman <horms@kernel.org>
+To: Alexander Lobakin <aleksander.lobakin@intel.com>
+Cc: Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Alexei Starovoitov <ast@kernel.org>,
+	Daniel Borkmann <daniel@iogearbox.net>,
+	John Fastabend <john.fastabend@gmail.com>,
+	Andrii Nakryiko <andrii@kernel.org>,
+	"Jose E. Marchesi" <jose.marchesi@oracle.com>,
+	Toke =?utf-8?Q?H=C3=B8iland-J=C3=B8rgensen?= <toke@redhat.com>,
+	Magnus Karlsson <magnus.karlsson@intel.com>,
+	Maciej Fijalkowski <maciej.fijalkowski@intel.com>,
+	Przemek Kitszel <przemyslaw.kitszel@intel.com>,
+	Jason Baron <jbaron@akamai.com>,
+	Casey Schaufler <casey@schaufler-ca.com>,
+	Nathan Chancellor <nathan@kernel.org>, bpf@vger.kernel.org,
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH net-next 4/4] xsk: add helper to get &xdp_desc's DMA and
+ meta pointer in one go
+Message-ID: <20250209110344.GA554665@kernel.org>
+References: <20250206182630.3914318-1-aleksander.lobakin@intel.com>
+ <20250206182630.3914318-5-aleksander.lobakin@intel.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250206182630.3914318-5-aleksander.lobakin@intel.com>
 
-Support TX timestamping in SCO sockets.
+On Thu, Feb 06, 2025 at 07:26:29PM +0100, Alexander Lobakin wrote:
+> Currently, when your driver supports XSk Tx metadata and you want to
+> send an XSk frame, you need to do the following:
+> 
+> * call external xsk_buff_raw_get_dma();
+> * call inline xsk_buff_get_metadata(), which calls external
+>   xsk_buff_raw_get_data() and then do some inline checks.
+> 
+> This effectively means that the following piece:
+> 
+> addr = pool->unaligned ? xp_unaligned_add_offset_to_addr(addr) : addr;
+> 
+> is done twice per frame, plus you have 2 external calls per frame, plus
+> this:
+> 
+> 	meta = pool->addrs + addr - pool->tx_metadata_len;
+> 	if (unlikely(!xsk_buff_valid_tx_metadata(meta)))
+> 
+> is always inlined, even if there's no meta or it's invalid.
+> 
+> Add xsk_buff_raw_get_ctx() (xp_raw_get_ctx() to be precise) to do that
+> in one go. It returns a small structure with 2 fields: DMA address,
+> filled unconditionally, and metadata pointer, non-NULL only if it's
+> present and valid. The address correction is performed only once and
+> you also have only 1 external call per XSk frame, which does all the
+> calculations and checks outside of your hotpath. You only need to
+> check `if (ctx.meta)` for the metadata presence.
+> To not copy any existing code, derive address correction and getting
+> virtual and DMA address into small helpers. bloat-o-meter reports no
+> object code changes for the existing functionality.
+> 
+> Signed-off-by: Alexander Lobakin <aleksander.lobakin@intel.com>
 
-Support MSG_ERRQUEUE in SCO recvmsg.
+Hi Alexander,
 
-Signed-off-by: Pauli Virtanen <pav@iki.fi>
----
- net/bluetooth/sco.c | 19 +++++++++++++++++--
- 1 file changed, 17 insertions(+), 2 deletions(-)
+I think that this patch needs to be accompanied by at least one
+patch that uses xsk_buff_raw_get_ctx() in a driver.
 
-diff --git a/net/bluetooth/sco.c b/net/bluetooth/sco.c
-index aa7bfe26cb40..f39c57ac594f 100644
---- a/net/bluetooth/sco.c
-+++ b/net/bluetooth/sco.c
-@@ -370,7 +370,8 @@ static int sco_connect(struct sock *sk)
- 	return err;
- }
- 
--static int sco_send_frame(struct sock *sk, struct sk_buff *skb)
-+static int sco_send_frame(struct sock *sk, struct sk_buff *skb,
-+			  const struct sockcm_cookie *sockc)
- {
- 	struct sco_conn *conn = sco_pi(sk)->conn;
- 	int len = skb->len;
-@@ -381,6 +382,7 @@ static int sco_send_frame(struct sock *sk, struct sk_buff *skb)
- 
- 	BT_DBG("sk %p len %d", sk, len);
- 
-+	hci_setup_tx_timestamp(skb, 1, sockc);
- 	hci_send_sco(conn->hcon, skb);
- 
- 	return len;
-@@ -776,6 +778,7 @@ static int sco_sock_sendmsg(struct socket *sock, struct msghdr *msg,
- {
- 	struct sock *sk = sock->sk;
- 	struct sk_buff *skb;
-+	struct sockcm_cookie sockc;
- 	int err;
- 
- 	BT_DBG("sock %p, sk %p", sock, sk);
-@@ -787,6 +790,14 @@ static int sco_sock_sendmsg(struct socket *sock, struct msghdr *msg,
- 	if (msg->msg_flags & MSG_OOB)
- 		return -EOPNOTSUPP;
- 
-+	sockcm_init(&sockc, sk);
-+
-+	if (msg->msg_controllen) {
-+		err = sock_cmsg_send(sk, msg, &sockc);
-+		if (err)
-+			return err;
-+	}
-+
- 	skb = bt_skb_sendmsg(sk, msg, len, len, 0, 0);
- 	if (IS_ERR(skb))
- 		return PTR_ERR(skb);
-@@ -794,7 +805,7 @@ static int sco_sock_sendmsg(struct socket *sock, struct msghdr *msg,
- 	lock_sock(sk);
- 
- 	if (sk->sk_state == BT_CONNECTED)
--		err = sco_send_frame(sk, skb);
-+		err = sco_send_frame(sk, skb, &sockc);
- 	else
- 		err = -ENOTCONN;
- 
-@@ -860,6 +871,10 @@ static int sco_sock_recvmsg(struct socket *sock, struct msghdr *msg,
- 	struct sock *sk = sock->sk;
- 	struct sco_pinfo *pi = sco_pi(sk);
- 
-+	if (unlikely(flags & MSG_ERRQUEUE))
-+		return sock_recv_errqueue(sk, msg, len, SOL_BLUETOOTH,
-+					  BT_SCM_ERROR);
-+
- 	lock_sock(sk);
- 
- 	if (sk->sk_state == BT_CONNECT2 &&
--- 
-2.48.1
+Also, as this seems to be an optimisation, some performance data would
+be nice too.
 
+Which brings me to my last point. I'd always understood that
+returning a struct was discouraged due to performance implications.
+Perhaps that information is out of date, doesn't apply because
+the returned struct is so small in this case, or just plain wrong.
+But I'd appreciate it if you could add some colour to this.
 
