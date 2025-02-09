@@ -1,94 +1,176 @@
-Return-Path: <netdev+bounces-164444-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-164436-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 430D2A2DD25
-	for <lists+netdev@lfdr.de>; Sun,  9 Feb 2025 12:46:24 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id A6FC1A2DCEC
+	for <lists+netdev@lfdr.de>; Sun,  9 Feb 2025 12:14:07 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 36F8D3A6437
-	for <lists+netdev@lfdr.de>; Sun,  9 Feb 2025 11:46:15 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 893183A3103
+	for <lists+netdev@lfdr.de>; Sun,  9 Feb 2025 11:13:08 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 43001199223;
-	Sun,  9 Feb 2025 11:46:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2A8B31BEF90;
+	Sun,  9 Feb 2025 11:11:00 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=birger-koblitz.de header.i=@birger-koblitz.de header.b="lS9RmhUB"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="hr9dowNV"
 X-Original-To: netdev@vger.kernel.org
-Received: from wp175.webpack.hosteurope.de (wp175.webpack.hosteurope.de [80.237.132.182])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ej1-f51.google.com (mail-ej1-f51.google.com [209.85.218.51])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 441156F06A
-	for <netdev@vger.kernel.org>; Sun,  9 Feb 2025 11:46:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=80.237.132.182
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 38D6C190072;
+	Sun,  9 Feb 2025 11:10:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.51
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1739101580; cv=none; b=odLb42c7cM3UA/IIHFLp6b5+Xlq473J4VDDizNHWp6YGPTU70x43qu5jxuz2IMXZ44Fq/bUgidUvOLkoY2+0UJ+LosrM4DeHJyZSkGvAmXEeoBIBePlWgCg18EuZK+c5DKip0biR8wEdQ38FAFLaQcDqTwqqd/5zqOuuJEbJuAc=
+	t=1739099460; cv=none; b=WimoBYdqNkNiC16Irhq27ow/9XJ4ab7XnPX2XY54BEXmYxvrnV1ccWVnGy82N692QqY85iAeQu+m56CodMVIsuf2I0T56lIV6EEmaMTcL0EcXud8OmkzOBC8yX+Sq2YfFVOEQvvbyyns9K6LJsSYScd8M28Yet0ehkI0NCNn128=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1739101580; c=relaxed/simple;
-	bh=2YQ0Z9VJRJAuDcCknQnD0bYtE2SEQba1+QDHYWf9uFA=;
-	h=Message-ID:Date:MIME-Version:Subject:From:Cc:To:Content-Type; b=lz9pZKo1ZGlCgYga6v9b75cv2sO6gmoSo4K3yLGAaawaXf8dgi5vL19ZGR5bqHKzO9YXclg4m3Gyj0EXftdyXgqUCiIXRtQCKcwWnv8XjTtYS2SwxaacnIfQqGI4xoT0QAkcAhyCRBKZooxSr4idtYf0OFeojBbVRh+TB2CS20A=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=birger-koblitz.de; spf=pass smtp.mailfrom=birger-koblitz.de; dkim=pass (2048-bit key) header.d=birger-koblitz.de header.i=@birger-koblitz.de header.b=lS9RmhUB; arc=none smtp.client-ip=80.237.132.182
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=birger-koblitz.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=birger-koblitz.de
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=birger-koblitz.de; s=he134867; h=Content-Transfer-Encoding:Content-Type:To:
-	Cc:From:Subject:MIME-Version:Date:Message-ID:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:In-Reply-To:References;
-	bh=bQsJzyreAf1xYtSS4iP8u6nedAT9p660D2bLSRPz32U=; t=1739101578; x=1739533578; 
-	b=lS9RmhUBhDRJUpogqpyInlM3rMDm6scV6f5Uolf64xOS8so+2b+MnjbyCjI6aoqX2Vj1adCOi55
-	hQ9Xy6uPJOaUfBthWFbIeE0a/DtPYEWlYOaFmGF8qNSMWir0LpfSc4NH1Pi/xx6w1DrnSYT8Y/zSA
-	O3opawZxHHTsOb2o+Jn/m0yks/OJiupDDiw69Qadsxuyc8VgGDP23OxUdDmN6b/98kgH2kUJFRIHX
-	DDwKNqkGJovYCKHsWajspWC/F+5z150pjLF35jwFMEVF5YEUxCRhRw7CqN61rZ42HZl2gS9R91Wl9
-	dJfvAmHXzt2VXKDewYTJdYM4Wpq/RG6q2QuA==;
-Received: from [2a00:6020:47a3:e800:73c:e5f5:d827:2240]; authenticated
-	by wp175.webpack.hosteurope.de running ExIM with esmtpsa (TLS1.3:ECDHE_X25519__RSA_PSS_RSAE_SHA256__AES_128_GCM:128)
-	id 1th54i-00BBP6-05;
-	Sun, 09 Feb 2025 12:02:08 +0100
-Message-ID: <96223803-95a8-4879-8a26-bc13b66a6e6b@birger-koblitz.de>
-Date: Sun, 9 Feb 2025 12:01:55 +0100
+	s=arc-20240116; t=1739099460; c=relaxed/simple;
+	bh=AihhYJGwJTJyObdFZSI/rxytC55wEnFe8EzDy7l8A+0=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=JfUDjW2zseL6cYnz1w4NRGMaombXGPbXEeECpWG3PCBU0msAaOqPj+UOK3r89p2SeMvtTLpuLTjFuQYMYqoovoUp+AF3zsD6D9RNDnInhz1VeHq3CC5yzhP3bXxr6gtk4aPB0wamOEEHpmLLTAMvEg6KW+GpqoGbX5mrzCfZ0TE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=hr9dowNV; arc=none smtp.client-ip=209.85.218.51
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-ej1-f51.google.com with SMTP id a640c23a62f3a-ab7430e27b2so674062066b.3;
+        Sun, 09 Feb 2025 03:10:57 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1739099456; x=1739704256; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=6/OfFtkDCpNUsNNnB4udxCcQxzWSEZIHYYoj3YjYWKw=;
+        b=hr9dowNVVBtsGmJcMrMcY4x0vt8/cFhaUshgKeq+Aa4LRENbxMY1wGoYEEysdgNRF0
+         TLTSuZLujdUOOEmLv6E4qLBjbIjayBIsEDf8Wi1TdGqI4D4OY8gcr2bM+LiwlY7ayeKB
+         StLB0+nua/r8mXm5X1XcESWro8rGQf3UZWEEyJ7Io5bNoAY5NqKRSkZMRwanGOzNkbjl
+         9rESffqCNarc6leBEaszGFXmEB19OGEASeneIYbhiQpP59+m8IsSr03JuGGSqW6n7UQy
+         0D9koYxYGlLyBuS95yWpmxwL4DTPvvt85xBgndi2z9u9jyUHjdtCqaJ1DjbCT8ord5Ti
+         0BjQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1739099456; x=1739704256;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=6/OfFtkDCpNUsNNnB4udxCcQxzWSEZIHYYoj3YjYWKw=;
+        b=QdvfFv89f/2Tzv4nR3myJhwQ10sboS/vgkHXYKQ5XBV6jwImg6PAIgmW+O51+kUEzQ
+         ORsYkhatYgJrHGJDnY0lME0JucY2i09DFvi9CY498PDHCfhLwZtBF8rbFUxjHJxsWpRL
+         Mnw6MAeY8DMEj/Ir+zCzdCiJALFK1ma8NsyPEWj9igci1mHRM7SmD7UL/xN5KhhbXgHM
+         XWbSD+GezB2VO8HB64IahrgoTdM64JkYMTqx/L7BwER/VSw0g23jQ97xWZZCMbcb/R1v
+         nFncvJxaDcDotawRfXF0Bt2mmP9xkgtKeCT+xz/Sb+20whtF24qBh6jEpFCCW5ocfB/I
+         nF4Q==
+X-Forwarded-Encrypted: i=1; AJvYcCWMlvdcSKJBD3YiSDhdTD4GzXXPRNygM/cuoZux+fjLDv/H8pYA5AUg+XbDll0juAH4plE82+sxSWE/Rz0=@vger.kernel.org, AJvYcCXCHkVACvWht4bNmkPh2jJmFcyiiaqV93CxpUW+xv+GPrx8BHvDv5RT2wtfl8myQhsDeKeLko3NPy1gsCQ6HX+Z@vger.kernel.org
+X-Gm-Message-State: AOJu0YyzxrubCpYAyqD7x6jlJeTMh2TuTjcLh8gCg/joweyxtmPk2Gah
+	V+KGIGZglPf/zCvYakZJ71ibdQVTZ2vBf+ePe2zYi2eLOmlxK1l8
+X-Gm-Gg: ASbGncur80fvNO6KFA11CD62ZuB4AZ25qjEM2kOpsLJr2Okfk7CT95Pv30Auyqh+1ZW
+	5A7HT4iH3OH1soYR6VesJKmIdgKWG033LXQdTfE7epTye4BWfb7zsPxASZFryfSSaxJFqFOe5NF
+	ADb5uPAzccpHSo3NpAgCJ/Ttq3VriZXZQysRpiu1OK4tINnjM+XNtaoGhC0jmrRZ8Z9zjwvQV7r
+	L0HAEn76SFuWmXrjr2pUixuhi7gG0db2cecIBjio537UYjpO3XGWu50/aJbr6wCanpKeTC//PhF
+	2FIfMP2jAJ56Exh2W2aVTgodFpyzPHIxT2DlHj94f6i45/P3F4J/3kFg7CY5wrRPx5hyXmJnTyN
+	q8qPQ9DFdaWtNXOrLAXLsNJBldYWail6M
+X-Google-Smtp-Source: AGHT+IF7fuTwyISchVVytHDMJeeoIfh3ZpQJUt8rRdvlwIphExmlssHSJ85LTIMEOJAJqtrSBebVEg==
+X-Received: by 2002:a17:906:31cf:b0:ab7:8fcd:1f1b with SMTP id a640c23a62f3a-ab78fcd2196mr966938266b.7.1739099456462;
+        Sun, 09 Feb 2025 03:10:56 -0800 (PST)
+Received: from corebook.localdomain (2001-1c00-020d-1300-1b1c-4449-176a-89ea.cable.dynamic.v6.ziggo.nl. [2001:1c00:20d:1300:1b1c:4449:176a:89ea])
+        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-ab79afc7452sm357516366b.163.2025.02.09.03.10.54
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sun, 09 Feb 2025 03:10:56 -0800 (PST)
+From: Eric Woudstra <ericwouds@gmail.com>
+To: "David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Simon Horman <horms@kernel.org>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	Pablo Neira Ayuso <pablo@netfilter.org>,
+	Jozsef Kadlecsik <kadlec@netfilter.org>,
+	Jiri Pirko <jiri@resnulli.us>,
+	Ivan Vecera <ivecera@redhat.com>,
+	Roopa Prabhu <roopa@nvidia.com>,
+	Nikolay Aleksandrov <razor@blackwall.org>,
+	Matthias Brugger <matthias.bgg@gmail.com>,
+	AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>,
+	Kuniyuki Iwashima <kuniyu@amazon.com>,
+	Sebastian Andrzej Siewior <bigeasy@linutronix.de>,
+	Lorenzo Bianconi <lorenzo@kernel.org>,
+	Joe Damato <jdamato@fastly.com>,
+	Alexander Lobakin <aleksander.lobakin@intel.com>,
+	Vladimir Oltean <olteanv@gmail.com>,
+	"Frank Wunderlich" <frank-w@public-files.de>,
+	Daniel Golle <daniel@makrotopia.org>
+Cc: netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	netfilter-devel@vger.kernel.org,
+	coreteam@netfilter.org,
+	bridge@lists.linux.dev,
+	linux-arm-kernel@lists.infradead.org,
+	linux-mediatek@lists.infradead.org,
+	Eric Woudstra <ericwouds@gmail.com>
+Subject: [PATCH v6 net-next 08/14] netfilter: nf_flow_table_inet: Add nf_flowtable_type flowtable_bridge
+Date: Sun,  9 Feb 2025 12:10:28 +0100
+Message-ID: <20250209111034.241571-9-ericwouds@gmail.com>
+X-Mailer: git-send-email 2.47.1
+In-Reply-To: <20250209111034.241571-1-ericwouds@gmail.com>
+References: <20250209111034.241571-1-ericwouds@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: [PATCH net-next] net: sfp: add quirk for 2.5G OEM BX SFP
-Content-Language: en-US
-From: Birger Koblitz <mail@birger-koblitz.de>
-Cc: Daniel Golle <daniel@makrotopia.org>, Jakub Kicinski <kuba@kernel.org>
-To: netdev@vger.kernel.org
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-bounce-key: webpack.hosteurope.de;mail@birger-koblitz.de;1739101578;a067bad3;
-X-HE-SMSGID: 1th54i-00BBP6-05
+Content-Transfer-Encoding: 8bit
 
-The OEM SFP-2.5G-BX10-D/U SFP module pair is meant to operate with
-2500Base-X. However, in their EEPROM they incorrectly specify:
-Transceiver codes   : 0x00 0x12 0x00 0x00 0x12 0x00 0x01 0x05 0x00
-BR, Nominal         : 2500MBd
+This will allow a flowtable to be added to the nft bridge family.
 
-Use sfp_quirk_2500basex for this module to allow 2500Base-X mode anyway.
-Run-tested on BananaPi R3.
-
-Signed-off-by: Birger Koblitz <mail@birger-koblitz.de>
+Reviewed-by: Nikolay Aleksandrov <razor@blackwall.org>
+Signed-off-by: Eric Woudstra <ericwouds@gmail.com>
 ---
-  drivers/net/phy/sfp.c | 2 ++
-  1 file changed, 2 insertions(+)
+ net/netfilter/nf_flow_table_inet.c | 13 +++++++++++++
+ 1 file changed, 13 insertions(+)
 
-diff --git a/drivers/net/phy/sfp.c b/drivers/net/phy/sfp.c
-index 7dbcbf0a4ee2..9369f5297769 100644
---- a/drivers/net/phy/sfp.c
-+++ b/drivers/net/phy/sfp.c
-@@ -515,6 +515,8 @@ static const struct sfp_quirk sfp_quirks[] = {
-   	SFP_QUIRK_F("OEM", "SFP-10G-T", sfp_fixup_rollball_cc),
-  	SFP_QUIRK_M("OEM", "SFP-2.5G-T", sfp_quirk_oem_2_5g),
-+	SFP_QUIRK_M("OEM", "SFP-2.5G-BX10-D", sfp_quirk_2500basex),
-+	SFP_QUIRK_M("OEM", "SFP-2.5G-BX10-U", sfp_quirk_2500basex),
-  	SFP_QUIRK_F("OEM", "RTSFP-10", sfp_fixup_rollball_cc),
-  	SFP_QUIRK_F("OEM", "RTSFP-10G", sfp_fixup_rollball_cc),
-  	SFP_QUIRK_F("Turris", "RTSFP-2.5G", sfp_fixup_rollball),
+diff --git a/net/netfilter/nf_flow_table_inet.c b/net/netfilter/nf_flow_table_inet.c
+index b0f199171932..80b238196f29 100644
+--- a/net/netfilter/nf_flow_table_inet.c
++++ b/net/netfilter/nf_flow_table_inet.c
+@@ -65,6 +65,16 @@ static int nf_flow_rule_route_inet(struct net *net,
+ 	return err;
+ }
+ 
++static struct nf_flowtable_type flowtable_bridge = {
++	.family		= NFPROTO_BRIDGE,
++	.init		= nf_flow_table_init,
++	.setup		= nf_flow_table_offload_setup,
++	.action		= nf_flow_rule_bridge,
++	.free		= nf_flow_table_free,
++	.hook		= nf_flow_offload_inet_hook,
++	.owner		= THIS_MODULE,
++};
++
+ static struct nf_flowtable_type flowtable_inet = {
+ 	.family		= NFPROTO_INET,
+ 	.init		= nf_flow_table_init,
+@@ -97,6 +107,7 @@ static struct nf_flowtable_type flowtable_ipv6 = {
+ 
+ static int __init nf_flow_inet_module_init(void)
+ {
++	nft_register_flowtable_type(&flowtable_bridge);
+ 	nft_register_flowtable_type(&flowtable_ipv4);
+ 	nft_register_flowtable_type(&flowtable_ipv6);
+ 	nft_register_flowtable_type(&flowtable_inet);
+@@ -109,6 +120,7 @@ static void __exit nf_flow_inet_module_exit(void)
+ 	nft_unregister_flowtable_type(&flowtable_inet);
+ 	nft_unregister_flowtable_type(&flowtable_ipv6);
+ 	nft_unregister_flowtable_type(&flowtable_ipv4);
++	nft_unregister_flowtable_type(&flowtable_bridge);
+ }
+ 
+ module_init(nf_flow_inet_module_init);
+@@ -118,5 +130,6 @@ MODULE_LICENSE("GPL");
+ MODULE_AUTHOR("Pablo Neira Ayuso <pablo@netfilter.org>");
+ MODULE_ALIAS_NF_FLOWTABLE(AF_INET);
+ MODULE_ALIAS_NF_FLOWTABLE(AF_INET6);
++MODULE_ALIAS_NF_FLOWTABLE(AF_BRIDGE);
+ MODULE_ALIAS_NF_FLOWTABLE(1); /* NFPROTO_INET */
+ MODULE_DESCRIPTION("Netfilter flow table mixed IPv4/IPv6 module");
 -- 
-2.39.5
+2.47.1
+
 
