@@ -1,247 +1,391 @@
-Return-Path: <netdev+bounces-164396-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-164397-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9F0AAA2DBAE
-	for <lists+netdev@lfdr.de>; Sun,  9 Feb 2025 09:37:17 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 567E9A2DBB0
+	for <lists+netdev@lfdr.de>; Sun,  9 Feb 2025 09:41:47 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 8ABBD3A56EF
-	for <lists+netdev@lfdr.de>; Sun,  9 Feb 2025 08:37:08 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 2C83A3A546A
+	for <lists+netdev@lfdr.de>; Sun,  9 Feb 2025 08:41:38 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4F75286331;
-	Sun,  9 Feb 2025 08:37:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A30DC13B2BB;
+	Sun,  9 Feb 2025 08:41:43 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=ti.com header.i=@ti.com header.b="IK4fvz9s"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="R/I/4eR2"
 X-Original-To: netdev@vger.kernel.org
-Received: from fllvem-ot04.ext.ti.com (fllvem-ot04.ext.ti.com [198.47.19.246])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wm1-f50.google.com (mail-wm1-f50.google.com [209.85.128.50])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 18E08E57D;
-	Sun,  9 Feb 2025 08:37:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.47.19.246
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 82A8CE57D;
+	Sun,  9 Feb 2025 08:41:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.50
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1739090234; cv=none; b=ibLUXVpDhuCB7rSWcCzniogNnTQz0nQa9FOtAO5kFzC3YfhfZgmoe8qqWKGbIo7UWiVIU3Wd1et3+Xmf+R2/hy6VuR1UPqCakCLNUii0EDFBJIGmKiyocM9b6LqEy7mE1rnBiyODNoTa8Uf917ExlAY25eBDKu3fU3NtDC0ACy8=
+	t=1739090503; cv=none; b=UnNHSXNhFPmE2rwzQGNBNUsv/wMrI+eBqIYE/0+2DSeyrEcg/zfkg6xyvOdm7MUtvFncFl1VmB6RKAj6tWkEScyLCPrg2szsMs1HRtI7Xb+SsRGa/NAPKkshKDuhlcRYoAgUahdmay4vckNWtI6ooAf3uHufdA8+fLPb6gbild0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1739090234; c=relaxed/simple;
-	bh=PR6ksHgpbyrT0ZsFiZTNIUU6+rlzpFCfFx+9GafRar4=;
-	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
-	 In-Reply-To:Content-Type; b=fl1BqVGJXhpo61bqFgo2HHLYaQP364Z9rQPD5mz5IlAduAfC9Im4kNmxXyyqXbp9XN907cMvKfOmBwgAuK4s1d/o/DNbW/e5tAUqPddHbIXVMF4YYO9PCjF2voiQqioCwnI/1JOPc2Z51t0a0E2kFRkbtCgsKmTYoaIpQoeQNhg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=ti.com; spf=pass smtp.mailfrom=ti.com; dkim=pass (1024-bit key) header.d=ti.com header.i=@ti.com header.b=IK4fvz9s; arc=none smtp.client-ip=198.47.19.246
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=ti.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ti.com
-Received: from fllv0034.itg.ti.com ([10.64.40.246])
-	by fllvem-ot04.ext.ti.com (8.15.2/8.15.2) with ESMTPS id 5198akxq3213675
-	(version=TLSv1.2 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Sun, 9 Feb 2025 02:36:46 -0600
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ti.com;
-	s=ti-com-17Q1; t=1739090206;
-	bh=Mn4lMnvvmy1BglkQz0uTKuPE+nzuikcohuPbAhGDdcw=;
-	h=Date:Subject:To:CC:References:From:In-Reply-To;
-	b=IK4fvz9sfhV+pee1ke+c5o4VMqMxQjaTGUcwKUQr5oOh3hl1B1SvIbF8aYWnHcTi2
-	 6rhalYOmPe+1JqY+EDOySVmArJtx6urJJSMat/OZm/bPsEBNHSliZxAlVUwPV93s5Z
-	 hlfCEb11F96Gj6Ukpex4MAA+pOUSHcX9IOzh+70w=
-Received: from DLEE107.ent.ti.com (dlee107.ent.ti.com [157.170.170.37])
-	by fllv0034.itg.ti.com (8.15.2/8.15.2) with ESMTPS id 5198akLn092987
-	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=FAIL);
-	Sun, 9 Feb 2025 02:36:46 -0600
-Received: from DLEE108.ent.ti.com (157.170.170.38) by DLEE107.ent.ti.com
- (157.170.170.37) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.2507.23; Sun, 9
- Feb 2025 02:36:46 -0600
-Received: from lelvsmtp6.itg.ti.com (10.180.75.249) by DLEE108.ent.ti.com
- (157.170.170.38) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.2507.23 via
- Frontend Transport; Sun, 9 Feb 2025 02:36:46 -0600
-Received: from [10.249.135.49] ([10.249.135.49])
-	by lelvsmtp6.itg.ti.com (8.15.2/8.15.2) with ESMTP id 5198afGR112742;
-	Sun, 9 Feb 2025 02:36:42 -0600
-Message-ID: <09880b14-cef1-44cd-9fa4-8840fb673c0a@ti.com>
-Date: Sun, 9 Feb 2025 14:06:40 +0530
+	s=arc-20240116; t=1739090503; c=relaxed/simple;
+	bh=tXUwqLqqUyTXibDQaq/walXGMdy4ze3NTGYNkG0Ei1w=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=udzO+Tco68vUpomAa5tDaUq60lwe+r3vQCJFyMFGov05XRdjP+mZpTmjti2s7CCvTdTHfF1Vfxlhcn41JH51KB7UZlANkKyGWBOY80Z0EBoXN1tllMYkPCNRMnWnUuOiIyBAOtxQd0jzKRMLEf5PS5+1FpZDfQrV6YSvF27R8Eg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=R/I/4eR2; arc=none smtp.client-ip=209.85.128.50
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-wm1-f50.google.com with SMTP id 5b1f17b1804b1-4368a293339so37777935e9.3;
+        Sun, 09 Feb 2025 00:41:41 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1739090500; x=1739695300; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=5o8Ivwyd3rWhyoUQ97eMQIxP5xs7MHZGBFAWM3XnHuA=;
+        b=R/I/4eR2+IbT7N5m9m9B3JIXcVx5/I9JHZ+lGjeyNbqCo3YD878kdjmW5czgSCLRH+
+         IfIlNdburMx+DTTuVFE1WjpKKzLls/Qt+kmU3AYhct9xWsHQNCBxpRuu1ZHtSLOD0Zjg
+         SKErIURq0tEx6ZowOOefW3MjNfDuldsBNxE6zGrRnKmZPuLK9OMrtg1iLeEqYIE/Bm7F
+         hrLyxtjQ+6YkCWet26bVzhPYVJOMw3KGYw8wtQfzHQcu49nxWeT5nrrmeSe57rv4b+XW
+         6cRwmvcQq2Q9c59YoOkWFx1Ff/0LNUoxFPKzAxJqrDmbJsOIl5zfSJeK31qMxNkGrRth
+         sp8w==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1739090500; x=1739695300;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=5o8Ivwyd3rWhyoUQ97eMQIxP5xs7MHZGBFAWM3XnHuA=;
+        b=XgEBgj5aL/oroek/2KUHKvJP5xOr32X7/QEXiZfzNKwA15RLwokBtTupyoY4rGa1qy
+         DsXzwkMFKMndxnEBdXhPwMgsLCbofqPDKkm3Q2ENWiyR2T+axkyfw6aBsZFdqNtE+0Nm
+         J+LadDiZVFKXouitTyIXQDTN8l9eWHmGizgvce0IKqSM3m7TXsZsNCoNqImnqxwJZlIu
+         IvPHtxX8cIr9EhZacjugOaL5eUaNNmpmX9AQ4ZHmeYnZHF4+ZZ65jGNntlCkSsmYFt8I
+         5msTflmn/QXVo07IDoAfWtGyL8NOLo1rESXFT0+2fNDybiNajX1YzkJshxjnLKVl8QfV
+         SRAw==
+X-Forwarded-Encrypted: i=1; AJvYcCU688eZAIM8iTa/QypaA73b0wFVIcGFMOJi0xQ7Mx8EXVFzp17xYAUMoTGqD38oUt3aPvq6s6TZlRBTnas=@vger.kernel.org, AJvYcCWqnuwGfJBeiDCnz55yY+P3S0rIrQ96ksMs6GfkbBM8DpgoXm+ccq/NYHFKdWw37Vmpi66hnML7@vger.kernel.org
+X-Gm-Message-State: AOJu0YyfjVvkAV5m1jEcKVC+svjS6my+Wrunl9FkaoX5hWlLfSbupt2F
+	ilPeB6NFC72sygvXd0/HuhK8l3DaT6AMzlaXCtb7vjwC/UpnW3A3
+X-Gm-Gg: ASbGncuDiIaz4P3TqKqY+NLO3YXPB0ALXMsW8WwLqjqWRIMicyfJNzcD0LELpqPOxra
+	9TR/aVFc5kg3wmsYDVRtJGkaRwhdTj1TJBkCX/y6vr69fcTBAthrKSfKwvGJc5EuCw3fDcEQiwm
+	xdA5k+FLT25ROjfDIrCLRkuTWU+WApZo3wLP9K77eIuzKBbixFciiX+xjC1SvrBpGNCHFJ8yaBm
+	bap76Ztlt8GgpqDpJ0omqo5ttq41HiT+cG+zj70jOH5q+WrmDJraBtBh9AmQzvPdfLz9wO/wn59
+	w9ZDhvTGfGSW
+X-Google-Smtp-Source: AGHT+IEEs5J2wSi7OGmpoScKtnhOcCtPgCH6AjOxebBkBNhz5UJlzwMJSpXZBMzGeXPDgjQfYJlcZQ==
+X-Received: by 2002:a05:600c:4f82:b0:434:f9e1:5cf8 with SMTP id 5b1f17b1804b1-439249d1962mr75644615e9.31.1739090499492;
+        Sun, 09 Feb 2025 00:41:39 -0800 (PST)
+Received: from debian ([2a00:79c0:650:f000:45fb:7d1a:5e4d:9727])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-4391dc9ffcdsm105705885e9.15.2025.02.09.00.41.37
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sun, 09 Feb 2025 00:41:38 -0800 (PST)
+Date: Sun, 9 Feb 2025 09:41:35 +0100
+From: Dimitri Fedrau <dima.fedrau@gmail.com>
+To: Stefan Eichenberger <eichest@gmail.com>
+Cc: Andrew Lunn <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>,
+	Russell King <linux@armlinux.org.uk>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Niklas =?utf-8?Q?S=C3=B6derlund?= <niklas.soderlund+renesas@ragnatech.se>,
+	Gregor Herburger <gregor.herburger@ew.tq-group.com>,
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH net-next v2] net: phy: marvell-88q2xxx: Add support for
+ PHY LEDs on 88q2xxx
+Message-ID: <20250209084135.GA3453@debian>
+References: <20250207-marvell-88q2xxx-leds-v2-1-d0034e79e19d@gmail.com>
+ <Z6eJ6qPs7ORuOrbt@eichest-laptop>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [RFC PATCH 1/2] irqchip: ti-tsir: Add support for Timesync
- Interrupt Router
-To: Thomas Gleixner <tglx@linutronix.de>, Jason Reeder <jreeder@ti.com>,
-        <vigneshr@ti.com>, <nm@ti.com>, Paolo Abeni <pabeni@redhat.com>,
-        "Jakub
- Kicinski" <kuba@kernel.org>,
-        Eric Dumazet <edumazet@google.com>,
-        "David S.
- Miller" <davem@davemloft.net>,
-        Andrew Lunn <andrew+netdev@lunn.ch>
-CC: <netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>, <srk@ti.com>,
-        <s-vadapalli@ti.com>, <danishanwar@ti.com>, <m-malladi@ti.com>
-References: <20250205160119.136639-1-c-vankar@ti.com>
- <20250205160119.136639-2-c-vankar@ti.com> <87lduin4o5.ffs@tglx>
-Content-Language: en-US
-From: "Vankar, Chintan" <c-vankar@ti.com>
-In-Reply-To: <87lduin4o5.ffs@tglx>
-Content-Type: text/plain; charset="UTF-8"; format=flowed
-Content-Transfer-Encoding: 7bit
-X-C2ProcessedOrg: 333ef613-75bf-4e12-a4b1-8e3623f5dcea
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <Z6eJ6qPs7ORuOrbt@eichest-laptop>
 
-Hello Thomas,
+Hi Stefan,
 
-Thank you for the reply, I will address your comments to modify license
-identifier, comments, helper function for offset calculation. I have
-prioritized explaining Timesync interrupt router's functionality below.
-
-
-On 2/7/2025 2:58 AM, Thomas Gleixner wrote:
-> On Wed, Feb 05 2025 at 21:31, Chintan Vankar wrote:
->> +++ b/drivers/irqchip/ti-timesync-intr.c
->> @@ -0,0 +1,109 @@
->> +// SPDX-License-Identifier: GPL
+Am Sat, Feb 08, 2025 at 05:44:26PM +0100 schrieb Stefan Eichenberger:
+> On Fri, Feb 07, 2025 at 05:24:20PM +0100, Dimitri Fedrau wrote:
+> > Marvell 88Q2XXX devices support up to two configurable Light Emitting
+> > Diode (LED). Add minimal LED controller driver supporting the most common
+> > uses with the 'netdev' trigger.
+> > 
+> > Signed-off-by: Dimitri Fedrau <dima.fedrau@gmail.com>
 > 
-> That's not a valid license identifier
-> 
->> +static struct irq_chip ts_intr_irq_chip = {
->> +	.name			= "TIMESYNC_INTRTR",
->> +};
-> 
-> How is this interrupt chip supposed to work? All it implements is a
-> name.
+> Reviewed-by: Stefan Eichenberger <eichest@gmail.com>
 > 
 
-Timesync INTR can be used to map input sources with the corresponding
-output, so that we can configure specific functionality for the device
-that is using this output sources either as an interrupt source or to
-synchronize the time.
+thanks for reviewing. I just noticed that led0 is enabled in
+mv88q222x_config_init, but I think it should be enabled in
+mv88q2xxx_config_init because LED configuration is same for all
+mv88q2xxx devices. What do you think ?
 
-To implement above Timesync INTR's functionality, I have implemented
-ts_intr_irq_domain_alloc() and ts_intr_irq_domain_free() ops which are
-sufficient. Let me know if they are fine.
-
->> +static int ts_intr_irq_domain_alloc(struct irq_domain *domain, unsigned int virq,
->> +				    unsigned int nr_irqs, void *arg)
->> +{
->> +	unsigned int output_line, input_line, output_line_offset;
->> +	struct irq_fwspec *fwspec = (struct irq_fwspec *)arg;
->> +	int ret;
->> +
->> +	irq_domain_set_hwirq_and_chip(domain, virq, output_line,
->> +				      &ts_intr_irq_chip,
->> +				      NULL);
-> 
-> You set the interrupt chip and data before validating that the input
-> argument is valid. That does not make any sense.
-> 
->> +	/* Check for two input parameters: output line and corresponding input line */
->> +	if (fwspec->param_count != 2)
->> +		return -EINVAL;
->> +
->> +	output_line = fwspec->param[0];
->> +
->> +	/* Timesync Interrupt Router's mux-controller register starts at offset 4 from base
->> +	 * address and each output line are at offset in multiple of 4s in Timesync INTR's
->> +	 * register space, calculate the register offset from provided output line.
->> +	 */
-> 
-> Please use proper kernel comment style as documented:
-> 
->    https://www.kernel.org/doc/html/latest/process/maintainer-tip.html#comment-style
-> 
-> This is not networking code.
-> 
->> +	output_line_offset = 4 * output_line + 0x4;
-> 
-> Magic hardcoded numbers '4' and '0x4' without any explanation of the logic.
-> 
->> +	output_line_to_virq[output_line] = virq;
->> +	input_line = fwspec->param[1] & TIMESYNC_INTRTR_ENABLE;
->> +
->> +	/* Map output line corresponding to input line */
->> +	writel(input_line, tsr_data.tsr_base + output_line_offset);
->> +
->> +	/* When interrupt enable bit is set for Timesync Interrupt Router it maps the output
->> +	 * line with the existing input line, hence enable interrupt line after we set bits for
->> +	 * output line.
-> 
-> I have no idea what this comment is trying to tell me.
-> 
->> +	 */
->> +	input_line |= TIMESYNC_INTRTR_INT_ENABLE;
->> +	writel(input_line, tsr_data.tsr_base + output_line_offset);
->> +
->> +	return 0;
->> +}
->> +
->> +static void ts_intr_irq_domain_free(struct irq_domain *domain, unsigned int virq,
->> +				    unsigned int nr_irqs)
->> +{
->> +	struct output_line_to_virq *node, *n;
->> +	unsigned int output_line_offset;
->> +	int i;
->> +
->> +	for (i = 0; i < TIMESYNC_INTRTR_MAX_OUTPUT_LINES; i++) {
->> +		if (output_line_to_virq[i] == virq) {
->> +			/* Calculate the register offset value from provided output line */
-> 
-> Can you please implement a properly commented helper function which
-> explains how this offset calculation is supposed to work?
-> 
->> +			output_line_offset = 4 * i + 0x4;
->> +			writel(~TIMESYNC_INTRTR_INT_ENABLE, tsr_data.tsr_base + output_line_offset);
->> +		}
->> +	}
->> +}
->> +
->> +static const struct irq_domain_ops ts_intr_irq_domain_ops = {
->> +	.alloc		= ts_intr_irq_domain_alloc,
->> +	.free		= ts_intr_irq_domain_free,
->> +};
->> +
->> +static int tsr_init(struct device_node *node)
->> +{
->> +	tsr_data.tsr_base = of_iomap(node, 0);
->> +	if (IS_ERR(tsr_data.tsr_base)) {
->> +		pr_err("Unable to get reg\n");
->> +		return PTR_ERR(tsr_data.tsr_base);
->> +	}
->> +
->> +	tsr_data.domain = irq_domain_create_tree(&node->fwnode, &ts_intr_irq_domain_ops, &tsr_data);
-> 
-> So this instantiates a interrupt domain which is completely disconnected
-> from the rest of the world.
->  > How is the output side of this supposed to handle an interrupt which is
-> routed to it?
-> 
-
-                         ________________________
-                        |    Timesync INTR       +---->dma_local_events
-                        |                        |
-Device sync events----->                        +---->pcie_cpts_hw_push
-                        |                        |
-          cpts_genf----->                        +---->cpts_hw_push
-                        |________________________|
-
-
-No it is connected, it is being used to configure the output for
-Timesync INTR as mentioned above.
-
-As seen in the diagram, Timesync INTR has multiple output interfaces and
-we can configure those to map them with the corresponding input as
-required by peripherals which receives the signal. In context of this
-series, CPTS module is utilizing the output signal of cpts_genf as
-Hardware timestamp push event to generate timestamps at 1 seconds.
-
-Let me know if you need more details regarding any of the above points
-that I have mentioned.
-
-
-Regards,
-Chintan.
-
-> Thanks,
-> 
->          tglx
-> 
-> 
+> > ---
+> > Changes in v2:
+> > - Renamed MDIO_MMD_PCS_MV_LED_FUNC_CTRL_GPIO_MASK to
+> >   MDIO_MMD_PCS_MV_LED_FUNC_CTRL_LED_1_MASK (Stefan)
+> > - Renamed MDIO_MMD_PCS_MV_LED_FUNC_CTRL_TX_EN_MASK to
+> >   MDIO_MMD_PCS_MV_LED_FUNC_CTRL_LED_0_MASK (Stefan)
+> > - Added comment for disabling tx disable feature (Stefan)
+> > - Added defines for all led functions (Andrew)
+> > - Move enabling of led0 function from mv88q2xxx_probe to
+> >   mv88q222x_config_init. When the hardware reset pin is connected to a GPIO
+> >   for example and we bring the interface down and up again, the content
+> >   of the register MDIO_MMD_PCS_MV_RESET_CTRL is resetted to default.
+> >   This means LED function is disabled and can't be enabled again.
+> > - Link to v1: https://lore.kernel.org/r/20250110-marvell-88q2xxx-leds-v1-1-22e7734941c2@gmail.com
+> > ---
+> >  drivers/net/phy/marvell-88q2xxx.c | 175 ++++++++++++++++++++++++++++++++++++++
+> >  1 file changed, 175 insertions(+)
+> > 
+> > diff --git a/drivers/net/phy/marvell-88q2xxx.c b/drivers/net/phy/marvell-88q2xxx.c
+> > index a3996471a1c9a5d4060d5d19ce44aa70e902a83f..2d5ea3e1b26219bb1e050222347c2688903e2430 100644
+> > --- a/drivers/net/phy/marvell-88q2xxx.c
+> > +++ b/drivers/net/phy/marvell-88q2xxx.c
+> > @@ -8,6 +8,7 @@
+> >   */
+> >  #include <linux/ethtool_netlink.h>
+> >  #include <linux/marvell_phy.h>
+> > +#include <linux/of.h>
+> >  #include <linux/phy.h>
+> >  #include <linux/hwmon.h>
+> >  
+> > @@ -27,6 +28,9 @@
+> >  #define MDIO_MMD_AN_MV_STAT2_100BT1		0x2000
+> >  #define MDIO_MMD_AN_MV_STAT2_1000BT1		0x4000
+> >  
+> > +#define MDIO_MMD_PCS_MV_RESET_CTRL		32768
+> > +#define MDIO_MMD_PCS_MV_RESET_CTRL_TX_DISABLE	0x8
+> > +
+> >  #define MDIO_MMD_PCS_MV_INT_EN			32784
+> >  #define MDIO_MMD_PCS_MV_INT_EN_LINK_UP		0x0040
+> >  #define MDIO_MMD_PCS_MV_INT_EN_LINK_DOWN	0x0080
+> > @@ -40,6 +44,22 @@
+> >  #define MDIO_MMD_PCS_MV_GPIO_INT_CTRL			32787
+> >  #define MDIO_MMD_PCS_MV_GPIO_INT_CTRL_TRI_DIS		0x0800
+> >  
+> > +#define MDIO_MMD_PCS_MV_LED_FUNC_CTRL			32790
+> > +#define MDIO_MMD_PCS_MV_LED_FUNC_CTRL_LED_1_MASK	GENMASK(7, 4)
+> > +#define MDIO_MMD_PCS_MV_LED_FUNC_CTRL_LED_0_MASK	GENMASK(3, 0)
+> > +#define MDIO_MMD_PCS_MV_LED_FUNC_CTRL_LINK		0x0 /* Link established */
+> > +#define MDIO_MMD_PCS_MV_LED_FUNC_CTRL_LINK_RX_TX	0x1 /* Link established, blink for rx or tx activity */
+> > +#define MDIO_MMD_PCS_MV_LED_FUNC_CTRL_LINK_1000BT1	0x2 /* Blink 3x for 1000BT1 link established */
+> > +#define MDIO_MMD_PCS_MV_LED_FUNC_CTRL_RX_TX_ON		0x3 /* Receive or transmit activity */
+> > +#define MDIO_MMD_PCS_MV_LED_FUNC_CTRL_RX_TX		0x4 /* Blink on receive or transmit activity */
+> > +#define MDIO_MMD_PCS_MV_LED_FUNC_CTRL_TX		0x5 /* Transmit activity */
+> > +#define MDIO_MMD_PCS_MV_LED_FUNC_CTRL_LINK_COPPER	0x6 /* Copper Link established */
+> > +#define MDIO_MMD_PCS_MV_LED_FUNC_CTRL_LINK_1000BT1_ON	0x7 /* 1000BT1 link established */
+> > +#define MDIO_MMD_PCS_MV_LED_FUNC_CTRL_FORCE_OFF		0x8 /* Force off */
+> > +#define MDIO_MMD_PCS_MV_LED_FUNC_CTRL_FORCE_ON		0x9 /* Force on */
+> > +#define MDIO_MMD_PCS_MV_LED_FUNC_CTRL_FORCE_HIGHZ	0xa /* Force Hi-Z */
+> > +#define MDIO_MMD_PCS_MV_LED_FUNC_CTRL_FORCE_BLINK	0xb /* Force blink */
+> > +
+> >  #define MDIO_MMD_PCS_MV_TEMP_SENSOR1			32833
+> >  #define MDIO_MMD_PCS_MV_TEMP_SENSOR1_RAW_INT		0x0001
+> >  #define MDIO_MMD_PCS_MV_TEMP_SENSOR1_INT		0x0040
+> > @@ -95,8 +115,12 @@
+> >  
+> >  #define MDIO_MMD_PCS_MV_TDR_OFF_CUTOFF			65246
+> >  
+> > +#define MV88Q2XXX_LED_INDEX_TX_ENABLE	0
+> > +#define MV88Q2XXX_LED_INDEX_GPIO	1
+> > +
+> >  struct mv88q2xxx_priv {
+> >  	bool enable_temp;
+> > +	bool enable_led0;
+> >  };
+> >  
+> >  struct mmd_val {
+> > @@ -740,15 +764,62 @@ static int mv88q2xxx_hwmon_probe(struct phy_device *phydev)
+> >  }
+> >  #endif
+> >  
+> > +#if IS_ENABLED(CONFIG_OF_MDIO)
+> > +static int mv88q2xxx_leds_probe(struct phy_device *phydev)
+> > +{
+> > +	struct device_node *node = phydev->mdio.dev.of_node;
+> > +	struct mv88q2xxx_priv *priv = phydev->priv;
+> > +	struct device_node *leds;
+> > +	int ret = 0;
+> > +	u32 index;
+> > +
+> > +	if (!node)
+> > +		return 0;
+> > +
+> > +	leds = of_get_child_by_name(node, "leds");
+> > +	if (!leds)
+> > +		return 0;
+> > +
+> > +	for_each_available_child_of_node_scoped(leds, led) {
+> > +		ret = of_property_read_u32(led, "reg", &index);
+> > +		if (ret)
+> > +			goto exit;
+> > +
+> > +		if (index > MV88Q2XXX_LED_INDEX_GPIO) {
+> > +			ret = -EINVAL;
+> > +			goto exit;
+> > +		}
+> > +
+> > +		if (index == MV88Q2XXX_LED_INDEX_TX_ENABLE)
+> > +			priv->enable_led0 = true;
+> > +	}
+> > +
+> > +exit:
+> > +	of_node_put(leds);
+> > +
+> > +	return ret;
+> > +}
+> > +
+> > +#else
+> > +static int mv88q2xxx_leds_probe(struct phy_device *phydev)
+> > +{
+> > +	return 0;
+> > +}
+> > +#endif
+> > +
+> >  static int mv88q2xxx_probe(struct phy_device *phydev)
+> >  {
+> >  	struct mv88q2xxx_priv *priv;
+> > +	int ret;
+> >  
+> >  	priv = devm_kzalloc(&phydev->mdio.dev, sizeof(*priv), GFP_KERNEL);
+> >  	if (!priv)
+> >  		return -ENOMEM;
+> >  
+> >  	phydev->priv = priv;
+> > +	ret = mv88q2xxx_leds_probe(phydev);
+> > +	if (ret)
+> > +		return ret;
+> >  
+> >  	return mv88q2xxx_hwmon_probe(phydev);
+> >  }
+> > @@ -829,6 +900,15 @@ static int mv88q222x_config_init(struct phy_device *phydev)
+> >  			return ret;
+> >  	}
+> >  
+> > +	/* Enable LED function and disable TX disable feature on LED/TX_ENABLE */
+> > +	if (priv->enable_led0) {
+> > +		ret = phy_clear_bits_mmd(phydev, MDIO_MMD_PCS,
+> > +					 MDIO_MMD_PCS_MV_RESET_CTRL,
+> > +					 MDIO_MMD_PCS_MV_RESET_CTRL_TX_DISABLE);
+> > +		if (ret < 0)
+> > +			return ret;
+> > +	}
+> > +
+> >  	if (phydev->c45_ids.device_ids[MDIO_MMD_PMAPMD] == PHY_ID_88Q2220_REVB0)
+> >  		return mv88q222x_revb0_config_init(phydev);
+> >  	else
+> > @@ -918,6 +998,98 @@ static int mv88q222x_cable_test_get_status(struct phy_device *phydev,
+> >  	return 0;
+> >  }
+> >  
+> > +static int mv88q2xxx_led_mode(u8 index, unsigned long rules)
+> > +{
+> > +	switch (rules) {
+> > +	case BIT(TRIGGER_NETDEV_LINK):
+> > +		return MDIO_MMD_PCS_MV_LED_FUNC_CTRL_LINK;
+> > +	case BIT(TRIGGER_NETDEV_LINK_1000):
+> > +		return MDIO_MMD_PCS_MV_LED_FUNC_CTRL_LINK_1000BT1_ON;
+> > +	case BIT(TRIGGER_NETDEV_TX):
+> > +		return MDIO_MMD_PCS_MV_LED_FUNC_CTRL_TX;
+> > +	case BIT(TRIGGER_NETDEV_TX) | BIT(TRIGGER_NETDEV_RX):
+> > +		return MDIO_MMD_PCS_MV_LED_FUNC_CTRL_RX_TX;
+> > +	case BIT(TRIGGER_NETDEV_LINK) | BIT(TRIGGER_NETDEV_TX) | BIT(TRIGGER_NETDEV_RX):
+> > +		return MDIO_MMD_PCS_MV_LED_FUNC_CTRL_LINK_RX_TX;
+> > +	default:
+> > +		return -EOPNOTSUPP;
+> > +	}
+> > +}
+> > +
+> > +static int mv88q2xxx_led_hw_is_supported(struct phy_device *phydev, u8 index,
+> > +					 unsigned long rules)
+> > +{
+> > +	int mode;
+> > +
+> > +	mode = mv88q2xxx_led_mode(index, rules);
+> > +	if (mode < 0)
+> > +		return mode;
+> > +
+> > +	return 0;
+> > +}
+> > +
+> > +static int mv88q2xxx_led_hw_control_set(struct phy_device *phydev, u8 index,
+> > +					unsigned long rules)
+> > +{
+> > +	int mode;
+> > +
+> > +	mode = mv88q2xxx_led_mode(index, rules);
+> > +	if (mode < 0)
+> > +		return mode;
+> > +
+> > +	if (index == MV88Q2XXX_LED_INDEX_TX_ENABLE)
+> > +		return phy_modify_mmd(phydev, MDIO_MMD_PCS,
+> > +				      MDIO_MMD_PCS_MV_LED_FUNC_CTRL,
+> > +				      MDIO_MMD_PCS_MV_LED_FUNC_CTRL_LED_0_MASK,
+> > +				      FIELD_PREP(MDIO_MMD_PCS_MV_LED_FUNC_CTRL_LED_0_MASK,
+> > +						 mode));
+> > +	else
+> > +		return phy_modify_mmd(phydev, MDIO_MMD_PCS,
+> > +				      MDIO_MMD_PCS_MV_LED_FUNC_CTRL,
+> > +				      MDIO_MMD_PCS_MV_LED_FUNC_CTRL_LED_1_MASK,
+> > +				      FIELD_PREP(MDIO_MMD_PCS_MV_LED_FUNC_CTRL_LED_1_MASK,
+> > +						 mode));
+> > +}
+> > +
+> > +static int mv88q2xxx_led_hw_control_get(struct phy_device *phydev, u8 index,
+> > +					unsigned long *rules)
+> > +{
+> > +	int val;
+> > +
+> > +	val = phy_read_mmd(phydev, MDIO_MMD_PCS, MDIO_MMD_PCS_MV_LED_FUNC_CTRL);
+> > +	if (val < 0)
+> > +		return val;
+> > +
+> > +	if (index == MV88Q2XXX_LED_INDEX_TX_ENABLE)
+> > +		val = FIELD_GET(MDIO_MMD_PCS_MV_LED_FUNC_CTRL_LED_0_MASK, val);
+> > +	else
+> > +		val = FIELD_GET(MDIO_MMD_PCS_MV_LED_FUNC_CTRL_LED_1_MASK, val);
+> > +
+> > +	switch (val) {
+> > +	case MDIO_MMD_PCS_MV_LED_FUNC_CTRL_LINK:
+> > +		*rules = BIT(TRIGGER_NETDEV_LINK);
+> > +		break;
+> > +	case MDIO_MMD_PCS_MV_LED_FUNC_CTRL_LINK_1000BT1_ON:
+> > +		*rules = BIT(TRIGGER_NETDEV_LINK_1000);
+> > +		break;
+> > +	case MDIO_MMD_PCS_MV_LED_FUNC_CTRL_TX:
+> > +		*rules = BIT(TRIGGER_NETDEV_TX);
+> > +		break;
+> > +	case MDIO_MMD_PCS_MV_LED_FUNC_CTRL_RX_TX:
+> > +		*rules = BIT(TRIGGER_NETDEV_TX) | BIT(TRIGGER_NETDEV_RX);
+> > +		break;
+> > +	case MDIO_MMD_PCS_MV_LED_FUNC_CTRL_LINK_RX_TX:
+> > +		*rules = BIT(TRIGGER_NETDEV_LINK) | BIT(TRIGGER_NETDEV_TX) |
+> > +			 BIT(TRIGGER_NETDEV_RX);
+> > +		break;
+> > +	default:
+> > +		*rules = 0;
+> > +		break;
+> > +	}
+> > +
+> > +	return 0;
+> > +}
+> > +
+> >  static struct phy_driver mv88q2xxx_driver[] = {
+> >  	{
+> >  		.phy_id			= MARVELL_PHY_ID_88Q2110,
+> > @@ -953,6 +1125,9 @@ static struct phy_driver mv88q2xxx_driver[] = {
+> >  		.get_sqi_max		= mv88q2xxx_get_sqi_max,
+> >  		.suspend		= mv88q2xxx_suspend,
+> >  		.resume			= mv88q2xxx_resume,
+> > +		.led_hw_is_supported	= mv88q2xxx_led_hw_is_supported,
+> > +		.led_hw_control_set	= mv88q2xxx_led_hw_control_set,
+> > +		.led_hw_control_get	= mv88q2xxx_led_hw_control_get,
+> >  	},
+> >  };
+> >  
+> > 
+> > ---
+> > base-commit: f84db3bc8abc2141839cdb9454061633a4ce1db7
+> > change-id: 20241221-marvell-88q2xxx-leds-69a4037b5157
+> > 
+> > Best regards,
+> > -- 
+> > Dimitri Fedrau <dima.fedrau@gmail.com>
+> > 
 
