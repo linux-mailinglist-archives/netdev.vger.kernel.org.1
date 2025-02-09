@@ -1,192 +1,185 @@
-Return-Path: <netdev+bounces-164445-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-164446-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 40AA1A2DD2D
-	for <lists+netdev@lfdr.de>; Sun,  9 Feb 2025 12:53:15 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id DBC0CA2DD45
+	for <lists+netdev@lfdr.de>; Sun,  9 Feb 2025 13:07:47 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 27A783A4203
-	for <lists+netdev@lfdr.de>; Sun,  9 Feb 2025 11:53:06 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 7FC8216494A
+	for <lists+netdev@lfdr.de>; Sun,  9 Feb 2025 12:07:46 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8F2B61CCEDB;
-	Sun,  9 Feb 2025 11:53:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D56161CD215;
+	Sun,  9 Feb 2025 12:07:39 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Q/V8Ks2k"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="PXUPYhJy"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ej1-f47.google.com (mail-ej1-f47.google.com [209.85.218.47])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C55B51BD9CE
-	for <netdev@vger.kernel.org>; Sun,  9 Feb 2025 11:53:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.47
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AE3C41AF0BA;
+	Sun,  9 Feb 2025 12:07:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1739101991; cv=none; b=HegQi1Nm8+uawUF8P2eGgER3tA9i393sjTJv3jHd0w4FyDrLNuoob4MkiGr33ALwoYprIZlY7WMwCS+DgyMTUq38xLRdB0gW++z0eLbMyhQWepT8DnyJxH1pJXoGnHAvIeJjM6qK0O9Oyj+CRMBkwKwsjIiuNXohDmrbfM7wewc=
+	t=1739102859; cv=none; b=VDI8/t70YQF6e8GlXVIlzut9ZVkxEPR8AGBlwUi6M5STAHstfySlt8RnrWBCFnWpE08ZsN0kzgqpK0W/0p1rP2B3ffEKyFL6vstxY2PLbzfhdlwHAGGDvnNZ4ZQLAemmcc+74xcnYUeieI9eshrLstv8SWR/MDZhKy+7hq6wj64=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1739101991; c=relaxed/simple;
-	bh=/XDHJ8sr6t4n+Vz6TwxZY32yF7gE7n/9Na8VeFaq8/E=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=cURtRecgWW4Z3qIFvNclyC3G/Fw8rcwXGRkWiZf3mHxn2MMHnLRdCwrYvknRx90Pfv4dklHQQysv4CAmZeTO67/RGyuxGdr52+5q4/1DFfCptuzhCOPnYvnjYxqVhbetJs7LfC+fOCRzZj1pXMbtsaw+CJ/Y4SNAXvDIiBPzOyc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Q/V8Ks2k; arc=none smtp.client-ip=209.85.218.47
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ej1-f47.google.com with SMTP id a640c23a62f3a-ab2b29dfc65so555092666b.1
-        for <netdev@vger.kernel.org>; Sun, 09 Feb 2025 03:53:09 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1739101988; x=1739706788; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:autocrypt:from
-         :content-language:references:cc:to:subject:user-agent:mime-version
-         :date:message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=jLSLghMasTDx86lV/S59OCcHiw086kUYUqJjjTP6bVg=;
-        b=Q/V8Ks2k7m32SUahqCLf2A1F29s4jhi9XKPhOWJxYajLlDx5Vn7N8hFqcCxfQ1xFRT
-         Q0edHHgJJUrXAt9ggxtVgl/UnHdR3y5haVzmbhTrRteZweg1G6K3Q9MUABbCbIqa+Ba3
-         eM0exYDXsjnU6YlyMnZoPPMJrB31Qg5ZRs/4q/gOWJkZ97GOR1Iw6o4hi/NFDlmMtHN5
-         PCmGYHxdrKJZQiWyCeQeIRSqLBKAVTHfPGjjG9WlaqofT7BKv8dXZqCdvYr3IO4wWtw3
-         nrXEl/Xc+IyEgvGsB9A46gckcb+zS2ZYRjVqn/ylIVFOJJth7F9huw5U7jqCc1rD3OUP
-         zSnQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1739101988; x=1739706788;
-        h=content-transfer-encoding:in-reply-to:autocrypt:from
-         :content-language:references:cc:to:subject:user-agent:mime-version
-         :date:message-id:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=jLSLghMasTDx86lV/S59OCcHiw086kUYUqJjjTP6bVg=;
-        b=tuFp0K1NsxcxydWGdzV29FMYuTQNgfjqgATTdAjjl2B5xK7IqH3nV7TjgB2M1sSSSt
-         jvBa4a2aLYyH6ADxVb64Y04nl1EZyiGXz+YzPUTpf5GJB/ehNI6Eh9DtMjv273GYKd/5
-         +oTo6EActokH4x/QD2MwVIqiHYOP2IcOrZ7YH1f8kljI/c+k830GRY1wg5ns4Itrf7pK
-         mQ716hVK8rTd9DUNzgnndWwaSuJo8tSRiEtoTHT68IeoThA7YY8+p2S9z2Pj+RxAoGS+
-         6zAEni/Nx9EZKajyFXxmmXkDTtj23ra3uUuZfS9cFzMBax5l2PMfjbP+sYqNGsOutvPY
-         0BUg==
-X-Gm-Message-State: AOJu0YzhcVOFDoGpE/no9LJY2lcb3BDKV1UsNOGRqfYpzP1pUsbP+5oX
-	dFOEwpaWWJnStXZQiilGWwUyKQcWxaGHlrUSeA6KV6okrrfLEvk/
-X-Gm-Gg: ASbGnctr593OqpYLu6PlsQsEeciTncVaM1FHdEjS76TNU3JjSOqCRbVm8cGlBnxkqoX
-	LUg+IAWD5KN9nfyL0/JL6CzI7YDXKjAOzEpT/6JS668PeO8x2tF3vSBPo7KLGXfgDBuaNT9Sj1/
-	rZOCHeFa9eXuIBbiKi2dz5sbzaomhowOR+egjhRD8y1qjzNaNghSMlc6N+3YTpJG6xx6Zdoq9qV
-	QgXAeByMO4u0f5kcW+lL13Y/uXoltvSLiAaxxsUcr2g8rPtGFX6WTk5uDvvSelIgnXT9nprHD2Z
-	ohDGCNZMsvb5k2s8lwGUpEbM3N7kADL42yWATdvO3uYqN8n7xKckIapQDgqkJd65byQdPrtokfD
-	f8/gxOXVZ4S3fXE/Ge4qfDiDUtk3y9JtcRZonfH6ymm3ksCl5EeQwva15hNVzmSseOT9QvJJHXB
-	SXDoTRCbI=
-X-Google-Smtp-Source: AGHT+IEAmRFatxs5HFZpaqxhC6KAsurPDfElH5RS0jBNWRJQo3BlU7WLnlPdq2L8wy4k2OiUDwlHUw==
-X-Received: by 2002:a17:906:f5a4:b0:ab7:b08:dab2 with SMTP id a640c23a62f3a-ab789b39591mr1133994966b.22.1739101987651;
-        Sun, 09 Feb 2025 03:53:07 -0800 (PST)
-Received: from ?IPV6:2a02:3100:acf0:cb00:e533:c1d0:f45f:da1c? (dynamic-2a02-3100-acf0-cb00-e533-c1d0-f45f-da1c.310.pool.telefonica.de. [2a02:3100:acf0:cb00:e533:c1d0:f45f:da1c])
-        by smtp.googlemail.com with ESMTPSA id a640c23a62f3a-ab78d5771easm489169366b.83.2025.02.09.03.53.06
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Sun, 09 Feb 2025 03:53:07 -0800 (PST)
-Message-ID: <2257559d-6528-48c9-a2cf-b60a3a976037@gmail.com>
-Date: Sun, 9 Feb 2025 12:53:33 +0100
+	s=arc-20240116; t=1739102859; c=relaxed/simple;
+	bh=mrQhDEUAy9bpBI7w32R9V55ZsjnRFLW0WmEVeb+BEVA=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=KvZPxrCpUnwm+y3gWD0wHeriwZ5PLg2AzscZq++QmaJvwtFl1Om2lI4myFlMqwa/6Bl8FzLHAqHL5YCXHXR6ejgQNHy69HKQ/aIufLGenM0NbctJt4bPpDALopZbZmnKtuj244Z/0KIe2GDb85SLltvh506R2Xm73+4aw9HkSMI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=PXUPYhJy; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id A959EC4CEDD;
+	Sun,  9 Feb 2025 12:07:38 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1739102859;
+	bh=mrQhDEUAy9bpBI7w32R9V55ZsjnRFLW0WmEVeb+BEVA=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=PXUPYhJyPMN1QBehL4R85/FZdnTscVQylL76tGS8317rddXUB6kVfhb5XXWT3F177
+	 b3bY0TxIHpsXwOcXH8d21UsAXu0b1aZvSmAmf8ShGFeP7heWKT+6lgM5lXnC8sjJ/3
+	 rSeqzs27+UwRuD+rquEAZYoHUL/7HYD+9cLz4RQ4xF+y9ECohD85N9dHujBUdLNuxE
+	 fnTYniz8UIfIq03ex1/fPHXV2gL6U99/DO/ZiuR2PKuvcjEeDFE64xJ8s1D9YTGzKz
+	 HYu9E8djCwJU9y1k9FClbDV2EXzjp+vYjBgVV2LUclmfbhIiAmbIqfS3/sRy/WtVs6
+	 zk0GfTbI6BTuA==
+Date: Sun, 9 Feb 2025 13:07:36 +0100
+From: Lorenzo Bianconi <lorenzo@kernel.org>
+To: Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Felix Fietkau <nbd@nbd.name>, Sean Wang <sean.wang@mediatek.com>,
+	Matthias Brugger <matthias.bgg@gmail.com>,
+	AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>,
+	Philipp Zabel <p.zabel@pengutronix.de>,
+	Rob Herring <robh@kernel.org>,
+	Krzysztof Kozlowski <krzk+dt@kernel.org>,
+	Conor Dooley <conor+dt@kernel.org>,
+	"Chester A. Unal" <chester.a.unal@arinc9.com>,
+	Daniel Golle <daniel@makrotopia.org>,
+	DENG Qingfang <dqfext@gmail.com>, Andrew Lunn <andrew@lunn.ch>,
+	Vladimir Oltean <olteanv@gmail.com>
+Cc: netdev@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+	linux-mediatek@lists.infradead.org, devicetree@vger.kernel.org,
+	upstream@airoha.com, Christian Marangi <ansuelsmth@gmail.com>
+Subject: Re: [PATCH net-next v2 00/15] Introduce flowtable hw offloading in
+ airoha_eth driver
+Message-ID: <Z6iaiHVft8B-mAb4@lore-desk>
+References: <20250207-airoha-en7581-flowtable-offload-v2-0-3a2239692a67@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next] net: phy: remove unused PHY_INIT_TIMEOUT
- definitions
-To: Christophe Leroy <christophe.leroy@csgroup.eu>,
- Andrew Lunn <andrew+netdev@lunn.ch>, Paolo Abeni <pabeni@redhat.com>,
- Jakub Kicinski <kuba@kernel.org>, David Miller <davem@davemloft.net>,
- Eric Dumazet <edumazet@google.com>, Simon Horman <horms@kernel.org>,
- Andrew Lunn <andrew@lunn.ch>,
- Russell King - ARM Linux <linux@armlinux.org.uk>
-Cc: "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
- "linuxppc-dev@lists.ozlabs.org" <linuxppc-dev@lists.ozlabs.org>
-References: <11be8192-b722-4680-9d1c-3e4323afc27f@gmail.com>
- <0203253b-4bda-4e66-b7e6-e74300c44c80@csgroup.eu>
-Content-Language: en-US
-From: Heiner Kallweit <hkallweit1@gmail.com>
-Autocrypt: addr=hkallweit1@gmail.com; keydata=
- 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
-In-Reply-To: <0203253b-4bda-4e66-b7e6-e74300c44c80@csgroup.eu>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+Content-Type: multipart/signed; micalg=pgp-sha512;
+	protocol="application/pgp-signature"; boundary="jJ2SWV1szSy2UBu3"
+Content-Disposition: inline
+In-Reply-To: <20250207-airoha-en7581-flowtable-offload-v2-0-3a2239692a67@kernel.org>
 
-On 09.02.2025 10:28, Christophe Leroy wrote:
-> 
-> 
-> Le 08/02/2025 à 22:14, Heiner Kallweit a écrit :
->> Both identical definitions of PHY_INIT_TIMEOUT aren't used,
->> so remove them.
-> 
-> Would be good to say when it stopped being used, ie which commit or commits removed its use.
-> 
-> Also why only remove PHY_INIT_TIMEOUT ? For instance PHY_FORCE_TIMEOUT also seems to be unused. PHY_CHANGE_TIME as well.
-> 
-I stumbled just across PHY_INIT_TIMEOUT. You're right, I will include other apparently unused
-definitions as well.
 
->>
->> Signed-off-by: Heiner Kallweit <hkallweit1@gmail.com>
->> ---
->>   drivers/net/ethernet/freescale/ucc_geth.h | 1 -
->>   include/linux/phy.h                       | 1 -
->>   2 files changed, 2 deletions(-)
->>
->> diff --git a/drivers/net/ethernet/freescale/ucc_geth.h b/drivers/net/ethernet/freescale/ucc_geth.h
->> index 38789faae..03b515240 100644
->> --- a/drivers/net/ethernet/freescale/ucc_geth.h
->> +++ b/drivers/net/ethernet/freescale/ucc_geth.h
->> @@ -890,7 +890,6 @@ struct ucc_geth_hardware_statistics {
->>                                  addresses */
->>     #define TX_TIMEOUT                              (1*HZ)
->> -#define PHY_INIT_TIMEOUT                        100000
->>   #define PHY_CHANGE_TIME                         2
->>     /* Fast Ethernet (10/100 Mbps) */
->> diff --git a/include/linux/phy.h b/include/linux/phy.h
->> index 3028f8abf..9cb86666c 100644
->> --- a/include/linux/phy.h
->> +++ b/include/linux/phy.h
->> @@ -293,7 +293,6 @@ static inline long rgmii_clock(int speed)
->>       }
->>   }
->>   -#define PHY_INIT_TIMEOUT    100000
->>   #define PHY_FORCE_TIMEOUT    10
->>     #define PHY_MAX_ADDR    32
-> 
---
-pw-bot: cr
+--jJ2SWV1szSy2UBu3
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
+> Introduce netfilter flowtable integration in airoha_eth driver to
+> offload 5-tuple flower rules learned by the PPE module if the user
+> accelerates them using a nft configuration similar to the one reported
+> below:
+>=20
+> table inet filter {
+> 	flowtable ft {
+> 		hook ingress priority filter
+> 		devices =3D { lan1, lan2, lan3, lan4, eth1 }
+> 		flags offload;
+> 	}
+> 	chain forward {
+> 		type filter hook forward priority filter; policy accept;
+> 		meta l4proto { tcp, udp } flow add @ft
+> 	}
+> }
+>=20
+> Packet Processor Engine (PPE) module available on EN7581 SoC populates
+> the PPE table with 5-tuples flower rules learned from traffic forwarded
+> between the GDM ports connected to the Packet Switch Engine (PSE) module.
+> airoha_eth driver configures and collects data from the PPE module via a
+> Network Processor Unit (NPU) RISC-V module available on the EN7581 SoC.
+> Move airoha_eth driver in a dedicated folder
+> (drivers/net/ethernet/airoha).
+
+Please ignore this series, I spotted a couple of issues. I will post v3 soo=
+n.
+
+Regards,
+Lorenzo
+
+>=20
+> ---
+> Changes in v2:
+> - Add airoha-npu document binding
+> - Enable Rx SPTAG on MT7530 dsa switch for EN7581 SoC.
+> - Fix warnings in airoha_npu_run_firmware()
+> - Fix sparse warnings
+> - Link to v1: https://lore.kernel.org/r/20250205-airoha-en7581-flowtable-=
+offload-v1-0-d362cfa97b01@kernel.org
+>=20
+> ---
+> Lorenzo Bianconi (15):
+>       net: airoha: Move airoha_eth driver in a dedicated folder
+>       net: airoha: Move definitions in airoha_eth.h
+>       net: airoha: Move reg/write utility routines in airoha_eth.h
+>       net: airoha: Move register definitions in airoha_regs.h
+>       net: airoha: Move DSA tag in DMA descriptor
+>       net: dsa: mt7530: Enable Rx sptag for EN7581 SoC
+>       net: airoha: Enable support for multiple net_devices
+>       net: airoha: Move REG_GDM_FWD_CFG() initialization in airoha_dev_in=
+it()
+>       net: airoha: Rename airoha_set_gdm_port_fwd_cfg() in airoha_set_vip=
+_for_gdm_port()
+>       dt-bindings: arm: airoha: Add the NPU node for EN7581 SoC
+>       dt-bindings: net: airoha: Add airoha,npu phandle property
+>       net: airoha: Introduce PPE initialization via NPU
+>       net: airoha: Introduce flowtable offload support
+>       net: airoha: Add loopback support for GDM2
+>       net: airoha: Introduce PPE debugfs support
+>=20
+>  .../devicetree/bindings/arm/airoha,en7581-npu.yaml |   71 ++
+>  .../devicetree/bindings/net/airoha,en7581-eth.yaml |   10 +
+>  drivers/net/dsa/mt7530.c                           |    5 +
+>  drivers/net/dsa/mt7530.h                           |    4 +
+>  drivers/net/ethernet/Kconfig                       |    2 +
+>  drivers/net/ethernet/Makefile                      |    1 +
+>  drivers/net/ethernet/airoha/Kconfig                |   23 +
+>  drivers/net/ethernet/airoha/Makefile               |    9 +
+>  .../net/ethernet/{mediatek =3D> airoha}/airoha_eth.c | 1261 +++++-------=
+--------
+>  drivers/net/ethernet/airoha/airoha_eth.h           |  626 ++++++++++
+>  drivers/net/ethernet/airoha/airoha_npu.c           |  501 ++++++++
+>  drivers/net/ethernet/airoha/airoha_ppe.c           |  823 +++++++++++++
+>  drivers/net/ethernet/airoha/airoha_ppe_debugfs.c   |  175 +++
+>  drivers/net/ethernet/airoha/airoha_regs.h          |  793 ++++++++++++
+>  drivers/net/ethernet/mediatek/Kconfig              |    8 -
+>  drivers/net/ethernet/mediatek/Makefile             |    1 -
+>  16 files changed, 3310 insertions(+), 1003 deletions(-)
+> ---
+> base-commit: 26db4dbb747813b5946aff31485873f071a10332
+> change-id: 20250205-airoha-en7581-flowtable-offload-e3a11b3b34ad
+>=20
+> Best regards,
+> --=20
+> Lorenzo Bianconi <lorenzo@kernel.org>
+>=20
+
+--jJ2SWV1szSy2UBu3
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iHUEABYKAB0WIQTquNwa3Txd3rGGn7Y6cBh0uS2trAUCZ6iaiAAKCRA6cBh0uS2t
+rN4LAQDAr1GunH8bnfpjyai7bUPg8oqhBHj/K2KEpB2QdnUciAD/QS/hHVoQ1hGf
+SDi+CTuc9POv4dc6J0FYmcxb9/Vu5AA=
+=wIQ6
+-----END PGP SIGNATURE-----
+
+--jJ2SWV1szSy2UBu3--
 
