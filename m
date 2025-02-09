@@ -1,50 +1,50 @@
-Return-Path: <netdev+bounces-164447-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-164448-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 019F1A2DD4E
-	for <lists+netdev@lfdr.de>; Sun,  9 Feb 2025 13:09:34 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2A68BA2DD50
+	for <lists+netdev@lfdr.de>; Sun,  9 Feb 2025 13:09:41 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 8CEC4164A24
-	for <lists+netdev@lfdr.de>; Sun,  9 Feb 2025 12:09:32 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 5E8E118867BA
+	for <lists+netdev@lfdr.de>; Sun,  9 Feb 2025 12:09:45 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 53CC31D90C5;
-	Sun,  9 Feb 2025 12:09:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E870C1DD9A8;
+	Sun,  9 Feb 2025 12:09:23 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="hQxFXttu"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="EvIJuZpF"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1A9191D7E41;
-	Sun,  9 Feb 2025 12:09:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C01601D6DBF;
+	Sun,  9 Feb 2025 12:09:23 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1739102961; cv=none; b=ER14h7dyT/Z4NIAM6rXvV2yQ+NKdNx5rgc7Unlwab9LQq6d3wPoUvN73VE9Wkn5aLVBg8KwQqzGGzCJ5sK7dqTB/6eGePup7Q/0yZOH1Xh72ZZPkIEDTn/cZo1EiCyNewpqpjyqtYMtcB2s7pX3uF8R25wDuzg5SonocTzlFTco=
+	t=1739102963; cv=none; b=RgpYA+sOAPCLZtPuxuzVZADIYSnNXDi15OxDpB6hWghVOH273p2PwNn5W9ToC7x7Xpg7O5WvH2MOsqLXISGepOso8U7JD5ais8F+0Ula08ykUVYDxAyJc9dSgP/uQoTupCCjdDNAine/reMcyWR/CJXlrAk5XDkutMM1CjFDC/c=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1739102961; c=relaxed/simple;
-	bh=rvVWaQ3933ovo+AhnO53IS9md6uwvnhCRfjkB+Vwn6g=;
-	h=From:Subject:Date:Message-Id:MIME-Version:Content-Type:To:Cc; b=ZiB7SRdg6n2opEwnNvHhVAkCmXxtdCGK3cqm/SZrmYt6eYlop0xjZMT0TpA6prcp8wrKftTzLM+W4hlUjl2p7uOFU93TZmIpABqnr+2iGSE4ITvrJXKksFNePK4+2QYLrKm0sVg20DgWLgpZbFzAL+g0cy2a+HFjzGzKrA6tRto=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=hQxFXttu; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 117DCC4CEDD;
-	Sun,  9 Feb 2025 12:09:19 +0000 (UTC)
+	s=arc-20240116; t=1739102963; c=relaxed/simple;
+	bh=ZR5/2ulMQlwhUwl/HtlTLXlzn5sAotIiGMhXEhkdb3s=;
+	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
+	 In-Reply-To:To:Cc; b=Rsx105HtzmD7CBn1eN4Ph0MKdE8fhgLDjfQWBYmaART4rrkj/xQ3i1cQ6e8SxILyeKLrg7k3IbcE1KZqPH1ls1mjv3OQHd8U9/45HU+sd9tQEJF9p8p3MNE/pP6AQXKZVY0VHFoZmEv3FO1Uh2tPoVHjLJAYTny+vLhs8Ehu7pE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=EvIJuZpF; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id DAE13C4CEE2;
+	Sun,  9 Feb 2025 12:09:22 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1739102960;
-	bh=rvVWaQ3933ovo+AhnO53IS9md6uwvnhCRfjkB+Vwn6g=;
-	h=From:Subject:Date:To:Cc:From;
-	b=hQxFXttuoEO9bByp2FlBsoHxIXwBNJCwKw19TYGpdI1loXvds55aXpajC43iOm0a/
-	 THqibkZt9NjVmhW9tW+v3s7xxSx1vNNFvHdUigQdX8w7wxNEUrQykyTCKN0wTmxfNi
-	 ZNoP/QzHeOvp0lBB8zlmN2iWzS1huUF+gp5yLeG4J88ZoCrvoHUz+UvGF6+sqDAkNk
-	 X8IT79SAgM35cJp0BKiRuS7KAO8HasInnzp4YrNRfPKi+KxG82qv2aKCs/hcVwXzcX
-	 dJDA/8eMiaIj2pGj0zE1CpwN5Efj2q45wVLEC1DEJeXfZM4EZxbtNeHfZYnb5gcAsM
-	 XHKBCmiDP8LhQ==
+	s=k20201202; t=1739102963;
+	bh=ZR5/2ulMQlwhUwl/HtlTLXlzn5sAotIiGMhXEhkdb3s=;
+	h=From:Date:Subject:References:In-Reply-To:To:Cc:From;
+	b=EvIJuZpFDbbo2NzlKQOQelhhqr0JW9jWV/w+sv+ILq+cQZxz6XoTsDMuZjXZv1yus
+	 jBQmxdtYZJ6v6YK7JcD0Qj8nhqTZ/FahNl/oO9DI+6iwTp0ZLOr1Dj9SaduYvRvh43
+	 ApXiFy7R3PKw83M8v+N0s3YvjufZcg+ojSMrYnvHcGoQFMv1zEsIzFk6Gn4TgKY+us
+	 8TADuJR6ytE7T76tTnEmq+O53zO+Nc2/A6YivQ2nsO2mbCwv4BNO4as9ZHsStUVzQ3
+	 iSZFZxCrp/dNc6TgCyKFEsB3KWS51GRWFREfmyulr7oXtF4edNkKKKP08eb9MV7LMp
+	 0C1UkDbVcGEYw==
 From: Lorenzo Bianconi <lorenzo@kernel.org>
-Subject: [PATCH net-next v3 00/16] Introduce flowtable hw offloading in
- airoha_eth driver
-Date: Sun, 09 Feb 2025 13:08:53 +0100
-Message-Id: <20250209-airoha-en7581-flowtable-offload-v3-0-dba60e755563@kernel.org>
+Date: Sun, 09 Feb 2025 13:08:54 +0100
+Subject: [PATCH net-next v3 01/16] net: airoha: Fix TSO support for header
+ cloned skbs
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -53,11 +53,9 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-X-B4-Tracking: v=1; b=H4sIANWaqGcC/43NsQ6CMBDG8Vchna1pr0LFyfcwDld6hUZCTUtQQ
- 3h3C5NOut3/ht83s0TRU2KnYmaRJp98GHKoXcGaDoeWuLe5GQgoBYiSo4+hQ06DLo+Suz48RjQ
- 98eDyjZaTQimNMuqAlmXlHsn557ZwuebufBpDfG2Dk1y//9uT5IJbVUHjsNZGyPON4kD9PsSWr
- fgEn6D+DUIGFQKouqoBK/0FLsvyBvuMm+UgAQAA
-X-Change-ID: 20250205-airoha-en7581-flowtable-offload-e3a11b3b34ad
+Message-Id: <20250209-airoha-en7581-flowtable-offload-v3-1-dba60e755563@kernel.org>
+References: <20250209-airoha-en7581-flowtable-offload-v3-0-dba60e755563@kernel.org>
+In-Reply-To: <20250209-airoha-en7581-flowtable-offload-v3-0-dba60e755563@kernel.org>
 To: Andrew Lunn <andrew+netdev@lunn.ch>, 
  "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
  Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
@@ -72,91 +70,63 @@ To: Andrew Lunn <andrew+netdev@lunn.ch>,
  Andrew Lunn <andrew@lunn.ch>, Vladimir Oltean <olteanv@gmail.com>
 Cc: netdev@vger.kernel.org, linux-arm-kernel@lists.infradead.org, 
  linux-mediatek@lists.infradead.org, devicetree@vger.kernel.org, 
- upstream@airoha.com, Christian Marangi <ansuelsmth@gmail.com>
+ upstream@airoha.com
 X-Mailer: b4 0.14.2
 
-Introduce netfilter flowtable integration in airoha_eth driver to
-offload 5-tuple flower rules learned by the PPE module if the user
-accelerates them using a nft configuration similar to the one reported
-below:
+For GSO packets, skb_cow_head() will reallocate the skb for TSO header
+cloned skbs in airoha_dev_xmit(). For this reason, sinfo pointer can be
+no more valid. Fix the issue relying on skb_shinfo() macro directly in
+airoha_dev_xmit().
+This is not a user visible issue since we can't currently enable TSO for
+DSA user ports since we are missing to initialize net_device
+vlan_features field.
 
-table inet filter {
-	flowtable ft {
-		hook ingress priority filter
-		devices = { lan1, lan2, lan3, lan4, eth1 }
-		flags offload;
-	}
-	chain forward {
-		type filter hook forward priority filter; policy accept;
-		meta l4proto { tcp, udp } flow add @ft
-	}
-}
-
-Packet Processor Engine (PPE) module available on EN7581 SoC populates
-the PPE table with 5-tuples flower rules learned from traffic forwarded
-between the GDM ports connected to the Packet Switch Engine (PSE) module.
-airoha_eth driver configures and collects data from the PPE module via a
-Network Processor Unit (NPU) RISC-V module available on the EN7581 SoC.
-Move airoha_eth driver in a dedicated folder
-(drivers/net/ethernet/airoha).
-
+Fixes: 23020f049327 ("net: airoha: Introduce ethernet support for EN7581 SoC")
+Signed-off-by: Lorenzo Bianconi <lorenzo@kernel.org>
 ---
-Changes in v3:
-- Fix TSO support for header cloned skbs
-- Do not use skb_pull_rcsum() in airoha_get_dsa_tag()
-- Fix head lean computation after running airoha_get_dsa_tag() in
-  airoha_dev_xmit()
-- Link to v2: https://lore.kernel.org/r/20250207-airoha-en7581-flowtable-offload-v2-0-3a2239692a67@kernel.org
+ drivers/net/ethernet/mediatek/airoha_eth.c | 10 +++++-----
+ 1 file changed, 5 insertions(+), 5 deletions(-)
 
-Changes in v2:
-- Add airoha-npu document binding
-- Enable Rx SPTAG on MT7530 dsa switch for EN7581 SoC.
-- Fix warnings in airoha_npu_run_firmware()
-- Fix sparse warnings
-- Link to v1: https://lore.kernel.org/r/20250205-airoha-en7581-flowtable-offload-v1-0-d362cfa97b01@kernel.org
+diff --git a/drivers/net/ethernet/mediatek/airoha_eth.c b/drivers/net/ethernet/mediatek/airoha_eth.c
+index 09f448f291240257c5748725848ede231c502fbd..aa5f220ddbcf9ca5bee1173114294cb3aec701c9 100644
+--- a/drivers/net/ethernet/mediatek/airoha_eth.c
++++ b/drivers/net/ethernet/mediatek/airoha_eth.c
+@@ -2556,11 +2556,10 @@ static u16 airoha_dev_select_queue(struct net_device *dev, struct sk_buff *skb,
+ static netdev_tx_t airoha_dev_xmit(struct sk_buff *skb,
+ 				   struct net_device *dev)
+ {
+-	struct skb_shared_info *sinfo = skb_shinfo(skb);
+ 	struct airoha_gdm_port *port = netdev_priv(dev);
++	u32 nr_frags = 1 + skb_shinfo(skb)->nr_frags;
+ 	u32 msg0, msg1, len = skb_headlen(skb);
+ 	struct airoha_qdma *qdma = port->qdma;
+-	u32 nr_frags = 1 + sinfo->nr_frags;
+ 	struct netdev_queue *txq;
+ 	struct airoha_queue *q;
+ 	void *data = skb->data;
+@@ -2583,8 +2582,9 @@ static netdev_tx_t airoha_dev_xmit(struct sk_buff *skb,
+ 		if (skb_cow_head(skb, 0))
+ 			goto error;
+ 
+-		if (sinfo->gso_type & (SKB_GSO_TCPV4 | SKB_GSO_TCPV6)) {
+-			__be16 csum = cpu_to_be16(sinfo->gso_size);
++		if (skb_shinfo(skb)->gso_type & (SKB_GSO_TCPV4 |
++						 SKB_GSO_TCPV6)) {
++			__be16 csum = cpu_to_be16(skb_shinfo(skb)->gso_size);
+ 
+ 			tcp_hdr(skb)->check = (__force __sum16)csum;
+ 			msg0 |= FIELD_PREP(QDMA_ETH_TXMSG_TSO_MASK, 1);
+@@ -2613,7 +2613,7 @@ static netdev_tx_t airoha_dev_xmit(struct sk_buff *skb,
+ 	for (i = 0; i < nr_frags; i++) {
+ 		struct airoha_qdma_desc *desc = &q->desc[index];
+ 		struct airoha_queue_entry *e = &q->entry[index];
+-		skb_frag_t *frag = &sinfo->frags[i];
++		skb_frag_t *frag = &skb_shinfo(skb)->frags[i];
+ 		dma_addr_t addr;
+ 		u32 val;
+ 
 
----
-Lorenzo Bianconi (16):
-      net: airoha: Fix TSO support for header cloned skbs
-      net: airoha: Move airoha_eth driver in a dedicated folder
-      net: airoha: Move definitions in airoha_eth.h
-      net: airoha: Move reg/write utility routines in airoha_eth.h
-      net: airoha: Move register definitions in airoha_regs.h
-      net: airoha: Move DSA tag in DMA descriptor
-      net: dsa: mt7530: Enable Rx sptag for EN7581 SoC
-      net: airoha: Enable support for multiple net_devices
-      net: airoha: Move REG_GDM_FWD_CFG() initialization in airoha_dev_init()
-      net: airoha: Rename airoha_set_gdm_port_fwd_cfg() in airoha_set_vip_for_gdm_port()
-      dt-bindings: arm: airoha: Add the NPU node for EN7581 SoC
-      dt-bindings: net: airoha: Add airoha,npu phandle property
-      net: airoha: Introduce PPE initialization via NPU
-      net: airoha: Introduce flowtable offload support
-      net: airoha: Add loopback support for GDM2
-      net: airoha: Introduce PPE debugfs support
-
- .../devicetree/bindings/arm/airoha,en7581-npu.yaml |   71 ++
- .../devicetree/bindings/net/airoha,en7581-eth.yaml |   10 +
- drivers/net/dsa/mt7530.c                           |    5 +
- drivers/net/dsa/mt7530.h                           |    4 +
- drivers/net/ethernet/Kconfig                       |    2 +
- drivers/net/ethernet/Makefile                      |    1 +
- drivers/net/ethernet/airoha/Kconfig                |   23 +
- drivers/net/ethernet/airoha/Makefile               |    9 +
- .../net/ethernet/{mediatek => airoha}/airoha_eth.c | 1284 +++++---------------
- drivers/net/ethernet/airoha/airoha_eth.h           |  626 ++++++++++
- drivers/net/ethernet/airoha/airoha_npu.c           |  501 ++++++++
- drivers/net/ethernet/airoha/airoha_ppe.c           |  834 +++++++++++++
- drivers/net/ethernet/airoha/airoha_ppe_debugfs.c   |  175 +++
- drivers/net/ethernet/airoha/airoha_regs.h          |  798 ++++++++++++
- drivers/net/ethernet/mediatek/Kconfig              |    8 -
- drivers/net/ethernet/mediatek/Makefile             |    1 -
- 16 files changed, 3344 insertions(+), 1008 deletions(-)
----
-base-commit: acdefab0dcbc3833b5a734ab80d792bb778517a0
-change-id: 20250205-airoha-en7581-flowtable-offload-e3a11b3b34ad
-
-Best regards,
 -- 
-Lorenzo Bianconi <lorenzo@kernel.org>
+2.48.1
 
 
