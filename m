@@ -1,50 +1,50 @@
-Return-Path: <netdev+bounces-164453-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-164454-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id E3FD9A2DD5B
-	for <lists+netdev@lfdr.de>; Sun,  9 Feb 2025 13:10:13 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 2D586A2DD5C
+	for <lists+netdev@lfdr.de>; Sun,  9 Feb 2025 13:10:20 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 665881886511
-	for <lists+netdev@lfdr.de>; Sun,  9 Feb 2025 12:10:17 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 3C56B1886E5F
+	for <lists+netdev@lfdr.de>; Sun,  9 Feb 2025 12:10:23 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6D83F1DE8A2;
-	Sun,  9 Feb 2025 12:09:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 47D591DC996;
+	Sun,  9 Feb 2025 12:09:40 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="muGMZX/p"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="LX3rKGxu"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 459BE1DE895;
-	Sun,  9 Feb 2025 12:09:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1D52D1D61B5;
+	Sun,  9 Feb 2025 12:09:39 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1739102977; cv=none; b=QsbEFa6WWK/7QWYPy/+igL8STSnDs359gA3jkVXsEopHktdE/Inhm+8W9vZygPH9coPCOQapikJLZp1+iM/VNDbn3RNhVgviXVKHx4T3FRr7FbmFG9FMS9g3RX/XXaOCA9UIdMW6I0VYY7H04sGPoWA7EwyfgbMTL1oPWw1gGAA=
+	t=1739102980; cv=none; b=j3oo97sIsuLLKsZ0eXUGYh8HBrvWPaPuLoxuEz2mb9QizrgkhO56mTfS9MaEdzP05r2ThCROB20Z+D/i7N2VE8se0Mvx3l8E3OZo70o4DgVWYyShELW4KppGHn5X+KdqfeVuzR0jOoVDCH/VfMbXgrUQAsW+ISYXRPqBUqyVnkc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1739102977; c=relaxed/simple;
-	bh=fPqAl5WVzSgSEPCYLYJcFo3xIskaAzrnsiLHeLFi9PU=;
+	s=arc-20240116; t=1739102980; c=relaxed/simple;
+	bh=C1aFaWCNYf7kg2GH5A7lQw7Iuw2I/SkqM+nxoGYrGqc=;
 	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=eCFUYfik9i4MQwOrWQuDHORL4mcJGP7ZDEfWA2K9YrlmW9GD3g50L/Og6SAWZt1jtCXvZoopBf6Fdy+Zp6ZqfrS4YmiH5WfGCh2SSo6QbhTmo6DADZMFdzZkDCPTL+b8QjoaWBLPNIf5eBQk9x6mJHzx6aa684G5VBlw3SE7J4o=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=muGMZX/p; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 60E80C4CEEA;
-	Sun,  9 Feb 2025 12:09:36 +0000 (UTC)
+	 In-Reply-To:To:Cc; b=VhJDjspxSJ63QRzUX2eQMQ+nn+F7XJ56+X/hJW6WFCLuGsn4nLAfNz1DL0g7td8pr3afAefkBfhIvvI8BtUSXTLQ3zuW7szfSwxOVUBVSi4uCoAsWnfzw8z1ea39zITSojgxKXi9crEvc8iQ70FLvPBeAix1XXy2c0k6fHcSHzM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=LX3rKGxu; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 12472C4CEE2;
+	Sun,  9 Feb 2025 12:09:38 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1739102976;
-	bh=fPqAl5WVzSgSEPCYLYJcFo3xIskaAzrnsiLHeLFi9PU=;
+	s=k20201202; t=1739102979;
+	bh=C1aFaWCNYf7kg2GH5A7lQw7Iuw2I/SkqM+nxoGYrGqc=;
 	h=From:Date:Subject:References:In-Reply-To:To:Cc:From;
-	b=muGMZX/p8JMnkP3IwudhIlC3ZMidx85Qyrb/14TcjAQcFMlFiiDjsct+K91UNiTj+
-	 7EItu8nRzD1RFV+GCMRm4arQt1GAfAGcTspQwaJCT1rSdUlKEF9UH+pUQgdQ4xFWeq
-	 c2t+IXW0Z+lZW+2iMeDa9cWaQyZgXdc9nz6FWYkC8QF6h8knna/okb9P4bjaS/BDWr
-	 Bfd8b1IuYJ9jJUvCaglBaVb5YlcrNlEBo/LyduxpmtIEkNJHvNnLT9QYOIX61lkr5e
-	 7HQ2P+1sOEFQ5ky0moS7ijJI0AszeUwcK8PSSbAB+k5YenTz9qAVaHwbBZ6TZ+fxek
-	 FfMY/xXuaKfKA==
+	b=LX3rKGxuCVWzZ1YUV1qDWtoC178FikIiMBYdF8qT8YZuuOhiuYqLIUCZuSED5nhHS
+	 vtpi1ymnaA3Gw+oY9FAdBOY9Q5Gu85n9aZPaLqcXXQyUj9VVFcpstB+znrUbhQunDE
+	 ujYCZAWcA6yNNqaCK/hBT/q6yFQaizTJ1T6+zEDim6XIo9UaaRD/1/YEn8kKaDgYgQ
+	 bP1eev5felglHWDj3yFHpmydkiPgjm5GNPSx57CDMgFh00KEUe3wKHFNiXTFe66Ung
+	 eASpq+LlddmDATDdO98jnl4OmCRFzqoQMqIrNWcCJ6Zo1iTFLi8rqjqFeenTtfxr8p
+	 dvvsXoPFaxrCQ==
 From: Lorenzo Bianconi <lorenzo@kernel.org>
-Date: Sun, 09 Feb 2025 13:08:59 +0100
-Subject: [PATCH net-next v3 06/16] net: airoha: Move DSA tag in DMA
- descriptor
+Date: Sun, 09 Feb 2025 13:09:00 +0100
+Subject: [PATCH net-next v3 07/16] net: dsa: mt7530: Enable Rx sptag for
+ EN7581 SoC
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -53,7 +53,7 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-Message-Id: <20250209-airoha-en7581-flowtable-offload-v3-6-dba60e755563@kernel.org>
+Message-Id: <20250209-airoha-en7581-flowtable-offload-v3-7-dba60e755563@kernel.org>
 References: <20250209-airoha-en7581-flowtable-offload-v3-0-dba60e755563@kernel.org>
 In-Reply-To: <20250209-airoha-en7581-flowtable-offload-v3-0-dba60e755563@kernel.org>
 To: Andrew Lunn <andrew+netdev@lunn.ch>, 
@@ -73,290 +73,50 @@ Cc: netdev@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
  upstream@airoha.com
 X-Mailer: b4 0.14.2
 
-Packet Processor Engine (PPE) module reads DSA tags from the DMA descriptor
-and requires untagged DSA packets to properly parse them. Move DSA tag
-in the DMA descriptor on TX side and read DSA tag from DMA descriptor
-on RX side. In order to avoid skb reallocation, store tag in skb_dst on
-RX side.
+Packet Processor Engine (PPE) module used for hw acceleration on EN7581
+mac block, in order to properly parse packets, requires DSA untagged
+packets on TX side and read DSA tag from DMA descriptor on RX side.
+For this reason, enable RX Special Tag (SPTAG) for EN7581 SoC.
 This is a preliminary patch to enable netfilter flowtable hw offloading
 on EN7581 SoC.
 
 Signed-off-by: Lorenzo Bianconi <lorenzo@kernel.org>
 ---
- drivers/net/ethernet/airoha/airoha_eth.c  | 123 ++++++++++++++++++++++++++++--
- drivers/net/ethernet/airoha/airoha_eth.h  |   7 ++
- drivers/net/ethernet/airoha/airoha_regs.h |   2 +
- 3 files changed, 126 insertions(+), 6 deletions(-)
+ drivers/net/dsa/mt7530.c | 5 +++++
+ drivers/net/dsa/mt7530.h | 4 ++++
+ 2 files changed, 9 insertions(+)
 
-diff --git a/drivers/net/ethernet/airoha/airoha_eth.c b/drivers/net/ethernet/airoha/airoha_eth.c
-index b79556f1b4951c687aa89bc5839fc9405581a6c3..4f45db86d8d8d6b7a13d56a9315773f8685a09f6 100644
---- a/drivers/net/ethernet/airoha/airoha_eth.c
-+++ b/drivers/net/ethernet/airoha/airoha_eth.c
-@@ -9,6 +9,7 @@
- #include <linux/tcp.h>
- #include <linux/u64_stats_sync.h>
- #include <net/dsa.h>
-+#include <net/dst_metadata.h>
- #include <net/page_pool/helpers.h>
- #include <net/pkt_cls.h>
- #include <uapi/linux/ppp_defs.h>
-@@ -656,6 +657,7 @@ static int airoha_qdma_rx_process(struct airoha_queue *q, int budget)
- 		struct airoha_qdma_desc *desc = &q->desc[q->tail];
- 		dma_addr_t dma_addr = le32_to_cpu(desc->addr);
- 		u32 desc_ctrl = le32_to_cpu(desc->ctrl);
-+		struct airoha_gdm_port *port;
- 		struct sk_buff *skb;
- 		int len, p;
+diff --git a/drivers/net/dsa/mt7530.c b/drivers/net/dsa/mt7530.c
+index 1c83af805209cae40c56138fa8f72261e396f58c..eec8ba9d68088f1dbb2a774a32d3d60af1a9784c 100644
+--- a/drivers/net/dsa/mt7530.c
++++ b/drivers/net/dsa/mt7530.c
+@@ -2586,6 +2586,11 @@ mt7531_setup_common(struct dsa_switch *ds)
+ 	/* Allow mirroring frames received on the local port (monitor port). */
+ 	mt7530_set(priv, MT753X_AGC, LOCAL_EN);
  
-@@ -683,6 +685,7 @@ static int airoha_qdma_rx_process(struct airoha_queue *q, int budget)
- 			continue;
- 		}
++	/* Enable Special Tag for rx frames */
++	if (priv->id == ID_EN7581)
++		mt7530_write(priv, MT753X_CPORT_SPTAG_CFG,
++			     CPORT_SW2FE_STAG_EN | CPORT_FE2SW_STAG_EN);
++
+ 	/* Flush the FDB table */
+ 	ret = mt7530_fdb_cmd(priv, MT7530_FDB_FLUSH, NULL);
+ 	if (ret < 0)
+diff --git a/drivers/net/dsa/mt7530.h b/drivers/net/dsa/mt7530.h
+index 448200689f492dcb73ef056d7284090c1c662e67..349d72a35771f35d478244ab29be1801b3466a5f 100644
+--- a/drivers/net/dsa/mt7530.h
++++ b/drivers/net/dsa/mt7530.h
+@@ -627,6 +627,10 @@ enum mt7531_xtal_fsel {
+ #define  MT7531_GPIO12_RG_RXD3_MASK	GENMASK(19, 16)
+ #define  MT7531_EXT_P_MDIO_12		(2 << 16)
  
-+		port = eth->ports[p];
- 		skb = napi_build_skb(e->buf, q->buf_size);
- 		if (!skb) {
- 			page_pool_put_full_page(q->page_pool,
-@@ -694,10 +697,26 @@ static int airoha_qdma_rx_process(struct airoha_queue *q, int budget)
- 		skb_reserve(skb, 2);
- 		__skb_put(skb, len);
- 		skb_mark_for_recycle(skb);
--		skb->dev = eth->ports[p]->dev;
-+		skb->dev = port->dev;
- 		skb->protocol = eth_type_trans(skb, skb->dev);
- 		skb->ip_summed = CHECKSUM_UNNECESSARY;
- 		skb_record_rx_queue(skb, qid);
++#define MT753X_CPORT_SPTAG_CFG		0x7c10
++#define  CPORT_SW2FE_STAG_EN		BIT(1)
++#define  CPORT_FE2SW_STAG_EN		BIT(0)
 +
-+		if (netdev_uses_dsa(port->dev)) {
-+			/* PPE module requires untagged packets to work
-+			 * properly and it provides DSA port index via the
-+			 * DMA descriptor. Report DSA tag to the DSA stack
-+			 * via skb dst info.
-+			 */
-+			u32 sptag = FIELD_GET(QDMA_ETH_RXMSG_SPTAG,
-+					      le32_to_cpu(desc->msg0));
-+
-+			if (sptag < ARRAY_SIZE(port->dsa_meta) &&
-+			    port->dsa_meta[sptag])
-+				skb_dst_set_noref(skb,
-+						  &port->dsa_meta[sptag]->dst);
-+		}
-+
- 		napi_gro_receive(&q->napi, skb);
- 
- 		done++;
-@@ -1636,25 +1655,74 @@ static u16 airoha_dev_select_queue(struct net_device *dev, struct sk_buff *skb,
- 	return queue < dev->num_tx_queues ? queue : 0;
- }
- 
-+static u32 airoha_get_dsa_tag(struct sk_buff *skb, struct net_device *dev)
-+{
-+#if IS_ENABLED(CONFIG_NET_DSA)
-+	struct ethhdr *ehdr;
-+	struct dsa_port *dp;
-+	u8 xmit_tpid;
-+	u16 tag;
-+
-+	if (!netdev_uses_dsa(dev))
-+		return 0;
-+
-+	dp = dev->dsa_ptr;
-+	if (IS_ERR(dp))
-+		return 0;
-+
-+	if (dp->tag_ops->proto != DSA_TAG_PROTO_MTK)
-+		return 0;
-+
-+	if (skb_ensure_writable(skb, ETH_HLEN))
-+		return 0;
-+
-+	ehdr = (struct ethhdr *)skb->data;
-+	tag = be16_to_cpu(ehdr->h_proto);
-+	xmit_tpid = tag >> 8;
-+
-+	switch (xmit_tpid) {
-+	case MTK_HDR_XMIT_TAGGED_TPID_8100:
-+		ehdr->h_proto = cpu_to_be16(ETH_P_8021Q);
-+		break;
-+	case MTK_HDR_XMIT_TAGGED_TPID_88A8:
-+		ehdr->h_proto = cpu_to_be16(ETH_P_8021AD);
-+		break;
-+	default:
-+		/* PPE module requires untagged DSA packets to work properly,
-+		 * so move DSA tag to DMA descriptor.
-+		 */
-+		memmove(skb->data + MTK_HDR_LEN, skb->data, 2 * ETH_ALEN);
-+		__skb_pull(skb, MTK_HDR_LEN);
-+		break;
-+	}
-+
-+	return tag;
-+#else
-+	return 0;
-+#endif
-+}
-+
- static netdev_tx_t airoha_dev_xmit(struct sk_buff *skb,
- 				   struct net_device *dev)
- {
- 	struct airoha_gdm_port *port = netdev_priv(dev);
--	u32 nr_frags = 1 + skb_shinfo(skb)->nr_frags;
--	u32 msg0, msg1, len = skb_headlen(skb);
- 	struct airoha_qdma *qdma = port->qdma;
-+	u32 nr_frags, tag, msg0, msg1, len;
- 	struct netdev_queue *txq;
- 	struct airoha_queue *q;
--	void *data = skb->data;
-+	void *data;
- 	int i, qid;
- 	u16 index;
- 	u8 fport;
- 
- 	qid = skb_get_queue_mapping(skb) % ARRAY_SIZE(qdma->q_tx);
-+	tag = airoha_get_dsa_tag(skb, dev);
-+
- 	msg0 = FIELD_PREP(QDMA_ETH_TXMSG_CHAN_MASK,
- 			  qid / AIROHA_NUM_QOS_QUEUES) |
- 	       FIELD_PREP(QDMA_ETH_TXMSG_QUEUE_MASK,
--			  qid % AIROHA_NUM_QOS_QUEUES);
-+			  qid % AIROHA_NUM_QOS_QUEUES) |
-+	       FIELD_PREP(QDMA_ETH_TXMSG_SP_TAG_MASK, tag);
- 	if (skb->ip_summed == CHECKSUM_PARTIAL)
- 		msg0 |= FIELD_PREP(QDMA_ETH_TXMSG_TCO_MASK, 1) |
- 			FIELD_PREP(QDMA_ETH_TXMSG_UCO_MASK, 1) |
-@@ -1685,6 +1753,8 @@ static netdev_tx_t airoha_dev_xmit(struct sk_buff *skb,
- 	spin_lock_bh(&q->lock);
- 
- 	txq = netdev_get_tx_queue(dev, qid);
-+	nr_frags = 1 + skb_shinfo(skb)->nr_frags;
-+
- 	if (q->queued + nr_frags > q->ndesc) {
- 		/* not enough space in the queue */
- 		netif_tx_stop_queue(txq);
-@@ -1692,7 +1762,10 @@ static netdev_tx_t airoha_dev_xmit(struct sk_buff *skb,
- 		return NETDEV_TX_BUSY;
- 	}
- 
-+	len = skb_headlen(skb);
-+	data = skb->data;
- 	index = q->head;
-+
- 	for (i = 0; i < nr_frags; i++) {
- 		struct airoha_qdma_desc *desc = &q->desc[index];
- 		struct airoha_queue_entry *e = &q->entry[index];
-@@ -2226,6 +2299,37 @@ static const struct ethtool_ops airoha_ethtool_ops = {
- 	.get_rmon_stats		= airoha_ethtool_get_rmon_stats,
- };
- 
-+static int airoha_metadata_dst_alloc(struct airoha_gdm_port *port)
-+{
-+	int i;
-+
-+	for (i = 0; i < ARRAY_SIZE(port->dsa_meta); i++) {
-+		struct metadata_dst *md_dst;
-+
-+		md_dst = metadata_dst_alloc(0, METADATA_HW_PORT_MUX,
-+					    GFP_KERNEL);
-+		if (!md_dst)
-+			return -ENOMEM;
-+
-+		md_dst->u.port_info.port_id = i;
-+		port->dsa_meta[i] = md_dst;
-+	}
-+
-+	return 0;
-+}
-+
-+static void airoha_metadata_dst_free(struct airoha_gdm_port *port)
-+{
-+	int i;
-+
-+	for (i = 0; i < ARRAY_SIZE(port->dsa_meta); i++) {
-+		if (!port->dsa_meta[i])
-+			continue;
-+
-+		metadata_dst_free(port->dsa_meta[i]);
-+	}
-+}
-+
- static int airoha_alloc_gdm_port(struct airoha_eth *eth, struct device_node *np)
- {
- 	const __be32 *id_ptr = of_get_property(np, "reg", NULL);
-@@ -2298,6 +2402,10 @@ static int airoha_alloc_gdm_port(struct airoha_eth *eth, struct device_node *np)
- 	port->id = id;
- 	eth->ports[index] = port;
- 
-+	err = airoha_metadata_dst_alloc(port);
-+	if (err)
-+		return err;
-+
- 	return register_netdev(dev);
- }
- 
-@@ -2390,8 +2498,10 @@ static int airoha_probe(struct platform_device *pdev)
- 	for (i = 0; i < ARRAY_SIZE(eth->ports); i++) {
- 		struct airoha_gdm_port *port = eth->ports[i];
- 
--		if (port && port->dev->reg_state == NETREG_REGISTERED)
-+		if (port && port->dev->reg_state == NETREG_REGISTERED) {
-+			airoha_metadata_dst_free(port);
- 			unregister_netdev(port->dev);
-+		}
- 	}
- 	free_netdev(eth->napi_dev);
- 	platform_set_drvdata(pdev, NULL);
-@@ -2416,6 +2526,7 @@ static void airoha_remove(struct platform_device *pdev)
- 			continue;
- 
- 		airoha_dev_stop(port->dev);
-+		airoha_metadata_dst_free(port);
- 		unregister_netdev(port->dev);
- 	}
- 	free_netdev(eth->napi_dev);
-diff --git a/drivers/net/ethernet/airoha/airoha_eth.h b/drivers/net/ethernet/airoha/airoha_eth.h
-index 743aaf10235fe09fb2a91b491f4b25064ed8319b..fee6c10eaedfd30207205b6557e856091fd45d7e 100644
---- a/drivers/net/ethernet/airoha/airoha_eth.h
-+++ b/drivers/net/ethernet/airoha/airoha_eth.h
-@@ -15,6 +15,7 @@
- 
- #define AIROHA_MAX_NUM_GDM_PORTS	1
- #define AIROHA_MAX_NUM_QDMA		2
-+#define AIROHA_MAX_DSA_PORTS		7
- #define AIROHA_MAX_NUM_RSTS		3
- #define AIROHA_MAX_NUM_XSI_RSTS		5
- #define AIROHA_MAX_MTU			2000
-@@ -43,6 +44,10 @@
- #define QDMA_METER_IDX(_n)		((_n) & 0xff)
- #define QDMA_METER_GROUP(_n)		(((_n) >> 8) & 0x3)
- 
-+#define MTK_HDR_LEN			4
-+#define MTK_HDR_XMIT_TAGGED_TPID_8100	1
-+#define MTK_HDR_XMIT_TAGGED_TPID_88A8	2
-+
- enum {
- 	QDMA_INT_REG_IDX0,
- 	QDMA_INT_REG_IDX1,
-@@ -231,6 +236,8 @@ struct airoha_gdm_port {
- 	/* qos stats counters */
- 	u64 cpu_tx_packets;
- 	u64 fwd_tx_packets;
-+
-+	struct metadata_dst *dsa_meta[AIROHA_MAX_DSA_PORTS];
- };
- 
- struct airoha_eth {
-diff --git a/drivers/net/ethernet/airoha/airoha_regs.h b/drivers/net/ethernet/airoha/airoha_regs.h
-index 7c9dadb348834cb5a856760abe45e8221d6fd700..e467dd81ff44a9ad560226cab42b7431812f5fb9 100644
---- a/drivers/net/ethernet/airoha/airoha_regs.h
-+++ b/drivers/net/ethernet/airoha/airoha_regs.h
-@@ -624,6 +624,8 @@
- #define QDMA_ETH_TXMSG_ACNT_G1_MASK	GENMASK(10, 6)	/* 0x1f do not count */
- #define QDMA_ETH_TXMSG_ACNT_G0_MASK	GENMASK(5, 0)	/* 0x3f do not count */
- 
-+/* RX MSG0 */
-+#define QDMA_ETH_RXMSG_SPTAG		GENMASK(21, 14)
- /* RX MSG1 */
- #define QDMA_ETH_RXMSG_DEI_MASK		BIT(31)
- #define QDMA_ETH_RXMSG_IP6_MASK		BIT(30)
+ /* Registers for LED GPIO control (MT7530 only)
+  * All registers follow this pattern:
+  * [ 2: 0]  port 0
 
 -- 
 2.48.1
