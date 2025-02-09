@@ -1,91 +1,173 @@
-Return-Path: <netdev+bounces-164466-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-164467-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id AA355A2DDC8
-	for <lists+netdev@lfdr.de>; Sun,  9 Feb 2025 13:33:33 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 21BA0A2DE45
+	for <lists+netdev@lfdr.de>; Sun,  9 Feb 2025 15:25:28 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 040C918866DF
-	for <lists+netdev@lfdr.de>; Sun,  9 Feb 2025 12:33:39 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 90F07165466
+	for <lists+netdev@lfdr.de>; Sun,  9 Feb 2025 14:25:26 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5B35E14F9CC;
-	Sun,  9 Feb 2025 12:33:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 59E621DF25A;
+	Sun,  9 Feb 2025 14:25:18 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="ue+b2MLR"
+	dkim=pass (2048-bit key) header.d=svanheule.net header.i=@svanheule.net header.b="qtQ6s9bA"
 X-Original-To: netdev@vger.kernel.org
-Received: from out-178.mta1.migadu.com (out-178.mta1.migadu.com [95.215.58.178])
+Received: from polaris.svanheule.net (polaris.svanheule.net [84.16.241.116])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A06051E522
-	for <netdev@vger.kernel.org>; Sun,  9 Feb 2025 12:33:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.178
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A6981E56F
+	for <netdev@vger.kernel.org>; Sun,  9 Feb 2025 14:25:15 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=84.16.241.116
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1739104410; cv=none; b=A8mReLL6gILiTCPYCDGvwsmcXP3QOYX/endJ2TEQONepox3ufbxE7Wxq8/YHf2mq3JvTYUgNuSJSFZfAeN+m7m3UjD5Xvd9FMtxfKV+GKkf+B8LK9U3zd9THBcPxE5vL0wuwFz2JJGajmZ+jIVeMj7XQVkQ+CgYNFx+jXermjus=
+	t=1739111118; cv=none; b=Ik5RCW8C0inq640ioZpoT61befM0u+pJO0yvQGXykO2/wHKdazEfdVnDXB3TX9PG/ZC+6GatZHYfOoPQGk8bzDSHpzn2i4hB3nkBapFRGl9uxCCjHd920WQnOKo8QkL8VdD/wSLrpAVaZBXV2DvTPMeLrYiQE0G9RKgMylroq4Q=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1739104410; c=relaxed/simple;
-	bh=A+wgcMVaIDGkfixJVkQvX0PeVRMtpzdwCfEl2Xoegyw=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=hveObdVJ8LaXgREm/7f7LT+kSyeXxfo1f7AKfimMWGQO6Yj5psER85w8qxX6KWMk6HdVbNvNc8E/KH3sHsybYUmr7JjWTkbOUm6//nmVLuwk8WD9Ll4M3TWXBzNUQqMTc69VmDigQRIDXkrn/kTRZPUPlRXPl14daD29aiNDRoo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=ue+b2MLR; arc=none smtp.client-ip=95.215.58.178
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
-Message-ID: <7bc5e34e-8be6-46a2-8262-7129fff5e2f3@linux.dev>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1739104406;
+	s=arc-20240116; t=1739111118; c=relaxed/simple;
+	bh=7VqmGkIwDbHsveUhocMMuXTLiwi8kQYecmBa/DPy3ks=;
+	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
+	 Content-Type:MIME-Version; b=ti0g3kwLgOB3TP/oSOZSsM9byeXCA0xnwwxSQMnBONCdixdrpZmU3fhp91e5NnNFaiMVfHsWkw8JGgxO5bA5jHuhhRJzBpo7zFHlqxB7naOxbrRHlPtuUj+ZWpSlaLDXvv702Pz9KZOyRG/57lM7a8yUKuj9t1gvUByW9wvPgQ0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=svanheule.net; spf=pass smtp.mailfrom=svanheule.net; dkim=pass (2048-bit key) header.d=svanheule.net header.i=@svanheule.net header.b=qtQ6s9bA; arc=none smtp.client-ip=84.16.241.116
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=svanheule.net
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=svanheule.net
+Received: from [192.168.90.187] (unknown [94.110.49.146])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	(Authenticated sender: sander@svanheule.net)
+	by polaris.svanheule.net (Postfix) with ESMTPSA id 655E25B5D6D;
+	Sun,  9 Feb 2025 15:19:30 +0100 (CET)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=svanheule.net;
+	s=mail1707; t=1739110771;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=FFczN+NeV30e/Hem1hNYdpuoU3uz9unVoiPgWRZFv8s=;
-	b=ue+b2MLRaplF80rTO8sgQ9j5XcDIORLlO1DikFXQEN7eKcsYd0TE83RnZ+lzYAleQWZ6Ty
-	DgAfAKOPWM/LncUteT8EaUx5stqXzo6uSeksWloJtkBiwB0JefpTJSPqlxZCZiI6WNeay+
-	yNA28H6gapSMFZUj9jIKA8pbPX/mDws=
-Date: Sun, 9 Feb 2025 12:33:24 +0000
+	bh=boS7aXm7OXTOyVehmL65XtXcfRHHBL+5y6apx4GLa/k=;
+	b=qtQ6s9bATK6eseX5rLiyRCQ591RZwYqjO+L0NepmFuMpgvjaqckod+ycVOr0UKvCSRqluD
+	ln4j//tRVS+Y1Fq6GtATVTg2wb0R8ezDlrl8vst2wMzQEubgVh5nSRWrhnqOP0d3El6I8T
+	I+mGbZVQ4kMqeaj/G0N5/rr7Y5XL4CeqpnhzMLK40in4PleCKay2JGNeSvdFpdAF+jEUyY
+	M8c48NODxJe4FTUzyGwXuB5Vqjw6xWH41AxPeoIRNK7ksEkETgRKPEsD6BsAz+gGkMeqaj
+	bPdKTrNAu4rdfBQCJYwPThlQsiDVJKnMWrP3mtsvuobHnx0avlcNpZnXgIghfQ==
+Message-ID: <091a2e9cc6fedd99f35da124f67a54b69478648f.camel@svanheule.net>
+Subject: Re: [PATCH net-next v6 4/6] net: mdio: Add RTL9300 MDIO driver
+From: Sander Vanheule <sander@svanheule.net>
+To: Chris Packham <chris.packham@alliedtelesis.co.nz>, lee@kernel.org, 
+	robh@kernel.org, krzk+dt@kernel.org, conor+dt@kernel.org,
+ andrew+netdev@lunn.ch, 	davem@davemloft.net, edumazet@google.com,
+ kuba@kernel.org, pabeni@redhat.com, 	tsbogend@alpha.franken.de,
+ hkallweit1@gmail.com, linux@armlinux.org.uk, 	daniel@makrotopia.org,
+ markus.stockhausen@gmx.de
+Cc: devicetree@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	netdev@vger.kernel.org, linux-mips@vger.kernel.org
+Date: Sun, 09 Feb 2025 15:19:29 +0100
+In-Reply-To: <20250204030249.1965444-5-chris.packham@alliedtelesis.co.nz>
+References: <20250204030249.1965444-1-chris.packham@alliedtelesis.co.nz>
+	 <20250204030249.1965444-5-chris.packham@alliedtelesis.co.nz>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+User-Agent: Evolution 3.54.3 (3.54.3-1.fc41) 
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Subject: Re: [PATCH v6 net-next 0/4] PHC support in ENA driver
-To: Jakub Kicinski <kuba@kernel.org>, David Arinzon <darinzon@amazon.com>,
- "Machnikowski, Maciek" <maciek@machnikowski.net>
-Cc: David Miller <davem@davemloft.net>, netdev@vger.kernel.org,
- Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
- Simon Horman <horms@kernel.org>, Richard Cochran <richardcochran@gmail.com>,
- "Woodhouse, David" <dwmw@amazon.com>,
- Rahul Rameshbabu <rrameshbabu@nvidia.com>, Gal Pressman <gal@nvidia.com>
-References: <20250206141538.549-1-darinzon@amazon.com>
- <20250207165846.53e52bf7@kernel.org>
-Content-Language: en-US
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Vadim Fedorenko <vadim.fedorenko@linux.dev>
-In-Reply-To: <20250207165846.53e52bf7@kernel.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Migadu-Flow: FLOW_OUT
 
-On 08/02/2025 00:58, Jakub Kicinski wrote:
-> On Thu, 6 Feb 2025 16:15:34 +0200 David Arinzon wrote:
->> This patchset adds the support for PHC (PTP Hardware Clock)
->> in the ENA driver. The documentation part of the patchset
->> includes additional information, including statistics,
->> utilization and invocation examples through the testptp
->> utility.
-> 
-> Vadim, Maciek, did you see this? Looks like the device has limitations
-> on number of gettime calls per sec. Could be a good fit for the work
-> you are prototyping?
+Hi Chris,
 
-Hi Jakub!
+On Tue, 2025-02-04 at 16:02 +1300, Chris Packham wrote:
+> Add a driver for the MDIO controller on the RTL9300 family of Ethernet
+> switches with integrated SoC. There are 4 physical SMI interfaces on the
+> RTL9300 however access is done using the switch ports. The driver takes
+> the MDIO bus hierarchy from the DTS and uses this to configure the
+> switch ports so they are associated with the correct PHY. This mapping
+> is also used when dealing with software requests from phylib.
+>=20
+> Signed-off-by: Chris Packham <chris.packham@alliedtelesis.co.nz>
+> ---
+>=20
+> Notes:
+> =C2=A0=C2=A0=C2=A0 Changes in v6:
+> =C2=A0=C2=A0=C2=A0 - Parse port->phy mapping from devicetree removing the=
+ need for the
+> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 realtek,port property
 
-Yes, we have seen this patchset, and we were thinking of how to
-generalize error_bound property, which was removed from the latest
-version unfortunately. But it's a good point to look at it once
-again in terms of our prototype, thanks!
+Good to see you found a way to do this!
+
+
+> +/*
+> + * MDIO controller for RTL9300 switches with integrated SoC.
+> + *
+> + * The MDIO communication is abstracted by the switch. At the software l=
+evel
+> + * communication uses the switch port to address the PHY. We work out th=
+e
+> + * mapping based on the MDIO bus described in device tree and the realte=
+k,port
+> + * property.
+> + */
+
+Needs an update again ;-)
+
+
+> +static int rtl9300_mdio_phy_to_port(struct mii_bus *bus, int phy_id)
+> +{
+> +	struct rtl9300_mdio_chan *chan =3D bus->priv;
+> +	struct rtl9300_mdio_priv *priv =3D chan->priv;
+> +	int i;
+> +
+> +	for (i =3D find_first_bit(priv->valid_ports, MAX_PORTS);
+> +	=C2=A0=C2=A0=C2=A0=C2=A0 i < MAX_PORTS;
+> +	=C2=A0=C2=A0=C2=A0=C2=A0 i =3D find_next_bit(priv->valid_ports, MAX_POR=
+TS, i + 1))
+
+You could use the for_each_set_bit(i, priv->valid_ports, MAX_PORTS) loop ma=
+cro.
+
+
+> +static int rtl9300_mdio_read_c22(struct mii_bus *bus, int phy_id, int re=
+gnum)
+> +{
+[...]
+> +
+> +	err =3D regmap_write(regmap, SMI_ACCESS_PHY_CTRL_2, port << 16);
+
+Another candidate for FIELD_PREP()
+
+> +	if (err)
+> +		return err;
+> +
+> +	val =3D FIELD_PREP(GENMASK(24, 20), regnum) |
+> +	=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 FIELD_PREP(GENMASK(19, 15), 0x1f) |
+> +	=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 FIELD_PREP(GENMASK(14, 3), 0xfff) |
+
+You could use #define-s for the GENMASK() field masks too, similar to PHY_C=
+TRL_*. That
+would make what you're setting a bit clearer, compared to these literal val=
+ues.
+
+Nit: You're also setting all-one values, so GENMASK(19, 15) and GENMASK(14,=
+ 3) by
+themselves are sufficient. E.g. PHY_CTRL_NO_PAGE_PARK and PHY_CTRL_NO_PAGE_=
+SELECT.
+
+
+
+> +static int rtl9300_mdiobus_probe(struct platform_device *pdev)
+> +{
+[...]
+> +
+> +	device_for_each_child_node(dev, child) {
+> +		err =3D rtl9300_mdiobus_probe_one(dev, priv, child);
+
+In your next patch you use 'status =3D "disabled"' for the base dtsi. You m=
+ay want to use
+fwnode_for_each_available_child_node() in that case, so unused busses are n=
+ot probed.
+
 
 Best,
-Vadim
+Sander
 
