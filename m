@@ -1,129 +1,89 @@
-Return-Path: <netdev+bounces-164510-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-164512-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id B8BF1A2E049
-	for <lists+netdev@lfdr.de>; Sun,  9 Feb 2025 20:46:01 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 604F0A2E04E
+	for <lists+netdev@lfdr.de>; Sun,  9 Feb 2025 20:49:08 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A3B453A5B10
-	for <lists+netdev@lfdr.de>; Sun,  9 Feb 2025 19:45:52 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 9DB7A7A29C4
+	for <lists+netdev@lfdr.de>; Sun,  9 Feb 2025 19:48:11 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 349CB1922D4;
-	Sun,  9 Feb 2025 19:46:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 52B1D1D47C7;
+	Sun,  9 Feb 2025 19:49:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=uliege.be header.i=@uliege.be header.b="AnVPbMsg"
 X-Original-To: netdev@vger.kernel.org
-Received: from metis.whiteo.stw.pengutronix.de (metis.whiteo.stw.pengutronix.de [185.203.201.7])
+Received: from serv108.segi.ulg.ac.be (serv108.segi.ulg.ac.be [139.165.32.111])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 150BC70807
-	for <netdev@vger.kernel.org>; Sun,  9 Feb 2025 19:45:57 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.203.201.7
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D7527136A
+	for <netdev@vger.kernel.org>; Sun,  9 Feb 2025 19:49:00 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=139.165.32.111
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1739130360; cv=none; b=rINL8fuSFs+UZOyA5wWAbI247DlA6Pd9WllwBBLXxvJ2Ddx8qDvCE4VhTP77Jsq0dMr+c8pFYG+fP36W6AyTCAmy0cdMqCqzYiY3+zhneOPxZjWvwxqHuEx1NuJeluZHAj2NFHE3Qqlw+nt59/JYmco1/9rzxtBUaS4a7ysIEU8=
+	t=1739130542; cv=none; b=GtkzZ/y5NpEFjEJ9vBGN4M9D1EHM8JvrsvTnDNcs9cxyQn1LLuR+GOpcMN3B8kcPcF/akpWKfq73UttILAMd8S0pSBAYuXDDEMRIs5ko0jr/UzTVqmTqwy9NmVRZS70kKv+2s9J4NbeVv7xj6ttxoPOwqVvbSVN2d9JWgFSDUHQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1739130360; c=relaxed/simple;
-	bh=YpOONgEkF20tcqZ3NmMFtl2heUImZSs8vEBzd9SNccs=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=G+f++3wWf8Hq0/ij+/Q+L1HkTBmYqBeJgltM8vLL1OpCZiPZlmOPtWNXDnVRoxX4AY9xMEHvyLNiA3fTBz/GTZo9EkV02pDdj/ZPAaWhGmPH0Eylq72cOimBK1G4IOdOR8tUEKDITZs1jA0BlbUrUvkSsln5u7lhHrBufRBMtkI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de; spf=pass smtp.mailfrom=pengutronix.de; arc=none smtp.client-ip=185.203.201.7
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=pengutronix.de
-Received: from drehscheibe.grey.stw.pengutronix.de ([2a0a:edc0:0:c01:1d::a2])
-	by metis.whiteo.stw.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
-	(Exim 4.92)
-	(envelope-from <mkl@pengutronix.de>)
-	id 1thDFP-0003BH-LK; Sun, 09 Feb 2025 20:45:43 +0100
-Received: from moin.white.stw.pengutronix.de ([2a0a:edc0:0:b01:1d::7b] helo=bjornoya.blackshift.org)
-	by drehscheibe.grey.stw.pengutronix.de with esmtps  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.96)
-	(envelope-from <mkl@pengutronix.de>)
-	id 1thDFP-0007tm-11;
-	Sun, 09 Feb 2025 20:45:43 +0100
-Received: from pengutronix.de (unknown [IPv6:2a02:1210:32cc:3000:b91d:2c31:8aee:36c3])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange ECDHE (prime256v1) server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(Client did not present a certificate)
-	(Authenticated sender: mkl-all@blackshift.org)
-	by smtp.blackshift.org (Postfix) with ESMTPSA id EC32E3BD5AB;
-	Sun, 09 Feb 2025 19:45:30 +0000 (UTC)
-Date: Sun, 9 Feb 2025 20:45:25 +0100
-From: Marc Kleine-Budde <mkl@pengutronix.de>
-To: Stefan =?utf-8?B?TcOkdGpl?= <Stefan.Maetje@esd.eu>
-Cc: "horms@kernel.org" <horms@kernel.org>, 
-	"linux-can@vger.kernel.org" <linux-can@vger.kernel.org>, Frank Jungclaus <frank.jungclaus@esd.eu>, 
-	"netdev@vger.kernel.org" <netdev@vger.kernel.org>, "mailhol.vincent@wanadoo.fr" <mailhol.vincent@wanadoo.fr>
-Subject: Re: [PATCH 1/1] can: esd_usb: Fix not detecting version reply in
- probe routine
-Message-ID: <20250209-platinum-numbat-of-calibration-a8514d-mkl@pengutronix.de>
-References: <20250203145810.1286331-1-stefan.maetje@esd.eu>
- <20250203145810.1286331-2-stefan.maetje@esd.eu>
- <20250206-wild-masked-hoatzin-b194e1-mkl@pengutronix.de>
- <d7fd564775351ea8a60a6ada83a0368a99ea6b19.camel@esd.eu>
+	s=arc-20240116; t=1739130542; c=relaxed/simple;
+	bh=sB7X2elzaKzygKMTjg1J6HBySzLcFLP08u7Io8rsjSM=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=OVMITcjBpY2hZLtJUAGlQpPwAGFFa2yslScLXe/yKqkmKuWZX+heJQLj8uUVHZj0w2+X/HzR2ysgfvbKolC4DL9nTo7ZK9zuddyjsb0SOikg347Lj7Ze8gNLpWwS3rHdjySsDwBEUSPVBfwj6FCoLlccWq2LY+XscVO9ahZJZ00=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=uliege.be; spf=pass smtp.mailfrom=uliege.be; dkim=pass (2048-bit key) header.d=uliege.be header.i=@uliege.be header.b=AnVPbMsg; arc=none smtp.client-ip=139.165.32.111
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=uliege.be
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=uliege.be
+Received: from [192.168.144.30] (lfbn-ncy-1-721-166.w86-216.abo.wanadoo.fr [86.216.56.166])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+	(No client certificate requested)
+	by serv108.segi.ulg.ac.be (Postfix) with ESMTPSA id EF30E200E2B4;
+	Sun,  9 Feb 2025 20:48:58 +0100 (CET)
+DKIM-Filter: OpenDKIM Filter v2.11.0 serv108.segi.ulg.ac.be EF30E200E2B4
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=uliege.be;
+	s=ulg20190529; t=1739130539;
+	bh=j/s9WFHaRm44aCKz0S4Xl8fecNa8ZUz1vYeRut4ivSo=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=AnVPbMsgYZszFtt8Pwua9+5LemBpOjLLoV2DeMV3X0v0FF2YesVIG7tFJRJ7D2/0U
+	 pKgQOVYTS0QRRf5Iv8tgsP+14EPefjKnBNgKBlLF5keU1hdjFVECb7i4Jpe9Q2NEq3
+	 oexyuOGzFTUrhoiTBOGAbUBIsfj9irSpaqj13z3MznjOydeI5CNmPreQJmmx0+taOF
+	 pKLT8aoboVsISapURhVXoMa+azpXHfyeAwAqUD3fcL3jn+cF3J2EVBoaqEJsAwv5rq
+	 wt8FkHSVZ5A9uZ3rTvVoqCXm0mOp2YEcs2jjMc5+F4rz4bsq6XI5cI0NAxudL/zG7r
+	 H3S+zb2fYr/PA==
+Message-ID: <1a1a5bf4-9b20-48bd-b4ef-b42efafcae49@uliege.be>
+Date: Sun, 9 Feb 2025 20:48:58 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha512;
-	protocol="application/pgp-signature"; boundary="elfnnhkrcv3ndzlv"
-Content-Disposition: inline
-In-Reply-To: <d7fd564775351ea8a60a6ada83a0368a99ea6b19.camel@esd.eu>
-X-SA-Exim-Connect-IP: 2a0a:edc0:0:c01:1d::a2
-X-SA-Exim-Mail-From: mkl@pengutronix.de
-X-SA-Exim-Scanned: No (on metis.whiteo.stw.pengutronix.de); SAEximRunCond expanded to false
-X-PTX-Original-Recipient: netdev@vger.kernel.org
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net 0/3] several fixes for ioam6, rpl and seg6 lwtunnels
+To: netdev@vger.kernel.org
+Cc: davem@davemloft.net, dsahern@kernel.org, edumazet@google.com,
+ kuba@kernel.org, pabeni@redhat.com, horms@kernel.org
+References: <20250209193840.20509-1-justin.iurman@uliege.be>
+Content-Language: en-US
+From: Justin Iurman <justin.iurman@uliege.be>
+In-Reply-To: <20250209193840.20509-1-justin.iurman@uliege.be>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
+On 2/9/25 20:38, Justin Iurman wrote:
+> This patchset provides fixes to prevent loops in ioam6_iptunnel,
+> rpl_iptunnel and seg6_iptunnel.
+> 
+> Justin Iurman (3):
+>    net: ipv6: fix dst ref loops on input in lwtunnels
+>    net: ipv6: fix lwtunnel loops in ioam6, rpl and seg6
+>    net: ipv6: fix consecutive input and output transformation in
+>      lwtunnels
+> 
+>   net/ipv6/ioam6_iptunnel.c |  6 ++---
+>   net/ipv6/rpl_iptunnel.c   | 34 +++++++++++++++++++++--
+>   net/ipv6/seg6_iptunnel.c  | 57 +++++++++++++++++++++++++++++++++------
+>   3 files changed, 83 insertions(+), 14 deletions(-)
+> 
 
---elfnnhkrcv3ndzlv
-Content-Type: text/plain; protected-headers=v1; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [PATCH 1/1] can: esd_usb: Fix not detecting version reply in
- probe routine
-MIME-Version: 1.0
-
-On 09.02.2025 18:53:43, Stefan M=C3=A4tje wrote:
-> > > > > -	return usb_bulk_msg(dev->udev,
-> > > > > -			=C2=A0=C2=A0=C2=A0=C2=A0usb_rcvbulkpipe(dev->udev, 1),
-> > > > > -			=C2=A0=C2=A0=C2=A0=C2=A0msg,
-> > > > > -			=C2=A0=C2=A0=C2=A0=C2=A0sizeof(*msg),
-> > > > > -			=C2=A0=C2=A0=C2=A0=C2=A0&actual_length,
-> > > > > -			=C2=A0=C2=A0=C2=A0=C2=A01000);
-> > > > > +	for (attempt =3D 0; attempt < 8 && cnt_vs =3D=3D 0; ++attempt) {
-> > >=20
-> > > Can you create a #define for the "8" to avoid a magic number here?
->=20
-> This value was found empirically. But I think I have to reconsider
-> the style of handling here and may need to adapt the solution.
-
-You're the expert, change it as needed. I can only comment on the coding
-style and its best to avoid numbers in the code. Create a define and if
-you think it's worth, document that it's an empirically found value.
-
-Marc
-
---=20
-Pengutronix e.K.                 | Marc Kleine-Budde          |
-Embedded Linux                   | https://www.pengutronix.de |
-Vertretung N=C3=BCrnberg              | Phone: +49-5121-206917-129 |
-Amtsgericht Hildesheim, HRA 2686 | Fax:   +49-5121-206917-9   |
-
---elfnnhkrcv3ndzlv
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAABCgAdFiEEn/sM2K9nqF/8FWzzDHRl3/mQkZwFAmepBdAACgkQDHRl3/mQ
-kZw4SAf+LCQMYmQFCBf/DDbBUAkjiRiHJgH7VKwgfcxd2iVd0JdLK5Qt15sr8Ag+
-PbFpHy/yvMvfHMmLZ6hoRW34OINxJj/pTNcAruqSso1jjhzQ17NcUPpZhhMSLpwY
-Jw4cHBFjGoJ7xh8egXSnbKdBH9PBiKEV0Cb07mw87c/SAwbjiPRQJFvahKv6Es35
-izyvnU6ogBcCxhAsgWjxKNaI0tbQszpTJN1tamvVc+g+E3Wg524Rnd5ZBSuaBYcv
-taM+xzI2kF2PZI3FExrqDWMMdqMNZXiifddev5nWhVsZotoGZ8G8mPv2826im4W9
-I+4wjmIoQdJSfpchxxqmCQ/XvQNPuA==
-=okuT
------END PGP SIGNATURE-----
-
---elfnnhkrcv3ndzlv--
+@Jakub I'll send a net-next patch ASAP to provide rpl and seg6 "dummy" 
+selftests to detect dst refleaks with kmemleak. Also for net-next, I'll 
+re-apply the double allocation fix on top of this series.
 
