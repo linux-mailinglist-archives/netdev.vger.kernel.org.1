@@ -1,34 +1,34 @@
-Return-Path: <netdev+bounces-164424-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-164420-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 02AB4A2DC94
-	for <lists+netdev@lfdr.de>; Sun,  9 Feb 2025 11:40:16 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id CFEF8A2DC8C
+	for <lists+netdev@lfdr.de>; Sun,  9 Feb 2025 11:39:46 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 8CB5E1639FF
-	for <lists+netdev@lfdr.de>; Sun,  9 Feb 2025 10:40:12 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 6C49516300F
+	for <lists+netdev@lfdr.de>; Sun,  9 Feb 2025 10:39:45 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 55A441990C7;
-	Sun,  9 Feb 2025 10:39:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7ECF71632DF;
+	Sun,  9 Feb 2025 10:39:39 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=iki.fi header.i=@iki.fi header.b="oyv8UY62"
+	dkim=pass (2048-bit key) header.d=iki.fi header.i=@iki.fi header.b="bOQQMdeL"
 X-Original-To: netdev@vger.kernel.org
 Received: from lahtoruutu.iki.fi (lahtoruutu.iki.fi [185.185.170.37])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6FA8818871F;
-	Sun,  9 Feb 2025 10:39:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 68A5A13BC0C;
+	Sun,  9 Feb 2025 10:39:37 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=185.185.170.37
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1739097582; cv=pass; b=JDG5ME0BHlbiXOPHtpYUkFsIIC4lJY05tFtHipBneXqRsAZlEtfEYohvfv8Ks5JIGCH7Kj86avvQpMANV45hZQ1yEgM58R7lIt5FEj6b/4K5E8ZSDGEwEVND1bdp46Bqynt+HxlKgdioGsh8tT0E/6eCMwQXvb/Br+Dw01YyTpw=
+	t=1739097579; cv=pass; b=rFA8aZflPOa9Q7YVnMQbYguTKQWsyztY+/bd1qjPnQVDT7DL6/W6dxkOSXiciOJ45GpMo7PFHjZb9KE4JiVoQGbTkJs2kjB8nG+aYNw11TiJUrNkK3dhMN1CX0KdjtkIOwWpAXb2AXEothYnB21JOR2yGIyaV0tEjfkcS7UKi7Q=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1739097582; c=relaxed/simple;
-	bh=GGlgHljJvU5OSW5Z+NrOKg0R63Nlx7t5/LdeLWRmc0E=;
+	s=arc-20240116; t=1739097579; c=relaxed/simple;
+	bh=YgFPnBlAjdJ7kKacFYw8oZRvMTNxV7hsmxrUOCel/Lo=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=jtjtsalqZ2pn/nbkZviLDJOmbwMsg84a1YDS7/TBXDcut1xlucoib2JjzIxzfjX6EvDKizElSagh4AqOQWvQvIcKgNplZ7q68Q0zAtm113uw5hCqPKbu+gOlpSeBazk/gfIqJ7fv1ImTCQe7xdB1QnBObU4Aq4FBkFNPj9GFs2Q=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iki.fi; spf=pass smtp.mailfrom=iki.fi; dkim=pass (2048-bit key) header.d=iki.fi header.i=@iki.fi header.b=oyv8UY62; arc=pass smtp.client-ip=185.185.170.37
+	 MIME-Version; b=BmHpw1ej1U6N9Atr4akCLdv23OkEnsoZBKumtQ6mvyikiZdtzOQiAHIeJs+ycZ4RpuwbSUvpMJ//xNJO3jRhketfUBef//qg2F2CP0xOGsm1pTLy9Je301rSmf7q5en+9BXq/Sdk5JN72LSd5KPgsi60YI/t8/BbvVIJWUyD0+w=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iki.fi; spf=pass smtp.mailfrom=iki.fi; dkim=pass (2048-bit key) header.d=iki.fi header.i=@iki.fi header.b=bOQQMdeL; arc=pass smtp.client-ip=185.185.170.37
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iki.fi
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=iki.fi
 Received: from monolith.lan (unknown [193.138.7.198])
@@ -36,42 +36,42 @@ Received: from monolith.lan (unknown [193.138.7.198])
 	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
 	(No client certificate requested)
 	(Authenticated sender: pav)
-	by lahtoruutu.iki.fi (Postfix) with ESMTPSA id 4YrPN35cyTz49Q8f;
-	Sun,  9 Feb 2025 12:39:31 +0200 (EET)
+	by lahtoruutu.iki.fi (Postfix) with ESMTPSA id 4YrPN54dZ1z49Q94;
+	Sun,  9 Feb 2025 12:39:33 +0200 (EET)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=iki.fi; s=lahtoruutu;
-	t=1739097573;
+	t=1739097575;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=HD5NN7UschfyAn9AkZJEIsng2Wd5tpJPRq2qTqa1Qn4=;
-	b=oyv8UY62berxYgCqjNIRXF1PCFtnfxBVR9fl5ynJPopNiqiDbwFKqjAjOATebyX49ypgKi
-	3LB4RkibbbWQBaZBHCSpI6YSqga0ZtcYYRJG+H9Fmb29W2q4YmcrlT0CsdwdguNrcqgtpL
-	ZQZMeBHLaXlpnzZ37XBkC0n1jJ59ergssB2EZyqz2P4BQO72IIXQyEtVRQtkA0S4XQDzkQ
-	M91PkE9ieGzm2eirmgduRsIVQwoelh7j3z0AxZiILixO/p1Rxv80xiOs7XcVHvkzIB2mX7
-	tA+F1uzj6ISsHTiUde++tSuOVSaxZa7n8mh+MezHn1fp4RG03rcH3JRe1S5BjQ==
-ARC-Seal: i=1; s=lahtoruutu; d=iki.fi; t=1739097573; a=rsa-sha256;
+	bh=SDcfYIgWirj2irWZu5yqgLL8XZKsytvOPvE0gOE+0Zo=;
+	b=bOQQMdeLHu8LqkFERaAs3xneQMfUftMZzsN9x1nwF1FfsJoetyIhwHVdmR86oJjftbOeKr
+	3j/2LYjhC7ymKUL6My768kiSehEoqbi0+kSirK6aPRTn9Z+4Ee4uoyCF5KMCfhzogjMwH5
+	upRt+JlPLHLdX/B9q514b8gBc5kH7ekEd2cvdQ33LgzPRYYLIAEV5w+PlfTvU9y5dMsln6
+	dbAl9UTZGEtIXSDUguz9daG0YxW69Vk/oeiw9+wPByGyS2Zrz/eZjrfgN1RxKw6uZzJC0M
+	9eBY75EBUm6CMHTvhq6+AidmLTkX1HKzWZL88fDHkZTNCJmsHWiZwKlRsvWRTw==
+ARC-Seal: i=1; s=lahtoruutu; d=iki.fi; t=1739097575; a=rsa-sha256;
 	cv=none;
-	b=mcM0OxnEMkeJJYjTb1e6u2WlUHx1wbOdZQtNN2WzoRB86eWTX8HA9cb/Nch8ar2SYCrC3B
-	030TwUf5ec/vfFTQbfehgb/Nr5kOEc0pt9qaf5pzmE8UOEjiMw8hr04H843bTO3gwMKbD7
-	U51JCXCF3QMDISc6gCZ8uO9o6RDgkrQLL+Wi29Xdx7HXj94VOjvtFTPRN65b7HdXhkYiLD
-	7qYVbm4ZeaW3IuaKGMLZi3J9KLkj9sU3jTB7BdQR8YP5IEPTngZYKqZuqgHNNYMOviIuGR
-	3eMbhPOx53Y6QUc7RcfXLGtnmP148d1rAputo7hXro9GJxqaD6BOzckRcE5qMg==
+	b=KOl7Bf01802qaKjP55YzcYhdxlmDgIzGPjTLXM+pBFSIIE4hFoD8MHRObnfGUw7IvJuGVk
+	y7z5HWfFC2VM2wEvafhoCysCUDVk3Xvny4VuvgSxFGLLqM2YFdJI0KqZ+2YwOZYN/pQZdM
+	hOIuavXyz4jMI11cg9yDroreY+UzDr8xdB/HtOU5rffgtKnmCUVDqr9Vl/257Fu4NWoGqd
+	IJLf6+WcDJAysmOCWtBvefNhx3U6+mpxp1hTVEJT72MoAwfqMu4k38ds8jLKcEl1HW/xdz
+	hHDfdp3Rf8fddLK3MnvUYc7DaUSwJPjXaKrLnOZJkFzxx2FNq6jB8Me0Rg9UeQ==
 ARC-Authentication-Results: i=1;
 	ORIGINATING;
 	auth=pass smtp.auth=pav smtp.mailfrom=pav@iki.fi
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=iki.fi;
-	s=lahtoruutu; t=1739097573;
+	s=lahtoruutu; t=1739097575;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=HD5NN7UschfyAn9AkZJEIsng2Wd5tpJPRq2qTqa1Qn4=;
-	b=JipsX5z4iTWNV/MlveVkku30h97leIPCNSOz3TZbhhi1xze5F+pk0lS/3wOTV5u1131HhU
-	IjQfXd5GKFW2WP9tYVSFNlXzJw+ZMsfDplKTQ5/fjZ/ik0kH9Ychujwln1ZqwCjagkLh3Z
-	fubi5pTc/oRi34VrlzbAeKkQIRL33H6+jq/ZNIJAjJ58KbvcTnKTjdOKK90Hz9UD0szfLP
-	SRvdPQmNzY7dOw4PQlKvsQZAkSKoMOnvDfs/xPI1wlhMRJpnffxIswZAeV2FjhO5yvcpPF
-	Rn34yl/hzoeGav20zgBm5TzzwY8Q2qAToWubOXep/mV1Aml+MHPSsTMyy2gjGQ==
+	bh=SDcfYIgWirj2irWZu5yqgLL8XZKsytvOPvE0gOE+0Zo=;
+	b=lZ1kN3rq4LzA/HJ0Q4iT6EDJUJ02hDsTkyx3dmhxehPhshzhdKOvbl+R+YlHsIZ2yTbUWv
+	EmAc70t+GUDFh4vYOiPdD4QhyX2v+63qRdBp+qTVJk5RIMqX5O6wSqntjlPHx03bkqfLlZ
+	3CeB+5dcZC/xwaO1JKzja6uLekrIPzbsx6VP+9tOcH/rXLRSbZSVqf0REpODgQT5Dz7mZ3
+	kPOGI+CQ4k9BK1PY0jiAOwqr/ZP4GrU4z13PWgdNXg441KeOVR79Z4FQhLcmCJJR/i6sWD
+	J2mR2ZOxVz8D77RPszvhO32pgaSEy0l4qGNE1HcNmV01QVdkkT/2HHDkTgmRsw==
 From: Pauli Virtanen <pav@iki.fi>
 To: linux-bluetooth@vger.kernel.org
 Cc: Pauli Virtanen <pav@iki.fi>,
@@ -80,9 +80,9 @@ Cc: Pauli Virtanen <pav@iki.fi>,
 	davem@davemloft.net,
 	kuba@kernel.org,
 	willemdebruijn.kernel@gmail.com
-Subject: [PATCH v3 2/5] Bluetooth: add support for skb TX SND/COMPLETION timestamping
-Date: Sun,  9 Feb 2025 12:39:14 +0200
-Message-ID: <8a23a01e5d323df4907b5f5d08995d4bee86a391.1739097311.git.pav@iki.fi>
+Subject: [PATCH v3 3/5] Bluetooth: ISO: add TX timestamping
+Date: Sun,  9 Feb 2025 12:39:15 +0200
+Message-ID: <f3f0fa8615fbfebbf58212bd407e51579f85412a.1739097311.git.pav@iki.fi>
 X-Mailer: git-send-email 2.48.1
 In-Reply-To: <cover.1739097311.git.pav@iki.fi>
 References: <cover.1739097311.git.pav@iki.fi>
@@ -94,299 +94,105 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Support enabling TX timestamping for some skbs, and track them until
-packet completion. Generate software SCM_TSTAMP_COMPLETION when getting
-completion report from hardware.
+Add BT_SCM_ERROR socket CMSG type.
 
-Generate software SCM_TSTAMP_SND before sending to driver. Sending from
-driver requires changes in the driver API, and drivers mostly are going
-to send the skb immediately.
+Support TX timestamping in ISO sockets.
 
-Make the default situation with no COMPLETION TX timestamping more
-efficient by only counting packets in the queue when there is nothing to
-track.  When there is something to track, we need to make clones, since
-the driver may modify sent skbs.
+Support MSG_ERRQUEUE in ISO recvmsg.
 
-The tx_q queue length is bounded by the hdev flow control, which will
-not send new packets before it has got completion reports for old ones.
+If a packet from sendmsg() is fragmented, only the first ACL fragment is
+timestamped.
 
 Signed-off-by: Pauli Virtanen <pav@iki.fi>
 ---
- include/net/bluetooth/hci_core.h |  13 ++++
- net/bluetooth/hci_conn.c         | 117 +++++++++++++++++++++++++++++++
- net/bluetooth/hci_core.c         |  17 +++--
- net/bluetooth/hci_event.c        |   4 ++
- 4 files changed, 146 insertions(+), 5 deletions(-)
+ include/net/bluetooth/bluetooth.h |  1 +
+ net/bluetooth/iso.c               | 24 ++++++++++++++++++++----
+ 2 files changed, 21 insertions(+), 4 deletions(-)
 
-diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
-index 05919848ea95..1f539a9881ad 100644
---- a/include/net/bluetooth/hci_core.h
-+++ b/include/net/bluetooth/hci_core.h
-@@ -261,6 +261,12 @@ struct adv_info {
- 	struct delayed_work	rpa_expired_cb;
- };
+diff --git a/include/net/bluetooth/bluetooth.h b/include/net/bluetooth/bluetooth.h
+index 435250c72d56..bbefde319f95 100644
+--- a/include/net/bluetooth/bluetooth.h
++++ b/include/net/bluetooth/bluetooth.h
+@@ -156,6 +156,7 @@ struct bt_voice {
+ #define BT_PKT_STATUS           16
  
-+struct tx_queue {
-+	struct sk_buff_head queue;
-+	unsigned int extra;
-+	unsigned int tracked;
-+};
-+
- #define HCI_MAX_ADV_INSTANCES		5
- #define HCI_DEFAULT_ADV_DURATION	2
+ #define BT_SCM_PKT_STATUS	0x03
++#define BT_SCM_ERROR		0x04
  
-@@ -733,6 +739,8 @@ struct hci_conn {
- 	struct sk_buff_head data_q;
- 	struct list_head chan_list;
+ #define BT_ISO_QOS		17
  
-+	struct tx_queue tx_q;
-+
- 	struct delayed_work disc_work;
- 	struct delayed_work auto_accept_work;
- 	struct delayed_work idle_work;
-@@ -1571,6 +1579,11 @@ void hci_conn_enter_active_mode(struct hci_conn *conn, __u8 force_active);
- void hci_conn_failed(struct hci_conn *conn, u8 status);
- u8 hci_conn_set_handle(struct hci_conn *conn, u16 handle);
- 
-+void hci_conn_tx_queue(struct hci_conn *conn, struct sk_buff *skb);
-+void hci_conn_tx_dequeue(struct hci_conn *conn);
-+void hci_setup_tx_timestamp(struct sk_buff *skb, size_t key_offset,
-+			    const struct sockcm_cookie *sockc);
-+
- /*
-  * hci_conn_get() and hci_conn_put() are used to control the life-time of an
-  * "hci_conn" object. They do not guarantee that the hci_conn object is running,
-diff --git a/net/bluetooth/hci_conn.c b/net/bluetooth/hci_conn.c
-index d097e308a755..e437290d8b70 100644
---- a/net/bluetooth/hci_conn.c
-+++ b/net/bluetooth/hci_conn.c
-@@ -27,6 +27,7 @@
- 
- #include <linux/export.h>
- #include <linux/debugfs.h>
-+#include <linux/errqueue.h>
- 
- #include <net/bluetooth/bluetooth.h>
- #include <net/bluetooth/hci_core.h>
-@@ -1002,6 +1003,7 @@ static struct hci_conn *__hci_conn_add(struct hci_dev *hdev, int type, bdaddr_t
- 	}
- 
- 	skb_queue_head_init(&conn->data_q);
-+	skb_queue_head_init(&conn->tx_q.queue);
- 
- 	INIT_LIST_HEAD(&conn->chan_list);
- 	INIT_LIST_HEAD(&conn->link_list);
-@@ -1155,6 +1157,7 @@ void hci_conn_del(struct hci_conn *conn)
- 	}
- 
- 	skb_queue_purge(&conn->data_q);
-+	skb_queue_purge(&conn->tx_q.queue);
- 
- 	/* Remove the connection from the list and cleanup its remaining
- 	 * state. This is a separate function since for some cases like
-@@ -3064,3 +3067,117 @@ int hci_abort_conn(struct hci_conn *conn, u8 reason)
- 	 */
- 	return hci_cmd_sync_run_once(hdev, abort_conn_sync, conn, NULL);
+diff --git a/net/bluetooth/iso.c b/net/bluetooth/iso.c
+index 44acddf58a0c..f497759a2af5 100644
+--- a/net/bluetooth/iso.c
++++ b/net/bluetooth/iso.c
+@@ -518,7 +518,8 @@ static struct bt_iso_qos *iso_sock_get_qos(struct sock *sk)
+ 	return &iso_pi(sk)->qos;
  }
-+
-+void hci_setup_tx_timestamp(struct sk_buff *skb, size_t key_offset,
-+			    const struct sockcm_cookie *sockc)
-+{
-+	struct sock *sk = skb ? skb->sk : NULL;
-+
-+	/* This shall be called on a single skb of those generated by user
-+	 * sendmsg(), and only when the sendmsg() does not return error to
-+	 * user. This is required for keeping the tskey that increments here in
-+	 * sync with possible sendmsg() counting by user.
-+	 *
-+	 * Stream sockets shall set key_offset to sendmsg() length in bytes
-+	 * and call with the last fragment, others to 1 and first fragment.
-+	 */
-+
-+	if (!skb || !sockc || !sk || !key_offset)
-+		return;
-+
-+	sock_tx_timestamp(sk, sockc, &skb_shinfo(skb)->tx_flags);
-+
-+	if (sockc->tsflags & SOF_TIMESTAMPING_OPT_ID &&
-+	    sockc->tsflags & SOF_TIMESTAMPING_TX_RECORD_MASK) {
-+		if (sockc->tsflags & SOCKCM_FLAG_TS_OPT_ID) {
-+			skb_shinfo(skb)->tskey = sockc->ts_opt_id;
-+		} else {
-+			int key = atomic_add_return(key_offset, &sk->sk_tskey);
-+
-+			skb_shinfo(skb)->tskey = key - 1;
-+		}
-+	}
-+}
-+
-+void hci_conn_tx_queue(struct hci_conn *conn, struct sk_buff *skb)
-+{
-+	struct tx_queue *comp = &conn->tx_q;
-+	bool track = false;
-+
-+	/* Emit SND now, ie. just before sending to driver */
-+	if (skb->sk && (skb_shinfo(skb)->tx_flags & SKBTX_SW_TSTAMP))
-+		__skb_tstamp_tx(skb, NULL, NULL, skb->sk, SCM_TSTAMP_SND);
-+
-+	/* COMPLETION tstamp is emitted for tracked skb later in Number of
-+	 * Completed Packets event. Available only for flow controlled cases.
-+	 *
-+	 * TODO: SCO support (needs to be done in drivers)
-+	 */
-+	switch (conn->type) {
-+	case ISO_LINK:
-+	case ACL_LINK:
-+	case LE_LINK:
-+		break;
-+	default:
-+		return;
-+	}
-+
-+	if (skb->sk && (skb_shinfo(skb)->tx_flags & SKBTX_COMPLETION_TSTAMP))
-+		track = true;
-+
-+	/* If nothing is tracked, just count extra skbs at the queue head */
-+	if (!track && !comp->tracked) {
-+		comp->extra++;
-+		return;
-+	}
-+
-+	if (track) {
-+		skb = skb_clone_sk(skb);
-+		if (!skb)
-+			goto count_only;
-+
-+		comp->tracked++;
+ 
+-static int iso_send_frame(struct sock *sk, struct sk_buff *skb)
++static int iso_send_frame(struct sock *sk, struct sk_buff *skb,
++			  const struct sockcm_cookie *sockc)
+ {
+ 	struct iso_conn *conn = iso_pi(sk)->conn;
+ 	struct bt_iso_qos *qos = iso_sock_get_qos(sk);
+@@ -538,10 +539,12 @@ static int iso_send_frame(struct sock *sk, struct sk_buff *skb)
+ 	hdr->slen = cpu_to_le16(hci_iso_data_len_pack(len,
+ 						      HCI_ISO_STATUS_VALID));
+ 
+-	if (sk->sk_state == BT_CONNECTED)
++	if (sk->sk_state == BT_CONNECTED) {
++		hci_setup_tx_timestamp(skb, 1, sockc);
+ 		hci_send_iso(conn->hcon, skb);
+-	else
 +	} else {
-+		skb = skb_clone(skb, GFP_KERNEL);
-+		if (!skb)
-+			goto count_only;
+ 		len = -ENOTCONN;
 +	}
-+
-+	skb_queue_tail(&comp->queue, skb);
-+	return;
-+
-+count_only:
-+	/* Stop tracking skbs, and only count. This will not emit timestamps for
-+	 * the packets, but if we get here something is more seriously wrong.
-+	 */
-+	comp->tracked = 0;
-+	comp->extra += skb_queue_len(&comp->queue) + 1;
-+	skb_queue_purge(&comp->queue);
-+}
-+
-+void hci_conn_tx_dequeue(struct hci_conn *conn)
-+{
-+	struct tx_queue *comp = &conn->tx_q;
-+	struct sk_buff *skb;
-+
-+	/* If there are tracked skbs, the counted extra go before dequeuing real
-+	 * skbs, to keep ordering. When nothing is tracked, the ordering doesn't
-+	 * matter so dequeue real skbs first to get rid of them ASAP.
-+	 */
-+	if (comp->extra && (comp->tracked || skb_queue_empty(&comp->queue))) {
-+		comp->extra--;
-+		return;
-+	}
-+
-+	skb = skb_dequeue(&comp->queue);
-+	if (!skb)
-+		return;
-+
-+	if (skb->sk) {
-+		comp->tracked--;
-+		__skb_tstamp_tx(skb, NULL, NULL, skb->sk,
-+				SCM_TSTAMP_COMPLETION);
-+	}
-+
-+	kfree_skb(skb);
-+}
-diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
-index e7ec12437c8b..e0845188f626 100644
---- a/net/bluetooth/hci_core.c
-+++ b/net/bluetooth/hci_core.c
-@@ -3025,6 +3025,13 @@ static int hci_send_frame(struct hci_dev *hdev, struct sk_buff *skb)
- 	return 0;
+ 
+ 	return len;
  }
+@@ -1348,6 +1351,7 @@ static int iso_sock_sendmsg(struct socket *sock, struct msghdr *msg,
+ {
+ 	struct sock *sk = sock->sk;
+ 	struct sk_buff *skb, **frag;
++	struct sockcm_cookie sockc;
+ 	size_t mtu;
+ 	int err;
  
-+static int hci_send_conn_frame(struct hci_dev *hdev, struct hci_conn *conn,
-+			       struct sk_buff *skb)
-+{
-+	hci_conn_tx_queue(conn, skb);
-+	return hci_send_frame(hdev, skb);
-+}
+@@ -1360,6 +1364,14 @@ static int iso_sock_sendmsg(struct socket *sock, struct msghdr *msg,
+ 	if (msg->msg_flags & MSG_OOB)
+ 		return -EOPNOTSUPP;
+ 
++	sockcm_init(&sockc, sk);
 +
- /* Send HCI command */
- int hci_send_cmd(struct hci_dev *hdev, __u16 opcode, __u32 plen,
- 		 const void *param)
-@@ -3562,7 +3569,7 @@ static void hci_sched_sco(struct hci_dev *hdev)
- 	while (hdev->sco_cnt && (conn = hci_low_sent(hdev, SCO_LINK, &quote))) {
- 		while (quote-- && (skb = skb_dequeue(&conn->data_q))) {
- 			BT_DBG("skb %p len %d", skb, skb->len);
--			hci_send_frame(hdev, skb);
-+			hci_send_conn_frame(hdev, conn, skb);
- 
- 			conn->sent++;
- 			if (conn->sent == ~0)
-@@ -3586,7 +3593,7 @@ static void hci_sched_esco(struct hci_dev *hdev)
- 						     &quote))) {
- 		while (quote-- && (skb = skb_dequeue(&conn->data_q))) {
- 			BT_DBG("skb %p len %d", skb, skb->len);
--			hci_send_frame(hdev, skb);
-+			hci_send_conn_frame(hdev, conn, skb);
- 
- 			conn->sent++;
- 			if (conn->sent == ~0)
-@@ -3620,7 +3627,7 @@ static void hci_sched_acl_pkt(struct hci_dev *hdev)
- 			hci_conn_enter_active_mode(chan->conn,
- 						   bt_cb(skb)->force_active);
- 
--			hci_send_frame(hdev, skb);
-+			hci_send_conn_frame(hdev, chan->conn, skb);
- 			hdev->acl_last_tx = jiffies;
- 
- 			hdev->acl_cnt--;
-@@ -3676,7 +3683,7 @@ static void hci_sched_le(struct hci_dev *hdev)
- 
- 			skb = skb_dequeue(&chan->data_q);
- 
--			hci_send_frame(hdev, skb);
-+			hci_send_conn_frame(hdev, chan->conn, skb);
- 			hdev->le_last_tx = jiffies;
- 
- 			(*cnt)--;
-@@ -3710,7 +3717,7 @@ static void hci_sched_iso(struct hci_dev *hdev)
- 	while (*cnt && (conn = hci_low_sent(hdev, ISO_LINK, &quote))) {
- 		while (quote-- && (skb = skb_dequeue(&conn->data_q))) {
- 			BT_DBG("skb %p len %d", skb, skb->len);
--			hci_send_frame(hdev, skb);
-+			hci_send_conn_frame(hdev, conn, skb);
- 
- 			conn->sent++;
- 			if (conn->sent == ~0)
-diff --git a/net/bluetooth/hci_event.c b/net/bluetooth/hci_event.c
-index 2cc7a9306350..144b442180f7 100644
---- a/net/bluetooth/hci_event.c
-+++ b/net/bluetooth/hci_event.c
-@@ -4405,6 +4405,7 @@ static void hci_num_comp_pkts_evt(struct hci_dev *hdev, void *data,
- 		struct hci_comp_pkts_info *info = &ev->handles[i];
- 		struct hci_conn *conn;
- 		__u16  handle, count;
-+		unsigned int i;
- 
- 		handle = __le16_to_cpu(info->handle);
- 		count  = __le16_to_cpu(info->count);
-@@ -4415,6 +4416,9 @@ static void hci_num_comp_pkts_evt(struct hci_dev *hdev, void *data,
- 
- 		conn->sent -= count;
- 
-+		for (i = 0; i < count; ++i)
-+			hci_conn_tx_dequeue(conn);
++	if (msg->msg_controllen) {
++		err = sock_cmsg_send(sk, msg, &sockc);
++		if (err)
++			return err;
++	}
 +
- 		switch (conn->type) {
- 		case ACL_LINK:
- 			hdev->acl_cnt += count;
+ 	lock_sock(sk);
+ 
+ 	if (sk->sk_state != BT_CONNECTED) {
+@@ -1405,7 +1417,7 @@ static int iso_sock_sendmsg(struct socket *sock, struct msghdr *msg,
+ 	lock_sock(sk);
+ 
+ 	if (sk->sk_state == BT_CONNECTED)
+-		err = iso_send_frame(sk, skb);
++		err = iso_send_frame(sk, skb, &sockc);
+ 	else
+ 		err = -ENOTCONN;
+ 
+@@ -1474,6 +1486,10 @@ static int iso_sock_recvmsg(struct socket *sock, struct msghdr *msg,
+ 
+ 	BT_DBG("sk %p", sk);
+ 
++	if (unlikely(flags & MSG_ERRQUEUE))
++		return sock_recv_errqueue(sk, msg, len, SOL_BLUETOOTH,
++					  BT_SCM_ERROR);
++
+ 	if (test_and_clear_bit(BT_SK_DEFER_SETUP, &bt_sk(sk)->flags)) {
+ 		sock_hold(sk);
+ 		lock_sock(sk);
 -- 
 2.48.1
 
