@@ -1,209 +1,241 @@
-Return-Path: <netdev+bounces-164401-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-164413-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 42FAAA2DBFF
-	for <lists+netdev@lfdr.de>; Sun,  9 Feb 2025 11:17:39 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0FD9BA2DC44
+	for <lists+netdev@lfdr.de>; Sun,  9 Feb 2025 11:23:49 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 32A923A1405
-	for <lists+netdev@lfdr.de>; Sun,  9 Feb 2025 10:17:30 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 662B93A62DB
+	for <lists+netdev@lfdr.de>; Sun,  9 Feb 2025 10:23:11 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 901B9154456;
-	Sun,  9 Feb 2025 10:17:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id F3C761C1F27;
+	Sun,  9 Feb 2025 10:19:56 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="Ds5LFIYF"
+	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="WJoMrI0B"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.13])
+Received: from NAM12-MW2-obe.outbound.protection.outlook.com (mail-mw2nam12on2088.outbound.protection.outlook.com [40.107.244.88])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C5FA414B086;
-	Sun,  9 Feb 2025 10:17:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.13
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1739096256; cv=none; b=cbl59kUu8vdl5Gu2VkMvwzqQ1jRwS65E6DKqDDYvMWCUSw4q3vGhq0RyVYd6Bgdl8t6nSLXpUqjLfrLJ3tQTk/UZEdrFBELOV0IWFoTDk+w0lq/1rVqDpNnjEZPBn/JQ6RXpK6BuaVStInV4sZHvfPirZv2ZZkgWE+Wour1z1fg=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1739096256; c=relaxed/simple;
-	bh=Ec5owhxuVyqV6l/NuwWt6tySFHCPrsPZ2HH6kFOtAcQ=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=uX06ghuvPb6IQe9qlJ08WHz6aqPuaL4+j3Qk5bt36BP0IGGbBticPQFotCr+mRtzG4v/TPeK2IwR4u7/9JuuPpE3ONQ7m/OfTLGoa5rFliOvL7+N3UHyIW74DLkvZwGq+TdRI4fePOvrHxLretkkKmnFvyE2s95Y/oX2YGINQ+c=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=Ds5LFIYF; arc=none smtp.client-ip=192.198.163.13
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1739096253; x=1770632253;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=Ec5owhxuVyqV6l/NuwWt6tySFHCPrsPZ2HH6kFOtAcQ=;
-  b=Ds5LFIYFNa2x8j81YAyh4jCFficUq2EFpFSArcYJ5o3Sur4N/CsqlOOk
-   /pG/PEti8+lTdKPzMGoTfhKA9O1nTGR5ArkWATQsMAtOrG7ZqWHx4qlDw
-   W6zRL/iBF3xmZphgzeTuAVps/P9FX65/wS52I/sTw/TU4w5pfKGPe6m15
-   9+iS7/WOMfdp/51LEPLMCYvCFYPtoUXm8NvJOqodhdVNfxvT5Ey1NmZsY
-   QofOA37DKh/bcLdzvCSinjFLkDgiFMqoGWIzgNtNsTsHvxRu7WBghqMGB
-   QuR8/hz8lWculCpaKJoJzkrq8WUlpmkzqYJ2/FZASSUu1e2OwN4I1AJMq
-   A==;
-X-CSE-ConnectionGUID: 5Jgm3M3kR02K1TPOgaZrQw==
-X-CSE-MsgGUID: MIbmD4+2RNiKO7mpWD7Qkg==
-X-IronPort-AV: E=McAfee;i="6700,10204,11339"; a="42531859"
-X-IronPort-AV: E=Sophos;i="6.13,272,1732608000"; 
-   d="scan'208";a="42531859"
-Received: from fmviesa009.fm.intel.com ([10.60.135.149])
-  by fmvoesa107.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 09 Feb 2025 02:17:33 -0800
-X-CSE-ConnectionGUID: tAlE1hgASmaH/sPwSXJjeA==
-X-CSE-MsgGUID: kZk4YyznQK2YAC5F+sIwUA==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.13,272,1732608000"; 
-   d="scan'208";a="112557968"
-Received: from lkp-server01.sh.intel.com (HELO d63d4d77d921) ([10.239.97.150])
-  by fmviesa009.fm.intel.com with ESMTP; 09 Feb 2025 02:17:29 -0800
-Received: from kbuild by d63d4d77d921 with local (Exim 4.96)
-	(envelope-from <lkp@intel.com>)
-	id 1th4NS-0011KR-2i;
-	Sun, 09 Feb 2025 10:17:26 +0000
-Date: Sun, 9 Feb 2025 18:17:12 +0800
-From: kernel test robot <lkp@intel.com>
-To: Joe Damato <jdamato@fastly.com>, netdev@vger.kernel.org
-Cc: llvm@lists.linux.dev, oe-kbuild-all@lists.linux.dev, horms@kernel.org,
-	kuba@kernel.org, Joe Damato <jdamato@fastly.com>,
-	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
-	Donald Hunter <donald.hunter@gmail.com>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	Xuan Zhuo <xuanzhuo@linux.alibaba.com>,
-	Stanislav Fomichev <sdf@fomichev.me>,
-	Mina Almasry <almasrymina@google.com>,
-	Martin Karsten <mkarsten@uwaterloo.ca>,
-	Sridhar Samudrala <sridhar.samudrala@intel.com>,
-	David Wei <dw@davidwei.uk>, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH net-next v5 2/3] netdev-genl: Add an XSK attribute to
- queues
-Message-ID: <202502091844.PyraqTPE-lkp@intel.com>
-References: <20250208041248.111118-3-jdamato@fastly.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3ED241C07F3;
+	Sun,  9 Feb 2025 10:19:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.244.88
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1739096396; cv=fail; b=InoBvzCDXLuQu7MrdOgMDabmVOdcVlfWzG91+ekIVpnxvookZJuNVkfWA1pnTxWgdG69Q/x3bcBCWN8FK3IqV1odV2cppuqtMj+Nqwjv74un42XKVkXZHx3p5esU1rLhP4z2zf+Uq4WF+qHpY74+TPr7Cas48HPVpwk5AO2lg4c=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1739096396; c=relaxed/simple;
+	bh=Rsq8cRevFqQ1dJakWbjsVUxOtgZa1ITmNleLJt3RSck=;
+	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=omGHI9dmMUiEuuv9ayuUh4RfvsVB2W6TiaBpQhdIHFjoJXTIk+wWj5xW7ObEIbMN+93UZ2EQpkvyM0Isf4Iy1pypFByPvMC+LwE830jHb3A0rkC6PNQkX4B/VVquvhjUjQjvdNwRB3DkyhH+mq+NVeB4GA5FpJxjTN4wKvpL6wM=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=WJoMrI0B; arc=fail smtp.client-ip=40.107.244.88
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=deeKuLUExF7y998/VvJmX2VwQugnE653EO6oUfDkoZHPr6oSod4Ka/BwHP42hqP1TDzpBtXwlIUzTz3vm1OnZ91W7WnTuGTK1MBTjxwZILDpJG+V7FEKik8joR1aysEMC0hENvSV9BTHOqrNifLDsJbYcW0D6Krg30avLMlGWw5dQoTiz1JfQAbkQHMZlOt6mrmBWW1vIb9Ih44Hyj/oNLS/1p0bSKnYCt+MWyx+yAClkbhuy4YByPSaEO9D77iM0ZpFQgL1hz9yXYRGYapB6Vh9gXTsz6gRb7sGAJjS1GPIhrUJb6aYQrF72/ZMqAIpJ0s7V9CDoT8rwJF6Nhh8ig==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=OL0VxAaoDRj3cc8vIfPy+cK8eZ5xb2P6nRX4zgoWc5c=;
+ b=o5BqKObhM/fu2hkX1TLSHMOapHQ6794bvJ0J4EtwmH+Ag2kgMKc7KtfBX/TGNpgnzf45fWZQ0dci4ipI7+UmGbQD98tATsyboX3p4pFzl+xSXsC53AXO6X3ieFkTvtG+Xm+sz6pQJvOf+YSLdgj6x5jfvw6ONm09D9kajvR8BxIgJnFllnad4yFNsGw3nljz7fK6txVAIYclBmGFFMpbmzMcEYBPpqI0gL+42Y3QfkPnuhr+g4TuGqKHndRneOa4fDlVWcoPJtp+UU1f6jcp69jr9Ba+XBR4hESt3qknwcJ0Nhh5umsS9jmKlwedBa/tA/O6iVEC88srLCDNUE/qbQ==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
+ 216.228.118.232) smtp.rcpttodomain=davemloft.net smtp.mailfrom=nvidia.com;
+ dmarc=pass (p=reject sp=reject pct=100) action=none header.from=nvidia.com;
+ dkim=none (message not signed); arc=none (0)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=OL0VxAaoDRj3cc8vIfPy+cK8eZ5xb2P6nRX4zgoWc5c=;
+ b=WJoMrI0BwV2j844GpgrWou7o5tadn5TfEqwACwgYckWH6yrPuWBOH/5rQfR1VbgT/OarofHaCqL1PzDS/VkZEqGhp5X+9e9u/uEb9edunBDSoFrIPSASMsJhOTDzoKRRcq2ZyUM3v0biKYR/mv00n3M8ZdrdNWYhxUj9I7uk8VufPR+sKuL3MHUbfGClDoe4x1h1Bi6skhPy4JuCDoNbEfN1GP/IE/X4/9butZLWTyJKNvJ64FXCwiAB5HdRpJV8dBLEfDwEbQraIQv4gF+3nfTeQGuGiZHXUtZItPcvz+mjdNXP0RY6mI30h3GHWcL8DSwR2iHI5s2YhmBhCiGU6g==
+Received: from SJ0PR03CA0103.namprd03.prod.outlook.com (2603:10b6:a03:333::18)
+ by SA3PR12MB9105.namprd12.prod.outlook.com (2603:10b6:806:382::18) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8422.16; Sun, 9 Feb
+ 2025 10:19:50 +0000
+Received: from SJ1PEPF00002322.namprd03.prod.outlook.com
+ (2603:10b6:a03:333:cafe::46) by SJ0PR03CA0103.outlook.office365.com
+ (2603:10b6:a03:333::18) with Microsoft SMTP Server (version=TLS1_3,
+ cipher=TLS_AES_256_GCM_SHA384) id 15.20.8398.31 via Frontend Transport; Sun,
+ 9 Feb 2025 10:19:49 +0000
+X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 216.228.118.232)
+ smtp.mailfrom=nvidia.com; dkim=none (message not signed)
+ header.d=none;dmarc=pass action=none header.from=nvidia.com;
+Received-SPF: Pass (protection.outlook.com: domain of nvidia.com designates
+ 216.228.118.232 as permitted sender) receiver=protection.outlook.com;
+ client-ip=216.228.118.232; helo=mail.nvidia.com; pr=C
+Received: from mail.nvidia.com (216.228.118.232) by
+ SJ1PEPF00002322.mail.protection.outlook.com (10.167.242.84) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.8398.14 via Frontend Transport; Sun, 9 Feb 2025 10:19:49 +0000
+Received: from drhqmail203.nvidia.com (10.126.190.182) by mail.nvidia.com
+ (10.127.129.5) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.4; Sun, 9 Feb 2025
+ 02:19:49 -0800
+Received: from drhqmail202.nvidia.com (10.126.190.181) by
+ drhqmail203.nvidia.com (10.126.190.182) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1544.14; Sun, 9 Feb 2025 02:19:49 -0800
+Received: from vdi.nvidia.com (10.127.8.10) by mail.nvidia.com
+ (10.126.190.181) with Microsoft SMTP Server id 15.2.1544.14 via Frontend
+ Transport; Sun, 9 Feb 2025 02:19:44 -0800
+From: Tariq Toukan <tariqt@nvidia.com>
+To: "David S. Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>, Eric Dumazet <edumazet@google.com>, "Andrew
+ Lunn" <andrew+netdev@lunn.ch>
+CC: <netdev@vger.kernel.org>, Saeed Mahameed <saeedm@nvidia.com>, Gal Pressman
+	<gal@nvidia.com>, Leon Romanovsky <leonro@nvidia.com>, Simon Horman
+	<horms@kernel.org>, Donald Hunter <donald.hunter@gmail.com>, Jiri Pirko
+	<jiri@resnulli.us>, Jonathan Corbet <corbet@lwn.net>, Leon Romanovsky
+	<leon@kernel.org>, Tariq Toukan <tariqt@nvidia.com>, Alexei Starovoitov
+	<ast@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>, "Jesper Dangaard
+ Brouer" <hawk@kernel.org>, John Fastabend <john.fastabend@gmail.com>,
+	"Richard Cochran" <richardcochran@gmail.com>, <linux-kernel@vger.kernel.org>,
+	<linux-doc@vger.kernel.org>, <linux-rdma@vger.kernel.org>,
+	<bpf@vger.kernel.org>, Amir Tzin <amirtz@nvidia.com>, Aya Levin
+	<ayal@nvidia.com>
+Subject: [PATCH net-next 11/15] net/mlx5e: Move RQs diagnose to a dedicated function
+Date: Sun, 9 Feb 2025 12:17:12 +0200
+Message-ID: <20250209101716.112774-12-tariqt@nvidia.com>
+X-Mailer: git-send-email 2.45.0
+In-Reply-To: <20250209101716.112774-1-tariqt@nvidia.com>
+References: <20250209101716.112774-1-tariqt@nvidia.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250208041248.111118-3-jdamato@fastly.com>
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-NV-OnPremToCloud: AnonymousSubmission
+X-EOPAttributedMessage: 0
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: SJ1PEPF00002322:EE_|SA3PR12MB9105:EE_
+X-MS-Office365-Filtering-Correlation-Id: 4a3711b5-8129-4713-e6f5-08dd48f3493d
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam:
+	BCL:0;ARA:13230040|1800799024|376014|7416014|82310400026|36860700013;
+X-Microsoft-Antispam-Message-Info:
+	=?us-ascii?Q?PtFl8iUnfNO+nayXkmYoZZ7vzMnU22+MsgqbiUN09LufV90bW0FxRS74685d?=
+ =?us-ascii?Q?dEE9CN5RpM3yNeUu6wY6z0+INA2hrYYTEgpBwPBbKmsJqCxokiQ/GEROy/YK?=
+ =?us-ascii?Q?0CZ7mU/WJaU+XxDGbKrA0SEVxQCpQHSN7XuxIZOtudc3ksFCdP0F4QbYXrVn?=
+ =?us-ascii?Q?46H4lZHyKFWVBCtsJ4XY201kyqRMraXPQeW7rMkSW0B4qejbS+yUBIFJcbKR?=
+ =?us-ascii?Q?j+C9rve+izjGgzGhFpBaxgACKH/bNXNeyCmGYAFkpuBvemhPFMGxs0hWaOGz?=
+ =?us-ascii?Q?QWR+nXCc/3xKE+eTE4conXceCfPdLb+kjcqnpbnFgNEpp8+blj8T9M8e6VTC?=
+ =?us-ascii?Q?hTCetjxhN9qp3b1LOg7nyQrK6mny0Z5hiuwyuodvKh71HAcpvDZG3qRJ/zOK?=
+ =?us-ascii?Q?ME0qgkW0++PTn1cLVZa6D0XXR4ikrYU9/39xXHbKVaR9zHWP2mkgEpF1qyjI?=
+ =?us-ascii?Q?qjFBD7tLCvJ1bGCYiPLXrSOVEhnqVcfHgrT+7kpLGZ4uTiiTA/tyudp6djIw?=
+ =?us-ascii?Q?ZwbE2RDXZTzEE/AmXbWrXOpngj7UxMvb5tMYKpfPuzUzlZsMANVTvqVabtm7?=
+ =?us-ascii?Q?vxOXj8PbSPKpQw96D6uOZsYs7bH2tuAvSl5BwOyYGRNhzn+9yQfJUvKuC8hO?=
+ =?us-ascii?Q?5isrAqMlvuI5IPuH4VYcDTCS8MJr/tqNWPWMvUGStUpmeG+K3p5gbb8mjrp3?=
+ =?us-ascii?Q?pCtRqa/dYlBepDXgYeom9Z25k9ztNmnOjgNXViJVRsTPwFKSIilhfYmlF5+s?=
+ =?us-ascii?Q?6eoML4kel63qPBuw7Zp2UUYiLMaCjRG0ep/83fu+hIu7JQVoUJawXwLF8Whz?=
+ =?us-ascii?Q?dm5cgUjfYtYODjTTbM34JFoYQslQ3boyYxY5lgfdWxZZ0g/M06kR+9gN3aQq?=
+ =?us-ascii?Q?emNuYLKzur3kMIfAeScHOckHge0xdwmhM436pAmOiupdK3SkJvSe/A8YMWLD?=
+ =?us-ascii?Q?3ulcYVlcB6jSsp43eFj4M/IV4g6H/g4yCTjJEPLXUiyGhGgt67BfOq6OyXZc?=
+ =?us-ascii?Q?R3gDKykD1iKrTXZRPn7NkIq9tMh6VEd/N4hCXC2PsDlSQUP4egL2OTj3vTwc?=
+ =?us-ascii?Q?jMCUQa+GttjJhV2Lu9DoKD9NkYeeRmqIkGTdoTNilV+2QwZMl+VIwD5/jNl/?=
+ =?us-ascii?Q?VQyvwxwSQfvdea6hI7LHYncxX2yM3zUwrr9hB9wlz/ZZk6jABdXighmyPKt0?=
+ =?us-ascii?Q?zenJqdu6oW9pR523IYM+u0nQdHOGQSllNS93Nu2X3BfvQHQ8G8CzozdF/Nmc?=
+ =?us-ascii?Q?WBXd5998UoDLCwFuMioheLJlvO2I8j3/mwLrkx5r9ZmzEl44po3OXUc3/3bo?=
+ =?us-ascii?Q?pm7MB+Rg0Xcx1s7ZikINjba/uD98tcUQY/vKUd8PsHvoraO61GDw5If/eRhj?=
+ =?us-ascii?Q?ASMuPNFTS1L2Xge/cLmzh62lGCN5/o0mFlRsE+6O1m76XP6ZzqPe2xK8MhDv?=
+ =?us-ascii?Q?69EPZpUfxgarzT8aI3zxtubNT6RPnNravZIQhHD+tM/nB/GvbrAQ6SPP71KU?=
+ =?us-ascii?Q?MWjgYF5tXwdu1gY=3D?=
+X-Forefront-Antispam-Report:
+	CIP:216.228.118.232;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:dc7edge1.nvidia.com;CAT:NONE;SFS:(13230040)(1800799024)(376014)(7416014)(82310400026)(36860700013);DIR:OUT;SFP:1101;
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 09 Feb 2025 10:19:49.9368
+ (UTC)
+X-MS-Exchange-CrossTenant-Network-Message-Id: 4a3711b5-8129-4713-e6f5-08dd48f3493d
+X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[216.228.118.232];Helo=[mail.nvidia.com]
+X-MS-Exchange-CrossTenant-AuthSource:
+	SJ1PEPF00002322.namprd03.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Anonymous
+X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SA3PR12MB9105
 
-Hi Joe,
+From: Amir Tzin <amirtz@nvidia.com>
 
-kernel test robot noticed the following build errors:
+Move rx reporter RQs diagnose from mlx5e_rx_reporter_diagnose() to a
+dedicated function. This change is a preparation for the following
+series which extends diagnose output for the rx reporter. While at it,
+also pass a mlx5e_priv pointer to
+mlx5e_rx_reporter_diagnose_common_config() as this is the argument the
+latter actually needs.
 
-[auto build test ERROR on 233a2b1480a0bdf6b40d4debf58a07084e9921ff]
+Signed-off-by: Amir Tzin <amirtz@nvidia.com>
+Reviewed-by: Aya Levin <ayal@nvidia.com>
+Signed-off-by: Tariq Toukan <tariqt@nvidia.com>
+---
+ .../mellanox/mlx5/core/en/reporter_rx.c       | 31 +++++++++++--------
+ 1 file changed, 18 insertions(+), 13 deletions(-)
 
-url:    https://github.com/intel-lab-lkp/linux/commits/Joe-Damato/netlink-Add-nla_put_empty_nest-helper/20250208-121856
-base:   233a2b1480a0bdf6b40d4debf58a07084e9921ff
-patch link:    https://lore.kernel.org/r/20250208041248.111118-3-jdamato%40fastly.com
-patch subject: [PATCH net-next v5 2/3] netdev-genl: Add an XSK attribute to queues
-config: x86_64-kexec (https://download.01.org/0day-ci/archive/20250209/202502091844.PyraqTPE-lkp@intel.com/config)
-compiler: clang version 19.1.3 (https://github.com/llvm/llvm-project ab51eccf88f5321e7c60591c5546b254b6afab99)
-reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20250209/202502091844.PyraqTPE-lkp@intel.com/reproduce)
-
-If you fix the issue in a separate patch/commit (i.e. not just a new version of
-the same patch/commit), kindly add following tags
-| Reported-by: kernel test robot <lkp@intel.com>
-| Closes: https://lore.kernel.org/oe-kbuild-all/202502091844.PyraqTPE-lkp@intel.com/
-
-All errors (new ones prefixed by >>):
-
-   In file included from net/core/netdev-genl.c:3:
-   In file included from include/linux/netdevice.h:38:
-   In file included from include/net/net_namespace.h:43:
-   In file included from include/linux/skbuff.h:17:
-   In file included from include/linux/bvec.h:10:
-   In file included from include/linux/highmem.h:8:
-   In file included from include/linux/cacheflush.h:5:
-   In file included from arch/x86/include/asm/cacheflush.h:5:
-   In file included from include/linux/mm.h:2224:
-   include/linux/vmstat.h:504:43: warning: arithmetic between different enumeration types ('enum zone_stat_item' and 'enum numa_stat_item') [-Wenum-enum-conversion]
-     504 |         return vmstat_text[NR_VM_ZONE_STAT_ITEMS +
-         |                            ~~~~~~~~~~~~~~~~~~~~~ ^
-     505 |                            item];
-         |                            ~~~~
-   include/linux/vmstat.h:511:43: warning: arithmetic between different enumeration types ('enum zone_stat_item' and 'enum numa_stat_item') [-Wenum-enum-conversion]
-     511 |         return vmstat_text[NR_VM_ZONE_STAT_ITEMS +
-         |                            ~~~~~~~~~~~~~~~~~~~~~ ^
-     512 |                            NR_VM_NUMA_EVENT_ITEMS +
-         |                            ~~~~~~~~~~~~~~~~~~~~~~
-   include/linux/vmstat.h:524:43: warning: arithmetic between different enumeration types ('enum zone_stat_item' and 'enum numa_stat_item') [-Wenum-enum-conversion]
-     524 |         return vmstat_text[NR_VM_ZONE_STAT_ITEMS +
-         |                            ~~~~~~~~~~~~~~~~~~~~~ ^
-     525 |                            NR_VM_NUMA_EVENT_ITEMS +
-         |                            ~~~~~~~~~~~~~~~~~~~~~~
->> net/core/netdev-genl.c:404:12: error: no member named 'pool' in 'struct netdev_rx_queue'
-     404 |                 if (rxq->pool)
-         |                     ~~~  ^
->> net/core/netdev-genl.c:414:12: error: no member named 'pool' in 'struct netdev_queue'
-     414 |                 if (txq->pool)
-         |                     ~~~  ^
-   3 warnings and 2 errors generated.
-
-
-vim +404 net/core/netdev-genl.c
-
-   374	
-   375	static int
-   376	netdev_nl_queue_fill_one(struct sk_buff *rsp, struct net_device *netdev,
-   377				 u32 q_idx, u32 q_type, const struct genl_info *info)
-   378	{
-   379		struct pp_memory_provider_params *params;
-   380		struct netdev_rx_queue *rxq;
-   381		struct netdev_queue *txq;
-   382		void *hdr;
-   383	
-   384		hdr = genlmsg_iput(rsp, info);
-   385		if (!hdr)
-   386			return -EMSGSIZE;
-   387	
-   388		if (nla_put_u32(rsp, NETDEV_A_QUEUE_ID, q_idx) ||
-   389		    nla_put_u32(rsp, NETDEV_A_QUEUE_TYPE, q_type) ||
-   390		    nla_put_u32(rsp, NETDEV_A_QUEUE_IFINDEX, netdev->ifindex))
-   391			goto nla_put_failure;
-   392	
-   393		switch (q_type) {
-   394		case NETDEV_QUEUE_TYPE_RX:
-   395			rxq = __netif_get_rx_queue(netdev, q_idx);
-   396			if (nla_put_napi_id(rsp, rxq->napi))
-   397				goto nla_put_failure;
-   398	
-   399			params = &rxq->mp_params;
-   400			if (params->mp_ops &&
-   401			    params->mp_ops->nl_fill(params->mp_priv, rsp, rxq))
-   402				goto nla_put_failure;
-   403	
- > 404			if (rxq->pool)
-   405				if (nla_put_empty_nest(rsp, NETDEV_A_QUEUE_XSK))
-   406					goto nla_put_failure;
-   407	
-   408			break;
-   409		case NETDEV_QUEUE_TYPE_TX:
-   410			txq = netdev_get_tx_queue(netdev, q_idx);
-   411			if (nla_put_napi_id(rsp, txq->napi))
-   412				goto nla_put_failure;
-   413	
- > 414			if (txq->pool)
-   415				if (nla_put_empty_nest(rsp, NETDEV_A_QUEUE_XSK))
-   416					goto nla_put_failure;
-   417	
-   418			break;
-   419		}
-   420	
-   421		genlmsg_end(rsp, hdr);
-   422	
-   423		return 0;
-   424	
-   425	nla_put_failure:
-   426		genlmsg_cancel(rsp, hdr);
-   427		return -EMSGSIZE;
-   428	}
-   429	
-
+diff --git a/drivers/net/ethernet/mellanox/mlx5/core/en/reporter_rx.c b/drivers/net/ethernet/mellanox/mlx5/core/en/reporter_rx.c
+index 25d751eba99b..9255ab662af9 100644
+--- a/drivers/net/ethernet/mellanox/mlx5/core/en/reporter_rx.c
++++ b/drivers/net/ethernet/mellanox/mlx5/core/en/reporter_rx.c
+@@ -317,10 +317,8 @@ mlx5e_rx_reporter_diagnose_common_ptp_config(struct mlx5e_priv *priv, struct mlx
+ }
+ 
+ static void
+-mlx5e_rx_reporter_diagnose_common_config(struct devlink_health_reporter *reporter,
+-					 struct devlink_fmsg *fmsg)
++mlx5e_rx_reporter_diagnose_common_config(struct mlx5e_priv *priv, struct devlink_fmsg *fmsg)
+ {
+-	struct mlx5e_priv *priv = devlink_health_reporter_priv(reporter);
+ 	struct mlx5e_rq *generic_rq = &priv->channels.c[0]->rq;
+ 	struct mlx5e_ptp *ptp_ch = priv->channels.ptp;
+ 
+@@ -340,20 +338,11 @@ static void mlx5e_rx_reporter_build_diagnose_output_ptp_rq(struct mlx5e_rq *rq,
+ 	devlink_fmsg_obj_nest_end(fmsg);
+ }
+ 
+-static int mlx5e_rx_reporter_diagnose(struct devlink_health_reporter *reporter,
+-				      struct devlink_fmsg *fmsg,
+-				      struct netlink_ext_ack *extack)
++static void mlx5e_rx_reporter_diagnose_rqs(struct mlx5e_priv *priv, struct devlink_fmsg *fmsg)
+ {
+-	struct mlx5e_priv *priv = devlink_health_reporter_priv(reporter);
+ 	struct mlx5e_ptp *ptp_ch = priv->channels.ptp;
+ 	int i;
+ 
+-	mutex_lock(&priv->state_lock);
+-
+-	if (!test_bit(MLX5E_STATE_OPENED, &priv->state))
+-		goto unlock;
+-
+-	mlx5e_rx_reporter_diagnose_common_config(reporter, fmsg);
+ 	devlink_fmsg_arr_pair_nest_start(fmsg, "RQs");
+ 
+ 	for (i = 0; i < priv->channels.num; i++) {
+@@ -367,7 +356,23 @@ static int mlx5e_rx_reporter_diagnose(struct devlink_health_reporter *reporter,
+ 	}
+ 	if (ptp_ch && test_bit(MLX5E_PTP_STATE_RX, ptp_ch->state))
+ 		mlx5e_rx_reporter_build_diagnose_output_ptp_rq(&ptp_ch->rq, fmsg);
++
+ 	devlink_fmsg_arr_pair_nest_end(fmsg);
++}
++
++static int mlx5e_rx_reporter_diagnose(struct devlink_health_reporter *reporter,
++				      struct devlink_fmsg *fmsg,
++				      struct netlink_ext_ack *extack)
++{
++	struct mlx5e_priv *priv = devlink_health_reporter_priv(reporter);
++
++	mutex_lock(&priv->state_lock);
++
++	if (!test_bit(MLX5E_STATE_OPENED, &priv->state))
++		goto unlock;
++
++	mlx5e_rx_reporter_diagnose_common_config(priv, fmsg);
++	mlx5e_rx_reporter_diagnose_rqs(priv, fmsg);
+ unlock:
+ 	mutex_unlock(&priv->state_lock);
+ 	return 0;
 -- 
-0-DAY CI Kernel Test Service
-https://github.com/intel/lkp-tests/wiki
+2.45.0
+
 
