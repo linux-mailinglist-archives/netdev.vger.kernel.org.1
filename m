@@ -1,147 +1,94 @@
-Return-Path: <netdev+bounces-164437-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-164444-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id B82C0A2DCE6
-	for <lists+netdev@lfdr.de>; Sun,  9 Feb 2025 12:13:35 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 430D2A2DD25
+	for <lists+netdev@lfdr.de>; Sun,  9 Feb 2025 12:46:24 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 5BFE216288B
-	for <lists+netdev@lfdr.de>; Sun,  9 Feb 2025 11:13:34 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 36F8D3A6437
+	for <lists+netdev@lfdr.de>; Sun,  9 Feb 2025 11:46:15 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2C3131C1F04;
-	Sun,  9 Feb 2025 11:11:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 43001199223;
+	Sun,  9 Feb 2025 11:46:20 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="UL2AgNgi"
+	dkim=pass (2048-bit key) header.d=birger-koblitz.de header.i=@birger-koblitz.de header.b="lS9RmhUB"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ej1-f46.google.com (mail-ej1-f46.google.com [209.85.218.46])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from wp175.webpack.hosteurope.de (wp175.webpack.hosteurope.de [80.237.132.182])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5012D1BD9E6;
-	Sun,  9 Feb 2025 11:10:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.46
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 441156F06A
+	for <netdev@vger.kernel.org>; Sun,  9 Feb 2025 11:46:17 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=80.237.132.182
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1739099461; cv=none; b=H+k2B+batIOZRlWI33AQcGCwABolh9Kp+5n3rhJqm6xHsZy6X7QTMp0dpQC9VATAMTZti2Luu/TCVQxsEXuND2AjhlyMTRznU3ywyErJ4I+W5S3yGozSitSC7GQUkoFxMrN/Hb6A62jaxU/jIydJKQF1R8sW/7FkwAQGkFiKvVY=
+	t=1739101580; cv=none; b=odLb42c7cM3UA/IIHFLp6b5+Xlq473J4VDDizNHWp6YGPTU70x43qu5jxuz2IMXZ44Fq/bUgidUvOLkoY2+0UJ+LosrM4DeHJyZSkGvAmXEeoBIBePlWgCg18EuZK+c5DKip0biR8wEdQ38FAFLaQcDqTwqqd/5zqOuuJEbJuAc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1739099461; c=relaxed/simple;
-	bh=Vja1w1A/Wnz062ttT6Bt+MXuQBy3cdFVFTFu9bvZ8Ag=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=FkBvWYibCbv6bIpNXR+KZNIvYLrh5eLPRaO8qIciPTXCItCi+kxjP5ckdATPji7EKG3X1yKj9i3SkMi0DMm6D8w6NcEQdk1gtLoGT09ND7h8WNytDhF3qxEfr8wnOgWqRnCHEY6HI46jUaTFQWsPUKn1PGX60i7qDnxnCzd5mNg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=UL2AgNgi; arc=none smtp.client-ip=209.85.218.46
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ej1-f46.google.com with SMTP id a640c23a62f3a-ab7800d3939so516119366b.2;
-        Sun, 09 Feb 2025 03:10:59 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1739099458; x=1739704258; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=Gr1wMzwLJ3r114jkr+fSh/N13xzOYrfc9OnXbfM4Z7I=;
-        b=UL2AgNgiZ+DZIb4wnWOXQ9HuCAbNfYHcXdSdcMWOtjlpGYRLn+HVK/jbBTG8xjj6j4
-         QDu+r4WLI3FH53FahnKQ78zf8b84zXC6AN5b/5f1ZS3T+Vg0vN2ADVZjvWibDRvcXiKv
-         VdVYWMrB3iPSPbR5HJJS4+ZidB14vezaNyLOvAphoTwJK4ySrEhjBhC9cxDw9ZbA1Fbq
-         BPT0peJl4HLxKYqEURZYuVSgGnpr71FGNj3wyBEqamSoFIFYX1uYl8yWUNB/wQs2LsNx
-         y7I53G+M59t/VDiYetmNOc/c+F+KGwATr0Bu25QuZIJhyvm+h+5SUws7Txd8QfIslFUu
-         41rg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1739099458; x=1739704258;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=Gr1wMzwLJ3r114jkr+fSh/N13xzOYrfc9OnXbfM4Z7I=;
-        b=ORSCgQwI6o4k80ZKHuBq60/0APsPSUbEPirg13h4mOf9mQ54j9jW039azNLFnC+zgE
-         5xrgk3YxMtaQeQxD7LgzR4SG34ZTU2EutXP91Oijn+queq1KhwxTecHMomqQTZpM0tcQ
-         VpLsZv8QtJ78X+UIKB9tyhoVtr+OL5mvqPCuSLLz1XYuMKMf5TxALwSdjXp9kjpZlLAB
-         S03bsoSyRSs7fNw+/mfGLJWpK6P/YWDEkfTJnfKN2Os80JQOWSfWTenfJiBSzCFSXsiu
-         rpf4qPGPh201iLHj+m8gYhpujZZzCTMGlFlwEDyxXMD/AkxhZLkVbpk3qUo+WOaKg4Tf
-         e+yA==
-X-Forwarded-Encrypted: i=1; AJvYcCWpKRWemBKpKaK/TNBPytcvwjs1X0C21EzX1AVULyIOY3GGL79UJZXVVWWU3SHtdsxsbLyRQDcfUaQycxI=@vger.kernel.org, AJvYcCXw7K3hsyoYdyBWNWG9S3zpSU7FW0C82N5/T3plTpE3hu3cKGRRn6eHPCj4K2GPh9/JRsuwV+k9GB+OPPZOU99D@vger.kernel.org
-X-Gm-Message-State: AOJu0Yw/97rxJ9CFWilbgZ9QcMffeTk+J7cH2vtjmL01drWJeYDuRnUq
-	Q3LrXqxG0NDDsuudyTG8pNtMVec/E54ImTf35edfViUtlg1ErfnK
-X-Gm-Gg: ASbGncshcRMi0UybfdC3FV7QRnaJghFC8fZqYDCb3KUtzM8kpFUjKvI/USLEB3iSBUV
-	w1idhHiC7aun7EnwR3aISyGx0zaHutJ39M2tuOaIAA65pLQ0WoMNLtSGvgC78dTPhxJdLGAfeLQ
-	S6rHUCrH/AWuxAkWsB+GQ2Rg3ndLfD15uBO0iwCCVG8eWZa/qMSQAQkukpmg/Yw0hFci5Mu9PPb
-	kG1Qu05KISZfAOtGeC89gOMRYa5irnC2zv72KhKpug1/RpwN6XO4QtFM3imvMjC1ex5R9L+moMF
-	C+qbykG7io7nA7YnJMlx3JSnjxwQK5sVJVep8306S0+2OsPOyGglP5YZxn+1p/+1Qtg/Ll9AJiw
-	BKcHdtwVC+QDVCeWOeDGNpeVbT7UWniM1
-X-Google-Smtp-Source: AGHT+IFLIZqtdyB586XGL7BZF3ltsD3dhHx63zKrEdsvwLszqHVFUdLBJLGnB6J6lNIv2VbhyBQi/A==
-X-Received: by 2002:a17:907:2d91:b0:ab2:b863:b7fa with SMTP id a640c23a62f3a-ab789c1ce64mr946683266b.44.1739099457511;
-        Sun, 09 Feb 2025 03:10:57 -0800 (PST)
-Received: from corebook.localdomain (2001-1c00-020d-1300-1b1c-4449-176a-89ea.cable.dynamic.v6.ziggo.nl. [2001:1c00:20d:1300:1b1c:4449:176a:89ea])
-        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-ab79afc7452sm357516366b.163.2025.02.09.03.10.56
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sun, 09 Feb 2025 03:10:57 -0800 (PST)
-From: Eric Woudstra <ericwouds@gmail.com>
-To: "David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Simon Horman <horms@kernel.org>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	Pablo Neira Ayuso <pablo@netfilter.org>,
-	Jozsef Kadlecsik <kadlec@netfilter.org>,
-	Jiri Pirko <jiri@resnulli.us>,
-	Ivan Vecera <ivecera@redhat.com>,
-	Roopa Prabhu <roopa@nvidia.com>,
-	Nikolay Aleksandrov <razor@blackwall.org>,
-	Matthias Brugger <matthias.bgg@gmail.com>,
-	AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>,
-	Kuniyuki Iwashima <kuniyu@amazon.com>,
-	Sebastian Andrzej Siewior <bigeasy@linutronix.de>,
-	Lorenzo Bianconi <lorenzo@kernel.org>,
-	Joe Damato <jdamato@fastly.com>,
-	Alexander Lobakin <aleksander.lobakin@intel.com>,
-	Vladimir Oltean <olteanv@gmail.com>,
-	"Frank Wunderlich" <frank-w@public-files.de>,
-	Daniel Golle <daniel@makrotopia.org>
-Cc: netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	netfilter-devel@vger.kernel.org,
-	coreteam@netfilter.org,
-	bridge@lists.linux.dev,
-	linux-arm-kernel@lists.infradead.org,
-	linux-mediatek@lists.infradead.org,
-	Eric Woudstra <ericwouds@gmail.com>
-Subject: [PATCH v6 net-next 09/14] netfilter: nft_flow_offload: Add NFPROTO_BRIDGE to validate
-Date: Sun,  9 Feb 2025 12:10:29 +0100
-Message-ID: <20250209111034.241571-10-ericwouds@gmail.com>
-X-Mailer: git-send-email 2.47.1
-In-Reply-To: <20250209111034.241571-1-ericwouds@gmail.com>
-References: <20250209111034.241571-1-ericwouds@gmail.com>
+	s=arc-20240116; t=1739101580; c=relaxed/simple;
+	bh=2YQ0Z9VJRJAuDcCknQnD0bYtE2SEQba1+QDHYWf9uFA=;
+	h=Message-ID:Date:MIME-Version:Subject:From:Cc:To:Content-Type; b=lz9pZKo1ZGlCgYga6v9b75cv2sO6gmoSo4K3yLGAaawaXf8dgi5vL19ZGR5bqHKzO9YXclg4m3Gyj0EXftdyXgqUCiIXRtQCKcwWnv8XjTtYS2SwxaacnIfQqGI4xoT0QAkcAhyCRBKZooxSr4idtYf0OFeojBbVRh+TB2CS20A=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=birger-koblitz.de; spf=pass smtp.mailfrom=birger-koblitz.de; dkim=pass (2048-bit key) header.d=birger-koblitz.de header.i=@birger-koblitz.de header.b=lS9RmhUB; arc=none smtp.client-ip=80.237.132.182
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=birger-koblitz.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=birger-koblitz.de
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=birger-koblitz.de; s=he134867; h=Content-Transfer-Encoding:Content-Type:To:
+	Cc:From:Subject:MIME-Version:Date:Message-ID:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:In-Reply-To:References;
+	bh=bQsJzyreAf1xYtSS4iP8u6nedAT9p660D2bLSRPz32U=; t=1739101578; x=1739533578; 
+	b=lS9RmhUBhDRJUpogqpyInlM3rMDm6scV6f5Uolf64xOS8so+2b+MnjbyCjI6aoqX2Vj1adCOi55
+	hQ9Xy6uPJOaUfBthWFbIeE0a/DtPYEWlYOaFmGF8qNSMWir0LpfSc4NH1Pi/xx6w1DrnSYT8Y/zSA
+	O3opawZxHHTsOb2o+Jn/m0yks/OJiupDDiw69Qadsxuyc8VgGDP23OxUdDmN6b/98kgH2kUJFRIHX
+	DDwKNqkGJovYCKHsWajspWC/F+5z150pjLF35jwFMEVF5YEUxCRhRw7CqN61rZ42HZl2gS9R91Wl9
+	dJfvAmHXzt2VXKDewYTJdYM4Wpq/RG6q2QuA==;
+Received: from [2a00:6020:47a3:e800:73c:e5f5:d827:2240]; authenticated
+	by wp175.webpack.hosteurope.de running ExIM with esmtpsa (TLS1.3:ECDHE_X25519__RSA_PSS_RSAE_SHA256__AES_128_GCM:128)
+	id 1th54i-00BBP6-05;
+	Sun, 09 Feb 2025 12:02:08 +0100
+Message-ID: <96223803-95a8-4879-8a26-bc13b66a6e6b@birger-koblitz.de>
+Date: Sun, 9 Feb 2025 12:01:55 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+User-Agent: Mozilla Thunderbird
+Subject: [PATCH net-next] net: sfp: add quirk for 2.5G OEM BX SFP
+Content-Language: en-US
+From: Birger Koblitz <mail@birger-koblitz.de>
+Cc: Daniel Golle <daniel@makrotopia.org>, Jakub Kicinski <kuba@kernel.org>
+To: netdev@vger.kernel.org
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-bounce-key: webpack.hosteurope.de;mail@birger-koblitz.de;1739101578;a067bad3;
+X-HE-SMSGID: 1th54i-00BBP6-05
 
-Need to add NFPROTO_BRIDGE to nft_flow_offload_validate() to support
-the bridge-fastpath.
+The OEM SFP-2.5G-BX10-D/U SFP module pair is meant to operate with
+2500Base-X. However, in their EEPROM they incorrectly specify:
+Transceiver codes   : 0x00 0x12 0x00 0x00 0x12 0x00 0x01 0x05 0x00
+BR, Nominal         : 2500MBd
 
-Reviewed-by: Nikolay Aleksandrov <razor@blackwall.org>
-Signed-off-by: Eric Woudstra <ericwouds@gmail.com>
+Use sfp_quirk_2500basex for this module to allow 2500Base-X mode anyway.
+Run-tested on BananaPi R3.
+
+Signed-off-by: Birger Koblitz <mail@birger-koblitz.de>
 ---
- net/netfilter/nft_flow_offload.c | 3 ++-
- 1 file changed, 2 insertions(+), 1 deletion(-)
+  drivers/net/phy/sfp.c | 2 ++
+  1 file changed, 2 insertions(+)
 
-diff --git a/net/netfilter/nft_flow_offload.c b/net/netfilter/nft_flow_offload.c
-index 5ef2f4ba7ab8..323c531c7046 100644
---- a/net/netfilter/nft_flow_offload.c
-+++ b/net/netfilter/nft_flow_offload.c
-@@ -421,7 +421,8 @@ static int nft_flow_offload_validate(const struct nft_ctx *ctx,
- 
- 	if (ctx->family != NFPROTO_IPV4 &&
- 	    ctx->family != NFPROTO_IPV6 &&
--	    ctx->family != NFPROTO_INET)
-+	    ctx->family != NFPROTO_INET &&
-+	    ctx->family != NFPROTO_BRIDGE)
- 		return -EOPNOTSUPP;
- 
- 	return nft_chain_validate_hooks(ctx->chain, hook_mask);
+diff --git a/drivers/net/phy/sfp.c b/drivers/net/phy/sfp.c
+index 7dbcbf0a4ee2..9369f5297769 100644
+--- a/drivers/net/phy/sfp.c
++++ b/drivers/net/phy/sfp.c
+@@ -515,6 +515,8 @@ static const struct sfp_quirk sfp_quirks[] = {
+   	SFP_QUIRK_F("OEM", "SFP-10G-T", sfp_fixup_rollball_cc),
+  	SFP_QUIRK_M("OEM", "SFP-2.5G-T", sfp_quirk_oem_2_5g),
++	SFP_QUIRK_M("OEM", "SFP-2.5G-BX10-D", sfp_quirk_2500basex),
++	SFP_QUIRK_M("OEM", "SFP-2.5G-BX10-U", sfp_quirk_2500basex),
+  	SFP_QUIRK_F("OEM", "RTSFP-10", sfp_fixup_rollball_cc),
+  	SFP_QUIRK_F("OEM", "RTSFP-10G", sfp_fixup_rollball_cc),
+  	SFP_QUIRK_F("Turris", "RTSFP-2.5G", sfp_fixup_rollball),
 -- 
-2.47.1
-
+2.39.5
 
