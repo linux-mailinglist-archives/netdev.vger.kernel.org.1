@@ -1,74 +1,76 @@
-Return-Path: <netdev+bounces-164386-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-164387-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 23BB6A2DA32
-	for <lists+netdev@lfdr.de>; Sun,  9 Feb 2025 02:31:10 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9DB3FA2DA38
+	for <lists+netdev@lfdr.de>; Sun,  9 Feb 2025 02:31:28 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 660A91886B0F
-	for <lists+netdev@lfdr.de>; Sun,  9 Feb 2025 01:31:15 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 31D75165453
+	for <lists+netdev@lfdr.de>; Sun,  9 Feb 2025 01:31:27 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F2AFB3FD4;
-	Sun,  9 Feb 2025 01:31:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 18C0F24338A;
+	Sun,  9 Feb 2025 01:31:09 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="cEWFoDdB"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="fCCclelT"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qk1-f179.google.com (mail-qk1-f179.google.com [209.85.222.179])
+Received: from mail-qk1-f172.google.com (mail-qk1-f172.google.com [209.85.222.172])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 581D7653;
-	Sun,  9 Feb 2025 01:31:03 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.179
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 58AA712E5B;
+	Sun,  9 Feb 2025 01:31:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1739064664; cv=none; b=lZ1xKoWbAq9OTdcj+R9tsxduU5C4DE8jLlQpzti979+rPtT/rKkdu33aqdOxNTaF0rxFSvZcJvowgxUVS+XDimTx32FRWrfinjOeSGm4Q47p0Xcd8UjFuebanT0398jv3ldckqgWh4kO81PDMM8OiRnvU1vOXN7rzfAlMmnBNR4=
+	t=1739064669; cv=none; b=sU04Bc72LRYRqpPWWnHq3yKtpixkDya1vBvdAkzKCAoqxWyQmMajRs65MtFPbRNHcEjzbEIGQH+ut+WriMfGJ05rvYumeFM2HxlmdJGMS4k6Bbc0FImzghj/nEI9NHUYVJQVXeUNPoFDEFZl/ozgV/fW++BUyLxZFhebnfl6wOk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1739064664; c=relaxed/simple;
-	bh=MLVsc2+zgPEDXOT+DdwweQVNzbXN9yOCujghrU+hkzE=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=bG2tmQaKzbdK6Hr0FIRTwwE7cYbHy7L77Jk/mJ2HgY+PzcijmtQJCOgm/ZAkFdKf3MN8QE9DFNaLr50Lr+CAjPRtSc0w7ZZqjxhWRfeJE9YnTjLWIK9Az4qbAyfHD/fKunY0a1UPI7CwYavo8PU9Ik8i8HTSWbtltCWvmlvcRZQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=cEWFoDdB; arc=none smtp.client-ip=209.85.222.179
+	s=arc-20240116; t=1739064669; c=relaxed/simple;
+	bh=mlHLGDgu0lLYDoOEZj9Dh7DdijgTluzA7NKpDjvci0Q=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=EIjU+AMYJrwl9TwhHxxUtw8bdWo7mVBfwoT48QDGJHzfCje4Zrz0d8LrvetP7FXvP22BKu1bI+/6HXGG6/zuXaTjLhAN5ygd/P7AyoimP/YvI7sA/On+NMpS4+eaQCcc4mfbaxq/diFMlEURKbzGMiKWdOBcunOROWmMId7FQ2g=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=fCCclelT; arc=none smtp.client-ip=209.85.222.172
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-qk1-f179.google.com with SMTP id af79cd13be357-7be3f230436so317503185a.3;
-        Sat, 08 Feb 2025 17:31:03 -0800 (PST)
+Received: by mail-qk1-f172.google.com with SMTP id af79cd13be357-7c05b91245fso356485a.2;
+        Sat, 08 Feb 2025 17:31:07 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1739064662; x=1739669462; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=mpE4zKyAH8svDQr1EVUQPc0P7SOzCqW4Zan7hwoFlao=;
-        b=cEWFoDdB8te9qxwPK/njctLFMstVrk4PFuaCUA5Gz874qcttTaMve/RkG9RAWDdNa1
-         d3jwJ+V1qea7zJeCi8vSVB0ejDLH6Wq2/NBs3TwrqITKf287f7SvVg46F3S4CL/CE6BE
-         R6WIu4Is0TQzGMgUg02ajo7pHa+yi2Q6HnqqNUjgTGgck7wdgaDSW1YL0/92LfybrLIc
-         miZKLlFiiSXdOuFeIh46jUnkcfu3FGKi7N//JEQ8xwWAG5P6Bx2ou3n/3mWe7SWtkutb
-         vwbQFrmGqDT5lReRh8FaVQCTCoGZpdOe7IvkrQnHpAcTCteGKeE/1NIpRPMpeQ7jdI8J
-         PFsQ==
+        d=gmail.com; s=20230601; t=1739064666; x=1739669466; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=4e7ZzwqztMziHLUhoVfnoipumOCTxC0BX+2clstSkaw=;
+        b=fCCclelT4GMt+TGaENJIjZMr8V9DuPD9voF2AW03FoB5aFUpIMduCbvNX61fCCFiuC
+         HQ4bEIK/brtkCF83/A44ElrapPqVuOKo0IGGjCwJHRCYbVc2VILFBuEduTH9LWmnppLh
+         reja0Lbyh9PspQ2uwCGnvNGezUdX8ddlJ2Zhd9R+ZjCR569Lq2uDSeEMApQ/ZvEKvkVv
+         f6kgUysQqBSpztYczfVu3FGYuQc1IdvcvGRjHXsWYJWqyobqsdulhyBaz8nL9B7YJzg+
+         BgaVbfSzya3469WlfTocNMangZpBASjMCX7DRTiZXGuHgj4EjAYpz1j9cR8EyGVsqJR0
+         atVw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1739064662; x=1739669462;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=mpE4zKyAH8svDQr1EVUQPc0P7SOzCqW4Zan7hwoFlao=;
-        b=ASA6LJAVPZRKm6b3++FXFDo+onY6nHDHTV2v4JKzGMVYzNyEoh0EQdGw95reAqc0Ow
-         KmloeqUSs04NcpX0zWrOlI5YWLDLBaSsS343mkedc1HvQBQjeYuFMJ9xtpxNrpdHNxHu
-         2c4e3AIQccr+ydddS1nCpeeCqKx0rU+cc5asEycecCwpHeTmNZ1NNzCyQinr21RlChZE
-         MvE3boAbrC3f8R8DucPJfvB/2tX4wH/fvy8S/G0GHnSKKAFNxmA4U8Z9HK6yKsV6R08B
-         vpin6sng+4bga+coCqkxc1rwld0Ub/Rq9LUA/clNCAWH8y+QX681sgd1EjjOyCkoVTwn
-         p1wg==
-X-Forwarded-Encrypted: i=1; AJvYcCU6ksyjUQcKt9sc7A4qiGGrxhqayl3ia/OrPmpQraZoI9KWcHlnXM3xjr+upawZ/Fs9GB8YVVAe+2oN6xeQ@vger.kernel.org, AJvYcCV6tzWmqgSkhZCbUzRWBJkGivWOIaVMHIZhoeVy+mhMiZSeSJHcfB4AcphlMvWCDgJNduq1pzMJKBvM@vger.kernel.org, AJvYcCXqPIcnkE4sZnL6FTAqQJlMTAWLJTv0haGheSD7s2LCSWhVXtzYv0A0Jq9EhcC2xD22mpH7N4uH@vger.kernel.org
-X-Gm-Message-State: AOJu0YzriybIj5nmLXE3tJ2OkyCeNWV4cREzX5Q0ru6p+8/IvGgrUoGV
-	jVflm01tUYOcziD4uRRyb7KPSa26vIy9NhLa7Byc3cx2eDYltrB3
-X-Gm-Gg: ASbGnctvXtbhQkxwiIKrPlxtmrVQ25Kx85dbb2hnd1u/E83w5/pePUaU4TKmf8/yDJu
-	9iL6vtrGN+gZlJ9mCqR7gADxDKBpX2vXJ67cLpkT1oJ4bpA0As9cKROms4lc4pa2Wcz5zUikS+G
-	wyk1THaaCjz9S96x89AegIzIYle3lxv1ViYkMnN71wWc2+SsiJBZ1wrCBRberinjDbB+D5qDiyx
-	jU8vIcSaqIO7q8TZ0V4FOeXHKzurtNyX1Wje16aPPbcXtR6PSL0kVwGT6oR1izKK+4=
-X-Google-Smtp-Source: AGHT+IErNG966adydDNeNbSis7LGgBN1C8RNiREv5yWv/KkleMlno0XmKLtdyzMfyEP6jLn7m+bHdQ==
-X-Received: by 2002:ac8:7dc2:0:b0:467:4f9a:6511 with SMTP id d75a77b69052e-47167a348c6mr149530651cf.30.1739064661848;
-        Sat, 08 Feb 2025 17:31:01 -0800 (PST)
+        d=1e100.net; s=20230601; t=1739064666; x=1739669466;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=4e7ZzwqztMziHLUhoVfnoipumOCTxC0BX+2clstSkaw=;
+        b=TF/VCCZua1uk6LGlj0wDNPXuHHBoKNohYkIFkHg1zp3NJc5LgDgqyze/WL8YGMCIzj
+         JZqTVYCTptb6prm/fhnzOQiVmXklkbunqwiekd6Nj3GHotPxSi9Vhw67CKVTF2vSy/HY
+         j6qt92aSaHmCQKIQSsdwKKbBNVubP4slUquGkOjVK4ZxMtVpHDGUc1cVUXxQdzWc5fQa
+         xvN3YuM6e54fujgeq6jUQkIrm/A8mSFR8LeEv2hFWaGb2uQdpH9sLTGWHA0/zVSjL1iU
+         TH+CTSqmAR5xDNcgAKeY598d60V42+O38RAlGB9vDiBnFGRPHtEuRIwCtTC1tU5jpJgx
+         QMyw==
+X-Forwarded-Encrypted: i=1; AJvYcCVqG8ukzumcqgRZYNy7e0dBxpmHPlapqSeSNgxFdfsalt2d5BoNaTOLbOu8Kfd1yq0XYjfHdvkitOLh@vger.kernel.org, AJvYcCX5FUCnz3QJnc2z+Jp4CQbfp6UrWscacCLAaZm/DFkOKMbzxDZOX07KM0mfP29qBZ4/RZe8H4t2jQrIVV1j@vger.kernel.org, AJvYcCX9+fhxIZ+nqqjqqw2HlJRmBjZQIASCPRKLFK8irINN/7JLGTYjbh4n4hPtqOc2S6KgFJKUkyX5@vger.kernel.org
+X-Gm-Message-State: AOJu0YwVTUI/oP8JvSSnc7GqPKlqm6DagZEPQRIuUgCZfeVhJgN1l7SA
+	8iphme/tlVi1ebhq7iKhgWK3GfYT1BIq/810z8BHhrvrD3Q3Mc9q
+X-Gm-Gg: ASbGncuNprX26zT4aOVY0APhw1aquSIx32wE5jtSnn0xasKrPyM+ijIM8seByCLY2pt
+	hnj3m4DCXF8Fn3bAC2s+E4woJy+RcaPho/lt+mpHujcEKEz+KaoZR9KsKY/RLMWz5MyJMnTrbLk
+	HBuyYbzgZgYPuei4AoyQp4W8mtsQsnG5d8rLCjAQghXmrs9nUtycq+F382BWzuKYb+06SMqs91M
+	l7Rcj/FlozB71QGOESCYrXqBlizHQM2OmMsyY0OyeTJz0YZDhPFRu04JuMwdLWRLIk=
+X-Google-Smtp-Source: AGHT+IEH039HXExAei+7K/JmIEv7mGaHuYCB4awQfxRtlfWTrGL3Y1l9ujrADjSQi+g127ZTesIcZQ==
+X-Received: by 2002:a05:620a:bc9:b0:7b6:cedf:1b4e with SMTP id af79cd13be357-7c047c29ademr1345409585a.41.1739064665917;
+        Sat, 08 Feb 2025 17:31:05 -0800 (PST)
 Received: from localhost ([2001:da8:7001:11::cb])
-        by smtp.gmail.com with UTF8SMTPSA id d75a77b69052e-4714928d886sm31368431cf.18.2025.02.08.17.30.59
+        by smtp.gmail.com with UTF8SMTPSA id af79cd13be357-7c041dfb0d2sm356691185a.34.2025.02.08.17.31.04
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sat, 08 Feb 2025 17:31:00 -0800 (PST)
+        Sat, 08 Feb 2025 17:31:05 -0800 (PST)
 From: Inochi Amaoto <inochiama@gmail.com>
 To: Andrew Lunn <andrew+netdev@lunn.ch>,
 	"David S. Miller" <davem@davemloft.net>,
@@ -108,11 +110,14 @@ Cc: Inochi Amaoto <inochiama@gmail.com>,
 	linux-arm-kernel@lists.infradead.org,
 	linux-riscv@lists.infradead.org,
 	Yixun Lan <dlan@gentoo.org>,
-	Longbin Li <looong.bin@gmail.com>
-Subject: [PATCH net-next v4 0/3] riscv: sophgo: Add ethernet support for SG2044
-Date: Sun,  9 Feb 2025 09:30:49 +0800
-Message-ID: <20250209013054.816580-1-inochiama@gmail.com>
+	Longbin Li <looong.bin@gmail.com>,
+	Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
+Subject: [PATCH net-next v4 1/3] dt-bindings: net: Add support for Sophgo SG2044 dwmac
+Date: Sun,  9 Feb 2025 09:30:50 +0800
+Message-ID: <20250209013054.816580-2-inochiama@gmail.com>
 X-Mailer: git-send-email 2.48.1
+In-Reply-To: <20250209013054.816580-1-inochiama@gmail.com>
+References: <20250209013054.816580-1-inochiama@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -121,52 +126,181 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-The ethernet controller of SG2044 is Synopsys DesignWare IP with
-custom clock. Add glue layer for it.
+The GMAC IP on SG2044 is almost a standard Synopsys DesignWare
+MAC (version 5.30a) with some extra clock.
 
-Changed from v3:
-- https://lore.kernel.org/netdev/20241223005843.483805-1-inochiama@gmail.com/
-1. rebase for 6.14.rc1
-2. remove the dependency requirement as it was already merged
-   into master.
+Add necessary compatible string for this device.
 
-Changed from RFC:
-- https://lore.kernel.org/netdev/20241101014327.513732-1-inochiama@gmail.com/
-1. patch 1: apply Krzysztof' tag
-
-Changed from v2:
-- https://lore.kernel.org/netdev/20241025011000.244350-1-inochiama@gmail.com/
-1. patch 1: merge the first and the second bindings patch to show the all
-            compatible change.
-2. patch 2: use of_device_compatible_match helper function to perform check.
-2. patch 3: remove unused include and sort the left.
-3. patch 3: fix wrong variable usage in sophgo_dwmac_fix_mac_speed
-4. patch 3: drop unused variable in the patch.
-
-Changed from v1:
-- https://lore.kernel.org/netdev/20241021103617.653386-1-inochiama@gmail.com/
-1. patch 2: remove sophgo,syscon as this mac delay is resolved.
-2. patch 2: apply all the properties unconditionally.
-3. patch 4: remove sophgo,syscon code as this mac delay is resolved.
-4. patch 4: use the helper function to compute rgmii clock.
-5. patch 4: use remove instead of remove_new for the platform driver.
-
-Inochi Amaoto (3):
-  dt-bindings: net: Add support for Sophgo SG2044 dwmac
-  net: stmmac: platform: Add snps,dwmac-5.30a IP compatible string
-  net: stmmac: Add glue layer for Sophgo SG2044 SoC
-
+Signed-off-by: Inochi Amaoto <inochiama@gmail.com>
+Reviewed-by: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
+---
  .../devicetree/bindings/net/snps,dwmac.yaml   |   4 +
  .../bindings/net/sophgo,sg2044-dwmac.yaml     | 124 ++++++++++++++++++
- drivers/net/ethernet/stmicro/stmmac/Kconfig   |  11 ++
- drivers/net/ethernet/stmicro/stmmac/Makefile  |   1 +
- .../ethernet/stmicro/stmmac/dwmac-sophgo.c    | 105 +++++++++++++++
- .../ethernet/stmicro/stmmac/stmmac_platform.c |  17 ++-
- 6 files changed, 257 insertions(+), 5 deletions(-)
+ 2 files changed, 128 insertions(+)
  create mode 100644 Documentation/devicetree/bindings/net/sophgo,sg2044-dwmac.yaml
- create mode 100644 drivers/net/ethernet/stmicro/stmmac/dwmac-sophgo.c
 
---
+diff --git a/Documentation/devicetree/bindings/net/snps,dwmac.yaml b/Documentation/devicetree/bindings/net/snps,dwmac.yaml
+index 91e75eb3f329..02ab6a9aded2 100644
+--- a/Documentation/devicetree/bindings/net/snps,dwmac.yaml
++++ b/Documentation/devicetree/bindings/net/snps,dwmac.yaml
+@@ -32,6 +32,7 @@ select:
+           - snps,dwmac-4.20a
+           - snps,dwmac-5.10a
+           - snps,dwmac-5.20
++          - snps,dwmac-5.30a
+           - snps,dwxgmac
+           - snps,dwxgmac-2.10
+ 
+@@ -98,8 +99,10 @@ properties:
+         - snps,dwmac-4.20a
+         - snps,dwmac-5.10a
+         - snps,dwmac-5.20
++        - snps,dwmac-5.30a
+         - snps,dwxgmac
+         - snps,dwxgmac-2.10
++        - sophgo,sg2044-dwmac
+         - starfive,jh7100-dwmac
+         - starfive,jh7110-dwmac
+         - thead,th1520-gmac
+@@ -631,6 +634,7 @@ allOf:
+                 - snps,dwmac-4.20a
+                 - snps,dwmac-5.10a
+                 - snps,dwmac-5.20
++                - snps,dwmac-5.30a
+                 - snps,dwxgmac
+                 - snps,dwxgmac-2.10
+                 - st,spear600-gmac
+diff --git a/Documentation/devicetree/bindings/net/sophgo,sg2044-dwmac.yaml b/Documentation/devicetree/bindings/net/sophgo,sg2044-dwmac.yaml
+new file mode 100644
+index 000000000000..b7e4216ea45a
+--- /dev/null
++++ b/Documentation/devicetree/bindings/net/sophgo,sg2044-dwmac.yaml
+@@ -0,0 +1,124 @@
++# SPDX-License-Identifier: (GPL-2.0-only OR BSD-2-Clause)
++%YAML 1.2
++---
++$id: http://devicetree.org/schemas/net/sophgo,sg2044-dwmac.yaml#
++$schema: http://devicetree.org/meta-schemas/core.yaml#
++
++title: Sophgo SG2044 DWMAC glue layer
++
++maintainers:
++  - Inochi Amaoto <inochiama@gmail.com>
++
++select:
++  properties:
++    compatible:
++      contains:
++        enum:
++          - sophgo,sg2044-dwmac
++  required:
++    - compatible
++
++properties:
++  compatible:
++    items:
++      - const: sophgo,sg2044-dwmac
++      - const: snps,dwmac-5.30a
++
++  reg:
++    maxItems: 1
++
++  clocks:
++    items:
++      - description: GMAC main clock
++      - description: PTP clock
++      - description: TX clock
++
++  clock-names:
++    items:
++      - const: stmmaceth
++      - const: ptp_ref
++      - const: tx
++
++  interrupts:
++    maxItems: 1
++
++  interrupt-names:
++    maxItems: 1
++
++  resets:
++    maxItems: 1
++
++  reset-names:
++    const: stmmaceth
++
++required:
++  - compatible
++  - reg
++  - clocks
++  - clock-names
++  - interrupts
++  - interrupt-names
++  - resets
++  - reset-names
++
++allOf:
++  - $ref: snps,dwmac.yaml#
++
++unevaluatedProperties: false
++
++examples:
++  - |
++    #include <dt-bindings/interrupt-controller/irq.h>
++
++    ethernet@30006000 {
++      compatible = "sophgo,sg2044-dwmac", "snps,dwmac-5.30a";
++      reg = <0x30006000 0x4000>;
++      clocks = <&clk 151>, <&clk 152>, <&clk 154>;
++      clock-names = "stmmaceth", "ptp_ref", "tx";
++      interrupt-parent = <&intc>;
++      interrupts = <296 IRQ_TYPE_LEVEL_HIGH>;
++      interrupt-names = "macirq";
++      resets = <&rst 30>;
++      reset-names = "stmmaceth";
++      snps,multicast-filter-bins = <0>;
++      snps,perfect-filter-entries = <1>;
++      snps,aal;
++      snps,tso;
++      snps,txpbl = <32>;
++      snps,rxpbl = <32>;
++      snps,mtl-rx-config = <&gmac0_mtl_rx_setup>;
++      snps,mtl-tx-config = <&gmac0_mtl_tx_setup>;
++      snps,axi-config = <&gmac0_stmmac_axi_setup>;
++      status = "disabled";
++
++      gmac0_mtl_rx_setup: rx-queues-config {
++        snps,rx-queues-to-use = <8>;
++        snps,rx-sched-wsp;
++        queue0 {};
++        queue1 {};
++        queue2 {};
++        queue3 {};
++        queue4 {};
++        queue5 {};
++        queue6 {};
++        queue7 {};
++      };
++
++      gmac0_mtl_tx_setup: tx-queues-config {
++        snps,tx-queues-to-use = <8>;
++        queue0 {};
++        queue1 {};
++        queue2 {};
++        queue3 {};
++        queue4 {};
++        queue5 {};
++        queue6 {};
++        queue7 {};
++      };
++
++      gmac0_stmmac_axi_setup: stmmac-axi-config {
++        snps,blen = <16 8 4 0 0 0 0>;
++        snps,wr_osr_lmt = <1>;
++        snps,rd_osr_lmt = <2>;
++      };
++    };
+-- 
 2.48.1
 
 
