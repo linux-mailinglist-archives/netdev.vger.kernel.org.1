@@ -1,230 +1,144 @@
-Return-Path: <netdev+bounces-164390-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-164391-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1CC69A2DA4A
-	for <lists+netdev@lfdr.de>; Sun,  9 Feb 2025 02:43:55 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id E3505A2DABB
+	for <lists+netdev@lfdr.de>; Sun,  9 Feb 2025 05:06:34 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 9BE51165853
-	for <lists+netdev@lfdr.de>; Sun,  9 Feb 2025 01:43:53 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 7F10616562E
+	for <lists+netdev@lfdr.de>; Sun,  9 Feb 2025 04:06:33 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 026C54409;
-	Sun,  9 Feb 2025 01:43:52 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6E0B414A85;
+	Sun,  9 Feb 2025 04:06:31 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="GmKyMwNa"
+	dkim=pass (2048-bit key) header.d=ethancedwards.com header.i=@ethancedwards.com header.b="PSuJR+CM"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pj1-f54.google.com (mail-pj1-f54.google.com [209.85.216.54])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mout-p-202.mailbox.org (mout-p-202.mailbox.org [80.241.56.172])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6B54124339B;
-	Sun,  9 Feb 2025 01:43:50 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.54
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 666941392;
+	Sun,  9 Feb 2025 04:06:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=80.241.56.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1739065431; cv=none; b=UyGWvW9VZLCfQqp/0Ih8PTI0yp6q6CTVYk/DiJkuDiWe7WAnAdL+HStc4yX/EkP5WLIWhYEiYn5dxvge89I7ge+CDd0OZRdv2O+v8LbES1N7jRzUP1IIBBFA+sfoge5xOjvXI48zU+ALTbTw3b1F3SN7UHRyCPPv+nqjwi+QBMs=
+	t=1739073991; cv=none; b=b6ciT4O4KPSafN15vgZJCsQlZa2A2eSc2pVJpELv6uEbjqxr5OpC0l1wPCeZKWDVgUMP6YLBYRQITew3D2WaZEo3P4yVUUmGLsuUtE8Pr7/nV5sIO3g7Z1CrlOw2ZDdmmz1GsyG6isQeh8ciwC3RqUVwUQLJSWdNTfvN9Hd0sQs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1739065431; c=relaxed/simple;
-	bh=v6hmjDlCyLMRg1UetyuPjiAp5m87VU1tV0Vw28F5GXE=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=UWvOSQbfmkfBFnfueMuIO7aq/fVpyiQubRBGKLc7lRvBXgLSqWm00vwcEtlHrxDFc4ujXNRMK/cO4EoDRc3fvMDRUBDXd+pr2ir826v6yl/0OBkKKlI0KgPvy8R0C49Ec+Jx4mmy2/viqkpY6e38DGIGMg6vhhVsuxhY63HCIog=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=GmKyMwNa; arc=none smtp.client-ip=209.85.216.54
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pj1-f54.google.com with SMTP id 98e67ed59e1d1-2fa0f222530so5914683a91.0;
-        Sat, 08 Feb 2025 17:43:50 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1739065429; x=1739670229; darn=vger.kernel.org;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=5AWXsi+AKsTgHHtORUOGnKJ5JY/sS6Wt7Sy7YQM9hfQ=;
-        b=GmKyMwNavwo3OkQ8+bK9AqlEkXjJTpSWZ9sEU/Ni/Qt3c73MwOaFcoWy/Dg0iaknle
-         tSZCTuJAtmkI90eUDV1JWvRR25jjTkQ13M3YWyXVm9ThQjapZ/Z4xsAtNNlUVb4oxytd
-         pvmXZnOEgo3nF910LbYDK91GesQ7LqCE/55aD0Zh1euVNfl44GBK4n6aCqzTTweFb5Ew
-         1uctEDW1Pk0rHjoEp0t8R0A2lPgKrpqKiQZx6AXF5CLXaXz2qugRBjknezwD5BfhEP/X
-         EId9lZvNcQ/X/lu5SQtAGfkKue8/ba+E6c3Pvxsq8h+LEJLwUY0Eu6d3jWpZxRRpeeCA
-         Ek4w==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1739065429; x=1739670229;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=5AWXsi+AKsTgHHtORUOGnKJ5JY/sS6Wt7Sy7YQM9hfQ=;
-        b=WLV8RoOnWruSR7x+io2gYxRvdLhVl75RYN+J5Zski/+P33CeOIEvD5gbWu+ngUbeqT
-         gv7cRZtciR++Z1SvAz18iDN0zxyQVyFXRKieK4F6zOTIXROd6X2aWKRmMyaTakSWF0n4
-         HLok08s3iAVSuf5E1bAf4JWNtovhYwuOX+FxghGmZjk5777ojtMQlXvokXmDxap+qh2C
-         xZTE6pSykCTxECyPshlQIwvMpkkxepzPIjuZrvrGRHkFZ8SuiJ40AtPPCTo9pZvjJCUm
-         FmkJw8lh9VR0FahzVPbdOLKXH3kOV+juOtPUak0BpQPpLYEo2C8Uib8ukRHUMHqF2FbP
-         GoYA==
-X-Forwarded-Encrypted: i=1; AJvYcCWas0aXjNo5ciqqZFM51g8WJSA+BhJK7Vrz5r+BcMr2jTq8G0z3KRaTcjQngIVOZf1Qk6I+qE6Rcpqjqmc=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yz7CwAkOrCF9n2Dv4pcsE+fowmZQBCFUoa1Lnx71EU0Z47HIPaY
-	tuzPc4VsgsAc2xvde4JKPxDo4M6PpnbbsxaMMyVli7mHI+lTDB7iTO5n
-X-Gm-Gg: ASbGncsIC5TQoNxd3Yhvzlc8zWbdvk7DigyDlWyYjEDMxWQyhrs2x90HJ2t2jjgTAh+
-	AD4YCuYGc6A8naFRE/woCWpWLsYqX/LF6IvCpQi5F7uLWmcfiFs5w40hNlWsqsfjFY1y6ZmA3X4
-	j4Ob60D1fogXY3EArjTxvMpwVsFtYybl+AidkP3UGshvPlpT/Z8SZBT9jyQQOFIQ286M8FPM5Vr
-	r9m+cIpBBenx5CVMtWl9vzL5dJ6v7rWVAAsh4p0KoQFSsrCeqF7Lr1k9MDSJdP/QxgqSp6b9NWd
-	rfu9c1MJvBzSbus=
-X-Google-Smtp-Source: AGHT+IFmFJAmh1tWNvRFjQSGVwYYSKdDOMdzkY+wVKFb14shO0sampmYnW0/uF7Hk7Eoq04gZJc1Ww==
-X-Received: by 2002:a05:6a00:1821:b0:729:49a:2da6 with SMTP id d2e1a72fcca58-7305d43a913mr15025099b3a.3.1739065429428;
-        Sat, 08 Feb 2025 17:43:49 -0800 (PST)
-Received: from localhost ([2601:646:9e00:f56e:2844:3d8f:bf3e:12cc])
-        by smtp.gmail.com with UTF8SMTPSA id d2e1a72fcca58-73048ad28bfsm5392358b3a.51.2025.02.08.17.43.48
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sat, 08 Feb 2025 17:43:48 -0800 (PST)
-Date: Sat, 8 Feb 2025 17:43:47 -0800
-From: Stanislav Fomichev <stfomichev@gmail.com>
-To: Joe Damato <jdamato@fastly.com>
-Cc: netdev@vger.kernel.org, horms@kernel.org, kuba@kernel.org,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
-	Donald Hunter <donald.hunter@gmail.com>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	Xuan Zhuo <xuanzhuo@linux.alibaba.com>,
-	Stanislav Fomichev <sdf@fomichev.me>,
-	Mina Almasry <almasrymina@google.com>,
-	Martin Karsten <mkarsten@uwaterloo.ca>,
-	Sridhar Samudrala <sridhar.samudrala@intel.com>,
-	David Wei <dw@davidwei.uk>,
-	open list <linux-kernel@vger.kernel.org>
-Subject: Re: [PATCH net-next v5 2/3] netdev-genl: Add an XSK attribute to
- queues
-Message-ID: <Z6gIU3bsIjsYqCN_@mini-arch>
-References: <20250208041248.111118-1-jdamato@fastly.com>
- <20250208041248.111118-3-jdamato@fastly.com>
+	s=arc-20240116; t=1739073991; c=relaxed/simple;
+	bh=7zheC5r9UEDKuncLWSf9PYOyDSnuiBxjk4GVoEOc1hI=;
+	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:
+	 Content-Disposition; b=LO2Gqtl/8+Sduu6NYN7h6DVg6ITGcgNmzoqM8fX8WDwhHbzfV5ZMqXYC/IZtrqFjcLZAPagkSs83XaBPxJsrL3g4701cxMSU89LEM0ZG3396twkUQibLNTlaTIIhvyRZxPCYbJQvmGZDH3TEhAn8JKPIK61J0Jsj7apejIMsh30=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=ethancedwards.com; spf=pass smtp.mailfrom=ethancedwards.com; dkim=pass (2048-bit key) header.d=ethancedwards.com header.i=@ethancedwards.com header.b=PSuJR+CM; arc=none smtp.client-ip=80.241.56.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=ethancedwards.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ethancedwards.com
+Received: from smtp1.mailbox.org (smtp1.mailbox.org [IPv6:2001:67c:2050:b231:465::1])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mout-p-202.mailbox.org (Postfix) with ESMTPS id 4YrDfS3YsSz9skQ;
+	Sun,  9 Feb 2025 05:06:24 +0100 (CET)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ethancedwards.com;
+	s=MBO0001; t=1739073984;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type;
+	bh=ltjFoxTAxyndszAucu/FRvuWcGA6M5KNw2ipIWnLj0A=;
+	b=PSuJR+CM26cpujHSJeXkJIfkU3Tvq67PL2aXfCj2drNPGQB7FampRgON82ZCdLyzwu2t1Q
+	EtCdY2toTlu6+4U3UyP+/IPc/cy0nYUW5WtFOzuy72LkpEBCshokE4t9fjPXLHJY010TSo
+	9B8ynHCqfFY6VQgB0cCfS2+06PsIgzuCaYl/vo0Lm6c1UfimIGMgu5oZH9i+myBURe4MEY
+	yUZ7Dn6yNVyFSd0Kani0c1psdHj9ZCq4lL1DoPFPNMEYYPcPGIj5R1E06mMQQeI0KwYR1r
+	+n4fVRiWRhNNAzljKs5E4XoeEUkKqqiAgECB0RM+lF2cNkW3F5fHvxIfH0z3JA==
+Date: Sat, 8 Feb 2025 23:06:21 -0500
+From: Ethan Carter Edwards <ethan@ethancedwards.com>
+To: Dan Carpenter <dan.carpenter@linaro.org>
+Cc: linux-kernel@vger.kernel.org, netdev@vger.kernel.org, 
+	linux-hams@vger.kernel.org, pabeni@redhat.com, linux-hardening@vger.kernel.org, 
+	kernel-hardening@lists.openwall.com
+Subject: [PATCH v3] hamradio: baycom: replace strcpy() with strscpy()
+Message-ID: <3qo3fbrak7undfgocsi2s74v4uyjbylpdqhie4dohfoh4welfn@joq7up65ug6v>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <20250208041248.111118-3-jdamato@fastly.com>
+X-Rspamd-Queue-Id: 4YrDfS3YsSz9skQ
 
-On 02/08, Joe Damato wrote:
-> Expose a new per-queue nest attribute, xsk, which will be present for
-> queues that are being used for AF_XDP. If the queue is not being used for
-> AF_XDP, the nest will not be present.
-> 
-> In the future, this attribute can be extended to include more data about
-> XSK as it is needed.
-> 
-> Signed-off-by: Joe Damato <jdamato@fastly.com>
-> Suggested-by: Jakub Kicinski <kuba@kernel.org>
-> ---
->  v5:
->    - Removed unused variable, ret, from netdev_nl_queue_fill_one.
-> 
->  v4:
->    - Updated netdev_nl_queue_fill_one to use the empty nest helper added
->      in patch 1.
-> 
->  v2:
->    - Patch adjusted to include an attribute, xsk, which is an empty nest
->      and exposed for queues which have a pool.
-> 
->  Documentation/netlink/specs/netdev.yaml | 13 ++++++++++++-
->  include/uapi/linux/netdev.h             |  6 ++++++
->  net/core/netdev-genl.c                  | 11 +++++++++++
->  tools/include/uapi/linux/netdev.h       |  6 ++++++
->  4 files changed, 35 insertions(+), 1 deletion(-)
-> 
-> diff --git a/Documentation/netlink/specs/netdev.yaml b/Documentation/netlink/specs/netdev.yaml
-> index 288923e965ae..85402a2e289c 100644
-> --- a/Documentation/netlink/specs/netdev.yaml
-> +++ b/Documentation/netlink/specs/netdev.yaml
-> @@ -276,6 +276,9 @@ attribute-sets:
->          doc: The timeout, in nanoseconds, of how long to suspend irq
->               processing, if event polling finds events
->          type: uint
-> +  -
-> +    name: xsk-info
-> +    attributes: []
->    -
->      name: queue
->      attributes:
-> @@ -294,6 +297,9 @@ attribute-sets:
->        -
->          name: type
->          doc: Queue type as rx, tx. Each queue type defines a separate ID space.
-> +             XDP TX queues allocated in the kernel are not linked to NAPIs and
-> +             thus not listed. AF_XDP queues will have more information set in
-> +             the xsk attribute.
->          type: u32
->          enum: queue-type
->        -
-> @@ -309,7 +315,11 @@ attribute-sets:
->          doc: io_uring memory provider information.
->          type: nest
->          nested-attributes: io-uring-provider-info
-> -
-> +      -
-> +        name: xsk
-> +        doc: XSK information for this queue, if any.
-> +        type: nest
-> +        nested-attributes: xsk-info
->    -
->      name: qstats
->      doc: |
-> @@ -652,6 +662,7 @@ operations:
->              - ifindex
->              - dmabuf
->              - io-uring
-> +            - xsk
->        dump:
->          request:
->            attributes:
-> diff --git a/include/uapi/linux/netdev.h b/include/uapi/linux/netdev.h
-> index 6c6ee183802d..4e82f3871473 100644
-> --- a/include/uapi/linux/netdev.h
-> +++ b/include/uapi/linux/netdev.h
-> @@ -136,6 +136,11 @@ enum {
->  	NETDEV_A_NAPI_MAX = (__NETDEV_A_NAPI_MAX - 1)
->  };
->  
-> +enum {
-> +	__NETDEV_A_XSK_INFO_MAX,
-> +	NETDEV_A_XSK_INFO_MAX = (__NETDEV_A_XSK_INFO_MAX - 1)
-> +};
-> +
->  enum {
->  	NETDEV_A_QUEUE_ID = 1,
->  	NETDEV_A_QUEUE_IFINDEX,
-> @@ -143,6 +148,7 @@ enum {
->  	NETDEV_A_QUEUE_NAPI_ID,
->  	NETDEV_A_QUEUE_DMABUF,
->  	NETDEV_A_QUEUE_IO_URING,
-> +	NETDEV_A_QUEUE_XSK,
->  
->  	__NETDEV_A_QUEUE_MAX,
->  	NETDEV_A_QUEUE_MAX = (__NETDEV_A_QUEUE_MAX - 1)
-> diff --git a/net/core/netdev-genl.c b/net/core/netdev-genl.c
-> index 0dcd4faefd8d..b5a93a449af9 100644
-> --- a/net/core/netdev-genl.c
-> +++ b/net/core/netdev-genl.c
-> @@ -400,11 +400,22 @@ netdev_nl_queue_fill_one(struct sk_buff *rsp, struct net_device *netdev,
->  		if (params->mp_ops &&
->  		    params->mp_ops->nl_fill(params->mp_priv, rsp, rxq))
->  			goto nla_put_failure;
-> +
-> +		if (rxq->pool)
-> +			if (nla_put_empty_nest(rsp, NETDEV_A_QUEUE_XSK))
-> +				goto nla_put_failure;
+The strcpy() function has been deprecated and replaced with strscpy().
+There is an effort to make this change treewide:
+https://github.com/KSPP/linux/issues/88.
 
-Needs to be guarded by ifdef CONFIG_XDP_SOCKETS?
-
-
-net/core/netdev-genl.c: In function ‘netdev_nl_queue_fill_one’:
-net/core/netdev-genl.c:404:24: error: ‘struct netdev_rx_queue’ has no member named ‘pool’
-  404 |                 if (rxq->pool)
-      |                        ^~
-net/core/netdev-genl.c:414:24: error: ‘struct netdev_queue’ has no member named ‘pool’
-  414 |                 if (txq->pool)
-      |                        ^~
-
-
+Signed-off-by: Ethan Carter Edwards <ethan@ethancedwards.com>
+Reviewed-by: Dan Carpenter <dan.carpenter@linaro.org>
 ---
-pw-bot: cr
+ v3: resend after merge window ends
+ Link to v2: https://lore.kernel.org/lkml/62yrwnnvqtwv4etjeaatms5xwiixirkbm6f7urmijwp7kk7bio@r2ric7eqhsvf/T/#u
+ v2: reduce verbosity
+ Link to v1: https://lore.kernel.org/lkml/bqKL4XKDGLWNih2jsEzZYpBSHG6Ux5mLZfDBIgHckEUxDq4l4pPgQPEXEqKRE7pUwMrXZBVeko9aYr1w_E5h5r_R_YFA46G8dGhV1id7zy4=@ethancedwards.com/
+ drivers/net/hamradio/baycom_par.c     | 4 ++--
+ drivers/net/hamradio/baycom_ser_fdx.c | 2 +-
+ drivers/net/hamradio/baycom_ser_hdx.c | 4 ++--
+ 3 files changed, 5 insertions(+), 5 deletions(-)
+
+diff --git a/drivers/net/hamradio/baycom_par.c b/drivers/net/hamradio/baycom_par.c
+index 00ebc25d0b22..47bc74d3ad8c 100644
+--- a/drivers/net/hamradio/baycom_par.c
++++ b/drivers/net/hamradio/baycom_par.c
+@@ -427,7 +427,7 @@ static int baycom_ioctl(struct net_device *dev, void __user *data,
+ 		break;
+ 
+ 	case HDLCDRVCTL_GETMODE:
+-		strcpy(hi->data.modename, bc->options ? "par96" : "picpar");
++		strscpy(hi->data.modename, bc->options ? "par96" : "picpar");
+ 		if (copy_to_user(data, hi, sizeof(struct hdlcdrv_ioctl)))
+ 			return -EFAULT;
+ 		return 0;
+@@ -439,7 +439,7 @@ static int baycom_ioctl(struct net_device *dev, void __user *data,
+ 		return baycom_setmode(bc, hi->data.modename);
+ 
+ 	case HDLCDRVCTL_MODELIST:
+-		strcpy(hi->data.modename, "par96,picpar");
++		strscpy(hi->data.modename, "par96,picpar");
+ 		if (copy_to_user(data, hi, sizeof(struct hdlcdrv_ioctl)))
+ 			return -EFAULT;
+ 		return 0;
+diff --git a/drivers/net/hamradio/baycom_ser_fdx.c b/drivers/net/hamradio/baycom_ser_fdx.c
+index 799f8ece7824..3dda6b215fe3 100644
+--- a/drivers/net/hamradio/baycom_ser_fdx.c
++++ b/drivers/net/hamradio/baycom_ser_fdx.c
+@@ -531,7 +531,7 @@ static int baycom_ioctl(struct net_device *dev, void __user *data,
+ 		return baycom_setmode(bc, hi->data.modename);
+ 
+ 	case HDLCDRVCTL_MODELIST:
+-		strcpy(hi->data.modename, "ser12,ser3,ser24");
++		strscpy(hi->data.modename, "ser12,ser3,ser24");
+ 		if (copy_to_user(data, hi, sizeof(struct hdlcdrv_ioctl)))
+ 			return -EFAULT;
+ 		return 0;
+diff --git a/drivers/net/hamradio/baycom_ser_hdx.c b/drivers/net/hamradio/baycom_ser_hdx.c
+index 5d1ab4840753..4f058f61659e 100644
+--- a/drivers/net/hamradio/baycom_ser_hdx.c
++++ b/drivers/net/hamradio/baycom_ser_hdx.c
+@@ -570,7 +570,7 @@ static int baycom_ioctl(struct net_device *dev, void __user *data,
+ 		break;
+ 
+ 	case HDLCDRVCTL_GETMODE:
+-		strcpy(hi->data.modename, "ser12");
++		strscpy(hi->data.modename, "ser12");
+ 		if (bc->opt_dcd <= 0)
+ 			strcat(hi->data.modename, (!bc->opt_dcd) ? "*" : (bc->opt_dcd == -2) ? "@" : "+");
+ 		if (copy_to_user(data, hi, sizeof(struct hdlcdrv_ioctl)))
+@@ -584,7 +584,7 @@ static int baycom_ioctl(struct net_device *dev, void __user *data,
+ 		return baycom_setmode(bc, hi->data.modename);
+ 
+ 	case HDLCDRVCTL_MODELIST:
+-		strcpy(hi->data.modename, "ser12");
++		strscpy(hi->data.modename, "ser12");
+ 		if (copy_to_user(data, hi, sizeof(struct hdlcdrv_ioctl)))
+ 			return -EFAULT;
+ 		return 0;
+-- 
+2.47.1
+
 
