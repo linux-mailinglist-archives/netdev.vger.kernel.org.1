@@ -1,79 +1,79 @@
-Return-Path: <netdev+bounces-164464-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-164465-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9D814A2DD88
-	for <lists+netdev@lfdr.de>; Sun,  9 Feb 2025 13:13:05 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id F17E4A2DDA3
+	for <lists+netdev@lfdr.de>; Sun,  9 Feb 2025 13:27:26 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 99FB016132C
-	for <lists+netdev@lfdr.de>; Sun,  9 Feb 2025 12:12:55 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 06FE5188740D
+	for <lists+netdev@lfdr.de>; Sun,  9 Feb 2025 12:27:32 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2FD0E1D934C;
-	Sun,  9 Feb 2025 12:12:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C87AC1CCB40;
+	Sun,  9 Feb 2025 12:27:22 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="YoHLlxMv"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="IlFxqHM2"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-f52.google.com (mail-ed1-f52.google.com [209.85.208.52])
+Received: from mail-ed1-f41.google.com (mail-ed1-f41.google.com [209.85.208.41])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 63EA71D90DD
-	for <netdev@vger.kernel.org>; Sun,  9 Feb 2025 12:12:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.52
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1345B13D28F
+	for <netdev@vger.kernel.org>; Sun,  9 Feb 2025 12:27:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.41
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1739103142; cv=none; b=cMmRkKExGid51VSxSlGBWkxLbIUZo0nEvy5F4xhQnBx497lixmn7G7vFkjlN3dBGCjBxd4yJNl9JezMmzhvJ1jS1PQKVk4BxSgKkOi6lLt8R/dfQ0W6kW0LDHTgutQRtLQYPbwlRkRShjNQ6JBwTfvhZd58hRPOLZYar0YzqadE=
+	t=1739104042; cv=none; b=sb4gw9m4LShHi2oiVK3oS9kK3qH95gZSBmk82DHsoiHuRuohBMMmhUbHj4QpI0Al9DkdcMtIUOt+I51vxSZBUnOcJKfd2e3BTGTtpYALPNiaMPsqCKQ8MhMpqHaoYmPX6TD09JUtzxmcj8jBfMOcI20Ech7K0wx9tvZa6XWOIjA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1739103142; c=relaxed/simple;
-	bh=VgBacbJBOm8NdbGi5F1saMG5IONKIe65KydEpkXU72E=;
-	h=Message-ID:Date:MIME-Version:To:Cc:From:Subject:Content-Type; b=uWlhlb/hgHyvAcuvggiBonafhplDNVmTBwaR5QXFTv9XraEslBzbvDxCxEDMNLUj2rP2JeC4siF3QQmAIM8EhmCKsmRbv8USEoDIGBvMp7y7Q/pMBhx2uYKzDvJtps0Kw4DR/dl8Fdtoh7nFngGckRapYysfAcHZlcR9e07VtdA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=YoHLlxMv; arc=none smtp.client-ip=209.85.208.52
+	s=arc-20240116; t=1739104042; c=relaxed/simple;
+	bh=E9gKBFdyLEywmq4SoPqWCF85XLRR29CXjhxqRejXufU=;
+	h=Message-ID:Date:MIME-Version:To:Cc:From:Subject:Content-Type; b=BT7TINdLndOTjOrMfMuoh4600HD3ZuBw1a9RLGDTCHzSr9HX3RAu3CfQ3jGhGu43GvWJnRmvNOWHk/2Pu50XjTT0/droxaRrwJNKyOrO28z3TE5ycyLG1lRtE6HsaJc7OzDn+9WyDDCigzyjICcp1QktjVynv4yrVLtbw85WsQY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=IlFxqHM2; arc=none smtp.client-ip=209.85.208.41
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ed1-f52.google.com with SMTP id 4fb4d7f45d1cf-5dcef33eeceso6538279a12.2
-        for <netdev@vger.kernel.org>; Sun, 09 Feb 2025 04:12:20 -0800 (PST)
+Received: by mail-ed1-f41.google.com with SMTP id 4fb4d7f45d1cf-5dcdb56c9d3so5579532a12.0
+        for <netdev@vger.kernel.org>; Sun, 09 Feb 2025 04:27:20 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1739103138; x=1739707938; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1739104039; x=1739708839; darn=vger.kernel.org;
         h=content-transfer-encoding:autocrypt:subject:from:cc:to
          :content-language:user-agent:mime-version:date:message-id:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=oX5DMuzX5DVPwIQtGMs5kpdpSLvAD3DOntPnxjTmbwg=;
-        b=YoHLlxMvP+A+F/4odCLZ/YE8yODViFvJo6pKH6LnnXl8rtljUeez3Np6ak4us3y559
-         IdYvbFEBcPa/dDM8slous2JiVFFSCv+QT1cWpxINF5Ft/+XrEJlv/lb1gyHCDVKLHtmT
-         PGbYYEd+UCPRY+HJLxkbptJ2EkaQ9EOEz/RBLI4ISGF/KIt2WiQUtD9YJoMbMqu2t/rn
-         I5EczTK+sOhgTa15u72+NUnK5eltg0S2KQ7L/PqVP3hyIcs3Yyd1Q+L/f3iuK7I3lqTc
-         +remhisSuE7g1NvG7GsUc/VAlH9+kdfYWlZjfq7oVLxNNI6QNzFgDBF7MhdwKRkIDOR1
-         mHVA==
+        bh=s/Q0g45wO/Vm5iLpg41l4hJpa4Tg12cuaqUPd3vVcdI=;
+        b=IlFxqHM2/HkEQhHwoiDPH3IJSUCpJ4WfHx2/ikr17L1rN4gDqwwLfQU0yk4Vgz7gbY
+         OJ9lp5K6ac++ngdRaERIPjcuIfU+kQEays0ObUtPGj0oRtacS9p1XZKaw3OV6To3osiM
+         Fz7MCp9lB8LQAZIbC5ZXyTruXjyLKvhMTr1ab+CYsLYl6KWHgnjZPmirEre9f4ikd8FH
+         kJAQexfGPfGsZt8F9W4ye8GeGkT3jdJb9U1sFi/zNGtNvoTb2gNBy2y9eS0c1nCOSIJH
+         HnijNbZDco+4OzmWmNIknZAEnrvD9Sh5RITDmE+ESOQHm9YweOvvM67PUEzQCA8yU5oS
+         pedQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1739103138; x=1739707938;
+        d=1e100.net; s=20230601; t=1739104039; x=1739708839;
         h=content-transfer-encoding:autocrypt:subject:from:cc:to
          :content-language:user-agent:mime-version:date:message-id
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=oX5DMuzX5DVPwIQtGMs5kpdpSLvAD3DOntPnxjTmbwg=;
-        b=YE1MpA2VG2yqN6f41ZpwhwJjEghFabM7wvrZzhC4GlBeN625OaFr9wfujf3HGnI40v
-         PjHo+0M/IcpO/zAhd78g0sdKWoHeE2alpTjJAJAebI1dc6tMnmoPehv9EfjuPp4InyDO
-         oDQszaudThgoJQ/4tXEF/LUNrrRpKcoxbQwbxmRtYe8TFFKu4/xlRE4ruZy0VkJmidfs
-         PWiKJZH9olCwt6HoPxZyYdl9G9msp7z+/2bOrRh3Qozyv8JjdilA8muVUE0QSV0IFb4N
-         LxEZFdVomIdx6kHI5mDbeBSltc126SwpXxZBW4cpxkGnI3b3PjH+GzawAvTTNu35mmm0
-         Vj9A==
-X-Gm-Message-State: AOJu0YxA0ExAKLCZUaffwKOOFQ3LYMSS8pyZw7lYrc3pmXMlXPgLEW+j
-	PQwup703RgUa+G/OFgJ4A6KskrGLpWaNahlMx7Wt3BguP3F5rvYj
-X-Gm-Gg: ASbGncvLR/YrAxHQgUCvOH2m9raH+So489B98Ii6Lqek/6mgDkleP0tIQp2b0bOtzQc
-	93dTBxRY46NZNsqmNqi1LADvd6AN0gJz/C5YMnlQC93MR2Ty5fHZ8svOpyq01LydHsEbxgGvolI
-	zs/nO1WoGEpieWkDGlEVdZChUOp64iSlOqkbnCcYZSw58h1qhDfN7J7OEyPRux6C7T2HvLVtboW
-	fwusm6sgPE/YOAIaYt67vxgyWODT0QAui4ibCsx77rjyfwjOpOXNfuzmiFPDOBARLK/mwtB3t6/
-	HmQ0gBq0/ar8kM3z4k7/7SP24nOJ1eDJ6iwXrEZNnK+Hv1nkUk2wksMMgbAPreuQrMaoMmjZnAN
-	rQiXSKoUwY+ubvyMlMvb8hVJP7kkPJ4tJ6C/QFo8NpyrwOslIYs+co3ouGbRLJgMkuqymuEIQ/x
-	/bhect1us=
-X-Google-Smtp-Source: AGHT+IEzvcMDqQmXS+KzAC9YrSZzOlIJQ5AvwDhFiNEPuQh9+HkTdujLFJ5Mlf2duYI+jW4GyZzo8w==
-X-Received: by 2002:a05:6402:2187:b0:5dc:9002:3164 with SMTP id 4fb4d7f45d1cf-5de4504005bmr10613185a12.5.1739103138337;
-        Sun, 09 Feb 2025 04:12:18 -0800 (PST)
+        bh=s/Q0g45wO/Vm5iLpg41l4hJpa4Tg12cuaqUPd3vVcdI=;
+        b=gnO4o8j+8D0/KtN3Nf/vVhvjvayAEBDvgqqyAwAWyZ8CUdpZRUcBySo7HIlb5AnjZX
+         vc9By2hnKKhwWobmtutQLm6kTEQM+J1pbq24VSyg0uy8GsMKAcBm+qcj7oBhz0jxe07/
+         ojyZRCnchuRqcacZV72EVa9QlTZXspaK+JStFkHD4JwBogbI4Bus1uNXP5IIBKsKtfQu
+         3tWxXWtNI6t5tLO3/w4kT0sfQ3ItknD8Ch+SVYGZksxQatmHxTJl+TAfUXpmfNFYLMb5
+         7h3IcLI6gx/Ue4JniXRRkQIwguArr+RAnNyryAlY8+nhWIYfz6kA+pTFpdwtl/gnEamq
+         iWpQ==
+X-Gm-Message-State: AOJu0YwyxWvUMNBnoj95jQBrO/OR0nvU0fqjxw4+2RhgHFMAHzms0h0c
+	PktTwiFjPnqF+1H5iLbupZGLbGnMu1D4zlow1pubj7fb+7Rqw6Ew
+X-Gm-Gg: ASbGncuZPpA2+r1yL3j4bAGchuHZvwRPs6eASVQrf/17+w3MRz92Nu/zT3wBOq+nIA6
+	6avvKWSkXf1NwF0TeOf2ZK1anaZ5Nlf87jYamdN74YHNo2TPoTblZPNBWEOMdyteJtHWzZpyOOO
+	0MZC1j4d17iatiqMeFjFJe/SQpREQI3plsOQDDKxoQNfAgWKqYkAYXucIwoGxk3Uip3XxY6C4Tw
+	FbEtA3MVVFf1R4QPls0f+rkGn1vNCE6RzJMr0pKuGby7p/n4Dxz3kWLGuKIH4JRDXMHhti74Hj9
+	TeyVVNy/xVHFkcuDNv7jzOpjQSz9WEJFLRhPLtWSLQAk7CbdxclBsJdlALHdr2QKsd1sgnIz27G
+	nwivxSxtrgbUMJwYuhYAnOvYkAfslKokOxIIJoms7aKjgQbnqsqJ9wrn4VND3ysx5+KGLfd06Ad
+	tFIGdIEWQ=
+X-Google-Smtp-Source: AGHT+IEhfxVc23G9a45HCrUbZrYLCTwURq5kvHB3aPAZ0j7Kz+eR1B9m+52RTg+woKuLjm2dzMnWlw==
+X-Received: by 2002:a05:6402:210e:b0:5dc:58c8:3154 with SMTP id 4fb4d7f45d1cf-5de450800a4mr29998512a12.28.1739104039232;
+        Sun, 09 Feb 2025 04:27:19 -0800 (PST)
 Received: from ?IPV6:2a02:3100:acf0:cb00:e533:c1d0:f45f:da1c? (dynamic-2a02-3100-acf0-cb00-e533-c1d0-f45f-da1c.310.pool.telefonica.de. [2a02:3100:acf0:cb00:e533:c1d0:f45f:da1c])
-        by smtp.googlemail.com with ESMTPSA id 4fb4d7f45d1cf-5de61830117sm2479889a12.6.2025.02.09.04.12.16
+        by smtp.googlemail.com with ESMTPSA id a640c23a62f3a-ab772f48882sm667378466b.19.2025.02.09.04.27.17
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Sun, 09 Feb 2025 04:12:17 -0800 (PST)
-Message-ID: <f8e7b8ed-a665-41ad-b0ce-cbfdb65262ef@gmail.com>
-Date: Sun, 9 Feb 2025 13:12:44 +0100
+        Sun, 09 Feb 2025 04:27:18 -0800 (PST)
+Message-ID: <62e9429b-57e0-42ec-96a5-6a89553f441d@gmail.com>
+Date: Sun, 9 Feb 2025 13:27:44 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -82,15 +82,14 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
 Content-Language: en-US
-To: Andrew Lunn <andrew@lunn.ch>,
- Russell King - ARM Linux <linux@armlinux.org.uk>,
- Andrew Lunn <andrew+netdev@lunn.ch>, Paolo Abeni <pabeni@redhat.com>,
- Jakub Kicinski <kuba@kernel.org>, David Miller <davem@davemloft.net>,
- Eric Dumazet <edumazet@google.com>
-Cc: "netdev@vger.kernel.org" <netdev@vger.kernel.org>
+To: Andrew Lunn <andrew+netdev@lunn.ch>, Jakub Kicinski <kuba@kernel.org>,
+ Paolo Abeni <pabeni@redhat.com>, David Miller <davem@davemloft.net>,
+ Eric Dumazet <edumazet@google.com>, Simon Horman <horms@kernel.org>
+Cc: "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+ linuxppc-dev@lists.ozlabs.org
 From: Heiner Kallweit <hkallweit1@gmail.com>
-Subject: [PATCH net-next] net: phy: remove unused PHY_INIT_TIMEOUT and
- PHY_FORCE_TIMEOUT
+Subject: [PATCH net-next] net: freescale: ucc_geth: remove unused
+ PHY_INIT_TIMEOUT and PHY_CHANGE_TIME
 Autocrypt: addr=hkallweit1@gmail.com; keydata=
  xsFNBF/0ZFUBEAC0eZyktSE7ZNO1SFXL6cQ4i4g6Ah3mOUIXSB4pCY5kQ6OLKHh0FlOD5/5/
  sY7IoIouzOjyFdFPnz4Bl3927ClT567hUJJ+SNaFEiJ9vadI6vZm2gcY4ExdIevYHWe1msJF
@@ -139,28 +138,27 @@ Content-Transfer-Encoding: 7bit
 
 Both definitions are unused. Last users have been removed with:
 
-f3ba9d490d6e ("net: s6gmac: remove driver")
-2bd229df5e2e ("net: phy: remove state PHY_FORCING")
+1577ecef7666 ("netdev: Merge UCC and gianfar MDIO bus drivers")
+728de4c927a3 ("ucc_geth: migrate ucc_geth to phylib")
 
 Signed-off-by: Heiner Kallweit <hkallweit1@gmail.com>
 ---
- include/linux/phy.h | 3 ---
- 1 file changed, 3 deletions(-)
+ drivers/net/ethernet/freescale/ucc_geth.h | 2 --
+ 1 file changed, 2 deletions(-)
 
-diff --git a/include/linux/phy.h b/include/linux/phy.h
-index 19f076a71..e1237bc51 100644
---- a/include/linux/phy.h
-+++ b/include/linux/phy.h
-@@ -303,9 +303,6 @@ static inline long rgmii_clock(int speed)
- 	}
- }
+diff --git a/drivers/net/ethernet/freescale/ucc_geth.h b/drivers/net/ethernet/freescale/ucc_geth.h
+index 38789faae..84f92f638 100644
+--- a/drivers/net/ethernet/freescale/ucc_geth.h
++++ b/drivers/net/ethernet/freescale/ucc_geth.h
+@@ -890,8 +890,6 @@ struct ucc_geth_hardware_statistics {
+ 							   addresses */
  
--#define PHY_INIT_TIMEOUT	100000
--#define PHY_FORCE_TIMEOUT	10
--
- #define PHY_MAX_ADDR	32
+ #define TX_TIMEOUT                              (1*HZ)
+-#define PHY_INIT_TIMEOUT                        100000
+-#define PHY_CHANGE_TIME                         2
  
- /* Used when trying to connect to a specific phy (mii bus id:phy device id) */
+ /* Fast Ethernet (10/100 Mbps) */
+ #define UCC_GETH_URFS_INIT                      512	/* Rx virtual FIFO size
 -- 
 2.48.1
 
