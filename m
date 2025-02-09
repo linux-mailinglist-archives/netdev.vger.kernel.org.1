@@ -1,119 +1,100 @@
-Return-Path: <netdev+bounces-164489-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-164493-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 77E4DA2DFA3
-	for <lists+netdev@lfdr.de>; Sun,  9 Feb 2025 18:54:27 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 26773A2E001
+	for <lists+netdev@lfdr.de>; Sun,  9 Feb 2025 19:45:28 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 83D8916456C
-	for <lists+netdev@lfdr.de>; Sun,  9 Feb 2025 17:54:24 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 6E4D71882DD3
+	for <lists+netdev@lfdr.de>; Sun,  9 Feb 2025 18:45:33 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0E9EB1E1A18;
-	Sun,  9 Feb 2025 17:54:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3124A1D934D;
+	Sun,  9 Feb 2025 18:45:25 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="KlcbLrs4"
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=engleder-embedded.com header.i=@engleder-embedded.com header.b="aOs0nG8i"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from mx10lb.world4you.com (mx10lb.world4you.com [81.19.149.120])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 768511E0DCE
-	for <netdev@vger.kernel.org>; Sun,  9 Feb 2025 17:54:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6C10B1DE88B
+	for <netdev@vger.kernel.org>; Sun,  9 Feb 2025 18:45:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=81.19.149.120
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1739123651; cv=none; b=qMsP3mGfzO5PwEE3izGq+ufRFW1m9Oh2waGuAO9gQYHUbcnEZkac2JEuMRc9M8AF1y4mqw1sDn99Np+2V7lwNNp1thCXRQYzFq5qVjAJjLDUHxEJoR6nGLecgWFsCNNZkT1R7IjWfGA5ZVfTWlPVKMfC4QjNztGvgo9fDpR7wVk=
+	t=1739126725; cv=none; b=pu2+WkDALR8Zpx7yWZnR3kdnomPvkZJcXw4vTT9x/WB2HylTkLPAUKdU36WuI/GwiiBiqsvEchTucWVeeo/jJVPY58gazblf1hssyT5LeTgO4jiOriPidrOYKf335hstYdZVn3toNgupZEOeKBV2PHAM3xO4tc0H/nlyqAqu4vs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1739123651; c=relaxed/simple;
-	bh=k99UAQAdKzxoqi1fK05SSQ9xO4q/5wpfZNfxu+vdzsc=;
-	h=From:In-Reply-To:References:To:Cc:Subject:MIME-Version:
-	 Content-Type:Date:Message-ID; b=VN0IPTfw7NukDnBgIUDTiHuoY7gwF5P3zJjXuGDKKEkpcx8EzR5uC6SmfP0U6kuyUj94k0NYpgh7umyVGAQVH7+4JXtYwHxScCsB9RnwpdSkXRbo2LJoEnxjVo/iyiBran/BATxwXYrfcQI9nkc+wnw+yvgooZUlfq7Krv5nXoE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=KlcbLrs4; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1739123648;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=HZy+2KXL+332PNbEE4REP74hQEw249CGirMqJVtIdAE=;
-	b=KlcbLrs4DAF44kTyEMpHa6Xsp+cliKXHGH7Frtz0kp/QZ9Bjys9qRD6aucw24HMRLHISjS
-	ilFhwHA3YAYyWanCk7/K+0FcsncGHdnqsHsYhGngIQgwqLuJjJBUPWFrLYxORy9dStHsiV
-	ioLvxfx0KZaPEOM3YWeBTSsgoFQ9RF0=
-Received: from mx-prod-mc-08.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-35-165-154-97.us-west-2.compute.amazonaws.com [35.165.154.97]) by
- relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-179-fiKubr2EN-OLiH49vN8dyQ-1; Sun,
- 09 Feb 2025 12:54:03 -0500
-X-MC-Unique: fiKubr2EN-OLiH49vN8dyQ-1
-X-Mimecast-MFC-AGG-ID: fiKubr2EN-OLiH49vN8dyQ
-Received: from mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.93])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mx-prod-mc-08.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 72BCF180036F;
-	Sun,  9 Feb 2025 17:54:00 +0000 (UTC)
-Received: from warthog.procyon.org.uk (unknown [10.42.28.92])
-	by mx-prod-int-06.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 794E51800360;
-	Sun,  9 Feb 2025 17:53:55 +0000 (UTC)
-Organization: Red Hat UK Ltd. Registered Address: Red Hat UK Ltd, Amberley
-	Place, 107-111 Peascod Street, Windsor, Berkshire, SI4 1TE, United
-	Kingdom.
-	Registered in England and Wales under Company Registration No. 3798903
-From: David Howells <dhowells@redhat.com>
-In-Reply-To: <Z6XKtPKryJsRfYvK@gondor.apana.org.au>
-References: <Z6XKtPKryJsRfYvK@gondor.apana.org.au> <20250203142343.248839-1-dhowells@redhat.com> <20250203142343.248839-4-dhowells@redhat.com>
-To: Herbert Xu <herbert@gondor.apana.org.au>
-Cc: dhowells@redhat.com, netdev@vger.kernel.org,
-    Marc Dionne <marc.dionne@auristor.com>,
-    Jakub Kicinski <kuba@kernel.org>,
-    "David S. Miller" <davem@davemloft.net>,
-    Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
-    Simon Horman <horms@kernel.org>,
-    Trond Myklebust <trond.myklebust@hammerspace.com>,
-    Chuck Lever <chuck.lever@oracle.com>,
-    Eric Biggers <ebiggers@kernel.org>, Ard Biesheuvel <ardb@kernel.org>,
-    linux-crypto@vger.kernel.org, linux-afs@lists.infradead.org,
-    linux-nfs@vger.kernel.org, linux-fsdevel@vger.kernel.org,
-    linux-kernel@vger.kernel.org
-Subject: Re: [PATCH net 03/24] crypto: Add 'krb5enc' hash and cipher AEAD algorithm
+	s=arc-20240116; t=1739126725; c=relaxed/simple;
+	bh=2WrSbi+Uo3ib6BNjbcYeSbgwXEfdCjTNB0zOjZTqknw=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=TNqE6sO+f7yomtLck4y6R3otCOloYA0SWbFRqDyE9KLVUwKD+K6fSdmKQ7JeQtyXy3ot9Me7VpOZxmGJXzfWmlJc1gyD61u5FI7wibC5LXamYQVTwSEJnr0MHiUXRVBG9PAVXeW+XQIp8bUH0+HvvSqGOuRMhfGbsTyI/cQz8FQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=engleder-embedded.com; spf=pass smtp.mailfrom=engleder-embedded.com; dkim=pass (1024-bit key) header.d=engleder-embedded.com header.i=@engleder-embedded.com header.b=aOs0nG8i; arc=none smtp.client-ip=81.19.149.120
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=engleder-embedded.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=engleder-embedded.com
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=engleder-embedded.com; s=dkim11; h=Content-Transfer-Encoding:Content-Type:
+	In-Reply-To:From:References:Cc:To:Subject:MIME-Version:Date:Message-ID:Sender
+	:Reply-To:Content-ID:Content-Description:Resent-Date:Resent-From:
+	Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:List-Help:
+	List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
+	bh=lJ0M1krCmi4eiwYD2F8NcoMHdmDqLxf3C+ZCd5NYc0s=; b=aOs0nG8iCgPhMu0X6frAFmWxgo
+	jsVXpuqyarFrlcNmBJ6SKf/ou9ZIxO7C0PifSq/w29e5FuYue0zFLiuDsGlb1kG0RZzSbWfH6798Y
+	FatCS9D7J9ysG95zHe4VmgErCeP4NPLAAxEd9yOPXj+FdJ3kx5hhQGzMOYXeVqzydv/o=;
+Received: from [88.117.60.28] (helo=[10.0.0.160])
+	by mx10lb.world4you.com with esmtpsa  (TLS1.2) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.97.1)
+	(envelope-from <gerhard@engleder-embedded.com>)
+	id 1thC1d-000000006NR-3bxU;
+	Sun, 09 Feb 2025 19:27:26 +0100
+Message-ID: <3a94fc8d-b2de-4ccf-be41-dc9c1aed26fd@engleder-embedded.com>
+Date: Sun, 9 Feb 2025 19:27:24 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-ID: <1934017.1739123634.1@warthog.procyon.org.uk>
-Content-Transfer-Encoding: quoted-printable
-Date: Sun, 09 Feb 2025 17:53:54 +0000
-Message-ID: <1934018.1739123634@warthog.procyon.org.uk>
-X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.93
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next] net: freescale: ucc_geth: remove unused
+ PHY_INIT_TIMEOUT and PHY_CHANGE_TIME
+To: Heiner Kallweit <hkallweit1@gmail.com>
+Cc: "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+ linuxppc-dev@lists.ozlabs.org, Andrew Lunn <andrew+netdev@lunn.ch>,
+ Paolo Abeni <pabeni@redhat.com>, Jakub Kicinski <kuba@kernel.org>,
+ Eric Dumazet <edumazet@google.com>, David Miller <davem@davemloft.net>,
+ Simon Horman <horms@kernel.org>
+References: <62e9429b-57e0-42ec-96a5-6a89553f441d@gmail.com>
+Content-Language: en-US
+From: Gerhard Engleder <gerhard@engleder-embedded.com>
+In-Reply-To: <62e9429b-57e0-42ec-96a5-6a89553f441d@gmail.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-AV-Do-Run: Yes
 
-Herbert Xu <herbert@gondor.apana.org.au> wrote:
+On 09.02.25 13:27, Heiner Kallweit wrote:
+> Both definitions are unused. Last users have been removed with:
+> 
+> 1577ecef7666 ("netdev: Merge UCC and gianfar MDIO bus drivers")
+> 728de4c927a3 ("ucc_geth: migrate ucc_geth to phylib")
+> 
+> Signed-off-by: Heiner Kallweit <hkallweit1@gmail.com>
+> ---
+>   drivers/net/ethernet/freescale/ucc_geth.h | 2 --
+>   1 file changed, 2 deletions(-)
+> 
+> diff --git a/drivers/net/ethernet/freescale/ucc_geth.h b/drivers/net/ethernet/freescale/ucc_geth.h
+> index 38789faae..84f92f638 100644
+> --- a/drivers/net/ethernet/freescale/ucc_geth.h
+> +++ b/drivers/net/ethernet/freescale/ucc_geth.h
+> @@ -890,8 +890,6 @@ struct ucc_geth_hardware_statistics {
+>   							   addresses */
+>   
+>   #define TX_TIMEOUT                              (1*HZ)
+> -#define PHY_INIT_TIMEOUT                        100000
+> -#define PHY_CHANGE_TIME                         2
+>   
+>   /* Fast Ethernet (10/100 Mbps) */
+>   #define UCC_GETH_URFS_INIT                      512	/* Rx virtual FIFO size
 
-> > [!] Note that the net/sunrpc/auth_gss/ implementation gets a pair of
-> > ciphers, one non-CTS and one CTS, using the former to do all the align=
-ed
-> > blocks and the latter to do the last two blocks if they aren't also
-> > aligned.  It may be necessary to do this here too for performance reas=
-ons -
-> > but there are considerations both ways:
-> =
-
-> The CTS template will take any hardware accelerated CBC implementation
-> and turn it into CTS.
-> =
-
-> So there is no reason to do the CTS/CBC thing by hand at all.
-
-Glad to hear it.  I'm just reporting what net/sunrpc/ does now.  My suspic=
-ion
-is that this is from before a lot of cpu crypto-based optimisations were m=
-ade
-available in the crypto layer.
-
-David
-
+Reviewed-by: Gerhard Engleder <gerhard@engleder-embedded.com>
 
