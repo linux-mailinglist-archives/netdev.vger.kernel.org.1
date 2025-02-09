@@ -1,120 +1,104 @@
-Return-Path: <netdev+bounces-164400-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-164398-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 975E1A2DBDD
-	for <lists+netdev@lfdr.de>; Sun,  9 Feb 2025 10:50:09 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id E2F49A2DBD2
+	for <lists+netdev@lfdr.de>; Sun,  9 Feb 2025 10:45:38 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 36EEE163D0E
-	for <lists+netdev@lfdr.de>; Sun,  9 Feb 2025 09:50:08 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D3F623A55B3
+	for <lists+netdev@lfdr.de>; Sun,  9 Feb 2025 09:45:29 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 08C9014B092;
-	Sun,  9 Feb 2025 09:50:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 45DB413C8F3;
+	Sun,  9 Feb 2025 09:45:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="BKbiPCj/"
 X-Original-To: netdev@vger.kernel.org
-Received: from pegase2.c-s.fr (pegase2.c-s.fr [93.17.235.10])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1313F13BC35
-	for <netdev@vger.kernel.org>; Sun,  9 Feb 2025 09:50:03 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=93.17.235.10
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 112D014A91;
+	Sun,  9 Feb 2025 09:45:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1739094605; cv=none; b=TgWeVDaKg+vvI+xXVCFO3EXiN6a+FEOLKCPYKVHaAoYuSbjyFkZf75T/cVLs5lGrxwwHeXug+N4tXa3HxCkFnEESDeIwEm8/0+VfuewovWad8qbxoK84x758QYp+5u/+YmztYcBQKFWHRIZNo3KH+WjGDq8vtYqyBaibqqSDa98=
+	t=1739094333; cv=none; b=uBT6aq5Tr90LTges4XTkbYzvWHfSFwJhTiLePuBxpt60U/i0u0o/QySBDsN748IgejPYcesdGNst+BfwqPKOZjhX3tT8iq/X8BLs+95D4KgFICIEmsjhZuVAS6p3dO4wcKl3bVfRY8Pn0DlP+qfw5+7JgLi7ShfD5lkch6pNgrE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1739094605; c=relaxed/simple;
-	bh=SdldE1rsjy8RfHD9TTHjtKO95k/CZZCtoRAWlss9pS0=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=LkkDHqBPgAE4DwKZZm8yYyj6UsGf7QLAsfjjDw6e5rQWIz/Nrm+uPzIwca+6Ao4m8CNgQxbTVvC9YaVoma3TmBPK/3LCgL1E9TWUriTGBoD1l+FR18xVZ0K94dQ5r3hDmCWqPw76Y3W/cnL9Fa2HC6gZSUECEH72A0iBRB6ZKKk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=csgroup.eu; spf=pass smtp.mailfrom=csgroup.eu; arc=none smtp.client-ip=93.17.235.10
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=csgroup.eu
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=csgroup.eu
-Received: from localhost (mailhub3.si.c-s.fr [172.26.127.67])
-	by localhost (Postfix) with ESMTP id 4YrMpP1Dw5z9sRr;
-	Sun,  9 Feb 2025 10:28:45 +0100 (CET)
-X-Virus-Scanned: amavisd-new at c-s.fr
-Received: from pegase2.c-s.fr ([172.26.127.65])
-	by localhost (pegase2.c-s.fr [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id DDi-BSp373Uq; Sun,  9 Feb 2025 10:28:45 +0100 (CET)
-Received: from messagerie.si.c-s.fr (messagerie.si.c-s.fr [192.168.25.192])
-	by pegase2.c-s.fr (Postfix) with ESMTP id 4YrMpP0PSMz9sRk;
-	Sun,  9 Feb 2025 10:28:45 +0100 (CET)
-Received: from localhost (localhost [127.0.0.1])
-	by messagerie.si.c-s.fr (Postfix) with ESMTP id F275D8B764;
-	Sun,  9 Feb 2025 10:28:44 +0100 (CET)
-X-Virus-Scanned: amavisd-new at c-s.fr
-Received: from messagerie.si.c-s.fr ([127.0.0.1])
-	by localhost (messagerie.si.c-s.fr [127.0.0.1]) (amavisd-new, port 10023)
-	with ESMTP id lJDIllVd9YL8; Sun,  9 Feb 2025 10:28:44 +0100 (CET)
-Received: from [192.168.235.99] (unknown [192.168.235.99])
-	by messagerie.si.c-s.fr (Postfix) with ESMTP id 6C8D78B763;
-	Sun,  9 Feb 2025 10:28:44 +0100 (CET)
-Message-ID: <0203253b-4bda-4e66-b7e6-e74300c44c80@csgroup.eu>
-Date: Sun, 9 Feb 2025 10:28:42 +0100
+	s=arc-20240116; t=1739094333; c=relaxed/simple;
+	bh=WcgMqs/ZwM9rIg7kqK/twtKrWUkfdn5EnRYbJxE9NiA=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=iyFmnZOnnGU2O15hvIJYnmXCweW1ZfMgwEufLzkdNRNk2V3bsElpcOWk2jlF9MYlwIa9aaNfPPvn64KIauMF6oWl7W6MuKljmFU1pghV+XzMyhX4pTKi620YAc4SkQmwtGfP9g9SlhH7P5lAUeDFxkMm+34mnodPUHG7/py6LEs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=BKbiPCj/; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id CF9A3C4CEDD;
+	Sun,  9 Feb 2025 09:45:31 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1739094332;
+	bh=WcgMqs/ZwM9rIg7kqK/twtKrWUkfdn5EnRYbJxE9NiA=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=BKbiPCj/bnlGorhgWoHY+EgObj2nir8+E7QW5MkGQOUMTEmHvM2N+dtFPBBYRQvcm
+	 OPjhYkD6NPdPp0lAxwPzZPGLIKV328kum/oDyYA5csdDanqK8N7Kz6O8ixLWpA1INj
+	 tGazUnO7nszkrdjYVA0RK5TgJ4e03JoWxUbnWCFodUgQsvHrvXyDZM1k6YTJaxRCDk
+	 iNxBEW9ncLl8dksuDg4Q9rTlywbhUMwDGW2M3U6fsbi+iXyCSIEJFiQOXPhhRyTGe9
+	 5cgrpd3Mlu55Y7ZIso38CLJNW8ZJDRQhi60e4ELE06WWbGMMD/3E3VIr56l3e/U3W8
+	 jFuMRfHpkh+Og==
+Date: Sun, 9 Feb 2025 11:45:28 +0200
+From: Leon Romanovsky <leon@kernel.org>
+To: longli@linuxonhyperv.com
+Cc: Jason Gunthorpe <jgg@ziepe.ca>, Ajay Sharma <sharmaajay@microsoft.com>,
+	Konstantin Taranov <kotaranov@microsoft.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	linux-rdma@vger.kernel.org, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org, linux-hyperv@vger.kernel.org,
+	Long Li <longli@microsoft.com>
+Subject: Re: [Patch v2 0/3] IB/core: Fix GID cache for bonded net devices
+Message-ID: <20250209094528.GB17863@unreal>
+References: <1738964178-18836-1-git-send-email-longli@linuxonhyperv.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next] net: phy: remove unused PHY_INIT_TIMEOUT
- definitions
-To: Heiner Kallweit <hkallweit1@gmail.com>,
- Andrew Lunn <andrew+netdev@lunn.ch>, Paolo Abeni <pabeni@redhat.com>,
- Jakub Kicinski <kuba@kernel.org>, David Miller <davem@davemloft.net>,
- Eric Dumazet <edumazet@google.com>, Simon Horman <horms@kernel.org>,
- Andrew Lunn <andrew@lunn.ch>,
- Russell King - ARM Linux <linux@armlinux.org.uk>
-Cc: "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
- "linuxppc-dev@lists.ozlabs.org" <linuxppc-dev@lists.ozlabs.org>
-References: <11be8192-b722-4680-9d1c-3e4323afc27f@gmail.com>
-Content-Language: fr-FR
-From: Christophe Leroy <christophe.leroy@csgroup.eu>
-In-Reply-To: <11be8192-b722-4680-9d1c-3e4323afc27f@gmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <1738964178-18836-1-git-send-email-longli@linuxonhyperv.com>
 
+On Fri, Feb 07, 2025 at 01:36:15PM -0800, longli@linuxonhyperv.com wrote:
+> From: Long Li <longli@microsoft.com>
+> 
+> When populating GID cache for net devices in a bonded setup, it should use the master device's
+> address whenever applicable.
+> 
+> The current code has some incorrect behaviors when dealing with bonded devices:
+> 1. It adds IP of bonded slave to the GID cache when the device is already bonded
+> 2. It adds IP of bonded slave to the GID cache when the device becomes bonded (via NETDEV_CHANGEUPPER notifier)
+> 3. When a bonded slave device is unbonded, it doesn't add its IP to the default table in GID cache.
 
+I took a look at the patches and would like to see the reasoning why
+current behaviour is incorrect and need to be changed. In addition,
+there is a need to add examples of what is "broken" now and will start
+to work after the fixes.
 
-Le 08/02/2025 à 22:14, Heiner Kallweit a écrit :
-> Both identical definitions of PHY_INIT_TIMEOUT aren't used,
-> so remove them.
+Thanks
 
-Would be good to say when it stopped being used, ie which commit or 
-commits removed its use.
-
-Also why only remove PHY_INIT_TIMEOUT ? For instance PHY_FORCE_TIMEOUT 
-also seems to be unused. PHY_CHANGE_TIME as well.
 
 > 
-> Signed-off-by: Heiner Kallweit <hkallweit1@gmail.com>
-> ---
->   drivers/net/ethernet/freescale/ucc_geth.h | 1 -
->   include/linux/phy.h                       | 1 -
->   2 files changed, 2 deletions(-)
+> The patchset fixes those issues.
 > 
-> diff --git a/drivers/net/ethernet/freescale/ucc_geth.h b/drivers/net/ethernet/freescale/ucc_geth.h
-> index 38789faae..03b515240 100644
-> --- a/drivers/net/ethernet/freescale/ucc_geth.h
-> +++ b/drivers/net/ethernet/freescale/ucc_geth.h
-> @@ -890,7 +890,6 @@ struct ucc_geth_hardware_statistics {
->   							   addresses */
->   
->   #define TX_TIMEOUT                              (1*HZ)
-> -#define PHY_INIT_TIMEOUT                        100000
->   #define PHY_CHANGE_TIME                         2
->   
->   /* Fast Ethernet (10/100 Mbps) */
-> diff --git a/include/linux/phy.h b/include/linux/phy.h
-> index 3028f8abf..9cb86666c 100644
-> --- a/include/linux/phy.h
-> +++ b/include/linux/phy.h
-> @@ -293,7 +293,6 @@ static inline long rgmii_clock(int speed)
->   	}
->   }
->   
-> -#define PHY_INIT_TIMEOUT	100000
->   #define PHY_FORCE_TIMEOUT	10
->   
->   #define PHY_MAX_ADDR	32
-
+> Changes log:
+> v2: Added cover letter explaining the overall problem and current behaviors.
+> 
+> Long Li (3):
+>   IB/core: Do not use netdev IP if it is a bonded slave
+>   IB/core: Use upper_device_filter to add upper ips
+>   IB/core: Add default IP when a slave is unlinked
+> 
+>  drivers/infiniband/core/roce_gid_mgmt.c | 17 +++++++++--------
+>  1 file changed, 9 insertions(+), 8 deletions(-)
+> 
+> -- 
+> 2.34.1
+> 
 
