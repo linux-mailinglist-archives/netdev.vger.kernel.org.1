@@ -1,43 +1,43 @@
-Return-Path: <netdev+bounces-164620-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-164619-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 552BCA2E7DF
-	for <lists+netdev@lfdr.de>; Mon, 10 Feb 2025 10:35:18 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id C97C5A2E7DD
+	for <lists+netdev@lfdr.de>; Mon, 10 Feb 2025 10:35:14 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 3B50B3A6F7B
-	for <lists+netdev@lfdr.de>; Mon, 10 Feb 2025 09:35:06 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 637DE162A26
+	for <lists+netdev@lfdr.de>; Mon, 10 Feb 2025 09:35:13 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D3CB71CB337;
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D14B41CB31D;
 	Mon, 10 Feb 2025 09:34:10 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="WIWxHHKz"
+	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="QjiKms0r"
 X-Original-To: netdev@vger.kernel.org
-Received: from NAM12-MW2-obe.outbound.protection.outlook.com (mail-mw2nam12on2055.outbound.protection.outlook.com [40.107.244.55])
+Received: from NAM11-DM6-obe.outbound.protection.outlook.com (mail-dm6nam11on2049.outbound.protection.outlook.com [40.107.223.49])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A3A1615B543
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 038481CAA64
 	for <netdev@vger.kernel.org>; Mon, 10 Feb 2025 09:34:08 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.244.55
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.223.49
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1739180050; cv=fail; b=PYO9O6w73vZtTA3G7GKtdIUlkWLJ9JM9BvZxhkbHrtj22WHD9dfbTiVFsjzYD5bR5TZWoGWRVf0itCLT8pIoh9ZgzYGt0WebSr6G9HYU+5c9ufuwNyaKddwriiZmWOJdyJfRx9LqS/Uda0vv/jrV9qDEDY88YeG875ECVlviiFg=
+	t=1739180050; cv=fail; b=DILHxMvZmc/MPiyfIQYX1gd0g2vr6/13X0diOy6b5sz2jxLoyr5VoXvYkwOPkRWuSAUYvBLlCt30jt9oPALtGf/bd9D6WNKyZl5gfzjLt/WciWaWCfQP57sLHBQWphUtBNkJGok9gxq04w/hlJTaq8ug6jCQX3W15MCRirytmsw=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1739180050; c=relaxed/simple;
-	bh=GSP94I1KpzN5+aFMjV0LSg53SrIAP07goTVSUO1KKGo=;
+	bh=5eQFFAq4Yc5BjwNQmFXutQwaGOSL7y2SQyNtC0iiZbc=;
 	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=F0QlhD6a/w4YJhvKLEH0aKdEOo35ab3M3hBYfwrgtEE/+eFhRMXzmv8iY4Qsr/6q0XrbgadnOrERSoPasrEaKl9r1w6Fz/IqcAtN/cSGLsKE36xygiwvNjLcLwNduraGQZIPdxXWyqTIJv1SNo06z8vRuJnmWajv9g+CEYmGTCE=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=WIWxHHKz; arc=fail smtp.client-ip=40.107.244.55
+	 MIME-Version:Content-Type; b=bdTflDwFm8Bp+c7mt5O1HlqcHm5MGzQcWIsIOoPJGAW2ka52nDbD6M9zKRdR63NCHf/Eh9FVaXoB5vH+pO0G0zmjNqas/7o7BoI3Djw+yHHgwgWRUq70uNpQAtfLZEkTTT+bvgLyZiya2hCUtlRDxKYy+Rd0IwU0meiHCjtlynY=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=QjiKms0r; arc=fail smtp.client-ip=40.107.223.49
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
 Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=DqwHw7Od9+zGTc1gx6CBFbCROv6JRY/cKEn0bO3dUXsmaJe6iLRvswZMUteJ9rqFcy/wCUcLhTi2c0VQElw7s/MRKgtqB45Khbv+eCMBFe3k0wNiiVhEec/Mh/2spGSA1I/2ZKTBLkUGywrdUonj7Vh+f9wv7VlmNya3SUKR1SsjtcgtYYleUjkkkbDrWDYCPDRQiam8tMr/ExktgCYhY2mHH7dHHPI1gGCZmVJYmM0b2HfzFaJbq3Kb8amKkJ5YmpMBu0qk+2HiGu6TZEW2KKlHiCEY7sRJk0ErD6+lKGZArlPNN3ipoKHMq4r6B5cjHwmuptoLVK7P+0IYn+vL5g==
+ b=HuwWiQFqyae4rarApslDMUsRaLxxE1Gfv/XmVtA6iwJYgE61rIpSi2YBad+Rdj1KJ5USG1qMLVZ7pHuLW77d6cIvnjkFs97TT8zCdsFJf6vocZdhBeucw5LeYzljJnYvnQfWVhpbocLMdQo5HzwR60NFze46MVjY6KYO87aFv8018OzxFzlJ29uGV2rtwP6Sk30EZcWWi5vFh3scZEqrXM6Weg0XYx3WIYBfoXXzXbPiJNL+TyJ/LtXoX6/IxQpLssNoVwZdpOSqMmjHAporaOWEy1XSLQ7rJnmCY/jqIMInFHjl42WhFhRAQrXYjdybcIzGQuUhx7V2+wPwHWpNxQ==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector10001;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=JhR67nnwyeBYnWau2BGFlcjQCLxmwitcYUNr/+j8sh0=;
- b=uMCBJ+vKkHEeFFOo7VE8f7o8ox+xr2kcIOHmVeShV923DdHL8nzzWulpW919Q9aISGQWkMz9uYiGBpYyKghl3ELavLm473qtGMQ/QXVhfkrgoB4mkXj5pI5no7oEmInteRoMutCVE3QWeUIRQunuhURJfvXldQGjY2yG4uX3sKlPXC9JWH0GMSdZ3i9oKg7PaN9qPNL2o/dSIJoPMIvMscs3C883P1midrss2M/KnZyEDeoj28T4UNm1MJC9cgmxXI83VMf/5WaoFgPD1TxGbVTOqFoXZZSy7M8hBfflZqt0TCYcZNMKwG/ApUW65DXUzMNMjifJEXhnZmXT2pAPrg==
+ bh=848/VcPOCSoHL4gnuV+vhiqfefNyaHtL/mNcIRVeF5s=;
+ b=k7NnuP5B679414nWO1O/yd5yu2bVNRU5bh8j2xgWPyyBfCAGyvq9oR695IeRqvbi0wzFuRyNeI6EzStvSufCraat59v0NXjRnggieurTzLJdRxgI/yX3RL0w5mDX0KZuYB8VIiqPmkQkO2pXzQE2q6wp9USMe1UF37TK9bHCB1JlUpvlR+UJu3ryv+k3wr9FeIedYKG3VeUZQfeU2H8fJY+oVbC3foiXx9HFhmUz8uhBUONtjEvRx1Z++XlFtJLYzygE2CiBRw9PzW8NdgBCJgV41XBHoR/8V0cLL0zqTWCW8feN7Y3T2w98MvxhbPeIbJvpG60vzHr1xstXADVESw==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
  216.228.117.160) smtp.rcpttodomain=vger.kernel.org smtp.mailfrom=nvidia.com;
  dmarc=pass (p=reject sp=reject pct=100) action=none header.from=nvidia.com;
@@ -45,18 +45,18 @@ ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
  s=selector2;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=JhR67nnwyeBYnWau2BGFlcjQCLxmwitcYUNr/+j8sh0=;
- b=WIWxHHKz1MPIFQWjVpU65s86a5xP7CQeJ0hO433dqMZUpJEF89T6gjYXb6OSd34AO2Nnqx7CqJfYiYVVYtaySjOsIqaH5Od4EjP7K3ZNKHd8Zzcfpev9JLBXSsVFDRHkCb7g71GF2tbqK8HMIlENDGaIgZvPvxhLwmE65KnkEsMfI7EVriNF7zEOf2cKF+1UbAoLoR+Sx1acnnzmj+qDS11P+r5q1TPiVK9wNIjJnOvrO4xnqYLY0Nc+ZrDSW+8vzcuLPvIQeS2IldDWRoqgYUOPy10A+dj4b34o+XwQffmIQzya0pPg6IvWNbMe2F9WnL7C8DQ3uJjqX4LYalvzTA==
-Received: from CH5PR04CA0006.namprd04.prod.outlook.com (2603:10b6:610:1f4::11)
- by SN7PR12MB6669.namprd12.prod.outlook.com (2603:10b6:806:26f::13) with
+ bh=848/VcPOCSoHL4gnuV+vhiqfefNyaHtL/mNcIRVeF5s=;
+ b=QjiKms0rk/E3Pnn3Oh2Oy8bm0C4XvLA/4TgOex4yfYxSGn5M7Z3K8xQzn79eDwM+lf8SbM4n8kzcVJSilDS85KOTE70f1jl+0BkPoeQupZeb/PEXPKsFInu+9sFrp96maj7tRuTU6CFYO86lR+Y07/FwDVlNXl50o4QlkP33R8R+k91lWKkwxvdg82+yhYk461xL1T8Z2k6Y77VwaZrpv8+ydw9KkO+yWeooHFSHtCngpM60cerqoigoxqva/tV32AszKGSug9cGw6KLbMsQEhfZLWqBUptVgWFSoNBLWWK5piVaoJwi5i8PkIUEeonnQ+iBS6J2w/CovL4RRMkHTQ==
+Received: from CH5PR04CA0013.namprd04.prod.outlook.com (2603:10b6:610:1f4::13)
+ by SN7PR12MB6689.namprd12.prod.outlook.com (2603:10b6:806:273::17) with
  Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8422.11; Mon, 10 Feb
- 2025 09:34:02 +0000
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8422.16; Mon, 10 Feb
+ 2025 09:34:04 +0000
 Received: from DS2PEPF00003446.namprd04.prod.outlook.com
- (2603:10b6:610:1f4:cafe::d2) by CH5PR04CA0006.outlook.office365.com
- (2603:10b6:610:1f4::11) with Microsoft SMTP Server (version=TLS1_3,
+ (2603:10b6:610:1f4:cafe::ef) by CH5PR04CA0013.outlook.office365.com
+ (2603:10b6:610:1f4::13) with Microsoft SMTP Server (version=TLS1_3,
  cipher=TLS_AES_256_GCM_SHA384) id 15.20.8398.31 via Frontend Transport; Mon,
- 10 Feb 2025 09:34:02 +0000
+ 10 Feb 2025 09:34:04 +0000
 X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 216.228.117.160)
  smtp.mailfrom=nvidia.com; dkim=none (message not signed)
  header.d=none;dmarc=pass action=none header.from=nvidia.com;
@@ -66,23 +66,23 @@ Received-SPF: Pass (protection.outlook.com: domain of nvidia.com designates
 Received: from mail.nvidia.com (216.228.117.160) by
  DS2PEPF00003446.mail.protection.outlook.com (10.167.17.73) with Microsoft
  SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.8445.10 via Frontend Transport; Mon, 10 Feb 2025 09:34:02 +0000
+ 15.20.8445.10 via Frontend Transport; Mon, 10 Feb 2025 09:34:04 +0000
 Received: from rnnvmail201.nvidia.com (10.129.68.8) by mail.nvidia.com
  (10.129.200.66) with Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.4; Mon, 10 Feb
- 2025 01:33:50 -0800
+ 2025 01:33:52 -0800
 Received: from dev-r-vrt-155.mtr.labs.mlnx (10.126.231.35) by
  rnnvmail201.nvidia.com (10.129.68.8) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.14; Mon, 10 Feb 2025 01:33:48 -0800
+ 15.2.1544.14; Mon, 10 Feb 2025 01:33:50 -0800
 From: Danielle Ratson <danieller@nvidia.com>
 To: <netdev@vger.kernel.org>
 CC: <mkubecek@suse.cz>, <matt@traverse.com.au>, <daniel.zahka@gmail.com>,
 	<amcohen@nvidia.com>, <nbu-mlxsw@exchange.nvidia.com>, Danielle Ratson
 	<danieller@nvidia.com>
-Subject: [PATCH ethtool-next v5 08/16] cmis: Add JSON output handling to --module-info in CMIS modules
-Date: Mon, 10 Feb 2025 11:33:08 +0200
-Message-ID: <20250210093316.1580715-9-danieller@nvidia.com>
+Subject: [PATCH ethtool-next v5 09/16] cmis: Enable JSON output support in CMIS modules
+Date: Mon, 10 Feb 2025 11:33:09 +0200
+Message-ID: <20250210093316.1580715-10-danieller@nvidia.com>
 X-Mailer: git-send-email 2.47.0
 In-Reply-To: <20250210093316.1580715-1-danieller@nvidia.com>
 References: <20250210093316.1580715-1-danieller@nvidia.com>
@@ -98,604 +98,232 @@ X-ClientProxiedBy: rnnvmail202.nvidia.com (10.129.68.7) To
  rnnvmail201.nvidia.com (10.129.68.8)
 X-EOPAttributedMessage: 0
 X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: DS2PEPF00003446:EE_|SN7PR12MB6669:EE_
-X-MS-Office365-Filtering-Correlation-Id: cd0cd667-5c8c-4f91-79b7-08dd49b60e2f
+X-MS-TrafficTypeDiagnostic: DS2PEPF00003446:EE_|SN7PR12MB6689:EE_
+X-MS-Office365-Filtering-Correlation-Id: 7d0356b5-699d-4955-7fa8-08dd49b60f59
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
 X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|36860700013|1800799024|376014|82310400026;
+	BCL:0;ARA:13230040|82310400026|1800799024|376014|36860700013;
 X-Microsoft-Antispam-Message-Info:
-	=?us-ascii?Q?0eVC6A73heLQRIVIpvwV5gBHIb90anp9VUUE3tnkaAAaT9tRo/7ypXfpwUEH?=
- =?us-ascii?Q?pXBOru9QW0/S9hWLMIPxdr8TVE9ObgZaoPiUuMLgVMziapKGkm8azH5fFwZf?=
- =?us-ascii?Q?MHU/5WnhBxf20zGrVtzg2UCZme6UqKtmkicqCbfCzk6c61KK24HQT9Qbk7fV?=
- =?us-ascii?Q?ZblbFz3Lk8s2NisR0tTN6ssj+KZT4shr2fqQolSs8L0259CW0lkErG9LUybs?=
- =?us-ascii?Q?2UdtI2OHNtdG7ye/g+OE31wq8JWv1LI6vaJFmNTk8bCF2Mu9TmAnsZ9fFUWs?=
- =?us-ascii?Q?Yas1L7cLvTRwG34I6WQ8BaN6ihjgh7vWoCQDG7RaDBbGlzyzFVVaMFd3MxJo?=
- =?us-ascii?Q?/zloibW0msNJdFKhjSoqbiFHkkkXf0IWlhg4PPTHL9oAKGiMpK8k9aAuKUIW?=
- =?us-ascii?Q?ugreXckcNwgS6hj7T5cdVDehGbFo5PdfrnoMIDyTIVJIA13JrvPfHVUTg55D?=
- =?us-ascii?Q?B2Y6T/JScqDW/+TmOLeRj6Ep0DVsHr2HMhSVAhtm1iVo8Mqy9A31jHEKnxqL?=
- =?us-ascii?Q?83LwHGeqbSchxLkvwc+PynNEwUsdq+E/7WLEoi6m3IRUoCxKlxsYJziM2S3k?=
- =?us-ascii?Q?S7pVuktSqj2I32kbnRpKycsFm6Z9ATAndVZTuPVWmWEmf+Yin2syM/qTpr5b?=
- =?us-ascii?Q?NyFx3sHOpWSyqp9bYmPnoN4OJcuv3zrZrrELdVXTNc72cDnv6zl6A/SesBRy?=
- =?us-ascii?Q?2XLnfdgpfo8VuvYcaIb3jRMSE0DErmU/RUyGJ+O8K3TUItE8vOCFZeNghGSx?=
- =?us-ascii?Q?G+gSY/LK60uyADFxstokor4pLE/xWFDvUUdhowGoNi2yCTvPXInXYeelXkmc?=
- =?us-ascii?Q?T+aHax0vNAGAAmYOEve8ETHGMJ9GvikjMlxdBSQ9EBFMD2W7vHSHRgaMIZWv?=
- =?us-ascii?Q?FADGyyokGJqXVC/LBPCKoO38gXob81LoQJQN+KMHmglwRU9C3wMl5bPZNzAu?=
- =?us-ascii?Q?IS4SRvUUldlm/kWNzWwpVjZBHIySPvRbKtgVddvh93VWdtm/I1vPyzRDaofR?=
- =?us-ascii?Q?phdIDmVjlYVbEa7nD/wOqEHzzM+zAYj6zlnuzI1bVR/J+Ob8VZzhHUjXpsSb?=
- =?us-ascii?Q?aeliSzB+nHlEtFsTloml2qpa/drtXykqZ0laa7KT4bFPT2K1OAflkdpSLJPe?=
- =?us-ascii?Q?Xw7VgHBPscRQ1IF7JgfapuHlKcct4ZV1ZJvfHGAJCt26OIyOty8em/zYEwzX?=
- =?us-ascii?Q?yyu4BrwDwB8doH9w5pmkYmmXETcniPt3U3ef7PtA/9zAkUc/5EpOW3T+XTo1?=
- =?us-ascii?Q?jeJVGsiOTVZX8XZEJ0PNAGqu0pxR3lZpDi9te/upml/kCYA/9afNrjbTiMfU?=
- =?us-ascii?Q?y4DcSWZ6kovyUvaSZejO/ruJVkTd8ZgcpqezdBQohma167JcbHNH47S+ZkLG?=
- =?us-ascii?Q?2rrmlzYFp+3kYqwNmrfNAQNrbUXlM/Ha8oOtmQ6e+oXskGDiwai9TP3NNFoC?=
- =?us-ascii?Q?E6Q1o8hOLpbuzYyuMiQPOBl/MZRtAmw86HPBw9F5KnjtBrK9mBXURZQhRFl8?=
- =?us-ascii?Q?6zW8GHzECJOSirs=3D?=
+	=?us-ascii?Q?5yRbyy/eRwusevlsFngDe79bSohN6PK1cImzYIjzyvGHxPPXyBb0DF4CPff8?=
+ =?us-ascii?Q?2PVOY7koCxKAW/kzawVCYq5Yw65+d/3q0HlpnIrDI2aqAYCehRvLaRgSwK0q?=
+ =?us-ascii?Q?8vufTg5ivbCrER9v6mVp5/IvTfv3wfqhThC8/5kWzBtA1KWe7MROH2OPqHqZ?=
+ =?us-ascii?Q?p62Rre5sZ3K9fimqohwV7BU/LqMXAlcOZPhSgGXXKPIZB2Cpf6e6A1e6dbQw?=
+ =?us-ascii?Q?UIaB5wuIiyUC8TzkOjZfzkYi8s+AKRc0nWORe01DCN65RbE+kd/uPXDikJlF?=
+ =?us-ascii?Q?FuOoxDXmZrB7lGr2BiZAwPsfoS8GDNBsBQNGELsfbG+ttYUO2KclspCaApiV?=
+ =?us-ascii?Q?jJUDuMgxgKlHhFG/pn6l/Svv9DAUmx8ghlxrjBb5ApqYsBCHk2EL9wPRWHEB?=
+ =?us-ascii?Q?ELqkLhC+dTp4ScyZ+q6hNXo8ELnhKbLOhgPPsvNmGTuTH98HuTVRsiKqGF8B?=
+ =?us-ascii?Q?B/5M+n+58iZQJl8jF+Bn0JZBPUpl8wxzdALnhm+GntfSPEe5m7yPMFaQgKM0?=
+ =?us-ascii?Q?o8tDQKI+cKc2lYDlRnrZ47NOH3guHfFD5UBHM5yxS1ztEarV9cCZ8bXawuvl?=
+ =?us-ascii?Q?Da+awQFHA9EeUYLhhBag/475jNO76aQN45p3lOGxRT+5JTslkuBWZo+PaMb8?=
+ =?us-ascii?Q?8IY/NL4QrvMcc0EaewiMZv+8IXa2GbwUuKSsnJHEURFz1sDhCH7AOSwKNzFr?=
+ =?us-ascii?Q?eyZ39Yo4j4wyRuArNMD3gbx8QoRdfILpM2oKIQZJ28kr39Tv1+JCUB9H6z6R?=
+ =?us-ascii?Q?pLvJ5HU/xMfzxy0sZ8rwlw0IuxDUwp3bUEiLcdmx5jAK0pkSfdtVekbRRMEQ?=
+ =?us-ascii?Q?3Ikbp4UzWEZPTaZDPvWIcJCsZYVHj/u+OpFb2tZT1MJrDmZ9+9XSGHKgK18O?=
+ =?us-ascii?Q?hHRjlZisdregh2DN0WS2Zd0JOR5Jl2s4NRwx3PDba+Wt8LLE8JCg+ACHQi0r?=
+ =?us-ascii?Q?5kFuo7alXEkUDcMOEm2Qp57c9F4rw9nv8P9u9UXXKieyWKTOFNxqUPaeNYS2?=
+ =?us-ascii?Q?iMA+24igbB4diFP9GhlGZLTM8jrMkQOH2PHfR7dAiF/gW6SZebd1FFjHV/GN?=
+ =?us-ascii?Q?KxfQ9ahVdQGHoWt3Pgrnc8xZqtV2Ms0RdW1MOyaiMDYNv45D9lO4daRaHJPk?=
+ =?us-ascii?Q?o5Ctj5A0zeDAnPBtdCMveVn2T4JooS6juaD+xDzATgAmoFbLZi04T0EJsnuQ?=
+ =?us-ascii?Q?2Fbg0dDG0GCDMo7nglDq+7yhVFK1RQM1ywvZZ7ROjEU5GB+dr7wt1+/+HfEB?=
+ =?us-ascii?Q?u0RRYoJiFjVm+TYc4MeZvFwHYCcUuR0L9jcOJu2bA3otuAqr9x5fBVuXGvHr?=
+ =?us-ascii?Q?o2qwXVPwTq2NkQ8xJu7yPKhuSFHOcsiCFReCrqorfoWjNeGiCi4jOd9AKMsj?=
+ =?us-ascii?Q?AHVLpGEQDtDaDx+jg1/Mg5JWhM1RrJFJuheuxiPCGwPRzqI25PvS+a/YuqIj?=
+ =?us-ascii?Q?JiSlGhmWLPtSB1gqELBwFR5zbT8Zo7N34KK3ujKUvTlSzDYOI1Qynn5Vb6yv?=
+ =?us-ascii?Q?o3lPX/TykHRfXGM=3D?=
 X-Forefront-Antispam-Report:
-	CIP:216.228.117.160;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:dc6edge1.nvidia.com;CAT:NONE;SFS:(13230040)(36860700013)(1800799024)(376014)(82310400026);DIR:OUT;SFP:1101;
+	CIP:216.228.117.160;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:dc6edge1.nvidia.com;CAT:NONE;SFS:(13230040)(82310400026)(1800799024)(376014)(36860700013);DIR:OUT;SFP:1101;
 X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 10 Feb 2025 09:34:02.5783
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 10 Feb 2025 09:34:04.5315
  (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: cd0cd667-5c8c-4f91-79b7-08dd49b60e2f
+X-MS-Exchange-CrossTenant-Network-Message-Id: 7d0356b5-699d-4955-7fa8-08dd49b60f59
 X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
 X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[216.228.117.160];Helo=[mail.nvidia.com]
 X-MS-Exchange-CrossTenant-AuthSource:
 	DS2PEPF00003446.namprd04.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Anonymous
 X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: SN7PR12MB6669
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SN7PR12MB6689
 
-Add JSON output handling for 'ethtool -m' / --module-info, following the
-guideline below:
+A sample output:
 
-1. Fields with description, will have a separate description field.
-2. Units will be documented in a separate module-info.json file.
-3. ASCII fields will be presented as strings.
-4. On/Off is rendered as true/false.
-5. Yes/no is rendered as true/false.
-6. Per-channel fields will be presented as array, when each element
-   represents a channel.
-7. Fields that hold version, will be split to major and minor sub fields.
+$ ethtool --json -m swp23
+[ {
+        "identifier": 24,
+        "identifier_description": "QSFP-DD Double Density 8X Pluggable
+Transceiver (INF-8628)",
+        "power_class": 5,
+        "max_power": 10,
+        "connector": 40,
+        "connector_description": "MPO 1x16",
+        "cable_assembly_length": 0,
+        "tx_cdr_bypass_control": false,
+        "rx_cdr_bypass_control": false,
+        "tx_cdr": true,
+        "rx_cdr": true,
+        "transmitter_technology": 0,
+        "transmitter_technology_description": "850 nm VCSEL",
+        "laser_wavelength": 850,
+        "laser_wavelength_tolerance": 94.8,
+        "length_(smf)": 0,
+        "length_(om5)": 0,
+        "length_(om4)": 100,
+        "length_(om3)": 70,
+        "length_(om2)": 0,
+        "vendor_name": "FINISAR CORP.",
+        "vendor_oui": [ 0,144,101 ],
+        "vendor_pn": "FTCD8613E1PCM",
+        "vendor_rev": "A0",
+        "vendor_sn": "X6LBE6H",
+        "date_code": "211229__",
+        "revision_compliance": {
+            "major": 4,
+            "minor": 0
+        },
+        "rx_loss_of_signal": [
+"Yes","Yes","Yes","Yes","Yes","Yes","Yes","Yes" ],
+        "tx_loss_of_signal": false,
+        "rx_loss_of_lock": false,
+        "tx_loss_of_lock": false,
+        "tx_fault": false,
+        "module_state": 3,
+        "module_state_description": "ModuleReady",
+        "low_pwr_allow_request_hw": false,
+        "low_pwr_request_sw": false,
+        "module_temperature": 37.5273,
+        "module_voltage": 3.3358,
+        "laser_tx_bias_current": [ 0,0,0,0,0,0,0,0 ],
+        "transmit_avg_optical_power": [
+0.0001,0.0001,0.0001,0.0001,0.0001,0.0001,0.0001,0.0001 ],
+        "rx_power": {
+            "values": [
+0.0001,0.0001,0.0001,0.0001,0.0001,0.0001,0.0001,0.0001 ],
+            "type": "Rcvr signal avg optical power"
+        },
+        "module_temperature_high_alarm": false,
+        "module_temperature_low_alarm": false,
+        "module_temperature_high_warning": false,
+        "module_temperature_low_warning": false,
+        "module_voltage_high_alarm": false,
+        "module_voltage_low_alarm": false,
+        "module_voltage_high_warning": false,
+        "module_voltage_low_warning": false,
+        "laser_bias_current_high_alarm": [
+false,false,false,false,false,false,false,false ],
+        "laser_bias_current_low_alarm": [
+false,false,false,false,false,false,false,false ],
+        "laser_bias_current_high_warning": [
+false,false,false,false,false,false,false,false ],
+        "laser_bias_current_low_warning": [
+false,false,false,false,false,false,false,false ],
+        "laser_tx_power_high_alarm": [
+false,false,false,false,false,false,false,false ],
+        "laser_tx_power_low_alarm": [
+false,false,false,false,false,false,false,false ],
+        "laser_tx_power_high_warning": [
+false,false,false,false,false,false,false,false ],
+        "laser_tx_power_low_warning": [
+false,false,false,false,false,false,false,false ],
+        "laser_rx_power_high_alarm": [
+false,false,false,false,false,false,false,false ],
+        "laser_rx_power_low_alarm": [
+false,false,false,false,false,false,false,false ],
+        "laser_rx_power_high_warning": [
+false,false,false,false,false,false,false,false ],
+        "laser_rx_power_low_warning": [
+false,false,false,false,false,false,false,false ],
+        "laser_bias_current": {
+            "high_alarm_threshold": 13,
+            "low_alarm_threshold": 3,
+            "high_warning_threshold": 11,
+            "low_warning_threshold": 5
+        },
+        "laser_output_power": {
+            "high_alarm_threshold": 3.1623,
+            "low_alarm_threshold": 0.1,
+            "high_warning_threshold": 1.9953,
+            "low_warning_threshold": 0.1585
+        },
+        "module_temperature": {
+            "high_alarm_threshold": 75,
+            "low_alarm_threshold": -5,
+            "high_warning_threshold": 70,
+            "low_warning_threshold": 0
+        },
+        "module_voltage": {
+            "high_alarm_threshold": 3.465,
+            "low_alarm_threshold": 3.135,
+            "high_warning_threshold": 3.45,
+            "low_warning_threshold": 3.15
+        },
+        "laser_rx_power": {
+            "high_alarm_threshold": 3.1623,
+            "low_alarm_threshold": 0.0398,
+            "high_warning_threshold": 2.5119,
+            "low_warning_threshold": 0.0794
+        },
+        "active_firmware_version": {
+            "major": 2,
+            "minor": 7
+        },
+        "inactive_firmware_version": {
+            "major": 2,
+            "minor": 7
+        },
+        "cdb_instances": 1,
+        "cdb_background_mode": "Supported",
+        "cdb_epl_pages": 0,
+        "cdb_maximum_epl_rw_length": 128,
+        "cdb_maximum_lpl_rw_length": 128,
+        "cdb_trigger_method": "Single write"
+    } ]
 
 Signed-off-by: Danielle Ratson <danieller@nvidia.com>
+Reviewed-by: Amit Cohen <amcohen@nvidia.com>
 Acked-by: Jakub Kicinski <kuba@kernel.org>
 ---
 
 Notes:
     v3:
-    	* Remove unit fields.
     	* Reword commit message.
-    
-    v2:
-    	* Use uint instead of hexa fields in JSON context.
-    	* In rx_power JSON field, add a type field to let the user know
-    	  what type is printed in "value".
 
- cmis.c | 278 +++++++++++++++++++++++++++++++++++++++------------------
- 1 file changed, 189 insertions(+), 89 deletions(-)
+ cmis.c    | 6 ++++++
+ ethtool.c | 1 +
+ 2 files changed, 7 insertions(+)
 
 diff --git a/cmis.c b/cmis.c
-index 9cd2bb1..267d088 100644
+index 267d088..305814c 100644
 --- a/cmis.c
 +++ b/cmis.c
-@@ -62,7 +62,15 @@ static void cmis_show_rev_compliance(const struct cmis_memory_map *map)
- 	int major = (rev >> 4) & 0x0F;
- 	int minor = rev & 0x0F;
+@@ -1122,10 +1122,16 @@ int cmis_show_all_nl(struct cmd_context *ctx)
+ 	struct cmis_memory_map map = {};
+ 	int ret;
  
--	printf("\t%-41s : Rev. %d.%d\n", "Revision compliance", major, minor);
-+	if (is_json_context()) {
-+		open_json_object("revision_compliance");
-+		print_uint(PRINT_JSON, "major", "%u", major);
-+		print_uint(PRINT_JSON, "minor", "%u", minor);
-+		close_json_object();
-+	} else {
-+		printf("\t%-41s : Rev. %d.%d\n", "Revision compliance", major,
-+		       minor);
-+	}
- }
- 
- static void
-@@ -123,8 +131,8 @@ static void cmis_show_power_info(const struct cmis_memory_map *map)
- 	base_power = map->page_00h[CMIS_PWR_MAX_POWER_OFFSET];
- 	max_power = base_power * 0.25f;
- 
--	printf("\t%-41s : %d\n", "Power class", power_class + 1);
--	printf("\t%-41s : %.02fW\n", "Max power", max_power);
-+	module_print_any_uint("Power class", power_class + 1, NULL);
-+	module_print_any_float("Max power", max_power, "W");
- }
- 
- /**
-@@ -143,7 +151,7 @@ static void cmis_show_cbl_asm_len(const struct cmis_memory_map *map)
- 
- 	/* Check if max length */
- 	if (map->page_00h[CMIS_CBL_ASM_LEN_OFFSET] == CMIS_6300M_MAX_LEN) {
--		printf("\t%-41s : > 6.3km\n", fn);
-+		module_print_any_string(fn, "> 6.3km");
- 		return;
- 	}
- 
-@@ -168,7 +176,7 @@ static void cmis_show_cbl_asm_len(const struct cmis_memory_map *map)
- 	/* Get base value from first 6 bits and multiply by mul */
- 	val = (map->page_00h[CMIS_CBL_ASM_LEN_OFFSET] & CMIS_LEN_VAL_MASK);
- 	val = (float)val * mul;
--	printf("\t%-41s : %0.2fm\n", fn, val);
-+	module_print_any_float(fn, val, "m");
- }
- 
- /**
-@@ -202,7 +210,7 @@ static void cmis_print_smf_cbl_len(const struct cmis_memory_map *map)
- 	/* Get base value from first 6 bits and multiply by mul */
- 	val = (map->page_01h[CMIS_SMF_LEN_OFFSET] & CMIS_LEN_VAL_MASK);
- 	val = (float)val * mul;
--	printf("\t%-41s : %0.2fkm\n", fn, val);
-+	module_print_any_float(fn, val, "km");
- }
- 
- /**
-@@ -212,22 +220,26 @@ static void cmis_print_smf_cbl_len(const struct cmis_memory_map *map)
-  */
- static void cmis_show_sig_integrity(const struct cmis_memory_map *map)
- {
-+	bool value;
++	new_json_obj(ctx->json);
++	open_json_object(NULL);
 +
- 	if (!map->page_01h)
- 		return;
+ 	ret = cmis_memory_map_init_pages(ctx, &map);
+ 	if (ret < 0)
+ 		return ret;
+ 	cmis_show_all_common(&map);
  
- 	/* CDR Bypass control: 2nd bit from each byte */
--	printf("\t%-41s : ", "Tx CDR bypass control");
--	printf("%s\n", YESNO(map->page_01h[CMIS_SIG_INTEG_TX_OFFSET] & 0x02));
-+	value = map->page_01h[CMIS_SIG_INTEG_TX_OFFSET] & 0x02;
-+	module_print_any_bool("Tx CDR bypass control", NULL, value,
-+			      YESNO(value));
- 
--	printf("\t%-41s : ", "Rx CDR bypass control");
--	printf("%s\n", YESNO(map->page_01h[CMIS_SIG_INTEG_RX_OFFSET] & 0x02));
-+	value = map->page_01h[CMIS_SIG_INTEG_RX_OFFSET] & 0x02;
-+	module_print_any_bool("Rx CDR bypass control", NULL, value,
-+			      YESNO(value));
- 
- 	/* CDR Implementation: 1st bit from each byte */
--	printf("\t%-41s : ", "Tx CDR");
--	printf("%s\n", YESNO(map->page_01h[CMIS_SIG_INTEG_TX_OFFSET] & 0x01));
-+	value = map->page_01h[CMIS_SIG_INTEG_TX_OFFSET] & 0x01;
-+	module_print_any_bool("Tx CDR", NULL, value, YESNO(value));
- 
--	printf("\t%-41s : ", "Rx CDR");
--	printf("%s\n", YESNO(map->page_01h[CMIS_SIG_INTEG_RX_OFFSET] & 0x01));
-+	value = map->page_01h[CMIS_SIG_INTEG_RX_OFFSET] & 0x01;
-+	module_print_any_bool("Rx CDR", NULL, value, YESNO(value));
- }
- 
- /**
-@@ -247,21 +259,25 @@ static void cmis_show_mit_compliance(const struct cmis_memory_map *map)
- 	module_show_mit_compliance(value);
- 
- 	if (value >= CMIS_COPPER_UNEQUAL) {
--		printf("\t%-41s : %udb\n", "Attenuation at 5GHz",
--		       map->page_00h[CMIS_COPPER_ATT_5GHZ]);
--		printf("\t%-41s : %udb\n", "Attenuation at 7GHz",
--		       map->page_00h[CMIS_COPPER_ATT_7GHZ]);
--		printf("\t%-41s : %udb\n", "Attenuation at 12.9GHz",
--		       map->page_00h[CMIS_COPPER_ATT_12P9GHZ]);
--		printf("\t%-41s : %udb\n", "Attenuation at 25.8GHz",
--		       map->page_00h[CMIS_COPPER_ATT_25P8GHZ]);
-+		module_print_any_uint("Attenuation at 5GHz",
-+				      map->page_00h[CMIS_COPPER_ATT_5GHZ], "db");
-+		module_print_any_uint("Attenuation at 7GHz",
-+				      map->page_00h[CMIS_COPPER_ATT_7GHZ], "db");
-+		module_print_any_uint("Attenuation at 12.9GHz",
-+				      map->page_00h[CMIS_COPPER_ATT_12P9GHZ],
-+				      "db");
-+		module_print_any_uint("Attenuation at 25.8GHz",
-+				      map->page_00h[CMIS_COPPER_ATT_25P8GHZ],
-+				      "db");
- 	} else if (map->page_01h) {
--		printf("\t%-41s : %.3lfnm\n", "Laser wavelength",
--		       (((map->page_01h[CMIS_NOM_WAVELENGTH_MSB] << 8) |
--			  map->page_01h[CMIS_NOM_WAVELENGTH_LSB]) * 0.05));
--		printf("\t%-41s : %.3lfnm\n", "Laser wavelength tolerance",
--		       (((map->page_01h[CMIS_WAVELENGTH_TOL_MSB] << 8) |
--			  map->page_01h[CMIS_WAVELENGTH_TOL_LSB]) * 0.005));
-+		module_print_any_float("Laser wavelength",
-+				       (((map->page_01h[CMIS_NOM_WAVELENGTH_MSB] << 8) |
-+				        map->page_01h[CMIS_NOM_WAVELENGTH_LSB]) * 0.05),
-+				       "nm");
-+		module_print_any_float("Laser wavelength tolerance",
-+				       (((map->page_01h[CMIS_WAVELENGTH_TOL_MSB] << 8) |
-+				        map->page_01h[CMIS_NOM_WAVELENGTH_LSB]) * 0.05),
-+				       "nm");
- 	}
- }
- 
-@@ -314,6 +330,8 @@ static void cmis_show_vendor_info(const struct cmis_memory_map *map)
- 				  CMIS_CLEI_END_OFFSET, "CLEI code");
- }
- 
-+#define CMIS_MAX_DESC_LEN	64
-+
- /* Print the current Module State. Relevant documents:
-  * [1] CMIS Rev. 5, pag. 57, section 6.3.2.2, Figure 6-3
-  * [2] CMIS Rev. 5, pag. 60, section 6.3.2.3, Figure 6-4
-@@ -321,31 +339,40 @@ static void cmis_show_vendor_info(const struct cmis_memory_map *map)
-  */
- static void cmis_show_mod_state(const struct cmis_memory_map *map)
- {
-+	char mod_state_description[CMIS_MAX_DESC_LEN];
- 	__u8 mod_state;
- 
- 	mod_state = (map->lower_memory[CMIS_MODULE_STATE_OFFSET] &
- 		     CMIS_MODULE_STATE_MASK) >> 1;
--	printf("\t%-41s : 0x%02x", "Module State", mod_state);
- 	switch (mod_state) {
- 	case CMIS_MODULE_STATE_MODULE_LOW_PWR:
--		printf(" (ModuleLowPwr)\n");
-+		strncpy(mod_state_description, "ModuleLowPwr",
-+			CMIS_MAX_DESC_LEN);
- 		break;
- 	case CMIS_MODULE_STATE_MODULE_PWR_UP:
--		printf(" (ModulePwrUp)\n");
-+		strncpy(mod_state_description, "ModulePwrUp",
-+			CMIS_MAX_DESC_LEN);
- 		break;
- 	case CMIS_MODULE_STATE_MODULE_READY:
--		printf(" (ModuleReady)\n");
-+		strncpy(mod_state_description, "ModuleReady",
-+			CMIS_MAX_DESC_LEN);
- 		break;
- 	case CMIS_MODULE_STATE_MODULE_PWR_DN:
--		printf(" (ModulePwrDn)\n");
-+		strncpy(mod_state_description, "ModulePwrDn",
-+			CMIS_MAX_DESC_LEN);
- 		break;
- 	case CMIS_MODULE_STATE_MODULE_FAULT:
--		printf(" (ModuleFault)\n");
-+		strncpy(mod_state_description, "ModuleFault",
-+			CMIS_MAX_DESC_LEN);
- 		break;
- 	default:
--		printf(" (reserved or unknown)\n");
-+		strncpy(mod_state_description, "reserved or unknown",
-+			CMIS_MAX_DESC_LEN);
- 		break;
- 	}
-+
-+	sff_print_any_hex_field("Module state", "module_state",
-+				mod_state, mod_state_description);
- }
- 
- /* Print the Module Fault Information. Relevant documents:
-@@ -354,6 +381,7 @@ static void cmis_show_mod_state(const struct cmis_memory_map *map)
-  */
- static void cmis_show_mod_fault_cause(const struct cmis_memory_map *map)
- {
-+	char fault_cause_description[CMIS_MAX_DESC_LEN];
- 	__u8 mod_state, fault_cause;
- 
- 	mod_state = (map->lower_memory[CMIS_MODULE_STATE_OFFSET] &
-@@ -362,24 +390,31 @@ static void cmis_show_mod_fault_cause(const struct cmis_memory_map *map)
- 		return;
- 
- 	fault_cause = map->lower_memory[CMIS_MODULE_FAULT_OFFSET];
--	printf("\t%-41s : 0x%02x", "Module Fault Cause", fault_cause);
- 	switch (fault_cause) {
- 	case CMIS_MODULE_FAULT_NO_FAULT:
--		printf(" (No fault detected / not supported)\n");
-+		strncpy(fault_cause_description,
-+			"No fault detected / not supported", CMIS_MAX_DESC_LEN);
- 		break;
- 	case CMIS_MODULE_FAULT_TEC_RUNAWAY:
--		printf(" (TEC runaway)\n");
-+		strncpy(fault_cause_description, "TEC runaway",
-+			CMIS_MAX_DESC_LEN);
- 		break;
- 	case CMIS_MODULE_FAULT_DATA_MEM_CORRUPTED:
--		printf(" (Data memory corrupted)\n");
-+		strncpy(fault_cause_description, "Data memory corrupted",
-+			CMIS_MAX_DESC_LEN);
- 		break;
- 	case CMIS_MODULE_FAULT_PROG_MEM_CORRUPTED:
--		printf(" (Program memory corrupted)\n");
-+		strncpy(fault_cause_description, "Program memory corrupted",
-+			CMIS_MAX_DESC_LEN);
- 		break;
- 	default:
--		printf(" (reserved or unknown)\n");
-+		strncpy(fault_cause_description, "reserved or unknown",
-+			CMIS_MAX_DESC_LEN);
- 		break;
- 	}
-+
-+	sff_print_any_hex_field("Module Fault Cause", "module_fault_cause",
-+				fault_cause, fault_cause_description);
- }
- 
- /* Print the current Module-Level Controls. Relevant documents:
-@@ -388,12 +423,17 @@ static void cmis_show_mod_fault_cause(const struct cmis_memory_map *map)
-  */
- static void cmis_show_mod_lvl_controls(const struct cmis_memory_map *map)
- {
--	printf("\t%-41s : ", "LowPwrAllowRequestHW");
--	printf("%s\n", ONOFF(map->lower_memory[CMIS_MODULE_CONTROL_OFFSET] &
--			     CMIS_LOW_PWR_ALLOW_REQUEST_HW_MASK));
--	printf("\t%-41s : ", "LowPwrRequestSW");
--	printf("%s\n", ONOFF(map->lower_memory[CMIS_MODULE_CONTROL_OFFSET] &
--			     CMIS_LOW_PWR_REQUEST_SW_MASK));
-+	bool value;
-+
-+	value = map->lower_memory[CMIS_MODULE_CONTROL_OFFSET] &
-+		CMIS_LOW_PWR_ALLOW_REQUEST_HW_MASK;
-+	module_print_any_bool("LowPwrAllowRequestHW", "low_pwr_allow_request_hw",
-+			      value, ONOFF(value));
-+
-+	value = map->lower_memory[CMIS_MODULE_CONTROL_OFFSET] &
-+		CMIS_LOW_PWR_REQUEST_SW_MASK;
-+	module_print_any_bool("LowPwrRequestSW", "low_pwr_request_sw", value,
-+			      ONOFF(value));
- }
- 
- static void cmis_parse_dom_power_type(const struct cmis_memory_map *map,
-@@ -557,14 +597,22 @@ cmis_show_dom_chan_lvl_tx_bias_bank(const struct cmis_memory_map *map,
- 	if (!page_11h)
- 		return;
- 
-+	open_json_array("laser_tx_bias_current", "");
-+
- 	for (i = 0; i < CMIS_CHANNELS_PER_BANK; i++) {
- 		int chan = bank * CMIS_CHANNELS_PER_BANK + i;
- 		char fmt_str[80];
- 
--		snprintf(fmt_str, 80, "%s (Channel %d)",
--			 "Laser tx bias current", chan + 1);
--		PRINT_BIAS(fmt_str, sd->scd[chan].bias_cur);
-+		if (is_json_context()) {
-+			print_float(PRINT_JSON, NULL, "%.3f",
-+				    (double)sd->scd[chan].bias_cur / 500.);
-+		} else {
-+			snprintf(fmt_str, 80, "%s (Channel %d)",
-+				 "Laser tx bias current", chan + 1);
-+			PRINT_BIAS(fmt_str, sd->scd[chan].bias_cur);
-+		}
- 	}
-+	close_json_array("");
- }
- 
- static void cmis_show_dom_chan_lvl_tx_bias(const struct cmis_memory_map *map,
-@@ -593,14 +641,22 @@ cmis_show_dom_chan_lvl_tx_power_bank(const struct cmis_memory_map *map,
- 	if (!page_11h)
- 		return;
- 
-+	open_json_array("transmit_avg_optical_power", "");
-+
- 	for (i = 0; i < CMIS_CHANNELS_PER_BANK; i++) {
- 		int chan = bank * CMIS_CHANNELS_PER_BANK + i;
- 		char fmt_str[80];
- 
--		snprintf(fmt_str, 80, "%s (Channel %d)",
--			 "Transmit avg optical power", chan + 1);
--		PRINT_xX_PWR(fmt_str, sd->scd[chan].tx_power);
-+		if (is_json_context()) {
-+			print_float(PRINT_JSON, NULL, "%.4f",
-+				    (double)sd->scd[chan].tx_power / 10000.);
-+		} else {
-+			snprintf(fmt_str, 80, "%s (Channel %d)",
-+				 "Transmit avg optical power", chan + 1);
-+			PRINT_xX_PWR(fmt_str, sd->scd[chan].tx_power);
-+		}
- 	}
-+	close_json_array("");
- }
- 
- static void cmis_show_dom_chan_lvl_tx_power(const struct cmis_memory_map *map,
-@@ -623,25 +679,38 @@ cmis_show_dom_chan_lvl_rx_power_bank(const struct cmis_memory_map *map,
- 				     const struct sff_diags *sd, int bank)
- {
- 	const __u8 *page_11h = map->upper_memory[bank][0x11];
-+	char *rx_power_type_str;
- 	int i;
- 
- 	if (!page_11h)
- 		return;
- 
-+	if (!sd->rx_power_type)
-+		rx_power_type_str = "Receiver signal OMA";
-+	else
-+		rx_power_type_str = "Rcvr signal avg optical power";
-+
-+	open_json_object("rx_power");
-+
-+	open_json_array("values", "");
- 	for (i = 0; i < CMIS_CHANNELS_PER_BANK; i++) {
- 		int chan = bank * CMIS_CHANNELS_PER_BANK + i;
--		char *rx_power_str;
- 		char fmt_str[80];
- 
--		if (!sd->rx_power_type)
--			rx_power_str = "Receiver signal OMA";
--		else
--			rx_power_str = "Rcvr signal avg optical power";
--
--		snprintf(fmt_str, 80, "%s (Channel %d)", rx_power_str,
--			 chan + 1);
--		PRINT_xX_PWR(fmt_str, sd->scd[chan].rx_power);
-+		if (is_json_context()) {
-+			print_float(PRINT_JSON, NULL, "%.4f",
-+				    (double)sd->scd[chan].rx_power / 10000.);
-+		} else {
-+			snprintf(fmt_str, 80, "%s (Channel %d)",
-+				 rx_power_type_str, chan + 1);
-+			PRINT_xX_PWR(fmt_str, sd->scd[chan].rx_power);
-+		}
- 	}
-+	close_json_array("");
-+
-+	if (is_json_context())
-+		module_print_any_string("type", rx_power_type_str);
 +	close_json_object();
- }
- 
- static void cmis_show_dom_chan_lvl_rx_power(const struct cmis_memory_map *map,
-@@ -672,10 +741,13 @@ static void cmis_show_dom_mod_lvl_flags(const struct cmis_memory_map *map)
- 	int i;
- 
- 	for (i = 0; module_aw_mod_flags[i].str; i++) {
--		if (module_aw_mod_flags[i].type == MODULE_TYPE_CMIS)
--			printf("\t%-41s : %s\n", module_aw_mod_flags[i].str,
--			       map->lower_memory[module_aw_mod_flags[i].offset] &
--			       module_aw_mod_flags[i].value ? "On" : "Off");
-+		if (module_aw_mod_flags[i].type == MODULE_TYPE_CMIS) {
-+			bool value = map->lower_memory[module_aw_mod_flags[i].offset] &
-+					module_aw_mod_flags[i].value;
++	delete_json_obj();
 +
-+			module_print_any_bool(module_aw_mod_flags[i].str, NULL,
-+					      value, ONOFF(value));
-+		}
- 	}
+ 	return 0;
  }
- 
-@@ -692,11 +764,16 @@ static void cmis_show_dom_chan_lvl_flag(const struct cmis_memory_map *map,
- 	for (i = 0; i < CMIS_CHANNELS_PER_BANK; i++) {
- 		int chan = bank * CMIS_CHANNELS_PER_BANK + i;
- 		char str[80];
--
--		snprintf(str, 80, module_aw_chan_flags[flag].fmt_str, chan + 1);
--		printf("\t%-41s : %s\n", str,
--		       page_11h[module_aw_chan_flags[flag].offset] & chan ?
--		       "On" : "Off");
-+		bool value;
-+
-+		value = page_11h[module_aw_chan_flags[flag].offset] & chan;
-+		if (is_json_context()) {
-+			print_bool(PRINT_JSON, NULL, NULL, value);
-+		} else {
-+			snprintf(str, 80, "%s (Chan %d)",
-+				 module_aw_chan_flags[flag].fmt_str, chan + 1);
-+			printf("\t%-41s : %s\n", str, ONOFF(value));
-+		}
- 	}
- }
- 
-@@ -711,11 +788,19 @@ cmis_show_dom_chan_lvl_flags_bank(const struct cmis_memory_map *map,
- 		return;
- 
- 	for (flag = 0; module_aw_chan_flags[flag].fmt_str; flag++) {
--		if (!(map->page_01h[module_aw_chan_flags[flag].adver_offset] &
--		      module_aw_chan_flags[flag].adver_value))
--			continue;
--
--		cmis_show_dom_chan_lvl_flag(map, bank, flag);
-+		char json_str[80] = {};
-+
-+		if (module_aw_chan_flags[flag].type == MODULE_TYPE_CMIS) {
-+			if (!(map->page_01h[module_aw_chan_flags[flag].adver_offset] &
-+			   module_aw_chan_flags[flag].adver_value))
-+				continue;
-+
-+			convert_json_field_name(module_aw_chan_flags[flag].fmt_str,
-+						json_str);
-+			open_json_array(json_str, "");
-+			cmis_show_dom_chan_lvl_flag(map, bank, flag);
-+			close_json_array("");
-+		}
- 	}
- }
- 
-@@ -745,8 +830,12 @@ static void cmis_show_dom(const struct cmis_memory_map *map)
- 	cmis_show_dom_chan_lvl_monitors(map, &sd);
- 	cmis_show_dom_mod_lvl_flags(map);
- 	cmis_show_dom_chan_lvl_flags(map);
--	if (sd.supports_alarms)
--		sff_show_thresholds(sd);
-+	if (sd.supports_alarms) {
-+		if (is_json_context())
-+			sff_show_thresholds_json(sd);
-+		else
-+			sff_show_thresholds(sd);
-+	}
- }
- 
- /* Print active and inactive firmware versions. Relevant documents:
-@@ -756,14 +845,24 @@ static void cmis_show_dom(const struct cmis_memory_map *map)
- static void cmis_show_fw_version_common(const char *name, __u8 major,
- 					__u8 minor)
- {
-+	char json_fn[32] = "";
-+
- 	if (major == 0 && minor == 0) {
- 		return;
- 	} else if (major == 0xFF && minor == 0xFF) {
--		printf("\t%-41s : Invalid\n", name);
-+		module_print_any_string(name, "Invalid");
- 		return;
- 	}
- 
--	printf("\t%-41s : %d.%d\n", name, major, minor);
-+	if (is_json_context()) {
-+		convert_json_field_name(name, json_fn);
-+		open_json_object(json_fn);
-+		print_uint(PRINT_JSON, "major", "%u", major);
-+		print_uint(PRINT_JSON, "minor", "%u", minor);
-+		close_json_object();
-+	} else {
-+		printf("\t%-41s : %d.%d\n", name, major, minor);
-+	}
- }
- 
- static void cmis_show_fw_active_version(const struct cmis_memory_map *map)
-@@ -811,7 +910,7 @@ static void cmis_show_cdb_instances(const struct cmis_memory_map *map)
- {
- 	__u8 cdb_instances = cmis_cdb_instances_get(map);
- 
--	printf("\t%-41s : %u\n", "CDB instances", cdb_instances);
-+	module_print_any_uint("CDB instances", cdb_instances, NULL);
- }
- 
- static void cmis_show_cdb_mode(const struct cmis_memory_map *map)
-@@ -819,8 +918,8 @@ static void cmis_show_cdb_mode(const struct cmis_memory_map *map)
- 	__u8 mode = map->page_01h[CMIS_CDB_ADVER_OFFSET] &
- 		    CMIS_CDB_ADVER_MODE_MASK;
- 
--	printf("\t%-41s : %s\n", "CDB background mode",
--	       mode ? "Supported" : "Not supported");
-+	module_print_any_string("CDB background mode",
-+			        mode ? "Supported" : "Not supported");
- }
- 
- static void cmis_show_cdb_epl_pages(const struct cmis_memory_map *map)
-@@ -828,7 +927,7 @@ static void cmis_show_cdb_epl_pages(const struct cmis_memory_map *map)
- 	__u8 epl_pages = map->page_01h[CMIS_CDB_ADVER_OFFSET] &
- 			 CMIS_CDB_ADVER_EPL_MASK;
- 
--	printf("\t%-41s : %u\n", "CDB EPL pages", epl_pages);
-+	module_print_any_uint("CDB EPL pages", epl_pages, NULL);
- }
- 
- static void cmis_show_cdb_rw_len(const struct cmis_memory_map *map)
-@@ -839,9 +938,10 @@ static void cmis_show_cdb_rw_len(const struct cmis_memory_map *map)
- 	 * units of 8 bytes, in addition to the minimum 8 bytes.
- 	 */
- 	rw_len = (rw_len + 1) * 8;
--	printf("\t%-41s : %u\n", "CDB Maximum EPL RW length", rw_len);
--	printf("\t%-41s : %u\n", "CDB Maximum LPL RW length",
--	       rw_len > CMIS_PAGE_SIZE ? CMIS_PAGE_SIZE : rw_len);
-+	module_print_any_uint("CDB Maximum EPL RW length", rw_len, NULL);
-+	module_print_any_uint("CDB Maximum LPL RW length",
-+			      rw_len > CMIS_PAGE_SIZE ? CMIS_PAGE_SIZE : rw_len,
-+			      NULL);
- }
- 
- static void cmis_show_cdb_trigger(const struct cmis_memory_map *map)
-@@ -853,8 +953,8 @@ static void cmis_show_cdb_trigger(const struct cmis_memory_map *map)
- 	 * page, or by multiple writes ending with the writing of the CDB
- 	 * Command Code (CMDID).
- 	 */
--	printf("\t%-41s : %s\n", "CDB trigger method",
--	       trigger ? "Single write" : "Multiple writes");
-+	module_print_any_string("CDB trigger method",
-+				trigger ? "Single write" : "Multiple writes");
- }
- 
- /* Print CDB messaging support advertisement. Relevant documents:
+diff --git a/ethtool.c b/ethtool.c
+index a1393bc..0b876e8 100644
+--- a/ethtool.c
++++ b/ethtool.c
+@@ -6050,6 +6050,7 @@ static const struct option args[] = {
+ 	},
+ 	{
+ 		.opts	= "-m|--dump-module-eeprom|--module-info",
++		.json	= true,
+ 		.func	= do_getmodule,
+ 		.nlfunc = nl_getmodule,
+ 		.help	= "Query/Decode Module EEPROM information and optical diagnostics if available",
 -- 
 2.47.0
 
