@@ -1,129 +1,94 @@
-Return-Path: <netdev+bounces-164741-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-164742-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 64962A2EE92
-	for <lists+netdev@lfdr.de>; Mon, 10 Feb 2025 14:43:59 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id E0953A2EEC0
+	for <lists+netdev@lfdr.de>; Mon, 10 Feb 2025 14:49:53 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 3D4623A2A7F
-	for <lists+netdev@lfdr.de>; Mon, 10 Feb 2025 13:43:50 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 4BF3C7A128E
+	for <lists+netdev@lfdr.de>; Mon, 10 Feb 2025 13:48:57 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A6FDF22FF46;
-	Mon, 10 Feb 2025 13:43:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BCEC7221DA9;
+	Mon, 10 Feb 2025 13:49:47 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="LeVKiW6Y"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail.loongson.cn (mail.loongson.cn [114.242.206.163])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3F48022F39B;
-	Mon, 10 Feb 2025 13:43:49 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=114.242.206.163
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1339222E410
+	for <netdev@vger.kernel.org>; Mon, 10 Feb 2025 13:49:44 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1739195035; cv=none; b=bDiqOI4f/D129ocXofltfRVsGSDbqC//RhheVjWF72aWNVuhzT/W7s3U84Q9khTJvq8twD9EuWsdoTjTeeUdWnQR8Z8nCplMGkSQVpndhmw1VaD0uJdvsh6Yy+5vdvrbLq1wE+A1rlTd95lI7FxLL7904Lhegb+hW3HZDJQnnko=
+	t=1739195387; cv=none; b=uAuAAMhD2E1fnrXSG6tpwMVFppnS1GypsoGE7t749WiBENfIOSDTuSWLrPmElBmGjnAKqbz7Ut3uLNh1SIZpzrJgS4TkkM4bfA+DlW+AdpKFwo8qe5PnvQHxcEW7rLtxWuD+JhDSPkO5Nyx1K0kbQD9SzpxlqBXTzMfpRtkOKMQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1739195035; c=relaxed/simple;
-	bh=Wlvzxj03zn35CGnYkYRl6zp3QBzmopWRqmURA9W2vHo=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=F4z9ne90vLWx70WRhTNUZXXrBO+dCwBzhRmHa1F5Bi2BX+Yv8HS8+ARfbvPvKbHz8Sh8iTB4PTrKUYdMUzRZhHDWffqhauhiD2IV+d+CG4etvdawZPOTquLEYgSifdkfSMWOiXX15ibjz0JIBD6ut880EJ+eDYr2JNsi1VcqfPA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=loongson.cn; spf=pass smtp.mailfrom=loongson.cn; arc=none smtp.client-ip=114.242.206.163
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=loongson.cn
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=loongson.cn
-Received: from loongson.cn (unknown [223.64.68.38])
-	by gateway (Coremail) with SMTP id _____8CxqmqTAqpnEUlxAA--.522S3;
-	Mon, 10 Feb 2025 21:43:47 +0800 (CST)
-Received: from localhost.localdomain (unknown [223.64.68.38])
-	by front1 (Coremail) with SMTP id qMiowMCxasSNAqpnxVcKAA--.1453S2;
-	Mon, 10 Feb 2025 21:43:45 +0800 (CST)
-From: Huacai Chen <chenhuacai@loongson.cn>
-To: Huacai Chen <chenhuacai@kernel.org>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S . Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>
-Cc: Yanteng Si <si.yanteng@linux.dev>,
-	Feiyang Chen <chris.chenfeiyang@gmail.com>,
-	Alexandre Torgue <alexandre.torgue@foss.st.com>,
-	Jose Abreu <joabreu@synopsys.com>,
-	Serge Semin <fancer.lancer@gmail.com>,
-	loongarch@lists.linux.dev,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	Huacai Chen <chenhuacai@loongson.cn>,
-	stable@vger.kernel.org,
-	Simon Horman <horms@kernel.org>,
-	Chong Qiao <qiaochong@loongson.cn>
-Subject: [PATCH net V2] net: stmmac: dwmac-loongson: Set correct {tx,rx}_fifo_size
-Date: Mon, 10 Feb 2025 21:43:28 +0800
-Message-ID: <20250210134328.2755328-1-chenhuacai@loongson.cn>
-X-Mailer: git-send-email 2.47.1
+	s=arc-20240116; t=1739195387; c=relaxed/simple;
+	bh=A/NyHZyAF0nMwNbgLVy64b2xXt7yvj+JPw9b9S59g1k=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=Ge7TrRBZ4pdDRuR5TkRG3r7VaodCym9y4/XUy05INhHnx5svNGcjAwkDBHl87g4RHn9hTEDhNkMx6ZBHEHdajPUhkXvLGSzPTdW+JnGH6PVytzqzKuW5QN5RzIfxKTRn3dGYfDIMsqsd48cZpVz2o1Dz8G3I+fBY78gcTLNvrWE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=LeVKiW6Y; arc=none smtp.client-ip=156.67.10.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=VABgsncBHj3rxSQDwmUyLL1Hr5UZmX/R+inZQJo5RL0=; b=LeVKiW6YsD1TuJE8ccj/KX648w
+	0JCB5t2134aw8vwhUQY6/LGbTiauKDp3DfGuN6UwqHbF2wcdVyZx+tmx2QGbKumBp7KrZcAXwZgMv
+	0Mldc/kFc8KizKO35m4qktfp82jvNPSdhCNlL5GA3jnTLT9bJHPLtCG1V3DhLKAnkodY=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1thUAQ-00Cj6T-DZ; Mon, 10 Feb 2025 14:49:42 +0100
+Date: Mon, 10 Feb 2025 14:49:42 +0100
+From: Andrew Lunn <andrew@lunn.ch>
+To: Raju Rangoju <Raju.Rangoju@amd.com>
+Cc: netdev@vger.kernel.org, kuba@kernel.org, pabeni@redhat.com,
+	edumazet@google.com, davem@davemloft.net, andrew+netdev@lunn.ch,
+	Shyam Sundar S K <Shyam-sundar.S-k@amd.com>
+Subject: Re: [PATCH net-next] amd-xgbe: re-initiate auto-negotiation for
+ Broadcom PHYs
+Message-ID: <cd0413bb-105e-4c84-93f5-c1a5af5b4158@lunn.ch>
+References: <20250210120933.1981517-1-Raju.Rangoju@amd.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-CM-TRANSID:qMiowMCxasSNAqpnxVcKAA--.1453S2
-X-CM-SenderInfo: hfkh0x5xdftxo6or00hjvr0hdfq/
-X-Coremail-Antispam: 1Uk129KBj93XoW7KFWkCrW7Zr4fJw4DCFy8JFc_yoW8ZryDpr
-	W3Aa4ag34jgr45Cw1DZ3yUCFyruay5trZFgFWIk34fuFWkA3sFqr1YvFWYgrsrArZ3Ga4a
-	qr1q9r1rGF1DCrbCm3ZEXasCq-sJn29KB7ZKAUJUUUUk529EdanIXcx71UUUUU7KY7ZEXa
-	sCq-sGcSsGvfJ3Ic02F40EFcxC0VAKzVAqx4xG6I80ebIjqfuFe4nvWSU5nxnvy29KBjDU
-	0xBIdaVrnRJUUUB0b4IE77IF4wAFF20E14v26r1j6r4UM7CY07I20VC2zVCF04k26cxKx2
-	IYs7xG6rWj6s0DM7CIcVAFz4kK6r106r15M28lY4IEw2IIxxk0rwA2F7IY1VAKz4vEj48v
-	e4kI8wA2z4x0Y4vE2Ix0cI8IcVAFwI0_Ar0_tr1l84ACjcxK6xIIjxv20xvEc7CjxVAFwI
-	0_Gr0_Cr1l84ACjcxK6I8E87Iv67AKxVW0oVCq3wA2z4x0Y4vEx4A2jsIEc7CjxVAFwI0_
-	GcCE3s1ln4kS14v26r1q6r43M2AIxVAIcxkEcVAq07x20xvEncxIr21l57IF6xkI12xvs2
-	x26I8E6xACxx1l5I8CrVACY4xI64kE6c02F40Ex7xfMcIj6xIIjxv20xvE14v26r1q6rW5
-	McIj6I8E87Iv67AKxVW8JVWxJwAm72CE4IkC6x0Yz7v_Jr0_Gr1lF7xvr2IYc2Ij64vIr4
-	1lc7CjxVAaw2AFwI0_Jw0_GFyl42xK82IYc2Ij64vIr41l4I8I3I0E4IkC6x0Yz7v_Jr0_
-	Gr1l4IxYO2xFxVAFwI0_Jw0_GFylx2IqxVAqx4xG67AKxVWUJVWUGwC20s026x8GjcxK67
-	AKxVWUGVWUWwC2zVAF1VAY17CE14v26r4a6rW5MIIYrxkI7VAKI48JMIIF0xvE2Ix0cI8I
-	cVAFwI0_JFI_Gr1lIxAIcVC0I7IYx2IY6xkF7I0E14v26r4j6F4UMIIF0xvE42xK8VAvwI
-	8IcIk0rVWUJVWUCwCI42IY6I8E87Iv67AKxVWUJVW8JwCI42IY6I8E87Iv6xkF7I0E14v2
-	6r4j6r4UJbIYCTnIWIevJa73UjIFyTuYvjxUslALDUUUU
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250210120933.1981517-1-Raju.Rangoju@amd.com>
 
-Now for dwmac-loongson {tx,rx}_fifo_size are uninitialised, which means
-zero. This means dwmac-loongson doesn't support changing MTU because in
-stmmac_change_mtu() it requires the fifo size be no less than MTU. Thus,
-set the correct tx_fifo_size and rx_fifo_size for it (16KB multiplied by
-queue counts).
+On Mon, Feb 10, 2025 at 05:39:33PM +0530, Raju Rangoju wrote:
+> Some PHYs on certain platforms may show a successful link after setting
+> the speed to 100Mbps through auto-negotiation (AN) even when
+> 10M/100M/1G concurrent speed is configured. However, they may not be
+> able to transmit or receive data. These PHYs need an "additional
+> auto-negotiation (AN) cycle" after the speed change, to function correctly.
+> 
+> A quirk for these PHYs is that if the outcome of the AN leads to a
+> change in speed, the AN should be re-initiated at the new speed.
 
-Here {tx,rx}_fifo_size is initialised with the initial value (also the
-maximum value) of {tx,rx}_queues_to_use. So it will keep as 16KB if we
-don't change the queue count, and will be larger than 16KB if we change
-(decrease) the queue count. However stmmac_change_mtu() still work well
-with current logic (MTU cannot be larger than 16KB for stmmac).
+Are you sure it is the PHY which is broken, not the MAC? Is there an
+errata from Broadcom?
 
-Note: the Fixes tag picked here is the oldest commit and key commit of
-the dwmac-loongson series "stmmac: Add Loongson platform support".
+> +static bool xgbe_phy_broadcom_phy_quirks(struct xgbe_prv_data *pdata)
+> +{
+> +	struct xgbe_phy_data *phy_data = pdata->phy_data;
+> +	unsigned int phy_id = phy_data->phydev->phy_id;
+> +	unsigned int ver;
+> +
+> +	ver = XGMAC_GET_BITS(pdata->hw_feat.version, MAC_VR, SNPSVER);
+> +
+> +	/* For Broadcom PHY, use the extra AN flag */
+> +	if (ver == SNPS_MAC_VER_0x21 && (phy_id & 0xffffffff) == 0x600d8595) {
 
-Cc: stable@vger.kernel.org
-Fixes: ad72f783de06 ("net: stmmac: Add multi-channel support")
-Acked-by: Yanteng Si <si.yanteng@linux.dev>
-Reviewed-by: Simon Horman <horms@kernel.org>
-Signed-off-by: Chong Qiao <qiaochong@loongson.cn>
-Signed-off-by: Huacai Chen <chenhuacai@loongson.cn>
----
-V2: Update commit message and CC list.
+Please add this ID to include/linux/brcmphy.h.
 
- drivers/net/ethernet/stmicro/stmmac/dwmac-loongson.c | 3 +++
- 1 file changed, 3 insertions(+)
+Also, is it specifically revision 5 of this PHY which is broken?
 
-diff --git a/drivers/net/ethernet/stmicro/stmmac/dwmac-loongson.c b/drivers/net/ethernet/stmicro/stmmac/dwmac-loongson.c
-index bfe6e2d631bd..79acdf38c525 100644
---- a/drivers/net/ethernet/stmicro/stmmac/dwmac-loongson.c
-+++ b/drivers/net/ethernet/stmicro/stmmac/dwmac-loongson.c
-@@ -574,6 +574,9 @@ static int loongson_dwmac_probe(struct pci_dev *pdev, const struct pci_device_id
- 	if (ret)
- 		goto err_disable_device;
- 
-+	plat->tx_fifo_size = SZ_16K * plat->tx_queues_to_use;
-+	plat->rx_fifo_size = SZ_16K * plat->rx_queues_to_use;
-+
- 	if (dev_of_node(&pdev->dev))
- 		ret = loongson_dwmac_dt_config(pdev, plat, &res);
- 	else
--- 
-2.47.1
-
+	Andrew
 
