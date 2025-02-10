@@ -1,133 +1,120 @@
-Return-Path: <netdev+bounces-164846-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-164847-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id E9FF0A2F5D3
-	for <lists+netdev@lfdr.de>; Mon, 10 Feb 2025 18:50:45 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7A2CFA2F5E1
+	for <lists+netdev@lfdr.de>; Mon, 10 Feb 2025 18:52:02 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 5A8053AA7E8
-	for <lists+netdev@lfdr.de>; Mon, 10 Feb 2025 17:49:17 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 0CA18168132
+	for <lists+netdev@lfdr.de>; Mon, 10 Feb 2025 17:51:40 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 91A2725B698;
-	Mon, 10 Feb 2025 17:49:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B7F56255E46;
+	Mon, 10 Feb 2025 17:50:39 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="idL8J8HS"
+	dkim=pass (1024-bit key) header.d=fastly.com header.i=@fastly.com header.b="Y/JIWh+N"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wr1-f41.google.com (mail-wr1-f41.google.com [209.85.221.41])
+Received: from mail-pl1-f180.google.com (mail-pl1-f180.google.com [209.85.214.180])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C531825B66E;
-	Mon, 10 Feb 2025 17:49:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.41
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 38E6E25B66E
+	for <netdev@vger.kernel.org>; Mon, 10 Feb 2025 17:50:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.180
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1739209758; cv=none; b=G1x1o0NGnZGz0pVpy1UqTaBo/RrDcPuSCer9EgB57B4CM/BX+jUldh1MVOmx4b2ZtPPLn8MtVek5CPAQvcnbP5+uTYcIfns8UwH1sWQYhASVOKmjAooUooJXLw6HJF6Kn7BtG9imsxENhhpnh+KmgAOEVXL0dV5xPfN9h7sL7lM=
+	t=1739209839; cv=none; b=QkXh1mJ7T300E2Hq7ZzniK2xqN6WmsLYDBzEpKgZp3f8/7SViDze5Hrzz5b44xtb6EMdt4i7SA4Qtafu/Y/DCb9e4EORVYrFfEMQ5hz8c/02epusz2U+kHSYfxcfZoIzjM2y3B/qbXQsfBQaQvAO4sf2eJxoL5IndWPXsqwHfjc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1739209758; c=relaxed/simple;
-	bh=sf3+hamH12xc0FshkmkYt8PucfXSBNKQ0p1oax2RSGs=;
-	h=From:Date:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=EJn33EvHgU+2WvbswJ+U6FjQvTp2JfV8ScRufXfn3DEpJHz+O7IjhzlFbLyJGmu/P6SvzuTijXMOBZ2TlQatxD967Mgj24BShaS4TnWaPJt0JKKMjHJt9MYuDyhC/dqVZ73LoFjc5SJl/MlXYI46X7vXzDn3HGBWcwOnGfY39GE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=idL8J8HS; arc=none smtp.client-ip=209.85.221.41
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wr1-f41.google.com with SMTP id ffacd0b85a97d-38dc1dfd9f2so3048572f8f.3;
-        Mon, 10 Feb 2025 09:49:16 -0800 (PST)
+	s=arc-20240116; t=1739209839; c=relaxed/simple;
+	bh=5itngRyI3QLkc3iUAXbbXE3l84sxybC0VJY8BsapT6Y=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=dago/ADC1SdA9fwRffMy/Tkkp1HhqxAzbsSM0EkrlPsM2QIhOTmhsoMq5lqjOruuTfjBdwFZrLP1hjzKJNPBPbQI/6rkeV5kQ4afMaJiHKmz51rMsEZx8rWMlTaAFqo7pfjfceDQJOuEAjUa4FtQf+TdXABwi8tsABsv3Eq6bYw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fastly.com; spf=pass smtp.mailfrom=fastly.com; dkim=pass (1024-bit key) header.d=fastly.com header.i=@fastly.com header.b=Y/JIWh+N; arc=none smtp.client-ip=209.85.214.180
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fastly.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=fastly.com
+Received: by mail-pl1-f180.google.com with SMTP id d9443c01a7336-21f49837d36so52079525ad.3
+        for <netdev@vger.kernel.org>; Mon, 10 Feb 2025 09:50:36 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1739209755; x=1739814555; darn=vger.kernel.org;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:date:from:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=MJNDJ3NguU/eYBT9ZFeshvkzjHdrLe1geJc1GHLeeJA=;
-        b=idL8J8HSp0dzyJpTBYQmAspNE9C2bPSTZ59AWoe22tMMCLnTzix4NVsWfm1BbMpzP3
-         ddPrJIoUZ+mDZz8/EUx3W3FKcmHZnj940/EPM2w1GQLc7Lw6sYvS/FTx5M+6e4mBnQwj
-         vP5A0E8Df+1oDq/XyooSdbT/75MUt02lIjnhOTnXLNQjXkP3B813/WgHHOwTOplMBPS3
-         UqpG8g5MhNMUzxiURHND4nRh52rjZdkRZAAyKCnID9oUD8RpvxfvGSJLMB/w2J2xR/e1
-         N/+BHJRKOHsEecn9fZJgQ29NqbhVeiNuKEqWWUpXcTtiksGdTFTe5r0mDkMhI0YcA6an
-         5PnA==
+        d=fastly.com; s=google; t=1739209836; x=1739814636; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references
+         :mail-followup-to:message-id:subject:cc:to:from:date:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=OCO3aIRcq5bPxRXLWL+/UKDcQnItmXbvQb/S10a8uSI=;
+        b=Y/JIWh+NTFsGFS8sJ0F23YHaZC+GWW5HJj3+TEOHzKo/XyBEUqur76CkwGKb7CAHKz
+         Nw2S/XsPt36cjhZJfAOBnm/W3rtepRc67H4yH95yNl6BVVy60Yrr05Dv0xv7yoUsATXf
+         XkkvnqQT+rogwFP6lAXwXGWmCA+eNirQQcYVA=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1739209755; x=1739814555;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:date:from
+        d=1e100.net; s=20230601; t=1739209836; x=1739814636;
+        h=in-reply-to:content-disposition:mime-version:references
+         :mail-followup-to:message-id:subject:cc:to:from:date
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=MJNDJ3NguU/eYBT9ZFeshvkzjHdrLe1geJc1GHLeeJA=;
-        b=K0s41iSNooCRpNWS3Jixm7Ggp3bE8Zz48QzriXNb0FJrZy4AzGQKne6VB6nrl3hxrA
-         QW6zHk96temeEybE8ugDGA1fItUXZWtwhCv1gOzrVTm2OfKrDfK/bGhVwYXyIqi0C1n4
-         aHq8Fz4AAr7+LPD/tu5B5dVjyjVN2UKVHZpEg9cY2pXw/wWjePG7HhcAWVpZi/sxCfY5
-         iKLoqqRdtFeCC8O3eNUKlveTa2s9r9IiaQhwlFwnR6936zhMxKOL/ASrHLaHyTHsVLTf
-         h1Z5vEJyNYyERkYoviqgOFODxGfasQpIu/2rCNbwMvIclYQWBld24JsbK4d7HU9qvH68
-         ZJmw==
-X-Forwarded-Encrypted: i=1; AJvYcCWvtgaiKwSfDAUpeWxdp/fMgRTLgsNAnHDM3rGScy3GnSWntuDKVX8TpL4VsBAOC2URsQc=@vger.kernel.org, AJvYcCXybX7sfGiBsFNNLTIHcm59dgSyX0oLihwHuMdTpArMda0wRM22YCMowURwLNtQNoJe7mZbPurg@vger.kernel.org
-X-Gm-Message-State: AOJu0Yw+t9VBdaJaKvMyI+vHOjOLeKJweCujxWhC3vdwXuviqUFTt4qR
-	Mz2Pm4KhbTN39KtIpIGtCclMTb5vfcg3rs9qopDiBFi/9BDX3brqqZIwJrXP
-X-Gm-Gg: ASbGncvdX4xvUUBxulHQ7PF526TkR7qGnCkVbG6kRcVMNZ3UD9pCfxKCZdAfT86F3c0
-	YFLzz5aCih5UusTKhEa2AlZrEUL0prkDFZKcfx2Gtb2P5CNWlYAIto8e124zhgH4n66WJQGgVJ4
-	6wH0I16S6iQFqsDryFgmj8mpUiJIucCh68MSJe2tcHlx5cPEAFJaJpJ5TFcLdwAM5knM3VAStUu
-	DLGaa2vXhRuJapP/tnd3QTDGDELct1FiguBrN4oBsU0KzNUmZcNcagI6hdbZXfjD8o5hvrOP/7H
-	dQ==
-X-Google-Smtp-Source: AGHT+IEj77Vn1dlKwhjvXoNME3CjdbE3hdyIy+xUDAzhTpw9VpNfFUB+yC80B9wuJKv4RaRhz7txCA==
-X-Received: by 2002:a5d:6d85:0:b0:38d:a713:8e4e with SMTP id ffacd0b85a97d-38dc933e2b2mr10840511f8f.47.1739209754822;
-        Mon, 10 Feb 2025 09:49:14 -0800 (PST)
-Received: from krava ([173.38.220.45])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-43941c09ee8sm47971825e9.37.2025.02.10.09.49.13
+        bh=OCO3aIRcq5bPxRXLWL+/UKDcQnItmXbvQb/S10a8uSI=;
+        b=P1JFMSLbxV0IzHZn5Pxu+1fd6rL6wELuAB0gb0U+oGGr85GSHNOsbJEkcvYi5OjY5B
+         om9ixT5n/GBafiBknQkYhwBvwzNGTgfeOSKhEGa4NfK9CK9RKsNw1rTqnXsOuHkTPSFL
+         r4qoNj7rxvjp8NZfjUP1Epdu0C4QkU88DL6IivCMr6fjejB6qNP4X/TBm9QPDUO8CDJn
+         XxN4t1Ws9X0MH44FeYp+1M1lfAPkNI+KeD1/Yn4f6c/C8eRsoAj27BD0kXtTOo03703b
+         DZt7zbMXrM9TDQCPoFawtyQnBfd5UlKSz9iqZ8STCo+S4K7jY0lHNj9dE3Foy7pmQVdu
+         ApKw==
+X-Forwarded-Encrypted: i=1; AJvYcCVzXHckDmP6r9xzMMR6IpqnlQXAl4BTI4SCc92gX//6wqWNbzelG123grSyxy8WsR7+03hokgA=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyLp/qnMC6dcfi+fBQxgq9jHkWS46JObLhpGMlpl4fN3YWLmfl1
+	FJvFfm5roJeIRK9zpxzTNvwdeLWbTVIh2KSB6XEhSOL5JPOBTpSf6HAuyVdHKg0=
+X-Gm-Gg: ASbGncvZ8P0oVGNJNZLj2LJKVabH+aKz/Bx3TqHUb5JCE0kNXhG2Sr6Y97QOMcok3o9
+	NriQAkqo+C4ZLx+pE3vpmu42YleOn2bwVIVzpzvKbrdXDp/y7XjpvEgda555N1WVigGWdmsiHu2
+	jtBgOeM8FEajd0NoDSqYENyHRiIV6Tis4dTSuK0LsUbjloUFTvBLN0a0Swgguggru4bWoYwRp3W
+	HVssk0D48fo2CMk/sLZsc5clKZpt8jHDcER5gcP2Kd1lgAgpt4+del+cRIQcir5JKq4jb8fkWb6
+	ADW9Lvn24orBmZdPecZ1qrQFLYVnOLgxiBdFCjGFQlDyTv5CJyc+0r83TA==
+X-Google-Smtp-Source: AGHT+IESIWs0nDg5kAqiOuNPxZ9VJShu5naJndD6KAbqxfopHAr2qsG48oAN4aHnkGyTLNqhk6vhKg==
+X-Received: by 2002:a17:902:f78d:b0:21f:68ae:56e3 with SMTP id d9443c01a7336-21f68ae57dcmr162636775ad.39.1739209836373;
+        Mon, 10 Feb 2025 09:50:36 -0800 (PST)
+Received: from LQ3V64L9R2 (c-24-6-151-244.hsd1.ca.comcast.net. [24.6.151.244])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-21f36897faesm81159455ad.213.2025.02.10.09.50.35
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 10 Feb 2025 09:49:14 -0800 (PST)
-From: Jiri Olsa <olsajiri@gmail.com>
-X-Google-Original-From: Jiri Olsa <jolsa@kernel.org>
-Date: Mon, 10 Feb 2025 18:49:12 +0100
-To: Jiri Olsa <olsajiri@gmail.com>
-Cc: Alexei Starovoitov <alexei.starovoitov@gmail.com>,
-	Kuniyuki Iwashima <kuniyu@amazon.com>,
-	Martin KaFai Lau <martin.lau@linux.dev>,
-	Alexei Starovoitov <ast@kernel.org>,
-	Daniel Borkmann <daniel@iogearbox.net>,
-	Andrii Nakryiko <andrii@kernel.org>,
-	Kumar Kartikeya Dwivedi <memxor@gmail.com>,
-	Kuniyuki Iwashima <kuni1840@gmail.com>, bpf <bpf@vger.kernel.org>,
-	Network Development <netdev@vger.kernel.org>,
-	Yan Zhai <yan@cloudflare.com>
-Subject: Re: [PATCH v2 bpf] net: Add rx_skb of kfree_skb to
- raw_tp_null_args[].
-Message-ID: <Z6o8GKce9xSDlAC2@krava>
-References: <20250201030142.62703-1-kuniyu@amazon.com>
- <Z53Xv-okoj3PDT50@krava>
- <CAADnVQJodt1fBaR5d0wTR2pwipJVVdKSd+7_ou_vE-gRMzbT6w@mail.gmail.com>
- <Z59Donij6yuw9hvB@krava>
+        Mon, 10 Feb 2025 09:50:35 -0800 (PST)
+Date: Mon, 10 Feb 2025 09:50:33 -0800
+From: Joe Damato <jdamato@fastly.com>
+To: Purva Yeshi <purvayeshi550@gmail.com>
+Cc: "David S . Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	skhan@linuxfoundation.org, Simon Horman <horms@kernel.org>,
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH net-next v2] af_unix: Fix undefined 'other' error
+Message-ID: <Z6o8aeG_GqxtwXV9@LQ3V64L9R2>
+Mail-Followup-To: Joe Damato <jdamato@fastly.com>,
+	Purva Yeshi <purvayeshi550@gmail.com>,
+	"David S . Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	skhan@linuxfoundation.org, Simon Horman <horms@kernel.org>,
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+References: <20250210075006.9126-1-purvayeshi550@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <Z59Donij6yuw9hvB@krava>
+In-Reply-To: <20250210075006.9126-1-purvayeshi550@gmail.com>
 
-On Sun, Feb 02, 2025 at 11:06:26AM +0100, Jiri Olsa wrote:
-> On Sat, Feb 01, 2025 at 09:15:28AM +0100, Alexei Starovoitov wrote:
-> > On Sat, Feb 1, 2025 at 9:13 AM Jiri Olsa <olsajiri@gmail.com> wrote:
-> > >
-> > > > v2:
-> > > >   * Add kfree_skb to raw_tp_null_args[] instead of annotating
-> > > >     rx_skb with __nullable
-> > >
-> > > Acked-by: Jiri Olsa <jolsa@kernel.org>
-> > 
-> > Jiri, Kumar,
-> > how come that we missed it earlier?
-> > Is this a new change in the tracepoint?
+On Mon, Feb 10, 2025 at 01:20:06PM +0530, Purva Yeshi wrote:
+> Fix issue detected by smatch tool:
+> An "undefined 'other'" error occur in __releases() annotation.
 > 
-> must have slipped, sry.. I'll double check tracepoints again
+> Fix an undefined 'other' error in unix_wait_for_peer() caused by  
+> __releases(&unix_sk(other)->lock) being placed before 'other' is in  
+> scope. Since AF_UNIX does not use Sparse annotations, remove it to fix  
+> the issue.  
+> 
+> Eliminate the error without affecting functionality.  
+> 
+> Signed-off-by: Purva Yeshi <purvayeshi550@gmail.com>
+> ---
+> V1 - https://lore.kernel.org/lkml/20250209184355.16257-1-purvayeshi550@gmail.com/
+> V2 - Remove __releases() annotation as AF_UNIX does not use Sparse annotations.
+>  net/unix/af_unix.c | 1 -
+>  1 file changed, 1 deletion(-)
+> 
 
-sry for late reply, I was traveling last week
-
-I overlooked tracepoints defined in drivers directly :-\
-
-however there was one recent change adding the null check:
-  9ab96b524dce hugetlb: fix NULL pointer dereference in trace_hugetlbfs_alloc_inode
-
-will send update shortly
-
-jirka
+Reviewed-by: Joe Damato <jdamato@fastly.com>
 
