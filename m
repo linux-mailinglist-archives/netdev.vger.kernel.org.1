@@ -1,202 +1,188 @@
-Return-Path: <netdev+bounces-164636-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-164637-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id F3A6AA2E897
-	for <lists+netdev@lfdr.de>; Mon, 10 Feb 2025 11:05:30 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id EB881A2E8A2
+	for <lists+netdev@lfdr.de>; Mon, 10 Feb 2025 11:06:29 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id C17E4188A69D
-	for <lists+netdev@lfdr.de>; Mon, 10 Feb 2025 10:05:12 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C72C23AB3A0
+	for <lists+netdev@lfdr.de>; Mon, 10 Feb 2025 10:05:41 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 574D81CAA8D;
-	Mon, 10 Feb 2025 10:03:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C2C411CAA64;
+	Mon, 10 Feb 2025 10:05:03 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=ideasonboard.com header.i=@ideasonboard.com header.b="e9JIjGIb"
+	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="djT9CY5J"
 X-Original-To: netdev@vger.kernel.org
-Received: from perceval.ideasonboard.com (perceval.ideasonboard.com [213.167.242.64])
+Received: from relay1-d.mail.gandi.net (relay1-d.mail.gandi.net [217.70.183.193])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 52A111C4A0A;
-	Mon, 10 Feb 2025 10:03:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=213.167.242.64
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0994C1C6FF0;
+	Mon, 10 Feb 2025 10:05:00 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.193
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1739181802; cv=none; b=cNlSlXZbQg6FHLPWgwrvNKIR23yprqntOg9uYSrOozADiwY9fAnOxIcbFnwDieX6CwjJqAyzI4Fi/ZOxKlKUrN88o2KNjJtcCozOAtC37amkk0XMs1/qALWPWFxKrWD/wwYzjgXgdVtxMHB0ElnnuSh3jvaJ9ORsO19zs4fmxdY=
+	t=1739181903; cv=none; b=G5ujmqKIbo0Mz5Ubz2Q5i03QppcSsNDURxRNp1N2BYAhRmdpY4f0Zr9qGHyFnkxbuiC1PAfTFuWtgWLjIxkZgfPax97ekV1D15UGmwbSLhjTnhdMqbqe0OtpRUIGJrbbjsI9n3WIrBQZ36Zg/POp18IHfrARQwsQCYqLqba+CJk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1739181802; c=relaxed/simple;
-	bh=DYI8FPWv2nrFA0bms9nZRqfoHZqOqiWHzVO7WBrXD7c=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=ht47ZUb1sd7wRmzBeFXmgumD5a4lsN8wCmS/e4MrLlwuE3+J+46rBtgFxx71if4bMazGrDj5cOcGmKDewY9U9r8qiRP6e2BpULVDC3ymEr2Xd4+Qz4CpvedaKkrLs5GvbWJ1sRaD7roGSU72rp+XRwFa4y8I5/1vGRZC3A0lNAk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ideasonboard.com; spf=pass smtp.mailfrom=ideasonboard.com; dkim=pass (1024-bit key) header.d=ideasonboard.com header.i=@ideasonboard.com header.b=e9JIjGIb; arc=none smtp.client-ip=213.167.242.64
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ideasonboard.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ideasonboard.com
-Received: from pendragon.ideasonboard.com (81-175-209-231.bb.dnainternet.fi [81.175.209.231])
-	by perceval.ideasonboard.com (Postfix) with ESMTPSA id BE35322E;
-	Mon, 10 Feb 2025 11:02:00 +0100 (CET)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=ideasonboard.com;
-	s=mail; t=1739181720;
-	bh=DYI8FPWv2nrFA0bms9nZRqfoHZqOqiWHzVO7WBrXD7c=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=e9JIjGIbxAbHFBZNoHhzMtWVU3aQ9YxlVTuCOKgJi2aq03Ua4rQA6/NKopcvO1WuG
-	 cHjfxeUHiqkeHdDEuwFrBPi5JqWzg2Kq/4BvNV1sd9vHfM8lVjcq46bd0u3vXU42pb
-	 vq62ObCJEh+arMeDvr5kTxRVUI5tnOOcDdKA4qGI=
-Date: Mon, 10 Feb 2025 12:03:07 +0200
-From: Laurent Pinchart <laurent.pinchart@ideasonboard.com>
-To: "zhangzekun (A)" <zhangzekun11@huawei.com>
-Cc: Oleksij Rempel <o.rempel@pengutronix.de>, robh@kernel.org,
-	saravanak@google.com, justin.chen@broadcom.com,
-	florian.fainelli@broadcom.com, andrew+netdev@lunn.ch,
-	kuba@kernel.org, kory.maincent@bootlin.com,
-	jacopo+renesas@jmondi.org, kieran.bingham+renesas@ideasonboard.com,
-	maddy@linux.ibm.com, mpe@ellerman.id.au, npiggin@gmail.com,
-	olteanv@gmail.com, davem@davemloft.net, taras.chornyi@plvision.eu,
-	edumazet@google.com, pabeni@redhat.com, sudeep.holla@arm.com,
-	cristian.marussi@arm.com, arm-scmi@vger.kernel.org,
-	linuxppc-dev@lists.ozlabs.org, linux-media@vger.kernel.org,
-	netdev@vger.kernel.org, devicetree@vger.kernel.org,
-	chenjun102@huawei.com
-Subject: Re: [PATCH 1/9] of: Add warpper function
- of_find_node_by_name_balanced()
-Message-ID: <20250210100307.GA2966@pendragon.ideasonboard.com>
-References: <20250207013117.104205-1-zhangzekun11@huawei.com>
- <20250207013117.104205-2-zhangzekun11@huawei.com>
- <Z6XDKi_V0BZSdCeL@pengutronix.de>
- <80b1c21c-096b-4a11-b9d7-069c972b146a@huawei.com>
- <20250207153722.GA24886@pendragon.ideasonboard.com>
- <c48952c7-716c-4302-949c-2c66ea102a3e@huawei.com>
+	s=arc-20240116; t=1739181903; c=relaxed/simple;
+	bh=MsStyGB/s8toCJdgsIBul5jFwlgpyY05XQEDDYZX7IU=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=jbRSU3uUd1TfO3FM5EYwgsWvJhbrnmhnW14oc+Qr7EKwRq3kp0oY6ElH31gD7P2E/c86YkvXb7KN23BpWVuIfPYWgeSKLS6DpcfjUJW6QLziQXbkTpXuRPlNyIuG7h/QBxo0crLjhWMwGhZii/K46X/ouArM49EjfeQTxy+9WpA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=djT9CY5J; arc=none smtp.client-ip=217.70.183.193
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
+Received: by mail.gandi.net (Postfix) with ESMTPSA id 81F17442A5;
+	Mon, 10 Feb 2025 10:04:46 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
+	t=1739181892;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=AJb8bkauCDhTBOcu8X/HjYqi4iRH5JJNhU2FKZwS+C4=;
+	b=djT9CY5JnUvFf4Rd2gWUzxSrpbB9MCYbNvoDPDv3FKOuTwvv6X4g3AhUpMHjJGjPo+jlpT
+	AFI4rCoyH7VDsFmSSLDgWxOvgrTa2MXWWNcxzHtFjeExYlOp6L2k+rBjgelQmnk/g0zQtD
+	y0ICAmmzdAoNV28D6kuxTkA25Xcy9ZH/UsaVbVUDFwQO9cIgrcxLYnogyAsCzKhoJEXSLU
+	vQZB2QqhFD/u3H3VrVOvEFisMee4/6do/wEPOBW8Tgc1aWrDkzNSBMedbrFWSSSLvzM9Sc
+	5cKP5ReoDV39Zvz/uAhIBDkwUs8i3D7b9cslvpUazE6Cq1A+/fEweUAhsoDVJw==
+From: Romain Gantois <romain.gantois@bootlin.com>
+To: Andrew Lunn <andrew+netdev@lunn.ch>,
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ Rob Herring <robh@kernel.org>, Krzysztof Kozlowski <krzk+dt@kernel.org>,
+ Conor Dooley <conor+dt@kernel.org>, Chen Wang <unicorn_wang@outlook.com>,
+ Inochi Amaoto <inochiama@outlook.com>,
+ Maxime Coquelin <mcoquelin.stm32@gmail.com>,
+ Alexandre Torgue <alexandre.torgue@foss.st.com>,
+ Richard Cochran <richardcochran@gmail.com>,
+ Paul Walmsley <paul.walmsley@sifive.com>,
+ Palmer Dabbelt <palmer@dabbelt.com>, Albert Ou <aou@eecs.berkeley.edu>,
+ Emil Renner Berthing <emil.renner.berthing@canonical.com>,
+ Jisheng Zhang <jszhang@kernel.org>,
+ "Jan Petrous (OSS)" <jan.petrous@oss.nxp.com>,
+ =?UTF-8?B?Q2zDqW1lbnQgTMOpZ2Vy?= <clement.leger@bootlin.com>,
+ Simon Horman <horms@kernel.org>, Furong Xu <0x1207@gmail.com>,
+ Serge Semin <fancer.lancer@gmail.com>, Lothar Rubusch <l.rubusch@gmail.com>,
+ Suraj Jaiswal <quic_jsuraj@quicinc.com>,
+ Joe Hattori <joe@pf.is.s.u-tokyo.ac.jp>,
+ Bartosz Golaszewski <bartosz.golaszewski@linaro.org>,
+ Giuseppe Cavallaro <peppe.cavallaro@st.com>,
+ Jose Abreu <joabreu@synopsys.com>, Inochi Amaoto <inochiama@gmail.com>
+Cc: Inochi Amaoto <inochiama@gmail.com>, netdev@vger.kernel.org,
+ devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
+ linux-stm32@st-md-mailman.stormreply.com,
+ linux-arm-kernel@lists.infradead.org, linux-riscv@lists.infradead.org,
+ Yixun Lan <dlan@gentoo.org>, Longbin Li <looong.bin@gmail.com>
+Subject:
+ Re: [PATCH net-next v4 2/3] net: stmmac: platform: Add snps,dwmac-5.30a IP
+ compatible string
+Date: Mon, 10 Feb 2025 11:04:40 +0100
+Message-ID: <5868742.DvuYhMxLoT@fw-rgant>
+In-Reply-To: <20250209013054.816580-3-inochiama@gmail.com>
+References:
+ <20250209013054.816580-1-inochiama@gmail.com>
+ <20250209013054.816580-3-inochiama@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <c48952c7-716c-4302-949c-2c66ea102a3e@huawei.com>
+Content-Type: multipart/signed; boundary="nextPart6136790.lOV4Wx5bFT";
+ micalg="pgp-sha256"; protocol="application/pgp-signature"
+X-GND-State: clean
+X-GND-Score: -100
+X-GND-Cause: gggruggvucftvghtrhhoucdtuddrgeefvddrtddtgdefjeejjecutefuodetggdotefrodftvfcurfhrohhfihhlvgemucfitefpfffkpdcuggftfghnshhusghstghrihgsvgenuceurghilhhouhhtmecufedtudenucesvcftvggtihhpihgvnhhtshculddquddttddmnecujfgurhephffvvefufffkjghfgggtsehgtderredttdejnecuhfhrohhmpeftohhmrghinhcuifgrnhhtohhishcuoehrohhmrghinhdrghgrnhhtohhishessghoohhtlhhinhdrtghomheqnecuggftrfgrthhtvghrnhepieekkeffvdeugfekjeegfefhvdetuefhtdelieduheeileduledvteelgefgffffnecukfhppeeltddrkeelrdduieefrdduvdejnecuvehluhhsthgvrhfuihiivgeptdenucfrrghrrghmpehinhgvthepledtrdekledrudeifedruddvjedphhgvlhhopehffidqrhhgrghnthdrlhhotggrlhhnvghtpdhmrghilhhfrhhomheprhhomhgrihhnrdhgrghnthhoihhssegsohhothhlihhnrdgtohhmpdhnsggprhgtphhtthhopeefkedprhgtphhtthhopegrnhgurhgvfidonhgvthguvghvsehluhhnnhdrtghhpdhrtghpthhtohepuggrvhgvmhesuggrvhgvmhhlohhfthdrnhgvthdprhgtphhtthhopegvughumhgriigvthesghhoohhglhgvrdgtohhmpdhrtghpthhtohepkhhusggrsehkvghrnhgvlhdrohhrghdprhgtphhtthhopehprggsvghnihesrhgvughhrghtrdgtohhmpdhrtghpthhtoheprhhos
+ ghhsehkvghrnhgvlhdrohhrghdprhgtphhtthhopehkrhiikhdoughtsehkvghrnhgvlhdrohhrghdprhgtphhtthhopegtohhnohhrodgutheskhgvrhhnvghlrdhorhhg
+X-GND-Sasl: romain.gantois@bootlin.com
 
-Hi Zekun,
+--nextPart6136790.lOV4Wx5bFT
+Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset="utf-8"; protected-headers="v1"
+From: Romain Gantois <romain.gantois@bootlin.com>
+Date: Mon, 10 Feb 2025 11:04:40 +0100
+Message-ID: <5868742.DvuYhMxLoT@fw-rgant>
+In-Reply-To: <20250209013054.816580-3-inochiama@gmail.com>
+MIME-Version: 1.0
 
-On Mon, Feb 10, 2025 at 02:47:28PM +0800, zhangzekun (A) wrote:
-> > I think we all agree that of_find_node_by_name() is miused, and that it
-> > shows the API isn't optimal. What we have different opinions on is how
-> > to make the API less error-prone. I think adding a new
-> > of_find_node_by_name_balanced() function works around the issue and
-> > doesn't improve the situation much, I would argue it makes things even
-> > more confusing.
-> > 
-> > We have only 20 calls to of_find_node_by_name() with a non-NULL first
-> > argument in v6.14-rc1:
-> > 
-> > arch/powerpc/platforms/chrp/pci.c:      rtas = of_find_node_by_name (root, "rtas");
-> > 
-> > The 'root' variable here is the result of a call to
-> > 'of_find_node_by_path("/")', so I think we could pass a null pointer
-> > instead to simplify things.
-> > 
-> > arch/powerpc/platforms/powermac/pic.c:          slave = of_find_node_by_name(master, "mac-io");
-> > 
-> > Here I believe of_find_node_by_name() is called to find a *child* node
-> > of 'master'. of_find_node_by_name() is the wrong function for that.
-> > 
-> > arch/sparc/kernel/leon_kernel.c:        np = of_find_node_by_name(rootnp, "GAISLER_IRQMP");
-> > arch/sparc/kernel/leon_kernel.c:                np = of_find_node_by_name(rootnp, "01_00d");
-> > arch/sparc/kernel/leon_kernel.c:        np = of_find_node_by_name(nnp, "GAISLER_GPTIMER");
-> > arch/sparc/kernel/leon_kernel.c:                np = of_find_node_by_name(nnp, "01_011");
-> > 
-> > Here too the code seems to be looking for child nodes only (but I
-> > couldn't find a DT example or binding in-tree, so I'm not entirely
-> > sure).
-> > 
-> > drivers/clk/ti/clk.c:   return of_find_node_by_name(from, tmp);
-> > 
-> > Usage here seems correct, the reference-count decrement is intended.
-> > 
-> > drivers/media/i2c/max9286.c:    i2c_mux = of_find_node_by_name(dev->of_node, "i2c-mux");
-> > drivers/media/platform/qcom/venus/core.c:       enp = of_find_node_by_name(dev->of_node, node_name);
-> > drivers/net/dsa/bcm_sf2.c:      ports = of_find_node_by_name(dn, "ports");
-> > drivers/net/dsa/hirschmann/hellcreek_ptp.c:     leds = of_find_node_by_name(hellcreek->dev->of_node, "leds");
-> > drivers/net/ethernet/broadcom/asp2/bcmasp.c:    ports_node = of_find_node_by_name(dev->of_node, "ethernet-ports");
-> > drivers/net/ethernet/marvell/prestera/prestera_main.c:  ports = of_find_node_by_name(sw->np, "ports");
-> > drivers/net/pse-pd/tps23881.c:  channels_node = of_find_node_by_name(priv->np, "channels");
-> > drivers/regulator/scmi-regulator.c:     np = of_find_node_by_name(handle->dev->of_node, "regulators");
-> > drivers/regulator/tps6594-regulator.c:          np = of_find_node_by_name(tps->dev->of_node, multi_regs[multi].supply_name);
-> > 
-> > Incorrect usage, as far as I understand all those drivers are looking
-> > for child nodes only.
-> > 
-> > drivers/of/unittest.c:          found = of_find_node_by_name(nd->overlay, "test-unittest16");
-> > drivers/of/unittest.c:          found = of_find_node_by_name(nd->overlay, "test-unittest17");
-> > drivers/of/unittest.c:          found = of_find_node_by_name(nd->overlay, "test-unittest18");
-> > drivers/of/unittest.c:          found = of_find_node_by_name(nd->overlay, "test-unittest19");
-> > 
-> > Here too I think only child nodes are meant to be considered.
-> > 
-> > of_find_node_by_name() is very much misused as most callers want to find
-> > child nodes, while of_find_node_by_name() will walk the whole DT from a
-> > given starting point.
-> > 
-> > I think the right fix here is to
-> > 
-> > - Replace of_find_node_by_name(root, ...) with
-> >    of_find_node_by_name(NULL, ...) in arch/powerpc/platforms/chrp/pci.c
-> >    (if my understanding of the code is correct).
-> 
-> For arch/powerpc/platforms/chrp/pci.c, noticing that there is a comment 
-> in setup_peg2():
->   /* keep the reference to the root node */
-> 
-> It might can not be convert to of_find_node_by_name(NULL, ...), and the 
-> origin use of of_find_node_by_name() put the ref count which want to be 
-> kept.
+On dimanche 9 f=C3=A9vrier 2025 02:30:51 heure normale d=E2=80=99Europe cen=
+trale Inochi=20
+Amaoto wrote:
+> Add "snps,dwmac-5.30a" compatible string for 5.30a version that can avoid
+> to define some platform data in the glue layer.
+>=20
+> Signed-off-by: Inochi Amaoto <inochiama@gmail.com>
+> ---
+>  .../ethernet/stmicro/stmmac/stmmac_platform.c   | 17 ++++++++++++-----
+>  1 file changed, 12 insertions(+), 5 deletions(-)
+>=20
+> diff --git a/drivers/net/ethernet/stmicro/stmmac/stmmac_platform.c
+> b/drivers/net/ethernet/stmicro/stmmac/stmmac_platform.c index
+> d0e61aa1a495..8dc3bd6946c6 100644
+> --- a/drivers/net/ethernet/stmicro/stmmac/stmmac_platform.c
+> +++ b/drivers/net/ethernet/stmicro/stmmac/stmmac_platform.c
+> @@ -405,6 +405,17 @@ static int stmmac_of_get_mac_mode(struct device_node
+> *np) return -ENODEV;
+>  }
+>=20
+> +/* Compatible string array for all gmac4 devices */
+> +static const char * const stmmac_gmac4_compats[] =3D {
+> +	"snps,dwmac-4.00",
+> +	"snps,dwmac-4.10a",
+> +	"snps,dwmac-4.20a",
+> +	"snps,dwmac-5.10a",
+> +	"snps,dwmac-5.20",
+> +	"snps,dwmac-5.30a",
+> +	NULL
+> +};
+> +
+>  /**
+>   * stmmac_probe_config_dt - parse device-tree driver parameters
+>   * @pdev: platform_device structure
+> @@ -538,11 +549,7 @@ stmmac_probe_config_dt(struct platform_device *pdev,=
+ u8
+> *mac) plat->pmt =3D 1;
+>  	}
+>=20
+> -	if (of_device_is_compatible(np, "snps,dwmac-4.00") ||
+> -	    of_device_is_compatible(np, "snps,dwmac-4.10a") ||
+> -	    of_device_is_compatible(np, "snps,dwmac-4.20a") ||
+> -	    of_device_is_compatible(np, "snps,dwmac-5.10a") ||
+> -	    of_device_is_compatible(np, "snps,dwmac-5.20")) {
+> +	if (of_device_compatible_match(np, stmmac_gmac4_compats)) {
+>  		plat->has_gmac4 =3D 1;
+>  		plat->has_gmac =3D 0;
+>  		plat->pmt =3D 1;
 
-But the reference is dropped by of_find_node_by_name(). Unless I'm
-missing something, dropping the lien
+LGTM
 
-	struct device_node *root = of_find_node_by_path("/");
+Reviewed-by: Romain Gantois <romain.gantois@bootlin.com>
 
-and changing
 
-	rtas = of_find_node_by_name (root, "rtas");
 
-to
+--nextPart6136790.lOV4Wx5bFT
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: This is a digitally signed message part.
+Content-Transfer-Encoding: 7Bit
 
-	rtas = of_find_node_by_name (NULL, "rtas");
+-----BEGIN PGP SIGNATURE-----
 
-will not change the behaviour of the code.
+iQIzBAABCAAdFiEEYFZBShRwOvLlRRy+3R9U/FLj284FAmepzzgACgkQ3R9U/FLj
+286J5g//fmDyVJafzX14tHwfj8aI+uwgNu7ZJxduC9DnxnYWy+EN+dby2S6/rlPN
+T4ypshgRrmYqPoji5FJKurYu3LHwUE/V8N2z06jexZaWXA8/VW+aNUkHoIbyHHko
+fYFD4Op0fKrWBGBHR+Hj8qJv2QbWFBc8vo4Swzk3PjbzLTx36g3gFWb/CUkP569I
+12TrG1wPA0ZBtugewKlLSdXOFVtDqsh0mTfCpQ8dsRjTc4TrVrcFDaxIW1aENksw
+0SIncY9LUMPnCW+IHHB7E8Ln6y84/ipUGsySMvtUOg/cnobji2ehcScRVh+QpuZQ
+L/P1dWf83kE5M1Kll9HPhs0R1qtrK2bWAaBamcDl79AW6c+4MPdBPxk9gaQmMuov
+/tiHVI0LagpoFV+Y/hXy7mMMRmqLAhlwwkmNiJuzYPnBJOReYcJ5kJ4QvCr+n0I9
+YQ+zLGBWxvi0aQk8p+qh8a6VZ+8I1aGmjGDluy9M+7f1wl1Rj3RMOOL8G86M4ZxD
+BnbNszU+FrI1fZObie8NsvvQwunu/bJcR1Mhn9RcyVcc/b6bIpAekcjcctz07P7B
+KWTz8PjEv0dHTX7k40Lr9GhZjKIQeVR3YMCNjzqvANzcCeEcSnnIY/r+U/hpK5jp
+ShGT0E6pno6LqL/YVkx+G1N/T736ljcC/BCLeQvGusrPc6Md3Aw=
+=KCpu
+-----END PGP SIGNATURE-----
 
-> > 
-> > - Replace of_find_node_by_name() with of_get_child_by_name() in callers
-> >    that need to search immediate children only (I expected that to be the
-> >    majority of the above call sites)
->
-> Since there is no enough information about these DT nodes, it would take 
-> time to prove if it is OK to make such convert.
+--nextPart6136790.lOV4Wx5bFT--
 
-It will take a bit of time, yes. I'm afraid time is needed to improve
-things :-) In most cases, as DT bindings are available, it shouldn't be
-very difficult.
 
-> > 
-> > - If there are other callers that need to find indirect children,
-> >    introduce a new of_get_child_by_name_recursive() function.
-> > 
-> > At that point, the only remaining caller of of_find_node_by_name()
-> > (beside its usage in the for_each_node_by_name() macro) will be
-> > drivers/clk/ti/clk.c, which uses the function correctly.
-> > 
-> > I'm tempted to then rename of_find_node_by_name() to
-> > __of_find_node_by_name() to indicate it's an internal function not meant
-> > to be called except in special cases. It could all be renamed to
-> > __of_find_next_node_by_name() to make its behaviour clearer.
-> >
-> 
-> The actual code logic of of_find_node_by_name() is more suitable to be 
-> used in a loop.So,rename of_find_node_by_name() to 
-> __of_find_next_node_by_name() seems to be a good idea.
 
--- 
-Regards,
-
-Laurent Pinchart
 
