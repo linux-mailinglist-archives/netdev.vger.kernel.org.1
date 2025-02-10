@@ -1,185 +1,206 @@
-Return-Path: <netdev+bounces-164820-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-164821-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2659EA2F495
-	for <lists+netdev@lfdr.de>; Mon, 10 Feb 2025 18:04:31 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 91380A2F4B1
+	for <lists+netdev@lfdr.de>; Mon, 10 Feb 2025 18:09:02 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id DAD783A3B7F
-	for <lists+netdev@lfdr.de>; Mon, 10 Feb 2025 17:04:21 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id AC2891887938
+	for <lists+netdev@lfdr.de>; Mon, 10 Feb 2025 17:08:59 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A955B157487;
-	Mon, 10 Feb 2025 17:04:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B0EE81F4630;
+	Mon, 10 Feb 2025 17:08:48 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=ubicloud.com header.i=@ubicloud.com header.b="L03HU1Dq"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-il1-f208.google.com (mail-il1-f208.google.com [209.85.166.208])
+Received: from mail-pj1-f42.google.com (mail-pj1-f42.google.com [209.85.216.42])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BF3181F4626
-	for <netdev@vger.kernel.org>; Mon, 10 Feb 2025 17:04:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.208
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9547E256C6B
+	for <netdev@vger.kernel.org>; Mon, 10 Feb 2025 17:08:46 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.42
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1739207063; cv=none; b=HZewAZQNXZaUOD6kSqUIrsPRYkLSxT5+KK9/YLzswir54FmS3RtIpsOY89QrAUXsx4KRUzmlAynIQWIB2WAb1avrM5Ju+YkMlMHSA+2smmohVVy5GXPs4G0b5LHlIouJvcveJX+UmMExwyB6UMefZjDBdRbaw1w6tfm3DzQ0Vn4=
+	t=1739207328; cv=none; b=KvHSnF4iQMP+2U9DrDyruG57PA/M8rbOO50m1z02ikU6i68SQUfFwbDRYvC5nCaD8MyUcVt29Ot/6vxbYvviswOuZ+75/D7rztzQq0IfSgfoP8UQSlP8U7cRr+skqcQ9RjFQ8e+SlMpV8ht5evu9DcP4jLwn5HaHQxsYV/sA3pw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1739207063; c=relaxed/simple;
-	bh=ayDh2XGkK8pdTTCHt3YthG9+gbxnM+ZS2XGaCXOhg60=;
-	h=MIME-Version:Date:Message-ID:Subject:From:To:Content-Type; b=iEJCxUjaXD4SPMg+CsTaWFGgMtxWlWSwgj2JmyBEy4j0B8p3H3RW3LHgXdyoSkrJm2tuCeUE0b4JeJy5QHQPVr+EZJPM7IA5Lf6bCh1Ud2fkNZCS6x5SjdJAP1Y3vgVog6MLAG760sGOZlNOeKQ4kRnsma5u9d3ZkVN+o82BmBo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.208
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
-Received: by mail-il1-f208.google.com with SMTP id e9e14a558f8ab-3cfba1ca53bso32033255ab.3
-        for <netdev@vger.kernel.org>; Mon, 10 Feb 2025 09:04:21 -0800 (PST)
+	s=arc-20240116; t=1739207328; c=relaxed/simple;
+	bh=gfNXR4vSaEVJMS3lPvkBsS/dW6wB6XJO/B4mL7DHEBc=;
+	h=MIME-Version:From:Date:Message-ID:Subject:To:Cc:Content-Type; b=aJSvjuHJXCPEmYWGe3DVA30Rtq/qGv+k3sPiTYlBHl85Y87CpCYQwfFkH0yzRJ9QdDcHqQb7/vMlX3icssi9/K+3HJMifW2Ioyku5TbFykHAOB7uiFY4W03Qu3q/v1xkeAO5ip14i5qaRcqUaui9SkXACYhvlefwNmJm/yrJG3o=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=ubicloud.com; spf=pass smtp.mailfrom=ubicloud.com; dkim=pass (2048-bit key) header.d=ubicloud.com header.i=@ubicloud.com header.b=L03HU1Dq; arc=none smtp.client-ip=209.85.216.42
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=ubicloud.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ubicloud.com
+Received: by mail-pj1-f42.google.com with SMTP id 98e67ed59e1d1-2fa51743d80so2786357a91.2
+        for <netdev@vger.kernel.org>; Mon, 10 Feb 2025 09:08:46 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=ubicloud.com; s=google; t=1739207325; x=1739812125; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=kvm+0EnMYRXJ/bn2uF7TNtzUtj3OtQbVGlmRFALZ31o=;
+        b=L03HU1Dq130B7gkmfztpvFEMGEM2GYKlzspqgRtZ6h9kUJAuOCgioR4z8qnfV7Myq4
+         kXefx/YAHt/vcdhxhbE7MYIFfjvSrxVD8KTb856tSQ/vSbgdFji1jU4zF3kzzZOiSjld
+         p8+1bOdKknnHuj+p7PS1pcJZFyRS8ZDxRo93Xv+ec4aR2Tom+y3dAXnInonwrW/q34H4
+         xSGKHVD0UKcvO9SzJorlnLdqht/k2UA3V/efTG771hZS20Do3m7Bi+KfNCcpesp0Qp/A
+         QlYa/wb7geSKrKn7uU0P237QCW7wgGhHvIdTaaD+XD7reFUHJXLI1xW+EqExWf5gbKoC
+         VAGQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1739207061; x=1739811861;
-        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=GT+g3UbstXLhzNW5rP1Aqw38eFbZ1w5rUxR73G8bj1I=;
-        b=Q5Mwdwnyn+Bdh+CBQBn0eTdWpYLblfLFkpkPcW7Q5UQ9DvoI34lOjsPNZiMNgDorrS
-         E5wDuhWxcuP+WrzilTANlQW7RAyhLCNC/OaO1gz+PTIoiQd3ZULxwj4qxC/SHztvdHK6
-         jxzFoD4LgyiF9yhDkP5S/sFDU+OmjInVaqk+Ge3g9z5hDju6jXB6Ct2SYTPXr5DlDwwC
-         nnYFZg/AoYyYW79Vqv6/bA75jBdxlN7Q5L6QKEVfmVMeI7q+m38MuFloYxxgMcHKjk51
-         RRPJDTSVuia51130dndHWk1wof3pgDoU60FZ1ptFY7Qz4T2EsJymo6W7foAHJUGovvl9
-         a/tA==
-X-Forwarded-Encrypted: i=1; AJvYcCXrMlA/Nny3YIND/2GA/SNlIBxnmE/79BvrGsAZJhaa84D944sIXFZ3svL1MIUwsaMVB/sxg8Q=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yy3KzVXF/l+0BzvSuBklLh5/95sHK5HE54qQ8hY2VjyzsU+cJ+w
-	GCvjKGaT4yRLDvgOZXwBnYkQCikwQX4E1hQIZ64jj/STmz7Gzwq7Ma0YKhzwxHN8FBEXahftcqe
-	EusZjyBSQyMoJoBN4bZVofnngem8rfdJ9E/LWVQSRNbe7S+xYNutNp0g=
-X-Google-Smtp-Source: AGHT+IGUE2boMaoqj5trTNkX7hMjoHNOU6Pk4rn16Ze27x+v3ITQ77e8y+sWklE/WTqYaPgxnCBmZZgqjLv6NCu0AdJpxf/SNYlU
+        d=1e100.net; s=20230601; t=1739207326; x=1739812126;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=kvm+0EnMYRXJ/bn2uF7TNtzUtj3OtQbVGlmRFALZ31o=;
+        b=U0dENSIdUoVySQO9vHjAbDwi9RmhD+Ek/1QI/09JW+vSU+2DR+iMwQpSouId8416VY
+         ZzeL1Pmdc+GSJkO2mL9qk61n9GF/3I4aMXg/BTHONgO4P33G9IL7qaosE4oDEgOeC3d1
+         7Ebp5dM3gdA8ORaPEjlh48J2wMTKStyipkl1Dq5TFKJBT9C9a6TRx8Nh0LOwqCNDXpW5
+         obtproHLC5IruTucXiskFfxmYgUGHZ9TzA6v1+sq5wpIG7F7icoq6L+LXcKsuGQUEQhM
+         FGF/KBOUor2ivtJfi9vVyRv988iPw5WMn4ENuwsA+anTOqEcZgZVGkdY7CTuuljHSF+W
+         WNuQ==
+X-Gm-Message-State: AOJu0Yx46LHpSuZRo0EkCQxlDKzlfSopckHeow20sVlajZXf/GMR/WML
+	2YryZeDsJmixiDfhFoMwdvp91jKZ7qvdqKvaixIDvr459RPcnSqoEilWgtNs3keRys7YqeYDiQY
+	uxEoqO/rK/BZkQztI+rlZbf6nHfgoGSrBHVckKLzzqi+9RQxidqI=
+X-Gm-Gg: ASbGnct6RY8NG9KWiwEzrulcEvL1tyjeQf4swnTTP1/bCJFCq0tpAOBn6g/k6+kapSb
+	FpB6+Wjz/xgo7x6sYZrwcHyT7hzsKufn4krI4a9lFOAGJVBzZn9FhncA8iNDA/BSLybSK8/m8TX
+	QoHreyoKhX//a9MuNhEZnBHyNkkWA=
+X-Google-Smtp-Source: AGHT+IHFnKiODR9wAH8CVe0A02Chu31IPUA7DY6mn6YXWqz6m/32aLIA4sWGT6uA4Q28oH+SDhHjzph7nqoUt9HELz0=
+X-Received: by 2002:a17:90b:4b87:b0:2fa:e9b:33ab with SMTP id
+ 98e67ed59e1d1-2fa241768e3mr24563807a91.16.1739207324169; Mon, 10 Feb 2025
+ 09:08:44 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Received: by 2002:a05:6e02:1b0e:b0:3cf:cac9:b02d with SMTP id
- e9e14a558f8ab-3d13dd609b2mr111016245ab.8.1739207060742; Mon, 10 Feb 2025
- 09:04:20 -0800 (PST)
-Date: Mon, 10 Feb 2025 09:04:20 -0800
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <67aa3194.050a0220.3d72c.0054.GAE@google.com>
-Subject: [syzbot] [ext4?] [net?] general protection fault in __dev_set_rx_mode
-From: syzbot <syzbot+b0e409c0b9976e4b3923@syzkaller.appspotmail.com>
-To: davem@davemloft.net, edumazet@google.com, horms@kernel.org, 
-	kuba@kernel.org, linux-ext4@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	netdev@vger.kernel.org, pabeni@redhat.com, syzkaller-bugs@googlegroups.com
+From: Furkan Sahin <furkan@ubicloud.com>
+Date: Mon, 10 Feb 2025 18:08:32 +0100
+X-Gm-Features: AWEUYZkUpwoZHwu9jdEz-oHmjTsBC9vYJaMYURxgFEasHcudUt9YwLnuumeUqy0
+Message-ID: <CAM-1W_v_P49VKnsxUdLkXEDyVw-YHKq6YCJ-R4WSexwHuU8Ejw@mail.gmail.com>
+Subject: [Performance] ip-xfrm 20x encapsulation penalty
+To: netdev@vger.kernel.org
+Cc: Daniel Farina <daniel@ubicloud.com>, Junhao Li <junhao@ubicloud.com>, 
+	Ozgun Erdogan <ozgun@ubicloud.com>
 Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Hello,
+Hello all,
+Respectfully, I have a question regarding the performance impact of encrypt=
+ion
++ encapsulation with ip xfrm. I have a very basic setup with two namespaces=
+ in
+the same server. Then, we are running a very basic iperf command with and
+without tunnels. The performance jump is extremely high going from encrypte=
+d to
+not. Here are the numbers:
 
-syzbot found the following issue on:
+Without encryption and encapsulation:
+```
+[root@vh8m4859621y4j6xxsfgxc3wkh ~]# ip netns exec interface2 bash
+[root@vh8m4859621y4j6xxsfgxc3wkh ~]# iperf -s -V
+[root@vh8m4859621y4j6xxsfgxc3wkh ~]# ip netns exec interface1 bash
+[root@vh8m4859621y4j6xxsfgxc3wkh ~]# iperf -c 2a01:4f8:10a:128b:456::1
+-b 100G -P 1
+------------------------------------------------------------
+Client connecting to 2a01:4f8:10a:128b:456::1, TCP port 5001
+TCP window size: 85.0 KByte (default)
+------------------------------------------------------------
+[  1] local 2a01:4f8:10a:128b:: port 50882 connected with
+2a01:4f8:10a:128b:456::1 port 5001
+[ ID] Interval       Transfer     Bandwidth
+[  1] 0.0000-10.0116 sec  52.0 GBytes  44.6 Gbits/sec
+```
+With encryption and encapsulation:
+```
+[root@vh8m4859621y4j6xxsfgxc3wkh ~]# ip netns exec interface2 bash
+[root@vh8m4859621y4j6xxsfgxc3wkh ~]# iperf -s -V
+[root@vh8m4859621y4j6xxsfgxc3wkh ~]# ip netns exec interface1 bash
+[root@vh8m4859621y4j6xxsfgxc3wkh ~]# iperf -c
+fd53:3f0e:d350:6740:456::2 -b 100G -P 1
+------------------------------------------------------------
+Client connecting to fd53:3f0e:d350:6740:456::2, TCP port 5001
+TCP window size: 85.0 KByte (default)
+------------------------------------------------------------
+[  1] local fd53:3f0e:d350:6740:: port 33162 connected with
+fd53:3f0e:d350:6740:456::2 port 5001
+[ ID] Interval       Transfer     Bandwidth
+[  1] 0.0000-10.0098 sec  1.46 GBytes  1.26 Gbits/sec
+```
+My question is, what am I missing? Why do we see such a poor performance wi=
+th
+encryption + encapsulation. I didn=E2=80=99t want to provide more terminal =
+output but
+even with null encryption, we are seeing around 2.2 Gbit/sec. That is quite=
+ a
+big jump from 44.6 Gbit/sec for encapsulation. Is this expected?
 
-HEAD commit:    92514ef226f5 Merge tag 'for-6.14-rc1-tag' of git://git.ker..
-git tree:       upstream
-console output: https://syzkaller.appspot.com/x/log.txt?x=162e5318580000
-kernel config:  https://syzkaller.appspot.com/x/.config?x=1909f2f0d8e641ce
-dashboard link: https://syzkaller.appspot.com/bug?extid=b0e409c0b9976e4b3923
-compiler:       Debian clang version 15.0.6, GNU ld (GNU Binutils for Debian) 2.40
-syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=149d41b0580000
+Here is the very basic script I use to setup the interfaces and tunnels:
+```
+ip netns add interface1
+ip netns add interface2
+ip link add vethointerface1 addr 7a:b5:34:4e:44:be type veth peer name
+vethiinterface1 addr ce:8f:66:87:d5:6f netns interface1
+ip link add vethointerface2 addr 1e:e7:ef:aa:21:c0 type veth peer name
+vethiinterface2 addr ba:9b:f0:50:68:cd netns interface2
 
-Downloadable assets:
-disk image (non-bootable): https://storage.googleapis.com/syzbot-assets/7feb34a89c2a/non_bootable_disk-92514ef2.raw.xz
-vmlinux: https://storage.googleapis.com/syzbot-assets/c4d8b91f8769/vmlinux-92514ef2.xz
-kernel image: https://storage.googleapis.com/syzbot-assets/c24ec4365966/bzImage-92514ef2.xz
-mounted in repro: https://storage.googleapis.com/syzbot-assets/2fed19de440d/mount_0.gz
+ip link set dev vethointerface1 up
+ip route replace 2a01:4f8:10a:128b:123::/80 via
+fe80::cc8f:66ff:fe87:d56f dev vethointerface1
+ip -n interface1 addr replace 2a01:4f8:10a:128b:123::1/80 dev vethiinterfac=
+e1
+ip -n interface1 link set dev vethiinterface1 up
+ip -n interface1 route replace 2000::/3 via fe80::78b5:34ff:fe4e:44be
+dev vethiinterface1
 
-IMPORTANT: if you fix the issue, please add the following tag to the commit:
-Reported-by: syzbot+b0e409c0b9976e4b3923@syzkaller.appspotmail.com
+ip link set dev vethointerface2 up
+ip route replace 2a01:4f8:10a:128b:456::/79 via
+fe80::b89b:f0ff:fe50:68cd dev vethointerface2
+ip -n interface2 addr replace 2a01:4f8:10a:128b:456::1/80 dev vethiinterfac=
+e2
+ip -n interface2 link set dev vethiinterface2 up
+ip -n interface2 route replace 2000::/3 via fe80::1ce7:efff:feaa:21c0
+dev vethiinterface2
 
-Oops: general protection fault, probably for non-canonical address 0xffec282c2c2c2c34: 0000 [#1] PREEMPT SMP KASAN NOPTI
-KASAN: maybe wild-memory-access in range [0xff616161616161a0-0xff616161616161a7]
-CPU: 0 UID: 0 PID: 30 Comm: kworker/u4:2 Not tainted 6.14.0-rc1-syzkaller-00034-g92514ef226f5 #0
-Hardware name: QEMU Standard PC (Q35 + ICH9, 2009), BIOS 1.16.3-debian-1.16.3-2~bpo12+1 04/01/2014
-Workqueue: ipv6_addrconf addrconf_dad_work
-RIP: 0010:__dev_set_rx_mode+0x1c2/0x280 net/core/dev.c:9092
-Code: 8b 04 24 42 0f b6 04 20 84 c0 48 8b 5c 24 08 0f 85 b3 00 00 00 40 88 2b eb 05 e8 e9 78 00 f8 49 83 c6 40 4c 89 f0 48 c1 e8 03 <42> 80 3c 20 00 74 08 4c 89 f7 e8 3f 11 67 f8 49 8b 2e 48 85 ed 74
-RSP: 0018:ffffc900005177e0 EFLAGS: 00010a02
-RAX: 1fec2c2c2c2c2c34 RBX: ffff888042c70410 RCX: ffff888030eca440
-RDX: 0000000000000000 RSI: 0000000000000000 RDI: 0000000000000000
-RBP: 0000000000000000 R08: ffffffff89bee4d6 R09: 1ffff1100858e015
-R10: dffffc0000000000 R11: ffffed100858e016 R12: dffffc0000000000
-R13: ffff888042c70000 R14: ff616161616161a1 R15: 0000000000000000
-FS:  0000000000000000(0000) GS:ffff88801fc00000(0000) knlGS:0000000000000000
-CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-CR2: 00007f4808733114 CR3: 000000003efa4000 CR4: 0000000000352ef0
-DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
-DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
-Call Trace:
- <TASK>
- __dev_mc_add net/core/dev_addr_lists.c:872 [inline]
- dev_mc_add+0xca/0x110 net/core/dev_addr_lists.c:886
- igmp6_group_added+0x1a4/0x710 net/ipv6/mcast.c:684
- __ipv6_dev_mc_inc+0x8da/0xac0 net/ipv6/mcast.c:988
- addrconf_join_solict net/ipv6/addrconf.c:2240 [inline]
- addrconf_dad_begin net/ipv6/addrconf.c:4095 [inline]
- addrconf_dad_work+0x44f/0x16a0 net/ipv6/addrconf.c:4223
- process_one_work kernel/workqueue.c:3236 [inline]
- process_scheduled_works+0xa66/0x1840 kernel/workqueue.c:3317
- worker_thread+0x870/0xd30 kernel/workqueue.c:3398
- kthread+0x7a9/0x920 kernel/kthread.c:464
- ret_from_fork+0x4b/0x80 arch/x86/kernel/process.c:148
- ret_from_fork_asm+0x1a/0x30 arch/x86/entry/entry_64.S:244
- </TASK>
-Modules linked in:
----[ end trace 0000000000000000 ]---
-RIP: 0010:__dev_set_rx_mode+0x1c2/0x280 net/core/dev.c:9092
-Code: 8b 04 24 42 0f b6 04 20 84 c0 48 8b 5c 24 08 0f 85 b3 00 00 00 40 88 2b eb 05 e8 e9 78 00 f8 49 83 c6 40 4c 89 f0 48 c1 e8 03 <42> 80 3c 20 00 74 08 4c 89 f7 e8 3f 11 67 f8 49 8b 2e 48 85 ed 74
-RSP: 0018:ffffc900005177e0 EFLAGS: 00010a02
-RAX: 1fec2c2c2c2c2c34 RBX: ffff888042c70410 RCX: ffff888030eca440
-RDX: 0000000000000000 RSI: 0000000000000000 RDI: 0000000000000000
-RBP: 0000000000000000 R08: ffffffff89bee4d6 R09: 1ffff1100858e015
-R10: dffffc0000000000 R11: ffffed100858e016 R12: dffffc0000000000
-R13: ffff888042c70000 R14: ff616161616161a1 R15: 0000000000000000
-FS:  0000000000000000(0000) GS:ffff88801fc00000(0000) knlGS:0000000000000000
-CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-CR2: 00007f4808733114 CR3: 000000003efa4000 CR4: 0000000000352ef0
-DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
-DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
-----------------
-Code disassembly (best guess):
-   0:	8b 04 24             	mov    (%rsp),%eax
-   3:	42 0f b6 04 20       	movzbl (%rax,%r12,1),%eax
-   8:	84 c0                	test   %al,%al
-   a:	48 8b 5c 24 08       	mov    0x8(%rsp),%rbx
-   f:	0f 85 b3 00 00 00    	jne    0xc8
-  15:	40 88 2b             	mov    %bpl,(%rbx)
-  18:	eb 05                	jmp    0x1f
-  1a:	e8 e9 78 00 f8       	call   0xf8007908
-  1f:	49 83 c6 40          	add    $0x40,%r14
-  23:	4c 89 f0             	mov    %r14,%rax
-  26:	48 c1 e8 03          	shr    $0x3,%rax
-* 2a:	42 80 3c 20 00       	cmpb   $0x0,(%rax,%r12,1) <-- trapping instruction
-  2f:	74 08                	je     0x39
-  31:	4c 89 f7             	mov    %r14,%rdi
-  34:	e8 3f 11 67 f8       	call   0xf8671178
-  39:	49 8b 2e             	mov    (%r14),%rbp
-  3c:	48 85 ed             	test   %rbp,%rbp
-  3f:	74                   	.byte 0x74
+ip -n interface1 xfrm policy add src fd53:3f0e:d350:6740:123::/79 dst
+fd53:3f0e:d350:6740:456::/79 dir out tmpl src 2a01:4f8:10a:128b:123::1
+dst 2a01:4f8:10a:128b:456::1 proto esp reqid 85910 mode tunnel
+ip -n interface2 xfrm policy add src fd53:3f0e:d350:6740:123::/79 dst
+fd53:3f0e:d350:6740:456::/79 dir in tmpl src 2a01:4f8:10a:128b:123::1
+dst 2a01:4f8:10a:128b:456::1 proto esp reqid 85910 mode tunnel
+ip -n interface1 xfrm policy add src fd53:3f0e:d350:6740:456::/79 dst
+fd53:3f0e:d350:6740:123::/79 dir in tmpl src 2a01:4f8:10a:128b:456::1
+dst 2a01:4f8:10a:128b:123::1 proto esp reqid 49480 mode tunnel
+ip -n interface2 xfrm policy add src fd53:3f0e:d350:6740:456::/79 dst
+fd53:3f0e:d350:6740:123::/79 dir out tmpl src 2a01:4f8:10a:128b:456::1
+dst 2a01:4f8:10a:128b:123::1 proto esp reqid 49480 mode tunnel
 
+ip -n interface1 xfrm state add src 2a01:4f8:10a:128b:123::1 dst
+2a01:4f8:10a:128b:456::1 proto esp spi 0x33ff09b5 reqid 85910 mode
+tunnel replay-window 0 aead 'rfc4106(gcm(aes))'
+0x0efb31b0e1837b2a6f4145dc6ed81565d04654e691a063d06d1c826e001e50519e692675
+128 sel src ::/0 dst ::/0
+ip -n interface1 xfrm state add src 2a01:4f8:10a:128b:456::1 dst
+2a01:4f8:10a:128b:123::1 proto esp spi 0x62f75b71 reqid 49480 mode
+tunnel replay-window 0 aead 'rfc4106(gcm(aes))'
+0xb89577cecab3a5150bc275042d1485bf917ab55fa2f3100cb135cbfc21d7ee31aa5cf5d0
+128 sel src ::/0 dst ::/0
+ip -n interface2 xfrm state add src 2a01:4f8:10a:128b:123::1 dst
+2a01:4f8:10a:128b:456::1 proto esp spi 0x33ff09b5 reqid 85910 mode
+tunnel replay-window 0 aead 'rfc4106(gcm(aes))'
+0x0efb31b0e1837b2a6f4145dc6ed81565d04654e691a063d06d1c826e001e50519e692675
+128 sel src ::/0 dst ::/0
+ip -n interface2 xfrm state add src 2a01:4f8:10a:128b:456::1 dst
+2a01:4f8:10a:128b:123::1 proto esp spi 0x62f75b71 reqid 49480 mode
+tunnel replay-window 0 aead 'rfc4106(gcm(aes))'
+0xb89577cecab3a5150bc275042d1485bf917ab55fa2f3100cb135cbfc21d7ee31aa5cf5d0
+128 sel src ::/0 dst ::/0
 
----
-This report is generated by a bot. It may contain errors.
-See https://goo.gl/tpsmEJ for more information about syzbot.
-syzbot engineers can be reached at syzkaller@googlegroups.com.
+ip -n interface1 addr add fd53:3f0e:d350:6740:123::2/80 dev vethiinterface1
+ip -n interface2 addr add fd53:3f0e:d350:6740:456::2/80 dev vethiinterface2
+ip -n interface1 route add fd53:3f0e:d350:6740:456::2/80 dev vethiinterface=
+1
+ip -n interface2 route add fd53:3f0e:d350:6740:123::2/80 dev vethiinterface=
+2
+```
 
-syzbot will keep track of this issue. See:
-https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
-
-If the report is already addressed, let syzbot know by replying with:
-#syz fix: exact-commit-title
-
-If you want syzbot to run the reproducer, reply with:
-#syz test: git://repo/address.git branch-or-commit-hash
-If you attach or paste a git patch, syzbot will apply it before testing.
-
-If you want to overwrite report's subsystems, reply with:
-#syz set subsystems: new-subsystem
-(See the list of subsystem names on the web dashboard)
-
-If the report is a duplicate of another one, reply with:
-#syz dup: exact-subject-of-another-report
-
-If you want to undo deduplication, reply with:
-#syz undup
+Best regards,
+Furkan
 
