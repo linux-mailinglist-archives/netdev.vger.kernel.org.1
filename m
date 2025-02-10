@@ -1,92 +1,64 @@
-Return-Path: <netdev+bounces-164814-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-164815-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 820C7A2F3D1
-	for <lists+netdev@lfdr.de>; Mon, 10 Feb 2025 17:41:39 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id A8DB4A2F3D7
+	for <lists+netdev@lfdr.de>; Mon, 10 Feb 2025 17:42:26 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id DE97B1885A63
-	for <lists+netdev@lfdr.de>; Mon, 10 Feb 2025 16:41:44 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 9F80E3A82C6
+	for <lists+netdev@lfdr.de>; Mon, 10 Feb 2025 16:41:56 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0F0EF1F4634;
-	Mon, 10 Feb 2025 16:41:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7BBAA1F4634;
+	Mon, 10 Feb 2025 16:41:52 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="QpHkfzIh"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ODK7qD1V"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D3F241F462E;
-	Mon, 10 Feb 2025 16:41:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 53C2B1F4625;
+	Mon, 10 Feb 2025 16:41:52 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1739205695; cv=none; b=OGZciaR4ttUQxxp/Y8P+nl/HvVCUq7ZPGQFdf0216lOdLIeWPbmtMvpHfI5HSynnc2uostTmpRO7ynAbvKyyT8nkvqkSa21YeM1/hrNcUJ06+FfCzIT0ei63yXl/eyvqYTTdqoQ3JxwNYKatR9doY+ZT5i66faOWrCNVLgATYGk=
+	t=1739205712; cv=none; b=nw1Gm5t5wMEPfHTNYQfm0TNKyhPIqBK7wXTdkJlGLO14GmtR0WzHFUiPwse1fT6ZEXm7Vf+MV8CU4wkqXh4S9cfk0F5CoyjSqJzBIO13X71IN5a1myRHHzP4ltEWlJ46OFm4xaQyJvmoaXwRw4TgFLkusIved7jiMAjXVqnRzAc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1739205695; c=relaxed/simple;
-	bh=uAyfkHEewWlOYk9WBIv7qJzqDqE+h83eCP+cS6RAJIE=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=i1OlZU3fC0EJ52k+mhupUnlzeFZ33Q5Povf7r1/qN5V4QH5hB9ewdgnChLQhnOY9++/4L+e/UY7mxXtW0iccYpNI1Lj40I8xK/fUi0NEGrZOfRzJCUQh618Wo4BhrHnOlwRYeCfAWBDFFYuFyjfAofsLbBEEQcuMLxX+GMNzu98=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=QpHkfzIh; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 63CE4C4CED1;
-	Mon, 10 Feb 2025 16:41:30 +0000 (UTC)
+	s=arc-20240116; t=1739205712; c=relaxed/simple;
+	bh=QpeiK2sRkZo2IkL69SEukYBewbXtcL/h1uTz1zaXmac=;
+	h=Date:From:To:Subject:Message-ID:MIME-Version:Content-Type; b=FoM4pVb1WVOtr4nwdt92A6Vu7ApBeiyOq/qV3evlrbCGX7tD9a4AV+/7vbRNufk4McHMMkveMxgIMD32plkQx6QwkuyOOOF+G8U23jhEC3cp5zoeakssCGJTVzHB3zLIT3GgaccYpGDxleaoqLyDo4eFs3LiA2Whh0zAP2pSxfk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ODK7qD1V; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 13170C4CEDF;
+	Mon, 10 Feb 2025 16:41:52 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1739205694;
-	bh=uAyfkHEewWlOYk9WBIv7qJzqDqE+h83eCP+cS6RAJIE=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=QpHkfzIhoCH0NwwuU7ojFAjSWRhE4Vrag9yp5NLAcXhMJPGpBUOCCzaSZUUyTC5OW
-	 pVLHL6GgbBNPtKcjyy+TufUunEqZ9zhEBVSt9kNYAY5MrD30ZkwcsyzaOQavGEvLgI
-	 4n+ct6G509MoAlQigJ4pgdycA8ObxkcMKvTH3AplbfXv6R8rp0vwLfQ1oYEeGDcQE2
-	 nsPHNHd3NTdPDnwAt/yxBvAgumqcr9qyiPUjzn0R9q7L+E16j7oS3JNqVGe2G6cai4
-	 Zxnp2prbQDKo+c+9QulZdWGbJp+OtxS/HEVzUq1InCaVmp0k5kEjM2F+uTMwbmIkWN
-	 wGEHuphvNt+AQ==
-Date: Mon, 10 Feb 2025 16:41:28 +0000
-From: Simon Horman <horms@kernel.org>
-To: Suman Ghosh <sumang@marvell.com>
-Cc: sgoutham@marvell.com, gakula@marvell.com, sbhatta@marvell.com,
-	hkelam@marvell.com, davem@davemloft.net, edumazet@google.com,
-	kuba@kernel.org, pabeni@redhat.com, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org, lcherian@marvell.com,
-	jerinj@marvell.com, john.fastabend@gmail.com, bbhushan2@marvell.com,
-	hawk@kernel.org, andrew+netdev@lunn.ch, ast@kernel.org,
-	daniel@iogearbox.net, bpf@vger.kernel.org, larysa.zaremba@intel.com
-Subject: Re: [net-next PATCH v5 2/6] octeontx2-pf: Add AF_XDP non-zero copy
- support
-Message-ID: <20250210164128.GG554665@kernel.org>
-References: <20250206085034.1978172-1-sumang@marvell.com>
- <20250206085034.1978172-3-sumang@marvell.com>
+	s=k20201202; t=1739205712;
+	bh=QpeiK2sRkZo2IkL69SEukYBewbXtcL/h1uTz1zaXmac=;
+	h=Date:From:To:Subject:From;
+	b=ODK7qD1VXKLlYEvVnv5qk2bYM/zvc6qP/rON9+WFZ/sveu1lRHzo1H9VVkTMt+s0q
+	 wshqhv348Kd+MJkpXhaUvSTmGYX8Zpx4mp56cvhGUOZHjGB9VW2B+GLodmHwxnKjz1
+	 aAIFtS25Go6kXw/w+BS2Q5mJWh/l231WxrE77PRs+GIUJERa1oilHymVMrT5+HgreZ
+	 hHO7zcHKxhKvQIQVEnRRxCBiZEvwSTK33gU2sh4aC7yBH+T88K1HoN7qBs/5PWSthE
+	 rpu66LfQ5g1STdqPqidXqU0S/DJ1+v8Z1VeqNMOBy+1/yPfxO4jHy2ZpOC6+CNQm6k
+	 9JfeF/vMJWBKg==
+Date: Mon, 10 Feb 2025 08:41:51 -0800
+From: Jakub Kicinski <kuba@kernel.org>
+To: netdev@vger.kernel.org, netdev-driver-reviewers@vger.kernel.org
+Subject: [ANN] netdev call - Feb 11th
+Message-ID: <20250210084151.160d5d4f@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250206085034.1978172-3-sumang@marvell.com>
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-On Thu, Feb 06, 2025 at 02:20:30PM +0530, Suman Ghosh wrote:
-> Set xdp rx ring memory type as MEM_TYPE_PAGE_POOL for
-> af-xdp to work. This is needed since xdp_return_frame
-> internally will use page pools.
-> 
-> Fixes: 06059a1a9a4a ("octeontx2-pf: Add XDP support to netdev PF")
-> Signed-off-by: Suman Ghosh <sumang@marvell.com>
+Hi!
 
-Hi Suman,
+The bi-weekly call is scheduled for tomorrow at 8:30 am (PT) / 
+5:30 pm (~EU), at https://bbb.lwn.net/rooms/ldm-chf-zxx-we7/join
 
-If this is a bug fix then it should be targeted at net, which
-implies splitting it out of this patch-set.
-
-If, on the other hand, it is not a fix then it should not have a Fixes tag.
-In that case you can cite a commit using this syntax:
-
-commit 06059a1a9a4a ("octeontx2-pf: Add XDP support to netdev PF")
-
-Unlike a Fixes tag it:
-* Should be in the body of the patch description,
-  rather than part of the tags at the bottom of the patch description
-* May be line wrapped
-* Can me included in a sentence
+I'm not aware of any topics so please share some, if nobody
+does we'll cancel.
 
