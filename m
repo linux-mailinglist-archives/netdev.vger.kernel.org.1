@@ -1,318 +1,115 @@
-Return-Path: <netdev+bounces-164676-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-164677-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id B8697A2EA98
-	for <lists+netdev@lfdr.de>; Mon, 10 Feb 2025 12:08:03 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 49FCAA2EA9A
+	for <lists+netdev@lfdr.de>; Mon, 10 Feb 2025 12:08:16 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 20E443A30B9
-	for <lists+netdev@lfdr.de>; Mon, 10 Feb 2025 11:06:48 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 3CDF43A2694
+	for <lists+netdev@lfdr.de>; Mon, 10 Feb 2025 11:07:26 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E31F91EF1D;
-	Mon, 10 Feb 2025 11:06:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="AE8xFDbp"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 098091CAA98;
+	Mon, 10 Feb 2025 11:07:31 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.19])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ej1-f53.google.com (mail-ej1-f53.google.com [209.85.218.53])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C5B9F189B80
-	for <netdev@vger.kernel.org>; Mon, 10 Feb 2025 11:06:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=198.175.65.19
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1739185613; cv=fail; b=AudIFPs88vOJExjePC3be5/aL+8i0PhEfNUFJhfPRx90RmTTqfpJXWI1NMJaoeDnVLI1du6FLLu9r03pbdyIrUK7hdT707G/RAZSDrO9zqGQhaWs3U6FhddLt3L73Q3d41ISjRGQGWPB3u1uIcMlbzJC+B3qLC0K1Js0PBqPBb8=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1739185613; c=relaxed/simple;
-	bh=ZaAsDsY12MdfL/ExrKLWtx9Ep66G66zhCY09WUfzKSg=;
-	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
-	 Content-Type:MIME-Version; b=jK1lt6K/X/oh0M+rEc7KTKee5ldy8rZxG8eKr+uIHj4Y4ZWLIDcGQJxkRzk8/mZ5/FCh6Ow/mAEBGSUljIdScpNuP2oSjZ/aggDjbshasOPPUenpgnrBQqSPLV5SL63HzWk8tvCeYBobeLIv1Ik2CxyYdtnLSNR1YycHn060S5M=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=AE8xFDbp; arc=fail smtp.client-ip=198.175.65.19
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1739185611; x=1770721611;
-  h=from:to:cc:subject:date:message-id:references:
-   in-reply-to:content-transfer-encoding:mime-version;
-  bh=ZaAsDsY12MdfL/ExrKLWtx9Ep66G66zhCY09WUfzKSg=;
-  b=AE8xFDbpYHrqwarR14VCiN8Ba0gTNj821ks/gPHajUyrk3jMw35Nj58N
-   OxF5QzBZN55Nawme0DW6/xnSdc3Ca+WD9Wkjz3LuLu+vxG8q+9DM4Mcmq
-   p+d+JSkKO7+JRU24cAohUniWoVu1m0yXgNAAai4K4J8umoPgNvEeFZhkJ
-   Ldqxqo5vLZSUAMjOkhHg4yf04jiv2LuRQMBU8bPdlCNtNq/Dcs1VZOWv5
-   kHCiQyKHXY1lWfrN/TyjZv/qdlLVRZLqbQ5DNiR14nynUrEtEVreTY31A
-   UIOA8Lovh9FRGkJ6SWjw08VrCgCkyAbh3hzStnwgWUALNvMSZFWOKus5P
-   g==;
-X-CSE-ConnectionGUID: y2zE131FSiqNjxvl6GW/sw==
-X-CSE-MsgGUID: LLxbleE7SNKAfL6kB7uiDg==
-X-IronPort-AV: E=McAfee;i="6700,10204,11340"; a="39625728"
-X-IronPort-AV: E=Sophos;i="6.13,274,1732608000"; 
-   d="scan'208";a="39625728"
-Received: from orviesa006.jf.intel.com ([10.64.159.146])
-  by orvoesa111.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 10 Feb 2025 03:06:51 -0800
-X-CSE-ConnectionGUID: 17VT+zINTRyJK5S+P4/28Q==
-X-CSE-MsgGUID: Tx6W7qlIS/q5sIUXe4vYzQ==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.13,274,1732608000"; 
-   d="scan'208";a="112111898"
-Received: from orsmsx603.amr.corp.intel.com ([10.22.229.16])
-  by orviesa006.jf.intel.com with ESMTP/TLS/AES256-GCM-SHA384; 10 Feb 2025 03:06:51 -0800
-Received: from orsmsx601.amr.corp.intel.com (10.22.229.14) by
- ORSMSX603.amr.corp.intel.com (10.22.229.16) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.44; Mon, 10 Feb 2025 03:06:49 -0800
-Received: from ORSEDG601.ED.cps.intel.com (10.7.248.6) by
- orsmsx601.amr.corp.intel.com (10.22.229.14) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.44 via Frontend Transport; Mon, 10 Feb 2025 03:06:49 -0800
-Received: from NAM02-BN1-obe.outbound.protection.outlook.com (104.47.51.45) by
- edgegateway.intel.com (134.134.137.102) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.1.2507.44; Mon, 10 Feb 2025 03:06:49 -0800
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=HszbuAZvuu2qzIqPm7mIekzK7IOT7AnndonY2fvPXoGlTudUWYGoxj78VqKBPQTonz6T/XqVRMgS4qDnj4E2vPr8wwJWkolQq4quWq75BVmXJRuoGIix43Oi2UYUjbv8eD/QpxlhWWUUfsfqU3Ns6wMrtuVaLl33JOzNO3ZtimVLSusdCg0NjWC2otGurA3vlQ65/6uzW74SA/+xdRypyVs2ceLejEUN1FRc0J4V5mlpLUzenzHEd0ZEPTep9fzjq+8Lf6YpcVDtbFshtE+xhwUyVCr5nud/DkePOZpxMur9LYBoKifv1lQECw7hzzGnOhXhyTWeh/StBr5HfreXqA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=JWCch3V6JSU0ck5Qu2dz/jQ3ewhPcX2Sp296z0c64n0=;
- b=Swe1y13GqOFBaSVTemasgfYjdjlcifjfmVErcBnrnqKcOORAZYoPAvZ5U8CmBDMy+uC652Z9qnjoQ4LD/aNcHSjub7hiSDHlFxqYTV38W1QAoaYPuOwfl4Y6zddr+lcDS+vFNTYJa5kdlI5/69f6dE6JQL97ZATSF8IS2sv1uOWoXudZheSMpKmqTdT6FU79YZ9e8ksWccDXudQvpsH8jjiJUCWQ6YVnBtYGGYwm/HJPYJgYAaPrrgOctEXykD90BxE/vr2niiPmlWLnprDEHO95ZdIi7SrKHkxT2LGZCwqSwnM0UmtB5bSLQ1rVIArsTL4VFANvuX1xFJzrzQIm6Q==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
- dkim=pass header.d=intel.com; arc=none
-Received: from DS0PR11MB7785.namprd11.prod.outlook.com (2603:10b6:8:f1::8) by
- DM4PR11MB5246.namprd11.prod.outlook.com (2603:10b6:5:389::11) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.8422.18; Mon, 10 Feb 2025 11:06:47 +0000
-Received: from DS0PR11MB7785.namprd11.prod.outlook.com
- ([fe80::7a4d:ceff:b32a:ed18]) by DS0PR11MB7785.namprd11.prod.outlook.com
- ([fe80::7a4d:ceff:b32a:ed18%6]) with mapi id 15.20.8422.010; Mon, 10 Feb 2025
- 11:06:47 +0000
-From: "Jagielski, Jedrzej" <jedrzej.jagielski@intel.com>
-To: Simon Horman <horms@kernel.org>
-CC: "intel-wired-lan@lists.osuosl.org" <intel-wired-lan@lists.osuosl.org>,
-	"Nguyen, Anthony L" <anthony.l.nguyen@intel.com>, "netdev@vger.kernel.org"
-	<netdev@vger.kernel.org>, "Polchlopek, Mateusz"
-	<mateusz.polchlopek@intel.com>
-Subject: RE: [PATCH iwl-next v1 02/13] ixgbe: add handler for devlink
- .info_get()
-Thread-Topic: [PATCH iwl-next v1 02/13] ixgbe: add handler for devlink
- .info_get()
-Thread-Index: AQHbdk67/5/SL/GiukWEQRnGO/K977M/MmAAgAE4HAA=
-Date: Mon, 10 Feb 2025 11:06:47 +0000
-Message-ID: <DS0PR11MB7785F42A55BDDBA791D14AE9F0F22@DS0PR11MB7785.namprd11.prod.outlook.com>
-References: <20250203150328.4095-1-jedrzej.jagielski@intel.com>
- <20250203150328.4095-3-jedrzej.jagielski@intel.com>
- <20250209162722.GD554665@kernel.org>
-In-Reply-To: <20250209162722.GD554665@kernel.org>
-Accept-Language: pl-PL, en-US
-Content-Language: en-US
-X-MS-Has-Attach:
-X-MS-TNEF-Correlator:
-authentication-results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=intel.com;
-x-ms-publictraffictype: Email
-x-ms-traffictypediagnostic: DS0PR11MB7785:EE_|DM4PR11MB5246:EE_
-x-ms-office365-filtering-correlation-id: 10c551dc-3c12-4d8d-a22a-08dd49c3031b
-x-ms-exchange-senderadcheck: 1
-x-ms-exchange-antispam-relay: 0
-x-microsoft-antispam: BCL:0;ARA:13230040|376014|1800799024|366016|38070700018;
-x-microsoft-antispam-message-info: =?us-ascii?Q?IeUFkOMeOBfQ8QEmD9jLg/C5/o7/QfFW5GjIW3DcKuxpGwjx+Vf+KuBgNkIm?=
- =?us-ascii?Q?TScjDxZC3jZTDDmuhWYC5W9/iDVnaFrKQnXuCwCHCn312QN4P3U3KLs6swJR?=
- =?us-ascii?Q?De+EFA0DJURWT5y6xlaXdke4tMCRET6uQGMbP3KP+IKXld4z/ilq5jgq/6CJ?=
- =?us-ascii?Q?k+PWbVVyY0VPX6T0dDQp4ZK/7O5Y7/OfbNjBx3JZXJzoIQu/OvJH681lgpH5?=
- =?us-ascii?Q?53KV7RFmE/8IB6qmO7AHDeuBBeQYIgJneRpEuQ/n0qRNeC5IiH6SeLR0AEb5?=
- =?us-ascii?Q?MoyI5vAxty/M5nTW1Ls0nGT8oda1Zs+vR1+Xba8AYOWIvPDFwbdUQFm934of?=
- =?us-ascii?Q?kGvyr+hI0oIpXogb4o9euRTh6InS+h+cvTvy0a/IK9FzhjbRyVV90KGZeJWF?=
- =?us-ascii?Q?FmH7yZ3CF5gSd9eP5FN86AU8KCOZvlkkZZVkmRwzcGETXGHSv2UTFQo9qbKT?=
- =?us-ascii?Q?/rTg0fnWcupcy7OJeaBlUZ4gLRJ4wavKt8TGwivlo5igWHRv2kuJo7oMG7rh?=
- =?us-ascii?Q?jncvDL6Ifq912vBtPWR6G/hYPkyRUeC1dIptp0GBf3GdGbdBTAFnua8fy3jk?=
- =?us-ascii?Q?+suh6svnYxy5yPCwlbLFPR0X+h3TDOeU1WTnweleWEiT52VOcf126/DwmvKH?=
- =?us-ascii?Q?O+m4kNxBYAGyC2zxB5mAaeHqGwPTuEmeAjgLDyGHcHBoZoZwimtkDqWkYxrI?=
- =?us-ascii?Q?gRG3FMKo+4gvy1nOjsJYR34JZJwWNyUTGJBMWloL0Hi1bY2MCjIpNGe07AoY?=
- =?us-ascii?Q?HUoJtvgc+MqD2aEXWxcsenAkQXjv5B5tj6MtqPN4WiimZmX0p+gPV+5nbMUl?=
- =?us-ascii?Q?ZunNy7a3cMd+7z/JeE2JTr6ZnoGlfxRYfegRqs3bJVeLZh2jrv61xS5OxOtX?=
- =?us-ascii?Q?Bt2dlXU0YHbSsUW3gxJqYFFWgAytkJ6oU2k0lZpWTjZHxJn3JMIADYdSbhVd?=
- =?us-ascii?Q?NBlsU5xmsoabV44ePaNMU28HpBJR6PMr87XcvQgwxvfLwWt3wCao6lP16LZV?=
- =?us-ascii?Q?YPSQbl2GcIdrnLhE10XLKwxYIzxiq9Ldvs7t/ncUvg3GXgygAYv1lVLrVbUo?=
- =?us-ascii?Q?xYo2epM0MPxmnkMOLMfhB433ckCrqQeGhncyR4FrPT3WAvE9CrYZpH9dJXfU?=
- =?us-ascii?Q?oi18XAQOnO4kmMb93oWtPQcUz/yeY67+zPEGW7FQ7pZiOGcP/bho1mE7LsR2?=
- =?us-ascii?Q?zgh2xpekgG8osOlbNflpQ/+IP4LBYRQ4hxzxL+OcUi0RoOYB+jNFOkcp0/GE?=
- =?us-ascii?Q?SmRxjk0kaGWBvGU9TOGwfoJEwQSqzzTq/ipwNfm3owkY9UVT/h8BPzWJFFvr?=
- =?us-ascii?Q?QoAUggr4pnWcVUL4+0T8mRZZG11IsNAhDbwybJAuViLYmlNuzIGn7E1l0K3W?=
- =?us-ascii?Q?hULRwO/yYNVyHhcs5NMuCjH6u9ZNM/RbnrbEfc2FeR1XwA93XGOKd0oAcPWJ?=
- =?us-ascii?Q?IlXlcb/4+/QEVVl1Z99um3zF+/FHeo7l?=
-x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DS0PR11MB7785.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(376014)(1800799024)(366016)(38070700018);DIR:OUT;SFP:1101;
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0: =?us-ascii?Q?R65l3gYu4e6gQYwd3MKo8VJ/weqCKYAnl6v0R1hhYBuFDeFM0l5PZ4trH+qf?=
- =?us-ascii?Q?5sVyLntXeVgYdOpdxpCjW3QcSOFQv2m/WWoRKhWxjTltGU9GPjxtYkVCoI9o?=
- =?us-ascii?Q?UJUCHnzvXwB6g9+LhHyGqiQhMQBNPlfRCre3lHU+T32eMVYTzwEo10gpBXc1?=
- =?us-ascii?Q?H/3vHxfT3sK3bYsHv4lyjxblc2II/B932XUfepeyxrzyGewfrvFjBY2N2I/G?=
- =?us-ascii?Q?m1KGKvvZgO7EW5fA4xm/5TD4lU6PPyPohmx9FKVbju0F8nRHXGi4FczJSt0X?=
- =?us-ascii?Q?XuZNPB+RkqhPJ5Q2r+YnXo/G/oLa3d45nFPHX9TuuiH/db6pq7C3nSnRsk8Z?=
- =?us-ascii?Q?h2gvdmsO2D/tvitvsrXtFzix6qtVb8/jwg1ObW0Odinos9pDpizpTYTrExe1?=
- =?us-ascii?Q?c2E9FK65EcdET6Czw4lsObgzLG7XqnbMiKC5G+ial9JHyITcKsMlJUkWX3Js?=
- =?us-ascii?Q?YPzrUvkXgd85Q+b+SOqU4isKoHjBqxbVoPKoWf5mcs0iU906bTbjR5evy8e/?=
- =?us-ascii?Q?1Yy8I5H8GGqNcqKS/9QoM/NVmmEqqWvk5T7L+OrLqvosO46oEjZJUGgnV3nL?=
- =?us-ascii?Q?a0ZqQiEWxHWGFkMFC/So8drs5yuoaRnQNXG07U05KFPGcWbD0wYQ9ifey3CB?=
- =?us-ascii?Q?JaeypPRnTzZriV4t0cC0UKQ5VkmdJxh8DsmZ8vxo39RXBuK5lka36K9a+RoN?=
- =?us-ascii?Q?4geNWusHENlkcaJ8LFpKgyjyN15C6v+py5lSHtOBB7xb8p4O4dHgH/1JOwBa?=
- =?us-ascii?Q?NwbPvGlElex3DdRTNkQJe1R6F4rRNLLTXHK1nodaNZ8HrtWIIZrbn5FdhZy3?=
- =?us-ascii?Q?zA3V+djGVa4kdOOOpGnod9253hbNcXuoBbSsKUjJWVOQVr/F96jhhhHECrq9?=
- =?us-ascii?Q?89TP1ZQaro6+ppIAeevXIpy69cE96RdEo0OHs6Tm1QTi3NV1VgiXS+HZZoqm?=
- =?us-ascii?Q?aNJWyIXoCfbjt2zUSmUDlI3WhZV/DbQVIt50SNyqBDwed4PwAfc+1DgLdcyZ?=
- =?us-ascii?Q?1qY9LI767XDBrhWIeIf9R68ecdnbEbvrAbio0spt1BZqV2HMFcnWkdfzR5ov?=
- =?us-ascii?Q?wfx1+nW8LqniuA0XkuLctrOMnvAiNXVsiFFKPp/nJ/+QC7Gzy9oiQ38cLlEH?=
- =?us-ascii?Q?5AW2C1JYF627eqvPXHoSdNLxvio1uKAfDaO5yalwHUy0Bx/XhkRBmtQoYIe8?=
- =?us-ascii?Q?47FG1Zj59CtIQuYDTheoc6tJFUoj8QRHfagpHfBvkhjnvONw5k2iq5tJsThx?=
- =?us-ascii?Q?ywz3uB2iIqlDeOK3Qnndv9ReOriQTg0+XPtlk+Tn0Hn+gMpjggNv/COqXscJ?=
- =?us-ascii?Q?7b/j5bRxJUkiEYhx0lYY8ZGl08qsNFxTUiIxja8LWs4YxK/BJATRqRTh6qS7?=
- =?us-ascii?Q?AA0+sUlEvSCSjQ1jOiWbJF8VFFhTSLokv3gEagDw6J/tkwlKBjcxRg14pnJl?=
- =?us-ascii?Q?75HujBoFv3DJE4GeXsRZB8gBgWx3rZam6/XqVC1AeLTYvUa8VaAn5MQZbaWC?=
- =?us-ascii?Q?Q3fVLyg6OoR4xARBDC2UyVAnY+LQQDkyy6aeK8DnRzpIyl2IYqqaS18JM1O1?=
- =?us-ascii?Q?wC/uH2U9p9lOKSJP/NvjlHFWxGvQpue5Y17bHYn3?=
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 47E651EF1D;
+	Mon, 10 Feb 2025 11:07:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.53
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1739185650; cv=none; b=e08TZeXPJE+QAjpvOT1KVZ4t+6GaJ80hZDz11wN6cUFMStzIlco3QM6a/5XNsmAQkgHYKJGgUyNDKSmnGCONuDmYvScXC0hXnv44foNXVHSqRLKORjEJNL0SU/s5UpUzR+VUgstLxRD+t8B83EnpE+fRYls6sdP++WtvgVkqirM=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1739185650; c=relaxed/simple;
+	bh=p3RrExhhMbcybY++HDmJSat1lWJaRselOq7u0dkhjsI=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=Vfh5ay27sDWp79+f9SXU4YYUmIcgRjYFo8mDMD9bUzhZKeheD8HKKC/D6jbdeK7dBbpG4y7ZV2iAcMrAZbGAcXkjSydF77JXFt8Bk0CgYW4XycKnbnazVD1mg84tAS0bE3hRQGzZ8pR38aD1yo2YPZk4vcQhvvZr1CD1W9W2Blw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.218.53
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-ej1-f53.google.com with SMTP id a640c23a62f3a-ab77e266c71so598620066b.2;
+        Mon, 10 Feb 2025 03:07:28 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1739185647; x=1739790447;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=yAgZVVzs1qooCCE2t7DyLuVDHyt8kAQrNZT9NH7Ms9w=;
+        b=tFyvCPBV24llzcr8V9F/cFo6cp3N4ofXmEbfll+bezUsLq8crel4bw7eNEg6jT9aDb
+         4Bw3CeWvoRfUIoQ12KOQjcHRl6AZ8QOTp5duz5ey1ejDqTCUGocC9XFKkDGF8/vakDy2
+         Rmk+KlKVSETQN8TXjqFD9yO7E0kZ49z0M742QzGv+BwhhzJk4TGmpChfQvJ8lVwhkapq
+         vebxCM+t2Bw6S6OtpTe3dNxxvWEfuMAS5BptdQ9uGZuiPZuvbZyfpHWqdQRvUjziSLks
+         q/9G2hVu8kMHu6WirN2NlKoTHS7aeCx02Se5mYCYaMvz/n4/6lvgAH98kyIVqG33JY08
+         4o7Q==
+X-Forwarded-Encrypted: i=1; AJvYcCVFXAQERs+xq/kJ4MLzbt73BPhTLz0rm7yUz0/f8EHRNNpOr8Gcf6CproA9r+/dKSGRbBNmogk5OYEWgg2izba1@vger.kernel.org, AJvYcCW6ZS6pHevWG3WArxgVUf2eVvp71m5H+s3R2jb2LUpC3wed4D/t2K9nh0BmlEwwa76daBsD9WlCl+Ae3/YU@vger.kernel.org, AJvYcCWzeqRXRgfShEtxGQ+i5xNjqsi7NlvYW4s7LFzoMG0Dbz/JeNRvooVDTg038o1HdA749cmwLXt5jyQ=@vger.kernel.org, AJvYcCX/cKYmADmNwNw8+ivUzrhJHb/45B/yZMfqKnJpP83H6lBdX0uddWFrqjyBZeo8OvQ8kaCdUZXz@vger.kernel.org
+X-Gm-Message-State: AOJu0YyKPqtOekLb3LOv32jNdL2ThoXwMbLNIFBWTc394SjWvttoimja
+	imyembexSzgYCxn/3BCrzaDpt2S2OFj2qVbknAb2C4I7MveXmzcB
+X-Gm-Gg: ASbGncteTKyF+7t0JC1onnBFM0vK8sOUVgMrykFxyTOtCDypC8D1SPJCCP+vOmBO35e
+	RE/BTjPnT5ZvZ5YL3xVg7DyitmL/Zr6B+XqqvvGK8n780pypaffr2nv+0la6tVakn3UJpYkc10p
+	D0a4wN9SNeFn4kvmQ/9HG1MvBZ4n0KTvuL3YONAuW4QjUdZYbfaLJ2qS2CPE/uX68EPxZXa/H9G
+	cVeNu4LIsfW4Lgxy83ysSSDjBZGDkENfZVrbZ+JphHX7DU5xvEZar/z3UxN6235Rmr5rmPZ2fcm
+	dM4=
+X-Google-Smtp-Source: AGHT+IENAJlo7TsBJws4Qf1vo99U2cLsdl6/G/Z/CVxbymzOGRwCo/AL0b6oPbO9KfI+15t76NEuNQ==
+X-Received: by 2002:a17:906:e4a:b0:ab7:cc43:c51e with SMTP id a640c23a62f3a-ab7cc43cffamr144056666b.13.1739185647150;
+        Mon, 10 Feb 2025 03:07:27 -0800 (PST)
+Received: from gmail.com ([2a03:2880:30ff::])
+        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-ab7ced6fe0dsm68989466b.179.2025.02.10.03.07.25
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 10 Feb 2025 03:07:26 -0800 (PST)
+Date: Mon, 10 Feb 2025 03:07:24 -0800
+From: Breno Leitao <leitao@debian.org>
+To: Bagas Sanjaya <bagasdotme@gmail.com>
+Cc: Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Simon Horman <horms@kernel.org>, Jonathan Corbet <corbet@lwn.net>,
+	Shuah Khan <shuah@kernel.org>, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org, linux-doc@vger.kernel.org,
+	linux-kselftest@vger.kernel.org, rdunlap@infradead.org,
+	kernel-team@meta.com
+Subject: Re: [PATCH net-next v5 8/8] netconsole: docs: Add documentation for
+ CPU number auto-population
+Message-ID: <20250210-crafty-snobbish-pogona-83e904@leitao>
+References: <20250206-netcon_cpu-v5-0-859b23cc3826@debian.org>
+ <20250206-netcon_cpu-v5-8-859b23cc3826@debian.org>
+ <Z6Vm3ny5VN6mcKJN@archie.me>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: DS0PR11MB7785.namprd11.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 10c551dc-3c12-4d8d-a22a-08dd49c3031b
-X-MS-Exchange-CrossTenant-originalarrivaltime: 10 Feb 2025 11:06:47.5776
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 46c98d88-e344-4ed4-8496-4ed7712e255d
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: 7bDwdkM24NDoAobOVFgysBInZd//w50xttRZFjuXJuS6in+5gzt9uEHDpjbYXrLJs53LV7UUzQo0Z3PDDBEzDVZ+GWb5d8PWgKR4p+Suk54=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM4PR11MB5246
-X-OriginatorOrg: intel.com
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <Z6Vm3ny5VN6mcKJN@archie.me>
 
-From: Simon Horman <horms@kernel.org>=20
-Sent: Sunday, February 9, 2025 5:27 PM
->On Mon, Feb 03, 2025 at 04:03:17PM +0100, Jedrzej Jagielski wrote:
->> Provide devlink .info_get() callback implementation to allow the
->> driver to report detailed version information. The following info
->> is reported:
->>=20
->>  "serial_number" -> The PCI DSN of the adapter
->>  "fw.bundle_id" -> Unique identifier for the combined flash image
->>  "fw.undi" -> Version of the Option ROM containing the UEFI driver
->>  "board.id" -> The PBA ID string
->>=20
->> Reviewed-by: Mateusz Polchlopek <mateusz.polchlopek@intel.com>
->> Signed-off-by: Jedrzej Jagielski <jedrzej.jagielski@intel.com>
->
->...
->
->> diff --git a/drivers/net/ethernet/intel/ixgbe/devlink/devlink.c b/driver=
-s/net/ethernet/intel/ixgbe/devlink/devlink.c
->
->...
->
->> +static void ixgbe_info_nvm_ver(struct ixgbe_adapter *adapter,
->> +			       struct ixgbe_info_ctx *ctx)
->> +{
->> +	struct ixgbe_hw *hw =3D &adapter->hw;
->> +	struct ixgbe_nvm_version nvm_ver;
->> +
->> +	ixgbe_get_oem_prod_version(hw, &nvm_ver);
->> +	if (nvm_ver.oem_valid) {
->> +		snprintf(ctx->buf, sizeof(ctx->buf), "%x.%x.%x",
->> +			 nvm_ver.oem_major, nvm_ver.oem_minor,
->> +			 nvm_ver.oem_release);
->> +
->> +		return;
->> +	}
->> +
->> +	ixgbe_get_orom_version(hw, &nvm_ver);
->> +	if (nvm_ver.or_valid)
->> +		snprintf(ctx->buf, sizeof(ctx->buf), "%d.%d.%d",
->> +			 nvm_ver.or_major, nvm_ver.or_build, nvm_ver.or_patch);
->
->Hi Jedrzej,
->
->If neither of the conditions above are met then it seems that ctx->buf wil=
-l
->contain whatever string was present when the function was called. Is
->something like the following needed here?
->
->	ctx->buf[0] =3D '\0';
+Hello Bagas,
 
-Hi Simon,
-thanks for suggestion, it's definitely worth do be incorporated in the next
-revision.
+On Fri, Feb 07, 2025 at 08:50:22AM +0700, Bagas Sanjaya wrote:
+> On Thu, Feb 06, 2025 at 03:05:59AM -0800, Breno Leitao wrote:
+> > +.. note::
+> > +
+> > +   If the user has set a conflicting `cpu` key in the userdata dictionary,
+> > +   both keys will be reported, with the kernel-populated entry appearing after
+> > +   the user one. For example::
+> 
+> In that case, shouldn't the kernel autopopulates numbers of the rest of
+> CPUs?
 
-Thanks!
+Do you mean listing all the CPUs that are *not* sending the current
+message?
 
->
->> +}
->> +
->> +static void ixgbe_info_eetrack(struct ixgbe_adapter *adapter,
->> +			       struct ixgbe_info_ctx *ctx)
->> +{
->> +	struct ixgbe_hw *hw =3D &adapter->hw;
->> +	struct ixgbe_nvm_version nvm_ver;
->> +
->> +	ixgbe_get_oem_prod_version(hw, &nvm_ver);
->> +	/* No ETRACK version for OEM */
->> +	if (nvm_ver.oem_valid)
->> +		return;
->
->Likewise, here.
->
->> +
->> +	ixgbe_get_etk_id(hw, &nvm_ver);
->> +	snprintf(ctx->buf, sizeof(ctx->buf), "0x%08x", nvm_ver.etk_id);
->> +}
->> +
->> +static int ixgbe_devlink_info_get(struct devlink *devlink,
->> +				  struct devlink_info_req *req,
->> +				  struct netlink_ext_ack *extack)
->> +{
->> +	struct ixgbe_devlink_priv *devlink_private =3D devlink_priv(devlink);
->> +	struct ixgbe_adapter *adapter =3D devlink_private->adapter;
->> +	struct ixgbe_hw *hw =3D &adapter->hw;
->> +	struct ixgbe_info_ctx *ctx;
->> +	int err;
->> +
->> +	ctx =3D kmalloc(sizeof(*ctx), GFP_KERNEL);
->> +	if (!ctx)
->> +		return -ENOMEM;
->> +
->> +	ixgbe_info_get_dsn(adapter, ctx);
->> +	err =3D devlink_info_serial_number_put(req, ctx->buf);
->> +	if (err)
->> +		goto free_ctx;
->> +
->> +	ixgbe_info_nvm_ver(adapter, ctx);
->> +	err =3D ixgbe_devlink_info_put(req, IXGBE_DL_VERSION_RUNNING,
->> +				     DEVLINK_INFO_VERSION_GENERIC_FW_UNDI,
->> +				     ctx->buf);
->> +	if (err)
->> +		goto free_ctx;
->> +
->> +	ixgbe_info_eetrack(adapter, ctx);
->> +	err =3D ixgbe_devlink_info_put(req, IXGBE_DL_VERSION_RUNNING,
->> +				     DEVLINK_INFO_VERSION_GENERIC_FW_BUNDLE_ID,
->> +				     ctx->buf);
->> +	if (err)
->> +		goto free_ctx;
->> +
->> +	err =3D ixgbe_read_pba_string_generic(hw, ctx->buf, sizeof(ctx->buf));
->> +	if (err)
->> +		goto free_ctx;
->> +
->> +	err =3D ixgbe_devlink_info_put(req, IXGBE_DL_VERSION_FIXED,
->> +				     DEVLINK_INFO_VERSION_GENERIC_BOARD_ID,
->> +				     ctx->buf);
->> +free_ctx:
->> +	kfree(ctx);
->> +	return err;
->> +}
->
->...
+Let me come up with an example to try to understand this better. Let's
+suppopse I have a machine with 64 cores, and cpu=42 is sending that
+current message, then I would see the following on the dictionary:
+
+ cpu=42
+
+You are suggesting we send all the other cpus, except 42 in a "key"?
+
+Thanks
+--breno
 
