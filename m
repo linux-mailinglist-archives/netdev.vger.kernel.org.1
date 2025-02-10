@@ -1,97 +1,183 @@
-Return-Path: <netdev+bounces-164640-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-164641-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0D5B9A2E92E
-	for <lists+netdev@lfdr.de>; Mon, 10 Feb 2025 11:24:34 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 18A0FA2E93B
+	for <lists+netdev@lfdr.de>; Mon, 10 Feb 2025 11:25:07 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id B690C7A3E70
-	for <lists+netdev@lfdr.de>; Mon, 10 Feb 2025 10:23:36 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 694D07A3386
+	for <lists+netdev@lfdr.de>; Mon, 10 Feb 2025 10:24:10 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 903261D61B5;
-	Mon, 10 Feb 2025 10:19:15 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C10DC1E0B66;
+	Mon, 10 Feb 2025 10:21:06 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="M52Tf+wi"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Mm+DtC/f"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 647531D47C7;
-	Mon, 10 Feb 2025 10:19:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 688A31E04BE
+	for <netdev@vger.kernel.org>; Mon, 10 Feb 2025 10:21:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1739182755; cv=none; b=R13NL53+PBDfrmau3tLOCBZEY/OKmf8Z9DgnGzfBgDPgGooXLw5EaWUasi0vCcd+5/NxM7LIvZsx6p8REayBfqq4DC9oKcsPEb00i4QQP2TNM0rmX2iyliCwyvkPnI4BXJtQb8a3FqsdetWU8R1BHJNQ549QbjD5DuwPEXfhhE4=
+	t=1739182866; cv=none; b=ay3SYppLPK3P6MOip9KBFDUlX4IorR92ZnTVBliK9DghoHZtl/0HZ63nNI62jW322eoWZq1BWn33StgtasmJJp2B/b/apEoyaKKAp2hXMpUhc+vhOnZLh9f7ks7mAE/wdoH2edGYfSu0tXzPHvNJXVINBDfNG/UuNpAVtQ9XcnE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1739182755; c=relaxed/simple;
-	bh=Xhm1EhuWSeR0HnKbycECrEOCwoXKQXTmtIjJmXXW/G8=;
+	s=arc-20240116; t=1739182866; c=relaxed/simple;
+	bh=SjxpoViRRUJMYf5HMy2R9EEQje7spE+QwEA9cDQhYV8=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=VQUTfEmpzRX0pOPVNK2ZJxsjDs4Lss1Lo9j3XuGRNY7KGl0sF9sagz6a5uoI9R6FLto3g6jQ/ANC5hvLRvBZrhkn9jHf1fx4vzg4CrkE+AkQ68OUS/4tjuMeSz6WVJDWR0gZkMrY7JHwmTGKxlwLlezpogg8/2alhMenhy/Kl2w=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=M52Tf+wi; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 48CABC4CED1;
-	Mon, 10 Feb 2025 10:19:13 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1739182755;
-	bh=Xhm1EhuWSeR0HnKbycECrEOCwoXKQXTmtIjJmXXW/G8=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=M52Tf+wiSyn/N0JgepdvasifZj0RiK/ofryUtmeYDrx5xGiCDD7Z4IHdLUvxvEPnH
-	 ZE2GaG73x3m+U53r3h00/BRLb4gTA5KCFt0rMLfdAUupPGef4mdXlJjMJaWJ17XFK1
-	 bA1RiPRgVnCQhVUrvpOVqwSZAmvwqto48rmkkwHZTWXvTRIGG2FM7qy8ONy+ewLAX6
-	 R0C9vdXqSqwRk19lpGUV3Xec1C5HqgMMYZeXAmfM8m3I3BsSJDku2eSsnB9Fzd9v+J
-	 EW3dZdjYiyUTLm/FIws9sDSHPoWSnLMPENuVHnnnmQ6j9+yz4eM/P47jbcXR1Yn7wD
-	 Mu+eS6qmCI+DA==
-Date: Mon, 10 Feb 2025 11:19:11 +0100
-From: Krzysztof Kozlowski <krzk@kernel.org>
-To: Steffen Trumtrar <s.trumtrar@pengutronix.de>
-Cc: Andrew Lunn <andrew+netdev@lunn.ch>, 
-	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Rob Herring <robh@kernel.org>, 
-	Krzysztof Kozlowski <krzk+dt@kernel.org>, Conor Dooley <conor+dt@kernel.org>, 
-	Dinh Nguyen <dinguyen@kernel.org>, kernel@pengutronix.de, netdev@vger.kernel.org, 
-	devicetree@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v4 1/6] dt-bindings: socfpga-dwmac: fix typo
-Message-ID: <20250210-calm-oriole-of-experiment-17a66c@krzk-bin>
-References: <20250205-v6-12-topic-socfpga-agilex5-v4-0-ebf070e2075f@pengutronix.de>
- <20250205-v6-12-topic-socfpga-agilex5-v4-1-ebf070e2075f@pengutronix.de>
+	 Content-Type:Content-Disposition:In-Reply-To; b=eQ00TRnYst6l2bDoito1VeCl3k8KWP8zi2YCak/aYhBPzwJ8Y+4Ru9sbsIM2fXWjNSexBWVK0JEaDO9s6ILDwbspSjJf3rQeNyttaTrmV+iS1B0RGqC9D2bBZk3WPS715rWVLOc6nl77cB/ud6ZixLOZZDEwP66PSep6N7o5QA8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=Mm+DtC/f; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1739182862;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=kcc7oTQuTQ+nV5fDZHirwJ8W3b89Pi6Do8TO5JtQzXY=;
+	b=Mm+DtC/fOorRRcb4VfmIZT0v08eGLSLOo+rlFbOm7/P8FQJ/NCwgK+ykw5NCz9JHzjf8pd
+	XjtmDAWR+/EOPDTv8CAcl8+rivnzilC3/KqyPKV2eTfh+ehRJhDEOo1GuuDHX+Yh4XTMvX
+	jsWYN6jiKIi7VqDVa35D2l27I4nD1BU=
+Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com
+ [209.85.221.72]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-607-2lxnfgZjMzmx-HS49nS9Rg-1; Mon, 10 Feb 2025 05:21:01 -0500
+X-MC-Unique: 2lxnfgZjMzmx-HS49nS9Rg-1
+X-Mimecast-MFC-AGG-ID: 2lxnfgZjMzmx-HS49nS9Rg
+Received: by mail-wr1-f72.google.com with SMTP id ffacd0b85a97d-38dd533dad0so992646f8f.0
+        for <netdev@vger.kernel.org>; Mon, 10 Feb 2025 02:21:00 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1739182860; x=1739787660;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=kcc7oTQuTQ+nV5fDZHirwJ8W3b89Pi6Do8TO5JtQzXY=;
+        b=J2+jieKFrGfeH+ClwcvXmCkb23SLbBflPSsXUOicPL/MrSeFEArZkWz9K0tDbXpevS
+         uU+r3MizISxRYKxSL15JMpG4FMr0nPB4GV3Bs6hU9uwxiif7Z5IIyfNJGrilHh4Q3JeD
+         fz8VfRtipSWQkMXRWay57GuiewnUpRLp9JbZo0XB7cTzuj8ROoZER2fa1u3xD1CpAfg7
+         Vt/0j9Q32L18I8/zD2ov2fXOBzzJCQmPYo5g/OncQbHzh3c4ZlDuPxbsyb43LdyzJ3Lz
+         UFyqdON1ZqkY+hT5HAIzn5THBcxmJzODg+W8Y5/JVd3WpmKNkJEVr6C87A6Npo08LcvB
+         EBZw==
+X-Forwarded-Encrypted: i=1; AJvYcCXYYSjK0jl8T0QZyPecUZ6qTyt3UluvBhDWutwoAU1BPmbqhYs+CzoV0dVc1hJHvetTwFi/4p8=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yx8lwbF+xF634hYx8msE++9pkAqkcchJ9bwZoXqW374PEG+MAAn
+	R4bcSywHyHdSSOXEM8vn4hQUKnEjPebkULYQECvgWBrnGL0US2tG0L5zQBl4zh1/3fO0Onb1lSm
+	vNDdZuJcweJUuVYMQ8aqeqfAFVjKtbrZEb0ade8Q5+Ru/+3lE4cnTDA==
+X-Gm-Gg: ASbGncuk5F2OaP876Y8B+COOvz+zJayFbWMy9XpFmAiuKhXwmwkCnCqR7v3o7k0Xgr2
+	k1j5Bqmol+G775DqYHL6EJhX+PSmcSjvj4Jgo9ybRAyff8uv1EOiy3RwBfUj2vB63XsEB0W4fdc
+	Hsapm4ipY6o9deotdtPVfiZetMVTomyn+c8qAvZ6qxfz4rmVlSi68dLquIp2kePKKhsw5g+e8Cj
+	PbizV89F67E1VzW0qsfpC1yI1ltEXOFEUN/A4m9xYRcoKyTdjYIN/tGGshThLLTUqrnPeYApRE2
+	KO9Cif4i7doQQpVCK5W0Zvg9rV0fAAiulhotQM2skSGvTQEwJoEOPA==
+X-Received: by 2002:a05:6000:1f84:b0:38d:caf1:41b8 with SMTP id ffacd0b85a97d-38dcaf14441mr9077695f8f.39.1739182859954;
+        Mon, 10 Feb 2025 02:20:59 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IHmjXX8GoNn0vwO6RsrfVCcVr00Q6EZB4atQh0jOxGjhyit3nNGsDQXvL/8qDaU0AwyNh8ifw==
+X-Received: by 2002:a05:6000:1f84:b0:38d:caf1:41b8 with SMTP id ffacd0b85a97d-38dcaf14441mr9077649f8f.39.1739182859367;
+        Mon, 10 Feb 2025 02:20:59 -0800 (PST)
+Received: from sgarzare-redhat (host-79-46-200-29.retail.telecomitalia.it. [79.46.200.29])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-38dc2f6aeafsm10789246f8f.20.2025.02.10.02.20.58
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 10 Feb 2025 02:20:58 -0800 (PST)
+Date: Mon, 10 Feb 2025 11:20:54 +0100
+From: Stefano Garzarella <sgarzare@redhat.com>
+To: Michal Luczaj <mhal@rbox.co>
+Cc: "David S. Miller" <davem@davemloft.net>, 
+	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
+	Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, netdev@vger.kernel.org, 
+	Luigi Leonardi <leonardi@redhat.com>
+Subject: Re: [PATCH net v2 2/2] vsock/test: Add test for SO_LINGER null ptr
+ deref
+Message-ID: <s4jllsolwiqdd4uwgytb2zbofnaujh34bhwrtaikup75zoqrko@uds74ecujnh3>
+References: <20250206-vsock-linger-nullderef-v2-0-f8a1f19146f8@rbox.co>
+ <20250206-vsock-linger-nullderef-v2-2-f8a1f19146f8@rbox.co>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii; format=flowed
 Content-Disposition: inline
-In-Reply-To: <20250205-v6-12-topic-socfpga-agilex5-v4-1-ebf070e2075f@pengutronix.de>
+In-Reply-To: <20250206-vsock-linger-nullderef-v2-2-f8a1f19146f8@rbox.co>
 
-On Wed, Feb 05, 2025 at 04:32:22PM +0100, Steffen Trumtrar wrote:
-> The phandle to the SGMII converter must be called
-> "altr,gmii-to-sgmii-converter".
-> 
-> This is how the phandle is called in the example and the driver. As
-> there are no upstream users of this binding anyway, this shouldn't
-> break anything.
-> 
-> Signed-off-by: Steffen Trumtrar <s.trumtrar@pengutronix.de>
-> ---
->  Documentation/devicetree/bindings/net/socfpga-dwmac.txt | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
-> 
-> diff --git a/Documentation/devicetree/bindings/net/socfpga-dwmac.txt b/Documentation/devicetree/bindings/net/socfpga-dwmac.txt
-> index 612a8e8abc88774619f4fd4e9205a3dd32226a9b..67784463f6f5a3ba7d2e10810810ab2d51715842 100644
-> --- a/Documentation/devicetree/bindings/net/socfpga-dwmac.txt
-> +++ b/Documentation/devicetree/bindings/net/socfpga-dwmac.txt
-> @@ -24,7 +24,7 @@ Optional properties:
->  altr,emac-splitter: Should be the phandle to the emac splitter soft IP node if
->  		DWMAC controller is connected emac splitter.
->  phy-mode: The phy mode the ethernet operates in
-> -altr,sgmii-to-sgmii-converter: phandle to the TSE SGMII converter
-> +altr,gmii-to-sgmii-converter: phandle to the TSE SGMII converter
+On Thu, Feb 06, 2025 at 12:06:48AM +0100, Michal Luczaj wrote:
+>Explicitly close() a TCP_ESTABLISHED (connectible) socket with SO_LINGER
+>enabled.
+>
+>As for now, test does not verify if close() actually lingers.
+>On an unpatched machine, may trigger a null pointer dereference.
+>
+>Tested-by: Luigi Leonardi <leonardi@redhat.com>
+>Signed-off-by: Michal Luczaj <mhal@rbox.co>
+>---
+> tools/testing/vsock/vsock_test.c | 41 ++++++++++++++++++++++++++++++++++++++++
+> 1 file changed, 41 insertions(+)
 
-You remove it in the next patch, so just squash it and mention any
-changes done during conversion. This is noop otherwise.
+Reviewed-by: Stefano Garzarella <sgarzare@redhat.com>
 
-Best regards,
-Krzysztof
+>
+>diff --git a/tools/testing/vsock/vsock_test.c b/tools/testing/vsock/vsock_test.c
+>index dfff8b288265f96b602cb1bfa0e6dce02f114222..d0f6d253ac72d08a957cb81a3c38fcc72bec5a53 100644
+>--- a/tools/testing/vsock/vsock_test.c
+>+++ b/tools/testing/vsock/vsock_test.c
+>@@ -1788,6 +1788,42 @@ static void test_stream_connect_retry_server(const struct test_opts *opts)
+> 	close(fd);
+> }
+>
+>+static void test_stream_linger_client(const struct test_opts *opts)
+>+{
+>+	struct linger optval = {
+>+		.l_onoff = 1,
+>+		.l_linger = 1
+>+	};
+>+	int fd;
+>+
+>+	fd = vsock_stream_connect(opts->peer_cid, opts->peer_port);
+>+	if (fd < 0) {
+>+		perror("connect");
+>+		exit(EXIT_FAILURE);
+>+	}
+>+
+>+	if (setsockopt(fd, SOL_SOCKET, SO_LINGER, &optval, sizeof(optval))) {
+>+		perror("setsockopt(SO_LINGER)");
+>+		exit(EXIT_FAILURE);
+>+	}
+>+
+>+	close(fd);
+>+}
+>+
+>+static void test_stream_linger_server(const struct test_opts *opts)
+>+{
+>+	int fd;
+>+
+>+	fd = vsock_stream_accept(VMADDR_CID_ANY, opts->peer_port, NULL);
+>+	if (fd < 0) {
+>+		perror("accept");
+>+		exit(EXIT_FAILURE);
+>+	}
+>+
+>+	vsock_wait_remote_close(fd);
+>+	close(fd);
+>+}
+>+
+> static struct test_case test_cases[] = {
+> 	{
+> 		.name = "SOCK_STREAM connection reset",
+>@@ -1943,6 +1979,11 @@ static struct test_case test_cases[] = {
+> 		.run_client = test_stream_connect_retry_client,
+> 		.run_server = test_stream_connect_retry_server,
+> 	},
+>+	{
+>+		.name = "SOCK_STREAM SO_LINGER null-ptr-deref",
+>+		.run_client = test_stream_linger_client,
+>+		.run_server = test_stream_linger_server,
+>+	},
+> 	{},
+> };
+>
+>
+>-- 
+>2.48.1
+>
 
 
