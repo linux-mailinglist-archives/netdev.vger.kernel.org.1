@@ -1,61 +1,61 @@
-Return-Path: <netdev+bounces-164897-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-164898-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id D2BB7A2F898
-	for <lists+netdev@lfdr.de>; Mon, 10 Feb 2025 20:25:05 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id A5D89A2F896
+	for <lists+netdev@lfdr.de>; Mon, 10 Feb 2025 20:24:59 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id D1EDB188B379
-	for <lists+netdev@lfdr.de>; Mon, 10 Feb 2025 19:24:52 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B8236168FA9
+	for <lists+netdev@lfdr.de>; Mon, 10 Feb 2025 19:24:54 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 707422586F1;
-	Mon, 10 Feb 2025 19:24:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3B3F3259499;
+	Mon, 10 Feb 2025 19:24:11 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="K+Qyc/0K"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="fWXqfJ52"
 X-Original-To: netdev@vger.kernel.org
 Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 723ED25743C;
-	Mon, 10 Feb 2025 19:24:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6EAE0257447;
+	Mon, 10 Feb 2025 19:24:09 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1739215450; cv=none; b=WzILftWPtJJyt4lYI6cGztDaWfX4S8/oXVoqJDj1cJyzeOHHjPbuCMvC6tTg2dLZEDUjJO9T3LAGL0UxMbwHCxmk5RSFcqF6Vy2zbBV52MxhQ6HXQz4341hhnF4jgo2K/O7M/1AZTRQCB0bFgujvO6T21HsmStkbkytaJrIXcyI=
+	t=1739215451; cv=none; b=dzrwi0g5/EZheVdIuOwb0+nwqVBHubamdZaC5+L63SGsTqqBea2b4SL0IKpUK1Stgml+FMy/sWEFd6ZNJhS7mSiksryEjb9k8gzYKxfPFnVjVQfaNNPMpXpGJI7XIeDKbMUAmJl2MCgCx8dwPCjrIae6ceL/f6bL8oCyRLFQu6Q=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1739215450; c=relaxed/simple;
-	bh=wjGi3TMzL6IYIJTtBfNvej5jpj7kuEV6x+Qp5PlfwvE=;
+	s=arc-20240116; t=1739215451; c=relaxed/simple;
+	bh=cj0NxklMDpQLejnIH1WTb5QzUrFHN/+zrlInglvaL7o=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=ECurAovWBuuyto41xbsiWeKxq5ZM2xs8ZvqirzVc/jzMyk3Q8Cf+sIEJdu6X/8h0Iwuq22MMB6FOVLfzi7XQJOyrczrITSwt//rE6TKGKTHckOnbYuV/QqMy0GaAYhLfHjPLdqabcyWV0HdvH+G1Iu5MMsU2mQrEDEuIjRVpoMs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=K+Qyc/0K; arc=none smtp.client-ip=198.175.65.18
+	 MIME-Version; b=IP1p0I10S5KjreHNsRbAbpufpG8I/6sYqlxWoHql7/0mpT2OG9PuL4hj3ehWwcW2AVZ72EvPpES9PCagqRi1vFtsEwUJv2IAuKRsWO7LWoyibe/k4IeZ60z0L78dKj65hTUqcTUTpxbf2bxNs+ZuONYdwhamK1YyzjhdO3DG9tQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=fWXqfJ52; arc=none smtp.client-ip=198.175.65.18
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1739215448; x=1770751448;
+  t=1739215449; x=1770751449;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=wjGi3TMzL6IYIJTtBfNvej5jpj7kuEV6x+Qp5PlfwvE=;
-  b=K+Qyc/0KchfS0s3Nv0JCLgXT7cqU6xIwAUeSfLOBI3ycMI93PbDfdbTl
-   OVuUJjyl6Tg29iBI59EhjUuteujCJGT1Iqd+9YeHXQ12AJovZVHIjReTL
-   F/CftwSuH0Cnp1ZHZ1155IUz9tJOs6Nry7Inah2Ylak1yKzdthoPvC+c0
-   icnv3nMDeu++MqX8x7IL0YHyqFA3fm7fnngAhkHNtEwAGmbcR9MclOOgE
-   sxmI9qkfxcx3V02GTKD+Wbdtw7v7gaWFvAXzerngTx0w+0i5YeQ/GGFoN
-   NQRxHlxtQTBl/I+3YYqJa1SHyYhBNGDvMqypGul74A5qmcFz+TWDG7Wlz
-   w==;
-X-CSE-ConnectionGUID: 1d7LUwXdQ6OgsvAJT/m6ZA==
-X-CSE-MsgGUID: mAP4IAjwSTe4HRdgxdsJUw==
-X-IronPort-AV: E=McAfee;i="6700,10204,11314"; a="39929264"
+  bh=cj0NxklMDpQLejnIH1WTb5QzUrFHN/+zrlInglvaL7o=;
+  b=fWXqfJ52YP7N5BhiEgoWDx7mysRiIHxbk/CbPaIR2K8qPJXCFzs+fjuU
+   MUbQSQTdEkxGQNWnBWcXxPY7dZnAHFrefZrA8c+xVPpc1R1TZ0JtR/i1k
+   wF3E6Q/IcavmDum0BoQlXW/2NlTWN/vfpeA8iMjnm01d3wQmxA6SrGnNX
+   2GS1jsZ4JQDR/7qMjN4OFZx1klk3d3pVgy3nlGbBltpsLY13Z/3Odi3pT
+   KnCicV+XYMpDRY9wsTNNHmiSyTAolqSMeN0SCkc6Znu3fv+jTW7rnBdgl
+   JWv9STtElXRe7lp6IqN7YDC81Ke/ulCzmsRcWOKu8Q+zTmsxwKpBTViH9
+   A==;
+X-CSE-ConnectionGUID: s1J0MzjCQ/KuTr4IOkkGdA==
+X-CSE-MsgGUID: gqUxIsNZTmOSTjjfDMOOBA==
+X-IronPort-AV: E=McAfee;i="6700,10204,11314"; a="39929272"
 X-IronPort-AV: E=Sophos;i="6.12,310,1728975600"; 
-   d="scan'208";a="39929264"
+   d="scan'208";a="39929272"
 Received: from orviesa007.jf.intel.com ([10.64.159.147])
   by orvoesa110.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 10 Feb 2025 11:24:02 -0800
-X-CSE-ConnectionGUID: RWE7oCN6S7uxP4Hq2U55gw==
-X-CSE-MsgGUID: kPmXicKbSSWr10pPb+vPuA==
+X-CSE-ConnectionGUID: pb56rcPzQga0E2NUYXNUOg==
+X-CSE-MsgGUID: FFY66tXgQZODJGnN7mwcKw==
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="6.12,224,1728975600"; 
-   d="scan'208";a="112733888"
+   d="scan'208";a="112733895"
 Received: from anguy11-upstream.jf.intel.com ([10.166.9.133])
   by orviesa007.jf.intel.com with ESMTP; 10 Feb 2025 11:24:02 -0800
 From: Tony Nguyen <anthony.l.nguyen@intel.com>
@@ -65,22 +65,25 @@ To: davem@davemloft.net,
 	edumazet@google.com,
 	andrew+netdev@lunn.ch,
 	netdev@vger.kernel.org
-Cc: Song Yoong Siang <yoong.siang.song@intel.com>,
+Cc: Gerhard Engleder <eg@keba.com>,
 	anthony.l.nguyen@intel.com,
+	przemyslaw.kitszel@intel.com,
+	aleksander.lobakin@intel.com,
+	gerhard@engleder-embedded.com,
+	rostedt@goodmis.org,
+	bigeasy@linutronix.de,
+	clrkwllms@kernel.org,
+	linux-rt-devel@lists.linux.dev,
+	linux-pci@vger.kernel.org,
+	bhelgaas@google.com,
+	pmenzel@molgen.mpg.de,
 	vitaly.lifshits@intel.com,
 	dima.ruinskiy@intel.com,
-	vinicius.gomes@intel.com,
-	maciej.fijalkowski@intel.com,
-	magnus.karlsson@intel.com,
-	ast@kernel.org,
-	daniel@iogearbox.net,
-	hawk@kernel.org,
-	john.fastabend@gmail.com,
-	bpf@vger.kernel.org,
-	Avigail Dahan <avigailx.dahan@intel.com>
-Subject: [PATCH net-next 09/10] igc: Avoid unnecessary link down event in XDP_SETUP_PROG process
-Date: Mon, 10 Feb 2025 11:23:47 -0800
-Message-ID: <20250210192352.3799673-10-anthony.l.nguyen@intel.com>
+	Avigail Dahan <avigailx.dahan@intel.com>,
+	Simon Horman <horms@kernel.org>
+Subject: [PATCH net-next 10/10] e1000e: Fix real-time violations on link up
+Date: Mon, 10 Feb 2025 11:23:48 -0800
+Message-ID: <20250210192352.3799673-11-anthony.l.nguyen@intel.com>
 X-Mailer: git-send-email 2.47.1
 In-Reply-To: <20250210192352.3799673-1-anthony.l.nguyen@intel.com>
 References: <20250210192352.3799673-1-anthony.l.nguyen@intel.com>
@@ -92,131 +95,85 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-From: Song Yoong Siang <yoong.siang.song@intel.com>
+From: Gerhard Engleder <eg@keba.com>
 
-The igc_close()/igc_open() functions are too drastic for installing a new
-XDP prog because they cause undesirable link down event and device reset.
+Link down and up triggers update of MTA table. This update executes many
+PCIe writes and a final flush. Thus, PCIe will be blocked until all
+writes are flushed. As a result, DMA transfers of other targets suffer
+from delay in the range of 50us. This results in timing violations on
+real-time systems during link down and up of e1000e in combination with
+an Intel i3-2310E Sandy Bridge CPU.
 
-To avoid delays in Ethernet traffic, improve the XDP_SETUP_PROG process by
-using the same sequence as igc_xdp_setup_pool(), which performs only the
-necessary steps, as follows:
- 1. stop the traffic and clean buffer
- 2. stop NAPI
- 3. install the XDP program
- 4. resume NAPI
- 5. allocate buffer and resume the traffic
+The i3-2310E is quite old. Launched 2011 by Intel but still in use as
+robot controller. The exact root cause of the problem is unclear and
+this situation won't change as Intel support for this CPU has ended
+years ago. Our experience is that the number of posted PCIe writes needs
+to be limited at least for real-time systems. With posted PCIe writes a
+much higher throughput can be generated than with PCIe reads which
+cannot be posted. Thus, the load on the interconnect is much higher.
+Additionally, a PCIe read waits until all posted PCIe writes are done.
+Therefore, the PCIe read can block the CPU for much more than 10us if a
+lot of PCIe writes were posted before. Both issues are the reason why we
+are limiting the number of posted PCIe writes in row in general for our
+real-time systems, not only for this driver.
 
-This patch has been tested using the 'ip link set xdpdrv' command to attach
-a simple XDP prog that always returns XDP_PASS.
+A flush after a low enough number of posted PCIe writes eliminates the
+delay but also increases the time needed for MTA table update. The
+following measurements were done on i3-2310E with e1000e for 128 MTA
+table entries:
 
-Before this patch, attaching xdp program will cause ptp4l to lose sync for
-few seconds, as shown in ptp4l log below:
-  ptp4l[198.082]: rms    4 max    8 freq   +906 +/-   2 delay    12 +/-   0
-  ptp4l[199.082]: rms    3 max    4 freq   +906 +/-   3 delay    12 +/-   0
-  ptp4l[199.536]: port 1 (enp2s0): link down
-  ptp4l[199.536]: port 1 (enp2s0): SLAVE to FAULTY on FAULT_DETECTED (FT_UNSPECIFIED)
-  ptp4l[199.600]: selected local clock 22abbc.fffe.bb1234 as best master
-  ptp4l[199.600]: port 1 (enp2s0): assuming the grand master role
-  ptp4l[199.600]: port 1 (enp2s0): master state recommended in slave only mode
-  ptp4l[199.600]: port 1 (enp2s0): defaultDS.priority1 probably misconfigured
-  ptp4l[202.266]: port 1 (enp2s0): link up
-  ptp4l[202.300]: port 1 (enp2s0): FAULTY to LISTENING on INIT_COMPLETE
-  ptp4l[205.558]: port 1 (enp2s0): new foreign master 44abbc.fffe.bb2144-1
-  ptp4l[207.558]: selected best master clock 44abbc.fffe.bb2144
-  ptp4l[207.559]: port 1 (enp2s0): LISTENING to UNCALIBRATED on RS_SLAVE
-  ptp4l[208.308]: port 1 (enp2s0): UNCALIBRATED to SLAVE on MASTER_CLOCK_SELECTED
-  ptp4l[208.933]: rms  742 max 1303 freq   -195 +/- 682 delay    12 +/-   0
-  ptp4l[209.933]: rms  178 max  274 freq   +387 +/- 243 delay    12 +/-   0
+Single flush after all writes: 106us
+Flush after every write:       429us
+Flush after every 2nd write:   266us
+Flush after every 4th write:   180us
+Flush after every 8th write:   141us
+Flush after every 16th write:  121us
 
-After this patch, attaching xdp program no longer cause ptp4l to lose sync,
-as shown in ptp4l log below:
-  ptp4l[201.183]: rms    1 max    3 freq   +959 +/-   1 delay     8 +/-   0
-  ptp4l[202.183]: rms    1 max    3 freq   +961 +/-   2 delay     8 +/-   0
-  ptp4l[203.183]: rms    2 max    3 freq   +958 +/-   2 delay     8 +/-   0
-  ptp4l[204.183]: rms    3 max    5 freq   +961 +/-   3 delay     8 +/-   0
-  ptp4l[205.183]: rms    2 max    4 freq   +964 +/-   3 delay     8 +/-   0
+A flush after every 8th write delays the link up by 35us and the
+negative impact to DMA transfers of other targets is still tolerable.
 
-Besides, before this patch, attaching xdp program will causes flood ping to
-lose 10 packets, as shown in ping statistics below:
-  --- 169.254.1.2 ping statistics ---
-  100000 packets transmitted, 99990 received, +6 errors, 0.01% packet loss, time 34001ms
-  rtt min/avg/max/mdev = 0.028/0.301/3104.360/13.838 ms, pipe 10, ipg/ewma 0.340/0.243 ms
+Execute a flush after every 8th write. This prevents overloading the
+interconnect with posted writes.
 
-After this patch, attaching xdp program no longer cause flood ping to loss
-any packets, as shown in ping statistics below:
-  --- 169.254.1.2 ping statistics ---
-  100000 packets transmitted, 100000 received, 0% packet loss, time 32326ms
-  rtt min/avg/max/mdev = 0.027/0.231/19.589/0.155 ms, pipe 2, ipg/ewma 0.323/0.322 ms
-
-On the other hand, this patch has been tested with tools/testing/selftests/
-bpf/xdp_hw_metadata app to make sure AF_XDP zero-copy is working fine with
-XDP Tx and Rx metadata. Below is the result of last packet after received
-10000 UDP packets with interval 1 ms:
-  poll: 1 (0) skip=0 fail=0 redir=10000
-  xsk_ring_cons__peek: 1
-  0x55881c7ef7a8: rx_desc[9999]->addr=8f110 addr=8f110 comp_addr=8f110 EoP
-  rx_hash: 0xFB9BB6A3 with RSS type:0x1
-  HW RX-time:   1733923136269470866 (sec:1733923136.2695) delta to User RX-time sec:0.0000 (43.280 usec)
-  XDP RX-time:   1733923136269482482 (sec:1733923136.2695) delta to User RX-time sec:0.0000 (31.664 usec)
-  No rx_vlan_tci or rx_vlan_proto, err=-95
-  0x55881c7ef7a8: ping-pong with csum=ab19 (want 315b) csum_start=34 csum_offset=6
-  0x55881c7ef7a8: complete tx idx=9999 addr=f010
-  HW TX-complete-time:   1733923136269591637 (sec:1733923136.2696) delta to User TX-complete-time sec:0.0001 (108.571 usec)
-  XDP RX-time:   1733923136269482482 (sec:1733923136.2695) delta to User TX-complete-time sec:0.0002 (217.726 usec)
-  HW RX-time:   1733923136269470866 (sec:1733923136.2695) delta to HW TX-complete-time sec:0.0001 (120.771 usec)
-  0x55881c7ef7a8: complete rx idx=10127 addr=8f110
-
-Signed-off-by: Song Yoong Siang <yoong.siang.song@intel.com>
+Signed-off-by: Gerhard Engleder <eg@keba.com>
+Link: https://lore.kernel.org/netdev/f8fe665a-5e6c-4f95-b47a-2f3281aa0e6c@lunn.ch/T/
+CC: Vitaly Lifshits <vitaly.lifshits@intel.com>
+Reviewed-by: Przemek Kitszel <przemyslaw.kitszel@intel.com>
 Tested-by: Avigail Dahan <avigailx.dahan@intel.com>
+Reviewed-by: Vitaly Lifshits <vitaly.lifshits@intel.com>
+Reviewed-by: Simon Horman <horms@kernel.org>
 Signed-off-by: Tony Nguyen <anthony.l.nguyen@intel.com>
 ---
- drivers/net/ethernet/intel/igc/igc_xdp.c | 19 +++++++++++++++----
- 1 file changed, 15 insertions(+), 4 deletions(-)
+ drivers/net/ethernet/intel/e1000e/mac.c | 15 ++++++++++++++-
+ 1 file changed, 14 insertions(+), 1 deletion(-)
 
-diff --git a/drivers/net/ethernet/intel/igc/igc_xdp.c b/drivers/net/ethernet/intel/igc/igc_xdp.c
-index 13bbd3346e01..c538e6b18aad 100644
---- a/drivers/net/ethernet/intel/igc/igc_xdp.c
-+++ b/drivers/net/ethernet/intel/igc/igc_xdp.c
-@@ -14,6 +14,7 @@ int igc_xdp_set_prog(struct igc_adapter *adapter, struct bpf_prog *prog,
- 	bool if_running = netif_running(dev);
- 	struct bpf_prog *old_prog;
- 	bool need_update;
-+	unsigned int i;
- 
- 	if (dev->mtu > ETH_DATA_LEN) {
- 		/* For now, the driver doesn't support XDP functionality with
-@@ -24,8 +25,13 @@ int igc_xdp_set_prog(struct igc_adapter *adapter, struct bpf_prog *prog,
+diff --git a/drivers/net/ethernet/intel/e1000e/mac.c b/drivers/net/ethernet/intel/e1000e/mac.c
+index d7df2a0ed629..44249dd91bd6 100644
+--- a/drivers/net/ethernet/intel/e1000e/mac.c
++++ b/drivers/net/ethernet/intel/e1000e/mac.c
+@@ -331,8 +331,21 @@ void e1000e_update_mc_addr_list_generic(struct e1000_hw *hw,
  	}
  
- 	need_update = !!adapter->xdp_prog != !!prog;
--	if (if_running && need_update)
--		igc_close(dev);
-+	if (if_running && need_update) {
-+		for (i = 0; i < adapter->num_rx_queues; i++) {
-+			igc_disable_rx_ring(adapter->rx_ring[i]);
-+			igc_disable_tx_ring(adapter->tx_ring[i]);
-+			napi_disable(&adapter->rx_ring[i]->q_vector->napi);
+ 	/* replace the entire MTA table */
+-	for (i = hw->mac.mta_reg_count - 1; i >= 0; i--)
++	for (i = hw->mac.mta_reg_count - 1; i >= 0; i--) {
+ 		E1000_WRITE_REG_ARRAY(hw, E1000_MTA, i, hw->mac.mta_shadow[i]);
++
++		if (IS_ENABLED(CONFIG_PREEMPT_RT)) {
++			/*
++			 * Do not queue up too many posted writes to prevent
++			 * increased latency for other devices on the
++			 * interconnect. Flush after each 8th posted write,
++			 * to keep additional execution time low while still
++			 * preventing increased latency.
++			 */
++			if (!(i % 8) && i)
++				e1e_flush();
 +		}
 +	}
- 
- 	old_prog = xchg(&adapter->xdp_prog, prog);
- 	if (old_prog)
-@@ -36,8 +42,13 @@ int igc_xdp_set_prog(struct igc_adapter *adapter, struct bpf_prog *prog,
- 	else
- 		xdp_features_clear_redirect_target(dev);
- 
--	if (if_running && need_update)
--		igc_open(dev);
-+	if (if_running && need_update) {
-+		for (i = 0; i < adapter->num_rx_queues; i++) {
-+			napi_enable(&adapter->rx_ring[i]->q_vector->napi);
-+			igc_enable_tx_ring(adapter->tx_ring[i]);
-+			igc_enable_rx_ring(adapter->rx_ring[i]);
-+		}
-+	}
- 
- 	return 0;
+ 	e1e_flush();
  }
+ 
 -- 
 2.47.1
 
