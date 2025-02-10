@@ -1,93 +1,81 @@
-Return-Path: <netdev+bounces-164582-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-164584-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id DC025A2E53E
-	for <lists+netdev@lfdr.de>; Mon, 10 Feb 2025 08:22:20 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 399CEA2E5B4
+	for <lists+netdev@lfdr.de>; Mon, 10 Feb 2025 08:46:54 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id BA1463A5321
-	for <lists+netdev@lfdr.de>; Mon, 10 Feb 2025 07:22:11 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id DC4DC16297C
+	for <lists+netdev@lfdr.de>; Mon, 10 Feb 2025 07:46:52 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C5E4A1A3159;
-	Mon, 10 Feb 2025 07:22:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 200CA1B2180;
+	Mon, 10 Feb 2025 07:46:49 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="SrsHcMrW"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="F141LZyr"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f53.google.com (mail-wm1-f53.google.com [209.85.128.53])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.16])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 17286198E8C;
-	Mon, 10 Feb 2025 07:22:14 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.53
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 150D52F22;
+	Mon, 10 Feb 2025 07:46:46 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.16
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1739172136; cv=none; b=DIXWDRbqyLWkwdvm3c62Z2lWVB1IINfRWm5T8UmewEuSDcHkvQWvb0WYeDv6dke0kh+PnOil0tL7Y0ZfRfpPCjFU64bAz9E4hVOE8GdaRqok9L8nwb4L9gCec30XHtSQkkUI3Cc8XtOzB74ed0wzUoqCwy6hI74DanYEQyelnOY=
+	t=1739173609; cv=none; b=sK6Za12+/N04v18oJlmcmSKFF9oijSqApvJQw1hewXApRAK8x2xBfAImLiYYy/OFEE1P8yOLimF9fAZ7oC0BOxxk0W0rA5nj0PMoElBAYYCNtcxLnTRp5O7w0ScCAJPebxlHdv/IFgJW5aunWdQs8JD+hGekwQhZlHemXBWsvWg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1739172136; c=relaxed/simple;
-	bh=0F3FlD9Pfc8KQWwxXtSJ8R0axhweOBOY6Fso5tS46b0=;
+	s=arc-20240116; t=1739173609; c=relaxed/simple;
+	bh=57FsZbFOLUMSsYGliPSMD+RfYyI9b+xhfGwhfTv6VoU=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=BG4YrihgGmIrA2u5mmexYRresVSJnW3l5pbKstCCIfy14JU4YWqGsgnKdqVGLvWxTATol4bTfeXN+/Y5wKjS8ispGkBupoqsHiVDaPw51yAybNh/QDAVuJpjz+hJXM+oN5HyOt9wlWSY7etsc2lMvcO21j/YnpZ6Eybm6oCeejc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=SrsHcMrW; arc=none smtp.client-ip=209.85.128.53
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wm1-f53.google.com with SMTP id 5b1f17b1804b1-43622267b2eso40358375e9.0;
-        Sun, 09 Feb 2025 23:22:14 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1739172133; x=1739776933; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=pWhUEOTz7NAjdQTe76b2+gajv13F37YsdelF+ND6FT0=;
-        b=SrsHcMrWAOy7ANPposC89rYRcHP0OcVoFwj636MXqGyB1ZjVz9od92qbGDb4y/3mIr
-         NBuRVz3gyv9Jv6wvABNukBAcNvkx/TAnydTRsUFUtedFKzCRbUQQaA5wjRv56r87p+hf
-         MuiBqHf9/kGplMPU/68vWyd2EyTEUex415Rw+gv7XpO4l9V6y0tMY7Q4N5ECTMZHY1X2
-         Ic77jmIdcOQ+ZRJy/wgx7GbI2VuPRzcj9eIv6qMGD0WGsQW/ESjKFZlSbZjjKXwKNFgV
-         bd9oLPP5hUQLbSWNRGnpriH2qnlgFqHpuDC6KniZDVfttN8oghuMuCWohHU2H0uk4JlS
-         Lu5g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1739172133; x=1739776933;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=pWhUEOTz7NAjdQTe76b2+gajv13F37YsdelF+ND6FT0=;
-        b=AQYs5LyS5R4/4tMt8k/EmnE3khJrW4q4smkhAfX0f9Ga5uLnBmAeOPEZ7oWJ8lfccx
-         WNg8YRaYUGPSSYAnWZuk5wbX+3WpOzPDF5hvIeWPWZsGlIfXfcg+L5NBBoe2zbLSg8pe
-         kHqLQn7CVluhS3aGc5sMSOKp/LuClUdwpvSmlaKpOXjVktSOLBykq4/IqJTGNWwkby5i
-         JMZAzCKgaUZYA8+ByFJnoMUti/8Z1OwrJDKnJf32fS+wdZjTpHKtKpYuijadT2bc3M/n
-         SytWXS4ETctryhfXAeSqII6bl7+J7nwNoaAGw5i1ZCG3K0zT9DnRTI71pOZBDmBTaAc3
-         cM8w==
-X-Forwarded-Encrypted: i=1; AJvYcCV7LR+5oiw2qW3fyZE+a9qwn88m95YUU+xKm6bA40phkajMEchsNC1185ZHoVYo/+hCJdsM90qE@vger.kernel.org, AJvYcCWgskVZR2qaJJTgZ3J6V+N85bSKoFkwDm5kksm2fLVBc0MhV5+qsjasV6PaJlzsbr3sKHmC8QwKKtJaBZ4=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yxb9vmo7JdL5+xiD2Hyt/xNaBwHuvzCGBukXXV/wijeVMi7Ajgj
-	5fbnsToebcCYZ1wLluHdATlLEhjr+mgpSRayFwf6cG5/KeInZSdl
-X-Gm-Gg: ASbGncuWfvbLwtRiEO0aRaQ2Om6JFlNkoNDHWcpXOdqdg0o1x3Y+5+vwvrYMTmhDaAS
-	ia0abpOaFCGOlXKWguiJrKqHvURg8db2fbXumaeuJaluTpl9VXrEPYR6GEtAd4PmyjArzQUz7kr
-	B/M/mtycBdIIdvkuSqBoIS4oiAeE5msq6X6yyRCpmbBXfZsXbZL90LvsqLdIXjCpo+jgdLlkdBE
-	NnZhY1na4mA8Uv/S5TqPN71atNmcXGAmW3FYnz1dMPEv/d0kIaQXyWWCAymHTq9mZ/ISE72hyue
-	3aAcNRT/spJii64=
-X-Google-Smtp-Source: AGHT+IEA0jsVCFpxuFcvOyCb0vtOtFd0q4rm1UdtDnrMoG8c+kdWh7Uxs1o4qtTltvMbYSgqTxKA7w==
-X-Received: by 2002:a05:600c:5947:b0:439:4706:ae04 with SMTP id 5b1f17b1804b1-4394706af65mr11421595e9.16.1739172133066;
-        Sun, 09 Feb 2025 23:22:13 -0800 (PST)
-Received: from eichest-laptop ([2a02:168:af72:0:1e6d:7190:f4b8:8cea])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-439471bf782sm11085275e9.39.2025.02.09.23.22.12
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sun, 09 Feb 2025 23:22:12 -0800 (PST)
-Date: Mon, 10 Feb 2025 08:22:10 +0100
-From: Stefan Eichenberger <eichest@gmail.com>
-To: Dimitri Fedrau <dima.fedrau@gmail.com>
-Cc: Andrew Lunn <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>,
-	Russell King <linux@armlinux.org.uk>,
+	 Content-Type:Content-Disposition:In-Reply-To; b=JwbCDLxOpRZaSEtkx7ZRgDUj8AnkAITqT79oVIiM5z9WfUeEyClQQuvpYQVs9BYmaGcuxMy0Sa+KFI10mivYOpkqjPdVT0c3l62cKWvGU4u0wMWmz5RvKnrF6fZfAe0PCeYkG1Gg31z+q7PSUGxUKK9qcxy5iH0J0ekarM8Hbrs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=F141LZyr; arc=none smtp.client-ip=198.175.65.16
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1739173607; x=1770709607;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=57FsZbFOLUMSsYGliPSMD+RfYyI9b+xhfGwhfTv6VoU=;
+  b=F141LZyrA60WMKlKILeGmPqXKM9a8bg774zLiEVoMCCDzRISI4bdvOPf
+   RGUmYP2JiIUiL5M/5w0SH5mrWyxG5sCQFlLOfRRlOZzwsQ+JLmrteJpj0
+   6jX3e6jCK8MZMf0xhnk0ePfJbWTFke3c4xdAOPW9eEhwbJhjW7vb79mEg
+   A0S3pISenmyOMNXP5858sRDUo4UDv7yX/dZsTXZQLglxQaGIsGYKimJCM
+   i+/yjm57ufLfTuMYqixa9OLwBDta+KT2rA3kkrGmuQxkLve7zXHFRNdYg
+   uOhDv9RMBwWkbj2pyTH/AWU2vY+xyQfeKtpAXtnhD+lObcn5TKlUv50g0
+   w==;
+X-CSE-ConnectionGUID: yX6VJDKXQieem4OvBDolBA==
+X-CSE-MsgGUID: 3okIMeZiR6GRR42qIVlC4w==
+X-IronPort-AV: E=McAfee;i="6700,10204,11340"; a="39868187"
+X-IronPort-AV: E=Sophos;i="6.13,274,1732608000"; 
+   d="scan'208";a="39868187"
+Received: from orviesa008.jf.intel.com ([10.64.159.148])
+  by orvoesa108.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 09 Feb 2025 23:46:46 -0800
+X-CSE-ConnectionGUID: 168nfPuIRfeGYDg3PECo0w==
+X-CSE-MsgGUID: cljx2HRWQAuLmpH7eaD5VA==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.12,224,1728975600"; 
+   d="scan'208";a="112994147"
+Received: from mev-dev.igk.intel.com ([10.237.112.144])
+  by orviesa008-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 09 Feb 2025 23:46:42 -0800
+Date: Mon, 10 Feb 2025 08:43:07 +0100
+From: Michal Swiatkowski <michal.swiatkowski@linux.intel.com>
+To: Eric Woudstra <ericwouds@gmail.com>
+Cc: Felix Fietkau <nbd@nbd.name>, Sean Wang <sean.wang@mediatek.com>,
+	Lorenzo Bianconi <lorenzo@kernel.org>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
 	"David S. Miller" <davem@davemloft.net>,
 	Eric Dumazet <edumazet@google.com>,
 	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Niklas =?iso-8859-1?Q?S=F6derlund?= <niklas.soderlund+renesas@ragnatech.se>,
-	Gregor Herburger <gregor.herburger@ew.tq-group.com>,
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH net-next v2] net: phy: marvell-88q2xxx: Add support for
- PHY LEDs on 88q2xxx
-Message-ID: <Z6mpIpjM1l5vT49W@eichest-laptop>
-References: <20250207-marvell-88q2xxx-leds-v2-1-d0034e79e19d@gmail.com>
- <Z6eJ6qPs7ORuOrbt@eichest-laptop>
- <20250209084135.GA3453@debian>
+	Matthias Brugger <matthias.bgg@gmail.com>,
+	AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>,
+	Frank Wunderlich <frank-w@public-files.de>,
+	Daniel Golle <daniel@makrotopia.org>, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+	linux-mediatek@lists.infradead.org
+Subject: Re: [PATCH v3 net-next] net: ethernet: mtk_ppe_offload: Allow QinQ
+Message-ID: <Z6muC7WshGlaY9Ft@mev-dev.igk.intel.com>
+References: <20250209110936.241487-1-ericwouds@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -96,32 +84,94 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20250209084135.GA3453@debian>
+In-Reply-To: <20250209110936.241487-1-ericwouds@gmail.com>
 
-Hi Dimitri,
-
-On Sun, Feb 09, 2025 at 09:41:35AM +0100, Dimitri Fedrau wrote:
-> Hi Stefan,
+On Sun, Feb 09, 2025 at 12:09:36PM +0100, Eric Woudstra wrote:
+> mtk_foe_entry_set_vlan() in mtk_ppe.c already seems to support
+> double vlan tagging, but mtk_flow_offload_replace() in
+> mtk_ppe_offload.c only allows for 1 vlan tag, optionally in
+> combination with pppoe and dsa tags.
 > 
-> Am Sat, Feb 08, 2025 at 05:44:26PM +0100 schrieb Stefan Eichenberger:
-> > On Fri, Feb 07, 2025 at 05:24:20PM +0100, Dimitri Fedrau wrote:
-> > > Marvell 88Q2XXX devices support up to two configurable Light Emitting
-> > > Diode (LED). Add minimal LED controller driver supporting the most common
-> > > uses with the 'netdev' trigger.
-> > > 
-> > > Signed-off-by: Dimitri Fedrau <dima.fedrau@gmail.com>
-> > 
-> > Reviewed-by: Stefan Eichenberger <eichest@gmail.com>
-> > 
+> This patch adds QinQ support to mtk_flow_offload_replace().
 > 
-> thanks for reviewing. I just noticed that led0 is enabled in
-> mv88q222x_config_init, but I think it should be enabled in
-> mv88q2xxx_config_init because LED configuration is same for all
-> mv88q2xxx devices. What do you think ?
+> Only PPPoE-in-Q (as before) and Q-in-Q are allowed. A combination
+> of PPPoE and Q-in-Q is not allowed.
+> 
+> Signed-off-by: Eric Woudstra <ericwouds@gmail.com>
+> ---
+> 
+> Changes in v3:
+> - Removed unnecessary second check for ETH_P_8021Q.
+> 
+> Changes in v2:
+> - Unchanged, only RFC to PATCH.
+> 
+> Tested on the BPI-R3(mini), on non-dsa-ports and dsa-ports.
+> 
+>  .../net/ethernet/mediatek/mtk_ppe_offload.c   | 22 +++++++++----------
+>  1 file changed, 11 insertions(+), 11 deletions(-)
+> 
+> diff --git a/drivers/net/ethernet/mediatek/mtk_ppe_offload.c b/drivers/net/ethernet/mediatek/mtk_ppe_offload.c
+> index f20bb390df3a..c855fb799ce1 100644
+> --- a/drivers/net/ethernet/mediatek/mtk_ppe_offload.c
+> +++ b/drivers/net/ethernet/mediatek/mtk_ppe_offload.c
+> @@ -34,8 +34,10 @@ struct mtk_flow_data {
+>  	u16 vlan_in;
+>  
+>  	struct {
+> -		u16 id;
+> -		__be16 proto;
+> +		struct {
+> +			u16 id;
+> +			__be16 proto;
+> +		} vlans[2];
+>  		u8 num;
+>  	} vlan;
+>  	struct {
+> @@ -349,18 +351,19 @@ mtk_flow_offload_replace(struct mtk_eth *eth, struct flow_cls_offload *f,
+>  		case FLOW_ACTION_CSUM:
+>  			break;
+>  		case FLOW_ACTION_VLAN_PUSH:
+> -			if (data.vlan.num == 1 ||
+> +			if (data.vlan.num + data.pppoe.num == 2 ||
+>  			    act->vlan.proto != htons(ETH_P_8021Q))
+>  				return -EOPNOTSUPP;
+>  
+> -			data.vlan.id = act->vlan.vid;
+> -			data.vlan.proto = act->vlan.proto;
+> +			data.vlan.vlans[data.vlan.num].id = act->vlan.vid;
+> +			data.vlan.vlans[data.vlan.num].proto = act->vlan.proto;
+>  			data.vlan.num++;
+>  			break;
+>  		case FLOW_ACTION_VLAN_POP:
+>  			break;
+>  		case FLOW_ACTION_PPPOE_PUSH:
+> -			if (data.pppoe.num == 1)
+> +			if (data.pppoe.num == 1 ||
+> +			    data.vlan.num == 2)
+>  				return -EOPNOTSUPP;
+>  
+>  			data.pppoe.sid = act->pppoe.sid;
+> @@ -450,12 +453,9 @@ mtk_flow_offload_replace(struct mtk_eth *eth, struct flow_cls_offload *f,
+>  	if (offload_type == MTK_PPE_PKT_TYPE_BRIDGE)
+>  		foe.bridge.vlan = data.vlan_in;
+>  
+> -	if (data.vlan.num == 1) {
+> -		if (data.vlan.proto != htons(ETH_P_8021Q))
+> -			return -EOPNOTSUPP;
+> +	for (i = 0; i < data.vlan.num; i++)
+> +		mtk_foe_entry_set_vlan(eth, &foe, data.vlan.vlans[i].id);
+>  
+> -		mtk_foe_entry_set_vlan(eth, &foe, data.vlan.id);
+> -	}
+>  	if (data.pppoe.num == 1)
+>  		mtk_foe_entry_set_pppoe(eth, &foe, data.pppoe.sid);
 
-I think you are right. If you can move that to mv88q2xxx_config_init it
-would be great. You can add my Reviewed-by tag to the updated patch.
+Thanks for addressing comments.
 
-Thanks,
-Stefan
+Reviewed-by: Michal Swiatkowski <michal.swiatkowski@linux.intel.com>
+
+>  
+> -- 
+> 2.47.1
 
