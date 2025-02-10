@@ -1,128 +1,110 @@
-Return-Path: <netdev+bounces-164771-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-164772-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 156B1A2F036
-	for <lists+netdev@lfdr.de>; Mon, 10 Feb 2025 15:50:27 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6B9BFA2F045
+	for <lists+netdev@lfdr.de>; Mon, 10 Feb 2025 15:52:30 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 79B9B188730C
-	for <lists+netdev@lfdr.de>; Mon, 10 Feb 2025 14:50:32 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 1AEB11662FA
+	for <lists+netdev@lfdr.de>; Mon, 10 Feb 2025 14:52:29 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 389181F8BBD;
-	Mon, 10 Feb 2025 14:50:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5562F204860;
+	Mon, 10 Feb 2025 14:52:23 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="NArGeRE/"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Kmryy+cV"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f54.google.com (mail-wm1-f54.google.com [209.85.128.54])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 71E921BEF91
-	for <netdev@vger.kernel.org>; Mon, 10 Feb 2025 14:50:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.54
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 230DE1F8BA4;
+	Mon, 10 Feb 2025 14:52:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1739199023; cv=none; b=l7AftpgU0qF8SjMgbdXn0HZVkCzdZ8Hme7QL8q7PaXdp/lrvCqOSJughsA/f0I1RDTCOjWEYC9cFpTSL4LmjeVuRV+V387hYB5Kn+3DlPdz72c73nAqHLLHlMACkNG9W3bGlqujgRYJM5xjgXbq0B7Uj+A/sdk7TxT++L/q2NMs=
+	t=1739199143; cv=none; b=BBtwYiflop7qBSCHEabX12nPdRHDEU2fJh9qnN3xWQXVKrqfUexh8qgi/vpqzO7w72rRlyu+e0DF60JWxzZ+2nIZkUCxJA1JaJDXkmtqIKnagcZhkYDWN4kRLCIscJfeqKjInZ4aVgPPTGyzgjzGZpaRPvpXq6xWKZHlYlikNA4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1739199023; c=relaxed/simple;
-	bh=wp6wmbrqjZAChKTl8y/4Kq51nbOadwczA0IQFgBBSQ4=;
-	h=Subject:To:Cc:References:From:Message-ID:Date:MIME-Version:
-	 In-Reply-To:Content-Type; b=HfBohN62b6TgRnYLu5LevyuTm1GaGqePSOa6XrilS19YFEck5CE/KcpFb/bHfzI3DW+/cM2pj2nbUyjGfPdrYv0Fo+jhSc3oh81iD/BWf+SIUj5uGOMfqPEyOjNc21yf+tNtuekmfyPnGPCmcbW3hzrHxaKZtsF3PkGdegjlqWw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=NArGeRE/; arc=none smtp.client-ip=209.85.128.54
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wm1-f54.google.com with SMTP id 5b1f17b1804b1-4361815b96cso29852405e9.1
-        for <netdev@vger.kernel.org>; Mon, 10 Feb 2025 06:50:21 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1739199020; x=1739803820; darn=vger.kernel.org;
-        h=content-transfer-encoding:content-language:in-reply-to:mime-version
-         :user-agent:date:message-id:from:references:cc:to:subject:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=hcphbmqkIIdPEWHNIfdnN6TAUXLGgnTab4JgK3F09KA=;
-        b=NArGeRE/TeKhyDDJ/lo5UQ8f6dHUTRqts1CJigcQXnZ8EFt/SZ9Aik5ZESJaVMYdBW
-         OCJ/g71bh1TCmwn30o7uke1SaYL1x24S2kTsMzqt0MVn1cxcpPT5dM+TK921+sdt9em/
-         GcnaR5hZfFAgqbRv4N7qIXvsAPYtB6ZLs+pIyaMZU3mMXwDTKq2KYP9bY5zCEg5yA/5X
-         VTp4DcoOMyY1egruO+t/dmBsOTpWUrsi1T2QKngt2VQ9CXTHN6wv9CaAI69/FQNXiPqh
-         Eg9iG8VFfIs5VheCz6Fu6FnRlxyX0IBNpl5wIzrgp4+ErmEyCLoxG8dabiayeJOTwnbO
-         pmvA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1739199020; x=1739803820;
-        h=content-transfer-encoding:content-language:in-reply-to:mime-version
-         :user-agent:date:message-id:from:references:cc:to:subject
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=hcphbmqkIIdPEWHNIfdnN6TAUXLGgnTab4JgK3F09KA=;
-        b=ikMc77xh/Gm4c4t2cmq3bQotvZ/KnCLo1eSYbia8EnsnflaE6hMCK2GgRU/FtOhBmF
-         UJaurDNx0GrLrXl4QeRjMb2LZSFgJhr8HCxBhd9EPZQ/n84qF6nComaYmstwo7vDYcA3
-         h2igADHEWhnCkD0zRRP+jbDLLd9O3NXPNzpMWMlJnFq4IClYtp0pFZRvSfPTQ72CY0rO
-         82COmLwezP+OmYanOZPHb4c2RgWWOgBmMc0U1Nmpa8O4DlvHpgopPtwV2fHgiQOFQSh7
-         z5u2Zkjg6jCzc88Cb+cUuum8a+Lwuw4bf+LqyyISPRXV/HutlebPgRV/IPi+2CpcQfZl
-         /j3A==
-X-Forwarded-Encrypted: i=1; AJvYcCWraUTUSQErizs+vHlHQgPUCXkcmUEk1/YjhpTQFDYKf+uNjF+qCwbRce3evJky/6h3njeA0B8=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxwmdQtRlklmWY5LX6x1IthCZAbW3ctvwYj69F4vgsUDUks4X7e
-	2jmKK3bbnVDvM3A7xO/BVcLfoQ68Byih+7V/4cWqfDkPbCKP8rNE
-X-Gm-Gg: ASbGncv9gDkHhuqFJxpp5OcYFLDKKWrMzdfIrizo4AlWLWhVlDIXTLcPOfWxq6ZMAUY
-	VY4FIb2YZ12cd0vGC9npYuBz9hC12OKNMGERYyAYt/KUP2zAzxnTH+FptEVKA/6grEY/zoqe4Hj
-	eCzwuy8V+stsWePImajAcKtvzXSohwzGs/Hc9FJqxW1OxOj6jCM3BHUqaPVQKP1z4qqc+RoyMJk
-	W2yIYxRuren5RyChDuLPcBn6GVDy1+ZEv7IQmQzFzO8ffs9YZEfLnoTcqU5JYZk39/EblZLH/UN
-	PjLFb/3nrUIGOcB+grXXG9qeM4g6gS/It1Oi+T9IgP5VW5uIM8xSJu7syT7ucpRJxot8alnuWle
-	z8VY=
-X-Google-Smtp-Source: AGHT+IGbEF6Pvt0mIo6bYTqLTOnsdh0UP8aNgoO+J861Qaqwo+HVnKMoL3rH82oFknZA/uMNkWWhVw==
-X-Received: by 2002:a05:600c:3b86:b0:439:4696:c071 with SMTP id 5b1f17b1804b1-4394696c404mr25810425e9.19.1739199019508;
-        Mon, 10 Feb 2025 06:50:19 -0800 (PST)
-Received: from [192.168.1.122] (cpc159313-cmbg20-2-0-cust161.5-4.cable.virginm.net. [82.0.78.162])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-38dd07fa80csm8296986f8f.13.2025.02.10.06.50.18
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 10 Feb 2025 06:50:19 -0800 (PST)
-Subject: Re: [PATCH v2 net-next 4/4] sfc: document devlink flash support
-To: Jiri Pirko <jiri@resnulli.us>
-Cc: linux-net-drivers@amd.com, davem@davemloft.net, kuba@kernel.org,
- edumazet@google.com, pabeni@redhat.com, horms@kernel.org,
- andrew+netdev@lunn.ch, habetsm.xilinx@gmail.com, netdev@vger.kernel.org,
- edward.cree@amd.com, Jacob Keller <jacob.e.keller@intel.com>
-References: <cover.1739186252.git.ecree.xilinx@gmail.com>
- <3476b0ef04a0944f03e0b771ec8ed1a9c70db4dc.1739186253.git.ecree.xilinx@gmail.com>
- <p527x74v7gycii3qfgcqn46j2dixpa62tguri6k2dzymohkeyw@rqqmgs5tbobj>
-From: Edward Cree <ecree.xilinx@gmail.com>
-Message-ID: <116cc011-4e4a-12c9-0cba-3097c6e85e0d@gmail.com>
-Date: Mon, 10 Feb 2025 14:50:18 +0000
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.14.0
+	s=arc-20240116; t=1739199143; c=relaxed/simple;
+	bh=wwFNBD+2n7iIkpjz+HDpg51f9v6nAIvUywQsatviOGY=;
+	h=From:Subject:Date:Message-Id:MIME-Version:Content-Type:To:Cc; b=We8tqZ3s9vZFS1jZQLBPzYntraCP2sK0ZeIpvsAKfpJUmTqDQXOVwJEVdG4y7DXxgzk/hgIAm/BmV2QWZWC/0r5Emq0fseUcysrd+kNA4rXzczV5xJo8QRISMRdqaQEdmkV3lZwJ/Q6Esa+BgcQcac1ivO4n3cxOe8Stk7TgrkE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Kmryy+cV; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 39FC0C4CED1;
+	Mon, 10 Feb 2025 14:52:19 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1739199143;
+	bh=wwFNBD+2n7iIkpjz+HDpg51f9v6nAIvUywQsatviOGY=;
+	h=From:Subject:Date:To:Cc:From;
+	b=Kmryy+cVf+JluFTwBz4BWzZBKcdKW7FdeD9R1Eoo8hLLH6xrs/WiaF2ME6LxMs3Xa
+	 u+E1qHBaAIGJlTS3g27JU0vkODp6wIwz7SnNypPHYWSSODfrxbyg0SHldOtDVOphfN
+	 jUTS9/YVfWuDTRz/+GtRBk4E9IWVjGtzgdQe88CGn9RSFmFFPgfOg45EepANPbGaby
+	 ucyKTSqlx7oUzyfj5/cmxGn8aszXMGc+yEmS0ja33+i8Wd5hJNwoO9sgvfACleEINJ
+	 HELH1ttrpVocWTMXn8rVaJjsl6CRf1rwUTgGqAzxNgGm35IHma4hLRPu9JjkVwftn1
+	 gYIQARw/2vOGw==
+From: Roger Quadros <rogerq@kernel.org>
+Subject: [PATCH net 0/3] net: ethernet: ti: am65-cpsw: XDP fixes
+Date: Mon, 10 Feb 2025 16:52:14 +0200
+Message-Id: <20250210-am65-cpsw-xdp-fixes-v1-0-ec6b1f7f1aca@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-In-Reply-To: <p527x74v7gycii3qfgcqn46j2dixpa62tguri6k2dzymohkeyw@rqqmgs5tbobj>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-GB
+Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
+X-B4-Tracking: v=1; b=H4sIAJ4SqmcC/x3LQQ5AMBBA0avIrE1SpSWuIhbFYBaq6QgScXeN5
+ cvPf0AoMgm02QORThbefUKRZzCuzi+EPCWDVtoorWp0mzU4BrnwngLOfJPg0FgqjbW6cjOkM0T
+ 6Qxo78HRA/74fQX5Q22oAAAA=
+To: Andrew Lunn <andrew+netdev@lunn.ch>, 
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+ Alexei Starovoitov <ast@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>, 
+ Jesper Dangaard Brouer <hawk@kernel.org>, 
+ John Fastabend <john.fastabend@gmail.com>, 
+ Julien Panis <jpanis@baylibre.com>, Jacob Keller <jacob.e.keller@intel.com>
+Cc: danishanwar@ti.com, s-vadapalli@ti.com, srk@ti.com, 
+ netdev@vger.kernel.org, linux-kernel@vger.kernel.org, bpf@vger.kernel.org, 
+ Roger Quadros <rogerq@kernel.org>
+X-Mailer: b4 0.14.1
+X-Developer-Signature: v=1; a=openpgp-sha256; l=677; i=rogerq@kernel.org;
+ h=from:subject:message-id; bh=wwFNBD+2n7iIkpjz+HDpg51f9v6nAIvUywQsatviOGY=;
+ b=owEBbQKS/ZANAwAIAdJaa9O+djCTAcsmYgBnqhKiATtcQYm+JuEEy6wcpmRai+D+jCvVaQmnI
+ /ZOSebmLD2JAjMEAAEIAB0WIQRBIWXUTJ9SeA+rEFjSWmvTvnYwkwUCZ6oSogAKCRDSWmvTvnYw
+ kxVaEACw9zOudx9B3C0lX3vAffFZ+jLgSSUR7fd9hEAf8six91LiHhG8cN2lv8BuDoocv8YsMqK
+ 2W6Rdry6o/TKCN/0IBtVdnf4YOXbH4DeeCDfccNMZia69FZYTil4G9xrHd1cbAWfdJBSXfos5lt
+ 1f9z/qyHx4sxP1MbysI2dj21eX0HkpqDfZfD5L4xl2JyEXvwF3Sypa3CQrUEzMRy0Ad23B2g9Y1
+ dLWrYpvUPJmQuS7y4WqvcKNoAO38nt9QZ26Pq0No53HvIOuIKEvXFMCjW25AlK2VZO+oCz9CEz4
+ 9tjNGiWIVsW8JD0agxnvla7y545/BupBCFdgEYQ9hnSvAYhvMkueSwjD4uwg1rnjRXJwcpYmKoc
+ YJc7nkOiE6OvV0nxKVRxElOYRmUcCy7V+p5r6npWyi6lXCNWirVOzf3bjkq5wTXIBISnUxaUMm/
+ 2KsREj/ZbthSn+cL1AhEGcqxGBqT5CGTNrQjr6No+dtOTRtFFaNa6upEXCHIUSjAiu+C3WDmFfk
+ ZVLa79TUR9oRZvgDtpxJTW9uRNL1ZjBRSzrrKvqqd7uUv7CfvhheocYDBLRr4+4aw2y7al0ljNo
+ XzwcElPHbmujXISr5+keMnOiEFXz93scKQ2wadp/ic27IhZSu8oaqZZ8hlVjy2BhnS0vJMVmvs9
+ 8go216vxRrKKAhQ==
+X-Developer-Key: i=rogerq@kernel.org; a=openpgp;
+ fpr=412165D44C9F52780FAB1058D25A6BD3BE763093
 
-On 10/02/2025 13:51, Jiri Pirko wrote:
-> Mon, Feb 10, 2025 at 12:25:45PM +0100, edward.cree@amd.com wrote:
->> Info versions
->> =============
->> @@ -18,6 +18,10 @@ The ``sfc`` driver reports the following versions
->>    * - Name
->>      - Type
->>      - Description
->> +   * - ``fw.bundle_id``
-> 
-> Why "id"? It is the bundle version, isn't it. In that case just "bundle"
-> would be fine I guess...
+Hi,
 
-bundle_id comes from DEVLINK_INFO_VERSION_GENERIC_FW_BUNDLE_ID in
- include/net/devlink.h, which git blame tells me was added by Jacob
- Keller in 2020 as a generalisation of a similar name in nfp.[1]
-Its use in sfc was added[2] by Alejandro Lucero in 2023 but seems to
- have been left out of the documentation at that time.
-The present patch series is merely documenting the name that already
- exists, not adding it.  Changing it might break existing scripts, and
- in any case would affect more drivers than just sfc (it is used by
- i40e, ice, and nfp).
+This series fixes memleak and statistics for XDP cases.
 
-CCing Jacob in case he has anything to add on why that name was chosen.
+cheers,
+-roger
 
-[1]: https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/commit/?id=c90977a3c227
-[2]: https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/commit/?id=14743ddd2495
+Signed-off-by: Roger Quadros <rogerq@kernel.org>
+---
+Roger Quadros (3):
+      net: ethernet: ti: am65-cpsw: fix memleak in certain XDP cases
+      net: ethernet: ti: am65-cpsw: fix RX & TX statistics for XDP_TX case
+      net: ethernet: ti: am65_cpsw: fix tx_cleanup for XDP case
+
+ drivers/net/ethernet/ti/am65-cpsw-nuss.c | 50 +++++++++++++++++++-------------
+ 1 file changed, 30 insertions(+), 20 deletions(-)
+---
+base-commit: 2014c95afecee3e76ca4a56956a936e23283f05b
+change-id: 20250207-am65-cpsw-xdp-fixes-b86e356624af
+
+Best regards,
+-- 
+Roger Quadros <rogerq@kernel.org>
+
 
