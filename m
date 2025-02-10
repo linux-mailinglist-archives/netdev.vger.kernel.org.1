@@ -1,246 +1,175 @@
-Return-Path: <netdev+bounces-164859-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-164860-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1769BA2F64E
-	for <lists+netdev@lfdr.de>; Mon, 10 Feb 2025 19:03:29 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3616CA2F67F
+	for <lists+netdev@lfdr.de>; Mon, 10 Feb 2025 19:11:24 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id DE92D3A1812
-	for <lists+netdev@lfdr.de>; Mon, 10 Feb 2025 18:03:19 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 9243218836CA
+	for <lists+netdev@lfdr.de>; Mon, 10 Feb 2025 18:11:29 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A129825B698;
-	Mon, 10 Feb 2025 18:03:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=fastly.com header.i=@fastly.com header.b="qHmr8G/C"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4ACC92253B0;
+	Mon, 10 Feb 2025 18:11:22 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f170.google.com (mail-pl1-f170.google.com [209.85.214.170])
+Received: from mail-io1-f78.google.com (mail-io1-f78.google.com [209.85.166.78])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 00BAF25B671
-	for <netdev@vger.kernel.org>; Mon, 10 Feb 2025 18:03:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.170
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 88CD525B693
+	for <netdev@vger.kernel.org>; Mon, 10 Feb 2025 18:11:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.78
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1739210605; cv=none; b=mrf6ZEocj7vRL2hF1utc5eVa/8+DAQsSwPn1H4LyCnKquAXn4o0nVWSs/FcSJnFBtyej1g7HJXzIZbWV0/R369JLGFbFUhzPZk2i4m+l0+au/reQ/mpJ6MUYwzCs+kVHtqTbJhdevKL8GVraUPqA/yQYFlqcBn+4A1fyMpKmJqs=
+	t=1739211082; cv=none; b=i/6XCRroUFQHG8uicX+7zxda5n/TJtuW1tY6Yuk7SO6SAQoqr1GxeTlAGp0RoZHSdwZnPnwlaBQfw/XROf4sNaR8kN1ckziyl6P5GkKh2Bkdcn3zzlGpzo9Gq5vKXBGtl7N4GtaCdInOjVzbF8djqHkmg5Nthzrexkhtatrcr5Q=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1739210605; c=relaxed/simple;
-	bh=p6KSjYsGfmpN4uaNswBoAqfX2n84u2MhXIvKb0re0U8=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=vD5xVz6PLCg4V9fjkiONAJGsfRf17zFZ5CfwVjEO0OIHZ1g8Ed7eH0MOPeY6AlOuZndF7wWsinHGu9ZKtVJ/B8gcLM6vRNccnHtUIbz5HcJKf9MDh9LcBrH2dJIKz8qwR+pThDCHWaJ0zBKe+EptPasKxvzfCKtIrSeifGfrd2g=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fastly.com; spf=pass smtp.mailfrom=fastly.com; dkim=pass (1024-bit key) header.d=fastly.com header.i=@fastly.com header.b=qHmr8G/C; arc=none smtp.client-ip=209.85.214.170
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fastly.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=fastly.com
-Received: by mail-pl1-f170.google.com with SMTP id d9443c01a7336-21f48ab13d5so75277455ad.0
-        for <netdev@vger.kernel.org>; Mon, 10 Feb 2025 10:03:23 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=fastly.com; s=google; t=1739210603; x=1739815403; darn=vger.kernel.org;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:mail-followup-to:message-id:subject:cc:to
-         :from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=q0ColAFAZi4Tngf2Yhd/Mj5SSDQPz6saNuJ+0XCUfiw=;
-        b=qHmr8G/CJw7j9WoZexAb75s0tE67BWWnf+n53G2j1ng29BSiBVBZMhMgg35HD+UO0v
-         kuenZDluhGlFnXnw7CvAgsTeV3IkWhPmEC8jeyPasOw8rtQ/8dhN6PFoHwWxL+m6r27H
-         2QknvMcjwMvT9/CfOHH76SxqSHwStrB8VRym4=
+	s=arc-20240116; t=1739211082; c=relaxed/simple;
+	bh=uGO1CdY++0LxTNG1UPJz1ESlgJkfuvMFfPrFf9UaGjY=;
+	h=MIME-Version:Date:Message-ID:Subject:From:To:Content-Type; b=EdgTOjBgR8mZfcvNpdE7AhXNGTbEuCTlGJCqQJmW2cvuN2Nw5spT42yb1nCY0CgGS5F6KBUVFlpeWEvvDl370B2IU2upd0dFshEOU39vglS3WSqmIJbIgMAQww2QSlpwX4uu01M/ogRWcvyHLf2difMVvxmY2z1I3XNL/2ze7hc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.78
+Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
+Received: by mail-io1-f78.google.com with SMTP id ca18e2360f4ac-855418e04e5so60270739f.2
+        for <netdev@vger.kernel.org>; Mon, 10 Feb 2025 10:11:20 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1739210603; x=1739815403;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:mail-followup-to:message-id:subject:cc:to
-         :from:date:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=q0ColAFAZi4Tngf2Yhd/Mj5SSDQPz6saNuJ+0XCUfiw=;
-        b=qrqA74DnqOkqADw2nhWlbteAjAIp//4G2XvOlQPFAkKMd9jKGthNEz2VOY3Ci4q8zx
-         mK65RqBkHe/30xnwZDqx/sTupOo5+uxAJWbV/olMWMX51VpArXoJuAxVa5StKnFuNvFh
-         CaoA63yWxoY24tNMuE5k4e4PHS3zVWhwbg8vfzkfls1f5x5w3i6De15+uVthpWrgwNAQ
-         7AAY3aADcGBb0dbEiRBeG2xiE8SGk01gm5MBva1NL5eoDpcZBAS3kX4DmVw2BDRIPYIR
-         0j4QNyd/czGygeM45nuZcx94p4QQ3BwjzrcJsFETPNeDmrGhgIoZrniwf192H55Afxxc
-         gfnA==
-X-Gm-Message-State: AOJu0Yxc5DcAX3H0EnAL6JlhK33j7MUPWt4hONQ91gYgPQTyR1tPOA8o
-	hlG+YZHTY01fmxA01mX1IJMHQJG/jHOEbX2vaGY754r/WB4GWx5gpnHN0tdIuJs=
-X-Gm-Gg: ASbGncuszO5fMldBb1sfvUcnZ2f0HVfXJUnJR1KDGYl9mdMLvdxSpxDJX98BnZ0ENtL
-	zBeW5l86qleyZk5Aa7vlTCg7X7JRgKCsWpgwHjPQ7y/mF8Mv6d/JHQs6M1BRfJbfTGfj7QjaWnT
-	GYpgm/ZHiWfS4tZnOCd1Dz9bNAzXpCPnToQ3ttFynaA1Y62p9ynijOYUygyNXgy7zmm7GbNW8lK
-	1Hn+igrHNeFxGQljrWj4H4st+BJveJsIg/34wqjPEi05K9xrybGb2knt6TD0KIjBa5MaJkw4wcR
-	ljQ7pHMlvjWZFCwM7ug4o4hNQPDyQIe7LJonJGCRndswyI81kH64OFMglw==
-X-Google-Smtp-Source: AGHT+IE5iidFomxHkIy+VYqWBmgoUJnNmg2a1BiELKxmTrveZa2Z19C3u7qiwVfucLVEQXEENuF22w==
-X-Received: by 2002:a05:6a21:202:b0:1ee:321b:313b with SMTP id adf61e73a8af0-1ee321b32f8mr8307599637.41.1739210603202;
-        Mon, 10 Feb 2025 10:03:23 -0800 (PST)
-Received: from LQ3V64L9R2 (c-24-6-151-244.hsd1.ca.comcast.net. [24.6.151.244])
-        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-730767fe44asm4411507b3a.4.2025.02.10.10.03.21
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 10 Feb 2025 10:03:22 -0800 (PST)
-Date: Mon, 10 Feb 2025 10:03:20 -0800
-From: Joe Damato <jdamato@fastly.com>
-To: Stanislav Fomichev <stfomichev@gmail.com>
-Cc: netdev@vger.kernel.org, horms@kernel.org, kuba@kernel.org,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
-	Donald Hunter <donald.hunter@gmail.com>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	Xuan Zhuo <xuanzhuo@linux.alibaba.com>,
-	Stanislav Fomichev <sdf@fomichev.me>,
-	Mina Almasry <almasrymina@google.com>,
-	Martin Karsten <mkarsten@uwaterloo.ca>,
-	Sridhar Samudrala <sridhar.samudrala@intel.com>,
-	David Wei <dw@davidwei.uk>,
-	open list <linux-kernel@vger.kernel.org>
-Subject: Re: [PATCH net-next v5 2/3] netdev-genl: Add an XSK attribute to
- queues
-Message-ID: <Z6o_aMvoycAAJOd3@LQ3V64L9R2>
-Mail-Followup-To: Joe Damato <jdamato@fastly.com>,
-	Stanislav Fomichev <stfomichev@gmail.com>, netdev@vger.kernel.org,
-	horms@kernel.org, kuba@kernel.org,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
-	Donald Hunter <donald.hunter@gmail.com>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	Xuan Zhuo <xuanzhuo@linux.alibaba.com>,
-	Stanislav Fomichev <sdf@fomichev.me>,
-	Mina Almasry <almasrymina@google.com>,
-	Martin Karsten <mkarsten@uwaterloo.ca>,
-	Sridhar Samudrala <sridhar.samudrala@intel.com>,
-	David Wei <dw@davidwei.uk>,
-	open list <linux-kernel@vger.kernel.org>
-References: <20250208041248.111118-1-jdamato@fastly.com>
- <20250208041248.111118-3-jdamato@fastly.com>
- <Z6gIU3bsIjsYqCN_@mini-arch>
+        d=1e100.net; s=20230601; t=1739211079; x=1739815879;
+        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=ZuL72nu9kcv2bTXn3eChmkygmSBm5cQNmdbeFEmtP+E=;
+        b=RZyLgtU3G6+uuWqZCFAnBMAhT+WNtYdUov5+L1NEQ0XKUzGCuqtb4iYJ8Nwm7WWOkr
+         PH8OLllSJxwuqx3I1GZMV5ZTyKEh31UO/Oet/8ugG1eAxWA48N5fmGctzY4IJIjcIbp6
+         TGmUhq+elIiD6415LaV/nqr+IBhmb8dht2bRW2dXt9zYv8p8CB9nZrrIi2OXtE0xw85w
+         2+Xa0fb6ja/3oTpDwjRfc4evKwKQqX5b9a0KW5M2kxqil2lC8JGOa6E0eL1MoGHsK/ry
+         ZEBZmQO86HwsvgNnHNps2UjEXQSx5IOoCz6HYCdZ/B60xSw6cpxYYWqD9KDqvcbLDzO0
+         N58g==
+X-Forwarded-Encrypted: i=1; AJvYcCUDPubTRoBt4iRwkXBdVVr8c8K7U8VzGB1HjbjFihUzsDuUfx3p/UnG1iiKB3Hrt8HwSYokVa8=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yx3i/S1ojmdf+uUpHyiQ7MsVJoUHmz1WM/vYY9XhN5XeX6MBGoh
+	q8nydNQ5qNfzpctnx44z16y6OMVeJqEUJnEza/kBzAJB1C5ctJvvhYMdYVEeiY0bEDmVls2VX1f
+	zWpxZ7pUruGdsoomb6lY4yML6nU4wjuOwFmiY8TZGBxbr6b27EiGCeV8=
+X-Google-Smtp-Source: AGHT+IEEbNDtXVqnXaewfgLpfOm/xaG4kKq/xHWqN4CJ+FbBv6siCo/VcSMl6/DysKYcgKRoxVxLaSWsZcEoxPOh5qN1WDqi69RZ
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <Z6gIU3bsIjsYqCN_@mini-arch>
+X-Received: by 2002:a05:6e02:17ce:b0:3d0:1bc4:77a0 with SMTP id
+ e9e14a558f8ab-3d13da22469mr122217325ab.0.1739211079624; Mon, 10 Feb 2025
+ 10:11:19 -0800 (PST)
+Date: Mon, 10 Feb 2025 10:11:19 -0800
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <67aa4147.050a0220.3d72c.0055.GAE@google.com>
+Subject: [syzbot] [net?] general protection fault in arp_create (3)
+From: syzbot <syzbot+3b1dd14b3a62374e75c7@syzkaller.appspotmail.com>
+To: davem@davemloft.net, dsahern@kernel.org, edumazet@google.com, 
+	horms@kernel.org, kuba@kernel.org, linux-kernel@vger.kernel.org, 
+	netdev@vger.kernel.org, pabeni@redhat.com, syzkaller-bugs@googlegroups.com
+Content-Type: text/plain; charset="UTF-8"
 
-On Sat, Feb 08, 2025 at 05:43:47PM -0800, Stanislav Fomichev wrote:
-> On 02/08, Joe Damato wrote:
-> > Expose a new per-queue nest attribute, xsk, which will be present for
-> > queues that are being used for AF_XDP. If the queue is not being used for
-> > AF_XDP, the nest will not be present.
-> > 
-> > In the future, this attribute can be extended to include more data about
-> > XSK as it is needed.
-> > 
-> > Signed-off-by: Joe Damato <jdamato@fastly.com>
-> > Suggested-by: Jakub Kicinski <kuba@kernel.org>
-> > ---
-> >  v5:
-> >    - Removed unused variable, ret, from netdev_nl_queue_fill_one.
-> > 
-> >  v4:
-> >    - Updated netdev_nl_queue_fill_one to use the empty nest helper added
-> >      in patch 1.
-> > 
-> >  v2:
-> >    - Patch adjusted to include an attribute, xsk, which is an empty nest
-> >      and exposed for queues which have a pool.
-> > 
-> >  Documentation/netlink/specs/netdev.yaml | 13 ++++++++++++-
-> >  include/uapi/linux/netdev.h             |  6 ++++++
-> >  net/core/netdev-genl.c                  | 11 +++++++++++
-> >  tools/include/uapi/linux/netdev.h       |  6 ++++++
-> >  4 files changed, 35 insertions(+), 1 deletion(-)
-> > 
-> > diff --git a/Documentation/netlink/specs/netdev.yaml b/Documentation/netlink/specs/netdev.yaml
-> > index 288923e965ae..85402a2e289c 100644
-> > --- a/Documentation/netlink/specs/netdev.yaml
-> > +++ b/Documentation/netlink/specs/netdev.yaml
-> > @@ -276,6 +276,9 @@ attribute-sets:
-> >          doc: The timeout, in nanoseconds, of how long to suspend irq
-> >               processing, if event polling finds events
-> >          type: uint
-> > +  -
-> > +    name: xsk-info
-> > +    attributes: []
-> >    -
-> >      name: queue
-> >      attributes:
-> > @@ -294,6 +297,9 @@ attribute-sets:
-> >        -
-> >          name: type
-> >          doc: Queue type as rx, tx. Each queue type defines a separate ID space.
-> > +             XDP TX queues allocated in the kernel are not linked to NAPIs and
-> > +             thus not listed. AF_XDP queues will have more information set in
-> > +             the xsk attribute.
-> >          type: u32
-> >          enum: queue-type
-> >        -
-> > @@ -309,7 +315,11 @@ attribute-sets:
-> >          doc: io_uring memory provider information.
-> >          type: nest
-> >          nested-attributes: io-uring-provider-info
-> > -
-> > +      -
-> > +        name: xsk
-> > +        doc: XSK information for this queue, if any.
-> > +        type: nest
-> > +        nested-attributes: xsk-info
-> >    -
-> >      name: qstats
-> >      doc: |
-> > @@ -652,6 +662,7 @@ operations:
-> >              - ifindex
-> >              - dmabuf
-> >              - io-uring
-> > +            - xsk
-> >        dump:
-> >          request:
-> >            attributes:
-> > diff --git a/include/uapi/linux/netdev.h b/include/uapi/linux/netdev.h
-> > index 6c6ee183802d..4e82f3871473 100644
-> > --- a/include/uapi/linux/netdev.h
-> > +++ b/include/uapi/linux/netdev.h
-> > @@ -136,6 +136,11 @@ enum {
-> >  	NETDEV_A_NAPI_MAX = (__NETDEV_A_NAPI_MAX - 1)
-> >  };
-> >  
-> > +enum {
-> > +	__NETDEV_A_XSK_INFO_MAX,
-> > +	NETDEV_A_XSK_INFO_MAX = (__NETDEV_A_XSK_INFO_MAX - 1)
-> > +};
-> > +
-> >  enum {
-> >  	NETDEV_A_QUEUE_ID = 1,
-> >  	NETDEV_A_QUEUE_IFINDEX,
-> > @@ -143,6 +148,7 @@ enum {
-> >  	NETDEV_A_QUEUE_NAPI_ID,
-> >  	NETDEV_A_QUEUE_DMABUF,
-> >  	NETDEV_A_QUEUE_IO_URING,
-> > +	NETDEV_A_QUEUE_XSK,
-> >  
-> >  	__NETDEV_A_QUEUE_MAX,
-> >  	NETDEV_A_QUEUE_MAX = (__NETDEV_A_QUEUE_MAX - 1)
-> > diff --git a/net/core/netdev-genl.c b/net/core/netdev-genl.c
-> > index 0dcd4faefd8d..b5a93a449af9 100644
-> > --- a/net/core/netdev-genl.c
-> > +++ b/net/core/netdev-genl.c
-> > @@ -400,11 +400,22 @@ netdev_nl_queue_fill_one(struct sk_buff *rsp, struct net_device *netdev,
-> >  		if (params->mp_ops &&
-> >  		    params->mp_ops->nl_fill(params->mp_priv, rsp, rxq))
-> >  			goto nla_put_failure;
-> > +
-> > +		if (rxq->pool)
-> > +			if (nla_put_empty_nest(rsp, NETDEV_A_QUEUE_XSK))
-> > +				goto nla_put_failure;
-> 
-> Needs to be guarded by ifdef CONFIG_XDP_SOCKETS?
-> 
-> 
-> net/core/netdev-genl.c: In function `netdev_nl_queue_fill_one´:
-> net/core/netdev-genl.c:404:24: error: `struct netdev_rx_queue´ has no member named `pool´
->   404 |                 if (rxq->pool)
->       |                        ^~
-> net/core/netdev-genl.c:414:24: error: `struct netdev_queue´ has no member named `pool´
->   414 |                 if (txq->pool)
->       |                        ^~
+Hello,
 
-Ah, thanks.
+syzbot found the following issue on:
 
-I'm trying to decide if it'll look better factored out into helpers
-vs just dropping the #ifdefs in netdev_nl_queue_fill_one.
+HEAD commit:    7ee983c850b4 Merge tag 'drm-fixes-2025-02-08' of https://g..
+git tree:       upstream
+console output: https://syzkaller.appspot.com/x/log.txt?x=127b61b0580000
+kernel config:  https://syzkaller.appspot.com/x/.config?x=147b7d49d83b8036
+dashboard link: https://syzkaller.appspot.com/bug?extid=3b1dd14b3a62374e75c7
+compiler:       Debian clang version 15.0.6, GNU ld (GNU Binutils for Debian) 2.40
 
-Open to opinions so that hopefully v6 will be the last one ;)
+Unfortunately, I don't have any reproducer for this issue yet.
+
+Downloadable assets:
+disk image: https://storage.googleapis.com/syzbot-assets/54ead761f64f/disk-7ee983c8.raw.xz
+vmlinux: https://storage.googleapis.com/syzbot-assets/95e57de2a045/vmlinux-7ee983c8.xz
+kernel image: https://storage.googleapis.com/syzbot-assets/d24a612a8ac7/bzImage-7ee983c8.xz
+
+IMPORTANT: if you fix the issue, please add the following tag to the commit:
+Reported-by: syzbot+3b1dd14b3a62374e75c7@syzkaller.appspotmail.com
+
+Oops: general protection fault, probably for non-canonical address 0xdffffc0000000016: 0000 [#1] PREEMPT SMP KASAN PTI
+KASAN: null-ptr-deref in range [0x00000000000000b0-0x00000000000000b7]
+CPU: 1 UID: 0 PID: 3448 Comm: kworker/u8:9 Not tainted 6.14.0-rc1-syzkaller-00181-g7ee983c850b4 #0
+Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 12/27/2024
+Workqueue: bat_events batadv_bla_periodic_work
+RIP: 0010:arp_create+0x46/0x910 net/ipv4/arp.c:554
+Code: 49 89 ce 89 54 24 3c 89 74 24 30 89 fb 49 bd 00 00 00 00 00 fc ff df e8 18 e6 62 f7 49 8d be b4 00 00 00 48 89 f8 48 c1 e8 03 <42> 0f b6 04 28 84 c0 0f 85 db 05 00 00 45 0f b7 a6 b4 00 00 00 49
+RSP: 0018:ffffc9000c3a7870 EFLAGS: 00010203
+RAX: 0000000000000016 RBX: 0000000000000002 RCX: ffff888031bcbc00
+RDX: 0000000000000000 RSI: 0000000000000806 RDI: 00000000000000b4
+RBP: ffffc9000c3a79f0 R08: 0000000000000000 R09: 0000000000000000
+R10: dffffc0000000000 R11: fffff52001874f30 R12: ffffc9000c3a7aa0
+R13: dffffc0000000000 R14: 0000000000000000 R15: 0000000000000002
+FS:  0000000000000000(0000) GS:ffff8880b8700000(0000) knlGS:0000000000000000
+CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+CR2: 00007f4b41e61fa8 CR3: 000000007e55a000 CR4: 00000000003526f0
+DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
+DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
+Call Trace:
+ <TASK>
+ batadv_bla_send_claim+0x16f/0xea0 net/batman-adv/bridge_loop_avoidance.c:361
+ batadv_bla_send_announce net/batman-adv/bridge_loop_avoidance.c:675 [inline]
+ batadv_bla_periodic_work+0x5dc/0xaf0 net/batman-adv/bridge_loop_avoidance.c:1481
+ process_one_work kernel/workqueue.c:3236 [inline]
+ process_scheduled_works+0xa66/0x1840 kernel/workqueue.c:3317
+ worker_thread+0x870/0xd30 kernel/workqueue.c:3398
+ kthread+0x7a9/0x920 kernel/kthread.c:464
+ ret_from_fork+0x4b/0x80 arch/x86/kernel/process.c:148
+ ret_from_fork_asm+0x1a/0x30 arch/x86/entry/entry_64.S:244
+ </TASK>
+Modules linked in:
+---[ end trace 0000000000000000 ]---
+RIP: 0010:arp_create+0x46/0x910 net/ipv4/arp.c:554
+Code: 49 89 ce 89 54 24 3c 89 74 24 30 89 fb 49 bd 00 00 00 00 00 fc ff df e8 18 e6 62 f7 49 8d be b4 00 00 00 48 89 f8 48 c1 e8 03 <42> 0f b6 04 28 84 c0 0f 85 db 05 00 00 45 0f b7 a6 b4 00 00 00 49
+RSP: 0018:ffffc9000c3a7870 EFLAGS: 00010203
+RAX: 0000000000000016 RBX: 0000000000000002 RCX: ffff888031bcbc00
+RDX: 0000000000000000 RSI: 0000000000000806 RDI: 00000000000000b4
+RBP: ffffc9000c3a79f0 R08: 0000000000000000 R09: 0000000000000000
+R10: dffffc0000000000 R11: fffff52001874f30 R12: ffffc9000c3a7aa0
+R13: dffffc0000000000 R14: 0000000000000000 R15: 0000000000000002
+FS:  0000000000000000(0000) GS:ffff8880b8700000(0000) knlGS:0000000000000000
+CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+CR2: 00007f4b41e61fa8 CR3: 00000000348fa000 CR4: 00000000003526f0
+DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
+DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
+----------------
+Code disassembly (best guess):
+   0:	49 89 ce             	mov    %rcx,%r14
+   3:	89 54 24 3c          	mov    %edx,0x3c(%rsp)
+   7:	89 74 24 30          	mov    %esi,0x30(%rsp)
+   b:	89 fb                	mov    %edi,%ebx
+   d:	49 bd 00 00 00 00 00 	movabs $0xdffffc0000000000,%r13
+  14:	fc ff df
+  17:	e8 18 e6 62 f7       	call   0xf762e634
+  1c:	49 8d be b4 00 00 00 	lea    0xb4(%r14),%rdi
+  23:	48 89 f8             	mov    %rdi,%rax
+  26:	48 c1 e8 03          	shr    $0x3,%rax
+* 2a:	42 0f b6 04 28       	movzbl (%rax,%r13,1),%eax <-- trapping instruction
+  2f:	84 c0                	test   %al,%al
+  31:	0f 85 db 05 00 00    	jne    0x612
+  37:	45 0f b7 a6 b4 00 00 	movzwl 0xb4(%r14),%r12d
+  3e:	00
+  3f:	49                   	rex.WB
+
+
+---
+This report is generated by a bot. It may contain errors.
+See https://goo.gl/tpsmEJ for more information about syzbot.
+syzbot engineers can be reached at syzkaller@googlegroups.com.
+
+syzbot will keep track of this issue. See:
+https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
+
+If the report is already addressed, let syzbot know by replying with:
+#syz fix: exact-commit-title
+
+If you want to overwrite report's subsystems, reply with:
+#syz set subsystems: new-subsystem
+(See the list of subsystem names on the web dashboard)
+
+If the report is a duplicate of another one, reply with:
+#syz dup: exact-subject-of-another-report
+
+If you want to undo deduplication, reply with:
+#syz undup
 
