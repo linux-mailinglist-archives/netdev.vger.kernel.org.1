@@ -1,228 +1,274 @@
-Return-Path: <netdev+bounces-164670-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-164672-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8D06AA2EA2F
-	for <lists+netdev@lfdr.de>; Mon, 10 Feb 2025 11:56:34 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 31477A2EA78
+	for <lists+netdev@lfdr.de>; Mon, 10 Feb 2025 12:04:53 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D2A65168D08
-	for <lists+netdev@lfdr.de>; Mon, 10 Feb 2025 10:56:10 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 634271883313
+	for <lists+netdev@lfdr.de>; Mon, 10 Feb 2025 11:04:56 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EC72E1E412A;
-	Mon, 10 Feb 2025 10:54:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7036E1E04AE;
+	Mon, 10 Feb 2025 11:02:12 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="iitgo919"
+	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="N73WP17z"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.18])
+Received: from relay2-d.mail.gandi.net (relay2-d.mail.gandi.net [217.70.183.194])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 38EFC1E47B3
-	for <netdev@vger.kernel.org>; Mon, 10 Feb 2025 10:54:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=192.198.163.18
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1739184880; cv=fail; b=NF6rvOxMD2/xhSvPxn39g9DG4WBhYj33F5GMkGp6J+s3hOzzZNBNryeVM2qYGAfHychmzt4pcvLWeHKTXB3wJbtjRHZNNB9xIcRKZarPTtkcPaoiuZOYSQsF+1H8AtUWIErr82UItGE3+uUtIsDMcgZZHvZWsdT90resyakygL8=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1739184880; c=relaxed/simple;
-	bh=nZ0usIPh3Xe1EHm8QP7Hf0+za+fwghgsmogo79yMt10=;
-	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
-	 Content-Type:MIME-Version; b=pCc2nFWuMWXEtjO6foTs9oRgq5CyETJOfABiHCTbUhhlwzud2z4d6GyLtzoaTPIqTs9E3fOBDFOVZntyG9Q6ZFktVJuamqWfuC3jRdSKc2IXU/OZcK3JpfbniWtiNo/O6dsJUnP/1PY6VUWzKY7sPf3O+5rt2NWD/qzVO+0y2q4=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=iitgo919; arc=fail smtp.client-ip=192.198.163.18
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1739184879; x=1770720879;
-  h=from:to:cc:subject:date:message-id:references:
-   in-reply-to:content-transfer-encoding:mime-version;
-  bh=nZ0usIPh3Xe1EHm8QP7Hf0+za+fwghgsmogo79yMt10=;
-  b=iitgo9191cJHQQ/xmF/hFzdIkaZsmOsksXIqE6DfhPWdQJZSxAG0hnub
-   pDv9TAdO7py1Pt2nrNIuzE2A4mTfsBmJoH5570KuREc7D9feNgBb25AXD
-   SbGfAd3joBpDQ/kAM/vz1IozxNiwdUqT2KOf+pE9qRJb+wbTVCzEVVo0X
-   9+1VvkK2SQXZRlo7xoZRf8LWPTx7Vgiw4q7DiST1hz0GbLjUBbtEiILRa
-   6dwZq24rRgktfo861cJzPZZkty/w4azLoB/jdKJpntX1Vr236yBG1REqe
-   Gtd9TP+TTGvBM/1z/+Y4+qeFSgMoEUH2dB6jo8WJwW3p8A7KJYsA6ohb1
-   A==;
-X-CSE-ConnectionGUID: 61nEBMLZSJiBoG65x4TxSw==
-X-CSE-MsgGUID: UsEX+EzlRSWyy8W0ePnZaQ==
-X-IronPort-AV: E=McAfee;i="6700,10204,11340"; a="38995325"
-X-IronPort-AV: E=Sophos;i="6.13,274,1732608000"; 
-   d="scan'208";a="38995325"
-Received: from fmviesa010.fm.intel.com ([10.60.135.150])
-  by fmvoesa112.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 10 Feb 2025 02:54:38 -0800
-X-CSE-ConnectionGUID: sXqLHyF1T/yLXsuzv0Hu3g==
-X-CSE-MsgGUID: KfitusQWRyWPeRZS8N0yvw==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.13,274,1732608000"; 
-   d="scan'208";a="112685240"
-Received: from orsmsx603.amr.corp.intel.com ([10.22.229.16])
-  by fmviesa010.fm.intel.com with ESMTP/TLS/AES256-GCM-SHA384; 10 Feb 2025 02:54:38 -0800
-Received: from orsmsx601.amr.corp.intel.com (10.22.229.14) by
- ORSMSX603.amr.corp.intel.com (10.22.229.16) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.44; Mon, 10 Feb 2025 02:54:37 -0800
-Received: from ORSEDG601.ED.cps.intel.com (10.7.248.6) by
- orsmsx601.amr.corp.intel.com (10.22.229.14) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.44 via Frontend Transport; Mon, 10 Feb 2025 02:54:37 -0800
-Received: from NAM12-BN8-obe.outbound.protection.outlook.com (104.47.55.177)
- by edgegateway.intel.com (134.134.137.102) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.1.2507.44; Mon, 10 Feb 2025 02:54:37 -0800
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=bsph5lWSl63qHGx0nlBgN1T32I93IMS9lLydyYKtX2P5uY4idQ8Z/bHyImFNg3XYCAictUBEa0o3l4XT1rUTnSaWmLimT23wmvjZLm31NRMBQ349w3mZdSe4SX09EltQ0ZychcuqcTbcwWzbuErCqOX/m/1Csx1eJ64QNIzMsWX6CQ8bFj9A4iCKFqeV+n2i8Kt3WrlYHRNcO0sRRuzl54USvGp6qZJfVkfT85/mOg1gl1RSCeyp8FqMlX/JZmIZrS53htUXqyl2He0WSn/WVbORFBn5omuIdhlm4Wus1uCHMuyipqGCfj2p3w8UD1q0zJ9SZy5c9eZF6c2HwX14Tg==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=nZ0usIPh3Xe1EHm8QP7Hf0+za+fwghgsmogo79yMt10=;
- b=gOivEAw3zwRXvjOqHNPP9Mn3oluaJyOCWxzv1r8EEHcFz3MAb0AFbgbIoQdBjqeBOebPT7sx87ovwVhNskjvHRZFgGXohBYaZM+wQ0MzjDhBTzk7C1cCbsBK+XI1WLMDyy7HatfACmBskfVFEgA6SdIBmJ9/a1CgPNROUVXNA6s7jzO/LWIie5PAvIb+lqhGr5de6epEFd6rzbCBJF6UB/SGHLuMOQVrpBWTB/+M+AI8F6la1EOD5W/qVbEkgDPDf0Tt2jwv4io6LBupPVKAxv6+rq7MGQr+3dvLCmzK9xL1RAtMsr6LPMVyMsSG8mz+zPLDyQyvt6GAgKsmYz+BdQ==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
- dkim=pass header.d=intel.com; arc=none
-Received: from IA1PR11MB6219.namprd11.prod.outlook.com (2603:10b6:208:3e9::15)
- by CY5PR11MB6308.namprd11.prod.outlook.com (2603:10b6:930:20::8) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8422.18; Mon, 10 Feb
- 2025 10:54:34 +0000
-Received: from IA1PR11MB6219.namprd11.prod.outlook.com
- ([fe80::f302:c534:2d71:822b]) by IA1PR11MB6219.namprd11.prod.outlook.com
- ([fe80::f302:c534:2d71:822b%4]) with mapi id 15.20.8422.015; Mon, 10 Feb 2025
- 10:54:34 +0000
-From: "Nitka, Grzegorz" <grzegorz.nitka@intel.com>
-To: Simon Horman <horms@kernel.org>
-CC: "intel-wired-lan@lists.osuosl.org" <intel-wired-lan@lists.osuosl.org>,
-	"netdev@vger.kernel.org" <netdev@vger.kernel.org>, "Nguyen, Anthony L"
-	<anthony.l.nguyen@intel.com>, "Kitszel, Przemyslaw"
-	<przemyslaw.kitszel@intel.com>, "Kolacinski, Karol"
-	<karol.kolacinski@intel.com>
-Subject: RE: [PATCH iwl-next v1 1/3] ice: Add sync delay for E825C
-Thread-Topic: [PATCH iwl-next v1 1/3] ice: Add sync delay for E825C
-Thread-Index: AQHbeHLNg6cxkljSk0aw72vpIX558bM7ni+AgATCzyA=
-Date: Mon, 10 Feb 2025 10:54:34 +0000
-Message-ID: <IA1PR11MB62190D71B315202FB7BB4D8A92F22@IA1PR11MB6219.namprd11.prod.outlook.com>
-References: <20250206083655.3005151-1-grzegorz.nitka@intel.com>
- <20250206083655.3005151-2-grzegorz.nitka@intel.com>
- <20250207100331.GJ554665@kernel.org>
-In-Reply-To: <20250207100331.GJ554665@kernel.org>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach:
-X-MS-TNEF-Correlator:
-authentication-results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=intel.com;
-x-ms-publictraffictype: Email
-x-ms-traffictypediagnostic: IA1PR11MB6219:EE_|CY5PR11MB6308:EE_
-x-ms-office365-filtering-correlation-id: 563ba4bf-e0dc-46de-a317-08dd49c14e4b
-x-ms-exchange-senderadcheck: 1
-x-ms-exchange-antispam-relay: 0
-x-microsoft-antispam: BCL:0;ARA:13230040|1800799024|376014|366016|38070700018;
-x-microsoft-antispam-message-info: =?us-ascii?Q?SCaz+cZZHHbZoM2p1ybJlWpV4FS+7F7OhzxvPlCPgTdFkM62TWFxzpY5A1ft?=
- =?us-ascii?Q?T788eHI1jCZ7o9PUa2H7YNvA3Ab1Lj6zrkD3dUT06p5R2SZoNusk/2T/0Uov?=
- =?us-ascii?Q?6rEf/UX4VpmqXN4w+/r7iU09NrwbKpXQNrFR1Q2vKc3bR53WuS1FCUqIq+Cs?=
- =?us-ascii?Q?4IRJX2uzQkFBuHxA6dyicKkeTae1+CWD3tl+9dJ/1n41sN3QUKn0rkl274LP?=
- =?us-ascii?Q?yWAjPbBETXVSA+zmjxgefwbts18xkpu/LyKqiVYNwmOR+Gk+V+d98bpQ4DoU?=
- =?us-ascii?Q?rA8fOArJnQIXDVjHi5s1rtzAVUw+/2U/Z5h9kdkAgdxOWp1Ru/BbfMhTWW4x?=
- =?us-ascii?Q?Kvu/NE36woGtdPTTkfIA8ts0Ca1JgPXDfR9KYEwWuD4f+0dt3LCbq8zDh//M?=
- =?us-ascii?Q?i9hSMlI2L5VyITaae/CvHG6X9UkN3x+FcKj3u6ZeR5cYRUC2x//mLZs8qbUH?=
- =?us-ascii?Q?juu/HaogMg3YUon+xMol936s/OGD8aD1qgEdFwGMSG2Nng2BQaneiKKVO2NP?=
- =?us-ascii?Q?x0ykApnNLQAsvGLdM6Y/AKl9CVSXLRYevUPG3aGQ2JuStOMrYL8dGs27e7+p?=
- =?us-ascii?Q?Ik8mHnBG9DkIeEFuR53oP4qjX/Yo79OKDUy1PoaG1HLmKmBHqOrfGqhwi9R2?=
- =?us-ascii?Q?Yy00iL1g/eYnd3ZAC+GNiBM7Gz0GyOMLEU4GkJkudgt8nyasf1wo0JbVoJNX?=
- =?us-ascii?Q?GZbwY/tVM/anZZT87xgvS2O0GTlEVCI0ieWVfXNOfSMYJgxmMh7liXNF6Zxu?=
- =?us-ascii?Q?gLc/u2+65JvaRzdm9E/OD9N1q6cWJI7JKn1HoZePPlcra1F7ZCjgUQUjY99x?=
- =?us-ascii?Q?WgExlgyQAtjDzCVGC9XqhVN0YOF4g5UJcyl7bBfD8Gzfs6/KY1McOIi8cYzu?=
- =?us-ascii?Q?z+M1LhjgAajsSCURoJUJURKJ5DrNJBaSXJ4n/cb3md0DWi4dEGfXV4y7mHHo?=
- =?us-ascii?Q?ivoT2Z1hpJ/dM+/Swn00u4kyGqE4uv9E8onC3MiN4Jm2a18MOe5djEWbokmU?=
- =?us-ascii?Q?EtkdwzSbxVEQ3KrizsMUmdI5gFYA/sknw8GC178TffXl1gs39f9vXwu5pA9/?=
- =?us-ascii?Q?JfbOJiXwUeD/MCna6firx2odx0FmpUPSml1+pui0OCiYU7aMKafhPnd2HOsP?=
- =?us-ascii?Q?txHObNOP5d42A7TlcNkhulh6sVwbFI9oS1lPWj5yu/sEOeXa0xh+XtQG3Ray?=
- =?us-ascii?Q?3K7rWuVk1PalseyA/D6RGj3Tl9G+q3uFK232X46O57mq+iFRO+zUTtnY4F40?=
- =?us-ascii?Q?8JMD3VaXs/z4tqjrH1Pl1Ybp/t8Mf3Y4qAQ9AyezeqBFVKUpDRapUHu6AM5D?=
- =?us-ascii?Q?aqatccOLDFKJf4uja2/CNOw6ZcC5eos8f4/jcqRH7QuUXxA32+im6dbjXem3?=
- =?us-ascii?Q?M9aUtOrICZ7IwCZyPeKOexanjC4Um12KzBc0JyuyDeTBHK1uIRg4T2gupFGC?=
- =?us-ascii?Q?Ou4Np7+czp89f6AQSI5JORhSZffKl7qV?=
-x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:IA1PR11MB6219.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(1800799024)(376014)(366016)(38070700018);DIR:OUT;SFP:1101;
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0: =?us-ascii?Q?3qizLEl5DX5So8wowd1+0Ovq0bOYG/QM5SAyOOJW4c2rr/T3DeBVKFpY2YB+?=
- =?us-ascii?Q?e0He0mtWqm0Vvjl0yo49SEdMAdAl1ZFoUFSRRLEpuE5V1JpPGOxg6Kt+nLXJ?=
- =?us-ascii?Q?2qqODoBSTuUAXk0tsKRLbhlLCVfy3h33T8trOMy1z583yZLmf3FMK31GIaLo?=
- =?us-ascii?Q?DH5QZJ/8GAXnD1sA98pIZA+BIc5dTyCwj/t2d4qcPtFKvBCswLh3KLfHcvBr?=
- =?us-ascii?Q?zku+SAaroRu06AclcjnSMcyLOautRSTSEXsha8RcLw7UfzmyHzq+H6oqTZO5?=
- =?us-ascii?Q?/b4M6Inyyi/h7EjwzgZqbheqPk8VWqRKEiKDPLOoY/lqsqmZjydc0LgrUkyO?=
- =?us-ascii?Q?wUfJZ+I+Ob2vm4Br+1/+eYe59tMaq7iGaIx7UORINtUYVou6eZFpXRZdLfCM?=
- =?us-ascii?Q?XBpiJd0YmXekGzmNdSNtq3HkePGVs4u+p/kyzb8iYinFbv4cPSBGZCdJ81SU?=
- =?us-ascii?Q?u5qz+9F/5NjGG6qudQWLdwSXBnkGskPb9qauKtF1T8bp2NFQj0L5TDKFDJ2n?=
- =?us-ascii?Q?cuZJCb3yERu6ix+03s+z5szpHtocRfMpIQ6b9UkGjvsE5nwNSf1Ss+2KzUlj?=
- =?us-ascii?Q?vUshFWjQPdYavTbuyoCefVOlxdNPA/UPy8Nw0Kqw7rpmu0PxisZ5n8UxPTnz?=
- =?us-ascii?Q?1EIgdsTip0EmzazG/aVt575ayjyVH5r1UZ2lalHnB3HRtLnQrOFXNbtb0tA4?=
- =?us-ascii?Q?OLExEDEhhS/ss/6Acg6ItPNP3dN+oZ5v0motMS8IdKb+TU5wgoD8EwdtNd9r?=
- =?us-ascii?Q?wHUoUq73B2xPTC0UUO2Nk8sqDjel2Eg1eyKnvEzisD822mcG1v7VSfZNzNf5?=
- =?us-ascii?Q?qEvUJFNEfxcufGY9y37u78FiIR4v8unMiPf3B4v4e7zhhxW1YtybwgGVt/TZ?=
- =?us-ascii?Q?puohWr1XPZFn5KR3NOqmk6vwVoT6zvwJTbVu1MVwgb5zAE7cBIGPlZwHly+y?=
- =?us-ascii?Q?3OIOPn1GMovwZHwCP7gX/lpdHYkUG6B+ZFa9svAqDE7Z8OGPT29PTaxlacYu?=
- =?us-ascii?Q?ESyauUUpV/w3GsUNhsQNsTZx7ruFQLZRDTy/3Tin8i7sVMKVw7ZZh1qnG2ho?=
- =?us-ascii?Q?NANA75a/mrN9w2vbxwkpPD1hb8ByEnRfLRkoiQw/y6yC4yq3Qk6NnjhFfMh7?=
- =?us-ascii?Q?G0mvUzL7Z5Vwg98zejsXCm3ut/SRy1woFXMwczlR6wIjAW9Z+fvkbXBHos5h?=
- =?us-ascii?Q?1+4r0FgBnSCyruDd0XV37uWCYF+WogLtHk4XVKeB4nlJZXCujg20ivKE6jJH?=
- =?us-ascii?Q?l68df/ZtR1QJIJLpWw4MBPIhFbKSBr0bpZASg8K5MjKy1Q4h8S+/MvETeeNu?=
- =?us-ascii?Q?fqKs5h/RKptH92TrlIDGXk+I+XGEQxGK8isAGE9On4psnQ08LO5mcbg1AE2+?=
- =?us-ascii?Q?to8YKQLM9r+KwMC1KKcQ+CQi3gUyda2Umf+nBdDG1Ay7mL4QY2j8d99iEzjI?=
- =?us-ascii?Q?HCyTtixdoNiJKyoBsFIBsQK/hAH/Ada/8RnoBus2GTEw4zZPLmbHc0dd8Pi3?=
- =?us-ascii?Q?B7Pf44xkcD9nvrsvRxEkSkLuqOz0Fyn+Stsz3uHg3SD7W2R/BRceKejRZBaC?=
- =?us-ascii?Q?38hBCvoFqW/UA3gmwzPkqbsEssVzYgXc0EsWkJvP?=
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 958ED1CAA89;
+	Mon, 10 Feb 2025 11:02:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.194
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1739185332; cv=none; b=DwCzEWRb3Rw7V8nvLnY61jlXSqGBSTdGirvIRViqDSPE2wAlt1o3ldJh1p28TqQYzdkxncY92ZvhgBRbMSN5R+RtncIGWB6RuV0n8nxYQvqFJ+Ve/x2/SOYKxKdvm6toAxi75kPbXd0x5m1b2pEDjOqHHdRDaK0x44rY7GyZwsM=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1739185332; c=relaxed/simple;
+	bh=cPwVpEPDZTLSJTVR83ceQc5S9hkJaly2lPhwNgX0AxI=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=AEghwELSlMJG5OlxT1+LsI6vDvH0GcwffdZ8R2ZcLB+qxFpok+RyUCQ8SiRe86o+fs1da2+GjUnGXu9P4wUCFU7R5mg1PPjrHHIs/vVcPnPSnm3aS+IGQDF2doNi6WWxSrNoIpc/P3B+sG0qV+aD+488zlZvDdm8StVD1FRJqPE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=N73WP17z; arc=none smtp.client-ip=217.70.183.194
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
+Received: by mail.gandi.net (Postfix) with ESMTPSA id 0E7C643158;
+	Mon, 10 Feb 2025 11:02:01 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
+	t=1739185326;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=Gmrlu3nc02d+jWxj8+i6q0M+l8i8yQBkmFLjW9PKKPQ=;
+	b=N73WP17z6Ic2ftM721SqQ5LZBUU2XcrnIDnXt45t7Qsp64VKrWg5vBZdI/F7GnGLZaZgmy
+	zePYcj8MDBlTyj9rSSTq9T/dbWeNFZ8HtdZnAHFA7OKAh9lFWDtdO7EoYdRXk/r5sPHcEN
+	nIWeKshIl1699eaP//L+A8w9+XJBwQftxS9VpUCYtM6vRZTzxke6VsgyhU5iNaIFL16pkQ
+	tvhMOBf8jNpYxUlNnMXltyOOk5X3l2zpBT+Amhm9Gyk0QtXNi2Lad2wfqQu+RHsDoXTbv1
+	15Zf21A1IPMf5vptTCTxiN1Z+J7OOpQynMvh7/qvev4nJ570AswZ7z2LZ2PIew==
+From: Romain Gantois <romain.gantois@bootlin.com>
+To: Andrew Lunn <andrew+netdev@lunn.ch>,
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ Rob Herring <robh@kernel.org>, Krzysztof Kozlowski <krzk+dt@kernel.org>,
+ Conor Dooley <conor+dt@kernel.org>, Chen Wang <unicorn_wang@outlook.com>,
+ Inochi Amaoto <inochiama@outlook.com>,
+ Maxime Coquelin <mcoquelin.stm32@gmail.com>,
+ Alexandre Torgue <alexandre.torgue@foss.st.com>,
+ Richard Cochran <richardcochran@gmail.com>,
+ Paul Walmsley <paul.walmsley@sifive.com>,
+ Palmer Dabbelt <palmer@dabbelt.com>, Albert Ou <aou@eecs.berkeley.edu>,
+ Emil Renner Berthing <emil.renner.berthing@canonical.com>,
+ Jisheng Zhang <jszhang@kernel.org>,
+ "Jan Petrous (OSS)" <jan.petrous@oss.nxp.com>,
+ =?UTF-8?B?Q2zDqW1lbnQgTMOpZ2Vy?= <clement.leger@bootlin.com>,
+ Simon Horman <horms@kernel.org>, Furong Xu <0x1207@gmail.com>,
+ Serge Semin <fancer.lancer@gmail.com>, Lothar Rubusch <l.rubusch@gmail.com>,
+ Suraj Jaiswal <quic_jsuraj@quicinc.com>,
+ Joe Hattori <joe@pf.is.s.u-tokyo.ac.jp>,
+ Bartosz Golaszewski <bartosz.golaszewski@linaro.org>,
+ Giuseppe Cavallaro <peppe.cavallaro@st.com>,
+ Jose Abreu <joabreu@synopsys.com>, Inochi Amaoto <inochiama@gmail.com>
+Cc: Inochi Amaoto <inochiama@gmail.com>, netdev@vger.kernel.org,
+ devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
+ linux-stm32@st-md-mailman.stormreply.com,
+ linux-arm-kernel@lists.infradead.org, linux-riscv@lists.infradead.org,
+ Yixun Lan <dlan@gentoo.org>, Longbin Li <looong.bin@gmail.com>
+Subject:
+ Re: [PATCH net-next v4 3/3] net: stmmac: Add glue layer for Sophgo SG2044 SoC
+Date: Mon, 10 Feb 2025 12:01:56 +0100
+Message-ID: <2379380.ElGaqSPkdT@fw-rgant>
+In-Reply-To: <20250209013054.816580-4-inochiama@gmail.com>
+References:
+ <20250209013054.816580-1-inochiama@gmail.com>
+ <20250209013054.816580-4-inochiama@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: IA1PR11MB6219.namprd11.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 563ba4bf-e0dc-46de-a317-08dd49c14e4b
-X-MS-Exchange-CrossTenant-originalarrivaltime: 10 Feb 2025 10:54:34.7077
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 46c98d88-e344-4ed4-8496-4ed7712e255d
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: qHn5+657gEFVH2CD87UX4tAlIreWr1GtzrwAk9tl902JndS6hrJxpCgzp9dBsR0Ppv+BP8uDLz7P9TDIsMmbFwyPkXT3DMHPMNwQoNYmToM=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: CY5PR11MB6308
-X-OriginatorOrg: intel.com
+Content-Type: multipart/signed; boundary="nextPart4980893.GXAFRqVoOG";
+ micalg="pgp-sha256"; protocol="application/pgp-signature"
+X-GND-State: clean
+X-GND-Score: -100
+X-GND-Cause: gggruggvucftvghtrhhoucdtuddrgeefvddrtddtgdefjeeklecutefuodetggdotefrodftvfcurfhrohhfihhlvgemucfitefpfffkpdcuggftfghnshhusghstghrihgsvgenuceurghilhhouhhtmecufedtudenucesvcftvggtihhpihgvnhhtshculddquddttddmnecujfgurhephffvvefufffkjghfgggtsehgtderredttdejnecuhfhrohhmpeftohhmrghinhcuifgrnhhtohhishcuoehrohhmrghinhdrghgrnhhtohhishessghoohhtlhhinhdrtghomheqnecuggftrfgrthhtvghrnhephfdvleekvefgieejtdduieehfeffjefhleegudeuhfelteduiedukedtieehlefgnecuffhomhgrihhnpegsohhothhlihhnrdgtohhmnecukfhppeeltddrkeelrdduieefrdduvdejnecuvehluhhsthgvrhfuihiivgeptdenucfrrghrrghmpehinhgvthepledtrdekledrudeifedruddvjedphhgvlhhopehffidqrhhgrghnthdrlhhotggrlhhnvghtpdhmrghilhhfrhhomheprhhomhgrihhnrdhgrghnthhoihhssegsohhothhlihhnrdgtohhmpdhnsggprhgtphhtthhopeefkedprhgtphhtthhopegrnhgurhgvfidonhgvthguvghvsehluhhnnhdrtghhpdhrtghpthhtohepuggrvhgvmhesuggrvhgvmhhlohhfthdrnhgvthdprhgtphhtthhopegvughumhgriigvthesghhoohhglhgvrdgtohhmpdhrtghpthhtohepkhhusggrsehkvghrnhgvlhdrohhrghdprhgtphhtthhopehprggsvghnihesr
+ hgvughhrghtrdgtohhmpdhrtghpthhtoheprhhosghhsehkvghrnhgvlhdrohhrghdprhgtphhtthhopehkrhiikhdoughtsehkvghrnhgvlhdrohhrghdprhgtphhtthhopegtohhnohhrodgutheskhgvrhhnvghlrdhorhhg
+X-GND-Sasl: romain.gantois@bootlin.com
 
-> -----Original Message-----
-> From: Simon Horman <horms@kernel.org>
-> Sent: Friday, February 7, 2025 11:04 AM
-> To: Nitka, Grzegorz <grzegorz.nitka@intel.com>
-> Cc: intel-wired-lan@lists.osuosl.org; netdev@vger.kernel.org; Nguyen,
-> Anthony L <anthony.l.nguyen@intel.com>; Kitszel, Przemyslaw
-> <przemyslaw.kitszel@intel.com>; Kolacinski, Karol
-> <karol.kolacinski@intel.com>
-> Subject: Re: [PATCH iwl-next v1 1/3] ice: Add sync delay for E825C
->=20
-> On Thu, Feb 06, 2025 at 09:36:53AM +0100, Grzegorz Nitka wrote:
-> > From: Karol Kolacinski <karol.kolacinski@intel.com>
-> >
-> > Implement setting GLTSYN_SYNC_DLAY for E825C products.
-> > This is the execution delay compensation of SYNC command between
-> > PHC and PHY.
-> > Also, refactor the code by changing ice_ptp_init_phc_eth56g function
-> > name to ice_ptp_init_phc_e825, to be consistent with the naming pattern
-> > for other devices.
->=20
-> Adding support for GLTSYN_SYNC_DLAY and the refactor seem
-> to be two distinct changes, albeit touching common code.
->=20
-> I think it would be slightly better to split this into two patches.
->=20
-Sure, will exclude this commit from the series and will submit it as separa=
-te patch.
-Thanks for your review and valuable feedback.
+--nextPart4980893.GXAFRqVoOG
+Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset="utf-8"; protected-headers="v1"
+From: Romain Gantois <romain.gantois@bootlin.com>
+Date: Mon, 10 Feb 2025 12:01:56 +0100
+Message-ID: <2379380.ElGaqSPkdT@fw-rgant>
+In-Reply-To: <20250209013054.816580-4-inochiama@gmail.com>
+MIME-Version: 1.0
 
-> > Reviewed-by: Przemek Kitszel <przemyslaw.kitszel@intel.com>
-> > Signed-off-by: Karol Kolacinski <karol.kolacinski@intel.com>
-> > Signed-off-by: Grzegorz Nitka <grzegorz.nitka@intel.com>
->=20
-> ...
+Hello Inochi,
+
+On dimanche 9 f=C3=A9vrier 2025 02:30:52 heure normale d=E2=80=99Europe cen=
+trale Inochi=20
+Amaoto wrote:
+> Adds Sophgo dwmac driver support on the Sophgo SG2044 SoC.
+=2E..
+> --- /dev/null
+> +++ b/drivers/net/ethernet/stmicro/stmmac/dwmac-sophgo.c
+> @@ -0,0 +1,105 @@
+> +// SPDX-License-Identifier: GPL-2.0+
+> +/*
+> + * Sophgo DWMAC platform driver
+> + *
+> + * Copyright (C) 2024 Inochi Amaoto <inochiama@gmail.com>
+> + */
+> +
+> +#include <linux/bits.h>
+
+It doesn't look like this include is used, could you please remove it?
+
+> +#include <linux/mod_devicetable.h>
+> +#include <linux/phy.h>
+> +#include <linux/platform_device.h>
+> +
+> +#include "stmmac_platform.h"
+> +
+> +struct sophgo_dwmac {
+> +	struct device *dev;
+> +	struct clk *clk_tx;
+> +};
+> +
+> +static void sophgo_dwmac_fix_mac_speed(void *priv, unsigned int speed,
+> unsigned int mode) +{
+> +	struct sophgo_dwmac *dwmac =3D priv;
+> +	long rate;
+> +	int ret;
+> +
+> +	rate =3D rgmii_clock(speed);
+> +	if (rate < 0) {
+> +		dev_err(dwmac->dev, "invalid speed %u\n", speed);
+> +		return;
+> +	}
+> +
+> +	ret =3D clk_set_rate(dwmac->clk_tx, rate);
+> +	if (ret)
+> +		dev_err(dwmac->dev, "failed to set tx rate %lu: %pe\n",
+
+nit: shouldn't this be "%ld"?
+
+> +			rate, ERR_PTR(ret));
+> +}
+> +
+> +static int sophgo_sg2044_dwmac_init(struct platform_device *pdev,
+> +				    struct plat_stmmacenet_data *plat_dat,
+> +				    struct stmmac_resources *stmmac_res)
+> +{
+> +	struct sophgo_dwmac *dwmac;
+> +
+> +	dwmac =3D devm_kzalloc(&pdev->dev, sizeof(*dwmac), GFP_KERNEL);
+> +	if (!dwmac)
+> +		return -ENOMEM;
+> +
+> +	dwmac->clk_tx =3D devm_clk_get_enabled(&pdev->dev, "tx");
+> +	if (IS_ERR(dwmac->clk_tx))
+> +		return dev_err_probe(&pdev->dev, PTR_ERR(dwmac->clk_tx),
+> +				     "failed to get tx clock\n");
+> +
+> +	dwmac->dev =3D &pdev->dev;
+> +	plat_dat->bsp_priv =3D dwmac;
+> +	plat_dat->flags |=3D STMMAC_FLAG_SPH_DISABLE;
+> +	plat_dat->fix_mac_speed =3D sophgo_dwmac_fix_mac_speed;
+> +	plat_dat->multicast_filter_bins =3D 0;
+> +	plat_dat->unicast_filter_entries =3D 1;
+> +
+> +	return 0;
+> +}
+> +
+> +static int sophgo_dwmac_probe(struct platform_device *pdev)
+> +{
+> +	struct plat_stmmacenet_data *plat_dat;
+> +	struct stmmac_resources stmmac_res;
+
+nit: I think adding "struct device *dev =3D &pdev->dev;" here would
+be better than repeating "&pdev->dev" later on.
+
+> +	int ret;
+> +
+> +	ret =3D stmmac_get_platform_resources(pdev, &stmmac_res);
+> +	if (ret)
+> +		return dev_err_probe(&pdev->dev, ret,
+> +				     "failed to get resources\n");
+
+This error message is a bit too vague, maybe replace it with "failed to get=
+=20
+platform resources"?
+
+> +
+> +	plat_dat =3D devm_stmmac_probe_config_dt(pdev, stmmac_res.mac);
+> +	if (IS_ERR(plat_dat))
+> +		return dev_err_probe(&pdev->dev, PTR_ERR(plat_dat),
+> +				     "dt configuration failed\n");
+
+This error message is a bit misleading IMO, I would replace it with
+something like "failed to parse device-tree parameters".
+
+> +
+> +	ret =3D sophgo_sg2044_dwmac_init(pdev, plat_dat, &stmmac_res);
+> +	if (ret)
+> +		return ret;
+> +
+> +	return stmmac_dvr_probe(&pdev->dev, plat_dat, &stmmac_res);
+> +}
+> +
+> +static const struct of_device_id sophgo_dwmac_match[] =3D {
+> +	{ .compatible =3D "sophgo,sg2044-dwmac" },
+> +	{ /* sentinel */ }
+> +};
+> +MODULE_DEVICE_TABLE(of, sophgo_dwmac_match);
+> +
+> +static struct platform_driver sophgo_dwmac_driver =3D {
+> +	.probe  =3D sophgo_dwmac_probe,
+> +	.remove =3D stmmac_pltfr_remove,
+> +	.driver =3D {
+> +		.name =3D "sophgo-dwmac",
+> +		.pm =3D &stmmac_pltfr_pm_ops,
+> +		.of_match_table =3D sophgo_dwmac_match,
+> +	},
+> +};
+> +module_platform_driver(sophgo_dwmac_driver);
+> +
+> +MODULE_AUTHOR("Inochi Amaoto <inochiama@gmail.com>");
+> +MODULE_DESCRIPTION("Sophgo DWMAC platform driver");
+> +MODULE_LICENSE("GPL");
+
+Thanks,
+
+=2D-=20
+Romain Gantois, Bootlin
+Embedded Linux and Kernel engineering
+https://bootlin.com
+
+--nextPart4980893.GXAFRqVoOG
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: This is a digitally signed message part.
+Content-Transfer-Encoding: 7Bit
+
+-----BEGIN PGP SIGNATURE-----
+
+iQIzBAABCAAdFiEEYFZBShRwOvLlRRy+3R9U/FLj284FAmep3KQACgkQ3R9U/FLj
+284HFg/+MKQUhhxOK5sTw8hghie4GbpkSvYhWBC7tuehA03Yc5WCIwmWrOG5wf1+
+xz9SLOp7IGs6gDtwXnC57LgTzaRuXEXtc1ZiWgjsnj/xnFGcNV5WGGtCGiRApP+L
+D3zxA/D+F7dTaFeGxmxk8T0aEd1sMHER4StQbPMxw3troHOBnVbNxbwXAgsxyTug
+8JcGrzp9i5q6Mdir9hfPywTwObPLzEormthGiAF/qo9GkB2X1nM7Fo6gk3laKCk6
+ukzNymMUp/XTAE3xRzpNG3qSH8G08YF7b5HqXXVXb7iV1EMnW63bP9t9XK32mS8z
+J04i/CHgFF1CTepv7/a0ZqQlvq5JhgPVUDnS/NFEnZ0Wb1k6g2+jlt02Hgl7lLUQ
+iCVbL3aFWaSuo9LL8EQfuQaqZS60v0a5ZIyZq1AtMh0KKT5xnIdmBA54bpIWq57y
+LvxHSHTNASAJgS8uBeJSH1s/2MrBU85LAFLjy07nvYEpk0dtN3Uoa9Vtxm2C3iet
+g4EFwNy7Uq9ok1c0GPX3cWhW6dQ+L77Hz/5m1jHhU4vnDCsrDjv/14b4mJ6CqvfF
+8NL56IidEjAVzBx18wh0rZMkZzZtoylqMa7rcPS7Nmt4l4WVK86wDA4DJAAG5CXU
+TXHuFqKW1rDwokkhRUYgHPBLuiYbjWTFQhGYA+weLW/8n4AecbE=
+=7ZQB
+-----END PGP SIGNATURE-----
+
+--nextPart4980893.GXAFRqVoOG--
+
+
+
 
