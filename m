@@ -1,155 +1,138 @@
-Return-Path: <netdev+bounces-164653-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-164662-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id E7069A2E9BA
-	for <lists+netdev@lfdr.de>; Mon, 10 Feb 2025 11:40:43 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id BACEFA2EA27
+	for <lists+netdev@lfdr.de>; Mon, 10 Feb 2025 11:55:33 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C3E1F3A2746
-	for <lists+netdev@lfdr.de>; Mon, 10 Feb 2025 10:40:34 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 710E1166BE4
+	for <lists+netdev@lfdr.de>; Mon, 10 Feb 2025 10:55:19 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BEC321DC04A;
-	Mon, 10 Feb 2025 10:40:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9E9C51D61B5;
+	Mon, 10 Feb 2025 10:53:58 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="a8Uidmhr"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="VE2WWVs3"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.15])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 214501C760A;
-	Mon, 10 Feb 2025 10:40:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.156.1
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D4ABD1D515B
+	for <netdev@vger.kernel.org>; Mon, 10 Feb 2025 10:53:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.15
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1739184019; cv=none; b=DmiEWTz5+kzJsyqujoJf7IbQVm79qRdWCdbyqkuL721YFjVflWTIqOQvBOJTRPOVDy/wodUo2F/yOGhdbzHChu6TDO1SbTICVZdnxTTic+dqDcdttcwrRiUlTmSCa+GAL4mDqF3aYD+w80xHJ6gEsbqMAPQjMJqOU2HHksYQjG8=
+	t=1739184838; cv=none; b=SKFMR738zwgftMYmk7VK8CE3orAMSPQhPe3m6dIkqITWiGPtzILCbbZpMm2M1cHYMElRS0UujGCnwUWxymTttm8nyU3281L4/DWhLIWoqjkJxO/4vsE2Y6r0mFhN5CtzE/cJ/fU6Wy22Z9fnX6mGoQjUC1lamTeYCoQft0azMrI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1739184019; c=relaxed/simple;
-	bh=ncnDP6pJKG77kyxFzNCp8swT2gLWcvpWpD1t7tV2FjM=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=mbvJYJwf/k00ogdBXFbvFxjVqTid8iCvJPZsICpaTMTIncsUfiTTym+8j6TbNjJYonWdrjTjoE4OWgsJjd6kkoKZOFWgCEhtD+D4t4CbA5Lg/nTf+dY4JA0qcN2GAA+cd6d+w87BXH5b8jHJCkOyX63Hgrs0A+4wVVrtWZTHeAA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=a8Uidmhr; arc=none smtp.client-ip=148.163.156.1
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
-Received: from pps.filterd (m0356517.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 519MnLqn015303;
-	Mon, 10 Feb 2025 10:40:10 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
-	:content-transfer-encoding:content-type:date:from:in-reply-to
-	:message-id:mime-version:references:subject:to; s=pp1; bh=R8wdkp
-	Sq74jP7jXEtGou00JFyMZWEHjj3uL01JkAbXQ=; b=a8Uidmhri27XdWID49w/Zc
-	BiUYeSaH/jMxmZdgdEWBWl9jKdGPYL1DuzLvQ5oIXxog1OTL/TaTiqz5zn0mCSl3
-	c728IRaXMIOoqUs5UQS0WbstaqlSpK2NRQ+SIpwKw3l2+WvCaXVXhNvz6HZ3iWuJ
-	RNJInLpmTwDD7KpMTi4gDb9uAeWF1zZV9oE067P0eFSM3L4BItia8IQzvllq4I2E
-	B4g8BACa/M5em481EzboLvMVvYJSsEnrIiEYe81RiOrmQIv6vgZh1LHbMhJc/Nz0
-	+ttByCkGo/AhthRmzDbfCK526sclnF/EgbvWMtgxIXtIITkIAaPzuoMvWLzXfKhA
-	==
-Received: from pps.reinject (localhost [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 44q5gaamct-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Mon, 10 Feb 2025 10:40:10 +0000 (GMT)
-Received: from m0356517.ppops.net (m0356517.ppops.net [127.0.0.1])
-	by pps.reinject (8.18.0.8/8.18.0.8) with ESMTP id 51AAWjoP028736;
-	Mon, 10 Feb 2025 10:40:09 GMT
-Received: from ppma12.dal12v.mail.ibm.com (dc.9e.1632.ip4.static.sl-reverse.com [50.22.158.220])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 44q5gaamcn-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Mon, 10 Feb 2025 10:40:09 +0000 (GMT)
-Received: from pps.filterd (ppma12.dal12v.mail.ibm.com [127.0.0.1])
-	by ppma12.dal12v.mail.ibm.com (8.18.1.2/8.18.1.2) with ESMTP id 51A7ATJ4021886;
-	Mon, 10 Feb 2025 10:40:08 GMT
-Received: from smtprelay03.fra02v.mail.ibm.com ([9.218.2.224])
-	by ppma12.dal12v.mail.ibm.com (PPS) with ESMTPS id 44phkse0qb-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Mon, 10 Feb 2025 10:40:08 +0000
-Received: from smtpav03.fra02v.mail.ibm.com (smtpav03.fra02v.mail.ibm.com [10.20.54.102])
-	by smtprelay03.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 51AAe3vP35520820
-	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Mon, 10 Feb 2025 10:40:03 GMT
-Received: from smtpav03.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 1E1E6200E4;
-	Mon, 10 Feb 2025 10:39:32 +0000 (GMT)
-Received: from smtpav03.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id ADCF6200DE;
-	Mon, 10 Feb 2025 10:39:31 +0000 (GMT)
-Received: from [9.152.224.153] (unknown [9.152.224.153])
-	by smtpav03.fra02v.mail.ibm.com (Postfix) with ESMTP;
-	Mon, 10 Feb 2025 10:39:31 +0000 (GMT)
-Message-ID: <19790e19-01f6-4843-a19d-9b8b1c5b16d5@linux.ibm.com>
-Date: Mon, 10 Feb 2025 11:39:31 +0100
+	s=arc-20240116; t=1739184838; c=relaxed/simple;
+	bh=GM6VJSBpOMWRU+b+GUpUMOWYRl+SmDkjju99OJjRWds=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=cDMtIEqAp8ZtLkzrayTBiFQ+NsgtJfB46JhcfP3bWAnqLGJsQzfkQ6rHkesF4gRbA5+l9IA2AdpGqPO7bfXL0AYfCiMk8/ZBhIZM5gOVzeEYdG8+4N20ixp7V76Ad/HnmNeolHIs+7WF2L52VtBAzDfqhM9TllyaVkgTssKLjEA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=VE2WWVs3; arc=none smtp.client-ip=192.198.163.15
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1739184837; x=1770720837;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=GM6VJSBpOMWRU+b+GUpUMOWYRl+SmDkjju99OJjRWds=;
+  b=VE2WWVs3c2hRLNQsezjDjIWNYFO7YJyx43Zv2LzW6qmHxCUknghCzwCc
+   DDYuX8yqcKNy4nTvcCDkOmhKXr296GdnswQJLED1XVOhRVcy031a8uPRW
+   0kmA8P2JBbqrt7b+LEMVannRwwgGa5HMwnTcCuIYR9JVqJeQq3wnbtui8
+   GLwPz8GqKfgQjMJ9JiTIhKX9mtSyRimSb4+b2InFfZo+Ptnfy89ojw2/B
+   lp3RMzpHTCyIy5ud/TgLzt/bN1FTiumqxMhdMjM9rHI4S7yOnsp+ICg3I
+   58mBMtwJi8GyuLmuEzQd/Amm76zZ9YJWFRrTf2wiFrds/hxT8y59km5jb
+   Q==;
+X-CSE-ConnectionGUID: jFsYjBVSTvWP1qw+N5J3qw==
+X-CSE-MsgGUID: dfwlFhfcRd+gAU1zKdhsrQ==
+X-IronPort-AV: E=McAfee;i="6700,10204,11340"; a="39910059"
+X-IronPort-AV: E=Sophos;i="6.13,274,1732608000"; 
+   d="scan'208";a="39910059"
+Received: from orviesa001.jf.intel.com ([10.64.159.141])
+  by fmvoesa109.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 10 Feb 2025 02:53:56 -0800
+X-CSE-ConnectionGUID: 1HnBKCHEQp6R/L+86DF7hA==
+X-CSE-MsgGUID: oqbxFyjBQJu8+7Daudj8QA==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.12,224,1728975600"; 
+   d="scan'208";a="149344599"
+Received: from os-delivery.igk.intel.com ([10.102.18.218])
+  by orviesa001.jf.intel.com with ESMTP; 10 Feb 2025 02:53:54 -0800
+From: Jedrzej Jagielski <jedrzej.jagielski@intel.com>
+To: intel-wired-lan@lists.osuosl.org
+Cc: anthony.l.nguyen@intel.com,
+	netdev@vger.kernel.org,
+	horms@kernel.org,
+	Jedrzej Jagielski <jedrzej.jagielski@intel.com>,
+	Przemek Kitszel <przemyslaw.kitszel@intel.com>,
+	Mateusz Polchlopek <mateusz.polchlopek@intel.com>
+Subject: [PATCH iwl-next v3] ixgbe: add support for thermal sensor event reception
+Date: Mon, 10 Feb 2025 11:40:17 +0100
+Message-Id: <20250210104017.62838-1-jedrzej.jagielski@intel.com>
+X-Mailer: git-send-email 2.31.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [RFC net-next 5/7] net/ism: Move ism_loopback to net/ism
-To: Julian Ruess <julianr@linux.ibm.com>, Wenjia Zhang
- <wenjia@linux.ibm.com>,
-        Jan Karcher <jaka@linux.ibm.com>, Gerd Bayer <gbayer@linux.ibm.com>,
-        Halil Pasic <pasic@linux.ibm.com>,
-        "D. Wythe" <alibuda@linux.alibaba.com>,
-        Tony Lu <tonylu@linux.alibaba.com>, Wen Gu <guwen@linux.alibaba.com>,
-        Peter Oberparleiter
- <oberpar@linux.ibm.com>,
-        David Miller <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>,
-        Paolo Abeni <pabeni@redhat.com>, Eric Dumazet <edumazet@google.com>,
-        Andrew Lunn <andrew+netdev@lunn.ch>
-Cc: Niklas Schnelle <schnelle@linux.ibm.com>,
-        Thorsten Winkler <twinkler@linux.ibm.com>, netdev@vger.kernel.org,
-        linux-s390@vger.kernel.org, Heiko Carstens <hca@linux.ibm.com>,
-        Vasily Gorbik <gor@linux.ibm.com>,
-        Alexander Gordeev
- <agordeev@linux.ibm.com>,
-        Christian Borntraeger <borntraeger@linux.ibm.com>,
-        Sven Schnelle <svens@linux.ibm.com>, Simon Horman <horms@kernel.org>
-References: <20250115195527.2094320-1-wintera@linux.ibm.com>
- <20250115195527.2094320-6-wintera@linux.ibm.com>
- <D7LJMF6OMXFQ.1ADL6WMIWIQ5C@linux.ibm.com>
-Content-Language: en-US
-From: Alexandra Winter <wintera@linux.ibm.com>
-In-Reply-To: <D7LJMF6OMXFQ.1ADL6WMIWIQ5C@linux.ibm.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: k1A_yghwez5FTiBcEUvttePrp9z9j8QY
-X-Proofpoint-ORIG-GUID: _Cr57fcxIt_uzhHaSveNeouHgBQdlS5i
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1057,Hydra:6.0.680,FMLib:17.12.68.34
- definitions=2025-02-10_05,2025-02-10_01,2024-11-22_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 priorityscore=1501
- impostorscore=0 clxscore=1015 suspectscore=0 mlxlogscore=788 spamscore=0
- lowpriorityscore=0 phishscore=0 malwarescore=0 bulkscore=0 adultscore=0
- mlxscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.19.0-2501170000 definitions=main-2502100088
+Content-Transfer-Encoding: 8bit
 
+E610 NICs unlike the previous devices utilising ixgbe driver
+are notified in the case of overheatning by the FW ACI event.
 
+In event of overheat when threshold is exceeded, FW suspends all
+traffic and sends overtemp event to the driver. Then driver
+logs appropriate message and closes the adapter instance.
+The card remains in that state until the platform is rebooted.
 
-On 06.02.25 18:36, Julian Ruess wrote:
->> +static int ism_lo_query_rgid(struct ism_dev *ism, uuid_t *rgid,
->> +			     u32 vid_valid, u32 vid)
->> +{
->> +	/* rgid should be the same as lgid; vlan is not supported */
->> +	if (!vid_valid && uuid_equal(rgid, &ism->gid))
->> +		return 0;
->> +	return -ENETUNREACH;
->> +}
-> This vid_valid check breaks ism-loopback for me.
+Reviewed-by: Przemek Kitszel <przemyslaw.kitszel@intel.com>
+Reviewed-by: Mateusz Polchlopek <mateusz.polchlopek@intel.com>
+Signed-off-by: Jedrzej Jagielski <jedrzej.jagielski@intel.com>
+---
+v2,3 : commit msg tweaks
+---
+ drivers/net/ethernet/intel/ixgbe/ixgbe_main.c      | 5 +++++
+ drivers/net/ethernet/intel/ixgbe/ixgbe_type_e610.h | 3 +++
+ 2 files changed, 8 insertions(+)
 
+diff --git a/drivers/net/ethernet/intel/ixgbe/ixgbe_main.c b/drivers/net/ethernet/intel/ixgbe/ixgbe_main.c
+index 7236f20c9a30..5c804948dd1f 100644
+--- a/drivers/net/ethernet/intel/ixgbe/ixgbe_main.c
++++ b/drivers/net/ethernet/intel/ixgbe/ixgbe_main.c
+@@ -3165,6 +3165,7 @@ static void ixgbe_aci_event_cleanup(struct ixgbe_aci_event *event)
+ static void ixgbe_handle_fw_event(struct ixgbe_adapter *adapter)
+ {
+ 	struct ixgbe_aci_event event __cleanup(ixgbe_aci_event_cleanup);
++	struct net_device *netdev = adapter->netdev;
+ 	struct ixgbe_hw *hw = &adapter->hw;
+ 	bool pending = false;
+ 	int err;
+@@ -3185,6 +3186,10 @@ static void ixgbe_handle_fw_event(struct ixgbe_adapter *adapter)
+ 		case ixgbe_aci_opc_get_link_status:
+ 			ixgbe_handle_link_status_event(adapter, &event);
+ 			break;
++		case ixgbe_aci_opc_temp_tca_event:
++			e_crit(drv, "%s\n", ixgbe_overheat_msg);
++			ixgbe_close(netdev);
++			break;
+ 		default:
+ 			e_warn(hw, "unknown FW async event captured\n");
+ 			break;
+diff --git a/drivers/net/ethernet/intel/ixgbe/ixgbe_type_e610.h b/drivers/net/ethernet/intel/ixgbe/ixgbe_type_e610.h
+index 8d06ade3c7cd..617e07878e4f 100644
+--- a/drivers/net/ethernet/intel/ixgbe/ixgbe_type_e610.h
++++ b/drivers/net/ethernet/intel/ixgbe/ixgbe_type_e610.h
+@@ -171,6 +171,9 @@ enum ixgbe_aci_opc {
+ 	ixgbe_aci_opc_done_alt_write			= 0x0904,
+ 	ixgbe_aci_opc_clear_port_alt_write		= 0x0906,
+ 
++	/* TCA Events */
++	ixgbe_aci_opc_temp_tca_event                    = 0x0C94,
++
+ 	/* debug commands */
+ 	ixgbe_aci_opc_debug_dump_internals		= 0xFF08,
+ 
+-- 
+2.31.1
 
-oops, I also get:
-> smc_chk -C 10.44.30.50
-[1] 967189
-Test with target IP 10.44.30.50 and port 37373
-  Live test (SMC-D and SMC-R)
-Server started on port 37373
-     Failed  (TCP fallback), reasons:
-          Client:        0x05000000   Peer declined during handshake
-          Server:        0x03030007   No SMC-Dv2 device found, but required
-
-Sorry about that.
-Current upstream smc_loopback just ignores vid_valid in smc_lo_query_rgidsmc_lo_query_rgid(),
-but I'm not sure that is the best way to handle that.
-I'll investigate and make sure it works in v2.
 
