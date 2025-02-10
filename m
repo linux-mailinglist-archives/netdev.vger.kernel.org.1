@@ -1,149 +1,123 @@
-Return-Path: <netdev+bounces-164796-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-164797-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id D7D63A2F1B5
-	for <lists+netdev@lfdr.de>; Mon, 10 Feb 2025 16:29:54 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 50155A2F1C7
+	for <lists+netdev@lfdr.de>; Mon, 10 Feb 2025 16:32:46 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 9ED8D1695D1
-	for <lists+netdev@lfdr.de>; Mon, 10 Feb 2025 15:28:48 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 365C53A1CE5
+	for <lists+netdev@lfdr.de>; Mon, 10 Feb 2025 15:31:31 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BA81F24BCE7;
-	Mon, 10 Feb 2025 15:28:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7146923A572;
+	Mon, 10 Feb 2025 15:31:37 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b="OIM6JWM+"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="aZSpO/DT"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp-fw-80007.amazon.com (smtp-fw-80007.amazon.com [99.78.197.218])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ed1-f47.google.com (mail-ed1-f47.google.com [209.85.208.47])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 248EF24BCE9
-	for <netdev@vger.kernel.org>; Mon, 10 Feb 2025 15:28:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=99.78.197.218
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A3F2923643C
+	for <netdev@vger.kernel.org>; Mon, 10 Feb 2025 15:31:35 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.47
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1739201306; cv=none; b=kHLqsBj8W2FLmfmAA2EWepppva5a8iPQzi7gNd4JFnlNHqmbsQGfSgKrRYmTGf+aCzb6jWT6SkmJ/D32i87UebWyM1Rb4UtnzI1rw7mBN4TVFO2yFly5N3RGoOPqOd7+fKVawHm0+5YOOAT5PRAWX0+GwvacB7cjUUaIwdMV5H4=
+	t=1739201497; cv=none; b=uNK4VJfGlrA/NX6iCAroXashGqCRlJ2QRyjlW5OMxx83v0VJ98+/VWAgEmq2+y0+WL+mVM4JXiSwhCiayOG/LYbvdHXBji9FNcPXq582drV5nuPHkTlQDWKuqbu1h+RMDkHrtzhNbc6IogqCzgQ3fF7YyA2ZPbeSvhvAGwponwk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1739201306; c=relaxed/simple;
-	bh=KTvu/WLUY1wWydIbUxAjoabwotyRkj5g16IaOCiVabg=;
-	h=Subject:From:To:CC:Date:Message-ID:References:In-Reply-To:
-	 Content-Type:MIME-Version; b=RvvCFMST9Cdizd4wEH0XNxnpvSsira1NXsNxL2ewvAwpCgS8SxaMF13sIq7Zw9cURoMw6EpsGdulMGXDNnhNsOfM+qVKgfg/sB+/1QfUD3xI9svsvPWk7Iv6D85uByVmpGb69IKznG3PJdh9dz8l7urQ6EZZkvAnbfb+oR4Gews=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.com; dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b=OIM6JWM+; arc=none smtp.client-ip=99.78.197.218
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.com
+	s=arc-20240116; t=1739201497; c=relaxed/simple;
+	bh=5xis8As8jO2Rt3mwgcf/kMRAOKhitW+ScGDLCUM47is=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=KH+3mkbu0I1vFLN9s4y8lQcL7QxkvDDkbBfdPpO3kkNruALoKB819xIfnyCPjz//1k2avGIWbr2upwYBO0idh9oxo7oJKyIaq9VqHYwfqsHaa+V1a7fidDKa7nYcsGXxFg5EyAS7LlvjpiQkntmtxRiC0iBf8bzcOJcK+rZrExk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=aZSpO/DT; arc=none smtp.client-ip=209.85.208.47
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-ed1-f47.google.com with SMTP id 4fb4d7f45d1cf-5de63846e56so3717983a12.1
+        for <netdev@vger.kernel.org>; Mon, 10 Feb 2025 07:31:35 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
-  t=1739201305; x=1770737305;
-  h=from:to:cc:date:message-id:references:in-reply-to:
-   content-transfer-encoding:mime-version:subject;
-  bh=FEAWD9VqmJlFXns1jyJrqSgPl3VeodqYoxpMajs4K28=;
-  b=OIM6JWM+VFNe1Jyz4nwsPvZK7o0rf5m0VHLCvhE+rFmiPZwyjKN5u+tu
-   W1u7tmMpBe7m3nQ+rij97VnwyhCsS+461vwZhQqGYlT879LkvRgE3BpPp
-   H6fRF8YNO2SfJuVl0FUQdiXHanklIaHPnlVF8E48qdyLzsFoffFVGBZFj
-   c=;
-X-IronPort-AV: E=Sophos;i="6.13,274,1732579200"; 
-   d="scan'208";a="376063862"
-Subject: RE: [PATCH v6 net-next 3/4] net: ena: Add PHC documentation
-Thread-Topic: [PATCH v6 net-next 3/4] net: ena: Add PHC documentation
-Received: from pdx4-co-svc-p1-lb2-vlan2.amazon.com (HELO smtpout.prod.us-east-1.prod.farcaster.email.amazon.dev) ([10.25.36.210])
-  by smtp-border-fw-80007.pdx80.corp.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 10 Feb 2025 15:28:22 +0000
-Received: from EX19MTAEUC001.ant.amazon.com [10.0.10.100:24065]
- by smtpin.naws.eu-west-1.prod.farcaster.email.amazon.dev [10.0.35.94:2525] with esmtp (Farcaster)
- id 53306492-e9fc-41c4-aa27-479caa606007; Mon, 10 Feb 2025 15:28:20 +0000 (UTC)
-X-Farcaster-Flow-ID: 53306492-e9fc-41c4-aa27-479caa606007
-Received: from EX19D004EUA002.ant.amazon.com (10.252.50.81) by
- EX19MTAEUC001.ant.amazon.com (10.252.51.155) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1258.39;
- Mon, 10 Feb 2025 15:28:20 +0000
-Received: from EX19D005EUA002.ant.amazon.com (10.252.50.11) by
- EX19D004EUA002.ant.amazon.com (10.252.50.81) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1544.14;
- Mon, 10 Feb 2025 15:28:20 +0000
-Received: from EX19D005EUA002.ant.amazon.com ([fe80::6aa4:b4a3:92f6:8e9]) by
- EX19D005EUA002.ant.amazon.com ([fe80::6aa4:b4a3:92f6:8e9%3]) with mapi id
- 15.02.1258.039; Mon, 10 Feb 2025 15:28:20 +0000
-From: "Arinzon, David" <darinzon@amazon.com>
-To: Jakub Kicinski <kuba@kernel.org>
-CC: David Miller <davem@davemloft.net>, "netdev@vger.kernel.org"
-	<netdev@vger.kernel.org>, Eric Dumazet <edumazet@google.com>, Paolo Abeni
-	<pabeni@redhat.com>, Simon Horman <horms@kernel.org>, Richard Cochran
-	<richardcochran@gmail.com>, "Woodhouse, David" <dwmw@amazon.co.uk>,
-	"Machulsky, Zorik" <zorik@amazon.com>, "Matushevsky, Alexander"
-	<matua@amazon.com>, "Bshara, Saeed" <saeedb@amazon.com>, "Wilson, Matt"
-	<msw@amazon.com>, "Liguori, Anthony" <aliguori@amazon.com>, "Bshara, Nafea"
-	<nafea@amazon.com>, "Schmeilin, Evgeny" <evgenys@amazon.com>, "Belgazal,
- Netanel" <netanel@amazon.com>, "Saidi, Ali" <alisaidi@amazon.com>,
-	"Herrenschmidt, Benjamin" <benh@amazon.com>, "Kiyanovski, Arthur"
-	<akiyano@amazon.com>, "Dagan, Noam" <ndagan@amazon.com>, "Bernstein, Amit"
-	<amitbern@amazon.com>, "Agroskin, Shay" <shayagr@amazon.com>, "Abboud, Osama"
-	<osamaabb@amazon.com>, "Ostrovsky, Evgeny" <evostrov@amazon.com>, "Tabachnik,
- Ofir" <ofirt@amazon.com>, "Machnikowski, Maciek" <maciek@machnikowski.net>,
-	Rahul Rameshbabu <rrameshbabu@nvidia.com>, Gal Pressman <gal@nvidia.com>
-Thread-Index: AQHbeKGvfULVz4EhOUW1QOSyLY+8YrM8lvgAgAQX1OA=
-Date: Mon, 10 Feb 2025 15:28:19 +0000
-Message-ID: <01fd0c4d50c7493986d80e22b0506fdf@amazon.com>
-References: <20250206141538.549-1-darinzon@amazon.com>
-	<20250206141538.549-4-darinzon@amazon.com>
- <20250207165516.2f237586@kernel.org>
-In-Reply-To: <20250207165516.2f237586@kernel.org>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach:
-X-MS-TNEF-Correlator:
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+        d=google.com; s=20230601; t=1739201494; x=1739806294; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=5xis8As8jO2Rt3mwgcf/kMRAOKhitW+ScGDLCUM47is=;
+        b=aZSpO/DTLrPp5XzyAzg2zy0ia+GSED0iUcYxC+QiPQR4GRRHR1PVY29eOwoxBu1j1x
+         FEgiJTkg5DCxqXlWPUaYeeWS7fti/jrXtN24h6VSN2MhvHDGix/+QywKoEAqJ8pJV+CY
+         avasHE4ZV5kw9nY2Frfgc2WUNa6N7py0Z8bTzWvAKW20kD7b21oPELyBKz4kltdl3BOn
+         fDjZViCtRnWpWBysy08VKLduuPt+pl7W3EcZ1I3Qcb1qERF5n10ZgUuvkUVtbqQJACm9
+         8QsoJ4v4q7mJJdTCKtY21vtyNMARa1nifZ0d9VtKEPNKOcnzcv4Y1NayU5ffQlkRFAyu
+         C0Lg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1739201494; x=1739806294;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=5xis8As8jO2Rt3mwgcf/kMRAOKhitW+ScGDLCUM47is=;
+        b=iOA8oANDUJ0GRDrt2m5EfsPmeZr4vBGGDbyWDlTRh0cEWO7hsgPWTn7IO/x1GOFOPe
+         12/SeK09u3OglWFbmh/ZnAAl5qkSpuGdCKE0UQcmu/KZOyXeNVg4ZgtKrlwu06RL8KPA
+         lgVkfS+/dl6zE5pyTcdeJ7vg3kKpJ5UI0trMxbGbXNQGVM9VBufEp0M3uO5HXz2UA52x
+         zR2l6qfodhtbcq6eN24zk1+Dib8g/xJeUaGCyanquDmaH9oVLGZ89CHlsNv14BYJVJ82
+         Q5B+HW2P4dg2gjzVGODeDj7LWoob/sA/vrm9GlEXl41Pv8p2d6KNm4Fai/jj7ht8igcQ
+         36jA==
+X-Forwarded-Encrypted: i=1; AJvYcCX+yJdQITOlJ1IAs5tMzJ2KIKwtDkKzXq5fj1u+7VNJxscfRszQXcd7y4r2aUxqXjFhIsR40vQ=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzZJuJkvZdSmuNKJn+6YnGcV6D6br1qZ1eMb5tshgCZwO6/S9h3
+	/3styfphytHCwCiTHCcUVpGkmSkttPFjmmXit6ihBNm77JzVaMpcG/NsiprcIowRPLguP3ytwDl
+	/KhD2YGraSKK3X5mifXHfYCjGNiqL2CtARc+V
+X-Gm-Gg: ASbGncuG18cuLHWxYCS3sWXYvaNoP1wEePAtu5F9+3o6nR+9ISJB+k9i81gzE/F1XRg
+	dUNLs4Y+48QCZqX81GrlZG4UZos94nRW8+3Ao7GNx3nXRk0/+03MR26f4+4brixhO/FHbYyN3
+X-Google-Smtp-Source: AGHT+IGYIDEKbs6dmHrwg0RTMVkj/Q1gAgz9hIfVyXJeXBAoeGn345KmetsEUL3Ngq0krWxUFJbHxMyoe+5b2fWRQs8=
+X-Received: by 2002:a05:6402:5214:b0:5dc:71f6:9723 with SMTP id
+ 4fb4d7f45d1cf-5de9a4645eemr88173a12.21.1739201493753; Mon, 10 Feb 2025
+ 07:31:33 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+References: <20250205163609.3208829-1-aleksander.lobakin@intel.com> <79d05c4b-bcfb-4dd3-84d9-b44e64eb4e66@intel.com>
+In-Reply-To: <79d05c4b-bcfb-4dd3-84d9-b44e64eb4e66@intel.com>
+From: Eric Dumazet <edumazet@google.com>
+Date: Mon, 10 Feb 2025 16:31:22 +0100
+X-Gm-Features: AWEUYZlWeDdRtwGn76PnjMKTNXzuvPG4UPRC8NQ_4EEIUAmtn9Mnehmfqoc219k
+Message-ID: <CANn89iLpDW5GK5WJcKezFY17hENaC2EeUW7BkkbJZuzJc5r5bw@mail.gmail.com>
+Subject: Re: [PATCH net-next v4 0/8] bpf: cpumap: enable GRO for XDP_PASS frames
+To: Alexander Lobakin <aleksander.lobakin@intel.com>
+Cc: Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller" <davem@davemloft.net>, 
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+	Lorenzo Bianconi <lorenzo@kernel.org>, Daniel Xu <dxu@dxuuu.xyz>, Alexei Starovoitov <ast@kernel.org>, 
+	Daniel Borkmann <daniel@iogearbox.net>, Andrii Nakryiko <andrii@kernel.org>, 
+	John Fastabend <john.fastabend@gmail.com>, =?UTF-8?B?VG9rZSBIw7hpbGFuZC1Kw7hyZ2Vuc2Vu?= <toke@kernel.org>, 
+	Jesper Dangaard Brouer <hawk@kernel.org>, Martin KaFai Lau <martin.lau@linux.dev>, netdev@vger.kernel.org, 
+	bpf@vger.kernel.org, linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-> > +PHC can be monitored using :code:`ethtool -S` counters:
-> > +
-> > +=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
-> =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D
-> > +**phc_cnt**         Number of successful retrieved timestamps (below
-> expire timeout).
-> > +**phc_exp**         Number of expired retrieved timestamps (above
-> expire timeout).
-> > +**phc_skp**         Number of skipped get time attempts (during block
-> period).
-> > +**phc_err**         Number of failed get time attempts (entering into =
-block
-> state).
-> > +=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
-> =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D
->=20
-> ethtool -S is for networking counters.
-> --
-> pw-bot: cr
+On Mon, Feb 10, 2025 at 3:10=E2=80=AFPM Alexander Lobakin
+<aleksander.lobakin@intel.com> wrote:
+>
+> From: Alexander Lobakin <aleksander.lobakin@intel.com>
+> Date: Wed, 5 Feb 2025 17:36:01 +0100
+>
+> > Several months ago, I had been looking through my old XDP hints tree[0]
+> > to check whether some patches not directly related to hints can be sent
+> > standalone. Roughly at the same time, Daniel appeared and asked[1] abou=
+t
+> > GRO for cpumap from that tree.
+>
+> I see "Changes requested" on Patchwork. Which ones?
+>
+> 1/8 regarding gro_node? Nobody proposed a solution which would be as
+> efficient, but avoid using struct_group(), I don't see such as well.
+> I explain in the commitmsgs and cover letter everything. Jakub gave me
+> Acked-by on struct_group() in the v3 thread.
 
-Hi Jakub,
+One of the points of your nice series is to dissociate GRO from NAPI,
+so defining gro_node inside napi_struct is not appealing.
 
-You are right in the regard that it is not a network specific functionality=
-.
-Having said that, PHC is a network card capability, making it a network-rel=
-ated component rather than purely a timekeeping feature.
-Moreover we failed to find an existing tool which would allow users to get =
-valuable feedback of the system's overall health.
+I suggested not putting napi_id in the new structure.
 
-Researching its existing support in the kernel we noted that:
-- PHC is embedded in network NIC and is supported by multiple NIC vendors i=
-n the kernel
-- PHC information is visible through ethtool -T
-- The Linux networking stack uses PHC for timekeeping as well as for packet=
- timestamping (via SO_TIMESTAMPING).
-  Packet timestamping statistics are available through ethtool get_ts_stats=
- hook
+If you need to cache a copy in it for "performance/whatever reason",
+you can cache napi_id, because napi->napi_id is only set once
+in __napi_hash_add_with_id()
 
-We have found `ethtool -S` as a suitable location for exposing these statis=
-tics, which are unique to the ENA NIC.
-
-We'd appreciate your thoughts on the matter, is there an alternative tool y=
-ou can recommend?
+gro->napi_id_cache =3D napi->napi_id;
 
