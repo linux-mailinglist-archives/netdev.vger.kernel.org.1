@@ -1,121 +1,187 @@
-Return-Path: <netdev+bounces-164929-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-164930-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id DBEB0A2FB68
-	for <lists+netdev@lfdr.de>; Mon, 10 Feb 2025 22:08:29 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6BBA5A2FB77
+	for <lists+netdev@lfdr.de>; Mon, 10 Feb 2025 22:10:14 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 8C794163C59
-	for <lists+netdev@lfdr.de>; Mon, 10 Feb 2025 21:08:28 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id A2B16188272E
+	for <lists+netdev@lfdr.de>; Mon, 10 Feb 2025 21:10:19 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E7C481BD9D2;
-	Mon, 10 Feb 2025 21:08:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 46AAF24CEC2;
+	Mon, 10 Feb 2025 21:10:06 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="PKbOI3bM"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="HYcKkZRy"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f181.google.com (mail-pl1-f181.google.com [209.85.214.181])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BAC04264609;
-	Mon, 10 Feb 2025 21:08:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B1B0D1BD9F8
+	for <netdev@vger.kernel.org>; Mon, 10 Feb 2025 21:10:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.181
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1739221705; cv=none; b=UvHjoYgBmyriVQHwUUgfrZX1/8M5Tx3P4Ju2DNbR9QZAu1nM4G95O54dXpBDFD/VH2yy+NAC8EoAUw6mwUS9yP1/+RpQJORp70WBFaubb+mP4eRCD2CKgylWthDXXbE8BoMTpmHKzDW7XZtSILRg9QZOMYoT7r3YH/gRVqyJ91Q=
+	t=1739221806; cv=none; b=PohVPaIxydQFfWkPy4lK827eG6zkBxVn/dfnnAcrrk+F1thGiN34oZo1+eSOG6bwAgmJHs8pxa0RSkftiKQ4gxY2ZYH1NBv4alvXUdjdvR8o6r9hT9x4yzksiGmqTHGQW6Hh6bA0mlhTbHVYa8qI2TVVhnGHur3xzfJ5kaxXMxg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1739221705; c=relaxed/simple;
-	bh=ifYlc+ym4R8P85YHqdId6Knc8r20F8vpm7Pw13cLVR8=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=dbN4s3/YChs0Z782DPyydwe+MDoF6oijualQDH2Dczh+Rrd0VaaFGllZdMbTeE7vq8mlvtsAUkMF+7pU/BrYn/Fp3DSViMQ2VbvU9oKOHOu+CQOafWthSr+3DoBqXMuG339pbtB++fc6Jr600Uap9HVNG6BC2TlfPiy+L2SYmok=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=PKbOI3bM; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5CFC1C4CEE6;
-	Mon, 10 Feb 2025 21:08:21 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1739221705;
-	bh=ifYlc+ym4R8P85YHqdId6Knc8r20F8vpm7Pw13cLVR8=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=PKbOI3bMxVUQnTwWf1Tj9+lOl3wcPZtmllQ30Fz3SisR7YINJIcLOZA6sWJoOFx23
-	 W0Dh/NIsdK6fauMJQmyeQJZMjProtNmiajYRvOo/X1tzybxkz9jS6ctwg1CwUItvtr
-	 9kxr+VCxx0HrnbBg/uVOLw08yYXEIECdxDc77RtLGljdZQrmzqm6HW5VZPlwUuYjig
-	 tCmuv/lvFYaRNpVfMWox5npWr0xhtvD8sV3Y0sGx6hCrMLfuJzFw+erD94kRyeLiv+
-	 LiyJhyUXy2fo1ZTk9C4+tAEA6hHd5iUimCS6yb49gGQJ9zYCx1yYLw1a93fuCukoJX
-	 jmDqANUYbpFQA==
-Date: Mon, 10 Feb 2025 21:08:19 +0000
-From: Simon Horman <horms@kernel.org>
-To: Alexander Lobakin <aleksander.lobakin@intel.com>
-Cc: Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Alexei Starovoitov <ast@kernel.org>,
-	Daniel Borkmann <daniel@iogearbox.net>,
-	John Fastabend <john.fastabend@gmail.com>,
-	Andrii Nakryiko <andrii@kernel.org>,
-	"Jose E. Marchesi" <jose.marchesi@oracle.com>,
-	Toke =?utf-8?Q?H=C3=B8iland-J=C3=B8rgensen?= <toke@redhat.com>,
-	Magnus Karlsson <magnus.karlsson@intel.com>,
-	Maciej Fijalkowski <maciej.fijalkowski@intel.com>,
-	Przemek Kitszel <przemyslaw.kitszel@intel.com>,
-	Jason Baron <jbaron@akamai.com>,
-	Casey Schaufler <casey@schaufler-ca.com>,
-	Nathan Chancellor <nathan@kernel.org>, bpf@vger.kernel.org,
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH net-next 1/4] unroll: add generic loop unroll helpers
-Message-ID: <20250210210819.GF554665@kernel.org>
-References: <20250206182630.3914318-1-aleksander.lobakin@intel.com>
- <20250206182630.3914318-2-aleksander.lobakin@intel.com>
- <20250209110725.GB554665@kernel.org>
- <fa01e28e-b75d-4d60-b10a-ccf3e544ff1e@intel.com>
+	s=arc-20240116; t=1739221806; c=relaxed/simple;
+	bh=KJLfGH4r6zCwTj9etgMAbr9xZH0AFU/ISuULlewI/hw=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=lANQfkBFp7VRH2gBxqszsiu34j8dJxs9jKGRdTO+lbKCc7ygnbQpnNA2tMdC1jcCfiWiMsakJDGb39dGk4kmsml4PC6aVj/jClWaC5z56m+NkNXrBLo7NDOz06877moeuRYLoSH4JYrbgZJyExS8KoevL2WGWQT9saFvLDmNils=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=HYcKkZRy; arc=none smtp.client-ip=209.85.214.181
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-pl1-f181.google.com with SMTP id d9443c01a7336-219f6ca9a81so4055ad.1
+        for <netdev@vger.kernel.org>; Mon, 10 Feb 2025 13:10:03 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1739221803; x=1739826603; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=BpOwhdLpPNB8gZcJrWR5hgdVmgWAHMy1UaC6q1qkDqE=;
+        b=HYcKkZRyQNKbVx5G/iwtKV89LIVijVFII4qPK0wy3zDORkhMDGygEqD/YBhOAtvnT1
+         GV/kjK1wIsO2P8sPSY4FJwAqMDBjJ4LG08ZeLL+DUdaigstRLaqUHcHQIeJxlatAaK4L
+         sQER6fsn69HGUfKskHN/i2ouFn4yneqyRN5j5hhe2qI1D6s7vWClVEnV/Wso/TMcUGuL
+         Jk/w7JmDavqm+0HL9Ci19TTMwchyO1QmkpLP3yMFGlXKNWyzwj3x9/PB4gUJt6vODNuM
+         GzaubUQQEcQRZz6Fnog04MpnrpH24dPINOl/v6dt40MLih8J7dLPTmNwNNexHNXtSBuo
+         O3IA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1739221803; x=1739826603;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=BpOwhdLpPNB8gZcJrWR5hgdVmgWAHMy1UaC6q1qkDqE=;
+        b=MRchxbmEqeuxDG5zRUFtnLU16PfkKlIxnr8DuyBubE+kiAyQhM8WbldNjwmPOxzyB5
+         pb7YmOQevm2RXvUqpe5/pPejlyuCdKv5LFPrPC/6X58+D149xozP2DB8ANDuQHze9eh6
+         bAiP6nZiAb21pbdbdvtvZCSuWh9rbmT5BxHypJ+O4SyrjLRC8oBiAPdOWXWdmJ1HXzPu
+         rWyOvHT1AjPJC9EW6Z4JyXEbryP/OE4z5Jxvknk2Vh6E46/6aFoo7CZ86VFzy4Bq3fqL
+         rpqytuR4thcd0eNfeGYHyGydA3hqRTRkRwwMKEjyzOG5FFxc1xEglKHAS/GJQ/geUSq+
+         bsDw==
+X-Gm-Message-State: AOJu0YwXBs1d5bgrfsW0IUOsPmEwDiVWL6E+fFZTDUoXlfi+dhUPW/5M
+	3uwIh8mkFCYUU0IM5R80N3VaE+Yxc9tkLex7Y4dGykTplxf+h5zJTbDK/sYrBt9lqkdc+qS8574
+	+PZOrh6CSSjot6QIMdlRqI+741hWWf/ZsDgRw
+X-Gm-Gg: ASbGncuV8Kh9OouROG1FUCMzTND90pIUu6TkjhM4pQU24cPQN0Y0fsbAyUjs0MFBbJd
+	zMYWjvBty1D6ysfU/Xsl8UaiKvb14JfoArENdHA8AMEI+g/VqE6sk+PWmUkGZIFX5ihzIySJn
+X-Google-Smtp-Source: AGHT+IHi+uVLv++ClIB5TNGxSvvd8P8hJcj6QNPCjz84MeycHAppY5tmh3RbNn2a2dnjMuITjeslPW3wgJ9FwpR0OB4=
+X-Received: by 2002:a17:902:7c8a:b0:21f:631c:7fc9 with SMTP id
+ d9443c01a7336-21fb80c64a8mr630465ad.0.1739221802714; Mon, 10 Feb 2025
+ 13:10:02 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <fa01e28e-b75d-4d60-b10a-ccf3e544ff1e@intel.com>
+References: <20250203223916.1064540-1-almasrymina@google.com>
+ <20250203223916.1064540-6-almasrymina@google.com> <abc22620-d509-4b12-80ac-0c36b08b36d9@gmail.com>
+In-Reply-To: <abc22620-d509-4b12-80ac-0c36b08b36d9@gmail.com>
+From: Mina Almasry <almasrymina@google.com>
+Date: Mon, 10 Feb 2025 13:09:50 -0800
+X-Gm-Features: AWEUYZlmH-9dq3h0n7ypL1723AKovUOyGvCt-k8ZJ20f-dbsLO-5Bruftf8RSss
+Message-ID: <CAHS8izNOqaFe_40gFh09vdBz6-deWdeGu9Aky-e7E+Wu2qtfdw@mail.gmail.com>
+Subject: Re: [PATCH net-next v3 5/6] net: devmem: Implement TX path
+To: Pavel Begunkov <asml.silence@gmail.com>
+Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	linux-doc@vger.kernel.org, kvm@vger.kernel.org, 
+	virtualization@lists.linux.dev, linux-kselftest@vger.kernel.org, 
+	Donald Hunter <donald.hunter@gmail.com>, Jakub Kicinski <kuba@kernel.org>, 
+	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+	Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, Jonathan Corbet <corbet@lwn.net>, 
+	Andrew Lunn <andrew+netdev@lunn.ch>, Neal Cardwell <ncardwell@google.com>, 
+	David Ahern <dsahern@kernel.org>, "Michael S. Tsirkin" <mst@redhat.com>, Jason Wang <jasowang@redhat.com>, 
+	Xuan Zhuo <xuanzhuo@linux.alibaba.com>, =?UTF-8?Q?Eugenio_P=C3=A9rez?= <eperezma@redhat.com>, 
+	Stefan Hajnoczi <stefanha@redhat.com>, Stefano Garzarella <sgarzare@redhat.com>, Shuah Khan <shuah@kernel.org>, 
+	sdf@fomichev.me, dw@davidwei.uk, Jamal Hadi Salim <jhs@mojatatu.com>, 
+	Victor Nogueira <victor@mojatatu.com>, Pedro Tammela <pctammela@mojatatu.com>, 
+	Samiullah Khawaja <skhawaja@google.com>, Kaiyuan Zhang <kaiyuanz@google.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Mon, Feb 10, 2025 at 04:49:14PM +0100, Alexander Lobakin wrote:
-> From: Simon Horman <horms@kernel.org>
-> Date: Sun, 9 Feb 2025 11:07:25 +0000
-> 
-> > On Thu, Feb 06, 2025 at 07:26:26PM +0100, Alexander Lobakin wrote:
-> >> There are cases when we need to explicitly unroll loops. For example,
-> >> cache operations, filling DMA descriptors on very high speeds etc.
-> >> Add compiler-specific attribute macros to give the compiler a hint
-> >> that we'd like to unroll a loop.
-> >> Example usage:
-> >>
-> >>  #define UNROLL_BATCH 8
-> >>
-> >> 	unrolled_count(UNROLL_BATCH)
-> >> 	for (u32 i = 0; i < UNROLL_BATCH; i++)
-> >> 		op(priv, i);
-> >>
-> >> Note that sometimes the compilers won't unroll loops if they think this
-> >> would have worse optimization and perf than without unrolling, and that
-> >> unroll attributes are available only starting GCC 8. For older compiler
-> >> versions, no hints/attributes will be applied.
-> >> For better unrolling/parallelization, don't have any variables that
-> >> interfere between iterations except for the iterator itself.
-> >>
-> >> Co-developed-by: Jose E. Marchesi <jose.marchesi@oracle.com> # pragmas
-> >> Signed-off-by: Jose E. Marchesi <jose.marchesi@oracle.com>
-> >> Reviewed-by: Przemek Kitszel <przemyslaw.kitszel@intel.com>
-> >> Signed-off-by: Alexander Lobakin <aleksander.lobakin@intel.com>
-> > 
-> > Hi Alexander,
-> > 
-> > This patch adds four variants of the unrolled helper.  But as far as I can
-> > tell the patch-set only makes use of one of them, unrolled_count().
-> > 
-> > I think it would be best if this patch only added helpers that are used.
-> 
-> I thought they might help people in future.
-> I can remove them if you insist. BTW the original patch from Jose also
-> added several variants.
+On Wed, Feb 5, 2025 at 4:20=E2=80=AFAM Pavel Begunkov <asml.silence@gmail.c=
+om> wrote:
+>
+> On 2/3/25 22:39, Mina Almasry wrote:
+> ...
+> > diff --git a/include/linux/skbuff.h b/include/linux/skbuff.h
+> > index bb2b751d274a..3ff8f568c382 100644
+> > --- a/include/linux/skbuff.h
+> > +++ b/include/linux/skbuff.h
+> > @@ -1711,9 +1711,12 @@ struct ubuf_info *msg_zerocopy_realloc(struct so=
+ck *sk, size_t size,
+> ...
+> >   int zerocopy_fill_skb_from_iter(struct sk_buff *skb,
+> >                               struct iov_iter *from, size_t length);
+> > @@ -1721,12 +1724,14 @@ int zerocopy_fill_skb_from_iter(struct sk_buff =
+*skb,
+> >   static inline int skb_zerocopy_iter_dgram(struct sk_buff *skb,
+> >                                         struct msghdr *msg, int len)
+> >   {
+> > -     return __zerocopy_sg_from_iter(msg, skb->sk, skb, &msg->msg_iter,=
+ len);
+> > +     return __zerocopy_sg_from_iter(msg, skb->sk, skb, &msg->msg_iter,=
+ len,
+> > +                                    NULL);
+>
+> Instead of propagating it all the way down and carving a new path, why
+> not reuse the existing infra? You already hook into where ubuf is
+> allocated, you can stash the binding in there. And
 
-I do slightly prefer only adding what is used.
+It looks like it's not possible to increase the side of ubuf_info at
+all, otherwise the BUILD_BUG_ON in msg_zerocopy_alloc() fires.
+
+It's asserting that sizeof(ubuf_info_msgzc) <=3D sizeof(skb->cb), and
+I'm guessing increasing skb->cb size is not really the way to go.
+
+What I may be able to do here is stash the binding somewhere in
+ubuf_info_msgzc via union with fields we don't need for devmem, and/or
+stashing the binding in ubuf_info_ops (very hacky). Neither approach
+seems ideal, but the former may work and may be cleaner.
+
+I'll take a deeper look here. I had looked before and concluded that
+we're piggybacking devmem TX on MSG_ZEROCOPY path, because we need
+almost all of the functionality there (no copying, send complete
+notifications, etc), with one minor change in the skb filling. I had
+concluded that if MSG_ZEROCOPY was never updated to use the existing
+infra, then it's appropriate for devmem TX piggybacking on top of it
+to follow that. I would not want to get into a refactor of
+MSG_ZEROCOPY for no real reason.
+
+But I'll take a deeper look here and see if I can make something
+slightly cleaner work.
+
+> zerocopy_fill_skb_from_devmem can implement ->sg_from_iter,
+> see __zerocopy_sg_from_iter().
+>
+> ...
+> > diff --git a/net/core/datagram.c b/net/core/datagram.c
+> > index f0693707aece..c989606ff58d 100644
+> > --- a/net/core/datagram.c
+> > +++ b/net/core/datagram.c
+> > @@ -63,6 +63,8 @@
+> > +static int
+> > +zerocopy_fill_skb_from_devmem(struct sk_buff *skb, struct iov_iter *fr=
+om,
+> > +                           int length,
+> > +                           struct net_devmem_dmabuf_binding *binding)
+> > +{
+> > +     int i =3D skb_shinfo(skb)->nr_frags;
+> > +     size_t virt_addr, size, off;
+> > +     struct net_iov *niov;
+> > +
+> > +     while (length && iov_iter_count(from)) {
+> > +             if (i =3D=3D MAX_SKB_FRAGS)
+> > +                     return -EMSGSIZE;
+> > +
+> > +             virt_addr =3D (size_t)iter_iov_addr(from);
+>
+> Unless I missed it somewhere it needs to check that the iter
+> is iovec based.
+>
+
+How do we end up here with an iterator that is not iovec based? Is the
+user able to trigger that somehow and I missed it?
+
+--=20
+Thanks,
+Mina
 
