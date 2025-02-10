@@ -1,163 +1,170 @@
-Return-Path: <netdev+bounces-164862-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-164863-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1A3ABA2F6B7
-	for <lists+netdev@lfdr.de>; Mon, 10 Feb 2025 19:18:42 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id A12ACA2F6F3
+	for <lists+netdev@lfdr.de>; Mon, 10 Feb 2025 19:25:57 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id DCB313A5B0A
-	for <lists+netdev@lfdr.de>; Mon, 10 Feb 2025 18:18:32 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 5105D16639C
+	for <lists+netdev@lfdr.de>; Mon, 10 Feb 2025 18:25:56 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D84E3257420;
-	Mon, 10 Feb 2025 18:18:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 326CF255E24;
+	Mon, 10 Feb 2025 18:25:53 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=qualcomm.com header.i=@qualcomm.com header.b="csph2HZM"
+	dkim=pass (1024-bit key) header.d=fastly.com header.i=@fastly.com header.b="xPwBYCoP"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0a-0031df01.pphosted.com (mx0a-0031df01.pphosted.com [205.220.168.131])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pj1-f53.google.com (mail-pj1-f53.google.com [209.85.216.53])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0F4DB2566F6
-	for <netdev@vger.kernel.org>; Mon, 10 Feb 2025 18:18:05 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.168.131
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6D91122257D
+	for <netdev@vger.kernel.org>; Mon, 10 Feb 2025 18:25:51 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.53
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1739211487; cv=none; b=n8LJyzVnEtKjBkuo7Vp74dq6X/l8F6HMwOrK5YHFzOszQt23UgeTmtfTWMUWFppBX2vq710sCgy8n1kYlz2/YWgaLBEgcgJjtKeQgQywXK4V0B4i7jVhVRw6lIEG39H9nF8LpB6xI9RdYo8NLMN5gQV0u7djBqTfN/jnTIk2Dck=
+	t=1739211953; cv=none; b=iacDfMJv0BIRfXu/Hk4SMF4C+5lZVcnOMMX0bAsvBLkWuMzQppyIiQNWHyZ8euCMvl+nvN+stBn6KVpc9Qw27Crm5Mh/sCe/hoYMXiEEYzynrgtwtWVGOdXxzKvrkjOVYJ7kyTiiILixsrDH9e+J4sft0gT8YP2zLIVZAWNrpFw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1739211487; c=relaxed/simple;
-	bh=qinDKoM++ZG8IXfNfU1TPPoop+f/Y0BBrjoaVcAsZJk=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=FTWq2FE6dHdnTqNQV6VfGVLbR9AJkMGHA5Ac6Il6RAqA8krSt/R2DRgtZ4jl5le2WW169d/vrS+1aC6gt4ywHJZ7HECJb3xXJ8FMXTSgaXsAmZIH7GDK0ffG3xyX895Hs/IhObVg1rlAeHyyfFT3gcChVHQnzsPeXOWGqFW5PAA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oss.qualcomm.com; spf=pass smtp.mailfrom=oss.qualcomm.com; dkim=pass (2048-bit key) header.d=qualcomm.com header.i=@qualcomm.com header.b=csph2HZM; arc=none smtp.client-ip=205.220.168.131
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oss.qualcomm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=oss.qualcomm.com
-Received: from pps.filterd (m0279863.ppops.net [127.0.0.1])
-	by mx0a-0031df01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 51A9VveX008646
-	for <netdev@vger.kernel.org>; Mon, 10 Feb 2025 18:18:05 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=qualcomm.com; h=
-	cc:content-transfer-encoding:content-type:date:from:in-reply-to
-	:message-id:mime-version:references:subject:to; s=qcppdkim1; bh=
-	B7hH0YIMetgk89Mc/p2t6ycOF8BT5TouaRT/5posNTE=; b=csph2HZMhsirrzl4
-	T303c8Kj9wX3eqW3ayV9n+Moh8D0+ZH/4Pm5VXsxjBzAEsuxt+wGJ6LtmkvQ0NW/
-	oYg5OwMfheB4W4nnuiuvyfl94VNUigU0UAqycfsDbVe+lyvcxq9XJzduR3rl0EXg
-	n6a/qZoPBqKqkw9bJESlqvQDyd9i/hz8C7ROqQ6w1D3JCZqQ2Z7ihRepBkcuHqNy
-	At2zzPpygI7S5rRwdQm/INwpUeBsC1SSSKoqsPTr9rNIFQV77XgRocLKxKq8NjjD
-	2h5jFWF/hr6FhJczYYpnNPnaYgN5RY7wdGSXQJmLC7EANr/PybDVsympdx2dacx8
-	OeCd6A==
-Received: from mail-qt1-f198.google.com (mail-qt1-f198.google.com [209.85.160.198])
-	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 44qewh1ehf-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128 verify=NOT)
-	for <netdev@vger.kernel.org>; Mon, 10 Feb 2025 18:18:05 +0000 (GMT)
-Received: by mail-qt1-f198.google.com with SMTP id d75a77b69052e-4719173db00so2559601cf.0
-        for <netdev@vger.kernel.org>; Mon, 10 Feb 2025 10:18:05 -0800 (PST)
+	s=arc-20240116; t=1739211953; c=relaxed/simple;
+	bh=un6QQGCdV/jIvAwfpJI8Uq+adWEITlFotZcQe0NcveI=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=LNHFyhhj3nm2RSX47aakIX3+qbUOOAnsCw0XkVLFy293uMg/2AVE5aAfHTh5Lx3a4SUmXLpxn0W3Z7aSpBq8/CAFxMfLxAtnWZkQM4UD+vp5r03ue1ai44GIEc3C4/6dF0yH4YgVIbJtSC3l4idT2ly8c9PSW642RkCwoERG3XU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fastly.com; spf=pass smtp.mailfrom=fastly.com; dkim=pass (1024-bit key) header.d=fastly.com header.i=@fastly.com header.b=xPwBYCoP; arc=none smtp.client-ip=209.85.216.53
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fastly.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=fastly.com
+Received: by mail-pj1-f53.google.com with SMTP id 98e67ed59e1d1-2fa8ac56891so1459846a91.2
+        for <netdev@vger.kernel.org>; Mon, 10 Feb 2025 10:25:51 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=fastly.com; s=google; t=1739211950; x=1739816750; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references
+         :mail-followup-to:message-id:subject:cc:to:from:date:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=lBLXfzB522A5CbhK5TFNajhZ+MxFO1T0Mo8nWMaVTRQ=;
+        b=xPwBYCoP1g2HmKw7tnOeyWizqyeOoK8TjK6//BkARsEDggd5VAV0QXo4fAEETIDMVp
+         W+NbjaVU++pdVbm/Ht3+pFW+Uoj9x4D3ZyHVxiRt/CGhzZkxS8pN95jRg+RYCTDnEoti
+         R/7FP4EWLUYTLhEU2Y1lKRVGxUQEETkc8Xaws=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1739211484; x=1739816284;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
+        d=1e100.net; s=20230601; t=1739211950; x=1739816750;
+        h=in-reply-to:content-disposition:mime-version:references
+         :mail-followup-to:message-id:subject:cc:to:from:date
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=B7hH0YIMetgk89Mc/p2t6ycOF8BT5TouaRT/5posNTE=;
-        b=garwHIgwMg932suAhkirId9QQGR1b7d++1thlBNBDifw0w/Je2YiSOhJh9TVGO9sj2
-         U1IWJeKsAZmx5OYArOYC4WF9L002Bcg9aIYLTLJ8ZeQAdgWIa3e5kXV5JU8vVayeZToT
-         K0YGQhUGHJai8GKxcKjHqy9MTaGHXHl9S+dmroBFAunOJZQPaMDuLkzUmYhJOE6NpwpI
-         KI5BVbrBvmpxFxQJ0bLn1hs2xMnWErnVcEQetu47BD4ioYcni9l4dZbmzEGC24EQDlZ6
-         MPAAbwQe1zohIo+b51w8xShFQuxpmxeGPRO0s5x604LMJMXnThM6ablfnDpIJbzi/ASf
-         sZuQ==
-X-Forwarded-Encrypted: i=1; AJvYcCUkyk5Jt9JJIDOu6+RGXbMBEhrd28rSEk5dyRHZLueCW5P5BdazOBSIuQ4bFB/iTwkxVrPHqEQ=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzljZxX4w3Mch721lOg/uW2Wun3Jh5hDv5XEZfVAw/CEBmNiqZE
-	O3aRfRPVN+nACd74Ekig0LVptTA8FGZ/VYhDIbry3hbsWkCH3fHSoVSiq9syyooqX8XxLRW3YDF
-	/RdwhSclPBBZ6IgbeTIKjPLCKgtv556ak1a5q39GvCA4rdvdb8zQ7oOI=
-X-Gm-Gg: ASbGncthzN0iyg3/2DU4KHD/t2+dYsA9WCsFLTAcf0+r4WEnOHcguchqn4sJNvyuM4S
-	UOe2RAW6zQH30NIQZZ78116A7da0pNdCqH2vpsSiDMRts4KBRAXPAe6WiMEHrQReSWe/HmXPbBV
-	hlNyxEe7HQvFqWg4o2GGAA3BuwfRFnFEEwot0W3LV7XPQ3tXAxw18PMwlqtwpxaCkqpx5dxjDx0
-	W1TS5C2WBPu1UL4q/TjWQzBxfwPl5Kc7PgZJvmN/kp+TG7OLgU5klnMCe/BfjvxUe6uP9Ej3/Oh
-	wRJGJFPA/qU6bNo4y6fTaN38pWd0tCTr0MgLOjUitaIycsYI/iL2kkylEbQ=
-X-Received: by 2002:ac8:590e:0:b0:471:a14c:6847 with SMTP id d75a77b69052e-471a14c8663mr1571231cf.5.1739211483905;
-        Mon, 10 Feb 2025 10:18:03 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IGAXNmuIboEgfBo9SyYi4AwkYGvwLe1amQ3mO7hi9Y7qYBpldJid3eLK1F44rXVgl2m4+M4pA==
-X-Received: by 2002:ac8:590e:0:b0:471:a14c:6847 with SMTP id d75a77b69052e-471a14c8663mr1570831cf.5.1739211483535;
-        Mon, 10 Feb 2025 10:18:03 -0800 (PST)
-Received: from [192.168.65.90] (078088045245.garwolin.vectranet.pl. [78.88.45.245])
-        by smtp.gmail.com with ESMTPSA id 4fb4d7f45d1cf-5de44e4bc17sm7129357a12.70.2025.02.10.10.17.59
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 10 Feb 2025 10:18:03 -0800 (PST)
-Message-ID: <ee166cf3-4486-4172-a510-bafa1624ab79@oss.qualcomm.com>
-Date: Mon, 10 Feb 2025 19:17:58 +0100
+        bh=lBLXfzB522A5CbhK5TFNajhZ+MxFO1T0Mo8nWMaVTRQ=;
+        b=sKnpBTY+pZ16T/rbQncVGj3y/aE1XRDu3a5dzTycRznO4bXhd+4qqnPOg3V+AwDTIH
+         gZPW5OWuDBpgfdchxNJFITYOlLFgBc2/mAA3cXEeGQnlE9LonvUCZ1LZ/G9UJcCDx7gO
+         3C+Sd2QKpUT/QfdVjyqkQ7IdjCa2c5KtKzFlvDAGFudtbYOfpWrl6M75MEhTEwbiI/F1
+         KZhYIg5anDFDdAedstntDCljyh6cpfVJw8aopU4/VFEWZs5Sw7NpS/8fIHw8oV3biLJN
+         5+FYNDcYgIDoHEKLLztKWLeCMVJnzzEpTa8pjSTkB8uhZ5swhXqZ8A9C+O6FJbwUaTvr
+         zJqg==
+X-Forwarded-Encrypted: i=1; AJvYcCXqg8HDkICHcDHIhFGo8db25Pf54qQRISp/nu1gyKnVNP81klCLOOHOGHq7IT1P7Y8Km7+O3rM=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyfIc4mslFeGqQUI8V5mI2yrCdOidVRg9Va/cq4EDLTJlSpLMz9
+	nHfLYrinyzBc3XDObuKfNMiBZc3ZUVji8Q3/8tqbBBVct6AKeJ2Yv78jJzl1lr4=
+X-Gm-Gg: ASbGncv7DwU86gol9KeYXzI60JmkhpmDm0lVJeoIbqSDelvcfpCEPy1aDC7rDEy6tCg
+	CaqeJW2QsIsL+2atCgJKL69J8b2BSZ7enP5grbhDAEYTJcJBqG1sJd71xSwjmI/4sn3zN5AydpK
+	4/l2hOfaTJquy66rW4HN96WQRTWxeC+sO6lrP2a6sJtaCfJXxCH/7iH6yLH8uKMs36bbqZW1e6O
+	B127uGkzmryOKMaNQIRABydL+empkT9lRKt5ysrJfzmquBqax3BO8Z4kc/87awBw19yK9KX2nnR
+	5gNv6A4eVzRk+4Jkpfsv5RTggRMUDZjfNtZRR78uzBl8bwkCNt8hcjlMXg==
+X-Google-Smtp-Source: AGHT+IEeGi/YxACQdrn8oE1WkyJdsSg+jOCxVIUUqafmiRNWAw7aoFvnfDNnWa0QFcaXWTLwctzU3Q==
+X-Received: by 2002:a17:90b:3e8a:b0:2ee:a76a:830 with SMTP id 98e67ed59e1d1-2fa242e74fdmr23095209a91.24.1739211950624;
+        Mon, 10 Feb 2025 10:25:50 -0800 (PST)
+Received: from LQ3V64L9R2 (c-24-6-151-244.hsd1.ca.comcast.net. [24.6.151.244])
+        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-2f9e1e2373esm11431743a91.37.2025.02.10.10.25.49
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 10 Feb 2025 10:25:50 -0800 (PST)
+Date: Mon, 10 Feb 2025 10:25:47 -0800
+From: Joe Damato <jdamato@fastly.com>
+To: Kurt Kanzenbach <kurt@linutronix.de>
+Cc: Tony Nguyen <anthony.l.nguyen@intel.com>,
+	Przemek Kitszel <przemyslaw.kitszel@intel.com>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Sebastian Andrzej Siewior <bigeasy@linutronix.de>,
+	intel-wired-lan@lists.osuosl.org, netdev@vger.kernel.org
+Subject: Re: [PATCH 1/3] igb: Link IRQs to NAPI instances
+Message-ID: <Z6pEq9fs5RvglrVk@LQ3V64L9R2>
+Mail-Followup-To: Joe Damato <jdamato@fastly.com>,
+	Kurt Kanzenbach <kurt@linutronix.de>,
+	Tony Nguyen <anthony.l.nguyen@intel.com>,
+	Przemek Kitszel <przemyslaw.kitszel@intel.com>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Sebastian Andrzej Siewior <bigeasy@linutronix.de>,
+	intel-wired-lan@lists.osuosl.org, netdev@vger.kernel.org
+References: <20250210-igb_irq-v1-0-bde078cdb9df@linutronix.de>
+ <20250210-igb_irq-v1-1-bde078cdb9df@linutronix.de>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v9 5/6] arm64: dts: qcom: ipq9574: Add nsscc node
-To: Manikanta Mylavarapu <quic_mmanikan@quicinc.com>, andersson@kernel.org,
-        mturquette@baylibre.com, sboyd@kernel.org, robh@kernel.org,
-        krzk+dt@kernel.org, conor+dt@kernel.org, konradybcio@kernel.org,
-        catalin.marinas@arm.com, will@kernel.org, p.zabel@pengutronix.de,
-        richardcochran@gmail.com, geert+renesas@glider.be,
-        dmitry.baryshkov@linaro.org, arnd@arndb.de, nfraprado@collabora.com,
-        biju.das.jz@bp.renesas.com, quic_tdas@quicinc.com, ebiggers@google.com,
-        ardb@kernel.org, ross.burton@arm.com, quic_anusha@quicinc.com,
-        linux-arm-msm@vger.kernel.org, linux-clk@vger.kernel.org,
-        devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
-        linux-arm-kernel@lists.infradead.org, netdev@vger.kernel.org
-Cc: quic_srichara@quicinc.com, quic_varada@quicinc.com
-References: <20250207073926.2735129-1-quic_mmanikan@quicinc.com>
- <20250207073926.2735129-6-quic_mmanikan@quicinc.com>
-Content-Language: en-US
-From: Konrad Dybcio <konrad.dybcio@oss.qualcomm.com>
-In-Reply-To: <20250207073926.2735129-6-quic_mmanikan@quicinc.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-Proofpoint-ORIG-GUID: 5uWBivip54OWQB9t5WA5ovUcSvbHGEgS
-X-Proofpoint-GUID: 5uWBivip54OWQB9t5WA5ovUcSvbHGEgS
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1057,Hydra:6.0.680,FMLib:17.12.68.34
- definitions=2025-02-10_10,2025-02-10_01,2024-11-22_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 mlxscore=0 spamscore=0
- impostorscore=0 mlxlogscore=849 phishscore=0 clxscore=1015 adultscore=0
- lowpriorityscore=0 malwarescore=0 bulkscore=0 suspectscore=0
- priorityscore=1501 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.19.0-2501170000 definitions=main-2502100148
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250210-igb_irq-v1-1-bde078cdb9df@linutronix.de>
 
-On 7.02.2025 8:39 AM, Manikanta Mylavarapu wrote:
-> From: Devi Priya <quic_devipriy@quicinc.com>
+On Mon, Feb 10, 2025 at 10:19:35AM +0100, Kurt Kanzenbach wrote:
+> Link IRQs to NAPI instances via netdev-genl API. This allows users to query
+> that information via netlink:
 > 
-> Add a node for the nss clock controller found on ipq9574 based devices.
+> |$ ./tools/net/ynl/pyynl/cli.py --spec Documentation/netlink/specs/netdev.yaml \
+> |                               --dump napi-get --json='{"ifindex": 2}'
+> |[{'defer-hard-irqs': 0,
+> |  'gro-flush-timeout': 0,
+> |  'id': 8204,
+> |  'ifindex': 2,
+> |  'irq': 127,
+> |  'irq-suspend-timeout': 0},
+> | {'defer-hard-irqs': 0,
+> |  'gro-flush-timeout': 0,
+> |  'id': 8203,
+> |  'ifindex': 2,
+> |  'irq': 126,
+> |  'irq-suspend-timeout': 0},
+> | {'defer-hard-irqs': 0,
+> |  'gro-flush-timeout': 0,
+> |  'id': 8202,
+> |  'ifindex': 2,
+> |  'irq': 125,
+> |  'irq-suspend-timeout': 0},
+> | {'defer-hard-irqs': 0,
+> |  'gro-flush-timeout': 0,
+> |  'id': 8201,
+> |  'ifindex': 2,
+> |  'irq': 124,
+> |  'irq-suspend-timeout': 0}]
+> |$ cat /proc/interrupts | grep enp2s0
+> |123:          0          1 IR-PCI-MSIX-0000:02:00.0   0-edge      enp2s0
+> |124:          0          7 IR-PCI-MSIX-0000:02:00.0   1-edge      enp2s0-TxRx-0
+> |125:          0          0 IR-PCI-MSIX-0000:02:00.0   2-edge      enp2s0-TxRx-1
+> |126:          0          5 IR-PCI-MSIX-0000:02:00.0   3-edge      enp2s0-TxRx-2
+> |127:          0          0 IR-PCI-MSIX-0000:02:00.0   4-edge      enp2s0-TxRx-3
 > 
-> Signed-off-by: Devi Priya <quic_devipriy@quicinc.com>
-> Signed-off-by: Manikanta Mylavarapu <quic_mmanikan@quicinc.com>
+> Signed-off-by: Kurt Kanzenbach <kurt@linutronix.de>
 > ---
-> Changes in V9:
-> 	- Rebased on linux-next tip.
+>  drivers/net/ethernet/intel/igb/igb_main.c | 3 +++
+>  1 file changed, 3 insertions(+)
 > 
->  arch/arm64/boot/dts/qcom/ipq9574.dtsi | 19 +++++++++++++++++++
->  1 file changed, 19 insertions(+)
-> 
-> diff --git a/arch/arm64/boot/dts/qcom/ipq9574.dtsi b/arch/arm64/boot/dts/qcom/ipq9574.dtsi
-> index 942290028972..29008b156a7e 100644
-> --- a/arch/arm64/boot/dts/qcom/ipq9574.dtsi
-> +++ b/arch/arm64/boot/dts/qcom/ipq9574.dtsi
-> @@ -1193,6 +1193,25 @@ pcie0: pci@28000000 {
->  			status = "disabled";
->  		};
->  
-> +		nsscc: clock-controller@39b00000 {
-> +			compatible = "qcom,ipq9574-nsscc";
-> +			reg = <0x39b00000 0x80000>;
-> +			clocks = <&xo_board_clk>,
-> +				 <&cmn_pll NSS_1200MHZ_CLK>,
-> +				 <&cmn_pll PPE_353MHZ_CLK>,
-> +				 <&gcc GPLL0_OUT_AUX>,
-> +				 <0>,
-> +				 <0>,
-> +				 <0>,
-> +				 <0>,
-> +				 <0>,
-> +				 <0>,
-> +				 <&gcc GCC_NSSCC_CLK>;
+> diff --git a/drivers/net/ethernet/intel/igb/igb_main.c b/drivers/net/ethernet/intel/igb/igb_main.c
+> index d368b753a4675d01b5dfa50dee4cd218e6a5e14b..d4128d19cc08f62f95682069bb5ed9b8bbbf10cb 100644
+> --- a/drivers/net/ethernet/intel/igb/igb_main.c
+> +++ b/drivers/net/ethernet/intel/igb/igb_main.c
+> @@ -947,6 +947,9 @@ static int igb_request_msix(struct igb_adapter *adapter)
+>  				  q_vector);
+>  		if (err)
+>  			goto err_free;
+> +
+> +		netif_napi_set_irq(&q_vector->napi,
+> +				   adapter->msix_entries[vector].vector);
+>  	}
 
-This last clock doesn't seem to be used in the driver - is that by design?
+As far as I can tell, all paths that lead here hold RTNL:
+  - power management (__igb_resume)
+  - ethtool set_channels (igb_reinit_queues)
+  - and regular ndo_open
 
-Konrad
+So:
+
+Reviewed-by: Joe Damato <jdamato@fastly.com>
 
