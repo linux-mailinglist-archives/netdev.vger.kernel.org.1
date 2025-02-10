@@ -1,119 +1,127 @@
-Return-Path: <netdev+bounces-164585-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-164586-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id D078FA2E5BD
-	for <lists+netdev@lfdr.de>; Mon, 10 Feb 2025 08:49:56 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id CC870A2E5C2
+	for <lists+netdev@lfdr.de>; Mon, 10 Feb 2025 08:50:38 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id D42E51884F46
-	for <lists+netdev@lfdr.de>; Mon, 10 Feb 2025 07:50:01 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 2B8391883D05
+	for <lists+netdev@lfdr.de>; Mon, 10 Feb 2025 07:50:44 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B63BB2F22;
-	Mon, 10 Feb 2025 07:49:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 16A0A1B414A;
+	Mon, 10 Feb 2025 07:50:34 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="Hxdw8M6C"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="lRbyjq/4"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-f43.google.com (mail-ed1-f43.google.com [209.85.208.43])
+Received: from mail-pj1-f54.google.com (mail-pj1-f54.google.com [209.85.216.54])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E91081BBBE5
-	for <netdev@vger.kernel.org>; Mon, 10 Feb 2025 07:49:43 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.43
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A572F1B0F00;
+	Mon, 10 Feb 2025 07:50:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.54
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1739173786; cv=none; b=AJ0WxB2GzMjK7+/n2RP6i2Hqb8s9W4NJboNZU2+oVyIDFT7Dlb/kQVTBakr8AJUmyRAfP0qSeXa7WtGbjhtsj2UZRQg57XzEoP47lZJmQtFJ+3pldaEqqDVO77dt4+OuZT1iWNfbseQJ196l+ukKTAnUBqxHOEQ7wg+jwIZMAvg=
+	t=1739173834; cv=none; b=D99JLB1pMMf0OX65un4rvezOX8YxBklaFwy4W/6IUKZ6D7R7v60FcXcwETpytiboL7+qd0Kkswk/lttxG9Htr5pZujmybPuo7k9v0PR8v9wNUrvN70Jn0Md3etq+0L2nJAOR7i+V+FPqgB7lYYMUYeikJidE5tt4UEpPooC/GSQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1739173786; c=relaxed/simple;
-	bh=nEqMlZ2pjVh0LdY2fkE/N4iZ0HkpQVMfXEse3Af54mA=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=VynJwdet0cTvK4KaPojC8rNAOzi9tmfi5vp9gcFTnVnjTcTTNyho/IJK5DU7iw8SwTpHd1m98emf6YIJ7c0CwY0K6quSZ2WDwk3NE/1y9U84i1Zep1c+gBMmFtobYWnBEhovxiXcXmDhPolEoh4okrQE+NVv7BLhUGLnAGJ09IY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=Hxdw8M6C; arc=none smtp.client-ip=209.85.208.43
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-ed1-f43.google.com with SMTP id 4fb4d7f45d1cf-5de3c29e9b3so5595488a12.3
-        for <netdev@vger.kernel.org>; Sun, 09 Feb 2025 23:49:43 -0800 (PST)
+	s=arc-20240116; t=1739173834; c=relaxed/simple;
+	bh=KcLkOdKpnk1CJoSNTQMgCGG1hRd+E7Qg89aooupMW4A=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=DcNKWa6xsuM3FpaSCiEbSKAOGPfYbF3WsgwoaIp7aI/0ab6Oxt5XmCKNDnDa8Jw88q5V9JgqN3Z2ibu0LkzkAQhRVFfjbH1fjT6vHD72iRvy3X0VdGvLBc91o+SBmUPww1CzDgzxB9QkTtj1SvfXKu/tuTIoMT7mhHf8ChG3u38=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=lRbyjq/4; arc=none smtp.client-ip=209.85.216.54
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pj1-f54.google.com with SMTP id 98e67ed59e1d1-2fa1d9fb990so6029821a91.2;
+        Sun, 09 Feb 2025 23:50:31 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1739173782; x=1739778582; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=vVa68QPgK9kaQwjfkRjiftD2eZ+FNC17cNuQB5Ss6Y0=;
-        b=Hxdw8M6CQ8J9rJwHofAvkMv9WZE0xJjNoJNeo4Oaj+dizxmS3sBMBgiM8g7VxABOyT
-         nnET1I0sftsl74PWKrOqTTpSbasE/5diiMtRfa8uMCMuO8H/walvICJtu6DCt8GwFta8
-         6H9RSWyaewbwVyJbHd3vxbFusTX0R7I/wNGFJgDWDMffa1I2UzPq/nTkjT/fd3DKnmmI
-         1o18aFFShtCYB2umd2909DlpAPUX4aLjVfjYFUllSFFvUQDeXprSAdg/ju6lYngaj0VB
-         RZHJtw6+T1EChAgNqAJK9Ng264j07ybYs9Fd/KK+0hzPloA1wJTHrDZ/E2Pjhnf6yj/k
-         JMrA==
+        d=gmail.com; s=20230601; t=1739173831; x=1739778631; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=yH1eZR8Z4tfbwC4sdMJnrsadw3QkNTq9pA/sDaio2h4=;
+        b=lRbyjq/4YBOvjOR0R1ucOna8+7wIoRhsfhRH2nwnpkNH/j2+9s5ENZ76MLJcTqBXUA
+         TSovRS3zOVKGRz5C0Gu3ijpgj6FGO29WghoSmStHugp5w24JGlkosmMEDjvaBYMRFIqb
+         VBvqpzqSKmn24EmuTAyqjgOcclYlCBSxmcNzE0cuuRSFQKBYA9Kpb3nF3gpIgpmc3/pX
+         X3Z47BZB2qfIhJNpZ/4gnbJVWnzzRmVwjiHi4BPbGw3ReJ+1QwCBCneehZFAwQLXESIk
+         TA+BFueVp5zQQofM1YYNk7Z5bBFebCNUvuSxHHect+KNJxcf8vPfICTUd+Gbf+is4IVl
+         tnVw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1739173782; x=1739778582;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=vVa68QPgK9kaQwjfkRjiftD2eZ+FNC17cNuQB5Ss6Y0=;
-        b=uDjBFPOXnthfscP8FgJEm7U8TosN3mLy9tcW6ViSe2T9Vyq9Hg0KUKYjRSvfHhJ1Nb
-         pqcpCapofEgbiGM9hadSvS38UvMxad/WN+DqXXm+HaoR2Xd/g3q8IoVYfH8AmGpPrnoN
-         7LI5lAjr6YQ8pw0iui0V0pU/L3rSWGCz7UB8eRFtNTcio7gSurijUfJTt2dzGxQLeucu
-         6gFqXkIvgI8VYvia85aAhiWHB3t5lMZgJbdC/SlwPJWOq8zS9EG00AF7+mgFWUsYIVsn
-         gEGGQv1H9EN1+4UoFYVjtCJ9Cu+Rflqh6+dXAq1VsATd/H/VDNoR9/+nbMGQZIwWrSAB
-         gI3A==
-X-Gm-Message-State: AOJu0YxAONw04oBDRS1wLo9fpDOGZBUCTtYqYXhjW43U7u82C8u9lu8h
-	DHPggpJWS6FPWsAr7ZIxifWiqW4t5+h4Cmu1nLp6ErKzQJ/cYEITqVfkxpQXe+fg6rtRX/FcxPE
-	BUsGDpflrq5AV1E/91XJcUFls/GHlKCIf+pZQ
-X-Gm-Gg: ASbGnculYkZHNp8XNqzfA2M+5rWIm2EEed+Vl9GniCHV81HnUlJ8SWevzQigy3J9jec
-	KmFgYmIasz6obmK8a9cydJqZ4q/42yVVjdR9v/Oq0GlYbVasY/Uj2qGVBOz1nF9L60hDcecWI
-X-Google-Smtp-Source: AGHT+IGMQXwBQLyl7JgDmAMFg4PKXcNdkLydZ1g/uWQYzDv9WOB894IjCtChTlS4uNEdlM4X/VLWREF4o2F7H8V4Tok=
-X-Received: by 2002:a05:6402:3818:b0:5db:d9ac:b302 with SMTP id
- 4fb4d7f45d1cf-5de450b1e67mr13168210a12.32.1739173782135; Sun, 09 Feb 2025
- 23:49:42 -0800 (PST)
+        d=1e100.net; s=20230601; t=1739173831; x=1739778631;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=yH1eZR8Z4tfbwC4sdMJnrsadw3QkNTq9pA/sDaio2h4=;
+        b=j1fWDuHSWMcM7lPPN5Cynbgl3yH1b46wypUuUT952SAN53tJ+eJyAYSdrCi4S5tYcZ
+         e7qn/pSWW+bFqYYyHX5+FRpqeGr+lQ8K9jtWtfOlAzRubNt9WMEO+FgbX+VK5en+gEIz
+         pFZzzlQCwpFVl/XxkOKwIo5Pe5Tq2xOoOmEKq6Udc2mty0Ak+FhWNbcvLd9SClZvSNii
+         yt9GMvhBgDU1LNs/00Q5wtCOUmEK7nshr4xJw8tu8APQO6XHiGcBzRr1IHg8U7IZcQfz
+         xEe+AQuS7ihMOs/iUcL+14Aiqo7PnmtvpDTsfr0YiVoIrCpSvvO1qB38LQzH8x1lPR4W
+         6Fow==
+X-Forwarded-Encrypted: i=1; AJvYcCWb+wVTK1Ry6mtfHrAt3BeW5T9WbRWuM7ez0ptrcSciDEKJPkBW6BvvyFbLWWgCnWf6ydJ/+oc1@vger.kernel.org, AJvYcCXekWP1SJNDvhlvTkeEWRlzPs5Pd7uqPf65ufEc5YLncKdaagGvA/54krLxPUT+JEOB7UADCL8Sw856rXY=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yy+djdPC/oG4NksWuM6173U8B40eDIpgo85t/ypjAhjq2ZzLFjh
+	ytFavnMjE7+6xzoUV+PV6Vm+IS1SxHhPT0YLxjqJSMYiLLahLaka
+X-Gm-Gg: ASbGncvN7NiBe96j2UnGkTSmwM8cgR5z9JtW5chlBEXJFTOatUOIt2cE+IrfuDZaI1N
+	NrytMkkKXk0xf45tC5rRD6QoAGDq8K9CMvKgtZLI0Yn454l5WW2y9vaxc0TITz4En6i2I5GTOne
+	hfZBuqB+CQSUEaM42ykxgqsk+6cmu/GQupEzN2ClJhdGoZUZB0MXVZAOBBENuct2yoYJKODDrZi
+	3vX7keOH/q8qRBYkbvbOFyujrRhYqgrErQyv85gq42CjrNU5eOmxCqQV7hY2ehb/BGXQ7yYV8ZJ
+	u8nZXeGH0/P5n8VbajlMWcUYADKz0m3hDZ9m23J1Dcq3GRQOow==
+X-Google-Smtp-Source: AGHT+IH9ZEbEouCLt6NuoakuYdcUnELKqrJuy+RTbWTtRy+8lev6j+fv/HSLVCV9hcgXMelfHzw/XA==
+X-Received: by 2002:a17:90a:f94e:b0:2f6:d266:f45c with SMTP id 98e67ed59e1d1-2fa23f5abcemr21436969a91.2.1739173830745;
+        Sun, 09 Feb 2025 23:50:30 -0800 (PST)
+Received: from purva-IdeaPad-Gaming-3-15IHU6.. ([2409:40c0:101c:99b7:34e3:b424:c392:121c])
+        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-2fa09a46a89sm7877027a91.23.2025.02.09.23.50.25
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sun, 09 Feb 2025 23:50:30 -0800 (PST)
+From: Purva Yeshi <purvayeshi550@gmail.com>
+To: "David S . Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>
+Cc: skhan@linuxfoundation.org,
+	Simon Horman <horms@kernel.org>,
+	Purva Yeshi <purvayeshi550@gmail.com>,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: [PATCH net-next v2] af_unix: Fix undefined 'other' error
+Date: Mon, 10 Feb 2025 13:20:06 +0530
+Message-Id: <20250210075006.9126-1-purvayeshi550@gmail.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <cover.1738940816.git.pabeni@redhat.com>
-In-Reply-To: <cover.1738940816.git.pabeni@redhat.com>
-From: Eric Dumazet <edumazet@google.com>
-Date: Mon, 10 Feb 2025 08:49:30 +0100
-X-Gm-Features: AWEUYZnJayc7VnjDglIHbWRqxjHwQ37YuSLYpNSJaiohQa_Xp9Ys6G64_mAKTvA
-Message-ID: <CANn89iJGn=GPKF880yctgdxEFi4tgFsX+piGmyLr9MMUuxB0-A@mail.gmail.com>
-Subject: Re: [RFC PATCH 0/2] udp: avoid false sharing on sk_tsflags
-To: Paolo Abeni <pabeni@redhat.com>
-Cc: netdev@vger.kernel.org, Willem de Bruijn <willemdebruijn.kernel@gmail.com>, 
-	Kuniyuki Iwashima <kuniyu@amazon.com>, "David S. Miller" <davem@davemloft.net>, 
-	Jakub Kicinski <kuba@kernel.org>, Simon Horman <horms@kernel.org>, Neal Cardwell <ncardwell@google.com>, 
-	David Ahern <dsahern@kernel.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
 
-On Fri, Feb 7, 2025 at 5:24=E2=80=AFPM Paolo Abeni <pabeni@redhat.com> wrot=
-e:
->
-> While benchmarking the recently shared page frag revert, I observed a
-> lot of cache misses in the UDP RX path due to false sharing between the
-> sk_tsflags and the sk_forward_alloc sk fields.
->
-> Here comes a solution attempt for such a problem, inspired by commit
-> f796feabb9f5 ("udp: add local "peek offset enabled" flag").
->
-> The first patch adds a new proto op allowing protocol specific operation
-> on tsflags updates, and the 2nd one leverages such operation to cache
-> the problematic field in a cache friendly manner.
->
-> The need for a new operation is possibly suboptimal, hence the RFC tag,
-> but I could not find other good solutions. I considered:
-> - moving the sk_tsflags just before 'sk_policy', in the 'sock_read_rxtx'
->   group. It arguably belongs to such group, but the change would create
->   a couple of holes, increasing the 'struct sock' size and would have
->   side effects on other protocols
-> - moving the sk_tsflags just before 'sk_stamp'; similar to the above,
->   would possibly reduce the side effects, as most of 'struct sock'
->   layout will be unchanged. Could increase the number of cacheline
->   accessed in the TX path.
->
-> I opted for the present solution as it should minimize the side effects
-> to other protocols.
+Fix issue detected by smatch tool:
+An "undefined 'other'" error occur in __releases() annotation.
 
-Hmm, thanks for the analysis. I will take a look at this today.
+Fix an undefined 'other' error in unix_wait_for_peer() caused by  
+__releases(&unix_sk(other)->lock) being placed before 'other' is in  
+scope. Since AF_UNIX does not use Sparse annotations, remove it to fix  
+the issue.  
+
+Eliminate the error without affecting functionality.  
+
+Signed-off-by: Purva Yeshi <purvayeshi550@gmail.com>
+---
+V1 - https://lore.kernel.org/lkml/20250209184355.16257-1-purvayeshi550@gmail.com/
+V2 - Remove __releases() annotation as AF_UNIX does not use Sparse annotations.
+ net/unix/af_unix.c | 1 -
+ 1 file changed, 1 deletion(-)
+
+diff --git a/net/unix/af_unix.c b/net/unix/af_unix.c
+index 34945de1f..319153850 100644
+--- a/net/unix/af_unix.c
++++ b/net/unix/af_unix.c
+@@ -1508,7 +1508,6 @@ static int unix_dgram_connect(struct socket *sock, struct sockaddr *addr,
+ }
+ 
+ static long unix_wait_for_peer(struct sock *other, long timeo)
+-	__releases(&unix_sk(other)->lock)
+ {
+ 	struct unix_sock *u = unix_sk(other);
+ 	int sched;
+-- 
+2.34.1
+
 
