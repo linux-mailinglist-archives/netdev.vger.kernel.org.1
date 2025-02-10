@@ -1,179 +1,176 @@
-Return-Path: <netdev+bounces-164569-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-164570-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id C07D9A2E44E
-	for <lists+netdev@lfdr.de>; Mon, 10 Feb 2025 07:47:43 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id BD51AA2E451
+	for <lists+netdev@lfdr.de>; Mon, 10 Feb 2025 07:48:51 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 58BE8162350
-	for <lists+netdev@lfdr.de>; Mon, 10 Feb 2025 06:47:42 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 2D2DF3A45AC
+	for <lists+netdev@lfdr.de>; Mon, 10 Feb 2025 06:48:42 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A7E0D1A314B;
-	Mon, 10 Feb 2025 06:47:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DAA00199237;
+	Mon, 10 Feb 2025 06:48:46 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="r7Ks1RkC"
 X-Original-To: netdev@vger.kernel.org
-Received: from szxga05-in.huawei.com (szxga05-in.huawei.com [45.249.212.191])
+Received: from NAM10-BN7-obe.outbound.protection.outlook.com (mail-bn7nam10on2058.outbound.protection.outlook.com [40.107.92.58])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B8ABA189F20;
-	Mon, 10 Feb 2025 06:47:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.191
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1739170057; cv=none; b=uGMfG0ycsJR1KEprNDnC08vny8h2f0rYCGKbEA6neG/4+C67cMR3ABmw+lYVAp8U/C0mo2VK0EnNTR9gmyIF1jtgGmanWvpRUFVb3KCTrOj1ez+pd7Y6Jv75bBnrpcBk2U8OQpSstBUSlLiw6/fQRKvqM/YKvjpMYQ5yAc2HBs4=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1739170057; c=relaxed/simple;
-	bh=e66W8EygnZvlrt91LMyE+AAHGIqSis3Oo8eWbRS+JTk=;
-	h=Message-ID:Date:MIME-Version:From:Subject:To:CC:References:
-	 In-Reply-To:Content-Type; b=f69ukjNvocauHkZKUh9DL1TjfXmxK19VufyPx80EcmMZrdSWomK9smmxKky9ASqDXnPWOZE9VTp/VQFFLPINzHz+EibGhNZ2nltdK9AtOjKSLAP8auIfqRTS/yry0edw2apslHc91B7Gbv5XDyz3TPF3b2VFFRrzCLNz1BSGbH8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.191
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
-Received: from mail.maildlp.com (unknown [172.19.88.163])
-	by szxga05-in.huawei.com (SkyGuard) with ESMTP id 4Yrw5c0HCfz1ltZX;
-	Mon, 10 Feb 2025 14:43:48 +0800 (CST)
-Received: from kwepemf500003.china.huawei.com (unknown [7.202.181.241])
-	by mail.maildlp.com (Postfix) with ESMTPS id EED2618001B;
-	Mon, 10 Feb 2025 14:47:30 +0800 (CST)
-Received: from [10.174.176.82] (10.174.176.82) by
- kwepemf500003.china.huawei.com (7.202.181.241) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.11; Mon, 10 Feb 2025 14:47:28 +0800
-Message-ID: <c48952c7-716c-4302-949c-2c66ea102a3e@huawei.com>
-Date: Mon, 10 Feb 2025 14:47:28 +0800
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3DEB2134BD;
+	Mon, 10 Feb 2025 06:48:44 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.92.58
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1739170126; cv=fail; b=HToWdqiGSAMyDd/Adql9+tMP6NkXwuNu1lkYw36KktkjqmO2t7ZHrmS++6A/5ZVMpJ28dotKyWIWTaCPuLJRfRg/vo42Ngoi2xWd27N9ixCJVbdqleLHUXGpcbFUcJKMYvACHXAoWUte7uherbBWeUD8IUakdPQgkMDLtJXP/SU=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1739170126; c=relaxed/simple;
+	bh=G9FqypnUUT+f9kerBppRCWFP5gmdmP9Qoe/8tDYdf4s=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:Content-Type:
+	 Content-Disposition:In-Reply-To:MIME-Version; b=abBFbEfCzTHO3HmD6eO4jQ/TeqZ88kE7WbUMidqfd0B+ZTptV9cESts5+jCimuiaog2h1nt/Bgx62U3tgARDwLs7qbaxwDpBqgZNW/IffqFWnxEv1BCQJnBEFDHQXGsKHKUm/XuFoSbO1PuC7yqgSuuY17Gj4q+ySqO/I5IAt24=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=r7Ks1RkC; arc=fail smtp.client-ip=40.107.92.58
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=X6VxOhchp/ETiue4rBQZ21bwISly7OxFaqiv/85UtflRQQZikq/EK6XyxRuWhjK/2MR2c9yPOVUjRvLGcBEit6UirgildwqfaNHfinQLvuDW0JUuvNeXa3pNjFHXoCQVFax0AHXhpGsTw7bN5MtHuW7XhflQfvmiHlweGBeKjvkh9eBbeqQFAbKWCybATHdB6WPO+Zw9H0yv5UIL309hZDDzrpdOdyTm97Y0F2PTmpM9/jZQw9EaokbULav87hNtA0uVYx8mI8Gvg5nm46aCYzbM/sWc6CPZYC8xQCyTwZ/W0qwBx6FaDUxA9dmTDVgnQAXILy5p19FV/PhQyDMEsw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=EP0QLnsRoCEjmYmS5ZcEU8SpzNo7kXIaEEqVCFY3C8E=;
+ b=uYituHiJ5wMT440qo1cLNqbvbhKnUbPS1KmLHMeBXAymbPqCTz/4Ngk2fEKImpeHNqz71mF9n8EAqUv4DKozh+/gpoZHlUyhqesA8bPh3AHzcg0RgWVWDqPzqzPY8d56Twp4cA3uRJXD5Q8yAUfnP7BVQikizN+sgGv2m7LPYFpdDbAVLeB6c3Ipfr9Z7Zr+wVWXcuQsQtIfEcIguYVbwoOVe8tOquB5a7tPY30LbELE+QfwyNgJUZ6SjuBU+k/hXptiU7Jo4EypivwGZWYJEUCKieZBR2lqJ3OcwSQjYah9TVvQIUZv0o/609CxR1TZOfqumAMWhxDxRWSS8c7FKA==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
+ dkim=pass header.d=nvidia.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=EP0QLnsRoCEjmYmS5ZcEU8SpzNo7kXIaEEqVCFY3C8E=;
+ b=r7Ks1RkCpU8qDhdfhXpCHZZ0s2vseXPgsxUvA1UHClfe31uLmPkXYRgqSRXBt7va4QrEcErNk5y6x2kmYoE8t03jgOZ+E3XazpfLcLjXBgs7GQol8LTx42YtTiZXotZyDI+HjjeIBYl5K3JtLsCeaNEsjQJUCeCArTjUDHdd13m/13bZIicHMOPePaJ8NmFUrSD733iNv3LXi1ZB/2JSu9AnTss32rHFmwolFjeY9NIEankT2FDQqOHpLCnaZ7Gx5r1+eNbK0YcS4/sTBuXMzlraGoy5kxGpAha0CQe3Bj6LbwjVAwfCOqq72jZxjhiu/IZnuPpXzBmrk307XZhNNw==
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=nvidia.com;
+Received: from SA3PR12MB7901.namprd12.prod.outlook.com (2603:10b6:806:306::12)
+ by CH2PR12MB4215.namprd12.prod.outlook.com (2603:10b6:610:ab::24) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8422.14; Mon, 10 Feb
+ 2025 06:48:42 +0000
+Received: from SA3PR12MB7901.namprd12.prod.outlook.com
+ ([fe80::66fc:f8a2:1bfb:6de8]) by SA3PR12MB7901.namprd12.prod.outlook.com
+ ([fe80::66fc:f8a2:1bfb:6de8%7]) with mapi id 15.20.8422.015; Mon, 10 Feb 2025
+ 06:48:42 +0000
+Date: Mon, 10 Feb 2025 08:48:32 +0200
+From: Ido Schimmel <idosch@nvidia.com>
+To: Eric Woudstra <ericwouds@gmail.com>
+Cc: Petr Machata <petrm@nvidia.com>, Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Vladimir Oltean <olteanv@gmail.com>,
+	Nikolay Aleksandrov <razor@blackwall.org>, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: Re: [RFC PATCH v1 net-next] net: mlxsw_sp: Use
+ switchdev_handle_port_obj_add_foreign() for vxlan
+Message-ID: <Z6mhQL-b58L5xkK4@shredder>
+References: <20250208141518.191782-1-ericwouds@gmail.com>
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250208141518.191782-1-ericwouds@gmail.com>
+X-ClientProxiedBy: FR2P281CA0164.DEUP281.PROD.OUTLOOK.COM
+ (2603:10a6:d10:99::14) To SA3PR12MB7901.namprd12.prod.outlook.com
+ (2603:10b6:806:306::12)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-From: "zhangzekun (A)" <zhangzekun11@huawei.com>
-Subject: Re: [PATCH 1/9] of: Add warpper function
- of_find_node_by_name_balanced()
-To: Laurent Pinchart <laurent.pinchart@ideasonboard.com>
-CC: Oleksij Rempel <o.rempel@pengutronix.de>, <robh@kernel.org>,
-	<saravanak@google.com>, <justin.chen@broadcom.com>,
-	<florian.fainelli@broadcom.com>, <andrew+netdev@lunn.ch>, <kuba@kernel.org>,
-	<kory.maincent@bootlin.com>, <jacopo+renesas@jmondi.org>,
-	<kieran.bingham+renesas@ideasonboard.com>, <maddy@linux.ibm.com>,
-	<mpe@ellerman.id.au>, <npiggin@gmail.com>, <olteanv@gmail.com>,
-	<davem@davemloft.net>, <taras.chornyi@plvision.eu>, <edumazet@google.com>,
-	<pabeni@redhat.com>, <sudeep.holla@arm.com>, <cristian.marussi@arm.com>,
-	<arm-scmi@vger.kernel.org>, <linuxppc-dev@lists.ozlabs.org>,
-	<linux-media@vger.kernel.org>, <netdev@vger.kernel.org>,
-	<devicetree@vger.kernel.org>, <chenjun102@huawei.com>
-References: <20250207013117.104205-1-zhangzekun11@huawei.com>
- <20250207013117.104205-2-zhangzekun11@huawei.com>
- <Z6XDKi_V0BZSdCeL@pengutronix.de>
- <80b1c21c-096b-4a11-b9d7-069c972b146a@huawei.com>
- <20250207153722.GA24886@pendragon.ideasonboard.com>
-In-Reply-To: <20250207153722.GA24886@pendragon.ideasonboard.com>
-Content-Type: text/plain; charset="UTF-8"; format=flowed
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: dggems706-chm.china.huawei.com (10.3.19.183) To
- kwepemf500003.china.huawei.com (7.202.181.241)
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: SA3PR12MB7901:EE_|CH2PR12MB4215:EE_
+X-MS-Office365-Filtering-Correlation-Id: a3ee3bb0-30b0-40e1-6642-08dd499ef506
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;ARA:13230040|7416014|376014|366016|1800799024;
+X-Microsoft-Antispam-Message-Info:
+	=?us-ascii?Q?BvDd4jp8IB3gYoYi1gyE1DzkleeJLd9xuvtMpA1kolQexEzAQ1tGUAXzLvx9?=
+ =?us-ascii?Q?ToOB6QB6Jgw9zA0+ylcTSxPpxi/dIhWfx5mGheR5Oc653UuENapVg1MMfx/X?=
+ =?us-ascii?Q?YmZO9I/WkA9VEryR3+/kCPTDGH1DnhTqKIPRnn5ddjGDuoCfOVMS5qixreQQ?=
+ =?us-ascii?Q?q1WQomZAHmWJadnwH0RsoKsgU1bUTnhwYCRyGX68/Pca1DKHbom3Twmqi9Ha?=
+ =?us-ascii?Q?y77SIvxzcSUzni5sJuqTSJeJpj69l26FsZ7LHt7X2072xKqoWGcAd7kflnRt?=
+ =?us-ascii?Q?fB/+dIFTekP3mROg7xsoAG4W+ioYCPmRO2Znj5IlBNF0hWuBY9bQ5az3Duvg?=
+ =?us-ascii?Q?w/T7tOr/bPe6K9wvpir3dJr7uGRPLDExUcTqfrFO2uJf++rcCUho/4aAOV/0?=
+ =?us-ascii?Q?YvaPQHk33wnRMBjZt22XTXPueRXFsrESASoBs+yfTTxVK/ZLwIpLK4BsoE4o?=
+ =?us-ascii?Q?wkjadaOe5uPPogBp9PryjBVTaGIpA+yCHqop3ZpJbBZjVZiacFCN7ZDrh+Rn?=
+ =?us-ascii?Q?1tuXStql9R6ylUppTjovRgfgdgswn0cnXeJRw3NKmnVuJE7ZDRQUTDE3wB3j?=
+ =?us-ascii?Q?AvlVYOvWhGs9vL7Tw7yipxEzg3ggVAeJcILXlWDCeig0YnR7jaTABKr1Sr/X?=
+ =?us-ascii?Q?2Fwk6H9C0zIdL/V73kSpsR9OoSxJ/ZoZPtgMlQ56e5bIhRurnG9sbv5O3zn8?=
+ =?us-ascii?Q?0AyHVctfRm0WX4mVq34u1RqfkPi35TuwipzQ6FV4iohADP15pXLcsmUXymf8?=
+ =?us-ascii?Q?3B4+wYwdUiXERF0uUv5kSTqOZdjxESXcsIr7fvzivTd+6tGpdqStIO4zzpBP?=
+ =?us-ascii?Q?KV6MopJ1FZmrtmSbsysmOTZqEQxNk9T2O6kP65xDo5mlD4QIFCZkslX1zwTc?=
+ =?us-ascii?Q?vrRyGhppi4oppYZDHynejO/MUfbWScGeMxgNOxYW1h6mVUPWOe/XD9AiSudg?=
+ =?us-ascii?Q?1J7csqnuApTcyceAzB56XnzRpdxglhHJo3SdUoFqF5K9W5ioQznCc3A/ylcS?=
+ =?us-ascii?Q?ptZpgWateByiwYHKtnZSyZSRrk4uieCAOPWAhMHA+vf0qF9AjuGQDglpidYk?=
+ =?us-ascii?Q?8vcRIcty8SsYta4jbD5WTKuMdRioBrFzPmTPO2Z+Ym380DN5Hywwc9cZEBh5?=
+ =?us-ascii?Q?YguzTiUALb5iFdWEE9ggaT1oWpFCcZ3BVXO2WRgfc8BN2fEksRtfRsuRAbAL?=
+ =?us-ascii?Q?J5g5rNfKatxDj8h/jF4bysMr1qvaKVW4Li9kAhhY9daaAaPhOgOcmPwb6w4r?=
+ =?us-ascii?Q?c8vSnvvYXEVoKMePeCK+vRI2ZudRwWEtVl/CitwZmr9e8JbyIIpQkCbL27fl?=
+ =?us-ascii?Q?gwIPXGJ4wXCvWVnkEjbwlSG9BACRxFDHcBFTk5hpJK6pIKKBpMfmVok8VQGc?=
+ =?us-ascii?Q?bblam3SCZ/lng7PsyQKceISKJGPZ?=
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SA3PR12MB7901.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(7416014)(376014)(366016)(1800799024);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?us-ascii?Q?3PoyzbkuqkKz4HUBiwbc6xGFC5PQb4nVkrga4zmN3ZmYlhWmyAcnBCPq/WPC?=
+ =?us-ascii?Q?O2XjMiG38nXhFQL2GgO2QExqotrN9sXqCN8NucaeHM3IvwKLlUPeweEW8jIK?=
+ =?us-ascii?Q?uImHlzGwfSkApPGTLY9/o3z4Dr3Q6Z3Z2Lgkh2aBJT8DXhGNczbbHKmzZ2IV?=
+ =?us-ascii?Q?BzIfeNaCDMSs8cBAy5kZlYyTAWUkc7HpzzzYDcaaaF30UcWINhr9WF56kuqA?=
+ =?us-ascii?Q?LhlpwSHrGyKtfqGDf61iihs3DkontMRTcqEGhS1hme7cB/kAHSOaps7+rh8O?=
+ =?us-ascii?Q?MDiA1TrzFohGeKMWAxay1oME8Glr5eh7eLESzxbuZCCLWn19i46VZcviLALh?=
+ =?us-ascii?Q?p3akZ9qUwBWvqGKJ/pOOOixx0d+4qgYXA2g69WX5PN3mDYooUr9eM1XmdLoa?=
+ =?us-ascii?Q?MgvZ04D+E1Rj5gnp03LpLysmdB5xLvIZ9vNLQzfwUEYwkIPvcXyg1NZVnNjO?=
+ =?us-ascii?Q?DjMKC5CiTjpRRxaUYG7rlT49xpuPL4/6S+aXQbCYFNSbiMuaKcgFvTFmOPhv?=
+ =?us-ascii?Q?HdSh3RVSIYUs8RN6v9Ph9BKXChDisQ6cAuDiFRLXcDjiGKApesnoAysU+0K7?=
+ =?us-ascii?Q?ryvZq2UHI2Bw20S+lNDeB44rkFiMVKkZG3SYHVkmUPSm31D48b0T+93U9r3u?=
+ =?us-ascii?Q?SxnlT0Vm1RuA6LyraeApmH6jrk3PupXlBPVffjjCVS7fovyDwWlJ+lIVdBeR?=
+ =?us-ascii?Q?xmLFU+rr4J+sE/MPadL/EGBOJnIhExy2zUd+vUXHl2hB6K4SPm10xliGleng?=
+ =?us-ascii?Q?V/pfGOK6THCt3t/dWdD0BN5ByQOdnoWxeU0zeL/06V+6RKt+eTtz7sqMszSV?=
+ =?us-ascii?Q?iDEu0VHHYNwLOjTFrpIx0ZY2B4GivT1HzKkDM7Lz8RtGvazk5eU5iVVZcYT/?=
+ =?us-ascii?Q?mO9ZfZQ4dDXEt0cjtsBqRRHpnGK9HqUzozzqecoN/FMK4RDKoR4YzaaiStra?=
+ =?us-ascii?Q?oS8dD+BeP3RQ+P7Ff4IrELYvBYRhdrz/tgxxV+dKuUosgBXw7X14yknegLY2?=
+ =?us-ascii?Q?tEOG67dO76BZEAGN8taNsoccu8LJqpBP5SRzwOukaxXttfm6DZOfNWvqghCF?=
+ =?us-ascii?Q?Ia98glEqQAEfNmTNNItSQJTsAm4Llm+L2SkBTMOWsMFk0mndvvjin0uSmxU6?=
+ =?us-ascii?Q?k6xhc25jG7T9Qvwhq8OwFZJfji7j2Vz0DW0XGT8CLlTYTAeyrR+Xqn6/fKNe?=
+ =?us-ascii?Q?NEdj2pn6P622ZVFMdwOhKyLfuV4fw5lPUQx9tGjz8gfKkpRed4LzW0haRAGe?=
+ =?us-ascii?Q?RdFSDFHYcsE4BuzXtYf0MslaXPAUjWIXcc+oGrP7UnC56d0IkjNtAT6TgSjA?=
+ =?us-ascii?Q?ylmgG8WAHsY181VSX6ygO9Rvhi/ysPzjW1LWSfmmd/Pg3RNWgrofoOpOP9Iq?=
+ =?us-ascii?Q?36WjA63oX59jnAiJqrcIfSb9Z2TyxmX72jaWs5R9tfmTGz/SZZilnhnlez/e?=
+ =?us-ascii?Q?fLHRfUAdqy0yTQ4X1ggZ+RA63PlHv0PSx10PI+Cof7NHfXmk63yHYGnwgwmF?=
+ =?us-ascii?Q?EPCyyx06+IHqQx23ZCL8YHnLHOQGbMQUtzYj42srCN8+jnTG6kfCKA/TTBvQ?=
+ =?us-ascii?Q?jwbfoJFgBPzi5iuEKgKTnWUwrSPwaRKgb6dPC8oZ?=
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: a3ee3bb0-30b0-40e1-6642-08dd499ef506
+X-MS-Exchange-CrossTenant-AuthSource: SA3PR12MB7901.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 10 Feb 2025 06:48:42.2064
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: OowYong0HGXmz0U5hMYC5R7V2SezY5VjaYnIGxJ/t3Qb4NbGKU299QKALQtJlwanLmfLBG37usOd6tXiK1vNMg==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: CH2PR12MB4215
 
-Hi, Laurent,
+On Sat, Feb 08, 2025 at 03:15:18PM +0100, Eric Woudstra wrote:
+> Sending as RFC as I do not own this hardware. This code is not tested.
+> 
+> Vladimir found this part of the spectrum switchdev, while looking at
+> another issue here:
+> 
+> https://lore.kernel.org/all/20250207220408.zipucrmm2yafj4wu@skbuf/
+> 
+> As vxlan seems a foreign port, wouldn't it be better to use
+> switchdev_handle_port_obj_add_foreign() ?
 
-> I think we all agree that of_find_node_by_name() is miused, and that it
-> shows the API isn't optimal. What we have different opinions on is how
-> to make the API less error-prone. I think adding a new
-> of_find_node_by_name_balanced() function works around the issue and
-> doesn't improve the situation much, I would argue it makes things even
-> more confusing.
-> 
-> We have only 20 calls to of_find_node_by_name() with a non-NULL first
-> argument in v6.14-rc1:
-> 
-> arch/powerpc/platforms/chrp/pci.c:      rtas = of_find_node_by_name (root, "rtas");
-> 
-> The 'root' variable here is the result of a call to
-> 'of_find_node_by_path("/")', so I think we could pass a null pointer
-> instead to simplify things.
-> 
-> arch/powerpc/platforms/powermac/pic.c:          slave = of_find_node_by_name(master, "mac-io");
-> 
-> Here I believe of_find_node_by_name() is called to find a *child* node
-> of 'master'. of_find_node_by_name() is the wrong function for that.
-> 
-> arch/sparc/kernel/leon_kernel.c:        np = of_find_node_by_name(rootnp, "GAISLER_IRQMP");
-> arch/sparc/kernel/leon_kernel.c:                np = of_find_node_by_name(rootnp, "01_00d");
-> arch/sparc/kernel/leon_kernel.c:        np = of_find_node_by_name(nnp, "GAISLER_GPTIMER");
-> arch/sparc/kernel/leon_kernel.c:                np = of_find_node_by_name(nnp, "01_011");
-> 
-> Here too the code seems to be looking for child nodes only (but I
-> couldn't find a DT example or binding in-tree, so I'm not entirely
-> sure).
-> 
-> drivers/clk/ti/clk.c:   return of_find_node_by_name(from, tmp);
-> 
-> Usage here seems correct, the reference-count decrement is intended.
-> 
-> drivers/media/i2c/max9286.c:    i2c_mux = of_find_node_by_name(dev->of_node, "i2c-mux");
-> drivers/media/platform/qcom/venus/core.c:       enp = of_find_node_by_name(dev->of_node, node_name);
-> drivers/net/dsa/bcm_sf2.c:      ports = of_find_node_by_name(dn, "ports");
-> drivers/net/dsa/hirschmann/hellcreek_ptp.c:     leds = of_find_node_by_name(hellcreek->dev->of_node, "leds");
-> drivers/net/ethernet/broadcom/asp2/bcmasp.c:    ports_node = of_find_node_by_name(dev->of_node, "ethernet-ports");
-> drivers/net/ethernet/marvell/prestera/prestera_main.c:  ports = of_find_node_by_name(sw->np, "ports");
-> drivers/net/pse-pd/tps23881.c:  channels_node = of_find_node_by_name(priv->np, "channels");
-> drivers/regulator/scmi-regulator.c:     np = of_find_node_by_name(handle->dev->of_node, "regulators");
-> drivers/regulator/tps6594-regulator.c:          np = of_find_node_by_name(tps->dev->of_node, multi_regs[multi].supply_name);
-> 
-> Incorrect usage, as far as I understand all those drivers are looking
-> for child nodes only.
-> 
-> drivers/of/unittest.c:          found = of_find_node_by_name(nd->overlay, "test-unittest16");
-> drivers/of/unittest.c:          found = of_find_node_by_name(nd->overlay, "test-unittest17");
-> drivers/of/unittest.c:          found = of_find_node_by_name(nd->overlay, "test-unittest18");
-> drivers/of/unittest.c:          found = of_find_node_by_name(nd->overlay, "test-unittest19");
-> 
-> Here too I think only child nodes are meant to be considered.
-> 
-> of_find_node_by_name() is very much misused as most callers want to find
-> child nodes, while of_find_node_by_name() will walk the whole DT from a
-> given starting point.
-> 
-> I think the right fix here is to
-> 
-> - Replace of_find_node_by_name(root, ...) with
->    of_find_node_by_name(NULL, ...) in arch/powerpc/platforms/chrp/pci.c
->    (if my understanding of the code is correct).
-
-For arch/powerpc/platforms/chrp/pci.c, noticing that there is a comment 
-in setup_peg2():
-  /* keep the reference to the root node */
-
-It might can not be convert to of_find_node_by_name(NULL, ...), and the 
-origin use of of_find_node_by_name() put the ref count which want to be 
-kept.
-
-> 
-> - Replace of_find_node_by_name() with of_get_child_by_name() in callers
->    that need to search immediate children only (I expected that to be the
->    majority of the above call sites)
-Since there is no enough information about these DT nodes, it would take 
-time to prove if it is OK to make such convert.
-> 
-> - If there are other callers that need to find indirect children,
->    introduce a new of_get_child_by_name_recursive() function.
-> 
-> At that point, the only remaining caller of of_find_node_by_name()
-> (beside its usage in the for_each_node_by_name() macro) will be
-> drivers/clk/ti/clk.c, which uses the function correctly.
-> 
-> I'm tempted to then rename of_find_node_by_name() to
-> __of_find_node_by_name() to indicate it's an internal function not meant
-> to be called except in special cases. It could all be renamed to
-> __of_find_next_node_by_name() to make its behaviour clearer.
->
-
-The actual code logic of of_find_node_by_name() is more suitable to be 
-used in a loop.So,rename of_find_node_by_name() to 
-__of_find_next_node_by_name() seems to be a good idea.
-
-Best regards,
-Zekun
-
-
+Thanks for the patch, but the VXLAN port is not foreign to the other
+switch ports. That is, forwarding between these ports and VXLAN happens
+in hardware. And yes, switchdev_bridge_port_offload() does need to be
+called for the VXLAN port so that it's assigned the same hardware domain
+as the other ports.
 
