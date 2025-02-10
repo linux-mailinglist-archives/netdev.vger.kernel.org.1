@@ -1,174 +1,90 @@
-Return-Path: <netdev+bounces-164926-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-164927-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id CB585A2FB20
-	for <lists+netdev@lfdr.de>; Mon, 10 Feb 2025 21:54:50 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id B40F9A2FB29
+	for <lists+netdev@lfdr.de>; Mon, 10 Feb 2025 21:59:44 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 0E26C1669BC
-	for <lists+netdev@lfdr.de>; Mon, 10 Feb 2025 20:54:49 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 203061882BDB
+	for <lists+netdev@lfdr.de>; Mon, 10 Feb 2025 20:59:50 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3D1D41B4148;
-	Mon, 10 Feb 2025 20:54:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 663E01BD9F8;
+	Mon, 10 Feb 2025 20:59:40 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="aKimG2Ow"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Ug5yZVgo"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6BA32264609
-	for <netdev@vger.kernel.org>; Mon, 10 Feb 2025 20:54:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3FCE1264609
+	for <netdev@vger.kernel.org>; Mon, 10 Feb 2025 20:59:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1739220888; cv=none; b=bWJQ9JQl4cGUSKqJtCQK9YSw3lvsNr/hZpG2VNmyOmHUWQc+Bk/+9KWTJCkMHurLmJUob8kiGwz7HJ/G05kMGoxL00vz3SPn+esLCrsCrkz55KPEMn/Hv4KueKYEWtCp0/uD6N0W1AF9kaGnJDPDGdQHKHeK6VnT6MCMV9tpt4M=
+	t=1739221180; cv=none; b=u0wl9DS/MhaiZy5AkffJPJA6U8L7+T76TMNhan8a3fXMkA8K6OB6QYa771CdiIlli2AZCQlmIz//ldfII1TOITzRU61m+cmKnUdTwVM3acEUYTKrVZ26opYYfu63s2rNZB+dLTA7aU7F9Hf/dVre+P6QNJblRUGdkRbie5VvJ0g=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1739220888; c=relaxed/simple;
-	bh=wRIktLVq+YdRJowlsMZLWHOC6g8CV3RYo/Slb89jV7M=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=h9q4mwfgSUKL81PzUiEdy9p0yyRBVzLLiB7WSKihMSRzLw60OGIuBH8LddxmGPJhxg6I4MBwJOHTkmIVINN+vQG3b5y9eq0IuJHrKeMncZaa1Xjd2gH07fyYFa4isNKx0z5qpTXIAmLZOJOQci+U9rwtcciQSxmNx3zXbpLmcik=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=aKimG2Ow; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1739220885;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=KUL3tjdAHMcyzN4zBhxzlbXW7WE/Kkr0fWW8kSoJ3M0=;
-	b=aKimG2OwMMHgk+Nsl4wLQiNUwK9IccZIN02BFRnjw36NuKdasSp9+EWIBhRLajdr5+DGvh
-	zzHQPXwG6DQDN8BZO1JHtIrGybdDt28xr+/BRwxv4VEmpUGvSyZM8dmZ+puWWGqw++hlqH
-	WnsrlfJpmhAShxWgbNzR6M5zCdJq3zs=
-Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com
- [209.85.221.72]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-100-nKE9gmEsNXqmaLjA4VllGw-1; Mon, 10 Feb 2025 15:54:43 -0500
-X-MC-Unique: nKE9gmEsNXqmaLjA4VllGw-1
-X-Mimecast-MFC-AGG-ID: nKE9gmEsNXqmaLjA4VllGw
-Received: by mail-wr1-f72.google.com with SMTP id ffacd0b85a97d-38dafe1699cso3201287f8f.3
-        for <netdev@vger.kernel.org>; Mon, 10 Feb 2025 12:54:43 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1739220882; x=1739825682;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=KUL3tjdAHMcyzN4zBhxzlbXW7WE/Kkr0fWW8kSoJ3M0=;
-        b=U1GbeIMCgs6I8O984CNZ3izkVl+AqcLmVVSeJjhHFGR55vkz4L0KtDFCu3DcTYsgfI
-         sN0l2pThQkOiC773Ary4qIyuMx7D1d21RgtY2MOGaA7SKNalmuNPT7Wv3HUbMFMNwALs
-         3xlQ6Aq0S8hq0m0rT9qlBioFm9vTmEwV7dafj4gkNgwzSQYI+QIWF9kw/D3yvUjlQ5o7
-         XFuwqxmA7DtqoBWfuVnHZRQAH79PVVcGvG194yyCBV4ViqejdNG83mmBz2F+FXWUM2oV
-         ZI3v1voT4mMb1eZXyJoyHPPY24iWIJCJz5g5rkucjJ5eAIxkRGtZN79ZseNRL1fJiwUj
-         CHKg==
-X-Gm-Message-State: AOJu0YwcjEBNlGOXIhJo56mcJ3kxU/fNb+16JNs0LTRBdS8Xhcw8K+/S
-	s6IynMs8tuWEX8EjuDDxv0YZb1vvFXmJZYAyM6JudDnk/SF8IDADFUgjxxcvn2SdVBVACfmvBIZ
-	/rE1STbQqsqRuTzqsZp1B6aTKeDn81DCpiV8AL5P9rcQagCP9FdKBDA==
-X-Gm-Gg: ASbGnctiKT0W6VkCIVzxzPEe0zBhzdNvV8G7RyK3APRuDp7DBwFnBGcM+KEI+kbQeLp
-	8dKM/ramIem0nX+45XUbxPVUg7gNSO5C1Olv3f+PgnJD7V1octp2nisOGW7M/nvmoVjBcbCeQaG
-	3QLKjvgFh7m4PMP5RIq60xgKwhigOQJ9OXLcVbo9KgDFxgJJsmvYmFfk0HjM1PzdQVyB3Vn/SQz
-	6ZzSVVzaup49zqBZAjdQwA2Sd/uMT0xeKqFpMK4EZolZHUw8tc8HO9tFNZ+yDSQTLlOI4TLLQqL
-	9AfL/Ym/rzmnUsPAbmAqkIVGkgfdAr3yb8g=
-X-Received: by 2002:a05:6000:1889:b0:38d:cab2:921a with SMTP id ffacd0b85a97d-38dcab294b5mr11445005f8f.1.1739220882669;
-        Mon, 10 Feb 2025 12:54:42 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IE7ymYeJaWDwWKlTSihvo41rIjuNYQ2OW1UEHPV8PRQaG9zgiJ3QMfNF2O7lriDdGRImB/lGQ==
-X-Received: by 2002:a05:6000:1889:b0:38d:cab2:921a with SMTP id ffacd0b85a97d-38dcab294b5mr11444992f8f.1.1739220882326;
-        Mon, 10 Feb 2025 12:54:42 -0800 (PST)
-Received: from [192.168.88.253] (146-241-31-160.dyn.eolo.it. [146.241.31.160])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-38dd0d3120fsm8735485f8f.70.2025.02.10.12.54.40
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 10 Feb 2025 12:54:41 -0800 (PST)
-Message-ID: <1cc7d4f5-8004-43d4-b401-fdaebcf87b45@redhat.com>
-Date: Mon, 10 Feb 2025 21:54:40 +0100
+	s=arc-20240116; t=1739221180; c=relaxed/simple;
+	bh=PTkTYkscwOyBi14GEU1ClW0elvE2FVK6kLlhHo4tCK4=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=fDFgv7TuyrbvHAnEILS0aPdbPXMB3zVajcfblLxigKA9ygjRjg/pqRdTatA9ccljy6s4jl2dWXHP6osTjI1WwWPwUyDg1WXCUgngBHbrvuI5N5qE53AXqeXBaW24uluAtyZ2FnDyLBQFlIEqYS8cfv4s3ovT2wL7CdfviAFPGfE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Ug5yZVgo; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id C9095C4CED1;
+	Mon, 10 Feb 2025 20:59:37 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1739221179;
+	bh=PTkTYkscwOyBi14GEU1ClW0elvE2FVK6kLlhHo4tCK4=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=Ug5yZVgolA83veJPOkjT6JDh6WBpfkLEB3cVX1oOp+Vsww5SGPNJDQv/F2w6s2ReB
+	 MjisbUbCCGrkLo654gC0E1mgf5OFa4paZKk7dQJLu2IGxM+kqx3pxq1pl70u6orA5X
+	 8cs1Az6DVIzFWPqEdia2qXigUPCWUHGjw5ZnHvZqACRKcsan7U2eOMW1VfculKm73w
+	 9Dqoc38OAhELH3jGelwp+surp4J6Kb67pDCutql3wVLy6ddLnjmaPrw7ukhN0bAQgx
+	 TSB6HMoSAzmaN7DS47pOcqvRqoSecnfHbBm4x3Xk6oJBY4s8oCl85O0V+cxMFu19nr
+	 ImnKtKQKqWDdw==
+Date: Mon, 10 Feb 2025 20:59:35 +0000
+From: Simon Horman <horms@kernel.org>
+To: Petr Machata <petrm@nvidia.com>
+Cc: "David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Andrew Lunn <andrew+netdev@lunn.ch>, netdev@vger.kernel.org,
+	Ido Schimmel <idosch@nvidia.com>, mlxsw@nvidia.com
+Subject: Re: [PATCH net-next] mlxsw: Enable Tx checksum offload
+Message-ID: <20250210205935.GD554665@kernel.org>
+References: <8dc86c95474ce10572a0fa83b8adb0259558e982.1738950446.git.petrm@nvidia.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [RFC PATCH 0/2] udp: avoid false sharing on sk_tsflags
-To: Willem de Bruijn <willemdebruijn.kernel@gmail.com>,
- Eric Dumazet <edumazet@google.com>
-Cc: netdev@vger.kernel.org, Kuniyuki Iwashima <kuniyu@amazon.com>,
- "David S. Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>,
- Simon Horman <horms@kernel.org>, Neal Cardwell <ncardwell@google.com>,
- David Ahern <dsahern@kernel.org>
-References: <cover.1738940816.git.pabeni@redhat.com>
- <67a979c156cbe_14761294f6@willemb.c.googlers.com.notmuch>
- <CANn89i+G_Zeqhjp24DMNXj32Z4_vCt8dTRiZ12ChNjFaYKvGDA@mail.gmail.com>
- <1d8801d4-73a9-4822-adf9-20e6c5a6a25c@redhat.com>
- <CANn89iLaDEjuDAE-Bupi4iDjt4wa90NA8bRjH8_0qWOQpHJ98Q@mail.gmail.com>
- <67aa3d2d6df73_6ea21294e6@willemb.c.googlers.com.notmuch>
-Content-Language: en-US
-From: Paolo Abeni <pabeni@redhat.com>
-In-Reply-To: <67aa3d2d6df73_6ea21294e6@willemb.c.googlers.com.notmuch>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <8dc86c95474ce10572a0fa83b8adb0259558e982.1738950446.git.petrm@nvidia.com>
 
-On 2/10/25 6:53 PM, Willem de Bruijn wrote:
-> Eric Dumazet wrote:
->> On Mon, Feb 10, 2025 at 5:16 PM Paolo Abeni <pabeni@redhat.com> wrote:
->>>
->>> On 2/10/25 4:13 PM, Eric Dumazet wrote:
->>>> On Mon, Feb 10, 2025 at 5:00 AM Willem de Bruijn
->>>> <willemdebruijn.kernel@gmail.com> wrote:
->>>>>
->>>>> Paolo Abeni wrote:
->>>>>> While benchmarking the recently shared page frag revert, I observed a
->>>>>> lot of cache misses in the UDP RX path due to false sharing between the
->>>>>> sk_tsflags and the sk_forward_alloc sk fields.
->>>>>>
->>>>>> Here comes a solution attempt for such a problem, inspired by commit
->>>>>> f796feabb9f5 ("udp: add local "peek offset enabled" flag").
->>>>>>
->>>>>> The first patch adds a new proto op allowing protocol specific operation
->>>>>> on tsflags updates, and the 2nd one leverages such operation to cache
->>>>>> the problematic field in a cache friendly manner.
->>>>>>
->>>>>> The need for a new operation is possibly suboptimal, hence the RFC tag,
->>>>>> but I could not find other good solutions. I considered:
->>>>>> - moving the sk_tsflags just before 'sk_policy', in the 'sock_read_rxtx'
->>>>>>   group. It arguably belongs to such group, but the change would create
->>>>>>   a couple of holes, increasing the 'struct sock' size and would have
->>>>>>   side effects on other protocols
->>>>>> - moving the sk_tsflags just before 'sk_stamp'; similar to the above,
->>>>>>   would possibly reduce the side effects, as most of 'struct sock'
->>>>>>   layout will be unchanged. Could increase the number of cacheline
->>>>>>   accessed in the TX path.
->>>>>>
->>>>>> I opted for the present solution as it should minimize the side effects
->>>>>> to other protocols.
->>>>>
->>>>> The code looks solid at a high level to me.
->>>>>
->>>>> But if the issue can be adddressed by just moving a field, that is
->>>>> quite appealing. So have no reviewed closely yet.
->>>>>
->>>>
->>>> sk_tsflags has not been put in an optimal group, I would indeed move it,
->>>> even if this creates one hole.
->>>>
->>>> Holes tend to be used quite fast anyway with new fields.
->>>>
->>>> Perhaps sock_read_tx group would be the best location,
->>>> because tcp_recv_timestamp() is not called in the fast path.
->>>
->>> Just to wrap my head on the above reasoning: for UDP such a change could
->>> possibly increase the number of `struct sock` cache-line accessed in the
->>> RX path (the `sock_write_tx` group should not be touched otherwise) but
->>> that will not matter much, because we expect a low number of UDP sockets
->>> in the system, right?
->>
->> Are you referring to UDP applications needing timestamps ?
->>
->> Because sk_tsflags is mostly always used in TX
+On Fri, Feb 07, 2025 at 07:00:44PM +0100, Petr Machata wrote:
+> From: Ido Schimmel <idosch@nvidia.com>
 > 
-> I thought the issue on rx was with the test in sock_recv_cmsgs.
+> The device is able to checksum plain TCP / UDP packets over IPv4 / IPv6
+> when the 'ipcs' bit in the send descriptor is set. Advertise support for
+> the 'NETIF_F_IP{,6}_CSUM' features in net devices registered by the
+> driver and VLAN uppers and set the 'ipcs' bit when the stack requests Tx
+> checksum offload.
+> 
+> Note that the device also calculates the IPv4 checksum, but it first
+> zeroes the current checksum so there should not be any difference
+> compared to the checksum calculated by the kernel.
+> 
+> On SN5600 (Spectrum-4) there is about 10% improvement in Tx packet rate
+> with 1400 byte packets when using pktgen.
+> 
+> Tested on Spectrum-{1,2,3,4} with all the combinations of IPv4 / IPv6,
+> TCP / UDP, with and without VLAN.
+> 
+> Signed-off-by: Ido Schimmel <idosch@nvidia.com>
+> Reviewed-by: Petr Machata <petrm@nvidia.com>
+> Signed-off-by: Petr Machata <petrm@nvidia.com>
 
-Yes, the critical bits in my tests are in sock_recv_cmsgs(): such
-function touches sk->sk_tsflags unconditionally on each recvmsg call.
-
-/P
+Reviewed-by: Simon Horman <horms@kernel.org>
 
 
