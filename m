@@ -1,210 +1,136 @@
-Return-Path: <netdev+bounces-164601-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-164602-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7D5E3A2E70D
-	for <lists+netdev@lfdr.de>; Mon, 10 Feb 2025 09:56:01 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id A5D86A2E75D
+	for <lists+netdev@lfdr.de>; Mon, 10 Feb 2025 10:10:34 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 508C73A05B3
-	for <lists+netdev@lfdr.de>; Mon, 10 Feb 2025 08:55:52 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id BEB23188B5E2
+	for <lists+netdev@lfdr.de>; Mon, 10 Feb 2025 09:10:39 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E9B701C173C;
-	Mon, 10 Feb 2025 08:55:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BE3661DF756;
+	Mon, 10 Feb 2025 09:08:22 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="o95JPqWv"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="R2htDOrI"
 X-Original-To: netdev@vger.kernel.org
-Received: from relay2-d.mail.gandi.net (relay2-d.mail.gandi.net [217.70.183.194])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ed1-f41.google.com (mail-ed1-f41.google.com [209.85.208.41])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0AC181C07C6;
-	Mon, 10 Feb 2025 08:55:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.194
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DEE391C5D56
+	for <netdev@vger.kernel.org>; Mon, 10 Feb 2025 09:08:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.41
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1739177757; cv=none; b=Gi4GRaEVmtSpXMAd0ljLbCftDgSWzUnOUckwDvu3eUdi2YysupErpXo4ey6GPtD5TiZ8ExWt/mfVI70UbeUe5/l5oT+DxPGb09qZVoX1aSa9lRO0I8C30dfczrixmilaEaW2cOCyPCa2nMGvvEOf8KtQtWue8QnFyftAIxp+Hds=
+	t=1739178502; cv=none; b=bOMZISGEo0tHqwXkyqd3g0Yt9uf8xgD1hdAsRxZmQln2SvI2C/m9Zun010h6zvsqSkkxuZFzl0dwps+3KF64TjChjKwpNm6vIzwsIHs2BRgF0V1YL7JkzrixJ9SEejg/YEHDk0scbueg++0SqPcdFi11hhe3n3m/Rx9KBe2azBY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1739177757; c=relaxed/simple;
-	bh=s9JN02o5t9RCKpyA40HtclFOmmyHLhidAsVTcAxGwww=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=grWkYAQUGRYwSzuusKBnpnm75rZdG5JWceSrL/YZp80WyBTBdk0dNr+TMDsws5LwyJCcD1LqgRRobQBwi4o6d7ozrfq9ZXYhRR402TfpVmQCyEjkZ6IkTFaEkeJtjwPdGaQQ37dtM/ZqKHOWOHmww9ahSUVjpijIgJ5U0Q7lFM8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=o95JPqWv; arc=none smtp.client-ip=217.70.183.194
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
-Received: by mail.gandi.net (Postfix) with ESMTPSA id 3F07B42CCD;
-	Mon, 10 Feb 2025 08:55:43 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
-	t=1739177746;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=1H+Ir3hzjFy5kvh3ZHOggs0A8zRpB/qKteU8q68oXLw=;
-	b=o95JPqWvhZ/aFf3L1LdM6mNc5/6sUr8ZjPYQyKCtXkRxeXZI6mG6PsAn2U/P17fRwv3lY8
-	fmFVMAz0Xc3xwF2gIrqvokXwtRnKsM4DaXs1UtadUYGahgI1LiQJ2zDI3iUqClbV8yMGDs
-	APXlmCSmYxom/m5suGnd/DSXEKCxEtbSHCEymobtQ+/4HpUQTL7xs1Q5NrYcLcmp65NFxV
-	47U6Bkk2fjsRh9if58lr4DHo7gJVwsTrMSZQziMuB16BY/dcWADU7RmHSCtdZuJ6fWAox3
-	c41sUjfgH1SJ8gj1uIZyC33e+AxKBUZ3t1JWCpZIPfABB0zPVW4ggqm2u2oeqg==
-Date: Mon, 10 Feb 2025 09:55:42 +0100
-From: Maxime Chevallier <maxime.chevallier@bootlin.com>
-To: Sean Anderson <seanga2@gmail.com>
-Cc: davem@davemloft.net, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org, linux-arm-msm@vger.kernel.org,
- thomas.petazzoni@bootlin.com, Andrew Lunn <andrew@lunn.ch>, Jakub Kicinski
- <kuba@kernel.org>, Eric Dumazet <edumazet@google.com>, Paolo Abeni
- <pabeni@redhat.com>, Russell King <linux@armlinux.org.uk>,
- linux-arm-kernel@lists.infradead.org, Christophe Leroy
- <christophe.leroy@csgroup.eu>, Herve Codina <herve.codina@bootlin.com>,
- Florian Fainelli <f.fainelli@gmail.com>, Heiner Kallweit
- <hkallweit1@gmail.com>, Vladimir Oltean <vladimir.oltean@nxp.com>,
- =?UTF-8?B?S8O2cnk=?= Maincent <kory.maincent@bootlin.com>, Marek
- =?UTF-8?B?QmVow7pu?= <kabel@kernel.org>, Oleksij Rempel
- <o.rempel@pengutronix.de>, =?UTF-8?B?Tmljb2zDsg==?= Veronese
- <nicveronese@gmail.com>, Simon Horman <horms@kernel.org>,
- mwojtas@chromium.org, Antoine Tenart <atenart@kernel.org>,
- devicetree@vger.kernel.org, Conor Dooley <conor+dt@kernel.org>, Krzysztof
- Kozlowski <krzk+dt@kernel.org>, Rob Herring <robh@kernel.org>, Romain
- Gantois <romain.gantois@bootlin.com>
-Subject: Re: [PATCH net-next 00/13] Introduce an ethernet port
- representation
-Message-ID: <20250210095542.721bf967@fedora-1.home>
-In-Reply-To: <8349c217-f0ef-3629-6a70-f35d36636635@gmail.com>
-References: <20250207223634.600218-1-maxime.chevallier@bootlin.com>
-	<8349c217-f0ef-3629-6a70-f35d36636635@gmail.com>
-Organization: Bootlin
-X-Mailer: Claws Mail 4.3.0 (GTK 3.24.43; x86_64-redhat-linux-gnu)
+	s=arc-20240116; t=1739178502; c=relaxed/simple;
+	bh=rTzP73EAtAPD+gT8uNsrDQK06aQHVpn2UBYpmalWoQU=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=dbLaCz9uOEm05AW9rH+nDAsh4DW2r4/OlXnvYesosrkfeDQ9z1uCUMb9NVojibrIkggvTbnjgCGhAxHuzxouBppQCdvW9ks1lqK20B7a/e1XW19hKj7HRRLEX0/WB87dhuqSMRSFsslHv4TmL/xNhlMsDr5FNwBBzdhkZNornWM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=R2htDOrI; arc=none smtp.client-ip=209.85.208.41
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-ed1-f41.google.com with SMTP id 4fb4d7f45d1cf-5de63846e56so2843065a12.1
+        for <netdev@vger.kernel.org>; Mon, 10 Feb 2025 01:08:20 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1739178499; x=1739783299; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=vgx0aq4YsGeIiVyqY+VQhA53zvtStll/9h6lpKXslqA=;
+        b=R2htDOrId4ChNgS+XFLx5J4EXuDCIRgGXSasffFJUNEokHlGtHsibf78Do6KaRcQJQ
+         7GIfZNM2qYXrQJgY6YWkQfFNJK3zWDDHAWgxKv76BvScDDNZBVX2g5iuCimYpYOSXAa8
+         esra+T1Tr58r0a+VbeVHt5eiO4wdRzoW+YJ1r/0i0O+hKkVoOV14DF6DO7sgHeq2FEEV
+         nlLfSy6MAwynFFTd3ZZZER/0cDbNm5n7/+yYmyy+a2hx3JGTXzkJBLdrG1HEMepwad1Q
+         +LVUG0tNahM2MnS6mCb5Hc+NUAT4YfAaZJ65F/zmwGtVny+ZHZB90p4oJ4AZM6M/4Olz
+         0e6g==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1739178499; x=1739783299;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=vgx0aq4YsGeIiVyqY+VQhA53zvtStll/9h6lpKXslqA=;
+        b=BfpyV59n99TUdDCKt1mZENaTFyDfF7H9jiIFaNFj9DNwapQjWtCYS/R9ZSv707qayO
+         iFdMiuXdUbJaxQ/TvQGF3LvV5x9lBcq4EPbSpajmxvrgzxotVOvGzzptXH/MxaXlhjlO
+         uYqhWQg7FtTVkqfFDFORgoVli9+DmdgTdHKqLCuf/OdcIMfv7gb4LYGSDK3+G/+dYx5g
+         x6DegBXkA01W2o5pggC5PSI4XS5DS+maMWfUbPK2aVcdDwWDsnAzBcddmDV0XHfPAb5f
+         +j9yXew01L7H2o3lblCZispBXPRDNuaB/Yv5wkiWdO9hr2vg/DVn+ef7Hl1G36PGnV2J
+         vtsw==
+X-Forwarded-Encrypted: i=1; AJvYcCWqeVYK89cZ8/yShgu/XzzNQNgtabmWqafc17rCk0NQ/6HkrDKNL9l3f4p53TKKt+QH3lDS5og=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzZcDO0FymT58bRzWI61aeTlxKwG6a7OX/jCcpF2N9Hkzx7osFl
+	m4RqFL3KpwxrUuYwhTpcUt5zoHC+dmrvC9qhoxYIID3JghYaADLSI3EkAVP/qkdnkwJqH32xysV
+	3/rkB3T+yL7IZ6xaVqPI4b42t2xSLocr8/DyeuWiNk4DyuXY0AYlm
+X-Gm-Gg: ASbGncvAiYzu2eC4r2PlGIRE8AeWUh69hcGenAxtEp1LN9zGhqqvp8cID6GixpVNVNv
+	vqs1iRjIn8rR12fyrIjccDN7JA+Zx7u4lN+t2s5u5rBaFx4on6YXw+hWQ7em979T/Vk/daNJZ
+X-Google-Smtp-Source: AGHT+IGclx9hMgngPXK31ShR3FnOU09EEySqHAwOeG45zag+1x1XYM0RYZEGF7JSnAi/XD0aSHFByagZyiIBdRJGb7M=
+X-Received: by 2002:a05:6402:3883:b0:5dc:7425:ea9b with SMTP id
+ 4fb4d7f45d1cf-5de45072303mr11405131a12.25.1739178497563; Mon, 10 Feb 2025
+ 01:08:17 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-X-GND-State: clean
-X-GND-Score: -100
-X-GND-Cause: gggruggvucftvghtrhhoucdtuddrgeefvddrtddtgdefjeeifecutefuodetggdotefrodftvfcurfhrohhfihhlvgemucfitefpfffkpdcuggftfghnshhusghstghrihgsvgenuceurghilhhouhhtmecufedtudenucesvcftvggtihhpihgvnhhtshculddquddttddmnecujfgurhepfffhvfevuffkjghfohfogggtgfesthejredtredtvdenucfhrhhomhepofgrgihimhgvucevhhgvvhgrlhhlihgvrhcuoehmrgigihhmvgdrtghhvghvrghllhhivghrsegsohhothhlihhnrdgtohhmqeenucggtffrrghtthgvrhhnpedugfelledvtdffvdekudeijeduueevvdevffehudehvdeuudetheekheeigfetheenucffohhmrghinhepkhgvrhhnvghlrdhorhhgnecukfhppedvrgdtudemtggsudelmeekugegtgemlehftddtmegstgdvudemkeekleelmeehgedttgemvgehlegvnecuvehluhhsthgvrhfuihiivgeptdenucfrrghrrghmpehinhgvthepvdgrtddumegtsgduleemkegugegtmeelfhdttdemsggtvddumeekkeelleemheegtdgtmegvheelvgdphhgvlhhopehfvgguohhrrgdquddrhhhomhgvpdhmrghilhhfrhhomhepmhgrgihimhgvrdgthhgvvhgrlhhlihgvrhessghoohhtlhhinhdrtghomhdpnhgspghrtghpthhtohepvdelpdhrtghpthhtohepshgvrghnghgrvdesghhmrghilhdrtghomhdprhgtphhtthhopegurghvvghmsegurghvvghmlhhofhhtrdhnvghtpdhrtghpthhtohepnhgvt
- hguvghvsehvghgvrhdrkhgvrhhnvghlrdhorhhgpdhrtghpthhtoheplhhinhhugidqkhgvrhhnvghlsehvghgvrhdrkhgvrhhnvghlrdhorhhgpdhrtghpthhtoheplhhinhhugidqrghrmhdqmhhsmhesvhhgvghrrdhkvghrnhgvlhdrohhrghdprhgtphhtthhopehthhhomhgrshdrphgvthgriiiiohhnihessghoohhtlhhinhdrtghomhdprhgtphhtthhopegrnhgurhgvfieslhhunhhnrdgthhdprhgtphhtthhopehkuhgsrgeskhgvrhhnvghlrdhorhhg
-X-GND-Sasl: maxime.chevallier@bootlin.com
+References: <20250210082805.465241-1-edumazet@google.com> <20250210082805.465241-4-edumazet@google.com>
+ <31325da6-d74b-4c9c-ada8-67100bd50310@intel.com>
+In-Reply-To: <31325da6-d74b-4c9c-ada8-67100bd50310@intel.com>
+From: Eric Dumazet <edumazet@google.com>
+Date: Mon, 10 Feb 2025 10:08:06 +0100
+X-Gm-Features: AWEUYZns84NSX6AfaV-J9oT7KH35WjzF879_2IGR1LxcCmXo3gMY9BAe2pEsWRo
+Message-ID: <CANn89i+WfwMQnYRRe8greWXTYR8CpUGz-pZF-YW-1B_fM7oXrg@mail.gmail.com>
+Subject: Re: [PATCH net-next 3/4] tcp: use EXPORT_IPV6_MOD[_GPL]()
+To: Mateusz Polchlopek <mateusz.polchlopek@intel.com>
+Cc: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
+	Paolo Abeni <pabeni@redhat.com>, netdev@vger.kernel.org, 
+	Willem de Bruijn <willemb@google.com>, Simon Horman <horms@kernel.org>, eric.dumazet@gmail.com
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Hi Sean,
+On Mon, Feb 10, 2025 at 9:41=E2=80=AFAM Mateusz Polchlopek
+<mateusz.polchlopek@intel.com> wrote:
+>
+>
+>
+> On 2/10/2025 9:28 AM, Eric Dumazet wrote:
+> > Use EXPORT_IPV6_MOD[_GPL]() for symbols that don't need
+> > to be exported unless CONFIG_IPV6=3Dm
+> >
+> > tcp_hashinfo is no longer used from any module anyway.
+>
+> You also removed EXPORT for tcp_openreq_init_rwin function. Quick
+> grep shows that it is also not used anymore by any module, so probably
+> you forgot to add this info to commit message? Do you think it is worth
+> to add?
 
-On Fri, 7 Feb 2025 21:14:32 -0500
-Sean Anderson <seanga2@gmail.com> wrote:
+I forgot to add this in the commit message.
 
-> Hi Maxime,
-> 
-> On 2/7/25 17:36, Maxime Chevallier wrote:
-> > Hello everyone,
-> > 
-> > This series follows the 2 RFC that were sent a few weeks ago :
-> > RFC V2: https://lore.kernel.org/netdev/20250122174252.82730-1-maxime.chevallier@bootlin.com/
-> > RFC V1: https://lore.kernel.org/netdev/20241220201506.2791940-1-maxime.chevallier@bootlin.com/
-> > 
-> > The goal of this series is to introduce an internal way of representing
-> > the "outputs" of ethernet devices, for now only focusing on PHYs.
-> > 
-> > This allows laying the groundwork for multi-port devices support (both 1
-> > PHY 2 ports, or more exotic setups with 2 PHYs in parallel, or MII
-> > multiplexers).
-> > 
-> > Compared to the RFCs, this series tries to properly support SFP,
-> > especially PHY-driven SFPs through special phy_ports named "serdes"
-> > ports. They have the particularity of outputing a generic interface,
-> > that feeds into another component (usually, an SFP cage and therefore an
-> > SFP module).
-> > 
-> > This allows getting a fairly generic PHY-driven SFP support (MAC-driven
-> > SFP is handled by phylink).
-> > 
-> > This series doesn't address PHY-less interfaces (bare MAC devices, MACs
-> > with embedded PHYs not driven by phylink, or MAC connected to optical
-> > SFPs) to stay within the 15 patches limit, nor does it include the uAPI
-> > part that exposes these ports to userspace.
-> > 
-> > I've kept the cover short, much more details can be found in the RFC
-> > covers.
-> > 
-> > Thanks everyone,
-> > 
-> > Maxime  
-> 
-> Forgive me for my ignorance, but why have a new ethtool interface instead of
-> extending ethtool_link_settings.port? It's a rather ancient interface, but it
-> seems to be tackling the exact same problem as you are trying to address. Older
-> NICs used to have several physical connectors (e.g. BNC, MII, twisted-pair) but
-> only one could be used at once. This seems directly analogous to a PHY that
-> supports multiple "port"s but not all at once. In fact, the only missing
-> connector type seems to be PORT_BACKPLANE.
-> 
-> I can think of a few reasons why you wouldn't use PORT_*:
-> 
-> - It describes the NIC and not the PHY, and perhaps there is too much impedance
->    mismatch?
-> - There is too much legacy in userspace (or in the kernel) to use that API in
->    this way?
-> - You need more flexibility?
+Not sure if this worth a v2, because IPv6 no longer calls this
+function after this old commit
 
-So there are multiple reasons that make the PORT_* field limited :
+commit 1fb6f159fd21c640a28eb65fbd62ce8c9f6a777e
+Author: Octavian Purdila <octavian.purdila@intel.com>
+Date:   Wed Jun 25 17:10:02 2014 +0300
 
- - We can't gracefully handle multi-port PHYs for complex scenarios
-where we could say "I'm currently using the Copper port, but does the
-Fiber port has link ?"
+    tcp: add tcp_conn_request
 
- - As you mention in your first argument, what I'd like to try to do is
-come-up with a "generic" representation of outgoing NIC interfaces. The
-final use-cases I'd like to cover are multi-port NICs, allowing
-userspace to control which physical interfaces are available, and which
-t use. Looking at the hardware, this can be implemented in multiple
-ways :
 
-           ___ Copper
-          /
- MAC - PHY
-          \__ SFP
+>
+> >
+> > Signed-off-by: Eric Dumazet <edumazet@google.com>
+> > ---
+>
+> [...]
+>
+> > @@ -457,7 +457,6 @@ void tcp_openreq_init_rwin(struct request_sock *req=
+,
+> >               rcv_wnd);
+> >       ireq->rcv_wscale =3D rcv_wscale;
+> >   }
+> > -EXPORT_SYMBOL(tcp_openreq_init_rwin);
+>
+> Exactly here
 
-Here, a single PHY has 2 media-side interfaces, and we'd like to select
-the one to use. That's fairly common now, there are quite a number of
-PHYs that support this : mv33x3310, VSC8552, mv88x2222 only to name a
-few. But there are other, more uncommon topologies that exist :
-
-                           ____ SGMII PHY -- Copper
-                          /
- MAC - SGMII/1000BaseX MUX
-                          \____ SFP
-
-Here, we also have 2 media-side ports, but they are driver through
-different entities : The Copper port sits behind a single-port PHY,
-that is itself behind a *MII MUX, that's also connected to an SFP. Here
-the port selection is done at the MUX level
-
-Finally, I've been working on supporting devices whith another topology
-(actually, what started this whole work) :
-
-            ___ PHY
-           /
- MAC --MUX |
-           \__ PHY
-
-Here both PHYs are on the same *MII bus, with some physical,
-gpio-driven MUX, and we have 2 PORT_TP on the same NIC. That design is
-used for link redundancy, if one PHY loses the link, we switch to the
-other one (that hopefully has link).
-
-All these cases have different drivers involved in the MUX'ing (phy
-driver itself, intermediate MUX in-between...), so the end-goal would
-be to expose to userspace info about the media interfaces themselves.
-
-This phy_port object would be what we expose to userspace. One missing
-step in this series is adding control on the ports (netlink API,
-enabling/disabling logic for ports) but that far exceeds the 15 patches
-limitation :)
-
-Sorry if all of that was blurry, I did make so good of a job linking to
-all previous discussions on the topic, I'll address that for the next
-round.
-
-Thanks,
-
-Maxime
+Yes, thanks.
 
