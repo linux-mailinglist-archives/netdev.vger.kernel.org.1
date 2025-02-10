@@ -1,46 +1,79 @@
-Return-Path: <netdev+bounces-164681-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-164682-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1AD4DA2EAE6
-	for <lists+netdev@lfdr.de>; Mon, 10 Feb 2025 12:17:13 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5B669A2EAFF
+	for <lists+netdev@lfdr.de>; Mon, 10 Feb 2025 12:24:41 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id BD2F6163353
-	for <lists+netdev@lfdr.de>; Mon, 10 Feb 2025 11:17:11 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 8C9B71885422
+	for <lists+netdev@lfdr.de>; Mon, 10 Feb 2025 11:24:46 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0DBEC1DC996;
-	Mon, 10 Feb 2025 11:17:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AAC8F1DCB24;
+	Mon, 10 Feb 2025 11:24:37 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b="mE9SnCYw"
+	dkim=pass (2048-bit key) header.d=blackwall-org.20230601.gappssmtp.com header.i=@blackwall-org.20230601.gappssmtp.com header.b="zF39tmod"
 X-Original-To: netdev@vger.kernel.org
-Received: from out30-119.freemail.mail.aliyun.com (out30-119.freemail.mail.aliyun.com [115.124.30.119])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ej1-f42.google.com (mail-ej1-f42.google.com [209.85.218.42])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8D6A619CC33;
-	Mon, 10 Feb 2025 11:17:01 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=115.124.30.119
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C49851C07CF
+	for <netdev@vger.kernel.org>; Mon, 10 Feb 2025 11:24:35 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.42
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1739186227; cv=none; b=oAF63MIB0avXJ3HO7SsJlXq2OArJnOtPCClEinYlmj9VG1csUCFdCdzH2heTvpr8w7xh7fc/AtTqhsWW7dATpG2pKDoKeQAobFH13Ce5mKlVL+lQSdn/JQuBzaIDY8pcLcTv+f7a7Ko6Xvc/nneBWsWFIipjlr32N+myAzHJidA=
+	t=1739186677; cv=none; b=Z0sFTF8CSMxzqg9YKXJh8IVhoqvqSjmBC8JIYwoIKv9y4SJTk6cnc/sQ3uP0l2F2Bf/IejeXndzIVLDm1N2N4Jgm1FutmW/am3QCy6en3v4zGmakO4SH0TL1pWDKKdpNPWrF3V0ECHXGHFFwwHNzfjoMqf/SySFy4JV0anWuKCA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1739186227; c=relaxed/simple;
-	bh=mSkiGXTqHGYYLjplMNYod7sGEW6e2weQZ7cjuOsZaz4=;
-	h=Message-ID:Date:MIME-Version:Subject:From:To:Cc:References:
-	 In-Reply-To:Content-Type; b=f4emNCJ/lSaWLys9kpzF1upE2OyrSJmW1cTN/kIBJfVpYaoahp2sEB2Mvc9J1dfcKOTpm5WUwwxL8mv7egDDWNWvLIDpitiiOSCFrpJGimX0Uhlquw+l42ISRvuvZnFDqYd0q8KwymLen0ukCf8AeZOhECTsR/pLtSjlazR/aPI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com; spf=pass smtp.mailfrom=linux.alibaba.com; dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b=mE9SnCYw; arc=none smtp.client-ip=115.124.30.119
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.alibaba.com
-DKIM-Signature:v=1; a=rsa-sha256; c=relaxed/relaxed;
-	d=linux.alibaba.com; s=default;
-	t=1739186219; h=Message-ID:Date:MIME-Version:Subject:From:To:Content-Type;
-	bh=dmcnIETOkRmcLc2k59ZJrtg3E4RjzRzuJfuWKk05UZg=;
-	b=mE9SnCYwJRHxiEBu9mJNa6oBcFz+IoIFaDRytYWlITj1aAxOLGj4+gfGs4TZVQkmazzO0Zxl0dQylqlJ0kYDJLGqmqGzloAR6Z9hoVPIGl4WquKb7zVyrbo48xRlZuvTS3AEhEFPlnZ6xyxo8LedbLkOqVsdx+w4hJ4GHXOoxpQ=
-Received: from 30.221.98.157(mailfrom:guangguan.wang@linux.alibaba.com fp:SMTPD_---0WPAl8CS_1739186218 cluster:ay36)
-          by smtp.aliyun-inc.com;
-          Mon, 10 Feb 2025 19:16:59 +0800
-Message-ID: <4339aaa1-f2aa-4454-b5b1-6ffb6415f484@linux.alibaba.com>
-Date: Mon, 10 Feb 2025 19:16:57 +0800
+	s=arc-20240116; t=1739186677; c=relaxed/simple;
+	bh=tbatCdkWNAkuhZ08pL+ZTsXKAJEwYMN0UaUAzElVGXk=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=a7lICPOh/Alhlim5ZQXTjzL8/n8JE0dkDTq2XHXLQULaY+Gn8+V/fkte+QfCPpRqCeGNopXV+587sMaeXLRKooHW7rrrjIi4Gni7pXQ6ZqOA/MEYMdt2NstlTSxxXyFMmIk93GGBjNrtuLNkimAc0mnTqxsR42K2PKfH+Ff6B14=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=blackwall.org; spf=none smtp.mailfrom=blackwall.org; dkim=pass (2048-bit key) header.d=blackwall-org.20230601.gappssmtp.com header.i=@blackwall-org.20230601.gappssmtp.com header.b=zF39tmod; arc=none smtp.client-ip=209.85.218.42
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=blackwall.org
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=blackwall.org
+Received: by mail-ej1-f42.google.com with SMTP id a640c23a62f3a-ab78e6edb99so401596966b.2
+        for <netdev@vger.kernel.org>; Mon, 10 Feb 2025 03:24:35 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=blackwall-org.20230601.gappssmtp.com; s=20230601; t=1739186674; x=1739791474; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=EeccGsM1J9i+FSRyPdKrrA6cczaJYGA2SpQWOuAJn10=;
+        b=zF39tmodbH6MWHrblD6MDfLJyb8o/gF2+i/NdOLLxdgDf/wIwKq+wZ3wcJLtBNp0CP
+         jbLXqVkcJ3R0j0GvUZFfw98SJLcW91K8ZdB1Rqh7lebK7gHCeX34/tnwzXjgqFRxDMK6
+         kZJcyT0dUjFAqExz2/5rDbuOmO6Ob21hfhVuvpewYbFbLWgR5eBNJCdPB2T9EoKpIBzd
+         0iblhkcUz9rz7SemR7zzMJkSRHvoy6hiqmpaFHhKSnof4DWSecekIPVgAelv6Cjh/m/Z
+         9eHpFzsYbxnImwenpYohHt/GkraFOroCrpUmAHZlt9uW9KpELbZv9v/dNlAmBx8kIsCV
+         VbMA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1739186674; x=1739791474;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=EeccGsM1J9i+FSRyPdKrrA6cczaJYGA2SpQWOuAJn10=;
+        b=Sbfc6L/IL8EkFP5oh4JE4JiRDreN/JBTMq/Ha8b7Q6Cr+WtRveIsw1DJp8nQT3OPbB
+         azZN8yYcVe+EA7XWrFJdVWw6R01HHQqFkbEzS057V9WPYz4GvxhtDKNZ1F1n9RGfZWqn
+         wliIynD4+4sTaWL2/hv+OqWCnzprworFbIWggvsKXpjXAPXxjQnBz+C41M09wWTtBp2t
+         KEWu2FustRcRVvGKtBtzAeifO8YKhkf/4XqCTKLOJK+jEQyCqBNCeWNNAfQZWh1B0Aih
+         yb1eUlKRdbiB8QuT2+WbB99vXwnGDzJHfkDU80Klz0Zs5CYDXeIBhPd0yA7V8ZOy/UjI
+         utmQ==
+X-Forwarded-Encrypted: i=1; AJvYcCXHuSc1mUipe1aLp7zgMt6dTYPooeEmYWpSqVzzs8NwedIN4KQhHaqYAYudJlUpWLDNhpYmsM4=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxYRMPNpzWcCN9fFZGSLHH5OWA/rgebBHp3CYLeBYmSdBkLzR0a
+	hH83FyJ6/znVwlEsWsZxXdFE6e7d0n/06+RbNpXO3JlDevvZ2j01+ubZN045sz0=
+X-Gm-Gg: ASbGncu5U3eFM4S4cYw46A+lRitnbOB+wO3rxYlMMrWge7s8VkbIWudar2LM0PCpWiv
+	COwCvyw+CKLqcmbyRb0IT2L8iwMxvGzZP/rc21tbXno/2orUj5kHYW/P0gWMTWKjjQKHPWgKuNt
+	i2TMs66JqrjGcpYvtEW+uCjTCbbwtJ1G684jGvTxg158cu+25ttRD9+zaifaJjVrO0bT72uEJF+
+	6c9V3AZgMLC4SFVIghYiGYibdEQKqiS6v0/2vW//9Si/VwLlF2TIOIH2ZAEu5WUNXNCo4L5wWgK
+	/cjGQeKCmOGtsfVUHserEAP9L1Y92dqsW73hiutD2oQVKQk=
+X-Google-Smtp-Source: AGHT+IGgq66U81iP+J9yAhdkX8DCNNRiyyFNHezO+ySzpG7pm4xLBJh18mJVlLkywENiEvG1X55Bgw==
+X-Received: by 2002:a17:906:5011:b0:ab7:87ec:79fa with SMTP id a640c23a62f3a-ab789c6d932mr1220682966b.51.1739186673726;
+        Mon, 10 Feb 2025 03:24:33 -0800 (PST)
+Received: from [192.168.0.205] (78-154-15-142.ip.btc-net.bg. [78.154.15.142])
+        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-ab772f893e9sm862826766b.65.2025.02.10.03.24.32
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 10 Feb 2025 03:24:33 -0800 (PST)
+Message-ID: <dd666dd8-f0a5-42dc-aad6-855b69ccef3c@blackwall.org>
+Date: Mon, 10 Feb 2025 13:24:31 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -48,99 +81,71 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net] net/smc: use the correct ndev to find pnetid by
- pnetid table
-From: Guangguan Wang <guangguan.wang@linux.alibaba.com>
-To: Halil Pasic <pasic@linux.ibm.com>
-Cc: Paolo Abeni <pabeni@redhat.com>, wenjia@linux.ibm.com,
- jaka@linux.ibm.com, alibuda@linux.alibaba.com, tonylu@linux.alibaba.com,
- guwen@linux.alibaba.com, davem@davemloft.net, edumazet@google.com,
- kuba@kernel.org, horms@kernel.org, linux-rdma@vger.kernel.org,
- linux-s390@vger.kernel.org, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org, Alexandra Winter <wintera@linux.ibm.com>
-References: <20241227040455.91854-1-guangguan.wang@linux.alibaba.com>
- <1f4a721f-fa23-4f1d-97a9-1b27bdcd1e21@redhat.com>
- <20250107203218.5787acb4.pasic@linux.ibm.com>
- <908be351-b4f8-4c25-9171-4f033e11ffc4@linux.alibaba.com>
- <20250109040429.350fdd60.pasic@linux.ibm.com>
- <b1053a92-3a3f-4042-9be9-60b94b97747d@linux.alibaba.com>
- <20250114130747.77a56d9a.pasic@linux.ibm.com>
- <3dc68650-904c-4a1d-adc4-172e771f640c@linux.alibaba.com>
+Subject: Re: [PATCH net-next 0/4] vxlan: Join / leave MC group when
+ reconfigured
+To: Petr Machata <petrm@nvidia.com>, "David S. Miller" <davem@davemloft.net>,
+ Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+ Paolo Abeni <pabeni@redhat.com>, netdev@vger.kernel.org
+Cc: Ido Schimmel <idosch@nvidia.com>, mlxsw@nvidia.com,
+ Andrew Lunn <andrew+netdev@lunn.ch>, Roopa Prabhu <roopa@nvidia.com>,
+ Menglong Dong <menglong8.dong@gmail.com>, Guillaume Nault <gnault@redhat.com>
+References: <cover.1738949252.git.petrm@nvidia.com>
 Content-Language: en-US
-In-Reply-To: <3dc68650-904c-4a1d-adc4-172e771f640c@linux.alibaba.com>
+From: Nikolay Aleksandrov <razor@blackwall.org>
+In-Reply-To: <cover.1738949252.git.petrm@nvidia.com>
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
 
+On 2/7/25 19:34, Petr Machata wrote:
+> When a vxlan netdevice is brought up, if its default remote is a multicast
+> address, the device joins the indicated group.
+> 
+> Therefore when the multicast remote address changes, the device should
+> leave the current group and subscribe to the new one. Similarly when the
+> interface used for endpoint communication is changed in a situation when
+> multicast remote is configured. This is currently not done.
+> 
+> Both vxlan_igmp_join() and vxlan_igmp_leave() can however fail. So it is
+> possible that with such fix, the netdevice will end up in an inconsistent
+> situation where the old group is not joined anymore, but joining the
+> new group fails. Should we join the new group first, and leave the old one
+> second, we might end up in the opposite situation, where both groups are
+> joined. Undoing any of this during rollback is going to be similarly
+> problematic.
+> 
+> One solution would be to just forbid the change when the netdevice is up.
+> However in vnifilter mode, changing the group address is allowed, and these
+> problems are simply ignored (see vxlan_vni_update_group()):
+> 
+>  # ip link add name br up type bridge vlan_filtering 1
+>  # ip link add vx1 up master br type vxlan external vnifilter local 192.0.2.1 dev lo dstport 4789
+>  # bridge vni add dev vx1 vni 200 group 224.0.0.1
+>  # tcpdump -i lo &
+>  # bridge vni add dev vx1 vni 200 group 224.0.0.2
+>  18:55:46.523438 IP 0.0.0.0 > 224.0.0.22: igmp v3 report, 1 group record(s)
+>  18:55:46.943447 IP 0.0.0.0 > 224.0.0.22: igmp v3 report, 1 group record(s)
+>  # bridge vni
+>  dev               vni                group/remote
+>  vx1               200                224.0.0.2
+> 
+> Having two different modes of operation for conceptually the same interface
+> is silly, so in this patchset, just do what the vnifilter code does and
+> deal with the errors by crossing fingers real hard.
+> 
+> Petr Machata (4):
+>   vxlan: Join / leave MC group after remote changes
+>   selftests: forwarding: lib: Move require_command to net, generalize
+>   selftests: test_vxlan_fdb_changelink: Convert to lib.sh
+>   selftests: test_vxlan_fdb_changelink: Add a test for MC remote change
+> 
+>  drivers/net/vxlan/vxlan_core.c                |  15 +++
+>  tools/testing/selftests/net/forwarding/lib.sh |  10 --
+>  tools/testing/selftests/net/lib.sh            |  19 +++
+>  .../net/test_vxlan_fdb_changelink.sh          | 111 ++++++++++++++++--
+>  4 files changed, 132 insertions(+), 23 deletions(-)
+> 
 
-
-On 2025/1/15 19:53, Guangguan Wang wrote:
-> 
-> 
-> On 2025/1/14 20:07, Halil Pasic wrote:
->> On Fri, 10 Jan 2025 13:43:44 +0800
->> Guangguan Wang <guangguan.wang@linux.alibaba.com> wrote:
->>
->>>> I think I showed a valid and practical setup that would break with your
->>>> patch as is. Do you agree with that statement?  
->>> Did you mean
->>> "
->>> Now for something like a bond of two OSA
->>> interfaces, I would expect the two legs of the bond to probably have a
->>> "HW PNETID", but the netdev representing the bond itself won't have one
->>> unless the Linux admin defines a software PNETID, which is work, and
->>> can't have a HW PNETID because it is a software construct within Linux.
->>> Breaking for example an active-backup bond setup where the legs have
->>> HW PNETIDs and the admin did not bother to specify a PNETID for the bond
->>> is not acceptable.
->>> " ?
->>> If the legs have HW pnetids, add pnetid to bond netdev will fail as
->>> smc_pnet_add_eth will check whether the base_ndev already have HW pnetid.
->>>
->>> If the legs without HW pnetids, and admin add pnetids to legs through smc_pnet.
->>> Yes, my patch will break the setup. What Paolo suggests(both checking ndev and
->>> base_ndev, and replace || by && )can help compatible with the setup.
->>
->> I'm glad we agree on that part. Things are much more acceptable if we
->> are doing both base and ndev. 
-> It is also acceptable for me.
-> 
->> Nevertheless I would like to understand
->> your problem better, and talk about it to my team. I will also ask some
->> questions in another email.
-> Questions are welcome.
-> 
->>
->> That said having things work differently if there is a HW PNETID on
->> the base, and different if there is none is IMHO wonky and again
->> asymmetric.
->>
->> Imagine the following you have your nice little setup with a PNETID on
->> a non-leaf and a base_ndev that has no PNETID. Then your HW admin
->> configures a PNETID to your base_ndev, a different one. Suddenly
->> your ndev PNETID is ignored for reasons not obvious to you. Yes it is
->> similar to having a software PNETID on the base_ndev and getting it
->> overruled by a HW PNETID, but much less obvious IMHO. I am wondering if there are any scenarios that require setting different
-> pnetids for different net devices in one netdev hierarchy. If no, maybe
-> we should limit that only one pnetid can be set to one netdev hierarchy.
-> 
->> I also think
->> a software PNETID of the base should probably take precedence over over
->> the software pnetid of ndev.
-> Agree!
-> 
-> Thanks,
-> Guangguan Wang
->>
->> Regards,
->> Halil
-
-Hi Halil,
-
-Are there any questions or further discussions about this patch? If no, I will
-send a v2 patch, in which software pnetid will be searched in both base_ndev and ndev,
-and base_ndev will take precedence over ndev.
-
-Thanks,
-Guangguan Wang
+For the set,
+Reviewed-by: Nikolay Aleksandrov <razor@blackwall.org>
 
 
