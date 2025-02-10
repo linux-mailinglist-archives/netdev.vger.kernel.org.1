@@ -1,137 +1,158 @@
-Return-Path: <netdev+bounces-164816-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-164817-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id BC82CA2F3E5
-	for <lists+netdev@lfdr.de>; Mon, 10 Feb 2025 17:44:33 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id C752BA2F41A
+	for <lists+netdev@lfdr.de>; Mon, 10 Feb 2025 17:49:54 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 2593C7A0489
-	for <lists+netdev@lfdr.de>; Mon, 10 Feb 2025 16:43:37 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 635FA3A169B
+	for <lists+netdev@lfdr.de>; Mon, 10 Feb 2025 16:49:31 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 270E41F4630;
-	Mon, 10 Feb 2025 16:44:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8EAD42586C2;
+	Mon, 10 Feb 2025 16:49:36 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="KFBtI9gU"
+	dkim=pass (2048-bit key) header.d=networkplumber-org.20230601.gappssmtp.com header.i=@networkplumber-org.20230601.gappssmtp.com header.b="l0me74Tg"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-il1-f177.google.com (mail-il1-f177.google.com [209.85.166.177])
+Received: from mail-pl1-f180.google.com (mail-pl1-f180.google.com [209.85.214.180])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8CCC62580D8;
-	Mon, 10 Feb 2025 16:44:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.177
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 455F22586C8
+	for <netdev@vger.kernel.org>; Mon, 10 Feb 2025 16:49:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.180
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1739205865; cv=none; b=TPOe3SJQFZ9PR3Pb8H6DeEegyKB0yPuqTmpYzj8jsufr45SI7HvQsh7gP/CYioQoh3yRl99CoTJ8nu0olspXqfOUAxrXu2SAnC4B9/rBE8GeOgii/li/1Acm9Nf0I/s/Dgd1zCK8F4qn30Wc4KAaxwTDs4366bn3pEmM6W6jAeY=
+	t=1739206176; cv=none; b=WG1xZ4TWB3u6PVk8V/3/bXpUffiSSFQt+0xzibH40f+UezQhbCKxY1pObBmuztyxMZaN80oFedKoicRk+306QZ7t60/l97TGdMZDCeX6BwRIxeeWrJu2AFeXG9UvxZ4ttjLuCFjDIYO3jQfk+TCSTs2wvVOMkNnb6/4Y7Gbyvhw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1739205865; c=relaxed/simple;
-	bh=DLLNIR2LPPCobRYdsJqDnKKJwwcVg/3WpLPAPX9ibM4=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=CaC3ZxFybyfnn4K0+w/tFYI8UiV0CHSJCL2egzEASqT4Pj7k7QZAv+xI6nDXnx3TH3kx+8IXBdnvh7orcwTWI1POl/wsm1VHjrlq3hXC/oderxGOpcmfa/NEBLSwyZ+SyDyyKcFjWfIS5jc57fH0p9nceHYtH+v2b5y7w/Dp5X8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=KFBtI9gU; arc=none smtp.client-ip=209.85.166.177
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-il1-f177.google.com with SMTP id e9e14a558f8ab-3d0558c61f4so14326925ab.0;
-        Mon, 10 Feb 2025 08:44:23 -0800 (PST)
+	s=arc-20240116; t=1739206176; c=relaxed/simple;
+	bh=yQZdQZsVwBqhzmNXzbrVVN1SHjOkGrEpBj7lY8wIH4A=;
+	h=Date:From:To:Subject:Message-ID:MIME-Version:Content-Type; b=WJfD/tf+8HXsPR3sADhxLoa6cFLVBHpbTe5KSzQAQosDnBQS89ppwjyBHuoXclERve3V/WZ1jdOzeMScIpN3XitA79z6hRa6l0srbEVlMFqUzLjywd+Bcts5i1jQpwSwxar7JBF8ci8KsGpac4MTyR/A65rE2E+F8GlobUpiii4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=networkplumber.org; spf=pass smtp.mailfrom=networkplumber.org; dkim=pass (2048-bit key) header.d=networkplumber-org.20230601.gappssmtp.com header.i=@networkplumber-org.20230601.gappssmtp.com header.b=l0me74Tg; arc=none smtp.client-ip=209.85.214.180
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=networkplumber.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=networkplumber.org
+Received: by mail-pl1-f180.google.com with SMTP id d9443c01a7336-21f2f386cbeso85122885ad.0
+        for <netdev@vger.kernel.org>; Mon, 10 Feb 2025 08:49:33 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1739205862; x=1739810662; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=qPpEY5RIO5eaVLxLgovJSjTf6ZwKjzUAU3yoX/8apS8=;
-        b=KFBtI9gUJgdBnl280ek5wHlKZQVabD2at39GtPtL86dAvHt8qCCn2ABcwd5QXkm/Uq
-         vhMpBDal3B3R+jU5hSbwPeDVyEJOSsO8U/UFtr4UPh5k6EQK/junRZj6sponspcA3dTS
-         7fR/kJuZVDCczOd0Ndtwz1n5PIu3BH1VzRP1SSSN2JaCHQD7vHjvvNX6KBuvXAF5bimI
-         RZz3POwPe2TxaWt+1YqqYIeVVGyrssgi5+TmMkhG6Ovncy87RoBo/EfvfrkYOf4h3yKx
-         25acaefy6kmSbXegTkJMWjgQu+s9AyPhB0AIMZDQX/MvWOa10z0XxFMN/NMCn5pQsKKA
-         n1VA==
+        d=networkplumber-org.20230601.gappssmtp.com; s=20230601; t=1739206173; x=1739810973; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:subject:to:from
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=+YvRvdBFBu03Qr/dUsEmvG4BCWhOSJZ5iKkgw21ypus=;
+        b=l0me74Tg9XO+erGMJiwC6EKhLIGtOq0YnsMCB4Vj1SdQPYE7w0WwlvrMGvV/8/yScE
+         su1WWxwdggfUATsAwdzhJY/Cg746kHK/u2ZbD+IxAZiWXW6Iges6Y0ZjMxGG4/A/Z7bB
+         A8m8QBv/+UMeOZkStSt65hjMwm7cYnI3ZfEAcPlP0cwowW06f40yEf6PQAX/NB61pugJ
+         Z00Jk9FEzRyy8OVa3lRYG/6igqKTqjwa3A/7Xhod2YiIsaPN5lcDictRRau3ys8HKOOo
+         us2dd6eWwSe/6l0ACb+n1+u3stlwoJASAtJZ6ndYWAgV86mERYNZQlLdrbJZsUBMarxT
+         PGQg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1739205862; x=1739810662;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=qPpEY5RIO5eaVLxLgovJSjTf6ZwKjzUAU3yoX/8apS8=;
-        b=Dha8v5JOoEXtw0IHo6MZHmy5Y08l+dMb0dNxpQRJq+h+bm3w8GxqV8JzHWozgcoF4M
-         Elto2VfA62lwBWKgbIkxUn8tfFvAoZ/C1R4R/PGJ0E2IuQ4sjAdjxixDSKA+H6uQB2c8
-         tWHIf/FiyvO6U9G7GgWC879JBiiwBaLPasy8+mScLMbSc32o0NEzL39pfgLJk3xOX2lG
-         ZhaFH0FUFG6uA284QwSiFlMekT5UCqMmqm2zGMfur7ziRtVMrTxYknD2vIXE4TbTtyoR
-         brEceR9pEbzOV9tjz1RYtb1D/aVLiH+DuNB8mqn4hSftY+BIvuKIbpN+H855Clt2/Aq/
-         D1Xw==
-X-Forwarded-Encrypted: i=1; AJvYcCXQuY24/J/RsgewBwG1LAemCHfdzOS311YHwVk5EctuKVeQCrnL7kAOMiiyJV4TyIAl0VNceezE+rw5@vger.kernel.org
-X-Gm-Message-State: AOJu0Yy3qxz3gcOh9aspXFpFlqcBsy0hFD9HzBeEPf+6CT3emd+yAmg9
-	IcmZma8Lmw0kOZSxVewbsJNQNL2sTCqe663odKb+ijp+Atm9rtvq3oEFPdV+Sjm2UcBjm+0k59W
-	fCoEQjTeXU7EkH6W6YZuXsKfYiwA=
-X-Gm-Gg: ASbGncvd6eHDlut3yBye+JgqMf6TcmfalA6F/u85Lck1qQ7iIDIYPWgJ3zSU6gixWn6
-	yq7UOeLlvHuqstkq3tu0vuBvLs234yyZBmXW9RTAhHgEHviIwxKez0uSddnT/MMlCzN/ebJdY
-X-Google-Smtp-Source: AGHT+IGVQrV0JzayK1BGapeStMdewIARXEY8Cj7kPvjvcA2Zs85eH3o2pbyXTbwh72+hbS9BvcKdDQwujbs+VhtLI6A=
-X-Received: by 2002:a92:c243:0:b0:3d0:353a:c97e with SMTP id
- e9e14a558f8ab-3d13e2e3680mr98844235ab.10.1739205862500; Mon, 10 Feb 2025
- 08:44:22 -0800 (PST)
+        d=1e100.net; s=20230601; t=1739206173; x=1739810973;
+        h=content-transfer-encoding:mime-version:message-id:subject:to:from
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=+YvRvdBFBu03Qr/dUsEmvG4BCWhOSJZ5iKkgw21ypus=;
+        b=oY9d5xMnUXrLQAfSIBlr+FiYKta8LPLWNjak8A1wes9/n2tbkmtvcyLlXk8uWfgbW5
+         YOm5JamMEbOFEL/3ABdbF8vpufQx/7JS7XaReOoRAtwRfvoGrKtNJp6sE77MV8LAWcMz
+         3BMiEa+wv8Mvftn1bkztAqorc+71y/ckSh66E+ynxbNemSc3eNVdWjXUFHCQ8CXjVlpF
+         qMpVXrXOE/gKX7ySL+bu6uEe4cJtjNikETIjX0ny0a87fdEOW4zpjrDS74HOKs5vwgHm
+         Vx5mN3cgTuO6koE9YpPJTcvSNwNHDk1KsOpa7emLZk3ebCCNFQAm9Tr18XrTnjrsfQmq
+         POWA==
+X-Gm-Message-State: AOJu0Yy7/0joibwCDKZbS/ysfqSpcMTE02X5fYvpqfnHiidlj0IjW8x6
+	DYy8nnnN/2iqQrqkD9qgGoqP4+9YB957SF/ieZTI+TP3X7Y2E7XzyNHh1haJIr33x14IJnYY6Aj
+	q
+X-Gm-Gg: ASbGncuqhDZwKiM6Vy94k3DZXJYtSQcoPWrIx1OskxZsk+DROdqDRUAperN0pwW9Lxn
+	5Dx5u4Mqj3YVobCtByRKH1m8ZC5t76/1EbbrF1AWIOfQWbMNa9vFwHZ/cPe7m7wgK/Ea18W9m2A
+	z23fSM/2ArbtbZk1DSilXqTESNr8CuUB8YycY1aVtIJt0k7tEy+OHHxSipELH7Jquf8/C0h7+xE
+	wyOjK62bZxbyw4SFHWYCJATO5YGy2M3ANv2sEFtqU+FXK23TiENioVtZraD2lI20kYdrGc63eYD
+	OQ8sRV/oPKB2Rv/Kssl3OfrPam+8BiETyKDznCT7kBHY8EmxVkEM036G3OLt7KOon0L2
+X-Google-Smtp-Source: AGHT+IHzqt5Fzo87K7+YPO4c7fuMld10vsjtADQ5xXh6+ESgY0cLh7V9bGGutQI7SlZSD2XSKIBaVA==
+X-Received: by 2002:a17:902:ef51:b0:215:b45a:6a5e with SMTP id d9443c01a7336-21f4e6bf56fmr192172665ad.18.1739206173454;
+        Mon, 10 Feb 2025 08:49:33 -0800 (PST)
+Received: from hermes.local (204-195-96-226.wavecable.com. [204.195.96.226])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-21f3683d576sm80402925ad.130.2025.02.10.08.49.32
+        for <netdev@vger.kernel.org>
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 10 Feb 2025 08:49:32 -0800 (PST)
+Date: Mon, 10 Feb 2025 08:49:31 -0800
+From: Stephen Hemminger <stephen@networkplumber.org>
+To: netdev@vger.kernel.org
+Subject: Fw: [Bug 219766] New: Garbage Ethernet Frames
+Message-ID: <20250210084931.23a5c2e4@hermes.local>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <b3c2dc3a102eb89bd155abca2503ebd015f50ee0.1739193671.git.marcelo.leitner@gmail.com>
-In-Reply-To: <b3c2dc3a102eb89bd155abca2503ebd015f50ee0.1739193671.git.marcelo.leitner@gmail.com>
-From: Xin Long <lucien.xin@gmail.com>
-Date: Mon, 10 Feb 2025 11:44:10 -0500
-X-Gm-Features: AWEUYZkU1FH-8tzmzujlYTgDp447ZVRZH2rz5cE62oPHFUdXLFr-zHvabV2bvgc
-Message-ID: <CADvbK_dtrrU1w6DNyy_OxizNwx_Nv=mjs5xESR+mB8U6=LKXdA@mail.gmail.com>
-Subject: Re: [PATCH net] MAINTAINERS: Add sctp headers to the general netdev entry
-To: Marcelo Ricardo Leitner <marcelo.leitner@gmail.com>
-Cc: netdev@vger.kernel.org, linux-sctp@vger.kernel.org, 
-	thorsten.blum@linux.dev
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-On Mon, Feb 10, 2025 at 8:25=E2=80=AFAM Marcelo Ricardo Leitner
-<marcelo.leitner@gmail.com> wrote:
->
-> All SCTP patches are picked up by netdev maintainers. Two headers were
-> missing to be listed there.
->
-> Reported-by: Thorsten Blum <thorsten.blum@linux.dev>
-> Signed-off-by: Marcelo Ricardo Leitner <marcelo.leitner@gmail.com>
-> ---
->  MAINTAINERS | 2 ++
->  1 file changed, 2 insertions(+)
->
-> diff --git a/MAINTAINERS b/MAINTAINERS
-> index 873aa2cce4d7fd5fd31613edbf3d99faaf7810bd..34ff998079d4c4843336936e4=
-7bd74c0e919012b 100644
-> --- a/MAINTAINERS
-> +++ b/MAINTAINERS
-> @@ -16509,6 +16509,7 @@ F:      include/linux/netdev*
->  F:     include/linux/netlink.h
->  F:     include/linux/netpoll.h
->  F:     include/linux/rtnetlink.h
-> +F:     include/linux/sctp.h
->  F:     include/linux/seq_file_net.h
->  F:     include/linux/skbuff*
->  F:     include/net/
-> @@ -16525,6 +16526,7 @@ F:      include/uapi/linux/netdev*
->  F:     include/uapi/linux/netlink.h
->  F:     include/uapi/linux/netlink_diag.h
->  F:     include/uapi/linux/rtnetlink.h
-> +F:     include/uapi/linux/sctp.h
->  F:     lib/net_utils.c
->  F:     lib/random32.c
->  F:     net/
+Not really enough information to do any deep analysis but forwarding to netdev
+anyway as it is not junk.
 
-Checking some other subcomponents like: MPTCP, TIPC, OPENVSWITCH,
-HANDSHAKE UPCALL ...
+Begin forwarded message:
 
-It seems that we should append:
+Date: Sun, 09 Feb 2025 12:24:32 +0000
+From: bugzilla-daemon@kernel.org
+To: stephen@networkplumber.org
+Subject: [Bug 219766] New: Garbage Ethernet Frames
 
-  L:      netdev@vger.kernel.org
 
-after:
+https://bugzilla.kernel.org/show_bug.cgi?id=219766
 
-  L:      linux-sctp@vger.kernel.org
+            Bug ID: 219766
+           Summary: Garbage Ethernet Frames
+           Product: Networking
+           Version: 2.5
+          Hardware: All
+                OS: Linux
+            Status: NEW
+          Severity: normal
+          Priority: P3
+         Component: Other
+          Assignee: stephen@networkplumber.org
+          Reporter: fmei@sfs.com
+        Regression: No
 
-in the section:
+I am currently troubleshooting a very strange problem which appears when
+upgrading Kernel 6.6.58 to 6.6.60. The kernel version change is part of a
+change of talos linux (www.talos.dev) from 1.8.2 to 1.8.3.
 
-  SCTP PROTOCOL
+We are running this machines at hetzner - a company which is providing server
+hosting. they complain that we are using mac addresses which are not allowed
+(are not the mac addresses of the physical nic)
+
+In the investigation of the problem I did tcpdumps on the physical adapters and
+captured this suspicious ethernet frames. The frames do neither have a known
+ethertype, nor do they have a mac address of a known vendor or a known virtual
+mac address range. They seem garbage to me. Below an example. More can be found
+in the github issue. This frames are not emitted very often and the systems are
+operating normally. If I would not be informed by the hosting provider I would
+not have noticed it at all.
+
+I also tried to track it down to a specific hardware (r8169), but we have the
+same problem with e1000e.
+
+I checked the changelogs of the two kernel versions (6.6.59 & 6.6.60) and
+noticed there were some changes which could be the problem, but I simply do not
+have the experience for it.
+
+Can anybody check the changelog of the 2 versions and see if there is a change
+which might cause the problem? Can anybody give me a hint how to track it down
+further?
+
+tcpdump: verbose output suppressed, use -v[v]... for full protocol decode
+listening on enp9s0, link-type EN10MB (Ethernet), snapshot length 262144 bytes
+22:07:02.329668 20:00:40:11:18:fb > 45:00:00:44:f4:94, ethertype Unknown
+(0x58c6), length 68:
+        0x0000:  8dda 74ca f1ae ca6c ca6c 0098 969c 0400  ..t....l.l......
+        0x0010:  0000 4730 3f18 6800 0000 0000 0000 9971  ..G0?.h........q
+        0x0020:  c4c9 9055 a157 0a70 9ead bf83 38ca ab38  ...U.W.p....8..8
+        0x0030:  8add ab96 e052                           .....R
+
+
+Issue with more information: https://github.com/siderolabs/talos/issues/9837
+
+-- 
+You may reply to this email to add a comment.
+
+You are receiving this mail because:
+You are the assignee for the bug.
 
