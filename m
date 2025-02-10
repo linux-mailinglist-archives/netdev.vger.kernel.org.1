@@ -1,119 +1,146 @@
-Return-Path: <netdev+bounces-164680-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-164681-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 25F8DA2EAD0
-	for <lists+netdev@lfdr.de>; Mon, 10 Feb 2025 12:13:52 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 1AD4DA2EAE6
+	for <lists+netdev@lfdr.de>; Mon, 10 Feb 2025 12:17:13 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C8A0B162530
-	for <lists+netdev@lfdr.de>; Mon, 10 Feb 2025 11:13:50 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id BD2F6163353
+	for <lists+netdev@lfdr.de>; Mon, 10 Feb 2025 11:17:11 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1C20716D9C2;
-	Mon, 10 Feb 2025 11:13:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0DBEC1DC996;
+	Mon, 10 Feb 2025 11:17:08 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="siyCZEM9"
+	dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b="mE9SnCYw"
 X-Original-To: netdev@vger.kernel.org
-Received: from fhigh-a7-smtp.messagingengine.com (fhigh-a7-smtp.messagingengine.com [103.168.172.158])
+Received: from out30-119.freemail.mail.aliyun.com (out30-119.freemail.mail.aliyun.com [115.124.30.119])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E00601CD219
-	for <netdev@vger.kernel.org>; Mon, 10 Feb 2025 11:13:41 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=103.168.172.158
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8D6A619CC33;
+	Mon, 10 Feb 2025 11:17:01 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=115.124.30.119
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1739186024; cv=none; b=m4nsqxlttyFO7VoxZWyN9M5m8uts4wHGwDFxinuo7n3bMm7/pOrL60c494TUoyWf4vOv5GAx+zKL1pNuLwvxTWdyNMWMzMYGtjhm4RNkc568WQrS9RRNsz1V/7fz1zDYwY8EDtkKvPuOE2riNxvWDz/3ivj709lsAHuowOv2dDw=
+	t=1739186227; cv=none; b=oAF63MIB0avXJ3HO7SsJlXq2OArJnOtPCClEinYlmj9VG1csUCFdCdzH2heTvpr8w7xh7fc/AtTqhsWW7dATpG2pKDoKeQAobFH13Ce5mKlVL+lQSdn/JQuBzaIDY8pcLcTv+f7a7Ko6Xvc/nneBWsWFIipjlr32N+myAzHJidA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1739186024; c=relaxed/simple;
-	bh=joWXMR8BxZkxBpp1PnlvAgULRI244ynbGdS6m0xRVSU=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=mJ+gP6g0mKk71joM4FL1A36l7OF9yjLbOT/jK4aBHTdvw9wmbWLGLd8ensxNEcuk6w38Q0YcWjd70+X5n+STAeSvTjHiliZy6tYc0DQx8aiIMCMTiiT2VGdOIMrK1gRGMuii6sSW5GA3BpQmJQUpV8z3e3ziue21VF7TM/Q/Jt4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=idosch.org; spf=none smtp.mailfrom=idosch.org; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=siyCZEM9; arc=none smtp.client-ip=103.168.172.158
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=idosch.org
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=idosch.org
-Received: from phl-compute-04.internal (phl-compute-04.phl.internal [10.202.2.44])
-	by mailfhigh.phl.internal (Postfix) with ESMTP id D4E0C114017C;
-	Mon, 10 Feb 2025 06:13:40 -0500 (EST)
-Received: from phl-mailfrontend-02 ([10.202.2.163])
-  by phl-compute-04.internal (MEProxy); Mon, 10 Feb 2025 06:13:40 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
-	messagingengine.com; h=cc:cc:content-type:content-type:date:date
-	:feedback-id:feedback-id:from:from:in-reply-to:in-reply-to
-	:message-id:mime-version:references:reply-to:subject:subject:to
-	:to:x-me-proxy:x-me-sender:x-me-sender:x-sasl-enc; s=fm3; t=
-	1739186020; x=1739272420; bh=xGqDNK2t7UcD5J1LYZS1Axq9vJt+wqTFZFZ
-	fTxH7ZyU=; b=siyCZEM9X8yL0RraTh0+qiaPSLwyry4JbMTS6yjbRh/HqsIHaSZ
-	dO20nE6xrbDO6GHOgKwxlP5IEtEAxm+VaSebLNPt6v6pwCcCY7zoPyNwmr1A5xvO
-	ylrx0oCQN1AREihXPPgdo+WdjcEL+721NL9jV+AMKHCQI3eYrCliiNJCKo+extkH
-	QRgk+IVRPk35qhJWnNimUKSqe+IEKf4qY+Val5tfl+lZj1YRUJsKt7lS6odn7oOr
-	c3JMTwE5m7U1LBO+j41YA9vzbpltaC3doTL27JU3GIzxIdegF7HTOw6Ga78UmRtX
-	v2NqN6fH4Wm1jY/8J5Lt2NZa3VXv+hwQokg==
-X-ME-Sender: <xms:ZN-pZ9QGvkFqMFvgZ7SXbauxJdtbGOF3T-rG47oREeuNw70GAIK3RQ>
-    <xme:ZN-pZ2x8cSOf5qOEfrAL2IoIAk8zKN2VbQYsD_mVYeK7fetKTG4ys-hb0VMEdwgzb
-    BV1yQ5aLT8elRg>
-X-ME-Received: <xmr:ZN-pZy1aC2BMJD_nBiJAnY8EMoA5ydl3WqnTKuPbX2E0l-LmZiKWA2MwacUd>
-X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeefvddrtddtgdefjeelvdcutefuodetggdotefrod
-    ftvfcurfhrohhfihhlvgemucfhrghsthforghilhdpggftfghnshhusghstghrihgsvgdp
-    uffrtefokffrpgfnqfghnecuuegrihhlohhuthemuceftddtnecusecvtfgvtghiphhivg
-    hnthhsucdlqddutddtmdenucfjughrpeffhffvvefukfhfgggtuggjsehttdertddttddv
-    necuhfhrohhmpefkughoucfutghhihhmmhgvlhcuoehiughoshgthhesihguohhstghhrd
-    horhhgqeenucggtffrrghtthgvrhhnpeehhfdtjedviefffeduuddvffegteeiieeguefg
-    udffvdfftdefheeijedthfejkeenucffohhmrghinhepkhgvrhhnvghlrdhorhhgnecuve
-    hluhhsthgvrhfuihiivgeptdenucfrrghrrghmpehmrghilhhfrhhomhepihguohhstghh
-    sehiughoshgthhdrohhrghdpnhgspghrtghpthhtohepledpmhhouggvpehsmhhtphhouh
-    htpdhrtghpthhtohepvgguuhhmrgiivghtsehgohhoghhlvgdrtghomhdprhgtphhtthho
-    pegurghvvghmsegurghvvghmlhhofhhtrdhnvghtpdhrtghpthhtohepkhhusggrsehkvg
-    hrnhgvlhdrohhrghdprhgtphhtthhopehprggsvghnihesrhgvughhrghtrdgtohhmpdhr
-    tghpthhtohepnhgvthguvghvsehvghgvrhdrkhgvrhhnvghlrdhorhhgpdhrtghpthhtoh
-    ephhhorhhmsheskhgvrhhnvghlrdhorhhgpdhrtghpthhtohepvghrihgtrdguuhhmrgii
-    vghtsehgmhgrihhlrdgtohhmpdhrtghpthhtohepshihiigsohhtodeirgeliedvgeehle
-    dvvddukegtvdgthegvjegrrgesshihiihkrghllhgvrhdrrghpphhsphhothhmrghilhdr
-    tghomhdprhgtphhtthhopehrohhophgrsehnvhhiughirgdrtghomh
-X-ME-Proxy: <xmx:ZN-pZ1A_OYRy3dzSmRWjG3jfAvjaTSNx3Dfm5mvDDvojnR-gXUd7KQ>
-    <xmx:ZN-pZ2iZRbXLJYwxO8e_Hh-XM2WC6FC7-M-e9B2QNonSvD4CuG1M5A>
-    <xmx:ZN-pZ5pdPNPsxcgupAsct3OaL4HJsccFz8mgryjBLobvoiOV5wx_YA>
-    <xmx:ZN-pZxjIYXWhOSZdgFQl-JfbMU1uscF1uTmRuNXUF25OD7gg1KNW8w>
-    <xmx:ZN-pZ_UnqW0VaYUvuKlPZD4-_WZMo3RptCmv8ycScwd8VVDGhyxG7x6J>
-Feedback-ID: i494840e7:Fastmail
-Received: by mail.messagingengine.com (Postfix) with ESMTPA; Mon,
- 10 Feb 2025 06:13:39 -0500 (EST)
-Date: Mon, 10 Feb 2025 13:13:38 +0200
-From: Ido Schimmel <idosch@idosch.org>
-To: Eric Dumazet <edumazet@google.com>
-Cc: "David S . Miller" <davem@davemloft.net>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	netdev@vger.kernel.org, Simon Horman <horms@kernel.org>,
-	eric.dumazet@gmail.com,
-	syzbot+6a9624592218c2c5e7aa@syzkaller.appspotmail.com,
-	Roopa Prabhu <roopa@nvidia.com>
-Subject: Re: [PATCH net] vxlan: check vxlan_vnigroup_init() return value
-Message-ID: <Z6nfYhddH6itouGy@shredder>
-References: <20250210105242.883482-1-edumazet@google.com>
+	s=arc-20240116; t=1739186227; c=relaxed/simple;
+	bh=mSkiGXTqHGYYLjplMNYod7sGEW6e2weQZ7cjuOsZaz4=;
+	h=Message-ID:Date:MIME-Version:Subject:From:To:Cc:References:
+	 In-Reply-To:Content-Type; b=f4emNCJ/lSaWLys9kpzF1upE2OyrSJmW1cTN/kIBJfVpYaoahp2sEB2Mvc9J1dfcKOTpm5WUwwxL8mv7egDDWNWvLIDpitiiOSCFrpJGimX0Uhlquw+l42ISRvuvZnFDqYd0q8KwymLen0ukCf8AeZOhECTsR/pLtSjlazR/aPI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com; spf=pass smtp.mailfrom=linux.alibaba.com; dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b=mE9SnCYw; arc=none smtp.client-ip=115.124.30.119
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.alibaba.com
+DKIM-Signature:v=1; a=rsa-sha256; c=relaxed/relaxed;
+	d=linux.alibaba.com; s=default;
+	t=1739186219; h=Message-ID:Date:MIME-Version:Subject:From:To:Content-Type;
+	bh=dmcnIETOkRmcLc2k59ZJrtg3E4RjzRzuJfuWKk05UZg=;
+	b=mE9SnCYwJRHxiEBu9mJNa6oBcFz+IoIFaDRytYWlITj1aAxOLGj4+gfGs4TZVQkmazzO0Zxl0dQylqlJ0kYDJLGqmqGzloAR6Z9hoVPIGl4WquKb7zVyrbo48xRlZuvTS3AEhEFPlnZ6xyxo8LedbLkOqVsdx+w4hJ4GHXOoxpQ=
+Received: from 30.221.98.157(mailfrom:guangguan.wang@linux.alibaba.com fp:SMTPD_---0WPAl8CS_1739186218 cluster:ay36)
+          by smtp.aliyun-inc.com;
+          Mon, 10 Feb 2025 19:16:59 +0800
+Message-ID: <4339aaa1-f2aa-4454-b5b1-6ffb6415f484@linux.alibaba.com>
+Date: Mon, 10 Feb 2025 19:16:57 +0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250210105242.883482-1-edumazet@google.com>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net] net/smc: use the correct ndev to find pnetid by
+ pnetid table
+From: Guangguan Wang <guangguan.wang@linux.alibaba.com>
+To: Halil Pasic <pasic@linux.ibm.com>
+Cc: Paolo Abeni <pabeni@redhat.com>, wenjia@linux.ibm.com,
+ jaka@linux.ibm.com, alibuda@linux.alibaba.com, tonylu@linux.alibaba.com,
+ guwen@linux.alibaba.com, davem@davemloft.net, edumazet@google.com,
+ kuba@kernel.org, horms@kernel.org, linux-rdma@vger.kernel.org,
+ linux-s390@vger.kernel.org, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org, Alexandra Winter <wintera@linux.ibm.com>
+References: <20241227040455.91854-1-guangguan.wang@linux.alibaba.com>
+ <1f4a721f-fa23-4f1d-97a9-1b27bdcd1e21@redhat.com>
+ <20250107203218.5787acb4.pasic@linux.ibm.com>
+ <908be351-b4f8-4c25-9171-4f033e11ffc4@linux.alibaba.com>
+ <20250109040429.350fdd60.pasic@linux.ibm.com>
+ <b1053a92-3a3f-4042-9be9-60b94b97747d@linux.alibaba.com>
+ <20250114130747.77a56d9a.pasic@linux.ibm.com>
+ <3dc68650-904c-4a1d-adc4-172e771f640c@linux.alibaba.com>
+Content-Language: en-US
+In-Reply-To: <3dc68650-904c-4a1d-adc4-172e771f640c@linux.alibaba.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-On Mon, Feb 10, 2025 at 10:52:42AM +0000, Eric Dumazet wrote:
-> vxlan_init() must check vxlan_vnigroup_init() success
-> otherwise a crash happens later, spotted by syzbot.
+
+
+On 2025/1/15 19:53, Guangguan Wang wrote:
 > 
-
-[...]
-
 > 
-> Fixes: f9c4bb0b245c ("vxlan: vni filtering support on collect metadata device")
-> Reported-by: syzbot+6a9624592218c2c5e7aa@syzkaller.appspotmail.com
-> Closes: https://lore.kernel.org/netdev/67a9d9b4.050a0220.110943.002d.GAE@google.com/T/#u
-> Signed-off-by: Eric Dumazet <edumazet@google.com>
-> Cc: Roopa Prabhu <roopa@nvidia.com>
+> On 2025/1/14 20:07, Halil Pasic wrote:
+>> On Fri, 10 Jan 2025 13:43:44 +0800
+>> Guangguan Wang <guangguan.wang@linux.alibaba.com> wrote:
+>>
+>>>> I think I showed a valid and practical setup that would break with your
+>>>> patch as is. Do you agree with that statement?  
+>>> Did you mean
+>>> "
+>>> Now for something like a bond of two OSA
+>>> interfaces, I would expect the two legs of the bond to probably have a
+>>> "HW PNETID", but the netdev representing the bond itself won't have one
+>>> unless the Linux admin defines a software PNETID, which is work, and
+>>> can't have a HW PNETID because it is a software construct within Linux.
+>>> Breaking for example an active-backup bond setup where the legs have
+>>> HW PNETIDs and the admin did not bother to specify a PNETID for the bond
+>>> is not acceptable.
+>>> " ?
+>>> If the legs have HW pnetids, add pnetid to bond netdev will fail as
+>>> smc_pnet_add_eth will check whether the base_ndev already have HW pnetid.
+>>>
+>>> If the legs without HW pnetids, and admin add pnetids to legs through smc_pnet.
+>>> Yes, my patch will break the setup. What Paolo suggests(both checking ndev and
+>>> base_ndev, and replace || by && )can help compatible with the setup.
+>>
+>> I'm glad we agree on that part. Things are much more acceptable if we
+>> are doing both base and ndev. 
+> It is also acceptable for me.
+> 
+>> Nevertheless I would like to understand
+>> your problem better, and talk about it to my team. I will also ask some
+>> questions in another email.
+> Questions are welcome.
+> 
+>>
+>> That said having things work differently if there is a HW PNETID on
+>> the base, and different if there is none is IMHO wonky and again
+>> asymmetric.
+>>
+>> Imagine the following you have your nice little setup with a PNETID on
+>> a non-leaf and a base_ndev that has no PNETID. Then your HW admin
+>> configures a PNETID to your base_ndev, a different one. Suddenly
+>> your ndev PNETID is ignored for reasons not obvious to you. Yes it is
+>> similar to having a software PNETID on the base_ndev and getting it
+>> overruled by a HW PNETID, but much less obvious IMHO. I am wondering if there are any scenarios that require setting different
+> pnetids for different net devices in one netdev hierarchy. If no, maybe
+> we should limit that only one pnetid can be set to one netdev hierarchy.
+> 
+>> I also think
+>> a software PNETID of the base should probably take precedence over over
+>> the software pnetid of ndev.
+> Agree!
+> 
+> Thanks,
+> Guangguan Wang
+>>
+>> Regards,
+>> Halil
 
-Reviewed-by: Ido Schimmel <idosch@nvidia.com>
+Hi Halil,
 
-Thanks!
+Are there any questions or further discussions about this patch? If no, I will
+send a v2 patch, in which software pnetid will be searched in both base_ndev and ndev,
+and base_ndev will take precedence over ndev.
+
+Thanks,
+Guangguan Wang
+
 
