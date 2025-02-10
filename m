@@ -1,194 +1,195 @@
-Return-Path: <netdev+bounces-164638-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-164639-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7047FA2E8D1
-	for <lists+netdev@lfdr.de>; Mon, 10 Feb 2025 11:16:13 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id DBB3CA2E92C
+	for <lists+netdev@lfdr.de>; Mon, 10 Feb 2025 11:24:25 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 41C1A3A1360
-	for <lists+netdev@lfdr.de>; Mon, 10 Feb 2025 10:16:04 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 7C3BD16206A
+	for <lists+netdev@lfdr.de>; Mon, 10 Feb 2025 10:24:24 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3FA1B1C3BF8;
-	Mon, 10 Feb 2025 10:16:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 839C81CD219;
+	Mon, 10 Feb 2025 10:18:56 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="eeBbq3MS"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="UVnO9qxC"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D5439189902
-	for <netdev@vger.kernel.org>; Mon, 10 Feb 2025 10:16:03 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CCFF01CD213
+	for <netdev@vger.kernel.org>; Mon, 10 Feb 2025 10:18:52 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1739182568; cv=none; b=dxEeIiMqaA2SbU8qe5r7T0X6yiKb03cD19SjcaqBddWXh2Bp9OX2mJ416cxv1aeD0PxVwrfD0aye7VOrh2XkxHFGCT5XktaCMyekExRZCVhiWav6wV5CFa/gCDIBuna4SUpQgNr687JMWXkURYRyvoGl2R59Uz/+Aj/uonpnpeE=
+	t=1739182736; cv=none; b=hI26kyeRH+GDH7qAOeFxqSFs/nFMqsMx+F5KZ9qjHq4ZF9CQ3mfrhP/6mcsvbqh2JJjRQSIGos7qSmqaFDXwA53vsKFvIxay23ZL1Duhi3RHiZpzw669ebfypybwGH9wKdkiIz8gDXepnRvBYN2l2F+DSRixda/X+E+8H4E8Kjs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1739182568; c=relaxed/simple;
-	bh=p5WUXwy0MVXPNMhTdeCzdF4yaFQYosHveP/Gs6BTPxw=;
+	s=arc-20240116; t=1739182736; c=relaxed/simple;
+	bh=toBq8ao5ulma1PGaQoH6GOc583fwuhkt+ho+yDVJkaA=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=V16U0xr9/h2qJyNsM7y64qoLsk6GCKK7mJDA2HvDBwn6OKmX3DME0P8TM0hBZD0H8CYxKLIMBDsP6PWFcVuqE23/c1EJqGt3yAzxC2cNcvWHBZhHDSBapvKA2zBGZ44yhPWxilQu2XUSePn6NRgRL5XZTX/qVgE9epoplbVjrUI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=eeBbq3MS; arc=none smtp.client-ip=170.10.129.124
+	 Content-Type:Content-Disposition:In-Reply-To; b=bqDeuYPkPAG2B1fBB71flx7SPS/gDI181Pv0wp0D3IaM8q1kza8/OZV4eRcAhe8Gzg1od9yBC60kzwaKGPnQmz+jl1DAqf6GyJf2wbPZpkX+SwPORd9G24vB6PucvjcSEncw7EeXhmEbMQrCWu2v0Sj2wkCRqnnXIC+OglG4VPo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=UVnO9qxC; arc=none smtp.client-ip=170.10.133.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1739182562;
+	s=mimecast20190719; t=1739182731;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=A9sJEC/icQo18bVFXRpigQVdBJdFsITaqQvJCE/XAEo=;
-	b=eeBbq3MSyxLWqXEy+MT0HCQW3qY1CbsdgvzxlVErxf2otuocUCoxrJk6TvM0fgfVwGohAn
-	CT6fiQ4q+6GtRWlqUoynzGq9uU458Gcxxn4QW4wXJM6h/GYtC7dXhZB6u6ON+dQXFvHO7J
-	SY27l7cXIbJxWBB7eBZU2uJ0o5WXLJU=
-Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
- [209.85.128.71]) by relay.mimecast.com with ESMTP with STARTTLS
+	bh=LNFNsRnUDwZy+nRKMqXmAwrAdYaoOa6UkCTEVB/Y5kg=;
+	b=UVnO9qxCvFUBxWHwUIzXCMRT+jnogied4tRFd+8oDwR5P08CBPi+GjjlrG/GiBhEQsUwS2
+	bv8oj4QIetQztjkl+vUKqx5/53PqJ+RFP5Z5G77aV8z4Rl1wOdGS2kLhSQZDRypz+btuuK
+	tijKGBqrO/pX3KHQQA9ZNZAKLlcPyZw=
+Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
+ [209.85.221.71]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-617-El8R0Nv4MhWPjP9UjxMAfw-1; Mon, 10 Feb 2025 05:15:57 -0500
-X-MC-Unique: El8R0Nv4MhWPjP9UjxMAfw-1
-X-Mimecast-MFC-AGG-ID: El8R0Nv4MhWPjP9UjxMAfw
-Received: by mail-wm1-f71.google.com with SMTP id 5b1f17b1804b1-43947979ce8so2505105e9.0
-        for <netdev@vger.kernel.org>; Mon, 10 Feb 2025 02:15:56 -0800 (PST)
+ us-mta-610-bmzrYCGLODikfS9aDT6lZg-1; Mon, 10 Feb 2025 05:18:50 -0500
+X-MC-Unique: bmzrYCGLODikfS9aDT6lZg-1
+X-Mimecast-MFC-AGG-ID: bmzrYCGLODikfS9aDT6lZg
+Received: by mail-wr1-f71.google.com with SMTP id ffacd0b85a97d-38de0201875so293668f8f.0
+        for <netdev@vger.kernel.org>; Mon, 10 Feb 2025 02:18:50 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1739182556; x=1739787356;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=A9sJEC/icQo18bVFXRpigQVdBJdFsITaqQvJCE/XAEo=;
-        b=mIe3FW3VGK6L5EjGqR3vWcDYdafzMq8I7657quDAyFwt7FZgS56EePzh+f4ks3mg8g
-         259iQOIG43K0HW+FA1Of6JHy+LAPyRIkvgjg1GIdOT7qNzDaXM6Gq9bKckusGRNS7JF9
-         2EnrLTlgEw9RZcVdQWacEewiAj9FrNMpQf3lEe2LYDfbabP6/zIjqnZXt+pUkJnNcsvY
-         mDXP7dgRL83gt1P2xqYk8AFHZSZrnnAhHKxKg3GVvw1fC6Cnxg0QVlp2U367PFiTPdrF
-         ldAS+SpwxJwo3+RK4d8D2clI61aC4VVyBZmGbCGlzssMTkqvDvB5RNnjkClTHNWpLCIC
-         NQVw==
-X-Forwarded-Encrypted: i=1; AJvYcCUiLx2eVa0UwRnfW8vH5MBfPKxmDICWhqj3ORJnC2t69PRvr8WTM23rD/6DPE21y+cFAuMWA0A=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yym0FrXSDLlzjTCVLezwSFJ7mBAJCUAZbAtcRIRqwvm8urX9qy0
-	6p5Bx+PGOw6sY99u6kL/Hje2p6z7bmfxqd2hOQLn0psI/NXbClcnq21fp9SkrKNUHAlvK7hEiHE
-	n0ZIKWjWDPaGvcmOL1oc63QkPWGsOh4uglDXnOOHo6xcL3qOm+8tqbw==
-X-Gm-Gg: ASbGncumzjoJko5prmaESSDQHbBrhQS8EEBtYxD7HoEJ9wtf9w0+Z4LNRhRmnTVccf6
-	Dg3oAbeoUrd337wI5ItcIWDLu1e8bqpWUuY4FvJub8kwPi6zJ+YO0UB1sPX2JiMzhfj6OGv+0fq
-	6PyHDK22TNLkF1xQGZEmqmSxmkGcksO9XqKISsrP2+aoVbCHtbDckZV1wGG8vTRJm+xYSkR67YK
-	SyagtwXQhrTFcV1zOnHIikKSxFCYA876wm6towj3p5n18D6CaRUAQpDtwX5eCBw9cnSR5sZ8R/R
-	1Opo6+f4LKMIqkDeGtGLgpT2xrM2DTFRtwFZSjuxN3SQpaAFMgPyhQ==
-X-Received: by 2002:a05:600c:35cb:b0:434:f917:2b11 with SMTP id 5b1f17b1804b1-439249b2b99mr83682265e9.21.1739182555832;
-        Mon, 10 Feb 2025 02:15:55 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IEzyHmFxq9APlvZ5/KjMZW8FMS6DvOra/FJmHwifoO1Pq3YL3SAL/TwgqtRqswE/KetCkJU4A==
-X-Received: by 2002:a05:600c:35cb:b0:434:f917:2b11 with SMTP id 5b1f17b1804b1-439249b2b99mr83681645e9.21.1739182554738;
-        Mon, 10 Feb 2025 02:15:54 -0800 (PST)
+        d=1e100.net; s=20230601; t=1739182729; x=1739787529;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=LNFNsRnUDwZy+nRKMqXmAwrAdYaoOa6UkCTEVB/Y5kg=;
+        b=Fz+V8tS6i1dGKpZ0MXG11NU/BVRaBFtqvQPP4nVLHNzK2tFMTNcSv11lwP86pAytPz
+         M42EEzIFqguxyWRmnxtrtfy9weO+P1qbHYL6aKskaUtWCQoffHiFB4oqDXvlpfPAGmTH
+         SncBGIlNDUMAtVzRIJYLGZnytBzlAobaz2QfDwmxY5rVNUYtakwBsyUu46mbc3DYP9D9
+         S93dAdA6KbQlQlMScpETQFP5zrqrm3tNvb+n2ZViExVonOltnD0EfBl1Dcds8p58szuY
+         HSWy1lBjIcbEJ9Ru9Gd7RTWMYM7hi0SURQKzIfDCm7dKKK31MqZbzWkuftAdNkJN4T7E
+         kcpA==
+X-Forwarded-Encrypted: i=1; AJvYcCW4nFleTVTjEFeomqN7xAafC9ZGFvMYfMfs60b+KmkRRtOhABJdE+IppEyUb5bEe4cQoVA0/cM=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxAXiZeQEoz+YXukxxjetkB1ej/PXbptU+TlfIx5Gh697ZQg1wT
+	HE9S/E1PiQZB6tM+roJjWQTUtCSxZ1SzV5tIye7uELZCvoQ3PWKzLhAeIyCddC4LLCANFH32taq
+	hxraK6nNR7qHdePDxJxBtNeYIbiHlh4VNgPPIKXr57wZyZfAjcf5AZ0QvOQLIkQ==
+X-Gm-Gg: ASbGncvmJ+fqfjLo7iPYxsFdsqfzB+MmnwUUDGD9HoUTow15yMXmA2DTfNgY7tCOppM
+	AZiAiRw7vgNKUNfpgmWqCMsMI+/nWbNJxgCBGz/cTI974gvbBwMgdoDKzsWzFZXmC/Nm3bkm58p
+	YiQ+UatCZYG4nJKebiZvjlALrQ0xpJY2pHH6rJzzCoe8tsV6i6UMjqjVtJ/io8Mxck0XrfWuKdz
+	QR2LRs4D+T+JcARwhd3n2ciohuJIKjP7pnDTlUjQmC7lJmNVV2YF9d5TtC+fGwkw59aVGXmgfV+
+	6gX9yhqvF9QDsoQzTV4vg0tY7A4OAl9/DA0vvBlgWO1pBXx/mFm5fA==
+X-Received: by 2002:a05:6000:1448:b0:38d:b4c4:9f47 with SMTP id ffacd0b85a97d-38dc8da6665mr10332862f8f.3.1739182728811;
+        Mon, 10 Feb 2025 02:18:48 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IFImNQz2ZL2Jip+LcFIH0iQm1f1hwZG7FzSiWlKNe5OmlnXiW000OQ/Z63tEyXeHUIf5bNj3g==
+X-Received: by 2002:a05:6000:1448:b0:38d:b4c4:9f47 with SMTP id ffacd0b85a97d-38dc8da6665mr10332806f8f.3.1739182728095;
+        Mon, 10 Feb 2025 02:18:48 -0800 (PST)
 Received: from sgarzare-redhat (host-79-46-200-29.retail.telecomitalia.it. [79.46.200.29])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-4390daf4480sm175997295e9.27.2025.02.10.02.15.53
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-38dc33939f3sm11028304f8f.17.2025.02.10.02.18.46
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 10 Feb 2025 02:15:54 -0800 (PST)
-Date: Mon, 10 Feb 2025 11:15:47 +0100
+        Mon, 10 Feb 2025 02:18:47 -0800 (PST)
+Date: Mon, 10 Feb 2025 11:18:42 +0100
 From: Stefano Garzarella <sgarzare@redhat.com>
 To: Michal Luczaj <mhal@rbox.co>
 Cc: "David S. Miller" <davem@davemloft.net>, 
 	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
-	Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, netdev@vger.kernel.org, 
-	syzbot+9d55b199192a4be7d02c@syzkaller.appspotmail.com, Luigi Leonardi <leonardi@redhat.com>
-Subject: Re: [PATCH net v2 1/2] vsock: Orphan socket after transport release
-Message-ID: <zboo362son7nvmvoigmcj2v23gdcdpb364sxqzo5xndxuqqnmy@27cgbg6bxte2>
-References: <20250206-vsock-linger-nullderef-v2-0-f8a1f19146f8@rbox.co>
- <20250206-vsock-linger-nullderef-v2-1-f8a1f19146f8@rbox.co>
+	Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, netdev@vger.kernel.org
+Subject: Re: [PATCH net 2/2] vsock/test: Add test for SO_LINGER null ptr deref
+Message-ID: <vsghmgwurw3rxzw32najvwddolmrbroyryquzsoqt5jr3trzif@4rjr7kwlaowa>
+References: <20250204-vsock-linger-nullderef-v1-0-6eb1760fa93e@rbox.co>
+ <20250204-vsock-linger-nullderef-v1-2-6eb1760fa93e@rbox.co>
+ <n3azri2tr3mzyo2ahwtrddkcwfsgyzdyuowekl34kkehk4zgf7@glvhh6bg4rsi>
+ <5c19a921-8d4d-44a3-8d82-849e95732726@rbox.co>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Type: text/plain; charset=us-ascii; format=flowed
 Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <20250206-vsock-linger-nullderef-v2-1-f8a1f19146f8@rbox.co>
+In-Reply-To: <5c19a921-8d4d-44a3-8d82-849e95732726@rbox.co>
 
-On Thu, Feb 06, 2025 at 12:06:47AM +0100, Michal Luczaj wrote:
->During socket release, sock_orphan() is called without considering that it
->sets sk->sk_wq to NULL. Later, if SO_LINGER is enabled, this leads to a
->null pointer dereferenced in virtio_transport_wait_close().
+On Wed, Feb 05, 2025 at 12:20:56PM +0100, Michal Luczaj wrote:
+>On 2/4/25 11:48, Stefano Garzarella wrote:
+>> On Tue, Feb 04, 2025 at 01:29:53AM +0100, Michal Luczaj wrote:
+>>> ...
+>>> +static void test_stream_linger_client(const struct test_opts *opts)
+>>> +{
+>>> +	struct linger optval = {
+>>> +		.l_onoff = 1,
+>>> +		.l_linger = 1
+>>> +	};
+>>> +	int fd;
+>>> +
+>>> +	fd = vsock_stream_connect(opts->peer_cid, opts->peer_port);
+>>> +	if (fd < 0) {
+>>> +		perror("connect");
+>>> +		exit(EXIT_FAILURE);
+>>> +	}
+>>> +
+>>> +	if (setsockopt(fd, SOL_SOCKET, SO_LINGER, &optval, sizeof(optval))) {
+>>> +		perror("setsockopt(SO_LINGER)");
+>>> +		exit(EXIT_FAILURE);
+>>> +	}
+>>
+>> Since we are testing SO_LINGER, will also be nice to check if it's
+>> working properly, since one of the fixes proposed could break it.
+>>
+>> To test, we may set a small SO_VM_SOCKETS_BUFFER_SIZE on the receive
+>> side and try to send more than that value, obviously without reading
+>> anything into the receiver, and check that close() here, returns after
+>> the timeout we set in .l_linger.
 >
->Orphan the socket only after transport release.
->
->While there, reflow the other comment.
->
->Partially reverts the 'Fixes:' commit.
->
->KASAN: null-ptr-deref in range [0x0000000000000018-0x000000000000001f]
-> lock_acquire+0x19e/0x500
-> _raw_spin_lock_irqsave+0x47/0x70
-> add_wait_queue+0x46/0x230
-> virtio_transport_release+0x4e7/0x7f0
-> __vsock_release+0xfd/0x490
-> vsock_release+0x90/0x120
-> __sock_release+0xa3/0x250
-> sock_close+0x14/0x20
-> __fput+0x35e/0xa90
-> __x64_sys_close+0x78/0xd0
-> do_syscall_64+0x93/0x1b0
-> entry_SYSCALL_64_after_hwframe+0x76/0x7e
->
->Reported-by: syzbot+9d55b199192a4be7d02c@syzkaller.appspotmail.com
->Closes: https://syzkaller.appspot.com/bug?extid=9d55b199192a4be7d02c
->Fixes: fcdd2242c023 ("vsock: Keep the binding until socket destruction")
->Tested-by: Luigi Leonardi <leonardi@redhat.com>
->Signed-off-by: Michal Luczaj <mhal@rbox.co>
->---
-> net/vmw_vsock/af_vsock.c | 15 ++++++++++-----
-> 1 file changed, 10 insertions(+), 5 deletions(-)
->
->diff --git a/net/vmw_vsock/af_vsock.c b/net/vmw_vsock/af_vsock.c
->index 075695173648d3a4ecbd04e908130efdbb393b41..85d20891b771a25b8172a163983054a2557f98c1 100644
->--- a/net/vmw_vsock/af_vsock.c
->+++ b/net/vmw_vsock/af_vsock.c
->@@ -817,20 +817,25 @@ static void __vsock_release(struct sock *sk, int level)
-> 	vsk = vsock_sk(sk);
-> 	pending = NULL;	/* Compiler warning. */
->
->-	/* When "level" is SINGLE_DEPTH_NESTING, use the nested
->-	 * version to avoid the warning "possible recursive locking
->-	 * detected". When "level" is 0, lock_sock_nested(sk, level)
->-	 * is the same as lock_sock(sk).
->+	/* When "level" is SINGLE_DEPTH_NESTING, use the nested version to avoid
->+	 * the warning "possible recursive locking detected". When "level" is 0,
->+	 * lock_sock_nested(sk, level) is the same as lock_sock(sk).
+>I may be doing something wrong, but (at least for loopback transport) it
 
-This comment is formatted “weird” because recently in commit
-135ffc7becc8 ("bpf, vsock: Invoke proto::close on close()") we reduced
-the indentation without touching the comment.
+Also with VMs is the same, I think virtio_transport_wait_close() can be 
+improved to check if everything is sent, avoiding to wait.
 
-Since this is a fix we may have to backport into stable branches without
-that commit, I would avoid touching it to avoid unnecessary conflicts.
-
-The rest LGTM!
-
-Thanks for the quick fix and sorry for the late reply but FOSDEM-flu
-caught me.
+But this is material for another series, so this test should be fine for 
+now!
 
 Thanks,
 Stefano
 
-> 	 */
-> 	lock_sock_nested(sk, level);
+>seems that close() lingers until data is received, not sent (without even
+>touching SO_VM_SOCKETS_BUFFER_SIZE).
 >
->-	sock_orphan(sk);
->+	/* Indicate to vsock_remove_sock() that the socket is being released and
->+	 * can be removed from the bound_table. Unlike transport reassignment
->+	 * case, where the socket must remain bound despite vsock_remove_sock()
->+	 * being called from the transport release() callback.
->+	 */
->+	sock_set_flag(sk, SOCK_DEAD);
+>```
+>import struct, fcntl, termios, time
+>from socket import *
 >
-> 	if (vsk->transport)
-> 		vsk->transport->release(vsk);
-> 	else if (sock_type_connectible(sk->sk_type))
-> 		vsock_remove_sock(vsk);
+>def linger(s, timeout):
+>	if s.family == AF_VSOCK:
+>		s.setsockopt(SOL_SOCKET, SO_LINGER, (timeout<<32) | 1)
+>	elif s.family == AF_INET:
+>		s.setsockopt(SOL_SOCKET, SO_LINGER, struct.pack('ii', 1, timeout))
+>	else:
+>		assert False
 >
->+	sock_orphan(sk);
-> 	sk->sk_shutdown = SHUTDOWN_MASK;
+>def unsent(s):
+>	SIOCOUTQ = termios.TIOCOUTQ
+>	return struct.unpack('I', fcntl.ioctl(s, SIOCOUTQ, bytes(4)))[0]
 >
-> 	skb_queue_purge(&sk->sk_receive_queue);
+>def check_lingering(family, addr):
+>	lis = socket(family, SOCK_STREAM)
+>	lis.bind(addr)
+>	lis.listen()
 >
->-- 
->2.48.1
+>	s = socket(family, SOCK_STREAM)
+>	linger(s, 2)
+>	s.connect(lis.getsockname())
+>
+>	for _ in range(1, 1<<8):
+>		s.send(b'x')
+>
+>	while unsent(s) != 0:
+>		pass
+>
+>	print("closing...")
+>	ts = time.time()
+>	s.close()
+>	print(f"done in %ds" % (time.time() - ts))
+>
+>check_lingering(AF_INET, ('127.0.0.1', 1234))
+>check_lingering(AF_VSOCK, (1, 1234)) # VMADDR_CID_LOCAL
+>```
+>
+>Gives me:
+>closing...
+>done in 0s
+>closing...
+>done in 2s
 >
 
 
