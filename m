@@ -1,34 +1,34 @@
-Return-Path: <netdev+bounces-164891-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-164890-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id D000CA2F88D
-	for <lists+netdev@lfdr.de>; Mon, 10 Feb 2025 20:24:18 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 15575A2F88C
+	for <lists+netdev@lfdr.de>; Mon, 10 Feb 2025 20:24:14 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id EE8EE3A1E80
-	for <lists+netdev@lfdr.de>; Mon, 10 Feb 2025 19:24:07 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 0546E3A183B
+	for <lists+netdev@lfdr.de>; Mon, 10 Feb 2025 19:24:03 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 16BB9257AD2;
-	Mon, 10 Feb 2025 19:24:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 529E8257453;
+	Mon, 10 Feb 2025 19:24:05 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="UHNu3jCt"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="VXI/c/Qk"
 X-Original-To: netdev@vger.kernel.org
 Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 55FE42566E6
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5134A2566D6
 	for <netdev@vger.kernel.org>; Mon, 10 Feb 2025 19:24:03 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1739215446; cv=none; b=sfNZ8l59M6m1N8jFujnNN1a6SolwvdpxoaFMQUnWLXb4fF4yt+Kh97K1HhEYy3Ay6YOcL1LGU9uJCRLEcsKWImUSim+PUlcZ1MTpzlxqQQAve6kDGXCqZvbr+VDyPtjY/kGoMes01Mkq/4ypgAoULfbbasoUTukTIvz6pVJRHOg=
+	t=1739215445; cv=none; b=QvFEhrJV1ZDunIMLnk0z8LeOLMQR2J8Cgciz0FpKSwdqcUIJnxCNPq+qu/O8kVp+ReqTu7BRPkMMcLzunypbKHMFPiEOxHH00obced2FyDXEY6BsajyiDaWPu6vK9DJFs6bgI96veL/F6Z8+d8U3dDVrQIvq2exzbyg0z8o7Uvk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1739215446; c=relaxed/simple;
-	bh=DHm8J8wTrdl0jjc3aENsi2T5paPM24R06Dh1RF7hcgE=;
+	s=arc-20240116; t=1739215445; c=relaxed/simple;
+	bh=bvEKMpHjXaSJ0Xov9aIn4h6MBlLNB8ZOnO1UoYuK0js=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=aHqAU5fcvTaALKPpibk6bmtzkpjZmILLs/p05hdJVkR+UCyyrAP+mbMm1TMY5SKcN4284pqTUqjFccmIZqb040qT3Ge/A5fjfNN1fe6mjdjSJ8+ouiSBXZM1X5eEJ0jAj9PkYovjWnwV0SRL+h2lkp1x9s42nAmSAE5aSJaeehA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=UHNu3jCt; arc=none smtp.client-ip=198.175.65.18
+	 MIME-Version; b=sMRCf2JcL9a5Wq09GNeOa8XFLzADm6a1bvVqgEToiTwKeS6VdtBTwqCytH1WwwJEbRtxbiBud+IzrXlCilXnLk4zfWX9CiqFKscwbTtdpFQsUzZkyPWGJe5LBs9G7KZXXssO5cPDWTLnygVtA2oQoUSuUcY7kaA/v+qS3pSUOvU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=VXI/c/Qk; arc=none smtp.client-ip=198.175.65.18
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
@@ -36,26 +36,26 @@ DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   t=1739215443; x=1770751443;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=DHm8J8wTrdl0jjc3aENsi2T5paPM24R06Dh1RF7hcgE=;
-  b=UHNu3jCtJ4sQrDz+2iSzmmj/sDv6CufCD/JvPI8XSzgH3uMQaP9uYkL6
-   TjTag20PMhEvvJ4DAkdPa8bAdESxZ5AEnnTYb2aw9M2fcLSf1awC2DbZm
-   qFuoTOVHjMfWWHS7wGmm+j5BErQs8r6JoViOU5BNscMwMrUsmhjG4SHcO
-   jaHoomVo+FAWjsjwncUFlQK97lr5Enzm8Oir2I7TSzu1jo8sOmxk4mc/Q
-   ZIm32vN7qvAFxrb0fl5huqak+FJXlC3fkDbbpI7Sb2dvkQIPi6fGiUQH8
-   V3/8ouk1Dg68edQM91VfzrOIhs65iLUOZPAODDWB9+VtCY1yIaSWT6UZZ
-   w==;
-X-CSE-ConnectionGUID: cTgxwj70TG2A/Y4hUSZ+5A==
-X-CSE-MsgGUID: mJPx/Iz4QtSKl9ewF+XP5Q==
-X-IronPort-AV: E=McAfee;i="6700,10204,11314"; a="39929214"
+  bh=bvEKMpHjXaSJ0Xov9aIn4h6MBlLNB8ZOnO1UoYuK0js=;
+  b=VXI/c/QktTwvx5vXeqrDEHxJAQ2z00wGR3PnvlkHIFQZ5WJCZmS77F1n
+   OjgT0xrDayjEMyR3tUGgTxGtNPsehcubfdEPjo/P0R15LUnma0oifpXqD
+   jEHQyJbJX2+cKg2/KIwkTFOrNOclvPgcp11g3sQQQmJEp7sH4v9LPjE9J
+   NMUO/PjQ4LQ/XG16mFezKNxxqoVbh5LxQW5DWoDh2VquQQ5hn6SaNpA1+
+   6GyFC3Xmywh+mc9o0IArJ6NKQKnGQh1gM6WFsOr5ygISKqqk33aEXUpa+
+   XtSWs72yvM2rX7VjDJnyzJ8clbA2SbpDLUHa5mgcVKpEr8d9N4MYY/Z62
+   Q==;
+X-CSE-ConnectionGUID: 854po/p6RWSmlaTmNbQTDw==
+X-CSE-MsgGUID: kwEEiHTMSderj7S+ywYwWw==
+X-IronPort-AV: E=McAfee;i="6700,10204,11314"; a="39929221"
 X-IronPort-AV: E=Sophos;i="6.12,310,1728975600"; 
-   d="scan'208";a="39929214"
+   d="scan'208";a="39929221"
 Received: from orviesa007.jf.intel.com ([10.64.159.147])
   by orvoesa110.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 10 Feb 2025 11:24:01 -0800
-X-CSE-ConnectionGUID: cCEmhcQYQ2SMobs7HxetWw==
-X-CSE-MsgGUID: 4jx3rEBgTve9XODLR+WDhA==
+X-CSE-ConnectionGUID: S02RsMkJRf6nI/r3ee5BJA==
+X-CSE-MsgGUID: CE2hzCeNRC2GsHmF7tzNkQ==
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="6.12,224,1728975600"; 
-   d="scan'208";a="112733863"
+   d="scan'208";a="112733866"
 Received: from anguy11-upstream.jf.intel.com ([10.166.9.133])
   by orviesa007.jf.intel.com with ESMTP; 10 Feb 2025 11:24:01 -0800
 From: Tony Nguyen <anthony.l.nguyen@intel.com>
@@ -69,10 +69,11 @@ Cc: Karol Kolacinski <karol.kolacinski@intel.com>,
 	anthony.l.nguyen@intel.com,
 	richardcochran@gmail.com,
 	grzegorz.nitka@intel.com,
-	przemyslaw.kitszel@intel.com
-Subject: [PATCH net-next 02/10] ice: Remove unnecessary ice_is_e8xx() functions
-Date: Mon, 10 Feb 2025 11:23:40 -0800
-Message-ID: <20250210192352.3799673-3-anthony.l.nguyen@intel.com>
+	przemyslaw.kitszel@intel.com,
+	horms@kernel.org
+Subject: [PATCH net-next 03/10] ice: Use FIELD_PREP for timestamp values
+Date: Mon, 10 Feb 2025 11:23:41 -0800
+Message-ID: <20250210192352.3799673-4-anthony.l.nguyen@intel.com>
 X-Mailer: git-send-email 2.47.1
 In-Reply-To: <20250210192352.3799673-1-anthony.l.nguyen@intel.com>
 References: <20250210192352.3799673-1-anthony.l.nguyen@intel.com>
@@ -86,900 +87,81 @@ Content-Transfer-Encoding: 8bit
 
 From: Karol Kolacinski <karol.kolacinski@intel.com>
 
-Remove unnecessary ice_is_e8xx() functions and PHY model. Instead, use
-MAC type where applicable.
+Instead of using shifts and casts, use FIELD_PREP after reading 40b
+timestamp values.
 
-Don't check device type in ice_ptp_maybe_trigger_tx_interrupt(), because
-in reality it depends on the ready bitmap, which only E810 does not
-have.
+Rename a couple defines for better clarity and consistency.
 
-Call ice_ptp_cfg_phy_interrupt() unconditionally, because all further
-function calls check the MAC type anyway and this allows simpler code
-in the future with addition of the new MAC types.
-
-Reorder ICE_MAC_* cases in switches in ice_ptp* as in enum ice_mac_type.
-
+Reviewed-by: Simon Horman <horms@kernel.org>
 Signed-off-by: Karol Kolacinski <karol.kolacinski@intel.com>
 Tested-by: Pucha Himasekhar Reddy <himasekharx.reddy.pucha@intel.com> (A Contingent worker at Intel)
 Signed-off-by: Tony Nguyen <anthony.l.nguyen@intel.com>
 ---
- drivers/net/ethernet/intel/ice/ice.h        |   5 -
- drivers/net/ethernet/intel/ice/ice_common.c | 118 +---------------
- drivers/net/ethernet/intel/ice/ice_common.h |   5 -
- drivers/net/ethernet/intel/ice/ice_ddp.c    |   4 +-
- drivers/net/ethernet/intel/ice/ice_ptp.c    | 133 +++++++++---------
- drivers/net/ethernet/intel/ice/ice_ptp_hw.c | 142 ++++++++++----------
- drivers/net/ethernet/intel/ice/ice_ptp_hw.h |  10 +-
- drivers/net/ethernet/intel/ice/ice_type.h   |   9 --
- 8 files changed, 147 insertions(+), 279 deletions(-)
+ drivers/net/ethernet/intel/ice/ice_ptp_hw.c | 11 ++++++-----
+ drivers/net/ethernet/intel/ice/ice_ptp_hw.h |  9 +++++----
+ 2 files changed, 11 insertions(+), 9 deletions(-)
 
-diff --git a/drivers/net/ethernet/intel/ice/ice.h b/drivers/net/ethernet/intel/ice/ice.h
-index 2a6de2115193..c9104b13e1d2 100644
---- a/drivers/net/ethernet/intel/ice/ice.h
-+++ b/drivers/net/ethernet/intel/ice/ice.h
-@@ -1046,10 +1046,5 @@ static inline void ice_clear_rdma_cap(struct ice_pf *pf)
- 	clear_bit(ICE_FLAG_RDMA_ENA, pf->flags);
- }
- 
--static inline enum ice_phy_model ice_get_phy_model(const struct ice_hw *hw)
--{
--	return hw->ptp.phy_model;
--}
--
- extern const struct xdp_metadata_ops ice_xdp_md_ops;
- #endif /* _ICE_H_ */
-diff --git a/drivers/net/ethernet/intel/ice/ice_common.c b/drivers/net/ethernet/intel/ice/ice_common.c
-index b61a50fda533..aaa592ffd2d8 100644
---- a/drivers/net/ethernet/intel/ice/ice_common.c
-+++ b/drivers/net/ethernet/intel/ice/ice_common.c
-@@ -186,7 +186,7 @@ static int ice_set_mac_type(struct ice_hw *hw)
-  * ice_is_generic_mac - check if device's mac_type is generic
-  * @hw: pointer to the hardware structure
-  *
-- * Return: true if mac_type is generic (with SBQ support), false if not
-+ * Return: true if mac_type is ICE_MAC_GENERIC*, false otherwise.
-  */
- bool ice_is_generic_mac(struct ice_hw *hw)
- {
-@@ -194,120 +194,6 @@ bool ice_is_generic_mac(struct ice_hw *hw)
- 		hw->mac_type == ICE_MAC_GENERIC_3K_E825);
- }
- 
--/**
-- * ice_is_e810
-- * @hw: pointer to the hardware structure
-- *
-- * returns true if the device is E810 based, false if not.
-- */
--bool ice_is_e810(struct ice_hw *hw)
--{
--	return hw->mac_type == ICE_MAC_E810;
--}
--
--/**
-- * ice_is_e810t
-- * @hw: pointer to the hardware structure
-- *
-- * returns true if the device is E810T based, false if not.
-- */
--bool ice_is_e810t(struct ice_hw *hw)
--{
--	switch (hw->device_id) {
--	case ICE_DEV_ID_E810C_SFP:
--		switch (hw->subsystem_device_id) {
--		case ICE_SUBDEV_ID_E810T:
--		case ICE_SUBDEV_ID_E810T2:
--		case ICE_SUBDEV_ID_E810T3:
--		case ICE_SUBDEV_ID_E810T4:
--		case ICE_SUBDEV_ID_E810T6:
--		case ICE_SUBDEV_ID_E810T7:
--			return true;
--		}
--		break;
--	case ICE_DEV_ID_E810C_QSFP:
--		switch (hw->subsystem_device_id) {
--		case ICE_SUBDEV_ID_E810T2:
--		case ICE_SUBDEV_ID_E810T3:
--		case ICE_SUBDEV_ID_E810T5:
--			return true;
--		}
--		break;
--	default:
--		break;
--	}
--
--	return false;
--}
--
--/**
-- * ice_is_e822 - Check if a device is E822 family device
-- * @hw: pointer to the hardware structure
-- *
-- * Return: true if the device is E822 based, false if not.
-- */
--bool ice_is_e822(struct ice_hw *hw)
--{
--	switch (hw->device_id) {
--	case ICE_DEV_ID_E822C_BACKPLANE:
--	case ICE_DEV_ID_E822C_QSFP:
--	case ICE_DEV_ID_E822C_SFP:
--	case ICE_DEV_ID_E822C_10G_BASE_T:
--	case ICE_DEV_ID_E822C_SGMII:
--	case ICE_DEV_ID_E822L_BACKPLANE:
--	case ICE_DEV_ID_E822L_SFP:
--	case ICE_DEV_ID_E822L_10G_BASE_T:
--	case ICE_DEV_ID_E822L_SGMII:
--		return true;
--	default:
--		return false;
--	}
--}
--
--/**
-- * ice_is_e823
-- * @hw: pointer to the hardware structure
-- *
-- * returns true if the device is E823-L or E823-C based, false if not.
-- */
--bool ice_is_e823(struct ice_hw *hw)
--{
--	switch (hw->device_id) {
--	case ICE_DEV_ID_E823L_BACKPLANE:
--	case ICE_DEV_ID_E823L_SFP:
--	case ICE_DEV_ID_E823L_10G_BASE_T:
--	case ICE_DEV_ID_E823L_1GBE:
--	case ICE_DEV_ID_E823L_QSFP:
--	case ICE_DEV_ID_E823C_BACKPLANE:
--	case ICE_DEV_ID_E823C_QSFP:
--	case ICE_DEV_ID_E823C_SFP:
--	case ICE_DEV_ID_E823C_10G_BASE_T:
--	case ICE_DEV_ID_E823C_SGMII:
--		return true;
--	default:
--		return false;
--	}
--}
--
--/**
-- * ice_is_e825c - Check if a device is E825C family device
-- * @hw: pointer to the hardware structure
-- *
-- * Return: true if the device is E825-C based, false if not.
-- */
--bool ice_is_e825c(struct ice_hw *hw)
--{
--	switch (hw->device_id) {
--	case ICE_DEV_ID_E825C_BACKPLANE:
--	case ICE_DEV_ID_E825C_QSFP:
--	case ICE_DEV_ID_E825C_SFP:
--	case ICE_DEV_ID_E825C_SGMII:
--		return true;
--	default:
--		return false;
--	}
--}
--
- /**
-  * ice_is_pf_c827 - check if pf contains c827 phy
-  * @hw: pointer to the hw struct
-@@ -2408,7 +2294,7 @@ ice_parse_1588_func_caps(struct ice_hw *hw, struct ice_hw_func_caps *func_p,
- 	info->tmr_index_owned = ((number & ICE_TS_TMR_IDX_OWND_M) != 0);
- 	info->tmr_index_assoc = ((number & ICE_TS_TMR_IDX_ASSOC_M) != 0);
- 
--	if (!ice_is_e825c(hw)) {
-+	if (hw->mac_type != ICE_MAC_GENERIC_3K_E825) {
- 		info->clk_freq = FIELD_GET(ICE_TS_CLK_FREQ_M, number);
- 		info->clk_src = ((number & ICE_TS_CLK_SRC_M) != 0);
- 	} else {
-diff --git a/drivers/net/ethernet/intel/ice/ice_common.h b/drivers/net/ethernet/intel/ice/ice_common.h
-index 54a8692839dd..9b00aa0ddf10 100644
---- a/drivers/net/ethernet/intel/ice/ice_common.h
-+++ b/drivers/net/ethernet/intel/ice/ice_common.h
-@@ -131,7 +131,6 @@ int
- ice_aq_manage_mac_write(struct ice_hw *hw, const u8 *mac_addr, u8 flags,
- 			struct ice_sq_cd *cd);
- bool ice_is_generic_mac(struct ice_hw *hw);
--bool ice_is_e810(struct ice_hw *hw);
- int ice_clear_pf_cfg(struct ice_hw *hw);
- int
- ice_aq_set_phy_cfg(struct ice_hw *hw, struct ice_port_info *pi,
-@@ -276,10 +275,6 @@ ice_stat_update40(struct ice_hw *hw, u32 reg, bool prev_stat_loaded,
- void
- ice_stat_update32(struct ice_hw *hw, u32 reg, bool prev_stat_loaded,
- 		  u64 *prev_stat, u64 *cur_stat);
--bool ice_is_e810t(struct ice_hw *hw);
--bool ice_is_e822(struct ice_hw *hw);
--bool ice_is_e823(struct ice_hw *hw);
--bool ice_is_e825c(struct ice_hw *hw);
- int
- ice_sched_query_elem(struct ice_hw *hw, u32 node_teid,
- 		     struct ice_aqc_txsched_elem_data *buf);
-diff --git a/drivers/net/ethernet/intel/ice/ice_ddp.c b/drivers/net/ethernet/intel/ice/ice_ddp.c
-index 03988be03729..69d5b1a28491 100644
---- a/drivers/net/ethernet/intel/ice/ice_ddp.c
-+++ b/drivers/net/ethernet/intel/ice/ice_ddp.c
-@@ -2345,14 +2345,14 @@ ice_get_set_tx_topo(struct ice_hw *hw, u8 *buf, u16 buf_size,
- 			cmd->set_flags |= ICE_AQC_TX_TOPO_FLAGS_SRC_RAM |
- 					  ICE_AQC_TX_TOPO_FLAGS_LOAD_NEW;
- 
--		if (ice_is_e825c(hw))
-+		if (hw->mac_type == ICE_MAC_GENERIC_3K_E825)
- 			desc.flags |= cpu_to_le16(ICE_AQ_FLAG_RD);
- 	} else {
- 		ice_fill_dflt_direct_cmd_desc(&desc, ice_aqc_opc_get_tx_topo);
- 		cmd->get_flags = ICE_AQC_TX_TOPO_GET_RAM;
- 	}
- 
--	if (!ice_is_e825c(hw))
-+	if (hw->mac_type != ICE_MAC_GENERIC_3K_E825)
- 		desc.flags |= cpu_to_le16(ICE_AQ_FLAG_RD);
- 
- 	status = ice_aq_send_cmd(hw, &desc, buf, buf_size, cd);
-diff --git a/drivers/net/ethernet/intel/ice/ice_ptp.c b/drivers/net/ethernet/intel/ice/ice_ptp.c
-index e26320ce52ca..7bb4005a67f6 100644
---- a/drivers/net/ethernet/intel/ice/ice_ptp.c
-+++ b/drivers/net/ethernet/intel/ice/ice_ptp.c
-@@ -1318,20 +1318,20 @@ ice_ptp_port_phy_stop(struct ice_ptp_port *ptp_port)
- 	struct ice_hw *hw = &pf->hw;
- 	int err;
- 
--	if (ice_is_e810(hw))
--		return 0;
--
- 	mutex_lock(&ptp_port->ps_lock);
- 
--	switch (ice_get_phy_model(hw)) {
--	case ICE_PHY_ETH56G:
--		err = ice_stop_phy_timer_eth56g(hw, port, true);
-+	switch (hw->mac_type) {
-+	case ICE_MAC_E810:
-+		err = 0;
- 		break;
--	case ICE_PHY_E82X:
-+	case ICE_MAC_GENERIC:
- 		kthread_cancel_delayed_work_sync(&ptp_port->ov_work);
- 
- 		err = ice_stop_phy_timer_e82x(hw, port, true);
- 		break;
-+	case ICE_MAC_GENERIC_3K_E825:
-+		err = ice_stop_phy_timer_eth56g(hw, port, true);
-+		break;
- 	default:
- 		err = -ENODEV;
- 	}
-@@ -1361,19 +1361,16 @@ ice_ptp_port_phy_restart(struct ice_ptp_port *ptp_port)
- 	unsigned long flags;
- 	int err;
- 
--	if (ice_is_e810(hw))
--		return 0;
--
- 	if (!ptp_port->link_up)
- 		return ice_ptp_port_phy_stop(ptp_port);
- 
- 	mutex_lock(&ptp_port->ps_lock);
- 
--	switch (ice_get_phy_model(hw)) {
--	case ICE_PHY_ETH56G:
--		err = ice_start_phy_timer_eth56g(hw, port);
-+	switch (hw->mac_type) {
-+	case ICE_MAC_E810:
-+		err = 0;
- 		break;
--	case ICE_PHY_E82X:
-+	case ICE_MAC_GENERIC:
- 		/* Start the PHY timer in Vernier mode */
- 		kthread_cancel_delayed_work_sync(&ptp_port->ov_work);
- 
-@@ -1398,6 +1395,9 @@ ice_ptp_port_phy_restart(struct ice_ptp_port *ptp_port)
- 		kthread_queue_delayed_work(pf->ptp.kworker, &ptp_port->ov_work,
- 					   0);
- 		break;
-+	case ICE_MAC_GENERIC_3K_E825:
-+		err = ice_start_phy_timer_eth56g(hw, port);
-+		break;
- 	default:
- 		err = -ENODEV;
- 	}
-@@ -1432,12 +1432,13 @@ void ice_ptp_link_change(struct ice_pf *pf, bool linkup)
- 	/* Skip HW writes if reset is in progress */
- 	if (pf->hw.reset_ongoing)
- 		return;
--	switch (ice_get_phy_model(hw)) {
--	case ICE_PHY_E810:
-+
-+	switch (hw->mac_type) {
-+	case ICE_MAC_E810:
- 		/* Do not reconfigure E810 PHY */
- 		return;
--	case ICE_PHY_ETH56G:
--	case ICE_PHY_E82X:
-+	case ICE_MAC_GENERIC:
-+	case ICE_MAC_GENERIC_3K_E825:
- 		ice_ptp_port_phy_restart(ptp_port);
- 		return;
- 	default:
-@@ -1465,46 +1466,44 @@ static int ice_ptp_cfg_phy_interrupt(struct ice_pf *pf, bool ena, u32 threshold)
- 
- 	ice_ptp_reset_ts_memory(hw);
- 
--	switch (ice_get_phy_model(hw)) {
--	case ICE_PHY_ETH56G: {
--		int port;
-+	switch (hw->mac_type) {
-+	case ICE_MAC_E810:
-+		return 0;
-+	case ICE_MAC_GENERIC: {
-+		int quad;
- 
--		for (port = 0; port < hw->ptp.num_lports; port++) {
-+		for (quad = 0; quad < ICE_GET_QUAD_NUM(hw->ptp.num_lports);
-+		     quad++) {
- 			int err;
- 
--			err = ice_phy_cfg_intr_eth56g(hw, port, ena, threshold);
-+			err = ice_phy_cfg_intr_e82x(hw, quad, ena, threshold);
- 			if (err) {
--				dev_err(dev, "Failed to configure PHY interrupt for port %d, err %d\n",
--					port, err);
-+				dev_err(dev, "Failed to configure PHY interrupt for quad %d, err %d\n",
-+					quad, err);
- 				return err;
- 			}
- 		}
- 
- 		return 0;
- 	}
--	case ICE_PHY_E82X: {
--		int quad;
-+	case ICE_MAC_GENERIC_3K_E825: {
-+		int port;
- 
--		for (quad = 0; quad < ICE_GET_QUAD_NUM(hw->ptp.num_lports);
--		     quad++) {
-+		for (port = 0; port < hw->ptp.num_lports; port++) {
- 			int err;
- 
--			err = ice_phy_cfg_intr_e82x(hw, quad, ena, threshold);
-+			err = ice_phy_cfg_intr_eth56g(hw, port, ena, threshold);
- 			if (err) {
--				dev_err(dev, "Failed to configure PHY interrupt for quad %d, err %d\n",
--					quad, err);
-+				dev_err(dev, "Failed to configure PHY interrupt for port %d, err %d\n",
-+					port, err);
- 				return err;
- 			}
- 		}
- 
- 		return 0;
- 	}
--	case ICE_PHY_E810:
--		return 0;
--	case ICE_PHY_UNSUP:
-+	case ICE_MAC_UNKNOWN:
- 	default:
--		dev_warn(dev, "%s: Unexpected PHY model %d\n", __func__,
--			 ice_get_phy_model(hw));
- 		return -EOPNOTSUPP;
- 	}
- }
-@@ -1740,7 +1739,7 @@ static int ice_ptp_write_perout(struct ice_hw *hw, unsigned int chan,
- 	/* 0. Reset mode & out_en in AUX_OUT */
- 	wr32(hw, GLTSYN_AUX_OUT(chan, tmr_idx), 0);
- 
--	if (ice_is_e825c(hw)) {
-+	if (hw->mac_type == ICE_MAC_GENERIC_3K_E825) {
- 		int err;
- 
- 		/* Enable/disable CGU 1PPS output for E825C */
-@@ -1824,7 +1823,7 @@ static int ice_ptp_cfg_perout(struct ice_pf *pf, struct ptp_perout_request *rq,
- 		return ice_ptp_write_perout(hw, rq->index, gpio_pin, 0, 0);
- 
- 	if (strncmp(pf->ptp.pin_desc[pin_desc_idx].name, "1PPS", 64) == 0 &&
--	    period != NSEC_PER_SEC && hw->ptp.phy_model == ICE_PHY_E82X) {
-+	    period != NSEC_PER_SEC && hw->mac_type == ICE_MAC_GENERIC) {
- 		dev_err(ice_pf_to_dev(pf), "1PPS pin supports only 1 s period\n");
- 		return -EOPNOTSUPP;
- 	}
-@@ -2078,7 +2077,7 @@ ice_ptp_settime64(struct ptp_clock_info *info, const struct timespec64 *ts)
- 	/* For Vernier mode on E82X, we need to recalibrate after new settime.
- 	 * Start with marking timestamps as invalid.
- 	 */
--	if (ice_get_phy_model(hw) == ICE_PHY_E82X) {
-+	if (hw->mac_type == ICE_MAC_GENERIC) {
- 		err = ice_ptp_clear_phy_offset_ready_e82x(hw);
- 		if (err)
- 			dev_warn(ice_pf_to_dev(pf), "Failed to mark timestamps as invalid before settime\n");
-@@ -2102,7 +2101,7 @@ ice_ptp_settime64(struct ptp_clock_info *info, const struct timespec64 *ts)
- 	ice_ptp_enable_all_perout(pf);
- 
- 	/* Recalibrate and re-enable timestamp blocks for E822/E823 */
--	if (ice_get_phy_model(hw) == ICE_PHY_E82X)
-+	if (hw->mac_type == ICE_MAC_GENERIC)
- 		ice_ptp_restart_all_phy(pf);
- exit:
- 	if (err) {
-@@ -2556,7 +2555,7 @@ static void ice_ptp_set_funcs_e82x(struct ice_pf *pf)
- 		pf->ptp.info.getcrosststamp = ice_ptp_getcrosststamp_e82x;
- 
- #endif /* CONFIG_ICE_HWTS */
--	if (ice_is_e825c(&pf->hw)) {
-+	if (pf->hw.mac_type == ICE_MAC_GENERIC_3K_E825) {
- 		pf->ptp.ice_pin_desc = ice_pin_desc_e825c;
- 		pf->ptp.info.n_pins = ICE_PIN_DESC_ARR_LEN(ice_pin_desc_e825c);
- 	} else {
-@@ -2644,10 +2643,17 @@ static void ice_ptp_set_caps(struct ice_pf *pf)
- 	info->enable = ice_ptp_gpio_enable;
- 	info->verify = ice_verify_pin;
- 
--	if (ice_is_e810(&pf->hw))
-+	switch (pf->hw.mac_type) {
-+	case ICE_MAC_E810:
- 		ice_ptp_set_funcs_e810(pf);
--	else
-+		return;
-+	case ICE_MAC_GENERIC:
-+	case ICE_MAC_GENERIC_3K_E825:
- 		ice_ptp_set_funcs_e82x(pf);
-+		return;
-+	default:
-+		return;
-+	}
- }
- 
- /**
-@@ -2777,7 +2783,7 @@ static void ice_ptp_maybe_trigger_tx_interrupt(struct ice_pf *pf)
- 	bool trigger_oicr = false;
- 	unsigned int i;
- 
--	if (ice_is_e810(hw))
-+	if (!pf->ptp.port.tx.has_ready_bitmap)
- 		return;
- 
- 	if (!ice_pf_src_tmr_owned(pf))
-@@ -2912,14 +2918,12 @@ static int ice_ptp_rebuild_owner(struct ice_pf *pf)
- 	 */
- 	ice_ptp_flush_all_tx_tracker(pf);
- 
--	if (!ice_is_e810(hw)) {
--		/* Enable quad interrupts */
--		err = ice_ptp_cfg_phy_interrupt(pf, true, 1);
--		if (err)
--			return err;
-+	/* Enable quad interrupts */
-+	err = ice_ptp_cfg_phy_interrupt(pf, true, 1);
-+	if (err)
-+		return err;
- 
--		ice_ptp_restart_all_phy(pf);
--	}
-+	ice_ptp_restart_all_phy(pf);
- 
- 	/* Re-enable all periodic outputs and external timestamp events */
- 	ice_ptp_enable_all_perout(pf);
-@@ -2971,8 +2975,9 @@ void ice_ptp_rebuild(struct ice_pf *pf, enum ice_reset_req reset_type)
- 
- static bool ice_is_primary(struct ice_hw *hw)
- {
--	return ice_is_e825c(hw) && ice_is_dual(hw) ?
--		!!(hw->dev_caps.nac_topo.mode & ICE_NAC_TOPO_PRIMARY_M) : true;
-+	return hw->mac_type == ICE_MAC_GENERIC_3K_E825 && ice_is_dual(hw) ?
-+		       !!(hw->dev_caps.nac_topo.mode & ICE_NAC_TOPO_PRIMARY_M) :
-+		       true;
- }
- 
- static int ice_ptp_setup_adapter(struct ice_pf *pf)
-@@ -2990,7 +2995,7 @@ static int ice_ptp_setup_pf(struct ice_pf *pf)
- 	struct ice_ptp *ctrl_ptp = ice_get_ctrl_ptp(pf);
- 	struct ice_ptp *ptp = &pf->ptp;
- 
--	if (WARN_ON(!ctrl_ptp) || ice_get_phy_model(&pf->hw) == ICE_PHY_UNSUP)
-+	if (WARN_ON(!ctrl_ptp) || pf->hw.mac_type == ICE_MAC_UNKNOWN)
- 		return -ENODEV;
- 
- 	INIT_LIST_HEAD(&ptp->port.list_node);
-@@ -3007,7 +3012,7 @@ static void ice_ptp_cleanup_pf(struct ice_pf *pf)
- {
- 	struct ice_ptp *ptp = &pf->ptp;
- 
--	if (ice_get_phy_model(&pf->hw) != ICE_PHY_UNSUP) {
-+	if (pf->hw.mac_type != ICE_MAC_UNKNOWN) {
- 		mutex_lock(&pf->adapter->ports.lock);
- 		list_del(&ptp->port.list_node);
- 		mutex_unlock(&pf->adapter->ports.lock);
-@@ -3134,18 +3139,18 @@ static int ice_ptp_init_port(struct ice_pf *pf, struct ice_ptp_port *ptp_port)
- 
- 	mutex_init(&ptp_port->ps_lock);
- 
--	switch (ice_get_phy_model(hw)) {
--	case ICE_PHY_ETH56G:
--		return ice_ptp_init_tx_eth56g(pf, &ptp_port->tx,
--					      ptp_port->port_num);
--	case ICE_PHY_E810:
-+	switch (hw->mac_type) {
-+	case ICE_MAC_E810:
- 		return ice_ptp_init_tx_e810(pf, &ptp_port->tx);
--	case ICE_PHY_E82X:
-+	case ICE_MAC_GENERIC:
- 		kthread_init_delayed_work(&ptp_port->ov_work,
- 					  ice_ptp_wait_for_offsets);
- 
- 		return ice_ptp_init_tx_e82x(pf, &ptp_port->tx,
- 					    ptp_port->port_num);
-+	case ICE_MAC_GENERIC_3K_E825:
-+		return ice_ptp_init_tx_eth56g(pf, &ptp_port->tx,
-+					      ptp_port->port_num);
- 	default:
- 		return -ENODEV;
- 	}
-@@ -3162,8 +3167,8 @@ static int ice_ptp_init_port(struct ice_pf *pf, struct ice_ptp_port *ptp_port)
-  */
- static void ice_ptp_init_tx_interrupt_mode(struct ice_pf *pf)
- {
--	switch (ice_get_phy_model(&pf->hw)) {
--	case ICE_PHY_E82X:
-+	switch (pf->hw.mac_type) {
-+	case ICE_MAC_GENERIC:
- 		/* E822 based PHY has the clock owner process the interrupt
- 		 * for all ports.
- 		 */
 diff --git a/drivers/net/ethernet/intel/ice/ice_ptp_hw.c b/drivers/net/ethernet/intel/ice/ice_ptp_hw.c
-index 53ce40fa2fe6..8475d422f1ec 100644
+index 8475d422f1ec..a2a666e6df86 100644
 --- a/drivers/net/ethernet/intel/ice/ice_ptp_hw.c
 +++ b/drivers/net/ethernet/intel/ice/ice_ptp_hw.c
-@@ -746,7 +746,7 @@ static int ice_init_cgu_e82x(struct ice_hw *hw)
- 	int err;
- 
- 	/* Disable sticky lock detection so lock err reported is accurate */
--	if (ice_is_e825c(hw))
-+	if (hw->mac_type == ICE_MAC_GENERIC_3K_E825)
- 		err = ice_cfg_cgu_pll_dis_sticky_bits_e825c(hw);
- 	else
- 		err = ice_cfg_cgu_pll_dis_sticky_bits_e82x(hw);
-@@ -756,7 +756,7 @@ static int ice_init_cgu_e82x(struct ice_hw *hw)
- 	/* Configure the CGU PLL using the parameters from the function
- 	 * capabilities.
+@@ -1576,9 +1576,8 @@ static int ice_read_ptp_tstamp_eth56g(struct ice_hw *hw, u8 port, u8 idx,
+ 	 * lower 8 bits in the low register, and the upper 32 bits in the high
+ 	 * register.
  	 */
--	if (ice_is_e825c(hw))
-+	if (hw->mac_type == ICE_MAC_GENERIC_3K_E825)
- 		err = ice_cfg_cgu_pll_e825c(hw, ts_info->time_ref,
- 					    (enum ice_clk_src)ts_info->clk_src);
- 	else
-@@ -827,8 +827,8 @@ static u32 ice_ptp_tmr_cmd_to_port_reg(struct ice_hw *hw,
- 	/* Certain hardware families share the same register values for the
- 	 * port register and source timer register.
+-	*tstamp = FIELD_PREP(TS_PHY_HIGH_M, hi) |
+-		  FIELD_PREP(TS_PHY_LOW_M, lo);
+-
++	*tstamp = FIELD_PREP(PHY_40B_HIGH_M, hi) |
++		  FIELD_PREP(PHY_40B_LOW_M, lo);
+ 	return 0;
+ }
+ 
+@@ -3213,7 +3212,8 @@ ice_read_phy_tstamp_e82x(struct ice_hw *hw, u8 quad, u8 idx, u64 *tstamp)
+ 	 * lower 8 bits in the low register, and the upper 32 bits in the high
+ 	 * register.
  	 */
--	switch (ice_get_phy_model(hw)) {
--	case ICE_PHY_E810:
-+	switch (hw->mac_type) {
-+	case ICE_MAC_E810:
- 		return ice_ptp_tmr_cmd_to_src_reg(hw, cmd) & TS_CMD_MASK_E810;
- 	default:
- 		break;
-@@ -2729,10 +2729,7 @@ static void ice_ptp_init_phy_e825(struct ice_hw *hw)
- {
- 	struct ice_ptp_hw *ptp = &hw->ptp;
- 	struct ice_eth56g_params *params;
--	u32 phy_rev;
--	int err;
+-	*tstamp = FIELD_PREP(TS_PHY_HIGH_M, hi) | FIELD_PREP(TS_PHY_LOW_M, lo);
++	*tstamp = FIELD_PREP(PHY_40B_HIGH_M, hi) |
++		  FIELD_PREP(PHY_40B_LOW_M, lo);
  
--	ptp->phy_model = ICE_PHY_ETH56G;
- 	params = &ptp->phy.eth56g;
- 	params->onestep_ena = false;
- 	params->peer_delay = 0;
-@@ -2742,9 +2739,6 @@ static void ice_ptp_init_phy_e825(struct ice_hw *hw)
- 	ptp->num_lports = params->num_phys * ptp->ports_per_phy;
- 
- 	ice_sb_access_ena_eth56g(hw, true);
--	err = ice_read_phy_eth56g(hw, hw->pf_id, PHY_REG_REVISION, &phy_rev);
--	if (err || phy_rev != PHY_REVISION_ETH56G)
--		ptp->phy_model = ICE_PHY_UNSUP;
+ 	return 0;
  }
+@@ -4979,7 +4979,8 @@ ice_read_phy_tstamp_e810(struct ice_hw *hw, u8 lport, u8 idx, u64 *tstamp)
+ 	/* For E810 devices, the timestamp is reported with the lower 32 bits
+ 	 * in the low register, and the upper 8 bits in the high register.
+ 	 */
+-	*tstamp = ((u64)hi) << TS_HIGH_S | ((u64)lo & TS_LOW_M);
++	*tstamp = FIELD_PREP(PHY_EXT_40B_HIGH_M, hi) |
++		  FIELD_PREP(PHY_EXT_40B_LOW_M, lo);
  
- /* E822 family functions
-@@ -4792,7 +4786,6 @@ int ice_phy_cfg_intr_e82x(struct ice_hw *hw, u8 quad, bool ena, u8 threshold)
-  */
- static void ice_ptp_init_phy_e82x(struct ice_ptp_hw *ptp)
- {
--	ptp->phy_model = ICE_PHY_E82X;
- 	ptp->num_lports = 8;
- 	ptp->ports_per_phy = 8;
+ 	return 0;
  }
-@@ -5445,7 +5438,6 @@ int ice_ptp_read_sdp_ac(struct ice_hw *hw, __le16 *entries, uint *num_entries)
-  */
- static void ice_ptp_init_phy_e810(struct ice_ptp_hw *ptp)
- {
--	ptp->phy_model = ICE_PHY_E810;
- 	ptp->num_lports = 8;
- 	ptp->ports_per_phy = 4;
- 
-@@ -5454,9 +5446,8 @@ static void ice_ptp_init_phy_e810(struct ice_ptp_hw *ptp)
- 
- /* Device agnostic functions
-  *
-- * The following functions implement shared behavior common to both E822 and
-- * E810 devices, possibly calling a device specific implementation where
-- * necessary.
-+ * The following functions implement shared behavior common to all devices,
-+ * possibly calling a device specific implementation where necessary.
-  */
- 
- /**
-@@ -5519,14 +5510,19 @@ void ice_ptp_init_hw(struct ice_hw *hw)
- {
- 	struct ice_ptp_hw *ptp = &hw->ptp;
- 
--	if (ice_is_e822(hw) || ice_is_e823(hw))
--		ice_ptp_init_phy_e82x(ptp);
--	else if (ice_is_e810(hw))
-+	switch (hw->mac_type) {
-+	case ICE_MAC_E810:
- 		ice_ptp_init_phy_e810(ptp);
--	else if (ice_is_e825c(hw))
-+		break;
-+	case ICE_MAC_GENERIC:
-+		ice_ptp_init_phy_e82x(ptp);
-+		break;
-+	case ICE_MAC_GENERIC_3K_E825:
- 		ice_ptp_init_phy_e825(hw);
--	else
--		ptp->phy_model = ICE_PHY_UNSUP;
-+		break;
-+	default:
-+		return;
-+	}
- }
- 
- /**
-@@ -5547,11 +5543,11 @@ void ice_ptp_init_hw(struct ice_hw *hw)
- static int ice_ptp_write_port_cmd(struct ice_hw *hw, u8 port,
- 				  enum ice_ptp_tmr_cmd cmd)
- {
--	switch (ice_get_phy_model(hw)) {
--	case ICE_PHY_ETH56G:
--		return ice_ptp_write_port_cmd_eth56g(hw, port, cmd);
--	case ICE_PHY_E82X:
-+	switch (hw->mac_type) {
-+	case ICE_MAC_GENERIC:
- 		return ice_ptp_write_port_cmd_e82x(hw, port, cmd);
-+	case ICE_MAC_GENERIC_3K_E825:
-+		return ice_ptp_write_port_cmd_eth56g(hw, port, cmd);
- 	default:
- 		return -EOPNOTSUPP;
- 	}
-@@ -5612,8 +5608,8 @@ static int ice_ptp_port_cmd(struct ice_hw *hw, enum ice_ptp_tmr_cmd cmd)
- 	u32 port;
- 
- 	/* PHY models which can program all ports simultaneously */
--	switch (ice_get_phy_model(hw)) {
--	case ICE_PHY_E810:
-+	switch (hw->mac_type) {
-+	case ICE_MAC_E810:
- 		return ice_ptp_port_cmd_e810(hw, cmd);
- 	default:
- 		break;
-@@ -5691,17 +5687,17 @@ int ice_ptp_init_time(struct ice_hw *hw, u64 time)
- 
- 	/* PHY timers */
- 	/* Fill Rx and Tx ports and send msg to PHY */
--	switch (ice_get_phy_model(hw)) {
--	case ICE_PHY_ETH56G:
--		err = ice_ptp_prep_phy_time_eth56g(hw,
--						   (u32)(time & 0xFFFFFFFF));
--		break;
--	case ICE_PHY_E810:
-+	switch (hw->mac_type) {
-+	case ICE_MAC_E810:
- 		err = ice_ptp_prep_phy_time_e810(hw, time & 0xFFFFFFFF);
- 		break;
--	case ICE_PHY_E82X:
-+	case ICE_MAC_GENERIC:
- 		err = ice_ptp_prep_phy_time_e82x(hw, time & 0xFFFFFFFF);
- 		break;
-+	case ICE_MAC_GENERIC_3K_E825:
-+		err = ice_ptp_prep_phy_time_eth56g(hw,
-+						   (u32)(time & 0xFFFFFFFF));
-+		break;
- 	default:
- 		err = -EOPNOTSUPP;
- 	}
-@@ -5737,16 +5733,16 @@ int ice_ptp_write_incval(struct ice_hw *hw, u64 incval)
- 	wr32(hw, GLTSYN_SHADJ_L(tmr_idx), lower_32_bits(incval));
- 	wr32(hw, GLTSYN_SHADJ_H(tmr_idx), upper_32_bits(incval));
- 
--	switch (ice_get_phy_model(hw)) {
--	case ICE_PHY_ETH56G:
--		err = ice_ptp_prep_phy_incval_eth56g(hw, incval);
--		break;
--	case ICE_PHY_E810:
-+	switch (hw->mac_type) {
-+	case ICE_MAC_E810:
- 		err = ice_ptp_prep_phy_incval_e810(hw, incval);
- 		break;
--	case ICE_PHY_E82X:
-+	case ICE_MAC_GENERIC:
- 		err = ice_ptp_prep_phy_incval_e82x(hw, incval);
- 		break;
-+	case ICE_MAC_GENERIC_3K_E825:
-+		err = ice_ptp_prep_phy_incval_eth56g(hw, incval);
-+		break;
- 	default:
- 		err = -EOPNOTSUPP;
- 	}
-@@ -5806,16 +5802,16 @@ int ice_ptp_adj_clock(struct ice_hw *hw, s32 adj)
- 	wr32(hw, GLTSYN_SHADJ_L(tmr_idx), 0);
- 	wr32(hw, GLTSYN_SHADJ_H(tmr_idx), adj);
- 
--	switch (ice_get_phy_model(hw)) {
--	case ICE_PHY_ETH56G:
--		err = ice_ptp_prep_phy_adj_eth56g(hw, adj);
--		break;
--	case ICE_PHY_E810:
-+	switch (hw->mac_type) {
-+	case ICE_MAC_E810:
- 		err = ice_ptp_prep_phy_adj_e810(hw, adj);
- 		break;
--	case ICE_PHY_E82X:
-+	case ICE_MAC_GENERIC:
- 		err = ice_ptp_prep_phy_adj_e82x(hw, adj);
- 		break;
-+	case ICE_MAC_GENERIC_3K_E825:
-+		err = ice_ptp_prep_phy_adj_eth56g(hw, adj);
-+		break;
- 	default:
- 		err = -EOPNOTSUPP;
- 	}
-@@ -5839,13 +5835,13 @@ int ice_ptp_adj_clock(struct ice_hw *hw, s32 adj)
-  */
- int ice_read_phy_tstamp(struct ice_hw *hw, u8 block, u8 idx, u64 *tstamp)
- {
--	switch (ice_get_phy_model(hw)) {
--	case ICE_PHY_ETH56G:
--		return ice_read_ptp_tstamp_eth56g(hw, block, idx, tstamp);
--	case ICE_PHY_E810:
-+	switch (hw->mac_type) {
-+	case ICE_MAC_E810:
- 		return ice_read_phy_tstamp_e810(hw, block, idx, tstamp);
--	case ICE_PHY_E82X:
-+	case ICE_MAC_GENERIC:
- 		return ice_read_phy_tstamp_e82x(hw, block, idx, tstamp);
-+	case ICE_MAC_GENERIC_3K_E825:
-+		return ice_read_ptp_tstamp_eth56g(hw, block, idx, tstamp);
- 	default:
- 		return -EOPNOTSUPP;
- 	}
-@@ -5869,13 +5865,13 @@ int ice_read_phy_tstamp(struct ice_hw *hw, u8 block, u8 idx, u64 *tstamp)
-  */
- int ice_clear_phy_tstamp(struct ice_hw *hw, u8 block, u8 idx)
- {
--	switch (ice_get_phy_model(hw)) {
--	case ICE_PHY_ETH56G:
--		return ice_clear_ptp_tstamp_eth56g(hw, block, idx);
--	case ICE_PHY_E810:
-+	switch (hw->mac_type) {
-+	case ICE_MAC_E810:
- 		return ice_clear_phy_tstamp_e810(hw, block, idx);
--	case ICE_PHY_E82X:
-+	case ICE_MAC_GENERIC:
- 		return ice_clear_phy_tstamp_e82x(hw, block, idx);
-+	case ICE_MAC_GENERIC_3K_E825:
-+		return ice_clear_ptp_tstamp_eth56g(hw, block, idx);
- 	default:
- 		return -EOPNOTSUPP;
- 	}
-@@ -5932,14 +5928,14 @@ static int ice_get_pf_c827_idx(struct ice_hw *hw, u8 *idx)
-  */
- void ice_ptp_reset_ts_memory(struct ice_hw *hw)
- {
--	switch (ice_get_phy_model(hw)) {
--	case ICE_PHY_ETH56G:
--		ice_ptp_reset_ts_memory_eth56g(hw);
--		break;
--	case ICE_PHY_E82X:
-+	switch (hw->mac_type) {
-+	case ICE_MAC_GENERIC:
- 		ice_ptp_reset_ts_memory_e82x(hw);
- 		break;
--	case ICE_PHY_E810:
-+	case ICE_MAC_GENERIC_3K_E825:
-+		ice_ptp_reset_ts_memory_eth56g(hw);
-+		break;
-+	case ICE_MAC_E810:
- 	default:
- 		return;
- 	}
-@@ -5961,13 +5957,13 @@ int ice_ptp_init_phc(struct ice_hw *hw)
- 	/* Clear event err indications for auxiliary pins */
- 	(void)rd32(hw, GLTSYN_STAT(src_idx));
- 
--	switch (ice_get_phy_model(hw)) {
--	case ICE_PHY_ETH56G:
--		return ice_ptp_init_phc_eth56g(hw);
--	case ICE_PHY_E810:
-+	switch (hw->mac_type) {
-+	case ICE_MAC_E810:
- 		return ice_ptp_init_phc_e810(hw);
--	case ICE_PHY_E82X:
-+	case ICE_MAC_GENERIC:
- 		return ice_ptp_init_phc_e82x(hw);
-+	case ICE_MAC_GENERIC_3K_E825:
-+		return ice_ptp_init_phc_eth56g(hw);
- 	default:
- 		return -EOPNOTSUPP;
- 	}
-@@ -5986,16 +5982,16 @@ int ice_ptp_init_phc(struct ice_hw *hw)
-  */
- int ice_get_phy_tx_tstamp_ready(struct ice_hw *hw, u8 block, u64 *tstamp_ready)
- {
--	switch (ice_get_phy_model(hw)) {
--	case ICE_PHY_ETH56G:
--		return ice_get_phy_tx_tstamp_ready_eth56g(hw, block,
--							  tstamp_ready);
--	case ICE_PHY_E810:
-+	switch (hw->mac_type) {
-+	case ICE_MAC_E810:
- 		return ice_get_phy_tx_tstamp_ready_e810(hw, block,
- 							tstamp_ready);
--	case ICE_PHY_E82X:
-+	case ICE_MAC_GENERIC:
- 		return ice_get_phy_tx_tstamp_ready_e82x(hw, block,
- 							tstamp_ready);
-+	case ICE_MAC_GENERIC_3K_E825:
-+		return ice_get_phy_tx_tstamp_ready_eth56g(hw, block,
-+							  tstamp_ready);
- 		break;
- 	default:
- 		return -EOPNOTSUPP;
 diff --git a/drivers/net/ethernet/intel/ice/ice_ptp_hw.h b/drivers/net/ethernet/intel/ice/ice_ptp_hw.h
-index 15f048d9b582..6b4679407558 100644
+index 6b4679407558..4381ef4a6c77 100644
 --- a/drivers/net/ethernet/intel/ice/ice_ptp_hw.h
 +++ b/drivers/net/ethernet/intel/ice/ice_ptp_hw.h
-@@ -430,13 +430,13 @@ int ice_phy_cfg_ptp_1step_eth56g(struct ice_hw *hw, u8 port);
-  */
- static inline u64 ice_get_base_incval(struct ice_hw *hw)
- {
--	switch (hw->ptp.phy_model) {
--	case ICE_PHY_ETH56G:
--		return ICE_ETH56G_NOMINAL_INCVAL;
--	case ICE_PHY_E810:
-+	switch (hw->mac_type) {
-+	case ICE_MAC_E810:
- 		return ICE_PTP_NOMINAL_INCVAL_E810;
--	case ICE_PHY_E82X:
-+	case ICE_MAC_GENERIC:
- 		return ice_e82x_nominal_incval(ice_e82x_time_ref(hw));
-+	case ICE_MAC_GENERIC_3K_E825:
-+		return ICE_ETH56G_NOMINAL_INCVAL;
- 	default:
- 		return 0;
- 	}
-diff --git a/drivers/net/ethernet/intel/ice/ice_type.h b/drivers/net/ethernet/intel/ice/ice_type.h
-index 33a1a5934c0d..0aab21113cc4 100644
---- a/drivers/net/ethernet/intel/ice/ice_type.h
-+++ b/drivers/net/ethernet/intel/ice/ice_type.h
-@@ -871,14 +871,6 @@ union ice_phy_params {
- 	struct ice_eth56g_params eth56g;
- };
+@@ -652,15 +652,16 @@ static inline bool ice_is_dual(struct ice_hw *hw)
+ /* Source timer incval macros */
+ #define INCVAL_HIGH_M			0xFF
  
--/* PHY model */
--enum ice_phy_model {
--	ICE_PHY_UNSUP = -1,
--	ICE_PHY_E810 = 1,
--	ICE_PHY_E82X,
--	ICE_PHY_ETH56G,
--};
+-/* Timestamp block macros */
++/* PHY 40b registers macros */
++#define PHY_EXT_40B_LOW_M		GENMASK(31, 0)
++#define PHY_EXT_40B_HIGH_M		GENMASK_ULL(39, 32)
++#define PHY_40B_LOW_M			GENMASK(7, 0)
++#define PHY_40B_HIGH_M			GENMASK_ULL(39, 8)
+ #define TS_VALID			BIT(0)
+ #define TS_LOW_M			0xFFFFFFFF
+ #define TS_HIGH_M			0xFF
+ #define TS_HIGH_S			32
+ 
+-#define TS_PHY_LOW_M			GENMASK(7, 0)
+-#define TS_PHY_HIGH_M			GENMASK_ULL(39, 8)
 -
- /* Global Link Topology */
- enum ice_global_link_topo {
- 	ICE_LINK_TOPO_UP_TO_2_LINKS,
-@@ -888,7 +880,6 @@ enum ice_global_link_topo {
- };
+ #define BYTES_PER_IDX_ADDR_L_U		8
+ #define BYTES_PER_IDX_ADDR_L		4
  
- struct ice_ptp_hw {
--	enum ice_phy_model phy_model;
- 	union ice_phy_params phy;
- 	u8 num_lports;
- 	u8 ports_per_phy;
 -- 
 2.47.1
 
