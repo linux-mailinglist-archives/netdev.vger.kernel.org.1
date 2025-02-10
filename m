@@ -1,167 +1,223 @@
-Return-Path: <netdev+bounces-164743-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-164744-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id CE9EDA2EEDB
-	for <lists+netdev@lfdr.de>; Mon, 10 Feb 2025 14:52:18 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 7E75BA2EEDF
+	for <lists+netdev@lfdr.de>; Mon, 10 Feb 2025 14:53:40 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 0212F1883BC0
-	for <lists+netdev@lfdr.de>; Mon, 10 Feb 2025 13:52:24 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id A8B9E1884E33
+	for <lists+netdev@lfdr.de>; Mon, 10 Feb 2025 13:53:45 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B895E22FE13;
-	Mon, 10 Feb 2025 13:52:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 40BAC23098C;
+	Mon, 10 Feb 2025 13:53:35 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b="eNttC2T8"
+	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="TJr+InTy"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-f46.google.com (mail-ed1-f46.google.com [209.85.208.46])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 262D7221DA9
-	for <netdev@vger.kernel.org>; Mon, 10 Feb 2025 13:52:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.46
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 705A721C9E0;
+	Mon, 10 Feb 2025 13:53:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.158.5
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1739195534; cv=none; b=FNDCtg2J8d2tQVaG2I6vMCItZQTk7BCqfZ77Iqg89oiPSU5GwcoATWD0BYXJEFkmbnjjqcaKibdOioAuMWnf4RoSJvLeEAG8bMwxJOPIHgRINmnlYQqtrwxpYhRgipJcbFusl8M3rzIUFPMzIITf2gPg4I6gTAbiufekuDStGEg=
+	t=1739195615; cv=none; b=Ps+xqloqrBfXga3+rpNiQKHHJSkB/8ySnMcnGCl1MhRHFYJxMjcY7nd0h7hIva5y8Wch/tDUIJ4I2KFwhIqD8gEq4ey7/LHvv3bRn1D2emp5Pbh3jfj9sChsF6nX+LdELVC02cZGW91oPful1Z8qGdjUJokHxzRYg1A5SnQS9Zg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1739195534; c=relaxed/simple;
-	bh=agN+p1qDjVD/YbUOhNOZQdzS2At2JV87lJYkBMe++Ts=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=FDa2x/lKekHFWAH4aL2/FJ528WyBrIvexWt38rH6h7L4cT1XH+WZ6rVsWU36IpcaKcXvGRgd34kNDkozSSyPOC23q/KOW4eRYZgr8bCqlMWZcHEqaL+QuK943xixMX/0AU8Guul2xdGiB9VlyoaFyvdPB7g3mL5V1UBAwg+AEQY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us; spf=none smtp.mailfrom=resnulli.us; dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b=eNttC2T8; arc=none smtp.client-ip=209.85.208.46
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=resnulli.us
-Received: by mail-ed1-f46.google.com with SMTP id 4fb4d7f45d1cf-5dcdb56c9d3so7088925a12.0
-        for <netdev@vger.kernel.org>; Mon, 10 Feb 2025 05:52:11 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=resnulli-us.20230601.gappssmtp.com; s=20230601; t=1739195530; x=1739800330; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=SZQNEHEQAe659xIoT4PLJLc9ZVxizRkVD7tjKwywtPo=;
-        b=eNttC2T8j3c/tcEPlb51opH4A9CHGC9ugAsJkrXG7G/YolCP4jgI2EkgN2LJE2se4A
-         Ib2xfc59Nmg7TvvDbKGzl5AmwfpPPxpIOic7OZegeZVzArShVbvlXaKqqlSTkOkcR1bt
-         n6t7UegrnDeYa3sgGN/GV4DDJxgDMAKJi+BirIWMW0riW8QpQ7zf4+vBOYJVGPDoiUSe
-         1pJM1XoIE3/V/beeyg8IVBaNE8IVuXjhcOqnBkNOulgE+sY9j4eypdGRNOEVnbpI8bSI
-         SiBs5nwABevh3wLH7m/yifeYorQR/Tl7cYHqBLBLw3hdicYzTnBfolOB5TQ56dJzC25o
-         rQ4A==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1739195530; x=1739800330;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=SZQNEHEQAe659xIoT4PLJLc9ZVxizRkVD7tjKwywtPo=;
-        b=eHOioBFo/xQL6eeHyWCYrRBnoRvItdPo6KUg1L52IUOgalXQyFMWXLNAEI8IdTEh5L
-         2zjKB2qyNEuAr85Wft+5KbFdlK9wvn4jr7wCoVNb4WQAtcRnCtYhinWeCFtzZxclbpyO
-         h3kFRPmixDwOh1Oww4NECtdVpsEn/MJH8OiNR9a0pYdtXgj2d/Gs4WQHBWnWsWvlCIGQ
-         oUnbb54Vhf+eAjTBIplf6IlCoinnPnRvA2HjyYbJYKnR93nYnxUKDkRduqaDeGF9CvCp
-         1WKqDei0RpW0pXNauCkMnyemzHKZaxsZhFbJKCVa9UABlzHOQ6Qt+0BxZjmhWVUPS5hg
-         IKpg==
-X-Forwarded-Encrypted: i=1; AJvYcCXQJeqS9KTh4MswI3NDd87UeS9WLh8pe78h42JNYWUfwESo6xIDvPZRCztu7AAzvTr+8Kc7QEQ=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyUEjgHIC9Cz7oatHsxf7/UosYhlMDZRJ+MhhVOQ/rLxRoAgLse
-	74tfj4xZY2kJvws4QE7IGZEXNcWAS9mNGICCgGSywr8o6/VnWQiTt7MDUfXDUDQ=
-X-Gm-Gg: ASbGncs0H5VIdBmPsRe3pwlufru1hQtTqPBxuIdD1oppZQcbmRmU+GAsafZOrf+HBYa
-	jtZQRzc3CijIr/vkQNPNfERB+U7OfiBkrmOjWiFwb74akKPNr6mHKr8/CrvyO9elMzmSpiXzwYL
-	nPVfn0amJj+R+hrKAzVKGG2N3CIBCa7+nnNhb3FjvGFITGMWIJLs1dasBZ8KVTEoK768BWLQjhV
-	pLrjTuGEMfsycYJVkJsr6Nfw8CMnfhuFil9uo/0/guhzvD3zLu89az2Yj9dDNu59ecj3vdnOFrd
-	Z2WDD9peI4n2uDTmAfxt0LQ=
-X-Google-Smtp-Source: AGHT+IEo+Lt+h+TivO7ynglQRKJ9MQHRtOnQvg4NqgdxaL8qUNSXUWAT4vclDvQ4z7hcmV33adyksw==
-X-Received: by 2002:a05:6402:4606:b0:5d9:ae5:8318 with SMTP id 4fb4d7f45d1cf-5de450706dbmr32938734a12.20.1739195530328;
-        Mon, 10 Feb 2025 05:52:10 -0800 (PST)
-Received: from jiri-mlt ([193.47.165.251])
-        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-ab7985f9786sm596196666b.20.2025.02.10.05.52.04
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 10 Feb 2025 05:52:09 -0800 (PST)
-Date: Mon, 10 Feb 2025 14:51:59 +0100
-From: Jiri Pirko <jiri@resnulli.us>
-To: edward.cree@amd.com
-Cc: linux-net-drivers@amd.com, davem@davemloft.net, kuba@kernel.org, 
-	edumazet@google.com, pabeni@redhat.com, horms@kernel.org, andrew+netdev@lunn.ch, 
-	Edward Cree <ecree.xilinx@gmail.com>, habetsm.xilinx@gmail.com, netdev@vger.kernel.org
-Subject: Re: [PATCH v2 net-next 4/4] sfc: document devlink flash support
-Message-ID: <p527x74v7gycii3qfgcqn46j2dixpa62tguri6k2dzymohkeyw@rqqmgs5tbobj>
-References: <cover.1739186252.git.ecree.xilinx@gmail.com>
- <3476b0ef04a0944f03e0b771ec8ed1a9c70db4dc.1739186253.git.ecree.xilinx@gmail.com>
+	s=arc-20240116; t=1739195615; c=relaxed/simple;
+	bh=+yxgt6+xyAp6s+YD52QMLqkv1qTdvCPj8HeHjseiZRs=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=J5E54DTQnjd7fjulF1Ql76MLMRGilivYNqPPrntZVZEjItKh+QDUaVMxa/BJDYjTNDnMn05Fw5GHTCFm3D1nGk3YRj1SK8wy3h+5EgGNYr67Mkr6Q+kPjQqnefztjUN3pkCE1ahdofp4WK8+hQnRvlkb64RNogW6I5G7yEU7hgE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=TJr+InTy; arc=none smtp.client-ip=148.163.158.5
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
+Received: from pps.filterd (m0360072.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 51A7X6pI020862;
+	Mon, 10 Feb 2025 13:53:15 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
+	:content-transfer-encoding:content-type:date:from:in-reply-to
+	:message-id:mime-version:references:subject:to; s=pp1; bh=550vrO
+	d5X6IQBeVHaRhw+8u8h7h1HP+3g0ov9GC21RM=; b=TJr+InTyJZ9U4e04kJrytk
+	TwJ4Y2I0jSZ15emqC840+rzjNbytEVwEU/lt/wand0gR0BoviixxVOJpSaMhOlS8
+	y+ZMnkQk2SXAs5vTt8qoVZVnyTsjoTLo5Z3v//EyuBrn/tHRkUsoX3LrNGKq+R7Z
+	3BAMh3qft29S3lBHZPTZJBAsquinG36AT2IHK3WtaScwRr33w4TRy3RXfgA9IRnY
+	02PkVsED2of93IVp/NuX+5CxYQWlR6V/X4bGTsPTu9SyRXBWukzrz2i0V9ZBIbFG
+	I53vfu9U2395SU2cBG/5iRAx8lNk952FuWL9JzLr3ybAjPKQcjZQuWPlMCS+i1Zg
+	==
+Received: from pps.reinject (localhost [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 44qd5nsq38-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Mon, 10 Feb 2025 13:53:15 +0000 (GMT)
+Received: from m0360072.ppops.net (m0360072.ppops.net [127.0.0.1])
+	by pps.reinject (8.18.0.8/8.18.0.8) with ESMTP id 51ADoGFH029176;
+	Mon, 10 Feb 2025 13:53:14 GMT
+Received: from ppma21.wdc07v.mail.ibm.com (5b.69.3da9.ip4.static.sl-reverse.com [169.61.105.91])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 44qd5nsq33-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Mon, 10 Feb 2025 13:53:14 +0000 (GMT)
+Received: from pps.filterd (ppma21.wdc07v.mail.ibm.com [127.0.0.1])
+	by ppma21.wdc07v.mail.ibm.com (8.18.1.2/8.18.1.2) with ESMTP id 51AC7PkY001051;
+	Mon, 10 Feb 2025 13:53:13 GMT
+Received: from smtprelay06.fra02v.mail.ibm.com ([9.218.2.230])
+	by ppma21.wdc07v.mail.ibm.com (PPS) with ESMTPS id 44pjkmxj66-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Mon, 10 Feb 2025 13:53:13 +0000
+Received: from smtpav01.fra02v.mail.ibm.com (smtpav01.fra02v.mail.ibm.com [10.20.54.100])
+	by smtprelay06.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 51ADrAVp14680354
+	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Mon, 10 Feb 2025 13:53:10 GMT
+Received: from smtpav01.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 03057200F2;
+	Mon, 10 Feb 2025 13:53:10 +0000 (GMT)
+Received: from smtpav01.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 137E9200F0;
+	Mon, 10 Feb 2025 13:53:09 +0000 (GMT)
+Received: from li-ce58cfcc-320b-11b2-a85c-85e19b5285e0 (unknown [9.171.22.27])
+	by smtpav01.fra02v.mail.ibm.com (Postfix) with SMTP;
+	Mon, 10 Feb 2025 13:52:58 +0000 (GMT)
+Date: Mon, 10 Feb 2025 14:52:55 +0100
+From: Halil Pasic <pasic@linux.ibm.com>
+To: Guangguan Wang <guangguan.wang@linux.alibaba.com>
+Cc: Paolo Abeni <pabeni@redhat.com>, wenjia@linux.ibm.com, jaka@linux.ibm.com,
+        alibuda@linux.alibaba.com, tonylu@linux.alibaba.com,
+        guwen@linux.alibaba.com, davem@davemloft.net, edumazet@google.com,
+        kuba@kernel.org, horms@kernel.org, linux-rdma@vger.kernel.org,
+        linux-s390@vger.kernel.org, netdev@vger.kernel.org,
+        linux-kernel@vger.kernel.org, Alexandra Winter <wintera@linux.ibm.com>,
+        Halil Pasic <pasic@linux.ibm.com>
+Subject: Re: [PATCH net] net/smc: use the correct ndev to find pnetid by
+ pnetid table
+Message-ID: <20250210145255.793e6639.pasic@linux.ibm.com>
+In-Reply-To: <b1053a92-3a3f-4042-9be9-60b94b97747d@linux.alibaba.com>
+References: <20241227040455.91854-1-guangguan.wang@linux.alibaba.com>
+	<1f4a721f-fa23-4f1d-97a9-1b27bdcd1e21@redhat.com>
+	<20250107203218.5787acb4.pasic@linux.ibm.com>
+	<908be351-b4f8-4c25-9171-4f033e11ffc4@linux.alibaba.com>
+	<20250109040429.350fdd60.pasic@linux.ibm.com>
+	<b1053a92-3a3f-4042-9be9-60b94b97747d@linux.alibaba.com>
+Organization: IBM
+X-Mailer: Claws Mail 3.17.8 (GTK+ 2.24.32; x86_64-redhat-linux-gnu)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <3476b0ef04a0944f03e0b771ec8ed1a9c70db4dc.1739186253.git.ecree.xilinx@gmail.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-GUID: z7c8wxOxHz5HvQIUQRHj7y0YaOkhha7N
+X-Proofpoint-ORIG-GUID: 9lggT4HDYvzhX0pavHSmB7QoLTkpK_W8
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1057,Hydra:6.0.680,FMLib:17.12.68.34
+ definitions=2025-02-10_07,2025-02-10_01,2024-11-22_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 priorityscore=1501
+ bulkscore=0 phishscore=0 mlxscore=0 clxscore=1015 spamscore=0
+ mlxlogscore=999 suspectscore=0 malwarescore=0 impostorscore=0
+ lowpriorityscore=0 adultscore=0 classifier=spam adjust=0 reason=mlx
+ scancount=1 engine=8.19.0-2501170000 definitions=main-2502100113
 
-Mon, Feb 10, 2025 at 12:25:45PM +0100, edward.cree@amd.com wrote:
->From: Edward Cree <ecree.xilinx@gmail.com>
->
->Update the information in sfc's devlink documentation including
-> support for firmware update with devlink flash.
->Also update the help text for CONFIG_SFC_MTD, as it is no longer
-> strictly required for firmware updates.
->
->Signed-off-by: Edward Cree <ecree.xilinx@gmail.com>
->---
-> Documentation/networking/devlink/sfc.rst | 16 +++++++++++++++-
-> drivers/net/ethernet/sfc/Kconfig         |  5 +++--
-> 2 files changed, 18 insertions(+), 3 deletions(-)
->
->diff --git a/Documentation/networking/devlink/sfc.rst b/Documentation/networking/devlink/sfc.rst
->index db64a1bd9733..0398d59ea184 100644
->--- a/Documentation/networking/devlink/sfc.rst
->+++ b/Documentation/networking/devlink/sfc.rst
->@@ -5,7 +5,7 @@ sfc devlink support
-> ===================
+On Fri, 10 Jan 2025 13:43:44 +0800
+Guangguan Wang <guangguan.wang@linux.alibaba.com> wrote:
+
+> We want to use SMC in container on cloud environment, and encounter problem
+> when using smc_pnet with commit 890a2cb4a966. In container, there have choices
+> of different container network, such as directly using host network, virtual
+> network IPVLAN, veth, etc. Different choices of container network have different
+> netdev hierarchy. Examples of netdev hierarchy show below. (eth0 and eth1 in host
+> below is the netdev directly related to the physical device).
+>  _______________________________      ________________________________   
+> |   _________________           |     |   _________________           |  
+> |  |POD              |          |     |  |POD  __________  |          |  
+> |  |                 |          |     |  |    |upper_ndev| |          |  
+> |  | eth0_________   |          |     |  |eth0|__________| |          |  
+> |  |____|         |__|          |     |  |_______|_________|          |  
+> |       |         |             |     |          |lower netdev        |  
+> |       |         |             |     |        __|______              |  
+> |   eth1|base_ndev| eth0_______ |     |   eth1|         | eth0_______ |  
+> |       |         |    | RDMA  ||     |       |base_ndev|    | RDMA  ||  
+> | host  |_________|    |_______||     | host  |_________|    |_______||  
+> ———————————————————————————————-      ———————————————————————————————-    
+>  netdev hierarchy if directly          netdev hierarchy if using IPVLAN    
+>    using host network
+>  _______________________________
+> |   _____________________       |
+> |  |POD        _________ |      |
+> |  |          |base_ndev||      |
+> |  |eth0(veth)|_________||      |
+> |  |____________|________|      |
+> |               |pairs          |
+> |        _______|_              |
+> |       |         | eth0_______ |
+> |   veth|base_ndev|    | RDMA  ||
+> |       |_________|    |_______||
+> |        _________              |
+> |   eth1|base_ndev|             |
+> | host  |_________|             |
+>  ———————————————————————————————
+>   netdev hierarchy if using veth
 > 
-> This document describes the devlink features implemented by the ``sfc``
->-device driver for the ef100 device.
->+device driver for the ef10 and ef100 devices.
+> Due to some reasons, the eth1 in host is not RDMA attached netdevice, pnetid
+> is needed to map the eth1(in host) with RDMA device so that POD can do SMC-R.
+> Because the eth1(in host) is managed by CNI plugin(such as Terway, network
+> management plugin in container environment), and in cloud environment the
+> eth(in host) can dynamically be inserted by CNI when POD create and dynamically
+> be removed by CNI when POD destroy and no POD related to the eth(in host)
+> anymore.
+
+I'm pretty clueless when it comes to the details of CNI but I think
+I'm barely able to follow. Nevertheless if you have the feeling that
+my extrapolations are wrong, please do point it out.
+
+> It is hard for us to config the pnetid to the eth1(in host). So we
+> config the pnetid to the netdevice which can be seen in POD.
+
+Hm, this sounds like you could set PNETID on eth1 (in host) for each of
+the cases and everything would be cool (and would work), but because CNI
+and the environment do not support it, or supports it in a very
+inconvenient way, you are looking for a workaround where PNETID is set
+in the POD. Is that right? Or did I get something wrong?
+
+> When do SMC-R, both
+> the container directly using host network and the container using veth network
+> can successfully match the RDMA device, because the configured pnetid netdev is a
+> base_ndev. But the container using IPVLAN can not successfully match the RDMA
+> device and 0x03030000 fallback happens, because the configured pnetid netdev is
+> not a base_ndev. Additionally, if config pnetid to the eth1(in host) also can not
+> work for matching RDMA device when using veth network and doing SMC-R in POD.
+
+That I guess answers my question from the first paragraph. Setting
+PNETID on eth1 (host) would not be sufficient for veth. Right?
+
+Another silly question: is making the PNETID basically a part of the Pod
+definition shifting PNETID from the realm of infrastructure (i.e.
+configured by the cloud provider) to the ream of an application (i.e.
+configured by the tenant)?
+
+AFAIU veth (host) is bridged (or similar) to eth1 (host) and that is in
+the host, and this is where we make sure that the requirements for SMC-R
+are satisfied.
+
+But veth (host) could be attached to eth3 which is on a network not
+reachable via eth0 (host) or eth1 (host). In that case the pod could
+still set PNETID on veth (POD). Or?
+
 > 
-> Info versions
-> =============
->@@ -18,6 +18,10 @@ The ``sfc`` driver reports the following versions
->    * - Name
->      - Type
->      - Description
->+   * - ``fw.bundle_id``
+> My patch can resolve the problem we encountered and also can unify the pnetid setup
+> of different network choices list above, assuming the pnetid is not limited to
+> config to the base_ndev directly related to the physical device(indeed, the current
+> implementation has not limited it yet).
 
-Why "id"? It is the bundle version, isn't it. In that case just "bundle"
-would be fine I guess...
+I see some problems here, but I'm afraid we see different problems. For
+me not being able to set eth0 (veth/POD)'s PNEDID from the host is a
+problem. Please notice that with the current implementation users can
+only control the PNETID if infrastructure does not do so in the first
+place.
 
 
->+     - stored
->+     - Version of the firmware "bundle" image that was last used to update
->+       multiple components.
->    * - ``fw.mgmt.suc``
->      - running
->      - For boards where the management function is split between multiple
->@@ -55,3 +59,13 @@ The ``sfc`` driver reports the following versions
->    * - ``fw.uefi``
->      - running
->      - UEFI driver version (No UNDI support).
->+
->+Flash Update
->+============
->+
->+The ``sfc`` driver implements support for flash update using the
->+``devlink-flash`` interface. It supports updating the device flash using a
->+combined flash image ("bundle") that contains multiple components (on ef10,
->+typically ``fw.mgmt``, ``fw.app``, ``fw.exprom`` and ``fw.uefi``).
->+
->+The driver does not support any overwrite mask flags.
->diff --git a/drivers/net/ethernet/sfc/Kconfig b/drivers/net/ethernet/sfc/Kconfig
->index 3eb55dcfa8a6..c4c43434f314 100644
->--- a/drivers/net/ethernet/sfc/Kconfig
->+++ b/drivers/net/ethernet/sfc/Kconfig
->@@ -38,8 +38,9 @@ config SFC_MTD
-> 	default y
-> 	help
-> 	  This exposes the on-board flash and/or EEPROM as MTD devices
->-	  (e.g. /dev/mtd1).  This is required to update the firmware or
->-	  the boot configuration under Linux.
->+	  (e.g. /dev/mtd1).  This is required to update the boot
->+	  configuration under Linux, or use some older userland tools to
->+	  update the firmware.
-> config SFC_MCDI_MON
-> 	bool "Solarflare SFC9100-family hwmon support"
-> 	depends on SFC && HWMON && !(SFC=y && HWMON=m)
+Can you please help me reason about this? I'm unfortunately lacking
+Kubernetes skills here, and it is difficult for me to think along.
+
+Regards,
+Halil
 
