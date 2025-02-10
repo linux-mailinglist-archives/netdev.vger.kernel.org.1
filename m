@@ -1,184 +1,251 @@
-Return-Path: <netdev+bounces-164627-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-164628-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id E130DA2E7EA
-	for <lists+netdev@lfdr.de>; Mon, 10 Feb 2025 10:36:45 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id B01E5A2E7FA
+	for <lists+netdev@lfdr.de>; Mon, 10 Feb 2025 10:38:48 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 6C113188740A
-	for <lists+netdev@lfdr.de>; Mon, 10 Feb 2025 09:36:10 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 4A8BD160F05
+	for <lists+netdev@lfdr.de>; Mon, 10 Feb 2025 09:38:47 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E39641C5D4A;
-	Mon, 10 Feb 2025 09:34:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D644318CC1D;
+	Mon, 10 Feb 2025 09:38:44 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="VbbdCT/O"
+	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="gbA5h+bk"
 X-Original-To: netdev@vger.kernel.org
-Received: from NAM10-DM6-obe.outbound.protection.outlook.com (mail-dm6nam10on2065.outbound.protection.outlook.com [40.107.93.65])
+Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5A44D1D47A2
-	for <netdev@vger.kernel.org>; Mon, 10 Feb 2025 09:34:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.93.65
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1739180068; cv=fail; b=DAUcR/YOa4fcK1joOk35SDH7w3VQ70W5nd6L7sCw8AYKZMnIlJp6+lidgjwHqGZWPXLF3cPud8xPtlJowGm/Eq6VkTYzNP0fLczchq3TGL2CUbrjBR6CEjYKO3SfDhVx8wQThJ3wwj2ckyxFjh1AmFAOhZW9uhQtzHOyW//4+nk=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1739180068; c=relaxed/simple;
-	bh=y+gXBFyGHj9CW5mTMClCiyGn63mxO0lzWvYMHrR5uuo=;
-	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=GgJnYCayVRVi33akrtY+fLFDxRdX0sfXheB/vRtBQSc+2NQyKBrPVv2QCMqnkM4yKvBdlB8SLLK+F7PMXJ1uYe6A4aUKAQAuovk+LSdKc7/6RwUuuCOWGV/p/+y9ysjltYnMj2VVd1o0mCGK7e1woPeZRqW/Zvn/0JdK/oveMXc=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=VbbdCT/O; arc=fail smtp.client-ip=40.107.93.65
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=Tx5DETM5tzQQfffriMmcNNaNPElJBwezSF2y5FNrLiJSkiQkWwZsm/i2DvYxqWXgWHUF0ynBU+rU7+Mc/NM7vrxFRoUzOBs1pC6t5URlzgGWnC49EFzaeA23z5cudWDqlQbebCzduOPQ/G1qLSlwK7Ty44GPVsrDPSvBuFD04OrmpiYUBdK4WHZQ/w2FHRLX8y8llNkuALhwEGEfsQiwAAJSpYZVE+NzUy6LAT2i2ksT4ZH3FB+7ms7We8nLwDsKrSDKhwBKjeSfvIe/b1q8W69QBxNlOdBBavAdLPWDCAzHpV90ianGZwjT44ukzN9clSh6mx1qAD+A6hFM+017VA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=16aqgjJnzbXPsltju/p3sJDKjH/lx97tyJ4I9kbsrgE=;
- b=X2Pf25YMCJg0/5rj1rzwM15M/EzEQJh3ojAdLD9tExZaHCA+tUEGPsVFkgzKPHCv7YCQO1N39M6f5xn3RmdOYH9b3wA5Q2tsXyCSUhW4tKpGS032OzOUeDku8eXoqGkmvyHRU3s61BDpJjJp48uVd+6DmnYajOW5sGRlXrsi0z8dWWZKUFewcnTPlSez0h/1FGBLnzcsUryC2FVU2/IgtLeC1DikCEyAXUZ3jQZ2vS3Am6/9C8OksNYj14vRwLEXQRVBJUDQA0J4Pq+aGNgtQ53wq4sm8trq7/kEzUzRWb7il4T8Qv0Jy/r2KAR6zvW53SkIgGqgCIbF2BbAngysPQ==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
- 216.228.117.160) smtp.rcpttodomain=vger.kernel.org smtp.mailfrom=nvidia.com;
- dmarc=pass (p=reject sp=reject pct=100) action=none header.from=nvidia.com;
- dkim=none (message not signed); arc=none (0)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=16aqgjJnzbXPsltju/p3sJDKjH/lx97tyJ4I9kbsrgE=;
- b=VbbdCT/Or1imihzbgFVAodAITwU/5Uk3Ny9S7EdyI29uuH1oPWL2j0Upy55T21QveKxGziql7figYNQ51d9zMEG/irf2zYVvTLIl+1qVTXkQclyqkhiCwFQ9oyDAPp1nzJuRYXnsk3w8XbmiQWNWqjSXv9jL0SuOBJ3ap4gDjoPL57E/0L8XqV0YSJQYX+hz1k4cowRPZs7xaZi8E4UC7u5MAW0QLYy81YiXO2eZbAXGzKvrWqBRkFJIUiKkE3ArPy8Bs3BoR6h0oqKgI2JgxYgl/d05Z1J6pafAZirOQMq6tQ5eLTqcsR+XLmxGF0Vt6gRaCIsFX3WPtu/O76Z5Ag==
-Received: from DS7P220CA0001.NAMP220.PROD.OUTLOOK.COM (2603:10b6:8:1ca::6) by
- CYXPR12MB9427.namprd12.prod.outlook.com (2603:10b6:930:d6::8) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.8422.16; Mon, 10 Feb 2025 09:34:21 +0000
-Received: from DS2PEPF00003448.namprd04.prod.outlook.com
- (2603:10b6:8:1ca:cafe::36) by DS7P220CA0001.outlook.office365.com
- (2603:10b6:8:1ca::6) with Microsoft SMTP Server (version=TLS1_3,
- cipher=TLS_AES_256_GCM_SHA384) id 15.20.8398.31 via Frontend Transport; Mon,
- 10 Feb 2025 09:34:21 +0000
-X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 216.228.117.160)
- smtp.mailfrom=nvidia.com; dkim=none (message not signed)
- header.d=none;dmarc=pass action=none header.from=nvidia.com;
-Received-SPF: Pass (protection.outlook.com: domain of nvidia.com designates
- 216.228.117.160 as permitted sender) receiver=protection.outlook.com;
- client-ip=216.228.117.160; helo=mail.nvidia.com; pr=C
-Received: from mail.nvidia.com (216.228.117.160) by
- DS2PEPF00003448.mail.protection.outlook.com (10.167.17.75) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.8445.10 via Frontend Transport; Mon, 10 Feb 2025 09:34:21 +0000
-Received: from rnnvmail201.nvidia.com (10.129.68.8) by mail.nvidia.com
- (10.129.200.66) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.4; Mon, 10 Feb
- 2025 01:34:08 -0800
-Received: from dev-r-vrt-155.mtr.labs.mlnx (10.126.231.35) by
- rnnvmail201.nvidia.com (10.129.68.8) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.14; Mon, 10 Feb 2025 01:34:06 -0800
-From: Danielle Ratson <danieller@nvidia.com>
-To: <netdev@vger.kernel.org>
-CC: <mkubecek@suse.cz>, <matt@traverse.com.au>, <daniel.zahka@gmail.com>,
-	<amcohen@nvidia.com>, <nbu-mlxsw@exchange.nvidia.com>, Danielle Ratson
-	<danieller@nvidia.com>
-Subject: [PATCH ethtool-next v5 16/16] ethtool: Add '-j' support to ethtool
-Date: Mon, 10 Feb 2025 11:33:16 +0200
-Message-ID: <20250210093316.1580715-17-danieller@nvidia.com>
-X-Mailer: git-send-email 2.47.0
-In-Reply-To: <20250210093316.1580715-1-danieller@nvidia.com>
-References: <20250210093316.1580715-1-danieller@nvidia.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 29B63185935;
+	Mon, 10 Feb 2025 09:38:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.156.1
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1739180324; cv=none; b=mp7XjE7ZAveFmgnS7c0fCqYGiKxz0r0jT0sWOzf5oYOBSnlLG3lO37Iq0rWMLra3SokNKwutP8/uMXMTzlseN37ELMit+0GADZMTZL3vUGu1rknD6kTZbRQsZtE26zusqyvE5hPvZu7Gv1n99HJ6CV5K1JdDw0WvcmC9SpV770U=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1739180324; c=relaxed/simple;
+	bh=Bnr8nlzxW4be0QMbIzK7H7SpQV3GQZRjleUSYZEwTYM=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=oSkd+LCjo3rO8NGRxE0vx47y1IuCKzQeefcfPAMO0kP9IPxargG7T31Cha45CtjVbDrldqadUG3TSt6nFljaql5nlQ2vvkjQkGjNTGcOWP2CbU7j7wmxneSvPA/QOmWe89dNX+M4cW4JSWr4ha32wYxMkkGM2yFBUBBZl0iNEks=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=gbA5h+bk; arc=none smtp.client-ip=148.163.156.1
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
+Received: from pps.filterd (m0353729.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 51A5NnRr014109;
+	Mon, 10 Feb 2025 09:38:34 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
+	:content-transfer-encoding:content-type:date:from:in-reply-to
+	:message-id:mime-version:references:subject:to; s=pp1; bh=popzWI
+	PTmAirApyC3XWQ8mFJPHtAI4FAQo69XIqoIOo=; b=gbA5h+bklUTgebaUux/S3X
+	sQVpECOQ4BdH2JeSaSxLdW9QJ0MSaR52/UcJ9f9/pjpKahsISwsQly7kwO73l5Dh
+	xklLcbkhae1agrpmVNHtNb15+vDgXGfRqV8mEgvzuER2V1UgSSgK/xRn9sL69dwc
+	N9RwiKDSndoziOou00H3JcroUvH+ZU/cAb/nk5tfXT/iyAKTpJ6eIloBX4A7mew5
+	WF4FHGYftQKj3EConNBgGYKtK85b/Urv2CXlCsszZqkn9RxzGcl/0DNoc74lrMxg
+	DZQddpbroDjcfI7D/T6gFivlmcskoompaP6scNAz+aY0q5D3RlxPspPmzFPonnCg
+	==
+Received: from pps.reinject (localhost [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 44qb97s3w0-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Mon, 10 Feb 2025 09:38:33 +0000 (GMT)
+Received: from m0353729.ppops.net (m0353729.ppops.net [127.0.0.1])
+	by pps.reinject (8.18.0.8/8.18.0.8) with ESMTP id 51A9WIJe026869;
+	Mon, 10 Feb 2025 09:38:33 GMT
+Received: from ppma23.wdc07v.mail.ibm.com (5d.69.3da9.ip4.static.sl-reverse.com [169.61.105.93])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 44qb97s3vr-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Mon, 10 Feb 2025 09:38:33 +0000 (GMT)
+Received: from pps.filterd (ppma23.wdc07v.mail.ibm.com [127.0.0.1])
+	by ppma23.wdc07v.mail.ibm.com (8.18.1.2/8.18.1.2) with ESMTP id 51A8BmXw016672;
+	Mon, 10 Feb 2025 09:38:32 GMT
+Received: from smtprelay03.fra02v.mail.ibm.com ([9.218.2.224])
+	by ppma23.wdc07v.mail.ibm.com (PPS) with ESMTPS id 44pk3jwh9m-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Mon, 10 Feb 2025 09:38:31 +0000
+Received: from smtpav02.fra02v.mail.ibm.com (smtpav02.fra02v.mail.ibm.com [10.20.54.101])
+	by smtprelay03.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 51A9cS6a44564752
+	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Mon, 10 Feb 2025 09:38:28 GMT
+Received: from smtpav02.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id BE0282012D;
+	Mon, 10 Feb 2025 09:38:27 +0000 (GMT)
+Received: from smtpav02.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 7BB5320129;
+	Mon, 10 Feb 2025 09:38:27 +0000 (GMT)
+Received: from [9.152.224.153] (unknown [9.152.224.153])
+	by smtpav02.fra02v.mail.ibm.com (Postfix) with ESMTP;
+	Mon, 10 Feb 2025 09:38:27 +0000 (GMT)
+Message-ID: <1e96806f-0a4e-4292-9483-928b1913d311@linux.ibm.com>
+Date: Mon, 10 Feb 2025 10:38:27 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [RFC net-next 0/7] Provide an ism layer
+To: dust.li@linux.alibaba.com, Niklas Schnelle <schnelle@linux.ibm.com>,
+        Julian Ruess <julianr@linux.ibm.com>,
+        Wenjia Zhang <wenjia@linux.ibm.com>, Jan Karcher <jaka@linux.ibm.com>,
+        Gerd Bayer <gbayer@linux.ibm.com>, Halil Pasic <pasic@linux.ibm.com>,
+        "D. Wythe" <alibuda@linux.alibaba.com>,
+        Tony Lu <tonylu@linux.alibaba.com>, Wen Gu <guwen@linux.alibaba.com>,
+        Peter Oberparleiter <oberpar@linux.ibm.com>,
+        David Miller <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>,
+        Paolo Abeni <pabeni@redhat.com>, Eric Dumazet <edumazet@google.com>,
+        Andrew Lunn <andrew+netdev@lunn.ch>
+Cc: Thorsten Winkler <twinkler@linux.ibm.com>, netdev@vger.kernel.org,
+        linux-s390@vger.kernel.org, Heiko Carstens <hca@linux.ibm.com>,
+        Vasily Gorbik <gor@linux.ibm.com>,
+        Alexander Gordeev
+ <agordeev@linux.ibm.com>,
+        Christian Borntraeger <borntraeger@linux.ibm.com>,
+        Sven Schnelle <svens@linux.ibm.com>, Simon Horman <horms@kernel.org>
+References: <20250115195527.2094320-1-wintera@linux.ibm.com>
+ <20250116093231.GD89233@linux.alibaba.com>
+ <D73H7Q080GUQ.3BDOH23P4WDOL@linux.ibm.com>
+ <0f96574a-567e-495a-b815-6aef336f12e6@linux.ibm.com>
+ <20250117021353.GF89233@linux.alibaba.com>
+ <dc2ff4c83ce8f7884872068570454f285510bda2.camel@linux.ibm.com>
+ <20250118153154.GI89233@linux.alibaba.com>
+ <d1927140-443b-401c-92ff-f467c12d3e75@linux.ibm.com>
+ <20250210050851.GS89233@linux.alibaba.com>
+Content-Language: en-US
+From: Alexandra Winter <wintera@linux.ibm.com>
+In-Reply-To: <20250210050851.GS89233@linux.alibaba.com>
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: rnnvmail202.nvidia.com (10.129.68.7) To
- rnnvmail201.nvidia.com (10.129.68.8)
-X-EOPAttributedMessage: 0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: DS2PEPF00003448:EE_|CYXPR12MB9427:EE_
-X-MS-Office365-Filtering-Correlation-Id: 4db355eb-7f87-439a-a054-08dd49b6198e
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|376014|36860700013|82310400026|1800799024;
-X-Microsoft-Antispam-Message-Info:
-	=?us-ascii?Q?UKX03oPKwDsHKz4YvklpCTyBc4p7TSNHBfl2T1feN++u4ytNvpI8MU1qk6qq?=
- =?us-ascii?Q?/1/WZu+RemAUnI5kdbx9eo//aiui9DS1Yihpz3m0kRPOebUls1Kk8aJM1/9o?=
- =?us-ascii?Q?gWxuP4tn+d2wTXeq6rlQa3lhdtPXOOAIk2K9YbR0VRZ9JNy6wn6aUE6bwwKX?=
- =?us-ascii?Q?2ujMdEGyxMNYXTbwENqjoxcY6xfaEcRVX+ID6tg3R8wiEPVxJ0OE/rke9ZFg?=
- =?us-ascii?Q?79Lt5UibnT2OVCdzRmLqSf1Qj73nvP0tsoxTgTfAubHItuWsZTeCrvxQ0SjJ?=
- =?us-ascii?Q?wlL5Jmptc5ozLg7w0gZkAp2KmU3pqvm7QZAyMbpY9UYAscHd+StLx5QyQuTM?=
- =?us-ascii?Q?CR1RneZqsxD/IxUjObTZA9fG3m8rtBjwkI6JV/WXDs1ugRlWNsiyA3nvmOkH?=
- =?us-ascii?Q?VMx9TqIjNVKI2PwHz9YJ/fOv4tCFKmYBPnl5XBYsUO+t6GBzaBBbncm2qapw?=
- =?us-ascii?Q?AxraT2JiHUcUZN/jT6vWnty8QiSMstjoQ2zwpU/+kney4ibFU+2CYBXa6NLJ?=
- =?us-ascii?Q?1xLC2QE9nU5cqsER7Aq8oZCp2P64zqWGedsEvRxxiBkyur0gGao9ZRVORz2U?=
- =?us-ascii?Q?5LvcCEUoEH+axG6gP0ENNaUm4Ov0kLVWJ8/Ij0wGp2tsRVqRgzG/ep9WHV37?=
- =?us-ascii?Q?sZVa6ybQ2hgTh8LEHUx2z5Zl7hF1CdrlCYu/cmCVIjCm1T+8uFl5iBPmiofR?=
- =?us-ascii?Q?FZa6cySAJyAm67ZZcQFojBhFcJsau4ZgEfd/A4er5lJ24YTqVD6OCmpP0iQq?=
- =?us-ascii?Q?NW5kgvHXGonrKnsz5zDw+0oli5bE5QAg4libY/TPIPcbLdBKmBZrvaBSNe2D?=
- =?us-ascii?Q?6RzAV/hdhGLoWAsogyy/UJrxxiDkm+nRjfeBr6toEAA+zN58bL/m1DECIbc0?=
- =?us-ascii?Q?DtXM9wNo16E9NDlZOa8xAy6HEOVzCXHW2CD8u/B9bQwYv1nVF3dnf67zf5J2?=
- =?us-ascii?Q?FbN8OPQiRTGPiJX4/YmPUelwvRXuO+ziHYIxmQ+Wvuix0tybgLu3qpam5Qcs?=
- =?us-ascii?Q?VRLtsxUDH4iQM4E2qGqc5RpIe9dlyY0MVES4Mt0LtlWPiOA1FDkOMy0I95Tu?=
- =?us-ascii?Q?ZFQXjCaPVlcVhAs8vUOL237F0MzwQOJyB7S1Tg+84czbpWFlCW3w5jPFT3Cw?=
- =?us-ascii?Q?n/mJJiEepa5Kl8ad9kHGX7Oo3LFtGalNaXSwKnKZdYLN2PBlNTeodXqUi+3T?=
- =?us-ascii?Q?Br1EbK2+WnZXz+9R9Ci0U+MVspm8gOc8mIxdeuntDMwV1B4AuWb0qLhmiCMq?=
- =?us-ascii?Q?sbnTInmQYElWLLy3gWdPAHk1Ld1vNWtqfNF/8hLI7D1CR/32rTnG2utcWtEr?=
- =?us-ascii?Q?ZtnmmLdfs7WQubVX1UH/FU+LYn7nEwz4Hs1/5M3b+kPOpVPeGXRnCcHM3pHK?=
- =?us-ascii?Q?vkpWmoiwYVVT5AIgGHOR51+Nu7ziqGFJQ1MG3NczAGXJdF4VXqXE0+ncQfdZ?=
- =?us-ascii?Q?P42xapk57emzVG/seU+aGGtuXMVNecL7OQo9Mh6bZpMClv5VdcKuABvQXWSL?=
- =?us-ascii?Q?2WdFyt9fHNkUAnM=3D?=
-X-Forefront-Antispam-Report:
-	CIP:216.228.117.160;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:dc6edge1.nvidia.com;CAT:NONE;SFS:(13230040)(376014)(36860700013)(82310400026)(1800799024);DIR:OUT;SFP:1101;
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 10 Feb 2025 09:34:21.6569
- (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: 4db355eb-7f87-439a-a054-08dd49b6198e
-X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[216.228.117.160];Helo=[mail.nvidia.com]
-X-MS-Exchange-CrossTenant-AuthSource:
-	DS2PEPF00003448.namprd04.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Anonymous
-X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: CYXPR12MB9427
+X-TM-AS-GCONF: 00
+X-Proofpoint-GUID: tKs-IO5xHX0wWxos7ucAef5RPIMr4t5t
+X-Proofpoint-ORIG-GUID: 6GRDQvdMUltAZAP5CTJ-LM0Fk82y-Fsq
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1057,Hydra:6.0.680,FMLib:17.12.68.34
+ definitions=2025-02-10_04,2025-02-10_01,2024-11-22_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 lowpriorityscore=0
+ clxscore=1015 bulkscore=0 priorityscore=1501 phishscore=0 suspectscore=0
+ malwarescore=0 spamscore=0 mlxlogscore=856 impostorscore=0 mlxscore=0
+ adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.19.0-2501170000 definitions=main-2502100079
 
-Currently, only '--json' flag is supported for JSON output in the
-ethtool commands.
 
-Add support for the shorter '-j' flag also.
 
-Signed-off-by: Danielle Ratson <danieller@nvidia.com>
-Acked-by: Jakub Kicinski <kuba@kernel.org>
----
- ethtool.c | 5 +++--
- 1 file changed, 3 insertions(+), 2 deletions(-)
+On 10.02.25 06:08, Dust Li wrote:
+> On 2025-01-28 17:04:53, Alexandra Winter wrote:
+>>
+>>
+>> On 18.01.25 16:31, Dust Li wrote:
+>>> On 2025-01-17 11:38:39, Niklas Schnelle wrote:
+>>>> On Fri, 2025-01-17 at 10:13 +0800, Dust Li wrote:
+>>>>>>
+>>>> ---8<---
+>>>>>> Here are some of my thoughts on the matter:
+>>>>>>>>
+>>>>>>>> Naming and Structure: I suggest we refer to it as SHD (Shared Memory
+>>>>>>>> Device) instead of ISM (Internal Shared Memory). 
+>>>>>>
+>>>>>>
+>>>>>> So where does the 'H' come from? If you want to call it Shared Memory _D_evice?
+>>>>>
+>>>>> Oh, I was trying to refer to SHM(Share memory file in the userspace, see man
+>>>>> shm_open(3)). SMD is also OK.
+>>>>>
+>>>>>>
+>>>>>>
+>>>>>> To my knowledge, a
+>>>>>>>> "Shared Memory Device" better encapsulates the functionality we're
+>>>>>>>> aiming to implement. 
+>>>>>>
+>>>>>>
+>>>>>> Could you explain why that would be better?
+>>>>>> 'Internal Shared Memory' is supposed to be a bit of a counterpart to the
+>>>>>> Remote 'R' in RoCE. Not the greatest name, but it is used already by our ISM
+>>>>>> devices and by ism_loopback. So what is the benefit in changing it?
+>>>>>
+>>>>> I believe that if we are going to separate and refine the code, and add
+>>>>> a common subsystem, we should choose the most appropriate name.
+>>>>>
+>>>>> In my opinion, "ISM" doesn’t quite capture what the device provides.
+>>>>> Since we’re adding a "Device" that enables different entities (such as
+>>>>> processes or VMs) to perform shared memory communication, I think a more
+>>>>> fitting name would be better. If you have any alternative suggestions,
+>>>>> I’m open to them.
+>>>>
+>>>> I kept thinking about this a bit and I'd like to propose yet another
+>>>> name for this group of devices: Memory Communication Devices (MCD)
+>>>>
+>>>> One important point I see is that there is a bit of a misnomer in the
+>>>> existing ISM name in that our ISM device does in fact *not* share
+>>>> memory in the common sense of the "shared memory" wording. Instead it
+>>>> copies data between partitions of memory that share a common
+>>>> cache/memory hierarchy while not sharing the memory itself. loopback-
+>>>> ism and a possibly future virtio-ism on the other hand would share
+>>>> memory in the "shared memory" sense. Though I'd very much hope they
+>>>> will retain a copy mode to allow use in partition scenarios.
+>>>>
+>>>> With that background I think the common denominator between them and
+>>>> the main idea behind ISM is that they facilitate communication via
+>>>> memory buffers and very simple and reliable copy/share operations. I
+>>>> think this would also capture our planned use-case of devices (TTYs,
+>>>> block devices, framebuffers + HID etc) provided by a peer on top of
+>>>> such a memory communication device.
+>>>
+>>> Make sense, I agree with MCD.
+>>>
+>>> Best regard,
+>>> Dust
+>>>
+>>
+>>
+> 
+> Hi Winter,
+> 
+> Sorry for the late reply; we were on break for the Chinese Spring
+> Festival.
+> 
+>>
+>> In the discussion with Andrew Lunn, it showed that
+>> a) we need an abstract description of 'ISM' devices (noted)
+>> b) DMBs (Direct Memory Buffers) are a critical differentiator.
+>>
+>> So what do your think of Direct Memory Communication (DMC) as class name for these devices?
+>>
+>> I don't have a strong preference (we could also stay with ISM). But DMC may be a bit more
+>> concrete than MCD or ISM.
+> 
+> I personally prefer MCD over Direct Memory Communication (DMC).
+> 
+> For loopback or Virtio-ISM, DMC seems like a good choice. However, for
+> IBM ISM, since there's a DMA copy involved, it doesn’t seem truly "Direct,"
+> does it?
+> 
+> Additionally, since we are providing a device, MCD feels like a more
+> fitting choice, as it aligns better with the concept of a "device."
+> 
+> Best regards,
+> Dust
 
-diff --git a/ethtool.c b/ethtool.c
-index 8a81001..453058d 100644
---- a/ethtool.c
-+++ b/ethtool.c
-@@ -6303,7 +6303,7 @@ static int show_usage(struct cmd_context *ctx __maybe_unused)
- 	fprintf(stdout, "\n");
- 	fprintf(stdout, "FLAGS:\n");
- 	fprintf(stdout, "	--debug MASK	turn on debugging messages\n");
--	fprintf(stdout, "	--json		enable JSON output format (not supported by all commands)\n");
-+	fprintf(stdout, "	-j|--json	enable JSON output format (not supported by all commands)\n");
- 	fprintf(stdout, "	-I|--include-statistics		request device statistics related to the command (not supported by all commands)\n");
- 
- 	return 0;
-@@ -6565,7 +6565,8 @@ int main(int argc, char **argp)
- 			argc -= 1;
- 			continue;
- 		}
--		if (*argp && !strcmp(*argp, "--json")) {
-+		if (*argp && (!strcmp(*argp, "--json") ||
-+			      !strcmp(*argp, "-j"))) {
- 			ctx.json = true;
- 			argp += 1;
- 			argc -= 1;
--- 
-2.47.0
+Thank you for your thoughts, Dust.
+For me the 'D as 'direct' is not so much about the number of copies, but more about the
+aspect, that you can directly write at any offset into the buffer. I.e. no queues.
+More like the D in DMA or RDMA.
+
+I am preparing a talk for netdev in March about this subject, and the more I work on it,
+it seems to me that the buffers ('B'), that are
+a) only authorized for a single remote device and
+b) can be accessed at any offset
+are the important differentiator compared other virtual devices.
+So maybe 'D' for Dedicated?
+
+I even came up with
+dibs - Dedicated Internal Buffer Sharing or
+dibc - Dedicated Internal Buffer Communication
+(ok, I like the sound and look of the 'I'. But being on the same hardware as opposed
+to RDMA is also an important aspect.)
+
+
+MCD - 'memory communication device' sounds rather vague to me. But if it is the
+smallest common denominator, i.e. the only thing we can all agree on, I could live with it.
+
 
 
