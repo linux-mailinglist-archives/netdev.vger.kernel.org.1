@@ -1,143 +1,114 @@
-Return-Path: <netdev+bounces-164745-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-164761-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 651B6A2EF2C
-	for <lists+netdev@lfdr.de>; Mon, 10 Feb 2025 15:06:23 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0C611A2EF66
+	for <lists+netdev@lfdr.de>; Mon, 10 Feb 2025 15:12:21 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 36D363A2DD9
-	for <lists+netdev@lfdr.de>; Mon, 10 Feb 2025 14:06:14 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id BA1C21688B3
+	for <lists+netdev@lfdr.de>; Mon, 10 Feb 2025 14:11:48 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5C159231A2C;
-	Mon, 10 Feb 2025 14:06:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9EBD7233138;
+	Mon, 10 Feb 2025 14:11:12 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="V+TIswjD"
+	dkim=pass (2048-bit key) header.d=suse.com header.i=@suse.com header.b="R8dN25Pd"
 X-Original-To: netdev@vger.kernel.org
-Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wr1-f53.google.com (mail-wr1-f53.google.com [209.85.221.53])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 023DD156F53
-	for <netdev@vger.kernel.org>; Mon, 10 Feb 2025 14:06:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3DE03231A3C
+	for <netdev@vger.kernel.org>; Mon, 10 Feb 2025 14:11:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.53
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1739196380; cv=none; b=FgpupjpTg+4M3lkq/bBBJ4dcXNdME28ognqz9h+sOHBwW0NBCuLLmjEgWVBwwwMQHdKldPCtjv1ETXc0WhopWGb49yDEA9azKKAj/vRdy7bOPrDFW570/B9ys7BxVxeAn6Jtrc0Q49Kx8ZhhM6saLHqBAHzBRSqy1jvx+56iPxE=
+	t=1739196672; cv=none; b=XL+cekZG+v4p6pdvgQm671/7DRmRH5Z/K4lOJ93QOEw05W75mYQrZ0Ctzy2KSJ6zU/e8sAiMXZ392ktBnbbrof4jipHdl4Hr/X6WL05cVEpkUKcnltSsU/gge+WA8sc0n0JMYsPRsMSYHkhYO7wlOxAEkLr0V915QPKj9SjWt78=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1739196380; c=relaxed/simple;
-	bh=n09Qqc7qtTevDNVNcVQniUl0zTzht/nFRfuJQ0rx1/g=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=pcK+apdLHaEnRFpLX2d9g7bPsgWM5x/G/tddewqMcMkryZZeu5O6taRDFlrrQfH6EzQPt/M0EjvYViitJgUf4tvHYjGaKmcrxztSNzT4GcPg2i3o6YdPF6+kPTfvaSkoej9WBLDLJt8MsLKQULBFLSiA5hEsbqdbd+yMWu/GvOI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=V+TIswjD; arc=none smtp.client-ip=78.32.30.218
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
-	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
-	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
-	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=IoB0EWW2RDZaUJiqYLd1EGoHFiBhYJK8r8MHAwgkWuw=; b=V+TIswjDzP474U55wenzHJBHaU
-	I7bVlVRKEZYOxz4+ozjuh0ic6srYPKzMs2BpF4V9QaKdFqmRCQ0syBWBHi389hqnAzl3QzvGGuxrN
-	Y6N4HhmQj/iits0ndz6xaGAXkoGpbXMHGS6O89ZM2uqIH1Hq81y2604BLxmLE28s2s0bDB5J3P+Yh
-	/nNxjmzIQ5dYHc+e2oK6M8oWSme8N4S1ab6YHPCjibgdQNZrxYOZbDQrL4G4XV8+OjijAKa/WjLLI
-	nVpNrQuIn8ULwKuv4BRe23J+3e572a9G63H6PAa3Xm2ptrDVEkNsneaKSBxe6IPLja+c6DyAQZe5a
-	eE0iPPIg==;
-Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:57222)
-	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.96)
-	(envelope-from <linux@armlinux.org.uk>)
-	id 1thUQE-00075e-35;
-	Mon, 10 Feb 2025 14:06:03 +0000
-Received: from linux by shell.armlinux.org.uk with local (Exim 4.96)
-	(envelope-from <linux@shell.armlinux.org.uk>)
-	id 1thUQA-0007Y7-0X;
-	Mon, 10 Feb 2025 14:05:58 +0000
-Date: Mon, 10 Feb 2025 14:05:58 +0000
-From: "Russell King (Oracle)" <linux@armlinux.org.uk>
-To: Vladimir Oltean <olteanv@gmail.com>
-Cc: Andrew Lunn <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>,
-	AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>,
-	"Chester A. Unal" <chester.a.unal@arinc9.com>,
-	Daniel Golle <daniel@makrotopia.org>,
-	"David S. Miller" <davem@davemloft.net>,
-	DENG Qingfang <dqfext@gmail.com>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	linux-arm-kernel@lists.infradead.org,
-	linux-mediatek@lists.infradead.org,
-	Matthias Brugger <matthias.bgg@gmail.com>, netdev@vger.kernel.org,
-	Paolo Abeni <pabeni@redhat.com>, Sean Wang <sean.wang@mediatek.com>,
-	Simon Horman <horms@kernel.org>
-Subject: Re: [PATCH net-next v3 1/3] net: phylink: provide
- phylink_mac_implements_lpi()
-Message-ID: <Z6oHxrtBHAvaMqd3@shell.armlinux.org.uk>
-References: <Z6nWujbjxlkzK_3P@shell.armlinux.org.uk>
- <E1thR9g-003vX6-4s@rmk-PC.armlinux.org.uk>
- <20250210132054.oaqb5mboh6qiixfv@skbuf>
+	s=arc-20240116; t=1739196672; c=relaxed/simple;
+	bh=CrJKFWlnCDI2FZ4lKLW7Vf7WCdpVbHJIu4stf/aDmtA=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=YJMx4saAtLrBvdb4L88Bq0kVcrJ3NvDnpWBhkOTXpgryV4N4a/ZGtRMbK8HZ8zOkO8gPPBsfMdsZHr6Mdo0BVKa89W7lwfoELP8CUwsanbLzROxtfFJ6Kmqri2YUHC0lOIzVVi95/eU/bvh/4heg/t6kzOxKUGc82zOhv2nkICA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com; spf=pass smtp.mailfrom=suse.com; dkim=pass (2048-bit key) header.d=suse.com header.i=@suse.com header.b=R8dN25Pd; arc=none smtp.client-ip=209.85.221.53
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=suse.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.com
+Received: by mail-wr1-f53.google.com with SMTP id ffacd0b85a97d-38dd93a4e8eso1227688f8f.1
+        for <netdev@vger.kernel.org>; Mon, 10 Feb 2025 06:11:08 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=suse.com; s=google; t=1739196667; x=1739801467; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=ykMeXqtDfbSzGAc/i1oX4lCWVOUKvKYl+ifVgwQb5zM=;
+        b=R8dN25Pd0VZXdBjTVFCZN0Cg43aJot5CdPRZn/hri0vtbByS3QOGd9vWS6xDLz/UAx
+         dwBz88xMHITP7DU9WC41kltPX/oIFj0TID7NJQ0sq+fXIxdiFrAYB3B/Q0Izcw6AhVWc
+         ywiNebbGZmWYrOaoY943MIM6PzZzyRW+HXtnuvfmonnJCkvT/KIfSeNhpDL8FLGCJuTG
+         b7WHsNLOobdNu4hKoyLrDp2jyEnV9bv3Dfag+2DpFaRaOyyo3QqFGAfqUAC5kBi0Yzf0
+         RWV/x1iw5+SDR8M+oJhAv0jcqbE8tjiKlWflQB30TYe2+9Of90o0XWMnkHHBr0r00v8b
+         4LCw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1739196667; x=1739801467;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=ykMeXqtDfbSzGAc/i1oX4lCWVOUKvKYl+ifVgwQb5zM=;
+        b=iNYfnQoXUwmv7nakl1S4+9y6M3YsUAsauTbzv6bVRFg9PNtVO63IYCxG9YW26hXYYY
+         uDpltoDOGYX0FDLngjMJvs7azYSjfJzyHasj8hI7R7KDs4Joq3TBb5/6j+SIa8Aanvl7
+         kLWiAZf+Pn1VIElcSLnsPw2IkPEZwncRJPEXJ9p6wwoPVM1uQ379RPKaC+wWsoNKzlBz
+         +cGfJKW3JTlbcMfvVXPEdd6BbGWpeUQ7ZDk6C1gOsuYOPxNY8a+twrjEbvNKvAys76uE
+         c3UJ7Zd9pcHmLv2v8lpsf5RS5C/vfFXiAXrSB5cOQNsZu72k3oxUHM7H2brJ9ab+kO1V
+         FWYg==
+X-Gm-Message-State: AOJu0YzkFymPQ7ev36AELU0CzyxnopAY/waFDQoM6o7+AC1S1OFbjyZY
+	La+9wHrgwP5p4PNaJH9kJU0AdLc5ynL0ny0VfrbBzuc604XUU/P1BZ0MmoVPdVu3ptqqQTONcXe
+	M
+X-Gm-Gg: ASbGnct7+kerAd3OH8Z9cNVXH+5375G9UAkHhK8T4Wd0MI8itAxm09JenkAGnoAgnoZ
+	2ww0vhZp4E0eIHAuY0PVk6ljmD2HfrM4pJYYQCRoesv7nDPXj3FtovL+xCIGwEi+IdwYqp9DtZE
+	do4iNDUkBhQetVOCs9CMrNinDtW1h8z+RWo3mxwhLzgdZE13eBeaj+Ob/pk1vcToBa/iDYmoitN
+	gTjfMx9zgoDBYDSYD7u1qfwhVlOJX42RK2YhTLmq5tLMVi2WwYe9D4NeJ4tQWGarjFHe7OAa/+C
+	NCxvsRNGYK3GMOIXrA==
+X-Google-Smtp-Source: AGHT+IGZqAlMr/NAFCu+gALkFjNVFDc7QOIx4CFPg/IpyGbv1PDU3DFlpMi5dGnZGK+JF6IpM1f01g==
+X-Received: by 2002:a5d:59a9:0:b0:38d:dd43:8be5 with SMTP id ffacd0b85a97d-38ddd438e20mr3926817f8f.15.1739196667499;
+        Mon, 10 Feb 2025 06:11:07 -0800 (PST)
+Received: from blackdock.suse.cz ([193.86.92.181])
+        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-ab7bca07294sm271656566b.68.2025.02.10.06.11.07
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 10 Feb 2025 06:11:07 -0800 (PST)
+From: =?UTF-8?q?Michal=20Koutn=C3=BD?= <mkoutny@suse.com>
+To: netdev@vger.kernel.org
+Cc: mkoutny@suse.com,
+	mkubecek@suse.cz
+Subject: [PATCH] ss: Tone down cgroup path resolution
+Date: Mon, 10 Feb 2025 15:11:03 +0100
+Message-ID: <20250210141103.44270-1-mkoutny@suse.com>
+X-Mailer: git-send-email 2.48.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250210132054.oaqb5mboh6qiixfv@skbuf>
-Sender: Russell King (Oracle) <linux@armlinux.org.uk>
+Content-Transfer-Encoding: 8bit
 
-On Mon, Feb 10, 2025 at 03:20:54PM +0200, Vladimir Oltean wrote:
-> On Mon, Feb 10, 2025 at 10:36:44AM +0000, Russell King (Oracle) wrote:
-> > diff --git a/include/linux/phylink.h b/include/linux/phylink.h
-> > index 898b00451bbf..0de78673172d 100644
-> > --- a/include/linux/phylink.h
-> > +++ b/include/linux/phylink.h
-> > @@ -737,6 +737,18 @@ static inline int phylink_get_link_timer_ns(phy_interface_t interface)
-> >  	}
-> >  }
-> >  
-> > +/**
-> > + * phylink_mac_implements_lpi() - determine if MAC implements LPI ops
-> > + * @ops: phylink_mac_ops structure
-> > + *
-> > + * Returns true if the phylink MAC operations structure indicates that the
-> > + * LPI operations have been implemented, false otherwise.
-> 
-> This is something that I only noticed for v3 because I wanted to leave a
-> review tag, so I first checked the status in patchwork, but there it says:
-> 
-> include/linux/phylink.h:749: warning: No description found for return value of 'phylink_mac_implements_lpi'
-> 
-> I am aware of this conversation from November where you raised the point
-> about tooling being able to accept the syntax without the colon as well:
-> https://lore.kernel.org/netdev/87v7wjffo6.fsf@trenco.lwn.net/
-> 
-> but it looks like it didn't go anywhere, with Jon still preferring the
-> strict syntax for now, and no follow-up that I can see. So, the current
-> conventions are not these, and you haven't specifically said anywhere
-> that you are deliberately ignoring them.
+Sockets and cgroups have different lifetimes (e.g. fd passing between
+cgroups) so obtaining a cgroup id to a removed cgroup dir is not an
+error. Furthermore, the message is printed for each such a socket.
+Improve user experience by silencing these specific errors.
+---
+ lib/fs.c | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
 
-It was explained in this email as part of that thread:
-
-https://lore.kernel.org/netdev/ZzjHH-L-ylLe0YhU@shell.armlinux.org.uk/
-
-The reason is that it goes against natural grammar. The only time that
-"Returns:" would make sense in grammar is when listing with e.g. a
-bulleted list, where the part before the colon doesn't have to be a
-complete sentence.
-
-This is why it's going to be an uphill battle - grammatically it is
-wrong, and thus it doesn't flow when thinking about documenting the
-return value.
-
-If we want to go to a bulleted list, then it will be natural to add
-the colon.
-
-I'm not going to explain to this level of detail in every email, and
-because of the grammatical nature of this, it's going to be very
-difficult to use a form that goes against proper grammar.
-
+diff --git a/lib/fs.c b/lib/fs.c
+index 622f28b3..6fe1d6db 100644
+--- a/lib/fs.c
++++ b/lib/fs.c
+@@ -223,7 +223,8 @@ char *get_cgroup2_path(__u64 id, bool full)
+ 
+ 	fd = open_by_handle_at(mnt_fd, fhp, 0);
+ 	if (fd < 0) {
+-		fprintf(stderr, "Failed to open cgroup2 by ID\n");
++		if (errno != ESTALE)
++			fprintf(stderr, "Failed to open cgroup2 by ID\n");
+ 		goto out;
+ 	}
+ 
 -- 
-RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
-FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
+2.48.1
+
 
