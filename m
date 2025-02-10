@@ -1,81 +1,92 @@
-Return-Path: <netdev+bounces-164718-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-164719-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id A5889A2ED15
-	for <lists+netdev@lfdr.de>; Mon, 10 Feb 2025 14:00:57 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 87541A2ED34
+	for <lists+netdev@lfdr.de>; Mon, 10 Feb 2025 14:06:40 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 119197A111D
-	for <lists+netdev@lfdr.de>; Mon, 10 Feb 2025 13:00:01 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id DFE2D1888D0E
+	for <lists+netdev@lfdr.de>; Mon, 10 Feb 2025 13:06:45 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EB2651BD01F;
-	Mon, 10 Feb 2025 13:00:50 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="mQxC+HS9"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BE94622371D;
+	Mon, 10 Feb 2025 13:06:25 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+Received: from szxga05-in.huawei.com (szxga05-in.huawei.com [45.249.212.191])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B12BE243378;
-	Mon, 10 Feb 2025 13:00:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B285B223323;
+	Mon, 10 Feb 2025 13:06:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.191
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1739192450; cv=none; b=TQXry+9Ax7cy0GhSo+G7DSJ5Q4ZEU5nWcnoJzbWMYGFEjXTEDcmkMEXPT2TSxwYLTKqhQoZxZUHJsH8nkAI1Xf7V2DPnO+/MYCKSsdmqw3MGPh4YVlSdsDcuRqz3sgs0dmKRuGbUn8u9XF5+z7R9ZNSVNg/0H53/EzF3OpgMplk=
+	t=1739192785; cv=none; b=jUncAnYhna57J9R/2gjo1WAoWqlINIcAXwwZbh+ELisaYtLxWCIDO0Sem8m4Y5/xU3oJzJbgwdRtIC3bxDzBZmmmODvHBIk++FmAm3O/2Rj9R46iCKkwOSWEiD8Yb9a32YqNmdLMIEmE3CbceQjAzyHalXpqbN+8V2TroWv4Dsg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1739192450; c=relaxed/simple;
-	bh=k8BCw/rCXL9HABA1KoWo1oX3z8/5JPE8FP+EMj8Y+OU=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=mk8842X6JXa97zIUwW/N//zlLt9+aVyFL7LmzcEzFu1+lIe9A1U9KDTtBqZHTEBN7wWaqw9krUHSqLXxMUVGLsnw2gue9eZreLOQucVFJngUB71+KY26DAudUwaXQuo5EpcWb9SQMs8IFReAjQPsiV9zU0YhK7Ci/SVyuMWLFQc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=mQxC+HS9; arc=none smtp.client-ip=156.67.10.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=wy6vrOoyIm2ACk3He6+xKikKNiwbAEjnjNO36JbVUOU=; b=mQxC+HS9l3/xGYpwW5UNTG2NJz
-	wT6tKgHRIjatNJTq8ZJj3+91SIn+JlxLuJosAZ0gRLcTn3Sh6jwCCr7GmbdQoRE5YA8lRgegl29PA
-	l7pvvABNcFCYIGSgsTsYj3xZOosXBl/kfJfa0InEXqw7Ek37gU82hSqwebIjwjA+9DZ8=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1thTOq-00CiF5-QP; Mon, 10 Feb 2025 14:00:32 +0100
-Date: Mon, 10 Feb 2025 14:00:32 +0100
-From: Andrew Lunn <andrew@lunn.ch>
-To: Wolfram Sang <wsa+renesas@sang-engineering.com>
-Cc: linux-kernel@vger.kernel.org,
-	Florian Fainelli <florian.fainelli@broadcom.com>,
-	Broadcom internal kernel review list <bcm-kernel-feedback-list@broadcom.com>,
-	Heiner Kallweit <hkallweit1@gmail.com>,
-	Russell King <linux@armlinux.org.uk>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	netdev@vger.kernel.org
-Subject: Re: [PATCH RESEND] net: phy: broadcom: don't include
- '<linux/pm_wakeup.h>' directly
-Message-ID: <78761890-deb9-43f0-8315-d5b48c02ee38@lunn.ch>
-References: <20250210113658.52019-2-wsa+renesas@sang-engineering.com>
+	s=arc-20240116; t=1739192785; c=relaxed/simple;
+	bh=lGlDCciVjiUxQPcUI4Jw2a370ATxZ9mi47m7J1PwXT8=;
+	h=From:To:CC:Subject:Date:Message-ID:Content-Type:MIME-Version; b=m8DFCBSEP1A4fwgcn7A8hX+cno85ArYB4Pm8XKpmU0ZZnPGHEuJyndKvnfUKGWp1qPq+58r/ueEz4q7EOSwVczmRfAj+0a2QyxmaLVo0boGDzokUYiheZD512qGQVm/HY0mJeQ/leQ1WH4uoSfHAFmywJgUtQMsgTs3MlAQ/xf8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.191
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
+Received: from mail.maildlp.com (unknown [172.19.88.163])
+	by szxga05-in.huawei.com (SkyGuard) with ESMTP id 4Ys4Vd4dGZz1ltc3;
+	Mon, 10 Feb 2025 21:02:33 +0800 (CST)
+Received: from dggemv704-chm.china.huawei.com (unknown [10.3.19.47])
+	by mail.maildlp.com (Postfix) with ESMTPS id D111518001B;
+	Mon, 10 Feb 2025 21:06:12 +0800 (CST)
+Received: from kwepemn500013.china.huawei.com (7.202.194.154) by
+ dggemv704-chm.china.huawei.com (10.3.19.47) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.1.2507.39; Mon, 10 Feb 2025 21:06:12 +0800
+Received: from kwepemo500008.china.huawei.com (7.202.195.163) by
+ kwepemn500013.china.huawei.com (7.202.194.154) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1544.11; Mon, 10 Feb 2025 21:06:12 +0800
+Received: from kwepemo500008.china.huawei.com ([7.202.195.163]) by
+ kwepemo500008.china.huawei.com ([7.202.195.163]) with mapi id 15.02.1544.011;
+ Mon, 10 Feb 2025 21:06:12 +0800
+From: mengkanglai <mengkanglai2@huawei.com>
+To: Pablo Neira Ayuso <pablo@netfilter.org>, Jozsef Kadlecsik
+	<kadlec@netfilter.org>, "David S. Miller" <davem@davemloft.net>, Eric Dumazet
+	<edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
+	<pabeni@redhat.com>, Simon Horman <horms@kernel.org>,
+	"netfilter-devel@vger.kernel.org" <netfilter-devel@vger.kernel.org>,
+	"coreteam@netfilter.org" <coreteam@netfilter.org>, "netdev@vger.kernel.org"
+	<netdev@vger.kernel.org>, "linux-kernel@vger.kernel.org"
+	<linux-kernel@vger.kernel.org>
+CC: "Yanan (Euler)" <yanan@huawei.com>, "Fengtao (fengtao, Euler)"
+	<fengtao40@huawei.com>, "gaoxingwang (A)" <gaoxingwang1@huawei.com>
+Subject: ftp ipvs connect failed in ipv6
+Thread-Topic: ftp ipvs connect failed in ipv6
+Thread-Index: Adt7u90tPuI4P4Z+R9u0e87z5R2gbQ==
+Date: Mon, 10 Feb 2025 13:06:11 +0000
+Message-ID: <e1527ca5f8f84be09022859f5e33b584@huawei.com>
+Accept-Language: en-US
+Content-Language: zh-CN
+X-MS-Has-Attach:
+X-MS-TNEF-Correlator:
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20250210113658.52019-2-wsa+renesas@sang-engineering.com>
 
-On Mon, Feb 10, 2025 at 12:36:59PM +0100, Wolfram Sang wrote:
-> The header clearly states that it does not want to be included directly,
-> only via '<linux/(platform_)?device.h>'. Replace the include accordingly.
-> 
-> Signed-off-by: Wolfram Sang <wsa+renesas@sang-engineering.com>
-> Acked-by: Florian Fainelli <florian.fainelli@broadcom.com>
+Hello:
+I found a problem with ftp ipvs.
+I create 3 virtual machine in one host. One is the FTP client, the other is=
+ the ipvs transition host, and the other is the FTP server.
+The ftp connection is successful in ipv4 address,but failed in ipv6 address=
+.
+The failure is tcp6 checksum error in tcp_dnat_handler(tcp_dnat_handler-> t=
+cp_csum_check->csum_ipv6_magic),
+I trace back where skb->csum is assigned and found skb->csum is assigned in=
+ nf_ip6_checksum in case CHECKSUM_NONE(ipv6_conntrack_in=3D> nf_conntrack_i=
+n =3D> nf_conntrack_tcp_packet =3D> nf_ip6_checksum).
+I don't know much about ipv6 checksums,why ipv6 nf_conntrack assign skb->cs=
+um but check error in ipvs tcp_dnat_handler?
+Best wishes!
 
-Reviewed-by: Andrew Lunn <andrew@lunn.ch>
-
-    Andrew
 
