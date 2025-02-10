@@ -1,155 +1,184 @@
-Return-Path: <netdev+bounces-164629-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-164630-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9E910A2E805
-	for <lists+netdev@lfdr.de>; Mon, 10 Feb 2025 10:41:21 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 116BBA2E815
+	for <lists+netdev@lfdr.de>; Mon, 10 Feb 2025 10:44:03 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 6EA873A91C3
-	for <lists+netdev@lfdr.de>; Mon, 10 Feb 2025 09:41:12 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A90CC3A9741
+	for <lists+netdev@lfdr.de>; Mon, 10 Feb 2025 09:43:49 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D26CB1C3C0D;
-	Mon, 10 Feb 2025 09:41:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CF9B71C3C18;
+	Mon, 10 Feb 2025 09:43:42 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="1th6MVEY"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="f9LlKHIC"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wr1-f51.google.com (mail-wr1-f51.google.com [209.85.221.51])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DAE3E185935
-	for <netdev@vger.kernel.org>; Mon, 10 Feb 2025 09:41:14 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.51
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F34F91C5D58
+	for <netdev@vger.kernel.org>; Mon, 10 Feb 2025 09:43:40 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1739180476; cv=none; b=O349F3uZNV6GDT1zqo39AWm3TvACeytv6l44EVxJwyeFNW4plleoV4UkwtnEBcfXi23xpodM4ftaVwAhdhGj2EMSas8WylaJBgV7gj8ZD9Y30d/PqQduVrnpFFebKtKyfHX1aUlpNJtbWWuvmywlkJRka8u4QOROZAerRK++KOg=
+	t=1739180622; cv=none; b=FG4berlk8pv+RebI9JO67Nz+fSTOlt/T1b9xW9sKo+UlgZYIug9YE1YH6jkKBEWMHEt4ExjK0IwL0h6UDOmHt5TslkqvD9AF16VHccv01V9n/9sE/wmUVMLlJ1ph2JnIV83QyXGbbvGinwT8Vzd14Egb+8vzOwa1cu3weg+z5Do=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1739180476; c=relaxed/simple;
-	bh=p4bQSg87uFVkYpd3/MVrEp/e7zuLTdd+q0YZ9vhYMhI=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=pCfl92aDll79RrWH23Sg2MRYRy3lYUQGBBED3sr67S9g2QwBw/tVvewDqvv941RI0i0WG9PBBxPAwAVKxOZg8s42/wuV19wsE+zdNCEMJaZH9AQWbO668Iur+lFN+NbzPYoraKTyiwmrDOZV50uCMKyo6DKqJzyNKaCJ2HhR8C8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=1th6MVEY; arc=none smtp.client-ip=209.85.221.51
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-wr1-f51.google.com with SMTP id ffacd0b85a97d-38dd91c313bso659612f8f.3
-        for <netdev@vger.kernel.org>; Mon, 10 Feb 2025 01:41:14 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1739180473; x=1739785273; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=iCBNOxznqCDPYuXB5E7wzbFvG2L1F3n8EQ/l45ckAzA=;
-        b=1th6MVEYLzBYM05aJm6Z61Z0G6nvsQF126bXIm3v2+nQdQ3jcufz/wh0cflA2y9sCn
-         w7KQAho2EgY7NeY+EblN+LkgJ+gvrNCWHp8SDE+b5F4LEbC6IFSGj6knPoJkGy8ZoKhq
-         H9tXK79mU7H7UFk0uLOx/N8FNHtJ3Ohi0Pld+Artje0eilbG43ISmeulgfJ1EkcugrRB
-         dnwY8vKb+DGDFS42KJnCPIoGiXKM5xgElJnJo9Kf8mzq69cBjnXdPDislBbb6+O2psxE
-         a4FIv8law7fJuKdU0PGbZEUQc5zN6liXzGeVZaK1Oh0c5rN8Od7dRp3kfuhcax2R+wZ8
-         qgpg==
+	s=arc-20240116; t=1739180622; c=relaxed/simple;
+	bh=4nnGRZWW2/AIdWnnKh8a2BrGef7FP9UITDSDs1NXlLE=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=jCD5/0J9qG/JN7IMbh6CJDctffbyMvLFnAsJorw26ramiLwPxo0RJA11ig7vUL/IsD207PqNFSHtgwSTtdy1YIJkpZJxAaIn4c9QdLyWwPmzILRYmKeTi1qdWOuBfLJb/FkLrXD9Yx3kMVc3mrEUfNo1CGnRA3vluK7KLrBZJ18=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=f9LlKHIC; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1739180619;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=OV0I0aQqD+wSVhWeEAawFpUzdxgKYx0GC3wuNeeP0og=;
+	b=f9LlKHICKjLt2lHUIpcTsx2743UOCrDx+IpYKKPb0PupL0RD8+NJIj29DcZjrWOxxrTCn1
+	lImvy4jlxcDf8Sy8KofsMjbWd11dDZLK0WrLy61EFJiJTl7oPyfd3MvF3Z2NgLtXbsbIUi
+	KGVNyIQ6WsIhp20eImPZLzRna5SdnjA=
+Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com
+ [209.85.221.72]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-695-M9yCyFfWOVSGmVSJUSsD2w-1; Mon, 10 Feb 2025 04:43:38 -0500
+X-MC-Unique: M9yCyFfWOVSGmVSJUSsD2w-1
+X-Mimecast-MFC-AGG-ID: M9yCyFfWOVSGmVSJUSsD2w
+Received: by mail-wr1-f72.google.com with SMTP id ffacd0b85a97d-38dd692b6d9so572886f8f.3
+        for <netdev@vger.kernel.org>; Mon, 10 Feb 2025 01:43:38 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1739180473; x=1739785273;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=iCBNOxznqCDPYuXB5E7wzbFvG2L1F3n8EQ/l45ckAzA=;
-        b=XGY73os8JTFOXdGBPijwa30i+HnwB4Vygyi/7DYV9+M4UCNkCBZPK2kojQAwJqbcXG
-         d+wP2m5l5p7QDmqgdnc6HQYkrxzyBMfmgRg00t2uEFm0aL2hnMkz6EDZbuM34Vmb9HQn
-         RxK7224rWXs7DDpTW1ZaSf/+fMxAfm/vnO9At1zyrhXs4+E2YAKsG4CeEC03gY7pgrG1
-         sOgAET6FgxqgH0ARujpmkb0eiMtvF/MnDLOZHw81E6Sx4mmpcbs0q6hE/OyBgEJ1dOGO
-         olZkn6JkMtechmUXoOeZEVRhsXJUtxaO0opa4N5F0QnIZpA7BlF6Kqqa3cywQGJ0ZU0k
-         KUgQ==
-X-Forwarded-Encrypted: i=1; AJvYcCXn0qpG5zz2a6tRo2d3O7ut2ymzMJFZ4A3UUZ3E/db7JIXlYRksyxhtGxU8H+LDvxoVNaX1oj8=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzyuZ8+IdX+Xvl/oLfQusKaSKgTfYwXD7+70gzJIIvswbx64dMG
-	t8DtZMlbvI+B/veZPMSYNEMVtw783xGF5fOBtpdDcBfWlDXl7yWdLr3mP5N0UOPM/w32w7r1+G4
-	Xsj/w1FbIS9+wiLJIYpqhLwuCRtLE/wqUbBVh
-X-Gm-Gg: ASbGnctUc7v8SgVX0+SaWSE44w5p2/72/kHIbAU384I6uxXKl07TGgqYZhrWK2SfjEq
-	zCF5DLQOikNEP6/qe0VJ+0eLhWOQOErYYwkU/DJ0L2J3gcV6QSp0MWI23xjLdnYhCoXvV4rcT2g
-	==
-X-Google-Smtp-Source: AGHT+IHEuf8P7J1DpuNuDhKVh1hrYoLIiGq+/hlGA9zolraaf3yrulKD6NlrzKrc8ZqwFjERJM8NaGnRUmNvl8upGCo=
-X-Received: by 2002:a5d:64ae:0:b0:38d:d371:e010 with SMTP id
- ffacd0b85a97d-38dd371e1bdmr6514970f8f.35.1739180473091; Mon, 10 Feb 2025
- 01:41:13 -0800 (PST)
+        d=1e100.net; s=20230601; t=1739180617; x=1739785417;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=OV0I0aQqD+wSVhWeEAawFpUzdxgKYx0GC3wuNeeP0og=;
+        b=Fcewhk8gUgd8CGinh1qBCzBbC1/nGsaqDBfrwoifwnqdzJNl1vGEwKuMIBAzcaplMO
+         UCaExIvHitmmzejO73Fz3q73wjniYeb06kcCwy3VUzftADgPQD90pTDkMXzl+D0QSWId
+         ZSrqEWpuE/PvHOonWaJdfK/SEBwogM1x63EvgqzAqjy3rkxJd0omFtxaykSLHWCMci7n
+         7ufQLmwUIrz5b90bXbLyIXgjs5Ddh7nonMzM6SSI3tZGxUPFz2QEw6Er06XUBVLP4AWK
+         +qGJ/e7qOHG4P1dLdrxYHwFt4nuqa8xgdT/30+NPizRg3AvRFWjFO6H8TvZrnq9zRoxY
+         rTDQ==
+X-Forwarded-Encrypted: i=1; AJvYcCXhGjGo021B6oZnY93WT//yAVWcqX/urpmRZ11NnkToI1UmDAMMIT00sqLgq5AeFjIkB+zMpCA=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzHgM0g88wXnGJKB1KkZtPikgMp+8e72VFZTAg0TAeHt5lFVBR+
+	+xNQPUeNb37/ENbPtHgjYJpFwX4Zs3oebzPq38vYGG4OKpB/hWpLh7ftzZfnjcseJMzBtn/tVIh
+	+4vmOaGoqQ6uDNCzSCLOC8yeNIC1C8+PXpEs6/QzFzNaS8FxhrHOm/A==
+X-Gm-Gg: ASbGncvMLKf0iPehDPARkjInL7jZXfMOawpTsQVX7zttDD785HQd6gnQDM2BYoIPTSv
+	TY8uSGWcvYXjI1SLE7NGm+M55RisnG1QN48P+S2+oc9J9Bs03pFlvGce/ePy5+KJ7X1K5auC2nK
+	E5uWepyFkHsxP+IHs4CO68s85CHYUsu8J4c+0DlYk1464GylgjM/TV8UN6ypKYCOxMSFwbZYHcE
+	wBwHRZQYB3H4/654qyIwwaa3ZvWJxuN6dRFhIYZNtPOtRQfujjG/BCGcBqMAJSjr422buVOK8VI
+	uo0L3qiU
+X-Received: by 2002:a5d:47ca:0:b0:385:e8b0:df13 with SMTP id ffacd0b85a97d-38dc93338dfmr10260997f8f.40.1739180616983;
+        Mon, 10 Feb 2025 01:43:36 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IGtDMMFpdiiXsWsysnFaQ7CSpb+NbM1wiCOHPvDVkxEiC0O13gU+wXlV45zGOW6comGIKK5/A==
+X-Received: by 2002:a5d:47ca:0:b0:385:e8b0:df13 with SMTP id ffacd0b85a97d-38dc93338dfmr10260964f8f.40.1739180616626;
+        Mon, 10 Feb 2025 01:43:36 -0800 (PST)
+Received: from leonardi-redhat ([176.206.32.19])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-38dd8dee385sm4628048f8f.61.2025.02.10.01.43.35
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 10 Feb 2025 01:43:36 -0800 (PST)
+Date: Mon, 10 Feb 2025 10:43:34 +0100
+From: Luigi Leonardi <leonardi@redhat.com>
+To: Michal Luczaj <mhal@rbox.co>
+Cc: Stefano Garzarella <sgarzare@redhat.com>, 
+	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, 
+	netdev@vger.kernel.org
+Subject: Re: [PATCH net v2 2/2] vsock/test: Add test for SO_LINGER null ptr
+ deref
+Message-ID: <ysek3sr42wapewffu5cbtt5lvyso5u6xnq4u2nigywylle5dr2@xuzmkbsy3phh>
+References: <20250206-vsock-linger-nullderef-v2-0-f8a1f19146f8@rbox.co>
+ <20250206-vsock-linger-nullderef-v2-2-f8a1f19146f8@rbox.co>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250207132623.168854-1-fujita.tomonori@gmail.com>
- <20250207132623.168854-2-fujita.tomonori@gmail.com> <20250207181258.233674df@pumpkin>
- <20250208.120103.2120997372702679311.fujita.tomonori@gmail.com>
-In-Reply-To: <20250208.120103.2120997372702679311.fujita.tomonori@gmail.com>
-From: Alice Ryhl <aliceryhl@google.com>
-Date: Mon, 10 Feb 2025 10:41:00 +0100
-X-Gm-Features: AWEUYZk6EqTIZZGO1SVVqrV6LG5OFX5VZNOHhYpPhCPzQ0NZdqfyiNifhY4e36w
-Message-ID: <CAH5fLgiDCNj3C313JHGDrBS=14K1COOLF5vpV287pT9TM6a4zQ@mail.gmail.com>
-Subject: Re: [PATCH v10 1/8] sched/core: Add __might_sleep_precision()
-To: FUJITA Tomonori <fujita.tomonori@gmail.com>
-Cc: david.laight.linux@gmail.com, boqun.feng@gmail.com, 
-	linux-kernel@vger.kernel.org, rust-for-linux@vger.kernel.org, 
-	netdev@vger.kernel.org, andrew@lunn.ch, hkallweit1@gmail.com, 
-	tmgross@umich.edu, ojeda@kernel.org, alex.gaynor@gmail.com, gary@garyguo.net, 
-	bjorn3_gh@protonmail.com, benno.lossin@proton.me, a.hindborg@samsung.com, 
-	anna-maria@linutronix.de, frederic@kernel.org, tglx@linutronix.de, 
-	arnd@arndb.de, jstultz@google.com, sboyd@kernel.org, mingo@redhat.com, 
-	peterz@infradead.org, juri.lelli@redhat.com, vincent.guittot@linaro.org, 
-	dietmar.eggemann@arm.com, rostedt@goodmis.org, bsegall@google.com, 
-	mgorman@suse.de, vschneid@redhat.com, tgunders@redhat.com, me@kloenk.dev
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii; format=flowed
+Content-Disposition: inline
+In-Reply-To: <20250206-vsock-linger-nullderef-v2-2-f8a1f19146f8@rbox.co>
 
-On Sat, Feb 8, 2025 at 4:01=E2=80=AFAM FUJITA Tomonori
-<fujita.tomonori@gmail.com> wrote:
+On Thu, Feb 06, 2025 at 12:06:48AM +0100, Michal Luczaj wrote:
+>Explicitly close() a TCP_ESTABLISHED (connectible) socket with SO_LINGER
+>enabled.
 >
-> On Fri, 7 Feb 2025 18:12:58 +0000
-> David Laight <david.laight.linux@gmail.com> wrote:
+>As for now, test does not verify if close() actually lingers.
+>On an unpatched machine, may trigger a null pointer dereference.
 >
-> >>  static void print_preempt_disable_ip(int preempt_offset, unsigned lon=
-g ip)
-> >>  {
-> >>      if (!IS_ENABLED(CONFIG_DEBUG_PREEMPT))
-> >> @@ -8717,7 +8699,8 @@ static inline bool resched_offsets_ok(unsigned i=
-nt offsets)
-> >>      return nested =3D=3D offsets;
-> >>  }
-> >>
-> >> -void __might_resched(const char *file, int line, unsigned int offsets=
-)
-> >> +static void __might_resched_precision(const char *file, int len, int =
-line,
-> >
-> > For clarity that ought to be file_len.
+>Tested-by: Luigi Leonardi <leonardi@redhat.com>
+>Signed-off-by: Michal Luczaj <mhal@rbox.co>
+>---
+> tools/testing/vsock/vsock_test.c | 41 ++++++++++++++++++++++++++++++++++++++++
+> 1 file changed, 41 insertions(+)
 >
-> Yeah, I'll update.
+>diff --git a/tools/testing/vsock/vsock_test.c b/tools/testing/vsock/vsock_test.c
+>index dfff8b288265f96b602cb1bfa0e6dce02f114222..d0f6d253ac72d08a957cb81a3c38fcc72bec5a53 100644
+>--- a/tools/testing/vsock/vsock_test.c
+>+++ b/tools/testing/vsock/vsock_test.c
+>@@ -1788,6 +1788,42 @@ static void test_stream_connect_retry_server(const struct test_opts *opts)
+> 	close(fd);
+> }
 >
-> >> +                                  unsigned int offsets)
-> >>  {
-> >>      /* Ratelimiting timestamp: */
-> >>      static unsigned long prev_jiffy;
-> >> @@ -8740,8 +8723,10 @@ void __might_resched(const char *file, int line=
-, unsigned int offsets)
-> >>      /* Save this before calling printk(), since that will clobber it:=
- */
-> >>      preempt_disable_ip =3D get_preempt_disable_ip(current);
-> >>
-> >> -    pr_err("BUG: sleeping function called from invalid context at %s:=
-%d\n",
-> >> -           file, line);
-> >> +    if (len < 0)
-> >> +            len =3D strlen(file);
-> >
-> > No need for strlen(), just use a big number instead of -1.
-> > Anything bigger than a sane upper limit on the filename length will do.
+>+static void test_stream_linger_client(const struct test_opts *opts)
+>+{
+>+	struct linger optval = {
+>+		.l_onoff = 1,
+>+		.l_linger = 1
+>+	};
+>+	int fd;
+>+
+>+	fd = vsock_stream_connect(opts->peer_cid, opts->peer_port);
+>+	if (fd < 0) {
+>+		perror("connect");
+>+		exit(EXIT_FAILURE);
+>+	}
+>+
+>+	if (setsockopt(fd, SOL_SOCKET, SO_LINGER, &optval, sizeof(optval))) {
+>+		perror("setsockopt(SO_LINGER)");
+>+		exit(EXIT_FAILURE);
+>+	}
+>+
+>+	close(fd);
+>+}
+>+
+>+static void test_stream_linger_server(const struct test_opts *opts)
+>+{
+>+	int fd;
+>+
+>+	fd = vsock_stream_accept(VMADDR_CID_ANY, opts->peer_port, NULL);
+>+	if (fd < 0) {
+>+		perror("accept");
+>+		exit(EXIT_FAILURE);
+>+	}
+>+
+>+	vsock_wait_remote_close(fd);
+>+	close(fd);
+>+}
+>+
+> static struct test_case test_cases[] = {
+> 	{
+> 		.name = "SOCK_STREAM connection reset",
+>@@ -1943,6 +1979,11 @@ static struct test_case test_cases[] = {
+> 		.run_client = test_stream_connect_retry_client,
+> 		.run_server = test_stream_connect_retry_server,
+> 	},
+>+	{
+>+		.name = "SOCK_STREAM SO_LINGER null-ptr-deref",
+>+		.run_client = test_stream_linger_client,
+>+		.run_server = test_stream_linger_server,
+>+	},
+> 	{},
+> };
 >
-> Ah, that's right. Just passing the maximum precision (1<<15-1) works.
 >
-> The precision specifies the maximum length. vsnprintf() always
-> iterates through a string until it reaches the maximum length or
-> encounters the null terminator. So strlen() here is useless.
+>-- 
+>2.48.1
 >
-> Alice and Boqun, the above change is fine? Can I keep the tags?
 
-I'd probably like a comment explaining the meaning of this constant
-somewhere, but sure ok with me.
+Thanks!
 
-Alice
+Reviewed-by: Luigi Leonardi <leonardi@redhat.com>
+
 
