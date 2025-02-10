@@ -1,176 +1,195 @@
-Return-Path: <netdev+bounces-164939-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-164940-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4024CA2FCFC
-	for <lists+netdev@lfdr.de>; Mon, 10 Feb 2025 23:28:22 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 945E1A2FD38
+	for <lists+netdev@lfdr.de>; Mon, 10 Feb 2025 23:37:38 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 0440F3A503D
-	for <lists+netdev@lfdr.de>; Mon, 10 Feb 2025 22:28:13 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 5D0683A566D
+	for <lists+netdev@lfdr.de>; Mon, 10 Feb 2025 22:37:29 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D54142505C5;
-	Mon, 10 Feb 2025 22:28:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6851F253356;
+	Mon, 10 Feb 2025 22:37:33 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ZhoEDTaB"
+	dkim=pass (2048-bit key) header.d=baylibre-com.20230601.gappssmtp.com header.i=@baylibre-com.20230601.gappssmtp.com header.b="dNxvM1PT"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f49.google.com (mail-wm1-f49.google.com [209.85.128.49])
+Received: from mail-oi1-f176.google.com (mail-oi1-f176.google.com [209.85.167.176])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 08A7024C69B;
-	Mon, 10 Feb 2025 22:28:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.49
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E6640253346
+	for <netdev@vger.kernel.org>; Mon, 10 Feb 2025 22:37:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.176
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1739226497; cv=none; b=sDkfnOLnX3uuCTuTvx1PFbjLl7bnr4OH/1QyVcWn7Rg49p2kISVLqUIs1+JAmGb8SvXGwV3INdeCyzbVpRD6tX+9B4VIvaoyS6yzWz2ACMxFC6dhsIKeJndYRQ0/zIS+Runc2dw1cJ+BI42c95HPcGt+qT+QDzyHo15nXGQfzSw=
+	t=1739227053; cv=none; b=BnZicRZcewaZGKLZnffC11CPjKYpc6NUbIZRi8IVwmDohC9L6aWmAd8/GL6qG5OeAR2NDQzB65IBaUg7bXr04F30nEM20cpPtDz68eyCaV7H8Huo4zPbE+ERzTvvzQavYFhBeHxmcqV7VQwRPHdnYGB75w6lkiVZCFYrKTmjqck=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1739226497; c=relaxed/simple;
-	bh=ndLubKwFBHWtlTDCPdx1r2RbDgFfGS3iAmUDE2AS1Vw=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=bKXA1OaXbhjq+JD3dYhGK24FidqAkQvtwxFP7NeZu2vwslz+0quOrwMVZmc10adrYvRnKzmsj8kH9+NGhSH5f9OSUWJ1fCiQY/ZU+xCxpDyhN7I0AH2Ucg9+FSAdyVgBF6YVSdN8G0+Dpnmlb2nxZ/E6Q9MnCNNDe+759wiTB64=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=ZhoEDTaB; arc=none smtp.client-ip=209.85.128.49
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wm1-f49.google.com with SMTP id 5b1f17b1804b1-436345cc17bso33993285e9.0;
-        Mon, 10 Feb 2025 14:28:15 -0800 (PST)
+	s=arc-20240116; t=1739227053; c=relaxed/simple;
+	bh=afEXr0Ym345b+01JWvSTXXjtaEwJ8nYEblSojlE39NE=;
+	h=From:Subject:Date:Message-Id:MIME-Version:Content-Type:To:Cc; b=iEjw80/Ksr6MqU6SOt0Qp9HU/8GRl/FJVpvJQ1VJx03WXINCmtUDIQ0kPluJ0ijLRLuDM5IXDdzkDaJHQjr6damDCgfbmySvUJd/NRQc7sdIj27o4fL1nYPMi0v5O9gmbKVQAcMMMycgFpNYCx3f89plMrg3Wyi3mo4F2p/K+L8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=baylibre.com; spf=pass smtp.mailfrom=baylibre.com; dkim=pass (2048-bit key) header.d=baylibre-com.20230601.gappssmtp.com header.i=@baylibre-com.20230601.gappssmtp.com header.b=dNxvM1PT; arc=none smtp.client-ip=209.85.167.176
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=baylibre.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=baylibre.com
+Received: by mail-oi1-f176.google.com with SMTP id 5614622812f47-3f3a6cb98a5so1662365b6e.0
+        for <netdev@vger.kernel.org>; Mon, 10 Feb 2025 14:37:30 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1739226494; x=1739831294; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:subject:cc:to:from:date:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=qkWWMjBJ1/YRt3lwgOfr2tNA5D2acLgDBlTp/Ye7Oa8=;
-        b=ZhoEDTaBXqehH8mcLxQAJ+MlyetSpm6uDuUpb+RX7HFB7qOCdZZv4uvK6GPaDYCeQp
-         2mSEo/6ok3aDLG9+DuWNZQSHqFibw0N+HY/VlJco1VVnPcM5UFxuGbsXbUHTJz5EE0X4
-         eIlvskZCxsCzK4tOzWS7KmEjFVK2nTe9mx6hubyal4PqJVdZSEqVW7OSeKd9NyJT2ijZ
-         MzJRNOpepCZQ1868xWtE5rLFBrb6/8Wp/VlP5KaNDSRSECDrEKkcKNnFZjVNnOpor+kU
-         xOgiXYtRuhfmhC2vL0nMoHB18Jq9soqo8o4MC1YgUhzu6oES/+mByRdUIsGjOhAHSFWg
-         /tGg==
+        d=baylibre-com.20230601.gappssmtp.com; s=20230601; t=1739227050; x=1739831850; darn=vger.kernel.org;
+        h=cc:to:content-transfer-encoding:mime-version:message-id:date
+         :subject:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=Ab4LJ9OfN5R35QeUwpcAeHgQPVCquBOJeARRwrwUU60=;
+        b=dNxvM1PTOikhj0bgd5gWpulEoUseM6YcLRSKCSZEzbP2S5Y+OWKJYP5ZZPl44zLIvX
+         aUe910QjwwjJgQv5A4TouSJ8bzjuEn+b1mdVk6VJKO0QlqL8b5pzqv6fVowCEa1KtQTt
+         z4k8TtljAtU7Pg6PmrQAjmrPMGUcx478O/sXboCOOZI3s9zHbWkIz8oMPvvd0u06JDFS
+         Zb4AcpG2f3hKWhfFJZDOGdkzsbLOGq8eXVbPAX7++k49MRIStGtCfRvZj92Tx8BA4qeI
+         FtZatXQVjv6SMloLyLMKsUDzSYv+jr/a+am0PPirSbGBPuEmJof3Pon3ZIEis+em24fL
+         CORQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1739226494; x=1739831294;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:subject:cc:to:from:date:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=qkWWMjBJ1/YRt3lwgOfr2tNA5D2acLgDBlTp/Ye7Oa8=;
-        b=Q2RqAuTJTW7dRtu/fgwUJemHOZdePj6xVrI0k7GfyCh9SAgyHtVjFVFr2IT6Uuj6yH
-         h5kBbG5eZY0nbfLBQkfSeZDSieTjNJ2/pElMPYMczGDagiUfX/dUO8J2Fo3uMEDH3wzG
-         rZK/01uzQkVgXMQDrlbB3eszId+mKqbAJr7W62NRmYMJ0jgtmp4YaZD1NGJf4ykvkcQH
-         ziMYnBmoe4g7wxt/Xyrq4e9/mv7u98M4EWm2KptsjB4AVsL7wbHH777I6uTgDwgKZ4qr
-         VAxN/x6+s8JtlK5s/5a+3k/xBVmeDrLbn1w6gO3Y1951WKxIuYxKZKQ++tLy+CX+a85n
-         45pA==
-X-Forwarded-Encrypted: i=1; AJvYcCVtHYv6+1ERM5iWfoFfGi5gru7V2dRbVoHuLNIiX+F3e70cg/I1SnEWEVh0P7bJ68z/JCQ=@vger.kernel.org, AJvYcCXeMhqmgulTOWQUxUcwSo9uf9CggIsyFQjpxf7zwVf8KuoMu5xNZlD/FExlFx75ZyhuWd9q1lYy@vger.kernel.org, AJvYcCXzC6vzdXgh1Q7szSLg6GiIg2HgjCvLqxq+qbw8bljMTb1J06nI7rVu395PNsLNpXnyjBexdeCb8NlrHMH6@vger.kernel.org
-X-Gm-Message-State: AOJu0YxE2nOOni+76oB1qFqns6f4pZ5N0nfK8JF9LFhn9TAn1+jT4wSk
-	H7w87V9fYJyLn0Ipe0C/UFapOU8VihU5jIRlkqhPsK22Mceskl2QUMrW/Q==
-X-Gm-Gg: ASbGncvNPdJXUAsQMMg4o1pZ0JdaWfCbL6SPyF51Bm92HltlDEHjAK68YmtMlWm+Wre
-	j02oye2vSG2H1brr2pNqVTfbckBR1X4ruOZOIIc9LhtiSXak7lsbj5sV9CEFRFL6o/BXVGc44T+
-	+WPBSO8w3KCsD6XyLgge0h/+kDGblioj3eA2vSOmgpkqY0QNZ5WiT12lVxNgRFqFzZodf5ab4Hi
-	6k8tYZdjc2FvlTIKiTIo2A4mWZTZ/l3oLn8lh5/uojv3Ei47jNSEJowbmt46jcvcFn2iJumX0xe
-	tbZZdVBQJ+J1sDyKnb6dtmtYYEJfb4J9RaSUjSuYuB0FA+WRQxa1/w==
-X-Google-Smtp-Source: AGHT+IHN7gLlSgITrNkUYlErBuW/66QbgQ6hSOX+j8FGt+/mR40pZI3bKrEQ0DY8izu56Um9ILmDrg==
-X-Received: by 2002:a05:600c:cce:b0:434:f131:1e64 with SMTP id 5b1f17b1804b1-4394c815898mr12942205e9.9.1739226493939;
-        Mon, 10 Feb 2025 14:28:13 -0800 (PST)
-Received: from pumpkin (82-69-66-36.dsl.in-addr.zen.co.uk. [82.69.66.36])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-38dc0c5a894sm12940620f8f.95.2025.02.10.14.28.12
+        d=1e100.net; s=20230601; t=1739227050; x=1739831850;
+        h=cc:to:content-transfer-encoding:mime-version:message-id:date
+         :subject:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=Ab4LJ9OfN5R35QeUwpcAeHgQPVCquBOJeARRwrwUU60=;
+        b=qZMFL7Tq3suzmQimc+4l+DW9dJeDPrM5kIGHSXoWhjtgZrJ40gcT3Ryo1RcozxpGdA
+         hZIJhyCeijw5ArB8VzGFwJ6JXFp+1Rugl8wWWmtJV+XnpkXBvyh1FkyuEzV3ibpfpq00
+         zkXLbgh9q7LB+vvVSYGULrywa0MRhzMKooMxOLXrdbwXlhETto16ffqZGWJxV4+n2RQT
+         cIPNDYZlES2Zq1VIGw+KotKRTiTxrGw87XVBiJ1b0O/KIUWyW3fZ7qorjHR+WIcVaK16
+         GHxhzyR449BZLHHzJtxKP+A/Lnc1ujQj58qxT01iGcjw6FchN+Tdq9Jo48o9y9umess4
+         6skQ==
+X-Forwarded-Encrypted: i=1; AJvYcCXNJGnytK21YwIJCxKucyivPWIfcVsJsvHAR+jl+imOFGO06eSAFJPzTQTfr6wO9ZI2dZEs+Jc=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzcQAsCB32ZDu/anakauwyTUJnCx4RwMdGduPKWINiEZ6VAruIy
+	u12WjukokYCKC0jeMiZsL3lW9z97BA08xb7T6RmlelucrfhAsXU7jeP8hKBAoK8=
+X-Gm-Gg: ASbGncu+PexaqvTB25b2rLYJCysUiHwTUVwX6KWbM+6PDWV2euVTRGPbQaFz0NMFdRs
+	tGChtBN7PWADnbddQE4w8MMDiGqLGKLzAU3WQF7fa/wfTfvhCUOeW7zOGM4+OkrGlkUk04t9pyM
+	QARvhIfT758KUaiophkmLRU4XAtsc9ZJ3sBr/Evt/eI1k4T78QkrALYYOmFZLat04a49sqLLz1C
+	JCOqMOi7YaQkD4l5MaF+o08m1TBoX9qbCOh3H4uSNFCIr7hzIMKC3WYz3bqFyREZgIzPNcemfof
+	GSi4c8K8x5lkv4DmsiPD5R+o7ynrx1Ix/0z0JNWnTLniROA=
+X-Google-Smtp-Source: AGHT+IFEgA0pJb7eJnXxFcDkmebwOZge9kDnXmYCEiBKRqgUBP3v1eLeI1sEGHGrzyQ56T+MANckEg==
+X-Received: by 2002:a05:6808:18a3:b0:3f3:bf98:c4b1 with SMTP id 5614622812f47-3f3bf98c976mr1193202b6e.33.1739227049851;
+        Mon, 10 Feb 2025 14:37:29 -0800 (PST)
+Received: from [127.0.1.1] (ip98-183-112-25.ok.ok.cox.net. [98.183.112.25])
+        by smtp.gmail.com with ESMTPSA id 5614622812f47-3f389ed1ca2sm2521820b6e.11.2025.02.10.14.37.26
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 10 Feb 2025 14:28:13 -0800 (PST)
-Date: Mon, 10 Feb 2025 22:28:12 +0000
-From: David Laight <david.laight.linux@gmail.com>
-To: Alexander Lobakin <aleksander.lobakin@intel.com>
-Cc: Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller"
- <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Jakub Kicinski
- <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Alexei Starovoitov
- <ast@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>, John Fastabend
- <john.fastabend@gmail.com>, Andrii Nakryiko <andrii@kernel.org>, "Jose E.
- Marchesi" <jose.marchesi@oracle.com>, Toke =?UTF-8?B?SMO4aWxhbmQtSsO4cmdl?=
- =?UTF-8?B?bnNlbg==?= <toke@redhat.com>, Magnus Karlsson
- <magnus.karlsson@intel.com>, Maciej Fijalkowski
- <maciej.fijalkowski@intel.com>, Przemek Kitszel
- <przemyslaw.kitszel@intel.com>, Jason Baron <jbaron@akamai.com>, Casey
- Schaufler <casey@schaufler-ca.com>, Nathan Chancellor <nathan@kernel.org>,
- bpf@vger.kernel.org, netdev@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH net-next 2/4] i40e: use generic unrolled_count() macro
-Message-ID: <20250210222812.1d0479a4@pumpkin>
-In-Reply-To: <20250206182630.3914318-3-aleksander.lobakin@intel.com>
-References: <20250206182630.3914318-1-aleksander.lobakin@intel.com>
-	<20250206182630.3914318-3-aleksander.lobakin@intel.com>
-X-Mailer: Claws Mail 4.1.1 (GTK 3.24.38; arm-unknown-linux-gnueabihf)
+        Mon, 10 Feb 2025 14:37:28 -0800 (PST)
+From: David Lechner <dlechner@baylibre.com>
+Subject: [PATCH v3 00/15] gpiolib: add gpiod_multi_set_value_cansleep
+Date: Mon, 10 Feb 2025 16:33:26 -0600
+Message-Id: <20250210-gpio-set-array-helper-v3-0-d6a673674da8@baylibre.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
+X-B4-Tracking: v=1; b=H4sIALZ+qmcC/4XNywrCMBCF4VeRrB3JpVdXvoe4SNJpG6hNmZRgK
+ X13024EQVz+B+ablQUkh4FdTysjjC44P6ZQ5xOzvR47BNekZpLLnAsloJuch4AzaCK9QI/DhAS
+ mybSSlSp5o1i6nQhb9zrc+yN178LsaTneRLGv/8QogENdC1tZa7KmwJvRy+AM4cX6J9vRKD+Q5
+ MUvSCZI2LzlWdWWtVVf0LZtb7b5zjgGAQAA
+X-Change-ID: 20250131-gpio-set-array-helper-bd4a328370d3
+To: Linus Walleij <linus.walleij@linaro.org>, 
+ Bartosz Golaszewski <brgl@bgdev.pl>, Andy Shevchenko <andy@kernel.org>, 
+ Geert Uytterhoeven <geert@linux-m68k.org>, 
+ Lars-Peter Clausen <lars@metafoo.de>, 
+ Michael Hennerich <Michael.Hennerich@analog.com>, 
+ Jonathan Cameron <jic23@kernel.org>, Ulf Hansson <ulf.hansson@linaro.org>, 
+ Peter Rosin <peda@axentia.se>, Andrew Lunn <andrew@lunn.ch>, 
+ Heiner Kallweit <hkallweit1@gmail.com>, 
+ Russell King <linux@armlinux.org.uk>, 
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+ Vinod Koul <vkoul@kernel.org>, Kishon Vijay Abraham I <kishon@kernel.org>, 
+ =?utf-8?q?Nuno_S=C3=A1?= <nuno.sa@analog.com>, 
+ Liam Girdwood <lgirdwood@gmail.com>, Mark Brown <broonie@kernel.org>, 
+ Jaroslav Kysela <perex@perex.cz>, Takashi Iwai <tiwai@suse.com>
+Cc: linux-gpio@vger.kernel.org, linux-kernel@vger.kernel.org, 
+ linux-iio@vger.kernel.org, linux-mmc@vger.kernel.org, 
+ netdev@vger.kernel.org, linux-phy@lists.infradead.org, 
+ linux-sound@vger.kernel.org, David Lechner <dlechner@baylibre.com>, 
+ Andy Shevchenko <andy.shevchenko@gmail.com>, 
+ Jonathan Cameron <Jonathan.Cameron@huawei.com>
+X-Mailer: b4 0.14.2
 
-On Thu,  6 Feb 2025 19:26:27 +0100
-Alexander Lobakin <aleksander.lobakin@intel.com> wrote:
+This series was inspired by some minor annoyance I have experienced a
+few times in recent reviews.
 
-> i40e, as well as ice, has a custom loop unrolling macro for unrolling
-> Tx descriptors filling on XSk xmit.
-> Replace i40e defs with generic unrolled_count(), which is also more
-> convenient as it allows passing defines as its argument, not hardcoded
-> values, while the loop declaration will still be a usual for-loop.
-..
->  #define PKTS_PER_BATCH 4
->  
-> -#ifdef __clang__
-> -#define loop_unrolled_for _Pragma("clang loop unroll_count(4)") for
-> -#elif __GNUC__ >= 8
-> -#define loop_unrolled_for _Pragma("GCC unroll 4") for
-> -#else
-> -#define loop_unrolled_for for
-> -#endif
-...
-> @@ -529,7 +530,8 @@ static void i40e_xmit_pkt_batch(struct i40e_ring *xdp_ring, struct xdp_desc *des
->  	dma_addr_t dma;
->  	u32 i;
->  
-> -	loop_unrolled_for(i = 0; i < PKTS_PER_BATCH; i++) {
-> +	unrolled_count(PKTS_PER_BATCH)
-> +	for (i = 0; i < PKTS_PER_BATCH; i++) {
->  		u32 cmd = I40E_TX_DESC_CMD_ICRC | xsk_is_eop_desc(&desc[i]);
->  
->  		dma = xsk_buff_raw_get_dma(xdp_ring->xsk_pool, desc[i].addr);
+Calling gpiod_set_array_value_cansleep() can be quite verbose due to
+having so many parameters. In most cases, we already have a struct
+gpio_descs that contains the first 3 parameters so we end up with 3 (or
+often even 6) pointer indirections at each call site. Also, people have
+a tendency to want to hard-code the first argument instead of using
+struct gpio_descs.ndescs, often without checking that ndescs >= the
+hard-coded value.
 
-The rest of that code is:
+So I'm proposing that we add a gpiod_multi_set_value_cansleep()
+function that is a wrapper around gpiod_set_array_value_cansleep()
+that has struct gpio_descs as the first parameter to make it a bit
+easier to read the code and avoid the hard-coding temptation.
 
+I've just done gpiod_multi_set_value_cansleep() for now since there
+were over 10 callers of this one. There aren't as many callers of
+the get and atomic variants, but we can add those too if this seems
+like a useful thing to do.
 
-		tx_desc = I40E_TX_DESC(xdp_ring, ntu++);
-		tx_desc->buffer_addr = cpu_to_le64(dma);
-		tx_desc->cmd_type_offset_bsz = build_ctob(cmd, 0, desc[i].len, 0);
+Maintainers, if you prefer to have this go through the gpio tree, please
+give your Acked-by:. Several maintainers have also requested an
+immutable branch, so I expect that will be made available. And if there
+is anything leftover after the next kernel release, I will resend it.
 
-		*total_bytes += desc[i].len;
-	}
+---
+Changes in v3:
+- Added IS_ERR_OR_NULL() check to gpiod_multi_set_value_cansleep()
+- Added new patches to clean up accessing bitmap directly (ts-nbus, ad2s1210).
+- Added function prefix for max3191x.
+- Removed unnecessary braces in ad7606 patch.
+- Picked up additional trailers.
+- Link to v2: https://lore.kernel.org/r/20250206-gpio-set-array-helper-v2-0-1c5f048f79c3@baylibre.com
 
-	xdp_ring->next_to_use = ntu;
-}
+Changes in v2:
+- Renamed new function from gpiods_multi_set_value_cansleep() to
+  gpiod_multi_set_value_cansleep()
+- Fixed typo in name of replaced function in all commit messages.
+- Picked up trailers.
+- Link to v1: https://lore.kernel.org/r/20250131-gpio-set-array-helper-v1-0-991c8ccb4d6e@baylibre.com
 
-static void i40e_fill_tx_hw_ring(struct i40e_ring *xdp_ring, struct xdp_desc *descs, u32 nb_pkts,
-				 unsigned int *total_bytes)
-{
-	u32 batched, leftover, i;
+---
+David Lechner (15):
+      gpiolib: add gpiod_multi_set_value_cansleep()
+      auxdisplay: seg-led-gpio: use gpiod_multi_set_value_cansleep
+      bus: ts-nbus: validate ts,data-gpios array size
+      bus: ts-nbus: use gpiod_multi_set_value_cansleep
+      bus: ts-nbus: use bitmap_get_value8()
+      gpio: max3191x: use gpiod_multi_set_value_cansleep
+      iio: adc: ad7606: use gpiod_multi_set_value_cansleep
+      iio: amplifiers: hmc425a: use gpiod_multi_set_value_cansleep
+      iio: resolver: ad2s1210: use gpiod_multi_set_value_cansleep
+      iio: resolver: ad2s1210: use bitmap_write
+      mmc: pwrseq_simple: use gpiod_multi_set_value_cansleep
+      mux: gpio: use gpiod_multi_set_value_cansleep
+      net: mdio: mux-gpio: use gpiod_multi_set_value_cansleep
+      phy: mapphone-mdm6600: use gpiod_multi_set_value_cansleep
+      ASoC: adau1701: use gpiod_multi_set_value_cansleep
 
-	batched = nb_pkts & ~(PKTS_PER_BATCH - 1);
-	leftover = nb_pkts & (PKTS_PER_BATCH - 1);
-	for (i = 0; i < batched; i += PKTS_PER_BATCH)
-		i40e_xmit_pkt_batch(xdp_ring, &descs[i], total_bytes);
-	for (i = batched; i < batched + leftover; i++)
-		i40e_xmit_pkt(xdp_ring, &descs[i], total_bytes);
-}
+ drivers/auxdisplay/seg-led-gpio.c           |  3 +--
+ drivers/bus/ts-nbus.c                       | 15 +++++++++------
+ drivers/gpio/gpio-max3191x.c                | 18 +++++++-----------
+ drivers/iio/adc/ad7606.c                    |  3 +--
+ drivers/iio/adc/ad7606_spi.c                |  7 +++----
+ drivers/iio/amplifiers/hmc425a.c            |  3 +--
+ drivers/iio/resolver/ad2s1210.c             | 13 +++++--------
+ drivers/mmc/core/pwrseq_simple.c            |  3 +--
+ drivers/mux/gpio.c                          |  4 +---
+ drivers/net/mdio/mdio-mux-gpio.c            |  3 +--
+ drivers/phy/motorola/phy-mapphone-mdm6600.c |  4 +---
+ include/linux/gpio/consumer.h               | 11 +++++++++++
+ sound/soc/codecs/adau1701.c                 |  4 +---
+ 13 files changed, 43 insertions(+), 48 deletions(-)
+---
+base-commit: df4b2bbff898227db0c14264ac7edd634e79f755
+change-id: 20250131-gpio-set-array-helper-bd4a328370d3
 
-If it isn't a silly question why all the faffing with unrolling?
-It isn't as though the loop body is trivial - it contains real function calls.
-Unrolling loops is so 1980s - unless you are trying to get the absolute
-max performance from a very short loop and need to unroll once (maybe twice)
-to get enough spare instruction execution slots to run the loop control
-code in parallel with the body.
-
-In this case it looks like the 'batched' loop contains an inlined copy of
-the function called for the remainder.
-I can't see anything else.
-You'd probably gain more by getting rid of the 'int *total bytes' and using
-the function return value - that is what it is fot.
-
-	David
+Best regards,
+-- 
+David Lechner <dlechner@baylibre.com>
 
 
