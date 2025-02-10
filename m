@@ -1,188 +1,194 @@
-Return-Path: <netdev+bounces-164637-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-164638-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id EB881A2E8A2
-	for <lists+netdev@lfdr.de>; Mon, 10 Feb 2025 11:06:29 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7047FA2E8D1
+	for <lists+netdev@lfdr.de>; Mon, 10 Feb 2025 11:16:13 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C72C23AB3A0
-	for <lists+netdev@lfdr.de>; Mon, 10 Feb 2025 10:05:41 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 41C1A3A1360
+	for <lists+netdev@lfdr.de>; Mon, 10 Feb 2025 10:16:04 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C2C411CAA64;
-	Mon, 10 Feb 2025 10:05:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3FA1B1C3BF8;
+	Mon, 10 Feb 2025 10:16:08 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="djT9CY5J"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="eeBbq3MS"
 X-Original-To: netdev@vger.kernel.org
-Received: from relay1-d.mail.gandi.net (relay1-d.mail.gandi.net [217.70.183.193])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0994C1C6FF0;
-	Mon, 10 Feb 2025 10:05:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.193
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D5439189902
+	for <netdev@vger.kernel.org>; Mon, 10 Feb 2025 10:16:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1739181903; cv=none; b=G5ujmqKIbo0Mz5Ubz2Q5i03QppcSsNDURxRNp1N2BYAhRmdpY4f0Zr9qGHyFnkxbuiC1PAfTFuWtgWLjIxkZgfPax97ekV1D15UGmwbSLhjTnhdMqbqe0OtpRUIGJrbbjsI9n3WIrBQZ36Zg/POp18IHfrARQwsQCYqLqba+CJk=
+	t=1739182568; cv=none; b=dxEeIiMqaA2SbU8qe5r7T0X6yiKb03cD19SjcaqBddWXh2Bp9OX2mJ416cxv1aeD0PxVwrfD0aye7VOrh2XkxHFGCT5XktaCMyekExRZCVhiWav6wV5CFa/gCDIBuna4SUpQgNr687JMWXkURYRyvoGl2R59Uz/+Aj/uonpnpeE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1739181903; c=relaxed/simple;
-	bh=MsStyGB/s8toCJdgsIBul5jFwlgpyY05XQEDDYZX7IU=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=jbRSU3uUd1TfO3FM5EYwgsWvJhbrnmhnW14oc+Qr7EKwRq3kp0oY6ElH31gD7P2E/c86YkvXb7KN23BpWVuIfPYWgeSKLS6DpcfjUJW6QLziQXbkTpXuRPlNyIuG7h/QBxo0crLjhWMwGhZii/K46X/ouArM49EjfeQTxy+9WpA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=djT9CY5J; arc=none smtp.client-ip=217.70.183.193
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
-Received: by mail.gandi.net (Postfix) with ESMTPSA id 81F17442A5;
-	Mon, 10 Feb 2025 10:04:46 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
-	t=1739181892;
+	s=arc-20240116; t=1739182568; c=relaxed/simple;
+	bh=p5WUXwy0MVXPNMhTdeCzdF4yaFQYosHveP/Gs6BTPxw=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=V16U0xr9/h2qJyNsM7y64qoLsk6GCKK7mJDA2HvDBwn6OKmX3DME0P8TM0hBZD0H8CYxKLIMBDsP6PWFcVuqE23/c1EJqGt3yAzxC2cNcvWHBZhHDSBapvKA2zBGZ44yhPWxilQu2XUSePn6NRgRL5XZTX/qVgE9epoplbVjrUI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=eeBbq3MS; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1739182562;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=AJb8bkauCDhTBOcu8X/HjYqi4iRH5JJNhU2FKZwS+C4=;
-	b=djT9CY5JnUvFf4Rd2gWUzxSrpbB9MCYbNvoDPDv3FKOuTwvv6X4g3AhUpMHjJGjPo+jlpT
-	AFI4rCoyH7VDsFmSSLDgWxOvgrTa2MXWWNcxzHtFjeExYlOp6L2k+rBjgelQmnk/g0zQtD
-	y0ICAmmzdAoNV28D6kuxTkA25Xcy9ZH/UsaVbVUDFwQO9cIgrcxLYnogyAsCzKhoJEXSLU
-	vQZB2QqhFD/u3H3VrVOvEFisMee4/6do/wEPOBW8Tgc1aWrDkzNSBMedbrFWSSSLvzM9Sc
-	5cKP5ReoDV39Zvz/uAhIBDkwUs8i3D7b9cslvpUazE6Cq1A+/fEweUAhsoDVJw==
-From: Romain Gantois <romain.gantois@bootlin.com>
-To: Andrew Lunn <andrew+netdev@lunn.ch>,
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- Rob Herring <robh@kernel.org>, Krzysztof Kozlowski <krzk+dt@kernel.org>,
- Conor Dooley <conor+dt@kernel.org>, Chen Wang <unicorn_wang@outlook.com>,
- Inochi Amaoto <inochiama@outlook.com>,
- Maxime Coquelin <mcoquelin.stm32@gmail.com>,
- Alexandre Torgue <alexandre.torgue@foss.st.com>,
- Richard Cochran <richardcochran@gmail.com>,
- Paul Walmsley <paul.walmsley@sifive.com>,
- Palmer Dabbelt <palmer@dabbelt.com>, Albert Ou <aou@eecs.berkeley.edu>,
- Emil Renner Berthing <emil.renner.berthing@canonical.com>,
- Jisheng Zhang <jszhang@kernel.org>,
- "Jan Petrous (OSS)" <jan.petrous@oss.nxp.com>,
- =?UTF-8?B?Q2zDqW1lbnQgTMOpZ2Vy?= <clement.leger@bootlin.com>,
- Simon Horman <horms@kernel.org>, Furong Xu <0x1207@gmail.com>,
- Serge Semin <fancer.lancer@gmail.com>, Lothar Rubusch <l.rubusch@gmail.com>,
- Suraj Jaiswal <quic_jsuraj@quicinc.com>,
- Joe Hattori <joe@pf.is.s.u-tokyo.ac.jp>,
- Bartosz Golaszewski <bartosz.golaszewski@linaro.org>,
- Giuseppe Cavallaro <peppe.cavallaro@st.com>,
- Jose Abreu <joabreu@synopsys.com>, Inochi Amaoto <inochiama@gmail.com>
-Cc: Inochi Amaoto <inochiama@gmail.com>, netdev@vger.kernel.org,
- devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
- linux-stm32@st-md-mailman.stormreply.com,
- linux-arm-kernel@lists.infradead.org, linux-riscv@lists.infradead.org,
- Yixun Lan <dlan@gentoo.org>, Longbin Li <looong.bin@gmail.com>
-Subject:
- Re: [PATCH net-next v4 2/3] net: stmmac: platform: Add snps,dwmac-5.30a IP
- compatible string
-Date: Mon, 10 Feb 2025 11:04:40 +0100
-Message-ID: <5868742.DvuYhMxLoT@fw-rgant>
-In-Reply-To: <20250209013054.816580-3-inochiama@gmail.com>
-References:
- <20250209013054.816580-1-inochiama@gmail.com>
- <20250209013054.816580-3-inochiama@gmail.com>
+	bh=A9sJEC/icQo18bVFXRpigQVdBJdFsITaqQvJCE/XAEo=;
+	b=eeBbq3MSyxLWqXEy+MT0HCQW3qY1CbsdgvzxlVErxf2otuocUCoxrJk6TvM0fgfVwGohAn
+	CT6fiQ4q+6GtRWlqUoynzGq9uU458Gcxxn4QW4wXJM6h/GYtC7dXhZB6u6ON+dQXFvHO7J
+	SY27l7cXIbJxWBB7eBZU2uJ0o5WXLJU=
+Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
+ [209.85.128.71]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-617-El8R0Nv4MhWPjP9UjxMAfw-1; Mon, 10 Feb 2025 05:15:57 -0500
+X-MC-Unique: El8R0Nv4MhWPjP9UjxMAfw-1
+X-Mimecast-MFC-AGG-ID: El8R0Nv4MhWPjP9UjxMAfw
+Received: by mail-wm1-f71.google.com with SMTP id 5b1f17b1804b1-43947979ce8so2505105e9.0
+        for <netdev@vger.kernel.org>; Mon, 10 Feb 2025 02:15:56 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1739182556; x=1739787356;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=A9sJEC/icQo18bVFXRpigQVdBJdFsITaqQvJCE/XAEo=;
+        b=mIe3FW3VGK6L5EjGqR3vWcDYdafzMq8I7657quDAyFwt7FZgS56EePzh+f4ks3mg8g
+         259iQOIG43K0HW+FA1Of6JHy+LAPyRIkvgjg1GIdOT7qNzDaXM6Gq9bKckusGRNS7JF9
+         2EnrLTlgEw9RZcVdQWacEewiAj9FrNMpQf3lEe2LYDfbabP6/zIjqnZXt+pUkJnNcsvY
+         mDXP7dgRL83gt1P2xqYk8AFHZSZrnnAhHKxKg3GVvw1fC6Cnxg0QVlp2U367PFiTPdrF
+         ldAS+SpwxJwo3+RK4d8D2clI61aC4VVyBZmGbCGlzssMTkqvDvB5RNnjkClTHNWpLCIC
+         NQVw==
+X-Forwarded-Encrypted: i=1; AJvYcCUiLx2eVa0UwRnfW8vH5MBfPKxmDICWhqj3ORJnC2t69PRvr8WTM23rD/6DPE21y+cFAuMWA0A=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yym0FrXSDLlzjTCVLezwSFJ7mBAJCUAZbAtcRIRqwvm8urX9qy0
+	6p5Bx+PGOw6sY99u6kL/Hje2p6z7bmfxqd2hOQLn0psI/NXbClcnq21fp9SkrKNUHAlvK7hEiHE
+	n0ZIKWjWDPaGvcmOL1oc63QkPWGsOh4uglDXnOOHo6xcL3qOm+8tqbw==
+X-Gm-Gg: ASbGncumzjoJko5prmaESSDQHbBrhQS8EEBtYxD7HoEJ9wtf9w0+Z4LNRhRmnTVccf6
+	Dg3oAbeoUrd337wI5ItcIWDLu1e8bqpWUuY4FvJub8kwPi6zJ+YO0UB1sPX2JiMzhfj6OGv+0fq
+	6PyHDK22TNLkF1xQGZEmqmSxmkGcksO9XqKISsrP2+aoVbCHtbDckZV1wGG8vTRJm+xYSkR67YK
+	SyagtwXQhrTFcV1zOnHIikKSxFCYA876wm6towj3p5n18D6CaRUAQpDtwX5eCBw9cnSR5sZ8R/R
+	1Opo6+f4LKMIqkDeGtGLgpT2xrM2DTFRtwFZSjuxN3SQpaAFMgPyhQ==
+X-Received: by 2002:a05:600c:35cb:b0:434:f917:2b11 with SMTP id 5b1f17b1804b1-439249b2b99mr83682265e9.21.1739182555832;
+        Mon, 10 Feb 2025 02:15:55 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IEzyHmFxq9APlvZ5/KjMZW8FMS6DvOra/FJmHwifoO1Pq3YL3SAL/TwgqtRqswE/KetCkJU4A==
+X-Received: by 2002:a05:600c:35cb:b0:434:f917:2b11 with SMTP id 5b1f17b1804b1-439249b2b99mr83681645e9.21.1739182554738;
+        Mon, 10 Feb 2025 02:15:54 -0800 (PST)
+Received: from sgarzare-redhat (host-79-46-200-29.retail.telecomitalia.it. [79.46.200.29])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-4390daf4480sm175997295e9.27.2025.02.10.02.15.53
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 10 Feb 2025 02:15:54 -0800 (PST)
+Date: Mon, 10 Feb 2025 11:15:47 +0100
+From: Stefano Garzarella <sgarzare@redhat.com>
+To: Michal Luczaj <mhal@rbox.co>
+Cc: "David S. Miller" <davem@davemloft.net>, 
+	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
+	Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, netdev@vger.kernel.org, 
+	syzbot+9d55b199192a4be7d02c@syzkaller.appspotmail.com, Luigi Leonardi <leonardi@redhat.com>
+Subject: Re: [PATCH net v2 1/2] vsock: Orphan socket after transport release
+Message-ID: <zboo362son7nvmvoigmcj2v23gdcdpb364sxqzo5xndxuqqnmy@27cgbg6bxte2>
+References: <20250206-vsock-linger-nullderef-v2-0-f8a1f19146f8@rbox.co>
+ <20250206-vsock-linger-nullderef-v2-1-f8a1f19146f8@rbox.co>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; boundary="nextPart6136790.lOV4Wx5bFT";
- micalg="pgp-sha256"; protocol="application/pgp-signature"
-X-GND-State: clean
-X-GND-Score: -100
-X-GND-Cause: gggruggvucftvghtrhhoucdtuddrgeefvddrtddtgdefjeejjecutefuodetggdotefrodftvfcurfhrohhfihhlvgemucfitefpfffkpdcuggftfghnshhusghstghrihgsvgenuceurghilhhouhhtmecufedtudenucesvcftvggtihhpihgvnhhtshculddquddttddmnecujfgurhephffvvefufffkjghfgggtsehgtderredttdejnecuhfhrohhmpeftohhmrghinhcuifgrnhhtohhishcuoehrohhmrghinhdrghgrnhhtohhishessghoohhtlhhinhdrtghomheqnecuggftrfgrthhtvghrnhepieekkeffvdeugfekjeegfefhvdetuefhtdelieduheeileduledvteelgefgffffnecukfhppeeltddrkeelrdduieefrdduvdejnecuvehluhhsthgvrhfuihiivgeptdenucfrrghrrghmpehinhgvthepledtrdekledrudeifedruddvjedphhgvlhhopehffidqrhhgrghnthdrlhhotggrlhhnvghtpdhmrghilhhfrhhomheprhhomhgrihhnrdhgrghnthhoihhssegsohhothhlihhnrdgtohhmpdhnsggprhgtphhtthhopeefkedprhgtphhtthhopegrnhgurhgvfidonhgvthguvghvsehluhhnnhdrtghhpdhrtghpthhtohepuggrvhgvmhesuggrvhgvmhhlohhfthdrnhgvthdprhgtphhtthhopegvughumhgriigvthesghhoohhglhgvrdgtohhmpdhrtghpthhtohepkhhusggrsehkvghrnhgvlhdrohhrghdprhgtphhtthhopehprggsvghnihesrhgvughhrghtrdgtohhmpdhrtghpthhtoheprhhos
- ghhsehkvghrnhgvlhdrohhrghdprhgtphhtthhopehkrhiikhdoughtsehkvghrnhgvlhdrohhrghdprhgtphhtthhopegtohhnohhrodgutheskhgvrhhnvghlrdhorhhg
-X-GND-Sasl: romain.gantois@bootlin.com
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <20250206-vsock-linger-nullderef-v2-1-f8a1f19146f8@rbox.co>
 
---nextPart6136790.lOV4Wx5bFT
-Content-Transfer-Encoding: quoted-printable
-Content-Type: text/plain; charset="utf-8"; protected-headers="v1"
-From: Romain Gantois <romain.gantois@bootlin.com>
-Date: Mon, 10 Feb 2025 11:04:40 +0100
-Message-ID: <5868742.DvuYhMxLoT@fw-rgant>
-In-Reply-To: <20250209013054.816580-3-inochiama@gmail.com>
-MIME-Version: 1.0
+On Thu, Feb 06, 2025 at 12:06:47AM +0100, Michal Luczaj wrote:
+>During socket release, sock_orphan() is called without considering that it
+>sets sk->sk_wq to NULL. Later, if SO_LINGER is enabled, this leads to a
+>null pointer dereferenced in virtio_transport_wait_close().
+>
+>Orphan the socket only after transport release.
+>
+>While there, reflow the other comment.
+>
+>Partially reverts the 'Fixes:' commit.
+>
+>KASAN: null-ptr-deref in range [0x0000000000000018-0x000000000000001f]
+> lock_acquire+0x19e/0x500
+> _raw_spin_lock_irqsave+0x47/0x70
+> add_wait_queue+0x46/0x230
+> virtio_transport_release+0x4e7/0x7f0
+> __vsock_release+0xfd/0x490
+> vsock_release+0x90/0x120
+> __sock_release+0xa3/0x250
+> sock_close+0x14/0x20
+> __fput+0x35e/0xa90
+> __x64_sys_close+0x78/0xd0
+> do_syscall_64+0x93/0x1b0
+> entry_SYSCALL_64_after_hwframe+0x76/0x7e
+>
+>Reported-by: syzbot+9d55b199192a4be7d02c@syzkaller.appspotmail.com
+>Closes: https://syzkaller.appspot.com/bug?extid=9d55b199192a4be7d02c
+>Fixes: fcdd2242c023 ("vsock: Keep the binding until socket destruction")
+>Tested-by: Luigi Leonardi <leonardi@redhat.com>
+>Signed-off-by: Michal Luczaj <mhal@rbox.co>
+>---
+> net/vmw_vsock/af_vsock.c | 15 ++++++++++-----
+> 1 file changed, 10 insertions(+), 5 deletions(-)
+>
+>diff --git a/net/vmw_vsock/af_vsock.c b/net/vmw_vsock/af_vsock.c
+>index 075695173648d3a4ecbd04e908130efdbb393b41..85d20891b771a25b8172a163983054a2557f98c1 100644
+>--- a/net/vmw_vsock/af_vsock.c
+>+++ b/net/vmw_vsock/af_vsock.c
+>@@ -817,20 +817,25 @@ static void __vsock_release(struct sock *sk, int level)
+> 	vsk = vsock_sk(sk);
+> 	pending = NULL;	/* Compiler warning. */
+>
+>-	/* When "level" is SINGLE_DEPTH_NESTING, use the nested
+>-	 * version to avoid the warning "possible recursive locking
+>-	 * detected". When "level" is 0, lock_sock_nested(sk, level)
+>-	 * is the same as lock_sock(sk).
+>+	/* When "level" is SINGLE_DEPTH_NESTING, use the nested version to avoid
+>+	 * the warning "possible recursive locking detected". When "level" is 0,
+>+	 * lock_sock_nested(sk, level) is the same as lock_sock(sk).
 
-On dimanche 9 f=C3=A9vrier 2025 02:30:51 heure normale d=E2=80=99Europe cen=
-trale Inochi=20
-Amaoto wrote:
-> Add "snps,dwmac-5.30a" compatible string for 5.30a version that can avoid
-> to define some platform data in the glue layer.
->=20
-> Signed-off-by: Inochi Amaoto <inochiama@gmail.com>
-> ---
->  .../ethernet/stmicro/stmmac/stmmac_platform.c   | 17 ++++++++++++-----
->  1 file changed, 12 insertions(+), 5 deletions(-)
->=20
-> diff --git a/drivers/net/ethernet/stmicro/stmmac/stmmac_platform.c
-> b/drivers/net/ethernet/stmicro/stmmac/stmmac_platform.c index
-> d0e61aa1a495..8dc3bd6946c6 100644
-> --- a/drivers/net/ethernet/stmicro/stmmac/stmmac_platform.c
-> +++ b/drivers/net/ethernet/stmicro/stmmac/stmmac_platform.c
-> @@ -405,6 +405,17 @@ static int stmmac_of_get_mac_mode(struct device_node
-> *np) return -ENODEV;
->  }
->=20
-> +/* Compatible string array for all gmac4 devices */
-> +static const char * const stmmac_gmac4_compats[] =3D {
-> +	"snps,dwmac-4.00",
-> +	"snps,dwmac-4.10a",
-> +	"snps,dwmac-4.20a",
-> +	"snps,dwmac-5.10a",
-> +	"snps,dwmac-5.20",
-> +	"snps,dwmac-5.30a",
-> +	NULL
-> +};
-> +
->  /**
->   * stmmac_probe_config_dt - parse device-tree driver parameters
->   * @pdev: platform_device structure
-> @@ -538,11 +549,7 @@ stmmac_probe_config_dt(struct platform_device *pdev,=
- u8
-> *mac) plat->pmt =3D 1;
->  	}
->=20
-> -	if (of_device_is_compatible(np, "snps,dwmac-4.00") ||
-> -	    of_device_is_compatible(np, "snps,dwmac-4.10a") ||
-> -	    of_device_is_compatible(np, "snps,dwmac-4.20a") ||
-> -	    of_device_is_compatible(np, "snps,dwmac-5.10a") ||
-> -	    of_device_is_compatible(np, "snps,dwmac-5.20")) {
-> +	if (of_device_compatible_match(np, stmmac_gmac4_compats)) {
->  		plat->has_gmac4 =3D 1;
->  		plat->has_gmac =3D 0;
->  		plat->pmt =3D 1;
+This comment is formatted “weird” because recently in commit
+135ffc7becc8 ("bpf, vsock: Invoke proto::close on close()") we reduced
+the indentation without touching the comment.
 
-LGTM
+Since this is a fix we may have to backport into stable branches without
+that commit, I would avoid touching it to avoid unnecessary conflicts.
 
-Reviewed-by: Romain Gantois <romain.gantois@bootlin.com>
+The rest LGTM!
 
+Thanks for the quick fix and sorry for the late reply but FOSDEM-flu
+caught me.
 
+Thanks,
+Stefano
 
---nextPart6136790.lOV4Wx5bFT
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: This is a digitally signed message part.
-Content-Transfer-Encoding: 7Bit
-
------BEGIN PGP SIGNATURE-----
-
-iQIzBAABCAAdFiEEYFZBShRwOvLlRRy+3R9U/FLj284FAmepzzgACgkQ3R9U/FLj
-286J5g//fmDyVJafzX14tHwfj8aI+uwgNu7ZJxduC9DnxnYWy+EN+dby2S6/rlPN
-T4ypshgRrmYqPoji5FJKurYu3LHwUE/V8N2z06jexZaWXA8/VW+aNUkHoIbyHHko
-fYFD4Op0fKrWBGBHR+Hj8qJv2QbWFBc8vo4Swzk3PjbzLTx36g3gFWb/CUkP569I
-12TrG1wPA0ZBtugewKlLSdXOFVtDqsh0mTfCpQ8dsRjTc4TrVrcFDaxIW1aENksw
-0SIncY9LUMPnCW+IHHB7E8Ln6y84/ipUGsySMvtUOg/cnobji2ehcScRVh+QpuZQ
-L/P1dWf83kE5M1Kll9HPhs0R1qtrK2bWAaBamcDl79AW6c+4MPdBPxk9gaQmMuov
-/tiHVI0LagpoFV+Y/hXy7mMMRmqLAhlwwkmNiJuzYPnBJOReYcJ5kJ4QvCr+n0I9
-YQ+zLGBWxvi0aQk8p+qh8a6VZ+8I1aGmjGDluy9M+7f1wl1Rj3RMOOL8G86M4ZxD
-BnbNszU+FrI1fZObie8NsvvQwunu/bJcR1Mhn9RcyVcc/b6bIpAekcjcctz07P7B
-KWTz8PjEv0dHTX7k40Lr9GhZjKIQeVR3YMCNjzqvANzcCeEcSnnIY/r+U/hpK5jp
-ShGT0E6pno6LqL/YVkx+G1N/T736ljcC/BCLeQvGusrPc6Md3Aw=
-=KCpu
------END PGP SIGNATURE-----
-
---nextPart6136790.lOV4Wx5bFT--
-
-
+> 	 */
+> 	lock_sock_nested(sk, level);
+>
+>-	sock_orphan(sk);
+>+	/* Indicate to vsock_remove_sock() that the socket is being released and
+>+	 * can be removed from the bound_table. Unlike transport reassignment
+>+	 * case, where the socket must remain bound despite vsock_remove_sock()
+>+	 * being called from the transport release() callback.
+>+	 */
+>+	sock_set_flag(sk, SOCK_DEAD);
+>
+> 	if (vsk->transport)
+> 		vsk->transport->release(vsk);
+> 	else if (sock_type_connectible(sk->sk_type))
+> 		vsock_remove_sock(vsk);
+>
+>+	sock_orphan(sk);
+> 	sk->sk_shutdown = SHUTDOWN_MASK;
+>
+> 	skb_queue_purge(&sk->sk_receive_queue);
+>
+>-- 
+>2.48.1
+>
 
 
