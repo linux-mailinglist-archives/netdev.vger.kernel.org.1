@@ -1,95 +1,101 @@
-Return-Path: <netdev+bounces-164956-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-164957-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id E2E91A2FD8C
-	for <lists+netdev@lfdr.de>; Mon, 10 Feb 2025 23:43:15 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id C4928A2FE2D
+	for <lists+netdev@lfdr.de>; Tue, 11 Feb 2025 00:07:46 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 6FE3F165597
-	for <lists+netdev@lfdr.de>; Mon, 10 Feb 2025 22:43:07 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 8CB0E3A50AB
+	for <lists+netdev@lfdr.de>; Mon, 10 Feb 2025 23:07:37 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2154B253F1E;
-	Mon, 10 Feb 2025 22:39:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C683925B696;
+	Mon, 10 Feb 2025 23:07:42 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="RGlsLEGe"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="YniOKWZd"
 X-Original-To: netdev@vger.kernel.org
-Received: from out-183.mta0.migadu.com (out-183.mta0.migadu.com [91.218.175.183])
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.14])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 201AF253F11
-	for <netdev@vger.kernel.org>; Mon, 10 Feb 2025 22:39:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.183
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1EDF22586FA;
+	Mon, 10 Feb 2025 23:07:40 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.14
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1739227195; cv=none; b=NcP7sh3A4Q7Xqarsih/xbPQTmEQhGpuXjq9fgP71SENjEn6GsGB3GRt5D0wc3aM2oeeFxj+QriTn4vN0qoEg9babq03zFga7ICrEBULWlhheNo0TKim0aLGgCYd2HYcem4w6ohxPII+v/pPQt9lfyOM7U1ZNnYVzn4rWDGgdhjY=
+	t=1739228862; cv=none; b=lqUjqfeJlwE1TvJMW+KARg+Nz9sf9n31BK8u4fwHKaO3+x3t1D0oX2wK9/rTmz4rlUv9vEWNXG1AnWobN1B2+lR2cmWC7sFuppCzylFxvdiFObJZiXN5+Cz+Sn3QghD8+GbYwm0vpe+AH58yqzIRClAkFysBZF5vJlx084VNtuE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1739227195; c=relaxed/simple;
-	bh=0P72uV3pB6pL+48smtl0CFdO6pvz1q048WmjWhaF7qs=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=XZUkqHccugeUr53x8I6h5S54zNxX1jmkeotxXe5tFeyllQbkTTQWxpT6I1tWWqTg6J7Zfy5aZRzSKYqmJiK0fIdT0KMxlwFMfKZcYzLmqoSEEcS1m8keDihQV8iM9IJBQYe5GQVWALTNMcxIZddjGDOdZB172HcrjXe617DzZmU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=RGlsLEGe; arc=none smtp.client-ip=91.218.175.183
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
-Message-ID: <e6f2c489-85a9-436e-8d05-4b3063c133fd@linux.dev>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1739227191;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=7w3YMgpbpcGG8afYcxZb7YRFBy/TyESQsnHPgNHSTkE=;
-	b=RGlsLEGeTnWUkDTC9wQAypdqYsh8qtet+1va35o9zoMOBuawDjwC8mqQd23mYwzZHqCAbU
-	23geRR9gDZeJ/fjszBBCoaY19udtJnuD89hrxP+aOVBN5di1J23JOg58tbZ6rgjNpnsMSk
-	WDs450dJTfGwCgWBKgEf1u3id+7TSz8=
-Date: Mon, 10 Feb 2025 14:39:44 -0800
+	s=arc-20240116; t=1739228862; c=relaxed/simple;
+	bh=5Ad+mDP0f4rkKnJARYGaDv1lwZ6hbqhdNqwk2x11ziE=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=kKS02BTFm3y6bk0KgDVLAI4D1dB+M1mK7xYhDLwcTJ7/qKPrEpPn9N9i9n4RhwLXk0nfESUHDloMavgAC4CU3Rim2tc/XjFXdxPVIYgy5+tkmm0stSIZMvCj1daakApIfRl7QyIwhZ2H05O0EPhifzBt9xHuIrGk1zrKB4QJZoY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=YniOKWZd; arc=none smtp.client-ip=192.198.163.14
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1739228861; x=1770764861;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=5Ad+mDP0f4rkKnJARYGaDv1lwZ6hbqhdNqwk2x11ziE=;
+  b=YniOKWZdnVEZsPmFZDJdqF3C1dpHEReZkUcOFYDpk5G5eftMUqFqt5JY
+   3Z+9FF1K8l8H+9TpyhS6qCa9U0MNHdl55TcQML+zcc7lGP1xP6G6fmlzD
+   c0wWtSYDM4+kf63rs19R4mYEwFxGeOxQpGC00dAS36gCkzNwjFpu3NIRE
+   M8P0DHn6GOTjpf5MqPw2EIt7XZnW8exIWUnoo1Ajq7axj4Zgp3p8kIaXn
+   CuIDXe8ZUM2dRTHIQ43LVeV6wPYhBdyC0Mzv2y8L3q0uNTDSGpJuUsDlt
+   Md02+D3BFhUQkN2C4jgQIMVev8dHMAJJ+REAK/MqyeTbgN50ZVg9YZq2X
+   w==;
+X-CSE-ConnectionGUID: unn9jk2+RCSzK2ex47ldXQ==
+X-CSE-MsgGUID: GDmhlwVbQGOYO200/H3Kug==
+X-IronPort-AV: E=McAfee;i="6700,10204,11341"; a="40099706"
+X-IronPort-AV: E=Sophos;i="6.13,275,1732608000"; 
+   d="scan'208";a="40099706"
+Received: from fmviesa007.fm.intel.com ([10.60.135.147])
+  by fmvoesa108.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 10 Feb 2025 15:07:40 -0800
+X-CSE-ConnectionGUID: W+uTPteqRxaqvriAKsP9+Q==
+X-CSE-MsgGUID: Zkib2YFtSS+773YNKGPQMA==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.13,275,1732608000"; 
+   d="scan'208";a="112303550"
+Received: from bergbenj-mobl1.ger.corp.intel.com (HELO intel.com) ([10.245.246.18])
+  by fmviesa007-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 10 Feb 2025 15:07:38 -0800
+Date: Tue, 11 Feb 2025 00:07:34 +0100
+From: Andi Shyti <andi.shyti@linux.intel.com>
+To: "Jason A. Donenfeld" <Jason@zx2c4.com>
+Cc: Markus Theil <theil.markus@gmail.com>, linux-kernel@vger.kernel.org,
+	intel-gfx@lists.freedesktop.org, netdev@vger.kernel.org,
+	tytso@mit.edu
+Subject: Re: [PATCH] prandom: remove next_pseudo_random32
+Message-ID: <Z6qGtsEdjpz4ETvl@ashyti-mobl2.lan>
+References: <20250210133556.66431-1-theil.markus@gmail.com>
+ <CAHmME9oqvWp_Nd1Gwgyw52qy8wxztMyCpNsjByH=VnRaXqczww@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Subject: Re: [PATCH bpf-next v8 08/12] bpf: support hw SCM_TSTAMP_SND of
- SO_TIMESTAMPING
-To: Jason Xing <kerneljasonxing@gmail.com>,
- Willem de Bruijn <willemdebruijn.kernel@gmail.com>
-Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
- pabeni@redhat.com, dsahern@kernel.org, willemb@google.com, ast@kernel.org,
- daniel@iogearbox.net, andrii@kernel.org, eddyz87@gmail.com, song@kernel.org,
- yonghong.song@linux.dev, john.fastabend@gmail.com, kpsingh@kernel.org,
- sdf@fomichev.me, haoluo@google.com, jolsa@kernel.org, horms@kernel.org,
- bpf@vger.kernel.org, netdev@vger.kernel.org
-References: <20250204183024.87508-1-kerneljasonxing@gmail.com>
- <20250204183024.87508-9-kerneljasonxing@gmail.com>
- <67a3878eaefdf_14e08329415@willemb.c.googlers.com.notmuch>
- <CAL+tcoAH6OYNOvUg8LDYw_b+ar3bo2AXqq0=oHgb-ogEYAeHZA@mail.gmail.com>
-Content-Language: en-US
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Martin KaFai Lau <martin.lau@linux.dev>
-In-Reply-To: <CAL+tcoAH6OYNOvUg8LDYw_b+ar3bo2AXqq0=oHgb-ogEYAeHZA@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
-X-Migadu-Flow: FLOW_OUT
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <CAHmME9oqvWp_Nd1Gwgyw52qy8wxztMyCpNsjByH=VnRaXqczww@mail.gmail.com>
 
-On 2/5/25 8:03 AM, Jason Xing wrote:
->>> @@ -5574,9 +5575,9 @@ static void skb_tstamp_tx_bpf(struct sk_buff *skb, struct sock *sk,
->>>                op = BPF_SOCK_OPS_TS_SCHED_OPT_CB;
->>>                break;
->>>        case SCM_TSTAMP_SND:
->>> -             if (!sw)
->>> -                     return;
->>> -             op = BPF_SOCK_OPS_TS_SW_OPT_CB;
->>> +             op = sw ? BPF_SOCK_OPS_TS_SW_OPT_CB : BPF_SOCK_OPS_TS_HW_OPT_CB;
->>> +             if (!sw && hwtstamps)
->>> +                     *skb_hwtstamps(skb) = *hwtstamps;
->> Isn't this called by drivers that have actually set skb_hwtstamps?
-> Oops, somehow my mind has gone blank 🙁 Will remove it. Thanks for
-> correcting me!
+Hi,
 
-I just noticed I missed this thread when reviewing v9.
+On Mon, Feb 10, 2025 at 02:39:43PM +0100, Jason A. Donenfeld wrote:
+> Hey Markus,
+> 
+> Thanks for this. I hadn't realized that next_pseudo_random32() only
+> had two users left. Excellent.
+> 
+> I'll queue this up in the random tree (unless there are objections
+> from the maintainers of that test code).
 
-I looked at a few drivers, e.g. the mlx5e_consume_skb(). It does not necessarily 
-set the skb_hwtstamps(skb) before calling skb_tstamp_tx(). The __skb_tstamp_tx() 
-is also setting skb_hwtstamps(skb) after testing "if (hwtstamps)", so I think 
-this assignment is still needed here?
+actually would be better if we apply the i915 part in drm-tip
+rather than waiting for kernel releases to receive this change in
+our branch. It has been source of conflicts and headaches.
+
+May I ask Markus to split the patch in two parts and we handle
+the i915 side?
+
+Thanks,
+Andi
 
