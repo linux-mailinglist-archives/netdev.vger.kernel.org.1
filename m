@@ -1,97 +1,66 @@
-Return-Path: <netdev+bounces-164722-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-164723-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8AE17A2ED6C
-	for <lists+netdev@lfdr.de>; Mon, 10 Feb 2025 14:21:05 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0F98FA2EDA3
+	for <lists+netdev@lfdr.de>; Mon, 10 Feb 2025 14:24:55 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 37EB8166F14
-	for <lists+netdev@lfdr.de>; Mon, 10 Feb 2025 13:21:04 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 8DC483A217D
+	for <lists+netdev@lfdr.de>; Mon, 10 Feb 2025 13:24:31 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 29512221DA9;
-	Mon, 10 Feb 2025 13:21:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 059082253B2;
+	Mon, 10 Feb 2025 13:24:38 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="CHhCp9MU"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="z5QisoNQ"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f44.google.com (mail-wm1-f44.google.com [209.85.128.44])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6017117557
-	for <netdev@vger.kernel.org>; Mon, 10 Feb 2025 13:21:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.44
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0BCAB225384;
+	Mon, 10 Feb 2025 13:24:35 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1739193662; cv=none; b=Ju1A2jom0SzsfrZ/Wozz8Q/lNCmd0dKUsvP0aDpJ0Hs33ZOY+lBl+0w55rbUxkR0xmnljrxn2t6qngA49s+CbkOrHWtu9obWv/cNznEoNR4gd8rsYl4cOQoSfoTPPL80hAz9/VMM8PVmy2OYecIDy5qQ/LN0KYoFyxTJ1z/6DdE=
+	t=1739193877; cv=none; b=JhUcAjHQ/nFNOn/kt2HsR4bTHueW1iebTKschGv1qDrbMc88ky4ykoGYjELN6M9P6tuuTfnPIr6q+slFmvxKJWA+RL/YwnOfNZZp/dj/c0IR4EiT7O7+pTV6NQWhKpGfeMBa4jpMNs2iP2AXPVcJEBY+LEQb1IfKqEikW8BVEEs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1739193662; c=relaxed/simple;
-	bh=Z/ZxQ9HB0LGdcnJMJMiCL+HTzBP4hRUHrxJuyTdc4Qc=;
+	s=arc-20240116; t=1739193877; c=relaxed/simple;
+	bh=3vTa1OmPa2IbVNIroF/LkJXvrC0UZYwWBhaau487Xxo=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=YBvSormdQto8g4MZuc1XDCEjbs+VbrbnMlgwihNjZgQ8beqEwNHZ4o++SZ4lOIzPNUMA3oMHjmaKWe+3CTx6m+Qi0fL52eEt1Qt3fmVXXG8Cjj933ag+RDqgcCGKm0x3lTUVerXwudJFZTXBhwF/tddtYAzoUQXQt2ZXrpoW3oI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=CHhCp9MU; arc=none smtp.client-ip=209.85.128.44
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wm1-f44.google.com with SMTP id 5b1f17b1804b1-43938828d02so2554085e9.1
-        for <netdev@vger.kernel.org>; Mon, 10 Feb 2025 05:21:00 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1739193658; x=1739798458; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=IR1STzBHWflyOdMHe8euRfwJ+fzKwFGSyoXduLUKaJw=;
-        b=CHhCp9MUcVxXFqwerLSmG0u5US18visbAT1Cbfl6RwEDucCrPHjm18xHUPPK1JsZu8
-         gdhQyk5tdyTKM62OUr0Fkr4gkDaXwL2xcTpNogiN2guBEGsZ7tREN7RPbby+T07r/pRR
-         Ijaeqz40wik/zOctWCk9wAUaW/quVPTvPok59ustZn6H9d+uye2wizLaEgJB1w/iMhLI
-         stzskM+s2aIotp4CwPoFA0biy+K+16D20v/EWqv8cCRPzbRzH5khzV7rmZsyn1XtSOV+
-         J8Hrsyz0vNP5U8lqT9WotzppVzjn0WKg2W9uZYdHjrPQTbIple3H31JludXXKRUsgY0R
-         OREw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1739193658; x=1739798458;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=IR1STzBHWflyOdMHe8euRfwJ+fzKwFGSyoXduLUKaJw=;
-        b=e+FAQww78MVgigsRAZ4Lta5j+R1dfiSXuDJ3RWT9RHaxki2m1FRkdbVu/NzkFaeI/i
-         UwnYpN8Yum83Co6BLOPrrvAyQOvW3iuQPQmPPZzgq7yFzz1G6vOl8GJFKZHEc8TTDyAU
-         RWjASHN9p/oLXUaS7s32LM/Uk9H7bOwDB9wDh/MT2ln391lNJzWiwfTmU0THVKA5dzB6
-         eVezw+FoexnDqtzjPdKRsMoRuaTi9q2LfBnwTsmjzVFh31blA/5xaf0DN96H4AhFA8RZ
-         GEiMUrIAGgwW8/Pv4zC50EUYn1lNVGEkrJnHAM0aW7pUbe6wjIKfDdZzuJtLWGibrWhb
-         MaeQ==
-X-Forwarded-Encrypted: i=1; AJvYcCUZY39+2EbIfZuh2/hFuzxfEeEpcnMn+nYj0jKrNeQnxAHYI91G9a+I8o66YzILniJIDWcraSk=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwmxGPiYyELSRgZ3Jjqf7AD3LrQ4fx93WIl6LppwKxuaeqn0p84
-	om/Z+4GF1F5Ok0rZy6g8SJay6T/n9lsyZD9rC22nB58GooFrU7fJ
-X-Gm-Gg: ASbGncsMOYiabg91gHWmnaHTELYcEReZnzUo1wcU0pWC4uU2C6DgNi4u5MupN3QnNE3
-	fkWMej8NxK2n1GpgEzqDeLYrRUbnTkoi1qmU0enu7QCBqHAcFjrrTYebmSx10ObDkaLPMBDIPyN
-	HNVP1GVzHMn02Ibj7wuCC2YyBOQoYPoOmh7tFnlQzVyHq5cUsh3fQJXaqiCSuJO+vKV6RC6t828
-	iZMjQ9gBSpWE8JVujUUxpRRirpcnNnNkuNw2HO4dm9gdEaZiE6/b9MTX07ph1XrcgTRg0aaqbwf
-	qOY=
-X-Google-Smtp-Source: AGHT+IHKAnx4OMOJyxd+FsV4Q2cMCuFMhriiOBiD/pKtcrVChJIsEdo0ysTRISiCt7SIXZmiHfdEkg==
-X-Received: by 2002:a05:600c:444a:b0:439:4b67:555f with SMTP id 5b1f17b1804b1-4394b67585fmr4261405e9.6.1739193658476;
-        Mon, 10 Feb 2025 05:20:58 -0800 (PST)
-Received: from skbuf ([86.127.124.81])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-38dd4764880sm6684638f8f.25.2025.02.10.05.20.56
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 10 Feb 2025 05:20:57 -0800 (PST)
-Date: Mon, 10 Feb 2025 15:20:54 +0200
-From: Vladimir Oltean <olteanv@gmail.com>
-To: "Russell King (Oracle)" <rmk+kernel@armlinux.org.uk>
-Cc: Andrew Lunn <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>,
-	AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>,
-	"Chester A. Unal" <chester.a.unal@arinc9.com>,
-	Daniel Golle <daniel@makrotopia.org>,
+	 Content-Type:Content-Disposition:In-Reply-To; b=LkqR0og1N2ZHU9fxO3+/CRBzsJCb1KFLE61AsLuGaH4S9LjxXZMP1CFVpq3Fyn/hLwGwemvIN3yyW78UZOGWYjP589XG+uXCHIjMzE43ckJF3PdZgtUqMjoIZ8NWDYCeILApSbn2KIIh4qMF8Dg4gSr8eWrgrLV4ByZwYTnUgYc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=z5QisoNQ; arc=none smtp.client-ip=156.67.10.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=Jt6pQHoQVd00iFlOT0zKR71VJA5KHbXP387LWjI2wQQ=; b=z5QisoNQ0/YrhBAPBpWuEN7Kad
+	nBuGUOEmIWDpWL4KSa+eVE00GHWoPktI4ietdBcYAILpJsvmQszRnQAX5ckDMqvC/8KmNhywc28Q7
+	JCvb5nUq5gUvERun7RIXKSzqFRaDoN6NhP3CtEUbaYSD7RXWHWc1mk2Hofu+BPRQ2Zuk=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1thTlo-00CiYV-0K; Mon, 10 Feb 2025 14:24:16 +0100
+Date: Mon, 10 Feb 2025 14:24:15 +0100
+From: Andrew Lunn <andrew@lunn.ch>
+To: Ethan Carter Edwards <ethan@ethancedwards.com>
+Cc: Piotr Kwapulinski <piotr.kwapulinski@intel.com>,
+	Tony Nguyen <anthony.l.nguyen@intel.com>,
+	Przemek Kitszel <przemyslaw.kitszel@intel.com>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
 	"David S. Miller" <davem@davemloft.net>,
-	DENG Qingfang <dqfext@gmail.com>,
 	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	linux-arm-kernel@lists.infradead.org,
-	linux-mediatek@lists.infradead.org,
-	Matthias Brugger <matthias.bgg@gmail.com>, netdev@vger.kernel.org,
-	Paolo Abeni <pabeni@redhat.com>, Sean Wang <sean.wang@mediatek.com>,
-	Simon Horman <horms@kernel.org>
-Subject: Re: [PATCH net-next v3 1/3] net: phylink: provide
- phylink_mac_implements_lpi()
-Message-ID: <20250210132054.oaqb5mboh6qiixfv@skbuf>
-References: <Z6nWujbjxlkzK_3P@shell.armlinux.org.uk>
- <E1thR9g-003vX6-4s@rmk-PC.armlinux.org.uk>
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Jedrzej Jagielski <jedrzej.jagielski@intel.com>,
+	Simon Horman <horms@kernel.org>,
+	Stefan Wegrzyn <stefan.wegrzyn@intel.com>,
+	Michal Swiatkowski <michal.swiatkowski@linux.intel.com>,
+	intel-wired-lan@lists.osuosl.org, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org, linux-hardening@vger.kernel.org
+Subject: Re: [PATCH] ixgbe: remove self assignment
+Message-ID: <a9070724-b4b7-4a23-8ed4-b6464175b660@lunn.ch>
+References: <20250209-e610-self-v1-1-34c6c46ffe11@ethancedwards.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -100,49 +69,29 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <E1thR9g-003vX6-4s@rmk-PC.armlinux.org.uk>
+In-Reply-To: <20250209-e610-self-v1-1-34c6c46ffe11@ethancedwards.com>
 
-On Mon, Feb 10, 2025 at 10:36:44AM +0000, Russell King (Oracle) wrote:
-> diff --git a/include/linux/phylink.h b/include/linux/phylink.h
-> index 898b00451bbf..0de78673172d 100644
-> --- a/include/linux/phylink.h
-> +++ b/include/linux/phylink.h
-> @@ -737,6 +737,18 @@ static inline int phylink_get_link_timer_ns(phy_interface_t interface)
->  	}
->  }
->  
-> +/**
-> + * phylink_mac_implements_lpi() - determine if MAC implements LPI ops
-> + * @ops: phylink_mac_ops structure
-> + *
-> + * Returns true if the phylink MAC operations structure indicates that the
-> + * LPI operations have been implemented, false otherwise.
+On Sun, Feb 09, 2025 at 11:47:24PM -0500, Ethan Carter Edwards wrote:
+> Variable self assignment does not have any effect.
 
-This is something that I only noticed for v3 because I wanted to leave a
-review tag, so I first checked the status in patchwork, but there it says:
+Hi Ethan
 
-include/linux/phylink.h:749: warning: No description found for return value of 'phylink_mac_implements_lpi'
+As a general rule, it would be good to explain in the comment message
+what research you did to find out why there is a self assignment, and
+why just deleting it is the correct solution.
 
-I am aware of this conversation from November where you raised the point
-about tooling being able to accept the syntax without the colon as well:
-https://lore.kernel.org/netdev/87v7wjffo6.fsf@trenco.lwn.net/
+There are somewhat legitimate reasons to do a self assign, some older
+compilers would warn about variables which were set but then never
+used, for example. Or it could be a dumb copy/paste error when writing
+the code. But more likely than not, the developer had something in
+mind, got distracted, and never finished the code. Which appears to
+the issue here.
 
-but it looks like it didn't go anywhere, with Jon still preferring the
-strict syntax for now, and no follow-up that I can see. So, the current
-conventions are not these, and you haven't specifically said anywhere
-that you are deliberately ignoring them.
+If you cannot figure out what the correct fix is, please just email to
+the list, Cc: the Maintainer of the file, pointing out the problem.
 
-In the end it's not something for me to decide, but I thought maybe I'm
-speeding things up a little bit by opening up the discussion now, rather
-than wait for a maintainer to look at it.
+    Andrew
 
-> + */
-> +static inline bool phylink_mac_implements_lpi(const struct phylink_mac_ops *ops)
-> +{
-> +	return ops && ops->mac_disable_tx_lpi && ops->mac_enable_tx_lpi;
-> +}
-> +
->  void phylink_mii_c22_pcs_decode_state(struct phylink_link_state *state,
->  				      unsigned int neg_mode, u16 bmsr, u16 lpa);
->  void phylink_mii_c22_pcs_get_state(struct mdio_device *pcs,
+---
+pw-bot: cr
 
