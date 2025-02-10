@@ -1,80 +1,80 @@
-Return-Path: <netdev+bounces-164944-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-164945-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id AB4FCA2FD4C
-	for <lists+netdev@lfdr.de>; Mon, 10 Feb 2025 23:39:03 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id A4698A2FD52
+	for <lists+netdev@lfdr.de>; Mon, 10 Feb 2025 23:39:24 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id AA3D01662FA
-	for <lists+netdev@lfdr.de>; Mon, 10 Feb 2025 22:38:51 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 7A80E188A94C
+	for <lists+netdev@lfdr.de>; Mon, 10 Feb 2025 22:39:14 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5202C25A2D9;
-	Mon, 10 Feb 2025 22:37:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CD43425A352;
+	Mon, 10 Feb 2025 22:37:47 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=baylibre-com.20230601.gappssmtp.com header.i=@baylibre-com.20230601.gappssmtp.com header.b="z4odNCuW"
+	dkim=pass (2048-bit key) header.d=baylibre-com.20230601.gappssmtp.com header.i=@baylibre-com.20230601.gappssmtp.com header.b="TLOvJjDN"
 X-Original-To: netdev@vger.kernel.org
 Received: from mail-oi1-f175.google.com (mail-oi1-f175.google.com [209.85.167.175])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7D3F72512ED
-	for <netdev@vger.kernel.org>; Mon, 10 Feb 2025 22:37:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B6EE325335E
+	for <netdev@vger.kernel.org>; Mon, 10 Feb 2025 22:37:45 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.175
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1739227065; cv=none; b=a7bnwsw9Pn+fkJ7thehmAZygim+xTCorKkqP30bjAGuWV5lrOxDh1ZYzYWQuSct8KUNoPWkVIoVp419txamkqe3p60ofkD7C7Xk667Lu1Xf+AdPwFD+Qpt37i5SkqREId/MVJbfs/JnmcnHrMUsy2WFbHlD//G9KVtLzNj3UbnY=
+	t=1739227067; cv=none; b=QeTgf5QXVuNa3q0l7S55SgQ/wN9qsHawOMj8RlC3tD8ruP//jft9eNWf8vKgKoBc5Kvwgapu5nmrHY9QBimfT4B3KrcvelCNeBLYYcCi445nYsCbL7+erX6qOLVJsyze1QgH25sfuV7BrDRNh0PwMy98Dj/OotUwjNhyc94EkcQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1739227065; c=relaxed/simple;
-	bh=K5V5TnWu+110nnHuULWw1Pwd0QiBFgzUapmy9BeC2p8=;
+	s=arc-20240116; t=1739227067; c=relaxed/simple;
+	bh=h4/JkT/aieYSqhfnM9UnuUTJJW8FA5AwmbHA2f2Z3qI=;
 	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=R4IAevGLES+AIBZIC4NB7vy4rnZTAS1fkpGVxbmzo4S2piEHJKw2nC0yFBgzRfUvDtDPVV0Gl4y70Tw/KmDTW4wCuoQo+TFB/NgektB/h7SpuxBmuzJuWED1bk+IDvWeX1mo7+6gd2mReCHnIKPHh9MT7gMZ7O/5xX5FcMUiUAY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=baylibre.com; spf=pass smtp.mailfrom=baylibre.com; dkim=pass (2048-bit key) header.d=baylibre-com.20230601.gappssmtp.com header.i=@baylibre-com.20230601.gappssmtp.com header.b=z4odNCuW; arc=none smtp.client-ip=209.85.167.175
+	 In-Reply-To:To:Cc; b=lJgUWiDmvpkA7LG0P2gz5kTHIo1ORnFFlzo5nw9uL7zeTJ1Q7EL5ndgv7iY0tjOI/MeEhpoXAcmN6q7W1nUPGMerNx2LbGp2zLl/Y1d+3V7Zs3Av5a9M89fxGYKw+E2WtYxBFtIf1sD43WHyvzddTi8hIK7srCn6Qp7JfMheVa8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=baylibre.com; spf=pass smtp.mailfrom=baylibre.com; dkim=pass (2048-bit key) header.d=baylibre-com.20230601.gappssmtp.com header.i=@baylibre-com.20230601.gappssmtp.com header.b=TLOvJjDN; arc=none smtp.client-ip=209.85.167.175
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=baylibre.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=baylibre.com
-Received: by mail-oi1-f175.google.com with SMTP id 5614622812f47-3f3ba3d0433so594181b6e.2
-        for <netdev@vger.kernel.org>; Mon, 10 Feb 2025 14:37:43 -0800 (PST)
+Received: by mail-oi1-f175.google.com with SMTP id 5614622812f47-3f314ff6ffdso2853703b6e.0
+        for <netdev@vger.kernel.org>; Mon, 10 Feb 2025 14:37:45 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=baylibre-com.20230601.gappssmtp.com; s=20230601; t=1739227062; x=1739831862; darn=vger.kernel.org;
+        d=baylibre-com.20230601.gappssmtp.com; s=20230601; t=1739227065; x=1739831865; darn=vger.kernel.org;
         h=cc:to:in-reply-to:references:message-id:content-transfer-encoding
          :mime-version:subject:date:from:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=oAgdP5/7nbSCpei3bdgHz+Kvp3J/VbeQ+Dc9cWuRxQY=;
-        b=z4odNCuWEIdXw6egWdAWzvkDfUm2yp9LCjnZQvBCOP3qcsaxfCXnX9ztT4tAzJgMaI
-         oDzp3usrGdpGtWbm0FqUkKrpmWAEIq0wPRJUUbuLHncebfsQtZRIdXurTcE0coBezaot
-         JCqwfqdc21V6HhF23eOTpr1Hv00Dk390SFpGVTMpKQAG5hTBVYYJCwcIsgcO9kiueCqz
-         pcz1nbGaOl3KNFWRBj/DCKZxfPkD/u9KWoJF+RASmhfD3E5roTW7Q9RZbtvCdUfMt4C1
-         4t7qWk6gsXi17m+oWug7qVV/Df5lYt5w/9r/5UtGtJtXuARRfAjocCTg95E9CRvg5S42
-         AFPg==
+        bh=aXB+byZeKAp4YicbFdNdAOrg4x68Xt2NQ79nnhRrJVU=;
+        b=TLOvJjDNBxarUBELg7go/ZxX0zU+xs39riDy84aC4j2XbIyhm1pT74p/AGm39IqyRZ
+         bknIVVrQU2LwEzznw9FCg4/I6+7S/onqBEXzcpR65VT172DkSyNa4b6zuoHcZwRcLORR
+         yooOMj/CxF7agVXCqEErNuJBbNcNcreGO1y0qaCMTXz0qQzT3w7uMQD+kc2Q5ty9Dzm/
+         3zF3qLHrKWV/Srh+kAZopRBiRZo7Nk9kUIIJ8dS4T6VUnaNj25a1ZNm3dcZ2WGQw+O5a
+         qAtRg4iru5kNYEqyRzgAT3OoX/SGWZ5VwNlTo6iGuKGRzWMV5R4ptInabd4QfOB9yJqD
+         zbng==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1739227062; x=1739831862;
+        d=1e100.net; s=20230601; t=1739227065; x=1739831865;
         h=cc:to:in-reply-to:references:message-id:content-transfer-encoding
          :mime-version:subject:date:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=oAgdP5/7nbSCpei3bdgHz+Kvp3J/VbeQ+Dc9cWuRxQY=;
-        b=TQ0sq1aqoHPLhxMuby0HzFp64IUlAugLHbTaK153Fq5Gm0cCAb5eZNjY7z02PYHUor
-         dA9qjtf470fyQTxQbvRCXof5n7fAj4UWfx6cdUMk4VF0CnRm5ZAXw1NDw1Cp6KHhN8ET
-         QUBkVReKiLwLiOSQ75xw+AEvxsfyPqEbLBFqEkW8LzSPlLKCOldWp5rGTI8jOd/Dwcc3
-         7tpMwV2YQ7uIKU1giNxVV2mXH1UkxtMfn8OxfDzMk3v9OcGp+VWWwZ6mv6GnxYKi2O7e
-         8i+UeTbOWJqaQxHa1oEF1kNMF1/rRtTNdM2X3J5yfWBMoQIrhMnSAZ3MzYUwpubfEOm+
-         TFVw==
-X-Forwarded-Encrypted: i=1; AJvYcCXktUA015KhtIOzYIGTRCGbeb+W/cnYv0pKRuqqInrOnUfaBrXfjeQZg3i+hvgxp8d/vA6pCkg=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yz8VyBVcqzmfUlmcYg52zP4zqBrE0Aun0MFfw8ck0eftOQa5rxB
-	BmBthlmMfI2nGc8+Ufk6mxFMlhvMkqJLN8BUSinzdxM8bYfCnJKgK5QTwvyRG3g=
-X-Gm-Gg: ASbGncsU12S6pv8eHNWW1V8nCJXlYS3j/HQ8npGZw+QaKxBK+JeLfWyI9znvmG7WO3p
-	2OaRLzPTFjS4qI3LhXAYQqyyJCltsJl5j+qrfm3uyU0Av+5D+uWWn96MSncA4J/novjGWdkMNst
-	05Qr9yYSPdTsglbh+GoiIuZ9KOuQlmGX1rpdEO91uEQWhmaaNqNey8HCHLD7R00RmL38Szzw9QD
-	cjXEn3ak196pmmXpaHw8D2MDyhmz78F3gwbBPvLjuoRlxQJ3F/3PLLxBqjIjmtG+gSpQilJclyf
-	u4nKpBRe3NSaNjaVrrQxJ9dN93ZBCCijdwqLTSmf8m2o4Wo=
-X-Google-Smtp-Source: AGHT+IGCum5h1AQwvUJNh3Kk51lVy6xq7QJ+B7z8EkY33CFant2nucCBaXwDqcXBpkDagMClSCsXTA==
-X-Received: by 2002:a05:6808:4099:b0:3f3:b0ae:7998 with SMTP id 5614622812f47-3f3b0ae7b3fmr3901508b6e.17.1739227062548;
-        Mon, 10 Feb 2025 14:37:42 -0800 (PST)
+        bh=aXB+byZeKAp4YicbFdNdAOrg4x68Xt2NQ79nnhRrJVU=;
+        b=OKPiLa0eDVBdRDHwOMDBBVC90DBGsvziGHoopWDa4TjcR083ttAZQs5pUqeiSvsmxr
+         gojChHhAOuftMaOdlpA+q0vV0XTUt/tciYkttwj+SDvqgPpDroQk/9Sgu+t/yDTPkn9P
+         L1euUB3OZ3L7GTvyBVGb0myX/ROynXYR8t+lY0zCT9kRatyxokhjXT5c6etQSRhKQZc/
+         +RW5CiGdXkXkASfCsU557Xj17uzGG651PXqhqJrFAfi+nYZnelhirbfJ2mja8toRxnBG
+         Gynb+UUIlfCniB9ICyean7oGtfmmCl62LEwttY4/KJzdd7aS6q36fLMJ9730BpffD7wo
+         A7nQ==
+X-Forwarded-Encrypted: i=1; AJvYcCV++gEvs0U/Efh/mi66iOQ3xpL9+nHFK/iEslWTl5QS+j6QBC9W74mugi3M6tHyp/+22FlXQoQ=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yw2uDtsZ9nfOsfqVFz1JxuO4XWyRfddrDV/p9xc/kODY1y+JrOL
+	KHH9QnuYhYa+YBPZTI6jv9tS7F+y6AG0n7BNhiJT0zrc4VQw4+rFCgqNOd0FQbI=
+X-Gm-Gg: ASbGnctsbfemCPT+JS0rygw0E7TZtT/lclX7VcnS7Guwihx7y4Gb4ETaUDF8oDxDfOL
+	qwJeM5hGdHp+XcmiZnUI2Of7a6aIlNFYUSZ1lBDFhR6e+1057rbHb91Zk+JXyJge/Vi2dsV/VQN
+	1mY9dyESY9PWkfPe2bHsI/iKU6iSjZ02G96HaWyt7rqsAXvRl/YOmZLBI3GWl7N8fKh2hV7Ah0n
+	Wtz/Sb0sfF4Jv+FVuFMn11ObtlEHfmM5aaXJwNXWtqXw9cyxBCH1sgY3lkyXpro7za/5WnI99K8
+	IYtbFf0yrVbSU+Oq2KBneEpasgFMwlPhth9+S9UC3GuRLXk=
+X-Google-Smtp-Source: AGHT+IHioMIxu9VGnzXizdV46F3qMiFjs48WUo2oHZz5JGkXBH5C7gXq210bMR9McIstDGpa5KGthg==
+X-Received: by 2002:a05:6808:319a:b0:3f3:c1e0:c466 with SMTP id 5614622812f47-3f3c1e0c4edmr1094523b6e.5.1739227064928;
+        Mon, 10 Feb 2025 14:37:44 -0800 (PST)
 Received: from [127.0.1.1] (ip98-183-112-25.ok.ok.cox.net. [98.183.112.25])
-        by smtp.gmail.com with ESMTPSA id 5614622812f47-3f389ed1ca2sm2521820b6e.11.2025.02.10.14.37.39
+        by smtp.gmail.com with ESMTPSA id 5614622812f47-3f389ed1ca2sm2521820b6e.11.2025.02.10.14.37.42
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 10 Feb 2025 14:37:41 -0800 (PST)
+        Mon, 10 Feb 2025 14:37:43 -0800 (PST)
 From: David Lechner <dlechner@baylibre.com>
-Date: Mon, 10 Feb 2025 16:33:30 -0600
-Subject: [PATCH v3 04/15] bus: ts-nbus: use gpiod_multi_set_value_cansleep
+Date: Mon, 10 Feb 2025 16:33:31 -0600
+Subject: [PATCH v3 05/15] bus: ts-nbus: use bitmap_get_value8()
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -83,7 +83,7 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-Message-Id: <20250210-gpio-set-array-helper-v3-4-d6a673674da8@baylibre.com>
+Message-Id: <20250210-gpio-set-array-helper-v3-5-d6a673674da8@baylibre.com>
 References: <20250210-gpio-set-array-helper-v3-0-d6a673674da8@baylibre.com>
 In-Reply-To: <20250210-gpio-set-array-helper-v3-0-d6a673674da8@baylibre.com>
 To: Linus Walleij <linus.walleij@linaro.org>, 
@@ -104,49 +104,51 @@ To: Linus Walleij <linus.walleij@linaro.org>,
 Cc: linux-gpio@vger.kernel.org, linux-kernel@vger.kernel.org, 
  linux-iio@vger.kernel.org, linux-mmc@vger.kernel.org, 
  netdev@vger.kernel.org, linux-phy@lists.infradead.org, 
- linux-sound@vger.kernel.org, David Lechner <dlechner@baylibre.com>
+ linux-sound@vger.kernel.org, Andy Shevchenko <andy.shevchenko@gmail.com>, 
+ David Lechner <dlechner@baylibre.com>
 X-Mailer: b4 0.14.2
 
-Reduce verbosity by using gpiod_multi_set_value_cansleep() instead of
-gpiod_set_array_value_cansleep().
+Use bitmap_get_value8() instead of accessing the bitmap directly.
 
-ts_nbus->data->ndescs is validated to be 8 during probe, so will have
-the same value as the hard-coded 8 that is removed by this change.
+Accessing the bitmap directly is not considered good practice. We now
+have a helper function that can be used instead, so let's use it.
 
-Reviewed-by: Linus Walleij <linus.walleij@linaro.org>
+Suggested-by: Andy Shevchenko <andy.shevchenko@gmail.com>
 Signed-off-by: David Lechner <dlechner@baylibre.com>
 ---
- drivers/bus/ts-nbus.c | 6 ++----
- 1 file changed, 2 insertions(+), 4 deletions(-)
+ drivers/bus/ts-nbus.c | 5 +++--
+ 1 file changed, 3 insertions(+), 2 deletions(-)
 
 diff --git a/drivers/bus/ts-nbus.c b/drivers/bus/ts-nbus.c
-index d3ee102a13893c83c50e41f7298821f4d7ae3487..b4c9308caf0647a3261071d9527fffce77784af2 100644
+index b4c9308caf0647a3261071d9527fffce77784af2..beac67f3b820377f8bb1fc4f4ee77e15ee240834 100644
 --- a/drivers/bus/ts-nbus.c
 +++ b/drivers/bus/ts-nbus.c
-@@ -109,8 +109,7 @@ static void ts_nbus_reset_bus(struct ts_nbus *ts_nbus)
- 
- 	values[0] = 0;
- 
--	gpiod_set_array_value_cansleep(8, ts_nbus->data->desc,
--				       ts_nbus->data->info, values);
-+	gpiod_multi_set_value_cansleep(ts_nbus->data, values);
- 	gpiod_set_value_cansleep(ts_nbus->csn, 0);
- 	gpiod_set_value_cansleep(ts_nbus->strobe, 0);
- 	gpiod_set_value_cansleep(ts_nbus->ale, 0);
-@@ -150,12 +149,11 @@ static int ts_nbus_read_byte(struct ts_nbus *ts_nbus, u8 *val)
+@@ -10,6 +10,7 @@
+  * TS-4600 SoM.
   */
- static void ts_nbus_write_byte(struct ts_nbus *ts_nbus, u8 byte)
+ 
++#include <linux/bitmap.h>
+ #include <linux/bitops.h>
+ #include <linux/gpio/consumer.h>
+ #include <linux/kernel.h>
+@@ -107,7 +108,7 @@ static void ts_nbus_reset_bus(struct ts_nbus *ts_nbus)
  {
--	struct gpio_descs *gpios = ts_nbus->data;
  	DECLARE_BITMAP(values, 8);
  
- 	values[0] = byte;
+-	values[0] = 0;
++	bitmap_set_value8(values, byte, 0);
  
--	gpiod_set_array_value_cansleep(8, gpios->desc, gpios->info, values);
-+	gpiod_multi_set_value_cansleep(ts_nbus->data, values);
+ 	gpiod_multi_set_value_cansleep(ts_nbus->data, values);
+ 	gpiod_set_value_cansleep(ts_nbus->csn, 0);
+@@ -151,7 +152,7 @@ static void ts_nbus_write_byte(struct ts_nbus *ts_nbus, u8 byte)
+ {
+ 	DECLARE_BITMAP(values, 8);
+ 
+-	values[0] = byte;
++	bitmap_set_value8(values, byte, 8);
+ 
+ 	gpiod_multi_set_value_cansleep(ts_nbus->data, values);
  }
- 
- /*
 
 -- 
 2.43.0
