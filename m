@@ -1,227 +1,146 @@
-Return-Path: <netdev+bounces-164843-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-164845-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 537DBA2F59F
-	for <lists+netdev@lfdr.de>; Mon, 10 Feb 2025 18:46:07 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id BBBA5A2F5A6
+	for <lists+netdev@lfdr.de>; Mon, 10 Feb 2025 18:46:33 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 9389B18831AA
-	for <lists+netdev@lfdr.de>; Mon, 10 Feb 2025 17:46:12 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 83EA67A2625
+	for <lists+netdev@lfdr.de>; Mon, 10 Feb 2025 17:45:35 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C1513257AFB;
-	Mon, 10 Feb 2025 17:44:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1B633255E45;
+	Mon, 10 Feb 2025 17:45:08 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="OrgBZ2H9"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="A8PBU0H4"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pj1-f51.google.com (mail-pj1-f51.google.com [209.85.216.51])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 33EB5257ACE;
-	Mon, 10 Feb 2025 17:44:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.51
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DEE8F2500BA;
+	Mon, 10 Feb 2025 17:45:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1739209450; cv=none; b=QEqwLAesS+m8xBt12JP/2WNYH2BSvgtf9XIfqgPcyJKi5b+DQWpGdLM0kBphctddye76xRzxJUlOmbBlVTB9gCkQ1eDkNyNWZWHekp1xdptNPr0uGJf2efAd2e96ArrhMCLbNlZy+GusX6+Pi5v6l+zwhDdEXgOhyluuL1Q10x8=
+	t=1739209508; cv=none; b=AOvBUbxZAlOE8ab7uy1MtRBDeraHjtiTNRi6hsOTydV+AzuK7tFSBWD6t6HkDWAqyfm/etkB2OSKzXB9AXJxcReQ3Dpowd1G9JZibumrnzl0HgZR6SdgbtlOLuPftqhyXFEKXfwpg+ZxGkMOnbGBgBd1Hhb+74sGCm7eSqGOHJk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1739209450; c=relaxed/simple;
-	bh=sVVkbk0Gn1THhmgFQQYZXWJ516ceqWV7SjuSKbWsCVg=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=eJgQAForLUlK1dmB2jvTmgUx5iJjmg3nTSaq03N+J4+vK3eMsimO5Cn2sUhZo9T9xOqgup6wT0jflmGKGvFeGOvQfRcPC9SHelD3WwlRs6FZXjkBYJ4Rl82AJypKfN7dbRg9qL825povtDnWT5JFwPUuDkRU9p/AeG6/njzcHKM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=OrgBZ2H9; arc=none smtp.client-ip=209.85.216.51
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pj1-f51.google.com with SMTP id 98e67ed59e1d1-2fa40c0bab2so4582396a91.0;
-        Mon, 10 Feb 2025 09:44:09 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1739209448; x=1739814248; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=tCot4AmKUdSjbCpz+84y1dF8CcLEygWZ6VcGHROBKi0=;
-        b=OrgBZ2H9xgqfRzwspedh5cy7sxDwbimO7B/BppDOsiwahGWgIF92V6TDXQftrymsgZ
-         GYuflqUMwIjBBKfLSrsStv/0HCCnLY11o3owE/1D/svRcMQb0jDgu6fZfbgIt9Wim3od
-         DcwgBKENGU4Z33EB+eQ8zcy//tStSZc6Jw5W7FEyJ8teXq7FAG1/Ybcl7hgs5/hihG9g
-         2RzKMadEI/dN3sLbRTGvWsPrNlFxs4hO+Cljrd7FDQijEKmM1H60XBMmSkrrzQVDJxT8
-         WQnlEl0rZEzKSeNfDfpAZRZdO5rMua8qaTcS9n4DXNU6wEw3cWYdvMaecd8tS2u3nOjH
-         10Iw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1739209448; x=1739814248;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=tCot4AmKUdSjbCpz+84y1dF8CcLEygWZ6VcGHROBKi0=;
-        b=CSK6bi4PbXgTgg6eoDwLp76ZgXf5VjwTlcEVkH+syuD+QyBX3Mo4dkGggOOMweIhDi
-         qvebENqx5BsON06bw7guk5NUnuT0lZsr//3Z/jwVGW3z6C7qZd/tr71zdouM97QQ0FrX
-         U2pKgexMN6p+QodAFLCuK9CtR9TuXsIUsRtHBkEtcJ0m+h32wC50FLuZcz1A4k9eXrJu
-         miSPEOo8dZxUjFmD1VIktspvEMhXH0tMZZRCuzK1XVrvI6ZjD5OZ6874NvJBjGiC245F
-         PbAddW8k+gROy7ajO3vsnuB1Oo5P1Et+dRVdXne7qTkOFRl712WaqsrSznvy594maexn
-         yfxQ==
-X-Gm-Message-State: AOJu0YzUkutGR6w+UHYbiW1AD8FWgVuVRdVkKw6fUc79wWvssR0SYFX6
-	KF2X18L5JWEPdAcP9Y7Wjcb9fxU2siqC9FxGIpc+7Evf6BhwJh79KvmD6Kul
-X-Gm-Gg: ASbGncte6f8VXJ7UFj+raCZUW2VXapUvSkKQaY3UKEImZJfOfK5pWB93Mugqxs9fuEK
-	VpmsFXOeDgmocpGFnL4f6/JBpygG8+CHy6r5xr6CdQ3opbqr7J9xIn3ClHDHioRLCl38bCmuTUk
-	68Vt6HSH027uwcmOhXHddVu2Gbl9H5XKWBSedXXeEkSz+XbNoZZpZnuhBUBUrxYC7SuiHM6uhjr
-	AtOCEBdfhCZElohGCfEI9AH+N/BLovLWga5Nmba6sMBTCwCKgyd6vBDvNM+nWhUfIvy2D4FGd6J
-	Lvngi178pHa4qc5L2xUNvlF+/Gw90vzwmLzis1/e0Rr3Udt+ZnMeTxVqXbY7vXqeTA==
-X-Google-Smtp-Source: AGHT+IGOQqcef8+uXJOslKW4MqjO0+yfdJIEKy/ckO4RYPSE7YgsLhAZhQKf734vkt/D81RganGRcg==
-X-Received: by 2002:a17:90b:350b:b0:2fa:228d:5af3 with SMTP id 98e67ed59e1d1-2fa24271b0bmr24427087a91.15.1739209448573;
-        Mon, 10 Feb 2025 09:44:08 -0800 (PST)
-Received: from localhost.localdomain (c-76-146-13-146.hsd1.wa.comcast.net. [76.146.13.146])
-        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-2fa3fb55dcasm5554961a91.4.2025.02.10.09.44.07
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 10 Feb 2025 09:44:08 -0800 (PST)
-From: Amery Hung <ameryhung@gmail.com>
-To: netdev@vger.kernel.org
-Cc: bpf@vger.kernel.org,
-	daniel@iogearbox.net,
-	andrii@kernel.org,
-	alexei.starovoitov@gmail.com,
-	martin.lau@kernel.org,
-	kuba@kernel.org,
-	edumazet@google.com,
-	xiyou.wangcong@gmail.com,
-	cong.wang@bytedance.com,
-	jhs@mojatatu.com,
-	sinquersw@gmail.com,
-	toke@redhat.com,
-	jiri@resnulli.us,
-	stfomichev@gmail.com,
-	ekarani.silvestre@ccc.ufcg.edu.br,
-	yangpeihao@sjtu.edu.cn,
-	yepeilin.cs@gmail.com,
-	ameryhung@gmail.com,
-	kernel-team@meta.com
-Subject: [PATCH bpf-next v4 19/19] selftests/bpf: Test attaching bpf qdisc to mq and non root
-Date: Mon, 10 Feb 2025 09:43:33 -0800
-Message-ID: <20250210174336.2024258-20-ameryhung@gmail.com>
-X-Mailer: git-send-email 2.47.1
-In-Reply-To: <20250210174336.2024258-1-ameryhung@gmail.com>
-References: <20250210174336.2024258-1-ameryhung@gmail.com>
+	s=arc-20240116; t=1739209508; c=relaxed/simple;
+	bh=EkPg0iVWp2FJbeErYnYBxnLlulonUWK0FxLvxy3RRK4=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=eb4GB9yKwOvz3JR7C4qAgfgk9qLQ/kjtDHmwEfe0R8N+cV+0C0/I3F2CRyaG5vQN90TzooTdtQCKaEcTA1pyKuw/2H+/RqrxITi8lPKVSzTo3M40JRTOQs405cNq2ZK1CAlu4y3AKQMZ/V3p87pjmDBtKw1jCPolfeSWp+l7E00=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=A8PBU0H4; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 567D9C4CEE5;
+	Mon, 10 Feb 2025 17:45:07 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1739209507;
+	bh=EkPg0iVWp2FJbeErYnYBxnLlulonUWK0FxLvxy3RRK4=;
+	h=From:To:Cc:Subject:Date:From;
+	b=A8PBU0H4UdGp7EEii9SVKDYE3xCTXFxnvsSm8n6vjdQKVpgfLVGBqMvwYcxapcqpG
+	 /e9WhuyHheagw0ggp5DGCOWc0AnApALJ0iW4WveKnDahwmH/3SJlhgo1lV/7jv8OUM
+	 9GU+cJNUit24AYXhDaBEmgBns7TT5XjQR3jrX52kpazd8M8GoYAfD8Up8/CBz6OHio
+	 evRcWwznTb4ubpjoL+hvA6H/uZIB7GRBQwh3/B28BQvPkoR7l1xCZJ/E2l5MKHCZlz
+	 vhHUHKstenVnlUZ9HBkO70ibzWQbihBg72d9QfAhGNuXuTc2MI/jcCN433DEyLGhd7
+	 oSogFORbTUGWQ==
+From: Kees Cook <kees@kernel.org>
+To: Tariq Toukan <tariqt@nvidia.com>
+Cc: Kees Cook <kees@kernel.org>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Yishai Hadas <yishaih@nvidia.com>,
+	netdev@vger.kernel.org,
+	linux-rdma@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	linux-hardening@vger.kernel.org
+Subject: [PATCH] net/mlx4_core: Avoid impossible mlx4_db_alloc() order value
+Date: Mon, 10 Feb 2025 09:45:05 -0800
+Message-Id: <20250210174504.work.075-kees@kernel.org>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+X-Developer-Signature: v=1; a=openpgp-sha256; l=3608; i=kees@kernel.org; h=from:subject:message-id; bh=EkPg0iVWp2FJbeErYnYBxnLlulonUWK0FxLvxy3RRK4=; b=owGbwMvMwCVmps19z/KJym7G02pJDOmrrBU+V3w5JxDieixNs3bKsg1HJS8/6yu7FMJesI1tm pLqtFOhHaUsDGJcDLJiiixBdu5xLh5v28Pd5yrCzGFlAhnCwMUpABP51MzI0MoVuTjI7V/Imin7 fz7hVjPYxvHm6E3Otf6rcjqulj8oZWFkWPLgkVkHT6j8q3Pf+ATFrK/NPaLA8+9Z9M87ipV2kz4 f4AQA
+X-Developer-Key: i=kees@kernel.org; a=openpgp; fpr=A5C3F68F229DD60F723E6E138972F4DFDC6DC026
 Content-Transfer-Encoding: 8bit
 
-Until we are certain that existing classful qdiscs work with bpf qdisc,
-make sure we don't allow attaching a bpf qdisc to non root. Meanwhile,
-attaching to mq is allowed.
+GCC can see that the value range for "order" is capped, but this leads
+it to consider that it might be negative, leading to a false positive
+warning (with GCC 15 with -Warray-bounds -fdiagnostics-details):
 
-Signed-off-by: Amery Hung <ameryhung@gmail.com>
+../drivers/net/ethernet/mellanox/mlx4/alloc.c:691:47: error: array subscript -1 is below array bounds of 'long unsigned int *[2]' [-Werror=array-bounds=]
+  691 |                 i = find_first_bit(pgdir->bits[o], MLX4_DB_PER_PAGE >> o);
+      |                                    ~~~~~~~~~~~^~~
+  'mlx4_alloc_db_from_pgdir': events 1-2
+  691 |                 i = find_first_bit(pgdir->bits[o], MLX4_DB_PER_PAGE >> o);                        |                     ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+      |                     |                         |                                                   |                     |                         (2) out of array bounds here
+      |                     (1) when the condition is evaluated to true                             In file included from ../drivers/net/ethernet/mellanox/mlx4/mlx4.h:53,
+                 from ../drivers/net/ethernet/mellanox/mlx4/alloc.c:42:
+../include/linux/mlx4/device.h:664:33: note: while referencing 'bits'
+  664 |         unsigned long          *bits[2];
+      |                                 ^~~~
+
+Switch the argument to unsigned int, which removes the compiler needing
+to consider negative values.
+
+Signed-off-by: Kees Cook <kees@kernel.org>
 ---
- tools/testing/selftests/bpf/config            |  1 +
- .../selftests/bpf/prog_tests/bpf_qdisc.c      | 75 +++++++++++++++++++
- 2 files changed, 76 insertions(+)
+Cc: Tariq Toukan <tariqt@nvidia.com>
+Cc: Andrew Lunn <andrew+netdev@lunn.ch>
+Cc: "David S. Miller" <davem@davemloft.net>
+Cc: Eric Dumazet <edumazet@google.com>
+Cc: Jakub Kicinski <kuba@kernel.org>
+Cc: Paolo Abeni <pabeni@redhat.com>
+Cc: Yishai Hadas <yishaih@nvidia.com>
+Cc: netdev@vger.kernel.org
+Cc: linux-rdma@vger.kernel.org
+---
+ drivers/net/ethernet/mellanox/mlx4/alloc.c | 6 +++---
+ include/linux/mlx4/device.h                | 2 +-
+ 2 files changed, 4 insertions(+), 4 deletions(-)
 
-diff --git a/tools/testing/selftests/bpf/config b/tools/testing/selftests/bpf/config
-index 6b0cab55bd2d..3201a962b3dc 100644
---- a/tools/testing/selftests/bpf/config
-+++ b/tools/testing/selftests/bpf/config
-@@ -74,6 +74,7 @@ CONFIG_NET_MPLS_GSO=y
- CONFIG_NET_SCH_BPF=y
- CONFIG_NET_SCH_FQ=y
- CONFIG_NET_SCH_INGRESS=y
-+CONFIG_NET_SCH_HTB=y
- CONFIG_NET_SCHED=y
- CONFIG_NETDEVSIM=y
- CONFIG_NETFILTER=y
-diff --git a/tools/testing/selftests/bpf/prog_tests/bpf_qdisc.c b/tools/testing/selftests/bpf/prog_tests/bpf_qdisc.c
-index 7e8e3170e6b6..5d4fa5ad40e1 100644
---- a/tools/testing/selftests/bpf/prog_tests/bpf_qdisc.c
-+++ b/tools/testing/selftests/bpf/prog_tests/bpf_qdisc.c
-@@ -86,6 +86,77 @@ static void test_fq(void)
- 	bpf_qdisc_fq__destroy(fq_skel);
+diff --git a/drivers/net/ethernet/mellanox/mlx4/alloc.c b/drivers/net/ethernet/mellanox/mlx4/alloc.c
+index b330020dc0d6..f2bded847e61 100644
+--- a/drivers/net/ethernet/mellanox/mlx4/alloc.c
++++ b/drivers/net/ethernet/mellanox/mlx4/alloc.c
+@@ -682,9 +682,9 @@ static struct mlx4_db_pgdir *mlx4_alloc_db_pgdir(struct device *dma_device)
  }
  
-+static void test_qdisc_attach_to_mq(void)
-+{
-+	DECLARE_LIBBPF_OPTS(bpf_tc_hook, hook,
-+			    .attach_point = BPF_TC_QDISC,
-+			    .parent = TC_H_MAKE(1 << 16, 1),
-+			    .handle = 0x11 << 16,
-+			    .qdisc = "bpf_fifo");
-+	struct bpf_qdisc_fifo *fifo_skel;
-+	struct bpf_link *link;
-+	int err;
-+
-+	fifo_skel = bpf_qdisc_fifo__open_and_load();
-+	if (!ASSERT_OK_PTR(fifo_skel, "bpf_qdisc_fifo__open_and_load"))
-+		return;
-+
-+	link = bpf_map__attach_struct_ops(fifo_skel->maps.fifo);
-+	if (!ASSERT_OK_PTR(link, "bpf_map__attach_struct_ops")) {
-+		bpf_qdisc_fifo__destroy(fifo_skel);
-+		return;
-+	}
-+
-+	SYS(out, "ip link add veth0 type veth peer veth1");
-+	hook.ifindex = if_nametoindex("veth0");
-+	SYS(out, "tc qdisc add dev veth0 root handle 1: mq");
-+
-+	err = bpf_tc_hook_create(&hook);
-+	ASSERT_OK(err, "attach qdisc");
-+
-+	bpf_tc_hook_destroy(&hook);
-+
-+	SYS(out, "tc qdisc delete dev veth0 root mq");
-+out:
-+	bpf_link__destroy(link);
-+	bpf_qdisc_fifo__destroy(fifo_skel);
-+}
-+
-+static void test_qdisc_attach_to_non_root(void)
-+{
-+	DECLARE_LIBBPF_OPTS(bpf_tc_hook, hook, .ifindex = LO_IFINDEX,
-+			    .attach_point = BPF_TC_QDISC,
-+			    .parent = TC_H_MAKE(1 << 16, 1),
-+			    .handle = 0x11 << 16,
-+			    .qdisc = "bpf_fifo");
-+	struct bpf_qdisc_fifo *fifo_skel;
-+	struct bpf_link *link;
-+	int err;
-+
-+	fifo_skel = bpf_qdisc_fifo__open_and_load();
-+	if (!ASSERT_OK_PTR(fifo_skel, "bpf_qdisc_fifo__open_and_load"))
-+		return;
-+
-+	link = bpf_map__attach_struct_ops(fifo_skel->maps.fifo);
-+	if (!ASSERT_OK_PTR(link, "bpf_map__attach_struct_ops")) {
-+		bpf_qdisc_fifo__destroy(fifo_skel);
-+		return;
-+	}
-+
-+	SYS(out, "tc qdisc add dev lo root handle 1: htb");
-+	SYS(out_del_htb, "tc class add dev lo parent 1: classid 1:1 htb rate 75Kbit");
-+
-+	err = bpf_tc_hook_create(&hook);
-+	if (!ASSERT_ERR(err, "attach qdisc"))
-+		bpf_tc_hook_destroy(&hook);
-+
-+out_del_htb:
-+	SYS(out, "tc qdisc delete dev lo root htb");
-+out:
-+	bpf_link__destroy(link);
-+	bpf_qdisc_fifo__destroy(fifo_skel);
-+}
-+
- void test_bpf_qdisc(void)
+ static int mlx4_alloc_db_from_pgdir(struct mlx4_db_pgdir *pgdir,
+-				    struct mlx4_db *db, int order)
++				    struct mlx4_db *db, unsigned int order)
  {
- 	struct netns_obj *netns;
-@@ -98,6 +169,10 @@ void test_bpf_qdisc(void)
- 		test_fifo();
- 	if (test__start_subtest("fq"))
- 		test_fq();
-+	if (test__start_subtest("attach to mq"))
-+		test_qdisc_attach_to_mq();
-+	if (test__start_subtest("attach to non root"))
-+		test_qdisc_attach_to_non_root();
+-	int o;
++	unsigned int o;
+ 	int i;
  
- 	netns_free(netns);
+ 	for (o = order; o <= 1; ++o) {
+@@ -712,7 +712,7 @@ static int mlx4_alloc_db_from_pgdir(struct mlx4_db_pgdir *pgdir,
+ 	return 0;
  }
+ 
+-int mlx4_db_alloc(struct mlx4_dev *dev, struct mlx4_db *db, int order)
++int mlx4_db_alloc(struct mlx4_dev *dev, struct mlx4_db *db, unsigned int order)
+ {
+ 	struct mlx4_priv *priv = mlx4_priv(dev);
+ 	struct mlx4_db_pgdir *pgdir;
+diff --git a/include/linux/mlx4/device.h b/include/linux/mlx4/device.h
+index 27f42f713c89..86f0f2a25a3d 100644
+--- a/include/linux/mlx4/device.h
++++ b/include/linux/mlx4/device.h
+@@ -1135,7 +1135,7 @@ int mlx4_write_mtt(struct mlx4_dev *dev, struct mlx4_mtt *mtt,
+ int mlx4_buf_write_mtt(struct mlx4_dev *dev, struct mlx4_mtt *mtt,
+ 		       struct mlx4_buf *buf);
+ 
+-int mlx4_db_alloc(struct mlx4_dev *dev, struct mlx4_db *db, int order);
++int mlx4_db_alloc(struct mlx4_dev *dev, struct mlx4_db *db, unsigned int order);
+ void mlx4_db_free(struct mlx4_dev *dev, struct mlx4_db *db);
+ 
+ int mlx4_alloc_hwq_res(struct mlx4_dev *dev, struct mlx4_hwq_resources *wqres,
 -- 
-2.47.1
+2.34.1
 
 
