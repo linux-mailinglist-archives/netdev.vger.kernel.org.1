@@ -1,214 +1,244 @@
-Return-Path: <netdev+bounces-164548-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-164549-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id A273CA2E286
-	for <lists+netdev@lfdr.de>; Mon, 10 Feb 2025 04:10:07 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 11116A2E2C2
+	for <lists+netdev@lfdr.de>; Mon, 10 Feb 2025 04:29:54 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id D70F87A26DC
-	for <lists+netdev@lfdr.de>; Mon, 10 Feb 2025 03:09:10 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 502E47A2814
+	for <lists+netdev@lfdr.de>; Mon, 10 Feb 2025 03:28:57 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D1CB05336D;
-	Mon, 10 Feb 2025 03:09:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5452E81741;
+	Mon, 10 Feb 2025 03:29:48 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b="XINvUSvz"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="mC9Ld4PY"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0a-0031df01.pphosted.com (mx0a-0031df01.pphosted.com [205.220.168.131])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qk1-f178.google.com (mail-qk1-f178.google.com [209.85.222.178])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1E6A146B8;
-	Mon, 10 Feb 2025 03:09:57 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.168.131
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8131B6F06B;
+	Mon, 10 Feb 2025 03:29:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.178
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1739156999; cv=none; b=njLpNt/pR18IhnPA57lPD9me9mwN17lN4LiTmihUngpwt+hrOVHvgK1egAIzl84X+taHa4jt+RbqIyl1ruV7rrS4sjDBQ9Km+nobjC9F3DqPrG3XdwLtj5bNYuuqfPoOrIniNOWyVwiqL6SK2kPRbN4myox7111g2Bo2s14tsSg=
+	t=1739158188; cv=none; b=rApYyumUKmFVRd2rf9357lUQQBl3ntvTJf/fWoBDms63nx2BJl3vW8AMmvjUNiVyZtZLLtCeounWV3iM9G6VdU/l6BWPV+qxet5MpDNhmjRgWWl9t3yRjkbXgiR9faaXrtQxbjaG9heUyzOksCk28RLSV8BQ6KeGGFZnatv07eE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1739156999; c=relaxed/simple;
-	bh=vvVdz5hbQ96exbeAjzH3VgoKZdEKBHSULsJvPrZH1PE=;
-	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
-	 In-Reply-To:Content-Type; b=kgJnChLe1yAO5+Oo/XhjBBdg0E0tU+nW/xwK/h+NE9EBNjs7pB1xarsDZQz4nGWp6uoqNeGPAGnjGPUI/BsHG78sCSJ00/CGAM/qfEGpSb6ogalXGIGRiRbA4KNhYqFMhvyxb7bo8BnuU6j6t7gCT/YNRBeSFZ8GPQd0L/djGiI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com; spf=pass smtp.mailfrom=quicinc.com; dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b=XINvUSvz; arc=none smtp.client-ip=205.220.168.131
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=quicinc.com
-Received: from pps.filterd (m0279865.ppops.net [127.0.0.1])
-	by mx0a-0031df01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 519KIPgQ009545;
-	Mon, 10 Feb 2025 03:09:34 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=quicinc.com; h=
-	cc:content-transfer-encoding:content-type:date:from:in-reply-to
-	:message-id:mime-version:references:subject:to; s=qcppdkim1; bh=
-	pyxopfq01qIFG3pHou1VqDKtq+2Cvr5wueyIRGqt7Nw=; b=XINvUSvzgJINdMlV
-	8MUc1ugbYkxE+OkqobWw7X0IY806Ad3nvtCe0i8+bPU3s3HnX2x0pMmftUZRRE87
-	oEQJQAsIBJzJzwyirzGeXa2hVQe0Lf3hSmv+tTVjFLzFbaI8qRKRYJN9A2ghyNdC
-	rtpGHS1oLm+Y1UVahpR9DRxf9ysdYxDrN0/uLhlUt8TKQxPPGQmnuWdJByZz9e4B
-	8I1iBD+u1RkMxFOOrbxD9jhqsU8kp4jMsjUm4E6WVH56U8ptCywcWhUh+53zS9LT
-	MctaJhefa3fNWzcr2O3d4MIvWQgwX5PSxumJ4SH8TuXm8N3RihtxBjQGkQyeq8zq
-	+ajfww==
-Received: from nalasppmta02.qualcomm.com (Global_NAT1.qualcomm.com [129.46.96.20])
-	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 44p0f72x6f-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Mon, 10 Feb 2025 03:09:34 +0000 (GMT)
-Received: from nalasex01c.na.qualcomm.com (nalasex01c.na.qualcomm.com [10.47.97.35])
-	by NALASPPMTA02.qualcomm.com (8.18.1.2/8.18.1.2) with ESMTPS id 51A39XJv013735
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Mon, 10 Feb 2025 03:09:33 GMT
-Received: from [10.253.11.86] (10.80.80.8) by nalasex01c.na.qualcomm.com
- (10.47.97.35) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.9; Sun, 9 Feb 2025
- 19:09:23 -0800
-Message-ID: <46423f11-9642-4239-af5d-3eb3b548b98c@quicinc.com>
-Date: Mon, 10 Feb 2025 11:09:03 +0800
+	s=arc-20240116; t=1739158188; c=relaxed/simple;
+	bh=TiMs+0GrXPhBIQlJ+sK/2499r3p2U33LMuvdPUGAmFc=;
+	h=Date:From:To:Cc:Message-ID:In-Reply-To:References:Subject:
+	 Mime-Version:Content-Type; b=tsWoKQVxMJmUpH+0x9h+nVpsgisCWAd5pcSene5Rh5jVM3v2hQSVKb/lHmIx+FZNFo6eXRi+rXGSb8T3c1jEHZ7otiSDIR6/f4c561tJDGbS6Ua5nZ/CufT78PHtpwBCAPuQMcshFFcaRfxSW0knHXOxEj0M+uQwJezWvxlY6ak=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=mC9Ld4PY; arc=none smtp.client-ip=209.85.222.178
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-qk1-f178.google.com with SMTP id af79cd13be357-7c056bba58dso115070985a.0;
+        Sun, 09 Feb 2025 19:29:45 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1739158184; x=1739762984; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:subject:references
+         :in-reply-to:message-id:cc:to:from:date:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=s4D5SKtJkUhMyuF1JqdYDwxuISgefMnQMQ1RNK2WMIw=;
+        b=mC9Ld4PYlGMEIpw24lu0lA6sojFNp/vSweb9pUM+yeGUcpoO3tFuLSv8/5azG22Ptf
+         9pI1Aya7dLjpjLC+DDmrubgQxMZDHxNjShjrHx4ypQm7f2xiB+3jZwuVSFc7bwJHQiwb
+         /GOI4dwrB+ZKw6XdEz7oq4xxaIyVT+hL5Zd1hkP/Sfl1HIeJg0qLMozAzCGH1YikBz7S
+         kr5OOvFt//5H6IbjraehlzWeVG2u6CzjWCexGTNzC3GXA6sXpcYzDUIK+FzstcNaAA81
+         k5Mxp3cLxUfhEOPxZe3JBFbEavnaFCm5hpig2Bsml/UfGn0EjrcoghS3RZcOJsPOI2yW
+         VRXQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1739158184; x=1739762984;
+        h=content-transfer-encoding:mime-version:subject:references
+         :in-reply-to:message-id:cc:to:from:date:x-gm-message-state:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=s4D5SKtJkUhMyuF1JqdYDwxuISgefMnQMQ1RNK2WMIw=;
+        b=RaiM1bN5IowIgf8GSGdwUsrP+f1Q+19mCfPOxOll3i35pTzh5rrLC/pHF5J5ttD/Bp
+         PLPH/4J2FzZk8isPlUv8BNEa5J6GZMc7Hh+ToFapOm5Mc8Ebnq5uXC1d379HYJm1YRdn
+         vG332SkRtAmX/HPCM8AbGdr4R73KeYDhgVfPjnsOoHfNswj3/L+uAQ5ShXvNaZ39vD9M
+         qfAlLvJtZVCQ9zFZQ3seezeuWS2i2EaS6VwzYPeUDrhIE0BY7Fk17K7RUNDuGt5LAnQb
+         koQCcz3c9C/Dom+yKrL6+VJAHuuKi5uqHptqLFSoA4xlIeCq+iBD/FDLvBDC9CdpnwBZ
+         3boQ==
+X-Forwarded-Encrypted: i=1; AJvYcCVBmJOWHdUnk8BE1388/68fd2V0wrzr649YGmfW5Zfclkg1yD48/IikhNmDEoIobeEGXVKM4hMiVF8G4SYoIhg=@vger.kernel.org, AJvYcCXBoNlUrKgY/iGhU16NTaqdxJw/D13aDaph5ZGZ+Y9AIoN5aKrGAN/9KiEETCUDM9uVYXoSNWhF@vger.kernel.org
+X-Gm-Message-State: AOJu0YwfnjIcGJw+NSVTFUxgtzhr1nfesMbfS/BP2XO2gYCNJOW3b5mj
+	adNxA3zTZuQNPLMAvYzACXjMYbL8H8nQ8wGpif/Z771vimyrfAGq
+X-Gm-Gg: ASbGncuct/0mDwVdEPo2sJHm7PWTDWUlfN7jfhMT5Gy6EDckc+tHkhre8Bc0d8oEB8u
+	5WpicbztGjKv6+CPxng6YrQ4dwRjAxNnyhlkpKYxJnlEEECo1zbvhP+tBgYi87dX+3hRqvE42fX
+	5KDXk5cvUSXiMIlmG7AKqy8dSKRrvXw6XoEY5lW0N6r7DL8KH9Us1OJi+0KGICzSOo4wJHhSLgP
+	qKFuqoxwXCgL7uuYm8912ArmkCXTGd/w3dJHMEKJBUJ8NYnARszK+scYhYoMNibahDMkQvBALa4
+	8nGvK49r+j+YrKz+K8BOkFFESuWl+yzT6yNA06pXewtgrnY/WE7uVWihvIGijUs=
+X-Google-Smtp-Source: AGHT+IHCyj0ldJK2CFpEeHdNhyisVpPeHuY6R9c2tretRFYcMqDQD1GjE9j4WDmHNH/+jmnfnkvtTQ==
+X-Received: by 2002:a05:620a:25d0:b0:7be:72e2:90a2 with SMTP id af79cd13be357-7c047ba4b07mr2052025385a.6.1739158184242;
+        Sun, 09 Feb 2025 19:29:44 -0800 (PST)
+Received: from localhost (15.60.86.34.bc.googleusercontent.com. [34.86.60.15])
+        by smtp.gmail.com with ESMTPSA id af79cd13be357-7c041e1388asm477780885a.61.2025.02.09.19.29.43
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sun, 09 Feb 2025 19:29:43 -0800 (PST)
+Date: Sun, 09 Feb 2025 22:29:42 -0500
+From: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
+To: Pauli Virtanen <pav@iki.fi>, 
+ linux-bluetooth@vger.kernel.org
+Cc: Pauli Virtanen <pav@iki.fi>, 
+ Luiz Augusto von Dentz <luiz.dentz@gmail.com>, 
+ netdev@vger.kernel.org, 
+ davem@davemloft.net, 
+ kuba@kernel.org, 
+ willemdebruijn.kernel@gmail.com
+Message-ID: <67a972a6e2704_14761294b0@willemb.c.googlers.com.notmuch>
+In-Reply-To: <71b88f509237bcce4139c152b3f624d7532047fd.1739097311.git.pav@iki.fi>
+References: <cover.1739097311.git.pav@iki.fi>
+ <71b88f509237bcce4139c152b3f624d7532047fd.1739097311.git.pav@iki.fi>
+Subject: Re: [PATCH v3 1/5] net-timestamp: COMPLETION timestamp on packet tx
+ completion
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v3 2/4] net: stmmac: dwmac-qcom-ethqos: Mask PHY mode if
- configured with rgmii-id
-To: Konrad Dybcio <konrad.dybcio@oss.qualcomm.com>,
-        Krzysztof Kozlowski
-	<krzk@kernel.org>,
-        Andrew Lunn <andrew+netdev@lunn.ch>,
-        "David S. Miller"
-	<davem@davemloft.net>,
-        Eric Dumazet <edumazet@google.com>, Jakub Kicinski
-	<kuba@kernel.org>,
-        Paolo Abeni <pabeni@redhat.com>, Rob Herring
-	<robh@kernel.org>,
-        Krzysztof Kozlowski <krzk+dt@kernel.org>,
-        Conor Dooley
-	<conor+dt@kernel.org>, Vinod Koul <vkoul@kernel.org>,
-        Maxime Coquelin
-	<mcoquelin.stm32@gmail.com>,
-        Alexandre Torgue <alexandre.torgue@foss.st.com>,
-        Bjorn Andersson <andersson@kernel.org>,
-        Konrad Dybcio
-	<konradybcio@kernel.org>,
-        Richard Cochran <richardcochran@gmail.com>
-CC: <netdev@vger.kernel.org>, <devicetree@vger.kernel.org>,
-        <linux-kernel@vger.kernel.org>, <linux-arm-msm@vger.kernel.org>,
-        <linux-stm32@st-md-mailman.stormreply.com>,
-        <linux-arm-kernel@lists.infradead.org>
-References: <20250121-dts_qcs615-v3-0-fa4496950d8a@quicinc.com>
- <20250121-dts_qcs615-v3-2-fa4496950d8a@quicinc.com>
- <30450f09-83d4-4ff0-96b2-9f251f0c0896@kernel.org>
- <48ce7924-bbb7-4a0f-9f56-681c8b2a21bd@quicinc.com>
- <2bd19e9e-775d-41b0-99d4-accb9ae8262d@kernel.org>
- <71da0edf-9b2a-464e-8979-8e09f7828120@oss.qualcomm.com>
-Content-Language: en-US
-From: Yijie Yang <quic_yijiyang@quicinc.com>
-In-Reply-To: <71da0edf-9b2a-464e-8979-8e09f7828120@oss.qualcomm.com>
-Content-Type: text/plain; charset="UTF-8"; format=flowed
+Mime-Version: 1.0
+Content-Type: text/plain;
+ charset=utf-8
 Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: nasanex01b.na.qualcomm.com (10.46.141.250) To
- nalasex01c.na.qualcomm.com (10.47.97.35)
-X-QCInternal: smtphost
-X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=5800 signatures=585085
-X-Proofpoint-GUID: 9UFZc4nDbCM3vzlrXRaDfvajb5-5fsgx
-X-Proofpoint-ORIG-GUID: 9UFZc4nDbCM3vzlrXRaDfvajb5-5fsgx
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1057,Hydra:6.0.680,FMLib:17.12.68.34
- definitions=2025-02-10_02,2025-02-07_03,2024-11-22_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 priorityscore=1501 mlxscore=0
- suspectscore=0 lowpriorityscore=0 phishscore=0 malwarescore=0
- impostorscore=0 mlxlogscore=999 clxscore=1015 bulkscore=0 adultscore=0
- spamscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.19.0-2501170000 definitions=main-2502100023
 
-
-
-On 2025-01-27 18:49, Konrad Dybcio wrote:
-> On 22.01.2025 10:48 AM, Krzysztof Kozlowski wrote:
->> On 22/01/2025 09:56, Yijie Yang wrote:
->>>
->>>
->>> On 2025-01-21 20:47, Krzysztof Kozlowski wrote:
->>>> On 21/01/2025 08:54, Yijie Yang wrote:
->>>>> The Qualcomm board always chooses the MAC to provide the delay instead of
->>>>> the PHY, which is completely opposite to the suggestion of the Linux
->>>>> kernel.
->>>>
->>>>
->>>> How does the Linux kernel suggest it?
->>>>
->>>>> The usage of phy-mode in legacy DTS was also incorrect. Change the
->>>>> phy_mode passed from the DTS to the driver from PHY_INTERFACE_MODE_RGMII_ID
->>>>> to PHY_INTERFACE_MODE_RGMII to ensure correct operation and adherence to
->>>>> the definition.
->>>>> To address the ABI compatibility issue between the kernel and DTS caused by
->>>>> this change, handle the compatible string 'qcom,qcs404-evb-4000' in the
->>>>> code, as it is the only legacy board that mistakenly uses the 'rgmii'
->>>>> phy-mode.
->>>>>
->>>>> Signed-off-by: Yijie Yang <quic_yijiyang@quicinc.com>
->>>>> ---
->>>>>    .../net/ethernet/stmicro/stmmac/dwmac-qcom-ethqos.c    | 18 +++++++++++++-----
->>>>>    1 file changed, 13 insertions(+), 5 deletions(-)
->>>>>
->>>>> diff --git a/drivers/net/ethernet/stmicro/stmmac/dwmac-qcom-ethqos.c b/drivers/net/ethernet/stmicro/stmmac/dwmac-qcom-ethqos.c
->>>>> index 2a5b38723635b5ef9233ca4709e99dd5ddf06b77..e228a62723e221d58d8c4f104109e0dcf682d06d 100644
->>>>> --- a/drivers/net/ethernet/stmicro/stmmac/dwmac-qcom-ethqos.c
->>>>> +++ b/drivers/net/ethernet/stmicro/stmmac/dwmac-qcom-ethqos.c
->>>>> @@ -401,14 +401,11 @@ static int ethqos_dll_configure(struct qcom_ethqos *ethqos)
->>>>>    static int ethqos_rgmii_macro_init(struct qcom_ethqos *ethqos)
->>>>>    {
->>>>>    	struct device *dev = &ethqos->pdev->dev;
->>>>> -	int phase_shift;
->>>>> +	int phase_shift = 0;
->>>>>    	int loopback;
->>>>>    
->>>>>    	/* Determine if the PHY adds a 2 ns TX delay or the MAC handles it */
->>>>> -	if (ethqos->phy_mode == PHY_INTERFACE_MODE_RGMII_ID ||
->>>>> -	    ethqos->phy_mode == PHY_INTERFACE_MODE_RGMII_TXID)
->>>>> -		phase_shift = 0;
->>>>> -	else
->>>>> +	if (ethqos->phy_mode == PHY_INTERFACE_MODE_RGMII_ID)
->>>>>    		phase_shift = RGMII_CONFIG2_TX_CLK_PHASE_SHIFT_EN;
->>>>>    
->>>>>    	/* Disable loopback mode */
->>>>> @@ -810,6 +807,17 @@ static int qcom_ethqos_probe(struct platform_device *pdev)
->>>>>    	ret = of_get_phy_mode(np, &ethqos->phy_mode);
->>>>>    	if (ret)
->>>>>    		return dev_err_probe(dev, ret, "Failed to get phy mode\n");
->>>>> +
->>>>> +	root = of_find_node_by_path("/");
->>>>> +	if (root && of_device_is_compatible(root, "qcom,qcs404-evb-4000"))
->>>>
->>>>
->>>> First, just check if machine is compatible, don't open code it.
->>>>
->>>> Second, drivers should really, really not rely on the machine. I don't
->>>> think how this resolves ABI break for other users at all.
->>>
->>> As detailed in the commit description, some boards mistakenly use the
->>> 'rgmii' phy-mode, and the MAC driver has also incorrectly parsed and
->>
->> That's a kind of an ABI now, assuming it worked fine.
+Pauli Virtanen wrote:
+> Add SOF_TIMESTAMPING_TX_COMPLETION, for requesting a software timestamp
+> when hardware reports a packet completed.
 > 
-> I'm inclined to think it's better to drop compatibility given we're talking
-> about rather obscure boards here.
+> Completion tstamp is useful for Bluetooth, where hardware tx timestamps
+> cannot be obtained except for ISO packets, and the hardware has a queue
+> where packets may wait.  In this case the software SND timestamp only
+> reflects the kernel-side part of the total latency (usually small) and
+> queue length (usually 0 unless HW buffers congested), whereas the
+> completion report time is more informative of the true latency.
 > 
-> $ rg 'mode.*=.*"rgmii"' arch/arm64/boot/dts/qcom -l
-> 
-> arch/arm64/boot/dts/qcom/sa8155p-adp.dts
-> arch/arm64/boot/dts/qcom/qcs404-evb-4000.dts
-> 
-> QCS404 seems to have zero interest from anyone (and has been considered
-> for removal upstream..).
-> 
-> The ADP doesn't see much traction either, last time around someone found
-> a boot breaking issue months after it was committed.
+> It may also be useful in other cases where HW TX timestamps cannot be
+> obtained and user wants to estimate an upper bound to when the TX
+> probably happened.
 
-But what about the out-of-tree boards that Andrew mentioned? We need to 
-ensure we don't break them, right?
+Getting the completion timestamp may indeed be useful more broadly.
 
+Alternatively, the HW timestamp is relatively imprecisely defined so
+you could even just use that. Ideally, a hw timestamp conforms to IEEE
+1588v2 PHY: first symbol on the wire IIRC. But in many cases this is
+not the case. It is not feasible at line rate, or the timestamp is
+only taken when the completion is written over PCI, which may be
+subject to PCI backpressure and happen after transmission on the wire.
+As a result, the worst case hw tstamp must already be assumed not much
+earlier than a completion timestamp.
+
+That said, +1 on adding explicit well defined measurement point
+instead.
+
+
+> Signed-off-by: Pauli Virtanen <pav@iki.fi>
+> ---
+>  Documentation/networking/timestamping.rst | 9 +++++++++
+>  include/linux/skbuff.h                    | 6 +++++-
+>  include/uapi/linux/errqueue.h             | 1 +
+>  include/uapi/linux/net_tstamp.h           | 6 ++++--
+>  net/ethtool/common.c                      | 1 +
+>  net/socket.c                              | 3 +++
+>  6 files changed, 23 insertions(+), 3 deletions(-)
 > 
-> Konrad
+> diff --git a/Documentation/networking/timestamping.rst b/Documentation/networking/timestamping.rst
+> index 61ef9da10e28..de2afed7a516 100644
+> --- a/Documentation/networking/timestamping.rst
+> +++ b/Documentation/networking/timestamping.rst
+> @@ -140,6 +140,15 @@ SOF_TIMESTAMPING_TX_ACK:
+>    cumulative acknowledgment. The mechanism ignores SACK and FACK.
+>    This flag can be enabled via both socket options and control messages.
+>  
+> +SOF_TIMESTAMPING_TX_COMPLETION:
+> +  Request tx timestamps on packet tx completion.  The completion
+> +  timestamp is generated by the kernel when it receives packet a
+> +  completion report from the hardware. Hardware may report multiple
+> +  packets at once, and completion timestamps reflect the timing of the
+> +  report and not actual tx time. The completion timestamps are
+> +  currently implemented only for: Bluetooth L2CAP and ISO.  This
+> +  flag can be enabled via both socket options and control messages.
+> +
 
--- 
-Best Regards,
-Yijie
+Either we should support this uniformly, or it should be possible to
+query whether a driver supports this.
 
+Unfortunately all completion callbacks are driver specific.
+
+But drivers that support hwtstamps will call skb_tstamp_tx with
+nonzero hwtstamps. We could use that also to compute and queue
+a completion timestamp if requested. At least for existing NIC
+drivers.
+
+>  1.3.2 Timestamp Reporting
+>  ^^^^^^^^^^^^^^^^^^^^^^^^^
+> diff --git a/include/linux/skbuff.h b/include/linux/skbuff.h
+> index bb2b751d274a..3707c9075ae9 100644
+> --- a/include/linux/skbuff.h
+> +++ b/include/linux/skbuff.h
+> @@ -489,10 +489,14 @@ enum {
+>  
+>  	/* generate software time stamp when entering packet scheduling */
+>  	SKBTX_SCHED_TSTAMP = 1 << 6,
+> +
+> +	/* generate software time stamp on packet tx completion */
+> +	SKBTX_COMPLETION_TSTAMP = 1 << 7,
+>  };
+>  
+>  #define SKBTX_ANY_SW_TSTAMP	(SKBTX_SW_TSTAMP    | \
+> -				 SKBTX_SCHED_TSTAMP)
+> +				 SKBTX_SCHED_TSTAMP | \
+> +				 SKBTX_COMPLETION_TSTAMP)
+
+These fields are used in the skb_shared_info tx_flags field.
+Which is a very scarce resource. This takes the last available bit.
+That is my only possible concern: the opportunity cost.
+
+>  #define SKBTX_ANY_TSTAMP	(SKBTX_HW_TSTAMP | \
+>  				 SKBTX_HW_TSTAMP_USE_CYCLES | \
+>  				 SKBTX_ANY_SW_TSTAMP)
+> diff --git a/include/uapi/linux/errqueue.h b/include/uapi/linux/errqueue.h
+> index 3c70e8ac14b8..1ea47309d772 100644
+> --- a/include/uapi/linux/errqueue.h
+> +++ b/include/uapi/linux/errqueue.h
+> @@ -73,6 +73,7 @@ enum {
+>  	SCM_TSTAMP_SND,		/* driver passed skb to NIC, or HW */
+>  	SCM_TSTAMP_SCHED,	/* data entered the packet scheduler */
+>  	SCM_TSTAMP_ACK,		/* data acknowledged by peer */
+> +	SCM_TSTAMP_COMPLETION,	/* packet tx completion */
+>  };
+>  
+>  #endif /* _UAPI_LINUX_ERRQUEUE_H */
+> diff --git a/include/uapi/linux/net_tstamp.h b/include/uapi/linux/net_tstamp.h
+> index 55b0ab51096c..383213de612a 100644
+> --- a/include/uapi/linux/net_tstamp.h
+> +++ b/include/uapi/linux/net_tstamp.h
+> @@ -44,8 +44,9 @@ enum {
+>  	SOF_TIMESTAMPING_BIND_PHC = (1 << 15),
+>  	SOF_TIMESTAMPING_OPT_ID_TCP = (1 << 16),
+>  	SOF_TIMESTAMPING_OPT_RX_FILTER = (1 << 17),
+> +	SOF_TIMESTAMPING_TX_COMPLETION = (1 << 18),
+>  
+> -	SOF_TIMESTAMPING_LAST = SOF_TIMESTAMPING_OPT_RX_FILTER,
+> +	SOF_TIMESTAMPING_LAST = SOF_TIMESTAMPING_TX_COMPLETION,
+>  	SOF_TIMESTAMPING_MASK = (SOF_TIMESTAMPING_LAST - 1) |
+>  				 SOF_TIMESTAMPING_LAST
+>  };
+> @@ -58,7 +59,8 @@ enum {
+>  #define SOF_TIMESTAMPING_TX_RECORD_MASK	(SOF_TIMESTAMPING_TX_HARDWARE | \
+>  					 SOF_TIMESTAMPING_TX_SOFTWARE | \
+>  					 SOF_TIMESTAMPING_TX_SCHED | \
+> -					 SOF_TIMESTAMPING_TX_ACK)
+> +					 SOF_TIMESTAMPING_TX_ACK | \
+> +					 SOF_TIMESTAMPING_TX_COMPLETION)
+>  
+>  /**
+>   * struct so_timestamping - SO_TIMESTAMPING parameter
+> diff --git a/net/ethtool/common.c b/net/ethtool/common.c
+> index 2bd77c94f9f1..75e3b756012e 100644
+> --- a/net/ethtool/common.c
+> +++ b/net/ethtool/common.c
+> @@ -431,6 +431,7 @@ const char sof_timestamping_names[][ETH_GSTRING_LEN] = {
+>  	[const_ilog2(SOF_TIMESTAMPING_BIND_PHC)]     = "bind-phc",
+>  	[const_ilog2(SOF_TIMESTAMPING_OPT_ID_TCP)]   = "option-id-tcp",
+>  	[const_ilog2(SOF_TIMESTAMPING_OPT_RX_FILTER)] = "option-rx-filter",
+> +	[const_ilog2(SOF_TIMESTAMPING_TX_COMPLETION)] = "completion-transmit",
+
+just "tx-completion"?
 
