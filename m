@@ -1,82 +1,97 @@
-Return-Path: <netdev+bounces-164527-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-164528-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7BF10A2E1C6
-	for <lists+netdev@lfdr.de>; Mon, 10 Feb 2025 01:32:57 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id B6300A2E1C7
+	for <lists+netdev@lfdr.de>; Mon, 10 Feb 2025 01:33:39 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 2C6311617BF
-	for <lists+netdev@lfdr.de>; Mon, 10 Feb 2025 00:32:56 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 9B2103A3324
+	for <lists+netdev@lfdr.de>; Mon, 10 Feb 2025 00:33:30 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6F74C632;
-	Mon, 10 Feb 2025 00:32:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E58A89460;
+	Mon, 10 Feb 2025 00:33:35 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="G0XMAlA2"
+	dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b="CQ1m0dYK"
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+Received: from smtp-fw-52005.amazon.com (smtp-fw-52005.amazon.com [52.119.213.156])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A17145258
-	for <netdev@vger.kernel.org>; Mon, 10 Feb 2025 00:32:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 45097522F
+	for <netdev@vger.kernel.org>; Mon, 10 Feb 2025 00:33:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=52.119.213.156
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1739147574; cv=none; b=IMujM/GfdiLSEG1vaOHcJoMss78k44CBoxixojAaZRrcFK8cwTmPb2rCDPgTIFRm7eT/c1JRiI+B0zoQFKVLnrjTBTQSwKJ7pKZ1tGutenSPTkKK2+DBnFTcuWY6hcw+U8TJYErR+h5R6J6XA4i5Vt0AgfEYUZu3/maSf5n9WkQ=
+	t=1739147615; cv=none; b=H/ag8L5GHDzI0xHSxq2Xrd2zTDvU530ZmnOUifYipPreJVUYmW3zcoxisP23qN92Eqq9fOlVHosHlwspHfuZhQ7NOEzR1ydoJFui+J1B9FHit9di1jFFPX1PvwXu+bOJbaIJvEj6a39BBEUKWkzS4lfsRbk06d3LHgZEEn/RWXI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1739147574; c=relaxed/simple;
-	bh=MG/y6wumQaqPj6ectDsmzcLThbySPojKPPFgXLjBxMw=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=b0Vl04Nrv9Jme34G+sD1Z19QOonIiAte4uF6uh7W+R59uURrc7qmqOfKvbF7G4Gd9G0sbrCMiH+H4sdM1fOm7K3jx2e2VQtkDNhg1lMUAqymQrB8J8zYFTEoVCr5zd7A3pfxGVzxSYQjWvqmiHXpNBxMisq/njMunuxC6uIxQZQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=G0XMAlA2; arc=none smtp.client-ip=156.67.10.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=+zrVL00Y7mH/Y/PHtnbU3jGC3BfYX+exBMvRQJY6Gmo=; b=G0XMAlA2tSUgTM8YwNdaI9bfGF
-	puXU5v7dupj6py2tUxKkUubzDaf9/mq9A2M0XGaRD/bJ4A1LGqcsLelJEywgcS0UBrd2qWU7Tc+mI
-	Y0dfHPykt4KytEM1elReD54IaHdcewDsJQyonKCnCnfWfVX3I/HYPclfWxIOjVs04hiw=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1thHj8-00CYEc-6b; Mon, 10 Feb 2025 01:32:42 +0100
-Date: Mon, 10 Feb 2025 01:32:42 +0100
-From: Andrew Lunn <andrew@lunn.ch>
-To: "Russell King (Oracle)" <rmk+kernel@armlinux.org.uk>
-Cc: Heiner Kallweit <hkallweit1@gmail.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Jacob Keller <jacob.e.keller@intel.com>, netdev@vger.kernel.org
-Subject: Re: [PATCH net] net: phylink: make configuring clock-stop dependent
- on MAC support
-Message-ID: <5232a50c-3840-4c76-8b9b-cb0dcbbcc833@lunn.ch>
-References: <E1tgjNn-003q0w-Pw@rmk-PC.armlinux.org.uk>
+	s=arc-20240116; t=1739147615; c=relaxed/simple;
+	bh=yCd/A1yr7QJyEKmhs032Tca/I49MIejDjBkLGQKLMXI=;
+	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=heTDxm/798AogoFqXwOadM4VjZ2sCHigRZ07IuWIUMUbRBv8ka4M8EPwWl1lnsIwXpk3vyS5UmgIQyLE3AL4f4vJGVzzj0iSQKUPoIfIqz3+8nhxyhQw/VVpkc7H5tIRnyKYp1pmlQ2prDwyYOSG2ld2B4LrvX8cteDmZohGeqc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.co.jp; dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b=CQ1m0dYK; arc=none smtp.client-ip=52.119.213.156
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.co.jp
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
+  t=1739147615; x=1770683615;
+  h=from:to:cc:subject:date:message-id:in-reply-to:
+   references:mime-version:content-transfer-encoding;
+  bh=g6mAtu8JpSntRxs1o4fFNZTNcocJKfeGwCKLXw+JcHw=;
+  b=CQ1m0dYK0rQENK+C9O8pGpL/y37pEmrmWlXk800gf+JGHAsTCQCUS+G+
+   6P/HpO7jln4cELn8jbqLppbJ2N5JB4g3Q5cNquZ/L9cHoUGsRkS6Fi/gW
+   sg67peSkN9waQj8S4o73ML9GpAimlnzluYxGaJvWMHrglSnmwT7rTWYWK
+   I=;
+X-IronPort-AV: E=Sophos;i="6.13,273,1732579200"; 
+   d="scan'208";a="717380616"
+Received: from iad12-co-svc-p1-lb1-vlan3.amazon.com (HELO smtpout.prod.us-west-2.prod.farcaster.email.amazon.dev) ([10.43.8.6])
+  by smtp-border-fw-52005.iad7.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 10 Feb 2025 00:33:32 +0000
+Received: from EX19MTAUWB002.ant.amazon.com [10.0.7.35:34470]
+ by smtpin.naws.us-west-2.prod.farcaster.email.amazon.dev [10.0.61.44:2525] with esmtp (Farcaster)
+ id a06edc3e-66f3-46ab-ba2c-33ab0485b924; Mon, 10 Feb 2025 00:33:30 +0000 (UTC)
+X-Farcaster-Flow-ID: a06edc3e-66f3-46ab-ba2c-33ab0485b924
+Received: from EX19D004ANA001.ant.amazon.com (10.37.240.138) by
+ EX19MTAUWB002.ant.amazon.com (10.250.64.231) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1258.39;
+ Mon, 10 Feb 2025 00:33:30 +0000
+Received: from 6c7e67bfbae3.amazon.com (10.37.244.8) by
+ EX19D004ANA001.ant.amazon.com (10.37.240.138) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1544.14;
+ Mon, 10 Feb 2025 00:33:08 +0000
+From: Kuniyuki Iwashima <kuniyu@amazon.com>
+To: <edumazet@google.com>
+CC: <davem@davemloft.net>, <eric.dumazet@gmail.com>, <horms@kernel.org>,
+	<kernelxing@tencent.com>, <kuba@kernel.org>, <kuniyu@amazon.com>,
+	<ncardwell@google.com>, <netdev@vger.kernel.org>, <pabeni@redhat.com>
+Subject: Re: [PATCH net-next 2/5] tcp: add a @pace_delay parameter to tcp_reset_xmit_timer()
+Date: Mon, 10 Feb 2025 09:32:58 +0900
+Message-ID: <20250210003258.49725-1-kuniyu@amazon.com>
+X-Mailer: git-send-email 2.39.5 (Apple Git-154)
+In-Reply-To: <20250207152830.2527578-3-edumazet@google.com>
+References: <20250207152830.2527578-3-edumazet@google.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <E1tgjNn-003q0w-Pw@rmk-PC.armlinux.org.uk>
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-ClientProxiedBy: EX19D041UWA001.ant.amazon.com (10.13.139.124) To
+ EX19D004ANA001.ant.amazon.com (10.37.240.138)
 
-On Sat, Feb 08, 2025 at 11:52:23AM +0000, Russell King (Oracle) wrote:
-> We should not be configuring the PHYs clock-stop settings unless the
-> MAC supports phylink managed EEE. Make this dependent on MAC support.
+From: Eric Dumazet <edumazet@google.com>
+Date: Fri,  7 Feb 2025 15:28:27 +0000
+> We want to factorize calls to inet_csk_reset_xmit_timer(),
+> to ease TCP_RTO_MAX change.
 > 
-> This was noticed in a suspicious RCU usage report from the kernel
-> test robot (the suspicious RCU usage due to calling phy_detach()
-> remains unaddressed, but is triggered by the error this was
-> generating.)
+> Current users want to add tcp_pacing_delay(sk)
+> to the timeout.
 > 
-> Fixes: 03abf2a7c654 ("net: phylink: add EEE management")
-> Signed-off-by: Russell King (Oracle) <rmk+kernel@armlinux.org.uk>
+> Remaining calls to inet_csk_reset_xmit_timer()
+> do not add the pacing delay. Following patch
+> will convert them, passing false for @pace_delay.
+> 
+> Signed-off-by: Eric Dumazet <edumazet@google.com>
 
-Reviewed-by: Andrew Lunn <andrew@lunn.ch>
-
-    Andrew
+Reviewed-by: Kuniyuki Iwashima <kuniyu@amazon.com>
 
