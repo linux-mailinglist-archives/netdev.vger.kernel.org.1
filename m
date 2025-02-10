@@ -1,208 +1,155 @@
-Return-Path: <netdev+bounces-164652-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-164653-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3E79CA2E9A6
-	for <lists+netdev@lfdr.de>; Mon, 10 Feb 2025 11:37:53 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id E7069A2E9BA
+	for <lists+netdev@lfdr.de>; Mon, 10 Feb 2025 11:40:43 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D78CF3A9EC6
-	for <lists+netdev@lfdr.de>; Mon, 10 Feb 2025 10:37:42 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C3E1F3A2746
+	for <lists+netdev@lfdr.de>; Mon, 10 Feb 2025 10:40:34 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CAF9F1C68A6;
-	Mon, 10 Feb 2025 10:37:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BEC321DC04A;
+	Mon, 10 Feb 2025 10:40:19 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="ukjnz8SY"
+	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="a8Uidmhr"
 X-Original-To: netdev@vger.kernel.org
-Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
+Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2CACF1D14FF
-	for <netdev@vger.kernel.org>; Mon, 10 Feb 2025 10:37:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 214501C760A;
+	Mon, 10 Feb 2025 10:40:17 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.156.1
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1739183844; cv=none; b=I/ziHnVskntTLdRp1o8jH/hEXK0ZLvll363OD0bjYxwjVGbFNltGWMG8laEoWkWSK3wXjBw6tX8i1QStm1TM01PbU1QX6OVqlR1kH8TQLtaDSSNBm7DDQrwiTd+F2FZabDwulZB1pATcZXNz5CNjRk2oCrjFdAhL+ZPdAz/Dsts=
+	t=1739184019; cv=none; b=DmiEWTz5+kzJsyqujoJf7IbQVm79qRdWCdbyqkuL721YFjVflWTIqOQvBOJTRPOVDy/wodUo2F/yOGhdbzHChu6TDO1SbTICVZdnxTTic+dqDcdttcwrRiUlTmSCa+GAL4mDqF3aYD+w80xHJ6gEsbqMAPQjMJqOU2HHksYQjG8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1739183844; c=relaxed/simple;
-	bh=uhnsYK8lhYw1vJvlUg+sUQjW9WgfpkLhxLKh5lEuTvo=;
-	h=In-Reply-To:References:From:To:Cc:Subject:MIME-Version:
-	 Content-Disposition:Content-Type:Message-Id:Date; b=QW7y1hut0ArZpsTzNi5VA/ek2mPo9yMxPZVS9Ym1kfpV+W0+36gi4lT1Lzpz373XwWCXKoZ+0lwLT6NZNRNozzue0vPjfs8TbzegbJ6bNtVmt2gr4NUESzf9yYl6XqNI+9DZzRtumkrkxwPfKiWQeMx+GtfQwpmjZGg2HhUABs4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=ukjnz8SY; arc=none smtp.client-ip=78.32.30.218
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=armlinux.org.uk; s=pandora-2019; h=Date:Sender:Message-Id:Content-Type:
-	Content-Transfer-Encoding:MIME-Version:Subject:Cc:To:From:References:
-	In-Reply-To:Reply-To:Content-ID:Content-Description:Resent-Date:Resent-From:
-	Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:List-Help:
-	List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=rPlsVId33txdBBranLBlQ1L7Lpylf6kTxcaJ3s9zHV8=; b=ukjnz8SYZHHdBdIZziI8MlP9sP
-	ic8omwR9g94e9tTntfnTQiwIODxtyR+6linoGhmPZy+bw9LCPvPF+q1wjGS438JXMm9ZsiB/1HvSx
-	YsV0GSMKWMSPu05VhUo6X8mYw5G2ds82XDU1shsr9JrtRSYNTMEK14DLm2w3DeRAfS9bb8fhf10Ut
-	UVOItsMFE3E9SdNymd4IEnib2xYOnzKrn1Mqs302s8B3h88sMsr3ybUowzoiAlDqVvJRvDfI8JuHf
-	F5taXt8NdGnQC+CL/bbp62jbFf8Zt3sWGlHN43SNol4NeRbFmx6uY9J0GzSw/0W1HowZuU2jA4JWZ
-	gCF/gGQA==;
-Received: from e0022681537dd.dyn.armlinux.org.uk ([fd8f:7570:feb6:1:222:68ff:fe15:37dd]:36674 helo=rmk-PC.armlinux.org.uk)
-	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.96)
-	(envelope-from <rmk@armlinux.org.uk>)
-	id 1thRAA-0006RY-0A;
-	Mon, 10 Feb 2025 10:37:14 +0000
-Received: from rmk by rmk-PC.armlinux.org.uk with local (Exim 4.94.2)
-	(envelope-from <rmk@rmk-PC.armlinux.org.uk>)
-	id 1thR9q-003vXI-Cp; Mon, 10 Feb 2025 10:36:54 +0000
-In-Reply-To: <Z6nWujbjxlkzK_3P@shell.armlinux.org.uk>
-References: <Z6nWujbjxlkzK_3P@shell.armlinux.org.uk>
-From: "Russell King (Oracle)" <rmk+kernel@armlinux.org.uk>
-To: Andrew Lunn <andrew@lunn.ch>,
-	Heiner Kallweit <hkallweit1@gmail.com>
-Cc: AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>,
-	"Chester A. Unal" <chester.a.unal@arinc9.com>,
-	Daniel Golle <daniel@makrotopia.org>,
-	"David S. Miller" <davem@davemloft.net>,
-	DENG Qingfang <dqfext@gmail.com>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	linux-arm-kernel@lists.infradead.org,
-	linux-mediatek@lists.infradead.org,
-	Matthias Brugger <matthias.bgg@gmail.com>,
-	netdev@vger.kernel.org,
-	Paolo Abeni <pabeni@redhat.com>,
-	Sean Wang <sean.wang@mediatek.com>,
-	Simon Horman <horms@kernel.org>,
-	Vladimir Oltean <olteanv@gmail.com>
-Subject: [PATCH net-next v3 3/3] net: dsa: mt7530: convert to phylink managed
- EEE
+	s=arc-20240116; t=1739184019; c=relaxed/simple;
+	bh=ncnDP6pJKG77kyxFzNCp8swT2gLWcvpWpD1t7tV2FjM=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=mbvJYJwf/k00ogdBXFbvFxjVqTid8iCvJPZsICpaTMTIncsUfiTTym+8j6TbNjJYonWdrjTjoE4OWgsJjd6kkoKZOFWgCEhtD+D4t4CbA5Lg/nTf+dY4JA0qcN2GAA+cd6d+w87BXH5b8jHJCkOyX63Hgrs0A+4wVVrtWZTHeAA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=a8Uidmhr; arc=none smtp.client-ip=148.163.156.1
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
+Received: from pps.filterd (m0356517.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 519MnLqn015303;
+	Mon, 10 Feb 2025 10:40:10 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
+	:content-transfer-encoding:content-type:date:from:in-reply-to
+	:message-id:mime-version:references:subject:to; s=pp1; bh=R8wdkp
+	Sq74jP7jXEtGou00JFyMZWEHjj3uL01JkAbXQ=; b=a8Uidmhri27XdWID49w/Zc
+	BiUYeSaH/jMxmZdgdEWBWl9jKdGPYL1DuzLvQ5oIXxog1OTL/TaTiqz5zn0mCSl3
+	c728IRaXMIOoqUs5UQS0WbstaqlSpK2NRQ+SIpwKw3l2+WvCaXVXhNvz6HZ3iWuJ
+	RNJInLpmTwDD7KpMTi4gDb9uAeWF1zZV9oE067P0eFSM3L4BItia8IQzvllq4I2E
+	B4g8BACa/M5em481EzboLvMVvYJSsEnrIiEYe81RiOrmQIv6vgZh1LHbMhJc/Nz0
+	+ttByCkGo/AhthRmzDbfCK526sclnF/EgbvWMtgxIXtIITkIAaPzuoMvWLzXfKhA
+	==
+Received: from pps.reinject (localhost [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 44q5gaamct-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Mon, 10 Feb 2025 10:40:10 +0000 (GMT)
+Received: from m0356517.ppops.net (m0356517.ppops.net [127.0.0.1])
+	by pps.reinject (8.18.0.8/8.18.0.8) with ESMTP id 51AAWjoP028736;
+	Mon, 10 Feb 2025 10:40:09 GMT
+Received: from ppma12.dal12v.mail.ibm.com (dc.9e.1632.ip4.static.sl-reverse.com [50.22.158.220])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 44q5gaamcn-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Mon, 10 Feb 2025 10:40:09 +0000 (GMT)
+Received: from pps.filterd (ppma12.dal12v.mail.ibm.com [127.0.0.1])
+	by ppma12.dal12v.mail.ibm.com (8.18.1.2/8.18.1.2) with ESMTP id 51A7ATJ4021886;
+	Mon, 10 Feb 2025 10:40:08 GMT
+Received: from smtprelay03.fra02v.mail.ibm.com ([9.218.2.224])
+	by ppma12.dal12v.mail.ibm.com (PPS) with ESMTPS id 44phkse0qb-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Mon, 10 Feb 2025 10:40:08 +0000
+Received: from smtpav03.fra02v.mail.ibm.com (smtpav03.fra02v.mail.ibm.com [10.20.54.102])
+	by smtprelay03.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 51AAe3vP35520820
+	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Mon, 10 Feb 2025 10:40:03 GMT
+Received: from smtpav03.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 1E1E6200E4;
+	Mon, 10 Feb 2025 10:39:32 +0000 (GMT)
+Received: from smtpav03.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id ADCF6200DE;
+	Mon, 10 Feb 2025 10:39:31 +0000 (GMT)
+Received: from [9.152.224.153] (unknown [9.152.224.153])
+	by smtpav03.fra02v.mail.ibm.com (Postfix) with ESMTP;
+	Mon, 10 Feb 2025 10:39:31 +0000 (GMT)
+Message-ID: <19790e19-01f6-4843-a19d-9b8b1c5b16d5@linux.ibm.com>
+Date: Mon, 10 Feb 2025 11:39:31 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain; charset="utf-8"
-Message-Id: <E1thR9q-003vXI-Cp@rmk-PC.armlinux.org.uk>
-Sender: Russell King <rmk@armlinux.org.uk>
-Date: Mon, 10 Feb 2025 10:36:54 +0000
+User-Agent: Mozilla Thunderbird
+Subject: Re: [RFC net-next 5/7] net/ism: Move ism_loopback to net/ism
+To: Julian Ruess <julianr@linux.ibm.com>, Wenjia Zhang
+ <wenjia@linux.ibm.com>,
+        Jan Karcher <jaka@linux.ibm.com>, Gerd Bayer <gbayer@linux.ibm.com>,
+        Halil Pasic <pasic@linux.ibm.com>,
+        "D. Wythe" <alibuda@linux.alibaba.com>,
+        Tony Lu <tonylu@linux.alibaba.com>, Wen Gu <guwen@linux.alibaba.com>,
+        Peter Oberparleiter
+ <oberpar@linux.ibm.com>,
+        David Miller <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>,
+        Paolo Abeni <pabeni@redhat.com>, Eric Dumazet <edumazet@google.com>,
+        Andrew Lunn <andrew+netdev@lunn.ch>
+Cc: Niklas Schnelle <schnelle@linux.ibm.com>,
+        Thorsten Winkler <twinkler@linux.ibm.com>, netdev@vger.kernel.org,
+        linux-s390@vger.kernel.org, Heiko Carstens <hca@linux.ibm.com>,
+        Vasily Gorbik <gor@linux.ibm.com>,
+        Alexander Gordeev
+ <agordeev@linux.ibm.com>,
+        Christian Borntraeger <borntraeger@linux.ibm.com>,
+        Sven Schnelle <svens@linux.ibm.com>, Simon Horman <horms@kernel.org>
+References: <20250115195527.2094320-1-wintera@linux.ibm.com>
+ <20250115195527.2094320-6-wintera@linux.ibm.com>
+ <D7LJMF6OMXFQ.1ADL6WMIWIQ5C@linux.ibm.com>
+Content-Language: en-US
+From: Alexandra Winter <wintera@linux.ibm.com>
+In-Reply-To: <D7LJMF6OMXFQ.1ADL6WMIWIQ5C@linux.ibm.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-GUID: k1A_yghwez5FTiBcEUvttePrp9z9j8QY
+X-Proofpoint-ORIG-GUID: _Cr57fcxIt_uzhHaSveNeouHgBQdlS5i
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1057,Hydra:6.0.680,FMLib:17.12.68.34
+ definitions=2025-02-10_05,2025-02-10_01,2024-11-22_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 priorityscore=1501
+ impostorscore=0 clxscore=1015 suspectscore=0 mlxlogscore=788 spamscore=0
+ lowpriorityscore=0 phishscore=0 malwarescore=0 bulkscore=0 adultscore=0
+ mlxscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.19.0-2501170000 definitions=main-2502100088
 
-Convert mt7530 to use phylink managed EEE. When enabling EEE, we set
-both PMCR_FORCE_EEE1G and PMCR_FORCE_EEE100 irrespective of the speed,
-and clear them both when disabling.
 
-Signed-off-by: Russell King (Oracle) <rmk+kernel@armlinux.org.uk>
----
- drivers/net/dsa/mt7530.c | 68 +++++++++++++++++++++++++++-------------
- 1 file changed, 47 insertions(+), 21 deletions(-)
 
-diff --git a/drivers/net/dsa/mt7530.c b/drivers/net/dsa/mt7530.c
-index 1c83af805209..9fd44e55d519 100644
---- a/drivers/net/dsa/mt7530.c
-+++ b/drivers/net/dsa/mt7530.c
-@@ -2957,28 +2957,61 @@ static void mt753x_phylink_mac_link_up(struct phylink_config *config,
- 			mcr |= PMCR_FORCE_RX_FC_EN;
- 	}
- 
--	if (mode == MLO_AN_PHY && phydev && phy_init_eee(phydev, false) >= 0) {
--		switch (speed) {
--		case SPEED_1000:
--		case SPEED_2500:
--			mcr |= PMCR_FORCE_EEE1G;
--			break;
--		case SPEED_100:
--			mcr |= PMCR_FORCE_EEE100;
--			break;
--		}
--	}
--
- 	mt7530_set(priv, MT753X_PMCR_P(dp->index), mcr);
- }
- 
-+static void mt753x_phylink_mac_disable_tx_lpi(struct phylink_config *config)
-+{
-+	struct dsa_port *dp = dsa_phylink_to_port(config);
-+	struct mt7530_priv *priv = dp->ds->priv;
-+
-+	mt7530_clear(priv, MT753X_PMCR_P(dp->index),
-+		     PMCR_FORCE_EEE1G | PMCR_FORCE_EEE100);
-+}
-+
-+static int mt753x_phylink_mac_enable_tx_lpi(struct phylink_config *config,
-+					    u32 timer, bool tx_clock_stop)
-+{
-+	struct dsa_port *dp = dsa_phylink_to_port(config);
-+	struct mt7530_priv *priv = dp->ds->priv;
-+	u32 val;
-+
-+	/* If the timer is zero, then set LPI_MODE_EN, which allows the
-+	 * system to enter LPI mode immediately rather than waiting for
-+	 * the LPI threshold.
-+	 */
-+	if (!timer)
-+		val = LPI_MODE_EN;
-+	else if (FIELD_FIT(LPI_THRESH_MASK, timer))
-+		val = FIELD_PREP(LPI_THRESH_MASK, timer);
-+	else
-+		val = LPI_THRESH_MASK;
-+
-+	mt7530_rmw(priv, MT753X_PMEEECR_P(dp->index),
-+		   LPI_THRESH_MASK | LPI_MODE_EN, val);
-+
-+	mt7530_set(priv, MT753X_PMCR_P(dp->index),
-+		   PMCR_FORCE_EEE1G | PMCR_FORCE_EEE100);
-+
-+	return 0;
-+}
-+
- static void mt753x_phylink_get_caps(struct dsa_switch *ds, int port,
- 				    struct phylink_config *config)
- {
- 	struct mt7530_priv *priv = ds->priv;
-+	u32 eeecr;
- 
- 	config->mac_capabilities = MAC_ASYM_PAUSE | MAC_SYM_PAUSE;
- 
-+	config->lpi_capabilities = MAC_100FD | MAC_1000FD | MAC_2500FD;
-+
-+	eeecr = mt7530_read(priv, MT753X_PMEEECR_P(port));
-+	/* tx_lpi_timer should be in microseconds. The time units for
-+	 * LPI threshold are unspecified.
-+	 */
-+	config->lpi_timer_default = FIELD_GET(LPI_THRESH_MASK, eeecr);
-+
- 	priv->info->mac_port_get_caps(ds, port, config);
- }
- 
-@@ -3088,18 +3121,9 @@ mt753x_setup(struct dsa_switch *ds)
- static int mt753x_set_mac_eee(struct dsa_switch *ds, int port,
- 			      struct ethtool_keee *e)
- {
--	struct mt7530_priv *priv = ds->priv;
--	u32 set, mask = LPI_THRESH_MASK | LPI_MODE_EN;
--
- 	if (e->tx_lpi_timer > 0xFFF)
- 		return -EINVAL;
- 
--	set = LPI_THRESH_SET(e->tx_lpi_timer);
--	if (!e->tx_lpi_enabled)
--		/* Force LPI Mode without a delay */
--		set |= LPI_MODE_EN;
--	mt7530_rmw(priv, MT753X_PMEEECR_P(port), mask, set);
--
- 	return 0;
- }
- 
-@@ -3238,6 +3262,8 @@ static const struct phylink_mac_ops mt753x_phylink_mac_ops = {
- 	.mac_config	= mt753x_phylink_mac_config,
- 	.mac_link_down	= mt753x_phylink_mac_link_down,
- 	.mac_link_up	= mt753x_phylink_mac_link_up,
-+	.mac_disable_tx_lpi = mt753x_phylink_mac_disable_tx_lpi,
-+	.mac_enable_tx_lpi = mt753x_phylink_mac_enable_tx_lpi,
- };
- 
- const struct mt753x_info mt753x_table[] = {
--- 
-2.30.2
+On 06.02.25 18:36, Julian Ruess wrote:
+>> +static int ism_lo_query_rgid(struct ism_dev *ism, uuid_t *rgid,
+>> +			     u32 vid_valid, u32 vid)
+>> +{
+>> +	/* rgid should be the same as lgid; vlan is not supported */
+>> +	if (!vid_valid && uuid_equal(rgid, &ism->gid))
+>> +		return 0;
+>> +	return -ENETUNREACH;
+>> +}
+> This vid_valid check breaks ism-loopback for me.
 
+
+oops, I also get:
+> smc_chk -C 10.44.30.50
+[1] 967189
+Test with target IP 10.44.30.50 and port 37373
+  Live test (SMC-D and SMC-R)
+Server started on port 37373
+     Failed  (TCP fallback), reasons:
+          Client:        0x05000000   Peer declined during handshake
+          Server:        0x03030007   No SMC-Dv2 device found, but required
+
+Sorry about that.
+Current upstream smc_loopback just ignores vid_valid in smc_lo_query_rgidsmc_lo_query_rgid(),
+but I'm not sure that is the best way to handle that.
+I'll investigate and make sure it works in v2.
 
