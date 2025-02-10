@@ -1,189 +1,395 @@
-Return-Path: <netdev+bounces-164643-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-164644-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id F0010A2E95D
-	for <lists+netdev@lfdr.de>; Mon, 10 Feb 2025 11:27:53 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4C928A2E978
+	for <lists+netdev@lfdr.de>; Mon, 10 Feb 2025 11:32:47 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 678E83A81D1
-	for <lists+netdev@lfdr.de>; Mon, 10 Feb 2025 10:27:06 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 7A07D1888148
+	for <lists+netdev@lfdr.de>; Mon, 10 Feb 2025 10:32:52 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 45D011CC8AE;
-	Mon, 10 Feb 2025 10:24:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2ECB21B040E;
+	Mon, 10 Feb 2025 10:32:43 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="CtLAFpRj"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="pAcJdZXF"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f201.google.com (mail-pl1-f201.google.com [209.85.214.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 76A251CAA8D
-	for <netdev@vger.kernel.org>; Mon, 10 Feb 2025 10:24:49 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6889915624D
+	for <netdev@vger.kernel.org>; Mon, 10 Feb 2025 10:32:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1739183091; cv=none; b=hYBsRtGP5DIwRmdd5pdxhNXFowt4j1xT1vwQ33s76oYzzfS2eKmYNV0Codxw2h7vTLxKkCG7GXYetsp6AImhmPgiTjg+f2cEECBAxRRu3FVjAJj7DYTrMELR0SJ+kbLqFe+/Z4EI8V6TK2Vf5TVQ12OAEU/Z6vKfCY7G2VshjrU=
+	t=1739183563; cv=none; b=Xzok/pOv5I+BzNhgo9Y7VfhpRp+vEHbZ9ib6bj3LCb/6BOfcYyS0Y/0E63fViv8TXyUvC1LHIvzlcDyl2Yrk6wZdrhOdj5mb2gK35KqSl+9kU+Cp2JG+cCNOhWnRMs9TdVsM1U7AWbpupQ+Rm21Rhe7JRACPcmpMs2k9dh0PxZ8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1739183091; c=relaxed/simple;
-	bh=MC6GhJjaeY2C5xOw4+/XFqy9lcuzxj0JI0v1ZaAyp+A=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=GGbsj+8Urj29Q4OW9CIB7iHVgr+HdOHRcImLktNl5peivcjDmKYvHS7+hAgdKZOBXPmLo9+ZMtx5nM/bP68jcUtwtbRQF7LJ28XGocGD9ipOGGtJlcKElMOhdx6LG8cFH0LEifwYiG+shu1IlqRr8tdvkQia+LkPnov7saC787g=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=CtLAFpRj; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1739183088;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=KGQIWELu/U5AoSIa7ITCHff9VGrc0oPYfYC1ThoBsPk=;
-	b=CtLAFpRjysj1iKM1a4uZ6FRCUBAUEjuMaGEASFP4oRDz9W1ZWm/6NSdhasaoVAPdlN1dt+
-	SgOoyvjHB0tMphM2EpQ1L2OJLn4FzCyCeGsD3JaNPLEvI7t0Iy30NZGhyN4Qll7oQQiubZ
-	fwR0dHTXV74rH/scHmh4CcXktI3e0qA=
-Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com
- [209.85.221.69]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-651-SZF9jsajMaeA79aL22U_uQ-1; Mon, 10 Feb 2025 05:24:46 -0500
-X-MC-Unique: SZF9jsajMaeA79aL22U_uQ-1
-X-Mimecast-MFC-AGG-ID: SZF9jsajMaeA79aL22U_uQ
-Received: by mail-wr1-f69.google.com with SMTP id ffacd0b85a97d-38dcb65c717so652539f8f.2
-        for <netdev@vger.kernel.org>; Mon, 10 Feb 2025 02:24:46 -0800 (PST)
+	s=arc-20240116; t=1739183563; c=relaxed/simple;
+	bh=k6S24Di5Cdwbbg6ULAifEixC4TcQWv4S89+Lx7d6IdA=;
+	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=dfawrBHVhdo2zZhnWl6vqztQwnITj5WQaHCGA+5dKsISTtRJo8dQwlgMy1y6NU31xpiGCY0cpLAxPppI4fjtUrABky+kL7E+2yUqyfJuQ2iJ/M4TPvPCVAwo6q1P33TwxiwCYqXXlHqw2Z9Sxq2RwghW2oS8aksLIrYgP4tl/Gs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--chharry.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=pAcJdZXF; arc=none smtp.client-ip=209.85.214.201
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--chharry.bounces.google.com
+Received: by mail-pl1-f201.google.com with SMTP id d9443c01a7336-21f6cd48c67so31946585ad.0
+        for <netdev@vger.kernel.org>; Mon, 10 Feb 2025 02:32:41 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1739183561; x=1739788361; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=cYJwxxQlwIyZkX+HoEtBlpfUCxgrdmdHLu1+dW+gUMk=;
+        b=pAcJdZXF3R/aNYbY9bEZxjR4tzoyeNI+a231dY+o5I6xBXHrQn7t+2oM4ea27z6HUG
+         FJuuU49q8vwFHQnLs54CWY1vWIAPKZL3Edl9OEYZeFN1Mdk+kCSpof1fxHBqEG9B5WJ7
+         PRDEVNSejYC5Jm/bkOt9RVS/1wtHPQCU/Hx2OxIioVApvFRtU3FoqVKVWeTHILDzJ466
+         cI3Ll04HrMuj8e0B9dQg99Pev+GNM+J28gzZdRtkQYjhGIC6o854LE62qvTwHbCdEK9F
+         uF3zcxmczRc0c/cmrIixV9yQzfRDzNZ+j/hj/oJ2lY/m/6KcgyGZ5EgvGzMRpHISumII
+         7Wwg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1739183085; x=1739787885;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=KGQIWELu/U5AoSIa7ITCHff9VGrc0oPYfYC1ThoBsPk=;
-        b=wEUPYvdLfDzghw/3W7py4HkPNTR0uv8V9p704XT1jXiMFlsCHjFH73TF2cHtTFvQ3l
-         T0QjNJi2o4xD1bCwbal/4Oc9aCtGq8lNcAPKihlj5p0CywkALnJoXvpO9KSUZV0B+P8r
-         8WiqyYHkhiQ2GyFQZkrR5sxXcMXhCZDhIlMqZ9j+eyDIRx3wfVGEgZQBTYAEkeffSfJL
-         8xn3SWhA9EEZ7fUfFUr9GPl5QITMAnHyUbkX6Yi1yxO4Qurjvi4HxH37BUBrbncOGbXI
-         MeiIMPawd2hAGghHlbdn2czDMpDP5bf1/YtyWtDx9CIEzG2oz9lE630uOQ3MXYNqOO5A
-         ZOpw==
-X-Forwarded-Encrypted: i=1; AJvYcCVBTBnjjE/bxBeqGih0SqQtCr3uov40pzK6pqTYFqjygxwBtkBY9pJ0B3T40j4k66YuZH//zag=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzDolLNu2LZbOEsorq3znWzY2ghwYs4/tn7lcOsb6u1qwGQNrcc
-	PJ6mVu31rcwWG1KgrS6LqdgKxKBBqYeqfKbGoekM439NqsmCrNG7ksAkqDabWxNOgXIuCIqtSId
-	kt/XITo0AvPBIoH/LvSNJLYpfpANSiYNeB7yGSDW5fIsWsz/Xt1Engg==
-X-Gm-Gg: ASbGncuFm0jtDKMW0KHXlXpLFmjQT2zkdAHt4YGy6fZh2i4+YxJuq4RPAHiWmlbyZMe
-	VIj4KH/ZCsOSNLByTZiPLIY/oSi5xRvkh/iROdATP1DyPaUh3XjEKZuUWuRwlQA1e51XCbDFDut
-	MePXfmU2jZvTSVheVrIO+mWvx2YSnxGSnQjaKR82Kdb5fQQScgz0Aq5sf+zAlxDPimWoQnYqacH
-	Ov9xeAwJZo/BaoL1VWNe9W5gKYxZs+QyBWfGMN5cNiCJprX8/hn793xzcsAOq1IvdzjHae1YtIn
-	UdlwvZmo
-X-Received: by 2002:a5d:5f8f:0:b0:38b:dc3d:e4be with SMTP id ffacd0b85a97d-38dc949201fmr10938004f8f.51.1739183085506;
-        Mon, 10 Feb 2025 02:24:45 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IEA4RTNVmX33K3IY4yT7AA2VCL6orUHF3zZA1G3EONeJl4Q/TRSP0DLiiI0HLoJ7mpF9ux++w==
-X-Received: by 2002:a5d:5f8f:0:b0:38b:dc3d:e4be with SMTP id ffacd0b85a97d-38dc949201fmr10937960f8f.51.1739183084906;
-        Mon, 10 Feb 2025 02:24:44 -0800 (PST)
-Received: from leonardi-redhat ([176.206.32.19])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-38dc627fecesm10223798f8f.77.2025.02.10.02.24.44
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 10 Feb 2025 02:24:44 -0800 (PST)
-Date: Mon, 10 Feb 2025 11:24:42 +0100
-From: Luigi Leonardi <leonardi@redhat.com>
-To: Michal Luczaj <mhal@rbox.co>
-Cc: Stefano Garzarella <sgarzare@redhat.com>, 
-	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, 
-	netdev@vger.kernel.org, syzbot+9d55b199192a4be7d02c@syzkaller.appspotmail.com
-Subject: Re: [PATCH net v2 1/2] vsock: Orphan socket after transport release
-Message-ID: <3h4ju6opsomkttmppwvugofepnecqegdb52tsq7n5c5zrvan22@echiriqwccz7>
-References: <20250206-vsock-linger-nullderef-v2-0-f8a1f19146f8@rbox.co>
- <20250206-vsock-linger-nullderef-v2-1-f8a1f19146f8@rbox.co>
+        d=1e100.net; s=20230601; t=1739183561; x=1739788361;
+        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=cYJwxxQlwIyZkX+HoEtBlpfUCxgrdmdHLu1+dW+gUMk=;
+        b=KxcBZc9kJGzYqurZIGQBZ1hqjz5SH629nsgZ4OpIf5G0KYoDpV+mEi/4q0AAJWzUcz
+         RG5H2JRWhFTFQJZcLwfOBr/mboG1fap+y+0LG4wTNPJIcsdpYXFDHB5sxQdMGuCZcUGV
+         WfxEj2N3vi7oxYdJM7HPeet3o2sRz967HoyGFsjPiV5G183CYVbO8pzCYYCOO1WtCHaI
+         aEDaZ2Nmp94nP+Pn8vLi5VZR+hNt14rn4KHJPF+90D4XeE60veAxSND8PbjaTqxjy0eo
+         CQEUMd43uPYr3mOhmf4nTvSJ3L1l4QeDasBW3YcH1Y+NxMZan1XKlP7iWo4CKQ4cJrDV
+         Psrg==
+X-Forwarded-Encrypted: i=1; AJvYcCVkneZKHGVCJI4BzoyVk3wFapC43x8G8Gv/zRjMFjO19yFmNPiFdM3ZY69QjAMILHyWm0OfIBg=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yw4jYRC5XHenFjutXz5+X5A2JoZXTHnGXHVT7yaxRpheTPXZOPU
+	2ZcmPfDO6h1QXdePAe0VFYIdvlyBRE/5RVIJX3uneVL4Hhdq5e5CjaK42JYtJqjzxsAbqD2NGpf
+	XvwFnzQ==
+X-Google-Smtp-Source: AGHT+IHr9Ul6LuFDhqG7/temf6lJOMuZo29msAazGLl3VQJ6PsAB+BlbP4aMj/SS+SnKlMb6S2LlRIK2wDw3
+X-Received: from plaq3.prod.google.com ([2002:a17:903:2043:b0:216:2234:bf3e])
+ (user=chharry job=prod-delivery.src-stubby-dispatcher) by 2002:a17:902:d2d0:b0:21f:797f:9f45
+ with SMTP id d9443c01a7336-21f797fa86bmr103526125ad.29.1739183560662; Mon, 10
+ Feb 2025 02:32:40 -0800 (PST)
+Date: Mon, 10 Feb 2025 18:32:24 +0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii; format=flowed
-Content-Disposition: inline
-In-Reply-To: <20250206-vsock-linger-nullderef-v2-1-f8a1f19146f8@rbox.co>
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.48.1.502.g6dc24dfdaf-goog
+Message-ID: <20250210183224.v3.1.If6f14aa2512336173a53fc3552756cd8a332b0a3@changeid>
+Subject: [PATCH v3 1/3] Bluetooth: Fix possible race with userspace of sysfs isoc_alt
+From: Hsin-chen Chuang <chharry@google.com>
+To: linux-bluetooth@vger.kernel.org, luiz.dentz@gmail.com
+Cc: chromeos-bluetooth-upstreaming@chromium.org, 
+	Hsin-chen Chuang <chharry@chromium.org>, "David S. Miller" <davem@davemloft.net>, 
+	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
+	Johan Hedberg <johan.hedberg@gmail.com>, Marcel Holtmann <marcel@holtmann.org>, 
+	Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, Ying Hsu <yinghsu@chromium.org>, 
+	linux-kernel@vger.kernel.org, netdev@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
 
-Hi Michal,
+From: Hsin-chen Chuang <chharry@chromium.org>
 
-On Thu, Feb 06, 2025 at 12:06:47AM +0100, Michal Luczaj wrote:
->During socket release, sock_orphan() is called without considering that it
->sets sk->sk_wq to NULL. Later, if SO_LINGER is enabled, this leads to a
->null pointer dereferenced in virtio_transport_wait_close().
->
->Orphan the socket only after transport release.
->
->While there, reflow the other comment.
-May I ask you why?
->
->Partially reverts the 'Fixes:' commit.
->
->KASAN: null-ptr-deref in range [0x0000000000000018-0x000000000000001f]
-> lock_acquire+0x19e/0x500
-> _raw_spin_lock_irqsave+0x47/0x70
-> add_wait_queue+0x46/0x230
-> virtio_transport_release+0x4e7/0x7f0
-> __vsock_release+0xfd/0x490
-> vsock_release+0x90/0x120
-> __sock_release+0xa3/0x250
-> sock_close+0x14/0x20
-> __fput+0x35e/0xa90
-> __x64_sys_close+0x78/0xd0
-> do_syscall_64+0x93/0x1b0
-> entry_SYSCALL_64_after_hwframe+0x76/0x7e
->
->Reported-by: syzbot+9d55b199192a4be7d02c@syzkaller.appspotmail.com
->Closes: https://syzkaller.appspot.com/bug?extid=9d55b199192a4be7d02c
->Fixes: fcdd2242c023 ("vsock: Keep the binding until socket destruction")
->Tested-by: Luigi Leonardi <leonardi@redhat.com>
->Signed-off-by: Michal Luczaj <mhal@rbox.co>
->---
-> net/vmw_vsock/af_vsock.c | 15 ++++++++++-----
-> 1 file changed, 10 insertions(+), 5 deletions(-)
->
->diff --git a/net/vmw_vsock/af_vsock.c b/net/vmw_vsock/af_vsock.c
->index 075695173648d3a4ecbd04e908130efdbb393b41..85d20891b771a25b8172a163983054a2557f98c1 100644
->--- a/net/vmw_vsock/af_vsock.c
->+++ b/net/vmw_vsock/af_vsock.c
->@@ -817,20 +817,25 @@ static void __vsock_release(struct sock *sk, int level)
-> 	vsk = vsock_sk(sk);
-> 	pending = NULL;	/* Compiler warning. */
->
->-	/* When "level" is SINGLE_DEPTH_NESTING, use the nested
->-	 * version to avoid the warning "possible recursive locking
->-	 * detected". When "level" is 0, lock_sock_nested(sk, level)
->-	 * is the same as lock_sock(sk).
->+	/* When "level" is SINGLE_DEPTH_NESTING, use the nested version to avoid
->+	 * the warning "possible recursive locking detected". When "level" is 0,
->+	 * lock_sock_nested(sk, level) is the same as lock_sock(sk).
-> 	 */
-> 	lock_sock_nested(sk, level);
->
->-	sock_orphan(sk);
->+	/* Indicate to vsock_remove_sock() that the socket is being released and
->+	 * can be removed from the bound_table. Unlike transport reassignment
->+	 * case, where the socket must remain bound despite vsock_remove_sock()
->+	 * being called from the transport release() callback.
->+	 */
->+	sock_set_flag(sk, SOCK_DEAD);
->
-> 	if (vsk->transport)
-> 		vsk->transport->release(vsk);
-> 	else if (sock_type_connectible(sk->sk_type))
-> 		vsock_remove_sock(vsk);
->
->+	sock_orphan(sk);
-> 	sk->sk_shutdown = SHUTDOWN_MASK;
->
-> 	skb_queue_purge(&sk->sk_receive_queue);
->
->-- 
->2.48.1
->
+Use device group to avoid the racing. To reuse the group defined in
+hci_sysfs.c, defined 2 callbacks switch_usb_alt_setting and
+read_usb_alt_setting which are only registered in btusb.
 
-Code LGTM!
+Fixes: b16b327edb4d ("Bluetooth: btusb: add sysfs attribute to control USB alt setting")
+Signed-off-by: Hsin-chen Chuang <chharry@chromium.org>
+---
 
-I probably wouldn't have changed that comment because of possible 
-conflicts.
+Changes in v3:
+- Make the attribute exported only when the isoc_alt is available.
+- In btusb_probe, determine data->isoc before calling hci_alloc_dev_priv
+  (which calls hci_init_sysfs).
+- Since hci_init_sysfs is called before btusb could modify the hdev,
+  add new argument add_isoc_alt_attr for btusb to inform hci_init_sysfs.
 
-Reviewed-by: Luigi Leonardi <leonardi@redhat.com>
+ drivers/bluetooth/btintel_pcie.c |  3 +-
+ drivers/bluetooth/btusb.c        | 69 +++++++++++---------------------
+ drivers/bluetooth/hci_serdev.c   |  2 +-
+ include/net/bluetooth/hci_core.h |  8 ++--
+ net/bluetooth/hci_core.c         |  4 +-
+ net/bluetooth/hci_sysfs.c        | 52 +++++++++++++++++++++++-
+ 6 files changed, 84 insertions(+), 54 deletions(-)
 
-Thank you,
-Luigi
+diff --git a/drivers/bluetooth/btintel_pcie.c b/drivers/bluetooth/btintel_pcie.c
+index b8b241a92bf9..856de070b440 100644
+--- a/drivers/bluetooth/btintel_pcie.c
++++ b/drivers/bluetooth/btintel_pcie.c
+@@ -1514,7 +1514,8 @@ static int btintel_pcie_setup_hdev(struct btintel_pcie_data *data)
+ 	int err;
+ 	struct hci_dev *hdev;
+ 
+-	hdev = hci_alloc_dev_priv(sizeof(struct btintel_data));
++	hdev = hci_alloc_dev_priv(sizeof(struct btintel_data),
++				  /* add_isoc_alt_attr = */ false);
+ 	if (!hdev)
+ 		return -ENOMEM;
+ 
+diff --git a/drivers/bluetooth/btusb.c b/drivers/bluetooth/btusb.c
+index 1caf7a071a73..a451403c62eb 100644
+--- a/drivers/bluetooth/btusb.c
++++ b/drivers/bluetooth/btusb.c
+@@ -2247,6 +2247,13 @@ static int btusb_switch_alt_setting(struct hci_dev *hdev, int new_alts)
+ 	return 0;
+ }
+ 
++static int btusb_read_alt_setting(struct hci_dev *hdev)
++{
++	struct btusb_data *data = hci_get_drvdata(hdev);
++
++	return data->isoc_altsetting;
++}
++
+ static struct usb_host_interface *btusb_find_altsetting(struct btusb_data *data,
+ 							int alt)
+ {
+@@ -3676,32 +3683,6 @@ static const struct file_operations force_poll_sync_fops = {
+ 	.llseek		= default_llseek,
+ };
+ 
+-static ssize_t isoc_alt_show(struct device *dev,
+-			     struct device_attribute *attr,
+-			     char *buf)
+-{
+-	struct btusb_data *data = dev_get_drvdata(dev);
+-
+-	return sysfs_emit(buf, "%d\n", data->isoc_altsetting);
+-}
+-
+-static ssize_t isoc_alt_store(struct device *dev,
+-			      struct device_attribute *attr,
+-			      const char *buf, size_t count)
+-{
+-	struct btusb_data *data = dev_get_drvdata(dev);
+-	int alt;
+-	int ret;
+-
+-	if (kstrtoint(buf, 10, &alt))
+-		return -EINVAL;
+-
+-	ret = btusb_switch_alt_setting(data->hdev, alt);
+-	return ret < 0 ? ret : count;
+-}
+-
+-static DEVICE_ATTR_RW(isoc_alt);
+-
+ static int btusb_probe(struct usb_interface *intf,
+ 		       const struct usb_device_id *id)
+ {
+@@ -3821,7 +3802,20 @@ static int btusb_probe(struct usb_interface *intf,
+ 
+ 	data->recv_acl = hci_recv_frame;
+ 
+-	hdev = hci_alloc_dev_priv(priv_size);
++	if (id->driver_info & BTUSB_AMP) {
++		/* AMP controllers do not support SCO packets */
++		data->isoc = NULL;
++	} else {
++		/* Interface orders are hardcoded in the specification */
++		data->isoc = usb_ifnum_to_if(data->udev, ifnum_base + 1);
++		data->isoc_ifnum = ifnum_base + 1;
++	}
++
++	if (id->driver_info & BTUSB_BROKEN_ISOC)
++		data->isoc = NULL;
++
++	hdev = hci_alloc_dev_priv(priv_size,
++				  /* add_isoc_alt_attr = */ data->isoc);
+ 	if (!hdev)
+ 		return -ENOMEM;
+ 
+@@ -3969,15 +3963,6 @@ static int btusb_probe(struct usb_interface *intf,
+ 		hci_set_msft_opcode(hdev, 0xFD70);
+ 	}
+ 
+-	if (id->driver_info & BTUSB_AMP) {
+-		/* AMP controllers do not support SCO packets */
+-		data->isoc = NULL;
+-	} else {
+-		/* Interface orders are hardcoded in the specification */
+-		data->isoc = usb_ifnum_to_if(data->udev, ifnum_base + 1);
+-		data->isoc_ifnum = ifnum_base + 1;
+-	}
+-
+ 	if (IS_ENABLED(CONFIG_BT_HCIBTUSB_RTL) &&
+ 	    (id->driver_info & BTUSB_REALTEK)) {
+ 		btrtl_set_driver_name(hdev, btusb_driver.name);
+@@ -4010,9 +3995,6 @@ static int btusb_probe(struct usb_interface *intf,
+ 			set_bit(HCI_QUIRK_FIXUP_BUFFER_SIZE, &hdev->quirks);
+ 	}
+ 
+-	if (id->driver_info & BTUSB_BROKEN_ISOC)
+-		data->isoc = NULL;
+-
+ 	if (id->driver_info & BTUSB_WIDEBAND_SPEECH)
+ 		set_bit(HCI_QUIRK_WIDEBAND_SPEECH_SUPPORTED, &hdev->quirks);
+ 
+@@ -4066,9 +4048,8 @@ static int btusb_probe(struct usb_interface *intf,
+ 		if (err < 0)
+ 			goto out_free_dev;
+ 
+-		err = device_create_file(&intf->dev, &dev_attr_isoc_alt);
+-		if (err)
+-			goto out_free_dev;
++		hdev->switch_usb_alt_setting = btusb_switch_alt_setting;
++		hdev->read_usb_alt_setting = btusb_read_alt_setting;
+ 	}
+ 
+ 	if (IS_ENABLED(CONFIG_BT_HCIBTUSB_BCM) && data->diag) {
+@@ -4115,10 +4096,8 @@ static void btusb_disconnect(struct usb_interface *intf)
+ 	hdev = data->hdev;
+ 	usb_set_intfdata(data->intf, NULL);
+ 
+-	if (data->isoc) {
+-		device_remove_file(&intf->dev, &dev_attr_isoc_alt);
++	if (data->isoc)
+ 		usb_set_intfdata(data->isoc, NULL);
+-	}
+ 
+ 	if (data->diag)
+ 		usb_set_intfdata(data->diag, NULL);
+diff --git a/drivers/bluetooth/hci_serdev.c b/drivers/bluetooth/hci_serdev.c
+index 89a22e9b3253..41a4a91be4b8 100644
+--- a/drivers/bluetooth/hci_serdev.c
++++ b/drivers/bluetooth/hci_serdev.c
+@@ -326,7 +326,7 @@ int hci_uart_register_device_priv(struct hci_uart *hu,
+ 	set_bit(HCI_UART_PROTO_READY, &hu->flags);
+ 
+ 	/* Initialize and register HCI device */
+-	hdev = hci_alloc_dev_priv(sizeof_priv);
++	hdev = hci_alloc_dev_priv(sizeof_priv, /* add_isoc_alt_attr = */ false);
+ 	if (!hdev) {
+ 		BT_ERR("Can't allocate HCI device");
+ 		err = -ENOMEM;
+diff --git a/include/net/bluetooth/hci_core.h b/include/net/bluetooth/hci_core.h
+index 05919848ea95..2a596ea40308 100644
+--- a/include/net/bluetooth/hci_core.h
++++ b/include/net/bluetooth/hci_core.h
+@@ -641,6 +641,8 @@ struct hci_dev {
+ 				     struct bt_codec *codec, __u8 *vnd_len,
+ 				     __u8 **vnd_data);
+ 	u8 (*classify_pkt_type)(struct hci_dev *hdev, struct sk_buff *skb);
++	int (*switch_usb_alt_setting)(struct hci_dev *hdev, int new_alts);
++	int (*read_usb_alt_setting)(struct hci_dev *hdev);
+ };
+ 
+ #define HCI_PHY_HANDLE(handle)	(handle & 0xff)
+@@ -1686,11 +1688,11 @@ static inline void *hci_get_priv(struct hci_dev *hdev)
+ struct hci_dev *hci_dev_get(int index);
+ struct hci_dev *hci_get_route(bdaddr_t *dst, bdaddr_t *src, u8 src_type);
+ 
+-struct hci_dev *hci_alloc_dev_priv(int sizeof_priv);
++struct hci_dev *hci_alloc_dev_priv(int sizeof_priv, bool add_isoc_alt_attr);
+ 
+ static inline struct hci_dev *hci_alloc_dev(void)
+ {
+-	return hci_alloc_dev_priv(0);
++	return hci_alloc_dev_priv(0, /* add_isoc_alt_attr = */ false);
+ }
+ 
+ void hci_free_dev(struct hci_dev *hdev);
+@@ -1843,7 +1845,7 @@ int hci_get_adv_monitor_offload_ext(struct hci_dev *hdev);
+ 
+ void hci_event_packet(struct hci_dev *hdev, struct sk_buff *skb);
+ 
+-void hci_init_sysfs(struct hci_dev *hdev);
++void hci_init_sysfs(struct hci_dev *hdev, bool add_isoc_alt_attr);
+ void hci_conn_init_sysfs(struct hci_conn *conn);
+ void hci_conn_add_sysfs(struct hci_conn *conn);
+ void hci_conn_del_sysfs(struct hci_conn *conn);
+diff --git a/net/bluetooth/hci_core.c b/net/bluetooth/hci_core.c
+index e7ec12437c8b..7c90391721ba 100644
+--- a/net/bluetooth/hci_core.c
++++ b/net/bluetooth/hci_core.c
+@@ -2405,7 +2405,7 @@ static int hci_suspend_notifier(struct notifier_block *nb, unsigned long action,
+ }
+ 
+ /* Alloc HCI device */
+-struct hci_dev *hci_alloc_dev_priv(int sizeof_priv)
++struct hci_dev *hci_alloc_dev_priv(int sizeof_priv, bool add_isoc_alt_attr)
+ {
+ 	struct hci_dev *hdev;
+ 	unsigned int alloc_size;
+@@ -2530,7 +2530,7 @@ struct hci_dev *hci_alloc_dev_priv(int sizeof_priv)
+ 
+ 	hci_devcd_setup(hdev);
+ 
+-	hci_init_sysfs(hdev);
++	hci_init_sysfs(hdev, add_isoc_alt_attr);
+ 	discovery_init(hdev);
+ 
+ 	return hdev;
+diff --git a/net/bluetooth/hci_sysfs.c b/net/bluetooth/hci_sysfs.c
+index 041ce9adc378..3242f1ce00b2 100644
+--- a/net/bluetooth/hci_sysfs.c
++++ b/net/bluetooth/hci_sysfs.c
+@@ -102,6 +102,38 @@ static ssize_t reset_store(struct device *dev, struct device_attribute *attr,
+ }
+ static DEVICE_ATTR_WO(reset);
+ 
++static ssize_t isoc_alt_show(struct device *dev,
++			     struct device_attribute *attr,
++			     char *buf)
++{
++	struct hci_dev *hdev = to_hci_dev(dev);
++
++	if (hdev->read_usb_alt_setting)
++		return sysfs_emit(buf, "%d\n", hdev->read_usb_alt_setting(hdev));
++
++	return -ENODEV;
++}
++
++static ssize_t isoc_alt_store(struct device *dev,
++			      struct device_attribute *attr,
++			      const char *buf, size_t count)
++{
++	struct hci_dev *hdev = to_hci_dev(dev);
++	int alt;
++	int ret;
++
++	if (kstrtoint(buf, 10, &alt))
++		return -EINVAL;
++
++	if (hdev->switch_usb_alt_setting) {
++		ret = hdev->switch_usb_alt_setting(hdev, alt);
++		return ret < 0 ? ret : count;
++	}
++
++	return -ENODEV;
++}
++static DEVICE_ATTR_RW(isoc_alt);
++
+ static struct attribute *bt_host_attrs[] = {
+ 	&dev_attr_reset.attr,
+ 	NULL,
+@@ -114,11 +146,27 @@ static const struct device_type bt_host = {
+ 	.groups = bt_host_groups,
+ };
+ 
+-void hci_init_sysfs(struct hci_dev *hdev)
++static struct attribute *bt_host_isoc_alt_attrs[] = {
++	&dev_attr_reset.attr,
++	&dev_attr_isoc_alt.attr,
++	NULL,
++};
++ATTRIBUTE_GROUPS(bt_host_isoc_alt);
++
++static const struct device_type bt_host_isoc_alt = {
++	.name    = "host",
++	.release = bt_host_release,
++	.groups  = bt_host_isoc_alt_groups,
++};
++
++void hci_init_sysfs(struct hci_dev *hdev, bool add_isoc_alt_attr)
+ {
+ 	struct device *dev = &hdev->dev;
+ 
+-	dev->type = &bt_host;
++	if (add_isoc_alt_attr)
++		dev->type = &bt_host_isoc_alt;
++	else
++		dev->type = &bt_host;
+ 	dev->class = &bt_class;
+ 
+ 	__module_get(THIS_MODULE);
+-- 
+2.48.1.502.g6dc24dfdaf-goog
 
 
