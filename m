@@ -1,763 +1,141 @@
-Return-Path: <netdev+bounces-164782-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-164783-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5F3CFA2F162
-	for <lists+netdev@lfdr.de>; Mon, 10 Feb 2025 16:22:44 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7337EA2F166
+	for <lists+netdev@lfdr.de>; Mon, 10 Feb 2025 16:23:14 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 2A7843A80A3
-	for <lists+netdev@lfdr.de>; Mon, 10 Feb 2025 15:22:35 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 8698E166DF1
+	for <lists+netdev@lfdr.de>; Mon, 10 Feb 2025 15:23:01 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 80FF0204867;
-	Mon, 10 Feb 2025 15:22:39 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0A2AF2397B7;
+	Mon, 10 Feb 2025 15:22:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="YZUQJz+9"
 X-Original-To: netdev@vger.kernel.org
-Received: from Chamillionaire.breakpoint.cc (Chamillionaire.breakpoint.cc [91.216.245.30])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wm1-f50.google.com (mail-wm1-f50.google.com [209.85.128.50])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 400322528E1;
-	Mon, 10 Feb 2025 15:22:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.216.245.30
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3F0172343BD;
+	Mon, 10 Feb 2025 15:22:50 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.50
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1739200959; cv=none; b=S3MsIUL6/X3oAjOT01YzjS3VwJ9UNIvF88nKNxDMvppATo2bIRWrv1CBHBuConcq+L88IIfirN8+aMHQKqjKhUZTylK/LSW+svbnCahJ2/wtE8f4bB3F6ZNsXIN8bK85mVB7ErSB4x630aEiobrCd+zqrvYHaAnfgY7kn4N4DWs=
+	t=1739200972; cv=none; b=uysmPR/5LhSBSIIFpK8s6TbTEah73JWo39Xm+4O8+fG/+fEl7FvXmJ6XwyQaCQCnor4vF//W6Ac1Z8mrHDuOC0fLu+CJlePGnXmvszmFXRw1ZLTPy5sxS866vFPKEB8SZ60D/648EBCT3Fm9f5zC444ML1TqEW+6V10FfRZ70js=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1739200959; c=relaxed/simple;
-	bh=7GPDD1p5x/nzF4Ei8HQZImikaglz3PbRapLaFGCOQt0=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=GJ2aDuunSATJv2AJehPGS5sejQFFI4ppszSGTUkmlvMyTWuyKdFN5uODTXGmamPFZsHlA6LVn77PlO8UPg4F+yO3Bh+G/wLP8sUG+YyMMnI6XoFMjhnnW5AprNIuZbCzBwZkWg2ydoBBAl0JxA6rJWijPedL9rpHMA8HEPQMJo4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=strlen.de; spf=pass smtp.mailfrom=breakpoint.cc; arc=none smtp.client-ip=91.216.245.30
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=strlen.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=breakpoint.cc
-Received: from fw by Chamillionaire.breakpoint.cc with local (Exim 4.92)
-	(envelope-from <fw@breakpoint.cc>)
-	id 1thVcA-0000ID-O8; Mon, 10 Feb 2025 16:22:26 +0100
-From: Florian Westphal <fw@strlen.de>
-To: <netdev@vger.kernel.org>
-Cc: <netfilter-devel@vger.kernel.org>,
-	donald.hunter@gmail.com,
-	Florian Westphal <fw@strlen.de>
-Subject: [PATCH v2 net-next] netlink: specs: add conntrack dump and stats dump support
-Date: Mon, 10 Feb 2025 16:21:52 +0100
-Message-ID: <20250210152159.41077-1-fw@strlen.de>
-X-Mailer: git-send-email 2.48.1
+	s=arc-20240116; t=1739200972; c=relaxed/simple;
+	bh=4ey5/kZZywhO4NrHdQDX0eGskD/P5tmgMEuhTvXsAnA=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=V/byD/UhLn2y87GJbnnZXrUs/eNITJeJ/Fj+7zjnGRrFYMIWcWE+/3OyqXJcERiHjqa7eBSYEgh2heVTN+CsjCtMAnMuqYmWD94dHTq+AssuG7O1zDvbT3vw5/W4m4Db5JhQEZOpQu+b2smyoiZE9OKf+KfPYwLVedAzDbldN54=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=YZUQJz+9; arc=none smtp.client-ip=209.85.128.50
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-wm1-f50.google.com with SMTP id 5b1f17b1804b1-43938828d02so2760755e9.1;
+        Mon, 10 Feb 2025 07:22:50 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1739200969; x=1739805769; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=Br74BShwtiiuy7z2LZlgm7PDF+Zhj54VgRc9wxXedw4=;
+        b=YZUQJz+9LXwUlrXb98qp1cShVTYaImShSCqPUKMao86wxNkG5pr8LHTRclfgW9gupS
+         Iu/3+VRYVp2+G4LakjyG5cf554Qf94ZvWHBT2Umb3n53CavUzQOAR+lOZY16sTMLverL
+         gQEzYwonBjg34GOA8qkYZ+WNzjc7KJIEPbMinEVMKyW921wyD823HPQMROlKnU7BIgC2
+         KqrotgvCWfNoVPxwGKHLAg9kQqjmtKrFifWpHJ7EXK3oCSN5F5JbLj6ugp19o5BwyvAK
+         E9c93fXQjRWJ1Y67Jn0uZjQyrkUTP81o96k5edVfddcxzvc6wsGKsbIbRUHAcbVYFiy3
+         +6gg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1739200969; x=1739805769;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=Br74BShwtiiuy7z2LZlgm7PDF+Zhj54VgRc9wxXedw4=;
+        b=W6UEoosmLpnSJz/QnjCCxGhd5gkN7fepAFSXk2UDGXRl2SSigpoVbMwBB3Bpne/eG1
+         0hCYx1U5hKdLcQdPUBpP8SQ0DK9Yj7vFl990G5l4B0zAUMm6oK44YHOH100dT2vhdNpl
+         MqPWvMzOVTjHqxmERQ0gtuzCbslx6h5E7pEhEkQuZkqKzt5llw0L85muXgMQ3fUAXjYc
+         UA8w6JiaYliWPU4ahcfAEZacOy9XM5oVPaJQKbvIftZwdzImxKBBXkdmuyImz9+DM7QI
+         Rwk+OknHveTgl2YH2IpnxRF7X8BC0+MWsN0SrzVi1/3JdxRSJfUaIRDooGG7Dm8WPfn3
+         ABwg==
+X-Forwarded-Encrypted: i=1; AJvYcCUmBFsCogLIDXZWB68puCAonZicRE/bp6KwmNUey5JuJYW5r+7bq8MoPsqnADplU/cWqYTIr6MjnsFwBCM=@vger.kernel.org, AJvYcCWDp26qDmV1cxurW6lxoGbHJqFwk9zj83n4DQzAQ4B/eOLJe8uTRVg2MLX8bxQTSLzAAEIlK4zu@vger.kernel.org
+X-Gm-Message-State: AOJu0Yx434Utagbv8rvoof3zjaveD14Bbu4Oc3beBPUWwdyZ2SNCPKIx
+	iQnRVt+1It6KoIJiO4o2pj1UVgKjVEPnDa9lLqqA57liRd7vJhBf
+X-Gm-Gg: ASbGnctkee3YJGyFiR6oPNEZorcbke6B8BcmXeTrDrI/LZNT+m5EMSLUDO4R4INk/cX
+	BMiLmOM1sXT2TCOCs11SPQ6uLOdftbomfikxlXKUFn8mUQZQSXI623j5ChNxJ55bOwob7nQyGRE
+	bKHYqmDWqnp2/WP0gLrmYF3y5oVx9Q7FcD5B+eCW7nXXwIRcPvqPihsWytg0bNA33kDok1GPiQ0
+	bGhMiedTGbt5m9xS8+fKldN5F/eZQM+Y/sZMXBoGXJKqHrKi3OA1RYUVmAmDF2K+AiQ0ELybjhH
+	8Xs=
+X-Google-Smtp-Source: AGHT+IEDYZZ6jSptYMQEw+9oVycI5AcOuMHr+sf8wBwW+OthyZShWcZ0gpBTn9WQOn4H3vy7SzPuTg==
+X-Received: by 2002:a05:600c:3b1f:b0:439:4a9d:aed9 with SMTP id 5b1f17b1804b1-4394a9db2f1mr7336105e9.8.1739200969126;
+        Mon, 10 Feb 2025 07:22:49 -0800 (PST)
+Received: from skbuf ([86.127.124.81])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-4392fc7ceacsm83217705e9.20.2025.02.10.07.22.47
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 10 Feb 2025 07:22:48 -0800 (PST)
+Date: Mon, 10 Feb 2025 17:22:46 +0200
+From: Vladimir Oltean <olteanv@gmail.com>
+To: Ido Schimmel <idosch@nvidia.com>
+Cc: Eric Woudstra <ericwouds@gmail.com>, Petr Machata <petrm@nvidia.com>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Nikolay Aleksandrov <razor@blackwall.org>, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: Re: [RFC PATCH v1 net-next] net: mlxsw_sp: Use
+ switchdev_handle_port_obj_add_foreign() for vxlan
+Message-ID: <20250210152246.4ajumdchwhvbarik@skbuf>
+References: <20250208141518.191782-1-ericwouds@gmail.com>
+ <Z6mhQL-b58L5xkK4@shredder>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <Z6mhQL-b58L5xkK4@shredder>
 
-This adds support to dump the connection tracking table
-("conntrack -L") and the conntrack statistics, ("conntrack -S").
+On Mon, Feb 10, 2025 at 08:48:32AM +0200, Ido Schimmel wrote:
+> On Sat, Feb 08, 2025 at 03:15:18PM +0100, Eric Woudstra wrote:
+> > Sending as RFC as I do not own this hardware. This code is not tested.
+> > 
+> > Vladimir found this part of the spectrum switchdev, while looking at
+> > another issue here:
+> > 
+> > https://lore.kernel.org/all/20250207220408.zipucrmm2yafj4wu@skbuf/
+> > 
+> > As vxlan seems a foreign port, wouldn't it be better to use
+> > switchdev_handle_port_obj_add_foreign() ?
+> 
+> Thanks for the patch, but the VXLAN port is not foreign to the other
+> switch ports. That is, forwarding between these ports and VXLAN happens
+> in hardware. And yes, switchdev_bridge_port_offload() does need to be
+> called for the VXLAN port so that it's assigned the same hardware domain
+> as the other ports.
 
-Example conntrack dump:
-tools/net/ynl/pyynl/cli.py --spec Documentation/netlink/specs/conntrack.yaml --dump get
-[{'id': 59489769,
-  'mark': 0,
-  'nfgen-family': 2,
-  'protoinfo': {'protoinfo-tcp': {'tcp-flags-original': {'flags': {'maxack',
-                                                                   'sack-perm',
-                                                                   'window-scale'},
-                                                         'mask': set()},
-                                  'tcp-flags-reply': {'flags': {'maxack',
-                                                                'sack-perm',
-                                                                'window-scale'},
-                                                      'mask': set()},
-                                  'tcp-state': 'established',
-                                  'tcp-wscale-original': 7,
-                                  'tcp-wscale-reply': 8}},
-  'res-id': 0,
-  'secctx': {'secctx-name': 'system_u:object_r:unlabeled_t:s0'},
-  'status': {'assured',
-             'confirmed',
-             'dst-nat-done',
-             'seen-reply',
-             'src-nat-done'},
-  'timeout': 431949,
-  'tuple-orig': {'tuple-ip': {'ip-v4-dst': '34.107.243.93',
-                              'ip-v4-src': '192.168.0.114'},
-                 'tuple-proto': {'proto-dst-port': 443,
-                                 'proto-num': 6,
-                                 'proto-src-port': 37104}},
-  'tuple-reply': {'tuple-ip': {'ip-v4-dst': '192.168.0.114',
-                               'ip-v4-src': '34.107.243.93'},
-                  'tuple-proto': {'proto-dst-port': 37104,
-                                  'proto-num': 6,
-                                  'proto-src-port': 443}},
-  'use': 1,
-  'version': 0},
- {'id': 3402229480,
+Thanks, this is useful. I'm not providing a patch yet because there are
+still things I don't understand.
 
-Example stats dump:
-tools/net/ynl/pyynl/cli.py --spec Documentation/netlink/specs/conntrack.yaml --dump get-stats
-[{'chain-toolong': 0,
-  'clash-resolve': 3,
-  'drop': 0,
- ....
+Have you seen any of the typical problems associated with the software
+bridge thinking vxlan isn't part of the same hwdom as the ingress
+physical port, and, say, flooding packets twice to vxlan, when the
+switch had already forwarded a copy of the packet? In almost 4 years
+since commit 2f5dc00f7a3e ("net: bridge: switchdev: let drivers inform
+which bridge ports are offloaded"), I would have expected such issues
+would have been noticed?
 
-Changes since last iteration:
- - Address comments from Donald Hunter, in particular, fixup "get" and
-   "get-stats" descriptions, the former operation supports both dump
-   and normal request (returns a single entry, if found), the latter
-   only supports dumps.
+Do we require a Fixes: tag for this?
 
-Signed-off-by: Florian Westphal <fw@strlen.de>
----
- Documentation/netlink/specs/conntrack.yaml | 643 +++++++++++++++++++++
- 1 file changed, 643 insertions(+)
- create mode 100644 Documentation/netlink/specs/conntrack.yaml
+And then, switchdev_bridge_port_offload() has a brport_dev argument,
+which would pretty clearly be passed as vxlan_dev by
+mlxsw_sp_bridge_8021d_vxlan_join() and
+mlxsw_sp_bridge_vlan_aware_vxlan_join(), but it also has one other
+"struct net_device *dev" argument, on which br_switchdev_port_offload()
+wants to call dev_get_port_parent_id(), to see what hwdom (what other
+bridge ports) to associate it to.
 
-diff --git a/Documentation/netlink/specs/conntrack.yaml b/Documentation/netlink/specs/conntrack.yaml
-new file mode 100644
-index 000000000000..840dc4504216
---- /dev/null
-+++ b/Documentation/netlink/specs/conntrack.yaml
-@@ -0,0 +1,643 @@
-+# SPDX-License-Identifier: ((GPL-2.0 WITH Linux-syscall-note) OR BSD-3-Clause)
-+
-+name: conntrack
-+protocol: netlink-raw
-+protonum: 12
-+
-+doc:
-+  Netfilter connection tracking subsystem over nfnetlink
-+
-+definitions:
-+  -
-+    name: nfgenmsg
-+    type: struct
-+    members:
-+      -
-+        name: nfgen-family
-+        type: u8
-+      -
-+        name: version
-+        type: u8
-+      -
-+        name: res-id
-+        byte-order: big-endian
-+        type: u16
-+  -
-+    name: nf-ct-tcp-flags-mask
-+    type: struct
-+    members:
-+      -
-+        name: flags
-+        type: u8
-+        enum: nf-ct-tcp-flags
-+        enum-as-flags: true
-+      -
-+        name: mask
-+        type: u8
-+        enum: nf-ct-tcp-flags
-+        enum-as-flags: true
-+  -
-+    name: nf-ct-tcp-flags
-+    type: flags
-+    entries:
-+      - window-scale
-+      - sack-perm
-+      - close-init
-+      - be-liberal
-+      - unacked
-+      - maxack
-+      - challenge-ack
-+      - simultaneous-open
-+  -
-+    name: nf-ct-tcp-state
-+    type: enum
-+    entries:
-+      - none
-+      - syn-sent
-+      - syn-recv
-+      - established
-+      - fin-wait
-+      - close-wait
-+      - last-ack
-+      - time-wait
-+      - close
-+      - syn-sent2
-+      - max
-+      - ignore
-+      - retrans
-+      - unack
-+      - timeout-max
-+  -
-+    name: nf-ct-sctp-state
-+    type: enum
-+    entries:
-+      - none
-+      - cloned
-+      - cookie-wait
-+      - cookie-echoed
-+      - established
-+      - shutdown-sent
-+      - shutdown-received
-+      - shutdown-ack-sent
-+      - shutdown-heartbeat-sent
-+  -
-+    name: nf-ct-status
-+    type: flags
-+    entries:
-+      - expected
-+      - seen-reply
-+      - assured
-+      - confirmed
-+      - src-nat
-+      - dst-nat
-+      - seq-adj
-+      - src-nat-done
-+      - dst-nat-done
-+      - dying
-+      - fixed-timeout
-+      - template
-+      - nat-clash
-+      - helper
-+      - offload
-+      - hw-offload
-+
-+attribute-sets:
-+  -
-+    name: counter-attrs
-+    attributes:
-+      -
-+        name: packets
-+        type: u64
-+        byte-order: big-endian
-+      -
-+        name: bytes
-+        type: u64
-+        byte-order: big-endian
-+      -
-+        name: packets-old
-+        type: u32
-+      -
-+        name: bytes-old
-+        type: u32
-+      -
-+        name: pad
-+        type: pad
-+  -
-+    name: tuple-proto-attrs
-+    attributes:
-+      -
-+        name: proto-num
-+        type: u8
-+        doc: l4 protocol number
-+      -
-+        name: proto-src-port
-+        type: u16
-+        byte-order: big-endian
-+        doc: l4 source port
-+      -
-+        name: proto-dst-port
-+        type: u16
-+        byte-order: big-endian
-+        doc: l4 source port
-+      -
-+        name: proto-icmp-id
-+        type: u16
-+        byte-order: big-endian
-+        doc: l4 icmp id
-+      -
-+        name: proto-icmp-type
-+        type: u8
-+      -
-+        name: proto-icmp-code
-+        type: u8
-+      -
-+        name: proto-icmpv6-id
-+        type: u16
-+        byte-order: big-endian
-+        doc: l4 icmp id
-+      -
-+        name: proto-icmpv6-type
-+        type: u8
-+      -
-+        name: proto-icmpv6-code
-+        type: u8
-+  -
-+    name: tuple-ip-attrs
-+    attributes:
-+      -
-+        name: ip-v4-src
-+        type: u32
-+        byte-order: big-endian
-+        display-hint: ipv4
-+        doc: ipv4 source address
-+      -
-+        name: ip-v4-dst
-+        type: u32
-+        byte-order: big-endian
-+        display-hint: ipv4
-+        doc: ipv4 destination address
-+      -
-+        name: ip-v6-src
-+        type: binary
-+        checks:
-+          min-len: 16
-+        byte-order: big-endian
-+        display-hint: ipv6
-+        doc: ipv6 source address
-+      -
-+        name: ip-v6-dst
-+        type: binary
-+        checks:
-+          min-len: 16
-+        byte-order: big-endian
-+        display-hint: ipv6
-+        doc: ipv6 destination address
-+  -
-+    name: tuple-attrs
-+    attributes:
-+    -
-+        name: tuple-ip
-+        type: nest
-+        nested-attributes: tuple-ip-attrs
-+        doc: conntrack l3 information
-+    -
-+        name: tuple-proto
-+        type: nest
-+        nested-attributes: tuple-proto-attrs
-+        doc: conntrack l4 information
-+    -
-+        name: tuple-zone
-+        type: u16
-+        byte-order: big-endian
-+        doc: conntrack zone id
-+  -
-+    name: protoinfo-tcp-attrs
-+    attributes:
-+    -
-+        name: tcp-state
-+        type: u8
-+        enum: nf-ct-tcp-state
-+        doc: tcp connection state
-+    -
-+        name: tcp-wscale-original
-+        type: u8
-+        doc: window scaling factor in original direction
-+    -
-+        name: tcp-wscale-reply
-+        type: u8
-+        doc: window scaling factor in reply direction
-+    -
-+        name: tcp-flags-original
-+        type: binary
-+        struct: nf-ct-tcp-flags-mask
-+    -
-+        name: tcp-flags-reply
-+        type: binary
-+        struct: nf-ct-tcp-flags-mask
-+  -
-+    name: protoinfo-dccp-attrs
-+    attributes:
-+    -
-+        name: dccp-state
-+        type: u8
-+        doc: dccp connection state
-+    -
-+        name: dccp-role
-+        type: u8
-+    -
-+        name: dccp-handshake-seq
-+        type: u64
-+        byte-order: big-endian
-+    -
-+        name: dccp-pad
-+        type: pad
-+  -
-+    name: protoinfo-sctp-attrs
-+    attributes:
-+    -
-+        name: sctp-state
-+        type: u8
-+        doc: sctp connection state
-+        enum: nf-ct-sctp-state
-+    -
-+        name: vtag-original
-+        type: u32
-+        byte-order: big-endian
-+    -
-+        name: vtag-reply
-+        type: u32
-+        byte-order: big-endian
-+  -
-+    name: protoinfo-attrs
-+    attributes:
-+    -
-+        name: protoinfo-tcp
-+        type: nest
-+        nested-attributes: protoinfo-tcp-attrs
-+        doc: conntrack tcp state information
-+    -
-+        name: protoinfo-dccp
-+        type: nest
-+        nested-attributes: protoinfo-dccp-attrs
-+        doc: conntrack dccp state information
-+    -
-+        name: protoinfo-sctp
-+        type: nest
-+        nested-attributes: protoinfo-sctp-attrs
-+        doc: conntrack sctp state information
-+  -
-+    name: help-attrs
-+    attributes:
-+      -
-+        name: help-name
-+        type: string
-+        doc: helper name
-+  -
-+    name: nat-proto-attrs
-+    attributes:
-+      -
-+        name: nat-port-min
-+        type: u16
-+        byte-order: big-endian
-+      -
-+        name: nat-port-max
-+        type: u16
-+        byte-order: big-endian
-+  -
-+    name: nat-attrs
-+    attributes:
-+      -
-+        name: nat-v4-minip
-+        type: u32
-+        byte-order: big-endian
-+      -
-+        name: nat-v4-maxip
-+        type: u32
-+        byte-order: big-endian
-+      -
-+        name: nat-v6-minip
-+        type: binary
-+      -
-+        name: nat-v6-maxip
-+        type: binary
-+      -
-+        name: nat-proto
-+        type: nest
-+        nested-attributes: nat-proto-attrs
-+  -
-+    name: seqadj-attrs
-+    attributes:
-+      -
-+        name: correction-pos
-+        type: u32
-+        byte-order: big-endian
-+      -
-+        name: offset-before
-+        type: u32
-+        byte-order: big-endian
-+      -
-+        name: offset-after
-+        type: u32
-+        byte-order: big-endian
-+  -
-+    name: secctx-attrs
-+    attributes:
-+      -
-+        name: secctx-name
-+        type: string
-+  -
-+    name: synproxy-attrs
-+    attributes:
-+      -
-+        name: isn
-+        type: u32
-+        byte-order: big-endian
-+      -
-+        name: its
-+        type: u32
-+        byte-order: big-endian
-+      -
-+        name: tsoff
-+        type: u32
-+        byte-order: big-endian
-+  -
-+    name: conntrack-attrs
-+    attributes:
-+      -
-+        name: tuple-orig
-+        type: nest
-+        nested-attributes: tuple-attrs
-+        doc: conntrack l3+l4 protocol information, original direction
-+      -
-+        name: tuple-reply
-+        type: nest
-+        nested-attributes: tuple-attrs
-+        doc: conntrack l3+l4 protocol information, reply direction
-+      -
-+        name: status
-+        type: u32
-+        byte-order: big-endian
-+        enum: nf-ct-status
-+        enum-as-flags: true
-+        doc: conntrack flag bits
-+      -
-+        name: protoinfo
-+        type: nest
-+        nested-attributes: protoinfo-attrs
-+      -
-+        name: help
-+        type: nest
-+        nested-attributes: help-attrs
-+      -
-+        name: nat-src
-+        type: nest
-+        nested-attributes: nat-attrs
-+      -
-+        name: timeout
-+        type: u32
-+        byte-order: big-endian
-+      -
-+        name: mark
-+        type: u32
-+        byte-order: big-endian
-+      -
-+        name: counters-orig
-+        type: nest
-+        nested-attributes: counter-attrs
-+      -
-+        name: counters-reply
-+        type: nest
-+        nested-attributes: counter-attrs
-+      -
-+        name: use
-+        type: u32
-+        byte-order: big-endian
-+      -
-+        name: id
-+        type: u32
-+        byte-order: big-endian
-+      -
-+        name: nat-dst
-+        type: nest
-+        nested-attributes: nat-attrs
-+      -
-+        name: tuple-master
-+        type: nest
-+        nested-attributes: tuple-attrs
-+      -
-+        name: seq-adj-orig
-+        type: nest
-+        nested-attributes: seqadj-attrs
-+      -
-+        name: seq-adj-reply
-+        type: nest
-+        nested-attributes: seqadj-attrs
-+      -
-+        name: secmark
-+        type: binary
-+        doc: obsolete
-+      -
-+        name: zone
-+        type: u16
-+        byte-order: big-endian
-+        doc: conntrack zone id
-+      -
-+        name: secctx
-+        type: nest
-+        nested-attributes: secctx-attrs
-+      -
-+        name: timestamp
-+        type: u64
-+        byte-order: big-endian
-+      -
-+        name: mark-mask
-+        type: u32
-+        byte-order: big-endian
-+      -
-+        name: labels
-+        type: binary
-+      -
-+        name: labels mask
-+        type: binary
-+      -
-+        name: synproxy
-+        type: nest
-+        nested-attributes: synproxy-attrs
-+      -
-+        name: filter
-+        type: nest
-+        nested-attributes: tuple-attrs
-+      -
-+        name: status-mask
-+        type: u32
-+        byte-order: big-endian
-+        enum: nf-ct-status
-+        enum-as-flags: true
-+        doc: conntrack flag bits to change
-+      -
-+        name: timestamp-event
-+        type: u64
-+        byte-order: big-endian
-+  -
-+    name: conntrack-stats-attrs
-+    attributes:
-+      -
-+        name: searched
-+        type: u32
-+        byte-order: big-endian
-+        doc: obsolete
-+      -
-+        name: found
-+        type: u32
-+        byte-order: big-endian
-+      -
-+        name: new
-+        type: u32
-+        byte-order: big-endian
-+        doc: obsolete
-+      -
-+        name: invalid
-+        type: u32
-+        byte-order: big-endian
-+        doc: obsolete
-+      -
-+        name: ignore
-+        type: u32
-+        byte-order: big-endian
-+        doc: obsolete
-+      -
-+        name: delete
-+        type: u32
-+        byte-order: big-endian
-+        doc: obsolete
-+      -
-+        name: delete-list
-+        type: u32
-+        byte-order: big-endian
-+        doc: obsolete
-+      -
-+        name: insert
-+        type: u32
-+        byte-order: big-endian
-+      -
-+        name: insert-failed
-+        type: u32
-+        byte-order: big-endian
-+      -
-+        name: drop
-+        type: u32
-+        byte-order: big-endian
-+      -
-+        name: early-drop
-+        type: u32
-+        byte-order: big-endian
-+      -
-+        name: error
-+        type: u32
-+        byte-order: big-endian
-+      -
-+        name: search-restart
-+        type: u32
-+        byte-order: big-endian
-+      -
-+        name: clash-resolve
-+        type: u32
-+        byte-order: big-endian
-+      -
-+        name: chain-toolong
-+        type: u32
-+        byte-order: big-endian
-+
-+operations:
-+  enum-model: directional
-+  list:
-+    -
-+      name: get
-+      doc: get / dump entries
-+      attribute-set: conntrack-attrs
-+      fixed-header: nfgenmsg
-+      do:
-+        request:
-+          value: 0x101
-+          attributes:
-+            - tuple-orig
-+            - tuple-reply
-+            - zone
-+        reply:
-+          value: 0x100
-+          attributes:
-+            - tuple-orig
-+            - tuple-reply
-+            - status
-+            - protoinfo
-+            - help
-+            - nat-src
-+            - nat-dst
-+            - timeout
-+            - mark
-+            - counter-orig
-+            - counter-reply
-+            - use
-+            - id
-+            - nat-dst
-+            - tuple-master
-+            - seq-adj-orig
-+            - seq-adj-reply
-+            - zone
-+            - secctx
-+            - labels
-+            - synproxy
-+      dump:
-+        request:
-+          value: 0x101
-+          attributes:
-+            - nfgen-family
-+            - mark
-+            - filter
-+            - status
-+            - zone
-+        reply:
-+          value: 0x100
-+          attributes:
-+            - tuple-orig
-+            - tuple-reply
-+            - status
-+            - protoinfo
-+            - help
-+            - nat-src
-+            - nat-dst
-+            - timeout
-+            - mark
-+            - counter-orig
-+            - counter-reply
-+            - use
-+            - id
-+            - nat-dst
-+            - tuple-master
-+            - seq-adj-orig
-+            - seq-adj-reply
-+            - zone
-+            - secctx
-+            - labels
-+            - synproxy
-+    -
-+      name: get-stats
-+      doc: dump pcpu conntrack stats
-+      attribute-set: conntrack-stats-attrs
-+      fixed-header: nfgenmsg
-+      dump:
-+        request:
-+          value: 0x104
-+        reply:
-+          value: 0x104
-+          attributes:
-+            - searched
-+            - found
-+            - insert
-+            - insert-failed
-+            - drop
-+            - early-drop
-+            - error
-+            - search-restart
-+            - clash-resolve
-+            - chain-toolong
--- 
-2.48.1
-
+Usually we use the mlxsw_sp_port->dev as the second argument, but which
+port to use here? Any random port that's under the bridge, or is there a
+specific one for the vxlan that should be used?
 
