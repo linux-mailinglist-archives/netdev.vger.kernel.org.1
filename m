@@ -1,263 +1,230 @@
-Return-Path: <netdev+bounces-164760-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-164746-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id CB779A2EF61
-	for <lists+netdev@lfdr.de>; Mon, 10 Feb 2025 15:11:53 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2E1C6A2EF45
+	for <lists+netdev@lfdr.de>; Mon, 10 Feb 2025 15:10:12 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id C6ABD18875C8
-	for <lists+netdev@lfdr.de>; Mon, 10 Feb 2025 14:11:49 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id BE0111665A3
+	for <lists+netdev@lfdr.de>; Mon, 10 Feb 2025 14:10:10 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AEC14235363;
-	Mon, 10 Feb 2025 14:10:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C5EC1233131;
+	Mon, 10 Feb 2025 14:10:07 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="bgI9sPS7"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="e6IhQ4N+"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.10])
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.13])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D0B59236448
-	for <netdev@vger.kernel.org>; Mon, 10 Feb 2025 14:10:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.10
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1739196653; cv=none; b=cJq/olDIfgYyyh2Jq5LmFW100HvFQjp81SS/LRMophzfQ2AGqD+KC+rlpT7PrwPnSIdOlorbsC5saHJg239jQO/65kIJNnq9rGbTjwsVaECQTYqif6b4+3DGiXLAkh3j1sTPoTiO8nxyr14ebVta3syNs5tFjydxZ60JCdN1SAs=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1739196653; c=relaxed/simple;
-	bh=bfA1jw3N3ySgwrrR6JwlgamqYiFYJ13+8x9rse5vQHU=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=LA2qJXNm/IUj0owGAbNBRNbSf/tgtYci2QflfUhj01gc+BHfRK+7aN2SMgVMRRLgJFor3TLq8kaesEBldm1oILrY64JhU0P6k+f+WrXcxp2dRttEZAkl2PTZW4IQMdjskzHsIZZcX0M6p49rjZCwSu4I5iOEx3PCoKAYPm5qIig=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=bgI9sPS7; arc=none smtp.client-ip=198.175.65.10
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1CBB82327A3;
+	Mon, 10 Feb 2025 14:10:06 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=192.198.163.13
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1739196607; cv=fail; b=FirqevcmbTLQ4nq0QOv+Cgc5V6zWI2m3WYU1ZojyMqnod2gZ9e0WrqKfgd1UwHGZRr1IuxeDgBWUJvYW5HfUL7k52OwiZZYCJ4PZ64QgWCVa2WN0ATa9sLWR1TBQjIg8YL+7sWeiMLzYfRaoOBG0mBCj8AgVJ8LzQOu9Xm4ZTp8=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1739196607; c=relaxed/simple;
+	bh=TcLlsa7zdDLNXiXU5SUHbqNXqEOYMxwjmyplWFn80tg=;
+	h=Message-ID:Date:Subject:To:CC:References:From:In-Reply-To:
+	 Content-Type:MIME-Version; b=r04Ri4YKDYvlDMPAEPBz8FR4CWkoT/TCkf62bwAjoBUKo4sTE+9fNQJFfzPm0QzBBM+v0jmOo9OQcPnGypT9M1dl9o5YDEoE3ClnMuqAgMlMGnmUvUqJd3EtJBteoEGX49oGiPZGuzSUsDBhndXRQmYr4VIJ1a7BNguI+vue2IY=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=e6IhQ4N+; arc=fail smtp.client-ip=192.198.163.13
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1739196652; x=1770732652;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=bfA1jw3N3ySgwrrR6JwlgamqYiFYJ13+8x9rse5vQHU=;
-  b=bgI9sPS7qHEKHGGxG1190fj/43POrajcyzNfjP7GLDJS8/ufs1+c47at
-   7scaI4mSZRpYT/3GM9/Yryv1ndt0n6LFu3pybmWMiIS3SD+7DZiWw2VvA
-   gf2a8AI07/RaUD5i3wvWSlZozC6owJPc+xXzTvazwil++F7fx3sP2IaWN
-   5xZHN0WHCcRUQutRzUpMaDQQhHdUzHXEX7uNck28n/Obwv15ahN4GkFbm
-   omM/4i4gtTDABVVGfIJZ8uhA2dsGaBeu2dIiqoVZRqIqwK3KbY9noI8Hh
-   5JyN7yko2sFOIBP1DhCk+izs6sBg7jYUcZ9uNZwgBaxdeywFOrikFixjS
+  t=1739196607; x=1770732607;
+  h=message-id:date:subject:to:cc:references:from:
+   in-reply-to:content-transfer-encoding:mime-version;
+  bh=TcLlsa7zdDLNXiXU5SUHbqNXqEOYMxwjmyplWFn80tg=;
+  b=e6IhQ4N+hNqRlWMf+Eqms69J8+3hXKNvR7uclMVA6MLJDEDyk6d1iAxW
+   UBu0mpX2TnuhjtbHfkhqmuO1VzbjJbVPqzBMk23ejwMXIzvVksOaupDT5
+   9K6Nw1tQJMm7boEWoSC1r0pinnyRLnOrbt3yQA6OodMKwvLyr/NCwuwCg
+   3i6sGdjqspW2Dcf2Pfi+LKvZZegy0Qbhj/Z/tKJ4uBTwG+eQcNzSONZLY
+   YJHKDqzl9uCz2Yf8DcuGNPYnPen/3v7xeVE9VO5x9elYYGlfBUBMjkJCH
+   6372lUqDorsqSycAeyjGKVAjKM4pHJuLQ5N433MJtl74+oXQCci6JQ1U/
    Q==;
-X-CSE-ConnectionGUID: qF11OX5XRK+W9jhzSEwLAw==
-X-CSE-MsgGUID: l9/uwN3QT0OQyTGnziHKKg==
-X-IronPort-AV: E=McAfee;i="6700,10204,11341"; a="57190499"
+X-CSE-ConnectionGUID: 5vKxBWI6T2CNml2580elPQ==
+X-CSE-MsgGUID: tLxb763eRiiCfuS+kKSmCg==
+X-IronPort-AV: E=McAfee;i="6700,10204,11341"; a="42617541"
 X-IronPort-AV: E=Sophos;i="6.13,274,1732608000"; 
-   d="scan'208";a="57190499"
-Received: from orviesa009.jf.intel.com ([10.64.159.149])
-  by orvoesa102.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 10 Feb 2025 06:10:52 -0800
-X-CSE-ConnectionGUID: w8tqpnawRaSmVSNuk2qljg==
-X-CSE-MsgGUID: dK2ud7R1QXe1tCb0GHtlGw==
+   d="scan'208";a="42617541"
+Received: from fmviesa004.fm.intel.com ([10.60.135.144])
+  by fmvoesa107.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 10 Feb 2025 06:10:05 -0800
+X-CSE-ConnectionGUID: VvrJUcyiS4izriSCqxm6ag==
+X-CSE-MsgGUID: TgFiEdSJQVK4SQsbUBuRww==
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="6.13,274,1732608000"; 
-   d="scan'208";a="111964244"
-Received: from os-delivery.igk.intel.com ([10.102.18.218])
-  by orviesa009.jf.intel.com with ESMTP; 10 Feb 2025 06:10:49 -0800
-From: Jedrzej Jagielski <jedrzej.jagielski@intel.com>
-To: intel-wired-lan@lists.osuosl.org
-Cc: anthony.l.nguyen@intel.com,
-	netdev@vger.kernel.org,
-	horms@kernel.org,
-	Andrii Staikov <andrii.staikov@intel.com>,
-	Mateusz Polchlopek <mateusz.polchlopek@intel.com>,
-	Jedrzej Jagielski <jedrzej.jagielski@intel.com>
-Subject: [PATCH iwl-next v2 13/13] ixgbe: add support for FW rollback mode
-Date: Mon, 10 Feb 2025 14:56:39 +0100
-Message-Id: <20250210135639.68674-14-jedrzej.jagielski@intel.com>
-X-Mailer: git-send-email 2.31.1
-In-Reply-To: <20250210135639.68674-1-jedrzej.jagielski@intel.com>
-References: <20250210135639.68674-1-jedrzej.jagielski@intel.com>
+   d="scan'208";a="117265080"
+Received: from orsmsx603.amr.corp.intel.com ([10.22.229.16])
+  by fmviesa004.fm.intel.com with ESMTP/TLS/AES256-GCM-SHA384; 10 Feb 2025 06:10:04 -0800
+Received: from orsmsx601.amr.corp.intel.com (10.22.229.14) by
+ ORSMSX603.amr.corp.intel.com (10.22.229.16) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.44; Mon, 10 Feb 2025 06:10:04 -0800
+Received: from orsedg603.ED.cps.intel.com (10.7.248.4) by
+ orsmsx601.amr.corp.intel.com (10.22.229.14) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.44 via Frontend Transport; Mon, 10 Feb 2025 06:10:04 -0800
+Received: from NAM10-BN7-obe.outbound.protection.outlook.com (104.47.70.41) by
+ edgegateway.intel.com (134.134.137.100) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.1.2507.44; Mon, 10 Feb 2025 06:10:03 -0800
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=lR77eJAvdcDD6pbKQJsjonFUMS7axVW1RzF9H0KIhq+3QqxFw0+viCpS45nIcdXWhcWIW1cyP+Kh8udd0CT/+kKl70QJC264Jeuwv8TpspPJy45F6runQxuWzMmM3d7KfgDUlB+dUlXN9kM6q1HoT8f8EgOQRB/57XK+DwQjJt65fVq+Qc4nnX/0THRya4JhqKsBu8iOrVS+YN2JgVj/Nn/5ijua4fA/KX6eVLpOeKpbQWFJFHZVQajCqvwZQN9Xmc6FEOv+k72iKaqgvnxBLLfn11rVzTk8JUIwiCtL0UnANcniOkKd6lOQnCvrFGRuGoTNqRRudPeSrQIJV9LWew==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=TcLlsa7zdDLNXiXU5SUHbqNXqEOYMxwjmyplWFn80tg=;
+ b=s8bcbFwXYg72zT+hh45fZMae1wIq2Cdb8nOUDu1Qcy3pjkp2KWzhqMh42NXiVhgkR49bxBE51PbF8bfeEhYabj1/R3OsfhNh7Eyn10tj6UgBQ25lAB4BC+SwspBqmrLmjqinuvfolMejm+WuZY4q5d2hk+A+PnkMw/TpPMSEoj/ILtZ1ps6SdsWJaY1VGh81Du5xHQvKFrgWcPuwvEI10DCKjQtcxKyek2powq7zjaXOI+shi92hh3c4IChARj1F6w7gD9RjH6sNvRIhGxu8O7ZiUIvnDk9P3PoFjN0YeoouPM+5TBPeFSJ1T5UTOX5WYeeXM7zLN4jogDFUW/dF/g==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=intel.com;
+Received: from DS0PR11MB8718.namprd11.prod.outlook.com (2603:10b6:8:1b9::20)
+ by MN2PR11MB4760.namprd11.prod.outlook.com (2603:10b6:208:266::22) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8422.19; Mon, 10 Feb
+ 2025 14:09:48 +0000
+Received: from DS0PR11MB8718.namprd11.prod.outlook.com
+ ([fe80::4b3b:9dbe:f68c:d808]) by DS0PR11MB8718.namprd11.prod.outlook.com
+ ([fe80::4b3b:9dbe:f68c:d808%4]) with mapi id 15.20.8422.015; Mon, 10 Feb 2025
+ 14:09:47 +0000
+Message-ID: <79d05c4b-bcfb-4dd3-84d9-b44e64eb4e66@intel.com>
+Date: Mon, 10 Feb 2025 15:05:53 +0100
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next v4 0/8] bpf: cpumap: enable GRO for XDP_PASS
+ frames
+To: Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller"
+	<davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Jakub Kicinski
+	<kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>
+CC: Lorenzo Bianconi <lorenzo@kernel.org>, Daniel Xu <dxu@dxuuu.xyz>, "Alexei
+ Starovoitov" <ast@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>,
+	"Andrii Nakryiko" <andrii@kernel.org>, John Fastabend
+	<john.fastabend@gmail.com>, =?UTF-8?Q?Toke_H=C3=B8iland-J=C3=B8rgensen?=
+	<toke@kernel.org>, "Jesper Dangaard Brouer" <hawk@kernel.org>, Martin KaFai
+ Lau <martin.lau@linux.dev>, <netdev@vger.kernel.org>, <bpf@vger.kernel.org>,
+	<linux-kernel@vger.kernel.org>
+References: <20250205163609.3208829-1-aleksander.lobakin@intel.com>
+From: Alexander Lobakin <aleksander.lobakin@intel.com>
+Content-Language: en-US
+In-Reply-To: <20250205163609.3208829-1-aleksander.lobakin@intel.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: VI1PR0902CA0037.eurprd09.prod.outlook.com
+ (2603:10a6:802:1::26) To DS0PR11MB8718.namprd11.prod.outlook.com
+ (2603:10b6:8:1b9::20)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: DS0PR11MB8718:EE_|MN2PR11MB4760:EE_
+X-MS-Office365-Filtering-Correlation-Id: 6eed9a15-9ed0-4734-33d0-08dd49dc939e
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;ARA:13230040|1800799024|376014|7416014|366016;
+X-Microsoft-Antispam-Message-Info: =?utf-8?B?UFdSdW5aVmhscUcrR3NjVHY3ZGhZUkxvcXltRU93Y1ZCMEFMZFNRZjRWWG1v?=
+ =?utf-8?B?ZGRjZ2QxN3hpV0Q3OThXUGRNL1o4MmpuVnhCTktaM3BxTFV1SExwU2pGZThR?=
+ =?utf-8?B?MFlkZEdISnRqTDVCR2dWd2JRYTBaNTdrYWRJL1NXN1RtaUdHSjRncGN1NDNp?=
+ =?utf-8?B?QlZPSGZmVWpyL2FVbml3bXZlY3dxSTB4aVBHUXZqaU5Ga0EwYnhVRU9xVzlX?=
+ =?utf-8?B?aEFQdW4xY1IwZzRYa1RqT09UN3JObGRaZlJTZ1gweW81VU16UXViSS9HMXA4?=
+ =?utf-8?B?bGQxOGFmZ1RGMm1QMnZHOUxpQ1h4T2hMSnREVGVUMVdHUEZLOCtyK0o1YnI0?=
+ =?utf-8?B?T3hGaUVsbVFqdGhzVEQ4V05IczhtUm9ka00zR0JiNTJnVmFkZzJ0cGdXbXZh?=
+ =?utf-8?B?eXo5NG1tN0d2SEhWOFpWNEZKTm8xM29kdkhjK2ZYd2g2Y3dMUjRtY1JuMHJs?=
+ =?utf-8?B?TWdLQUdwT1puOThFSlFISjRXV2krY0poc0hud2ozczRodVFXelgzc2Mxc1VT?=
+ =?utf-8?B?UnhPa0NYd3dGamxxS0Vmd2RQMGFqU3ZnRWNrSWJjUjh5RUhJbFlvNmFDQ0Zu?=
+ =?utf-8?B?V0g2cXhwbWRieFlEUzhKS01La2JXNUZic0tGbVQ1U08ydVI1SVRRSEgvKzFs?=
+ =?utf-8?B?aEtMck5xYkVsUFhmWWliNVBpamxGam1yaDIvWC9qcHdSRktha255ZFRodkYv?=
+ =?utf-8?B?OVQ3b3N2cHc3UldSdWFiVkxVWm5RWHZiY0llMHNTSSsrcFN2NEdhZzJuTU9T?=
+ =?utf-8?B?bUprVHFtMXo1MFdKSDRDYnE4bk1JbHF3RFJiaDdHTFliUlFqZ0xXbDNYR2Rx?=
+ =?utf-8?B?RXZLcWhzd1EyUEpnKzlUbFJoNzdpT1U1UFMvOXVLRzF0YVFqdW9qRUROemVx?=
+ =?utf-8?B?UUNEUnlUc2Z1TzQ4UkpHaWVhNzJzd3lFK01zNXFBaGNwQU5iaWwweHdjVU5F?=
+ =?utf-8?B?SzBtbC85a2JIY09kMUowNnBJaHoxS015NUVqUC8ySyszcDRnVkk0YW9vTHlD?=
+ =?utf-8?B?S3gyMkxDQloxZmE4NHpTVmpDb0ZlUDJ3N3ozcWV0bUpBVXJQMzFFUDlLYTVX?=
+ =?utf-8?B?bTZuM1F3Rkw0UCtvakdLR2FvaDBVK2RsZ2loRUY5RUJjRitIL1lVYzZoVjR1?=
+ =?utf-8?B?QVkzT1BzZVV6Mm1NaUc4dzVyTks2UjVmZWhVWVdRbmNaL21HK3o1b0RPN21k?=
+ =?utf-8?B?L1lLeXhhandNVTN2ZkxtYkdLa3hzamdBK3RaZkFjTDRBQmN5SXdHTit4aDJI?=
+ =?utf-8?B?Skc0dTc1WWxHUWJ3VFFieUhLZmtBT1hEMjFodmdIQkNSa0VVemJvMWtoSHlL?=
+ =?utf-8?B?Y0ptM2dwYkhsdU9EMXMrcldTdDN3dzdDemlNWW1taEtYeHRTbWVlaUlZVDBB?=
+ =?utf-8?B?S1NEQ0l3R1oxbGVDZmRNRHd4SEk5bXlNUnZhVXJJMXBsdzRER2ZXc2lSKzBu?=
+ =?utf-8?B?NENEUDgvTnZlMUx5cFQ0dlJDVGg1Y0tMbGU1ell0dFFmWEdkZFkxWnJ1dzg5?=
+ =?utf-8?B?RFJjNFdXTEQxS3oxc0Q3RUVRaU0zT1d5eUNwNEdMaXgwK2k4b2dhamJuc292?=
+ =?utf-8?B?RjlrK0t6NTR4S2R4T3NCU3k3d3d5b1JHVlBDeDl2bTZiK1JWQ2N6R3hoQ21s?=
+ =?utf-8?B?OXJVVlYvOHp5ZnB0ZlRNTjkzZlJGYkVjbExScnBTTXJsUHcwMklSeGdJQk9s?=
+ =?utf-8?B?ZmcrakQyUVNiMis0RDdMaDBiZnB4c0FPTDllK21PVzlvZ1QyWXE4clhlQytj?=
+ =?utf-8?B?aU52aDJON2lEejVkZ1hhVDBOay9RbDA3NmxaNWZrZ0diVjVjMFlEbFZVLzNQ?=
+ =?utf-8?B?Uy9ET3ZNdUxUdkgwTElnbk04UVBtcHozYm8yRzNOcUVMQk1wS3MzcTJsb1Mr?=
+ =?utf-8?Q?5mqgiquKFgzyz?=
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DS0PR11MB8718.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(1800799024)(376014)(7416014)(366016);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?N2ZZOG9hTGptdmxzQzFJa3ZRdGtLR3BpQmdiN0Z2cTZrMGdCUlFvZnVRVElh?=
+ =?utf-8?B?TW42UXMxLzFHQmZQMVZyZEdFZ2NBVktQWlAySEExVmhrUWpNSFNlNEJxZ09E?=
+ =?utf-8?B?anowK1VwbW41WHhRYVJPRzJtaWx1VFB2RXBQTERITkFWMHBoZkVKNUVjaVMw?=
+ =?utf-8?B?RytFblZDZ0lsN0gxNWRvNkhKaHV3MDBzcVJyRzI4bWxoN3FIRzdkRUtQUHdl?=
+ =?utf-8?B?MnArcjhiMkJkU29SRWJlak9xbFhIbTUvMXRDNHFLTm1JK2NXdlFhakMxdjlv?=
+ =?utf-8?B?TkZrVi91NTRtQUJpTndwN0YrWDFCTTdlV1lPYzJIYkxlamdrVTJNajNLYnpK?=
+ =?utf-8?B?cHo4NlBCU2lNT2U3L05JR1N0bTJYekZkNE1QdkcrMjJEVDh2TGdqeXkrbDFt?=
+ =?utf-8?B?YmxiMEVnVzdKVFlmOC9TWWxBY0JheUEyWUE2eXFFNjFkZ0xBaUxOSFVXY3g1?=
+ =?utf-8?B?QXNMVkNMOU5oR1dqYWlCRUtnRFNGSkNJRXpvOGJZL0JMeG9SOHRJYXJVODYy?=
+ =?utf-8?B?bDdYY1FKbXo2R2c2SXgrdGlscHJaZGpKWE5tbEthdDl4T0c4NFBIY3hGNGVP?=
+ =?utf-8?B?ZmwvVEhiVys3V2lGTFYrZCtHYnZ4MUtKb3djLzBBRU84SUhBa0ZLbFlJbGhH?=
+ =?utf-8?B?TzE3dXYzdEQ0bGpnVVpqQ09xOHBxOUhPckREaFFScXhqSkNkWjVoVTdzRVFE?=
+ =?utf-8?B?MWJvVFFZbFRKU2ZlQVpSKzR1aDc3Y2QreDd0UGRITzJibU9UR1dYM3BLVVhp?=
+ =?utf-8?B?cU1lNXJMYmRpV0EySUNVOUh6Zkl1V3NIMUF0eDh5SnNTV2grVWRlV044Rk5R?=
+ =?utf-8?B?d0xnek1DY3J6SHZJTjN4SGpPSzlhU0sxL3FLcU8yb0NBRktKajhhOFZ3WDhq?=
+ =?utf-8?B?MnpFdnd1ZFN6dnBHZ3hMWjNFalUrank5aGtKRS9XQ0lueFRsclhSQ0V4L0Z3?=
+ =?utf-8?B?ZzBaSHJLaHFDTXNuQUhuL3duMWtxZm5OM1dtS1ZZODdzT1ZNUkdzUDBJakhW?=
+ =?utf-8?B?c09hVERwZ0RYK3BrbUpTbExPRGhrWGk3OW9Hc1dOMXU4V3FEMENnRG9kV1g2?=
+ =?utf-8?B?MEtCckFvbURPNklCdmJxMzdJQXFyL1RYMUNkQkxxLzc2UWp5bEtnTXpkeGYz?=
+ =?utf-8?B?RXBQcHNndW9TUWp0LzIzTWZZeXVXeVdtSHkyMmFmQk5tam12ZHhlWkUyaDVD?=
+ =?utf-8?B?Vm9XWmtWWlRQaEF3VExsN2NoQ0Y2clNQMWZtZkRiL2JrOXkweUtveVVIWVA5?=
+ =?utf-8?B?endFcnc4cHM5NXhlNHpzY3NJVVVMTDZFNXdjRFh3dzVZN0ZIL3hCRVByWjJX?=
+ =?utf-8?B?cmFweWNMVmthckFtOCtkT1h6VURkaVhPalNNWjZweG94WWdsdEZPTjMraW1C?=
+ =?utf-8?B?SXM4dVE4b0diaDNoT1hLaXdkcllVcmFPQ0F0V1Z1TlcvVWNQNTdJOXIxcHJs?=
+ =?utf-8?B?dG94aWxSL3c3SjNqVHM1U2JuK1AvbzhsalBMcmM5YTM3YlpwUnIvMW82TUVO?=
+ =?utf-8?B?eGxBck1idHdyOCtBRGo2S0EvRXNWR3hFdU1YblhDUGx3bHpwa0crYVgveXhV?=
+ =?utf-8?B?K3dzM1FJSElSWlE3T3BTK2dieUdQYzQ3bUhmMGdOVWQ3RDYwVmREYWROSWt1?=
+ =?utf-8?B?TUllWnBhcVh3dU5iV0Q1dFJsSWJUV1BBU09rNTM5c3lGdSsrNUtETjN4RlV0?=
+ =?utf-8?B?SXBMTUE5Q1J1N0p4Rm1JRXg1MlpZM0JwR2J6UWs1NFJBMlpJRlF0eEdWcG9I?=
+ =?utf-8?B?aTBvdy96YlI2YnpuY0Z2dEZnZzB4QnB4UUhqNitGVm9Zc2FyS3pOcFQzSHMz?=
+ =?utf-8?B?eUxudThYejNYQzYxUWFqeVYxR1B2ZFpoNE1nSldGWFhZSWhEajdpQjdTd0tz?=
+ =?utf-8?B?YUtXN0ViTGFrZUlOS2NJNmVHNVVtQkY5czJ0RFdWUTdrdXVjeGFCTE1Jc05t?=
+ =?utf-8?B?MFlKYjU5djY4VUJqMmJ6UUI5ZklPb2FsNU9hT1JORGdLWU5oMzMxZ3luMUxO?=
+ =?utf-8?B?Rk5mUGtiRXZrckVjb0JLNWpHVGJibnJCOE9UNXFMS0lzU2NnY3FYQ205K3Q3?=
+ =?utf-8?B?cVBkZzhxUnJxT0wxbWV2L2ovS25RUm5DYWIvbWoyWG01Ly9rU2FuOUE4Y3ZJ?=
+ =?utf-8?B?WnBZYkpIVzdHS1NCSk9uYTc2SGY0QjF5MXRFTGZvamR2SGdnVWJLajc5eHBw?=
+ =?utf-8?B?anc9PQ==?=
+X-MS-Exchange-CrossTenant-Network-Message-Id: 6eed9a15-9ed0-4734-33d0-08dd49dc939e
+X-MS-Exchange-CrossTenant-AuthSource: DS0PR11MB8718.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 10 Feb 2025 14:09:47.8000
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: 9mVcmwRxQOJkrOLepW5RBCNOstqxeeOQ8p68ue8XHL8ulzykQAcb0Xy8ZB3bztj4CeqrlnA3ffssuGooadyMxrjc50RSd+CilWMuYjV35aM=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: MN2PR11MB4760
+X-OriginatorOrg: intel.com
 
-From: Andrii Staikov <andrii.staikov@intel.com>
+From: Alexander Lobakin <aleksander.lobakin@intel.com>
+Date: Wed, 5 Feb 2025 17:36:01 +0100
 
-The driver should detect whether the device entered FW rollback
-mode and then notify user with the dedicated message including
-FW and NVM versions.
+> Several months ago, I had been looking through my old XDP hints tree[0]
+> to check whether some patches not directly related to hints can be sent
+> standalone. Roughly at the same time, Daniel appeared and asked[1] about
+> GRO for cpumap from that tree.
 
-Even if the driver detected rollback mode, this should not result
-in an probe error and the normal flow proceeds.
+I see "Changes requested" on Patchwork. Which ones?
 
-FW tries to rollback to “old” operational FW located in the
-inactive NVM bank in cases when newly loaded FW exhibits faulty
-behavior. If something goes wrong during boot the FW may switch
-into rollback mode in an attempt to avoid recovery mode and stay
-operational. After rollback is successful, the banks are swapped,
-and the “rollback” bank becomes the active bank for the next reset.
+1/8 regarding gro_node? Nobody proposed a solution which would be as
+efficient, but avoid using struct_group(), I don't see such as well.
+I explain in the commitmsgs and cover letter everything. Jakub gave me
+Acked-by on struct_group() in the v3 thread.
 
-Reviewed-by: Mateusz Polchlopek <mateusz.polchlopek@intel.com>
-Signed-off-by: Andrii Staikov <andrii.staikov@intel.com>
-Signed-off-by: Jedrzej Jagielski <jedrzej.jagielski@intel.com>
----
- .../ethernet/intel/ixgbe/devlink/devlink.c    |  3 +-
- drivers/net/ethernet/intel/ixgbe/ixgbe.h      |  1 +
- drivers/net/ethernet/intel/ixgbe/ixgbe_e610.c | 34 +++++++++++++++++++
- drivers/net/ethernet/intel/ixgbe/ixgbe_main.c | 26 ++++++++++++++
- drivers/net/ethernet/intel/ixgbe/ixgbe_type.h |  3 ++
- .../ethernet/intel/ixgbe/ixgbe_type_e610.h    |  1 +
- 6 files changed, 67 insertions(+), 1 deletion(-)
-
-diff --git a/drivers/net/ethernet/intel/ixgbe/devlink/devlink.c b/drivers/net/ethernet/intel/ixgbe/devlink/devlink.c
-index 4ba72ec5422b..885971447ea9 100644
---- a/drivers/net/ethernet/intel/ixgbe/devlink/devlink.c
-+++ b/drivers/net/ethernet/intel/ixgbe/devlink/devlink.c
-@@ -540,7 +540,8 @@ static int ixgbe_devlink_reload_empr_finish(struct devlink *devlink,
- 
- 	*actions_performed = BIT(DEVLINK_RELOAD_ACTION_FW_ACTIVATE);
- 
--	adapter->flags2 &= ~IXGBE_FLAG2_API_MISMATCH;
-+	adapter->flags2 &= ~(IXGBE_FLAG2_API_MISMATCH |
-+			     IXGBE_FLAG2_FW_ROLLBACK);
- 
- 	return 0;
- }
-diff --git a/drivers/net/ethernet/intel/ixgbe/ixgbe.h b/drivers/net/ethernet/intel/ixgbe/ixgbe.h
-index 59dceb96e76a..68f77d7b4cad 100644
---- a/drivers/net/ethernet/intel/ixgbe/ixgbe.h
-+++ b/drivers/net/ethernet/intel/ixgbe/ixgbe.h
-@@ -672,6 +672,7 @@ struct ixgbe_adapter {
- #define IXGBE_FLAG2_NO_MEDIA			BIT(21)
- #define IXGBE_FLAG2_MOD_POWER_UNSUPPORTED	BIT(22)
- #define IXGBE_FLAG2_API_MISMATCH		BIT(23)
-+#define IXGBE_FLAG2_FW_ROLLBACK			BIT(24)
- 
- 	/* Tx fast path data */
- 	int num_tx_queues;
-diff --git a/drivers/net/ethernet/intel/ixgbe/ixgbe_e610.c b/drivers/net/ethernet/intel/ixgbe/ixgbe_e610.c
-index c263e4e08179..e46696baf4a4 100644
---- a/drivers/net/ethernet/intel/ixgbe/ixgbe_e610.c
-+++ b/drivers/net/ethernet/intel/ixgbe/ixgbe_e610.c
-@@ -1826,6 +1826,22 @@ static bool ixgbe_fw_recovery_mode_e610(struct ixgbe_hw *hw)
- 	return !!(fwsm & IXGBE_GL_MNG_FWSM_RECOVERY_M);
- }
- 
-+/**
-+ * ixgbe_fw_rollback_mode_e610 - Check FW NVM rollback mode
-+ * @hw: pointer to hardware structure
-+ *
-+ * Check FW NVM rollback mode by reading the value of
-+ * the dedicated register.
-+ *
-+ * Return: true if FW is in rollback mode, otherwise false.
-+ */
-+static bool ixgbe_fw_rollback_mode_e610(struct ixgbe_hw *hw)
-+{
-+	u32 fwsm = IXGBE_READ_REG(hw, IXGBE_GL_MNG_FWSM);
-+
-+	return !!(fwsm & IXGBE_GL_MNG_FWSM_ROLLBACK_M);
-+}
-+
- /**
-  * ixgbe_init_phy_ops_e610 - PHY specific init
-  * @hw: pointer to hardware structure
-@@ -3158,6 +3174,21 @@ int ixgbe_get_inactive_nvm_ver(struct ixgbe_hw *hw, struct ixgbe_nvm_info *nvm)
- 	return ixgbe_get_nvm_ver_info(hw, IXGBE_INACTIVE_FLASH_BANK, nvm);
- }
- 
-+/**
-+ * ixgbe_get_active_nvm_ver - Read Option ROM version from the active bank
-+ * @hw: pointer to the HW structure
-+ * @nvm: storage for Option ROM version information
-+ *
-+ * Reads the NVM EETRACK ID, Map version, and security revision of the
-+ * active NVM bank.
-+ *
-+ * Return: the exit code of the operation.
-+ */
-+static int ixgbe_get_active_nvm_ver(struct ixgbe_hw *hw, struct ixgbe_nvm_info *nvm)
-+{
-+	return ixgbe_get_nvm_ver_info(hw, IXGBE_ACTIVE_FLASH_BANK, nvm);
-+}
-+
- /**
-  * ixgbe_get_netlist_info - Read the netlist version information
-  * @hw: pointer to the HW struct
-@@ -3889,6 +3920,9 @@ static const struct ixgbe_mac_operations mac_ops_e610 = {
- 	.get_media_type			= ixgbe_get_media_type_e610,
- 	.setup_link			= ixgbe_setup_link_e610,
- 	.fw_recovery_mode		= ixgbe_fw_recovery_mode_e610,
-+	.fw_rollback_mode		= ixgbe_fw_rollback_mode_e610,
-+	.get_fw_ver			= ixgbe_aci_get_fw_ver,
-+	.get_nvm_ver			= ixgbe_get_active_nvm_ver,
- 	.get_link_capabilities		= ixgbe_get_link_capabilities_e610,
- 	.get_bus_info			= ixgbe_get_bus_info_generic,
- 	.acquire_swfw_sync		= ixgbe_acquire_swfw_sync_X540,
-diff --git a/drivers/net/ethernet/intel/ixgbe/ixgbe_main.c b/drivers/net/ethernet/intel/ixgbe/ixgbe_main.c
-index 265770ea32bd..dfb4c85f7a02 100644
---- a/drivers/net/ethernet/intel/ixgbe/ixgbe_main.c
-+++ b/drivers/net/ethernet/intel/ixgbe/ixgbe_main.c
-@@ -8417,6 +8417,32 @@ static bool ixgbe_check_fw_error(struct ixgbe_adapter *adapter)
- 			return true;
- 	}
- 
-+	/* return here if FW rollback mode has been already detected */
-+	if (adapter->flags2 & IXGBE_FLAG2_FW_ROLLBACK)
-+		return false;
-+
-+	if (hw->mac.ops.fw_rollback_mode && hw->mac.ops.fw_rollback_mode(hw)) {
-+		struct ixgbe_nvm_info *nvm_info = &adapter->hw.flash.nvm;
-+		char ver_buff[64] = "";
-+
-+		if (hw->mac.ops.get_fw_ver && hw->mac.ops.get_fw_ver(hw))
-+			goto no_version;
-+
-+		if (hw->mac.ops.get_nvm_ver &&
-+		    hw->mac.ops.get_nvm_ver(hw, nvm_info))
-+			goto no_version;
-+
-+		snprintf(ver_buff, sizeof(ver_buff),
-+			 "Current version is NVM:%x.%x.%x, FW:%d.%d. ",
-+			 nvm_info->major, nvm_info->minor, nvm_info->eetrack,
-+			 hw->fw_maj_ver, hw->fw_maj_ver);
-+no_version:
-+		e_dev_warn("Firmware rollback mode detected. %sDevice may exhibit limited functionality. Refer to the Intel(R) Ethernet Adapters and Devices User Guide for details on firmware rollback mode.",
-+			   ver_buff);
-+
-+		adapter->flags2 |= IXGBE_FLAG2_FW_ROLLBACK;
-+	}
-+
- 	return false;
- }
- 
-diff --git a/drivers/net/ethernet/intel/ixgbe/ixgbe_type.h b/drivers/net/ethernet/intel/ixgbe/ixgbe_type.h
-index 5f814f023573..33406e1f0b9e 100644
---- a/drivers/net/ethernet/intel/ixgbe/ixgbe_type.h
-+++ b/drivers/net/ethernet/intel/ixgbe/ixgbe_type.h
-@@ -3524,6 +3524,9 @@ struct ixgbe_mac_operations {
- 	int (*get_thermal_sensor_data)(struct ixgbe_hw *);
- 	int (*init_thermal_sensor_thresh)(struct ixgbe_hw *hw);
- 	bool (*fw_recovery_mode)(struct ixgbe_hw *hw);
-+	bool (*fw_rollback_mode)(struct ixgbe_hw *hw);
-+	int (*get_fw_ver)(struct ixgbe_hw *hw);
-+	int (*get_nvm_ver)(struct ixgbe_hw *hw, struct ixgbe_nvm_info *nvm);
- 	void (*disable_rx)(struct ixgbe_hw *hw);
- 	void (*enable_rx)(struct ixgbe_hw *hw);
- 	void (*set_source_address_pruning)(struct ixgbe_hw *, bool,
-diff --git a/drivers/net/ethernet/intel/ixgbe/ixgbe_type_e610.h b/drivers/net/ethernet/intel/ixgbe/ixgbe_type_e610.h
-index 1df5ac2e1fc5..c5cf153a19e9 100644
---- a/drivers/net/ethernet/intel/ixgbe/ixgbe_type_e610.h
-+++ b/drivers/net/ethernet/intel/ixgbe/ixgbe_type_e610.h
-@@ -90,6 +90,7 @@
- 
- #define IXGBE_GL_MNG_FWSM		0x000B6134 /* Reset Source: POR */
- #define IXGBE_GL_MNG_FWSM_RECOVERY_M	BIT(1)
-+#define IXGBE_GL_MNG_FWSM_ROLLBACK_M    BIT(2)
- 
- /* Flash Access Register */
- #define IXGBE_GLNVM_FLA			0x000B6108 /* Reset Source: POR */
--- 
-2.31.1
-
+Thanks,
+Olek
 
