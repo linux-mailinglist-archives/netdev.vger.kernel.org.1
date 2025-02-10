@@ -1,59 +1,59 @@
-Return-Path: <netdev+bounces-164715-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-164716-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id E4624A2ECC9
-	for <lists+netdev@lfdr.de>; Mon, 10 Feb 2025 13:44:11 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0A2FCA2ECCA
+	for <lists+netdev@lfdr.de>; Mon, 10 Feb 2025 13:44:16 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 8CE11160D0F
-	for <lists+netdev@lfdr.de>; Mon, 10 Feb 2025 12:44:10 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 3C54F3A4A9A
+	for <lists+netdev@lfdr.de>; Mon, 10 Feb 2025 12:44:06 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EB6FF221D88;
-	Mon, 10 Feb 2025 12:44:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CB5FA22259A;
+	Mon, 10 Feb 2025 12:44:09 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=rbox.co header.i=@rbox.co header.b="FYmxuoaO"
+	dkim=pass (2048-bit key) header.d=rbox.co header.i=@rbox.co header.b="a8lXB5Ij"
 X-Original-To: netdev@vger.kernel.org
-Received: from mailtransmit04.runbox.com (mailtransmit04.runbox.com [185.226.149.37])
+Received: from mailtransmit05.runbox.com (mailtransmit05.runbox.com [185.226.149.38])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B0C4E17BB6
-	for <netdev@vger.kernel.org>; Mon, 10 Feb 2025 12:44:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.226.149.37
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6C4CF1E1C22
+	for <netdev@vger.kernel.org>; Mon, 10 Feb 2025 12:44:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.226.149.38
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1739191448; cv=none; b=bKAQmIWEeAB/2wmKNaHxTk0gljc/oz5pkbuZ2nh4bDA9CFeMwlRv7vGKO/5UcD1A6VlGeZ4OlO0qANF/HzTJKuW/gUrIRA/0B6lUnhXr6g6uZUYjp1RoOw5I3fOlET6erJMfXXgU7JNZHfg4rjP6eOlxYTL6ujY4vl7YRYo6Hbk=
+	t=1739191449; cv=none; b=t+GxmlgnzYLiIuMvcai5dfQC4VDAh8lTps2B9kzex/dN5+bHvwuvL4UUbV3GQTHMkFxkKUdZk6lsL51QA+TISs2B+OXEx3AjMLPMvpq63qk7BHNXlknVYW+69DyhB5q2C5XFaz4F/ucHQE4T/lrkFhk28SL7m8fLxb4VEiZTkr0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1739191448; c=relaxed/simple;
-	bh=wLXaWUduSKs261rv8e4jnzmmI79Sf/KqPFAOmNqHIyA=;
+	s=arc-20240116; t=1739191449; c=relaxed/simple;
+	bh=GLZwLaofuai1+ZKxckCk1D+VBkztYywkGUQdVMLjs7U=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=cK+rksGFYd8YuuVya1nP304jskQn83EkOGKzC9wqz4rwmp/4wjWqaOR/XlMvw0QRWAvG9OuYCjEZySusIxh1svnt8D6I9o7IG4H5YOhcLmWzeKw+1Os2JSURl+cUezfGnLVbmtI5EBNJCXYOJVzVexvTiSYnX3wf1W5IOItdEa4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=rbox.co; spf=pass smtp.mailfrom=rbox.co; dkim=pass (2048-bit key) header.d=rbox.co header.i=@rbox.co header.b=FYmxuoaO; arc=none smtp.client-ip=185.226.149.37
+	 In-Reply-To:Content-Type; b=tm5OePQXT1qcAY3qT8xYGcRUzmtBkCiFGylBjwMccJ7tWc5BGkdqMlhNYMAcR3qG9uFLVhHvniq7OjGgOW8qSdirWE2g38xh0Q3OgNEMJ/brqn9H5dNUxcs8qcdIbXgsJ/BhxT2mIVrrgWVZyaDBeMdw27q884lTPosJN1J5bVI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=rbox.co; spf=pass smtp.mailfrom=rbox.co; dkim=pass (2048-bit key) header.d=rbox.co header.i=@rbox.co header.b=a8lXB5Ij; arc=none smtp.client-ip=185.226.149.38
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=rbox.co
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=rbox.co
-Received: from mailtransmit02.runbox ([10.9.9.162] helo=aibo.runbox.com)
-	by mailtransmit04.runbox.com with esmtps  (TLS1.2) tls TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256
+Received: from mailtransmit03.runbox ([10.9.9.163] helo=aibo.runbox.com)
+	by mailtransmit05.runbox.com with esmtps  (TLS1.2) tls TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256
 	(Exim 4.93)
 	(envelope-from <mhal@rbox.co>)
-	id 1thT8s-00BSQe-1x; Mon, 10 Feb 2025 13:44:02 +0100
+	id 1thT8t-00BRMy-2A; Mon, 10 Feb 2025 13:44:03 +0100
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=rbox.co;
 	s=selector1; h=Content-Transfer-Encoding:Content-Type:In-Reply-To:From:
 	References:Cc:To:Subject:MIME-Version:Date:Message-ID;
-	bh=Cs8P/Xd2MuEmbYH3QRWV2bwKBSBIHj2Wm5m7LgYGROE=; b=FYmxuoaO/34wR2TgTRkknR4v6w
-	rnSVj+Cl1Fwx3G7cyheCNZgOxo8eAGqIM+CqMm9fnBe03VdsARlD/6nHE/fbo09HgKe8zM8f9vFmD
-	MOE1zxaI0aKkcn9w+CQTFCyFx8/UNUkmUzNd7VR9o7Cb8qBv9CHWiayDiFxV8XYJ4kJi9L3cMczP7
-	Ke+KL2p9Q+S1Yvpr2auhEAGA9J+jIWh7T14j4L8DgS99WDoUATKDqE2cck0uP2zqvPc1sM8nkqohX
-	Shm0ifOkO4epcvFila/T+WB/HlHII+TC0lHRQ0/dDaHc8WvEz3su/CVYlXZMcZ9z3zNcfXLcIpBSP
-	jC70k9ZQ==;
-Received: from [10.9.9.74] (helo=submission03.runbox)
-	by mailtransmit02.runbox with esmtp (Exim 4.86_2)
+	bh=wO85ERmJMlSw/Yf7vbMFqN4QVwV47Z00fmhOJhTEfak=; b=a8lXB5IjOm171G9+KuipIHEGuv
+	3S3WKntDXPjmJRnO7IZxCSHYkOkVlz3p4GgKjapAKC+vyJ7Qd6bcFeAYPeYeCaD7Ql0dZa06pnwvy
+	XEPrOKb18D2oLIsAZt5dDxvUTkcT3v49dk00sZtXjpD0Ttiq976ScxwDSe0IjMIH9x0m0/hZMOexr
+	MIZe0u+NfWuOePRYH1PtW1WIHDoxU1p8WKlAKkWlxyxOgsGRdX+phUYhx02w3OQP7UcAPgH094SUj
+	pPr1dUDpGoXNBmLGA7aPnu2QT/F+bWlhtjuxL4qlsmtQ8Fc8yqqykA9gP4HT7KOAp2b4UyMjfi/61
+	lEcp7kyQ==;
+Received: from [10.9.9.73] (helo=submission02.runbox)
+	by mailtransmit03.runbox with esmtp (Exim 4.86_2)
 	(envelope-from <mhal@rbox.co>)
-	id 1thT8i-0002Cv-8d; Mon, 10 Feb 2025 13:43:56 +0100
-Received: by submission03.runbox with esmtpsa  [Authenticated ID (604044)]  (TLS1.2:ECDHE_SECP256R1__RSA_PSS_RSAE_SHA256__AES_256_GCM:256)
+	id 1thT8s-0000gY-ES; Mon, 10 Feb 2025 13:44:02 +0100
+Received: by submission02.runbox with esmtpsa  [Authenticated ID (604044)]  (TLS1.2:ECDHE_SECP256R1__RSA_PSS_RSAE_SHA256__AES_256_GCM:256)
 	(Exim 4.93)
-	id 1thT8Y-007Rc6-2V; Mon, 10 Feb 2025 13:43:42 +0100
-Message-ID: <6a181a14-a665-4796-bec7-d73dcc39a319@rbox.co>
-Date: Mon, 10 Feb 2025 13:43:40 +0100
+	id 1thT8k-006GmA-As; Mon, 10 Feb 2025 13:43:54 +0100
+Message-ID: <2f253267-2277-4a96-b732-ebbed46e023a@rbox.co>
+Date: Mon, 10 Feb 2025 13:43:53 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -62,46 +62,54 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
 Subject: Re: [PATCH net v2 1/2] vsock: Orphan socket after transport release
-To: Luigi Leonardi <leonardi@redhat.com>
-Cc: Stefano Garzarella <sgarzare@redhat.com>,
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- Simon Horman <horms@kernel.org>, netdev@vger.kernel.org,
- syzbot+9d55b199192a4be7d02c@syzkaller.appspotmail.com
+To: Stefano Garzarella <sgarzare@redhat.com>
+Cc: "David S. Miller" <davem@davemloft.net>,
+ Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+ Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>,
+ netdev@vger.kernel.org,
+ syzbot+9d55b199192a4be7d02c@syzkaller.appspotmail.com,
+ Luigi Leonardi <leonardi@redhat.com>
 References: <20250206-vsock-linger-nullderef-v2-0-f8a1f19146f8@rbox.co>
  <20250206-vsock-linger-nullderef-v2-1-f8a1f19146f8@rbox.co>
- <3h4ju6opsomkttmppwvugofepnecqegdb52tsq7n5c5zrvan22@echiriqwccz7>
+ <zboo362son7nvmvoigmcj2v23gdcdpb364sxqzo5xndxuqqnmy@27cgbg6bxte2>
 Content-Language: pl-PL, en-GB
 From: Michal Luczaj <mhal@rbox.co>
-In-Reply-To: <3h4ju6opsomkttmppwvugofepnecqegdb52tsq7n5c5zrvan22@echiriqwccz7>
+In-Reply-To: <zboo362son7nvmvoigmcj2v23gdcdpb364sxqzo5xndxuqqnmy@27cgbg6bxte2>
 Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 
-On 2/10/25 11:24, Luigi Leonardi wrote:
-> Hi Michal,
-> 
+On 2/10/25 11:15, Stefano Garzarella wrote:
 > On Thu, Feb 06, 2025 at 12:06:47AM +0100, Michal Luczaj wrote:
->> During socket release, sock_orphan() is called without considering that it
->> sets sk->sk_wq to NULL. Later, if SO_LINGER is enabled, this leads to a
->> null pointer dereferenced in virtio_transport_wait_close().
+>> ...
+>> diff --git a/net/vmw_vsock/af_vsock.c b/net/vmw_vsock/af_vsock.c
+>> index 075695173648d3a4ecbd04e908130efdbb393b41..85d20891b771a25b8172a163983054a2557f98c1 100644
+>> --- a/net/vmw_vsock/af_vsock.c
+>> +++ b/net/vmw_vsock/af_vsock.c
+>> @@ -817,20 +817,25 @@ static void __vsock_release(struct sock *sk, int level)
+>> 	vsk = vsock_sk(sk);
+>> 	pending = NULL;	/* Compiler warning. */
 >>
->> Orphan the socket only after transport release.
->>
->> While there, reflow the other comment.
-> May I ask you why?
-
-For aesthetic purposes only :)
-
+>> -	/* When "level" is SINGLE_DEPTH_NESTING, use the nested
+>> -	 * version to avoid the warning "possible recursive locking
+>> -	 * detected". When "level" is 0, lock_sock_nested(sk, level)
+>> -	 * is the same as lock_sock(sk).
+>> +	/* When "level" is SINGLE_DEPTH_NESTING, use the nested version to avoid
+>> +	 * the warning "possible recursive locking detected". When "level" is 0,
+>> +	 * lock_sock_nested(sk, level) is the same as lock_sock(sk).
+> 
+> This comment is formatted “weird” because recently in commit
+> 135ffc7becc8 ("bpf, vsock: Invoke proto::close on close()") we reduced
+> the indentation without touching the comment.
+> 
+> Since this is a fix we may have to backport into stable branches without
+> that commit, I would avoid touching it to avoid unnecessary conflicts.
 > ...
-> Code LGTM!
-> 
-> I probably wouldn't have changed that comment because of possible 
-> conflicts.
-> 
-> Reviewed-by: Luigi Leonardi <leonardi@redhat.com>
 
-Got it, dropping the old comment reflow, thanks.
+I've checked that 135ffc7becc8 was already backported (6.1, 6.6, 6.12) and
+thought it's safe to do, but I understand your concern, so sending v3
+without touching the other comment.
 
+Thanks,
 Michal
 
 
