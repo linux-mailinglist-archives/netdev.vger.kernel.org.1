@@ -1,47 +1,47 @@
-Return-Path: <netdev+bounces-164916-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-164917-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4C13DA2F995
-	for <lists+netdev@lfdr.de>; Mon, 10 Feb 2025 20:54:41 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id C6F67A2F99F
+	for <lists+netdev@lfdr.de>; Mon, 10 Feb 2025 20:55:44 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 8CC893AAF6A
-	for <lists+netdev@lfdr.de>; Mon, 10 Feb 2025 19:52:48 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 614CF3AB85B
+	for <lists+netdev@lfdr.de>; Mon, 10 Feb 2025 19:53:42 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1449224C681;
-	Mon, 10 Feb 2025 19:52:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 469B224E4A6;
+	Mon, 10 Feb 2025 19:52:47 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="oilG5x/+"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Jq3/m16Y"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DC2D625C6E2;
-	Mon, 10 Feb 2025 19:52:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1C50F24E4A2;
+	Mon, 10 Feb 2025 19:52:47 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1739217154; cv=none; b=UILejjttG+OUGDQPeT5rm7yNgxUbGa2Udhq7Lif+0KJGFWdQ3nyqUtXzgKhhAJ+O6jz8IthHrMoejPZ0NRuX8YlQfGFElYZrM7WHfDR8O7N4kCHte6p7fgbt3eL1vy0y0uka7pNGAV9jKfiB1W0QYSGeImo3uuI6ClETJJJjjsQ=
+	t=1739217167; cv=none; b=jQIQizdLt/1N31ujbXf9gUEF9KRz0vvxXXx8Rr1HdErLgglU+PfrRxOYxJZADLSJQX7F4bpD0YGn1T1sTJII4mNfJuRhNXWflfilWnYIktE5XrK/ModP2gcvP8hlZ9p5LUzi0gkkHKGvwvEkKxNJOMTpfqTebEUpbYXflwUW2ME=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1739217154; c=relaxed/simple;
-	bh=/D6d+sjlL6BkmyPK4ooZ5CTEN16NxmyezNw45fqLVzQ=;
+	s=arc-20240116; t=1739217167; c=relaxed/simple;
+	bh=zbqmjJ/TxKX7U/m5+hgRgAGIrFw5+CmX9sFh4piK0QQ=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=G7U+aYzHTuFBWAM6Ics45y8HXi1kzbQ122rweLrRk+pMQt/u37T/oWkXiPIBjtmKOPtY9XD84SZ6Ajt6bBPTb+6CjNsDueK2YTYqrur9sJOWdA8bn1lSxo/eZIskOXGPjVgeK6gTbh+/oaBlrnhHvCdcFSfBcXmhzFCu+2r0C3Q=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=oilG5x/+; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id C73E1C4CED1;
-	Mon, 10 Feb 2025 19:52:31 +0000 (UTC)
+	 Content-Type:Content-Disposition:In-Reply-To; b=KCETnbD+ARqhxbWKJAm1GGkP3DEZ8Yb207et1+XcTxikKBh9aiXgLO3CywuwXMSJ/r0FCYCE8Lc579wA8terQb7EQvbJDNM58zDvOuiYGPJmcZ+RrJtoKGKGRVP/XCf6IXQvpH2Pp2dGR/4DpUExWGfq9dy8Wxga62iGpI3zMP4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Jq3/m16Y; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id EFAA1C4CED1;
+	Mon, 10 Feb 2025 19:52:44 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1739217153;
-	bh=/D6d+sjlL6BkmyPK4ooZ5CTEN16NxmyezNw45fqLVzQ=;
+	s=k20201202; t=1739217166;
+	bh=zbqmjJ/TxKX7U/m5+hgRgAGIrFw5+CmX9sFh4piK0QQ=;
 	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=oilG5x/+q3qud/uL21jyC5sLtfE6gzzqXFo3IRia8GrCnxMHkcm3yzYhTFz0cSElD
-	 hQVpCZsdiL5gew0RFpBTJzOb28AymQnepu8xX4NyDcGnlU+oa4DSFEn/ANBP+XKf9o
-	 oIBkLUfhnu9EeMcTTyI0iyOBJZHeoycU08MWHnu8Q24QTEVFTgAB2OS+ej2eMSxswz
-	 LU0njQab18ueCDbr/2WPp0WbYr9O401/9MU3osFZgwNRLWWYZTT9+nZkO4sn46bUkR
-	 qXotPem8ldn7p7gLaxtLbx6SY9cuzlb3sBy4LUgZigVMA2QntgIaS+6nVjvR0j1oUg
-	 rSebjrwX0Zwkw==
-Date: Mon, 10 Feb 2025 19:52:29 +0000
+	b=Jq3/m16YbpHRVW3WrViZSasayOPhOgS0RarkIDN/ckhjaXkLhhX27+jUBG205L/3/
+	 gVM/zdrGSjchlJpkubN3yy9tIwqpI2M7Vo0kcs3OmorAv/YioarMOCPIeXestE1LPS
+	 eD4evm8zr84wT1WLNb+nfwy5fp+2I8A/NQxA6Qr/hfwG/fREK5EJIym1KpqfnUHzQx
+	 rlfPYW8rwuEHLEj/1B65MlSvY/qIpKfbmzLo6dw0HzFzfOgRenCX+NX4xZ792ip2Yu
+	 QSV34ZX91SAADWwMO7m2Y/xf7UWdiT6K1qHzQl3fC7gxlAvPWq0q3W2MduKzBlNKsZ
+	 t3j3Y+yAxZXvA==
+Date: Mon, 10 Feb 2025 19:52:43 +0000
 From: Simon Horman <horms@kernel.org>
 To: "Matthieu Baerts (NGI0)" <matttbe@kernel.org>
 Cc: mptcp@lists.linux.dev, Mat Martineau <martineau@kernel.org>,
@@ -50,11 +50,10 @@ Cc: mptcp@lists.linux.dev, Mat Martineau <martineau@kernel.org>,
 	Eric Dumazet <edumazet@google.com>,
 	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
 	netdev@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH net-next v3 13/15] mptcp: pm: drop skb parameter of
- set_flags
-Message-ID: <20250210195229.GA554665@kernel.org>
+Subject: Re: [PATCH net-next v3 14/15] mptcp: pm: change rem type of set_flags
+Message-ID: <20250210195243.GB554665@kernel.org>
 References: <20250207-net-next-mptcp-pm-misc-cleanup-2-v3-0-71753ed957de@kernel.org>
- <20250207-net-next-mptcp-pm-misc-cleanup-2-v3-13-71753ed957de@kernel.org>
+ <20250207-net-next-mptcp-pm-misc-cleanup-2-v3-14-71753ed957de@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -63,17 +62,22 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20250207-net-next-mptcp-pm-misc-cleanup-2-v3-13-71753ed957de@kernel.org>
+In-Reply-To: <20250207-net-next-mptcp-pm-misc-cleanup-2-v3-14-71753ed957de@kernel.org>
 
-On Fri, Feb 07, 2025 at 02:59:31PM +0100, Matthieu Baerts (NGI0) wrote:
+On Fri, Feb 07, 2025 at 02:59:32PM +0100, Matthieu Baerts (NGI0) wrote:
 > From: Geliang Tang <tanggeliang@kylinos.cn>
 > 
-> The first parameter 'skb' in mptcp_pm_nl_set_flags() is only used to
-> obtained the network namespace, which can also be obtained through the
-> second parameters 'info' by using genl_info_net() helper.
+> Generally, in the path manager interfaces, the local address is defined
+> as an mptcp_pm_addr_entry type address, while the remote address is
+> defined as an mptcp_addr_info type one:
 > 
-> This patch drops these useless parameters 'skb' in all three set_flags()
-> interfaces.
+>     (struct mptcp_pm_addr_entry *local, struct mptcp_addr_info *remote)
+> 
+> But the set_flags() interface uses two mptcp_pm_addr_entry type
+> parameters.
+> 
+> This patch changes the second one to mptcp_addr_info type and use helper
+> mptcp_pm_parse_addr() to parse it instead of using mptcp_pm_parse_entry().
 > 
 > Signed-off-by: Geliang Tang <tanggeliang@kylinos.cn>
 > Reviewed-by: Matthieu Baerts (NGI0) <matttbe@kernel.org>
