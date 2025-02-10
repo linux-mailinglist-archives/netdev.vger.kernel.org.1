@@ -1,187 +1,82 @@
-Return-Path: <netdev+bounces-164930-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-164934-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6BBA5A2FB77
-	for <lists+netdev@lfdr.de>; Mon, 10 Feb 2025 22:10:14 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3F0E8A2FBFA
+	for <lists+netdev@lfdr.de>; Mon, 10 Feb 2025 22:26:12 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id A2B16188272E
-	for <lists+netdev@lfdr.de>; Mon, 10 Feb 2025 21:10:19 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E76BC16530B
+	for <lists+netdev@lfdr.de>; Mon, 10 Feb 2025 21:26:10 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 46AAF24CEC2;
-	Mon, 10 Feb 2025 21:10:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D24BA1C2DB0;
+	Mon, 10 Feb 2025 21:26:07 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="HYcKkZRy"
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=engleder-embedded.com header.i=@engleder-embedded.com header.b="P1MkszLE"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f181.google.com (mail-pl1-f181.google.com [209.85.214.181])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mx07lb.world4you.com (mx07lb.world4you.com [81.19.149.117])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B1B0D1BD9F8
-	for <netdev@vger.kernel.org>; Mon, 10 Feb 2025 21:10:03 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.181
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 72E67189B8C
+	for <netdev@vger.kernel.org>; Mon, 10 Feb 2025 21:26:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=81.19.149.117
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1739221806; cv=none; b=PohVPaIxydQFfWkPy4lK827eG6zkBxVn/dfnnAcrrk+F1thGiN34oZo1+eSOG6bwAgmJHs8pxa0RSkftiKQ4gxY2ZYH1NBv4alvXUdjdvR8o6r9hT9x4yzksiGmqTHGQW6Hh6bA0mlhTbHVYa8qI2TVVhnGHur3xzfJ5kaxXMxg=
+	t=1739222767; cv=none; b=Pk6jYCcycftAKJtWTwAeWyykx3ykNdnPRgUsJJw3sr9CGbqHlILbLXwOZ3C1d12ZetDe44FDRJFgGIEg7EaxaFPIf23ltt4nuiNenK8DZTM59CLXGalXjJt7MLKjVJ0sdBV+KqMwbyQ4+SLuCC2Meo/vWUcR6786HU2HIE4+xGI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1739221806; c=relaxed/simple;
-	bh=KJLfGH4r6zCwTj9etgMAbr9xZH0AFU/ISuULlewI/hw=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=lANQfkBFp7VRH2gBxqszsiu34j8dJxs9jKGRdTO+lbKCc7ygnbQpnNA2tMdC1jcCfiWiMsakJDGb39dGk4kmsml4PC6aVj/jClWaC5z56m+NkNXrBLo7NDOz06877moeuRYLoSH4JYrbgZJyExS8KoevL2WGWQT9saFvLDmNils=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=HYcKkZRy; arc=none smtp.client-ip=209.85.214.181
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-pl1-f181.google.com with SMTP id d9443c01a7336-219f6ca9a81so4055ad.1
-        for <netdev@vger.kernel.org>; Mon, 10 Feb 2025 13:10:03 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1739221803; x=1739826603; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=BpOwhdLpPNB8gZcJrWR5hgdVmgWAHMy1UaC6q1qkDqE=;
-        b=HYcKkZRyQNKbVx5G/iwtKV89LIVijVFII4qPK0wy3zDORkhMDGygEqD/YBhOAtvnT1
-         GV/kjK1wIsO2P8sPSY4FJwAqMDBjJ4LG08ZeLL+DUdaigstRLaqUHcHQIeJxlatAaK4L
-         sQER6fsn69HGUfKskHN/i2ouFn4yneqyRN5j5hhe2qI1D6s7vWClVEnV/Wso/TMcUGuL
-         Jk/w7JmDavqm+0HL9Ci19TTMwchyO1QmkpLP3yMFGlXKNWyzwj3x9/PB4gUJt6vODNuM
-         GzaubUQQEcQRZz6Fnog04MpnrpH24dPINOl/v6dt40MLih8J7dLPTmNwNNexHNXtSBuo
-         O3IA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1739221803; x=1739826603;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=BpOwhdLpPNB8gZcJrWR5hgdVmgWAHMy1UaC6q1qkDqE=;
-        b=MRchxbmEqeuxDG5zRUFtnLU16PfkKlIxnr8DuyBubE+kiAyQhM8WbldNjwmPOxzyB5
-         pb7YmOQevm2RXvUqpe5/pPejlyuCdKv5LFPrPC/6X58+D149xozP2DB8ANDuQHze9eh6
-         bAiP6nZiAb21pbdbdvtvZCSuWh9rbmT5BxHypJ+O4SyrjLRC8oBiAPdOWXWdmJ1HXzPu
-         rWyOvHT1AjPJC9EW6Z4JyXEbryP/OE4z5Jxvknk2Vh6E46/6aFoo7CZ86VFzy4Bq3fqL
-         rpqytuR4thcd0eNfeGYHyGydA3hqRTRkRwwMKEjyzOG5FFxc1xEglKHAS/GJQ/geUSq+
-         bsDw==
-X-Gm-Message-State: AOJu0YwXBs1d5bgrfsW0IUOsPmEwDiVWL6E+fFZTDUoXlfi+dhUPW/5M
-	3uwIh8mkFCYUU0IM5R80N3VaE+Yxc9tkLex7Y4dGykTplxf+h5zJTbDK/sYrBt9lqkdc+qS8574
-	+PZOrh6CSSjot6QIMdlRqI+741hWWf/ZsDgRw
-X-Gm-Gg: ASbGncuV8Kh9OouROG1FUCMzTND90pIUu6TkjhM4pQU24cPQN0Y0fsbAyUjs0MFBbJd
-	zMYWjvBty1D6ysfU/Xsl8UaiKvb14JfoArENdHA8AMEI+g/VqE6sk+PWmUkGZIFX5ihzIySJn
-X-Google-Smtp-Source: AGHT+IHi+uVLv++ClIB5TNGxSvvd8P8hJcj6QNPCjz84MeycHAppY5tmh3RbNn2a2dnjMuITjeslPW3wgJ9FwpR0OB4=
-X-Received: by 2002:a17:902:7c8a:b0:21f:631c:7fc9 with SMTP id
- d9443c01a7336-21fb80c64a8mr630465ad.0.1739221802714; Mon, 10 Feb 2025
- 13:10:02 -0800 (PST)
+	s=arc-20240116; t=1739222767; c=relaxed/simple;
+	bh=PHnXMs2aP1nRZ3kx4/ik8KOkWi00ecq8fsqcNsyvwCo=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=qn7wchyGuF9JZ0jMdxhzN0YuQ55ybcr/8R9N7yXUfCs+gq+2SfmqfZ5hFRICj3JVHepxiiqgXv9ArvAcnTD/WQjKoLZIlZHgYrad2v1jT8m6qWoN0o9ywpZccTsPp+F6N4RCxX9T3kVBIVdsiknaIDA3NbrVhqp1tk/VX7REa+8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=engleder-embedded.com; spf=pass smtp.mailfrom=engleder-embedded.com; dkim=pass (1024-bit key) header.d=engleder-embedded.com header.i=@engleder-embedded.com header.b=P1MkszLE; arc=none smtp.client-ip=81.19.149.117
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=engleder-embedded.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=engleder-embedded.com
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=engleder-embedded.com; s=dkim11; h=Content-Transfer-Encoding:Content-Type:
+	In-Reply-To:From:References:Cc:To:Subject:MIME-Version:Date:Message-ID:Sender
+	:Reply-To:Content-ID:Content-Description:Resent-Date:Resent-From:
+	Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:List-Help:
+	List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
+	bh=PHnXMs2aP1nRZ3kx4/ik8KOkWi00ecq8fsqcNsyvwCo=; b=P1MkszLEP/MF1UfFLY2anAljxH
+	jmfuZ/KTuW9qljoZFj8cF/rwd4fmDVJ83YnTjLWO+7etM1qwWU9qWw1bVFphshkdu4CmMubI/9R+i
+	Bzbs9YcBdrgtPT2ee4RFxspBAnMda/NQ5q76Cx1xsH4t7Am69PnjXhkZYVIpC1U1SeL8=;
+Received: from [88.117.55.1] (helo=[10.0.0.160])
+	by mx07lb.world4you.com with esmtpsa  (TLS1.2) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.97.1)
+	(envelope-from <gerhard@engleder-embedded.com>)
+	id 1thaAt-000000000NS-1KUN;
+	Mon, 10 Feb 2025 21:14:35 +0100
+Message-ID: <b1b3e5e1-b1fe-4816-85eb-61ac7ea2d46d@engleder-embedded.com>
+Date: Mon, 10 Feb 2025 21:14:33 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250203223916.1064540-1-almasrymina@google.com>
- <20250203223916.1064540-6-almasrymina@google.com> <abc22620-d509-4b12-80ac-0c36b08b36d9@gmail.com>
-In-Reply-To: <abc22620-d509-4b12-80ac-0c36b08b36d9@gmail.com>
-From: Mina Almasry <almasrymina@google.com>
-Date: Mon, 10 Feb 2025 13:09:50 -0800
-X-Gm-Features: AWEUYZlmH-9dq3h0n7ypL1723AKovUOyGvCt-k8ZJ20f-dbsLO-5Bruftf8RSss
-Message-ID: <CAHS8izNOqaFe_40gFh09vdBz6-deWdeGu9Aky-e7E+Wu2qtfdw@mail.gmail.com>
-Subject: Re: [PATCH net-next v3 5/6] net: devmem: Implement TX path
-To: Pavel Begunkov <asml.silence@gmail.com>
-Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	linux-doc@vger.kernel.org, kvm@vger.kernel.org, 
-	virtualization@lists.linux.dev, linux-kselftest@vger.kernel.org, 
-	Donald Hunter <donald.hunter@gmail.com>, Jakub Kicinski <kuba@kernel.org>, 
-	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
-	Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, Jonathan Corbet <corbet@lwn.net>, 
-	Andrew Lunn <andrew+netdev@lunn.ch>, Neal Cardwell <ncardwell@google.com>, 
-	David Ahern <dsahern@kernel.org>, "Michael S. Tsirkin" <mst@redhat.com>, Jason Wang <jasowang@redhat.com>, 
-	Xuan Zhuo <xuanzhuo@linux.alibaba.com>, =?UTF-8?Q?Eugenio_P=C3=A9rez?= <eperezma@redhat.com>, 
-	Stefan Hajnoczi <stefanha@redhat.com>, Stefano Garzarella <sgarzare@redhat.com>, Shuah Khan <shuah@kernel.org>, 
-	sdf@fomichev.me, dw@davidwei.uk, Jamal Hadi Salim <jhs@mojatatu.com>, 
-	Victor Nogueira <victor@mojatatu.com>, Pedro Tammela <pctammela@mojatatu.com>, 
-	Samiullah Khawaja <skhawaja@google.com>, Kaiyuan Zhang <kaiyuanz@google.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH 3/3] igb: Get rid of spurious interrupts
+To: Kurt Kanzenbach <kurt@linutronix.de>
+Cc: Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller"
+ <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ Przemek Kitszel <przemyslaw.kitszel@intel.com>,
+ Sebastian Andrzej Siewior <bigeasy@linutronix.de>,
+ Joe Damato <jdamato@fastly.com>, intel-wired-lan@lists.osuosl.org,
+ netdev@vger.kernel.org, Tony Nguyen <anthony.l.nguyen@intel.com>
+References: <20250210-igb_irq-v1-0-bde078cdb9df@linutronix.de>
+ <20250210-igb_irq-v1-3-bde078cdb9df@linutronix.de>
+Content-Language: en-US
+From: Gerhard Engleder <gerhard@engleder-embedded.com>
+In-Reply-To: <20250210-igb_irq-v1-3-bde078cdb9df@linutronix.de>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-AV-Do-Run: Yes
 
-On Wed, Feb 5, 2025 at 4:20=E2=80=AFAM Pavel Begunkov <asml.silence@gmail.c=
-om> wrote:
->
-> On 2/3/25 22:39, Mina Almasry wrote:
-> ...
-> > diff --git a/include/linux/skbuff.h b/include/linux/skbuff.h
-> > index bb2b751d274a..3ff8f568c382 100644
-> > --- a/include/linux/skbuff.h
-> > +++ b/include/linux/skbuff.h
-> > @@ -1711,9 +1711,12 @@ struct ubuf_info *msg_zerocopy_realloc(struct so=
-ck *sk, size_t size,
-> ...
-> >   int zerocopy_fill_skb_from_iter(struct sk_buff *skb,
-> >                               struct iov_iter *from, size_t length);
-> > @@ -1721,12 +1724,14 @@ int zerocopy_fill_skb_from_iter(struct sk_buff =
-*skb,
-> >   static inline int skb_zerocopy_iter_dgram(struct sk_buff *skb,
-> >                                         struct msghdr *msg, int len)
-> >   {
-> > -     return __zerocopy_sg_from_iter(msg, skb->sk, skb, &msg->msg_iter,=
- len);
-> > +     return __zerocopy_sg_from_iter(msg, skb->sk, skb, &msg->msg_iter,=
- len,
-> > +                                    NULL);
->
-> Instead of propagating it all the way down and carving a new path, why
-> not reuse the existing infra? You already hook into where ubuf is
-> allocated, you can stash the binding in there. And
+On 10.02.25 10:19, Kurt Kanzenbach wrote:
+> When running the igc with XDP/ZC in busy polling mode with deferral of hard
+> interrupts, interrupts still happen from time to time. That is caused by
+> the igc task watchdog which triggers Rx interrupts periodically.
 
-It looks like it's not possible to increase the side of ubuf_info at
-all, otherwise the BUILD_BUG_ON in msg_zerocopy_alloc() fires.
-
-It's asserting that sizeof(ubuf_info_msgzc) <=3D sizeof(skb->cb), and
-I'm guessing increasing skb->cb size is not really the way to go.
-
-What I may be able to do here is stash the binding somewhere in
-ubuf_info_msgzc via union with fields we don't need for devmem, and/or
-stashing the binding in ubuf_info_ops (very hacky). Neither approach
-seems ideal, but the former may work and may be cleaner.
-
-I'll take a deeper look here. I had looked before and concluded that
-we're piggybacking devmem TX on MSG_ZEROCOPY path, because we need
-almost all of the functionality there (no copying, send complete
-notifications, etc), with one minor change in the skb filling. I had
-concluded that if MSG_ZEROCOPY was never updated to use the existing
-infra, then it's appropriate for devmem TX piggybacking on top of it
-to follow that. I would not want to get into a refactor of
-MSG_ZEROCOPY for no real reason.
-
-But I'll take a deeper look here and see if I can make something
-slightly cleaner work.
-
-> zerocopy_fill_skb_from_devmem can implement ->sg_from_iter,
-> see __zerocopy_sg_from_iter().
->
-> ...
-> > diff --git a/net/core/datagram.c b/net/core/datagram.c
-> > index f0693707aece..c989606ff58d 100644
-> > --- a/net/core/datagram.c
-> > +++ b/net/core/datagram.c
-> > @@ -63,6 +63,8 @@
-> > +static int
-> > +zerocopy_fill_skb_from_devmem(struct sk_buff *skb, struct iov_iter *fr=
-om,
-> > +                           int length,
-> > +                           struct net_devmem_dmabuf_binding *binding)
-> > +{
-> > +     int i =3D skb_shinfo(skb)->nr_frags;
-> > +     size_t virt_addr, size, off;
-> > +     struct net_iov *niov;
-> > +
-> > +     while (length && iov_iter_count(from)) {
-> > +             if (i =3D=3D MAX_SKB_FRAGS)
-> > +                     return -EMSGSIZE;
-> > +
-> > +             virt_addr =3D (size_t)iter_iov_addr(from);
->
-> Unless I missed it somewhere it needs to check that the iter
-> is iovec based.
->
-
-How do we end up here with an iterator that is not iovec based? Is the
-user able to trigger that somehow and I missed it?
-
---=20
-Thanks,
-Mina
+igc or igb?
 
