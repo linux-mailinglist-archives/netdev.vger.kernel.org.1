@@ -1,59 +1,60 @@
-Return-Path: <netdev+bounces-164714-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-164712-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7FE86A2ECC8
-	for <lists+netdev@lfdr.de>; Mon, 10 Feb 2025 13:43:27 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5A4F3A2ECC2
+	for <lists+netdev@lfdr.de>; Mon, 10 Feb 2025 13:40:59 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 593763A4AD6
-	for <lists+netdev@lfdr.de>; Mon, 10 Feb 2025 12:43:18 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id B15951886420
+	for <lists+netdev@lfdr.de>; Mon, 10 Feb 2025 12:41:04 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 079991E32A2;
-	Mon, 10 Feb 2025 12:43:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2C38E222577;
+	Mon, 10 Feb 2025 12:40:54 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=rbox.co header.i=@rbox.co header.b="NlVVzcJW"
+	dkim=pass (2048-bit key) header.d=rbox.co header.i=@rbox.co header.b="Ba7j6/9l"
 X-Original-To: netdev@vger.kernel.org
-Received: from mailtransmit04.runbox.com (mailtransmit04.runbox.com [185.226.149.37])
+Received: from mailtransmit05.runbox.com (mailtransmit05.runbox.com [185.226.149.38])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 659FB1F55E0
-	for <netdev@vger.kernel.org>; Mon, 10 Feb 2025 12:43:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.226.149.37
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3B722222575
+	for <netdev@vger.kernel.org>; Mon, 10 Feb 2025 12:40:50 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.226.149.38
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1739191403; cv=none; b=PkpoDijT29lyOdnmwNTMN5jmmn1jm0glsUlZTs8wShYWEXl6uCvvTtSKZpVIpoNuH3JGW1xexWCLbWWmktSZFOq1BAiYWyfGrVKwLcgS6KvbR9kKGqQZ4WQlSQ5vjc1nIIAtwwQNrjkvtRpw44oSDpeA6jW3ZJOVmMWMyi/dL+8=
+	t=1739191254; cv=none; b=QGabbOjoPTodfHpADLfLhJdFYbz1sp0b7w+chEg2SN/o/qH5zbC8+nz8lIah1fyglXO9sHMQiassPwbEmLmo9oKs3ghoAW7c3R0W6mmlpMnkXwMDesmiCp3WI2AHZKoEun9B3kuJ3gPNOdS37Dy+zMnSjCCxdeDBgOLSelQOePM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1739191403; c=relaxed/simple;
-	bh=n5NCPa8eV6GZBTdSg6vjn8SkLmwFhcZRcjDhInFN09w=;
-	h=From:Subject:Date:Message-Id:MIME-Version:Content-Type:To:Cc; b=evecA5laEM7gco9BGyQ7IC816NL48B+WTgZP4AO6KtEw5aYjWyim170zcJhVb3bANFuzdMquS10OVIKliMs5kYO2Iv2bPR+SQjFp6tRsmZ75hQOKOq21VZRLI75zAY/Eth8b0Bhv8nDrRvkhEpP4FNYCJFzmTSssbywZdGYlXfs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=rbox.co; spf=pass smtp.mailfrom=rbox.co; dkim=pass (2048-bit key) header.d=rbox.co header.i=@rbox.co header.b=NlVVzcJW; arc=none smtp.client-ip=185.226.149.37
+	s=arc-20240116; t=1739191254; c=relaxed/simple;
+	bh=MqA1FsWvjSKtmaQxWAexnfl6xQ7Kq6tPjk8gZxy9Dus=;
+	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
+	 In-Reply-To:To:Cc; b=aZOEloX1W28oDQflLDIOZcZaLSpDwCD+sRaqYAyNJPwD0+2ma50L/ERve6aH2Ek4nB07AzUOKyjekJWcUnOwGXOoEYiZf6QY5NH2/uXTD8wd6bKSDongk2ZXjVfBTkew730zKBUllcJBKgXJsr52mQZW9WNcXXyu5r9vVbSWyqk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=rbox.co; spf=pass smtp.mailfrom=rbox.co; dkim=pass (2048-bit key) header.d=rbox.co header.i=@rbox.co header.b=Ba7j6/9l; arc=none smtp.client-ip=185.226.149.38
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=rbox.co
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=rbox.co
 Received: from mailtransmit02.runbox ([10.9.9.162] helo=aibo.runbox.com)
-	by mailtransmit04.runbox.com with esmtps  (TLS1.2) tls TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256
+	by mailtransmit05.runbox.com with esmtps  (TLS1.2) tls TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256
 	(Exim 4.93)
 	(envelope-from <mhal@rbox.co>)
-	id 1thSh3-00BOd3-Vh; Mon, 10 Feb 2025 13:15:18 +0100
+	id 1thSh4-00BNte-SF; Mon, 10 Feb 2025 13:15:18 +0100
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=rbox.co;
-	s=selector1; h=Cc:To:Content-Transfer-Encoding:Content-Type:MIME-Version:
-	Message-Id:Date:Subject:From; bh=9jYT+Lwe173M220kQ7BSLEATCHvMhe0NHrGue399DfY=
-	; b=NlVVzcJWMAd9R60K80s7VKgFlp+ZKy/X9Ql9QmawAhbY0bqejJ5nAFahDvoJrmn6Pk6RvS+Cp
-	bq2oSlVdTkqFI7lgzxT0mfxNGujBPwYFnLpTN0Z77v5Hg9kETL2BvuJMS0D052WlcaEVcom6SiCQ9
-	nrwEYfqYzyRvRSCfvbhW4J/j5WPdVJoS9hROLx/Ej3cXOgK99zF+LcquYhCmhuH0LNDpHC0A62Fyj
-	DvWTSEs5qevT9JObquY3m+YLsgmznv9R48aBocct2cLaAJiKBu7Z/jrB4oXZz2sXG5k7Oww7r99wB
-	dSSdnCHNSMVJ+CmgFYSXZJg+9S02H5VQxuZ7Nw==;
+	s=selector1; h=Cc:To:In-Reply-To:References:Message-Id:
+	Content-Transfer-Encoding:Content-Type:MIME-Version:Subject:Date:From;
+	bh=JldiuB0XR8hVWEibYgQzf41tTKrljaWoQOxMRih5Tjs=; b=Ba7j6/9lEiTpBtU1HPrplzpJSi
+	iqaauveifuIcjb3E2ubRll1XTdr5F4CQtRl3bs031GFTg8X/4DlaOC3GthwDyULe9Gy/LhwQ7Jce5
+	YfiLNIq2pNPDzYxDC9DAXq43sKKDesB5u/KOJauaEvKNHLXb7FMmPs8sipQnFoHkxEYx7sg7cOQ7D
+	MN+qYQjLqsMeSRFqPaLvWQA4ji5KVS4XnQATNCVRWK+uPz2e90dIebM637WSQg9AjhRkNdvairX34
+	VzJ6FYyU9sD2VzJRz9beruVrSYGYTHCHL1/7weK1huQ95zsCLauVLZCOPEDe5IbVuQINJqEEHsAOZ
+	gTvG9CqQ==;
 Received: from [10.9.9.72] (helo=submission01.runbox)
 	by mailtransmit02.runbox with esmtp (Exim 4.86_2)
 	(envelope-from <mhal@rbox.co>)
-	id 1thSh3-00088j-44; Mon, 10 Feb 2025 13:15:17 +0100
+	id 1thSh4-00088s-DD; Mon, 10 Feb 2025 13:15:18 +0100
 Received: by submission01.runbox with esmtpsa  [Authenticated ID (604044)]  (TLS1.2:ECDHE_SECP256R1__RSA_PSS_RSAE_SHA256__AES_256_GCM:256)
 	(Exim 4.93)
-	id 1thSgx-007tu3-2Y; Mon, 10 Feb 2025 13:15:11 +0100
+	id 1thSgx-007tu3-Il; Mon, 10 Feb 2025 13:15:11 +0100
 From: Michal Luczaj <mhal@rbox.co>
-Subject: [PATCH net v3 0/2] vsock: null-ptr-deref when SO_LINGER enabled
-Date: Mon, 10 Feb 2025 13:14:59 +0100
-Message-Id: <20250210-vsock-linger-nullderef-v3-0-ef6244d02b54@rbox.co>
+Date: Mon, 10 Feb 2025 13:15:00 +0100
+Subject: [PATCH net v3 1/2] vsock: Orphan socket after transport release
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -62,11 +63,9 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-X-B4-Tracking: v=1; b=H4sIAMPtqWcC/3XNTQrCMBAF4KvIrI3kz9i68h7iIk0nNlgSSWqol
- N7dEATddPneY75ZIGF0mOC8WyBidskFX4LY78AM2t+RuL5k4JQfKaeC5BTMg4yuTJH41zj2GNE
- S06GUlOteUAXl+FlKN1f4Ch4nuJVycGkK8V2fZVanryu33MwIJQo7dlLU6lbgJXZhPphQwcz/E
- bWJ8ILYRjPLWiaVbX7Iuq4fN1HS1wQBAAA=
-X-Change-ID: 20250203-vsock-linger-nullderef-cbe4402ad306
+Message-Id: <20250210-vsock-linger-nullderef-v3-1-ef6244d02b54@rbox.co>
+References: <20250210-vsock-linger-nullderef-v3-0-ef6244d02b54@rbox.co>
+In-Reply-To: <20250210-vsock-linger-nullderef-v3-0-ef6244d02b54@rbox.co>
 To: Stefano Garzarella <sgarzare@redhat.com>, 
  "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
  Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
@@ -76,37 +75,65 @@ Cc: netdev@vger.kernel.org, Michal Luczaj <mhal@rbox.co>,
  Luigi Leonardi <leonardi@redhat.com>
 X-Mailer: b4 0.14.2
 
-syzbot pointed out that a recent patching of a use-after-free introduced a
-null-ptr-deref. This series fixes the problem and adds a test.
+During socket release, sock_orphan() is called without considering that it
+sets sk->sk_wq to NULL. Later, if SO_LINGER is enabled, this leads to a
+null pointer dereferenced in virtio_transport_wait_close().
 
-Fixes fcdd2242c023 ("vsock: Keep the binding until socket destruction").
+Orphan the socket only after transport release.
 
+Partially reverts the 'Fixes:' commit.
+
+KASAN: null-ptr-deref in range [0x0000000000000018-0x000000000000001f]
+ lock_acquire+0x19e/0x500
+ _raw_spin_lock_irqsave+0x47/0x70
+ add_wait_queue+0x46/0x230
+ virtio_transport_release+0x4e7/0x7f0
+ __vsock_release+0xfd/0x490
+ vsock_release+0x90/0x120
+ __sock_release+0xa3/0x250
+ sock_close+0x14/0x20
+ __fput+0x35e/0xa90
+ __x64_sys_close+0x78/0xd0
+ do_syscall_64+0x93/0x1b0
+ entry_SYSCALL_64_after_hwframe+0x76/0x7e
+
+Reported-by: syzbot+9d55b199192a4be7d02c@syzkaller.appspotmail.com
+Closes: https://syzkaller.appspot.com/bug?extid=9d55b199192a4be7d02c
+Fixes: fcdd2242c023 ("vsock: Keep the binding until socket destruction")
+Tested-by: Luigi Leonardi <leonardi@redhat.com>
+Reviewed-by: Luigi Leonardi <leonardi@redhat.com>
 Signed-off-by: Michal Luczaj <mhal@rbox.co>
 ---
-Changes in v3:
-- Don't touch the old comment [Stefano, Luigi]
-- Collect tags [Stefano, Luigi]
-- Link to v2: https://lore.kernel.org/r/20250206-vsock-linger-nullderef-v2-0-f8a1f19146f8@rbox.co
+ net/vmw_vsock/af_vsock.c | 8 +++++++-
+ 1 file changed, 7 insertions(+), 1 deletion(-)
 
-Changes in v2:
-- Collect tags [Luigi]
-- Explain the reason for the explicit set_flag(SOCK_DEAD) [Stefano]
-- Link to v1: https://lore.kernel.org/r/20250204-vsock-linger-nullderef-v1-0-6eb1760fa93e@rbox.co
+diff --git a/net/vmw_vsock/af_vsock.c b/net/vmw_vsock/af_vsock.c
+index 075695173648d3a4ecbd04e908130efdbb393b41..53a081d49d28ac1c04e7f8057c8a55e7b73cc131 100644
+--- a/net/vmw_vsock/af_vsock.c
++++ b/net/vmw_vsock/af_vsock.c
+@@ -824,13 +824,19 @@ static void __vsock_release(struct sock *sk, int level)
+ 	 */
+ 	lock_sock_nested(sk, level);
+ 
+-	sock_orphan(sk);
++	/* Indicate to vsock_remove_sock() that the socket is being released and
++	 * can be removed from the bound_table. Unlike transport reassignment
++	 * case, where the socket must remain bound despite vsock_remove_sock()
++	 * being called from the transport release() callback.
++	 */
++	sock_set_flag(sk, SOCK_DEAD);
+ 
+ 	if (vsk->transport)
+ 		vsk->transport->release(vsk);
+ 	else if (sock_type_connectible(sk->sk_type))
+ 		vsock_remove_sock(vsk);
+ 
++	sock_orphan(sk);
+ 	sk->sk_shutdown = SHUTDOWN_MASK;
+ 
+ 	skb_queue_purge(&sk->sk_receive_queue);
 
----
-Michal Luczaj (2):
-      vsock: Orphan socket after transport release
-      vsock/test: Add test for SO_LINGER null ptr deref
-
- net/vmw_vsock/af_vsock.c         |  8 +++++++-
- tools/testing/vsock/vsock_test.c | 41 ++++++++++++++++++++++++++++++++++++++++
- 2 files changed, 48 insertions(+), 1 deletion(-)
----
-base-commit: 011b0335903832facca86cd8ed05d7d8d94c9c76
-change-id: 20250203-vsock-linger-nullderef-cbe4402ad306
-
-Best regards,
 -- 
-Michal Luczaj <mhal@rbox.co>
+2.48.1
 
 
