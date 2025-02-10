@@ -1,134 +1,174 @@
-Return-Path: <netdev+bounces-164551-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-164552-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id E41CEA2E2F8
-	for <lists+netdev@lfdr.de>; Mon, 10 Feb 2025 05:00:08 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 86FF9A2E307
+	for <lists+netdev@lfdr.de>; Mon, 10 Feb 2025 05:14:15 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id AB3283A5256
-	for <lists+netdev@lfdr.de>; Mon, 10 Feb 2025 03:59:59 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 638343A52FD
+	for <lists+netdev@lfdr.de>; Mon, 10 Feb 2025 04:14:06 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6D94613B7BE;
-	Mon, 10 Feb 2025 04:00:05 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 42CF5155393;
+	Mon, 10 Feb 2025 04:14:11 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="DDSgRFXn"
+	dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b="lSXbnDGo"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qv1-f49.google.com (mail-qv1-f49.google.com [209.85.219.49])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp-fw-80009.amazon.com (smtp-fw-80009.amazon.com [99.78.197.220])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C595D143890
-	for <netdev@vger.kernel.org>; Mon, 10 Feb 2025 04:00:03 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.49
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 93880145A18
+	for <netdev@vger.kernel.org>; Mon, 10 Feb 2025 04:14:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=99.78.197.220
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1739160005; cv=none; b=gO/SNM8oJWPECMFVR8AqnxN0b03OLLSJ9kiI4+Khyq3b1UtLya++f/uPSBmtVn3u7T/Vb3tkQdfmMx+AmZx163SXI5ybBIX5+LubQCGPbW+Wt+IOOSSF2BOip9hs79DxUasRcTeXuzocpqwh7FNgwE2qxt8ytZIkhIjGLoWCngQ=
+	t=1739160851; cv=none; b=myOZr9o8HwAWsyfkVj8fcxfgxDjSGV/hEe5tkQA8fyvBnU2Tud/rcfKB5XSDMpwFcGWDSKRFajAvxh6rsqjZdbkEodz9FkUbCrNjYUr5R0bUX/TSKu1sCUe6Hhb1jm9Zi8H2IcS/GCdXEpT/osJA6ut2v+95Me7v0PTxaltNNY4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1739160005; c=relaxed/simple;
-	bh=o9L6wygnIjlk6pq9qdbVxhm16zGSITIhNwPAA15zuSI=;
-	h=Date:From:To:Cc:Message-ID:In-Reply-To:References:Subject:
-	 Mime-Version:Content-Type; b=czShe8qFJc5+4OHMRnN2db05wCyHTboSngMGYeHtsN/2rrE90avUUDlaP1t9uOeFIm3GbzowvgT+W71aB/h/4n7Xu3G3XRw0nPGFHtTOsqh1e6+VgM1cXi59zC+9CrI9sF4nynoKTottWLXjmRiN13CDownp9JRXdPqFueBt//0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=DDSgRFXn; arc=none smtp.client-ip=209.85.219.49
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-qv1-f49.google.com with SMTP id 6a1803df08f44-6e45258610bso13069236d6.1
-        for <netdev@vger.kernel.org>; Sun, 09 Feb 2025 20:00:03 -0800 (PST)
+	s=arc-20240116; t=1739160851; c=relaxed/simple;
+	bh=d7ASBTUmVgHnyXAHKLKO7SZm0ylBU5JVJNzAkCoH+BU=;
+	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=d9f/nu7frj1PAMWTqc8fH10P6ZXTbnA6pAhfml9pL4u5tTFvG9USG/DnUZ6B4IkdFam+wRhR8yN2HV3Paz49uvVkdH85IbXTnbFYhZiEeZ1vAR3w5dSrj795xq5IUZeJVL4BrraXGydIQuUiIo6u+WjyH+Tbd7Jtckbfi9JkLfE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.co.jp; dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b=lSXbnDGo; arc=none smtp.client-ip=99.78.197.220
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.co.jp
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1739160002; x=1739764802; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:subject:references
-         :in-reply-to:message-id:cc:to:from:date:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=Os5zFJQwD/r4LzPwyBHqXJLn1SZv18rznMv4qe6uQrw=;
-        b=DDSgRFXnJad60RRoemObG+RCpm4T8XQVTeChYNiqAUyoZrz6gwZ++h1q4kcMSw3j45
-         9eueRkX/jq3Ej0fcMl62DaAog5CZrW+otY49h0+v4wmm496w6/Wcb+eLlI6Ix9A63/Ib
-         tyPILmpW43FKQ539I56F6YNkqskWb2jQtUrw/5EtygIcHcCMGZFx2GXdhDytYRj8vGhV
-         9ESJyndWWghT4OE/XC2inO+EW5Rq0ZxYQCWxkLoLGmeounOVQZA5j5IMy0P5lNnVCbBj
-         0LBgBuIwQLQTl9GDX9aFRkWnQ7Jj4r5mdQTVdrtK4s4WQ98K18gSE2X1+qxbivw3Qol9
-         rDOg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1739160002; x=1739764802;
-        h=content-transfer-encoding:mime-version:subject:references
-         :in-reply-to:message-id:cc:to:from:date:x-gm-message-state:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=Os5zFJQwD/r4LzPwyBHqXJLn1SZv18rznMv4qe6uQrw=;
-        b=Cnl+oF2yF263wCTEEvvaub4e7Zub7Z9JhwUlBD27TEGq3Y5J8RdX7Z8L5+KKKIlwUJ
-         QnAabLhKUh/BfJhO+nEe0XwVE/GOlDF1mGduUpq9gl8Inxh/BwjuqJlFUcV6xoLnkjfV
-         O8/y+7W0pq2eO5UHHtrEjZ/dXgsKH0czCJ2jGX1RXmzumaMck4II2ncX8iD/KScAI1+c
-         sKWvPV1KIwtQo0vrIBM7tKjU/FqzwuQ1HaemiRF97YHx9Gg+aKqrAyr52AJQN1DbYGw6
-         AB40v174KBrKrpthgsO3OVFkJCgdUb7CF6smOUr0zJRCRf/11tP99lkyiH99jASX9qj1
-         tRaQ==
-X-Forwarded-Encrypted: i=1; AJvYcCUR4JdBQVyCnK5niU46GM216qKiW0x4Yxx6aIW8x1FMQNq52VSoh7umNcBEJ6j5ADphPDHwVMA=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzNf7QnA5HdTh9ZcZYAPyUqem0dBB3YtXuKNqrO0nxXtUKfj5Bx
-	a+/c8NAZIPqNK06Ug9F2qjYJdiaMRDEfP/WUM/Jum6Ug/UJ2lZiF
-X-Gm-Gg: ASbGnctB2nktACra85pxWf4Kz/48ClLy+b4ZI4MzfOapAfl8DqausF1mMaaw6kUsTZb
-	33Vx3jXAyTFxIAwHdV+gknanQkSnYLZZ2P2hsxwvQyFyO3W+LZ2/yx5HZj2cdmM5FixMGY5+VZL
-	Gi3zG5zx32C2B5nCeGjbih/8c7T6HNh09U2zLGm8lDT/ILntnAnDTnW1fXh2V1TrFy/EIvkwp8v
-	tAGCK5oADwvhRqfVxNFH78NESSPaGDcxhUVWRVzE6SZJz2WyaCKe1C6FWaWu57sHemPF82khcNE
-	E52uWxg7Rn923jRv0A4IrppIwhE8rDbrTMr68nH+Yzn9IGYWWVb9LucRTG5tOeU=
-X-Google-Smtp-Source: AGHT+IETfLyH3aymVom07P4nR7/6YN1xQAv4syiBwRbBajDX5W7WtiRToL5URmn0iRmJdGdvRo+vqQ==
-X-Received: by 2002:a05:6214:c88:b0:6e4:5b6a:9d48 with SMTP id 6a1803df08f44-6e45b6aa0d5mr69761496d6.7.1739160002470;
-        Sun, 09 Feb 2025 20:00:02 -0800 (PST)
-Received: from localhost (15.60.86.34.bc.googleusercontent.com. [34.86.60.15])
-        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-6e43baacb74sm42663326d6.77.2025.02.09.20.00.01
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sun, 09 Feb 2025 20:00:01 -0800 (PST)
-Date: Sun, 09 Feb 2025 23:00:01 -0500
-From: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
-To: Paolo Abeni <pabeni@redhat.com>, 
- netdev@vger.kernel.org
-Cc: Willem de Bruijn <willemdebruijn.kernel@gmail.com>, 
- Eric Dumazet <edumazet@google.com>, 
- Kuniyuki Iwashima <kuniyu@amazon.com>, 
- "David S. Miller" <davem@davemloft.net>, 
- Jakub Kicinski <kuba@kernel.org>, 
- Simon Horman <horms@kernel.org>, 
- Neal Cardwell <ncardwell@google.com>, 
- David Ahern <dsahern@kernel.org>
-Message-ID: <67a979c156cbe_14761294f6@willemb.c.googlers.com.notmuch>
-In-Reply-To: <cover.1738940816.git.pabeni@redhat.com>
-References: <cover.1738940816.git.pabeni@redhat.com>
-Subject: Re: [RFC PATCH 0/2] udp: avoid false sharing on sk_tsflags
+  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
+  t=1739160849; x=1770696849;
+  h=from:to:cc:subject:date:message-id:in-reply-to:
+   references:mime-version:content-transfer-encoding;
+  bh=0ULJdBiHztoqR+g86iMNzJo4twVd0vxpsJx9SpvTw1s=;
+  b=lSXbnDGopiUi8U3WCvUbdQDfX3VJlbXI9kctojetsKVcb27Cwl16kQUR
+   TTkQUYNPXHCXhZHuLl/TwGzb9kTg3wK4iW+Dh7OqOFFAqeITuAZXQtiQ5
+   G4HxUh86ksuv2zKAxSWfqzXhxQPnZMCSroRBGntsHBflJdIBGiZpxk+U1
+   c=;
+X-IronPort-AV: E=Sophos;i="6.13,273,1732579200"; 
+   d="scan'208";a="171028519"
+Received: from pdx4-co-svc-p1-lb2-vlan2.amazon.com (HELO smtpout.prod.us-west-2.prod.farcaster.email.amazon.dev) ([10.25.36.210])
+  by smtp-border-fw-80009.pdx80.corp.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 10 Feb 2025 04:14:07 +0000
+Received: from EX19MTAUWC001.ant.amazon.com [10.0.7.35:16658]
+ by smtpin.naws.us-west-2.prod.farcaster.email.amazon.dev [10.0.14.41:2525] with esmtp (Farcaster)
+ id bd2d05d2-fec2-47e0-b92e-3762f998a7ae; Mon, 10 Feb 2025 04:14:07 +0000 (UTC)
+X-Farcaster-Flow-ID: bd2d05d2-fec2-47e0-b92e-3762f998a7ae
+Received: from EX19D004ANA001.ant.amazon.com (10.37.240.138) by
+ EX19MTAUWC001.ant.amazon.com (10.250.64.174) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1258.39;
+ Mon, 10 Feb 2025 04:14:01 +0000
+Received: from 6c7e67bfbae3.amazon.com (10.37.244.8) by
+ EX19D004ANA001.ant.amazon.com (10.37.240.138) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1544.14;
+ Mon, 10 Feb 2025 04:13:57 +0000
+From: Kuniyuki Iwashima <kuniyu@amazon.com>
+To: <edumazet@google.com>
+CC: <davem@davemloft.net>, <eric.dumazet@gmail.com>, <horms@kernel.org>,
+	<kuba@kernel.org>, <netdev@vger.kernel.org>, <pabeni@redhat.com>
+Subject: Re: [PATCH v3 net-next 3/5] net: no longer hold RTNL while calling flush_all_backlogs()
+Date: Mon, 10 Feb 2025 13:13:48 +0900
+Message-ID: <20250210041348.69881-1-kuniyu@amazon.com>
+X-Mailer: git-send-email 2.39.5 (Apple Git-154)
+In-Reply-To: <20250114205531.967841-4-edumazet@google.com>
+References: <20250114205531.967841-4-edumazet@google.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Content-Type: text/plain;
- charset=utf-8
-Content-Transfer-Encoding: 7bit
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-ClientProxiedBy: EX19D039UWB002.ant.amazon.com (10.13.138.79) To
+ EX19D004ANA001.ant.amazon.com (10.37.240.138)
 
-Paolo Abeni wrote:
-> While benchmarking the recently shared page frag revert, I observed a
-> lot of cache misses in the UDP RX path due to false sharing between the
-> sk_tsflags and the sk_forward_alloc sk fields.
-> 
-> Here comes a solution attempt for such a problem, inspired by commit
-> f796feabb9f5 ("udp: add local "peek offset enabled" flag").
-> 
-> The first patch adds a new proto op allowing protocol specific operation
-> on tsflags updates, and the 2nd one leverages such operation to cache
-> the problematic field in a cache friendly manner.
-> 
-> The need for a new operation is possibly suboptimal, hence the RFC tag,
-> but I could not find other good solutions. I considered:
-> - moving the sk_tsflags just before 'sk_policy', in the 'sock_read_rxtx'
->   group. It arguably belongs to such group, but the change would create
->   a couple of holes, increasing the 'struct sock' size and would have 
->   side effects on other protocols
-> - moving the sk_tsflags just before 'sk_stamp'; similar to the above,
->   would possibly reduce the side effects, as most of 'struct sock'
->   layout will be unchanged. Could increase the number of cacheline
->   accessed in the TX path.
-> 
-> I opted for the present solution as it should minimize the side effects
-> to other protocols.
+Hi Eric,
 
-The code looks solid at a high level to me.
+From: Eric Dumazet <edumazet@google.com>
+Date: Tue, 14 Jan 2025 20:55:29 +0000
+> @@ -11575,8 +11598,10 @@ void unregister_netdevice_many_notify(struct list_head *head,
+>  		unlist_netdevice(dev);
+>  		WRITE_ONCE(dev->reg_state, NETREG_UNREGISTERING);
+>  	}
+> -	flush_all_backlogs();
+>  
+> +	rtnl_drop_if_cleanup_net();
+> +	flush_all_backlogs();
+> +	rtnl_acquire_if_cleanup_net();
+>  	synchronize_net();
+>  
+>  	list_for_each_entry(dev, head, unreg_list) {
 
-But if the issue can be adddressed by just moving a field, that is
-quite appealing. So have no reviewed closely yet.
+One of my syzkaller setup happend to not have the revert of this series
+and this hunk seemed to trigger BUG_ON(dev->reg_state != NETREG_REGISTERED)
+for PPP.
 
-Question is which field to swap it with. Something like sk_rcvlowat is
-not used in UDP. But is clearly not a write_rxtx or write_tx field.
+ppp_release() assumed that RTNL is not released until ->ndo_uninit() that
+clears ppp->owner to NULL, so this change may be needed in the next try,
+just fyi.
+
+Thanks!
+
+---8<---
+diff --git a/drivers/net/ppp/ppp_generic.c b/drivers/net/ppp/ppp_generic.c
+index 4583e15ad03a..ccf3b708bbc9 100644
+--- a/drivers/net/ppp/ppp_generic.c
++++ b/drivers/net/ppp/ppp_generic.c
+@@ -406,7 +406,8 @@ static int ppp_release(struct inode *unused, struct file *file)
+ 		if (pf->kind == INTERFACE) {
+ 			ppp = PF_TO_PPP(pf);
+ 			rtnl_lock();
+-			if (file == ppp->owner)
++			if (file == ppp->owner &&
++			    ppp->dev->reg_state == NETREG_REGISTERED)
+ 				unregister_netdevice(ppp->dev);
+ 			rtnl_unlock();
+ 		}
+---8<---
+
+---8<---
+kernel BUG at net/core/dev.c:11773!
+Oops: invalid opcode: 0000 [#1] PREEMPT SMP KASAN
+CPU: 0 UID: 0 PID: 1681 Comm: syz.2.364 Not tainted 6.13.0-04046-g0ad9617c78ac #25 2a4f595e37b581d176eb9aae48dfe81ca9e88551
+Hardware name: QEMU Standard PC (i440FX + PIIX, 1996), BIOS rel-1.16.3-0-ga6ed6b701f0a-prebuilt.qemu.org 04/01/2014
+RIP: 0010:unregister_netdevice_many_notify+0x1d44/0x1d50 net/core/dev.c:11773
+Code: c1 80 61 30 87 80 e1 07 80 c1 03 38 c1 0f 8c c8 e8 ff ff 48 c7 c7 80 61 30 87 e8 17 6b dc fd e9 b7 e8 ff ff e8 3d c6 8b fd 90 <0f> 0b e8 35 c6 8b fd 90 0f 0b 66 90 55 41 57 41 56 41 55 41 54 53
+RSP: 0018:ffa000001440f6c0 EFLAGS: 00010293
+RAX: ffffffff83cad063 RBX: 1fe22000029bc02f RCX: ff11000103764480
+RDX: 0000000000000000 RSI: 0000000000000002 RDI: 0000000000000001
+RBP: ffa000001440f890 R08: ffffffff8709abc7 R09: 1ffffffff0e13578
+R10: dffffc0000000000 R11: fffffbfff0e13579 R12: ffa000001440f8e0
+R13: ffa000001440f8e0 R14: 0000000000000002 R15: 0000000000000002
+FS:  0000000000000000(0000) GS:ff1100011a000000(0000) knlGS:0000000000000000
+CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+CR2: 00007f9c1a46e000 CR3: 00000001095ee002 CR4: 0000000000771ef0
+DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
+DR3: 0000000000000000 DR6: 00000000ffff0ff0 DR7: 0000000000000600
+PKRU: 80000000
+Call Trace:
+ <TASK>
+ unregister_netdevice_many net/core/dev.c:11875 [inline]
+ unregister_netdevice_queue+0x33d/0x380 net/core/dev.c:11741
+ unregister_netdevice include/linux/netdevice.h:3329 [inline]
+ ppp_release+0xed/0x1f0 drivers/net/ppp/ppp_generic.c:410
+ __fput+0x212/0xa60 fs/file_table.c:450
+ task_work_run+0x1cb/0x240 kernel/task_work.c:239
+ exit_task_work include/linux/task_work.h:43 [inline]
+ do_exit+0x87e/0x2470 kernel/exit.c:938
+ do_group_exit+0x21c/0x2d0 kernel/exit.c:1087
+ get_signal+0x1206/0x12c0 kernel/signal.c:3036
+ arch_do_signal_or_restart+0x87/0x7a0 arch/x86/kernel/signal.c:337
+ exit_to_user_mode_loop kernel/entry/common.c:111 [inline]
+ exit_to_user_mode_prepare include/linux/entry-common.h:329 [inline]
+ __syscall_exit_to_user_mode_work kernel/entry/common.c:207 [inline]
+ syscall_exit_to_user_mode+0x8b/0x110 kernel/entry/common.c:218
+ do_syscall_64+0xf1/0x1c0 arch/x86/entry/common.c:89
+ entry_SYSCALL_64_after_hwframe+0x4b/0x53
+RIP: 0033:0x7f35b2c05d29
+Code: Unable to access opcode bytes at 0x7f35b2c05cff.
+RSP: 002b:00007f35b1235038 EFLAGS: 00000246 ORIG_RAX: 000000000000012a
+RAX: 0000000000000005 RBX: 00007f35b2df6160 RCX: 00007f35b2c05d29
+RDX: fdffffffffffffff RSI: 0000000000000000 RDI: 0000000020000100
+RBP: 00007f35b2c81b08 R08: 0000000000000000 R09: 0000000000000000
+R10: ffffffffffffffff R11: 0000000000000246 R12: 0000000000000000
+R13: 0000000000000000 R14: 00007f35b2df6160 R15: 00007f35b2f1fa28
+ </TASK>
+Modules linked in:
+---8<---
 
