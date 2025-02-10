@@ -1,141 +1,168 @@
-Return-Path: <netdev+bounces-164709-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-164711-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 58D69A2ECA6
-	for <lists+netdev@lfdr.de>; Mon, 10 Feb 2025 13:37:12 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4D6CFA2ECBD
+	for <lists+netdev@lfdr.de>; Mon, 10 Feb 2025 13:40:39 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 07E401612E1
-	for <lists+netdev@lfdr.de>; Mon, 10 Feb 2025 12:37:11 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id BC6B8163758
+	for <lists+netdev@lfdr.de>; Mon, 10 Feb 2025 12:40:36 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 199BF14B08C;
-	Mon, 10 Feb 2025 12:37:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DCF3E221D88;
+	Mon, 10 Feb 2025 12:40:27 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="bghmlNOb"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Bye8pxLW"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f47.google.com (mail-wm1-f47.google.com [209.85.128.47])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5514828E7
-	for <netdev@vger.kernel.org>; Mon, 10 Feb 2025 12:37:07 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.47
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0DDD122333D
+	for <netdev@vger.kernel.org>; Mon, 10 Feb 2025 12:40:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1739191029; cv=none; b=Uoj9ue5vgPbfvEr3sma0Aw5bEWbA3L9Y/jsu1ZgWfIX3BFfy5303W1Kk9Bm09XVgdkGST8wtRX3/01+J+0RiZR5o69mBoLTA2K/Tynx42m6fcpoUI861khqXRkB+RHl9ufIVjDBIlmo2fqHVLxGVgF7J3AnUJm5efWhisOG4LS0=
+	t=1739191227; cv=none; b=uAFPXLuo9Oxz3wWmQ2cfnfiOFhpdO8ShyL6lPeaAxjN91MdDBvS0T7k+Zn1fadwF3hbesMG9o3Isq6cQkWcnXzxS02Uv5E5IL7ZMn3S/Rsr7fbXRXsbKZU39oOuIqce0arH0lKR63Ep6VilYiNJHT0bp/mfqnvClazma8OVdBVI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1739191029; c=relaxed/simple;
-	bh=K3MtQ5idC4oHoXTcpqKWeJSzAGrhCwaVTOUqmUG9xiY=;
+	s=arc-20240116; t=1739191227; c=relaxed/simple;
+	bh=ZZBZ3akWv+ZpJPt5wUANYxLrBGP46bHYLVbBRCXozmE=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=dXczD9bUHW7jalY66icOaJiwIchW92zgbW41NtwpyJmoYmavKOysygxMJa+kcvU/1zXOWzLOZgxhBoVWhDdCRpCW7A/lFto1eocF3Nma/Z9Hn5SrCFHxJmR4HwKTznXd/SE/XVk5BpnCAmfPoBHblp78P1pUqvNBojOT0Yya8FQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=bghmlNOb; arc=none smtp.client-ip=209.85.128.47
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wm1-f47.google.com with SMTP id 5b1f17b1804b1-434f398a171so3928965e9.2
-        for <netdev@vger.kernel.org>; Mon, 10 Feb 2025 04:37:06 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1739191025; x=1739795825; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=K3MtQ5idC4oHoXTcpqKWeJSzAGrhCwaVTOUqmUG9xiY=;
-        b=bghmlNObN4ngLaKGYGifhki0vjqAhhBtQLPKG5Ts6GOhft0r+A0O9xOk549qy4+E7B
-         LR5rBfB6zWjfwI1C4makZRLzgkjsZBUujlXI+K9+atoZSWywuWzsV55O9i/mxv5rEv0y
-         EyDaV0jI88qaSuClu2Nj93lShYgiWsOgpny2Sio4/TR5T8fKDhubOx4SZ06i16FkdSaq
-         A5VmG/75jaDt7/07OkPm4qh2AndIopipT6fCNnpvpWF5j3pEnDJWgsc68QF4PrsK3t3w
-         dF9eXYA/5TZ2VQM/Lk+LA+dfrbDBCGIGVNCr7PdMpw7uj8aOtJrMOIE3FNptbhTpWBW/
-         vehQ==
+	 Content-Type:Content-Disposition:In-Reply-To; b=H+CWVevC0R3DAuF4F0jwt1aac1Lh4Q0oS6ZKZG1jHO3CvnFUvN5t32FD2OkbbI2A3Qs8Afus+n4IxFjjBxdYNgJo1VVpVLjltqtHZa+6C/JG+ivaoY5YCbAsAi4qwTDW3jCuWkaTwjxwPro7pG3lW3xMZ5LfNa0Ad9Iaw0nxnao=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=Bye8pxLW; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1739191225;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=+eh3qOjkAFyaCbqREPJPy1zgrNomisIFnz0D7Yt9Iu8=;
+	b=Bye8pxLWHFOdNyiqvqW3NuGmG4yxcml2K9SLBwyADi0ruYywRwrZptRV1AlQtZYLbUNhK0
+	LupUwWtzJraOi9P+MrD8IRmXVpiY86e6OccK7bqVeHQuJAV3jZwD9o3RtsS07zGGGTcKZ8
+	H626eGdZ48TgTzVlG++pz2LtTbFrceI=
+Received: from mail-wm1-f69.google.com (mail-wm1-f69.google.com
+ [209.85.128.69]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-91-RwxZuqd7Pm2pJSRSlcRyGA-1; Mon, 10 Feb 2025 07:40:23 -0500
+X-MC-Unique: RwxZuqd7Pm2pJSRSlcRyGA-1
+X-Mimecast-MFC-AGG-ID: RwxZuqd7Pm2pJSRSlcRyGA
+Received: by mail-wm1-f69.google.com with SMTP id 5b1f17b1804b1-439385b08d1so11725035e9.1
+        for <netdev@vger.kernel.org>; Mon, 10 Feb 2025 04:40:23 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1739191025; x=1739795825;
+        d=1e100.net; s=20230601; t=1739191222; x=1739796022;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=K3MtQ5idC4oHoXTcpqKWeJSzAGrhCwaVTOUqmUG9xiY=;
-        b=DGYnK9JpUFCo5F6McvwbOgMWn3UJm3lyZ2QdeMVi9OQn4uHQ+kLMZpq/4EK3O7HtIu
-         jDp3cw1LLTwkDWXYFHbgC4rzI/IP0hE1ZqFyYRvGudkRAs4Z4VT5s/JYazOex/282Qu5
-         f7ZG661tsB4teVDRLp3euqLqy6JLUuspBgdfHYi/8rITX5FDhwBH/RwsysGVxa0qFDgN
-         DgA0g3aOrpLdJLixYtbFW87ahdwFta0wJe0urrMHMUMNGAFjoK17larpo7nb0q5ZQsSL
-         EMfqywZr3/LmPrsnIbx1PNo7o8piK85Wod4wEmguF15ewH4WStqMHBYEQy5LzyFdzlhu
-         tVeQ==
-X-Forwarded-Encrypted: i=1; AJvYcCVwkCSIWaLA7TmvxZxaECkIJDukdToQQ/YYD2+JI/3n9+WRJ+18a+QdwQDNHq5UW9HFRVoAqYg=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwcqoRFROee6w3IwJzpA8lO1fZw/YYBCkm74nfkP28+QS64E/JT
-	7oeAu25BKtJk1AhkgRQI96cFsRjvGvK/41YfbI9dIgC1FwPixdhe
-X-Gm-Gg: ASbGncv9Zrli64aqMFwrbFfVoswmmhDgthxEecdQCoDo6lkovAcUIg2GDiQaatf8zns
-	OoFpuAGkEzfgg6CeGmR3Bz9iqBcRy+mGN09r/llVaU5QSCCxZxXpGdgmzWCh5romQd+sh0WL6+M
-	IrMUXHbopDckTbsb8R3UnNYPOU9PJEk1XvCgBWGcTMCY5ua4xV6rnTUq3sM4Qx0v/ZM5PjjI/OH
-	xkL892p5Q8F1xLbr57IizzVJmM8NhAzOflbZUSkByf04SHcyIzUegem74d4K1Rqs5tzJmrptHyD
-	s08=
-X-Google-Smtp-Source: AGHT+IFp/qrMqpF0QewcGTK19D8rZ6WhmzABzEYZiO2aWnKT/+1DEN2GE0Y0xC2bvfjR6EFR1vJt5w==
-X-Received: by 2002:a05:600c:3b24:b0:434:a0fd:95d0 with SMTP id 5b1f17b1804b1-439249af823mr44302995e9.4.1739191025313;
-        Mon, 10 Feb 2025 04:37:05 -0800 (PST)
-Received: from skbuf ([86.127.124.81])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-38dd34f2af5sm7073731f8f.78.2025.02.10.04.37.03
+        bh=+eh3qOjkAFyaCbqREPJPy1zgrNomisIFnz0D7Yt9Iu8=;
+        b=hGLeEw4N6A2xsyNWyRAbWJDEsmeBvK97FUK863ENQK5Q1bTaUbEoyAvvH/YszaV6QK
+         Le3PosyGF/mQyY79rSWY6+2fJTKUlj1XJbW1L94KnHce+qt/DciI8tjwRyW22xEijPZ0
+         FM/+1zej0MMrkUlSyFw/ZtNqtuvcqWXZKoK6AW6htfTSiMyGmH4yRMnTWvjSC1CIsMq5
+         PsUE0eBDYSKLhElYKa9GQ7TKn/pZ4HNSUWWcWPkcem6SlI54nrVPpIL11CR7TLIV3sqi
+         78CNHir2mlpVxDuTAjm4Q+Sh2tbQbs2E4kti1dxTZ9BqM4OXdukXzRzrk8vfQvGYkTAo
+         Ll3g==
+X-Forwarded-Encrypted: i=1; AJvYcCXuAMiov26oscm8gox3hgRw18lyvAA4g9uneNqXWLe5Kz8ot9JC0SGLyS3m96SbRbhGkRHhEC4=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzOzv2YdXkyJwgkpkUVvZ42HV5YsJJWGxqDAZWWJ1a4/G8dK9a4
+	4x8w7GqvKirjXTW9wbft+hfpxvCjSWpoG7bAHDUGSWhgMBBbNkw92pkk4tOocq8K9CLSnPNInf+
+	y2XukEfsvFEEftM2xWaOwpjasqezXLYgkaW/H7zamAI+VVvNX0MAVRQ==
+X-Gm-Gg: ASbGncuIcffP1mjqkaWGheIAl/Aqt/DNZhRTEu5aWUsx2XIy2nldXhFDV3pdQnaRES+
+	o7CyuKJygKmgWO/X51tklXWdA+v+EH30pZg/cYxrlWxhmB+dOjJjcdNnkpM0iwWBRb10AbDkBnx
+	F6DqWZR5U75cBhksioXrC7AGr8RHTjeDH+j5p6Ju/0FNjQu1ODihIbhRzcvStysQcUW2j/VaFKz
+	0jw2Lc1YMWsGwC7XoJMlX3FXlwIyyNsPBsqP10chYuuxtae0wOdDf7RjGWmXc0OpsyN+CVvWabw
+	i0q212RjI57IGc5QPTixPcLnBg17irgRAZkkKsLmXVLPq/h9VlzmIw==
+X-Received: by 2002:a5d:64ed:0:b0:38d:d8b2:cf0a with SMTP id ffacd0b85a97d-38dd8b2d311mr5422125f8f.31.1739191222432;
+        Mon, 10 Feb 2025 04:40:22 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IHTeSl1RLHLzc450XocagDjMuvY6r3TYDHeMR0TsZO2sNf1Ruyqf4Hle1EyYoKCPOvYojpUPw==
+X-Received: by 2002:a5d:64ed:0:b0:38d:d8b2:cf0a with SMTP id ffacd0b85a97d-38dd8b2d311mr5422077f8f.31.1739191221664;
+        Mon, 10 Feb 2025 04:40:21 -0800 (PST)
+Received: from sgarzare-redhat (host-79-46-200-29.retail.telecomitalia.it. [79.46.200.29])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-43936bcc04fsm69817105e9.20.2025.02.10.04.40.20
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 10 Feb 2025 04:37:04 -0800 (PST)
-Date: Mon, 10 Feb 2025 14:37:01 +0200
-From: Vladimir Oltean <olteanv@gmail.com>
-To: "Russell King (Oracle)" <linux@armlinux.org.uk>
-Cc: Andrew Lunn <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>,
-	AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>,
-	"Chester A. Unal" <chester.a.unal@arinc9.com>,
-	Daniel Golle <daniel@makrotopia.org>,
-	"David S. Miller" <davem@davemloft.net>,
-	DENG Qingfang <dqfext@gmail.com>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	linux-arm-kernel@lists.infradead.org,
-	linux-mediatek@lists.infradead.org,
-	Matthias Brugger <matthias.bgg@gmail.com>, netdev@vger.kernel.org,
-	Paolo Abeni <pabeni@redhat.com>, Sean Wang <sean.wang@mediatek.com>,
-	Simon Horman <horms@kernel.org>
-Subject: Re: [PATCH net-next v2 2/3] net: dsa: allow use of phylink managed
- EEE support
-Message-ID: <20250210123701.7gdt56l5m6t5c6ge@skbuf>
-References: <Z6YF4o0ED0KLqYS9@shell.armlinux.org.uk>
- <E1tgO70-003ilF-1x@rmk-PC.armlinux.org.uk>
- <20250207151959.jab2c36oejmdhf3k@skbuf>
- <Z6Yn2jTVmbEmhPf9@shell.armlinux.org.uk>
- <20250207213823.2uofelxulqxpdtka@skbuf>
- <Z6aIGzHWdzF5Rlci@shell.armlinux.org.uk>
+        Mon, 10 Feb 2025 04:40:21 -0800 (PST)
+Date: Mon, 10 Feb 2025 13:40:15 +0100
+From: Stefano Garzarella <sgarzare@redhat.com>
+To: Michal Luczaj <mhal@rbox.co>
+Cc: "David S. Miller" <davem@davemloft.net>, 
+	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
+	Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, netdev@vger.kernel.org, 
+	syzbot+9d55b199192a4be7d02c@syzkaller.appspotmail.com, Luigi Leonardi <leonardi@redhat.com>
+Subject: Re: [PATCH net v3 1/2] vsock: Orphan socket after transport release
+Message-ID: <fbjf5w5ipezxjh4gbxsqfqw5tktkg56yj6bzhmjgekriug54yn@pcwsqsdvoltz>
+References: <20250210-vsock-linger-nullderef-v3-0-ef6244d02b54@rbox.co>
+ <20250210-vsock-linger-nullderef-v3-1-ef6244d02b54@rbox.co>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=us-ascii; format=flowed
 Content-Disposition: inline
-In-Reply-To: <Z6aIGzHWdzF5Rlci@shell.armlinux.org.uk>
+In-Reply-To: <20250210-vsock-linger-nullderef-v3-1-ef6244d02b54@rbox.co>
 
-On Fri, Feb 07, 2025 at 10:24:27PM +0000, Russell King (Oracle) wrote:
-> You may have noticed that I'm no longer putting as much effort into
-> cover messages - and this is precisely why. I honestly don't see
-> that there's any point in spending much time on cover messages anymore.
+On Mon, Feb 10, 2025 at 01:15:00PM +0100, Michal Luczaj wrote:
+>During socket release, sock_orphan() is called without considering that it
+>sets sk->sk_wq to NULL. Later, if SO_LINGER is enabled, this leads to a
+>null pointer dereferenced in virtio_transport_wait_close().
+>
+>Orphan the socket only after transport release.
+>
+>Partially reverts the 'Fixes:' commit.
+>
+>KASAN: null-ptr-deref in range [0x0000000000000018-0x000000000000001f]
+> lock_acquire+0x19e/0x500
+> _raw_spin_lock_irqsave+0x47/0x70
+> add_wait_queue+0x46/0x230
+> virtio_transport_release+0x4e7/0x7f0
+> __vsock_release+0xfd/0x490
+> vsock_release+0x90/0x120
+> __sock_release+0xa3/0x250
+> sock_close+0x14/0x20
+> __fput+0x35e/0xa90
+> __x64_sys_close+0x78/0xd0
+> do_syscall_64+0x93/0x1b0
+> entry_SYSCALL_64_after_hwframe+0x76/0x7e
+>
+>Reported-by: syzbot+9d55b199192a4be7d02c@syzkaller.appspotmail.com
+>Closes: https://syzkaller.appspot.com/bug?extid=9d55b199192a4be7d02c
+>Fixes: fcdd2242c023 ("vsock: Keep the binding until socket destruction")
+>Tested-by: Luigi Leonardi <leonardi@redhat.com>
+>Reviewed-by: Luigi Leonardi <leonardi@redhat.com>
+>Signed-off-by: Michal Luczaj <mhal@rbox.co>
+>---
+> net/vmw_vsock/af_vsock.c | 8 +++++++-
+> 1 file changed, 7 insertions(+), 1 deletion(-)
 
-I have things to do and places to be, and I'm sure you do too, so
-I won't drag this out more than I need to. I'll just give you one
-self-contained example of what bothers me, from this very thread.
-I'm not even expecting you to change all of a sudden, I know it's hard
-and takes time and a deeper understanding of what is happening.
+Reviewed-by: Stefano Garzarella <sgarzare@redhat.com>
 
-First of all, if "I tend not to read cover messages" isn't sarcastic
-when you've make it pretty obvious so many times that this is important
-to you, then I don't know what sarcasm is. So, your message starts off
-from the very beginning by not acknowledging the way in which your
-reaction is perceived.
+>
+>diff --git a/net/vmw_vsock/af_vsock.c b/net/vmw_vsock/af_vsock.c
+>index 075695173648d3a4ecbd04e908130efdbb393b41..53a081d49d28ac1c04e7f8057c8a55e7b73cc131 100644
+>--- a/net/vmw_vsock/af_vsock.c
+>+++ b/net/vmw_vsock/af_vsock.c
+>@@ -824,13 +824,19 @@ static void __vsock_release(struct sock *sk, int level)
+> 	 */
+> 	lock_sock_nested(sk, level);
+>
+>-	sock_orphan(sk);
+>+	/* Indicate to vsock_remove_sock() that the socket is being released and
+>+	 * can be removed from the bound_table. Unlike transport reassignment
+>+	 * case, where the socket must remain bound despite vsock_remove_sock()
+>+	 * being called from the transport release() callback.
+>+	 */
+>+	sock_set_flag(sk, SOCK_DEAD);
+>
+> 	if (vsk->transport)
+> 		vsk->transport->release(vsk);
+> 	else if (sock_type_connectible(sk->sk_type))
+> 		vsock_remove_sock(vsk);
+>
+>+	sock_orphan(sk);
+> 	sk->sk_shutdown = SHUTDOWN_MASK;
+>
+> 	skb_queue_purge(&sk->sk_receive_queue);
+>
+>-- 
+>2.48.1
+>
 
-Then, your message goes off to justify your reaction by essentially
-reiterating what you've publicly said elsewhere about not being noticed,
-making things sew with no Singer sewing machines required, and what not.
-Apart from the fact that you seem to build certain expectations of others'
-reactions in your mind and behave bizarrely when they react differently
-to how you expect (or not at all), my personal problem is that you've
-responded to a complaint which was really hard for me to verbalize by
-talking about you, again. Everything I've said in the previous email,
-about you expecting more respect and attention than you are willing to
-give, still stands.
-
-You are an important and valued member of the community, but you don't
-have to be so hard on people when they don't rise to your expectations.
-Your inflexibility makes it difficult at least for me to find a place
-around you.
 
