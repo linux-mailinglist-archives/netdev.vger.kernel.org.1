@@ -1,127 +1,107 @@
-Return-Path: <netdev+bounces-165272-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-165273-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id DAB9AA315E3
-	for <lists+netdev@lfdr.de>; Tue, 11 Feb 2025 20:50:53 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id A305FA315EC
+	for <lists+netdev@lfdr.de>; Tue, 11 Feb 2025 20:51:36 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 0E0241616D1
-	for <lists+netdev@lfdr.de>; Tue, 11 Feb 2025 19:50:52 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 5ED9E3A91A9
+	for <lists+netdev@lfdr.de>; Tue, 11 Feb 2025 19:51:00 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4FB96265636;
-	Tue, 11 Feb 2025 19:47:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 53D742638A3;
+	Tue, 11 Feb 2025 19:47:43 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="bqXsQQAK"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="1V5wWrO9"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pj1-f74.google.com (mail-pj1-f74.google.com [209.85.216.74])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 10B0126562F;
-	Tue, 11 Feb 2025 19:47:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CC414263884
+	for <netdev@vger.kernel.org>; Tue, 11 Feb 2025 19:47:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.74
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1739303234; cv=none; b=GffLN5LwqzZw4z+YYs2MryQ8L/9Si+vfrzcgWu2GEt0ITboQejxj1z5G++NtMi4V43MbHbJiy64U30L2Ey3Nkcd7tVwYG6JRo0BUU0t8F+SQUC0xziUqx5n6rgVhXmZLGmRMMJR9x2FtuDLTib4iFSCFCCr5ntPuww0Dnw/Kuig=
+	t=1739303263; cv=none; b=q7pBmaku21DQfElfPJWr3yoSobtqJk+cPKbKGPTgWNiv3CrN+t09vo7LZeDqzZTnRJt6rValt0Yw86To9HK0WnD/tCtnexCQMty8LjAOklbuv6+xMsTzqlbM6Zpr5u+SkvRoQFfL4KV90C1e0APmP0xMvduvEamt3u5HsSWdqmI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1739303234; c=relaxed/simple;
-	bh=l+iielRDD1bT9pM6nGbHot5GG7rZbmttCOx/HN/goU4=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=Ai7Bo58oPVLetAIkrnXyZ3CjO8Yh0SbiStOI9oK9kmdlCHZegviRGvWFJyIK3xZ37TRL+q9sWRSgRr3yaZ+QkjdiNXkOc0c7Q2F0/1uYgGo1LcmZPOrz8+PuY0sdXwBmwCziJbrudKqFK4wM87cU0IwtBn4kqdGCM3pnD9BEqgo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=bqXsQQAK; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 99459C4CEDD;
-	Tue, 11 Feb 2025 19:47:03 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1739303233;
-	bh=l+iielRDD1bT9pM6nGbHot5GG7rZbmttCOx/HN/goU4=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=bqXsQQAKXNpcPIx/WGsrVudBGjDBJGYDzYGupkC/m/yjeYFTzw//u+4Rcck6JDRoN
-	 XRlVHoP6LL6Vpc++j6YQOc1DsslK488cxUTfjBxpEC9c9UZzchUrygtiU6dT9hnxAY
-	 YeMSdBEC7VF2X/KfFSzw41R+5Sh2XKND46lfId60Qm+76moulNskmn+88svpHL6ufB
-	 Tc730P46NE7W8EqNRAMkR6ro+ggaQ9xhIXaDusCaeBzYw2MaMshFiCra/pAFgWAYb2
-	 9qMHCJbUev6uUvd2s5BPOd+3p/QMKeWkkoYArIchnm9txu416uQI81b6hl/ueMlP81
-	 ik8UmeTWMLfHg==
-Date: Tue, 11 Feb 2025 19:46:58 +0000
-From: Jonathan Cameron <jic23@kernel.org>
-To: David Lechner <dlechner@baylibre.com>
-Cc: Linus Walleij <linus.walleij@linaro.org>, Bartosz Golaszewski
- <brgl@bgdev.pl>, Andy Shevchenko <andy@kernel.org>, Geert Uytterhoeven
- <geert@linux-m68k.org>, Lars-Peter Clausen <lars@metafoo.de>, Michael
- Hennerich <Michael.Hennerich@analog.com>, Ulf Hansson
- <ulf.hansson@linaro.org>, Peter Rosin <peda@axentia.se>, Andrew Lunn
- <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>, Russell King
- <linux@armlinux.org.uk>, "David S. Miller" <davem@davemloft.net>, Eric
- Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo
- Abeni <pabeni@redhat.com>, Vinod Koul <vkoul@kernel.org>, Kishon Vijay
- Abraham I <kishon@kernel.org>, Nuno =?UTF-8?B?U8Oh?= <nuno.sa@analog.com>,
- Liam Girdwood <lgirdwood@gmail.com>, Mark Brown <broonie@kernel.org>,
- Jaroslav Kysela <perex@perex.cz>, Takashi Iwai <tiwai@suse.com>,
- linux-gpio@vger.kernel.org, linux-kernel@vger.kernel.org,
- linux-iio@vger.kernel.org, linux-mmc@vger.kernel.org,
- netdev@vger.kernel.org, linux-phy@lists.infradead.org,
- linux-sound@vger.kernel.org
-Subject: Re: [PATCH v3 10/15] iio: resolver: ad2s1210: use bitmap_write
-Message-ID: <20250211194658.0cfb437b@jic23-huawei>
-In-Reply-To: <20250210-gpio-set-array-helper-v3-10-d6a673674da8@baylibre.com>
-References: <20250210-gpio-set-array-helper-v3-0-d6a673674da8@baylibre.com>
-	<20250210-gpio-set-array-helper-v3-10-d6a673674da8@baylibre.com>
-X-Mailer: Claws Mail 4.3.0 (GTK 3.24.48; x86_64-pc-linux-gnu)
+	s=arc-20240116; t=1739303263; c=relaxed/simple;
+	bh=pJv71v/cri0TPX1o0+CLzhGyaVlgIxqgIFLIPmHfKVg=;
+	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=gT0ytTOi0aoR53iPUyWyObhAyGKFPLVVoXv5VcxX4XSSj/oX2JVzwva6Eq50nZHg0lDnquuG0dTFSsStfpVpJ8M8Csx7LFDNYXdKQtrZhJK2YkEDGZgyfctCyYaYoMk8aeP6qimJt4nHkWfdaBYcrMXrxe7j77tU8sgxDsZV3f0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--jeroendb.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=1V5wWrO9; arc=none smtp.client-ip=209.85.216.74
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--jeroendb.bounces.google.com
+Received: by mail-pj1-f74.google.com with SMTP id 98e67ed59e1d1-2fa166cf656so11158151a91.2
+        for <netdev@vger.kernel.org>; Tue, 11 Feb 2025 11:47:41 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1739303261; x=1739908061; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=dHh4Wwsziy+3nuZCP27QtsSzjh5eaqEICsFmTBKoA8k=;
+        b=1V5wWrO9Zo8so1CNWkgLFqm0DUdqe/ok7yz9plhDdObXhyB+pQS3CkElc8LB1YgOfO
+         +U5Zh4qJjEFIYUzJ79uWbBFrWQqaHc2lvDVCdbn39G/w3Qlqyel4gmGIRCoJ+NgshRYW
+         qIreBxJMXtRric9LYVn01GL5AMOp9TwwnMsJU+pymEc9f7xGd01TWKbl+ACuuYh7GPvI
+         Eb02U/QO/Q7IUBey/eDfpSAxeI9QSyPXVWRV3GE2uHK14WkJLrNErPQ4Ti0uDXlMvTq0
+         21PAVbORCz01Oz1qm0kgAjm3ripMA/a/EUfX5JDKH2uHzLnaX4nfjO5VtP4cozlfb8bB
+         synw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1739303261; x=1739908061;
+        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=dHh4Wwsziy+3nuZCP27QtsSzjh5eaqEICsFmTBKoA8k=;
+        b=sDlqfidrsg2aty/B3ariczlSfo6ISb8wEjH1tEZbuSXx0///V1jO8DEfckqqtBmii5
+         uWSiSbsPQCbi9UNVfhhUQ/QlXCD9V+eMWy7XqHmJQfX4qoMbyWJgDjG0sNNpATIRb4PM
+         kc/t8b6cxnBt3yIkRydc8qHkxgqYGJ8Z5UwxUKz1QPYiVS4AmQtn2LO3CtPy4jAxrXdI
+         hwe0iMYF0vXgsuBoGUhKhf1HKOaOzexRM8kd3TkNVD2QoCLvCc8yimr0wNqlAcKXr5Jn
+         wM3U1pjVhFz5mCqkegTXZELFjG+ZfyddbpX+wztM2a94tPG+fQdHhRscvQePFgEEdmCv
+         p16A==
+X-Gm-Message-State: AOJu0YyIItpmrxzxpCbarT2GzRLdYdD2vDt2J+v9RZT94SLzonSbOmP5
+	x54yic1Bc9/XozboKAbStdQ2KYmaCrEYhjQQ7LAFm88zXHtkaN08XFt1oNlx+CK++RG+Ppbafjd
+	0O9lgv1FkfXvPrsaq32KoCayRd401VdQLsEBjGCADAn/of91pn2KE1DC9ivHXKDsZJyviyYQ4ML
+	mk9wt3yeO0WdGQ3Jj42cBydq14DAAEqeBSiM/c92HH0jw=
+X-Google-Smtp-Source: AGHT+IEU3hX9hycREpNQY0Z67pvynsSq9jxI1tO/uK5JEcjk9RVvajVETUlyD2AoizOa0zkv2TYNTqvTt/zONA==
+X-Received: from pjbpv5.prod.google.com ([2002:a17:90b:3c85:b0:2f2:e5c9:de99])
+ (user=jeroendb job=prod-delivery.src-stubby-dispatcher) by
+ 2002:a17:90a:c88e:b0:2fa:1f1b:3db2 with SMTP id 98e67ed59e1d1-2fbf5c58cf7mr529268a91.25.1739303261059;
+ Tue, 11 Feb 2025 11:47:41 -0800 (PST)
+Date: Tue, 11 Feb 2025 11:47:26 -0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.48.1.502.g6dc24dfdaf-goog
+Message-ID: <20250211194726.1593170-1-jeroendb@google.com>
+Subject: [PATCH NET] gve: Update MAINTAINERS
+From: Jeroen de Borst <jeroendb@google.com>
+To: netdev@vger.kernel.org
+Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org, 
+	willemb@google.com, Jeroen de Borst <jeroendb@google.com>
+Content-Type: text/plain; charset="UTF-8"
 
-On Mon, 10 Feb 2025 16:33:36 -0600
-David Lechner <dlechner@baylibre.com> wrote:
+Updating MAINTAINERS to include active contributers.
 
-> Replace bitmap array access with bitmap_write.
-> 
-> Accessing the bitmap array directly is not recommended and now there is
-> a helper function that can be used.
-> 
-> Reviewed-by: Linus Walleij <linus.walleij@linaro.org>
-> Signed-off-by: David Lechner <dlechner@baylibre.com>
-Acked-by: Jonathan Cameron <Jonathan.Cameron@huawei.com>
+Signed-off-by: Jeroen de Borst <jeroendb@google.com>
+---
+ MAINTAINERS | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
-
-> ---
->  drivers/iio/resolver/ad2s1210.c | 5 +++--
->  1 file changed, 3 insertions(+), 2 deletions(-)
-> 
-> diff --git a/drivers/iio/resolver/ad2s1210.c b/drivers/iio/resolver/ad2s1210.c
-> index 7f18df790157f1e411fb70de193a49f0677c999f..04879e6d538bce664469c5f6759d8b1cedea16e9 100644
-> --- a/drivers/iio/resolver/ad2s1210.c
-> +++ b/drivers/iio/resolver/ad2s1210.c
-> @@ -46,6 +46,7 @@
->   */
->  
->  #include <linux/bitfield.h>
-> +#include <linux/bitmap.h>
->  #include <linux/bits.h>
->  #include <linux/cleanup.h>
->  #include <linux/clk.h>
-> @@ -180,7 +181,7 @@ static int ad2s1210_set_mode(struct ad2s1210_state *st, enum ad2s1210_mode mode)
->  	if (!gpios)
->  		return mode == st->fixed_mode ? 0 : -EOPNOTSUPP;
->  
-> -	bitmap[0] = mode;
-> +	bitmap_write(bitmap, mode, 0, 2);
->  
->  	return gpiod_multi_set_value_cansleep(gpios, bitmap);
->  }
-> @@ -1470,7 +1471,7 @@ static int ad2s1210_setup_gpios(struct ad2s1210_state *st)
->  			return dev_err_probe(dev, -EINVAL,
->  				      "requires exactly 2 resolution-gpios\n");
->  
-> -		bitmap[0] = st->resolution;
-> +		bitmap_write(bitmap, st->resolution, 0, 2);
->  
->  		ret = gpiod_multi_set_value_cansleep(resolution_gpios, bitmap);
->  		if (ret < 0)
-> 
+diff --git a/MAINTAINERS b/MAINTAINERS
+index e1bc31a6624b..a0e92051ac60 100644
+--- a/MAINTAINERS
++++ b/MAINTAINERS
+@@ -8711,8 +8711,8 @@ F:	drivers/input/touchscreen/goodix*
+ 
+ GOOGLE ETHERNET DRIVERS
+ M:	Jeroen de Borst <jeroendb@google.com>
+-M:	Catherine Sullivan <csully@google.com>
+-R:	Shailend Chand <shailend@google.com>
++M:	Joshua Washington <joshwash@google.com>
++M:	Harshitha Ramamurthy <hramamurthy@google.com>
+ L:	netdev@vger.kernel.org
+ S:	Supported
+ F:	Documentation/networking/device_drivers/ethernet/google/gve.rst
+-- 
+2.48.1.502.g6dc24dfdaf-goog
 
 
