@@ -1,130 +1,305 @@
-Return-Path: <netdev+bounces-165081-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-165082-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 16BBFA30560
-	for <lists+netdev@lfdr.de>; Tue, 11 Feb 2025 09:13:48 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 24EB9A3057A
+	for <lists+netdev@lfdr.de>; Tue, 11 Feb 2025 09:15:47 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C8A613A7015
-	for <lists+netdev@lfdr.de>; Tue, 11 Feb 2025 08:13:38 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 40C58188B19D
+	for <lists+netdev@lfdr.de>; Tue, 11 Feb 2025 08:15:50 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 76F041EE7DF;
-	Tue, 11 Feb 2025 08:13:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6F2DA1EEA37;
+	Tue, 11 Feb 2025 08:15:25 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="DbYM5IJW"
+	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="nKLX3de0"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from relay9-d.mail.gandi.net (relay9-d.mail.gandi.net [217.70.183.199])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A49E81EE7A5
-	for <netdev@vger.kernel.org>; Tue, 11 Feb 2025 08:13:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6F7101922E7
+	for <netdev@vger.kernel.org>; Tue, 11 Feb 2025 08:15:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.199
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1739261626; cv=none; b=lvlX+6o9QWlZqgndmdCk9H7ebcCxDRxPd6mQAENynWva1zm/sSis6vBAiUSr1gwBh2QAUKnZ9HYmCJOa9PKIWoMEOnTcgOL5/CwFJXN+uHcV4cdzEQ8jvLMT6M8dVrB8ITiM1d2OmS9u+V8N/iN9ptCeERDopa7NwwbTCJQUu5U=
+	t=1739261725; cv=none; b=MdLXk6G0r+uGO8Z3yafL/bgKtheRxPfDDLhjcFe6zYTtXajv638Achctr7UHJ9sbjbBlbAVVrCjcOtN5IRStca/zz5RP1Ey3NPWJYeTZ+5pCHUExpKIcJkZZYv+0XrRPWvGVyMadjvQ8lvstwmTvGl57Pe1top7aF2TMV65jJTA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1739261626; c=relaxed/simple;
-	bh=0dvMrOU+jpUj7tdCPK1OdWeuBFlDOcoyCJs0wbTUm44=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=FBYT9ktWQpoXqioKrf++CPO043U8hNbosEdbIsrbitNkw/zi51YL3HrxemQN+6+R2Hrya6/wXp7APYkzDJ+PpVEARXeBVdNVatXbDYNMzJdeZKLitppYqa6nppe0lt0V72tqZexqMgwQ8LAX1X6jD2gIsVJygiV1CccuZFqpE9s=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=DbYM5IJW; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1739261623;
+	s=arc-20240116; t=1739261725; c=relaxed/simple;
+	bh=rjdIQEYlZdOAaWMDalwxHV435B5Q2LTgg06zvqrwOmw=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=Cl9VsfU54HKyTNhz1QkumIrg2k5boKVclan8OzSRcF0TIVnTp3L2w6vrFQ59s7HX/d6vKU0Vfl5cxNiK9BQIegJJF9MKRVxd77gPfJ1c5wq0GbtV3sZLMIxCOja89Jwjb2ZIij6Nlp4tRfulDzausDQEyz2BLfS60gASIzhyu8I=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=nKLX3de0; arc=none smtp.client-ip=217.70.183.199
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
+Received: by mail.gandi.net (Postfix) with ESMTPSA id 1EA21442FD;
+	Tue, 11 Feb 2025 08:15:17 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
+	t=1739261720;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=1n8vkK3pIQpfbo4j0Rb3+1FkQLwn21MZFeg/srwCbfE=;
-	b=DbYM5IJWEctXRUCDhqF7daBrdse4KcN5gk15oEMl+Z4lq6hBDz9bkNvtARHIjWHi8uXpz7
-	OA3XossWiwzlHO7RSrU4JRjcDI3gTjsAWqSCGcXtJMW+4uZNe6h5Ax5VkP93cvKsxjFLy5
-	IK8HyJNABgfRizR7d8iZ85XO3ePZCOk=
-Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com
- [209.85.221.72]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-507-vz7MTIc2P6O-U3m13HZ-Ig-1; Tue, 11 Feb 2025 03:13:42 -0500
-X-MC-Unique: vz7MTIc2P6O-U3m13HZ-Ig-1
-X-Mimecast-MFC-AGG-ID: vz7MTIc2P6O-U3m13HZ-Ig
-Received: by mail-wr1-f72.google.com with SMTP id ffacd0b85a97d-38dc56ef418so1908328f8f.1
-        for <netdev@vger.kernel.org>; Tue, 11 Feb 2025 00:13:42 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1739261620; x=1739866420;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=1n8vkK3pIQpfbo4j0Rb3+1FkQLwn21MZFeg/srwCbfE=;
-        b=uvUpT8uwylZkySxl3D2q4SbrSpwOzzN/88CLP0syfRP1pmXQWyiTvafqJh8f96yqaN
-         MWdhz6iqdEphCEBswe4QdYlte8edeWG46ap+P3mPGZedPJ1zVkh0+xp1+dN+/A23a+q3
-         zzCklPWn0y9cjgcou2c2Vbiuasn+9k11LzAD5VSqeq1qvhBAaOKGBjz9q9Q/AEkVjLPx
-         m56cp/YAALv3sumVeJ8Idtis7TeRM1IB+m/b6S+Pg/PXAh3/DgSFjSTJhMp84QSgWe/v
-         Xnh2l5QtBN4Wq+XZ0sdAtIdyf1nLfaB9wa/VS9+3cwcIys2UVLO9fELpQ2NzNnmelX+d
-         3TJQ==
-X-Forwarded-Encrypted: i=1; AJvYcCVOoEvElpw0tlLCaPlncfOQP7+ZcNFt1yO+MgUV55v9HA+YwPDvXK4tsA++YOGvDA441zlDIBc=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyFy8LO6N3RsOh1QZdAuarE3U2i8TxroChOBMyrr9SJoboJ9HDr
-	BU+nlZjmRrbEadsmMFMpH8H6t+ELGkR4pIrFgkNuvyDxGdVoxYIUDCNCyahL+HIt/tmNYcyZ3Fk
-	0284VtH8U6r7p1GXn7pNYPVKfzRCIsbuGak8J2La4RyFboZPz7lf6hA==
-X-Gm-Gg: ASbGncuMlhscfr0hrS4cWpySVU6Er/Nf9ujn1E3/y4ViXW067FJk3eTFN6/01ohc8/m
-	mz/ueFeP5Qva1lgcMKEPBr0moicoSIRATMrcDSXa2qAhjGrR5ViLbSDpK5My/GlLBHUQTPy6Ng4
-	Pdvno0wspYtJMPOipKv4e72goSesAVyINIM78dIAxI1AHdbMDYz/rWy73W6C6wQwWBDWSjTe9ij
-	JcRTHacscibTa6665LDnKaxjiEWgBmSoJ4qn9M7LMvrHycdGeK4QVmLRZxppHnnGRdJUPOXkeGm
-	etKTUrOwKHFSm2DO2kDu6kqEXNNxc8PwpEDgLVwuBhXPnKDru0JCGQ==
-X-Received: by 2002:a5d:64a6:0:b0:38d:dcf1:d191 with SMTP id ffacd0b85a97d-38ddcf1d528mr8272417f8f.21.1739261620710;
-        Tue, 11 Feb 2025 00:13:40 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IESlByLWTFDUB78pjxA1Dd6V3iLKw47Bgjaj5JruimINPkrnWdgcGJctJ+ryQRtChMGWsKZHA==
-X-Received: by 2002:a5d:64a6:0:b0:38d:dcf1:d191 with SMTP id ffacd0b85a97d-38ddcf1d528mr8272350f8f.21.1739261620000;
-        Tue, 11 Feb 2025 00:13:40 -0800 (PST)
-Received: from sgarzare-redhat (host-79-46-200-29.retail.telecomitalia.it. [79.46.200.29])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-38dd6080926sm8087046f8f.83.2025.02.11.00.13.38
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 11 Feb 2025 00:13:39 -0800 (PST)
-Date: Tue, 11 Feb 2025 09:13:36 +0100
-From: Stefano Garzarella <sgarzare@redhat.com>
-To: syzbot <syzbot+71613b464c8ef17ab718@syzkaller.appspotmail.com>
-Cc: bobby.eshleman@bytedance.com, davem@davemloft.net, edumazet@google.com, 
-	horms@kernel.org, kuba@kernel.org, leonardi@redhat.com, 
-	linux-kernel@vger.kernel.org, netdev@vger.kernel.org, pabeni@redhat.com, 
-	syzkaller-bugs@googlegroups.com, v4bel@theori.io, virtualization@lists.linux-foundation.org, 
-	virtualization@lists.linux.dev
-Subject: Re: [syzbot] [net?] [virt?] general protection fault in
- vsock_stream_has_data
-Message-ID: <xx2igtwgro5ffbmdaahbwz6irolnfh4ktmdfatfrl72kppne7m@rp2ajscxfpp2>
-References: <67867937.050a0220.216c54.007c.GAE@google.com>
- <67aaa81c.050a0220.3d72c.0059.GAE@google.com>
+	bh=Q9ICIc2tHJNQXL43Nm1ltNdAEKKkMBQM1HN7ctpn74w=;
+	b=nKLX3de0d0HIIzHbm+CIp52F9ue5vYVCTzvvHdDxneSpqrhIL5elf4QqQiKNEzcx/bOJST
+	7+fAaYfqFEyucRQsniuJrgqyJy9YliBom1a9dam1MS8g+sS9lhb89rPwX65EUhwBu/x0Rj
+	GI5cdcHpK2R1HVRWguC21DwYLEz9um7ZUPKyVsAZsQbpTnsBfJXhS9xse/CbBuM6/Vl4YP
+	BgDC+fF5gB1k9oageil87XBMus6NuJMuRoQ/pwTFtbsY6pQvKRxJmAUV+u0BsMI2zzZdem
+	HOWcXP/KT+0AVZO3Zzh9DGlhNy+gRHNLO6+y51P/mXAfMYb2fX3UOp7YWU972w==
+Date: Tue, 11 Feb 2025 09:15:07 +0100
+From: Maxime Chevallier <maxime.chevallier@bootlin.com>
+To: Daniel Golle <daniel@makrotopia.org>
+Cc: Bo-Cun Chen <bc-bocun.chen@mediatek.com>, Chad Monroe
+ <chad.monroe@adtran.com>, John Crispin <john@phrozen.org>, "Russell King
+ (Oracle)" <linux@armlinux.org.uk>, Vladimir Oltean <olteanv@gmail.com>,
+ Andrew Lunn <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>,
+ AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>,
+ "Chester A. Unal" <chester.a.unal@arinc9.com>, "David S. Miller"
+ <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>,
+ linux-mediatek@lists.infradead.org, Matthias Brugger
+ <matthias.bgg@gmail.com>, netdev@vger.kernel.org
+Subject: Re: upstream Linux support for Ethernet combo ports via external
+ mux
+Message-ID: <20250211091507.59238fc1@fedora-1.home>
+In-Reply-To: <Z6qHi1bQZEnYUDp7@makrotopia.org>
+References: <Z6qHi1bQZEnYUDp7@makrotopia.org>
+Organization: Bootlin
+X-Mailer: Claws Mail 4.3.0 (GTK 3.24.43; x86_64-redhat-linux-gnu)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii; format=flowed
-Content-Disposition: inline
-In-Reply-To: <67aaa81c.050a0220.3d72c.0059.GAE@google.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+X-GND-State: clean
+X-GND-Score: -100
+X-GND-Cause: gggruggvucftvghtrhhoucdtuddrgeefvddrtddtgdegtdeglecutefuodetggdotefrodftvfcurfhrohhfihhlvgemucfitefpfffkpdcuggftfghnshhusghstghrihgsvgenuceurghilhhouhhtmecufedtudenucesvcftvggtihhpihgvnhhtshculddquddttddmnecujfgurhepfffhvfevuffkjghfohfogggtgfesthhqredtredtjeenucfhrhhomhepofgrgihimhgvucevhhgvvhgrlhhlihgvrhcuoehmrgigihhmvgdrtghhvghvrghllhhivghrsegsohhothhlihhnrdgtohhmqeenucggtffrrghtthgvrhhnpeekheegieejkeetfffhleehteffgefhfffhueefieefffejfeethfevudetudeuueenucffohhmrghinhepkhgvrhhnvghlrdhorhhgnecukfhppedvrgdtudemtggsudelmeekugegtgemlehftddtmegttgeftgemgeelfhegmeefieehheemsgehjeegnecuvehluhhsthgvrhfuihiivgeptdenucfrrghrrghmpehinhgvthepvdgrtddumegtsgduleemkegugegtmeelfhdttdemtggtfegtmeeglehfgeemfeeiheehmegsheejgedphhgvlhhopehfvgguohhrrgdquddrhhhomhgvpdhmrghilhhfrhhomhepmhgrgihimhgvrdgthhgvvhgrlhhlihgvrhessghoohhtlhhinhdrtghomhdpnhgspghrtghpthhtohepudehpdhrtghpthhtohepuggrnhhivghlsehmrghkrhhothhophhirgdrohhrghdprhgtphhtthhopegstgdqsghotghunhdrtghhvghnsehmvgguihgrthgvkhdrtghom
+ hdprhgtphhtthhopegthhgrugdrmhhonhhrohgvsegrughtrhgrnhdrtghomhdprhgtphhtthhopehjohhhnhesphhhrhhoiigvnhdrohhrghdprhgtphhtthhopehlihhnuhigsegrrhhmlhhinhhugidrohhrghdruhhkpdhrtghpthhtohepohhlthgvrghnvhesghhmrghilhdrtghomhdprhgtphhtthhopegrnhgurhgvfieslhhunhhnrdgthhdprhgtphhtthhopehhkhgrlhhlfigvihhtudesghhmrghilhdrtghomh
+X-GND-Sasl: maxime.chevallier@bootlin.com
 
-#syz fix: vsock/virtio: cancel close work in the destructor
+Hi Daniel,
 
-On Mon, Feb 10, 2025 at 05:30:04PM -0800, syzbot wrote:
->syzbot suspects this issue was fixed by commit:
->
->commit df137da9d6d166e87e40980e36eb8e0bc90483ef
->Author: Stefano Garzarella <sgarzare@redhat.com>
->Date:   Fri Jan 10 08:35:09 2025 +0000
->
->    vsock/virtio: cancel close work in the destructor
->
->bisection log:  https://syzkaller.appspot.com/x/bisect.txt?x=12bb31b0580000
->start commit:   25cc469d6d34 net: phy: micrel: use helper phy_disable_eee
->git tree:       net-next
->kernel config:  https://syzkaller.appspot.com/x/.config?x=d50f1d63eac02308
->dashboard link: https://syzkaller.appspot.com/bug?extid=71613b464c8ef17ab718
->syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=125a3218580000
->C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=147f11df980000
->
->If the result looks correct, please mark the issue as fixed by replying with:
->
->#syz fix: vsock/virtio: cancel close work in the destructor
->
->For information about bisection process see: https://goo.gl/tpsmEJ#bisection
->
+On Mon, 10 Feb 2025 23:11:07 +0000
+Daniel Golle <daniel@makrotopia.org> wrote:
+
+> Hi,
+>=20
+> Looking for ways to support a passive SerDes mux in vanilla Linux I
+> found Maxime's slides "Multi-port and Multi-PHY Ethernet interfaces"[1].
+
+I'm actively working on getting this exact case supported. The MUX I
+have is an RGMII MUX, but gpio-driven just as in your case :) I'll make
+sure to CC: you in the next iterations
+
+> The case I want to support is probably quite common nowadays but isn't
+> covered there nor implemented in Linux.
+>=20
+>  +----------------------------+
+>  |            SoC             |
+>  |    +-----------------+     |
+>  |    |       MAC       |     |
+>  |    +----+-------+----+     |
+>  |         |  PCS  |   +------+
+>  |         +---=3D---+   | GPIO |
+>  +-------------=3D-------+---=3D--+
+>               |            |
+>            +---=3D---+       |
+>            |  Mux  <-------+
+>            +-=3D---=3D-+
+>              |   |
+>             /     \
+>      +-----=3D-+   +-=3D-----+
+>      |  PHY  |   |  SFP  |
+>      +-------+   +-------+
+
+The work in question is here :
+
+https://lore.kernel.org/netdev/20250210095542.721bf967@fedora-1.home/
+
+Preliminary work was merged here :
+
+https://lore.kernel.org/netdev/20240821151009.1681151-1-maxime.chevallier@b=
+ootlin.com/
+
+To summarize the whole process :
+
+I started with a use-case similar as yours, but instead of PHY - SFP
+combo I have a PHY-PHY combo. That's fairly analoguous to what you have
+(say you plug a copper SFP on the cage, you now have 2 parallel PHYs
+behind the MAC)
+
+So the first step was the intrduction of phy_link_topology to allow
+tracking PHYs attached to a MAC, even if they aren't directly on the
+active datapath (the PHY isolated by the MUX). That was clearly a
+pre-requisite for any kind of muxing.
+
+=46rom all the feedback (among other, from Oleksji Rempel, Russell King,
+Marek Beh=C3=B9n), it appears that this setup you have is not that unusual,
+and also ressembles other setups such as :
+
+        +-- SFP
+MAC - PHY
+        +-- RJ45
+
+If we look at the big picture from the end-user's point of view,
+there's no difference between a MAC connected to a dual-port PHY and a
+MAC connected to a PHY + SFP through a MUX, it's just a NIC with 2
+ports.
+
+So where I'm at today is that I'm trying to get a "generic"
+representation of front-facing ports accepted, that will be the kernel
+objects used for configuration.
+
+If user wants to enable the SFP port for example, if the SFP is behind
+a MUX, the MUX will be cntrolled to set the correct output, and if the
+SFP is behind a PHY, then the PHY driver will be in charge of the
+mux'ing.
+
+> So other than it was when SoCs didn't have built-in PCSs, now the SFP is
+> not connected to the PHY, but there is an additional mux IC controlled
+> by the SoC to connect the serialized MII either to the PHY (in case no
+> SFP is inserted) or to the SFP (in case a module is inserted).
+>=20
+> MediaTek came up with a vendor-specific solution[2] for that which works
+> well -- but obviously it would be much nicer to have generic, vendor-
+> agnostic support for such setups in phylink, ideally based on the
+> existing gpio-mux driver.
+>=20
+> So I imagine something like a generic phylink-mux, controlled by hooking
+> to the module_insert and module_remove remove SFP ops (assuming the
+> moddef0 signal is connected...).
+>=20
+> Before I get my hands dirty, please join my line of thought for one
+> moment, so we can agree on a sketch:
+>=20
+> Does everyone agree that phylink would be the right place to do this?
+
+As Andrew says, we can't really let phylink alone handle that. The
+approach I have taken is to model the MUX as a dedicated driver, that
+would have "parent" ops allowing to notify whatever is upstream of the
+mux to know about state change :
+
+> DT bindings could look like this (option A):
+>  ...
+>     mux: mux-controller {
+>         compatible =3D "gpio-mux";
+>         #mux-control-cells =3D <0>;
+>=20
+>         mux-gpios =3D <&pio 7 GPIO_ACTIVE_HIGH>;
+>     };
+>=20
+>     mux0: mii-mux {
+>         compatible =3D "mii-mux";
+>         mux-controls =3D <&mux>;
+>         #address-cells =3D <1>;
+>         #size-cells =3D <0>;
+>=20
+>         channel@0 {
+>             reg =3D <0>;
+>             sfp =3D <&sfp0>;
+>             managed =3D "in-band-status";
+>             module-presence-controls-mux;
+>         };
+>=20
+>         channel@1 {
+>             reg =3D <1>;
+>             phy-handle =3D <&phy0>;
+>             phy-connection-type =3D "sgmii";
+>         };
+>     };
+>   };
+>=20
+>   soc {
+>       ethernet@12340000 {
+>           mii-mux =3D <&mux0>;
+>       };
+>   };
+
+I have some code written for that, and I have a very similar binding in
+the end :
+
+		eth1: ucc@2200 {
+			far-id =3D <0 1 3 4 5 6 7>;
+			device_type =3D "network";
+			compatible =3D "ucc_geth", "cs,mia-far";
+			cell-index =3D <3>;
+			reg =3D <0x2200 0x200>;
+			interrupts =3D <34>;
+			interrupt-parent =3D <&qeic>;
+			local-mac-address =3D [ 00 00 00 00 00 00 ];
+			rx-clock-name =3D "clk12";
+			tx-clock-name =3D "clk12";
+			phy-mux-handle =3D <&phymux>;
+			pio-handle =3D <&ucc3pio>;
+			phy-connection-type =3D "rmii";
+		};
+
+		phymux: phymux@0 {
+			compatible =3D "gpio-phy-mux";
+			status =3D "okay";
+			select-gpios =3D <&qe_pio_c 21 1>;
+
+			phy-node@0 {
+				phy-handle =3D <&phy2>;
+				phy-mode =3D "rmii";
+			};
+
+			phy-node@1 {
+				active-low;
+				phy-handle =3D <&phy3>;
+				phy-mode =3D "rmii";
+			};
+		};
+
+The mux node can of course include SFP.
+
+>=20
+> or like this (option B):
+>  ...
+>     mux: mux-controller {
+>         compatible =3D "gpio-mux";
+>         #mux-control-cells =3D <0>;
+>=20
+>         mux-gpios =3D <&pio 7 GPIO_ACTIVE_HIGH>;
+>     };
+>   };
+>=20
+>   soc {
+>       ethernet@12340000 {
+>           sfp =3D <&sfp0>;
+>           phy =3D <&phy0>;
+>           phy-connection-type =3D "sgmii";
+>           mux-controls =3D <&mux>;
+>       };
+>   };
+>=20
+>=20
+> Obviously option A is more expressive, but also more complex, and I'm
+> not 100% sure if all that complexity is really needed in practise.
+> However, for "better safe than sorry" reasons I'd opt for option A,
+> unless anyone comes up with a better idea.
+
+Maybe we can sync our work, I'm all in to get more hands on this. The
+current roadmap I have in mind is :
+
+ - Get the port representation stable and accepted
+ - Get muxing working for the "simple" case of PHY-driven muxes, which
+includes a new netlink API, and muxing operations for front-facing ports
+ - Get PHY muxes going, with a PHY mux framework and mux drivers
+(gpio-driven, MMIO-register driven, completely passive muxes based on
+PHY powerdown...)
+
+I've made some attemps to get the phy mux support first, but we've
+discussed that extensively with Andrew and Russell on that thread
+here and the path forward would be to get that problem first from the
+perspective of the ports :
+
+https://lore.kernel.org/netdev/20241004161601.2932901-1-maxime.chevallier@b=
+ootlin.com/
+
+Thanks,
+
+Maxime
 
 
