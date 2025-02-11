@@ -1,58 +1,71 @@
-Return-Path: <netdev+bounces-165271-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-165272-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1C28FA3158F
-	for <lists+netdev@lfdr.de>; Tue, 11 Feb 2025 20:44:36 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id DAB9AA315E3
+	for <lists+netdev@lfdr.de>; Tue, 11 Feb 2025 20:50:53 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 24E377A2F64
-	for <lists+netdev@lfdr.de>; Tue, 11 Feb 2025 19:43:39 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 0E0241616D1
+	for <lists+netdev@lfdr.de>; Tue, 11 Feb 2025 19:50:52 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9914C26E62B;
-	Tue, 11 Feb 2025 19:44:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4FB96265636;
+	Tue, 11 Feb 2025 19:47:14 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="J6hROUo7"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="bqXsQQAK"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7410C26E621
-	for <netdev@vger.kernel.org>; Tue, 11 Feb 2025 19:44:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 10B0126562F;
+	Tue, 11 Feb 2025 19:47:13 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1739303070; cv=none; b=HViXxByjUdK7BhgtN+BbEq8C+852BWvAZk28yq6hMyN3Y+3DKc3fm6nmz0oXUeVfu5DA9DvvTTK6i/y39zyXD4pOQhLptTPASwNxFHnVIyb418YdfkbSurYIVLxWpdW0g8dvR0NHB7xTE8k8SznAvXRuaSv2/GOWG1l+hvEArZc=
+	t=1739303234; cv=none; b=GffLN5LwqzZw4z+YYs2MryQ8L/9Si+vfrzcgWu2GEt0ITboQejxj1z5G++NtMi4V43MbHbJiy64U30L2Ey3Nkcd7tVwYG6JRo0BUU0t8F+SQUC0xziUqx5n6rgVhXmZLGmRMMJR9x2FtuDLTib4iFSCFCCr5ntPuww0Dnw/Kuig=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1739303070; c=relaxed/simple;
-	bh=B5Bj9x6sFxtUYDmfCTGMugB62bYX/E0CWtdX74dh0CQ=;
+	s=arc-20240116; t=1739303234; c=relaxed/simple;
+	bh=l+iielRDD1bT9pM6nGbHot5GG7rZbmttCOx/HN/goU4=;
 	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=TbqyhUuO8nRLyQNDALSiJgQuTxOxtaHrffHMp7z6fgFWu1jpC41gtO4SzIIwOYJj7cKMRTSkXHtISs3+KHYRrlvOb64OwFPZ6e+f1qHcskGkIJdVqFnZmw37b1VukJJkAJglkRIUV9uIKd5SVV5lSsS87pH/An8fM01e8t+AJrE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=J6hROUo7; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8D315C4CEE4;
-	Tue, 11 Feb 2025 19:44:29 +0000 (UTC)
+	 MIME-Version:Content-Type; b=Ai7Bo58oPVLetAIkrnXyZ3CjO8Yh0SbiStOI9oK9kmdlCHZegviRGvWFJyIK3xZ37TRL+q9sWRSgRr3yaZ+QkjdiNXkOc0c7Q2F0/1uYgGo1LcmZPOrz8+PuY0sdXwBmwCziJbrudKqFK4wM87cU0IwtBn4kqdGCM3pnD9BEqgo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=bqXsQQAK; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 99459C4CEDD;
+	Tue, 11 Feb 2025 19:47:03 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1739303070;
-	bh=B5Bj9x6sFxtUYDmfCTGMugB62bYX/E0CWtdX74dh0CQ=;
+	s=k20201202; t=1739303233;
+	bh=l+iielRDD1bT9pM6nGbHot5GG7rZbmttCOx/HN/goU4=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=J6hROUo7LOwkIBkEMRcEuf47Z61XIlDnIzavKnpnkrQF9jpnwKICi3D6+aSnYAn+q
-	 i0/KAyewhR6AFXyu8KHvJoey7eFeDPcSHeEUL7NYqtPcRiPVC4SBmIVslW90NchDqZ
-	 9YUDUhgwtdBGNd/pDkuMlqYSUzydRM8W43fqoOHB9FLAtKWxNNFNhVEM8W5ITYCDSq
-	 CpfZ+zx7vmDce3FshuHSOqFpjcGcCeUhcp5kWvpnjl9++5jds5//SrCzuu3P2j53c9
-	 jGKhELEcZxj4Je4DrLX1SeKx6FHIt242SzN+Odb64QYTFNtU8/b9kaG30tKNLxffh9
-	 ZudPPzucXAROg==
-Date: Tue, 11 Feb 2025 11:44:28 -0800
-From: Jakub Kicinski <kuba@kernel.org>
-To: Tariq Toukan <ttoukan.linux@gmail.com>
-Cc: davem@davemloft.net, netdev@vger.kernel.org, edumazet@google.com,
- pabeni@redhat.com, andrew+netdev@lunn.ch, horms@kernel.org,
- tariqt@nvidia.com, hawk@kernel.org
-Subject: Re: [PATCH net-next 1/4] eth: mlx4: create a page pool for Rx
-Message-ID: <20250211114428.6dc9c7e3@kernel.org>
-In-Reply-To: <8eab9a5a-ce82-4291-8952-5e5c4610e0b0@gmail.com>
-References: <20250205031213.358973-1-kuba@kernel.org>
-	<20250205031213.358973-2-kuba@kernel.org>
-	<8eab9a5a-ce82-4291-8952-5e5c4610e0b0@gmail.com>
+	b=bqXsQQAKXNpcPIx/WGsrVudBGjDBJGYDzYGupkC/m/yjeYFTzw//u+4Rcck6JDRoN
+	 XRlVHoP6LL6Vpc++j6YQOc1DsslK488cxUTfjBxpEC9c9UZzchUrygtiU6dT9hnxAY
+	 YeMSdBEC7VF2X/KfFSzw41R+5Sh2XKND46lfId60Qm+76moulNskmn+88svpHL6ufB
+	 Tc730P46NE7W8EqNRAMkR6ro+ggaQ9xhIXaDusCaeBzYw2MaMshFiCra/pAFgWAYb2
+	 9qMHCJbUev6uUvd2s5BPOd+3p/QMKeWkkoYArIchnm9txu416uQI81b6hl/ueMlP81
+	 ik8UmeTWMLfHg==
+Date: Tue, 11 Feb 2025 19:46:58 +0000
+From: Jonathan Cameron <jic23@kernel.org>
+To: David Lechner <dlechner@baylibre.com>
+Cc: Linus Walleij <linus.walleij@linaro.org>, Bartosz Golaszewski
+ <brgl@bgdev.pl>, Andy Shevchenko <andy@kernel.org>, Geert Uytterhoeven
+ <geert@linux-m68k.org>, Lars-Peter Clausen <lars@metafoo.de>, Michael
+ Hennerich <Michael.Hennerich@analog.com>, Ulf Hansson
+ <ulf.hansson@linaro.org>, Peter Rosin <peda@axentia.se>, Andrew Lunn
+ <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>, Russell King
+ <linux@armlinux.org.uk>, "David S. Miller" <davem@davemloft.net>, Eric
+ Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo
+ Abeni <pabeni@redhat.com>, Vinod Koul <vkoul@kernel.org>, Kishon Vijay
+ Abraham I <kishon@kernel.org>, Nuno =?UTF-8?B?U8Oh?= <nuno.sa@analog.com>,
+ Liam Girdwood <lgirdwood@gmail.com>, Mark Brown <broonie@kernel.org>,
+ Jaroslav Kysela <perex@perex.cz>, Takashi Iwai <tiwai@suse.com>,
+ linux-gpio@vger.kernel.org, linux-kernel@vger.kernel.org,
+ linux-iio@vger.kernel.org, linux-mmc@vger.kernel.org,
+ netdev@vger.kernel.org, linux-phy@lists.infradead.org,
+ linux-sound@vger.kernel.org
+Subject: Re: [PATCH v3 10/15] iio: resolver: ad2s1210: use bitmap_write
+Message-ID: <20250211194658.0cfb437b@jic23-huawei>
+In-Reply-To: <20250210-gpio-set-array-helper-v3-10-d6a673674da8@baylibre.com>
+References: <20250210-gpio-set-array-helper-v3-0-d6a673674da8@baylibre.com>
+	<20250210-gpio-set-array-helper-v3-10-d6a673674da8@baylibre.com>
+X-Mailer: Claws Mail 4.3.0 (GTK 3.24.48; x86_64-pc-linux-gnu)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -62,19 +75,53 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
 
-On Tue, 11 Feb 2025 21:18:46 +0200 Tariq Toukan wrote:
-> > -	if (xdp_rxq_info_reg(&ring->xdp_rxq, priv->dev, queue_index, 0) < 0)
-> > +	pp.flags = PP_FLAG_DMA_MAP;
-> > +	pp.pool_size = MLX4_EN_MAX_RX_SIZE;
-> > +	pp.nid = node;
-> > +	pp.napi = &priv->rx_cq[queue_index]->napi;
-> > +	pp.netdev = priv->dev;
-> > +	pp.dev = &mdev->dev->persist->pdev->dev;
-> > +	pp.dma_dir = DMA_BIDIRECTIONAL;  
-> 
-> I just noticed one more thing, here we better take the value from 
-> priv->dma_dir, as it could be DMA_FROM_DEVICE or DMA_BIDIRECTIONAL 
-> depending on XDP program presence.
+On Mon, 10 Feb 2025 16:33:36 -0600
+David Lechner <dlechner@baylibre.com> wrote:
 
-ack!
+> Replace bitmap array access with bitmap_write.
+> 
+> Accessing the bitmap array directly is not recommended and now there is
+> a helper function that can be used.
+> 
+> Reviewed-by: Linus Walleij <linus.walleij@linaro.org>
+> Signed-off-by: David Lechner <dlechner@baylibre.com>
+Acked-by: Jonathan Cameron <Jonathan.Cameron@huawei.com>
+
+
+> ---
+>  drivers/iio/resolver/ad2s1210.c | 5 +++--
+>  1 file changed, 3 insertions(+), 2 deletions(-)
+> 
+> diff --git a/drivers/iio/resolver/ad2s1210.c b/drivers/iio/resolver/ad2s1210.c
+> index 7f18df790157f1e411fb70de193a49f0677c999f..04879e6d538bce664469c5f6759d8b1cedea16e9 100644
+> --- a/drivers/iio/resolver/ad2s1210.c
+> +++ b/drivers/iio/resolver/ad2s1210.c
+> @@ -46,6 +46,7 @@
+>   */
+>  
+>  #include <linux/bitfield.h>
+> +#include <linux/bitmap.h>
+>  #include <linux/bits.h>
+>  #include <linux/cleanup.h>
+>  #include <linux/clk.h>
+> @@ -180,7 +181,7 @@ static int ad2s1210_set_mode(struct ad2s1210_state *st, enum ad2s1210_mode mode)
+>  	if (!gpios)
+>  		return mode == st->fixed_mode ? 0 : -EOPNOTSUPP;
+>  
+> -	bitmap[0] = mode;
+> +	bitmap_write(bitmap, mode, 0, 2);
+>  
+>  	return gpiod_multi_set_value_cansleep(gpios, bitmap);
+>  }
+> @@ -1470,7 +1471,7 @@ static int ad2s1210_setup_gpios(struct ad2s1210_state *st)
+>  			return dev_err_probe(dev, -EINVAL,
+>  				      "requires exactly 2 resolution-gpios\n");
+>  
+> -		bitmap[0] = st->resolution;
+> +		bitmap_write(bitmap, st->resolution, 0, 2);
+>  
+>  		ret = gpiod_multi_set_value_cansleep(resolution_gpios, bitmap);
+>  		if (ret < 0)
+> 
+
 
