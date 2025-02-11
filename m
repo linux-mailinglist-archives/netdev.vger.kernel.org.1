@@ -1,68 +1,76 @@
-Return-Path: <netdev+bounces-165112-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-165113-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2D740A307F0
-	for <lists+netdev@lfdr.de>; Tue, 11 Feb 2025 11:05:16 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5B4AFA30819
+	for <lists+netdev@lfdr.de>; Tue, 11 Feb 2025 11:10:52 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id DD4093A7340
-	for <lists+netdev@lfdr.de>; Tue, 11 Feb 2025 10:05:06 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A7327166EBD
+	for <lists+netdev@lfdr.de>; Tue, 11 Feb 2025 10:10:50 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B99721F2C35;
-	Tue, 11 Feb 2025 10:05:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E6F411F4281;
+	Tue, 11 Feb 2025 10:09:47 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="nDz3IABY"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="RqQfUHO+"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 901F61F2BB0;
-	Tue, 11 Feb 2025 10:05:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B584B1F4264;
+	Tue, 11 Feb 2025 10:09:47 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1739268312; cv=none; b=HZvsq39JNVpwKrENA11NzKPlNH/i3FzwY0xk2we9lVWXJdot5WNTUqGX+uXBAyggDWuC7drzOb8kMadgzTDZF7zl1Y0u7t4jgAk8f+sKXE4VQCvcIYOZ8/jnJYrZWrIjaD3kAN91WwzL1d+GF3utEifPv76kKZy7duvGqS+W024=
+	t=1739268587; cv=none; b=SoauQn39DrRCGyBnKAE280vmmaDvS8tw5HUpknz/aoJqkDOjjOx3+JZdZI6krjY8X799XbAgr0rbMPknb5excI050BAIfnDBUjL7z7VvC47ZB6OvVGK4PVmWt/ijWhAXoItCZOrufK+w642s5ATT6grCAPRWDgyZ/7q5EymGOZQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1739268312; c=relaxed/simple;
-	bh=16KN1Mp7otYAOTGe8F70UjNoHgS3ex+64eqSdYJYwmM=;
+	s=arc-20240116; t=1739268587; c=relaxed/simple;
+	bh=vlK1kYDAhpjzPcfIwGf1Lxx/sTSC0Xl2d3beqDbehpU=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=WINIjRxRNHvwzFaNir5iXc6HCyNUnOzsCPVe8xa2uj7nD20Btm63+UjpfDDHa21wqEPiBKIuYMOcCWLJwmA3201flLsr8ZvAZkQjeRxw80vzUWpCbiDbhDe+LEXzxiH1DXziOcP89hqBBFzVioU0Sc573yIbwMFc3FNsocqm0vs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=nDz3IABY; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 626AAC4CEDD;
-	Tue, 11 Feb 2025 10:05:09 +0000 (UTC)
+	 Content-Type:Content-Disposition:In-Reply-To; b=I8eikktUxTmhzzPNLdJ1MtYYj77GTwaCC67znHZgURAiplRYZKh0Yzw6SmDrCZQIWbu0z7Sgjwl6s8ZSLfff7EiQjfsIpTICOmHhxm2RwA6Wc/9O2xhp/gD8a6r0u0pWOLvER6QAX1KVL8uizgFoXKV3g05XI4k+zd71Vqynz/w=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=RqQfUHO+; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id B3AD2C4CEDD;
+	Tue, 11 Feb 2025 10:09:43 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1739268312;
-	bh=16KN1Mp7otYAOTGe8F70UjNoHgS3ex+64eqSdYJYwmM=;
+	s=k20201202; t=1739268587;
+	bh=vlK1kYDAhpjzPcfIwGf1Lxx/sTSC0Xl2d3beqDbehpU=;
 	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=nDz3IABYScaHlSV+3mrN5zdijNEVvEaa2+pGfiTkoej9kljC4nGeQHRG7e3im7mcT
-	 +CXHcLyAgjNXu4ZcwsHSV4sBnVbU3pMMF6zT66WFZ4k+t/T4bTyggLuH24cjAfzNlv
-	 UnQXgo2DSlLS/jxcO4gn+oeAUoI/8dWAhBDG4CXYg0TYZjHRGmRoLRTBTauQbWPXOU
-	 CJAcPxrGHBab+uEq4syNJajlHlvBwO06O833eBPIDPlO43bZtO22zUkKNwse4hFXxs
-	 o6Ns0VeGVJif2wdEWF6q+nXkJgjNfPamUtVyeYYmlPaXjTWn2VoPdWwD4BSY9KTWtk
-	 o84aDpcmuRxfw==
-Date: Tue, 11 Feb 2025 10:05:07 +0000
+	b=RqQfUHO+ooFm+5w4bq6zRRZFDISyiTyPAQ8yykyVor2I9+5KEn1/5S3dLje93Xpud
+	 5LgTmo5ZGytpxnZnyHmCRSbZ3Ok5/ouprHWyXEKJG/TU3XGDnVSTv06L7+yEp+svHV
+	 SfD+Xq74PFC7T1qU1SHvM5wl3d9KMkCRJUI6HqflDXMe3BnmrB5Lu9Tbhc3qg0Q3lI
+	 0nfoAQYlgGu+tss1xDhz18XEGsqs2yDKpHyzXEMQICx5KIXXcguS2oyI59jiGhkOfo
+	 IpRRAdvxRHev+/vsmCNxNGMgn9w0UYY+mGt+DhUJkXKOqhEv+dgFPln1GYfjlk+C0v
+	 12bGaSBwEtxzA==
+Date: Tue, 11 Feb 2025 10:09:41 +0000
 From: Simon Horman <horms@kernel.org>
-To: Yuyang Huang <yuyanghuang@google.com>
-Cc: "David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	David Ahern <dsahern@kernel.org>, netdev@vger.kernel.org,
-	Donald Hunter <donald.hunter@gmail.com>,
-	Shuah Khan <shuah@kernel.org>,
-	Nikolay Aleksandrov <razor@blackwall.org>,
-	Hangbin Liu <liuhangbin@gmail.com>,
-	Daniel Borkmann <daniel@iogearbox.net>, petrm@nvidia.com,
-	linux-kselftest@vger.kernel.org,
-	Maciej =?utf-8?Q?=C5=BBenczykowski?= <maze@google.com>,
-	Lorenzo Colitti <lorenzo@google.com>
-Subject: Re: [PATCH net-next, v8 2/2] selftests/net: Add selftest for IPv4
- RTM_GETMULTICAST support
-Message-ID: <20250211100507.GH554665@kernel.org>
-References: <20250207110836.2407224-1-yuyanghuang@google.com>
- <20250207110836.2407224-2-yuyanghuang@google.com>
- <20250210161306.GE554665@kernel.org>
- <CADXeF1GP24uJNYBPjjegs=sycUa1d=cVacvchKdAk5+p=ZOj8w@mail.gmail.com>
+To: Suman Ghosh <sumang@marvell.com>
+Cc: Sunil Kovvuri Goutham <sgoutham@marvell.com>,
+	Geethasowjanya Akula <gakula@marvell.com>,
+	Subbaraya Sundeep Bhatta <sbhatta@marvell.com>,
+	Hariprasad Kelam <hkelam@marvell.com>,
+	"davem@davemloft.net" <davem@davemloft.net>,
+	"edumazet@google.com" <edumazet@google.com>,
+	"kuba@kernel.org" <kuba@kernel.org>,
+	"pabeni@redhat.com" <pabeni@redhat.com>,
+	"netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+	Linu Cherian <lcherian@marvell.com>,
+	Jerin Jacob <jerinj@marvell.com>,
+	"john.fastabend@gmail.com" <john.fastabend@gmail.com>,
+	Bharat Bhushan <bbhushan2@marvell.com>,
+	"hawk@kernel.org" <hawk@kernel.org>,
+	"andrew+netdev@lunn.ch" <andrew+netdev@lunn.ch>,
+	"ast@kernel.org" <ast@kernel.org>,
+	"daniel@iogearbox.net" <daniel@iogearbox.net>,
+	"bpf@vger.kernel.org" <bpf@vger.kernel.org>,
+	"larysa.zaremba@intel.com" <larysa.zaremba@intel.com>
+Subject: Re: [EXTERNAL] Re: [net-next PATCH v5 2/6] octeontx2-pf: Add AF_XDP
+ non-zero copy support
+Message-ID: <20250211100941.GI554665@kernel.org>
+References: <20250206085034.1978172-1-sumang@marvell.com>
+ <20250206085034.1978172-3-sumang@marvell.com>
+ <20250210164128.GG554665@kernel.org>
+ <SJ0PR18MB521635EA615322287FB56A37DBFD2@SJ0PR18MB5216.namprd18.prod.outlook.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -71,22 +79,31 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <CADXeF1GP24uJNYBPjjegs=sycUa1d=cVacvchKdAk5+p=ZOj8w@mail.gmail.com>
+In-Reply-To: <SJ0PR18MB521635EA615322287FB56A37DBFD2@SJ0PR18MB5216.namprd18.prod.outlook.com>
 
-On Mon, Feb 10, 2025 at 09:43:03PM -0800, Yuyang Huang wrote:
-> >FWIIW I think that the YAML spec entry is distinct from, although a
-> >dependency of, adding the test. I would put it in a separate patch.
-> 
-> Thanks for the feedback! I will split the change into two patches in
-> the next submission.
+On Tue, Feb 11, 2025 at 07:07:02AM +0000, Suman Ghosh wrote:
+> >Hi Suman,
+> >
+> >If this is a bug fix then it should be targeted at net, which implies
+> >splitting it out of this patch-set.
+> >
+> >If, on the other hand, it is not a fix then it should not have a Fixes
+> >tag.
+> >In that case you can cite a commit using this syntax:
+> >
+> >commit 06059a1a9a4a ("octeontx2-pf: Add XDP support to netdev PF")
+> >
+> >Unlike a Fixes tag it:
+> >* Should be in the body of the patch description,
+> >  rather than part of the tags at the bottom of the patch description
+> >* May be line wrapped
+> >* Can me included in a sentence
+> [Suman] Hi Simon,
+> This was suggested the Paolo in v3. He suggested this to simplify the merging process but to add the fix tag.
 
-Thanks,
+Thanks Suman,
 
-After sleeping on this I realise that this is really only a very
-minor process issue. And as we are already on v8, after mostly
-minor revisions to get there, I think this patchset can be accepted
-as-is after all.
+Sorry for missing Paolo's advice on v3 [1].
 
-So no action required by you at this time.
-
+[1] https://lore.kernel.org/netdev/dddca9a4-9ee3-4da1-b68d-26f208566d5d@redhat.com/
 
