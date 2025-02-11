@@ -1,99 +1,116 @@
-Return-Path: <netdev+bounces-165132-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-165133-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5D969A309BE
-	for <lists+netdev@lfdr.de>; Tue, 11 Feb 2025 12:18:13 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 75A72A309C0
+	for <lists+netdev@lfdr.de>; Tue, 11 Feb 2025 12:18:20 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id BFC19188C25A
-	for <lists+netdev@lfdr.de>; Tue, 11 Feb 2025 11:18:18 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 99DDD188C3FA
+	for <lists+netdev@lfdr.de>; Tue, 11 Feb 2025 11:18:23 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id ACA831F4262;
-	Tue, 11 Feb 2025 11:18:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AF1191F153A;
+	Tue, 11 Feb 2025 11:18:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="dhWrskw/"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtpbgsg2.qq.com (smtpbgsg2.qq.com [54.254.200.128])
+Received: from out-178.mta1.migadu.com (out-178.mta1.migadu.com [95.215.58.178])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7980B1CEACB
-	for <netdev@vger.kernel.org>; Tue, 11 Feb 2025 11:17:57 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=54.254.200.128
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E73DA1CEACB;
+	Tue, 11 Feb 2025 11:18:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.178
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1739272680; cv=none; b=goMKldh/gGYCwdHEQ5ZEeGD9rkiGtcMkpTIEz5hpVfPy8f9UUCd0EXgv6c2A5koeIQWXcVLprWxIrAI+cP2+0TMIsl+mz41BsFVqkF+p0nCbizHEh3JH3loazrrUXf0JnAtepilVSZBkRQLNUcRPNMErRITcOJ6B4VprbuQ/2nE=
+	t=1739272693; cv=none; b=Xxq/GVJlC+W11qXWUY6p0Bmqf/6ymj5HlplmBGTON/SYUyPuKSZC9ETHRNNghf2c8SbC5VTRchNOXxk8Jq8Xv3dLMgO8zE5kPdM9nqlo3t84024e93CdbgsW2Wozd+y9tDVE31CngWsC0+YKkzNFGmJID5ug3WMPS6zvk1G/rD8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1739272680; c=relaxed/simple;
-	bh=K1d0tx3PaHBtI6Q44wAHQKRnhl2rM8eeQ97J0PsPlGw=;
+	s=arc-20240116; t=1739272693; c=relaxed/simple;
+	bh=nZc64ROQtMBsvksqiiVY9LcdEwaoBQcQl2UaguE/5w0=;
 	h=Content-Type:Mime-Version:Subject:From:In-Reply-To:Date:Cc:
-	 Message-Id:References:To; b=TarPtvIsmOTKE8ovboOAbIj2HZs1hkMZwunmoLz/406dVT7Wm1kH8BTAdxR/uxkgNPAwG63V35FBWKA2XKseXO2KYMnEkGyMD2qE1UaVi2PTxMc0ag2KFWXwhQABu6yj62/INncIESpLkHc8EoPVVtLyodospQwPohfP+2xHGnY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=net-swift.com; spf=pass smtp.mailfrom=net-swift.com; arc=none smtp.client-ip=54.254.200.128
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=net-swift.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=net-swift.com
-X-QQ-mid: bizesmtp89t1739272651tofnbwrp
-X-QQ-Originating-IP: P5U8U1wrOZTiqP5qZxqquvqM2S7v0NeiIWXNSWTYSw4=
-Received: from smtpclient.apple ( [183.157.104.65])
-	by bizesmtp.qq.com (ESMTP) with 
-	id ; Tue, 11 Feb 2025 19:17:28 +0800 (CST)
-X-QQ-SSF: 0001000000000000000000000000000
-X-QQ-GoodBg: 2
-X-BIZMAIL-ID: 3854022505142321806
+	 Message-Id:References:To; b=I76j06yMycwQcDbhmgEmMsZLKc111gYe+r2K08ET5ybYR7fA8Q/FGormIvkqBoWqJSbID35UFXomblTtSqHjYfh71Lbk6qYb/vEng/5nPVyVi+4L3hLvKqTvKa5rmEKGrq7nNO9PhcoSlnUzh7rAjdWqfRkq+RaXJBpskgLMIeg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=dhWrskw/; arc=none smtp.client-ip=95.215.58.178
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
 Content-Type: text/plain;
-	charset=utf-8
+	charset=us-ascii
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1739272688;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=SX5VwgGFraKOYu4YaOaik6I5FHiTMUvQxaqLPeEoq90=;
+	b=dhWrskw/Bo6aXVwaDNtm4Y3Mo9B0wkB6HVswPOesLbySk7guj6ZlagMyvSH0KTHW7uaQkw
+	gb+Le2XwuHBxZmN1g6wNkUAI2NW+BWKadEIsDZAwQ4Q17WfgdUmKm/Qmdx2tVqIdCKHSDa
+	3YX+5rZKGnPkb7xEmJiL368xF+vLWys=
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0 (Mac OS X Mail 16.0 \(3818.100.11.1.3\))
-Subject: Re: [PATCH net-next v7 3/6] net: libwx: Redesign flow when sriov is
- enabled
-From: "mengyuanlou@net-swift.com" <mengyuanlou@net-swift.com>
-In-Reply-To: <20250207171552.35446145@kernel.org>
-Date: Tue, 11 Feb 2025 19:17:15 +0800
-Cc: netdev@vger.kernel.org,
- jiawenwu@trustnetic.com,
- duanqiangwen@net-swift.com
-Content-Transfer-Encoding: quoted-printable
-Message-Id: <FC1A7A5B-0648-407D-8F2F-0B300FB47710@net-swift.com>
-References: <20250206103750.36064-1-mengyuanlou@net-swift.com>
- <20250206103750.36064-4-mengyuanlou@net-swift.com>
- <20250207171552.35446145@kernel.org>
-To: Jakub Kicinski <kuba@kernel.org>
-X-Mailer: Apple Mail (2.3818.100.11.1.3)
-X-QQ-SENDSIZE: 520
-Feedback-ID: bizesmtp:net-swift.com:qybglogicsvrsz:qybglogicsvrsz4a-0
-X-QQ-XMAILINFO: NNC6H2+gqsu3zZEbTjJQ2jv5TkyPOFD8iLBs6Wxqtb5OpjBwz6t1vpBD
-	VB8TL2gB/KpgBFVj7toKUrOdR5rIT0MSg7VP7SQr4KyPEMa3ddphECF5xPWPeD5iL+voKll
-	s1VGlHFbn51lR6i/fFyl55XznQ7Dmfim5kGu/UO31mgNytuAgAsAGt8WX8yVXbMBVMTqug7
-	3zW5QIlugST8zhBCU2Vz4YvM5l3/jP8tSKSZ2uih2m/z854GQL4noVdNio9Ddwz6dwQVp+o
-	29yt+HHIjqUQ01YgMvxT77B3MjxG92SDAcentkUmPf3R0s4Oi+9p3hW96nQAck6FDSTdIX3
-	VTcJn4rA1ehL3FICa/3WBtnMS4BUf7rjQeeOkNw8oPQImbZBg3Js7KiD5+ua0mEr8JLBTUn
-	lmXgnAcl2jBIfxQ2CisWO9GbEIgm1nn/TMYnmP7I0AXqqriutNHLFUcPndjO13l3+KQ3Gl5
-	OFHEqkM4kccE1Ot1/tiotF6ZECdH5UhvXXVuzX7CbYCG4JHmsHnJKqIanzb8oMZRPe+c2SD
-	z8hD4UHNxf8CnS9dNeR6n77hlvc0ELGw1YMVzygGsNJVpkXxzsMF+ErRL/b5JMY/2ObvNtw
-	uV+nIS5gs6QvEv4QHQKjsJGa2bFUKin1LdnXvHyb8bSXiZXx3Al1wYRr0hDuXzBwBVg888p
-	WWlHSvkjMnAjI0lamlDcMYVwTMCeKqem6dGo9OajsU1PnKgavQuVZpiXRnkseDkU3s6Qple
-	zV/b/Zm2brbG/2Nql2PpZFLZvl3IX5R4u4DXwuvwFm0AEcxGQ6DCwxLV4lb8SCwR3YOOdIe
-	6P+5wGB6D641/SvZxlatY56CM9IWqeesqEIOBxxidW4AnNI4qMU9IJ0FlfttPLrXZGxoxyA
-	8BGToab/OKXyWVx7rtXnjGPo31UtBrOj2/cyJl4+UXnD2Bj95HF4J8F/Ny3+58M+ZFy4Ox+
-	2NyFLXeSkJWmcyPjWGCyRiN5ATsxftDjQp0JFCRX5VZmJ2VLEPJsVdJNZS7w4gZzLXG3A01
-	dnt7VlBkmNSX6OtJNVJFK4Kw1gCUs=
-X-QQ-XMRINFO: OD9hHCdaPRBwq3WW+NvGbIU=
-X-QQ-RECHKSPAM: 0
+Mime-Version: 1.0 (Mac OS X Mail 16.0 \(3776.700.51.11.1\))
+Subject: Re: [PATCH net-next] sctp: Remove commented out code
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Thorsten Blum <thorsten.blum@linux.dev>
+In-Reply-To: <b85e552d-5525-4179-a9c4-6553b711d949@intel.com>
+Date: Tue, 11 Feb 2025 12:17:54 +0100
+Cc: Marcelo Ricardo Leitner <marcelo.leitner@gmail.com>,
+ Xin Long <lucien.xin@gmail.com>,
+ "David S. Miller" <davem@davemloft.net>,
+ Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>,
+ Paolo Abeni <pabeni@redhat.com>,
+ Simon Horman <horms@kernel.org>,
+ linux-sctp@vger.kernel.org,
+ netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org
+Content-Transfer-Encoding: 7bit
+Message-Id: <6F08E5F2-761F-4593-9FEB-173ECF18CC71@linux.dev>
+References: <20250211102057.587182-1-thorsten.blum@linux.dev>
+ <b85e552d-5525-4179-a9c4-6553b711d949@intel.com>
+To: Mateusz Polchlopek <mateusz.polchlopek@intel.com>
+X-Migadu-Flow: FLOW_OUT
 
+On 11. Feb 2025, at 11:49, Mateusz Polchlopek wrote:
+> On 2/11/2025 11:20 AM, Thorsten Blum wrote:
+>> Remove commented out code.
+>> Signed-off-by: Thorsten Blum <thorsten.blum@linux.dev>
+>> ---
+>>  include/linux/sctp.h | 1 -
+>>  1 file changed, 1 deletion(-)
+>> diff --git a/include/linux/sctp.h b/include/linux/sctp.h
+>> index 836a7e200f39..812011d8b67e 100644
+>> --- a/include/linux/sctp.h
+>> +++ b/include/linux/sctp.h
+>> @@ -222,7 +222,6 @@ struct sctp_datahdr {
+>>   __be16 stream;
+>>   __be16 ssn;
+>>   __u32 ppid;
+>> - /* __u8  payload[]; */
+>>  };
+>>    struct sctp_data_chunk {
+> 
+> Hi Thorsten
+> 
+> I don't think we want to remove that piece of code, please refer
+> to the discussion under the link:
+> 
+> https://lore.kernel.org/netdev/cover.1681917361.git.lucien.xin@gmail.com/
 
+Hm, the commit message (dbda0fba7a14) says payload was deleted because
+"the member is not even used anywhere," but it was just commented out.
+In the cover letter it then explains that "deleted" actually means
+"commented out."
 
-> 2025=E5=B9=B42=E6=9C=888=E6=97=A5 09:15=EF=BC=8CJakub Kicinski =
-<kuba@kernel.org> =E5=86=99=E9=81=93=EF=BC=9A
->=20
-> On Thu,  6 Feb 2025 18:37:47 +0800 mengyuanlou wrote:
->> + vector_reg =3D (vfinfo->vf_mc_hashes[j] >> 5) &
->> +     GENMASK(6, 0);
->> + vector_bit =3D vfinfo->vf_mc_hashes[j] & GENMASK(4, 0);
->=20
-> Can you add proper defines for these fields and use FIELD_GET() ?
->=20
-Thanks for reminding.
->=20
+However, I can't follow the reasoning in the cover letter either:
 
+"Note that instead of completely deleting it, we just leave it as a
+comment in the struct, signalling to the reader that we do expect
+such variable parameters over there, as Marcelo suggested."
+
+Where do I find Marcelo's suggestion and the "variable parameters over
+there?"
+
+Thanks,
+Thorsten
 
