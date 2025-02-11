@@ -1,165 +1,114 @@
-Return-Path: <netdev+bounces-165026-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-165027-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 38B93A3019E
-	for <lists+netdev@lfdr.de>; Tue, 11 Feb 2025 03:41:28 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9A335A301A9
+	for <lists+netdev@lfdr.de>; Tue, 11 Feb 2025 03:50:56 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C24033A6B89
-	for <lists+netdev@lfdr.de>; Tue, 11 Feb 2025 02:41:18 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 3E6C51673A5
+	for <lists+netdev@lfdr.de>; Tue, 11 Feb 2025 02:50:55 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 97E811BFE00;
-	Tue, 11 Feb 2025 02:41:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7BAD21CD1FD;
+	Tue, 11 Feb 2025 02:50:52 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="ORLfukIz"
+	dkim=pass (1024-bit key) header.d=fastly.com header.i=@fastly.com header.b="rgYTXCTj"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.9])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pj1-f41.google.com (mail-pj1-f41.google.com [209.85.216.41])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E60C41C3C1C
-	for <netdev@vger.kernel.org>; Tue, 11 Feb 2025 02:41:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.9
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EBE3B1CAA60
+	for <netdev@vger.kernel.org>; Tue, 11 Feb 2025 02:50:50 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.41
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1739241684; cv=none; b=WtYbrRFmwUDQhrTE0zVdZYE8TdtNAn+Vnc2lDlJNKD0qYP6rYrMokbOb6ch+9duHW+nmPxNES50VkLBHxWmBFRIprskhhRR4ULigvqFXW69QjZ+cLNb36Q/rWeuW4m9MTLa3JaGN8nWwBf3TxOA7Tf5Bv6MczoZODbUq3EsIbYQ=
+	t=1739242252; cv=none; b=hdiOTFn6y8ZdTqjIgX4fibA1UcDoOEWvcQOgjhmDcDPDmZfGzhPBHXci0zckoAXrjxTrmTNAWkCNf/3MUQrlR0YOmkmiYkqIAeOqjDxSgKDmA3Uz149oS9S+0gKWH9VfwunzhioZ3tT5A4Obu9Vy2HY0cE5ZFNXm5tkeWNSPaZ0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1739241684; c=relaxed/simple;
-	bh=0I4trm11Zt0vOhZIkPvv8fZ+KaLcMHXs1mD4PkidyuQ=;
-	h=From:To:Cc:Subject:Date:Message-Id; b=cwVOwLL25M3Wk5zNkdNQ0BJ+mEvaK5D54IfsOtTkKkl14M4i9b7U/bjATu3dWKYGcqexsMoXKGUmbgRhfIWvZO949gncmTh58cpOxXedMaMiRtO4iOJ9CdibJpmREuvTuETYPPL9GFpgBYaxImrIJc3QrU0DHd2j8KLW2b6ishc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=ORLfukIz; arc=none smtp.client-ip=192.198.163.9
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1739241683; x=1770777683;
-  h=from:to:cc:subject:date:message-id;
-  bh=0I4trm11Zt0vOhZIkPvv8fZ+KaLcMHXs1mD4PkidyuQ=;
-  b=ORLfukIzBb7n8DBrwvwwiuV/NOTI8VayxdAe7p7y9q9DHG+dgZbmwjaD
-   2MgILKBOOUZEv1IYarsM2hm6T3BzH8bJXGCcqWcIv5mhWNZ74ua2D7Z1S
-   3pBkURHMG3avH/6ipRwjgqyWwyMV0IZkZb2MDSRiiqGz1JncON3c89H+A
-   nHnxl+iV9tEFMJf4zNbk6gNrSCmeNLTLlIin4ioPHfx9mXKGtdxssHipm
-   EvqTRdMZFItDtYRIe+eWHuHZnnCdfjbURLWCf0osjV6wgcwZywrdTcdzW
-   TaRxgJDJXze1udKFyST77fYPelTOA1lYAb6lCAOx7miq70IiqfMcfpM/t
-   w==;
-X-CSE-ConnectionGUID: vIIk0EyWRZyWVMd4XehYGw==
-X-CSE-MsgGUID: uGDb7SXQTnCmXFL/Hc+N7g==
-X-IronPort-AV: E=McAfee;i="6700,10204,11341"; a="50483861"
-X-IronPort-AV: E=Sophos;i="6.13,276,1732608000"; 
-   d="scan'208";a="50483861"
-Received: from fmviesa002.fm.intel.com ([10.60.135.142])
-  by fmvoesa103.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 10 Feb 2025 18:41:21 -0800
-X-CSE-ConnectionGUID: CLmtrMOVRZ+N5emmFzHgXQ==
-X-CSE-MsgGUID: QlUJ7qYUT2eLFpUKHpID0A==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.12,224,1728975600"; 
-   d="scan'208";a="135635057"
-Received: from estantil-desk.jf.intel.com ([10.166.241.24])
-  by fmviesa002.fm.intel.com with ESMTP; 10 Feb 2025 18:41:20 -0800
-From: Emil Tantilov <emil.s.tantilov@intel.com>
-To: intel-wired-lan@lists.osuosl.org
-Cc: netdev@vger.kernel.org,
-	decot@google.com,
-	willemb@google.com,
-	anthony.l.nguyen@intel.com,
-	davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	madhu.chittim@intel.com
-Subject: [PATCH iwl-net] idpf: check error for register_netdev() on init
-Date: Mon, 10 Feb 2025 18:38:51 -0800
-Message-Id: <20250211023851.21090-1-emil.s.tantilov@intel.com>
-X-Mailer: git-send-email 2.17.2
+	s=arc-20240116; t=1739242252; c=relaxed/simple;
+	bh=VRrjI00Me/cNAVhfeUoIza0DR3FFrIOng/ndd468AvQ=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=AVfd/tmQ1aU/EMJJ00uGoWVV8ZrYbcLpy67ZFMc4Dt1NwmPLNsrDC5FGfsU1Mazeteguqrw4ZiVB+l9kggOYuUmXnG5mk85MrLiEdv+umS+z9SR1g2m+qYNWqTrMKcLr2tYkLgNa9VuhuJUP9Cvm4iUCvDtpl7EC6g3zxoc0G7c=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fastly.com; spf=pass smtp.mailfrom=fastly.com; dkim=pass (1024-bit key) header.d=fastly.com header.i=@fastly.com header.b=rgYTXCTj; arc=none smtp.client-ip=209.85.216.41
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fastly.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=fastly.com
+Received: by mail-pj1-f41.google.com with SMTP id 98e67ed59e1d1-2fa48404207so4994376a91.1
+        for <netdev@vger.kernel.org>; Mon, 10 Feb 2025 18:50:50 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=fastly.com; s=google; t=1739242250; x=1739847050; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references
+         :mail-followup-to:message-id:subject:cc:to:from:date:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=Inxmkf7GXwx4Ju5kxyAeSkmwU4lkXnkfugn8Ok+jGZE=;
+        b=rgYTXCTjTrFiVFmkTg61tGHzGTkr0oF0eyOk7TPQuftlxao9yeZaVrbbxIllSomAPq
+         LbVbcjaDmOSOJhEHSjdEaAL6WD6f4zQyDhfPLfmgWHFOnkNeKa1kvprTji7BAKLasM6x
+         faWL0+m5e8UA5hpyjFDqDeglirLafitSMlxDM=
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1739242250; x=1739847050;
+        h=in-reply-to:content-disposition:mime-version:references
+         :mail-followup-to:message-id:subject:cc:to:from:date
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=Inxmkf7GXwx4Ju5kxyAeSkmwU4lkXnkfugn8Ok+jGZE=;
+        b=gEQKzWqQHJK81a+e2eIJgPSPlteguoTVYeT0SUbqXeOGirYtgxPfoF/eXnbgF1k70b
+         XyTwF/FvEgrde1rQi/LFxsND/WN+K1CVt4eDyfIrYDaTG0OGinjO8Uidgvg2Tq2C0P5w
+         pAE294h1IAhn3pRdhSe0a1VI6p8EoKkfLkpKl7znpZrAPOGyyaIOaR9OM9xbzzZe6LmN
+         u6qe/PTQAdpZa78JDReTY1z821vAorwLIAli8Mz26bK524P/ly3+TqNWq01+3IUXxW2s
+         6cxa0sSRDzKpFGHYU7wKfQr940QWTzgd2Ts27ZuxipV7zRlZdUF7N1mq6l5f1Uxtvxeo
+         kiBA==
+X-Gm-Message-State: AOJu0YxzLvx+bMmq6OnoJ3fxvX1R8+Vozy+aDhkPTNEa28MshvXbJtGD
+	Eb3BsTIGTlfdXDqPE4x8hhIYquO5zoIPwfR29nHp2pwwdO+B8mbso0+QZgCUynvUo5y9Tw7DCr+
+	P
+X-Gm-Gg: ASbGncsCDT/HNLMwJPNWcc/Tvl1Z9BB5ecr0Z9hsr4pj6XQql0+2rshcs7y2YlHcn7f
+	87JQvUM5BlwWomg55KdLuCPd0KLi82aNHCmSkmZuidS0T7Mkv5hkNPQS/SA88SabY3cVd/yF4gE
+	i1MVtPY5Sd34eYMWug1hoyc55A4I9PrvO70C6Pi0s/0UeNFDuTh5BaWdIQQFDA1MqlrAhzzVt+/
+	deXg2HvD4bk6haLJrHpz1ZnLcaxOdRE+HfvtI2D7yf8SvUCrsf1PSUytG6o/HXhfbMUGa2tixew
+	kIlDRavnf6QResnY5JbB1ZMthKZ5+e42J3Hta8zgMGqNfOTr5R0C/uXchW29ZG0=
+X-Google-Smtp-Source: AGHT+IEwU9HQiodle9G1DfCEZFuDdCXwxGqXcPc3IIYwRBiVYDyT5p/hIkOvMkdFa3mITYqhW/6SIA==
+X-Received: by 2002:a05:6a00:13a4:b0:730:8a0a:9f09 with SMTP id d2e1a72fcca58-7308a0aaceemr11800001b3a.18.1739242250105;
+        Mon, 10 Feb 2025 18:50:50 -0800 (PST)
+Received: from LQ3V64L9R2 (c-24-6-151-244.hsd1.ca.comcast.net. [24.6.151.244])
+        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-73085eb5facsm3577237b3a.11.2025.02.10.18.50.48
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 10 Feb 2025 18:50:49 -0800 (PST)
+Date: Mon, 10 Feb 2025 18:50:47 -0800
+From: Joe Damato <jdamato@fastly.com>
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: netdev@vger.kernel.org, ahmed.zaki@intel.com,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
+	Simon Horman <horms@kernel.org>, Jonathan Corbet <corbet@lwn.net>,
+	"open list:DOCUMENTATION" <linux-doc@vger.kernel.org>,
+	open list <linux-kernel@vger.kernel.org>
+Subject: Re: [PATCH net-next] documentation: networking: Add NAPI config
+Message-ID: <Z6q7B79h73ydzOhM@LQ3V64L9R2>
+Mail-Followup-To: Joe Damato <jdamato@fastly.com>,
+	Jakub Kicinski <kuba@kernel.org>, netdev@vger.kernel.org,
+	ahmed.zaki@intel.com, "David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
+	Simon Horman <horms@kernel.org>, Jonathan Corbet <corbet@lwn.net>,
+	"open list:DOCUMENTATION" <linux-doc@vger.kernel.org>,
+	open list <linux-kernel@vger.kernel.org>
+References: <20250208012822.34327-1-jdamato@fastly.com>
+ <20250210181635.2c84f2e1@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250210181635.2c84f2e1@kernel.org>
 
-Current init logic ignores the error code from register_netdev(),
-which will cause WARN_ON() on attempt to unregister it, if there was one,
-and there is no info for the user that the creation of the netdev failed.
+On Mon, Feb 10, 2025 at 06:16:35PM -0800, Jakub Kicinski wrote:
+> On Sat,  8 Feb 2025 01:28:21 +0000 Joe Damato wrote:
+> > +Persistent NAPI config
+> > +----------------------
+> > +
+> > +Drivers can opt-in to using a persistent NAPI configuration space by calling
+> 
+> Should we be more forceful? I think for new drivers the _add_config() 
+> API should always be preferred given the benefits.
 
-WARNING: CPU: 89 PID: 6902 at net/core/dev.c:11512 unregister_netdevice_many_notify+0x211/0x1a10
-...
-[ 3707.563641]  unregister_netdev+0x1c/0x30
-[ 3707.563656]  idpf_vport_dealloc+0x5cf/0xce0 [idpf]
-[ 3707.563684]  idpf_deinit_task+0xef/0x160 [idpf]
-[ 3707.563712]  idpf_vc_core_deinit+0x84/0x320 [idpf]
-[ 3707.563739]  idpf_remove+0xbf/0x780 [idpf]
-[ 3707.563769]  pci_device_remove+0xab/0x1e0
-[ 3707.563786]  device_release_driver_internal+0x371/0x530
-[ 3707.563803]  driver_detach+0xbf/0x180
-[ 3707.563816]  bus_remove_driver+0x11b/0x2a0
-[ 3707.563829]  pci_unregister_driver+0x2a/0x250
-
-Introduce an error check and log the vport number and error code.
-On removal make sure to check VPORT_REG_NETDEV flag prior to calling
-unregister and free on the netdev.
-
-Add local variables for idx, vport_config and netdev for readability.
-
-Fixes: 0fe45467a104 ("idpf: add create vport and netdev configuration")
-Reviewed-by: Madhu Chittim <madhu.chittim@intel.com>
-Suggested-by: Tony Nguyen <anthony.l.nguyen@intel.com>
-Signed-off-by: Emil Tantilov <emil.s.tantilov@intel.com>
----
- drivers/net/ethernet/intel/idpf/idpf_lib.c | 27 ++++++++++++++--------
- 1 file changed, 18 insertions(+), 9 deletions(-)
-
-diff --git a/drivers/net/ethernet/intel/idpf/idpf_lib.c b/drivers/net/ethernet/intel/idpf/idpf_lib.c
-index a3d6b8f198a8..a322a8ac771e 100644
---- a/drivers/net/ethernet/intel/idpf/idpf_lib.c
-+++ b/drivers/net/ethernet/intel/idpf/idpf_lib.c
-@@ -927,15 +927,19 @@ static int idpf_stop(struct net_device *netdev)
- static void idpf_decfg_netdev(struct idpf_vport *vport)
- {
- 	struct idpf_adapter *adapter = vport->adapter;
-+	u16 idx = vport->idx;
- 
- 	kfree(vport->rx_ptype_lkup);
- 	vport->rx_ptype_lkup = NULL;
- 
--	unregister_netdev(vport->netdev);
--	free_netdev(vport->netdev);
-+	if (test_and_clear_bit(IDPF_VPORT_REG_NETDEV,
-+			       adapter->vport_config[idx]->flags)) {
-+		unregister_netdev(vport->netdev);
-+		free_netdev(vport->netdev);
-+	}
- 	vport->netdev = NULL;
- 
--	adapter->netdevs[vport->idx] = NULL;
-+	adapter->netdevs[idx] = NULL;
- }
- 
- /**
-@@ -1536,12 +1540,17 @@ void idpf_init_task(struct work_struct *work)
- 	}
- 
- 	for (index = 0; index < adapter->max_vports; index++) {
--		if (adapter->netdevs[index] &&
--		    !test_bit(IDPF_VPORT_REG_NETDEV,
--			      adapter->vport_config[index]->flags)) {
--			register_netdev(adapter->netdevs[index]);
--			set_bit(IDPF_VPORT_REG_NETDEV,
--				adapter->vport_config[index]->flags);
-+		struct idpf_vport_config *vport_config = adapter->vport_config[index];
-+		struct net_device *netdev = adapter->netdevs[index];
-+
-+		if (netdev && !test_bit(IDPF_VPORT_REG_NETDEV, vport_config->flags)) {
-+			err = register_netdev(netdev);
-+			if (err) {
-+				dev_err(&pdev->dev, "failed to register netdev for vport %d: %pe\n",
-+					index, ERR_PTR(err));
-+				continue;
-+			}
-+			set_bit(IDPF_VPORT_REG_NETDEV, vport_config->flags);
- 		}
- 	}
- 
--- 
-2.17.2
-
+How about: "Drivers should opt-in ..." instead? I have no strong
+preference.
 
