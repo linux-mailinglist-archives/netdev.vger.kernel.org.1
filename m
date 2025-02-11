@@ -1,89 +1,108 @@
-Return-Path: <netdev+bounces-165276-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-165277-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 94AB6A3160A
-	for <lists+netdev@lfdr.de>; Tue, 11 Feb 2025 20:55:00 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 00EB9A3162F
+	for <lists+netdev@lfdr.de>; Tue, 11 Feb 2025 20:57:42 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 4667E3A06FF
-	for <lists+netdev@lfdr.de>; Tue, 11 Feb 2025 19:54:51 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A746B3A2311
+	for <lists+netdev@lfdr.de>; Tue, 11 Feb 2025 19:57:32 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 44F7A261592;
-	Tue, 11 Feb 2025 19:54:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4D9FF265626;
+	Tue, 11 Feb 2025 19:57:33 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=fastly.com header.i=@fastly.com header.b="Vi3rG4MR"
+	dkim=pass (1024-bit key) header.d=fastly.com header.i=@fastly.com header.b="wYsvPKyB"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f180.google.com (mail-pl1-f180.google.com [209.85.214.180])
+Received: from mail-pl1-f173.google.com (mail-pl1-f173.google.com [209.85.214.173])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9852626562C
-	for <netdev@vger.kernel.org>; Tue, 11 Feb 2025 19:54:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.180
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 88618265621
+	for <netdev@vger.kernel.org>; Tue, 11 Feb 2025 19:57:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.173
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1739303682; cv=none; b=LIT6X+4/5CKQLywLzKOZbUqlXAq4Yd2y1xsPvaIT/Em1tFzia5stU9nys7+ieVh5uuKmppPN4RC0nmOtD3k9TAMhskAUkxRO76Db8A032nSn4V9yzsw5taECbM5NN74MBQjB5/u3w4OFa2KoA6frD38CO7f2TeoxMyoA1feTb5k=
+	t=1739303853; cv=none; b=BiVO/+SHLVHHY5/Oqh3QBiWIDmjO0vc84zsLcnjRwJtdoA//bx1WvckG9TKvWlu209NV/5zyCOMs8hmTR++XqNFz0PTAP0eDL2YPPc3OW/gDF0YJtHR923UoOpUI8QgDzWnZCCYhulaAlPHCJPqIJ8iwAp9lliCK2nKleK5l6lg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1739303682; c=relaxed/simple;
-	bh=/LnRNKsSeHarCEcGt6s7GQnikEoa7tUtmLzliMuwik4=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=ATUsrMOyTVOXW71yJOokzhDYO5NR+0774zY3NhVBD5vqd9eM+xNyY0NGYgdg/GpbhMobkeaEyyfLXJR+syHGJ7qc6pqDrVcExsEJDS0XPFAWL4d0HwqkwJSlZgBkU+TJDZUtFLCBeutx0Z84umyKUCpOdf7seXZ2fdFWBCLw9pI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fastly.com; spf=pass smtp.mailfrom=fastly.com; dkim=pass (1024-bit key) header.d=fastly.com header.i=@fastly.com header.b=Vi3rG4MR; arc=none smtp.client-ip=209.85.214.180
+	s=arc-20240116; t=1739303853; c=relaxed/simple;
+	bh=4L1l3nbsQwxG4dhopMpRTZTo6TywqvNfWe0By30mxKA=;
+	h=Date:From:To:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=IwGui/mIQfgtnvMuJ6sfId49tMq7k3X8e1DZay/4rmuQZysG1FBA0D9W6POV1zShMvP/gZlOujd7CW8IJ0MkCqPrSZVNg4+SEQLbMpK73OOf6jB1iBd19wD2mYkDXXUaaw94/BcYzFw2Q9z6dwe9IgIJiOjLun9l8rgzWjkSKPo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fastly.com; spf=pass smtp.mailfrom=fastly.com; dkim=pass (1024-bit key) header.d=fastly.com header.i=@fastly.com header.b=wYsvPKyB; arc=none smtp.client-ip=209.85.214.173
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fastly.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=fastly.com
-Received: by mail-pl1-f180.google.com with SMTP id d9443c01a7336-21f2339dcfdso1749115ad.1
-        for <netdev@vger.kernel.org>; Tue, 11 Feb 2025 11:54:40 -0800 (PST)
+Received: by mail-pl1-f173.google.com with SMTP id d9443c01a7336-21c2f1b610dso145137355ad.0
+        for <netdev@vger.kernel.org>; Tue, 11 Feb 2025 11:57:31 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=fastly.com; s=google; t=1739303680; x=1739908480; darn=vger.kernel.org;
+        d=fastly.com; s=google; t=1739303851; x=1739908651; darn=vger.kernel.org;
         h=in-reply-to:content-disposition:mime-version:references
-         :mail-followup-to:message-id:subject:cc:to:from:date:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=mVy/xf6PjorjI/7sJR8fb9keGNyWM2jlUfvzyIc5MAQ=;
-        b=Vi3rG4MRXnjhFjQJUK8Sb0NcB6e9naVQHmaYWJgOHo/GmMw5bUnGUnYzO63ZVRNUMV
-         xdLPoDISMYayproswD9BKEYt8qkRMoamb4CWD4zMvCYsVg0ZQ0e4FdJdjKy2Tg92eSIk
-         1UKtyRyhda9LviOA2sN8rEmcMqKkCFBjVAoGM=
+         :mail-followup-to:message-id:subject:to:from:date:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=LZz21PoK7ESpRyCP00gJn2627gqZOHRBJZHWL/EIwBo=;
+        b=wYsvPKyBkoDXAYAkV39HQmlK8TOoSuLUE6ER8pM+sKGn78lxAmujZPT9cYAIlhtZDo
+         o1z8M1XBvBIrRDEmndONT4C68fO8Xyl0V4BjRVs3xfyI0eLoxQfVNJX1yfmfNi8uzNMB
+         Z7MptZhHeLUgnv0bJeXlV0/5rhe6vHGoFdBYQ=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1739303680; x=1739908480;
+        d=1e100.net; s=20230601; t=1739303851; x=1739908651;
         h=in-reply-to:content-disposition:mime-version:references
-         :mail-followup-to:message-id:subject:cc:to:from:date
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=mVy/xf6PjorjI/7sJR8fb9keGNyWM2jlUfvzyIc5MAQ=;
-        b=GTiOtRwyj/vh4iTr1UZ0ekIbs5wwXeCdJAq2LCJKkwoCQDgbo6iVVB34Edp7AffdaC
-         OwdEmlmEv5YdsepyHYa2EbCrVZA7rvLoF+TzoFNlt/Qo/Vmb35wzd6uYTEyvPCTYaItg
-         I6J5AD+VrYxDF4QjF29DplWmD5Ihheb5vXzGS+Hwnzqkp+C9CVLOpGMm77z0+rj91wqF
-         AOpetNXLSJ2YSJDQEB+bfwod3VEOxgchwpn8UYXh4SziWnFm5Fc9bBz/DjTV248E1w+o
-         jvNSXOvva46do6cqvWegi/tOhe3qcOA8aNErwyOqV+S6fdYVk+wn288tBdUkx4cgID87
-         DAeA==
-X-Forwarded-Encrypted: i=1; AJvYcCWhf7NAGePSQnBjQR5ocbVY45oTsW6fhV8EsSRcB7l+/zXCrEFiP90RUj/pUUvRc1l+kfQqhkc=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yzg9HYprcqqRqzqc5PcgPO41WQLkS5r+xXR7EL9DUc7uCLwbWlJ
-	5xfbPORG78z+trcWGADwtegU0qbfo89yrzgQ4iKUjnJYxXFZzjNbZJ69kt5SZ0o=
-X-Gm-Gg: ASbGncstW3B4mItqXNBO02jbQl+EOubWFYiU65l+McRQ5soaV4IQWbGd+83PNIAeCNL
-	uAx5xzM2qrv28uM1Ls7qmVC6L5G1Pr+Pz8kHLrKfCEqZwCWutxKy49HgKC1MXf3Rx6+hLDDI28a
-	UskjAeMKbmexIzaN/I9HNfGt4xb8NvmeNPPHcSzl2LV3lz0BgXeohUagXDR119ycbjbc6SLAFTS
-	d4nYctrkf4OvyD2xNYKFJzLDqeJvnmIHDjYiDe9gz8iN/MmVQsfqdPZpmbDd/icjC5k6gXhbyYE
-	AqJdlMA5IhDY99WjuKjWpIYZP7AJ+KnfnnfOtfLiNCNyY5Lv/Gkazqnbag==
-X-Google-Smtp-Source: AGHT+IFrFg9rcWVRZXYna/afuwk5nqJ9ZR4F4VRSZ67wNYmrzHuUG/NBwTPbkgJtQUp60JdYXqftLQ==
-X-Received: by 2002:a17:902:ebd1:b0:215:58be:3349 with SMTP id d9443c01a7336-220bc202f37mr5974295ad.14.1739303679853;
-        Tue, 11 Feb 2025 11:54:39 -0800 (PST)
+         :mail-followup-to:message-id:subject:to:from:date:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=LZz21PoK7ESpRyCP00gJn2627gqZOHRBJZHWL/EIwBo=;
+        b=qovemNIaGWl8aC4QWuFt3CC34M/ThUYTxTDHLaeRfWhg7DSxCInPPNyRxy1YfSa/bD
+         xqvVjhMK92ihqWweoX8rPKVgHpQsJXtcRCPdTzK6DLHdHC6Nvvujf603IBGhQxuZagpw
+         8tDPSBKP1BXkQNrwvhLTtwD27QH/gsYFG0R8y/1FBaqbMOGPJqA4/Ebhs9Rdlik4ndwl
+         F2wI4msqfkbssRyoitAjS3uG/z91hUc8QZ8uSAjn2gx5tCQB6zp301zL7ldd/VuLt0EN
+         /b4xIoiC1A0/nYWwZPeFZmopfXW4tXaNORCf0pYxyrnBnzmUfniqKtj84420fCwKk6JI
+         kitA==
+X-Forwarded-Encrypted: i=1; AJvYcCWJYHeBc4U8CNrBWoLd1UwZWBfGGUtGr4ZzER1DBT89fEh6XuErNLbR1dyXbPGW6M3UltYKNfY=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxfamKc7cnzWCNek4mKXXcoRrZbaeXgBz6hKNDK83UbRWr7VlJs
+	6LmxEjibpulBAqgQkWHGD8nPpctFRp76CI7lrnxzd/viu4AQjllDlM7nYtZexZo=
+X-Gm-Gg: ASbGnctT2QEiCsmsJX+mVm+7fqe5TlwDpEcmrX7kTr5jn6YrIo3SrD+SLp04SK0X5Iu
+	ohX376lrQNx95XNDGCzQW4XFJTpDzv3jxK6w4ocWe8yVUi2X3OymPPgwRWjbTCNW6m20dD+FyI3
+	eW8RU6fhsFHyxkUswSeYBnB6UcsdK09XNeeAR1fCV70lO82RCJYsnlGcWv1PLLK+geJzK35D+ZM
+	ZwOCIRgqx5Ow8JJq9A4IQXbJxPNS52Ry7K2A9GCYQ1ff4SHZ4CvUEdoWXsTNN7HA248woxft669
+	9tawOmahCJ0hhGtio/e4D3qyLPGDSCZEgJq8j8OrqEqduDmuDYchTlJkKA==
+X-Google-Smtp-Source: AGHT+IHGm6N7udAh5kUmRKYI+y4WUkbVC6Seg2Hl1n1knL0KkTOJXLUEmjJNH2ogtVLi5OCw8cUlqg==
+X-Received: by 2002:a05:6a21:7001:b0:1ed:534e:38b1 with SMTP id adf61e73a8af0-1ee5c85fa2cmr1060630637.41.1739303850821;
+        Tue, 11 Feb 2025 11:57:30 -0800 (PST)
 Received: from LQ3V64L9R2 (c-24-6-151-244.hsd1.ca.comcast.net. [24.6.151.244])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-21f3650cf56sm100217155ad.11.2025.02.11.11.54.38
+        by smtp.gmail.com with ESMTPSA id 41be03b00d2f7-ad53f481ec4sm5371235a12.9.2025.02.11.11.57.29
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 11 Feb 2025 11:54:39 -0800 (PST)
-Date: Tue, 11 Feb 2025 11:54:37 -0800
+        Tue, 11 Feb 2025 11:57:30 -0800 (PST)
+Date: Tue, 11 Feb 2025 11:57:27 -0800
 From: Joe Damato <jdamato@fastly.com>
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: davem@davemloft.net, alexanderduyck@fb.com, netdev@vger.kernel.org,
-	edumazet@google.com, pabeni@redhat.com, andrew+netdev@lunn.ch,
-	horms@kernel.org
-Subject: Re: [PATCH net-next 5/5] eth: fbnic: re-sort the objects in the
- Makefile
-Message-ID: <Z6uq_f7knvHIhFT_@LQ3V64L9R2>
+To: Paolo Abeni <pabeni@redhat.com>, netdev@vger.kernel.org,
+	stfomichev@gmail.com, horms@kernel.org, kuba@kernel.org,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>, Shuah Khan <shuah@kernel.org>,
+	Alexei Starovoitov <ast@kernel.org>,
+	Daniel Borkmann <daniel@iogearbox.net>,
+	Jesper Dangaard Brouer <hawk@kernel.org>,
+	John Fastabend <john.fastabend@gmail.com>,
+	open list <linux-kernel@vger.kernel.org>,
+	"open list:KERNEL SELFTEST FRAMEWORK" <linux-kselftest@vger.kernel.org>,
+	"open list:XDP (eXpress Data Path):Keyword:(?:b|_)xdp(?:b|_)" <bpf@vger.kernel.org>
+Subject: Re: [PATCH net-next v6 3/3] selftests: drv-net: Test queue xsk
+ attribute
+Message-ID: <Z6urp3d41nvBoSbG@LQ3V64L9R2>
 Mail-Followup-To: Joe Damato <jdamato@fastly.com>,
-	Jakub Kicinski <kuba@kernel.org>, davem@davemloft.net,
-	alexanderduyck@fb.com, netdev@vger.kernel.org, edumazet@google.com,
-	pabeni@redhat.com, andrew+netdev@lunn.ch, horms@kernel.org
-References: <20250211181356.580800-1-kuba@kernel.org>
- <20250211181356.580800-6-kuba@kernel.org>
+	Paolo Abeni <pabeni@redhat.com>, netdev@vger.kernel.org,
+	stfomichev@gmail.com, horms@kernel.org, kuba@kernel.org,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>, Shuah Khan <shuah@kernel.org>,
+	Alexei Starovoitov <ast@kernel.org>,
+	Daniel Borkmann <daniel@iogearbox.net>,
+	Jesper Dangaard Brouer <hawk@kernel.org>,
+	John Fastabend <john.fastabend@gmail.com>,
+	open list <linux-kernel@vger.kernel.org>,
+	"open list:KERNEL SELFTEST FRAMEWORK" <linux-kselftest@vger.kernel.org>,
+	"open list:XDP (eXpress Data Path):Keyword:(?:b|_)xdp(?:b|_)" <bpf@vger.kernel.org>
+References: <20250210193903.16235-1-jdamato@fastly.com>
+ <20250210193903.16235-4-jdamato@fastly.com>
+ <13afab27-2066-4912-b8f6-15ee4846e802@redhat.com>
+ <Z6uM1IDP9JgvGvev@LQ3V64L9R2>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -92,36 +111,86 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20250211181356.580800-6-kuba@kernel.org>
+In-Reply-To: <Z6uM1IDP9JgvGvev@LQ3V64L9R2>
 
-On Tue, Feb 11, 2025 at 10:13:56AM -0800, Jakub Kicinski wrote:
-> Looks like recent commit broke the sort order, fix it.
+On Tue, Feb 11, 2025 at 09:45:56AM -0800, Joe Damato wrote:
+> On Tue, Feb 11, 2025 at 12:09:50PM +0100, Paolo Abeni wrote:
+> > On 2/10/25 8:38 PM, Joe Damato wrote:
+> > > +def check_xdp(cfg, nl, xdp_queue_id=0) -> None:
+> > > +    test_dir = os.path.dirname(os.path.realpath(__file__))
+> > > +    xdp = subprocess.Popen([f"{test_dir}/xdp_helper", f"{cfg.ifindex}", f"{xdp_queue_id}"],
+> > > +                           stdin=subprocess.PIPE, stdout=subprocess.PIPE, bufsize=1,
+> > > +                           text=True)
+> > > +    defer(xdp.kill)
+> > > +
+> > > +    stdout, stderr = xdp.communicate(timeout=10)
+> > > +    rx = tx = False
+> > > +
+> > > +    queues = nl.queue_get({'ifindex': cfg.ifindex}, dump=True)
+> > > +    if not queues:
+> > > +        raise KsftSkipEx("Netlink reports no queues")
+> > > +
+> > > +    for q in queues:
+> > > +        if q['id'] == 0:
+> > > +            if q['type'] == 'rx':
+> > > +                rx = True
+> > > +            if q['type'] == 'tx':
+> > > +                tx = True
+> > > +
+> > > +            ksft_eq(q['xsk'], {})
+> > > +        else:
+> > > +            if 'xsk' in q:
+> > > +                _fail("Check failed: xsk attribute set.")
+> > > +
+> > > +    ksft_eq(rx, True)
+> > > +    ksft_eq(tx, True)
+> > 
+> > This causes self-test failures:
+> > 
+> > https://netdev-3.bots.linux.dev/vmksft-net-drv/results/987742/4-queues-py/stdout
+> > 
+> > but I really haven't done any real investigation here.
 > 
-> Signed-off-by: Jakub Kicinski <kuba@kernel.org>
-> ---
->  drivers/net/ethernet/meta/fbnic/Makefile | 3 ++-
->  1 file changed, 2 insertions(+), 1 deletion(-)
+> I think it's because the test kernel in this case has
+> CONFIG_XDP_SOCKETS undefined [1].
 > 
-> diff --git a/drivers/net/ethernet/meta/fbnic/Makefile b/drivers/net/ethernet/meta/fbnic/Makefile
-> index 239b2258ec65..0dbc634adb4b 100644
-> --- a/drivers/net/ethernet/meta/fbnic/Makefile
-> +++ b/drivers/net/ethernet/meta/fbnic/Makefile
-> @@ -20,6 +20,7 @@ fbnic-y := fbnic_csr.o \
->  	   fbnic_pci.o \
->  	   fbnic_phylink.o \
->  	   fbnic_rpc.o \
-> +	   fbnic_time.o \
->  	   fbnic_tlv.o \
->  	   fbnic_txrx.o \
-> -	   fbnic_time.o
-> +# End of objects
+> The error printed in the link you mentioned:
+> 
+>   socket creation failed: Address family not supported by protocol
+> 
+> is coming from the C program, which fails to create the AF_XDP
+> socket.
+> 
+> I think the immediate reaction is to add more error checking to the
+> python to make sure that the subprocess succeeded and if it failed,
+> skip.
+> 
+> But, we may want it to fail for other error states instead of
+> skipping? Not sure if there's general guidance on this, but my plan
+> was to have the AF_XDP socket creation failure return a different
+> error code (I dunno maybe -1?) and only skip the test in that case.
+> 
+> Will that work or is there a better way? I only want to skip if
+> AF_XDP doesn't exist in the test kernel.
+> 
+> [1]: https://netdev-3.bots.linux.dev/vmksft-net-drv/results/987742/config
 
-Incredibly minor nit, do you want to remove the trailing '\' after
-fbnic_txrx.o which is the new last line to keep the format
-consistent with how it was previously?
+I'll give it a few more hours incase anyone has comments before I
+resend, but I got something working (tested on kernels with and
+without XDP sockets).
 
-Your call, but I definitely feel bad pointing that out and
-potentially causing a re-spin, so:
+xdp_helper returns -1 if (errno == EAFNOSUPPORT). All other error
+cases return 1.
 
-Acked-by: Joe Damato <jdamato@fastly.com>
+Updated the python to do this:
+
+  if xdp.returncode == 255:
+      raise KsftSkipEx('AF_XDP unsupported')
+  elif xdp.returncode > 0:
+      raise KsftFailEx('unable to create AF_XDP socket')
+
+Which seems to work on both types of kernels?
+
+Happy to take feedback; will hold off on respinning for a bit just
+incase there's a better way I don't know about.
 
