@@ -1,114 +1,110 @@
-Return-Path: <netdev+bounces-165058-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-165059-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 61203A303D9
-	for <lists+netdev@lfdr.de>; Tue, 11 Feb 2025 07:50:13 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1A972A303F8
+	for <lists+netdev@lfdr.de>; Tue, 11 Feb 2025 07:55:58 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id C9EC51888E2E
-	for <lists+netdev@lfdr.de>; Tue, 11 Feb 2025 06:50:18 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id DAB773A7008
+	for <lists+netdev@lfdr.de>; Tue, 11 Feb 2025 06:55:48 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D14D01E9B2E;
-	Tue, 11 Feb 2025 06:50:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E12E01E9B17;
+	Tue, 11 Feb 2025 06:55:54 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.microsoft.com header.i=@linux.microsoft.com header.b="s8oe5aJc"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="tt20c1bA"
 X-Original-To: netdev@vger.kernel.org
-Received: from linux.microsoft.com (linux.microsoft.com [13.77.154.182])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4DBB01E9B12;
-	Tue, 11 Feb 2025 06:49:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=13.77.154.182
+Received: from out-172.mta1.migadu.com (out-172.mta1.migadu.com [95.215.58.172])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C9A4E190674
+	for <netdev@vger.kernel.org>; Tue, 11 Feb 2025 06:55:52 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1739256600; cv=none; b=kaQzISHk8o5hPDvPEmQQn6RKjKa+t9WKCZXOY2NMreIhYT+55ps6Pc0e9jTzA9I4BAnlwWm2jIQFeJkObRGuF3EJdl2lUIW1Y8lUBNNhpoO51qMDlzbOdma7PYtk0UUE0LHghU1fSyQ903UZQnmxVcQ5mlEYAs/YnPaImxRPK24=
+	t=1739256954; cv=none; b=h12GbNGbcPVnO0mYWC6Aa3JOZ4qbkYwiJw0bvKK/z+hmY8RQhuGbPihnePl/w75IHLPyP+tvFtpBZiRwhmsu9aD/PK5pY9nO4KK/ZSCtX4t8l2k28JFbao5TqoBTnltZpJIqQLh4ozwjJjzUY6ComY395vb7GwPHOJg7/d2vLlU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1739256600; c=relaxed/simple;
-	bh=/72hblTAr0ml+v4ncYL24QnW3hc34oy4og4/RR+FOMY=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=A8/tYvi9Ai2K22wT4XomxfP+7yp0odiVlvLD4M5wNJAM4UU5gFkl9uvBhKzZJ6iGN0yu7LE7s39sGBShbaWMc7Qvvkfpr1Kc6pkhtUV8fUrOuZUZKdrc6oPe+ezCBVi36/itWCVQhYGdPedI2alhBkyZ4uTwLN8JjPHM2m2gDFY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.microsoft.com; spf=pass smtp.mailfrom=linux.microsoft.com; dkim=pass (1024-bit key) header.d=linux.microsoft.com header.i=@linux.microsoft.com header.b=s8oe5aJc; arc=none smtp.client-ip=13.77.154.182
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.microsoft.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.microsoft.com
-Received: by linux.microsoft.com (Postfix, from userid 1134)
-	id 46D8B2107A99; Mon, 10 Feb 2025 22:49:53 -0800 (PST)
-DKIM-Filter: OpenDKIM Filter v2.11.0 linux.microsoft.com 46D8B2107A99
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.microsoft.com;
-	s=default; t=1739256593;
-	bh=BS9tA2SNyXv7FIdpYEaWS+oZRZ0ThGbQVd0wOfdmQsA=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=s8oe5aJcB4/HLlM7JrcXOBPm3lkZjNiLQcm9vXVXZ00Qz9zGY1vDe9xPaflZ9ider
-	 TyebF2YMfEywsCIq/oeJxFu0k5LDdgA6ezTJbaEYv1KvgZj3e/Gl5nX3l4mSzVIPGp
-	 8szFKJhTCE5L8oQ0iyzZK35oaXpxVWK5eYUcsz+E=
-Date: Mon, 10 Feb 2025 22:49:53 -0800
-From: Shradha Gupta <shradhagupta@linux.microsoft.com>
-To: Eric Dumazet <edumazet@google.com>
-Cc: linux-hyperv@vger.kernel.org, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	"K. Y. Srinivasan" <kys@microsoft.com>,
-	Haiyang Zhang <haiyangz@microsoft.com>,
-	Wei Liu <wei.liu@kernel.org>, Dexuan Cui <decui@microsoft.com>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Long Li <longli@microsoft.com>,
-	Konstantin Taranov <kotaranov@microsoft.com>,
-	Souradeep Chakrabarti <schakrabarti@linux.microsoft.com>,
-	Erick Archer <erick.archer@outlook.com>,
-	Shradha Gupta <shradhagupta@microsoft.com>
-Subject: Re: [PATCH v2 net-next 1/2] net: mana: Allow tso_max_size to go
- up-to GSO_MAX_SIZE
-Message-ID: <20250211064953.GA26170@linuxonhyperv3.guj3yctzbm1etfxqx2vob5hsef.xx.internal.cloudapp.net>
-References: <1739162392-6356-1-git-send-email-shradhagupta@linux.microsoft.com>
- <1739162428-6679-1-git-send-email-shradhagupta@linux.microsoft.com>
- <CANn89iJ3cT6BWLmFpdkxn6EeeLTM7rF0pwWGArq1gG8pk8orsg@mail.gmail.com>
- <20250210175753.GA17857@linuxonhyperv3.guj3yctzbm1etfxqx2vob5hsef.xx.internal.cloudapp.net>
- <20250210175931.GA18891@linuxonhyperv3.guj3yctzbm1etfxqx2vob5hsef.xx.internal.cloudapp.net>
- <CANn89i+ovDB+qLBV3DEx5eB4vDZq=X+rWUZgR7qHjDLc4=UN2w@mail.gmail.com>
+	s=arc-20240116; t=1739256954; c=relaxed/simple;
+	bh=U1/HE/+P4Vke9jaDcFO9AO8Ucrw1SSc9S8TqGyaAJm4=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=XeOwBzK3jlUS264UeKEY8MUWEIhjW/m2yECG91bCHbeX1tIUa+ibhMtANpNS6R+OSHKY3Ws1F/897eOfZjlsnIExY4lG1sFzADxjppoBifj+4JZxVhd2Agnp4RZketyyQbyHAy2l2F2uvY1IDZbX8WL/DPUBvZTUwsXRrUJc2p0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=tt20c1bA; arc=none smtp.client-ip=95.215.58.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+Message-ID: <787db122-d9d3-4ceb-b8c8-36ed9590b49b@linux.dev>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1739256951;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=gBmmjMNTTInn3bPIxx/t3FfX1VhkeNHK4TKQlUwysUY=;
+	b=tt20c1bAysXWMq1CJ5AxOR4b6R3hT4Vmp7a9+KTi31+L5nLr9WiKdaW0Hwfl3XDdPaU21e
+	l8dIupl6cDEQnLeMfFuxyqW7QL9ff4bZyfPsHIno/lxWWJDu1fudDjUtPLpCCOasP4duCa
+	r4LZAJXBliJnqmmZFOIoN6PVlHZo6Gk=
+Date: Mon, 10 Feb 2025 22:55:42 -0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <CANn89i+ovDB+qLBV3DEx5eB4vDZq=X+rWUZgR7qHjDLc4=UN2w@mail.gmail.com>
-User-Agent: Mutt/1.5.21 (2010-09-15)
+Subject: Re: [PATCH bpf-next v9 04/12] bpf: stop calling some sock_op BPF
+ CALLs in new timestamping callbacks
+To: Jason Xing <kerneljasonxing@gmail.com>
+Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+ pabeni@redhat.com, dsahern@kernel.org, willemdebruijn.kernel@gmail.com,
+ willemb@google.com, ast@kernel.org, daniel@iogearbox.net, andrii@kernel.org,
+ eddyz87@gmail.com, song@kernel.org, yonghong.song@linux.dev,
+ john.fastabend@gmail.com, kpsingh@kernel.org, sdf@fomichev.me,
+ haoluo@google.com, jolsa@kernel.org, horms@kernel.org, bpf@vger.kernel.org,
+ netdev@vger.kernel.org
+References: <20250208103220.72294-1-kerneljasonxing@gmail.com>
+ <20250208103220.72294-5-kerneljasonxing@gmail.com>
+Content-Language: en-US
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Martin KaFai Lau <martin.lau@linux.dev>
+In-Reply-To: <20250208103220.72294-5-kerneljasonxing@gmail.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Migadu-Flow: FLOW_OUT
 
-On Mon, Feb 10, 2025 at 07:02:04PM +0100, Eric Dumazet wrote:
-> On Mon, Feb 10, 2025 at 6:59???PM Shradha Gupta
-> <shradhagupta@linux.microsoft.com> wrote:
-> >
-> > On Mon, Feb 10, 2025 at 09:57:53AM -0800, Shradha Gupta wrote:
-> > > On Mon, Feb 10, 2025 at 04:55:54PM +0100, Eric Dumazet wrote:
-> > > > On Mon, Feb 10, 2025 at 5:40???AM Shradha Gupta
-> > > > <shradhagupta@linux.microsoft.com> wrote:
-> > > > >
-> > > > > Allow the max aggregated pkt size to go up-to GSO_MAX_SIZE for MANA NIC.
-> > > > > This patch only increases the max allowable gso/gro pkt size for MANA
-> > > > > devices and does not change the defaults.
-> > > > > Following are the perf benefits by increasing the pkt aggregate size from
-> > > > > legacy gso_max_size value(64K) to newer one(up-to 511K)
-> > > > >
-> > > > > for i in {1..10}; do netperf -t TCP_RR  -H 10.0.0.5 -p50000 -- -r80000,80000
-> > > > > -O MIN_LATENCY,P90_LATENCY,P99_LATENCY,THROUGHPUT|tail -1; done
-> > > >
-> > > > Was this tested with IPv6 ?
-> > >
-> > > Hi Eric,
-> > > yes, sanity and functional testing where performed(manually) and passed on azure
-> > > VMs with IPv6.
-> > Forgot to mention that the tests were performed on both IPv4 and IPv6
-> > and these numbers are from IPv4 testing
+On 2/8/25 2:32 AM, Jason Xing wrote:
+> Considering the potential invalid access issues, calling
+> bpf_sock_ops_setsockopt/getsockopt, bpf_sock_ops_cb_flags_set,
+> and the bpf_sock_ops_load_hdr_opt in the new timestamping
+> callbacks will return -EOPNOTSUPP error value.
+
+The "why" part is mostly missing. Why they are not safe to be used in the TX 
+timestamping callbacks?
+
 > 
-> Where is the IPv6 jumbo header removed ?
-I think this is missed in this patchset. In our IPv6 tests, patch sanity was
-performed without changing the default values.
-I will add this support, thorughly test IPv6 and send out another
-version with complete IPv6 support and numbers.
+> It also prevents the UDP socket trying to access TCP fields in
+> the bpf extension for SO_TIMESTAMPING for the same consideration.
+Let's remove this UDP part to avoid confusion. UDP has very little to do with 
+disabling the helpers here.
 
-Thanks for the pointers Eric.
+"BPF_CALL" in the subject is not clear either. "BPF_CALL" can mean many things, 
+such as calling BPF helpers, calling BPF kfuncs, or calling its own BPF 
+subprograms, etc. In this case, it is the calling BPF helpers.
 
-Regards,
-Shradha Gupta.
+(Subject)
+bpf: Disable unsafe helpers in TX timestamping callbacks
+
+(Why)
+New TX timestamping sock_ops callbacks will be added in the subsequent patch. 
+Some of the existing BPF helpers will not be safe to be used in the TX 
+timestamping callbacks.
+
+The bpf_sock_ops_setsockopt, bpf_sock_ops_getsockopt, and 
+bpf_sock_ops_cb_flags_set require owning the sock lock. TX timestamping 
+callbacks will not own the lock.
+
+The bpf_sock_ops_load_hdr_opt needs the skb->data pointing to the TCP header. 
+This will not be true in the TX timestamping callbacks.
+
+(What and How)
+At the beginning of these helpers, this patch checks the bpf_sock->op to ensure 
+these helpers are used by the existing sock_ops callbacks only.
+
 
