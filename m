@@ -1,152 +1,102 @@
-Return-Path: <netdev+bounces-165240-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-165241-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3CE67A313B2
-	for <lists+netdev@lfdr.de>; Tue, 11 Feb 2025 19:05:14 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7D599A313CE
+	for <lists+netdev@lfdr.de>; Tue, 11 Feb 2025 19:14:08 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E960E3A209B
-	for <lists+netdev@lfdr.de>; Tue, 11 Feb 2025 18:05:04 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id DC3067A0F47
+	for <lists+netdev@lfdr.de>; Tue, 11 Feb 2025 18:13:10 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EEF7F1DF992;
-	Tue, 11 Feb 2025 18:05:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1380E1E3793;
+	Tue, 11 Feb 2025 18:14:02 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="M61+PM/9"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="AX2fQoJw"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wr1-f47.google.com (mail-wr1-f47.google.com [209.85.221.47])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 31B7C261567
-	for <netdev@vger.kernel.org>; Tue, 11 Feb 2025 18:05:08 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.47
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E4227261593
+	for <netdev@vger.kernel.org>; Tue, 11 Feb 2025 18:14:01 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1739297110; cv=none; b=mwixcXKsTWbRe2jKqlP1VcJIN9Yy+/HzCGsMPc0XC7wF9Vwr2s4udhSAwsEQhz+KPvpIEYn0nmMGE9/PIImrEJ7Y6bUOAmQYR1iJr4od/iVF0+zKy4Q8lY5cIblulSdACPaMsDO3XOI9ecHxP4FBhRwzCXYJbHva45cHtRQIJyw=
+	t=1739297642; cv=none; b=B4beBHEFlMRjHCZyVivUmcz+YTAU+sjMiylXYwQe2C+ycbWRctV1HsuKy+3ELFXVMCKaw7MdwJFrjjL1iUrHGgeL8WYUugU+ybZwyqnsvEDjLU5B+CIar9ShOAiZB0jo++g7/lFpEZEc37/zRlp+ZVzQSC7rGLAhHg2UQEAZE3E=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1739297110; c=relaxed/simple;
-	bh=jF9lf/bkKyTubAzPIxFZ6TcYeUfoET/FNKTcO0+MPKg=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=mD2OH/5q0ZNEoj5mFmbLFxZeqmSGIYzDu4+GW5eGxQp5IZLLCLK9y8JxdgvW+85dtYdKrBwQ4TmSEFurHZ4Lapw9pttZxuCzNa/E817HcGE2UbJz08xdp6gQYcZHC7Gi2Ksa66wBOsh0veIEZizzDjsOUrALblVgcHEKuEeuAoo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=M61+PM/9; arc=none smtp.client-ip=209.85.221.47
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wr1-f47.google.com with SMTP id ffacd0b85a97d-38dd0dc2226so3314495f8f.2
-        for <netdev@vger.kernel.org>; Tue, 11 Feb 2025 10:05:08 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1739297107; x=1739901907; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=W8SVaFO/cnRwgNka2nJtzNolfs3wZ9VBPCuFWitOulc=;
-        b=M61+PM/9R1AeJJMwMwP7LrqZ5LHK5ZIiXe4WArb86hsG6l7AgMxXMCs1sduHvvtw1T
-         Owzkr2ptnDLPrdGPG9OGNp5prkpK+E67ManR2rsNPKvxZ9HRGk6/lEd4na+q/dDJgZ/1
-         ROSUaew2+FZvNV9+khwwbhxIvXEOySD15srQQnnhp7bwF3aIvFOgnVZXW2N5PTTiZHZh
-         54ulGke0QJCjCSbTJCa6FCTbVQOtHeHOmiSBsNwuNRtS35wBy5cvjbJTqIsFFPE1kNAX
-         grcPKQHJvJtER/dw+NS4dVtc4NiuX21xWdaJ0OTdcvKdcmC1W6xDqXXW47Etyql6QA+R
-         oDSw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1739297107; x=1739901907;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=W8SVaFO/cnRwgNka2nJtzNolfs3wZ9VBPCuFWitOulc=;
-        b=UEAB/DKbxcGG+ueRFMvcuUWYI7USROi2poSgreGLL0L6SXtVABvjayc5kqQ3LE+jQ8
-         FGedO5vN4TtnQHEjU4mShnP/brYrKNr3NwhV70ubdhnne48E8bnyxXVlbZbCd8LrpiW5
-         aovo4bgrfR45Iyhl8gMm3MGb7mkbUZakes3TekWnl26urnIwEO1biRljW8mxM5AZSQPz
-         +/OOK2xKhqoGrGIk0fJHsgtqZ2qa4ac61sFcAKKYYsTnk02t8k0t51zQOxfNTLFcbEdj
-         QnEQIY8LC9KKGOYFZNVgNtu9AuAbhScdhl5q+UBcs3X1uOSITNE97c+Hju+uQCG5kUSU
-         s0QA==
-X-Forwarded-Encrypted: i=1; AJvYcCU2M6sDLGEF/tDTtf8Ufx/kOrKW6ZNhXuGSUOi08Wg/vbFz2bbEbCTV0tm1k7dybVWON6DFHFI=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyPax0zouJEvL6EDCB5bsex8H8F+SbphRKB0OkqnyKChdqsqA0r
-	4b62ROzKWaP9p3n1+YcrEgwOtadMPOo3vmXLZ9Y2gvtdkZJ7HmM6
-X-Gm-Gg: ASbGncuPIHnYwwKKTUaOdOehKKWkrgUN+wPW2FEUhvbhfQ2qWMKpSbjmbm7V+hn7+Lp
-	lPUQTJK1GH1bxWIXRP50PfANfUBH8+CcOtY8bGqhf9xK5/UWy7V+QOJ+u5NQSBeuvuOoBHJc6Tr
-	L75EEdILSqcG2Ty9gE7UrTYBGbiXvPNmaeIMzBsyYev73y4TWL4yt5I1xxwTOlVOosDfWGGzWZS
-	+3D+YH4jK1AUlEdwa356qsyGOMOPSeWhjbSJzegs7dnbo8f4Cf/XeZbM31nNqZyXX9wINvBzuaf
-	nXtF8zGxHkkOYIrs7W9sW4y9O9lrGbhJ3SMQ
-X-Google-Smtp-Source: AGHT+IGkWNBAlWK8MRRk3RypR8yIHGYzLHFTLHg6rnKAj/gFhAHYLddeSuTDAUleKhV6+7OOZiks3g==
-X-Received: by 2002:a5d:64cc:0:b0:38d:d18d:262f with SMTP id ffacd0b85a97d-38dd18d26aemr12778520f8f.26.1739297105301;
-        Tue, 11 Feb 2025 10:05:05 -0800 (PST)
-Received: from [172.27.54.124] ([193.47.165.251])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-4393f202721sm84932285e9.21.2025.02.11.10.05.03
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 11 Feb 2025 10:05:04 -0800 (PST)
-Message-ID: <1c187a13-977d-4dae-a9eb-18ef602f5682@gmail.com>
-Date: Tue, 11 Feb 2025 20:05:01 +0200
+	s=arc-20240116; t=1739297642; c=relaxed/simple;
+	bh=lTdXUi/gs6nCqWHaPtyimuwgqhiDTgdiKRw9C5UV3sE=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=Y4Z6x6z0SjxJQ9HfdozTN08tEYa6uzcSdSl5Xh0CPDUhrbZGBT/XltPU5DVqa7YX/12BM6DH6nFZ6z9IO4DWDQktwnNdMpdnVI53l8ZZWx127D3FLgj2m+3Y+K9ntwOB/f8Fn8ap750U/CKDRASZlnGwLIQM5slftfw59QAiabk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=AX2fQoJw; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0EBEBC4CEDD;
+	Tue, 11 Feb 2025 18:14:01 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1739297641;
+	bh=lTdXUi/gs6nCqWHaPtyimuwgqhiDTgdiKRw9C5UV3sE=;
+	h=From:To:Cc:Subject:Date:From;
+	b=AX2fQoJwMGvw92F91jbatYLG3QbypszFrRFhE3SybW6u6J0flq6j73UukXSes+awK
+	 YS/ceirOWszAf7K4yqxqDKuc6iw0eRwrVY8E2QRF2MPnBz3QHm1722DA5JrR/MW4a/
+	 VElqu2OJPalolpBUDle/iBUd6BqrWtbZ1v9/LqDMlgE8L6Mv14S4Gm65DuB1XK7ouS
+	 DbB9M1K65Yi1ur48nTiwPS0UJj3Ge1tz3nrJr10c0fqHVIa4Y5Jzn5re5lDBqqVoa2
+	 +rlft94qqbge/prbXMHi9x9col84efFmBTgtMtz4fOWZXYjNn4sWuIX75SNzULhTfn
+	 R5u+a74n68PnQ==
+From: Jakub Kicinski <kuba@kernel.org>
+To: davem@davemloft.net
+Cc: alexanderduyck@fb.com,
+	netdev@vger.kernel.org,
+	edumazet@google.com,
+	pabeni@redhat.com,
+	andrew+netdev@lunn.ch,
+	horms@kernel.org,
+	Jakub Kicinski <kuba@kernel.org>
+Subject: [PATCH net-next 0/5] eth: fbnic: report software queue stats
+Date: Tue, 11 Feb 2025 10:13:51 -0800
+Message-ID: <20250211181356.580800-1-kuba@kernel.org>
+X-Mailer: git-send-email 2.48.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next 0/4] eth: mlx4: use the page pool for Rx buffers
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: davem@davemloft.net, netdev@vger.kernel.org, edumazet@google.com,
- pabeni@redhat.com, andrew+netdev@lunn.ch, horms@kernel.org,
- tariqt@nvidia.com, hawk@kernel.org
-References: <20250205031213.358973-1-kuba@kernel.org>
- <c130df76-9b18-40a9-9b0c-7ad21fd6625b@gmail.com>
- <20250206075846.1b87b347@kernel.org>
-Content-Language: en-US
-From: Tariq Toukan <ttoukan.linux@gmail.com>
-In-Reply-To: <20250206075846.1b87b347@kernel.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 
+Fill in typical software queue stats.
 
+  # ./pyynl/cli.py --spec netlink/specs/netdev.yaml --dump qstats-get 
+  [{'ifindex': 2,
+    'rx-alloc-fail': 0,
+    'rx-bytes': 398064076,
+    'rx-csum-complete': 271,
+    'rx-csum-none': 0,
+    'rx-packets': 276044,
+    'tx-bytes': 7223770,
+    'tx-needs-csum': 28148,
+    'tx-packets': 28449,
+    'tx-stop': 0,
+    'tx-wake': 0}]
 
-On 06/02/2025 17:58, Jakub Kicinski wrote:
-> On Thu, 6 Feb 2025 14:57:59 +0200 Tariq Toukan wrote:
->> On 05/02/2025 5:12, Jakub Kicinski wrote:
->>> Convert mlx4 to page pool. I've been sitting on these patches for
->>> over a year, and Jonathan Lemon had a similar series years before.
->>> We never deployed it or sent upstream because it didn't really show
->>> much perf win under normal load (admittedly I think the real testing
->>> was done before Ilias's work on recycling).
->>>
->>> During the v6.9 kernel rollout Meta's CDN team noticed that machines
->>> with CX3 Pro (mlx4) are prone to overloads (double digit % of CPU time
->>> spent mapping buffers in the IOMMU). The problem does not occur with
->>> modern NICs, so I dusted off this series and reportedly it still works.
->>> And it makes the problem go away, no overloads, perf back in line with
->>> older kernels. Something must have changed in IOMMU code, I guess.
->>>
->>> This series is very simple, and can very likely be optimized further.
->>> Thing is, I don't have access to any CX3 Pro NICs. They only exist
->>> in CDN locations which haven't had a HW refresh for a while. So I can
->>> say this series survives a week under traffic w/ XDP enabled, but
->>> my ability to iterate and improve is a bit limited.
->>
->> Hi Jakub,
->>
->> Thanks for your patches.
->>
->> As this series touches critical data-path area, and you had no real
->> option of testing it, we are taking it through a regression cycle, in
->> parallel to the code review.
->>
->> We should have results early next week. We'll update.
-> 
-> Sounds good, could you repost once ready?
-> I'll mark it as awaiting upstream in patchwork for now.
-> And feel free to drop the line pointed out by Ido, no real
-> preference either way there.
+Note that we don't collect csum-unnecessary, just the uncommon
+cases (and unnecessary is all the rest of the packets). There
+is no programatic use for these stats AFAIK, just manual debug.
 
-Hi,
+Jakub Kicinski (5):
+  net: report csum_complete via qstats
+  eth: fbnic: wrap tx queue stats in a struct
+  eth: fbnic: report software Rx queue stats
+  eth: fbnic: report software Tx queue stats
+  eth: fbnic: re-sort the objects in the Makefile
 
-Patches passed functional tests.
+ drivers/net/ethernet/meta/fbnic/Makefile      |  3 +-
+ drivers/net/ethernet/meta/fbnic/fbnic_txrx.h  | 16 +++-
+ include/net/netdev_queues.h                   |  1 +
+ .../net/ethernet/meta/fbnic/fbnic_ethtool.c   |  8 +-
+ .../net/ethernet/meta/fbnic/fbnic_netdev.c    | 22 +++++-
+ drivers/net/ethernet/meta/fbnic/fbnic_txrx.c  | 74 +++++++++++++++----
+ net/core/netdev-genl.c                        |  1 +
+ 7 files changed, 102 insertions(+), 23 deletions(-)
 
-Overall, the patches look good.
-
-Only a few comments:
-1. Nit by Ido.
-2. pool size.
-3. xdp xmit support description.
-
-How do you want to proceed?
-Do you want to fix and re-spin?
-
+-- 
+2.48.1
 
 
