@@ -1,126 +1,117 @@
-Return-Path: <netdev+bounces-165269-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-165270-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id D8B4EA31582
-	for <lists+netdev@lfdr.de>; Tue, 11 Feb 2025 20:38:27 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3C281A31584
+	for <lists+netdev@lfdr.de>; Tue, 11 Feb 2025 20:41:17 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 865D93A63D3
-	for <lists+netdev@lfdr.de>; Tue, 11 Feb 2025 19:38:18 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id DF1FC168A68
+	for <lists+netdev@lfdr.de>; Tue, 11 Feb 2025 19:41:15 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DB12E26E629;
-	Tue, 11 Feb 2025 19:38:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7495E26E639;
+	Tue, 11 Feb 2025 19:41:13 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="HHZskN3+"
+	dkim=pass (1024-bit key) header.d=fastly.com header.i=@fastly.com header.b="ngab9+Zo"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f45.google.com (mail-wm1-f45.google.com [209.85.128.45])
+Received: from mail-pj1-f41.google.com (mail-pj1-f41.google.com [209.85.216.41])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 34EF226E621
-	for <netdev@vger.kernel.org>; Tue, 11 Feb 2025 19:38:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.45
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DDBAE26E621
+	for <netdev@vger.kernel.org>; Tue, 11 Feb 2025 19:41:11 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.41
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1739302703; cv=none; b=MJoZnAyBeqo2cD85Yv6WM3ysc3OlNkEpUwurHKnbLRTnduRmhMv9/b0BcJiCkWSRZwQsTqTtOMCemXsfuxM7m7Mo483STjI+Qebhknow2tTVVoMI9+0F84UIsNAGAY1bo0H0mIifyRopkOOdatV/JDqZpdhlaPZN//ISj4aZex8=
+	t=1739302873; cv=none; b=tBhYp5lifWJQluMxRc1ihtfq1+EqOo5xDUdEU4GtdGC+38Aq4nUJjHwUaYUsis2enCzqmwCnCGTAKvcB8rNwl8OUOXJMw6VpPOmLsXzzaap1u9rKSjPrWvfN1C/UPH9j0rbTlQwts3n1nKjKm7uTitmDlRE25Vs5qxanYbFjxZc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1739302703; c=relaxed/simple;
-	bh=k1QSfAWnbCOLgn760SbafDIY3Rviuoxegxo0KNRF6pY=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=cL3mdd+eBLdKJ3KldBCuYuKrUxm+NhBpmuIZ9VE9QJ6U1JMs0L/QxMa1W5UqA+sWPc230UIX3T7HNvB02Z5XoTKukOzl+zvuGDPfyWD5bTfSZEq4YcVjfDpKwizLqUiB8MG1XRHhjuNUSpwUgblHpTdwTZf+N6tuf4T/+M4CLrM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=HHZskN3+; arc=none smtp.client-ip=209.85.128.45
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wm1-f45.google.com with SMTP id 5b1f17b1804b1-439566c991dso5416925e9.3
-        for <netdev@vger.kernel.org>; Tue, 11 Feb 2025 11:38:21 -0800 (PST)
+	s=arc-20240116; t=1739302873; c=relaxed/simple;
+	bh=cqr1ywEI+LQUNTyKV+zhPdanLQ0rxsFzyPp65NvI0lI=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=JjqKg5xvQ53MUSwdYAEJcerDSFHes4aLHuRm9/9rRwys8NGaeNja9vYGbOVQOmFPy0qT+jKvuJSGS2VZMlIXxzrOWXb9mPhpZbg/hS6ArU55LczXlNf54URmXth/zH+zvUr4oYKsJqjjHJVjBmZE9z5nIZJ8jHl2gj1Wkb0bviQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fastly.com; spf=pass smtp.mailfrom=fastly.com; dkim=pass (1024-bit key) header.d=fastly.com header.i=@fastly.com header.b=ngab9+Zo; arc=none smtp.client-ip=209.85.216.41
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fastly.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=fastly.com
+Received: by mail-pj1-f41.google.com with SMTP id 98e67ed59e1d1-2fa0c039d47so8803302a91.1
+        for <netdev@vger.kernel.org>; Tue, 11 Feb 2025 11:41:11 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1739302700; x=1739907500; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=aZrtBMffe9e0Zwvjl95eVJSN3NyPnhnMJlXXCdakls0=;
-        b=HHZskN3+JkMA+iZooogfyKD3aoHYCuG8k7rNraMS24vnBo7Mbm4sMVWlOC6pdcDWLr
-         H91muRv3DsWGMYTCW2IuLPpnwFxYHwUDDw+uT55pPpdVnFeo2cNr/+no1IsZ4TIE4GQL
-         pKAAwTbAMHMHPkLLuR0XtKcDJNNOmM7txBz9+csZT/b6ezzFX8CyCZO7wUqx8QXtVrsE
-         x4s2sQH/Sn/G4Py3Bz7WuQUSKM4IGAtubSCb1oLYMhQh+iIs7SFe1RYerOSC7/hF3H4I
-         0Ce9aEJRQAaECIzvV/i1cOt5wzR0I8dw1G+2ASY5+z35Q4SQSDVWEDhR+doqO436fN0E
-         PI+A==
+        d=fastly.com; s=google; t=1739302871; x=1739907671; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references
+         :mail-followup-to:message-id:subject:cc:to:from:date:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=oHud0oEgDVUS7GYr4QZ8+LWOjY15+xjgAPUOA37axLo=;
+        b=ngab9+ZoVZW7l6HCydN8/TBf641EZA3bmYfRK1/cWHIRAh493Lz0yrG+jC2z1PuJra
+         kbWhJPQPeBRLMrODRhuYSXuewOegX6BwThG0oGlnlYTNz20JvwumEBfeK7gGabuI2P7c
+         me7hy/IVgiFlQdgY1OGh0SHQmTHAFnaSd2278=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1739302700; x=1739907500;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
+        d=1e100.net; s=20230601; t=1739302871; x=1739907671;
+        h=in-reply-to:content-disposition:mime-version:references
+         :mail-followup-to:message-id:subject:cc:to:from:date
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=aZrtBMffe9e0Zwvjl95eVJSN3NyPnhnMJlXXCdakls0=;
-        b=V0j+CpJzxQ5jt0grNjiBtutIFs4/mYeGZz7bsIq6UKZHMzao69YyHjCNq4RuW78ebh
-         gYQo+qtqJXyfUKtA6WqudLBmcme8j7hIPo7SylZVTHgoPlKy+y3gRWnTz2LA/quIzpGC
-         WV0vLWvMQuyE/o6jZ9iZykj0fUyAMG37CbIpbx5bwmD0+oAzZ8L+FlTEcN1QNfTH6E5t
-         Fpi33EwRqQW6aJ5byQN1NB6UWBCsE49caD2u3swPTtK6cDhNTvtIAVWBqLNKHdVazdLJ
-         /3VuFfqCcUmb1txbImm9p8TGfBYoPwCvawCR555gSXPC5kkYm//1/e9zj6wT4WnCZgL5
-         Taaw==
-X-Forwarded-Encrypted: i=1; AJvYcCWb5pWLE5YCaCHD6+dKyZLqObQxZsN1cchhdMgMQ4z6vBbrxuC4QsNO8KFVi02anjMSD/d2R6E=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzmxavNTludaiLmw4dNp3U87lStaP1Ei+219iqpzlNm9rUhmEpg
-	aggRlDYxFTUyjtC9nHiqU12xvmRQ12JZzRqmXvYPHVF4/5bl/tWj
-X-Gm-Gg: ASbGncsjuOZRA5tw3Mtl5sgRz8XO2TPM1HhKGYW/gvv+vTKt2hegQCEKEjkPbGZ+7qi
-	THURi1qof9WbEk5maiHq89W0hOeqCood4jTyOS8pWdCwhKbDvIaX+YvAUNtV2FRmo9Jc7VyRRI4
-	N0q27EBOWFakwXNAK6r7d+ToaS6BvZmfcfkLgn+8aAT+DajYuJiaQTWfHZuaEu20UCjbELfb2lc
-	RF+fMTzZhteCa+wQgc5pIM/qvWo80id7hsuK8m9mn5yUHKpCo58Fe9a+ukCfSocU0rHyC2YAcYX
-	FYifyNHXXys0xu60a5UG46c6SEX7EHvK12sY
-X-Google-Smtp-Source: AGHT+IGlgPxfd4QBNZbT7SuDxwMCO/QChVlyMshXdkN/Vf18D7DdT630K9yS+hOLzN7AzSBNfPH/RA==
-X-Received: by 2002:a05:600c:1c0b:b0:439:54f2:70c4 with SMTP id 5b1f17b1804b1-4395817691amr4476865e9.9.1739302699935;
-        Tue, 11 Feb 2025 11:38:19 -0800 (PST)
-Received: from [172.27.54.124] ([193.47.165.251])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-4393b66f3e3sm97409265e9.19.2025.02.11.11.38.18
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 11 Feb 2025 11:38:19 -0800 (PST)
-Message-ID: <634d145e-52d8-4c29-affc-f4233c28d322@gmail.com>
-Date: Tue, 11 Feb 2025 21:38:16 +0200
+        bh=oHud0oEgDVUS7GYr4QZ8+LWOjY15+xjgAPUOA37axLo=;
+        b=F4M2FYYgDMpF7trXdMtpKv4eO21BHvAvQIbLB0cyinGOhhqJLG7CMNy+oy5LjoDvaP
+         m4EiAetQCe3uAzAV6HYvsL5zSYDR67zMhF846PjPgSpjSJGM6xgCfH1x0bryXE/cWwPN
+         BfsPj46XhSIcVr92L91ow2AeIFEZ+bajF75nVu8lBgVxg0Eh+mr9Ei+4YKrIaGWIKPKy
+         GbjF10pdk671NUpfM0hmLt3xHnEATSs8pHIBLhRhX/cvgre+Sc9/bsrBqTNEHKr6WeUr
+         w7DKCnFai+rMWVWvldiwBhIFBGjCyVr+1rb1hijgv2CehEv52PqgJS7tOfO+jgROVX6x
+         +Z2Q==
+X-Forwarded-Encrypted: i=1; AJvYcCXMA+DpLMuKCHENnJGdpXTLSwXrpd+5Ybr8nJRPVnPgfK3rq/WWB397MZjYfVu+D2v4zbi23PY=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzVSGbmnvtfRcPipB4uc/rLjUDbkk9D7v6nDbCJL3Fec+L5acQh
+	Ckjbk17q80DjW9mwnWdL3cWU4OWhwywq9vGhU8/V/hH6Z1c6JlBBW4mVdzyoyzRezzvu9uFFqkW
+	D
+X-Gm-Gg: ASbGnctX8821JZCAb1qTcBgleWxsmJxYzn8jbIN44iag0Is0JdI5GXtAf71hx5q07UK
+	Z+uo6XTmfx6Q4IlE3pZxeTAhjeQoMI0Yyo1b6+lVolbNIH5uWUrAkcxCUbgtyN3c5hbcR+0kqk4
+	zGrtozt8ZAzfkCWkPedDyvhgjtuBeqOhNEX3M/6wxIPlmTCkuYnScpBXizMvzKtjyKagG1LeU1S
+	G0n5Q/S/oAKvcpnFUp0EUQALavIzhVxjFl/muLNtqX9iPPscCDrzvjvfgFdbihNi+uLiCdpWS2U
+	e47l27Ny+ckErul26Foyn950UzMn4D/u/uRwsOlAP6oniaW+1u1hSzT/xA==
+X-Google-Smtp-Source: AGHT+IH1aI6InFFtV2fuC9FXYDsP3M1qnA+5RhqNDLqMZHazgxer6yIJ+k9LimHbHu5so6wNtQNGKA==
+X-Received: by 2002:a17:90b:2dc8:b0:2ee:964e:67ce with SMTP id 98e67ed59e1d1-2fbf5bb9167mr465333a91.3.1739302871242;
+        Tue, 11 Feb 2025 11:41:11 -0800 (PST)
+Received: from LQ3V64L9R2 (c-24-6-151-244.hsd1.ca.comcast.net. [24.6.151.244])
+        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-2fa099f5c06sm10621047a91.2.2025.02.11.11.41.09
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 11 Feb 2025 11:41:10 -0800 (PST)
+Date: Tue, 11 Feb 2025 11:41:08 -0800
+From: Joe Damato <jdamato@fastly.com>
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: davem@davemloft.net, alexanderduyck@fb.com, netdev@vger.kernel.org,
+	edumazet@google.com, pabeni@redhat.com, andrew+netdev@lunn.ch,
+	horms@kernel.org
+Subject: Re: [PATCH net-next 2/5] eth: fbnic: wrap tx queue stats in a struct
+Message-ID: <Z6un1GD15zX5-104@LQ3V64L9R2>
+Mail-Followup-To: Joe Damato <jdamato@fastly.com>,
+	Jakub Kicinski <kuba@kernel.org>, davem@davemloft.net,
+	alexanderduyck@fb.com, netdev@vger.kernel.org, edumazet@google.com,
+	pabeni@redhat.com, andrew+netdev@lunn.ch, horms@kernel.org
+References: <20250211181356.580800-1-kuba@kernel.org>
+ <20250211181356.580800-3-kuba@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next 1/4] eth: mlx4: create a page pool for Rx
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: davem@davemloft.net, netdev@vger.kernel.org, edumazet@google.com,
- pabeni@redhat.com, andrew+netdev@lunn.ch, horms@kernel.org,
- tariqt@nvidia.com, hawk@kernel.org
-References: <20250205031213.358973-1-kuba@kernel.org>
- <20250205031213.358973-2-kuba@kernel.org>
- <76129ce2-37a7-4e97-81f6-f73f72723a17@gmail.com>
- <20250206150434.4aff906b@kernel.org>
- <18dc77ac-5671-43ed-ac88-1c145bc37a00@gmail.com>
- <20250211110635.16a43562@kernel.org>
- <ed868c30-d5e5-4496-8ea2-b40f6111f8ad@gmail.com>
- <587688ee-2e81-49f5-a1a2-4198c14ac184@gmail.com>
- <20250211112340.619ae409@kernel.org>
-Content-Language: en-US
-From: Tariq Toukan <ttoukan.linux@gmail.com>
-In-Reply-To: <20250211112340.619ae409@kernel.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20250211181356.580800-3-kuba@kernel.org>
 
-
-
-On 11/02/2025 21:23, Jakub Kicinski wrote:
-> On Tue, 11 Feb 2025 21:21:13 +0200 Tariq Toukan wrote:
->>>> The ring size is in *pages*. Frag is also somewhat irrelevant, given
->>>> that we're talking about full pages here, not 2k frags. So I think
->>>> I'll go with:
->>>>
->>>>      pp.pool_size =
->>>>          size * DIV_ROUND_UP(MLX4_EN_EFF_MTU(dev->mtu), PAGE_SIZE);
->>>    
->>
->> Can use priv->rx_skb_size as well, it hosts the eff mtu value.
+On Tue, Feb 11, 2025 at 10:13:53AM -0800, Jakub Kicinski wrote:
+> The queue stats struct is used for Rx and Tx queues. Wrap
+> the Tx stats in a struct and a union, so that we can reuse
+> the same space for Rx stats on Rx queues.
 > 
-> Missed this before hitting send, I'll repost tomorrow, I guess.
+> This also makes it easy to add an assert to the stat handling
+> code to catch new stats not being aggregated on shutdown.
+> 
+> Signed-off-by: Jakub Kicinski <kuba@kernel.org>
+> ---
+>  drivers/net/ethernet/meta/fbnic/fbnic_txrx.h    |  8 ++++++--
+>  drivers/net/ethernet/meta/fbnic/fbnic_ethtool.c |  8 ++++----
+>  drivers/net/ethernet/meta/fbnic/fbnic_txrx.c    | 10 ++++++----
+>  3 files changed, 16 insertions(+), 10 deletions(-)
 
-Sorry for posting them a bit late.
+Read through the driver and changes look good to me. Since I don't
+have an fbnic or a lot of familiarity with the driver, I'll provide
+a more modest:
 
-This one is a nit, I want to make sure you noticed my other comment 
-regarding pp.dma_dir.
-
-
+Acked-by: Joe Damato <jdamato@fastly.com>
 
