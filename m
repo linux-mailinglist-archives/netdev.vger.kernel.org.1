@@ -1,118 +1,103 @@
-Return-Path: <netdev+bounces-165029-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-165030-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 52824A301CB
-	for <lists+netdev@lfdr.de>; Tue, 11 Feb 2025 03:56:39 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 09D05A30203
+	for <lists+netdev@lfdr.de>; Tue, 11 Feb 2025 04:10:14 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 8EF81188B2F6
-	for <lists+netdev@lfdr.de>; Tue, 11 Feb 2025 02:56:44 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id BF39D3AC05B
+	for <lists+netdev@lfdr.de>; Tue, 11 Feb 2025 03:10:04 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 96D241D54C2;
-	Tue, 11 Feb 2025 02:56:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 22FBA433C0;
+	Tue, 11 Feb 2025 03:10:10 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Si9CrZRp"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="mLkr/gL7"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qv1-f49.google.com (mail-qv1-f49.google.com [209.85.219.49])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 092AC1D5147
-	for <netdev@vger.kernel.org>; Tue, 11 Feb 2025 02:56:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.49
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ED12526BD9E;
+	Tue, 11 Feb 2025 03:10:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1739242590; cv=none; b=MvtjM9aN+jqN9Z8a9tiQXAtPZsAzmBYe5Xfprgs3ovVtyVY4BWvYgozTOa4FqyevSS4KFQnBbriRfZF5Za4Yoxc6moDz5K026ULaqJVvT+7M80h25s9rXanrqwemVo1JPBh4UzDpCc6doqYYybQOYia+rAhRniMLEN/0z4p0vco=
+	t=1739243410; cv=none; b=DjrejOsXGOtAnnNyRu3DcbWGhM9Kpo0XxQPp39MgCiDMcChmn/tyoeTrglDq8Otfdou10wK9VNROFJWGnn7IximB+2Wv/xlVE2JwSmbFJTEcR9ZfOEMGFrSV3z2LN3g/k93Fa+RTsFpRusHNsJS8gfnqWOSUqEEnttM4yBMNVr4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1739242590; c=relaxed/simple;
-	bh=6Gc+7orx8UnOqA+ypi5w0+tMqd2/ona3RdlLOJWQLq8=;
-	h=Date:From:To:Cc:Message-ID:In-Reply-To:References:Subject:
-	 Mime-Version:Content-Type; b=ej7XR4WGGtv1QezMBga297L8+xXaFoASU1/NK8aQBrAZLtoRRUJPDWZaexvXluxfo3iw0rUiKOm80cw3ecWtCG3xB0qRtUQQQh1iSQnIM2eBNe5ROylVnv9QmvrRTL5ILNdMPjmww0UQB9ien1LJRWBIYIKD4YOT3cLBjDriRdg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Si9CrZRp; arc=none smtp.client-ip=209.85.219.49
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-qv1-f49.google.com with SMTP id 6a1803df08f44-6e4487fce51so18175836d6.0
-        for <netdev@vger.kernel.org>; Mon, 10 Feb 2025 18:56:28 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1739242588; x=1739847388; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:subject:references
-         :in-reply-to:message-id:cc:to:from:date:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=cOHZzwCQ/myqo+gwDEkJjemBLVd+Edrvrd4ft8eKgPg=;
-        b=Si9CrZRpfqc9M/KOUqbThb51zU8FgybA0CnaDbKPW8xKmeuAa6HR6U9pYx9Fh3NP7Q
-         gIHkpenVa3WArh7hZ3oqPYejNWbyLDZ7W/0SLlxQmVoJaX7xQYwWz9Xizw7HD/W92FsR
-         X0UaCBaNmj5Pqt+VIoGb1YRaZAYxFJKhLR1J5wrGZIczZuViof4++LtYUHy/SVveHwRD
-         bt/PHO+imVdiRgjB/Y1t0SjohEITwIH9DBFQ9UokbpOXYaKNZ2/oeGiVS4W2Ui3rFPc1
-         K5ynOiRN6gRYooY7EJi2vPKDGCJZbyY2bB8qG6kpkafTKAqnR/vXJRQ16oiQwFoO8BNO
-         iLyg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1739242588; x=1739847388;
-        h=content-transfer-encoding:mime-version:subject:references
-         :in-reply-to:message-id:cc:to:from:date:x-gm-message-state:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=cOHZzwCQ/myqo+gwDEkJjemBLVd+Edrvrd4ft8eKgPg=;
-        b=Qs1G68t4cwVZo6iZ+RpaC34Y35Skm4/UakmV7Nzv3muzvFcKVZA5q7ZeYlLiiyLYpS
-         MW3/l5jUKQUT3QyKo4AShP3h1GR6JigwQlMJm/roQHrhzetbBUSYsoWyLjW+Mu3OTzLO
-         X0lNDKRgtittFxpdxC6iwqUrqoqAOwevV5QI/2sYg0/llOX+67jSa70ghGmLtVNyQDkj
-         6M2/UrjlFaCa+d9Mry7ROl5mdcBOgOu49cgYE9Qyeq81VWWhflyLCvJnSE/vNblnzbxY
-         F04p7jKtiMNkr90evXP2MUwOKLxIRMnnW/bPvjROIAJQ8NJw630gG4Lj3y5HYhFt9dGz
-         Dedg==
-X-Gm-Message-State: AOJu0Yy30xNv4731z5pRNP4mSYCLHnT0GwLHvVq1TeK4Ov7TSznq8X97
-	5RwYygFo9mI4a8Y08mTeIZaZYKbg+POzFGA/r7RB1FsgxTGWHcyn
-X-Gm-Gg: ASbGncsPIdNdqaLfGCW8WqGW7E0+8eIfBN49lGTlRCkxkAU/z+3AMyY31naEC8/pj2o
-	oFixgRiTcO5vZHu6KPik77gK+v7dXBY7HTub0nr81g5qgXMmgA4Q6tT2+fvP5ie0absZa8Nrg3r
-	05BpN302rdKcjUVC2+ti0NZQZsu4hVAKgaAZYHCn6tUJlsCRdtWpMcgm/oGOpG05rpTa69vyDB4
-	BtMVifBjBHAYCU4Sap8hgrNaBhT1MtWx+qsp2QVJU61DAELRzlZiMwMmdrZmF3cS+r14d+IWhg6
-	i5KSnibpv3WWrM2ru4nMev79ML4e6UMZq8yw18CrPxxtyl7JEN/IJ30+u0fOerk=
-X-Google-Smtp-Source: AGHT+IESMBcBeOj2ptVeubtv1U9WxTJ5iyTHkEf8LqhB9DJYfg5GCLAsP6spv5aFZx/9CCXnyHvYAA==
-X-Received: by 2002:ad4:5f89:0:b0:6e4:3faf:3647 with SMTP id 6a1803df08f44-6e4455e96b9mr210226676d6.15.1739242587896;
-        Mon, 10 Feb 2025 18:56:27 -0800 (PST)
-Received: from localhost (15.60.86.34.bc.googleusercontent.com. [34.86.60.15])
-        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-6e444eaa762sm47126386d6.90.2025.02.10.18.56.27
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 10 Feb 2025 18:56:27 -0800 (PST)
-Date: Mon, 10 Feb 2025 21:56:26 -0500
-From: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
-To: Eric Dumazet <edumazet@google.com>, 
- "David S . Miller" <davem@davemloft.net>, 
- Jakub Kicinski <kuba@kernel.org>, 
- Paolo Abeni <pabeni@redhat.com>
-Cc: netdev@vger.kernel.org, 
- Willem de Bruijn <willemb@google.com>, 
- Simon Horman <horms@kernel.org>, 
- eric.dumazet@gmail.com, 
- Eric Dumazet <edumazet@google.com>
-Message-ID: <67aabc5aea2eb_881f329441@willemb.c.googlers.com.notmuch>
-In-Reply-To: <20250210082805.465241-5-edumazet@google.com>
-References: <20250210082805.465241-1-edumazet@google.com>
- <20250210082805.465241-5-edumazet@google.com>
-Subject: Re: [PATCH net-next 4/4] udp: use EXPORT_IPV6_MOD[_GPL]()
+	s=arc-20240116; t=1739243410; c=relaxed/simple;
+	bh=YJOBToaYzUqd9DyOP+SvGJW2ufNR3336/zAErdq2/20=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=SDsZzjiI24K9HWoJWYh2p4Net42kW3F9h9ep3ebV/0nJpegYMZYz8fHWki4BxtUaJnN/3/RGE/56Sg+Tbk/yI2GTWIam0uPTJR930XOdztlM9cg62nUO+X0FCiAiXOhPVTjT2vQpFGAAotlYSG84lAheIvjpy6GV+QpOH2F8I0c=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=mLkr/gL7; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 50E1DC4CED1;
+	Tue, 11 Feb 2025 03:10:09 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1739243409;
+	bh=YJOBToaYzUqd9DyOP+SvGJW2ufNR3336/zAErdq2/20=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=mLkr/gL7GMILaca8r3fdPmR6S/WLp5cbubv6Tl3v8+jFnUHALuNsMMlDr8YZ83rya
+	 nZ/oAOgdzD8RFRGOx/rIFBVb8ywXdpThLUZxZhIFx++7zjR+/RvIE487pTKveQLcva
+	 5Etmfshvb9TgDDJEeQQY0mwORHEhOWEen8GJcRIa/gii2pEaa8LsjqGaRmQOsBnduX
+	 1n7vw9QPl6+hzei77a/g3blE4ht7UAsubqExNy17webSDmy4qdToLCpqKuMLoO0H+i
+	 FWON+5tLp61Md5fB3weT6e1Reus7bTpmLc1IIZFnVIq3do6aoZ5/PhuXaEeuy9srHF
+	 TdrVUOUvp4DMQ==
+Received: from [10.30.226.235] (localhost [IPv6:::1])
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 25F22380AA7A;
+	Tue, 11 Feb 2025 03:10:39 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Content-Type: text/plain;
- charset=utf-8
-Content-Transfer-Encoding: 7bit
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH net-next v5 0/4] net: xilinx: axienet: Enable adaptive IRQ
+ coalescing with DIM
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <173924343783.3943945.3127869136485517111.git-patchwork-notify@kernel.org>
+Date: Tue, 11 Feb 2025 03:10:37 +0000
+References: <20250206201036.1516800-1-sean.anderson@linux.dev>
+In-Reply-To: <20250206201036.1516800-1-sean.anderson@linux.dev>
+To: Sean Anderson <sean.anderson@linux.dev>
+Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+ pabeni@redhat.com, radhey.shyam.pandey@amd.com, netdev@vger.kernel.org,
+ michal.simek@amd.com, linux-arm-kernel@lists.infradead.org,
+ linux-kernel@vger.kernel.org, shannon.nelson@amd.com,
+ hengqi@linux.alibaba.com
 
-Eric Dumazet wrote:
-> Use EXPORT_IPV6_MOD[_GPL]() for symbols that don't need
-> to be exported unless CONFIG_IPV6=m
+Hello:
+
+This series was applied to netdev/net-next.git (main)
+by Jakub Kicinski <kuba@kernel.org>:
+
+On Thu,  6 Feb 2025 15:10:32 -0500 you wrote:
+> To improve performance without sacrificing latency under low load,
+> enable DIM. While I appreciate not having to write the library myself, I
+> do think there are many unusual aspects to DIM, as detailed in the last
+> patch.
 > 
-> udp_table is no longer used from any modules, and does not
-> need to be exported anyway.
+> Changes in v5:
+> - Move axienet_coalesce_params doc fix to correct patch
+> - Rebase onto net-next/master
 > 
-> Signed-off-by: Eric Dumazet <edumazet@google.com>
+> [...]
 
-Should udp_disconnect be included?
+Here is the summary with links:
+  - [net-next,v5,1/4] net: xilinx: axienet: Combine CR calculation
+    https://git.kernel.org/netdev/net-next/c/e76d1ea8cb18
+  - [net-next,v5,2/4] net: xilinx: axienet: Support adjusting coalesce settings while running
+    https://git.kernel.org/netdev/net-next/c/d048c717df33
+  - [net-next,v5,3/4] net: xilinx: axienet: Get coalesce parameters from driver state
+    https://git.kernel.org/netdev/net-next/c/eb80520e8a5b
+  - [net-next,v5,4/4] net: xilinx: axienet: Enable adaptive IRQ coalescing with DIM
+    https://git.kernel.org/netdev/net-next/c/e1d27d29dbe5
 
-And perhaps udp_encap_needed_key. The only real user is static inline
-udp_unexpected_gso, itself only used in core udp code. But not sure if
-it would cause build errors.
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
 
-With those minor asides
 
-Acked-by: Willem de Bruijn <willemb@google.com>
 
