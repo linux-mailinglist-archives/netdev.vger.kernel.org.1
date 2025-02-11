@@ -1,204 +1,118 @@
-Return-Path: <netdev+bounces-165196-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-165197-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5478BA30EA3
-	for <lists+netdev@lfdr.de>; Tue, 11 Feb 2025 15:43:43 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 87B84A30EAC
+	for <lists+netdev@lfdr.de>; Tue, 11 Feb 2025 15:44:26 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 28ABD167AE3
-	for <lists+netdev@lfdr.de>; Tue, 11 Feb 2025 14:43:36 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 6227B162FC0
+	for <lists+netdev@lfdr.de>; Tue, 11 Feb 2025 14:44:08 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3AE552512C5;
-	Tue, 11 Feb 2025 14:43:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 289F82505C8;
+	Tue, 11 Feb 2025 14:44:06 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="RViKGNih"
+	dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="q6Gweo1H";
+	dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="q4fLvAWT"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ej1-f48.google.com (mail-ej1-f48.google.com [209.85.218.48])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from galois.linutronix.de (Galois.linutronix.de [193.142.43.55])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 25FBE1F12FC;
-	Tue, 11 Feb 2025 14:43:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.48
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6159D1F12FC
+	for <netdev@vger.kernel.org>; Tue, 11 Feb 2025 14:44:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=193.142.43.55
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1739285008; cv=none; b=kBxYonr1SW/STYKHzmznQBQJi6iZEJTibk72gLtPqD5r0mRV7J3kH/DCSo3u2dwB1AB93VjpnN8F0Wdav3VpsqFyP23d9l84t3XRT2ThyJP4nlx+K6dC+SJRgPQjffWPJWjOAI5llN+7J8aT+GmKPPrWXLg8KzK2SKQCfXqH29M=
+	t=1739285046; cv=none; b=KQkG+yLBGilczp2CdMoYCb5nEpZW2hCnNIMCzatdJqPSOtCX4PlyKfPM1tZMXleVZhRLLub5MazrtLZsYmlCmvMSTYA9j/CkLR4C/8rV2rgerFB4N5S4WNgEefsf8VbeH3eLPjtsz8/hzXecA6kquz/pkEtNAKrBs/LL1ydWhh4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1739285008; c=relaxed/simple;
-	bh=tQt2YViAGNRUcLLNMB6hphKc7NudM5eIWN91tXZ0fI0=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=CvNXrN/3IImDxpKcf/tR3thHFVKyQ2XBTUb686JUY8Xc7iP6xF0JvOLyyKkYKQTZDWifFRvV0hiMqHJaplyiQtcIg0iWRvfb6NDMRhklq2Q7XUU6PL4PtAOacS5Ciec+LBl8chdAA3DvovTdJRvOZ1bA9oFGfxgChH0Kf0J0/Tg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=RViKGNih; arc=none smtp.client-ip=209.85.218.48
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ej1-f48.google.com with SMTP id a640c23a62f3a-ab7d451f7c4so205379066b.0;
-        Tue, 11 Feb 2025 06:43:25 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1739285004; x=1739889804; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=V+syQltWy2iShpV3VhhxV37TML7DelsfUgKCvN307fw=;
-        b=RViKGNihGemvHScsUoIWlqB4F8Y+Vv1Ll+mXlyZmMio0D1p2u4j4Q2xTSPKRBpXnfP
-         A5EDvKo5ZhN244bGIi6l89/8c46bPMELWHZu2xcVOZTQH1SzDmVKu1JPw7zy+zoJ9Qos
-         HBDA5Zfb/2DWN8OCmJmA3SqfqmvbdGcUECyWrXGgRUxbwCXdliAkDKUgaX0hK9mAMZAg
-         PlWokNyUcQO8A4HStBpJ9eV5mAMkbC7CB23HQ1DnpDNTFIgYh8DtDyaRmHK6N1LvE6MD
-         KpEoH6fK6nD4HdYSo8Szb7AAQvfWGfKRrPrIj5KQRrrS/EQ6aB/RWRGFiHdTIH5JkEZM
-         NnzA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1739285004; x=1739889804;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=V+syQltWy2iShpV3VhhxV37TML7DelsfUgKCvN307fw=;
-        b=Hbcv90ga96aZV5Rh+BBNZ1vy5QYmFqTpktipJ/OYpSkPYDIiRlGo3AkMTqVSP8jagN
-         Kjf4CR2TQAU9T8JYV4efFpUhQeowxJ6It3q4Hlu96Q6d92McziQidFTl7O2vU1GGPEe9
-         6yJ0sBZjVTVXtmKo6J4584YcISViEYi/88YGaHN1uakJo4yNG4jVzKh6JUJTxoN/METZ
-         HLzaa1Gg/VAbv/LL7TwOyG9EW9xPXucbUsByHPBV+LCTdKvpyH73y2N6Qs4nEU8fPZD9
-         MyqT8Zwym3jezxLi6orv9aMd7uWsyp2HseSJTvRUVhEn3rEFCg8fWG0zaGUHkNaWgQy1
-         WLxA==
-X-Forwarded-Encrypted: i=1; AJvYcCUt3228LRqTXUjeXbD3y8GtkNsdvgIWtalqpoUACcYm1iS9uWrm08Zv7vks9nT6MDTf2PgJt/6XLTjXVz7wObsT@vger.kernel.org, AJvYcCWhPgsQTAFYsuX0K2PyetOI187egoCP/iCzkPSgL6hGEfLCKCsVQTsRjrEYT7yXZJReUyj6gNSo@vger.kernel.org, AJvYcCWkp10P11GKEs+Rafc+8FNnjja7eEj3FnQH2zsZ31cx8wZGqjf34ihUND6sit8o6ztNCMyMxvn95Ufdot0=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxHMt5CXxJG33mqMJGn0EAAu/En6SphaPnDIPErmDfmk1Tz202f
-	VLuwrzkktNkLb5dpDN1dwe099DDLAucNQ4ycHKayMTMGkGKEzW4h
-X-Gm-Gg: ASbGnctVkzHakti597bAJmfiWF8EuPlmHBQeyI10jIzKMJxH58rN0L5SZ0GWicGxF+N
-	oa7rJVcTMfnll52RbKYmvLfdkvI5XQJwSBQhuMub4ENs+WQvpLZQEijuR9Pj0npAZo4+ffJ4IUt
-	c7/VgQvy8VypMCSgIza8JFH+AmBy/c9ZFZt90eIFyWRUGKe2CsQqy5uGqG+hrmuINOx094vVkTs
-	amFtMnSboaFbPAE0BoqEFs+8QgK5YTtlhr/FdNtiqCPUkdCq3Zh8nUAKu3mkmgkvMEIet0zRi2D
-	xW7FHjAc6MemYY2MXSz9RHIJNWZ7X+zMapjb6SlJVr767XgO3nrTPWVeU0TrMPbJHzUKnPSasKA
-	wwWCYnaIhvz5ywo0WO1ryU0oDUwCq0CnYhsJ1SyKyAzyRXie74AuHLxca9w3AsHDDPA==
-X-Google-Smtp-Source: AGHT+IF9jmcJFJFbEK49xdcz+FAYc5JFQf9JpzthNkFP4VwxwCFQdCkq660UzRh31VnMKEshFSn0QQ==
-X-Received: by 2002:a17:907:6e86:b0:aa6:9eac:4b8e with SMTP id a640c23a62f3a-ab789bfc7d9mr2013030966b.41.1739285004009;
-        Tue, 11 Feb 2025 06:43:24 -0800 (PST)
-Received: from ?IPV6:2001:1c00:20d:1300:1b1c:4449:176a:89ea? (2001-1c00-020d-1300-1b1c-4449-176a-89ea.cable.dynamic.v6.ziggo.nl. [2001:1c00:20d:1300:1b1c:4449:176a:89ea])
-        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-ab7c4a50e73sm394025366b.36.2025.02.11.06.43.22
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 11 Feb 2025 06:43:23 -0800 (PST)
-Message-ID: <9ae3548a-844e-4449-9c00-5dd79e804922@gmail.com>
-Date: Tue, 11 Feb 2025 15:43:22 +0100
+	s=arc-20240116; t=1739285046; c=relaxed/simple;
+	bh=frPQ2x9r1wmULVqXEPuuRGWbRtOiAHnDEcb1q1nENVM=;
+	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
+	 MIME-Version:Content-Type; b=tjqhE1nzjUVraQ45fEVFVhtCffKYAZfn5feR5LgwSKTx5/8NB01OZcd2N0OystNH4Y+/09wG1zx1Zpxyn9Ahp2ZPaqOm1Z8n9c9/kRWl8JgVjC0hUbl5lvKpNC6xrV5dW2PueqrVLDrbcv+sQc9KnSGP3m0clXrElzUMpJ5/HbI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de; spf=pass smtp.mailfrom=linutronix.de; dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=q6Gweo1H; dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=q4fLvAWT; arc=none smtp.client-ip=193.142.43.55
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linutronix.de
+From: Kurt Kanzenbach <kurt@linutronix.de>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linutronix.de;
+	s=2020; t=1739285042;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=frPQ2x9r1wmULVqXEPuuRGWbRtOiAHnDEcb1q1nENVM=;
+	b=q6Gweo1HpLPTyBz4O/b0+gHb0AFS4c6dQdiKDvQEFQbFtpCWmqRClopXiOKm2ja20L3EDJ
+	v3e/lzpuJbTL78rNRg3709tFZ3fC+5dBZCchOQnbqwKWmp4jV+kUnD29E7AdiSRxik7t3f
+	5INucZ8ohYQKmama5x68frM1kPvNtmScEqkTA/Y1WiabRwkE3XcgaFRd+c/eD6saJuLz14
+	IsW8Wr1jlagNGSMY6tc1h7mBcNTVnj8jsqTa5KBDV1qnc4ynzE9H6ByFvCjp2pFA0TdNo+
+	OqmJB0uE9G0IgvPHcAjEiuLhwwnbMXYrEeCaJsB/h50ENH21cU5A7DhwXGbVaQ==
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=linutronix.de;
+	s=2020e; t=1739285042;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=frPQ2x9r1wmULVqXEPuuRGWbRtOiAHnDEcb1q1nENVM=;
+	b=q4fLvAWT5Vlkm8VWaTGtvYApBxoY3M+ZG18eAp42c3vISDHVfKuHKJeRJe173A/x6mzgIF
+	DSbdLAn7j+ZNnnBw==
+To: Joe Damato <jdamato@fastly.com>
+Cc: Tony Nguyen <anthony.l.nguyen@intel.com>, Przemek Kitszel
+ <przemyslaw.kitszel@intel.com>, Andrew Lunn <andrew+netdev@lunn.ch>,
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet
+ <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
+ <pabeni@redhat.com>, Sebastian Andrzej Siewior <bigeasy@linutronix.de>,
+ intel-wired-lan@lists.osuosl.org, netdev@vger.kernel.org
+Subject: Re: [PATCH 0/3] igb: XDP/ZC follow up
+In-Reply-To: <Z6rAuqYnIzQH_gtN@LQ3V64L9R2>
+References: <20250210-igb_irq-v1-0-bde078cdb9df@linutronix.de>
+ <Z6rAuqYnIzQH_gtN@LQ3V64L9R2>
+Date: Tue, 11 Feb 2025 15:44:00 +0100
+Message-ID: <87ikpgr173.fsf@kurt.kurt.home>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v6 net-next 05/14] bridge: Add filling forward path from
- port to port
-To: Vladimir Oltean <olteanv@gmail.com>
-Cc: "David S. Miller" <davem@davemloft.net>,
- Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
- Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>,
- Andrew Lunn <andrew+netdev@lunn.ch>, Pablo Neira Ayuso
- <pablo@netfilter.org>, Jozsef Kadlecsik <kadlec@netfilter.org>,
- Jiri Pirko <jiri@resnulli.us>, Ivan Vecera <ivecera@redhat.com>,
- Roopa Prabhu <roopa@nvidia.com>, Nikolay Aleksandrov <razor@blackwall.org>,
- Matthias Brugger <matthias.bgg@gmail.com>,
- AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>,
- Kuniyuki Iwashima <kuniyu@amazon.com>,
- Sebastian Andrzej Siewior <bigeasy@linutronix.de>,
- Lorenzo Bianconi <lorenzo@kernel.org>, Joe Damato <jdamato@fastly.com>,
- Alexander Lobakin <aleksander.lobakin@intel.com>,
- Frank Wunderlich <frank-w@public-files.de>,
- Daniel Golle <daniel@makrotopia.org>, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org, netfilter-devel@vger.kernel.org,
- coreteam@netfilter.org, bridge@lists.linux.dev,
- linux-arm-kernel@lists.infradead.org, linux-mediatek@lists.infradead.org
-References: <20250209111034.241571-1-ericwouds@gmail.com>
- <20250209111034.241571-6-ericwouds@gmail.com>
- <20250211132832.aiy6ocvqppoqkd65@skbuf>
-Content-Language: en-US
-From: Eric Woudstra <ericwouds@gmail.com>
-In-Reply-To: <20250211132832.aiy6ocvqppoqkd65@skbuf>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Type: multipart/signed; boundary="=-=-=";
+	micalg=pgp-sha512; protocol="application/pgp-signature"
 
+--=-=-=
+Content-Type: text/plain
+Content-Transfer-Encoding: quoted-printable
 
+On Mon Feb 10 2025, Joe Damato wrote:
+> On Mon, Feb 10, 2025 at 10:19:34AM +0100, Kurt Kanzenbach wrote:
+>> This is a follow up for the igb XDP/ZC implementation. The first two=20
+>> patches link the IRQs and queues to NAPI instances. This is required to=
+=20
+>> bring back the XDP/ZC busy polling support. The last patch removes=20
+>> undesired IRQs (injected via igb watchdog) while busy polling with=20
+>> napi_defer_hard_irqs and gro_flush_timeout set.
+>
+> You may want to use netif_napi_add_config to enable persistent NAPI
+> config, btw. This makes writing userland programs based on
+> SO_INCOMING_NAPI_ID much easier.
 
-On 2/11/25 2:28 PM, Vladimir Oltean wrote:
-> On Sun, Feb 09, 2025 at 12:10:25PM +0100, Eric Woudstra wrote:
->> @@ -1453,7 +1454,10 @@ void br_vlan_fill_forward_path_pvid(struct net_bridge *br,
->>  	if (!br_opt_get(br, BROPT_VLAN_ENABLED))
->>  		return;
->>  
->> -	vg = br_vlan_group(br);
->> +	if (p)
->> +		vg = nbp_vlan_group(p);
->> +	else
->> +		vg = br_vlan_group(br);
->>  
->>  	if (idx >= 0 &&
->>  	    ctx->vlan[idx].proto == br->vlan_proto) {
-> 
-> I think the original usage of br_vlan_group() here was incorrect, and so
-> is the new usage of nbp_vlan_group(). They should be br_vlan_group_rcu()
-> and nbp_vlan_group_rcu().
-> 
-> The lockdep annotation is important, otherwise I get this with CONFIG_PROVE_LOCKING=y:
-> [ 1140.931869] =============================
-> [ 1140.935996] WARNING: suspicious RCU usage
-> [ 1140.940094] 6.14.0-rc1-00224-gda8926a49ba1-dirty #2666 Not tainted
-> [ 1140.946371] -----------------------------
-> [ 1140.950520] net/bridge/br_private.h:1604 suspicious rcu_dereference_protected() usage!
-> [ 1140.958622]
-> [ 1140.958622] other info that might help us debug this:
-> [ 1140.958622]
-> [ 1140.966752]
-> [ 1140.966752] rcu_scheduler_active = 2, debug_locks = 1
-> [ 1140.973435] 2 locks held by swapper/0/0:
-> [ 1140.977521]  #0: ffffd9f646c333b0 (rcu_read_lock){....}-{1:3}, at: rcu_lock_acquire+0x4/0x40
-> [ 1140.986404]  #1: ffffd9f646c333b0 (rcu_read_lock){....}-{1:3}, at: rcu_lock_acquire+0x4/0x48
-> [ 1140.995170]
-> [ 1140.995170] stack backtrace:
-> [ 1140.999636] CPU: 0 UID: 0 PID: 0 Comm: swapper/0 Not tainted 6.14.0-rc1-00224-gda8926a49ba1-dirty #2666
-> [ 1140.999650] Hardware name: LS1028A RDB Board (DT)
-> [ 1140.999656] Call trace:
-> [ 1140.999660]  show_stack+0x24/0x38 (C)
-> [ 1140.999683]  dump_stack_lvl+0x40/0xa0
-> [ 1140.999698]  dump_stack+0x18/0x24
-> [ 1140.999711]  lockdep_rcu_suspicious+0x174/0x218
-> [ 1140.999723]  br_vlan_fill_forward_path_pvid+0x90/0x150
-> [ 1140.999735]  br_fill_forward_path+0x54/0x1b0
-> [ 1140.999751]  dev_fill_bridge_path+0x9c/0x188
-> [ 1140.999766]  nft_dev_fill_bridge_path+0x2ac/0x418
-> [ 1140.999785]  nft_flow_offload_bridge_init+0x188/0x1c8
-> [ 1140.999801]  nft_flow_offload_eval+0x18c/0x300
-> [ 1140.999816]  nft_do_chain+0x1c8/0x538
-> [ 1140.999831]  nft_do_chain_bridge+0x15c/0x210
-> [ 1140.999846]  nf_hook_slow+0x80/0x130
-> [ 1140.999862]  NF_HOOK+0xd8/0x1d0
-> [ 1140.999871]  __br_forward+0x138/0x1a0
-> [ 1140.999880]  br_forward+0xd8/0x160
-> [ 1140.999889]  br_handle_frame_finish+0x3bc/0x5a8
-> [ 1140.999900]  br_nf_pre_routing_finish+0x538/0x608
-> [ 1140.999917]  NF_HOOK+0x254/0x298
-> [ 1140.999933]  br_nf_pre_routing+0x3e8/0x428
-> [ 1140.999949]  br_handle_frame+0x264/0x490
-> [ 1140.999959]  __netif_receive_skb_core+0x13c/0x1128
-> [ 1140.999975]  __netif_receive_skb_list_core+0xd4/0x1e8
-> [ 1140.999989]  netif_receive_skb_list_internal+0x224/0x338
-> [ 1141.000000]  napi_complete_done+0xb4/0x1d8
-> [ 1141.000012]  gro_cell_poll+0x94/0xb8
-> [ 1141.000025]  __napi_poll+0x58/0x258
-> [ 1141.000040]  net_rx_action+0x1f4/0x3e0
-> [ 1141.000055]  handle_softirqs+0x184/0x458
-> [ 1141.000070]  __do_softirq+0x20/0x2c
-> [ 1141.000079]  ____do_softirq+0x1c/0x30
-> [ 1141.000095]  call_on_irq_stack+0x24/0x58
-> [ 1141.000111]  do_softirq_own_stack+0x28/0x40
-> [ 1141.000127]  __irq_exit_rcu+0xd4/0x1a0
-> [ 1141.000139]  irq_exit_rcu+0x1c/0x40
-> [ 1141.000152]  el1_interrupt+0x8c/0xc0
-> [ 1141.000170]  el1h_64_irq_handler+0x18/0x28
-> [ 1141.000186]  el1h_64_irq+0x6c/0x70
-> [ 1141.000195]  arch_local_irq_enable+0x8/0x10 (P)
-> [ 1141.000213]  cpuidle_enter+0x44/0x68
-> [ 1141.000228]  do_idle+0x1e8/0x280
-> [ 1141.000238]  cpu_startup_entry+0x40/0x50
-> [ 1141.000248]  rest_init+0x1c4/0x1d0
-> [ 1141.000260]  start_kernel+0x324/0x3e8
-> [ 1141.000272]  __primary_switched+0x88/0x98
-> [ 1141.197568] ------------[ cut here ]------------
+Thanks, that looks useful too. I'll add another patch to this series to
+use netif_napi_add_config().
 
-Thanks. I will correct both in v7.
+--=-=-=
+Content-Type: application/pgp-signature; name="signature.asc"
 
+-----BEGIN PGP SIGNATURE-----
+
+iQJHBAEBCgAxFiEEvLm/ssjDfdPf21mSwZPR8qpGc4IFAmerYjATHGt1cnRAbGlu
+dXRyb25peC5kZQAKCRDBk9HyqkZzgupeD/0REufAXeovfQatLQDXtxRC5rNUMCRK
+ZhJJ08SX1hSZ54M3vA7sX7pzDKg5YBXQIqBVvaE/fto8oWbc1OBM57g3vY8sMCF+
+lctEZpn6VDxlRMj2YfJZ+tP3gnImXZlnnBbYgmUp0C+uIyDRPr99QpfohcM99sSm
+5bakMC9RrJ64G4lxbIjLw5qyH+xGNZ4+WPoS2uVN3+Nn7llHUGY4Q3A6Wt0hcQg/
+XzhdejD9voNkVG6blV5v2nIGNQk3Dq2nf3akAOUyFPxcEtco8ZDDhgnNlNjW4CbY
+iWh+PQnsJgzmV7nxqH5j508V42rizJzfmawTjwPZKEYGC7PZqWjg5Qb+BcyXF0if
+ZorUeesaOzxPgNLPNOJrqPWLzcX2ofF7lsYeROPuL/r5CHytIV9k5+Vk3Wgsv/2d
+heoN+snGL/QcgotauSC04lZAhf3OsPXgK2lop1K5M7+w0KsZKbeBPoTKsuxngFXL
+raYoiHLUWEUL8eXGB+hZdiOyFSkU4r1PsBvFIdrikD2F+MrQO+tORwUgOcDvr6Nk
+IT8O+VDhXTNoFK2m2QMvHHVm6VP7MYROGoAubZmzSUwMVxoS0pCIz/2UIctLdJZT
+Xx4L/HK6le1JEdIzkaNRS9B6KED9PZCVeWVkwIHgYMuWPbhQ610+A94wFHiCWJ8n
+LPmzYjQ2ra/2aQ==
+=xpvO
+-----END PGP SIGNATURE-----
+--=-=-=--
 
