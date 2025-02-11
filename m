@@ -1,86 +1,79 @@
-Return-Path: <netdev+bounces-165219-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-165220-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 553BAA31049
-	for <lists+netdev@lfdr.de>; Tue, 11 Feb 2025 16:53:11 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6A165A3107F
+	for <lists+netdev@lfdr.de>; Tue, 11 Feb 2025 17:00:39 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 0BC783A0311
-	for <lists+netdev@lfdr.de>; Tue, 11 Feb 2025 15:53:02 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 9DB937A1120
+	for <lists+netdev@lfdr.de>; Tue, 11 Feb 2025 15:59:42 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B7896253B4C;
-	Tue, 11 Feb 2025 15:52:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 612992512E3;
+	Tue, 11 Feb 2025 16:00:12 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="JvYQuI6c"
+	dkim=pass (2048-bit key) header.d=blackwall-org.20230601.gappssmtp.com header.i=@blackwall-org.20230601.gappssmtp.com header.b="PAfX6H3I"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ej1-f51.google.com (mail-ej1-f51.google.com [209.85.218.51])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C03BA24F5AA
-	for <netdev@vger.kernel.org>; Tue, 11 Feb 2025 15:52:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 63278253B47
+	for <netdev@vger.kernel.org>; Tue, 11 Feb 2025 16:00:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.51
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1739289168; cv=none; b=bXkO06vTq4ooEHcdVXWL25KKgPEDDW46F9q1l2seM8PngOp2RzeS8SM3Mrq3LSU4wHOz71lOv8mxlbQoOfORvn0T+CxBNG+Eo+yPaVwyd85UhTsYclooJUI19NQl0EhykMIIWqmdjxcNArxBXWEPb3A0zy0q4Mf1aY3FzKlcjGs=
+	t=1739289612; cv=none; b=MCaPDhRUYA3RSmcyOZaAvxh4F6kRnMcE3EVTpWgYT7M++EByyL+KmjHya7+K0pJIXxaWdm4orxzBM/BX7h/hG8VmMVW65yBG9muu7q2gem/68YhaPAHyKycxco6Oxj3iWdvLZ9bNKcEv7BNfdBFD9eYvFxa19f4nmrebiEu9X8k=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1739289168; c=relaxed/simple;
-	bh=hirMgTGHSHqUkgshgRKdz/hvRvF8KEyXkXtK7FAOlTc=;
+	s=arc-20240116; t=1739289612; c=relaxed/simple;
+	bh=367tBOVSTQNE68f9evXGvkRc2n1V8n4iAsIeEbOEs7M=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=Ydfrl1rS3BvHXY9ZhUjXN1XngTB6fWQ3AyM61BYNXRnMjZX0k8R9rmrrvI57xoI4BvhVbr0IVzVPZKxvG7vxJmWCvfOQeY6fOjNBM5v3EIie2M0zjE66DCYCSBWekabDQnFo5DwOAqEqcj1GZG46n6z5DkxCAPJ0S9hiFjDZJ3M=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=JvYQuI6c; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1739289165;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=1JFOkigcOlo+cPqITq6LOOyh+gSUjUpzKOs27gpxkAQ=;
-	b=JvYQuI6cmMna0iekW3/upa57mtIFF4RHrCTF47Zbj0OzQQkasJ0w451Au6kOE936zBWz/x
-	s/G6NHKp4wO4GA6MQBOHJl/hVWOmufRs3lISxOqCPo9VNFVkK4tJ/J6+5oePbSoeYO1H5w
-	uefQRn8oBB/kakWXw6taylk6RPrWnpk=
-Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
- [209.85.128.71]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-444-SuWmXLN5OjqW-pBnJK12gg-1; Tue, 11 Feb 2025 10:52:44 -0500
-X-MC-Unique: SuWmXLN5OjqW-pBnJK12gg-1
-X-Mimecast-MFC-AGG-ID: SuWmXLN5OjqW-pBnJK12gg
-Received: by mail-wm1-f71.google.com with SMTP id 5b1f17b1804b1-438e180821aso33036235e9.1
-        for <netdev@vger.kernel.org>; Tue, 11 Feb 2025 07:52:44 -0800 (PST)
+	 In-Reply-To:Content-Type; b=jNj7o4NsOtjjOgSeKg/G4D9bvsnFahz7BGFU1KJbh+WLVNLrl/ASpuXbOSytwxX6g04Myef4Q/OeAeIEEGz1TEnrWVDip+e1Ihb088cjGBWNilTcbOBD+8RupntIJp0RmveiapJMS3lvxNwtj//SQQi433OGYo/74AxUTGJkIz4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=blackwall.org; spf=none smtp.mailfrom=blackwall.org; dkim=pass (2048-bit key) header.d=blackwall-org.20230601.gappssmtp.com header.i=@blackwall-org.20230601.gappssmtp.com header.b=PAfX6H3I; arc=none smtp.client-ip=209.85.218.51
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=blackwall.org
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=blackwall.org
+Received: by mail-ej1-f51.google.com with SMTP id a640c23a62f3a-ab7b7250256so411123366b.0
+        for <netdev@vger.kernel.org>; Tue, 11 Feb 2025 08:00:10 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=blackwall-org.20230601.gappssmtp.com; s=20230601; t=1739289608; x=1739894408; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=hI/ECcJmQ5+lRsmCQ33ubWCT5i7ZlE5HoQwEXVHTSj0=;
+        b=PAfX6H3IXurM2KFL7dkio3W4u4fg1aQj/lhZQ0vzFZXxrBvHGkIEh5qa1rdCway+/0
+         oKU9dphjhzdnk9b/Vdn3cFy0qIxAVL8Vdc/x/urq9wmws4i8F50armq4fo/oP5G43Ps/
+         JRjQF+k8b3tnmeRk7LH/6J0rp4rKDfde94w4Gf0w3ukOagclMo/j7K/PqugVoKKeUVkg
+         tgJdAeZgni5ws6DBcbEVyuDfVf76I6U2sKDImzZgDTab+WXprsnOfpprkb9dvh7DdVvn
+         Tc5/hVoUwcRWWv5Kt7HD++LimcvKsC/D5oeS8EumXW2ont/827c8Km0ITIYELVsVRYaj
+         1i8Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1739289163; x=1739893963;
+        d=1e100.net; s=20230601; t=1739289608; x=1739894408;
         h=content-transfer-encoding:in-reply-to:from:content-language
          :references:cc:to:subject:user-agent:mime-version:date:message-id
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=1JFOkigcOlo+cPqITq6LOOyh+gSUjUpzKOs27gpxkAQ=;
-        b=R9DJz4E1MiGzhZDnRmSaHaYLQsSH5J3WwO0YrbqpH3fkB4Wdo4lcdVQ72uU+/YOX0Q
-         GwkVDR/UKkjt1cz+vasSq6sUDEzn+wMQRbYzEeOiYtL5No8/IZvOtE+tc4l07LMFGksI
-         QFgEz1mCAotZmyfIhKXG2pVef2bF5M4feQp1XDHo7FR1TxFpY/nb6Qku+i2LmTXoflVK
-         ttuugRG9nBo4qbdgAFHTcKKKLvebTnx8SUlXwf13rOop9nYLSIAbsxWfxyQ8xHSJ4rZr
-         QXrBi9z3bRtrH89sTIbwe2+jsyChr+3/Bkjik0Tgs58BgX4SMymPs22QMkOtjBsdFt+q
-         YcTg==
-X-Forwarded-Encrypted: i=1; AJvYcCUytkx5guzT17brQfJ7rUW9F73grOft2+Q+XKU95o+7FAqsdpUoWhwzdwY7a/9McSR/RgK6BO4=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzTGejwVNvfqVMOSTUe8VYFDx3IZUC2xO7k9Sn5KljzZ6alBMHl
-	cfAXil/a0yfXDYqwm3i/eHERD25HbmPsjQ1XktFbZcd35Hy1OL9oqEbdb/OIqU47hzOpXoq4SF8
-	XDJR7jN85TdhhfjmD19yh1EuCi+1OXOzIfp5auegKkJy0n6N7RDhBoQ==
-X-Gm-Gg: ASbGncuOaAqBXp5+LSX1kupdEhAdUHlT8BvyG6atxu7ysYbnTwNCysgLZzHOTXDTZ5H
-	GyHauwmaVZ9CSp7zewetfSdLPlMXbdyxk2PmPURgIIiDXPkEUzUPR2BfGLTJJ9PgZ+f3mTbA+Ax
-	V8vrh3cYFXGWFBYG+p808VEG7yU5k7fbUj4xbGxjkRan2mb5v9DeV/x2gRPmudRrL7klmGM+cC2
-	fibAiR3JkjKYK+AhKnk317QvjznDmRCPWoMKMKVdgPc9IS2IR7fvQGRIO+UA5DaU3xKLNXDIpQy
-	vi2IzVWb0RmXblxNtD2CE5euuIstO9Wu2Es=
-X-Received: by 2002:a05:600c:1e08:b0:439:448c:6135 with SMTP id 5b1f17b1804b1-439448c6335mr74900845e9.24.1739289162951;
-        Tue, 11 Feb 2025 07:52:42 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IEA9mQSQnJdpEhXnycku90Q0Y08EptbfzMXWvn4BFrnfHJzfYqnB8u8BnMyOePHpOt6MUjZCA==
-X-Received: by 2002:a05:600c:1e08:b0:439:448c:6135 with SMTP id 5b1f17b1804b1-439448c6335mr74900715e9.24.1739289162602;
-        Tue, 11 Feb 2025 07:52:42 -0800 (PST)
-Received: from [192.168.88.253] (146-241-31-160.dyn.eolo.it. [146.241.31.160])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-4394328fcb8sm70371815e9.32.2025.02.11.07.52.41
+        bh=hI/ECcJmQ5+lRsmCQ33ubWCT5i7ZlE5HoQwEXVHTSj0=;
+        b=rorwUyCPkbZmn9Eo7PB11KYEjkGGCrs7H45tLCMgnT8vaKC3BZt5TFpufnsXylgg33
+         N2NQu5L93EbUvA910D2ZPzfHJCKasZiJqNaCJuDTfwwEeU61+Xt5ZbAHmDABxzSPEfGI
+         OkDC4cro3+UI2UWceaTPJ9CxBw5YDdh6Cnr4eEHWpMHa4l/MFDABUj6rDE/9WeROYl0N
+         0jVgHQ12h0dQTpo+WyFlvtqR311uOfInpdV/ERyzm0Js2iSCI0+6cK3RgzTScNx0l6QP
+         nA8D4dRp1PFCbn3LQ1BI5Ss2+eQVkNi6GPhYEH7TTG6KhzFa9RTaoTGbK+OULuBwTjab
+         q1RA==
+X-Forwarded-Encrypted: i=1; AJvYcCUm3uX+MFa2OMlW6aVugQULlMrIsqgMVNfRulfZOo4Dk3zTgzDVY0zoa8u/v8qMuxvdICG0EOM=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyTl3S+feb+2hs9VwWR4BAzwDOAxPKyvuZJ4E1xkiQdK3pj/cY9
+	oDpWXZ0eUgNBj1b8nAHuYLayubjHTWE+fk6HXjGNbnUcrN6Rmw0AkTNJBSmvuYU=
+X-Gm-Gg: ASbGncspHMmE20Gq9mm2CPlcqxbzxHC8nbJpWF6CElcwG/Rf2DzLI4pd5+ludYW//aF
+	8/kj76kQfcBJgQoexJUImOZpAmLSkSEYrwtMjC9jVJBysRDCDh+iZ2DM+YH52SWnwuFO8tzHyAk
+	zUkf72lktVRpOP2jSPkIE1l0YxNfxH2xR8fKAk8dQ2J6RTjKvZLvdtXfuvHUVNMGIVOcsKgfklZ
+	LJvC+E6zEsHAGkLRxcxX8SnbdHAb7WuCDkYqVmHarmN23GU7En19dapoeeJo1rGHVjXqt2jeFej
+	POrBvmfTY1yh1ZIW2IoRzH7oopX/QsgXZuXUzSAITiS0KIc=
+X-Google-Smtp-Source: AGHT+IE7ksSku6fs3EFiOJ7qMjT+Xj86y9WzUfaIKnMbJB/roCniH1bXiqumQdCG0sjm3B/UGhh56Q==
+X-Received: by 2002:a17:907:2d24:b0:ab2:ea29:b6 with SMTP id a640c23a62f3a-ab7f01cc9bemr17039766b.35.1739289608146;
+        Tue, 11 Feb 2025 08:00:08 -0800 (PST)
+Received: from [192.168.0.205] (78-154-15-142.ip.btc-net.bg. [78.154.15.142])
+        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-ab7ce2e91e9sm307325466b.117.2025.02.11.08.00.06
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 11 Feb 2025 07:52:42 -0800 (PST)
-Message-ID: <aa210895-61d0-468d-b902-93451983756b@redhat.com>
-Date: Tue, 11 Feb 2025 16:52:40 +0100
+        Tue, 11 Feb 2025 08:00:07 -0800 (PST)
+Message-ID: <91d709aa-2414-4fb4-b3e1-94e0e330d33c@blackwall.org>
+Date: Tue, 11 Feb 2025 18:00:05 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -88,62 +81,55 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next 1/4] vxlan: Join / leave MC group after remote
- changes
-To: Petr Machata <petrm@nvidia.com>
+Subject: Re: [PATCH v6 net-next 05/14] bridge: Add filling forward path from
+ port to port
+To: Vladimir Oltean <olteanv@gmail.com>, Eric Woudstra <ericwouds@gmail.com>
 Cc: "David S. Miller" <davem@davemloft.net>,
  Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
- netdev@vger.kernel.org, Ido Schimmel <idosch@nvidia.com>, mlxsw@nvidia.com,
- Andrew Lunn <andrew+netdev@lunn.ch>,
- Nikolay Aleksandrov <razor@blackwall.org>, Roopa Prabhu <roopa@nvidia.com>,
- Menglong Dong <menglong8.dong@gmail.com>, Guillaume Nault <gnault@redhat.com>
-References: <cover.1738949252.git.petrm@nvidia.com>
- <6986ccd18ece80d1c1adb028972a2bca603b9c11.1738949252.git.petrm@nvidia.com>
- <a800d740-0c28-4982-913b-a74e2e427f25@redhat.com> <87seoksdjh.fsf@nvidia.com>
+ Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>,
+ Andrew Lunn <andrew+netdev@lunn.ch>, Pablo Neira Ayuso
+ <pablo@netfilter.org>, Jozsef Kadlecsik <kadlec@netfilter.org>,
+ Jiri Pirko <jiri@resnulli.us>, Ivan Vecera <ivecera@redhat.com>,
+ Roopa Prabhu <roopa@nvidia.com>, Matthias Brugger <matthias.bgg@gmail.com>,
+ AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>,
+ Kuniyuki Iwashima <kuniyu@amazon.com>,
+ Sebastian Andrzej Siewior <bigeasy@linutronix.de>,
+ Lorenzo Bianconi <lorenzo@kernel.org>, Joe Damato <jdamato@fastly.com>,
+ Alexander Lobakin <aleksander.lobakin@intel.com>,
+ Frank Wunderlich <frank-w@public-files.de>,
+ Daniel Golle <daniel@makrotopia.org>, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org, netfilter-devel@vger.kernel.org,
+ coreteam@netfilter.org, bridge@lists.linux.dev,
+ linux-arm-kernel@lists.infradead.org, linux-mediatek@lists.infradead.org
+References: <20250209111034.241571-1-ericwouds@gmail.com>
+ <20250209111034.241571-6-ericwouds@gmail.com>
+ <20250211132832.aiy6ocvqppoqkd65@skbuf>
 Content-Language: en-US
-From: Paolo Abeni <pabeni@redhat.com>
-In-Reply-To: <87seoksdjh.fsf@nvidia.com>
+From: Nikolay Aleksandrov <razor@blackwall.org>
+In-Reply-To: <20250211132832.aiy6ocvqppoqkd65@skbuf>
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
 
-On 2/11/25 3:56 PM, Petr Machata wrote:
-> Paolo Abeni <pabeni@redhat.com> writes:
->> On 2/7/25 6:34 PM, Petr Machata wrote:
->>> @@ -3899,6 +3904,11 @@ static void vxlan_config_apply(struct net_device *dev,
->>>  			dev->mtu = conf->mtu;
->>>  
->>>  		vxlan->net = src_net;
->>> +
->>> +	} else if (vxlan->dev->flags & IFF_UP) {
->>> +		if (vxlan_addr_multicast(&vxlan->default_dst.remote_ip) &&
->>> +		    rem_changed)
->>> +			vxlan_multicast_leave(vxlan);
->>
->> AFAICS vxlan_vni_update_group() is not completely ignore
->> vxlan_multicast_{leave,join} errors. Instead is bailing out as soon as
->> any error happens. For consistency's sake I think it would be better do
->> the same here.
->>
->> Also I have the feeling that ending-up in an inconsistent status with no
->> group joined would be less troublesome than the opposite.
+On 2/11/25 15:28, Vladimir Oltean wrote:
+> On Sun, Feb 09, 2025 at 12:10:25PM +0100, Eric Woudstra wrote:
+>> @@ -1453,7 +1454,10 @@ void br_vlan_fill_forward_path_pvid(struct net_bridge *br,
+>>  	if (!br_opt_get(br, BROPT_VLAN_ENABLED))
+>>  		return;
+>>  
+>> -	vg = br_vlan_group(br);
+>> +	if (p)
+>> +		vg = nbp_vlan_group(p);
+>> +	else
+>> +		vg = br_vlan_group(br);
+>>  
+>>  	if (idx >= 0 &&
+>>  	    ctx->vlan[idx].proto == br->vlan_proto) {
 > 
-> This can already happen FWIW. If you currently want to change the remote
-> group address in a way that doesn't break things, you take the netdevice
-> down, then change it, then bring it back up. The leave during downing
-> can fail and will not be diagnosed. (Nor can it really be, you can't
-> veto downing.)
+> I think the original usage of br_vlan_group() here was incorrect, and so
+> is the new usage of nbp_vlan_group(). They should be br_vlan_group_rcu()
+> and nbp_vlan_group_rcu().
+> 
 
-I see.
-
-> I can add the bail-outs that you ask for, but I don't know that there is
-> a way to resolve these issues for real.
-
-The main point I made was about consistency: making the
-vxlan_config_apply() behavior as close as possible to
-vxlan_vni_update_group() as stated in the commit message.
-
-Cheers,
-
-Paolo
+Oops, right. Nice catch!
 
 
