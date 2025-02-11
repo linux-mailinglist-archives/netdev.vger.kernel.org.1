@@ -1,135 +1,144 @@
-Return-Path: <netdev+bounces-165220-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-165221-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6A165A3107F
-	for <lists+netdev@lfdr.de>; Tue, 11 Feb 2025 17:00:39 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 50461A31128
+	for <lists+netdev@lfdr.de>; Tue, 11 Feb 2025 17:23:15 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 9DB937A1120
-	for <lists+netdev@lfdr.de>; Tue, 11 Feb 2025 15:59:42 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 571FF161C54
+	for <lists+netdev@lfdr.de>; Tue, 11 Feb 2025 16:23:12 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 612992512E3;
-	Tue, 11 Feb 2025 16:00:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A353224C679;
+	Tue, 11 Feb 2025 16:23:09 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=blackwall-org.20230601.gappssmtp.com header.i=@blackwall-org.20230601.gappssmtp.com header.b="PAfX6H3I"
+	dkim=pass (2048-bit key) header.d=salutedevices.com header.i=@salutedevices.com header.b="JnGDb0UY"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ej1-f51.google.com (mail-ej1-f51.google.com [209.85.218.51])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mx1.sberdevices.ru (mx2.sberdevices.ru [45.89.224.132])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 63278253B47
-	for <netdev@vger.kernel.org>; Tue, 11 Feb 2025 16:00:10 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.51
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6F51D21D5B8;
+	Tue, 11 Feb 2025 16:23:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.89.224.132
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1739289612; cv=none; b=MCaPDhRUYA3RSmcyOZaAvxh4F6kRnMcE3EVTpWgYT7M++EByyL+KmjHya7+K0pJIXxaWdm4orxzBM/BX7h/hG8VmMVW65yBG9muu7q2gem/68YhaPAHyKycxco6Oxj3iWdvLZ9bNKcEv7BNfdBFD9eYvFxa19f4nmrebiEu9X8k=
+	t=1739290989; cv=none; b=EEOLN7qg9ScVL/rftFMZ2s209QGp7hCei0xPCsGAVllmPJ2ShRaDdNeFHhIwvTjR8elegRPn+YRb80vFEtWuj9ld/m6sM5Ft74aqtR5W0tmpHJGCADSYFJ1Qwi38EnZ5S5p1xTVyNwONjVjD4dTDXvxAsXG7EJ40isbsjzVQzk4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1739289612; c=relaxed/simple;
-	bh=367tBOVSTQNE68f9evXGvkRc2n1V8n4iAsIeEbOEs7M=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=jNj7o4NsOtjjOgSeKg/G4D9bvsnFahz7BGFU1KJbh+WLVNLrl/ASpuXbOSytwxX6g04Myef4Q/OeAeIEEGz1TEnrWVDip+e1Ihb088cjGBWNilTcbOBD+8RupntIJp0RmveiapJMS3lvxNwtj//SQQi433OGYo/74AxUTGJkIz4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=blackwall.org; spf=none smtp.mailfrom=blackwall.org; dkim=pass (2048-bit key) header.d=blackwall-org.20230601.gappssmtp.com header.i=@blackwall-org.20230601.gappssmtp.com header.b=PAfX6H3I; arc=none smtp.client-ip=209.85.218.51
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=blackwall.org
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=blackwall.org
-Received: by mail-ej1-f51.google.com with SMTP id a640c23a62f3a-ab7b7250256so411123366b.0
-        for <netdev@vger.kernel.org>; Tue, 11 Feb 2025 08:00:10 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=blackwall-org.20230601.gappssmtp.com; s=20230601; t=1739289608; x=1739894408; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=hI/ECcJmQ5+lRsmCQ33ubWCT5i7ZlE5HoQwEXVHTSj0=;
-        b=PAfX6H3IXurM2KFL7dkio3W4u4fg1aQj/lhZQ0vzFZXxrBvHGkIEh5qa1rdCway+/0
-         oKU9dphjhzdnk9b/Vdn3cFy0qIxAVL8Vdc/x/urq9wmws4i8F50armq4fo/oP5G43Ps/
-         JRjQF+k8b3tnmeRk7LH/6J0rp4rKDfde94w4Gf0w3ukOagclMo/j7K/PqugVoKKeUVkg
-         tgJdAeZgni5ws6DBcbEVyuDfVf76I6U2sKDImzZgDTab+WXprsnOfpprkb9dvh7DdVvn
-         Tc5/hVoUwcRWWv5Kt7HD++LimcvKsC/D5oeS8EumXW2ont/827c8Km0ITIYELVsVRYaj
-         1i8Q==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1739289608; x=1739894408;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=hI/ECcJmQ5+lRsmCQ33ubWCT5i7ZlE5HoQwEXVHTSj0=;
-        b=rorwUyCPkbZmn9Eo7PB11KYEjkGGCrs7H45tLCMgnT8vaKC3BZt5TFpufnsXylgg33
-         N2NQu5L93EbUvA910D2ZPzfHJCKasZiJqNaCJuDTfwwEeU61+Xt5ZbAHmDABxzSPEfGI
-         OkDC4cro3+UI2UWceaTPJ9CxBw5YDdh6Cnr4eEHWpMHa4l/MFDABUj6rDE/9WeROYl0N
-         0jVgHQ12h0dQTpo+WyFlvtqR311uOfInpdV/ERyzm0Js2iSCI0+6cK3RgzTScNx0l6QP
-         nA8D4dRp1PFCbn3LQ1BI5Ss2+eQVkNi6GPhYEH7TTG6KhzFa9RTaoTGbK+OULuBwTjab
-         q1RA==
-X-Forwarded-Encrypted: i=1; AJvYcCUm3uX+MFa2OMlW6aVugQULlMrIsqgMVNfRulfZOo4Dk3zTgzDVY0zoa8u/v8qMuxvdICG0EOM=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyTl3S+feb+2hs9VwWR4BAzwDOAxPKyvuZJ4E1xkiQdK3pj/cY9
-	oDpWXZ0eUgNBj1b8nAHuYLayubjHTWE+fk6HXjGNbnUcrN6Rmw0AkTNJBSmvuYU=
-X-Gm-Gg: ASbGncspHMmE20Gq9mm2CPlcqxbzxHC8nbJpWF6CElcwG/Rf2DzLI4pd5+ludYW//aF
-	8/kj76kQfcBJgQoexJUImOZpAmLSkSEYrwtMjC9jVJBysRDCDh+iZ2DM+YH52SWnwuFO8tzHyAk
-	zUkf72lktVRpOP2jSPkIE1l0YxNfxH2xR8fKAk8dQ2J6RTjKvZLvdtXfuvHUVNMGIVOcsKgfklZ
-	LJvC+E6zEsHAGkLRxcxX8SnbdHAb7WuCDkYqVmHarmN23GU7En19dapoeeJo1rGHVjXqt2jeFej
-	POrBvmfTY1yh1ZIW2IoRzH7oopX/QsgXZuXUzSAITiS0KIc=
-X-Google-Smtp-Source: AGHT+IE7ksSku6fs3EFiOJ7qMjT+Xj86y9WzUfaIKnMbJB/roCniH1bXiqumQdCG0sjm3B/UGhh56Q==
-X-Received: by 2002:a17:907:2d24:b0:ab2:ea29:b6 with SMTP id a640c23a62f3a-ab7f01cc9bemr17039766b.35.1739289608146;
-        Tue, 11 Feb 2025 08:00:08 -0800 (PST)
-Received: from [192.168.0.205] (78-154-15-142.ip.btc-net.bg. [78.154.15.142])
-        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-ab7ce2e91e9sm307325466b.117.2025.02.11.08.00.06
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 11 Feb 2025 08:00:07 -0800 (PST)
-Message-ID: <91d709aa-2414-4fb4-b3e1-94e0e330d33c@blackwall.org>
-Date: Tue, 11 Feb 2025 18:00:05 +0200
+	s=arc-20240116; t=1739290989; c=relaxed/simple;
+	bh=93OCurokwazYSKoYLZQnYciT9cqkswl/r4fl+UXzcyE=;
+	h=Message-ID:Date:MIME-Version:Subject:From:To:References:
+	 In-Reply-To:Content-Type; b=Mm6CZ8EVdFBgOsjuvx41RhDlxo1dJEpQHqCBl9py04DIBZxpgmvlsVPorloTv+xWVl6mo1USzIQ7xwz/RLmq2HtgStmchJYrKuFdbj+ua5QvyM1cZfI0XJ40Zjqix134wuL0/czFhBVsmt2SWMTdMD2Fr6Nk8iaQjRiX6yUXj3k=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=salutedevices.com; spf=pass smtp.mailfrom=salutedevices.com; dkim=pass (2048-bit key) header.d=salutedevices.com header.i=@salutedevices.com header.b=JnGDb0UY; arc=none smtp.client-ip=45.89.224.132
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=salutedevices.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=salutedevices.com
+Received: from p-infra-ksmg-sc-msk02.sberdevices.ru (localhost [127.0.0.1])
+	by mx1.sberdevices.ru (Postfix) with ESMTP id E5A10120007;
+	Tue, 11 Feb 2025 19:22:53 +0300 (MSK)
+DKIM-Filter: OpenDKIM Filter v2.11.0 mx1.sberdevices.ru E5A10120007
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=salutedevices.com;
+	s=mail; t=1739290973;
+	bh=WPFZfeQ8PegZ3Nuh6+l4FJbam841wWNz+m9Q/mulbrg=;
+	h=Message-ID:Date:MIME-Version:Subject:From:To:Content-Type:From;
+	b=JnGDb0UYpInSi1z5y8lw7H2IrPn4ZoCX9kiLB5WT46LGpgIx/lLIsjSxvk6Z6cLq/
+	 TKUf4ufM3I/cfDlckqTv62RnXPDsgE7R3UxdnxzLiIsOlYxyWW2vMM9szNK4dR1g85
+	 jsyCPlCWLrwAHEWL/tOQ1HE74Q8PLqsEWbA72oNQCPVQhBgNaUY2V87BlzFmVgAIqC
+	 36RKoISq0Z21IIU6AMoI+bu/QlDzxJ5+mQkKQzIxZtE4ZMpsSl72aqK79LAAzqvz9t
+	 kl1cw4UT+3WTrJibuZvHrbJAoT8K1NgsC1MZEhzbCc6/rHqCaXgX7kocj1b9WmOQvh
+	 9nZROV0z256hQ==
+Received: from smtp.sberdevices.ru (p-exch-cas-a-m1.sberdevices.ru [172.24.201.216])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by mx1.sberdevices.ru (Postfix) with ESMTPS;
+	Tue, 11 Feb 2025 19:22:53 +0300 (MSK)
+Message-ID: <c2d99ec3-d69e-b47d-45cc-0ad39893afd7@salutedevices.com>
+Date: Tue, 11 Feb 2025 19:22:51 +0300
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v6 net-next 05/14] bridge: Add filling forward path from
- port to port
-To: Vladimir Oltean <olteanv@gmail.com>, Eric Woudstra <ericwouds@gmail.com>
-Cc: "David S. Miller" <davem@davemloft.net>,
- Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
- Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>,
- Andrew Lunn <andrew+netdev@lunn.ch>, Pablo Neira Ayuso
- <pablo@netfilter.org>, Jozsef Kadlecsik <kadlec@netfilter.org>,
- Jiri Pirko <jiri@resnulli.us>, Ivan Vecera <ivecera@redhat.com>,
- Roopa Prabhu <roopa@nvidia.com>, Matthias Brugger <matthias.bgg@gmail.com>,
- AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>,
- Kuniyuki Iwashima <kuniyu@amazon.com>,
- Sebastian Andrzej Siewior <bigeasy@linutronix.de>,
- Lorenzo Bianconi <lorenzo@kernel.org>, Joe Damato <jdamato@fastly.com>,
- Alexander Lobakin <aleksander.lobakin@intel.com>,
- Frank Wunderlich <frank-w@public-files.de>,
- Daniel Golle <daniel@makrotopia.org>, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org, netfilter-devel@vger.kernel.org,
- coreteam@netfilter.org, bridge@lists.linux.dev,
- linux-arm-kernel@lists.infradead.org, linux-mediatek@lists.infradead.org
-References: <20250209111034.241571-1-ericwouds@gmail.com>
- <20250209111034.241571-6-ericwouds@gmail.com>
- <20250211132832.aiy6ocvqppoqkd65@skbuf>
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.4.2
+Subject: Re: [DMARC error] Re: [syzbot] [bluetooth?] KASAN:
+ slab-use-after-free Read in skb_queue_purge_reason (2)
 Content-Language: en-US
-From: Nikolay Aleksandrov <razor@blackwall.org>
-In-Reply-To: <20250211132832.aiy6ocvqppoqkd65@skbuf>
-Content-Type: text/plain; charset=UTF-8
+From: Arseniy Krasnov <avkrasnov@salutedevices.com>
+To: <hdanton@sina.com>, <linux-bluetooth@vger.kernel.org>,
+	<linux-kernel@vger.kernel.org>, <luiz.dentz@gmail.com>,
+	<luiz.von.dentz@intel.com>, <marcel@holtmann.org>, <netdev@vger.kernel.org>
+References: <67a9e24a.050a0220.3d72c.0050.GAE@google.com>
+ <e8b8686f-8de1-aa25-9707-fcad4ffa5710@salutedevices.com>
+In-Reply-To: <e8b8686f-8de1-aa25-9707-fcad4ffa5710@salutedevices.com>
+Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: p-i-exch-a-m2.sberdevices.ru (172.24.196.120) To
+ p-exch-cas-a-m1.sberdevices.ru (172.24.201.216)
+X-KSMG-Rule-ID: 1
+X-KSMG-Message-Action: clean
+X-KSMG-AntiSpam-Lua-Profiles: 190946 [Feb 11 2025]
+X-KSMG-AntiSpam-Version: 6.1.1.11
+X-KSMG-AntiSpam-Envelope-From: avkrasnov@salutedevices.com
+X-KSMG-AntiSpam-Rate: 0
+X-KSMG-AntiSpam-Status: not_detected
+X-KSMG-AntiSpam-Method: none
+X-KSMG-AntiSpam-Auth: dkim=none
+X-KSMG-AntiSpam-Info: LuaCore: 51 0.3.51 68896fb0083a027476849bf400a331a2d5d94398, {Tracking_uf_ne_domains}, {Tracking_from_domain_doesnt_match_to}, 127.0.0.199:7.1.2;d41d8cd98f00b204e9800998ecf8427e.com:7.1.1;smtp.sberdevices.ru:7.1.1,5.0.1;lore.kernel.org:7.1.1;syzkaller.appspot.com:7.1.1,5.0.1;salutedevices.com:7.1.1;goo.gl:7.1.1,5.0.1, FromAlignment: s
+X-MS-Exchange-Organization-SCL: -1
+X-KSMG-AntiSpam-Interceptor-Info: scan successful
+X-KSMG-AntiPhishing: Clean, bases: 2025/02/11 14:44:00
+X-KSMG-LinksScanning: Clean, bases: 2025/02/11 14:43:00
+X-KSMG-AntiVirus: Kaspersky Secure Mail Gateway, version 2.0.1.6960, bases: 2025/02/11 08:54:00 #27149591
+X-KSMG-AntiVirus-Status: Clean, skipped
 
-On 2/11/25 15:28, Vladimir Oltean wrote:
-> On Sun, Feb 09, 2025 at 12:10:25PM +0100, Eric Woudstra wrote:
->> @@ -1453,7 +1454,10 @@ void br_vlan_fill_forward_path_pvid(struct net_bridge *br,
->>  	if (!br_opt_get(br, BROPT_VLAN_ENABLED))
->>  		return;
->>  
->> -	vg = br_vlan_group(br);
->> +	if (p)
->> +		vg = nbp_vlan_group(p);
->> +	else
->> +		vg = br_vlan_group(br);
->>  
->>  	if (idx >= 0 &&
->>  	    ctx->vlan[idx].proto == br->vlan_proto) {
+May be my previous version was free of this problem ?
+
+https://lore.kernel.org/linux-bluetooth/a1db0c90-1803-e01c-3e23-d18e4343a4eb@salutedevices.com/
+
+Thanks
+
+On 11.02.2025 17:16, Arseniy Krasnov wrote:
+> Hi, I guess problem here is that, if hci_uart_tty_close() will be called between
+> setting HCI_UART_PROTO_READY and skb_queue_head_init(), in that case mrvl_close()
+> will access uninitialized data.
 > 
-> I think the original usage of br_vlan_group() here was incorrect, and so
-> is the new usage of nbp_vlan_group(). They should be br_vlan_group_rcu()
-> and nbp_vlan_group_rcu().
+> hci_uart_set_proto() {
+>         ...
+>         set_bit(HCI_UART_PROTO_READY, &hu->flags);
+>                                                    
+>         err = hci_uart_register_dev(hu);
+>                 mrvl_open()
+>                     skb_queue_head_init();
 > 
-
-Oops, right. Nice catch!
-
+>         if (err) {
+>                 return err;
+>         }
+>         ...
+> }
+> 
+> Thanks
+> 
+> On 10.02.2025 14:26, syzbot wrote:
+>> syzbot has bisected this issue to:
+>>
+>> commit c411c62cc13319533b1861e00cedc4883c3bc1bb
+>> Author: Arseniy Krasnov <avkrasnov@salutedevices.com>
+>> Date:   Thu Jan 30 18:43:26 2025 +0000
+>>
+>>     Bluetooth: hci_uart: fix race during initialization
+>>
+>> bisection log:  https://syzkaller.appspot.com/x/bisect.txt?x=116cebdf980000
+>> start commit:   40b8e93e17bf Add linux-next specific files for 20250204
+>> git tree:       linux-next
+>> final oops:     https://syzkaller.appspot.com/x/report.txt?x=136cebdf980000
+>> console output: https://syzkaller.appspot.com/x/log.txt?x=156cebdf980000
+>> kernel config:  https://syzkaller.appspot.com/x/.config?x=ec880188a87c6aad
+>> dashboard link: https://syzkaller.appspot.com/bug?extid=683f8cb11b94b1824c77
+>> syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=10b7eeb0580000
+>> C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=12f74f64580000
+>>
+>> Reported-by: syzbot+683f8cb11b94b1824c77@syzkaller.appspotmail.com
+>> Fixes: c411c62cc133 ("Bluetooth: hci_uart: fix race during initialization")
+>>
+>> For information about bisection process see: https://goo.gl/tpsmEJ#bisection
 
