@@ -1,109 +1,87 @@
-Return-Path: <netdev+bounces-164971-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-164972-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id D46BCA2FF2D
-	for <lists+netdev@lfdr.de>; Tue, 11 Feb 2025 01:34:30 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id AF7B9A2FF34
+	for <lists+netdev@lfdr.de>; Tue, 11 Feb 2025 01:35:36 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 4AF591886BFC
-	for <lists+netdev@lfdr.de>; Tue, 11 Feb 2025 00:34:36 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 1D93F1888B48
+	for <lists+netdev@lfdr.de>; Tue, 11 Feb 2025 00:35:42 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9F67C1D514A;
-	Tue, 11 Feb 2025 00:32:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DEE307080C;
+	Tue, 11 Feb 2025 00:35:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b="PJQMFmG1"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="uODfralo"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp-fw-6001.amazon.com (smtp-fw-6001.amazon.com [52.95.48.154])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AEDEA1D416B;
-	Tue, 11 Feb 2025 00:32:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=52.95.48.154
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B4E0D22F19;
+	Tue, 11 Feb 2025 00:35:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1739233945; cv=none; b=rlz8iUZge3SZ+aeQ0wfXues3j1DwvbJ1fUe/MPfVErFSINb9UXzMNs3vLDxyL2MmGI2eN9ZSpvL1W9/XYZ8Ucr177Lp8XkI6/SD+plXWtamUPREsM2iw6MRx68osQDTyve/lx6s9+SOvaX96qMsYERATSWDwG0dBVaqD/kgx7vY=
+	t=1739234130; cv=none; b=IOMVPYMA+dgLJyfLvSUFAwi6Ur3ZL3DCUt6lo5e3HxbUtnH0/EGSwXa5OWvlLnnTsC6XA2f0kdEK3WfEq1PpLUvATtDlYTof3DuJ8AxURACjfpb06ouMNRHcNw/KwQWXu2bZnH2WVsCivSAmezgOHPrcUJBF69ddfad0JFBNrj4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1739233945; c=relaxed/simple;
-	bh=8hnEEwumIACI2RGCX/n0ZCe7bepAH5Rf/UlOnNZ2eI0=;
-	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=OIE0e31sh/C+PmVjMh94NyKn9a9FezVqGs8mZq+fa+3fQ5y/K0+6VuzvIFrIxVp9CDaT7lXAHQJlgma+UHzWJ4obY4K+cbU/xOa5Zocm3WwJu3u383NgpcJFkBfXqHMV4mtaQ8bWwTx5OIu+lX/lj8SIJyk1vhA+lSx5HJhIMrs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.co.jp; dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b=PJQMFmG1; arc=none smtp.client-ip=52.95.48.154
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.co.jp
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
-  t=1739233944; x=1770769944;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=oodxLLIagUSjNK4OaEfKhxTLV4oY43xwOMwvm4NsIGg=;
-  b=PJQMFmG1o9acKBlt80iAj4fl5hiGsyINKVAdYnJb7PNXaMQBfCDRy2zI
-   74JrSlBMCVkwJA8p+aH3YpCUqMG5+S85sldw49/ZzdT2EB4gHhuB4PH/h
-   88tAM9OmTIfaz3scVQVe/rkJ+E6K9bZhdb+bJLRQZW5PKRsqBwZRkA3tU
-   w=;
-X-IronPort-AV: E=Sophos;i="6.13,275,1732579200"; 
-   d="scan'208";a="461407162"
-Received: from iad12-co-svc-p1-lb1-vlan2.amazon.com (HELO smtpout.prod.us-west-2.prod.farcaster.email.amazon.dev) ([10.43.8.2])
-  by smtp-border-fw-6001.iad6.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 11 Feb 2025 00:32:20 +0000
-Received: from EX19MTAUWA001.ant.amazon.com [10.0.38.20:20934]
- by smtpin.naws.us-west-2.prod.farcaster.email.amazon.dev [10.0.40.1:2525] with esmtp (Farcaster)
- id c2741c6b-ce1f-40ff-9b5d-df50ce218835; Tue, 11 Feb 2025 00:32:19 +0000 (UTC)
-X-Farcaster-Flow-ID: c2741c6b-ce1f-40ff-9b5d-df50ce218835
-Received: from EX19D004ANA001.ant.amazon.com (10.37.240.138) by
- EX19MTAUWA001.ant.amazon.com (10.250.64.217) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1258.39;
- Tue, 11 Feb 2025 00:32:18 +0000
-Received: from 6c7e67bfbae3.amazon.com (10.119.10.138) by
- EX19D004ANA001.ant.amazon.com (10.37.240.138) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1544.14;
- Tue, 11 Feb 2025 00:32:14 +0000
-From: Kuniyuki Iwashima <kuniyu@amazon.com>
-To: <purvayeshi550@gmail.com>
-CC: <davem@davemloft.net>, <edumazet@google.com>, <horms@kernel.org>,
-	<kuba@kernel.org>, <linux-kernel@vger.kernel.org>, <netdev@vger.kernel.org>,
-	<pabeni@redhat.com>, <skhan@linuxfoundation.org>, Kuniyuki Iwashima
-	<kuniyu@amazon.com>
-Subject: Re: [PATCH net-next v2] af_unix: Fix undefined 'other' error
-Date: Tue, 11 Feb 2025 09:32:03 +0900
-Message-ID: <20250211003203.81463-1-kuniyu@amazon.com>
-X-Mailer: git-send-email 2.39.5 (Apple Git-154)
-In-Reply-To: <20250210075006.9126-1-purvayeshi550@gmail.com>
-References: <20250210075006.9126-1-purvayeshi550@gmail.com>
+	s=arc-20240116; t=1739234130; c=relaxed/simple;
+	bh=RJLOvptniuLFOM2SuVPHG71XSa6FSB90+DGF7eT1cng=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=aFEKNC7J+E1+u7cw+OnqFEs3kiY4yq8g3Bo+0SJdftksp2pCaxmcRLLxmMsUEThVh+OG1/ROlDnfdyAP6/AyysZ51kp63SSfWWKbnV9ViYSD2iF72hsA/T/WGwUYWc4P2YbWzpQfn/LNGAp81WgF8jB5cAZcsJKWWBSxVYAXrS8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=uODfralo; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9F91FC4CED1;
+	Tue, 11 Feb 2025 00:35:29 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1739234130;
+	bh=RJLOvptniuLFOM2SuVPHG71XSa6FSB90+DGF7eT1cng=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=uODfralo8jAlCffLiLEwgPlpFGB059bewe3/CMUqh1MVUJaxc5kywILk0ox9buY2Y
+	 wvJmVhIhYPbAN9Cme4H+zXP1+ckpgJfqboggN1lpyibvJwl9Tt7T9cbCmIiE9MrCyb
+	 9ynjzLlgcBxRv+sFPmq83E56cn8jUFlC+zU13AGqp56Id6GmX3y9V7fqcUiXakfNlK
+	 BVB6/qpHcXoCL3Psp8cDGsM9SwXZ1FfqlJvIn1MTvRrMSXMBBLAI9L2iWfGNF3mzft
+	 uLImlNR0qxUJ6h60x0TyG+fALgIpIaBMDpYQKgVbqj2jSrwv4HBXEWuJGTW4zDcK75
+	 3PK2Lp+GWYUzQ==
+Date: Mon, 10 Feb 2025 16:35:29 -0800
+From: Jakub Kicinski <kuba@kernel.org>
+To: Alexander Lobakin <aleksander.lobakin@intel.com>
+Cc: Eric Dumazet <edumazet@google.com>, Andrew Lunn <andrew+netdev@lunn.ch>,
+ "David S. Miller" <davem@davemloft.net>, Paolo Abeni <pabeni@redhat.com>,
+ Lorenzo Bianconi <lorenzo@kernel.org>, Daniel Xu <dxu@dxuuu.xyz>, Alexei
+ Starovoitov <ast@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>,
+ Andrii Nakryiko <andrii@kernel.org>, John Fastabend
+ <john.fastabend@gmail.com>, Toke =?UTF-8?B?SMO4aWxhbmQtSsO4cmdlbnNlbg==?=
+ <toke@kernel.org>, Jesper Dangaard Brouer <hawk@kernel.org>, Martin KaFai
+ Lau <martin.lau@linux.dev>, <netdev@vger.kernel.org>,
+ <bpf@vger.kernel.org>, <linux-kernel@vger.kernel.org>
+Subject: Re: [PATCH net-next v4 0/8] bpf: cpumap: enable GRO for XDP_PASS
+ frames
+Message-ID: <20250210163529.1ba7360a@kernel.org>
+In-Reply-To: <7003bc18-bbff-4edd-9db5-dd1c17a88cc0@intel.com>
+References: <20250205163609.3208829-1-aleksander.lobakin@intel.com>
+	<79d05c4b-bcfb-4dd3-84d9-b44e64eb4e66@intel.com>
+	<CANn89iLpDW5GK5WJcKezFY17hENaC2EeUW7BkkbJZuzJc5r5bw@mail.gmail.com>
+	<7003bc18-bbff-4edd-9db5-dd1c17a88cc0@intel.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: EX19D041UWA002.ant.amazon.com (10.13.139.121) To
- EX19D004ANA001.ant.amazon.com (10.37.240.138)
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-From: Purva Yeshi <purvayeshi550@gmail.com>
-Date: Mon, 10 Feb 2025 13:20:06 +0530
-> Fix issue detected by smatch tool:
-> An "undefined 'other'" error occur in __releases() annotation.
-> 
-> Fix an undefined 'other' error in unix_wait_for_peer() caused by  
-> __releases(&unix_sk(other)->lock) being placed before 'other' is in  
-> scope. Since AF_UNIX does not use Sparse annotations, remove it to fix  
-> the issue.  
-> 
-> Eliminate the error without affecting functionality.  
+On Mon, 10 Feb 2025 16:31:52 +0100 Alexander Lobakin wrote:
+> This was rejected by Kuba in v2.
+> He didn't like to have napi_id two times within napi_struct (one inside
+> gro_node, one outside).
 
-The 5 lines of the 3 sentences above have trailing double spaces.
-You may want to configure your editor to highlight them.
+Do you mean:
 
-e.g. for emacs
+  the napi_id in gro sticks out..
 
-(setq-default show-trailing-whitespace t)
+https://lore.kernel.org/netdev/20250113130104.5c2c02e0@kernel.org/ ?
 
-
-> 
-> Signed-off-by: Purva Yeshi <purvayeshi550@gmail.com>
-
-Otherwise looks good.
-
-Reviewed-by: Kuniyuki Iwashima <kuniyu@amazon.com>
+That's more of a nudge to try harder than a "no". We explored 
+the alternatives, there's no perfect way to layer this. I think 
+Eric's suggestion is probably as clean as we can get.
 
