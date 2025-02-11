@@ -1,120 +1,147 @@
-Return-Path: <netdev+bounces-165083-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-165084-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id D139DA3057E
-	for <lists+netdev@lfdr.de>; Tue, 11 Feb 2025 09:16:03 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id ADB9AA305B2
+	for <lists+netdev@lfdr.de>; Tue, 11 Feb 2025 09:25:12 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id BE0A9188B438
-	for <lists+netdev@lfdr.de>; Tue, 11 Feb 2025 08:16:04 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A6ABB161E7E
+	for <lists+netdev@lfdr.de>; Tue, 11 Feb 2025 08:25:08 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1D1021EF08A;
-	Tue, 11 Feb 2025 08:15:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 32B361F03CE;
+	Tue, 11 Feb 2025 08:24:54 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=collabora.com header.i=Usama.Anjum@collabora.com header.b="HvnVlaZa"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="cJACzgLn"
 X-Original-To: netdev@vger.kernel.org
-Received: from sender4-pp-f112.zoho.com (sender4-pp-f112.zoho.com [136.143.188.112])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-il1-f173.google.com (mail-il1-f173.google.com [209.85.166.173])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 377A21EE031;
-	Tue, 11 Feb 2025 08:15:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=136.143.188.112
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1739261745; cv=pass; b=cJ5om75DlAaGENb7phIcfEMCaBEKgOqacF7LDznf5Ny+CfeM4vo6oNsO3nWzb/Zfkx81Ie/6YHpP9BOCCxalv7OdEb+gQLjeLAAzsDucOFTd5HwesjFE0ZqVczTNLWrMwUeZVgOgHcHDtP8VdOlFCRPNkxSS3KcfN4J92Fq3ef8=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1739261745; c=relaxed/simple;
-	bh=ml9HCLFnHj3okZfENU5PWNu76H5yibO9VbLtc/Rw0KE=;
-	h=Message-ID:Date:MIME-Version:Cc:From:Subject:To:Content-Type; b=sOwr8ROwmwcWGhqD6wzFIxnhtwd2ZCujXDhjeDHTwoUQEFReJn/qYxXYTcv9bDAruGrPkTWiJNUNW1h8PW9nerVXhsbZe4FRIgF2Jf3anIw3gV3y5ncaOudiEJ12VpZ6feesCPwxR2DSMXXu0qlVao7MbMz7uphPnJuWl99XNgA=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=collabora.com; spf=pass smtp.mailfrom=collabora.com; dkim=pass (1024-bit key) header.d=collabora.com header.i=Usama.Anjum@collabora.com header.b=HvnVlaZa; arc=pass smtp.client-ip=136.143.188.112
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=collabora.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=collabora.com
-ARC-Seal: i=1; a=rsa-sha256; t=1739261723; cv=none; 
-	d=zohomail.com; s=zohoarc; 
-	b=UGPx6GsCZ4qC2x55GioKK9jhZ4XcOAQhBYpk1HPuJcKFfIoQ+CusgVxAZc/n4Ajcr03BfWVFPIBpyEx5OhBzPZbyMsMab/FyMbonI4E/ZiYYnrglITikLTy4/fraTretrYrFQedBKJzJe7LralxjDapL4HPU9mEjor8bb5hOxhE=
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=zohomail.com; s=zohoarc; 
-	t=1739261723; h=Content-Type:Content-Transfer-Encoding:Cc:Cc:Date:Date:From:From:MIME-Version:Message-ID:Subject:Subject:To:To:Message-Id:Reply-To; 
-	bh=Jm2+B3dC9Go2CBCBCYErvWv91+CAUXIZB+j0be0w8Fc=; 
-	b=GHJIVZsZ7anm0JxHe69Z9GlJJBFfIpDJd24M3kZWYYjdowqg9UMcWn03BqYHtHTFMPHlhZo8XiMOt7S47cRcO0TO68yL9DObmLBhm1pZsb1/Pf0DKSkTPVqQNPWYIU2VxD3Pe7TefJd5DCryl+l1PL4sH3SE7PG1sGcVyikoJeI=
-ARC-Authentication-Results: i=1; mx.zohomail.com;
-	dkim=pass  header.i=collabora.com;
-	spf=pass  smtp.mailfrom=Usama.Anjum@collabora.com;
-	dmarc=pass header.from=<Usama.Anjum@collabora.com>
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; t=1739261723;
-	s=zohomail; d=collabora.com; i=Usama.Anjum@collabora.com;
-	h=Message-ID:Date:Date:MIME-Version:Cc:Cc:From:From:Subject:Subject:To:To:Content-Type:Content-Transfer-Encoding:Message-Id:Reply-To;
-	bh=Jm2+B3dC9Go2CBCBCYErvWv91+CAUXIZB+j0be0w8Fc=;
-	b=HvnVlaZaABEpZRMUDfS656mZSHd3yqfW/qACeoH9MdwFui+vy9u3FasRnBzOqame
-	JE1eP+c1fEdG7RFH3o4ztcm5UpTN9QT2adnfp+SRmGMC8qmyxwwol+/5+PBgzCw89Bb
-	lr6rmaS/v+7lAcb2wBG19dn54pNQeGXwa6a+zvFg=
-Received: by mx.zohomail.com with SMTPS id 1739261719547543.4080545437324;
-	Tue, 11 Feb 2025 00:15:19 -0800 (PST)
-Message-ID: <59c036b6-a3d6-403b-8bb0-566a17f72abc@collabora.com>
-Date: Tue, 11 Feb 2025 13:15:55 +0500
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9A4A51F03C1;
+	Tue, 11 Feb 2025 08:24:52 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.173
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1739262294; cv=none; b=hXQ1cs4C1QS1g/yM4LxJ93dfbAmEH1mxeY8tVoCOBQxmD2jqhEDAh3Y6SpgyFG/Ktwopq4hLZNt759G5LrXVGwt59M961+FdrslWuBXDjCC5jpW4tpPLzmwwRbTJy2yiSKwR6+lkyxnF5/eVMbzsBqAwj5ZyFJkaXl4BLbVh4wY=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1739262294; c=relaxed/simple;
+	bh=yM4yTu9AzIeqDLLA+9J5hzBkrcTTw8MubsNz4vj5f10=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=G+eYuADQe31bUdhMromHQWBhIAgjo0VPV/1lHqUvxXV6F4CunIERa2DhgdJKgvSsD6N3BNp22tcz7aeesktyfZt7s5EHE5CUOfHYRBqEDCY1o7867iTb5VWq2rsF5w59aTbLpUt2eCotPVSqQKo+H4iQytfAkawpgSG55n08TnQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=cJACzgLn; arc=none smtp.client-ip=209.85.166.173
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-il1-f173.google.com with SMTP id e9e14a558f8ab-3d04932a36cso47422765ab.1;
+        Tue, 11 Feb 2025 00:24:52 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1739262291; x=1739867091; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=yM4yTu9AzIeqDLLA+9J5hzBkrcTTw8MubsNz4vj5f10=;
+        b=cJACzgLneuLhpP6MO/zdTQgccghBwjQ1+cAxxg9taKucx2inswBMqxUKkr5zxTOhlc
+         1hd6paYOp2loieLBVN9cIloCG6JYzepJZgxkb71e2Y2+vistV8osSo23Pksxv0wYSyeM
+         l8ZfTpsojdxTTz0jCUMj4VTu8mesnE/w1dmhWsR0+A1U/BvZ91H+dcHA/6H9NWr/HUNh
+         LGmCwKM5ZLEHr2jwp5IQib3vwJ/Wbc+xJ+s1enAk7qvnJPvQave2zS44cUwhKr+SVQhR
+         fZvH/ymVznWUzYmmJB5ER1RMiFjbXSUr8p0DIo/JFKxfhdnv6WBxyftmDJuaCsUbicD0
+         Incw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1739262291; x=1739867091;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=yM4yTu9AzIeqDLLA+9J5hzBkrcTTw8MubsNz4vj5f10=;
+        b=iaQGqTGxtwD6aUDGE01TcR4eo1gMIq2vWGY6qEHWamNfxGEGBri/4jgQZzm2T3Yz3L
+         DlIq+Nt6Y5IOd5sSc22Wl7ySjG3Qbe9LUeSYMoMoeVSELM+Va4n9oj9i9+4XB44YBDO4
+         pnnsHk9XEwcPjuwpvpBD7Vw3xRTOm+RLegQhjLIKXgda8esssnKyWxypa8z3ymbsqpNc
+         jyOe/8HszN+nOJNuhCS4WVW2yUjz8a57Bhz1FXYuHO0QWs8YqItkGP5gC31nwPCmT7Na
+         cEGh8PIfnXNA4ywcEgRfyIEA+bFQhrA1mH1f4jjp+0iW2DOOQu8/x9D1f8Z2Ul6k6vpf
+         Lmgg==
+X-Forwarded-Encrypted: i=1; AJvYcCUtMDkK9ywh7vEuXmMxclwjhJsJfNlntjcOJpOJAN+IX78EvH3eOjZIryQP4dFUm2MbJ/Y=@vger.kernel.org, AJvYcCW5sL9X0SX5IjumRDtFUQAcjbLJR9fkUfFMv851nToS/xOPIMH777nlCZ6TKwPxyqoTEJKKxtha@vger.kernel.org
+X-Gm-Message-State: AOJu0YxP1uVs20MbWas4vqzdE6QEw9KyzWxTg81Etl7mOFx8U8Z/jd3r
+	AOSvtvLDRSgvZh29yoPWHL4vMi9SDwujY2c7gh7tVe9YU/q7je5mCZfCx5BwbS3eU38lX3vizi7
+	Gtqzpquy0P0Jk7AvfATpLWodTDKs=
+X-Gm-Gg: ASbGnct/3Tcdf5q6Y20oQWope+PM4md35p7tuAN/pDjugOGPsFG3y4cUdxraIz9WveU
+	5oC2Es5Jpxzk7vMmoXsCxsNXOo6K6jiXR0HZzKBlny9DZXSKgV0OtyeobBNHJSKPCLO2Kr73N
+X-Google-Smtp-Source: AGHT+IEeKgLVteP3YzhUtFi1M+X8sRBHB3OD+iBBf8Fqli+qCKqzWwCBV/CpzXmP7w79eGZTRPjaIDkZ7o3JdFvcSXA=
+X-Received: by 2002:a05:6e02:174f:b0:3cf:ceac:37e1 with SMTP id
+ e9e14a558f8ab-3d13dd4f257mr135523565ab.11.1739262291553; Tue, 11 Feb 2025
+ 00:24:51 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Cc: Usama.Anjum@collabora.com, linux-arm-msm@vger.kernel.org,
- netdev@vger.kernel.org, linux-kernel@vger.kernel.org, mhi@lists.linux.dev,
- kernel@collabora.com
-Content-Language: en-US
-From: Muhammad Usama Anjum <Usama.Anjum@collabora.com>
-Subject: [BUG REPORT] MHI's resume from hibernate is broken
-To: Manivannan Sadhasivam <manivannan.sadhasivam@linaro.org>,
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- Johan Hovold <johan@kernel.org>, Loic Poulain <loic.poulain@linaro.org>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-ZohoMailClient: External
+References: <20250208103220.72294-1-kerneljasonxing@gmail.com>
+ <20250208103220.72294-5-kerneljasonxing@gmail.com> <787db122-d9d3-4ceb-b8c8-36ed9590b49b@linux.dev>
+In-Reply-To: <787db122-d9d3-4ceb-b8c8-36ed9590b49b@linux.dev>
+From: Jason Xing <kerneljasonxing@gmail.com>
+Date: Tue, 11 Feb 2025 16:24:14 +0800
+X-Gm-Features: AWEUYZmSvcBJxaTGsiWKtEth1o6K44A-xORs7uzUlHL-QK103rd6b5k28jctxig
+Message-ID: <CAL+tcoC0G0LB5ChzXMm=BGgjt=eGqf_jk89YyqQjydVWGuCtgg@mail.gmail.com>
+Subject: Re: [PATCH bpf-next v9 04/12] bpf: stop calling some sock_op BPF
+ CALLs in new timestamping callbacks
+To: Martin KaFai Lau <martin.lau@linux.dev>
+Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org, 
+	pabeni@redhat.com, dsahern@kernel.org, willemdebruijn.kernel@gmail.com, 
+	willemb@google.com, ast@kernel.org, daniel@iogearbox.net, andrii@kernel.org, 
+	eddyz87@gmail.com, song@kernel.org, yonghong.song@linux.dev, 
+	john.fastabend@gmail.com, kpsingh@kernel.org, sdf@fomichev.me, 
+	haoluo@google.com, jolsa@kernel.org, horms@kernel.org, bpf@vger.kernel.org, 
+	netdev@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Hi,
+On Tue, Feb 11, 2025 at 2:55=E2=80=AFPM Martin KaFai Lau <martin.lau@linux.=
+dev> wrote:
+>
+> On 2/8/25 2:32 AM, Jason Xing wrote:
+> > Considering the potential invalid access issues, calling
+> > bpf_sock_ops_setsockopt/getsockopt, bpf_sock_ops_cb_flags_set,
+> > and the bpf_sock_ops_load_hdr_opt in the new timestamping
+> > callbacks will return -EOPNOTSUPP error value.
+>
+> The "why" part is mostly missing. Why they are not safe to be used in the=
+ TX
+> timestamping callbacks?
+>
+> >
+> > It also prevents the UDP socket trying to access TCP fields in
+> > the bpf extension for SO_TIMESTAMPING for the same consideration.
+> Let's remove this UDP part to avoid confusion. UDP has very little to do =
+with
+> disabling the helpers here.
+>
+> "BPF_CALL" in the subject is not clear either. "BPF_CALL" can mean many t=
+hings,
+> such as calling BPF helpers, calling BPF kfuncs, or calling its own BPF
+> subprograms, etc. In this case, it is the calling BPF helpers.
+>
+> (Subject)
+> bpf: Disable unsafe helpers in TX timestamping callbacks
+>
+> (Why)
+> New TX timestamping sock_ops callbacks will be added in the subsequent pa=
+tch.
+> Some of the existing BPF helpers will not be safe to be used in the TX
+> timestamping callbacks.
+>
+> The bpf_sock_ops_setsockopt, bpf_sock_ops_getsockopt, and
+> bpf_sock_ops_cb_flags_set require owning the sock lock. TX timestamping
+> callbacks will not own the lock.
+>
+> The bpf_sock_ops_load_hdr_opt needs the skb->data pointing to the TCP hea=
+der.
+> This will not be true in the TX timestamping callbacks.
+>
+> (What and How)
+> At the beginning of these helpers, this patch checks the bpf_sock->op to =
+ensure
+> these helpers are used by the existing sock_ops callbacks only.
 
-I've been digging in the MHI code to find the reason behind broken
-resume from hibernation for MHI. The same resume function is used
-for both resume from suspend and resume from hibernation. The resume
-from suspend works fine because at resume time the state of MHI is 
-MHI_STATE_M3. On the other hand, the state is MHI_STATE_RESET when
-we resume from hibernation.
+Many thanks here! I will use them in the commit message.
 
-It seems resume from MHI_STATE_RESET state isn't correctly supported.
-The channel state is MHI_CH_STATE_ENABLED at this point. We get error
-while switching channel state from MHI_CH_STATE_ENABLE to
-MHI_CH_STATE_RUNNING. Hence, channel state change fails and later mhi
-resume fails as well. 
-
-I've put some debug prints to understand the issue. These may be
-helpful:
-
-[  669.032683] mhi_update_channel_state: switch to MHI_CH_STATE_TYPE_START[2] channel state not possible cuzof channel current state[1]. mhi state: [0] Return -EINVAL
-[  669.032685] mhi_prepare_channel: mhi_update_channel_state to MHI_CH_STATE_TYPE_START[2] returned -22
-[  669.032693] qcom_mhi_qrtr mhi0_IPCR: failed to prepare for autoqueue transfer -22
-
-This same error has been reported on some fix patches [1] [2]. Are there
-any patches which I should test? 
-
-Is officially hibernation use case supported at all?
-
-In my view, this path may not have gotten tested and can be fixed easily
-as we need to perform, more or less the same steps which were performed
-at init time. But I've not found much documentation around MHI protocol
-and its state machine, how is mhi state related to mhi channels support.
-
-PS: Just some information, my device has QCNFA765 endpoint and ath11k_pci
-is being used. It doesn't seem like the problem is in the driver. The
-problem is on the host side which isn't able to communicate correctly with
-the endpoint. The resume from hibernation would be broken on all wifi
-chips using mhi.
-
-[1] https://lore.kernel.org/all/Z5EKrbXMTK9WBsbq@hovoldconsulting.com 
-[2] https://lore.kernel.org/all/Z5ENq9EMPlNvxNOF@hovoldconsulting.com 
--- 
-BR,
-Muhammad Usama Anjum
-
+Thanks,
+Jason
 
