@@ -1,127 +1,146 @@
-Return-Path: <netdev+bounces-165226-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-165227-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id E838AA31190
-	for <lists+netdev@lfdr.de>; Tue, 11 Feb 2025 17:33:18 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5E897A311AB
+	for <lists+netdev@lfdr.de>; Tue, 11 Feb 2025 17:35:52 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A29293A41AD
-	for <lists+netdev@lfdr.de>; Tue, 11 Feb 2025 16:33:09 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 824937A2FFE
+	for <lists+netdev@lfdr.de>; Tue, 11 Feb 2025 16:34:55 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E95C2255E25;
-	Tue, 11 Feb 2025 16:32:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5B95E254B16;
+	Tue, 11 Feb 2025 16:35:45 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="QXQ8MtrC"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="J4nJC9Q7"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f176.google.com (mail-pl1-f176.google.com [209.85.214.176])
+Received: from mail-ej1-f49.google.com (mail-ej1-f49.google.com [209.85.218.49])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 68404255E32
-	for <netdev@vger.kernel.org>; Tue, 11 Feb 2025 16:32:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.176
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8AE6F25291B;
+	Tue, 11 Feb 2025 16:35:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.49
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1739291579; cv=none; b=esT9Oep9JW7n+WG7kbklKpcBsOacxorbSIV2aGMDtxVAMpNiEQWUrtuoKb4LimTazZ1woVTWrsDF0NQqf5QWaIAjCqz4NL1xSvPPDvs8IpWzGYL/7bQhLkl1HFYvoQN6GSWelEOkqGnrCbA5IOizKvS6QuIj7AOeIh6rdjbCRM0=
+	t=1739291745; cv=none; b=cxK3lbHjZ0YjQvppftbSASS2apXm+RMZdJiGbXPOdgCUrM1VMqCoBiFJtxnjFMFRQV6nv7t6UjUCOzLtskQEep9nWk1lTJyO2EgRtOU84xjplSbHxnJdmorla1tU8BpRxkXwYcloaXenqKQy/zLGvY2atdmwtaVb6+WWnMhy6hU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1739291579; c=relaxed/simple;
-	bh=e85HWHgoBQOm4j1abf5gLl/lX/2Ykg2xZnhWLvM8Vdw=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=OsOkf1Z2wjLa2ULkrxqm5j8QJVprr1F95fuSszuqB8cynYzDxKCxUUURL8eamgHKI+2zCBOBFUyViZFSve8rERRcGidHyZzT8j4m13Q7220lmdVDPMCv3TCQxw8jU/R+wQzHUIst/0F8ZNM6mdgrIp2t2CIVe8rTVZTIQjIh9KM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=QXQ8MtrC; arc=none smtp.client-ip=209.85.214.176
+	s=arc-20240116; t=1739291745; c=relaxed/simple;
+	bh=b0ktKhICDViwNI9nds4vgA/sl9rP+Pr4YC+CAbIiiOw=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=h2wJ3/CrN5WlggQ4r2UhSOJQbWTplVtfqOwfvmx5NSzE3YUpBX10AkKhRb5gAP0NufqedgWjR9moXcykSnfvbFh0isELqV2u0nbQcbaVMtAd1V1fO/kQmSqOinVv/dLkeOmZyAeT7upN1ta7Un/9/8KgL3pHsq9w0Wnq0VIljMA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=J4nJC9Q7; arc=none smtp.client-ip=209.85.218.49
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pl1-f176.google.com with SMTP id d9443c01a7336-21f6a47d617so57557935ad.2
-        for <netdev@vger.kernel.org>; Tue, 11 Feb 2025 08:32:58 -0800 (PST)
+Received: by mail-ej1-f49.google.com with SMTP id a640c23a62f3a-ab7483b9bf7so848874966b.3;
+        Tue, 11 Feb 2025 08:35:42 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1739291578; x=1739896378; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=A5/z+2AkX14OVBfSBzvANjsGUw8qqOk+bTDpMOl03dA=;
-        b=QXQ8MtrCzGWB2wV1+gPeUG6iK7J9oLE78yzWX3/n5Aao5y8PrmdSZqpZJVzpY8+wu9
-         ZvFZJJu75BNlNggotwJcIVAx+zfFr/lF5fO4DIRzvRVhucqtqCX5k+C6U98qhkhngSTp
-         m5VgkisNti/W0SqU3f1y8TlhmOAiH/ML7U0perQdJb9DpDEEj1yf1Kt2mRjT+ohrKAUM
-         o/zYI43eA9XCABv8jZsE68WXrvo9OKD3fJm4AF5L9tBrBWXj6AeanYIAxRAa1F07UEEh
-         b25nTaQhLRqNdcnvzlsi+vpJdqBNa1K2DkhQCaeJfG/J19js8jrc2gkIjylyBB3AojbH
-         8UhQ==
+        d=gmail.com; s=20230601; t=1739291741; x=1739896541; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:content-language:from
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=mIIV8i2tvb8tBK+tEU2BRevQmqyOqUAI4Z6TbcBV6q0=;
+        b=J4nJC9Q74YM7YHSNJVA0vjCiRaP5bVk1lZj1iD4Zn2E/AynWLQhHhOFWSBdeUCpG8s
+         t0jFioEeaKmhDXAumqQ8v/rxKK8CLbwBK/f7xnJSYUMV7CSo0rmqHpMD/jzmjIUWMgqX
+         4U4vBAGFtLwJqDrRUHGLWqgXb2TrKwTq9iRY0UkTYxUVk34MA3qxITZVaoSN3U7ZpiVS
+         unA6055JkRfa7WrfsGN2uR9Vz7l0raD+92QIGRzItewC2YnF5dCdWkjBHXaqG9jSyJUN
+         Nmo6Z/kDTznAe4gnn5sTjBiR/HU1g94vq39ac2HE/wWeMspkVUEu11N1irmV0GjM4MQP
+         RrVw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1739291578; x=1739896378;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=A5/z+2AkX14OVBfSBzvANjsGUw8qqOk+bTDpMOl03dA=;
-        b=jNIRJRogom2bDjT7uk/ESuf6NO4reABW+bq59Kht63hK8Pkmucg/C0jbqjqcevskEq
-         q5V5XTJ/IwoDx7nd9Aer6+iqML8HDtAC805Pg9qZaAyq3EFsIBH/efl6GpjYYPmOkoZc
-         e4ppnZnSK1Hiy62j3hnZSalDB+LkXL1pMbYoJDQLaMAvscU09upEC7hJBnkb96Q9D+jH
-         BBe2BlOEv9Vy/ZBREEYGG+AUjKBnObVEyj0JuM5kVUshCYVBZw+djkP6vfEoEeyWFSY6
-         pbnB7iZ/XS9KGf6pHSYQBN3IRck1gYS6k+zJWPXyhErRlZkW6Ue+00Qwq47xlpswl1p2
-         NOAg==
-X-Forwarded-Encrypted: i=1; AJvYcCXLTGJu7xu7faAU4BC5Ynlfb0Nyp9GciAxe6OU0Fwib3AikmZMSROx2vm1PzYBkLNBIf6J+72Q=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxOgNKdSHdS8fcy4/V0scJiDjsSAlwMEPnj/swBVi5JJ7AGHSSV
-	OlAi6ohs3orL0EU1sHLokqafULbniCO37I0SI3hQh5F3jbwE38k=
-X-Gm-Gg: ASbGncurKKvE9QovnX6cJb4Xi5uJbACp0VjPYKIAHFbmxJBRUFi1eXlsi3G2MsX9TST
-	Z6Zr7/qwmVbZtA50hVsTeDYZQob4SaD6Df1MNoSJHsVtDaMY9g1+IiI7C3ln7vRpJoX5K16SXpX
-	GSadSBzFf53hOCB3fHj/lCXgYR5S4Th+9zB0TnnBbEejICW5VzkhUJeou1lSmcdr2408RKl7YoF
-	A/Q5hu/fTGbyuedbY3m8KvNQ1JrMyf1CYUvaGKLKgPK9dWO1bzwwttjhF/MtrIU7vMIYQFLTrGt
-	0CEorcpfnjvzIlY=
-X-Google-Smtp-Source: AGHT+IFat0G7HhNeYeKUsWDr3KgwrFNW75mw6kVWT17FjiObx98gq2CIoJqz/DfNT9Aw37wUcqQYYw==
-X-Received: by 2002:a05:6a21:b8b:b0:1d9:3957:8a14 with SMTP id adf61e73a8af0-1ee03a21cfemr31578020637.1.1739291576165;
-        Tue, 11 Feb 2025 08:32:56 -0800 (PST)
-Received: from localhost ([2601:646:9e00:f56e:123b:cea3:439a:b3e3])
-        by smtp.gmail.com with UTF8SMTPSA id d2e1a72fcca58-73048a9d7aesm9591487b3a.33.2025.02.11.08.32.55
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 11 Feb 2025 08:32:55 -0800 (PST)
-Date: Tue, 11 Feb 2025 08:32:54 -0800
-From: Stanislav Fomichev <stfomichev@gmail.com>
-To: kernel test robot <lkp@intel.com>
-Cc: Stanislav Fomichev <sdf@fomichev.me>, netdev@vger.kernel.org,
-	oe-kbuild-all@lists.linux.dev, davem@davemloft.net,
-	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
-	Saeed Mahameed <saeed@kernel.org>
-Subject: Re: [PATCH net-next 04/11] net: hold netdev instance lock during
- rtnetlink operations
-Message-ID: <Z6t7tlSr8W9SznXO@mini-arch>
-References: <20250210192043.439074-5-sdf@fomichev.me>
- <202502112254.DdkYlmMx-lkp@intel.com>
+        d=1e100.net; s=20230601; t=1739291741; x=1739896541;
+        h=content-transfer-encoding:in-reply-to:content-language:from
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=mIIV8i2tvb8tBK+tEU2BRevQmqyOqUAI4Z6TbcBV6q0=;
+        b=Vxw9vCDeVuXApUJznbrVsOFnDrWU+/A1VbaemjNp4v8RcfBIogd+yKxjzdvvm1+A62
+         lc+vzak/HKnNP4HJScoSC1Eg94GI02GG3l+NCnKmxH1dQYr5/lLTmOQf1cPzpEJpMdvV
+         e5Dh0PptEJcjmM9NlnE++oh/wytEcFh8bFGfD5OrI/aFYBmPnf63dpaf2DqlkTmybYDi
+         8uyzmvSHN0o9Br2Djo3w9josDrnBdEBrJDYpEqvW8zWl1FL4GW1sLpdaILw7urwuUGm5
+         hTpT14slgYsetGNkwHFbfI+1Jbyhxs4WuNjzXtrNYkQNbXmBij6MbTZtS8rwDIz7DGNj
+         LIUQ==
+X-Forwarded-Encrypted: i=1; AJvYcCUZswbCplyCQCpEX34H93idPbhfXcd8QSGGV+orKkXA8umf61kydkYBo9h8TGvVpUifVyeV6cUj@vger.kernel.org, AJvYcCV1z5OjfIYaCjk5+9g9ZZjlYh91GeT5hnZa/4s0KGdeiuKCJlYDUGMPNRxdS+AEVPToLuQZhB02hVOI9v0=@vger.kernel.org, AJvYcCXdj5IIt6N2j/NAZYzl9KVgyTUw2txHqR32ASAeUKf2x8zzwRuX6AOKy4ja38O1LoV5C+GIaOlqhxFxWBiPx65l@vger.kernel.org
+X-Gm-Message-State: AOJu0YyHkoLsyXElnhWEpBcbZMiP2Cnd9YkDt8gmZF+FQ4BsGTl1TrP4
+	VhHzf5W+C3e9sWyzF2aoxJQflOzTJPPQbHzxMpNQ0hUFT5RkFPQv
+X-Gm-Gg: ASbGncuWSWZkDJqydqCSUBRYbb/pRGBlSFky/xyUBruvMxh0R1dP5fY5gL7TNszG+O8
+	7kFFyJ6Ezx/f6FvcwzgvDAFxWs3K2hNPjpVp2fdM9aYZtJAWveeIR/yvMtyqPkeW/ttbKGnnDGm
+	kBITqKyazITinrqUIqvttPy6icz/7auXZWjOLUM5uN3EzClY75XKnynHxNYkQM76Y0bvHfC97+g
+	xQFAPEYAVbH2puA/SdO6IWr447vGVXmQtWsSlKj6eUtUrj+/souH3e5FpSaQWq3gFVtF151p1CL
+	wgDLcvuHY36yUnlSaJHBLb5g95g/5vT5qlUBiycxdxQydjnsq2wgnq2WuQDS96SCvQDeorMTlxt
+	uarPZpD0Kr0ZrV/71dg1BFV5PnH2FNw5MMGLNLIH/IbcoTnzIR+Dfd5/aeEStzmvDRA==
+X-Google-Smtp-Source: AGHT+IEaE5wrrlIY6nl8fC2Lf84LvPSm2KRFTGEbR5fKUB08K5dstyn+LuQpM8Wzz6vHlCpVh97tIA==
+X-Received: by 2002:a17:907:72c5:b0:ab7:c284:7245 with SMTP id a640c23a62f3a-ab7c284dcb7mr766174866b.18.1739291740484;
+        Tue, 11 Feb 2025 08:35:40 -0800 (PST)
+Received: from ?IPV6:2001:1c00:20d:1300:1b1c:4449:176a:89ea? (2001-1c00-020d-1300-1b1c-4449-176a-89ea.cable.dynamic.v6.ziggo.nl. [2001:1c00:20d:1300:1b1c:4449:176a:89ea])
+        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-ab7bf9ae406sm445655466b.82.2025.02.11.08.35.39
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 11 Feb 2025 08:35:40 -0800 (PST)
+Message-ID: <1aa60578-ba4c-458b-b020-cff59b119bdc@gmail.com>
+Date: Tue, 11 Feb 2025 17:35:38 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <202502112254.DdkYlmMx-lkp@intel.com>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v6 net-next 05/14] bridge: Add filling forward path from
+ port to port
+To: Nikolay Aleksandrov <razor@blackwall.org>,
+ Vladimir Oltean <olteanv@gmail.com>
+Cc: "David S. Miller" <davem@davemloft.net>,
+ Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+ Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>,
+ Andrew Lunn <andrew+netdev@lunn.ch>, Pablo Neira Ayuso
+ <pablo@netfilter.org>, Jozsef Kadlecsik <kadlec@netfilter.org>,
+ Jiri Pirko <jiri@resnulli.us>, Ivan Vecera <ivecera@redhat.com>,
+ Roopa Prabhu <roopa@nvidia.com>, Matthias Brugger <matthias.bgg@gmail.com>,
+ AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>,
+ Kuniyuki Iwashima <kuniyu@amazon.com>,
+ Sebastian Andrzej Siewior <bigeasy@linutronix.de>,
+ Lorenzo Bianconi <lorenzo@kernel.org>, Joe Damato <jdamato@fastly.com>,
+ Alexander Lobakin <aleksander.lobakin@intel.com>,
+ Frank Wunderlich <frank-w@public-files.de>,
+ Daniel Golle <daniel@makrotopia.org>, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org, netfilter-devel@vger.kernel.org,
+ coreteam@netfilter.org, bridge@lists.linux.dev,
+ linux-arm-kernel@lists.infradead.org, linux-mediatek@lists.infradead.org
+References: <20250209111034.241571-1-ericwouds@gmail.com>
+ <20250209111034.241571-6-ericwouds@gmail.com>
+ <20250211132832.aiy6ocvqppoqkd65@skbuf>
+ <91d709aa-2414-4fb4-b3e1-94e0e330d33c@blackwall.org>
+From: Eric Woudstra <ericwouds@gmail.com>
+Content-Language: en-US
+In-Reply-To: <91d709aa-2414-4fb4-b3e1-94e0e330d33c@blackwall.org>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-On 02/11, kernel test robot wrote:
-> Hi Stanislav,
-> 
-> kernel test robot noticed the following build warnings:
-> 
-> [auto build test WARNING on net-next/main]
-> 
-> url:    https://github.com/intel-lab-lkp/linux/commits/Stanislav-Fomichev/net-hold-netdev-instance-lock-during-ndo_open-ndo_stop/20250211-032336
-> base:   net-next/main
-> patch link:    https://lore.kernel.org/r/20250210192043.439074-5-sdf%40fomichev.me
-> patch subject: [PATCH net-next 04/11] net: hold netdev instance lock during rtnetlink operations
-> config: arc-randconfig-001-20250211 (https://download.01.org/0day-ci/archive/20250211/202502112254.DdkYlmMx-lkp@intel.com/config)
-> compiler: arceb-elf-gcc (GCC) 13.2.0
-> reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20250211/202502112254.DdkYlmMx-lkp@intel.com/reproduce)
-> 
-> If you fix the issue in a separate patch/commit (i.e. not just a new version of
-> the same patch/commit), kindly add following tags
-> | Reported-by: kernel test robot <lkp@intel.com>
-> | Closes: https://lore.kernel.org/oe-kbuild-all/202502112254.DdkYlmMx-lkp@intel.com/
-> 
-> All warnings (new ones prefixed by >>):
-> 
->    net/core/dev.c: In function 'dev_set_mtu':
->    net/core/dev.c:9320:15: error: implicit declaration of function 'netdev_set_mtu_ext_locked'; did you mean 'netdev_ops_assert_locked'? [-Werror=implicit-function-declaration]
->     9320 |         err = netdev_set_mtu_ext_locked(dev, new_mtu, &extack);
->          |               ^~~~~~~~~~~~~~~~~~~~~~~~~
->          |               netdev_ops_assert_locked
->    net/core/dev.c: At top level:
 
-Looks like my rebase error, will fix it in v2. Should hopefully not
-affect the review overall..
+
+On 2/11/25 5:00 PM, Nikolay Aleksandrov wrote:
+> On 2/11/25 15:28, Vladimir Oltean wrote:
+>> On Sun, Feb 09, 2025 at 12:10:25PM +0100, Eric Woudstra wrote:
+>>> @@ -1453,7 +1454,10 @@ void br_vlan_fill_forward_path_pvid(struct net_bridge *br,
+>>>  	if (!br_opt_get(br, BROPT_VLAN_ENABLED))
+>>>  		return;
+>>>  
+>>> -	vg = br_vlan_group(br);
+>>> +	if (p)
+>>> +		vg = nbp_vlan_group(p);
+>>> +	else
+>>> +		vg = br_vlan_group(br);
+>>>  
+>>>  	if (idx >= 0 &&
+>>>  	    ctx->vlan[idx].proto == br->vlan_proto) {
+>>
+>> I think the original usage of br_vlan_group() here was incorrect, and so
+>> is the new usage of nbp_vlan_group(). They should be br_vlan_group_rcu()
+>> and nbp_vlan_group_rcu().
+>>
+> 
+> Oops, right. Nice catch!
+> 
+
+Hi Nikolay,
+
+I gather that I can include your Acked-by also in the corrected patch.
+
 
