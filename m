@@ -1,89 +1,109 @@
-Return-Path: <netdev+bounces-164970-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-164971-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8239FA2FF13
-	for <lists+netdev@lfdr.de>; Tue, 11 Feb 2025 01:27:39 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id D46BCA2FF2D
+	for <lists+netdev@lfdr.de>; Tue, 11 Feb 2025 01:34:30 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 490F23A624B
-	for <lists+netdev@lfdr.de>; Tue, 11 Feb 2025 00:27:30 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 4AF591886BFC
+	for <lists+netdev@lfdr.de>; Tue, 11 Feb 2025 00:34:36 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5EBAE7080C;
-	Tue, 11 Feb 2025 00:27:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9F67C1D514A;
+	Tue, 11 Feb 2025 00:32:25 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="G22b7Vr9"
+	dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b="PJQMFmG1"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from smtp-fw-6001.amazon.com (smtp-fw-6001.amazon.com [52.95.48.154])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 352A13EA98;
-	Tue, 11 Feb 2025 00:27:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AEDEA1D416B;
+	Tue, 11 Feb 2025 00:32:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=52.95.48.154
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1739233647; cv=none; b=gM0megTls8rOZQ/ifGG78xr27bkWvPJDvMh7BrKEAGsiNiOVma19HPLrsjX1yF2DKI9JvBtP1e8K2A6Wt33YoyqMNlrkMddPosi+LmZ6jehcvDOuRGxsDf6s3GZhuHKoaBiVi34fTbhVT2WiEiRs/z+TjWHak/GPKjE1JK8Ug5E=
+	t=1739233945; cv=none; b=rlz8iUZge3SZ+aeQ0wfXues3j1DwvbJ1fUe/MPfVErFSINb9UXzMNs3vLDxyL2MmGI2eN9ZSpvL1W9/XYZ8Ucr177Lp8XkI6/SD+plXWtamUPREsM2iw6MRx68osQDTyve/lx6s9+SOvaX96qMsYERATSWDwG0dBVaqD/kgx7vY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1739233647; c=relaxed/simple;
-	bh=WaSiRtR9tVkO5k1OdaRvVKphqY1LusolyGVDDUSoTvg=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=ezG9RvIUIc1Mc4wGMMK6zG/0O+Ctx4UVMNkIphOAQaETlfzJzui1Av8OThsWLY/EbuotkIBoLf9NV5FJ33IdwrJRc4/LBv1eMAeCWNshrWFcqJtMpE0jSyhiSfIVE0zB9Ae81L8Iu/7hHaUqrJ+MIyw9dzPk9tKlAKxeR1MDeQw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=G22b7Vr9; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 399ADC4CED1;
-	Tue, 11 Feb 2025 00:27:26 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1739233646;
-	bh=WaSiRtR9tVkO5k1OdaRvVKphqY1LusolyGVDDUSoTvg=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=G22b7Vr938vw+ByXWDcb8DxXVdU6bEsIoiWNlRQmApIxn3v8HD/th4YelaSXTh/PH
-	 0llQ38MfAcvluRxxw21B2EDOJ7JH4nEyxwRYMlDMk3iwgEA3sQASkFf7VCtxoZO1lI
-	 u1ixE1RpaiUV5J0RrVpf25EhOxHEb/T/RHT9q+o1bILvmnmKAfPPvGR2RdFRejpIAp
-	 Wqlo/WNXTho4dliIbrWtmyp0kViLAhha/HhQjv4lmYQWjzPXxEDUxm2239UAlazVfo
-	 ztPih7Js0+SlJoD4e8iNTZpTZqpRdNeutvQSThmizeW0xUPvYmQzJz37rzsQvjXsby
-	 yF95hP9SjV3Yw==
-Date: Mon, 10 Feb 2025 16:27:25 -0800
-From: Jakub Kicinski <kuba@kernel.org>
-To: Gal Pressman <gal@nvidia.com>
-Cc: "David S. Miller" <davem@davemloft.net>, netdev@vger.kernel.org, Eric
- Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, Simon
- Horman <horms@kernel.org>, Jonathan Corbet <corbet@lwn.net>, Tony Nguyen
- <anthony.l.nguyen@intel.com>, Przemek Kitszel
- <przemyslaw.kitszel@intel.com>, Andrew Lunn <andrew+netdev@lunn.ch>, Tariq
- Toukan <tariqt@nvidia.com>, Edward Cree <ecree.xilinx@gmail.com>, Ahmed
- Zaki <ahmed.zaki@intel.com>, linux-doc@vger.kernel.org
-Subject: Re: [PATCH net-next v2 0/2] Symmetric OR-XOR RSS hash
-Message-ID: <20250210162725.4bd38438@kernel.org>
-In-Reply-To: <191d5c1c-7a86-4309-9e74-0bc275c01e45@nvidia.com>
-References: <20250205135341.542720-1-gal@nvidia.com>
-	<20250206173225.294954e2@kernel.org>
-	<191d5c1c-7a86-4309-9e74-0bc275c01e45@nvidia.com>
+	s=arc-20240116; t=1739233945; c=relaxed/simple;
+	bh=8hnEEwumIACI2RGCX/n0ZCe7bepAH5Rf/UlOnNZ2eI0=;
+	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=OIE0e31sh/C+PmVjMh94NyKn9a9FezVqGs8mZq+fa+3fQ5y/K0+6VuzvIFrIxVp9CDaT7lXAHQJlgma+UHzWJ4obY4K+cbU/xOa5Zocm3WwJu3u383NgpcJFkBfXqHMV4mtaQ8bWwTx5OIu+lX/lj8SIJyk1vhA+lSx5HJhIMrs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.co.jp; dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b=PJQMFmG1; arc=none smtp.client-ip=52.95.48.154
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.co.jp
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
+  t=1739233944; x=1770769944;
+  h=from:to:cc:subject:date:message-id:in-reply-to:
+   references:mime-version:content-transfer-encoding;
+  bh=oodxLLIagUSjNK4OaEfKhxTLV4oY43xwOMwvm4NsIGg=;
+  b=PJQMFmG1o9acKBlt80iAj4fl5hiGsyINKVAdYnJb7PNXaMQBfCDRy2zI
+   74JrSlBMCVkwJA8p+aH3YpCUqMG5+S85sldw49/ZzdT2EB4gHhuB4PH/h
+   88tAM9OmTIfaz3scVQVe/rkJ+E6K9bZhdb+bJLRQZW5PKRsqBwZRkA3tU
+   w=;
+X-IronPort-AV: E=Sophos;i="6.13,275,1732579200"; 
+   d="scan'208";a="461407162"
+Received: from iad12-co-svc-p1-lb1-vlan2.amazon.com (HELO smtpout.prod.us-west-2.prod.farcaster.email.amazon.dev) ([10.43.8.2])
+  by smtp-border-fw-6001.iad6.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 11 Feb 2025 00:32:20 +0000
+Received: from EX19MTAUWA001.ant.amazon.com [10.0.38.20:20934]
+ by smtpin.naws.us-west-2.prod.farcaster.email.amazon.dev [10.0.40.1:2525] with esmtp (Farcaster)
+ id c2741c6b-ce1f-40ff-9b5d-df50ce218835; Tue, 11 Feb 2025 00:32:19 +0000 (UTC)
+X-Farcaster-Flow-ID: c2741c6b-ce1f-40ff-9b5d-df50ce218835
+Received: from EX19D004ANA001.ant.amazon.com (10.37.240.138) by
+ EX19MTAUWA001.ant.amazon.com (10.250.64.217) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1258.39;
+ Tue, 11 Feb 2025 00:32:18 +0000
+Received: from 6c7e67bfbae3.amazon.com (10.119.10.138) by
+ EX19D004ANA001.ant.amazon.com (10.37.240.138) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1544.14;
+ Tue, 11 Feb 2025 00:32:14 +0000
+From: Kuniyuki Iwashima <kuniyu@amazon.com>
+To: <purvayeshi550@gmail.com>
+CC: <davem@davemloft.net>, <edumazet@google.com>, <horms@kernel.org>,
+	<kuba@kernel.org>, <linux-kernel@vger.kernel.org>, <netdev@vger.kernel.org>,
+	<pabeni@redhat.com>, <skhan@linuxfoundation.org>, Kuniyuki Iwashima
+	<kuniyu@amazon.com>
+Subject: Re: [PATCH net-next v2] af_unix: Fix undefined 'other' error
+Date: Tue, 11 Feb 2025 09:32:03 +0900
+Message-ID: <20250211003203.81463-1-kuniyu@amazon.com>
+X-Mailer: git-send-email 2.39.5 (Apple Git-154)
+In-Reply-To: <20250210075006.9126-1-purvayeshi550@gmail.com>
+References: <20250210075006.9126-1-purvayeshi550@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-ClientProxiedBy: EX19D041UWA002.ant.amazon.com (10.13.139.121) To
+ EX19D004ANA001.ant.amazon.com (10.37.240.138)
 
-On Sun, 9 Feb 2025 09:59:22 +0200 Gal Pressman wrote:
-> I don't understand the rationale, the new input_xfrm field didn't
-> deserve a selftest, why does a new value to the field does?
+From: Purva Yeshi <purvayeshi550@gmail.com>
+Date: Mon, 10 Feb 2025 13:20:06 +0530
+> Fix issue detected by smatch tool:
+> An "undefined 'other'" error occur in __releases() annotation.
+> 
+> Fix an undefined 'other' error in unix_wait_for_peer() caused by  
+> __releases(&unix_sk(other)->lock) being placed before 'other' is in  
+> scope. Since AF_UNIX does not use Sparse annotations, remove it to fix  
+> the issue.  
+> 
+> Eliminate the error without affecting functionality.  
 
-Ahmed and Sudheer added ETHTOOL_MSG_RSS_GET as part of their work.
-Everyone pays off a little bit of technical debt to get their
-feature in.
+The 5 lines of the 3 sentences above have trailing double spaces.
+You may want to configure your editor to highlight them.
 
-I don't appreciate your reaction. Please stop acting as if nVidia was 
-a victim of some grand conspiracy within netdev.
+e.g. for emacs
 
-> Testing this would require new userspace ethtool (which has not been
-> submitted yet), I don't think it's wise to implement a test before the
-> user interface/output is merged.
+(setq-default show-trailing-whitespace t)
 
-No it doesn't. You can call netlink directly from Python or C.
 
-> I assume you want an additional case in rss_ctx.py?
+> 
+> Signed-off-by: Purva Yeshi <purvayeshi550@gmail.com>
 
-No, separate test.
+Otherwise looks good.
+
+Reviewed-by: Kuniyuki Iwashima <kuniyu@amazon.com>
 
