@@ -1,121 +1,147 @@
-Return-Path: <netdev+bounces-164962-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-164963-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 923F1A2FE99
-	for <lists+netdev@lfdr.de>; Tue, 11 Feb 2025 00:44:10 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id D2023A2FEAF
+	for <lists+netdev@lfdr.de>; Tue, 11 Feb 2025 01:01:23 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 0A8FC1887035
-	for <lists+netdev@lfdr.de>; Mon, 10 Feb 2025 23:44:16 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 6F4A116678E
+	for <lists+netdev@lfdr.de>; Tue, 11 Feb 2025 00:01:22 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6B56E25E470;
-	Mon, 10 Feb 2025 23:44:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 421311D54EE;
+	Tue, 11 Feb 2025 00:01:08 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="2O5WYhNt"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="K65ICpft"
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-il1-f169.google.com (mail-il1-f169.google.com [209.85.166.169])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 74DB1194141
-	for <netdev@vger.kernel.org>; Mon, 10 Feb 2025 23:44:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 95F631BFE00;
+	Tue, 11 Feb 2025 00:01:06 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.169
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1739231046; cv=none; b=Yfd4WYeYLFYsp7sRnFSPQThq5FZj0iTlHUR8EiOAEXPxbrspr/htQr6t9cIELj1K33P11iPCNpsnTYbqw9WYcrOXZaoaUWj7/TInWiiiaSV3r3nBysOeZYtl5DHa34og0mIz2fr5QuKVAeZe07pseSQ3b7iAmfPRbZC4fCpT080=
+	t=1739232068; cv=none; b=iI9qXfjmGOK4rw1yZ8dgGkWl1dJ2WhMYlrUJopXwdod5L/T6QwWUuvXiYMQX8pbXKCFFC3+oyHetcFp13ebYre887LNiXn+nSQ2+t7o2Hxm/AIv3jrmzkXyD7/6mm7aNwSsCitvNgV5SSvXe5DSKNtt+MWOoj6eXvJM/xdy+mu4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1739231046; c=relaxed/simple;
-	bh=4wdt4i5RWTvirgj9C4mIYtEvg7SkqV/7aaKwMYpbbco=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=ZfWhTCFkgqRZoJOPKJd89nJsV4Czk9dMSHnuw6tx/BgDb03QC7m3hadO8+gNi4wp7Bv+CnvhYcfaaK4ipiMFOqpW119B8yt9CHdpilc/cnhNdjnFse+tXyvUOkCq8+/rB2/Mk4/MpA/MUYKie4TGbl1QvB8DtC+4bdtOktYurJ4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=2O5WYhNt; arc=none smtp.client-ip=156.67.10.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=TQoIKTC4F29j3zhkzzTdWiTiq+DveQGlu8tEPYrS5Z0=; b=2O5WYhNtC5VJuZReoo4JOnl8Mj
-	eqLQr14u4Y/zT13qc3+8jKXzL9Axe3b/eXidQPRh0xxKAMvk2zNs/rHGjJkOJAedK7Yx8JAHS5/zK
-	rJRfCSFjm8ObRi1DHI6o913GPzvZICteBfSlL2UF+6RzKdewatNTwJE7cq8CMPDgoeYI=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1thdR5-00CsBE-KW; Tue, 11 Feb 2025 00:43:31 +0100
-Date: Tue, 11 Feb 2025 00:43:31 +0100
-From: Andrew Lunn <andrew@lunn.ch>
-To: Daniel Golle <daniel@makrotopia.org>
-Cc: Bo-Cun Chen <bc-bocun.chen@mediatek.com>,
-	Chad Monroe <chad.monroe@adtran.com>,
-	John Crispin <john@phrozen.org>, maxime.chevallier@bootlin.com,
-	"Russell King (Oracle)" <linux@armlinux.org.uk>,
-	Vladimir Oltean <olteanv@gmail.com>,
-	Heiner Kallweit <hkallweit1@gmail.com>,
-	AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>,
-	"Chester A. Unal" <chester.a.unal@arinc9.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Jakub Kicinski <kuba@kernel.org>,
-	linux-mediatek@lists.infradead.org,
-	Matthias Brugger <matthias.bgg@gmail.com>, netdev@vger.kernel.org
-Subject: Re: upstream Linux support for Ethernet combo ports via external mux
-Message-ID: <e56150f0-1a57-4a04-ae74-d966e3dda5d3@lunn.ch>
-References: <Z6qHi1bQZEnYUDp7@makrotopia.org>
+	s=arc-20240116; t=1739232068; c=relaxed/simple;
+	bh=LtNu0hLLYWkIDqE1WjVUidT6v1gAK5mlfHR7MROpIoQ=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=qYvlAUIpJ4J0ZXgjzsSurASsrs9Yv7fVJGh/gvXtBpOe2vi+QGXkbcERgN/yUSwbTRKk8uQuvmrjNA4QgY8G2TXhtn3rZePJZZH56H3V8N9XQf6pf9FR+EkaAYnORbl0PdO65uywtq5XdiFZWc9aMovS2gHRLVoz/c8tCpnwewI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=K65ICpft; arc=none smtp.client-ip=209.85.166.169
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-il1-f169.google.com with SMTP id e9e14a558f8ab-3cf82bd380bso41469605ab.0;
+        Mon, 10 Feb 2025 16:01:06 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1739232065; x=1739836865; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=tvs+SrA5yj3ot/zdCGwqMLGtc//Fs99RUqtk+u6og/A=;
+        b=K65ICpftrDvmvakRIAsI9dXD6JrMdvap72KRSmU0fZVdxRKkhDF20s4CAwo7KAkAo9
+         JMVP6lNw//rawpSqsU9AdWRjniPJQrsWrDmWEyG6DXAOih5rAjlrd96ZcPH51oqhqvjC
+         GedyIkC5fghAxH/PIjgN/UMb0pq0Rmk8f51GU6UmuAYVpoIPTccNVv4EiqpW8ALSneEc
+         1fvT4XAX5WUUsD/t9pNcWe7164Sbe04bQg0AGXf9Emy27J4HBuHg0UvkL/C86W6EDxUl
+         aDijvi+4gXf2iEBRaKBsWGTF6xFjUb4ayXqwwQSf3r0ZWSI3/ifFMLkaqkRgZeZ01qmQ
+         tGqQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1739232065; x=1739836865;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=tvs+SrA5yj3ot/zdCGwqMLGtc//Fs99RUqtk+u6og/A=;
+        b=RwTiM2ls+WthECD8Nw+TkaUfCUndGcmBD6b7LygtprBch/35BMkaPG2x7aT2mg98pj
+         oFK0mBGS0kLeGfydS1AG6dsIUyDbHmpWdm554GZIYZqJnkePst6lgvhzFBof4qr8rC4G
+         FC/Bpj6uSeLukFSF3O+plu7CWjbPkR4RWhkBc23gYX57dQE49pUdTAFp85z1AmzuhCuX
+         ji/MQKnH1eUwUUi/jN3xangFh9Y8nvYTXXdq6AI0bEk+Q//TmM2OhDITGEHKeDEakADN
+         9cMql/HandQwJChL/s2ejHuAndpQZYfC+Aj37Zyow72B9AjSh4xKczrmNsbB6fOaFzQr
+         YBMg==
+X-Forwarded-Encrypted: i=1; AJvYcCVpTcnQ0D8N4dLvcyLS5KVyHaMzgVDK2n1mEpzoxd8M4/cdkXbQU066B9eNizzy+53Y8eA=@vger.kernel.org, AJvYcCXKOGjeAMnweq/vsO5AvPm1UorjYiWUB+loytkQnA/OBZmnfnGRJkdQ4FWgdVuC4jWTEcHzII9k@vger.kernel.org
+X-Gm-Message-State: AOJu0YyRZuYcw+ogu4y0wkwQpe+YZXNgP+1L2Xu0jlrML8YAJKvQMo3a
+	hA8m5hMhGBkcHohmgRZswrVRzZCKmsMDkBOkvY4W0BPPPLpOJVF14C3pQi12D6m2XLqSj7Up/Id
+	Nzp4Lm/MicyIDxmBbC44NMFVvfYwzkjnn41HLnsru
+X-Gm-Gg: ASbGncsBfQDUXLMrul8EaUOFIQDuRmFVPGNLspUAy1Y4yxtZqwl93zEG/QZZLsr/yMb
+	agf+jhU6VyYL4uusgiuuQaEnrwCwcCNCPoWIaYAdmEHnwy8rwF+4UtrRZb3dmQqJb6hHBeLiK
+X-Google-Smtp-Source: AGHT+IGFOgzDd9mVFv8R2Y/UecKvR5yibkezTo4wAewqE7dKEomxWYOyqBang81mQYwquXVb/W0vc5fs8rcBYMJbNxo=
+X-Received: by 2002:a05:6e02:b4d:b0:3cf:bb7d:ac13 with SMTP id
+ e9e14a558f8ab-3d13dd0261cmr92207965ab.1.1739232065549; Mon, 10 Feb 2025
+ 16:01:05 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <Z6qHi1bQZEnYUDp7@makrotopia.org>
+References: <20250204183024.87508-1-kerneljasonxing@gmail.com>
+ <20250204183024.87508-9-kerneljasonxing@gmail.com> <67a3878eaefdf_14e08329415@willemb.c.googlers.com.notmuch>
+ <CAL+tcoAH6OYNOvUg8LDYw_b+ar3bo2AXqq0=oHgb-ogEYAeHZA@mail.gmail.com> <e6f2c489-85a9-436e-8d05-4b3063c133fd@linux.dev>
+In-Reply-To: <e6f2c489-85a9-436e-8d05-4b3063c133fd@linux.dev>
+From: Jason Xing <kerneljasonxing@gmail.com>
+Date: Tue, 11 Feb 2025 08:00:29 +0800
+X-Gm-Features: AWEUYZlE7vfBaBxDJ33s6Ck5iJUfkht7Ylw9cwzuDgwF2YEc9_ac4wrjqwpjZ5U
+Message-ID: <CAL+tcoBMVfcmdvwAOe5QROweKnMQw4NrrBwtQZ6RZYD4xEX_3g@mail.gmail.com>
+Subject: Re: [PATCH bpf-next v8 08/12] bpf: support hw SCM_TSTAMP_SND of SO_TIMESTAMPING
+To: Martin KaFai Lau <martin.lau@linux.dev>
+Cc: Willem de Bruijn <willemdebruijn.kernel@gmail.com>, davem@davemloft.net, 
+	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com, dsahern@kernel.org, 
+	willemb@google.com, ast@kernel.org, daniel@iogearbox.net, andrii@kernel.org, 
+	eddyz87@gmail.com, song@kernel.org, yonghong.song@linux.dev, 
+	john.fastabend@gmail.com, kpsingh@kernel.org, sdf@fomichev.me, 
+	haoluo@google.com, jolsa@kernel.org, horms@kernel.org, bpf@vger.kernel.org, 
+	netdev@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Mon, Feb 10, 2025 at 11:11:07PM +0000, Daniel Golle wrote:
-> Hi,
-> 
-> Looking for ways to support a passive SerDes mux in vanilla Linux I
-> found Maxime's slides "Multi-port and Multi-PHY Ethernet interfaces"[1].
+On Tue, Feb 11, 2025 at 6:40=E2=80=AFAM Martin KaFai Lau <martin.lau@linux.=
+dev> wrote:
+>
+> On 2/5/25 8:03 AM, Jason Xing wrote:
+> >>> @@ -5574,9 +5575,9 @@ static void skb_tstamp_tx_bpf(struct sk_buff *s=
+kb, struct sock *sk,
+> >>>                op =3D BPF_SOCK_OPS_TS_SCHED_OPT_CB;
+> >>>                break;
+> >>>        case SCM_TSTAMP_SND:
+> >>> -             if (!sw)
+> >>> -                     return;
+> >>> -             op =3D BPF_SOCK_OPS_TS_SW_OPT_CB;
+> >>> +             op =3D sw ? BPF_SOCK_OPS_TS_SW_OPT_CB : BPF_SOCK_OPS_TS=
+_HW_OPT_CB;
+> >>> +             if (!sw && hwtstamps)
+> >>> +                     *skb_hwtstamps(skb) =3D *hwtstamps;
+> >> Isn't this called by drivers that have actually set skb_hwtstamps?
+> > Oops, somehow my mind has gone blank =F0=9F=99=81 Will remove it. Thank=
+s for
+> > correcting me!
+>
+> I just noticed I missed this thread when reviewing v9.
+>
+> I looked at a few drivers, e.g. the mlx5e_consume_skb(). It does not nece=
+ssarily
 
-Maxime is still working on this. There was a patchset posted
-recently...
+There are indeed many drivers behaving like you said:
+1. xgbe_tx_tstamp()
+2. aq_ptp_tx_hwtstamp()
+3. bnx2x_ptp_task
+4. i40e_ptp_tx_hwtstamp
+...
 
-> The case I want to support is probably quite common nowadays but isn't
-> covered there nor implemented in Linux.
-> 
->  +----------------------------+
->  |            SoC             |
->  |    +-----------------+     |
->  |    |       MAC       |     |
->  |    +----+-------+----+     |
->  |         |  PCS  |   +------+
->  |         +---=---+   | GPIO |
->  +-------------=-------+---=--+
->               |            |
->            +---=---+       |
->            |  Mux  <-------+
->            +-=---=-+
->              |   |
->             /     \
->      +-----=-+   +-=-----+
->      |  PHY  |   |  SFP  |
->      +-------+   +-------+
-> 
-> So other than it was when SoCs didn't have built-in PCSs, now the SFP is
-> not connected to the PHY, but there is an additional mux IC controlled
-> by the SoC to connect the serialized MII either to the PHY (in case no
-> SFP is inserted) or to the SFP (in case a module is inserted).
-> 
-> MediaTek came up with a vendor-specific solution[2] for that which works
-> well -- but obviously it would be much nicer to have generic, vendor-
-> agnostic support for such setups in phylink, ideally based on the
-> existing gpio-mux driver.
+I really doubt that I've checked this a long time ago and then left
+this memory behind in V9, after all we've discussed this a lot of
+times...
 
-I don't actually understand how it can work. For the PHY the PCS
-probably needs to be running SGMII. For the SFP it probably wants
-1000BaseX. It looks like phylink has no idea the mux has been flipped,
-so it needs to reprogram the PCS. You cannot just create two phylink
-instances and flip flop between them. You need phylink actively
-involved so it can correctly manage the PCS.
+> set the skb_hwtstamps(skb) before calling skb_tstamp_tx(). The __skb_tsta=
+mp_tx()
+> is also setting skb_hwtstamps(skb) after testing "if (hwtstamps)", so I t=
+hink
 
-	Andrew
+This assignment is used to assign a cloned or newly allocated skb
+instead of the orig_skb passing from the driver side.
+
+> this assignment is still needed here?
+
+Right.
+
+Thanks,
+Jason
 
