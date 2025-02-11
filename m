@@ -1,84 +1,84 @@
-Return-Path: <netdev+bounces-165094-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-165095-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id CB4EAA30673
-	for <lists+netdev@lfdr.de>; Tue, 11 Feb 2025 09:54:50 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9A94EA30681
+	for <lists+netdev@lfdr.de>; Tue, 11 Feb 2025 09:57:57 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 226767A0621
-	for <lists+netdev@lfdr.de>; Tue, 11 Feb 2025 08:53:54 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 5301A3A4495
+	for <lists+netdev@lfdr.de>; Tue, 11 Feb 2025 08:57:48 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B9D111F0E25;
-	Tue, 11 Feb 2025 08:54:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 44CBE1F0E3C;
+	Tue, 11 Feb 2025 08:57:52 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="GZq3/7Bu"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="LyPA6XyV"
 X-Original-To: netdev@vger.kernel.org
 Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DEF0B1F03C5
-	for <netdev@vger.kernel.org>; Tue, 11 Feb 2025 08:54:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8F6EE1F0E20
+	for <netdev@vger.kernel.org>; Tue, 11 Feb 2025 08:57:50 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1739264084; cv=none; b=EJaFKbiQOF/d3tfQyEzAmKaNVOlMm4jUYlaMgU8wzL9IhWAnxxbCxz+x0PRCh5T7pGZGsynRjMJfhyc3rqDFqQClzC46Kw7kDJ82giTgktklNk627DQkqSH+N2OdErvZoAPSwpkiIHsdqm4oKhgJWIl7XcukyDzdamAwteqHkco=
+	t=1739264272; cv=none; b=eLe7dOYdQ2EWDU9yDOZlwjNOGwSkc+4leSIb0wY5QTO6PQP6L9+x3Hjz7u1AaFgRrgG+xED6gLGRLbCKT1JhkiH1rw5BirCXwFyDNzRSMLihTRD2ndwMXGHsvb2rp4pcO2WDK7EiuD/2IbbX1a+pnZM6P3/GxWLHcHKWkufP6hA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1739264084; c=relaxed/simple;
-	bh=A9OGoTsHrjtvyBc5Q07ZgbbmAyoBumXm7SUvVbyvJc4=;
+	s=arc-20240116; t=1739264272; c=relaxed/simple;
+	bh=HDnBlOyPw8QhBcGdjodP9zFRxyfM6MYgL5alIXcYcHU=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=EGR7YibOSY+6PG5vDzMVLSDutFXBeuHXiPFWjN92aUfjt0K7Z77Kqy2ObCcks8Xa9PolL/o57//bg6ae7KhGi5QEEdff6z9f/woiEWTZeGvm/tUoUafXfI0R70pBiMHflxN61eiHZk+1fFteQKvEk4C9VzA/EVeHoeGp4+7V7yg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=GZq3/7Bu; arc=none smtp.client-ip=170.10.129.124
+	 Content-Type:Content-Disposition:In-Reply-To; b=SWZ93VgdkoIFZF0KrNxgVv7qYCcu5dRy//lyouZS8nS7wu/+RT/aZhFYyKp77tBU21O06yNYq7ByRF0gXmljb3jSbFSQ62NvlllTRABvhumAYqvIIGiizYF7XuUskG1gkjcwo6dFQiMTyjsQZ6g/gL967OS2If7daSG7EH71vOU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=LyPA6XyV; arc=none smtp.client-ip=170.10.129.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1739264081;
+	s=mimecast20190719; t=1739264269;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 in-reply-to:in-reply-to:references:references;
-	bh=+JLq8TzMXCM9fnXbwXAYKIjuUWhuJvIj9pOn4Osk/Hg=;
-	b=GZq3/7Buua4e4xWI7jRkfUghkVpbsyf2KBHk/uEQi+KHCIoljcmDDc5URwia7Lu9PQ6SZJ
-	BsdOpyrXh5EjxB04vUZ2/9ZSd2KkzXwv2yQstrmQNd1WEVv4+MQrtkavCNOYrU5H5ytqjZ
-	QNfLPxm0kKqIWYOi3Vdu2t8j+iyVmZc=
-Received: from mail-wr1-f69.google.com (mail-wr1-f69.google.com
- [209.85.221.69]) by relay.mimecast.com with ESMTP with STARTTLS
+	bh=zIQbPjiqwmwUxZhJUEjUvnEZCNp6KfZmxpyLl8jvIIY=;
+	b=LyPA6XyVAdjwn8AdhpPcHzpjM+x8ib5qWeiEaK9HraQntPbi180TXgUUOZjujRhG0/Pjgh
+	3WSPfFYbs0Xsdq6ydUi5gVD0nYTzkdZcxnmzrdx6e7nwkmkpdVQVH+vc8TthXy2uph/qcV
+	aevO9HCzQ0MUsFSdeMh1fbq0NKGZcC0=
+Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com
+ [209.85.128.72]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-235-xt-meVDPMNS3ZQ5t4NFTfA-1; Tue, 11 Feb 2025 03:54:40 -0500
-X-MC-Unique: xt-meVDPMNS3ZQ5t4NFTfA-1
-X-Mimecast-MFC-AGG-ID: xt-meVDPMNS3ZQ5t4NFTfA
-Received: by mail-wr1-f69.google.com with SMTP id ffacd0b85a97d-38dca55788eso2176911f8f.1
-        for <netdev@vger.kernel.org>; Tue, 11 Feb 2025 00:54:40 -0800 (PST)
+ us-mta-307-jf7MDbRHOmKrW42CqHTegw-1; Tue, 11 Feb 2025 03:57:48 -0500
+X-MC-Unique: jf7MDbRHOmKrW42CqHTegw-1
+X-Mimecast-MFC-AGG-ID: jf7MDbRHOmKrW42CqHTegw
+Received: by mail-wm1-f72.google.com with SMTP id 5b1f17b1804b1-43933eb7e1dso18855795e9.2
+        for <netdev@vger.kernel.org>; Tue, 11 Feb 2025 00:57:47 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1739264079; x=1739868879;
+        d=1e100.net; s=20230601; t=1739264267; x=1739869067;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=+JLq8TzMXCM9fnXbwXAYKIjuUWhuJvIj9pOn4Osk/Hg=;
-        b=f1uLLCr5cn0xnrCrfopw1OICV+7iWF5s7765dcVh5NrIcsibnxXJMDEB0Ce8tMv6c3
-         4+IbZeOIMBR/x5dqwJKriJWFD7KTAK8QBWN1WVgQ0gwtIPBEH0WAp5UIzUmYBmzRv9Ha
-         uGgnFF60796SuNLBIUh/bvqJ2TWpzgar9i4Dhnl0NnVdToN80A35QnAqqFPfEFUElthS
-         BquKwg8JJdrCL0O+xQqzysJkLviKdh38RwkzFEz7HDsXr7rLN0PN1wbK8rJ8zKufkvr6
-         2IARa7Ue3lVWMeDxOL5GgQAEQw5iD5LV1AFBSBR3zi4taW1xji0vg4La+7Bjxj9OGmLm
-         IcVQ==
-X-Forwarded-Encrypted: i=1; AJvYcCVJwlPHG/obtLuuuUhBtOx/LFCqZTpRJLx9oznOs8bbF6ENjPYP720qReD348fzkNiRp4GSk08=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzH1qKXPN58BCw/wfDJ6GvAmWpPPnvt/dMDtgRozFZ0LfQRqpHx
-	RBM2WUfpC5xqcbn5/Tbfq25JtIObB3d0HKrRQ7U5lMKnZFxEFeiWZ+jaYDMkpiHS+JZkz0Y5mHk
-	ivkJMFpN7UjjT9IQU2X+vIqzn8z1Y7Mu7PT40dmgUo5ccEKXjgaiokA==
-X-Gm-Gg: ASbGnctpvnBrouOT6e5gbLtJOjZ7CJ722NwaRSndBBttXDOMHfugrh/Xy520xNOPQi3
-	CyK2GVHc6wDg/L2TXgyd1GYb6DyJ96vWVscpen4VQG2zENesGjU7fcxSQ4WpUUI5ibsq06fpGRH
-	S0jJRApcE6U39N6DSasM8GDmy90xSlOWOLenWZnN9/fNDNDgXLJ9SLXFGh86/gSyx7cz0siFom+
-	hA/d+xtE2Pnw4KZdNiy9uAW3tj7ObP5wnAzKnlwomg8VKN/Gl86PFoLratzrnGZzVlPe3XWJonc
-	D4goqA2HdWQE/TLBRG4GymEDQ7z2OV95eIn5mLaxJpzDQaYGBh8yoQ==
-X-Received: by 2002:a05:6000:1a85:b0:38d:d906:dbb0 with SMTP id ffacd0b85a97d-38dd906dcbcmr7731129f8f.7.1739264079242;
-        Tue, 11 Feb 2025 00:54:39 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IH+FXQlM4sVQQqQ6bfC1MLrVyaITtJSDcEgeRD57O/EtV7ZEKzfLqyRzc94bzpSoemBGMAbgw==
-X-Received: by 2002:a05:6000:1a85:b0:38d:d906:dbb0 with SMTP id ffacd0b85a97d-38dd906dcbcmr7731090f8f.7.1739264078600;
-        Tue, 11 Feb 2025 00:54:38 -0800 (PST)
+        bh=zIQbPjiqwmwUxZhJUEjUvnEZCNp6KfZmxpyLl8jvIIY=;
+        b=rLKAfUkAL7l7SdmFr7+DvvK913aoNiX7+YBuPy/UsS/1SWG4xfhe2+gqiNZ28UGexO
+         1ZJKedFrj0uqSguEVF7ukWF/AM/l/0CGu9CRFze+XgY221xGcH+XKCfwvm3KsQ849n5e
+         4ikaA7NnuaJQ3Qk6lS5zUHaGd3WJuAHnhlEZTN0+3a3v8xuR+dyo6d6jELnx9/dU84kA
+         uBn6D8MbBwlsTHALPH2mj60vLaltVaqTZBcsNB5O3Yd7FdkzEyJeEQ8TXDkGeFAVqBNC
+         yoNb81jtbtqC6dlMUS0Rq/BfqvCkfkFaf0OOAatoTVcoB6Bj4v/FhHm7dpmpuBtN8Hhm
+         kFRQ==
+X-Forwarded-Encrypted: i=1; AJvYcCWHRQ7JwEzYHlzQJ30LyOfbkatdYawld8GBx2i9OcIzqefB/VOya6Vt1Iy7ZV/EVJKf92jG4B4=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yy7atnOKyjJfDEk+NjMH7mXEAkguJ5y5KTJxQi7bKtDwZ20YETb
+	togDhzWX4YBndJu5hN04Y9hrmYmsJYGyhuUBE4itqnbqpweFNvc3kofbU0KvtqFJtsy997/0BxI
+	uREr0Bqu2lUhG2vP57yWe0ClsY0K4fJLMzv6LPun9QAx3Y1+s1N6eoA==
+X-Gm-Gg: ASbGncvM5rcPFGr5HTgs1K1Z0jOZqATXmZNk040kIVACTmsuJ4OMvxZv2pRPM4ePAdA
+	VY8jLef0/ppesYIh6dF2G1PRMvyqeNzJQmpvTgnZXK5ARdFzDcDrXZTDNo9UbKiZ/dXOBHOc/K6
+	Uwz1PRVpsmn1s+vzuTMX/C5i77vedxDyIff6feI3iHj6u7WLye8ZArB9xUCCcdz9AEhWYuxRHew
+	n5qjrL/ZgEa4OOKxkyCo8dcmdz0FZ/6wYFJSpBMzNVxCxdFc90bGcySAdAkbnMssa6/tYXYQyUa
+	9BZwQqdLcgh50/B1mLomhiQWvGPy3vvfQLVe29EnX3tgk+97GvndzQ==
+X-Received: by 2002:a5d:438f:0:b0:386:3835:9fec with SMTP id ffacd0b85a97d-38dc935fba0mr13080912f8f.44.1739264266785;
+        Tue, 11 Feb 2025 00:57:46 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IG9gS/8oWxy2/+63oWaWVYrKsS8WPZEr2M1pgDTFIO4r0DJWvdJ3n9OPtCV6k/zDtewXv+XUA==
+X-Received: by 2002:a5d:438f:0:b0:386:3835:9fec with SMTP id ffacd0b85a97d-38dc935fba0mr13080869f8f.44.1739264266036;
+        Tue, 11 Feb 2025 00:57:46 -0800 (PST)
 Received: from sgarzare-redhat (host-79-46-200-29.retail.telecomitalia.it. [79.46.200.29])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-4394df55f51sm12596505e9.0.2025.02.11.00.54.36
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-4391da9652bsm173908095e9.2.2025.02.11.00.57.44
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 11 Feb 2025 00:54:37 -0800 (PST)
-Date: Tue, 11 Feb 2025 09:54:32 +0100
+        Tue, 11 Feb 2025 00:57:45 -0800 (PST)
+Date: Tue, 11 Feb 2025 09:57:41 +0100
 From: Stefano Garzarella <sgarzare@redhat.com>
 To: Junnan Wu <junnan01.wu@samsung.com>
 Cc: stefanha@redhat.com, mst@redhat.com, jasowang@redhat.com, 
@@ -87,10 +87,12 @@ Cc: stefanha@redhat.com, mst@redhat.com, jasowang@redhat.com,
 	virtualization@lists.linux.dev, netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
 	q1.huang@samsung.com, ying01.gao@samsung.com, ying123.xu@samsung.com, 
 	lei19.wang@samsung.com
-Subject: Re: [Patch net 0/2] vsock suspend/resume fix
-Message-ID: <jeqyqnuqklvk4ozyfhi4x4zadb5wxjvnefmk7w4ktvjna4psix@fc244relosif>
-References: <CGME20250211071930epcas5p2dbb3a4171fbe04574c0fa7b3a6f1a0c2@epcas5p2.samsung.com>
- <20250211071922.2311873-1-junnan01.wu@samsung.com>
+Subject: Re: [Patch net 1/2] vsock/virtio: initialize rx_buf_nr and
+ rx_buf_max_nr when resuming
+Message-ID: <gr5rqfwb4qgc23dadpfwe74jvsq37udpeqwhpokhnvvin6biv2@6v5npbxf6kbn>
+References: <20250211071922.2311873-1-junnan01.wu@samsung.com>
+ <CGME20250211071941epcas5p308a13898102cf851bc9988c0e2766c5e@epcas5p3.samsung.com>
+ <20250211071922.2311873-2-junnan01.wu@samsung.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -99,31 +101,76 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii; format=flowed
 Content-Disposition: inline
-In-Reply-To: <20250211071922.2311873-1-junnan01.wu@samsung.com>
+In-Reply-To: <20250211071922.2311873-2-junnan01.wu@samsung.com>
 
-For the third time, please READ this link:
-https://www.kernel.org/doc/html/latest/process/submitting-patches.html
 
-This is a v2, so you should put it in the tags [PATCH net v2 ...]
+You need to update the title now that you're moving also queued_replies.
 
-And also include a changelog and a link to the v1:
-
-v1: https://lore.kernel.org/virtualization/20250207052033.2222629-1-junnan01.wu@samsung.com/
-
-On Tue, Feb 11, 2025 at 03:19:20PM +0800, Junnan Wu wrote:
->CC all maintainers and reviews.
->Modify commits accroding to reviewers' comments.
->Re-organize the patches, cover letter, tag, Signed-Off, Co-worker etc.
+On Tue, Feb 11, 2025 at 03:19:21PM +0800, Junnan Wu wrote:
+>When executing suspend to ram twice in a row,
+>the `rx_buf_nr` and `rx_buf_max_nr` increase to three times vq->num_free.
+>Then after virtqueue_get_buf and `rx_buf_nr` decreased
+>in function virtio_transport_rx_work,
+>the condition to fill rx buffer
+>(rx_buf_nr < rx_buf_max_nr / 2) will never be met.
 >
->Junnan Wu (2):
->  vsock/virtio: initialize rx_buf_nr and rx_buf_max_nr when resuming
->  vsock/virtio: Don't reset the created SOCKET during suspend to ram
+>It is because that `rx_buf_nr` and `rx_buf_max_nr`
+>are initialized only in virtio_vsock_probe(),
+>but they should be reset whenever virtqueues are recreated,
+>like after a suspend/resume.
 >
-> net/vmw_vsock/virtio_transport.c | 28 +++++++++++++++++++---------
-> 1 file changed, 19 insertions(+), 9 deletions(-)
+>Move the `rx_buf_nr` and `rx_buf_max_nr` initialization in
+>virtio_vsock_vqs_init(), so we are sure that they are properly
+>initialized, every time we initialize the virtqueues, either when we
+>load the driver or after a suspend/resume.
+>At the same time, also move `queued_replies`.
+
+Why?
+
+As I mentioned the commit description should explain why the changes are 
+being made for both reviewers and future references to this patch.
+
+The rest LGTM.
+
+Stefano
+
 >
+>Fixes: bd50c5dc182b ("vsock/virtio: add support for device suspend/resume")
+>Co-developed-by: Ying Gao <ying01.gao@samsung.com>
+>Signed-off-by: Ying Gao <ying01.gao@samsung.com>
+>Signed-off-by: Junnan Wu <junnan01.wu@samsung.com>
+>---
+> net/vmw_vsock/virtio_transport.c | 10 +++++++---
+> 1 file changed, 7 insertions(+), 3 deletions(-)
 >
->base-commit: a64dcfb451e254085a7daee5fe51bf22959d52d3
+>diff --git a/net/vmw_vsock/virtio_transport.c b/net/vmw_vsock/virtio_transport.c
+>index b58c3818f284..f0e48e6911fc 100644
+>--- a/net/vmw_vsock/virtio_transport.c
+>+++ b/net/vmw_vsock/virtio_transport.c
+>@@ -670,6 +670,13 @@ static int virtio_vsock_vqs_init(struct virtio_vsock *vsock)
+> 	};
+> 	int ret;
+>
+>+	mutex_lock(&vsock->rx_lock);
+>+	vsock->rx_buf_nr = 0;
+>+	vsock->rx_buf_max_nr = 0;
+>+	mutex_unlock(&vsock->rx_lock);
+>+
+>+	atomic_set(&vsock->queued_replies, 0);
+>+
+> 	ret = virtio_find_vqs(vdev, VSOCK_VQ_MAX, vsock->vqs, vqs_info, NULL);
+> 	if (ret < 0)
+> 		return ret;
+>@@ -779,9 +786,6 @@ static int virtio_vsock_probe(struct virtio_device *vdev)
+>
+> 	vsock->vdev = vdev;
+>
+>-	vsock->rx_buf_nr = 0;
+>-	vsock->rx_buf_max_nr = 0;
+>-	atomic_set(&vsock->queued_replies, 0);
+>
+> 	mutex_init(&vsock->tx_lock);
+> 	mutex_init(&vsock->rx_lock);
 >-- 
 >2.34.1
 >
