@@ -1,237 +1,139 @@
-Return-Path: <netdev+bounces-165203-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-165205-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6A611A30F09
-	for <lists+netdev@lfdr.de>; Tue, 11 Feb 2025 16:02:25 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 98FCCA30F3C
+	for <lists+netdev@lfdr.de>; Tue, 11 Feb 2025 16:07:53 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D2370165C67
-	for <lists+netdev@lfdr.de>; Tue, 11 Feb 2025 15:02:17 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 5BDF83A843B
+	for <lists+netdev@lfdr.de>; Tue, 11 Feb 2025 15:07:25 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3B34A1FAC5D;
-	Tue, 11 Feb 2025 15:02:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DC4FF24F5AA;
+	Tue, 11 Feb 2025 15:07:28 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="PtMCALep"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="HRBoTkIK"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.7])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 092DA17C91;
-	Tue, 11 Feb 2025 15:02:08 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 067DB26BD8C
+	for <netdev@vger.kernel.org>; Tue, 11 Feb 2025 15:07:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.7
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1739286129; cv=none; b=TAdPnoM6pWxMk3NnH7xXckr/7wJUylg0mDHb7Zc9gKuXsL0tDkvvm6oH+bIaprWdNUZSKvPDuofpch3nilDcVjJqQzlDoaGejlH845XvN2VrjBiDfukzf/dnLiAGmFoLldz3tt18/t9SVZbXAU7NC5enjm8HG01HBRpDr0h6asM=
+	t=1739286448; cv=none; b=fBzumosyDO6LrpwLGCh52m1aTLn+FX2cuZiAnxzn7ORCA/5mtRWwNtLUxPyizjUtxSA5JHY29UUxZuA+Iz3Vdy+AyAW3PCLOgXqLqrIy7ddVR5Zp76RYQncuvPSc/1tn8IUpYtIQL3qcstLUDlXihfGRHNhVy0gPkYqt89rEOSY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1739286129; c=relaxed/simple;
-	bh=NJrnNissa9VtChrtfIQicfGI0gqVDx4S851Ho4mvxao=;
+	s=arc-20240116; t=1739286448; c=relaxed/simple;
+	bh=63VFTzhlfsv+FsZFWjumFpyRmumdLMBYpTENKjOczHc=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=CIIn04Bc44MIZgBRu4bShVdI4s5tOL/aHmVVXWpSYMOaFFbX7+XzbzpE+qcMzn7kEdKhx6YtHHSFCQqpUHrqqDn/hi6Vf+v5q8oOIj3+BiwrnK8oiP/n0qlME+pM4fuMD6RZn6IA0ezUZlUHtX05b9QPSuioPwYK2W0gHHTUwk4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=PtMCALep; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id DCECDC4CEE7;
-	Tue, 11 Feb 2025 15:02:07 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1739286128;
-	bh=NJrnNissa9VtChrtfIQicfGI0gqVDx4S851Ho4mvxao=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=PtMCALepGKOl5gqAXES2uJ8GTWxB9LvAebovV4W8TkyeSZDr/2c6LGfjo7t/drubi
-	 gFJAoypbz8Uegh+vvUKY1meiwkSMUOHzxmf1C87GdM7IDCDooUILviqJMq7PyBeRWN
-	 i1ubLMrrY5ghFPM0VCmnGy1Ffe8XyEad/1u4gaY/A1v+uKIykRp7YnrNs9T9BLPoNg
-	 5qbAYkod9qTldl2T6X8Z5uEWnl0Knhq6bVNfQfI0FJXyv6DCd+vUvC1Y4uwf2Ik6zy
-	 lelJ27tr1xQuQ00pordUKZduYMqGxWWLjknMF+eorhEySDM2eXl3eeQMUvFJYuW3rQ
-	 b2qLTIbJamAEA==
-Date: Tue, 11 Feb 2025 16:02:05 +0100
-From: Frederic Weisbecker <frederic@kernel.org>
-To: Paul Menzel <pmenzel@molgen.mpg.de>
-Cc: =?utf-8?Q?Micha=C5=82?= Pecio <michal.pecio@gmail.com>,
-	anna-maria@linutronix.de, linux-kernel@vger.kernel.org,
-	linux-trace-kernel@vger.kernel.org, linux-usb@vger.kernel.org,
-	mingo@kernel.org, tglx@linutronix.de,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Hayes Wang <hayeswang@realtek.com>, Simon Horman <horms@kernel.org>,
-	netdev@vger.kernel.org
-Subject: Re: NOHZ tick-stop error: local softirq work is pending, handler
- #08!!! on Dell XPS 13 9360
-Message-ID: <Z6tmbdl646D_UjrY@localhost.localdomain>
-References: <20250210124551.3687ae51@foxbook>
- <b0d55f4c-a078-42a0-a0fe-5823700f2837@molgen.mpg.de>
- <Z6n-dWDSxNCjROYV@localhost.localdomain>
- <10de7289-653f-43b1-ad46-2e8a0cd42724@molgen.mpg.de>
+	 Content-Type:Content-Disposition:In-Reply-To; b=RtajRQzxY4BXBXKT+ic0gB5GJhiSF1isTqDCRF7N8N1Wa1yV3BG59AVysDnL7/I9BY6CDnXLdyiDxg0DCKHjsrfJsq+QueV3K3v+NY20WgNtjiQaEceZrqLtH9WZnnGSiFPU5TVfTpfhGkJb58SpYTs/LoASDhgaQVERwKFWRJA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=HRBoTkIK; arc=none smtp.client-ip=192.198.163.7
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1739286447; x=1770822447;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=63VFTzhlfsv+FsZFWjumFpyRmumdLMBYpTENKjOczHc=;
+  b=HRBoTkIKPK8tvvGbipPB2Vlr2tkxNVKf7TWi4uiRh+yEz5BpDJPd4Eiy
+   hWCfJE+N6iTj1DpGpCUzH8crHzsKoc4x7bFzjd1oM54U0VYzR5BwJnktS
+   0Bjh5dZkLG2b4hFg1RFZNTz99NQEN8+rN1oht5RAn3AK8gR4J7LVLf211
+   xHVMqB9Q9rxWSz1KpGlJX/O9mEEgWzVQvAWorixRLPcQuIT0HUUZLoF5Y
+   Zvrhi59Lv6IiLj5OGD4IbONb1Dup9n9MaXyjlKp3bdPtg+AHHr7Nq1TTE
+   aziwae+GjAFiCQ4eWIG6T9pcWMEHduVMBPJAtrfASg55c+6OcazUUyXVV
+   w==;
+X-CSE-ConnectionGUID: A89MC3oUQvuhwa/xt62fug==
+X-CSE-MsgGUID: 1s3HUMTwQuy2BTZMmczW4A==
+X-IronPort-AV: E=McAfee;i="6700,10204,11342"; a="65265096"
+X-IronPort-AV: E=Sophos;i="6.13,277,1732608000"; 
+   d="scan'208";a="65265096"
+Received: from orviesa001.jf.intel.com ([10.64.159.141])
+  by fmvoesa101.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 11 Feb 2025 07:07:26 -0800
+X-CSE-ConnectionGUID: NNsH8mroR9G95lu4V/QFpA==
+X-CSE-MsgGUID: PMIuv5/aQt6Jwd2faijUjw==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.12,224,1728975600"; 
+   d="scan'208";a="149723779"
+Received: from lkp-server01.sh.intel.com (HELO d63d4d77d921) ([10.239.97.150])
+  by orviesa001.jf.intel.com with ESMTP; 11 Feb 2025 07:07:23 -0800
+Received: from kbuild by d63d4d77d921 with local (Exim 4.96)
+	(envelope-from <lkp@intel.com>)
+	id 1thrr7-0014Kt-1S;
+	Tue, 11 Feb 2025 15:07:21 +0000
+Date: Tue, 11 Feb 2025 23:06:52 +0800
+From: kernel test robot <lkp@intel.com>
+To: Stanislav Fomichev <sdf@fomichev.me>, netdev@vger.kernel.org
+Cc: oe-kbuild-all@lists.linux.dev, davem@davemloft.net, edumazet@google.com,
+	kuba@kernel.org, pabeni@redhat.com,
+	Saeed Mahameed <saeed@kernel.org>
+Subject: Re: [PATCH net-next 04/11] net: hold netdev instance lock during
+ rtnetlink operations
+Message-ID: <202502112254.DdkYlmMx-lkp@intel.com>
+References: <20250210192043.439074-5-sdf@fomichev.me>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <10de7289-653f-43b1-ad46-2e8a0cd42724@molgen.mpg.de>
+In-Reply-To: <20250210192043.439074-5-sdf@fomichev.me>
 
-Le Tue, Feb 11, 2025 at 12:57:33PM +0100, Paul Menzel a écrit :
-> Dear Frederic,
-> 
-> 
-> Thank you for your reply.
-> 
-> 
-> Am 10.02.25 um 14:26 schrieb Frederic Weisbecker:
-> > Le Mon, Feb 10, 2025 at 12:59:42PM +0100, Paul Menzel a écrit :
-> 
-> > > Am 10.02.25 um 12:45 schrieb Michał Pecio:
-> > > 
-> > > > > > > > > > > On Dell XPS 13 9360/0596KF, BIOS 2.21.0 06/02/2022, with Linux
-> > > > > > > > > > > 6.9-rc2+
-> > > > 
-> > > > > Just for the record, I am still seeing this with 6.14.0-rc1
-> > > > 
-> > > > Is this a regression? If so, which versions were not affected?
-> > > 
-> > > Unfortunately, I do not know. Right now, my logs go back until September
-> > > 2024.
-> > > 
-> > >      Sep 22 13:08:04 abreu kernel: Linux version 6.11.0-07273-g1e7530883cd2 (build@bohemianrhapsody.molgen.mpg.de) (gcc (Debian 14.2.0-5) 14.2.0, GNU ld (GNU Binutils for Debian) 2.43.1) #12 SMP PREEMPT_DYNAMIC Sun Sep 22 09:57:36 CEST 2024
-> > > 
-> > > > How hard to reproduce? Wasn't it during resume from hibernation?
-> > > 
-> > > It’s not easy to reproduce, and I believe it’s not related with resuming
-> > > from hibernation (which I do not use) or ACPI S3 suspend. I think, I can
-> > > force it more, when having the USB-C adapter with only the network cable
-> > > plugged into it, and then running `sudo powertop --auto-tune`. But sometimes
-> > > it seems unrelated.
-> > > 
-> > > > IRQ isuses may be a red herring, this code here is a busy wait under
-> > > > spinlock. There are a few of those, they cause various problems.
-> > > > 
-> > > >                   if (xhci_handshake(&xhci->op_regs->status,
-> > > >                                 STS_RESTORE, 0, 100 * 1000)) {
-> > > >                           xhci_warn(xhci, "WARN: xHC restore state timeout\n");
-> > > > 			spin_unlock_irq(&xhci->lock);
-> > > >                           return -ETIMEDOUT;
-> > > >                   }
-> > > > 
-> > > > This thing timing out may be close to the root cause of everything.
-> > > 
-> > > Interesting. Hopefully the USB folks have an idea.
-> > 
-> > Handler #08 is NET_RX. So something raised the NET_RX on some non-appropriate
-> > place, perhaps...
-> > 
-> > Can I ask you one more trace dump?
-> > 
-> > I need:
-> > 
-> > echo 1 > /sys/kernel/tracing/events/irq/softirq_raise/enable
-> > echo 1 > /sys/kernel/tracing/options/stacktrace
-> > 
-> > Unfortunately this will also involve a small patch:
-> > 
-> > diff --git a/kernel/time/tick-sched.c b/kernel/time/tick-sched.c
-> > index fa058510af9c..accd2eb8c927 100644
-> > --- a/kernel/time/tick-sched.c
-> > +++ b/kernel/time/tick-sched.c
-> > @@ -1159,6 +1159,9 @@ static bool report_idle_softirq(void)
-> >   	if (local_bh_blocked())
-> >   		return false;
-> > +	trace_printk("STOP\n");
-> > +	trace_dump_stack(0);
-> > +	tracing_off();
-> >   	pr_warn("NOHZ tick-stop error: local softirq work is pending, handler #%02x!!!\n",
-> >   		pending);
-> >   	ratelimit++;
-> 
-> Thank you for your help. I applied the patch on top of 6.14-rc2, and was
-> able to reproduce the issue. Please find the Linux messages attached, and
-> the trace can be downloaded [1].
+Hi Stanislav,
 
-So here is the offender:
+kernel test robot noticed the following build warnings:
 
- => __raise_softirq_irqoff
- => __napi_schedule
- => rtl8152_runtime_resume.isra.0
- => rtl8152_resume
- => usb_resume_interface.isra.0
- => usb_resume_both
- => __rpm_callback
- => rpm_callback
- => rpm_resume
- => __pm_runtime_resume
- => usb_autoresume_device
- => usb_remote_wakeup
- => hub_event
- => process_one_work
- => worker_thread
- => kthread
- => ret_from_fork
- => ret_from_fork_asm
+[auto build test WARNING on net-next/main]
 
-It is calling napi_schedule() from a non-interrupt. And since
-____napi_schedule() assumes to be called from an interrupt, it
-raises the softirq accordingly without waking up ksoftirqd.
+url:    https://github.com/intel-lab-lkp/linux/commits/Stanislav-Fomichev/net-hold-netdev-instance-lock-during-ndo_open-ndo_stop/20250211-032336
+base:   net-next/main
+patch link:    https://lore.kernel.org/r/20250210192043.439074-5-sdf%40fomichev.me
+patch subject: [PATCH net-next 04/11] net: hold netdev instance lock during rtnetlink operations
+config: arc-randconfig-001-20250211 (https://download.01.org/0day-ci/archive/20250211/202502112254.DdkYlmMx-lkp@intel.com/config)
+compiler: arceb-elf-gcc (GCC) 13.2.0
+reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20250211/202502112254.DdkYlmMx-lkp@intel.com/reproduce)
 
-Can you try the following fix (untested, sorry...) ?
+If you fix the issue in a separate patch/commit (i.e. not just a new version of
+the same patch/commit), kindly add following tags
+| Reported-by: kernel test robot <lkp@intel.com>
+| Closes: https://lore.kernel.org/oe-kbuild-all/202502112254.DdkYlmMx-lkp@intel.com/
 
-diff --git a/drivers/net/usb/r8152.c b/drivers/net/usb/r8152.c
-index 468c73974046..8f6ea4e7685c 100644
---- a/drivers/net/usb/r8152.c
-+++ b/drivers/net/usb/r8152.c
-@@ -8537,8 +8537,11 @@ static int rtl8152_runtime_resume(struct r8152 *tp)
- 		clear_bit(SELECTIVE_SUSPEND, &tp->flags);
- 		smp_mb__after_atomic();
- 
--		if (!list_empty(&tp->rx_done))
-+		if (!list_empty(&tp->rx_done)) {
-+			local_bh_disable();
- 			napi_schedule(&tp->napi);
-+			local_bh_enable();
-+		}
- 
- 		usb_submit_urb(tp->intr_urb, GFP_NOIO);
- 	} else {
-diff --git a/include/linux/lockdep.h b/include/linux/lockdep.h
-index 67964dc4db95..1bd730b881f0 100644
---- a/include/linux/lockdep.h
-+++ b/include/linux/lockdep.h
-@@ -619,6 +619,17 @@ do {									\
- 		     (!in_softirq() || in_irq() || in_nmi()));		\
- } while (0)
- 
-+/*
-+ * Assert to be either in hardirq or in serving softirq or with
-+ * softirqs disabled. Verifies a safe context to queue a softirq
-+ * with __raise_softirq_irqoff().
-+ */
-+#define lockdep_assert_in_interrupt()				\
-+do {								\
-+	WARN_ON_ONCE(__lockdep_enabled && !in_interrupt());	\
-+} while (0)
-+
-+
- extern void lockdep_assert_in_softirq_func(void);
- 
- #else
-@@ -634,6 +645,7 @@ extern void lockdep_assert_in_softirq_func(void);
- # define lockdep_assert_preemption_enabled() do { } while (0)
- # define lockdep_assert_preemption_disabled() do { } while (0)
- # define lockdep_assert_in_softirq() do { } while (0)
-+# define lockdep_assert_in_interrupt() do { } while (0)
- # define lockdep_assert_in_softirq_func() do { } while (0)
- #endif
- 
-diff --git a/net/core/dev.c b/net/core/dev.c
-index c0021cbd28fc..80e415ccf2c8 100644
---- a/net/core/dev.c
-+++ b/net/core/dev.c
-@@ -4666,6 +4666,7 @@ static inline void ____napi_schedule(struct softnet_data *sd,
- 	struct task_struct *thread;
- 
- 	lockdep_assert_irqs_disabled();
-+	lockdep_assert_in_interrupt();
- 
- 	if (test_bit(NAPI_STATE_THREADED, &napi->state)) {
- 		/* Paired with smp_mb__before_atomic() in
+All warnings (new ones prefixed by >>):
+
+   net/core/dev.c: In function 'dev_set_mtu':
+   net/core/dev.c:9320:15: error: implicit declaration of function 'netdev_set_mtu_ext_locked'; did you mean 'netdev_ops_assert_locked'? [-Werror=implicit-function-declaration]
+    9320 |         err = netdev_set_mtu_ext_locked(dev, new_mtu, &extack);
+         |               ^~~~~~~~~~~~~~~~~~~~~~~~~
+         |               netdev_ops_assert_locked
+   net/core/dev.c: At top level:
+>> net/core/dev.c:11390:12: warning: 'netdev_lock_cmp_fn' defined but not used [-Wunused-function]
+   11390 | static int netdev_lock_cmp_fn(const struct lockdep_map *a, const struct lockdep_map *b)
+         |            ^~~~~~~~~~~~~~~~~~
+   cc1: some warnings being treated as errors
+--
+>> net/core/dev_api.c:109: warning: Excess function parameter 'new_ifindex' description in 'dev_change_net_namespace'
+
+
+vim +/netdev_lock_cmp_fn +11390 net/core/dev.c
+
+ 11389	
+ 11390	static int netdev_lock_cmp_fn(const struct lockdep_map *a, const struct lockdep_map *b)
+ 11391	{
+ 11392		/* Only lower devices currently grab the instance lock, so no
+ 11393		 * real ordering issues can occur. In the near future, only
+ 11394		 * hardware devices will grab instance lock which also does not
+ 11395		 * involve any ordering. Suppress lockdep ordering warnings
+ 11396		 * until (if) we start grabbing instance lock on pure SW
+ 11397		 * devices (bond/team/etc).
+ 11398		 */
+ 11399		return -1;
+ 11400	}
+ 11401	
+
+-- 
+0-DAY CI Kernel Test Service
+https://github.com/intel/lkp-tests/wiki
 
