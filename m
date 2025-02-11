@@ -1,110 +1,135 @@
-Return-Path: <netdev+bounces-165059-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-165060-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1A972A303F8
-	for <lists+netdev@lfdr.de>; Tue, 11 Feb 2025 07:55:58 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id A2D33A30421
+	for <lists+netdev@lfdr.de>; Tue, 11 Feb 2025 08:05:18 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id DAB773A7008
-	for <lists+netdev@lfdr.de>; Tue, 11 Feb 2025 06:55:48 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 21A81188844B
+	for <lists+netdev@lfdr.de>; Tue, 11 Feb 2025 07:05:24 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E12E01E9B17;
-	Tue, 11 Feb 2025 06:55:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 78D571D5CCD;
+	Tue, 11 Feb 2025 07:05:15 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="tt20c1bA"
+	dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b="U6sgb5+N"
 X-Original-To: netdev@vger.kernel.org
-Received: from out-172.mta1.migadu.com (out-172.mta1.migadu.com [95.215.58.172])
+Received: from smtp-fw-80008.amazon.com (smtp-fw-80008.amazon.com [99.78.197.219])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C9A4E190674
-	for <netdev@vger.kernel.org>; Tue, 11 Feb 2025 06:55:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.172
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D8B0026BDB6
+	for <netdev@vger.kernel.org>; Tue, 11 Feb 2025 07:05:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=99.78.197.219
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1739256954; cv=none; b=h12GbNGbcPVnO0mYWC6Aa3JOZ4qbkYwiJw0bvKK/z+hmY8RQhuGbPihnePl/w75IHLPyP+tvFtpBZiRwhmsu9aD/PK5pY9nO4KK/ZSCtX4t8l2k28JFbao5TqoBTnltZpJIqQLh4ozwjJjzUY6ComY395vb7GwPHOJg7/d2vLlU=
+	t=1739257515; cv=none; b=T5VZqzYf4AGHbN2KQoNk7oN6Q4KmTGlM0liLVhX7Co8EKa03hV5w12YsMbAvtG+ly3WpdIq2qAF2tquyoXtKjQQtQqhiYHlDA15zYS/RpQ2LewPjcBLJKthvFZgD+GGXp6qiuUg+9GAVeMj4nNIOqYVL3RQMBBcPQj37TeL/3+Q=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1739256954; c=relaxed/simple;
-	bh=U1/HE/+P4Vke9jaDcFO9AO8Ucrw1SSc9S8TqGyaAJm4=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=XeOwBzK3jlUS264UeKEY8MUWEIhjW/m2yECG91bCHbeX1tIUa+ibhMtANpNS6R+OSHKY3Ws1F/897eOfZjlsnIExY4lG1sFzADxjppoBifj+4JZxVhd2Agnp4RZketyyQbyHAy2l2F2uvY1IDZbX8WL/DPUBvZTUwsXRrUJc2p0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=tt20c1bA; arc=none smtp.client-ip=95.215.58.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
-Message-ID: <787db122-d9d3-4ceb-b8c8-36ed9590b49b@linux.dev>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1739256951;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=gBmmjMNTTInn3bPIxx/t3FfX1VhkeNHK4TKQlUwysUY=;
-	b=tt20c1bAysXWMq1CJ5AxOR4b6R3hT4Vmp7a9+KTi31+L5nLr9WiKdaW0Hwfl3XDdPaU21e
-	l8dIupl6cDEQnLeMfFuxyqW7QL9ff4bZyfPsHIno/lxWWJDu1fudDjUtPLpCCOasP4duCa
-	r4LZAJXBliJnqmmZFOIoN6PVlHZo6Gk=
-Date: Mon, 10 Feb 2025 22:55:42 -0800
+	s=arc-20240116; t=1739257515; c=relaxed/simple;
+	bh=c/3NARD47thG928r4JEDuOuj1PWVXEKcZ6WYzerY8Zc=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=gOIFeyNqPvm9H+Y6Hm9MVruRfefJ/+Cx+LiH2H2nv4OVHmKtmakfEozdaYvzySrz5qVR2NcLE+bDfPmnQv6Bi0NRuZUmAHT+/a0Ac8b4V01MpkHbStVLcgYYZ3II4uwzoYSV0f1wBhurp3IxPtbXo3ee3fva4IW36rFBu+kqDxc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.co.jp; dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b=U6sgb5+N; arc=none smtp.client-ip=99.78.197.219
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.co.jp
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
+  t=1739257513; x=1770793513;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=atsfQ+TUSkNYHjgSbto7nTfuyQYB1flml3P/OMxmCA0=;
+  b=U6sgb5+N22DJFDeuOw+6eRa9Vdyts4a5yLyhTaD4at7BLQ529/Cng35r
+   WHJv0bEpnRJHIvOVYiteAIKRQ4ZV8s28YrzlEQa1B4EWkUHN6aDC5CsjP
+   8gMhFjP7qDFmwIP5OdM4AorD52DLmUhoeXjnRp4WTlBLwqhikRh/NDbyh
+   g=;
+X-IronPort-AV: E=Sophos;i="6.13,276,1732579200"; 
+   d="scan'208";a="168607293"
+Received: from pdx4-co-svc-p1-lb2-vlan3.amazon.com (HELO smtpout.prod.us-west-2.prod.farcaster.email.amazon.dev) ([10.25.36.214])
+  by smtp-border-fw-80008.pdx80.corp.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 11 Feb 2025 07:05:11 +0000
+Received: from EX19MTAUWC002.ant.amazon.com [10.0.38.20:48011]
+ by smtpin.naws.us-west-2.prod.farcaster.email.amazon.dev [10.0.25.59:2525] with esmtp (Farcaster)
+ id 018353bb-46f5-4c87-b73a-8c47e6e80ec8; Tue, 11 Feb 2025 07:05:11 +0000 (UTC)
+X-Farcaster-Flow-ID: 018353bb-46f5-4c87-b73a-8c47e6e80ec8
+Received: from EX19D004ANA001.ant.amazon.com (10.37.240.138) by
+ EX19MTAUWC002.ant.amazon.com (10.250.64.143) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1258.39;
+ Tue, 11 Feb 2025 07:05:02 +0000
+Received: from 6c7e67bfbae3.amazon.com (10.119.10.138) by
+ EX19D004ANA001.ant.amazon.com (10.37.240.138) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1544.14;
+ Tue, 11 Feb 2025 07:04:57 +0000
+From: Kuniyuki Iwashima <kuniyu@amazon.com>
+To: "David S. Miller" <davem@davemloft.net>, Eric Dumazet
+	<edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
+	<pabeni@redhat.com>, Simon Horman <horms@kernel.org>
+CC: Andy Whitcroft <apw@canonical.com>, Joe Perches <joe@perches.com>,
+	Dwaipayan Ray <dwaipayanray1@gmail.com>, Lukas Bulwahn
+	<lukas.bulwahn@gmail.com>, Kuniyuki Iwashima <kuniyu@amazon.com>, "Kuniyuki
+ Iwashima" <kuni1840@gmail.com>, <netdev@vger.kernel.org>
+Subject: [PATCH v1 net-next] checkpatch: Discourage a new use of rtnl_lock() variants.
+Date: Tue, 11 Feb 2025 16:04:47 +0900
+Message-ID: <20250211070447.25001-1-kuniyu@amazon.com>
+X-Mailer: git-send-email 2.39.5 (Apple Git-154)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Subject: Re: [PATCH bpf-next v9 04/12] bpf: stop calling some sock_op BPF
- CALLs in new timestamping callbacks
-To: Jason Xing <kerneljasonxing@gmail.com>
-Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
- pabeni@redhat.com, dsahern@kernel.org, willemdebruijn.kernel@gmail.com,
- willemb@google.com, ast@kernel.org, daniel@iogearbox.net, andrii@kernel.org,
- eddyz87@gmail.com, song@kernel.org, yonghong.song@linux.dev,
- john.fastabend@gmail.com, kpsingh@kernel.org, sdf@fomichev.me,
- haoluo@google.com, jolsa@kernel.org, horms@kernel.org, bpf@vger.kernel.org,
- netdev@vger.kernel.org
-References: <20250208103220.72294-1-kerneljasonxing@gmail.com>
- <20250208103220.72294-5-kerneljasonxing@gmail.com>
-Content-Language: en-US
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Martin KaFai Lau <martin.lau@linux.dev>
-In-Reply-To: <20250208103220.72294-5-kerneljasonxing@gmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Migadu-Flow: FLOW_OUT
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-ClientProxiedBy: EX19D041UWA004.ant.amazon.com (10.13.139.9) To
+ EX19D004ANA001.ant.amazon.com (10.37.240.138)
 
-On 2/8/25 2:32 AM, Jason Xing wrote:
-> Considering the potential invalid access issues, calling
-> bpf_sock_ops_setsockopt/getsockopt, bpf_sock_ops_cb_flags_set,
-> and the bpf_sock_ops_load_hdr_opt in the new timestamping
-> callbacks will return -EOPNOTSUPP error value.
+rtnl_lock() is a "Big Kernel Lock" in the networking slow path
+and still serialises most of RTM_(NEW|DEL|SET)* rtnetlink requests.
 
-The "why" part is mostly missing. Why they are not safe to be used in the TX 
-timestamping callbacks?
+Commit 76aed95319da ("rtnetlink: Add per-netns RTNL.") started a
+very large, in-progress, effort to make the RTNL lock scope per
+network namespace.
 
-> 
-> It also prevents the UDP socket trying to access TCP fields in
-> the bpf extension for SO_TIMESTAMPING for the same consideration.
-Let's remove this UDP part to avoid confusion. UDP has very little to do with 
-disabling the helpers here.
+However, there are still some patches that newly use rtnl_lock(),
+which is now discouraged, and we need to revisit it later.
 
-"BPF_CALL" in the subject is not clear either. "BPF_CALL" can mean many things, 
-such as calling BPF helpers, calling BPF kfuncs, or calling its own BPF 
-subprograms, etc. In this case, it is the calling BPF helpers.
+Let's warn about the case by checkpatch.
 
-(Subject)
-bpf: Disable unsafe helpers in TX timestamping callbacks
+The target functions are as follows:
 
-(Why)
-New TX timestamping sock_ops callbacks will be added in the subsequent patch. 
-Some of the existing BPF helpers will not be safe to be used in the TX 
-timestamping callbacks.
+  * rtnl_lock()
+  * rtnl_trylock()
+  * rtnl_lock_interruptible()
+  * rtnl_lock_killable()
 
-The bpf_sock_ops_setsockopt, bpf_sock_ops_getsockopt, and 
-bpf_sock_ops_cb_flags_set require owning the sock lock. TX timestamping 
-callbacks will not own the lock.
+and the warning will be like:
 
-The bpf_sock_ops_load_hdr_opt needs the skb->data pointing to the TCP header. 
-This will not be true in the TX timestamping callbacks.
+  WARNING: A new use of rtnl_lock() variants is discouraged, try to use rtnl_net_lock(net) variants
+  #18: FILE: net/core/rtnetlink.c:79:
+  +	rtnl_lock();
 
-(What and How)
-At the beginning of these helpers, this patch checks the bpf_sock->op to ensure 
-these helpers are used by the existing sock_ops callbacks only.
+Signed-off-by: Kuniyuki Iwashima <kuniyu@amazon.com>
+---
+It would be nice if this patch goes through net-next.git to catch
+new rtnl_lock() users by netdev CI.
+---
+ scripts/checkpatch.pl | 6 ++++++
+ 1 file changed, 6 insertions(+)
+
+diff --git a/scripts/checkpatch.pl b/scripts/checkpatch.pl
+index 7b28ad331742..09d5420436cc 100755
+--- a/scripts/checkpatch.pl
++++ b/scripts/checkpatch.pl
+@@ -6995,6 +6995,12 @@ sub process {
+ #			}
+ #		}
+ 
++# A new use of rtnl_lock() is discouraged as it's being converted to rtnl_net_lock(net).
++		if ($line =~ /^\+.*\brtnl_(try)?lock(_interruptible|_killable)?\(\)/) {
++			WARN("rtnl_lock()",
++			     "A new use of rtnl_lock() variants is discouraged, try to use rtnl_net_lock(net) variants\n" . $herecurr);
++		}
++
+ # strcpy uses that should likely be strscpy
+ 		if ($line =~ /\bstrcpy\s*\(/) {
+ 			WARN("STRCPY",
+-- 
+2.39.5 (Apple Git-154)
 
 
