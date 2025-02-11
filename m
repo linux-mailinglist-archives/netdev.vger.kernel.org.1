@@ -1,50 +1,90 @@
-Return-Path: <netdev+bounces-165144-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-165145-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 67546A30AEB
-	for <lists+netdev@lfdr.de>; Tue, 11 Feb 2025 13:00:10 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id E3B0AA30AFC
+	for <lists+netdev@lfdr.de>; Tue, 11 Feb 2025 13:01:46 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 274AE3A7BE5
-	for <lists+netdev@lfdr.de>; Tue, 11 Feb 2025 12:00:01 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 905161655D8
+	for <lists+netdev@lfdr.de>; Tue, 11 Feb 2025 12:01:45 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 54E691FBCBC;
-	Tue, 11 Feb 2025 12:00:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6CDA11FAC3B;
+	Tue, 11 Feb 2025 12:01:43 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Jf0Un9f6"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="bksaGsBj"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wr1-f47.google.com (mail-wr1-f47.google.com [209.85.221.47])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 253761FAC5E;
-	Tue, 11 Feb 2025 12:00:07 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9ECE71F1527;
+	Tue, 11 Feb 2025 12:01:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.47
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1739275208; cv=none; b=CI81fppTL0VbPJfy4CqmTqZI17knb9txLr2rdENuQA3COo6j160G6EeAEJlsey3bD3UaNi+VZpK8iFVlksMIdwZXNGLKDDLqcZFZNea3bIksyUJiHCtnqEm9mwe23p0jG97rhyP/3Ev2sVEtmWOXfqfEDMbAI/sWniXBGn27rEs=
+	t=1739275303; cv=none; b=FjtPxSlEC4sxZh2kX1NEybP4SUBYi/LAtW8NAwBqNQfp2WrZyB1977dbiQlDGVUhTsk5WRepWc666QhVQVczv8luy5kkbuiYqiAF2sMMI/gx72hOWsZ0vu1ay1KQqW/L+kHV6mRKiwpxfKNyvIt2F9v1RItQlPTy67TWPRApu6Q=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1739275208; c=relaxed/simple;
-	bh=DxNubQ82BSZPNr9Q4aWGZXDD+6hlE4NvdnH2GOjIkYo=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=G0ALPTfkgcdOiF7h0IdBxC4rg0BEzZj/F5qfxejJbBRsYmasAYOdyTb6wymvz8A4g2fkL4RgSfJqfo+JI9P0lQk8pXet6sIIryuFI5o5GlUc4VC4ZVSGNljWPnSjXWN/C/RwXpw5mywB9u3WyABKkr3nH5aXxWoMokfUxWUqFv0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Jf0Un9f6; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 86DE0C4CEDD;
-	Tue, 11 Feb 2025 12:00:07 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1739275207;
-	bh=DxNubQ82BSZPNr9Q4aWGZXDD+6hlE4NvdnH2GOjIkYo=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=Jf0Un9f6fgt+xsHQoEewcvtt/PmxnSTl1blNMwfN5II1phCl8yqyQwLCLS9JlxK0G
-	 4kP0z5LkzO9/9hwJZI6uCBHiVJG6SiMgnWNf3LXnqBNLZRVVdhd2nskkNBBaxNIh2V
-	 yfyPpKnTO1tp/dQl3nUTpQa96DdWrEHHRyWZQiPpPHaeKV7zW9fCA+19Rt4qK5NFG8
-	 1M+vxEyQioFukQ7S4Hbas7Dp9SIsc7ozN3ilbrUrXnsHmZpuLnNBBCDUeTjvMGbn95
-	 l6yMnhw7cZj6BCy1oh2fQH8cXEDx0YRWpoRDgLRC+FdS37SJ5W9Ab8qrIwlnF65UDR
-	 buECrlJffpq1Q==
-Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 70F61380AA7A;
-	Tue, 11 Feb 2025 12:00:37 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=arc-20240116; t=1739275303; c=relaxed/simple;
+	bh=7VXKGckgTXLQbLZqlx3iFOFqY1BCkUS116vkLEJFdoA=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=mu/K1G51ZSKFPUlEgiMJFzitAWFbA2IcERlK4GEaEIIKBUG5r897QhLWZB3aIflzt/K6Ib32c1QCPoDmvn3ZOgQ3GmDOXqCVlbF3hWP+MAArq2sq8Lt3F8n8Dwy/NFl28hc2GWk5GdNRoM0JWxQTCiCLdOVJ4WU0eq+W6BRAdXY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=bksaGsBj; arc=none smtp.client-ip=209.85.221.47
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-wr1-f47.google.com with SMTP id ffacd0b85a97d-38dc0cd94a6so2571699f8f.0;
+        Tue, 11 Feb 2025 04:01:41 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1739275299; x=1739880099; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=vGTkgcpu6GeYJOfp2a5cUV6YJapwz25ukuoDqvZXbzc=;
+        b=bksaGsBj0nK4F40kvHQtzFp+MJjJCkRq6CyRj+wJ3UKrrTDIBkDeEF5MQBjXsHr2TW
+         Aq5Ql3kFpActvwnA6I2h4e6bDt1kxME/VnnqC0LVDTUVyAx7DE6CKr4C8kv5LqV77dBr
+         vZ8h1PhcUOfER/CXbPW0RX+IWW24ErPxleV7TUgxcDEbId61E9fboXnbNGZ8wX3QwpIF
+         rDLcCAXH+6IA7aTHRy5Gbzvwh8IKaIk7TsC667hCLRDNs9ExX4RAHLl7LbJ87zViVh1W
+         WYI4wIN3E5BhSfTya7eyEMN2OnokWbOXZZCJwJr6nMLKDUxg4VVR3v59EeS+1qC6nCJK
+         zwtw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1739275299; x=1739880099;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=vGTkgcpu6GeYJOfp2a5cUV6YJapwz25ukuoDqvZXbzc=;
+        b=Lqafs11jUmsAtAAuiSrBrBccTl+DHR2MWgXmBc0nr1ceTCty/yw0TFWZQmE2cavFdR
+         B0mgW6w9MbFwn8evCgCtQo3cPp9L+EYwJgU3K+yLzP74DBqVvS7iiWhszyGfRwORq0P5
+         XNKmrc0v8ZEKVv3kI+pIMyA137QeyBVXvtRkjIJhTgvQUyLW7y6GBwDB2/erQz91LIev
+         wGXx9whdesoEfZXHYt07xVdPZ9FJ2AZENBmjrjSpDHsIumWBc0qhN+0g8yO6fIEZl0WX
+         Zqo++jGVX+KoNq6qC05wKAaPOJsdB9IRJA6+RQ8iaRLx7uvu6V0zgU2FOIVB4rq/AnEa
+         Bj6g==
+X-Forwarded-Encrypted: i=1; AJvYcCWlCU5iuVG5pwRpMCcg+57lxwOmVHbTeIULmz0/8m1FDSHBt/dqDaSpAlHf0lmUiRAKFwSxekibPdENQEBGwA==@vger.kernel.org
+X-Gm-Message-State: AOJu0Yx5YDyGipEl8IxSIuLXfcCcquTkO8pD8yP0pUKH3rPaGBP/qqTv
+	t8Rqc5DHv05R8OM91Ckon2hnikJBsTP6SMWyO615FEcMODt/AGX7bQ9gDQ==
+X-Gm-Gg: ASbGnctdMGOh79fFbYLaoTfC5+Cta3etOXalfHGEQLfkWXaIRpdfMSZ83+1heZn7IJq
+	STBaSqftNEYqdXodaf+GwF6R4sD53dCe4qq18gopNdqbbqxHkEJ4LVPBff9S55Rnm41GRkWcU0T
+	7BoFz9BDSnFefmjvEMvrxxcL0OcrFOykCIHzA+WmiDob5w9oFqblGH2earjmleat2EizEcw2oxB
+	MiXY8pJ21wtcX8buer9HiUn/FtcFYvhaGO2MVy1OkmjqBLvtGRP66QIQzjMXBKfWP8rjevM3A9u
+	1jac//cgDznye+F4xrkoNChUq8aUUlPbxg==
+X-Google-Smtp-Source: AGHT+IHklZt/L+K1Pi0r69p1vzW7qCqNjL9dPtnefYnt86yYASF/hehFOcELaLocy6p+vuyK5ShRvg==
+X-Received: by 2002:a05:6000:1883:b0:385:f7ef:a57f with SMTP id ffacd0b85a97d-38dc9233968mr14206414f8f.27.1739275299332;
+        Tue, 11 Feb 2025 04:01:39 -0800 (PST)
+Received: from imac.lan ([2a02:8010:60a0:0:ac07:4372:f96c:546e])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-38dc933ff9fsm12466658f8f.96.2025.02.11.04.01.38
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 11 Feb 2025 04:01:38 -0800 (PST)
+From: Donald Hunter <donald.hunter@gmail.com>
+To: netdev@vger.kernel.org,
+	Jakub Kicinski <kuba@kernel.org>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Simon Horman <horms@kernel.org>,
+	Johannes Berg <johannes@sipsolutions.net>,
+	linux-wireless@vger.kernel.org
+Cc: donald.hunter@redhat.com,
+	Donald Hunter <donald.hunter@gmail.com>
+Subject: [PATCH net-next v5 00/10] netlink: specs: add a spec for nl80211 wiphy
+Date: Tue, 11 Feb 2025 12:01:17 +0000
+Message-ID: <20250211120127.84858-1-donald.hunter@gmail.com>
+X-Mailer: git-send-email 2.48.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -52,70 +92,56 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net-next v3 00/15] mptcp: pm: misc cleanups, part 2
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <173927523626.4027827.1076693017347574469.git-patchwork-notify@kernel.org>
-Date: Tue, 11 Feb 2025 12:00:36 +0000
-References: <20250207-net-next-mptcp-pm-misc-cleanup-2-v3-0-71753ed957de@kernel.org>
-In-Reply-To: <20250207-net-next-mptcp-pm-misc-cleanup-2-v3-0-71753ed957de@kernel.org>
-To: Matthieu Baerts (NGI0) <matttbe@kernel.org>
-Cc: mptcp@lists.linux.dev, martineau@kernel.org, geliang@kernel.org,
- davem@davemloft.net, edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
- horms@kernel.org, netdev@vger.kernel.org, linux-kernel@vger.kernel.org
 
-Hello:
+Add a rudimentary YNL spec for nl80211 that includes get-wiphy and
+get-interface, along with some required enhancements to YNL and the
+netlink schemas.
 
-This series was applied to netdev/net-next.git (main)
-by Paolo Abeni <pabeni@redhat.com>:
+Patch 1 is a minor cleanup to prepare for patch 2
+Patches 2-4 are new features for YNL
+Patches 5-7 are updates to ynl_gen_c
+Patches 8-9 are schema updates for feature parity
+Patch 10 is the new nl80211 spec
 
-On Fri, 07 Feb 2025 14:59:18 +0100 you wrote:
-> These cleanups lead the way to the unification of the path-manager
-> interfaces, and allow future extensions. The following patches are not
-> all linked to each others, but are all related to the path-managers.
-> 
-> - Patch 1: drop unneeded parameter in a function helper.
-> 
-> - Patch 2: clearer NL error message when an NL attribute is missing.
-> 
-> [...]
+v4 -> v5
+ - Rename nl80211-iftype-attrs -> iftype-attrs, thanks Paolo
 
-Here is the summary with links:
-  - [net-next,v3,01/15] mptcp: pm: drop info of userspace_pm_remove_id_zero_address
-    https://git.kernel.org/netdev/net-next/c/a9d71b5de76c
-  - [net-next,v3,02/15] mptcp: pm: userspace: flags: clearer msg if no remote addr
-    https://git.kernel.org/netdev/net-next/c/58b21309f97b
-  - [net-next,v3,03/15] mptcp: pm: more precise error messages
-    https://git.kernel.org/netdev/net-next/c/891a87f7a76c
-  - [net-next,v3,04/15] mptcp: pm: improve error messages
-    https://git.kernel.org/netdev/net-next/c/b2bdec19beec
-  - [net-next,v3,05/15] mptcp: pm: userspace: use GENL_REQ_ATTR_CHECK
-    https://git.kernel.org/netdev/net-next/c/07bfabf8407b
-  - [net-next,v3,06/15] mptcp: pm: remove duplicated error messages
-    https://git.kernel.org/netdev/net-next/c/60097f03fc7a
-  - [net-next,v3,07/15] mptcp: pm: mark missing address attributes
-    https://git.kernel.org/netdev/net-next/c/8cdc56f99e6c
-  - [net-next,v3,08/15] mptcp: pm: use NL_SET_ERR_MSG_ATTR when possible
-    https://git.kernel.org/netdev/net-next/c/a25a8b10491b
-  - [net-next,v3,09/15] mptcp: pm: make three pm wrappers static
-    https://git.kernel.org/netdev/net-next/c/7aeab89b090f
-  - [net-next,v3,10/15] mptcp: pm: drop skb parameter of get_addr
-    https://git.kernel.org/netdev/net-next/c/67dcf6592544
-  - [net-next,v3,11/15] mptcp: pm: add id parameter for get_addr
-    https://git.kernel.org/netdev/net-next/c/d47b80758f4c
-  - [net-next,v3,12/15] mptcp: pm: reuse sending nlmsg code in get_addr
-    https://git.kernel.org/netdev/net-next/c/8556f4aecc9a
-  - [net-next,v3,13/15] mptcp: pm: drop skb parameter of set_flags
-    https://git.kernel.org/netdev/net-next/c/2c8971c04f74
-  - [net-next,v3,14/15] mptcp: pm: change rem type of set_flags
-    https://git.kernel.org/netdev/net-next/c/ab5723599cfd
-  - [net-next,v3,15/15] mptcp: pm: add local parameter for set_flags
-    https://git.kernel.org/netdev/net-next/c/c7f25f7987c0
+v3 -> v4
+ - Simplify the leading digit check in p6, thanks Jakub
+ - Fix a typo in the nl80211 spec, thanks Johannes
 
-You are awesome, thank you!
+v2 -> v3
+ - Updates to spec and codegen to clean up compiler
+   errors in generated nl80211-user.[ch]
+
+v1 -> v2
+ - Add formatting hints support to patch 3, thanks Jakub
+ - Raise exception for unhandled hints in patch 4, thanks Jakub
+ - Update nl80211 spec w/ split-wiphy-dump in patch 7, thanks Johannes
+
+Donald Hunter (10):
+  tools/net/ynl: remove extraneous plural from variable names
+  tools/net/ynl: support decoding indexed arrays as enums
+  tools/net/ynl: support rendering C array members to strings
+  tools/net/ynl: accept IP string inputs
+  tools/net/ynl: add s8, s16 to valid scalars in ynl-gen-c
+  tools/net/ynl: sanitise enums with leading digits in ynl-gen-c
+  tools/net/ynl: add indexed-array scalar support to ynl-gen-c
+  netlink: specs: support nested structs in genetlink legacy
+  netlink: specs: add s8, s16 to genetlink schemas
+  netlink: specs: wireless: add a spec for nl80211
+
+ Documentation/netlink/genetlink-c.yaml      |    2 +-
+ Documentation/netlink/genetlink-legacy.yaml |    5 +-
+ Documentation/netlink/genetlink.yaml        |    2 +-
+ Documentation/netlink/specs/nl80211.yaml    | 2000 +++++++++++++++++++
+ tools/net/ynl/Makefile.deps                 |    1 +
+ tools/net/ynl/pyynl/lib/ynl.py              |   46 +-
+ tools/net/ynl/pyynl/ynl_gen_c.py            |   28 +-
+ 7 files changed, 2063 insertions(+), 21 deletions(-)
+ create mode 100644 Documentation/netlink/specs/nl80211.yaml
+
 -- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
-
+2.48.1
 
 
