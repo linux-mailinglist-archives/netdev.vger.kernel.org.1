@@ -1,186 +1,152 @@
-Return-Path: <netdev+bounces-165078-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-165079-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 17614A30545
-	for <lists+netdev@lfdr.de>; Tue, 11 Feb 2025 09:08:47 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id C29AEA30547
+	for <lists+netdev@lfdr.de>; Tue, 11 Feb 2025 09:09:12 +0100 (CET)
 Received: from smtp.subspace.kernel.org (relay.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-ECDSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 61BA4164453
-	for <lists+netdev@lfdr.de>; Tue, 11 Feb 2025 08:08:41 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 6FF9B163D19
+	for <lists+netdev@lfdr.de>; Tue, 11 Feb 2025 08:09:11 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 498A01EE7A9;
-	Tue, 11 Feb 2025 08:08:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7D1DA1EDA2B;
+	Tue, 11 Feb 2025 08:09:09 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="FFMSn8vF"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="WUpIj5Fh"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-il1-f173.google.com (mail-il1-f173.google.com [209.85.166.173])
+Received: from mail-ed1-f46.google.com (mail-ed1-f46.google.com [209.85.208.46])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A1DBF1EE039;
-	Tue, 11 Feb 2025 08:08:39 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.173
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A98EE1EDA18
+	for <netdev@vger.kernel.org>; Tue, 11 Feb 2025 08:09:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.46
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1739261321; cv=none; b=JZi1qtjMep8lqHomL7ZoU2Bz96BpIVnTCt8zwXcT1by2clAjL4jxqWTONLFT/9JQouynDrXwcfHbPt5qBGqugbLz2NHQPzJFA86eV2Lad+VbmT/KDpmOlmLiJAFkEE46aDULhFLWAV3y9GJzlO6L/T7Oqtv4Yl8PdT35fswoJzs=
+	t=1739261349; cv=none; b=s+C5GAHQW6n7vL056LwzElLGjvPudknu4BxHfV8V4j+SLW/yeGxKH47KRLouOSMj1RRAEa5prkqkIboO2re1b1K/7KVqxcJTuuev5iUfGkwk5IrI/0Z4AzjXb5vsiCLsOdbV+9AxunHg/zR1CFKbnzszxW5cQaKJsgLwxKRI9gQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1739261321; c=relaxed/simple;
-	bh=TI6fDrgKY+b/NDlj/UdB9z0v9/To2V5obkuwSf4c8/w=;
+	s=arc-20240116; t=1739261349; c=relaxed/simple;
+	bh=EIHK36EHvqXNfJShR0B6u2xH5/sGyZjJj6voLm7Sn1w=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=KEI5QE1uRQDE93IwqbYbsGY22RiSEwMWygUHwYg3sN+ZgXq9FBG6e5VLMSEzfMuoUCHfV/sObcf0Kd+ownYEJuZ90cOxBYO5DXs7OsgHi7laGNlg5VUd2BH2LbezQ3XDXZzmivmnt7UnOqlWcbvElraffNAM8RaMj/36Nq01h6w=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=FFMSn8vF; arc=none smtp.client-ip=209.85.166.173
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-il1-f173.google.com with SMTP id e9e14a558f8ab-3cfe17f75dfso49760325ab.2;
-        Tue, 11 Feb 2025 00:08:39 -0800 (PST)
+	 To:Cc:Content-Type; b=OUowGdCBbBny7Rk+AgXixV1y/MFRX1LoNLLsY0OBfbpLVDEl6c+rUWph3pqUJXCWireOgTNt29PDbQFzYY4qdJ1990GI9Zktb4klnjScOngg0pol9JiVu9/YcpjW5dhyXvbj/oqqHq1s43hcCfu66audAhvNQXD+z7BJCYI01bo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=WUpIj5Fh; arc=none smtp.client-ip=209.85.208.46
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-ed1-f46.google.com with SMTP id 4fb4d7f45d1cf-5de5a853090so6230299a12.3
+        for <netdev@vger.kernel.org>; Tue, 11 Feb 2025 00:09:07 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1739261318; x=1739866118; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1739261346; x=1739866146; darn=vger.kernel.org;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=TI6fDrgKY+b/NDlj/UdB9z0v9/To2V5obkuwSf4c8/w=;
-        b=FFMSn8vFOXk3SyEY0EUYMlQvU3y+pgVvjMUEXU9LMNz7eDdxSCB+tBss8yummTUBT8
-         2DABw/tJ4fXbGEnIXH6RByhxEX7hagoIS6HLNX0XLnTsd+/1bTFiVyaXsTjKXdoxDz5o
-         prgiCNCa9HMo/21TzfB1rGHl5B9RTu0EPCVJmuWVndsUEhBlufncAKeup+NceiAFavhH
-         EmfPqdLe95ZDQwGcY5o3/xJn2408ajgChBIPmB3zLYLb/63L/Av+esz8ETHO51qeBW09
-         CdzFdv1IjWiS81rmkxogcbTrWjWs2np34E0vFmpy8myb76KWAV8CTb5wEEjK3IvPFjQc
-         8uEA==
+        bh=HG6e8unvP83ksHQWgChsby1Eosod0PJ4WdLiUX1sgbs=;
+        b=WUpIj5FhA4gA360g/pYx77xqVU7CfWZ0L5PVnA7jMApQEODN8sR6CNhaSFjvsqHgwf
+         aoG7ptXyZiPt5O75Sr90VUchV6Ct54Tkb3KNa5oQiV3Lf9o9hc6bIJ3xxcvPRbdDvdBT
+         zsxmj7PAa4cbRNgCIS9AKTSqVVV0KIoSDaZa1I4KPPiy0CpnapqomM2Hajlk1rFlx9UZ
+         ufB/YuCPqtXaMhM4gW9MgifBDf9KeGaxpu/BFqSo9G+SGmngZq+6F21fbR7s9mECliug
+         HqOJXI+Ofphx+bk0I0tbeVxXlwrSVWvjNMUZ682QrIz2Ml/kY0yIZe4RboZ7aUFswMrK
+         zn8Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1739261318; x=1739866118;
+        d=1e100.net; s=20230601; t=1739261346; x=1739866146;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=TI6fDrgKY+b/NDlj/UdB9z0v9/To2V5obkuwSf4c8/w=;
-        b=PewXsPUJWKYVh2DFUZ347slSYSJdfYGXE1WIrksI70yRgL/2r5F2Gt74EBOFyqHppK
-         Bm8HGBJ/I1hna8AvBe1c8PiN/NHgfmBtdtbSf+NadzoZv1y8dwyTs5FB2554nL/66zvq
-         T4t8k/Py7XhSH3IIrDiHBlpSgPEDG1H2x21xU3MoXTshUlvGr33VQsdSMVA5cvt0ag74
-         gRawRY/UHwJdN37k8jPx7qkOuQoDwXvsDt5ZsDhPkeTa7+BhrCuP8r/Bqct9AP3SLCqM
-         yOlYw4MJGjE8Ty185q3sb9jjIt/Hjs3sFYqHERHvV/CoepaNm+WMHJWjxqffHbLvtFkb
-         GH9g==
-X-Forwarded-Encrypted: i=1; AJvYcCVBVTTlbbfVYQHvN+hrtK9aclfdEyBvbmQTVvPte+AurNPjyD9Cy+dSnqExlEEx8Cpa0Mbu64i8@vger.kernel.org, AJvYcCVxvrQAPFRRFT/02yC9BCkP00t78K2h9IIIs6+xIUaCw5QfcagYTfPnxVYaFOhnmQKa6/k=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yw4l4uIqcJGC3Vly0zrBje5cUduYr67UDtb/c8trxLDaZHktyfW
-	5R6i60Su/Dm6sfYX6skx/6viB+K3iTSuhJ0/M3T9LZacVvxirSvadjxj+5QfOpqFGD0h24q5Z+6
-	wPe6CCXjfcnwvcYKbDEL/SBqAVo1BVgHwtAZJ5A==
-X-Gm-Gg: ASbGncsF7hZWV4mlhcQza+pJvOW4MD9iFK24Ulh9DrNCnoybyH3no3eDmigsZutsmkA
-	8HtNMsP99Bs6ZDrhMwLK4JkrCetePjAMNDOvB0qF/BeZnwOtBqNKRGnRXNxqbZLntHIJ1s1DR
-X-Google-Smtp-Source: AGHT+IFISN4Tn+1MYaghN7liU6DZ8QD/mF3xm5GjM7HQZg2cRUlZjdRZJGpFh3xSDV+hm9FZvZpj2Api8hh385h3fDQ=
-X-Received: by 2002:a05:6e02:3304:b0:3d0:f31:3657 with SMTP id
- e9e14a558f8ab-3d13da2284bmr146513495ab.0.1739261318679; Tue, 11 Feb 2025
- 00:08:38 -0800 (PST)
+        bh=HG6e8unvP83ksHQWgChsby1Eosod0PJ4WdLiUX1sgbs=;
+        b=if9MhfBTEo18aFgL03db7GcES6cZhfLeUy1G2OOOB9bAJdxW800K7FJV5Hs1faVJMH
+         U1XQWLwF7osF6Q1qBI7/c2FDybumznHrkYG1gYY66eAf8uv6fwub2MoHdjWrHsDPW+po
+         5hDxvDnOz2hi3K2STeMRqgf1WEx30xGXptcJK/Yu2jJ9I6SbOE1kC4lO+4GOf+k3xfey
+         RC3DCk/1PK2/eSROxRxVKUWVpah0zM2osmZ4y6pkzweBUNhEyHCIVLIby7yT06Gy4RvK
+         HtgIjeDtA4XgVXM/Wn+PeMJ+cD3YPQq+HiqiKVj3ZVXlaAF/IwHNG51wE9HyPwmeh1QJ
+         Y0GQ==
+X-Forwarded-Encrypted: i=1; AJvYcCUtRjZlm2nXkDhjbizVhFOFbNc7RujlGRHJaaaIWPNMGImMa6d3rVNDji0+mtaSTepESaaTLz4=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yx7iEELkAgKt/Nuxa3eXsRkRhUoPQHdteFFberpBvZDyA8bRKe1
+	qgUj6kfaJB8qV6mJJXJgojm8eFj/498F5Wve5eaFpacvLm0fvotgX4lIjUJqfcImrmOIk0lp7Ju
+	QuUOr1odES63Z2RUQ4KHiceij23SRDhyeEYTd
+X-Gm-Gg: ASbGncuBBKN+8DFUWx0z73sAdQd35cKIBtuRcSVg6+Vz9Vq2xzVKEG/4CMJdO4YTk0C
+	4Cf6Miyq24I0LiwM+uSe3JMx/uY329RCby0x6c/V2jnZAFfI21chxeaPLDX6ev4T4cavJC28=
+X-Google-Smtp-Source: AGHT+IFZee0T89qKM+2ftfmr4a8W0Sn7ggCuC444PBKTPKa0TpgDX8mI00sV+QdxN+ESxeEaMsekt+Ystzz/L3N2nyg=
+X-Received: by 2002:a05:6402:3510:b0:5de:5947:ea35 with SMTP id
+ 4fb4d7f45d1cf-5de5947eab6mr14037700a12.25.1739261345681; Tue, 11 Feb 2025
+ 00:09:05 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20250208103220.72294-1-kerneljasonxing@gmail.com>
- <20250208103220.72294-4-kerneljasonxing@gmail.com> <1ac825c7-e685-4363-ba9d-db0d983ce9f2@linux.dev>
-In-Reply-To: <1ac825c7-e685-4363-ba9d-db0d983ce9f2@linux.dev>
-From: Jason Xing <kerneljasonxing@gmail.com>
-Date: Tue, 11 Feb 2025 16:08:02 +0800
-X-Gm-Features: AWEUYZn6rGNOv8K-2LTL-Ex62_gfXnAZns_M2wwZ6hro5JLT5yuU6jEgmqg_eMw
-Message-ID: <CAL+tcoDVGLnoWSSg7TGjnQDvq+etUy6m=XBUBDDmcQZp3GQ1bA@mail.gmail.com>
-Subject: Re: [PATCH bpf-next v9 03/12] bpf: stop unsafely accessing TCP fields
- in bpf callbacks
-To: Martin KaFai Lau <martin.lau@linux.dev>
-Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org, 
-	pabeni@redhat.com, dsahern@kernel.org, willemdebruijn.kernel@gmail.com, 
-	willemb@google.com, ast@kernel.org, daniel@iogearbox.net, andrii@kernel.org, 
-	eddyz87@gmail.com, song@kernel.org, yonghong.song@linux.dev, 
-	john.fastabend@gmail.com, kpsingh@kernel.org, sdf@fomichev.me, 
-	haoluo@google.com, jolsa@kernel.org, horms@kernel.org, bpf@vger.kernel.org, 
-	netdev@vger.kernel.org
+References: <20250210082805.465241-1-edumazet@google.com> <20250210082805.465241-5-edumazet@google.com>
+ <67aabc5aea2eb_881f329441@willemb.c.googlers.com.notmuch>
+In-Reply-To: <67aabc5aea2eb_881f329441@willemb.c.googlers.com.notmuch>
+From: Eric Dumazet <edumazet@google.com>
+Date: Tue, 11 Feb 2025 09:08:54 +0100
+X-Gm-Features: AWEUYZlcy_kS6VrXQ4VNvdG863uJ1heRn64upn1OxCxhvJVlKRWOewPKxDOzKY0
+Message-ID: <CANn89iKh1xww10fQtcZEWBdOCYTxX98eMPOZ_5guBtYwwZvduw@mail.gmail.com>
+Subject: Re: [PATCH net-next 4/4] udp: use EXPORT_IPV6_MOD[_GPL]()
+To: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
+Cc: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
+	Paolo Abeni <pabeni@redhat.com>, netdev@vger.kernel.org, 
+	Willem de Bruijn <willemb@google.com>, Simon Horman <horms@kernel.org>, eric.dumazet@gmail.com
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-On Tue, Feb 11, 2025 at 2:34=E2=80=AFPM Martin KaFai Lau <martin.lau@linux.=
-dev> wrote:
+On Tue, Feb 11, 2025 at 3:56=E2=80=AFAM Willem de Bruijn
+<willemdebruijn.kernel@gmail.com> wrote:
 >
-> On 2/8/25 2:32 AM, Jason Xing wrote:
-> > The "is_locked_tcp_sock" flag is added to indicate that the callback
-> > site has a tcp_sock locked.
->
-> It should mention that the later TX timestamping callbacks will not own t=
-he
-> lock. This is what this patch is primarily for. We know the background, b=
-ut
-> future code readers may not. We will eventually become the readers of thi=
-s patch
-> in a few years' time.
->
+> Eric Dumazet wrote:
+> > Use EXPORT_IPV6_MOD[_GPL]() for symbols that don't need
+> > to be exported unless CONFIG_IPV6=3Dm
 > >
-> > Apply the new member is_locked_tcp_sock in the existing callbacks
->
-> It is hard to read "Apply the new member....". "Apply" could mean a few t=
-hings.
-> "Set to 1" is clearer.
->
->
-> > where is_fullsock is set to 1 can stop UDP socket accessing struct
->
-> The UDP part is future proof. This set does not support UDP which has to =
-be
-> clear in the commit message. This has been brought up before also.
->
-> > tcp_sock and stop TCP socket without sk lock protecting does the
-> > similar thing, or else it could be catastrophe leading to panic.
+> > udp_table is no longer used from any modules, and does not
+> > need to be exported anyway.
 > >
-> > To keep it simple, instead of distinguishing between read and write
-> > access, users aren't allowed all read/write access to the tcp_sock
-> > through the older bpf_sock_ops ctx. The new timestamping callbacks
-> > can use newer helpers to read everything from a sk (e.g. bpf_core_cast)=
-,
-> > so nothing is lost.
+> > Signed-off-by: Eric Dumazet <edumazet@google.com>
 >
-> (Subject):
-> bpf: Prevent unsafe access to the sock fields in the BPF timestamping cal=
-lback
->
-> (Why):
-> The subsequent patch will implement BPF TX timestamping. It will call the
-> sockops BPF program without holding the sock lock.
->
-> This breaks the current assumption that all sock ops programs will hold t=
-he sock
-> lock. The sock's fields of the uapi's bpf_sock_ops requires this assumpti=
-on.
->
-> (What and How):
-> To address this,
-> a new "u8 is_locked_tcp_sock;" field is added. This patch sets it in the =
-current
-> sock_ops callbacks. The "is_fullsock" test is then replaced by the
-> "is_locked_tcp_sock" test during sock_ops_convert_ctx_access().
->
-> The new TX timestamping callbacks added in the subsequent patch will not =
-have
-> this set. This will prevent unsafe access from the new timestamping callb=
-acks.
->
-> Potentially, we could allow read-only access. However, this would require
-> identifying which callback is read-safe-only and also requires additional=
- BPF
-> instruction rewrites in the covert_ctx. Since the BPF program can always =
-read
-> everything from a socket (e.g., by using bpf_core_cast), this patch keeps=
- it
-> simple and disables all read and write access to any socket fields throug=
-h the
-> bpf_sock_ops UAPI from the new TX timestamping callback.
->
-> Moreover, note that some of the fields in bpf_sock_ops are specific to tc=
-p_sock,
-> and sock_ops currently only supports tcp_sock. In the future, UDP timesta=
-mping
-> will be added, which will also break this assumption. The same idea used =
-in this
-> patch will be reused. Considering that the current sock_ops only supports
-> tcp_sock, the variable is named is_locked_"tcp"_sock.
+> Should udp_disconnect be included?
 
-Thanks so much for polishing the commit message. I appreciate it!
+Yes, it can.
 
-Will adjust it.
+>
+> And perhaps udp_encap_needed_key. The only real user is static inline
+> udp_unexpected_gso, itself only used in core udp code. But not sure if
+> it would cause build errors.
+>
 
-Thanks,
-Jason
+udp_encap_needed_key and udpv6_encap_needed_key can both get the new
+macro, thanks
+
+> With those minor asides
+>
+> Acked-by: Willem de Bruijn <willemb@google.com>
+
+I will squash the following in v2, thanks !
+
+diff --git a/net/ipv4/udp.c b/net/ipv4/udp.c
+index 73ac614beb109146c5635aeeb10c2e9f77a6ee1c..3485989cd4bdec96e8cb7ecb28b=
+68a25c3444a96
+100644
+--- a/net/ipv4/udp.c
++++ b/net/ipv4/udp.c
+@@ -808,11 +808,11 @@ static inline bool __udp_is_mcast_sock(struct
+net *net, const struct sock *sk,
+ }
+
+ DEFINE_STATIC_KEY_FALSE(udp_encap_needed_key);
+-EXPORT_SYMBOL(udp_encap_needed_key);
++EXPORT_IPV6_MOD(udp_encap_needed_key);
+
+ #if IS_ENABLED(CONFIG_IPV6)
+ DEFINE_STATIC_KEY_FALSE(udpv6_encap_needed_key);
+-EXPORT_SYMBOL(udpv6_encap_needed_key);
++EXPORT_IPV6_MOD(udpv6_encap_needed_key);
+ #endif
+
+ void udp_encap_enable(void)
+@@ -2185,7 +2185,7 @@ int udp_disconnect(struct sock *sk, int flags)
+        release_sock(sk);
+        return 0;
+ }
+-EXPORT_SYMBOL(udp_disconnect);
++EXPORT_IPV6_MOD(udp_disconnect);
+
+ void udp_lib_unhash(struct sock *sk)
+ {
 
